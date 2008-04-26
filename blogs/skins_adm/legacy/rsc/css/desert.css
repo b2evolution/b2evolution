@@ -8,7 +8,7 @@
  * @package admin
  */
 
-@import url(legbase.css);
+@import url("legbase.css");
 
 #TitleArea h1 {
 	color: #9e9286;

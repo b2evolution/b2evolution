@@ -1,10 +1,10 @@
 /* Designed by François PLANQUE http://fplanque.net/ */
 
-@import url(basic.css);	/* Import basic styles */
-@import url(forms.css);	/* Import default form styles */
-@import url(comments.css);	/* Import default comment styles */
-@import url(img.css);	/* Import standard image styles */
-@import url(blog_elements.css);	/* Import standard blog elements styles */
+@import url("basic.css");	/* Import basic styles */
+@import url("forms.css");	/* Import default form styles */
+@import url("comments.css");	/* Import default comment styles */
+@import url("img.css");	/* Import standard image styles */
+@import url("blog_elements.css");	/* Import standard blog elements styles */
 
 div.main {
 	margin-right: 0px;
@@ -67,7 +67,7 @@ div.bComment {
 }
 
 /* Styles for comment form */
-input.bComment, 
+input.bComment,
 textarea.bComment
 {
 	background-color: #f0f0f0;
@@ -95,8 +95,8 @@ div.statbloc
 {
 	float: left;
 	width: 44%;
-	margin-left: 2%; 
-	margin-right: 0%; 
+	margin-left: 2%;
+	margin-right: 0%;
 	margin-bottom: 2ex;
 	border: 1px solid #33BBBB;
 }

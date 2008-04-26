@@ -8,7 +8,7 @@
  * @package admin
  */
 
-@import url(legbase.css);
+@import url("legbase.css");
 
 /* Titles */
 #TitleArea h1 {

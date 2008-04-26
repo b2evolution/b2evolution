@@ -1,6 +1,6 @@
-@import url(basic.css);	/* Import basic styles */
-@import url(img.css);	/* Import standard image styles */
-@import url(forms.css);	/* Import standard form styles */
+@import url("basic.css");	/* Import basic styles */
+@import url("img.css");	/* Import standard image styles */
+@import url("forms.css");	/* Import standard form styles */
 
 /* Global page layout */
 body {
@@ -12,7 +12,7 @@ body {
 .wrapper1 {
 	background-color: #e5e5e5;
 	background-image: url(../img/distrib/top_shade.jpg);
-	background-repeat: repeat-x;	
+	background-repeat: repeat-x;
 }
 .wrapper2 {
 	width: 730px;
@@ -67,7 +67,7 @@ a:hover {
 	background: #fff url(../img/distrib/block_middle.gif) repeat-y;
 }
 .block2 {
-	background: url(../img/distrib/block_top.gif) no-repeat;	
+	background: url(../img/distrib/block_top.gif) no-repeat;
 }
 .block3 {
 	background: url(../img/distrib/block_bottom.gif) no-repeat bottom;

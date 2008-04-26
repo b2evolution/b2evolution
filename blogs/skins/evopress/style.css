@@ -4,11 +4,11 @@
 * Distributed with b2evolution with written permission from Michael Heilemann (2007-01-25).
 */
 
-@import url(../../rsc/css/basic.css);	/* Import basic styles */
-@import url(../../rsc/css/img.css);	/* Import standard image styles */
-@import url(../../rsc/css/blog_elements.css);	/* Import standard blog elements styles */
-@import url(../../rsc/css/forms.css);	/* Import default form styles */
-@import url(../../rsc/css/comments.css);	/* Import default comment styles */
+@import url("../../rsc/css/basic.css");	/* Import basic styles */
+@import url("../../rsc/css/img.css");	/* Import standard image styles */
+@import url("../../rsc/css/blog_elements.css");	/* Import standard blog elements styles */
+@import url("../../rsc/css/forms.css");	/* Import default form styles */
+@import url("../../rsc/css/comments.css");	/* Import default comment styles */
 
 
 /* Begin Typography & Colors */

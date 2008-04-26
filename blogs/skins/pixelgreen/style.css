@@ -6,11 +6,11 @@
    VERSION:          1.2
 	LAST MODIFIED:    June-05-2007
  *******************************************/
- @import url(../../rsc/css/basic.css);	/* Import basic styles */
- @import url(../../rsc/css/img.css);	/* Import standard image styles */
- @import url(../../rsc/css/blog_elements.css);	/* Import standard blog elements styles */
- @import url(../../rsc/css/forms.css);	/* Import default form styles */
- @import url(../../rsc/css/comments.css);	/* Import default comment styles */
+ @import url("../../rsc/css/basic.css");	/* Import basic styles */
+ @import url("../../rsc/css/img.css");	/* Import standard image styles */
+ @import url("../../rsc/css/blog_elements.css");	/* Import standard blog elements styles */
+ @import url("../../rsc/css/forms.css");	/* Import default form styles */
+ @import url("../../rsc/css/comments.css");	/* Import default comment styles */
 
 /********************************************
    HTML ELEMENTS
