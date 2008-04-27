@@ -199,7 +199,13 @@ function install_basic_skins()
 	$Skin->install( 'nifty_corners' );
 
 	$Skin = new Skin();
+	$Skin->install( 'pixelgreen' );
+
+	$Skin = new Skin();
 	$Skin->install( 'terrafirma' );
+
+	$Skin = new Skin();
+	$Skin->install( 'vastitude' );
 
 
 	$Skin = new Skin();
@@ -558,6 +564,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.50  2008/04/27 02:33:43  fplanque
+ * skins
+ *
  * Revision 1.49  2008/04/15 20:30:48  fplanque
  * terrafirma minor
  *
