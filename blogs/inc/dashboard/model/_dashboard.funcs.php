@@ -25,7 +25,7 @@
  */
 function b2evonet_get_updates()
 {
-	global $DB, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow;
+	global $DB, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow, $evo_charset;
 	global $Messages, $Settings, $baseurl, $instance_name, $app_name, $app_version, $app_date;
 
 	$update_every = 3600*12; // 12 hours
@@ -158,6 +158,9 @@ function b2evonet_get_updates()
 
 /*
  * $Log$
+ * Revision 1.13  2008/04/27 02:42:39  fplanque
+ * fix
+ *
  * Revision 1.12  2008/04/26 22:20:45  fplanque
  * Improved compatibility with older skins.
  *
