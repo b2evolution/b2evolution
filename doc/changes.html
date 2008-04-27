@@ -7,7 +7,7 @@
 	<meta name="viewport" content="width = 750" />
 	<link href="../blogs/rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
-	<!-- InstanceParam name="lang" type="text" value="en-US" --> 
+	<!-- InstanceParam name="lang" type="text" value="en-US" -->
 </head>
 
 <body>
@@ -15,15 +15,15 @@
 
 	<div class="wrapper1">
 	<div class="wrapper2">
-		<span class="version_top"><!-- InstanceBeginEditable name="Version" -->Plublic release changelog<!-- InstanceEndEditable --></span>	
-	
+		<span class="version_top"><!-- InstanceBeginEditable name="Version" -->Plublic release changelog<!-- InstanceEndEditable --></span>
+
 		<a href="http://b2evolution.net/" target="_blank"><img src="../blogs/rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
-		
-		<div class="menu_top"><!-- InstanceBeginEditable name="MenuTop" --> 
-			<span class="floatright"> After install: <a href="../blogs/index.php">Blogs</a> &bull; <a href="../blogs/admin.php">Admin</a> </span> 
-			Before install: <a href="../index.html">Hello!</a> &bull; <a href="changes.html">Changelog</a> &bull; <a href="../blogs/install/index.php">Installer</a> 
+
+		<div class="menu_top"><!-- InstanceBeginEditable name="MenuTop" -->
+			<span class="floatright"> After install: <a href="../blogs/index.php">Blogs</a> &bull; <a href="../blogs/admin.php">Admin</a> </span>
+			Before install: <a href="../index.html">Hello!</a> &bull; <a href="changes.html">Changelog</a> &bull; <a href="../blogs/install/index.php">Installer</a>
 		<!-- InstanceEndEditable --></div>
-		
+
 		<!-- InstanceBeginEditable name="Main" -->
 		<div class="block1">
 		<div class="block2">
@@ -75,6 +75,7 @@
 				<li>Improved iPhone compatibility.</li>
 				<li>TODO: finish featured post</li>
 				<li>EXPERIMENTAL: base64 email headers (sam2k)</li>
+				<li>Feedburner support (walter)</li>
 			</ul>
 
 
@@ -177,7 +178,7 @@
 				<li><strong>Security enhancements...</strong></li>
 				<li><strong>Bug fixes</strong> (fplanque, yabba, blueyed)</li>
 			</ul>
-			
+
 			<h2>2.3.0-rc1 &quot;Renaissance&quot;</h2>
 			<ul>
 				<li>Widgets
@@ -545,13 +546,13 @@
 					<li>Updated Quicktags plugin (fplanque)</li>
 				</ul>
 			</li>
-			<li>New bundled skins :    	
+			<li>New bundled skins :
 				<ul>
 						<li>Added l33t_gray skin (demented kitty)</li>
 						<li>Added Miami Blue (miami condo real estate)</li>
 				</ul>
 			</li>
-			<li>Bug fixes :		
+			<li>Bug fixes :
 				<ul>
 					<li>Fixed logging of refering spam (when spam refs are not blocked)</li>
 						<li>Fixed group permissions</li>
@@ -587,20 +588,20 @@
 				<li>Fixed handling of formats in pre-rendering content. You should delete the cache from the "Tools" menu after upgrading. (blueyed)</li>
 				<li>Some more minor fixes.</li>
 			</ul>
-		
+
 			<h2>1.9.2 &quot;Kyoto&quot; (Stable)</h2>
 			<ul>
 				<li>Bug fixes</li>
 				<li>Enhanced security</li>
 				<li>Moved some advanced plugins to <a href="http://plugins.b2evolution.net/">plugins.b2evolution.net</a></li>
 			</ul>
-		
+
 			<h2>1.9.1-beta &quot;Chris&quot;</h2>
 			<ul>
 				<li>Enhanced security</li>
 				<li>Minor bug fixes </li>
 			</ul>
-		
+
 			<h2>1.9-beta &quot;Casino Royale&quot;</h2>
 			<ul>
 				<li>Enhanced stats (fplanque)</li>
@@ -654,7 +655,7 @@
 					</ul>
 				</li>
 			</ul>
-		
+
 		</div>
 		</div>
 		</div>
@@ -669,13 +670,13 @@
 			<ul>
 				<li>Enhanced security.</li>
 			</ul>
-		
+
 			<h2>1.8.6 &quot;Anne&quot; (Stable)</h2>
 			<ul>
 				<li>Fixed displaying yearly archives (fplanque)</li>
 				<li>Enhanced Security </li>
 			</ul>
-		
+
 			<h2>1.8.5 &quot;Oktoberfest&quot; (Stable)</h2>
 			<ul>
 				<li>Fixed file upload restriction on allowed filetypes (blueyed)</li>
@@ -689,7 +690,7 @@
 				<li>Plugin API: Added "app_min" dependency; Deprecated "api_min" dependency (blueyed)</li>
 				<li>Many more minor fixes (blueyed)</li>
 			</ul>
-		
+
 			<h2>1.8.2 &quot;Serenity&quot; (Stable)</h2>
 			<ul>
 				<li>Avoid generating ambiguous passwords (blueyed, fplanque)</li>
@@ -700,7 +701,7 @@
 				<li>Minor bug fixes </li>
 				<li>Japanese localization (jmuto) </li>
 			</ul>
-		
+
 			<h2>1.8.1-RC &quot;Milestone&quot;</h2>
 			<ul>
 				<li>Members of the admin user group (not just user #1) can easily validate their account with 1 click (blueyed)</li>
@@ -723,7 +724,7 @@
 					</ul>
 				</li>
 			</ul>
-		
+
 			<h2>1.8-beta &quot;Summer Beta&quot;</h2>
 			<ul>
 				<li>Validation of email address to activate user's account on registration (enabled by default) (blueyed)</li>
@@ -735,7 +736,7 @@
 						<li>Easy setup for a database schema a plugin wants</li>
 					</ul>
 				</li>
-		
+
 				<li>
 				Antispam:
 				<ul>
@@ -756,7 +757,7 @@
 					<li>Blocking requests where the referer has been detected as spam is now optional. Also it does not block requests to the backoffice any longer. (blueyed)</li>
 				</ul>
 			</li>
-		
+
 			<li>
 				Usability:
 				<ul>
@@ -764,32 +765,32 @@
 					<li>Preview for comments in frontoffice (blueyed)</li>
 				</ul>
 			</li>
-		
+
 			<li>ItemList2 class which will replace ItemList. Better performance, security, stability and new features:
 				<ul>
 				<li>Filtering of posts on assignees with assgn=1 or assgn=1,2 or assgn=-1,2 or assgn=-</li>
 				<li>Filtering of posts on extra statuses with status=1 or status=1,2 or status=-1,2 or status=-</li>
 				</ul>
 			</li>
-		
+
 			<li>Scheduled tasks (cron) framework (fplanque)
 				<ul>
 					<li>Automatic retrieval of antispam blacklist (fplanque) </li>
 				</ul>
 			</li>
 			<li>db_delta() functionality that allows easier upgrading (blueyed)</li>
-		
+
 			<li>MySQL 5 strict mode compatibility (blueyed)</li>
 			<li>Fixed/Rewritten Auto-P plugin (blueyed)</li>
 			<li>ETag-header- and GZip-compression-support moved into transport optimizer plugin (blueyed)</li>
 			<li>Removed no longer supported Geeklog and Miniblog upgraders. (It is still possible to upgrade from those by upgrading to b2evo 0.9 and then to b2evo 1.x</li>
-		
+
 			<li>Added /conf/_basic_config.php which holds just the basic settings (as _config.php before, but without the including the other files).
 			You should merge your settings from _config.php to _basic_config.php.</li>
-		
+
 			<li>Many many many bug fixes... </li>
 		</ul>
-		
+
 		</div>
 		</div>
 		</div>
@@ -797,7 +798,7 @@
 		<div class="block1">
 		<div class="block2">
 		<div class="block3">
-		
+
 			<h1>1.6 &quot;Phoenix&quot; series</h1>
 			<p>Skins from 0.x will need some changes.</p>
 			<h2>1.6-alpha &quot;Phoenix Alpha&quot; </h2>
@@ -884,7 +885,7 @@
 				</ul>
 			</li>
 		</ul>
-		
+
 		</div>
 		</div>
 		</div>
@@ -942,7 +943,7 @@
 				<li>Updated $blacklList and $search_engines</li>
 				<li>Minor bug fixes</li>
 			</ul>
-		
+
 			<h2>0.9.0.10 &quot;Copenhagen&quot; (Stable)</h2>
 			<ul>
 				<li>Fixed broken upgrade in &quot;Madrid&quot;</li>
@@ -951,7 +952,7 @@
 				<li>Allow moving of posts between blogs ( conf/_admin : $allow_cross_posting = 3; )</li>
 				<li>Allow redirecting to main blog if post is permalinked through wrong blog ( conf/_advanced : $redirect_to_postblog = true; )</li>
 			</ul>
-		
+
 			<h2>0.9.0.9 &quot;Madrid&quot; (Stable)</h2>
 			<ul>
 				<li>Updated locales (Lucas, Walter, Mago, Jun and the others... ;) </li>
@@ -964,7 +965,7 @@
 				<li>Movable Type import script improved</li>
 				<li>Smiley toolbar is disabled by default (to enable it, open /plugins/toolbars/_smilies.toolbar.php and change <code>var $display = false;</code> to <code>var $display = true;</code>)</li>
 			</ul>
-		
+
 			<h2>0.9.0.8 &quot;Oslo&quot; (Stable)</h2>
 			<ul>
 				<li>Upgrade procedure will fix /' and /&quot; in older comments (fplanque) </li>
@@ -975,7 +976,7 @@
 				<li>bugfixes... (fplanque, blueyed) </li>
 				<li>security fixes (fplanque) </li>
 			</ul>
-		
+
 			<h2>0.9.0.5 &quot;Berlin&quot;  (Stable)</h2>
 			<ul>
 				<li>A load of little bug fixes (blueyed, fplanque) </li>
@@ -987,7 +988,7 @@
 				<li>Added more customizations options to the Calendar (fplanque)</li>
 				<li>WordPress CSS compatible skins [wpc_*] </li>
 			</ul>
-		
+
 			<h2>0.9.0 &quot;Europe&quot;  (Stable)</h2>
 			<ul>
 				<li>Install and start using b2evo without editing a single config file  (fplanque) </li>
@@ -1017,7 +1018,7 @@
 				<li>Blogrolls have been renamed to Linkblogs which should be a little easier to understand. </li>
 			<li>Backoffice improvements. </li>
 			</ul>
-		
+
 			<h1>0.8 series</h1>
 			<h2>0.8.9 &quot;Spring&quot; (Stable)</h2>
 			<ul>
@@ -1034,7 +1035,7 @@
 				<li>Quicktags made compatible with mozilla (ron)</li>
 				<li>Automatic loading of /conf/hacks.php if this file exists </li>
 			</ul>
-		
+
 			<h2>0.8.7 &quot;Cream&quot; (Stable)</h2>
 			<ul>
 				<li>Dynamic Anti-Spam table, with one-click referer bans</li>
@@ -1048,7 +1049,7 @@
 				<li>Ping to Technorati</li>
 				<li>Minor bug fixes</li>
 			</ul>
-		
+
 			<h2>0.8.6.2 &quot;Snow&quot; (Stable)</h2>
 			<ul>
 				<li>Spell checker doesn't require PERL any more (moved to PHP)</li>
@@ -1059,7 +1060,7 @@
 				<li>Default skin checking (too many people set it up improperly).</li>
 				<li>Minor bug fixes (but a lot of them! :P)</li>
 			</ul>
-		
+
 			<h2>0.8.6.1 &quot;Lightning&quot; (Stable)</h2>
 			<ul>
 				<li>Fixed displaying/hiding private/protected posts</li>
@@ -1071,18 +1072,18 @@
 				<li>Enhanced paged display in back-office</li>
 				<li>Display and translation fixes</li>
 			</ul>
-		
+
 			<h2>0.8.6  &quot;Thunder&quot; (Stable)</h2>
 			<ul>
 				<li>Minor bug fixes</li>
 			</ul>
-		
+
 			<h2>0.8.5.5-RC</h2>
 			<ul>
 				<li>Bug fixes</li>
 				<li>Login screens cleaned up</li>
 			</ul>
-		
+
 			<h2>0.8.5.3-beta</h2>
 			<ul>
 				<li>Passwords are now stored encrypted in the database (by Swirlee)</li>
@@ -1100,7 +1101,7 @@
 				<li>Stats summary.</li>
 				<li>Fully configurable directory structure.</li>
 			</ul>
-		
+
 			<h2>0.8.3-beta</h2>
 			<ul>
 				<li>Blog list moved to a standalone skin module + it is disabled by default in the conf. Too many people seem to be confused about having this on their blog template. Enabling is a easy as setting $display_blog_list = 1; at any time (main switch in b2evo_conf.php).</li>
@@ -1111,7 +1112,7 @@
 				<li>wordcount support (by Swirlee)</li>
 				<li><strong>Full localization even without gettext!</strong></li>
 			</ul>
-		
+
 			<h2>0.8.3-alpha</h2>
 			<ul>
 				<li>Cookie fix when using b2evo on a special port number</li>
@@ -1124,28 +1125,28 @@
 				<li>Checking PHP version on install</li>
 				<li>Better UTF-8 support</li>
 			</ul>
-		
+
 			<h2>0.8.2 (Stable)</h2>
 			<ul>
 				<li>Security fixes</li>
 				<li>Fixed pingbacks in b2mail.php</li>
 				<li>Fixed taborder in b2edit.php</li>
 			</ul>
-		
+
 			<h2>0.8.2-RC3</h2>
 			<ul>
 				<li>Fixed user reported bugs</li>
 				<li>Tootips + shortcut keys on tag buttons</li>
 				<li>Fixed timezone handling</li>
 			</ul>
-		
+
 			<h2>0.8.2-RC2</h2>
 			<ul>
 				<li>Categories ordered by name</li>
 				<li>Fixed time difference for new post dates</li>
 				<li>Fixed bug preventing from editing comment dates</li>
 			</ul>
-		
+
 			<h2>0.8.2-RC1</h2>
 			<ul>
 				<li>Ability to link each post to an URL</li>
@@ -1186,26 +1187,26 @@
 				<li>Some more code cleanup</li>
 				<li>Some more security fixes</li>
 			</ul>
-		
+
 			<h2>0.8.0 (Stable)</h2>
 				<ul>
 					<li>Fixed calendar</li>
 					<li>Cosmetic changes</li>
 				</ul>
-		
+
 			<h2>0.8.0-RC3</h2>
 				<ul>
 					<li>Fixed relative path includes</li>
 					<li>Fixed file upload</li>
 					<li>Cosmetic and skin changes, new skin: 'guadeloupe'.</li>
 				</ul>
-		
+
 			<h2>0.8.0-RC2</h2>
 			<ul>
 			<li>Fixed bookmarklet</li>
 				<li>Fixed sidebar</li>
 			</ul>
-		
+
 			<h2>0.8.0-RC1</h2>
 			<ul>
 				<li>Fixed skin switcher when PHP register globals is ON. (Don't forget to delete the skin cookie if you have been using previous versions)</li>
@@ -1217,15 +1218,15 @@
 		</div>
 <!-- InstanceEndEditable -->
 	</div>
-		
+
 	<div class="body_fade_out">
-		
+
 	<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->
 			Online resources: <a href="http://b2evolution.net/" target="_blank">Official website</a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank">Find a host</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">Manual</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">Forums</a>
 		<!-- InstanceEndEditable --></div>
-	
+
 	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright © 2003-2007 by François Planque & others · <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a><!-- InstanceEndEditable --></div>
-		
+
 	</div>
 	</div>
 
