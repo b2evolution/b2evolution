@@ -348,10 +348,14 @@ div.top_menu ul {
 	border-top: 1px solid #EAEAEA;
 	margin: 0 auto;
 	padding-left: 15px;
+	color: #777;
 }
 #footer-content a {
 	text-decoration: none;
 	color: #777;
+}
+#footer-content a.contact_link {
+	text-decoration: underline;
 }
 #footer-content a:hover {
 	text-decoration: underline;

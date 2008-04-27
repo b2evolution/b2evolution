@@ -328,6 +328,7 @@ skin_include( '_html_header.inc.php' );
 					// Note: Double quotes have been used around "Footer" only for test purposes.
 				?>
 				<p class="baseline">
+					<span class="author_credits">
 					<?php
 						// Display a link to contact the owner of this blog (if owner accepts messages):
 						$Blog->contact_link( array(
@@ -344,6 +345,7 @@ skin_include( '_html_header.inc.php' );
 								'after'       => '',
 							) );
 					?>
+					</span>
 					<br />
 					Design: <a href="http://www.nodethirtythree.com">Node33</a>
 					&bull;
@@ -355,7 +357,7 @@ skin_include( '_html_header.inc.php' );
 						// If you can add your own credits without removing the defaults, you'll be very cool :))
 						// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 						credits( array(
-								'list_start'  => T_('Credits').': ',
+								'list_start'  => ' ',
 								'list_end'    => ' ',
 								'separator'   => '|',
 								'item_start'  => ' ',

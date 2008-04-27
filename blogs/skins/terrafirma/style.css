@@ -268,12 +268,12 @@ h3.bTitle {
 	font-size: 1.1em;
 }
 
-.bPosts h2 a:link, .bPosts h2 a:visited
+.bPosts h2 a
 {
 	border-bottom:none;
 	color:#656551;
 }
-.bPosts h2 a:hover,.bPosts h2 a:active
+.bPosts h2 a:hover
 {
 	border-bottom:#656551 1px solid;
 }
@@ -424,11 +424,11 @@ div.bSideItem div.notes {
 	padding: 0 0 0 15px;
 	margin:0;
 }
-.bSideBar a:link,.bSideBar a:visited
+.bSideBar a
 {
 	border-bottom:none;
 }
-.bSideBar a:hover, .bSideBar a:active
+.bSideBar a:hover
 {
 	border-bottom:1px solid;
 }
@@ -473,7 +473,7 @@ textarea{
 	text-align: center;
 	border-top:#e8e8de 1px solid;
 	background:#fafaf8;
-	color: #A8A88D;
+	color: #999;
 	padding:10px;
 	margin:0;
 }
@@ -481,17 +481,29 @@ textarea{
 	margin: 0;
 }
 
-#pageFooter a:link,#pageFooter a:visited
+#pageFooter a
 {
-	color: #6C6C63;
+	color: #999;
 	text-decoration:none;
 	border:none;
 }
-#pageFooter a:hover,#pageFooter a:active
+.author_credits
 {
-	color: #acacac;
+	color: #666;
+}
+#pageFooter a.contact_link
+{
+	color: #666;
 	text-decoration:underline;
-	border:none;
+}
+#pageFooter a.contact_link:hover
+{
+	color: #333;
+}
+#pageFooter a:hover
+{
+	color: #666;
+	text-decoration:underline;
 }
 /* Begin Calendar */
 #wp-calendar {
@@ -633,8 +645,7 @@ div.PageTop a.default:hover {
 	text-decoration: underline;
 	color: #FFF7D4;
 }
-div.PageTop a.selected,
-div.PageTop a.selected:visited {
+div.PageTop a.selected {
 	color: #FFFF99;
 }
 div.PageTop a.selected:hover {
