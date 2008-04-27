@@ -279,13 +279,18 @@ POSSIBILITY OF SUCH DAMAGES.
 --------------------------------------------------------------------------
 
  * In addition, as a special exception, the copyright holders give permission to link
- * the code of this program with the PHP/SWF Charts library by maani.us (or with
- * modified versions of this library that use the same license as PHP/SWF Charts library
- * by maani.us), and distribute linked combinations including the two. You must obey the
- * GNU General Public License in all respects for all of the code used other than the
- * PHP/SWF Charts library by maani.us. If you modify this file, you may extend this
- * exception to your version of the file, but you are not obligated to do so. If you do
- * not wish to do so, delete this exception statement from your version.
+ * the code of this program with the following code libraries or files and distribute
+ * linked combinations including any number of these and the main code.
+ * - Any blog skin, "evoSkin" or design elements licensed under any of the following
+ *   Creative Commons licenses:
+ *    - Attribution-Share Alike ( http://creativecommons.org/licenses/by-sa/3.0/ )
+ *    - Attribution ( http://creativecommons.org/licenses/by/3.0/ )
+ * - The PHP/SWF Charts library by maani.us (or with modified versions of this library
+ *   that use the same license as PHP/SWF Charts library by maani.us).
+ * You must obey the GNU General Public License in all respects for all of the code used
+ * other than the libraries/files listed above. If you modify this file, you may extend
+ * this exception to your version of the file, but you are not obligated to do so. If
+ * you do not wish to do so, delete this exception statement from your version.
 
 --------------------------------------------------------------------------
 
