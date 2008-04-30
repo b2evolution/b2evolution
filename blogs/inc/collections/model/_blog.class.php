@@ -297,7 +297,8 @@ class Blog extends DataObject
 			$atom_redirect = get_param( 'atom_redirect' );
 			if( ! preg_match( '|^([A-Za-z0-9\-_]+(/[A-Za-z0-9\-_]+)*)?$|', $atom_redirect) )
 			{
-				param_error( 'atom_redirect', T_('Invalid feedburner.') );
+				// TODO (waltercruz) find way to check for a URL
+				//param_error( 'atom_redirect', T_('Invalid feedburner.') );
 			}
 			$this->set_setting( 'atom_redirect', $atom_redirect);
 		}
@@ -307,7 +308,8 @@ class Blog extends DataObject
 			$rss2_redirect = get_param( 'rss2_redirect' );
 			if( ! preg_match( '|^([A-Za-z0-9\-_]+(/[A-Za-z0-9\-_]+)*)?$|', $rss2_redirect) )
 			{
-				param_error( 'rss2_redirect', T_('Invalid feedburner.') );
+				// TODO (waltercruz) way to check for a URL
+				//param_error( 'rss2_redirect', T_('Invalid feedburner.') );
 			}
 			$this->set_setting( 'rss2_redirect', $rss2_redirect);
 		}
@@ -1925,6 +1927,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2008/04/30 18:35:05  waltercruz
+ * Temporary fix
+ *
  * Revision 1.37  2008/04/26 22:20:44  fplanque
  * Improved compatibility with older skins.
  *
