@@ -507,31 +507,7 @@ if( !empty( $skin ) )
 				require $disp_handler;
 			}
 			else
-			{	// Verify if the tempskin is redirected to feendurner, othervise, use the default handler from the skins dir:
-				if ($skin == '_atom')
-				{
-					$atom_redirect = $Blog->get_setting('atom_redirect');
-					if (!empty($atom_redirect))
-					{
-						if (!preg_match("/feedburner|feedvalidator/i", $_SERVER['HTTP_USER_AGENT']))
-						{
-							header_redirect("http://feeds.feedburner.com/" . $atom_redirect);
-							exit();
-						}
-					}
-				}
-				if ($skin == '_rss2')
-				{
-					$rss2_redirect = $Blog->get_setting('rss2_redirect');
-					if (!empty($rss2_redirect))
-					{
-						if (!preg_match("/feedburner|feedvalidator/i", $_SERVER['HTTP_USER_AGENT']))
-						{
-							header_redirect("http://feeds.feedburner.com/" . $rss2_redirect);
-							exit();
-						}
-					}
-				}
+			{
 				require $ads_current_skin_path.'index.main.php';
 			}
 		}
@@ -552,6 +528,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.101  2008/04/30 18:26:56  waltercruz
+ * External feeds
+ *
  * Revision 1.100  2008/04/19 15:11:42  waltercruz
  * Feednurner
  *

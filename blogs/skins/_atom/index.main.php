@@ -14,6 +14,15 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+$atom_redirect = $Blog->get_setting('atom_redirect');
+if (!empty($atom_redirect))
+{
+	if( $redir == 'yes' )
+	{
+		header_redirect($atom_redirect);
+		exit();
+	}
+}
 
 // Note: even if we request the same post as $Item earlier, the following will do more restrictions (dates, etc.)
 // Init the MainList object:

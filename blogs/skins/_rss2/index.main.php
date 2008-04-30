@@ -17,6 +17,15 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+$rss2_redirect = $Blog->get_setting('rss2_redirect');
+if (!empty($rss2_redirect))
+{
+	if( $redir == 'yes' )
+	{
+		header_redirect("http://feeds.feedburner.com/" . $rss2_redirect);
+		exit();
+	}
+}
 
 // Note: even if we request the same post as $Item earlier, the following will do more restrictions (dates, etc.)
 // Init the MainList object:
