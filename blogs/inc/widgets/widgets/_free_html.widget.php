@@ -103,13 +103,13 @@ class free_html_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		// Collection common links:
-		echo $this->disp_params['block_start'];
+		echo "\n" . $this->disp_params['block_start'] . "\n";
 
-		$this->disp_title( $this->disp_params['title'] );
+		$this->disp_title( $this->disp_params['title'] ) . "\n";
 
-		echo format_to_output( $this->disp_params['content'] );
+		echo format_to_output( $this->disp_params['content'] ) . "\n";
 
-		echo $this->disp_params['block_end'];
+		echo $this->disp_params['block_end'] . "\n";
 
 		return true;
 	}
@@ -118,6 +118,9 @@ class free_html_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.9  2008/04/30 13:35:21  afwas
+ * Added linebreaks
+ *
  * Revision 1.8  2008/01/21 09:35:37  fplanque
  * (c) 2008
  *
