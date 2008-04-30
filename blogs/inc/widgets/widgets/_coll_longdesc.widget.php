@@ -78,11 +78,11 @@ class coll_longdesc_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		// Collection long description:
-		echo $this->disp_params['block_start'];
+		echo "\n" . $this->disp_params['block_start'] . "\n";
 		echo '<p>';
 		$Blog->disp( 'longdesc', 'htmlbody' );
-		echo '</p>';
-		echo $this->disp_params['block_end'];
+		echo '</p>' . "\n";
+		echo $this->disp_params['block_end'] . "\n";
 
 		return true;
 	}
@@ -91,6 +91,9 @@ class coll_longdesc_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.4  2008/04/30 13:00:30  afwas
+ * Added linebreaks
+ *
  * Revision 1.3  2008/01/21 09:35:37  fplanque
  * (c) 2008
  *

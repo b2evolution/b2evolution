@@ -136,7 +136,7 @@ class coll_category_list_Widget extends ComponentWidget
 		);
 
 		// START DISPLAY:
-		echo $this->disp_params['block_start'];
+		echo "\n" .$this->disp_params['block_start'] . "\n";
 
 		// Display title if requested
 		$this->disp_title();
@@ -158,16 +158,16 @@ class coll_category_list_Widget extends ComponentWidget
 					$tmp_disp .= $Blog->gen_blogurl();
 				}
 				$tmp_disp .= '">'.$this->disp_params['option_all'].'</a>';
-				$tmp_disp .= $this->disp_params['item_end'];
+				$tmp_disp .= $this->disp_params['item_end'] . "\n";
 			}
 
 			$r = $tmp_disp . $ChapterCache->recurse( $callbacks, $Blog->ID );
 
 			if( ! empty($r) )
 			{
-				echo $this->disp_params['list_start'];
+				echo $this->disp_params['list_start'] . "\n";
 				echo $r;
-				echo $this->disp_params['list_end'];
+				echo $this->disp_params['list_end'] . "\n";
 			}
 		}
 		else
@@ -179,7 +179,7 @@ class coll_category_list_Widget extends ComponentWidget
 			// fp> TODO: scaling
 			$ChapterCache->load_all();
 
-			echo $this->disp_params['collist_start'];
+			echo  "\n" . $this->disp_params['collist_start'] . "\n";
 
 			$coll_ID_array = explode( ',', $aggregate_coll_IDs );
 			foreach( $coll_ID_array as $curr_blog_ID )
@@ -194,7 +194,7 @@ class coll_category_list_Widget extends ComponentWidget
 				// Display blog title, if requested:
 				if( $this->disp_params['disp_names_for_coll_list'] )
 				{
-					echo $this->disp_params['coll_start'];
+					echo $this->disp_params['coll_start'] . "\n";
 					echo '<a href="';
 					if( $this->disp_params['link_type'] == 'context' )
 					{	// We want to preserve current browsing context:
@@ -207,16 +207,16 @@ class coll_category_list_Widget extends ComponentWidget
 					echo '">';
 					$loop_Blog->disp('name');
 					echo '</a>';
-					echo $this->disp_params['coll_end'];
+					echo $this->disp_params['coll_end'] . "\n";
 				}
 
 				$r = $ChapterCache->recurse( $callbacks, $curr_blog_ID );
 
 				if( ! empty($r) )
 				{
-					echo $this->disp_params['list_start'];
+					echo $this->disp_params['list_start'] . "\n";
 					echo $r;
-					echo $this->disp_params['list_end'];
+					echo $this->disp_params['list_end'] . "\n";
 				}
 			}
 		}
@@ -242,7 +242,7 @@ class coll_category_list_Widget extends ComponentWidget
 		}
 
 
-		echo $this->disp_params['block_end'];
+		echo $this->disp_params['block_end'] . "\n";
 
 		return true;
 	}
@@ -298,7 +298,7 @@ class coll_category_list_Widget extends ComponentWidget
 
 		if( $this->disp_params['use_form'] )
 		{	// We want to add form fields:
-			$r .= '</label>';
+			$r .= '</label>' . "\n";
 		}
 
 		// Do not end line here because we need to include children first!
@@ -318,7 +318,7 @@ class coll_category_list_Widget extends ComponentWidget
 	function cat_no_children( $Chapter, $level )
 	{
 		// End current line:
-		return $this->disp_params['item_end'];
+		return $this->disp_params['item_end'] . "\n";
 	}
 
 
@@ -333,7 +333,7 @@ class coll_category_list_Widget extends ComponentWidget
 		$r = '';
 		if( $level > 0 )
 		{	// If this is not the root:
-			$r .= $this->disp_params['group_start'];
+			$r .= $this->disp_params['group_start'] . "\n";
 		}
 		return $r;
 	}
@@ -349,9 +349,9 @@ class coll_category_list_Widget extends ComponentWidget
 		$r = '';
 		if( $level > 0 )
 		{	// If this is not the root:
-			$r .= $this->disp_params['group_end'];
+			$r .= $this->disp_params['group_end'] . "\n";
 			// End current (parent) line:
-			$r .= $this->disp_params['item_end'];
+			$r .= $this->disp_params['item_end'] . "\n";
 		}
 		return $r;
 	}
@@ -361,6 +361,9 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.10  2008/04/30 12:59:26  afwas
+ * Added linebreaks
+ *
  * Revision 1.9  2008/01/21 09:35:37  fplanque
  * (c) 2008
  *

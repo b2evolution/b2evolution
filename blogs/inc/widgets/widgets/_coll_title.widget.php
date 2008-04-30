@@ -97,14 +97,14 @@ class coll_title_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		// Collection title:
-		echo $this->disp_params['block_start'];
+		echo "\n\n" . $this->disp_params['block_start'] . "\n";
 
 		$title = '<a href="'.$Blog->get( 'url', 'raw' ).'">'
 							.$Blog->dget( 'name', 'htmlbody' )
 							.'</a>';
 		$this->disp_title( $title );
 
-		echo $this->disp_params['block_end'];
+		echo  "\n" . $this->disp_params['block_end'] . "\n";
 
 		return true;
 	}
@@ -113,6 +113,9 @@ class coll_title_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.4  2008/04/30 13:03:40  afwas
+ * Added linebreaks
+ *
  * Revision 1.3  2008/01/21 09:35:37  fplanque
  * (c) 2008
  *
