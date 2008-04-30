@@ -90,13 +90,11 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Blogs to aggregate'), T_('List blog IDs separated by ,'), 255 );
 	$Form->end_fieldset();
 
-	$Form->begin_fieldset( T_('Feedburner'));
-		$Form->text_input( 'atom_redirect', $edited_Blog->get_setting( 'atom_redirect' ), 25, T_('Atom'),
-												T_('Your Feedburner atom feed'),
-												array( 'input_prefix' => "<code>http://feeds.feedburner.com/</code>", 'maxlength' => 255 ) );
-		$Form->text_input( 'rss2_redirect', $edited_Blog->get_setting( 'rss2_redirect' ), 25, T_('RSS2'),
-												T_('Your Feedburner rss2 feed'),
-												array( 'input_prefix' => "<code>http://feeds.feedburner.com/</code>", 'maxlength' => 255 ) );
+	$Form->begin_fieldset( T_('External Feeds'));
+		$Form->text_input( 'atom_redirect', $edited_Blog->get_setting( 'atom_redirect' ), 50, T_('Atom'),
+												T_('Your external atom feed'));
+		$Form->text_input( 'rss2_redirect', $edited_Blog->get_setting( 'rss2_redirect' ), 50, T_('RSS2'),
+												T_('Your external rss2 feed'));
 	$Form->end_fieldset();
 
 
@@ -177,6 +175,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.11  2008/04/30 18:32:52  waltercruz
+ * External feeds
+ *
  * Revision 1.10  2008/04/19 15:14:35  waltercruz
  * Feedburner
  *
