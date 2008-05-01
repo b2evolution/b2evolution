@@ -600,8 +600,10 @@ class Hit
 		{
 			$blog_ID = $blog;
 		}
-		else
-		{
+
+		if( ! is_numeric($blog_ID) )
+		{ // this can be anything given by URL param "blog"! (because it's called on shutdown)
+		  // see todo in param().
 			$blog_ID = NULL;
 		}
 
@@ -752,6 +754,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.9  2008/05/01 18:53:42  blueyed
+ * Fix SQL injection through $blog
+ *
  * Revision 1.8  2008/04/26 22:23:59  fplanque
  * reverted dirty hack (you must treat search engines through conf file)
  *

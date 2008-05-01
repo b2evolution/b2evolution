@@ -51,6 +51,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Also forces type.
  * Priority order: POST, GET, COOKIE, DEFAULT.
  *
+ * @todo when bad_request_die() gets called, the GLOBAL should not be left set to the invalid value!
+ *
  * @param string Variable to set
  * @param string Force value type to one of:
  * - integer
@@ -1904,6 +1906,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.21  2008/05/01 18:53:42  blueyed
+ * Fix SQL injection through $blog
+ *
  * Revision 1.20  2008/04/17 11:53:16  fplanque
  * Goal editing
  *
