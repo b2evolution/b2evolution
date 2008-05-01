@@ -134,10 +134,21 @@ class test_plugin extends Plugin
 				'multiple' => true,
 				'allow_none' => true,
 			),
+			'single_user' => array(
+				'label' => 'A single user',
+				'type' => 'select_user',
+				'allow_none' => true,
+				'default_value' => 0,
+				'note' => 'Allows chosing none or one user'
+			),
 			'sets' => array(
-				'type' => 'array',
+				'type' => 'select_user',
+				'label' => 'Multiple users',
 				'min_count' => 0,
 				'max_count' => 3,
+				'multiple' => 'true',
+				'allow_none' => true,			
+				'note' => 'Allows none or one or more than one user (up to three in this example)',
 				'entries' => array(
 					'user' => array(
 						'label' => 'A user',
@@ -729,6 +740,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.73  2008/05/01 00:13:57  afwas
+ * Restored the 'select_user' type
+ *
  * Revision 1.72  2008/01/21 09:35:41  fplanque
  * (c) 2008
  *
