@@ -385,7 +385,11 @@ class basic_antispam_plugin extends Plugin
 		}
 
 		// Load page content (max. 500kb), using fsockopen:
-		$url_parsed = parse_url($referer);
+		$url_parsed = @parse_url($referer);
+		if( ! $url_parsed )
+		{
+			return false;
+		}
 		if( empty($url_parsed['scheme']) ) {
 			$url_parsed = parse_url('http://'.$referer);
 		}
@@ -615,6 +619,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.32  2008/05/03 23:58:41  blueyed
+ * basic_antispam_plugin: is_referer_linking_us(): make parse_url silent and return false in case of error
+ *
  * Revision 1.31  2008/01/21 09:35:41  fplanque
  * (c) 2008
  *
