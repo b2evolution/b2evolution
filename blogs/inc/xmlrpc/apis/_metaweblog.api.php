@@ -2,14 +2,14 @@
 /**
  * XML-RPC : MetaWeblog API
  *
- * @see http://manual.b2evolution.net/MetaWeblog_API
- * @see http://www.xmlrpc.com/metaWeblogApi
- *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @author tor
+ *
+ * @see http://manual.b2evolution.net/MetaWeblog_API
+ * @see http://www.xmlrpc.com/metaWeblogApi
  *
  * @package xmlsrv
  *
@@ -834,6 +834,9 @@ $xmlrpc_procs["metaWeblog.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.4  2008/05/04 23:01:05  blueyed
+ * fix fatal phpdoc errors
+ *
  * Revision 1.3  2008/04/12 19:58:03  fplanque
  * bugfix
  *

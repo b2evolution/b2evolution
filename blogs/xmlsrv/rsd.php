@@ -2,15 +2,15 @@
 /**
  * RSD Really Simple Discoverability
  *
- * @see http://archipelago.phrasewise.com/rsd
- * @see http://en.wikipedia.org/wiki/Really_Simple_Discovery
- * @see http://cyber.law.harvard.edu/blogs/gems/tech/rsd.html
- *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @todo fp> do we want to restrict API definitions to a specific blog with blogID="" ?
+ *
+ * @see http://archipelago.phrasewise.com/rsd
+ * @see http://en.wikipedia.org/wiki/Really_Simple_Discovery
+ * @see http://cyber.law.harvard.edu/blogs/gems/tech/rsd.html
  *
  * @package xmlsrv
  *
@@ -67,6 +67,9 @@ echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 
 /*
  * $Log$
+ * Revision 1.3  2008/05/04 23:01:05  blueyed
+ * fix fatal phpdoc errors
+ *
  * Revision 1.2  2008/01/13 03:10:22  fplanque
  * Enhanced RSD
  *
