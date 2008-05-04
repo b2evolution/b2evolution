@@ -38,7 +38,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * {@internal This function gets tested in misc.funcs.simpletest.php.}}
  *
  * @param string Url to validate
- * @param string
+ * @param string Context ("posting", "commenting")
  * @param boolean also do an antispam check on the url
  * @return mixed false (which means OK) or error message
  */
@@ -189,8 +189,8 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 
 
 /**
- *
- * @param string
+ * Get allowed URI schemes for a given context.
+ * @param string Context ("posting", "commenting")
  * @return array
  */
 function get_allowed_uri_schemes( $context = 'posting' )
@@ -223,7 +223,7 @@ function get_allowed_uri_schemes( $context = 'posting' )
 
 		$Group = & $current_User->get_Group();
 
-	  if( $Group->perm_xhtml_javascript )
+		if( $Group->perm_xhtml_javascript )
 		{
 			$schemes[] = 'javascript';
 		}
@@ -620,6 +620,9 @@ function disp_url( $url, $max_length = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.17  2008/05/04 15:49:33  blueyed
+ * doc
+ *
  * Revision 1.16  2008/04/14 16:01:36  fplanque
  * url validation fix
  *
