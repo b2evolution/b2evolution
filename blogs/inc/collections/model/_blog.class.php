@@ -292,26 +292,22 @@ class Blog extends DataObject
 			$this->set_setting( 'category_prefix', $category_prefix);
 		}
 
-		if( param( 'atom_redirect', 'string', NULL) !== NULL )
+		if( param( 'atom_redirect', 'string', NULL ) !== NULL )
 		{
-			$atom_redirect = get_param( 'atom_redirect' );
-			if( ! preg_match( '|^([A-Za-z0-9\-_]+(/[A-Za-z0-9\-_]+)*)?$|', $atom_redirect) )
+			if( !preg_match( '#^(https?://.+)?$#', get_param( 'atom_redirect' ) ) )
 			{
-				// TODO (waltercruz) find way to check for a URL
-				//param_error( 'atom_redirect', T_('Invalid feedburner.') );
+				param_error( 'atom_redirect', T_('Invalid atom feed address.') );
 			}
-			$this->set_setting( 'atom_redirect', $atom_redirect);
+			$this->set_setting( 'atom_redirect', get_param( 'atom_redirect' ) );
 		}
 
-		if( param( 'rss2_redirect', 'string', NULL) !== NULL )
+		if( param( 'rss2_redirect', 'string', NULL ) !== NULL )
 		{
-			$rss2_redirect = get_param( 'rss2_redirect' );
-			if( ! preg_match( '|^([A-Za-z0-9\-_]+(/[A-Za-z0-9\-_]+)*)?$|', $rss2_redirect) )
+			if( !preg_match( '#^(https?://.+)?$#', get_param( 'rss2_redirect' ) ) )
 			{
-				// TODO (waltercruz) way to check for a URL
-				//param_error( 'rss2_redirect', T_('Invalid feedburner.') );
+				param_error( 'rss2_redirect', T_('Invalid rss2 feed address.') );
 			}
-			$this->set_setting( 'rss2_redirect', $rss2_redirect);
+			$this->set_setting( 'rss2_redirect', get_param( 'rss2_redirect' ) );
 		}
 
 		if( param( 'tag_links',   'string', NULL ) !== NULL )
@@ -1927,6 +1923,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.39  2008/05/05 18:50:07  waltercruz
+ * URL validation of external feeds
+ *
  * Revision 1.38  2008/04/30 18:35:05  waltercruz
  * Temporary fix
  *
