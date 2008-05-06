@@ -138,11 +138,11 @@ class coll_comment_list_Widget extends ComponentWidget
 
 		$CommentList = & new CommentList( $listBlog, "'comment','trackback','pingback'", array('published'), '',	'',	$order,	'',	$limit );
 
-		echo "\n" . $this->disp_params[ 'block_start'] . "\n";
+		echo $this->disp_params[ 'block_start'];
 
-		echo $this->disp_params[ 'block_title_start' ].$this->disp_params[ 'title' ].$this->disp_params[ 'block_title_end' ] . "\n";
+		echo $this->disp_params[ 'block_title_start' ].$this->disp_params[ 'title' ].$this->disp_params[ 'block_title_end' ];
 
-		echo $this->disp_params[ 'list_start' ] . "\n";
+		echo $this->disp_params[ 'list_start' ];
 
     /**
 		 * @var Comment
@@ -158,10 +158,10 @@ class coll_comment_list_Widget extends ComponentWidget
 				'text'        => $Comment->Item->title,
 				'title'       => $this->disp_params[ 'hover_text' ],
 				) );
-			echo $this->disp_params[ 'item_end' ] . "\n";
+			echo $this->disp_params[ 'item_end' ];
 		}	// End of comment loop.}
-		echo $this->disp_params[ 'list_end' ] . "\n";
-		echo $this->disp_params[ 'block_end' ] . "\n";
+		echo $this->disp_params[ 'list_end' ];
+		echo $this->disp_params[ 'block_end' ];
 
 		return true;
 	}
@@ -170,8 +170,8 @@ class coll_comment_list_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.6  2008/04/30 13:50:43  afwas
- * Added linebreaks
+ * Revision 1.7  2008/05/06 23:35:47  fplanque
+ * The correct way to add linebreaks to widgets is to add them to $disp_params when the container is called, right after the array_merge with defaults.
  *
  * Revision 1.5  2008/01/21 09:35:37  fplanque
  * (c) 2008

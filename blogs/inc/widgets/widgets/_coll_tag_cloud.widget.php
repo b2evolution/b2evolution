@@ -181,26 +181,26 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 		usort($results, 'tag_cloud_cmp');
 
-		echo "\n" . $this->disp_params['block_start'] . "\n";
+		echo $this->disp_params['block_start'];
 
 		$this->disp_title();
 
-		echo $this->disp_params['tag_cloud_start'] . "\n";
+		echo $this->disp_params['tag_cloud_start'];
 		$count = 0;
 		foreach( $results as $row )
 		{
 			if( $count > 0 )
 			{
-				echo $this->disp_params['tag_separator'] . "\n";
+				echo $this->disp_params['tag_separator'];
 			}
 			$size = floor( $row->tag_count * $size_span / $count_span + $min_size );
 			echo '<a href="'.$Blog->gen_tag_url( $row->tag_name ).'" style="font-size: '.$size.'pt;" title="'
 						.sprintf( T_('%d posts'), $row->tag_count ).'">'.format_to_output($row->tag_name).'</a>';
 			$count++;
 		}
-		echo "\n" . $this->disp_params['tag_cloud_end'] . "\n";
+		echo $this->disp_params['tag_cloud_end'];
 
-		echo $this->disp_params['block_end'] . "\n";
+		echo $this->disp_params['block_end'];
 
 		return true;
 	}
@@ -209,8 +209,8 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.9  2008/04/30 14:04:27  afwas
- * Added linebreaks
+ * Revision 1.10  2008/05/06 23:35:47  fplanque
+ * The correct way to add linebreaks to widgets is to add them to $disp_params when the container is called, right after the array_merge with defaults.
  *
  * Revision 1.8  2008/01/21 09:35:37  fplanque
  * (c) 2008

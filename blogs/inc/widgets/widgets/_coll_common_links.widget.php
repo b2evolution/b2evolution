@@ -116,14 +116,14 @@ class coll_common_links_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		// Collection common links:
-		echo "\n" . $this->disp_params['block_start'] . "\n";
-		echo $this->disp_params['list_start'] . "\n";
+		echo $this->disp_params['block_start'];
+		echo $this->disp_params['list_start'];
 
 		if( $this->disp_params['show_recently'] )
 		{
 			echo $this->disp_params['item_start'];
 			echo '<strong><a href="'.$Blog->get('url').'">'.T_('Recently').'</a></strong>';
-			echo $this->disp_params['item_end'] . "\n";
+			echo $this->disp_params['item_end'];
 		}
 
 		if( $this->disp_params['show_archives'] )
@@ -131,7 +131,7 @@ class coll_common_links_Widget extends ComponentWidget
 			// fp> TODO: don't display this if archives plugin not installed... or depluginize archives (I'm not sure)
 			echo $this->disp_params['item_start'];
 			echo '<strong><a href="'.$Blog->get('arcdirurl').'">'.T_('Archives').'</a></strong>';
-			echo $this->disp_params['item_end'] . "\n";
+			echo $this->disp_params['item_end'];
 		}
 
 		if( $this->disp_params['show_categories'] )
@@ -139,18 +139,18 @@ class coll_common_links_Widget extends ComponentWidget
 			// fp> TODO: don't display this if categories plugin not installed... or depluginize categories (I'm not sure)
 			echo $this->disp_params['item_start'];
 			echo '<strong><a href="'.$Blog->get('catdirurl').'">'.T_('Categories').'</a></strong>';
-			echo $this->disp_params['item_end'] . "\n";
+			echo $this->disp_params['item_end'];
 		}
 
 		if( $this->disp_params['show_latestcomments'] )
 		{
 			echo $this->disp_params['item_start'];
 			echo '<strong><a href="'.$Blog->get('lastcommentsurl').'">'.T_('Latest comments').'</a></strong>';
-			echo $this->disp_params['item_end'] . "\n";
+			echo $this->disp_params['item_end'];
 		}
 
-		echo $this->disp_params['list_end'] . "\n";
-		echo $this->disp_params['block_end'] . "\n";
+		echo $this->disp_params['list_end'];
+		echo $this->disp_params['block_end'];
 
 		return true;
 	}
@@ -159,8 +159,8 @@ class coll_common_links_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.5  2008/04/30 13:02:07  afwas
- * Added linebreaks
+ * Revision 1.6  2008/05/06 23:35:47  fplanque
+ * The correct way to add linebreaks to widgets is to add them to $disp_params when the container is called, right after the array_merge with defaults.
  *
  * Revision 1.4  2008/01/21 09:35:37  fplanque
  * (c) 2008
