@@ -253,7 +253,7 @@ function get_allowed_uri_schemes( $context = 'posting' )
  *                       is available)
  * @return string|false The remote page as a string; false in case of error
  */
-function fetch_remote_page( $url, & $info )
+function fetch_remote_page( $url, & $info, $timeout = 15 )
 {
 	$info = array(
 		'error' => '',
@@ -262,16 +262,21 @@ function fetch_remote_page( $url, & $info )
 	// CURL:
 	if( extension_loaded('curl') )
 	{
+		// echo 'curl'; flush();
+
 		$info['used_method'] = 'curl';
 
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 		if( ! empty($params['method']) && $params['method'] == 'HEAD'  )
 		{
 			curl_setopt($ch, CURLOPT_NOBODY, true);
 		}
 		$r = curl_exec($ch);
+
 		$info['status'] = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		$info['error'] = curl_error($ch);
 		if( curl_errno($ch) )
@@ -287,6 +292,8 @@ function fetch_remote_page( $url, & $info )
 	// FSOCKOPEN:
 	if( function_exists('fsockopen') ) // may have been disabled
 	{
+		// echo 'fsockopen'; flush();
+
 		$info['used_method'] = 'fsockopen';
 		$url_parsed = parse_url($url);
 		if( empty($url_parsed['scheme']) )
@@ -312,7 +319,7 @@ function fetch_remote_page( $url, & $info )
 
 		// pre_dump($out);
 
-		$fp = @fsockopen($host, $port, $errno, $errstr, 30);
+		$fp = @fsockopen($host, $port, $errno, $errstr, $timeout);
 		if( ! $fp )
 		{
 			$info['error'] = $errstr.' (#'.$errno.')';
@@ -321,9 +328,9 @@ function fetch_remote_page( $url, & $info )
 
 		// Set timeout for data:
 		if( function_exists('stream_set_timeout') )
-			stream_set_timeout( $fp, 20 ); // PHP 4.3.0
+			stream_set_timeout( $fp, $timeout ); // PHP 4.3.0
 		else
-			socket_set_timeout( $fp, 20 ); // PHP 4
+			socket_set_timeout( $fp, $timeout ); // PHP 4
 
 		// Send request:
 		fwrite($fp, $out);
@@ -364,6 +371,8 @@ function fetch_remote_page( $url, & $info )
 	// URL FOPEN:
 	if( ini_get('allow_url_fopen') && function_exists('stream_get_meta_data') /* PHP 4.3, may also be disabled!? */ )
 	{
+		//echo 'fopen'; flush();
+
 		$info['used_method'] = 'fopen';
 
 		$fp = @fopen($url, 'r');
@@ -393,7 +402,7 @@ function fetch_remote_page( $url, & $info )
 
 
 	// All failed:
-	$info['used_method'] = null;
+	$info['used_method'] = NULL;
 	$info['error'] = 'No method available to access URL!';
 	return false;
 }
@@ -620,6 +629,9 @@ function disp_url( $url, $max_length = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.18  2008/05/06 23:23:46  fplanque
+ * timeout handling
+ *
  * Revision 1.17  2008/05/04 15:49:33  blueyed
  * doc
  *
