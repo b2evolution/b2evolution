@@ -76,23 +76,23 @@ class coll_search_form_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		// Collection search form:
-		echo "\n" . $this->disp_params['block_start'] . "\n";
+		echo $this->disp_params['block_start'];
 
 		$this->disp_title( T_('Search') );
 
 		form_formstart( $Blog->gen_blogurl(), 'search', 'SearchForm' );
-		echo '<p>' . "\n";
+		echo '<p>';
 		$s = get_param( 's' );
-		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars($s).'" class="SearchField" /><br />' . "\n";
+		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars($s).'" class="SearchField" /><br />';
 		$sentence = get_param( 'sentence' );
-		echo '<input type="radio" name="sentence" value="AND" id="sentAND" '.( $sentence=='AND' ? 'checked="checked" ' : '' ).'/><label for="sentAND">'.T_('All Words').'</label><br />' . "\n";
-		echo '<input type="radio" name="sentence" value="OR" id="sentOR" '.( $sentence=='OR' ? 'checked="checked" ' : '' ).'/><label for="sentOR">'.T_('Some Word').'</label><br />' . "\n";
-		echo '<input type="radio" name="sentence" value="sentence" id="sentence" '.( $sentence=='sentence' ? 'checked="checked" ' : '' ).'/><label for="sentence">'.T_('Entire phrase').'</label>' . "\n";
-		echo '</p>' . "\n";
-		echo '<input type="submit" name="submit" class="submit search_submit" value="'.T_('Search').'" />' . "\n";
-		echo '</form>' . "\n";
+		echo '<input type="radio" name="sentence" value="AND" id="sentAND" '.( $sentence=='AND' ? 'checked="checked" ' : '' ).'/><label for="sentAND">'.T_('All Words').'</label><br />';
+		echo '<input type="radio" name="sentence" value="OR" id="sentOR" '.( $sentence=='OR' ? 'checked="checked" ' : '' ).'/><label for="sentOR">'.T_('Some Word').'</label><br />';
+		echo '<input type="radio" name="sentence" value="sentence" id="sentence" '.( $sentence=='sentence' ? 'checked="checked" ' : '' ).'/><label for="sentence">'.T_('Entire phrase').'</label>';
+		echo '</p>';
+		echo '<input type="submit" name="submit" class="submit" value="'.T_('Search').'" class="search_submit" />';
+		echo '</form>';
 
-		echo $this->disp_params['block_end'] . "\n";
+		echo $this->disp_params['block_end'];
 
 		return true;
 	}
@@ -101,8 +101,8 @@ class coll_search_form_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.5  2008/04/30 13:05:03  afwas
- * Added linebreaks
+ * Revision 1.6  2008/05/06 23:34:25  fplanque
+ * reverted my own screwup on the search_submit class
  *
  * Revision 1.4  2008/04/30 04:18:34  afwas
  * Combined class submit and class search_submit
