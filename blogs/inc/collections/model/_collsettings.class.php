@@ -99,8 +99,8 @@ class CollectionSettings extends AbstractSettings
 			'single_item_footer_text' => '',
 			'xml_item_footer_text' => '<p><small><a href="$item_perm_url$">Original post</a> blogged on <a href="http://b2evolution.net/">b2evolution</a>.</small></p>',
 			'max_footer_credits' => 3,
-			'atom_redirect' =>'',
-			'rss2_redirect'=>'',
+			'atom_redirect' => '',
+			'rss2_redirect' => '',
 		);
 
 
@@ -136,6 +136,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.19  2008/05/06 23:25:34  fplanque
+ * minor
+ *
  * Revision 1.18  2008/04/19 15:14:35  waltercruz
  * Feedburner
  *
