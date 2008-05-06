@@ -394,11 +394,6 @@ function create_demo_contents()
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Topanga', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://www.tenderfeelings.be', 'disabled', array() );
-
-	// Insert a post into linkblog:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
 	$edited_Item->insert( 1, 'Danny', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://personman.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
@@ -414,11 +409,6 @@ function create_demo_contents()
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'EdB', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://wonderwinds.com/', 'disabled', array() );
-
-	// Insert a post into linkblog:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
 	$edited_Item->insert( 1, 'Francois', '', $now, $cat_linkblog_contrib, array(), 'published',	 'fr-FR', '', 'http://fplanque.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
@@ -429,7 +419,7 @@ function create_demo_contents()
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Webhosting', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://b2evolution.net/web-hosting/blog/', 'disabled', array() );
+	$edited_Item->insert( 1, 'Web hosting', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://b2evolution.net/web-hosting/blog/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -651,6 +641,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.243  2008/05/06 23:37:36  fplanque
+ * MFB
+ *
  * Revision 1.242  2008/04/06 19:19:30  fplanque
  * Started moving some intelligence to the Modules.
  * 1) Moved menu structure out of the AdminUI class.
