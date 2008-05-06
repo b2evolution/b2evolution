@@ -470,7 +470,6 @@ if( !empty( $skin ) )
 		// Path for the current skin:
 		$ads_current_skin_path = $skins_path.$skin.'/';
 
-
 		$disp_handlers = array(
 				'404'            => '404_not_found.main.php',
 				'arcdir'         => 'arcdir.main.php',
@@ -489,7 +488,6 @@ if( !empty( $skin ) )
 
 		if( !empty($disp_handlers[$disp]) )
 		{
-
 			if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[$disp] ) )
 			{	// The skin has a customized page handler for this display:
 				require $disp_handler;
@@ -507,7 +505,7 @@ if( !empty( $skin ) )
 				require $disp_handler;
 			}
 			else
-			{
+			{	// Use the default handler from the skins dir:
 				require $ads_current_skin_path.'index.main.php';
 			}
 		}
@@ -528,11 +526,8 @@ else
 
 /*
  * $Log$
- * Revision 1.101  2008/04/30 18:26:56  waltercruz
- * External feeds
- *
- * Revision 1.100  2008/04/19 15:11:42  waltercruz
- * Feednurner
+ * Revision 1.102  2008/05/06 23:37:06  fplanque
+ * revert
  *
  * Revision 1.99  2008/03/30 23:04:23  fplanque
  * fix
