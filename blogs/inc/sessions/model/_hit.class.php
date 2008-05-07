@@ -598,15 +598,13 @@ class Hit
 		}
 		elseif( !empty( $blog ) )
 		{
+			if( ! is_numeric($blog) )
+			{ // this can be anything given by URL param "blog"! (because it's called on shutdown)
+			  // see todo in param().
+				$blog = NULL;
+			}
 			$blog_ID = $blog;
 		}
-
-		if( ! is_numeric($blog_ID) )
-		{ // this can be anything given by URL param "blog"! (because it's called on shutdown)
-		  // see todo in param().
-			$blog_ID = NULL;
-		}
-
 
 		$hit_uri = substr($ReqURI, 0, 250); // VARCHAR(250) and likely to be longer
 		$hit_referer = substr($this->referer, 0, 250); // VARCHAR(250) and likely to be longer
@@ -754,6 +752,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.10  2008/05/07 18:07:12  fplanque
+ * trying to fix.
+ *
  * Revision 1.9  2008/05/01 18:53:42  blueyed
  * Fix SQL injection through $blog
  *
