@@ -605,6 +605,10 @@ class Hit
 			}
 			$blog_ID = $blog;
 		}
+		else
+		{
+			$blog_ID = NULL;
+		}
 
 		$hit_uri = substr($ReqURI, 0, 250); // VARCHAR(250) and likely to be longer
 		$hit_referer = substr($this->referer, 0, 250); // VARCHAR(250) and likely to be longer
@@ -752,6 +756,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.11  2008/05/07 18:10:17  fplanque
+ * trying to fix.
+ *
  * Revision 1.10  2008/05/07 18:07:12  fplanque
  * trying to fix.
  *
