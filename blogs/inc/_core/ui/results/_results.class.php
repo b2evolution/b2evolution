@@ -972,7 +972,8 @@ class Results extends Table
 				// Contents to output:
 				$output = $this->parse_col_content( $col['td'] );
 				#pre_dump( '{'.$output.'}' );
-				eval( "echo '$output';" );
+				$out = eval( "return '$output';" );
+				echo (empty($out) ? '&nbsp;' : $out);
 
 				// COL START:
 				$this->display_col_end();
@@ -1363,7 +1364,6 @@ class Results extends Table
 
 		// Make callback function move_icons for oderable lists // dh> what does it do?
 		$content = str_replace( '{move}', "'.\$this->move_icons().'", $content );
-
 
 		return $content;
 	}
@@ -1795,6 +1795,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.9  2008/05/10 23:00:18  fplanque
+ * add nbsps for IE to draw cell borders
+ *
  * Revision 1.8  2008/04/24 01:56:08  fplanque
  * Goal hit summary
  *
