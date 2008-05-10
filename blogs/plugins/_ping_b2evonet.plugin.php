@@ -36,7 +36,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Pingomatic plugin.
+ * Ping b2evonet plugin.
  *
  * @package plugins
  */
@@ -110,6 +110,9 @@ class ping_b2evonet_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.10  2008/05/10 22:48:30  fplanque
+ * minor
+ *
  * Revision 1.9  2008/05/10 21:30:39  fplanque
  * better UTF-8 handling
  *
