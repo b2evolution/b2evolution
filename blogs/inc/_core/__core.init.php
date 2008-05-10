@@ -38,7 +38,6 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 $db_config['aliases'] = array(
 		'T_antispam'            => $tableprefix.'antispam',
-		'T_basedomains'         => $tableprefix.'basedomains',
 		'T_blogs'               => $tableprefix.'blogs',
 		'T_categories'          => $tableprefix.'categories',
 		'T_coll_group_perms'    => $tableprefix.'bloggroups',
@@ -69,7 +68,6 @@ $db_config['aliases'] = array(
 		'T_skins__skin'         => $tableprefix.'skins__skin',
 		'T_subscriptions'       => $tableprefix.'subscriptions',
 		'T_users'               => $tableprefix.'users',
-		'T_useragents'          => $tableprefix.'useragents',
 		'T_usersettings'        => $tableprefix.'usersettings',
 		'T_widget'              => $tableprefix.'widget',
 	);
@@ -414,6 +412,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.2  2008/05/10 22:59:09  fplanque
+ * keyphrase logging
+ *
  * Revision 1.1  2008/04/06 19:19:29  fplanque
  * Started moving some intelligence to the Modules.
  * 1) Moved menu structure out of the AdminUI class.

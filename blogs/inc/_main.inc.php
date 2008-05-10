@@ -321,7 +321,6 @@ load_class('items/model/_link.class.php');
 load_funcs('comments/model/_comment.funcs.php');
 load_funcs('items/model/_item.funcs.php');
 load_class('comments/model/_commentlist.class.php');
-load_funcs('sessions/model/_hitlog.funcs.php');     // referer logging
 load_funcs('_core/ui/forms/_form.funcs.php');
 load_funcs('_core/ui/forms/_form.class.php');
 load_class('items/model/_itemquery.class.php');
@@ -652,6 +651,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.91  2008/05/10 22:59:09  fplanque
+ * keyphrase logging
+ *
  * Revision 1.90  2008/02/19 11:11:16  fplanque
  * no message
  *

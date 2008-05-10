@@ -26,8 +26,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-
 load_class('sessions/model/_hitlist.class.php');
+load_funcs('sessions/model/_hitlog.funcs.php');
 
 /**
  * @var User
@@ -117,12 +117,12 @@ switch( $action )
 
 if( $perm_view_all )
 {
-	$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab ), T_('All'),
-					'admin.php?ctrl=stats&amp;tab='.$tab.'&amp;blog=0' );
+	$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ), T_('All'),
+					'admin.php?ctrl=stats&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0' );
 }
 else
 {	// No permission to view aggregated stats:
-	$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab ) );
+	$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ) );
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -139,6 +139,7 @@ echo $AdminUI->get_html_menu( array( 'stats', $tab ), 'menu3' );
 switch( $AdminUI->get_path(1) )
 {
 	case 'summary':
+		flush();
 		// Display VIEW:
 		switch( $tab3 )
 		{
@@ -222,6 +223,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2008/05/10 22:59:10  fplanque
+ * keyphrase logging
+ *
  * Revision 1.7  2008/04/17 11:53:19  fplanque
  * Goal editing
  *

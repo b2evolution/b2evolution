@@ -265,50 +265,20 @@ function stats_basedomain( $disp = true )
 
 /**
  * Displays keywords used for search leading to this page
- *
- * @todo link keyword param to search engine ()
  */
-function stats_search_keywords( $ref )
+function stats_search_keywords( $keyphrase )
 {
-	$kwout = '';
-	if( ($pos_question = strpos( $ref, '?' )) == false )
+	if( empty( $keyphrase ) )
 	{
-		return '<span class="note">['.T_('n.a.').']';
+		return '<span class="note">['.T_('n.a.').']</span>';
 	}
-	$ref_params = explode( '&', substr( $ref, $pos_question+1 ) );
-	foreach( $ref_params as $ref_param )
+
+	if( strlen( $keyphrase ) > 30 )
 	{
-		$param_parts = explode( '=', $ref_param );
-		if( $param_parts[0] == 'q'
-				|| $param_parts[0] == 'as_q' 		 // Google Advanced Search Query
-				|| $param_parts[0] == 'query'
-				|| $param_parts[0] == 'search'
-				|| $param_parts[0] == 'p'
-				|| $param_parts[0] == 'kw'
-				|| $param_parts[0] == 'qs'
-				|| $param_parts[0] == 'r'
-				|| $param_parts[0] == 'rdata'			// search.ke.voila.fr
-				|| $param_parts[0] == 'string'		// att.net
-				|| $param_parts[0] == 'su'				// suche.web.de
-				|| $param_parts[0] == 'Gw'				// scroogle.org
-			)
-		{ // found "q" query parameter
-			$q = urldecode($param_parts[1]);
-			if( strpos( $q, 'Ã' ) !== false )
-			{ // Probability that the string is UTF-8 encoded is very high, that'll do for now...
-				//echo "[UTF-8 decoding]";
-				$q = utf8_decode( $q );
-			}
-			$qwords = explode( ' ', $q );
-			foreach( $qwords as $qw )
-			{
-				if( strlen( $qw ) > 30 ) $qw = substr( $qw, 0, 30 )."...";	// word too long, crop it
-				$kwout .= $qw.' ';
-			}
-			return htmlentities($kwout);
-		}
+		$keyphrase = substr( $keyphrase, 0, 30 )."...";	// word too long, crop it
 	}
-	return '<span class="note">['.T_('n.a.').']</span>';
+
+	return htmlentities( $keyphrase );
 }
 
 
@@ -349,6 +319,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.5  2008/05/10 22:59:10  fplanque
+ * keyphrase logging
+ *
  * Revision 1.4  2008/02/19 11:11:18  fplanque
  * no message
  *

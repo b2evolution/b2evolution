@@ -385,28 +385,6 @@ $schema_queries = array(
 			unique file (file_root_type, file_root_ID, file_path)
 		)" ),
 
-	'T_basedomains' => array(
-		'Creating table for base domains',
-		"CREATE TABLE T_basedomains (
-			dom_ID     INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			dom_name   VARCHAR(250) NOT NULL DEFAULT '',
-			dom_status ENUM('unknown','whitelist','blacklist') NOT NULL DEFAULT 'unknown',
-			dom_type   ENUM('unknown','normal','searcheng','aggregator') NOT NULL DEFAULT 'unknown',
-			PRIMARY KEY     (dom_ID),
-			UNIQUE dom_name (dom_name),
-			INDEX dom_type  (dom_type)
-		)" ),
-
-	'T_useragents' => array(
-		'Creating table for user agents',
-		"CREATE TABLE T_useragents (
-			agnt_ID        INT UNSIGNED NOT NULL AUTO_INCREMENT,
-			agnt_signature VARCHAR(250) NOT NULL,
-			agnt_type      ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL ,
-			PRIMARY KEY (agnt_ID),
-			INDEX agnt_type ( agnt_type )
-		)" ),
-
 	'T_subscriptions' => array(
 		'Creating table for subscriptions',
 		"CREATE TABLE T_subscriptions (
@@ -561,6 +539,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.2  2008/05/10 22:59:09  fplanque
+ * keyphrase logging
+ *
  * Revision 1.1  2008/04/06 19:19:29  fplanque
  * Started moving some intelligence to the Modules.
  * 1) Moved menu structure out of the AdminUI class.

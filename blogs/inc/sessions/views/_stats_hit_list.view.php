@@ -40,8 +40,9 @@ $remote_IP = param( 'remote_IP', 'string', NULL, true );
 
 // Create result set:
 $sql = 'SELECT hit_ID, sess_ID, hit_datetime, hit_referer_type, hit_uri, hit_blog_ID, hit_referer, hit_remote_addr,
-								user_login, agnt_type, blog_shortname, dom_name, goal_name
+								user_login, agnt_type, blog_shortname, dom_name, goal_name, keyp_phrase
 					FROM T_hitlog LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
+							  LEFT JOIN T_track__keyphrase ON hit_keyphrase_keyp_ID = keyp_ID
 								LEFT JOIN T_sessions ON hit_sess_ID = sess_ID
 								LEFT JOIN T_useragents ON hit_agnt_ID = agnt_ID
 								LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
@@ -131,7 +132,8 @@ $Results->cols[] = array(
 // Keywords:
 $Results->cols[] = array(
 		'th' => T_('Search keywords'),
-		'td' => '%stats_search_keywords( #hit_referer# )%',
+		'order' => 'keyp_phrase',
+		'td' => '%stats_search_keywords( #keyp_phrase# )%',
 	);
 
 $Results->cols[] = array(
@@ -167,6 +169,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.2  2008/05/10 22:59:10  fplanque
+ * keyphrase logging
+ *
  * Revision 1.1  2008/03/22 19:58:18  fplanque
  * missing views
  *

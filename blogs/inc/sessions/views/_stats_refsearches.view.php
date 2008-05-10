@@ -39,9 +39,10 @@ echo '<p class="notes">'.T_('These are hits from people who came to this blog sy
 
 // Create result set:
 $Results = & new Results( "
-	 	 SELECT hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname
+	 	 SELECT hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname, keyp_phrase
 		 	 FROM T_hitlog INNER JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
 					  INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
+					  LEFT JOIN T_track__keyphrase ON hit_keyphrase_keyp_ID = keyp_ID
 					  LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
 		  WHERE hit_referer_type = 'search'
 			 			AND agnt_type = 'browser'"
@@ -77,7 +78,8 @@ else
 // Keywords:
 $Results->cols[] = array(
 		'th' => T_('Search keywords'),
-		'td' => '%stats_search_keywords( #hit_referer# )%',
+		'order' => 'keyp_phrase',
+		'td' => '%stats_search_keywords( #keyp_phrase# )%',
 	);
 
 // Target Blog:
@@ -147,6 +149,9 @@ if( count( $res_stats ) )
 
 /*
  * $Log$
+ * Revision 1.5  2008/05/10 22:59:10  fplanque
+ * keyphrase logging
+ *
  * Revision 1.4  2008/02/19 11:11:18  fplanque
  * no message
  *

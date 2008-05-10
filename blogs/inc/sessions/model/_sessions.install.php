@@ -53,19 +53,53 @@ $schema_queries['T_sessions'] = array(
 		// NOTE: sess_lastseen is only relevant/used by Sessions class (+ stats) and results in a quite large index (file size wise)
 		// NOTE: sess_data is (MEDIUM)BLOB because e.g. serialize() does not completely convert binary data to text
 
+$schema_queries['T_basedomains'] = array(
+		'Creating table for base domains',
+		"CREATE TABLE T_basedomains (
+			dom_ID     INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			dom_name   VARCHAR(250) NOT NULL DEFAULT '',
+			dom_status ENUM('unknown','whitelist','blacklist') NOT NULL DEFAULT 'unknown',
+			dom_type   ENUM('unknown','normal','searcheng','aggregator') NOT NULL DEFAULT 'unknown',
+			PRIMARY KEY     (dom_ID),
+			UNIQUE dom_name (dom_name),
+			INDEX dom_type  (dom_type)
+		)" );
+
+// fp> TODO: this table is crap. It has to go.
+$schema_queries['T_useragents'] = array(
+		'Creating table for user agents',
+		"CREATE TABLE T_useragents (
+			agnt_ID        INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			agnt_signature VARCHAR(250) NOT NULL,
+			agnt_type      ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL ,
+			PRIMARY KEY (agnt_ID),
+			INDEX agnt_type ( agnt_type )
+		)" );
+
+$schema_queries['T_track__keyphrase'] = array(
+		'Creating table for Hit-Logs',
+		"CREATE TABLE T_track__keyphrase (
+			keyp_ID      INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			keyp_phrase  VARCHAR( 255 ) NOT NULL,
+			PRIMARY KEY        ( keyp_ID ),
+			UNIQUE keyp_phrase ( keyp_phrase )
+		)" );
+
+
 $schema_queries['T_hitlog'] = array(
 		'Creating table for Hit-Logs',
 		"CREATE TABLE T_hitlog (
-			hit_ID               INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			hit_sess_ID          INT UNSIGNED,
-			hit_datetime         DATETIME NOT NULL,
-			hit_uri              VARCHAR(250) DEFAULT NULL,
-			hit_referer_type     ENUM('search','blacklist','spam','referer','direct','self','admin') NOT NULL,
-			hit_referer          VARCHAR(250) DEFAULT NULL,
-			hit_referer_dom_ID   INT UNSIGNED DEFAULT NULL,
-			hit_blog_ID          int(11) UNSIGNED NULL DEFAULT NULL,
-			hit_remote_addr      VARCHAR(40) DEFAULT NULL,
-			hit_agnt_ID          INT UNSIGNED NULL,
+			hit_ID                INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			hit_sess_ID           INT UNSIGNED,
+			hit_datetime          DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
+			hit_uri               VARCHAR(250) DEFAULT NULL,
+			hit_referer_type      ENUM('search','blacklist','spam','referer','direct','self','admin') NOT NULL,
+			hit_referer           VARCHAR(250) DEFAULT NULL,
+			hit_referer_dom_ID    INT UNSIGNED DEFAULT NULL,
+			hit_keyphrase_keyp_ID INT UNSIGNED DEFAULT NULL,
+			hit_blog_ID           int(11) UNSIGNED NULL DEFAULT NULL,
+			hit_remote_addr       VARCHAR(40) DEFAULT NULL,
+			hit_agnt_ID           INT UNSIGNED NULL,
 			PRIMARY KEY              (hit_ID),
 			INDEX hit_agnt_ID        ( hit_agnt_ID ),
 			INDEX hit_blog_ID        ( hit_blog_ID ),
@@ -73,6 +107,7 @@ $schema_queries['T_hitlog'] = array(
 			INDEX hit_referer_dom_ID ( hit_referer_dom_ID ),
 			INDEX hit_sess_ID        ( hit_sess_ID )
 		)" );
+		// fp> needed? 			INDEX hit_keyphrase_keyp_ID( hit_keyphrase_keyp_ID ),
 
 $schema_queries['T_track__goal'] = array(
 		'Creating goals table',
@@ -101,6 +136,9 @@ $schema_queries['T_track__goalhit'] = array(
 
 /*
  * $Log$
+ * Revision 1.2  2008/05/10 22:59:10  fplanque
+ * keyphrase logging
+ *
  * Revision 1.1  2008/04/06 19:19:30  fplanque
  * Started moving some intelligence to the Modules.
  * 1) Moved menu structure out of the AdminUI class.

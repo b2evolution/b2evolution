@@ -36,6 +36,56 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * @param string referer
+ * @return string keyphrase
+ */
+function extract_keyphrase_from_referer( $ref )
+{
+	$kwout = '';
+	if( ($pos_question = strpos( $ref, '?' )) == false )
+	{
+		return NULL;
+	}
+
+	$known_search_params =  array(
+				'q',
+				'as_q', 		 // Google Advanced Search Query
+				'as_epq', 		 // Google Advanced Search Query
+				'query',
+				'search',
+				's',				// google.co.uk
+				'p',
+				'kw',
+				'qs',
+				'searchfor',	// mysearch.myway.com
+				'r',
+				'rdata',		// search.ke.voila.fr
+				'string',		// att.net
+				'su',				// suche.web.de
+				'Gw',		// scroogle.org
+			);
+
+	$ref_params = explode( '&', substr( $ref, $pos_question+1 ) );
+	foreach( $ref_params as $ref_param )
+	{
+		$param_parts = explode( '=', $ref_param );
+		if( !empty($param_parts[1]) && in_array( $param_parts[0], $known_search_params )	)
+		{ // found "q" query parameter
+			$q = trim(urldecode($param_parts[1]));
+			if( strpos( $q, 'Ã' ) !== false )
+			{ // Probability that the string is UTF-8 encoded is very high, that'll do for now...
+				//echo "[UTF-8 decoding]";
+				$q = utf8_decode( $q );
+			}
+			return $q;
+		}
+	}
+
+	return NULL;
+}
+
+
+/**
  * A hit to a blog.
  *
  * NOTE: The internal function double_check_referer() uses the class Net_IDNA_php4 from /blogs/lib/_idna_convert.class.php.
@@ -159,6 +209,8 @@ class Hit
 	var $agent_ID;
 
 
+	var $_extracted_keyphrase = false;
+	var $_keyphrase = NULL;
 
 
 	/**
@@ -256,7 +308,7 @@ class Hit
 	function detect_referer()
 	{
 		global $HTTP_REFERER; // might be set by PHP (give highest priority)
-		global $Debuglog;
+		global $Debuglog, $debug;
 		global $self_referer_list, $blackList, $search_engines;  // used to detect $referer_type
 		global $skins_path;
 		global $Settings;
@@ -296,7 +348,8 @@ class Hit
 		// reloads on these... and that would be a problem!
 		foreach( $self_referer_list as $self_referer )
 		{
-			if( strpos( $this->referer, $self_referer ) !== false )
+			if( strpos( $this->referer, $self_referer ) !== false
+				&& ! ($debug && strpos( $this->referer, '/search.html' ) ) ) // search simulation
 			{
 				// This type may be superseeded by admin page
 				if( ! $this->detect_admin_page() )
@@ -347,9 +400,10 @@ class Hit
 
 
 		// Is the referer a search engine?
+		// Note: for debug simulation, you may need to add sth like $search_engines[] = '/credits.html'; into the conf
 		foreach( $search_engines as $lSearchEngine )
 		{
-			if( stristr($this->referer, $lSearchEngine) )
+			if( stristr($this->referer, $lSearchEngine) ) // search simulation
 			{
 				$Debuglog->add( 'detect_referer(): search engine ('.$lSearchEngine.')', 'hit' );
 				$this->referer_type = 'search';
@@ -613,17 +667,68 @@ class Hit
 		$hit_uri = substr($ReqURI, 0, 250); // VARCHAR(250) and likely to be longer
 		$hit_referer = substr($this->referer, 0, 250); // VARCHAR(250) and likely to be longer
 
+		$keyphrase = $this->get_keyphrase();
+
+
+		$keyp_ID = NULL;
+		if( !empty( $keyphrase ) )
+		{
+			$DB->begin();
+
+			$sql = 'SELECT keyp_ID
+								FROM T_track__keyphrase
+							 WHERE keyp_phrase = '.$DB->quote($keyphrase);
+			$keyp_ID = $DB->get_var( $sql, 0, 0, 'Get keyphrase ID' );
+
+			if( empty( $keyp_ID ) )
+			{
+				$sql = 'INSERT INTO T_track__keyphrase( keyp_phrase )
+								VALUES ('.$DB->quote($keyphrase).')';
+				$DB->query( $sql, 'Add new keyphrase' );
+				$keyp_ID = $DB->insert_id;
+			}
+		}
+
 		// insert hit into DB table:
 		$sql = "
 			INSERT INTO T_hitlog(
 				hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
-				hit_referer, hit_referer_dom_ID, hit_blog_ID, hit_remote_addr, hit_agnt_ID )
+				hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_blog_ID, hit_remote_addr, hit_agnt_ID )
 			VALUES( '".$Session->ID."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', '".$this->referer_type
-				."', '".$DB->escape($hit_referer)."', ".$DB->null($this->referer_domain_ID).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', ".$this->agent_ID.'
+				."', '".$DB->escape($hit_referer)."', ".$DB->null($this->referer_domain_ID).', '.$DB->null($keyp_ID)
+				.', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', ".$this->agent_ID.'
 			)';
 
 		$DB->query( $sql, 'Record the hit' );
+
+		if( !empty( $keyphrase ) )
+		{
+			$DB->commit();
+		}
+
 		$this->ID = $DB->insert_id;
+	}
+
+
+
+	/**
+	 * Get the keyphrase in the referer
+	 */
+	function get_keyphrase()
+	{
+		if( !empty( $this->_extracted_keyphrase ) )
+		{
+			return $this->_keyphrase;
+		}
+
+		if( $this->referer_type == 'search' )
+		{
+			$this->_keyphrase = extract_keyphrase_from_referer( $this->referer );
+		}
+
+		$this->_extracted_keyphrase = true;
+
+		return $this->_keyphrase;
 	}
 
 
@@ -756,8 +861,8 @@ class Hit
 
 /*
  * $Log$
- * Revision 1.11  2008/05/07 18:10:17  fplanque
- * trying to fix.
+ * Revision 1.12  2008/05/10 22:59:10  fplanque
+ * keyphrase logging
  *
  * Revision 1.10  2008/05/07 18:07:12  fplanque
  * trying to fix.

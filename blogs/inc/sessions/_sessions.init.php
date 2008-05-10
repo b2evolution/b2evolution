@@ -36,10 +36,13 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  *  If you want to have multiple b2evo installations in a single database you should
  *  change {@link $tableprefix} in _basic_config.php)
  */
+$db_config['aliases']['T_basedomains'] = $tableprefix.'basedomains';
 $db_config['aliases']['T_hitlog'] = $tableprefix.'hitlog';
+$db_config['aliases']['T_track__keyphrase'] = $tableprefix.'track__keyphrase';
 $db_config['aliases']['T_sessions'] = $tableprefix.'sessions';
 $db_config['aliases']['T_track__goal'] = $tableprefix.'track__goal';
 $db_config['aliases']['T_track__goalhit'] = $tableprefix.'track__goalhit';
+$db_config['aliases']['T_useragents'] = $tableprefix.'useragents';
 
 
 /**
@@ -199,6 +202,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.4  2008/05/10 22:59:09  fplanque
+ * keyphrase logging
+ *
  * Revision 1.3  2008/04/24 01:56:08  fplanque
  * Goal hit summary
  *

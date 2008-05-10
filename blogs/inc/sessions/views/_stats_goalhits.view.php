@@ -28,9 +28,10 @@ $goal_name = param( 'goal_name', 'string', NULL, true );
 
 // Create result set:
 $sql = 'SELECT hit_ID, sess_ID, sess_hitcount, hit_datetime, hit_referer_type, hit_uri, hit_blog_ID, hit_referer, hit_remote_addr,
-								user_login, agnt_type, dom_name, goal_name
+								user_login, agnt_type, dom_name, goal_name, keyp_phrase
 					FROM T_track__goalhit LEFT JOIN T_hitlog ON ghit_hit_ID = hit_ID
 								LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
+							  LEFT JOIN T_track__keyphrase ON hit_keyphrase_keyp_ID = keyp_ID
 								LEFT JOIN T_sessions ON hit_sess_ID = sess_ID
 								LEFT JOIN T_useragents ON hit_agnt_ID = agnt_ID
 								LEFT JOIN T_users ON sess_user_ID = user_ID
@@ -122,7 +123,8 @@ $Results->cols[] = array(
 // Keywords:
 $Results->cols[] = array(
 		'th' => T_('Search keywords'),
-		'td' => '%stats_search_keywords( #hit_referer# )%',
+		'order' => 'keyp_phrase',
+		'td' => '%stats_search_keywords( #keyp_phrase# )%',
 	);
 
 $Results->cols[] = array(
@@ -144,6 +146,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.3  2008/05/10 22:59:10  fplanque
+ * keyphrase logging
+ *
  * Revision 1.2  2008/04/17 11:53:21  fplanque
  * Goal editing
  *

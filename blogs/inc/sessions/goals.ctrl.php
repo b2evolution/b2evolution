@@ -17,6 +17,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class( 'sessions/model/_goal.class.php' );
+load_funcs('sessions/model/_hitlog.funcs.php');
 
 /**
  * @var User
@@ -221,6 +222,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2008/05/10 22:59:09  fplanque
+ * keyphrase logging
+ *
  * Revision 1.2  2008/04/24 01:56:08  fplanque
  * Goal hit summary
  *
