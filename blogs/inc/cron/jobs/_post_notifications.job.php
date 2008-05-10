@@ -44,6 +44,9 @@ if( $DB->rows_affected != 1 )
 
 // Get the Item:
 $ItemCache = & get_Cache( 'ItemCache' );
+/**
+ * @var Item
+ */
 $edited_Item = & $ItemCache->get_by_ID( $item_ID );
 
 // send outbound pings:
@@ -64,6 +67,9 @@ return 1; /* ok */
 
 /*
  * $Log$
+ * Revision 1.2  2008/05/10 23:53:46  fplanque
+ * fix
+ *
  * Revision 1.1  2007/06/25 10:59:46  fplanque
  * MODULES (refactored MVC)
  *
