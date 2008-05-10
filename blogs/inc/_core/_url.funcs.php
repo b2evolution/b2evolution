@@ -126,7 +126,14 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 			load_funcs('_ext/idna/_idna_convert.class.php');
 			$IDNA = new Net_IDNA_php4();
 			global $evo_charset;
-			$url = $IDNA->encode( convert_charset($url, 'utf-8', $evo_charset) );
+			$url_utf8 = convert_charset( $url, 'utf-8', $evo_charset );
+			//echo '['.$url_utf8.'] ';
+			$url = $IDNA->encode( $url_utf8 );
+			/* if( $idna_error = $IDNA->get_last_error() )
+			{
+				echo $idna_error;
+			} */
+			// echo '['.$url.']<br>';
 
 			if( ! preg_match('~^           # start
 				([a-z][a-z0-9+.\-]*)             # scheme
@@ -629,6 +636,9 @@ function disp_url( $url, $max_length = NULL )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.19  2008/05/10 21:30:39  fplanque
+ * better UTF-8 handling
+ *
  * Revision 1.18  2008/05/06 23:23:46  fplanque
  * timeout handling
  *

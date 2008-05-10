@@ -48,7 +48,7 @@ class ping_b2evonet_plugin extends Plugin
 	 */
 	var $code = 'ping_b2evonet';
 	var $priority = 50;
-	var $version = '2.0';
+	var $version = '2.4.2.1';
 	var $author = 'The b2evo Group';
 
 	/*
@@ -79,8 +79,11 @@ class ping_b2evonet_plugin extends Plugin
 	function ItemSendPing( & $params )
 	{
 		global $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri;
-		global $debug, $baseurl, $instance_name;
+		global $debug, $baseurl, $instance_name, $evo_charset;
 
+    /**
+		 * @var Blog
+		 */
 		$item_Blog = $params['Item']->get_Blog();
 
 		$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port);
@@ -90,10 +93,10 @@ class ping_b2evonet_plugin extends Plugin
 				new xmlrpcval($item_Blog->ID),    // id
 				new xmlrpcval($baseurl),		      // user -- is this unique enough?
 				new xmlrpcval($instance_name),		// pass -- fp> TODO: do we actually want randomly generated instance names?
-				new xmlrpcval($item_Blog->dget('name', 'xml')),
-				new xmlrpcval($item_Blog->dget('url', 'xml')),
-				new xmlrpcval($item_Blog->dget('locale', 'xml')),
-				new xmlrpcval($params['Item']->dget('title', 'xml' )),
+				new xmlrpcval(convert_charset( $item_Blog->get('name'), 'utf-8', $evo_charset ) ),
+				new xmlrpcval(convert_charset( $item_Blog->get('url'), 'utf-8', $evo_charset ) ),
+				new xmlrpcval($item_Blog->locale),
+				new xmlrpcval(convert_charset( $params['Item']->get('title'), 'utf-8', $evo_charset ) ),
 			)  );
 		$result = $client->send($message);
 
@@ -107,6 +110,9 @@ class ping_b2evonet_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.9  2008/05/10 21:30:39  fplanque
+ * better UTF-8 handling
+ *
  * Revision 1.8  2008/04/09 15:33:36  fplanque
  * ping antispam - part 1
  *

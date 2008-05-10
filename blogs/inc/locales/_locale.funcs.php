@@ -831,6 +831,7 @@ function convert_charset( $string, $dest_charset, $src_charset )
 	{ // mb_string extension:
 		mb_convert_variables( $dest_charset, $src_charset, $string );
 	}
+	// pre_dump( $dest_charset, $src_charset, $string );
 
 	return $string;
 }
@@ -965,6 +966,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.9  2008/05/10 21:30:39  fplanque
+ * better UTF-8 handling
+ *
  * Revision 1.8  2008/03/07 02:04:45  blueyed
  * fix indent again
  *

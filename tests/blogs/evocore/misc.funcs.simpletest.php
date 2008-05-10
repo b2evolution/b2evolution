@@ -9,11 +9,11 @@
  */
 require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 
-
 global $inc_path;
 
 load_funcs('antispam/model/_antispam.funcs.php');
 load_funcs('_core/_misc.funcs.php');
+load_funcs('_core/_url.funcs.php');
 
 
 /**
@@ -159,7 +159,25 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 
 	function test_validate_url()
 	{
+		global $evo_charset;
+		$evo_charset = 'latin1';
+
 		// valid:
+		foreach( array(
+			'http://b2evolution.net',
+			'https://demo.b2evolution.net',
+			'http://user@example.com/path',
+			'http://user:pass@example.com/path',
+			'mailto:example@example.org',
+			'mailto:example@example.org?subject=TEST',
+			'http://lдu.de/',
+			) as $url )
+		{
+			$r = validate_url( $url, 'commenting' );
+			// True means validation ok
+			$this->assertFalse( $r, $url.' NOT allowed in comments' );
+		}
+
 		foreach( array(
 			'http://b2evolution.net',
 			'https://demo.b2evolution.net',
@@ -173,11 +191,8 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 			'#anchor',
 			) as $url )
 		{
-			$r = validate_url( $url, $GLOBALS['comments_allowed_uri_scheme'] );
-			$this->assertFalse( $r, $url.' allowed in comments' );
-
-			$r = validate_url( $url, $GLOBALS['allowed_uri_scheme'] );
-			$this->assertFalse( $r, $url.' allowed in general' );
+			$r = validate_url( $url, 'posting' );
+			$this->assertFalse( $r, $url.' NOT allowed in posts' );
 		}
 
 		// invalid:
@@ -189,11 +204,12 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 			'foobar',
 			) as $url )
 		{
-			$r = validate_url( $url, $GLOBALS['comments_allowed_uri_scheme'] );
+			$r = validate_url( $url, 'commenting' );
+			// True means validation rejected
 			$this->assertTrue( $r, $url.' allowed in comments' );
 
-			$r = validate_url( $url, $GLOBALS['allowed_uri_scheme'] );
-			$this->assertTrue( $r, $url.' allowed in general' );
+			$r = validate_url( $url, 'posting' );
+			$this->assertTrue( $r, $url.' allowed in posts' );
 		}
 	}
 
@@ -315,7 +331,20 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 	 */
 	function test_format_to_output()
 	{
+		global $evo_charset;
+
+		$evo_charset = 'latin1';
 		$this->assertEqual( format_to_output('<a href="">link</a>  text', 'text'), 'link text' );
+		$this->assertEqual( format_to_output('<b>йки</b>', 'htmlbody'), '<b>&#233;&#234;&#232;</b>' );
+		$this->assertEqual( format_to_output('<b>йки</b>', 'xml'), '&#233;&#234;&#232;' );
+		$this->assertEqual( format_to_output( chr(128).'&#128;' ), '&#8364;&#8364;' ); // Euro sign, Windows style
+
+		$evo_charset = 'utf-8';
+		$this->assertEqual( format_to_output('<a href="">link</a>  text', 'text'), 'link text' );
+		$this->assertEqual( format_to_output('<b>Г©ГЄГЁГ«</b>', 'htmlbody'), '<b>Г©ГЄГЁГ«</b>' );
+		$this->assertEqual( format_to_output('<b>Г©ГЄГЁГ«</b>', 'xml'), 'Г©ГЄГЁГ«' );
+
+		$evo_charset = 'latin1';
 	}
 
 
@@ -365,6 +394,21 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual(
 			make_rel_links_abs('foo <a href="http://test/bar">bar</a> <img src="/bar" />', 'http://example.com'),
 			'foo <a href="http://test/bar">bar</a> <img src="http://example.com/bar" />' );
+	}
+
+
+	/**
+	 * Tests {@link test_convert_charset()}.
+	 */
+	function test_convert_charset()
+	{
+		$this->assertEqual( convert_charset( 'йкил', 'utf-8', 'latin1' ), 'Г©ГЄГЁГ«' );
+		$this->assertEqual( convert_charset( 'Г©ГЄГЁГ«', 'latin1', 'utf-8' ), 'йкил' );
+		$this->assertEqual( convert_charset( 'Г©ГЄГЁГ«', 'Latin1', 'UTF-8' ), 'йкил' );
+		$this->assertEqual( convert_charset( 'Г©ГЄГЁГ«', 'Latin1', 'Utf8' ), 'йкил' );
+
+		// THIS ONE will produce NO conversion because 'latin-1' is not a valid charset name for this func
+		$this->assertEqual( convert_charset( 'йкил', 'utf-8', 'latin-1' ), 'йкил' );
 	}
 
 }
