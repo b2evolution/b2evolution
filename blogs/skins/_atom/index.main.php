@@ -14,6 +14,19 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+// EXTERNAL FEED PROVIDER?
+$atom_redirect = $Blog->get_setting('atom_redirect');
+if (!empty($atom_redirect))
+{
+	if( $redir == 'yes' )
+	{
+		header_redirect( $atom_redirect, 301 );
+		exit(0);
+	}
+}
+
+
 // Note: even if we request the same post as $Item earlier, the following will do more restrictions (dates, etc.)
 // Init the MainList object:
 init_MainList( $Blog->get_setting('posts_per_feed') );
@@ -24,16 +37,6 @@ if( $feed_content == 'none' )
 {	// We don't want to provide this feed!
 	// This will normaly have been detected earlier but just for security:
 	debug_die( 'Feeds are disabled.');
-}
-
-$atom_redirect = $Blog->get_setting('atom_redirect');
-if (!empty($atom_redirect))
-{
-	if( $redir == 'yes' )
-	{
-		header_redirect($atom_redirect);
-		exit();
-	}
 }
 
 if( $debug)

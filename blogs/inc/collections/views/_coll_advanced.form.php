@@ -83,18 +83,19 @@ $Form->begin_fieldset( T_('After each new post...') );
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset( T_('External Feeds').get_manual_link('external_feeds') );
+	$Form->text_input( 'atom_redirect', $edited_Blog->get_setting( 'atom_redirect' ), 50, T_('Atom Feed URL'),
+											T_('Example: Your Feedburner Atom URL'));
+	$Form->text_input( 'rss2_redirect', $edited_Blog->get_setting( 'rss2_redirect' ), 50, T_('RSS2 Feed URL'),
+											T_('Example: Your Feedburner RSS2 URL'));
+$Form->end_fieldset();
+
+
 if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 {	// Permission to edit advanced admin settings
 
 	$Form->begin_fieldset( T_('Aggregation').' ['.T_('Admin').']' );
 		$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Blogs to aggregate'), T_('List blog IDs separated by ,'), 255 );
-	$Form->end_fieldset();
-
-	$Form->begin_fieldset( T_('External Feeds'));
-		$Form->text_input( 'atom_redirect', $edited_Blog->get_setting( 'atom_redirect' ), 50, T_('Atom'),
-												T_('Your external atom feed'));
-		$Form->text_input( 'rss2_redirect', $edited_Blog->get_setting( 'rss2_redirect' ), 50, T_('RSS2'),
-												T_('Your external rss2 feed'));
 	$Form->end_fieldset();
 
 
@@ -175,6 +176,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.12  2008/05/10 23:41:32  fplanque
+ * cleanup of external feed providers
+ *
  * Revision 1.11  2008/04/30 18:32:52  waltercruz
  * External feeds
  *

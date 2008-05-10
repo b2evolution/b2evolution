@@ -294,19 +294,11 @@ class Blog extends DataObject
 
 		if( param( 'atom_redirect', 'string', NULL ) !== NULL )
 		{
-			if( !preg_match( '#^(https?://.+)?$#', get_param( 'atom_redirect' ) ) )
-			{
-				param_error( 'atom_redirect', T_('Invalid atom feed address.') );
-			}
+			param_check_url( 'atom_redirect', 'commenting' );
 			$this->set_setting( 'atom_redirect', get_param( 'atom_redirect' ) );
-		}
 
-		if( param( 'rss2_redirect', 'string', NULL ) !== NULL )
-		{
-			if( !preg_match( '#^(https?://.+)?$#', get_param( 'rss2_redirect' ) ) )
-			{
-				param_error( 'rss2_redirect', T_('Invalid rss2 feed address.') );
-			}
+			param( 'rss2_redirect', 'string', NULL );
+			param_check_url( 'rss2_redirect', 'commenting' );
 			$this->set_setting( 'rss2_redirect', get_param( 'rss2_redirect' ) );
 		}
 
@@ -1923,6 +1915,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.40  2008/05/10 23:41:31  fplanque
+ * cleanup of external feed providers
+ *
  * Revision 1.39  2008/05/05 18:50:07  waltercruz
  * URL validation of external feeds
  *
