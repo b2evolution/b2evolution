@@ -2089,9 +2089,21 @@ function upgrade_b2evo_tables()
 			ADD COLUMN post_varchar3  VARCHAR(255) NULL COMMENT 'Custom varchar value 3' AFTER post_varchar2" );
 		echo "OK.<br />\n";
 
-		echo 'Upgrading hitlog table... ';
+ 		echo 'Creating keyphrase table... ';
+		$query = "CREATE TABLE T_track__keyphrase (
+            keyp_ID      INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            keyp_phrase  VARCHAR( 255 ) NOT NULL,
+            PRIMARY KEY        ( keyp_ID ),
+            UNIQUE keyp_phrase ( keyp_phrase )
+          )";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+
+ 		echo 'Upgrading hitlog table... ';
 		$query = "ALTER TABLE T_hitlog
-			CHANGE COLUMN hit_ID hit_ID               INT(11) UNSIGNED NOT NULL AUTO_INCREMENT";
+			 CHANGE COLUMN hit_ID hit_ID              INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			 CHANGE COLUMN hit_datetime hit_datetime  DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
+			 ADD COLUMN hit_keyphrase_keyp_ID         INT UNSIGNED DEFAULT NULL AFTER hit_referer_dom_ID";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
@@ -2119,7 +2131,49 @@ function upgrade_b2evo_tables()
          )" );
 		echo "OK.<br />\n";
 
+		set_upgrade_checkpoint( '9800' );
 	}
+
+
+	echo 'Updating keyphrases in hitlog table... ';
+	flush();
+	load_funcs( 'sessions/model/_hit.class.php' );
+  $sql = 'SELECT hit_ID, hit_referer
+  					FROM T_hitlog
+   				 WHERE hit_referer_type = "search"
+   				 	 AND hit_keyphrase_keyp_ID IS NULL'; // this line just in case we crashed in the middle, so we restart where we stopped
+	$rows = $DB->get_results( $sql, OBJECT, 'get all search hits' );
+	foreach( $rows as $row )
+	{
+		$keyphrase = extract_keyphrase_from_referer( $row->hit_referer );
+		if( empty( $keyphrase ) )
+		{
+			continue;
+		}
+
+		$DB->begin();
+
+		$sql = 'SELECT keyp_ID
+							FROM T_track__keyphrase
+						 WHERE keyp_phrase = '.$DB->quote($keyphrase);
+		$keyp_ID = $DB->get_var( $sql, 0, 0, 'Get keyphrase ID' );
+
+		if( empty( $keyp_ID ) )
+		{
+			$sql = 'INSERT INTO T_track__keyphrase( keyp_phrase )
+							VALUES ('.$DB->quote($keyphrase).')';
+			$DB->query( $sql, 'Add new keyphrase' );
+			$keyp_ID = $DB->insert_id;
+		}
+
+		$DB->query( 'UPDATE T_hitlog
+										SET hit_keyphrase_keyp_ID = '.$keyp_ID.'
+									WHERE hit_ID = '.$row->hit_ID, 'Update hit' );
+
+		$DB->commit();
+		echo ". \n";
+	}
+	echo "OK.<br />\n";
 
 
 	/*
@@ -2239,6 +2293,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.256  2008/05/10 23:41:04  fplanque
+ * keyphrase logging
+ *
  * Revision 1.255  2008/04/06 19:19:30  fplanque
  * Started moving some intelligence to the Modules.
  * 1) Moved menu structure out of the AdminUI class.
