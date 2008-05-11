@@ -973,7 +973,7 @@ class Results extends Table
 				$output = $this->parse_col_content( $col['td'] );
 				#pre_dump( '{'.$output.'}' );
 				$out = eval( "return '$output';" );
-				echo ( trim(strip_tags($out)) === '' ? '&nbsp;' : $out );
+				echo ( trim(strip_tags($out,'<img>')) === '' ? '&nbsp;' : $out );
 
 				// COL START:
 				$this->display_col_end();
@@ -1795,6 +1795,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.11  2008/05/11 22:20:32  fplanque
+ * fix
+ *
  * Revision 1.10  2008/05/10 23:53:46  fplanque
  * fix
  *
