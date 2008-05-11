@@ -43,12 +43,6 @@
  * @author mfollett: Matt FOLLETT.
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
- * {@internal Below is a list of former authors whose contributions to this file have been
- *            either removed or redesigned and rewritten anew:
- *            - t3dworld
- *            - tswicegood
- * }}
- *
  * @version $Id$
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
@@ -325,8 +319,6 @@ load_funcs('_core/ui/forms/_form.funcs.php');
 load_funcs('_core/ui/forms/_form.class.php');
 load_class('items/model/_itemquery.class.php');
 load_funcs('_ext/_swfcharts.php');
-
-
 $Timer->pause( '_main.inc:requires' );
 
 
@@ -359,7 +351,7 @@ locale_activate( $default_locale );
 /*
  * Login procedure: {{{
  * TODO: dh> the meat of this login procedure should be moved to an extra file IMHO so that if a session exists (in most cases) it does not trigger parsing the meat of this code
- * !!! fp> a session can and wil exist before a user is already logged in.
+ * !!! fp> a session can and will exist before a user is already logged in.
  */
 if( !isset($login_required) )
 {
@@ -651,6 +643,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.92  2008/05/11 22:20:46  fplanque
+ * minor
+ *
  * Revision 1.91  2008/05/10 22:59:09  fplanque
  * keyphrase logging
  *
