@@ -458,27 +458,20 @@ function skin_404_header()
 /**
  * Template tag. Output content-type header
  *
- * We use this method when we are NOT generating a static page
- *
  * @see skin_content_meta()
  *
  * @param string content-type; override for RSS feeds
  */
 function skin_content_header( $type = 'text/html' )
 {
-	global $generating_static, $io_charset;
+	global $io_charset;
 
-	if( empty($generating_static) )
-	{	// We use this method when we are NOT generating a static page
-		header( 'Content-type: '.$type.'; charset='.$io_charset );
-	}
+	header( 'Content-type: '.$type.'; charset='.$io_charset );
 }
 
 
 /**
  * Template tag. Output content-type http_equiv meta tag
- *
- * We use this method when we ARE generating a static page
  *
  * @see skin_content_header()
  *
@@ -486,12 +479,9 @@ function skin_content_header( $type = 'text/html' )
  */
 function skin_content_meta( $type = 'text/html' )
 {
-	global $generating_static, $io_charset;
+	global $io_charset;
 
-	if( ! empty($generating_static) )
-	{	// We use this method when we ARE generating a static page
-		echo '<meta http-equiv="Content-Type" content="'.$type.'; charset='.$io_charset.'" />';
-	}
+	echo '<meta http-equiv="Content-Type" content="'.$type.'; charset='.$io_charset.'" />'."\n";
 }
 
 
@@ -605,6 +595,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.31  2008/05/11 01:09:42  fplanque
+ * always output charset header + meta
+ *
  * Revision 1.30  2008/04/26 22:20:45  fplanque
  * Improved compatibility with older skins.
  *

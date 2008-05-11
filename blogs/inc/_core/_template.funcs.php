@@ -339,7 +339,7 @@ function base_tag( $url, $target = NULL )
 	{
 		echo ' target="'.$target.'"';
 	}
-	echo "\" />\n";
+	echo " />\n";
 }
 
 
@@ -769,6 +769,9 @@ function link_pages()
 
 /*
  * $Log$
+ * Revision 1.30  2008/05/11 01:09:42  fplanque
+ * always output charset header + meta
+ *
  * Revision 1.29  2008/04/26 22:20:44  fplanque
  * Improved compatibility with older skins.
  *
