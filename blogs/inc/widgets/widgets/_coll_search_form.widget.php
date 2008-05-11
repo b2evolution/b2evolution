@@ -89,7 +89,7 @@ class coll_search_form_Widget extends ComponentWidget
 		echo '<input type="radio" name="sentence" value="OR" id="sentOR" '.( $sentence=='OR' ? 'checked="checked" ' : '' ).'/><label for="sentOR">'.T_('Some Word').'</label><br />';
 		echo '<input type="radio" name="sentence" value="sentence" id="sentence" '.( $sentence=='sentence' ? 'checked="checked" ' : '' ).'/><label for="sentence">'.T_('Entire phrase').'</label>';
 		echo '</p>';
-		echo '<input type="submit" name="submit" class="submit" value="'.T_('Search').'" class="search_submit" />';
+		echo '<input type="submit" name="submit" class="submit" value="'.T_('Search').'" />';
 		echo '</form>';
 
 		echo $this->disp_params['block_end'];
@@ -101,6 +101,9 @@ class coll_search_form_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.7  2008/05/11 01:06:40  fplanque
+ * OMG I'm pathetic :/
+ *
  * Revision 1.6  2008/05/06 23:34:25  fplanque
  * reverted my own screwup on the search_submit class
  *
