@@ -867,11 +867,12 @@ switch( $action )
 					$DB->commit();
 
 					$Messages->add( sprintf( T_('&laquo;%s&raquo; has been posted.'), $l_File->dget('name') ), 'success' );
-
-					// Note: we redirect without restoring filter. This should allow to see the new files.
-					// &filter=restore
-					header_redirect( 'admin.php?ctrl=items&blog='.$blog );	// Will save $Messages
 				}
+
+				// Note: we redirect without restoring filter. This should allow to see the new files.
+				// &filter=restore
+				header_redirect( 'admin.php?ctrl=items&blog='.$blog );	// Will save $Messages
+
 				break;
 		}
 
@@ -1552,6 +1553,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2008/05/12 20:33:53  fplanque
+ * fix
+ *
  * Revision 1.17  2008/04/14 19:50:51  fplanque
  * enhanced attachments handling in post edit mode
  *
