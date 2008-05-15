@@ -356,8 +356,11 @@ skin_include( '_html_header.inc.php' );
 
 
 </div></div>
-<!-- footer ends here -->
-
+<!-- footer ends here
+<?php
+	// Trigger plugin event, which could be used e.g. by a google_analytics plugin to add the javascript snippet here:
+	$Plugins->trigger_event('SkinEndHtmlBody');
+?>
 <!-- wrap ends here -->
 </div>
 
