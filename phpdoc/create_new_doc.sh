@@ -17,7 +17,7 @@ export PHP="php -d memory_limit=1024M"
 TIMESTAMPFILE="create_new_doc.timestamp"
 TIMESTAMPFILE_PHPDOC="create_new_doc.phpdoc.timestamp"
 
-RSYNC_TARGET="doc.b2evolution.net:/var/www/vhosts/evodoc/web/HEAD/"
+RSYNC_TARGET="dada.thequod.de:/var/www/vhosts/evodoc/web/HEAD/"
 
 # halt on any error:
 set -e
