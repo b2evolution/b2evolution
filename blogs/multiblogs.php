@@ -282,7 +282,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		$Blog_B = & $BlogCache->get_by_ID( 2, false );
 		if( empty($Blog_B) )
 		{
-			echo T_('Blog #2 doesn\'t seem to exist.');
+			echo sprintf( T_('Blog #%d doesn\'t seem to exist.'), 2 );
 		}
 		else
 		{
@@ -342,7 +342,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		$Blog_roll = & $BlogCache->get_by_ID( 3, false );
 		if( empty($Blog_roll) )
 		{
-			echo T_('Blog #3 doesn\'t seem to exist.');
+			echo sprintf( T_('Blog #%d doesn\'t seem to exist.'), 3 );
 		}
 		else
 		{
