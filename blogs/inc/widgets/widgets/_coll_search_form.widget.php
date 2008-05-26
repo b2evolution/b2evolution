@@ -46,6 +46,26 @@ class coll_search_form_Widget extends ComponentWidget
 	}
 
 
+  /**
+   * Get definitions for editable params
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		$r = array_merge( array(
+				'disp_search_options' => array(
+					'label' => T_( 'Search options' ),
+					'note' => T_( 'Display radio buttons for "All Words", "Some Word" and "Entire Phrase"' ),
+					'type' => 'checkbox',
+					'defaultvalue' => true,
+				),
+			), parent::get_param_definitions( $params )	);
+
+		return $r;
+	}
+
 	/**
 	 * Get name of widget
 	 */
@@ -83,11 +103,17 @@ class coll_search_form_Widget extends ComponentWidget
 		form_formstart( $Blog->gen_blogurl(), 'search', 'SearchForm' );
 		echo '<p>';
 		$s = get_param( 's' );
-		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars($s).'" class="SearchField" /><br />';
-		$sentence = get_param( 'sentence' );
-		echo '<input type="radio" name="sentence" value="AND" id="sentAND" '.( $sentence=='AND' ? 'checked="checked" ' : '' ).'/><label for="sentAND">'.T_('All Words').'</label><br />';
-		echo '<input type="radio" name="sentence" value="OR" id="sentOR" '.( $sentence=='OR' ? 'checked="checked" ' : '' ).'/><label for="sentOR">'.T_('Some Word').'</label><br />';
-		echo '<input type="radio" name="sentence" value="sentence" id="sentence" '.( $sentence=='sentence' ? 'checked="checked" ' : '' ).'/><label for="sentence">'.T_('Entire phrase').'</label>';
+		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars($s).'" class="SearchField" />';
+
+		if( $this->disp_params[ 'disp_search_options' ] )
+		{
+			$sentence = get_param( 'sentence' );
+			echo '<div class="search_options">';
+			echo '<div class="search_option"><input type="radio" name="sentence" value="AND" id="sentAND" '.( $sentence=='AND' ? 'checked="checked" ' : '' ).'/><label for="sentAND">'.T_('All Words').'</label></div>';
+			echo '<div class="search_option"><input type="radio" name="sentence" value="OR" id="sentOR" '.( $sentence=='OR' ? 'checked="checked" ' : '' ).'/><label for="sentOR">'.T_('Some Word').'</label></div>';
+			echo '<div class="search_option"><input type="radio" name="sentence" value="sentence" id="sentence" '.( $sentence=='sentence' ? 'checked="checked" ' : '' ).'/><label for="sentence">'.T_('Entire phrase').'</label></div>';
+			echo '</div>';
+		}
 		echo '</p>';
 		echo '<input type="submit" name="submit" class="submit" value="'.T_('Search').'" />';
 		echo '</form>';
@@ -101,6 +127,9 @@ class coll_search_form_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.8  2008/05/26 19:02:28  fplanque
+ * enhanced search widget
+ *
  * Revision 1.7  2008/05/11 01:06:40  fplanque
  * OMG I'm pathetic :/
  *
