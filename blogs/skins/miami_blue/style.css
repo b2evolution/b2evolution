@@ -80,26 +80,26 @@ div.pageHeader {
 /*
  * Header / bloglist on top:
  */
-div.pageHeader ul {
+div#page_top ul {
 	float:right;
 	margin: 0;
 	list-style-type:none;
 	padding: 8px 5px;
 }
-div.pageHeader li {
+div#page_top li {
 	display: inline;
 	padding: 0 1ex 0 0;
 }
-div.pageHeader li a {
+div#page_top li a {
 	font-weight: bold;
 	font-style:italic;
 	color: #fff;
 }
-div.pageHeader li a:hover {
+div#page_top li a:hover {
 	color: #666;
 	text-decoration: underline;
 }
-div.pageHeader li a.selected {
+div#page_top li a.selected {
 	text-decoration: underline;
 }
 

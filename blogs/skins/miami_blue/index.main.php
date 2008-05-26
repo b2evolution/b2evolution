@@ -37,7 +37,7 @@ skin_include( '_html_header.inc.php' );
 
 <div class="pageHeader">
 
-	<div class="PageTop">
+	<div id="page_top">
 		<?php
 			// Display container and contents:
 			skin_container( NT_('Page Top'), array(
