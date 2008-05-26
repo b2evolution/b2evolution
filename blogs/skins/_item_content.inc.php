@@ -16,12 +16,18 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Default params:
 $params = array_merge( array(
-		'image_size'	     => 'fit-400x320',
-		'before_url_link'  => '<p class="post_link">'.T_('Link:').' ',
-		'after_url_link'   => '</p>',
-		'before_more_link' => '<p class="bMore">',
-		'after_more_link'  => '</p>',
-		'more_link_text'   => '#',
+		'before_images'       => '<div class="bImages">',
+		'before_image'        => '<div class="image_block">',
+		'before_image_legend' => '<div class="image_legend">',
+		'after_image_legend'  => '</div>',
+		'after_image'         => '</div>',
+		'after_images'        => '</div>',
+		'image_size'	        => 'fit-400x320',
+		'before_url_link'     => '<p class="post_link">'.T_('Link:').' ',
+		'after_url_link'      => '</p>',
+		'before_more_link'    => '<p class="bMore">',
+		'after_more_link'     => '</p>',
+		'more_link_text'      => '#',
 	), $params );
 
 
@@ -29,12 +35,12 @@ if( !empty($params['image_size']) )
 {
 	// Display images that are linked to this post:
 	$Item->images( array(
-			'before' =>              '<div class="bImages">',
-			'before_image' =>        '<div class="image_block">',
-			'before_image_legend' => '<div class="image_legend">',
-			'after_image_legend' =>  '</div>',
-			'after_image' =>         '</div>',
-			'after' =>               '</div>',
+			'before' =>              $params['before_images'],
+			'before_image' =>        $params['before_image'],
+			'before_image_legend' => $params['before_image_legend'],
+			'after_image_legend' =>  $params['after_image_legend'],
+			'after_image' =>         $params['after_image_legend'],
+			'after' =>               $params['after_images'],
 			'image_size' =>					 $params['image_size'],
 		) );
 }
@@ -87,6 +93,9 @@ if( !empty($params['image_size']) )
 <?php
 /*
  * $Log$
+ * Revision 1.9  2008/05/26 19:22:07  fplanque
+ * fixes
+ *
  * Revision 1.8  2008/01/21 09:35:42  fplanque
  * (c) 2008
  *

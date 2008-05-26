@@ -119,12 +119,18 @@ if( $resolve_extra_path )
 	$blog_baseuri = substr( $Blog->gen_baseurl(), strlen( $Blog->get('baseurlroot') ) );
 	$Debuglog->add( 'blog_baseuri: "'.$blog_baseuri.'"', 'params' );
 
-	if( ($pos = strpos( $ReqPath, $blog_baseuri )) !== false )
-	{ // note: $pos will typically be 0
-		$path_string = substr( $ReqPath, $pos+strlen( $blog_baseuri ) );
+	// Remove trailer:
+	$blog_baseuri_regexp = preg_replace( '¤(\.php[0-9]?)?/?$¤', '', $blog_baseuri );
+	// Readd possibilities in order to get a broad match:
+	$blog_baseuri_regexp = '¤^'.preg_quote( $blog_baseuri_regexp ).'(\.php[0-9]?)?/(.+)$¤';
+	// pre_dump( 'blog_baseuri_regexp: "', $blog_baseuri_regexp );
+
+	if( preg_match( $blog_baseuri_regexp, $ReqPath, $matches ) )
+	{ // We have extra path info
+		$path_string = $matches[2];
 
 		$Debuglog->add( 'Extra path info found! path_string=' . $path_string , 'params' );
-		//echo "path=[$path_string]<br />";
+		// echo "path=[$path_string]<br />";
 
 		// Replace encoded ; with regular ; (used for tags)
 		$path_string = str_replace( '%3b', ';', $path_string );
@@ -141,7 +147,7 @@ if( $resolve_extra_path )
 				$path_elements[] = $path_element;
 			}
 		}
-		// pre_dump( $path_elements );
+		// pre_dump( '',$path_elements );
 
 		if( isset( $path_elements[0] ) && preg_match( '#.*\.php[0-9]?$#', $path_elements[0] ) )
 		{ // Ignore element ending with .php (fp: note: may be just '.php')
@@ -303,11 +309,11 @@ if( !empty($p) || !empty($title) )
 	// Make sure the single post we're requesting (still) exists:
 	$ItemCache = & get_Cache( 'ItemCache' );
 	if( !empty($p) )
-	{
+	{	// Get from post ID:
 		$Item = & $ItemCache->get_by_ID( $p, false );
 	}
 	else
-	{
+	{	// Get from post title:
 		$title = preg_replace( '/[^A-Za-z0-9_]/', '-', $title );
 		$Item = & $ItemCache->get_by_urltitle( $title, false );
 	}
@@ -368,9 +374,10 @@ elseif( $disp == 'posts' && !empty($Item) )
 
 			$canonical_url = $Item->get_permanent_url( '', '', '&' );
 
+			// fp> why are we cropping params?
 			$requested_crop = preg_replace( '¤\?.*$¤', '', $ReqHost.$ReqURI );
 			$canonical_crop = preg_replace( '¤\?.*$¤', '', $canonical_url );
-			// pre_dump( $requested_crop, $canonical_crop );
+			// pre_dump( '', $requested_crop, $canonical_crop );
 
 			if( $requested_crop != $canonical_crop )
 			{	// The requested URL does not look like the canonical URL for this post,
@@ -526,6 +533,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.103  2008/05/26 19:22:00  fplanque
+ * fixes
+ *
  * Revision 1.102  2008/05/06 23:37:06  fplanque
  * revert
  *

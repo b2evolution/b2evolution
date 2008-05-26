@@ -237,14 +237,14 @@ function rmdir_r( $path )
 
 			// echo "<br> - $os_filepath ";
 
-			if( is_dir( $adfp_filepath ) )
-			{
+			if( is_dir( $adfp_filepath ) && ! is_link($adfp_filepath) )
+			{ // Note: we do NOT follow symlinks
 				// echo 'D';
 				rmdir_r( $adfp_filepath );
 			}
 			else
-			{
-				//echo 'F';
+			{ // File or symbolic link
+				//echo 'F/S';
 				@unlink( $adfp_filepath );
 			}
 		}
@@ -346,7 +346,7 @@ function no_trailing_slash( $path )
 {
 	if( substr( $path, -1 ) == '/' )
 	{
-		return substr( $path, 0, strlen( $path ) );
+		return substr( $path, 0, strlen( $path )-1 );
 	}
 	else
 	{
@@ -721,6 +721,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 
 /*
  * $Log$
+ * Revision 1.7  2008/05/26 19:22:00  fplanque
+ * fixes
+ *
  * Revision 1.6  2008/01/21 09:35:28  fplanque
  * (c) 2008
  *

@@ -387,9 +387,13 @@ class ItemList2 extends ItemListLight
 	{
 		$params = array_merge( array(
 									'template' => '$prev$$next$',
+									'prev_start' => '',
 									'prev_text' => '&laquo; $title$',
+									'prev_end' => '',
 									'prev_no_item' => '',
+									'next_start' => '',
 									'next_text' => '$title$ &raquo;',
+									'next_end' => '',
 									'next_no_item' => '',
 								), $params );
 
@@ -604,6 +608,14 @@ class ItemList2 extends ItemListLight
 			case 'order':
 				// We have to integrate a rounding error margin
 				$comp_order_value = $current_Item->order;
+				if( is_null($comp_order_value) )
+				{	// fall back to only ID
+          $next_Query->WHERE_and( $this->Cache->dbIDname
+																	.$operator
+																	.$current_Item->ID
+															);
+					break;
+				}
 				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
 																.$operator
 																.( $operator == ' < ' ? $comp_order_value-0.000000001 : $comp_order_value+0.000000001 )
@@ -654,6 +666,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.12  2008/05/26 19:22:02  fplanque
+ * fixes
+ *
  * Revision 1.11  2008/04/12 21:40:16  afwas
  * Minor: Added ptyp_ID as post order query option in single post display (get_prevnext_Item())
  *

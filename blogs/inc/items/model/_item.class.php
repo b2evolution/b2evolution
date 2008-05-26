@@ -353,11 +353,15 @@ class Item extends ItemLight
 		if( $params['link_to'] == 'userpage' )
 		{
 			$url = $this->creator_User->get_userpage_url( NULL );
+		}
+		elseif( $params['link_to'] == 'userurl' )
+		{
+			$url = $this->creator_User->url;
+		}
 
-			if( !empty($url) )
-			{
-				$r = '<a href="'.$url.'">'.$r.'</a>';
-			}
+		if( !empty($url) )
+		{
+			$r = '<a href="'.$url.'">'.$r.'</a>';
 		}
 
 		echo $params['before'].$r.$params['after'];
@@ -3540,6 +3544,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.50  2008/05/26 19:22:00  fplanque
+ * fixes
+ *
  * Revision 1.49  2008/04/26 22:20:45  fplanque
  * Improved compatibility with older skins.
  *
