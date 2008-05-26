@@ -1,0 +1,82 @@
+/*  
+Theme Name: GlossyBlue
+Theme URI: http://www.ndesign-studio.com
+Description: WP glossy theme designed by <a href="http://www.ndesign-studio.com">N.Design Studio</a>.
+Version: 1.4
+Author: Nick La
+Author URI: http://www.ndesign-studio.com
+
+	This theme was designed and built by Nick La.
+
+	By downloading and using this theme, you agree to the following terms:
+    - You may NOT resell this theme
+    - A link back to N.Design Studio must be retained in the footer (either modified or unmodified)
+    - You may use this theme for personal or commercial projects
+    - You may modify, translate or distribute
+
+*/
+
+#page {
+	width: 100%;
+	border: none;
+	background: none;
+}
+#header {
+	border-bottom: 3px solid #59780a;
+	height: auto;
+}
+#headerimg {
+	width: auto;
+}
+#headerimg .description{
+	color: #666666;
+	text-align: right;
+	padding-bottom: 3px;
+	right: 0px;
+	position: absolute;
+	left: auto;
+}
+h1 {
+	margin:0px;
+	font: bold 36px/100% "Trebuchet MS", Tahoma, Arial;
+	text-align: right;
+	padding-bottom: 3px;
+}
+h1 a, h1 a:visited{
+	color: #000;
+	text-decoration: none;
+}
+#content {
+	padding: 10px 0px 30px 0px;
+	width: 100%;
+}
+.post-date {
+	font-size: 11px;
+	text-transform: uppercase;
+	color: #666666;
+	height: auto;
+}
+.post-month, .post-day {
+	color: #666666;
+	display: inline;
+	font-size: 11px;
+	padding: 0px;
+	margin: 0px;
+}
+.post-title {
+	margin: 0px;
+	width: 100%;
+	clear: both;
+}
+.post-cat {
+	float:left;
+	font-size: 11px;
+	padding: 0;
+}
+.post-comments, .post-calendar {
+	float: right;
+	font-size: 11px;
+}
+#comments, #respond, .navigation, #nav, #commentform, #sidebar, #footer, #credits {
+	display: none;
+}
