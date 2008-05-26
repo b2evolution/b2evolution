@@ -251,7 +251,9 @@ class Results extends Table
 	 * @param integer number of lines displayed on one page (0 to disable paging; null to use $UserSettings/results_per_page)
 	 * @param string SQL to get the total count of results
 	 * @param boolean
-	 * @param NULL|string SQL query used to count the total # of rows (if NULL, we'll try to COUNT(*) by ourselves)
+	 * @param string|integer SQL query used to count the total # of rows
+	 * 												- if integer, we'll use that as the count
+	 * 												- if NULL, we'll try to COUNT(*) by ourselves
 	 */
 	function Results( $sql, $param_prefix = '', $default_order = '', $limit = NULL, $count_sql = NULL, $init_page = true )
 	{
@@ -607,58 +609,65 @@ class Results extends Table
 	{
 		global $DB;
 
-		if( empty( $sql_count ) )
-		{
-			if( is_null($this->sql) )
-			{ // We may want to remove this later...
-				$this->total_rows = 0;
-				$this->total_pages = 0;
-				return;
-			}
-
-			$sql_count = $this->sql;
-			// echo $sql_count;
-
-			/*
-			 *
-			 * On a un problème avec la recherche sur les sociétés
-			 * si on fait un select count(*), ça sort un nombre de réponses énorme
-			 * mais on ne sait pas pourquoi... la solution est de lister des champs dans le COUNT()
-			 * MAIS malheureusement ça ne fonctionne pas pour d'autres requêtes.
-			 * L'idéal serait de réussir à isoler qu'est-ce qui, dans la requête SQL, provoque le comportement
-			 * bizarre....
-			 */
-			// Tentative 1:
-			// if( !preg_match( '#FROM(.*?)((WHERE|ORDER BY|GROUP BY) .*)?$#si', $sql_count, $matches ) )
-			//  debug_die( "Can't understand query..." );
-			// if( preg_match( '#(,|JOIN)#si', $matches[1] ) )
-			// { // there was a coma or a JOIN clause in the FROM clause of the original query,
-			// Tentative 2:
-			// fplanque: je pense que la différence est sur la présence de DISTINCT ou non.
-			// if( preg_match( '#\s DISTINCT \s#six', $sql_count, $matches ) )
-			if( preg_match( '#\s DISTINCT \s+ ([A-Za-z_]+)#six', $sql_count, $matches ) )
-			{ //
-				// Get rid of any Aliases in colmun names:
-				// $sql_count = preg_replace( '#\s AS \s+ ([A-Za-z_]+) #six', ' ', $sql_count );
-				// ** We must use field names in the COUNT **
-				//$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( $1 ) FROM', $sql_count );
-
-				//Tentative 3: we do a distinct on the first field only when counting:
-				$sql_count = preg_replace( '#^ \s* SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( DISTINCT '.$matches[1].' ) FROM', $sql_count );
-			}
-			else
-			{ // Single table request: we must NOT use field names in the count.
-				$sql_count = preg_replace( '#^ \s* SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( * ) FROM', $sql_count );
-			}
-
-
-			// Make sure there is no ORDER BY clause at the end:
-			$sql_count = preg_replace( '# \s ORDER \s+ BY .* $#xi', '', $sql_count );
-
-			// echo $sql_count;
+		if( is_integer( $sql_count ) )
+		{	// we have a total already
+			$this->total_rows = $sql_count;
 		}
+		else
+		{ // we need to query
+			if( is_null( $sql_count ) )
+			{
+				if( is_null($this->sql) )
+				{ // We may want to remove this later...
+					$this->total_rows = 0;
+					$this->total_pages = 0;
+					return;
+				}
 
-		$this->total_rows = $DB->get_var( $sql_count, 0, 0, get_class($this).'::count_total_rows()' ); //count total rows
+				$sql_count = $this->sql;
+				// echo $sql_count;
+
+				/*
+				 *
+				 * On a un problème avec la recherche sur les sociétés
+				 * si on fait un select count(*), ça sort un nombre de réponses énorme
+				 * mais on ne sait pas pourquoi... la solution est de lister des champs dans le COUNT()
+				 * MAIS malheureusement ça ne fonctionne pas pour d'autres requêtes.
+				 * L'idéal serait de réussir à isoler qu'est-ce qui, dans la requête SQL, provoque le comportement
+				 * bizarre....
+				 */
+				// Tentative 1:
+				// if( !preg_match( '#FROM(.*?)((WHERE|ORDER BY|GROUP BY) .*)?$#si', $sql_count, $matches ) )
+				//  debug_die( "Can't understand query..." );
+				// if( preg_match( '#(,|JOIN)#si', $matches[1] ) )
+				// { // there was a coma or a JOIN clause in the FROM clause of the original query,
+				// Tentative 2:
+				// fplanque: je pense que la différence est sur la présence de DISTINCT ou non.
+				// if( preg_match( '#\s DISTINCT \s#six', $sql_count, $matches ) )
+				if( preg_match( '#\s DISTINCT \s+ ([A-Za-z_]+)#six', $sql_count, $matches ) )
+				{ //
+					// Get rid of any Aliases in colmun names:
+					// $sql_count = preg_replace( '#\s AS \s+ ([A-Za-z_]+) #six', ' ', $sql_count );
+					// ** We must use field names in the COUNT **
+					//$sql_count = preg_replace( '#SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( $1 ) FROM', $sql_count );
+
+					//Tentative 3: we do a distinct on the first field only when counting:
+					$sql_count = preg_replace( '#^ \s* SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( DISTINCT '.$matches[1].' ) FROM', $sql_count );
+				}
+				else
+				{ // Single table request: we must NOT use field names in the count.
+					$sql_count = preg_replace( '#^ \s* SELECT \s+ (.+?) \s+ FROM#six', 'SELECT COUNT( * ) FROM', $sql_count );
+				}
+
+
+				// Make sure there is no ORDER BY clause at the end:
+				$sql_count = preg_replace( '# \s ORDER \s+ BY .* $#xi', '', $sql_count );
+
+				// echo $sql_count;
+			}
+
+			$this->total_rows = $DB->get_var( $sql_count, 0, 0, get_class($this).'::count_total_rows()' ); //count total rows
+		}
 
 		$this->total_pages = empty($this->limit) ? 1 : ceil($this->total_rows / $this->limit);
 
@@ -1795,6 +1804,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.12  2008/05/26 19:24:55  fplanque
+ * allow pre-counting
+ *
  * Revision 1.11  2008/05/11 22:20:32  fplanque
  * fix
  *
