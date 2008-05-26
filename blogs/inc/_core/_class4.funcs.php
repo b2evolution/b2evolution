@@ -95,7 +95,7 @@ function & get_Cache( $objectName )
 			return $FiletypeCache;
 
 		case 'GoalCache';
-			$GoalCache = new DataObjectCache( 'Goal', false, 'T_track__goal', 'goal_', 'goal_ID' ); // COPY (FUNC)
+			$GoalCache = new DataObjectCache( 'Goal', false, 'T_track__goal', 'goal_', 'goal_ID', 'goal_name', 'goal_name' ); // COPY (FUNC)
 			return $GoalCache;
 
 		case 'GroupCache':
@@ -152,6 +152,9 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.9  2008/05/26 19:25:41  fplanque
+ * minor
+ *
  * Revision 1.8  2008/04/17 11:53:16  fplanque
  * Goal editing
  *

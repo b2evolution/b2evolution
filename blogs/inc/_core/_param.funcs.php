@@ -561,7 +561,7 @@ function param_check_isregexp( $var, $err_msg, $field_err_msg = NULL )
  * @param string error message
  * @param boolean Is a non-empty date required?
  * @param string Default (in the format of $date_format)
- * @param string|NULL date format (php format), defaults to {@link locale_datefmt()}
+ * @param string date format (php format), defaults to {@link locale_datefmt()}
  */
 function param_date( $var, $err_msg, $required, $default = '', $date_format = NULL )
 {
@@ -1907,6 +1907,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.23  2008/05/26 19:25:41  fplanque
+ * minor
+ *
  * Revision 1.22  2008/05/06 23:26:56  fplanque
  * doc
  *

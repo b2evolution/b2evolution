@@ -93,6 +93,12 @@ class Goal extends DataObject
 	}
 
 
+	function get_name()
+	{
+		return $this->name;
+	}
+
+
 	/**
 	 * Set param value
 	 *
@@ -124,6 +130,9 @@ class Goal extends DataObject
 
 /*
  * $Log$
+ * Revision 1.2  2008/05/26 19:26:32  fplanque
+ * minor
+ *
  * Revision 1.1  2008/04/20 13:13:36  fplanque
  * no message
  *
