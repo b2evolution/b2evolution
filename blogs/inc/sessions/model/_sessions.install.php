@@ -105,8 +105,10 @@ $schema_queries['T_hitlog'] = array(
 			INDEX hit_blog_ID        ( hit_blog_ID ),
 			INDEX hit_uri            ( hit_uri ),
 			INDEX hit_referer_dom_ID ( hit_referer_dom_ID ),
+		  INDEX hit_remote_addr		 ( hit_remote_addr ),
 			INDEX hit_sess_ID        ( hit_sess_ID )
 		)" );
+		// Note: hit_remote_addr is used for goal matching stats
 		// fp> needed? 			INDEX hit_keyphrase_keyp_ID( hit_keyphrase_keyp_ID ),
 
 $schema_queries['T_track__goal'] = array(
@@ -136,6 +138,9 @@ $schema_queries['T_track__goalhit'] = array(
 
 /*
  * $Log$
+ * Revision 1.3  2008/05/26 19:30:37  fplanque
+ * enhanced analytics
+ *
  * Revision 1.2  2008/05/10 22:59:10  fplanque
  * keyphrase logging
  *

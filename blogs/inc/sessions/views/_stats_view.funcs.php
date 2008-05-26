@@ -33,6 +33,13 @@ function percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '.' )
 	return number_format( $hit_count * 100 / $hit_total, $decimals, $dec_point, '' ).'&nbsp;%';
 }
 
+function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '.' )
+{
+	static $addup = 0;
+
+	$addup += $hit_count;
+	return number_format( $addup * 100 / $hit_total, $decimals, $dec_point, '' ).'&nbsp;%';
+}
 
 /**
  * Helper function for "Requested URI" column
@@ -82,6 +89,9 @@ function stat_session_login( $login, $link = false )
 
 /*
  * $Log$
+ * Revision 1.4  2008/05/26 19:30:39  fplanque
+ * enhanced analytics
+ *
  * Revision 1.3  2008/02/19 11:11:19  fplanque
  * no message
  *

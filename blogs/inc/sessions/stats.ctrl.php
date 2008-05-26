@@ -135,11 +135,11 @@ $AdminUI->disp_body_top();
 $AdminUI->disp_payload_begin();
 
 echo $AdminUI->get_html_menu( array( 'stats', $tab ), 'menu3' );
+flush();
 
 switch( $AdminUI->get_path(1) )
 {
 	case 'summary':
-		flush();
 		// Display VIEW:
 		switch( $tab3 )
 		{
@@ -173,7 +173,20 @@ switch( $AdminUI->get_path(1) )
 
 	case 'refsearches':
 		// Display VIEW:
-		$AdminUI->disp_view( 'sessions/views/_stats_refsearches.view.php' );
+		switch( $tab3 )
+		{
+			case 'hits':
+				$AdminUI->disp_view( 'sessions/views/_stats_refsearches.view.php' );
+				break;
+
+			case 'keywords':
+				$AdminUI->disp_view( 'sessions/views/_stats_search_keywords.view.php' );
+				break;
+
+			case 'topengines':
+				$AdminUI->disp_view( 'sessions/views/_stats_search_engines.view.php' );
+				break;
+		}
 		break;
 
 	case 'useragents':
@@ -223,6 +236,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2008/05/26 19:30:33  fplanque
+ * enhanced analytics
+ *
  * Revision 1.8  2008/05/10 22:59:10  fplanque
  * keyphrase logging
  *

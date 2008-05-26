@@ -2103,7 +2103,8 @@ function upgrade_b2evo_tables()
 		$query = "ALTER TABLE T_hitlog
 			 CHANGE COLUMN hit_ID hit_ID              INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			 CHANGE COLUMN hit_datetime hit_datetime  DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
-			 ADD COLUMN hit_keyphrase_keyp_ID         INT UNSIGNED DEFAULT NULL AFTER hit_referer_dom_ID";
+			 ADD COLUMN hit_keyphrase_keyp_ID         INT UNSIGNED DEFAULT NULL AFTER hit_referer_dom_ID,
+			 ADD INDEX hit_remote_addr ( hit_remote_addr )";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
@@ -2293,6 +2294,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.257  2008/05/26 19:30:32  fplanque
+ * enhanced analytics
+ *
  * Revision 1.256  2008/05/10 23:41:04  fplanque
  * keyphrase logging
  *

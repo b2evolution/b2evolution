@@ -123,7 +123,19 @@ class sessions_Module
 									),
 								'refsearches' => array(
 									'text' => T_('Search B-hits'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=refsearches&amp;blog='.$blog ),
+									'href' => 'admin.php?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog='.$blog,
+									'entries' => array(
+										'hits' => array(
+											'text' => T_('Search hits'),
+											'href' => 'admin.php?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog='.$blog ),
+										'keywords' => array(
+											'text' => T_('Keywords'),
+											'href' => 'admin.php?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords&amp;blog='.$blog ),
+										'topengines' => array(
+											'text' => T_('Top engines'),
+											'href' => 'admin.php?ctrl=stats&amp;tab=refsearches&amp;tab3=topengines&amp;blog='.$blog ),
+										),
+									 ),
 								'referers' => array(
 									'text' => T_('Referered B-hits'),
 									'href' => 'admin.php?ctrl=stats&amp;tab=referers&amp;blog='.$blog ),
@@ -202,6 +214,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.5  2008/05/26 19:30:32  fplanque
+ * enhanced analytics
+ *
  * Revision 1.4  2008/05/10 22:59:09  fplanque
  * keyphrase logging
  *
