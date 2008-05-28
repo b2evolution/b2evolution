@@ -90,13 +90,13 @@ function b2edit_reload( form, newaction, blog )
 	}
 
 	// Set the new form "action" HIDDEN value:
-	if( form.elements.action.value == "update" )
+	if( form.elements.namedItem("actionArray[update]") )
 	{
-		form.elements.action.value = "edit_switchtab";
+		jQuery(form).append('<input type="hidden" name="action" value="edit_switchtab" />');
 	}
-	else if( form.elements.action.value == "create" )
+	else if( form.elements.namedItem("actionArray[create]") )
 	{
-		form.elements.action.value = "new_switchtab";
+		jQuery(form).append('<input type="hidden" name="action" value="new_switchtab" />');
 	}
 
 	// Set the blog we are switching to:
@@ -104,7 +104,7 @@ function b2edit_reload( form, newaction, blog )
 	{
 		form.elements.blog.value = blog;
 	}
-	
+
 	// form.action.value = 'reload';
 	// form.post_title.value = 'demo';
 	// alert( form.action.value + ' ' + form.post_title.value );
@@ -112,7 +112,7 @@ function b2edit_reload( form, newaction, blog )
 	// disable bozo validator if active:
 	// TODO: dh> this seems to actually delete any events attached to beforeunload, which can cause problems if e.g. a plugin hooks this event
 	window.onbeforeunload = null;
-	
+
 	// Submit the form:
 	form.submit();
 
