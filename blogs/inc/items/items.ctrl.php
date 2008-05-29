@@ -126,7 +126,7 @@ switch( $action )
 		// Where are we going to redirect to?
 		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' ) );
 
-		// What form buttton has been pressed?
+		// What form button has been pressed?
 		param( 'save', 'string', '' );
 		$exit_after_save = ( $action != 'update_edit' );
 		break;
@@ -865,6 +865,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2008/05/29 22:15:48  blueyed
+ * typo
+ *
  * Revision 1.22  2008/04/14 16:24:39  fplanque
  * use ActionArray[] to make action handlign more robust
  *
