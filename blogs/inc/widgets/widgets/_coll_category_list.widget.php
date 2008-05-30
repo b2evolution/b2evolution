@@ -57,7 +57,7 @@ class coll_category_list_Widget extends ComponentWidget
 	}
 
 
-    /**
+	/**
 	 * Get short description
 	 */
 	function get_desc()
@@ -66,9 +66,9 @@ class coll_category_list_Widget extends ComponentWidget
 	}
 
 
-    /**
-     * Get definitions for editable params
-     *
+	/**
+	 * Get definitions for editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param array local params
 	 *  - 'title': block title (string, default "Categories")
@@ -358,6 +358,9 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.13  2008/05/30 19:57:37  blueyed
+ * really fix indent
+ *
  * Revision 1.12  2008/05/30 16:39:06  blueyed
  * Indent, doc
  *
