@@ -55,20 +55,20 @@ class coll_title_Widget extends ComponentWidget
 	}
 
 
-  /**
+	/**
 	 * Get short description
 	 */
 	function get_desc()
 	{
 		global $Blog;
 		return sprintf( T_('&laquo;%s&raquo; from the blog\'s <a %s>general settings</a>.'),
-				'<strong>'.$Blog->dget('name').'</strong>', 'href="?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'"' );
+			'<strong>'.$Blog->dget('name').'</strong>', 'href="?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'"' );
 	}
 
 
-  /**
-   * Get definitions for editable params
-   *
+ 	/**
+	 * Get definitions for editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
 	 */
@@ -100,8 +100,8 @@ class coll_title_Widget extends ComponentWidget
 		echo $this->disp_params['block_start'];
 
 		$title = '<a href="'.$Blog->get( 'url', 'raw' ).'">'
-							.$Blog->dget( 'name', 'htmlbody' )
-							.'</a>';
+			.$Blog->dget( 'name', 'htmlbody' )
+			.'</a>';
 		$this->disp_title( $title );
 
 		echo $this->disp_params['block_end'];
@@ -113,6 +113,9 @@ class coll_title_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.6  2008/05/30 16:30:38  blueyed
+ * Fix indent
+ *
  * Revision 1.5  2008/05/06 23:35:47  fplanque
  * The correct way to add linebreaks to widgets is to add them to $disp_params when the container is called, right after the array_merge with defaults.
  *

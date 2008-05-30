@@ -55,7 +55,7 @@ class coll_tagline_Widget extends ComponentWidget
 	}
 
 
-  /**
+	/**
 	 * Get short description
 	 */
 	function get_desc()
@@ -66,9 +66,9 @@ class coll_tagline_Widget extends ComponentWidget
 	}
 
 
-  /**
-   * Get definitions for editable params
-   *
+ 	/**
+	 * Get definitions for editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
 	 */
@@ -108,6 +108,9 @@ class coll_tagline_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.4  2008/05/30 16:30:38  blueyed
+ * Fix indent
+ *
  * Revision 1.3  2008/01/21 09:35:37  fplanque
  * (c) 2008
  *
