@@ -997,13 +997,11 @@ class ItemListLight extends DataObjectList2
 			$title_array['ymdhms'] = $arch;
 		}
 
-
 		// KEYWORDS:
 		if( !empty($this->filters['keywords']) )
 		{
 			$title_array['keywords'] = T_('Keyword(s)').': '.$this->filters['keywords'];
 		}
-
 
 		// TAGS:
 		if( !empty($this->filters['tags']) )
@@ -1011,13 +1009,11 @@ class ItemListLight extends DataObjectList2
 			$title_array[] = $params['tags_text'].$this->filters['tags'];
 		}
 
-
 		// AUTHORS:
 		if( !empty($this->filters['authors']) )
 		{
 			$title_array[] = T_('Author(s)').': '.$this->filters['authors'];
 		}
-
 
 		// ASSIGNEES:
 		if( !empty($this->filters['assignees']) )
@@ -1032,13 +1028,11 @@ class ItemListLight extends DataObjectList2
 			}
 		}
 
-
 		// LOCALE:
 		if( $this->filters['lc'] != 'all' )
 		{
 			$title_array[] = T_('Locale').': '.$this->filters['lc'];
 		}
-
 
 		// EXTRA STATUSES:
 		if( !empty($this->filters['statuses']) )
@@ -1053,7 +1047,6 @@ class ItemListLight extends DataObjectList2
 			}
 		}
 
-
 		// SHOW STATUSES
 		if( count( $this->filters['visibility_array'] ) < 5
 			&& !in_array( 'visibility', $ignore ) )
@@ -1065,7 +1058,6 @@ class ItemListLight extends DataObjectList2
 			}
 			$title_array[] = T_('Visibility').': '.implode( ', ', $status_titles );
 		}
-
 
 		// START AT
 		if( !empty($this->filters['ymdhms_min'] ) )
@@ -1083,7 +1075,6 @@ class ItemListLight extends DataObjectList2
 				$title_array['ts_min'] = T_('Start at').': '.$this->filters['ts_min'];
 			}
 		}
-
 
 		// STOP AT
 		if( !empty($this->filters['ymdhms_max'] ) )
@@ -1104,7 +1095,6 @@ class ItemListLight extends DataObjectList2
 				$title_array['ts_max'] = T_('Stop at').': '.$this->filters['ts_max'];
 			}
 		}
-
 
 		// LIMIT TO
 		if( $this->single_post )   // p or title
@@ -1138,15 +1128,16 @@ class ItemListLight extends DataObjectList2
 			}
 		}
 		else
+		{ 
 			debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->filters['unit'].' (paged mode is obsolete)' );
-
+		}
 
 		return $title_array;
 	}
 
 
 	/**
-	 * return total number of posts
+	 * Return total number of posts
 	 *
 	 * This is basically just a stub for backward compatibility
 	 *
@@ -1513,6 +1504,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.21  2008/05/30 17:42:40  blueyed
+ * whitespace, minor doc
+ *
  * Revision 1.20  2008/03/22 19:39:28  fplanque
  * <title> tag support
  *
