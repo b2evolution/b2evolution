@@ -57,7 +57,7 @@ class coll_category_list_Widget extends ComponentWidget
 	}
 
 
-  /**
+    /**
 	 * Get short description
 	 */
 	function get_desc()
@@ -66,9 +66,9 @@ class coll_category_list_Widget extends ComponentWidget
 	}
 
 
-  /**
-   * Get definitions for editable params
-   *
+    /**
+     * Get definitions for editable params
+     *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param array local params
 	 *  - 'title': block title (string, default "Categories")
@@ -107,7 +107,6 @@ class coll_category_list_Widget extends ComponentWidget
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
-
 	}
 
 
@@ -129,10 +128,10 @@ class coll_category_list_Widget extends ComponentWidget
 		$ChapterCache = & get_Cache( 'ChapterCache' );
 
 		$callbacks = array(
-			'line' 			 	 => array( $this, 'cat_line' ),
+			'line'         => array( $this, 'cat_line' ),
 			'no_children'  => array( $this, 'cat_no_children' ),
 			'before_level' => array( $this, 'cat_before_level' ),
-			'after_level'	 => array( $this, 'cat_after_level' )
+			'after_level'  => array( $this, 'cat_after_level' )
 		);
 
 		// START DISPLAY:
@@ -222,7 +221,6 @@ class coll_category_list_Widget extends ComponentWidget
 		}
 
 
-
 		if( $this->disp_params['use_form'] )
 		{	// We want to add form fields:
 		?>
@@ -241,7 +239,6 @@ class coll_category_list_Widget extends ComponentWidget
 		<?php
 		}
 
-
 		echo $this->disp_params['block_end'];
 
 		return true;
@@ -249,7 +246,7 @@ class coll_category_list_Widget extends ComponentWidget
 
 
 	/**
-	 * Generate category line when it has children
+	 * Callback: Generate category line when it has children
 	 *
 	 * @param Chapter generic category we want to display
 	 * @param int level of the category in the recursive tree
@@ -309,7 +306,7 @@ class coll_category_list_Widget extends ComponentWidget
 
 
 	/**
-	 * Generate category line when it has no children
+	 * Callback: Generate category line when it has no children
 	 *
 	 * @param Chapter generic category we want to display
 	 * @param int level of the category in the recursive tree
@@ -323,7 +320,7 @@ class coll_category_list_Widget extends ComponentWidget
 
 
 	/**
-	 * Generate code when entering a new level
+	 * Callback: Generate code when entering a new level
 	 *
 	 * @param int level of the category in the recursive tree
 	 * @return string HTML
@@ -338,8 +335,9 @@ class coll_category_list_Widget extends ComponentWidget
 		return $r;
 	}
 
+
 	/**
-	 * Generate code when exiting from a level
+	 * Callback: Generate code when exiting from a level
 	 *
 	 * @param int level of the category in the recursive tree
 	 * @return string HTML
@@ -355,12 +353,14 @@ class coll_category_list_Widget extends ComponentWidget
 		}
 		return $r;
 	}
-
 }
 
 
 /*
  * $Log$
+ * Revision 1.12  2008/05/30 16:39:06  blueyed
+ * Indent, doc
+ *
  * Revision 1.11  2008/05/06 23:35:47  fplanque
  * The correct way to add linebreaks to widgets is to add them to $disp_params when the container is called, right after the array_merge with defaults.
  *
