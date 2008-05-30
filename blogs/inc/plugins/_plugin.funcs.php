@@ -530,6 +530,11 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
 	$set_name = $path[0];
 
 	$setting = $Plugin->$set_type->get($set_name);  // $Plugin->Settings or $Plugin->UserSettings
+	if( ! is_array($setting) )
+	{ // this may happen, if there was a non-array setting stored previously:
+		// discard those!
+		$setting = array();
+	}
 
 	// meta info for this setting:
 	$method = 'GetDefault'.$set_type; // GetDefaultSettings or GetDefaultUserSettings
@@ -998,6 +1003,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /*
  * $Log$
+ * Revision 1.5  2008/05/30 19:54:21  blueyed
+ * bugfix for corner case, if setting is not an array really
+ *
  * Revision 1.4  2008/02/13 11:34:06  blueyed
  * Explicitly call jQuery(), not the shortcut ($())
  *
