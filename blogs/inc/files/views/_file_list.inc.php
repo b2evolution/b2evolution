@@ -498,9 +498,9 @@ $Form->begin_form();
 				?>
 				&mdash;
 				<input class="ActionButton"
-					title="<?php echo T_('Insert IMG tags for selected files'); ?>"
+					title="<?php echo T_('Insert IMG or link tags for the selected files, directly into the post text'); ?>"
 					name="actionArray[img_tag]"
-					value="<?php echo T_('Make IMG tags') ?>"
+					value="<?php echo T_('Insert IMG/link into post') ?>"
 					type="submit"
 					onclick="insert_tag_for_selected_files(); return false;" />
 				<?php
@@ -591,6 +591,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.8  2008/05/31 00:12:13  fplanque
+ * wording
+ *
  * Revision 1.7  2008/04/14 19:50:51  fplanque
  * enhanced attachments handling in post edit mode
  *
