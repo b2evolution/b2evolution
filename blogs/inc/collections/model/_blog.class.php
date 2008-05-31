@@ -73,11 +73,16 @@ class Blog extends DataObject
 	var $shortdesc; // description
 	var $longdesc;
 
+	/**
+	 * @var integer
+	 */
 	var $owner_user_ID;
 
 	/**
 	 * Lazy filled
 	 * @var User
+	 * @see get_owner_User()
+	 * @access protected
 	 */
 	var $owner_User = NULL;
 
@@ -87,9 +92,9 @@ class Blog extends DataObject
 	var $access_type;
 
 	/*
-   * ?> TODO: we should have an extra DB column that either defines type of blog_siteurl
-   * OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
-   */
+	 * ?> TODO: we should have an extra DB column that either defines type of blog_siteurl
+	 * OR split blog_siteurl into blog_siteurl_abs and blog_siteurl_rel (where blog_siteurl_rel could be "blog_sitepath")
+	 */
 	var $siteurl;
 	var $stub;     // stub file (can be empty/virtual)
 	var $urlname;  // used to identify blog in URLs
@@ -469,7 +474,7 @@ class Blog extends DataObject
 		}
 
 
-    /*
+		/*
 		 * ADVANCED ADMIN SETTINGS
 		 */
 		if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
@@ -625,7 +630,6 @@ class Blog extends DataObject
 		}
 
 		return ! param_errors_detected();
-
 	}
 
 
@@ -745,7 +749,7 @@ class Blog extends DataObject
 	}
 
 
-  /**
+	/**
 	 * Generate the baseurl of the blog (URL of the folder where the blog lives)
 	 *
 	 * @todo test
@@ -785,7 +789,7 @@ class Blog extends DataObject
 	}
 
 
-  /**
+	/**
 	 * Load presets
 	 *
 	 * @param string
@@ -972,7 +976,7 @@ class Blog extends DataObject
 	}
 
 
-  /**
+	/**
 	 * Generate archive page URL
 	 *
 	 * Note: there ate two similar functions here.
@@ -1040,8 +1044,9 @@ class Blog extends DataObject
 
 
 	/**
-	 *
+	 * Generate link to archive
 	 * @uses Blog::gen_archive_url()
+	 * @return string HTML A tag
 	 */
 	function gen_archive_link( $text, $title, $year, $month = NULL, $day = NULL, $week = NULL, $glue = '&amp;' )
 	{
@@ -1065,10 +1070,10 @@ class Blog extends DataObject
 	}
 
 
-  /**
+	/**
 	 * Get archive page URL
 	 *
-	 * Note: there ate two similar functions here.
+	 * Note: there are two similar functions here.
 	 *
 	 * @uses Blog::gen_archive_url()
 	 *
@@ -1098,7 +1103,7 @@ class Blog extends DataObject
 	}
 
 
-  /**
+	/**
 	 * Generate a tag url on this blog
 	 */
 	function gen_tag_url( $tag, $paged = 1, $glue = '&amp;' )
@@ -1148,7 +1153,7 @@ class Blog extends DataObject
 	 */
 	function get_allowed_item_status( $status = NULL )
 	{
-    /**
+		/**
 		 * @var User
 		 */
 		global $current_User;
@@ -1373,8 +1378,10 @@ class Blog extends DataObject
 	}
 
 
-  /**
-	 * Callback user for footer_text()
+	/**
+	 * Callback function for footer_text()
+	 * @param array
+	 * @return string
 	 */
 	function replace_callback( $matches )
 	{
@@ -1387,7 +1394,7 @@ class Blog extends DataObject
 				return date( 'Y', $localtimenow );
 
 			case 'owner':
-        /**
+				/**
 				 * @var User
 				 */
 				$owner_User = $this->get_owner_User();
@@ -1804,7 +1811,6 @@ class Blog extends DataObject
 	}
 
 
-
 	/**
 	 * Get the name of the blog
 	 *
@@ -1894,7 +1900,7 @@ class Blog extends DataObject
 	}
 
 
-  /**
+	/**
 	 * @param boolean do we want to redirect back to where we came from after message?
 	 */
 	function get_contact_url( $with_redirect = true )
@@ -1910,11 +1916,14 @@ class Blog extends DataObject
 
 		return $r;
 	}
-
 }
+
 
 /*
  * $Log$
+ * Revision 1.41  2008/05/31 22:29:07  blueyed
+ * indent, doc
+ *
  * Revision 1.40  2008/05/10 23:41:31  fplanque
  * cleanup of external feed providers
  *
