@@ -6,8 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution\n"
+"Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2008-01-21 20:40+0100\n"
+"PO-Revision-Date: 2008-05-31 14:48+0100\n"
 "Last-Translator: Olivier Daury <http://daury.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -160,12 +161,12 @@ msgid "Beta software"
 msgstr "Version beta"
 
 #: ../../index.src.html:67
-msgid "This is an ALPHA / BETA release!"
-msgstr "Ceci est une version ALPHA / BETA!"
+msgid "This is a BETA release!"
+msgstr "Ceci est une version BETA!"
 
 #: ../../index.src.html:68
-msgid "There are still bugs we know of, but we consider the software is globally operational! The most important thing you need to know about ALPHA / BETA releases is that nothing is to be considered final, including skintags and the plugin API."
-msgstr "Il reste des bugs connus, mais nous considérons que le logiciel est globalement opérationnel! La chose la plus importante que vous devez savoir sur les versions ALPHA / BETA c'est que rien ne doit être considéré comme final, y compris les tags dans les skins ainsi que l'API des plugins."
+msgid "There are still bugs we know of, but we consider the software to be globally operational!"
+msgstr "Il y a encore des bogues que nous connaissons, mais nous considérons que le logiciels est globalement opérationnel."
 
 #: ../../index.src.html:69
 msgid "NOTE: This version is and will continue to be fully supported in the upgrading scheme and procedures."
@@ -174,7 +175,7 @@ msgstr "NOTE: Cette version est et continuera d'être complètement supportée par 
 #: ../../index.src.html:80
 #: ../../doc/install_new.src.html:64
 #: ../../doc/upgradefrom_b2.src.html:52
-#: ../../doc/upgradefrom_b2evo.src.html:61
+#: ../../doc/upgradefrom_b2evo.src.html:63
 #: ../../doc/upgradefrom_mt.src.html:51
 #: ../../doc/upgradefrom_wp.src.html:49
 msgid "Online resources"
@@ -183,7 +184,7 @@ msgstr "Ressources en ligne"
 #: ../../index.src.html:80
 #: ../../doc/install_new.src.html:64
 #: ../../doc/upgradefrom_b2.src.html:52
-#: ../../doc/upgradefrom_b2evo.src.html:61
+#: ../../doc/upgradefrom_b2evo.src.html:63
 #: ../../doc/upgradefrom_mt.src.html:51
 #: ../../doc/upgradefrom_wp.src.html:49
 msgid "Official website"
@@ -192,7 +193,7 @@ msgstr "Site web officiel"
 #: ../../index.src.html:80
 #: ../../doc/install_new.src.html:64
 #: ../../doc/upgradefrom_b2.src.html:52
-#: ../../doc/upgradefrom_b2evo.src.html:61
+#: ../../doc/upgradefrom_b2evo.src.html:63
 #: ../../doc/upgradefrom_mt.src.html:51
 #: ../../doc/upgradefrom_wp.src.html:49
 msgid "Find a host"
@@ -201,7 +202,7 @@ msgstr "Trouver un hébergeur"
 #: ../../index.src.html:80
 #: ../../doc/install_new.src.html:64
 #: ../../doc/upgradefrom_b2.src.html:52
-#: ../../doc/upgradefrom_b2evo.src.html:61
+#: ../../doc/upgradefrom_b2evo.src.html:63
 #: ../../doc/upgradefrom_mt.src.html:51
 #: ../../doc/upgradefrom_wp.src.html:49
 msgid "Manual"
@@ -210,7 +211,7 @@ msgstr "Manuel"
 #: ../../index.src.html:80
 #: ../../doc/install_new.src.html:64
 #: ../../doc/upgradefrom_b2.src.html:52
-#: ../../doc/upgradefrom_b2evo.src.html:61
+#: ../../doc/upgradefrom_b2evo.src.html:63
 #: ../../doc/upgradefrom_mt.src.html:51
 #: ../../doc/upgradefrom_wp.src.html:49
 msgid "Forums"
@@ -219,7 +220,7 @@ msgstr "Forums"
 #: ../../index.src.html:83
 #: ../../doc/install_new.src.html:67
 #: ../../doc/upgradefrom_b2.src.html:55
-#: ../../doc/upgradefrom_b2evo.src.html:64
+#: ../../doc/upgradefrom_b2evo.src.html:66
 #: ../../doc/upgradefrom_mt.src.html:54
 #: ../../doc/upgradefrom_wp.src.html:52
 msgid "GNU GPL license"
@@ -228,7 +229,7 @@ msgstr "Licence GNU GPL"
 #: ../../index.src.html:83
 #: ../../doc/install_new.src.html:67
 #: ../../doc/upgradefrom_b2.src.html:55
-#: ../../doc/upgradefrom_b2evo.src.html:64
+#: ../../doc/upgradefrom_b2evo.src.html:66
 #: ../../doc/upgradefrom_mt.src.html:54
 #: ../../doc/upgradefrom_wp.src.html:52
 msgid "Contact"
@@ -279,12 +280,12 @@ msgid "Run the installation script on your server. It is located in <code>http:/
 msgstr "Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/votredossier/install</code>. Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation vos posera quelques questions, créera les tables requises dans la base de donnés et configurera b2evolution pour vous."
 
 #: ../../doc/install_new.src.html:50
-#: ../../doc/upgradefrom_b2evo.src.html:44
+#: ../../doc/upgradefrom_b2evo.src.html:46
 msgid "Check to make sure the new installation works."
 msgstr "Vérifiez que la nouvelle installation fonctionne."
 
 #: ../../doc/install_new.src.html:51
-#: ../../doc/upgradefrom_b2evo.src.html:46
+#: ../../doc/upgradefrom_b2evo.src.html:48
 msgid "On production servers, it is recommended that you delete the <code>/install</code> subfolder."
 msgstr "Sur les serveurs de production, il est recommandé de supprimer le sous répertoire <code>/install</code>."
 
@@ -317,32 +318,32 @@ msgid "Come back to the current version of b2evolution and <a %s>upgrade from b2
 msgstr "Revenez à la version actuelle de b2evolution et <a %s>upgradez depuis b2evolution 1.x vers la version actuelle</a>."
 
 #: ../../doc/upgradefrom_b2evo.src.html:35
-msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including /conf, skins, blog templates, stubfiles, hacks, third party plugins, etc..."
-msgstr "Faites une copie de sauvegarde de tous vos fichiers b2evolution. Prenez spécialement soin des fichiers que vous avez modifié, y compris /conf, les habillages (skins), les gabarits de blogs, les fichiers stub, les hacks, les plugins tiers, etc..."
+msgid "Backup all your b2evolution files. Take special care of the files you may have modified, including <strong>/conf</strong>, <strong>/skins</strong>, <strong>/plugins</strong>, your <strong>/media</strong> directory and possibly stubfiles, hacks or custom templates..."
+msgstr "Faites une copie de sauvegarde de tous vos fichiers b2evolution. Prenez spécialement soin des fichiers que vous avez modifié, y compris <strong>/conf</strong>, <strong>/skins</strong>, <strong>/plugins</strong>, le répertoire <strong>/media</strong> ainsi que les fichiers stub, les hacks, les templates personnels..."
 
 #: ../../doc/upgradefrom_b2evo.src.html:36
 msgid "You should also backup your database if you can. This functionality should be provided by your host."
 msgstr "Vous devriez également faire une sauvegarde de votre base de données si vous le pouvez. Cette fonctionnalité devrait être proposée par votre hébergeur."
 
 #: ../../doc/upgradefrom_b2evo.src.html:37
-msgid "Delete <strong>all your existing b2evolution files from your site</strong> before uploading the new ones! Some of the old files may not be compatible with this new version and will cause it to fail! This will also ensure you don't keep unnecessary files on your server after upgrading. Plus, it's better for security."
-msgstr "Supprimez <strong>tous vos fichiers b2evolution existants de votre site</strong> avant de télécharger les nouveaux! Certains anciens fichiers risquent de ne pas être compatibles avec cette nouvelle version et provoqueront des erreurs! Ceci vous assurera également de ne pas conserver de vieux fichiers non nécessaires sur votre serveur après la mise à jour. De plus, c'est mieux en termes de sécurité."
+msgid "If you are upgrading from a version prior to 2.0, we highly recommend you clean up outdated files. To achieve this, delete your b2evolution folders <strong>except /media</strong>. Folders to delete include /admin, /conf, /cron, /htsrv, /inc, /install, /plugins, /skins, /skins_adm, /xmlsrv. Depending on your version, you may not have all of these folders on your server. Also, again, make sure you have a backup before deleting."
+msgstr "Si vous mettez à jour depuis une version inférieure a 2.0, il est hautement recommandé d'effacer tous les anciens fichiers. Pour cela, supprimez tous les répertoires à l'exception de <strong>/media</strong>. Les répertoires à supprimer incluent  /admin, /conf, /cron, /htsrv, /inc, /install, /plugins, /skins, /skins_adm, /xmlsrv. Selon votre version, vous pouvez ne pas avoir tous ces répertoires sur votre serveur. N'oubliez pas de faire une sauvegarde avant de les supprimer."
 
 #: ../../doc/upgradefrom_b2evo.src.html:38
-msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you can't reuse your customized files, including  /conf, skins, blog templates, stubfiles, etc. as they are!<br /> <br /> That means you will have to customize all these files again. We're sorry but, due to the pace of development and adding of new features, we cannot guarantee that anything will work if you keep older files in place. <strong>However</strong>, since you have backed up all these files in step 1, you can try to partially reuse them once the upgrade process is done. See step 8 below."
-msgstr "Téléchargez <strong>tous les nouveaux fichiers b2evolution du dossier /blogs</strong> sur votre serveur. Nous ne pouvons insister suffisament sur ce point: <strong>TOUS LES FICHIERS</strong>! Et ceci signifie que vous ne pouvez pas réutiliser vos fichiers personnalisés, y compris /conf, /skins, gabarits, fichiers stub, etc. en l'état!<br /> <br /> Celà signifie que vous allez devoir recommencer la personnalisation pour tous ces fichiers. Nous sommes désolés, mais, à la vitesse où nous développons et ajoutons de nouvelles fonctionnalités, nous ne pouvons pas garantir que tout fonctionnera correctement su vous conservez vos anciens fichiers personnalisés. <stong>Toutefois</strong>, ayant sauvegardé vos fichiers personnalisés à l'étape 1, vous pouvez tenter de les réutiliser partiellement après avoir fini la mise à jour. Voir étape 8 ci-dessous."
+msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you cannot reuse your  /conf files, default skin templates or default plugins as they are.<br /> <br /> Since your custom skins and custom plugins should be using different names, they will not be overwritten. Same for your media files.<br /> <br /> The one file you must absolutely restore from your backup (see step 1) though is <code>/blogs/_basic_config.php</code>. You will need to either restore or recreate that file in order to proceed with upgrade."
+msgstr "Téléchargez <strong>tous les nouveaux fichiers b2evolution du dossier /blogs</strong> sur votre serveur. Nous ne pouvons insister suffisament sur ce point: <strong>TOUS LES FICHIERS</strong>! Et ceci signifie que vous ne pouvez pas réutiliser vos fichiers personnalisés, y compris /conf, /skins, gabarits, fichiers stub, etc. en l'état!<br /> <br />Si vos gabarits et vos plugins portent des noms différents, ils ne seront pas écrasés. De même pour les fichiers du répertoire media.<br /> <br />Le seul fichier que vous devez absolument restaurer depuis votres sauvegarde (voir étape 1) est <code>/blogs/_basic_config.php</code>. Vous devez soit restaurer ce fichier, soit le recréer afin de procéder a la mise à jour."
 
-#: ../../doc/upgradefrom_b2evo.src.html:41
-msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you basic configuration settings (unless you have already updated /conf/_config.php before uploading), then allow you to run a database upgrade from any b2evolution version to the new one."
-msgstr "Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/votredossierblogs/install</code>. Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation vos posera quelques questions, créera les tables requises dans la base de donnés et configurera b2evolution pour vous."
+#: ../../doc/upgradefrom_b2evo.src.html:43
+msgid "Run the installation/upgrade script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code>/ . Then, simply follow the on screen instructions.<br /> <br /> The installer/upgrader will  allow you to run a database upgrade from <strong>any</strong> b2evolution version to the new one."
+msgstr "Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/votredossierblogs/install</code>. Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation/mise à jour vous proposera de mettre à jour la base de donnée depuis <strong>n'importe</strong> quelle version de b2evolution vers la nouvelle."
 
-#: ../../doc/upgradefrom_b2evo.src.html:45
+#: ../../doc/upgradefrom_b2evo.src.html:47
 msgid "Check the online manual for <a %s>specific upgrade instructions</a> to your new version of b2evolution."
 msgstr "Consultez le manuel en ligne pour obtenir des <a %s>instructions de mise à jour spécifiques</a> à votre nouvelle version de b2evolution."
 
-#: ../../doc/upgradefrom_b2evo.src.html:47
-msgid "It's now time to bring back your previous customizations. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly."
-msgstr "Il est maintenant temps de réintroduire vos précédentes personnalisations. Nous vous recommandons de vous procurer un outil de type diff/merge tel que <a %s>WinMerge</a>. Ceci vous permettra de comparer aisément vos anciens fichiers (sauvegardés) avec vos nouveaux fichiers (et même des dossiers entiers en une seule opération) afin de reporter les modifications nécessaires."
+#: ../../doc/upgradefrom_b2evo.src.html:49
+msgid "If you had hacks or other customizations to the core files, your can bring those back now. We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly."
+msgstr "Si vous aviez des hacks ou autres personnalisations de fichiers, vous pouvez maintenant les réintroduire. Nous vous recommandons de vous procurer un outil de type diff/merge tel que <a %s>WinMerge</a>. Ceci vous permettra de comparer aisément vos anciens fichiers (sauvegardés) avec vos nouveaux fichiers (et même des dossiers entiers en une seule opération) afin de reporter les modifications nécessaires."
 
 #: ../../doc/upgradefrom_mt.src.html:7
 #: ../../doc/upgradefrom_mt.src.html:31
@@ -395,4 +396,29 @@ msgstr "Une fois que b2evolution est installé, dans l'administration, cliquez su
 #: ../../doc/upgradefrom_wp.src.html:37
 msgid "Follow the instructions on screen and provide connection information to your WordPress database (Read Only)"
 msgstr "Suivez les instructions à l'écran et fournissez les informations de connexion à votre base de données WordPress (Lecture Seule)"
+
+#~ msgid ""
+#~ "There are still bugs we know of, but we consider the software is globally "
+#~ "operational! The most important thing you need to know about ALPHA / BETA "
+#~ "releases is that nothing is to be considered final, including skintags "
+#~ "and the plugin API."
+#~ msgstr ""
+#~ "Il reste des bugs connus, mais nous considérons que le logiciel est "
+#~ "globalement opérationnel! La chose la plus importante que vous devez "
+#~ "savoir sur les versions ALPHA / BETA c'est que rien ne doit être "
+#~ "considéré comme final, y compris les tags dans les skins ainsi que l'API "
+#~ "des plugins."
+#~ msgid ""
+#~ "Delete <strong>all your existing b2evolution files from your site</"
+#~ "strong> before uploading the new ones! Some of the old files may not be "
+#~ "compatible with this new version and will cause it to fail! This will "
+#~ "also ensure you don't keep unnecessary files on your server after "
+#~ "upgrading. Plus, it's better for security."
+#~ msgstr ""
+#~ "Supprimez <strong>tous vos fichiers b2evolution existants de votre site</"
+#~ "strong> avant de télécharger les nouveaux! Certains anciens fichiers "
+#~ "risquent de ne pas être compatibles avec cette nouvelle version et "
+#~ "provoqueront des erreurs! Ceci vous assurera également de ne pas "
+#~ "conserver de vieux fichiers non nécessaires sur votre serveur après la "
+#~ "mise à jour. De plus, c'est mieux en termes de sécurité."
 
