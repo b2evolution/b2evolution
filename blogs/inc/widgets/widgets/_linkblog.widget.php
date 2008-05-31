@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the xyz Widget class.
+ * This file implements the linkblog_Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -28,9 +28,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'widgets/model/_widget.class.php' );
 
 /**
- * ComponentWidget Class
+ * linkblog_widget class
  *
- * A ComponentWidget is a displayable entity that can be placed into a Container on a web page.
+ * This widget displays another blog as a linkblog.
  *
  * @package evocore
  */
@@ -56,7 +56,7 @@ class linkblog_Widget extends ComponentWidget
 	}
 
 
-  /**
+	/**
 	 * Get short description
 	 */
 	function get_desc()
@@ -65,9 +65,9 @@ class linkblog_Widget extends ComponentWidget
 	}
 
 
-  /**
-   * Get definitions for editable params
-   *
+	/**
+	 * Get definitions for editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
 	 */
@@ -80,13 +80,13 @@ class linkblog_Widget extends ComponentWidget
 					'label' => 'Block title',
 					'size' => 60,
 					'defaultvalue' => T_('Linkblog'),
-					'note' => T_( 'This is title to display in your skin.' ),
+					'note' => T_( 'This is the title to display in your skin.' ),
 				),
 				'linkblog_ID' => array(
 					'label' => T_( 'Linkblog' ),
 					'size' => 4,
-					'defaultvalue' => $Blog->get('links_blog_ID'),	// Here we conveniently recycle the previous value from its deprecated links_blog_ID param. We will eventually drop that field from teh database.
-					'note' => T_( 'This is ID number of the blog to use as a linkblog.' ),
+					'defaultvalue' => $Blog->get('links_blog_ID'),	// Here we conveniently recycle the previous value from its deprecated links_blog_ID param. We will eventually drop that field from the database.
+					'note' => T_( 'This is the ID number of the blog to use as a linkblog.' ),
 				),
 				'linkblog_limit' => array(
 					'label' => T_( 'Display' ),
@@ -119,6 +119,9 @@ class linkblog_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.9  2008/05/31 22:38:55  blueyed
+ * doc, indent
+ *
  * Revision 1.8  2008/01/21 09:35:37  fplanque
  * (c) 2008
  *
