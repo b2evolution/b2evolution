@@ -2463,7 +2463,7 @@ class Item extends ItemLight
 				}
 				if( $links )
 				{	// We want links
-					echo '<a href="'.$this->Blog->gen_tag_url( $tag ).'">';
+					echo '<a href="'.$this->Blog->gen_tag_url( $tag ).'" rel="tag">';
 				}
 				echo htmlspecialchars( $tag );
 				if( $links )
@@ -3544,6 +3544,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.51  2008/06/01 23:57:20  waltercruz
+ * Adding rel=tag (some microformats love)
+ *
  * Revision 1.50  2008/05/26 19:22:00  fplanque
  * fixes
  *
