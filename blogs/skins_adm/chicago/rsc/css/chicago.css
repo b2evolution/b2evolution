@@ -554,6 +554,9 @@ form.bComment /* New comment form */
 	padding: 0;
 	margin: 1ex;
 }
+div.bComment > p { /* padding for e.g. "No feedback for this post yet..." */
+    padding: 1ex;
+}
 
 
 /*
