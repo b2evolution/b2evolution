@@ -52,6 +52,11 @@ param( 'root', 'string', true );	// the root directory from the dropdown box (us
 param( 'path', 'string', true );
 param( 'size', 'string', NULL );	// Can be used for images.
 
+if ( false !== strpos( urldecode( $path ), '..' ) ) 
+{
+  debug_die( 'Relative pathnames not allowed!' );
+}
+
 // Load fileroot info:
 $FileRootCache = & get_Cache( 'FileRootCache' );
 $FileRoot = & $FileRootCache->get_by_ID( $root );
@@ -81,6 +86,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.15  2008/06/08 17:39:01  stephankn
+ * check for relative paths and stop execution if detected
+ *
  * Revision 1.14  2008/01/21 09:35:23  fplanque
  * (c) 2008
  *
