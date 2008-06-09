@@ -1417,7 +1417,15 @@ function import_data_extract_authors_cats()
 	global $import_mode;
 
 	$fp = fopen( $exportedfile, 'rb');
-	$buffer = fread($fp, filesize( $exportedfile ));
+//slamp_080609_begin: to avoid warning when importing file with 0 bytes of data	
+//	$buffer = fread($fp, filesize( $exportedfile ));
+	$buffer = '';
+	$length = filesize($exportedfile);
+	if($length) 
+	{
+  		$buffer = fread($fp, $length);
+	}	
+//slamp_080609_end 
 	fclose($fp);
 	if( !preg_match( '/^[-\s]*AUTHOR: /', $buffer ) )
 	{
@@ -1661,6 +1669,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.6  2008/06/09 20:11:41  slamp
+ * Add a test to avoid warning when importing file with 0 bytes of data
+ *
  * Revision 1.5  2008/02/19 11:11:19  fplanque
  * no message
  *
