@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: b2evolution 2.3\n"
+"Project-Id-Version: b2evolution 2.5\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2008-03-16 15:39+0100\n"
-"PO-Revision-Date: 2008-05-31 15:36+0100\n"
+"PO-Revision-Date: 2008-06-14 14:34+0100\n"
 "Last-Translator: Olivier Daury <http://daury.net/>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -170,7 +170,7 @@ msgstr "Sitemap XML pour le Blog #1 (appelé par un fichier stub)"
 # D:\www\b2evo\blogs\default.php:95
 #: ..\..\..\default.php:171
 msgid "Blog #1 aggregated XML sitemap (called through a stub)"
-msgstr "Sitemap XML aggregé pour le blog #1 (appelé par un fichier stub)"
+msgstr "Sitemap XML aggrégé pour le blog #1 (appelé par un fichier stub)"
 
 #: ..\..\..\default.php:175
 msgid "Summary of latest posts in all blogs"
@@ -417,7 +417,7 @@ msgstr "Publier"
 
 #: ..\..\..\conf\_icons.php:296
 msgid "Deprecate"
-msgstr "Deprécier"
+msgstr "Déprécier"
 
 #: ..\..\..\conf\_icons.php:301
 msgid "Locate"
@@ -962,7 +962,7 @@ msgstr "Mot de passe"
 
 #: ..\..\..\cron\getmail.php:501
 msgid "Unhandled email part type"
-msgstr "Partie d'email de type non géré."
+msgstr ""
 
 #: ..\..\..\cron\getmail.php:520
 msgid "Authenticating User"
@@ -1065,7 +1065,7 @@ msgstr "Si vous avez correctement entré votre login, un lien permettant de chang
 
 #: ..\..\..\htsrv\login.php:89
 msgid "You cannot reset this account in demo mode."
-msgstr "Vous ne pouvez pas réinitialisze ce compte en mode démo."
+msgstr "Vous ne pouvez pas réinitialiser ce compte en mode démo."
 
 #: ..\..\..\htsrv\login.php:101
 msgid "You have no email address with your profile, therefore we cannot reset your password."
@@ -1192,11 +1192,11 @@ msgstr "ATTENTION: vous essayez de vous authentifier sur <strong>%s</strong> mai
 # D:\www\b2evo\blogs\htsrv\message_send.php:41
 #: ..\..\..\htsrv\message_send.php:62
 msgid "All your comments have been marked not to allow emailing you through a message form."
-msgstr "Tous vos commentaires ont été marqués comme n'autorisant pas de vous contacter par message."
+msgstr "Tous vos commentaires ont été marqués de façcon à interdire de vous contacter via un formulaire."
 
 #: ..\..\..\htsrv\message_send.php:68
 msgid "The request not to receive emails through a message form for your comments failed."
-msgstr "La demande de ne plus pouvoir etre contacté à partir de vos commentaires a échoué."
+msgstr "La demande de ne plus pouvoir être contacté à partir de vos commentaires a échoué."
 
 #: ..\..\..\htsrv\message_send.php:79
 msgid ""
@@ -1689,7 +1689,7 @@ msgstr "Le mot clef &laquo;%s&raquo; est trop court, il doit comporter au minimu
 #: ..\..\..\inc\antispam\antispam_list.ctrl.php:83
 #, php-format
 msgid "Deleted %d logged hits matching &laquo;%s&raquo;."
-msgstr "%d hits contenant &laquo;%s&raquo; ont été supprimés."
+msgstr "%d requêtes contenant &laquo;%s&raquo; ont été supprimées."
 
 #: ..\..\..\inc\antispam\antispam_list.ctrl.php:93
 #, php-format
@@ -1788,7 +1788,7 @@ msgstr "Nouvelle date de dernière mise à jour"
 #: ..\..\..\inc\cron\jobs\_post_notifications.job.php:61
 #: ..\..\..\inc\items\model\_item.class.php:3135
 msgid "Done."
-msgstr "Ok."
+msgstr "Fait."
 
 #: ..\..\..\inc\antispam\model\_antispam.funcs.php:280
 msgid "Invalid reponse."
@@ -1807,12 +1807,12 @@ msgstr "Confirmez l'interdiction & la suppression"
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:52
 #, php-format
 msgid "No log-hits match the keyword [%s]."
-msgstr "Aucun hitlog ne contient le mot clef [%s]."
+msgstr "Aucun log de requête ne contient le mot clef [%s]."
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:60
 #, php-format
 msgid "Delete the following %s referer hits:"
-msgstr "Supprimer les %s hit référents suivants:"
+msgstr "Supprimer les %s requêtes référentes suivantes:"
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:66
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:121
@@ -2005,7 +2005,7 @@ msgstr "Source"
 # D:\www\b2evo19\blogs\inc\VIEW\antispam\_blacklist.inc.php:133
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:151
 msgid "Allow keyword back (Remove it from the blacklist)"
-msgstr "Autotiser le mot clef à nouveau (Le retirer de la liste noire)"
+msgstr "Autoriser le mot clef à nouveau (Le retirer de la liste noire)"
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:164
 msgid "Report abuse to centralized ban blacklist!"
@@ -2017,7 +2017,7 @@ msgstr "Rapporter"
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:170
 msgid "Check hit-logs and comments for this keyword!"
-msgstr "Vérifier la présence du mot clef dans les hitlogs et les commentaires!"
+msgstr "Vérifier la présence du mot clef dans les logs de requêtes et les commentaires!"
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:171
 msgid "Re-check"
@@ -2243,14 +2243,14 @@ msgstr "La catégorie a été déplacée."
 #: ..\..\..\inc\chapters\chapters.ctrl.php:283
 #, php-format
 msgid "The category &laquo;%s&raquo; has been moved (with children) to &laquo;%s&raquo;'s root. You may want to nest it in another parent category below..."
-msgstr "La categorie &laquo;%s&raquo; a été déplacée (avec ses enfants) vers la racine du blog &laquo;%s&raquo;. Vous voudrez peut être la déplacer dans une sous-catégorie ci-dessous..."
+msgstr "La catégorie &laquo;%s&raquo; a été déplacée (avec ses enfants) vers la racine du blog &laquo;%s&raquo;. Vous voudrez peut être la déplacer dans une sous-catégorie ci-dessous..."
 
 #: ..\..\..\inc\chapters\chapters.ctrl.php:309
 #: ..\..\..\inc\generic\inc\_generic_listeditor.php:212
 #: ..\..\..\inc\generic\inc\_generic_recursive_listeditor.php:190
 #, php-format
 msgid "Element &laquo;%s&raquo; deleted."
-msgstr "Element &laquo;%s&raquo; supprimé."
+msgstr "Elément &laquo;%s&raquo; supprimé."
 
 #: ..\..\..\inc\chapters\chapters.ctrl.php:320
 #: ..\..\..\inc\generic\inc\_generic_listeditor.php:223
@@ -2578,7 +2578,7 @@ msgstr "%d widgets"
 #: ..\..\..\inc\collections\model\_blog.class.php:151
 #, php-format
 msgid "%d hits"
-msgstr "%d hits"
+msgstr "%d requêtes"
 
 # D:\www\b2evo20\blogs\inc\MODEL\collections\_blog.class.php:207
 #: ..\..\..\inc\collections\model\_blog.class.php:203
@@ -2685,7 +2685,7 @@ msgstr "Vous devez indiquer une URL relative (sans <code>http://</code> ni <code
 
 #: ..\..\..\inc\collections\model\_blog.class.php:527
 msgid "Invalid aggregate blog ID list!"
-msgstr "Liste de n°s de blogs aggregés invalide!"
+msgstr "Liste de n°s de blogs aggrégés invalide!"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:553
 #: ..\..\..\inc\collections\model\_blog.class.php:557
@@ -2726,7 +2726,7 @@ msgstr "Le dossier média &laquo;%s&raquo; pour le blog a été créé avec les permi
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1652
 msgid "Deleted post-categories"
-msgstr "Liaisions article-catégories supprimées"
+msgstr "Liaisons article-catégories supprimées"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1659
 msgid "Deleted comments on blog's posts"
@@ -2781,7 +2781,7 @@ msgstr "Pinger %s"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:75
 msgid "There are no ping plugins activated."
-msgstr "Aucun plugin de ping spam n'est activé."
+msgstr "Aucun plugin de ping n'est activé."
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:89
 msgid "Aggregation"
@@ -3097,7 +3097,7 @@ msgstr "Habillage"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:128
 msgid "Allow customized blog CSS file"
-msgstr "Autoriser CSS personnalisé pour ce blog"
+msgstr "Autoriser un fichier CSS personnalisé pour ce blog"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:128
 msgid "You will be able to customize the blog's skin stylesheet with a file named style.css in the blog's media file folder."
@@ -3105,7 +3105,7 @@ msgstr "Vous aurez la possibilité de personnaliser la feuille de style de ce blo
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:129
 msgid "Allow user customized CSS file for this blog"
-msgstr "Autoriser CSS personnalisé par utilisateur"
+msgstr "Autoriser un fichier CSS personnalisé par utilisateur"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:129
 msgid "Users will be able to customize the blog and skin stylesheets with a file named style.css in their personal file folder."
@@ -3362,7 +3362,7 @@ msgstr "Est<br />membre"
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:247
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:255
 msgid "Permission to read protected posts"
-msgstr "Permission de lire lire les articles protégés."
+msgstr "Permission de lire les articles protégés."
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:246
@@ -4004,7 +4004,7 @@ msgstr "Autres pages"
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:281
 msgid "Other filtered posts pages"
-msgstr "Autres page d'articles filtrées"
+msgstr "Autres pages d'articles filtrées"
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:281
 msgid "Filtered by keyword search, by author, etc."
@@ -6033,7 +6033,7 @@ msgstr "Insérer des tags IMG pour les fichiers sélectionnés"
 
 #: ..\..\..\inc\files\views\_file_list.inc.php:457
 msgid "Make IMG tags"
-msgstr "Créer de tags IMG"
+msgstr "Créer des tags IMG"
 
 #: ..\..\..\inc\files\views\_file_list.inc.php:467
 msgid "Make posts"
@@ -9403,7 +9403,7 @@ msgstr "L'extension XML n'est pas chargée."
 
 #: ..\..\..\inc\tools\system.ctrl.php:483
 msgid "b2evolution will not be able to convert character sets and special characters/languages may not be displayed correctly. Enable the mbstring extension in your php.ini file or ask your hosting provider about it."
-msgstr ""
+msgstr "b2evolution ne sera pas capable de convertir les caractères et les caractères spéciaux pourront ne pas être affichés correctement. Activer l'extension mbstring dans votre fichier php.ini ou demander à votre hébergeur de le faire."
 
 #: ..\..\..\inc\tools\system.ctrl.php:502
 msgid "GD Library (image handling)"
@@ -9924,7 +9924,7 @@ msgstr "Force XHTML valide et renforce la sécurité"
 #: ..\..\..\inc\users\views\_group.form.php:105
 #: ..\..\..\inc\users\views\_group.form.php:112
 msgid "The security filters below will be strongly enforced."
-msgstr "Les filtres de sécurité seront fortement renforcé."
+msgstr "Les filtres de sécurité seront fortement renforcés."
 
 # D:\www\b2cvs20\blogs\inc\users\views\_group.form.php:106
 # D:\www\b2cvs20\blogs\inc\users\views\_group.form.php:113
@@ -10871,7 +10871,7 @@ msgstr "Nuage de tag"
 
 #: ..\..\..\inc\widgets\widgets\_coll_tag_cloud.widget.php:78
 msgid "Cloud of all tags; click filters blog on selected tag."
-msgstr "Nuage de tag. Clique filtre les blogs en fonction du tag sélectionné."
+msgstr "Nuage de tag. Clique affiche les articles du blog relatifs au tag sélectionné."
 
 #: ..\..\..\inc\widgets\widgets\_coll_tag_cloud.widget.php:99
 msgid "Max # of tags"
