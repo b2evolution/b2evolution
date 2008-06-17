@@ -2389,6 +2389,23 @@ class Plugin
 
 
 	/**
+	 * Translate and escape single quotes.
+	 *
+	 * This is to be used mainly for Javascript strings.
+	 *
+	 * @uses Plugin::T_()
+	 * @since 2.5.0
+	 * @param string String to translate
+	 * @param string Locale to use
+	 * @return string
+	 */
+	function TS_( $string, $req_locale = '' )
+	{
+		return str_replace( "'", "\'", $this->T_( $string, $req_locale ) );
+	}
+
+
+	/**
 	 * Get the absolute URL to the plugin's directory (where the plugins classfile is).
 	 * Trailing slash included.
 	 *
@@ -2884,6 +2901,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.9  2008/06/17 18:41:34  blueyed
+ * Add Plugin::TS_(), doing the same as TS_() but for plugins.
+ *
  * Revision 1.8  2008/04/06 19:19:30  fplanque
  * Started moving some intelligence to the Modules.
  * 1) Moved menu structure out of the AdminUI class.
