@@ -698,6 +698,16 @@ class ItemLight extends DataObject
 	 */
 	function title( $params = array() )
 	{
+		echo $this->get_title($params);
+	}
+
+
+	/**
+	 * Get "nice" title of the Item
+	 * @return string
+	 */
+	function get_title( $params = array() )
+	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'before'      => '',
@@ -730,23 +740,24 @@ class ItemLight extends DataObject
 				break;
 
 			case 'admin_view':
-      	$url = '?ctrl=items&amp;blog='.$this->blog_ID.'&amp;p='.$this->ID;
+				$url = '?ctrl=items&amp;blog='.$this->blog_ID.'&amp;p='.$this->ID;
 				break;
 
 			case 'none':
 			default:
 		}
 
-		echo $params['before'];
+		$r = $params['before'];
 		if( !empty($url) )
 		{
-			echo '<a href="'.$url.'">'.$title.'</a>';
+			$r .= '<a href="'.$url.'">'.$title.'</a>';
 		}
 		else
 		{
-			echo $title;
+			$r .= $title;
 		}
-		echo $params['after'];
+		$r .= $params['after'];
+		return $r;
 	}
 
 
@@ -876,6 +887,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2008/06/20 01:22:04  blueyed
+ * Add ItemLight::get_title(). Make ItemLight::title() use this.
+ *
  * Revision 1.8  2008/01/21 09:35:31  fplanque
  * (c) 2008
  *
