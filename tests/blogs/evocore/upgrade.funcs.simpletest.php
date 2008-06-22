@@ -1127,6 +1127,27 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 		$this->assertEqual( $sql_clean, $r['test_1'][0]['queries'][0] );
 	}
 
+
+	/**
+	 * Test if a table with ENGINE=MyISAM gets changed to
+	 * ENGINE=InnoDB
+	 */
+	function test_alter_engine()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE test_1 (
+				i INTEGER
+			) ENGINE=MyISAM" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE test_1 (
+				i INTEGER
+			) ENGINE=InnoDB" );
+
+		$this->assertEqual( $r['test_1'][0]['queries'][0],
+			'ALTER TABLE test_1 ENGINE=InnoDB' );
+	}
+
 }
 
 

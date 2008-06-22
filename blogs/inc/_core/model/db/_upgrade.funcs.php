@@ -57,6 +57,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *  - 'add_column'
  *  - 'add_index'
  *  - 'drop_index'
+ *  - 'alter_engine'
  * NOTE: it may be needed to merge an 'add_index' or 'drop_index' type query into an
  *       'add_column'/'change_column' query (adding "AUTO_INCREMENT" for example)!
  *
@@ -247,8 +248,9 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 
 		// Get all of the field names in the query from between the parens
-		preg_match( '|\((.*)\)|s', $items[$table_lowered][0]['queries'][0], $match ); // we have only one query here
+		preg_match( '|\((.*)\)(.*)$|s', $items[$table_lowered][0]['queries'][0], $match ); // we have only one query here
 		$qryline = trim($match[1]);
+		$qry_table_options = trim($match[2]);
 
 		// Separate field lines into an array
 		#$flds = preg_split( '~,(\r?\n|\r)~', $qryline, -1, PREG_SPLIT_NO_EMPTY );
@@ -284,6 +286,23 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 		}
 
 		//echo "<hr/><pre>\n".print_r(strtolower($table), true).":\n".print_r($items, true)."</pre><hr/>";
+
+		// ALTER ENGINE, if different (and given in query):
+		if( preg_match( '~\bENGINE\s*=\s*(\w+)~', $qry_table_options, $match ) )
+		{
+			$wanted_engine = $match[1];
+			$current_engine = $DB->get_row( '
+				SHOW TABLE STATUS LIKE '.$DB->quote($table) );
+			$current_engine = $current_engine->Engine;
+
+			if( strtolower($current_engine) != strtolower($wanted_engine) )
+			{
+				$items[$table_lowered][] = array(
+							'queries' => array('ALTER TABLE '.$table.' ENGINE='.$wanted_engine),
+							'note' => 'Alter engine of <strong>'.$table.'.</strong> to <strong>'.$wanted_engine.'</strong>',
+							'type' => 'alter_engine' );
+			}
+		}
 
 		$prev_fld = '';
 		foreach( $flds as $create_definition )
@@ -1205,6 +1224,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.4  2008/06/22 13:42:57  blueyed
+ * db_delta(): add new query_type 'alter_engine', which adds a query to change the engine used for a table. Includes test.
+ *
  * Revision 1.3  2008/01/21 09:35:24  fplanque
  * (c) 2008
  *
