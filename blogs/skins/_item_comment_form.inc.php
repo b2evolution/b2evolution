@@ -16,6 +16,11 @@ global $cookie_name, $cookie_email, $cookie_url;
 global $comment_allowed_tags, $comments_use_autobr;
 global $comment_cookies, $comment_allow_msgform;
 
+if( is_null($comment_cookies) )
+{ // "Remember me" checked, if remembered before:
+	$comment_cookies = isset($_COOKIE[$cookie_name]) || isset($_COOKIE[$cookie_email]) || isset($_COOKIE[$cookie_url]);
+}
+
 // Default params:
 $params = array_merge( array(
 		'disp_comment_form'	   =>	true,
@@ -24,9 +29,9 @@ $params = array_merge( array(
 		'policy_text'          => '',
 		'textarea_lines'       => 10,
 		'default_text'         => '',
-    'preview_start'        => '<div class="bComment" id="comment_preview">',
-    'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
-    'preview_end'          => '</div>',
+		'preview_start'        => '<div class="bComment" id="comment_preview">',
+		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
+		'preview_end'          => '</div>',
 	), $params );
 
 /*
@@ -44,8 +49,8 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 			// ------------------ PREVIEW COMMENT INCLUDED HERE ------------------
 			skin_include( $params['comment_template'], array(
 					'Comment'              => & $Comment,
-				  'comment_start'        => $params['preview_start'],
-				  'comment_end'          => $params['preview_end'],
+					'comment_start'        => $params['preview_start'],
+					'comment_end'          => $params['preview_end'],
 				) );
 			// Note: You can customize the default item feedback by copying the generic
 			// /skins/_item_comment.inc.php file into the current skin folder.
@@ -138,21 +143,21 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	if( substr($comments_use_autobr,0,4) == 'opt-')
 	{
 		$comment_options[] = '<label><input type="checkbox" class="checkbox" name="comment_autobr" tabindex="6"'
-													.( ($comments_use_autobr == 'opt-out') ? ' checked="checked"' : '' )
-													.' value="1" /> '.T_('Auto-BR').'</label>'
-													.' <span class="note">('.T_('Line breaks become &lt;br /&gt;').')</span>';
+			.( ($comments_use_autobr == 'opt-out') ? ' checked="checked"' : '' )
+			.' value="1" /> '.T_('Auto-BR').'</label>'
+			.' <span class="note">('.T_('Line breaks become &lt;br /&gt;').')</span>';
 	}
 
 	if( ! is_logged_in() )
 	{ // User is not logged in:
 		$comment_options[] = '<label><input type="checkbox" class="checkbox" name="comment_cookies" tabindex="7"'
-													.( $comment_cookies ? ' checked="checked"' : '' ).' value="1" /> '.T_('Remember me').'</label>'
-													.' <span class="note">('.T_('Name, email &amp; website').')</span>';
+			.( $comment_cookies ? ' checked="checked"' : '' ).' value="1" /> '.T_('Remember me').'</label>'
+			.' <span class="note">('.T_('Name, email &amp; website').')</span>';
 		// TODO: If we got info from cookies, Add a link called "Forget me now!" (without posting a comment).
 
 		$comment_options[] = '<label><input type="checkbox" class="checkbox" name="comment_allow_msgform" tabindex="8"'
-													.( $comment_allow_msgform ? ' checked="checked"' : '' ).' value="1" /> '.T_('Allow message form').'</label>'
-													.' <span class="note">('.T_('Allow users to contact you through a message form (your email will <strong>not</strong> be revealed.').')</span>';
+			.( $comment_allow_msgform ? ' checked="checked"' : '' ).' value="1" /> '.T_('Allow message form').'</label>'
+			.' <span class="note">('.T_('Allow users to contact you through a message form (your email will <strong>not</strong> be revealed.').')</span>';
 		// TODO: If we have an email in a cookie, Add links called "Add a contact icon to all my previous comments" and "Remove contact icon from all my previous comments".
 	}
 
@@ -186,6 +191,10 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.6  2008/06/22 18:19:24  blueyed
+ * - "Remember me" checked, if name, url or email has been remembered before
+ * - Fix indent
+ *
  * Revision 1.5  2008/02/11 23:46:35  fplanque
  * cleanup
  *
