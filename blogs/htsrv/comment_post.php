@@ -318,18 +318,18 @@ if( !is_logged_in() )
 		{
 			setcookie( $cookie_name, '', $cookie_expired, $cookie_path, $cookie_domain);
 		}
-		if( !empty($_COOKIE['comment_author_email']) )
+		if( !empty($_COOKIE[$cookie_email]) )
 		{
 			setcookie( $cookie_email, '', $cookie_expired, $cookie_path, $cookie_domain);
 		}
-		if( !empty($_COOKIE['comment_author_url']) )
+		if( !empty($_COOKIE[$cookie_url]) )
 		{
 			setcookie( $cookie_url, '', $cookie_expired, $cookie_path, $cookie_domain);
 		}
 	}
 }
 
-// Note: we don't give any clue that we have automatically deleted a comment. Il would only give spammers the perfect tool to find out how to pass the filter.
+// Note: we don't give any clue that we have automatically deleted a comment. It would only give spammers the perfect tool to find out how to pass the filter.
 
 if( $Comment->ID )
 { // comment has not been deleted
@@ -367,6 +367,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.122  2008/06/22 17:50:51  blueyed
+ * Use vars for cookie names; typo
+ *
  * Revision 1.121  2008/02/19 11:11:16  fplanque
  * no message
  *
