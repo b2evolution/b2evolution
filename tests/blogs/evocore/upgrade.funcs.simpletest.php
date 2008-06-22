@@ -270,7 +270,7 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 	{
 		global $schema_queries, $basepath;
 
-		require_once $basepath.'install/_db_schema.inc.php';
+		load_db_schema();
 
 		foreach( $schema_queries as $query_info )
 		{
