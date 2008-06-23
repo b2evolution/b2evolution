@@ -1430,7 +1430,7 @@ function debug_info( $force = false )
 	global $cache_imgsize, $cache_File;
 	global $Session;
 	global $db_config, $tableprefix;
-  /**
+	/**
 	 * @var Hit
 	 */
 	global $Hit;
@@ -1457,6 +1457,8 @@ function debug_info( $force = false )
 	$debug_done = true;
 
 	$ReqHostPathQuery = $ReqHost.$ReqPath.( empty( $_SERVER['QUERY_STRING'] ) ? '' : '?'.$_SERVER['QUERY_STRING'] );
+
+	echo "\n\n\n";
 	echo '<div class="debug"><h2>Debug info</h2>';
 
 	$Debuglog->add( 'Len of serialized $cache_imgsize: '.strlen(serialize($cache_imgsize)), 'memory' );
@@ -2792,6 +2794,9 @@ function modules_call_method( $method_name )
 
 /*
  * $Log$
+ * Revision 1.38  2008/06/23 21:55:38  blueyed
+ * Add newlines/whitespace before debug_info output; fix indent
+ *
  * Revision 1.37  2008/05/10 21:30:38  fplanque
  * better UTF-8 handling
  *
