@@ -55,7 +55,7 @@ param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 )
 
 if( is_logged_in() )
 {
-    /**
+	/**
 	 * @var User
 	 */
 	$User = & $current_User;
@@ -80,7 +80,7 @@ param( 'comment_rating', 'integer', NULL );
 
 // Passthrough comment_cookies & comment_allow_msgform params:
 $redirect_to = url_add_param($redirect_to, 'comment_cookies='.$comment_cookies
-    .'&comment_allow_msgform='.$comment_allow_msgform, '&');
+	.'&comment_allow_msgform='.$comment_allow_msgform, '&');
 
 $now = date( 'Y-m-d H:i:s', $localtimenow );
 
@@ -371,6 +371,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.124  2008/06/26 21:21:12  blueyed
+ * Fix indent
+ *
  * Revision 1.123  2008/06/22 18:17:55  blueyed
  * comment_post: Passthrough comment_cookies & comment_allow_msgform params
  *
