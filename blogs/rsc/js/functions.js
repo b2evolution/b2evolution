@@ -474,8 +474,50 @@ b2evo_Callbacks.prototype = {
 
 var b2evo_Callbacks = new b2evo_Callbacks();
 
+
+function evo_menu_show( elt )
+{
+	// console.log( 'evo_menu_show on ', elt );
+	// window.status = elt.nodeName;
+
+	child = elt.firstChild;
+	while( child.nodeName != 'UL' )
+	{
+		child = child.nextSibling;
+		if( child == null )
+		{	// No UL was found
+			return;
+		}
+	}
+
+	// Find offset of parent bottom:
+	var x = elt.offsetLeft;
+	var y = elt.offsetTop + elt.offsetHeight;
+	// Need to recurse to add parent offsets:
+	var obj = elt.offsetParent;
+	while (obj) {
+		x += obj.offsetLeft;
+		y += obj.offsetTop;
+		obj = obj.offsetParent;
+	}
+
+	child.style.left = x + 'px';
+	child.style.top = y + 'px';
+	elt.className = 'menu_open'; // This is for IE6 which has no li:hover support
+}
+function evo_menu_hide( elt )
+{
+	// console.log( 'evo_menu_hide on ', elt );
+	elt.className = 'menu_close'; // This is for IE6 which has no li:hover support
+}
+
+
+
 /*
  * $Log$
+ * Revision 1.32  2008/06/26 23:36:07  blueyed
+ * Move evo_menu_show() and evo_menu_hide() javascript functions to global functions.js, instead of inlining them on every page
+ *
  * Revision 1.31  2008/02/20 02:08:49  blueyed
  * doc
  *
