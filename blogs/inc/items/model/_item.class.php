@@ -512,6 +512,16 @@ class Item extends ItemLight
 			$Plugins_admin = & get_Cache('Plugins_admin');
 			$Plugins_admin->filter_contents( $GLOBALS['post_title'] /* by ref */, $GLOBALS['content'] /* by ref */, $renderers );
 
+
+			// Title handling:
+			$this->get_Blog();
+			$require_title = $this->Blog->get_setting('require_title');
+
+			if( $require_title == 'required' )
+			{
+				param_check_not_empty( 'post_title', T_('Please provide a title.'), '' );
+			}
+
 			// Format raw HTML input to cleaned up and validated HTML:
 			param_check_html( 'post_title', T_('Invalid title.'), '' );
 			$this->set( 'title', get_param( 'post_title' ) );
@@ -3544,6 +3554,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.52  2008/06/30 23:47:04  blueyed
+ * require_title setting for Blogs, defaulting to 'required'. This makes the title field now a requirement (by default), since it often gets forgotten when posting first (and then the urltitle is ugly already)
+ *
  * Revision 1.51  2008/06/01 23:57:20  waltercruz
  * Adding rel=tag (some microformats love)
  *

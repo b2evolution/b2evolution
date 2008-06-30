@@ -118,15 +118,20 @@ for( $i = 1 ; $i <= 3; $i++ )
 
 	$Form->begin_fieldset( T_('Post contents').get_manual_link('post_contents_fieldset') );
 
-	$Form->switch_layout( 'none' );
+	// Title input:
+	$require_title = $Blog->get_setting('require_title');
+	if( $require_title != 'none' )
+	{
+		$Form->switch_layout( 'none' );
 
-	echo '<table cellspacing="0" class="compose_layout"><tr>';
-	echo '<td class"label"><strong>'.T_('Title').':</strong></td>';
-	echo '<td class="input">';
-	$Form->text_input( 'post_title', $item_title, 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-	echo '</td><td width="1"><!-- for IE7 --></td></tr></table>';
+		echo '<table cellspacing="0" class="compose_layout"><tr>';
+		echo '<td class"label"><strong>'.T_('Title').':</strong></td>';
+		echo '<td class="input">';
+		$Form->text_input( 'post_title', $item_title, 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;', 'required'=>($require_title=='required')) );
+		echo '</td><td width="1"><!-- for IE7 --></td></tr></table>';
 
-	$Form->switch_layout( NULL );
+		$Form->switch_layout( NULL );
+	}
 
 	// --------------------------- TOOLBARS ------------------------------------
 	echo '<div class="edit_toolbars">';
@@ -288,6 +293,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.20  2008/06/30 23:47:04  blueyed
+ * require_title setting for Blogs, defaulting to 'required'. This makes the title field now a requirement (by default), since it often gets forgotten when posting first (and then the urltitle is ugly already)
+ *
  * Revision 1.19  2008/04/14 19:50:51  fplanque
  * enhanced attachments handling in post edit mode
  *

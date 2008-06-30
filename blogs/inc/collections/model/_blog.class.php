@@ -362,6 +362,11 @@ class Blog extends DataObject
 			$this->set_setting( 'posts_per_feed', get_param( 'posts_per_feed' ) );
 		}
 
+		if( param( 'require_title', 'string', NULL ) !== NULL )
+		{ // Title for items required?
+			$this->set_setting( 'require_title', get_param( 'require_title' ) );
+		}
+
 		if( param( 'blog_description', 'string', NULL ) !== NULL )
 		{	// Description:
 			$this->set_from_Request( 'shortdesc', 'blog_description' );
@@ -1921,6 +1926,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.42  2008/06/30 23:47:04  blueyed
+ * require_title setting for Blogs, defaulting to 'required'. This makes the title field now a requirement (by default), since it often gets forgotten when posting first (and then the urltitle is ugly already)
+ *
  * Revision 1.41  2008/05/31 22:29:07  blueyed
  * indent, doc
  *

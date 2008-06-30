@@ -101,6 +101,8 @@ class CollectionSettings extends AbstractSettings
 			'max_footer_credits' => 3,
 			'atom_redirect' => '',
 			'rss2_redirect' => '',
+
+			'require_title' => 'required',  // Is a title for items required ("required", "optional", "none")
 		);
 
 
@@ -136,6 +138,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.20  2008/06/30 23:47:04  blueyed
+ * require_title setting for Blogs, defaulting to 'required'. This makes the title field now a requirement (by default), since it often gets forgotten when posting first (and then the urltitle is ugly already)
+ *
  * Revision 1.19  2008/05/06 23:25:34  fplanque
  * minor
  *

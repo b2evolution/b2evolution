@@ -113,6 +113,14 @@ $Form->begin_fieldset( T_('Multiple authors') );
 	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Items') );
+	$Form->radio( 'require_title', $edited_Blog->get_setting('require_title'),
+								array(  array( 'required', T_('Required') ),
+												array( 'optional', T_('Optional') ),
+												array( 'none', T_('No title field') ),
+											), T_('Require title'), true, T_('Is a title required for items?') );
+$Form->end_fieldset();
+
 
 $Form->begin_fieldset( T_('Custom field names') );
 	$notes = array(
@@ -171,6 +179,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.11  2008/06/30 23:47:04  blueyed
+ * require_title setting for Blogs, defaulting to 'required'. This makes the title field now a requirement (by default), since it often gets forgotten when posting first (and then the urltitle is ugly already)
+ *
  * Revision 1.10  2008/04/03 22:03:06  fplanque
  * added "save & edit" and "publish now" buttons to edit screen.
  *
