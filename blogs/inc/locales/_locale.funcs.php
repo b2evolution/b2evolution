@@ -817,14 +817,23 @@ function locale_updateDB()
  * @see can_convert_charsets()
  * @param string String to convert
  * @param string Target charset (TO)
- * @param string Source charset (FROM)
+ * @param string Source charset (FROM) - leave empty to detect it automatically (UTF8, latin1 or latin15)
  * @return string Encoded string (if it cannot be converted it's the original one)
  */
-function convert_charset( $string, $dest_charset, $src_charset )
+function convert_charset( $string, $dest_charset, $src_charset = null )
 {
 	if( $dest_charset == $src_charset )
 	{ // no conversation required
 		return $string;
+	}
+
+	if( ! strlen($src_charset) )
+	{
+		if( function_exists('mb_detect_encoding') )
+		{
+			$detect_string = $string.'a'; // work around a bug in mb_detect_encoding, where an ISO string gets detected as UTF-8, if the last char is e.g. "ae" (german umlaut)
+			$src_charset = mb_detect_encoding($detect_string, 'UTF-8, ISO-8859-1, ISO-8859-15', true);
+		}
 	}
 
 	if( function_exists('mb_convert_variables') )
@@ -966,6 +975,10 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.10  2008/06/30 21:24:20  blueyed
+ * - convert_charset(): auto-detect source encoding, if not given (UTF-8, ISO-8859-1, ISO-8859-15)
+ * - extract_keyphrase_from_referer: use convert_charset() to convert query string to $evo_charset
+ *
  * Revision 1.9  2008/05/10 21:30:39  fplanque
  * better UTF-8 handling
  *

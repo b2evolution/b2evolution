@@ -41,6 +41,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function extract_keyphrase_from_referer( $ref )
 {
+	global $evo_charset;
+
 	$kwout = '';
 	if( ($pos_question = strpos( $ref, '?' )) == false )
 	{
@@ -72,11 +74,7 @@ function extract_keyphrase_from_referer( $ref )
 		if( !empty($param_parts[1]) && in_array( $param_parts[0], $known_search_params )	)
 		{ // found "q" query parameter
 			$q = trim(urldecode($param_parts[1]));
-			if( strpos( $q, 'Ã' ) !== false )
-			{ // Probability that the string is UTF-8 encoded is very high, that'll do for now...
-				//echo "[UTF-8 decoding]";
-				$q = utf8_decode( $q );
-			}
+			$q = convert_charset($q, $evo_charset);
 			return $q;
 		}
 	}
@@ -861,6 +859,10 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.13  2008/06/30 21:24:20  blueyed
+ * - convert_charset(): auto-detect source encoding, if not given (UTF-8, ISO-8859-1, ISO-8859-15)
+ * - extract_keyphrase_from_referer: use convert_charset() to convert query string to $evo_charset
+ *
  * Revision 1.12  2008/05/10 22:59:10  fplanque
  * keyphrase logging
  *
