@@ -533,7 +533,7 @@ class ComponentWidget extends DataObject
 		{
 			echo $this->disp_params['block_start'];
 			echo T_('The requested Blog doesn\'t exist any more!');
-  		echo $this->disp_params['block_end'];
+			echo $this->disp_params['block_end'];
 			return;
 		}
 
@@ -733,6 +733,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2008/06/30 20:46:05  blueyed
+ * Fix indent
+ *
  * Revision 1.35  2008/04/24 02:01:04  fplanque
  * experimental
  *

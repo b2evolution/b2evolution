@@ -26,20 +26,20 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Default params:
 $params = array_merge( array(
-		'disp_comments'        =>	true,
-		'disp_comment_form'	   =>	true,
-		'disp_trackbacks'	     =>	true,
-		'disp_trackback_url'   =>	true,
-		'disp_pingbacks'	     =>	true,
+		'disp_comments'        => true,
+		'disp_comment_form'    => true,
+		'disp_trackbacks'      => true,
+		'disp_trackback_url'   => true,
+		'disp_pingbacks'       => true,
 		'before_section_title' => '<h3>',
 		'after_section_title'  => '</h3>',
-    'comment_list_start'   => "\n\n",
-    'comment_list_end'     => "\n\n",
-    'comment_start'        => '<div class="bComment">',
-    'comment_end'          => '</div>',
-    'preview_start'        => '<div class="bComment" id="comment_preview">',
-    'preview_end'          => '</div>',
-    'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
+		'comment_list_start'   => "\n\n",
+		'comment_list_end'     => "\n\n",
+		'comment_start'        => '<div class="bComment">',
+		'comment_end'          => '</div>',
+		'preview_start'        => '<div class="bComment" id="comment_preview">',
+		'preview_end'          => '</div>',
+		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
 		'form_title_start'     => '<h3>',
 		'form_title_end'       => '</h3>',
 	), $params );
@@ -203,6 +203,9 @@ skin_include( '_item_comment_form.inc.php', $params );
 
 /*
  * $Log$
+ * Revision 1.16  2008/06/30 20:51:03  blueyed
+ * Fix indent
+ *
  * Revision 1.15  2008/02/05 01:52:37  fplanque
  * enhanced comment form
  *
