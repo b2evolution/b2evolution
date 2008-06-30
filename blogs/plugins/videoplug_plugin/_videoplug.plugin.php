@@ -13,6 +13,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Replaces Video Plug markup in HTML (not XML).
  *
+ * @todo dh> Hook into AdminBeforeItemEditUpdate and validate provided video IDs
+ *
  * @package plugins
  */
 class videoplug_plugin extends Plugin
@@ -79,22 +81,11 @@ class videoplug_plugin extends Plugin
 	 */
 	function RenderItemAsXml( & $params )
 	{
-		$this->RenderItemAsHtml( $params );
-
-		/*
-		$content = & $params['data'];
-		$Item = & $params['Item'];
-
-		$content = preg_replace( '¤\[video:.+?]¤', '<p>'.$Item->get_permanent_link( T_('See video').' &raquo;' ).'</p>', $content );
-		*/
-
-		return true;
+		return $this->RenderItemAsHtml( $params );
 	}
 
 	/**
-	 * Display a toolbar in admin
-	 * dh>> Do the service names, e.g. "YouTube" have to be marked for i18n?
-	 * fp> nope
+	 * Display a toolbar in admin.
 	 *
 	 * @param array Associative array of parameters
 	 * @return boolean did we display a toolbar?
@@ -108,11 +99,11 @@ class videoplug_plugin extends Plugin
 
 		echo '<div class="edit_toolbar">';
 		echo T_('Video').': ';
-		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="quicktags" onclick="videotag(\'youtube\');" value="'.T_('YouTube').'" />';
-		echo '<input type="button" id="video_google" title="'.T_('Insert Google video').'" class="quicktags" onclick="videotag(\'google\');" value="'.T_('Google video').'" />';
-		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="quicktags" onclick="videotag(\'dailymotion\');" value="'.T_('DailyMotion').'" />';
-		echo '<input type="button" id="video_livevideo" title="'.T_('Insert LiveVideo video').'" class="quicktags" onclick="videotag(\'livevideo\');" value="'.T_('LiveVideo').'" />';
-		echo '<input type="button" id="video_ifilm" title="'.T_('Insert iFilm video').'" class="quicktags" onclick="videotag(\'ifilm\');" value="'.T_('iFilm').'" />';
+		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="quicktags" onclick="videotag(\'youtube\');" value="YouTube" />';
+		echo '<input type="button" id="video_google" title="'.T_('Insert Google video').'" class="quicktags" onclick="videotag(\'google\');" value="Google video" />';
+		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="quicktags" onclick="videotag(\'dailymotion\');" value="DailyMotion" />';
+		echo '<input type="button" id="video_livevideo" title="'.T_('Insert LiveVideo video').'" class="quicktags" onclick="videotag(\'livevideo\');" value="LiveVideo" />';
+		echo '<input type="button" id="video_ifilm" title="'.T_('Insert iFilm video').'" class="quicktags" onclick="videotag(\'ifilm\');" value="iFilm" />';
 
 		echo '</div>';
 
@@ -121,11 +112,37 @@ class videoplug_plugin extends Plugin
 			//<![CDATA[
 			function videotag( tag )
 			{
-				var p = '<?php echo TS_('Enter video ID from %s:') ?>';
-				var video_ID = prompt( p.replace( /%s/, tag ), '' );
-				if( ! video_ID )
+				while( 1 )
 				{
-					return;
+					var valid_video_ID = false;
+					var p = '<?php echo TS_('Enter video ID from %s:') ?>';
+					var video_ID = prompt( p.replace( /%s/, tag ), '' );
+					if( ! video_ID )
+					{
+						return;
+					}
+
+					// Validate Video ID:
+					// TODO: verify validation / add for others..
+					switch( tag )
+					{
+					case 'youtube':
+						if( video_ID.match( /^\w+$/ ) )
+						{ // valid
+							valid_video_ID = true;
+						}
+						break;
+
+					default:
+						valid_video_ID = true;
+						break;
+					}
+
+					if( valid_video_ID )
+					{
+						break;
+					}
+					alert( '<?php echo TS_('The video ID is invalid.'); ?>' );
 				}
 
 				tag = '[video:'+tag+':'+video_ID+']';
@@ -138,12 +155,14 @@ class videoplug_plugin extends Plugin
 
 		return true;
 	}
-
 }
 
 
 /*
  * $Log$
+ * Revision 1.12  2008/06/30 20:49:50  blueyed
+ * videoplug_plugin: validate video ID (only for YouTube currently); do not translate video service names
+ *
  * Revision 1.11  2008/01/21 09:35:42  fplanque
  * (c) 2008
  *
