@@ -816,6 +816,8 @@ class Comment extends DataObject
 		echo $before;
 		echo '<a href="'.$form_url.'" title="'.$title.'"';
 		if( !empty( $class ) ) echo ' class="'.$class.'"';
+		// TODO: have an SEO setting for nofollow here, default to nofollow
+		echo ' rel="nofollow"';
 		echo '>'.$text.'</a>';
 		echo $after;
 
@@ -1338,6 +1340,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.23  2008/07/01 08:32:12  fplanque
+ * minor
+ *
  * Revision 1.22  2008/04/13 22:07:59  fplanque
  * email fixes
  *

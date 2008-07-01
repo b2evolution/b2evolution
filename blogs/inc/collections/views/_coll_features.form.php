@@ -53,6 +53,20 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'features' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
+$Form->begin_fieldset( T_('Post options') );
+	$Form->radio( 'require_title', $edited_Blog->get_setting('require_title'),
+								array(  array( 'required', T_('Always'), T_('The blogger must provide a title') ),
+												array( 'optional', T_('Optional'), T_('The blogger can leave the title field empty') ),
+												array( 'none', T_('Never'), T_('No title field') ),
+											), T_('Post titles'), true );
+
+	// FP> TODO:
+	// -post_url  always('required')|optional|never
+	// -multilingual:  true|false   or better yet: provide a list to narrow down the active locales
+	// -tags  always('required')|optional|never
+
+$Form->end_fieldset();
+
 $Form->begin_fieldset( T_('Feedback options') );
 	$Form->radio( 'blog_allowcomments', $edited_Blog->get( 'allowcomments' ),
 						array(  array( 'always', T_('Allow on all posts'), T_('Always allow comments on every post'),
@@ -113,14 +127,6 @@ $Form->begin_fieldset( T_('Multiple authors') );
 	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Items') );
-	$Form->radio( 'require_title', $edited_Blog->get_setting('require_title'),
-								array(  array( 'required', T_('Required') ),
-												array( 'optional', T_('Optional') ),
-												array( 'none', T_('No title field') ),
-											), T_('Require title'), true, T_('Is a title required for items?') );
-$Form->end_fieldset();
-
 
 $Form->begin_fieldset( T_('Custom field names') );
 	$notes = array(
@@ -179,6 +185,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.12  2008/07/01 08:32:12  fplanque
+ * minor
+ *
  * Revision 1.11  2008/06/30 23:47:04  blueyed
  * require_title setting for Blogs, defaulting to 'required'. This makes the title field now a requirement (by default), since it often gets forgotten when posting first (and then the urltitle is ugly already)
  *

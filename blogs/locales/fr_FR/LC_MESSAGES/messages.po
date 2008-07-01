@@ -3756,7 +3756,7 @@ msgstr "Page 2,3,4..."
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:141
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:195
 msgid "NOFOLLOW on links to"
-msgstr "NOFOLLOW pour les liens"
+msgstr "NOFOLLOW pour les liens vers"
 
 # D:\www\b2cvs20\blogs\inc\collections\views\_coll_seo.form.php:66
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:144
