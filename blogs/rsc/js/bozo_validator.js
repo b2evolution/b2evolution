@@ -232,5 +232,5 @@ var bozo = {
 
 // Init Bozo validator when the window is loaded:
 addEvent( window, 'load', bozo.init, false );
-// The following does not work with addEvent, being a "very special" event:
+// Note: beforeunload is a "very special" event and cannot be added with addEvent:
 window.onbeforeunload = bozo.validate_close;
