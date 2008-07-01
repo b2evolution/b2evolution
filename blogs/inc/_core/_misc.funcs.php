@@ -2223,6 +2223,8 @@ function get_ip_list( $firstOnly = false )
  */
 function get_base_domain( $url )
 {
+	global $evo_charset;
+
 	//echo '<p>'.$url;
 	// Chop away the http part and the path:
 	$domain = preg_replace( '~^([a-z]+://)?([^:/#]+)(.*)$~i', '\\2', $url );
@@ -2236,17 +2238,22 @@ function get_base_domain( $url )
 
 	// Get the base domain up to 3 levels (x.y.tld):
 	// NOTE: "_" is not really valid, but for Windows it is..
-	// TODO: dh> this should also handle IDN "raw" domains with umlauts..
-	// NOTE: \w does not always match umlauts.. it's based on setlocale().. (fp> hum, it was too good to be real :P)
 	// NOTE: \w includes "_"
-	if( ! preg_match( '~  ( \w (\w|-|_)* \. ){0,2}   \w (\w|-|_)*  $~ix', $domain, $matches ) )
+
+	// convert URL to IDN:
+	load_funcs('_ext/idna/_idna_convert.class.php');
+	$IDNA = new Net_IDNA_php4();
+	$domain = $IDNA->encode( convert_charset($domain, 'UTF-8', $evo_charset) );
+
+	$domain_pattern = '~ ( \w (\w|-|_)* \. ){0,2}   \w (\w|-|_)* $~ix';
+	if( ! preg_match( $domain_pattern, $domain, $match ) )
 	{
 		return '';
 	}
-	$base_domain = $matches[0];
+	$base_domain = convert_charset($IDNA->decode( $match[0] ), $evo_charset, 'UTF-8');
 
 	// Remove any www*. prefix:
-	$base_domain = preg_replace( '~^(www (\w|-|_)* \. )~xi', '', $base_domain );
+	$base_domain = preg_replace( '~^www.*?\.~i', '', $base_domain );
 
 	//echo '<br>'.$base_domain.'</p>';
 
@@ -2794,6 +2801,9 @@ function modules_call_method( $method_name )
 
 /*
  * $Log$
+ * Revision 1.39  2008/07/01 20:22:23  blueyed
+ * Fix get_base_domain for IDN (umlaut) domains.
+ *
  * Revision 1.38  2008/06/23 21:55:38  blueyed
  * Add newlines/whitespace before debug_info output; fix indent
  *
