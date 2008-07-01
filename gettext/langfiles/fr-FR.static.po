@@ -166,7 +166,7 @@ msgstr "Ceci est une version BETA!"
 
 #: ../../index.src.html:68
 msgid "There are still bugs we know of, but we consider the software to be globally operational!"
-msgstr "Il y a encore des bogues que nous connaissons, mais nous considérons que le logiciels est globalement opérationnel."
+msgstr "Il reste des bugs connus, mais nous considérons que le logiciel est globalement opérationnel!"
 
 #: ../../index.src.html:69
 msgid "NOTE: This version is and will continue to be fully supported in the upgrading scheme and procedures."
@@ -396,29 +396,4 @@ msgstr "Une fois que b2evolution est installé, dans l'administration, cliquez su
 #: ../../doc/upgradefrom_wp.src.html:37
 msgid "Follow the instructions on screen and provide connection information to your WordPress database (Read Only)"
 msgstr "Suivez les instructions à l'écran et fournissez les informations de connexion à votre base de données WordPress (Lecture Seule)"
-
-#~ msgid ""
-#~ "There are still bugs we know of, but we consider the software is globally "
-#~ "operational! The most important thing you need to know about ALPHA / BETA "
-#~ "releases is that nothing is to be considered final, including skintags "
-#~ "and the plugin API."
-#~ msgstr ""
-#~ "Il reste des bugs connus, mais nous considérons que le logiciel est "
-#~ "globalement opérationnel! La chose la plus importante que vous devez "
-#~ "savoir sur les versions ALPHA / BETA c'est que rien ne doit être "
-#~ "considéré comme final, y compris les tags dans les skins ainsi que l'API "
-#~ "des plugins."
-#~ msgid ""
-#~ "Delete <strong>all your existing b2evolution files from your site</"
-#~ "strong> before uploading the new ones! Some of the old files may not be "
-#~ "compatible with this new version and will cause it to fail! This will "
-#~ "also ensure you don't keep unnecessary files on your server after "
-#~ "upgrading. Plus, it's better for security."
-#~ msgstr ""
-#~ "Supprimez <strong>tous vos fichiers b2evolution existants de votre site</"
-#~ "strong> avant de télécharger les nouveaux! Certains anciens fichiers "
-#~ "risquent de ne pas être compatibles avec cette nouvelle version et "
-#~ "provoqueront des erreurs! Ceci vous assurera également de ne pas "
-#~ "conserver de vieux fichiers non nécessaires sur votre serveur après la "
-#~ "mise à jour. De plus, c'est mieux en termes de sécurité."
 
