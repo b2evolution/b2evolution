@@ -822,7 +822,7 @@ function locale_updateDB()
  */
 function convert_charset( $string, $dest_charset, $src_charset = NULL )
 {
-	if( $dest_charset == $src_charset )
+	if( $dest_charset == $src_charset || $dest_charset == '' )
 	{ // no conversation required
 		return $string;
 	}
@@ -975,6 +975,9 @@ function init_charsets( $req_io_charset )
 
 /*
  * $Log$
+ * Revision 1.12  2008/07/01 21:52:54  blueyed
+ * convert_charset(): return string itself unconverted, if $dest_charset is empty, which may happen when $evo_charset is not defined yet(?)
+ *
  * Revision 1.11  2008/07/01 08:34:10  fplanque
  * minor
  *
