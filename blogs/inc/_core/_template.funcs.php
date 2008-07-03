@@ -418,7 +418,7 @@ function require_js( $js_file, $relative_to_base = FALSE )
 		'#jquery#' => 'jquery.min.js',
 		'#jquery_debug#' => 'jquery.js',
 		'#jqueryUI#' => ( $debug ? 'jquery.ui.all.js' : 'jquery.ui.all.min.js' ),
-		'#jqueryUI_debug#' => 'jquery.js',
+		'#jqueryUI_debug#' => 'jquery.ui.all.js',
 	);
 
 	if( in_array( $js_file, array( '#jqueryUI#', '#jqueryUI_debug#' ) ) )
@@ -788,6 +788,9 @@ function link_pages()
 
 /*
  * $Log$
+ * Revision 1.32  2008/07/03 10:35:22  yabs
+ * minor fix
+ *
  * Revision 1.31  2008/07/03 09:51:52  yabs
  * widget UI
  *
