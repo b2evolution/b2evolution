@@ -177,7 +177,7 @@ $schema_queries = array(
 			wi_ID					INT(10) UNSIGNED auto_increment,
 			wi_coll_ID    INT(11) UNSIGNED NOT NULL,
 			wi_sco_name   VARCHAR( 40 ) NOT NULL,
-			wi_order			INT(10) UNSIGNED NOT NULL,
+			wi_order			INT(10) NOT NULL,
 			wi_type       ENUM( 'core', 'plugin' ) NOT NULL DEFAULT 'core',
 			wi_code       VARCHAR(32) NOT NULL,
 			wi_params     TEXT NULL,
@@ -539,6 +539,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.3  2008/07/03 09:55:07  yabs
+ * widget UI
+ *
  * Revision 1.2  2008/05/10 22:59:09  fplanque
  * keyphrase logging
  *

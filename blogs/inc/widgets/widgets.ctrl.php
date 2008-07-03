@@ -30,6 +30,9 @@ global $Plugins;
 load_class( 'widgets/model/_widget.class.php' );
 
 param( 'action', 'string', 'list' );
+param( 'display_mode', 'string', 'normal' );
+
+$display_mode = ( in_array( $display_mode, array( 'js', 'normal' ) ) ? $display_mode : 'normal' );
 
 /*
  * Init the objects we want to work on.
@@ -46,6 +49,19 @@ switch( $action )
 		param( 'code', 'string', true );
 	case 'new':
 		param( 'container', 'string', true, true );	// memorize
+		break;
+
+	case 're-order' : // js request
+		param( 'container_list', 'string' );
+		$containers_list = explode( ',', $container_list );
+		$containers = Array();
+		foreach( $containers_list as $a_container )
+		{	// add each container and grab it's widgets
+			if( $container_name = trim( str_replace( array( 'container_', '_' ), array( '', ' ' ), $a_container ), ',' ) )
+			{
+				$containers[ $container_name ] = explode( ',', param( trim( $a_container, ',' ), 'string' ) );
+			}
+		}
 		break;
 
 	case 'edit':
@@ -72,7 +88,20 @@ if( ! valid_blog_requested() )
 {
 	debug_die( 'Invalid blog requested' );
 }
-$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+switch( $display_mode )
+{
+	case 'js' : // js response needed
+		if( !$current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
+		{	// user doesn't have permissions
+			$Messages->add( T_('You do not have permission to perform this action' ) );
+			send_javascript_message( array( 'closeWidgetSettings' => array() ) );
+		}
+		break;
+
+	case 'normal':
+	default : // take usual approach
+		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+}
 
 // Get Skin used by current Blog:
 $SkinCache = & get_Cache( 'SkinCache' );
@@ -133,7 +162,18 @@ switch( $action )
 		$Messages->add( sprintf( T_('Widget &laquo;%s&raquo; has been added to container &laquo;%s&raquo;.'),
 					$edited_ComponentWidget->get_name(), T_($container)	), 'success' );
 
-		header_redirect( '?ctrl=widgets&action=edit&wi_ID='.$edited_ComponentWidget->ID );
+		switch( $display_mode )
+		{
+			case 'js' :	// this is a js call, lets return the settings page
+				send_javascript_message( array( 'addNewWidgetCallback' => array( $edited_ComponentWidget->ID, $container, $edited_ComponentWidget->get( 'order' ), $edited_ComponentWidget->get_name() ) ) ); // will be sent with settings form
+				$action = 'edit'; // pulls up the settings form
+				break;
+
+			case 'normal' :
+			default : // take usual action
+				header_redirect( '?ctrl=widgets&action=edit&wi_ID='.$edited_ComponentWidget->ID );
+				break;
+		}
 		break;
 
 
@@ -145,6 +185,18 @@ switch( $action )
 		{	// Update settings:
 			$edited_ComponentWidget->dbupdate();
 			$Messages->add( T_('Widget settings have been updated'), 'success' );
+			switch( $display_mode )
+			{
+				case 'js' : // js reply
+					$edited_ComponentWidget->init_display( array() );
+					$widget_name =  '<strong>'.$edited_ComponentWidget->disp_params[ 'widget_name' ].'</strong>';
+					if( $edited_ComponentWidget->disp_params[ 'widget_name' ] != $edited_ComponentWidget->get_short_desc() )
+					{	// The name is customized and the short desc may be relevant additional info
+						$widget_name .= ' ('.$edited_ComponentWidget->get_short_desc().')';
+					}
+					send_javascript_message(array( 'widgetSettingsCallback' => array( $edited_ComponentWidget->ID, $widget_name ), 'closeWidgetSettings' => array() ), true );
+					break;
+			}
 			$action = 'list';
 		}
 		break;
@@ -217,37 +269,103 @@ switch( $action )
 	case 'delete':
 		// Remove a widget from container:
 		$msg = sprintf( T_('Widget &laquo;%s&raquo; removed.'), $edited_ComponentWidget->get_name() );
+		$edited_widget_ID = $edited_ComponentWidget->ID;
 		$edited_ComponentWidget->dbdelete( true );
 		unset( $edited_ComponentWidget );
 		forget_param( 'wi_ID' );
 		$Messages->add( $msg, 'success' );
 
-		// PREVENT RELOAD & Switch to list mode:
-		header_redirect( '?ctrl=widgets&blog='.$blog );
+		switch( $display_mode )
+		{
+			case 'js' :	// js call : return success message
+				send_javascript_message( array( 'doDelete' => $edited_widget_ID ) );
+				break;
+
+			case 'normal' :
+			default : // take usual action
+				// PREVENT RELOAD & Switch to list mode:
+				header_redirect( '?ctrl=widgets&blog='.$blog );
+				break;
+		}
 		break;
 
  	case 'list':
 		break;
 
+ 	case 're-order' : // js request
+ 		$DB->begin();
+
+ 		// Reset the current orders and make sco_names temp to avoid duplicate entry errors
+		$DB->query( 'UPDATE T_widget
+										SET wi_order = wi_order * -1, wi_sco_name = CONCAT( \'temp_\', wi_sco_name )
+										WHERE wi_coll_ID = '.$Blog->ID );
+
+		foreach( $containers as $container => $widgets )
+		{	// loop through each container and set new order
+			$order = 0; // reset counter for this container
+			foreach( $widgets as $widget )
+			{	// loop through each widget
+				if( $widget = preg_replace( '~[^0-9]~', '', $widget ) )
+				{ // valid widget id
+					$order++;
+					$DB->query( 'UPDATE T_widget
+												SET wi_order = '.$order.', wi_sco_name = '.$DB->quote( $container ).'
+												WHERE wi_ID = '.$widget );
+				}
+			}
+		}
+		// remove deleted widgets and empty temp containers
+		$DB->query( 'DELETE FROM T_widget WHERE wi_order < 1 OR wi_sco_name LIKE \'temp_%\'' );
+
+		$DB->commit();
+		//$Messages->add( 'Test error', 'error' );
+ 		$Messages->add( T_( 'Widgets updated' ), 'success' );
+ 		send_javascript_message( array( 'sendWidgetOrderCallback' => array() ) ); // exits() automatically
+ 		break;
+
 	default:
 		debug_die( 'Action: unhandled action' );
 }
 
+if( $display_mode == 'normal' )
+{	// this is a normal request
+	/**
+	 * Display page header, menus & messages:
+	 */
+	$AdminUI->set_coll_list_params( 'blog_properties', 'edit', array( 'ctrl' => 'widgets' ),
+				T_('List'), '?ctrl=collections&amp;blog=0' );
 
-/**
- * Display page header, menus & messages:
- */
-$AdminUI->set_coll_list_params( 'blog_properties', 'edit', array( 'ctrl' => 'widgets' ),
-			T_('List'), '?ctrl=collections&amp;blog=0' );
+	$AdminUI->set_path( 'blogs', 'widgets' );
 
-$AdminUI->set_path( 'blogs', 'widgets' );
+	// load the js and css required to make the magic work
+	global $dispatcher;
+	require_js( '#jqueryUI#' ); // auto requires jQuery
+	require_js( 'communication.js' ); // auto requires jQuery
+	add_headline( '<script type="text/javascript">
+	/**
+	 * @internal T_ array of translation strings required by the UI
+	 */
+	var T_ = new Array();
+	T_["Changes pending"] = "'.T_( 'Changes pending' ).'";
+	T_["Saving changes"] = "'.T_( 'Saving changes' ).'";
+	T_["Widget order unchanged"] = "'.T_( 'Widget order unchanged' ).'";
 
-// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-$AdminUI->disp_html_head();
+	/**
+	 * @internal various urls, would like to remove these as and when possible
+	 */
+	var enabled_icon_url = "'.get_icon( 'deactivate', 'url' ).'";
+	var disabled_icon_url = "'.get_icon( 'activate', 'url' ).'";
+	</script>' );
+	require_js( 'blog_widgets.js' );
+	require_css( 'blog_widgets.css' );
 
-// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-$AdminUI->disp_body_top();
 
+	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
+
+	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+	$AdminUI->disp_body_top();
+}
 
 /**
  * Display payload:
@@ -273,15 +391,36 @@ switch( $action )
 
 	case 'edit':
 	case 'update':	// on error
-		// Begin payload block:
-		$AdminUI->disp_payload_begin();
+		switch( $display_mode )
+		{
+			case 'js' : // js request
+				ob_start();
+				// Display VIEW:
+				$AdminUI->disp_view( 'widgets/views/_widget.form.php' );
+				$output = ob_get_clean();
+				if( $js_reply )
+				{	// we already have a message, should be from "create widget"
+					$js_reply += array( 'widgetSettings' => $output );
+				}
+				else
+				{	// this is the only reply
+					$js_reply = array( 'widgetSettings' => $output );
+				}
+				send_javascript_message( $js_reply );
+				break;
 
-		// Display VIEW:
-		$AdminUI->disp_view( 'widgets/views/_widget.form.php' );
+			case 'normal' :
+			default : // take usual action
+				// Begin payload block:
+				$AdminUI->disp_payload_begin();
 
+				// Display VIEW:
+				$AdminUI->disp_view( 'widgets/views/_widget.form.php' );
 
-		// End payload block:
-		$AdminUI->disp_payload_end();
+				// End payload block:
+				$AdminUI->disp_payload_end();
+				break;
+		}
 		break;
 
 
@@ -289,6 +428,13 @@ switch( $action )
 	default:
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
+
+		// Display VIEW:
+		echo '<fieldset class="available_widgets">'."\n"; // this will be enabled if js available
+		echo '<legend>'.T_( 'Add new widget' ).'</legend>'."\n";
+		echo '<div id="available_widgets_inner">'."\n";
+		$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );
+		echo '</div></fieldset><!-- /available_widgets -->'."\n";
 
 		// Display VIEW:
 		$AdminUI->disp_view( 'widgets/views/_widget_list.view.php' );
@@ -304,6 +450,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2008/07/03 09:52:51  yabs
+ * widget UI
+ *
  * Revision 1.8  2008/01/21 09:35:36  fplanque
  * (c) 2008
  *

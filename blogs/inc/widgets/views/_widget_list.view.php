@@ -37,10 +37,13 @@ function display_container( $container, $legend_suffix = '' )
 
 	$Table = & new Table();
 
-	$Table->title = T_($container).$legend_suffix;
+	$Table->title = sprintf( ( $legend_suffix ? '%s' : '<span class="container_name">%s</span>' ), T_($container) ).$legend_suffix;
 
-	$Table->global_icon( T_('Add a widget...'), 'new',
-			regenerate_url( '', 'action=new&amp;container='.rawurlencode($container) ), /* TRANS: note this is NOT a NEW widget */ T_('Add widget').' &raquo;', 3, 4 );
+	if( !$legend_suffix )
+	{	// this is an existing container
+		$Table->global_icon( T_('Add a widget...'), 'new',
+			regenerate_url( '', 'action=new&amp;container='.rawurlencode($container) ), /* TRANS: note this is NOT a NEW widget */ '<span class="add_new_widget_text">'.T_('Add widget').'</span> &raquo;', 3, 4, array( 'id' => 'add_new_'.str_replace( ' ', '_', $container ) ) );
+	}
 
 	$Table->cols = array(
 			array( 'th' => T_('Widget') ),
@@ -56,6 +59,13 @@ function display_container( $container, $legend_suffix = '' )
 		);
 
 	$Table->display_init();
+	// add ID for jQuery
+	$Table->params['head_title' ] = str_replace( '<table', '<table id="'.str_replace( ' ', '_', $container ).'"', $Table->params['head_title'] );
+
+	if( $legend_suffix )
+	{	// add jQuery no-drop
+		$Table->params['head_title' ] = str_replace( 'class="grouped"', 'class="grouped no-drop"', $Table->params['head_title'] );
+	}
 
 	$Table->display_list_start();
 
@@ -75,7 +85,8 @@ function display_container( $container, $legend_suffix = '' )
 	{	// TODO: cleanup
 		$Table->display_line_start( true );
 		$Table->display_col_start();
-		echo T_('There is no widget in this container yet.');
+		echo '<strong class="new_widget">'.T_('There is no widget in this container yet.').'</strong>';
+//		echo '<strong class="new_widget">'.T_('Add a widget to this container ( needs linking )').'</strong>';
 		$Table->display_col_end();
 		$Table->display_line_end();
 	}
@@ -104,7 +115,7 @@ function display_container( $container, $legend_suffix = '' )
 			{	// The name is customized and the short desc may be relevant additional info
 				$widget_name .= ' ('.$ComponentWidget->get_short_desc().')';
 			}
-			echo '<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID).'">'.$widget_name.'</a>';
+			echo '<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID).'" class="widget_name">'.$widget_name.'</a>';
 			$Table->display_col_end();
 
 			// Note: this is totally useless, but we need more cols for the screen to feel "right":
@@ -135,8 +146,8 @@ function display_container( $container, $legend_suffix = '' )
 
 			// Actions
 			$Table->display_col_start();
-			echo action_icon( T_('Edit widget settings!'), 'edit', regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ) );
-			echo action_icon( T_('Remove this widget!'), 'delete', regenerate_url( 'blog', 'action=delete&amp;wi_ID='.$ComponentWidget->ID ) );
+			echo '<span class="edit_icon_hook">'.action_icon( T_('Edit widget settings!'), 'edit', regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ) ).'</span>';
+			echo '<span class="delete_icon_hook">'.action_icon( T_('Remove this widget!'), 'delete', regenerate_url( 'blog', 'action=delete&amp;wi_ID='.$ComponentWidget->ID ) ).'</span>';
 			$Table->display_col_end();
 
 			$Table->display_line_end();
@@ -149,7 +160,38 @@ function display_container( $container, $legend_suffix = '' )
 	$Table->display_list_end();
 }
 
-// Dislplay containers for current skin:
+echo '<fieldset id="current_widgets">'."\n"; // fieldsets are cool at remembering their width ;)
+
+/**
+ * Not yet implemented
+ */
+/*
+// add a form for storing the current widgets & containers settings
+$Form = & new Form('', 'save_layout', 'post' );
+$Form->begin_form( 'save_state_form' );
+$Form->switch_layout('inline');
+$Form->text( 'state_name', '', 40, T_( 'Save as' ) );
+$Form->submit( array( 'onclick' => 'saveWidgetState();', 'value' => T_( 'Store state' ) ) );
+$Form->end_form();
+
+// add a form for restoring a previously saved state
+$Form = & new Form( '', 'stored_layouts', 'post' );
+$Form->begin_form( 'restore_state_form' );
+$Form->switch_layout('inline');
+global $UserSettings;
+if( $user_layouts = $UserSettings->get( 'stored_widget_layouts' ) )
+{	// user has some stored layouts
+	$user_layouts = explode( ',', $user_layouts );
+}
+else
+{	// user doesn't have any stored layouts
+	$user_layouts = array( 'No stored layouts' );
+}
+$Form->select_input_array( 'stored_layouts', $user_layouts[0], $user_layouts, T_( 'Restore state' ) );
+$Form->submit( array( 'onclick' => 'restoreWidgetState();', 'value' => T_( 'Restore state' ) ) );
+$Form->end_form();
+*/
+// Display containers for current skin:
 foreach( $container_list as $container )
 {
 	display_container( $container );
@@ -168,12 +210,18 @@ global $rsc_url;
 
 echo '<img src="'.$rsc_url.'img/blank.gif" width="1" height="1" /><!-- for IE -->';
 
-// Fadeout javascript
-echo '<script type="text/javascript" src="'.$rsc_url.'js/fadeout.js"></script>';
-echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, false);</script>';
+echo '</fieldset>'."\n";
+echo '<div class="clear">&nbsp;</div>'."\n";
 
+
+// Fadeout javascript
+//echo '<script type="text/javascript" src="'.$rsc_url.'js/fadeout.js"></script>';
+//echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, false);</script>';
 /*
  * $Log$
+ * Revision 1.11  2008/07/03 09:53:08  yabs
+ * widget UI
+ *
  * Revision 1.10  2008/01/21 09:35:37  fplanque
  * (c) 2008
  *

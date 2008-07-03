@@ -415,9 +415,20 @@ function require_js( $js_file, $relative_to_base = FALSE )
   global $required_js, $rsc_url, $debug;
 
   $js_aliases = array(
-    '#jquery#' => 'jquery.min.js',
-    '#jquery_debug#' => 'jquery.js',
-    );
+		'#jquery#' => 'jquery.min.js',
+		'#jquery_debug#' => 'jquery.js',
+		'#jqueryUI#' => ( $debug ? 'jquery.ui.all.js' : 'jquery.ui.all.min.js' ),
+		'#jqueryUI_debug#' => 'jquery.js',
+	);
+
+	if( in_array( $js_file, array( '#jqueryUI#', '#jqueryUI_debug#' ) ) )
+	{	// Dependency : ensure jQuery is loaded
+		require_js( str_replace( 'jqueryUI', 'jquery', $js_file ), $relative_to_base );
+	}
+	elseif( $js_file == 'communication.js' )
+	{ // jQuery dependency
+		require_js( '#jquery#' );
+	}
 
   // First get the real filename or url
   $absolute = FALSE;
@@ -448,8 +459,16 @@ function require_js( $js_file, $relative_to_base = FALSE )
 		$end_script_tag = '"></script>';
 		add_headline( $start_script_tag . $js_url . $end_script_tag );
     $required_js[] = $js_url;
+		if( $js_file == 'communication.js' )
+		{	// needs admin url
+			global $admin_url;
+			add_headline( '<script type="text/javascript">
+			//<![CDATA[
+			var b2evo_dispatcher_url = "'.$admin_url.'";
+			//]]>
+</script>' );
+	  }
   }
-
 }
 
 /**
@@ -769,6 +788,9 @@ function link_pages()
 
 /*
  * $Log$
+ * Revision 1.31  2008/07/03 09:51:52  yabs
+ * widget UI
+ *
  * Revision 1.30  2008/05/11 01:09:42  fplanque
  * always output charset header + meta
  *

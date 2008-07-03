@@ -2178,6 +2178,15 @@ function upgrade_b2evo_tables()
 	echo "OK.<br />\n";
 
 
+	if( $old_db_version < 9900 )
+	{	// drag n drop widgets
+		task_begin( 'Upgrading widgets table... ' );
+		$DB->query( "ALTER TABLE T_widget
+			CHANGE COLUMN wi_order wi_order INT(10) NOT NULL" );
+		task_end();
+		set_upgrade_checkpoint( '9900' );
+	}
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -2296,6 +2305,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.259  2008/07/03 09:53:37  yabs
+ * widget UI
+ *
  * Revision 1.258  2008/05/27 23:36:40  blueyed
  * Fix indent. Add TODOs about checkpoints.
  *

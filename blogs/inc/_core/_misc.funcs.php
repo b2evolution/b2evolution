@@ -2798,9 +2798,92 @@ function modules_call_method( $method_name )
 	}
 }
 
+/**
+ * Send a result as javascript
+ * automatically includes any Messages ( @see Log::display() )
+ * no return from function as it terminates processing
+ *
+ * @param array $methods javascript funtions to call with array of parameters
+ * 	format : 'function_name' => array( param1, parm2, param3 )
+ * @param boolean $send_as_html return result as html page with script tag : default is to send as js file
+ * @param string $target prepended to function calls : blank or window.parent
+ */
+function send_javascript_message( $methods = array(), $send_as_html = false, $target = '' )
+{
+	// lets spit out any messages
+	global $Messages;
+	ob_start();
+	$Messages->display();
+	$output = ob_get_clean();
+
+	// set target and add trailing [dot] if missing
+	$target = trim( ( $target ? $target : param( 'js_target', 'string' ) ), '.' ).'.';
+
+	// target should be empty or window.parent.
+	if( $target && $target != 'window.parent.' )
+	{
+		debug_die( T_( 'Unexpected javascript target' ) );
+	}
+
+	if( $output )
+	{	// we have some messages
+		$output = $target.'DisplayServerMessages( \''.format_to_js( $output ).'\');'."\n";
+	}
+
+	if( !empty( $methods ) )
+	{	// we have a methods to call
+		foreach( $methods as $method => $param_list )
+		{	// loop through each requested method
+			$params = array();
+			if( !is_array( $param_list ) )
+			{	// lets make it an array
+				$param_list = array( $param_list );
+			}
+			foreach( $param_list as $param )
+			{	// add each parameter to the output
+				if( !is_numeric() )
+				{	// this is a string, quote it
+					$param = '\''.format_to_js( $param ).'\'';
+				}
+				$params[] = $param;// add param to the list
+			}
+			// add method and parameters
+			$output .= $target.$method.'('.implode( ',', $params ).');'."\n";
+		}
+	}
+
+	if( $send_as_html )
+	{	// we want to send as a html document
+		echo '<html><head></head><body><script type="text/javascript">'."\n";
+		echo $output;
+		echo '</script></body></html>';
+	}
+	else
+	{	// we want to send as js
+		header( 'Content-Type: text/javascript' );
+		echo $output;
+	}
+	exit;
+}
+
+
+/**
+ * Basic tidy up of strings
+ *
+ * @param string $unformatted raw data
+ * @return string formatted data
+ */
+function format_to_js( $unformatted )
+{
+	$formatted = str_replace( array( "'", "\r", "\n" ), array( '\\\'', '', '' ), $unformatted );
+	return $formatted;
+}
 
 /*
  * $Log$
+ * Revision 1.40  2008/07/03 09:51:51  yabs
+ * widget UI
+ *
  * Revision 1.39  2008/07/01 20:22:23  blueyed
  * Fix get_base_domain for IDN (umlaut) domains.
  *

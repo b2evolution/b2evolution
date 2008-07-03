@@ -29,7 +29,7 @@ $Form = & new Form( NULL, 'form' );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', $creating ?  T_('New widget') : T_('Widget') );
+$Form->begin_form( 'fform', sprintf( $creating ?  T_('New widget %s in %s') : T_('Edit widget %s in %s'), $edited_ComponentWidget->get_name(), $edited_ComponentWidget->get( 'sco_name' ) ) );
 
 $Form->hidden( 'action', $creating ? 'create' : 'update' );
 $Form->hidden( 'wi_ID', $edited_ComponentWidget->ID );
@@ -79,6 +79,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.7  2008/07/03 09:53:08  yabs
+ * widget UI
+ *
  * Revision 1.6  2008/01/21 09:35:37  fplanque
  * (c) 2008
  *

@@ -1,0 +1,215 @@
+/**
+ * @todo yabs > : this needs sorting out once everything works
+ *
+ */
+
+#save_layout{
+float:left;
+margin:0 2em 0 0;
+}
+
+.widget_container{
+margin:0;
+padding:0;
+list-style:none;
+border:solid #ccc;
+border-width:0 1px 1px 1px;
+}
+
+.widget_container li{
+margin:0;
+padding:2px 10px;
+border-top:1px solid #ccc;
+}
+
+.widget_actions{
+border-left:1px solid #ccc;
+margin-left:10px;
+padding-left:10px;
+cursor:pointer;
+float:right;
+}
+
+.widget_actions img{
+margin:0 2px;
+}
+
+.odd{
+background-color:#def;
+color:#444;
+}
+
+.even{
+background-color:#cde;
+color:#444;
+}
+
+.odd:hover{
+background-color:#eef;
+color:#444;
+}
+
+.even:hover{
+background-color:#dde;
+color:#444;
+}
+
+#current_widgets .droppable-hover,
+#current_widgets .droppable-hover .fieldset_title_right,
+#current_widgets .droppable-hover .fieldset_title_bg{
+color:#444;
+background:#ee8;
+}
+
+.add_widget{
+	background:#ddd;
+}
+
+.add_new_widget{
+cursor:pointer;
+margin:0 0 0 1em;
+}
+
+.draggable_widget{
+cursor:move;
+}
+
+#current_widgets{
+padding:0;
+border:0;
+clear:both;
+}
+
+.available_widgets{
+width:44em;
+position:absolute;
+background:#f1f6ff;
+display:none;
+margin:0;
+padding:0;
+}
+
+.available_widgets_active{
+display:block;
+}
+
+.available_widgets_toolbar{
+background:#008;
+color:#eee;
+text-align:center;
+line-height:150%;
+}
+
+#available_widgets_inner{
+padding:1em 0 1em 1em;
+height:300px;
+overflow:auto;
+}
+
+.available_widgets h2{
+display:none;
+}
+
+.available_widgets h3{
+font-size:94%;
+}
+
+.available_widgets ul{
+list-style:none;
+margin:0;
+padding:0;
+}
+
+.available_widgets li{
+margin:0;
+padding:4px;
+}
+
+.available_widgets strong{
+cursor:pointer;
+}
+
+
+/**
+ * Widget settings page
+ */
+#screen_mask{
+position:fixed;
+left:-300%;
+top:-300%;
+background:#000;
+opacity:.5;
+z-index:998;
+}
+
+#widget_settings{
+display:none;
+}
+
+.screen_mask_active{
+bottom:0;
+right:0;
+}
+
+#widget_settings.widget_settings_active{
+position:fixed;
+bottom:5%;
+right:5%;
+height:90%;
+width:90%;
+overflow:auto;
+z-index:999;
+background:#f1f6f8;
+border:1px solid #ccc;
+display:block;
+}
+
+.widget_settings_active form{
+padding:1em;
+}
+
+#widget_postback{
+position:absolute;
+top:-1000em;
+left:-1000em;
+}
+
+/**
+ * widget help
+ */
+#widget_help{
+float:right;
+position:relative;
+}
+
+#widget_help dl{
+position:absolute;
+width:40em;
+padding:1em;
+display:none;
+border:1px solid #ccc;
+background:#f1f6ff;
+right:0;
+top:-1em;
+}
+
+#widget_help:hover dl{
+display:block;
+}
+
+#widget_help dt{
+font-weight:bold;
+}
+
+#widget_help dd{
+margin:0;
+padding:0 0 10px 10px;
+}
+
+.pending_update{
+background-color:#fdd;
+}
+
+.server_updating{
+background-color:#dfd;
+}
