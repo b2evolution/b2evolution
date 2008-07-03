@@ -460,7 +460,6 @@ function require_js( $js_file, $relative_to_base = FALSE )
 		$start_script_tag = '<script type="text/javascript" src="';
 		$end_script_tag = '"></script>';
 		add_headline( $start_script_tag . $js_url . $end_script_tag );
-		var_dump($js_url);
 		$required_js[] = strtolower($js_url);
 
 		// TODO: dh> this is a dependency, too, and should get added to the include code of communications.js itself
@@ -793,6 +792,9 @@ function link_pages()
 
 /*
  * $Log$
+ * Revision 1.34  2008/07/03 19:25:10  blueyed
+ * Remove var_dump
+ *
  * Revision 1.33  2008/07/03 19:15:19  blueyed
  * require_js(): add TODOs about dependency handling; fix 'already included?' check (case insensitivity)
  * require_css(): fix 'already included?' check (case insensitivity)
