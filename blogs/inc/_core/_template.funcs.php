@@ -421,6 +421,8 @@ function require_js( $js_file, $relative_to_base = FALSE )
 		'#jqueryUI_debug#' => 'jquery.ui.all.js',
 	);
 
+	// TODO: dh> I think dependencies should get handled where the files are included!
+	//       That's more true for communications.js than jqueryUI, but basically for both of them.
 	if( in_array( $js_file, array( '#jqueryUI#', '#jqueryUI_debug#' ) ) )
 	{	// Dependency : ensure jQuery is loaded
 		require_js( str_replace( 'jqueryUI', 'jquery', $js_file ), $relative_to_base );
@@ -458,7 +460,10 @@ function require_js( $js_file, $relative_to_base = FALSE )
 		$start_script_tag = '<script type="text/javascript" src="';
 		$end_script_tag = '"></script>';
 		add_headline( $start_script_tag . $js_url . $end_script_tag );
-    $required_js[] = $js_url;
+		var_dump($js_url);
+		$required_js[] = strtolower($js_url);
+
+		// TODO: dh> this is a dependency, too, and should get added to the include code of communications.js itself
 		if( $js_file == 'communication.js' )
 		{	// needs admin url
 			global $admin_url;
@@ -518,7 +523,7 @@ function require_css( $css_file, $relative_to_base = FALSE, $title = NULL, $medi
 		$start_link_tag .= ' type="text/css" href="';
 		$end_link_tag = '" />';
 		add_headline( $start_link_tag . $css_url . $end_link_tag );
-    $required_css[] = $css_url;
+		$required_css[] = strtolower($css_url);
   }
 
 }
@@ -788,6 +793,10 @@ function link_pages()
 
 /*
  * $Log$
+ * Revision 1.33  2008/07/03 19:15:19  blueyed
+ * require_js(): add TODOs about dependency handling; fix 'already included?' check (case insensitivity)
+ * require_css(): fix 'already included?' check (case insensitivity)
+ *
  * Revision 1.32  2008/07/03 10:35:22  yabs
  * minor fix
  *
