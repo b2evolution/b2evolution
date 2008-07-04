@@ -2816,8 +2816,12 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 	$Messages->display();
 	$output = ob_get_clean();
 
-	// set target and add trailing [dot] if missing
-	$target = trim( ( $target ? $target : param( 'js_target', 'string' ) ), '.' ).'.';
+	// set target
+	$target = ( $target ? $target : param( 'js_target', 'string' ) );
+	if( $target )
+	{	// add trailing [dot]
+		$target = trim( $target, '.' ).'.';
+	}
 
 	// target should be empty or window.parent.
 	if( $target && $target != 'window.parent.' )
@@ -2881,6 +2885,9 @@ function format_to_js( $unformatted )
 
 /*
  * $Log$
+ * Revision 1.41  2008/07/04 05:56:11  yabs
+ * minor bug fix
+ *
  * Revision 1.40  2008/07/03 09:51:51  yabs
  * widget UI
  *
