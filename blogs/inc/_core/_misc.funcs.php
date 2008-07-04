@@ -2845,7 +2845,7 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 			}
 			foreach( $param_list as $param )
 			{	// add each parameter to the output
-				if( !is_numeric() )
+				if( !is_numeric( $param ) )
 				{	// this is a string, quote it
 					$param = '\''.format_to_js( $param ).'\'';
 				}
@@ -2885,6 +2885,9 @@ function format_to_js( $unformatted )
 
 /*
  * $Log$
+ * Revision 1.42  2008/07/04 06:23:31  yabs
+ * minor bug fix
+ *
  * Revision 1.41  2008/07/04 05:56:11  yabs
  * minor bug fix
  *

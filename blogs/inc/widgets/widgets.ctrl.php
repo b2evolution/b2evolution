@@ -398,15 +398,7 @@ switch( $action )
 				// Display VIEW:
 				$AdminUI->disp_view( 'widgets/views/_widget.form.php' );
 				$output = ob_get_clean();
-				if( $js_reply )
-				{	// we already have a message, should be from "create widget"
-					$js_reply += array( 'widgetSettings' => $output );
-				}
-				else
-				{	// this is the only reply
-					$js_reply = array( 'widgetSettings' => $output );
-				}
-				send_javascript_message( $js_reply );
+				send_javascript_message( array( 'widgetSettings' => $output ) );
 				break;
 
 			case 'normal' :
@@ -450,6 +442,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2008/07/04 06:23:54  yabs
+ * minor bug fix
+ *
  * Revision 1.9  2008/07/03 09:52:51  yabs
  * widget UI
  *
