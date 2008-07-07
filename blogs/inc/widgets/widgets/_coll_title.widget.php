@@ -62,7 +62,7 @@ class coll_title_Widget extends ComponentWidget
 	{
 		global $Blog;
 		return sprintf( T_('&laquo;%s&raquo; from the blog\'s <a %s>general settings</a>.'),
-			'<strong>'.$Blog->dget('name').'</strong>', 'href="?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'"' );
+				'<strong>'.$Blog->dget('name').'</strong>', 'href="?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'"' );
 	}
 
 
@@ -100,8 +100,8 @@ class coll_title_Widget extends ComponentWidget
 		echo $this->disp_params['block_start'];
 
 		$title = '<a href="'.$Blog->get( 'url', 'raw' ).'">'
-			.$Blog->dget( 'name', 'htmlbody' )
-			.'</a>';
+							.$Blog->dget( 'name', 'htmlbody' )
+							.'</a>';
 		$this->disp_title( $title );
 
 		echo $this->disp_params['block_end'];
@@ -113,6 +113,9 @@ class coll_title_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.7  2008/07/07 05:59:25  fplanque
+ * minor / doc / rollback of overzealous indetation "fixes"
+ *
  * Revision 1.6  2008/05/30 16:30:38  blueyed
  * Fix indent
  *

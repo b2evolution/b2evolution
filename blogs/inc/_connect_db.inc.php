@@ -14,7 +14,7 @@
  * Load configuration
  * NOTE: fp> config should always be loaded as a whole because of the prequire"_once" stuff not working very well on Windows
  */
-require_once dirname(__FILE__).'/../conf/_config.php';
+// require_once dirname(__FILE__).'/../conf/_config.php';
 
 /**
  * Load DB class
@@ -30,6 +30,9 @@ $DB = & new DB( $db_config );
 
 /*
  * $Log$
+ * Revision 1.11  2008/07/07 05:59:26  fplanque
+ * minor / doc / rollback of overzealous indetation "fixes"
+ *
  * Revision 1.10  2008/01/21 09:35:23  fplanque
  * (c) 2008
  *
