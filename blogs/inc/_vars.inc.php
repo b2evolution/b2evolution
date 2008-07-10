@@ -58,8 +58,6 @@ $is_web = ! $is_cli;
 // echo ($is_cli ? 'cli' : 'web' );
 
 // Initialize some variables for template functions
-$required_js = array();
-$required_css = array();
 $headlines = array();
 
 
@@ -300,6 +298,9 @@ $skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', ar
 
 /*
  * $Log$
+ * Revision 1.29  2008/07/10 23:21:41  blueyed
+ * Merge trivial changes (I hope so) from my bzr branch
+ *
  * Revision 1.28  2008/03/15 19:07:25  fplanque
  * no message
  *

@@ -133,7 +133,7 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 
 	$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
 
- 	// see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+	// see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 	switch( $status )
 	{
 		case 301:
@@ -360,16 +360,16 @@ function robots_tag()
 	$r = '<meta name="robots" content="';
 
 	if( $robots_index === false )
-	 $r .= 'NOINDEX';
+		$r .= 'NOINDEX';
 	else
-	 $r .= 'INDEX';
+		$r .= 'INDEX';
 
 	$r .= ',';
 
 	if( $robots_follow === false )
-	 $r .= 'NOFOLLOW';
+		$r .= 'NOFOLLOW';
 	else
-	 $r .= 'FOLLOW';
+		$r .= 'FOLLOW';
 
 	$r .= '" />'."\n";
 
@@ -389,14 +389,13 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 
 	if( !empty( $Blog ) )
 	{
-  	echo $before.'<a href="'.$Blog->get( 'url' ).'">'.$blog_text.'</a>'.$after;
+		echo $before.'<a href="'.$Blog->get( 'url' ).'">'.$blog_text.'</a>'.$after;
 	}
 	elseif( !empty($home_text) )
 	{
-  	echo $before.'<a href="'.$baseurl.'">'.$home_text.'</a>'.$after;
+		echo $before.'<a href="'.$baseurl.'">'.$home_text.'</a>'.$after;
 	}
 }
-
 
 
 /**
@@ -407,14 +406,17 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
  * If 'jquery' is used and $debug is set to true, the 'jquery_debug' is automatically swapped in.
  * Any javascript added to the page is also added to the $required_js array, which is then checked to prevent adding the same code twice
  *
+ * @todo merge with require_css()
  * @param string alias, url or filename (relative to rsc/js) for javascript file
- * @param boolean relative_to_base.  False (default) if the file is in the rsc/js folder.  True to make it relative
+ * @param boolean Is the file's path relative to the base path/url?
+ *                Use true to not add any prefix ("$rsc_url/js/").
  */
 function require_js( $js_file, $relative_to_base = FALSE )
 {
-  global $required_js, $rsc_url, $debug;
+	global $rsc_url, $debug;
+	static $required_js;
 
-  $js_aliases = array(
+	$js_aliases = array(
 		'#jquery#' => 'jquery.min.js',
 		'#jquery_debug#' => 'jquery.js',
 		'#jqueryUI#' => ( $debug ? 'jquery.ui.all.js' : 'jquery.ui.all.min.js' ),
@@ -432,35 +434,33 @@ function require_js( $js_file, $relative_to_base = FALSE )
 		require_js( '#jquery#' );
 	}
 
-  // First get the real filename or url
-  $absolute = FALSE;
-  if( stristr( $js_file, 'http://' ) )
-  { // It's an absolute url
-    $js_url = $js_file;
-    $absolute = TRUE;
-  }
-  elseif( !empty( $js_aliases[$js_file]) )
-  { // It's an alias
-    if ( $js_file == '#jquery#' and $debug ) $js_file = '#jquery_debug#';
-    $js_file = $js_aliases[$js_file];
-  }
+	// First get the real filename or url
+	$absolute = FALSE;
+	if( preg_match('~^https?://~', $js_file ) )
+	{ // It's an absolute url
+		$js_url = $js_file;
+		$absolute = TRUE;
+	}
+	elseif( !empty( $js_aliases[$js_file]) )
+	{ // It's an alias
+		if ( $js_file == '#jquery#' && $debug ) $js_file = '#jquery_debug#';
+		$js_file = $js_aliases[$js_file];
+	}
 
-  if ( $relative_to_base or $absolute )
-  {
-    $js_url = $js_file;
-  }
-  else
-  { // Add on the $rsc_url
-    $js_url = $rsc_url . 'js/' . $js_file;
-  }
+	if( $relative_to_base || $absolute )
+	{
+		$js_url = $js_file;
+	}
+	else
+	{
+		$js_url = $rsc_url.'js/'.$js_file;
+	}
 
-  // Then check to see if it has already been added
-  if ( empty( $required_js ) or !in_array( strtolower( $js_url ), $required_js ) )
-  { // Not required before, add it to the array, so the next plugin won't add it again
-		$start_script_tag = '<script type="text/javascript" src="';
-		$end_script_tag = '"></script>';
-		add_headline( $start_script_tag . $js_url . $end_script_tag );
+	// Add to headlines, if not done already:
+	if( empty( $required_js ) || ! in_array( strtolower($js_url), $required_js ) )
+	{
 		$required_js[] = strtolower($js_url);
+		add_headline( '<script type="text/javascript" src="'.$js_url.'"></script>' );
 
 		// TODO: dh> this is a dependency, too, and should get added to the include code of communications.js itself
 		if( $js_file == 'communication.js' )
@@ -470,59 +470,58 @@ function require_js( $js_file, $relative_to_base = FALSE )
 			//<![CDATA[
 			var b2evo_dispatcher_url = "'.$admin_url.'";
 			//]]>
-</script>' );
-	  }
-  }
+			</script>' );
+		}
+	}
 }
+
 
 /**
  * Memorize that a specific css that file will be required by the current page.
  * All requested files will be included in the page head only once (when headlines is called)
  *
- * Accepts absolute urls, filenames relative to the rsc/css directory.  Set $relative_to_base to TRUE to prevent this function from adding on the rsc_path
+ * Accepts absolute urls, filenames relative to the rsc/css directory.
+ * Set $relative_to_base to TRUE to prevent this function from adding on the rsc_path
  *
- * @param string alias, url or filename (relative to rsc/js) for javascript file
- * @param boolean relative_to_base.  False (default) if the file is in the rsc/css folder.  True to make it relative
+ * @todo merge with require_js()
+ * @param string alias, url or filename (relative to rsc/css) for CSS file
+ * @param boolean|string Is the file's path relative to the base path/url?
+ *                Use true to not add any prefix ("$rsc_url/css/").
  * @param string title.  The title for the link tag
  * @param string media.  ie, 'print'
  */
 function require_css( $css_file, $relative_to_base = FALSE, $title = NULL, $media = NULL )
 {
-  global $required_css, $rsc_url, $debug;
+	global $rsc_url, $debug;
+	static $required_css;
 
-  $css_aliases = array();
+	// First get the real filename or url
+	$absolute = FALSE;
+	if( preg_match('~^https?://~', $css_file ) )
+	{ // It's an absolute url
+		$css_url = $css_file;
+		$absolute = TRUE;
+	}
 
-  // First get the real filename or url
-  $absolute = FALSE;
-  if( stristr( $css_file, 'http://' ) )
-  { // It's an absolute url
-    $css_url = $css_file;
-    $absolute = TRUE;
-  }
-  elseif( !empty( $css_aliases[$css_file]) )
-  { // It's an alias
-    $css_url = $css_aliases[$css_file];
-  }
+	if( $relative_to_base || $absolute )
+	{
+		$css_url = $css_file;
+	}
+	else
+	{
+		$css_url = $rsc_url . 'css/' . $css_file;
+	}
 
-  if ( $relative_to_base or $absolute )
-  {
-    $css_url = $css_file;
-  }
-  else
-  { // The add on the $rsc_url
-    $css_url = $rsc_url . 'css/' . $css_file;
-  }
-
-  // Then check to see if it has already been added
-  if ( empty( $required_css ) or !in_array( strtolower( $css_url ), $required_css ) )
-  { // Not required before, add it to the array, so it won't be added again
+	// Add to headlines, if not done already:
+	if( empty( $required_css ) || ! in_array( strtolower($css_url), $required_css ) )
+	{
+		$required_css[] = $css_url;
 		$start_link_tag = '<link rel="stylesheet"';
 		if ( !empty( $title ) ) $start_link_tag .= ' title="' . $title . '"';
 		if ( !empty( $media ) ) $start_link_tag .= ' media="' . $media . '"';
 		$start_link_tag .= ' type="text/css" href="';
 		$end_link_tag = '" />';
 		add_headline( $start_link_tag . $css_url . $end_link_tag );
-		$required_css[] = strtolower($css_url);
   }
 
 }
@@ -538,8 +537,8 @@ function require_css( $css_file, $relative_to_base = FALSE, $title = NULL, $medi
  */
 function add_headline($headline)
 {
-  global $headlines;
-  $headlines[] = $headline;
+	global $headlines;
+	$headlines[] = $headline;
 }
 
 
@@ -550,9 +549,10 @@ function add_headline($headline)
  */
 function include_headlines()
 {
-  global $headlines;
-  $r = implode( "\n\t", $headlines )."\n\t";
-  echo $r;
+	global $headlines;
+
+	$r = implode( "\n\t", $headlines )."\n\t";
+	echo $r;
 }
 
 
@@ -693,7 +693,7 @@ function credits( $params = array() )
 		$cred_links = unserialize('a:2:{i:0;a:2:{i:0;s:24:"http://b2evolution.net/r";i:1;s:18:"free blog software";}i:1;a:2:{i:0;s:36:"http://b2evolution.net/web-hosting/r";i:1;s:19:"quality web hosting";}}');
 	}
 
- 	$max_credits = (empty($Blog) ? NULL : $Blog->get_setting( 'max_footer_credits' ));
+	$max_credits = (empty($Blog) ? NULL : $Blog->get_setting( 'max_footer_credits' ));
 
 	display_list( $cred_links, $params['list_start'], $params['list_end'], $params['separator'], $params['item_start'], $params['item_end'], NULL, $max_credits );
 }
@@ -792,6 +792,9 @@ function link_pages()
 
 /*
  * $Log$
+ * Revision 1.37  2008/07/10 23:21:42  blueyed
+ * Merge trivial changes (I hope so) from my bzr branch
+ *
  * Revision 1.36  2008/07/10 21:29:23  blueyed
  * base_tag(): remember used URL in , so this can be used/queried later.
  *
