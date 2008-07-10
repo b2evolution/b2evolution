@@ -785,13 +785,16 @@ function bloginfo( $what )
  */
 function link_pages()
 {
-	echo '<!-- link_page() is DEPRECATED -->';
+	echo '<!-- link_pages() is DEPRECATED -->';
 }
 
 
 
 /*
  * $Log$
+ * Revision 1.35  2008/07/10 21:26:52  blueyed
+ * Fix deprecated message for link_pages()
+ *
  * Revision 1.34  2008/07/03 19:25:10  blueyed
  * Remove var_dump
  *
