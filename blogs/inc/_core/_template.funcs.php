@@ -332,7 +332,7 @@ function base_tag( $url, $target = NULL )
 {
 	global $base_tag_set;
 
-	$base_tag_set = true;
+	$base_tag_set = $url;
 	echo '<base href="'.$url.'"';
 
 	if( !empty($target) )
@@ -792,6 +792,9 @@ function link_pages()
 
 /*
  * $Log$
+ * Revision 1.36  2008/07/10 21:29:23  blueyed
+ * base_tag(): remember used URL in , so this can be used/queried later.
+ *
  * Revision 1.35  2008/07/10 21:26:52  blueyed
  * Fix deprecated message for link_pages()
  *
