@@ -113,7 +113,7 @@ if( empty($tab) )
 	?>
 		<ol>
 			<li><?php echo T_('Use MT\'s export functionnality to create a .TXT file containing your posts;') ?></li>
-			<li><?php printf( T_('Follow the insctructions in <a %s>Daniel\'s Movable Type Importer</a>.'), ' href="?ctrl=mtimport"' ) ?></li>
+			<li><?php printf( T_('Follow the instructions in <a %s>Daniel\'s Movable Type Importer</a>.'), ' href="?ctrl=mtimport"' ) ?></li>
 		</ol>
 	<?php
 	$block_item_Widget->disp_template_raw( 'block_end' );
@@ -154,6 +154,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2008/07/11 23:10:01  blueyed
+ * s/insctructions/instructions/g
+ *
  * Revision 1.4  2008/01/21 09:35:35  fplanque
  * (c) 2008
  *

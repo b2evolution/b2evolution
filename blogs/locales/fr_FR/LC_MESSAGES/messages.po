@@ -9464,7 +9464,7 @@ msgstr "Utilisez la fonction d'export de MT pour créer un fichier .TXT contenant
 
 #: ..\..\..\inc\tools\tools.ctrl.php:116
 #, php-format
-msgid "Follow the insctructions in <a %s>Daniel's Movable Type Importer</a>."
+msgid "Follow the instructions in <a %s>Daniel's Movable Type Importer</a>."
 msgstr "Suivez les instructions dans <a %s>l'importateur Movable Type de Daniel</a>."
 
 #: ..\..\..\inc\tools\tools.ctrl.php:122

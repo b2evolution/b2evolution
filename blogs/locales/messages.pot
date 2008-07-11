@@ -9284,7 +9284,7 @@ msgstr ""
 
 #: ..\..\..\inc\tools\tools.ctrl.php:116
 #, possible-php-format
-msgid "Follow the insctructions in <a %s>Daniel's Movable Type Importer</a>."
+msgid "Follow the instructions in <a %s>Daniel's Movable Type Importer</a>."
 msgstr ""
 
 #: ..\..\..\inc\tools\tools.ctrl.php:122
