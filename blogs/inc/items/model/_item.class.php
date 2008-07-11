@@ -545,7 +545,7 @@ class Item extends ItemLight
 	}
 
 
-  /**
+	/**
 	 * @return string
 	 */
 	function get_anchor_id()
@@ -557,7 +557,7 @@ class Item extends ItemLight
 	}
 
 
-  /**
+	/**
 	 * Template tag
 	 */
 	function anchor_id()
@@ -901,7 +901,7 @@ class Item extends ItemLight
 	}
 
 
-  /**
+	/**
 	 * This is like a teaser with no HTML and a cropping.
 	 *
 	 * @todo fp> allow use to submit his own excerpt in expert editing mode
@@ -1201,7 +1201,7 @@ class Item extends ItemLight
 	}
 
 
-  /**
+	/**
 	 * Display more link
 	 */
 	function get_more_link( $params = array() )
@@ -1370,7 +1370,7 @@ class Item extends ItemLight
 	}
 
 
-  /**
+	/**
 	 * Split tags by space or comma
 	 *
 	 * @todo fp> allow tags with spaces when quoted like "long tag". Nota comma should never be allowed in a tag.
@@ -2093,9 +2093,9 @@ class Item extends ItemLight
 		if( $params['title'] == '#' ) $params['title'] = T_('Edit this post...');
 
 		$actionurl = $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$this->ID;
-   	if( $params['save_context'] )
+		if( $params['save_context'] )
 		{
-			$actionurl .= '&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
+			$actionurl .= '&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ).'#'.$this->get_anchor_id() );
 		}
 
 
@@ -3554,6 +3554,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.53  2008/07/11 22:16:52  blueyed
+ * Item::get_edit_link(): append anchor to item in redirect_to URL, so that you get to the actual item when pressing save after editing; indent fixes
+ *
  * Revision 1.52  2008/06/30 23:47:04  blueyed
  * require_title setting for Blogs, defaulting to 'required'. This makes the title field now a requirement (by default), since it often gets forgotten when posting first (and then the urltitle is ugly already)
  *
