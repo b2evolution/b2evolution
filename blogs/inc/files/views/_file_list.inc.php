@@ -325,12 +325,14 @@ $Form->begin_form();
 		/****************  File time stamp  ***************/
 
 		if( $UserSettings->get('fm_showdate') != 'no' )
-		{ // Show file types
-			echo '<td class="timestamp">';
+		{ // Show last modified datetime (always full in title attribute)
+			$lastmod_date = $lFile->get_lastmod_formatted( 'date' );
+			$lastmod_time = $lFile->get_lastmod_formatted( 'time' );
+			echo '<td class="timestamp" title="'.$lastmod_date.' '.$lastmod_time.'">';
 			if( $UserSettings->get('fm_showdate') == 'long' )
 			{
-				echo '<span class="date">'.$lFile->get_lastmod_formatted( 'date' ).'</span> ';
-				echo '<span class="time">'.$lFile->get_lastmod_formatted( 'time' ).'</span>';
+				echo '<span class="date">'.$lastmod_date.'</span> ';
+				echo '<span class="time">'.$lastmod_time.'</span>';
 			}
 			else
 			{	// Compact format
@@ -591,6 +593,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.9  2008/07/11 23:23:19  blueyed
+ * Always display full last modification date+time in title of lastmod TD in filelist
+ *
  * Revision 1.8  2008/05/31 00:12:13  fplanque
  * wording
  *
