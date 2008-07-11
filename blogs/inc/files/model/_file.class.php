@@ -418,7 +418,7 @@ class File extends DataObject
 	function is_editable( $allow_locked = false )
 	{
 		if( $this->is_dir()	// we cannot edit dirs
-				|| !isset($this->Filetype)
+				|| empty($this->Filetype)
 				|| $this->Filetype->viewtype != 'text' )	// we can only edit text files
 		{
 			return false;
@@ -1801,6 +1801,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2008/07/11 23:13:05  blueyed
+ * Fix possible E_NOTICE for files without Filetype in File::is_editable
+ *
  * Revision 1.8  2008/05/26 19:22:00  fplanque
  * fixes
  *
