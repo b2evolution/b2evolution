@@ -25,6 +25,8 @@
  *
  * @package htsrv
  *
+ * @todo dh> Add support for ETag / If-Modified-Since. Maybe send "Expires", too? (to "force" caching)
+ *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
@@ -65,7 +67,7 @@ $FileRoot = & $FileRootCache->get_by_ID( $root );
 $File = & new File( $FileRoot->type, $FileRoot->in_type_ID, $path );
 
 if ( !empty( $size ) && $File->is_image() )
-{ 
+{
 	// We want a thumbnail:
 	// This will do all the magic:
 	$File->thumbnail( $size );
@@ -88,6 +90,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.18  2008/07/11 23:49:01  blueyed
+ * TODO: add etag/modified-since support to getfile.php
+ *
  * Revision 1.17  2008/07/07 05:59:26  fplanque
  * minor / doc / rollback of overzealous indetation "fixes"
  *
