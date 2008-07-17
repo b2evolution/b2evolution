@@ -144,12 +144,13 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		}
 
 		global $DB;
-
-		$sql = 'SELECT LOWER(tag_name) AS tag_name, COUNT(itag_itm_ID) AS tag_count
+		
+		$sql = 'SELECT LOWER(tag_name) AS tag_name, COUNT(DISTINCT itag_itm_ID) AS tag_count
 						  FROM T_items__tag INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID
 					  				INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID
 					  				INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-						 WHERE cat_blog_ID = '.$Blog->ID.'
+					  				INNER JOIN T_items__item ON itag_itm_ID = post_ID
+						 WHERE cat_blog_ID = '.$Blog->ID.' AND post_status = "published" AND post_datestart < NOW()
 						 GROUP BY tag_name
 						 ORDER BY tag_count DESC
 						 LIMIT '.$this->disp_params['max_tags'];
@@ -194,8 +195,8 @@ class coll_tag_cloud_Widget extends ComponentWidget
 				echo $this->disp_params['tag_separator'];
 			}
 			$size = floor( $row->tag_count * $size_span / $count_span + $min_size );
-			echo '<a href="'.$Blog->gen_tag_url( $row->tag_name ).'" style="font-size: '.$size.'pt;" title="'
-						.sprintf( T_('%d posts'), $row->tag_count ).'">'.format_to_output($row->tag_name).'</a>';
+			echo '<a href="'.$Blog->gen_tag_url( $row->tag_name ) . '" style="font-size: '.$size.'pt;" title="'
+						.sprintf( T_('%d posts'), $row->tag_count ).'">'.format_to_output( str_replace( ' ', '&nbsp;', $row->tag_name ) ).'</a>';
 			$count++;
 		}
 		echo $this->disp_params['tag_cloud_end'];
@@ -209,6 +210,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.11  2008/07/17 02:03:23  afwas
+ * Bug fix in DB query. Won't show tags from not published posts and future posts. Also will no longer show tags twice.
+ *
  * Revision 1.10  2008/05/06 23:35:47  fplanque
  * The correct way to add linebreaks to widgets is to add them to $disp_params when the container is called, right after the array_merge with defaults.
  *
