@@ -21,6 +21,8 @@
  *
  * @package internal
  *
+ * @todo Add checks for format, headers and domain ("msgfmt -c")
+ *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
  *
