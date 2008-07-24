@@ -2229,7 +2229,7 @@ function get_base_domain( $url )
 	// Chop away the http part and the path:
 	$domain = preg_replace( '~^([a-z]+://)?([^:/#]+)(.*)$~i', '\\2', $url );
 
-	if( empty($domain) || preg_match( '~^([0-9]+\.)+$~', $domain ) )
+	if( empty($domain) || preg_match( '~^(\d+\.)+\d+$~', $domain ) )
 	{	// Empty or All numeric = IP address, don't try to cut it any further
 		return $domain;
 	}
@@ -2885,6 +2885,9 @@ function format_to_js( $unformatted )
 
 /*
  * $Log$
+ * Revision 1.43  2008/07/24 00:37:34  blueyed
+ * Fix get_base_domain() for numerical domains (IPs). Would get handled as regular domain (and limited to 3 segments therefore).
+ *
  * Revision 1.42  2008/07/04 06:23:31  yabs
  * minor bug fix
  *

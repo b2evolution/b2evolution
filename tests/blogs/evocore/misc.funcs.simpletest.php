@@ -279,6 +279,10 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( get_base_domain('www-öl.käse-öl.de'), 'käse-öl.de' );
 		$this->assertEqual( get_base_domain('sub1.sub2.pröhl.de'), 'sub2.pröhl.de' );
 
+		// Numerical, should be kept:
+		$this->assertIdentical( get_base_domain( '123.123.123.123' ), '123.123.123.123' );
+		$this->assertIdentical( get_base_domain( '123.123.123.123:8080' ), '123.123.123.123' );
+
 		// Invalid, but ok:
 		// fp> This function is called get_base_domain(), not validate_domain() . If we receive a domain starting with a _, then it is not a problem to keep it in the base domain.
 		$this->assertEqual( get_base_domain('_host'), '_host' );
