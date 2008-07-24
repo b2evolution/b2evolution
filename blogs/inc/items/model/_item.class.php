@@ -2510,7 +2510,12 @@ class Item extends ItemLight
 		echo '  dc:identifier="';
 		$this->permanent_url( 'single' );
 		echo '"'."\n";
-		$this->title( '  dc:title="', '"'."\n", false, 'xmlattr' );
+		$this->title( array(
+			'before' =>' dc:title="',
+			'after' => '"'."\n",
+			'link_type' => 'none',
+			'format' => 'xmlattr' 
+			) ); 
 		echo '  trackback:ping="';
 		$this->trackback_url();
 		echo '" />'."\n";
@@ -3554,6 +3559,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.54  2008/07/24 01:24:24  afwas
+ * $this->title() in function trackback_rdf() used old style parameters. Reported by Austriaco.
+ *
  * Revision 1.53  2008/07/11 22:16:52  blueyed
  * Item::get_edit_link(): append anchor to item in redirect_to URL, so that you get to the actual item when pressing save after editing; indent fixes
  *
