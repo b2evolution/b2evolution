@@ -136,6 +136,7 @@ $search_engines = array(
 	'crawler.com/search/',	// q
 	'inbox.com/search/', // q
 	'scroogle.org/', // GW=
+	'cuil.com/'
 );
 
 
