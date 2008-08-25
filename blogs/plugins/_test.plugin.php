@@ -379,15 +379,16 @@ class test_plugin extends Plugin
 		$params['Form']->end_fieldset( 'Foo' );
 	}
 
+
 	/**
 	 * @see Plugin::SkinBeginHtmlHead()
 	 */
+	function SkinBeginHtmlHead()
+	{
+		require_js( '#jquery#');
+	}
 
-  function SkinBeginHtmlHead()
-  {
-    require_js( '#jquery#');
-  }
-  
+
 	/**
 	 * @see Plugin::AdminBeforeItemEditCreate()
 	 */
@@ -740,6 +741,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.74  2008/08/25 22:03:37  blueyed
+ * test_plugin: Fix indent around SkinBeginHtmlHead (Thanks, David Newcomb)
+ *
  * Revision 1.73  2008/05/01 00:13:57  afwas
  * Restored the 'select_user' type
  *
