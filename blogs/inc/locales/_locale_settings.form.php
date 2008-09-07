@@ -386,7 +386,7 @@ else
 			if( isset($lval[ 'fromdb' ]) )
 			{ // allow to delete locales loaded from db
 				$l_atleastonefromdb = 1;
-				echo action_icon( T_('Reset custom settings'), 'delete', $pagenow.'?ctrl=locales&amp;action=deletelocale&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '' ) );
+				echo action_icon( T_('Restore default locale settings'), 'reload', $pagenow.'?ctrl=locales&amp;action=deletelocale&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '' ) );
 			}
 			echo '</td>';
 		}
@@ -493,7 +493,7 @@ else
 
 		if( isset($l_atleastonefromdb) )
 		{
-			echo '<p class="center"><a href="'.$pagenow.'?ctrl=locales&amp;action=reset'.( $loc_transinfo ? '&amp;loc_transinfo=1' : '' ).'" onclick="return confirm(\''.TS_('Are you sure you want to reset?').'\')">'.get_icon( 'delete' ).' '.T_('Reset to defaults (delete database table)').'</a></p>';
+			echo '<p class="center"><a href="'.$pagenow.'?ctrl=locales&amp;action=reset'.( $loc_transinfo ? '&amp;loc_transinfo=1' : '' ).'" onclick="return confirm(\''.TS_('Are you sure you want to restore to default locales?\nAll custom locale definitions will be lost!').'\')">'.get_icon( 'reload' ).' '.T_('Restore defaults').'</a></p>';
 		}
 	}
 
@@ -508,6 +508,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.5  2008/09/07 09:34:55  fplanque
+ * Used reload icons instead of delete b/c it does not visually delete much
+ *
  * Revision 1.4  2008/09/07 09:13:28  fplanque
  * Locale definitions are now included in language packs.
  * A bit experimental but it should work...
