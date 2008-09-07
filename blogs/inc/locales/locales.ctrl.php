@@ -44,6 +44,11 @@ param( 'action', 'string' );
 param( 'edit_locale', 'string' );
 param( 'loc_transinfo', 'integer', 0 );
 
+
+// Load all available locale defintions:
+locales_load_available_defs();
+
+
 if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale', 'deletelocale', 'extract', 'prioup', 'priodown' )) )
 { // We have an action to do..
 	// Check permission:
@@ -107,6 +112,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 			param( 'newloc_datefmt', 'string', true);
 			param( 'newloc_timefmt', 'string', true);
 			param( 'newloc_startofweek', 'integer', true);
+			param( 'newloc_priority', 'integer', 1);
 			param( 'newloc_messages', 'string', true);
 
 			if( $action == 'updatelocale' )
@@ -153,7 +159,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 								( loc_locale, loc_charset, loc_datefmt, loc_timefmt, loc_startofweek, loc_name, loc_messages, loc_priority, loc_enabled )
 								VALUES ( '.$DB->quote($newloc_locale).', '.$DB->quote($newloc_charset).', '.$DB->quote($newloc_datefmt).', '
 									.$DB->quote($newloc_timefmt).', '.$DB->quote($newloc_startofweek).', '.$DB->quote($newloc_name).', '
-									.$DB->quote($newloc_messages).', "1", '.$DB->quote($newloc_enabled).' )';
+									.$DB->quote($newloc_messages).', '.$DB->quote($newloc_priority).', '.$DB->quote($newloc_enabled).' )';
 			$q = $DB->query($query);
 			$Messages->add( sprintf(T_('Saved locale &laquo;%s&raquo;.'), $newloc_locale), 'success' );
 
@@ -166,6 +172,9 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 				include $conf_path.'_overrides_TEST.php';
 			}
 			$evo_charset = $old_evo_charset;
+
+			// Load all available locale defintions:
+			locales_load_available_defs();
 
 			break;
 
@@ -192,7 +201,10 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 			$Settings->set( 'default_locale', $default_locale );
 			$Settings->dbupdate();
 
-			$Messages->add( T_('Locales table deleted, defaults from <code>/conf/_locales.php</code> loaded.'), 'success' );
+			// Load all available locale defintions:
+			locales_load_available_defs();
+
+			$Messages->add( T_('Locale definitions reset to defaults. (<code>/conf/_locales.php</code>)'), 'success' );
 			break;
 
 
@@ -352,6 +364,9 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 				include $conf_path.'_overrides_TEST.php';
 			}
 
+			// Load all available locale defintions:
+			locales_load_available_defs();
+
 			break;
 
 		// --- SWITCH PRIORITIES -----------------
@@ -424,6 +439,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2008/09/07 09:13:28  fplanque
+ * Locale definitions are now included in language packs.
+ * A bit experimental but it should work...
+ *
  * Revision 1.2  2008/01/21 09:35:32  fplanque
  * (c) 2008
  *

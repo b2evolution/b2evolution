@@ -599,7 +599,7 @@ function locale_from_httpaccept()
 
 		foreach( $locales as $localekey => $locale )
 		{ // Check each locale
-			if( ! $locale['enabled'] )
+			if( empty($locale['enabled']) )
 			{ // We only want to use activated locales
 				continue;
 			}
@@ -973,8 +973,76 @@ function init_charsets( $req_io_charset )
 }
 
 
+/**
+ * Load available locale definitions
+ */
+function locales_load_available_defs()
+{
+	global $locales_path;
+	global $locales;
+
+	// This is where language packs will store their locale defintions:
+	$locale_defs = array();
+
+	// Get all locale folder names:
+	$locale_folders = get_filenames( $locales_path, false, true, true, false, true );
+	// Go through all locale folders:
+	foreach( $locale_folders as $locale_folder )
+	{
+		$ad_locale_folder = $locales_path.'/'.$locale_folder;
+		// Get files in folder:
+		$locale_def_files = get_filenames( $ad_locale_folder, true, false, true, false, true );
+		// Go through files in locale folder:
+		foreach( $locale_def_files as $locale_def_file )
+		{	// Check if it's a definition file:
+			if( preg_match( '¤[a-z0-9\-]\.locale\.php$¤i', $locale_def_file ) )
+			{	// We found a definition file:
+				// pre_dump( $locale_def_file );
+				include $ad_locale_folder.'/'.$locale_def_file;
+			}
+		}
+	}
+
+	// Copy any new locale definitions over to $locales:
+	foreach( $locale_defs as $locale_code => $locale_def )
+	{
+		if( !isset( $locales[$locale_code] ) )
+		{	// New locale, add to main array:
+			$locales[$locale_code] = $locale_def;
+			// ... but mark as not enabled!
+			$locales[$locale_code]['enabled'] = 0;
+		}
+	}
+
+
+	// Assign priorities:
+
+	// Find highest used priority:
+	$max_prio = 0;
+	foreach( $locales as $locale )
+	{
+		if( isset($locale['priority']) && $locale['priority'] > $max_prio )
+		{
+			$max_prio = $locale['priority'];
+		}
+	}
+
+	foreach( $locales as $lkey=>$locale )
+	{
+		if( !isset($locale['priority']) )
+		{
+			$locales[$lkey]['priority'] = ++$max_prio;
+		}
+	}
+
+}
+
 /*
  * $Log$
+ * Revision 1.13  2008/09/07 09:13:28  fplanque
+ * Locale definitions are now included in language packs.
+ * A bit experimental but it should work...
+ *
  * Revision 1.12  2008/07/01 21:52:54  blueyed
  * convert_charset(): return string itself unconverted, if $dest_charset is empty, which may happen when $evo_charset is not defined yet(?)
  *

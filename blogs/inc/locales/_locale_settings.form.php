@@ -278,6 +278,7 @@ else
 		<th><?php echo T_('Time fmt') ?></th>
 		<th title="<?php echo T_('Day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc');
 			?>"><?php echo T_('Start of week') ?></th>
+		<th><?php echo T_('Priority') ?></th>
 		<?php if( $current_User->check_perm( 'options', 'edit' ) )
 		{ ?>
 			<th><?php echo T_('Edit') ?></th>
@@ -346,6 +347,9 @@ else
 			$Form->dayOfWeek( 'loc_'.$i.'_startofweek', $locales[$lkey]['startofweek'], '', '' );
 			$Form->switch_layout( NULL ); // Restore layout
 			echo '</td>';
+
+		echo '<td class="right">'.$locales[$lkey]['priority'].'</td>';
+
 
 		if( $current_User->check_perm( 'options', 'edit' ) )
 		{
@@ -504,6 +508,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.4  2008/09/07 09:13:28  fplanque
+ * Locale definitions are now included in language packs.
+ * A bit experimental but it should work...
+ *
  * Revision 1.3  2008/09/07 07:56:37  fplanque
  * Fixed select box warning
  *

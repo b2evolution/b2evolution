@@ -36,8 +36,9 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
+// Get all skin folder names:
 $skin_folders = get_filenames( $skins_path, false, true, true, false, true );
-
+// Go through all skin folders:
 foreach( $skin_folders as $skin_folder )
 {
 	if( ! strlen($skin_folder) || $skin_folder[0] == '.' || $skin_folder == 'CVS' )
@@ -59,6 +60,10 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.5  2008/09/07 09:13:28  fplanque
+ * Locale definitions are now included in language packs.
+ * A bit experimental but it should work...
+ *
  * Revision 1.4  2008/01/21 09:35:35  fplanque
  * (c) 2008
  *
