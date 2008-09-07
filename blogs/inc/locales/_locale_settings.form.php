@@ -161,11 +161,6 @@ if( $action == 'edit' )
 }
 else
 { // show main form
-	if( ! isset($locales[$Settings->get('default_locale')])
-		|| ! $locales[$Settings->get('default_locale')]['enabled'] )
-	{ // default locale is not enabled
-		echo '<div class="error">' . T_('Note: default locale is not enabled.') . '</div>';
-	}
 
 	// JavaScript function to calculate time difference: {{{
 	?>
@@ -237,13 +232,25 @@ else
 	{ // just full hours:
 		$td_value = $td_value/3600;
 	}
-	if($neg) { $td_value = '-'.$td_value; }
+
+	if($neg)
+	{
+		$td_value = '-'.$td_value;
+	}
 
 	$Form->text_input( 'newtime_difference', $td_value, 8 /* hh:mm:ss */, T_('Time difference'), sprintf( '['. T_('in hours, e.g. "1", "1:30" or "1.5"'). '] '. T_('If you\'re not on the timezone of your server. Current server time is: %s.'), '<span id="cur_servertime">'.date_i18n( locale_timefmt(), $servertimenow ).'</span>' )
 					.' <a href="#" onclick="calc_TimeDifference(); return false;">'.T_('Calculate time difference').'</a>',
 					array( 'maxlength'=> 8, 'required'=>true ) );
 
-	$Form->select( 'newdefault_locale', $Settings->get('default_locale'), 'locale_options_return', T_('Default locale'), T_('Overridden by browser config, user locale or blog locale (in this order).'));
+	if( ! isset($locales[$Settings->get('default_locale')])
+		|| ! $locales[$Settings->get('default_locale')]['enabled'] )
+	{ // default locale is not enabled
+		param_error( 'newdefault_locale', T_('Note: default locale is not enabled.') );
+	}
+
+	$locale_options = locale_options( $Settings->get('default_locale'), false );
+	$Form->select_input_options( 'newdefault_locale', $locale_options, T_('Default locale'), T_('Overridden by browser config, user locale or blog locale (in this order).') );
+	// $Form->select( 'newdefault_locale', $Settings->get('default_locale'), 'locale_options_return', T_('Default locale'), T_('Overridden by browser config, user locale or blog locale (in this order).'));
 	$Form->end_fieldset();
 
 
@@ -497,6 +504,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.3  2008/09/07 07:56:37  fplanque
+ * Fixed select box warning
+ *
  * Revision 1.2  2008/01/21 09:35:32  fplanque
  * (c) 2008
  *

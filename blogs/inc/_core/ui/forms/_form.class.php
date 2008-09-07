@@ -403,20 +403,10 @@ class Form extends Widget
 	 *
 	 * A field is a fielset containing a label div and an input div.
 	 *
-	 * @param string Field's note to display. (deprecated)
-	 * @param string Format of the field's note (%s gets replaced with the note). (deprecated)
 	 * @return The generated HTML
 	 */
-	function end_field( $field_note = NULL, $field_note_format = NULL )
+	function end_field()
 	{
-		if( isset($field_note) ) // Note: allow "0" as a note
-		{ // deprecated - should get set by calling handle_common_params()
-			$this->_common_params['note'] = $field_note;
-		}
-		if( isset($field_note_format) )
-		{ // deprecated - should get set by calling handle_common_params()
-			$this->_common_params['note_format'] = $field_note_format;
-		}
 
 		$r = '';
 
@@ -1683,7 +1673,7 @@ class Form extends Widget
 	 */
 	function select_input_options( $field_name, $field_options, $field_label, $field_note = '', $field_params = array() )
 	{
-		$this->handle_common_params( $field_params, $field_name, $field_label );
+		$this->handle_common_params( $field_params, $field_name, $field_label, $field_note );
 
 		$r = $this->begin_field();
 		if( !empty( $field_params['parent'] ) )
@@ -1695,7 +1685,7 @@ class Form extends Widget
 			 .$field_options
 			 ."</select>\n";
 
-		$r .= $this->end_field( $field_note );
+		$r .= $this->end_field();
 
 		if( !empty( $field_params['parent'] ) )
 		{ // Set up the dynamic preselection array from the parent to this select list options
@@ -2692,7 +2682,7 @@ class Form extends Widget
 	 * @param array An array passed to a field generating function like {@link text_input()}. By reference!
 	 * @param string|NULL The name of the field. If not empty it gets used to build the id attribute.
 	 */
-	function handle_common_params( & $field_params, $field_name = NULL, $field_label = NULL )
+	function handle_common_params( & $field_params, $field_name = NULL, $field_label = NULL, $field_note = NULL )
 	{
 		#pre_dump( 'handle_common_params (before)', $field_params );
 
@@ -2703,6 +2693,7 @@ class Form extends Widget
 		{
 			$field_params['name'] = $field_name;
 		}
+
 		if( isset($field_label) )
 		{
 			$field_params['label'] = $field_label;
@@ -2712,6 +2703,10 @@ class Form extends Widget
 		{
 			$this->_common_params['note'] = $field_params['note'];
 			unset($field_params['note']); // no HTML attribute
+		}
+		elseif( isset($field_note) ) // Note: allow "0" as a note
+		{
+			$this->_common_params['note'] = $field_note;
 		}
 		else
 		{
@@ -2835,6 +2830,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.28  2008/09/07 07:56:37  fplanque
+ * Fixed select box warning
+ *
  * Revision 1.27  2008/02/13 11:33:42  blueyed
  * Explicitly call jQuery(), not the shortcut ($())
  *
