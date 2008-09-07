@@ -2115,35 +2115,35 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Creating goal tracking table... ';
-		$DB->query( "CREATE TABLE T_track__goal(
-			goal_ID       int(10) unsigned NOT NULL auto_increment,
-			goal_name     varchar(50) default NULL,
-			PRIMARY KEY  (goal_ID)
-		)" );
+    $DB->query( "CREATE TABLE T_track__goal(
+            goal_ID       int(10) unsigned NOT NULL auto_increment,
+            goal_name     varchar(50) default NULL,
+            PRIMARY KEY  (goal_ID)
+          )" );
 
-		$DB->query( "CREATE TABLE T_track__goalhit (
-			ghit_ID int(10) unsigned NOT NULL auto_increment,
-			ghit_goal_ID    int(10) unsigned NOT NULL,
-			ghit_sess_ID    int(10) unsigned NOT NULL,
-			ghit_params     TEXT default NULL,
-			PRIMARY KEY  (ghit_ID),
-			KEY ghit_goal_ID (ghit_goal_ID),
-			KEY ghit_sess_ID (ghit_sess_ID)
-		)" );
+    $DB->query( "CREATE TABLE T_track__goalhit (
+            ghit_ID int(10) unsigned NOT NULL auto_increment,
+            ghit_goal_ID    int(10) unsigned NOT NULL,
+            ghit_sess_ID    int(10) unsigned NOT NULL,
+            ghit_params     TEXT default NULL,
+            PRIMARY KEY  (ghit_ID),
+            KEY ghit_goal_ID (ghit_goal_ID),
+            KEY ghit_sess_ID (ghit_sess_ID)
+         )" );
 		echo "OK.<br />\n";
 
 		set_upgrade_checkpoint( '9800' );
 	}
 
 
-	// TODO: needs checkpoint block!
+	// dh> TODO: needs checkpoint block!
 	echo 'Updating keyphrases in hitlog table... ';
 	flush();
 	load_funcs( 'sessions/model/_hit.class.php' );
-	$sql = 'SELECT hit_ID, hit_referer
-	          FROM T_hitlog
-   	         WHERE hit_referer_type = "search"
-   	           AND hit_keyphrase_keyp_ID IS NULL'; // this line just in case we crashed in the middle, so we restart where we stopped
+  $sql = 'SELECT hit_ID, hit_referer
+  					FROM T_hitlog
+   				 WHERE hit_referer_type = "search"
+   				 	 AND hit_keyphrase_keyp_ID IS NULL'; // this line just in case we crashed in the middle, so we restart where we stopped
 	$rows = $DB->get_results( $sql, OBJECT, 'get all search hits' );
 	foreach( $rows as $row )
 	{
@@ -2204,7 +2204,7 @@ function upgrade_b2evo_tables()
 	}
 
 
-	// TODO: should be in a block, not at the end for all cases
+	// ALWAYS reset polling times (since security warnings for example should be refreshed based on the new version that has been installed)
 	echo 'Resetting b2evolution.net polling times... ';
 	$DB->query( "
 		DELETE FROM T_settings
@@ -2305,6 +2305,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.260  2008/09/07 07:57:58  fplanque
+ * doc
+ *
  * Revision 1.259  2008/07/03 09:53:37  yabs
  * widget UI
  *
