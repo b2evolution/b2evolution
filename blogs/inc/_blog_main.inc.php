@@ -169,8 +169,8 @@ if( $resolve_extra_path )
 		{
 			// Does the pathinfo end with a / or a ; ?
 			$last_char = substr( $path_string, -1 );
-			if( $last_char == ';' )
-			{	// ENDING SEMI COLUMN -> We'll consider this to be a tag page
+			if( $last_char == '-' || $last_char == ':'|| $last_char == ';' )
+			{	// - : or ; -> We'll consider this to be a tag page
 				$last_part = $path_elements[count($path_elements)-1];
 				$tag = substr( $last_part, 0, strlen($last_part)-1 );
 				$tag = urldecode($tag);
@@ -261,6 +261,7 @@ if( $resolve_extra_path )
 						// We are going to consider this to be a post title with a misplaced trailing slash.
 						// That happens when upgrading from WP for example.
 						$title = $last_part; // Will be sought later
+						$already_looked_into_chapters = true;
 					}
 					else
 					{	// We could match a chapter from the extra path:
@@ -318,10 +319,47 @@ if( !empty($p) || !empty($title) )
 		$Item = & $ItemCache->get_by_urltitle( $title, false );
 	}
 	if( empty( $Item ) )
-	{	// Post doesn't exist! Let's go 404!
+	{	// Post doesn't exist!
+
 		// fp> TODO: ->viewing_allowed() for draft, private, protected and deprecated...
-		$disp = '404';
-		$disp_detail = '404-post_not_found';
+
+		$title_fallback = false;
+
+		if( !empty($title) && empty($already_looked_into_chapters) )
+		{	// Let's try to fall back to a category/chapter...
+			$ChapterCache = & get_Cache( 'ChapterCache' );
+			/**
+			 * @var Chapter
+			 */
+			$Chapter = & $ChapterCache->get_by_urlname( $title, false );
+			if( !empty( $Chapter ) )
+			{	// We could match a chapter from the extra path:
+				$cat = $Chapter->ID;
+				$title_fallback = true;
+				$title = NULL;
+				// Also use the prefered posts per page for a cat
+				if( ! $posts = $Blog->get_setting( 'chapter_posts_per_page' ) )
+				{ // use blog default
+					$posts = $Blog->get_setting( 'posts_per_page' );
+				}
+			}
+		}
+
+		if( !empty($title) )
+		{	// Let's try to fall back to a tag...
+			if( $Blog->get_tag_post_count( $title ) )
+			{ // We could match a tag from the extra path:
+				$tag = $title;
+				$title_fallback = true;
+				$title = NULL;
+			}
+		}
+
+		if( ! $title_fallback )
+		{	// We were not able to fallback to anythign meaningful:
+			$disp = '404';
+			$disp_detail = '404-post_not_found';
+		}
 	}
 }
 
@@ -533,6 +571,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.104  2008/09/09 06:03:29  fplanque
+ * More tag URL options
+ * Enhanced URL resolution for categories and tags
+ *
  * Revision 1.103  2008/05/26 19:22:00  fplanque
  * fixes
  *

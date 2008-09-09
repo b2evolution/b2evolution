@@ -77,7 +77,7 @@ class CollectionSettings extends AbstractSettings
 			'chapter_noindex' => '1',						// META NOINDEX on Category pages
 			'category_prefix' => '',
 
-			'tag_links'  => 'semicol',					// 'param', 'semicol'
+			'tag_links'  => 'colon',					// 'param', 'semicol'
 			'canonical_tag_urls' => 1,					// Redirect tag pages to their canonical Url?
 			'tag_posts_per_page' => NULL,
 			'tag_noindex' => '1',				      	// META NOINDEX on Tag pages
@@ -138,6 +138,10 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.21  2008/09/09 06:03:30  fplanque
+ * More tag URL options
+ * Enhanced URL resolution for categories and tags
+ *
  * Revision 1.20  2008/06/30 23:47:04  blueyed
  * require_title setting for Blogs, defaulting to 'required'. This makes the title field now a requirement (by default), since it often gets forgotten when posting first (and then the urltitle is ugly already)
  *

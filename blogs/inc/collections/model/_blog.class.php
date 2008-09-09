@@ -809,7 +809,7 @@ class Blog extends DataObject
 				$this->set_setting( 'chapter_links', 'chapters' );
 				$this->set_setting( 'chapter_posts_per_page', NULL );
 				$this->set_setting( 'tag_posts_per_page', NULL );
-				$this->set_setting( 'tag_links', 'semicol' );
+				$this->set_setting( 'tag_links', 'colon' );
 				$this->set_setting( 'single_links', 'ymd' );
 
 				$this->set_setting( 'canonical_item_urls', 1 );
@@ -844,7 +844,7 @@ class Blog extends DataObject
 				$this->set_setting( 'chapter_links', 'subchap' );
 				$this->set_setting( 'chapter_posts_per_page', 10 );
 				$this->set_setting( 'tag_posts_per_page', 10 );
-				$this->set_setting( 'tag_links', 'semicol' );
+				$this->set_setting( 'tag_links', 'colon' );
 				$this->set_setting( 'single_links', 'short' );
 
 				$this->set_setting( 'canonical_item_urls', 1 );
@@ -879,7 +879,7 @@ class Blog extends DataObject
 				$this->set_setting( 'chapter_links', 'chapters' );
 				$this->set_setting( 'chapter_posts_per_page', 20 );
 				$this->set_setting( 'tag_posts_per_page', 20 );
-				$this->set_setting( 'tag_links', 'semicol' );
+				$this->set_setting( 'tag_links', 'colon' );
 				$this->set_setting( 'single_links', 'chapters' );
 
 				$this->set_setting( 'canonical_item_urls', 1 );
@@ -914,7 +914,7 @@ class Blog extends DataObject
 				$this->set_setting( 'chapter_links', 'subchap' );
 				$this->set_setting( 'chapter_posts_per_page', 50 );
 				$this->set_setting( 'tag_posts_per_page', 50 );
-				$this->set_setting( 'tag_links', 'semicol' );
+				$this->set_setting( 'tag_links', 'colon' );
 				$this->set_setting( 'single_links', 'short' );
 
 				$this->set_setting( 'canonical_item_urls', 1 );
@@ -949,7 +949,7 @@ class Blog extends DataObject
 				$this->set_setting( 'chapter_links', 'chapters' );
 				$this->set_setting( 'chapter_posts_per_page', 10 );
 				$this->set_setting( 'tag_posts_per_page', 10 );
-				$this->set_setting( 'tag_links', 'semicol' );
+				$this->set_setting( 'tag_links', 'colon' );
 				$this->set_setting( 'single_links', 'chapters' );
 
 				$this->set_setting( 'canonical_item_urls', 1 );
@@ -1126,16 +1126,28 @@ class Blog extends DataObject
 				}
 				break;
 
-			case 'semicol':
 			default:
+				switch( $link_type )
+				{
+					case 'dash':
+						$trailer = '-';
+						break;
+					case 'semicolon':
+						$trailer = ';';
+						break;
+					case 'colon':
+					default:
+						$trailer = ':';
+						break;
+				}
 				$tag_prefix = $this->get_setting('tag_prefix');
 				if( !empty( $tag_prefix ) )
 				{
-					$r = url_add_tail( $this->gen_blogurl(), '/'.$tag_prefix.'/'.urlencode( $tag ).';' );
+					$r = url_add_tail( $this->gen_blogurl(), '/'.$tag_prefix.'/'.urlencode( $tag ).$trailer );
 				}
 				else
 				{
-					$r = url_add_tail( $this->gen_blogurl(), '/'.urlencode( $tag ).';' );
+					$r = url_add_tail( $this->gen_blogurl(), '/'.urlencode( $tag ).$trailer );
 				}
 		}
 
@@ -1921,11 +1933,34 @@ class Blog extends DataObject
 
 		return $r;
 	}
+
+
+  /**
+	 * Get # of posts for a given tag
+	 */
+	function get_tag_post_count( $tag )
+	{
+		global $DB;
+
+		$sql = 'SELECT COUNT(itag_itm_ID)
+						  FROM T_items__tag INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID
+					  				INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID
+					  				INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+						 WHERE cat_blog_ID = '.$this->ID.'
+						 	 AND tag_name = '.$DB->quote( strtolower($tag) );
+
+		return $DB->get_var( $sql );
+
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.43  2008/09/09 06:03:30  fplanque
+ * More tag URL options
+ * Enhanced URL resolution for categories and tags
+ *
  * Revision 1.42  2008/06/30 23:47:04  blueyed
  * require_title setting for Blogs, defaulting to 'required'. This makes the title field now a requirement (by default), since it often gets forgotten when posting first (and then the urltitle is ugly already)
  *

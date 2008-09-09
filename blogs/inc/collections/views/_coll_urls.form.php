@@ -252,7 +252,11 @@ $Form->begin_fieldset( T_('Tag page URLs') );
 		array(
 				array( 'param', T_('Use param'), T_('E-g: ')
 								.url_add_param( $blogurl, '<strong>tag=mytag</strong>' ),'', 'onclick="show_hide_tag_prefix(this);"'),
-				array( 'semicol', T_('Use extra-path'), T_('E-g: ')
+				array( 'dash', T_('Use extra-path').': '.'trailing dash', T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/mytag-</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
+				array( 'colon', T_('Use extra-path').': '.'trailing colon', T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/mytag:</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
+				array( 'semicol', T_('Use extra-path').': '.'Trailing semi-colon (NOT recommended)', T_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/mytag;</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
 			), T_('Tag page URLs'), true );
 
@@ -308,6 +312,10 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.18  2008/09/09 06:03:30  fplanque
+ * More tag URL options
+ * Enhanced URL resolution for categories and tags
+ *
  * Revision 1.17  2008/01/21 09:35:27  fplanque
  * (c) 2008
  *

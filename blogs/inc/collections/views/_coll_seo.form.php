@@ -246,7 +246,11 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo') );
 		array(
 				array( 'param', T_('Use param'), T_('E-g: ')
 								.url_add_param( $blogurl, '<strong>tag=mytag</strong>' ),'', 'onclick="show_hide_tag_prefix(this);"'),
-				array( 'semicol', T_('Use extra-path'), T_('E-g: ')
+				array( 'dash', T_('Use extra-path').': '.'trailing dash', T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/mytag-</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
+				array( 'colon', T_('Use extra-path').': '.'trailing colon', T_('E-g: ')
+								.url_add_tail( $blogurl, '<strong>/mytag:</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
+				array( 'semicol', T_('Use extra-path').': '.'Trailing semi-colon (NOT recommended)', T_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/mytag;</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
 			), T_('Tag page URLs'), true );
 
@@ -307,6 +311,10 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.13  2008/09/09 06:03:30  fplanque
+ * More tag URL options
+ * Enhanced URL resolution for categories and tags
+ *
  * Revision 1.12  2008/03/21 19:42:44  fplanque
  * enhanced 404 handling
  *
