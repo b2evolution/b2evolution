@@ -127,9 +127,7 @@ while( $Item = & mainlist_get_item() )
 			// -------------------------- END OF POST CONTENT -------------------------
 		?>
 
-		<p class="postmetadata alt">
-			<small>
-
+		<p class="postmetadata alt small">
 				<?php
 					// List all tags attached to this post:
 					$Item->tags( array(
@@ -138,7 +136,6 @@ while( $Item = & mainlist_get_item() )
 							'separator' =>      ', ',
 						) );
 				?>
-
 				<!-- You can follow any responses to this entry through the RSS feed. -->
 				<?php
 					$Item->edit_link( array( // Link to backoffice for editing
@@ -147,7 +144,6 @@ while( $Item = & mainlist_get_item() )
 
 						) );
 				?>
-			</small>
 		</p>
 
 	</div>

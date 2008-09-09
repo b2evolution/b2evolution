@@ -126,15 +126,24 @@ while( $Item = & mainlist_get_item() )
 			// -------------------------- END OF POST CONTENT -------------------------
 		?>
 
-		<?php
-			// List all tags attached to this post:
-			$Item->tags( array(
-					'before' =>         '<div class="posttags">'.T_('Tags').': ',
-					'after' =>          '</div>',
-					'separator' =>      ', ',
-				) );
-		?>
+		<p class="postmetadata alt small">
+			<?php
+				// List all tags attached to this post:
+				$Item->tags( array(
+						'before' =>         T_('Tags').': ',
+						'after' =>          ' ',
+						'separator' =>      ', ',
+					) );
+			?>
 
+			<?php
+				$Item->edit_link( array( // Link to backoffice for editing
+						'before'    => '',
+						'after'     => '',
+
+					) );
+			?>
+		</p>
 	</div>
 
 	<?php
