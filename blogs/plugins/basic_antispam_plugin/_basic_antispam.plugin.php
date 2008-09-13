@@ -315,8 +315,6 @@ class basic_antispam_plugin extends Plugin
 	 */
 	function AppendHitLog( & $params )
 	{
-		global $debug_no_register_shutdown;
-
 		$Hit = & $params['Hit'];
 
 		if( $Hit->referer_type != 'referer' )
@@ -324,7 +322,7 @@ class basic_antispam_plugin extends Plugin
 			return false;
 		}
 
-		if( empty($debug_no_register_shutdown) && function_exists( 'register_shutdown_function' ) )
+		if( function_exists( 'register_shutdown_function' ) )
 		{ // register it as a shutdown function, because it will be slow!
 			$this->debug_log( 'AppendHitLog: loading referering page.. (through register_shutdown_function())' );
 
@@ -619,6 +617,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.33  2008/09/13 10:22:59  fplanque
+ * removed superfluous conf variable
+ *
  * Revision 1.32  2008/05/03 23:58:41  blueyed
  * basic_antispam_plugin: is_referer_linking_us(): make parse_url silent and return false in case of error
  *
