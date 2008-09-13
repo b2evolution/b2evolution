@@ -27,6 +27,7 @@ function b2evonet_get_updates()
 {
 	global $DB, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow, $evo_charset;
 	global $Messages, $Settings, $baseurl, $instance_name, $app_name, $app_version, $app_date;
+	global $Debuglog;
 
 	$update_every = 3600*12; // 12 hours
 	$attempt_every = 3600*4; // 4 hours
@@ -51,6 +52,7 @@ function b2evonet_get_updates()
 		return false;
 	}
 
+	$Debuglog->add( 'Getting updates from '.$evonetsrv_host, 'evonet' );
 	if( $debug )
 	{
 		$Messages->add( T_('Getting updates from ').$evonetsrv_host, 'notes' );
@@ -145,10 +147,13 @@ function b2evonet_get_updates()
 			$Settings->set( 'evonet_last_update', $servertimenow );
 			$Settings->dbupdate();
 
+			$Debuglog->add( 'Updates saved', 'evonet' );
+
 			return true;
 		}
 		else
 		{
+			$Debuglog->add( 'Invalid updates received', 'evonet' );
 			$Messages->add( T_('Invalid updates received'), 'error' );
 		}
 	}
@@ -158,6 +163,9 @@ function b2evonet_get_updates()
 
 /*
  * $Log$
+ * Revision 1.14  2008/09/13 11:07:43  fplanque
+ * speed up display of dashboard on first login of the day
+ *
  * Revision 1.13  2008/04/27 02:42:39  fplanque
  * fix
  *

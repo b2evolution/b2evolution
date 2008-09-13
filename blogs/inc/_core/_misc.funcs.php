@@ -64,8 +64,7 @@ load_funcs('files/model/_file.funcs.php');
  * This is registered in _main.inc.php with register_shutdown_function()
  * This is called by PHP at the end of the script.
  *
- * NOTE: anything happening here will unfortunately not appear in the debug_log
- *       dh> Well, it does so for me (PHP 5.2.4).
+ * NOTE: before PHP 4.1 nothing can be echoed here any more, but the minimum PHP requirement for b2evo is PHP 4.3
  */
 function shutdown()
 {
@@ -80,15 +79,24 @@ function shutdown()
 	global $Session;
 
 	global $Settings;
+	global $Debuglog;
 
 	// fp> do we need special processing if we are in CLI mode?  probably earlier actually
 	// if( ! $is_cli )
+
+	// Note: it might be useful at some point to do special processing if the script has been aborted or has timed out
+	// connection_aborted()
+	// connection_status()
 
 	// Save the current HIT:
 	$Hit->log();
 
 	// Update the SESSION:
 	$Session->dbsave();
+
+	// Get updates here instead of slowing down normal display of the dashboard
+	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+	b2evonet_get_updates();
 
 	// Auto pruning of old HITS, old SESSIONS and potentially MORE analytics data:
 	if( $Settings->get( 'auto_prune_stats_mode' ) == 'page' )
@@ -2885,6 +2893,9 @@ function format_to_js( $unformatted )
 
 /*
  * $Log$
+ * Revision 1.44  2008/09/13 11:07:41  fplanque
+ * speed up display of dashboard on first login of the day
+ *
  * Revision 1.43  2008/07/24 00:37:34  blueyed
  * Fix get_base_domain() for numerical domains (IPs). Would get handled as regular domain (and limited to 3 segments therefore).
  *

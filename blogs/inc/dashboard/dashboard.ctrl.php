@@ -420,11 +420,13 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 
 
-	// EXPERIMENTAL
+	// Note: hopefully, the update swill have been downloaded in the shutdown function of a previous page (including the login screen)
+	// However if we have outdated info, we will load updates here.
 	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 	// Let's clear any remaining messages that should already have been displayed before...
 	$Messages->clear( 'all' );
 	b2evonet_get_updates();
+
 	// Display info & error messages
 	echo $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
 
@@ -495,6 +497,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.26  2008/09/13 11:07:43  fplanque
+ * speed up display of dashboard on first login of the day
+ *
  * Revision 1.25  2008/04/15 21:53:31  fplanque
  * minor
  *

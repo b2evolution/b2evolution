@@ -407,6 +407,8 @@ class Session
 
 	/**
 	 * Updates session data in database.
+	 *
+	 * NOTE: Debuglog additions will may not be displayed since the debuglog may alreayd have been displayed (shutdown function)
 	 */
 	function dbsave()
 	{
@@ -542,6 +544,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.5  2008/09/13 11:07:43  fplanque
+ * speed up display of dashboard on first login of the day
+ *
  * Revision 1.4  2008/03/18 00:31:40  blueyed
  * Fix loading of required classes for unserialize, if ini_set() is disabled (ref: http://forums.b2evolution.net//viewtopic.php?p=71333#71333)
  *
