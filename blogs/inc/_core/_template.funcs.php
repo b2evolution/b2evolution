@@ -515,14 +515,15 @@ function require_css( $css_file, $relative_to_base = FALSE, $title = NULL, $medi
 	// Add to headlines, if not done already:
 	if( empty( $required_css ) || ! in_array( strtolower($css_url), $required_css ) )
 	{
-		$required_css[] = $css_url;
+		$required_css[] = strtolower($css_url);
+
 		$start_link_tag = '<link rel="stylesheet"';
 		if ( !empty( $title ) ) $start_link_tag .= ' title="' . $title . '"';
 		if ( !empty( $media ) ) $start_link_tag .= ' media="' . $media . '"';
 		$start_link_tag .= ' type="text/css" href="';
 		$end_link_tag = '" />';
 		add_headline( $start_link_tag . $css_url . $end_link_tag );
-  }
+	}
 
 }
 
@@ -792,6 +793,9 @@ function link_pages()
 
 /*
  * $Log$
+ * Revision 1.38  2008/09/15 21:53:09  blueyed
+ * Fix lowercase check in require_css() again; broke it in last merge
+ *
  * Revision 1.37  2008/07/10 23:21:42  blueyed
  * Merge trivial changes (I hope so) from my bzr branch
  *
