@@ -1658,13 +1658,6 @@ function mail_encode_header_string( $header_str, $mode = 'Q' )
 {
 	global $evo_charset;
 
-	/* blueyed way that requires mbstring  (did not work for Alex RU)
-	if( function_exists('mb_encode_mimeheader') )
-	{ // encode subject
-		$subject = mb_encode_mimeheader( $subject, mb_internal_encoding(), 'B', $NL );
-	}
-	*/
-
 	if( preg_match( '¤[^a-z0-9!*+\-/ ]¤i', $header_str ) )
 	{	// If the string actually needs some encoding
 		if( $mode == 'Q' )
@@ -2901,6 +2894,9 @@ function format_to_js( $unformatted )
 
 /*
  * $Log$
+ * Revision 1.46  2008/09/15 20:47:38  blueyed
+ * mail_encode_header_string(): remove commented blueyed-way block
+ *
  * Revision 1.45  2008/09/15 03:11:36  fplanque
  * target control
  *
