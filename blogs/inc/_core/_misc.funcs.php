@@ -2594,7 +2594,7 @@ function implode_with_and( $arr, $implode_by = ', ', $implode_last = ' &amp; ' )
  * @param string
  */
 function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_separator = '',
-												$item_start = '<li>', $item_end = '</li>', $force_hash = NULL, $max_items = NULL )
+												$item_start = '<li>', $item_end = '</li>', $force_hash = NULL, $max_items = NULL, $link_params = array() )
 {
 	if( !is_null($max_items) && $max_items < 1 )
 	{
@@ -2610,7 +2610,7 @@ function display_list( $items, $list_start = '<ul>', $list_end = '</ul>', $item_
 		foreach( $items as $item )
 		{	// For each list item:
 
-			$link = resolve_link_params( $item, $force_hash );
+			$link = resolve_link_params( $item, $force_hash, $link_params );
 			if( empty( $link ) )
 			{
 				continue;
@@ -2768,6 +2768,7 @@ function generate_link_from_params( $link_params, $params = array() )
 			'img_width'   => '',
 			'img_height'  => '',
 			'title'       => '',
+			'target'      => '_blank',
 		), $params );
 
 	$text = $link_params[1];
@@ -2781,14 +2782,21 @@ function generate_link_from_params( $link_params, $params = array() )
 		return '';
 	}
 
+	$r = '<a href="'.$url.'"';
+
+	if( !empty($params['target'] ) )
+	{
+		$r .= ' target="'.$params['target'].'"';
+	}
+
 	if( $params['type'] == 'img' )
 	{
-		return '<a href="'.$url.'" target="_blank" title="'.$params['title'].'"><img src="'.$params['img_url'].'" alt="'
+		return $r.' title="'.$params['title'].'"><img src="'.$params['img_url'].'" alt="'
 						.$text.'" title="'.$params['title'].'" width="'.$params['img_width'].'" height="'.$params['img_height']
 						.'" border="0" /></a>';
 	}
 
-	return '<a href="'.$url.'" target="_blank">'.$text.'</a>';
+	return $r.'>'.$text.'</a>';
 }
 
 
@@ -2893,6 +2901,9 @@ function format_to_js( $unformatted )
 
 /*
  * $Log$
+ * Revision 1.45  2008/09/15 03:11:36  fplanque
+ * target control
+ *
  * Revision 1.44  2008/09/13 11:07:41  fplanque
  * speed up display of dashboard on first login of the day
  *
