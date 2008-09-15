@@ -119,28 +119,12 @@ function b2evonet_get_updates()
 			 */
 			global $global_Cache;
 
-			if( isset( $response['evo_links'] ) )
-			{ // Extract evo links into its own var:
-				$evo_links = $response['evo_links'];
-				unset( $response['evo_links'] );
-				if( is_array( $evo_links ) )
-				{	// Save creds:
-					$global_Cache->set( 'evo_links', serialize($evo_links) );
-				}
+			foreach( $response as $key=>$data )
+			{
+				$global_Cache->set( $key, serialize($data) );
 			}
 
-			if( isset( $response['creds'] ) )
-			{ // Extract creds into its own var:
-				$creds = $response['creds'];
-				unset( $response['creds'] );
-				if( is_array( $creds ) )
-				{	// Save creds:
-					$global_Cache->set( 'creds', serialize($creds) );
-				}
-			}
-
-			// Save other info:
-			$global_Cache->set( 'evonet_updates', serialize($response) );
+			$global_Cache->delete( 'evonet_updates' );	// Cleanup
 
 			$global_Cache->dbupdate();
 
@@ -163,6 +147,9 @@ function b2evonet_get_updates()
 
 /*
  * $Log$
+ * Revision 1.15  2008/09/15 03:10:40  fplanque
+ * simplified updates
+ *
  * Revision 1.14  2008/09/13 11:07:43  fplanque
  * speed up display of dashboard on first login of the day
  *

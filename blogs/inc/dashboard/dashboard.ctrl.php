@@ -435,13 +435,14 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	 * @var AbstractSettings
 	 */
 	global $global_Cache;
-	$updates_array = $global_Cache->get( 'evonet_updates' );
-	if( !empty($updates_array) )
+	$version_status_msg = $global_Cache->get( 'version_status_msg' );
+	if( !empty($version_status_msg) )
 	{	// We have managed to get updates (right now or in the past):
-		echo '<p>'.$updates_array['version_status_msg'].'</p>';
-		if( !empty($updates_array['extra_msg']) )
+		echo '<p>'.$version_status_msg.'</p>';
+		$extra_msg = $global_Cache->get( 'extra_msg' );
+		if( !empty($extra_msg) )
 		{
-			echo '<p>'.$updates_array['extra_msg'].'</p>';
+			echo '<p>'.$extra_msg.'</p>';
 		}
 	}
 
@@ -497,6 +498,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.27  2008/09/15 03:10:40  fplanque
+ * simplified updates
+ *
  * Revision 1.26  2008/09/13 11:07:43  fplanque
  * speed up display of dashboard on first login of the day
  *
