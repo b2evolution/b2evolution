@@ -1796,11 +1796,36 @@ class File extends DataObject
 			imagepng( $im_handle );
 		}
 	}
+
+
+  /**
+	 * @param Item
+	 */
+	function link_to_Item( & $edited_Item )
+	{
+		global $DB;
+
+		$DB->begin();
+
+		// Load meta data AND MAKE SURE IT IS CREATED IN DB:
+		$this->load_meta( true );
+
+		// Let's make the link!
+		$edited_Link = & new Link();
+		$edited_Link->set( 'itm_ID', $edited_Item->ID );
+		$edited_Link->set( 'file_ID', $this->ID );
+		$edited_Link->dbinsert();
+
+		$DB->commit();
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.10  2008/09/15 11:01:09  fplanque
+ * Installer now creates a demo photoblog
+ *
  * Revision 1.9  2008/07/11 23:13:05  blueyed
  * Fix possible E_NOTICE for files without Filetype in File::is_editable
  *

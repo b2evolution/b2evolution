@@ -200,30 +200,30 @@ class Blog extends DataObject
 	/**
 	 * @param string
 	 */
-	function init_by_kind( $kind )
+	function init_by_kind( $kind, $name = NULL, $shortname = NULL, $urlname = NULL )
 	{
 		switch( $kind )
 		{
 			case 'photo':
-				$this->set( 'name', T_('My photoblog') );
-				$this->set( 'shortname', T_('Photoblog') );
-				$this->set( 'urlname', 'photo' );
+				$this->set( 'name', empty($name) ? T_('My photoblog') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Photoblog') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'photo' : $urlname );
 				$this->set_setting( 'posts_per_page', 1 );
 				$this->set_setting( 'archive_mode', 'postbypost' );
 				break;
 
 			case 'group':
-				$this->set( 'name', T_('Our blog') );
-				$this->set( 'shortname', T_('Group') );
-				$this->set( 'urlname', 'group' );
+				$this->set( 'name', empty($name) ? T_('Our blog') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Group') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'group' : $urlname );
 				$this->set_setting( 'use_workflow', 1 );
 				break;
 
 			case 'std':
 			default:
-				$this->set( 'name', T_('My weblog') );
-				$this->set( 'shortname', T_('Blog') );
-				$this->set( 'urlname', 'blog' );
+				$this->set( 'name', empty($name) ? T_('My weblog') : $name );
+				$this->set( 'shortname', empty($shortname) ? T_('Blog') : $shortname );
+				$this->set( 'urlname', empty($urlname) ? 'blog' : $urlname );
 				break;
 		}
 	}
@@ -1942,7 +1942,7 @@ class Blog extends DataObject
 	{
 		global $DB;
 
-		$sql = 'SELECT COUNT(itag_itm_ID)
+		$sql = 'SELECT COUNT(DISTINCT itag_itm_ID)
 						  FROM T_items__tag INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID
 					  				INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID
 					  				INNER JOIN T_categories ON postcat_cat_ID = cat_ID
@@ -1957,6 +1957,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.44  2008/09/15 11:01:06  fplanque
+ * Installer now creates a demo photoblog
+ *
  * Revision 1.43  2008/09/09 06:03:30  fplanque
  * More tag URL options
  * Enhanced URL resolution for categories and tags

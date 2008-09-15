@@ -536,6 +536,21 @@ to
 		{
 			echo '<h2>'.T_('Installing sample contents...').'</h2>';
 			flush();
+
+			// We're gonna need some environment in order to create the demo contents...
+			load_class( 'settings/model/_generalsettings.class.php' );
+			load_class( 'users/model/_usersettings.class.php' );
+			/**
+			 * @var GeneralSettings
+			 */
+			$Settings = & new GeneralSettings();
+
+      /**
+			 * @var UserCache
+			 */
+ 			$UserCache = & get_Cache( 'UserCache' );
+			$current_User = & $UserCache->get_by_ID( 1 );
+
 			create_demo_contents();
 		}
 
@@ -723,6 +738,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
+ * Revision 1.145  2008/09/15 11:01:15  fplanque
+ * Installer now creates a demo photoblog
+ *
  * Revision 1.144  2008/02/19 11:11:20  fplanque
  * no message
  *

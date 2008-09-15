@@ -224,45 +224,36 @@ function create_default_data()
  * Create a new a blog
  * This funtion has to handle all needed DB dependencies!
  *
- * @todo move this to Blog object
+ * @todo move this to Blog object (only half done here)
  */
 function create_blog(
 	$blog_name,
 	$blog_shortname,
 	$blog_urlname,
-	$blog_staticfilename = '', // obsolete
 	$blog_tagline = '',
 	$blog_longdesc = '',
-	$blog_skin_ID = 1 )
+	$blog_skin_ID = 1,
+	$kind = 'std' ) // standard blog; notorious variation: "photo"
 {
-	global $DB, $default_locale;
+	global $default_locale;
 
-	$query = "INSERT INTO T_blogs( blog_name, blog_shortname, blog_siteurl,
-						blog_urlname,
-						blog_tagline, blog_longdesc, blog_locale,
-						blog_allowcomments, blog_allowtrackbacks,
-						blog_in_bloglist, blog_skin_ID )
-	VALUES ( ";
-	$query .= "'".$DB->escape($blog_name)."', ";
-	$query .= "'".$DB->escape($blog_shortname)."', ";
-	$query .= "'', ";
-	$query .= "'".$DB->escape($blog_urlname)."', ";
-	$query .= "'".$DB->escape($blog_tagline)."', ";
-	$query .= "'".$DB->escape($blog_longdesc)."', ";
-	$query .= "'".$DB->escape($default_locale)."', ";
-	$query .= "'post_by_post', 0, 1, $blog_skin_ID )";
+ 	$Blog = & new Blog( NULL );
 
-	if( ! ($DB->query( $query )) )
-		return false;
+	$Blog->init_by_kind( $kind, $blog_name, $blog_shortname, $blog_urlname );
 
-	$ID = $DB->insert_id;  // blog ID
+	$Blog->set( 'tagline', $blog_tagline );
+	$Blog->set( 'longdesc', $blog_longdesc );
+	$Blog->set( 'locale', $default_locale );
+	$Blog->set( 'skin_ID', $blog_skin_ID );
 
-	$DB->query( 'UPDATE T_blogs
-									SET blog_access_type = "relative",
-											blog_siteurl = "blog'.$ID.'.php"
-								WHERE blog_ID = '.$ID );
+	$Blog->dbinsert();
 
-	return $ID;
+	$Blog->set( 'access_type', 'relative' );
+	$Blog->set( 'siteurl', 'blog'.$Blog->ID.'.php' );
+
+	$Blog->dbupdate();
+
+	return $Blog->ID;
 }
 
 
@@ -280,6 +271,16 @@ function create_demo_contents()
 	global $DB;
 	global $default_locale, $install_password;
 	global $Plugins;
+
+  /**
+   * @var FileRootCache
+   */
+	global $FileRootCache;
+
+	load_class( 'collections/model/_blog.class.php' );
+	load_class( 'files/model/_file.class.php' );
+	load_class( 'files/model/_filetype.class.php' );
+	load_class( 'items/model/_link.class.php' );
 
 	echo 'Creating demo user... ';
 	$User_Demo = & new User();
@@ -312,10 +313,9 @@ function create_demo_contents()
 		$blog_a_long,
 		$blog_shortname,
 		$blog_stub,
-		$blog_stub.'.html',
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-		1 ); // Skin ID
+		1, 'std' ); // Skin ID
 
 	$blog_shortname = 'Blog B';
 	$blog_stub = 'b';
@@ -323,10 +323,9 @@ function create_demo_contents()
 		sprintf( T_('%s Title'), $blog_shortname ),
 		$blog_shortname,
 		$blog_stub,
-		$blog_stub.'.html',
 		sprintf( T_('Tagline for %s'), $blog_shortname ),
 		sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-		2 ); // Skin ID
+		2, 'std' ); // Skin ID
 
 	$blog_shortname = 'Linkblog';
 	$blog_stub = 'links';
@@ -337,10 +336,22 @@ function create_demo_contents()
 		'Linkblog',
 		$blog_shortname,
 		$blog_stub,
-		$blog_stub.'.html',
 		T_('Some interesting links...'),
 		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-		3 ); // SKin ID
+		3, 'std' ); // SKin ID
+
+	$blog_shortname = 'Photoblog';
+	$blog_stub = 'photos';
+	$blog_more_longdesc = '<br />
+<br />
+<strong>'.T_("This is a photoblog, optimized for displaying photos.").'</strong>';
+	$blog_photoblog_ID = create_blog(
+		'Photoblog',
+		$blog_shortname,
+		$blog_stub,
+		T_('This blog shows photos...'),
+		sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
+		4, 'photo' ); // SKin ID
 
 	echo "OK.<br />\n";
 
@@ -368,6 +379,9 @@ function create_demo_contents()
 	$cat_linkblog_b2evo = cat_create( 'b2evolution', 'NULL', $blog_linkblog_ID );
 	$cat_linkblog_contrib = cat_create( 'contributors', 'NULL', $blog_linkblog_ID );
 
+	// Create categories for photoblog
+	$cat_photo_album = cat_create( 'Monument Valley', 'NULL', $blog_photoblog_ID );
+
 	echo "OK.<br />\n";
 
 
@@ -387,6 +401,53 @@ function create_demo_contents()
 
 <p>It appears in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a ) );
 
+
+	// PHOTOBLOG:
+  /**
+   * @var FileRootCache
+   */
+	$FileRootCache = & get_Cache( 'FileRootCache' );
+	$FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $blog_photoblog_ID, true );
+
+	// Insert a post into photoblog:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_('Bus Stop Ahead'), 'In the middle of nowhere: a school bus stop where you wouldn\'t really expect it!',
+					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
+	$edit_File = & new File( $FileRoot->type, $FileRoot->in_type_ID, 'monument-valley/bus-stop-ahead.jpg' );
+	$edit_File->link_to_Item( $edited_Item );
+
+	// Insert a post into photoblog:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_('John Ford Point'), 'Does this scene look familiar? You\'ve probably seen it in a couple of John Ford westerns!',
+					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
+	$edit_File = & new File( $FileRoot->type, $FileRoot->in_type_ID, 'monument-valley/john-ford-point.jpg' );
+	$edit_File->link_to_Item( $edited_Item );
+
+	// Insert a post into photoblog:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_('Monuments'), 'This is one of the most famous views in Monument Valley. I like to frame it with the dirt road in order to give a better idea of the size of those things!',
+					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
+	$edit_File = & new File( $FileRoot->type, $FileRoot->in_type_ID, 'monument-valley/monuments.jpg' );
+	$edit_File->link_to_Item( $edited_Item );
+
+	// Insert a post into photoblog:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_('Road to Monument Valley'), 'This gives a pretty good idea of the Monuments you\'re about to drive into...',
+					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
+	$edit_File = & new File( $FileRoot->type, $FileRoot->in_type_ID, 'monument-valley/monument-valley-road.jpg' );
+	$edit_File->link_to_Item( $edited_Item );
+
+	// Insert a post into photoblog:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_('Monument Valley'), T_('This is a short photo album demo. Use the arrows to navigate between photos. Click on "Index" to see a thumbnail index.'),
+					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
+	$edit_File = & new File( $FileRoot->type, $FileRoot->in_type_ID, 'monument-valley/monument-valley.jpg' );
+	$edit_File->link_to_Item( $edited_Item );
 
 
 	// POPULATE THE LINKBLOG:
@@ -641,6 +702,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.245  2008/09/15 11:01:10  fplanque
+ * Installer now creates a demo photoblog
+ *
  * Revision 1.244  2008/09/10 17:23:56  blueyed
  * Default linkblog: 'dAniel' => 'Daniel'
  *
