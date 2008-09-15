@@ -134,9 +134,26 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 		echo $this->disp_params['list_end'];
 
-		echo $this->disp_params['notes_start'];
-		echo '<a href="http://webreference.fr/2006/08/30/rss_atom_xml"'.( $this->disp_params[ 'info_link' ] ? ' target="_blank"' : '' ).' title="External - English">What is RSS?</a>';
-		echo $this->disp_params['notes_end'];
+		/**
+		 * @var AbstractSettings
+		 */
+		global $global_Cache;
+
+		$feedhlp = $global_Cache->get( 'feedhlp' );
+		if( empty( $feedhlp ) )
+		{	// Use basic default: (fp> needs serious update)
+			$feedhlp = array( array( 'http://webreference.fr/2006/08/30/rss_atom_xml', 'What is RSS?' ) );
+		}
+
+		if( $this->disp_params[ 'info_link' ] )
+		{
+			$link_params = array( 'target' => '_blank' );
+		}
+		else
+		{
+			$link_params = array( 'target' => '' );
+		}
+		display_list( $feedhlp, $this->disp_params['notes_start'], $this->disp_params['notes_end'], ' ', '', '', NULL, 1, $link_params );
 
 		echo $this->disp_params['block_end'];
 
@@ -147,6 +164,9 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.10  2008/09/15 03:12:22  fplanque
+ * help link update
+ *
  * Revision 1.9  2008/05/06 23:35:47  fplanque
  * The correct way to add linebreaks to widgets is to add them to $disp_params when the container is called, right after the array_merge with defaults.
  *
