@@ -211,6 +211,7 @@ skin_include( '_html_header.inc.php' );
 				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 				skin_include( '_item_content.inc.php', array(
 						'image_size'	=>	'',
+						'url_link_text_template' => '', // link will be displayed (except player if podcast)
 					) );
 				// Note: You can customize the default item feedback by copying the generic
 				// /skins/_item_feedback.inc.php file into the current skin folder.
@@ -242,6 +243,18 @@ skin_include( '_html_header.inc.php' );
 						'before' =>         ' &bull; '.T_('Tags').': ',
 						'after' =>          ' ',
 						'separator' =>      ', ',
+					) );
+			?>
+
+			<?php
+				// URL link, if the post has one:
+				$Item->url_link( array(
+						'before'        => ' &bull; '.T_('Link').': ',
+						'after'         => ' ',
+						'text_template' => '$url$',
+						'url_template'  => '$url$',
+						'target'        => '',
+						'podcast'       => false,        // DO NOT display mp3 player if post type is podcast
 					) );
 			?>
 

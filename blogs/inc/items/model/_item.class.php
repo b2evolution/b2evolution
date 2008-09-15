@@ -2566,7 +2566,7 @@ class Item extends ItemLight
 		$params = array_merge( array(
 				'before'        => ' ',
 				'after'         => ' ',
-				'text_template' => '$url$',
+				'text_template' => '$url$',		// If evaluates to empty, nothing will be displayed (except player if podcast)
 				'url_template'  => '$url$',
 				'target'        => '',
 				'format'        => 'htmlbody',
@@ -2591,7 +2591,14 @@ class Item extends ItemLight
 
 		}
 		else
-		{
+		{ // Not displaying podcast player:
+
+			$text = str_replace( '$url$', $this->url, $params['text_template'] );
+			if( empty($text) )
+			{	// Nothing to display
+				return;
+			}
+
 			$r = $params['before'];
 
 			$r .= '<a href="'.str_replace( '$url$', $this->url, $params['url_template'] ).'"';
@@ -2601,7 +2608,7 @@ class Item extends ItemLight
 				$r .= ' target="'.$params['target'].'"';
 			}
 
-			$r .= '>'.str_replace( '$url$', $this->url, $params['text_template'] ).'</a>';
+			$r .= '>'.$text.'</a>';
 
 			$r .= $params['after'];
 
@@ -3559,6 +3566,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.55  2008/09/15 10:44:16  fplanque
+ * skin cleanup
+ *
  * Revision 1.54  2008/07/24 01:24:24  afwas
  * $this->title() in function trackback_rdf() used old style parameters. Reported by Austriaco.
  *

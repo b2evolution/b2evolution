@@ -25,6 +25,7 @@ $params = array_merge( array(
 		'image_size'	        => 'fit-400x320',
 		'before_url_link'     => '<p class="post_link">'.T_('Link:').' ',
 		'after_url_link'      => '</p>',
+		'url_link_text_template' => '$url$',
 		'before_more_link'    => '<p class="bMore">',
 		'after_more_link'     => '</p>',
 		'more_link_text'      => '#',
@@ -57,7 +58,7 @@ if( !empty($params['image_size']) )
 		$Item->url_link( array(
 				'before'        => $params['before_url_link'],
 				'after'         => $params['after_url_link'],
-				'text_template' => '$url$',
+				'text_template' => $params['url_link_text_template'],
 				'url_template'  => '$url$',
 				'target'        => '',
 				'podcast'       => '#',        // auto display mp3 player if post type is podcast (=> false, to disable)
@@ -93,6 +94,9 @@ if( !empty($params['image_size']) )
 <?php
 /*
  * $Log$
+ * Revision 1.10  2008/09/15 10:44:17  fplanque
+ * skin cleanup
+ *
  * Revision 1.9  2008/05/26 19:22:07  fplanque
  * fixes
  *
