@@ -78,13 +78,21 @@ if( !empty($size) && $File->is_image() )
 else
 {	// We want the regular file:
 	// Headers to display the file directly in the browser
-	header('Content-type: '.$File->Filetype->mimetype );
+	if( ! is_readable($File->get_full_path()) )
+	{
+		debug_die( sprintf('File "%s" is not readable!', rel_path_to_base($File->get_full_path())) );
+	}
+
+	if( ! empty($File->Filetype) )
+	{
+		header('Content-type: '.$File->Filetype->mimetype );
+		if( $File->Filetype->viewtype == 'download' )
+		{
+			header('Content-disposition: attachment; filename="'.$File->get_name().'"' );
+		}
+	}
 	header('Content-Length: '.filesize( $File->get_full_path() ) );
 
-	if( $File->Filetype->viewtype == 'download' )
-	{
-		header('Content-disposition: attachment; filename="'.$File->get_name().'"' );
-	}
 
 	// Display the content of the file
 	readfile( $File->get_full_path() );
@@ -92,6 +100,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.20  2008/09/19 20:11:50  blueyed
+ * getfile.php: fail if file is not readable and check if Filetype is set
+ *
  * Revision 1.19  2008/09/15 10:35:28  fplanque
  * Fixed bug where thumbnails are only created when user is logged in
  *
