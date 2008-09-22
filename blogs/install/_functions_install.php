@@ -12,6 +12,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * Begin install task.
  * This will offer other display methods in the future
  */
 function task_begin( $title )
@@ -21,6 +22,7 @@ function task_begin( $title )
 
 
 /**
+ * End install task.
  * This will offer other display methods in the future
  */
 function task_end()
@@ -571,6 +573,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.52  2008/09/22 20:06:13  blueyed
+ * doc
+ *
  * Revision 1.51  2008/05/26 19:15:32  fplanque
  * glossyblue skin
  *
