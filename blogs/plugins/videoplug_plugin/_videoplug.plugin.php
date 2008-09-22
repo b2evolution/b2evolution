@@ -69,6 +69,10 @@ class videoplug_plugin extends Plugin
 		// iFilm
 		$content = preg_replace( '¤\[video:ifilm:(.+?)]¤', '<div class="videoblock"><embed width="425" height="350" src="http://www.ifilm.com/efp" quality="high" bgcolor="000000" name="efp" align="middle" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="flvbaseclip=\\1"> </embed></div>', $content );
 
+		// vimeo
+		// TODO: might want to use oEmbed (to get title etc separately and display it below video): http://vimeo.com/api/docs/oembed
+		$content = preg_replace( '~\[video:vimeo:(.+?)]~', '<div class="videoblock"><object data="http://vimeo.com/moogaloop.swf?clip_id=1737450&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" width="400" height="225" type="application/x-shockwave-flash">	<param name="allowfullscreen" value="true" />	<param name="allowscriptaccess" value="always" />	<param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$1&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /></object></div>', $content );
+
 		return true;
 	}
 
@@ -104,6 +108,7 @@ class videoplug_plugin extends Plugin
 		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="quicktags" onclick="videotag(\'dailymotion\');" value="DailyMotion" />';
 		echo '<input type="button" id="video_livevideo" title="'.T_('Insert LiveVideo video').'" class="quicktags" onclick="videotag(\'livevideo\');" value="LiveVideo" />';
 		echo '<input type="button" id="video_ifilm" title="'.T_('Insert iFilm video').'" class="quicktags" onclick="videotag(\'ifilm\');" value="iFilm" />';
+		echo '<input type="button" id="video_vimeo" title="'.T_('Insert vimeo video').'" class="quicktags" onclick="videotag(\'vimeo\');" value="vimeo" />';
 
 		echo '</div>';
 
@@ -128,6 +133,12 @@ class videoplug_plugin extends Plugin
 					{
 					case 'youtube':
 						if( video_ID.match( /^\w+$/ ) )
+						{ // valid
+							valid_video_ID = true;
+						}
+						break;
+					case 'vimeo':
+						if( video_ID.match( /^\d+$/ ) )
 						{ // valid
 							valid_video_ID = true;
 						}
@@ -160,6 +171,9 @@ class videoplug_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.13  2008/09/22 19:29:17  blueyed
+ * videoplug_plugin: add vimeo service
+ *
  * Revision 1.12  2008/06/30 20:49:50  blueyed
  * videoplug_plugin: validate video ID (only for YouTube currently); do not translate video service names
  *
