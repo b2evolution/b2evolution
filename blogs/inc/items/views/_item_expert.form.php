@@ -154,27 +154,6 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	// CALL PLUGINS NOW:
 	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'expert' ) );
 
-	// ---------- FILES... ----------
-	/* Deprecated by "Attach files (popup)"
-
-	if( $Settings->get( 'fm_enabled' ) )
-	{ // Note: we try to land in the Blog media folder if possible
-		// fp> TODO: check what happens if blog folders are disabled
-		if( $current_User->check_perm( 'files', 'view' ) )
-		{
-			$fm_url_params = 'mode=upload';
-			if( !empty($edited_Item->ID) )
-			{
-				$fm_url_params .= '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID;
-			}
-			echo '<input id="itemform_button_files" type="button" value="'.format_to_output(T_('Files...'), 'formvalue')
-						.'" class="ActionButton" onclick="pop_up_window( \''
-						.url_add_param( $Blog->get_filemanager_link(), $fm_url_params ).'\', \'fileman_upload\', 1000 )" /> ';
-		}
-	}
-
-	*/
-
 	if( $use_preview )
 	{ // ---------- PREVIEW ----------
 		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
@@ -415,6 +394,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.36  2008/09/23 05:26:38  fplanque
+ * Handle attaching files when multiple posts are edited simultaneously
+ *
  * Revision 1.35  2008/06/30 23:47:04  blueyed
  * require_title setting for Blogs, defaulting to 'required'. This makes the title field now a requirement (by default), since it often gets forgotten when posting first (and then the urltitle is ugly already)
  *

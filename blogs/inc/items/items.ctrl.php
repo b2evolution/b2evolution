@@ -61,6 +61,9 @@ switch( $action )
 		break;
 
 	case 'unlink':
+		// Name of teh iframe we want some atiosn to come back to:
+		param( 'iframe_name', 'string', '', true );
+
 	  param( 'link_ID', 'integer', true );
 		$LinkCache = & get_Cache( 'LinkCache' );
 		if( ($edited_Link = & $LinkCache->get_by_ID( $link_ID, false )) !== false )
@@ -865,6 +868,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2008/09/23 05:26:38  fplanque
+ * Handle attaching files when multiple posts are edited simultaneously
+ *
  * Revision 1.23  2008/05/29 22:15:48  blueyed
  * typo
  *

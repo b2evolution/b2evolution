@@ -107,6 +107,9 @@ if( !empty($action) && $fm_mode != 'link_item' )
 	$fm_mode = '';
 }
 
+// Name of the iframe we want some atiosn to come back to:
+param( 'iframe_name', 'string', '', true );
+
 // Get root:
 $ads_list_path = false; // false by default, gets set if we have a valid root
 /**
@@ -1553,6 +1556,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2008/09/23 05:26:37  fplanque
+ * Handle attaching files when multiple posts are edited simultaneously
+ *
  * Revision 1.18  2008/05/12 20:33:53  fplanque
  * fix
  *

@@ -71,6 +71,8 @@ global $Blog;
 
 global $fm_hide_dirtree, $create_name, $ads_list_path;
 
+// Name of the iframe we want some atiosn to come back to:
+global $iframe_name;
 
 $Form = & new Form( NULL, 'FilesForm', 'post', 'none' );
 $Form->begin_form();
@@ -266,7 +268,7 @@ $Form->begin_form();
 				$link_action = 'link';
 				if( $mode == 'upload' )
 				{	// We want the action to happen in the post attachments iframe:
-					$link_attribs['target'] = 'attachmentframe';	// TODO: fp> if multiple posts are opened for edit, frames should get unique names
+					$link_attribs['target'] = $iframe_name;
 					$link_action = 'link_inpost';
 				}
 				echo action_icon( T_('Link this file!'), 'link',
@@ -483,7 +485,6 @@ $Form->begin_form();
 			// This is too geeky! Default perms radio options and unchecked radio groups! NO WAY!
 			// If you want this feature to be usable by average users you must only have one line per file OR one file for all. You can't mix both.
 			// The only way to have both is to have 2 spearate forms: 1 titled "change perms for all files simultaneously"-> submit  and another 1 title "change perms for each file individually" -> another submit
-			// POST PHOENIX
 			// fplanque>> second thought: changing perms for multiple files at once is useful. BUT assigning different perms to several files with ONE form is trying to solve a problem that not even geeks can face once in a lifetime.
 			// This has to be simplified to ONE single set of permissions for all selected files. (If you need different perms, click again)
 			$field_options['file_perms'] = T_('Change permissions for the selected files...');
@@ -593,6 +594,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.10  2008/09/23 05:26:38  fplanque
+ * Handle attaching files when multiple posts are edited simultaneously
+ *
  * Revision 1.9  2008/07/11 23:23:19  blueyed
  * Always display full last modification date+time in title of lastmod TD in filelist
  *

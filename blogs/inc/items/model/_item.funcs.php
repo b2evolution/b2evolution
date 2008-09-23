@@ -346,9 +346,10 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 	global $current_User;
 	global $Settings;
 
+	$fieldset_title = T_('Attachments').get_manual_link('post_attachments_fieldset');
+
 	if( $creating )
 	{	// Creating new post
-		$fieldset_title = T_('Attachments');
 		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks' ) );
 
 		echo '<table cellspacing="0" cellpadding="0"><tr><td>';
@@ -359,10 +360,11 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 	}
 	else
 	{ // Editing post
-		$fieldset_title = T_('Attachments').get_manual_link('post_attachments_fieldset');
 
-		$fieldset_title .= ' - <a href="'.$admin_url.'?ctrl=items&amp;action=edit_links&amp;mode=iframe&amp;item_ID='.$edited_Item->ID
-					.'" target="attachmentframe">'.get_icon( 'refresh', 'imgtag' ).' '.T_('Refresh').'</a>';
+		$iframe_name = 'attach_'.generate_random_key( 16 );
+
+		$fieldset_title .= ' - <a href="'.$admin_url.'?ctrl=items&amp;action=edit_links&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;item_ID='.$edited_Item->ID
+					.'" target="'.$iframe_name.'">'.get_icon( 'refresh', 'imgtag' ).' '.T_('Refresh').'</a>';
 
 		if( $Settings->get( 'fm_enabled' )
 			&& $current_User->check_perm( 'files', 'view' )
@@ -371,14 +373,14 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 
 			$fieldset_title .= ' - <a href="'.url_add_param( $Blog->get_filemanager_link(),
 						'fm_mode=link_item&amp;item_ID='.$edited_Item->ID ).'" onclick="return pop_up_window( \''
-						.url_add_param( $Blog->get_filemanager_link(), 'mode=upload&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID ).'\', \'fileman_upload\', 1000 )">'
+						.url_add_param( $Blog->get_filemanager_link(), 'mode=upload&amp;iframe_name='.$iframe_name.'&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID ).'\', \'fileman_upload\', 1000 )">'
 						.get_icon( 'folder', 'imgtag' ).' '.T_('Attach files (popup)').'</a>';
 		}
 
 		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_links' ) );
 
-		echo '<iframe src="'.$admin_url.'?ctrl=items&amp;action=edit_links&amp;mode=iframe&amp;item_ID='.$edited_Item->ID
-					.'" name="attachmentframe" width="100%" marginwidth="0" height="160" marginheight="0" align="top" scrolling="auto" frameborder="0" id="attachmentframe"></iframe>';
+		echo '<iframe src="'.$admin_url.'?ctrl=items&amp;action=edit_links&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;item_ID='.$edited_Item->ID
+					.'" name="'.$iframe_name.'" width="100%" marginwidth="0" height="160" marginheight="0" align="top" scrolling="auto" frameborder="0" id="attachmentframe"></iframe>';
 
 		$Form->end_fieldset();
 	}
@@ -722,6 +724,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.17  2008/09/23 05:26:38  fplanque
+ * Handle attaching files when multiple posts are edited simultaneously
+ *
  * Revision 1.16  2008/04/14 19:50:51  fplanque
  * enhanced attachments handling in post edit mode
  *

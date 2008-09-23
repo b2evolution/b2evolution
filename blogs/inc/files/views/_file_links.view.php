@@ -148,13 +148,17 @@ if( $mode != 'upload' )
 
 if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 {	// Check that we have permission to edit item:
-	printf( '<p>'.T_('Click on link %s icons below to link additional files to this post.').'</p>', get_icon( 'link', 'imgtag', array('class'=>'top') ) );
+	printf( '<div>'.T_('Click on link %s icons below to link additional files to the post: ')
+				.'&laquo;<strong>'.$edited_Item->dget( 'title' ).'</strong>&raquo;</div>', get_icon( 'link', 'imgtag', array('class'=>'top') ) );
 }
 
 
 
 /*
  * $Log$
+ * Revision 1.7  2008/09/23 05:26:38  fplanque
+ * Handle attaching files when multiple posts are edited simultaneously
+ *
  * Revision 1.6  2008/04/14 19:50:51  fplanque
  * enhanced attachments handling in post edit mode
  *

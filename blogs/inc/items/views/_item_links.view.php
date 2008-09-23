@@ -1,6 +1,6 @@
 <?php
 /**
- * This file displays the links attached to an Item
+ * This file displays the links attached to an Item (called within the attachment_frame)
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -44,6 +44,9 @@ global $AdminUI;
 global $debug;
 $debug = 0;
 
+// Name of teh iframe we want some atiosn to come back to:
+param( 'iframe_name', 'string', '', true );
+
 $SQL = & new SQL();
 
 $SQL->SELECT( 'link_ID, link_ltype_ID, file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
@@ -54,7 +57,6 @@ $SQL->ORDER_BY( 'link_ID' );
 $Results = & new Results( $SQL->get(), 'link_' );
 
 $Results->title = T_('Attachments');
-
 
 /*
  * Sub Type column
@@ -136,6 +138,7 @@ if( $current_User->check_perm( 'files', 'view' ) )
 		 */
 		global $current_File;
 		global $edited_Item, $current_User;
+		global $iframe_name;
 
 		$r = '';
 
@@ -144,14 +147,14 @@ if( $current_User->check_perm( 'files', 'view' ) )
 			$title = T_('Locate this file!');
 			$url = $current_File->get_linkedit_url( $edited_Item->ID );
 			$r = '<a href="'.$url.'" onclick="return pop_up_window( \''
-						.url_add_param( $url, 'mode=upload' ).'\', \'fileman_upload\', 1000 )" target="_parent" title="'.$title.'">'
+						.url_add_param( $url, 'mode=upload&amp;iframe_name='.$iframe_name.'' ).'\', \'fileman_upload\', 1000 )" target="_parent" title="'.$title.'">'
 						.get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ).'</a> ';
 		}
 
 		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	  {	// Check that we have permission to edit item:
 			$r .= action_icon( T_('Delete this link!'), 'unlink',
-			                  regenerate_url( 'p,itm_ID,action', "link_ID=$link_ID&amp;action=unlink&amp;mode=iframe" ) );
+			                  regenerate_url( 'p,itm_ID,action', "link_ID=$link_ID&amp;action=unlink" ) );
 		}
 
 		return $r;
@@ -167,6 +170,9 @@ $Results->display( $AdminUI->get_template( 'compact_results' ) );
 
 /*
  * $Log$
+ * Revision 1.3  2008/09/23 05:26:38  fplanque
+ * Handle attaching files when multiple posts are edited simultaneously
+ *
  * Revision 1.2  2008/04/14 19:50:51  fplanque
  * enhanced attachments handling in post edit mode
  *
