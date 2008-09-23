@@ -339,6 +339,11 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_', $req_b
 
 /**
  * Compose screen: display attachment iframe
+ *
+ * @param Form
+ * @param boolean
+ * @param Item
+ * @param Blog
  */
 function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 {
@@ -371,9 +376,9 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 			&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 		{	// Check that we have permission to edit item:
 
-			$fieldset_title .= ' - <a href="'.url_add_param( $Blog->get_filemanager_link(),
-						'fm_mode=link_item&amp;item_ID='.$edited_Item->ID ).'" onclick="return pop_up_window( \''
-						.url_add_param( $Blog->get_filemanager_link(), 'mode=upload&amp;iframe_name='.$iframe_name.'&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID ).'\', \'fileman_upload\', 1000 )">'
+			$fieldset_title .= ' - <a href="admin.php?ctrl=files&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID
+						.'" onclick="return pop_up_window( \'admin.php?ctrl=files&amp;mode=upload&amp;iframe_name='
+						.$iframe_name.'&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID.'\', \'fileman_upload\', 1000 )">'
 						.get_icon( 'folder', 'imgtag' ).' '.T_('Attach files (popup)').'</a>';
 		}
 
@@ -724,6 +729,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.18  2008/09/23 07:56:47  fplanque
+ * Demo blog now uses shared files folder for demo media + more images in demo posts
+ *
  * Revision 1.17  2008/09/23 05:26:38  fplanque
  * Handle attaching files when multiple posts are edited simultaneously
  *

@@ -1570,21 +1570,8 @@ class Item extends ItemLight
 				'limit' =>               1000,	// Max # of images displayed
 			), $params );
 
-		$FileCache = & get_Cache( 'FileCache' );
-
-		$FileList = & new DataObjectList2( $FileCache );
-
-
-		$SQL = & new SQL();
-		$SQL->SELECT( 'file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
-		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
-		$SQL->WHERE( 'link_itm_ID = '.$this->ID );
-		$SQL->ORDER_BY( 'link_ID' );
-		$SQL->LIMIT( $params['limit'] );
-
-		$FileList->sql = $SQL->get();
-
-		$FileList->query( false, false, false );
+		// Get list of attached files
+		$FileList = $this->get_attachment_FileList( $params['limit'] );
 
 		$r = '';
     /**
@@ -1611,6 +1598,36 @@ class Item extends ItemLight
 		}
 
 		return $r;
+	}
+
+
+  /**
+	 * Get list of attached files
+	 *
+	 * INNER JOIN on files ensures we only get backj file links
+	 *
+	 * @return DataObjectList2
+	 */
+	function get_attachment_FileList( $limit = 1000 )
+	{
+		load_class('_core/model/dataobjects/_dataobjectlist2.class.php');
+
+		$FileCache = & get_Cache( 'FileCache' );
+
+		$FileList = new DataObjectList2( $FileCache ); // IN FUNC
+
+		$SQL = & new SQL();
+		$SQL->SELECT( 'file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
+		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
+		$SQL->WHERE( 'link_itm_ID = '.$this->ID );
+		$SQL->ORDER_BY( 'link_ID' );
+		$SQL->LIMIT( $limit );
+
+		$FileList->sql = $SQL->get();
+
+		$FileList->query( false, false, false );
+
+		return $FileList;
 	}
 
 
@@ -2514,8 +2531,8 @@ class Item extends ItemLight
 			'before' =>' dc:title="',
 			'after' => '"'."\n",
 			'link_type' => 'none',
-			'format' => 'xmlattr' 
-			) ); 
+			'format' => 'xmlattr'
+			) );
 		echo '  trackback:ping="';
 		$this->trackback_url();
 		echo '" />'."\n";
@@ -3566,6 +3583,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.56  2008/09/23 07:56:47  fplanque
+ * Demo blog now uses shared files folder for demo media + more images in demo posts
+ *
  * Revision 1.55  2008/09/15 10:44:16  fplanque
  * skin cleanup
  *

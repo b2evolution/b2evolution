@@ -90,6 +90,23 @@ else
 }
 
 
+/*
+ * Load linkable objects:
+ */
+if( param( 'item_ID', 'integer', NULL, true, false, false ) )
+{ // Load Requested iem:
+	$ItemCache = & get_Cache( 'ItemCache' );
+	if( ($edited_Item = & $ItemCache->get_by_ID( $item_ID, false )) === false )
+	{	// We could not find the contact to link:
+		$Messages->head = T_('Cannot link Item!');
+		$Messages->add( T_('Requested item does not exist any longer.'), 'error' );
+		unset( $edited_Item );
+		forget_param( 'item_ID' );
+		unset( $item_ID );
+	}
+}
+
+
 /**
  * @global string The file manager mode we're in ('fm_upload', 'fm_move')
  */
@@ -131,8 +148,25 @@ if( ! empty($root) )
 		$fm_FileRoot = false;
 	}
 }
-elseif( !empty($Blog) )
-{	// try to get it for the current Blog
+elseif( !empty($edited_Item) )
+{	// We have a post, check if it already has a linked file in a particular root, in which case we want to use that root!
+	// This is useful when whlicking "attach files" from teh post edit screen: it takes you to the root where you have
+	// already attached files from. Otherwise the next block below will default to the Blog's fileroot.
+	// Get list of attached files:
+	$FileList = $edited_Item->get_attachment_FileList( 1 );
+	// Get first file:
+  /**
+	 * @var File
+	 */
+	$File = & $FileList->get_next();
+	if( !empty( $File ) )
+	{	// Obtain and use file root of first file:
+		$fm_FileRoot = & $File->get_FileRoot();
+	}
+}
+
+if( empty($fm_FileRoot) && !empty($Blog) )
+{	// Still not set a root, try to get it for the current Blog
 	$fm_FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $Blog->ID );
 	if( ! $fm_FileRoot || ! isset( $available_Roots[$fm_FileRoot->ID] ) )
 	{ // Root not found or not in list of available ones
@@ -243,23 +277,6 @@ if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 		unset( $edited_Link );
 		forget_param( 'link_ID' );
 		unset( $link_ID );
-	}
-}
-
-
-/*
- * Load linkable objects:
- */
-if( param( 'item_ID', 'integer', NULL, true, false, false ) )
-{ // Load Requested iem:
-	$ItemCache = & get_Cache( 'ItemCache' );
-	if( ($edited_Item = & $ItemCache->get_by_ID( $item_ID, false )) === false )
-	{	// We could not find the contact to link:
-		$Messages->head = T_('Cannot link Item!');
-		$Messages->add( T_('Requested item does not exist any longer.'), 'error' );
-		unset( $edited_Item );
-		forget_param( 'item_ID' );
-		unset( $item_ID );
 	}
 }
 
@@ -1556,6 +1573,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2008/09/23 07:56:47  fplanque
+ * Demo blog now uses shared files folder for demo media + more images in demo posts
+ *
  * Revision 1.19  2008/09/23 05:26:37  fplanque
  * Handle attaching files when multiple posts are edited simultaneously
  *

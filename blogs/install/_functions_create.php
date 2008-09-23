@@ -406,15 +406,15 @@ function create_demo_contents()
   /**
    * @var FileRootCache
    */
-	$FileRootCache = & get_Cache( 'FileRootCache' );
-	$FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $blog_photoblog_ID, true );
+	// $FileRootCache = & get_Cache( 'FileRootCache' );
+	// $FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $blog_photoblog_ID, true );
 
 	// Insert a post into photoblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_('Bus Stop Ahead'), 'In the middle of nowhere: a school bus stop where you wouldn\'t really expect it!',
 					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
-	$edit_File = & new File( $FileRoot->type, $FileRoot->in_type_ID, 'monument-valley/bus-stop-ahead.jpg' );
+	$edit_File = & new File( 'shared', 0, 'monument-valley/bus-stop-ahead.jpg' );
 	$edit_File->link_to_Item( $edited_Item );
 
 	// Insert a post into photoblog:
@@ -422,7 +422,7 @@ function create_demo_contents()
 	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_('John Ford Point'), 'Does this scene look familiar? You\'ve probably seen it in a couple of John Ford westerns!',
 					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
-	$edit_File = & new File( $FileRoot->type, $FileRoot->in_type_ID, 'monument-valley/john-ford-point.jpg' );
+	$edit_File = & new File( 'shared', 0, 'monument-valley/john-ford-point.jpg' );
 	$edit_File->link_to_Item( $edited_Item );
 
 	// Insert a post into photoblog:
@@ -430,7 +430,7 @@ function create_demo_contents()
 	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_('Monuments'), 'This is one of the most famous views in Monument Valley. I like to frame it with the dirt road in order to give a better idea of the size of those things!',
 					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
-	$edit_File = & new File( $FileRoot->type, $FileRoot->in_type_ID, 'monument-valley/monuments.jpg' );
+	$edit_File = & new File( 'shared', 0, 'monument-valley/monuments.jpg' );
 	$edit_File->link_to_Item( $edited_Item );
 
 	// Insert a post into photoblog:
@@ -438,7 +438,7 @@ function create_demo_contents()
 	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_('Road to Monument Valley'), 'This gives a pretty good idea of the Monuments you\'re about to drive into...',
 					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
-	$edit_File = & new File( $FileRoot->type, $FileRoot->in_type_ID, 'monument-valley/monument-valley-road.jpg' );
+	$edit_File = & new File( 'shared', 0, 'monument-valley/monument-valley-road.jpg' );
 	$edit_File->link_to_Item( $edited_Item );
 
 	// Insert a post into photoblog:
@@ -446,7 +446,7 @@ function create_demo_contents()
 	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_('Monument Valley'), T_('This is a short photo album demo. Use the arrows to navigate between photos. Click on "Index" to see a thumbnail index.'),
 					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
-	$edit_File = & new File( $FileRoot->type, $FileRoot->in_type_ID, 'monument-valley/monument-valley.jpg' );
+	$edit_File = & new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
 	$edit_File->link_to_Item( $edited_Item );
 
 
@@ -525,15 +525,10 @@ Info pages are very much like regular posts, except that they do not appear in t
 
 If needed, a skin can format info pages differently from regular posts."), $now, $cat_ann_a,
 		array( $cat_ann_a, $cat_ann_b, $cat_linkblog_b2evo ), 'published', '#', '', '', 'open', array('default'), 1000 );
+	$edit_File = & new File( 'shared', 0, 'logos/b2evolution8.png' );
+	$edit_File->link_to_Item( $edited_Item );
 
 
-
-	// Insert a post:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("Clean Permalinks!"), T_("b2evolution uses old-style permalinks and feedback links by default. This is to ensure maximum compatibility with various webserver configurations.
-
-Nethertheless, once you feel comfortable with b2evolution, you should try activating clean permalinks in the Global Settings &gt; Link options in the admin interface."), $now, $cat_b2evo );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -584,7 +579,17 @@ To start customizing a skin, open its "<code>index.main.php</code>" file in an e
 And, of course, read the <a href="http://manual.b2evolution.net/Skins_2.0" target="_blank">manual on skins</a>!'), $now, $cat_b2evo );
 
 
-	// Create newbie posts:
+	// Insert a post:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_('Image post'), T_('<p>This post has an image attached to it. The image is automatically resized to fit the current skin. You can zoom in by clicking on the thumbnail.</p>
+
+<p>Check out the photoblog (accessible trhough the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>'), $now, $cat_bg );
+	$edit_File = & new File( 'shared', 0, 'monument-valley/monuments.jpg' );
+	$edit_File->link_to_Item( $edited_Item );
+
+
+	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_('This is a multipage post'), T_('This is page 1 of a multipage post.
@@ -606,6 +611,7 @@ This is page 4.
 It is the last page.'), $now, $cat_bg );
 
 
+	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_('Extended post with no teaser'), T_('This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.
@@ -615,6 +621,7 @@ It is the last page.'), $now, $cat_bg );
 This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_bg );
 
 
+	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_('Extended post'), T_('This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.
@@ -622,6 +629,7 @@ This is the extended text. You only see it when you have clicked the "more" link
 <!--more-->
 
 This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_bg );
+
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -635,6 +643,8 @@ This is the extended text. You only see it when you have clicked the "more" link
 </ul>
 
 You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, skin, widgets, etc.) from the Blog Settings tab in the admin interface."), $now, $cat_ann_a );
+	$edit_File = & new File( 'shared', 0, 'logos/b2evolution8.png' );
+	$edit_File->link_to_Item( $edited_Item );
 
 
 
@@ -703,6 +713,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.247  2008/09/23 07:56:47  fplanque
+ * Demo blog now uses shared files folder for demo media + more images in demo posts
+ *
  * Revision 1.246  2008/09/23 05:26:55  fplanque
  * MFB
  *
