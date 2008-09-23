@@ -626,11 +626,12 @@ This is the extended text. You only see it when you have clicked the "more" link
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("Welcome to b2evolution!"), T_("Three blogs have been created with sample contents:
+	$edited_Item->insert( 1, T_("Welcome to b2evolution!"), T_("Four blogs have been created with sample contents:
 <ul>
 	<li><strong>Blog A</strong>: You are currently looking at it. It contains a few sample posts, using simple features of b2evolution.</li>
 	<li><strong>Blog B</strong>: You can access it from a link at the top of the page. It contains information about more advanced features.</li>
 	<li><strong>Linkblog</strong>: By default, the linkblog is included as a \"Blogroll\" in the sidebar of both Blog A &amp; Blog B.</li>
+	<li><strong>Photoblog</strong>: This blog is an example of how you can use b2evolution to showcase photos, with one photo per page as well as a thumbnail index.</li>
 </ul>
 
 You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, skin, widgets, etc.) from the Blog Settings tab in the admin interface."), $now, $cat_ann_a );
@@ -702,6 +703,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.246  2008/09/23 05:26:55  fplanque
+ * MFB
+ *
  * Revision 1.245  2008/09/15 11:01:10  fplanque
  * Installer now creates a demo photoblog
  *
