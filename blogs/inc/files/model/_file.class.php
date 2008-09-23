@@ -1737,6 +1737,12 @@ class File extends DataObject
 				$thumb_quality = 85;
 				break;
 
+			case 'fit-160x120';
+				$thumb_width = 160;
+				$thumb_height = 120;
+				$thumb_quality = 80;
+				break;
+
 			case 'fit-80x80';
 			default:
 				$size_name = 'fit-80x80';
@@ -1823,6 +1829,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2008/09/23 09:04:33  fplanque
+ * moved media index to a widget
+ *
  * Revision 1.10  2008/09/15 11:01:09  fplanque
  * Installer now creates a demo photoblog
  *

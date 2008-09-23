@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the xyz Widget class.
+ * This file implements the Comment List Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -140,7 +140,8 @@ class coll_comment_list_Widget extends ComponentWidget
 
 		echo $this->disp_params[ 'block_start'];
 
-		echo $this->disp_params[ 'block_title_start' ].$this->disp_params[ 'title' ].$this->disp_params[ 'block_title_end' ];
+		// Display title if requested
+		$this->disp_title();
 
 		echo $this->disp_params[ 'list_start' ];
 
@@ -170,6 +171,9 @@ class coll_comment_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.8  2008/09/23 09:04:32  fplanque
+ * moved media index to a widget
+ *
  * Revision 1.7  2008/05/06 23:35:47  fplanque
  * The correct way to add linebreaks to widgets is to add them to $disp_params when the container is called, right after the array_merge with defaults.
  *

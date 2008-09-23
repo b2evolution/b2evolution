@@ -31,6 +31,7 @@ $core_componentwidget_defs = array(
 			'coll_post_list',
 			'coll_page_list',
 			'coll_comment_list',
+			'coll_media_index',
 			'coll_xml_feeds',
 		'*'.T_('Meta info for the blog'),
 			'coll_title',
@@ -110,6 +111,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.11  2008/09/23 09:04:33  fplanque
+ * moved media index to a widget
+ *
  * Revision 1.10  2008/02/13 07:37:55  fplanque
  * renamed Blog Logo widget
  *

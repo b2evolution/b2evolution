@@ -352,6 +352,14 @@ class ComponentWidget extends DataObject
 					'item_text_end' => '',
 					'item_selected_start' => '<li class="selected">',
 					'item_selected_end' => '</li>',
+					'mediaindex_start' => '<ul>',
+					'mediaindex_end' => '</ul>',
+					'mediaindex_cols' => 1,
+					'mediaindex_colstart' => ' ',
+					'mediaindex_colend' => ' ',
+					'media_start' => '<li>',
+					'media_end' => '</li>',
+					'media_thumb_size' => 'fit-160x120',
 					'link_selected_class' => 'selected',
 					'link_type' => 'canonic',		// 'canonic' | 'context' (context will regenrate URL injecting/replacing a single filter)
 					'item_selected_text_start' => '',
@@ -362,6 +370,7 @@ class ComponentWidget extends DataObject
 					'notes_end' => '</div>',
 					'tag_cloud_start' => '<p class="tag_cloud">',
 					'tag_cloud_end' => '</p>',
+					'limit' => 100,
 				), $widget_defaults, $params, $this->param_array );
 
 		if( false )
@@ -733,6 +742,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.37  2008/09/23 09:04:33  fplanque
+ * moved media index to a widget
+ *
  * Revision 1.36  2008/06/30 20:46:05  blueyed
  * Fix indent
  *
