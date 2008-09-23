@@ -54,11 +54,42 @@ echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 <?php
 while( $Item = & mainlist_get_item() )
 {	// For each blog post, do everything below up to the closing curly brace "}"
+	// age in days of teh post
+	$age = ($localtimenow - mysql2timestamp($Item->datemodified)) / 86400;
+	// Prio: Recent posts will get higher priority compared to older posts, in case the SE doesn't want to index all posts!
+	// Change frequency: recent posts are more likely to change often than older posts, especially regarding comments.
+	// We hint SEs to check back more often (and not to waste indexing credits on old stuff).
+	if( $age < 8 )
+	{
+		$prio = 0.9;
+		$changefreq = 'hourly';
+	}
+	elseif( $age < 30 )
+	{
+		$prio = 0.8;
+		$changefreq = 'daily';
+	}
+	elseif( $age < 90 )
+	{
+		$prio = 0.7;
+		$changefreq = 'daily';
+	}
+	elseif( $age < 365 )
+	{
+		$prio = 0.6;
+		$changefreq = 'weekly';
+	}
+	else
+	{
+		$prio = 0.5;
+		$changefreq = 'monthly';
+	}
 	?>
 	<url>
 		<loc><?php $Item->permanent_url( 'single' ) ?></loc>
-		<lastmod><?php $Item->mod_date( 'isoZ', true ) ?></lastmod>
-		<priority>0.9</priority>
+		<lastmod><?php $Item->mod_date( 'isoZ', true ) /* fp> date_touched including comments would be even better */ ?></lastmod>
+		<priority><?php echo $prio; ?></priority>
+		<changefreq><?php echo $changefreq; ?></changefreq>
 	</url>
 	<?php
 } ?>
