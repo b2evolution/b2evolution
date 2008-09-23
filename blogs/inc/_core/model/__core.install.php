@@ -375,7 +375,7 @@ $schema_queries = array(
 		'Creating table for File Meta Data',
 		"CREATE TABLE T_files (
 			file_ID        int(11) unsigned  not null AUTO_INCREMENT,
-			file_root_type enum('absolute','user','group','collection','skins') not null default 'absolute',
+			file_root_type enum('absolute','user','collection','shared','skins') not null default 'absolute',
 			file_root_ID   int(11) unsigned  not null default 0,
 			file_path      varchar(255)      not null default '',
 			file_title     varchar(255),
@@ -539,6 +539,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.4  2008/09/23 06:18:33  fplanque
+ * File manager now supports a shared directory (/media/shared/global/)
+ *
  * Revision 1.3  2008/07/03 09:55:07  yabs
  * widget UI
  *

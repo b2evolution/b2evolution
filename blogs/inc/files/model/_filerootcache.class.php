@@ -71,7 +71,7 @@ class FileRootCache
 			$r[ $user_FileRoot->ID ] = & $user_FileRoot;
 		}
 
-		// blog/collection media dirs:
+		// Blog/collection media dirs:
 		$BlogCache = & get_Cache( 'BlogCache' );
 		$bloglist = $BlogCache->load_user_blogs( 'blog_media_browse', $current_User->ID );
 		foreach( $bloglist as $blog_ID )
@@ -82,7 +82,14 @@ class FileRootCache
 			}
 		}
 
-		// skins root:
+		// Shared root:
+		$shared_FileRoot = & $this->get_by_type_and_ID( 'shared', 0, true );
+		if( $shared_FileRoot )
+		{ // We got a shared dir:
+			$r[ $shared_FileRoot->ID ] = & $shared_FileRoot;
+		}
+
+		// Skins root:
 		$skins_FileRoot = & $this->get_by_type_and_ID( 'skins', 0, false );
 		if( $skins_FileRoot )
 		{ // We got a skins dir:
@@ -154,6 +161,9 @@ class FileRootCache
 
 /*
  * $Log$
+ * Revision 1.3  2008/09/23 06:18:38  fplanque
+ * File manager now supports a shared directory (/media/shared/global/)
+ *
  * Revision 1.2  2008/01/21 09:35:29  fplanque
  * (c) 2008
  *

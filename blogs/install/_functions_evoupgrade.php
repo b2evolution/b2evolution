@@ -2187,6 +2187,13 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9900' );
 	}
 
+	echo 'Upgrading Files table... ';
+	$DB->query( "ALTER TABLE T_files
+							CHANGE COLUMN file_root_type file_root_type enum('absolute','user','collection','shared','skins') not null default 'absolute'" );
+	echo "OK.<br />\n";
+
+
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -2305,6 +2312,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.261  2008/09/23 06:18:39  fplanque
+ * File manager now supports a shared directory (/media/shared/global/)
+ *
  * Revision 1.260  2008/09/07 07:57:58  fplanque
  * doc
  *

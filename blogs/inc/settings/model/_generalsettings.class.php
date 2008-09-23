@@ -76,8 +76,8 @@ class GeneralSettings extends AbstractSettings
 		'fm_enable_create_dir' => '1',
 		'fm_enable_create_file' => '1',
 		'fm_enable_roots_blog' => '1',
-		// 'fm_enable_roots_group' => '0',  // TO DO
 		'fm_enable_roots_user' => '1',
+		'fm_enable_roots_shared' => '1',
 		'fm_enable_roots_skins' => '1',
 
 		'fm_showtypes' => '0',
@@ -159,6 +159,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.10  2008/09/23 06:18:38  fplanque
+ * File manager now supports a shared directory (/media/shared/global/)
+ *
  * Revision 1.9  2008/04/04 17:02:22  fplanque
  * cleanup of global settings
  *

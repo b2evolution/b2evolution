@@ -60,8 +60,8 @@ switch( $action )
 			$Settings->delete_array( array(
 					'fm_enabled',
 					'fm_enable_roots_blog',
-					// 'fm_enable_roots_group',
 					'fm_enable_roots_user',
+					'fm_enable_roots_shared',
 					'fm_enable_roots_skins',
 					'fm_enable_create_dir',
 					'fm_default_chmod_dir',
@@ -88,10 +88,11 @@ switch( $action )
 			param( 'fm_enable_roots_blog', 'integer', 0 );
 			$Settings->set( 'fm_enable_roots_blog', $fm_enable_roots_blog );
 
-			// param( 'fm_enable_roots_group', 'fm_enable_roots_group', 'integer', 0 );
-
 			param( 'fm_enable_roots_user', 'integer', 0 );
 			$Settings->set( 'fm_enable_roots_user', $fm_enable_roots_user );
+
+			param( 'fm_enable_roots_shared', 'integer', 0 );
+			$Settings->set( 'fm_enable_roots_shared', $fm_enable_roots_shared );
 
 			param( 'fm_enable_roots_skins', 'integer', 0 );
 			$Settings->set( 'fm_enable_roots_skins', $fm_enable_roots_skins );
@@ -179,6 +180,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2008/09/23 06:18:34  fplanque
+ * File manager now supports a shared directory (/media/shared/global/)
+ *
  * Revision 1.2  2008/01/21 09:35:28  fplanque
  * (c) 2008
  *
