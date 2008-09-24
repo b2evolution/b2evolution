@@ -23,14 +23,17 @@ skin_widget( array(
 		'block_start' => '',
 		'block_end' => '',
 		'block_display_title' => false,
-		'mediaindex_start' => '<table class="image_index" cellspacing="3">',
-		'mediaindex_end' => '</table>',
-		'mediaindex_cols' => 8,
-		'mediaindex_colstart' => '<tr>',
-		'mediaindex_colend' => '</tr>',
-		'media_start' => '<td>',
-		'media_end' => '</td>',
-		'media_thumb_size' => 'fit-80x80',
+		'thumb_size' => 'fit-80x80',
+		'thumb_layout' => 'grid',
+		'grid_start' => '<table class="image_index" cellspacing="3">',
+		'grid_end' => '</table>',
+		'grid_nb_cols' => 8,
+		'grid_colstart' => '<tr>',
+		'grid_colend' => '</tr>',
+		'grid_cellstart' => '<td>',
+		'grid_cellend' => '</td>',
+		'order_by' => $Blog->get_setting('orderby'),
+		'order_dir' => $Blog->get_setting('orderdir'),
 		'limit' => 1000,
 	) );
 // ---------------------------------- END OF MEDIA INDEX ---------------------------------
@@ -38,6 +41,9 @@ skin_widget( array(
 
 /*
  * $Log$
+ * Revision 1.5  2008/09/24 08:47:12  fplanque
+ * enhanced mediaidx widget
+ *
  * Revision 1.4  2008/09/23 09:04:33  fplanque
  * moved media index to a widget
  *

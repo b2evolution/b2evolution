@@ -277,6 +277,15 @@ div.skin_error {
 	margin: 1em;
 }
 
+table.widget_grid {
+	margin: 8px auto 1px;
+}
+table.widget_grid td {
+	background-color: #ccc;
+}
+table.widget_grid td {
+	padding: 0;
+}
 
 div.debug_container {
 	border: 1px solid #f00;
