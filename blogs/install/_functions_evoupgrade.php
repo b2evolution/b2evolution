@@ -2136,62 +2136,60 @@ function upgrade_b2evo_tables()
 	}
 
 
-	// dh> TODO: needs checkpoint block!
-	echo 'Updating keyphrases in hitlog table... ';
-	flush();
-	load_funcs( 'sessions/model/_hit.class.php' );
-  $sql = 'SELECT hit_ID, hit_referer
-  					FROM T_hitlog
-   				 WHERE hit_referer_type = "search"
-   				 	 AND hit_keyphrase_keyp_ID IS NULL'; // this line just in case we crashed in the middle, so we restart where we stopped
-	$rows = $DB->get_results( $sql, OBJECT, 'get all search hits' );
-	foreach( $rows as $row )
-	{
-		$keyphrase = extract_keyphrase_from_referer( $row->hit_referer );
-		if( empty( $keyphrase ) )
-		{
-			continue;
-		}
-
-		$DB->begin();
-
-		$sql = 'SELECT keyp_ID
-		          FROM T_track__keyphrase
-		         WHERE keyp_phrase = '.$DB->quote($keyphrase);
-		$keyp_ID = $DB->get_var( $sql, 0, 0, 'Get keyphrase ID' );
-
-		if( empty( $keyp_ID ) )
-		{
-			$sql = 'INSERT INTO T_track__keyphrase( keyp_phrase )
-			        VALUES ('.$DB->quote($keyphrase).')';
-			$DB->query( $sql, 'Add new keyphrase' );
-			$keyp_ID = $DB->insert_id;
-		}
-
-		$DB->query( 'UPDATE T_hitlog
-		                SET hit_keyphrase_keyp_ID = '.$keyp_ID.'
-		              WHERE hit_ID = '.$row->hit_ID, 'Update hit' );
-
-		$DB->commit();
-		echo ". \n";
-	}
-	echo "OK.<br />\n";
-
-
 	if( $old_db_version < 9900 )
-	{	// drag n drop widgets
+	{	// 3.0
+		task_begin( 'Updating keyphrases in hitlog table... ' );
+		flush();
+		load_funcs( 'sessions/model/_hit.class.php' );
+	  $sql = 'SELECT hit_ID, hit_referer
+  						FROM T_hitlog
+   					 WHERE hit_referer_type = "search"
+   				 		 AND hit_keyphrase_keyp_ID IS NULL'; // this line just in case we crashed in the middle, so we restart where we stopped
+		$rows = $DB->get_results( $sql, OBJECT, 'get all search hits' );
+		foreach( $rows as $row )
+		{
+			$keyphrase = extract_keyphrase_from_referer( $row->hit_referer );
+			if( empty( $keyphrase ) )
+			{
+				continue;
+			}
+
+			$DB->begin();
+
+			$sql = 'SELECT keyp_ID
+			          FROM T_track__keyphrase
+			         WHERE keyp_phrase = '.$DB->quote($keyphrase);
+			$keyp_ID = $DB->get_var( $sql, 0, 0, 'Get keyphrase ID' );
+
+			if( empty( $keyp_ID ) )
+			{
+				$sql = 'INSERT INTO T_track__keyphrase( keyp_phrase )
+				        VALUES ('.$DB->quote($keyphrase).')';
+				$DB->query( $sql, 'Add new keyphrase' );
+				$keyp_ID = $DB->insert_id;
+			}
+
+			$DB->query( 'UPDATE T_hitlog
+			                SET hit_keyphrase_keyp_ID = '.$keyp_ID.'
+			              WHERE hit_ID = '.$row->hit_ID, 'Update hit' );
+
+			$DB->commit();
+			echo ". \n";
+		}
+		task_end();
+
 		task_begin( 'Upgrading widgets table... ' );
 		$DB->query( "ALTER TABLE T_widget
 			CHANGE COLUMN wi_order wi_order INT(10) NOT NULL" );
 		task_end();
+
+		task_begin( 'Upgrading Files table... ' );
+		$DB->query( "ALTER TABLE T_files
+								CHANGE COLUMN file_root_type file_root_type enum('absolute','user','collection','shared','skins') not null default 'absolute'" );
+		task_end();
+
 		set_upgrade_checkpoint( '9900' );
 	}
-
-	echo 'Upgrading Files table... ';
-	$DB->query( "ALTER TABLE T_files
-							CHANGE COLUMN file_root_type file_root_type enum('absolute','user','collection','shared','skins') not null default 'absolute'" );
-	echo "OK.<br />\n";
-
 
 
 	/*
@@ -2312,6 +2310,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.262  2008/09/24 09:28:36  fplanque
+ * no message
+ *
  * Revision 1.261  2008/09/23 06:18:39  fplanque
  * File manager now supports a shared directory (/media/shared/global/)
  *
