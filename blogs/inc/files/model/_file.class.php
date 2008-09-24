@@ -1702,54 +1702,22 @@ class File extends DataObject
 	 */
 	function thumbnail( $req_size )
 	{
+		global $thumbnail_sizes;
+
 		load_funcs( '/files/model/_image.funcs.php' );
 
 		$size_name = $req_size;
-		switch( $req_size )
+		if( isset($thumbnail_sizes[$req_size] ) )
 		{
-			case 'fit-720x500';
-				$thumb_width = 720;
-				$thumb_height = 500;
-				$thumb_quality = 90;
-				break;
-
-			case 'fit-640x480';
-				$thumb_width = 640;
-				$thumb_height = 480;
-				$thumb_quality = 90;
-				break;
-
-			case 'fit-520x390';
-				$thumb_width = 520;
-				$thumb_height = 390;
-				$thumb_quality = 90;
-				break;
-
-			case 'fit-400x320';
-				$thumb_width = 400;
-				$thumb_height = 320;
-				$thumb_quality = 85;
-				break;
-
-			case 'fit-320x320';
-				$thumb_width = 320;
-				$thumb_height = 320;
-				$thumb_quality = 85;
-				break;
-
-			case 'fit-160x120';
-				$thumb_width = 160;
-				$thumb_height = 120;
-				$thumb_quality = 80;
-				break;
-
-			case 'fit-80x80';
-			default:
-				$size_name = 'fit-80x80';
-				$thumb_width = 80;
-				$thumb_height = 80;
-				$thumb_quality = 75;
+			$size_name = $req_size;
 		}
+		else
+		{
+			$size_name = 'fit-80x80';
+		}
+
+		// Set all params for requested size:
+		list( $thumb_type, $thumb_width, $thumb_height, $thumb_quality ) = $thumbnail_sizes[$size_name];
 
 		$mimetype = $this->Filetype->mimetype;
 
@@ -1763,7 +1731,7 @@ class File extends DataObject
 			list( $err, $src_imh ) = load_image( $this->get_full_path(), $mimetype );
 			if( empty( $err ) )
 			{
-				list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_width, $thumb_height );
+				list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height );
 				if( empty( $err ) )
 				{
 					$err = $this->save_thumb_to_cache( $dest_imh, $size_name, $mimetype, $thumb_quality );
@@ -1829,6 +1797,10 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2008/09/24 08:35:11  fplanque
+ * Support of "cropped" thumbnails (the image will always fill the whole thumbnail area)
+ * Thumbnail sizes can be configured in /conf/_advanced.php
+ *
  * Revision 1.11  2008/09/23 09:04:33  fplanque
  * moved media index to a widget
  *

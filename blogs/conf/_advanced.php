@@ -61,6 +61,23 @@ $log_app_errors = 1;
 
 
 /**
+ * Thumbnail size definitions
+ *
+ * type, width, height, quality
+ */
+$thumbnail_sizes = array(
+			'fit-720x500' => array( 'fit', 720, 500, 90 ),
+			'fit-640x480' => array( 'fit', 640, 480, 90 ),
+			'fit-520x390' => array( 'fit', 520, 390, 90 ),
+			'fit-400x320' => array( 'fit', 400, 320, 85 ),
+			'fit-320x320' => array( 'fit', 320, 320, 85 ),
+			'fit-160x120' => array( 'fit', 160, 120, 80 ),
+			'fit-80x80' => array( 'fit', 80, 80, 75 ),
+			'crop-80x80' => array( 'crop', 80, 80, 80 ),
+	);
+
+
+/**
  * Demo mode
  *  - Do not allow update of files in the file manager
  *  - Do not allow changes to the 'demouser' and 'admin' account/group

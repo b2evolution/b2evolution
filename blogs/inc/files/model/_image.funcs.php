@@ -30,6 +30,52 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * @return array 'key'=>'name'
+ */
+function get_available_thumb_sizes()
+{
+	global $thumbnail_sizes;
+
+	$thumb_size_names = array();
+
+	foreach( $thumbnail_sizes as $key=>$dummy )
+	{
+		$thumb_size_names[$key] = $key;
+	}
+
+	return $thumb_size_names;
+}
+
+
+/**
+ * Crop dimensions to fit into a constrained size, while preserving aspect ratio.
+ *
+ * @param integer source width
+ * @param integer source height
+ * @param integer constrained width
+ * @param integer constrained height
+ */
+function crop_to_constraint( $src_width, $src_height, $max_width, $max_height )
+{
+	$src_ratio = $src_width / $src_height;
+	if( $max_width / $max_height <= $src_ratio )
+	{
+		$x = ($src_width - $src_height) / 2;
+		$y = 0;
+		$src_width = $src_height;
+	}
+	else
+	{
+		$x = 0;
+		$y = ($src_height - $src_width) / 2;
+		$src_height = $src_width;
+	}
+
+	return array( $x, $y, $src_width, $src_height );
+}
+
+
+/**
  * Scale dimensions to fit into a constrained size, while preserving aspect ratio.
  *
  * @param integer source width
@@ -200,7 +246,7 @@ function output_image( $imh, $mimetype )
  *
  * @return array short error code + dest image handler
  */
-function generate_thumb( $src_imh, $thumb_width, $thumb_height )
+function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 {
 	$src_width = imagesx( $src_imh ) ;
 	$src_height = imagesy( $src_imh );
@@ -210,15 +256,29 @@ function generate_thumb( $src_imh, $thumb_width, $thumb_height )
 		return array( NULL, $src_imh );
 	}
 
-	list( $dest_width, $dest_height ) = scale_to_constraint( $src_width, $src_height, $thumb_width, $thumb_height );
+	switch( $thumb_type )
+	{
+		case 'crop':
+			list( $src_x, $src_y, $src_width, $src_height) = crop_to_constraint( $src_width, $src_height, $thumb_width, $thumb_height );
+			$dest_width = $thumb_width;
+			$dest_height = $thumb_height;
+			break;
 
-	// pre_dump( $src_width, $src_height, $dest_width, $dest_height );
+		case 'fit':
+		default:
+			list( $dest_width, $dest_height ) = scale_to_constraint( $src_width, $src_height, $thumb_width, $thumb_height );
+			$src_x = $src_y = 0;
+	}
+
+	// pre_dump( $src_x, $src_y, $dest_width, $dest_height, $src_width, $src_height );
 
 	$dest_imh = imagecreatetruecolor( $dest_width, $dest_height ); // Create a black image
-	if( ! imagecopyresampled( $dest_imh, $src_imh, 0, 0, 0, 0, $dest_width, $dest_height, $src_width, $src_height ) )
+
+	if( ! imagecopyresampled( $dest_imh, $src_imh, 0, 0, $src_x, $src_y, $dest_width, $dest_height, $src_width, $src_height ) )
 	{
 		return array( '!GD-library internal error (resample)', $dest_imh );
 	}
+
 
 	// TODO: imageinterlace();
 
@@ -227,6 +287,10 @@ function generate_thumb( $src_imh, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.4  2008/09/24 08:35:11  fplanque
+ * Support of "cropped" thumbnails (the image will always fill the whole thumbnail area)
+ * Thumbnail sizes can be configured in /conf/_advanced.php
+ *
  * Revision 1.3  2008/01/21 09:35:29  fplanque
  * (c) 2008
  *

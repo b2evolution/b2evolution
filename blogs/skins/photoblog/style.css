@@ -198,6 +198,7 @@ table.image_index td {
 	text-align: center;
 	vertical-align: middle;
 	border: 1px solid #333;
+	padding: 0;
 }
 table.image_index td:hover {
 	background: #777;
