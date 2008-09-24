@@ -1661,7 +1661,11 @@ function mail_encode_header_string( $header_str, $mode = 'Q' )
 	/* mbstring way  (did not work for Alex RU)
 	if( function_exists('mb_encode_mimeheader') )
 	{ // encode subject
-		$subject = mb_encode_mimeheader( $subject, mb_internal_encoding(), 'B', $NL );
+		$orig = mb_internal_encoding();
+		mb_internal_encoding('utf-8');
+		$r = mb_encode_mimeheader( $header_str, 'utf-8', $mode );
+		mb_internal_encoding($orig);
+		return $r;
 	}
 	*/
 
@@ -1740,7 +1744,6 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	// echo 'sending email to: ['.htmlspecialchars($to).'] from ['.htmlspecialchars($from).']';
 
-	// sam2k way that doe snot require mbstring:
 	$subject = mail_encode_header_string($subject);
 
 	$message = str_replace( array( "\r\n", "\r" ), $NL, $message );
@@ -2946,6 +2949,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.48  2008/09/24 20:15:31  blueyed
+ * Since the commented mbstring way in mail_encode_header_string() has been ''rolled back'', I can provide the method that works, too
+ *
  * Revision 1.47  2008/09/24 08:44:12  fplanque
  * Fixed and normalized order params for widgets (Comments not done yet)
  *
