@@ -1658,6 +1658,13 @@ function mail_encode_header_string( $header_str, $mode = 'Q' )
 {
 	global $evo_charset;
 
+	/* mbstring way  (did not work for Alex RU)
+	if( function_exists('mb_encode_mimeheader') )
+	{ // encode subject
+		$subject = mb_encode_mimeheader( $subject, mb_internal_encoding(), 'B', $NL );
+	}
+	*/
+
 	if( preg_match( '¤[^a-z0-9!*+\-/ ]¤i', $header_str ) )
 	{	// If the string actually needs some encoding
 		if( $mode == 'Q' )
@@ -2892,10 +2899,55 @@ function format_to_js( $unformatted )
 	return $formatted;
 }
 
+
+/**
+ * @return array key=>name
+ */
+function get_available_sort_options()
+{
+	return array(
+		'datestart'    => T_('Date issued (Default)'),
+		'order'        => T_('Order (as explicitely specified)'),
+		//'datedeadline' => T_('Deadline'),
+		'title'        => T_('Title'),
+		'datecreated'  => T_('Date created'),
+		'datemodified' => T_('Date last modified'),
+		'urltitle'     => T_('URL "filename"'),
+		'priority'     => T_('Priority'),
+		'RAND'         => T_('Random order!'),
+	);
+}
+
+
+/**
+ * Generate order by clause
+ *
+ * @return string
+ */
+function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambiguation )
+{
+	$orderby = str_replace( ' ', ',', $order_by );
+	$orderby_array = explode( ',', $orderby );
+
+	// Format each order param with default column names:
+	$orderby_array = preg_replace( '#^(.+)$#', $dbprefix.'$1 '.$order_dir, $orderby_array );
+
+	$order_by = implode( ', ', $orderby_array );
+
+	// Special case for RAND:
+	$order_by = str_replace( $dbprefix.'RAND ', 'RAND()', $order_by );
+
+	// Add an ID parameter to make sure there is no ambiguity in ordering on similar items:
+	$order_by = $order_by.', '.$dbIDname_disambiguation.' '.$order_dir;
+
+	return $order_by;
+}
+
+
 /*
  * $Log$
- * Revision 1.46  2008/09/15 20:47:38  blueyed
- * mail_encode_header_string(): remove commented blueyed-way block
+ * Revision 1.47  2008/09/24 08:44:12  fplanque
+ * Fixed and normalized order params for widgets (Comments not done yet)
  *
  * Revision 1.45  2008/09/15 03:11:36  fplanque
  * target control

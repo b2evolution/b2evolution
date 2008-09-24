@@ -352,14 +352,15 @@ class ComponentWidget extends DataObject
 					'item_text_end' => '',
 					'item_selected_start' => '<li class="selected">',
 					'item_selected_end' => '</li>',
-					'mediaindex_start' => '<ul>',
-					'mediaindex_end' => '</ul>',
-					'mediaindex_cols' => 1,
-					'mediaindex_colstart' => ' ',
-					'mediaindex_colend' => ' ',
-					'media_start' => '<li>',
-					'media_end' => '</li>',
-					'media_thumb_size' => 'fit-160x120',
+					'grid_start' => '<table cellspacing="1" class="widget_grid">',
+					'grid_end' => '</table>',
+					'grid_nb_cols' => 2,
+					'grid_colstart' => '<tr>',
+					'grid_colend' => '</tr>',
+					'grid_cellstart' => '<td>',
+					'grid_cellend' => '</td>',
+					'thumb_size' => 'crop-80x80',
+					// 'thumb_size' => 'fit-160x120',
 					'link_selected_class' => 'selected',
 					'link_type' => 'canonic',		// 'canonic' | 'context' (context will regenrate URL injecting/replacing a single filter)
 					'item_selected_text_start' => '',
@@ -472,15 +473,16 @@ class ComponentWidget extends DataObject
 		{
 			$ItemList->set_filters( array(
 					'types' => '1000',					// Restrict to type 1000 (pages)
-					'orderby' => 'title',
-					'order' => ( $this->disp_params[ 'disp_order' ] ? $this->disp_params[ 'disp_order' ] : 'ASC' ),
+					'orderby' => $this->disp_params[ 'order_by' ],
+					'order' => $this->disp_params[ 'order_dir' ],
 					'unit' => 'posts',
 				), false );
 		}
 		else
 		{	// post list
 			$ItemList->set_filters( array(
-					'order' => ( $this->disp_params[ 'disp_order' ] ? $this->disp_params[ 'disp_order' ] : 'DESC' ),
+					'orderby' => $this->disp_params[ 'order_by' ],
+					'order' => $this->disp_params[ 'order_dir' ],
 					'unit' => 'posts',						// We want to advertise all items (not just a page or a day)
 				) );
 		}
@@ -742,6 +744,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2008/09/24 08:44:12  fplanque
+ * Fixed and normalized order params for widgets (Comments not done yet)
+ *
  * Revision 1.37  2008/09/23 09:04:33  fplanque
  * moved media index to a widget
  *

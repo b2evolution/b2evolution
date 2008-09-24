@@ -83,16 +83,7 @@ $Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear
 
 
 $Form->begin_fieldset( T_('Content / Posts') );
-	$Form->select_input_array( 'orderby', $edited_Blog->get_setting('orderby'), array(
-												'datestart'    => T_('Date issued (Default)'),
-												'order'        => T_('Order (as explicitely specified)'),
-												//'datedeadline' => T_('Deadline'),
-												'title'        => T_('Title'),
-												'datecreated'  => T_('Date created'),
-												'datemodified' => T_('Date last modified'),
-												'urltitle'     => T_('URL "filename"'),
-												'priority'     => T_('Priority'),
-											), T_('Order by'), T_('Default ordering of posts.') );
+	$Form->select_input_array( 'orderby', $edited_Blog->get_setting('orderby'), get_available_sort_options(), T_('Order by'), T_('Default ordering of posts.') );
 	$Form->select_input_array( 'orderdir', $edited_Blog->get_setting('orderdir'), array(
 												'ASC'  => T_('Ascending'),
 												'DESC' => T_('Descending'), ), T_('Direction') );
@@ -123,6 +114,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.6  2008/09/24 08:44:11  fplanque
+ * Fixed and normalized order params for widgets (Comments not done yet)
+ *
  * Revision 1.5  2008/02/09 02:56:00  fplanque
  * explicit order by field
  *

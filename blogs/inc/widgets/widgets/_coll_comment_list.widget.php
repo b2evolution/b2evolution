@@ -70,8 +70,8 @@ class coll_comment_list_Widget extends ComponentWidget
 				'defaultvalue' => 'DESC',
 			),
 			'limit' => array(
-				'label' => T_( 'Display' ),
-				'note' => T_( 'Max items to display.' ),
+				'label' => T_( 'Max items' ),
+				'note' => T_( 'Maximum number of items to display.' ),
 				'size' => 4,
 				'defaultvalue' => 20,
 			),
@@ -171,6 +171,9 @@ class coll_comment_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.9  2008/09/24 08:44:11  fplanque
+ * Fixed and normalized order params for widgets (Comments not done yet)
+ *
  * Revision 1.8  2008/09/23 09:04:32  fplanque
  * moved media index to a widget
  *

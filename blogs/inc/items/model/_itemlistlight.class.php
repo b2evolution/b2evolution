@@ -643,26 +643,7 @@ class ItemListLight extends DataObjectList2
 		/*
 		 * ORDER BY stuff:
 		 */
-		$order = $this->filters['order'];
-		if( strtoupper( $order ) == 'RAND' )
-		{
-			$order_by = 'RAND()';
-		}
-		else
-		{
-			$orderby = str_replace( ' ', ',', $this->filters['orderby'] );
-			$orderby_array = explode( ',', $orderby );
-
-			// Format each order param with default column names:
-			$orderby_array = preg_replace( '#^(.+)$#', $this->Cache->dbprefix.'$1 '.$order, $orderby_array );
-			// walter>fp> $order_cols_to_select = $orderby_array;
-
-			// Add an ID parameter to make sure there is no ambiguity in ordering on similar items:
-			$orderby_array[] = $this->Cache->dbIDname.' '.$order;
-
-			$order_by = implode( ', ', $orderby_array );
-		}
-
+		$order_by = gen_order_clause( $this->filters['orderby'], $this->filters['order'], $this->Cache->dbprefix, $this->Cache->dbIDname );
 
 		$this->ItemQuery->order_by( $order_by );
 
@@ -1138,7 +1119,7 @@ class ItemListLight extends DataObjectList2
 			}
 		}
 		else
-		{ 
+		{
 			debug_die( 'Unhandled LIMITING mode in ItemList:'.$this->filters['unit'].' (paged mode is obsolete)' );
 		}
 
@@ -1514,6 +1495,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.23  2008/09/24 08:44:12  fplanque
+ * Fixed and normalized order params for widgets (Comments not done yet)
+ *
  * Revision 1.22  2008/07/01 08:32:13  fplanque
  * minor
  *

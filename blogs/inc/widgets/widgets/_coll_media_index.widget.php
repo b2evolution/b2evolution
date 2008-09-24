@@ -55,6 +55,8 @@ class coll_media_index_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array_merge( array(
 			'title' => array(
 				'label' => t_('Block title'),
@@ -62,11 +64,45 @@ class coll_media_index_Widget extends ComponentWidget
 				'size' => 40,
 				'defaultvalue' => T_('Recent photos'),
 			),
+			'thumb_size' => array(
+				'label' => T_('Thumbnail size'),
+				'note' => T_('Cropping and sizing of thumbnails'),
+				'type' => 'select',
+				'options' => get_available_thumb_sizes(),
+				'defaultvalue' => 'crop-80x80',
+			),
+			'thumb_layout' => array(
+				'label' => T_('Layout'),
+				'note' => T_('How to lay out the thumbnails'),
+				'type' => 'select',
+				'options' => array( 'grid' => T_( 'Grid' ), 'list' => T_( 'List' ) ),
+				'defaultvalue' => 'grid',
+			),
+			'grid_nb_cols' => array(
+				'label' => T_( 'Columns' ),
+				'note' => T_( 'Number of columns in grod mode.' ),
+				'size' => 4,
+				'defaultvalue' => 2,
+			),
 			'limit' => array(
-				'label' => T_( 'Display' ),
-				'note' => T_( 'Max items to display.' ),
+				'label' => T_( 'Max items' ),
+				'note' => T_( 'Maximum number of items to display.' ),
 				'size' => 4,
 				'defaultvalue' => 3,
+			),
+			'order_by' => array(
+				'label' => T_('Order by'),
+				'note' => T_('How to sort the items'),
+				'type' => 'select',
+				'options' => get_available_sort_options(),
+				'defaultvalue' => 'datestart',
+			),
+			'order_dir' => array(
+				'label' => T_('Direction'),
+				'note' => T_('How to sort the items'),
+				'type' => 'select',
+				'options' => array( 'ASC'  => T_('Ascending'), 'DESC' => T_('Descending') ),
+				'defaultvalue' => 'DESC',
 			),
 			'blog_ID' => array(
 				'label' => T_( 'Blog' ),
@@ -140,16 +176,25 @@ class coll_media_index_Widget extends ComponentWidget
 		$SQL->WHERE_and( 'post_status = "published"' );	// TODO: this is a dirty temporary hack. More should be shown.
 		$SQL->GROUP_BY( 'link_ID' );
 		$SQL->LIMIT( $this->disp_params[ 'limit' ] );
-		$SQL->ORDER_BY( 'post_'.$list_Blog->get_setting('orderby').' '.$list_Blog->get_setting('orderdir')
-										.', post_ID '.$list_Blog->get_setting('orderdir').', link_ID' );
+		$SQL->ORDER_BY(	gen_order_clause( $this->disp_params['order_by'], $this->disp_params['order_dir'],
+											'post_', 'post_ID '.$this->disp_params['order_dir'].', link_ID' ) );
 
 		$FileList->sql = $SQL->get();
 
 		$FileList->query( false, false, false );
 
-		echo $this->disp_params[ 'mediaindex_start' ];
+		$layout = $this->disp_params[ 'thumb_layout' ];
 
-		$nb_cols = $this->disp_params[ 'mediaindex_cols' ];
+		if( $layout == 'grid' )
+		{
+			echo $this->disp_params[ 'grid_start' ];
+		}
+		else
+		{
+			echo $this->disp_params[ 'list_start' ];
+		}
+
+		$nb_cols = $this->disp_params[ 'grid_nb_cols' ];
 		$count = 0;
 		$prev_post_ID = 0;
     /**
@@ -163,11 +208,18 @@ class coll_media_index_Widget extends ComponentWidget
 				continue;
 			}
 
-			if( $count % $nb_cols == 0 )
+			if( $layout == 'grid' )
 			{
-      	echo $this->disp_params[ 'mediaindex_colstart' ];
+				if( $count % $nb_cols == 0 )
+				{
+      		echo $this->disp_params[ 'grid_colstart' ];
+				}
+				echo $this->disp_params[ 'grid_cellstart' ];
 			}
-			echo $this->disp_params[ 'media_start' ];
+			else
+			{
+				echo $this->disp_params[ 'item_start' ];
+			}
 
 			$post_ID = $FileList->rows[$FileList->current_idx-1]->post_ID;
 			if( $post_ID != $prev_post_ID )
@@ -187,26 +239,38 @@ class coll_media_index_Widget extends ComponentWidget
 
 			echo '<a href="'.$ItemLight->get_permanent_url().'">';
 			// Generate the IMG THUMBNAIL tag with all the alt, title and desc if available
-			echo '<img src="'.$File->get_thumb_url( $this->disp_params['media_thumb_size'] ).'" '
+			echo '<img src="'.$File->get_thumb_url( $this->disp_params['thumb_size'] ).'" '
 						.'alt="'.$File->dget('alt', 'htmlattr').'" '
 						.'title="'.$File->dget('title', 'htmlattr').'" />';
 			echo '</a>';
 
-     	echo $this->disp_params[ 'media_end' ];
-			if( $count % $nb_cols == 0 )
+			if( $layout == 'grid' )
 			{
-      	echo $this->disp_params[ 'mediaindex_colend' ];
+     		echo $this->disp_params[ 'grid_cellend' ];
+				if( $count % $nb_cols == 0 )
+				{
+      		echo $this->disp_params[ 'grid_colend' ];
+				}
+			}
+			else
+			{
+      	echo $this->disp_params[ 'item_end' ];
+			}
+		}
+
+		if( $layout == 'grid' )
+		{
+			if( $count && ( $count % $nb_cols != 0 ) )
+			{
+     		echo $this->disp_params[ 'grid_colend' ];
 			}
 
+			echo $this->disp_params[ 'grid_end' ];
 		}
-
-		if( $count && ( $count % $nb_cols != 0 ) )
+		else
 		{
-     	echo $this->disp_params[ 'mediaindex_colend' ];
+      echo $this->disp_params[ 'list_end' ];
 		}
-
-
-		echo $this->disp_params[ 'mediaindex_end' ];
 
 
 		echo $this->disp_params[ 'block_end' ];
@@ -218,6 +282,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2008/09/24 08:44:11  fplanque
+ * Fixed and normalized order params for widgets (Comments not done yet)
+ *
  * Revision 1.1  2008/09/23 09:04:33  fplanque
  * moved media index to a widget
  *
