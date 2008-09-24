@@ -277,7 +277,7 @@ function install_basic_widgets()
 
 	echo 'Installing default widgets... ';
 
-	// Add nlog list to all blog Page Tops:
+	// Add blog list to all blog Page Tops:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							 SELECT blog_ID, "Page Top", 1, "core", "colls_list_public"
 							   FROM T_blogs' );
@@ -308,10 +308,11 @@ function install_basic_widgets()
 							 SELECT blog_ID, "Menu", 4, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'login'))).'"
 							   FROM T_blogs' );
 
-	// Add Calendar plugin to all blog Sidebars:
+	// Add Calendar plugin to all blog Sidebars except blog A:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							 SELECT blog_ID, "Sidebar", 1, "plugin", "evo_Calr"
-							   FROM T_blogs' );
+							   FROM T_blogs
+							  WHERE blog_ID > 1' );
 	// Add title to all blog Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							 SELECT blog_ID, "Sidebar", 2, "core", "coll_title"
@@ -582,6 +583,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.54  2008/09/24 10:39:42  fplanque
+ * no message
+ *
  * Revision 1.53  2008/09/24 10:36:32  fplanque
  * create some imagy widgets
  *
