@@ -70,7 +70,7 @@ class videoplug_plugin extends Plugin
 		$content = preg_replace( '¤\[video:ifilm:(.+?)]¤', '<div class="videoblock"><embed width="425" height="350" src="http://www.ifilm.com/efp" quality="high" bgcolor="000000" name="efp" align="middle" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="flvbaseclip=\\1"> </embed></div>', $content );
 
 		// vimeo
-		// TODO: might want to use oEmbed (to get title etc separately and display it below video): http://vimeo.com/api/docs/oembed
+		// blueyed> TODO: might want to use oEmbed (to get title etc separately and display it below video): http://vimeo.com/api/docs/oembed
 		$content = preg_replace( '~\[video:vimeo:(.+?)]~', '<div class="videoblock"><object data="http://vimeo.com/moogaloop.swf?clip_id=1737450&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" width="400" height="225" type="application/x-shockwave-flash">	<param name="allowfullscreen" value="true" />	<param name="allowscriptaccess" value="always" />	<param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$1&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /></object></div>', $content );
 
 		return true;
@@ -131,22 +131,23 @@ class videoplug_plugin extends Plugin
 					// TODO: verify validation / add for others..
 					switch( tag )
 					{
-					case 'youtube':
-						if( video_ID.match( /^\w+$/ ) )
-						{ // valid
-							valid_video_ID = true;
-						}
-						break;
-					case 'vimeo':
-						if( video_ID.match( /^\d+$/ ) )
-						{ // valid
-							valid_video_ID = true;
-						}
-						break;
+						case 'youtube':
+							if( video_ID.match( /^\w+$/ ) )
+							{ // valid
+								valid_video_ID = true;
+							}
+							break;
 
-					default:
-						valid_video_ID = true;
-						break;
+						case 'vimeo':
+							if( video_ID.match( /^\d+$/ ) )
+							{ // valid
+								valid_video_ID = true;
+							}
+							break;
+
+						default:
+							valid_video_ID = true;
+							break;
 					}
 
 					if( valid_video_ID )
@@ -171,6 +172,9 @@ class videoplug_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.14  2008/09/24 09:29:57  fplanque
+ * minor
+ *
  * Revision 1.13  2008/09/22 19:29:17  blueyed
  * videoplug_plugin: add vimeo service
  *
