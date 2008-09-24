@@ -332,14 +332,19 @@ function install_basic_widgets()
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							 SELECT blog_ID, "Sidebar", 6, "core", "coll_category_list"
 							   FROM T_blogs' );
+	// Add Random photo to blog Sidebars except blog B:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
+							 SELECT blog_ID, "Sidebar", 7, "core", "coll_media_index", \'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";s:7:"blog_ID";s:1:"4";s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\'
+							   FROM T_blogs
+							  WHERE blog_ID <> 2' );
 	// Add linkblog to blog Sidebars for blog A & B:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-							 SELECT blog_ID, "Sidebar", 7, "core", "linkblog", \'a:6:{s:5:"title";s:8:"Blogroll";s:11:"linkblog_ID";s:1:"3";s:14:"linkblog_limit";s:3:"100";s:11:"widget_name";s:8:"Linkblog";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\'
+							 SELECT blog_ID, "Sidebar", 8, "core", "linkblog", \'a:6:{s:5:"title";s:8:"Blogroll";s:11:"linkblog_ID";s:1:"3";s:14:"linkblog_limit";s:3:"100";s:11:"widget_name";s:8:"Linkblog";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\'
 							   FROM T_blogs
 							  WHERE blog_ID <= 2' );
 	// Add XML feeds to all blogs Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 8, "core", "coll_xml_feeds"
+							 SELECT blog_ID, "Sidebar", 9, "core", "coll_xml_feeds"
 							   FROM T_blogs' );
 
 	// All blog Sidebar 2:
@@ -352,7 +357,11 @@ function install_basic_widgets()
 							   FROM T_blogs' );
 
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-							 SELECT blog_ID, "Sidebar 2", 3, "core", "free_html", \'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\'
+							 SELECT blog_ID, "Sidebar 2", 3, "core", "coll_media_index", \'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";s:7:"blog_ID";s:1:"4";s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\'
+							   FROM T_blogs' );
+
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
+							 SELECT blog_ID, "Sidebar 2", 4, "core", "free_html", \'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\'
 							   FROM T_blogs' );
 
 	echo "OK.<br />\n";
@@ -573,6 +582,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.53  2008/09/24 10:36:32  fplanque
+ * create some imagy widgets
+ *
  * Revision 1.52  2008/09/22 20:06:13  blueyed
  * doc
  *
