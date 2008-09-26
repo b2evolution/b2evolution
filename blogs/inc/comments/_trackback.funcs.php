@@ -78,32 +78,45 @@ function trackback(
 	$Item = & $ItemCache->get_by_ID( $ID );
 	$url = rawurlencode( $Item->get_permanent_url('', '', '&') );
 	// dis is the trackback stuff to be sent:
-	$query_string = "title=$title&url=$url&blog_name=$blog_name&excerpt=$excerpt";
+	$query_string = 'title='.$title.'&url='.$url.'&blog_name='.$blog_name.'&excerpt='.$excerpt;
 	// echo "url:$trackback_url<br>$sending:$query_string<br />";
 
 	$result = '';
 	if (strstr($trackback_url, '?'))
-	{
+	{	// use a HTTP GET request
 		$Messages->add( $trackback_message.'[get]', 'note' );
-		$trackback_url .= "&".$query_string;;
-		flush();
-		if( $fp = fopen($trackback_url, 'r') )
+		$trackback_url = parse_url($trackback_url.'&'.$query_string);
+
+		if (((isset($trackback_url['host']) && !empty($trackback_url['host']))
+			&& (isset($trackback_url['path']) && !empty($trackback_url['path'])))
+			&& ($fp = fsockopen($trackback_url['host'], 80, $foo, $foo, 20)) !== false)
 		{
-			// blueyed>> why do we here just read the first 4kb, but in the POSTed response everything?
-			// fp>> this is dirty code... I've never really reviewed it entirely. Feel free to refactor as much as needed.
-			$result = fread($fp, 4096);
+			$header  = 'GET '.$trackback_url['path'].'?'.$trackback_url['query']." HTTP/1.0\r\n";
+			$header .= 'Host: '.$trackback_url['host']."\r\n";
+			$header .= 'User-Agent: '.$app_name.'/'.$app_version."\r\n\r\n";
+			fwrite($fp, $header, strlen($header));
+
+			if(function_exists('stream_set_timeout'))
+			{
+				stream_set_timeout($fp, 20); // PHP 4.3.0
+			}
+			else
+			{
+				socket_set_timeout($fp, 20); // PHP 4
+			}
+
+			while (!feof($fp))
+			{
+				$result .= fgets($fp);
+			}
 			fclose($fp);
 
 			/* debug code
-			$debug_file = 'trackback.log';
-			$fp = fopen($debug_file, 'a');
-			fwrite($fp, "\n*****\nTrackback URL query:\n\n$trackback_url\n\nResponse:\n\n");
-			fwrite($fp, $result);
-			fwrite($fp, "\n\n");
-			fclose($fp);
+			$df = fopen('trackback.log', 'a');
+			fwrite($df, "---------\nRequest:\n\n$header\n\nResponse:\n\n$result\n");
+			fclose($df);
 			*/
 		}
-
 	}
 	else
 	{
@@ -212,6 +225,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.4  2008/09/26 19:00:47  tblue246
+ * Partial rewrite of trackback(): use fsockopen() for GET requests instead of fopen().
+ *
  * Revision 1.3  2008/01/21 09:35:27  fplanque
  * (c) 2008
  *
