@@ -116,7 +116,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				{ // string begins:
 					$in_string = $qry[$i];
 				}
-				if( $qry[$i] === $in_string )
+				elseif( $qry[$i] === $in_string )
 				{
 					$in_string = false;
 				}
@@ -1224,6 +1224,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.5  2008/09/26 19:14:17  tblue246
+ * minor
+ *
  * Revision 1.4  2008/06/22 13:42:57  blueyed
  * db_delta(): add new query_type 'alter_engine', which adds a query to change the engine used for a table. Includes test.
  *
