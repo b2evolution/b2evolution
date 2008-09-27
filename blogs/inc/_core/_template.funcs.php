@@ -331,7 +331,6 @@ function request_title( $params = array() )
 function base_tag( $url, $target = NULL )
 {
 	global $base_tag_set;
-
 	$base_tag_set = $url;
 	echo '<base href="'.$url.'"';
 
@@ -406,12 +405,12 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
  * If 'jquery' is used and $debug is set to true, the 'jquery_debug' is automatically swapped in.
  * Any javascript added to the page is also added to the $required_js array, which is then checked to prevent adding the same code twice
  *
- * @todo merge with require_css()
+ * @todo dh>merge with require_css()
  * @param string alias, url or filename (relative to rsc/js) for javascript file
  * @param boolean Is the file's path relative to the base path/url?
- *                Use true to not add any prefix ("$rsc_url/js/").
+ *                Use false if file is in $rsc_url/js/
  */
-function require_js( $js_file, $relative_to_base = FALSE )
+function require_js( $js_file, $relative_to_base = false )
 {
 	global $rsc_url, $debug;
 	static $required_js;
@@ -419,7 +418,7 @@ function require_js( $js_file, $relative_to_base = FALSE )
 	$js_aliases = array(
 		'#jquery#' => 'jquery.min.js',
 		'#jquery_debug#' => 'jquery.js',
-		'#jqueryUI#' => ( $debug ? 'jquery.ui.all.js' : 'jquery.ui.all.min.js' ),
+		'#jqueryUI#' => 'jquery.ui.all.min.js',
 		'#jqueryUI_debug#' => 'jquery.ui.all.js',
 	);
 
@@ -427,7 +426,7 @@ function require_js( $js_file, $relative_to_base = FALSE )
 	//       That's more true for communications.js than jqueryUI, but basically for both of them.
 	if( in_array( $js_file, array( '#jqueryUI#', '#jqueryUI_debug#' ) ) )
 	{	// Dependency : ensure jQuery is loaded
-		require_js( str_replace( 'jqueryUI', 'jquery', $js_file ), $relative_to_base );
+		require_js( '#jquery#' );
 	}
 	elseif( $js_file == 'communication.js' )
 	{ // jQuery dependency
@@ -463,6 +462,7 @@ function require_js( $js_file, $relative_to_base = FALSE )
 		add_headline( '<script type="text/javascript" src="'.$js_url.'"></script>' );
 
 		// TODO: dh> this is a dependency, too, and should get added to the include code of communications.js itself
+	// fp> true, this should get out of here
 		if( $js_file == 'communication.js' )
 		{	// needs admin url
 			global $admin_url;
@@ -483,14 +483,14 @@ function require_js( $js_file, $relative_to_base = FALSE )
  * Accepts absolute urls, filenames relative to the rsc/css directory.
  * Set $relative_to_base to TRUE to prevent this function from adding on the rsc_path
  *
- * @todo merge with require_js()
+ * @todo dh>merge with require_js()
  * @param string alias, url or filename (relative to rsc/css) for CSS file
  * @param boolean|string Is the file's path relative to the base path/url?
  *                Use true to not add any prefix ("$rsc_url/css/").
  * @param string title.  The title for the link tag
  * @param string media.  ie, 'print'
  */
-function require_css( $css_file, $relative_to_base = FALSE, $title = NULL, $media = NULL )
+function require_css( $css_file, $relative_to_base = false, $title = NULL, $media = NULL )
 {
 	global $rsc_url, $debug;
 	static $required_css;
@@ -793,6 +793,9 @@ function link_pages()
 
 /*
  * $Log$
+ * Revision 1.39  2008/09/27 00:05:35  fplanque
+ * doc, minor
+ *
  * Revision 1.38  2008/09/15 21:53:09  blueyed
  * Fix lowercase check in require_css() again; broke it in last merge
  *
