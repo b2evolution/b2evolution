@@ -182,7 +182,11 @@ $mysql_version = $DB->get_version();
 init_system_check( 'MySQL version', $DB->version_long );
 if( version_compare( $mysql_version, '4.0' ) < 0 )
 {
-	disp_system_check( 'warning', T_('This version is not guaranteed to work.') );
+	disp_system_check( 'error', T_('This version is too old. The minium recommended MySQL version is 4.1.') );
+}
+elseif( version_compare( $mysql_version, '4.1' ) < 0 )
+{
+	disp_system_check( 'warning', T_('This version is not guaranteed to work. The minium recommended MySQL version is 4.1.') );
 }
 else
 {
@@ -484,6 +488,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2008/09/27 00:05:54  fplanque
+ * minor/version bump
+ *
  * Revision 1.11  2008/04/24 22:06:00  fplanque
  * factorized system checks
  *

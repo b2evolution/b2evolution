@@ -2104,31 +2104,37 @@ function upgrade_b2evo_tables()
 			 CHANGE COLUMN hit_ID hit_ID              INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			 CHANGE COLUMN hit_datetime hit_datetime  DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
 			 ADD COLUMN hit_keyphrase_keyp_ID         INT UNSIGNED DEFAULT NULL AFTER hit_referer_dom_ID,
-			 ADD INDEX hit_remote_addr ( hit_remote_addr )";
+			 ADD INDEX hit_remote_addr ( hit_remote_addr ),
+			 ADD INDEX hit_sess_ID        ( hit_sess_ID )";
 		$DB->query( $query );
 		echo "OK.<br />\n";
 
 		echo 'Upgrading sessions table... ';
 		$DB->query( "ALTER TABLE T_sessions
 			ALTER COLUMN sess_lastseen SET DEFAULT '2000-01-01 00:00:00',
-			ADD COLUMN sess_hitcount  INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER sess_key" );
+			ADD COLUMN sess_hitcount  INT(10) UNSIGNED NOT NULL DEFAULT 1 AFTER sess_key,
+			ADD KEY sess_user_ID (sess_user_ID)" );
 		echo "OK.<br />\n";
 
 		echo 'Creating goal tracking table... ';
     $DB->query( "CREATE TABLE T_track__goal(
-            goal_ID       int(10) unsigned NOT NULL auto_increment,
-            goal_name     varchar(50) default NULL,
-            PRIMARY KEY  (goal_ID)
+					  goal_ID int(10) unsigned NOT NULL auto_increment,
+					  goal_name varchar(50) default NULL,
+					  goal_key varchar(32) default NULL,
+					  goal_redir_url varchar(255) default NULL,
+					  goal_default_value double default NULL,
+					  PRIMARY KEY (goal_ID),
+					  UNIQUE KEY goal_key (goal_key)
           )" );
 
     $DB->query( "CREATE TABLE T_track__goalhit (
-            ghit_ID int(10) unsigned NOT NULL auto_increment,
-            ghit_goal_ID    int(10) unsigned NOT NULL,
-            ghit_sess_ID    int(10) unsigned NOT NULL,
-            ghit_params     TEXT default NULL,
-            PRIMARY KEY  (ghit_ID),
-            KEY ghit_goal_ID (ghit_goal_ID),
-            KEY ghit_sess_ID (ghit_sess_ID)
+					  ghit_ID int(10) unsigned NOT NULL auto_increment,
+					  ghit_goal_ID    int(10) unsigned NOT NULL,
+					  ghit_hit_ID     int(10) unsigned NOT NULL,
+					  ghit_params     TEXT default NULL,
+					  PRIMARY KEY  (ghit_ID),
+					  KEY ghit_goal_ID (ghit_goal_ID),
+					  KEY ghit_hit_ID (ghit_hit_ID)
          )" );
 		echo "OK.<br />\n";
 
@@ -2310,6 +2316,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.263  2008/09/27 00:05:54  fplanque
+ * minor/version bump
+ *
  * Revision 1.262  2008/09/24 09:28:36  fplanque
  * no message
  *

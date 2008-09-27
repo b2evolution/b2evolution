@@ -112,7 +112,7 @@ header('Content-Type: text/html; charset='.$io_charset);
 	<meta name="viewport" content="width = 750" />
 	<link href="../rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
-	<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" -->
+	<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" --> 
 </head>
 
 <body>
@@ -120,10 +120,10 @@ header('Content-Type: text/html; charset='.$io_charset);
 
 	<div class="wrapper1">
 	<div class="wrapper2">
-		<span class="version_top"><!-- InstanceBeginEditable name="Version" --><?php echo T_('Installer for version ').' '. $app_version ?><!-- InstanceEndEditable --></span>
-
+		<span class="version_top"><!-- InstanceBeginEditable name="Version" --><?php echo T_('Installer for version ').' '. $app_version ?><!-- InstanceEndEditable --></span>	
+	
 		<a href="http://b2evolution.net/" target="_blank"><img src="../rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
-
+		
 		<div class="menu_top"><!-- InstanceBeginEditable name="MenuTop" -->
 			<span class="floatright"><?php echo T_('After install') ?>: <a href="../index.php"><?php echo T_('Blogs') ?></a> &middot;
 			<a href="../admin.php"><?php echo T_('Admin') ?></a>
@@ -132,7 +132,7 @@ header('Content-Type: text/html; charset='.$io_charset);
 		<a href="index.php?locale=<?php echo $default_locale ?>"><?php echo T_('Install menu') ?></a> &middot;
 		<a href="phpinfo.php"><?php echo T_('PHP info') ?></a>
 		<!-- InstanceEndEditable --></div>
-
+		
 		<!-- InstanceBeginEditable name="Main" -->
 		<div class="block1">
 		<div class="block2">
@@ -710,16 +710,16 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 ?>
 <!-- InstanceEndEditable -->
 	</div>
-
+		
 	<div class="body_fade_out">
-
+		
 	<div class="menu_bottom"><!-- InstanceBeginEditable name="MenuBottom" -->
 			<?php echo T_('Online resources') ?>: <a href="http://b2evolution.net/" target="_blank"><?php echo T_('Official website') ?></a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank"><?php echo T_('Find a host') ?></a> &bull; <a href="http://manual.b2evolution.net/" target="_blank"><?php echo T_('Manual') ?></a> &bull; <a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Forums') ?></a>
 		<!-- InstanceEndEditable --></div>
-
-	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright © 2003-2007 by François Planque & others · <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
+	
+	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright &copy; 2003-2008 by Fran&ccedil;ois Planque &amp; others &middot; <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
 		<!-- InstanceEndEditable --></div>
-
+		
 	</div>
 	</div>
 
@@ -738,6 +738,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
+ * Revision 1.146  2008/09/27 00:05:54  fplanque
+ * minor/version bump
+ *
  * Revision 1.145  2008/09/15 11:01:15  fplanque
  * Installer now creates a demo photoblog
  *

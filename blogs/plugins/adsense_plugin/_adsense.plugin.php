@@ -138,6 +138,8 @@ class adsense_plugin extends Plugin
 	/**
 	 * Perform rendering (at display time, i-e: NOT cached)
 	 *
+	 * @todo: does this actually get fed out in the xml feeds?
+	 *
 	 * @see Plugin::DisplayItemAsHtml()
 	 */
 	function DisplayItemAsHtml( & $params )
@@ -210,6 +212,9 @@ class adsense_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.3  2008/09/27 00:05:55  fplanque
+ * minor/version bump
+ *
  * Revision 1.2  2008/01/21 09:35:41  fplanque
  * (c) 2008
  *

@@ -73,6 +73,7 @@ foreach( $pofiles as $po )
 	$target = basename( $po, '.static.po' );
 	$targets[ $target ] = $po;
 
+	/*
 	// add targets that use same message file
 	foreach( $locales as $key => $value ) if( $key != $target )
 	{
@@ -81,6 +82,7 @@ foreach( $pofiles as $po )
 			$targets[ $key ] = $po;
 		}
 	}
+	*/
 }
 
 
@@ -97,7 +99,7 @@ if( !isset($argv) )
 	<body>
 	<div class="center" style="margin:auto;width:75%">
 
-	<img src="<?php echo $rsc_url ?>img/b2evolution_logo_360.gif" /><br />
+	<img src="<?php echo $rsc_url ?>img/b2evolution8.png" /><br />
 <?php
 }
 
@@ -326,7 +328,8 @@ switch( $action )
 					$linkto = str_replace('.src.', ( $ttarget != DEFAULT_TARGET ) ? ".$ttarget." : '.', basename($srcfile) );
 
 					$trans_available .=
-					'<a href="'.$linkto.'" title="'.T_( $locales[$ttarget]['name'] ).'">'
+					'<a href="'.$linkto.'">'
+					// title="'.T_( $locales[$ttarget]['name'] ).'"
 					.locale_flag($ttarget, 'h10px', 'flag', '', false, $path_to_root.'blogs/rsc/flags')
 					.'</a>'."\n";
 				}
@@ -335,7 +338,8 @@ switch( $action )
 				$text = str_replace( TRANSTAG_OPEN.'trans_available'.TRANSTAG_CLOSE, $trans_available, $text );
 
 				// Current lang:
-				$text = str_replace( TRANSTAG_OPEN.'trans_current'.TRANSTAG_CLOSE, T_( $locales[$target]['name'] ), $text );
+				$text = str_replace( TRANSTAG_OPEN.'trans_current'.TRANSTAG_CLOSE, $target, $text );
+				// T_( $locales[$target]['name'] )
 
 				// standard replacements
 				$search = array(

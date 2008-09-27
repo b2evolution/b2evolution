@@ -25,26 +25,6 @@ $siteurl = $Blog->get('url');
 /**
  * WP compatibility template tag - UNSUPPORTED.
  */
-function bloginfo( $param )
-{
-	global $Blog;
-
-	/*
-	switch( $param )
-	{
-		case 'comments_rss2_url':
-			$param = '';
-			break;
-	}
-	*/
-
-	echo $Blog->disp( $param );
-}
-
-
-/**
- * WP compatibility template tag - UNSUPPORTED.
- */
 function get_calendar()
 {
 	global $Plugins;
@@ -339,6 +319,9 @@ function next_posts_link( $link_text = 'Next' )
 
 /*
  * $Log$
+ * Revision 1.6  2008/09/27 00:05:55  fplanque
+ * minor/version bump
+ *
  * Revision 1.5  2008/01/07 02:53:27  fplanque
  * cleaner tag urls
  *

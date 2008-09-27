@@ -17,7 +17,7 @@
 
 	<div class="wrapper1">
 	<div class="wrapper2">
-		<span class="version_top">Version 2.5.0-beta</span>	
+		<span class="version_top">Version 3.0.0-alpha</span>	
 	
 		<a href="http://b2evolution.net/" target="_blank"><img src="../blogs/rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
 		
@@ -33,22 +33,19 @@
 		<h1>Upgrader depuis une version précédente de b2evolution</h1>
 		<p class="note">Avant de commencer, merci de noter que certaines fonctionnalités distribuées de b2evolution nécessitent que vous approuvier nos <a href="http://b2evolution.net/about/terms.html" target="_blank">Conditions d'utilisation</a> (très simples).</p>
 		<ol class="expanded">
-			<li>Backup all your b2evolution files. Take special care of the files you may have modified, including <strong>/conf</strong>, <strong>/skins</strong>, <strong>/plugins</strong>, your <strong>/media</strong> directory and possibly stubfiles, hacks or custom templates...</li>
+			<li>Faites une copie de sauvegarde de tous vos fichiers b2evolution. Prenez spécialement soin des fichiers que vous avez modifié, y compris <strong>/conf</strong>, <strong>/skins</strong>, <strong>/plugins</strong>, le répertoire <strong>/media</strong> ainsi que les fichiers stub, les hacks, les templates personnels...</li>
 			<li>Vous devriez également faire une sauvegarde de votre base de données si vous le pouvez. Cette fonctionnalité devrait être proposée par votre hébergeur.</li>
-			<li>If you are upgrading from a version prior to 2.0, we highly recommend you clean up outdated files. To achieve this, delete your b2evolution folders <strong>except /media</strong>. Folders to delete include /admin, /conf, /cron, /htsrv, /inc, /install, /plugins, /skins, /skins_adm, /xmlsrv. Depending on your version, you may not have all of these folders on your server. Also, again, make sure you have a backup before deleting.</li>
+			<li>Si vous mettez à jour depuis une version inférieure a 2.0, il est hautement recommandé d'effacer tous les anciens fichiers. Pour cela, supprimez tous les répertoires à l'exception de <strong>/media</strong>. Les répertoires à supprimer incluent  /admin, /conf, /cron, /htsrv, /inc, /install, /plugins, /skins, /skins_adm, /xmlsrv. Selon votre version, vous pouvez ne pas avoir tous ces répertoires sur votre serveur. N'oubliez pas de faire une sauvegarde avant de les supprimer.</li>
 			<li>Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you cannot reuse your  /conf files, default skin templates or default plugins as they are.<br />
 				<br />
 				Since your custom skins and custom plugins should be using different names, they will not be overwritten. Same for your media files.<br />
 				<br />
-				The one file you must absolutely restore from your backup (see step 1) though is <code>/blogs/_basic_config.php</code>. You will need to either restore or recreate that file in order to proceed with upgrade.</li>
-			<li>Run the installation/upgrade script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code>/ . Then, simply follow the on screen instructions.<br />
-		<br />
-		The installer/upgrader will  allow you to run a database upgrade from <strong>any</strong> b2evolution version to the new one.</li>
+				The one file you must absolutely restore from your backup (see step 1) though is <code>/blogs/conf/_basic_config.php</code>. You will need to either restore or recreate that file in order to proceed with upgrade.</li>
+			<li>Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/votredossierblogs/install</code>. Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation/mise à jour vous proposera de mettre à jour la base de donnée depuis <strong>n'importe</strong> quelle version de b2evolution vers la nouvelle.</li>
 			<li>Vérifiez que la nouvelle installation fonctionne.</li>
 			<li>Consultez le manuel en ligne pour obtenir des <a href="http://manual.b2evolution.net/Upgrade_from_an_older_version" target="_blank">instructions de mise à jour spécifiques</a> à votre nouvelle version de b2evolution.</li>
 			<li>Sur les serveurs de production, il est recommandé de supprimer le sous répertoire <code>/install</code>.</li>
-			<li>If you had hacks or other customizations to the core files, your can bring those back now.
-		We recommend you get yourself a diff/merge tool like <a href="http://winmerge.sourceforge.net/" target="_blank">WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.</li>
+			<li>Si vous aviez des hacks ou autres personnalisations de fichiers, vous pouvez maintenant les réintroduire. Nous vous recommandons de vous procurer un outil de type diff/merge tel que <a href="http://winmerge.sourceforge.net/" target="_blank">WinMerge</a>. Ceci vous permettra de comparer aisément vos anciens fichiers (sauvegardés) avec vos nouveaux fichiers (et même des dossiers entiers en une seule opération) afin de reporter les modifications nécessaires.</li>
 			</ol>
 		
 		</div>
@@ -64,7 +61,7 @@
 			Ressources en ligne: <a href="http://b2evolution.net/" target="_blank">Site web officiel</a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank">Trouver un hébergeur</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">Manuel</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">Forums</a>
 		</div>
 	
-	<div class="copyright"><a href="http://b2evolution.net/about/license.html" target="_blank">Copyright © 2003-2007 by François Planque & others · Licence GNU GPL</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a></div>
+	<div class="copyright"><a href="http://b2evolution.net/about/license.html" target="_blank">Copyright &copy; 2003-2008 by Fran&ccedil;ois Planque &amp; others &middot; Licence GNU GPL</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a></div>
 		
 	</div>
 	</div>
