@@ -103,6 +103,8 @@ class CollectionSettings extends AbstractSettings
 			'rss2_redirect' => '',
 
 			'require_title' => 'required',  // Is a title for items required ("required", "optional", "none")
+
+			'cache_enabled' => 0,
 		);
 
 
@@ -138,6 +140,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.22  2008/09/27 00:48:32  fplanque
+ * caching step 0.
+ *
  * Revision 1.21  2008/09/09 06:03:30  fplanque
  * More tag URL options
  * Enhanced URL resolution for categories and tags

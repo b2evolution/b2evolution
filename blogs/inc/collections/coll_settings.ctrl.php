@@ -139,8 +139,29 @@ switch( $action )
 				break;
 
 			case 'advanced':
-				if( $edited_Blog->load_from_Request( array( 'pings' ) ) )
+				$old_cache_status = $edited_Blog->get_setting('cache_enabled');
+				if( $edited_Blog->load_from_Request( array( 'pings', 'cache' ) ) )
 				{ // Commit update to the DB:
+					$new_cache_status =  $edited_Blog->get_setting('cache_enabled');
+					if( $old_cache_status == false && $new_cache_status == true )
+					{ // Caching has been turned ON:
+						if( $edited_Blog->cache_create() )
+						{
+							$Messages->add( T_('Caching has been enabled for this blog.'), 'success' );
+						}
+						else
+						{
+							$Messages->add( T_('Caching could not be enabled for this blog. Check /cache/ folder file permissions.'), 'success' );
+							$edited_Blog->set_setting('cache_enabled', 0 );
+						}
+					}
+					elseif( $old_cache_status == true && $new_cache_status == false )
+					{ // Caching has been turned OFF:
+						$edited_Blog->cache_delete();
+						$Messages->add( T_('Caching has been disabled for this blog. All cache contents have been purged.'), 'note' );
+					}
+
+
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog settings have been updated'), 'success' );
 				}
@@ -228,6 +249,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2008/09/27 00:48:32  fplanque
+ * caching step 0.
+ *
  * Revision 1.12  2008/03/21 10:45:55  yabs
  * validation
  *

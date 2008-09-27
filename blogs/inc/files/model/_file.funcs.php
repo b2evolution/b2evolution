@@ -222,6 +222,19 @@ function get_dirsize_recursive( $path )
 function rmdir_r( $path )
 {
 	$path = trailing_slash( $path );
+
+	cleardir_r( $path );
+
+	@rmdir( $path );
+}
+
+
+/**
+ * Clear contents of dorectory, but do not delete directory itself
+ */
+function cleardir_r( $path )
+{
+	$path = trailing_slash( $path );
 	// echo "<br>rmdir_r($path)";
 
 	if( $dir = @opendir($path) )
@@ -249,11 +262,8 @@ function rmdir_r( $path )
 			}
 		}
 		closedir($dir);
-
-		@rmdir( $path );
 	}
 }
-
 
 /**
  * Get the size of an image file
@@ -721,6 +731,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 
 /*
  * $Log$
+ * Revision 1.8  2008/09/27 00:48:32  fplanque
+ * caching step 0.
+ *
  * Revision 1.7  2008/05/26 19:22:00  fplanque
  * fixes
  *

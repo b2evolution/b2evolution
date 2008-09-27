@@ -474,6 +474,18 @@ $cron_url = $baseurl.$cron_subdir;    // You should not need to change this
 $install_subdir = 'install/';            // Subdirectory relative to base
 
 /**
+ * Location of the rendered page cache folder.
+ *
+ * Note: This folder does NOT NEED to be accessible through HTTP.
+ * This folder MUST be writable by PHP.
+ *
+ * @global string $cache_subdir
+ */
+$cache_subdir = 'cache/';                // Subdirectory relative to base
+$cache_path = $basepath.$cache_subdir;   // You should not need to change this
+
+
+/**
  * Location of the root media folder.
  *
  * Note: This folder MAY or MAY NOT NEED to be accessible by PHP AND/OR through HTTP.

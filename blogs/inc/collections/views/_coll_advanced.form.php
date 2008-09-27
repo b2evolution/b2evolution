@@ -99,7 +99,12 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	$Form->end_fieldset();
 
 
-	$Form->begin_fieldset( T_('Static file generation').' ['.T_('Admin').']' );
+	$Form->begin_fieldset( T_('Caching').' ['.T_('Admin').']' );
+		$Form->checkbox_input( 'cache_enabled', $edited_Blog->get_setting('cache_enabled'), T_('Enable cache'), array( 'note'=>T_('Cache rendered blog pages') ) );
+	$Form->end_fieldset();
+
+
+	$Form->begin_fieldset( '[Deprecated] '.T_('Static file generation').' ['.T_('Admin').']' );
 		$Form->text_input( 'source_file', $edited_Blog->get_setting( 'source_file' ), 25, T_('Source file'),
 												T_('.php (stub) file used to generate the static homepage.'),
 												array( 'input_prefix' => "<code>$basepath</code>", 'maxlength' => 255 ) );
@@ -176,6 +181,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.13  2008/09/27 00:48:32  fplanque
+ * caching step 0.
+ *
  * Revision 1.12  2008/05/10 23:41:32  fplanque
  * cleanup of external feed providers
  *

@@ -420,6 +420,11 @@ class Blog extends DataObject
 			$this->set_setting('ping_plugins', implode(',', $blog_ping_plugins));
 		}
 
+		if( in_array( 'cache', $groups ) )
+		{ // we want to load the cache params:
+			$this->set_setting( 'cache_enabled', param( 'cache_enabled', 'integer', 0 ) );
+		}
+
 		if( in_array( 'features', $groups ) )
 		{ // we want to load the workflow checkboxes:
 			$this->set_setting( 'allow_subscriptions',  param( 'allow_subscriptions', 'integer', 0 ) );
@@ -1952,11 +1957,49 @@ class Blog extends DataObject
 		return $DB->get_var( $sql );
 
 	}
-}
 
+
+	/**
+	 * @return boolean true if cache has been successfully created
+	 */
+	function cache_create()
+	{
+		global $cache_path;
+		// This collection's cache path;
+		$ads_collcache_path = $cache_path.'c'.$this->ID;
+
+		// Create by using the filemanager's default chmod. TODO> we may not want to make these publicly readable
+		if( ! mkdir_r( $ads_collcache_path, NULL ) )
+		{
+			return false;
+		}
+
+		// Clear contents of folder, if any:
+		cleardir_r( $ads_collcache_path );
+
+		return true;
+	}
+
+
+  /**
+	 *
+	 */
+	function cache_delete()
+	{
+		global $cache_path;
+		// This collection's cache path;
+		$ads_collcache_path = $cache_path.'c'.$this->ID;
+
+		// Delete all cache files:
+		rmdir_r( $ads_collcache_path );
+	}
+}
 
 /*
  * $Log$
+ * Revision 1.45  2008/09/27 00:48:32  fplanque
+ * caching step 0.
+ *
  * Revision 1.44  2008/09/15 11:01:06  fplanque
  * Installer now creates a demo photoblog
  *
