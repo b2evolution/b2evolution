@@ -77,7 +77,7 @@ class ItemCache extends DataObjectCache
 		if( !isset( $this->urltitle_index[$req_urltitle] ) )
 		{ // not yet in cache:
 			// Load just the requested object:
-			$Debuglog->add( "Loading <strong>$this->objtype($req_urltitle)</strong> into cache" );
+			$Debuglog->add( "Loading <strong>$this->objtype($req_urltitle)</strong> into cache", 'dataobjects' );
 			$sql = "SELECT *
 			          FROM $this->dbtablename
 			         WHERE post_urltitle = ".$DB->quote($req_urltitle);
@@ -115,7 +115,7 @@ class ItemCache extends DataObjectCache
 		global $DB, $Debuglog;
 
 		$req_list = "'".implode( "','", $req_array)."'";
-		$Debuglog->add( "Loading <strong>$this->objtype($req_list)</strong> into cache" );
+		$Debuglog->add( "Loading <strong>$this->objtype($req_list)</strong> into cache", 'dataobjects' );
 		$sql = "SELECT * FROM $this->dbtablename WHERE post_urltitle IN ( $req_list )";
 		$dbIDname = $this->dbIDname;
 		$objtype = $this->objtype;
@@ -146,6 +146,9 @@ class ItemCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.3  2008/09/27 07:54:33  fplanque
+ * minor
+ *
  * Revision 1.2  2008/01/21 09:35:31  fplanque
  * (c) 2008
  *

@@ -57,6 +57,8 @@ $is_cli = empty($_SERVER['SERVER_SOFTWARE']) ? true : false;
 $is_web = ! $is_cli;
 // echo ($is_cli ? 'cli' : 'web' );
 
+$content_type_header = NULL;
+
 // Initialize some variables for template functions
 $required_js = array();
 $required_css = array();
@@ -300,6 +302,9 @@ $skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', ar
 
 /*
  * $Log$
+ * Revision 1.31  2008/09/27 07:54:33  fplanque
+ * minor
+ *
  * Revision 1.30  2008/09/24 09:17:12  fplanque
  * rollback
  *

@@ -465,8 +465,11 @@ function skin_404_header()
 function skin_content_header( $type = 'text/html' )
 {
 	global $io_charset;
+	global $content_type_header;
 
-	header( 'Content-type: '.$type.'; charset='.$io_charset );
+	$content_type_header = 'Content-type: '.$type.'; charset='.$io_charset;
+
+	header( $content_type_header );
 }
 
 
@@ -591,10 +594,11 @@ function skin_exists( $name, $filename = 'index.main.php' )
 }
 
 
-
-
 /*
  * $Log$
+ * Revision 1.32  2008/09/27 07:54:34  fplanque
+ * minor
+ *
  * Revision 1.31  2008/05/11 01:09:42  fplanque
  * always output charset header + meta
  *

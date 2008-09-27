@@ -78,9 +78,6 @@ else
 
 param( 'comment_rating', 'integer', NULL );
 
-// Passthrough comment_cookies & comment_allow_msgform params:
-$redirect_to = url_add_param($redirect_to, 'comment_cookies='.$comment_cookies
-	.'&comment_allow_msgform='.$comment_allow_msgform, '&');
 
 $now = date( 'Y-m-d H:i:s', $localtimenow );
 
@@ -280,6 +277,15 @@ if( $action == 'preview' )
 	$Session->set( 'core.no_CachePageContent', 1 );
 	$Session->dbsave();
 
+	// This message serves the purpose that the next page will not even try to retrieve preview from cache... (and won't collect data to be cached)
+	// This is session based, so it's not 100% safe to prevent caching. We are also using explicit caching prevention whenever personal data is displayed
+	$Messages->add( T_('This is a preview only! Do not forget to send your comment!'), 'error' );
+
+	// Passthrough comment_cookies & comment_allow_msgform params:
+	// fp> moved this down here in order to keep return URLs clean whenever this is not needed.
+	$redirect_to = url_add_param($redirect_to, 'comment_cookies='.$comment_cookies
+		.'&comment_allow_msgform='.$comment_allow_msgform, '&');
+
 	$redirect_to .= '#comment_preview';
 
 	header_nocache();
@@ -362,6 +368,14 @@ if( $Comment->ID )
 	{
 		$Messages->add( T_('Your comment has been submitted. It will appear once it has been approved.'), 'success' );
 	}
+
+	if( !is_logged_in() )
+	{ // Not logged in user. We want him to see his comment has not vanished if he checks back on the Item page
+		// before the cache has expired. Invalidate cache for that page:
+		// Note: this is approximative and may not cover all URLs where the user expects to see the comment...
+		// TODO: fp> solution: touch dates?
+		$Comment->Item->Blog->cache_invalidate( $Comment->Item->get_single_url() );
+	}
 }
 
 
@@ -371,6 +385,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.125  2008/09/27 07:54:33  fplanque
+ * minor
+ *
  * Revision 1.124  2008/06/26 21:21:12  blueyed
  * Fix indent
  *

@@ -150,7 +150,7 @@ class ChapterCache extends GenericCategoryCache
 		if( !isset( $this->urlname_index[$req_urlname] ) )
 		{ // not yet in cache:
 			// Load just the requested object:
-			$Debuglog->add( "Loading <strong>$this->objtype($req_urlname)</strong> into cache" );
+			$Debuglog->add( "Loading <strong>$this->objtype($req_urlname)</strong> into cache", 'dataobjects' );
 			$sql = "SELECT *
 			          FROM $this->dbtablename
 			         WHERE cat_urlname = ".$DB->quote($req_urlname);
@@ -298,6 +298,9 @@ class ChapterCache extends GenericCategoryCache
 
 /*
  * $Log$
+ * Revision 1.3  2008/09/27 07:54:33  fplanque
+ * minor
+ *
  * Revision 1.2  2008/01/21 09:35:26  fplanque
  * (c) 2008
  *

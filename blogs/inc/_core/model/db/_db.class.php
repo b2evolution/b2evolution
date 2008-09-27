@@ -413,12 +413,12 @@ class DB
 
 		if( $debug )
 		{ // Force MySQL strict mode
-			//As  Austriaco pointed on the forum (http://forums.b2evolution.net/viewtopic.php?p=68443),
-			//TRADITIONAL mode is only available to mysql > 5.0.22 .
-			$mysql_version = $this->get_version();
+			// As  Austriaco pointed on the forum (http://forums.b2evolution.net/viewtopic.php?p=68443),
+			// TRADITIONAL mode is only available to mysql > 5.0.22 .
+			$mysql_version = $this->get_version( 'we do this in DEBUG mode only' );
 			if( version_compare( $mysql_version, '5.0.2' ) > 0 )
 			{
-				$this->query( 'SET sql_mode = "TRADITIONAL"' );
+				$this->query( 'SET sql_mode = "TRADITIONAL"', 'we do this in DEBUG mode only' );
 			}
 		}
 	}
@@ -602,7 +602,7 @@ class DB
   /**
 	 * Get MYSQL version
 	 */
-	function get_version()
+	function get_version( $query_title = NULL )
 	{
 		if( isset( $this->version ) )
 		{
@@ -616,7 +616,7 @@ class DB
 		$this->halt_on_error = false;
 		$last_error = $this->last_error;
 		$error = $this->error;
-		if( ($this->version_long = $this->get_var( 'SELECT VERSION()' ) ) === NULL )
+		if( ($this->version_long = $this->get_var( 'SELECT VERSION()', 0, 0, $query_title ) ) === NULL )
 		{	// Very old version ( < 4.0 )
 			$this->version = '';
 			$this->version_long = '';
@@ -1413,6 +1413,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.9  2008/09/27 07:54:33  fplanque
+ * minor
+ *
  * Revision 1.8  2008/04/24 01:56:08  fplanque
  * Goal hit summary
  *

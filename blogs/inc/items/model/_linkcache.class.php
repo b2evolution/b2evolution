@@ -101,7 +101,7 @@ class LinkCache extends DataObjectCache
 
 		if( isset( $this->cache_item[$item_ID] ) )
 		{
-			$Debuglog->add( "Already loaded <strong>$this->objtype(Item #$item_ID)</strong> into cache" );
+			$Debuglog->add( "Already loaded <strong>$this->objtype(Item #$item_ID)</strong> into cache", 'dataobjects' );
 			return false;
 		}
 
@@ -117,7 +117,7 @@ class LinkCache extends DataObjectCache
 			// Remember this special load:
 			$this->cache_item[$item_ID] = array();
 
-			$Debuglog->add( "Loading <strong>$this->objtype(Item #$item_ID)</strong> into cache" );
+			$Debuglog->add( "Loading <strong>$this->objtype(Item #$item_ID)</strong> into cache", 'dataobjects' );
 
 			$sql = 'SELECT *
 								FROM T_links
@@ -146,7 +146,7 @@ class LinkCache extends DataObjectCache
 
 		$item_list = implode( ',', $itemIDarray );
 
-		$Debuglog->add( "Loading <strong>$this->objtype(Items #$item_list)</strong> into cache" );
+		$Debuglog->add( "Loading <strong>$this->objtype(Items #$item_list)</strong> into cache", 'dataobjects' );
 
 		// For each item in list...
 		foreach( $itemIDarray as $item_ID )
@@ -168,6 +168,9 @@ class LinkCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.3  2008/09/27 07:54:34  fplanque
+ * minor
+ *
  * Revision 1.2  2008/01/21 09:35:31  fplanque
  * (c) 2008
  *
