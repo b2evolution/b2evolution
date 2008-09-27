@@ -91,9 +91,12 @@ if( empty($url) )
 
 @header('Content-Type: text/xml');
 
-$comment_post_ID = $tb_id;
 $ItemCache = & get_Cache( 'ItemCache' );
-$commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
+if( !( $commented_Item = & $ItemCache->get_by_ID( $tb_id, false ) ) )
+{
+	trackback_response( 1, 'Sorry, the requested post doesn\'t exist.' ); // exits
+}
+
 if( !( $Blog = & $commented_Item->get_Blog() ) )
 {
 	trackback_response( 1, 'Sorry, could not get the post\'s weblog.' ); // exits
@@ -173,6 +176,9 @@ $Plugins->trigger_event( 'BeforeTrackbackInsert', array( 'Comment' => & $Comment
 if( $errstring = $Messages->get_string( 'Cannot insert trackback, please correct these errors:', '' ) )
 {
 	trackback_response(2, $errstring);	// TODO: check TRACKBACK SPEC that error code 2 is ok
+										// tblue> the spec at <http://www.sixapart.com/pronet/docs/trackback_spec>
+										//	only shows error code 1 in the example response
+										//	and we also only check for code 1 in TB answers.
 }
 
 
@@ -207,6 +213,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.65  2008/09/27 16:52:30  tblue246
+ * Exit with a trackback error instead of debug_die()ing when there's no post with the supplied post ID.
+ *
  * Revision 1.64  2008/02/19 11:11:16  fplanque
  * no message
  *
