@@ -242,7 +242,3 @@ while( $Item = & mainlist_get_item() )
 }
 ?>
 </rdf:RDF>
-<?php
-	// This is a self contained XML document, make sure there is no additional output:
-	exit(0);
-?>

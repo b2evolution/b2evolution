@@ -80,7 +80,3 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 	} // End of comment loop.
 	?>
 </feed>
-<?php
-	// This is a self contained XML document, make sure there is no additional output:
-	exit(0);
-?>

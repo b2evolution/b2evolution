@@ -269,7 +269,3 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		?>
 	</channel>
 </rss>
-<?php
-	// This is a self contained XML document, make sure there is no additional output:
-	exit(0);
-?>

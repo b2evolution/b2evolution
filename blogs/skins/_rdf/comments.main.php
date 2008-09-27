@@ -84,7 +84,3 @@ while( $Comment = & $CommentList->get_next() )
 </item>
 <?php } // End of comment loop. ?>
 </rdf:RDF>
-<?php
-	// This is a self contained XML document, make sure there is no additional output:
-	exit(0);
-?>

@@ -506,58 +506,69 @@ $Plugins->trigger_event( 'BeforeBlogDisplay', array('skin'=>$skin) );
 if( !empty( $skin ) )
 { // We want to display with a skin now:
 
-	if( $skin_provided_by_plugin = skin_provided_by_plugin($skin) )
-	{
-		$Plugins->call_method( $skin_provided_by_plugin, 'DisplaySkin', $tmp_params = array('skin'=>$skin) );
-	}
-	else
-	{
-		// Path for the current skin:
-		$ads_current_skin_path = $skins_path.$skin.'/';
+	// Check for cached content & Start caching if needed
+	// Note: there are some redirects inside the skins themselves for canonical URLs,
+	// If we have a cache hit, the redirect won't take place until the cache expires -- probably ok.
+	// If we start collecting and a redirect happens, the collecting will just be lost and that's what we want.
+	if(! $Blog->cache_check() )
+	{	// Cache miss, we have to generate:
 
-		$disp_handlers = array(
-				'404'            => '404_not_found.main.php',
-				'arcdir'         => 'arcdir.main.php',
-				'catdir'         => 'catdir.main.php',
-				'comments'       => 'comments.main.php',
-				'feedback-popup' => 'feedback_popup.main.php',
-				'mediaidx'       => 'mediaidx.main.php',
-				'msgform'        => 'msgform.main.php',
-				'page'           => 'page.main.php',
-				'posts'          => 'posts.main.php',
-				'profile'        => 'profile.main.php',
-				'single'         => 'single.main.php',
-				'subs'           => 'subs.main.php',
-				// All others will default to index.main.php
-			);
-
-		if( !empty($disp_handlers[$disp]) )
+		if( $skin_provided_by_plugin = skin_provided_by_plugin($skin) )
 		{
-			if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[$disp] ) )
-			{	// The skin has a customized page handler for this display:
-				require $disp_handler;
-			}
-			elseif( $disp_handlers[$disp] == 'posts.main.php' && file_exists( $disp_handler = $ads_current_skin_path.'items.main.php' ) )
-			{	// Compatibility with skins < 2.2.0
-				require $disp_handler;
-			}
-			elseif( $disp_handlers[$disp] == 'comments.main.php' && file_exists( $disp_handler = $ads_current_skin_path.'latestcom.tpl.php' ) )
-			{	// Compatibility with skins < 2.2.0
-				require $disp_handler;
-			}
-			elseif( $disp_handlers[$disp] == 'feedback_popup.main.php' && file_exists( $disp_handler = $ads_current_skin_path.'feedback_popup.tpl.php' ) )
-			{	// Compatibility with skins < 2.2.0
-				require $disp_handler;
+			$Plugins->call_method( $skin_provided_by_plugin, 'DisplaySkin', $tmp_params = array('skin'=>$skin) );
+		}
+		else
+		{
+			// Path for the current skin:
+			$ads_current_skin_path = $skins_path.$skin.'/';
+
+			$disp_handlers = array(
+					'404'            => '404_not_found.main.php',
+					'arcdir'         => 'arcdir.main.php',
+					'catdir'         => 'catdir.main.php',
+					'comments'       => 'comments.main.php',
+					'feedback-popup' => 'feedback_popup.main.php',
+					'mediaidx'       => 'mediaidx.main.php',
+					'msgform'        => 'msgform.main.php',
+					'page'           => 'page.main.php',
+					'posts'          => 'posts.main.php',
+					'profile'        => 'profile.main.php',
+					'single'         => 'single.main.php',
+					'subs'           => 'subs.main.php',
+					// All others will default to index.main.php
+				);
+
+			if( !empty($disp_handlers[$disp]) )
+			{
+				if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[$disp] ) )
+				{	// The skin has a customized page handler for this display:
+					require $disp_handler;
+				}
+				elseif( $disp_handlers[$disp] == 'posts.main.php' && file_exists( $disp_handler = $ads_current_skin_path.'items.main.php' ) )
+				{	// Compatibility with skins < 2.2.0
+					require $disp_handler;
+				}
+				elseif( $disp_handlers[$disp] == 'comments.main.php' && file_exists( $disp_handler = $ads_current_skin_path.'latestcom.tpl.php' ) )
+				{	// Compatibility with skins < 2.2.0
+					require $disp_handler;
+				}
+				elseif( $disp_handlers[$disp] == 'feedback_popup.main.php' && file_exists( $disp_handler = $ads_current_skin_path.'feedback_popup.tpl.php' ) )
+				{	// Compatibility with skins < 2.2.0
+					require $disp_handler;
+				}
+				else
+				{	// Use the default handler from the skins dir:
+					require $ads_current_skin_path.'index.main.php';
+				}
 			}
 			else
 			{	// Use the default handler from the skins dir:
 				require $ads_current_skin_path.'index.main.php';
 			}
 		}
-		else
-		{	// Use the default handler from the skins dir:
-			require $ads_current_skin_path.'index.main.php';
-		}
+
+		// Collect cached data:
+		$Blog->cache_collect_end();
 	}
 }
 else
@@ -571,6 +582,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.105  2008/09/27 08:14:02  fplanque
+ * page level caching
+ *
  * Revision 1.104  2008/09/09 06:03:29  fplanque
  * More tag URL options
  * Enhanced URL resolution for categories and tags

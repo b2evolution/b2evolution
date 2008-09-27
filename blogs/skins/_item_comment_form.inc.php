@@ -16,10 +16,6 @@ global $cookie_name, $cookie_email, $cookie_url;
 global $comment_allowed_tags, $comments_use_autobr;
 global $comment_cookies, $comment_allow_msgform;
 
-if( is_null($comment_cookies) )
-{ // "Remember me" checked, if remembered before:
-	$comment_cookies = isset($_COOKIE[$cookie_name]) || isset($_COOKIE[$cookie_email]) || isset($_COOKIE[$cookie_url]);
-}
 
 // Default params:
 $params = array_merge( array(
@@ -46,6 +42,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 		if( $Comment->item_ID == $Item->ID )
 		{ // display PREVIEW:
 
+			// We do not want the current rendered page to be cached!!
+			$Item->Blog->cache_abort_collect();
+
 			// ------------------ PREVIEW COMMENT INCLUDED HERE ------------------
 			skin_include( $params['comment_template'], array(
 					'Comment'              => & $Comment,
@@ -70,16 +69,39 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	else
 	{ // New comment:
 		$Comment = & new Comment();
-		$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
-		$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
-		$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
+		if( $Item->Blog->cache_is_collecting )
+		{	// This page is going into the cache, we don't want personal data cached!!!
+			// fp> These fields should be filled out locally with Javascript tapping directly into the cookies. Anyone JS savvy enough to do that?
+      $comment_author = '';
+			$comment_author_email = '';
+			$comment_author_url = '';
+		}
+		else
+		{
+			$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
+			$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
+			$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
+		}
 		if( empty($comment_author_url) )
 		{	// Even if we have a blank cookie, let's reset this to remind the bozos what it's for
 			$comment_author_url = 'http://';
 		}
+
 		$comment_content =  $params['default_text'];
 	}
 
+
+	if( $Item->Blog->cache_is_collecting )
+	{	// This page is going into the cache, we don't want personal data cached!!!
+		// fp> These fields should be filled out locally with Javascript tapping directly into the cookies. Anyone JS savvy enough to do that?
+	}
+	else
+	{
+		if( is_null($comment_cookies) )
+		{ // "Remember me" checked, if remembered before:
+			$comment_cookies = isset($_COOKIE[$cookie_name]) || isset($_COOKIE[$cookie_email]) || isset($_COOKIE[$cookie_url]);
+		}
+	}
 
 	echo $params['form_title_start'];
 	echo T_('Leave a comment');
@@ -96,9 +118,11 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	$Form->hidden( 'comment_post_ID', $Item->ID );
 	$Form->hidden( 'redirect_to',
 			// Make sure we get back to the right page (on the right domain)
-			// fplanque>> TODO: check if we can use the permalink instead but we must check that application wide,
+			// fp> TODO: check if we can use the permalink instead but we must check that application wide,
 			// that is to say: check with the comments in a pop-up etc...
-			url_rel_to_same_host(regenerate_url( '', '', $Blog->get('blogurl'), '&' ), $htsrv_url) );
+			url_rel_to_same_host(regenerate_url( '', '', $Blog->get('blogurl'), '&' ), $htsrv_url)
+			// fp> what we need is a regenerate_url that will work in permalinks
+			);
 
 	if( is_logged_in() )
 	{ // User is logged in:
@@ -191,6 +215,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.8  2008/09/27 08:14:02  fplanque
+ * page level caching
+ *
  * Revision 1.7  2008/07/07 05:59:26  fplanque
  * minor / doc / rollback of overzealous indetation "fixes"
  *
