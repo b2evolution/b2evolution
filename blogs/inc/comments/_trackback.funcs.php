@@ -87,9 +87,8 @@ function trackback(
 		$Messages->add( $trackback_message.'[get]', 'note' );
 		$trackback_url = parse_url($trackback_url.'&'.$query_string);
 
-		if (((isset($trackback_url['host']) && !empty($trackback_url['host']))
-			&& (isset($trackback_url['path']) && !empty($trackback_url['path'])))
-			&& ($fp = fsockopen($trackback_url['host'], 80, $foo, $foo, 20)) !== false)
+		if (!empty($trackback_url['host']) && !empty($trackback_url['path'])
+			&& ($fp = @fsockopen($trackback_url['host'], 80, $foo, $foo, 20)) !== false)
 		{
 			$header  = 'GET '.$trackback_url['path'].'?'.$trackback_url['query']." HTTP/1.0\r\n";
 			$header .= 'Host: '.$trackback_url['host']."\r\n";
@@ -225,6 +224,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.5  2008/09/27 16:57:22  tblue246
+ * minor
+ *
  * Revision 1.4  2008/09/26 19:00:47  tblue246
  * Partial rewrite of trackback(): use fsockopen() for GET requests instead of fopen().
  *
