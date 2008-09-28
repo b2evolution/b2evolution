@@ -279,9 +279,9 @@ class DataObjectCache
 	 */
 	function & instantiate( & $db_row )
 	{
-		if ($db_row === NULL)
+		if( is_null($db_row) )
 		{	// we can't access NULL as an object
-			return $db_row;
+			return $db_row;	
 		}
 		
 		// Get ID of the object we'ere preparing to instantiate...
@@ -589,6 +589,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.4  2008/09/28 05:05:07  fplanque
+ * minor
+ *
  * Revision 1.3  2008/09/26 19:02:30  tblue246
  * Do not instantiate NULL "objects" in the cache (fixes http://forums.b2evolution.net/viewtopic.php?t=15973)
  *

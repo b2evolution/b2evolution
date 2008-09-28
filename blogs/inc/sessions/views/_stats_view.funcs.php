@@ -26,22 +26,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * Return a formatted percentage (should probably go to _misc.funcs)
- */
-function percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '.' )
-{
-	return number_format( $hit_count * 100 / $hit_total, $decimals, $dec_point, '' ).'&nbsp;%';
-}
-
-function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '.' )
-{
-	static $addup = 0;
-
-	$addup += $hit_count;
-	return number_format( $addup * 100 / $hit_total, $decimals, $dec_point, '' ).'&nbsp;%';
-}
-
-/**
  * Helper function for "Requested URI" column
  * @param integer Blog ID
  * @param string Requested URI
@@ -89,6 +73,9 @@ function stat_session_login( $login, $link = false )
 
 /*
  * $Log$
+ * Revision 1.5  2008/09/28 05:05:07  fplanque
+ * minor
+ *
  * Revision 1.4  2008/05/26 19:30:39  fplanque
  * enhanced analytics
  *

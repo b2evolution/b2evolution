@@ -175,10 +175,10 @@ $Plugins->trigger_event( 'BeforeTrackbackInsert', array( 'Comment' => & $Comment
 // Display errors:
 if( $errstring = $Messages->get_string( 'Cannot insert trackback, please correct these errors:', '' ) )
 {
-	trackback_response(2, $errstring);	// TODO: check TRACKBACK SPEC that error code 2 is ok
-										// tblue> the spec at <http://www.sixapart.com/pronet/docs/trackback_spec>
-										//	only shows error code 1 in the example response
-										//	and we also only check for code 1 in TB answers.
+	trackback_response(1, $errstring);
+	// tblue> Note: the spec at <http://www.sixapart.com/pronet/docs/trackback_spec>
+	//	only shows error code 1 in the example response
+	//	and we also only check for code 1 in TB answers.
 }
 
 
@@ -213,6 +213,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.66  2008/09/28 05:05:06  fplanque
+ * minor
+ *
  * Revision 1.65  2008/09/27 16:52:30  tblue246
  * Exit with a trackback error instead of debug_die()ing when there's no post with the supplied post ID.
  *

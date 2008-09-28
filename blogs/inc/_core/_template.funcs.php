@@ -790,9 +790,29 @@ function link_pages()
 }
 
 
+/**
+ * Return a formatted percentage (should probably go to _misc.funcs)
+ */
+function percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '.' )
+{
+	return number_format( $hit_count * 100 / $hit_total, $decimals, $dec_point, '' ).'&nbsp;%';
+}
+
+function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '.' )
+{
+	static $addup = 0;
+
+	$addup += $hit_count;
+	return number_format( $addup * 100 / $hit_total, $decimals, $dec_point, '' ).'&nbsp;%';
+}
+
+
 
 /*
  * $Log$
+ * Revision 1.40  2008/09/28 05:05:06  fplanque
+ * minor
+ *
  * Revision 1.39  2008/09/27 00:05:35  fplanque
  * doc, minor
  *

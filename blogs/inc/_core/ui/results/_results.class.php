@@ -982,7 +982,8 @@ class Results extends Table
 				$output = $this->parse_col_content( $col['td'] );
 				#pre_dump( '{'.$output.'}' );
 				$out = eval( "return '$output';" );
-				echo ( trim(strip_tags($out,'<img><input>')) === '' ? '&nbsp;' : $out );
+//fp> why do we need this?:				echo ( trim(strip_tags($out,'<img><input>')) === '' ? '&nbsp;' : $out );
+				echo ( trim(strip_tags($out,'<img>')) === '' ? '&nbsp;' : $out );
 
 				// COL START:
 				$this->display_col_end();
@@ -1804,6 +1805,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.14  2008/09/28 05:05:07  fplanque
+ * minor
+ *
  * Revision 1.13  2008/09/26 19:25:43  tblue246
  * display_body(): do not strip <input> from row contents
  *

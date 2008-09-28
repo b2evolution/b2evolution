@@ -151,7 +151,7 @@ switch( $action )
 						}
 						else
 						{
-							$Messages->add( T_('Caching could not be enabled for this blog. Check /cache/ folder file permissions.'), 'success' );
+							$Messages->add( T_('Caching could not be enabled for this blog. Check /cache/ folder file permissions.'), 'error' );
 							$edited_Blog->set_setting('cache_enabled', 0 );
 						}
 					}
@@ -249,6 +249,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2008/09/28 05:05:07  fplanque
+ * minor
+ *
  * Revision 1.13  2008/09/27 00:48:32  fplanque
  * caching step 0.
  *
