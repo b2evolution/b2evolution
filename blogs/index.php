@@ -23,7 +23,7 @@
  * First thing: Do the minimal initializations required for b2evo:
  */
 require_once dirname(__FILE__).'/conf/_config.php';
-
+// waltercruz: just testing my cvs commit e-mails on sourceforge, will revert it right now, fp, forgive me.
 require_once $inc_path.'_main.inc.php';
 
 // Check if a specific blog has been requested in the URL:
