@@ -133,8 +133,6 @@ class ItemQuery extends SQL
 	/**
 	 * Restrict to specific collection/chapters (blog/categories)
 	 *
-	 * @todo get rid of blog #1
-	 *
 	 * @param integer
 	 * @param string List of cats to restrict to
 	 * @param array Array of cats to restrict to
@@ -196,8 +194,6 @@ class ItemQuery extends SQL
 
 	/**
 	 * Restrict to specific collection/chapters (blog/categories)
-	 *
-	 * @todo get rid of blog #1
 	 *
 	 * @param Blog
 	 * @param array
@@ -707,6 +703,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.7  2008/09/28 17:40:39  waltercruz
+ * Removing done todos
+ *
  * Revision 1.6  2008/01/21 09:35:31  fplanque
  * (c) 2008
  *
