@@ -14,7 +14,7 @@
  */
 
 // The User ID of the administrator:
-$recipient_id = 1; 
+$recipient_id = 1;
 
 // Tie this to no blog in particular. (Do not include a link to any blog in the emails you will receive).
 $blog = 0;
@@ -36,18 +36,19 @@ load_funcs( 'skins/_skin.funcs.php' );
 // Are we returning to this page?
 param( 'return', 'integer', 0 );
 
+// Note: This is an interactive page: not a good candidate for caching.
 
-header( 'Content-type: text/html; charset='.$io_charset );
+header_content_type( 'text/html' );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/Standard.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
 <title><?php echo T_('Contact Form Demo'); ?></title>
-<!-- InstanceEndEditable --> 
+<!-- InstanceEndEditable -->
 <link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 <!-- InstanceBeginEditable name="head" -->
- <!-- InstanceEndEditable --> 
+ <!-- InstanceEndEditable -->
 </head>
 <body>
 <!-- InstanceBeginEditable name="ToolBar" -->
@@ -121,15 +122,15 @@ header( 'Content-type: text/html; charset='.$io_charset );
 		{	// We haven't asked for a specific return URL, so we'll come back to here with a param.
 			$redirect_to = url_add_param( $ReqURI, 'return=1', '&' );
 		}
-		
+
 		// The form, per se:
 		require $skins_path.'_msgform.disp.php';
 	}
 	else
 	{	// We are coming back after sending a message:
-	
+
 		echo '<p>'.T_('Thank you for your message. I will reply as soon as possible.').'</p>';
-		
+
 		// This is useful for testing but does not really make sense on production:
 		echo '<p><a href="'.regenerate_url().'">'.T_('Send another message?').'</a></p>';
 	}
@@ -149,7 +150,7 @@ header( 'Content-type: text/html; charset='.$io_charset );
   </tr>
 </table>
 <!-- InstanceBeginEditable name="Baseline" -->
-<?php 
+<?php
 	debug_info();
 ?>
 <!-- InstanceEndEditable -->

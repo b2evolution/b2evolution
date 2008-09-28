@@ -37,7 +37,7 @@ global $io_charset, $rsc_url, $UserSettings, $Debuglog, $Plugins, $generating_st
 global $month, $month_abbrev, $weekday, $weekday_abbrev; /* for localized calendar */
 global $debug, $Hit;
 
-header( 'Content-type: text/html; charset='.$io_charset );
+header_content_type( 'text/html' );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
@@ -246,6 +246,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.8  2008/09/28 08:06:13  fplanque
+ * Refactoring / extended page level caching
+ *
  * Revision 1.7  2008/04/03 14:54:34  fplanque
  * date fixes
  *

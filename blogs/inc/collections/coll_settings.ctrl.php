@@ -143,9 +143,13 @@ switch( $action )
 				if( $edited_Blog->load_from_Request( array( 'pings', 'cache' ) ) )
 				{ // Commit update to the DB:
 					$new_cache_status =  $edited_Blog->get_setting('cache_enabled');
+
+					load_class( '_core/model/_pagecache.class.php' );
+					$PageCache = & new PageCache( $edited_Blog );
+
 					if( $old_cache_status == false && $new_cache_status == true )
 					{ // Caching has been turned ON:
-						if( $edited_Blog->cache_create() )
+						if( $PageCache->cache_create() )
 						{
 							$Messages->add( T_('Caching has been enabled for this blog.'), 'success' );
 						}
@@ -157,7 +161,7 @@ switch( $action )
 					}
 					elseif( $old_cache_status == true && $new_cache_status == false )
 					{ // Caching has been turned OFF:
-						$edited_Blog->cache_delete();
+						$PageCache->cache_delete();
 						$Messages->add( T_('Caching has been disabled for this blog. All cache contents have been purged.'), 'note' );
 					}
 
@@ -249,6 +253,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2008/09/28 08:06:07  fplanque
+ * Refactoring / extended page level caching
+ *
  * Revision 1.14  2008/09/28 05:05:07  fplanque
  * minor
  *

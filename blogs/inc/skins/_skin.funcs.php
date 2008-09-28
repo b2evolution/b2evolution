@@ -457,6 +457,7 @@ function skin_404_header()
 
 /**
  * Template tag. Output content-type header
+ * For backward compatibility
  *
  * @see skin_content_meta()
  *
@@ -464,12 +465,7 @@ function skin_404_header()
  */
 function skin_content_header( $type = 'text/html' )
 {
-	global $io_charset;
-	global $content_type_header;
-
-	$content_type_header = 'Content-type: '.$type.'; charset='.$io_charset;
-
-	header( $content_type_header );
+	header_content_type( $type );
 }
 
 
@@ -596,6 +592,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.33  2008/09/28 08:06:08  fplanque
+ * Refactoring / extended page level caching
+ *
  * Revision 1.32  2008/09/27 07:54:34  fplanque
  * minor
  *

@@ -81,6 +81,8 @@ function shutdown()
 	global $Settings;
 	global $Debuglog;
 
+	// echo '*** SHUTDOWN FUNC KICKING IN ***';
+
 	// fp> do we need special processing if we are in CLI mode?  probably earlier actually
 	// if( ! $is_cli )
 
@@ -1280,7 +1282,7 @@ function debug_die( $additional_info = '' )
 	if( ! headers_sent() )
 	{
 		global $io_charset;
-		header('Content-type: text/html; charset='.$io_charset); // it's ok, if a previous header would be replaced;
+    header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
 		header('HTTP/1.0 500 Internal Server Error');
 	}
 
@@ -1395,7 +1397,7 @@ function bad_request_die( $additional_info = '' )
 	if( ! headers_sent() )
 	{
 		global $io_charset;
-		header('Content-type: text/html; charset='.$io_charset); // it's ok, if a previous header would be replaced;
+    header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
 		header('HTTP/1.0 400 Bad Request');
 	}
 
@@ -2949,6 +2951,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.49  2008/09/28 08:06:05  fplanque
+ * Refactoring / extended page level caching
+ *
  * Revision 1.48  2008/09/24 20:15:31  blueyed
  * Since the commented mbstring way in mail_encode_header_string() has been ''rolled back'', I can provide the method that works, too
  *

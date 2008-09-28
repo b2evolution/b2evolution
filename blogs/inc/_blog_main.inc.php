@@ -506,11 +506,14 @@ $Plugins->trigger_event( 'BeforeBlogDisplay', array('skin'=>$skin) );
 if( !empty( $skin ) )
 { // We want to display with a skin now:
 
+	// Instanciate PageCache:
+	load_class( '_core/model/_pagecache.class.php' );
+	$PageCache = & new PageCache( $Blog );
 	// Check for cached content & Start caching if needed
 	// Note: there are some redirects inside the skins themselves for canonical URLs,
 	// If we have a cache hit, the redirect won't take place until the cache expires -- probably ok.
 	// If we start collecting and a redirect happens, the collecting will just be lost and that's what we want.
-	if(! $Blog->cache_check() )
+	if( ! $PageCache->check() )
 	{	// Cache miss, we have to generate:
 
 		if( $skin_provided_by_plugin = skin_provided_by_plugin($skin) )
@@ -567,9 +570,13 @@ if( !empty( $skin ) )
 			}
 		}
 
-		// Collect cached data:
-		$Blog->cache_collect_end();
+		// Save collected cached data if needed:
+		$PageCache->end_collect();
 	}
+
+	// We probably don't want to return to the caller if we have displayed a skin...
+	// That is useful if the caller implements a custom display but we still use skins for RSS/ Atom etc..
+	exit(0);
 }
 else
 {	// We don't use a skin. Hopefully the caller will do some displaying.
@@ -582,6 +589,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.106  2008/09/28 08:06:04  fplanque
+ * Refactoring / extended page level caching
+ *
  * Revision 1.105  2008/09/27 08:14:02  fplanque
  * page level caching
  *

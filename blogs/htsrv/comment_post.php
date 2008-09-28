@@ -374,7 +374,9 @@ if( $Comment->ID )
 		// before the cache has expired. Invalidate cache for that page:
 		// Note: this is approximative and may not cover all URLs where the user expects to see the comment...
 		// TODO: fp> solution: touch dates?
-		$Comment->Item->Blog->cache_invalidate( $Comment->Item->get_single_url() );
+		load_class( '_core/model/_pagecache.class.php' );
+		$PageCache = & new PageCache( $Blog );
+		$PageCache->invalidate( $Comment->Item->get_single_url() );
 	}
 }
 
@@ -385,6 +387,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.126  2008/09/28 08:06:03  fplanque
+ * Refactoring / extended page level caching
+ *
  * Revision 1.125  2008/09/27 07:54:33  fplanque
  * minor
  *

@@ -35,6 +35,33 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * Template tag. Output content-type header
+ *
+ * @param string content-type; override for RSS feeds
+ */
+function header_content_type( $type = 'text/html', $charset = '#' )
+{
+	global $io_charset;
+	global $content_type_header;
+
+	$content_type_header = 'Content-type: '.$type;
+
+	if( !empty($charset) )
+	{
+		if( $charset == '#' )
+		{
+			$charset = $io_charset;
+		}
+
+		$content_type_header .= '; charset='.$charset;
+	}
+
+	header( $content_type_header );
+}
+
+
+
+/**
  * Sends HTTP header to redirect to the previous location (which
  * can be given as function parameter, GET parameter (redirect_to),
  * is taken from {@link Hit::$referer} or {@link $baseurl}).
@@ -810,6 +837,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.41  2008/09/28 08:06:05  fplanque
+ * Refactoring / extended page level caching
+ *
  * Revision 1.40  2008/09/28 05:05:06  fplanque
  * minor
  *

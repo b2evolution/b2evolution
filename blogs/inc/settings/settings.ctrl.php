@@ -94,6 +94,32 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	param_integer_range( 'reloadpage_timeout', 0, 99999, T_('Reload-page timeout must be between %d and %d.') );
 	$Settings->set( 'reloadpage_timeout', $reloadpage_timeout );
 
+	$new_cache_status = param( 'general_cache_enabled', 'integer', 0 );
+	$old_cache_status = $Settings->get('general_cache_enabled');
+
+	load_class( '_core/model/_pagecache.class.php' );
+	$PageCache = & new PageCache(  );
+
+	if( $old_cache_status == false && $new_cache_status == true )
+	{ // Caching has been turned ON:
+		if( $PageCache->cache_create() )
+		{
+			$Messages->add( T_('General caching has been enabled.'), 'success' );
+		}
+		else
+		{
+			$Messages->add( T_('General caching could not be enabled. Check /cache/ folder file permissions.'), 'error' );
+			$new_cache_status = 0;
+		}
+	}
+	elseif( $old_cache_status == true && $new_cache_status == false )
+	{ // Caching has been turned OFF:
+		$PageCache->cache_delete();
+		$Messages->add( T_('General caching has been disabled. All general cache contents have been purged.'), 'note' );
+	}
+
+	$Settings->set( 'general_cache_enabled', $new_cache_status );
+
 	if( ! $Messages->count('error') )
 	{
 		if( $Settings->dbupdate() )
@@ -125,6 +151,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2008/09/28 08:06:07  fplanque
+ * Refactoring / extended page level caching
+ *
  * Revision 1.2  2008/01/21 09:35:34  fplanque
  * (c) 2008
  *

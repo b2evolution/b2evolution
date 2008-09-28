@@ -61,7 +61,7 @@ switch( $action )
 {
 	case 'add_plugin_sett_set':
 		// Add a Plugin(User)Settings set (for "array" type settings):
-		header('Content-type: text/html; charset='.$io_charset);
+    header_content_type( 'text/html' );
 
 		param( 'plugin_ID', 'integer', true );
 
@@ -115,6 +115,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.28  2008/09/28 08:06:03  fplanque
+ * Refactoring / extended page level caching
+ *
  * Revision 1.27  2008/02/19 11:11:16  fplanque
  * no message
  *

@@ -23,17 +23,29 @@ require_once $inc_path.'_main.inc.php';
 
 load_funcs( 'skins/_skin.funcs.php' );
 
-header( 'Content-type: text/html; charset='.$io_charset );
+
+// --------------------- PAGE LEVEL CACHING SUPPORT ---------------------
+// Note: This is totally optional. General caching must be enabled in Global settings, otherwise this will do nothing.
+// Delete this block if you don't care about page level caching. Don't forget to delet the matching section at the end of the page.
+load_class( '_core/model/_pagecache.class.php' );
+$PageCache = & new PageCache( NULL );
+// Check for cached content & Start caching if needed:
+if( ! $PageCache->check() )
+{	// Cache miss, we have to generate:
+	// --------------------- PAGE LEVEL CACHING SUPPORT ---------------------
+
+
+header_content_type( 'text/html' );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/Standard.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
 <title><?php echo T_('Summary Demo'); ?></title>
-<!-- InstanceEndEditable --> 
+<!-- InstanceEndEditable -->
 <link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 <!-- InstanceBeginEditable name="head" -->
- <!-- InstanceEndEditable --> 
+ <!-- InstanceEndEditable -->
 </head>
 <body>
 <!-- InstanceBeginEditable name="ToolBar" -->
@@ -157,9 +169,13 @@ header( 'Content-type: text/html; charset='.$io_charset );
   </tr>
 </table>
 <!-- InstanceBeginEditable name="Baseline" -->
-<?php
-	debug_info();
-?>
 <!-- InstanceEndEditable -->
 </body>
 <!-- InstanceEnd --></html>
+<?php
+	// --------------------- PAGE LEVEL CACHING SUPPORT ---------------------
+	// Save collected cached data if needed:
+	$PageCache->end_collect();
+}
+// --------------------- PAGE LEVEL CACHING SUPPORT ---------------------
+?>

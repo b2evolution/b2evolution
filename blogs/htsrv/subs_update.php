@@ -70,7 +70,7 @@ profile_check_params( array( 'email' => array($newuser_email, 'newuser_email') )
 if( $Messages->count( 'error' ) )
 {
 	// TODO: dh> display errors with the form itself
-	header( 'Content-type: text/html; charset='.$io_charset );
+	header_content_type( 'text/html' );
 	$Messages->display( T_('Cannot update profile. Please correct the following errors:'),
 			'[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
 	exit(0);
@@ -131,6 +131,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.25  2008/09/28 08:06:03  fplanque
+ * Refactoring / extended page level caching
+ *
  * Revision 1.24  2008/02/19 11:11:16  fplanque
  * no message
  *

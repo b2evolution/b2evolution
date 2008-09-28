@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $cookie_name, $cookie_email, $cookie_url;
 global $comment_allowed_tags, $comments_use_autobr;
 global $comment_cookies, $comment_allow_msgform;
-
+global $PageCache;
 
 // Default params:
 $params = array_merge( array(
@@ -43,7 +43,7 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 		{ // display PREVIEW:
 
 			// We do not want the current rendered page to be cached!!
-			$Item->Blog->cache_abort_collect();
+			$PageCache->abort_collect();
 
 			// ------------------ PREVIEW COMMENT INCLUDED HERE ------------------
 			skin_include( $params['comment_template'], array(
@@ -69,7 +69,7 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	else
 	{ // New comment:
 		$Comment = & new Comment();
-		if( $Item->Blog->cache_is_collecting )
+		if( $PageCache->is_collecting )
 		{	// This page is going into the cache, we don't want personal data cached!!!
 			// fp> These fields should be filled out locally with Javascript tapping directly into the cookies. Anyone JS savvy enough to do that?
       $comment_author = '';
@@ -91,7 +91,7 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	}
 
 
-	if( $Item->Blog->cache_is_collecting )
+	if( $PageCache->is_collecting )
 	{	// This page is going into the cache, we don't want personal data cached!!!
 		// fp> These fields should be filled out locally with Javascript tapping directly into the cookies. Anyone JS savvy enough to do that?
 	}
@@ -215,6 +215,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.9  2008/09/28 08:06:09  fplanque
+ * Refactoring / extended page level caching
+ *
  * Revision 1.8  2008/09/27 08:14:02  fplanque
  * page level caching
  *

@@ -28,7 +28,7 @@ if( $feed_content == 'none' )
 }
 
 
-skin_content_header( 'application/xml' );	// Sets charset!
+header_content_type( 'application/xml' );	// Sets charset!
 
 echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 

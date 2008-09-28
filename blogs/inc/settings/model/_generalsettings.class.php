@@ -105,6 +105,8 @@ class GeneralSettings extends AbstractSettings
 		'webhelp_enabled' => '1',
 
 		'allow_moving_chapters' => '0',				// Do not allow moving chapters by default
+
+		'general_cache_enabled' => 0,
 	);
 
 
@@ -159,6 +161,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.11  2008/09/28 08:06:07  fplanque
+ * Refactoring / extended page level caching
+ *
  * Revision 1.10  2008/09/23 06:18:38  fplanque
  * File manager now supports a shared directory (/media/shared/global/)
  *

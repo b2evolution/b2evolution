@@ -65,7 +65,7 @@ $FileRoot = & $FileRootCache->get_by_ID( $root );
 // Create file object
 $selected_File = & new File( $FileRoot->type , $FileRoot->in_type_ID, $path );
 
-header( 'Content-type: text/html; charset='.$io_charset );
+header_content_type( 'text/html' );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
@@ -242,6 +242,9 @@ switch( $viewtype )
 <?php
 /*
  * $Log$
+ * Revision 1.21  2008/09/28 08:06:03  fplanque
+ * Refactoring / extended page level caching
+ *
  * Revision 1.20  2008/07/07 05:59:26  fplanque
  * minor / doc / rollback of overzealous indetation "fixes"
  *

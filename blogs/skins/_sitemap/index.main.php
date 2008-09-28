@@ -45,7 +45,7 @@ $Timer->start( 'display list' );
 
 // Note: since URLs are likely to be clean ASCII, $io_charset can probably be faked to UTF-8 here
 
-header( 'Content-type: application/xml; charset=UTF-8' );
+header_content_type( 'application/xml', 'UTF-8' );
 
 echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 ?>
@@ -97,7 +97,4 @@ while( $Item = & mainlist_get_item() )
 <?php
 
 $Timer->stop( 'display list' );
-
-// This is a self contained XML document, make sure there is no additional output:
-exit(0);
 ?>

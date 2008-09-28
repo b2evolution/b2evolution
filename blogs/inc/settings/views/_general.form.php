@@ -107,6 +107,14 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
+$Form->begin_fieldset( T_('Caching') );
+
+	$Form->checkbox_input( 'general_cache_enabled', $Settings->get('general_cache_enabled'), T_('Enable general cache'), array( 'note'=>T_('Cache rendered pages that are not controlled by a skin. See Blog Settings for skin output caching.') ) );
+
+$Form->end_fieldset();
+
+// --------------------------------------------
+
 if( $current_User->check_perm( 'options', 'edit' ) )
 {
 	$Form->end_form( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
@@ -115,6 +123,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.4  2008/09/28 08:06:07  fplanque
+ * Refactoring / extended page level caching
+ *
  * Revision 1.3  2008/01/21 09:35:34  fplanque
  * (c) 2008
  *
