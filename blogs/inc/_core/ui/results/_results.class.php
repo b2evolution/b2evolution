@@ -983,6 +983,10 @@ class Results extends Table
 				#pre_dump( '{'.$output.'}' );
 				$out = eval( "return '$output';" );
 //fp> why do we need this?:				echo ( trim(strip_tags($out,'<img><input>')) === '' ? '&nbsp;' : $out );
+// tblue> strip_tags($out, '<img>') strips all tags except <img>, so e. g.
+//	the checkboxes on the user/group perms tab aren't displayed (<input> gets
+//	stripped => string appears to be empty => only &nbsp; is displayed).
+//	see also: http://forums.b2evolution.net/viewtopic.php?t=16334
 				echo ( trim(strip_tags($out,'<img>')) === '' ? '&nbsp;' : $out );
 
 				// COL START:
@@ -1805,6 +1809,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.15  2008/09/28 12:11:12  tblue246
+ * display_body(): comment on strip_tags() issue
+ *
  * Revision 1.14  2008/09/28 05:05:07  fplanque
  * minor
  *
