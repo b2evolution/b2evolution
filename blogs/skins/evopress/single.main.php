@@ -125,6 +125,14 @@ while( $Item = & mainlist_get_item() )
 		<p class="postmetadata alt">
 			<small>
 				<?php
+					$Item->author( array(
+							'link_text'    => 'avatar',
+							'link_rel'     => 'nofollow',
+							'thumb_size'   => 'crop-32x32',
+							'thumb_class'  => 'leftmargin',
+						) );
+				?>
+				<?php
 					$Item->issue_time( array(
 							'before'      => /* TRANS: date */ T_('This entry was posted on '),
 							'time_format' => 'F jS, Y',

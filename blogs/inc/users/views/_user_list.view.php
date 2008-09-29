@@ -77,7 +77,7 @@ $count_sql = 'SELECT COUNT(*)
 							 WHERE '.$where_clause.' 1';
 
 
-$Results = & new Results( $sql, 'user_', '-A', NULL, $count_sql );
+$Results = & new Results( $sql, 'user_', '--A', NULL, $count_sql );
 
 $Results->title = T_('Groups & Users');
 
@@ -158,6 +158,28 @@ $Results->cols[] = array(
 						'td_class' => 'shrinkwrap',
 						'order' => 'user_ID',
 						'td' => '$user_ID$',
+					);
+
+function user_avatar( $user_ID, $user_avatar_file_ID )
+{
+	$FileCache = & get_Cache( 'FileCache' );
+
+	// Do not halt on error. A file can disappear without the profile being updated.
+	/**
+	 * @var File
+	 */
+	if( ! $File = & $FileCache->get_by_ID( $user_avatar_file_ID, false, false ) )
+	{
+		return '';
+	}
+
+	return '<a href="?ctrl=users&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-48x48' ).'</a>';
+}
+$Results->cols[] = array(
+						'th' => T_('Avatar'),
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap center',
+						'td' => '%user_avatar( #user_ID#, #user_avatar_file_ID# )%',
 					);
 
 $Results->cols[] = array(
@@ -274,6 +296,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2008/09/29 08:30:40  fplanque
+ * Avatar support
+ *
  * Revision 1.5  2008/01/21 09:35:36  fplanque
  * (c) 2008
  *

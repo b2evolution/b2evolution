@@ -282,7 +282,33 @@ function create_demo_contents()
 	load_class( 'files/model/_filetype.class.php' );
 	load_class( 'items/model/_link.class.php' );
 
-	echo 'Creating demo user... ';
+	task_begin('Assigning avatar to Admin... ');
+	$edit_File = & new File( 'user', 1, 'faceyourmanga_admin_boy.png' );
+	// Load meta data AND MAKE SURE IT IS CREATED IN DB:
+	$edit_File->load_meta( true );
+	$UserCache = & get_Cache( 'UserCache' );
+	$User_Admin = & $UserCache->get_by_ID( 1 );
+	$User_Admin->set( 'avatar_file_ID', $edit_File->ID );
+	$User_Admin->dbupdate();
+	task_end();
+
+	task_begin('Creating demo blogger user... ');
+	$User_Blogger = & new User();
+	$User_Blogger->set( 'login', 'ablogger' );
+	$User_Blogger->set( 'pass', md5($random_password) ); // random
+	$User_Blogger->set( 'nickname', 'Blogger A' );
+	$User_Blogger->set_email( $admin_email );
+	$User_Blogger->set( 'validated', 1 ); // assume it's validated
+	$User_Blogger->set( 'ip', '127.0.0.1' );
+	$User_Blogger->set( 'domain', 'localhost' );
+	$User_Blogger->set( 'level', 1 );
+	$User_Blogger->set( 'locale', $default_locale );
+	$User_Blogger->set_datecreated( $timestamp++ );
+	$User_Blogger->set_Group( $Group_Bloggers );
+	$User_Blogger->dbinsert();
+	task_end();
+
+	task_begin('Creating demo user... ');
 	$User_Demo = & new User();
 	$User_Demo->set( 'login', 'demouser' );
 	$User_Demo->set( 'pass', md5($random_password) ); // random
@@ -296,8 +322,7 @@ function create_demo_contents()
 	$User_Demo->set_datecreated( $timestamp++ );
 	$User_Demo->set_Group( $Group_Users );
 	$User_Demo->dbinsert();
-	echo "OK.<br />\n";
-
+	task_end();
 
 	global $default_locale, $query, $timestamp;
 	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
@@ -713,6 +738,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.248  2008/09/29 08:30:38  fplanque
+ * Avatar support
+ *
  * Revision 1.247  2008/09/23 07:56:47  fplanque
  * Demo blog now uses shared files folder for demo media + more images in demo posts
  *

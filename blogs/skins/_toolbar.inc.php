@@ -44,7 +44,10 @@ global $Hit;
 <div class="actions_right">
 	<ul>
  	<li class="menu_close" onmouseover="evo_menu_show(this)" onmouseout="evo_menu_hide(this)">
-		<?php	user_profile_link( '<strong>', '</strong>', '%s '.get_icon('dropdown') ); ?>
+		<?php
+		echo $current_User->get_avatar_imgtag( 'crop-15x15', '', 'top' );
+
+		user_profile_link( '<strong>', '</strong>', '%s '.get_icon('dropdown') ); ?>
 		<ul>
 		<?php
 			user_profile_link( '<li>', '</li>', T_('User profile').' (%s)' );

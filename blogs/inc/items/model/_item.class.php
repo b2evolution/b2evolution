@@ -339,16 +339,29 @@ class Item extends ItemLight
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'before'      => ' ',
-				'after'       => ' ',
-				'format'      => 'htmlbody',
-				'link_to'			=> 'userpage',
+				'before'       => ' ',
+				'after'        => ' ',
+				'format'       => 'htmlbody',
+				'link_to'		   => 'userpage',
+				'link_text'    => 'preferredname',
+				'link_rel'     => '',
+				'link_class'   => '',
+				'thumb_size'   => 'crop-32x32',
+				'thumb_class'  => '',
 			), $params );
 
 		// Load User
 		$this->get_creator_User();
 
-		$r = $this->creator_User->dget( 'preferredname', $params['format'] );
+		if( $params['link_text'] == 'avatar' )
+		{
+			$r = $this->creator_User->get_avatar_imgtag( $params['thumb_size'], $params['thumb_class'] );
+
+		}
+		else
+		{
+			$r = $this->creator_User->dget( 'preferredname', $params['format'] );
+		}
 
 		if( $params['link_to'] == 'userpage' )
 		{
@@ -361,7 +374,16 @@ class Item extends ItemLight
 
 		if( !empty($url) )
 		{
-			$r = '<a href="'.$url.'">'.$r.'</a>';
+			$link = '<a href="'.$url.'"';
+			if( !empty($params['link_rel']) )
+			{
+				$link .= ' rel="'.$params['link_rel'].'"';
+			}
+			if( !empty($params['link_class']) )
+			{
+				$link .= ' class="'.$params['link_class'].'"';
+			}
+			$r = $link.'>'.$r.'</a>';
 		}
 
 		echo $params['before'].$r.$params['after'];
@@ -3583,6 +3605,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.57  2008/09/29 08:30:39  fplanque
+ * Avatar support
+ *
  * Revision 1.56  2008/09/23 07:56:47  fplanque
  * Demo blog now uses shared files folder for demo media + more images in demo posts
  *

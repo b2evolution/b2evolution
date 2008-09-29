@@ -42,6 +42,8 @@ $ProfileForm = & new Form( '', 'ProfileForm' );
 
 $ProfileForm->begin_form( 'bComment' );
 
+echo $User->get_avatar_imgtag( 'fit-160x160', 'rightmargin' );
+
 $ProfileForm->begin_fieldset( T_('Identity') );
 
 	$ProfileForm->info( T_('Name'), $User->get( 'preferredname' ) );
@@ -77,6 +79,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.2  2008/09/29 08:30:39  fplanque
+ * Avatar support
+ *
  * Revision 1.1  2008/04/13 23:38:54  fplanque
  * Basic public user profiles
  *

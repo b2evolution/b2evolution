@@ -71,9 +71,14 @@ $thumbnail_sizes = array(
 			'fit-520x390' => array( 'fit', 520, 390, 90 ),
 			'fit-400x320' => array( 'fit', 400, 320, 85 ),
 			'fit-320x320' => array( 'fit', 320, 320, 85 ),
+			'fit-160x160' => array( 'fit', 160, 160, 80 ),
 			'fit-160x120' => array( 'fit', 160, 120, 80 ),
-			'fit-80x80' => array( 'fit', 80, 80, 75 ),
-			'crop-80x80' => array( 'crop', 80, 80, 80 ),
+			'fit-80x80' => array( 'fit', 80, 80, 80 ),
+			'crop-80x80' => array( 'crop', 80, 80, 85 ),
+			'crop-64x64' => array( 'crop', 64, 64, 85 ),
+			'crop-48x48' => array( 'crop', 48, 48, 85 ),
+			'crop-32x32' => array( 'crop', 32, 32, 85 ),
+			'crop-15x15' => array( 'crop', 15, 15, 85 ),
 	);
 
 

@@ -103,7 +103,8 @@ $schema_queries = array(
 			user_notify tinyint(1) NOT NULL default 1,
 			user_showonline tinyint(1) NOT NULL default 1,
 			user_grp_ID int(4) NOT NULL default 1,
-			user_validated TINYINT(1) NOT NULL DEFAULT 0,
+			user_validated tinyint(1) NOT NULL DEFAULT 0,
+	  	user_avatar_file_ID int(11) unsigned default NULL,
 			PRIMARY KEY user_ID (user_ID),
 			UNIQUE user_login (user_login),
 			KEY user_grp_ID (user_grp_ID)
@@ -539,6 +540,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.5  2008/09/29 08:30:36  fplanque
+ * Avatar support
+ *
  * Revision 1.4  2008/09/23 06:18:33  fplanque
  * File manager now supports a shared directory (/media/shared/global/)
  *

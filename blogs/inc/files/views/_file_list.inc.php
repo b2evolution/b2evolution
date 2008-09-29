@@ -67,6 +67,8 @@ global $selected_Filelist;
  */
 global $edited_Item;
 
+global $edited_User;
+
 global $Blog;
 
 global $fm_hide_dirtree, $create_name, $ads_list_path;
@@ -262,6 +264,7 @@ $Form->begin_form();
 
 			/***************  Link ("chain") icon:  **************/
 
+			// fp> here might not be the best place to put the perm check
 			if( isset($edited_Item) && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 			{	// Offer option to link the file to an Item (or anything else):
 				$link_attribs = array();
@@ -274,6 +277,14 @@ $Form->begin_form();
 				echo action_icon( T_('Link this file!'), 'link',
 							regenerate_url( 'fm_selected', 'action='.$link_action.'&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ),
 							NULL, NULL, NULL, $link_attribs );
+				echo ' ';
+			}
+
+			if( isset($edited_User) ) // fp> Perm already checked in controller
+			{	// Offer option to link the file to an Item (or anything else):
+				echo action_icon( T_('Link this file!'), 'link',
+							regenerate_url( 'fm_selected', 'action=link_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ),
+							NULL, NULL, NULL, array() );
 				echo ' ';
 			}
 
@@ -594,6 +605,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.11  2008/09/29 08:30:38  fplanque
+ * Avatar support
+ *
  * Revision 1.10  2008/09/23 05:26:38  fplanque
  * Handle attaching files when multiple posts are edited simultaneously
  *

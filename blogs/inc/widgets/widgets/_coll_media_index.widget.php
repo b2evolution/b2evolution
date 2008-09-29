@@ -239,9 +239,7 @@ class coll_media_index_Widget extends ComponentWidget
 
 			echo '<a href="'.$ItemLight->get_permanent_url().'">';
 			// Generate the IMG THUMBNAIL tag with all the alt, title and desc if available
-			echo '<img src="'.$File->get_thumb_url( $this->disp_params['thumb_size'] ).'" '
-						.'alt="'.$File->dget('alt', 'htmlattr').'" '
-						.'title="'.$File->dget('title', 'htmlattr').'" />';
+			echo $File->get_thumb_imgtag( $this->disp_params['thumb_size'] );
 			echo '</a>';
 
 			if( $layout == 'grid' )
@@ -282,6 +280,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.3  2008/09/29 08:30:36  fplanque
+ * Avatar support
+ *
  * Revision 1.2  2008/09/24 08:44:11  fplanque
  * Fixed and normalized order params for widgets (Comments not done yet)
  *

@@ -60,6 +60,7 @@ class User extends DataObject
 	var $browser;
 	var $datecreated;
 	var $level;
+	var $avatar_file_ID;
 
 	/**
 	 * Does the user accept emails through a message form?
@@ -196,6 +197,7 @@ class User extends DataObject
 			$this->validated = $db_row->user_validated;
 			$this->notify = $db_row->user_notify;
 			$this->showonline = $db_row->user_showonline;
+			$this->avatar_file_ID = $db_row->user_avatar_file_ID;
 
 			// Group for this user:
 			$this->group_ID = $db_row->user_grp_ID;
@@ -1366,10 +1368,50 @@ class User extends DataObject
 
 	// }}}
 
+
+	function & get_avatar_File()
+	{
+		if( empty($this->avatar_file_ID) )
+		{
+			$File = NULL;
+		}
+		else
+		{
+			$FileCache = & get_Cache( 'FileCache' );
+
+			// Do not halt on error. A file can disappear without the profile being updated.
+	    /**
+			 * @var File
+			 */
+			$File = & $FileCache->get_by_ID( $this->avatar_file_ID, false, false );
+		}
+
+		return $File;
+	}
+
+
+	function get_avatar_imgtag( $size = 'crop-80x80', $class = '', $align = '' )
+	{
+
+    /**
+		 * @var File
+		 */
+		if( ! $File = & $this->get_avatar_File() )
+		{
+			return '';
+		}
+
+		$r = $File->get_thumb_imgtag( $size, $class, $align );
+
+		return $r;
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.12  2008/09/29 08:30:40  fplanque
+ * Avatar support
+ *
  * Revision 1.11  2008/04/13 23:38:53  fplanque
  * Basic public user profiles
  *

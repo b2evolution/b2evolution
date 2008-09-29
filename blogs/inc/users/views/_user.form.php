@@ -155,8 +155,15 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Identity') );
 
+
   if( $action != 'view_user' )
 	{ // We can edit the values:
+
+		global $admin_url;
+		$Form->info( T_('Avatar'), $edited_User->get_avatar_imgtag()
+			.' <a href="'.$admin_url.'?ctrl=files&amp;user_ID='.$edited_User->ID.'">'.T_('change').' &raquo;</a>' );
+
+		// fp> TODO: a javascript REFRAME feature would ne neat here: selecting a square area of the img and saving it as a new avatar image
 
 		$Form->text_input( 'edited_user_login', $edited_User->login, 20, T_('Login'), '', array( 'required' => true ) );
 		$Form->text_input( 'edited_user_firstname', $edited_User->firstname, 20, T_('First name'), '', array( 'maxlength' => 50 ) );
@@ -170,6 +177,8 @@ $Form->begin_fieldset( T_('Identity') );
 	}
 	else
 	{ // display only
+
+		$Form->info( T_('Avatar'), $edited_User->get_imgtag() );
 
 		$Form->info( T_('Login'), $edited_User->get('login') );
 		$Form->info( T_('First name'), $edited_User->get('firstname') );
@@ -386,6 +395,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.4  2008/09/29 08:30:40  fplanque
+ * Avatar support
+ *
  * Revision 1.3  2008/01/21 09:35:36  fplanque
  * (c) 2008
  *

@@ -98,11 +98,36 @@ if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 	$ItemCache = & get_Cache( 'ItemCache' );
 	if( ($edited_Item = & $ItemCache->get_by_ID( $item_ID, false )) === false )
 	{	// We could not find the contact to link:
-		$Messages->head = T_('Cannot link Item!');
 		$Messages->add( T_('Requested item does not exist any longer.'), 'error' );
 		unset( $edited_Item );
 		forget_param( 'item_ID' );
 		unset( $item_ID );
+	}
+}
+
+if( param( 'user_ID', 'integer', NULL, true, false, false ) )
+{ // Load Requested user:
+	$UserCache = & get_Cache( 'UserCache' );
+	if( ($edited_User = & $UserCache->get_by_ID( $user_ID, false )) === false )
+	{	// We could not find the contact to link:
+		$Messages->add( T_('Requested user does not exist any longer.'), 'error' );
+		unset( $edited_User );
+		forget_param( 'user_ID' );
+		unset( $user_ID );
+	}
+	else
+	{	// Found User, check perm:
+		if( $edited_User->ID != $current_User->ID )
+		{	// if not editing himself, must have user edit permission:
+			if( ! $current_User->check_perm( 'users', 'edit' ) )
+			{
+				$Messages->add( T_('No permission to edit this user.'), 'error' );
+				unset( $edited_User );
+				forget_param( 'user_ID' );
+				unset( $user_ID );
+			}
+		}
+
 	}
 }
 
@@ -118,8 +143,8 @@ if( $action == 'group_action' )
 	$action = param( 'group_action', 'string', '' );
 }
 
-if( !empty($action) && $fm_mode != 'link_item' )
-{	// The only mode which can tolerate simultaneous actions at this time is link_item
+if( !empty($action) && substr( $fm_mode, 0, 5 ) != 'link_' )
+{	// The only modes which can tolerate simultaneous actions at this time are link_* modes (item, user...)
 	// file_move & file_copy shouldn't actually be modes
 	$fm_mode = '';
 }
@@ -148,6 +173,19 @@ if( ! empty($root) )
 		$fm_FileRoot = false;
 	}
 }
+elseif( !empty($edited_User) )
+{	// We have a user, check if it already has a linked file in a particular root, in which case we want to use that root!
+	// This is useful so users can find their existing avatar
+	// Get list of attached files:
+  /**
+	 * @var File
+	 */
+	if( $avatar_File = & $edited_User->get_avatar_File() )
+	{
+		$fm_FileRoot = & $avatar_File->get_FileRoot();
+		$path = dirname( $avatar_File->get_rdfs_rel_path() ).'/';
+	}
+}
 elseif( !empty($edited_Item) )
 {	// We have a post, check if it already has a linked file in a particular root, in which case we want to use that root!
 	// This is useful when whlicking "attach files" from teh post edit screen: it takes you to the root where you have
@@ -162,6 +200,17 @@ elseif( !empty($edited_Item) )
 	if( !empty( $File ) )
 	{	// Obtain and use file root of first file:
 		$fm_FileRoot = & $File->get_FileRoot();
+		$path = dirname( $File->get_rdfs_rel_path() ).'/';
+	}
+}
+
+
+if( empty($fm_FileRoot) && !empty($edited_User) )
+{	// Still not set a root, try to get it for the edited User
+	$fm_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $edited_User->ID );
+	if( ! $fm_FileRoot || ! isset( $available_Roots[$fm_FileRoot->ID] ) )
+	{ // Root not found or not in list of available ones
+		$fm_FileRoot = false;
 	}
 }
 
@@ -173,6 +222,7 @@ if( empty($fm_FileRoot) && !empty($Blog) )
 		$fm_FileRoot = false;
 	}
 }
+
 
 if( ! $fm_FileRoot )
 { // No root requested (or the requested is invalid),
@@ -442,28 +492,29 @@ switch( $action )
 		// Check permission!
  		$current_User->check_perm( 'files', 'edit', true );
 
-		$edit_File = & $selected_Filelist->get_by_idx(0);
+ 		// Get the file we want to update:
+		$edited_File = & $selected_Filelist->get_by_idx(0);
 
 		// Check that the file is editable:
-		if( ! $edit_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
+		if( ! $edited_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
 		{
-			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edit_File->dget('name') ), 'error' );
+			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edited_File->dget('name') ), 'error' );
 			break;
 		}
 
 		param( 'file_content', 'html', '', false );
 
 
-    $full_path = $edit_File->get_full_path();
+    $full_path = $edited_File->get_full_path();
 		if( $rsc_handle = fopen( $full_path, 'w+') )
 		{
 			fwrite( $rsc_handle, $file_content );
 			fclose( $rsc_handle );
-			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; has been updated.' ), $edit_File->dget('name') ), 'success' );
+			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; has been updated.' ), $edited_File->dget('name') ), 'success' );
 		}
 		else
 		{
-			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; could not be updated.' ), $edit_File->dget('name') ), 'error' );
+			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; could not be updated.' ), $edited_File->dget('name') ), 'error' );
 		}
 
 		header_redirect( regenerate_url( '', '', '', '&' ) );
@@ -916,27 +967,28 @@ switch( $action )
 		// Check permission!
  		$current_User->check_perm( 'files', 'edit', true );
 
-		$edit_File = & $selected_Filelist->get_by_idx(0);
+ 		// Get the file we want to edit:
+		$edited_File = & $selected_Filelist->get_by_idx(0);
 
 		// Check that the file is editable:
-		if( ! $edit_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
+		if( ! $edited_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
 		{
-			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edit_File->dget('name') ), 'error' );
+			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edited_File->dget('name') ), 'error' );
 	 		// Leave special display mode:
 			$action = 'list';
 			break;
 		}
 
-		$full_path = $edit_File->get_full_path();
+		$full_path = $edited_File->get_full_path();
 		if( $size = filesize($full_path) )
 		{
 			$rsc_handle = fopen( $full_path, 'r');
-			$edit_File->content = fread( $rsc_handle, $size );
+			$edited_File->content = fread( $rsc_handle, $size );
 			fclose( $rsc_handle );
 		}
 		else
 		{	// Empty file
-			$edit_File->content = '';
+			$edited_File->content = '';
 		}
 		break;
 
@@ -948,8 +1000,8 @@ switch( $action )
 		// Check permission!
  		$current_User->check_perm( 'files', 'edit', true );
 
-		$edit_File = & $selected_Filelist->get_by_idx(0);
-		$edit_File->load_meta();
+		$edited_File = & $selected_Filelist->get_by_idx(0);
+		$edited_File->load_meta();
 		break;
 
 
@@ -960,70 +1012,103 @@ switch( $action )
 		// Check permission!
  		$current_User->check_perm( 'files', 'edit', true );
 
-		$edit_File = & $selected_Filelist->get_by_idx(0);
+		$edited_File = & $selected_Filelist->get_by_idx(0);
 		// Load meta data:
-		$edit_File->load_meta();
+		$edited_File->load_meta();
 
-		$edit_File->set( 'title', param( 'title', 'string', '' ) );
-		$edit_File->set( 'alt', param( 'alt', 'string', '' ) );
-		$edit_File->set( 'desc', param( 'desc', 'string', '' ) );
+		$edited_File->set( 'title', param( 'title', 'string', '' ) );
+		$edited_File->set( 'alt', param( 'alt', 'string', '' ) );
+		$edited_File->set( 'desc', param( 'desc', 'string', '' ) );
 
 		// Store File object into DB:
-		if( $edit_File->dbsave() )
+		if( $edited_File->dbsave() )
 		{
-			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have been updated.' ), $edit_File->dget('name') ), 'success' );
+			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have been updated.' ), $edited_File->dget('name') ), 'success' );
 		}
 		else
 		{
-			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $edit_File->dget('name') ), 'note' );
+			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $edited_File->dget('name') ), 'note' );
 		}
+		break;
+
+
+	case 'link_user':
+		// TODO: We don't need the Filelist, move UP!
+		// Link File to User:
+		if( ! isset($edited_User) )
+ 		{	// No User to link to
+			$fm_mode = NULL;	// not really needed but just  n case...
+			break;
+		}
+
+		// Permission HAS been checked on top of controller!
+
+ 		// Get the file we want to link:
+		if( !$selected_Filelist->count() )
+		{
+			$Messages->add( T_('Nothing selected.'), 'error' );
+			break;
+		}
+		$edited_File = & $selected_Filelist->get_by_idx(0);
+
+		// Load meta data AND MAKE SURE IT IS CREATED IN DB:
+		$edited_File->load_meta( true );
+
+		// Assign avatar:
+		$edited_User->set( 'avatar_file_ID', $edited_File->ID );
+		// Save to DB:
+ 		$edited_User->dbupdate();
+
+		$Messages->add( T_('User avatar modified.'), 'success' );
+
+		// REDIRECT / EXIT
+		header_redirect( $admin_url.'?ctrl=users&user_ID='.$edited_User->ID );
 		break;
 
 
 	case 'link':
 	case 'link_inpost':	// In the context of a post
 		// TODO: We don't need the Filelist, move UP!
-		// Link File to Item (or other object if extended below):
+		// Link File to Item
 
 		// Note: we are not modifying any file here, we're just linking it
 		// we only need read perm on file, but we'll need write perm on destination object (to be checked below)
 
-		if( isset($edited_Item) )
-		{
-			if( !$selected_Filelist->count() )
-			{
-				$Messages->add( T_('Nothing selected.'), 'error' );
-				break;
-			}
-
-			$edit_File = & $selected_Filelist->get_by_idx(0);
-
-			// check item EDIT permissions:
-			$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
-
-			$DB->begin();
-
-			// Load meta data AND MAKE SURE IT IS CREATED IN DB:
-			$edit_File->load_meta( true );
-
-			// Let's make the link!
-			$edited_Link = & new Link();
-			$edited_Link->set( 'itm_ID', $edited_Item->ID );
-			$edited_Link->set( 'file_ID', $edit_File->ID );
-			$edited_Link->dbinsert();
-
-			$DB->commit();
-
-			$Messages->add( T_('Selected file has been linked to item.'), 'success' );
-
-			// In case the mode had been closed, reopen it:
-			$fm_mode = 'link_item';
-		}
-		// Plug extensions/hacks here!
-		else
-		{	// No Item to link to - end link_item mode.
+		if( ! isset($edited_Item) )
+ 		{	// No Item to link to - end link_item mode.
 			$fm_mode = NULL;
+			break;
 		}
+
+		// Check item EDIT permissions:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+ 		// Get the file we want to link:
+		if( !$selected_Filelist->count() )
+		{
+			$Messages->add( T_('Nothing selected.'), 'error' );
+			break;
+		}
+		$edited_File = & $selected_Filelist->get_by_idx(0);
+
+		$DB->begin();
+
+		// Load meta data AND MAKE SURE IT IS CREATED IN DB:
+		$edited_File->load_meta( true );
+
+		// Let's make the link!
+		$edited_Link = & new Link();
+		$edited_Link->set( 'itm_ID', $edited_Item->ID );
+		$edited_Link->set( 'file_ID', $edited_File->ID );
+		$edited_Link->dbinsert();
+
+		$DB->commit();
+
+		$Messages->add( T_('Selected file has been linked to item.'), 'success' );
+
+		// In case the mode had been closed, reopen it:
+		$fm_mode = 'link_item';
+
 
 		// REDIRECT / EXIT
 		if( $action == 'link_inpost' )
@@ -1577,6 +1662,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2008/09/29 08:30:43  fplanque
+ * Avatar support
+ *
  * Revision 1.22  2008/09/29 04:23:50  fplanque
  * Nasty bug fix where you would quick upload to the wrong location!
  *

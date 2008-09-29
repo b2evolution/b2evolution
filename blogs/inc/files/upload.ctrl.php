@@ -58,6 +58,7 @@ $AdminUI->set_path( 'files', 'upload' );
 // Params that may need to be passed through:
 param( 'fm_mode', 'string', NULL, true );
 param( 'item_ID', 'integer', NULL, true );
+param( 'user_ID', 'integer', NULL, true );
 param( 'iframe_name', 'string', '', true );
 
 $action = param_action();
@@ -430,6 +431,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2008/09/29 08:30:43  fplanque
+ * Avatar support
+ *
  * Revision 1.9  2008/09/29 03:52:47  fplanque
  * bugfix - iframe name passthrough
  *

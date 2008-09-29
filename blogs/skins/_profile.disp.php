@@ -66,6 +66,10 @@ $ProfileForm->end_fieldset();
 
 $ProfileForm->begin_fieldset( T_('Identity') );
 
+	global $admin_url;
+	$ProfileForm->info( T_('Avatar'), $current_User->get_avatar_imgtag()
+		.' <a href="'.$admin_url.'?ctrl=files&amp;user_ID='.$current_User->ID.'">'.T_('change').' &raquo;</a>' );
+
   $ProfileForm->info( T_('Login'), $current_User->get('login') );
 	$ProfileForm->text_input( 'newuser_firstname', $current_User->get( 'firstname' ), 40, T_('First name'), '', array( 'maxlength' => 50, 'class' => 'bComment' ) );
 	$ProfileForm->text_input( 'newuser_lastname', $current_User->get( 'lastname' ), 40, T_('Last name'), '', array( 'maxlength' => 50, 'class' => 'bComment' ) );
@@ -110,6 +114,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.4  2008/09/29 08:30:39  fplanque
+ * Avatar support
+ *
  * Revision 1.3  2008/01/21 09:35:42  fplanque
  * (c) 2008
  *

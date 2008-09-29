@@ -1476,7 +1476,7 @@ class File extends DataObject
 	/**
 	 * Get the thumbnail URL for this file
 	 *
-	 * @param string not ready for being changed yet (fp)
+	 * @param string
 	 */
 	function get_thumb_url( $size_name = 'fit-80x80' )
 	{
@@ -1510,6 +1510,23 @@ class File extends DataObject
 						.'?root='.$root.'&amp;path='.$this->_rdfp_rel_path.'&amp;size='.$size_name;
 
 		return $url;
+	}
+
+
+  /**
+	 *  Generate the IMG THUMBNAIL tag with all the alt & title if available
+	 */
+	function get_thumb_imgtag( $size_name = 'fit-80x80', $class = '', $align = '' )
+	{
+		if( ! $this->is_image() )
+		{ // Not an image
+			return '';
+		}
+
+		return '<img src="'.$this->get_thumb_url($size_name).'" '
+					.'alt="'.$this->dget('alt', 'htmlattr').'" '
+					.'title="'.$this->dget('title', 'htmlattr').'" '
+					.'class="'.$class.'" align="'.$align.'" />';
 	}
 
 
@@ -1797,6 +1814,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2008/09/29 08:30:36  fplanque
+ * Avatar support
+ *
  * Revision 1.12  2008/09/24 08:35:11  fplanque
  * Support of "cropped" thumbnails (the image will always fill the whole thumbnail area)
  * Thumbnail sizes can be configured in /conf/_advanced.php
