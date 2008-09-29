@@ -375,7 +375,7 @@ if( $Comment->ID )
 		// Note: this is approximative and may not cover all URLs where the user expects to see the comment...
 		// TODO: fp> solution: touch dates?
 		load_class( '_core/model/_pagecache.class.php' );
-		$PageCache = & new PageCache( $Blog );
+		$PageCache = & new PageCache( $Comment->Item->Blog );
 		$PageCache->invalidate( $Comment->Item->get_single_url() );
 	}
 }
@@ -387,6 +387,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.127  2008/09/29 08:22:47  fplanque
+ * bugfix
+ *
  * Revision 1.126  2008/09/28 08:06:03  fplanque
  * Refactoring / extended page level caching
  *
