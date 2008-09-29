@@ -178,7 +178,7 @@ $Form->begin_fieldset( T_('Identity') );
 	else
 	{ // display only
 
-		$Form->info( T_('Avatar'), $edited_User->get_imgtag() );
+		$Form->info( T_('Avatar'), $edited_User->get_avatar_imgtag() );
 
 		$Form->info( T_('Login'), $edited_User->get('login') );
 		$Form->info( T_('First name'), $edited_User->get('firstname') );
@@ -395,6 +395,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.5  2008/09/29 15:36:20  blueyed
+ * Fix display of user avatar in view-only profile
+ *
  * Revision 1.4  2008/09/29 08:30:40  fplanque
  * Avatar support
  *
