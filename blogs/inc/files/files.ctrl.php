@@ -197,6 +197,10 @@ if( $fm_FileRoot )
 	}
 	else
 	{ // Root exists
+
+		// Make sure $root is set:
+		$root = $fm_FileRoot->ID;
+
 		// Let's get into requested list dir...
 		$non_canonical_list_path = $fm_FileRoot->ads_path.$path;
 
@@ -235,7 +239,7 @@ if( empty($ads_list_path) )
 	exit(0);
 }
 
-
+$Debuglog->add( 'root: '.var_export( $root, true ), 'files' );
 $Debuglog->add( 'FM root: '.var_export( $fm_FileRoot, true ), 'files' );
 $Debuglog->add( 'FM _ads_list_path: '.var_export( $ads_list_path, true ), 'files' );
 $Debuglog->add( 'path: '.var_export( $path, true ), 'files' );
@@ -1573,6 +1577,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2008/09/29 04:23:50  fplanque
+ * Nasty bug fix where you would quick upload to the wrong location!
+ *
  * Revision 1.21  2008/09/29 03:52:47  fplanque
  * bugfix - iframe name passthrough
  *
