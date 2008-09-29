@@ -124,7 +124,7 @@ if( !empty($action) && $fm_mode != 'link_item' )
 	$fm_mode = '';
 }
 
-// Name of the iframe we want some atiosn to come back to:
+// Name of the iframe we want some actions to come back to:
 param( 'iframe_name', 'string', '', true );
 
 // Get root:
@@ -1573,6 +1573,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2008/09/29 03:52:47  fplanque
+ * bugfix - iframe name passthrough
+ *
  * Revision 1.20  2008/09/23 07:56:47  fplanque
  * Demo blog now uses shared files folder for demo media + more images in demo posts
  *
