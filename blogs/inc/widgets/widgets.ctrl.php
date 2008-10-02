@@ -338,10 +338,7 @@ if( $display_mode == 'normal' )
 	$AdminUI->set_path( 'blogs', 'widgets' );
 
 	// load the js and css required to make the magic work
-	global $dispatcher;
-	require_js( '#jqueryUI#' ); // auto requires jQuery
-	require_js( 'communication.js' ); // auto requires jQuery
-	add_headline( '<script type="text/javascript">
+	add_js_headline( '
 	/**
 	 * @internal T_ array of translation strings required by the UI
 	 */
@@ -355,7 +352,10 @@ if( $display_mode == 'normal' )
 	 */
 	var enabled_icon_url = "'.get_icon( 'deactivate', 'url' ).'";
 	var disabled_icon_url = "'.get_icon( 'activate', 'url' ).'";
-	</script>' );
+	
+	var b2evo_dispatcher_url = "'.$admin_url.'";' );
+	require_js( '#jqueryUI#' ); // auto requires jQuery
+	require_js( 'communication.js' ); // auto requires jQuery
 	require_js( 'blog_widgets.js' );
 	require_css( 'blog_widgets.css' );
 
@@ -442,6 +442,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2008/10/02 23:33:08  blueyed
+ * - require_js(): remove dirty dependency handling for communication.js.
+ * - Add add_js_headline() for adding inline JS and use it for admin already.
+ *
  * Revision 1.10  2008/07/04 06:23:54  yabs
  * minor bug fix
  *

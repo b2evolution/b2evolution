@@ -47,14 +47,10 @@ header_content_type( 'text/html' );
 	<?php
 	global $rsc_path, $rsc_url, $htsrv_url;
 
-	$paths_script = "
-	<script type=\"text/javascript\">
-		// Paths used by JS functions:
+	add_js_headline( "// Paths used by JS functions:
 		var imgpath_expand = '" . get_icon( 'expand', 'url' ) . "';
 		var imgpath_collapse = '" . get_icon( 'collapse', 'url' ) . "';
-		var htsrv_url = '$htsrv_url';
-	</script>";
-	add_headline( $paths_script );
+		var htsrv_url = '$htsrv_url';" );
 
  	// script allowing to check and uncheck all boxes in forms
 	require_js( 'functions.js');
@@ -64,13 +60,9 @@ header_content_type( 'text/html' );
 
 	$tmp_month = $month;
 	array_shift( $tmp_month );	// Remove junk value that is only used for WP compatibility
-	$date_overrides_script = "
-	<script type=\"text/javascript\">
-		// Override vars used by date.js (and calendarpopup.js, if present)
+	add_js_headline( "// Override vars used by date.js (and calendarpopup.js, if present)
 		var MONTH_NAMES = new Array( '".implode("','", array_map('T_',$tmp_month))."','".implode("','", array_map('trim', array_map( 'T_', $month_abbrev ))) . "' );
-		var DAY_NAMES = new Array('" . implode("','", array_map('T_', $weekday)) . "','" . implode("','", array_map('T_',$weekday_abbrev)) . "');
-	</script>";
-	add_headline( $date_overrides_script );
+		var DAY_NAMES = new Array('" . implode("','", array_map('T_', $weekday)) . "','" . implode("','", array_map('T_',$weekday_abbrev)) . "');" );
 
 	require_js( 'popupwindow.js' );
 	require_js( 'calendarpopup.js' );
@@ -246,6 +238,10 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.9  2008/10/02 23:33:08  blueyed
+ * - require_js(): remove dirty dependency handling for communication.js.
+ * - Add add_js_headline() for adding inline JS and use it for admin already.
+ *
  * Revision 1.8  2008/09/28 08:06:13  fplanque
  * Refactoring / extended page level caching
  *
