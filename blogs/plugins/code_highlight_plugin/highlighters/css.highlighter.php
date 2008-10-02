@@ -22,7 +22,7 @@
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
- * @package plugins: AmCode Plugin
+ * @package plugins
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file:
  * @author Yabba: Paul Jones - {@link http://astonishme.co.uk/}
@@ -164,6 +164,9 @@ class am_css_highlighter
 }
 /**
  * $Log$
+ * Revision 1.3  2008/10/02 21:52:10  blueyed
+ * fix doc
+ *
  * Revision 1.2  2008/03/21 10:33:55  yabs
  * added back to cvs
  *
