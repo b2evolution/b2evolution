@@ -28,17 +28,17 @@ class FormattingFuncsTestCase extends EvoUnitTestCase
 
 
 	/**
-	 * Test {@link balanceTags()}
+	 * Test {@link balance_tags()}
 	 */
 	function test_balanceTags()
 	{
-		$this->assertEqual( balanceTags( '<div><!-- comment --></div>' ), '<div><!-- comment --></div>' );
-		$this->assertEqual( balanceTags( '<div><!-- comment -->' ), '<div><!-- comment --></div>' );
-		$this->assertEqual( balanceTags( '<!-- comment --></div>' ), '<!-- comment -->' );
+		$this->assertEqual( balance_tags( '<div><!-- comment --></div>' ), '<div><!-- comment --></div>' );
+		$this->assertEqual( balance_tags( '<div><!-- comment -->' ), '<div><!-- comment --></div>' );
+		$this->assertEqual( balance_tags( '<!-- comment --></div>' ), '<!-- comment -->' );
 
-		$this->assertEqual( balanceTags( '<div> text </div>' ), '<div> text </div>' );
-		$this->assertEqual( balanceTags( '<div> text ' ), '<div> text </div>' );
-		$this->assertEqual( balanceTags( ' text </div>' ), ' text ' );
+		$this->assertEqual( balance_tags( '<div> text </div>' ), '<div> text </div>' );
+		$this->assertEqual( balance_tags( '<div> text ' ), '<div> text </div>' );
+		$this->assertEqual( balance_tags( ' text </div>' ), ' text ' );
 	}
 
 }
