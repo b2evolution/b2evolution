@@ -1281,8 +1281,7 @@ function debug_die( $additional_info = '' )
 	// This should help preventing indexing robots from indexing the error :P
 	if( ! headers_sent() )
 	{
-		global $io_charset;
-    header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
+		header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
 		header('HTTP/1.0 500 Internal Server Error');
 	}
 
@@ -1396,8 +1395,7 @@ function bad_request_die( $additional_info = '' )
 	// This should help preventing indexing robots from indexing the error :P
 	if( ! headers_sent() )
 	{
-		global $io_charset;
-    header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
+		header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
 		header('HTTP/1.0 400 Bad Request');
 	}
 
@@ -2951,6 +2949,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.50  2008/10/02 21:52:34  blueyed
+ * fix unnecessary global and indent
+ *
  * Revision 1.49  2008/09/28 08:06:05  fplanque
  * Refactoring / extended page level caching
  *
