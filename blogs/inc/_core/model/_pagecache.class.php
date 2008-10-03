@@ -36,21 +36,21 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class PageCache
 {
 
-  /**
+	/**
 	 * By default we consider caching not to be enabled
 	 */
 	var $is_enabled = false;
 
-  /**
+	/**
 	 *
 	 */
 	var $ads_collcache_path;
 
-  /**
+	/**
 	 * Filename of cache for current page
 	 */
 	var $cache_filepath;
-  /**
+	/**
 	 * Progressively caching the content of the current page:
 	 */
 	var $cached_page_content = '';
@@ -60,7 +60,7 @@ class PageCache
 	var $is_collecting = false;
 
 
-  /**
+	/**
 	 * Constructor
 	 *
 	 * @params Blog to use, can be NULL
@@ -101,8 +101,8 @@ class PageCache
 	}
 
 
-  /**
-	 * get path to file for current URL
+	/**
+	 * Get path to file for current URL
 	 *
 	 * @todo fp> We may need to add some keys like the locale or the charset, I'm not sure.
 	 */
@@ -118,7 +118,7 @@ class PageCache
 			// echo $ReqAbsUrl;
  			$Debuglog->add( 'URL being cached: '.$ReqAbsUrl, 'cache' );
 
- 			$this->cache_filepath = $this->gen_filecahe_path( $ReqAbsUrl );
+ 			$this->cache_filepath = $this->gen_filecache_path( $ReqAbsUrl );
 
  			$Debuglog->add( 'Cache file: '.$this->cache_filepath, 'cache' );
 		}
@@ -127,10 +127,12 @@ class PageCache
 	}
 
 
-  /**
-	 *
+	/**
+	 * Generate path for caching $url.
+	 * @param string URL
+	 * @return string
 	 */
-	function gen_filecahe_path( $url )
+	function gen_filecache_path( $url )
 	{
 		$url_hash = md5($url);	// fp> is this teh fastest way to hash this into something not too obvious to guess?
 		// echo $url_hash;
@@ -151,8 +153,8 @@ class PageCache
 		// echo 'Invalidating:'.$url;
 		$Debuglog->add( 'Invalidating:'.$url, 'cache' );
 
-    // What would be the cache file for the current URL?
-		$af_cache_file = $this->gen_filecahe_path( $url );
+		// What would be the cache file for the current URL?
+		$af_cache_file = $this->gen_filecache_path( $url );
 
 		@unlink( $af_cache_file );
 	}
@@ -176,17 +178,16 @@ class PageCache
 	}
 
 
-  /**
-	 *
+	/**
+	 * Delete all cache files
 	 */
 	function cache_delete()
 	{
-		// Delete all cache files:
 		rmdir_r( $this->ads_collcache_path );
 	}
 
 
-  /**
+	/**
 	 * Check if cache contents are available, otherwise start collecting output to be cached
 	 *
 	 * @return true if we found and have echoed content from the cache
@@ -238,15 +239,15 @@ class PageCache
 
 		$Debuglog->add( 'Collecting started', 'cache' );
 
-		ob_start( array( & $this, 'output_handler'), 2000 );
+		ob_start( array( & $this, 'output_handler'), 4096 );
 
 		return false;
 	}
 
 
-  /**
-   * Retrieve cache for current URL.
-   *
+	/**
+	 * Retrieve and output cache for current URL.
+	 *
 	 * @return boolean true if we could retrieve
 	 */
 	function retrieve()
@@ -260,7 +261,7 @@ class PageCache
 
 
 		/*
-		// fstat() is interesting becaus eif give the last access time... use that for purging...
+		// fstat() is interesting because it gives the last access time... use that for purging...
 		if( $fh = @fopen( $af_cache_file, 'r', false ) )
 		{
 			$fstat = fstat( $fh );
@@ -321,8 +322,8 @@ class PageCache
 	}
 
 
-  /**
-	 * This is called every x bytes to provide real time output
+	/**
+	 * This is called every 4096 bytes to provide real time output
 	 */
 	function output_handler( $buffer )
 	{
@@ -331,7 +332,7 @@ class PageCache
 	}
 
 
-  /**
+	/**
 	 * We are going to output personal data and we want to abort collecting the data for the cache.
 	 */
 	function abort_collect()
@@ -352,7 +353,7 @@ class PageCache
 	}
 
 
-  /**
+	/**
 	 * End collecting output to be cached
 	 */
 	function end_collect()
@@ -375,9 +376,10 @@ class PageCache
 		// fp> I'm not sure if this below gets an exclusive lock on the file
 		// However, I believe that fwrite() is atomic so the worst case scenario is that multiple PHP threads open
 		// the same file and all overwrite it sequentially with the same content. That should be ok.
+		// TODO: dh> fwrite is not atomic
 		if( ! $fh = @fopen( $af_cache_file, 'w+', false ) )
 		{
-   		$Debuglog->add( 'Could not open cache file!', 'cache' );
+			$Debuglog->add( 'Could not open cache file!', 'cache' );
 		}
 		else
 		{
@@ -404,7 +406,7 @@ class PageCache
 
 			fwrite( $fh, $file_head.$this->cached_page_content );
 			fclose( $fh );
-   		$Debuglog->add( 'Cache updated!', 'cache' );
+			$Debuglog->add( 'Cache updated!', 'cache' );
 		}
 	}
 
@@ -412,6 +414,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.2  2008/10/03 16:27:56  blueyed
+ * Fix indent, cleanup, doc
+ *
  * Revision 1.1  2008/09/28 08:06:06  fplanque
  * Refactoring / extended page level caching
  * */
