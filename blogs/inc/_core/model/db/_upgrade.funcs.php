@@ -330,7 +330,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				$add_index['col_names'] = explode( ',', $match[4] );
 				foreach( $add_index['col_names'] as $k => $v )
 				{
-					$add_index['col_names'][$k] = strtolower(trim($v));
+					$add_index['col_names'][$k] = strtolower(db_delta_remove_backticks(trim($v)));
 				}
 
 				if( $fieldname_lowered == 'primary' )
@@ -1224,6 +1224,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.6  2008/10/03 21:56:05  blueyed
+ * db_delta: fix index names surrounded in backticks. Add test.
+ *
  * Revision 1.5  2008/09/26 19:14:17  tblue246
  * minor
  *

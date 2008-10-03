@@ -1148,6 +1148,24 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 			'ALTER TABLE test_1 ENGINE=InnoDB' );
 	}
 
+
+	/**
+	 * Check that backticks in index names get ignored.
+	 */
+	function test_backticks_in_indexnames()
+	{
+		$sql = "
+			CREATE TABLE test_1 (
+				id int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+				PRIMARY KEY  (`id`)
+			)";
+		$this->test_DB->query($sql);
+
+		$r = $this->db_delta_wrapper($sql);
+
+		$this->assertIdentical( $r, array() );
+	}
+
 }
 
 
