@@ -129,13 +129,13 @@ class _core_Module
 	function build_menu_1()
 	{
 		global $blog;
-    /**
+		/**
 		 * @var User
 		 */
 		global $current_User;
 		global $Blog;
 		global $Settings;
-    /**
+		/**
 		 * @var AdminUI_general
 		 */
 		global $AdminUI;
@@ -171,7 +171,7 @@ class _core_Module
 		}
 	}
 
-  /**
+	/**
 	 * Builds the 2nd half of the menu. This is the one with the configuration features
 	 *
 	 * At some point this might be displayed differently than the 1st half.
@@ -179,12 +179,12 @@ class _core_Module
 	function build_menu_2()
 	{
 		global $blog, $loc_transinfo, $ctrl;
-    /**
+		/**
 		 * @var User
 		 */
 		global $current_User;
 		global $Blog;
-    /**
+		/**
 		 * @var AdminUI_general
 		 */
 		global $AdminUI;
@@ -412,6 +412,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.3  2008/10/03 22:00:47  blueyed
+ * Indent fixes
+ *
  * Revision 1.2  2008/05/10 22:59:09  fplanque
  * keyphrase logging
  *

@@ -29,7 +29,7 @@ $Comment = & $params['Comment'];
 <!-- ========== START of a COMMENT/TB/PB ========== -->
 <?php
 	$Comment->anchor();
-  echo $params['comment_start'];
+	echo $params['comment_start'];
 ?>
 	<div class="bCommentTitle">
 	<?php
@@ -96,6 +96,9 @@ $Comment = & $params['Comment'];
 
 /*
  * $Log$
+ * Revision 1.4  2008/10/03 22:00:47  blueyed
+ * Indent fixes
+ *
  * Revision 1.3  2008/01/21 09:35:42  fplanque
  * (c) 2008
  *
