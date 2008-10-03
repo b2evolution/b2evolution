@@ -161,6 +161,11 @@ function param( $var, $type = '', $default = '', $memorize = false,
 				{
 					$GLOBALS[$var] = trim( strip_tags($GLOBALS[$var]) );
 					// Make sure the string is a single line
+					// TODO: dh> this breaks e.g. multi-line widget params (e.g. "Custom TinyMCE init")
+					//           While this example works without newlines, there are probably places
+					//           where it's more important.
+					//       fp> Someone was hiding text. Can't remember exactly where.
+					//           Make a "multiline-string" where appropriate.
 					$GLOBALS[$var] = preg_replace( '¤\r|\n¤', '', $GLOBALS[$var] );
 				}
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as string', 'params' );
@@ -1907,6 +1912,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.24  2008/10/03 15:32:19  blueyed
+ * todo/doc about param('string') removing newlines
+ *
  * Revision 1.23  2008/05/26 19:25:41  fplanque
  * minor
  *
