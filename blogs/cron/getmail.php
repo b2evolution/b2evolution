@@ -139,7 +139,7 @@ function echo_message( $strmessage , $color = '', $level = 0, $newline = false )
 		}
 
 		echo $strmessage;
-			
+
 		if ( $test > 0 && $color )
 		{
 			echo '</font>';
@@ -238,7 +238,6 @@ function tempdir( $dir, $prefix = 'tmp', $mode = 0700 )
  */
 function processHeader( &$header )
 {
-
 	// write to these globals
 	global $subject, $post_date;
 
@@ -418,7 +417,7 @@ switch ( $Settings -> get( 'eblog_method' ) )
 		// --------------------------------------------------------------------
 		if ( ! extension_loaded( 'imap' ) )
 		{
-			echo_message( '&#x2718; '.T_( 'The php_imap extension is not available to php on this server. Please configure a different email retrieval method on the Features tab.' ), ERROR, 0, true );
+			echo_message( T_( 'The php_imap extension is not available to php on this server. Please configure a different email retrieval method on the Features tab.' ), ERROR, 0, true );
 			exit;
 		}
 		echo_message( T_( 'Connecting and authenticating to mail server' ), INFO, 1, true );
@@ -433,7 +432,7 @@ switch ( $Settings -> get( 'eblog_method' ) )
 		$mbox = @imap_open( $mailserver, $Settings -> get( 'eblog_username' ), $Settings -> get( 'eblog_password' ) );
 		if ( ! $mbox )
 		{
-			echo_message( '&#x2718; ' . T_( 'Connection failed: ' ) . imap_last_error(), ERROR, 0, true );
+			echo_message( T_( 'Connection failed: ' ) . imap_last_error(), ERROR, 0, true );
 			exit();
 		}
 		@imap_errors();
@@ -463,7 +462,7 @@ switch ( $Settings -> get( 'eblog_method' ) )
 			// save mail to disk because with attachments could take up much RAM
 			if (!($tmpMIME = tempnam( sys_get_temp_dir(), 'b2evoMail' )))
 			{
-				echo_message('&#x2718; '.T_('Could not create temporary file.'), ERROR, true);
+				echo_message( T_('Could not create temporary file.'), ERROR, 0, true );
 				continue;
 			}
 			imap_savebody( $mbox, $tmpMIME, $index );
@@ -482,7 +481,7 @@ switch ( $Settings -> get( 'eblog_method' ) )
 				
 			if ( !$mimeParser -> Decode( $MIMEparameters, $decodedMIME ) )
 			{
-				echo_message( '&#x2718; ' .T_( 'MIME message decoding error: ' ) . $mimeParser -> error . T_(' at position ' ) . $mimeParser -> error_position, ERROR, 0, true );
+				echo_message( T_( 'MIME message decoding error: ' ) . $mimeParser -> error . T_(' at position ' ) . $mimeParser -> error_position, ERROR, 0, true );
 				rmdir_r( $tmpDirMIME );
 				unlink( $tmpMIME );
 				continue;
@@ -492,7 +491,7 @@ switch ( $Settings -> get( 'eblog_method' ) )
 				echo_message( '&#x2714; ' . T_( 'MIME message decoding successful.'), INFO, 3, true );
 				if ( ! $mimeParser -> Analyze( $decodedMIME[0], $parsedMIME ) )
 				{
-					echo_message( '&#x2718; ' . T_('MIME message analyse error: ') . $mimeParser -> error, ERROR, 0, true );
+					echo_message( T_('MIME message analyse error: ') . $mimeParser -> error, ERROR, 0, true );
 					// var_dump($parsedMIME);
 					rmdir_r( $tmpDirMIME );
 					unlink( $tmpMIME );
@@ -570,7 +569,7 @@ switch ( $Settings -> get( 'eblog_method' ) )
 			// authenticate user
 			if ( !user_pass_ok( $user_login, $user_pass ) )
 			{
-				echo_message( '&#x2718; ' . T_( 'Authentication failed for user ' ) . htmlspecialchars( $user_login ), ERROR, 0, true );
+				echo_message( T_( 'Authentication failed for user ' ) . htmlspecialchars( $user_login ), ERROR, 0, true );
 				echo_message( '&#x2718; ' . T_( 'Wrong login or password.' ) . ' ' . T_( 'First line of text in email must be in the format "username:password"' ), ERROR, 3, true );
 				rmdir_r( $tmpDirMIME );
 				continue;
@@ -611,7 +610,7 @@ switch ( $Settings -> get( 'eblog_method' ) )
 				
 			if ( empty( $Blog ) )
 			{
-				echo_message( '&#x2718; ' . T_( 'Blog not found: ' ) . htmlspecialchars( $blog_ID ), ERROR, 0, true );
+				echo_message( T_( 'Blog not found: ' ) . htmlspecialchars( $blog_ID ), ERROR, 0, true );
 				rmdir_r( $tmpDirMIME );
 				continue;
 			}
@@ -623,7 +622,7 @@ switch ( $Settings -> get( 'eblog_method' ) )
 			|| ( $hasAttachment && !$current_User -> check_perm( 'files', 'add', false ) )
 			)
 			{
-				echo_message( '&#x2718; ' . T_( 'Permission denied' ), ERROR, 0, true );
+				echo_message( T_( 'Permission denied' ), ERROR, 0, true );
 				rmdir_r( $tmpDirMIME );
 				continue;
 			}
@@ -642,7 +641,7 @@ switch ( $Settings -> get( 'eblog_method' ) )
 				}
 				else
 				{
-					echo_message( '&#x2718; ' . T_( 'Unable to access media directory. No attachments processed' ), ERROR, 0, true );
+					echo_message( T_( 'Unable to access media directory. No attachments processed' ), ERROR, 0, true );
 				}
 			}
 				
@@ -650,9 +649,10 @@ switch ( $Settings -> get( 'eblog_method' ) )
 			$post_title = check_html_sanity( trim( $post_title ), 'posting', false );
 			$content = check_html_sanity( trim( $content ), 'posting', $Settings -> get( 'AutoBR' ) );
 
-			if ( $Messages -> display( T_( 'Cannot post, please correct these errors:' ), '', true, 'error' ) )
+			if ( ( $error = $Messages->get_string( T_( 'Cannot post, please correct these errors:' ), '', 'error' ) ) )
 			{
-				$Messages -> reset();
+				echo_message( $error, ERROR, 0, true );
+				$Messages->clear( 'error' );
 				rmdir_r( $tmpDirMIME );
 				continue;
 			}
