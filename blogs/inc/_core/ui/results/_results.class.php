@@ -987,7 +987,9 @@ class Results extends Table
 //	the checkboxes on the user/group perms tab aren't displayed (<input> gets
 //	stripped => string appears to be empty => only &nbsp; is displayed).
 //	see also: http://forums.b2evolution.net/viewtopic.php?t=16334
-				echo ( trim(strip_tags($out,'<img>')) === '' ? '&nbsp;' : $out );
+// tblue> 10/04/08> i'm fixing this again, i don't see the problem of
+//	this fix.
+				echo ( trim(strip_tags($out,'<img><input>')) === '' ? '&nbsp;' : $out );
 
 				// COL START:
 				$this->display_col_end();
@@ -1809,6 +1811,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.16  2008/10/04 19:12:14  tblue246
+ * display_body(): don't strip <input> tag from column content (again). if there really is a problem with this fix, please rollback and add a comment describing the the problem.
+ *
  * Revision 1.15  2008/09/28 12:11:12  tblue246
  * display_body(): comment on strip_tags() issue
  *
