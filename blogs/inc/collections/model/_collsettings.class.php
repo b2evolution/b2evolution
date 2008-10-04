@@ -105,6 +105,9 @@ class CollectionSettings extends AbstractSettings
 			'require_title' => 'required',  // Is a title for items required ("required", "optional", "none")
 
 			'cache_enabled' => 0,
+
+			'eblog_add_imgtag' => 1,
+			'eblog_method' => 'pop3a',
 		);
 
 
@@ -140,6 +143,10 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.23  2008/10/04 14:25:25  tblue246
+ * Code improvements in blog/cron/getmail.php, e. g. option to add <img> tags for image attachments.
+ * All attachments now get added to the post if the filename is valid (validate_filename()). Not sure if this is secure, but should be.
+ *
  * Revision 1.22  2008/09/27 00:48:32  fplanque
  * caching step 0.
  *

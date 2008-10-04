@@ -84,7 +84,7 @@ $Form->begin_fieldset( T_('Blog by email').get_manual_link('blog_by_email') );
 	// fp> TODO: this is IMPOSSIBLE to turn back on when you have no javascript!!! :((
 	echo '<div id="eblog_section" style="'.( $Settings->get('eblog_enabled') ? '' : 'display:none' ).'">';
 
-		$Form->select_input_array( 'eblog_method', $Settings->get('eblog_method'), array( 'pop3'=>T_('POP3'), 'pop3a' => T_('POP3 through IMAP extension (experimental)') ), // TRANS: E-Mail retrieval method
+		$Form->select_input_array( 'eblog_method', $Settings->get('eblog_method'), array( 'pop3a' => T_('POP3 through IMAP extension'), 'pop3' => T_('POP3 (no longer supported!)'), ), // TRANS: E-Mail retrieval method
 			T_('Retrieval method'), T_('Choose a method to retrieve the emails.') );
 
 		$Form->text_input( 'eblog_server_host', $Settings->get('eblog_server_host'), 40, T_('Mail Server'), T_('Hostname or IP address of your incoming mail server.'), array( 'maxlength' => 255 ) );
@@ -118,17 +118,20 @@ $Form->begin_fieldset( T_('Blog by email').get_manual_link('blog_by_email') );
 		// TODO: provide Non-JS functionality
 		echo '<div id="eblog_section_more" style="display:none">';
 
+			$Form->checkbox( 'eblog_add_imgtag', $Settings->get('eblog_add_imgtag'), T_('Add &lt;img&gt; tags'), T_('Display image attachments using &lt;img&gt; tags (instead of creating a link).'));
+
 			$Form->checkbox( 'AutoBR', $Settings->get('AutoBR'), T_('Email/MMS Auto-BR'), T_('Add &lt;BR /&gt; tags to mail/MMS posts.') );
 
 			$Form->text_input( 'eblog_body_terminator', $Settings->get('eblog_body_terminator'), 15, T_('Body Terminator'), T_('Starting from this string, everything will be ignored, including this string.'), array( 'maxlength' => 255 )  );
 
 			$Form->checkbox_input( 'eblog_test_mode', $Settings->get('eblog_test_mode'), T_('Test Mode'), array( 'note' => T_('Check to run Blog by Email in test mode.' ) ) );
 
+			/* tblue> this isn't used/implemented at the moment
 			$Form->checkbox_input( 'eblog_phonemail', $Settings->get('eblog_phonemail'), T_('Phone Email *'),
 				array( 'note' => 'Some mobile phone email services will send identical subject &amp; content on the same line. If you use such a service, check this option, and indicate a separator string when you compose your message, you\'ll type your subject then the separator string then you type your login:password, then the separator, then content.' ) );
 
 			$Form->text_input( 'eblog_phonemail_separator', $Settings->get('eblog_phonemail_separator'), 15, T_('Phonemail Separator'), '',
-												array( 'maxlength' => 255 ) );
+												array( 'maxlength' => 255 ) );*/
 
 		echo '</div>';
 
@@ -191,6 +194,10 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.6  2008/10/04 14:25:25  tblue246
+ * Code improvements in blog/cron/getmail.php, e. g. option to add <img> tags for image attachments.
+ * All attachments now get added to the post if the filename is valid (validate_filename()). Not sure if this is secure, but should be.
+ *
  * Revision 1.5  2008/02/13 11:34:20  blueyed
  * Explicitly call jQuery(), not the shortcut ($())
  *

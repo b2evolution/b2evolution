@@ -143,11 +143,15 @@ switch( $action )
 			param( 'eblog_test_mode', 'integer', 0 );
 			$Settings->set( 'eblog_test_mode', $eblog_test_mode );
 
+			param( 'eblog_add_imgtag', 'boolean', 0 );
+			$Settings->set( 'eblog_add_imgtag', $eblog_add_imgtag );
+
+			/* tblue> this isn't used/implemented at the moment
 			param( 'eblog_phonemail', 'integer', 0 );
 			$Settings->set( 'eblog_phonemail', $eblog_phonemail );
 
 			param( 'eblog_phonemail_separator', 'string', true );
-			$Settings->set( 'eblog_phonemail_separator', trim($eblog_phonemail_separator) );
+			$Settings->set( 'eblog_phonemail_separator', trim($eblog_phonemail_separator) );*/
 
 
 			// Hit & Session logs
@@ -204,6 +208,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2008/10/04 14:25:25  tblue246
+ * Code improvements in blog/cron/getmail.php, e. g. option to add <img> tags for image attachments.
+ * All attachments now get added to the post if the filename is valid (validate_filename()). Not sure if this is secure, but should be.
+ *
  * Revision 1.3  2008/02/19 11:11:19  fplanque
  * no message
  *
