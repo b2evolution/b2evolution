@@ -203,8 +203,7 @@ switch( $action )
 		param( 'conf_baseurl', 'string', true );
 		$conf_baseurl = preg_replace( '#(/)?$#', '', $conf_baseurl ).'/'; // force trailing slash
 		param( 'conf_admin_email', 'string', true );
-		param( 'conf_instance_name', 'string', true );
-		
+
 		// Connect to DB:
 		$DB = new DB( array(
 			'user' => $conf_db_user,
@@ -223,22 +222,13 @@ switch( $action )
 		}
 		else
 		{
-			// ### MODIFY _basic_config.php AND _advanced.php ###
 			$conf_filepath = $conf_path.'_basic_config.php';
-			$advconf_filepath = $conf_path.'_advanced.php';
-			
 			// Read original:
-			$conf = @implode( '', @file( $conf_filepath ) );
-			$advconf = @implode( '', @file( $advconf_filepath ) );
+			$conf = implode( '', file( $conf_filepath ) );
 
 			if( empty( $conf ) )
 			{ // This should actually never happen, just in case...
 				printf( '<p class="error">Could not load original conf file [%s]. Is it missing?</p>', $conf_filepath );
-				break;
-			}
-			elseif( empty( $advconf ) )
-			{
-				printf( '<p class="error">Could not load original advanced conf file [%s]. Is it missing?</p>', $advconf_filepath );
 				break;
 			}
 
@@ -269,50 +259,37 @@ switch( $action )
 					'config_is_done = 1;',
 				), $conf );
 
-			$advconf = preg_replace(
-				'#\$instance_name\s*=\s*[\'"].*?[\'"];#',
-				'\$instance_name = \''.$conf_instance_name.'\';',
-				$advconf, 1 );
-
 			$f = @fopen( $conf_filepath , 'w' );
-			$af = @fopen( $advconf_filepath, 'w' );
-			if( $f === false || $af === false )
+			if( $f == false )
 			{
 				?>
 				<h1><?php echo T_('Config file update') ?></h1>
-				<p><strong><?php printf( T_('We cannot automatically update your config files [%s] and/or [%s]!'), $conf_filepath, $advconf_filepath ); ?></strong></p>
+				<p><strong><?php printf( T_('We cannot automatically update your config file [%s]!'), $conf_filepath ); ?></strong></p>
 				<p><?php echo T_('There are two ways to deal with this:') ?></p>
 				<ul>
-					<li><strong><?php echo T_('You can allow the installer to update the config files by changing its permissions:') ?></strong>
+					<li><strong><?php echo T_('You can allow the installer to update the config file by changing its permissions:') ?></strong>
 						<ol>
-							<li><?php printf( T_('<code>chmod 666 %s %s</code>. If needed, see the <a %s>online manual about permissions</a>.'), $conf_filepath, $advconf_filepath, 'href="http://manual.b2evolution.net/Directory_and_file_permissions" target="_blank"' ); ?></li>
+							<li><?php printf( T_('<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about permissions</a>.'), $conf_filepath, 'href="http://manual.b2evolution.net/Directory_and_file_permissions" target="_blank"' ); ?></li>
 							<li><?php echo T_('Come back to this page and refresh/reload.') ?></li>
 						</ol>
 						<br />
 					</li>
-					<li><strong><?php echo T_('Alternatively, you can update the config files manually:') ?></strong>
+					<li><strong><?php echo T_('Alternatively, you can update the config file manually:') ?></strong>
 						<ol>
-							<li><?php echo T_('Open the _basic_config.php and/or _advanced.php file locally with a text editor.') ?></li>
+							<li><?php echo T_('Open the _basic_config.php file locally with a text editor.') ?></li>
 							<li><?php echo T_('Delete all contents!') ?></li>
-							<li><?php echo T_('Copy the contents from the respective box below.') ?></li>
+							<li><?php echo T_('Copy the contents from the box below.') ?></li>
 							<li><?php echo T_('Paste them into your local text editor. <strong>ATTENTION: make sure there is ABSOLUTELY NO WHITESPACE after the final <code>?&gt;</code> in the file.</strong> Any space, tab, newline or blank line at the end of the conf file may prevent cookies from being set when you try to log in later.') ?></li>
-							<li><?php echo T_('Save the new _basic_config.php and/or _advanced.php file locally.') ?></li>
-							<li><?php echo T_('Upload the files to your server, into the /_conf folder.') ?></li>
+							<li><?php echo T_('Save the new _basic_config.php file locally.') ?></li>
+							<li><?php echo T_('Upload the file to your server, into the /_conf folder.') ?></li>
 							<li><?php printf( T_('<a %s>Call the installer from scratch</a>.'), 'href="index.php?locale='.$default_locale.'"') ?></li>
 						</ol>
 					</li>
 				</ul>
-				<p><?php echo sprintf( T_('This is how your _basic_config.php should look like (<a %s>see below</a> for the contents of the _advanced.php file):'), 'href="#advconf"' ) ?></p>
+				<p><?php echo T_('This is how your _basic_config.php should look like:') ?></p>
 				<blockquote>
 				<pre><?php
 					echo htmlspecialchars( $conf );
-				?></pre>
-				</blockquote>
-				<a name="advconf"></a>
-				<p><?php echo T_('...and this is how your _advanced.php file should look like:'); ?></p>
-				<blockquote>
-				<pre><?php
-					echo htmlspecialchars( $advconf );
 				?></pre>
 				</blockquote>
 				<?php
@@ -322,10 +299,8 @@ switch( $action )
 			{ // Write new contents:
 				fwrite( $f, $conf );
 				fclose($f);
-				fwrite( $af, $advconf );
-				fclose( $af );
 
-				printf( '<p>'.T_('Your configuration files [%s] and [%s] have been successfully updated.').'</p>', $conf_filepath, $advconf_filepath );
+				printf( '<p>'.T_('Your configuration file [%s] has been successfully updated.').'</p>', $conf_filepath );
 
 				$tableprefix = $conf_db_tableprefix;
 				$baseurl = $conf_baseurl;
@@ -351,7 +326,6 @@ switch( $action )
 			param( 'conf_db_name', 'string', $db_config['name'] );
 			param( 'conf_db_host', 'string', $db_config['host'] );
 			param( 'conf_db_tableprefix', 'string', $tableprefix );
-			
 			// Guess baseurl:
 			// TODO: dh> IMHO HTTP_HOST would be a better default, because it's what the user accesses for install.
 			//       fp, please change it, if it's ok. SERVER_NAME might get used if HTTP_HOST is not given, but that shouldn't be the case normally.
@@ -361,8 +335,6 @@ switch( $action )
 			$baseurl .= preg_replace( '#/install(/(index.php)?)?$#', '', $ReqPath ).'/';
 			param( 'conf_baseurl', 'string', $baseurl );
 			param( 'conf_admin_email', 'string', $admin_email );
-			param( 'conf_instance_name', 'string',
-				'b2evo_'.substr( get_base_domain( $conf_baseurl ), 0, 5 ).'_'.substr( uniqid( mt_rand(), true ), 0, 5 ) );
 
 			?>
 			<h1><?php echo T_('Base configuration') ?></h1>
@@ -392,8 +364,6 @@ switch( $action )
 						form_text( 'conf_baseurl', $conf_baseurl, 50, T_('Base URL'), sprintf( T_('This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine\'s name!' ) ), 120 );
 
 						form_text( 'conf_admin_email', $conf_admin_email, 50, T_('Your email'), sprintf( T_('Will be used in severe error messages so that users can contact you. You will also receive notifications for new user registrations.' ) ), 80 );
-
-						form_text( 'conf_instance_name', $conf_instance_name, 50, T_( 'Instance name' ), T_( 'Will be used for cookies and notification mails. Should be unique if you install more than one b2evolution on the same website. MUST BE A SINGLE WORD! NO SPACES!' ), 50 );
 					?>
 				</fieldset>
 
@@ -768,8 +738,8 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
- * Revision 1.147  2008/10/04 21:44:15  tblue246
- * Set a random $instance_name on installation.
+ * Revision 1.148  2008/10/04 23:47:32  tblue246
+ * reverting to rev 1.146
  *
  * Revision 1.146  2008/09/27 00:05:54  fplanque
  * minor/version bump
