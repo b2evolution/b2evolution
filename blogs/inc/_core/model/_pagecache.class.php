@@ -239,7 +239,7 @@ class PageCache
 
 		$Debuglog->add( 'Collecting started', 'cache' );
 
-		ob_start( array( & $this, 'output_handler'), 4096 );
+		ob_start( array( & $this, 'output_handler'), 2000 );
 
 		return false;
 	}
@@ -322,8 +322,8 @@ class PageCache
 	}
 
 
-	/**
-	 * This is called every 4096 bytes to provide real time output
+  /**
+	 * This is called every x bytes to provide real time output
 	 */
 	function output_handler( $buffer )
 	{
@@ -414,6 +414,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.3  2008/10/05 04:43:19  fplanque
+ * minor, and would 4096 serve any purpose?
+ *
  * Revision 1.2  2008/10/03 16:27:56  blueyed
  * Fix indent, cleanup, doc
  *
