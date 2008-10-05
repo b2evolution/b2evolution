@@ -31,8 +31,8 @@ load_class( 'widgets/model/_widget.class.php' );
 
 param( 'action', 'string', 'list' );
 param( 'display_mode', 'string', 'normal' );
-
 $display_mode = ( in_array( $display_mode, array( 'js', 'normal' ) ) ? $display_mode : 'normal' );
+// This should probably be handled with teh existing $mode var
 
 /*
  * Init the objects we want to work on.
@@ -54,7 +54,7 @@ switch( $action )
 	case 're-order' : // js request
 		param( 'container_list', 'string' );
 		$containers_list = explode( ',', $container_list );
-		$containers = Array();
+		$containers = array();
 		foreach( $containers_list as $a_container )
 		{	// add each container and grab it's widgets
 			if( $container_name = trim( str_replace( array( 'container_', '_' ), array( '', ' ' ), $a_container ), ',' ) )
@@ -88,12 +88,15 @@ if( ! valid_blog_requested() )
 {
 	debug_die( 'Invalid blog requested' );
 }
+
 switch( $display_mode )
 {
 	case 'js' : // js response needed
+// fp> when does this happen -- should be documented
 		if( !$current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
 		{	// user doesn't have permissions
 			$Messages->add( T_('You do not have permission to perform this action' ) );
+// fp>does this only happen when we try to edit settings. The hardcoded 'closeWidgetSettings' response looks bad.
 			send_javascript_message( array( 'closeWidgetSettings' => array() ) );
 		}
 		break;
@@ -164,7 +167,8 @@ switch( $action )
 
 		switch( $display_mode )
 		{
-			case 'js' :	// this is a js call, lets return the settings page
+			case 'js' :	// this is a js call, lets return the settings page -- fp> what do you mean "settings page" ?
+				// fp> wthis will visually live insert the new widget into the container; it probably SHOULD open the edit properties right away
 				send_javascript_message( array( 'addNewWidgetCallback' => array( $edited_ComponentWidget->ID, $container, $edited_ComponentWidget->get( 'order' ), $edited_ComponentWidget->get_name() ) ) ); // will be sent with settings form
 				$action = 'edit'; // pulls up the settings form
 				break;
@@ -295,10 +299,11 @@ switch( $action )
  	case 're-order' : // js request
  		$DB->begin();
 
- 		// Reset the current orders and make sco_names temp to avoid duplicate entry errors
+ 		// Reset the current orders and make container names temp to avoid duplicate entry errors
 		$DB->query( 'UPDATE T_widget
-										SET wi_order = wi_order * -1, wi_sco_name = CONCAT( \'temp_\', wi_sco_name )
-										WHERE wi_coll_ID = '.$Blog->ID );
+										SET wi_order = wi_order * -1,
+												wi_sco_name = CONCAT( \'temp_\', wi_sco_name )
+									WHERE wi_coll_ID = '.$Blog->ID );
 
 		foreach( $containers as $container => $widgets )
 		{	// loop through each container and set new order
@@ -309,16 +314,20 @@ switch( $action )
 				{ // valid widget id
 					$order++;
 					$DB->query( 'UPDATE T_widget
-												SET wi_order = '.$order.', wi_sco_name = '.$DB->quote( $container ).'
+													SET wi_order = '.$order.',
+															wi_sco_name = '.$DB->quote( $container ).'
 												WHERE wi_ID = '.$widget );
 				}
 			}
 		}
-		// remove deleted widgets and empty temp containers
-		$DB->query( 'DELETE FROM T_widget WHERE wi_order < 1 OR wi_sco_name LIKE \'temp_%\'' );
+
+		// Cleanup deleted widgets and empty temp containers (fp> what do you mean 'and empty temp containers' ??? wi_order < 1 should be enough for all scenarios, no?)
+		$DB->query( 'DELETE FROM T_widget
+									WHERE wi_order < 1
+										 OR wi_sco_name LIKE \'temp_%\'' );
 
 		$DB->commit();
-		//$Messages->add( 'Test error', 'error' );
+
  		$Messages->add( T_( 'Widgets updated' ), 'success' );
  		send_javascript_message( array( 'sendWidgetOrderCallback' => array() ) ); // exits() automatically
  		break;
@@ -328,7 +337,8 @@ switch( $action )
 }
 
 if( $display_mode == 'normal' )
-{	// this is a normal request
+{	// this is a normal (not a JS) request
+	// fp> This probably shouldn't be handled like this but with $mode
 	/**
 	 * Display page header, menus & messages:
 	 */
@@ -350,6 +360,7 @@ if( $display_mode == 'normal' )
 	/**
 	 * @internal various urls, would like to remove these as and when possible
 	 */
+		// fp> where is that used?
 	var enabled_icon_url = "'.get_icon( 'deactivate', 'url' ).'";
 	var disabled_icon_url = "'.get_icon( 'activate', 'url' ).'";
 	
@@ -442,6 +453,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2008/10/05 04:36:50  fplanque
+ * notes for Yabba
+ *
  * Revision 1.11  2008/10/02 23:33:08  blueyed
  * - require_js(): remove dirty dependency handling for communication.js.
  * - Add add_js_headline() for adding inline JS and use it for admin already.
