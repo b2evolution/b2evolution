@@ -738,8 +738,14 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
+ * Revision 1.149  2008/10/05 09:59:30  tblue246
+ * fixing log...
+ *
  * Revision 1.148  2008/10/04 23:47:32  tblue246
  * reverting to rev 1.146
+ *
+ * Revision 1.147  2008/10/04 21:44:15  tblue246
+ * Set a random $instance_name on installation.
  *
  * Revision 1.146  2008/09/27 00:05:54  fplanque
  * minor/version bump
