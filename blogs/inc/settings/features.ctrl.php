@@ -113,8 +113,9 @@ switch( $action )
 			param( 'eblog_enabled', 'integer', 0 );
 			$Settings->set( 'eblog_enabled', $eblog_enabled );
 
+			/* tblue> Not needed anymore since we've only one method.
 			param( 'eblog_method', 'string', true );
-			$Settings->set( 'eblog_method', strtolower(trim($eblog_method)));
+			$Settings->set( 'eblog_method', strtolower(trim($eblog_method)));*/
 
 			param( 'eblog_server_host', 'string', true );
 			$Settings->set( 'eblog_server_host', strtolower(trim($eblog_server_host)));
@@ -208,6 +209,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2008/10/05 10:55:46  tblue246
+ * Blog by mail: We've only one working method => removed the drop-down box and added automatical change to pop3a.
+ * The default value for this setting was in the wrong file, moved.
+ *
  * Revision 1.4  2008/10/04 14:25:25  tblue246
  * Code improvements in blog/cron/getmail.php, e. g. option to add <img> tags for image attachments.
  * All attachments now get added to the post if the filename is valid (validate_filename()). Not sure if this is secure, but should be.

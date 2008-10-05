@@ -85,8 +85,10 @@ $Form->begin_fieldset( T_('Blog by email').get_manual_link('blog_by_email') );
 	echo '<div id="eblog_section" style="'.( $Settings->get('eblog_enabled') ? '' : 'display:none' ).'">';
 
 		// fp> Since there is only one working choice, this param should be completely removed
+		/* tblue> OK. I'll also modify the switch statement in getmail.php. Maybe we'll add
+		 * 	other methods in the future, so I'll keep it, though.
 		$Form->select_input_array( 'eblog_method', $Settings->get('eblog_method'), array( 'pop3a' => T_('POP3 through IMAP extension'), 'pop3' => T_('POP3 (no longer supported!)'), ), // TRANS: E-Mail retrieval method
-			T_('Retrieval method'), T_('Choose a method to retrieve the emails.') );
+			T_('Retrieval method'), T_('Choose a method to retrieve the emails.') );*/
 
 		$Form->text_input( 'eblog_server_host', $Settings->get('eblog_server_host'), 40, T_('Mail Server'), T_('Hostname or IP address of your incoming mail server.'), array( 'maxlength' => 255 ) );
 
@@ -195,6 +197,10 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.8  2008/10/05 10:55:46  tblue246
+ * Blog by mail: We've only one working method => removed the drop-down box and added automatical change to pop3a.
+ * The default value for this setting was in the wrong file, moved.
+ *
  * Revision 1.7  2008/10/05 06:28:32  fplanque
  * no message
  *

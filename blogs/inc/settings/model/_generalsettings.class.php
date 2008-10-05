@@ -107,6 +107,9 @@ class GeneralSettings extends AbstractSettings
 		'allow_moving_chapters' => '0',				// Do not allow moving chapters by default
 
 		'general_cache_enabled' => 0,
+
+		'eblog_add_imgtag' => 1,					// blog by email
+		'eblog_method' => 'pop3a',					// blog by email
 	);
 
 
@@ -161,6 +164,10 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.12  2008/10/05 10:55:46  tblue246
+ * Blog by mail: We've only one working method => removed the drop-down box and added automatical change to pop3a.
+ * The default value for this setting was in the wrong file, moved.
+ *
  * Revision 1.11  2008/09/28 08:06:07  fplanque
  * Refactoring / extended page level caching
  *

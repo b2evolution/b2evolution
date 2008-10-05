@@ -105,9 +105,6 @@ class CollectionSettings extends AbstractSettings
 			'require_title' => 'required',  // Is a title for items required ("required", "optional", "none")
 
 			'cache_enabled' => 0,
-
-			'eblog_add_imgtag' => 1,				// blog by email
-			'eblog_method' => 'pop3a',			// blog by email
 		);
 
 
@@ -143,6 +140,10 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.25  2008/10/05 10:55:46  tblue246
+ * Blog by mail: We've only one working method => removed the drop-down box and added automatical change to pop3a.
+ * The default value for this setting was in the wrong file, moved.
+ *
  * Revision 1.24  2008/10/05 06:28:32  fplanque
  * no message
  *

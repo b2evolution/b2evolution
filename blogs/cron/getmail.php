@@ -403,17 +403,23 @@ function get_post_title( $content, $alternate_title )
 	return $title;
 }
 
-
 // MAIN ROUTINE
 switch ( $Settings -> get( 'eblog_method' ) )
 {
 	case 'pop3':
-		echo_message( T_( 'The POP3 retrieval method is no longer supported. Please configure a different email retrieval method on the Features tab.' ), ERROR, 0, true );
-		break;
+		// tblue> Since the setting is commented out in _features.form.php,
+		//	we change it here because the user won't be able to. When we
+		// 	will have more than one supported method in the future, the
+		// 	user will be able to change the method on the Features tab anyway,
+		// 	so this won't be needed anymore. 
+		echo_message( T_( 'The POP3 retrieval method is no longer supported. The method has automatically been changed to "POP3 through IMAP extension".' ), WARNING, 0, true );
+		$Settings->set( 'eblog_method', 'pop3a' );
+		$Settings->dbupdate();
+		// try to continue here (or better break??). 		break;
 
 	case 'pop3a':
 		// --------------------------------------------------------------------
-		// eblog_method = POP3 through IMAP extension
+		// eblog_method = POP3 through IMAP extension (default)
 		// --------------------------------------------------------------------
 		if ( ! extension_loaded( 'imap' ) )
 		{
