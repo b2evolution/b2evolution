@@ -37,13 +37,13 @@ function display_container( $container, $legend_suffix = '' )
 
 	$Table = & new Table();
 
-	$Table->title = sprintf( ( $legend_suffix ? '%s' : '<span class="container_name">%s</span>' ), T_($container) ).$legend_suffix;
+	$Table->title = '<span class="container_name">'.T_($container).'</span>'.$legend_suffix;
 
-	if( !$legend_suffix )
-	{	// this is an existing container
-		$Table->global_icon( T_('Add a widget...'), 'new',
-			regenerate_url( '', 'action=new&amp;container='.rawurlencode($container) ), /* TRANS: note this is NOT a NEW widget */ '<span class="add_new_widget_text">'.T_('Add widget').'</span> &raquo;', 3, 4, array( 'id' => 'add_new_'.str_replace( ' ', '_', $container ) ) );
-	}
+	// Table ID - fp> needs to be handled cleanly by Table object
+	$table_id = str_replace( ' ', '_', $container ); // fp> Using the container name which has special chars is a bad idea. Counter would be better
+
+	$Table->global_icon( T_('Add a widget...'), 'new',
+			regenerate_url( '', 'action=new&amp;container='.rawurlencode($container) ), /* TRANS: note this is NOT a NEW widget */ '<span class="add_new_widget_text">'.T_('Add widget').'</span> &raquo;', 3, 4, array( 'id' => 'add_new_'.$table_id ) );
 
 	$Table->cols = array(
 			array( 'th' => T_('Widget') ),
@@ -60,12 +60,14 @@ function display_container( $container, $legend_suffix = '' )
 
 	$Table->display_init();
 	// add ID for jQuery
-	$Table->params['head_title' ] = str_replace( '<table', '<table id="'.str_replace( ' ', '_', $container ).'"', $Table->params['head_title'] );
+	$Table->params['head_title'] = str_replace( '<table', '<table id="'.$table_id.'"', $Table->params['head_title'] );
 
+	/*
 	if( $legend_suffix )
-	{	// add jQuery no-drop
-		$Table->params['head_title' ] = str_replace( 'class="grouped"', 'class="grouped no-drop"', $Table->params['head_title'] );
+	{	// add jQuery no-drop -- fp> what do we need this one for?
+		$Table->params['head_title'] = str_replace( 'class="grouped"', 'class="grouped no-drop"', $Table->params['head_title'] );
 	}
+	*/
 
 	$Table->display_list_start();
 
@@ -85,8 +87,7 @@ function display_container( $container, $legend_suffix = '' )
 	{	// TODO: cleanup
 		$Table->display_line_start( true );
 		$Table->display_col_start();
-		echo '<strong class="new_widget">'.T_('There is no widget in this container yet.').'</strong>';
-//		echo '<strong class="new_widget">'.T_('Add a widget to this container ( needs linking )').'</strong>';
+		echo '<span class="new_widget">'.T_('There is no widget in this container yet.').'</span>';
 		$Table->display_col_end();
 		$Table->display_line_end();
 	}
@@ -160,37 +161,9 @@ function display_container( $container, $legend_suffix = '' )
 	$Table->display_list_end();
 }
 
+// fp> what browser do we need a fielset for?
 echo '<fieldset id="current_widgets">'."\n"; // fieldsets are cool at remembering their width ;)
 
-/**
- * Not yet implemented
- */
-/*
-// add a form for storing the current widgets & containers settings
-$Form = & new Form('', 'save_layout', 'post' );
-$Form->begin_form( 'save_state_form' );
-$Form->switch_layout('inline');
-$Form->text( 'state_name', '', 40, T_( 'Save as' ) );
-$Form->submit( array( 'onclick' => 'saveWidgetState();', 'value' => T_( 'Store state' ) ) );
-$Form->end_form();
-
-// add a form for restoring a previously saved state
-$Form = & new Form( '', 'stored_layouts', 'post' );
-$Form->begin_form( 'restore_state_form' );
-$Form->switch_layout('inline');
-global $UserSettings;
-if( $user_layouts = $UserSettings->get( 'stored_widget_layouts' ) )
-{	// user has some stored layouts
-	$user_layouts = explode( ',', $user_layouts );
-}
-else
-{	// user doesn't have any stored layouts
-	$user_layouts = array( 'No stored layouts' );
-}
-$Form->select_input_array( 'stored_layouts', $user_layouts[0], $user_layouts, T_( 'Restore state' ) );
-$Form->submit( array( 'onclick' => 'restoreWidgetState();', 'value' => T_( 'Restore state' ) ) );
-$Form->end_form();
-*/
 // Display containers for current skin:
 foreach( $container_list as $container )
 {
@@ -211,14 +184,14 @@ global $rsc_url;
 echo '<img src="'.$rsc_url.'img/blank.gif" width="1" height="1" /><!-- for IE -->';
 
 echo '</fieldset>'."\n";
-echo '<div class="clear">&nbsp;</div>'."\n";
+echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear">';
 
 
-// Fadeout javascript
-//echo '<script type="text/javascript" src="'.$rsc_url.'js/fadeout.js"></script>';
-//echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, false);</script>';
 /*
  * $Log$
+ * Revision 1.12  2008/10/05 03:35:43  fplanque
+ * comments for yabba
+ *
  * Revision 1.11  2008/07/03 09:53:08  yabs
  * widget UI
  *
