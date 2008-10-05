@@ -2817,14 +2817,17 @@ function modules_call_method( $method_name )
 	}
 }
 
+
 /**
  * Send a result as javascript
  * automatically includes any Messages ( @see Log::display() )
  * no return from function as it terminates processing
  *
+ * @author Yabba
+ *
  * @param array $methods javascript funtions to call with array of parameters
- * 	format : 'function_name' => array( param1, parm2, param3 )
- * @param boolean $send_as_html return result as html page with script tag : default is to send as js file
+ *            	format : 'function_name' => array( param1, parm2, param3 )
+ * @param boolean $send_as_html Wrap the script into an html page with script tag; default is to send as js file
  * @param string $target prepended to function calls : blank or window.parent
  */
 function send_javascript_message( $methods = array(), $send_as_html = false, $target = '' )
@@ -2886,19 +2889,26 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 		header( 'Content-Type: text/javascript' );
 		echo $output;
 	}
-	exit;
+
+	exit(0);
 }
 
 
 /**
  * Basic tidy up of strings
  *
+ * @author Yabba
+ *
  * @param string $unformatted raw data
  * @return string formatted data
  */
 function format_to_js( $unformatted )
 {
-	$formatted = str_replace( array( "'", "\r", "\n" ), array( '\\\'', '', '' ), $unformatted );
+	$formatted = str_replace(
+			array( "'", "\r", "\n" ),
+			array( '\\\'', '', '' ),
+			$unformatted );
+
 	return $formatted;
 }
 
@@ -2949,6 +2959,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.51  2008/10/05 03:43:03  fplanque
+ * minor
+ *
  * Revision 1.50  2008/10/02 21:52:34  blueyed
  * fix unnecessary global and indent
  *
