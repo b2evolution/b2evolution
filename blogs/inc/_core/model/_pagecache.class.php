@@ -416,7 +416,8 @@ class PageCache
 
 			// Now atomically replace old cache with new cache (at least on Linux)
 			if( ! @rename( $af_cache_file.'.tmp', $af_cache_file ) )
-			{	// Rename failed, we are probably on windows... we have to split this:
+			{	// Rename failed, we are probably on windows PHP <= 5.2.5... http://bugs.php.net/bug.php?id=44805
+				// we have to split this:
 				$Debuglog->add( 'Renaming of cache file failed. (Windows?)', 'cache' );
 				// Kill cache:
 				unlink( $af_cache_file );
@@ -442,6 +443,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.5  2008/10/05 07:18:06  fplanque
+ * thow in a tiny doc about windows bug
+ *
  * Revision 1.4  2008/10/05 07:11:38  fplanque
  * I think it's atomic now
  *
