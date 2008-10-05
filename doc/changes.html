@@ -32,18 +32,12 @@
 			<h1>3.0 series</h1>
 			<h2>3.0.0-alpha</h2>
 			<ul>
-				<li>User avatar support</li>
-				<li>Post editing
+				<li>Blog features
 					<ul>
-						<li>Added &quot;Save &amp; edit&quot; button</li>
-								<li>Added 1 click &quot;Publish NOW !&quot; button</li>
-								<li>Enhanced handling of attached images &amp; files.</li>
-								<li>Posts can be explicitely ordered by the use of the order field. This can be set on each post in expert edit mode (in the right column).</li>
-								<li>Post can now have custom fields. Custom fields can be defined for each blog under &quot;Blog Settings &gt; Features&quot;.</li>
-								<li>The issue date can now be set to an explicit date or just to &quot;now&quot; in which case it will be updated without the need to explicitely type in the current date/time.</li>
-								<li>Urltitles (slugs) can now be up to 200 chars long.</li>
-								<li>You can now specify a different title to be displayed in the &lt;title&gt; tag than the regular title of your post.</li>
-							</ul>
+						<li>User avatar support</li>
+						<li>TODO: finish featured post</li>
+						<li>External Feeds/Feedburner support (walter, fplanque)</li>
+					</ul>
 				</li>
 				<li>Photoblogging
 					<ul>
@@ -70,28 +64,45 @@
 				</li>
 				<li>Performance
 					<ul>
-						<li>Page level caching. Can be enabled for each blog indivually (Advanced blog settings)</li>
+						<li>Page level caching. Can be enabled for each blog indivually (Advanced blog settings</li>
 					</ul>
 				</li>
+				<li>Admin interface
+					<ul>
+						<li>Yabbarriffic drag &amp; drop widget reordering (you can even move a widget from one container to another)</li>
+						<li>File manager now supports a shared directory (/media/shared/global/)</li>
+						<li>Enhanced dashboard.</li>
+						<li>Added usability shortcuts.</li>
+						<li>Improved iPhone compatibility.</li>
+						</ul>
+				</li>
+				<li>Post editing
+					<ul>
+						<li>Added &quot;Save &amp; edit&quot; button</li>
+						<li>Added 1 click &quot;Publish NOW !&quot; button</li>
+						<li>Enhanced handling of attached images &amp; files.</li>
+						<li>Posts can be explicitely ordered by the use of the order field. This can be set on each post in expert edit mode (in the right column).</li>
+						<li>Post can now have custom fields. Custom fields can be defined for each blog under &quot;Blog Settings &gt; Features&quot;.</li>
+						<li>The issue date can now be set to an explicit date or just to &quot;now&quot; in which case it will be updated without the need to explicitely type in the current date/time.</li>
+						<li>Urltitles (slugs) can now be up to 200 chars long.</li>
+						<li>You can now specify a different title to be displayed in the &lt;title&gt; tag than the regular title of your post</li>
+					</ul>
+				</li>
+				<li>Logging and stats					</li>
+				<ul>
+					<li>Session and Hit logging as well as debug info display are now done systematically at PHP shutdown. Therefore calls to $Hit-&gt;log() and debug_info() are no longer needed within skins. (It doesn't hurt to let them there either.) </li>
+					<li>Keyphrase logging</li>
+				</ul>
 				<li>More SEO settings:
 					<ul>
 						<li>Customizable 404 pages</li>
 						<li>Customizable 404 responses (200, 301, 302, 303, 404 and 410 !)</li>
-						<li>Description and keywords META tags are inserted into the main page only to avoid duplicate content.</li>
+						<li>Description and keywords META tags are inserted into the main page only to avoid duplicate content</li>
 					</ul>
-				</li>
-				<li>Session and Hit logging as well as debug info display are now done systematically at PHP shutdown. Therefore calls to $Hit-&gt;log() and debug_info() are no longer needed within skins. (It doesn't hurt to let them there either.)
-					<ul>
-						<li>Keyphrase logging</li>
-					</ul>
-				</li>
-				<li>Enhanced dashboard.</li>
-				<li>File manager now supports a shared directory (/media/shared/global/)</li>
-				<li>Added usability shortcuts.</li>
-				<li>Improved iPhone compatibility.</li>
-				<li>TODO: finish featured post</li>
-				<li>External Feeds/Feedburner support (walter, fplanque)</li>
+					</li>
+				<li>Enhanced blog by email (tilman)</li>
 				<li>Reworked demo blog created at install</li>
+				<li>Bug fixes</li>
 			</ul>
 
 
