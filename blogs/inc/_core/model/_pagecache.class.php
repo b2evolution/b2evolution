@@ -35,6 +35,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class PageCache
 {
+  /**
+	 * How old can a cached object get before we consider it outdated
+	 */
+	var $max_age_seconds = 300;  // 5 minutes for now
+
+  /**
+	 * After how many bytes should we output sth live while collecting cache content:
+	 */
+	var $output_chunk_size = 2000;
 
 	/**
 	 * By default we consider caching not to be enabled
@@ -239,7 +248,7 @@ class PageCache
 
 		$Debuglog->add( 'Collecting started', 'cache' );
 
-		ob_start( array( & $this, 'output_handler'), 2000 );
+		ob_start( array( & $this, 'output_handler'), $this->output_chunk_size );
 
 		return false;
 	}
@@ -300,7 +309,7 @@ class PageCache
 			unset($lines[1]);
 			$cache_age = $servertimenow-$retrieved_ts;
 			$Debuglog->add( 'Cache age: '.floor($cache_age/60).' min '.($cache_age % 60).' sec', 'cache' );
-			if( $cache_age > 300 ) // 5 minutes for now
+			if( $cache_age > $this->max_age_seconds )
 			{	// Cache has expired
 				return false;
 			}
@@ -373,11 +382,9 @@ class PageCache
 		// What would be the cache file for the current URL?
 		$af_cache_file = $this->get_af_filecache_path();
 
-		// fp> I'm not sure if this below gets an exclusive lock on the file
-		// However, I believe that fwrite() is atomic so the worst case scenario is that multiple PHP threads open
-		// the same file and all overwrite it sequentially with the same content. That should be ok.
-		// TODO: dh> fwrite is not atomic
-		if( ! $fh = @fopen( $af_cache_file, 'w+', false ) )
+		// fp> 'x' mode should either give an exclusive write lock or fail
+		// fp> TODO: this here should be ok, but it would be even better with locking the file when we start collecting cache
+		if( ! $fh = @fopen( $af_cache_file.'.tmp', 'x', false ) )
 		{
 			$Debuglog->add( 'Could not open cache file!', 'cache' );
 		}
@@ -406,7 +413,28 @@ class PageCache
 
 			fwrite( $fh, $file_head.$this->cached_page_content );
 			fclose( $fh );
-			$Debuglog->add( 'Cache updated!', 'cache' );
+
+			// Now atomically replace old cache with new cache (at least on Linux)
+			if( ! @rename( $af_cache_file.'.tmp', $af_cache_file ) )
+			{	// Rename failed, we are probably on windows... we have to split this:
+				$Debuglog->add( 'Renaming of cache file failed. (Windows?)', 'cache' );
+				// Kill cache:
+				unlink( $af_cache_file );
+				// Now, some other process might start to try caching (and will likely give up since the .tmp file already exists)
+				if( ! @rename( $af_cache_file.'.tmp', $af_cache_file ) )
+				{ // Hide errors bc another PHP process could have beaten us to writing a new file there
+					// Anyways, we still could not rename, let's drop the .tmp file:
+					unlink( $af_cache_file.'.tmp' );
+				}
+				else
+				{
+					$Debuglog->add( 'Cache updated... after unlink+rename!', 'cache' );
+				}
+			}
+			else
+			{
+				$Debuglog->add( 'Cache updated!', 'cache' );
+			}
 		}
 	}
 
@@ -414,6 +442,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.4  2008/10/05 07:11:38  fplanque
+ * I think it's atomic now
+ *
  * Revision 1.3  2008/10/05 04:43:19  fplanque
  * minor, and would 4096 serve any purpose?
  *
