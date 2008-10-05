@@ -106,8 +106,8 @@ class CollectionSettings extends AbstractSettings
 
 			'cache_enabled' => 0,
 
-			'eblog_add_imgtag' => 1,
-			'eblog_method' => 'pop3a',
+			'eblog_add_imgtag' => 1,				// blog by email
+			'eblog_method' => 'pop3a',			// blog by email
 		);
 
 
@@ -143,6 +143,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.24  2008/10/05 06:28:32  fplanque
+ * no message
+ *
  * Revision 1.23  2008/10/04 14:25:25  tblue246
  * Code improvements in blog/cron/getmail.php, e. g. option to add <img> tags for image attachments.
  * All attachments now get added to the post if the filename is valid (validate_filename()). Not sure if this is secure, but should be.

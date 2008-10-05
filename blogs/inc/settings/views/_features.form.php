@@ -84,6 +84,7 @@ $Form->begin_fieldset( T_('Blog by email').get_manual_link('blog_by_email') );
 	// fp> TODO: this is IMPOSSIBLE to turn back on when you have no javascript!!! :((
 	echo '<div id="eblog_section" style="'.( $Settings->get('eblog_enabled') ? '' : 'display:none' ).'">';
 
+		// fp> Since there is only one working choice, this param should be completely removed
 		$Form->select_input_array( 'eblog_method', $Settings->get('eblog_method'), array( 'pop3a' => T_('POP3 through IMAP extension'), 'pop3' => T_('POP3 (no longer supported!)'), ), // TRANS: E-Mail retrieval method
 			T_('Retrieval method'), T_('Choose a method to retrieve the emails.') );
 
@@ -194,6 +195,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.7  2008/10/05 06:28:32  fplanque
+ * no message
+ *
  * Revision 1.6  2008/10/04 14:25:25  tblue246
  * Code improvements in blog/cron/getmail.php, e. g. option to add <img> tags for image attachments.
  * All attachments now get added to the post if the filename is valid (validate_filename()). Not sure if this is secure, but should be.

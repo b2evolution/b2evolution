@@ -982,13 +982,7 @@ class Results extends Table
 				$output = $this->parse_col_content( $col['td'] );
 				#pre_dump( '{'.$output.'}' );
 				$out = eval( "return '$output';" );
-//fp> why do we need this?:				echo ( trim(strip_tags($out,'<img><input>')) === '' ? '&nbsp;' : $out );
-// tblue> strip_tags($out, '<img>') strips all tags except <img>, so e. g.
-//	the checkboxes on the user/group perms tab aren't displayed (<input> gets
-//	stripped => string appears to be empty => only &nbsp; is displayed).
-//	see also: http://forums.b2evolution.net/viewtopic.php?t=16334
-// tblue> 10/04/08> i'm fixing this again, i don't see the problem of
-//	this fix.
+				// fp> <input> is needed for checkboxes in the Blog User/Group permissions table > advanced
 				echo ( trim(strip_tags($out,'<img><input>')) === '' ? '&nbsp;' : $out );
 
 				// COL START:
@@ -1811,6 +1805,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.17  2008/10/05 06:28:32  fplanque
+ * no message
+ *
  * Revision 1.16  2008/10/04 19:12:14  tblue246
  * display_body(): don't strip <input> tag from column content (again). if there really is a problem with this fix, please rollback and add a comment describing the the problem.
  *
