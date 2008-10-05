@@ -29,7 +29,7 @@
  * @todo check different encodings. only tested with iso-8859-1
  * @todo try more exotic email clients like mobile phones
  * @todo tested and working with thunderbird (text, html, signed), yahoo mail (text, html), outlook webmail, K800i
- * @internal tblue> maybe we should add normal pop3 support (again)?
+ * @todo Allow user to choose whether to upload attachments to the blog media folder or to his user root.
  */
 
 /**
@@ -423,7 +423,7 @@ switch ( $Settings -> get( 'eblog_method' ) )
 		// --------------------------------------------------------------------
 		if ( ! extension_loaded( 'imap' ) )
 		{
-			echo_message( T_( 'The php_imap extension is not available to php on this server. Please configure a different email retrieval method on the Features tab.' ), ERROR, 0, true );
+			echo_message( T_( 'The php_imap extension is not available to PHP on this server. Please load it in php.ini or ask your hosting provider to do so.' ), ERROR, 0, true );
 			exit;
 		}
 		echo_message( T_( 'Connecting and authenticating to mail server' ), INFO, 1, true );
