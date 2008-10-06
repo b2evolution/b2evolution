@@ -110,12 +110,17 @@ switch( $action )
 			$Settings->set( 'outbound_notifications_mode',  get_param('outbound_notifications_mode') );
 
 			// Blog by email
-			param( 'eblog_enabled', 'integer', 0 );
+			param( 'eblog_enabled', 'boolean', 0 );
 			$Settings->set( 'eblog_enabled', $eblog_enabled );
 
-			/* tblue> Not needed anymore since we've only one method.
 			param( 'eblog_method', 'string', true );
-			$Settings->set( 'eblog_method', strtolower(trim($eblog_method)));*/
+			$Settings->set( 'eblog_method', strtolower(trim($eblog_method)));
+
+			param( 'eblog_encrypt', 'string', true );
+			$Settings->set( 'eblog_encrypt', $eblog_encrypt );
+
+			param( 'eblog_novalidatecert', 'boolean', 0 );
+			$Settings->set( 'eblog_novalidatecert', $eblog_novalidatecert );
 
 			param( 'eblog_server_host', 'string', true );
 			$Settings->set( 'eblog_server_host', strtolower(trim($eblog_server_host)));
@@ -135,13 +140,13 @@ switch( $action )
 			param( 'eblog_subject_prefix', 'string', true );
 			$Settings->set( 'eblog_subject_prefix', trim($eblog_subject_prefix) );
 
-			param( 'AutoBR', 'integer', 0 );
+			param( 'AutoBR', 'boolean', 0 );
 			$Settings->set( 'AutoBR', $AutoBR );
 
 			param( 'eblog_body_terminator', 'string', true );
 			$Settings->set( 'eblog_body_terminator', trim($eblog_body_terminator) );
 
-			param( 'eblog_test_mode', 'integer', 0 );
+			param( 'eblog_test_mode', 'boolean', 0 );
 			$Settings->set( 'eblog_test_mode', $eblog_test_mode );
 
 			param( 'eblog_add_imgtag', 'boolean', 0 );
@@ -209,6 +214,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2008/10/06 11:02:27  tblue246
+ * Blog by mail now supports POP3 & IMAP, SSL & TLS
+ *
  * Revision 1.5  2008/10/05 10:55:46  tblue246
  * Blog by mail: We've only one working method => removed the drop-down box and added automatical change to pop3a.
  * The default value for this setting was in the wrong file, moved.

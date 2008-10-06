@@ -78,21 +78,24 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Blog by email').get_manual_link('blog_by_email') );
 
 	$Form->checkbox_input( 'eblog_enabled', $Settings->get('eblog_enabled'), T_('Enable Blog by email'),
-		array( 'note' => T_('Check to enable the Blog by email feature.' ), 'onclick' =>
+		array( 'note' => sprintf(T_('Note: This feature needs the php_imap extension (currently %s).' ), extension_loaded( 'imap' ) ? T_('loaded') : T_('NOT loaded')), 'onclick' =>
 			'document.getElementById("eblog_section").style.display = (this.checked==true ? "" : "none") ;' ) );
 
 	// fp> TODO: this is IMPOSSIBLE to turn back on when you have no javascript!!! :((
 	echo '<div id="eblog_section" style="'.( $Settings->get('eblog_enabled') ? '' : 'display:none' ).'">';
 
-		// fp> Since there is only one working choice, this param should be completely removed
-		/* tblue> OK. I'll also modify the switch statement in getmail.php. Maybe we'll add
-		 * 	other methods in the future, so I'll keep it, though.
-		$Form->select_input_array( 'eblog_method', $Settings->get('eblog_method'), array( 'pop3a' => T_('POP3 through IMAP extension'), 'pop3' => T_('POP3 (no longer supported!)'), ), // TRANS: E-Mail retrieval method
-			T_('Retrieval method'), T_('Choose a method to retrieve the emails.') );*/
+		$Form->select_input_array( 'eblog_method', $Settings->get('eblog_method'), array( 'pop3' => T_('POP3'), 'imap' => T_('IMAP'), ), // TRANS: E-Mail retrieval method
+			T_('Retrieval method'), T_('Choose a method to retrieve the emails.') );
 
 		$Form->text_input( 'eblog_server_host', $Settings->get('eblog_server_host'), 40, T_('Mail Server'), T_('Hostname or IP address of your incoming mail server.'), array( 'maxlength' => 255 ) );
 
-		$Form->text_input( 'eblog_server_port', $Settings->get('eblog_server_port'), 5, T_('Port Number'), T_('Port number of your incoming mail server (Defaults: pop3:110 imap:143).'), array( 'maxlength' => 6 ) );
+		$Form->text_input( 'eblog_server_port', $Settings->get('eblog_server_port'), 5, T_('Port Number'), T_('Port number of your incoming mail server (Defaults: pop3: 110 imap: 143).'), array( 'maxlength' => 6 ) );
+
+		$Form->radio( 'eblog_encrypt', $Settings->get('eblog_encrypt'), array(
+																			array( 'none', T_('None'), ),
+																			array( 'ssl', T_('SSL'), ),
+																			array( 'tls', T_('TLS'), ),
+																		), T_('Encryption method') );
 
 		$Form->text_input( 'eblog_username', $Settings->get('eblog_username'), 15, T_('Account Name'), T_('User name for authenticating to your mail server.'), array( 'maxlength' => 255 ) );
 
@@ -104,13 +107,13 @@ $Form->begin_fieldset( T_('Blog by email').get_manual_link('blog_by_email') );
 		$Form->text_input( 'eblog_subject_prefix', $Settings->get('eblog_subject_prefix'), 15, T_('Subject Prefix'), T_('Email subject must start with this prefix to be imported.'), array( 'maxlength' => 255 ) );
 
 		// eblog test links
-		// TODO: provide Non-JS functionality (open in a new window).
 		// TODO: "cron/" is supposed to not reside in the server's DocumentRoot, therefor is not necessarily accessible
+		$getmailurl = $baseurl.'cron/getmail.php?test=';
 		$Form->info_field(
 			T_('Perform Server Test'),
-			' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "'.$baseurl.'cron/getmail.php?test=1", "getmail" )\'>[ ' . T_('connection') . ' ]</a>'
-			.' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "'.$baseurl.'cron/getmail.php?test=2", "getmail" )\'>[ ' . T_('messages') . ' ]</a>'
-			.' <a id="eblog_test" href="#" onclick=\'return pop_up_window( "'.$baseurl.'cron/getmail.php?test=3", "getmail" )\'>[ ' . T_('verbose') . ' ]</a>',
+			' <a id="eblog_test" target="_blank" href="'.$getmailurl.'1" onclick=\'return pop_up_window( "'.$getmailurl.'1", "getmail" )\'>[ ' . T_('connection') . ' ]</a>'
+			.' <a id="eblog_test" target="_blank" href="'.$getmailurl.'2" onclick=\'return pop_up_window( "'.$getmailurl.'2", "getmail" )\'>[ ' . T_('messages') . ' ]</a>'
+			.' <a id="eblog_test" target="_blank" href="'.$getmailurl.'3" onclick=\'return pop_up_window( "'.$getmailurl.'3", "getmail" )\'>[ ' . T_('verbose') . ' ]</a>',
 			array() );
 
 //		$Form->info_field ('','<a id="eblog_test_email" href="#" onclick=\'return pop_up_window( "' . $htsrv_url . 'getmail.php?test=email", "getmail" )\'>' . T_('Test email') . '</a>',array());
@@ -120,6 +123,8 @@ $Form->begin_fieldset( T_('Blog by email').get_manual_link('blog_by_email') );
 
 		// TODO: provide Non-JS functionality
 		echo '<div id="eblog_section_more" style="display:none">';
+
+			$Form->checkbox( 'eblog_novalidatecert', $Settings->get('eblog_novalidatecert'), T_('Do not validate certificate'), T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') ); 
 
 			$Form->checkbox( 'eblog_add_imgtag', $Settings->get('eblog_add_imgtag'), T_('Add &lt;img&gt; tags'), T_('Display image attachments using &lt;img&gt; tags (instead of creating a link).'));
 
@@ -197,6 +202,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.9  2008/10/06 11:02:27  tblue246
+ * Blog by mail now supports POP3 & IMAP, SSL & TLS
+ *
  * Revision 1.8  2008/10/05 10:55:46  tblue246
  * Blog by mail: We've only one working method => removed the drop-down box and added automatical change to pop3a.
  * The default value for this setting was in the wrong file, moved.

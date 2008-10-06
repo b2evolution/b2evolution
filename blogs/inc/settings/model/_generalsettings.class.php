@@ -107,9 +107,12 @@ class GeneralSettings extends AbstractSettings
 		'allow_moving_chapters' => '0',				// Do not allow moving chapters by default
 
 		'general_cache_enabled' => 0,
-
+		
+		'eblog_enabled' => 0,						// blog by email
+		'eblog_method' => 'pop3',					// blog by email
+		'eblog_encrypt' => 'none',					// blog by email
+		'eblog_server_port' => 110,					// blog by email
 		'eblog_add_imgtag' => 1,					// blog by email
-		'eblog_method' => 'pop3a',					// blog by email
 	);
 
 
@@ -164,6 +167,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.13  2008/10/06 11:02:27  tblue246
+ * Blog by mail now supports POP3 & IMAP, SSL & TLS
+ *
  * Revision 1.12  2008/10/05 10:55:46  tblue246
  * Blog by mail: We've only one working method => removed the drop-down box and added automatical change to pop3a.
  * The default value for this setting was in the wrong file, moved.
