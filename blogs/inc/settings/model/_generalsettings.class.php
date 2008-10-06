@@ -62,8 +62,6 @@ class GeneralSettings extends AbstractSettings
 		'evonet_last_update' => '1196000000',		// just around the time we implemented this ;)
 		'evonet_last_attempt' => '1196000000',		// just around the time we implemented this ;)
 
-		'AutoBR' => '0',			// Used for email blogging. fp> TODO: should be replaced by "email renderers/decoders/cleaners"...
-
 		'log_public_hits' => '1',
 		'log_admin_hits' => '0',
 		'log_spam_hits' => '0',
@@ -112,7 +110,11 @@ class GeneralSettings extends AbstractSettings
 		'eblog_method' => 'pop3',					// blog by email
 		'eblog_encrypt' => 'none',					// blog by email
 		'eblog_server_port' => 110,					// blog by email
+		'eblog_default_category' => 1,				// blog by email
+		'AutoBR' => 0,								// Used for email blogging. fp> TODO: should be replaced by "email renderers/decoders/cleaners"...
 		'eblog_add_imgtag' => 1,					// blog by email
+		'eblog_body_terminator' => '___',			// blog by email
+		'eblog_subject_prefix' => 'blog:',			// blog by email
 	);
 
 
@@ -167,6 +169,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.14  2008/10/06 18:11:58  tblue246
+ * Further blog by email fixes
+ *
  * Revision 1.13  2008/10/06 11:02:27  tblue246
  * Blog by mail now supports POP3 & IMAP, SSL & TLS
  *

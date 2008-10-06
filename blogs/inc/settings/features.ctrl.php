@@ -85,8 +85,10 @@ switch( $action )
 			*/
 
 			$Settings->delete_array( array(
-				'eblog_enabled', 'eblog_method', 'eblog_server_host', 'eblog_server_port', 'eblog_username',
-				'eblog_password', 'eblog_default_category', 'eblog_subject_prefix', 'AutoBR',
+				'eblog_enabled', 'eblog_method', 'eblog_encrypt', 'eblog_novalidatecert',
+				'eblog_server_host', 'eblog_server_port', 'eblog_username',
+				'eblog_password', 'eblog_default_category', 'eblog_subject_prefix',
+				'AutoBR', 'eblog_body_terminator', 'eblog_test_mode', 'eblog_add_imgtag',
 				'log_public_hits', 'log_admin_hits', 'auto_prune_stats_mode', 'auto_prune_stats',
 				'outbound_notifications_mode', 'webhelp_enabled' ) );
 
@@ -125,7 +127,7 @@ switch( $action )
 			param( 'eblog_server_host', 'string', true );
 			$Settings->set( 'eblog_server_host', strtolower(trim($eblog_server_host)));
 
-			param( 'eblog_server_port', 'integer', 0 );
+			param( 'eblog_server_port', 'integer', true );
 			$Settings->set( 'eblog_server_port', $eblog_server_port );
 
 			param( 'eblog_username', 'string', true );
@@ -134,7 +136,7 @@ switch( $action )
 			param( 'eblog_password', 'string', true );
 			$Settings->set( 'eblog_password', trim($eblog_password));
 
-			param( 'eblog_default_category', 'integer', 0 );
+			param( 'eblog_default_category', 'integer', true );
 			$Settings->set( 'eblog_default_category', $eblog_default_category );
 
 			param( 'eblog_subject_prefix', 'string', true );
@@ -214,6 +216,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2008/10/06 18:11:58  tblue246
+ * Further blog by email fixes
+ *
  * Revision 1.6  2008/10/06 11:02:27  tblue246
  * Blog by mail now supports POP3 & IMAP, SSL & TLS
  *
