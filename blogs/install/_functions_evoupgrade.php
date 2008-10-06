@@ -2215,6 +2215,7 @@ function upgrade_b2evo_tables()
 						( 10100, 'word',     'Yahoo IM'),
 						( 10200, 'word',     'AOL AIM'),
 						( 10300, 'number',   'ICQ ID'),
+						( 40000, 'phone',    'Skype'),
 						( 50000, 'phone',    'Main phone'),
 						( 50100, 'phone',    'Cell phone'),
 						( 50200, 'phone',    'Office phone'),
@@ -2400,6 +2401,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.265  2008/10/06 03:36:48  fplanque
+ * Added skype field
+ *
  * Revision 1.264  2008/10/06 01:55:06  fplanque
  * User fields proof of concept.
  * Needs UserFieldDef and UserFieldDefCache + editing of fields.

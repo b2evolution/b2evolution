@@ -147,6 +147,7 @@ function create_default_data()
 						( 10100, 'word',     'Yahoo IM'),
 						( 10200, 'word',     'AOL AIM'),
 						( 10300, 'number',   'ICQ ID'),
+						( 40000, 'phone',    'Skype'),
 						( 50000, 'phone',    'Main phone'),
 						( 50100, 'phone',    'Cell phone'),
 						( 50200, 'phone',    'Office phone'),
@@ -775,6 +776,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.250  2008/10/06 03:36:48  fplanque
+ * Added skype field
+ *
  * Revision 1.249  2008/10/06 01:55:06  fplanque
  * User fields proof of concept.
  * Needs UserFieldDef and UserFieldDefCache + editing of fields.
