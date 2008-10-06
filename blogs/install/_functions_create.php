@@ -138,9 +138,46 @@ function create_default_data()
 	$Group_Users->dbinsert();
 	echo "OK.<br />\n";
 
+/* to come:
+	echo 'Creating user field definitions... ';
+	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
+	$DB->query( "
+    INSERT INTO T_users__fielddefs (ufdf_ID, ufdf_type, ufdf_name)
+		 VALUES ( 10000, 'email',    'MSN/Live IM'),
+						( 10100, 'word',     'Yahoo IM'),
+						( 10200, 'word',     'AOL AIM'),
+						( 10300, 'number',   'ICQ ID'),
+						( 50000, 'phone',    'Main phone'),
+						( 50100, 'phone',    'Cell phone'),
+						( 50200, 'phone',    'Office phone'),
+						( 50300, 'phone',    'Home phone'),
+						( 60000, 'phone',    'Office FAX'),
+						( 60100, 'phone',    'Home FAX'),
+						(100000, 'url',      'Website'),
+						(100100, 'url',      'Blog'),
+						(110000, 'url',      'Linkedin'),
+						(120000, 'url',      'Twitter'),
+						(130100, 'url',      'Facebook'),
+						(130200, 'url',      'Myspace'),
+						(140000, 'url',      'Flickr'),
+						(150000, 'url',      'YouTube'),
+						(160000, 'url',      'Digg'),
+						(160100, 'url',      'StumbleUpon'),
+						(200100, 'text',     'Address Line 1'),
+						(200200, 'text',     'Address Line 2'),
+						(200300, 'text',     'Address Line 3'),
+						(200400, 'text',     'House/Building #'),
+						(200500, 'text',     'Street Name'),
+						(200600, 'text',     'Unit Type'),
+						(200700, 'text',     'Unit #'),
+						(201000, 'text',     'City'),
+						(201100, 'text',     'State'),
+						(201200, 'text',     'ZIP/Postcode'),
+						(201300, 'text',     'Country');" );
+	echo "OK.<br />\n";
+*/
 
 	echo 'Creating admin user... ';
-
 	global $timestamp, $admin_email, $default_locale, $install_password;
 	global $random_password;
 
@@ -738,6 +775,11 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.249  2008/10/06 01:55:06  fplanque
+ * User fields proof of concept.
+ * Needs UserFieldDef and UserFieldDefCache + editing of fields.
+ * Does anyone want to take if from there?
+ *
  * Revision 1.248  2008/09/29 08:30:38  fplanque
  * Avatar support
  *

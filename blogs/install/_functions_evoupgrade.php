@@ -2197,6 +2197,90 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9900' );
 	}
 
+/* User fields to come...
+
+	task_begin( 'Creating table for User field definitions' );
+	$DB->query( "CREATE TABLE T_users__fielddefs (
+			ufdf_ID int(10) unsigned NOT NULL,
+			ufdf_type char(8) NOT NULL,
+			ufdf_name varchar(255) collate latin1_general_ci NOT NULL,
+			PRIMARY KEY  (ufdf_ID)
+		)" );
+	task_end();
+
+	task_begin( 'Creating default field definitions' );
+	$DB->query( "
+    INSERT INTO T_users__fielddefs (ufdf_ID, ufdf_type, ufdf_name)
+		 VALUES ( 10000, 'email',    'MSN/Live IM'),
+						( 10100, 'word',     'Yahoo IM'),
+						( 10200, 'word',     'AOL AIM'),
+						( 10300, 'number',   'ICQ ID'),
+						( 50000, 'phone',    'Main phone'),
+						( 50100, 'phone',    'Cell phone'),
+						( 50200, 'phone',    'Office phone'),
+						( 50300, 'phone',    'Home phone'),
+						( 60000, 'phone',    'Office FAX'),
+						( 60100, 'phone',    'Home FAX'),
+						(100000, 'url',      'Website'),
+						(100100, 'url',      'Blog'),
+						(110000, 'url',      'Linkedin'),
+						(120000, 'url',      'Twitter'),
+						(130100, 'url',      'Facebook'),
+						(130200, 'url',      'Myspace'),
+						(140000, 'url',      'Flickr'),
+						(150000, 'url',      'YouTube'),
+						(160000, 'url',      'Digg'),
+						(160100, 'url',      'StumbleUpon'),
+						(200100, 'text',     'Address Line 1'),
+						(200200, 'text',     'Address Line 2'),
+						(200300, 'text',     'Address Line 3'),
+						(200400, 'text',     'House/Building #'),
+						(200500, 'text',     'Street Name'),
+						(200600, 'text',     'Unit Type'),
+						(200700, 'text',     'Unit #'),
+						(201000, 'text',     'City'),
+						(201100, 'text',     'State'),
+						(201200, 'text',     'ZIP/Postcode'),
+						(201300, 'text',     'Country');" );
+	task_end();
+
+	task_begin( 'Creating table for User fields' );
+	$DB->query( "CREATE TABLE T_users__fields (
+		  uf_user_ID int(10) unsigned NOT NULL,
+		  uf_ufdf_ID int(10) unsigned NOT NULL,
+		  uf_varchar varchar(255) NOT NULL,
+		  KEY uf_user_ID (uf_user_ID, uf_ufdf_ID)
+		)" );
+	task_end();
+
+	task_begin( 'Moving user data to fields' );
+	// ICQ
+	$DB->query( "INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
+							 SELECT user_ID, 10300, user_icq
+								 FROM T_users
+								WHERE user_msn IS NOT NULL AND TRIM(user_icq) <> ''" );
+	// URL
+	$DB->query( "INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
+							 SELECT user_ID, 100000, user_url
+								 FROM T_users
+								WHERE user_msn IS NOT NULL AND TRIM(user_url) <> ''" );
+	// AIM
+	$DB->query( "INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
+							 SELECT user_ID, 10200, user_aim
+								 FROM T_users
+								WHERE user_msn IS NOT NULL AND TRIM(user_aim) <> ''" );
+	// MSN/live IM
+	$DB->query( "INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
+							 SELECT user_ID, 10000, user_msn
+								 FROM T_users
+								WHERE user_msn IS NOT NULL AND TRIM(user_msn) <> ''" );
+	// Yahoo IM
+	$DB->query( "INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
+							 SELECT user_ID, 10100, user_yim
+								 FROM T_users
+								WHERE user_msn IS NOT NULL AND TRIM(user_yim) <> ''" );
+	task_end();
+*/
 
 	/*
 	 * ADD UPGRADES HERE.
@@ -2316,6 +2400,11 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.264  2008/10/06 01:55:06  fplanque
+ * User fields proof of concept.
+ * Needs UserFieldDef and UserFieldDefCache + editing of fields.
+ * Does anyone want to take if from there?
+ *
  * Revision 1.263  2008/09/27 00:05:54  fplanque
  * minor/version bump
  *

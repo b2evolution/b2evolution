@@ -68,6 +68,8 @@ $db_config['aliases'] = array(
 		'T_skins__skin'         => $tableprefix.'skins__skin',
 		'T_subscriptions'       => $tableprefix.'subscriptions',
 		'T_users'               => $tableprefix.'users',
+		'T_users__fielddefs'    => $tableprefix.'users__fielddefs',
+		'T_users__fields'       => $tableprefix.'users__fields',
 		'T_usersettings'        => $tableprefix.'usersettings',
 		'T_widget'              => $tableprefix.'widget',
 	);
@@ -412,6 +414,11 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.4  2008/10/06 01:55:06  fplanque
+ * User fields proof of concept.
+ * Needs UserFieldDef and UserFieldDefCache + editing of fields.
+ * Does anyone want to take if from there?
+ *
  * Revision 1.3  2008/10/03 22:00:47  blueyed
  * Indent fixes
  *

@@ -66,7 +66,25 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 
 $ProfileForm->end_fieldset();
 
+/*
 $ProfileForm->begin_fieldset( T_('Additional info') );
+
+	// This totally needs to move into User object
+	global $DB;
+	$userfields = $DB->get_results( '
+		SELECT ufdf_ID, ufdf_type, ufdf_name, uf_varchar
+			FROM T_users__fields LEFT JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
+		 WHERE uf_user_ID = '.$User->ID );
+
+	foreach( $userfields as $userfield )
+	{
+		$ProfileForm->info( $userfield->ufdf_name, $userfield->uf_varchar );
+	}
+
+$ProfileForm->end_fieldset();
+*/
+
+$ProfileForm->begin_fieldset( T_('Miscellaneous') );
 
 	$ProfileForm->info( T_('Locale'), $User->get( 'locale' ) );
 	$ProfileForm->info( T_('Level'), $User->get('level') );
@@ -79,6 +97,11 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.3  2008/10/06 01:55:06  fplanque
+ * User fields proof of concept.
+ * Needs UserFieldDef and UserFieldDefCache + editing of fields.
+ * Does anyone want to take if from there?
+ *
  * Revision 1.2  2008/09/29 08:30:39  fplanque
  * Avatar support
  *

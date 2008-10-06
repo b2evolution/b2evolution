@@ -109,7 +109,25 @@ $schema_queries = array(
 			UNIQUE user_login (user_login),
 			KEY user_grp_ID (user_grp_ID)
 		)" ),
+/*
+	'T_users__fielddefs' => array(
+		'Creating table for User field definitions',
+		"CREATE TABLE T_users__fielddefs (
+			ufdf_ID int(10) unsigned NOT NULL,
+			ufdf_type char(8) NOT NULL,
+			ufdf_name varchar(255) collate latin1_general_ci NOT NULL,
+			PRIMARY KEY  (ufdf_ID)
+		)" ),
 
+	'T_users_fields' => array(
+		'Creating table for User fields',
+		"CREATE TABLE T_users__fields (
+		  uf_user_ID int(10) unsigned NOT NULL,
+		  uf_ufdf_ID int(10) unsigned NOT NULL,
+		  uf_varchar varchar(255) NOT NULL,
+		  KEY uf_user_ID (uf_user_ID, uf_ufdf_ID)
+		)" ),
+*/
 	'T_skins__skin' => array(
 		'Creating table for installed skins',
 		"CREATE TABLE T_skins__skin (
@@ -540,6 +558,11 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.6  2008/10/06 01:55:06  fplanque
+ * User fields proof of concept.
+ * Needs UserFieldDef and UserFieldDefCache + editing of fields.
+ * Does anyone want to take if from there?
+ *
  * Revision 1.5  2008/09/29 08:30:36  fplanque
  * Avatar support
  *
