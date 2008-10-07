@@ -90,7 +90,8 @@ switch( $action )
 				'eblog_password', 'eblog_default_category', 'eblog_subject_prefix',
 				'AutoBR', 'eblog_body_terminator', 'eblog_test_mode', 'eblog_add_imgtag',
 				'log_public_hits', 'log_admin_hits', 'auto_prune_stats_mode', 'auto_prune_stats',
-				'outbound_notifications_mode', 'webhelp_enabled' ) );
+				'outbound_notifications_mode', 'webhelp_enabled', 'allow_moving_chapters',
+				'log_spam_hits', ) );
 
 			if( $Settings->dbupdate() )
 			{
@@ -216,6 +217,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2008/10/07 16:54:40  tblue246
+ * Unset all settings if resetting to default values (some were missing)
+ *
  * Revision 1.7  2008/10/06 18:11:58  tblue246
  * Further blog by email fixes
  *
