@@ -1633,6 +1633,8 @@ class File extends DataObject
 	{
 		if( empty($thumb_mimetype) )
 		{
+			// TODO: dh> "Notice: Trying to get property of non-object" for non-image files, e.g. "foo.png~"
+			//           This gets triggered in the File browser..
 			$thumb_mimetype = $this->Filetype->mimetype;
 		}
 		elseif( $thumb_mimetype != $this->Filetype->mimetype )
@@ -1814,6 +1816,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2008/10/07 16:59:59  blueyed
+ * todo/bug/notice
+ *
  * Revision 1.13  2008/09/29 08:30:36  fplanque
  * Avatar support
  *
