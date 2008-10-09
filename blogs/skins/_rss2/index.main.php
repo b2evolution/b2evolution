@@ -64,7 +64,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			// ------------------------------ END OF REQUEST TITLE -----------------------------
 		?></title>
 		<link><?php $Blog->disp( 'url', 'xml' ) ?></link>
-		<atom:link rel="self" type="application/rss+xml" href="<?php echo $Blog->get_item_feed_url( '_rss2' ); ?>" />
+		<atom:link rel="self" type="application/rss+xml" href="<?php $Blog->disp( 'rss2_url', 'xmlattr' ); ?>" />
 		<description><?php $Blog->disp( 'shortdesc', 'xml' ) ?></description>
 		<language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
 		<docs>http://blogs.law.harvard.edu/tech/rss</docs>
@@ -264,7 +264,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				}
 			?>
 			<comments><?php echo $Item->get_single_url( 'auto' ); ?>#comments</comments>
-			<wfw:commentRss><?php echo $Item->get_feedback_feed_url( '_rss2' ); ?></wfw:commentRss>
+			<wfw:commentRss><?php echo format_to_output( $Item->get_feedback_feed_url( '_rss2' ), 'xml' ); ?></wfw:commentRss>
 		</item>
 		<?php
 		}

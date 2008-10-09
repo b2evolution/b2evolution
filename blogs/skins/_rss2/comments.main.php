@@ -48,7 +48,16 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			// ------------------------------ END OF REQUEST TITLE -----------------------------
 		?></title>
 		<link><?php $Blog->disp( 'lastcommentsurl', 'xml' ) ?></link>
-		<atom:link rel="self" type="application/rss+xml" href="<?php echo $Item->get_feedback_feed_url( '_rss2' ); ?>" />
+		<atom:link rel="self" type="application/rss+xml" href="<?php
+			if ( isset( $Item ) )
+			{
+				echo format_to_output( $Item->get_feedback_feed_url( '_rss2' ), 'xmlattr' );
+			}
+			else
+			{
+				$Blog->disp( 'comments_rss2_url', 'xmlattr' );
+			}
+			?>" />
 		<description></description>
 		<language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
 		<docs>http://backend.userland.com/rss</docs>
