@@ -48,7 +48,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 
 ?>
 <!-- generator="<?php echo $app_name ?>/<?php echo $app_version ?>" -->
-<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:admin="http://webns.net/mvcb/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:admin="http://webns.net/mvcb/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:wfw="http://wellformedweb.org/CommentAPI/" xmlns:atom="http://www.w3.org/2005/Atom">
 	<channel>
 		<title><?php
 			$Blog->disp( 'name', 'xml' );
@@ -64,6 +64,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			// ------------------------------ END OF REQUEST TITLE -----------------------------
 		?></title>
 		<link><?php $Blog->disp( 'url', 'xml' ) ?></link>
+		<atom:link rel="self" type="application/rss+xml" href="<?php echo $Blog->get_item_feed_url( '_rss2' ); ?>" />
 		<description><?php $Blog->disp( 'shortdesc', 'xml' ) ?></description>
 		<language><?php $Blog->disp( 'locale', 'xml' ) ?></language>
 		<docs>http://blogs.law.harvard.edu/tech/rss</docs>
@@ -263,6 +264,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				}
 			?>
 			<comments><?php echo $Item->get_single_url( 'auto' ); ?>#comments</comments>
+			<wfw:commentRss><?php echo $Item->get_feedback_feed_url( '_rss2' ); ?></wfw:commentRss>
 		</item>
 		<?php
 		}
