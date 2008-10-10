@@ -422,9 +422,81 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
  */
 function make_clickable( $text, $moredelim = '&amp;' )
 {
-	$text = callback_on_non_matching_blocks( $text, '~<a[^>]*("[^"]"|\'[^\']\')?[^>]*>.*?</a>~is', 'make_clickable_callback', array( $moredelim ) );
+	$r = '';
+	$in_a_tag = false;
+	$in_a_tag_quote = false;
+	$from_pos = 0;
+	$i = 0;
+	$n = strlen($text);
 
-	return $text;
+	// Not using callback_on_non_matching_blocks(), because it requires
+	// wellformed HTML and the implementation below should be
+	// faster and less memory intensive (tested for some example content)
+	while( $i < $n )
+	{
+		if( $in_a_tag )
+		{
+			switch( $text[$i] )
+			{
+			case '<':
+				if( $in_a_tag_quote )
+				{
+					break;
+				}
+				if( strtolower(substr($text, $i+1, 3)) == '/a>' )
+				{
+					$r .= substr($text, $from_pos, $i-$from_pos+4);
+					$from_pos = $i+4;
+					$i += 3;
+					$in_a_tag = false;
+					$in_a_tag_quote = false;
+				}
+				break;
+
+			case '"':
+			case '\'':
+				if( ! $in_a_tag_quote )
+				{
+					$in_a_tag_quote = $text[$i];
+				}
+				elseif( $in_a_tag_quote == $text[$i] )
+				{
+					$in_a_tag_quote = false;
+				}
+				break;
+			}
+		}
+		else
+		{ // ! $in_a_tag:
+			$i = strpos($text, '<', $i);
+			if( $i === false )
+			{ // No more opening tags:
+				break;
+			}
+			if( ($text[$i+1] == 'a' || $text[$i+1] == 'A') && ctype_space($text[$i+2]) )
+			{ // opening "A" tag
+				$in_a_tag = true;
+				$in_a_tag_quote = false;
+				// Make the text before the opening A clickable:
+				$r .= make_clickable_callback( substr($text, $from_pos, $i-$from_pos), $moredelim );
+				$from_pos = $i;
+				$i += 2;
+			}
+		}
+
+		$i++;
+	}
+	// the remaining part:
+	if( $in_a_tag )
+	{ // may happen for invalid html:
+		$r .= substr($text, $from_pos);
+	}
+	else
+	{
+		$r .= make_clickable_callback( substr($text, $from_pos), $moredelim );
+	}
+
+	return $r;
 }
 
 
@@ -439,7 +511,7 @@ function make_clickable( $text, $moredelim = '&amp;' )
  *
  * @return string The clickable text.
  */
-function make_clickable_callback( & $text, $moredelim = '&amp;' )
+function make_clickable_callback( $text, $moredelim = '&amp;' )
 {
 	$pattern_domain = '([a-z0-9\-]+\.[a-z0-9\-.\~]+)'; // a domain name (not very strict)
 	$text = preg_replace(
@@ -2959,6 +3031,10 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.52  2008/10/10 14:13:33  blueyed
+ * make_clickable(): make it work for not well-formed HTML and improve performance
+ * make_clickable_callback(): do not pass $text param by reference
+ *
  * Revision 1.51  2008/10/05 03:43:03  fplanque
  * minor
  *
