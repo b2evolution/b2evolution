@@ -15,6 +15,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Replaces GreyMatter markup in HTML (not XML).
  *
+ * @todo dh> Do not replace in tags, it matches e.g. the following for italic:
+ *           """<img src="//url" /> [...] http://"""!
+ *
  * @package plugins
  */
 class gmcode_plugin extends Plugin
@@ -92,6 +95,9 @@ class gmcode_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.18  2008/10/10 14:14:38  blueyed
+ * todo
+ *
  * Revision 1.17  2008/01/21 09:35:41  fplanque
  * (c) 2008
  *
