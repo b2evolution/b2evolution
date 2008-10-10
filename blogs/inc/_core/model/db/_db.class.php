@@ -229,8 +229,8 @@ class DB
 
   /**
    * Do we want to log queries?
-	 * This gets set according to {@link $debug}, if it's set.
-	 * @todo fp> get rid of this var, use $debug only
+	 * If null, it gets set according to {@link $debug}.
+	 * A subclass may set it by default (e.g. DbUnitTestCase_DB).
    * @var boolean
    */
 	var $log_queries;
@@ -338,12 +338,19 @@ class DB
 		if( ! extension_loaded('mysql') )
 		{ // The mysql extension is not loaded, try to dynamically load it:
 			$mysql_ext_file = is_windows() ? 'php_mysql.dll' : 'mysql.so';
+			$php_errormsg = null;
+			$old_track_errors = ini_set('track_errors', 1);
+			$old_html_errors = ini_set('html_errors', 0);
 			@dl( $mysql_ext_file );
+			$error_msg = $php_errormsg;
+			if( $old_track_errors !== false ) ini_set('track_errors', $old_track_errors);
+			if( $old_html_errors !== false ) ini_set('html_errors', $old_html_errors);
 
 			if( ! extension_loaded('mysql') )
 			{ // Still not loaded:
 				$this->print_error( 'The PHP MySQL module could not be loaded.', '
-					<p>You must edit your php configuration (php.ini) and enable this module ('.$mysql_ext_file.').</p>
+					<p><strong>Error:</strong> '.$error_msg.'</p>
+					<p>You probably have to edit your php configuration (php.ini) and enable this module ('.$mysql_ext_file.').</p>
 					<p>Do not forget to restart your webserver (if necessary) after editing the PHP conf.</p>', false );
 				return;
 			}
@@ -352,33 +359,29 @@ class DB
 		$new_link = isset( $params['new_link'] ) ? $params['new_link'] : false;
 		$client_flags = isset( $params['client_flags'] ) ? $params['client_flags'] : 0;
 
-		if( ! isset($params['handle']) )
+		if( ! $this->dbhandle )
 		{ // Connect to the Database:
 			// echo "mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $new_link, $client_flags )";
+			// mysql_error() is tied to an established connection
+			// if the connection fails we need a different method to get the error message
+			$php_errormsg = null;
+			$old_track_errors = ini_set('track_errors', 1);
+			$old_html_errors = ini_set('html_errors', 0);
 			$this->dbhandle = @mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $new_link, $client_flags );
+			$mysql_error = $php_errormsg;
+			if( $old_track_errors !== false ) ini_set('track_errors', $old_track_errors);
+			if( $old_html_errors !== false ) ini_set('html_errors', $old_html_errors);
 		}
 
 		if( ! $this->dbhandle )
 		{
-			$mysql_error = mysql_error();
-			if( empty($mysql_error) )
-			{ // there was a PHP error, like with version below 4.3 which do not support new_link and client_flags; let PHP throw an error:
-				$this->print_error( 'Error establishing a database connection!', '
-					<p>If you are running a PHP version below 4.3, please upgrade.</p>', false );	// fp> Other causes include: simple tests passing wrong params!
-
-				// Let PHP throw an error:
-				mysql_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $new_link, $client_flags );
-			}
-			else
-			{
-				$this->print_error( 'Error establishing a database connection!', '
-					<p>('.$mysql_error.')</p>
-					<ol>
-						<li>Are you sure you have typed the correct user/password?</li>
-						<li>Are you sure that you have typed the correct hostname?</li>
-						<li>Are you sure that the database server is running?</li>
-					</ol>', false );
-			}
+			$this->print_error( 'Error establishing a database connection!', '
+				<p>('.$mysql_error.')</p>
+				<ol>
+					<li>Are you sure you have typed the correct user/password?</li>
+					<li>Are you sure that you have typed the correct hostname?</li>
+					<li>Are you sure that the database server is running?</li>
+				</ol>', false );
 		}
 		elseif( isset($this->dbname) )
 		{
@@ -468,8 +471,7 @@ class DB
 			{
 				$r .= $this->quote($elt).',';
 			}
-			$r = substr( $r, 0, strlen( $r ) - 1 );
-			return $r;
+			return substr( $r, 0, -1 );
 		}
 		else
 		{
@@ -529,7 +531,21 @@ class DB
 		$this->error = true;
 
 		// If no special error string then use mysql default..
-		$this->last_error = empty($title) ? ( mysql_error($this->dbhandle).'(Errno='.mysql_errno($this->dbhandle).')' ) : $title;
+		if( ! strlen($title) )
+		{
+			if( is_resource($this->dbhandle) )
+			{ // use mysql_error:
+				$this->last_error = mysql_error($this->dbhandle).'(Errno='.mysql_errno($this->dbhandle).')';
+			}
+			else
+			{
+				$this->last_error = 'Unknown (and no $dbhandle available)';
+			}
+		}
+		else
+		{
+			$this->last_error = $title;
+		}
 
 		// Log this error to the global array..
 		$EZSQL_ERROR[] = array(
@@ -544,7 +560,7 @@ class DB
 
 		if( $is_cli )
 		{ // Clean error message for command line interface:
-			$err_msg = "MySQL error! {$this->last_error}\n";
+			$err_msg = "MySQL error!\n{$this->last_error}\n";
 			if( ! empty($this->last_query) && $query_title !== false )
 			{
 				$err_msg .= "Your query: $query_title\n";
@@ -752,7 +768,7 @@ class DB
 		}
 
 		// If there is an error then take note of it..
-		if( mysql_error($this->dbhandle) )
+		if( is_resource($this->dbhandle) && mysql_error($this->dbhandle) )
 		{
 			@mysql_free_result($this->result);
 			$this->print_error( '', '', $title );
@@ -932,7 +948,7 @@ class DB
 
 
 	/**
-	 * Function to get 1 column from the cached result set based in X index
+	 * Function to get 1 column from the cached result set based on X index
 	 * see docs for usage and info
 	 *
 	 * @return array
@@ -1134,7 +1150,7 @@ class DB
 	 */
 	function format_query( $sql, $html = true )
 	{
-		$sql = str_replace("\t", '  ', $sql );
+		$sql = trim( str_replace("\t", '  ', $sql ) );
 		if( $html )
 		{
 			$sql = htmlspecialchars( $sql );
@@ -1145,6 +1161,8 @@ class DB
 			$replace_prefix = "\n";
 		}
 
+		// Split by FROM, WHERE, .. and AND, OR (if there's no comment sign before)
+		// TODO: dh> should not wrap in comments/string literals
 		$search = array(
 			'~(FROM|WHERE|GROUP BY|ORDER BY|LIMIT|VALUES)~',
 			'~(AND |OR )~',
@@ -1431,6 +1449,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.11  2008/10/10 14:00:06  blueyed
+ * Improved DB error handling
+ *
  * Revision 1.10  2008/09/29 21:31:18  blueyed
  * Add DB::save_error_state()/restore_error_state() to unify ignoring of errors
  *
