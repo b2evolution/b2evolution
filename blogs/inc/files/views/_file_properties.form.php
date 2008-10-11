@@ -31,7 +31,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @global File
  */
-global $edit_File;
+global $edited_File;
 
 $Form = & new Form( NULL, 'fm_properties_checkchanges' );
 
@@ -43,22 +43,22 @@ $Form->begin_form( 'fform', T_('File properties') );
 	$Form->hiddens_by_key( get_memorized() );
 
 	$Form->begin_fieldset( T_('Properties') );
-		$Form->info( T_('Filename'), $edit_File->dget('name'), T_('This is the name of the file on the server hard drive.') );
-		$Form->info( T_('Type'), $edit_File->get_icon().' '.$edit_File->get_type() );
+		$Form->info( T_('Filename'), $edited_File->dget('name'), T_('This is the name of the file on the server hard drive.') );
+		$Form->info( T_('Type'), $edited_File->get_icon().' '.$edited_File->get_type() );
 	$Form->end_fieldset();
 
 	$Form->begin_fieldset( T_('Meta data') );
 		if( $current_User->check_perm( 'files', 'edit' ) )
 		{ // User can edit:
-			$Form->text( 'title', $edit_File->title, 50, T_('Long title'), T_('This is a longer descriptive title'), 255 );
-			$Form->text( 'alt', $edit_File->alt, 50, T_('Alternative text'), T_('This is useful for images'), 255 );
-			$Form->textarea( 'desc', $edit_File->desc, 10, T_('Caption/Description') );
+			$Form->text( 'title', $edited_File->title, 50, T_('Long title'), T_('This is a longer descriptive title'), 255 );
+			$Form->text( 'alt', $edited_File->alt, 50, T_('Alternative text'), T_('This is useful for images'), 255 );
+			$Form->textarea( 'desc', $edited_File->desc, 10, T_('Caption/Description') );
 		}
 		else
 		{ // User can view only:
-			$Form->info( T_('Long title'), $edit_File->dget('title'), T_('This is a longer descriptive title') );
-			$Form->info( T_('Alternative text'), $edit_File->dget('alt'), T_('This is useful for images') );
-			$Form->info( T_('Caption/Description'), $edit_File->dget('desc') );
+			$Form->info( T_('Long title'), $edited_File->dget('title'), T_('This is a longer descriptive title') );
+			$Form->info( T_('Alternative text'), $edited_File->dget('alt'), T_('This is useful for images') );
+			$Form->info( T_('Caption/Description'), $edited_File->dget('desc') );
 		}
 	$Form->end_fieldset();
 
@@ -74,6 +74,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.4  2008/10/11 22:20:48  blueyed
+ * Fix edit and properties view in file browser. (edit_File has been renamed to edited_File)
+ *
  * Revision 1.3  2008/01/21 09:35:29  fplanque
  * (c) 2008
  *

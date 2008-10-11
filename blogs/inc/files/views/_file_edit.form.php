@@ -31,13 +31,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var File
  */
-global $edit_File;
+global $edited_File;
 
 $Form = & new Form( NULL, 'file_edit' );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url('fm_mode') );
 
-$Form->begin_form( 'fform', T_('Editing:').' '.$edit_File->get_rdfs_rel_path() );
+$Form->begin_form( 'fform', T_('Editing:').' '.$edited_File->get_rdfs_rel_path() );
 	$Form->hidden_ctrl();
 	$Form->hidden( 'action', 'update_file' );
 	$Form->hiddens_by_key( get_memorized() );
@@ -45,7 +45,7 @@ $Form->begin_form( 'fform', T_('Editing:').' '.$edit_File->get_rdfs_rel_path() )
  	$Form->switch_layout( 'none' );
 	echo '<div class="center">';
 
-	$Form->textarea_input( 'file_content', $edit_File->content, 25, '', array( 'class'=>'large', 'cols' => '80' ) );
+	$Form->textarea_input( 'file_content', $edited_File->content, 25, '', array( 'class'=>'large', 'cols' => '80' ) );
 
 	$Form->buttons( array( array( 'submit', '', T_('Save!'), 'SaveButton' ),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
@@ -57,6 +57,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.3  2008/10/11 22:20:48  blueyed
+ * Fix edit and properties view in file browser. (edit_File has been renamed to edited_File)
+ *
  * Revision 1.2  2008/01/21 09:35:29  fplanque
  * (c) 2008
  *
