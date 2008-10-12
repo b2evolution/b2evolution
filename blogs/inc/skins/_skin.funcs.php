@@ -141,13 +141,13 @@ function skin_init( $disp )
 							}
 							if( $Chapter )
 							{
-								$canoncical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
-								if( $ReqHost.$ReqURI != $canoncical_url )
+								$canonical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
+								if( $ReqHost.$ReqURI != $canonical_url )
 								{
 									// REDIRECT TO THE CANONICAL URL:
 									// fp> TODO: we're going to lose the additional params, it would be better to keep them...
 									// fp> what additional params actually?
-									header_redirect( $canoncical_url, true );
+									header_redirect( $canonical_url, true );
 								}
 							}
 						}
@@ -164,13 +164,13 @@ function skin_init( $disp )
 
 					if( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
 					{ // Check if the URL was canonical:
-						$canoncical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
-						if( $ReqHost.$ReqURI != $canoncical_url )
+						$canonical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
+						if( $ReqHost.$ReqURI != $canonical_url )
 						{
 							// REDIRECT TO THE CANONICAL URL:
 							// fp> TODO: we're going to lose the additional params, it would be better to keep them...
 							// fp> what additional params actually?
-							header_redirect( $canoncical_url, true );
+							header_redirect( $canonical_url, true );
 						}
 					}
 				}
@@ -592,6 +592,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.34  2008/10/12 18:07:17  blueyed
+ * s/canoncical_url/canonical_url/g
+ *
  * Revision 1.33  2008/09/28 08:06:08  fplanque
  * Refactoring / extended page level caching
  *
