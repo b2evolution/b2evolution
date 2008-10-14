@@ -132,8 +132,13 @@ if( $resolve_extra_path )
 		$Debuglog->add( 'Extra path info found! path_string=' . $path_string , 'params' );
 		// echo "path=[$path_string]<br />";
 
-		// Replace encoded ; with regular ; (used for tags)
-		$path_string = str_replace( '%3b', ';', $path_string );
+		// Replace encoded ";" and ":" with regular chars (used for tags)
+		// TODO: dh> why not urldecode it altogether?
+		// TODO: PHP5: use str_ireplace
+		$path_string = str_replace(
+			array('%3b', '%3B', '%3a', '%3A'),
+			array(';', ';', ':', ':'),
+			$path_string );
 
 		// Slice the path:
 		$path_split = explode( '/', $path_string, 20 );
@@ -589,6 +594,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.107  2008/10/14 23:18:50  blueyed
+ * Replace encoded ':' for tags in $path_string, too (and the lowercase encoded version)
+ *
  * Revision 1.106  2008/09/28 08:06:04  fplanque
  * Refactoring / extended page level caching
  *
