@@ -150,6 +150,9 @@ if( ! realpath($dir_root) )
 // Normalize path:
 $dir_root = realpath($dir_root).'/';
 
+// This is required for the cygwin on Windows:
+$dir_root = str_replace('\\', '/', $dir_root);
+
 // The messages.pot (template) file:
 $file_pot = $dir_root.'locales/messages.pot';
 
@@ -192,7 +195,8 @@ if( $action == 'extract' )
 	else
 	{
 		echo 'Extracting T_() and NT_() strings from all .php files below "'.basename($dir_root).'" into "'.basename($dir_root).'/locales/messages.pot".. ';
-		$cmd = 'find '.escapeshellarg($dir_root).' -iname "*.php" | xargs ';
+		# find *.php files, but not in "build" directory:
+		$cmd = 'find '.escapeshellarg($dir_root).' -wholename "*/build/*" -prune -o \( -iname "*.php" -print \) | xargs ';
 	}
 	$cmd .= 'xgettext -o '.escapeshellarg($file_pot).' --from-code=iso-8859-15 --no-wrap --add-comments=TRANS --copyright-holder="Francois PLANQUE" --msgid-bugs-address=http://fplanque.net/ --keyword=T_ --keyword=NT_ --keyword=TS_ -F';
 
@@ -201,7 +205,7 @@ if( $action == 'extract' )
 	{
 		for( $i = 3; $i < count($argv); $i++ )
 		{
-			$cmd .= ' '.$argv[$i];
+			$cmd .= ' '.escapeshellarg($argv[$i]);
 		}
 	}
 
@@ -235,10 +239,12 @@ if( $action == 'extract' )
 
 	if( $mode == 'CORE' )
 	{ // Replace header "vars" in first 20 lines:
-		// TODO: extract version from /conf directory
+		// Get $app_version:
+		require_once dirname(__FILE__).'/../blogs/conf/_config.php';
+
 		system( 'sed -i 1,20"'
 			.'s/PACKAGE/b2evolution/;'
-			.'s/VERSION/2.0/;'
+			.'s/VERSION/'.$app_version.'/;'
 			.'s/# SOME DESCRIPTIVE TITLE./# b2evolution - Language file/;'
 			.'s/(C) YEAR/(C) 2003-'.date('Y').'/;'
 			.'s/YEAR(?!-MO)/'.date('Y').'/;'
