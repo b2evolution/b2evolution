@@ -1506,6 +1506,7 @@ class File extends DataObject
 		$root = $this->_FileRoot->ID;
 		$url = $htsrv_url.'getfile.php/'
 						// This is for clean 'save as':
+						// TODO: dh> this requires working PATH_INFO support! - otherwise the request might get redirected to index.php and fails (404)..
 						.rawurlencode( $this->_name )
 						// This is for locating the file:
 						.'?root='.$root.'&amp;path='.$this->_rdfp_rel_path.'&amp;size='.$size_name;
@@ -1817,6 +1818,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2008/10/15 22:55:26  blueyed
+ * todo/bug
+ *
  * Revision 1.15  2008/10/15 22:07:54  blueyed
  * todo/bug
  *
