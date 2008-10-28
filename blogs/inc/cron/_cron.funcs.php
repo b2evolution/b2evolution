@@ -83,7 +83,7 @@ function call_job( $job_name, $job_params = array() )
 		if( ! $Plugin )
 		{
 			$result_message = 'Plugin for controller ['.$job_name.'] could not get instantiated.';
-			cron_log( $result_message, 3 );
+			cron_log( $result_message, 2 );
 			return;
 		}
 
@@ -100,7 +100,7 @@ function call_job( $job_name, $job_params = array() )
 		if( ! is_file( $controller ) )
 		{
 			$result_message = 'Controller ['.$job_name.'] does not exist.';
-			cron_log( $result_message, 3 );
+			cron_log( $result_message, 2 );
 			return;
 		}
 
@@ -112,12 +112,12 @@ function call_job( $job_name, $job_params = array() )
 	{	// We got an error
 		$result_status = 'error';
 		$result_message = '[Error code: '.$error_code.' ] '.$result_message;
-		$cron_log_level = 3;
+		$cron_log_level = 2;
 	}
 	else
 	{
 		$result_status = 'finished';
-		$cron_log_level = 2;
+		$cron_log_level = 1;
 	}
 
 	$timestop = time() + $time_difference;
@@ -128,6 +128,9 @@ function call_job( $job_name, $job_params = array() )
 
 /*
  * $Log$
+ * Revision 1.4  2008/10/28 20:50:41  blueyed
+ * Adjust/fix levels passed to cron_log()
+ *
  * Revision 1.3  2008/10/28 19:59:16  blueyed
  * Cron: implement different levels of quietness. Passing '-q -q' to cron_exec.php is now silent on successful execution.
  *
