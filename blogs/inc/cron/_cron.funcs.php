@@ -28,9 +28,22 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-function cron_log( $message )
+
+/**
+ * Log a message from cron.
+ * @param string Message
+ * @param integer Level of importance. The higher the more important.
+ *        (if $quiet (number of "-q" params passed to cron_exec.php) is lower than this,
+ *         the message gets skipped)
+ */
+function cron_log( $message, $level = 0 )
 {
-	global $is_web;
+	global $is_web, $quiet;
+
+	if( $quiet < $level )
+	{
+		return;
+	}
 
 	if( $is_web )
 	{
@@ -70,7 +83,7 @@ function call_job( $job_name, $job_params = array() )
 		if( ! $Plugin )
 		{
 			$result_message = 'Plugin for controller ['.$job_name.'] could not get instantiated.';
-			cron_log( $result_message );
+			cron_log( $result_message, 3 );
 			return;
 		}
 
@@ -87,7 +100,7 @@ function call_job( $job_name, $job_params = array() )
 		if( ! is_file( $controller ) )
 		{
 			$result_message = 'Controller ['.$job_name.'] does not exist.';
-			cron_log( $result_message );
+			cron_log( $result_message, 3 );
 			return;
 		}
 
@@ -99,20 +112,25 @@ function call_job( $job_name, $job_params = array() )
 	{	// We got an error
 		$result_status = 'error';
 		$result_message = '[Error code: '.$error_code.' ] '.$result_message;
+		$cron_log_level = 3;
 	}
 	else
 	{
 		$result_status = 'finished';
+		$cron_log_level = 2;
 	}
 
 	$timestop = time() + $time_difference;
 	cron_log( 'Task finished at '.date( 'H:i:s', $timestop ).' with status: '.$result_status
-		."\nMessage: $result_message" );
+		."\nMessage: $result_message", $cron_log_level );
 }
 
 
 /*
  * $Log$
+ * Revision 1.3  2008/10/28 19:59:16  blueyed
+ * Cron: implement different levels of quietness. Passing '-q -q' to cron_exec.php is now silent on successful execution.
+ *
  * Revision 1.2  2008/01/21 09:35:28  fplanque
  * (c) 2008
  *
