@@ -26,6 +26,12 @@ require_once $inc_path .'_main.inc.php';
  */
 load_funcs( '/cron/_cron.funcs.php' );
 
+/**
+ * @global integer Quietness.
+ *         1 suppresses trivial/informative messages,
+ *         2 suppresses success messages,
+ *         3 suppresses errors.
+ */
 $quiet = 0;
 if( $is_cli )
 { // called through Command Line Interface, handle args:
@@ -50,6 +56,8 @@ if( $is_cli )
 					echo "Options:\n";
 					echo " -q --quiet: Be quiet (do not output a message, if there are no jobs).\n";
 					echo "             This is especially useful, when running as a cron job.\n";
+					echo "             You can use this up to three times to increase quietness.\n";
+					echo "             Successful runs can be made silent with \"-q -q\".\n";
 					exit(0);
 					break;
 
@@ -100,17 +108,14 @@ $task = $DB->get_row( $sql, OBJECT, 0, 'Get next task to run in queue which has 
 
 if( empty( $task ) )
 {
-	if( $quiet < 1 )
-	{
-		cron_log( 'There is no task to execute yet.' );
-	}
+	cron_log( 'There is no task to execute yet.', 1 );
 }
 else
 {
 	$ctsk_ID = $task->ctsk_ID;
 	$ctsk_name = $task->ctsk_name;
 
-	cron_log( 'Requesting lock on task #'.$ctsk_ID.' ['.$ctsk_name.']' );
+	cron_log( 'Requesting lock on task #'.$ctsk_ID.' ['.$ctsk_name.']', 1 );
 
 	$DB->halt_on_error = false;
 	$DB->show_errors = false;
@@ -122,7 +127,7 @@ else
 	{ // This has no affected exactly ONE row: error! (probably locked -- duplicate key -- by a concurrent process)
 		$DB->show_errors = true;
 		$DB->halt_on_error = true;
-		cron_log( 'Could not lock. Task is probably handled by another process.' );
+		cron_log( 'Could not lock. Task is probably handled by another process.', 3 );
 	}
 	else
 	{
@@ -145,7 +150,7 @@ else
 
 		$DB->show_errors = true;
 		$DB->halt_on_error = true;
-		cron_log( 'Starting task #'.$ctsk_ID.' ['.$ctsk_name.'] at '.date( 'H:i:s', $localtimenow ).'.' );
+		cron_log( 'Starting task #'.$ctsk_ID.' ['.$ctsk_name.'] at '.date( 'H:i:s', $localtimenow ).'.', 2 );
 
 		if( empty($task->ctsk_params) )
 		{
@@ -201,6 +206,9 @@ if( ! $is_cli )
 
 /*
  * $Log$
+ * Revision 1.17  2008/10/28 19:51:01  blueyed
+ * Cron: implement different levels of quietness. Passing '-q -q' to cron_exec.php is now silent on successful execution.
+ *
  * Revision 1.16  2008/02/19 11:11:15  fplanque
  * no message
  *
