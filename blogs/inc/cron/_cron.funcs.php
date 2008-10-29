@@ -40,7 +40,7 @@ function cron_log( $message, $level = 0 )
 {
 	global $is_web, $quiet;
 
-	if( $level > $quiet )
+	if( $quiet > $level )
 	{
 		return;
 	}
@@ -128,6 +128,9 @@ function call_job( $job_name, $job_params = array() )
 
 /*
  * $Log$
+ * Revision 1.6  2008/10/29 21:30:47  blueyed
+ * Brown paper bag fix for cron_log logic
+ *
  * Revision 1.5  2008/10/29 20:42:00  blueyed
  * Fix skip logic in cron_log(), thanks Tblue
  *
