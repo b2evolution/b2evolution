@@ -33,14 +33,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Log a message from cron.
  * @param string Message
  * @param integer Level of importance. The higher the more important.
- *        (if $quiet (number of "-q" params passed to cron_exec.php) is lower than this,
- *         the message gets skipped)
+ *        (if $quiet (number of "-q" params passed to cron_exec.php)
+ *         is higher than this, the message gets skipped)
  */
 function cron_log( $message, $level = 0 )
 {
 	global $is_web, $quiet;
 
-	if( $quiet < $level )
+	if( $level > $quiet )
 	{
 		return;
 	}
@@ -128,6 +128,9 @@ function call_job( $job_name, $job_params = array() )
 
 /*
  * $Log$
+ * Revision 1.5  2008/10/29 20:42:00  blueyed
+ * Fix skip logic in cron_log(), thanks Tblue
+ *
  * Revision 1.4  2008/10/28 20:50:41  blueyed
  * Adjust/fix levels passed to cron_log()
  *
