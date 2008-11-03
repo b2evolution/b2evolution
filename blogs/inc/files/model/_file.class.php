@@ -1616,7 +1616,7 @@ class File extends DataObject
 
 
 	/**
-	 * Get the full path to the thumbanil for this file.
+	 * Get the full path to the thumbnail for this file.
 	 *
 	 * af = Absolute File
 	 *
@@ -1627,16 +1627,17 @@ class File extends DataObject
 	 */
 	function get_af_thumb_path( $size_name, $thumb_mimetype = NULL, $create_evocache_if_needed = false )
 	{
-		if( empty($thumb_mimetype) )
+		if( $this->Filetype )
 		{
-			// TODO: dh> "Notice: Trying to get property of non-object" for non-image files, e.g. "foo.png~"
-			//           This gets triggered in the File browser..
-			$thumb_mimetype = $this->Filetype->mimetype;
-		}
-		elseif( $thumb_mimetype != $this->Filetype->mimetype )
-		{
-			debug_die( 'Not supported. For now, thumbnails have to have same mime type as their parent file.' );
-			// TODO: extract prefered extension of filetypes config
+			if( empty($thumb_mimetype) )
+			{
+				$thumb_mimetype = $this->Filetype->mimetype;
+			}
+			elseif( $thumb_mimetype != $this->Filetype->mimetype )
+			{
+				debug_die( 'Not supported. For now, thumbnails have to have same mime type as their parent file.' );
+				// TODO: extract prefered extension of filetypes config
+			}
 		}
 
 		// Get the filename of the thumbnail
@@ -1812,6 +1813,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2008/11/03 21:01:56  blueyed
+ * get_af_thumb_path(): Fix notice for files without Filetype
+ *
  * Revision 1.17  2008/10/15 22:57:14  blueyed
  * Drop support for 'clean save as'. It should be done by sending the right headers instead.
  *
