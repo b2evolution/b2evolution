@@ -566,9 +566,22 @@ function add_headline($headline)
  */
 function add_js_headline($headline)
 {
-	global $headlines;
-	$headlines[] = "<script type=\"text/javascript\">/* <![CDATA[ */\n\t"
-		.$headline."\n\t/* ]]> */\n\t</script>";
+	add_headline("<script type=\"text/javascript\">/* <![CDATA[ */\n\t"
+		.$headline."\n\t/* ]]> */\n\t</script>");
+}
+
+
+/**
+ * Add a CSS headline.
+ * This is an extra function, to provide consistent wrapping and allow to bundle it
+ * (i.e. create a bundle with all required JS files and these inline code snippets,
+ *  in the correct order).
+ * @param string CSS
+ */
+function add_css_headline($headline)
+{
+	add_headline("<style type=\"text/css\">\n\t"
+		.$headline."\n\t/* ]]> */\n\t</style>");
 }
 
 
@@ -842,6 +855,10 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.43  2008/11/07 20:07:14  blueyed
+ * - Use add_headline() in add_js_headline()
+ * - Add add_css_headline()
+ *
  * Revision 1.42  2008/10/02 23:33:08  blueyed
  * - require_js(): remove dirty dependency handling for communication.js.
  * - Add add_js_headline() for adding inline JS and use it for admin already.
