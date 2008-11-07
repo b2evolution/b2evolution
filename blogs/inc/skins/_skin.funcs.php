@@ -257,7 +257,7 @@ function skin_init( $disp )
 	}
 
 	// dummy var for backward compatibility with versions < 2.4.1 -- prevents "Undefined variable"
-	Global $global_Cache, $credit_links;
+	global $global_Cache, $credit_links;
 	$credit_links = $global_Cache->get( 'creds' );
 }
 
@@ -592,6 +592,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.35  2008/11/07 23:12:47  tblue246
+ * minor
+ *
  * Revision 1.34  2008/10/12 18:07:17  blueyed
  * s/canoncical_url/canonical_url/g
  *
