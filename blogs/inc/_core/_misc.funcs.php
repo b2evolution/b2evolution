@@ -1362,7 +1362,7 @@ function debug_die( $additional_info = '' )
 		echo '== '.T_('An unexpected error has occured!')." ==\n";
 		echo T_('If this error persits, please report it to the administrator.')."\n";
 		echo T_('Additional information about this error:')."\n";
-		echo strip_tags( $additional_info );
+		echo strip_tags( $additional_info )."\n\n";
 	}
 	else
 	{
@@ -1501,12 +1501,12 @@ function bad_request_die( $additional_info = '' )
 /**
  * Outputs debug info, according to {@link $debug} or $force param. This gets called typically at the end of the page.
  *
- * @todo dh> add get_debug_info() which returns and supports non-html format (for debug_die())
  * @param boolean true to force output regardless of {@link $debug}
+ * @param boolean true to force clean output (without HTML) regardless of {@link $is_cli}
  */
-function debug_info( $force = false )
+function debug_info( $force = false, $force_clean = false )
 {
-	global $debug, $debug_done, $Debuglog, $DB, $obhandler_debug, $Timer, $ReqHost, $ReqPath;
+	global $debug, $debug_done, $Debuglog, $DB, $obhandler_debug, $Timer, $ReqHost, $ReqPath, $is_cli;
 	global $cache_imgsize, $cache_File;
 	global $Session;
 	global $db_config, $tableprefix;
@@ -1536,10 +1536,25 @@ function debug_info( $force = false )
 	//Make sure debug output only happens once:
 	$debug_done = true;
 
+	// clean output:
+	$clean = $is_cli || $force_clean;
+	$printf_format = '| %-45s | %-5s | %-7s | %-5s |';
+	/* This calculates the number of dashes to print e. g. on the top and
+	 * bottom of the table and after the header, making the table look
+	 * better (looks like the tables of the mysql command line client).
+	 * Normally, the value won't change, so it's hardcoded below. If you
+	 * change the printf() format above, this might be useful.
+	preg_match_all( '#\d+#', $printf_format, $table_headerlen );
+	$table_headerlen = array_sum( $table_headerlen[0] ) +
+									strlen( preg_replace( '#[^ \|]+#', '',
+												$printf_format ) ) - 2;
+	*/
+	$table_headerlen = 73;
+
 	$ReqHostPathQuery = $ReqHost.$ReqPath.( empty( $_SERVER['QUERY_STRING'] ) ? '' : '?'.$_SERVER['QUERY_STRING'] );
 
 	echo "\n\n\n";
-	echo '<div class="debug"><h2>Debug info</h2>';
+	echo ( $clean ? '*** Debug info ***'."\n\n" : '<div class="debug"><h2>Debug info</h2>' );
 
 	$Debuglog->add( 'Len of serialized $cache_imgsize: '.strlen(serialize($cache_imgsize)), 'memory' );
 	$Debuglog->add( 'Len of serialized $cache_File: '.strlen(serialize($cache_File)), 'memory' );
@@ -1560,46 +1575,86 @@ function debug_info( $force = false )
 		}
 		// arsort( $timer_rows );
 		ksort( $timer_rows );
-		echo '<table><thead>'
-			.'<tr><th colspan="4" class="center">Timers</th></tr>'
-			.'<tr><th>Category</th><th>Time</th><th>%</th><th>Count</th></tr>'
-			.'</thead><tbody>';
+
+		if ( $clean )
+		{
+			echo '== Timers =='."\n\n";
+			echo '+'.str_repeat( '-', $table_headerlen ).'+'."\n";
+			printf( $printf_format."\n", 'Category', 'Time', '%', 'Count' );
+			echo '+'.str_repeat( '-', $table_headerlen ).'+'."\n";
+		}
+		else
+		{
+			echo '<table><thead>'
+				.'<tr><th colspan="4" class="center">Timers</th></tr>'
+				.'<tr><th>Category</th><th>Time</th><th>%</th><th>Count</th></tr>'
+				.'</thead><tbody>';
+		}
 
 		$table_rows_ignore_perhaps = array();
 		foreach( $timer_rows as $l_cat => $l_time )
 		{
 			$percent_l_cat = $time_page > 0 ? number_format( 100/$time_page * $l_time, 2 ) : '0';
 
-			$row = "\n<tr>"
-				.'<td>'.$l_cat.'</td>'
-				.'<td class="right">'.$l_time.'</td>'
-				.'<td class="right">'.$percent_l_cat.'%</td>'
-				.'<td class="right">'.$Timer->get_count( $l_cat ).'</td></tr>';
-
+			if ( $clean )
+			{
+				$row = sprintf( $printf_format, $l_cat, $l_time, $percent_l_cat.'%', $Timer->get_count( $l_cat ) );
+			}
+			else
+			{
+				$row = "\n<tr>"
+					.'<td>'.$l_cat.'</td>'
+					.'<td class="right">'.$l_time.'</td>'
+					.'<td class="right">'.$percent_l_cat.'%</td>'
+					.'<td class="right">'.$Timer->get_count( $l_cat ).'</td></tr>';
+			}
+			
 			if( $l_time < 0.005 )
 			{
 				$table_rows_ignore_perhaps[] = $row;
 			}
 			else
 			{
-				echo $row;
+				echo $row."\n";
 			}
 		}
 		$count_ignored = count($table_rows_ignore_perhaps);
 		if( $count_ignored > 5 )
 		{
-			echo '<tr><td colspan="4" class="center"> + '.$count_ignored.' &lt; 0.005s </td></tr>';
+			if ( $clean )
+			{
+				printf( '| %-'.( $table_headerlen - 2 ).'s |'."\n", '+ '.$count_ignored.' < 0.005s' );
+			}
+			else
+			{
+				echo '<tr><td colspan="4" class="center"> + '.$count_ignored.' &lt; 0.005s </td></tr>';
+			}
 		}
 		else
 		{
-			echo implode( "\n", $table_rows_ignore_perhaps );
+			echo implode( "\n", $table_rows_ignore_perhaps )."\n";
 		}
-		echo '</tbody>';
-		echo '</table>';
+
+		if ( $clean )
+		{
+			echo '+'.str_repeat( '-', $table_headerlen ).'+'."\n\n";
+		}
+		else
+		{
+			echo '</tbody>';
+			echo '</table>';
+		}
 
 		if( isset($DB) )
 		{
-			echo '<a href="'.$ReqHostPathQuery.'#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br />';
+			if ( $clean )
+			{
+				echo 'Database queries: '.$DB->num_queries."\n";
+			}
+			else
+			{
+				echo '<a href="'.$ReqHostPathQuery.'#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br />';
+			}
 		}
 
 		foreach( array( // note: 8MB is default for memory_limit and is reported as 8388608 bytes
@@ -1609,14 +1664,22 @@ function debug_info( $force = false )
 			if( function_exists( $l_func ) )
 			{
 				$_usage = $l_func();
-				if( $_usage > $l_var['high'] ) echo '<span style="color:red; font-weight:bold">';
-				echo $l_var['display'].': '.bytesreadable( $_usage );
-				if( $_usage > $l_var['high'] ) echo '</span>';
-				echo '<br />';
+				
+				if( $_usage > $l_var['high'] )
+				{
+					echo $clean ? '[!!] ' : '<span style="color:red; font-weight:bold">';
+				}
+				
+				echo $l_var['display'].': '.bytesreadable( $_usage, ! $clean );
+				
+				if( ! $clean && $_usage > $l_var['high'] )
+				{
+					echo '</span>';
+				}
+				echo $clean ? "\n" : '<br />';
 			}
 		}
 	}
-
 
 	// DEBUGLOG(s) FROM PREVIOUS SESSIONS, after REDIRECT(s) (with list of categories at top):
 	if( isset($Session) && ($sess_Debuglogs = $Session->get('Debuglogs')) && ! empty($sess_Debuglogs) )
@@ -1624,83 +1687,137 @@ function debug_info( $force = false )
 		$count_sess_Debuglogs = count($sess_Debuglogs);
 		if( $count_sess_Debuglogs > 1 )
 		{ // Links to those Debuglogs:
-			echo '<p>There are '.$count_sess_Debuglogs.' Debuglogs from redirected pages: ';
-			for( $i = 1; $i <= $count_sess_Debuglogs; $i++ )
-			{
-				echo '<a href="'.$ReqHostPathQuery.'#debug_sess_debuglog_'.$i.'">#'.$i.'</a> ';
+			if ( $clean )
+			{	// kind of useless, but anyway...
+				echo "\n".'There are '.$count_sess_Debuglogs.' Debuglogs from redirected pages.'."\n";
 			}
-			echo '</p>';
+			else
+			{
+				echo '<p>There are '.$count_sess_Debuglogs.' Debuglogs from redirected pages: ';
+				for( $i = 1; $i <= $count_sess_Debuglogs; $i++ )
+				{
+					echo '<a href="'.$ReqHostPathQuery.'#debug_sess_debuglog_'.$i.'">#'.$i.'</a> ';
+				}
+				echo '</p>';
+			}
 		}
 
 		foreach( $sess_Debuglogs as $k => $sess_Debuglog )
 		{
 			$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
-			$log_cats = array_keys($sess_Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
-			$log_container_head = '<h3 id="debug_sess_debuglog_'.($k+1).'" style="color:#f00;">Debug messages from redirected page (#'.($k+1).')</h3>'
-				// link to real Debuglog:
-				.'<p><a href="'.$ReqHostPathQuery.'#debug_debuglog">See below for the Debuglog from the current request.</a></p>';
-			$log_head_links = array();
-			foreach( $log_cats as $l_cat )
-			{
-				$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_redir_'.($k+1).'_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
-			}
-			$log_container_head .= implode( ' | ', $log_head_links );
-			echo format_to_output(
-				$sess_Debuglog->display( array(
-						'container' => array( 'string' => $log_container_head, 'template' => false ),
-						'all' => array( 'string' => '<h4 id="debug_redir_'.($k+1).'_info_cat_%s">%s:</h4>', 'template' => false ) ),
-					'', false, $log_categories ),
-				'htmlbody' );
-		}
 
+			if ( $clean )
+			{
+				$log_container_head = "\n".'== Debug messages from redirected page (#'.($k+1).') =='."\n"
+									 .'See below for the Debuglog from the current request.'."\n";
+				echo format_to_output(
+					$sess_Debuglog->display( array(
+							'container' => array( 'string' => $log_container_head, 'template' => false ),
+							'all' => array( 'string' => '= %s ='."\n\n", 'template' => false ) ),
+						'', false, $log_categories, '', 'raw', false ),
+					'raw' );
+			}
+			else
+			{
+				$log_container_head = '<h3 id="debug_sess_debuglog_'.($k+1).'" style="color:#f00;">Debug messages from redirected page (#'.($k+1).')</h3>'
+					// link to real Debuglog:
+					.'<p><a href="'.$ReqHostPathQuery.'#debug_debuglog">See below for the Debuglog from the current request.</a></p>';
+				$log_cats = array_keys($sess_Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
+				$log_head_links = array();
+				
+				foreach( $log_cats as $l_cat )
+				{
+					$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_redir_'.($k+1).'_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
+				}
+				$log_container_head .= implode( ' | ', $log_head_links );
+
+				echo format_to_output(
+					$sess_Debuglog->display( array(
+							'container' => array( 'string' => $log_container_head, 'template' => false ),
+							'all' => array( 'string' => '<h4 id="debug_redir_'.($k+1).'_info_cat_%s">%s:</h4>', 'template' => false ) ),
+						'', false, $log_categories ),
+					'htmlbody' );
+			}
+		}
 		$Session->delete( 'Debuglogs' );
 	}
 
 
 	// CURRENT DEBUGLOG (with list of categories at top):
 	$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
-	$log_cats = array_keys($Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
-	$log_container_head = '<h3 id="debug_debuglog">Debug messages</h3>';
+	$log_container_head = $clean ? ( "\n".'== Debug messages =='."\n" ) : '<h3 id="debug_debuglog">Debug messages</h3>';
 	if( ! empty($sess_Debuglogs) )
 	{ // link to first sess_Debuglog:
-		$log_container_head .= '<p><a href="'.$ReqHostPathQuery.'#debug_sess_debuglog_1">See above for the Debuglog(s) from before the redirect.</a></p>';
+		if ( $clean )
+		{
+			$log_container_head .= 'See above for the Debuglog(s) from before the redirect.'."\n";
+		}
+		else
+		{
+			$log_container_head .= '<p><a href="'.$ReqHostPathQuery.'#debug_sess_debuglog_1">See above for the Debuglog(s) from before the redirect.</a></p>';
+		}
 	}
-	$log_head_links = array();
-	foreach( $log_cats as $l_cat )
+
+	if ( ! $clean )
 	{
-		$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
+		$log_cats = array_keys($Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
+		$log_head_links = array();
+		foreach( $log_cats as $l_cat )
+		{
+			$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
+		}
+		$log_container_head .= implode( ' | ', $log_head_links );
+
+		echo format_to_output(
+			$Debuglog->display( array(
+					'container' => array( 'string' => $log_container_head, 'template' => false ),
+					'all' => array( 'string' => '<h4 id="debug_info_cat_%s">%s:</h4>', 'template' => false ) ),
+				'', false, $log_categories ),
+			'htmlbody' );
+
+		echo '<h3 id="evo_debug_queries">DB</h3>';
 	}
-	$log_container_head .= implode( ' | ', $log_head_links );
-	echo format_to_output(
-		$Debuglog->display( array(
-				'container' => array( 'string' => $log_container_head, 'template' => false ),
-				'all' => array( 'string' => '<h4 id="debug_info_cat_%s">%s:</h4>', 'template' => false ) ),
-			'', false, $log_categories ),
-		'htmlbody' );
+	else
+	{
+		echo format_to_output(
+			$Debuglog->display( array(
+					'container' => array( 'string' => $log_container_head, 'template' => false ),
+					'all' => array( 'string' => '= %s ='."\n\n", 'template' => false ) ),
+				'', false, $log_categories, '', 'raw', false ),
+			'raw' );
 
-
-	echo '<h3 id="evo_debug_queries">DB</h3>';
+		echo "\n".'== DB =='."\n\n";
+	}
 
 	if($db_config)
 	{
-		echo '<pre>',
-		T_('DB Username').': '.$db_config['user']."\n".
-		T_('DB Database').': '.$db_config['name']."\n".
-		T_('DB Host').': '.$db_config['host']."\n".
-		T_('DB tables prefix').': '.$tableprefix."\n".
-		T_('DB connection charset').': '.$db_config['connection_charset']."\n".
-		'</pre>';
+		if ( ! $clean )
+		{
+			echo '<pre>';
+		}
+		
+		echo T_('DB Username').': '.$db_config['user']."\n".
+			 T_('DB Database').': '.$db_config['name']."\n".
+			 T_('DB Host').': '.$db_config['host']."\n".
+			 T_('DB tables prefix').': '.$tableprefix."\n".
+			 T_('DB connection charset').': '.$db_config['connection_charset']."\n";
+
+		echo $clean ? "\n" : '</pre>';
 	}
 
 	if( !isset($DB) )
 	{
-		echo 'No DB object.';
+		echo 'No DB object.'.( $clean ? "\n" : '' );
 	}
 	else
 	{
-		$DB->dump_queries();
+		$DB->dump_queries( ! $clean );
 	}
-	echo '</div>';
+
+	if ( ! $clean )
+	{
+		echo '</div>';
+	}
 }
 
 
@@ -3031,6 +3148,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.53  2008/11/07 23:20:09  tblue246
+ * debug_info() now supports plain text output for the CLI.
+ *
  * Revision 1.52  2008/10/10 14:13:33  blueyed
  * make_clickable(): make it work for not well-formed HTML and improve performance
  * make_clickable_callback(): do not pass $text param by reference

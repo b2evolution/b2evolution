@@ -52,9 +52,10 @@ if( ! function_exists('fnmatch') )
  * Converts bytes to readable bytes/kb/mb/gb, like "12.45mb"
  *
  * @param integer bytes
+ * @param boolean use HTML <abbr> tags
  * @return string bytes made readable
  */
-function bytesreadable( $bytes )
+function bytesreadable( $bytes, $htmlabbr = true )
 {
 	static $types = NULL;
 
@@ -83,9 +84,9 @@ function bytesreadable( $bytes )
 	$precision = max( 0, ( 1 -floor(log($bytes)/log(10))) );
 	$r = sprintf( '%.'.$precision.'f', $bytes );
 
-	$r .= '&nbsp;<abbr title="'.$types[$i]['text'].'">';
+	$r .= $htmlabbr ? ( '&nbsp;<abbr title="'.$types[$i]['text'].'">' ) : ' ';
 	$r .= $types[$i]['abbr'];
-	$r .= '</abbr>';
+	$r .= $htmlabbr ? '</abbr>' : ( ' ('.$types[$i]['text'].')' );
 
 	// $r .= ' '.$precision;
 
@@ -731,6 +732,9 @@ function mkdir_r( $dirName, $chmod = NULL )
 
 /*
  * $Log$
+ * Revision 1.9  2008/11/07 23:20:10  tblue246
+ * debug_info() now supports plain text output for the CLI.
+ *
  * Revision 1.8  2008/09/27 00:48:32  fplanque
  * caching step 0.
  *

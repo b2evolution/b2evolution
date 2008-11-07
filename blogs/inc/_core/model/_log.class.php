@@ -307,7 +307,7 @@ class Log
 	 * @param mixed the category of messages to use (category, 'all', list of categories (array)
 	 *              or NULL for {@link $defaultcategory}).
 	 * @param string the CSS class of the messages div tag (default: 'log_'.$category)
-	 * @param string the style to use, 'ul', 'p', 'br'
+	 * @param string the style to use, 'ul', 'p', 'br', 'raw'
 	 *               (default: 'br' for single message, 'ul' for more)
 	 * @param mixed the outer div, may be false
 	 * @return boolean false, if no messages; else true (and outputs if $display)
@@ -393,6 +393,10 @@ class Log
 			{
 				$disp .= "\t<p".( $lcssclass['class'] ? " class=\"{$lcssclass['class']}\"" : '' ).'>'
 							.implode( "</p>\n<p class=\"{$lcssclass['class']}\">", $lmessages )."</p>\n";
+			}
+			elseif( $style == 'raw' )
+			{
+				$disp .= implode( "\n", $lmessages )."\n";
 			}
 			else
 			{
@@ -648,6 +652,9 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.5  2008/11/07 23:20:10  tblue246
+ * debug_info() now supports plain text output for the CLI.
+ *
  * Revision 1.4  2008/01/21 09:35:24  fplanque
  * (c) 2008
  *

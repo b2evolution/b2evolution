@@ -1169,7 +1169,7 @@ class DB
 			);
 		$replace = array(
 				$replace_prefix.'$1',
-				$replace_prefix.'&nbsp; $1',
+				$replace_prefix.( $html ? '&nbsp;' : ' ' ).' $1',
 			);
 		$sql = preg_replace( $search, $replace, $sql );
 
@@ -1179,8 +1179,10 @@ class DB
 
 	/**
 	 * Displays all queries that have been executed
+	 * 
+	 * @param boolean Use HTML.
 	 */
-	function dump_queries()
+	function dump_queries( $html = true )
 	{
 		global $Timer;
 		if( is_object( $Timer ) )
@@ -1195,7 +1197,14 @@ class DB
 		$count_queries = 0;
 		$count_rows = 0;
 
-		echo '<strong>DB queries:</strong> '.$this->num_queries."<br />\n";
+		if ( $html )
+		{
+			echo '<strong>DB queries:</strong> '.$this->num_queries."<br />\n";
+		}
+		else
+		{
+			echo 'DB queries: '.$this->num_queries."\n\n";
+		}
 
 		if( ! $this->log_queries )
 		{ // nothing more to do here..
@@ -1205,34 +1214,54 @@ class DB
 		foreach( $this->queries as $query )
 		{
 			$count_queries++;
-			echo '<h4>Query #'.$count_queries.': '.$query['title']."</h4>\n";
-			echo '<code>';
-			echo $this->format_query( $query['sql'] );
-			echo "</code>\n";
+
+			if ( $html )
+			{
+				echo '<h4>Query #'.$count_queries.': '.$query['title']."</h4>\n";
+				echo '<code>';
+				echo $this->format_query( $query['sql'] );
+				echo "</code>\n";
+			}
+			else
+			{
+				echo '= Query #'.$count_queries.': '.$query['title']." =\n";
+				echo $this->format_query( $query['sql'], false )."\n\n";
+			}
 
 			// Color-Format duration: long => red, fast => green, normal => black
 			if( $query['time'] > $this->query_duration_slow )
 			{
 				$style_time_text = 'color:red;font-weight:bold;';
 				$style_time_graph = 'background-color:red;';
+				$plain_time_text = ' [slow]';
 			}
 			elseif( $query['time'] < $this->query_duration_fast )
 			{
 				$style_time_text = 'color:green;';
 				$style_time_graph = 'background-color:green;';
+				$plain_time_text = ' [fast]';
 			}
 			else
 			{
 				$style_time_text = '';
 				$style_time_graph = 'background-color:black;';
+				$plain_time_text = '';
 			}
 
 			// Number of rows with time (percentage and graph, if total time available)
-			echo '<div class="query_info">';
-			echo 'Rows: '.$query['rows'];
+			if ( $html )
+			{
+				echo '<div class="query_info">';
+				echo 'Rows: '.$query['rows'];
 
-			echo ' &ndash; Time: ';
-			if( $style_time_text )
+				echo ' &ndash; Time: ';
+			}
+			else
+			{
+				echo 'Rows: '.$query['rows'].' - Time: ';
+			}
+			
+			if( $html && $style_time_text )
 			{
 				echo '<span style="'.$style_time_text.'">';
 			}
@@ -1243,17 +1272,25 @@ class DB
 				echo ' ('.number_format( 100/$time_queries * $query['time'], 2 ).'%)';
 			}
 
-			if( $style_time_text )
+			if( $style_time_text || $plain_time_text )
 			{
-				echo '</span>';
+				echo $html ? '</span>' : $plain_time_text;
 			}
 
 			if( $time_queries > 0 )
 			{ // We have a total time we can use to display a graph/bar:
-				echo '<div style="margin:0; padding:0; height:12px; width:'.( round( 100/$time_queries * $query['time'] ) ).'%;'.$style_time_graph.'"></div>';
-			}
-			echo '</div>';
+				$perc = round( 100/$time_queries * $query['time'] );
 
+				if ( $html )
+				{
+					echo '<div style="margin:0; padding:0; height:12px; width:'.$perc.'%;'.$style_time_graph.'"></div>';
+				}
+				else
+				{	// display an ASCII bar
+					printf( "\n".'[%-50s]', str_repeat( '=', $perc / 2 ) );
+				}
+			}
+			echo $html ? '</div>' : "\n\n";
 
 			// Explain:
 			if( isset($query['explain']) )
@@ -1275,7 +1312,15 @@ class DB
 
 			$count_rows += $query['rows'];
 		}
-		echo "\n<strong>Total rows:</strong> $count_rows<br />\n";
+
+		if ( $html )
+		{
+			echo "\n<strong>Total rows:</strong> $count_rows<br />\n";
+		}
+		else
+		{
+			echo 'Total rows: '.$count_rows."\n";
+		}
 	}
 
 
@@ -1449,6 +1494,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.12  2008/11/07 23:20:10  tblue246
+ * debug_info() now supports plain text output for the CLI.
+ *
  * Revision 1.11  2008/10/10 14:00:06  blueyed
  * Improved DB error handling
  *
