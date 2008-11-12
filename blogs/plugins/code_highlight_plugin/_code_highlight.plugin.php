@@ -459,22 +459,22 @@ class code_highlight_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead()
 	{
-		 echo '<style type="text/css">
-/* AstonishMe code plugin styles */
-.amc0,.amc1,.amc2,.amc3,.amc4,.amc5,.amc6,
-.amc7,.amc8,.amc9 { background:
-  url('.$this->get_plugin_url().'img/numbers.gif) no-repeat; }
-</style>';
+		add_css_headline('/* AstonishMe code plugin styles */'
+			.'.amc0,.amc1,.amc2,.amc3,.amc4,.amc5,.amc6,.amc7,.amc8,.amc9 {'
+			.'background:url('.$this->get_plugin_url().'img/numbers.gif) no-repeat; }');
+        
+		require_css($this->get_plugin_url().'amcode.css', /* absolute path for ResourceBundles, evaluates to true in b2evo: */ dirname(__FILE__).'/amcode.css');
 
-		echo '<link rel="stylesheet" type="text/css" href="'.$this->get_plugin_url().'amcode.css" />
-<!--[if IE]>
-<style type="text/css">
-/* IE: make sure the last line is not hidden by a scrollbar */
-div.codeblock.amc_short table {
-	margin-bottom: 2ex;
-}
-</style>
-<![endif]-->';
+		// TODO: dh> move this to a IE-specific file, e.g. add_css_headline, but which is specific for IE
+		//           Or easier: fix it with a hack in amcode.css itself?!
+		add_headline('<!--[if IE]>'
+			.'<style type="text/css">'
+			.'/* IE: make sure the last line is not hidden by a scrollbar */'
+			.'div.codeblock.amc_short table {'
+			.'	margin-bottom: 2ex;'
+			.'}'
+			.'</style>'
+			.'<![endif]-->');
 	}
 
 
@@ -630,6 +630,9 @@ div.codeblock.amc_short table {
 
 /**
  * $Log$
+ * Revision 1.15  2008/11/12 14:14:55  blueyed
+ * code_highlight_plugin: use add_css_headline/require_css/add_headline for CSS injections.
+ *
  * Revision 1.14  2008/03/21 16:07:02  fplanque
  * longer post slugs
  *
