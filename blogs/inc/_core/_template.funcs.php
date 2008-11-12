@@ -580,8 +580,7 @@ function add_js_headline($headline)
  */
 function add_css_headline($headline)
 {
-	add_headline("<style type=\"text/css\">\n\t"
-		.$headline."\n\t/* ]]> */\n\t</style>");
+	add_headline("<style type=\"text/css\">\n\t".$headline."\n\t</style>");
 }
 
 
@@ -855,6 +854,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.44  2008/11/12 13:59:19  blueyed
+ * Fix add_css_headline(): remove unnecessary comment
+ *
  * Revision 1.43  2008/11/07 20:07:14  blueyed
  * - Use add_headline() in add_js_headline()
  * - Add add_css_headline()
