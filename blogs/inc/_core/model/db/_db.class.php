@@ -70,13 +70,6 @@ define( 'OBJECT', 'OBJECT', true );
 define( 'ARRAY_A', 'ARRAY_A', true);
 define( 'ARRAY_N', 'ARRAY_N', true);
 
-if( ! function_exists( 'mysql_real_escape_string' ) )
-{ // Function only available since PHP 4.3.0
-	function mysql_real_escape_string( $unescaped_string )
-	{
-		return mysql_escape_string( $unescaped_string );
-	}
-}
 
 /**
  * The Main Class
@@ -1498,6 +1491,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.14  2008/11/17 11:20:26  blueyed
+ * Remove wrapper for mysql_real_escape_string, if it does not exist - it exists since PHP 4.3
+ *
  * Revision 1.13  2008/11/17 11:16:19  blueyed
  * DB::print_error(): do not display errors if $halt_on_error is true, but $show_errors is false
  *
