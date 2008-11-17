@@ -642,25 +642,39 @@ class DB
 
 
 	/**
-	 * Save the vars responsible for error handling
+	 * Save the vars responsible for error handling.
+	 * This can be chained.
+	 * @see DB::restore_error_state()
 	 */
 	function save_error_state()
 	{
-		$this->save_show_errors = $this->show_errors;
-		$this->save_halt_on_error = $this->halt_on_error;
-		$this->last_error = $this->last_error;
-		$this->error = $this->error;
+		$this->saved_error_states[] = array(
+			'show_errors'   => $this->show_errors,
+			'halt_on_error' => $this->halt_on_error,
+			'last_error'    => $this->last_error,
+			'error'         => $this->error,
+		);
 	}
 
 	/**
-	 * Call this after {@link save_halt_on_error()} to restore the previous error state
+	 * Call this after {@link save_halt_on_error()} to
+	 * restore the previous error state.
+	 * This can be chained.
+	 * @see DB::save_error_state()
 	 */
 	function restore_error_state()
 	{
-		$this->show_errors = $this->save_show_errors;
-		$this->halt_on_error = $this->save_halt_on_error;
-		$this->last_error = $this->last_error;
-		$this->error = $this->error;
+		if( empty($this->saved_error_states)
+			|| ! is_array($this->saved_error_states) )
+		{
+			return false;
+		}
+		$state = array_pop($this->saved_error_states);
+
+		$this->show_errors   = $state['show_errors'];
+		$this->halt_on_error = $state['halt_on_error'];
+		$this->last_error    = $state['last_error'];
+		$this->error         = $state['error'];
 	}
 
 
@@ -1491,6 +1505,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.15  2008/11/17 11:41:35  blueyed
+ * Fix DB::save_error_state/DB::restore_error_state to also handle $last_error/$error and make it chainable
+ *
  * Revision 1.14  2008/11/17 11:20:26  blueyed
  * Remove wrapper for mysql_real_escape_string, if it does not exist - it exists since PHP 4.3
  *
