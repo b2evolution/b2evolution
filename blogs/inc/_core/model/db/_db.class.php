@@ -558,6 +558,11 @@ class DB
 			return;
 		}
 
+		if( $this->halt_on_error && ! $this->show_errors )
+		{ // do not show errors, just die:
+			die();
+		}
+
 		if( $is_cli )
 		{ // Clean error message for command line interface:
 			$err_msg = "MySQL error!\n{$this->last_error}\n";
@@ -599,7 +604,6 @@ class DB
 			echo $err_msg;
 			echo '</div>';
 		}
-
 	}
 
 
@@ -1494,6 +1498,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.13  2008/11/17 11:16:19  blueyed
+ * DB::print_error(): do not display errors if $halt_on_error is true, but $show_errors is false
+ *
  * Revision 1.12  2008/11/07 23:20:10  tblue246
  * debug_info() now supports plain text output for the CLI.
  *
