@@ -34,11 +34,13 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 // Create result set:
 $sql = 'SELECT user_login, COUNT( sess_ID ) AS nb_sessions, MAX( sess_lastseen ) AS sess_lastseen
-					FROM T_sessions LEFT JOIN T_users ON sess_user_ID = user_ID
-					GROUP BY sess_user_ID';
+          FROM T_sessions LEFT JOIN T_users ON sess_user_ID = user_ID
+         WHERE sess_key IS NOT NULL
+         GROUP BY sess_user_ID';
 
 $count_sql = 'SELECT COUNT( DISTINCT(sess_user_ID) )
-								FROM T_sessions';
+                FROM T_sessions
+               WHERE sess_key IS NOT NULL';
 
 $Results = & new Results( $sql, 'usess_', '-D', 20, $count_sql );
 
@@ -71,6 +73,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.5  2008/11/20 23:23:00  blueyed
+ * Session stats: ignore invalidated sessions
+ *
  * Revision 1.4  2008/02/19 11:11:19  fplanque
  * no message
  *
