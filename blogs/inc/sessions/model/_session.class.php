@@ -258,9 +258,9 @@ class Session
 				$Debuglog->add( 'Invalidating all previous user sessions, because login_multiple_sessions=0', 'session' );
 				$DB->query( '
 					UPDATE T_sessions
-						 SET sess_key = NULL
+					   SET sess_key = NULL
 					 WHERE sess_user_ID = '.$DB->quote($user_ID).'
-						 AND sess_ID != '.$this->ID );
+					   AND sess_ID != '.$this->ID );
 			}
 
 			$this->user_ID = $user_ID;
@@ -544,6 +544,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.6  2008/11/20 23:27:07  blueyed
+ * minor indenting
+ *
  * Revision 1.5  2008/09/13 11:07:43  fplanque
  * speed up display of dashboard on first login of the day
  *
