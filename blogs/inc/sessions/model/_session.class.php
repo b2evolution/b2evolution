@@ -213,7 +213,7 @@ class Session
 				VALUES (
 					'".$this->key."',
 					'".date( 'Y-m-d H:i:s', $localtimenow )."',
-					'".$Hit->IP."'
+					".$DB->quote($Hit->IP)."
 				)" );
 
 			$this->ID = $DB->insert_id;
@@ -544,6 +544,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.7  2008/11/20 23:30:57  blueyed
+ * Quote IP when creating new session
+ *
  * Revision 1.6  2008/11/20 23:27:07  blueyed
  * minor indenting
  *
