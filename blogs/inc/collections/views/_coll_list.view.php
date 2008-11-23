@@ -143,7 +143,6 @@ function disp_static_filename( & $Blog )
 }
 $Results->cols[] = array(
 						'th' => T_('Static File'),
-						'order' => 'blog_staticfilename',
 						'td' => '%disp_static_filename( {Obj} )%',
 					);
 
@@ -196,6 +195,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.4  2008/11/23 18:52:53  tblue246
+ * Blog list: Disabled sorting by static file because the column "blog_staticfilename" (evo_blogs table) doesn't exist anymore (setting has been moved into the evo_coll_settings table).
+ *
  * Revision 1.3  2008/01/21 09:35:27  fplanque
  * (c) 2008
  *
