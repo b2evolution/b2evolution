@@ -18,7 +18,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Create result set:
 $Results = & new Results( 'SELECT T_skins__skin.*, COUNT(blog_ID) AS nb_blogs
 													 	 FROM T_skins__skin LEFT JOIN T_blogs ON skin_ID = blog_skin_ID
-													 	GROUP BY skin_ID' );
+													 	GROUP BY skin_ID',
+							'', '', NULL, 'SELECT COUNT( * ) FROM T_skins__skin' );
 $Results->Cache = & get_Cache( 'SkinCache' );
 $Results->title = T_('Installed skins');
 
@@ -87,6 +88,9 @@ $Results->display( NULL, 'session' );
 
 
 /*
- * $Log:
+ * $Log$
+ * Revision 1.3  2008/11/26 16:00:21  tblue246
+ * Add correct SQL query for counting result rows, enables paging. Fixes http://forums.b2evolution.net/viewtopic.php?t=17280 .
+ *
  */
 ?>
