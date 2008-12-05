@@ -327,7 +327,7 @@ class Results extends Table
 	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true,
 										$query_title = 'Results::Query()' )
 	{
-		global $DB;
+		global $DB, $Debuglog;
 		if( !is_null( $this->rows ) )
 		{ // Query has already executed:
 			return;
@@ -397,27 +397,27 @@ class Results extends Table
 			$sql = preg_replace( '# \s ORDER \s+ BY (.+) \* #xi', ' ORDER BY $1 ', $sql );
 		}
 
+		$add_limit = $append_limit && ! empty( $this->limit );
 
-		if( $append_limit && !empty($this->limit) )
-		{	// Limit lien range to requested page
-			$sql .= ' LIMIT '.max(0, ($this->page-1)*$this->limit).', '.$this->limit;
+		if( $add_limit && ! $this->order_callbacks )
+		{	// No callbacks to be called, so we can limit the line range to the requested page:
+			$Debuglog->add( 'LIMIT requested and no callbacks - adding LIMIT to query.', 'results' );
+			$sql .= ' LIMIT '.max( 0, ( $this->page - 1 ) * $this->limit ).', '.$this->limit;
 		}
-
+		
 		// Execute query and store results
 		$this->rows = $DB->get_results( $sql, OBJECT, $query_title );
 
-		// Store row count
-		$this->result_num_rows = $DB->num_rows;
-
+		if ( ! $this->order_callbacks || ! $add_limit )
+		{
+			$Debuglog->add( 'Storing row count (no LIMIT or no callbacks)', 'results' );
+			$this->result_num_rows = $DB->num_rows;
+		}
 
 		// Sort with callbacks:
 		if( $this->order_callbacks )
 		{
-			if( $append_limit && !empty($this->limit) )
-			{ // Check for sorting with callbacks:
-				debug_die( '"order_objects_callback"/"order_rows_callback" are not supported with LIMIT.' );
-			}
-
+			$Debuglog->add( 'Sorting with callbacks.', 'results' );
 			foreach( $this->order_callbacks as $order_callback )
 			{
 				#echo 'order_callback: '; var_dump($order_callback);
@@ -433,6 +433,13 @@ class Results extends Table
 					usort( $this->rows, array( &$this, 'order_callback_wrapper_rows' ) );
 				}
 			}
+
+			if ( $add_limit )
+			{
+				$Debuglog->add( 'Callback sorting: LIMIT needed, extracting slice from array', 'results' );
+				$this->rows = array_slice( $this->rows, max( 0, ( $this->page - 1 ) * $this->limit ), $this->limit );
+				$this->result_num_rows = count( $this->rows );
+			}
 		}
 
 		// Group by object property:
@@ -446,7 +453,7 @@ class Results extends Table
 			$this->mergesort( $this->rows, array( &$this, 'callback_group_by_obj_prop' ) );
 		}
 
-		// echo '<br />rows on page='.$this->result_num_rows;
+		$Debuglog->add( 'rows on page='.$this->result_num_rows, 'results' );
 	}
 
 
@@ -1805,6 +1812,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.18  2008/12/05 23:57:25  tblue246
+ * Results class: Added support for callback sorting when a LIMIT is set.
+ *
  * Revision 1.17  2008/10/05 06:28:32  fplanque
  * no message
  *

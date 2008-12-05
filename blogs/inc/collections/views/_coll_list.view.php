@@ -141,9 +141,29 @@ function disp_static_filename( & $Blog )
 	}
 	return $r;
 }
+
+function sort_static_filename_callback( & $a, & $b, $desc )
+{
+	$a_static = $a->get_setting( 'static_file' );
+	$b_static = $b->get_setting( 'static_file' );
+	
+	if ( $desc == 'ASC' )
+	{
+		return strnatcmp( $a_static, $b_static );
+	}
+	else if ( $desc == 'DESC' )
+	{
+		return strnatcmp( $b_static, $a_static );
+	}
+	else
+	{
+		debug_die( '$desc has to be either ASC or DESC!' );
+	}
+}
 $Results->cols[] = array(
 						'th' => T_('Static File'),
 						'td' => '%disp_static_filename( {Obj} )%',
+						'order_objects_callback' => 'sort_static_filename_callback',
 					);
 
 $Results->cols[] = array(
@@ -195,6 +215,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.5  2008/12/05 23:57:25  tblue246
+ * Results class: Added support for callback sorting when a LIMIT is set.
+ *
  * Revision 1.4  2008/11/23 18:52:53  tblue246
  * Blog list: Disabled sorting by static file because the column "blog_staticfilename" (evo_blogs table) doesn't exist anymore (setting has been moved into the evo_coll_settings table).
  *
