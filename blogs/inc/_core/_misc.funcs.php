@@ -1353,6 +1353,7 @@ function debug_die( $additional_info = '' )
 	// This should help preventing indexing robots from indexing the error :P
 	if( ! headers_sent() )
 	{
+		load_funcs('_core/_template.funcs.php');
 		header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
 		header('HTTP/1.0 500 Internal Server Error');
 	}
@@ -1467,6 +1468,7 @@ function bad_request_die( $additional_info = '' )
 	// This should help preventing indexing robots from indexing the error :P
 	if( ! headers_sent() )
 	{
+		load_funcs('_core/_template.funcs.php');
 		header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
 		header('HTTP/1.0 400 Bad Request');
 	}
@@ -3148,6 +3150,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.54  2008/12/05 00:51:04  blueyed
+ * Load template funcs in debug_die(), bad_request_die(), so there is no E_FATAL when header_content_type() has not been defined yet\!
+ *
  * Revision 1.53  2008/11/07 23:20:09  tblue246
  * debug_info() now supports plain text output for the CLI.
  *
