@@ -98,13 +98,23 @@ function init_MainList( $items_nb_limit )
  * Using title as a source if url title is empty.
  * We allow up to 200 chars (which is ridiculously long) for WP import compatibility.
  *
+ * @internal Tblue> What is the purpose of $query_only? Querying the DB
+ *		but not modifying the URL title makes no sense to me, maybe it
+ *		would be better to disable the entire query instead. 
+ * 
  * @param string url title to validate
  * @param string real title to use as a source if $urltitle is empty (encoded in $evo_charset)
  * @param integer ID of post
+ * @param boolean Query the DB, but don't modify the URL title if the title already exists (Tblue> sense?)
+ * @param string The prefix of the database column names (e. g. "post_" for post_urltitle)
+ * @param string The name of the post ID column
+ * @param string The name of the DB table to use
+ * @param boolean Strip a possible dash at the end of the URL title which could prevent access to the post.
  * @return string validated url title
  */
 function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false,
-															$dbprefix = 'post_', $dbIDname = 'post_ID', $dbtable = 'T_items__item' )
+								$dbprefix = 'post_', $dbIDname = 'post_ID',
+									$dbtable = 'T_items__item', $stripdash = true )
 {
 	global $DB;
 
@@ -127,13 +137,17 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	// Make everything lowercase
 	$urltitle = strtolower( $urltitle );
 
-	// Normalize to 40 chars + a number
+	// Normalize to 200 chars + a number
 	preg_match( '/^(.*?)((-|_)+([0-9]+))?$/', $urltitle, $matches );
 	$urlbase = substr( $matches[1], 0, 200 );
+	if ( $stripdash )
+	{
+		$urlbase = rtrim( $urlbase, '-' );
+	}
 	$urltitle = $urlbase;
 	if( ! empty( $matches[4] ) )
 	{
-		$urltitle = $urlbase.'-'.$matches[4];
+		$urltitle .= '-'.$matches[4];
 	}
 
 
@@ -729,6 +743,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.19  2008/12/09 21:57:37  tblue246
+ * PHPDoc; strip a possible dash (-) at the end of an URL title which could prevent access to the post when a trailing dash is used to identify tag page URLs (see http://forums.b2evolution.net/viewtopic.php?p=84288 ).
+ *
  * Revision 1.18  2008/09/23 07:56:47  fplanque
  * Demo blog now uses shared files folder for demo media + more images in demo posts
  *
