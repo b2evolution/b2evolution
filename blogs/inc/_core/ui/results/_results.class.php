@@ -231,7 +231,7 @@ class Results extends Table
 	var $functions_area;
 
 
-  /**
+	/**
 	 * Should there be nofollows on page navigation
 	 */
 	var $nofollow_pagenav = false;
@@ -404,7 +404,7 @@ class Results extends Table
 			$Debuglog->add( 'LIMIT requested and no callbacks - adding LIMIT to query.', 'results' );
 			$sql .= ' LIMIT '.max( 0, ( $this->page - 1 ) * $this->limit ).', '.$this->limit;
 		}
-		
+
 		// Execute query and store results
 		$this->rows = $DB->get_results( $sql, OBJECT, $query_title );
 
@@ -1812,6 +1812,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.19  2008/12/10 00:04:31  blueyed
+ * Fix whitespace
+ *
  * Revision 1.18  2008/12/05 23:57:25  tblue246
  * Results class: Added support for callback sorting when a LIMIT is set.
  *
