@@ -2,7 +2,7 @@
 /**
  * This file implements parameter handling functions.
  *
- * This inlcudes:
+ * This includes:
  * - sanity checking of inputs
  * - removing PHP's stupid "magic" quotes
  * - validating specific inputs (urls, regexps...)
@@ -1912,6 +1912,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.25  2008/12/15 22:26:55  blueyed
+ * doc
+ *
  * Revision 1.24  2008/10/03 15:32:19  blueyed
  * todo/doc about param('string') removing newlines
  *
