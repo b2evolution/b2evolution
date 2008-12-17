@@ -52,10 +52,10 @@ function b2evonet_get_updates()
 		return false;
 	}
 
-	$Debuglog->add( 'Getting updates from '.$evonetsrv_host, 'evonet' );
+	$Debuglog->add( sprintf('Getting updates from %s.', $evonetsrv_host), 'evonet' );
 	if( $debug )
 	{
-		$Messages->add( T_('Getting updates from ').$evonetsrv_host, 'notes' );
+		$Messages->add( sprintf(T_('Getting updates from %s.'), $evonetsrv_host), 'notes' );
 	}
 	$Settings->set( 'evonet_last_attempt', $servertimenow );
 	$Settings->dbupdate();
@@ -147,6 +147,9 @@ function b2evonet_get_updates()
 
 /*
  * $Log$
+ * Revision 1.16  2008/12/17 23:14:29  blueyed
+ * Trans fix
+ *
  * Revision 1.15  2008/09/15 03:10:40  fplanque
  * simplified updates
  *
