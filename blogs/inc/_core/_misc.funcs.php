@@ -3039,7 +3039,7 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 	// target should be empty or window.parent.
 	if( $target && $target != 'window.parent.' )
 	{
-		debug_die( T_( 'Unexpected javascript target' ) );
+		debug_die( 'Unexpected javascript target' );
 	}
 
 	if( $output )
@@ -3150,6 +3150,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.55  2008/12/17 22:36:08  blueyed
+ * Trans fix: do not translate unexpected errors
+ *
  * Revision 1.54  2008/12/05 00:51:04  blueyed
  * Load template funcs in debug_die(), bad_request_die(), so there is no E_FATAL when header_content_type() has not been defined yet\!
  *
