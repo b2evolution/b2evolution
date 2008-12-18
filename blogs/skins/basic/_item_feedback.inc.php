@@ -19,6 +19,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $c, $cookie_name, $cookie_email, $cookie_url, $comment_allowed_tags;
+global $comments_use_autobr;
 
 // Display filters:
 // You can change these and call this template multiple time if you want to separate comments from trackbacks
@@ -136,12 +138,12 @@ while( $Comment = & $CommentList->get_next() )
 
 			case 'trackback': // Display a trackback:
 				echo T_('Trackback from:') ?>
-				<?php $Comment->author( 'htmlbody', true ) ?>
+				<?php $Comment->author( '', '#', '', '#', 'htmlbody', true ) ?>
 				<?php break;
 
 			case 'pingback': // Display a pingback:
 				echo T_('Pingback from:') ?>
-				<?php $Comment->author( 'htmlbody', true ) ?>
+				<?php $Comment->author( '', '#', '', '#', 'htmlbody', true ) ?>
 				<?php break;
 		}
 
