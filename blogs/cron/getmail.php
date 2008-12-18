@@ -4,7 +4,7 @@
  *
  * modified for 2.4.1 by Stephan Knauss. Contact me by PM in {@link http://forums.b2evolution.net/} (user stephankn)
  * or send a mail to stephankn at users.sourceforge.net
- * 
+ *
  * Uses MIME E-mail message parser classes written by Manuel Lemos: {@link http://www.phpclasses.org/browse/package/3169.html}
  *
  * This script could be called with a parameter "test" to specify what
@@ -21,7 +21,7 @@
  *
  * @author Stephan Knauss
  * @author tblue246: Tilman Blumenbach
- * 
+ *
  * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
  * This file built upon code from original b2 - http://cafelog.com/
  * @package htsrv
@@ -69,7 +69,7 @@ $subject = '';
  * post date of current message
  *
  * @global string $post_date
- */	
+ */
 $post_date = '';
 
 /**
@@ -103,13 +103,13 @@ if ( !isset( $current_User ) || !$current_User -> check_perm( 'options', 'edit',
 $do_real_posting = (!$Settings->get( 'eblog_test_mode' ) && $test != 2);
 if ( ! $do_real_posting )
 {
-	echo_message( T_('You configured test mode in the settings or set $test to 2. Nothing will be posted to the database/mediastore nor will your inbox be altered.'), WARNING, 0, true );
+	echo_message( T_('You configured test mode in the settings or set $test to 2. Nothing will be posted to the database/mediastore nor will your inbox be altered.'), WARNING, 0 );
 }
 
 if ( $test > 0 )
 {
 	//error_reporting (0);
-	
+
 	// TODO: I don't find a header to include for this popup window.
 	//	There should exist one in b2evo. So right now no valid HTML
 	$page_title = T_( 'Blog by email' );
@@ -126,9 +126,8 @@ if ( $test > 0 )
  * @param  string $strmessage The message to print
  * @param  string $color optional colour so use
  * @param  integer $level optional level to limit output to that level
- * @param  bool $newline insert a newline after message
  */
-function echo_message( $strmessage , $color = '', $level = 0, $newline = false )
+function echo_message( $strmessage , $color = '', $level = 0 )
 {
 	global $test;
 
@@ -145,26 +144,23 @@ function echo_message( $strmessage , $color = '', $level = 0, $newline = false )
 		{
 			echo '</font>';
 		}
-		
-		if ( $newline )
+
+		if ( $test > 0 )
 		{
-			if ( $test > 0 )
-			{
-				echo '<br />';
-			}
-			echo "\n";
+			echo '<br />';
 		}
+		echo "\n";
 	}
 }
 
 /**
  * provide sys_get_temp_dir for older versions of PHP.
- * 
+ *
  * code posted on php.net by minghong at gmail dot com
  * Based on {@link http://www.phpit.net/article/creating-zip-tar-archives-dynamically-php/2/}
  *
  * @return string path to system temporary directory
- */ 
+ */
 if ( !function_exists( 'sys_get_temp_dir' ) )
 {
 	function sys_get_temp_dir()
@@ -249,11 +245,11 @@ function processHeader( &$header )
 	$ddate = $header['Date'];
 
 	$prefix = $Settings->get( 'eblog_subject_prefix' );
-	echo_message( T_( 'Subject' ) . ': ' . $subject, INFO, 3, true );
+	echo_message( T_( 'Subject' ) . ': ' . $subject, INFO, 3 );
 
 	if (substr($subject, 0, strlen($prefix)) !== $prefix)
 	{
-		echo_message( '&#x2718; ' . T_( 'The subject prefix is not ' ) . '"' . $prefix . '"', WARNING, 2, true );
+		echo_message( '&#x2718; ' . T_( 'The subject prefix is not ' ) . '"' . $prefix . '"', WARNING, 2 );
 		return false;
 	}
 
@@ -313,25 +309,25 @@ function processAttachments( $mailAttachments, $mediadir, $media_url, $add_img_t
 	global $content;
 	global $do_real_posting;
 	global $Settings;
-	
+
 	$return = true;
 
-	echo_message( T_( 'Processing attachments' ), INFO, 3, true );
-	
+	echo_message( T_( 'Processing attachments' ), INFO, 3 );
+
 	foreach( $mailAttachments as $attachment )
 	{
 		$filename = strtolower( $attachment['FileName'] );
 		if ( $filename == '' )
 		{
 			$filename = tempnam( $mediadir, 'upload' ) . '.' . $attachment['SubType'];
-			echo_message( '&#x279C; ' . T_( 'Attachment without name. Using ' ) . htmlspecialchars( $filename ), WARNING, 2, true );
+			echo_message( '&#x279C; ' . sprintf(T_( 'Attachment without name. Using "%s".' ), htmlspecialchars( $filename )), WARNING, 2 );
 		}
 		$filename = preg_replace( '/[^a-z0-9\-_.]/', '-', $filename );
 
 		// Check valid filename/extension: (includes check for locked filenames)
 		if ( $error_filename = validate_filename( $filename, false ) )
 		{
-			echo_message( '&#x2718; ' . T_( 'Invalid filename' ).': '.$error_filename, WARNING, 2, true );
+			echo_message( '&#x2718; ' . T_( 'Invalid filename' ).': '.$error_filename, WARNING, 2 );
 			$return = false; // return: at least one error. try with next attachment
 			continue;
 		}
@@ -343,27 +339,27 @@ function processAttachments( $mailAttachments, $mediadir, $media_url, $add_img_t
 		while ( file_exists( $mediadir . $filename ) )
 		{
 			$filename = $prename.$cnt.$sufname;
-			echo_message( '&#x2718; ' . T_( 'file already exists. Changing filename to: ' ) . $filename , WARNING, 2, true );
+			echo_message( '&#x2718; ' . T_( 'file already exists. Changing filename to: ' ) . $filename , WARNING, 2 );
 			++$cnt;
 		}
 
 		if ( $do_real_posting )
 		{
-			echo_message( '&#x279C; ' . T_( 'Saving file to: ') . htmlspecialchars( $mediadir . $filename  ), INFO, 3, true );
+			echo_message( '&#x279C; ' . T_( 'Saving file to: ') . htmlspecialchars( $mediadir . $filename  ), INFO, 3 );
 			if ( !rename( $attachment['DataFile'], $mediadir . $filename ) )
 			{
-				echo_message( '&#x2718; ' . T_( 'Problem saving upload to ') . htmlspecialchars( $mediadir . $filename ), WARNING, 2, true );
+				echo_message( '&#x2718; ' . T_( 'Problem saving upload to ') . htmlspecialchars( $mediadir . $filename ), WARNING, 2 );
 				$return = false; // return: at least one error. try with next attachment
 				continue;
 			}
-	
+
 			// chmod uploaded file:
 			$chmod = $Settings -> get( 'fm_default_chmod_file' );
 			@chmod( $mediadir . $filename, octdec( $chmod ) );
 		}
 
 		$imginfo = @getimagesize($mediadir.$filename);
-		echo_message(T_('Attachment is an image: ').(is_array($imginfo) ? T_('yes') : T_('no')), INFO, 3, true);
+		echo_message(T_('Attachment is an image: ').(is_array($imginfo) ? T_('yes') : T_('no')), INFO, 3 );
 
 		$content .= "\n";
 		if (is_array($imginfo) && $add_img_tags)
@@ -382,7 +378,7 @@ function processAttachments( $mailAttachments, $mediadir, $media_url, $add_img_t
 
 /**
  * look inside message to get title for posting.
- * 
+ *
  * The message could contain a xml-tag <code><title>sample title</title></code> to specify a title for the posting.
  * If not tag is found there could be a global $post_default_title containing a global default title.
  * If none of these is found then the specified alternate title line is used.
@@ -390,7 +386,7 @@ function processAttachments( $mailAttachments, $mediadir, $media_url, $add_img_t
  * @param string $content message to search for title tag
  * @param string $alternate_title use this string if no title tag is found
  * @return string title of posting
- * 
+ *
  * @see $post_default_title
  */
 function get_post_title( $content, $alternate_title )
@@ -400,16 +396,16 @@ function get_post_title( $content, $alternate_title )
 	{
 		$title = $alternate_title;
 	}
-	
+
 	return $title;
 }
 
 if ( ! extension_loaded( 'imap' ) )
 {
-	echo_message( T_( 'The php_imap extension is not available to PHP on this server. Please load it in php.ini or ask your hosting provider to do so.' ), ERROR, 0, true );
+	echo_message( T_( 'The php_imap extension is not available to PHP on this server. Please load it in php.ini or ask your hosting provider to do so.' ), ERROR, 0 );
 	exit;
 }
-echo_message( T_( 'Connecting and authenticating to mail server' ), INFO, 1, true );
+echo_message( T_( 'Connecting and authenticating to mail server' ), INFO, 1 );
 
 /**
  * Prepare the connection string.
@@ -450,41 +446,41 @@ $mailserver .= '}INBOX';
 $mbox = @imap_open( $mailserver, $Settings -> get( 'eblog_username' ), $Settings -> get( 'eblog_password' ) );
 if ( ! $mbox )
 {
-	echo_message( T_( 'Connection failed: ' ) . imap_last_error(), ERROR, 0, true );
+	echo_message( T_( 'Connection failed: ' ) . imap_last_error(), ERROR, 0 );
 	exit();
 }
 @imap_errors();
 
-echo_message( '&#x2714; ' . T_( 'Success' ), SUCCESS, 1, true );
+echo_message( '&#x2714; ' . T_( 'Success' ), SUCCESS, 1 );
 if ( $test == 1 )
 {
-	echo_message( T_( 'All Tests completed' ), INFO, 1, true );
+	echo_message( T_( 'All Tests completed' ), INFO, 1 );
 	imap_close( $mbox );
 	exit();
 }
 
 
 // Read messages from server
-echo_message( T_( 'Reading messages from server' ), INFO, 2, true );
+echo_message( T_( 'Reading messages from server' ), INFO, 2 );
 $imap_obj = imap_check( $mbox );
-echo_message( ' &#x279C; ' . $imap_obj -> Nmsgs . ' ' . T_( 'messages' ), INFO, 2, true );
+echo_message( ' &#x279C; ' . $imap_obj -> Nmsgs . ' ' . T_( 'messages' ), INFO, 2 );
 
 $delMsgs = 0;
 for ( $index = 1; $index <= $imap_obj -> Nmsgs; $index++ )
 {
-	echo_message( '<b>' . T_( 'Message' ) . ' #'.$index . ':</b>', INFO, 2, true );
-		
+	echo_message( '<b>' . T_( 'Message' ) . ' #'.$index . ':</b>', INFO, 2 );
+
 	$strbody = '';
 	$hasAttachment = false;
-		
+
 	// save mail to disk because with attachments could take up much RAM
 	if (!($tmpMIME = tempnam( sys_get_temp_dir(), 'b2evoMail' )))
 	{
-		echo_message( T_('Could not create temporary file.'), ERROR, 0, true );
+		echo_message( T_('Could not create temporary file.'), ERROR, 0 );
 		continue;
 	}
 	imap_savebody( $mbox, $tmpMIME, $index );
-		
+
 	$tmpDirMIME = tempdir( sys_get_temp_dir(), 'b2evo' );
 	$mimeParser = new mime_parser_class;
 	$mimeParser -> mbox = 0; // Set to 0 for parsing a single message file
@@ -496,20 +492,20 @@ for ( $index = 1; $index <= $imap_obj -> Nmsgs; $index++ )
 		'SaveBody' => $tmpDirMIME, // Save the message body parts to a directory
 		'SkipBody' => 1, // Do not retrieve or save message body parts
 	);
-		
+
 	if ( !$mimeParser -> Decode( $MIMEparameters, $decodedMIME ) )
 	{
-		echo_message( T_( 'MIME message decoding error: ' ) . $mimeParser -> error . T_(' at position ' ) . $mimeParser -> error_position, ERROR, 0, true );
+		echo_message( T_( 'MIME message decoding error: ' ) . $mimeParser -> error . T_(' at position ' ) . $mimeParser -> error_position, ERROR, 0 );
 		rmdir_r( $tmpDirMIME );
 		unlink( $tmpMIME );
 		continue;
 	}
 	else
 	{
-		echo_message( '&#x2714; ' . T_( 'MIME message decoding successful.'), INFO, 3, true );
+		echo_message( '&#x2714; ' . T_( 'MIME message decoding successful.'), INFO, 3 );
 		if ( ! $mimeParser -> Analyze( $decodedMIME[0], $parsedMIME ) )
 		{
-			echo_message( T_('MIME message analyse error: ') . $mimeParser -> error, ERROR, 0, true );
+			echo_message( T_('MIME message analyse error: ') . $mimeParser -> error, ERROR, 0 );
 			// var_dump($parsedMIME);
 			rmdir_r( $tmpDirMIME );
 			unlink( $tmpMIME );
@@ -532,7 +528,7 @@ for ( $index = 1; $index <= $imap_obj -> Nmsgs; $index++ )
 		if ( $parsedMIME['Type'] == 'html' ){
 			foreach ( $parsedMIME['Alternative'] as $alternative ){
 				if ( $alternative['Type'] == 'text' ){
-					echo_message( T_( 'HTML alternative message part saved as ' ) . $alternative['DataFile'], INFO, 3, true );
+					echo_message( T_( 'HTML alternative message part saved as ' ) . $alternative['DataFile'], INFO, 3 );
 					$strbody = imap_qprint( file_get_contents( $alternative['DataFile'] ) );
 					break; // stop after first alternative
 				}
@@ -542,7 +538,7 @@ for ( $index = 1; $index <= $imap_obj -> Nmsgs; $index++ )
 		// mail is plain text
 		elseif ( $parsedMIME['Type'] == 'text' )
 		{
-			echo_message( T_( 'Plain-text message part saved as ' ) . $parsedMIME['DataFile'], INFO, 3, true );
+			echo_message( T_( 'Plain-text message part saved as ' ) . $parsedMIME['DataFile'], INFO, 3 );
 			$strbody = imap_qprint( file_get_contents( $parsedMIME['DataFile'] ) );
 		}
 
@@ -552,53 +548,53 @@ for ( $index = 1; $index <= $imap_obj -> Nmsgs; $index++ )
 			$hasAttachment = true;
 			foreach( $parsedMIME['Attachments'] as $attachment )
 			{
-				echo_message( T_( 'Attachment: ' ) . $attachment['FileName'] . T_( ' stored as ' ) . $attachment['DataFile'], INFO, 3, true );
+				echo_message( T_( 'Attachment: ' ) . $attachment['FileName'] . T_( ' stored as ' ) . $attachment['DataFile'], INFO, 3 );
 			}
 		}
 
-		$warning_count = count( $mimeParser->warnings ); 
+		$warning_count = count( $mimeParser->warnings );
 		if ( $warning_count > 0 )
 		{
-			echo_message( '&#x2718; ' . $warning_count . T_( ' warnings during decode: ' ), WARNING, 2, true );
+			echo_message( '&#x2718; ' . $warning_count . T_( ' warnings during decode: ' ), WARNING, 2 );
 			foreach ($mimeParser->warnings as $k => $v)
 			{
-				echo_message( '&#x2718; ' . T_( 'Warning: ' ) . $v . T_( ' at position ' ) . $k, WARNING, 3, true );
+				echo_message( '&#x2718; ' . T_( 'Warning: ' ) . $v . T_( ' at position ' ) . $k, WARNING, 3 );
 			}
 		}
 	}
 	unlink( $tmpMIME );
-		
+
 	// var_dump($strbody);
 	// process body. First fix different line-endings (dos, mac, unix), remove double newlines
 	$strbody = str_replace( array("\r", "\n\n"), "\n", $strbody );
-		
+
 	$a_body = explode( "\n", $strbody, 2 );
 
 	// tblue> splitting only into 2 parts allows colons in the user PW
 	$a_authentication = explode( ':', $a_body[0], 2 );
 	$content = trim( $a_body[1] );
-		
-	echo_message( T_( 'Message content:' ) . ' <code>' . htmlspecialchars( $content ) . '</code>', INFO, 3, true );
-		
+
+	echo_message( T_( 'Message content:' ) . ' <code>' . htmlspecialchars( $content ) . '</code>', INFO, 3 );
+
 	$user_login = trim( $a_authentication[0] );
 	$user_pass = @trim( $a_authentication[1] );
-		
-	echo_message( T_( 'Authenticating user' ) . ': ' . $user_login, INFO, 3, true );
+
+	echo_message( T_( 'Authenticating user' ) . ': ' . $user_login, INFO, 3 );
 	// authenticate user
 	if ( !user_pass_ok( $user_login, $user_pass ) )
 	{
-		echo_message( T_( 'Authentication failed for user ' ) . htmlspecialchars( $user_login ), ERROR, 0, true );
-		echo_message( '&#x2718; ' . T_( 'Wrong login or password.' ) . ' ' . T_( 'First line of text in email must be in the format "username:password"' ), ERROR, 3, true );
+		echo_message( T_( 'Authentication failed for user ' ) . htmlspecialchars( $user_login ), ERROR, 0 );
+		echo_message( '&#x2718; ' . T_( 'Wrong login or password.' ) . ' ' . T_( 'First line of text in email must be in the format "username:password"' ), ERROR, 3 );
 		rmdir_r( $tmpDirMIME );
 		continue;
 	}
 	else
 	{
-		echo_message( '&#x2714; ' . T_( 'Success' ), SUCCESS, 3, true );
+		echo_message( '&#x2714; ' . T_( 'Success' ), SUCCESS, 3 );
 	}
-		
+
 	$subject = trim( substr($subject, strlen($Settings->get( 'eblog_subject_prefix' ))) );
-		
+
 	// remove content after terminator
 	$eblog_terminator = $Settings -> get( 'eblog_body_terminator' );
 	if ( !empty( $eblog_terminator ) &&
@@ -606,49 +602,49 @@ for ( $index = 1; $index <= $imap_obj -> Nmsgs; $index++ )
 	{
 		$content = substr( $content, 0, $os_terminator );
 	}
-		
+
 	// check_html_sanity needs local user set.
 	$UserCache = & get_Cache( 'UserCache' );
 	$current_User = & $UserCache -> get_by_login( $user_login );
 
 	$post_title = get_post_title( $content, $subject );
-		
+
 	if ( ! ( $post_category = xmlrpc_getpostcategory( $content ) ) )
 	{
 		$post_category = $Settings -> get( 'eblog_default_category' );
 	}
-	echo_message( T_( 'Category ID' ) . ': ' . htmlspecialchars( $post_category ), INFO, 3, true );
-		
+	echo_message( T_( 'Category ID' ) . ': ' . htmlspecialchars( $post_category ), INFO, 3 );
+
 	$content = xmlrpc_removepostdata( $content );
 	$blog_ID = get_catblog( $post_category ); // TODO: should not die, if cat does not exist!
-	echo_message( T_( 'Blog ID' ) . ': ' . $blog_ID, INFO, 3, true );
-		
+	echo_message( T_( 'Blog ID' ) . ': ' . $blog_ID, INFO, 3 );
+
 	$BlogCache = & get_Cache( 'BlogCache' );
 	$Blog = $BlogCache -> get_by_ID( $blog_ID, false, false );
-		
+
 	if ( empty( $Blog ) )
 	{
-		echo_message( T_( 'Blog not found: ' ) . htmlspecialchars( $blog_ID ), ERROR, 0, true );
+		echo_message( T_( 'Blog not found: ' ) . htmlspecialchars( $blog_ID ), ERROR, 0 );
 		rmdir_r( $tmpDirMIME );
 		continue;
 	}
-		
-		
+
+
 	// Check permission:
-	echo_message( sprintf( T_( 'Checking permissions for user &laquo;%s&raquo; to post to Blog #%d' ), $user_login, $blog_ID ), INFO, 3, true );
+	echo_message( sprintf( T_( 'Checking permissions for user &laquo;%s&raquo; to post to Blog #%d' ), $user_login, $blog_ID ), INFO, 3 );
 	if ( !$current_User -> check_perm( 'blog_post!published', 'edit', false, $blog_ID )
 	|| ( $hasAttachment && !$current_User -> check_perm( 'files', 'add', false ) )
 	)
 	{
-		echo_message( T_( 'Permission denied' ), ERROR, 0, true );
+		echo_message( T_( 'Permission denied' ), ERROR, 0 );
 		rmdir_r( $tmpDirMIME );
 		continue;
 	}
 	else
 	{
-		echo_message( '&#x2714; ' . T_( 'Pass' ), SUCCESS, 3, true );
+		echo_message( '&#x2714; ' . T_( 'Pass' ), SUCCESS, 3 );
 	}
-		
+
 	// handle attachments
 	if ( $hasAttachment )
 	{
@@ -659,17 +655,17 @@ for ( $index = 1; $index <= $imap_obj -> Nmsgs; $index++ )
 		}
 		else
 		{
-			echo_message( T_( 'Unable to access media directory. No attachments processed' ), ERROR, 0, true );
+			echo_message( T_( 'Unable to access media directory. No attachments processed' ), ERROR, 0 );
 		}
 	}
-		
+
 	// CHECK and FORMAT content
 	$post_title = check_html_sanity( trim( $post_title ), 'posting', false );
 	$content = check_html_sanity( trim( $content ), 'posting', $Settings -> get( 'AutoBR' ) );
 
 	if ( ( $error = $Messages->get_string( T_( 'Cannot post, please correct these errors:' ), '', 'error' ) ) )
 	{
-		echo_message( $error, ERROR, 0, true );
+		echo_message( $error, ERROR, 0 );
 		$Messages->clear( 'error' );
 		rmdir_r( $tmpDirMIME );
 		continue;
@@ -686,13 +682,13 @@ for ( $index = 1; $index <= $imap_obj -> Nmsgs; $index++ )
 		$edited_Item -> handle_post_processing();
 	}
 
-	echo_message( '&#x2714; ' . T_( 'Message posting successfull.' ), SUCCESS, 2, true );
-	echo_message( '&#x279C; ' . T_( 'Post title: ' ) . htmlspecialchars( $post_title ), INFO, 3, true );
-	echo_message( '&#x279C; ' . T_( 'Post content: ' ) . htmlspecialchars( $content ), INFO, 3, true );
-		
+	echo_message( '&#x2714; ' . T_( 'Message posting successfull.' ), SUCCESS, 2 );
+	echo_message( '&#x279C; ' . T_( 'Post title: ' ) . htmlspecialchars( $post_title ), INFO, 3 );
+	echo_message( '&#x279C; ' . T_( 'Post content: ' ) . htmlspecialchars( $content ), INFO, 3 );
+
 	rmdir_r( $tmpDirMIME );
-		
-	echo_message( T_( 'Marking message for deletion' ) . ': '.$index, INFO, 3, true );
+
+	echo_message( T_( 'Marking message for deletion' ) . ': '.$index, INFO, 3 );
 	imap_delete( $mbox, $index );
 	++$delMsgs;
 }
@@ -700,7 +696,7 @@ for ( $index = 1; $index <= $imap_obj -> Nmsgs; $index++ )
 if ( $do_real_posting )
 {
 	imap_expunge( $mbox );
-	echo_message( sprintf(T_( 'Deleted %d processed message(s) from inbox' ), $delMsgs), INFO, 3, true );
+	echo_message( sprintf(T_( 'Deleted %d processed message(s) from inbox' ), $delMsgs), INFO, 3 );
 }
 
 imap_close( $mbox );
@@ -713,6 +709,9 @@ if ( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.29  2008/12/18 01:04:17  blueyed
+ * getmail.php: drop $newline param for echo_message, which was true always. Small translation fix. Whitespace fixes.
+ *
  * Revision 1.28  2008/10/06 11:02:27  tblue246
  * Blog by mail now supports POP3 & IMAP, SSL & TLS
  *
