@@ -353,6 +353,24 @@ class Comment extends DataObject
 	function author( $before = '', $after = '#', $before_user = '', $after_user = '#',
 										$format = 'htmlbody', $makelink = false )
 	{
+		echo $this->get_author($before, $after, $before_user, $after_user, $format, $makelink);
+	}
+
+
+	/**
+	 * Get author of comment
+	 *
+	 * @param string String to display before author name if not a user
+	 * @param string String to display after author name if not a user
+	 * @param string String to display before author name if he's a user
+	 * @param string String to display after author name if he's a user
+	 * @param string Output format, see {@link format_to_output()}
+	 * @param boolean true for link, false if you want NO html link
+	 * @return string
+	 */
+	function get_author( $before = '', $after = '#', $before_user = '', $after_user = '#',
+										$format = 'htmlbody', $makelink = false )
+	{
 		global $Plugins;
 
 		if( $this->get_author_User() )
@@ -392,7 +410,7 @@ class Comment extends DataObject
 
 		$Plugins->trigger_event( 'FilterCommentAuthor', array( 'data' => & $r, 'makelink' => $makelink, 'Comment' => $this ) );
 
-		echo $r;
+		return $r;
 	}
 
 
@@ -950,6 +968,40 @@ class Comment extends DataObject
 
 
 	/**
+	 * Get title of comment, e.g. "Comment from: Foo Bar"
+	 *
+	 * @param array Params
+	 *   'author_format': Formatting of the author (%s gets replaced with
+	 *                    the author string)
+	 * @return string
+	 */
+	function get_title($params = array())
+	{
+		if( empty($params['author_format']) )
+		{
+			$params['author_format'] = '%s';
+		}
+		$author = sprintf($params['author_format'], $this->get_author());
+
+		switch( $this->get( 'type' ) )
+		{
+			case 'comment': // Display a comment:
+				$s = T_('Comment from %s');
+				break;
+
+			case 'trackback': // Display a trackback:
+				$s = T_('Trackback from %s');
+				break;
+
+			case 'pingback': // Display a pingback:
+				$s = T_('Pingback from %s');
+				break;
+		}
+		return sprintf($s, $author);
+	}
+
+
+	/**
 	 * Template function: display date (datetime) of comment
 	 *
 	 * @param string date/time format: leave empty to use locale default date format
@@ -1340,6 +1392,10 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.24  2008/12/18 00:34:13  blueyed
+ * - Add Comment::get_author() and make Comment::author() use it
+ * - Add Comment::get_title() and use it in Dashboard and Admin comment list
+ *
  * Revision 1.23  2008/07/01 08:32:12  fplanque
  * minor
  *

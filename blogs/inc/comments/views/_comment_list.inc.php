@@ -75,24 +75,7 @@ while( $Comment = & $CommentList->get_next() )
 			?>
 		</div>
 		<div class="bCommentTitle">
-		<?php
-			switch( $Comment->get( 'type' ) )
-			{
-				case 'comment': // Display a comment:
-					echo T_('Comment from') ?>
-					<?php break;
-
-				case 'trackback': // Display a trackback:
-					echo T_('Trackback from') ?>
-					<?php break;
-
-				case 'pingback': // Display a pingback:
-					echo T_('Pingback from') ?>
-					<?php break;
-			}
-		echo ': ';
-		?>
-		<?php $Comment->author() ?>
+			<?php echo $Comment->get_title(); ?>
 		</div>
 		<div class="bCommentText">
 			<?php $Comment->rating(); ?>
@@ -127,6 +110,10 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.8  2008/12/18 00:34:13  blueyed
+ * - Add Comment::get_author() and make Comment::author() use it
+ * - Add Comment::get_title() and use it in Dashboard and Admin comment list
+ *
  * Revision 1.7  2008/01/21 09:35:27  fplanque
  * (c) 2008
  *
