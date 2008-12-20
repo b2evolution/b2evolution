@@ -142,7 +142,7 @@ function skin_init( $disp )
 							if( $Chapter )
 							{
 								$canonical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
-								if( $ReqHost.$ReqURI != $canonical_url )
+								if( ! is_same_url($ReqHost.$ReqURI, $canonical_url) )
 								{
 									// REDIRECT TO THE CANONICAL URL:
 									// fp> TODO: we're going to lose the additional params, it would be better to keep them...
@@ -165,7 +165,7 @@ function skin_init( $disp )
 					if( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
 					{ // Check if the URL was canonical:
 						$canonical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
-						if( $ReqHost.$ReqURI != $canonical_url )
+						if( ! is_same_url($ReqHost.$ReqURI, $canonical_url) )
 						{
 							// REDIRECT TO THE CANONICAL URL:
 							// fp> TODO: we're going to lose the additional params, it would be better to keep them...
@@ -592,6 +592,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.36  2008/12/20 22:36:33  blueyed
+ * Add is_same_url() to compare URLs without taking case of urlencoded parts into account. This is required to prevent infinite redirects in the handling of canonical URLs.
+ *
  * Revision 1.35  2008/11/07 23:12:47  tblue246
  * minor
  *

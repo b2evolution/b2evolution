@@ -422,7 +422,7 @@ elseif( $disp == 'posts' && !empty($Item) )
 			$canonical_crop = preg_replace( '¤\?.*$¤', '', $canonical_url );
 			// pre_dump( '', $requested_crop, $canonical_crop );
 
-			if( $requested_crop != $canonical_crop )
+			if( ! is_same_url($requested_crop, $canonical_crop) )
 			{	// The requested URL does not look like the canonical URL for this post,
 				// REDIRECT TO THE CANONICAL URL:
 				// fp> TODO: we might be losing additional params, it would be better to keep them... (but we have redir=no for that)
@@ -594,6 +594,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.108  2008/12/20 22:36:33  blueyed
+ * Add is_same_url() to compare URLs without taking case of urlencoded parts into account. This is required to prevent infinite redirects in the handling of canonical URLs.
+ *
  * Revision 1.107  2008/10/14 23:18:50  blueyed
  * Replace encoded ':' for tags in $path_string, too (and the lowercase encoded version)
  *

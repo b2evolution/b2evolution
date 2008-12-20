@@ -634,8 +634,26 @@ function disp_url( $url, $max_length = NULL )
 }
 
 
+/**
+ * Compare two given URLs, if they are the same.
+ * This converts all urlencoded chars (e.g. "%AA") to lowercase.
+ * It appears that some webservers use lowercase for the chars (Apache),
+ * while others use uppercase (lighttpd).
+ * @return boolean
+ */
+function is_same_url( $a, $b )
+{
+	$a = preg_replace_callback('~%[0-9A-F]{2}~', create_function('$m', 'return strtolower($m[0]);'), $a);
+	$b = preg_replace_callback('~%[0-9A-F]{2}~', create_function('$m', 'return strtolower($m[0]);'), $b);
+	return $a == $b;
+}
+
+
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.20  2008/12/20 22:36:33  blueyed
+ * Add is_same_url() to compare URLs without taking case of urlencoded parts into account. This is required to prevent infinite redirects in the handling of canonical URLs.
+ *
  * Revision 1.19  2008/05/10 21:30:39  fplanque
  * better UTF-8 handling
  *
