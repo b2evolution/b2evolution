@@ -342,16 +342,38 @@ if( ! defined( 'EVO_MAIN_INIT' ) )
 }
 
 
-// Note: the following regexp would fail when loging on to the same domain, because cookie_domain starts with a dot '.'
-// However, same domain logins will happen with a relative redirect_to, so it is covered with '^/'
-// (forms should use e.g. "url_rel_to_same_host($redirect_to, $htsrv_url_sensitive)" for this)
+// Test if cookie_domain matches the URL where we want to redirect to:
 if( strlen($redirect_to) )
 {
 	// Make it relative to the form's target, in case it has been set absolute (and can be made relative).
 	// Just in case it gets sent absolute. This should not trigger this warning then..!
 	$redirect_to = url_rel_to_same_host($redirect_to, $htsrv_url_sensitive);
 
-	if( !preg_match( '#^/|(https?://[a-z\-.]*'.str_replace( '.', '\.', $cookie_domain ).')#i', $redirect_to ) )
+	if( $redirect_to[0] == '/' )
+	{ // relative => ok
+		$cookie_domain_match = true;
+	}
+	else
+	{
+		$parsed_redirect_to = @parse_url($redirect_to);
+		if( isset($parsed_redirect_to['host']) )
+		{
+			if( $cookie_domain == $parsed_redirect_to['host'] )
+			{
+				$cookie_domain_match = true;
+			}
+			elseif( $cookie_domain[0] == '.'
+				&& substr($cookie_domain,1) == substr($parsed_redirect_to['host'], 1-strlen($cookie_domain)) )
+			{ // cookie domain includes subdomains and matches the last part of where we want to redirect to
+				$cookie_domain_match = true;
+			}
+		}
+		else
+		{
+			$cookie_domain_match = preg_match( '#^https?://[a-z\-.]*'.str_replace( '.', '\.', $cookie_domain ).'#i', $redirect_to );
+		}
+	}
+	if( ! $cookie_domain_match )
 	{
 		$Messages->add( sprintf( T_('WARNING: you are trying to log in to <strong>%s</strong> but your cookie domain is <strong>%s</strong>. You will not be able to successfully log in to the requested domain until you fix your cookie domain in your %s configuration.'), $redirect_to, $cookie_domain, $app_name ), 'error' );
 	}
@@ -395,6 +417,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.101  2008/12/21 17:51:23  blueyed
+ * Merge fix for cookie domain warning from whissip branch. This fixes the warning for cookie_domain=.example.com when logging into example.com.
+ *
  * Revision 1.100  2008/04/13 15:15:59  fplanque
  * attempt to fix email headers for non latin charsets
  *
