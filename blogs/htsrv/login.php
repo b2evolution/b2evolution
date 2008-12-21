@@ -349,6 +349,7 @@ if( strlen($redirect_to) )
 	// Just in case it gets sent absolute. This should not trigger this warning then..!
 	$redirect_to = url_rel_to_same_host($redirect_to, $htsrv_url_sensitive);
 
+	$cookie_domain_match = false;
 	if( $redirect_to[0] == '/' )
 	{ // relative => ok
 		$cookie_domain_match = true;
@@ -417,6 +418,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.102  2008/12/21 18:43:11  blueyed
+ * Fix E_NOTICE with new cookie_domain handling
+ *
  * Revision 1.101  2008/12/21 17:51:23  blueyed
  * Merge fix for cookie domain warning from whissip branch. This fixes the warning for cookie_domain=.example.com when logging into example.com.
  *
