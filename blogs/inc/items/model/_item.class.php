@@ -2550,10 +2550,10 @@ class Item extends ItemLight
 		$this->permanent_url( 'single' );
 		echo '"'."\n";
 		$this->title( array(
-			'before' =>' dc:title="',
-			'after' => '"'."\n",
+			'before'    => ' dc:title="',
+			'after'     => '"'."\n",
 			'link_type' => 'none',
-			'format' => 'xmlattr'
+			'format'    => 'xmlattr',
 			) );
 		echo '  trackback:ping="';
 		$this->trackback_url();
@@ -3605,6 +3605,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.59  2008/12/22 01:56:54  fplanque
+ * minor
+ *
  * Revision 1.58  2008/12/22 00:45:26  fplanque
  * antispam
  *

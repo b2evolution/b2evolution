@@ -158,8 +158,8 @@ class Session
 
 						// Unserialize session data (using an own callback that should provide class definitions):
 						$old_callback = ini_set( 'unserialize_callback_func', 'session_unserialize_callback' );
-						if( $old_callback === false || $old_callback === null /* disabled, reported with PHP 5.2.5 */ )
-						{ // this can fail, if "ini_set" has been disabled for security reasons.. :/
+						if( $old_callback === false || is_null($old_callback) /* disabled, reported with PHP 5.2.5 */ )
+						{	// NULL if ini_set has been disabled for security reasons
 							// Brutally load all classes that we might need:
  							session_unserialize_load_all_classes();
 						}
@@ -544,6 +544,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.8  2008/12/22 01:56:54  fplanque
+ * minor
+ *
  * Revision 1.7  2008/11/20 23:30:57  blueyed
  * Quote IP when creating new session
  *

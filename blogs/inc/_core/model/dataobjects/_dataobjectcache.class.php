@@ -281,7 +281,7 @@ class DataObjectCache
 	{
 		if( is_null($db_row) )
 		{	// we can't access NULL as an object
-			return $db_row;	
+			return $db_row;
 		}
 		
 		// Get ID of the object we'ere preparing to instantiate...
@@ -589,6 +589,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.5  2008/12/22 01:56:54  fplanque
+ * minor
+ *
  * Revision 1.4  2008/09/28 05:05:07  fplanque
  * minor
  *
