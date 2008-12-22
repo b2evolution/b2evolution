@@ -1461,7 +1461,7 @@ class Item extends ItemLight
 		echo $params['before'];
 		echo '<a href="'.$params['form_url'].'" title="'.$params['title'].'"';
 		if( !empty( $params['class'] ) ) echo ' class="'.$params['class'].'"';
-		echo '>'.$params['text'].'</a>';
+		echo ' rel="nofollow">'.$params['text'].'</a>';
 		echo $params['after'];
 
 		return true;
@@ -1495,7 +1495,7 @@ class Item extends ItemLight
 		echo $before;
 		echo '<a href="'.$form_url.'" title="'.$title.'"';
 		if( !empty( $class ) ) echo ' class="'.$class.'"';
-		echo '>'.$text.'</a>';
+		echo ' rel="nofollow">'.$text.'</a>';
 		echo $after;
 
 		return true;
@@ -3605,6 +3605,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.58  2008/12/22 00:45:26  fplanque
+ * antispam
+ *
  * Revision 1.57  2008/09/29 08:30:39  fplanque
  * Avatar support
  *
