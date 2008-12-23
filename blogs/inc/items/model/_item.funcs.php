@@ -264,29 +264,12 @@ function get_postdata($postid)
  * @param string
  * @return integer
  */
-function bpost_count_words($string)
+function bpost_count_words( $str )
 {
-	$string = trim(strip_tags($string));
-	if( function_exists( 'str_word_count' ) )
-	{ // PHP >= 4.3
-		return str_word_count($string);
-	}
-
-	/* In case str_word_count() doesn't exist (to accomodate PHP < 4.3).
-		(Code adapted from post by "brettNOSPAM at olwm dot NO_SPAM dot com" at
-		PHP documentation page for str_word_count(). A better implementation
-		probably exists.)
-	*/
-	if($string == '')
-	{
-		return 0;
-	}
-
-	$pattern = "/[^(\w|\d|\'|\"|\.|\!|\?|;|,|\\|\/|\-\-|:|\&|@)]+/";
-	$string = preg_replace($pattern, " ", $string);
-	$string = count(explode(" ", $string));
-
-	return $string;
+	$words = preg_split( '#\s+#', trim( strip_tags( $str ) ) );
+	$words = array_filter( $words,
+				create_function( '$v', 'return preg_match( \'#[a-z\p{L}]#i\', $v );' ) );
+	return count( $words );
 }
 
 
@@ -743,6 +726,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.21  2008/12/23 02:23:05  tblue246
+ * Make bpost_count_words() work more accurate. Inaccuracy reported by sam2kb ( http://forums.b2evolution.net/viewtopic.php?t=16596 ).
+ *
  * Revision 1.20  2008/12/22 01:56:54  fplanque
  * minor
  *
