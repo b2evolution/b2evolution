@@ -47,7 +47,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function disp_html_head()
 	{
-		require_css( 'skins_adm/evo/rsc/css/style.css', array('title'=>'Blue') );
+		require_css( 'skins_adm/evo/rsc/css/style.css' );
 
 		parent::disp_html_head();
 	}
@@ -208,6 +208,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.26  2008/12/23 18:59:35  blueyed
+ * Drop CSS title 'Blue', which is not required/used for skins_adm/evo/rsc/css/style.css
+ *
  * Revision 1.25  2008/12/23 18:55:31  blueyed
  * Refactored require_css()/require_js(). This does not duplicate
  * code for detecting filename/URL anymore and makes it easier
