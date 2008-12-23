@@ -250,7 +250,7 @@ register_shutdown_function( 'shutdown' );
 /**
  * @global AbstractSettings
  */
-$global_Cache = & new AbstractSettings( 'T_global__cache', array( 'cach_name' ), 'cach_cache', 1 );
+$global_Cache = & new AbstractSettings( 'T_global__cache', array( 'cach_name' ), 'cach_cache', 0 /* load all */ );
 
 
 
@@ -643,6 +643,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.93  2008/12/23 17:17:25  blueyed
+ * global_Cache: load all entries.. a typical installation (now) has 3 entries in this table and all get queried. So this saves 2 queries.
+ *
  * Revision 1.92  2008/05/11 22:20:46  fplanque
  * minor
  *
