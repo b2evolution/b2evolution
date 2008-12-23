@@ -95,13 +95,13 @@ class AdminUI extends AdminUI_general
 	{
 		global $mode, $rsc_url, $adminskins_path;
 
-		require_css ( 'skins_adm/legacy/rsc/css/variation.css', TRUE, 'Variation' );
-		require_css ( 'skins_adm/legacy/rsc/css/desert.css', TRUE, 'Desert' );
-		require_css ( 'skins_adm/legacy/rsc/css/legacy.css', TRUE, 'Legacy' );
+		require_css ( 'skins_adm/legacy/rsc/css/variation.css', array('title'=>'Variation') );
+		require_css ( 'skins_adm/legacy/rsc/css/desert.css', array('title'=>'Desert') );
+		require_css ( 'skins_adm/legacy/rsc/css/legacy.css', array('title'=>'Legacy') );
 
 		if( is_file( $adminskins_path.'/legacy/rsc/css/custom.css' ) )
 		{
-			require_css ( 'skins_adm/legacy/rsc/css/custom.css', TRUE, 'Custom' );
+			require_css ( 'skins_adm/legacy/rsc/css/custom.css', array('title'=>'Custom') );
 		}
 
 		// Style switcher:
@@ -201,6 +201,21 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.27  2008/12/23 18:55:31  blueyed
+ * Refactored require_css()/require_js(). This does not duplicate
+ * code for detecting filename/URL anymore and makes it easier
+ * to include resource bundle support (as done in whissip branch).
+ *  - Drop relative_to_base param
+ *  - Use include_paths instead (rsc/css and $basepath)
+ *  - Use $link_params for require_css() (since argument list changed
+ *    anyway), but add compatibility layer for 2.x syntax
+ *    (no plugin in evocms-plugins uses old $media or $title)
+ *  - Support absolute filenames, which is convenient from a skin, e.g.
+ *    if you want to include some external JS script
+ *  - Add helper function get_url_filepath_for_rsc_file()
+ *  - Add helper function is_absolute_filename()
+ *  - Adjust calls to require_js()/require_css()
+ *
  * Revision 1.26  2008/01/22 14:31:06  fplanque
  * minor
  *

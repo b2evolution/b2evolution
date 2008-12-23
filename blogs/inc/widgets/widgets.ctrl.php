@@ -363,7 +363,7 @@ if( $display_mode == 'normal' )
 		// fp> where is that used?
 	var enabled_icon_url = "'.get_icon( 'deactivate', 'url' ).'";
 	var disabled_icon_url = "'.get_icon( 'activate', 'url' ).'";
-	
+
 	var b2evo_dispatcher_url = "'.$admin_url.'";' );
 	require_js( '#jqueryUI#' ); // auto requires jQuery
 	require_js( 'communication.js' ); // auto requires jQuery
@@ -453,6 +453,21 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2008/12/23 18:55:31  blueyed
+ * Refactored require_css()/require_js(). This does not duplicate
+ * code for detecting filename/URL anymore and makes it easier
+ * to include resource bundle support (as done in whissip branch).
+ *  - Drop relative_to_base param
+ *  - Use include_paths instead (rsc/css and $basepath)
+ *  - Use $link_params for require_css() (since argument list changed
+ *    anyway), but add compatibility layer for 2.x syntax
+ *    (no plugin in evocms-plugins uses old $media or $title)
+ *  - Support absolute filenames, which is convenient from a skin, e.g.
+ *    if you want to include some external JS script
+ *  - Add helper function get_url_filepath_for_rsc_file()
+ *  - Add helper function is_absolute_filename()
+ *  - Adjust calls to require_js()/require_css()
+ *
  * Revision 1.12  2008/10/05 04:36:50  fplanque
  * notes for Yabba
  *

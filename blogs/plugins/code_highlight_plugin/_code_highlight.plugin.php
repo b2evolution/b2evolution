@@ -462,8 +462,8 @@ class code_highlight_plugin extends Plugin
 		add_css_headline('/* AstonishMe code plugin styles */'
 			.'.amc0,.amc1,.amc2,.amc3,.amc4,.amc5,.amc6,.amc7,.amc8,.amc9 {'
 			.'background:url('.$this->get_plugin_url().'img/numbers.gif) no-repeat; }');
-        
-		require_css($this->get_plugin_url().'amcode.css', /* absolute path for ResourceBundles, evaluates to true in b2evo: */ dirname(__FILE__).'/amcode.css');
+
+		require_css( dirname(__FILE__).'/amcode.css' );
 
 		// TODO: dh> move this to a IE-specific file, e.g. add_css_headline, but which is specific for IE
 		//           Or easier: fix it with a hack in amcode.css itself?!
@@ -630,6 +630,21 @@ class code_highlight_plugin extends Plugin
 
 /**
  * $Log$
+ * Revision 1.16  2008/12/23 18:55:31  blueyed
+ * Refactored require_css()/require_js(). This does not duplicate
+ * code for detecting filename/URL anymore and makes it easier
+ * to include resource bundle support (as done in whissip branch).
+ *  - Drop relative_to_base param
+ *  - Use include_paths instead (rsc/css and $basepath)
+ *  - Use $link_params for require_css() (since argument list changed
+ *    anyway), but add compatibility layer for 2.x syntax
+ *    (no plugin in evocms-plugins uses old $media or $title)
+ *  - Support absolute filenames, which is convenient from a skin, e.g.
+ *    if you want to include some external JS script
+ *  - Add helper function get_url_filepath_for_rsc_file()
+ *  - Add helper function is_absolute_filename()
+ *  - Adjust calls to require_js()/require_css()
+ *
  * Revision 1.15  2008/11/12 14:14:55  blueyed
  * code_highlight_plugin: use add_css_headline/require_css/add_headline for CSS injections.
  *
