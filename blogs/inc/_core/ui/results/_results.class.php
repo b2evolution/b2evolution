@@ -453,7 +453,7 @@ class Results extends Table
 			$this->mergesort( $this->rows, array( &$this, 'callback_group_by_obj_prop' ) );
 		}
 
-		$Debuglog->add( 'rows on page='.$this->result_num_rows, 'results' );
+		// $Debuglog->add( 'rows on page='.$this->result_num_rows, 'results' );
 	}
 
 
@@ -1812,6 +1812,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.20  2008/12/27 21:09:28  fplanque
+ * minor
+ *
  * Revision 1.19  2008/12/10 00:04:31  blueyed
  * Fix whitespace
  *

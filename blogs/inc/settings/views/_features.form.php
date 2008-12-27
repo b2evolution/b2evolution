@@ -202,6 +202,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.10  2008/12/27 21:09:28  fplanque
+ * minor
+ *
  * Revision 1.9  2008/10/06 11:02:27  tblue246
  * Blog by mail now supports POP3 & IMAP, SSL & TLS
  *

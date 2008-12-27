@@ -100,8 +100,8 @@ function init_MainList( $items_nb_limit )
  *
  * @internal Tblue> What is the purpose of $query_only? Querying the DB
  *		but not modifying the URL title makes no sense to me, maybe it
- *		would be better to disable the entire query instead. 
- * 
+ *		would be better to disable the entire query instead.
+ *
  * @param string url title to validate
  * @param string real title to use as a source if $urltitle is empty (encoded in $evo_charset)
  * @param integer ID of post
@@ -266,6 +266,9 @@ function get_postdata($postid)
  */
 function bpost_count_words( $str )
 {
+	// Note: PHP's str_word_count() is not accurate
+	// Inaccuracy reported by sam2kb ( http://forums.b2evolution.net/viewtopic.php?t=16596 ).
+
 	$words = preg_split( '#\s+#', trim( strip_tags( $str ) ) );
 	$words = array_filter( $words,
 				create_function( '$v', 'return preg_match( \'#[a-z\p{L}]#i\', $v );' ) );
@@ -726,6 +729,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.22  2008/12/27 21:09:28  fplanque
+ * minor
+ *
  * Revision 1.21  2008/12/23 02:23:05  tblue246
  * Make bpost_count_words() work more accurate. Inaccuracy reported by sam2kb ( http://forums.b2evolution.net/viewtopic.php?t=16596 ).
  *

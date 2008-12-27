@@ -1541,17 +1541,17 @@ function debug_info( $force = false, $force_clean = false )
 	// clean output:
 	$clean = $is_cli || $force_clean;
 	$printf_format = '| %-45s | %-5s | %-7s | %-5s |';
+	$table_headerlen = 73;
 	/* This calculates the number of dashes to print e. g. on the top and
 	 * bottom of the table and after the header, making the table look
 	 * better (looks like the tables of the mysql command line client).
-	 * Normally, the value won't change, so it's hardcoded below. If you
+	 * Normally, the value won't change, so it's hardcoded above. If you
 	 * change the printf() format above, this might be useful.
 	preg_match_all( '#\d+#', $printf_format, $table_headerlen );
 	$table_headerlen = array_sum( $table_headerlen[0] ) +
 									strlen( preg_replace( '#[^ \|]+#', '',
 												$printf_format ) ) - 2;
 	*/
-	$table_headerlen = 73;
 
 	$ReqHostPathQuery = $ReqHost.$ReqPath.( empty( $_SERVER['QUERY_STRING'] ) ? '' : '?'.$_SERVER['QUERY_STRING'] );
 
@@ -1610,7 +1610,7 @@ function debug_info( $force = false, $force_clean = false )
 					.'<td class="right">'.$percent_l_cat.'%</td>'
 					.'<td class="right">'.$Timer->get_count( $l_cat ).'</td></tr>';
 			}
-			
+
 			if( $l_time < 0.005 )
 			{
 				$table_rows_ignore_perhaps[] = $row;
@@ -1666,14 +1666,14 @@ function debug_info( $force = false, $force_clean = false )
 			if( function_exists( $l_func ) )
 			{
 				$_usage = $l_func();
-				
+
 				if( $_usage > $l_var['high'] )
 				{
 					echo $clean ? '[!!] ' : '<span style="color:red; font-weight:bold">';
 				}
-				
+
 				echo $l_var['display'].': '.bytesreadable( $_usage, ! $clean );
-				
+
 				if( ! $clean && $_usage > $l_var['high'] )
 				{
 					echo '</span>';
@@ -1726,7 +1726,7 @@ function debug_info( $force = false, $force_clean = false )
 					.'<p><a href="'.$ReqHostPathQuery.'#debug_debuglog">See below for the Debuglog from the current request.</a></p>';
 				$log_cats = array_keys($sess_Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
 				$log_head_links = array();
-				
+
 				foreach( $log_cats as $l_cat )
 				{
 					$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_redir_'.($k+1).'_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
@@ -1797,7 +1797,7 @@ function debug_info( $force = false, $force_clean = false )
 		{
 			echo '<pre>';
 		}
-		
+
 		echo T_('DB Username').': '.$db_config['user']."\n".
 			 T_('DB Database').': '.$db_config['name']."\n".
 			 T_('DB Host').': '.$db_config['host']."\n".
@@ -3150,6 +3150,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.56  2008/12/27 21:09:28  fplanque
+ * minor
+ *
  * Revision 1.55  2008/12/17 22:36:08  blueyed
  * Trans fix: do not translate unexpected errors
  *

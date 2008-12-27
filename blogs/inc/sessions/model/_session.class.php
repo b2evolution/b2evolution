@@ -544,6 +544,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.9  2008/12/27 21:09:28  fplanque
+ * minor
+ *
  * Revision 1.8  2008/12/22 01:56:54  fplanque
  * minor
  *
