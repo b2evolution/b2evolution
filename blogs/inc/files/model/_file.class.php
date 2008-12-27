@@ -568,7 +568,9 @@ class File extends DataObject
 			else
 			{ // Private Access: doesn't show the full path
 				$root = $this->_FileRoot->ID;
-				$url = $htsrv_url.'getfile.php'
+				$url = $htsrv_url.'getfile.php/'
+								// This is for clean 'save as':
+								.rawurlencode( $this->_name )
 								// This is for locating the file:
 								.'?root='.$root.'&amp;path='.$this->_rdfp_rel_path;
 			}
@@ -1501,7 +1503,9 @@ class File extends DataObject
 
 		// No thumbnail available (at least publicly), we need to go through getfile.php!
 		$root = $this->_FileRoot->ID;
-		$url = $htsrv_url.'getfile.php'
+		$url = $htsrv_url.'getfile.php/'
+						// This is for clean 'save as':
+						.rawurlencode( $this->_name )
 						// This is for locating the file:
 						.'?root='.$root.'&amp;path='.$this->_rdfp_rel_path.'&amp;size='.$size_name;
 
@@ -1627,17 +1631,14 @@ class File extends DataObject
 	 */
 	function get_af_thumb_path( $size_name, $thumb_mimetype = NULL, $create_evocache_if_needed = false )
 	{
-		if( $this->Filetype )
+		if( empty($thumb_mimetype) )
 		{
-			if( empty($thumb_mimetype) )
-			{
-				$thumb_mimetype = $this->Filetype->mimetype;
-			}
-			elseif( $thumb_mimetype != $this->Filetype->mimetype )
-			{
-				debug_die( 'Not supported. For now, thumbnails have to have same mime type as their parent file.' );
-				// TODO: extract prefered extension of filetypes config
-			}
+			$thumb_mimetype = $this->Filetype->mimetype;
+		}
+		elseif( $thumb_mimetype != $this->Filetype->mimetype )
+		{
+			debug_die( 'Not supported. For now, thumbnails have to have same mime type as their parent file.' );
+			// TODO: extract prefered extension of filetypes config
 		}
 
 		// Get the filename of the thumbnail
@@ -1813,11 +1814,16 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2008/12/27 20:06:27  fplanque
+ * rollback ( changes don't make sense to me )
+ *
  * Revision 1.18  2008/11/03 21:01:56  blueyed
  * get_af_thumb_path(): Fix notice for files without Filetype
+ * fp> How do we generate a thumbnail for a file with no filetype? How do we know what kind of thumbnail to generate?
  *
  * Revision 1.17  2008/10/15 22:57:14  blueyed
  * Drop support for 'clean save as'. It should be done by sending the right headers instead.
+ * fp> Sorry, can't drop that if you don't replace it with alternative.
  *
  * Revision 1.16  2008/10/15 22:55:26  blueyed
  * todo/bug
