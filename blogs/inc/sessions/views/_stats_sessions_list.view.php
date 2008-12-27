@@ -45,14 +45,6 @@ if( !empty( $user ) )
 	$count_sql .= ' LEFT JOIN T_users ON sess_user_ID = user_ID
 		WHERE user_login LIKE "%'.$DB->escape($user).'%"';
 }
-else
-{ // Dummy "where", so we can add "AND.." below
-	$sql .= ' WHERE 1';
-	$count_sql .= ' WHERE 1';
-}
-// Ignore invalidated sessions:
-$sql .= ' AND sess_key IS NOT NULL';
-$count_sql .= ' AND sess_key IS NOT NULL';
 
 $Results = & new Results( $sql, 'sess_', 'D', 20, $count_sql );
 
@@ -116,8 +108,12 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.3  2008/12/27 20:19:30  fplanque
+ * partial rollback ( changes don't make sense to me )
+ *
  * Revision 1.2  2008/11/20 23:11:41  blueyed
  * Session stats: fix SQL for 'Sessions'/user view and ignore invalidated sessions
+ * fp>why ignore invalidated sessions?
  *
  * Revision 1.1  2008/03/22 19:58:18  fplanque
  * missing views
