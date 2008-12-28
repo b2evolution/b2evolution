@@ -2865,8 +2865,8 @@ class Item extends ItemLight
 			$this->set_creator_User( $current_User );
 		}
 
-		// validate url title
-		$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, 0, false, $this->dbprefix, $this->dbIDname, $this->dbtablename) );
+		// validate url title / slug
+		$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $this->dbprefix.'urltitle', $this->dbIDname, $this->dbtablename) );
 
 		$this->update_renderers_from_Plugins();
 
@@ -2910,12 +2910,11 @@ class Item extends ItemLight
 
 		$DB->begin();
 
-		// validate url title
+		// validate url title / slug
 		if( empty($this->urltitle) || isset($this->dbchanges['post_urltitle']) )
 		{ // Url title has changed or is empty
 			// echo 'updating url title';
-			$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID,
-																false, $this->dbprefix, $this->dbIDname, $this->dbtablename ) );
+			$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $this->dbprefix.'urltitle', $this->dbIDname, $this->dbtablename) );
 		}
 
 		$this->update_renderers_from_Plugins();
@@ -3605,6 +3604,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.60  2008/12/28 23:35:51  fplanque
+ * Autogeneration of category/chapter slugs(url names)
+ *
  * Revision 1.59  2008/12/22 01:56:54  fplanque
  * minor
  *

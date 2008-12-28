@@ -90,41 +90,11 @@ class Chapter extends GenericCategory
 		parent::load_from_Request();
 
 		// Check url name
-		if( param_string_not_empty( 'cat_urlname', T_('Please enter an urlname.') ) )
-		{
-			$this->set_from_Request( 'urlname' );
-			if( ! preg_match( '|^[A-Za-z0-9\-]+$|', $this->urlname )
-					|| preg_match( '|^[A-Za-z][0-9]*$|', $this->urlname ) ) // This is to prevent conflict with things such as week number
-			{
-				param_error( 'cat_urlname', T_('The url name is invalid.') );
-			}
-			else
-			{
-    		if( Chapter::urlname_exists( $this->urlname, $this->ID ) )
-				{ // urlname is already in use
-					param_error( 'cat_urlname', T_('This URL name is already in use by another category. Please choose another name.') );
-				}
-			}
-		}
+		param( 'cat_urlname', 'string' );
+		$this->set_from_Request( 'urlname' );
 
 		return ! param_errors_detected();
 	}
-
-
-	/**
-	 * @static
-	 */
-	function urlname_exists( $urlname, $ignore_ID = 0 )
-	{
-		global $DB;
-
-		return $DB->get_var( 'SELECT COUNT(*)
-														 FROM T_categories
-														WHERE cat_urlname = '.$DB->quote($urlname).'
-															AND cat_ID <> '.$ignore_ID
-													);
-	}
-
 
 	function & get_parent_Chapter()
 	{
@@ -281,27 +251,34 @@ class Chapter extends GenericCategory
 
 		$DB->begin();
 
-		if( Chapter::urlname_exists( $this->urlname ) )
-		{	// We gotta find another name:
-			$sql = 'SELECT cat_urlname
-								FROM T_categories
-							 WHERE cat_urlname REGEXP "^'.$this->urlname.'(-[0-9]+)?$"';
-			$highest_number = 0;
-			foreach( $DB->get_results( $sql ) as $row )
-			{
-				if( preg_match( '/-([0-9]+)$/', $row->cat_urlname, $matches ) )
-				{ // This one has a number, we extract it:
-					$existing_number = (integer) $matches[1];
-					if( $existing_number > $highest_number )
-					{ // This is the new high
-						$highest_number = $existing_number;
-					}
-				}
-			}
-			$this->set( 'urlname', $this->urlname.'-'.($highest_number+1) );
-		}
+		// validate url title / slug
+		$this->set( 'urlname', urltitle_validate( $this->urlname, $this->name, $this->ID, false, $this->dbprefix.'urlname', $this->dbIDname, $this->dbtablename) );
 
 		$r = parent::dbinsert();
+
+		$DB->commit();
+
+		return $r;
+	}
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 *
+	 * @return boolean true on success
+	 */
+	function dbupdate()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		// validate url title / slug
+		if( empty($this->urlname) || isset($this->dbchanges['cat_urlname']) )
+		{ // Url title has changed or is empty
+			$this->set( 'urlname', urltitle_validate( $this->urlname, $this->name, $this->ID, false, $this->dbprefix.'urlname', $this->dbIDname, $this->dbtablename) );
+		}
+
+		$r = parent::dbupdate();
 
 		$DB->commit();
 
@@ -312,6 +289,9 @@ class Chapter extends GenericCategory
 
 /*
  * $Log$
+ * Revision 1.9  2008/12/28 23:35:51  fplanque
+ * Autogeneration of category/chapter slugs(url names)
+ *
  * Revision 1.8  2008/01/21 09:35:26  fplanque
  * (c) 2008
  *

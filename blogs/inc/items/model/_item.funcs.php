@@ -93,7 +93,7 @@ function init_MainList( $items_nb_limit )
 
 
 /**
- * Validate URL title
+ * Validate URL title (slug) / Also used for category slugs
  *
  * Using title as a source if url title is empty.
  * We allow up to 200 chars (which is ridiculously long) for WP import compatibility.
@@ -109,16 +109,16 @@ function init_MainList( $items_nb_limit )
  * @param string The prefix of the database column names (e. g. "post_" for post_urltitle)
  * @param string The name of the post ID column
  * @param string The name of the DB table to use
- * @param boolean Strip a possible dash at the end of the URL title which could prevent access to the post.
  * @return string validated url title
  */
 function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false,
-									$dbprefix = 'post_', $dbIDname = 'post_ID',
-									$dbtable = 'T_items__item', $stripdash = true )
+									$dbSlugFieldName = 'post_urltitle', $dbIDname = 'post_ID',
+									$dbtable = 'T_items__item' )
 {
-	global $DB;
+	global $DB, $Messages;
 
 	$urltitle = trim( $urltitle );
+	$orig_title = $urltitle;
 
 	if( empty( $urltitle ) )
 	{
@@ -140,10 +140,8 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	// Normalize to 200 chars + a number
 	preg_match( '/^(.*?)((-|_)+([0-9]+))?$/', $urltitle, $matches );
 	$urlbase = substr( $matches[1], 0, 200 );
-	if ( $stripdash )
-	{	// strip a possible dash at the end of the URL title:
-		$urlbase = rtrim( $urlbase, '-' );
-	}
+	// strip a possible dash at the end of the URL title:
+	$urlbase = rtrim( $urlbase, '-' );
 	$urltitle = $urlbase;
 	if( ! empty( $matches[4] ) )
 	{
@@ -153,9 +151,9 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	// CHECK FOR UNIQUENESS:
 	// Find all occurrences of urltitle-number in the DB:
-	$sql = 'SELECT '.$dbprefix.'urltitle
+	$sql = 'SELECT '.$dbSlugFieldName.'
 					  FROM '.$dbtable.'
-					 WHERE '.$dbprefix."urltitle REGEXP '^".$urlbase."(-[0-9]+)?$'";
+					 WHERE '.$dbSlugFieldName." REGEXP '^".$urlbase."(-[0-9]+)?$'";
 	if( $post_ID )
 	{	// Ignore current post
 		$sql .= ' AND '.$dbIDname.' <> '.$post_ID;
@@ -164,7 +162,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	$highest_number = 0;
 	foreach( $DB->get_results( $sql, ARRAY_A ) as $row )
 	{
-		$existing_urltitle = $row[$dbprefix.'urltitle'];
+		$existing_urltitle = $row[$dbSlugFieldName];
 		// echo "existing = $existing_urltitle <br />";
 		if( $existing_urltitle == $urltitle )
 		{ // We have an exact match, we'll have to change the number.
@@ -187,6 +185,11 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	}
 
 	// echo "using = $urltitle <br />";
+
+	if( !empty($orig_title) && $urltitle != $orig_title )
+	{
+		$Messages->add( sprintf(T_('Warning: In order to avoid a conflict, the URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'error' );
+	}
 
 	return $urltitle;
 }
@@ -729,6 +732,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.23  2008/12/28 23:35:51  fplanque
+ * Autogeneration of category/chapter slugs(url names)
+ *
  * Revision 1.22  2008/12/27 21:09:28  fplanque
  * minor
  *

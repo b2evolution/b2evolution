@@ -69,7 +69,7 @@ $Form->begin_fieldset( T_('Properties') );
 
 	$Form->text_input( $edited_Chapter->dbprefix.'name', $edited_Chapter->name, 40, T_('Name'), '', array( 'required' => true, 'maxlength' => 255 ) );
 
-	$Form->text_input( $edited_Chapter->dbprefix.'urlname', $edited_Chapter->urlname, 40, T_('URL name'), T_('Used for clean URLs. Must be unique.'), array( 'required' => true, 'maxlength' => 255 ) );
+	$Form->text_input( $edited_Chapter->dbprefix.'urlname', $edited_Chapter->urlname, 40, T_('URL "slug"'), T_('Used for clean URLs. Must be unique.'), array( 'required' => true, 'maxlength' => 255 ) );
 
 $Form->end_fieldset();
 
@@ -87,6 +87,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.5  2008/12/28 23:35:51  fplanque
+ * Autogeneration of category/chapter slugs(url names)
+ *
  * Revision 1.4  2008/12/28 22:55:55  fplanque
  * increase blog name max length to 255 chars
  *
