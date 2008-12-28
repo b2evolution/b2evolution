@@ -62,7 +62,7 @@ $Form->begin_fieldset( T_('Properties') );
 	{ // If moving cats between blogs is allowed:
 		$move = ' '.action_icon( T_('Move to a different blog...'), 'file_move', regenerate_url( 'action,cat_ID', 'cat_ID='.$edited_Chapter->ID.'&amp;action=move' ), T_('Move') );
 	}
-	$Form->info( T_('Blog'), $edited_Blog->dget('name').$move );
+	$Form->info( T_('Blog'), $edited_Blog->get_maxlen_name().$move );
 
 	$Form->select_input_options( $edited_Chapter->dbprefix.'parent_ID',
 				$GenericCategoryCache->recurse_select( $edited_Chapter->parent_ID, $subset_ID, true, NULL, 0, array($edited_Chapter->ID) ), T_('Parent category') );
@@ -87,6 +87,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.4  2008/12/28 22:55:55  fplanque
+ * increase blog name max length to 255 chars
+ *
  * Revision 1.3  2008/01/21 09:35:26  fplanque
  * (c) 2008
  *

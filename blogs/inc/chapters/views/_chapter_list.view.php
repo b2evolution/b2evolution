@@ -145,7 +145,7 @@ $callbacks = array(
 
 $Table = & new Table();
 
-$Table->title = T_('Categories for blog:').' '.$Blog->dget('name');
+$Table->title = T_('Categories for blog:').' '.$Blog->get_maxlen_name( 50 );
 
 $Table->global_icon( T_('Create a new category...'), 'new', regenerate_url( 'action,'.$GenericCategoryCache->dbIDname, 'action=new' ), T_('New category').' &raquo;', 3, 4  );
 
@@ -193,6 +193,9 @@ if( ! $Settings->get('allow_moving_chapters') )
 
 /*
  * $Log$
+ * Revision 1.7  2008/12/28 22:55:55  fplanque
+ * increase blog name max length to 255 chars
+ *
  * Revision 1.6  2008/01/21 09:35:26  fplanque
  * (c) 2008
  *

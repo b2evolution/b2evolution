@@ -78,7 +78,7 @@ class coll_title_Widget extends ComponentWidget
 
 		$r = parent::get_param_definitions( $params );
 
-		$r['widget_name']['defaultvalue'] = $Blog->dget('name');
+		$r['widget_name']['defaultvalue'] = $Blog->get_maxlen_name(50);
 
 		return $r;
 
@@ -113,6 +113,9 @@ class coll_title_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.8  2008/12/28 22:55:55  fplanque
+ * increase blog name max length to 255 chars
+ *
  * Revision 1.7  2008/07/07 05:59:25  fplanque
  * minor / doc / rollback of overzealous indetation "fixes"
  *
