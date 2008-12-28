@@ -44,7 +44,7 @@ load_funcs( 'skins/_skin.funcs.php' );
 $Widget = & new Widget();
 $template = $AdminUI->get_template( 'side_item' );
 
-$Widget->title = $Blog->dget( 'name', 'htmlbody' );
+$Widget->title = format_to_output( $Blog->get_maxlen_name( 22 ), 'htmlbody' );
 echo $Widget->replace_vars( $template['block_start'] );
 
 	// CALENDAR:
@@ -270,6 +270,9 @@ echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.11  2008/12/28 22:41:56  fplanque
+ * increase blog name max length to 255 chars
+ *
  * Revision 1.10  2008/01/21 09:35:31  fplanque
  * (c) 2008
  *

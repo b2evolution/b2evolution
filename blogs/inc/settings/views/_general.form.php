@@ -52,8 +52,13 @@ $Form->hidden( 'tab', 'general' );
 $Form->begin_fieldset( T_('Display options') );
 
 $BlogCache = & get_Cache( 'BlogCache' );
-$Form->select_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default blog to display'),
-										T_('This blog will be displayed on index.php.').' <a href="admin.php?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>', true );
+
+	$Form->select_input_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default blog to display'), array(
+			'note' => T_('This blog will be displayed on index.php.').' <a href="admin.php?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
+			'allow_none' => true,
+			'class' => '',
+			'loop_object_method' => 'get_maxlen_name',
+			'onchange' => '' )  );
 
 $Form->end_fieldset();
 
@@ -123,6 +128,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.5  2008/12/28 22:41:56  fplanque
+ * increase blog name max length to 255 chars
+ *
  * Revision 1.4  2008/09/28 08:06:07  fplanque
  * Refactoring / extended page level caching
  *

@@ -1844,6 +1844,17 @@ class Blog extends DataObject
 	}
 
 
+	function get_maxlen_name( $maxlen = 50 )
+	{
+		$text = $this->get_name();
+		if( strlen( $text ) > $maxlen )
+		{
+			$text = substr( $text, 0, $maxlen ).'&hellip;';
+		}
+
+		return $text;
+	}
+
 	/**
 	 * Resolve user ID of owner
 	 *
@@ -1961,6 +1972,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.48  2008/12/28 22:41:56  fplanque
+ * increase blog name max length to 255 chars
+ *
  * Revision 1.47  2008/09/28 08:06:07  fplanque
  * Refactoring / extended page level caching
  *
