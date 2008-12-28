@@ -118,7 +118,7 @@ if( $use_strict )
 
 if( $allow_objects )
 {
-	$E_Flow = '#PCDATA '.$E_block.' '.$E_inline.' '.$E_misc.' object';
+	$E_Flow = '#PCDATA '.$E_block.' '.$E_inline.' '.$E_misc.' object embed';
 }
 else
 {
@@ -427,7 +427,7 @@ if( $allow_objects )
 	(
 	  'object' => 'codebase classid id height width align type data wmode',
 	  'param' => 'name value',
-	  'embed' => 'src type height width wmode quality bgcolor name align allowScriptAccess pluginspage',
+	  'embed' => 'src type height width wmode quality bgcolor name align pluginspage flashvars allowfullscreen allowscriptaccess',
 	);
 }
 
@@ -567,6 +567,9 @@ $comments_allowed_attributes = array
 
 /*
  * $Log$
+ * Revision 1.4  2008/12/28 22:16:30  fplanque
+ * broader support of embedded players
+ *
  * Revision 1.3  2008/02/08 22:24:46  fplanque
  * bugfixes
  *
