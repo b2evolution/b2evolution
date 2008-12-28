@@ -134,7 +134,7 @@ $Messages = & new Log( 'error' );
 load_class('_core/model/_timer.class.php');
 $Timer = & new Timer('total');
 
-$Timer->start( '_main.inc' );
+$Timer->resume( '_main.inc' );
 
 
 /**
@@ -297,7 +297,7 @@ if( empty($generating_static) )
 /**
  * Includes:
  */
-$Timer->start('_main.inc:requires');
+$Timer->resume('_main.inc:requires');
 load_class('_core/model/dataobjects/_dataobjectcache.class.php');
 load_class('generic/model/_genericelement.class.php');
 load_class('generic/model/_genericcache.class.php');
@@ -643,6 +643,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.94  2008/12/28 19:02:19  fplanque
+ * minor
+ *
  * Revision 1.93  2008/12/23 17:17:25  blueyed
  * global_Cache: load all entries.. a typical installation (now) has 3 entries in this table and all get queried. So this saves 2 queries.
  *

@@ -468,7 +468,7 @@ param( 'import_mode', 'string', 'normal' );
 	*************/
 	elseif( $action == 'import' )
 	{
-		$Timer->start('import_main');
+		$Timer->resume('import_main');
 		?>
 		<div class="panelinfo">
 		<h4>Importing from [<?php echo $exportedfile ?>]..<?php if( $simulate ) echo ' (simulating)' ?></h4>
@@ -1417,15 +1417,15 @@ function import_data_extract_authors_cats()
 	global $import_mode;
 
 	$fp = fopen( $exportedfile, 'rb');
-//slamp_080609_begin: to avoid warning when importing file with 0 bytes of data	
+//slamp_080609_begin: to avoid warning when importing file with 0 bytes of data
 //	$buffer = fread($fp, filesize( $exportedfile ));
 	$buffer = '';
 	$length = filesize($exportedfile);
-	if($length) 
+	if($length)
 	{
   		$buffer = fread($fp, $length);
-	}	
-//slamp_080609_end 
+	}
+//slamp_080609_end
 	fclose($fp);
 	if( !preg_match( '/^[-\s]*AUTHOR: /', $buffer ) )
 	{
@@ -1669,6 +1669,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.7  2008/12/28 19:02:19  fplanque
+ * minor
+ *
  * Revision 1.6  2008/06/09 20:11:41  slamp
  * Add a test to avoid warning when importing file with 0 bytes of data
  *

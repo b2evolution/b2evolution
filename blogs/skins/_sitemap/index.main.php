@@ -12,7 +12,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-$Timer->start( 'prepare list' );
+$Timer->resume( 'prepare list' );
 
 // Use a LIGHT Item List:  (Sitemap = 50000 entries max)
 $MainList = & new ItemListLight( $Blog, $timestamp_min, $timestamp_max, 50000 );
@@ -41,7 +41,7 @@ $postIDarray = $MainList->get_page_ID_array();
 
 $Timer->stop( 'prepare list' );
 
-$Timer->start( 'display list' );
+$Timer->resume( 'display list' );
 
 // Note: since URLs are likely to be clean ASCII, $io_charset can probably be faked to UTF-8 here
 

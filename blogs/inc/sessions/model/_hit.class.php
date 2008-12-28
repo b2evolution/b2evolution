@@ -750,7 +750,7 @@ class Hit
 	{
 		global $Timer;
 
-		$Timer->start( 'Hit::get_remote_host' );
+		$Timer->resume( 'Hit::get_remote_host' );
 
 		if( is_null($this->_remoteHost) )
 		{
@@ -859,6 +859,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.14  2008/12/28 19:02:19  fplanque
+ * minor
+ *
  * Revision 1.13  2008/06/30 21:24:20  blueyed
  * - convert_charset(): auto-detect source encoding, if not given (UTF-8, ISO-8859-1, ISO-8859-15)
  * - extract_keyphrase_from_referer: use convert_charset() to convert query string to $evo_charset
