@@ -2194,8 +2194,14 @@ function upgrade_b2evo_tables()
 								CHANGE COLUMN file_root_type file_root_type enum('absolute','user','collection','shared','skins') not null default 'absolute'" );
 		task_end();
 
+		task_begin( 'Upgrading Blogs table... ' );
+		$DB->query( "ALTER TABLE T_blogs CHANGE COLUMN blog_name blog_name varchar(255) NOT NULL default ''" );
+		task_end();
+
 		set_upgrade_checkpoint( '9900' );
 	}
+
+
 
 /* User fields to come...
 
@@ -2401,6 +2407,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.266  2008/12/28 17:35:51  fplanque
+ * increase blog name max length to 255 chars
+ *
  * Revision 1.265  2008/10/06 03:36:48  fplanque
  * Added skype field
  *

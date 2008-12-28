@@ -49,7 +49,7 @@ else
 
 $Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear' ) );
 
-	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Title'), T_('Will be displayed on top of the blog.') );
+	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Title'), T_('Will be displayed on top of the blog.'), 255 );
 
 	$Form->text( 'blog_shortname', $edited_Blog->get( 'shortname', 'formvalue' ), 12, T_('Short name'), T_('Will be used in selection menus and throughout the admin interface.') );
 
@@ -114,6 +114,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.7  2008/12/28 17:35:51  fplanque
+ * increase blog name max length to 255 chars
+ *
  * Revision 1.6  2008/09/24 08:44:11  fplanque
  * Fixed and normalized order params for widgets (Comments not done yet)
  *

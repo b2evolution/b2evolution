@@ -153,7 +153,7 @@ $schema_queries = array(
 		"CREATE TABLE T_blogs (
 			blog_ID              int(11) unsigned NOT NULL auto_increment,
 			blog_shortname       varchar(12) NULL default '',
-			blog_name            varchar(50) NOT NULL default '',
+			blog_name            varchar(255) NOT NULL default '',
 			blog_owner_user_ID   int(11) unsigned NOT NULL default 1,
 			blog_advanced_perms  TINYINT(1) NOT NULL default 0,
 			blog_tagline         varchar(250) NULL default '',
@@ -558,6 +558,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.7  2008/12/28 17:35:51  fplanque
+ * increase blog name max length to 255 chars
+ *
  * Revision 1.6  2008/10/06 01:55:06  fplanque
  * User fields proof of concept.
  * Needs UserFieldDef and UserFieldDefCache + editing of fields.
