@@ -271,6 +271,20 @@ function zeroise($number, $threshold)
 
 
 /**
+ * crop string to maxlen with &hellip; at the end if needed
+ */
+function strmaxlen( $str, $maxlen = 50 )
+{
+	if( strlen( $str ) > $maxlen )
+	{
+		$str = substr( $str, 0, $maxlen-1 ).'&hellip;';
+	}
+
+	return $str;
+}
+
+
+/**
  * Convert all non ASCII chars (except if UTF-8, GB2312 or CP1251) to &#nnnn; unicode references.
  * Also convert entities to &#nnnn; unicode references if output is not HTML (eg XML)
  *
@@ -3150,6 +3164,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.57  2008/12/28 22:48:12  fplanque
+ * increase blog name max length to 255 chars
+ *
  * Revision 1.56  2008/12/27 21:09:28  fplanque
  * minor
  *

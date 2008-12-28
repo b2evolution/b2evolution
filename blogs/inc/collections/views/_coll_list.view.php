@@ -108,7 +108,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Full Name'),
 						'order' => 'blog_name',
-						'td' => '$blog_name$',
+						'td' => '%strmaxlen( #blog_name#, 40 )%',
 					);
 
 $Results->cols[] = array(
@@ -146,7 +146,7 @@ function sort_static_filename_callback( & $a, & $b, $desc )
 {
 	$a_static = $a->get_setting( 'static_file' );
 	$b_static = $b->get_setting( 'static_file' );
-	
+
 	if ( $desc == 'ASC' )
 	{
 		return strnatcmp( $a_static, $b_static );
@@ -215,6 +215,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.6  2008/12/28 22:48:12  fplanque
+ * increase blog name max length to 255 chars
+ *
  * Revision 1.5  2008/12/05 23:57:25  tblue246
  * Results class: Added support for callback sorting when a LIMIT is set.
  *
