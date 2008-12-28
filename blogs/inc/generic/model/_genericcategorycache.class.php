@@ -136,6 +136,9 @@ class GenericCategoryCache extends GenericCache
 	 */
 	function reveal_children( $subset_ID = NULL )
 	{
+		global $Debuglog;
+		global $Timer;
+
 		if( $this->revealed_all_children )
 		{	// ALL Children have already been revealed: (can happen even if we require a subset *now*)
 			return;
@@ -144,6 +147,8 @@ class GenericCategoryCache extends GenericCache
 
 		if( empty($this->subset_property) )
 		{	// We are not handling subsets
+
+			echo 'Revealing all children -- this is not yet handling all edge cases that the subset version can handle';
 
 			// Make sure everything has been loaded:
     	$this->load_all();
@@ -193,12 +198,24 @@ class GenericCategoryCache extends GenericCache
 					/* RETURN */
 				}
 
+				$Timer->resume('reveal_children');
+
+				$Debuglog->add( 'Revealing subset of children', 'CategoryCache' );
+
 				// Make sure the requested subset has been loaded:
     		$this->load_subset($subset_ID);
 
 				// Reveal children:
 				if( !empty( $this->subset_cache[$subset_ID] ) )
-				{	// There are loaded categories, so loop on all loaded categories to set their children list if it has:
+				{	// There are loaded categories
+
+					// Now check that each category has a path to the root:
+					foreach( $this->subset_cache[$subset_ID] as $cat_ID => $dummy )	// "as" would give a freakin copy of the object :(((
+					{
+						$this->check_path_to_root( $subset_ID, $cat_ID );
+					}
+
+					// loop on all loaded categories to set their children list if it has some:
 					foreach( $this->subset_cache[$subset_ID] as $cat_ID => $dummy )	// "as" would give a freakin copy of the object :(((
 					{
 						$GenericCategory = & $this->subset_cache[$subset_ID][$cat_ID];
@@ -206,32 +223,67 @@ class GenericCategoryCache extends GenericCache
 						// echo $GenericCategory->name;
 						if( ! is_null( $GenericCategory->parent_ID ) )
 						{	// This category has a parent, so add it to its parent children list:
-							// echo ' parent='.$GenericCategory->parent_ID;
-							if( ! isset($this->cache[$GenericCategory->parent_ID] ) )
-							{
-								global $Debuglog;
-								$Debuglog->add( 'Detected <strong>orphan cat</strong> with ID='.$GenericCategory->ID.' and non existent parent ID='.$GenericCategory->parent_ID );
-							}
-							else
-							{
-								// echo ' add child';
-								$this->cache[$GenericCategory->parent_ID]->add_children( $this->cache[$cat_ID] );
-							}
+							$Debuglog->add( 'adding child with ID='.$cat_ID.' to parent ID='.$GenericCategory->parent_ID, 'CategoryCache' );
+							$this->cache[$GenericCategory->parent_ID]->add_children( $this->cache[$cat_ID] );
 						}
 						else
 						{	// This category has no parent, so add it to the parent categories list
-							$this->root_cats[] = & $this->cache[$cat_ID];
-							$this->subset_root_cats[$this->cache[$cat_ID]->{$this->subset_property}][] = & $this->cache[$cat_ID];
+							$Debuglog->add( 'adding parent with ID='.$cat_ID, 'CategoryCache' );
+							$this->root_cats[] = & $GenericCategory; // $this->cache[$cat_ID];
+							$this->subset_root_cats[$this->cache[$cat_ID]->{$this->subset_property}][] = & $GenericCategory; // $this->cache[$cat_ID];
 						}
 					}
+
+					$Timer->pause('reveal_children');
+
 				}
 
 				// Children have been revealed.
 				$this->revealed_subsets[$subset_ID] = true;
 			}
 		}
+
 	}
 
+
+	/**
+	 * Support function for reveal_children()
+	 *
+	 * @param integer
+	 * @param integer
+	 * @return true if root parent
+	 */
+	function check_path_to_root( $subset_ID, $cat_ID, $path_array = array() )
+	{
+		global $Debuglog;
+		$padding = str_pad('',count($path_array),'*');
+		$Debuglog->add( $padding.'Checking path to root for cat ID='.$cat_ID.' with path:'.implode(',',$path_array), 'CategoryCache' );
+		$GenericCategory = & $this->subset_cache[$subset_ID][$cat_ID];
+		if( is_null( $GenericCategory->parent_ID ) )
+		{	// Found root parent
+			$Debuglog->add( $padding.'*OK', 'CategoryCache' );
+			return true;
+		}
+		// This is not the last parent...
+		// Record path...
+		$path_array[] = $GenericCategory->ID;
+
+		if( in_array( $GenericCategory->parent_ID, $path_array ) )
+		{	// We are about to enter an infinite loop
+			$Debuglog->add( $padding.'*LOOP! -> assign to root', 'CategoryCache' );
+			$GenericCategory->parent_ID = NULL;
+			return false;
+		}
+		elseif( ! isset($this->cache[$GenericCategory->parent_ID] ) )
+		{
+			$Debuglog->add( $padding.'*Missing parent ID('.$GenericCategory->parent_ID.')! -> assign to root', 'CategoryCache' );
+			$GenericCategory->parent_ID = NULL;
+			return false;
+		}
+
+		// Recurse!
+		return $this->check_path_to_root( $subset_ID, $GenericCategory->parent_ID, $path_array );
+	}
 
 	/**
 	 * Return recursive display of loaded categories
@@ -329,6 +381,8 @@ class GenericCategoryCache extends GenericCache
 	function recurse_select( $selected = NULL, $subset_ID = NULL, $include_root = false, $Cat_array = NULL,
 							$level = 0, $exclude_array = array() )
 	{
+		// pre_dump( $exclude_array );
+
 		// Make sure children have been revealed for specific subset:
 		$this->reveal_children( $subset_ID );
 
@@ -365,7 +419,7 @@ class GenericCategoryCache extends GenericCache
 
 			if( !empty( $GenericCategory->children ) )
 			{	// Add children categories:
-				$r .= $this->recurse_select( $selected, $subset_ID, false, $GenericCategory->children, $level+1 );
+				$r .= $this->recurse_select( $selected, $subset_ID, false, $GenericCategory->children, $level+1, $exclude_array );
 			}
 		}
 
@@ -376,6 +430,9 @@ class GenericCategoryCache extends GenericCache
 
 /*
  * $Log$
+ * Revision 1.5  2008/12/28 19:00:14  fplanque
+ * Fixed multiple category parent/child recursion issues. It should no longer be possible to "lose" categories by creating loops.
+ *
  * Revision 1.4  2008/01/21 09:35:30  fplanque
  * (c) 2008
  *

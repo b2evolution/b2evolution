@@ -215,6 +215,8 @@ class ChapterCache extends GenericCategoryCache
 
 
 	/**
+	 * Move a chapter and its descendants to a different collection
+	 *
 	 * @param integer
 	 * @param integer
 	 * @param integer
@@ -264,7 +266,7 @@ class ChapterCache extends GenericCategoryCache
 
 
 	/**
-	 * Support function
+	 * Support function for move_Chapter_subtree
 	 *
 	 * @param Chapter
 	 * @param array
@@ -298,6 +300,9 @@ class ChapterCache extends GenericCategoryCache
 
 /*
  * $Log$
+ * Revision 1.4  2008/12/28 19:00:14  fplanque
+ * Fixed multiple category parent/child recursion issues. It should no longer be possible to "lose" categories by creating loops.
+ *
  * Revision 1.3  2008/09/27 07:54:33  fplanque
  * minor
  *
