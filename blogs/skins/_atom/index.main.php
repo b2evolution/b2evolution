@@ -87,6 +87,20 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			<name><?php $Item->creator_User->preferred_name( 'xml' ) ?></name>
 			<?php $Item->creator_User->url( '<uri>', "</uri>\n", 'xml' ) ?>
 		</author>
+		<?php
+		$Chapters = $Item->get_Chapters();
+		foreach ($Chapters as $Chapter)
+		{
+			// walter> if adding categories in the feed for all categories is expensive,
+			// we can add it just for the main category
+			//  $Chapter = $Item->get_main_Chapter();
+			//  $cat_name = $Chapter->dget( 'name' );
+			$cat_name = $Chapter->dget( 'name' );
+		?>
+		<category term="<?php echo($cat_name)?>"/>
+		<?php
+		}
+		?>
 		<id><?php $Item->permanent_url( 'single' ) ?></id>
 		<?php
 			$Item->issue_date( array(
