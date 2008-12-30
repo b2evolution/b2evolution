@@ -95,13 +95,13 @@ class AdminUI extends AdminUI_general
 	{
 		global $mode, $rsc_url, $adminskins_path;
 
-		require_css ( 'skins_adm/legacy/rsc/css/variation.css', array('title'=>'Variation') );
-		require_css ( 'skins_adm/legacy/rsc/css/desert.css', array('title'=>'Desert') );
-		require_css ( 'skins_adm/legacy/rsc/css/legacy.css', array('title'=>'Legacy') );
+		require_css ( 'skins_adm/legacy/rsc/css/variation.css', true, 'Variation' );
+		require_css ( 'skins_adm/legacy/rsc/css/desert.css', true, 'Desert' );
+		require_css ( 'skins_adm/legacy/rsc/css/legacy.css', true, 'Legacy' );
 
 		if( is_file( $adminskins_path.'/legacy/rsc/css/custom.css' ) )
 		{
-			require_css ( 'skins_adm/legacy/rsc/css/custom.css', array('title'=>'Custom') );
+			require_css ( 'skins_adm/legacy/rsc/css/custom.css', true, 'Custom' );
 		}
 
 		// Style switcher:
@@ -201,20 +201,12 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
- * Revision 1.27  2008/12/23 18:55:31  blueyed
- * Refactored require_css()/require_js(). This does not duplicate
- * code for detecting filename/URL anymore and makes it easier
- * to include resource bundle support (as done in whissip branch).
- *  - Drop relative_to_base param
- *  - Use include_paths instead (rsc/css and $basepath)
- *  - Use $link_params for require_css() (since argument list changed
- *    anyway), but add compatibility layer for 2.x syntax
- *    (no plugin in evocms-plugins uses old $media or $title)
- *  - Support absolute filenames, which is convenient from a skin, e.g.
- *    if you want to include some external JS script
- *  - Add helper function get_url_filepath_for_rsc_file()
- *  - Add helper function is_absolute_filename()
- *  - Adjust calls to require_js()/require_css()
+ * Revision 1.28  2008/12/30 23:00:41  fplanque
+ * Major waste of time rolling back broken black magic! :(
+ * 1) It was breaking the backoffice as soon as $admin_url was not a direct child of $baseurl.
+ * 2) relying on dynamic argument decoding for backward comaptibility is totally unmaintainable and unreliable
+ * 3) function names with () in log break searches big time
+ * 4) complexity with no purpose (at least as it was)
  *
  * Revision 1.26  2008/01/22 14:31:06  fplanque
  * minor

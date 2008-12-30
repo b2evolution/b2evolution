@@ -25,8 +25,8 @@ skin_init( $disp );
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 // Initializations:
-require_css( 'rsc/nifty_corners.css', array('title'=>'Nifty Corners') );
-require_css( 'rsc/nifty_print.css', array('title'=>'Print', 'media'=>'print') );
+require_css( 'rsc/nifty_corners.css', true, 'Nifty Corners' );
+require_css( 'rsc/nifty_print.css', true, 'Print', 'print' );
 require_js( 'rsc/nifty_corners.js', true );
 $custom_js = <<<HEREDOC
 	<script type="text/javascript">

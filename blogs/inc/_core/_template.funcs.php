@@ -425,22 +425,21 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 
 
 /**
- * Require/Include a given JavaScript file.
+ * Memorize that a specific javascript file will be required by the current page.
+ * All requested files will be included in the page head only once (when headlines is called)
  *
- * This gets added to the HTML headlines and multiple includes
- * are detected.
+ * Accepts absolute urls, filenames relative to the rsc/js directory and certain aliases, like 'jquery' and 'jquery_debug'
+ * If 'jquery' is used and $debug is set to true, the 'jquery_debug' is automatically swapped in.
+ * Any javascript added to the page is also added to the $required_js array, which is then checked to prevent adding the same code twice
  *
- * Accepts aliases (e.g. 'jquery'), absolute filenames, absolute
- * urls, filenames relative to rsc/js or {@link $basepath}.
- *
- * If 'jquery' is used and $debug is set to true, the 'jquery_debug'
- * is automatically swapped in.
- *
- * @uses get_url_filepath_for_rsc_file()
- * @param string URL or filename/path (can be absolute, relative to rsc/js or basepath)
+ * @todo dh>merge with require_css()
+ * @param string alias, url or filename (relative to rsc/js) for javascript file
+ * @param boolean Is the file's path relative to the base path/url?
+ *                Use false if file is in $rsc_url/js/
  */
-function require_js( $js_file )
+function require_js( $js_file, $relative_to_base = false )
 {
+	global $rsc_url, $debug;
 	static $required_js;
 
 	$js_aliases = array(
@@ -460,15 +459,27 @@ function require_js( $js_file )
 		require_js( '#jquery#' );
 	}
 
-	// Alias handling:
-	if( ! empty( $js_aliases[$js_file]) )
+	// First get the real filename or url
+	$absolute = FALSE;
+	if( preg_match('~^https?://~', $js_file ) )
+	{ // It's an absolute url
+		$js_url = $js_file;
+		$absolute = TRUE;
+	}
+	elseif( !empty( $js_aliases[$js_file]) )
 	{ // It's an alias
-		global $debug;
-		if ( $debug && $js_file == '#jquery#' ) $js_file = '#jquery_debug#';
+		if ( $js_file == '#jquery#' && $debug ) $js_file = '#jquery_debug#';
 		$js_file = $js_aliases[$js_file];
 	}
 
-	$js_url = array_shift(get_url_filepath_for_rsc_file($js_file, 'js'));
+	if( $relative_to_base || $absolute )
+	{
+		$js_url = $js_file;
+	}
+	else
+	{
+		$js_url = $rsc_url.'js/'.$js_file;
+	}
 
 	// Add to headlines, if not done already:
 	if( empty( $required_js ) || ! in_array( strtolower($js_url), $required_js ) )
@@ -480,124 +491,54 @@ function require_js( $js_file )
 
 
 /**
- * Require/Include a given CSS file.
+ * Memorize that a specific css that file will be required by the current page.
+ * All requested files will be included in the page head only once (when headlines is called)
  *
- * This gets added to the HTML headlines and multiple includes
- * are detected.
+ * Accepts absolute urls, filenames relative to the rsc/css directory.
+ * Set $relative_to_base to TRUE to prevent this function from adding on the rsc_path
  *
- * Accepts absolute filename, absolute urls, filenames relative
- * to rsc/js or {@link $basepath}.
- *
- * @uses get_url_filepath_for_rsc_file()
- * @param string URL or filename/path (can be absolute, relative to rsc/js or basepath)
- * @param array Link params (like "title" or "media")
+ * @todo dh>merge with require_js()
+ * @param string alias, url or filename (relative to rsc/css) for CSS file
+ * @param boolean|string Is the file's path relative to the base path/url?
+ *                Use true to not add any prefix ("$rsc_url/css/").
+ * @param string title.  The title for the link tag
+ * @param string media.  ie, 'print'
  */
-function require_css( $css_file, $link_params = array() )
+function require_css( $css_file, $relative_to_base = false, $title = NULL, $media = NULL )
 {
+	global $rsc_url, $debug;
 	static $required_css;
 
-	if( is_bool($link_params) )
-	{ // compatibility for b2evo 2.x: translate to $link_params
-		global $Debuglog;
-		$func_args = func_get_args();
-		$link_params = array();
-		if( isset($func_args[2]) )
-		{
-			$link_params['title'] = $func_args[2];
-		}
-		if( isset($func_args[3]) )
-		{
-			$link_params['media'] = $func_args[3];
-		}
-		$Debuglog->add('require_css() called in a deprecated way (args: '.var_export($func_args, true).'). Please adjust.'
-			."\n".debug_get_backtrace(), 'deprecated');
+	// First get the real filename or url
+	$absolute = FALSE;
+	if( preg_match('~^https?://~', $css_file ) )
+	{ // It's an absolute url
+		$css_url = $css_file;
+		$absolute = TRUE;
 	}
 
-	$css_url = array_shift(get_url_filepath_for_rsc_file($css_file, 'css'));
+	if( $relative_to_base || $absolute )
+	{
+		$css_url = $css_file;
+	}
+	else
+	{
+		$css_url = $rsc_url . 'css/' . $css_file;
+	}
 
 	// Add to headlines, if not done already:
 	if( empty( $required_css ) || ! in_array( strtolower($css_url), $required_css ) )
 	{
 		$required_css[] = strtolower($css_url);
 
-		$headline = '<link rel="stylesheet"';
-		foreach( $link_params as $k => $v )
-		{
-			$headline .= ' '.htmlspecialchars($k).'="'.htmlspecialchars($v).'"';
-		}
-		$headline .= ' type="text/css" href="'.$css_url.'" />';
-		add_headline( $headline );
-	}
-}
-
-
-/**
- * Helper function for {@link require_css()} and {@link require_js()}.
- * Please use those functions instead.
- *
- * The filename gets checked in this order:
- *  - absolute URL (will return false for $filepath)
- *  - absolute filename (must be below $basepath and accessible
- *                       through $baseurl)
- *  - $rsc_path/$rsc_type/ (e.g. 'rsc/js/')
- *  - $basepath
- *
- * This method returns both the absolute filepath and URL, so that
- * the caller can easily bundle files into a single resourcebundle
- * (used in whissip branch and may get adopted later).
- *
- * @param string Filename / Filepath
- * @param string Resource type ("css", "js")
- * @return array ($url, $filepath)
- *         Returns list of URL and absolute filepath.
- *         The URL is made relative to {@link $ReqHost}.
- */
-function get_url_filepath_for_rsc_file($rsc_file, $rsc_type)
-{
-	global $rsc_path, $rsc_url, $basepath, $baseurl, $ReqHost;
-
-	if( preg_match('~^https?://~', $rsc_file ) )
-	{ // It's an absolute url
-		$url = $rsc_file;
-		$filepath = false;
-	}
-	elseif( is_absolute_filename($rsc_file) )
-	{
-		if( substr($rsc_file, 0, strlen($basepath)) == $basepath )
-		{
-			$url = $baseurl.substr($rsc_file, strlen($basepath));
-		}
-		else
-		{ // Path not below $basepath:
-			debug_die('get_url_for_rsc_file: Passed absolute filename, but it is not below $basepath ('.htmlspecialchars($rsc_file).').');
-		}
-		$filepath = $rsc_file;
-	}
-	else
-	{
-		$include_paths = array(
-			$rsc_path.$rsc_type.'/' => $rsc_url.$rsc_type.'/',
-			$basepath => $baseurl );
-
-		foreach( $include_paths as $include_path => $include_url )
-		{
-			$filepath = $include_path.$rsc_file;
-			if( file_exists($filepath) )
-			{
-				$url = $include_url.$rsc_file;
-				break;
-			}
-		}
-
-		if( ! isset($url) )
-		{
-			debug_die('get_url_for_rsc_file: No URL for $rsc_file found ('.htmlspecialchars($rsc_file).')');
-		}
+		$start_link_tag = '<link rel="stylesheet"';
+		if ( !empty( $title ) ) $start_link_tag .= ' title="' . $title . '"';
+		if ( !empty( $media ) ) $start_link_tag .= ' media="' . $media . '"';
+		$start_link_tag .= ' type="text/css" href="';
+		$end_link_tag = '" />';
+		add_headline( $start_link_tag . $css_url . $end_link_tag );
 	}
 
-	$url = url_rel_to_same_host($url, $ReqHost);
-
-	return array($url, $filepath);
 }
 
 
@@ -913,20 +854,12 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
- * Revision 1.45  2008/12/23 18:55:31  blueyed
- * Refactored require_css()/require_js(). This does not duplicate
- * code for detecting filename/URL anymore and makes it easier
- * to include resource bundle support (as done in whissip branch).
- *  - Drop relative_to_base param
- *  - Use include_paths instead (rsc/css and $basepath)
- *  - Use $link_params for require_css() (since argument list changed
- *    anyway), but add compatibility layer for 2.x syntax
- *    (no plugin in evocms-plugins uses old $media or $title)
- *  - Support absolute filenames, which is convenient from a skin, e.g.
- *    if you want to include some external JS script
- *  - Add helper function get_url_filepath_for_rsc_file()
- *  - Add helper function is_absolute_filename()
- *  - Adjust calls to require_js()/require_css()
+ * Revision 1.46  2008/12/30 23:00:41  fplanque
+ * Major waste of time rolling back broken black magic! :(
+ * 1) It was breaking the backoffice as soon as $admin_url was not a direct child of $baseurl.
+ * 2) relying on dynamic argument decoding for backward comaptibility is totally unmaintainable and unreliable
+ * 3) function names with () in log break searches big time
+ * 4) complexity with no purpose (at least as it was)
  *
  * Revision 1.44  2008/11/12 13:59:19  blueyed
  * Fix add_css_headline(): remove unnecessary comment
