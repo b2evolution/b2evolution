@@ -43,8 +43,10 @@ require_once $inc_path . '_main.inc.php';
 load_class('items/model/_itemlist.class.php');
 load_funcs('files/model/_file.funcs.php');
 
-/**
+/*
  * needed by the mime_parser_class
+ * TODO: dh> Please move this to inc/_ext and then use
+ *           load_funcs/load_class.
  */
 require_once( 'rfc822_addresses.php' );
 require_once( 'mime_parser.php' );
@@ -709,6 +711,9 @@ if ( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.30  2008/12/31 15:21:24  blueyed
+ * TODO: please move ext. libs
+ *
  * Revision 1.29  2008/12/18 01:04:17  blueyed
  * getmail.php: drop $newline param for echo_message, which was true always. Small translation fix. Whitespace fixes.
  *
