@@ -19,14 +19,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // EXTERNAL FEED PROVIDER?
-$rss2_redirect = $Blog->get_setting('rss2_redirect');
-if (!empty($rss2_redirect))
+$rss2_redirect = $Blog->get_setting( 'rss2_redirect' );
+if ( ! empty( $rss2_redirect ) && $redir == 'yes' )
 {
-	if( $redir == 'yes' )
-	{
-		header_redirect( $rss2_redirect, 301 );
-		exit(0);
-	}
+	header_redirect( $rss2_redirect, 301 );
+	exit( 0 );
 }
 
 

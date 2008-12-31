@@ -16,14 +16,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // EXTERNAL FEED PROVIDER?
-$atom_redirect = $Blog->get_setting('atom_redirect');
-if (!empty($atom_redirect))
+$atom_redirect = $Blog->get_setting( 'atom_redirect' );
+if ( ! empty( $atom_redirect ) && $redir == 'yes' )
 {
-	if( $redir == 'yes' )
-	{
-		header_redirect( $atom_redirect, 301 );
-		exit(0);
-	}
+	header_redirect( $atom_redirect, 301 );
+	exit( 0 );
 }
 
 
@@ -89,15 +86,15 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		</author>
 		<?php
 		$Chapters = $Item->get_Chapters();
-		foreach ($Chapters as $Chapter)
+		foreach ( $Chapters as $Chapter )
 		{
 			// walter> if adding categories in the feed for all categories is expensive,
 			// we can add it just for the main category
 			//  $Chapter = $Item->get_main_Chapter();
-			//  $cat_name = $Chapter->dget( 'name' );
-			$cat_name = $Chapter->dget( 'name' );
+			//  $cat_name = $Chapter->dget( 'name', 'xmlattr' );
+			$cat_name = $Chapter->dget( 'name', 'xmlattr' );
 		?>
-		<category term="<?php echo($cat_name)?>"/>
+		<category term="<?php echo $cat_name; ?>" />
 		<?php
 		}
 		?>
