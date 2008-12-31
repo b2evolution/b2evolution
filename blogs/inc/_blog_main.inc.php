@@ -254,7 +254,7 @@ if( $resolve_extra_path )
 						}
 					}
 				}
-				elseif( preg_match( '|^[A-Za-z0-9\-]+$|', $last_part ) )
+				elseif( preg_match( '|^[A-Za-z0-9\-_]+$|', $last_part ) )	// UNDERSCORES for catching OLD URLS!!!
 				{	// We are pointing to a chapter/category:
 					$ChapterCache = & get_Cache( 'ChapterCache' );
 					/**
@@ -594,6 +594,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.109  2008/12/31 00:25:26  fplanque
+ * bugfix
+ *
  * Revision 1.108  2008/12/20 22:36:33  blueyed
  * Add is_same_url() to compare URLs without taking case of urlencoded parts into account. This is required to prevent infinite redirects in the handling of canonical URLs.
  *
