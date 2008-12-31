@@ -38,18 +38,12 @@
  * load b2evolution configuration
  */
 require_once dirname( __FILE__ ) . '/../conf/_config.php';
-
 require_once $inc_path . '_main.inc.php';
+
 load_class('items/model/_itemlist.class.php');
 load_funcs('files/model/_file.funcs.php');
-
-/*
- * needed by the mime_parser_class
- * TODO: dh> Please move this to inc/_ext and then use
- *           load_funcs/load_class.
- */
-require_once( 'rfc822_addresses.php' );
-require_once( 'mime_parser.php' );
+load_class( '_ext/mime_parser/rfc822_addresses.php' );
+load_class( '_ext/mime_parser/mime_parser.php' );
 
 if ( !$Settings -> get( 'eblog_enabled' ) )
 {
@@ -711,6 +705,9 @@ if ( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.31  2008/12/31 16:04:04  tblue246
+ * Moving external classes needed by the blog by mail feature to inc/_ext.
+ *
  * Revision 1.30  2008/12/31 15:21:24  blueyed
  * TODO: please move ext. libs
  *
