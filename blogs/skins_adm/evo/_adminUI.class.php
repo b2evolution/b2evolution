@@ -47,7 +47,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function disp_html_head()
 	{
-		require_css( 'skins_adm/evo/rsc/css/style.css', true, 'Blue' );
+		require_css( 'skins_adm/evo/rsc/css/style.css' );
 
 		parent::disp_html_head();
 	}
@@ -208,6 +208,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.28  2009/01/01 02:18:25  blueyed
+ * RECOMMIT (1.26): Drop CSS title 'Blue', which is not required/used for skins_adm/evo/rsc/css/style.css
+ *
  * Revision 1.27  2008/12/30 23:00:41  fplanque
  * Major waste of time rolling back broken black magic! :(
  * 1) It was breaking the backoffice as soon as $admin_url was not a direct child of $baseurl.
