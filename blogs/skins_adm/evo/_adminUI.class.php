@@ -47,7 +47,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function disp_html_head()
 	{
-		require_css( 'skins_adm/evo/rsc/css/style.css' );
+		require_css( 'skins_adm/evo/rsc/css/style.css', true );
 
 		parent::disp_html_head();
 	}
@@ -208,6 +208,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.29  2009/01/01 02:19:26  blueyed
+ * fix RECOMMIT
+ *
  * Revision 1.28  2009/01/01 02:18:25  blueyed
  * RECOMMIT (1.26): Drop CSS title 'Blue', which is not required/used for skins_adm/evo/rsc/css/style.css
  *
