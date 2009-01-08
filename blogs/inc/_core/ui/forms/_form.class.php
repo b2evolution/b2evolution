@@ -140,7 +140,7 @@ class Form extends Widget
 	 * @param string the action destination of the form (NULL for pagenow)
 	 * @param string the name of the form (will be used as an ID)
 	 * @param string the action to execute when the form is submitted
-	 * @param string the method used to send data
+	 * @param string the method used to send data ("post" (Default), "get")
 	 * @param string the form layout : 'fieldset', 'table' or '' (NULL means: if there is an {@link $AdminUI} object get it from there, otherwise use 'fieldset')
 	 */
 	function Form( $form_action = NULL, $form_name = '', $form_method = 'post', $layout = NULL, $enctype = '' )
@@ -193,6 +193,21 @@ class Form extends Widget
 		$this->saved_layouts = array($layout);
 		$this->saved_templates = array($template);
 		$this->switch_layout( NULL );	// "restore" saved layout.
+
+
+		// Add any GET params from $form_action as hidden inputs.
+		// This is required for GET method at least, and may make
+		// sense for POST, too.
+		if( $form_method == 'get' && strpos($form_action, '?') )
+		{
+			$query_str = substr($form_action, strpos($form_action, '?')+1);
+			$query_args = explode('&', $query_str);
+			foreach( $query_args as $query_arg )
+			{
+				list($field_name, $field_value) = explode('=', $query_arg, 2);
+				$this->hidden($field_name, $field_value);
+			}
+		}
 	}
 
 
@@ -2830,6 +2845,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.29  2009/01/08 16:20:57  blueyed
+ * Form class: if $form_action contains GET params, add those as hidden inputs for $form_action==get (since browsers discard them otherwise).
+ *
  * Revision 1.28  2008/09/07 07:56:37  fplanque
  * Fixed select box warning
  *
