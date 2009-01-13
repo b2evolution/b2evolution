@@ -197,7 +197,8 @@ class Form extends Widget
 
 		// Add any GET params from $form_action as hidden inputs.
 		// This is required for GET method at least, and may make
-		// sense for POST, too.
+		// sense for POST, too. fp> I think it does.
+		// fp> TODO: this should probably remove params from $form_action
 		if( $form_method == 'get' && strpos($form_action, '?') )
 		{
 			$query_str = substr($form_action, strpos($form_action, '?')+1);
@@ -2845,6 +2846,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.30  2009/01/13 22:51:28  fplanque
+ * rollback / normalized / MFB
+ *
  * Revision 1.29  2009/01/08 16:20:57  blueyed
  * Form class: if $form_action contains GET params, add those as hidden inputs for $form_action==get (since browsers discard them otherwise).
  *

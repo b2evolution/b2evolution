@@ -130,6 +130,9 @@ function fit_into_constraint( $src_width, $src_height, $max_width, $max_height )
  */
 function load_image( $path, $mimetype )
 {
+	// yabs> GD library uses shedloads of memory
+	// fp> 256M is way too high to sneak this in here. There should be some checks in the systems page to warn against low memory conditions. Also i'm not sure it makes sense to bump memory just for images. If you allow memory you might as well allow it for anything. Anyways, this is too much to be snuk in.
+	// @ini_set('memory_limit', '256M'); // artificially inflate memory if we can
 	$err = NULL;
 	$imh = NULL;
 
@@ -287,6 +290,9 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.5  2009/01/13 22:51:28  fplanque
+ * rollback / normalized / MFB
+ *
  * Revision 1.4  2008/09/24 08:35:11  fplanque
  * Support of "cropped" thumbnails (the image will always fill the whole thumbnail area)
  * Thumbnail sizes can be configured in /conf/_advanced.php

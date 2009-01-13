@@ -1710,10 +1710,10 @@ function upgrade_b2evo_tables()
 			ALTER TABLE T_categories
 				ADD COLUMN cat_urlname VARCHAR(255) NOT NULL' );
 
-		// TODO: dh> "cID" is not that readable, is it? Should use a function instead. Also use it for cafelog upgrade then.
+		// TODO: dh> "catID" is not that readable, is it? Should use a function instead. Also use it for cafelog upgrade then.
 		$DB->query( '
       UPDATE T_categories
-         SET cat_urlname = CONCAT( "c" , cat_ID )' );
+						SET cat_urlname = CONCAT( "cat" , cat_ID )' ); // if we use c## then you can't edit current categories ;)
 		$DB->query( '
 			ALTER TABLE T_categories
 				ADD UNIQUE cat_urlname ( cat_urlname )' );
@@ -2407,6 +2407,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.267  2009/01/13 22:51:29  fplanque
+ * rollback / normalized / MFB
+ *
  * Revision 1.266  2008/12/28 17:35:51  fplanque
  * increase blog name max length to 255 chars
  *

@@ -63,7 +63,7 @@ $FileRootCache = & get_Cache( 'FileRootCache' );
 $FileRoot = & $FileRootCache->get_by_ID( $root );
 
 // Create file object
-$selected_File = & new File( $FileRoot->type , $FileRoot->in_type_ID, $path );
+$selected_File = & new File( $FileRoot->type , $FileRoot->in_type_ID, $path, true );
 
 header_content_type( 'text/html' );
 ?>
@@ -242,6 +242,9 @@ switch( $viewtype )
 <?php
 /*
  * $Log$
+ * Revision 1.22  2009/01/13 22:51:28  fplanque
+ * rollback / normalized / MFB
+ *
  * Revision 1.21  2008/09/28 08:06:03  fplanque
  * Refactoring / extended page level caching
  *

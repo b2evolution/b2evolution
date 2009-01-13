@@ -146,12 +146,14 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		global $DB;
 
 // fp> verrry dirty and params; TODO: clean up
+		// get list of relevant blogs
+		$blog_list = ( $Blog->get_setting( 'aggregate_coll_IDs' ) ? $Blog->get_setting( 'aggregate_coll_IDs' ) : $Blog->ID );
 		$sql = 'SELECT LOWER(tag_name) AS tag_name, COUNT(DISTINCT itag_itm_ID) AS tag_count
 						  FROM T_items__tag INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID
 					  				INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID
 					  				INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 					  				INNER JOIN T_items__item ON itag_itm_ID = post_ID
-						 WHERE cat_blog_ID = '.$Blog->ID.'
+						 WHERE cat_blog_ID IN( '.$blog_list.' )
 						  AND post_status = "published" AND post_datestart < NOW()
 						 GROUP BY tag_name
 						 ORDER BY tag_count DESC
@@ -212,6 +214,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.13  2009/01/13 22:51:29  fplanque
+ * rollback / normalized / MFB
+ *
  * Revision 1.12  2008/09/09 06:03:31  fplanque
  * More tag URL options
  * Enhanced URL resolution for categories and tags
