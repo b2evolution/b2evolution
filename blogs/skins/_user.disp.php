@@ -66,7 +66,7 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 
 $ProfileForm->end_fieldset();
 
-/*
+
 $ProfileForm->begin_fieldset( T_('Additional info') );
 
 	// This totally needs to move into User object
@@ -82,7 +82,7 @@ $ProfileForm->begin_fieldset( T_('Additional info') );
 	}
 
 $ProfileForm->end_fieldset();
-*/
+
 
 $ProfileForm->begin_fieldset( T_('Miscellaneous') );
 
@@ -97,6 +97,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.4  2009/01/13 23:45:59  fplanque
+ * User fields proof of concept
+ *
  * Revision 1.3  2008/10/06 01:55:06  fplanque
  * User fields proof of concept.
  * Needs UserFieldDef and UserFieldDefCache + editing of fields.

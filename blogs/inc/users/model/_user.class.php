@@ -111,6 +111,13 @@ class User extends DataObject
 
 
 	/**
+	 * User fields
+	 */
+	var $userfields = array();
+	var $new_fields = array();
+
+
+	/**
 	 * Constructor
 	 *
 	 * @param object DB row
@@ -983,22 +990,46 @@ class User extends DataObject
 	 * Update the DB based on previously recorded changes.
 	 *
 	 * Triggers the plugin event AfterUserUpdate.
-	 *
-	 * @return boolean true on success
 	 */
 	function dbupdate()
 	{
 		global $DB, $Plugins;
 
-		if( $result = parent::dbupdate() )
-		{ // We could update the user object..
+		$DB->begin();
 
-			// Notify plugins:
-			// Example: A authentication plugin could synchronize/update the password of the user.
-			$Plugins->trigger_event( 'AfterUserUpdate', $params = array( 'User' => & $this ) );
+		parent::dbupdate();
+
+		// Update existing fields:
+		foreach( $this->userfields as $uf_ID=>$uf_val )
+		{
+			if( empty( $uf_val ) )
+			{	// Delete field:
+				$DB->query( 'DELETE FROM T_users__fields
+													 WHERE uf_ID = '.$uf_ID );
+			}
+			else
+			{	// Update field:
+				$DB->query( 'UPDATE T_users__fields
+												SET uf_varchar = '.$DB->quote($uf_val).'
+											WHERE uf_ID = '.$uf_ID );
+			}
 		}
 
-		return $result;
+		// Add new fields:
+		if( !empty($this->new_fields) )
+		{
+			$sql = 'INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
+							VALUES '.implode( ',', $this->new_fields );
+			$DB->query( $sql, 'Insert new fields' );
+		}
+
+		// Notify plugins:
+		// Example: An authentication plugin could synchronize/update the password of the user.
+		$Plugins->trigger_event( 'AfterUserUpdate', $params = array( 'User' => & $this ) );
+
+		$DB->commit();
+
+		return true;
 	}
 
 
@@ -1369,6 +1400,9 @@ class User extends DataObject
 	// }}}
 
 
+	/**
+	 *
+	 */
 	function & get_avatar_File()
 	{
 		if( empty($this->avatar_file_ID) )
@@ -1390,9 +1424,11 @@ class User extends DataObject
 	}
 
 
+	/**
+	 * Get avatar <img> tag
+	 */
 	function get_avatar_imgtag( $size = 'crop-80x80', $class = '', $align = '' )
 	{
-
     /**
 		 * @var File
 		 */
@@ -1405,10 +1441,33 @@ class User extends DataObject
 
 		return $r;
 	}
+
+
+	/**
+	 * Add a user field
+	 */
+	function userfield_add( $type, $val )
+	{
+		global $DB;
+		$this->new_fields[] = '('.$this->ID.', '.$type.', '.$DB->quote($val).')';
+	}
+
+
+	/**
+	 * Update an user field. Enmpty fields will be deleted on dbupdate.
+	 */
+	function userfield_update( $uf_ID, $val )
+	{
+		global $DB;
+		$this->userfields[$uf_ID] = $val;
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.13  2009/01/13 23:45:59  fplanque
+ * User fields proof of concept
+ *
  * Revision 1.12  2008/09/29 08:30:40  fplanque
  * Avatar support
  *

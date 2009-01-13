@@ -109,25 +109,26 @@ $schema_queries = array(
 			UNIQUE user_login (user_login),
 			KEY user_grp_ID (user_grp_ID)
 		)" ),
-/*
+
 	'T_users__fielddefs' => array(
 		'Creating table for User field definitions',
 		"CREATE TABLE T_users__fielddefs (
 			ufdf_ID int(10) unsigned NOT NULL,
 			ufdf_type char(8) NOT NULL,
 			ufdf_name varchar(255) collate latin1_general_ci NOT NULL,
-			PRIMARY KEY  (ufdf_ID)
+			PRIMARY KEY (ufdf_ID)
 		)" ),
 
 	'T_users_fields' => array(
 		'Creating table for User fields',
 		"CREATE TABLE T_users__fields (
+			uf_ID      int(10) unsigned NOT NULL auto_increment,
 		  uf_user_ID int(10) unsigned NOT NULL,
 		  uf_ufdf_ID int(10) unsigned NOT NULL,
 		  uf_varchar varchar(255) NOT NULL,
-		  KEY uf_user_ID (uf_user_ID, uf_ufdf_ID)
+		  PRIMARY KEY (uf_ID)
 		)" ),
-*/
+
 	'T_skins__skin' => array(
 		'Creating table for installed skins',
 		"CREATE TABLE T_skins__skin (
@@ -558,6 +559,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.8  2009/01/13 23:45:59  fplanque
+ * User fields proof of concept
+ *
  * Revision 1.7  2008/12/28 17:35:51  fplanque
  * increase blog name max length to 255 chars
  *

@@ -338,6 +338,50 @@ if( !$Messages->count('error') )
 			param( 'edited_user_focusonfirst', 'integer', 0 );
 			param( 'edited_user_results_per_page', 'integer', null );
 
+
+			// EXPERIMENTAL user fields:
+
+			// EXISTING fields:
+			// Get indices of existing userfields:
+			$userfield_IDs = $DB->get_col( '
+						SELECT uf_ID
+							FROM T_users__fields
+						 WHERE uf_user_ID = '.$edited_User->ID );
+			foreach( $userfield_IDs as $userfield_ID )
+			{
+				$uf_val = param( 'uf_'.$userfield_ID, 'string', '' );
+
+				// TODO: type checking
+
+				$edited_User->userfield_update( $userfield_ID, $uf_val );
+			}
+
+			// NEW fields:
+			for( $i=1; $i<=3; $i++ )
+			{	// new fields:
+				$new_uf_type = param( 'new_uf_type_'.$i, 'integer', '' );
+				$new_uf_val = param( 'new_uf_val_'.$i, 'string', '' );
+				if( empty($new_uf_type) && empty($new_uf_val) )
+				{
+					continue;
+				}
+
+				if( empty($new_uf_type) )
+				{
+					param_error( 'new_uf_val_'.$i, T_('Please select a field type.') );
+				}
+				if( empty($new_uf_val) )
+				{
+					param_error( 'new_uf_val_'.$i, T_('Please enter a value.') );
+				}
+
+				// echo $new_uf_type.':'.$new_uf_val;
+
+				// TODO: type checking
+
+				$edited_User->userfield_add( $new_uf_type, $new_uf_val );
+			}
+
 			if( $Messages->count( 'error' ) )
 			{	// We have found validation errors:
 				$action = 'edit_user';
@@ -836,6 +880,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2009/01/13 23:45:59  fplanque
+ * User fields proof of concept
+ *
  * Revision 1.9  2008/04/12 19:56:56  fplanque
  * bugfix
  *

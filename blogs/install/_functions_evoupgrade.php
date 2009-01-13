@@ -2202,9 +2202,6 @@ function upgrade_b2evo_tables()
 	}
 
 
-
-/* User fields to come...
-
 	task_begin( 'Creating table for User field definitions' );
 	$DB->query( "CREATE TABLE T_users__fielddefs (
 			ufdf_ID int(10) unsigned NOT NULL,
@@ -2238,28 +2235,25 @@ function upgrade_b2evo_tables()
 						(150000, 'url',      'YouTube'),
 						(160000, 'url',      'Digg'),
 						(160100, 'url',      'StumbleUpon'),
-						(200100, 'text',     'Address Line 1'),
-						(200200, 'text',     'Address Line 2'),
-						(200300, 'text',     'Address Line 3'),
-						(200400, 'text',     'House/Building #'),
-						(200500, 'text',     'Street Name'),
-						(200600, 'text',     'Unit Type'),
-						(200700, 'text',     'Unit #'),
-						(201000, 'text',     'City'),
-						(201100, 'text',     'State'),
-						(201200, 'text',     'ZIP/Postcode'),
-						(201300, 'text',     'Country');" );
+						(200000, 'text',     'Role'),
+						(200100, 'text',     'Organization'),
+						(200200, 'text',     'Division'),
+						(211000, 'text',     'VAT ID'),
+						(300000, 'text',     'Main address'),
+						(300300, 'text',     'Home address');" );
 	task_end();
 
 	task_begin( 'Creating table for User fields' );
 	$DB->query( "CREATE TABLE T_users__fields (
+			uf_ID      int(10) unsigned NOT NULL auto_increment,
 		  uf_user_ID int(10) unsigned NOT NULL,
 		  uf_ufdf_ID int(10) unsigned NOT NULL,
 		  uf_varchar varchar(255) NOT NULL,
-		  KEY uf_user_ID (uf_user_ID, uf_ufdf_ID)
+		  PRIMARY KEY (uf_ID)
 		)" );
 	task_end();
 
+	/* Wait until we're sure and no longer experimental for that one...
 	task_begin( 'Moving user data to fields' );
 	// ICQ
 	$DB->query( "INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
@@ -2287,7 +2281,8 @@ function upgrade_b2evo_tables()
 								 FROM T_users
 								WHERE user_msn IS NOT NULL AND TRIM(user_yim) <> ''" );
 	task_end();
-*/
+	*/
+
 
 	/*
 	 * ADD UPGRADES HERE.
@@ -2407,6 +2402,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.268  2009/01/13 23:45:59  fplanque
+ * User fields proof of concept
+ *
  * Revision 1.267  2009/01/13 22:51:29  fplanque
  * rollback / normalized / MFB
  *

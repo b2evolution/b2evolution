@@ -138,7 +138,6 @@ function create_default_data()
 	$Group_Users->dbinsert();
 	echo "OK.<br />\n";
 
-/* to come:
 	echo 'Creating user field definitions... ';
 	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
 	$DB->query( "
@@ -164,19 +163,14 @@ function create_default_data()
 						(150000, 'url',      'YouTube'),
 						(160000, 'url',      'Digg'),
 						(160100, 'url',      'StumbleUpon'),
-						(200100, 'text',     'Address Line 1'),
-						(200200, 'text',     'Address Line 2'),
-						(200300, 'text',     'Address Line 3'),
-						(200400, 'text',     'House/Building #'),
-						(200500, 'text',     'Street Name'),
-						(200600, 'text',     'Unit Type'),
-						(200700, 'text',     'Unit #'),
-						(201000, 'text',     'City'),
-						(201100, 'text',     'State'),
-						(201200, 'text',     'ZIP/Postcode'),
-						(201300, 'text',     'Country');" );
+						(200000, 'text',     'Role'),
+						(200100, 'text',     'Organization'),
+						(200200, 'text',     'Division'),
+						(211000, 'text',     'VAT ID'),
+						(300000, 'text',     'Main address'),
+						(300300, 'text',     'Home address');" );
 	echo "OK.<br />\n";
-*/
+
 
 	echo 'Creating admin user... ';
 	global $timestamp, $admin_email, $default_locale, $install_password;
@@ -776,6 +770,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.251  2009/01/13 23:45:59  fplanque
+ * User fields proof of concept
+ *
  * Revision 1.250  2008/10/06 03:36:48  fplanque
  * Added skype field
  *

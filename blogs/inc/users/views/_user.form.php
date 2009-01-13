@@ -198,7 +198,7 @@ if( $action != 'view_user' )
 { // We can edit the values:
 
 	$Form->begin_fieldset( T_('Password') );
-
+		// fp> TODO: FF3 will autofill this which is awfully annoying. Another reason to move to multiple tabs and have the password on its own tab.
 		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'note' => ( !empty($edited_User->ID) ? T_('Leave empty if you don\'t want to change the password.') : '' ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0) ) );
 		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'note'=>sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0) ) );
 
@@ -373,6 +373,99 @@ $Form->begin_fieldset( T_('Additional info') );
 
 $Form->end_fieldset();
 
+
+$Form->begin_fieldset( T_('Experimental') );
+
+	// This totally needs to move into User object
+	global $DB;
+
+	// Get existing userfields:
+	$userfields = $DB->get_results( '
+		SELECT uf_ID, ufdf_ID, ufdf_type, ufdf_name, uf_varchar
+			FROM T_users__fields LEFT JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
+		 WHERE uf_user_ID = '.$edited_User->ID.'
+		 ORDER BY uf_ID' );
+
+	foreach( $userfields as $userfield )
+	{
+		switch( $userfield->ufdf_ID )
+		{
+			case 10200:
+				$field_note = '<a href="aim:goim?screenname='.$userfield->uf_varchar.'&amp;message=Hello">'.get_icon( 'play', 'imgtag', array('title'=>T_('Instant Message to user')) ).'</a>';
+				break;
+
+			case 10300:
+				$field_note = '<a href="http://wwp.icq.com/scripts/search.dll?to='.$userfield->uf_varchar.'" target="_blank">'.get_icon( 'play', 'imgtag', array('title'=>T_('Search on ICQ.com')) ).'</a>';
+				break;
+
+			default:
+				if( $userfield->ufdf_ID >= 100000 && $userfield->ufdf_ID < 200000 )
+				{
+					$url = $userfield->uf_varchar;
+					if( !preg_match('#://#', $url) )
+					{
+						$url = 'http://'.$url;
+					}
+					$field_note = '<a href="'.$url.'" target="_blank">'.get_icon( 'play', 'imgtag', array('title'=>T_('Visit the site')) ).'</a>';
+				}
+				else
+				{
+					$field_note = '';
+				}
+		}
+
+		$uf_val = param( 'uf_'.$userfield->uf_ID, 'string', NULL );
+		if( is_null( $uf_val ) )
+		{	// No value submitted yet, get DB val:
+			$uf_val = $userfield->uf_varchar;
+		}
+
+		// Display existing field:
+		$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 50, $userfield->ufdf_name, $field_note, array() );
+	}
+
+	// Get list of possible field types:
+	$userfielddefs = $DB->get_results( '
+		SELECT ufdf_ID, ufdf_type, ufdf_name
+			FROM T_users__fielddefs
+		 ORDER BY ufdf_ID' );
+	// New fields:
+	// TODO: JS for adding more than 3 at a time.
+	for( $i=1; $i<=3; $i++ )
+	{
+		$label = '<select name="new_uf_type_'.$i.'"><option value="">Add field...</option><optgroup label="Instant Messaging">';
+		foreach( $userfielddefs as $fielddef )
+		{
+			// check for group header:
+			switch( $fielddef->ufdf_ID )
+			{
+				case 50000:
+					$label .= "\n".'</optgroup><optgroup label="Phone">';
+					break;
+				case 100000:
+					$label .= "\n".'</optgroup><optgroup label="Web">';
+					break;
+				case 200000:
+					$label .= "\n".'</optgroup><optgroup label="Organization">';
+					break;
+				case 300000:
+					$label .= "\n".'</optgroup><optgroup label="Address">';
+					break;
+			}
+			$label .= "\n".'<option value="'.$fielddef->ufdf_ID.'"';
+			if( param( 'new_uf_type_'.$i, 'string', '' ) == $fielddef->ufdf_ID )
+			{	// We had selected this type before getting an error:
+				$label .= ' selected="selected"';
+			}
+			$label .= '>'.$fielddef->ufdf_name.'</option>';
+		}
+		$label .= '</optgroup></select>';
+
+		$Form->text_input( 'new_uf_val_'.$i, param( 'new_uf_val_'.$i, 'string', '' ), 50, $label, '', array() );
+	}
+
+$Form->end_fieldset();
+
 // _____________________________________________________________________
 
 if( $action != 'view_user' )
@@ -395,109 +488,13 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.6  2009/01/13 23:45:59  fplanque
+ * User fields proof of concept
+ *
  * Revision 1.5  2008/09/29 15:36:20  blueyed
  * Fix display of user avatar in view-only profile
  *
  * Revision 1.4  2008/09/29 08:30:40  fplanque
  * Avatar support
- *
- * Revision 1.3  2008/01/21 09:35:36  fplanque
- * (c) 2008
- *
- * Revision 1.2  2008/01/10 19:59:52  fplanque
- * reduced comment PITA
- *
- * Revision 1.1  2007/06/25 11:01:51  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.53  2007/06/19 20:41:36  fplanque
- * renamed generic functions to autoform_*
- *
- * Revision 1.52  2007/06/19 00:03:26  fplanque
- * doc / trying to make sense of automatic settings forms generation.
- *
- * Revision 1.51  2007/05/27 20:04:41  fplanque
- * wording
- *
- * Revision 1.50  2007/05/26 22:21:32  blueyed
- * Made $limit for Results configurable per user
- *
- * Revision 1.49  2007/05/26 19:06:35  blueyed
- * Trigger PluginUserSettingsEditDisplayAfter also if there are no UserSettings
- *
- * Revision 1.48  2007/04/26 00:11:13  fplanque
- * (c) 2007
- *
- * Revision 1.47  2007/03/04 05:24:52  fplanque
- * some progress on the toolbar menu
- *
- * Revision 1.46  2007/02/25 01:21:58  fplanque
- * Wording
- *
- * Revision 1.45  2007/02/21 22:21:30  blueyed
- * "Multiple sessions" user setting
- *
- * Revision 1.44  2007/02/19 23:17:00  blueyed
- * Only display Plugin(User)Settings fieldsets if there is content in them.
- *
- * Revision 1.43  2007/02/14 01:37:18  blueyed
- * Fixed E_PARSE
- *
- * Revision 1.42  2007/02/11 15:02:30  fplanque
- * completely removed autocaps on lastname
- *
- * Revision 1.40  2007/01/27 16:08:53  blueyed
- * Pass "User" param to PluginUserSettingsEditDisplayAfter plugin hook
- *
- * Revision 1.39  2007/01/23 08:57:36  fplanque
- * decrap!
- *
- * Revision 1.38  2006/12/17 23:42:39  fplanque
- * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
- * Look into Advanced Settings for the aggregating blog.
- * There may be side effects and new bugs created by this. Please report them :]
- *
- * Revision 1.37  2006/12/16 04:07:11  fplanque
- * visual cleanup
- *
- * Revision 1.36  2006/12/16 00:15:51  fplanque
- * reorganized user profile page/form
- *
- * Revision 1.35  2006/12/16 00:12:21  fplanque
- * reorganized user profile page/form
- *
- * Revision 1.34  2006/12/09 01:55:36  fplanque
- * feel free to fill in some missing notes
- * hint: "login" does not need a note! :P
- *
- * Revision 1.33  2006/12/05 02:54:37  blueyed
- * Go to user profile after resetting to defaults; fixed handling of action in case of redirecting
- *
- * Revision 1.32  2006/12/04 00:08:56  fplanque
- * minor
- *
- * Revision 1.31  2006/12/03 19:09:49  blueyed
- * Javascript confirm() for resetting user settings
- *
- * Revision 1.30  2006/12/03 16:37:15  fplanque
- * doc
- *
- * Revision 1.29  2006/11/28 01:31:23  blueyed
- * Display fix: user cannot edit "validated", if he has no "edit users" perms
- *
- * Revision 1.28  2006/11/24 18:27:26  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.27  2006/11/15 21:14:04  blueyed
- * "Restore defaults" in user profile
- *
- * Revision 1.26  2006/11/14 00:26:28  blueyed
- * Made isset($this->UserSettings)-hack work; fixed call to undefined function
- *
- * Revision 1.25  2006/11/05 20:13:57  fplanque
- * minor
- *
- * Revision 1.24  2006/10/30 19:00:36  blueyed
- * Lazy-loading of Plugin (User)Settings for PHP5 through overloading
  */
 ?>
