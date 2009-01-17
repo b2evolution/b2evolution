@@ -1716,6 +1716,7 @@ class File extends DataObject
 	 * @todo cleanup memory resources
 	 *
 	 * @param string requested size: 'thumbnail'
+	 * @return boolean True on success, false on failure.
 	 */
 	function thumbnail( $req_size )
 	{
@@ -1785,11 +1786,13 @@ class File extends DataObject
 			}
 			header('Content-type: image/png' );
 			imagepng( $im_handle );
-		}
+			return false;
+        }
+		return true;
 	}
 
 
-  /**
+	/**
 	 * @param Item
 	 */
 	function link_to_Item( & $edited_Item )
@@ -1814,6 +1817,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2009/01/17 21:16:25  blueyed
+ * Add return value to File::thumbnail
+ *
  * Revision 1.19  2008/12/27 20:06:27  fplanque
  * rollback ( changes don't make sense to me )
  *
