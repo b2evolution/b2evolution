@@ -54,10 +54,9 @@ function SendAdminRequest( ctrl, action, query_string )
  */
 function SendServerRequest( url )
 {
-	if( url.indexOf( '?' ) )
-	{	// we already have a query string
-		url = url + '&';
-	}
+	// add a & to the URL if we already have a query string, otherwise add a ?
+	url += ( url.indexOf( '?' ) != -1 ) ? '&' : '?'; 
+
 	var the_call = document.createElement( 'script' ); // create script element
 	the_call.src = url+'display_mode=js'; // add flag for js display mode
 	the_call.type = 'text/javascript'; // to be sure to be sure
