@@ -27,6 +27,7 @@
  *
  * @todo dh> Add support for ETag / If-Modified-Since. Maybe send "Expires", too? (to "force" caching)
  * @todo fp> for more efficient caching, this should probably redirect to the static file right after creating it
+ * @todo dh> You want to 302-redirect to the real file? Isn't that quite contradary to $public_access_to_media=false?!
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
@@ -74,6 +75,7 @@ if( !empty($size) && $File->is_image() )
 	// This will do all the magic:
 	$File->thumbnail( $size );
 	// fp> TODO: for more efficient caching, this should probably redirect to the static file right after creating it
+    // dh> You want to 302-redirect to the real file? Isn't that quite contradary to $public_access_to_media=false?!
 }
 else
 {	// We want the regular file:
@@ -100,6 +102,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.21  2009/01/17 21:09:27  blueyed
+ * doc/todo
+ *
  * Revision 1.20  2008/09/19 20:11:50  blueyed
  * getfile.php: fail if file is not readable and check if Filetype is set
  *
