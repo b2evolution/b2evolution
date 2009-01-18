@@ -1592,6 +1592,10 @@ function debug_info( $force = false, $force_clean = false )
 		// arsort( $timer_rows );
 		ksort( $timer_rows );
 
+		// Remove "total", it will get outputted as the last one:
+		$total_time = $timer_rows['total'];
+		unset($timer_rows['total']);
+
 		if ( $clean )
 		{
 			echo '== Timers =='."\n\n";
@@ -1650,6 +1654,21 @@ function debug_info( $force = false, $force_clean = false )
 		{
 			echo implode( "\n", $table_rows_ignore_perhaps )."\n";
 		}
+
+		// Output "total":
+		$percent_total = $time_page > 0 ? number_format( 100/$time_page * $total_time, 2 ) : '0';
+		if ( $clean )
+		{
+			echo sprintf( $printf_format, 'total', $total_time, $percent_total.'%', $Timer->get_count('total') );
+		}
+		else
+		{
+			echo "\n<tr>"
+				.'<td>total</td>'
+				.'<td class="right">'.$total_time.'</td>'
+				.'<td class="right">'.$percent_total.'%</td>'
+				.'<td class="right">'.$Timer->get_count('total').'</td></tr>';
+        }
 
 		if ( $clean )
 		{
@@ -3164,6 +3183,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.58  2009/01/18 20:18:28  blueyed
+ * debug_info(); Output 'total' row at the end always
+ *
  * Revision 1.57  2008/12/28 22:48:12  fplanque
  * increase blog name max length to 255 chars
  *
