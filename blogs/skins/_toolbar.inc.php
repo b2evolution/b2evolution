@@ -189,7 +189,7 @@ global $Hit;
 					{	// Set in skin_init()
 						echo $seo_page_type.': ';
 					}
-					if( $robots_index === false )
+					if( $robots_index === false || is_admin_page() )
 					{
 						echo 'NO INDEX';
 					}
