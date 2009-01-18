@@ -62,10 +62,13 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			$Comment->get_Item();
 			?>
 		<item>
-			<title><?php echo format_to_output( T_('In response to:'), 'xml' ) ?> <?php $Comment->Item->title( array(
-				'format' => 'xml',
-				'link_type' => 'none',
-			) ); ?></title>
+			<title><?php echo format_to_output( sprintf( /* TRANS: First %s: Commentator's name, second %s: post title */ T_( '%s in response to: %s' ),
+													$Comment->author( '', '#', '', '#', 'raw' ),
+													$Comment->Item->get_title( array(
+														'format' => 'raw',
+														'link_type' => 'none',
+													) ) ),
+												'xml' ); ?></title>
 			<pubDate><?php $Comment->time( 'r', true ); ?></pubDate>
 			<dc:creator><?php $Comment->author( '', '#', '', '#', 'xml' ); ?></dc:creator>
 			<guid isPermaLink="false">c<?php $Comment->ID() ?>@<?php echo $baseurl ?></guid>
