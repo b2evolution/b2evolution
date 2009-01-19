@@ -26,8 +26,7 @@
  * @package htsrv
  *
  * @todo dh> Add support for ETag / If-Modified-Since. Maybe send "Expires", too? (to "force" caching)
- * @todo fp> for more efficient caching, this should probably redirect to the static file right after creating it
- * @todo dh> You want to 302-redirect to the real file? Isn't that quite contradary to $public_access_to_media=false?!
+ * @todo fp> for more efficient caching, this should probably redirect to the static file right after creating it (when $public_access_to_media=true OF COURSE)
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
@@ -74,8 +73,7 @@ if( !empty($size) && $File->is_image() )
 {	// We want a thumbnail:
 	// This will do all the magic:
 	$File->thumbnail( $size );
-	// fp> TODO: for more efficient caching, this should probably redirect to the static file right after creating it
-    // dh> You want to 302-redirect to the real file? Isn't that quite contradary to $public_access_to_media=false?!
+	// fp> TODO: for more efficient caching, this should probably redirect to the static file right after creating it (when $public_access_to_media=true OF COURSE)
 }
 else
 {	// We want the regular file:
@@ -102,6 +100,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.22  2009/01/19 21:50:47  fplanque
+ * minor
+ *
  * Revision 1.21  2009/01/17 21:09:27  blueyed
  * doc/todo
  *

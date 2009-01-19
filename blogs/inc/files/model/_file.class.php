@@ -1787,7 +1787,7 @@ class File extends DataObject
 			header('Content-type: image/png' );
 			imagepng( $im_handle );
 			return false;
-        }
+		}
 		return true;
 	}
 
@@ -1817,6 +1817,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2009/01/19 21:50:47  fplanque
+ * minor
+ *
  * Revision 1.20  2009/01/17 21:16:25  blueyed
  * Add return value to File::thumbnail
  *
