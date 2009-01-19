@@ -29,7 +29,7 @@ class smilies_plugin extends Plugin
 	 * fp> There is... I can't remember the exact problem thouh. Probably some interaction with the code highlight or the video plugins.
 	 */
 	var $priority = 15;
-	var $version = '1.10';
+	var $version = '3.0';
 	var $apply_rendering = 'opt-out';
 	var $group = 'rendering';
 	var $number_of_installs = 3; // QUESTION: dh> why 3?
@@ -77,14 +77,14 @@ class smilies_plugin extends Plugin
 		return array(
 				'use_toolbar_default' => array(
 					'label' => T_( 'Use smilies toolbar' ),
-					'defaultvalue' => '1',
+					'defaultvalue' => 0,
 					'type' => 'checkbox',
 					'note' => T_( 'This is the default setting. Users can override it in their profile.' ),
 				),
 				'render_comments' => array(	// fp> Note: this is not a default in this version, it's an 'always' :]
 					'label' => $this->T_('Render comments' ),
 					'note' => $this->T_('Check to also render smilies in comments.'),
-					'defaultvalue' => '0',
+					'defaultvalue' => 0,
 					'type' => 'checkbox',
 				),
 				// TODO (yabs) : Display these as images and individual inputs
@@ -192,7 +192,7 @@ XX(      graydead.gif
 		if( $this->Settings->get( 'render_comments' )
 		&& ( ( is_logged_in() && $this->UserSettings->get( 'use_toolbar' ) )
 			|| ( !is_logged_in() && $this->Settings->get( 'use_toolbar_default' ) ) ) )
-		{	
+		{
 			return $this->display_smiley_bar();
 		}
 		return false;
@@ -238,8 +238,8 @@ XX(      graydead.gif
 		{
 			$this->RenderItemAsHtml( $params );
 		}
-	}	
-	
+	}
+
 
 
 	/**
@@ -400,6 +400,10 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.45  2009/01/19 21:41:44  fplanque
+ * Too many people find the smiley bar "ugly" :/
+ * No longer display it by default
+ *
  * Revision 1.44  2008/01/21 09:35:41  fplanque
  * (c) 2008
  *
