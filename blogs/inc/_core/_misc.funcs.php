@@ -1668,7 +1668,7 @@ function debug_info( $force = false, $force_clean = false )
 				.'<td class="right">'.$total_time.'</td>'
 				.'<td class="right">'.$percent_total.'%</td>'
 				.'<td class="right">'.$Timer->get_count('total').'</td></tr>';
-        }
+		}
 
 		if ( $clean )
 		{
@@ -3183,6 +3183,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.59  2009/01/19 23:57:33  blueyed
+ * fix indent
+ *
  * Revision 1.58  2009/01/18 20:18:28  blueyed
  * debug_info(); Output 'total' row at the end always
  *
