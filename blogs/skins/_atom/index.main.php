@@ -16,14 +16,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // EXTERNAL FEED PROVIDER?
-$atom_redirect = $Blog->get_setting('atom_redirect');
-if (!empty($atom_redirect))
+$atom_redirect = $Blog->get_setting( 'atom_redirect' );
+if ( ! empty( $atom_redirect ) && $redir == 'yes' )
 {
-	if( $redir == 'yes' )
-	{
-		header_redirect( $atom_redirect, 301 );
-		exit(0);
-	}
+	header_redirect( $atom_redirect, 301 );
+	exit( 0 );
 }
 
 
@@ -39,7 +36,7 @@ if( $feed_content == 'none' )
 	debug_die( 'Feeds are disabled.');
 }
 
-if( $debug)
+if( $debug )
 {
 	header_content_type( 'application/xml' );	// Sets charset!
 }
