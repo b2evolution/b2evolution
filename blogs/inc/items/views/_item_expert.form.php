@@ -304,7 +304,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	$Form->begin_fieldset( T_('Properties'), array( 'id' => 'itemform_extra' ) );
 
-	$Form->checkbox( 'item_featured', $edited_Item->featured, T_('Featured post') );
+	$Form->checkbox_basic_input( 'item_featured', $edited_Item->featured, '<strong>'.T_('Featured post').'</strong>' );
 
 	if( $current_User->check_perm( 'edit_timestamp' ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
@@ -394,6 +394,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.37  2009/01/19 21:40:59  fplanque
+ * Featured post proof of concept
+ *
  * Revision 1.36  2008/09/23 05:26:38  fplanque
  * Handle attaching files when multiple posts are edited simultaneously
  *

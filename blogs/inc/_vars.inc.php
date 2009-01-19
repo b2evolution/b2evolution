@@ -59,6 +59,11 @@ $is_web = ! $is_cli;
 
 $content_type_header = NULL;
 
+/**
+ * @global ID of featured post that is being displayed -- needed so we can filter it out of normal post flow
+ */
+$featured_displayed_item_ID = NULL;
+
 // Initialize some variables for template functions
 $required_js = array();
 $required_css = array();
@@ -302,6 +307,9 @@ $skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', ar
 
 /*
  * $Log$
+ * Revision 1.32  2009/01/19 21:40:59  fplanque
+ * Featured post proof of concept
+ *
  * Revision 1.31  2008/09/27 07:54:33  fplanque
  * minor
  *

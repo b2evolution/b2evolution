@@ -93,6 +93,45 @@ function init_MainList( $items_nb_limit )
 
 
 /**
+ * @return Item
+ */
+function & get_featured_Item()
+{
+	global $Blog;
+	global $timestamp_min, $timestamp_max;
+	global $MainList;
+	global $featured_displayed_item_ID;
+
+	if( !isset($MainList) || $MainList->is_filtered() )
+	{
+		$Item = NULL;
+		return $Item;
+	}
+
+	$FeaturedList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max, 1 );
+
+	$FeaturedList->set_default_filters( array(
+			'featured' => 1,  // Featured posts only (TODO!)
+			//'types' => '1000',		// pages
+		) );
+
+	// pre_dump( $MainList->default_filters );
+	// $FeaturedList->load_from_Request( false );
+	// pre_dump( $MainList->filters );
+
+	// Run the query:
+	$FeaturedList->query();
+
+	$Item = $FeaturedList->get_item();
+
+	// Memorize that ID so that it can later be filtered out normal display:
+	$featured_displayed_item_ID = $Item->ID;
+
+	return $Item;
+}
+
+
+/**
  * Validate URL title (slug) / Also used for category slugs
  *
  * Using title as a source if url title is empty.
@@ -675,6 +714,8 @@ function issue_date_control( $Form, $break = false )
 {
 	global $edited_Item, $set_issue_date;
 
+	echo T_('Issue date').':<br />';
+
 	echo '<label><input type="radio" name="set_issue_date" id="set_issue_date_now" value="now" '
 				.( ($set_issue_date == 'now') ? 'checked="checked"' : '' )
 				.'/><strong>'.T_('Update issue date to NOW').'</strong></label>';
@@ -732,6 +773,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.24  2009/01/19 21:40:59  fplanque
+ * Featured post proof of concept
+ *
  * Revision 1.23  2008/12/28 23:35:51  fplanque
  * Autogeneration of category/chapter slugs(url names)
  *

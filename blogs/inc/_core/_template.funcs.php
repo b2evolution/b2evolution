@@ -673,17 +673,22 @@ function mainlist_page_links( $params = array() )
  */
 function & mainlist_get_item()
 {
-	global $MainList;
+	global $MainList, $featured_displayed_item_ID;
 
 	if( isset($MainList) )
 	{
-		$r = $MainList->get_item();
+		$Item = & $MainList->get_item();
+
+		if( $Item->ID == $featured_displayed_item_ID )
+		{	// This post was already displayed as a Featured post, let's skip it and get the next one:
+			$Item = & $MainList->get_item();
+		}
 	}
 	else
 	{
-		$r = NULL;
+		$Item = NULL;
 	}
-	return $r;
+	return $Item;
 }
 
 
@@ -854,6 +859,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.47  2009/01/19 21:40:59  fplanque
+ * Featured post proof of concept
+ *
  * Revision 1.46  2008/12/30 23:00:41  fplanque
  * Major waste of time rolling back broken black magic! :(
  * 1) It was breaking the backoffice as soon as $admin_url was not a direct child of $baseurl.

@@ -55,6 +55,7 @@ class ItemQuery extends SQL
 	var $keywords;
 	var $phrase;
 	var $exact;
+	var $featured;
 
 
 	/**
@@ -271,6 +272,30 @@ class ItemQuery extends SQL
 		}
 
 		$this->WHERE_and( statuses_where_clause( $show_statuses, $this->dbprefix, $this->blog ) );
+	}
+
+
+	/**
+	 * Restrict to the featured/non featured posts if requested
+	 *
+	 * @param boolean|NULL Restrict to featured
+	 */
+	function where_featured( $featured = NULL )
+	{
+		$this->featured = $featured;
+
+		if( is_null( $this->featured ) )
+		{ // no restriction
+			return;
+		}
+		elseif( !empty( $this->featured ) )
+		{ // restrict to featured
+			$this->WHERE_and( $this->dbprefix.'featured <> 0' );
+		}
+		else
+		{ // restrict to NON featured
+			$this->WHERE_and( $this->dbprefix.'featured = 0' );
+		}
 	}
 
 
@@ -703,6 +728,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.8  2009/01/19 21:40:59  fplanque
+ * Featured post proof of concept
+ *
  * Revision 1.7  2008/09/28 17:40:39  waltercruz
  * Removing done todos
  *

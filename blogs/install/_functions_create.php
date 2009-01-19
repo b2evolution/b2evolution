@@ -590,6 +590,15 @@ If needed, a skin can format info pages differently from regular posts."), $now,
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("Featured post"), T_("This is a demo of a featured post.
+
+When this post is displayed in the featured area, it is not duplicated in the normal post flow."), $now, $cat_b2evo );
+	$edited_Item->set( 'featured', 1 );
+	$edited_Item->dbupdate();
+
+	// Insert a post:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_("Apache optimization..."), T_("In the <code>/blogs</code> folder there is a file called [<code>sample.htaccess</code>]. You should try renaming it to [<code>.htaccess</code>].
 
 This will optimize the way b2evolution is handled by the webserver (if you are using Apache). This file is not active by default because a few hosts would display an error right away when you try to use it. If this happens to you when you rename the file, just remove it and you'll be fine."), $now, $cat_b2evo );
@@ -770,6 +779,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.252  2009/01/19 21:40:58  fplanque
+ * Featured post proof of concept
+ *
  * Revision 1.251  2009/01/13 23:45:59  fplanque
  * User fields proof of concept
  *

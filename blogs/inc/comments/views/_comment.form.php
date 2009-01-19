@@ -201,21 +201,14 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		$Form->hidden( 'comment_rating', 0 );
 	}
 
-/*
+		/*
 		$Form->begin_fieldset( T_('Properties') );
-
-
-		echo '<p>';
-		$Form->checkbox_basic_input( 'comment_featured', $edited_Comment->featured, T_('Featured') );
-		echo '</p>';
-
-		echo '<p>';
-		$Form->checkbox_basic_input( 'comment_nofollow', $edited_Comment->nofollow, 'Nofollow' );
-		echo '</p>';
-
+			echo '<p>';
+			$Form->checkbox_basic_input( 'comment_featured', $edited_Comment->featured, T_('Featured') );
+			echo '</p>';
 		$Form->end_fieldset();
-*/
-
+		*/
+		
 		$Form->begin_fieldset( T_('Visibility'), array( 'id' => 'commentform_visibility' ) );
 
 		$sharing_options[] = array( 'published', T_('Published (Public)') );
@@ -226,10 +219,10 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		$Form->end_fieldset();
 
 		$Form->begin_fieldset( T_('Links') );
-
-		$Form->checkbox_basic_input( 'comment_nofollow', $edited_Comment->nofollow, T_('Nofollow website URL') );
-		// TODO: apply to all links
-
+			echo '<p>';
+			$Form->checkbox_basic_input( 'comment_nofollow', $edited_Comment->nofollow, T_('Nofollow website URL') );
+			// TODO: apply to all links  -- note: see basic antispam plugin that does this for x hours
+			echo '</p>';
 		$Form->end_fieldset();
 
 		$Form->begin_fieldset( T_('Feedback info') );
@@ -253,6 +246,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.5  2009/01/19 21:40:58  fplanque
+ * Featured post proof of concept
+ *
  * Revision 1.4  2008/04/15 21:53:31  fplanque
  * minor
  *

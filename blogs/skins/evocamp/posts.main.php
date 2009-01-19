@@ -15,9 +15,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( version_compare( $app_version, '2.4.1' ) < 0 )
+if( version_compare( $app_version, '3.0' ) < 0 )
 { // Older 2.x skins work on newer 2.x b2evo versions, but newer 2.x skins may not work on older 2.x b2evo versions.
-	die( 'This skin is designed for b2evolution 2.4.1 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
+	die( 'This skin is designed for b2evolution 3.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
 
 // This is the main template; it may be used to display very different things.
@@ -46,20 +46,79 @@ skin_include( '_body_header.inc.php' );
 	<div id="contentleft">
 
 	<?php
-	// NOT SUPPORTED YET
-	if( false && isset($MainList) && ! $MainList->is_filtered() )
+	// Go Grab the featured post:
+	if( $Item = & get_featured_Item() )
 	{
 		?>
 
 		<div class="featurepost">
 
-			<h2>Title</h2>
+			<h2><?php $Item->title(); ?></h2>
 
-			<p class="postinfo">By author on time in cat | comments | edit </p>
+			<p class="postinfo">
+			<?php
+      	$Item->author( array(
+					'before'       => T_('By').' ',
+					'after'        => ' ',
+				) );
+			?>
+			<?php
+				$Item->issue_time( array(
+						'before'      => /* TRANS: date */ T_('on '),
+						'after'       => '',
+						'time_format' => 'M j, Y',
+					) );
+			?>
+			<?php
+				$Item->categories( array(
+						'before'          => ' | '.T_('In '),
+						'after'           => ' ',
+						'include_main'    => true,
+						'include_other'   => true,
+						'include_external'=> true,
+						'link_categories' => true,
+					) );
+			?>
+			<?php
+				// Link to comments, trackbacks, etc.:
+				$Item->feedback_link( array(
+						'type' => 'feedbacks',
+						'link_before' => ' | ',
+						'link_after' => '',
+						'link_text_zero' => '#',
+						'link_text_one' => '#',
+						'link_text_more' => '#',
+						'link_title' => '#',
+						'use_popup' => false,
+					) );
+			?>
+			<?php
+				$Item->edit_link( array( // Link to backoffice for editing
+						'before'    => ' | ',
+						'after'     => '',
+					) );
+			?>
+			</p>
 
-			<div class="entry">
-				bolo bolo 						bolo bolo 						bolo bolo 						bolo bolo 						bolo bolo
-			</div>
+			<?php
+				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+				skin_include( '_item_content.inc.php', array(
+						'image_size'     => 'fit-400x320',
+						'more_link_text' => T_('Read more'),
+					) );
+				// Note: You can customize the default item feedback by copying the generic
+				// /skins/_item_feedback.inc.php file into the current skin folder.
+				// -------------------------- END OF POST CONTENT -------------------------
+			?>
+
+			<?php
+				// List all tags attached to this post:
+				$Item->tags( array(
+						'before' =>         '<div class="posttags">'.T_('Tags').': ',
+						'after' =>          '</div>',
+						'separator' =>      ', ',
+					) );
+			?>
 
 		</div>
 		<?php

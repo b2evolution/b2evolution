@@ -165,6 +165,7 @@ class ItemListLight extends DataObjectList2
 				'unit' => $this->Blog->get_setting('what_to_show'),
 				'posts' => $this->limit,
 				'page' => 1,
+				'featured' => NULL,
 			) );
 	}
 
@@ -639,6 +640,8 @@ class ItemListLight extends DataObjectList2
 		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
 		$this->ItemQuery->where_datecreated( $this->filters['ts_created_max'] );
 		$this->ItemQuery->where_visibility( $this->filters['visibility_array'] );
+		$this->ItemQuery->where_featured( $this->filters['featured'] );
+
 
 		/*
 		 * ORDER BY stuff:
@@ -1495,6 +1498,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.24  2009/01/19 21:40:59  fplanque
+ * Featured post proof of concept
+ *
  * Revision 1.23  2008/09/24 08:44:12  fplanque
  * Fixed and normalized order params for widgets (Comments not done yet)
  *
