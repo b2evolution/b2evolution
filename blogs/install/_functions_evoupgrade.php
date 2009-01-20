@@ -2201,6 +2201,15 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9900' );
 	}
 
+	/* Tblue> Shouldn't these upgrades be done only if the DB version is
+			  lower than e. g. 9900? They're done *every* time upgrade_b2evo_tables()
+			  is called. In my case, this breaks the upgrade process! Some
+			  changes in the DB schema are being detected below, so after
+			  approving them upgrade_b2evo_tables() is called again and
+			  tries to execute the queries below, which fail, of course
+			  (because the tables have already been created during the
+			  last call). The DB class then calls debug_die()...
+	*/
 
 	task_begin( 'Creating table for User field definitions' );
 	$DB->query( "CREATE TABLE T_users__fielddefs (
@@ -2402,6 +2411,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.269  2009/01/20 14:17:42  tblue246
+ * Upgrade process is possibly broken...
+ *
  * Revision 1.268  2009/01/13 23:45:59  fplanque
  * User fields proof of concept
  *
