@@ -113,6 +113,7 @@ $schema_queries['T_hitlog'] = array(
 		// dh> There appear too many indexes here, which makes inserting hits rather
 		//     slow! If the indexes need to stay, would it be possible to queue
 		//     the hit logs and let them get handled by cron?!
+		//     Well, converting the table to MyISAM (from InnoDB) helped a lot..
 
 $schema_queries['T_track__goal'] = array(
 		'Creating goals table',
@@ -141,6 +142,9 @@ $schema_queries['T_track__goalhit'] = array(
 
 /*
  * $Log$
+ * Revision 1.5  2009/01/21 00:46:45  blueyed
+ * re: Note about E_TOO_MANY_INDEXES for T_hitlog
+ *
  * Revision 1.4  2009/01/21 00:33:10  blueyed
  * Note about E_TOO_MANY_INDEXES for T_hitlog
  *
