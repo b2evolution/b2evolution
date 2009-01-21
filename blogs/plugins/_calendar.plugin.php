@@ -50,7 +50,7 @@ class calendar_plugin extends Plugin
 	var $name = 'Calendar Widget';
 	var $code = 'evo_Calr';
 	var $priority = 20;
-	var $version = '2.2';
+	var $version = '3.0';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 
@@ -170,7 +170,7 @@ class calendar_plugin extends Plugin
 		global $month;
 		global $Blog, $cat_array, $cat_modifier;
 		global $show_statuses;
-		global $author, $assgn, $status;
+		global $author, $assgn, $status, $types;
 		global $m, $w, $dstart, $timestamp_min, $timestamp_max;
 		global $s, $sentence, $exact;
 
@@ -260,6 +260,9 @@ class calendar_plugin extends Plugin
 
 			// Keyword search stuff:
 			$Calendar->ItemQuery->where_keywords( $s, $sentence, $exact );
+
+			// Exclude pages and intros:
+			$Calendar->ItemQuery->where_types( $types );
 		}
 		else
 		{	// We want to preserve only the minimal context:
@@ -271,6 +274,9 @@ class calendar_plugin extends Plugin
 
 			// - - - + * * if a month is specified in the querystring, load that month:
 			$Calendar->ItemQuery->where_datestart( /* NO m */'', /* NO w */'', '', '', $timestamp_min, $timestamp_max );
+
+			// Exclude pages and intros:
+			$Calendar->ItemQuery->where_types( '-1000,1500,1520,1530,1570,1600' );
 		}
 
 		// DISPLAY:
@@ -593,7 +599,7 @@ class Calendar
 			// Find months with posts
 			$arc_sql = 'SELECT COUNT(DISTINCT '.$this->dbIDname.') AS item_count, EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) AS mymonth
 									FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
-										INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+												INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 									WHERE EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) = \''.$this->year.'\' '
 										.$this->ItemQuery->get_where( ' AND ' ).'
 									GROUP BY mymonth '.$this->ItemQuery->get_group_by( ', ' );
@@ -916,6 +922,8 @@ class Calendar
 			$nav_ItemQuery->where_datestart( /* NO m */'', /* NO w */'', /* NO dstart */'', '', $this->ItemQuery->timestamp_min, $this->ItemQuery->timestamp_max );
 			// Keyword search stuff:
 			$nav_ItemQuery->where_keywords( $this->ItemQuery->keywords, $this->ItemQuery->phrase, $this->ItemQuery->exact );
+			// Exclude pages and intros:
+			$nav_ItemQuery->where_types( $this->ItemQuery->types );
 		}
 
 		switch( $direction )
@@ -946,10 +954,10 @@ class Calendar
 								'SELECT EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) AS year,
 												EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) AS month
 									FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
-										INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+												INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 									WHERE EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) < '.$this->year.'
-									'.$nav_ItemQuery->get_where( ' AND ' )
-									.$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
+												'.$nav_ItemQuery->get_where( ' AND ' )
+												.$nav_ItemQuery->get_group_by( ' GROUP BY ' ).'
 									ORDER BY EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) DESC, ABS( '.$use_range_month.' - EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) ) ASC
 									LIMIT 1', OBJECT, 0, 'Calendar: find prev year with posts' )
 							)
@@ -1144,6 +1152,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.52  2009/01/21 22:36:35  fplanque
+ * Cleaner handling of pages and intros in calendar and archives plugins
+ *
  * Revision 1.51  2008/03/31 00:27:11  blueyed
  * Nuke unused  global statements; use global  in loop instead of getter
  *

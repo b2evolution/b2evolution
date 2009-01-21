@@ -55,7 +55,7 @@ class archives_plugin extends Plugin
 	var $name = 'Archives Widget';
 	var $code = 'evo_Arch';
 	var $priority = 50;
-	var $version = '2.2';
+	var $version = '3.0';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 
@@ -338,7 +338,7 @@ class ArchiveList extends Results
 		global $DB;
 		global $blog, $cat, $catsel;
 		global $show_statuses;
-		global $author, $assgn, $status;
+		global $author, $assgn, $status, $types;
 		global $timestamp_min, $timestamp_max;
 		global $s, $sentence, $exact;
 
@@ -378,6 +378,9 @@ class ArchiveList extends Results
 
 			// Keyword search stuff:
 			$this->ItemQuery->where_keywords( $s, $sentence, $exact );
+
+			// Exclude pages and intros:
+			$this->ItemQuery->where_types( $types );
 		}
 		else
 		{	// We want to preserve only the minimal context:
@@ -389,6 +392,9 @@ class ArchiveList extends Results
 
 			// - - - + * * timestamp restrictions:
 			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
+
+			// Exclude pages and intros:
+			$this->ItemQuery->where_types( '-1000,1500,1520,1530,1570,1600' );
 		}
 
 
@@ -580,6 +586,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.47  2009/01/21 22:36:35  fplanque
+ * Cleaner handling of pages and intros in calendar and archives plugins
+ *
  * Revision 1.46  2008/01/21 09:35:38  fplanque
  * (c) 2008
  *
