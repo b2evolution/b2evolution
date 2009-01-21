@@ -679,7 +679,7 @@ function & mainlist_get_item()
 	{
 		$Item = & $MainList->get_item();
 
-		if( $Item->ID == $featured_displayed_item_ID )
+		if( $Item && $Item->ID == $featured_displayed_item_ID )
 		{	// This post was already displayed as a Featured post, let's skip it and get the next one:
 			$Item = & $MainList->get_item();
 		}
@@ -859,6 +859,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.48  2009/01/21 19:17:04  tblue246
+ * Fix PHP notice ("Trying to get property of non-object...")
+ *
  * Revision 1.47  2009/01/19 21:40:59  fplanque
  * Featured post proof of concept
  *
