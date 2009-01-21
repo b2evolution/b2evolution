@@ -217,12 +217,39 @@ $ItemList->cols[] = array(
 
 if( $ItemList->is_filtered() )
 {	// List is filtered, offer option to reset filters:
-	$ItemList->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters') );
+	$ItemList->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3 );
 }
 
 if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 {	// We have permission to add a post with at least one status:
-	$ItemList->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID, T_('New post').' &raquo;', 3, 4 );
+	global $tab;
+	switch( $tab )
+	{
+		case 'pages':
+			$label = T_('New page');
+			$title = T_('Create a new page...');
+			$new_ptyp_ID = 1000;
+			break;
+
+		case 'intros':
+			$label = T_('New intro');
+			$title = T_('Write a new intro text...');
+			$new_ptyp_ID = 1600;
+			break;
+
+		case 'podcasts':
+			$label = T_('New episode');
+			$title = T_('Package a new podcast episode...');
+			$new_ptyp_ID = 2000;
+			break;
+
+		default:
+			$label = T_('New post');
+			$title = T_('Write a new post...');
+			$new_ptyp_ID = 1;
+			break;
+	}
+	$ItemList->global_icon( $title, 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$new_ptyp_ID, $label.' &raquo;', 3, 4 );
 }
 
 
@@ -240,6 +267,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.9  2009/01/21 22:26:26  fplanque
+ * Added tabs to post browsing admin screen All/Posts/Pages/Intros/Podcasts/Comments
+ *
  * Revision 1.8  2008/02/09 20:13:08  fplanque
  * minor
  *

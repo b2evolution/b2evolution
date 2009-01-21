@@ -671,12 +671,24 @@ function attach_browse_tabs()
 			'items',
 			array(
 					'full' => array(
-						'text' => T_('Full posts'),
+						'text' => T_('All'),
 						'href' => 'admin.php?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 					'list' => array(
-						'text' => T_('Post list'),
+						'text' => T_('Posts'),
 						'href' => 'admin.php?ctrl=items&amp;tab=list&amp;filter=restore&amp;blog='.$Blog->ID,
+						),
+					'pages' => array(
+						'text' => T_('Pages'),
+						'href' => 'admin.php?ctrl=items&amp;tab=pages&amp;filter=restore&amp;blog='.$Blog->ID,
+						),
+					'intros' => array(
+						'text' => T_('Intros'),
+						'href' => 'admin.php?ctrl=items&amp;tab=intros&amp;filter=restore&amp;blog='.$Blog->ID,
+						),
+					'podcasts' => array(
+						'text' => T_('Podcasts'),
+						'href' => 'admin.php?ctrl=items&amp;tab=podcasts&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 				)
 		);
@@ -809,6 +821,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.27  2009/01/21 22:26:26  fplanque
+ * Added tabs to post browsing admin screen All/Posts/Pages/Intros/Podcasts/Comments
+ *
  * Revision 1.26  2009/01/21 20:33:49  fplanque
  * different display between featured and intro posts
  *

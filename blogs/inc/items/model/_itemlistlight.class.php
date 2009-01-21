@@ -106,8 +106,7 @@ class ItemListLight extends DataObjectList2
 			$limit = 20,
 			$cache_name = 'ItemCacheLight',	 // name of cache to be used (for table prefix info)
 			$param_prefix = '',
-			$filterset_name = '',				// Name to be used when saving the filterset (leave empty to use default for collection)
-			$restrict_to = array()			// Restrict the item list to a position, or contact, firm..... /* not used yet(?) */
+			$filterset_name = ''				// Name to be used when saving the filterset (leave empty to use default for collection)
 		)
 	{
 		global $Settings;
@@ -130,8 +129,6 @@ class ItemListLight extends DataObjectList2
 		}
 
 		$this->page_param = $param_prefix.'paged';
-
-		$this->restrict_to = $restrict_to;
 
 		// Initialize the default filter set:
 		$this->set_default_filters( array(
@@ -1512,6 +1509,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.26  2009/01/21 22:26:26  fplanque
+ * Added tabs to post browsing admin screen All/Posts/Pages/Intros/Podcasts/Comments
+ *
  * Revision 1.25  2009/01/21 18:23:26  fplanque
  * Featured posts and Intro posts
  *

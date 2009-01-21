@@ -597,18 +597,51 @@ function init_list_mode()
 	load_class('items/model/_itemlist.class.php');
 
 	// Create empty List:
-	$ItemList = new ItemList2( $Blog, NULL, NULL, $UserSettings->get('results_per_page') ); // COPY (func)
+	$ItemList = new ItemList2( $Blog, NULL, NULL, $UserSettings->get('results_per_page'), 'ItemCache', '', $tab /* filterset name */ ); // COPY (func)
 
 	$ItemList->set_default_filters( array(
 			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated', 'redirected' ),
-			'types' => NULL, // All types, TEMPORARY
 		) );
 
-	if( $tab == 'tracker' )
-	{	// In tracker mode, we want a different default sort:
-		$ItemList->set_default_filters( array(
-				'orderby' => 'priority',
-				'order' => 'ASC' ) );
+	switch( $tab )
+	{
+		case 'full':
+			$ItemList->set_default_filters( array(
+					'types' => NULL, // All types (suited for tab with full posts)
+				) );
+			break;
+
+		case 'list':
+			// Nothing special
+			break;
+
+		case 'pages':
+			$ItemList->set_default_filters( array(
+					'types' => '1000', // Pages
+				) );
+			break;
+
+		case 'intros':
+			$ItemList->set_default_filters( array(
+					'types' => '1500,1520,1530,1570,1600', // Intros
+				) );
+			break;
+
+		case 'podcasts':
+			$ItemList->set_default_filters( array(
+					'types' => '2000', // Podcasts
+				) );
+			break;
+
+		case 'tracker':
+			// In tracker mode, we want a different default sort:
+			$ItemList->set_default_filters( array(
+					'orderby' => 'priority',
+					'order' => 'ASC' ) );
+			break;
+
+		default:
+			echo $tab;
 	}
 
 	// Init filter params:
@@ -816,20 +849,23 @@ switch( $action )
 
 			switch( $tab )
 			{
-				case 'list':
-					// Display VIEW:
-					$AdminUI->disp_view( 'items/views/_item_list_table.view.php' );
-					break;
-
 				case 'tracker':
 					// Display VIEW:
 					$AdminUI->disp_view( 'items/views/_item_list_track.view.php' );
 					break;
 
 				case 'full':
-				default:
 					// Display VIEW:
 					$AdminUI->disp_view( 'items/views/_item_list_full.view.php' );
+					break;
+
+				case 'list':
+				case 'pages':
+				case 'intros':
+				case 'podcasts':
+				default:
+					// Display VIEW:
+					$AdminUI->disp_view( 'items/views/_item_list_table.view.php' );
 					break;
 			}
 
@@ -868,6 +904,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2009/01/21 22:26:26  fplanque
+ * Added tabs to post browsing admin screen All/Posts/Pages/Intros/Podcasts/Comments
+ *
  * Revision 1.24  2008/09/23 05:26:38  fplanque
  * Handle attaching files when multiple posts are edited simultaneously
  *

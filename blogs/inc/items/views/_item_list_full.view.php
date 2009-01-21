@@ -69,7 +69,7 @@ else
 	$block_item_Widget->title = T_('Full posts');
 	if( $ItemList->is_filtered() )
 	{	// List is filtered, offer option to reset filters:
-		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters') );
+		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3 );
 	}
 	$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post').' &raquo;', 3, 4 );
 }
@@ -404,6 +404,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.16  2009/01/21 22:26:26  fplanque
+ * Added tabs to post browsing admin screen All/Posts/Pages/Intros/Podcasts/Comments
+ *
  * Revision 1.15  2008/04/14 19:50:51  fplanque
  * enhanced attachments handling in post edit mode
  *

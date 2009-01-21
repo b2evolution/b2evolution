@@ -58,6 +58,7 @@ class ItemList2 extends ItemListLight
 	 * @param integer|NULL Limit
 	 * @param string name of cache to be used
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
+	 * @param string Name to be used when saving the filterset (leave empty to use default for collection)
 	 * @param array restrictions for itemlist (position, contact, firm, ...) key: restriction name, value: ID of the restriction
 	 */
 	function ItemList2(
@@ -67,14 +68,13 @@ class ItemList2 extends ItemListLight
 			$limit = 20,
 			$cache_name = 'ItemCache',	 // name of cache to be used
 			$param_prefix = '',
-			$filterset_name = '',				// Name to be used when saving the filterset (leave empty to use default for collection)
-			$restrict_to = array()			// Restrict the item list to a position, or contact, firm..... /* not used yet(?) */
+			$filterset_name = ''				// Name to be used when saving the filterset (leave empty to use default for collection)
 		)
 	{
 		global $Settings;
 
 		// Call parent constructor:
-		parent::ItemListLight( $Blog, $timestamp_min, $timestamp_max, $limit, $cache_name, $param_prefix, $filterset_name, $restrict_to );
+		parent::ItemListLight( $Blog, $timestamp_min, $timestamp_max, $limit, $cache_name, $param_prefix, $filterset_name );
 	}
 
 
@@ -666,6 +666,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.14  2009/01/21 22:26:26  fplanque
+ * Added tabs to post browsing admin screen All/Posts/Pages/Intros/Podcasts/Comments
+ *
  * Revision 1.13  2009/01/21 18:23:26  fplanque
  * Featured posts and Intro posts
  *
