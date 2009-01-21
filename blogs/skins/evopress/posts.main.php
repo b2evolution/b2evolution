@@ -88,6 +88,106 @@ skin_include( '_body_header.inc.php' );
 ?>
 
 <?php
+// -------------------------- BEGIN FEATURED/INTRO POST ---------------------------
+// Go Grab the featured post:
+if( $Item = & get_featured_Item() )
+{
+	?>
+	<div class="featured_post">
+
+		<?php
+			$Item->edit_link( array( // Link to backoffice for editing
+						'before'    => '<div class="floatright">',
+						'after'     => '</div>',
+					) );
+		?>
+
+		<h2><?php $Item->title(); ?></h2>
+
+		<?php
+			if( $Item->is_featured() )
+			{	// Featured post, display extra info: (as opposed to intro posts which are also displayed here):
+				?>
+				<small>
+					<?php
+						$Item->issue_time( array(
+								'time_format' => 'F jS, Y',
+							) );
+					?>
+				</small>
+				<?php
+			}
+		?>
+
+		<?php
+			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+			skin_include( '_item_content.inc.php', array(
+					'image_size'     => 'fit-400x320',
+					'more_link_text' => T_('Read more'),
+				) );
+			// Note: You can customize the default item feedback by copying the generic
+			// /skins/_item_feedback.inc.php file into the current skin folder.
+			// -------------------------- END OF POST CONTENT -------------------------
+		?>
+
+		<?php
+			// List all tags attached to this post:
+			$Item->tags( array(
+					'before' =>         '<div class="posttags">'.T_('Tags').': ',
+					'after' =>          '</div>',
+					'separator' =>      ', ',
+				) );
+		?>
+
+
+			<?php
+				if( $Item->is_featured() )
+				{	// Featured post, display extra info: (as opposed to intro posts which are also displayed here):
+					?>
+			<p class="postmetadata">
+				<?php
+					$Item->categories( array(
+						'before'          => T_('Posted in').' ',
+						'after'           => ' ',
+						'include_main'    => true,
+						'include_other'   => true,
+						'include_external'=> true,
+						'link_categories' => true,
+					) );
+				?>
+
+				<?php
+					$Item->edit_link( array( // Link to backoffice for editing
+							'before'    => ' | ',
+							'after'     => '',
+						) );
+				?>
+
+				<?php
+					// Link to comments, trackbacks, etc.:
+					$Item->feedback_link( array(
+							'type' => 'feedbacks',
+							'link_before' => ' | ',
+							'link_after' => '',
+							'link_text_zero' => '#',
+							'link_text_one' => '#',
+							'link_text_more' => '#',
+							'link_title' => '#',
+							'use_popup' => false,
+						) );
+				?>
+				</p>
+				<?php
+			}
+		?>
+
+	</div>
+	<?php
+}
+// ---------------------------- END FEATURED/INTRO POST ----------------------------
+?>
+
+<?php
 // Display message if no post:
 display_if_empty();
 

@@ -11,6 +11,14 @@ table.prevnext_post a {
 	text-decoration: none;
 }
 
+div.featured_post {
+	border: 1px solid #ccc;
+	padding: 14px;
+	margin: 1ex 0;
+}
+div.featured_post h2 {
+	margin-top: 6px;
+}
 
 .bMore {
 	text-align: left;

@@ -529,14 +529,12 @@ width: 100%;
 
 /* Styles for comments */
 div.bComment, /* Entire comment block */
-form.bComment /* New comment form */
-{
+form.bComment { /* New comment form */
 margin: 1ex 0;
 border: 1px dotted #999;
 }
 
-div.moderation_msg
-{
+div.moderation_msg {
 margin: 1ex 0;
 }
 
