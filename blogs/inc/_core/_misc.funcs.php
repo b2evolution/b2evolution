@@ -68,12 +68,12 @@ load_funcs('files/model/_file.funcs.php');
  */
 function shutdown()
 {
-  /**
+	/**
 	 * @var Hit
 	 */
 	global $Hit;
 
-  /**
+	/**
 	 * @var Session
 	 */
 	global $Session;
@@ -3183,6 +3183,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.60  2009/01/21 00:33:46  blueyed
+ * Fix indent
+ *
  * Revision 1.59  2009/01/19 23:57:33  blueyed
  * fix indent
  *
