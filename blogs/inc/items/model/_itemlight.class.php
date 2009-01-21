@@ -169,13 +169,13 @@ class ItemLight extends DataObject
 
 
 	/**
-	 * Is this a featured post
+	 * Is this a featured post (any intro post will return false even if it's checked as "featured")
 	 *
 	 * @return boolean
 	 */
 	function is_featured()
 	{
-		return !empty($this->featured);
+		return !( empty($this->featured) || $this->is_intro() );
 	}
 
 
@@ -916,6 +916,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2009/01/21 23:30:12  fplanque
+ * feature/intro posts display adjustments
+ *
  * Revision 1.11  2009/01/21 20:33:49  fplanque
  * different display between featured and intro posts
  *

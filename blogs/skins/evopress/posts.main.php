@@ -122,8 +122,8 @@ if( $Item = & get_featured_Item() )
 		<?php
 			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 			skin_include( '_item_content.inc.php', array(
-					'image_size'     => 'fit-400x320',
-					'more_link_text' => T_('Read more'),
+					'image_size' => 'fit-400x320',
+					'force_more' => true,
 				) );
 			// Note: You can customize the default item feedback by copying the generic
 			// /skins/_item_feedback.inc.php file into the current skin folder.
@@ -140,11 +140,11 @@ if( $Item = & get_featured_Item() )
 		?>
 
 
-			<?php
-				if( $Item->is_featured() )
-				{	// Featured post, display extra info: (as opposed to intro posts which are also displayed here):
-					?>
-			<p class="postmetadata">
+		<?php
+			if( $Item->is_featured() )
+			{	// Featured post, display extra info: (as opposed to intro posts which are also displayed here):
+				?>
+				<p class="postmetadata">
 				<?php
 					$Item->categories( array(
 						'before'          => T_('Posted in').' ',

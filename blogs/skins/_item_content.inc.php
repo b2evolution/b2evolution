@@ -26,6 +26,7 @@ $params = array_merge( array(
 		'before_url_link'     => '<p class="post_link">'.T_('Link:').' ',
 		'after_url_link'      => '</p>',
 		'url_link_text_template' => '$url$',
+		'force_more'  				=> false,
 		'before_more_link'    => '<p class="bMore">',
 		'after_more_link'     => '</p>',
 		'more_link_text'      => '#',
@@ -70,13 +71,15 @@ if( !empty($params['image_size']) )
 				'after'       => '',
 			) );
 		$Item->more_link( array(
-				'before'    => $params['before_more_link'],
-				'after'     => $params['after_more_link'],
-				'link_text' => $params['more_link_text'],
+				'force_more'  => $params['force_more'],
+				'before'      => $params['before_more_link'],
+				'after'       => $params['after_more_link'],
+				'link_text'   => $params['more_link_text'],
 			) );
 		$Item->content_extension( array(
 				'before'      => '',
 				'after'       => '',
+				'force_more'  => $params['force_more'],
 			) );
 
 		// Links to post pages (for multipage posts):
@@ -94,6 +97,9 @@ if( !empty($params['image_size']) )
 <?php
 /*
  * $Log$
+ * Revision 1.11  2009/01/21 23:30:12  fplanque
+ * feature/intro posts display adjustments
+ *
  * Revision 1.10  2008/09/15 10:44:17  fplanque
  * skin cleanup
  *

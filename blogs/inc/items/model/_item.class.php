@@ -1231,6 +1231,7 @@ class Item extends ItemLight
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
+				'force_more'  => false,
 				'before'      => '<p class="bMore">',
 				'after'       => '</p>',
 				'link_text'   => '#',		// text to display as the more link
@@ -1259,7 +1260,7 @@ class Item extends ItemLight
 			return '';
 		}
 
-		if( ! $more )
+		if( ! $more && ! $params['force_more'] )
 		{	// We're NOT in "more" mode:
 			if( $params['link_text'] == '#' )
 			{ // TRANS: this is the default text for the extended post "more" link
@@ -3605,6 +3606,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.62  2009/01/21 23:30:12  fplanque
+ * feature/intro posts display adjustments
+ *
  * Revision 1.61  2009/01/21 20:33:49  fplanque
  * different display between featured and intro posts
  *
