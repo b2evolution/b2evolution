@@ -114,6 +114,14 @@ $schema_queries['T_hitlog'] = array(
 		//     slow! If the indexes need to stay, would it be possible to queue
 		//     the hit logs and let them get handled by cron?!
 		//     Well, converting the table to MyISAM (from InnoDB) helped a lot..
+		// fp> Yes we do have a chronic problem with the hitlogging
+		//     The best solution would indeed be to write to a non indexed MyISAM table
+		//     and then to consolidate the data once per day/hour (not sure) to tables that will be used for viewing stats
+		//     ALSO ideally we would not keep all the hit data but only CONSOLIDATED data
+		//     needed for reports, e-g: this date = this many hits of type browser/robot/rss etc but not necessarilly the detail		
+		//     MAYBE a 2 step process would make sense?
+		//      1) write to MyISAM and cron every x minutes to replicate to indexed table
+		//      2) consolidate once a day
 
 $schema_queries['T_track__goal'] = array(
 		'Creating goals table',
@@ -142,6 +150,9 @@ $schema_queries['T_track__goalhit'] = array(
 
 /*
  * $Log$
+ * Revision 1.6  2009/01/21 18:30:01  fplanque
+ * doc
+ *
  * Revision 1.5  2009/01/21 00:46:45  blueyed
  * re: Note about E_TOO_MANY_INDEXES for T_hitlog
  *
