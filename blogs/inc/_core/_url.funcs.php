@@ -578,8 +578,8 @@ function url_rel_to_same_host( $url, $target_url )
  */
 function url_absolute( $url, $host = NULL )
 {
-	if( preg_match( '~^(\w+:)?//~', $url ) )
-	{ // URL is relative already ("//foo/bar" is absolute - leaving the protocol out):
+	if( is_absolute_url($url) )
+	{ // URL is absolute already
 		return $url;
 	}
 
@@ -637,6 +637,18 @@ function disp_url( $url, $max_length = NULL )
 
 
 /**
+ * Is a given URL absolute?
+ * Note: "//foo/bar" is absolute - leaving the protocol out.
+ * @param string URL
+ * @return boolean
+ */
+function is_absolute_url($url)
+{
+    return (bool)preg_match('~^(?:\w+:)?//~', $url);
+}
+
+
+/**
  * Compare two given URLs, if they are the same.
  * This converts all urlencoded chars (e.g. "%AA") to lowercase.
  * It appears that some webservers use lowercase for the chars (Apache),
@@ -653,6 +665,9 @@ function is_same_url( $a, $b )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.23  2009/01/21 21:22:07  blueyed
+ * Add is_absolute_url
+ *
  * Revision 1.22  2009/01/21 21:17:31  blueyed
  * validate_url: allow spaces in URL path. They are valid and allowed
  * in the file manager. So this allows linking to uploaded pictures
