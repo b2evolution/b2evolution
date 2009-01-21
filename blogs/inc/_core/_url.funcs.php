@@ -145,7 +145,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 						[a-z0-9]([a-z0-9.\-])+           # Don t allow anything too funky like entities
 				)
 				(:[0-9]+)?                       # optional port specification
-				[^ ]*                            # allow no space
+				.*                               # allow anything in the path (also spaces; used in FM - but no newlines).
 				$~ix', $url, $match) )
 			{ // Cannot validate URL structure
 				$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
@@ -653,6 +653,13 @@ function is_same_url( $a, $b )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.22  2009/01/21 21:17:31  blueyed
+ * validate_url: allow spaces in URL path. They are valid and allowed
+ * in the file manager. So this allows linking to uploaded pictures
+ * (which contain spaces in the file name).
+ * Previously, newlines have been valid in URLs! (due to use of "[^ ]")
+ * Add test.
+ *
  * Revision 1.21  2009/01/21 21:06:18  blueyed
  * url_rel_to_same_host:
  *  - Tests have been moved to url.funcs.simpletest.php.

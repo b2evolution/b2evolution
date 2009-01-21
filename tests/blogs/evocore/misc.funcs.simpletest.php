@@ -171,6 +171,7 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 			'mailto:example@example.org',
 			'mailto:example@example.org?subject=TEST',
 			'http://läu.de/',
+			'http://läu.de/foo bar',
 			) as $url )
 		{
 			$r = validate_url( $url, 'commenting' );
