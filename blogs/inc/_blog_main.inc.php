@@ -391,6 +391,7 @@ elseif( !empty($preview) )
 }
 elseif( $disp == 'posts' && !empty($Item) )
 { // We are going to display a single post
+	// if( in_array( $Item->ptyp_ID, array( 1000, 1500, 1520, 1530, 1570 ) ) ) // pages and intros
 	if( $Item->ptyp_ID == 1000 )
 	{
 		$disp = 'page';
@@ -594,6 +595,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.110  2009/01/21 20:33:49  fplanque
+ * different display between featured and intro posts
+ *
  * Revision 1.109  2008/12/31 00:25:26  fplanque
  * bugfix
  *

@@ -46,60 +46,55 @@ skin_include( '_body_header.inc.php' );
 	<div id="contentleft">
 
 	<?php
-	// -------------------------- BEGIN FEATURED POST ---------------------------
+	// -------------------------- BEGIN FEATURED/INTRO POST ---------------------------
 	// Go Grab the featured post:
 	if( $Item = & get_featured_Item() )
 	{
 		?>
-
 		<div class="featurepost">
+
+			<?php
+				$Item->edit_link( array( // Link to backoffice for editing
+							'before'    => '<div class="floatright">',
+							'after'     => '</div>',
+						) );
+			?>
 
 			<h2><?php $Item->title(); ?></h2>
 
 			<p class="postinfo">
 			<?php
-      	$Item->author( array(
-					'before'       => T_('By').' ',
-					'after'        => ' ',
-				) );
-			?>
-			<?php
-				$Item->issue_time( array(
-						'before'      => /* TRANS: date */ T_('on '),
-						'after'       => '',
-						'time_format' => 'M j, Y',
+				if( $Item->is_featured() )
+				{	// Featured post, display extra info: (as opposed to intro posts which are also displayed here):
+      		$Item->author( array(
+						'before'       => T_('By').' ',
+						'after'        => ' ',
 					) );
-			?>
-			<?php
-				/*
-				$Item->categories( array(
-						'before'          => ' | '.T_('In '),
-						'after'           => ' ',
-						'include_main'    => true,
-						'include_other'   => true,
-						'include_external'=> true,
-						'link_categories' => true,
-					) );
-				*/
-			?>
-			<?php
-				// Link to comments, trackbacks, etc.:
-				$Item->feedback_link( array(
-						'type' => 'feedbacks',
-						'link_before' => ' | ',
-						'link_after' => '',
-						'link_text_zero' => '#',
-						'link_text_one' => '#',
-						'link_text_more' => '#',
-						'link_title' => '#',
-						'use_popup' => false,
-					) );
-			?>
-			<?php
-				$Item->edit_link( array( // Link to backoffice for editing
-						'before'    => ' | ',
-						'after'     => '',
-					) );
+					$Item->issue_time( array(
+							'before'      => /* TRANS: date */ T_('on '),
+							'after'       => '',
+							'time_format' => 'M j, Y',
+						) );
+					$Item->categories( array(
+							'before'          => ' | '.T_('In '),
+							'after'           => ' ',
+							'include_main'    => true,
+							'include_other'   => true,
+							'include_external'=> true,
+							'link_categories' => true,
+						) );
+					// Link to comments, trackbacks, etc.:
+					$Item->feedback_link( array(
+							'type' => 'feedbacks',
+							'link_before' => ' | ',
+							'link_after' => '',
+							'link_text_zero' => '#',
+							'link_text_one' => '#',
+							'link_text_more' => '#',
+							'link_title' => '#',
+							'use_popup' => false,
+						) );
+				}
 			?>
 			</p>
 
@@ -126,7 +121,7 @@ skin_include( '_body_header.inc.php' );
 		</div>
 		<?php
 	}
-	// ---------------------------- END FEATURED POST ----------------------------
+	// ---------------------------- END FEATURED/INTRO POST ----------------------------
 	?>
 
 

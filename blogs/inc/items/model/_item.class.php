@@ -629,6 +629,7 @@ class Item extends ItemLight
 	function can_see_comments()
 	{
 		if( $this->comment_status == 'disabled'
+				|| $this->is_intro() // Intros: no comments
 		    || ( $this->get_Blog() && $this->Blog->allowcomments == 'never' ) )
 		{ // Comments are disabled on this post
 			return false;
@@ -3604,6 +3605,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.61  2009/01/21 20:33:49  fplanque
+ * different display between featured and intro posts
+ *
  * Revision 1.60  2008/12/28 23:35:51  fplanque
  * Autogeneration of category/chapter slugs(url names)
  *

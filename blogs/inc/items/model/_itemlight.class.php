@@ -157,6 +157,28 @@ class ItemLight extends DataObject
 	}
 
 
+	/**
+	 * Is this an Intro post
+	 *
+	 * @return boolean
+	 */
+	function is_intro()
+	{
+		return ($this->ptyp_ID >= 1500 && $this->ptyp_ID <= 1600);
+	}
+
+
+	/**
+	 * Is this a featured post
+	 *
+	 * @return boolean
+	 */
+	function is_featured()
+	{
+		return !empty($this->featured);
+	}
+
+
   /**
 	 * Generate a single post link for the item
 	 *
@@ -725,8 +747,15 @@ class ItemLight extends DataObject
 
 		if( $params['link_type'] == '#' )
 		{	// Use default link type from settings:
-			$this->get_Blog();
-			$params['link_type'] = $this->Blog->get_setting( 'title_link_type' );
+			if( $this->is_intro() )
+			{	// This is an intro, do not link title by default:
+				$params['link_type'] = 'none';
+			}
+			else
+			{	// This is a normal post: use default link strategy from Blog settings:
+				$this->get_Blog();
+				$params['link_type'] = $this->Blog->get_setting( 'title_link_type' );
+			}
 		}
 
 		switch( $params['link_type'] )
@@ -887,6 +916,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2009/01/21 20:33:49  fplanque
+ * different display between featured and intro posts
+ *
  * Revision 1.10  2009/01/21 18:23:26  fplanque
  * Featured posts and Intro posts
  *

@@ -59,6 +59,7 @@ function init_MainList( $items_nb_limit )
 		{	// Get  pages:
 			$MainList->set_default_filters( array(
 					'types' => '1000',		// pages
+					// 'types' => '1000,1500,1520,1530,1570',		// pages and intros (intros should normally never be called)
 				) );
 		}
 		// else: we are either in single or in posts mode
@@ -808,6 +809,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.26  2009/01/21 20:33:49  fplanque
+ * different display between featured and intro posts
+ *
  * Revision 1.25  2009/01/21 18:23:26  fplanque
  * Featured posts and Intro posts
  *
