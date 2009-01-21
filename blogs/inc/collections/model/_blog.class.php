@@ -1235,6 +1235,7 @@ class Blog extends DataObject
 	 *
 	 * If we're {@link is_admin_page() on an admin page}, it adds status messages.
 	 * @todo These status messages should rather go to a "syslog" and not be displayed to a normal user
+	 * @todo dh> refactor this into e.g. create_media_dir() and use it for Blog::get_media_dir, too.
 	 *
 	 * @param boolean Create the directory, if it does not exist yet?
 	 * @return string path string on success, false if the dir could not be created
@@ -1966,6 +1967,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.50  2009/01/21 21:44:35  blueyed
+ * TODO to add something like create_media_dir
+ *
  * Revision 1.49  2008/12/28 22:48:12  fplanque
  * increase blog name max length to 255 chars
  *

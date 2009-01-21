@@ -283,6 +283,7 @@ class User extends DataObject
 	 *
 	 * If we're {@link is_admin_page() on an admin page}, it adds status messages.
 	 * @todo These status messages should rather go to a "syslog" and not be displayed to a normal user
+	 * @todo dh> refactor this into e.g. create_media_dir() and use it for Blog::get_media_dir, too.
 	 *
 	 * @param boolean Create the directory, if it does not exist yet?
 	 * @return mixed the path as string on success, false if the dir could not be created
@@ -1465,6 +1466,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2009/01/21 21:44:35  blueyed
+ * TODO to add something like create_media_dir
+ *
  * Revision 1.13  2009/01/13 23:45:59  fplanque
  * User fields proof of concept
  *
