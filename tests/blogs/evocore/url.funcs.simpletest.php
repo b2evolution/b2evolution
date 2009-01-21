@@ -58,6 +58,15 @@ class UrlFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual(
 			url_rel_to_same_host('foobar', 'http://example.com/barfoo'),
 			'foobar' );
+
+		// Tests for URLs without protocol. Currently failing.
+		$this->assertEqual(
+			url_rel_to_same_host('http://foo/bar', '//foo/baz'),
+			'//foo/bar' );
+
+		$this->assertEqual(
+			url_rel_to_same_host('//foo/bar', 'https://foo/baz'),
+			'//foo/bar' );
 	}
 
 }

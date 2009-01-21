@@ -514,6 +514,8 @@ function url_add_tail( $url, $tail )
  * This is useful for redirect_to params, to keep them short and avoid mod_security
  * rejecting the request as "Not Acceptable" (whole URL as param).
  *
+ * NOTE: parse_url cannot handle URLs without scheme (e.g. "//example.com/foo").
+ *
  * @param string URL to handle
  * @param string URL where we want to make $url relative to
  * @return string
@@ -651,6 +653,13 @@ function is_same_url( $a, $b )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.21  2009/01/21 21:06:18  blueyed
+ * url_rel_to_same_host:
+ *  - Tests have been moved to url.funcs.simpletest.php.
+ *  - Add currently failing tests for handling of URLs without protocol,
+ *    which parse_url parses as path-only.
+ *  - Add note to phpdoc.
+ *
  * Revision 1.20  2008/12/20 22:36:33  blueyed
  * Add is_same_url() to compare URLs without taking case of urlencoded parts into account. This is required to prevent infinite redirects in the handling of canonical URLs.
  *
