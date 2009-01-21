@@ -2203,9 +2203,9 @@ function upgrade_b2evo_tables()
 
 	/* fp> this is CVS. This is NOT final	*/
 
-	task_begin( 'Adding default Post Types' );
+	task_begin( 'Adding new Post Types...' );
 	$DB->query( "
-		REPLACE INTO {$tableprefix}posttypes ( ptyp_ID, ptyp_name )
+		REPLACE INTO T_items__type( ptyp_ID, ptyp_name )
 		VALUES ( 1500, 'Intro-Main' ),
 					 ( 1520, 'Intro-Cat' ),
 					 ( 1530, 'Intro-Tag' ),
@@ -2222,7 +2222,7 @@ function upgrade_b2evo_tables()
 		)" );
 	task_end();
 
-	task_begin( 'Creating default field definitions' );
+	task_begin( 'Creating default field definitions...' );
 	$DB->query( "
     INSERT INTO T_users__fielddefs (ufdf_ID, ufdf_type, ufdf_name)
 		 VALUES ( 10000, 'email',    'MSN/Live IM'),
@@ -2254,7 +2254,7 @@ function upgrade_b2evo_tables()
 						(300300, 'text',     'Home address');" );
 	task_end();
 
-	task_begin( 'Creating table for User fields' );
+	task_begin( 'Creating table for User fields...' );
 	$DB->query( "CREATE TABLE T_users__fields (
 			uf_ID      int(10) unsigned NOT NULL auto_increment,
 		  uf_user_ID int(10) unsigned NOT NULL,
@@ -2413,6 +2413,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.271  2009/01/21 18:52:15  fplanque
+ * fix
+ *
  * Revision 1.270  2009/01/21 18:23:26  fplanque
  * Featured posts and Intro posts
  *
