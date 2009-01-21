@@ -283,6 +283,17 @@ class Results extends Table
 
 
 	/**
+	 * Reset the query -- EXPERIMENTAL
+	 *
+	 * Useful in derived classes such as ItemList to requery with a slighlty moidified filterset
+	 */
+	function reset()
+	{
+		$this->rows = NULL;
+	}
+
+
+	/**
 	 * Rewind resultset
 	 */
 	function restart()
@@ -1812,6 +1823,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.21  2009/01/21 18:23:26  fplanque
+ * Featured posts and Intro posts
+ *
  * Revision 1.20  2008/12/27 21:09:28  fplanque
  * minor
  *

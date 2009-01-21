@@ -46,6 +46,7 @@ skin_include( '_body_header.inc.php' );
 	<div id="contentleft">
 
 	<?php
+	// -------------------------- BEGIN FEATURED POST ---------------------------
 	// Go Grab the featured post:
 	if( $Item = & get_featured_Item() )
 	{
@@ -70,6 +71,7 @@ skin_include( '_body_header.inc.php' );
 					) );
 			?>
 			<?php
+				/*
 				$Item->categories( array(
 						'before'          => ' | '.T_('In '),
 						'after'           => ' ',
@@ -78,6 +80,7 @@ skin_include( '_body_header.inc.php' );
 						'include_external'=> true,
 						'link_categories' => true,
 					) );
+				*/
 			?>
 			<?php
 				// Link to comments, trackbacks, etc.:
@@ -123,6 +126,7 @@ skin_include( '_body_header.inc.php' );
 		</div>
 		<?php
 	}
+	// ---------------------------- END FEATURED POST ----------------------------
 	?>
 
 

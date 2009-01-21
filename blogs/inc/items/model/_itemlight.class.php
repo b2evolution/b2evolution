@@ -293,8 +293,8 @@ class ItemLight extends DataObject
 	{
 		global $DB, $cacheweekly, $Settings;
 
-		if( $this->ptyp_ID == 1000 )
-		{	// Page: force use of single url:
+		if( in_array( $this->ptyp_ID, array( 1000, 1500, 1520, 1530, 1570, 1600 ) ) ) // page & intros
+		{	// force use of single url:
 			$permalink_type = 'single';
 		}
 		elseif( empty( $permalink_type ) )
@@ -887,6 +887,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2009/01/21 18:23:26  fplanque
+ * Featured posts and Intro posts
+ *
  * Revision 1.9  2008/06/20 01:22:04  blueyed
  * Add ItemLight::get_title(). Make ItemLight::title() use this.
  *

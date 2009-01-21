@@ -61,7 +61,7 @@ function init_MainList( $items_nb_limit )
 					'types' => '1000',		// pages
 				) );
 		}
-		// else: we are either in single or in page mode
+		// else: we are either in single or in posts mode
 
 		// pre_dump( $MainList->default_filters );
 		$MainList->load_from_Request( false );
@@ -93,34 +93,69 @@ function init_MainList( $items_nb_limit )
 
 
 /**
+ * Return an Item if an Intro or a Featured item is available for display in current disp.
+ *
  * @return Item
  */
 function & get_featured_Item()
 {
 	global $Blog;
 	global $timestamp_min, $timestamp_max;
-	global $MainList;
+	global $disp, $disp_detail, $MainList;
 	global $featured_displayed_item_ID;
 
-	if( !isset($MainList) || $MainList->is_filtered() )
-	{
+	if( $disp != 'posts' || !isset($MainList) )
+	{	// If we're not displaying postS, don't display a feature post on top!
 		$Item = NULL;
 		return $Item;
 	}
 
 	$FeaturedList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max, 1 );
 
-	$FeaturedList->set_default_filters( array(
-			'featured' => 1,  // Featured posts only (TODO!)
-			//'types' => '1000',		// pages
-		) );
+	$FeaturedList->set_default_filters( $MainList->filters );
 
-	// pre_dump( $MainList->default_filters );
-	// $FeaturedList->load_from_Request( false );
-	// pre_dump( $MainList->filters );
+	if( ! $MainList->is_filtered() )
+	{	// Restrict to 'main' and 'all' intros:
+		$FeaturedList->set_filters( array(
+				'types' => '1500,1600',
+			) );
+	}
+	else
+	{	// Filtered...
+		// echo $disp_detail;
+		switch( $disp_detail )
+		{
+			case 'posts-cat':
+				$restrict_to_types = '1520,1570,1600';
+				break;
+			case 'posts-tag':
+				$restrict_to_types = '1530,1570,1600';
+				break;
+			default:
+				$restrict_to_types = '1570,1600';
+		}
 
+		$FeaturedList->set_filters( array(
+				'types' => $restrict_to_types,
+			) );
+	}
+	// pre_dump( $FeaturedList->filters );
 	// Run the query:
 	$FeaturedList->query();
+
+	if( $FeaturedList->result_num_rows == 0 )
+	{ // No Intro page was found, try to find a featured post instead:
+
+		$FeaturedList->reset();
+
+		$FeaturedList->set_filters( array(
+				'featured' => 1,  // Featured posts only (TODO!)
+				// Types will already be reset to defaults here
+			) );
+
+		// Run the query:
+		$FeaturedList->query();
+	}
 
 	$Item = $FeaturedList->get_item();
 
@@ -773,6 +808,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.25  2009/01/21 18:23:26  fplanque
+ * Featured posts and Intro posts
+ *
  * Revision 1.24  2009/01/19 21:40:59  fplanque
  * Featured post proof of concept
  *

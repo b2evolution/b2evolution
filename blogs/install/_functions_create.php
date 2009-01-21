@@ -208,6 +208,11 @@ function create_default_data()
 		VALUES ( 1, 'Post' ),
 					 ( 2, 'Link' ),
 					 ( 1000, 'Page' ),
+					 ( 1500, 'Intro-Main' ),
+					 ( 1520, 'Intro-Cat' ),
+					 ( 1530, 'Intro-Tag' ),
+					 ( 1570, 'Intro-Sub' ),
+					 ( 1600, 'Intro-All' ),
 					 ( 2000, 'Podcast' ),
 					 ( 3000, 'Reserved' ),
 					 ( 4000, 'Reserved' ),
@@ -586,22 +591,55 @@ If needed, a skin can format info pages differently from regular posts."), $now,
 	$edit_File->link_to_Item( $edited_Item );
 
 
-
+	/*
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("Default Intro post"), T_("This uses post type \"Intro-All\"."),
+												$now, $cat_b2evo, array( $cat_ann_b ), 'published', '#', '', '', 'open', array('default'), 1600 );
+	*/
+
+	// Insert a post:
+	$now = date('Y-m-d H:i:s', ($timestamp++ - 31536000) ); // A year ago
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("Main Intro post"), T_("This is the main intro post. It appears on the homepage only."),
+												$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 1500 );
+
+	// Insert a post:
+	$now = date('Y-m-d H:i:s', ($timestamp++ - 31536000) ); // A year ago
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("b2evolution tips category &ndash; Sub Intro post"), T_("This uses post type \"Intro-Cat\" and is attached to the desired Category(ies)."),
+												$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 1520 );
+
+	// Insert a post:
+	$now = date('Y-m-d H:i:s', ($timestamp++ - 31536000) ); // A year ago
+	$edited_Item = & new Item();
+	$edited_Item->insert( 1, T_("Widgets tag &ndash; Sub Intro post"), T_("This uses post type \"Intro-Tag\" and is tagged with the desired Tag(s)."),
+												$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 1530 );
+	$edited_Item->set_tags_from_string( 'widgets' );
+	//$edited_Item->dbsave();
+	$edited_Item->insert_update_tags( 'update' );
+
+	// Insert a post:
+	// TODO: move to Blog A
+	$now = date('Y-m-d H:i:s', $timestamp++);
+	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_("Featured post"), T_("This is a demo of a featured post.
 
-When this post is displayed in the featured area, it is not duplicated in the normal post flow."), $now, $cat_b2evo );
+It will be featured whenever we have no specific \"Intro\" post to display for the current request. To see it in action, try displaying the \"Announcements\" category.
+
+Also note that when the post is featured, it does not appear in the regular post flow."),
+	$now, $cat_b2evo, array( $cat_ann_b ) );
 	$edited_Item->set( 'featured', 1 );
-	$edited_Item->dbupdate();
+	$edited_Item->dbsave();
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_("Apache optimization..."), T_("In the <code>/blogs</code> folder there is a file called [<code>sample.htaccess</code>]. You should try renaming it to [<code>.htaccess</code>].
 
-This will optimize the way b2evolution is handled by the webserver (if you are using Apache). This file is not active by default because a few hosts would display an error right away when you try to use it. If this happens to you when you rename the file, just remove it and you'll be fine."), $now, $cat_b2evo );
+This will optimize the way b2evolution is handled by the webserver (if you are using Apache). This file is not active by default because a few hosts would display an error right away when you try to use it. If this happens to you when you rename the file, just remove it and you'll be fine."),
+												$now, $cat_b2evo, array( $cat_ann_b ) );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -619,6 +657,9 @@ If you want to integrate a b2evolution blog into a complex website, you'll proba
 You will find more information in the stub/template files themselves. Open them in a text editor and read the comments in there.
 
 Either way, make sure you go to the blogs admin and set the correct access method/URL for your blog. Otherwise, the permalinks will not function properly."), $now, $cat_b2evo );
+	$edited_Item->set_tags_from_string( 'skins' );
+	//$edited_Item->dbsave();
+	$edited_Item->insert_update_tags( 'update' );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -628,6 +669,9 @@ Either way, make sure you go to the blogs admin and set the correct access metho
 You can add, remove and reorder widgets from the Blog Settings tab in the admin interface.
 
 Note: to be displayed widgets are placed in containers. Each container appears in a specific place on a skin. If you change the skin of your blog, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.'), $now, $cat_b2evo );
+	$edited_Item->set_tags_from_string( 'widgets' );
+	//$edited_Item->dbsave();
+	$edited_Item->insert_update_tags( 'update' );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -643,6 +687,10 @@ You can also create your own skins by duplicating, renaming and customizing any 
 To start customizing a skin, open its "<code>index.main.php</code>" file in an editor and read the comments in there. Note: you can also edit skins in the "Files" tab of the admin interface.
 
 And, of course, read the <a href="http://manual.b2evolution.net/Skins_2.0" target="_blank">manual on skins</a>!'), $now, $cat_b2evo );
+	$edited_Item->set_tags_from_string( 'skins' );
+	$edited_Item->set( 'featured', 1 );
+	$edited_Item->dbsave();
+	// $edited_Item->insert_update_tags( 'update' );
 
 
 	// Insert a post:
@@ -779,6 +827,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.253  2009/01/21 18:23:26  fplanque
+ * Featured posts and Intro posts
+ *
  * Revision 1.252  2009/01/19 21:40:58  fplanque
  * Featured post proof of concept
  *

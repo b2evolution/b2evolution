@@ -58,34 +58,37 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 
 		// if( $debug ) echo "LOADING generic_ctp_number CACHE for posts: $postIDlist<br />";
 
-		foreach( $postIDarray as $tmp_post_id)
-		{	// Initializes each post to nocount!
-			$cache_ctp_number[$tmp_post_id] = array(
-					'comments' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
-					'trackbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
-					'pingbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
-					'feedbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 )
-				);
-		}
-
-		$query = "SELECT comment_post_ID, comment_type, comment_status, COUNT(*) AS type_count
-							  FROM T_comments
-							 WHERE comment_post_ID IN ($postIDlist)
-							 GROUP BY comment_post_ID, comment_type, comment_status";
-
-		foreach( $DB->get_results( $query ) as $row )
+		if( ! empty( $postIDlist ) )	// This can happen when displaying a featured post of something that's not in the MainList
 		{
-			// detail by status, tyep and post:
-			$cache_ctp_number[$row->comment_post_ID][$row->comment_type.'s'][$row->comment_status] = $row->type_count;
+			foreach( $postIDarray as $tmp_post_id)
+			{	// Initializes each post to nocount!
+				$cache_ctp_number[$tmp_post_id] = array(
+						'comments' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
+						'trackbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
+						'pingbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
+						'feedbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 )
+					);
+			}
 
-			// Total for type on post:
-			$cache_ctp_number[$row->comment_post_ID][$row->comment_type.'s']['total'] += $row->type_count;
+			$query = "SELECT comment_post_ID, comment_type, comment_status, COUNT(*) AS type_count
+								  FROM T_comments
+								 WHERE comment_post_ID IN ($postIDlist)
+								 GROUP BY comment_post_ID, comment_type, comment_status";
 
-			// Total for status on post:
-			$cache_ctp_number[$row->comment_post_ID]['feedbacks'][$row->comment_status] += $row->type_count;
+			foreach( $DB->get_results( $query ) as $row )
+			{
+				// detail by status, tyep and post:
+				$cache_ctp_number[$row->comment_post_ID][$row->comment_type.'s'][$row->comment_status] = $row->type_count;
 
-			// Total for post:
-			$cache_ctp_number[$row->comment_post_ID]['feedbacks']['total'] += $row->type_count;
+				// Total for type on post:
+				$cache_ctp_number[$row->comment_post_ID][$row->comment_type.'s']['total'] += $row->type_count;
+
+				// Total for status on post:
+				$cache_ctp_number[$row->comment_post_ID]['feedbacks'][$row->comment_status] += $row->type_count;
+
+				// Total for post:
+				$cache_ctp_number[$row->comment_post_ID]['feedbacks']['total'] += $row->type_count;
+			}
 		}
 	}
 	/*	else
@@ -217,6 +220,9 @@ function comments_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.3  2009/01/21 18:23:26  fplanque
+ * Featured posts and Intro posts
+ *
  * Revision 1.2  2008/01/21 09:35:27  fplanque
  * (c) 2008
  *

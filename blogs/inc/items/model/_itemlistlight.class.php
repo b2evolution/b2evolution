@@ -158,7 +158,7 @@ class ItemListLight extends DataObjectList2
 				'ymdhms_min' => NULL,
 				'ymdhms_max' => NULL,
 				'statuses' => NULL,
-				'types' => '-1000',							// All types except pages
+				'types' => '-1000,1500,1520,1530,1570,1600',	// All types except pages and intros
 				'visibility_array' => array( 'published', 'protected', 'private' ),
 				'orderby' => $this->Blog->get_setting('orderby'),
 				'order' => $this->Blog->get_setting('orderdir'),
@@ -167,6 +167,20 @@ class ItemListLight extends DataObjectList2
 				'page' => 1,
 				'featured' => NULL,
 			) );
+	}
+
+
+	/**
+	 * Reset the query -- EXPERIMENTAL
+	 *
+	 * Useful to requery with a slighlty moidified filterset
+	 */
+	function reset()
+	{
+		// The SQL Query object:
+		$this->ItemQuery = & new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
+
+		parent::reset();
 	}
 
 
@@ -1498,6 +1512,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.25  2009/01/21 18:23:26  fplanque
+ * Featured posts and Intro posts
+ *
  * Revision 1.24  2009/01/19 21:40:59  fplanque
  * Featured post proof of concept
  *

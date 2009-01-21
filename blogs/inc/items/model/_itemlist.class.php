@@ -238,7 +238,7 @@ class ItemList2 extends ItemListLight
 			return;
 		}
 
-		// INNIT THE QUERY:
+		// INIT THE QUERY:
 		$this->query_init();
 
 		// Results style orders:
@@ -490,7 +490,7 @@ class ItemList2 extends ItemListLight
 			return $r;
 		}
 
-		if( $current_Item->ptyp_ID == 1000 ) // page
+		if( in_array( $current_Item->ptyp_ID, array( 1000, 1500, 1520, 1530, 1570, 1600 ) ) ) // page & intros
 		{	// We are not on a REGULAR post:
 			$r = NULL;
 			return $r;
@@ -666,6 +666,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.13  2009/01/21 18:23:26  fplanque
+ * Featured posts and Intro posts
+ *
  * Revision 1.12  2008/05/26 19:22:02  fplanque
  * fixes
  *
