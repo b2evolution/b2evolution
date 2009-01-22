@@ -2254,6 +2254,7 @@ class Plugin
 	 *
 	 * {@internal This is mainly a copy of {@link T_()}, for the $use_l10n==2 case.}}
 	 *
+	 * @todo Factorize with global T_() function
 	 * @param string The string (english), that should be translated
 	 * @param string Requested locale ({@link $current_locale} gets used by default)
 	 * @return string
@@ -2901,6 +2902,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.10  2009/01/22 23:56:47  blueyed
+ * todo
+ *
  * Revision 1.9  2008/06/17 18:41:34  blueyed
  * Add Plugin::TS_(), doing the same as TS_() but for plugins.
  *
