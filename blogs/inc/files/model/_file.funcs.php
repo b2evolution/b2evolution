@@ -377,11 +377,19 @@ function get_canonical_path( $ads_path )
 	// Remove windows backslashes:
 	$ads_path = str_replace( '\\', '/', $ads_path );
 
+	$is_absolute = is_absolute_filename($ads_path);
+
 	// Make sure there's a trailing slash
 	$ads_path = trailing_slash($ads_path);
 
-	$ads_path = str_replace( '//', '/', $ads_path );
-	$ads_path = str_replace( '/./', '/', $ads_path );
+	while( strpos($ads_path, '//') !== false )
+	{
+		$ads_path = str_replace( '//', '/', $ads_path );
+	}
+	while( strpos($ads_path, '/./') !== false )
+	{
+		$ads_path = str_replace( '/./', '/', $ads_path );
+	}
 	while( ($ads_realpath = preg_replace( '#(^|/)([^/^.]+)/\.\./#', '$1', $ads_path )) != $ads_path )
 	{ // While we find /../ back references to dereference...
 		// echo '*';
@@ -392,6 +400,11 @@ function get_canonical_path( $ads_path )
 
 	if( strpos( $ads_realpath, '..' ) !== false )
 	{	// Path malformed:
+		return NULL;
+	}
+
+	if( $is_absolute && ! strlen($ads_realpath) )
+	{
 		return NULL;
 	}
 
@@ -730,8 +743,29 @@ function mkdir_r( $dirName, $chmod = NULL )
 }
 
 
+/**
+ * Is the given path absolute (non-relative)?
+ *
+ * @return boolean
+ */
+function is_absolute_filename($path)
+{
+	$pathlen = strlen($path);
+	if( ! $pathlen )
+	{
+		return false;
+	}
+	return $path[0] == '/' // unix
+		|| ( is_windows() && $pathlen > 1 && $path[1] == ':' );
+}
+
+
+
 /*
  * $Log$
+ * Revision 1.12  2009/01/22 23:21:50  blueyed
+ * Fix get_canonical_path. Add tests. Re-add is_absolute_filename (name sucks).
+ *
  * Revision 1.11  2008/12/30 23:00:41  fplanque
  * Major waste of time rolling back broken black magic! :(
  * 1) It was breaking the backoffice as soon as $admin_url was not a direct child of $baseurl.

@@ -91,20 +91,24 @@ class FileFuncsTestCase extends EvoUnitTestCase
 
 	function test_get_canonical_path()
 	{
-		$this->assertEqual( get_canonical_path( '' ), '' );
-		$this->assertEqual( get_canonical_path( '/hello/world' ), '/hello/world/' );
-		$this->assertEqual( get_canonical_path( 'hello/world' ), 'hello/world/' );
-		$this->assertEqual( get_canonical_path( '/hello/world/' ), '/hello/world/' );
-		$this->assertEqual( get_canonical_path( '/hello/../world' ), '/world/' );
-		$this->assertEqual( get_canonical_path( 'hello/../world/' ), 'world/' );
-		$this->assertEqual( get_canonical_path( '/hello/../world/../' ), '/' );
-		$this->assertEqual( get_canonical_path( '/hello/world/../../' ), '/' );
-		$this->assertEqual( get_canonical_path( '/../' ), NULL );
-		$this->assertEqual( get_canonical_path( '/../../' ), NULL );	// Even number of ..
-		$this->assertEqual( get_canonical_path( 'C:\\hello\\world\\..\\..\\' ), 'C:/' );
-		$this->assertEqual( get_canonical_path( 'C:\\hello\\world\\..\\..\\..\\' ), NULL );
-		$this->assertEqual( get_canonical_path( 'C:\\hello\\world\\..\\..\\..\\..\\' ), NULL );
-		$this->assertEqual( get_canonical_path( 'C:\\../..\\' ), NULL );
+		$this->assertIdentical( get_canonical_path( '' ), '' );
+		$this->assertIdentical( get_canonical_path( '/hello/world' ), '/hello/world/' );
+		$this->assertIdentical( get_canonical_path( 'hello/world' ), 'hello/world/' );
+		$this->assertIdentical( get_canonical_path( '/hello/world/' ), '/hello/world/' );
+		$this->assertIdentical( get_canonical_path( '/hello/../world' ), '/world/' );
+		$this->assertIdentical( get_canonical_path( 'hello/../world/' ), 'world/' );
+		$this->assertIdentical( get_canonical_path( '/hello/../world/../' ), '/' );
+		$this->assertIdentical( get_canonical_path( '/hello/world/../../' ), '/' );
+		$this->assertIdentical( get_canonical_path( '/../' ), NULL );
+		$this->assertIdentical( get_canonical_path( '/../../' ), NULL );	// Even number of ..
+		$this->assertIdentical( get_canonical_path( 'C:\\hello\\world\\..\\..\\' ), 'C:/' );
+		$this->assertIdentical( get_canonical_path( 'C:\\hello\\world\\..\\..\\..\\' ), NULL );
+		$this->assertIdentical( get_canonical_path( 'C:\\hello\\world\\..\\..\\..\\..\\' ), NULL );
+		$this->assertIdentical( get_canonical_path( 'C:\\../..\\' ), NULL );
+		$this->assertIdentical( get_canonical_path( '/./././././' ), '/' );
+		$this->assertIdentical( get_canonical_path( '/.//////.././//./.' ), NULL );
+		$this->assertIdentical( get_canonical_path( '/.//////foo/.././//./.' ), '/' );
+		$this->assertIdentical( get_canonical_path( '/.//////../foo/.///./.' ), NULL );
 	}
 }
 
