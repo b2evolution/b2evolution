@@ -61,6 +61,7 @@ $content_type_header = NULL;
 
 /**
  * @global ID of featured post that is being displayed -- needed so we can filter it out of normal post flow
+ * @todo dh> Why not just compare it with get_featured_Item()?!!
  */
 $featured_displayed_item_ID = NULL;
 
@@ -307,6 +308,9 @@ $skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', ar
 
 /*
  * $Log$
+ * Revision 1.33  2009/01/22 18:44:56  blueyed
+ * Fix E_NOTICE if there is no featured item. Add TODO about this assignment.
+ *
  * Revision 1.32  2009/01/19 21:40:59  fplanque
  * Featured post proof of concept
  *

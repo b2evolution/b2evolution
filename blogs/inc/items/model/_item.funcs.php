@@ -161,7 +161,7 @@ function & get_featured_Item()
 	$Item = $FeaturedList->get_item();
 
 	// Memorize that ID so that it can later be filtered out normal display:
-	$featured_displayed_item_ID = $Item->ID;
+	$featured_displayed_item_ID = $Item ? $Item->ID : $Item;
 
 	return $Item;
 }
@@ -821,6 +821,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.28  2009/01/22 18:44:56  blueyed
+ * Fix E_NOTICE if there is no featured item. Add TODO about this assignment.
+ *
  * Revision 1.27  2009/01/21 22:26:26  fplanque
  * Added tabs to post browsing admin screen All/Posts/Pages/Intros/Podcasts/Comments
  *
