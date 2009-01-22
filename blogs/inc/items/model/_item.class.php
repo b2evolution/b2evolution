@@ -2916,7 +2916,7 @@ class Item extends ItemLight
 		if( empty($this->urltitle) || isset($this->dbchanges['post_urltitle']) )
 		{ // Url title has changed or is empty
 			// echo 'updating url title';
-			$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $this->dbprefix.'urltitle', $this->dbIDname, $this->dbtablename) );
+			$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $this->dbprefix.'urltitle', $this->dbIDname, $this->dbtablename ) );
 		}
 
 		$this->update_renderers_from_Plugins();
@@ -3606,6 +3606,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.63  2009/01/22 00:59:00  blueyed
+ * minor
+ *
  * Revision 1.62  2009/01/21 23:30:12  fplanque
  * feature/intro posts display adjustments
  *

@@ -271,7 +271,10 @@ function zeroise($number, $threshold)
 
 
 /**
- * crop string to maxlen with &hellip; at the end if needed
+ * Crop string to maxlen with &hellip; at the end if needed.
+ * @param string
+ * @param int Maximum length
+ * @return string
  */
 function strmaxlen( $str, $maxlen = 50 )
 {
@@ -297,7 +300,7 @@ function convert_chars( $content, $flag = 'html' )
 {
 	global $b2_htmltrans, $evo_charset;
 
-  /**
+	/**
 	 * Translation of invalid Unicode references range to valid range.
 	 * These are Windows CP1252 specific characters.
 	 * They would look weird on non-Windows browsers.
@@ -3183,6 +3186,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.61  2009/01/22 00:59:00  blueyed
+ * minor
+ *
  * Revision 1.60  2009/01/21 00:33:46  blueyed
  * Fix indent
  *
