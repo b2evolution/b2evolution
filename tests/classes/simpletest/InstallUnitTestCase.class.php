@@ -26,7 +26,7 @@ class InstallUnitTestCase extends DbUnitTestCase
 	 *
 	 * @see install_basic_plugins()
 	 */
-	var $nr_of_basic_plugins = 12;
+	var $nr_of_basic_plugins = 10;
 
 
 	/**
@@ -37,6 +37,8 @@ class InstallUnitTestCase extends DbUnitTestCase
 		global $timestamp, $test_DB;
 
 		$timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
+
+		$GLOBALS['script_start_time'] = time(); // used by installer
 
 		parent::setUp();
 	}

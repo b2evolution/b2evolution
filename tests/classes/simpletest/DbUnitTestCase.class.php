@@ -169,13 +169,18 @@ class DbUnitTestCase extends EvoUnitTestCase
 class DbUnitTestCase_DB extends DB
 {
 	/**
-	 * Append a backtrace to any query errors.
+	 * Append a backtrace to any query errors, if errors get
+	 * displayed.
 	 */
-	function print_error( $str = '', $query_title = '' )
+	function print_error( $title = '', $html_str = '', $query_title = '' )
 	{
-		parent::print_error($str, $query_title);
+		$args = func_get_args();
+		call_user_func_array(array($this, 'parent::print_error'), $args);
 
-		echo debug_get_backtrace(NULL, array( 'function' => 'print_error' ));
+		if( $this->show_errors )
+		{
+			echo debug_get_backtrace(NULL, array( 'function' => 'print_error' ));
+		}
 	}
 }
 

@@ -47,9 +47,7 @@ class InstallSelfTestCase extends InstallUnitTestCase
 	function testInstall()
 	{
 		// NOTE: this is the same as with install action "newdb":
-		create_tables();
-		create_default_data();
-		create_demo_contents();
+		install_newdb();
 
 		$this->assertEqual( $this->test_DB->get_var( 'SELECT COUNT(*) FROM T_plugins' ), $this->nr_of_basic_plugins );
 	}

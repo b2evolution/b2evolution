@@ -12,6 +12,92 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * Install new DB.
+ */
+function install_newdb()
+{
+	global $new_db_version, $admin_url, $random_password;
+
+	/*
+	 * -----------------------------------------------------------------------------------
+	 * NEW DB: Create a plain new db structure + sample contents
+	 * -----------------------------------------------------------------------------------
+	 */
+	require_once dirname(__FILE__).'/_functions_create.php';
+
+	if( $old_db_version = get_db_version() )
+	{
+		echo '<p><strong>OOPS! It seems b2evolution is already installed!</strong></p>';
+
+		if( $old_db_version < $new_db_version )
+		{
+			echo '<p>Would you like to <a href="?action=evoupgrade">upgrade your existing installation now</a>?</p>';
+		}
+
+		return;
+	}
+
+	$installer_version = param( 'installer_version', 'integer', 0 );
+	if( $installer_version >= 10 )
+	{
+		$create_sample_contents = param( 'create_sample_contents', 'integer', 0 );
+	}
+	else
+	{	// OLD INSTALLER call. Probably an automated script calling.
+		// Let's force the sample contents since they haven't been explicitely disabled
+		$create_sample_contents = 1;
+	}
+
+	echo '<h2>'.T_('Creating b2evolution tables...').'</h2>';
+	flush();
+	create_tables();
+
+	echo '<h2>'.T_('Creating minimum default data...').'</h2>';
+	flush();
+	create_default_data();
+
+	if( $create_sample_contents )
+	{
+		global $Settings;
+
+		echo '<h2>'.T_('Installing sample contents...').'</h2>';
+		flush();
+
+		// We're gonna need some environment in order to create the demo contents...
+		load_class( 'settings/model/_generalsettings.class.php' );
+		load_class( 'users/model/_usersettings.class.php' );
+		/**
+		 * @var GeneralSettings
+		 */
+		$Settings = new GeneralSettings();
+
+		/**
+		 * @var UserCache
+		 */
+		$UserCache = & get_Cache( 'UserCache' );
+		// Create $current_User object.
+		// (Assigning by reference does not work with "global" keyword (PHP 5.2.8))
+		$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
+
+		create_demo_contents();
+	}
+
+	echo '<h2>'.T_('Installation successful!').'</h2>';
+
+	echo '<p><strong>';
+	printf( T_('Now you can <a %s>log in</a> with the following credentials:'), 'href="'.$admin_url.'"' );
+	echo '</strong></p>';
+
+	echo '<table>';
+	echo '<tr><td>Login: &nbsp;</td><td><strong><evo:password>admin</evo:password></strong></td></tr>';
+	printf( '<tr><td>Password: &nbsp;</td><td><strong><evo:password>%s</evo:password></strong></td></tr>', $random_password );
+	echo '</table>';
+
+	echo '<p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>';
+}
+
+
+/**
  * Begin install task.
  * This will offer other display methods in the future
  */
@@ -36,6 +122,7 @@ function get_db_version()
 {
 	global $DB;
 
+	$DB->save_error_state();
 	$DB->halt_on_error = false;
 	$DB->show_errors = false;
 
@@ -50,8 +137,7 @@ function get_db_version()
 		$r = $DB->get_var( 'SELECT db_version FROM T_settings' );
 	}
 
-	$DB->halt_on_error = true;
-	$DB->show_errors = true;
+	$DB->restore_error_state();
 
 	return $r;
 }
@@ -66,11 +152,19 @@ function db_col_exists( $table, $col_name )
 
 	$col_name = strtolower($col_name);
 
+	$r = false;
+	$DB->save_error_state();
 	foreach( $DB->get_results('SHOW COLUMNS FROM '.$table) as $row )
+	{
 		if( strtolower($row->Field) == $col_name )
-			return true;
+		{
+			$r = true;
+			break;
+		}
+	}
+	$DB->restore_error_state();
 
-	return false;
+	return $r;
 }
 
 
@@ -583,6 +677,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.55  2009/01/22 23:26:45  blueyed
+ * Fix install-myself test (and stuff around it). Move 'newdb' action from install/index.php to functions_install.php to call it the same as during real install.
+ *
  * Revision 1.54  2008/09/24 10:39:42  fplanque
  * no message
  *
