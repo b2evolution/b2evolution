@@ -29,7 +29,7 @@ class gmcode_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '1.9-dev';
+	var $version = '1.9.1';
 	var $number_of_installs = 1;
 
 
@@ -86,15 +86,30 @@ class gmcode_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		$content = preg_replace( $this->search, $this->replace, $content );
+		$content = callback_on_non_matching_blocks( $content, '~<[^>]*>~s', array($this, 'replace_callback') );
 
 		return true;
 	}
+
+
+	/**
+	 * Replace callback
+	 * @param string
+	 * @return string
+	 */
+	function replace_callback($text)
+	{
+		return preg_replace($this->search, $this->replace, $text);
+	}
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.19  2009/01/22 23:56:03  blueyed
+ * gmcode_plugin: use callback_on_non_matching_blocks to not replace GM code in HTML tags. Change plugin version to 1.9.1.
+ *
  * Revision 1.18  2008/10/10 14:14:38  blueyed
  * todo
  *
