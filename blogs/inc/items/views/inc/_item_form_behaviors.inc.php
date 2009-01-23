@@ -34,12 +34,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $js_doc_title_prefix;
 ?>
-<script type="text/javascript">
+
 	<?php
 	// Add event to the item title field to update document title and init it (important when switching tabs/blogs):
 	if( isset($js_doc_title_prefix) )
 	{ // dynamic document.title handling:
 		?>
+	<script type="text/javascript">
 		if( post_title_elt = document.getElementById('post_title') )
 		{
 			/**
@@ -57,42 +58,20 @@ global $js_doc_title_prefix;
 			// Init:
 			evo_update_document_title();
 		}
+	</script>
 		<?php
 	}
 
-	// Add event to check the set radio option whenever the date is modified:
 	?>
-	if( edit_date_elt = document.getElementById('set_issue_date_to') )
-	{
-		/**
-		 * If user modified date, select the appropriate radio:
-		 */
-		function evo_check_edit_date()
-		{
-			edit_date_elt.checked = true;
-		}
 
-		if( item_issue_date_elt = document.getElementById('item_issue_date') )
-		{
-			addEvent( item_issue_date_elt, 'change', evo_check_edit_date, false );
-			addEvent( item_issue_date_elt, 'click', evo_check_edit_date, false );
-		}
-		if( item_issue_time_elt = document.getElementById('item_issue_time') )
-		{
-			addEvent( item_issue_time_elt, 'change', evo_check_edit_date, false );
-			addEvent( item_issue_time_elt, 'click', evo_check_edit_date, false );
-		}
-		if( item_issue_date_button = document.getElementById('anchor_item_issue_date') )
-		{
-			addEvent( item_issue_date_button, 'click', evo_check_edit_date, false );
-		}
-	}
-</script>
 
 <?php
 
 /*
  * $Log$
+ * Revision 1.4  2009/01/23 22:19:39  afwas
+ * Remove obsolete javaScript from Admin UI (enables checbox after date change)
+ *
  * Revision 1.3  2008/03/22 15:20:19  fplanque
  * better issue time control
  *
