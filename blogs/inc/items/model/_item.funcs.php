@@ -117,9 +117,7 @@ function & get_featured_Item()
 
 	if( ! $MainList->is_filtered() )
 	{	// Restrict to 'main' and 'all' intros:
-		$FeaturedList->set_filters( array(
-				'types' => '1500,1600',
-			) );
+		$restrict_to_types = '1500,1600';
 	}
 	else
 	{	// Filtered...
@@ -135,11 +133,11 @@ function & get_featured_Item()
 			default:
 				$restrict_to_types = '1570,1600';
 		}
-
-		$FeaturedList->set_filters( array(
-				'types' => $restrict_to_types,
-			) );
 	}
+
+	$FeaturedList->set_filters( array(
+			'types' => $restrict_to_types,
+		), false /* Do NOT memorize!! */ );
 	// pre_dump( $FeaturedList->filters );
 	// Run the query:
 	$FeaturedList->query();
@@ -821,6 +819,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.30  2009/01/23 21:34:52  fplanque
+ * fixed UGLY bug on page 2,3,4
+ *
  * Revision 1.29  2009/01/23 17:23:09  fplanque
  * doc/minor
  *
