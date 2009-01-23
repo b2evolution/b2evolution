@@ -173,16 +173,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		$min_size = $this->disp_params['tag_min_size'];
 		$size_span = $max_size - $min_size;
 
-		function tag_cloud_cmp($a, $b)
-		{
-			if ($a->tag_name == $b->tag_name)
-			{
-				return 0;
-			}
-			return ($a->tag_name < $b->tag_name) ? -1 : 1;
-		}
-
-		usort($results, 'tag_cloud_cmp');
+		usort($results, array($this, 'tag_cloud_cmp'));
 
 		echo $this->disp_params['block_start'];
 
@@ -207,11 +198,23 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 		return true;
 	}
+
+
+	function tag_cloud_cmp($a, $b)
+	{
+		return strcasecmp($a->tag_name, $b->tag_name);
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.15  2009/01/23 00:09:41  blueyed
+ * coll_tag_cloud_Widget:
+ *  - fix E_FATAL, when included twice (tag_cloud_cmp function would get
+ *    defined twice)
+ *  - Simplify tag_cloud_cmp by using strcasecmp
+ *
  * Revision 1.14  2009/01/23 00:05:25  blueyed
  * Add Blog::get_sql_where_aggregate_coll_IDs, which adds support for '*' in list of aggregated blogs.
  *
