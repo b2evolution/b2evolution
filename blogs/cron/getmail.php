@@ -276,6 +276,11 @@ function processHeader( &$header )
 	$ddate_i = $match[6];
 	$ddate_s = $match[7];
 
+	if ( ! isset( $dmonths[$match[3]] ) )
+	{
+		echo_message( T_( 'Invalid month name in message date string.' ), ERROR, 0 );
+		return false;
+	}
 	$ddate_m = $dmonths[$match[3]];
 	$ddate_d = $match[2];
 	$ddate_Y = $match[4];
@@ -705,6 +710,9 @@ if ( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.32  2009/01/23 22:52:29  tblue246
+ * Blog by mail: Ensure the month name in the "Date" header is valid.
+ *
  * Revision 1.31  2008/12/31 16:04:04  tblue246
  * Moving external classes needed by the blog by mail feature to inc/_ext.
  *
