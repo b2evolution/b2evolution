@@ -739,12 +739,10 @@ class Form extends Widget
 		}
 		unset( $field_params['add_date_format_note'] );
 
-
 		if( !isset($field_params['size']) )
 		{ // Get size out of $date_format if not explicitly set
-			$field_params['size'] = strlen( $js_date_format );
+			$field_params['size'] = strlen( $date_format ) + 5;
 		}
-
 		/*
 		dh> do not use maxlength by default. Makes no sense IMHO and fails with dateformats like "j \d\e F, Y"
 		if( !isset($field_params['maxlength']) )
@@ -2801,6 +2799,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.32  2009/01/23 22:56:35  afwas
+ * Ooops, left an old variable $js_fate_format.
+ *
  * Revision 1.31  2009/01/23 22:36:19  afwas
  * Remove javaScript popup calendar to be replaced with jQuery datepicker.
  *
