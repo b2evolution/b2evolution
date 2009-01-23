@@ -46,7 +46,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 	}
 
 
-  /**
+	/**
 	 * Load params
 	 */
 	function load_from_Request()
@@ -70,7 +70,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 	}
 
 
-  /**
+	/**
 	 * Get short description
 	 */
 	function get_desc()
@@ -79,9 +79,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 	}
 
 
-  /**
-   * Get definitions for editable params
-   *
+	/**
+	 * Get definitions for editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
 	 */
@@ -123,7 +123,6 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		// add limit default 100
 
 		return $r;
-
 	}
 
 
@@ -147,13 +146,12 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 // fp> verrry dirty and params; TODO: clean up
 		// get list of relevant blogs
-		$blog_list = ( $Blog->get_setting( 'aggregate_coll_IDs' ) ? $Blog->get_setting( 'aggregate_coll_IDs' ) : $Blog->ID );
 		$sql = 'SELECT LOWER(tag_name) AS tag_name, COUNT(DISTINCT itag_itm_ID) AS tag_count
 						  FROM T_items__tag INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID
 					  				INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID
 					  				INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 					  				INNER JOIN T_items__item ON itag_itm_ID = post_ID
-						 WHERE cat_blog_ID IN( '.$blog_list.' )
+						 WHERE '.$Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID').'
 						  AND post_status = "published" AND post_datestart < NOW()
 						 GROUP BY tag_name
 						 ORDER BY tag_count DESC
@@ -214,6 +212,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.14  2009/01/23 00:05:25  blueyed
+ * Add Blog::get_sql_where_aggregate_coll_IDs, which adds support for '*' in list of aggregated blogs.
+ *
  * Revision 1.13  2009/01/13 22:51:29  fplanque
  * rollback / normalized / MFB
  *

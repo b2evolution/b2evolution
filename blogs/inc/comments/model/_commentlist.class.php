@@ -76,15 +76,7 @@ class CommentList extends DataObjectList
 			$this->sql .= 'INNER JOIN T_postcats ON post_ID = postcat_post_ID
 										INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID ';
 
-			$aggregate_coll_IDs = $Blog->get_setting('aggregate_coll_IDs');
-			if( empty( $aggregate_coll_IDs ) )
-			{	// We only want posts from the current blog:
-				$this->sql .= 'WHERE othercats.cat_blog_ID = '.$Blog->ID;
-			}
-			else
-			{	// We are aggregating posts from several blogs:
-				$this->sql .= 'WHERE othercats.cat_blog_ID IN ('.$aggregate_coll_IDs.')';
-			}
+			$this->sql .= 'WHERE '.$Blog->get_sql_where_aggregate_coll_IDs('othercats.cat_blog_ID');
 		}
 
 		$this->sql .= ' AND comment_type IN ('.$comment_types.') ';
@@ -177,6 +169,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.8  2009/01/23 00:05:24  blueyed
+ * Add Blog::get_sql_where_aggregate_coll_IDs, which adds support for '*' in list of aggregated blogs.
+ *
  * Revision 1.7  2008/09/24 08:46:45  fplanque
  * Fixed random order
  *

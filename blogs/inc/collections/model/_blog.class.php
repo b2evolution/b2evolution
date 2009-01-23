@@ -562,13 +562,14 @@ class Blog extends DataObject
 
 			if( param( 'aggregate_coll_IDs', 'string', NULL ) !== NULL )
 			{ // Aggregate list:
+				$aggregate_coll_IDs = get_param( 'aggregate_coll_IDs' );
 				// fp> TODO: check perms on each aggregated blog (if changed)
 				// fp> TODO: better interface
-				if( !preg_match( '#^([0-9]+(,[0-9]+)*)?$#', get_param( 'aggregate_coll_IDs' ) ) )
+				if( $aggregate_coll_IDs != '*' && !preg_match( '#^([0-9]+(,[0-9]+)*)?$#', $aggregate_coll_IDs ) )
 				{
 					param_error( 'aggregate_coll_IDs', T_('Invalid aggregate blog ID list!') );
 				}
-				$this->set_setting( 'aggregate_coll_IDs', get_param( 'aggregate_coll_IDs' ) );
+				$this->set_setting( 'aggregate_coll_IDs', $aggregate_coll_IDs );
 			}
 
 			if( param( 'source_file', 'string', NULL ) !== NULL )
@@ -1946,7 +1947,36 @@ class Blog extends DataObject
 	}
 
 
-  /**
+	/**
+	 * Get SQL expression to match the list of aggregates collection IDs.
+	 *
+	 * This resolves as follows:
+	 *  - empty: current blog only
+	 *  - "*": all blogs (returns "1")
+	 *  - other: as present in DB
+	 *
+	 * @param string SQL field name
+	 * @return string e.g. "$field IN (1,5)"
+	 */
+	function get_sql_where_aggregate_coll_IDs($field)
+	{
+		$aggregate_coll_IDs = $this->get_setting('aggregate_coll_IDs');
+		if( empty( $aggregate_coll_IDs ) )
+		{	// We only want posts from the current blog:
+			return " $field = $this->ID ";
+		}
+		elseif( $aggregate_coll_IDs == '*' )
+		{
+			return " 1 ";
+		}
+		else
+		{	// We are aggregating posts from several blogs:
+			return " $field IN ($aggregate_coll_IDs)";
+		}
+	}
+
+
+	/**
 	 * Get # of posts for a given tag
 	 */
 	function get_tag_post_count( $tag )
@@ -1967,6 +1997,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.51  2009/01/23 00:05:24  blueyed
+ * Add Blog::get_sql_where_aggregate_coll_IDs, which adds support for '*' in list of aggregated blogs.
+ *
  * Revision 1.50  2009/01/21 21:44:35  blueyed
  * TODO to add something like create_media_dir
  *

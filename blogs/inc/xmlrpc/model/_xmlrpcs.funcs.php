@@ -108,16 +108,7 @@ function _b2_or_mt_get_categories( $type, $m )
 
 	$BlogCache = & get_Cache('BlogCache');
 	$current_Blog = $BlogCache->get_by_ID( $Blog->ID );
-	$aggregate_coll_IDs = $current_Blog->get_setting('aggregate_coll_IDs');
-	if( empty( $aggregate_coll_IDs ) )
-	{	// We only want posts from the current blog:
-		$sql .= 'WHERE cat_blog_ID ='.$current_Blog->ID;
-	}
-	else
-	{	// We are aggregating posts from several blogs:
-		$sql .= 'WHERE cat_blog_ID IN ('.$aggregate_coll_IDs.')';
-	}
-
+	$sql .= $Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID');
 	$sql .= " ORDER BY cat_name ASC";
 
 	$rows = $DB->get_results( $sql );
@@ -441,6 +432,9 @@ function xmlrpcs_edit_item( & $edited_Item, $post_title, $content, $post_date, $
 
 /*
  * $Log$
+ * Revision 1.4  2009/01/23 00:05:25  blueyed
+ * Add Blog::get_sql_where_aggregate_coll_IDs, which adds support for '*' in list of aggregated blogs.
+ *
  * Revision 1.3  2008/01/19 10:57:11  fplanque
  * Splitting XHTML checking by group and interface
  *
