@@ -272,6 +272,7 @@ function zeroise($number, $threshold)
 
 /**
  * Crop string to maxlen with &hellip; at the end if needed.
+ *
  * @param string
  * @param int Maximum length
  * @return string
@@ -3186,6 +3187,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.62  2009/01/23 17:23:09  fplanque
+ * doc/minor
+ *
  * Revision 1.61  2009/01/22 00:59:00  blueyed
  * minor
  *

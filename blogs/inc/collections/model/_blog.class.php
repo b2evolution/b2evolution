@@ -561,7 +561,7 @@ class Blog extends DataObject
 
 
 			if( param( 'aggregate_coll_IDs', 'string', NULL ) !== NULL )
-			{ // Aggregate list:
+			{ // Aggregate list: (can be '*')
 				$aggregate_coll_IDs = get_param( 'aggregate_coll_IDs' );
 				// fp> TODO: check perms on each aggregated blog (if changed)
 				// fp> TODO: better interface
@@ -1952,13 +1952,13 @@ class Blog extends DataObject
 	 *
 	 * This resolves as follows:
 	 *  - empty: current blog only
-	 *  - "*": all blogs (returns "1")
+	 *  - "*": all blogs (returns "1" as in "WHERE 1")
 	 *  - other: as present in DB
 	 *
 	 * @param string SQL field name
 	 * @return string e.g. "$field IN (1,5)"
 	 */
-	function get_sql_where_aggregate_coll_IDs($field)
+	function get_sql_where_aggregate_coll_IDs( $field )
 	{
 		$aggregate_coll_IDs = $this->get_setting('aggregate_coll_IDs');
 		if( empty( $aggregate_coll_IDs ) )
@@ -1997,6 +1997,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.52  2009/01/23 17:23:09  fplanque
+ * doc/minor
+ *
  * Revision 1.51  2009/01/23 00:05:24  blueyed
  * Add Blog::get_sql_where_aggregate_coll_IDs, which adds support for '*' in list of aggregated blogs.
  *

@@ -29,7 +29,7 @@ class gmcode_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '1.9.1';
+	var $version = '3.0';
 	var $number_of_installs = 1;
 
 
@@ -107,6 +107,9 @@ class gmcode_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.20  2009/01/23 17:23:09  fplanque
+ * doc/minor
+ *
  * Revision 1.19  2009/01/22 23:56:03  blueyed
  * gmcode_plugin: use callback_on_non_matching_blocks to not replace GM code in HTML tags. Change plugin version to 1.9.1.
  *

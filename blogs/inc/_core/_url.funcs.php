@@ -145,7 +145,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 						[a-z0-9]([a-z0-9.\-])+           # Don t allow anything too funky like entities
 				)
 				(:[0-9]+)?                       # optional port specification
-				.*                               # allow anything in the path (also spaces; used in FM - but no newlines).
+				.*                               # allow anything in the path (including spaces - used in FileManager - but no newlines).
 				$~ix', $url, $match) )
 			{ // Cannot validate URL structure
 				$Debuglog->add( 'URL &laquo;'.$url.'&raquo; does not match url pattern!', 'error' );
@@ -579,7 +579,7 @@ function url_rel_to_same_host( $url, $target_url )
 function url_absolute( $url, $host = NULL )
 {
 	if( is_absolute_url($url) )
-	{ // URL is absolute already
+	{ // URL is already absolute
 		return $url;
 	}
 
@@ -639,6 +639,7 @@ function disp_url( $url, $max_length = NULL )
 /**
  * Is a given URL absolute?
  * Note: "//foo/bar" is absolute - leaving the protocol out.
+ *
  * @param string URL
  * @return boolean
  */
@@ -665,6 +666,9 @@ function is_same_url( $a, $b )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.24  2009/01/23 17:23:09  fplanque
+ * doc/minor
+ *
  * Revision 1.23  2009/01/21 21:22:07  blueyed
  * Add is_absolute_url
  *

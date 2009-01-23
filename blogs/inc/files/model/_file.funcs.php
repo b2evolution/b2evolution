@@ -377,7 +377,7 @@ function get_canonical_path( $ads_path )
 	// Remove windows backslashes:
 	$ads_path = str_replace( '\\', '/', $ads_path );
 
-	$is_absolute = is_absolute_filename($ads_path);
+	$is_absolute = is_absolute_pathname($ads_path);
 
 	// Make sure there's a trailing slash
 	$ads_path = trailing_slash($ads_path);
@@ -748,21 +748,32 @@ function mkdir_r( $dirName, $chmod = NULL )
  *
  * @return boolean
  */
-function is_absolute_filename($path)
+function is_absolute_pathname($path)
 {
 	$pathlen = strlen($path);
 	if( ! $pathlen )
 	{
 		return false;
 	}
-	return $path[0] == '/' // unix
-		|| ( is_windows() && $pathlen > 1 && $path[1] == ':' );
+
+	if( is_windows() )
+	{ // windows e-g: (note: "XY:" would actually be a valid drive ID in windows)
+		return ( $pathlen > 1 && $path[1] == ':' );
+	}
+	else
+	{ // unix
+		return ( $path[0] == '/' );
+	}
+
 }
 
 
 
 /*
  * $Log$
+ * Revision 1.13  2009/01/23 17:23:09  fplanque
+ * doc/minor
+ *
  * Revision 1.12  2009/01/22 23:21:50  blueyed
  * Fix get_canonical_path. Add tests. Re-add is_absolute_filename (name sucks).
  *

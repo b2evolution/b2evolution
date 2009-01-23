@@ -161,7 +161,7 @@ function & get_featured_Item()
 	$Item = $FeaturedList->get_item();
 
 	// Memorize that ID so that it can later be filtered out normal display:
-	$featured_displayed_item_ID = $Item ? $Item->ID : $Item;
+	$featured_displayed_item_ID = $Item ? $Item->ID : NULL;
 
 	return $Item;
 }
@@ -821,6 +821,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.29  2009/01/23 17:23:09  fplanque
+ * doc/minor
+ *
  * Revision 1.28  2009/01/22 18:44:56  blueyed
  * Fix E_NOTICE if there is no featured item. Add TODO about this assignment.
  *

@@ -60,8 +60,7 @@ $is_web = ! $is_cli;
 $content_type_header = NULL;
 
 /**
- * @global ID of featured post that is being displayed -- needed so we can filter it out of normal post flow
- * @todo dh> Why not just compare it with get_featured_Item()?!!
+ * @global integer ID of featured post that is being displayed (will become an array() in the future) -- needed so we can filter it out of normal post flow
  */
 $featured_displayed_item_ID = NULL;
 
@@ -308,6 +307,9 @@ $skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', ar
 
 /*
  * $Log$
+ * Revision 1.34  2009/01/23 17:23:09  fplanque
+ * doc/minor
+ *
  * Revision 1.33  2009/01/22 18:44:56  blueyed
  * Fix E_NOTICE if there is no featured item. Add TODO about this assignment.
  *
