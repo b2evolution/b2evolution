@@ -61,10 +61,10 @@ switch( $action )
 		break;
 
 	case 'unlink':
-		// Name of teh iframe we want some atiosn to come back to:
+		// Name of the iframe we want some action to come back to:
 		param( 'iframe_name', 'string', '', true );
 
-	  param( 'link_ID', 'integer', true );
+		param( 'link_ID', 'integer', true );
 		$LinkCache = & get_Cache( 'LinkCache' );
 		if( ($edited_Link = & $LinkCache->get_by_ID( $link_ID, false )) !== false )
 		{	// We have a link, get the Item it is attached to:
@@ -278,10 +278,10 @@ switch( $action )
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p );
 
-  	$item_tags = implode( ', ', $edited_Item->get_tags() );
-  	$trackback_url = '';
+		$item_tags = implode( ', ', $edited_Item->get_tags() );
+		$trackback_url = '';
 
-  	$set_issue_date = 'set';
+		$set_issue_date = 'set';
 
 		// Page title:
 		$js_doc_title_prefix = T_('Editing post').': ';
@@ -904,6 +904,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.26  2009/01/23 22:08:12  tblue246
+ * - Filter reserved post types from dropdown box on the post form (expert tab).
+ * - Indent/doc fixes
+ * - Do not check whether a post title is required when only e. g. switching tabs.
+ *
  * Revision 1.25  2009/01/21 22:26:26  fplanque
  * Added tabs to post browsing admin screen All/Posts/Pages/Intros/Podcasts/Comments
  *

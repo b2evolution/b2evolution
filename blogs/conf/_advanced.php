@@ -548,7 +548,7 @@ $debug_xmlrpc_logging = 0;
 $cron_timeout_delay = 1800; // 30 minutes
 
 
-// ----- CHANGE THE FOLLOWING ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
+// ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
 $evonetsrv_host = 'rpc.b2evolution.net';
 $evonetsrv_port = 80;
 $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
@@ -556,4 +556,27 @@ $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 $antispamsrv_host = 'antispam.b2evolution.net';
 $antispamsrv_port = 80;
 $antispamsrv_uri = '/evonetsrv/xmlrpc.php';
+
+/**
+ * Locked post type IDs.
+ *
+ * These post types can't be edited or deleted in the post type editor.
+ * They're needed by certain b2evolution features, so
+ * don't remove any IDs from this array.
+ *
+ * @global $posttypes_locked_IDs
+ */
+$posttypes_locked_IDs = array( 1000, 1500, 1520, 1530, 1570, 1600, 2000 );
+
+/**
+ * Reserved post type IDs.
+ *
+ * These post types are reserved for future use and can't be edited or
+ * deleted in the post type editor. It also is not possible to select
+ * them when creating a new post.
+ * Do not remove any IDs from this array.
+ *
+ * @global $posttypes_reserved_IDs
+ */
+$posttypes_reserved_IDs = array( 3000, 4000, 5000 );
 ?>

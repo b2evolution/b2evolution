@@ -401,6 +401,7 @@ class Item extends ItemLight
 	function load_from_Request( $editing = false )
 	{
 		global $default_locale, $current_User, $localtimenow, $set_issue_date;
+		global $posttypes_reserved_IDs, $item_typ_ID;
 
 		if( param( 'post_locale', 'string', NULL ) !== NULL )
 		{
@@ -410,6 +411,11 @@ class Item extends ItemLight
 		if( param( 'item_typ_ID', 'integer', NULL ) !== NULL )
 		{
 			$this->set_from_Request( 'ptyp_ID', 'item_typ_ID' );
+
+			if ( in_array( $item_typ_ID, $posttypes_reserved_IDs ) )
+			{
+				param_error( 'item_typ_ID', T_( 'This post type is reserved and cannot be used. Please choose another one.' ), '' );
+			}
 		}
 
 		if( param( 'post_url', 'string', NULL ) !== NULL )
@@ -539,7 +545,7 @@ class Item extends ItemLight
 			$this->get_Blog();
 			$require_title = $this->Blog->get_setting('require_title');
 
-			if( $require_title == 'required' )
+			if( ! $editing && $require_title == 'required' )
 			{
 				param_check_not_empty( 'post_title', T_('Please provide a title.'), '' );
 			}
@@ -3606,6 +3612,11 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.64  2009/01/23 22:08:12  tblue246
+ * - Filter reserved post types from dropdown box on the post form (expert tab).
+ * - Indent/doc fixes
+ * - Do not check whether a post title is required when only e. g. switching tabs.
+ *
  * Revision 1.63  2009/01/22 00:59:00  blueyed
  * minor
  *

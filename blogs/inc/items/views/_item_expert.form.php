@@ -121,7 +121,8 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	echo '<td width="1%">&nbsp;&nbsp;<strong>'.T_('Type').':</strong></td>';
 	echo '<td width="1%" class="select">';
 	$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
-	$Form->select_object( 'item_typ_ID', $edited_Item->ptyp_ID, $ItemTypeCache, '' );
+	$Form->select_object( 'item_typ_ID', $edited_Item->ptyp_ID, $ItemTypeCache,
+								'', '', false, '', 'get_option_list_unreserved_only' );
 	echo '</td>';
 
 	echo '</tr></table>';
@@ -394,6 +395,11 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.38  2009/01/23 22:08:12  tblue246
+ * - Filter reserved post types from dropdown box on the post form (expert tab).
+ * - Indent/doc fixes
+ * - Do not check whether a post title is required when only e. g. switching tabs.
+ *
  * Revision 1.37  2009/01/19 21:40:59  fplanque
  * Featured post proof of concept
  *

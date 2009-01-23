@@ -554,9 +554,10 @@ class DataObjectCache
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID ''
 	 * @param string Callback method name
+	 * @param array IDs to ignore.
 	 * @return string
 	 */
-	function get_option_list( $default = 0, $allow_none = false, $method = 'get_name' )
+	function get_option_list( $default = 0, $allow_none = false, $method = 'get_name', $ignore_IDs = array() )
 	{
 		if( (! $this->all_loaded) && $this->load_all )
 		{ // We have not loaded all items so far, but we're allowed to... so let's go:
@@ -574,6 +575,11 @@ class DataObjectCache
 
 		foreach( $this->cache as $loop_Obj )
 		{
+			if ( in_array( $loop_Obj->ID, $ignore_IDs ) )
+			{	// Ignore this ID
+				continue;
+			}
+			
 			$r .=  '<option value="'.$loop_Obj->ID.'"';
 			if( $loop_Obj->ID == $default ) $r .= ' selected="selected"';
 			$r .= '>';
@@ -589,6 +595,11 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.6  2009/01/23 22:08:12  tblue246
+ * - Filter reserved post types from dropdown box on the post form (expert tab).
+ * - Indent/doc fixes
+ * - Do not check whether a post title is required when only e. g. switching tabs.
+ *
  * Revision 1.5  2008/12/22 01:56:54  fplanque
  * minor
  *

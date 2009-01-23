@@ -47,9 +47,9 @@ class ItemTypeCache extends DataObjectCache
 	 */
 	var $col_cache = array();
 
-  /**
-   * Default item type for each collection
-   */
+	/**
+	 * Default item type for each collection
+	 */
 	var $col_default = array();
 
 
@@ -150,10 +150,31 @@ class ItemTypeCache extends DataObjectCache
 		return $r;
 	}
 
+	/**
+	 * Returns a form option list which only contains unreserved post types.
+	 *
+	 * @see $posttypes_reserved_IDs
+	 * 
+	 * @param integer The selected ID.
+	 * @param boolean Provide a choice for "none" with ID ''
+	 * @param string  Callback method name.
+	 * @return string
+	 */
+	function get_option_list_unreserved_only( $default = 0, $allow_none = false, $method = 'get_name' )
+	{
+		global $posttypes_reserved_IDs;
+
+		return $this->get_option_list( $default, $allow_none, $method, $posttypes_reserved_IDs );
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.3  2009/01/23 22:08:12  tblue246
+ * - Filter reserved post types from dropdown box on the post form (expert tab).
+ * - Indent/doc fixes
+ * - Do not check whether a post title is required when only e. g. switching tabs.
+ *
  * Revision 1.2  2008/01/21 09:35:31  fplanque
  * (c) 2008
  *
