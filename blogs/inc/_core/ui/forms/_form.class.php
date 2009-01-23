@@ -709,30 +709,6 @@ class Form extends Widget
 		// Don't keep that attrib in the list:
 		unset( $field_params['date_format'] );
 
-		// Convert PHP date format to JS library date format (date.js):
-		// NOTE: when editing/extending this here, you probably also have to adjust param_check_date()!
-		$js_date_format = preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
-			if( $m[1] == "\\\" ) return "\\\".$m[0]; // leave escaped
-			switch( $m[2] )
-			{
-				case "d": return "dd"; // day, 01-31
-				case "j": return "d"; // day, 1-31
-				case "l": return "EE"; // weekday (name)
-				case "D": return "E"; // weekday (abbr)
-				case "e": return ""; // weekday letter, not supported
-
-				case "m": return "MM"; // month, 01-12
-				case "n": return "M"; // month, 1-12
-				case "F": return "MMM"; // full month name; "name or abbr" in date.js
-				case "M": return "NNN"; // month name abbr
-
-				case "y": return "yy"; // year, 00-99
-				case "Y": return "yyyy"; // year, XXXX
-				default:
-					return $m[0];
-			}' ), $date_format );
-		#pre_dump( $js_date_format );
-
 		if( param_has_error( $field_name ) )
 		{ // There is an error message for this field:
 
@@ -776,41 +752,20 @@ class Form extends Widget
 			$field_params['maxlength'] = $field_params['size'];
 		}
 		*/
-
+		/*
+		 Afwas > In the existing locales only d m y and Y are used. Currently the jQuery Datepicker
+		 can't handle other dateformats. I will see to some basic check or enable all.
+		 @TODO ^^
+		 */
 		// Give it a class, so it can be selected for CSS in IE6
 		if( empty($field_params['class']) ) $field_params['class'] = 'form_date_input';
 		else $field_params['class'] .= ' form_date_input';
 
-
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
-		$r = $this->begin_field()
-				.'<script type="text/javascript">
-						//<![CDATA[
-						var cal_'.$field_name.' = new CalendarPopup();
-						cal_'.$field_name.'.showYearNavigation();
-						cal_'.$field_name.'.showNavigationDropdowns();
-						// cal_'.$field_name.'.showYearNavigationInput();
-						// MonthNames get set through MONTH_NAMES
-				   cal_'.$field_name.'.setDayHeaders( '
-							."'".T_($weekday_letter[0])."',"
-							."'".T_($weekday_letter[1])."',"
-							."'".T_($weekday_letter[2])."',"
-							."'".T_($weekday_letter[3])."',"
-							."'".T_($weekday_letter[4])."',"
-							."'".T_($weekday_letter[5])."',"
-							."'".T_($weekday_letter[6])."' );\n"
-				.' cal_'.$field_name.'.setWeekStartDay('.locale_startofweek().');
-						cal_'.$field_name.".setTodayText('".TS_('Today')."');
-						//]]>
-					</script>\n"
-				.$this->get_input_element($field_params, false)
-				.'<a href="#" onclick="cal_'.$field_name.".select(document.getElementById('".$field_name."'), 'anchor_".$field_name."', '".$js_date_format."');"
-				.' return false;" name="anchor_'.$field_name.'" id="anchor_'.$this->get_valid_id($field_name).'" title="'.T_('Select date').'">'
-				.get_icon( 'calendar', 'imgtag', array( 'title'=>T_('Select date') ) ).'</a>';
-
+		$r = $this->begin_field() . $this->get_input_element($field_params, false);
 		$r .= $this->end_field();
-
+		
 		return $this->display_or_return( $r );
 	}
 
@@ -2846,6 +2801,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.31  2009/01/23 22:36:19  afwas
+ * Remove javaScript popup calendar to be replaced with jQuery datepicker.
+ *
  * Revision 1.30  2009/01/13 22:51:28  fplanque
  * rollback / normalized / MFB
  *
