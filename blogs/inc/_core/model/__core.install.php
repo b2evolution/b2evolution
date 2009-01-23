@@ -104,7 +104,7 @@ $schema_queries = array(
 			user_showonline tinyint(1) NOT NULL default 1,
 			user_grp_ID int(4) NOT NULL default 1,
 			user_validated tinyint(1) NOT NULL DEFAULT 0,
-	  	user_avatar_file_ID int(11) unsigned default NULL,
+	  	user_avatar_file_ID int(10) unsigned default NULL,
 			PRIMARY KEY user_ID (user_ID),
 			UNIQUE user_login (user_login),
 			KEY user_grp_ID (user_grp_ID)
@@ -559,6 +559,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.9  2009/01/23 18:32:15  fplanque
+ * versioning
+ *
  * Revision 1.8  2009/01/13 23:45:59  fplanque
  * User fields proof of concept
  *

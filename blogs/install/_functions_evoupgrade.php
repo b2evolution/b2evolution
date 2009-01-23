@@ -2143,7 +2143,7 @@ function upgrade_b2evo_tables()
 
 
 	if( $old_db_version < 9900 )
-	{	// 3.0
+	{	// 3.0 part 1
 		task_begin( 'Updating keyphrases in hitlog table... ' );
 		flush();
 		load_funcs( 'sessions/model/_hit.class.php' );
@@ -2194,75 +2194,83 @@ function upgrade_b2evo_tables()
 								CHANGE COLUMN file_root_type file_root_type enum('absolute','user','collection','shared','skins') not null default 'absolute'" );
 		task_end();
 
+		set_upgrade_checkpoint( '9900' );
+	}
+
+	if( $old_db_version < 9910 )
+	{	// 3.0 part 2
+
 		task_begin( 'Upgrading Blogs table... ' );
 		$DB->query( "ALTER TABLE T_blogs CHANGE COLUMN blog_name blog_name varchar(255) NOT NULL default ''" );
 		task_end();
 
-		set_upgrade_checkpoint( '9900' );
+		task_begin( 'Adding new Post Types...' );
+		$DB->query( "
+			REPLACE INTO T_items__type( ptyp_ID, ptyp_name )
+			VALUES ( 1500, 'Intro-Main' ),
+						 ( 1520, 'Intro-Cat' ),
+						 ( 1530, 'Intro-Tag' ),
+						 ( 1570, 'Intro-Sub' ),
+						 ( 1600, 'Intro-All' ) " );
+		task_end();
+
+		task_begin( 'Updating User table' );
+		$DB->query( "ALTER TABLE T_users
+									ADD COLUMN user_avatar_file_ID int(10) unsigned default NULL AFTER user_validated" );
+		task_end();
+
+		task_begin( 'Creating table for User field definitions' );
+		$DB->query( "CREATE TABLE T_users__fielddefs (
+				ufdf_ID int(10) unsigned NOT NULL,
+				ufdf_type char(8) NOT NULL,
+				ufdf_name varchar(255) collate latin1_general_ci NOT NULL,
+				PRIMARY KEY  (ufdf_ID)
+			)" );
+		task_end();
+
+		task_begin( 'Creating default field definitions...' );
+		$DB->query( "
+	    INSERT INTO T_users__fielddefs (ufdf_ID, ufdf_type, ufdf_name)
+			 VALUES ( 10000, 'email',    'MSN/Live IM'),
+							( 10100, 'word',     'Yahoo IM'),
+							( 10200, 'word',     'AOL AIM'),
+							( 10300, 'number',   'ICQ ID'),
+							( 40000, 'phone',    'Skype'),
+							( 50000, 'phone',    'Main phone'),
+							( 50100, 'phone',    'Cell phone'),
+							( 50200, 'phone',    'Office phone'),
+							( 50300, 'phone',    'Home phone'),
+							( 60000, 'phone',    'Office FAX'),
+							( 60100, 'phone',    'Home FAX'),
+							(100000, 'url',      'Website'),
+							(100100, 'url',      'Blog'),
+							(110000, 'url',      'Linkedin'),
+							(120000, 'url',      'Twitter'),
+							(130100, 'url',      'Facebook'),
+							(130200, 'url',      'Myspace'),
+							(140000, 'url',      'Flickr'),
+							(150000, 'url',      'YouTube'),
+							(160000, 'url',      'Digg'),
+							(160100, 'url',      'StumbleUpon'),
+							(200000, 'text',     'Role'),
+							(200100, 'text',     'Organization'),
+							(200200, 'text',     'Division'),
+							(211000, 'text',     'VAT ID'),
+							(300000, 'text',     'Main address'),
+							(300300, 'text',     'Home address');" );
+		task_end();
+
+		task_begin( 'Creating table for User fields...' );
+		$DB->query( "CREATE TABLE T_users__fields (
+				uf_ID      int(10) unsigned NOT NULL auto_increment,
+			  uf_user_ID int(10) unsigned NOT NULL,
+			  uf_ufdf_ID int(10) unsigned NOT NULL,
+			  uf_varchar varchar(255) NOT NULL,
+			  PRIMARY KEY (uf_ID)
+			)" );
+		task_end();
+
 	}
-
-	/* fp> this is CVS. This is NOT final	*/
-
-	task_begin( 'Adding new Post Types...' );
-	$DB->query( "
-		REPLACE INTO T_items__type( ptyp_ID, ptyp_name )
-		VALUES ( 1500, 'Intro-Main' ),
-					 ( 1520, 'Intro-Cat' ),
-					 ( 1530, 'Intro-Tag' ),
-					 ( 1570, 'Intro-Sub' ),
-					 ( 1600, 'Intro-All' ) " );
-	task_end();
-
-	task_begin( 'Creating table for User field definitions' );
-	$DB->query( "CREATE TABLE T_users__fielddefs (
-			ufdf_ID int(10) unsigned NOT NULL,
-			ufdf_type char(8) NOT NULL,
-			ufdf_name varchar(255) collate latin1_general_ci NOT NULL,
-			PRIMARY KEY  (ufdf_ID)
-		)" );
-	task_end();
-
-	task_begin( 'Creating default field definitions...' );
-	$DB->query( "
-    INSERT INTO T_users__fielddefs (ufdf_ID, ufdf_type, ufdf_name)
-		 VALUES ( 10000, 'email',    'MSN/Live IM'),
-						( 10100, 'word',     'Yahoo IM'),
-						( 10200, 'word',     'AOL AIM'),
-						( 10300, 'number',   'ICQ ID'),
-						( 40000, 'phone',    'Skype'),
-						( 50000, 'phone',    'Main phone'),
-						( 50100, 'phone',    'Cell phone'),
-						( 50200, 'phone',    'Office phone'),
-						( 50300, 'phone',    'Home phone'),
-						( 60000, 'phone',    'Office FAX'),
-						( 60100, 'phone',    'Home FAX'),
-						(100000, 'url',      'Website'),
-						(100100, 'url',      'Blog'),
-						(110000, 'url',      'Linkedin'),
-						(120000, 'url',      'Twitter'),
-						(130100, 'url',      'Facebook'),
-						(130200, 'url',      'Myspace'),
-						(140000, 'url',      'Flickr'),
-						(150000, 'url',      'YouTube'),
-						(160000, 'url',      'Digg'),
-						(160100, 'url',      'StumbleUpon'),
-						(200000, 'text',     'Role'),
-						(200100, 'text',     'Organization'),
-						(200200, 'text',     'Division'),
-						(211000, 'text',     'VAT ID'),
-						(300000, 'text',     'Main address'),
-						(300300, 'text',     'Home address');" );
-	task_end();
-
-	task_begin( 'Creating table for User fields...' );
-	$DB->query( "CREATE TABLE T_users__fields (
-			uf_ID      int(10) unsigned NOT NULL auto_increment,
-		  uf_user_ID int(10) unsigned NOT NULL,
-		  uf_ufdf_ID int(10) unsigned NOT NULL,
-		  uf_varchar varchar(255) NOT NULL,
-		  PRIMARY KEY (uf_ID)
-		)" );
-	task_end();
 
 	/* Wait until we're sure and no longer experimental for that one...
 	task_begin( 'Moving user data to fields' );
@@ -2413,6 +2421,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.272  2009/01/23 18:32:15  fplanque
+ * versioning
+ *
  * Revision 1.271  2009/01/21 18:52:15  fplanque
  * fix
  *
