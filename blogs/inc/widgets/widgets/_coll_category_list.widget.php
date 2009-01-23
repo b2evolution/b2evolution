@@ -180,7 +180,15 @@ class coll_category_list_Widget extends ComponentWidget
 
 			echo $this->disp_params['collist_start'];
 
-			$coll_ID_array = explode( ',', $aggregate_coll_IDs );
+			if( $aggregate_coll_IDs == '*' )
+			{
+				$BlogCache->load_all();
+				$coll_ID_array = $BlogCache->get_ID_array();
+			}
+			else
+			{
+				$coll_ID_array = explode( ',', $aggregate_coll_IDs );
+			}
 			foreach( $coll_ID_array as $curr_blog_ID )
 			{
 				// Get blog:
@@ -358,6 +366,9 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.14  2009/01/23 00:06:25  blueyed
+ * Support '*' for aggregate_coll_IDs in coll_category_list.widget, too.
+ *
  * Revision 1.13  2008/05/30 19:57:37  blueyed
  * really fix indent
  *
