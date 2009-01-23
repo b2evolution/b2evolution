@@ -225,10 +225,18 @@ div.skin_wrapper_loggedin {
 	$datefmt = locale_datefmt();
 	$datefmt = str_replace( array( 'd', 'm', 'Y' ), array( 'dd', 'mm', 'yy' ), $datefmt );
 	add_js_headline( 'jQuery(function() {
-			jQuery("#item_issue_date, #item_deadline").datepicker({ 
+			var monthNames = [\'' . T_( 'January' ) . '\',\'' . T_( 'February' ) . '\', \'' . T_( 'March' ) . '\', \'' . T_( 'April' ) . '\', \'' . T_( 'May' ) . '\', \'' . T_( 'June' ) . '\', \'' . T_( 'July' ) . '\', \'' . T_( 'August' ) . '\', \'' . T_( 'September' ) . '\', \'' . T_( 'October' ) . '\', \'' . T_( 'November' ) . '\', \'' . T_( 'December' ) . '\']
+			var dayNamesMin = [\'' . T_( 'Sun' ) . '\', \'' . T_( 'Mon' ) . '\', \'' . T_( 'Tue' ) . '\', \'' . T_( 'Wed' ) . '\', \'' . T_( 'Thu' ) . '\', \'' . T_( 'Fri' ) . '\', \'' . T_( 'Sat' ) . '\']
+			jQuery("#item_issue_date").datepicker({ 
+					onSelect: function(){jQuery(\'#set_issue_date_to\').attr("checked", "checked");},
 					dateFormat: \'' . $datefmt . '\', 
-					monthNames: [\'' . T_( 'January' ) . '\',\'' . T_( 'February' ) . '\', \'' . T_( 'March' ) . '\', \'' . T_( 'April' ) . '\', \'' . T_( 'May' ) . '\', \'' . T_( 'June' ) . '\', \'' . T_( 'July' ) . '\', \'' . T_( 'August' ) . '\', \'' . T_( 'September' ) . '\', \'' . T_( 'October' ) . '\', \'' . T_( 'November' ) . '\', \'' . T_( 'December' ) . '\'],
-					dayNamesMin: [\'' . T_( 'Sun' ) . '\', \'' . T_( 'Mon' ) . '\', \'' . T_( 'Tue' ) . '\', \'' . T_( 'Wed' ) . '\', \'' . T_( 'Thu' ) . '\', \'' . T_( 'Fri' ) . '\', \'' . T_( 'Sat' ) . '\']
+					monthNames: monthNames,
+					dayNamesMin: dayNamesMin
+				});
+			jQuery("#item_deadline").datepicker({ 
+					dateFormat: \'' . $datefmt . '\', 
+					monthNames: monthNames,
+					dayNamesMin: dayNamesMin
 				});
 		});' );
 
@@ -243,6 +251,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.11  2009/01/23 23:19:54  afwas
+ * Set the radiobutton to 'Set to' if a date is picked
+ *
  * Revision 1.10  2009/01/23 22:14:39  afwas
  * Added jQuery datepicker, removed javaScript popup calendar
  *
