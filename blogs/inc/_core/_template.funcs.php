@@ -566,7 +566,7 @@ function add_headline($headline)
  */
 function add_js_headline($headline)
 {
-	add_headline("<script type=\"text/javascript\">/* <![CDATA[ */\n\t"
+	add_headline("<script type=\"text/javascript\">\n\t/* <![CDATA[ */\n\t\t"
 		.$headline."\n\t/* ]]> */\n\t</script>");
 }
 
@@ -859,6 +859,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.49  2009/01/23 22:10:31  afwas
+ * Remove javaScript popup calendar to be replaced with jQuery datepicker.
+ *
  * Revision 1.48  2009/01/21 19:17:04  tblue246
  * Fix PHP notice ("Trying to get property of non-object...")
  *
