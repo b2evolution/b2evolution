@@ -52,25 +52,19 @@ header_content_type( 'text/html' );
 		var imgpath_collapse = '" . get_icon( 'collapse', 'url' ) . "';
 		var htsrv_url = '$htsrv_url';" );
 
+ 	require_js( '#jquery#' );
+ 	require_js( '#jqueryUI#' );
  	// script allowing to check and uncheck all boxes in forms
-	require_js( 'functions.js');
+ 	require_js( 'functions.js');
 	require_js( 'form_extensions.js');
+	// Afwas > are these two used or part of the javaScript popup calendar?
 	require_js( 'anchorposition.js');
-	require_js( 'date.js');
-
-	$tmp_month = $month;
-	array_shift( $tmp_month );	// Remove junk value that is only used for WP compatibility
-	add_js_headline( "// Override vars used by date.js (and calendarpopup.js, if present)
-		var MONTH_NAMES = new Array( '".implode("','", array_map('T_',$tmp_month))."','".implode("','", array_map('trim', array_map( 'T_', $month_abbrev ))) . "' );
-		var DAY_NAMES = new Array('" . implode("','", array_map('T_', $weekday)) . "','" . implode("','", array_map('T_',$weekday_abbrev)) . "');" );
-
 	require_js( 'popupwindow.js' );
-	require_js( 'calendarpopup.js' );
 	require_js( 'rollovers.js' );
 	require_js( 'extracats.js' );
 	require_js( 'dynamic_select.js' );
 	require_js( 'admin.js' );
-	require_js( '#jquery#' );
+
 
 	global $UserSettings;
 	if( $UserSettings->get('control_form_abortions') )
@@ -226,6 +220,17 @@ div.skin_wrapper_loggedin {
 </style>
 <![endif]-->' );
 	}
+	require_css( 'ui.datepicker.css' );
+
+	$datefmt = locale_datefmt();
+	$datefmt = str_replace( array( 'd', 'm', 'Y' ), array( 'dd', 'mm', 'yy' ), $datefmt );
+	add_js_headline( 'jQuery(function() {
+			jQuery("#item_issue_date, #item_deadline").datepicker({ 
+					dateFormat: \'' . $datefmt . '\', 
+					monthNames: [\'' . T_( 'January' ) . '\',\'' . T_( 'February' ) . '\', \'' . T_( 'March' ) . '\', \'' . T_( 'April' ) . '\', \'' . T_( 'May' ) . '\', \'' . T_( 'June' ) . '\', \'' . T_( 'July' ) . '\', \'' . T_( 'August' ) . '\', \'' . T_( 'September' ) . '\', \'' . T_( 'October' ) . '\', \'' . T_( 'November' ) . '\', \'' . T_( 'December' ) . '\'],
+					dayNamesMin: [\'' . T_( 'Sun' ) . '\', \'' . T_( 'Mon' ) . '\', \'' . T_( 'Tue' ) . '\', \'' . T_( 'Wed' ) . '\', \'' . T_( 'Thu' ) . '\', \'' . T_( 'Fri' ) . '\', \'' . T_( 'Sat' ) . '\']
+				});
+		});' );
 
 	// CALL PLUGINS NOW:
 	global $Plugins;
@@ -238,6 +243,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.10  2009/01/23 22:14:39  afwas
+ * Added jQuery datepicker, removed javaScript popup calendar
+ *
  * Revision 1.9  2008/10/02 23:33:08  blueyed
  * - require_js(): remove dirty dependency handling for communication.js.
  * - Add add_js_headline() for adding inline JS and use it for admin already.
