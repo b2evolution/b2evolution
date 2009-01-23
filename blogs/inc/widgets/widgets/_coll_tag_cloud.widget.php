@@ -187,9 +187,13 @@ class coll_tag_cloud_Widget extends ComponentWidget
 			{
 				echo $this->disp_params['tag_separator'];
 			}
+			// If there's a space in the tag name, quote it:
+			$tag_name_disp = strpos($row->tag_name, ' ')
+				? '&laquo;'.format_to_output($row->tag_name, 'htmlbody').'&raquo;'
+				: format_to_output($row->tag_name, 'htmlbody');
 			$size = floor( $row->tag_count * $size_span / $count_span + $min_size );
 			echo '<a href="'.$Blog->gen_tag_url( $row->tag_name ).'" style="font-size: '.$size.'pt;" title="'
-						.sprintf( T_('%d posts'), $row->tag_count ).'">'.format_to_output( str_replace( ' ', '&nbsp;', $row->tag_name ) ).'</a>';
+						.sprintf( T_('%d posts'), $row->tag_count ).'">'.$tag_name_disp.'</a>';
 			$count++;
 		}
 		echo $this->disp_params['tag_cloud_end'];
@@ -209,6 +213,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.16  2009/01/23 00:10:45  blueyed
+ * coll_tag_cloud.widget: quote tags with spaces in them
+ *
  * Revision 1.15  2009/01/23 00:09:41  blueyed
  * coll_tag_cloud_Widget:
  *  - fix E_FATAL, when included twice (tag_cloud_cmp function would get
