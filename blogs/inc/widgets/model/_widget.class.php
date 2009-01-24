@@ -480,20 +480,10 @@ class ComponentWidget extends DataObject
 		}
 		else
 		{	// post list
-			$categories = $this->disp_params[ 'categories' ];
-			if (!empty($categories))
-			{
-				$cats = explode(',',$categories);
-			}
-			else
-			{
-				$cats = '';
-			}
 			$ItemList->set_filters( array(
 					'orderby' => $this->disp_params[ 'order_by' ],
 					'order' => $this->disp_params[ 'order_dir' ],
 					'unit' => 'posts',						// We want to advertise all items (not just a page or a day)
-					'cat_array' => $cats,
 					'types' => '1,1500,1520,1530,1570,2000', //walter > include everything that is a post. This is the right list?
 				) );
 		}
@@ -855,6 +845,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.40  2009/01/24 00:43:25  waltercruz
+ * bugfix
+ *
  * Revision 1.39  2009/01/24 00:29:27  waltercruz
  * Implementing links in the blog itself, not in a linkblog, first attempt
  *
