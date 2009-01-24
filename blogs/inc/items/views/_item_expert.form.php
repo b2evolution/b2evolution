@@ -388,13 +388,12 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 $Form->end_form();
 
 
-// ####################### JS BEHAVIORS #########################
-
-require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
-
 
 /*
  * $Log$
+ * Revision 1.39  2009/01/24 04:19:49  afwas
+ * Removed now obsolete call to /inc/items/viws/inc/_item_form_behaviors.inc.php
+ *
  * Revision 1.38  2009/01/23 22:08:12  tblue246
  * - Filter reserved post types from dropdown box on the post form (expert tab).
  * - Indent/doc fixes
