@@ -32,43 +32,23 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $js_doc_title_prefix;
+// Afwas > Moved the javaScript to <head> in /skins-adm/_html_header.inc.php
+// This file is now obsolete.
 ?>
 
 	<?php
-	// Add event to the item title field to update document title and init it (important when switching tabs/blogs):
-	if( isset($js_doc_title_prefix) )
-	{ // dynamic document.title handling:
-		?>
-	<script type="text/javascript">
-		if( post_title_elt = document.getElementById('post_title') )
-		{
-			/**
-			 * Updates document.title according to the item title field (post_title)
-			 */
-			function evo_update_document_title()
-			{
-				var posttitle = document.getElementById('post_title').value;
 
-				document.title = document.title.replace( /(<?php echo preg_quote( trim($js_doc_title_prefix) /* e.g. FF2 trims document.title */ ) ?>).*$/, '$1 '+posttitle );
-			}
-
-			addEvent( post_title_elt, 'keyup', evo_update_document_title, false );
-
-			// Init:
-			evo_update_document_title();
-		}
-	</script>
-		<?php
-	}
-
-	?>
+?>
 
 
 <?php
 
 /*
  * $Log$
+ * Revision 1.5  2009/01/24 03:04:53  afwas
+ * Recoded javaScript in jQuery and moved to <head> in /skins_adm/_html_header.inc.php.
+ * This file is now obsolete.
+ *
  * Revision 1.4  2009/01/23 22:19:39  afwas
  * Remove obsolete javaScript from Admin UI (enables checbox after date change)
  *
