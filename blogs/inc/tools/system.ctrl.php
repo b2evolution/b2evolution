@@ -383,6 +383,20 @@ else
 	disp_system_check( 'ok' );
 }
 
+// IMAP extension
+$imap_loaded = extension_loaded( 'imap' );
+init_system_check( 'PHP IMAP extension', $imap_loaded ? T_( 'Loaded' ) : T_( 'Not loaded' ) );
+if ( ! $imap_loaded )
+{
+	disp_system_check( 'warning', T_( 'You will not be able to use the Blog '
+									 .'by email feature of b2evolution. Enable '
+									 .'the IMAP extension in your php.ini file '
+									 .'or ask your hosting provider about it.' ) );
+}
+else
+{
+	disp_system_check( 'ok' );
+}
 
 // pre_dump( get_loaded_extensions() );
 
@@ -488,6 +502,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2009/01/24 21:49:45  tblue246
+ * Add a check for the PHP IMAP extension which is needed by the Blog by email feature.
+ *
  * Revision 1.12  2008/09/27 00:05:54  fplanque
  * minor/version bump
  *
