@@ -221,10 +221,32 @@ div.skin_wrapper_loggedin {
 <![endif]-->' );
 	}
 	require_css( 'ui.datepicker.css' );
+	
+	add_js_headline( 'jQuery(function(){
+			jQuery(\'#item_issue_date, #item_issue_time\').change(function(){
+				jQuery(\'#set_issue_date_to\').attr("checked", "checked")
+			})
+		})' );
+	
+	// Add event to the item title field to update document title and init it (important when switching tabs/blogs):
+	global $js_doc_title_prefix;
+	if( isset($js_doc_title_prefix) )
+	{ // dynamic document.title handling:
+		$base_title = preg_quote( trim($js_doc_title_prefix) /* e.g. FF2 trims document.title */ );
+	add_js_headline( 'jQuery(function(){
+			var generateTitle = function()
+			{
+				currentPostTitle = jQuery(\'#post_title\').val()
+				document.title = document.title.replace(/(' . $base_title . ').*$/, \'$1 \'+currentPostTitle)
+			}
+			generateTitle()
+			jQuery(\'#post_title\').keyup(generateTitle)
+		})' );
+	}
 
 	$datefmt = locale_datefmt();
 	$datefmt = str_replace( array( 'd', 'm', 'Y' ), array( 'dd', 'mm', 'yy' ), $datefmt );
-	add_js_headline( 'jQuery(function() {
+	add_js_headline( 'jQuery(function(){
 			var monthNames = [\'' . T_( 'January' ) . '\',\'' . T_( 'February' ) . '\', \'' . T_( 'March' ) . '\', \'' . T_( 'April' ) . '\', \'' . T_( 'May' ) . '\', \'' . T_( 'June' ) . '\', \'' . T_( 'July' ) . '\', \'' . T_( 'August' ) . '\', \'' . T_( 'September' ) . '\', \'' . T_( 'October' ) . '\', \'' . T_( 'November' ) . '\', \'' . T_( 'December' ) . '\']
 			var dayNamesMin = [\'' . T_( 'Sun' ) . '\', \'' . T_( 'Mon' ) . '\', \'' . T_( 'Tue' ) . '\', \'' . T_( 'Wed' ) . '\', \'' . T_( 'Thu' ) . '\', \'' . T_( 'Fri' ) . '\', \'' . T_( 'Sat' ) . '\']
 			jQuery("#item_issue_date").datepicker({ 
@@ -232,13 +254,13 @@ div.skin_wrapper_loggedin {
 					dateFormat: \'' . $datefmt . '\', 
 					monthNames: monthNames,
 					dayNamesMin: dayNamesMin
-				});
+				})
 			jQuery("#item_deadline").datepicker({ 
 					dateFormat: \'' . $datefmt . '\', 
 					monthNames: monthNames,
 					dayNamesMin: dayNamesMin
-				});
-		});' );
+				})
+		})' );
 
 	// CALL PLUGINS NOW:
 	global $Plugins;
@@ -251,6 +273,10 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.12  2009/01/24 03:10:20  afwas
+ * - added jQuery that sets 'Set to' radiobutton (#set_issue_date_to) after time or date have been manually modified.
+ * - Recoded javaScript in jQuery: changes to #post_title are added to document.head. This jS originated from /inc/items/views/inc/_item_form_behaviors.
+ *
  * Revision 1.11  2009/01/23 23:19:54  afwas
  * Set the radiobutton to 'Set to' if a date is picked
  *
