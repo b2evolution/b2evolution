@@ -46,6 +46,7 @@ $core_componentwidget_defs = array(
 			'colls_list_public',
 			'colls_list_owner',
 			'linkblog',
+			'links',
 	);
 $i = 0;
 foreach( $core_componentwidget_defs as $code )
@@ -111,6 +112,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.12  2009/01/24 00:29:27  waltercruz
+ * Implementing links in the blog itself, not in a linkblog, first attempt
+ *
  * Revision 1.11  2008/09/23 09:04:33  fplanque
  * moved media index to a widget
  *

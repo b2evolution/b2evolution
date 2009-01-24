@@ -243,6 +243,12 @@ if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) 
 			$new_ptyp_ID = 2000;
 			break;
 
+		case 'links':
+			$label = T_('New link');
+			$title = T_('Package a new link...');
+			$new_ptyp_ID = 2;
+			break;
+
 		default:
 			$label = T_('New post');
 			$title = T_('Write a new post...');
@@ -267,6 +273,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.10  2009/01/24 00:29:27  waltercruz
+ * Implementing links in the blog itself, not in a linkblog, first attempt
+ *
  * Revision 1.9  2009/01/21 22:26:26  fplanque
  * Added tabs to post browsing admin screen All/Posts/Pages/Intros/Podcasts/Comments
  *

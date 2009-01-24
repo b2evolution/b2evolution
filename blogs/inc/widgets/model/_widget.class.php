@@ -480,10 +480,21 @@ class ComponentWidget extends DataObject
 		}
 		else
 		{	// post list
+			$categories = $this->disp_params[ 'categories' ];
+			if (!empty($categories))
+			{
+				$cats = explode(',',$categories);
+			}
+			else
+			{
+				$cats = '';
+			}
 			$ItemList->set_filters( array(
 					'orderby' => $this->disp_params[ 'order_by' ],
 					'order' => $this->disp_params[ 'order_dir' ],
 					'unit' => 'posts',						// We want to advertise all items (not just a page or a day)
+					'cat_array' => $cats,
+					'types' => '1,1500,1520,1530,1570,2000', //walter > include everything that is a post. This is the right list?
 				) );
 		}
 		// Run the query:
@@ -638,6 +649,106 @@ class ComponentWidget extends DataObject
 
 
 	/**
+	 * List of items by category
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function disp_cat_item_list2( $link_type = 'linkto_url' )
+	{
+		global $Blog;
+		global $timestamp_min, $timestamp_max;
+
+		# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
+		# Example: $linkblog_cat = '4,6,7';
+		$cat = '';
+
+		# This is the array if categories to restrict the linkblog to (non recursive)
+		# Example: $linkblog_catsel = array( 4, 6, 7 );
+		$catsel = array();
+
+		// Compile cat array stuff:
+		$cat_array = array();
+		$cat_modifier = '';
+		compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */  $cat_modifier, $Blog->ID );
+
+		$limit = ( $this->disp_params[ 'limit' ] ? $this->disp_params[ 'limit' ] : 1000 ); // Note: 1000 will already kill the display
+
+		$ItemList = & new ItemListLight( $Blog, $timestamp_min, $timestamp_max, $limit );
+
+		$ItemList->set_filters( array(
+				'cat_array' => $cat_array,
+				'cat_modifier' => $cat_modifier,
+				'orderby' => 'main_cat_ID title',
+				'order' => 'ASC',
+				'unit' => 'posts',
+				'types' => '2',
+			), false ); // we don't want to memorise these params
+
+		// Run the query:
+		$ItemList->query();
+
+		if( ! $ItemList->get_num_rows() )
+		{ // empty list:
+			return;
+		}
+
+		echo $this->disp_params['block_start'];
+
+ 		$this->disp_title( $this->disp_params[ 'title' ] );
+
+		echo $this->disp_params['list_start'];
+
+		/**
+		 * @var ItemLight
+		 */
+		while( $Item = & $ItemList->get_category_group() )
+		{
+			// Open new cat:
+			echo $this->disp_params['item_start'];
+			$Item->main_category();
+			echo $this->disp_params['group_start'];
+
+			while( $Item = & $ItemList->get_item() )
+			{
+				echo $this->disp_params['item_start'];
+
+				$Item->title( array(
+						'link_type' => $link_type,
+					) );
+
+				/*
+				$Item->content_teaser( array(
+						'before'      => '',
+						'after'       => ' ',
+						'disppage'    => 1,
+						'stripteaser' => false,
+					) );
+
+				$Item->more_link( array(
+						'before'    => '',
+						'after'     => '',
+						'link_text' => T_('more').' &raquo;',
+					) );
+				*/
+
+
+				echo $this->disp_params['item_end'];
+			}
+
+			// Close cat
+			echo $this->disp_params['group_end'];
+			echo $this->disp_params['item_end'];
+		}
+
+		// Close the global list
+		echo $this->disp_params['list_end'];
+
+		echo $this->disp_params['block_end'];
+	}
+
+
+
+	/**
 	 * List of collections/blogs
 	 *
 	 * @param array MUST contain at least the basic display params
@@ -744,6 +855,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.39  2009/01/24 00:29:27  waltercruz
+ * Implementing links in the blog itself, not in a linkblog, first attempt
+ *
  * Revision 1.38  2008/09/24 08:44:12  fplanque
  * Fixed and normalized order params for widgets (Comments not done yet)
  *

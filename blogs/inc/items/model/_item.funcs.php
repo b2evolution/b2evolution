@@ -62,7 +62,14 @@ function init_MainList( $items_nb_limit )
 					// 'types' => '1000,1500,1520,1530,1570',		// pages and intros (intros should normally never be called)
 				) );
 		}
+		else
+		{
 		// else: we are either in single or in posts mode
+			$MainList->set_default_filters( array(
+					'types' => '1,1500,1520,1530,1570,2000',
+					// 'types' => '1000,1500,1520,1530,1570',		// pages and intros (intros should normally never be called)
+				) );
+		}
 
 		// pre_dump( $MainList->default_filters );
 		$MainList->load_from_Request( false );
@@ -688,6 +695,10 @@ function attach_browse_tabs()
 						'text' => T_('Podcasts'),
 						'href' => 'admin.php?ctrl=items&amp;tab=podcasts&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
+					'links' => array(
+						'text' => T_('Links'),
+						'href' => 'admin.php?ctrl=items&amp;tab=links&amp;filter=restore&amp;blog='.$Blog->ID,
+						),
 				)
 		);
 
@@ -819,6 +830,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.31  2009/01/24 00:29:27  waltercruz
+ * Implementing links in the blog itself, not in a linkblog, first attempt
+ *
  * Revision 1.30  2009/01/23 21:34:52  fplanque
  * fixed UGLY bug on page 2,3,4
  *

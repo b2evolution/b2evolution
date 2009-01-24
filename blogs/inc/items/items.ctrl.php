@@ -633,6 +633,12 @@ function init_list_mode()
 				) );
 			break;
 
+		case 'links':
+			$ItemList->set_default_filters( array(
+					'types' => '2', // Links
+				) );
+			break;
+
 		case 'tracker':
 			// In tracker mode, we want a different default sort:
 			$ItemList->set_default_filters( array(
@@ -904,6 +910,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.27  2009/01/24 00:29:27  waltercruz
+ * Implementing links in the blog itself, not in a linkblog, first attempt
+ *
  * Revision 1.26  2009/01/23 22:08:12  tblue246
  * - Filter reserved post types from dropdown box on the post form (expert tab).
  * - Indent/doc fixes
