@@ -588,8 +588,16 @@ function init_list_mode()
 {
 	global $tab, $Blog, $UserSettings, $ItemList;
 
-	// Store/retrieve preferred tab from UserSettings:
-	$UserSettings->param_Request( 'tab', 'pref_browse_tab', 'string', NULL, true /* memorize */ );
+	if ( param( 'p', 'integer', NULL ) || param( 'title', 'string', NULL ) )
+	{	// Single post requested, do not filter any post types. If the user
+		// has clicked a post link on the dashboard and previously has selected
+		// a tab which would filter this post, it wouldn't be displayed now.
+		$tab = 'full';
+	}
+	else
+	{	// Store/retrieve preferred tab from UserSettings:
+		$UserSettings->param_Request( 'tab', 'pref_browse_tab', 'string', NULL, true /* memorize */ );
+	}
 
 	/*
 	 * Init list of posts to display:
@@ -647,7 +655,12 @@ function init_list_mode()
 			break;
 
 		default:
-			echo $tab;
+			// Delete the pref_browse_tab setting so that the default
+			// (full) gets used the next time the user wants to browse
+			// a blog.
+			$UserSettings->delete( 'pref_browse_tab' );
+			$UserSettings->dbupdate();
+			debug_die( 'Unknown filterset ['.$tab.']' );
 	}
 
 	// Init filter params:
@@ -910,6 +923,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.28  2009/01/24 20:05:28  tblue246
+ * - Do not filter post types if a single post is requested (see comment in code for an explanation).
+ * - debug_die() when an invalid filterset name is passed via the tab parameter and restore the default value.
+ *
  * Revision 1.27  2009/01/24 00:29:27  waltercruz
  * Implementing links in the blog itself, not in a linkblog, first attempt
  *
