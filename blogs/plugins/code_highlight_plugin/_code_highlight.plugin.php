@@ -628,8 +628,12 @@ class code_highlight_plugin extends Plugin
 
 }
 
-/**
+
+/*
  * $Log$
+ * Revision 1.19  2009/01/25 23:13:55  blueyed
+ * Fix CVS log section, which is not phpdoc
+ *
  * Revision 1.18  2009/01/25 18:56:50  blueyed
  * doc fix: Error on line 747 - Unclosed code tag in DocBlock, parsing will be incorrect
  *

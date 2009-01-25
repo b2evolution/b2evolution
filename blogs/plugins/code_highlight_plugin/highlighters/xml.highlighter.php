@@ -125,8 +125,13 @@ class am_xml_highlighter
 
 
 }
-/**
+
+
+/*
  * $Log$
+ * Revision 1.8  2009/01/25 23:13:55  blueyed
+ * Fix CVS log section, which is not phpdoc
+ *
  * Revision 1.7  2008/01/21 09:35:42  fplanque
  * (c) 2008
  *

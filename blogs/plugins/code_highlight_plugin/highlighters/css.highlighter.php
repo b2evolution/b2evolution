@@ -162,8 +162,13 @@ class am_css_highlighter
 	}
 
 }
-/**
+
+
+/*
  * $Log$
+ * Revision 1.4  2009/01/25 23:13:55  blueyed
+ * Fix CVS log section, which is not phpdoc
+ *
  * Revision 1.3  2008/10/02 21:52:10  blueyed
  * fix doc
  *
