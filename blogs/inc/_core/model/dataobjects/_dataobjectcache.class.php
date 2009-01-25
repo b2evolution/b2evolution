@@ -198,12 +198,13 @@ class DataObjectCache
 	 * Load a list of objects into the cache
 	 *
 	 * @param string list of IDs of objects to load
+	 * @param boolean Invert list: Load all objects except those listed in the first parameter
 	 */
-	function load_list( $req_list )
+	function load_list( $req_list, $invert = false )
 	{
 		global $DB, $Debuglog;
 
-		$Debuglog->add( "Loading <strong>$this->objtype($req_list)</strong> into cache", 'dataobjects' );
+		$Debuglog->add( 'Loading <strong>'.$this->objtype.'('.( $invert ? 'ALL except ' : '' ).$req_list.')</strong> into cache', 'dataobjects' );
 
 		if( empty( $req_list ) )
 		{
@@ -212,7 +213,7 @@ class DataObjectCache
 
 		$sql = "SELECT *
 		          FROM $this->dbtablename
-		         WHERE $this->dbIDname IN ($req_list)";
+		         WHERE $this->dbIDname ".( $invert ? 'NOT ' : '' )."IN ($req_list)";
 
 		foreach( $DB->get_results( $sql ) as $row )
 		{
@@ -559,9 +560,16 @@ class DataObjectCache
 	 */
 	function get_option_list( $default = 0, $allow_none = false, $method = 'get_name', $ignore_IDs = array() )
 	{
-		if( (! $this->all_loaded) && $this->load_all )
-		{ // We have not loaded all items so far, but we're allowed to... so let's go:
-			$this->load_all();
+		if( ! $this->all_loaded && $this->load_all )
+		{ // We have not loaded all items so far, but we're allowed to.
+			if ( empty( $ignore_IDs ) )
+			{	// just load all items
+				$this->load_all();
+			}
+			else
+			{	// only load those items not listed in $ignore_IDs
+				$this->load_list( implode( ',', $ignore_IDs ), true );
+			}
 		}
 
 		$r = '';
@@ -595,6 +603,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.7  2009/01/25 14:05:08  tblue246
+ * DataObjectCache::load_list(): Allow loading all objects except those given
+ *
  * Revision 1.6  2009/01/23 22:08:12  tblue246
  * - Filter reserved post types from dropdown box on the post form (expert tab).
  * - Indent/doc fixes
