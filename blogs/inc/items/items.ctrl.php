@@ -14,8 +14,6 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @package admin
- *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -923,6 +921,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.29  2009/01/25 18:59:04  blueyed
+ * phpdoc: fix multiple package tags error
+ *
  * Revision 1.28  2009/01/24 20:05:28  tblue246
  * - Do not filter post types if a single post is requested (see comment in code for an explanation).
  * - debug_die() when an invalid filterset name is passed via the tab parameter and restore the default value.

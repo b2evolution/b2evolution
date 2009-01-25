@@ -14,8 +14,6 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
- * @package admin
- *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -274,6 +272,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2009/01/25 18:57:56  blueyed
+ * phpdoc: fix multiple package tags error
+ *
  * Revision 1.10  2008/02/09 16:19:31  fplanque
  * fixed commenting bugs
  *
