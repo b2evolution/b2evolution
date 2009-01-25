@@ -24,8 +24,8 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * http://www.example.com instead of http://www.example.com/ .
  *
  * @todo move to admin interface (T_basedomains list editor), but use for upgrading
- * @todo: handle multiple blog roots.
- * @todo: dh> "://$basehost" also matches images.google.com referrer URLs
+ * @todo handle multiple blog roots.
+ * @todo dh> "://$basehost" also matches images.google.com referrer URLs
  *            (which include the basehost)!
  *        Blacklists for Referrers should probably match at the beginning
  *        of the referrer URL (also for $blackList).

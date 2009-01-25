@@ -72,7 +72,7 @@ class PageCache
 	/**
 	 * Constructor
 	 *
-	 * @params Blog to use, can be NULL
+	 * @param Blog to use, can be NULL
 	 */
 	function PageCache( $Blog = NULL )
 	{
@@ -443,6 +443,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.6  2009/01/25 19:09:32  blueyed
+ * phpdoc fixes
+ *
  * Revision 1.5  2008/10/05 07:18:06  fplanque
  * thow in a tiny doc about windows bug
  *

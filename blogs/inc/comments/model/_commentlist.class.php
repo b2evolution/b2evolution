@@ -41,7 +41,7 @@ class CommentList extends DataObjectList
 	 * @param Blog can pass NULL if $p is passed
 	 * @param string
 	 * @param array
-	 * @param
+	 * @param integer Restrict to specific post
 	 * @param string Order ("ASC"/"DESC")
 	 * @param string List of fields to order by (separated by " ")
 	 * @param integer Limit
@@ -169,6 +169,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.9  2009/01/25 19:09:32  blueyed
+ * phpdoc fixes
+ *
  * Revision 1.8  2009/01/23 00:05:24  blueyed
  * Add Blog::get_sql_where_aggregate_coll_IDs, which adds support for '*' in list of aggregated blogs.
  *

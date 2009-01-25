@@ -83,8 +83,8 @@ function db_index_exists( $table, $index_name )
 
 
 /**
- * @string Table name
- * @array Column names
+ * @param string Table name
+ * @param array Column names
  * @return boolean Does a list of given column names exist in DB?
  */
 function db_cols_exist( $table, $col_names )
@@ -2421,6 +2421,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.273  2009/01/25 19:09:32  blueyed
+ * phpdoc fixes
+ *
  * Revision 1.272  2009/01/23 18:32:15  fplanque
  * versioning
  *

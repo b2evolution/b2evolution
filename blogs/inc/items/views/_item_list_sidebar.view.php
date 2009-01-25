@@ -35,7 +35,7 @@ global $Plugins;
 global $tab, $show_past, $show_future, $show_statuses, $s, $sentence, $exact, $author, $assgn, $status;
 
 /**
- * @vat ItemList
+ * @var ItemList
  */
 global $ItemList;
 
@@ -270,6 +270,9 @@ echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.12  2009/01/25 19:09:32  blueyed
+ * phpdoc fixes
+ *
  * Revision 1.11  2008/12/28 22:41:56  fplanque
  * increase blog name max length to 255 chars
  *

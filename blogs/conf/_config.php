@@ -11,10 +11,13 @@
  */
 
 if( defined('EVO_CONFIG_LOADED') )
-{ // This makes sure the config does not get loaded twice in Windows (when the /conf file is in a path containing Capitals like /Blog/conf)
+{
 	return;
 }
 
+/**
+ * This makes sure the config does not get loaded twice in Windows (when the /conf file is in a path containing Capitals like /Blog/conf).
+ */
 define( 'EVO_CONFIG_LOADED', true );
 
 require_once  dirname(__FILE__).'/_basic_config.php';			// basic settings
@@ -41,6 +44,9 @@ foreach( $modules as $module )
 
 /*
  * $Log$
+ * Revision 1.53  2009/01/25 19:09:32  blueyed
+ * phpdoc fixes
+ *
  * Revision 1.52  2008/04/06 19:19:30  fplanque
  * Started moving some intelligence to the Modules.
  * 1) Moved menu structure out of the AdminUI class.
