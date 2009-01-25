@@ -1615,7 +1615,7 @@ function debug_info( $force = false, $force_clean = false )
 				.'</thead><tbody>';
 		}
 
-		$table_rows_ignore_perhaps = array();
+		$table_rows_collapse = array();
 		foreach( $timer_rows as $l_cat => $l_time )
 		{
 			$percent_l_cat = $time_page > 0 ? number_format( 100/$time_page * $l_time, 2 ) : '0';
@@ -1633,31 +1633,27 @@ function debug_info( $force = false, $force_clean = false )
 					.'<td class="right">'.$Timer->get_count( $l_cat ).'</td></tr>';
 			}
 
-			if( $l_time < 0.005 )
+			// Maybe ignore this row later, but not for clean display.
+			if( ! $clean && $l_time < 0.005 )
 			{
-				$table_rows_ignore_perhaps[] = $row;
+				$table_rows_collapse[] = $row;
 			}
 			else
 			{
 				echo $row."\n";
 			}
 		}
-		$count_ignored = count($table_rows_ignore_perhaps);
-		if( $count_ignored > 5 )
+		$count_collapse = count($table_rows_collapse);
+
+		// Collapse ignored rows, allowing to expand them with Javascript:
+		if( $count_collapse > 5 )
 		{
-			if ( $clean )
-			{
-				printf( '| %-'.( $table_headerlen - 2 ).'s |'."\n", '+ '.$count_ignored.' < 0.005s' );
-			}
-			else
-			{
-				echo '<tr><td colspan="4" class="center"> + '.$count_ignored.' &lt; 0.005s </td></tr>';
-			}
+			echo '<tr><td colspan="4" class="center"> <a href="" onclick="jQuery(\'#evo-debuglog-timer-long\').toggle(); return false;">+ '.$count_collapse.' &lt; 0.005s</a> </td></tr>';
+			echo '</tbody>';
+			echo '<tbody id="evo-debuglog-timer-long" style="display:none;">';
 		}
-		else
-		{
-			echo implode( "\n", $table_rows_ignore_perhaps )."\n";
-		}
+	
+		echo implode( "\n", $table_rows_collapse )."\n";
 
 		// Output "total":
 		$percent_total = $time_page > 0 ? number_format( 100/$time_page * $total_time, 2 ) : '0';
@@ -1672,6 +1668,11 @@ function debug_info( $force = false, $force_clean = false )
 				.'<td class="right">'.$total_time.'</td>'
 				.'<td class="right">'.$percent_total.'%</td>'
 				.'<td class="right">'.$Timer->get_count('total').'</td></tr>';
+		}
+
+		if( $count_collapse > 5 )
+		{
+			echo '</tbody><tbody>';
 		}
 
 		if ( $clean )
@@ -3187,6 +3188,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.63  2009/01/25 23:01:48  blueyed
+ * debug_info: collapse minor Timer table entries, and do display them completely in clean mode always.
+ *
  * Revision 1.62  2009/01/23 17:23:09  fplanque
  * doc/minor
  *
