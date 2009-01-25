@@ -630,6 +630,9 @@ class code_highlight_plugin extends Plugin
 
 /**
  * $Log$
+ * Revision 1.18  2009/01/25 18:56:50  blueyed
+ * doc fix: Error on line 747 - Unclosed code tag in DocBlock, parsing will be incorrect
+ *
  * Revision 1.17  2008/12/30 23:00:41  fplanque
  * Major waste of time rolling back broken black magic! :(
  * 1) It was breaking the backoffice as soon as $admin_url was not a direct child of $baseurl.
@@ -724,7 +727,7 @@ class code_highlight_plugin extends Plugin
  * made some minor changes to the doc
  * made a few minor code changes ( line="99" etc )
  * added in styles for admin area
- * added in <code><php> tags
+ * added in code/php tags
  * added a fair few comments
  *
  * Revision 1.1.2.5  2007/03/31 22:42:44  fplanque
