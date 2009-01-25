@@ -317,15 +317,18 @@ $cookie_session = 'cookie'.$instance_name.'session';
  * Expiration for cookies.
  *
  * Value in seconds, set this to 0 if you wish to use non permanent cookies (erased when browser is closed).
- *
- * @global int Default: time() + 31536000; // One year from now
+ * Default: time() + 31536000 (one year from now)
+ * 
+ * @global int $cookie_expires
  */
 $cookie_expires = time() + 31536000;
 
 /**
  * Expired-time used to erase cookies.
  *
- * @global int time() - 86400;    // 24 hours ago
+ * Default: time() - 86400 (24 hours ago)
+ * 
+ * @global int $cookie_expired
  */
 $cookie_expired = time() - 86400;
 
@@ -537,7 +540,9 @@ $force_regexp_dirname = '';
 /**
  * XMLRPC logging. Set this to 1 to log XMLRPC calls received by this server (into /xmlsrv/xmlrpc.log).
  *
- * @global int $debug_xmlrpc_logging Default: 0
+ * Default: 0
+ * 
+ * @global int $debug_xmlrpc_logging
  */
 $debug_xmlrpc_logging = 0;
 
@@ -564,7 +569,7 @@ $antispamsrv_uri = '/evonetsrv/xmlrpc.php';
  * They're needed by certain b2evolution features, so
  * don't remove any IDs from this array.
  *
- * @global $posttypes_locked_IDs
+ * @global array $posttypes_locked_IDs
  */
 $posttypes_locked_IDs = array( 1000, 1500, 1520, 1530, 1570, 1600, 2000 );
 
@@ -576,7 +581,7 @@ $posttypes_locked_IDs = array( 1000, 1500, 1520, 1530, 1570, 1600, 2000 );
  * them when creating a new post.
  * Do not remove any IDs from this array.
  *
- * @global $posttypes_reserved_IDs
+ * @global array $posttypes_reserved_IDs
  */
 $posttypes_reserved_IDs = array( 3000, 4000, 5000 );
 ?>
