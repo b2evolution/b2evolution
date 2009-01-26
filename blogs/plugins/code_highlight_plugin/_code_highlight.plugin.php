@@ -463,7 +463,7 @@ class code_highlight_plugin extends Plugin
 			.'.amc0,.amc1,.amc2,.amc3,.amc4,.amc5,.amc6,.amc7,.amc8,.amc9 {'
 			.'background:url('.$this->get_plugin_url().'img/numbers.gif) no-repeat; }');
         
-		require_css($this->get_plugin_url().'amcode.css', /* absolute path for ResourceBundles, evaluates to true in b2evo: */ dirname(__FILE__).'/amcode.css');
+		require_css($this->get_plugin_url().'amcode.css');
 
 		// TODO: dh> move this to a IE-specific file, e.g. add_css_headline, but which is specific for IE
 		//           Or easier: fix it with a hack in amcode.css itself?!
@@ -631,6 +631,9 @@ class code_highlight_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.20  2009/01/26 22:56:13  blueyed
+ * Revert part of 1.15: no need to fake relative_to_base=true
+ *
  * Revision 1.19  2009/01/25 23:13:55  blueyed
  * Fix CVS log section, which is not phpdoc
  *
