@@ -572,7 +572,7 @@ function mw_getcategories( $m )
 
 	$sql = "SELECT cat_ID, cat_name
 					FROM T_categories ";
-	$sql .= $Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID');
+	$sql .= 'WHERE '.$Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID');
 	$sql .= " ORDER BY cat_name ASC";
 
 	$rows = $DB->get_results( $sql );
@@ -825,6 +825,9 @@ $xmlrpc_procs["metaWeblog.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.6  2009/01/26 00:11:21  fplanque
+ * fixing bugs resulting from someone tumble DRYing the code :(
+ *
  * Revision 1.5  2009/01/23 00:05:25  blueyed
  * Add Blog::get_sql_where_aggregate_coll_IDs, which adds support for '*' in list of aggregated blogs.
  *

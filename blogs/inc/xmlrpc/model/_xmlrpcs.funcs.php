@@ -108,7 +108,7 @@ function _b2_or_mt_get_categories( $type, $m )
 
 	$BlogCache = & get_Cache('BlogCache');
 	$current_Blog = $BlogCache->get_by_ID( $Blog->ID );
-	$sql .= $Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID');
+	$sql .= 'WHERE '.$Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID');
 	$sql .= " ORDER BY cat_name ASC";
 
 	$rows = $DB->get_results( $sql );
@@ -432,6 +432,9 @@ function xmlrpcs_edit_item( & $edited_Item, $post_title, $content, $post_date, $
 
 /*
  * $Log$
+ * Revision 1.5  2009/01/26 00:11:22  fplanque
+ * fixing bugs resulting from someone tumble DRYing the code :(
+ *
  * Revision 1.4  2009/01/23 00:05:25  blueyed
  * Add Blog::get_sql_where_aggregate_coll_IDs, which adds support for '*' in list of aggregated blogs.
  *
