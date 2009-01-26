@@ -295,7 +295,7 @@ class Comment extends DataObject
 	{
 		if( $this->get_author_User() )
 		{
-			return $this->author_User->preferred_name( 'raw', false );
+			return $this->author_User->get_preferred_name();
 		}
 		else
 		{
@@ -1392,6 +1392,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2009/01/26 20:45:51  blueyed
+ * Fix Comment::get_author_name for User (returned and echoed). Used nowhere and buggy since move to MVC (2007-06-25) at least. Thanks Walter for finding it :)
+ *
  * Revision 1.24  2008/12/18 00:34:13  blueyed
  * - Add Comment::get_author() and make Comment::author() use it
  * - Add Comment::get_title() and use it in Dashboard and Admin comment list
