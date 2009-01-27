@@ -353,30 +353,18 @@ while( $Item = & $ItemList->get_item() )
 						</div>
 				</fieldset>
 			<?php
-			$Form->textarea( 'p', '', 12, T_('Comment text'),
-												T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags)), 40, 'bComment' );
+			$Form->textarea( 'p', '', 12, T_('Comment text'), '', 40, 'bComment' );
 
 			if(substr($comments_use_autobr,0,4) == 'opt-')
 			{
-				echo $Form->fieldstart;
-				echo $Form->labelstart;
-			?>
-			<label><?php echo T_('Options') ?>:</label>
-
-			<?php
-				echo $Form->labelend;
-				echo $Form->inputstart;
 				$Form->checkbox( 'comment_autobr', 1, T_('Auto-BR'), T_('(Line breaks become &lt;br&gt;)'), 'checkbox' );
-				echo $Form->inputend;
-				$Form->end_fieldset();
-
 			}
 
-				echo $Form->fieldstart;
-				echo $Form->inputstart;
-				$Form->submit( array ('submit', T_('Send comment'), 'SaveButton' ) );
-				echo $Form->inputend;
-				$Form->end_fieldset();
+			echo $Form->fieldstart;
+			echo $Form->inputstart;
+			$Form->submit( array ('submit', T_('Send comment'), 'SaveButton' ) );
+			echo $Form->inputend;
+			$Form->end_fieldset();
 
 			?>
 
@@ -404,6 +392,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.17  2009/01/27 22:54:01  fplanque
+ * commenting cleanup
+ *
  * Revision 1.16  2009/01/21 22:26:26  fplanque
  * Added tabs to post browsing admin screen All/Posts/Pages/Intros/Podcasts/Comments
  *

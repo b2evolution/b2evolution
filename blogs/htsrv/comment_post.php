@@ -116,7 +116,7 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 // TODO: AutoBR should really be a "comment renderer" (like with Items)
 // OLD stub: $comment = format_to_post( $comment, $comment_autobr, 1 ); // includes antispam
 $saved_comment = $comment;
-$comment = check_html_sanity( $comment, $perm_comment_edit ? 'posting' : 'commenting', true );
+$comment = check_html_sanity( $comment, $perm_comment_edit ? 'posting' : 'commenting', $comment_autobr );
 if( $comment === false )
 {	// ERROR
 	$comment = $saved_comment;
@@ -398,6 +398,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.129  2009/01/27 22:54:01  fplanque
+ * commenting cleanup
+ *
  * Revision 1.128  2009/01/27 22:30:32  fplanque
  * Whoever has permission to *edit* comments will now have extended permissions on *new* comments too, including posting <a> tags.
  *
