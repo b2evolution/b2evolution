@@ -570,6 +570,8 @@ class User extends DataObject
 			return $this->cache_perms[$permname][$permlevel][$perm_target_ID];
 		}
 
+		// $Debuglog->add( "Querying perm [$permname][$permlevel][$perm_target_ID]", 'perms' );
+
 		$perm = false;
 
 		switch( $permname )
@@ -1466,6 +1468,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2009/01/27 23:45:54  fplanque
+ * minor
+ *
  * Revision 1.14  2009/01/21 21:44:35  blueyed
  * TODO to add something like create_media_dir
  *
