@@ -64,9 +64,6 @@ if( is_logged_in() )
 	$url = null;
 	$comment_cookies = null;
 	$comment_allow_msgform = null;
-
-	// Does user have permission to edit?
-	$perm_comment_edit = $User->check_perm( 'blog_comments', 'edit', false );
 }
 else
 {	// User is not logged in (registered users), we need some id info from him:
@@ -77,9 +74,6 @@ else
 	$url = param( 'o', 'string' );
 	param( 'comment_cookies', 'integer', 0 );
 	param( 'comment_allow_msgform', 'integer', 0 ); // checkbox
-
-	// NO permission to edit!
-	$perm_comment_edit = false;
 }
 
 param( 'comment_rating', 'integer', NULL );
@@ -112,18 +106,19 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 	) );
 
 
-// CHECK and FORMAT content
-// TODO: AutoBR should really be a "comment renderer" (like with Items)
-// OLD stub: $comment = format_to_post( $comment, $comment_autobr, 1 ); // includes antispam
-$saved_comment = $comment;
-$comment = check_html_sanity( $comment, $perm_comment_edit ? 'posting' : 'commenting', $comment_autobr );
-if( $comment === false )
-{	// ERROR
-	$comment = $saved_comment;
-}
+$commented_Item->get_Blog(); // Make sure Blog is loaded (will be needed wether logged in or not)
 
-if( ! $User )
-{	// User is still not logged in, we need some id info from him:
+if( $User )
+{	// User is logged in
+	// Does user have permission to edit?
+	$perm_comment_edit = $User->check_perm( 'blog_comments', 'edit', false, $commented_Item->Blog->ID );
+}
+else
+{	// User is still not logged in
+	// NO permission to edit!
+	$perm_comment_edit = false;
+
+	// we need some id info from the anonymous user:
 	if ($require_name_email)
 	{ // We want Name and EMail with comments
 		if( empty($author) )
@@ -166,6 +161,16 @@ if( ! $User )
 	}
 }
 
+// CHECK and FORMAT content
+// TODO: AutoBR should really be a "comment renderer" (like with Items)
+// OLD stub: $comment = format_to_post( $comment, $comment_autobr, 1 ); // includes antispam
+$saved_comment = $comment;
+$comment = check_html_sanity( $comment, $perm_comment_edit ? 'posting' : 'commenting', $comment_autobr );
+if( $comment === false )
+{	// ERROR
+	$comment = $saved_comment;
+}
+
 if( empty($comment) )
 { // comment should not be empty!
 	$Messages->add( T_('Please do not send empty comments.'), 'error' );
@@ -198,8 +203,6 @@ if( $commented_Item->can_rate() )
 $Comment->set( 'author_IP', $Hit->IP );
 $Comment->set( 'date', $now );
 $Comment->set( 'content', $comment );
-
-$commented_Item->get_Blog(); // Make sure Blog is loaded
 
 if( $perm_comment_edit )
 {	// User has perm to moderate comments, publish automatically:
@@ -398,6 +401,10 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.130  2009/01/27 23:45:41  fplanque
+ * theoretically this is a better implementation because the check_perm is supposed to check for perms on the currentblog here.
+ * needs some more testing though.
+ *
  * Revision 1.129  2009/01/27 22:54:01  fplanque
  * commenting cleanup
  *
