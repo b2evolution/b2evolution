@@ -64,6 +64,9 @@ if( is_logged_in() )
 	$url = null;
 	$comment_cookies = null;
 	$comment_allow_msgform = null;
+
+	// Does user have permission to edit?
+	$perm_comment_edit = $User->check_perm( 'blog_comments', 'edit', false );
 }
 else
 {	// User is not logged in (registered users), we need some id info from him:
@@ -74,6 +77,9 @@ else
 	$url = param( 'o', 'string' );
 	param( 'comment_cookies', 'integer', 0 );
 	param( 'comment_allow_msgform', 'integer', 0 ); // checkbox
+
+	// NO permission to edit!
+	$perm_comment_edit = false;
 }
 
 param( 'comment_rating', 'integer', NULL );
@@ -108,8 +114,13 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 
 // CHECK and FORMAT content
 // TODO: AutoBR should really be a "comment renderer" (like with Items)
-$comment = format_to_post( $comment, $comment_autobr, 1 ); // includes antispam
-
+// OLD stub: $comment = format_to_post( $comment, $comment_autobr, 1 ); // includes antispam
+$saved_comment = $comment;
+$comment = check_html_sanity( $comment, $perm_comment_edit ? 'posting' : 'commenting', true );
+if( $comment === false )
+{	// ERROR
+	$comment = $saved_comment;
+}
 
 if( ! $User )
 {	// User is still not logged in, we need some id info from him:
@@ -190,7 +201,7 @@ $Comment->set( 'content', $comment );
 
 $commented_Item->get_Blog(); // Make sure Blog is loaded
 
-if( !empty($User) && $User->check_perm( 'blog_comments', 'edit', false ) )
+if( $perm_comment_edit )
 {	// User has perm to moderate comments, publish automatically:
 	$Comment->set( 'status', 'published' );
 }
@@ -387,6 +398,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.128  2009/01/27 22:30:32  fplanque
+ * Whoever has permission to *edit* comments will now have extended permissions on *new* comments too, including posting <a> tags.
+ *
  * Revision 1.127  2008/09/29 08:22:47  fplanque
  * bugfix
  *
