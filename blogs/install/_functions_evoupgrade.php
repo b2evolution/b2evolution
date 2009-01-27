@@ -2272,6 +2272,13 @@ function upgrade_b2evo_tables()
 
 	}
 
+	task_begin( 'Upgrading Posts table... ' );
+	// This for old posts that may have a post type of NULL which should nerver happen. ptyp 1 is for regular posts
+	$DB->query( "UPDATE T_items__item
+									SET post_ptyp_ID = 1
+								WHERE post_ptyp_ID IS NULL" );
+	task_end();
+
 	/* Wait until we're sure and no longer experimental for that one...
 	task_begin( 'Moving user data to fields' );
 	// ICQ
@@ -2421,6 +2428,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.274  2009/01/27 16:48:31  fplanque
+ * quick fix for NULL ptyp_IDs
+ *
  * Revision 1.273  2009/01/25 19:09:32  blueyed
  * phpdoc fixes
  *
