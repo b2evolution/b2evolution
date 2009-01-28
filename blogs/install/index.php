@@ -56,8 +56,10 @@ $Timer = & new Timer('main');
 
 load_class('_core/_param.funcs.php');
 param( 'action', 'string', 'default' );
-param( 'locale', 'string' );
 
+// Load all available locale defintions:
+locales_load_available_defs();
+param( 'locale', 'string' );
 if( preg_match('/[a-z]{2}-[A-Z]{2}(-.{1,14})?/', $locale) )
 {
 	$default_locale = $locale;
@@ -666,6 +668,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
+ * Revision 1.152  2009/01/28 21:39:10  fplanque
+ * Fixed locale selection during install
+ *
  * Revision 1.151  2009/01/22 23:26:45  blueyed
  * Fix install-myself test (and stuff around it). Move 'newdb' action from install/index.php to functions_install.php to call it the same as during real install.
  *
