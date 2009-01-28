@@ -626,7 +626,7 @@ class Blog extends DataObject
 							else
 							{
 								// Validate if it's a valid directory name:
-								$subdir = substr($canonical_path, strlen($media_path));
+								$subdir = no_trailing_slash(substr($canonical_path, strlen($media_path)));
 								if( $error = validate_dirname($subdir) )
 								{
 									param_error( 'blog_media_subdir', T_('Media dir location').': '.$error );
@@ -2017,6 +2017,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.54  2009/01/28 22:47:41  fplanque
+ * bugfix
+ *
  * Revision 1.53  2009/01/28 22:34:21  fplanque
  * Default cat for each blog can now be chosen explicitely
  *
