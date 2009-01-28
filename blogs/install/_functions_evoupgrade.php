@@ -2273,7 +2273,7 @@ function upgrade_b2evo_tables()
 	}
 
 	task_begin( 'Upgrading Posts table... ' );
-	// This for old posts that may have a post type of NULL which should nerver happen. ptyp 1 is for regular posts
+	// This is for old posts that may have a post type of NULL which should never happen. ptyp 1 is for regular posts
 	$DB->query( "UPDATE T_items__item
 									SET post_ptyp_ID = 1
 								WHERE post_ptyp_ID IS NULL" );
@@ -2428,6 +2428,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.275  2009/01/28 00:59:19  blueyed
+ * Fixing doc for a block that gets skipped on installs tracking CVS HEAD, again (probably)
+ *
  * Revision 1.274  2009/01/27 16:48:31  fplanque
  * quick fix for NULL ptyp_IDs
  *
