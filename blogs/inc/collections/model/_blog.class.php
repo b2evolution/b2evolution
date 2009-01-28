@@ -1214,15 +1214,35 @@ class Blog extends DataObject
 	 */
 	function get_default_cat_ID()
 	{
-		if( !isset( $this->default_cat_ID ) )
-		{
-			global $DB;
+		global $DB, $Settings;
 
+		if( empty( $this->default_cat_ID ) )
+		{
+			if( $default_cat_ID = $this->get_setting('default_cat_ID') )
+			{	// A specific cat has previosuly been configured as the default:
+				// Try to get it from the DB (to make sure it exists and is in teh right blog):
+				$sql = 'SELECT cat_ID
+				          FROM T_categories
+				         WHERE cat_blog_ID = '.$this->ID.'
+				         	 AND cat_ID = '.$default_cat_ID;
+				$this->default_cat_ID = $DB->get_var( $sql, 0, 0, 'Get default category' );
+			}
+		}
+
+		if( empty( $this->default_cat_ID ) )
+		{	// If the previous query has returned NULL
 			$sql = 'SELECT cat_ID
 			          FROM T_categories
-			         WHERE cat_blog_ID = '.$this->ID.'
-			         ORDER BY cat_ID
-			         LIMIT 1';
+			         WHERE cat_blog_ID = '.$this->ID;
+			if( $Settings->get('chapter_ordering') == 'manual' )
+			{	// Manual order
+				$sql .= ' ORDER BY cat_order';
+			}
+			else
+			{	// Alphabetic order
+				$sql .= ' ORDER BY cat_name';
+			}
+			$sql .= ' LIMIT 1';
 
 			$this->default_cat_ID = $DB->get_var( $sql, 0, 0, 'Get default category' );
 		}
@@ -1997,6 +2017,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.53  2009/01/28 22:34:21  fplanque
+ * Default cat for each blog can now be chosen explicitely
+ *
  * Revision 1.52  2009/01/23 17:23:09  fplanque
  * doc/minor
  *

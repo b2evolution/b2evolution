@@ -46,6 +46,7 @@ class CollectionSettings extends AbstractSettings
 	 */
 	var $_defaults = array(
 			'new_feedback_status' => 'draft',  	// 'draft', 'published' or 'deprecated'
+			'default_cat_ID' => NULL,						// Default Cat for new posts
 
 			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet', // ping plugin codes, separated by comma
 			'orderby'        => 'datestart',
@@ -140,6 +141,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.26  2009/01/28 22:34:21  fplanque
+ * Default cat for each blog can now be chosen explicitely
+ *
  * Revision 1.25  2008/10/05 10:55:46  tblue246
  * Blog by mail: We've only one working method => removed the drop-down box and added automatical change to pop3a.
  * The default value for this setting was in the wrong file, moved.

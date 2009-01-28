@@ -26,6 +26,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 //____________________ Callbacks functions to display categories list _____________________
 
+/**
+ * @var Blog
+ */
 global $Blog;
 
 global $Settings;
@@ -40,6 +43,10 @@ global $subset_ID;
 
 global $result_fadeout;
 
+global $current_default_cat_ID;
+
+$current_default_cat_ID = $Blog->get_setting('default_cat_ID');
+
 $line_class = 'odd';
 
 
@@ -53,7 +60,7 @@ $line_class = 'odd';
 function cat_line( $Chapter, $level )
 {
 	global $line_class, $result_fadeout, $permission_to_edit, $current_User, $Settings;
-	global $GenericCategoryCache;
+	global $GenericCategoryCache, $current_default_cat_ID;
 
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
@@ -65,9 +72,22 @@ function cat_line( $Chapter, $level )
 						$Chapter->ID.'
 				</td>';
 
+	$makedef_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=make_default' );
+	$makedef_title = T_('Click to make this the default category');
+
+	if( $current_default_cat_ID == $Chapter->ID )
+	{
+		$makedef_icon = 'enabled';
+	}
+	else
+	{
+		$makedef_icon = 'disabled';
+	}
+	$r .= '<td class="center"><a href="'.$makedef_url.'" title="'.$makedef_title.'">'.get_icon($makedef_icon, 'imgtag').'</a></td>';
+
 	if( $permission_to_edit )
 	{	// We have permission permission to edit:
-		$edit_url = regenerate_url( 'action,'.$Chapter->dbIDname, $Chapter->dbIDname.'='.$Chapter->ID.'&amp;action=edit' );
+		$edit_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=edit' );
 		$r .= '<td>
 						<strong style="padding-left: '.($level).'em;"><a href="'.$edit_url.'" title="'.T_('Edit...').'">'.$Chapter->dget('name').'</a></strong>
 					 </td>';
@@ -86,17 +106,17 @@ function cat_line( $Chapter, $level )
 		$r .= '<td class="center">'.$Chapter->dget('order').'</td>';
 	}
 
-
 	$r .= '<td class="lastcol shrinkwrap">';
 	if( $permission_to_edit )
 	{	// We have permission permission to edit, so display action column:
-		$r .=  action_icon( T_('New...'), 'new', regenerate_url( 'action,cat_ID,cat_parent_ID', 'cat_parent_ID='.$Chapter->ID.'&amp;action=new' ) )
-					.action_icon( T_('Edit...'), 'edit', $edit_url );
+		$r .= '<a href="'.$makedef_url.'" title="'.$makedef_title.'">'.get_icon('activate', 'imgtag').'</a>';
+		$r .= action_icon( T_('Edit...'), 'edit', $edit_url );
 		if( $Settings->get('allow_moving_chapters') )
 		{ // If moving cats between blogs is allowed:
 			$r .= action_icon( T_('Move to a different blog...'), 'file_move', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=move' ), T_('Move') );
 		}
-		$r .= action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete' ) );
+		$r .= action_icon( T_('New...'), 'new', regenerate_url( 'action,cat_ID,cat_parent_ID', 'cat_parent_ID='.$Chapter->ID.'&amp;action=new' ) )
+					.action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete' ) );
 	}
 	$r .= '</td>';
 	$r .=	'</tr>';
@@ -160,6 +180,10 @@ $Table->cols[] = array(
 						'th' => T_('ID'),
 					);
 $Table->cols[] = array(
+						'th' => T_('Default'),
+						'th_class' => 'shrinkwrap',
+					);
+$Table->cols[] = array(
 						'th' => T_('Name'),
 					);
 $Table->cols[] = array(
@@ -212,6 +236,9 @@ echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categori
 
 /*
  * $Log$
+ * Revision 1.9  2009/01/28 22:34:21  fplanque
+ * Default cat for each blog can now be chosen explicitely
+ *
  * Revision 1.8  2009/01/28 21:23:22  fplanque
  * Manual ordering of categories
  *

@@ -101,6 +101,7 @@ if( param( $GenericCategoryCache->dbIDname, 'integer', NULL, true, false, false 
 		$Messages->add( T_('Requested element does not exist any longer.'), 'error' );
 		$action = 'nil';
 	}
+
 }
 
 if( !is_null( param( $GenericCategoryCache->dbprefix.'parent_ID', 'integer', NULL ) ) )
@@ -314,6 +315,16 @@ switch( $action )
 		}
 		break;
 
+	case 'make_default':
+		if( ! $permission_to_edit )
+		{
+			debug_die( 'No permission to edit' );
+		}
+
+		$edited_Blog->set_setting( 'default_cat_ID', $edited_GenericCategory->ID );
+		$edited_Blog->dbsave();
+
+		break;
 }
 
 
@@ -415,6 +426,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2009/01/28 22:34:21  fplanque
+ * Default cat for each blog can now be chosen explicitely
+ *
  * Revision 1.7  2009/01/28 21:23:23  fplanque
  * Manual ordering of categories
  *
