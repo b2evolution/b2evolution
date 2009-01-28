@@ -1646,9 +1646,9 @@ function debug_info( $force = false, $force_clean = false )
 		$count_collapse = count($table_rows_collapse);
 
 		// Collapse ignored rows, allowing to expand them with Javascript:
-		if( $count_collapse > 5 )
+		if( 1 || $count_collapse > 5 )
 		{
-			echo '<tr><td colspan="4" class="center"> <a href="" onclick="jQuery(\'#evo-debuglog-timer-long\').toggle(); return false;">+ '.$count_collapse.' &lt; 0.005s</a> </td></tr>';
+			echo '<tr><td colspan="4" class="center"> <a href="" onclick="var e = document.getElementById(\'evo-debuglog-timer-long\'); e.style.display = (e.style.display == \'none\' ? \'\' : \'none\'); return false;">+ '.$count_collapse.' &lt; 0.005s</a> </td></tr>';
 			echo '</tbody>';
 			echo '<tbody id="evo-debuglog-timer-long" style="display:none;">';
 		}
@@ -3188,6 +3188,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.64  2009/01/28 00:51:51  blueyed
+ * Do not use jQuery for Timer table toggle, which may not be available always.
+ *
  * Revision 1.63  2009/01/25 23:01:48  blueyed
  * debug_info: collapse minor Timer table entries, and do display them completely in clean mode always.
  *
