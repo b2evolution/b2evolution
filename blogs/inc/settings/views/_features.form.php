@@ -124,7 +124,7 @@ $Form->begin_fieldset( T_('Blog by email').get_manual_link('blog_by_email') );
 		// TODO: provide Non-JS functionality
 		echo '<div id="eblog_section_more" style="display:none">';
 
-			$Form->checkbox( 'eblog_novalidatecert', $Settings->get('eblog_novalidatecert'), T_('Do not validate certificate'), T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') ); 
+			$Form->checkbox( 'eblog_novalidatecert', $Settings->get('eblog_novalidatecert'), T_('Do not validate certificate'), T_('Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate.') );
 
 			$Form->checkbox( 'eblog_add_imgtag', $Settings->get('eblog_add_imgtag'), T_('Add &lt;img&gt; tags'), T_('Display image attachments using &lt;img&gt; tags (instead of creating a link).'));
 
@@ -187,6 +187,10 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Categories').get_manual_link('categories_global_settings'), array( 'id'=>'categories') );
 	$Form->checkbox_input( 'allow_moving_chapters', $Settings->get('allow_moving_chapters'), T_('Allow moving categories'), array( 'note' => T_('Check to allow moving categories accross blogs. (Caution: can break pre-existing permalinks!)' ) ) );
+	$Form->radio_input( 'chapter_ordering', $Settings->get('chapter_ordering'), array(
+					array( 'value'=>'alpha', 'label'=>T_('Alphabetical') ),
+					array( 'value'=>'manual', 'label'=>T_('Manual') ),
+			 ), T_('Ordering of categories') );
 $Form->end_fieldset();
 
 
@@ -202,6 +206,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.11  2009/01/28 21:23:22  fplanque
+ * Manual ordering of categories
+ *
  * Revision 1.10  2008/12/27 21:09:28  fplanque
  * minor
  *

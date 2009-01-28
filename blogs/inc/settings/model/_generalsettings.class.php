@@ -103,9 +103,10 @@ class GeneralSettings extends AbstractSettings
 		'webhelp_enabled' => '1',
 
 		'allow_moving_chapters' => '0',				// Do not allow moving chapters by default
+		'chapter_ordering' => 'alpha',
 
 		'general_cache_enabled' => 0,
-		
+
 		'eblog_enabled' => 0,						// blog by email
 		'eblog_method' => 'pop3',					// blog by email
 		'eblog_encrypt' => 'none',					// blog by email
@@ -169,6 +170,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.15  2009/01/28 21:23:23  fplanque
+ * Manual ordering of categories
+ *
  * Revision 1.14  2008/10/06 18:11:58  tblue246
  * Further blog by email fixes
  *

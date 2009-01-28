@@ -28,6 +28,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $Blog;
 
+global $Settings;
+
 global $GenericCategoryCache;
 
 global $line_class;
@@ -78,6 +80,11 @@ function cat_line( $Chapter, $level )
 	}
 
 	$r .= '<td>'.$Chapter->dget('urlname').'</td>';
+
+	if( $Settings->get('chapter_ordering') == 'manual' )
+	{
+		$r .= '<td class="center">'.$Chapter->dget('order').'</td>';
+	}
 
 
 	$r .= '<td class="lastcol shrinkwrap">';
@@ -156,8 +163,17 @@ $Table->cols[] = array(
 						'th' => T_('Name'),
 					);
 $Table->cols[] = array(
-						'th' => T_('URL name'),
+						'th' => T_('URL "slug"'),
 					);
+
+if( $Settings->get('chapter_ordering') == 'manual' )
+{
+	$Table->cols[] = array(
+							'th' => T_('Order'),
+							'th_class' => 'shrinkwrap',
+						);
+}
+
 if( $permission_to_edit )
 {	// We have permission permission to edit, so display action column:
 	$Table->cols[] = array(
@@ -190,9 +206,15 @@ if( ! $Settings->get('allow_moving_chapters') )
 	echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Moving categories across blogs is currently disabled in the %sglobal settings%s.'), '<a href="admin.php?ctrl=features#categories">', '</a>' ).'</p> ';
 }
 
+echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categories is currently set to %s the %sglobal settings%s.'),
+	$Settings->get('chapter_ordering') == 'manual' ? T_('Manual') : T_('Alphabetical'), '<a href="admin.php?ctrl=features#categories">', '</a>' ).'</p> ';
+
 
 /*
  * $Log$
+ * Revision 1.8  2009/01/28 21:23:22  fplanque
+ * Manual ordering of categories
+ *
  * Revision 1.7  2008/12/28 22:55:55  fplanque
  * increase blog name max length to 255 chars
  *

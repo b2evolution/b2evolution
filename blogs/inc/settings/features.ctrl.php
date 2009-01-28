@@ -91,7 +91,7 @@ switch( $action )
 				'AutoBR', 'eblog_body_terminator', 'eblog_test_mode', 'eblog_add_imgtag',
 				'log_public_hits', 'log_admin_hits', 'auto_prune_stats_mode', 'auto_prune_stats',
 				'outbound_notifications_mode', 'webhelp_enabled', 'allow_moving_chapters',
-				'log_spam_hits', ) );
+				'chapter_ordering', 'log_spam_hits', ) );
 
 			if( $Settings->dbupdate() )
 			{
@@ -179,6 +179,7 @@ switch( $action )
 
 			// Categories:
 			$Settings->set( 'allow_moving_chapters', param( 'allow_moving_chapters', 'integer', 0 ) );
+			$Settings->set( 'chapter_ordering', param( 'chapter_ordering', 'string', 'alpha' ) );
 
 
 			if( ! $Messages->count('error') )
@@ -217,6 +218,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2009/01/28 21:23:23  fplanque
+ * Manual ordering of categories
+ *
  * Revision 1.8  2008/10/07 16:54:40  tblue246
  * Unset all settings if resetting to default values (some were missing)
  *

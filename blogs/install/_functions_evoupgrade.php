@@ -2279,6 +2279,19 @@ function upgrade_b2evo_tables()
 								WHERE post_ptyp_ID IS NULL" );
 	task_end();
 
+	task_begin( 'Upgrading Categories table... ' );
+/*	$DB->query( "ALTER TABLE T_categories
+				CHANGE COLUMN cat_name cat_name varchar(255) NOT NULL,
+				CHANGE COLUMN cat_description cat_description varchar(255) NULL DEFAULT NULL,
+				ADD COLUMN cat_order int(11) NULL DEFAULT NULL AFTER cat_description,
+				ADD KEY cat_order (cat_order)" );
+	$DB->query( "UPDATE T_categories
+				SET cat_order = cat_ID" );
+*/
+	task_end();
+
+
+
 	/* Wait until we're sure and no longer experimental for that one...
 	task_begin( 'Moving user data to fields' );
 	// ICQ
@@ -2428,6 +2441,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.276  2009/01/28 21:23:22  fplanque
+ * Manual ordering of categories
+ *
  * Revision 1.275  2009/01/28 00:59:19  blueyed
  * Fixing doc for a block that gets skipped on installs tracking CVS HEAD, again (probably)
  *

@@ -45,7 +45,18 @@ class ChapterCache extends GenericCategoryCache
 	 */
 	function ChapterCache()
 	{
-		parent::GenericCategoryCache( 'Chapter', false, 'T_categories', 'cat_', 'cat_ID', 'cat_name', 'blog_ID' );
+		global $Settings;
+
+		if( $Settings->get('chapter_ordering') == 'manual' )
+		{	// Manual order
+			$order_by = 'cat_order';
+		}
+		else
+		{	// Alphabetic order
+			$order_by = 'cat_name';
+		}
+
+		parent::GenericCategoryCache( 'Chapter', false, 'T_categories', 'cat_', 'cat_ID', 'cat_name', 'blog_ID', $order_by );
 	}
 
 
@@ -186,7 +197,7 @@ class ChapterCache extends GenericCategoryCache
 	 */
 	function load_subset( $subset_ID )
 	{
-		global $DB, $Debuglog;
+		global $DB, $Debuglog, $Settings;
 
 		if( $this->all_loaded || isset( $this->loaded_subsets[$subset_ID] ) )
 		{ // Already loaded
@@ -199,8 +210,15 @@ class ChapterCache extends GenericCategoryCache
 		$Debuglog->add( 'ChapterCache - Loading <strong>chapters('.$subset_ID.')</strong> into cache', 'dataobjects' );
 		$sql = 'SELECT *
 							FROM T_categories
-						 WHERE cat_blog_ID = '.$subset_ID.'
-						 ORDER BY cat_name';
+						 WHERE cat_blog_ID = '.$subset_ID;
+		if( $Settings->get('chapter_ordering') == 'manual' )
+		{	// Manual order
+			$sql .= ' ORDER BY cat_order';
+		}
+		else
+		{	// Alphabetic order
+			$sql .= ' ORDER BY cat_name';
+		}
 
 		foreach( $DB->get_results( $sql, OBJECT, 'Loading chapters('.$subset_ID.') into cache' ) as $row )
 		{
@@ -300,6 +318,9 @@ class ChapterCache extends GenericCategoryCache
 
 /*
  * $Log$
+ * Revision 1.5  2009/01/28 21:23:22  fplanque
+ * Manual ordering of categories
+ *
  * Revision 1.4  2008/12/28 19:00:14  fplanque
  * Fixed multiple category parent/child recursion issues. It should no longer be possible to "lose" categories by creating loops.
  *

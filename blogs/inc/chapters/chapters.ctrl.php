@@ -6,7 +6,6 @@
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
- * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -18,9 +17,6 @@
  * }}
  *
  * @package admin
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE.
  *
  * @version $Id$
  */
@@ -44,15 +40,14 @@ $AdminUI->set_path( 'blogs', 'chapters' );
  * Delete restrictions
  */
 $delete_restrictions = array(
-							array( 'table'=>'T_categories', 'fk'=>'cat_parent_ID', 'msg'=>T_('%d sub categories') ),
-							array( 'table'=>'T_items__item', 'fk'=>'post_main_cat_ID', 'msg'=>T_('%d posts within category through main cat') ),
-							array( 'table'=>'T_postcats', 'fk'=>'postcat_cat_ID', 'msg'=>T_('%d posts within category through extra cat') ),
-					);
+		array( 'table'=>'T_categories', 'fk'=>'cat_parent_ID', 'msg'=>T_('%d sub categories') ),
+		array( 'table'=>'T_items__item', 'fk'=>'post_main_cat_ID', 'msg'=>T_('%d posts within category through main cat') ),
+		array( 'table'=>'T_postcats', 'fk'=>'postcat_cat_ID', 'msg'=>T_('%d posts within category through extra cat') ),
+	);
 
 $restrict_title = T_('Cannot delete category');	 //&laquo;%s&raquo;
 
-// mb> Used to know if the element can be deleted, so to display or not display confirm delete dialog (true:display, false:not display)
-// It must be initialized to false before checking the delete restrictions
+// This must be initialized to false before checking the delete restrictions
 $checked_delete = false;
 
 load_class( 'chapters/model/_chaptercache.class.php' );
@@ -74,11 +69,6 @@ $permission_to_edit = $current_User->check_perm( 'blog_cats', '', false, $blog )
 // The form will be on its own page:
 $form_below_list = false;
 $edit_view_path = 'chapters/views/_chapter.form.php';
-
-
-
-// fp> TODO: Detect and repair orphan cats.
-
 
 
 // ---- Below is a modified generic categtory list editor: -----
@@ -425,64 +415,13 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2009/01/28 21:23:23  fplanque
+ * Manual ordering of categories
+ *
  * Revision 1.6  2008/01/21 09:35:26  fplanque
  * (c) 2008
  *
  * Revision 1.5  2008/01/05 02:28:17  fplanque
  * enhanced blog selector (bloglist_buttons)
- *
- * Revision 1.4  2007/09/04 13:47:48  fplanque
- * fixed fadeout
- *
- * Revision 1.3  2007/09/04 13:33:26  fplanque
- * Fixed display for category screen.
- *
- * Revision 1.1  2007/06/25 10:59:24  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.19  2007/05/14 02:43:03  fplanque
- * Started renaming tables. There probably won't be a better time than 2.0.
- *
- * Revision 1.18  2007/05/13 18:49:54  fplanque
- * made autoselect_blog() more robust under PHP4
- *
- * Revision 1.17  2007/05/09 01:01:29  fplanque
- * permissions cleanup
- *
- * Revision 1.16  2007/04/26 00:11:07  fplanque
- * (c) 2007
- *
- * Revision 1.15  2007/01/07 05:27:41  fplanque
- * extended fadeout, but still not fixed everywhere
- *
- * Revision 1.14  2006/12/18 03:20:41  fplanque
- * _header will always try to set $Blog.
- * controllers can use valid_blog_requested() to make sure we have one
- * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
- *
- * Revision 1.13  2006/12/13 18:17:39  blueyed
- * Fixed header_redirect() which would only work if b2evo is installed in DOCUMENT_ROOT and would not have been RFC-compliant anyway
- *
- * Revision 1.12  2006/12/11 16:53:47  fplanque
- * controller name cleanup
- *
- * Revision 1.11  2006/12/11 00:32:26  fplanque
- * allow_moving_chapters stting moved to UI
- * chapters are now called categories in the UI
- *
- * Revision 1.10  2006/12/10 22:28:33  fplanque
- * improved moving chapters a little bit
- *
- * Revision 1.9  2006/12/10 01:52:27  fplanque
- * old cats are now officially dead :>
- *
- * Revision 1.8  2006/12/09 17:59:31  fplanque
- * started "moving chapters accross blogs" feature
- *
- * Revision 1.7  2006/11/30 22:34:15  fplanque
- * bleh
- *
- * Revision 1.6  2006/11/24 18:27:22  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

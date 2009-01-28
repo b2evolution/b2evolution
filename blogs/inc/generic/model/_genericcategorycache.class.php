@@ -83,9 +83,9 @@ class GenericCategoryCache extends GenericCache
 	/**
 	 * Constructor
 	 */
-	function GenericCategoryCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL, $subset_property = NULL )
+	function GenericCategoryCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname = 'ID', $name_field = NULL, $subset_property = NULL, $order_by = '' )
 	{
-		parent::GenericCache( $objtype, $load_all, $tablename, $prefix, $dbIDname, $name_field );
+		parent::GenericCache( $objtype, $load_all, $tablename, $prefix, $dbIDname, $name_field, $order_by );
 
 		$this->subset_property = $subset_property;
 	}
@@ -430,6 +430,9 @@ class GenericCategoryCache extends GenericCache
 
 /*
  * $Log$
+ * Revision 1.6  2009/01/28 21:23:23  fplanque
+ * Manual ordering of categories
+ *
  * Revision 1.5  2008/12/28 19:00:14  fplanque
  * Fixed multiple category parent/child recursion issues. It should no longer be possible to "lose" categories by creating loops.
  *

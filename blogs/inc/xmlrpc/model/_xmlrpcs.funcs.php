@@ -75,7 +75,7 @@ function starify( $string )
  */
 function _b2_or_mt_get_categories( $type, $m )
 {
-	global $xmlrpcerruser, $DB;
+	global $xmlrpcerruser, $DB, $Settings;
 
 	// CHECK LOGIN:
   /**
@@ -109,7 +109,14 @@ function _b2_or_mt_get_categories( $type, $m )
 	$BlogCache = & get_Cache('BlogCache');
 	$current_Blog = $BlogCache->get_by_ID( $Blog->ID );
 	$sql .= 'WHERE '.$Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID');
-	$sql .= " ORDER BY cat_name ASC";
+	if( $Settings->get('chapter_ordering') == 'manual' )
+	{	// Manual order
+		$sql .= ' ORDER BY cat_order';
+	}
+	else
+	{	// Alphabetic order
+		$sql .= ' ORDER BY cat_name';
+	}
 
 	$rows = $DB->get_results( $sql );
 	if( $DB->error )
@@ -432,6 +439,9 @@ function xmlrpcs_edit_item( & $edited_Item, $post_title, $content, $post_date, $
 
 /*
  * $Log$
+ * Revision 1.6  2009/01/28 21:23:23  fplanque
+ * Manual ordering of categories
+ *
  * Revision 1.5  2009/01/26 00:11:22  fplanque
  * fixing bugs resulting from someone tumble DRYing the code :(
  *

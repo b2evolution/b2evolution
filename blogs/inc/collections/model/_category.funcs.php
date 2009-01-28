@@ -124,6 +124,8 @@ function get_catblog( $cat_ID )
 
 /**
  * Load cache for category definitions.
+ *
+ * Warning: this loads all categories for ALL blogs
  */
 function cat_load_cache()
 {
@@ -140,9 +142,17 @@ function cat_load_cache()
 	$Timer->resume( 'cat_load_cache' );
 
 	// echo "loading CAT cache";
-	$sql = "SELECT cat_ID, cat_parent_ID, cat_name, cat_blog_ID
-					FROM T_categories
-					ORDER BY cat_name";
+	$sql = 'SELECT cat_ID, cat_parent_ID, cat_name, cat_blog_ID
+					FROM T_categories';
+	if( $Settings->get('chapter_ordering') == 'manual' )
+	{	// Manual order
+		$sql .= ' ORDER BY cat_order';
+	}
+	else
+	{	// Alphabetic order
+		$sql .= ' ORDER BY cat_name';
+	}
+
 
 	foreach( $DB->get_results( $sql, ARRAY_A, 'loading CAT cache' ) as $myrow )
 	{
@@ -463,6 +473,9 @@ function cat_req_dummy()
 
 /*
  * $Log$
+ * Revision 1.3  2009/01/28 21:23:22  fplanque
+ * Manual ordering of categories
+ *
  * Revision 1.2  2008/01/21 09:35:26  fplanque
  * (c) 2008
  *

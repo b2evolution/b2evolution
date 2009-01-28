@@ -48,6 +48,8 @@ class Chapter extends GenericCategory
 	var $Blog;
 
 	var $urlname;
+	var $description;
+	var $order;
 
 	/**
 	 * Lazy filled
@@ -74,6 +76,8 @@ class Chapter extends GenericCategory
 		{	// Wa are loading an object:
 			$this->blog_ID = $db_row->cat_blog_ID;
 			$this->urlname = $db_row->cat_urlname;
+			$this->description = $db_row->cat_description;
+			$this->order = $db_row->cat_order;
 		}
 	}
 
@@ -85,7 +89,7 @@ class Chapter extends GenericCategory
 	 */
 	function load_from_request()
 	{
-		global $DB;
+		global $DB, $Settings;
 
 		parent::load_from_Request();
 
@@ -93,9 +97,23 @@ class Chapter extends GenericCategory
 		param( 'cat_urlname', 'string' );
 		$this->set_from_Request( 'urlname' );
 
+		// Check description
+		param( 'cat_description', 'string' );
+		$this->set_from_Request( 'description' );
+
+		if( $Settings->get('chapter_ordering') == 'manual' )
+		{	// Manual ordering
+			param( 'cat_order', 'integer' );
+			$this->set_from_Request( 'order' );
+		}
+
 		return ! param_errors_detected();
 	}
 
+
+	/**
+	 *
+	 */
 	function & get_parent_Chapter()
 	{
 		if( ! isset( $this->parent_Chapter ) )
@@ -191,7 +209,7 @@ class Chapter extends GenericCategory
 				$category_prefix = $this->Blog->get_setting('category_prefix');
 				if( !empty( $category_prefix ) )
 				{
-					$r = url_add_tail( $blogurl, '/'. $category_prefix . '/' . $this->get_url_path() );
+					$r = url_add_tail( $blogurl, '/'.$category_prefix.'/'.$this->get_url_path() );
 				}
 				else
 				{
@@ -289,6 +307,9 @@ class Chapter extends GenericCategory
 
 /*
  * $Log$
+ * Revision 1.10  2009/01/28 21:23:22  fplanque
+ * Manual ordering of categories
+ *
  * Revision 1.9  2008/12/28 23:35:51  fplanque
  * Autogeneration of category/chapter slugs(url names)
  *

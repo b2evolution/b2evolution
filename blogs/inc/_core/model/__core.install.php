@@ -208,18 +208,18 @@ $schema_queries = array(
 	'T_categories' => array(
 		'Creating table for Categories',
 		"CREATE TABLE T_categories (
-			cat_ID int(11) unsigned NOT NULL auto_increment,
-			cat_parent_ID int(11) unsigned NULL,
-			cat_name tinytext NOT NULL,
-			cat_urlname varchar(255) NOT NULL,
-			cat_blog_ID int(11) unsigned NOT NULL default 2,
-			cat_description VARCHAR(250) NULL DEFAULT NULL,
-			cat_longdesc TEXT NULL DEFAULT NULL,
-			cat_icon VARCHAR(30) NULL DEFAULT NULL,
+			cat_ID          int(10) unsigned NOT NULL auto_increment,
+			cat_parent_ID   int(10) unsigned NULL,
+			cat_name        varchar(255) NOT NULL,
+			cat_urlname     varchar(255) NOT NULL,
+			cat_blog_ID     int(10) unsigned NOT NULL default 2,
+			cat_description varchar(255) NULL DEFAULT NULL,
+			cat_order       int(11) NULL DEFAULT NULL,
 			PRIMARY KEY cat_ID (cat_ID),
 			UNIQUE cat_urlname( cat_urlname ),
 			KEY cat_blog_ID (cat_blog_ID),
-			KEY cat_parent_ID (cat_parent_ID)
+			KEY cat_parent_ID (cat_parent_ID),
+			KEY cat_order (cat_order)
 		)" ),
 
 	'T_items__item' => array(
@@ -559,6 +559,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.10  2009/01/28 21:23:21  fplanque
+ * Manual ordering of categories
+ *
  * Revision 1.9  2009/01/23 18:32:15  fplanque
  * versioning
  *

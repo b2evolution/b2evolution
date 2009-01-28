@@ -344,7 +344,6 @@ class Table extends Widget
 			echo '<script type="text/javascript">addEvent( window, "load", Fat.fade_all, false);</script>';
 		}
 
-
 	}
 
 
@@ -728,8 +727,10 @@ class Table extends Widget
 						}
 						else
 						{	// The cell is a th
-							$th_title = $this->cols[$key]['th'] ;
-							$col_order = isset( $this->cols[$key]['order'] ) || isset( $this->cols[$key]['order_objects_callback'] ) || isset( $this->cols[$key]['order_rows_callback'] );
+							$th_title = $this->cols[$key]['th'];
+							$col_order = isset( $this->cols[$key]['order'] )
+							|| isset( $this->cols[$key]['order_objects_callback'] )
+							|| isset( $this->cols[$key]['order_rows_callback'] );
 						}
 
 
@@ -994,6 +995,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.8  2009/01/28 21:23:23  fplanque
+ * Manual ordering of categories
+ *
  * Revision 1.7  2008/04/24 01:56:08  fplanque
  * Goal hit summary
  *
