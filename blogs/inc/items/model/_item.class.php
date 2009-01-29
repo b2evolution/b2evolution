@@ -253,6 +253,7 @@ class Item extends ItemLight
 			$this->set( 'status', 'published' );
 			$this->set( 'locale', $default_locale );
 			$this->set( 'priority', 3 );
+			$this->set( 'ptyp_ID', 1 /* Post */ );
 		}
 		else
 		{
@@ -3612,6 +3613,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.65  2009/01/29 15:48:54  tblue246
+ * Use 1 as the default post type ID when creating a new Item object. Fixes http://forums.b2evolution.net/viewtopic.php?t=17780 .
+ *
  * Revision 1.64  2009/01/23 22:08:12  tblue246
  * - Filter reserved post types from dropdown box on the post form (expert tab).
  * - Indent/doc fixes
