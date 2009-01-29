@@ -103,15 +103,31 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		$Form->text_input( 'post_title', $item_title, 20, '', '', array('maxlength'=>255, 'style'=>'width: 100%;', 'required' => $Blog->get_setting('require_title') == 'required') );
 		echo '</td>';
 	}
-	echo '<td width="1%">';
-	if( $display_title_field )
-	{
-		echo '&nbsp;&nbsp;';
+
+	// -- Language chooser BEGIN --
+	$locale_options = locale_options( $edited_Item->get( 'locale' ), false, true );
+	
+	if ( is_array( $locale_options ) )
+	{	// We've only one enabled locale.
+		// Tblue> The locale name is not really needed here, but maybe we
+		//        want to display the name of the only locale?
+		$Form->hidden( 'post_locale', $locale_options[0] );
+		//pre_dump( $locale_options );
 	}
-	echo '<strong>'.T_('Language').':</strong></td>';
-	echo '<td width="1%" class="select">';
-	$Form->select( 'post_locale', $edited_Item->get( 'locale' ), 'locale_options_return', '' );
-	echo '</td></tr></table>';
+	else
+	{	// More than one locale => select field.
+		echo '<td width="1%">';
+		if( $display_title_field )
+		{
+			echo '&nbsp;&nbsp;';
+		}
+		echo '<strong>'.T_('Language').':</strong></td>';
+		echo '<td width="1%" class="select">';
+		$Form->select_options( 'post_locale', $locale_options, '' );
+		echo '</td>';
+	}
+	// -- Language chooser END --
+	echo '</tr></table>';
 
 	echo '<table cellspacing="0" class="compose_layout"><tr>';
 	echo '<td width="1%"><strong>'.T_('Link to url').':</strong></td>';
@@ -391,6 +407,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.40  2009/01/29 18:16:35  tblue246
+ * Hide language chooser on post form in expert mode if there's only one locale.
+ *
  * Revision 1.39  2009/01/24 04:19:49  afwas
  * Removed now obsolete call to /inc/items/viws/inc/_item_form_behaviors.inc.php
  *

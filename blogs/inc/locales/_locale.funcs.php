@@ -529,18 +529,23 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 
 
 /**
- * [callback function] Outputs an <option> set with default locale selected
+ * [callback function] Outputs an <option> set with default locale selected.
+ * Optionally returns an array with a locale key and name if there's only one enabled locale.
  *
  * @param string default value
  * @param boolean echo output?
+ * @param boolean Return array (locale key + name) if there's only one enabled locale?
+ * @return string|array The options string or an array (locale key + name) if there's only one enabled locale and $array_if_onelocale == true.
  */
-function locale_options( $default = '', $disp = true )
+function locale_options( $default = '', $disp = true, $array_if_onelocale = false )
 {
 	global $locales, $default_locale;
 
 	if( empty( $default ) ) $default = $default_locale;
 
 	$r = '';
+	$enabled_count = 0;
+	$enabled_lastkey = '';
 
 	foreach( $locales as $this_localekey => $this_locale )
 	{
@@ -550,16 +555,23 @@ function locale_options( $default = '', $disp = true )
 			if( $this_localekey == $default )
 				$r .= ' selected="selected"';
 			$r .= '>'. T_($this_locale['name']). '</option>';
+
+			++$enabled_count;
+			$enabled_lastkey = $this_localekey;
 		}
 	}
 
 	if( $disp )
-	{ // the result must be displayed
+	{	// the result must be displayed
 		echo $r;
-		return true;
+	}
+
+	if ( $array_if_onelocale && $enabled_count == 1 )
+	{	// We've only one enabled locale:
+		return array( $enabled_lastkey, $locales[$enabled_lastkey]['name'] );
 	}
 	else
-	{ //the result must be returned
+	{	// Return the string.
 		return $r;
 	}
 }
@@ -1039,6 +1051,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.14  2009/01/29 18:16:35  tblue246
+ * Hide language chooser on post form in expert mode if there's only one locale.
+ *
  * Revision 1.13  2008/09/07 09:13:28  fplanque
  * Locale definitions are now included in language packs.
  * A bit experimental but it should work...
