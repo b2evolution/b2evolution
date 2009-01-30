@@ -83,7 +83,8 @@ switch( $action )
 		param( 'kind', 'string', true );
 
 		// dh> TODO: "New %s" is probably too generic. What can %s become? (please comment it in "TRANS")
-		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( T_('New %s'), Blog::kind_name($kind) ) ) );
+		// Tblue> Look at Blog::kind_name(). I wrote a TRANS comment (30.01.09 22:03, HEAD).
+		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( /* TRANS: %s can become "Photoblog", "Group blog" or "Standard blog" */ T_('New %s'), Blog::kind_name($kind) ) ) );
 		break;
 
 	case 'new-name':
@@ -453,6 +454,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2009/01/30 21:04:54  tblue246
+ * Doc
+ *
  * Revision 1.9  2008/02/12 17:43:37  waltercruz
  * Updating a obsolete URL from the old manual to the wiki
  *
