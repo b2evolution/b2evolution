@@ -631,9 +631,18 @@ if( !$Messages->count('error') )
 				break;
 			}
 
+			$fullname = $edited_User->dget( 'fullname' );
 			if( param( 'confirm', 'integer', 0 ) )
 			{ // confirmed, Delete from DB:
-				$msg = sprintf( T_('User &laquo;%s&raquo; [%s] deleted.'), $edited_User->dget( 'fullname' ), $edited_User->dget( 'login' ) );
+				if ( ! empty( $fullname ) )
+				{
+					$msg = sprintf( T_('User &laquo;%s&raquo; [%s] deleted.'), $fullname, $edited_User->dget( 'login' ) );
+				}
+				else
+				{
+					$msg = sprintf( T_('User &laquo;%s&raquo; deleted.'), $edited_User->dget( 'login' ) );
+				}
+				
 				$edited_User->dbdelete( $Messages );
 				unset($edited_User);
 				forget_param('user_ID');
@@ -643,7 +652,16 @@ if( !$Messages->count('error') )
 			else
 			{	// not confirmed, Check for restrictions:
 				memorize_param( 'user_ID', 'integer', true );
-				if( ! $edited_User->check_delete( sprintf( T_('Cannot delete User &laquo;%s&raquo; [%s]'), $edited_User->dget( 'fullname' ), $edited_User->dget( 'login' ) ) ) )
+				if ( ! empty( $fullname ) )
+				{
+					$msg = sprintf( T_('Cannot delete User &laquo;%s&raquo; [%s]'), $fullname, $edited_User->dget( 'login' ) );
+				}
+				else
+				{
+					$msg = sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $edited_User->dget( 'login' ) );
+				}
+				
+				if( ! $edited_User->check_delete( $msg ) )
 				{	// There are restrictions:
 					$action = 'view_user';
 				}
@@ -841,9 +859,17 @@ switch( $action )
 
 		case 'delete_user':
 			// We need to ask for confirmation:
-			$edited_User->confirm_delete(
-					sprintf( T_('Delete user &laquo;%s&raquo; [%s]?'), $edited_User->dget( 'fullname' ), $edited_User->dget( 'login' ) ),
-					$action, get_memorized( 'action' ) );
+			$fullname = $edited_User->dget( 'fullname' );
+			if ( ! empty( $fullname ) )
+			{
+				$msg = sprintf( T_('Delete user &laquo;%s&raquo; [%s]?'), $fullname, $edited_User->dget( 'login' ) );
+			}
+			else
+			{
+				$msg = sprintf( T_('Delete user &laquo;%s&raquo;?'), $edited_User->dget( 'login' ) );
+			}
+			
+			$edited_User->confirm_delete( $msg, $action, get_memorized( 'action' ) );
 		case 'new_user':
 		case 'view_user':
 		case 'edit_user':
@@ -880,6 +906,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2009/02/01 16:52:29  tblue246
+ * Don't display the user's full name if it isn't set when deleting users. Fixes: http://forums.b2evolution.net/viewtopic.php?t=17822
+ *
  * Revision 1.10  2009/01/13 23:45:59  fplanque
  * User fields proof of concept
  *
