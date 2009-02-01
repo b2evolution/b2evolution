@@ -74,8 +74,7 @@ header_content_type( 'text/html' );
 
 	if( $UserSettings->get('focus_on_first_input') )
 	{	// Activate focus on first form <input type="text">:
-		$focus_on_first = '<script type="text/javascript">addEvent( window, "load", focus_on_first_input, false );</script>';
-		add_headline( $focus_on_first );
+		add_js_headline( 'jQuery( function() { focus_on_first_input() } )' );
 	}
 
 	global $Debuglog;
@@ -273,6 +272,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.13  2009/02/01 00:11:02  blueyed
+ * Use jQuery document.ready for focus_on_first_input
+ *
  * Revision 1.12  2009/01/24 03:10:20  afwas
  * - added jQuery that sets 'Set to' radiobutton (#set_issue_date_to) after time or date have been manually modified.
  * - Recoded javaScript in jQuery: changes to #post_title are added to document.head. This jS originated from /inc/items/views/inc/_item_form_behaviors.
