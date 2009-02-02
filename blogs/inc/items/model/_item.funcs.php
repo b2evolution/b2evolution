@@ -344,8 +344,8 @@ function get_postdata($postid)
 /**
  * Returns the number of the words in a string, sans HTML
  *
- * @param string
- * @return integer
+ * @param string The string.
+ * @return integer Number of words.
  */
 function bpost_count_words( $str )
 {
@@ -830,6 +830,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.32  2009/02/02 00:04:28  tblue246
+ * Fixing doc
+ *
  * Revision 1.31  2009/01/24 00:29:27  waltercruz
  * Implementing links in the blog itself, not in a linkblog, first attempt
  *
