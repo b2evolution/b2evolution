@@ -37,86 +37,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Start an field group.
- *
- * Fieldset with legend.
- *
- * @deprecated Deprecated by (@link Form::begin_fieldset())
- */
-function form_groupstart( $title = '' )
-{
-	echo "<fieldset>\n"
-				.'<legend>'.$title."</legend>\n";
-}
-
-
-/**
- * End an field group.
- *
- * Fieldset with legend.
- *
- * @deprecated Deprecated by (@link Form::end_fieldset())
- */
-function form_groupend( $title = '' )
-{
-	echo "</fieldset>\n";
-}
-
-
-/**
- * Start an input field.
- *
- * A field is a fielset containing a label div and an input div.
- *
- * @deprecated Deprecated by (@link Form::begin_field())
- */
-function form_fieldstart( $field_name, $field_label )
-{
-	return "<fieldset>\n"
-			.'<div class="label"><label for="'.$field_name.'">'.$field_label.":</label></div>\n"
-			.'<div class="input">';
-}
-
-/**
- * End an input field.
- *
- * A field is a fieldset containing a label div and an input div.
- *
- * @deprecated Deprecated by (@link Form::end_field())
- */
-function form_fieldend()
-{
-	return "</div>\n</fieldset>\n\n";
-}
-
-/**
- * Start an info field.
- *
- * An info field is a fielset containing a label div and an info div.
- *
- * @deprecated Deprecated by (@link Form::info_field())
- */
-function form_infostart( $field_label )
-{
-	return "<fieldset>\n".
-					'<div class="label">'.$field_label.":</div>\n".
-					'<div class="info">';
-}
-
-/**
- * End an info field.
- *
- * An info field is a fielset containing a label div and an info div.
- *
- * @deprecated Deprecated by (@link Form::info_field())
- */
-function form_infoend()
-{
-	return "</div>\n</fieldset>\n\n";
-}
-
-
-/**
  * Builds a text (or password) input field.
  *
  * @deprecated Deprecated by (@link Form::text_input())
@@ -173,84 +93,6 @@ function form_text( $field_name, $field_value, $field_size, $field_label, $field
 	}
 }
 
-
-/**
- * form_text_tr(-)
- *
- * @deprecated Deprecated by (@link Form::text_input())
- */
-function form_text_tr( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_maxlength = 0 , $field_class = '' )
-{
-	if( $field_maxlength == 0 )
-		$field_maxlength = $field_size;
-
-	echo '<tr>';
-	echo '  <td align="right"><label for="', $field_name, '"><strong>', $field_label, ':</strong></label></td>';
-	echo '  <td><input type="text" name="', $field_name, '" id="', $field_name, '" size="', $field_size, '" maxlength="', $field_maxlength, '" value="', format_to_output($field_value, 'formvalue'),'"';
-	if( !empty($field_class) )
-	{
-		echo ' class="', $field_class,'"';
-	}
-	echo '/>';
-	echo '  <small>', $field_note, '</small></td>';
-	echo "</tr>\n\n";
-}
-
-
-/**
- * Builds a hidden field.
- *
- * @deprecated Deprecated by (@link Form::button_input())
- *
- * @param string name
- * @param string value
- * @return string
- */
-function form_hidden( $field_name, $field_value, $display = true )
-{
-	$r = '<input type="hidden" name="'.$field_name
-				.'" value="'.format_to_output($field_value, 'formvalue').'" />'."\n";
-	if( $display )
-	{
-		echo $r;
-		return true;
-	}
-
-	return $r;
-}
-
-
-/**
- * Build a text area.
- *
- * @deprecated Deprecated by (@link Form::textarea_input())
- *
- * @param string
- * @param string
- * @param integer
- * @param string
- * @param string
- * @param integer
- * @param string
- */
-function form_textarea( $field_name, $field_value, $field_rows, $field_label,
-												$field_note = '', $field_cols = 50 , $field_class = '' )
-{
-	global $rsc_url;
-
-	echo '<fieldset>';
-	echo '  <div class="label"><label for="', $field_name, '">', $field_label, ':</label></div>';
-	echo '  <div class="input"><fieldset class="input"><img src="'.$rsc_url.'img/blank.gif" width="1" height="1" alt="" /><textarea name="', $field_name, '" id="', $field_name, '" rows="', $field_rows, '"  cols="', $field_cols, '"';
-	if( !empty($field_class) )
-	{
-		echo ' class="', $field_class,'"';
-	}
-	echo '>'.$field_value.'</textarea></fieldset>';
-	echo '  <span class="notes">', $field_note, '</span></div>';
-	echo "</fieldset>\n\n";
-}
-
-
 /**
  * Display a select field and populate it with a callback function.
  *
@@ -262,6 +104,7 @@ function form_textarea( $field_name, $field_value, $field_rows, $field_label,
  * @param string field label to be display before the field
  * @param string note to be displayed after the field
  * @param string CSS class for select
+ * waltercruz> still used by mtimport
  */
 function form_select(
 	$field_name,
@@ -301,6 +144,7 @@ function form_select(
  * @param string note to be displayed after the field
  * @param boolean allow to select [none] in list
  * @param string CSS class for select
+ * waltercruz> still used by mtimport
  */
 function form_select_object(
 	$field_name,
@@ -325,60 +169,6 @@ function form_select_object(
 	echo "</fieldset>\n\n";
 }
 
-
-/**
- * Generate set of radio options.
- *
- * @deprecated Deprecated by (@link Form::radio_input())
- *
- * @param string the name of the radio options
- * @param string the checked option
- * @param array of arrays the radio options (0: value, 1: label, 2: notes, 3: additional HTML [input field, ..], 4: attribs for <input tag> )
- * @param string label
- * @param boolean options on seperate lines (DIVs)
- * @param string notes
- */
-function form_radio(
-	$field_name,
-	$field_value,
-	$field_options,
-	$field_label,
-	$field_lines = false,
-	$field_notes = '' )
-{
-	echo '<fieldset class="setting">';
-	echo '  <div class="label">'.format_to_output($field_label).':</div>';
-	echo '  <div class="input"><fieldset class="input">';
-	foreach( $field_options as $loop_field_option )
-	{
-		if( $field_lines ) echo "<div>\n";
-		echo '<label class="radiooption"><input type="radio" class="radio" name="'.$field_name.'" value="'.format_to_output( $loop_field_option[0], 'formvalue' ).'"';
-		if( $field_value == $loop_field_option[0] )
-		{
-			echo ' checked="checked"';
-		}
-		if( !empty( $loop_field_option[4] ) )
-			echo ' '.$loop_field_option[4];
-		echo ' /> ', $loop_field_option[1], '</label>';
-		if( !empty( $loop_field_option[2] ) )
-		{ // notes for radio option
-			echo '<span class="notes">', $loop_field_option[2], '</span>';
-		}
-		if( !empty( $loop_field_option[3] ) )
-		{ // optional text for radio option (like additional fieldsets or input boxes)
-			echo $loop_field_option[3];
-		}
-		if( $field_lines ) echo "</div>\n";
-	}
-	if( !empty( $field_notes ) )
-	{
-		echo '<div><span class="notes">'.$field_notes.'</span></div>';
-	}
-	echo '  </fieldset></div>';
-	echo "</fieldset>\n\n";
-}
-
-
 /**
  * form_checkbox(-)
  *
@@ -391,6 +181,7 @@ function form_radio(
  * @param string CSS class
  * @param boolean to output (default)  or not
  * @return mixed true (if output) or the generated HTML if not outputting
+ * waltercruz > still used by mtimport
  */
 function form_checkbox( $field_name, $field_value, $field_label, $field_note = '',
 												$field_class = '', $output = true )
@@ -422,71 +213,11 @@ function form_checkbox( $field_name, $field_value, $field_label, $field_note = '
 	}
 }
 
-
-/**
- * form_checkbox_tr(-)
- *
- * @deprecated Deprecated by (@link Form::checkbox_input())
- */
-function form_checkbox_tr( $field_name, $field_value, $field_label, $field_note = '', $field_class = '' )
-{
-	echo '<tr>';
-	echo '  <td align="right"><label for="', $field_name, '"><strong>', $field_label, ':</label></strong></td>';
-	echo '  <td><input type="checkbox" name="', $field_name, '" id="', $field_name, '" value="1"';
-	if( $field_value )
-	{
-		echo ' checked="checked"';
-	}
-	if( !empty($field_class) )
-	{
-		echo ' class="', $field_class,'"';
-	}
-	echo ' />';
-	echo '  <small class="notes">', $field_note, '</small></td>';
-	echo "</tr>\n\n";
-}
-
-
-/**
- * form_info(-)
- *
- * @deprecated Deprecated by (@link Form::info_field())
- */
-function form_info( $field_label, $field_info, $field_note = '' )
-{
-	echo '<fieldset>';
-	echo '  <div class="label">', $field_label, ':</div>';
-	echo '  <div class="info">', $field_info;
-	if( !empty($field_note) )
-	{
-		echo '&nbsp; <small class="notes">', $field_note, '</small>';
-	}
-	echo '</div>';
-	echo "</fieldset>\n\n";
-}
-
-
-/**
- * form_info_tr(-)
- *
- * @deprecated Deprecated by (@link Form::info_field())
- */
-function form_info_tr( $field_label, $field_info, $field_note = '' )
-{
-	echo '<tr>';
-	echo '  <td align="right"><strong>', $field_label, ':</strong></td>';
-	echo '  <td>', $field_info;
-
-	if( !empty($field_note) )	echo ' <td class="small">', $field_note, '</td>';
-
-	echo "</td></tr>\n\n";
-}
-
-
 /**
  * Builds a form header and puts GET params of $action into hidden form inputs
  *
  * @deprecated Deprecated by (@link Form::begin_form())
+ * waltercruz> still used by inc/widgets/widgets/_coll_search_form.widget.php
  */
 function form_formstart( $action, $class = '', $name = '', $method = 'get', $id = '' )
 {
@@ -525,26 +256,11 @@ function form_formstart( $action, $class = '', $name = '', $method = 'get', $id 
 	}
 }
 
-/**
- *
- * @deprecated Deprecated by (@link Form::end_form())
- */
-function form_submit( $submit_attribs = '' )
-{
-	?>
-	<fieldset class="submit">
-		<fieldset>
-			<div class="input">
-				<input type="submit" name="submit" value="<?php echo T_('Save !') ?>" class="SaveButton" <?php echo $submit_attribs; ?> />
-				<input type="reset" value="<?php echo T_('Reset') ?>" class="ResetButton" />
-			</div>
-		</fieldset>
-	</fieldset>
-	<?php
-}
-
 /*
  * $Log$
+ * Revision 1.3  2009/02/02 12:51:08  waltercruz
+ * Removing deprecated form functions
+ *
  * Revision 1.2  2008/01/21 09:35:24  fplanque
  * (c) 2008
  *
