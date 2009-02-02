@@ -214,6 +214,25 @@ function form_checkbox( $field_name, $field_value, $field_label, $field_note = '
 }
 
 /**
+ * form_info(-)
+ *
+ * @deprecated Deprecated by (@link Form::info_field())
+ * @internal Tblue> Still used by gettext/staticfiles.php
+ */
+function form_info( $field_label, $field_info, $field_note = '' )
+{
+	echo '<fieldset>';
+	echo '  <div class="label">', $field_label, ':</div>';
+	echo '  <div class="info">', $field_info;
+	if( !empty($field_note) )
+	{
+		echo '&nbsp; <small class="notes">', $field_note, '</small>';
+	}
+	echo '</div>';
+	echo "</fieldset>\n\n";
+}
+
+/**
  * Builds a form header and puts GET params of $action into hidden form inputs
  *
  * @deprecated Deprecated by (@link Form::begin_form())
@@ -258,6 +277,9 @@ function form_formstart( $action, $class = '', $name = '', $method = 'get', $id 
 
 /*
  * $Log$
+ * Revision 1.4  2009/02/02 13:53:44  tblue246
+ * form_info() is still used by gettext/staticfiles.php (grep or ack is useful here).
+ *
  * Revision 1.3  2009/02/02 12:51:08  waltercruz
  * Removing deprecated form functions
  *
