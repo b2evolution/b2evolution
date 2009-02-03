@@ -139,11 +139,11 @@ class Item extends ItemLight
 	var $datedeadline = '';
 	var $priority;
 
-  /**
+	/**
 	 * @var float
 	 */
 	var $order;
-  /**
+	/**
 	 * @var boolean
 	 */
 	var $featured;
@@ -175,7 +175,7 @@ class Item extends ItemLight
 	 */
 	var $extra_cat_IDs = NULL;
 
-  /**
+	/**
 	 * Array of tags (strings)
 	 *
 	 * Lazy loaded.
@@ -736,7 +736,7 @@ class Item extends ItemLight
 	}
 
 
-  /**
+	/**
 	 * Template function: Check if user can can rate this post
 	 *
 	 * @return boolean true if user can post, false if s/he cannot
@@ -1130,7 +1130,7 @@ class Item extends ItemLight
 	}
 
 
-  /**
+	/**
 	 * Increase view counter
 	 *
 	 * @todo merge with inc_viewcount
@@ -1174,9 +1174,8 @@ class Item extends ItemLight
 
 		//echo 'COUNTING VIEW';
 
-    // Increment view counter (only if current User is not the item's author)
+		// Increment view counter (only if current User is not the item's author)
 		return $this->inc_viewcount(); // won't increment if current_User == Author
-
 	}
 
 
@@ -1360,7 +1359,7 @@ class Item extends ItemLight
 	}
 
 
-  /**
+	/**
 	 * Get array of tags
 	 *
 	 * Load from DB if necessary
@@ -1605,7 +1604,7 @@ class Item extends ItemLight
 		$FileList = $this->get_attachment_FileList( $params['limit'] );
 
 		$r = '';
-    /**
+		/**
 		 * @var File
 		 */
 		$File = NULL;
@@ -1632,7 +1631,7 @@ class Item extends ItemLight
 	}
 
 
-  /**
+	/**
 	 * Get list of attached files
 	 *
 	 * INNER JOIN on files ensures we only get backj file links
@@ -1911,14 +1910,15 @@ class Item extends ItemLight
 	 * @param boolean true to hide if no feedback
 	 */
 	function feedback_moderation( $type = 'feedbacks', $before = '', $after = '',
-													$zero = '', $one = '#', $more = '#', $edit_comments_link = '#', $params = array() )
+			$zero = '', $one = '#', $more = '#', $edit_comments_link = '#', $params = array() )
 	{
 		/**
 		 * @var User
 		 */
 		global $current_User;
 
-    $params = array_merge( array(
+		// TODO: dh> $params does not get used at all below?! (and it has some strange '' param)
+		$params = array_merge( array(
 									'type' => 'feedbacks',
 									'block_before' => '',
 									'blo_after' => '',
@@ -1928,7 +1928,7 @@ class Item extends ItemLight
 									'link_title' => '#',
 									'use_popup' => false,
 									'url' => '#',
-    							'type' => 'feedbacks',
+    									'type' => 'feedbacks',
 									'' => '',
 								), $params );
 
@@ -1956,7 +1956,6 @@ class Item extends ItemLight
 		{
 			echo $before.$r.$after;
 		}
-
 	}
 
 
@@ -2202,7 +2201,7 @@ class Item extends ItemLight
 
 		$r = $before;
 		$r .= '<a href="'.$admin_url.'?ctrl=items'.$glue.'action=publish'.$glue.'post_ID='.$this->ID;
-   	if( $save_context )
+		if( $save_context )
 		{
 			$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
 		}
@@ -3396,7 +3395,7 @@ class Item extends ItemLight
 	}
 
 
-  /**
+	/**
 	 * Send outbound pings for a post
 	 *
 	 * @param boolean give more info messages (we want to avoid that when we save & continue editing)
@@ -3443,7 +3442,7 @@ class Item extends ItemLight
 	}
 
 
-  /**
+	/**
 	 * Callback user for footer()
 	 */
 	function replace_callback( $matches )
@@ -3617,6 +3616,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.68  2009/02/03 22:14:10  blueyed
+ * Fix indent; TODO about some $params
+ *
  * Revision 1.67  2009/02/03 17:45:43  blueyed
  * Item::get_publish_link: check for appropriate status before any more expensive tests.
  *
