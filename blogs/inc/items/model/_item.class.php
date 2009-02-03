@@ -2184,16 +2184,16 @@ class Item extends ItemLight
 	{
 		global $current_User, $admin_url;
 
-		if( ! is_logged_in() ) return false;
-
-		if( ($this->status == 'published') // Already published!
-			|| ! ($current_User->check_perm( 'item_post!published', 'edit', false, $this ))
-			|| ! ($current_User->check_perm( 'edit_timestamp' ) ) )
-		{ // User has no right to publish this post now:
+		if( in_array($this->status, array('published', 'redirected')) )
+		{
 			return false;
 		}
-		if ( $this->status == 'redirected')
-		{
+
+		if( ! is_logged_in() ) return false;
+
+		if( ! ($current_User->check_perm( 'item_post!published', 'edit', false, $this ))
+			|| ! ($current_User->check_perm( 'edit_timestamp' ) ) )
+		{ // User has no right to publish this post now:
 			return false;
 		}
 
@@ -3617,6 +3617,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.67  2009/02/03 17:45:43  blueyed
+ * Item::get_publish_link: check for appropriate status before any more expensive tests.
+ *
  * Revision 1.66  2009/02/03 16:55:47  waltercruz
  * Doesn't make sense to publish a redirected post
  *
