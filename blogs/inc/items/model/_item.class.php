@@ -2192,6 +2192,10 @@ class Item extends ItemLight
 		{ // User has no right to publish this post now:
 			return false;
 		}
+		if ( $this->status == 'redirected')
+		{
+			return false;
+		}
 
 		if( $text == '#' ) $text = get_icon( 'publish', 'imgtag' ).' '.T_('Publish NOW!');
 		if( $title == '#' ) $title = T_('Publish now using current date and time.');
@@ -3613,6 +3617,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.66  2009/02/03 16:55:47  waltercruz
+ * Doesn't make sense to publish a redirected post
+ *
  * Revision 1.65  2009/01/29 15:48:54  tblue246
  * Use 1 as the default post type ID when creating a new Item object. Fixes http://forums.b2evolution.net/viewtopic.php?t=17780 .
  *
