@@ -847,7 +847,7 @@ class DB
 		@mysql_free_result($this->result);
 
 		// EXPLAIN JOINS ??
-		if( $this->log_queries && $this->debug_explain_joins && preg_match( '#^ \s* SELECT \s #ix', $query) )
+		if( $this->log_queries && $this->debug_explain_joins && preg_match( '#^ [\s(]* SELECT \s #ix', $query) )
 		{ // Query was a select, let's try to explain joins...
 
 			// save values:
@@ -1505,6 +1505,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.16  2009/02/05 15:09:35  blueyed
+ * DB class: fix EXPLAIN for queries starting with (SELECT (e.g. unions)
+ *
  * Revision 1.15  2008/11/17 11:41:35  blueyed
  * Fix DB::save_error_state/DB::restore_error_state to also handle $last_error/$error and make it chainable
  *
