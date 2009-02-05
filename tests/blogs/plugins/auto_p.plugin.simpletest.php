@@ -17,9 +17,9 @@ require_once $GLOBALS['plugins_path'].'_auto_p.plugin.php';
  */
 class AutoPPluginTestCase extends PluginUnitTestCase
 {
-	function AutoPPluginTestCase()
+	function __construct()
 	{
-		$this->PluginUnitTestCase( 'Auto-P plugin test' );
+		parent::__construct( 'Auto-P plugin test' );
 	}
 
 
@@ -133,13 +133,13 @@ class AutoPPluginTestCase extends PluginUnitTestCase
 		$this->assertEqual( "<blockquote><p>asdf</p></blockquote>",
 			$this->render( "<blockquote>asdf</blockquote>" ) );
 
-		$this->assertWantedPattern( '~^<p>foo</p><blockquote><p>asdf</p></blockquote>$~',
+		$this->assertPattern( '~^<p>foo</p><blockquote><p>asdf</p></blockquote>$~',
 			$this->render_wo_space( 'foo<blockquote>asdf</blockquote>' ) );
 
-		$this->assertWantedPattern( '~^<p>foo</p><blockquote><p>asdf</p></blockquote>$~',
+		$this->assertPattern( '~^<p>foo</p><blockquote><p>asdf</p></blockquote>$~',
 			$this->render_wo_space( 'foo<blockquote>asdf</blockquote>' ) );
 
-		$this->assertWantedPattern( '~^<p>foo</p><blockquote><p>asdf</p></blockquote>$~',
+		$this->assertPattern( '~^<p>foo</p><blockquote><p>asdf</p></blockquote>$~',
 			$this->render_wo_space( "foo<blockquote>asdf\n</blockquote>" ) );
 
 		$this->assertEqual( "<p>foo</p><blockquote><p>asdf_two_newlines_follow</p>\n\n</blockquote>",
@@ -157,11 +157,11 @@ class AutoPPluginTestCase extends PluginUnitTestCase
 			$this->render( "foo\n<div>asdf</div>bar" ) );
 
 		// block element in between (without newline):
-		$this->assertWantedPattern( '~^<p>foo</p><div>asdf</div><p>bar</p>$~',
+		$this->assertPattern( '~^<p>foo</p><div>asdf</div><p>bar</p>$~',
 			$this->render_wo_space( "foo<div>asdf</div>bar" ) );
 
 		// Valid table:
-		$this->assertWantedPattern( '~^<table><tr><td>foo</td></tr></table>$~',
+		$this->assertPattern( '~^<table><tr><td>foo</td></tr></table>$~',
 			$this->render_wo_space( "<table><tr><td>foo</td></tr></table>" ) );
 
 		// Invalid table:

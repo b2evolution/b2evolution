@@ -17,9 +17,9 @@ require_once( EVODIR.'blogs/plugins/_wikilinks.plugin.php' );
  */
 class WikilinksPluginTestCase extends EvoUnitTestCase
 {
-	function WikilinksPluginTestCase()
+	function __construct()
 	{
-		$this->EvoUnitTestCase( 'Wiki links plugin test' );
+		parent::__construct( 'Wiki links plugin test' );
 	}
 
 

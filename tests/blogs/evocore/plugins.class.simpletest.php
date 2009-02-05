@@ -19,9 +19,9 @@ load_class('plugins/_plugin.class.php');
  */
 class PluginsTestCase extends DbUnitTestCase
 {
-	function PluginsTestCase()
+	function __construct()
 	{
-		$this->DbUnitTestCase( 'Plugins class test' );
+		parent::__construct( 'Plugins class test' );
 	}
 
 

@@ -22,9 +22,9 @@ Mock::generatePartial( 'Form', 'FormTestVersion', array('hidden') );
  */
 class FormTestCase extends EvoUnitTestCase
 {
-	function FormTestCase()
+	function __construct()
 	{
-		$this->EvoUnitTestCase( 'Form class tests' );
+		parent::__construct( 'Form class tests' );
 	}
 
 
@@ -52,12 +52,12 @@ class FormTestCase extends EvoUnitTestCase
 		$Form->output = true;
 
 		$Form->expectCallCount( 'hidden', 6 );
-		$Form->expectArgumentsAt( 0, 'hidden', array( 'a', '1' ) );
-		$Form->expectArgumentsAt( 1, 'hidden', array( 'arr[arr1]', '2' ) );
-		$Form->expectArgumentsAt( 2, 'hidden', array( 'arr[arr2arr][arr2arr1]', '3' ) );
-		$Form->expectArgumentsAt( 3, 'hidden', array( 'arr[arr2arr][arr2arr2arr][arr2arr2arr1]', '4' ) );
-		$Form->expectArgumentsAt( 4, 'hidden', array( 'arr[arr3]', '5' ) );
-		$Form->expectArgumentsAt( 5, 'hidden', array( 'b', '6' ) );
+		$Form->expectAt( 0, 'hidden', array( 'a', '1' ) );
+		$Form->expectAt( 1, 'hidden', array( 'arr[arr1]', '2' ) );
+		$Form->expectAt( 2, 'hidden', array( 'arr[arr2arr][arr2arr1]', '3' ) );
+		$Form->expectAt( 3, 'hidden', array( 'arr[arr2arr][arr2arr2arr][arr2arr2arr1]', '4' ) );
+		$Form->expectAt( 4, 'hidden', array( 'arr[arr3]', '5' ) );
+		$Form->expectAt( 5, 'hidden', array( 'b', '6' ) );
 
 		// Test:
 		$Form->hiddens_by_key( $hiddens );

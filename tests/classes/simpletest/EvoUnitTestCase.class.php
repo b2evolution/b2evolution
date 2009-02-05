@@ -27,7 +27,6 @@ load_class( 'users/model/_usercache.class.php' );
 load_class( 'files/model/_file.class.php' );
 load_class( 'files/model/_filetype.class.php' );
 
-
 /**
  * Class EvoUnitTestCase
  */

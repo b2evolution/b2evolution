@@ -20,9 +20,9 @@ load_class('_core/_param.funcs.php');
  */
 class ParamFuncsTestCase extends EvoUnitTestCase
 {
-	function ParamFuncsTestCase()
+	function __construct()
 	{
-		$this->EvoUnitTestCase( 'Param functions test' );
+		parent::__construct( 'Param functions test' );
 	}
 
 

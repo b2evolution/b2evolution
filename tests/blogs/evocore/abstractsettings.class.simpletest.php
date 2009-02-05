@@ -17,9 +17,9 @@ class AbstractSettingsTestCase extends MockDbUnitTestCase
 {
 	var $mocked_DB_methods = array('get_results');
 
-	function AbstractSettingsTestCase()
+	function __construct()
 	{
-		$this->MockDbUnitTestCase( 'AbstractSettings class test' );
+		parent::__construct( 'AbstractSettings class test' );
 	}
 
 
@@ -33,7 +33,7 @@ class AbstractSettingsTestCase extends MockDbUnitTestCase
 
 	function testLoad()
 	{
-		$this->MockDB->expectOnce( 'get_results', array( new WantedPatternExpectation('/SELECT test_name, test_value\s+FROM testtable/i') ), 'DB select ok.' );
+		$this->MockDB->expectOnce( 'get_results', array( new PatternExpectation('/SELECT test_name, test_value\s+FROM testtable/i') ), 'DB select ok.' );
 		$this->TestSettings->_load();
 		$this->TestSettings->_load();
 		$this->MockDB->tally();

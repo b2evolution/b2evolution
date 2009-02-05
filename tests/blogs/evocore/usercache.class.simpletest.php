@@ -20,9 +20,9 @@ class UserCacheTestCase extends MockDbUnitTestCase
 {
 	var $mocked_DB_methods = array( 'get_row' );
 
-	function UserCacheTestCase()
+	function __construct()
 	{
-		$this->MockDbUnitTestCase( 'User cache tests' );
+		parent::__construct( 'User cache tests' );
 	}
 
 
@@ -34,7 +34,7 @@ class UserCacheTestCase extends MockDbUnitTestCase
 		$UserCache = new UserCache();
 
 		$this->MockDB->expectCallCount( 'get_row', 2 );
-		$this->MockDB->expectArguments( 'get_row', array( new WantedPatternExpectation('/SELECT \*\s+FROM T_users.*login/is'), '*', '*', '*' ), 'DB select ok.' );
+		$this->MockDB->expect( 'get_row', array( new PatternExpectation('/SELECT \*\s+FROM T_users.*login/is'), '*', '*', '*' ), 'DB select ok.' );
 		$UserCache->get_by_login( 'login' );
 
 		$UserCache->clear();

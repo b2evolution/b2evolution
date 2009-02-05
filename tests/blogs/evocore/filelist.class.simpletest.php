@@ -16,9 +16,9 @@ load_class( 'files/model/_filelist.class.php' );
  */
 class FilelistTestCase extends FilemanUnitTestCase
 {
-	function FilelistTestCase()
+	function __construct()
 	{
-		$this->FilemanUnitTestCase( 'Filelist class test' );
+		parent::__construct( 'Filelist class test' );
 	}
 
 

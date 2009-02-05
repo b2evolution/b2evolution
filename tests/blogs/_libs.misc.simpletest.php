@@ -25,9 +25,9 @@ load_class( 'xhtml_validator/_xhtml_validator.class.php' );
  */
 class ExtLibsTestCase extends EvoUnitTestCase
 {
-	function ExtLibsTestCase()
+	function __construct()
 	{
-		$this->UnitTestCase( 'ExtLibs functions test' );
+		parent::__construct( 'ExtLibs functions test' );
 	}
 
 
@@ -47,7 +47,7 @@ class ExtLibsTestCase extends EvoUnitTestCase
 
 
 	/**
-	 * Test {@link SafeHtmlChecker::check()} for encoding issues.
+	 * Test {@link XHTML_Validator::check()} for encoding issues.
 	 * NOTE: assignment by "& new" is required for PHP4! See also http://de3.php.net/manual/en/function.xml-set-object.php#46107
 	 *       Alternatively, multiple vars for each test may work, or unsetting the last one..
 	 */

@@ -15,9 +15,9 @@ require_once dirname(__FILE__).'/../../config.simpletest.php';
  */
 class UpgradeFuncsTestCase extends DbUnitTestCase
 {
-	function UpgradeFuncsTestCase()
+	function __construct()
 	{
-		$this->DbUnitTestCase( 'Upgrade funcs tests' );
+		parent::__construct( 'Upgrade funcs tests' );
 
 		/* exclude defaults: */
 		$this->exclude_defaults = array('drop_column', 'drop_index');

@@ -20,9 +20,9 @@ load_funcs( '_core/_url.funcs.php' );
  */
 class UrlFuncsTestCase extends EvoUnitTestCase
 {
-	function UrlFuncsTestCase()
+	function __construct()
 	{
-		$this->EvoUnitTestCase( 'URL functions test' );
+		parent::__construct( 'URL functions test' );
 	}
 
 

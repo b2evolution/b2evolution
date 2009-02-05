@@ -16,7 +16,7 @@ require_once( dirname(__FILE__).'/HtmlReporterShowPasses.class.php' );
  *
  * Provides methods for our group tests.
  */
-class EvoGroupTest extends GroupTest
+class EvoGroupTest extends TestSuite
 {
 	/**
 	 * This method loads all of the *.test.php files it can find.
@@ -41,7 +41,7 @@ class EvoGroupTest extends GroupTest
 			{
 				if( substr($lFile, -15) == '.simpletest.php' )
 				{
-					$this->addTestFile( $lFile );
+					$this->addFile( $lFile );
 				}
 			}
 		}

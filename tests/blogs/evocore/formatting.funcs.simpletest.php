@@ -21,9 +21,9 @@ load_funcs('_core/_misc.funcs.php');
  */
 class FormattingFuncsTestCase extends EvoUnitTestCase
 {
-	function FormattingFuncsTestCase()
+	function __construct()
 	{
-		$this->EvoUnitTestCase( 'Miscellaneous functions test' );
+		parent::__construct( 'Miscellaneous functions test' );
 	}
 
 

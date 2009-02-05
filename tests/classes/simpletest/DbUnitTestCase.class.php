@@ -117,6 +117,15 @@ class DbUnitTestCase extends EvoUnitTestCase
 		$drop_query = 'DROP TABLE IF EXISTS '.implode( ', ', $testDbTables );
 		$this->test_DB->query( $drop_query );
 
+		// Now drop all "evo_%" tables, which may not have been handled from
+		// the alias definitions above (e.g. "evo_posts" for the 0.8 upgrade
+		// test)
+		if( $test_tables = $this->test_DB->get_col( 'SHOW TABLES LIKE "evo_%"' ) )
+		{
+			$drop_query = 'DROP TABLE IF EXISTS '.implode( ', ', $test_tables );
+			$this->test_DB->query( $drop_query );
+		}
+
 		if( ! empty($old_fk_check) )
 		{
 			$this->test_DB->query( 'SET FOREIGN_KEY_CHECKS = '.$old_fk_check.';' );

@@ -27,9 +27,9 @@ require_once $conf_path.'_upgrade.php';
  */
 class UpgradeToCurrentTestCase extends InstallUnitTestCase
 {
-	function UpgradeToCurrentTestCase()
+	function __construct()
 	{
-		$this->InstallUnitTestCase( 'Upgrade to current version' );
+		parent::__construct( 'Upgrade to current version' );
 	}
 
 

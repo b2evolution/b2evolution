@@ -28,7 +28,7 @@ class MockDbUnitTestCase extends EvoUnitTestCase
 	/**
 	 * Check $testDB_conf and create mocked DB class.
 	 */
-	function MockDBUnitTestCase( $title )
+	function __construct( $label )
 	{
 		global $testDB_conf;
 		if( !isset( $testDB_conf['name'] ) )
@@ -36,7 +36,7 @@ class MockDbUnitTestCase extends EvoUnitTestCase
 			die( 'Please set the DB name to use for tests in /tests/config.php or /tests/config.OVERRIDE.php. See $testDB_conf there..' );
 		}
 		Mock::generatePartial('DB', 'MockDbUnitTestCase_DB_'.get_class($this), $this->mocked_DB_methods);
-		parent::EvoUnitTestCase($title);
+		parent::__construct($label);
 	}
 
 
