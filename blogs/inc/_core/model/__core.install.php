@@ -197,7 +197,8 @@ $schema_queries = array(
 			wi_ID					INT(10) UNSIGNED auto_increment,
 			wi_coll_ID    INT(11) UNSIGNED NOT NULL,
 			wi_sco_name   VARCHAR( 40 ) NOT NULL,
-			wi_order			INT(10) NOT NULL,
+			wi_order      INT(10) NOT NULL,
+			wi_enabled    TINYINT(1) NOT NULL DEFAULT 1,
 			wi_type       ENUM( 'core', 'plugin' ) NOT NULL DEFAULT 'core',
 			wi_code       VARCHAR(32) NOT NULL,
 			wi_params     TEXT NULL,
@@ -559,6 +560,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.11  2009/02/05 22:41:15  tblue246
+ * Add column wi_enabled (enabling/disabling widgets) when creating tables.
+ *
  * Revision 1.10  2009/01/28 21:23:21  fplanque
  * Manual ordering of categories
  *
