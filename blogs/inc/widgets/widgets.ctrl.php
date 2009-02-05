@@ -69,6 +69,7 @@ switch( $action )
 	case 'delete':
 	case 'move_up':
 	case 'move_down':
+	case 'toggle':
 		param( 'wi_ID', 'integer', true );
 		$WidgetCache = & get_Cache( 'WidgetCache' );
 		$edited_ComponentWidget = & $WidgetCache->get_by_ID( $wi_ID );
@@ -158,6 +159,7 @@ switch( $action )
 
 		$edited_ComponentWidget->set( 'coll_ID', $Blog->ID );
 		$edited_ComponentWidget->set( 'sco_name', $container );
+		$edited_ComponentWidget->set( 'enabled', 1 );
 
 		// INSERT INTO DB:
 		$edited_ComponentWidget->dbinsert();
@@ -252,7 +254,7 @@ switch( $action )
 														 AND wi_order > '.$order.'
 													 ORDER BY wi_order ASC
 													 LIMIT 0,1' );
-		if( !empty( $row) )
+		if( !empty( $row ) )
 		{
 			$next_ComponentWidget = & new ComponentWidget( $row );
 			$next_order = $next_ComponentWidget->order;
@@ -268,6 +270,29 @@ switch( $action )
 
 		}
 		$DB->commit();
+		break;
+
+	case 'toggle':
+		// Enable or disable the widget:
+		$enabled = $edited_ComponentWidget->get( 'enabled' );
+		$edited_ComponentWidget->set( 'enabled', (int)! $enabled );
+		$edited_ComponentWidget->dbupdate();
+
+		if ( $enabled )
+		{
+			$msg = T_( 'Widget has been disabled.' );
+		}
+		else
+		{
+			$msg = T_( 'Widget has been enabled.' );
+		}
+		$Messages->add( $msg, 'success' );
+
+		if ( $display_mode == 'js' )
+		{
+			// EXITS:
+			send_javascript_message( array( 'doToggle' => array( $edited_ComponentWidget->ID, (int)! $enabled ) ) );
+		}
 		break;
 
 	case 'delete':
@@ -358,11 +383,14 @@ if( $display_mode == 'normal' )
 	T_["Widget order unchanged"] = "'.T_( 'Widget order unchanged' ).'";
 
 	/**
-	 * @internal various urls, would like to remove these as and when possible
+	 * Image tags for the JavaScript widget UI.
+	 *
+	 * @internal Tblue> We get the whole img tags here (easier).
 	 */
-		// fp> where is that used?
-	var enabled_icon_url = "'.get_icon( 'deactivate', 'url' ).'";
-	var disabled_icon_url = "'.get_icon( 'activate', 'url' ).'";
+	var enabled_icon_tag = \''.get_icon( 'enabled', 'imgtag', array( 'title' => T_( 'The widget is enabled.' ) ) ).'\';
+	var disabled_icon_tag = \''.get_icon( 'disabled', 'imgtag', array( 'title' => T_( 'The widget is disabled.' ) ) ).'\';
+	var activate_icon_tag = \''.get_icon( 'activate', 'imgtag', array( 'title' => T_( 'Enable this widget!' ) ) ).'\';
+	var deactivate_icon_tag = \''.get_icon( 'deactivate', 'imgtag', array( 'title' => T_( 'Disable this widget!' ) ) ).'\';
 
 	var b2evo_dispatcher_url = "'.$admin_url.'";' );
 	require_js( '#jqueryUI#' ); // auto requires jQuery
@@ -453,6 +481,13 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2009/02/05 21:33:34  tblue246
+ * Allow the user to enable/disable widgets.
+ * Todo:
+ * 	* Fix CSS for the widget state bullet @ JS widget UI.
+ * 	* Maybe find a better solution than modifying get_Cache() to get only enabled widgets... :/
+ * 	* Buffer JS requests when toggling the state of a widget??
+ *
  * Revision 1.14  2008/12/30 23:00:42  fplanque
  * Major waste of time rolling back broken black magic! :(
  * 1) It was breaking the backoffice as soon as $admin_url was not a direct child of $baseurl.

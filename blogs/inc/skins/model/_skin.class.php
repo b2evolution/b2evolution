@@ -171,11 +171,11 @@ class Skin extends DataObject
 						.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'">Edit</a></span>'.$sco_name.'</div>';
 		}
 
-    /**
-		 * @var WidgetCache
+		/**
+		 * @var EnabledWidgetCache
 		 */
-   	$WidgetCache = & get_Cache( 'WidgetCache' );
-		$Widget_array = & $WidgetCache->get_by_coll_container( $Blog->ID, $sco_name );
+		$EnabledWidgetCache = & get_Cache( 'EnabledWidgetCache' );
+		$Widget_array = & $EnabledWidgetCache->get_by_coll_container( $Blog->ID, $sco_name );
 
 		if( !empty($Widget_array) )
 		{
@@ -452,6 +452,13 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2009/02/05 21:33:34  tblue246
+ * Allow the user to enable/disable widgets.
+ * Todo:
+ * 	* Fix CSS for the widget state bullet @ JS widget UI.
+ * 	* Maybe find a better solution than modifying get_Cache() to get only enabled widgets... :/
+ * 	* Buffer JS requests when toggling the state of a widget??
+ *
  * Revision 1.10  2008/04/24 02:01:04  fplanque
  * experimental
  *

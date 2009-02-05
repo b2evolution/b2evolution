@@ -2290,6 +2290,10 @@ function upgrade_b2evo_tables()
 */
 	task_end();
 
+	task_begin( 'Upgrading widgets table... ' );
+	$DB->query( "ALTER TABLE T_widget
+				ADD COLUMN wi_enabled tinyint(1) NOT NULL DEFAULT 1 AFTER wi_order" );
+	task_end();
 
 
 	/* Wait until we're sure and no longer experimental for that one...
@@ -2441,6 +2445,13 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.277  2009/02/05 21:33:34  tblue246
+ * Allow the user to enable/disable widgets.
+ * Todo:
+ * 	* Fix CSS for the widget state bullet @ JS widget UI.
+ * 	* Maybe find a better solution than modifying get_Cache() to get only enabled widgets... :/
+ * 	* Buffer JS requests when toggling the state of a widget??
+ *
  * Revision 1.276  2009/01/28 21:23:22  fplanque
  * Manual ordering of categories
  *

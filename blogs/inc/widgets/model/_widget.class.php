@@ -48,6 +48,13 @@ class ComponentWidget extends DataObject
 	var $params;
 
 	/**
+	 * Indicates whether the widget is enabled.
+	 *
+	 * @var boolean
+	 */
+	var $enabled;
+
+	/**
 	 * Array of params which have been customized for this widget instance
 	 *
 	 * This is saved to the DB as a serialized string ($params)
@@ -84,7 +91,7 @@ class ComponentWidget extends DataObject
 			$this->set( 'code', $code );
 		}
 		else
-		{	// Wa are loading an object:
+		{	// We are loading an object:
 			$this->ID       = $db_row->wi_ID;
 			$this->coll_ID  = $db_row->wi_coll_ID;
 			$this->sco_name = $db_row->wi_sco_name;
@@ -92,6 +99,7 @@ class ComponentWidget extends DataObject
 			$this->code     = $db_row->wi_code;
 			$this->params   = $db_row->wi_params;
 			$this->order    = $db_row->wi_order;
+			$this->enabled  = $db_row->wi_enabled;
 		}
 	}
 
@@ -822,7 +830,10 @@ class ComponentWidget extends DataObject
 	{
 		global $DB;
 
-		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
+		if( $this->ID != 0 )
+		{
+			debug_die( 'Existing object cannot be inserted!' );
+		}
 
 		$DB->begin();
 
@@ -845,6 +856,13 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.41  2009/02/05 21:33:34  tblue246
+ * Allow the user to enable/disable widgets.
+ * Todo:
+ * 	* Fix CSS for the widget state bullet @ JS widget UI.
+ * 	* Maybe find a better solution than modifying get_Cache() to get only enabled widgets... :/
+ * 	* Buffer JS requests when toggling the state of a widget??
+ *
  * Revision 1.40  2009/01/24 00:43:25  waltercruz
  * bugfix
  *

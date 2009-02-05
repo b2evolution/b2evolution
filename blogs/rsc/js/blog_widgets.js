@@ -67,7 +67,7 @@ var reorder_delay_remaining = 0;
 jQuery(document).ready(function(){
 	// grab some constants
 	edit_icon_tag = jQuery( '.edit_icon_hook' ).find( 'a' ).html();// grab the edit icon
-	delete_icon_tag = jQuery( '.delete_icon_hook' ).find( 'a' ).html();// grab the edit icon
+	delete_icon_tag = jQuery( '.delete_icon_hook' ).find( 'a' ).html();// grab the delete icon
 
 	// Modify the current widgets screen
 	jQuery( ".new_widget" ).parent().parent().remove();// remove the "no widgets yet" placeholder
@@ -99,7 +99,7 @@ jQuery(document).ready(function(){
 
 
 	// grab the widget ID out of the "delete" url and add as ID to parent row
-	jQuery( '.widget_row td:nth-child(4)' ).each( function(){
+	jQuery( '.widget_row td:nth-child(5)' ).each( function(){
 		var widget_id = jQuery( this ).find( 'a' ).attr( "href" );
 		widget_id = widget_id.substr( widget_id.indexOf( "wi_ID=" ) + 6, widget_id.length ); // extract ID
 		jQuery( this ).parent().attr( "id", "wi_ID_"+widget_id ); // add ID to parent row
@@ -115,6 +115,7 @@ jQuery(document).ready(function(){
 			the_widgets[ container ][ widget ] = new Array();
 			the_widgets[ container ][ widget ]["name"] = jQuery( "#"+widget).find('.widget_name' ).html();
 			the_widgets[ container ][ widget ]["class"] = jQuery( this ).attr( "className" );
+			the_widgets[ container ][ widget ]["enabled"] = jQuery( "#" + widget ).find( '.widget_is_enabled' ).size() > 0 ? 1 : 0;
 		} );
 	});
 
@@ -132,7 +133,7 @@ jQuery(document).ready(function(){
 		// create widget entry for each widget in each container
 		for( widget in the_widgets[container] )
 		{	// loop through all widgets in this container
-			createWidget( widget, container, 0, the_widgets[container][widget]["name"], the_widgets[container][widget]["class"] );
+			createWidget( widget, container, 0, the_widgets[container][widget]["name"], the_widgets[container][widget]["class"], the_widgets[container][widget]["enabled"] );
 		}
 	}
 
@@ -488,7 +489,7 @@ function addNewWidget( widget_list_item, admin_call )
 function addNewWidgetCallback( wi_ID, container, wi_order, wi_name )
 {
 	jQuery( '.fade_me' ).removeClass( 'fade_me' ); // kill any active fades
-	createWidget( 'wi_ID_'+wi_ID, container.replace( ' ', '_' ),wi_order, '<strong>'+wi_name+'</strong>', '' );
+	createWidget( 'wi_ID_'+wi_ID, container.replace( ' ', '_' ),wi_order, '<strong>'+wi_name+'</strong>', '', 1 );
 	doFade( '#wi_ID_'+wi_ID );
 	if( reorder_delay_remaining > 0 )
 	{	// send outstanding updates
@@ -505,10 +506,11 @@ function addNewWidgetCallback( wi_ID, container, wi_order, wi_name )
  *
  * @param integer wi_ID Id of the new widget
  * @param string container Container to add widget to
- * @param intger wi_order ( unused atm ) Order of the widget on the server
+ * @param integer wi_order ( unused atm ) Order of the widget on the server
  * @param string wi_name Name of the new widget
+ * @param boolean wi_enabled Is the widget enabled?
  */
-function createWidget( wi_ID, container, wi_order, wi_name, wi_class )
+function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled )
 {
 //	window.alert( wi_ID + ' : ' + container + ' : ' + wi_name + ' : ' +wi_class );
 	var newWidget = jQuery( '<li id="'+wi_ID+'" class="draggable_widget"><span class="widget_name">'+wi_name+'</span></li>' );
@@ -517,17 +519,44 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class )
 		jQuery( newWidget ).addClass( wi_class );
 	}
 
+	// Add state indicator:
+	jQuery( newWidget ).prepend( jQuery( '<span class="widget_state"></span>' ).prepend( 
+											wi_enabled ? enabled_icon_tag : disabled_icon_tag ) );
+
 	var actionIcons = jQuery( '<span class="widget_actions"></span>' ); // container for action icons
-//	jQuery( actionIcons ).prepend( '<img src="'+delete_icon_url+'" onclick="deleteWidget( \''+wi_ID+'\' );" />' );	// add delete action
-//	jQuery( actionIcons ).prepend( '<img src="'+edit_icon_url+'" onclick="editWidget( \''+wi_ID+'\' );" />' );	// add edit action
 	jQuery( actionIcons ).prepend( jQuery( delete_icon_tag ).attr( 'onclick', 'deleteWidget( "'+wi_ID+'" );' ) );	// add delete action
-	jQuery( actionIcons ).prepend( jQuery( edit_icon_tag ).attr( 'onclick', 'editWidget( "'+wi_ID+'" );' ) );	// add delete action
-//	jQuery( actionIcons ).prepend( '<img src="'+enabled_icon_url+'" onclick="enableWidget( \''+wi_ID+'\' );" />' );	// add enable/disable action
+	jQuery( actionIcons ).prepend( jQuery( edit_icon_tag ).attr( 'onclick', 'editWidget( "'+wi_ID+'" );' ) );	// add edit action
+	jQuery( actionIcons ).prepend( jQuery( '<span class="toggle_action">' + ( wi_enabled ? deactivate_icon_tag : activate_icon_tag ) + '</span>' ).attr( 'onclick', 'toggleWidget( "' + wi_ID + '" );' ) ); // add toggle action
 	jQuery( newWidget ).prepend( actionIcons ); // add widget action icons
 
 	jQuery( '#container_'+container ).append( newWidget );	// add widget to container
 	makeDragnDrop( '#'+wi_ID );
 	colourWidgets();	// recolour the widgets
+}
+
+/**
+ * Toggle the widget state.
+ *
+ * @param string Widget ID.
+ */
+function toggleWidget( wi_ID )
+{
+	//console.log( 'Toggling widget #' + wi_ID.substr( 6 ) );
+	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ) );
+}
+
+/**
+ * Callback for toggling a widget.
+ *
+ * @param integer Widget ID
+ * @param integer new widget state
+ */
+function doToggle( wi_ID, wi_enabled )
+{
+	//console.log( 'Setting state of widget #' + wi_ID + ' to ' + ( wi_enabled ? 'enabled' : 'disabled' ) );
+
+	jQuery( '#wi_ID_' + wi_ID + ' .widget_state' ).html( wi_enabled ? enabled_icon_tag : disabled_icon_tag );
+	jQuery( '#wi_ID_' + wi_ID + ' .toggle_action' ).html( wi_enabled ? deactivate_icon_tag : activate_icon_tag );
 }
 
 /**

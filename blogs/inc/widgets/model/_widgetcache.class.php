@@ -45,16 +45,25 @@ class WidgetCache extends DataObjectCache
 	var $cache_container_Widget_array = array();
 
 	/**
-	 * Constructor
+	 * Indicates whether to load enabled widgets only.
+	 * @var boolean
 	 */
-	function WidgetCache()
+	var $load_enabled_only;
+
+	/**
+	 * Constructor
+	 *
+	 * @param boolean Load enabled widgets only?
+	 */
+	function WidgetCache( $enabled_only = false )
 	{
 		parent::DataObjectCache( 'ComponentWidget', false, 'T_widget', 'wi_', 'wi_ID', NULL, NULL, NULL );
+		$this->load_enabled_only = $enabled_only;
 	}
 
 
 	/**
-	 * @param integer
+	 * @param integer Collection (blog) ID
 	 * @return array of coll_ID => array of container_name => array of Widget
 	 */
 	function & get_by_coll_ID( $coll_ID )
@@ -65,12 +74,18 @@ class WidgetCache extends DataObjectCache
 		{	// Not in Cache yet:
 			$sql = 'SELECT *
 					      FROM T_widget
-					     WHERE wi_coll_ID = '.$coll_ID.'
-					     ORDER BY wi_sco_name, wi_order';
+					     WHERE wi_coll_ID = '.$coll_ID;
+			if ( $this->load_enabled_only )
+			{	// We want to load enabled widgets only:
+				$sql .= ' AND wi_enabled = 1';
+			}
+			$sql .= ' ORDER BY wi_sco_name, wi_order';
+
 			$widget_rs = $DB->get_results( $sql, OBJECT, 'Get list of widgets for collection' );
 
 			$this->cache_container_Widget_array[$coll_ID] = array();
-			for( $i = 0; $i < count( $widget_rs ); $i++ )
+			$count = count( $widget_rs );
+			for( $i = 0; $i < $count; $i++ )
 			{
 				// fp> NOTE: object COPYing is weird here but it needs to be like this in PHP4 or all abjects from the loop will look the same
 				if( $ComponentWidget = & $this->new_obj( $widget_rs[$i] ) ) // fp> NOTE: no copy because we need copy on the next line anyway!!
@@ -120,8 +135,8 @@ class WidgetCache extends DataObjectCache
 
 
 	/**
-	 * @param integer
-	 * @param string
+	 * @param integer Collection (blog) ID
+	 * @param string Container
 	 * @return array of Widget
 	 */
 	function & get_by_coll_container( $coll_ID, $container )
@@ -136,6 +151,13 @@ class WidgetCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.3  2009/02/05 21:33:34  tblue246
+ * Allow the user to enable/disable widgets.
+ * Todo:
+ * 	* Fix CSS for the widget state bullet @ JS widget UI.
+ * 	* Maybe find a better solution than modifying get_Cache() to get only enabled widgets... :/
+ * 	* Buffer JS requests when toggling the state of a widget??
+ *
  * Revision 1.2  2008/01/21 09:35:36  fplanque
  * (c) 2008
  *

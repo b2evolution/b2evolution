@@ -46,6 +46,10 @@ function display_container( $container, $legend_suffix = '' )
 			regenerate_url( '', 'action=new&amp;container='.rawurlencode($container) ), /* TRANS: note this is NOT a NEW widget */ '<span class="add_new_widget_text">'.T_('Add widget').'</span> &raquo;', 3, 4, array( 'id' => 'add_new_'.$table_id ) );
 
 	$Table->cols = array(
+			array(
+				'th' => /* TRANS: shortcut for enabled */ T_( 'En' ),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap' ),
 			array( 'th' => T_('Widget') ),
 			array( 'th' => T_('Type') ),
 			array(
@@ -77,7 +81,7 @@ function display_container( $container, $legend_suffix = '' )
 	// BODY START:
 	$Table->display_body_start();
 
-  /**
+	/**
 	 * @var WidgetCache
 	 */
 	$WidgetCache = & get_Cache( 'WidgetCache' );
@@ -97,6 +101,7 @@ function display_container( $container, $legend_suffix = '' )
 		foreach( $Widget_array as $ComponentWidget )
 		{
 			$widget_count++;
+			$enabled = $ComponentWidget->get( 'enabled' );
 
 			if( isset($edited_ComponentWidget) && $edited_ComponentWidget->ID == $ComponentWidget->ID )
 			{
@@ -108,6 +113,20 @@ function display_container( $container, $legend_suffix = '' )
 			}
 
 			$Table->display_line_start( false, $fadeout );
+
+			$Table->display_col_start();
+			if ( $enabled )
+			{
+				// Indicator for the JS UI:
+				echo '<span class="widget_is_enabled">';
+				echo get_icon( 'enabled', 'imgtag', array( 'title' => T_( 'The widget is enabled.' ) ) );
+				echo '</span>';
+			}
+			else
+			{
+				echo get_icon( 'disabled', 'imgtag', array( 'title' => T_( 'The widget is disabled.' ) ) );
+			}
+			$Table->display_col_end();
 
 			$Table->display_col_start();
 			$ComponentWidget->init_display( array() );
@@ -147,6 +166,14 @@ function display_container( $container, $legend_suffix = '' )
 
 			// Actions
 			$Table->display_col_start();
+			if ( $enabled )
+			{
+				echo action_icon( T_( 'Disable this widget!' ), 'deactivate', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID ) );
+			}
+			else
+			{
+				echo action_icon( T_( 'Enable this widget!' ), 'activate', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID ) );
+			}
 			echo '<span class="edit_icon_hook">'.action_icon( T_('Edit widget settings!'), 'edit', regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ) ).'</span>';
 			echo '<span class="delete_icon_hook">'.action_icon( T_('Remove this widget!'), 'delete', regenerate_url( 'blog', 'action=delete&amp;wi_ID='.$ComponentWidget->ID ) ).'</span>';
 			$Table->display_col_end();
@@ -189,6 +216,13 @@ echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear">';
 
 /*
  * $Log$
+ * Revision 1.13  2009/02/05 21:33:34  tblue246
+ * Allow the user to enable/disable widgets.
+ * Todo:
+ * 	* Fix CSS for the widget state bullet @ JS widget UI.
+ * 	* Maybe find a better solution than modifying get_Cache() to get only enabled widgets... :/
+ * 	* Buffer JS requests when toggling the state of a widget??
+ *
  * Revision 1.12  2008/10/05 03:35:43  fplanque
  * comments for yabba
  *

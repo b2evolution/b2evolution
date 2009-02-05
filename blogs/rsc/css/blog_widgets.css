@@ -22,6 +22,18 @@ padding:2px 10px;
 border-top:1px solid #ccc;
 }
 
+.widget_state
+{
+	border-right: 1px solid #ccc;
+	margin-right: 10px;
+	padding-right: 10px;
+	float: left;
+
+	/* Tblue> Can this be done better? */
+	padding-top: 3.5px;
+	height: 13px;
+}
+
 .widget_actions{
 border-left:1px solid #ccc;
 margin-left:10px;

@@ -145,6 +145,16 @@ function & get_Cache( $objectName )
 			$WidgetCache = new WidgetCache(); // COPY (FUNC)
 			return $WidgetCache;
 
+		case 'EnabledWidgetCache':
+			// This simply instantiates a WidgetCache object, setting the
+			// $enabled_only parameter to true. Using a member variable
+			// instead of per-method parameters to load only the enabled
+			// widgets should be cleaner when there will be more methods
+			// in the WidgetCache class in the future. 
+			load_class( 'widgets/model/_widgetcache.class.php' );
+			$EnabledWidgetCache = new WidgetCache( true );
+			return $EnabledWidgetCache;
+
 		default:
 			debug_die( 'getCache(): Unknown Cache type:'.$objectName );
 	}
@@ -152,6 +162,13 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.10  2009/02/05 21:33:33  tblue246
+ * Allow the user to enable/disable widgets.
+ * Todo:
+ * 	* Fix CSS for the widget state bullet @ JS widget UI.
+ * 	* Maybe find a better solution than modifying get_Cache() to get only enabled widgets... :/
+ * 	* Buffer JS requests when toggling the state of a widget??
+ *
  * Revision 1.9  2008/05/26 19:25:41  fplanque
  * minor
  *
