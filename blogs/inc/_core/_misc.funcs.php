@@ -289,6 +289,65 @@ function strmaxlen( $str, $maxlen = 50 )
 
 
 /**
+ * Crop string to maxwords preserving tags.
+ *
+ * @param string
+ * @param int Maximum number words
+ * @param mixed array Optional parameters
+ * @return string
+ */
+function strmaxwords( $str, $maxwords = 50, $params = array() )
+{
+	$params = array_merge( array(
+			'continued_link' => '',
+			'continued_text' => '&hellip;',
+			'always_continue' => false,
+		), $params );
+	$open = false;
+	$end = strlen( $str );
+	for( $i = 0; $i < $end; $i++ )
+	{
+		switch( $char = substr( $str, $i, 1 ) )
+		{
+			case '<' :	// start of a tag
+				$open = true;
+				break;
+			case '>' : // end of a tag
+				$open = false;
+				break;
+
+			default:
+				 if( !$open && preg_match( '~\s~', $char ) )
+				 { // it's a word gap
+				 	--$maxwords;
+				 }
+				break;
+		}
+		if( $maxwords < 1 ) break;
+	}
+
+	// restrict content to required number of words and balance the tags out
+	$str = balance_Tags( substr( $str, 0, $i ) );
+
+	if( $params['always_continue'] || $maxwords == false )
+	{ // we want a continued text
+		if( $params['continued_link'] )
+		{ // we have a url
+			$str .= ' <a href="'.$params['continued_link'].'">'.$params['continued_text'].'</a>';
+		}
+		else
+		{ // we don't have a url
+			$str .= ' '.$params['continued_text'];
+		}
+	}
+	// remove empty tags
+	$str = preg_replace( '~<([\s]+?)[^>]*?></\1>~is', '', $str );
+
+	return $str;
+}
+
+
+/**
  * Convert all non ASCII chars (except if UTF-8, GB2312 or CP1251) to &#nnnn; unicode references.
  * Also convert entities to &#nnnn; unicode references if output is not HTML (eg XML)
  *
@@ -3186,6 +3245,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.66  2009/02/07 11:09:23  yabs
+ * adding word cut function
+ *
  * Revision 1.65  2009/01/28 00:54:51  blueyed
  * Remove debug code and display 'total' line in Timer table always.
  *
