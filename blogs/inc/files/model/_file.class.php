@@ -1518,15 +1518,30 @@ class File extends DataObject
 	 */
 	function get_thumb_imgtag( $size_name = 'fit-80x80', $class = '', $align = '' )
 	{
+		global $use_strict;
+
 		if( ! $this->is_image() )
 		{ // Not an image
 			return '';
 		}
 
-		return '<img src="'.$this->get_thumb_url($size_name).'" '
+		$imgtag = '<img src="'.$this->get_thumb_url($size_name).'" '
 					.'alt="'.$this->dget('alt', 'htmlattr').'" '
-					.'title="'.$this->dget('title', 'htmlattr').'" '
-					.'class="'.$class.'" align="'.$align.'" />';
+					.'title="'.$this->dget('title', 'htmlattr').'"';
+
+		if( $class )
+		{ // add class
+			$imgtag .= ' class="'.$class.'"';
+		}
+
+		if( !$use_strict && $align )
+		{ // add align
+			$imgtag .= ' align="'.$align.'"';
+		}
+
+		$imgtag .=' />';
+
+		return $imgtag;
 	}
 
 
@@ -1817,6 +1832,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2009/02/07 10:10:26  yabs
+ * Validation
+ *
  * Revision 1.21  2009/01/19 21:50:47  fplanque
  * minor
  *

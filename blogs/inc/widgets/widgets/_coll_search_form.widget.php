@@ -104,6 +104,7 @@ class coll_search_form_Widget extends ComponentWidget
 		echo '<p>';
 		$s = get_param( 's' );
 		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars($s).'" class="SearchField" />';
+		echo '</p>';
 
 		if( $this->disp_params[ 'disp_search_options' ] )
 		{
@@ -114,7 +115,6 @@ class coll_search_form_Widget extends ComponentWidget
 			echo '<div class="search_option"><input type="radio" name="sentence" value="sentence" id="sentence" '.( $sentence=='sentence' ? 'checked="checked" ' : '' ).'/><label for="sentence">'.T_('Entire phrase').'</label></div>';
 			echo '</div>';
 		}
-		echo '</p>';
 		echo '<input type="submit" name="submit" class="submit" value="'.T_('Search').'" />';
 		echo '</form>';
 
@@ -127,6 +127,9 @@ class coll_search_form_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.9  2009/02/07 10:09:56  yabs
+ * Validation
+ *
  * Revision 1.8  2008/05/26 19:02:28  fplanque
  * enhanced search widget
  *
