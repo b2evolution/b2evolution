@@ -39,8 +39,15 @@ header_content_type();	// Sets charset!
 	<?php skin_keywords_tag(); ?>
 	<?php robots_tag(); ?>
 	<meta name="generator" content="b2evolution <?php app_version(); ?>" /> <!-- Please leave this for stats -->
+	<?php
+	if( $Blog->get_setting( 'feed_content' ) != 'none' )
+	{ // auto-discovery urls
+		?>
 	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
+	<?php
+	}
+	?>
 	<link rel="stylesheet" href="style.css" type="text/css" />
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 	<?php
