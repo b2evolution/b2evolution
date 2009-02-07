@@ -573,7 +573,7 @@ class ComponentWidget extends DataObject
 
 		$limit = ( $this->disp_params[ 'linkblog_limit' ] ? $this->disp_params[ 'linkblog_limit' ] : 1000 ); // Note: 1000 will already kill the display
 
-		$LinkblogList = & new ItemListLight( $link_Blog, $timestamp_min, $timestamp_max, $limit );
+		$LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $limit );
 
 		$LinkblogList->set_filters( array(
 				'cat_array' => $linkblog_cat_array,
@@ -615,20 +615,25 @@ class ComponentWidget extends DataObject
 						'link_type' => $link_type,
 					) );
 
-				/*
-				$Item->content_teaser( array(
-						'before'      => '',
-						'after'       => ' ',
-						'disppage'    => 1,
-						'stripteaser' => false,
-					) );
+				if( $this->disp_params['linkblog_excerpts'] )
+				{ // we want to show some or all of the post content
+					$content = $Item->get_content_teaser( 1, false, 'htmlbody' );
 
-				$Item->more_link( array(
-						'before'    => '',
-						'after'     => '',
-						'link_text' => T_('more').' &raquo;',
-					) );
-				*/
+					if( $words = $this->disp_params['linkblog_cutoff'] )
+					{ // limit number of words
+						$content = strmaxwords( $content, $words, array(
+								'continued_link' => $Item->get_permanent_url(),
+								'continued_text' => T_( 'continued' ).' &hellip;',
+							 ) );
+					}
+					echo $content;
+
+					$Item->more_link( array(
+							'before'    => '',
+							'after'     => '',
+							'link_text' => T_('more').' &raquo;',
+						) );
+				}
 
 
 				echo $this->disp_params['item_end'];
@@ -856,6 +861,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.42  2009/02/07 11:09:00  yabs
+ * extra settings for linkblog
+ *
  * Revision 1.41  2009/02/05 21:33:34  tblue246
  * Allow the user to enable/disable widgets.
  * Todo:
