@@ -399,6 +399,12 @@ class Form extends Widget
 		{	// No ID in case there's no id/name given for a field.
 			$ffield_id = '';
 		}
+		// quick and dirty "required_field" addition, needs tidying once tested
+		if( !empty( $this->_common_params['required'] ) )
+		{ // required field
+			$ffield_id .= ' class="field_required"';
+		}
+
 		$r = str_replace( '$ID$', $ffield_id, $this->fieldstart );
 
 		if( isset($this->_common_params['field_prefix']) )
@@ -763,7 +769,7 @@ class Form extends Widget
 
 		$r = $this->begin_field() . $this->get_input_element($field_params, false);
 		$r .= $this->end_field();
-		
+
 		return $this->display_or_return( $r );
 	}
 
@@ -2799,6 +2805,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.33  2009/02/07 10:11:07  yabs
+ * Quick and dirty required fields, will tidy up after more testing
+ *
  * Revision 1.32  2009/01/23 22:56:35  afwas
  * Ooops, left an old variable $js_fate_format.
  *
