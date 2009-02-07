@@ -94,6 +94,18 @@ class linkblog_Widget extends ComponentWidget
 					'defaultvalue' => 100,
 					'note' => T_( 'This is the maximum number of links to display.' ),
 				),
+				'linkblog_excerpts' => array(
+					'label' => T_( 'Excerpts' ),
+					'type' => 'checkbox',
+					'defaultvalue' => false,
+					'note' => T_( 'Show contents for entries' ),
+				),
+				'linkblog_cutoff' => array(
+					'label' => T_( 'Max Words' ),
+					'type' => 'integer',
+					'defaultvalue' => 40,
+					'note' => T_( 'Max number of words to show in exerpts' ),
+				),
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -119,6 +131,9 @@ class linkblog_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.10  2009/02/07 11:08:39  yabs
+ * adding settings
+ *
  * Revision 1.9  2008/05/31 22:38:55  blueyed
  * doc, indent
  *
