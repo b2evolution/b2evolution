@@ -80,7 +80,7 @@ class coll_media_index_Widget extends ComponentWidget
 			),
 			'grid_nb_cols' => array(
 				'label' => T_( 'Columns' ),
-				'note' => T_( 'Number of columns in grod mode.' ),
+				'note' => T_( 'Number of columns in grid mode.' ),
 				'size' => 4,
 				'defaultvalue' => 2,
 			),
@@ -280,6 +280,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.4  2009/02/08 11:31:56  yabs
+ * Minor
+ *
  * Revision 1.3  2008/09/29 08:30:36  fplanque
  * Avatar support
  *
