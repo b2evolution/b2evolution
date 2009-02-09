@@ -304,10 +304,11 @@ function strmaxwords( $str, $maxwords = 50, $params = array() )
 			'always_continue' => false,
 		), $params );
 	$open = false;
+	$have_seen_non_whitespace = false;
 	$end = strlen( $str );
 	for( $i = 0; $i < $end; $i++ )
 	{
-		switch( $char = substr( $str, $i, 1 ) )
+		switch( $char = $str[$i] )
 		{
 			case '<' :	// start of a tag
 				$open = true;
@@ -316,11 +317,23 @@ function strmaxwords( $str, $maxwords = 50, $params = array() )
 				$open = false;
 				break;
 
+			case ctype_space($char):
+				if( ! $open )
+				{ // it's a word gap
+					// Eat any other whitespace.
+					while( isset($str[$i+1]) && ctype_space($str[$i+1]) )
+					{
+						$i++;
+					}
+					if( isset($str[$i+1]) && $have_seen_non_whitespace )
+					{ // only decrement words, if there's a non-space char left.
+						--$maxwords;
+					}
+				}
+				break;
+
 			default:
-				 if( !$open && preg_match( '~\s~', $char ) )
-				 { // it's a word gap
-				 	--$maxwords;
-				 }
+				$have_seen_non_whitespace = true;
 				break;
 		}
 		if( $maxwords < 1 ) break;
@@ -3245,6 +3258,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.67  2009/02/09 19:13:00  blueyed
+ * Fix strmaxwords for corner cases and add tests.
+ *
  * Revision 1.66  2009/02/07 11:09:23  yabs
  * adding word cut function
  *

@@ -381,6 +381,30 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( convert_charset( 'йкил', 'utf-8', 'latin-1' ), 'йкил' );
 	}
 
+
+	/**
+	 * Test {@link strmaxlen()}
+	 */
+	function test_strmaxlen()
+	{
+		$this->assertEqual( strmaxlen('foo', 3), 'foo' );
+		$this->assertEqual( strmaxlen('foo', 2), 'f&hellip;' );
+	}
+
+
+	/**
+	 * Test {@link strmaxwords()}
+	 */
+	function test_strmaxwords()
+	{
+		$this->assertEqual( strmaxwords('foo bar', 2), 'foo bar' );
+		$this->assertEqual( strmaxwords('foo  bar', 2), 'foo  bar' );
+		$this->assertEqual( strmaxwords('foo  bar  ', 2), 'foo  bar  ' );
+		$this->assertEqual( strmaxwords('  foo  bar  ', 2), '  foo  bar  ' );
+		$this->assertEqual( strmaxwords('  <img />foo  bar  ', 2), '  <img />foo  bar  ' );
+		$this->assertEqual( strmaxwords('  <img />foo  bar  ', 1), '  <img />foo  &hellip;' );
+	}
+
 }
 
 
