@@ -273,6 +273,7 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Generating wordcounts... ';
+		load_funcs('items/model/_item.funcs.php');
 		$query = "SELECT ID, post_content FROM {$tableprefix}posts WHERE post_wordcount IS NULL";
 		$i = 0;
 		foreach( $DB->get_results( $query, ARRAY_A ) as $row )
@@ -2445,6 +2446,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.278  2009/02/09 19:20:32  blueyed
+ * Fix E_FATAL during upgrade (bpost_count_words not defined)
+ *
  * Revision 1.277  2009/02/05 21:33:34  tblue246
  * Allow the user to enable/disable widgets.
  * Todo:
