@@ -365,7 +365,6 @@ class File extends DataObject
 		}
 
 		// for files and dirs:
-		$this->_lastmod_ts = @filemtime( $this->_adfp_full_path );
 		$this->_perms = @fileperms( $this->_adfp_full_path );
 	}
 
@@ -664,6 +663,10 @@ class File extends DataObject
 	 */
 	function get_lastmod_ts()
 	{
+		if( ! isset($this->_lastmod_ts) )
+		{
+			$this->_lastmod_ts = @filemtime( $this->_adfp_full_path );
+		}
 		return $this->_lastmod_ts;
 	}
 
@@ -678,36 +681,38 @@ class File extends DataObject
 	{
 		global $localtimenow;
 
+		$lastmod_ts = $this->get_lastmod_ts();
+
 		switch( $format )
 		{
 			case 'date':
-				return date_i18n( locale_datefmt(), $this->_lastmod_ts );
+				return date_i18n( locale_datefmt(), $lastmod_ts );
 
 			case 'time':
-				return date_i18n( locale_timefmt(), $this->_lastmod_ts );
+				return date_i18n( locale_timefmt(), $lastmod_ts );
 
 			case 'compact':
-				$age = $localtimenow - $this->_lastmod_ts;
+				$age = $localtimenow - $lastmod_ts;
 				if( $age < 3600 )
 				{	// Less than 1 hour: return full time
-					return date_i18n( 'H:i:s', $this->_lastmod_ts );
+					return date_i18n( 'H:i:s', $lastmod_ts );
 				}
 				if( $age < 86400 )
 				{	// Less than 24 hours: return compact time
-					return date_i18n( 'H:i', $this->_lastmod_ts );
+					return date_i18n( 'H:i', $lastmod_ts );
 				}
 				if( $age < 31536000 )
 				{	// Less than 365 days: Month and day
-					return date_i18n( 'M, d', $this->_lastmod_ts );
+					return date_i18n( 'M, d', $lastmod_ts );
 				}
 				// Older: return yeat
-				return date_i18n( 'Y', $this->_lastmod_ts );
+				return date_i18n( 'Y', $lastmod_ts );
 				break;
 
 			case '#':
 				default:
 				$format = locale_datefmt().' '.locale_timefmt();
-				return date_i18n( $format, $this->_lastmod_ts );
+				return date_i18n( $format, $lastmod_ts );
 		}
 	}
 
@@ -1831,6 +1836,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2009/02/10 21:23:43  blueyed
+ * File: lazy-fill _lastmod_ts through getter
+ *
  * Revision 1.24  2009/02/10 21:11:24  blueyed
  * typo, indent
  *
