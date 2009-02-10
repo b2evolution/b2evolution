@@ -51,7 +51,7 @@ if( ! $public_access_to_media )
 {
 	if( ! isset($current_User) )
 	{
-		debug_die( 'No permission to get file (not logged in)!' );
+		debug_die( 'No permission to get file (not logged in)!', array('status'=>'403 Forbidden') );
 	}
 	$current_User->check_perm( 'files', 'view', true );
 	// fp> TODO: check specific READ perm for requested fileroot
@@ -116,6 +116,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.24  2009/02/10 23:37:41  blueyed
+ * Add status param to debug_die() and use it for "Forbidden" in getfile.php. This has quite some potential to get reverted, but then debug_die() should not get used there, maybe?!
+ *
  * Revision 1.23  2009/02/10 23:28:59  blueyed
  * Add mtime-Expires caching to getfile.php.
  *  - getfile.php links have a mtime param to make the URLs unique

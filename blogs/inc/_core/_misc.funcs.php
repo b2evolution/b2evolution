@@ -1433,11 +1433,17 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
  * Examples: database broken, user changed URL by hand...
  *
  * @param string Message to output
+ * @param array Additional params
+ *        - "status" (Default: '500 Internal Server Error')
  */
-function debug_die( $additional_info = '' )
+function debug_die( $additional_info = '', $params = array() )
 {
 	global $debug, $baseurl;
 	global $log_app_errors, $app_name, $is_cli;
+
+	$params = array_merge( array(
+		'status' => '500 Internal Server Error',
+   		), $params );
 
 	// Attempt to output an error header (will not work if the output buffer has already flushed once):
 	// This should help preventing indexing robots from indexing the error :P
@@ -1445,7 +1451,8 @@ function debug_die( $additional_info = '' )
 	{
 		load_funcs('_core/_template.funcs.php');
 		header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
-		header('HTTP/1.0 500 Internal Server Error');
+		$status_header = $_SERVER['SERVER_PROTOCOL'].' '.$params['status'];
+		header($status_header);
 	}
 
 	if( $is_cli )
@@ -3258,6 +3265,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.69  2009/02/10 23:37:41  blueyed
+ * Add status param to debug_die() and use it for "Forbidden" in getfile.php. This has quite some potential to get reverted, but then debug_die() should not get used there, maybe?!
+ *
  * Revision 1.68  2009/02/10 20:51:36  blueyed
  * s/persits/persists/
  *
