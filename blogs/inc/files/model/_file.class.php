@@ -366,6 +366,7 @@ class File extends DataObject
 
 		// for files and dirs:
 		$this->_perms = @fileperms( $this->_adfp_full_path );
+		$this->_lastmod_ts = null;
 	}
 
 
@@ -1836,6 +1837,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2009/02/10 21:27:59  blueyed
+ * File: invalidate _lastmod_ts in load_properties, where it has been set before
+ *
  * Revision 1.25  2009/02/10 21:23:43  blueyed
  * File: lazy-fill _lastmod_ts through getter
  *
