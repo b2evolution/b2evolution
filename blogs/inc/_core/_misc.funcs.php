@@ -1451,7 +1451,7 @@ function debug_die( $additional_info = '' )
 	if( $is_cli )
 	{ // Command line interface, e.g. in cron_exec.php:
 		echo '== '.T_('An unexpected error has occured!')." ==\n";
-		echo T_('If this error persits, please report it to the administrator.')."\n";
+		echo T_('If this error persists, please report it to the administrator.')."\n";
 		echo T_('Additional information about this error:')."\n";
 		echo strip_tags( $additional_info )."\n\n";
 	}
@@ -1459,7 +1459,7 @@ function debug_die( $additional_info = '' )
 	{
 		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
 		echo '<h3 style="color:#f00;">'.T_('An unexpected error has occured!').'</h3>';
-		echo '<p>'.T_('If this error persits, please report it to the administrator.').'</p>';
+		echo '<p>'.T_('If this error persists, please report it to the administrator.').'</p>';
 		echo '<p><a href="'.$baseurl.'">'.T_('Go back to home page').'</a></p>';
 		echo '</div>';
 
@@ -3258,6 +3258,9 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 
 /*
  * $Log$
+ * Revision 1.68  2009/02/10 20:51:36  blueyed
+ * s/persits/persists/
+ *
  * Revision 1.67  2009/02/09 19:13:00  blueyed
  * Fix strmaxwords for corner cases and add tests.
  *
