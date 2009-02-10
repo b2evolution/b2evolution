@@ -1642,7 +1642,7 @@ class File extends DataObject
 	 * @param string size name
 	 * @param string mimetype of thumbnail (NULL if we're ready to take wathever is available)
 	 * @param boolean shall we create the dir if it doesn't exist?
-	 * @return string absolte filename or !error
+	 * @return string absolute filename or !error
 	 */
 	function get_af_thumb_path( $size_name, $thumb_mimetype = NULL, $create_evocache_if_needed = false )
 	{
@@ -1791,7 +1791,7 @@ class File extends DataObject
 			// $err = 'w='.$car_width.' '.$err;
 			$err = wordwrap( $err, $car_width, "\n" );
 			$err = split( "\n", $err );	// split into lines
-  		$im_handle = imagecreatetruecolor( $thumb_width, $thumb_height ); // Create a black image
+			$im_handle = imagecreatetruecolor( $thumb_width, $thumb_height ); // Create a black image
 			$text_color = imagecolorallocate( $im_handle, 255, 0, 0 );
 			$y = 0;
 			foreach( $err as $err_string )
@@ -1832,6 +1832,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.23  2009/02/10 21:08:50  blueyed
+ * doc, indent
+ *
  * Revision 1.22  2009/02/07 10:10:26  yabs
  * Validation
  *
