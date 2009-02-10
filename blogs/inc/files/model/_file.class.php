@@ -1146,7 +1146,7 @@ class File extends DataObject
 			return false;
 		}
 
- 		// Note: what happens if someone else creates the destination file right at this moment here?
+		// Note: what happens if someone else creates the destination file right at this moment here?
 
 		if( ! @copy( $this->get_full_path(), $dest_File->get_full_path() ) )
 		{	// Note: unlike rename() (at least on Windows), copy() will not fail if destination already exists
@@ -1445,7 +1445,7 @@ class File extends DataObject
 	}
 
 
-  /**
+	/**
 	 * @param integer ID of item to link to => will open the FM in link mode
 	 * @return string
 	 */
@@ -1513,7 +1513,7 @@ class File extends DataObject
 	}
 
 
-  /**
+	/**
 	 *  Generate the IMG THUMBNAIL tag with all the alt & title if available
 	 */
 	function get_thumb_imgtag( $size_name = 'fit-80x80', $class = '', $align = '' )
@@ -1545,12 +1545,12 @@ class File extends DataObject
 	}
 
 
- 	/**
+	/**
 	 * Displays a preview thumbnail which is clickable and opens a view popup
 	 *
 	 * @param string what do do with files that are not images? 'fulltype'
 	 * @return string HTML to display
- 	 */
+	 */
 	function get_preview_thumb( $format_for_non_images = '' )
 	{
 		if( $this->is_image() )
@@ -1609,7 +1609,7 @@ class File extends DataObject
 	}
 
 
-  /**
+	/**
 	 * Delete cache for a file
 	 */
 	function rm_cache()
@@ -1692,7 +1692,7 @@ class File extends DataObject
 	 * Output previously saved thumbnail for file
 	 *
 	 * @param string size name
-	 * @param string miemtype of thumbnail
+	 * @param string mimetype of thumbnail
 	 * @param string short error code
 	 */
 	function output_cached_thumb( $size_name, $thumb_mimetype )
@@ -1710,7 +1710,7 @@ class File extends DataObject
 				return '!Thumbnail read error! Check filesystem permissions.';
 			}
 
- 			header('Content-type: '.$thumb_mimetype );
+			header('Content-type: '.$thumb_mimetype );
 			header('Content-Length: '.filesize( $af_thumb_path ) );
 			// Output the content of the file
 			readfile( $af_thumb_path );
@@ -1719,7 +1719,6 @@ class File extends DataObject
 
 		return $af_thumb_path;	// !Error code
 	}
-
 
 
 	/**
@@ -1832,6 +1831,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.24  2009/02/10 21:11:24  blueyed
+ * typo, indent
+ *
  * Revision 1.23  2009/02/10 21:08:50  blueyed
  * doc, indent
  *
