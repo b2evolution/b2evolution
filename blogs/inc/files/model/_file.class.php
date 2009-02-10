@@ -576,12 +576,7 @@ class File extends DataObject
 			}
 			else
 			{ // Private Access: doesn't show the full path
-				$root = $this->_FileRoot->ID;
-				$url = $htsrv_url.'getfile.php/'
-								// This is for clean 'save as':
-								.rawurlencode( $this->_name )
-								// This is for locating the file:
-								.'?root='.$root.'&amp;path='.$this->_rdfp_rel_path;
+				$url = $this->get_getfile_url();
 			}
 		}
 		return $url;
@@ -1375,7 +1370,7 @@ class File extends DataObject
 					return $htsrv_url.'viewfile.php?root='.$root_ID.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=text';
 
 				case 'download':	 // will NOT open a popup and will insert a Content-disposition: attachment; header
-					return $htsrv_url.'getfile.php?root='.$root_ID.'&amp;path='.$this->_rdfp_rel_path;
+					return $this->get_getfile_url();
 
 				case 'browser':		// will open a popup
 				case 'external':  // will NOT open a popup
@@ -1529,14 +1524,25 @@ class File extends DataObject
 		}
 
 		// No thumbnail available (at least publicly), we need to go through getfile.php!
-		$root = $this->_FileRoot->ID;
-		$url = $htsrv_url.'getfile.php/'
-						// This is for clean 'save as':
-						.rawurlencode( $this->_name )
-						// This is for locating the file:
-						.'?root='.$root.'&amp;path='.$this->_rdfp_rel_path.'&amp;size='.$size_name;
+		$url = $this->get_getfile_url().'&amp;size='.$size_name;
 
 		return $url;
+	}
+
+
+	/**
+	 * Get the URL to access a file through getfile.php.
+	 * @return string
+	 */
+	function get_getfile_url()
+	{
+		global $htsrv_url;
+		return $htsrv_url.'getfile.php/'
+			// This is for clean 'save as':
+			.rawurlencode( $this->_name )
+			// This is for locating the file:
+			.'?root='.$this->_FileRoot->ID.'&amp;path='.$this->_rdfp_rel_path
+			.'&amp;mtime='.$this->get_lastmod_ts(); // TODO: dh> use salt here?!
 	}
 
 
@@ -1858,6 +1864,13 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2009/02/10 23:28:59  blueyed
+ * Add mtime-Expires caching to getfile.php.
+ *  - getfile.php links have a mtime param to make the URLs unique
+ *  - Add File::get_getfile_url
+ *  - getfile.php sends "Expires: 'in 10 years'" (not for thumbs yet, see
+ *    TODO)
+ *
  * Revision 1.27  2009/02/10 22:38:57  blueyed
  *  - Handle more File properties in File class lazily.
  *  - Cleanup recursive size handling:

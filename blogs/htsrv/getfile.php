@@ -26,9 +26,14 @@
  * @package htsrv
  *
  * @todo dh> Add support for ETag / If-Modified-Since. Maybe send "Expires", too? (to "force" caching)
- * @todo fp> for more efficient caching, this should probably redirect to the static file right after creating it (when $public_access_to_media=true OF COURSE)
+ *       fp> for more efficient caching, this should probably redirect to the static file right after creating it (when $public_access_to_media=true OF COURSE)
+ *       dh> this would add another redirect/HTTP request and no cache handling, assuming
+ *           that the server is not configured for smart caching.
+ *           Additionally, it does not help for non-public access, which is the meat of this file.
+ *           I've added "Expires: in ten years" now, but not for thumbs (see comment there).
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  */
@@ -56,6 +61,7 @@ if( ! $public_access_to_media )
 param( 'root', 'string', true );	// the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
 param( 'path', 'string', true );
 param( 'size', 'string', NULL );	// Can be used for images.
+param( 'mtime', 'integer', 0 );     // used for unique URLs (that never expire).
 
 if ( false !== strpos( urldecode( $path ), '..' ) )
 {
@@ -74,6 +80,9 @@ if( !empty($size) && $File->is_image() )
 	// This will do all the magic:
 	$File->thumbnail( $size );
 	// fp> TODO: for more efficient caching, this should probably redirect to the static file right after creating it (when $public_access_to_media=true OF COURSE)
+	// TODO: dh> it would be nice, if the above would not do all the magic, but return
+	//       image data and error code instead, allowing us to send "Expires" for given
+	//       "mtime" like below. We do not want to send it for error images after all.
 }
 else
 {	// We want the regular file:
@@ -91,15 +100,29 @@ else
 			header('Content-disposition: attachment; filename="'.$File->get_name().'"' );
 		}
 	}
-	header('Content-Length: '.filesize( $File->get_full_path() ) );
+	$file_path = $File->get_full_path();
+	header('Content-Length: '.filesize( $file_path ) );
 
+	// The URL refers to this specific file, therefore we can tell the browser that
+	// it does not expire anytime soon.
+	if( $mtime && $mtime == $File->get_lastmod_ts() ) // TODO: dh> use salt here?!
+	{
+		header('Expires: '.date('r', time()+315360000)); // 86400*365*10 (10 years)
+	}
 
 	// Display the content of the file
-	readfile( $File->get_full_path() );
+	readfile( $file_path );
 }
 
 /*
  * $Log$
+ * Revision 1.23  2009/02/10 23:28:59  blueyed
+ * Add mtime-Expires caching to getfile.php.
+ *  - getfile.php links have a mtime param to make the URLs unique
+ *  - Add File::get_getfile_url
+ *  - getfile.php sends "Expires: 'in 10 years'" (not for thumbs yet, see
+ *    TODO)
+ *
  * Revision 1.22  2009/01/19 21:50:47  fplanque
  * minor
  *
