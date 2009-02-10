@@ -203,7 +203,7 @@ function get_admin_skins()
  */
 function get_dirsize_recursive( $path )
 {
-	$files = get_filenames( $path, true, false );
+	$files = get_filenames( $path );
 	$total = 0;
 
 	foreach( $files as $lFile )
@@ -771,6 +771,15 @@ function is_absolute_pathname($path)
 
 /*
  * $Log$
+ * Revision 1.14  2009/02/10 22:38:59  blueyed
+ *  - Handle more File properties in File class lazily.
+ *  - Cleanup recursive size handling:
+ *    - Add Filelist::get_File_size
+ *    - Add Filelist::get_File_size_formatted
+ *    - Add File::_recursive_size/get_recursive_size
+ *    - Drop File::setSize
+ *    - get_dirsize_recursive: includes size of directories (e.g. 4kb here)
+ *
  * Revision 1.13  2009/01/23 17:23:09  fplanque
  * doc/minor
  *

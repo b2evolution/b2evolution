@@ -410,14 +410,6 @@ class Filelist
 		if( $File->is_dir() )
 		{	// Count 1 more directory
 			$this->_total_dirs++;
-
-			// fplanque>> TODO: get this outta here??
-			// blueyed>> Where does it belong instead?
-			if( $this->_use_recursive_dirsize )
-			{ // We want to use recursive directory sizes
-				// won't be done in the File constructor
-				$File->setSize( get_dirsize_recursive( $File->get_full_path() ) );
-			}
 		}
 		else
 		{	// Count 1 more file
@@ -425,9 +417,45 @@ class Filelist
 		}
 
 		// Count total bytes in this dir
-		$this->_total_bytes += $File->get_size();
+		$this->_total_bytes += $this->get_File_size($File);
 
 		return true;
+	}
+
+
+	/**
+	 * Get the size of a given File, according to $_use_recursive_dirsize.
+	 * @param File
+	 * @return int bytes
+	 */
+	function get_File_size($File)
+	{
+		if( $this->_use_recursive_dirsize )
+		{
+			return $File->get_recursive_size();
+		}
+		else
+		{
+			return $File->get_size();
+		}
+	}
+
+
+	/**
+	 * Get size of the file/dir, formatted to nearest unit (kb, mb, etc.)
+	 *
+	 * @uses bytesreadable()
+	 * @param File
+	 * @return string size as b/kb/mb/gd; or '&lt;dir&gt;'
+	 */
+	function get_File_size_formatted($File)
+	{
+		if( $this->_use_recursive_dirsize || ! $File->is_dir() )
+		{
+			return bytesreadable($File->get_recursive_size());
+		}
+
+        return /* TRANS: short for '<directory>' */ T_('&lt;dir&gt;');
 	}
 
 
@@ -527,20 +555,12 @@ class Filelist
 		$FileA = & $this->_entries[$a];
 		$FileB = & $this->_entries[$b];
 
-		// What colmun are we sorting on?
+		// What column are we sorting on?
+		// TODO: dh> this should probably fallback to sorting by name always if $r==0
 		switch( $this->_order )
 		{
 			case 'size':
-				if( $this->_use_recursive_dirsize )
-				{	// We are using recursive directory sizes:
-					$r = $FileA->get_size() - $FileB->get_size();
-				}
-				else
-				{
-					$r = $FileA->is_dir() && $FileB->is_dir() ?
-									strcasecmp( $FileA->get_name(), $FileB->get_name() ) :
-									( $FileA->get_size() - $FileB->get_size() );
-				}
+				$r = $this->get_File_size($FileA) - $this->get_File_size($FileB);
 				break;
 
 			case 'path': // group by dir
@@ -1045,7 +1065,7 @@ class Filelist
 		if( isset( $this->_md5_ID_index[ $File->get_md5_ID() ] ) )
 		{
 			$this->_total_entries--;
-			$this->_total_bytes -= $File->get_size();
+			$this->_total_bytes -= $this->get_File_size($File);
 
 			if( $File->is_dir() )
 			{
@@ -1238,6 +1258,15 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.3  2009/02/10 22:38:59  blueyed
+ *  - Handle more File properties in File class lazily.
+ *  - Cleanup recursive size handling:
+ *    - Add Filelist::get_File_size
+ *    - Add Filelist::get_File_size_formatted
+ *    - Add File::_recursive_size/get_recursive_size
+ *    - Drop File::setSize
+ *    - get_dirsize_recursive: includes size of directories (e.g. 4kb here)
+ *
  * Revision 1.2  2008/01/21 09:35:29  fplanque
  * (c) 2008
  *

@@ -143,6 +143,14 @@ class File extends DataObject
 	var $_size;
 
 	/**
+	 * Recursive directory size in bytes.
+	 * @var integer
+	 * @see get_recursive_size()
+	 * @access protected
+	 */
+	var $_recursive_size;
+
+	/**
 	 * UNIX timestamp of last modification on disk.
 	 * @var integer
 	 * @see get_lastmod_ts()
@@ -350,23 +358,20 @@ class File extends DataObject
 	{
 		// Unset values that will be determined (and cached) upon request
 		$this->_is_image = NULL;
-
-		$this->_exists = file_exists( $this->_adfp_full_path );
+		$this->_lastmod_ts = NULL;
+		$this->_exists = NULL;
+		$this->_perms = NULL;
+		$this->_size = NULL;
+		$this->_recursive_size = NULL;
 
 		if( is_dir( $this->_adfp_full_path ) )
 		{	// The File is a directory:
 			$this->_is_dir = true;
-			$this->_size = NULL;
 		}
 		else
 		{	// The File is a regular file:
 			$this->_is_dir = false;
-			$this->_size = @filesize( $this->_adfp_full_path );
 		}
-
-		// for files and dirs:
-		$this->_perms = @fileperms( $this->_adfp_full_path );
-		$this->_lastmod_ts = null;
 	}
 
 
@@ -377,6 +382,10 @@ class File extends DataObject
 	 */
 	function exists()
 	{
+		if( ! isset($this->_exists) )
+		{
+			$this->_exists = file_exists( $this->_adfp_full_path );
+		}
 		return $this->_exists;
 	}
 
@@ -647,12 +656,18 @@ class File extends DataObject
 
 
 	/**
-	 * Get file size in bytes.
+	 * Get file/dir size in bytes.
+	 *
+	 * For the recursive size of a directory see {@link get_recursive_size()}.
 	 *
 	 * @return integer bytes
 	 */
 	function get_size()
 	{
+		if( ! isset($this->_size) )
+		{
+			$this->_size = @filesize( $this->_adfp_full_path );
+		}
 		return $this->_size;
 	}
 
@@ -735,6 +750,10 @@ class File extends DataObject
 	 */
 	function get_perms( $type = NULL )
 	{
+		if( ! isset($this->_perms) )
+		{
+			$this->_perms = @fileperms( $this->_adfp_full_path );
+		}
 		switch( $type )
 		{
 			case 'raw':
@@ -908,13 +927,13 @@ class File extends DataObject
 	 */
 	function get_size_formatted()
 	{
-		if( $this->_size === NULL )
+		if( $this->is_dir() )
 		{
 			return /* TRANS: short for '<directory>' */ T_('&lt;dir&gt;');
 		}
 		else
 		{
-			return bytesreadable( $this->_size );
+			return bytesreadable( $this->get_size() );
 		}
 	}
 
@@ -988,19 +1007,20 @@ class File extends DataObject
 
 
 	/**
-	 * Internally sets the file/directory size
-	 *
-	 * This is used when the FileList wants to set the recursive size of a directory!
-	 *
-	 * @todo pass a param to the constructor telling it we want to store a recursive size for the direcrory.
-	 * @todo store the recursive size separately (in another member), to avoid confusion
-	 *
-	 * @access public
-	 * @param integer
+	 * Get the "full" size of a file/dir (recursive for directories).
+	 * This is used by the FileList.
+	 * @return integer Recursive size of the dir or the size alone for a file.
 	 */
-	function setSize( $bytes )
+	function get_recursive_size()
 	{
-		$this->_size = $bytes;
+		if( ! isset($this->_recursive_size) )
+		{
+			if( $this->is_dir() )
+				$this->_recursive_size = get_dirsize_recursive( $this->get_full_path() );
+			else
+				$this->_recursive_size = $this->get_size();
+		}
+		return $this->_recursive_size;
 	}
 
 
@@ -1152,7 +1172,8 @@ class File extends DataObject
 			return false;
 		}
 
-		// Note: what happens if someone else creates the destination file right at this moment here?
+		// TODO: fp> what happens if someone else creates the destination file right at this moment here?
+		//       dh> use a locking mechanism.
 
 		if( ! @copy( $this->get_full_path(), $dest_File->get_full_path() ) )
 		{	// Note: unlike rename() (at least on Windows), copy() will not fail if destination already exists
@@ -1202,7 +1223,7 @@ class File extends DataObject
 			$this->dbdelete();
 		}
 
-		//Remove thumb cache:
+		// Remove thumb cache:
 		$this->rm_cache();
 
 		// Physically remove file from disk:
@@ -1837,6 +1858,15 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.27  2009/02/10 22:38:57  blueyed
+ *  - Handle more File properties in File class lazily.
+ *  - Cleanup recursive size handling:
+ *    - Add Filelist::get_File_size
+ *    - Add Filelist::get_File_size_formatted
+ *    - Add File::_recursive_size/get_recursive_size
+ *    - Drop File::setSize
+ *    - get_dirsize_recursive: includes size of directories (e.g. 4kb here)
+ *
  * Revision 1.26  2009/02/10 21:27:59  blueyed
  * File: invalidate _lastmod_ts in load_properties, where it has been set before
  *

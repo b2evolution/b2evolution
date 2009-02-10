@@ -315,7 +315,7 @@ $Form->begin_form();
 			{
 				echo ' ('.$lFile->get_image_size( 'widthxheight' ).')';
 			}
-			// Optionnaly display meta data title:
+			// Optionally display meta data title:
 			if( $lFile->meta == 'loaded' )
 			{	// We have loaded meta data for this file:
 				echo ' - '.$lFile->title;
@@ -333,7 +333,7 @@ $Form->begin_form();
 
 		/*******************  File size  ******************/
 
-		echo '<td class="size">'.$lFile->get_size_formatted().'</td>';
+		echo '<td class="size">'.$fm_Filelist->get_File_size_formatted($lFile).'</td>';
 
 		/****************  File time stamp  ***************/
 
@@ -605,6 +605,15 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.12  2009/02/10 22:39:00  blueyed
+ *  - Handle more File properties in File class lazily.
+ *  - Cleanup recursive size handling:
+ *    - Add Filelist::get_File_size
+ *    - Add Filelist::get_File_size_formatted
+ *    - Add File::_recursive_size/get_recursive_size
+ *    - Drop File::setSize
+ *    - get_dirsize_recursive: includes size of directories (e.g. 4kb here)
+ *
  * Revision 1.11  2008/09/29 08:30:38  fplanque
  * Avatar support
  *
