@@ -696,10 +696,6 @@ class DB
 		// Flush cached values..
 		$this->flush();
 
-		// Log how the function was called
-		$this->func_call = '$db->query("'.$query.'")';
-		// echo $this->func_call, '<br />';
-
 		// Replace aliases:
 		if( ! empty($this->dbaliases) )
 		{
@@ -892,9 +888,6 @@ class DB
 	 */
 	function get_var( $query = NULL, $x = 0, $y = 0, $title = '' )
 	{
-		// Log how the function was called
-		$this->func_call = "\$db->get_var(\"$query\",$x,$y)";
-
 		// If there is a query then perform it if not then use cached results..
 		if( $query )
 		{
@@ -1505,6 +1498,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.17  2009/02/11 20:04:42  blueyed
+ * Drop usage of $func_call - got only set, but never used.
+ *
  * Revision 1.16  2009/02/05 15:09:35  blueyed
  * DB class: fix EXPLAIN for queries starting with (SELECT (e.g. unions)
  *
