@@ -333,12 +333,25 @@ $Debuglog->add( 'default_locale from DB: '.$default_locale, 'locale' );
 $default_locale = locale_from_httpaccept(); // set default locale by autodetect
 $Debuglog->add( 'default_locale from HTTP_ACCEPT: '.$default_locale, 'locale' );
 
-if( ($locale_from_get = param( 'locale', 'string', NULL, true ))
-		&& $locale_from_get != $default_locale
-		&& isset( $locales[$locale_from_get] ) )
+if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
 {
-	$default_locale = $locale_from_get;
-	$Debuglog->add( 'Overriding locale from REQUEST: '.$default_locale, 'locale' );
+	if( $locale_from_get != $default_locale )
+	{
+		if( isset( $locales[$locale_from_get] ) )
+		{
+			$default_locale = $locale_from_get;
+			$Debuglog->add('Overriding locale from REQUEST: '.$default_locale, 'locale');
+		}
+		else
+		{
+			$Debuglog->add('$locale_from_get ('.$locale_from_get.') is not set. Available locales: '.implode(', ', array_keys($locales)), 'locale');
+		}
+	}
+	else
+	{
+		$Debuglog->add('$locale_from_get == $default_locale ('.$locale_from_get.').', 'locale');
+	}
+
 }
 
 
@@ -643,6 +656,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.95  2009/02/11 20:50:36  blueyed
+ * Add more Debuglog to locale_from_get handling
+ *
  * Revision 1.94  2008/12/28 19:02:19  fplanque
  * minor
  *
