@@ -1928,7 +1928,7 @@ class Item extends ItemLight
 									'link_title' => '#',
 									'use_popup' => false,
 									'url' => '#',
-    									'type' => 'feedbacks',
+									'type' => 'feedbacks',
 									'' => '',
 								), $params );
 
@@ -2011,7 +2011,6 @@ class Item extends ItemLight
 
 		return true;
 	}
-
 
 
 	/**
@@ -2462,6 +2461,9 @@ class Item extends ItemLight
 	}
 
 
+	/**
+	 * Output raw status.
+	 */
 	function status_raw()
 	{
 		echo $this->status;
@@ -2486,7 +2488,6 @@ class Item extends ItemLight
 			echo $before.format_to_output( $extra_status, $format ).$after;
 		}
 	}
-
 
 
  	/**
@@ -2840,8 +2841,6 @@ class Item extends ItemLight
 		$this->set( 'urltitle', $post_urltitle );
 		$this->set( 'content', $post_content );
 		$this->set( 'datestart', $post_timestamp );
-
-		// TODO: dh> $localtimenow is not defined during install! - all sample posts get a last-modified date of 1970-01-01
 		$this->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
 
 		$this->set( 'main_cat_ID', $main_cat_ID );
@@ -3616,6 +3615,11 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.69  2009/02/12 19:59:41  blueyed
+ * - Install: define $localtimenow, so post_datemodified gets set correctly.
+ * - Send Cache-Control: no-cache for install/index.php: should not get cached, e.g. when going back to "delete", it should delete!?
+ * - indent fixes
+ *
  * Revision 1.68  2009/02/03 22:14:10  blueyed
  * Fix indent; TODO about some $params
  *
