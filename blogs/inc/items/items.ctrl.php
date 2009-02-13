@@ -222,7 +222,37 @@ switch( $action )
  		param( 'trackback_url', 'string', '' );
 
 		// Page title:
-		$AdminUI->title = T_('New post in blog:').' ';
+
+		if( param( 'item_typ_ID', 'integer', NULL ) !== NULL )
+		{
+			switch( $item_typ_ID )
+			{
+				case 2:
+					$AdminUI->title = T_('New link in blog:').' ';
+					break;
+
+				case 1000:
+					$AdminUI->title = T_('New page in blog:').' ';
+					break;
+
+				case 1600:
+					$AdminUI->title = T_('New intro in blog:').' ';
+					break;
+
+				case 2000:
+					$AdminUI->title = T_('New podcast episode:').' ';
+					break;
+
+				default:
+					$AdminUI->title = T_('New post in blog:').' ';
+					break;
+			}
+		}
+		else
+		{
+			$AdminUI->title = T_('New post in blog:').' ';
+		}
+
 		$AdminUI->title_titlearea = $AdminUI->title;
 		$js_doc_title_prefix = $AdminUI->title;
 
@@ -921,6 +951,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.30  2009/02/13 14:21:03  waltercruz
+ * Fixing titles
+ *
  * Revision 1.29  2009/01/25 18:59:04  blueyed
  * phpdoc: fix multiple package tags error
  *
