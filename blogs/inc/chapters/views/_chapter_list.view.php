@@ -115,8 +115,8 @@ function cat_line( $Chapter, $level )
 		{ // If moving cats between blogs is allowed:
 			$r .= action_icon( T_('Move to a different blog...'), 'file_move', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=move' ), T_('Move') );
 		}
-		$r .= action_icon( T_('New...'), 'new', regenerate_url( 'action,cat_ID,cat_parent_ID', 'cat_parent_ID='.$Chapter->ID.'&amp;action=new' ) )
-					.action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete' ) );
+
+		$r .= action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete' ) );
 	}
 	$r .= '</td>';
 	$r .=	'</tr>';
@@ -236,6 +236,9 @@ echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categori
 
 /*
  * $Log$
+ * Revision 1.10  2009/02/13 13:58:41  waltercruz
+ * Trying to clean (a bit) our UI
+ *
  * Revision 1.9  2009/01/28 22:34:21  fplanque
  * Default cat for each blog can now be chosen explicitely
  *
