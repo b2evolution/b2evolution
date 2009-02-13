@@ -86,8 +86,6 @@ function extract_keyphrase_from_referer( $ref )
 /**
  * A hit to a blog.
  *
- * NOTE: The internal function double_check_referer() uses the class Net_IDNA_php4 from /blogs/lib/_idna_convert.class.php.
- *       It's required() only, when needed.
  * @package evocore
  */
 class Hit
@@ -153,13 +151,13 @@ class Hit
 	 */
 	var $user_agent;
 
-  /**
+	/**
 	 * The user agent name, eg "safari"
 	 * @var string
 	 */
 	var $agent_name;
 
-  /**
+	/**
 	 * The user agent platform, eg "mac"
 	 * @var string
 	 */
@@ -601,7 +599,7 @@ class Hit
 	}
 
 
-  /**
+	/**
 	 * Tell if a HIT should be logged:
 	 *
 	 * @return boolean
@@ -859,6 +857,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.15  2009/02/13 19:57:50  blueyed
+ * doc, indent
+ *
  * Revision 1.14  2008/12/28 19:02:19  fplanque
  * minor
  *
