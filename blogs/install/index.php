@@ -105,7 +105,7 @@ switch( $action ) {
 }
 
 header('Content-Type: text/html; charset='.$io_charset);
-header('Cache-Control: no-cache'); // no request to this cache should get cached!
+header('Cache-Control: no-cache'); // no request to this page should get cached!
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/evo_distrib_2.dwt" codeOutsideHTMLIsLocked="false" -->
@@ -670,6 +670,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
+ * Revision 1.154  2009/02/17 16:00:25  blueyed
+ * Fix doc
+ *
  * Revision 1.153  2009/02/12 19:59:41  blueyed
  * - Install: define $localtimenow, so post_datemodified gets set correctly.
  * - Send Cache-Control: no-cache for install/index.php: should not get cached, e.g. when going back to "delete", it should delete!?
