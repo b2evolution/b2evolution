@@ -114,7 +114,7 @@ msgstr "Vous trouverez ci-dessous quelques instructions destinées à vous aider. 
 
 #: ../../index.src.html:34
 msgid "trans_current"
-msgstr ""
+msgstr "trans_current"
 
 #: ../../index.src.html:42
 msgid "Quickstart instructions"
