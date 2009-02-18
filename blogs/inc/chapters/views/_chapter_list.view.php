@@ -66,6 +66,7 @@ function cat_line( $Chapter, $level )
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 
 	$r = '<tr id="tr-'.$Chapter->ID.'"class="'.$line_class.
+					' chapter_parent_'.( $Chapter->parent_ID ? $Chapter->parent_ID : '0' ).
 					// Fadeout?
 					( isset($result_fadeout[$GenericCategoryCache->dbIDname]) && in_array( $Chapter->ID, $result_fadeout[$GenericCategoryCache->dbIDname] ) ? ' fadeout-ffff00': '' ).'">
 					<td class="firstcol shrinkwrap">'.
@@ -206,6 +207,8 @@ if( $permission_to_edit )
 }
 
 $Table->display_init( NULL, $result_fadeout );
+// add an id for jquery to hook into
+$Table->params['head_title'] = str_replace( '<table', '<table id="chapter_list"', $Table->params['head_title'] );
 
 $Table->display_list_start();
 
@@ -236,6 +239,9 @@ echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categori
 
 /*
  * $Log$
+ * Revision 1.11  2009/02/18 10:15:47  yabs
+ * Adding drag n drop hooks
+ *
  * Revision 1.10  2009/02/13 13:58:41  waltercruz
  * Trying to clean (a bit) our UI
  *
