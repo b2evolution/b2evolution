@@ -962,7 +962,7 @@ msgstr "Mot de passe"
 
 #: ..\..\..\cron\getmail.php:501
 msgid "Unhandled email part type"
-msgstr ""
+msgstr "Partie de l'email non traitée"
 
 #: ..\..\..\cron\getmail.php:520
 msgid "Authenticating User"
@@ -3129,7 +3129,7 @@ msgstr "Utiliser le workflow"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:136
 msgid "This will notably turn on the Tracker tab in the Posts view."
-msgstr ""
+msgstr "Cela activera notamment l'onglet Tracker dans la page de visualisation des articles."
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:50
 msgid "General parameters"
@@ -4032,7 +4032,7 @@ msgstr "Autres pages spéciales"
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:288
 msgid "Pages with no index setting of their own... yet."
-msgstr ""
+msgstr "Pages sans leur propre index définis... pour l'instant."
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:125
 msgid "Blog URL name"
@@ -4403,7 +4403,7 @@ msgstr "Liens"
 
 #: ..\..\..\inc\comments\views\_comment.form.php:230
 msgid "Nofollow website URL"
-msgstr ""
+msgstr "URL siteweb en Nofollow"
 
 #: ..\..\..\inc\comments\views\_comment.form.php:235
 msgid "Feedback info"
@@ -8235,7 +8235,7 @@ msgstr "Les plugins suivants sont ceux déjà installés dans votre répertoire \"pl
 #: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:206
 #, php-format
 msgid "You can find more plugins online at %s or other channels."
-msgstr ""
+msgstr "Vous pouvez trouver d'autres plugins en ligne notamment sur %s."
 
 # D:\www\b2cvs20\blogs\inc\plugins\views\_plugin_list_available.view.php:208
 #: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:208
@@ -10684,7 +10684,7 @@ msgstr "Lien vers l'auteur"
 
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:80
 msgid "Link the author to their url"
-msgstr ""
+msgstr "Lie l'auteur a ces urls"
 
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:85
 msgid "Hover text"
@@ -12977,10 +12977,10 @@ msgid "Wiki Links converter"
 msgstr "Convertisseur Wiki Links"
 
 #: ..\..\..\plugins\_wikilinks.plugin.php:38
-msgid ""
-"WikiWord links are created with a CamelCased WikiWord, a ((link)), or a [[link ]].<br />\n"
+msgid "WikiWord links are created with a CamelCased WikiWord, a ((link)), or a [[link ]].<br />\n"
 "\t\t CamelCased words will be exploded to camel_case which should then match a post url title."
-msgstr ""
+msgstr "Les liens WikiWord sont créés avec la syntaxe CamelCased WikiWord, ((link)), ou [[link ]].<br />\n
+\t\t Les mots CamelCased sont transformés en camel_case lesquels devraient correspondre à une url d'un titre d'article."
 
 #: ..\..\..\plugins\adsense_plugin\_adsense.plugin.php:38
 msgid "Easy AdSense insertion into posts."
