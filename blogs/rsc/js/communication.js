@@ -166,7 +166,7 @@ var _b2evoCommunications = function()
 				switch( ticker_status )
 				{
 					case 'cancel' : // cancel the server call
-						b2evoHelper.DisplayMessage( '<div class="log_message">'+b2evoHelper.T_( 'Update canceled' )+'</div>' );
+						b2evoHelper.DisplayMessage( '<div class="log_message">'+b2evoHelper.T_( 'Update cancelled' )+'</div>' );
 						return;
 
 					case 'pause' : // pause the server call
@@ -227,6 +227,9 @@ var b2evoCommunications = new _b2evoCommunications();
 
 /*
  * $Log$
+ * Revision 1.4  2009/02/18 16:23:34  yabs
+ * Correcting typo
+ *
  * Revision 1.3  2009/02/18 09:57:51  yabs
  * Updating drag n drop
  *
