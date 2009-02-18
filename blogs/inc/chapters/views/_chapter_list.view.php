@@ -233,12 +233,15 @@ if( ! $Settings->get('allow_moving_chapters') )
 	echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Moving categories across blogs is currently disabled in the %sglobal settings%s.'), '<a href="admin.php?ctrl=features#categories">', '</a>' ).'</p> ';
 }
 
-echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categories is currently set to %s the %sglobal settings%s.'),
+echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categories is currently set to %s in the %sglobal settings%s.'),
 	$Settings->get('chapter_ordering') == 'manual' ? T_('Manual') : T_('Alphabetical'), '<a href="admin.php?ctrl=features#categories">', '</a>' ).'</p> ';
 
 
 /*
  * $Log$
+ * Revision 1.12  2009/02/18 17:03:40  yabs
+ * minor
+ *
  * Revision 1.11  2009/02/18 10:15:47  yabs
  * Adding drag n drop hooks
  *
