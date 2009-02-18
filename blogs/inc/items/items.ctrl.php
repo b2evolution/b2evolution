@@ -353,7 +353,7 @@ switch( $action )
 		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
 		// Set object params:
-		$edited_Item->load_from_Request( false );
+		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit') );
 
 		$Plugins->trigger_event( 'AdminBeforeItemEditCreate', array( 'Item' => & $edited_Item ) );
 
@@ -951,6 +951,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.31  2009/02/18 18:49:39  blueyed
+ * Pass correct $editing value to Item::load_from_Request for $action="create_edit".
+ * This fixes (i.e. skips) e.g. title validation when clicking "Save & start attaching files".
+ *
  * Revision 1.30  2009/02/13 14:21:03  waltercruz
  * Fixing titles
  *
