@@ -156,3 +156,27 @@ table.grouped th a.single_sort_link:hover {
 }
 
 /* / Results navigation */
+
+/* Results drag n drop */
+ul.grouped li .draggable_object{
+cursor:move;
+}
+
+li.ui-draggable-dragging{
+width:80%;
+}
+
+ul.grouped .actions{
+display:block;
+float:right;
+margin-left:2ex;
+}
+
+.unsaved_change,
+.unsaved_change li{
+background-color:#f44;
+}
+
+.saving_change{
+background-color:#ddd;
+}

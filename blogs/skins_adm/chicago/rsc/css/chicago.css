@@ -344,6 +344,30 @@ textarea.field_error {
 /*
  * Result tables:
  */
+ul.grouped{
+border:solid #ccc;
+border-width: 0 1px 1px 0;
+margin:0 0 1ex 0;
+padding:0;
+list-style:none;
+}
+
+ul.grouped ul{
+margin:0;
+padding:0 0 0 1ex;
+list-style:none;
+}
+
+ul.grouped li{
+padding:0;
+border:solid #ccc;
+border-width:1px 0 0 1px;
+}
+ul.grouped li div{
+padding:2px 1ex;
+}
+
+ul.grouped,
 table.grouped,
 #fm_browser,
 table.filelist {
@@ -381,20 +405,25 @@ table.filelist th a.basic_current {
 	padding: 2px 8px;
 	background-color: #BACEDF;
 }
+ul.grouped li.even,
 table.grouped tr.even,
 table.filelist tr.even {
 	background-color: #fff;
 }
+ul.grouped li.odd,
 table.grouped tr.odd,
 table.filelist tr.odd {
 	background-color: #f1f6f8;
 }
+ul.grouped li.even div:hover,
+ul.grouped li.odd div:hover,
 table.grouped tr.even:hover,
 table.grouped tr.odd:hover,
 table.filelist tr.even:hover,
 table.filelist tr.odd:hover {
 	background-color: #DBE5ED;
 }
+ul.grouped li,
 table.grouped td,
 table.filelist td {
 	border-color: #9db0bc;
