@@ -42,7 +42,7 @@ load_class('/items/model/_itemlistlight.class.php');
  */
 class ItemList2 extends ItemListLight
 {
-  /**
+	/**
 	 * @var array
 	 */
 	var $prevnext_Item = array();
@@ -198,7 +198,7 @@ class ItemList2 extends ItemListLight
 			$this->sql .= $DB->quote(param( 'item_varchar'.$i, 'string', '' )).' AS post_varchar'.$i.",\n";
 		}
 
-    $this->sql .= $DB->quote(param( 'item_order', 'double', NULL )).' AS post_order'.",\n"
+		$this->sql .= $DB->quote(param( 'item_order', 'double', NULL )).' AS post_order'.",\n"
 								.$DB->quote(param( 'item_featured', 'integer', NULL )).' AS post_featured'."\n";
 		$this->total_rows = 1;
 		$this->total_pages = 1;
@@ -226,7 +226,7 @@ class ItemList2 extends ItemListLight
 	}
 
 
-  /**
+	/**
 	 * Run Query: GET DATA ROWS *** HEAVY ***
 	 */
 	function query()
@@ -380,7 +380,7 @@ class ItemList2 extends ItemListLight
 
 
 
-  /**
+	/**
 	 * Link to previous and next link in collection
 	 */
 	function prevnext_item_links( $params )
@@ -417,7 +417,7 @@ class ItemList2 extends ItemListLight
 	 */
 	function prev_item_link( $before = '', $after = '', $text = '&laquo; $title$', $no_item = '', $display = true )
 	{
-    /**
+		/**
 		 * @var Item
 		 */
 		$prev_Item = & $this->get_prevnext_Item( 'prev' );
@@ -442,7 +442,7 @@ class ItemList2 extends ItemListLight
 	 */
 	function next_item_link(  $before = '', $after = '', $text = '$title$ &raquo;', $no_item = '', $display = true )
 	{
-    /**
+		/**
 		 * @var Item
 		 */
 		$next_Item = & $this->get_prevnext_Item( 'next' );
@@ -479,7 +479,7 @@ class ItemList2 extends ItemListLight
 			return $r;
 		}
 
-    /**
+		/**
 		 * @var Item
 		 */
 		$current_Item = $this->get_by_idx(0);
@@ -559,7 +559,7 @@ class ItemList2 extends ItemListLight
 		// fp> TODO: I think some additional limits need to come back here (for timespans)
 
 
-    /*
+		/*
 		 * Position right after the current element depending on current sorting params
 		 *
 		 * If there are several items on the same issuedatetime for example, we'll then differentiate on post ID
@@ -610,10 +610,10 @@ class ItemList2 extends ItemListLight
 				$comp_order_value = $current_Item->order;
 				if( is_null($comp_order_value) )
 				{	// fall back to only ID
-          $next_Query->WHERE_and( $this->Cache->dbIDname
-																	.$operator
-																	.$current_Item->ID
-															);
+					$next_Query->WHERE_and( $this->Cache->dbIDname
+						.$operator
+						.$current_Item->ID
+					);
 					break;
 				}
 				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
@@ -666,6 +666,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.15  2009/02/19 05:00:20  blueyed
+ * Fix (some) indenting.
+ *
  * Revision 1.14  2009/01/21 22:26:26  fplanque
  * Added tabs to post browsing admin screen All/Posts/Pages/Intros/Podcasts/Comments
  *
