@@ -759,6 +759,10 @@ class Item extends ItemLight
 	 *
 	 * @todo dh> Currently this makes up one query per displayed item. Probably the cache should get pre-fetched by ItemList2?
 	 * fp> DEFINITELY!!! Preloading all pre-rendered contents for the current Itemlistpage is paramount!
+	 * dh> OK. Plan is as follows: create a PrerenderedContentCache object, get it using get_Cache
+	 *     here and if it's empty and $MainList is set, prefill it with $MainList->page_ID_list.
+	 *     I do not want to prefill any cache in ItemList2::Query already, but more lazily.
+	 *     Makes sense?
 	 *
 	 * @todo dh> In general, $content_prerendered gets only queried once per item, so it seems like a memory waste to cache the query result..!
 	 * fp> I don't know if this is supposed to be related but that doesn't change anything to the previous todo.
@@ -3615,6 +3619,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.70  2009/02/19 17:51:55  blueyed
+ * TODO about plan of PrerenderedContentCache, please comment
+ *
  * Revision 1.69  2009/02/12 19:59:41  blueyed
  * - Install: define $localtimenow, so post_datemodified gets set correctly.
  * - Send Cache-Control: no-cache for install/index.php: should not get cached, e.g. when going back to "delete", it should delete!?
