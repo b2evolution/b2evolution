@@ -98,7 +98,8 @@ else
 		header('Content-type: '.$Filetype->mimetype );
 		if( $Filetype->viewtype == 'download' )
 		{
-			header('Content-disposition: attachment; filename="'.$File->get_name().'"' );
+			header('Content-disposition: attachment; filename="'
+				.addcslashes($File->get_name(), '\\"').'"' ); // escape quotes and slashes, according to RFC
 		}
 	}
 	$file_path = $File->get_full_path();
@@ -117,6 +118,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.26  2009/02/19 04:53:21  blueyed
+ * getfile.php: escape filename in Content-disposition header.
+ *
  * Revision 1.25  2009/02/19 04:48:13  blueyed
  * Lazy-instantiate Filetype of a file, moved to get_Filetype. Bugfix: unset Filetype if name changes.
  *
