@@ -30,7 +30,7 @@ if( $mode != 'iframe' )
 	/**
 	 * Icon Legend
 	 */
-	if( $IconLegend = get_IconLegend() )
+	if( $IconLegend = & get_IconLegend() )
 	{ // Display icon legend, if activated by user
 		$IconLegend->display_legend();
 	}
@@ -74,6 +74,9 @@ if( $this->get_path(0) == 'files'
 <?php
 /*
  * $Log$
+ * Revision 1.9  2009/02/19 04:22:45  blueyed
+ * Fix for PHP4, as expected.
+ *
  * Revision 1.8  2009/02/19 03:54:44  blueyed
  * Optimize: move instantiation of $IconLegend (and $UserSettings query) out of main.inc.php, into get_IconLegend. TODO: test if it works with PHP4, or if it needs assignment by reference. Will do so on the test server.
  *

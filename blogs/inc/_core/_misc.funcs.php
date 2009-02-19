@@ -2422,7 +2422,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			$r .= '/>';
 
 
-			if( $include_in_legend && ( $IconLegend = get_IconLegend() ) )
+			if( $include_in_legend && ( $IconLegend = & get_IconLegend() ) )
 			{ // This icon should be included into the legend:
 				$IconLegend->add_icon( $iconKey );
 			}
@@ -3268,7 +3268,7 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
  *
  * @return IconLegend or false, if the user has not set "display_icon_legend"
  */
-function get_IconLegend()
+function & get_IconLegend()
 {
 	static $IconLegend;
 
@@ -3294,6 +3294,9 @@ function get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.71  2009/02/19 04:22:45  blueyed
+ * Fix for PHP4, as expected.
+ *
  * Revision 1.70  2009/02/19 03:54:44  blueyed
  * Optimize: move instantiation of $IconLegend (and $UserSettings query) out of main.inc.php, into get_IconLegend. TODO: test if it works with PHP4, or if it needs assignment by reference. Will do so on the test server.
  *
