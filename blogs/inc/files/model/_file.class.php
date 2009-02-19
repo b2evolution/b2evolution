@@ -193,6 +193,8 @@ class File extends DataObject
 
 	/**
 	 * Extension, Mime type, icon, viewtype and 'allowed extension' of the file
+	 * @access protected
+	 * @see File::get_Filetype
 	 * @var Filetype
 	 */
 	var $Filetype;
@@ -230,13 +232,6 @@ class File extends DataObject
 		$this->_name = basename( $this->_adfp_full_path );
 		$this->_dir = dirname( $this->_adfp_full_path ).'/';
 		$this->_md5ID = md5( $this->_adfp_full_path );
-
-		// Create the filetype with the extension of the file if the extension exist in database
-		if( $ext = $this->get_ext() )
-		{ // The file has an extension, load filetype object
-			$FiletypeCache = & get_Cache( 'FiletypeCache' );
-			$this->Filetype = & $FiletypeCache->get_by_extension( strtolower( $ext ), false );
-		}
 
 		// Initializes file properties (type, size, perms...)
 		$this->load_properties();
@@ -426,19 +421,49 @@ class File extends DataObject
 	 */
 	function is_editable( $allow_locked = false )
 	{
-		if( $this->is_dir()	// we cannot edit dirs
-				|| empty($this->Filetype)
-				|| $this->Filetype->viewtype != 'text' )	// we can only edit text files
+		if( $this->is_dir() )
+		{ // we cannot edit dirs
+			return false;
+		}
+
+		$Filetype = & $this->get_Filetype();
+		if( empty($Filetype) || $this->Filetype->viewtype != 'text' )	// we can only edit text files
 		{
 			return false;
 		}
 
-		if( ! $this->Filetype->allowed && ! $allow_locked )
+		if( ! $Filetype->allowed && ! $allow_locked )
 		{	// We cannot edit locked file types:
 			return false;
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Get the File's Filetype object (or NULL).
+	 *
+	 * @return Filetype The Filetype object or NULL
+	 */
+	function & get_Filetype()
+	{
+		if( ! isset($this->Filetype) )
+		{
+			// Create the filetype with the extension of the file if the extension exist in database
+			if( $ext = $this->get_ext() )
+			{ // The file has an extension, load filetype object
+				$FiletypeCache = & get_Cache( 'FiletypeCache' );
+				$this->Filetype = & $FiletypeCache->get_by_extension( strtolower( $ext ), false );
+			}
+
+			if( ! $this->Filetype )
+			{ // remember as being retrieved.
+				$this->Filetype = false;
+			}
+		}
+		$r = $this->Filetype ? $this->Filetype : NULL;
+		return $r;
 	}
 
 
@@ -639,9 +664,10 @@ class File extends DataObject
 			return $this->_type;
 		}
 
-		if( isset( $this->Filetype->mimetype ) )
+		$Filetype = & $this->get_Filetype();
+		if( isset( $Filetype->mimetype ) )
 		{
-			$this->_type = $this->Filetype->name;
+			$this->_type = $Filetype->name;
 			return $this->_type;
 		}
 
@@ -886,13 +912,17 @@ class File extends DataObject
 		{ // Directory icon:
 			$icon = 'folder';
 		}
-		elseif( isset( $this->Filetype->icon ) && $this->Filetype->icon )
-		{ // Return icon for known type of the file
-				return $this->Filetype->get_icon();
-		}
 		else
-		{ // Icon for unknown file type:
-			$icon = 'file_unknown';
+		{
+			$Filetype = & $this->get_Filetype();
+			if( isset( $Filetype->icon ) && $Filetype->icon )
+			{ // Return icon for known type of the file
+					return $Filetype->get_icon();
+			}
+			else
+			{ // Icon for unknown file type:
+				$icon = 'file_unknown';
+			}
 		}
 		// Return Icon for a directory or unknown type file:
 		return get_icon( $icon, 'imgtag', array( 'alt'=>$this->get_ext(), 'title'=>$this->get_type() ) );
@@ -1055,6 +1085,7 @@ class File extends DataObject
 		$this->load_meta();
 
 		$this->_name = $newname;
+		$this->Filetype = NULL; // depends on name
 
 		$rel_dir = dirname( $this->_rdfp_rel_path ).'/';
 		if( $rel_dir == './' )
@@ -1126,6 +1157,7 @@ class File extends DataObject
 		$this->_rdfp_rel_path = $rdfp_rel_path;
 		$this->_adfp_full_path = $adfp_posix_path;
 		$this->_name = basename( $this->_adfp_full_path );
+		$this->Filetype = NULL; // depends on name
 		$this->_dir = dirname( $this->_adfp_full_path ).'/';
 		$this->_md5ID = md5( $this->_adfp_full_path );
 
@@ -1357,11 +1389,12 @@ class File extends DataObject
 		}
 		else
 		{ // File
-			if( !isset( $this->Filetype->viewtype ) )
+			$Filetype = & $this->get_Filetype();
+			if( !isset( $Filetype->viewtype ) )
 			{
 				return NULL;
 			}
-			switch( $this->Filetype->viewtype )
+			switch( $Filetype->viewtype )
 			{
 				case 'image':
 					return  $htsrv_url.'viewfile.php?root='.$root_ID.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=image';
@@ -1410,7 +1443,8 @@ class File extends DataObject
 			return $no_access_text;
 		}
 
-		if( isset($this->Filetype) && in_array( $this->Filetype->viewtype, array( 'external', 'download' ) ) )
+		$Filetype = & $this->get_Filetype();
+		if( $Filetype && in_array( $Filetype->viewtype, array( 'external', 'download' ) ) )
 		{ // Link to open in the curent window
 			return '<a href="'.$url.'" title="'.$title.'">'.$text.'</a>';
 		}
@@ -1679,11 +1713,12 @@ class File extends DataObject
 	 */
 	function get_af_thumb_path( $size_name, $thumb_mimetype = NULL, $create_evocache_if_needed = false )
 	{
+		$Filetype = & $this->get_Filetype();
 		if( empty($thumb_mimetype) )
 		{
-			$thumb_mimetype = $this->Filetype->mimetype;
+			$thumb_mimetype = $Filetype->mimetype;
 		}
-		elseif( $thumb_mimetype != $this->Filetype->mimetype )
+		elseif( $thumb_mimetype != $Filetype->mimetype )
 		{
 			debug_die( 'Not supported. For now, thumbnails have to have same mime type as their parent file.' );
 			// TODO: extract prefered extension of filetypes config
@@ -1784,7 +1819,9 @@ class File extends DataObject
 		// Set all params for requested size:
 		list( $thumb_type, $thumb_width, $thumb_height, $thumb_quality ) = $thumbnail_sizes[$size_name];
 
-		$mimetype = $this->Filetype->mimetype;
+		$Filetype = & $this->get_Filetype();
+		// TODO: dh> Filetype may be NULL here! see also r1.18 (IIRC)
+		$mimetype = $Filetype->mimetype;
 
 		// Try to output the cached thumbnail:
 		$err = $this->output_cached_thumb( $size_name, $mimetype );
@@ -1864,6 +1901,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.29  2009/02/19 04:48:13  blueyed
+ * Lazy-instantiate Filetype of a file, moved to get_Filetype. Bugfix: unset Filetype if name changes.
+ *
  * Revision 1.28  2009/02/10 23:28:59  blueyed
  * Add mtime-Expires caching to getfile.php.
  *  - getfile.php links have a mtime param to make the URLs unique

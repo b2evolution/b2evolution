@@ -92,10 +92,11 @@ else
 		debug_die( sprintf('File "%s" is not readable!', rel_path_to_base($File->get_full_path())) );
 	}
 
-	if( ! empty($File->Filetype) )
+	$Filetype = & $File->get_Filetype();
+	if( ! empty($Filetype) )
 	{
-		header('Content-type: '.$File->Filetype->mimetype );
-		if( $File->Filetype->viewtype == 'download' )
+		header('Content-type: '.$Filetype->mimetype );
+		if( $Filetype->viewtype == 'download' )
 		{
 			header('Content-disposition: attachment; filename="'.$File->get_name().'"' );
 		}
@@ -116,6 +117,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.25  2009/02/19 04:48:13  blueyed
+ * Lazy-instantiate Filetype of a file, moved to get_Filetype. Bugfix: unset Filetype if name changes.
+ *
  * Revision 1.24  2009/02/10 23:37:41  blueyed
  * Add status param to debug_die() and use it for "Forbidden" in getfile.php. This has quite some potential to get reverted, but then debug_die() should not get used there, maybe?!
  *
