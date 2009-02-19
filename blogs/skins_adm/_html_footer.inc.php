@@ -30,8 +30,7 @@ if( $mode != 'iframe' )
 	/**
 	 * Icon Legend
 	 */
-	global $IconLegend;
-	if( isset($IconLegend) )
+	if( $IconLegend = get_IconLegend() )
 	{ // Display icon legend, if activated by user
 		$IconLegend->display_legend();
 	}
@@ -75,6 +74,9 @@ if( $this->get_path(0) == 'files'
 <?php
 /*
  * $Log$
+ * Revision 1.8  2009/02/19 03:54:44  blueyed
+ * Optimize: move instantiation of $IconLegend (and $UserSettings query) out of main.inc.php, into get_IconLegend. TODO: test if it works with PHP4, or if it needs assignment by reference. Will do so on the test server.
+ *
  * Revision 1.7  2008/04/13 20:40:06  fplanque
  * enhanced handlign of files attached to items
  *

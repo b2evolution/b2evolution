@@ -33,7 +33,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Display icon legend
+ * Display icon legend.
+ *
+ * Use {@link get_IconLegend()} to get the instance.
  *
  * @package evocore
  */
@@ -45,14 +47,6 @@ class IconLegend
 	 */
 	var $icons = array();
 
-
-	/**
-	 * Constructor
-	 * @return IconLegend
-	 */
-	function IconLegend()
-	{
-	}
 
 	/**
 	 * Add an icon with his legend to the icons array
@@ -119,6 +113,9 @@ class IconLegend
 
 /*
  * $Log$
+ * Revision 1.3  2009/02/19 03:54:44  blueyed
+ * Optimize: move instantiation of $IconLegend (and $UserSettings query) out of main.inc.php, into get_IconLegend. TODO: test if it works with PHP4, or if it needs assignment by reference. Will do so on the test server.
+ *
  * Revision 1.2  2008/01/21 09:35:24  fplanque
  * (c) 2008
  *

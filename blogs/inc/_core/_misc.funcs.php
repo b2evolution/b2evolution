@@ -2269,7 +2269,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
  */
 function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legend = false )
 {
-	global $admin_subdir, $Debuglog, $IconLegend, $use_strict;
+	global $admin_subdir, $Debuglog, $use_strict;
 	global $conf_path;
 	global $rsc_path, $rsc_url;
 
@@ -2422,7 +2422,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			$r .= '/>';
 
 
-			if( $include_in_legend && isset( $IconLegend ) )
+			if( $include_in_legend && ( $IconLegend = get_IconLegend() ) )
 			{ // This icon should be included into the legend:
 				$IconLegend->add_icon( $iconKey );
 			}
@@ -3263,8 +3263,40 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 }
 
 
+/**
+ * Get the IconLegend instance.
+ *
+ * @return IconLegend or false, if the user has not set "display_icon_legend"
+ */
+function get_IconLegend()
+{
+	static $IconLegend;
+
+	if( ! isset($IconLegend) )
+	{
+		global $UserSettings;
+		if( $UserSettings->get('display_icon_legend') )
+		{
+			/**
+			 * Icon Legend
+			 */
+			load_funcs( '_core/ui/_iconlegend.class.php' );
+			$IconLegend = new IconLegend();
+		}
+		else
+		{
+			$IconLegend = false;
+		}
+	}
+	return $IconLegend;
+}
+
+
 /*
  * $Log$
+ * Revision 1.70  2009/02/19 03:54:44  blueyed
+ * Optimize: move instantiation of $IconLegend (and $UserSettings query) out of main.inc.php, into get_IconLegend. TODO: test if it works with PHP4, or if it needs assignment by reference. Will do so on the test server.
+ *
  * Revision 1.69  2009/02/10 23:37:41  blueyed
  * Add status param to debug_die() and use it for "Forbidden" in getfile.php. This has quite some potential to get reverted, but then debug_die() should not get used there, maybe?!
  *

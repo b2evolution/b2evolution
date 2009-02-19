@@ -594,17 +594,6 @@ else
 /* Login procedure }}} */
 
 
-// Icon legend:
-if( $UserSettings->get('display_icon_legend') )
-{
-	/**
-	 * Icon Legend
-	 */
-	load_funcs( '_core/ui/_iconlegend.class.php' );
-	$IconLegend = & new IconLegend();
-}
-
-
 /**
  * User locale selection:
  */
@@ -656,6 +645,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.96  2009/02/19 03:54:44  blueyed
+ * Optimize: move instantiation of $IconLegend (and $UserSettings query) out of main.inc.php, into get_IconLegend. TODO: test if it works with PHP4, or if it needs assignment by reference. Will do so on the test server.
+ *
  * Revision 1.95  2009/02/11 20:50:36  blueyed
  * Add more Debuglog to locale_from_get handling
  *
