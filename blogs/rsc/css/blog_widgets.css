@@ -24,14 +24,14 @@ border-top:1px solid #ccc;
 
 .widget_state
 {
-	border-right: 1px solid #ccc;
-	margin-right: 10px;
-	padding-right: 10px;
-	float: left;
+border-right: 1px solid #ccc;
+margin-right: 10px;
+padding-right: 10px;
+float: left;
 
-	/* Tblue> Can this be done better? */
-	padding-top: 3.5px;
-	height: 13px;
+/* Tblue> Can this be done better? */
+padding-top: 3.5px;
+height: 13px;
 }
 
 .widget_actions{
@@ -66,11 +66,18 @@ background-color:#dde;
 color:#444;
 }
 
+/*
 #current_widgets .droppable-hover,
 #current_widgets .droppable-hover .fieldset_title_right,
-#current_widgets .droppable-hover .fieldset_title_bg{
+#current_widgets .droppable-hover .fieldset_title_bg
+{
 color:#444;
 background:#ee8;
+}
+*/
+.widget_container li.droppable-hover {
+	border-top: 2px solid #f00;
+	padding-top: 1px;
 }
 
 .add_widget{
