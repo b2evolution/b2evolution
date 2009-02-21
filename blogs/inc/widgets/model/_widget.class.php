@@ -492,7 +492,7 @@ class ComponentWidget extends DataObject
 					'orderby' => $this->disp_params[ 'order_by' ],
 					'order' => $this->disp_params[ 'order_dir' ],
 					'unit' => 'posts',						// We want to advertise all items (not just a page or a day)
-					'types' => '1,1500,1520,1530,1570,2000', //walter > include everything that is a post. This is the right list?
+					'types' => '1,1500,1520,1530,1570,2000', //walter > include everything that is a post. This is the right list? fp> NO, this should not override the default setting from ItemList
 				) );
 		}
 		// Run the query:
@@ -573,6 +573,7 @@ class ComponentWidget extends DataObject
 
 		$limit = ( $this->disp_params[ 'linkblog_limit' ] ? $this->disp_params[ 'linkblog_limit' ] : 1000 ); // Note: 1000 will already kill the display
 
+// fp> ItemList2 instead of ItemListLight adds processing overhead. Not wanted.
 		$LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $limit );
 
 		$LinkblogList->set_filters( array(
@@ -615,6 +616,7 @@ class ComponentWidget extends DataObject
 						'link_type' => $link_type,
 					) );
 
+// processing overhead issue
 				if( $this->disp_params['linkblog_excerpts'] )
 				{ // we want to show some or all of the post content
 					$content = $Item->get_content_teaser( 1, false, 'htmlbody' );
@@ -653,6 +655,8 @@ class ComponentWidget extends DataObject
 
 	/**
 	 * List of items by category
+	 *
+	 * FP> WHAT IT THIS? WHAT's THE DIFFERENCE WITH THE OTHER ONE?
 	 *
 	 * @param array MUST contain at least the basic display params
 	 */
@@ -748,7 +752,6 @@ class ComponentWidget extends DataObject
 
 		echo $this->disp_params['block_end'];
 	}
-
 
 
 	/**
@@ -861,6 +864,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.43  2009/02/21 22:22:23  fplanque
+ * eeeeeeek!
+ *
  * Revision 1.42  2009/02/07 11:09:00  yabs
  * extra settings for linkblog
  *
