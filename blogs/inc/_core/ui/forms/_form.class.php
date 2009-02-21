@@ -759,7 +759,7 @@ class Form extends Widget
 		/*
 		 Afwas > In the existing locales only d m y and Y are used. Currently the jQuery Datepicker
 		 can't handle other dateformats. I will see to some basic check or enable all.
-		 @TODO ^^
+		 @TODO ^^ fp> It might make sense to have 2 date formats for locales: 1 for display and 1 for inputs. Input formats could be forced to used numeric data only.
 		 */
 		// Give it a class, so it can be selected for CSS in IE6
 		if( empty($field_params['class']) ) $field_params['class'] = 'form_date_input';
@@ -2805,6 +2805,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.34  2009/02/21 23:10:43  fplanque
+ * Minor
+ *
  * Revision 1.33  2009/02/07 10:11:07  yabs
  * Quick and dirty required fields, will tidy up after more testing
  *

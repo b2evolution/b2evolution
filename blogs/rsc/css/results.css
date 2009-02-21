@@ -157,13 +157,15 @@ table.grouped th a.single_sort_link:hover {
 
 /* / Results navigation */
 
-/* Results drag n drop */
+/* 
+ * Results drag n drop 
+ */
 ul.grouped li .draggable_object{
 cursor:move;
 }
 
 li.ui-draggable-dragging{
-width:80%;
+width: 80%;	/* fp> TODO: JS copy actual pixel width of actual page objetcs */
 }
 
 ul.grouped .actions{

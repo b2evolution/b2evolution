@@ -26,7 +26,7 @@
  * @package htsrv
  *
  * @todo dh> Add support for ETag / If-Modified-Since. Maybe send "Expires", too? (to "force" caching)
- *       fp> for more efficient caching, this should probably redirect to the static file right after creating it (when $public_access_to_media=true OF COURSE)
+ *       fp> for more efficient caching (like creating a thumbnail on view 1 then displaying the thumbnail again on view 2), this should probably redirect to the static file right after creating it (when $public_access_to_media=true OF COURSE)
  *       dh> this would add another redirect/HTTP request and no cache handling, assuming
  *           that the server is not configured for smart caching.
  *           Additionally, it does not help for non-public access, which is the meat of this file.
@@ -118,6 +118,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.27  2009/02/21 23:10:43  fplanque
+ * Minor
+ *
  * Revision 1.26  2009/02/19 04:53:21  blueyed
  * getfile.php: escape filename in Content-disposition header.
  *

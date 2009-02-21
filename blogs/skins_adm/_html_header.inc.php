@@ -58,8 +58,8 @@ header_content_type( 'text/html' );
  	require_js( 'functions.js');
 	require_js( 'form_extensions.js');
 	// Afwas > are these two used or part of the javaScript popup calendar?
-	require_js( 'anchorposition.js');
-	require_js( 'popupwindow.js' );
+	// require_js( 'anchorposition.js');
+	//	require_js( 'popupwindow.js' );
 	require_js( 'rollovers.js' );
 	require_js( 'extracats.js' );
 	require_js( 'dynamic_select.js' );
@@ -219,6 +219,8 @@ div.skin_wrapper_loggedin {
 </style>
 <![endif]-->' );
 	}
+
+	// fp> TODO: ideally all this should only be included when the datepicker will be needed
 	require_css( 'ui.datepicker.css' );
 	
 	add_js_headline( 'jQuery(function(){
@@ -272,6 +274,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.14  2009/02/21 23:10:43  fplanque
+ * Minor
+ *
  * Revision 1.13  2009/02/01 00:11:02  blueyed
  * Use jQuery document.ready for focus_on_first_input
  *

@@ -72,13 +72,16 @@ span.checkbox_surround_init {
 	padding : 1px;
 }
 
+/* fp> The following breaks the login screen and probably a lot more space constrained forms.
 .label{
 padding-right:3ex;
 }
+*/
 
+/* The following is a dirty fix. */
 .field_required .label{
 	background-image:  url("../icons/mandatory_star_small.gif");
-	background-position: right center;
+	background-position: right top;
 	background-repeat: no-repeat;
 }
 

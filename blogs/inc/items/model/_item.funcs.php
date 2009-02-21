@@ -65,6 +65,7 @@ function init_MainList( $items_nb_limit )
 		else
 		{
 		// else: we are either in single or in posts mode
+		// FP> there should probably be nothing here
 			$MainList->set_default_filters( array(
 					'types' => '1,1500,1520,1530,1570,2000',
 					// 'types' => '1000,1500,1520,1530,1570',		// pages and intros (intros should normally never be called)
@@ -830,6 +831,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.33  2009/02/21 23:10:43  fplanque
+ * Minor
+ *
  * Revision 1.32  2009/02/02 00:04:28  tblue246
  * Fixing doc
  *

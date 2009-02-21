@@ -763,6 +763,7 @@ class Item extends ItemLight
 	 *     here and if it's empty and $MainList is set, prefill it with $MainList->page_ID_list.
 	 *     I do not want to prefill any cache in ItemList2::Query already, but more lazily.
 	 *     Makes sense?
+	 * fp> Makes sense. Call it ItemPrerenderingCache though as it only applies to prerenderings for Items, and not to any form of content.
 	 *
 	 * @todo dh> In general, $content_prerendered gets only queried once per item, so it seems like a memory waste to cache the query result..!
 	 * fp> I don't know if this is supposed to be related but that doesn't change anything to the previous todo.
@@ -1921,7 +1922,7 @@ class Item extends ItemLight
 		 */
 		global $current_User;
 
-		// TODO: dh> $params does not get used at all below?! (and it has some strange '' param)
+		/* TODO: finish this...
 		$params = array_merge( array(
 									'type' => 'feedbacks',
 									'block_before' => '',
@@ -1933,9 +1934,9 @@ class Item extends ItemLight
 									'use_popup' => false,
 									'url' => '#',
 									'type' => 'feedbacks',
-									'' => '',
 								), $params );
-
+		*/
+		
 		if( isset($current_User) && $current_User->check_perm( 'blog_comments', 'any', false,	$this->blog_ID ) )
 		{	// We jave permission to edit comments:
 			if( $edit_comments_link == '#' )
@@ -3619,6 +3620,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.71  2009/02/21 23:10:43  fplanque
+ * Minor
+ *
  * Revision 1.70  2009/02/19 17:51:55  blueyed
  * TODO about plan of PrerenderedContentCache, please comment
  *
