@@ -116,8 +116,8 @@ function cat_line( $Chapter, $level )
 		{ // If moving cats between blogs is allowed:
 			$r .= action_icon( T_('Move to a different blog...'), 'file_move', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=move' ), T_('Move') );
 		}
-
-		$r .= action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete' ) );
+		$r .= action_icon( T_('New...'), 'new', regenerate_url( 'action,cat_ID,cat_parent_ID', 'cat_parent_ID='.$Chapter->ID.'&amp;action=new' ) )
+					.action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete' ) );
 	}
 	$r .= '</td>';
 	$r .=	'</tr>';
@@ -207,7 +207,9 @@ if( $permission_to_edit )
 }
 
 $Table->display_init( NULL, $result_fadeout );
+
 // add an id for jquery to hook into
+// TODO: fp> Awfully dirty. This should be handled by the Table object
 $Table->params['head_title'] = str_replace( '<table', '<table id="chapter_list"', $Table->params['head_title'] );
 
 $Table->display_list_start();
@@ -239,6 +241,9 @@ echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categori
 
 /*
  * $Log$
+ * Revision 1.13  2009/02/21 22:46:24  fplanque
+ * ok I tried creating 10 categories in a row and I went nuts without the extra "add here" icon.
+ *
  * Revision 1.12  2009/02/18 17:03:40  yabs
  * minor
  *
