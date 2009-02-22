@@ -240,10 +240,7 @@ div.skin_wrapper_loggedin {
 			var generateTitle = function()
 			{
 				currentPostTitle = jQuery(\'#post_title\').val()
-				if ( currentPostTitle != undefined )
-				{	// Tblue> Dirty workaround! This script should be only used when editing/creating a post...
-					document.title = document.title.replace(/(' . $base_title . ').*$/, \'$1 \'+currentPostTitle)
-				}
+				document.title = document.title.replace(/(' . $base_title . ').*$/, \'$1 \'+currentPostTitle)
 			}
 			generateTitle()
 			jQuery(\'#post_title\').keyup(generateTitle)
@@ -286,6 +283,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.20  2009/02/22 19:31:11  tblue246
+ * Bugfix (see rev 1.18) is not needed anymore.
+ *
  * Revision 1.19  2009/02/22 18:46:56  afwas
  * - Reverted 1.14 && 1.15 because that didn't work for edited posts.
  * - Cut one of the functions for datepicker (handles change of radiobutton in other jQuery because the time can also change)
