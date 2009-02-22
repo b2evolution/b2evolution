@@ -175,8 +175,9 @@ margin-left:2ex;
 }
 
 .unsaved_change,
-.unsaved_change li{
-background-color:#f44;
+.unsaved_change li,
+.widget_changed{
+background-color:#faa;
 }
 
 .saving_change{
