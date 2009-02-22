@@ -538,25 +538,28 @@ class ComponentWidget extends DataObject
 	{
 		global $BlogCache, $Blog;
 		global $timestamp_min, $timestamp_max;
+		$link_Blog = null;
 
-		$linkblog = $this->disp_params[ 'linkblog_ID' ];
-
-		if( ! $linkblog )
-		{	// No linkblog blog requested for this blog
-			return;
-		}
-
-		// Load the linkblog blog:
-		$link_Blog = & $BlogCache->get_by_ID( $linkblog, false );
-
-		if( empty($link_Blog) )
+		if ( array_key_exists( 'linkblog_ID' , $this->disp_params ) )
 		{
-			echo $this->disp_params['block_start'];
-			echo T_('The requested Blog doesn\'t exist any more!');
-			echo $this->disp_params['block_end'];
-			return;
-		}
+			$linkblog = $this->disp_params[ 'linkblog_ID' ];
 
+			if( ! $linkblog )
+			{	// No linkblog blog requested for this blog
+				return;
+			}
+
+			// Load the linkblog blog:
+			$link_Blog = & $BlogCache->get_by_ID( $linkblog, false );
+
+			if( empty($link_Blog) )
+			{
+				echo $this->disp_params['block_start'];
+				echo T_('The requested Blog doesn\'t exist any more!');
+				echo $this->disp_params['block_end'];
+				return;
+			}
+		}
 
 		# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
 		# Example: $linkblog_cat = '4,6,7';
@@ -569,20 +572,40 @@ class ComponentWidget extends DataObject
 		// Compile cat array stuff:
 		$linkblog_cat_array = array();
 		$linkblog_cat_modifier = '';
-		compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $linkblog );
 
 		$limit = ( $this->disp_params[ 'linkblog_limit' ] ? $this->disp_params[ 'linkblog_limit' ] : 1000 ); // Note: 1000 will already kill the display
 
-// fp> ItemList2 instead of ItemListLight adds processing overhead. Not wanted.
-		$LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $limit );
+		if (!empty ( $link_Blog) )
+		{
+			compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $linkblog );
+	// fp> ItemList2 instead of ItemListLight adds processing overhead. Not wanted.
+			$LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $limit );
 
-		$LinkblogList->set_filters( array(
+			$LinkblogList->set_filters( array(
+					'cat_array' => $linkblog_cat_array,
+					'cat_modifier' => $linkblog_cat_modifier,
+					'orderby' => 'main_cat_ID title',
+					'order' => 'ASC',
+					'unit' => 'posts',
+				), false ); // we don't want to memorise these params
+		}
+		else
+		{
+			compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $Blog->ID);
+
+			$LinkblogList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max, $limit );
+			// fp> ItemList2 instead of ItemListLight adds processing overhead. Not wanted.
+			// waltercruz> this happends due to Item->get_content_teaser, we need to talk to yabba
+			$LinkblogList->set_filters( array(
 				'cat_array' => $linkblog_cat_array,
 				'cat_modifier' => $linkblog_cat_modifier,
 				'orderby' => 'main_cat_ID title',
 				'order' => 'ASC',
 				'unit' => 'posts',
+				'types' => '2',
 			), false ); // we don't want to memorise these params
+		}
+
 
 		// Run the query:
 		$LinkblogList->query();
@@ -868,6 +891,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.45  2009/02/22 14:42:03  waltercruz
+ * A basic implementation that merges disp_cat_item_list2(links) and disp_cat_item_list(linkblog). Will delete disp_cat_item_list2 as soon fplanque says that the merge it's ok
+ *
  * Revision 1.44  2009/02/22 14:15:48  waltercruz
  * updating docs
  *

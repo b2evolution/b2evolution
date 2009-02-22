@@ -82,11 +82,23 @@ class links_Widget extends ComponentWidget
 					'defaultvalue' => T_('Links'),
 					'note' => T_( 'This is the title to display in your skin.' ),
 				),
-				'limit' => array(
+				'linkblog_limit' => array(
 					'label' => T_( 'Display' ),
 					'size' => 4,
 					'defaultvalue' => 100,
 					'note' => T_( 'This is the maximum number of links to display.' ),
+				),
+				'linkblog_excerpts' => array(
+					'label' => T_( 'Excerpts' ),
+					'type' => 'checkbox',
+					'defaultvalue' => false,
+					'note' => T_( 'Show contents for entries' ),
+				),
+				'linkblog_cutoff' => array(
+					'label' => T_( 'Max Words' ),
+					'type' => 'integer',
+					'defaultvalue' => 40,
+					'note' => T_( 'Max number of words to show in exerpts' ),
 				),
 			), parent::get_param_definitions( $params )	);
 
@@ -104,7 +116,7 @@ class links_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		// List of pages:
-		$this->disp_cat_item_list2();
+		$this->disp_cat_item_list();
 
 		return true;
 	}
@@ -113,6 +125,9 @@ class links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.3  2009/02/22 14:42:03  waltercruz
+ * A basic implementation that merges disp_cat_item_list2(links) and disp_cat_item_list(linkblog). Will delete disp_cat_item_list2 as soon fplanque says that the merge it's ok
+ *
  * Revision 1.2  2009/02/22 14:15:48  waltercruz
  * updating docs
  *
