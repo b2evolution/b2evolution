@@ -221,6 +221,7 @@ div.skin_wrapper_loggedin {
 	}
 
 	// fp> TODO: ideally all this should only be included when the datepicker will be needed
+	// dh> The Datepicker could dynamically load this CSS in document.ready?!
 	require_css( 'ui.datepicker.css' );
 	
 	add_js_headline( 'jQuery(function(){
@@ -271,6 +272,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.17  2009/02/22 16:35:15  blueyed
+ * TODO comment
+ *
  * Revision 1.16  2009/02/22 07:43:08  afwas
  * Minor: simplification of javaScript function generateTitle()
  *
