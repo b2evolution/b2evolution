@@ -222,7 +222,8 @@ div.skin_wrapper_loggedin {
 
 	// fp> TODO: ideally all this should only be included when the datepicker will be needed
 	// dh> The Datepicker could dynamically load this CSS in document.ready?!
-	require_css( 'ui.datepicker.css' );
+	// Afwas> Done. Keeping this conversation for reference. The performance may be an issue.
+	// require_css( 'ui.datepicker.css' );
 	
 	add_js_headline( 'jQuery(function(){
 			jQuery(\'#item_issue_date, #item_issue_time\').change(function(){
@@ -231,37 +232,47 @@ div.skin_wrapper_loggedin {
 		})' );
 	
 	// Add event to the item title field to update document title and init it (important when switching tabs/blogs):
-	// dynamic document.title handling:
-	add_js_headline( 'jQuery(function(){
-			var docTitle = document.title
+	global $js_doc_title_prefix;
+	if( isset($js_doc_title_prefix) )
+	{ // dynamic document.title handling:
+		$base_title = preg_quote( trim($js_doc_title_prefix) /* e.g. FF2 trims document.title */ );
+		add_js_headline( 'jQuery(function(){
 			var generateTitle = function()
 			{
 				currentPostTitle = jQuery(\'#post_title\').val()
 				if ( currentPostTitle != undefined )
 				{	// Tblue> Dirty workaround! This script should be only used when editing/creating a post...
-					document.title = docTitle + " " + currentPostTitle
+					document.title = document.title.replace(/(' . $base_title . ').*$/, \'$1 \'+currentPostTitle)
 				}
 			}
 			generateTitle()
 			jQuery(\'#post_title\').keyup(generateTitle)
 		})' );
+	}
+
 
 	$datefmt = locale_datefmt();
 	$datefmt = str_replace( array( 'd', 'm', 'Y' ), array( 'dd', 'mm', 'yy' ), $datefmt );
 	add_js_headline( 'jQuery(function(){
 			var monthNames = [\'' . T_( 'January' ) . '\',\'' . T_( 'February' ) . '\', \'' . T_( 'March' ) . '\', \'' . T_( 'April' ) . '\', \'' . T_( 'May' ) . '\', \'' . T_( 'June' ) . '\', \'' . T_( 'July' ) . '\', \'' . T_( 'August' ) . '\', \'' . T_( 'September' ) . '\', \'' . T_( 'October' ) . '\', \'' . T_( 'November' ) . '\', \'' . T_( 'December' ) . '\']
 			var dayNamesMin = [\'' . T_( 'Sun' ) . '\', \'' . T_( 'Mon' ) . '\', \'' . T_( 'Tue' ) . '\', \'' . T_( 'Wed' ) . '\', \'' . T_( 'Thu' ) . '\', \'' . T_( 'Fri' ) . '\', \'' . T_( 'Sat' ) . '\']
-			jQuery("#item_issue_date").datepicker({ 
-					onSelect: function(){jQuery(\'#set_issue_date_to\').attr("checked", "checked");},
-					dateFormat: \'' . $datefmt . '\', 
-					monthNames: monthNames,
-					dayNamesMin: dayNamesMin
-				})
-			jQuery("#item_deadline").datepicker({ 
-					dateFormat: \'' . $datefmt . '\', 
-					monthNames: monthNames,
-					dayNamesMin: dayNamesMin
-				})
+			var docHead = document.getElementsByTagName(\'head\')[0];
+			for (i=0;i<dayNamesMin.length;i++)
+				dayNamesMin[i] = dayNamesMin[i].substr(0, 2)
+
+			jQuery("#item_issue_date, #item_deadline").datepicker({
+				beforeShow: function(){ // Dynamically add stylesheet just before display
+					jQuery(document.createElement(\'link\'))
+						.attr({type: \'text/css\', href: \'rsc/css/ui.datepicker.css\', rel: \'stylesheet\', media: \'screen\'})
+						.appendTo(docHead)
+				},
+				dateFormat: \'' . $datefmt . '\',
+				monthNames: monthNames,
+				dayNamesMin: dayNamesMin,
+				onClose: function(){ // Dynamically removing stylesheet, prevents duplicates
+					jQuery(docHead).find("link[href=\'rsc/css/ui.datepicker.css\']").remove();
+				}
+			})
 		})' );
 
 	// CALL PLUGINS NOW:
@@ -275,6 +286,11 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.19  2009/02/22 18:46:56  afwas
+ * - Reverted 1.14 && 1.15 because that didn't work for edited posts.
+ * - Cut one of the functions for datepicker (handles change of radiobutton in other jQuery because the time can also change)
+ * - Added dynamically loaded (and removed!) stylesheet for datepicker.
+ *
  * Revision 1.18  2009/02/22 18:09:40  tblue246
  * Bugfix
  *
