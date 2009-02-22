@@ -94,6 +94,7 @@ class linkblog_Widget extends ComponentWidget
 					'defaultvalue' => 100,
 					'note' => T_( 'This is the maximum number of links to display.' ),
 				),
+				/* fp> put this back once you have a condition test in the display in order not to add extra processing
 				'linkblog_excerpts' => array(
 					'label' => T_( 'Excerpts' ),
 					'type' => 'checkbox',
@@ -106,6 +107,7 @@ class linkblog_Widget extends ComponentWidget
 					'defaultvalue' => 40,
 					'note' => T_( 'Max number of words to show in exerpts' ),
 				),
+				*/
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -131,6 +133,9 @@ class linkblog_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.11  2009/02/22 23:40:09  fplanque
+ * dirty links widget :/
+ *
  * Revision 1.10  2009/02/07 11:08:39  yabs
  * adding settings
  *

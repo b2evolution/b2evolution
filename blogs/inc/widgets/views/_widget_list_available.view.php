@@ -46,7 +46,7 @@ $core_componentwidget_defs = array(
 			'colls_list_public',
 			'colls_list_owner',
 			'linkblog',
-			'links',
+			'links', // fp> TODO: call that linkroll
 	);
 $i = 0;
 foreach( $core_componentwidget_defs as $code )
@@ -112,6 +112,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.13  2009/02/22 23:40:09  fplanque
+ * dirty links widget :/
+ *
  * Revision 1.12  2009/01/24 00:29:27  waltercruz
  * Implementing links in the blog itself, not in a linkblog, first attempt
  *

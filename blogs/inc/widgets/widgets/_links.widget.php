@@ -51,7 +51,7 @@ class links_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		$title = T_('Links 2');
+		$title = T_('Links 2'); // fp >> Call this Linkroll -- EVRYWHERE
 		return $title;
 	}
 
@@ -125,6 +125,9 @@ class links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.4  2009/02/22 23:40:09  fplanque
+ * dirty links widget :/
+ *
  * Revision 1.3  2009/02/22 14:42:03  waltercruz
  * A basic implementation that merges disp_cat_item_list2(links) and disp_cat_item_list(linkblog). Will delete disp_cat_item_list2 as soon fplanque says that the merge it's ok
  *

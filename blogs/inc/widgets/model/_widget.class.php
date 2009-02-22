@@ -492,7 +492,6 @@ class ComponentWidget extends DataObject
 					'orderby' => $this->disp_params[ 'order_by' ],
 					'order' => $this->disp_params[ 'order_dir' ],
 					'unit' => 'posts',						// We want to advertise all items (not just a page or a day)
-					'types' => '1,1500,1520,1530,1570,2000', //walter > include everything that is a post. This is the right list? fp> NO, this should not override the default setting from ItemList
 				) );
 		}
 		// Run the query:
@@ -575,11 +574,12 @@ class ComponentWidget extends DataObject
 
 		$limit = ( $this->disp_params[ 'linkblog_limit' ] ? $this->disp_params[ 'linkblog_limit' ] : 1000 ); // Note: 1000 will already kill the display
 
-		if (!empty ( $link_Blog) )
-		{
-			compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $linkblog );
+	//	if (!empty ( $link_Blog) )
+	//	{ // fp> document when this case happens vs not.
+	//		compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $linkblog );
 	// fp> ItemList2 instead of ItemListLight adds processing overhead. Not wanted.
-			$LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $limit );
+	//	$LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $limit );
+		$LinkblogList = & new ItemListLight( $link_Blog, $timestamp_min, $timestamp_max, $limit );
 
 			$LinkblogList->set_filters( array(
 					'cat_array' => $linkblog_cat_array,
@@ -588,11 +588,11 @@ class ComponentWidget extends DataObject
 					'order' => 'ASC',
 					'unit' => 'posts',
 				), false ); // we don't want to memorise these params
-		}
-		else
-		{
-			compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $Blog->ID);
-
+//		}
+//		else
+//		{
+//			compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $Blog->ID);
+/*
 			$LinkblogList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max, $limit );
 			// fp> ItemList2 instead of ItemListLight adds processing overhead. Not wanted.
 			// waltercruz> this happends due to Item->get_content_teaser, we need to talk to yabba
@@ -605,7 +605,7 @@ class ComponentWidget extends DataObject
 				'types' => '2',
 			), false ); // we don't want to memorise these params
 		}
-
+*/
 
 		// Run the query:
 		$LinkblogList->query();
@@ -640,6 +640,7 @@ class ComponentWidget extends DataObject
 					) );
 
 // processing overhead issue
+/*
 				if( $this->disp_params['linkblog_excerpts'] )
 				{ // we want to show some or all of the post content
 					$content = $Item->get_content_teaser( 1, false, 'htmlbody' );
@@ -659,7 +660,7 @@ class ComponentWidget extends DataObject
 							'link_text' => T_('more').' &raquo;',
 						) );
 				}
-
+*/
 
 				echo $this->disp_params['item_end'];
 			}
@@ -684,6 +685,8 @@ class ComponentWidget extends DataObject
 	 * but using instead the posts with link type = 2. I use that in the links widget,
 	 * that as you can imagine, is pretty similar to the linkblog widget too. I can
 	 * try to think in a way to merge both functions.
+	 * fp> "pretty similar" or "exactly the same except for the 'types' filter" ????
+	 *     Of course this has to be factorized.
 	 *
 	 * @param array MUST contain at least the basic display params
 	 */
@@ -891,6 +894,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.46  2009/02/22 23:40:09  fplanque
+ * dirty links widget :/
+ *
  * Revision 1.45  2009/02/22 14:42:03  waltercruz
  * A basic implementation that merges disp_cat_item_list2(links) and disp_cat_item_list(linkblog). Will delete disp_cat_item_list2 as soon fplanque says that the merge it's ok
  *
