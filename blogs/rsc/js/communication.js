@@ -113,8 +113,8 @@ var _b2evoCommunications = function()
 	var me; // reference to self
 
 	var _delay_default = 2500; // default buffer delay in milli seconds
-
-	var _decrement = 250; // delay buffer decrement
+	var _interval_default = 250; // default delay buffer ticker interval
+	var _dispatcher; // admin url
 
 	return {
 		/**
@@ -122,16 +122,22 @@ var _b2evoCommunications = function()
 		 * Adds any translation strings found in html
 		 *
 		 * @param delay (int) buffered server call delay in milliseconds
+		 * @param interval (int) buffered server call ticker interval in milliseconds
 		 */
 		Init:function()
 		{
 			// set available params to defaults
 			var params = jQuery.fn.extend({
 				// no comma after final entry or IE barfs
-				delay:_delay_default
+				delay:_delay_default,
+				interval:_interval_default,
+				dispatcher:_dispatcher
 				}, ( arguments.length ? arguments[0] : '' ) );
 
-		_delay_default = params.delay; // change default delay if required
+			_delay_default = params.delay; // change default delay if required
+			_interval_default = params.interval; // change interval if required
+			_dispatcher = params.dispatcher; // store dispatcher
+
 			me = this; // set reference to self
 
 			b2evoHelper.info( 'Communications object ready' );
@@ -143,7 +149,8 @@ var _b2evoCommunications = function()
 		 *
 		 * @param ticker_callback (function) Called each time ticker occurs
 		 * @param send_callback (function) Called when send event occurs
-		 * @param buffer_delay (int) initial delay for buffer : defaults to _delay_default
+		 * @param delay (int) initial delay for buffer : defaults to _delay_default
+		 * @param interval (int) initial ticker interval : defaults to _interval_default
 		 * @param buffer_name (string) name for the buffer
 		 */
 		BufferedServerCall:function()
@@ -153,11 +160,12 @@ var _b2evoCommunications = function()
 					// no comma after final entry or IE barfs
 					ticker_callback: function(){ return true; }, // callback for ticker checks
 					send_callback: function(){}, // callback for sending
-					buffer_delay: _delay_default, // time to buffer call for
+					delay: _delay_default, // time to buffer call for
+					interval: _interval_default, // interval between polls
 					buffer_name:'' // name for the buffer
 					}, ( arguments.length ? arguments[0] : '' ) );
 
-			if( ticker_status = params.ticker_callback( params.buffer_delay ) )
+			if( ticker_status = params.ticker_callback( params.delay ) )
 			{
 				if( ticker_status !== true )
 				{
@@ -170,15 +178,22 @@ var _b2evoCommunications = function()
 						return;
 
 					case 'pause' : // pause the server call
-						b2evoHelper.DisplayMessage( '<div class="log_message">'+b2evoHelper.T_( 'Update Paused' )+' : '+b2evoHelper.str_repeat( '.', params.buffer_delay / _decrement )+'</div>' );
+						b2evoHelper.DisplayMessage( '<div class="log_message">'+b2evoHelper.T_( 'Update Paused' )+' : '+b2evoHelper.str_repeat( '.', params.delay / params.interval )+'</div>' );
 						me.BufferedServerLoop( params );
 						return;
 
+					case 'ignore' : // don't change current message, ask again on next ticker
+						me.BufferedServerLoop(params);
+						return;
+
+					case 'immediate' : // send call without delay
+						break;
+
 					default :
-						params.buffer_delay -= _decrement;
-						if( params.buffer_delay > 0 )
+						params.delay -= params.interval;
+						if( params.delay > 0 )
 						{ // still buffered
-							b2evoHelper.DisplayMessage( '<div class="log_message">'+b2evoHelper.T_( 'Changes pending' )+' : '+b2evoHelper.str_repeat( '.', params.buffer_delay / _decrement )+'</div>' );
+							b2evoHelper.DisplayMessage( '<div class="log_message">'+b2evoHelper.T_( 'Changes pending' )+' : '+b2evoHelper.str_repeat( '.', params.delay / params.interval )+'</div>' );
 							me.BufferedServerLoop(params);
 							return;
 						}
@@ -204,7 +219,7 @@ var _b2evoCommunications = function()
 			}
 			current_buffers[ params.buffer_name ] = params; // store params
 			jQuery( me ).data( 'buffers', current_buffers );
-			window.setTimeout( 'b2evoCommunications.BufferedServerCallback( "'+params.buffer_name+'" )', _decrement );
+			window.setTimeout( 'b2evoCommunications.BufferedServerCallback( "'+params.buffer_name+'" )', params.interval );
 		},
 
 
@@ -217,7 +232,61 @@ var _b2evoCommunications = function()
 		{
 			var current_buffers = jQuery( me ).data( 'buffers' );
 			me.BufferedServerCall( current_buffers[ buffer_key ] );
-		}
+		},
+
+
+		/**
+		 * Send a request to admin
+		 */
+		SendAdminRequest:function()
+		{
+			// set available params to defaults
+			var params = jQuery.fn.extend({
+					// no comma after final entry or IE barfs
+					ctrl: '', // destination admin control
+					action: '', // action to be taken
+					data: '', // associated data for the call
+					key: '', // communications key for the request
+					error:function(){ return false; }, // trigger for onerror
+					ok:function(){ return false; } // trigger for 200
+					}, ( arguments.length ? arguments[0] : '' ) );
+			var data = "ctrl="+params.ctrl+"&key="+params.key+"&action="+params.action+"&"+params.data;
+			me.SendServerRequest({
+				url:_dispatcher,
+				data:data,
+				error:params.error,
+				ok:params.ok
+			});
+		}, // SendAdminRequest
+
+
+		/**
+		 * Send a request to the server
+		 */
+		SendServerRequest:function(){
+			// set available params to defaults
+			var params = jQuery.fn.extend({
+					// no comma after final entry or IE barfs
+					url: '', // destination url
+					data: '', // associated data for the call
+					error:function(){ return false; }, // trigger for onerror
+					ok:function(){ return false; } // trigger for 200
+					}, ( arguments.length ? arguments[0] : '' ) );
+			if( params.url )
+			{ // we have a url
+				params.url += ( params.url.indexOf( '?' ) === true ? '&' : '?' )+'mode=js';
+				if( params.data )
+				{ // we have some data
+					params.url += '&'+params.data;
+				}
+				var script = jQuery( '<script type="text/javascript"></script>' );
+				script.attr( 'src', params.url );
+				script.load( params.ok() );
+				script.error( params.error() );
+				script.appendTo( 'body' );
+				b2evoHelper.log( 'Sending request : '+params.url );
+			}
+		} // SendServerRequest
 	}
 } // _b2evoCommunications
 
@@ -227,6 +296,9 @@ var b2evoCommunications = new _b2evoCommunications();
 
 /*
  * $Log$
+ * Revision 1.5  2009/02/22 06:15:28  yabs
+ * adding functionality
+ *
  * Revision 1.4  2009/02/18 16:23:34  yabs
  * Correcting typo
  *

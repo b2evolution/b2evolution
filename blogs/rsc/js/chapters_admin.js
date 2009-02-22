@@ -126,22 +126,25 @@ var _b2evoChapters = function(){
 				tolerance : "pointer", // droppable active when cursor over
 				delay: 100,
 				drop: function(ev, ui) {	// function called when object dropped
-					jQuery( ui.draggable ).insertBefore( this ); // add the dragged category(ies) after this category
-					jQuery( ui.draggable ).animate({
-							backgroundColor: "#ffff44"
-						},"fast" ).animate({
-							backgroundColor: "#ffffff"
-						},"fast", "", function(){
-							jQuery( this ).removeAttr( "style" );
-							jQuery( this ).removeClass( 'odd even' ).addClass( 'unsaved_change' );
-							jQuery( this ).find( '.odd' ).addClass( 'unsaved_change' );
-							jQuery( this ).find( '.even' ).addClass( 'unsaved_change' );
+				jQuery( ui.draggable ).insertBefore( this ); // add the dragged category(ies) after this category
+				b2evoHelper.FadeOut({
+						selector:ui.draggable,
+						start:{
+								backgroundColor:'#fff'
+							},
+						end:{
+								backgroundColor:'#f00'
+							},
+						callback:function( obj ){
+							jQuery( obj ).removeClass( 'odd even' ).addClass( 'unsaved_change' );
+							jQuery( obj ).find( '.odd, .even' ).addClass( 'unsaved_change' );
 							b2evoCommunications.BufferedServerCall({
 								ticker_callback : me.CheckChapterOrder,
 								send_callback: me.SaveChapterOrder,
 								buffer_name:'chapter_reorder'
 							})
 							me.ReInitChapters(); // redo odd/even etc
+						}
 					});
 				}
 			}).addClass( "draggable_chapter" ); // add our css class
@@ -259,6 +262,16 @@ var _b2evoChapters = function(){
 		{
 			me.GetChapterOrder({ group: 'saving' });
 			jQuery( '.unsaved_change' ).removeClass('unsaved_change' ).addClass( 'saving_change' );
+			b2evoHelper.FadeOut({
+				selector:'.saving_change',
+				start:{
+						backgroundColor:'#ff0'
+					},
+				end:{
+						backgroundColor:'#fff'
+					},
+				remove_style:true
+			});
 		} // SaveChapterOrder
 	}
 } // _b2evoChapters
@@ -267,6 +280,9 @@ var b2evoChapters = new _b2evoChapters();
 
 /*
  * $Log$
+ * Revision 1.2  2009/02/22 06:16:10  yabs
+ * adding functionality
+ *
  * Revision 1.1  2009/02/18 10:48:59  yabs
  * Start of category admin
  *

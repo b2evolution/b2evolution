@@ -50,7 +50,7 @@ var _b2evoHelper = function()
 
 			me = this; // set reference to self
 
-			jQuery( '<div id="b2evoMessages" class="log_container"></div>' ).prependTo( '.pblock' );// placeholder for error/success messages
+			jQuery( '<div id="b2evoMessages"></div>' ).prependTo( '.pblock' );// placeholder for error/success messages
 
 			jQuery( '#b2evo_translations div' ).each( function(){ // grab all translation strings
 				var untranslated = jQuery( this ).find( '.b2evo_t_string' ).html();
@@ -69,7 +69,51 @@ var _b2evoHelper = function()
 		 */
 		DisplayMessage:function( message )
 		{
-			jQuery( '#b2evoMessages' ).html( message );
+			jQuery( '#b2evoMessages' ).addClass( "log_container" ).html( message );
+		},
+
+
+		/**
+		 * Displays Server messages
+		 *
+		 * @param message (string) message to display
+		 */
+		DisplayServerMessage:function( message )
+		{
+			jQuery( '#b2evoMessages' ).removeClass( "log_container" ).html( message );
+		},
+
+
+		/**
+		 * Fades out the selected element(s)
+		 * For available effects see @link http://http://docs.jquery.com/Effects/animate#paramsoptions
+		 */
+		FadeOut:function()
+		{
+			// set available params to defaults
+			var params = jQuery.fn.extend({
+				// no comma after final entry or IE barfs
+				selector:'', // jQuery selector for objects to fade
+				start:{}, // params for start see @link http://http://docs.jquery.com/Effects/animate#paramsoptions
+				end:{}, // params for end see @link http://http://docs.jquery.com/Effects/animate#paramsoptions
+				callback:function(obj){}, // callback function when finished, will be passed the faded object
+				remove_style: true // remove style attribute when finished
+				}, ( arguments.length ? arguments[0] : '' ) );
+			jQuery( params.selector ).animate( params.start, {
+					duration:"fast",
+					complete:function(){
+						jQuery( this ).animate( params.end,{
+							duration:"fast",
+							complete:function(){
+								if( params.remove_style )
+								{
+									jQuery( this ).removeAttr( 'style' );
+								}
+								params.callback( this ); // trigger callback
+							}
+						});
+					}
+			});
 		},
 
 
@@ -157,6 +201,9 @@ var b2evoHelper = new _b2evoHelper();
 
 /*
  * $Log$
+ * Revision 1.2  2009/02/22 06:15:28  yabs
+ * adding functionality
+ *
  * Revision 1.1  2009/02/18 10:48:25  yabs
  * Start of helper object.
  *
