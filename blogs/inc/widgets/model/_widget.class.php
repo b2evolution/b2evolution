@@ -657,6 +657,10 @@ class ComponentWidget extends DataObject
 	 * List of items by category
 	 *
 	 * FP> WHAT IT THIS? WHAT's THE DIFFERENCE WITH THE OTHER ONE?
+	 * waltercruz> This is for the links list in the blog, without using a linkblog,
+	 * but using instead the posts with link type = 2. I use that in the links widget,
+	 * that as you can imagine, is pretty similar to the linkblog widget too. I can
+	 * try to think in a way to merge both functions.
 	 *
 	 * @param array MUST contain at least the basic display params
 	 */
@@ -864,6 +868,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.44  2009/02/22 14:15:48  waltercruz
+ * updating docs
+ *
  * Revision 1.43  2009/02/21 22:22:23  fplanque
  * eeeeeeek!
  *

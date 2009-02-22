@@ -30,7 +30,7 @@ load_class( 'widgets/model/_widget.class.php' );
 /**
  * links_widget class
  *
- * This widget displays the links from a blog.
+ * This widget displays the links from a blog, from the posts with post_type = Link, without using a linkblog.
  *
  * @package evocore
  */
@@ -113,6 +113,9 @@ class links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2009/02/22 14:15:48  waltercruz
+ * updating docs
+ *
  * Revision 1.1  2009/01/24 00:29:27  waltercruz
  * Implementing links in the blog itself, not in a linkblog, first attempt
  *
