@@ -245,7 +245,7 @@ if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) 
 
 		case 'links':
 			$label = T_('New link');
-			$title = T_('Package a new link...');
+			$title = T_('Add a link to the linkroll...');
 			$new_ptyp_ID = 2;
 			break;
 
@@ -273,6 +273,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.11  2009/02/22 23:20:19  fplanque
+ * partial rollback of stuff that can't be right...
+ *
  * Revision 1.10  2009/01/24 00:29:27  waltercruz
  * Implementing links in the blog itself, not in a linkblog, first attempt
  *

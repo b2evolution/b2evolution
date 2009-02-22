@@ -227,10 +227,6 @@ switch( $action )
 		{
 			switch( $item_typ_ID )
 			{
-				case 2:
-					$AdminUI->title = T_('New link:').' ';
-					break;
-
 				case 1000:
 					$AdminUI->title = T_('New page:').' ';
 					break;
@@ -241,6 +237,10 @@ switch( $action )
 
 				case 2000:
 					$AdminUI->title = T_('New podcast episode:').' ';
+					break;
+
+				case 3000:
+					$AdminUI->title = T_('New link:').' ';
 					break;
 			}
 		}
@@ -663,7 +663,7 @@ function init_list_mode()
 
 		case 'links':
 			$ItemList->set_default_filters( array(
-					'types' => '2', // Links
+					'types' => '3000', // Links
 				) );
 			break;
 
@@ -677,7 +677,7 @@ function init_list_mode()
 		default:
 			// Delete the pref_browse_tab setting so that the default
 			// (full) gets used the next time the user wants to browse
-			// a blog.
+			// a blog and we don't run into the same error again.
 			$UserSettings->delete( 'pref_browse_tab' );
 			$UserSettings->dbupdate();
 			debug_die( 'Unknown filterset ['.$tab.']' );
@@ -943,6 +943,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.33  2009/02/22 23:20:19  fplanque
+ * partial rollback of stuff that can't be right...
+ *
  * Revision 1.32  2009/02/22 17:11:13  tblue246
  * Remove the "in blog" from all page titles because it is rather confusing.
  *
