@@ -235,10 +235,11 @@ div.skin_wrapper_loggedin {
 	{ // dynamic document.title handling:
 		$base_title = preg_quote( trim($js_doc_title_prefix) /* e.g. FF2 trims document.title */ );
 	add_js_headline( 'jQuery(function(){
+			var docTitle = document.title
 			var generateTitle = function()
 			{
 				currentPostTitle = jQuery(\'#post_title\').val()
-				document.title = document.title.replace(/(' . $base_title . ').*$/, \'$1 \'+currentPostTitle)
+				document.title = docTitle+" "+currentPostTitle
 			}
 			generateTitle()
 			jQuery(\'#post_title\').keyup(generateTitle)
@@ -274,6 +275,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.15  2009/02/22 06:53:39  afwas
+ * Minor: simplification of javaScript function generateTitle()
+ *
  * Revision 1.14  2009/02/21 23:10:43  fplanque
  * Minor
  *
