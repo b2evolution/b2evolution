@@ -198,18 +198,6 @@ class Item extends ItemLight
 	var $priorities;
 
 	/**
-	 * Pre-rendered content, cached by format/validated renderers.
-	 *
-	 * Can be NULL
-	 *
-	 * @see Item::get_prerendered_content()
-	 * @access protected
-	 * @var array
-	 */
-	var $content_prerendered;
-
-
-	/**
 	 * Constructor
 	 *
 	 * @param object table Database row
@@ -757,17 +745,6 @@ class Item extends ItemLight
 	/**
 	 * Get the prerendered content. If it has not been generated yet, it will.
 	 *
-	 * @todo dh> Currently this makes up one query per displayed item. Probably the cache should get pre-fetched by ItemList2?
-	 * fp> DEFINITELY!!! Preloading all pre-rendered contents for the current Itemlistpage is paramount!
-	 * dh> OK. Plan is as follows: create a PrerenderedContentCache object, get it using get_Cache
-	 *     here and if it's empty and $MainList is set, prefill it with $MainList->page_ID_list.
-	 *     I do not want to prefill any cache in ItemList2::Query already, but more lazily.
-	 *     Makes sense?
-	 * fp> Makes sense. Call it ItemPrerenderingCache though as it only applies to prerenderings for Items, and not to any form of content.
-	 *
-	 * @todo dh> In general, $content_prerendered gets only queried once per item, so it seems like a memory waste to cache the query result..!
-	 * fp> I don't know if this is supposed to be related but that doesn't change anything to the previous todo.
-	 *
 	 * NOTE: This calls {@link Item::dbupdate()}, if renderers get changed (from Plugin hook).
 	 *
 	 * @param string Format, see {@link format_to_output()}.
@@ -778,83 +755,150 @@ class Item extends ItemLight
 	{
 		global $Plugins;
 
+		$r = null;
+
 		$post_renderers = $this->get_renderers_validated();
-		$cache_key = $format.'/'.implode('.', $post_renderers);
+		$cache_key = $format.'/'.implode('.', $post_renderers); // logic gets used below, for setting cache, too.
 
-		if( ! isset( $this->content_prerendered[$cache_key] ) )
-		{
-			$use_cache = $this->ID && in_array( $format, array( 'htmlbody', 'entityencoded', 'xml', 'text' ) );
+		$use_cache = $this->ID && in_array( $format, array('htmlbody', 'entityencoded', 'xml', 'text') );
 
-			// $use_cache = false;
+		// $use_cache = false;
+
+		if( $use_cache )
+		{ // the format/item can be cached:
+			$ItemPrerenderingCache = & get_Cache('ItemPrerenderingCache');
+
+			if( isset($ItemPrerenderingCache[$format][$this->ID][$cache_key]) )
+			{ // already in PHP cache.
+				$r = $ItemPrerenderingCache[$format][$this->ID][$cache_key];
+			}
+			else
+			{	// Try loading from DB cache, including all items in $MainList
+				global $DB, $MainList;
+
+				// TODO: dh> $MainList->page_ID_list is missing featured posts..
+				//           Is there a more thorough list?
+				//           Even more, a featured post triggers this
+				//           MainList-Cache-Query but then is not in the list.
+				//           Should we look at the items type-ID here?!
+				//           Going through in_array($this->ptyp_ID, explode(',', $MainList->ItemQuery->types)) does not help though.
+
+				if( $MainList && ! isset($ItemPrerenderingCache[$format])
+					/* && in_array($this->ptyp_ID, explode(',', $MainList->ItemQuery->types)) */ )
+				{
+					// Load prerendered content for all items in MainList.
+					// We load the current $format only, since it's most likely that only one gets used.
+					$ItemPrerenderingCache[$format] = array();
+
+					$rows = $DB->get_results( "
+						SELECT itpr_itm_ID, itpr_format, itpr_renderers, itpr_content_prerendered
+							FROM T_items__prerendering
+						 WHERE itpr_itm_ID IN (".$MainList->page_ID_list.")
+							 AND itpr_format = '".$format."'",
+							 0, 0, 'Preload prerendered item content for MainList ('.$format.')' );
+					foreach($rows as $row)
+					{
+						$row_cache_key = $row->itpr_format.'/'.$row->itpr_renderers;
+
+						if( ! isset($ItemPrerenderingCache[$format][$row->itpr_itm_ID]) )
+						{ // init list
+							$ItemPrerenderingCache[$format][$row->itpr_itm_ID] = array();
+						}
+
+						$ItemPrerenderingCache[$format][$row->itpr_itm_ID][$row_cache_key] = $row->itpr_content_prerendered;
+					}
+
+					// Set the value for current Item.
+					if( isset($ItemPrerenderingCache[$format][$this->ID][$cache_key]) )
+					{
+						$r = $ItemPrerenderingCache[$format][$this->ID][$cache_key];
+					}
+					// TODO: dh> workaround, see TODO above.. the MainList query should contain this ID always.
+					else
+					{
+						$cache = $DB->get_var( "
+							SELECT itpr_content_prerendered
+								FROM T_items__prerendering
+							 WHERE itpr_itm_ID = ".$this->ID."
+								 AND itpr_format = '".$format."'
+								 AND itpr_renderers = '".implode('.', $post_renderers)."'", 0, 0, 'Check prerendered item content' );
+						if( $cache !== NULL ) // may be empty string
+						{ // Retrieved from cache:
+							// echo ' retrieved from prerendered cache';
+							$r = $cache;
+						}
+					}
+
+				}
+				else
+				{ // No MainList; only get this item.
+					$cache = $DB->get_var( "
+						SELECT itpr_content_prerendered
+							FROM T_items__prerendering
+						 WHERE itpr_itm_ID = ".$this->ID."
+							 AND itpr_format = '".$format."'
+							 AND itpr_renderers = '".implode('.', $post_renderers)."'", 0, 0, 'Check prerendered item content' );
+					if( $cache !== NULL ) // may be empty string
+					{ // Retrieved from cache:
+						// echo ' retrieved from prerendered cache';
+						$r = $cache;
+					}
+				}
+			}
+		}
+
+		if( ! isset( $r ) )
+		{	// Not cached yet:
+			global $Debuglog;
+
+			if( $this->update_renderers_from_Plugins() )
+			{
+				$post_renderers = $this->get_renderers_validated(); // might have changed from call above
+				$cache_key = $format.'/'.implode('.', $post_renderers);
+
+				// Save new renderers with item:
+				$this->dbupdate();
+			}
+
+			// Call RENDERER plugins:
+			// pre_dump( $this->content );
+			$r = $this->content;
+			$Plugins->render( $r /* by ref */, $post_renderers, $format, array( 'Item' => $this ), 'Render' );
+			// pre_dump( $r );
+
+			$Debuglog->add( 'Generated pre-rendered content ['.$cache_key.'] for item #'.$this->ID, 'items' );
 
 			if( $use_cache )
-			{ // the format/item can be cached:
-				global $DB;
-
-				$cache = $DB->get_var( "
-					SELECT itpr_content_prerendered
-						FROM T_items__prerendering
-					 WHERE itpr_itm_ID = ".$this->ID."
-						 AND itpr_format = '".$format."'
-					   AND itpr_renderers = '".implode('.', $post_renderers)."'", 0, 0, 'Check prerendered item content' );
-
-				if( $cache !== NULL ) // may be empty string
-				{ // Retrieved from cache:
-					// echo ' retrieved from prerendered cache';
-					$this->content_prerendered[$cache_key] = $cache;
-				}
-			}
-
-			if( ! isset( $this->content_prerendered[$cache_key] ) )
-			{	// Not cached yet:
-				global $Debuglog;
-
-				if( $this->update_renderers_from_Plugins() )
-				{
-					$post_renderers = $this->get_renderers_validated(); // might have changed from call above
-					$cache_key = $format.'/'.implode('.', $post_renderers);
-
-					// Save new renderers with item:
-					$this->dbupdate();
-				}
-
-				// Call RENDERER plugins:
-				// pre_dump( $this->content );
-				$this->content_prerendered[$cache_key] = $this->content;
-				$Plugins->render( $this->content_prerendered[$cache_key] /* by ref */, $post_renderers, $format, array( 'Item' => $this ), 'Render' );
-				// pre_dump( $this->content_prerendered[$cache_key] );
-
-				$Debuglog->add( 'Generated pre-rendered content ['.$cache_key.'] for item #'.$this->ID, 'items' );
-
-				if( $use_cache )
-				{ // save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above)
-					$DB->query( "
-						REPLACE INTO T_items__prerendering (itpr_itm_ID, itpr_format, itpr_renderers, itpr_content_prerendered)
-						 VALUES ( ".$this->ID.", '".$format."', ".$DB->quote(implode('.', $post_renderers)).', '.$DB->quote($this->content_prerendered[$cache_key]).' )', 'Cache prerendered item content' );
-				}
+			{ // save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above)
+				$DB->query( "
+					REPLACE INTO T_items__prerendering (itpr_itm_ID, itpr_format, itpr_renderers, itpr_content_prerendered)
+					 VALUES ( ".$this->ID.", '".$format."', ".$DB->quote(implode('.', $post_renderers)).', '.$DB->quote($r).' )', 'Cache prerendered item content' );
 			}
 		}
-		else
-		{
-			$Debuglog->add( 'Fetched pre-rendered content ['.$cache_key.'] for item #'.$this->ID, 'items' );
-		}
 
-		return $this->content_prerendered[$cache_key];
+		return $r;
 	}
 
 
 	/**
-	 * Set the pre-rendered content.
-	 *
-	 * This is meant to get called by ItemList2, which would do a single query for all
-	 * items.
-	 *
-	 * @param string Pre-rendered content
-	 * @param string Cache-Key ($format.'/'.$renderers). See {@link Item::get_prerendered_content()} for the appropriate query skeleton.
+	 * Unset any prerendered content for this item (in PHP cache).
 	 */
-	function set_prerendered_content( $content, $cache_key )
+	function delete_prerendered_content()
 	{
-		$this->content_prerendered[$cache_key] = $content;
+		global $DB;
+
+		// Delete DB rows.
+		$DB->query( 'DELETE FROM T_items__prerendering WHERE itpr_itm_ID = '.$this->ID );
+
+		// Delete cache.
+		$ItemPrerenderingCache = & get_Cache('ItemPrerenderingCache');
+		foreach( array_keys($ItemPrerenderingCache) as $format )
+		{
+			unset($ItemPrerenderingCache[$format][$this->ID]);
+		}
+
+		// Delete derived properties.
+		unset($this->content_pages);
 	}
 
 
@@ -1942,7 +1986,7 @@ class Item extends ItemLight
 									'type' => 'feedbacks',
 								), $params );
 		*/
-		
+
 		if( isset($current_User) && $current_User->check_perm( 'blog_comments', 'any', false,	$this->blog_ID ) )
 		{	// We jave permission to edit comments:
 			if( $edit_comments_link == '#' )
@@ -2955,9 +2999,7 @@ class Item extends ItemLight
 			// Let's handle the extracats:
 			$this->insert_update_tags( 'update' );
 
-			// Empty pre-rendered content cache - any item property may have influence on it:
-			$DB->query( 'DELETE FROM T_items__prerendering WHERE itpr_itm_ID = '.$this->ID );
-			$this->content_prerendered = NULL;
+			$this->delete_prerendered_content();
 
 			$DB->commit();
 
@@ -2990,10 +3032,7 @@ class Item extends ItemLight
 
 		if( $r = parent::dbdelete() )
 		{
-			// Empty pre-rendered content cache:
-			$DB->query( 'DELETE FROM T_items__prerendering
-			                   WHERE itpr_itm_ID = '.$this->ID );
-			$this->content_prerendered = NULL;
+			$this->delete_prerendered_content();
 
 			$DB->commit();
 
@@ -3626,6 +3665,13 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.73  2009/02/22 23:59:53  blueyed
+ * ItemPrerenderingCache:
+ *  - simple array to prefetch all prerendered MainList items
+ *  - There's some flaw still, see the TODO(s)
+ *  - add delete_prerendered_content method, also invalidating
+ *    content_pages
+ *
  * Revision 1.72  2009/02/22 21:49:57  blueyed
  * Add Debuglog-error to File::get_images for non-existing images.
  *

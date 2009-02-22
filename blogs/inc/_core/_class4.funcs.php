@@ -111,6 +111,10 @@ function & get_Cache( $objectName )
 			$ItemCache = new ItemCache(); // COPY (FUNC)
 			return $ItemCache;
 
+		case 'ItemPrerenderingCache':
+			$ItemPrerenderingCache = array();
+			return $ItemPrerenderingCache;
+
 		case 'ItemStatusCache':
 			$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_items__status\', \'pst_\', \'pst_ID\', NULL, \'\', T_(\'No status\') )' );
 			return $ItemStatusCache;
@@ -150,7 +154,7 @@ function & get_Cache( $objectName )
 			// $enabled_only parameter to true. Using a member variable
 			// instead of per-method parameters to load only the enabled
 			// widgets should be cleaner when there will be more methods
-			// in the WidgetCache class in the future. 
+			// in the WidgetCache class in the future.
 			load_class( 'widgets/model/_widgetcache.class.php' );
 			$EnabledWidgetCache = new WidgetCache( true );
 			return $EnabledWidgetCache;
@@ -162,6 +166,13 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.11  2009/02/22 23:59:53  blueyed
+ * ItemPrerenderingCache:
+ *  - simple array to prefetch all prerendered MainList items
+ *  - There's some flaw still, see the TODO(s)
+ *  - add delete_prerendered_content method, also invalidating
+ *    content_pages
+ *
  * Revision 1.10  2009/02/05 21:33:33  tblue246
  * Allow the user to enable/disable widgets.
  * Todo:
