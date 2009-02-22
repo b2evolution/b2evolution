@@ -260,7 +260,9 @@ class Log
 	 * @param string HTML to display before the log when there is something to display
 	 * @param string HTML to display after the log when there is something to display
 	 * @param boolean Skip if previewing?
-	 *        QUESTION: dh> This appears to not display e.g. errors which got inserted?!!
+	 *        TODO: dh> This appears to not display e.g. errors which got inserted?!!
+	 *                  I also don't see how this is a "simple" param (in the sense
+	 *                  of useful/required)
 	 */
 	function disp( $before = '<div class="action_messages">', $after = '</div>', $skip_if_preview = true )
 	{
@@ -652,6 +654,9 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.6  2009/02/22 18:09:40  blueyed
+ * TODO
+ *
  * Revision 1.5  2008/11/07 23:20:10  tblue246
  * debug_info() now supports plain text output for the CLI.
  *
