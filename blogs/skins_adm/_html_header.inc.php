@@ -237,7 +237,10 @@ div.skin_wrapper_loggedin {
 			var generateTitle = function()
 			{
 				currentPostTitle = jQuery(\'#post_title\').val()
-				document.title = docTitle + " " + currentPostTitle
+				if ( currentPostTitle != undefined )
+				{	// Tblue> Dirty workaround! This script should be only used when editing/creating a post...
+					document.title = docTitle + " " + currentPostTitle
+				}
 			}
 			generateTitle()
 			jQuery(\'#post_title\').keyup(generateTitle)
@@ -272,6 +275,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.18  2009/02/22 18:09:40  tblue246
+ * Bugfix
+ *
  * Revision 1.17  2009/02/22 16:35:15  blueyed
  * TODO comment
  *
