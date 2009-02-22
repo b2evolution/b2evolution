@@ -62,15 +62,7 @@ function init_MainList( $items_nb_limit )
 					// 'types' => '1000,1500,1520,1530,1570',		// pages and intros (intros should normally never be called)
 				) );
 		}
-		else
-		{
 		// else: we are either in single or in posts mode
-		// FP> there should probably be nothing here
-			$MainList->set_default_filters( array(
-					'types' => '1,1500,1520,1530,1570,2000',
-					// 'types' => '1000,1500,1520,1530,1570',		// pages and intros (intros should normally never be called)
-				) );
-		}
 
 		// pre_dump( $MainList->default_filters );
 		$MainList->load_from_Request( false );
@@ -697,7 +689,7 @@ function attach_browse_tabs()
 						'href' => 'admin.php?ctrl=items&amp;tab=podcasts&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 					'links' => array(
-						'text' => T_('Links'),
+						'text' => T_('Linkroll'),
 						'href' => 'admin.php?ctrl=items&amp;tab=links&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 				)
@@ -831,6 +823,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.34  2009/02/22 23:14:29  fplanque
+ * partial rollback of stuff that can't be right...
+ *
  * Revision 1.33  2009/02/21 23:10:43  fplanque
  * Minor
  *
