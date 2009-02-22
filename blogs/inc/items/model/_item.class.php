@@ -1615,6 +1615,12 @@ class Item extends ItemLight
 		$File = NULL;
 		while( $File = & $FileList->get_next() )
 		{
+			if( ! $File->exists() )
+			{
+				global $Debuglog;
+				$Debuglog->add(sprintf('File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path()), array('error', 'files'));
+				continue;
+			}
 			if( ! $File->is_image() )
 			{	// Skip anything that is not an image
 				// fp> TODO: maybe this property should be stored in link_ltype_ID
@@ -3620,6 +3626,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.72  2009/02/22 21:49:57  blueyed
+ * Add Debuglog-error to File::get_images for non-existing images.
+ *
  * Revision 1.71  2009/02/21 23:10:43  fplanque
  * Minor
  *
