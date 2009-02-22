@@ -220,12 +220,12 @@ class DB
 
 	// DEBUG:
 
-  /**
-   * Do we want to log queries?
+	/**
+	 * Do we want to log queries?
 	 * If null, it gets set according to {@link $debug}.
 	 * A subclass may set it by default (e.g. DbUnitTestCase_DB).
-   * @var boolean
-   */
+	 * @var boolean
+	 */
 	var $log_queries;
 
 	/**
@@ -1498,6 +1498,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.18  2009/02/22 17:52:03  blueyed
+ * Fix indent
+ *
  * Revision 1.17  2009/02/11 20:04:42  blueyed
  * Drop usage of $func_call - got only set, but never used.
  *
