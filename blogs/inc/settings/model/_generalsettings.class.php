@@ -164,12 +164,33 @@ class GeneralSettings extends AbstractSettings
 		$DB->show_errors = $save_DB_show_errors;
 	}
 
+
+	/**
+	 * Get a 32-byte string that can be used as salt for public keys.
+	 *
+	 * @return string
+	 */
+	function get_public_key_salt()
+	{
+		$public_key_salt = $this->get( 'public_key_salt' );
+		if( empty($public_key_salt) )
+		{
+			$public_key_salt = generate_random_key(32);
+			$this->set( 'public_key_salt', $public_key_salt );
+			$this->dbupdate();
+		}
+		return $public_key_salt;
+	}
+
 }
 
 
 
 /*
  * $Log$
+ * Revision 1.16  2009/02/22 16:55:27  blueyed
+ * Add GeneralSettings::get_public_key_salt
+ *
  * Revision 1.15  2009/01/28 21:23:23  fplanque
  * Manual ordering of categories
  *
