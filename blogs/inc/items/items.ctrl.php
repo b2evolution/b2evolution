@@ -222,35 +222,27 @@ switch( $action )
  		param( 'trackback_url', 'string', '' );
 
 		// Page title:
-
+		$AdminUI->title = T_('New post:').' ';
 		if( param( 'item_typ_ID', 'integer', NULL ) !== NULL )
 		{
 			switch( $item_typ_ID )
 			{
 				case 2:
-					$AdminUI->title = T_('New link in blog:').' ';
+					$AdminUI->title = T_('New link:').' ';
 					break;
 
 				case 1000:
-					$AdminUI->title = T_('New page in blog:').' ';
+					$AdminUI->title = T_('New page:').' ';
 					break;
 
 				case 1600:
-					$AdminUI->title = T_('New intro in blog:').' ';
+					$AdminUI->title = T_('New intro:').' ';
 					break;
 
 				case 2000:
 					$AdminUI->title = T_('New podcast episode:').' ';
 					break;
-
-				default:
-					$AdminUI->title = T_('New post in blog:').' ';
-					break;
 			}
-		}
-		else
-		{
-			$AdminUI->title = T_('New post in blog:').' ';
 		}
 
 		$AdminUI->title_titlearea = $AdminUI->title;
@@ -292,7 +284,7 @@ switch( $action )
 		// Page title:
 		$js_doc_title_prefix = T_('Editing post').': ';
 		$AdminUI->title = $js_doc_title_prefix.$edited_Item->dget( 'title', 'htmlhead' );
-		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d in blog: %s'), $edited_Item->ID, $Blog->get('name') );
+		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d: %s'), $edited_Item->ID, $Blog->get('name') );
 
 		// Params we need for tab switching:
 		$tab_switch_params = 'p='.$edited_Item->ID;
@@ -314,7 +306,7 @@ switch( $action )
 		// Page title:
 		$js_doc_title_prefix = T_('Editing post').': ';
 		$AdminUI->title = $js_doc_title_prefix.$edited_Item->dget( 'title', 'htmlhead' );
-		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d in blog: %s'), $edited_Item->ID, $Blog->get('name') );
+		$AdminUI->title_titlearea = sprintf( T_('Editing post #%d: %s'), $edited_Item->ID, $Blog->get('name') );
 
 		// Params we need for tab switching:
 		$tab_switch_params = 'p='.$edited_Item->ID;
@@ -951,6 +943,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.32  2009/02/22 17:11:13  tblue246
+ * Remove the "in blog" from all page titles because it is rather confusing.
+ *
  * Revision 1.31  2009/02/18 18:49:39  blueyed
  * Pass correct $editing value to Item::load_from_Request for $action="create_edit".
  * This fixes (i.e. skips) e.g. title validation when clicking "Save & start attaching files".
