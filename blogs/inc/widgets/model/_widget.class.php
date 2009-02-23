@@ -579,7 +579,14 @@ class ComponentWidget extends DataObject
 	//		compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $linkblog );
 	// fp> ItemList2 instead of ItemListLight adds processing overhead. Not wanted.
 	//	$LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $limit );
-		$LinkblogList = & new ItemListLight( $link_Blog, $timestamp_min, $timestamp_max, $limit );
+			if( $this->disp_params['linkblog_excerpts'] )
+			{ // we want to show some or all of the post content, use ItemList2
+				$LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $limit );
+			}
+			else
+			{ // no excerpts, use ItemListLight
+				$LinkblogList = & new ItemListLight( $link_Blog, $timestamp_min, $timestamp_max, $limit );
+			}
 
 			$LinkblogList->set_filters( array(
 					'cat_array' => $linkblog_cat_array,
@@ -640,7 +647,7 @@ class ComponentWidget extends DataObject
 					) );
 
 // processing overhead issue
-/*
+// yabs > added check, selectively uses ItemList2
 				if( $this->disp_params['linkblog_excerpts'] )
 				{ // we want to show some or all of the post content
 					$content = $Item->get_content_teaser( 1, false, 'htmlbody' );
@@ -660,7 +667,7 @@ class ComponentWidget extends DataObject
 							'link_text' => T_('more').' &raquo;',
 						) );
 				}
-*/
+// /processing overhead issue
 
 				echo $this->disp_params['item_end'];
 			}
@@ -894,6 +901,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.47  2009/02/23 08:14:16  yabs
+ * Added check for excerpts
+ *
  * Revision 1.46  2009/02/22 23:40:09  fplanque
  * dirty links widget :/
  *
