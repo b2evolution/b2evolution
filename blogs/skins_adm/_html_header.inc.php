@@ -260,14 +260,14 @@ div.skin_wrapper_loggedin {
 			jQuery("#item_issue_date, #item_deadline").datepicker({
 				beforeShow: function(){ // Dynamically add stylesheet just before display
 					jQuery(document.createElement(\'link\'))
-						.attr({type: \'text/css\', href: \'rsc/css/ui.datepicker.css\', rel: \'stylesheet\', media: \'screen\'})
+						.attr({type: \'text/css\', href: \'' . $rsc_url . 'css/ui.datepicker.css\', rel: \'stylesheet\', media: \'screen\'})
 						.appendTo(docHead)
 				},
 				dateFormat: \'' . $datefmt . '\',
 				monthNames: monthNames,
 				dayNamesMin: dayNamesMin,
 				onClose: function(){ // Dynamically removing stylesheet, prevents duplicates
-					jQuery(docHead).find("link[href=\'rsc/css/ui.datepicker.css\']").remove();
+					jQuery(docHead).find("link[href=\'' . $rsc_url . 'css/ui.datepicker.css\']").remove();
 				}
 			})
 		})' );
@@ -283,6 +283,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.21  2009/02/23 00:11:21  afwas
+ * Added $rsc_url to make the link to css file absolute.
+ *
  * Revision 1.20  2009/02/22 19:31:11  tblue246
  * Bugfix (see rev 1.18) is not needed anymore.
  *
