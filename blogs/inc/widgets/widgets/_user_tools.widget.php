@@ -139,7 +139,7 @@ class user_tools_Widget extends ComponentWidget
 		echo $this->disp_params['block_start'];
 
 		echo $this->disp_params['block_title_start'];
-		echo T_('User tools');
+		echo $this->disp_params['title'];
 		echo $this->disp_params['block_title_end'];
 
 		echo $this->disp_params['list_start'];
@@ -158,6 +158,9 @@ class user_tools_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.4  2009/02/23 05:06:24  sam2kb
+ * Fixed hard-coded widget title
+ *
  * Revision 1.3  2008/01/21 09:35:37  fplanque
  * (c) 2008
  *
