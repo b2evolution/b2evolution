@@ -51,11 +51,11 @@ function extract_keyphrase_from_referer( $ref )
 
 	$known_search_params =  array(
 				'q',
-				'as_q', 		 // Google Advanced Search Query
-				'as_epq', 		 // Google Advanced Search Query
+				'as_q', 		// Google Advanced Search Query
+				'as_epq', 		// Google Advanced Search Query
 				'query',
 				'search',
-				's',				// google.co.uk
+				's',			// google.co.uk
 				'p',
 				'kw',
 				'qs',
@@ -63,8 +63,9 @@ function extract_keyphrase_from_referer( $ref )
 				'r',
 				'rdata',		// search.ke.voila.fr
 				'string',		// att.net
-				'su',				// suche.web.de
-				'Gw',		// scroogle.org
+				'su',			// suche.web.de
+				'Gw',			// scroogle.org
+				'text',			// yandex.ru
 			);
 
 	$ref_params = explode( '&', substr( $ref, $pos_question+1 ) );
@@ -857,6 +858,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.16  2009/02/23 07:45:37  sam2kb
+ * Added 'text' to known_search_params
+ *
  * Revision 1.15  2009/02/13 19:57:50  blueyed
  * doc, indent
  *
