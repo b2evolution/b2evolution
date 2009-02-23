@@ -109,13 +109,6 @@ class calendar_plugin extends Plugin
 				'options' => array( 'caption' => T_('Top'), 'tfoot' => T_('Bottom'), '' => T_('No navigation') ),
 				'defaultvalue' => 'tfoot',
 			),
-			'navigation' => array(
-				'label' => 'Navigation arrows',
-				'note' => T_('Where do you want to display the navigation arrows?'),
-				'type' => 'select',
-				'options' => array( 'caption' => T_('Top'), 'tfoot' => T_('Bottom'), '' => T_('No navigation') ),
-				'defaultvalue' => 'tfoot',
-			),
 			'browseyears' => array(
 				'label' => T_('Navigate years'),
 				'note' => T_('Display double arrows for yearly navigation?'),
@@ -1152,6 +1145,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.53  2009/02/23 05:03:07  sam2kb
+ * Removed duplicate code
+ *
  * Revision 1.52  2009/01/21 22:36:35  fplanque
  * Cleaner handling of pages and intros in calendar and archives plugins
  *
