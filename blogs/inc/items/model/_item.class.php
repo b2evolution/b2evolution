@@ -776,64 +776,46 @@ class Item extends ItemLight
 			{	// Try loading from DB cache, including all items in $MainList
 				global $DB, $MainList;
 
-				// TODO: dh> $MainList->page_ID_list is missing featured posts..
-				//           Is there a more thorough list?
-				// fp> Featured posts are not part of the Mainlist, so this is normal.
-				// dh>       Even more, a featured post triggers this
-				//           MainList-Cache-Query but then is not in the list.
-				// fp> if I understand this right, the featured post call this code right here BEFORE the mainlist actually gets displayed.
-				//     I believe the solution could be faily simple: if the MainList hasn"t been loaded yet, merge the current item_ID we want to display with the MainList ;)
-				//     Note, we could have dozens of calls for differents items before displaying the MainList. It would be wise not to load the mainlist a dozen times in that case.
-				// dh>       Should we look at the items type-ID here?!
-				//           Going through in_array($this->ptyp_ID, explode(',', $MainList->ItemQuery->types)) does not help though.
-				// fp> I don't understand why we'd want to do that.
-
-				if( $MainList && ! isset($ItemPrerenderingCache[$format])
-					/* && in_array($this->ptyp_ID, explode(',', $MainList->ItemQuery->types)) */ )
+				if( $MainList )
 				{
-					// Load prerendered content for all items in MainList.
-					// We load the current $format only, since it's most likely that only one gets used.
-					$ItemPrerenderingCache[$format] = array();
+					if( ! isset($ItemPrerenderingCache[$format]) )
+					{ // only do the prefetch loading once.
+						$prefetch_IDs = $MainList->page_ID_array;
 
-					$rows = $DB->get_results( "
-						SELECT itpr_itm_ID, itpr_format, itpr_renderers, itpr_content_prerendered
-							FROM T_items__prerendering
-						 WHERE itpr_itm_ID IN (".$MainList->page_ID_list.")
-							 AND itpr_format = '".$format."'",
-							 0, 0, 'Preload prerendered item content for MainList ('.$format.')' );
-					foreach($rows as $row)
-					{
-						$row_cache_key = $row->itpr_format.'/'.$row->itpr_renderers;
-
-						if( ! isset($ItemPrerenderingCache[$format][$row->itpr_itm_ID]) )
-						{ // init list
-							$ItemPrerenderingCache[$format][$row->itpr_itm_ID] = array();
+						// Add the current ID to the list to prefetch, if it's not in the MainList (e.g. featured item).
+						if( ! in_array($this->ID, $MainList->page_ID_array) )
+						{
+							$prefetch_IDs[] = $this->ID;
 						}
 
-						$ItemPrerenderingCache[$format][$row->itpr_itm_ID][$row_cache_key] = $row->itpr_content_prerendered;
-					}
+						// Load prerendered content for all items in MainList.
+						// We load the current $format only, since it's most likely that only one gets used.
+						$ItemPrerenderingCache[$format] = array();
 
-					// Set the value for current Item.
-					if( isset($ItemPrerenderingCache[$format][$this->ID][$cache_key]) )
-					{
-						$r = $ItemPrerenderingCache[$format][$this->ID][$cache_key];
-					}
-					// TODO: dh> workaround, see TODO above.. the MainList query should contain this ID always.
-					else
-					{
-						$cache = $DB->get_var( "
-							SELECT itpr_content_prerendered
+						$rows = $DB->get_results( "
+							SELECT itpr_itm_ID, itpr_format, itpr_renderers, itpr_content_prerendered
 								FROM T_items__prerendering
-							 WHERE itpr_itm_ID = ".$this->ID."
-								 AND itpr_format = '".$format."'
-								 AND itpr_renderers = '".implode('.', $post_renderers)."'", 0, 0, 'Check prerendered item content' );
-						if( $cache !== NULL ) // may be empty string
-						{ // Retrieved from cache:
-							// echo ' retrieved from prerendered cache';
-							$r = $cache;
+							 WHERE itpr_itm_ID IN (".implode(',', $prefetch_IDs).")
+								 AND itpr_format = '".$format."'",
+								 0, 0, 'Preload prerendered item content for MainList ('.$format.')' );
+						foreach($rows as $row)
+						{
+							$row_cache_key = $row->itpr_format.'/'.$row->itpr_renderers;
+
+							if( ! isset($ItemPrerenderingCache[$format][$row->itpr_itm_ID]) )
+							{ // init list
+								$ItemPrerenderingCache[$format][$row->itpr_itm_ID] = array();
+							}
+
+							$ItemPrerenderingCache[$format][$row->itpr_itm_ID][$row_cache_key] = $row->itpr_content_prerendered;
+						}
+
+						// Set the value for current Item.
+						if( isset($ItemPrerenderingCache[$format][$this->ID][$cache_key]) )
+						{
+							$r = $ItemPrerenderingCache[$format][$this->ID][$cache_key];
 						}
 					}
-
 				}
 				else
 				{ // No MainList; only get this item.
@@ -1471,7 +1453,7 @@ class Item extends ItemLight
 		{
 			$this->tags = preg_split( '/[;,]+/', $tags );
 		}
-		
+
 		if( function_exists( 'mb_strtolower' ) && function_exists( 'mb_detect_encoding' ) )
 		{
 			array_walk( $this->tags, create_function( '& $tag', '$tag = mb_strtolower(trim($tag), mb_detect_encoding($tag));' ) );
@@ -3678,6 +3660,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.76  2009/02/23 21:32:38  blueyed
+ * Pre-fetching Mainlists's pre-renderered content: Taking the suggested approach, by adding any out-of-Mainlist items to the query. Might be good for production now.
+ *
  * Revision 1.75  2009/02/23 06:44:50  sam2kb
  * Lowercase tags using mbstring funcs if avaliable,
  * see http://forums.b2evolution.net/viewtopic.php?t=14904
