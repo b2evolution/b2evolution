@@ -139,7 +139,9 @@ $search_engines = array(
 	'crawler.com/search/',	// q
 	'inbox.com/search/', // q
 	'scroogle.org/', // GW=
-	'cuil.com/'
+	'cuil.com/',
+	'yandex.ru/yandsearch',
+	'go.mail.ru/search'
 );
 
 
@@ -174,6 +176,7 @@ $user_agents = array(
 	array('robot', 'Bitacle bot/', 'Bitacle' ),
 	array('robot', 'Sphere Scout', 'Sphere Scout' ),
 	array('robot', 'Gigabot/', 'Gigablast (Gigabot)' ),
+	array('robot', 'Yandex', 'Yandex' ),
 	// Unknown robots:
 	array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:
@@ -187,6 +190,7 @@ $user_agents = array(
 	array('aggregator', 'Pompos/', 'Pompos' ),
 	array('aggregator', 'SharpReader/',	'SharpReader'),
 	array('aggregator', 'Straw ',	'Straw'),
+	array('aggregator', 'YandexBlog', 'YandexBlog'),
 );
 
 
