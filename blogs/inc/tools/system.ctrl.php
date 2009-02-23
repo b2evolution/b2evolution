@@ -434,7 +434,7 @@ else
 	}
 
 	// PNG:
-	init_system_check( 'GD PNG Support', !empty($gd_info['JPG Support']) ? T_('Read/Write') : T_('No') );
+	init_system_check( 'GD PNG Support', !empty($gd_info['PNG Support']) ? T_('Read/Write') : T_('No') );
 	if( empty($gd_info['PNG Support']) )
 	{
 		disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for PNG images.') );
@@ -499,6 +499,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2009/02/23 14:07:23  afwas
+ * Minor
+ *
  * Revision 1.14  2009/02/21 23:10:43  fplanque
  * Minor
  *
