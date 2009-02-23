@@ -778,10 +778,15 @@ class Item extends ItemLight
 
 				// TODO: dh> $MainList->page_ID_list is missing featured posts..
 				//           Is there a more thorough list?
-				//           Even more, a featured post triggers this
+				// fp> Featured posts are not part of the Mainlist, so this is normal.
+				// dh>       Even more, a featured post triggers this
 				//           MainList-Cache-Query but then is not in the list.
-				//           Should we look at the items type-ID here?!
+				// fp> if I understand this right, the featured post call this code right here BEFORE the mainlist actually gets displayed.
+				//     I believe the solution could be faily simple: if the MainList hasn"t been loaded yet, merge the current item_ID we want to display with the MainList ;)
+				//     Note, we could have dozens of calls for differents items before displaying the MainList. It would be wise not to load the mainlist a dozen times in that case.
+				// dh>       Should we look at the items type-ID here?!
 				//           Going through in_array($this->ptyp_ID, explode(',', $MainList->ItemQuery->types)) does not help though.
+				// fp> I don't understand why we'd want to do that.
 
 				if( $MainList && ! isset($ItemPrerenderingCache[$format])
 					/* && in_array($this->ptyp_ID, explode(',', $MainList->ItemQuery->types)) */ )
@@ -3665,6 +3670,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.74  2009/02/23 00:40:09  fplanque
+ * doc
+ *
  * Revision 1.73  2009/02/22 23:59:53  blueyed
  * ItemPrerenderingCache:
  *  - simple array to prefetch all prerendered MainList items
