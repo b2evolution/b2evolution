@@ -32,9 +32,7 @@ load_class( 'widgets/model/_widget.class.php' );
 param( 'action', 'string', 'list' );
 param( 'display_mode', 'string', 'normal' );
 $display_mode = ( in_array( $display_mode, array( 'js', 'normal' ) ) ? $display_mode : 'normal' );
-// This should probably be handled with the existing $mode var
-
-$auth_key = get_auth_key( $Blog->ID.'admin_control_widgets' ); // get / set our auth get
+// This should probably be handled with teh existing $mode var
 
 /*
  * Init the objects we want to work on.
@@ -53,7 +51,7 @@ switch( $action )
 		param( 'container', 'string', true, true );	// memorize
 		break;
 
-	case 'multi_update' : // js request
+	case 're-order' : // js request
 		param( 'container_list', 'string' );
 		$containers_list = explode( ',', $container_list );
 		$containers = array();
@@ -323,62 +321,41 @@ switch( $action )
  	case 'list':
 		break;
 
- 	case 'multi_update' : // this is a js request
- 		if( $key = param( 'key' ) )
- 		{ // we have a key
- 			if( $key == $auth_key )
- 			{ // we have a valid key
-		 		$DB->begin();
+ 	case 're-order' : // js request
+ 		$DB->begin();
 
-		 		// Reset the current orders and make container names temp to avoid duplicate entry errors
-				$DB->query( 'UPDATE T_widget
-												SET wi_order = wi_order * -1,
-														wi_sco_name = CONCAT( \'temp_\', wi_sco_name )
-											WHERE wi_coll_ID = '.$Blog->ID );
+ 		// Reset the current orders and make container names temp to avoid duplicate entry errors
+		$DB->query( 'UPDATE T_widget
+										SET wi_order = wi_order * -1,
+												wi_sco_name = CONCAT( \'temp_\', wi_sco_name )
+									WHERE wi_coll_ID = '.$Blog->ID );
 
-				foreach( $containers as $container => $widgets )
-				{	// loop through each container and set new order
-					$order = 0; // reset counter for this container
-					foreach( $widgets as $widget )
-					{	// loop through each widget
-
-						// matches[1] = widget ID, matches[2] = enabled flag
-						if( preg_match( '~^wi_ID_([0-9]+?)-([0-9]+?)$~', trim( $widget ), $matches ) )
-						{ // valid widget details
-							$order++;
-							$DB->query( 'UPDATE T_widget
-															SET wi_order = '.$order.',
-																	wi_sco_name = '.$DB->quote( $container ).',
-																	wi_enabled = '.$matches[2].'
-														WHERE wi_ID = '.$matches[1] );
-						}
-					}
+		foreach( $containers as $container => $widgets )
+		{	// loop through each container and set new order
+			$order = 0; // reset counter for this container
+			foreach( $widgets as $widget )
+			{	// loop through each widget
+				if( $widget = preg_replace( '~[^0-9]~', '', $widget ) )
+				{ // valid widget id
+					$order++;
+					$DB->query( 'UPDATE T_widget
+													SET wi_order = '.$order.',
+															wi_sco_name = '.$DB->quote( $container ).'
+												WHERE wi_ID = '.$widget );
 				}
+			}
+		}
 
-				// Cleanup deleted widgets and empty temp containers (fp> what do you mean 'and empty temp containers' ??? wi_order < 1 should be enough for all scenarios, no?) ( yabs > yep, query amended )
-				$DB->query( 'DELETE FROM T_widget
-											WHERE wi_order < 1' );
+		// Cleanup deleted widgets and empty temp containers (fp> what do you mean 'and empty temp containers' ??? wi_order < 1 should be enough for all scenarios, no?)
+		$DB->query( 'DELETE FROM T_widget
+									WHERE wi_order < 1
+										 OR wi_sco_name LIKE \'temp_%\'' );
 
-				$DB->commit();
+		$DB->commit();
 
-		 		$Messages->add( T_( 'Widgets updated' ), 'success' );
-		 		send_javascript_message( array( 'b2evoWidgets.WidgetUpdateCallback' => array() ) ); // exits() automatically
- 			}
- 			else
- 			{ // we have an invalid auth key
-	 			send_javascript_message( array(
-	 					'window.alert' => array( T_( 'Your b2evo admin just received an invalid request from this web page!' ) ),
-					) ); // exits automatically
- 			}
- 		}
- 		else
- 		{ // we don't have a key!
- 			send_javascript_message( array(
- 					'window.alert' => array( T_( 'Your b2evo admin just received an invalid request from this web page!' ) ),
- 				) ); // exits automatically
- 		}
+ 		$Messages->add( T_( 'Widgets updated' ), 'success' );
+ 		send_javascript_message( array( 'sendWidgetOrderCallback' => array() ) ); // exits() automatically
  		break;
-
 
 	default:
 		debug_die( 'Action: unhandled action' );
@@ -395,25 +372,32 @@ if( $display_mode == 'normal' )
 
 	$AdminUI->set_path( 'blogs', 'widgets' );
 
-	// add new interface
-	require_js_helper( 'communications' ); // auto requires jQuery, b2evoHelper helper, b2evoCommunications helper
-	require_js( '#jqueryUI#' );
+	// load the js and css required to make the magic work
+	add_js_headline( '
+	/**
+	 * @internal T_ array of translation strings required by the UI
+	 */
+	var T_ = new Array();
+	T_["Changes pending"] = "'.T_( 'Changes pending' ).'";
+	T_["Saving changes"] = "'.T_( 'Saving changes' ).'";
+	T_["Widget order unchanged"] = "'.T_( 'Widget order unchanged' ).'";
+
+	/**
+	 * Image tags for the JavaScript widget UI.
+	 *
+	 * @internal Tblue> We get the whole img tags here (easier).
+	 */
+	var enabled_icon_tag = \''.get_icon( 'enabled', 'imgtag', array( 'title' => T_( 'The widget is enabled.' ) ) ).'\';
+	var disabled_icon_tag = \''.get_icon( 'disabled', 'imgtag', array( 'title' => T_( 'The widget is disabled.' ) ) ).'\';
+	var activate_icon_tag = \''.get_icon( 'activate', 'imgtag', array( 'title' => T_( 'Enable this widget!' ) ) ).'\';
+	var deactivate_icon_tag = \''.get_icon( 'deactivate', 'imgtag', array( 'title' => T_( 'Disable this widget!' ) ) ).'\';
+
+	var b2evo_dispatcher_url = "'.$admin_url.'";' );
+	require_js( '#jqueryUI#' ); // auto requires jQuery
+	require_js( 'communication.js' ); // auto requires jQuery
 	require_js( 'blog_widgets.js' );
 	require_css( 'blog_widgets.css' );
-	add_js_headline( '
-		jQuery(document).ready(function(){
-			b2evoWidgets.Init({
-				activate_icon_tag : \''.get_icon( 'activate', 'imgtag', array( 'title' => T_( 'Enable this widget!' ) ) ).'\',
-				deactivate_icon_tag : \''.get_icon( 'deactivate', 'imgtag', array( 'title' => T_( 'Disable this widget!' ) ) ).'\',
-				blog:'.$Blog->ID.',
-				key:"'.$auth_key.'"
-			});
-			});'
-	);
 
-	// translation strings
-	T_( 'Widget is enabled', NULL, true );
-	T_( 'Widget is disabled', NULL, true );
 
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 	$AdminUI->disp_html_head();
@@ -497,8 +481,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.16  2009/02/23 08:13:31  yabs
- * Added check for excerpts
+ * Revision 1.17  2009/02/23 18:13:40  yabs
+ * Next attempt at rolling back my incompetance :D
  *
  * Revision 1.15  2009/02/05 21:33:34  tblue246
  * Allow the user to enable/disable widgets.
