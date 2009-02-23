@@ -481,8 +481,14 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2009/02/23 18:21:07  tblue246
+ * Fixing log :/
+ *
  * Revision 1.17  2009/02/23 18:13:40  yabs
  * Next attempt at rolling back my incompetance :D
+ *
+ * Revision 1.16  2009/02/23 08:13:31  yabs
+ * Added check for excerpts
  *
  * Revision 1.15  2009/02/05 21:33:34  tblue246
  * Allow the user to enable/disable widgets.
