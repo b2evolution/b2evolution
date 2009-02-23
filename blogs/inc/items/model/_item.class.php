@@ -1471,7 +1471,15 @@ class Item extends ItemLight
 		{
 			$this->tags = preg_split( '/[;,]+/', $tags );
 		}
-		array_walk( $this->tags, create_function( '& $tag', '$tag = strtolower(trim($tag));' ) );
+		
+		if( function_exists( 'mb_strtolower' ) && function_exists( 'mb_detect_encoding' ) )
+		{
+			array_walk( $this->tags, create_function( '& $tag', '$tag = mb_strtolower(trim($tag), mb_detect_encoding($tag));' ) );
+		}
+		else
+		{
+			array_walk( $this->tags, create_function( '& $tag', '$tag = strtolower(trim($tag));' ) );
+		}
 		$this->tags = array_unique( $this->tags );
 		$this->tags = array_diff( $this->tags, array('') );	// empty element can sneak in when ending with ,,
 		// pre_dump( $this->tags );
@@ -3670,6 +3678,10 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.75  2009/02/23 06:44:50  sam2kb
+ * Lowercase tags using mbstring funcs if avaliable,
+ * see http://forums.b2evolution.net/viewtopic.php?t=14904
+ *
  * Revision 1.74  2009/02/23 00:40:09  fplanque
  * doc
  *
