@@ -45,7 +45,7 @@ require_once $inc_path.'_main.inc.php';
 
 param( 'action', 'string', 'req_login' );
 param( 'mode', 'string', '' );
-
+param( 'locale', 'string', $Settings->get('default_locale') );
 param( 'login', 'string', '' );
 // echo 'login: ', $login;
 
@@ -53,6 +53,8 @@ param( 'login', 'string', '' );
 // TODO: dh> problem here is that $ReqURI won't include the e.g. "ctrl" param in a POSTed form and therefor the user lands on the default admin page after logging in (again)
 // fp> I think this will fix itself when we do another improvement: 303 redirect after each POST so that we never have an issue with people trying to reload a post
 param( 'redirect_to', 'string', $ReqURI );
+
+locale_activate( $locale );
 
 switch( $action )
 {
@@ -418,6 +420,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.103  2009/02/23 07:59:46  sam2kb
+ * Activate default locale
+ *
  * Revision 1.102  2008/12/21 18:43:11  blueyed
  * Fix E_NOTICE with new cookie_domain handling
  *
