@@ -576,63 +576,50 @@ class Log
  *
  * It just implements the used methods {@link get()} and {@link display()}.
  *
+ * This is used for $Debuglog, when $debug is not enabled.
+ *
  * @package evocore
  */
 class Log_noop {
 	/**
 	 * This is a no-operation method.
 	 */
-	function add()
-	{
-	}
+	function Log_noop() {}
 
 	/**
 	 * This is a no-operation method.
 	 */
-	function add_messages()
-	{
-	}
-
+	function add() {}
 
 	/**
 	 * This is a no-operation method.
 	 */
-	function clear()
-	{
-	}
-
+	function add_messages() {}
 
 	/**
 	 * This is a no-operation method.
 	 */
-	function count()
-	{
-	}
-
+	function clear() {}
 
 	/**
 	 * This is a no-operation method.
 	 */
-	function disp()
-	{
-	}
-
+	function count() {}
 
 	/**
 	 * This is a no-operation method.
 	 */
-	function display()
-	{
-	}
-
+	function disp() {}
 
 	/**
 	 * This is a no-operation method.
 	 */
-	function display_paragraphs()
-	{
-	}
+	function display() {}
 
+	/**
+	 * This is a no-operation method.
+	 */
+	function display_paragraphs() {}
 
 	/**
 	 * This is a no-operation method.
@@ -641,7 +628,6 @@ class Log_noop {
 	{
 		return array();
 	}
-
 
 	/**
 	 * This is a no-operation method.
@@ -652,8 +638,12 @@ class Log_noop {
 	}
 }
 
+
 /*
  * $Log$
+ * Revision 1.7  2009/02/23 20:18:00  blueyed
+ * Log_noop: add constructor as no-op, too. Make the 'do-nothing' funcs take less lines.
+ *
  * Revision 1.6  2009/02/22 18:09:40  blueyed
  * TODO
  *
