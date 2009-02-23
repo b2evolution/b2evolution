@@ -34,6 +34,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Afwas > Moved the javaScript to <head> in /skins-adm/_html_header.inc.php
 // This file is now obsolete.
+
+// FP> the nice thing about this file is that it was included only where it was needed.
+// *NOT* on every admin page.
 ?>
 
 	<?php
@@ -45,6 +48,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 /*
  * $Log$
+ * Revision 1.6  2009/02/23 00:08:10  fplanque
+ * no message
+ *
  * Revision 1.5  2009/01/24 03:04:53  afwas
  * Recoded javaScript in jQuery and moved to <head> in /skins_adm/_html_header.inc.php.
  * This file is now obsolete.
