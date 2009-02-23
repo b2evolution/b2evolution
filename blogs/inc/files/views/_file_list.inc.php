@@ -264,28 +264,33 @@ $Form->begin_form();
 
 			/***************  Link ("chain") icon:  **************/
 
-			// fp> here might not be the best place to put the perm check
-			if( isset($edited_Item) && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
-			{	// Offer option to link the file to an Item (or anything else):
-				$link_attribs = array();
-				$link_action = 'link';
-				if( $mode == 'upload' )
-				{	// We want the action to happen in the post attachments iframe:
-					$link_attribs['target'] = $iframe_name;
-					$link_action = 'link_inpost';
-				}
-				echo action_icon( T_('Link this file!'), 'link',
-							regenerate_url( 'fm_selected', 'action='.$link_action.'&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ),
-							NULL, NULL, NULL, $link_attribs );
-				echo ' ';
-			}
+			if( ! $lFile->is_dir() )
+			{	// Only provide link/"chain" icons for files.
+				// TODO: dh> provide support for direcories (display included files).
 
-			if( isset($edited_User) ) // fp> Perm already checked in controller
-			{	// Offer option to link the file to an Item (or anything else):
-				echo action_icon( T_('Link this file!'), 'link',
-							regenerate_url( 'fm_selected', 'action=link_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ),
-							NULL, NULL, NULL, array() );
-				echo ' ';
+				// fp> here might not be the best place to put the perm check
+				if( isset($edited_Item) && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+				{	// Offer option to link the file to an Item (or anything else):
+					$link_attribs = array();
+					$link_action = 'link';
+					if( $mode == 'upload' )
+					{	// We want the action to happen in the post attachments iframe:
+						$link_attribs['target'] = $iframe_name;
+						$link_action = 'link_inpost';
+					}
+					echo action_icon( T_('Link this file!'), 'link',
+								regenerate_url( 'fm_selected', 'action='.$link_action.'&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ),
+								NULL, NULL, NULL, $link_attribs );
+					echo ' ';
+				}
+
+				if( isset($edited_User) ) // fp> Perm already checked in controller
+				{	// Offer option to link the file to an Item (or anything else):
+					echo action_icon( T_('Link this file!'), 'link',
+								regenerate_url( 'fm_selected', 'action=link_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ),
+								NULL, NULL, NULL, array() );
+					echo ' ';
+				}
 			}
 
 			/********************  Filename  ********************/
@@ -605,6 +610,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.13  2009/02/23 20:50:45  blueyed
+ * Only display 'link/chain' icon for files, since dirs are not supported yet.
+ *
  * Revision 1.12  2009/02/10 22:39:00  blueyed
  *  - Handle more File properties in File class lazily.
  *  - Cleanup recursive size handling:
