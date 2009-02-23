@@ -178,7 +178,7 @@ var _b2evoCommunications = function()
 						return;
 
 					case 'pause' : // pause the server call
-						b2evoHelper.DisplayMessage( '<div class="log_message">'+b2evoHelper.T_( 'Update Paused' )+' : '+b2evoHelper.str_repeat( '.', params.delay / params.interval )+'</div>' );
+						b2evoHelper.DisplayMessage( '<div class="log_error">'+b2evoHelper.T_( 'Update Paused' )+' : '+b2evoHelper.str_repeat( '.', params.delay / params.interval )+'</div>' );
 						me.BufferedServerLoop( params );
 						return;
 
@@ -193,7 +193,7 @@ var _b2evoCommunications = function()
 						params.delay -= params.interval;
 						if( params.delay > 0 )
 						{ // still buffered
-							b2evoHelper.DisplayMessage( '<div class="log_message">'+b2evoHelper.T_( 'Changes pending' )+' : '+b2evoHelper.str_repeat( '.', params.delay / params.interval )+'</div>' );
+							b2evoHelper.DisplayMessage( '<div class="log_error">'+b2evoHelper.T_( 'Changes pending' )+' : '+b2evoHelper.str_repeat( '.', params.delay / params.interval )+'</div>' );
 							me.BufferedServerLoop(params);
 							return;
 						}
@@ -296,6 +296,9 @@ var b2evoCommunications = new _b2evoCommunications();
 
 /*
  * $Log$
+ * Revision 1.6  2009/02/23 08:52:20  yabs
+ * minor
+ *
  * Revision 1.5  2009/02/22 06:15:28  yabs
  * adding functionality
  *
