@@ -688,10 +688,10 @@ class Plugins_admin extends Plugins
 
 
 		// Delete obsolete events from DB:
-		if( $obsolete_events && $DB->query( "
+		if( $obsolete_events && $DB->query( '
 				DELETE FROM T_pluginevents
-				WHERE pevt_plug_ID = ".$Plugin->ID."
-					AND pevt_event IN ( '".implode( '", "', $obsolete_events )."' )" ) )
+				WHERE pevt_plug_ID = '.$Plugin->ID.'
+				AND pevt_event IN ( "'.implode( '", "', $obsolete_events ).'" )' ) )
 		{
 			$r = true;
 		}
@@ -1529,6 +1529,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.5  2009/02/23 06:12:25  sam2kb
+ * Quotes replaced, see http://forums.b2evolution.net/viewtopic.php?t=17994
+ *
  * Revision 1.4  2008/01/21 09:35:32  fplanque
  * (c) 2008
  *
