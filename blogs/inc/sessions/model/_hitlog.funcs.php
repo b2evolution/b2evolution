@@ -268,6 +268,8 @@ function stats_basedomain( $disp = true )
  */
 function stats_search_keywords( $keyphrase )
 {
+	global $evo_charset;
+	
 	if( empty( $keyphrase ) )
 	{
 		return '<span class="note">['.T_('n.a.').']</span>';
@@ -275,10 +277,27 @@ function stats_search_keywords( $keyphrase )
 
 	if( strlen( $keyphrase ) > 30 )
 	{
-		$keyphrase = substr( $keyphrase, 0, 30 )."...";	// word too long, crop it
+		if( function_exists('mb_substr') )
+		{	// 2-byte unicode strings are cropped to 15 characters
+			// When cropped with 'substr' usually end with junk character
+			$keyphrase = mb_substr( $keyphrase, 0, 30, $evo_charset )."...";
+		}
+		else
+		{
+			$keyphrase = substr( $keyphrase, 0, 30 )."...";	// word too long, crop it
+		}
 	}
-
-	return htmlentities( $keyphrase );
+	
+	if( version_compare(phpversion(), '4.3.2') >= 0 )
+	{	// Convert keyword encoding, some charsets are supported only in PHP 4.3.2 and later.
+		// This fixes encoding problem for Cyrillic keywords
+		// See http://forums.b2evolution.net/viewtopic.php?t=17431
+		return htmlentities( $keyphrase, ENT_COMPAT, $evo_charset );
+	}
+	else
+	{
+		return htmlentities( $keyphrase );
+	}
 }
 
 
@@ -319,6 +338,10 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.6  2009/02/24 04:28:34  sam2kb
+ * Convert keywords encoding and use 'mb_substr' to crop the string,
+ * see http://forums.b2evolution.net/viewtopic.php?t=17431
+ *
  * Revision 1.5  2008/05/10 22:59:10  fplanque
  * keyphrase logging
  *
