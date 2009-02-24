@@ -79,7 +79,7 @@ function refererList(
 
 	if( $groupby == '' )
 	{ // No grouping:
-		$sql = "SELECT hit_ID, UNIX_TIMESTAMP(hit_datetime) AS hit_datetime, hit_referer, dom_name";
+		$sql = 'SELECT hit_ID, UNIX_TIMESTAMP(hit_datetime) AS hit_datetime, hit_referer, dom_name';
 	}
 	else
 	{ // group by
@@ -87,19 +87,19 @@ function refererList(
 		{ // compatibility HACK!
 			$groupby = 'dom_name';
 		}
-		$sql = "SELECT COUNT(*) AS totalHits, hit_referer, dom_name";
+		$sql = 'SELECT COUNT(*) AS totalHits, hit_referer, dom_name';
 	}
 	if( $disp_blog )
 	{
-		$sql .= ", hit_blog_ID";
+		$sql .= ', hit_blog_ID';
 	}
 	if( $disp_uri )
 	{
-		$sql .= ", hit_uri";
+		$sql .= ', hit_uri';
 	}
 	if( $get_user_agent )
 	{
-		$sql .= ", agnt_signature";
+		$sql .= ', agnt_signature';
 	}
 
 	$sql_from_where = "
@@ -110,9 +110,9 @@ function refererList(
 			   AND agnt_type = 'browser'";
 	if( !empty($blog_ID) )
 	{
-		$sql_from_where .= " AND hit_blog_ID = '$blog_ID'";
+		$sql_from_where .= " AND hit_blog_ID = '".$blog_ID."'";
 	}
-	if ($visitURL != "global")
+	if ( $visitURL != 'global' )
 	{
 		$sql_from_where .= " AND hit_uri = '".$DB->escape($visitURL, 0, 250)."'";
 	}
@@ -121,19 +121,19 @@ function refererList(
 
 	if( $groupby == '' )
 	{ // No grouping:
-		$sql .= " ORDER BY hit_ID DESC";
+		$sql .= ' ORDER BY hit_ID DESC';
 	}
 	else
 	{ // group by
-		$sql .= " GROUP BY $groupby ORDER BY totalHits DESC";
+		$sql .= " GROUP BY ".$groupby." ORDER BY totalHits DESC";
 	}
-	$sql .= " LIMIT $howMany";
+	$sql .= ' LIMIT '.$howMany;
 
 	$res_stats = $DB->get_results( $sql, ARRAY_A );
 
 	if( $get_total_hits )
 	{ // we need to get total hits
-		$sql = "SELECT COUNT(*) ".$sql_from_where;
+		$sql = 'SELECT COUNT(*) '.$sql_from_where;
 		$stats_total_hits = $DB->get_var( $sql );
 	}
 	else
@@ -280,15 +280,15 @@ function stats_search_keywords( $keyphrase )
 		if( function_exists('mb_substr') )
 		{	// 2-byte unicode strings are cropped to 15 characters
 			// When cropped with 'substr' usually end with junk character
-			$keyphrase = mb_substr( $keyphrase, 0, 30, $evo_charset )."...";
+			$keyphrase = mb_substr( $keyphrase, 0, 30, $evo_charset ).'...';
 		}
 		else
 		{
-			$keyphrase = substr( $keyphrase, 0, 30 )."...";	// word too long, crop it
+			$keyphrase = substr( $keyphrase, 0, 30 ).'...';	// word too long, crop it
 		}
 	}
-	
-	if( version_compare(phpversion(), '4.3.2') >= 0 )
+
+	if( version_compare( PHP_VERSION, '4.3.2', '>=' ) )
 	{	// Convert keyword encoding, some charsets are supported only in PHP 4.3.2 and later.
 		// This fixes encoding problem for Cyrillic keywords
 		// See http://forums.b2evolution.net/viewtopic.php?t=17431
@@ -338,6 +338,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.7  2009/02/24 13:21:35  tblue246
+ * Minor
+ *
  * Revision 1.6  2009/02/24 04:28:34  sam2kb
  * Convert keywords encoding and use 'mb_substr' to crop the string,
  * see http://forums.b2evolution.net/viewtopic.php?t=17431
