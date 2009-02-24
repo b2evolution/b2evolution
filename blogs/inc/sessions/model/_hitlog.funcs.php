@@ -277,6 +277,12 @@ function stats_search_keywords( $keyphrase )
 
 	if( strlen( $keyphrase ) > 30 )
 	{
+		// TODO: dh> there are other places, where mb_substr should get used, when available!
+		//           Either create a generic wrapper (evo_substr()), or just use
+		//           mbstring_func_overlay=7 (php.ini). I'd say the latter is the way to go,
+		//           but at least the first option ("evo_substr") should get used otherwise
+		//           (which is kind of crappy though). Note: there are more internal PHP funcs
+		//           that would need wrapping, so overloading appears to be the way to go.
 		if( function_exists('mb_substr') )
 		{	// 2-byte unicode strings are cropped to 15 characters
 			// When cropped with 'substr' usually end with junk character
@@ -338,6 +344,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.8  2009/02/24 23:02:29  blueyed
+ * TODO/NOTE about conditional usage of mb_substr
+ *
  * Revision 1.7  2009/02/24 13:21:35  tblue246
  * Minor
  *
