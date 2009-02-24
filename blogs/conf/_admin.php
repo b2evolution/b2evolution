@@ -39,9 +39,35 @@ $allow_cross_posting = 1;
 /**
  * set this to 1 if you want to use the 'preview' function
  *
- * @todo fp>This should be moved to the backoffice. Checbox for each blog (features). Useful when a blog has no public skin. (Tracker)
+ * @todo fp>This should be moved to the backoffice. Checbox for each blog (features). Useful when a blog has no public skin. (Tracker) Should actually be a "has public interface" setting
  *
  * @global boolean $use_preview
  */
 $use_preview = 1;
+
+
+
+/**
+ * Locked post type IDs.
+ *
+ * These post types can't be edited or deleted in the post type editor.
+ * They're needed by certain b2evolution features, so
+ * don't remove any IDs from this array.
+ *
+ * @global array $posttypes_locked_IDs
+ */
+$posttypes_locked_IDs = array( 1000, 1500, 1520, 1530, 1570, 1600, 2000 );
+
+/**
+ * Reserved post type IDs.
+ *
+ * These post types are reserved for future use and can't be edited or
+ * deleted in the post type editor. It also is not possible to select
+ * them when creating a new post.
+ * Do not remove any IDs from this array.
+ *
+ * @global array $posttypes_reserved_IDs
+ */
+$posttypes_reserved_IDs = array( 3000, 4000, 5000 );
+
 ?>

@@ -561,27 +561,4 @@ $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 $antispamsrv_host = 'antispam.b2evolution.net';
 $antispamsrv_port = 80;
 $antispamsrv_uri = '/evonetsrv/xmlrpc.php';
-
-/**
- * Locked post type IDs.
- *
- * These post types can't be edited or deleted in the post type editor.
- * They're needed by certain b2evolution features, so
- * don't remove any IDs from this array.
- *
- * @global array $posttypes_locked_IDs
- */
-$posttypes_locked_IDs = array( 1000, 1500, 1520, 1530, 1570, 1600, 2000 );
-
-/**
- * Reserved post type IDs.
- *
- * These post types are reserved for future use and can't be edited or
- * deleted in the post type editor. It also is not possible to select
- * them when creating a new post.
- * Do not remove any IDs from this array.
- *
- * @global array $posttypes_reserved_IDs
- */
-$posttypes_reserved_IDs = array( 3000, 4000, 5000 );
 ?>
