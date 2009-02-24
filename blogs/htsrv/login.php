@@ -54,6 +54,8 @@ param( 'login', 'string', '' );
 // fp> I think this will fix itself when we do another improvement: 303 redirect after each POST so that we never have an issue with people trying to reload a post
 param( 'redirect_to', 'string', $ReqURI );
 
+// Activate the default locale (otherwise the login page is always in English) - same as on reg page
+// See http://forums.b2evolution.net/viewtopic.php?t=13770
 locale_activate( $locale );
 
 switch( $action )
@@ -420,6 +422,10 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.104  2009/02/24 00:46:11  sam2kb
+ * Activate the default locale - same as on reg page
+ * See http://forums.b2evolution.net/viewtopic.php?t=13770
+ *
  * Revision 1.103  2009/02/23 07:59:46  sam2kb
  * Activate default locale
  *
