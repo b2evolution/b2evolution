@@ -819,6 +819,7 @@ class Item extends ItemLight
 				}
 				else
 				{ // No MainList; only get this item.
+					// fp> why not put this into the cache? (just in case)
 					$cache = $DB->get_var( "
 						SELECT itpr_content_prerendered
 							FROM T_items__prerendering
@@ -1455,7 +1456,7 @@ class Item extends ItemLight
 		}
 
 		if( function_exists( 'mb_strtolower' ) && function_exists( 'mb_detect_encoding' ) )
-		{
+		{	// fp> TODO: instead of those "when used" ifs, it would make more sense to redefine mb_strtolower beforehand if it doesn"t exist (it would then just be a fallback to the strtolower + a Debuglog->add() )
 			array_walk( $this->tags, create_function( '& $tag', '$tag = mb_strtolower(trim($tag), mb_detect_encoding($tag));' ) );
 		}
 		else
@@ -2985,6 +2986,21 @@ class Item extends ItemLight
 
 		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
 
+		// pre_dump($this->dbchanges);
+		// fp> note that dbchanges isn't actually 100% accurate. At this time it does include variables that actually haven't changed.
+		if( isset($this->dbchanges['post_status'])
+			|| isset($this->dbchanges['post_title'])
+			|| isset($this->dbchanges['post_content']) )
+		{	// One of the fields we track in the revision history has changed:
+			// Save the "current" (soon to be "old") data as a version before overwriting it in parent::dbupdate:
+			// fp> TODO: actually, only the fields that have been changed should be copied to the version, the other should be left as NULL
+			$sql = 'INSERT INTO T_items__version( iver_itm_ID, iver_edit_user_ID, iver_edit_datetime, iver_status, iver_title, iver_content )
+				SELECT post_ID, post_lastedit_user_ID, post_datemodified, post_status, post_title, post_content
+					FROM T_items__item
+				 WHERE post_ID = '.$this->ID;
+			$DB->query( $sql, 'Save a version of the Item' );
+		}
+
 		if( $result = parent::dbupdate() )
 		{ // We could update the item object..
 
@@ -3660,6 +3676,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.77  2009/02/24 22:58:20  fplanque
+ * Basic version history of post edits
+ *
  * Revision 1.76  2009/02/23 21:32:38  blueyed
  * Pre-fetching Mainlists's pre-renderered content: Taking the suggested approach, by adding any out-of-Mainlist items to the query. Might be good for production now.
  *

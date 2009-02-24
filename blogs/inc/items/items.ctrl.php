@@ -94,6 +94,7 @@ switch( $action )
 		break;
 
 	case 'edit':
+	case 'history':
  		// Load post to edit:
 		param( 'p', 'integer', true, true );
 		$ItemCache = & get_Cache( 'ItemCache' );
@@ -290,6 +291,10 @@ switch( $action )
 		$tab_switch_params = 'p='.$edited_Item->ID;
 		break;
 
+	case 'history':
+		// Check permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		break;
 
 	case 'edit':
 		// Check permission:
@@ -875,6 +880,19 @@ switch( $action )
 		$AdminUI->disp_view( 'items/views/_item_links.view.php' );
 		break;
 
+	case 'history':
+		memorize_param( 'action', 'string', NULL );
+
+		// Begin payload block:
+		$AdminUI->disp_payload_begin();
+
+		// view:
+		$AdminUI->disp_view( 'items/views/_item_history.view.php' );
+
+		// End payload block:
+		$AdminUI->disp_payload_end();
+		break;
+
 	case 'list':
 	default:
 		// Begin payload block:
@@ -943,6 +961,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.34  2009/02/24 22:58:19  fplanque
+ * Basic version history of post edits
+ *
  * Revision 1.33  2009/02/22 23:20:19  fplanque
  * partial rollback of stuff that can't be right...
  *
@@ -1009,127 +1030,5 @@ $AdminUI->disp_global_footer();
  *
  * Revision 1.13  2008/01/05 02:28:17  fplanque
  * enhanced blog selector (bloglist_buttons)
- *
- * Revision 1.12  2007/12/26 17:58:31  fplanque
- * minor
- *
- * Revision 1.11  2007/12/26 11:27:14  yabs
- * ui improvement
- *
- * Revision 1.10  2007/11/29 22:47:15  fplanque
- * tags everywhere + debug
- *
- * Revision 1.9  2007/11/08 17:48:41  blueyed
- * Fixed encoding of redirect_to
- *
- * Revision 1.8  2007/09/29 09:50:32  yabs
- * validation
- *
- * Revision 1.7  2007/09/26 21:53:24  fplanque
- * file manager / file linking enhancements
- *
- * Revision 1.6  2007/09/22 19:23:56  fplanque
- * various fixes & enhancements
- *
- * Revision 1.5  2007/09/04 22:25:18  fplanque
- * fix
- *
- * Revision 1.4  2007/09/04 22:16:33  fplanque
- * in context editing of posts
- *
- * Revision 1.3  2007/09/03 16:44:31  fplanque
- * chicago admin skin
- *
- * Revision 1.2  2007/07/09 23:03:04  fplanque
- * cleanup of admin skins; especially evo
- *
- * Revision 1.1  2007/06/25 11:00:24  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.27  2007/06/11 01:53:54  fplanque
- * fix
- *
- * Revision 1.26  2007/05/28 01:33:22  fplanque
- * permissions/fixes
- *
- * Revision 1.25  2007/05/14 02:47:23  fplanque
- * (not so) basic Tags framework
- *
- * Revision 1.24  2007/05/13 18:49:54  fplanque
- * made autoselect_blog() more robust under PHP4
- *
- * Revision 1.23  2007/05/09 01:01:32  fplanque
- * permissions cleanup
- *
- * Revision 1.22  2007/04/26 00:11:12  fplanque
- * (c) 2007
- *
- * Revision 1.21  2007/04/05 22:57:33  fplanque
- * Added hook: UnfilterItemContents
- *
- * Revision 1.20  2007/03/26 14:21:30  fplanque
- * better defaults for pages implementation
- *
- * Revision 1.19  2007/03/21 02:21:37  fplanque
- * item controller: highlight current (step 2)
- *
- * Revision 1.18  2007/03/21 01:44:51  fplanque
- * item controller: better return to current filterset - step 1
- *
- * Revision 1.17  2007/03/11 23:56:03  fplanque
- * fixed some post editing oddities / variable cleanup (more could be done)
- *
- * Revision 1.16  2007/03/07 02:37:43  fplanque
- * OMG I decided that pregenerating the menus was getting to much of a PITA!
- * It's a zillion problems with the permissions.
- * This will be simplified a lot. Enough of these crazy stuff.
- *
- * Revision 1.15  2007/03/02 01:36:51  fplanque
- * small fixes
- *
- * Revision 1.14  2007/02/23 00:21:23  blueyed
- * Fixed Plugins::get_next() if the last Plugin got unregistered; Added AdminBeforeItemEditDelete hook
- *
- * Revision 1.13  2007/01/16 00:44:42  fplanque
- * don't use $admin_email in  the app
- *
- * Revision 1.12  2006/12/24 00:42:14  fplanque
- * refactoring / Blog::get_default_cat_ID()
- *
- * Revision 1.11  2006/12/23 23:37:35  fplanque
- * refactoring / Blog::get_default_cat_ID()
- *
- * Revision 1.10  2006/12/23 23:15:22  fplanque
- * refactoring / Blog::get_allowed_item_status()
- *
- * Revision 1.9  2006/12/18 03:20:41  fplanque
- * _header will always try to set $Blog.
- * controllers can use valid_blog_requested() to make sure we have one
- * controllers should call set_working_blog() to change $blog, so that it gets memorized in the user settings
- *
- * Revision 1.8  2006/12/18 01:43:25  fplanque
- * minor bugfix
- *
- * Revision 1.7  2006/12/14 00:01:49  fplanque
- * land in correct collection when opening FM from an Item
- *
- * Revision 1.6  2006/12/12 23:23:29  fplanque
- * finished post editing v2.0
- *
- * Revision 1.5  2006/12/12 19:39:07  fplanque
- * enhanced file links / permissions
- *
- * Revision 1.4  2006/12/12 18:04:53  fplanque
- * fixed item links
- *
- * Revision 1.3  2006/12/12 02:53:56  fplanque
- * Activated new item/comments controllers + new editing navigation
- * Some things are unfinished yet. Other things may need more testing.
- *
- * Revision 1.2  2006/12/12 00:39:46  fplanque
- * The bulk of item editing is done.
- *
- * Revision 1.1  2006/12/11 18:04:52  fplanque
- * started clean "1-2-3-4" item editing
  */
 ?>

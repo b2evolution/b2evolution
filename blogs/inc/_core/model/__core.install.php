@@ -358,6 +358,18 @@ $schema_queries = array(
 			PRIMARY KEY (itpr_itm_ID, itpr_format)
 		)' ),
 
+	'T_items__version' => array(
+		'Creating item versions table',
+		"CREATE TABLE T_items__version (
+			iver_itm_ID				 INT UNSIGNED NOT NULL ,
+			iver_edit_user_ID	 INT UNSIGNED NOT NULL ,
+			iver_edit_datetime DATETIME NOT NULL ,
+			iver_status				 ENUM('published','deprecated','protected','private','draft','redirected') NULL ,
+			iver_title				 TEXT NULL ,
+			iver_content			 MEDIUMTEXT NULL ,
+			INDEX iver_itm_ID ( iver_itm_ID )
+			) ENGINE = innodb" ),
+
 	'T_items__status' => array(
 		'Creating table for Post Statuses',
 		"CREATE TABLE T_items__status (
@@ -560,6 +572,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.12  2009/02/24 22:58:19  fplanque
+ * Basic version history of post edits
+ *
  * Revision 1.11  2009/02/05 22:41:15  tblue246
  * Add column wi_enabled (enabling/disabling widgets) when creating tables.
  *

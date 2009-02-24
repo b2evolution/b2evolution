@@ -126,6 +126,7 @@ class ItemLight extends DataObject
 				array( 'table'=>'T_links', 'fk'=>'link_itm_ID', 'msg'=>T_('%d links to destination items') ),
 				array( 'table'=>'T_postcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
 				array( 'table'=>'T_comments', 'fk'=>'comment_post_ID', 'msg'=>T_('%d comments') ),
+				array( 'table'=>'T_items__version', 'fk'=>'iver_itm_ID', 'msg'=>T_('%d versions') ),
 			);
 
 		$this->objtype = $objtype;
@@ -916,6 +917,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2009/02/24 22:58:20  fplanque
+ * Basic version history of post edits
+ *
  * Revision 1.12  2009/01/21 23:30:12  fplanque
  * feature/intro posts display adjustments
  *

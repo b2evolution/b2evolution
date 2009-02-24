@@ -178,7 +178,7 @@ $ItemList->cols[] = array(
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'shrinkwrap',
-	'td' => '@history_info_icon()@',
+	'td' => '<a href="?ctrl=items&amp;p=$post_ID$&amp;action=history">@history_info_icon()@</a>',
 );
 
 
@@ -273,6 +273,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.12  2009/02/24 22:58:20  fplanque
+ * Basic version history of post edits
+ *
  * Revision 1.11  2009/02/22 23:20:19  fplanque
  * partial rollback of stuff that can't be right...
  *

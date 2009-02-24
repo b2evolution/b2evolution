@@ -56,6 +56,7 @@ $db_config['aliases'] = array(
 		'T_items__status'       => $tableprefix.'items__status',
 		'T_items__tag'          => $tableprefix.'items__tag',
 		'T_items__type'         => $tableprefix.'items__type',
+		'T_items__version'      => $tableprefix.'items__version',
 		'T_links'               => $tableprefix.'links',
 		'T_locales'             => $tableprefix.'locales',
 		'T_plugins'             => $tableprefix.'plugins',
@@ -414,6 +415,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.5  2009/02/24 22:58:19  fplanque
+ * Basic version history of post edits
+ *
  * Revision 1.4  2008/10/06 01:55:06  fplanque
  * User fields proof of concept.
  * Needs UserFieldDef and UserFieldDefCache + editing of fields.
