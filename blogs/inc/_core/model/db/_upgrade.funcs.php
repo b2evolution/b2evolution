@@ -1191,9 +1191,13 @@ function install_make_db_schema_current( $display = true )
 			{
 				if( count($itemlist) == 1 && $itemlist[0]['type'] == 'create_table' )
 				{
-					echo $itemlist[0]['note'].'<br />';
+					echo $itemlist[0]['note']."<br />\n";
 					foreach( $itemlist[0]['queries'] as $query )
 					{ // should be just one, but just in case
+						if( $debug )
+						{
+							pre_dump( $query );
+						}
 						$DB->query( $query );
 					}
 				}
@@ -1224,6 +1228,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.7  2009/02/25 21:03:29  blueyed
+ * install_make_db_schema_current: Output create table entries in debug mode, too. Not tested.
+ *
  * Revision 1.6  2008/10/03 21:56:05  blueyed
  * db_delta: fix index names surrounded in backticks. Add test.
  *
