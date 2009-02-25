@@ -36,83 +36,39 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
-
-/**
- * TRANSLATE!
- *
- * Translate a text to the desired locale (b2evo localization only)
- * or to the current locale
- *
- * @param string String to translate, '' to get language file info (as in gettext spec)
- * @param string locale to translate to, '' to use current locale (basic gettext does only support '')
- */
-if( ($use_l10n == 1) && function_exists('_') )
-{ // We are going to use GETTEXT
-
-	function T_( $string, $req_locale = '' )
-	{
-		global $current_locale, $locales, $evo_charset;
-
-		if( empty( $req_locale ) )
-		{
-			if( empty( $current_locale ) )
-			{ // don't translate if we have no locale
-				return $string;
-			}
-
-			$req_locale = $current_locale;
-		}
-
-		if( $req_locale == $current_locale )
-		{ // We have not asked for a different locale than the currently active one:
-			$r = _($string);
-
-			$messages_charset = $locales[$req_locale]['charset'];
-		}
-		else
-		{ // We have asked for another locale...
-			if( locale_temp_switch( $req_locale ) )
-			{
-				global $current_charset;
-				$r = _($string);
-				$messages_charset = $current_charset;
-				locale_restore_previous();
-			}
-			else
-			{ // Locale could not be activated:
-				$r = $string;
-				$messages_charset = 'iso-8859-1'; // charset of our .php files
-			}
-		}
-
-		if( ! empty($evo_charset) ) // this extra check is needed, because $evo_charset may not yet be determined.. :/
-		{
-			$r = convert_charset( $r, $evo_charset, $messages_charset );
-		}
-
-		return $r;
-	}
-
-}
-elseif( $use_l10n == 2 )
-{ // We are going to use evoCore localization:
+// LOCALIZATION:
+if( $use_l10n )
+{ // We are going to use localization:
 
 	/**
-	 * @ignore
+	 * TRANSLATE!
+	 *
+	 * Translate a text to the desired locale or to the current locale.
+	 *
+	 * @param string String to translate, '' to get language file info (as in gettext spec)
+	 * @param string locale to translate to, '' to use current locale
+	 * @param array Alternate array to use for the caching of the translated strings. NULL to use the internal array.
+	 * @param string Plugin name if you want to use a plugin translation file instead of the global one.
+	 * @return string The translated string or the original string on error.
+	 *
+	 * @internal The last two parameters are used by Plugin::T_().
 	 */
-	function T_( $string, $req_locale = '' )
+	function T_( $string, $req_locale = '', & $ext_transarray = NULL, $plugin_name = NULL )
 	{
 		/**
-		 * The translations keyed by locale. They get loaded through include() of _global.php
+		 * The translations keyed by locale.
+		 *
+		 * This array is only used if $ext_transarray == NULL.
+		 * 
 		 * @var array
 		 * @static
 		 */
-		static $trans = array();
+		static $_trans = array();
 
-		global $current_locale, $locales, $Debuglog, $locales_path, $evo_charset;
+		global $current_locale, $locales, $locales_path, $plugins_path;
+		global $evo_charset, $Debuglog;
 
-
-		if( empty($req_locale) )
+		if( empty( $req_locale ) )
 		{ // By default we use the current locale
 			if( empty( $current_locale ) )
 			{ // don't translate if we have no locale
@@ -122,11 +78,15 @@ elseif( $use_l10n == 2 )
 			$req_locale = $current_locale;
 		}
 
-		if( !isset( $locales[$req_locale]['messages'] ) )
+		if( ! isset( $locales[$req_locale]['messages'] ) )
 		{
 			$Debuglog->add( 'No messages file path for locale. $locales["'
 					.$req_locale.'"] is '.var_export( @$locales[$req_locale], true ), 'locale' );
-			$locales[$req_locale]['messages'] = false;
+
+			if( ! empty( $evo_charset ) ) // this extra check is needed, because $evo_charset may not yet be determined.. :/
+			{
+				return convert_charset( $string, $evo_charset, 'iso-8859-1' );
+			}
 		}
 
 		$messages = $locales[$req_locale]['messages'];
@@ -136,35 +96,49 @@ elseif( $use_l10n == 2 )
 
 		// echo "Translating ", $search, " to $messages<br />";
 
-		if( ! isset($trans[ $messages ] ) )
+		if ( is_null( $ext_transarray ) )
+		{	// use our array
+			//$Debuglog->add( 'Using internal array', 'locale' );
+			$trans = & $_trans;
+		}
+		else
+		{	// use external array:
+			//$Debuglog->add( 'Using external array', 'locale' );
+			$trans = & $ext_transarray;
+		}
+
+		if( ! isset( $trans[ $messages ] ) )
 		{ // Translations for current locale have not yet been loaded:
-			// echo 'LOADING', dirname(__FILE__).'/../locales/'. $messages. '/_global.php';
-			if( file_exists($locales_path.$messages.'/_global.php') )
+			if ( ! is_null( $plugin_name ) )
+			{	// Load the plugin's translation file:
+				$path = $plugins_path.$plugin_name.'/locales/'.$messages.'/_global.php';
+			}
+			else
+			{	// Load our global translation file.
+				$path = $locales_path.$messages.'/_global.php';
+			}
+			$Debuglog->add( 'Loading file: '.$path, 'locale' );
+			
+			if( file_exists( $path ) )
 			{
-				include_once $locales_path.$messages.'/_global.php';
+				include_once $path;
 			}
 			if( ! isset($trans[ $messages ] ) )
 			{ // Still not loaded... file doesn't exist, memorize that no translations are available
 				// echo 'file not found!';
 				$trans[ $messages ] = array();
-
-				/*
-				May be an english locale without translation.
-				TODO: when refactoring locales, assign a key for 'original english'.
-				$Debuglog->add( 'No messages found for locale ['.$req_locale.'],
-												message file [/locales/'.$messages.'/_global.php]', 'locale' );*/
-
 			}
 		}
 
 		if( isset( $trans[ $messages ][ $search ] ) )
 		{ // If the string has been translated:
+			//$Debuglog->add( 'String ['.$string.'] found', 'locale' );
 			$r = $trans[ $messages ][ $search ];
 			$messages_charset = $locales[$req_locale]['charset'];
 		}
 		else
 		{
-			// echo "Not found!";
+			//$Debuglog->add( 'String ['.$string.'] not found', 'locale' );
 			// Return the English string:
 			$r = $string;
 			$messages_charset = 'iso-8859-1'; // our .php file encoding
@@ -175,6 +149,7 @@ elseif( $use_l10n == 2 )
 			$r = convert_charset( $r, $evo_charset, $messages_charset );
 		}
 
+		//$Debuglog->add( 'Result: ['.$r.']', 'locale' );
 		return $r;
 	}
 
@@ -185,13 +160,12 @@ else
 	/**
 	 * @ignore
 	 */
-	function T_( $string, $req_locale = '' )
+	function T_( $string, $req_locale = '', & $ext_transarray = NULL, $plugin_name = NULL )
 	{
 		return $string;
 	}
 
 }
-
 
 /**
  * Translate and escape single quotes.
@@ -269,7 +243,7 @@ function locale_restore_previous()
  */
 function locale_activate( $locale )
 {
-	global $use_l10n, $locales, $current_locale, $current_charset, $weekday;
+	global $locales, $current_locale, $current_charset;
 
 	if( $locale == $current_locale
 			|| empty( $locale )
@@ -282,47 +256,6 @@ function locale_activate( $locale )
 	$current_locale = $locale;
 	// Memorize new charset:
 	$current_charset = $locales[ $locale ][ 'charset' ];
-
-	// Activate translations in gettext:
-	if( ($use_l10n == 1) && function_exists( 'bindtextdomain' ) )
-	{ // Only if we are using GETTEXT ( if not, look into T_(-) ...)
-		global $locales_path;
-		# Activate the locale->language in gettext:
-
-		// Set locale: either to locale's definition
-		if( isset( $locales[$locale]['set_locales'] ) )
-		{
-			$set_locale = explode( ' ', $locales[$locale]['set_locales'] );
-		}
-		else
-		{
-			$set_locale = $locales[ $locale ][ 'messages' ];
-		}
-		setlocale( LC_MESSAGES, $set_locale );
-
-		// Specify location of translation tables and bind to domain
-		bindtextdomain( 'messages', $locales_path );
-		textdomain( 'messages' );
-
-		# Activate the charset for conversions in gettext:
-		/*
-		TODO: this does not work, as $evo_charset gets set/adjusted, AFTER activating the locale.
-		TODO: If this gets activated we won't need the mb_convert_variables() call in T_() for $use_l10n=1
-		if( function_exists( 'bind_textdomain_codeset' ) )
-		{ // Only if this gettext supports code conversions
-			$r = bind_textdomain_codeset( 'messages', $evo_charset );
-		}
-		*/
-	}
-
-	# Set locale for default language:
-	# This will influence the way numbers are displayed, etc.
-	// We are not using this right now, the default 'C' locale seems just fine
-	// setlocale( LC_ALL, $locale );
-
-	# Use this to check locale: (not relevant)
-	// echo setlocale( LC_MESSAGES, 0 );
-
 	return true;
 }
 
@@ -1051,6 +984,11 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.15  2009/02/25 20:15:21  tblue246
+ * L10n:
+ * - Remove Gettext functionality (that means we now use our PHP arrays from the _global.php files only).
+ * - Try to merge most functionality of Plugin::T_() into the global T_() function.
+ *
  * Revision 1.14  2009/01/29 18:16:35  tblue246
  * Hide language chooser on post form in expert mode if there's only one locale.
  *

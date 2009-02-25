@@ -288,13 +288,6 @@ class Plugin
 	var $_trans = array();
 
 	/**
-	 * The translation charsets keyed by locale. They get loaded through include() of _global.php.
-	 * @see Plugin::T_()
-	 * @var array
-	 */
-	var $_trans_charsets = array();
-
-	/**
 	 * Has the global /locales/_global.php file (where translation for
 	 * all languages can be put into) been loaded?
 	 *
@@ -2252,140 +2245,38 @@ class Plugin
 	 *
 	 * It uses the global/regular {@link T_()} function as fallback.
 	 *
-	 * {@internal This is mainly a copy of {@link T_()}, for the $use_l10n==2 case.}}
-	 *
-	 * @todo Factorize with global T_() function
 	 * @param string The string (english), that should be translated
 	 * @param string Requested locale ({@link $current_locale} gets used by default)
 	 * @return string
+	 * @uses T_()
 	 */
 	function T_( $string, $req_locale = '' )
 	{
-		global $current_locale, $locales, $Debuglog, $plugins_path, $evo_charset;
+		global $plugins_path;
 
+		$globalfile_path = $plugins_path.$this->classname.'/locales/_global.php';
 		$trans = & $this->_trans;
 
-		if( empty($req_locale) )
-		{ // By default we use the current locale
-			if( empty( $current_locale ) )
-			{ // don't translate if we have no locale
-				return $string;
-			}
-
-			$req_locale = $current_locale;
-		}
-
-		if( ! isset( $locales[$req_locale]['messages'] ) )
+		// Load the global messages file, if existing:
+		if( ! $this->_trans_loaded_global )
 		{
-			$this->debug_log( 'No messages file dirname for locale. $locales["'
-				.$req_locale.'"] is '.var_export( @$locales[$req_locale], true ), 'locale' );
-			$locales[$req_locale]['messages'] = false;
-		}
+			$this->_trans_loaded_global = true;
 
-		$messages = $locales[$req_locale]['messages'];
-
-		// replace special characters to msgid-equivalents
-		$search = str_replace( array("\n", "\r", "\t"), array('\n', '', '\t'), $string );
-
-		// echo "Translating ", $search, " to $messages<br />";
-
-		if( ! isset($trans[ $messages ] ) )
-		{ // Translations for current locale have not yet been loaded:
-
-			if( ! isset($this->classfile_path) )
-			{ // ->T_() called through the plugin's constructor, which is deprecated!
-				$this->debug_log( 'T_() method called through plugin constructor!' );
-				return $string;
-			}
-
-			$locales_dir = dirname($this->classfile_path).'/';
-			if( $locales_dir == $plugins_path )
+			if( file_exists( $globalfile_path ) && is_readable( $globalfile_path ) )
 			{
-				$locales_dir .= $this->classname.'/';
+				include_once $globalfile_path;
 			}
-			$locales_dir .= 'locales/';
-
-			// First load the global messages file, if existing:
-			if( ! $this->_trans_loaded_global )
+			else
 			{
-				$this->_trans_loaded_global = true;
-
-				$file_path = $locales_dir.'_global.php';
-				if( file_exists($file_path) )
-				{
-					if( is_readable($file_path) )
-					{
-						// echo 'LOADING GLOBAL '.$file_path;
-						include $file_path;
-					}
-					else
-					{
-						$this->debug_log( 'Global messages file '.$file_path.' is not readable!', 'locale' );
-					}
-				}
-			}
-
-			// Then load locale specific files:
-			$file_path = $locales_dir.$messages.'/_global.php';
-
-			if( file_exists($file_path) )
-			{
-				if( is_readable($file_path) )
-				{
-					// echo 'LOADING '.$file_path;
-					include $file_path;
-				}
-				else
-				{
-					$this->debug_log( 'Messages file '.$file_path.' for locale '.$req_locale.' is not readable!', 'locale' );
-				}
-			}
-
-			if( ! isset($trans[ $messages ] ) )
-			{ // Still not loaded... file doesn't exist, memorize that no translations are available
-				// echo 'file not found!';
-				$trans[ $messages ] = array();
-
-				/*
-				May be an english locale without translation.
-				TODO: when refactoring locales, assign a key for 'original english'.
-				$Debuglog->add( 'No messages found for locale ['.$req_locale.'],
-												message file [/locales/'.$messages.'/_global.php]', 'locale' );*/
-			}
-
-			// Remember the charset:
-			if( isset($trans[$messages]['']) )
-			{
-				if( ($pos = strpos($trans[$messages][''], 'Content-Type:')) !== false )
-				{
-					if( preg_match('~^Content-Type:.*charset=([\w\d-]+)~', substr($trans[$messages][''], $pos), $match) )
-					{
-						$this->_trans_charsets[$messages] = $match[1];
-						$this->debug_log( 'Charset of messages for '.$messages.' is '.$match[1] );
-					}
-				}
-			}
-			if( ! isset($this->_trans_charsets[$messages]) )
-			{ // not provided, use the one of the main locale files:
-				$this->_trans_charsets[$messages] = $locales[$req_locale]['charset'];
+				$this->debug_log( 'Global messages file '.$globalfile_path.' does not exist or is not readable!', 'locale' );
 			}
 		}
 
-		if( isset( $trans[ $messages ][ $search ] ) )
-		{ // If the string has been translated:
-			$r = $trans[ $messages ][ $search ];
-		}
-		else
-		{ // Fallback to global T_() function:
+		if ( ( $return = T_( $string, $req_locale, $this->_trans, $this->classname ) ) == $string )
+		{	// Fallback to global translation file:
 			return T_( $string, $req_locale );
 		}
-
-		if( ! empty($evo_charset) ) // this extra check is needed, because $evo_charset may not yet be determined.. :/
-		{
-			$r = convert_charset( $r, $evo_charset, $this->_trans_charsets[$messages] );
-		}
-
-		return $r;
+		return $return;
 	}
 
 
@@ -2902,6 +2793,11 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.11  2009/02/25 20:15:21  tblue246
+ * L10n:
+ * - Remove Gettext functionality (that means we now use our PHP arrays from the _global.php files only).
+ * - Try to merge most functionality of Plugin::T_() into the global T_() function.
+ *
  * Revision 1.10  2009/01/22 23:56:47  blueyed
  * todo
  *

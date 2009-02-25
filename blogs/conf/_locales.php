@@ -16,14 +16,11 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * Enable localization?
  *
  * Set to 0 to disable localization.
- * Set to 1 to enable gettext localization if supported (not recommended).
- *    Note: you will have to compile the .po files with msgfmt before this will work.
- *          Also, the locale information has to be available on the system ("locale -a" with Unix)
- * Set to 2 to enable b2evo advanced localization (recommended).
- *
+ * Set to 1 to enable localization.
+
  * @global integer
  */
-$use_l10n = 2;
+$use_l10n = 1;
 
 
 /**
