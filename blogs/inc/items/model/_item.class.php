@@ -771,6 +771,8 @@ class Item extends ItemLight
 			if( isset($ItemPrerenderingCache[$format][$this->ID][$cache_key]) )
 			{ // already in PHP cache.
 				$r = $ItemPrerenderingCache[$format][$this->ID][$cache_key];
+				// Save memory, typically only accessed once.
+				unset($ItemPrerenderingCache[$format][$this->ID][$cache_key]);
 			}
 			else
 			{	// Try loading from DB cache, including all items in $MainList
@@ -783,7 +785,7 @@ class Item extends ItemLight
 						$prefetch_IDs = $MainList->page_ID_array;
 
 						// Add the current ID to the list to prefetch, if it's not in the MainList (e.g. featured item).
-						if( ! in_array($this->ID, $MainList->page_ID_array) )
+						if( ! in_array($this->ID, $prefetch_IDs) )
 						{
 							$prefetch_IDs[] = $this->ID;
 						}
@@ -797,7 +799,7 @@ class Item extends ItemLight
 								FROM T_items__prerendering
 							 WHERE itpr_itm_ID IN (".implode(',', $prefetch_IDs).")
 								 AND itpr_format = '".$format."'",
-								 0, 0, 'Preload prerendered item content for MainList ('.$format.')' );
+								 OBJECT, 'Preload prerendered item content for MainList ('.$format.')' );
 						foreach($rows as $row)
 						{
 							$row_cache_key = $row->itpr_format.'/'.$row->itpr_renderers;
@@ -814,12 +816,17 @@ class Item extends ItemLight
 						if( isset($ItemPrerenderingCache[$format][$this->ID][$cache_key]) )
 						{
 							$r = $ItemPrerenderingCache[$format][$this->ID][$cache_key];
+							// Save memory, typically only accessed once.
+							unset($ItemPrerenderingCache[$format][$this->ID][$cache_key]);
 						}
 					}
 				}
 				else
 				{ // No MainList; only get this item.
-					// fp> why not put this into the cache? (just in case)
+					// This gets not added to ItemPrerenderingCache, since it would only waste
+					// memory - an item gets typically only accessed once per page, and even if
+					// it would get accessed more often, there is a cache higher in the chain
+					// ($this->content_pages).
 					$cache = $DB->get_var( "
 						SELECT itpr_content_prerendered
 							FROM T_items__prerendering
@@ -3676,6 +3683,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.78  2009/02/25 00:10:16  blueyed
+ * doc, add some memory optimisation (ItemPrerenderingCache items are typically only accessed once). Also fix query title for preloading.
+ *
  * Revision 1.77  2009/02/24 22:58:20  fplanque
  * Basic version history of post edits
  *
