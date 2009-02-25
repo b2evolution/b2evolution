@@ -849,7 +849,6 @@ switch( $action )
 				// SINGLE POST:
 				// Create a post:
 				$edited_Item = & new Item();
-				$edited_Item->blog_ID = $blog;
 				$edited_Item->set( 'status', $item_status );
 				$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
 
@@ -908,11 +907,7 @@ switch( $action )
 
 					// Create a post:
 					$edited_Item = & new Item();
-
-					$edited_Item->blog_ID = $blog;
-
 					$edited_Item->set( 'status', $item_status );
-
 					$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
 
 					$title = $l_File->get('title');
@@ -1662,6 +1657,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2009/02/25 22:17:53  blueyed
+ * ItemLight: lazily load blog_ID and main_Chapter.
+ * There is more, but I do not want to skim the diff again, after
+ * "cvs ci" failed due to broken pipe.
+ *
  * Revision 1.23  2008/09/29 08:30:43  fplanque
  * Avatar support
  *

@@ -195,8 +195,6 @@ switch( $action )
 		load_class('items/model/_item.class.php');
 		$edited_Item = & new Item();
 
-		$edited_Item->blog_ID = $blog;
-
 		// We use the request variables to fill the edit form, because we need to be able to pass those values
 		// from tab to tab via javascript when the editor wants to switch views...
 		// Also used by bookmarklet
@@ -210,10 +208,10 @@ switch( $action )
 
 		param( 'post_extracats', 'array', array() );
 
-		$edited_Item->main_cat_ID = param( 'post_category', 'integer', $Blog->get_default_cat_ID() );
-		if( $edited_Item->main_cat_ID && $allow_cross_posting < 3 && get_catblog($edited_Item->main_cat_ID) != $blog )
+		$edited_Item->set('main_cat_ID', param( 'post_category', 'integer', $Blog->get_default_cat_ID() ));
+		if( $edited_Item->main_cat_ID && $allow_cross_posting < 3 && $edited_Item->get_blog_ID() != $blog )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
-			$edited_Item->main_cat_ID = $Blog->get_default_cat_ID();
+			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 		}
 		$post_extracats = param( 'post_extracats', 'array', $post_extracats );
 
@@ -270,10 +268,10 @@ switch( $action )
 		$edited_Item->load_from_Request( true ); // needs Blog set
 
 		param( 'post_extracats', 'array', array() );
-		$edited_Item->main_cat_ID = param( 'post_category', 'integer', $edited_Item->main_cat_ID );
-		if( $edited_Item->main_cat_ID && $allow_cross_posting < 3 && get_catblog($edited_Item->main_cat_ID) != $blog )
+		$edited_Item->set('main_cat_ID', param( 'post_category', 'integer', $edited_Item->main_cat_ID ));
+		if( $edited_Item->main_cat_ID && $allow_cross_posting < 3 && $edited_Item->get_blog_ID() != $blog )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
-			$edited_Item->main_cat_ID = $Blog->get_default_cat_ID();
+			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 		}
 		$post_extracats = param( 'post_extracats', 'array', $post_extracats );
 
@@ -754,7 +752,7 @@ switch( $action )
 			case 'update_edit':
 			case 'update': // on error
 			case 'update_publish': // on error
-				if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $edited_Item->blog_ID ) )
+				if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $edited_Item->get_blog_ID() ) )
 				{ // User has no right to delete this post
 					break;
 				}
@@ -961,6 +959,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.35  2009/02/25 22:17:53  blueyed
+ * ItemLight: lazily load blog_ID and main_Chapter.
+ * There is more, but I do not want to skim the diff again, after
+ * "cvs ci" failed due to broken pipe.
+ *
  * Revision 1.34  2009/02/24 22:58:19  fplanque
  * Basic version history of post edits
  *

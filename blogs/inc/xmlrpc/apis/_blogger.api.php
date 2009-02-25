@@ -263,7 +263,7 @@ function blogger_deletepost($m)
 	}
 
 	// CHECK PERMISSION:
-	if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $edited_Item->blog_ID ) )
+	if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $edited_Item->get_blog_ID() ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
@@ -444,7 +444,7 @@ function blogger_getpost($m)
 
 	// CHECK PERMISSION: (we need at least one post/edit status)
 	// (we should be able to see even if we cannot edit the particular status of that post)
-	if( ! $current_User->check_perm( 'blog_post_statuses', 1, false, $edited_Item->blog_ID ) )
+	if( ! $current_User->check_perm( 'blog_post_statuses', 1, false, $edited_Item->get_blog_ID() ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
@@ -614,6 +614,11 @@ $xmlrpc_procs["blogger.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.4  2009/02/25 22:17:53  blueyed
+ * ItemLight: lazily load blog_ID and main_Chapter.
+ * There is more, but I do not want to skim the diff again, after
+ * "cvs ci" failed due to broken pipe.
+ *
  * Revision 1.3  2008/05/04 23:01:05  blueyed
  * fix fatal phpdoc errors
  *

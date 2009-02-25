@@ -573,7 +573,7 @@ class Comment extends DataObject
 
 		$this->get_Item();
 
-		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
+		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get_blog_ID() ) )
 		{ // If User has no permission to edit comments:
 			return false;
 		}
@@ -619,7 +619,7 @@ class Comment extends DataObject
 
 		$this->get_Item();
 
-		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
+		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get_blog_ID() ) )
 		{ // If User has no permission to edit comments:
 			return false;
 		}
@@ -687,7 +687,7 @@ class Comment extends DataObject
 		$this->get_Item();
 
 		if( ($this->status == 'deprecated') // Already deprecateded!
-			|| ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
+			|| ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get_blog_ID() ) )
 		{ // If User has no permission to edit comments:
 			return false;
 		}
@@ -748,7 +748,7 @@ class Comment extends DataObject
 		$this->get_Item();
 
 		if( ($this->status == 'published') // Already published!
-			|| ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get( 'blog_ID' ) ) )
+			|| ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get_blog_ID() ) )
 		{ // If User has no permission to edit comments:
 			return false;
 		}
@@ -1166,7 +1166,7 @@ class Comment extends DataObject
 			// Note: users receive comments on their own posts. This is done on purpose. Otherwise they think it's broken when they test the app.
 			$sql = 'SELECT DISTINCT user_email, user_locale
 								FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
-							 WHERE sub_coll_ID = '.$this->Item->blog_ID.'
+							 WHERE sub_coll_ID = '.$this->Item->get_blog_ID().'
 							   AND sub_comments <> 0
 							   AND LENGTH(TRIM(user_email)) > 0';
 			$notify_list = $DB->get_results( $sql );
@@ -1392,6 +1392,11 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2009/02/25 22:17:53  blueyed
+ * ItemLight: lazily load blog_ID and main_Chapter.
+ * There is more, but I do not want to skim the diff again, after
+ * "cvs ci" failed due to broken pipe.
+ *
  * Revision 1.25  2009/01/26 20:45:51  blueyed
  * Fix Comment::get_author_name for User (returned and echoed). Used nowhere and buggy since move to MVC (2007-06-25) at least. Thanks Walter for finding it :)
  *

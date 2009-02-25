@@ -44,7 +44,7 @@ switch( $action )
 		$edited_Comment = Comment_get_by_ID( $comment_ID );
 
 		$edited_Comment_Item = & $edited_Comment->get_Item();
-		set_working_blog( $edited_Comment_Item->blog_ID );
+		set_working_blog( $edited_Comment_Item->get_blog_ID() );
 		$BlogCache = & get_Cache( 'BlogCache' );
 		$Blog = & $BlogCache->get_by_ID( $blog );
 
@@ -272,6 +272,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2009/02/25 22:17:53  blueyed
+ * ItemLight: lazily load blog_ID and main_Chapter.
+ * There is more, but I do not want to skim the diff again, after
+ * "cvs ci" failed due to broken pipe.
+ *
  * Revision 1.11  2009/01/25 18:57:56  blueyed
  * phpdoc: fix multiple package tags error
  *

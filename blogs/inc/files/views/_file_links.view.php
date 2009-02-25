@@ -54,7 +54,7 @@ if( $mode != 'upload' )
 						'link_' );
 
 	$Results->title = sprintf( T_('Files linked to &laquo;%s&raquo;'),
-					'<a href="?ctrl=items&amp;blog='.$edited_Item->blog_ID.'&amp;p='.$edited_Item->ID.'" title="'
+					'<a href="?ctrl=items&amp;blog='.$edited_Item->get_blog_ID().'&amp;p='.$edited_Item->ID.'" title="'
 					.T_('View this post...').'">'.$edited_Item->dget('title').'</a>' );
 
 	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
@@ -156,6 +156,11 @@ if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Ite
 
 /*
  * $Log$
+ * Revision 1.8  2009/02/25 22:17:53  blueyed
+ * ItemLight: lazily load blog_ID and main_Chapter.
+ * There is more, but I do not want to skim the diff again, after
+ * "cvs ci" failed due to broken pipe.
+ *
  * Revision 1.7  2008/09/23 05:26:38  fplanque
  * Handle attaching files when multiple posts are edited simultaneously
  *

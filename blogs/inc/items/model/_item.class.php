@@ -610,7 +610,7 @@ class Item extends ItemLight
 	function get_assigned_user_options()
 	{
 		$UserCache = & get_Cache( 'UserCache' );
-		return $UserCache->get_blog_member_option_list( $this->blog_ID, $this->assigned_user_ID,
+		return $UserCache->get_blog_member_option_list( $this->get_blog_ID(), $this->assigned_user_ID,
 							true,	($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */ );
 	}
 
@@ -1990,12 +1990,12 @@ class Item extends ItemLight
 								), $params );
 		*/
 
-		if( isset($current_User) && $current_User->check_perm( 'blog_comments', 'any', false,	$this->blog_ID ) )
+		if( isset($current_User) && $current_User->check_perm( 'blog_comments', 'any', false, $this->get_blog_ID() ) )
 		{	// We jave permission to edit comments:
 			if( $edit_comments_link == '#' )
 			{	// Use default link:
 				global $admin_url;
-				$edit_comments_link = '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$this->blog_ID.'&amp;p='.$this->ID.'#comments" title="'.T_('Moderate these feedbacks').'">'.get_icon( 'edit' ).' '.T_('Moderate...').'</a>';
+				$edit_comments_link = '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID.'#comments" title="'.T_('Moderate these feedbacks').'">'.get_icon( 'edit' ).' '.T_('Moderate...').'</a>';
 			}
 		}
 		else
@@ -2088,7 +2088,7 @@ class Item extends ItemLight
 
 		if( ! is_logged_in() ) return false;
 
-		if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $this->blog_ID ) )
+		if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $this->get_blog_ID() ) )
 		{ // User has right to delete this post
 			return false;
 		}
@@ -3228,37 +3228,6 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get the Blog object for the Item.
-	 *
-	 * @return Blog
-	 */
-	function & get_Blog()
-	{
-		if( is_null($this->Blog) )
-		{
-			$this->load_Blog();
-		}
-
-		return $this->Blog;
-	}
-
-
-	/**
-	 * Load the Blog object for the Item, without returning it.
-	 *
-	 * This is needed for {@link Results} object callbacks.
-	 */
-	function load_Blog()
-	{
-		if( is_null($this->Blog) )
-		{
-			$BlogCache = & get_Cache( 'BlogCache' );
-			$this->Blog = & $BlogCache->get_by_ID( $this->blog_ID );
-		}
-	}
-
-
-	/**
 	 * Execute or schedule post(=after) processing tasks
 	 *
 	 * Includes notifications & pings
@@ -3382,7 +3351,7 @@ class Item extends ItemLight
 		// TODO: also use extra cats/blogs??
 		$sql = 'SELECT DISTINCT user_email, user_locale
 							FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
-						WHERE sub_coll_ID = '.$this->blog_ID.'
+						WHERE sub_coll_ID = '.$this->get_blog_ID().'
 							AND sub_items <> 0
 							AND LENGTH(TRIM(user_email)) > 0';
 		$notify_list = $DB->get_results( $sql );
@@ -3441,7 +3410,7 @@ class Item extends ItemLight
 
 					// Footer:
 					."\n-- \n"
-					.T_('Edit/Delete').': '.$admin_url.'?ctrl=items&blog='.$this->blog_ID.'&p='.$this->ID."\n\n"
+					.T_('Edit/Delete').': '.$admin_url.'?ctrl=items&blog='.$this->get_blog_ID().'&p='.$this->ID."\n\n"
 
 					.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->gen_blogurl(), 'disp=subs' ) )."\n";
 
@@ -3683,6 +3652,11 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.79  2009/02/25 22:17:53  blueyed
+ * ItemLight: lazily load blog_ID and main_Chapter.
+ * There is more, but I do not want to skim the diff again, after
+ * "cvs ci" failed due to broken pipe.
+ *
  * Revision 1.78  2009/02/25 00:10:16  blueyed
  * doc, add some memory optimisation (ItemPrerenderingCache items are typically only accessed once). Also fix query title for preloading.
  *

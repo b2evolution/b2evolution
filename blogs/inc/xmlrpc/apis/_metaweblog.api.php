@@ -448,7 +448,7 @@ function mw_editpost( $m )
 	logIO("Decoded xcontent");
 
 	// Categories:
-	$cat_IDs = _mw_get_cat_IDs( $contentstruct, $edited_Item->blog_ID, true /* empty is ok */ );
+	$cat_IDs = _mw_get_cat_IDs( $contentstruct, $edited_Item->get_blog_ID(), true /* empty is ok */ );
 	if( ! is_array($cat_IDs) )
 	{ // error:
 		return $cat_IDs;
@@ -457,7 +457,7 @@ function mw_editpost( $m )
 	if( empty($cat_IDs) )
 	{	// TODO: make this finer
 		// CHECK PERMISSION: (we need perm on current status)
-		if( ! $current_User->check_perm( 'blog_post!'.$status, 'edit', false, $edited_Item->blog_ID ) )
+		if( ! $current_User->check_perm( 'blog_post!'.$status, 'edit', false, $edited_Item->get_blog_ID() ) )
 		{	// Permission denied
 			return xmlrpcs_resperror( 3 );	// User error 3
 		}
@@ -762,7 +762,7 @@ function mw_getpost($m)
 	}
 
 	// CHECK PERMISSION: (we need at least one post/edit status)
-	if( ! $current_User->check_perm( 'blog_post_statuses', 1, false, $edited_Item->blog_ID ) )
+	if( ! $current_User->check_perm( 'blog_post_statuses', 1, false, $edited_Item->get_blog_ID() ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
@@ -831,6 +831,11 @@ $xmlrpc_procs["metaWeblog.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.8  2009/02/25 22:17:53  blueyed
+ * ItemLight: lazily load blog_ID and main_Chapter.
+ * There is more, but I do not want to skim the diff again, after
+ * "cvs ci" failed due to broken pipe.
+ *
  * Revision 1.7  2009/01/28 21:23:23  fplanque
  * Manual ordering of categories
  *

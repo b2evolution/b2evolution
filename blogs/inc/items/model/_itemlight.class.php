@@ -34,6 +34,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class('_core/model/dataobjects/_dataobject.class.php');
 
+
 /**
  * ItemLight Class
  *
@@ -70,22 +71,27 @@ class ItemLight extends DataObject
  	var $ptyp_ID;
 
 	/**
+	 * ID of the main category.
+	 * Use {@link ItemLight::set()} to set it, since other vars get lazily derived from it.
 	 * @var integer
 	 */
 	var $main_cat_ID = 0;
 	/**
 	 * @var Chapter
+	 * @access protected
+	 * @see ItemLight::get_main_Chapter()
 	 */
 	var $main_Chapter;
 
 	/**
-	 * Derived from $main_cat_ID
-	 *
-	 * This is set at instanciation.
+	 * Derived from $main_cat_ID.
 	 *
 	 * @var integer
+	 * @access protected
+	 * @see ItemLight::get_blog_ID()
 	 */
 	var $blog_ID;
+
 	/**
 	 * The Blog of the Item (lazy filled, use {@link get_Blog()} to access it.
 	 * @access protected
@@ -148,12 +154,6 @@ class ItemLight extends DataObject
 			$this->excerpt = $db_row->post_excerpt;
 			$this->ptyp_ID = $db_row->post_ptyp_ID;
 			$this->url = $db_row->post_url;
-
-			// Derived vars
-			$ChapterCache = & get_Cache( 'ChapterCache' );
-			$this->main_Chapter = & $ChapterCache->get_by_ID( $this->main_cat_ID );
-
-			$this->blog_ID = $this->main_Chapter->blog_ID;
 		}
 	}
 
@@ -229,11 +229,13 @@ class ItemLight extends DataObject
 				break;
 
  			case 'subchap':
-				$permalink = url_add_tail( $blogurl, '/'.$this->main_Chapter->urlname.'/'.$urltail );
+				$main_Chapter = & $this->get_main_Chapter();
+				$permalink = url_add_tail( $blogurl, '/'.$main_Chapter->urlname.'/'.$urltail );
 				break;
 
  			case 'chapters':
-				$permalink = url_add_tail( $blogurl, '/'.$this->main_Chapter->get_url_path().$urltail );
+				$main_Chapter = & $this->get_main_Chapter();
+				$permalink = url_add_tail( $blogurl, '/'.$main_Chapter->get_url_path().$urltail );
 				break;
 
 			case 'short':
@@ -285,7 +287,7 @@ class ItemLight extends DataObject
  	 * @param string base url to use
 	 * @param string glue between url params
 	 */
-	function get_chapter_url( $blogurl = '', $glue = '&amp;' )
+	function get_chapter_url( $blogurl = '', /* TODO: not used.. */ $glue = '&amp;' )
 	{
 		if( empty( $blogurl ) )
 		{
@@ -293,7 +295,8 @@ class ItemLight extends DataObject
 			$blogurl = $this->Blog->gen_blogurl();
 		}
 
-		$permalink = url_add_tail( $blogurl, '/'.$this->main_Chapter->get_url_path() );
+		$main_Chapter = & $this->get_main_Chapter();
+		$permalink = url_add_tail( $blogurl, '/'.$main_Chapter->get_url_path() );
 
 		return $permalink.'#item_'.$this->ID;
 	}
@@ -468,11 +471,30 @@ class ItemLight extends DataObject
 	 */
 	function & get_main_Chapter()
 	{
-		$ChapterCache = & get_Cache( 'ChapterCache' );
-		/**
-		 * @var Chapter
-		 */
-		return $ChapterCache->get_by_ID( $this->main_cat_ID );
+		if( is_null($this->main_Chapter) )
+		{
+			$ChapterCache = & get_Cache( 'ChapterCache' );
+			/**
+			 * @var Chapter
+			 */
+			$this->main_Chapter = & $ChapterCache->get_by_ID( $this->main_cat_ID );
+		}
+		return $this->main_Chapter;
+	}
+
+
+	/**
+	 * Get the blog ID of this item (derived from main chapter).
+	 * @return integer
+	 */
+	function get_blog_ID()
+	{
+		if( is_null($this->blog_ID) )
+		{
+			$main_Chapter = & $this->get_main_Chapter();
+			$this->blog_ID = $main_Chapter->blog_ID;
+		}
+		return $this->blog_ID;
 	}
 
 
@@ -770,7 +792,7 @@ class ItemLight extends DataObject
 				break;
 
 			case 'admin_view':
-				$url = '?ctrl=items&amp;blog='.$this->blog_ID.'&amp;p='.$this->ID;
+				$url = '?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID;
 				break;
 
 			case 'none':
@@ -856,8 +878,9 @@ class ItemLight extends DataObject
 				// make sure main cat is in extracat list and there are no duplicates
 				$this->extra_cat_IDs[] = $this->main_cat_ID;
 				$this->extra_cat_IDs = array_unique( $this->extra_cat_IDs );
-				// Update derived property:
-				$this->blog_ID = get_catblog( $this->main_cat_ID ); // This is a derived var
+				// Invalidate derived property:
+				$this->blog_ID = NULL;
+				$this->main_Chapter = NULL;
 				return $r;
 
 			case 'extra_cat_IDs':
@@ -908,7 +931,7 @@ class ItemLight extends DataObject
 		if( is_null($this->Blog) )
 		{
 			$BlogCache = & get_Cache( 'BlogCache' );
-			$this->Blog = & $BlogCache->get_by_ID( $this->blog_ID );
+			$this->Blog = & $BlogCache->get_by_ID( $this->get_blog_ID() );
 		}
 	}
 
@@ -917,6 +940,11 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2009/02/25 22:17:53  blueyed
+ * ItemLight: lazily load blog_ID and main_Chapter.
+ * There is more, but I do not want to skim the diff again, after
+ * "cvs ci" failed due to broken pipe.
+ *
  * Revision 1.13  2009/02/24 22:58:20  fplanque
  * Basic version history of post edits
  *

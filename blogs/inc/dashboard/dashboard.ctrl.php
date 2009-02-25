@@ -87,7 +87,7 @@ if( $blog )
 			echo $Comment->get_title(array('author_format'=>'<strong>%s</strong>'));
 			$comment_Item = & $Comment->get_Item();
 			echo ' '.T_('in response to')
-					.' <a href="?ctrl=items&amp;blog='.$comment_Item->blog_ID.'&amp;p='.$comment_Item->ID.'"><strong>'.$comment_Item->dget('title').'</strong></a>';
+					.' <a href="?ctrl=items&amp;blog='.$comment_Item->get_blog_ID().'&amp;p='.$comment_Item->ID.'"><strong>'.$comment_Item->dget('title').'</strong></a>';
 
 			echo '</h3>';
 
@@ -480,6 +480,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.29  2009/02/25 22:17:53  blueyed
+ * ItemLight: lazily load blog_ID and main_Chapter.
+ * There is more, but I do not want to skim the diff again, after
+ * "cvs ci" failed due to broken pipe.
+ *
  * Revision 1.28  2008/12/18 00:34:13  blueyed
  * - Add Comment::get_author() and make Comment::author() use it
  * - Add Comment::get_title() and use it in Dashboard and Admin comment list

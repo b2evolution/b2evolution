@@ -84,7 +84,7 @@ function task_title_link( $Item )
   if( $Item->Blog->allowcomments != 'never' )
 	{	// The current blog can have comments:
 		$nb_comments = generic_ctp_number($Item->ID, 'feedback');
-		$col .= '<a href="?ctrl=items&amp;blog='.$Item->blog_ID.'&amp;p='.$Item->ID.'"
+		$col .= '<a href="?ctrl=items&amp;blog='.$Item->get_blog_ID().'&amp;p='.$Item->ID.'"
 						title="'.sprintf( T_('%d feedbacks'), $nb_comments ).'" class="">';
 		if( $nb_comments )
 		{
@@ -97,7 +97,7 @@ function task_title_link( $Item )
 		$col .= '</a> ';
 	}
 
-	$col .= '<a href="?ctrl=items&amp;blog='.$Item->blog_ID.'&amp;p='.$Item->ID.'" class="" title="'.
+	$col .= '<a href="?ctrl=items&amp;blog='.$Item->get_blog_ID().'&amp;p='.$Item->ID.'" class="" title="'.
 								T_('Edit this task...').'">'.$Item->dget('title').'</a></strong>';
 
 	return $col;
@@ -264,6 +264,11 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.6  2009/02/25 22:17:53  blueyed
+ * ItemLight: lazily load blog_ID and main_Chapter.
+ * There is more, but I do not want to skim the diff again, after
+ * "cvs ci" failed due to broken pipe.
+ *
  * Revision 1.5  2008/01/21 09:35:31  fplanque
  * (c) 2008
  *

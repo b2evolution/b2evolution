@@ -650,8 +650,7 @@ class User extends DataObject
 				 * @var Item
 				 */
 				$Item = & $perm_target;
-				// fp> I believe we don't need this: $Item->get_Blog();
-				$blog_ID = $Item->blog_ID;
+				$blog_ID = $Item->get_blog_ID();
 
 				if( $this->check_perm_blogowner( $blog_ID ) )
 				{	// Owner can do *almost* anything:
@@ -1468,6 +1467,11 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2009/02/25 22:17:53  blueyed
+ * ItemLight: lazily load blog_ID and main_Chapter.
+ * There is more, but I do not want to skim the diff again, after
+ * "cvs ci" failed due to broken pipe.
+ *
  * Revision 1.15  2009/01/27 23:45:54  fplanque
  * minor
  *
