@@ -1653,7 +1653,7 @@ function debug_info( $force = false, $force_clean = false )
 	$ReqHostPathQuery = $ReqHost.$ReqPath.( empty( $_SERVER['QUERY_STRING'] ) ? '' : '?'.$_SERVER['QUERY_STRING'] );
 
 	echo "\n\n\n";
-	echo ( $clean ? '*** Debug info ***'."\n\n" : '<div class="debug"><h2>Debug info</h2>' );
+	echo ( $clean ? '*** Debug info ***'."\n\n" : '<div class="debug" id="debug_info"><h2>Debug info</h2>' );
 
 	$Debuglog->add( 'Len of serialized $cache_imgsize: '.strlen(serialize($cache_imgsize)), 'memory' );
 	$Debuglog->add( 'Len of serialized $cache_File: '.strlen(serialize($cache_File)), 'memory' );
@@ -3294,6 +3294,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.72  2009/02/25 22:06:18  blueyed
+ * Add id="debug_info" to Debug info div, usable as anchor.
+ *
  * Revision 1.71  2009/02/19 04:22:45  blueyed
  * Fix for PHP4, as expected.
  *
