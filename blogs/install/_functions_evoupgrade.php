@@ -2322,6 +2322,15 @@ function upgrade_b2evo_tables()
 		task_end();
 	}
 
+
+	// Should get moved into the next $old_db_version block:
+
+	// Rename previously reserved type to "Linkroll item".
+	task_begin( 'Updating item types...' );
+	$DB->query( "UPDATE T_items__type SET ptyp_name = 'Linkroll item' WHERE ptyp_ID = 3000" );
+	task_end();
+
+
 	/* Wait until we're sure and no longer experimental for that one...
 	task_begin( 'Moving user data to fields' );
 	// ICQ
@@ -2471,6 +2480,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.281  2009/02/25 22:03:19  blueyed
+ * Upgrade: rename ptyp_ID 3000 to 'Linkroll item'
+ *
  * Revision 1.280  2009/02/25 20:54:47  blueyed
  *  - db_add_col: if the column exist already, execute an ALTER statement
  *  - Add db_add_index, which will drop any existing index, and create the
