@@ -85,8 +85,9 @@ if( $use_l10n )
 
 			if( ! empty( $evo_charset ) ) // this extra check is needed, because $evo_charset may not yet be determined.. :/
 			{
-				return convert_charset( $string, $evo_charset, 'iso-8859-1' );
+				$string = convert_charset( $string, $evo_charset, 'iso-8859-1' );
 			}
+			return $string;
 		}
 
 		$messages = $locales[$req_locale]['messages'];
@@ -767,7 +768,7 @@ function locale_updateDB()
  */
 function convert_charset( $string, $dest_charset, $src_charset = NULL )
 {
-	if( $dest_charset == $src_charset || $dest_charset == '' )
+	if( $dest_charset == $src_charset || $dest_charset == '' /* may happen if $evo_charset is not defined yet */ )
 	{ // no conversation required
 		return $string;
 	}
@@ -984,6 +985,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.16  2009/02/25 23:47:12  blueyed
+ * T(): return string always, if messages are not set; not only if $evo_char is defined (and it gets converted); minor doc
+ *
  * Revision 1.15  2009/02/25 20:15:21  tblue246
  * L10n:
  * - Remove Gettext functionality (that means we now use our PHP arrays from the _global.php files only).
