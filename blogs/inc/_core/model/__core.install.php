@@ -361,12 +361,12 @@ $schema_queries = array(
 	'T_items__version' => array(
 		'Creating item versions table',
 		"CREATE TABLE T_items__version (
-			iver_itm_ID				 INT UNSIGNED NOT NULL ,
-			iver_edit_user_ID	 INT UNSIGNED NOT NULL ,
+			iver_itm_ID        INT UNSIGNED NOT NULL ,
+			iver_edit_user_ID  INT UNSIGNED NOT NULL ,
 			iver_edit_datetime DATETIME NOT NULL ,
-			iver_status				 ENUM('published','deprecated','protected','private','draft','redirected') NULL ,
-			iver_title				 TEXT NULL ,
-			iver_content			 MEDIUMTEXT NULL ,
+			iver_status        ENUM('published','deprecated','protected','private','draft','redirected') NULL ,
+			iver_title         TEXT NULL ,
+			iver_content       MEDIUMTEXT NULL ,
 			INDEX iver_itm_ID ( iver_itm_ID )
 			) ENGINE = innodb" ),
 
@@ -572,6 +572,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.14  2009/02/25 19:31:10  blueyed
+ * Fix indent. Please use just spaces for inner indenting.
+ *
  * Revision 1.13  2009/02/25 01:31:14  fplanque
  * upgrade stuff
  *
