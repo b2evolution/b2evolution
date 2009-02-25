@@ -237,7 +237,7 @@ $schema_queries = array(
 			post_datemodified           DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
 			post_status                 enum('published','deprecated','protected','private','draft','redirected') NOT NULL default 'published',
 			post_pst_ID                 int(11) unsigned NULL,
-			post_ptyp_ID                int(11) unsigned NULL,
+			post_ptyp_ID                int(10) unsigned NOT NULL DEFAULT 1,
 			post_locale                 VARCHAR(20) NOT NULL DEFAULT 'en-EU',
 			post_content                MEDIUMTEXT NULL,
 			post_excerpt                text NULL,
@@ -275,7 +275,7 @@ $schema_queries = array(
 			INDEX post_ptyp_ID( post_ptyp_ID ),
 			INDEX post_pst_ID( post_pst_ID ),
 			INDEX post_order( post_order )
-		)" ),
+		) ENGINE = innodb" ),
 
 	'T_postcats' => array(
 		'Creating table for Categories-to-Posts relationships',
@@ -572,6 +572,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.13  2009/02/25 01:31:14  fplanque
+ * upgrade stuff
+ *
  * Revision 1.12  2009/02/24 22:58:19  fplanque
  * Basic version history of post edits
  *

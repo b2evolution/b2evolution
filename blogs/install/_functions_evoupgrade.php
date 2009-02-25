@@ -2271,31 +2271,35 @@ function upgrade_b2evo_tables()
 			)" );
 		task_end();
 
+		set_upgrade_checkpoint( '9910' );
 	}
 
-	task_begin( 'Upgrading Posts table... ' );
-	// This is for old posts that may have a post type of NULL which should never happen. ptyp 1 is for regular posts
-	$DB->query( "UPDATE T_items__item
-									SET post_ptyp_ID = 1
-								WHERE post_ptyp_ID IS NULL" );
-	task_end();
+	if( $old_db_version < 9920 )
+	{	// 3.1
+		task_begin( 'Upgrading Posts table... ' );
+		// This is for old posts that may have a post type of NULL which should never happen. ptyp 1 is for regular posts
+		$DB->query( "UPDATE T_items__item
+										SET post_ptyp_ID = 1
+									WHERE post_ptyp_ID IS NULL" );
+		$DB->query( "ALTER TABLE T_items__item
+							CHANGE COLUMN post_ptyp_ID post_ptyp_ID int(10) unsigned NOT NULL DEFAULT 1" );
+		task_end();
 
-	task_begin( 'Upgrading Categories table... ' );
-/*	$DB->query( "ALTER TABLE T_categories
-				CHANGE COLUMN cat_name cat_name varchar(255) NOT NULL,
-				CHANGE COLUMN cat_description cat_description varchar(255) NULL DEFAULT NULL,
-				ADD COLUMN cat_order int(11) NULL DEFAULT NULL AFTER cat_description,
-				ADD KEY cat_order (cat_order)" );
-	$DB->query( "UPDATE T_categories
-				SET cat_order = cat_ID" );
-*/
-	task_end();
+		task_begin( 'Upgrading Categories table... ' );
+		$DB->query( "ALTER TABLE T_categories
+					CHANGE COLUMN cat_name cat_name varchar(255) NOT NULL,
+					CHANGE COLUMN cat_description cat_description varchar(255) NULL DEFAULT NULL,
+					ADD COLUMN cat_order int(11) NULL DEFAULT NULL AFTER cat_description,
+					ADD KEY cat_order (cat_order)" );
+		$DB->query( "UPDATE T_categories
+					SET cat_order = cat_ID" );
+		task_end();
 
-	task_begin( 'Upgrading widgets table... ' );
-	$DB->query( "ALTER TABLE T_widget
-				ADD COLUMN wi_enabled tinyint(1) NOT NULL DEFAULT 1 AFTER wi_order" );
-	task_end();
-
+		task_begin( 'Upgrading widgets table... ' );
+		$DB->query( "ALTER TABLE T_widget
+					ADD COLUMN wi_enabled tinyint(1) NOT NULL DEFAULT 1 AFTER wi_order" );
+		task_end();
+	}
 
 	/* Wait until we're sure and no longer experimental for that one...
 	task_begin( 'Moving user data to fields' );
@@ -2366,7 +2370,7 @@ function upgrade_b2evo_tables()
 	$upgrade_db_deltas = array(); // This holds changes to make, if any (just all queries)
 
 	foreach( $schema_queries as $table => $query_info )
-	{
+	{	// For each table in the schema, check diffs...
 		foreach( db_delta( $query_info[1], array('drop_column', 'drop_index') ) as $table => $queries )
 		{
 			foreach( $queries as $qinfo )
@@ -2446,6 +2450,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.279  2009/02/25 01:31:16  fplanque
+ * upgrade stuff
+ *
  * Revision 1.278  2009/02/09 19:20:32  blueyed
  * Fix E_FATAL during upgrade (bpost_count_words not defined)
  *
