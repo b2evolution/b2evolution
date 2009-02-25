@@ -51,7 +51,7 @@ class links_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		$title = T_('Links 2'); // fp >> Call this Linkroll -- EVRYWHERE
+		$title = T_('Linkroll'); // fp >> Call this Linkroll -- EVRYWHERE waltercruz> The class itself? Linkroll_Widget?
 		return $title;
 	}
 
@@ -125,6 +125,9 @@ class links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.5  2009/02/25 17:18:03  waltercruz
+ * Linkroll stuff, take #2
+ *
  * Revision 1.4  2009/02/22 23:40:09  fplanque
  * dirty links widget :/
  *

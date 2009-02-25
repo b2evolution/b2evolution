@@ -246,7 +246,7 @@ if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) 
 		case 'links':
 			$label = T_('New link');
 			$title = T_('Add a link to the linkroll...');
-			$new_ptyp_ID = 2;
+			$new_ptyp_ID = 3000;
 			break;
 
 		default:
@@ -273,6 +273,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.13  2009/02/25 17:18:03  waltercruz
+ * Linkroll stuff, take #2
+ *
  * Revision 1.12  2009/02/24 22:58:20  fplanque
  * Basic version history of post edits
  *

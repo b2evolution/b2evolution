@@ -539,6 +539,7 @@ class ComponentWidget extends DataObject
 		global $timestamp_min, $timestamp_max;
 		$link_Blog = null;
 
+		# we don't have a linkblog_ID: this is the linkroll widget
 		if ( array_key_exists( 'linkblog_ID' , $this->disp_params ) )
 		{
 			$linkblog = $this->disp_params[ 'linkblog_ID' ];
@@ -574,45 +575,55 @@ class ComponentWidget extends DataObject
 
 		$limit = ( $this->disp_params[ 'linkblog_limit' ] ? $this->disp_params[ 'linkblog_limit' ] : 1000 ); // Note: 1000 will already kill the display
 
-	//	if (!empty ( $link_Blog) )
-	//	{ // fp> document when this case happens vs not.
-	//		compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $linkblog );
+		if ( array_key_exists( 'linkblog_ID' , $this->disp_params ) )
+		{ // fp> document when this case happens vs not.
+			// we have pick a linkblog
+			compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $linkblog );
+		}
+		else
+		{
+			// we are using a linkroll (type=3000)
+			$link_Blog = $Blog;
+			compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $Blog->ID );
+		}
+
 	// fp> ItemList2 instead of ItemListLight adds processing overhead. Not wanted.
 	//	$LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $limit );
-			if( $this->disp_params['linkblog_excerpts'] )
-			{ // we want to show some or all of the post content, use ItemList2
-				$LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $limit );
-			}
-			else
-			{ // no excerpts, use ItemListLight
-				$LinkblogList = & new ItemListLight( $link_Blog, $timestamp_min, $timestamp_max, $limit );
-			}
+		if( $this->disp_params['linkblog_excerpts'] )
+		{ // we want to show some or all of the post content, use ItemList2
+			$LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $limit );
+		}
+		else
+		{ // no excerpts, use ItemListLight
+			$LinkblogList = & new ItemListLight( $link_Blog, $timestamp_min, $timestamp_max, $limit );
+		}
 
+		if ( array_key_exists( 'linkblog_ID' , $this->disp_params ) )
+		{
+			// Filters for linkblogs
 			$LinkblogList->set_filters( array(
 					'cat_array' => $linkblog_cat_array,
 					'cat_modifier' => $linkblog_cat_modifier,
 					'orderby' => 'main_cat_ID title',
 					'order' => 'ASC',
 					'unit' => 'posts',
-				), false ); // we don't want to memorise these params
-//		}
-//		else
-//		{
-//			compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $Blog->ID);
-/*
-			$LinkblogList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max, $limit );
-			// fp> ItemList2 instead of ItemListLight adds processing overhead. Not wanted.
-			// waltercruz> this happends due to Item->get_content_teaser, we need to talk to yabba
+			), false ); // we don't want to memorise these params
+
+		}
+		else
+		{
+			// Filters for linkroll
+			// waltercruz> don't know if this is the best way. Should I create a array 
+			// and add a 'types' key in the else clause?
 			$LinkblogList->set_filters( array(
 				'cat_array' => $linkblog_cat_array,
 				'cat_modifier' => $linkblog_cat_modifier,
 				'orderby' => 'main_cat_ID title',
 				'order' => 'ASC',
 				'unit' => 'posts',
-				'types' => '2',
+				'types' => '3000',
 			), false ); // we don't want to memorise these params
 		}
-*/
 
 		// Run the query:
 		$LinkblogList->query();
@@ -668,113 +679,6 @@ class ComponentWidget extends DataObject
 						) );
 				}
 // /processing overhead issue
-
-				echo $this->disp_params['item_end'];
-			}
-
-			// Close cat
-			echo $this->disp_params['group_end'];
-			echo $this->disp_params['item_end'];
-		}
-
-		// Close the global list
-		echo $this->disp_params['list_end'];
-
-		echo $this->disp_params['block_end'];
-	}
-
-
-	/**
-	 * List of items by category
-	 *
-	 * FP> WHAT IT THIS? WHAT's THE DIFFERENCE WITH THE OTHER ONE?
-	 * waltercruz> This is for the links list in the blog, without using a linkblog,
-	 * but using instead the posts with link type = 2. I use that in the links widget,
-	 * that as you can imagine, is pretty similar to the linkblog widget too. I can
-	 * try to think in a way to merge both functions.
-	 * fp> "pretty similar" or "exactly the same except for the 'types' filter" ????
-	 *     Of course this has to be factorized.
-	 *
-	 * @param array MUST contain at least the basic display params
-	 */
-	function disp_cat_item_list2( $link_type = 'linkto_url' )
-	{
-		global $Blog;
-		global $timestamp_min, $timestamp_max;
-
-		# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
-		# Example: $linkblog_cat = '4,6,7';
-		$cat = '';
-
-		# This is the array if categories to restrict the linkblog to (non recursive)
-		# Example: $linkblog_catsel = array( 4, 6, 7 );
-		$catsel = array();
-
-		// Compile cat array stuff:
-		$cat_array = array();
-		$cat_modifier = '';
-		compile_cat_array( $cat, $catsel, /* by ref */ $cat_array, /* by ref */  $cat_modifier, $Blog->ID );
-
-		$limit = ( $this->disp_params[ 'limit' ] ? $this->disp_params[ 'limit' ] : 1000 ); // Note: 1000 will already kill the display
-
-		$ItemList = & new ItemListLight( $Blog, $timestamp_min, $timestamp_max, $limit );
-
-		$ItemList->set_filters( array(
-				'cat_array' => $cat_array,
-				'cat_modifier' => $cat_modifier,
-				'orderby' => 'main_cat_ID title',
-				'order' => 'ASC',
-				'unit' => 'posts',
-				'types' => '2',
-			), false ); // we don't want to memorise these params
-
-		// Run the query:
-		$ItemList->query();
-
-		if( ! $ItemList->get_num_rows() )
-		{ // empty list:
-			return;
-		}
-
-		echo $this->disp_params['block_start'];
-
- 		$this->disp_title( $this->disp_params[ 'title' ] );
-
-		echo $this->disp_params['list_start'];
-
-		/**
-		 * @var ItemLight
-		 */
-		while( $Item = & $ItemList->get_category_group() )
-		{
-			// Open new cat:
-			echo $this->disp_params['item_start'];
-			$Item->main_category();
-			echo $this->disp_params['group_start'];
-
-			while( $Item = & $ItemList->get_item() )
-			{
-				echo $this->disp_params['item_start'];
-
-				$Item->title( array(
-						'link_type' => $link_type,
-					) );
-
-				/*
-				$Item->content_teaser( array(
-						'before'      => '',
-						'after'       => ' ',
-						'disppage'    => 1,
-						'stripteaser' => false,
-					) );
-
-				$Item->more_link( array(
-						'before'    => '',
-						'after'     => '',
-						'link_text' => T_('more').' &raquo;',
-					) );
-				*/
-
 
 				echo $this->disp_params['item_end'];
 			}
@@ -901,6 +805,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.48  2009/02/25 17:18:03  waltercruz
+ * Linkroll stuff, take #2
+ *
  * Revision 1.47  2009/02/23 08:14:16  yabs
  * Added check for excerpts
  *

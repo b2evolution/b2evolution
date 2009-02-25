@@ -155,7 +155,7 @@ class ItemListLight extends DataObjectList2
 				'ymdhms_min' => NULL,
 				'ymdhms_max' => NULL,
 				'statuses' => NULL,
-				'types' => '-1000,1500,1520,1530,1570,1600',	// All types except pages and intros
+				'types' => '-1000,1500,1520,1530,1570,1600,3000',	// All types except pages, intros and linkroll
 				'visibility_array' => array( 'published', 'protected', 'private' ),
 				'orderby' => $this->Blog->get_setting('orderby'),
 				'order' => $this->Blog->get_setting('orderdir'),
@@ -1509,6 +1509,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.27  2009/02/25 17:18:03  waltercruz
+ * Linkroll stuff, take #2
+ *
  * Revision 1.26  2009/01/21 22:26:26  fplanque
  * Added tabs to post browsing admin screen All/Posts/Pages/Intros/Podcasts/Comments
  *

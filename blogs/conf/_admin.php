@@ -56,7 +56,7 @@ $use_preview = 1;
  *
  * @global array $posttypes_locked_IDs
  */
-$posttypes_locked_IDs = array( 1000, 1500, 1520, 1530, 1570, 1600, 2000 );
+$posttypes_locked_IDs = array( 1000, 1500, 1520, 1530, 1570, 1600, 2000, 3000 );
 
 /**
  * Reserved post type IDs.
@@ -68,6 +68,6 @@ $posttypes_locked_IDs = array( 1000, 1500, 1520, 1530, 1570, 1600, 2000 );
  *
  * @global array $posttypes_reserved_IDs
  */
-$posttypes_reserved_IDs = array( 3000, 4000, 5000 );
+$posttypes_reserved_IDs = array( 4000, 5000 );
 
 ?>
