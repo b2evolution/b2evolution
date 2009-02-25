@@ -116,15 +116,36 @@ function db_drop_col( $table, $col_name )
 
 /**
  * Add a column, if it does not already exist.
+ * If it exists already, a "ALTER TABLE" statement will get executed instead.
+ *
+ * @return boolean True if the column has been added, False if not.
  */
 function db_add_col( $table, $col_name, $col_desc )
 {
 	global $DB;
 
 	if( db_col_exists($table, $col_name) )
+	{ // Column exists already, make sure it's the same.
+		$DB->query( 'ALTER TABLE '.$table.' MODIFY COLUMN '.$col_name.' '.$col_desc );
 		return false;
+	}	
 
 	$DB->query( 'ALTER TABLE '.$table.' ADD COLUMN '.$col_name.' '.$col_desc );
+}
+
+
+/**
+ * Add an INDEX. If another index with the same name already exists, it will
+ * get dropped before.
+ */
+function db_add_index( $table, $name, $def )
+{
+	global $DB;
+	if( db_index_exists($table, $name) )
+	{
+		$DB->query( 'ALTER TABLE '.$table.' DROP INDEX '.$name );
+	}
+	$DB->query( 'ALTER TABLE '.$table.' ADD INDEX '.$name.' ('.$def.')' );
 }
 
 
@@ -2287,17 +2308,17 @@ function upgrade_b2evo_tables()
 
 		task_begin( 'Upgrading Categories table... ' );
 		$DB->query( "ALTER TABLE T_categories
-					CHANGE COLUMN cat_name cat_name varchar(255) NOT NULL,
-					CHANGE COLUMN cat_description cat_description varchar(255) NULL DEFAULT NULL,
-					ADD COLUMN cat_order int(11) NULL DEFAULT NULL AFTER cat_description,
-					ADD KEY cat_order (cat_order)" );
+			CHANGE COLUMN cat_name cat_name varchar(255) NOT NULL,
+			CHANGE COLUMN cat_description cat_description varchar(255) NULL DEFAULT NULL" );
+		db_add_col( 'T_categories', 'cat_order', 'int(11) NULL DEFAULT NULL AFTER cat_description' );
+		db_add_index( 'T_categories', 'cat_order', 'cat_order' );
+
 		$DB->query( "UPDATE T_categories
 					SET cat_order = cat_ID" );
 		task_end();
 
 		task_begin( 'Upgrading widgets table... ' );
-		$DB->query( "ALTER TABLE T_widget
-					ADD COLUMN wi_enabled tinyint(1) NOT NULL DEFAULT 1 AFTER wi_order" );
+		db_add_col( 'T_widget', 'wi_enabled', 'tinyint(1) NOT NULL DEFAULT 1 AFTER wi_order' );
 		task_end();
 	}
 
@@ -2450,6 +2471,13 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.280  2009/02/25 20:54:47  blueyed
+ *  - db_add_col: if the column exist already, execute an ALTER statement
+ *  - Add db_add_index, which will drop any existing index, and create the
+ *    new one
+ *  - Use db_add_col/db_add_index for latest changes, to prevent errors on
+ *    HEAD installs
+ *
  * Revision 1.279  2009/02/25 01:31:16  fplanque
  * upgrade stuff
  *
