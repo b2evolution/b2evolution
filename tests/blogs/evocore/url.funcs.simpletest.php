@@ -75,12 +75,11 @@ class UrlFuncsTestCase extends EvoUnitTestCase
 	 */
 	function test_idna_encode()
 	{
-		if( ! function_exists('utf8_encode') )
-		{
-			$this->fail( 'utf8_encode() not available, cannot test.' );
-			return;
-		}
-		$this->assertEqual( idna_encode( utf8_encode('läu.de') ), 'xn--lu-via.de' );
+		global $evo_charset;
+		$old_evo_charset = $evo_charset;
+		$evo_charset = 'utf-8'; // this file
+		$this->assertEqual( idna_encode( 'läu.de' ), 'xn--lu-via.de' );
+		$evo_charset = $old_evo_charset;
 	}
 
 
