@@ -195,6 +195,8 @@ switch( $action )
 		load_class('items/model/_item.class.php');
 		$edited_Item = & new Item();
 
+		$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
+
 		// We use the request variables to fill the edit form, because we need to be able to pass those values
 		// from tab to tab via javascript when the editor wants to switch views...
 		// Also used by bookmarklet
@@ -959,6 +961,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.36  2009/02/26 22:02:02  blueyed
+ * Fix creating new item, broken with lazily handling blog_ID/main_cat_ID
+ *
  * Revision 1.35  2009/02/25 22:17:53  blueyed
  * ItemLight: lazily load blog_ID and main_Chapter.
  * There is more, but I do not want to skim the diff again, after
