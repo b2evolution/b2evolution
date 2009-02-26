@@ -2783,11 +2783,6 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 {
 	$r = '';
 
-	if( empty( $field_attribs ) )
-	{ // TODO: This extra check should not be needed, if $field_attribs is an array! (blueyed)
-		return $r;
-	}
-
 	foreach( $field_attribs as $l_attr => $l_value )
 	{
 		if( $l_value === '' || $l_value === NULL )
@@ -3249,6 +3244,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.75  2009/02/26 01:07:10  blueyed
+ * Drop unnecessary check in get_field_attribs_as_string, which would better trigger a notice anyway
+ *
  * Revision 1.74  2009/02/26 01:03:56  blueyed
  * Cleanup: remove disp_cond() and expand the code where it has been used only (file browser view)
  *
