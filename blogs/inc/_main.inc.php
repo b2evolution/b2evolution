@@ -645,6 +645,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.99  2009/02/26 23:52:30  blueyed
+ * Fix inline CVS log
+ *
  * Revision 1.98  2009/02/26 22:33:21  blueyed
  * Fix messup in last commit.
  *
@@ -679,7 +682,7 @@ if( file_exists($conf_path.'hacks.php') )
  * (c) 2008
  *
  * Revision 1.87  2008/01/14 23:41:47  fplanque
- * cleanup load_class( urls ) in main because it is ubiquitously used
+ * cleanup load_funcs( urls ) in main because it is ubiquitously used
  *
  * Revision 1.86  2007/12/10 01:06:33  blueyed
  * Apply same check as in login.php: if a user is not validated, but validation is turned off then do not require him to validate
