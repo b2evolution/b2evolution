@@ -1435,14 +1435,29 @@ class AdminUI_general extends Widget
 
     // Let the modules construct the menu:
     // Part 1:
-		modules_call_method( 'build_menu_1' );
+		$this->modules_call_method( 'build_menu_1' );
 
     // Part 2:
-		modules_call_method( 'build_menu_2' );
+		$this->modules_call_method( 'build_menu_2' );
 
 		// Call AdminAfterMenuInit to notify Plugins that the menu is initialized
 		// E.g. the livehits_plugin and weather_plugin use it for adding a menu entry.
 		$Plugins->trigger_event( 'AdminAfterMenuInit' );
+	}
+
+
+	/**
+	 * Call a method for all modules in a row
+	 */
+	function modules_call_method( $method_name )
+	{
+		global $modules;
+
+		foreach( $modules as $module )
+		{
+			$Module = & $GLOBALS[$module.'_Module'];
+			$Module->{$method_name}();
+		}
 	}
 
 
@@ -1540,6 +1555,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.87  2009/02/26 00:35:26  blueyed
+ * Cleanup: moving modules_call_method where it gets used (only)
+ *
  * Revision 1.86  2008/04/14 19:50:51  fplanque
  * enhanced attachments handling in post edit mode
  *

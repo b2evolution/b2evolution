@@ -3110,21 +3110,6 @@ function generate_link_from_params( $link_params, $params = array() )
 
 
 /**
- * Call a method for all modules in a row
- */
-function modules_call_method( $method_name )
-{
-	global $modules;
-
-	foreach( $modules as $module )
-	{
-		$Module = & $GLOBALS[$module.'_Module'];
-		$Module->{$method_name}();
-	}
-}
-
-
-/**
  * Send a result as javascript
  * automatically includes any Messages ( @see Log::display() )
  * no return from function as it terminates processing
@@ -3294,6 +3279,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.73  2009/02/26 00:35:26  blueyed
+ * Cleanup: moving modules_call_method where it gets used (only)
+ *
  * Revision 1.72  2009/02/25 22:06:18  blueyed
  * Add id="debug_info" to Debug info div, usable as anchor.
  *
