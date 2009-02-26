@@ -16,7 +16,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_funcs('_core/_param.funcs.php');
+load_class('_core/_param.funcs.php');
 
 
 /**
@@ -294,7 +294,7 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Generating wordcounts... ';
-		load_funcs('items/model/_item.funcs.php');
+		load_class('items/model/_item.funcs.php');
 		$query = "SELECT ID, post_content FROM {$tableprefix}posts WHERE post_wordcount IS NULL";
 		$i = 0;
 		foreach( $DB->get_results( $query, ARRAY_A ) as $row )
@@ -2168,7 +2168,7 @@ function upgrade_b2evo_tables()
 	{	// 3.0 part 1
 		task_begin( 'Updating keyphrases in hitlog table... ' );
 		flush();
-		load_funcs( 'sessions/model/_hit.class.php' );
+		load_class( 'sessions/model/_hit.class.php' );
 	  $sql = 'SELECT hit_ID, hit_referer
   						FROM T_hitlog
    					 WHERE hit_referer_type = "search"
@@ -2444,7 +2444,7 @@ function upgrade_b2evo_tables()
 		if( ! $confirmed_db_upgrade )
 		{
 			global $action, $locale;
-			load_funcs( '_core/ui/forms/_form.class.php' );
+			load_class( '_core/ui/forms/_form.class.php' );
 			$Form = & new Form( NULL, '', 'post' );
 			$Form->begin_form( 'fform', T_('Upgrade database') );
 			$Form->begin_fieldset();
@@ -2480,6 +2480,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.282  2009/02/26 22:16:54  blueyed
+ * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
+ *
  * Revision 1.281  2009/02/25 22:03:19  blueyed
  * Upgrade: rename ptyp_ID 3000 to 'Linkroll item'
  *

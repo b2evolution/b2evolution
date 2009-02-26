@@ -34,7 +34,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_funcs('_core/ui/results/_results.class.php');
+load_class('_core/ui/results/_results.class.php');
 
 
 /**
@@ -595,6 +595,9 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 
 /*
  * $Log$
+ * Revision 1.3  2009/02/26 22:16:54  blueyed
+ * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
+ *
  * Revision 1.2  2008/01/21 09:35:25  fplanque
  * (c) 2008
  *

@@ -10,7 +10,7 @@
 require_once dirname(__FILE__).'/../../config.simpletest.php';
 
 
-load_funcs( '_core/ui/forms/_form.class.php' );
+load_class( '_core/ui/forms/_form.class.php' );
 
 
 Mock::generatePartial( 'Form', 'FormTestVersion', array('hidden') );

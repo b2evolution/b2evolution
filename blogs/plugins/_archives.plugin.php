@@ -36,7 +36,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-load_funcs('_core/ui/results/_results.class.php');
+load_class('_core/ui/results/_results.class.php');
 
 
 
@@ -586,6 +586,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.48  2009/02/26 22:16:54  blueyed
+ * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
+ *
  * Revision 1.47  2009/01/21 22:36:35  fplanque
  * Cleaner handling of pages and intros in calendar and archives plugins
  *

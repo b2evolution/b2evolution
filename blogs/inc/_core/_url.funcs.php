@@ -123,7 +123,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 		else
 		{
 			// convert URL to IDN:
-			load_funcs('_ext/idna/_idna_convert.class.php');
+			load_class('_ext/idna/_idna_convert.class.php');
 			$IDNA = new Net_IDNA_php4();
 			global $evo_charset;
 			$url_utf8 = convert_charset( $url, 'utf-8', $evo_charset );
@@ -666,6 +666,9 @@ function is_same_url( $a, $b )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.25  2009/02/26 22:16:54  blueyed
+ * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
+ *
  * Revision 1.24  2009/01/23 17:23:09  fplanque
  * doc/minor
  *

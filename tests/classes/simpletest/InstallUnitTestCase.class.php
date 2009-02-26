@@ -13,7 +13,7 @@ global $install_subdir, $basepath;
 
 require_once $basepath.$install_subdir.'_functions_install.php';
 require_once $basepath.$install_subdir.'_functions_evoupgrade.php';
-load_class('_core/model/db/_upgrade.funcs.php');
+load_funcs('_core/model/db/_upgrade.funcs.php');
 
 
 /**

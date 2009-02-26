@@ -54,8 +54,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Dependencies
  */
-load_funcs('antispam/model/_antispam.funcs.php');
-load_funcs('files/model/_file.funcs.php');
+load_class('antispam/model/_antispam.funcs.php');
+load_class('files/model/_file.funcs.php');
 
 
 /**
@@ -97,7 +97,7 @@ function shutdown()
 	$Session->dbsave();
 
 	// Get updates here instead of slowing down normal display of the dashboard
-	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+	load_class( 'dashboard/model/_dashboard.funcs.php' );
 	b2evonet_get_updates();
 
 	// Auto pruning of old HITS, old SESSIONS and potentially MORE analytics data:
@@ -1449,7 +1449,7 @@ function debug_die( $additional_info = '', $params = array() )
 	// This should help preventing indexing robots from indexing the error :P
 	if( ! headers_sent() )
 	{
-		load_funcs('_core/_template.funcs.php');
+		load_class('_core/_template.funcs.php');
 		header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
 		$status_header = $_SERVER['SERVER_PROTOCOL'].' '.$params['status'];
 		header($status_header);
@@ -1565,7 +1565,7 @@ function bad_request_die( $additional_info = '' )
 	// This should help preventing indexing robots from indexing the error :P
 	if( ! headers_sent() )
 	{
-		load_funcs('_core/_template.funcs.php');
+		load_class('_core/_template.funcs.php');
 		header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
 		header('HTTP/1.0 400 Bad Request');
 	}
@@ -2526,7 +2526,7 @@ function get_base_domain( $url )
 	// NOTE: \w includes "_"
 
 	// convert URL to IDN:
-	load_funcs('_ext/idna/_idna_convert.class.php');
+	load_class('_ext/idna/_idna_convert.class.php');
 	$IDNA = new Net_IDNA_php4();
 	$domain = $IDNA->encode( convert_charset($domain, 'UTF-8', $evo_charset) );
 
@@ -3230,7 +3230,7 @@ function & get_IconLegend()
 			/**
 			 * Icon Legend
 			 */
-			load_funcs( '_core/ui/_iconlegend.class.php' );
+			load_class( '_core/ui/_iconlegend.class.php' );
 			$IconLegend = new IconLegend();
 		}
 		else
@@ -3244,6 +3244,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.76  2009/02/26 22:16:53  blueyed
+ * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
+ *
  * Revision 1.75  2009/02/26 01:07:10  blueyed
  * Drop unnecessary check in get_field_attribs_as_string, which would better trigger a notice anyway
  *

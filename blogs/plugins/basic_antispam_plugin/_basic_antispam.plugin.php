@@ -459,7 +459,7 @@ class basic_antispam_plugin extends Plugin
 		/**
 		 * IDNA converter class
 		 */
-		load_funcs('_ext/idna/_idna_convert.class.php');
+		load_class('_ext/idna/_idna_convert.class.php');
 		$IDNA = new Net_IDNA_php4();
 
 		$have_idn_name = false;
@@ -617,6 +617,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.34  2009/02/26 22:16:54  blueyed
+ * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
+ *
  * Revision 1.33  2008/09/13 10:22:59  fplanque
  * removed superfluous conf variable
  *

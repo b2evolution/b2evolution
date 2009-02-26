@@ -31,7 +31,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-load_funcs( '_core/ui/_uiwidget.class.php' );
+load_class( '_core/ui/_uiwidget.class.php' );
 
 
 /**
@@ -1555,6 +1555,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.88  2009/02/26 22:16:54  blueyed
+ * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
+ *
  * Revision 1.87  2009/02/26 00:35:26  blueyed
  * Cleanup: moving modules_call_method where it gets used (only)
  *

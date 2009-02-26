@@ -77,7 +77,7 @@ function install_plugin_db_schema_action( & $Plugin )
 
 	if( ! empty($db_layout) )
 	{ // The plugin has a DB layout attached
-		load_class('_core/model/db/_upgrade.funcs.php');
+		load_funcs('_core/model/db/_upgrade.funcs.php');
 
 		// Get the queries to make:
 		foreach( db_delta($db_layout) as $table => $queries )
@@ -1039,6 +1039,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2009/02/26 22:16:54  blueyed
+ * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
+ *
  * Revision 1.6  2008/02/19 11:11:18  fplanque
  * no message
  *

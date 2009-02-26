@@ -167,7 +167,7 @@ if( !$debug )
 /**
  * Miscellaneous functions
  */
-load_funcs('_core/_misc.funcs.php');
+load_class('_core/_misc.funcs.php');
 
 
 /**
@@ -220,7 +220,7 @@ $localtimenow = $servertimenow + $time_difference;
 load_class('sessions/model/_hit.class.php');
 // fp> The following constructor requires these right now:
 load_class('_core/_param.funcs.php');
-load_funcs('_core/_url.funcs.php');
+load_class('_core/_url.funcs.php');
 /**
  * @global Hit The Hit object
  */
@@ -302,23 +302,23 @@ load_class('_core/model/dataobjects/_dataobjectcache.class.php');
 load_class('generic/model/_genericelement.class.php');
 load_class('generic/model/_genericcache.class.php');
 load_class('collections/model/_blog.class.php');
-load_funcs('collections/model/_blog.funcs.php');
-load_funcs('collections/model/_category.funcs.php');
-load_funcs('items/model/_item.funcs.php');
-load_funcs('users/model/_user.funcs.php');
+load_class('collections/model/_blog.funcs.php');
+load_class('collections/model/_category.funcs.php');
+load_class('items/model/_item.funcs.php');
+load_class('users/model/_user.funcs.php');
 load_class('_core/_template.funcs.php');
 load_class('files/model/_file.class.php');
 load_class('files/model/_filetype.class.php');
 load_class('files/model/_filetypecache.class.php');
 load_class('items/model/_itemtype.class.php');
 load_class('items/model/_link.class.php');
-load_funcs('comments/model/_comment.funcs.php');
-load_funcs('items/model/_item.funcs.php');
+load_class('comments/model/_comment.funcs.php');
+load_class('items/model/_item.funcs.php');
 load_class('comments/model/_commentlist.class.php');
-load_funcs('_core/ui/forms/_form.funcs.php');
-load_funcs('_core/ui/forms/_form.class.php');
+load_class('_core/ui/forms/_form.funcs.php');
+load_class('_core/ui/forms/_form.class.php');
 load_class('items/model/_itemquery.class.php');
-load_funcs('_ext/_swfcharts.php');
+load_class('_ext/_swfcharts.php');
 $Timer->pause( '_main.inc:requires' );
 
 
@@ -645,6 +645,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.97  2009/02/26 22:16:53  blueyed
+ * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
+ *
  * Revision 1.96  2009/02/19 03:54:44  blueyed
  * Optimize: move instantiation of $IconLegend (and $UserSettings query) out of main.inc.php, into get_IconLegend. TODO: test if it works with PHP4, or if it needs assignment by reference. Will do so on the test server.
  *
@@ -673,7 +676,7 @@ if( file_exists($conf_path.'hacks.php') )
  * (c) 2008
  *
  * Revision 1.87  2008/01/14 23:41:47  fplanque
- * cleanup load_funcs( urls ) in main because it is ubiquitously used
+ * cleanup load_class( urls ) in main because it is ubiquitously used
  *
  * Revision 1.86  2007/12/10 01:06:33  blueyed
  * Apply same check as in login.php: if a user is not validated, but validation is turned off then do not require him to validate

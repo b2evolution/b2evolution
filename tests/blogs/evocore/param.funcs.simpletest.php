@@ -12,7 +12,7 @@ require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 
 global $inc_path;
 
-load_class('_core/_param.funcs.php');
+load_funcs('_core/_param.funcs.php');
 
 
 /**

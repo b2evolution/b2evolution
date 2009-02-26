@@ -42,7 +42,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class( 'users/model/_group.class.php' );
-load_funcs( 'collections/model/_category.funcs.php' );
+load_class( 'collections/model/_category.funcs.php' );
 
 /**
  * Used for fresh install
@@ -827,6 +827,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.254  2009/02/26 22:16:54  blueyed
+ * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
+ *
  * Revision 1.253  2009/01/21 18:23:26  fplanque
  * Featured posts and Intro posts
  *
