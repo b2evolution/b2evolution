@@ -249,13 +249,35 @@ global $edited_Item;
 		</span>
 
 		<?php
-		// Display filecounts:
+		// Display number of directories/files:
 		?>
 
 		<div id="fmbar_filecounts" title="<?php printf( T_('%s bytes'), number_format($fm_Filelist->count_bytes()) ); ?>"> (<?php
-			disp_cond( $fm_Filelist->count_dirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
+			$count_dirs = $fm_Filelist->count_dirs();
+			if( $count_dirs )
+			{
+				if( $count_dirs > 1 )
+					printf( T_('%d directories'), $count_dirs );
+				else
+					echo T_('One directory');
+			}
+			else
+			{
+				echo T_('No directories');
+			}
 			echo ', ';
-			disp_cond( $fm_Filelist->count_files(), T_('One file'), T_('%d files'), T_('No files' ) );
+			$count_files = $fm_Filelist->count_files();
+			if( $count_files )
+			{
+				if( $count_files > 1 )
+					printf( T_('%d files'), $count_files );
+				else
+					echo T_('One file');
+			}
+			else
+			{
+				echo T_('No files');
+			}
 			echo ', '.bytesreadable( $fm_Filelist->count_bytes() );
 			?>
 			)
@@ -382,6 +404,9 @@ global $edited_Item;
 
 /*
  * $Log$
+ * Revision 1.11  2009/02/26 01:03:56  blueyed
+ * Cleanup: remove disp_cond() and expand the code where it has been used only (file browser view)
+ *
  * Revision 1.10  2008/02/04 13:57:50  fplanque
  * wording
  *
