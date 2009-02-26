@@ -123,17 +123,7 @@ function validate_url( $url, $context = 'posting', $antispam_check = true )
 		else
 		{
 			// convert URL to IDN:
-			load_class('_ext/idna/_idna_convert.class.php');
-			$IDNA = new Net_IDNA_php4();
-			global $evo_charset;
-			$url_utf8 = convert_charset( $url, 'utf-8', $evo_charset );
-			//echo '['.$url_utf8.'] ';
-			$url = $IDNA->encode( $url_utf8 );
-			/* if( $idna_error = $IDNA->get_last_error() )
-			{
-				echo $idna_error;
-			} */
-			// echo '['.$url.']<br>';
+			$url = idna_encode($url);
 
 			if( ! preg_match('~^           # start
 				([a-z][a-z0-9+.\-]*)             # scheme
@@ -664,8 +654,71 @@ function is_same_url( $a, $b )
 }
 
 
+/**
+ * IDNA-Encode URL to Punycode.
+ * @param string URL
+ * @return string Encoded URL (ASCII)
+ */
+function idna_encode( $url )
+{
+	global $evo_charset;
+
+	$url_utf8 = convert_charset( $url, 'utf-8', $evo_charset );
+
+	if( version_compare(PHP_VERSION, '5', '>=') )
+	{
+		load_class('_ext/idna/_idna_convert.class.php');
+		$IDNA = new idna_convert();
+	}
+	else
+	{
+		load_class('_ext/idna/_idna_convert.class.php4');
+		$IDNA = new Net_IDNA_php4();
+	}
+
+	//echo '['.$url_utf8.'] ';
+	$url = $IDNA->encode( $url_utf8 );
+	/* if( $idna_error = $IDNA->get_last_error() )
+	{
+		echo $idna_error;
+	} */
+	// echo '['.$url.']<br>';
+
+	return $url;
+}
+
+
+/**
+ * Decode IDNA puny-code ("xn--..") to UTF-8 name.
+ *
+ * @param string 
+ * @return string The decoded puny-code ("xn--..") (UTF8!)
+ */
+function idna_decode( $url )
+{
+	if( version_compare(PHP_VERSION, '5', '>=') )
+	{
+		load_class('_ext/idna/_idna_convert.class.php');
+		$IDNA = new idna_convert();
+	}
+	else
+	{
+		load_class('_ext/idna/_idna_convert.class.php4');
+		$IDNA = new Net_IDNA_php4();
+	}
+	return $IDNA->decode($url);
+}
+
+
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.26  2009/02/26 23:33:46  blueyed
+ * Update IDNA library to 0.6.2 (includes at least a fix for mbstring.func_overload).
+ * Since it is PHP5 only, PHP4 won't benefit from it.
+ * Add wrapper idna_encode() and idna_decode() to url.funcs to handle loading
+ * of the PHP5 or PHP4 class.
+ * Move test.
+ *
  * Revision 1.25  2009/02/26 22:16:54  blueyed
  * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
  *

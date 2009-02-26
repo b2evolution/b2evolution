@@ -32,21 +32,6 @@ class ExtLibsTestCase extends EvoUnitTestCase
 
 
 	/**
-	 * Tests {@link idna_convert::encode()}
-	 */
-	function test_IDNA_decode()
-	{
-		if( ! function_exists('utf8_encode') )
-		{
-			$this->fail( 'utf8_encode() not available, cannot test.' );
-			return;
-		}
-		$IDNA = new Net_IDNA_php4();
-		$this->assertEqual( $IDNA->encode( utf8_encode('läu.de') ), 'xn--lu-via.de' );
-	}
-
-
-	/**
 	 * Test {@link XHTML_Validator::check()} for encoding issues.
 	 * NOTE: assignment by "& new" is required for PHP4! See also http://de3.php.net/manual/en/function.xml-set-object.php#46107
 	 *       Alternatively, multiple vars for each test may work, or unsetting the last one..

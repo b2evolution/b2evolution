@@ -456,12 +456,6 @@ class basic_antispam_plugin extends Plugin
 		}
 
 
-		/**
-		 * IDNA converter class
-		 */
-		load_class('_ext/idna/_idna_convert.class.php');
-		$IDNA = new Net_IDNA_php4();
-
 		$have_idn_name = false;
 
 		// Build the search pattern:
@@ -487,7 +481,7 @@ class basic_antispam_plugin extends Plugin
 		$search_pattern_hosts = array_unique($search_pattern_hosts);
 		foreach( $search_pattern_hosts as $l_host )
 		{ // add IDN, because this could be linked:
-			$l_idn_host = $IDNA->decode( $l_host ); // the decoded puny-code ("xn--..") name (utf8)
+			$l_idn_host = idna_decode( $l_host ); // the decoded puny-code ("xn--..") name (utf8)
 
 			if( $l_idn_host != $l_host )
 			{
@@ -617,6 +611,13 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.35  2009/02/26 23:33:46  blueyed
+ * Update IDNA library to 0.6.2 (includes at least a fix for mbstring.func_overload).
+ * Since it is PHP5 only, PHP4 won't benefit from it.
+ * Add wrapper idna_encode() and idna_decode() to url.funcs to handle loading
+ * of the PHP5 or PHP4 class.
+ * Move test.
+ *
  * Revision 1.34  2009/02/26 22:16:54  blueyed
  * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
  *

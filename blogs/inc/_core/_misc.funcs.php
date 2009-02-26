@@ -2526,9 +2526,7 @@ function get_base_domain( $url )
 	// NOTE: \w includes "_"
 
 	// convert URL to IDN:
-	load_class('_ext/idna/_idna_convert.class.php');
-	$IDNA = new Net_IDNA_php4();
-	$domain = $IDNA->encode( convert_charset($domain, 'UTF-8', $evo_charset) );
+	$domain = idna_encode($domain);
 
 	$domain_pattern = '~ ( \w (\w|-|_)* \. ){0,2}   \w (\w|-|_)* $~ix';
 	if( ! preg_match( $domain_pattern, $domain, $match ) )
@@ -3244,6 +3242,13 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.78  2009/02/26 23:33:46  blueyed
+ * Update IDNA library to 0.6.2 (includes at least a fix for mbstring.func_overload).
+ * Since it is PHP5 only, PHP4 won't benefit from it.
+ * Add wrapper idna_encode() and idna_decode() to url.funcs to handle loading
+ * of the PHP5 or PHP4 class.
+ * Move test.
+ *
  * Revision 1.77  2009/02/26 22:33:21  blueyed
  * Fix messup in last commit.
  *

@@ -69,6 +69,21 @@ class UrlFuncsTestCase extends EvoUnitTestCase
 			'//foo/bar' );
 	}
 
+
+	/**
+	 * Tests {@link idna_encode()}
+	 */
+	function test_idna_encode()
+	{
+		if( ! function_exists('utf8_encode') )
+		{
+			$this->fail( 'utf8_encode() not available, cannot test.' );
+			return;
+		}
+		$this->assertEqual( idna_encode( utf8_encode('läu.de') ), 'xn--lu-via.de' );
+	}
+
+
 }
 
 
