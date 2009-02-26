@@ -2,7 +2,7 @@
 /**
  * Function for handling Classes in PHP 4.
  *
- * Note: in PHP 5, another file should be included. It shoudl handle clone for example.
+ * Note: in PHP 5, another file should be included. It should handle clone for example.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -166,6 +166,9 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.12  2009/02/26 22:07:20  blueyed
+ * Fix typo
+ *
  * Revision 1.11  2009/02/22 23:59:53  blueyed
  * ItemPrerenderingCache:
  *  - simple array to prefetch all prerendered MainList items
