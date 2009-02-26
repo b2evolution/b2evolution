@@ -476,7 +476,7 @@ class Plugins
 				else
 				{
 					// Check if there are DB deltas required (also when downgrading!), without excluding any query type:
-					load_class('_core/model/db/_upgrade.funcs.php');
+					load_funcs('_core/model/db/_upgrade.funcs.php');
 					$db_deltas = db_delta( $Plugin->GetDbLayout() );
 
 					if( empty($db_deltas) )
@@ -1806,6 +1806,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.5  2009/02/26 22:33:22  blueyed
+ * Fix messup in last commit.
+ *
  * Revision 1.4  2008/01/21 09:35:32  fplanque
  * (c) 2008
  *

@@ -29,9 +29,9 @@ define( 'EVO_MAIN_INIT', true );
  */
 require_once $inc_path.'_core/_class4.funcs.php';
 load_class('_core/model/_log.class.php');
-load_class('_core/_param.funcs.php');
-load_class('_core/_misc.funcs.php');
-load_class('_core/ui/forms/_form.funcs.php');
+load_funcs('_core/_param.funcs.php');
+load_funcs('_core/_misc.funcs.php');
+load_funcs('_core/ui/forms/_form.funcs.php');
 require dirname(__FILE__).'/pofile.class.php';
 /**#@-*/
 

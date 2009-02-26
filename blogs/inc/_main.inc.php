@@ -167,7 +167,7 @@ if( !$debug )
 /**
  * Miscellaneous functions
  */
-load_class('_core/_misc.funcs.php');
+load_funcs('_core/_misc.funcs.php');
 
 
 /**
@@ -219,8 +219,8 @@ $localtimenow = $servertimenow + $time_difference;
  */
 load_class('sessions/model/_hit.class.php');
 // fp> The following constructor requires these right now:
-load_class('_core/_param.funcs.php');
-load_class('_core/_url.funcs.php');
+load_funcs('_core/_param.funcs.php');
+load_funcs('_core/_url.funcs.php');
 /**
  * @global Hit The Hit object
  */
@@ -302,20 +302,20 @@ load_class('_core/model/dataobjects/_dataobjectcache.class.php');
 load_class('generic/model/_genericelement.class.php');
 load_class('generic/model/_genericcache.class.php');
 load_class('collections/model/_blog.class.php');
-load_class('collections/model/_blog.funcs.php');
-load_class('collections/model/_category.funcs.php');
-load_class('items/model/_item.funcs.php');
-load_class('users/model/_user.funcs.php');
-load_class('_core/_template.funcs.php');
+load_funcs('collections/model/_blog.funcs.php');
+load_funcs('collections/model/_category.funcs.php');
+load_funcs('items/model/_item.funcs.php');
+load_funcs('users/model/_user.funcs.php');
+load_funcs('_core/_template.funcs.php');
 load_class('files/model/_file.class.php');
 load_class('files/model/_filetype.class.php');
 load_class('files/model/_filetypecache.class.php');
 load_class('items/model/_itemtype.class.php');
 load_class('items/model/_link.class.php');
-load_class('comments/model/_comment.funcs.php');
-load_class('items/model/_item.funcs.php');
+load_funcs('comments/model/_comment.funcs.php');
+load_funcs('items/model/_item.funcs.php');
 load_class('comments/model/_commentlist.class.php');
-load_class('_core/ui/forms/_form.funcs.php');
+load_funcs('_core/ui/forms/_form.funcs.php');
 load_class('_core/ui/forms/_form.class.php');
 load_class('items/model/_itemquery.class.php');
 load_class('_ext/_swfcharts.php');
@@ -645,6 +645,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.98  2009/02/26 22:33:21  blueyed
+ * Fix messup in last commit.
+ *
  * Revision 1.97  2009/02/26 22:16:53  blueyed
  * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
  *

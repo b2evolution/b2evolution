@@ -16,7 +16,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/_param.funcs.php');
+load_funcs('_core/_param.funcs.php');
 
 
 /**
@@ -237,7 +237,7 @@ function upgrade_b2evo_tables()
 	// Load DB schema from modules
 	load_db_schema();
 
-	load_class('_core/model/db/_upgrade.funcs.php');
+	load_funcs('_core/model/db/_upgrade.funcs.php');
 
 
 	echo '<p>'.T_('Checking DB schema version...').' ';
@@ -294,7 +294,7 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Generating wordcounts... ';
-		load_class('items/model/_item.funcs.php');
+		load_funcs('items/model/_item.funcs.php');
 		$query = "SELECT ID, post_content FROM {$tableprefix}posts WHERE post_wordcount IS NULL";
 		$i = 0;
 		foreach( $DB->get_results( $query, ARRAY_A ) as $row )
@@ -2480,6 +2480,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.283  2009/02/26 22:33:22  blueyed
+ * Fix messup in last commit.
+ *
  * Revision 1.282  2009/02/26 22:16:54  blueyed
  * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
  *

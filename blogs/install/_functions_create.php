@@ -42,7 +42,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class( 'users/model/_group.class.php' );
-load_class( 'collections/model/_category.funcs.php' );
+load_funcs( 'collections/model/_category.funcs.php' );
 
 /**
  * Used for fresh install
@@ -54,7 +54,7 @@ function create_tables()
 	// Load DB schema from modules
 	load_db_schema();
 
-	load_class('_core/model/db/_upgrade.funcs.php');
+	load_funcs('_core/model/db/_upgrade.funcs.php');
 
 	// Alter DB to match DB schema:
 	install_make_db_schema_current( true );
@@ -827,6 +827,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.255  2009/02/26 22:33:22  blueyed
+ * Fix messup in last commit.
+ *
  * Revision 1.254  2009/02/26 22:16:54  blueyed
  * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
  *

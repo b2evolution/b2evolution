@@ -54,8 +54,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Dependencies
  */
-load_class('antispam/model/_antispam.funcs.php');
-load_class('files/model/_file.funcs.php');
+load_funcs('antispam/model/_antispam.funcs.php');
+load_funcs('files/model/_file.funcs.php');
 
 
 /**
@@ -97,7 +97,7 @@ function shutdown()
 	$Session->dbsave();
 
 	// Get updates here instead of slowing down normal display of the dashboard
-	load_class( 'dashboard/model/_dashboard.funcs.php' );
+	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 	b2evonet_get_updates();
 
 	// Auto pruning of old HITS, old SESSIONS and potentially MORE analytics data:
@@ -1449,7 +1449,7 @@ function debug_die( $additional_info = '', $params = array() )
 	// This should help preventing indexing robots from indexing the error :P
 	if( ! headers_sent() )
 	{
-		load_class('_core/_template.funcs.php');
+		load_funcs('_core/_template.funcs.php');
 		header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
 		$status_header = $_SERVER['SERVER_PROTOCOL'].' '.$params['status'];
 		header($status_header);
@@ -1565,7 +1565,7 @@ function bad_request_die( $additional_info = '' )
 	// This should help preventing indexing robots from indexing the error :P
 	if( ! headers_sent() )
 	{
-		load_class('_core/_template.funcs.php');
+		load_funcs('_core/_template.funcs.php');
 		header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
 		header('HTTP/1.0 400 Bad Request');
 	}
@@ -3244,6 +3244,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.77  2009/02/26 22:33:21  blueyed
+ * Fix messup in last commit.
+ *
  * Revision 1.76  2009/02/26 22:16:53  blueyed
  * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
  *
