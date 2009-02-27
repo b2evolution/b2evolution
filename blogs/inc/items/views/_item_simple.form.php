@@ -163,7 +163,7 @@ for( $i = 1 ; $i <= 3; $i++ )
 	{ // ---------- PREVIEW ----------
 		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
 
-		$Form->button( array( 'button', '', T_('Preview'), '', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
+		$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
 	}
 
 	// ---------- SAVE ----------
@@ -273,6 +273,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.22  2009/02/27 23:17:02  afwas
+ * Add class 'PreviewButton' to Preview Button.
+ *
  * Revision 1.21  2008/09/23 05:26:39  fplanque
  * Handle attaching files when multiple posts are edited simultaneously
  *

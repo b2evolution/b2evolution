@@ -175,7 +175,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	{ // ---------- PREVIEW ----------
 		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
 
-		$Form->button( array( 'button', '', T_('Preview'), '', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
+		$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
 	}
 
 	// ---------- SAVE ----------
@@ -407,6 +407,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.41  2009/02/27 23:17:02  afwas
+ * Add class 'PreviewButton' to Preview Button.
+ *
  * Revision 1.40  2009/01/29 18:16:35  tblue246
  * Hide language chooser on post form in expert mode if there's only one locale.
  *
