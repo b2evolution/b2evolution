@@ -167,7 +167,7 @@ if( !$debug )
 /**
  * Miscellaneous functions
  */
-load_funcs('_core/_misc.funcs.php');
+require_once $inc_path.'/_core/_misc.funcs.php';
 
 
 /**
@@ -645,6 +645,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.100  2009/02/27 21:33:32  blueyed
+ * Move load_funcs from class4.funcs to misc.funcs
+ *
  * Revision 1.99  2009/02/26 23:52:30  blueyed
  * Fix inline CVS log
  *

@@ -42,18 +42,11 @@ function load_class( $class_path, $require = true )
 }
 
 
-/**
- * Load functions file
- */
-function load_funcs( $funcs_path )
-{
-	global $inc_path;
-	require_once $inc_path.$funcs_path;
-}
-
-
 /*
  * $Log$
+ * Revision 1.15  2009/02/27 21:33:33  blueyed
+ * Move load_funcs from class4.funcs to misc.funcs
+ *
  * Revision 1.14  2009/02/27 21:29:31  blueyed
  * Move get_Cache from class4.funcs to misc.funcs.
  *

@@ -176,6 +176,16 @@ function & get_Cache( $objectName )
 
 
 /**
+ * Load functions file
+ */
+function load_funcs( $funcs_path )
+{
+	global $inc_path;
+	require_once $inc_path.$funcs_path;
+}
+
+
+/**
  * Shutdown function: save HIT and update session!
  *
  * This is registered in _main.inc.php with register_shutdown_function()
@@ -3359,6 +3369,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.81  2009/02/27 21:33:33  blueyed
+ * Move load_funcs from class4.funcs to misc.funcs
+ *
  * Revision 1.80  2009/02/27 21:29:31  blueyed
  * Move get_Cache from class4.funcs to misc.funcs.
  *
