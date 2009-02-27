@@ -978,7 +978,7 @@ class Item extends ItemLight
 	/**
 	 * This is like a teaser with no HTML and a cropping.
 	 *
-	 * @todo fp> allow use to submit his own excerpt in expert editing mode
+	 * @todo fp> allow user to submit his own excerpt in expert editing mode
 	 */
 	function get_content_excerpt( $crop_at = 200 )
 	{
@@ -1392,6 +1392,7 @@ class Item extends ItemLight
 
 	/**
 	 * Load links if they were not loaded yet.
+	 * @todo dh> gets not used anywhere?! and is the only user of LinkCache::get_by_item_ID().
 	 */
 	function load_links()
 	{
@@ -1404,7 +1405,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get array of tags
+	 * Get array of tags.
 	 *
 	 * Load from DB if necessary
 	 *
@@ -1692,7 +1693,11 @@ class Item extends ItemLight
 	/**
 	 * Get list of attached files
 	 *
-	 * INNER JOIN on files ensures we only get backj file links
+	 * INNER JOIN on files ensures we only get back file links
+	 *
+	 * @todo dh> Add prefetching for MainList/ItemList (get_prefetch_itemlist_IDs)
+	 *           The $limit param and DataObjectList2 makes this quite difficult
+	 *           though. Would save (N-1) queries on a blog list page for N items.
 	 *
 	 * @return DataObjectList2
 	 */
@@ -3652,6 +3657,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.80  2009/02/27 19:57:05  blueyed
+ * doc/TODO
+ *
  * Revision 1.79  2009/02/25 22:17:53  blueyed
  * ItemLight: lazily load blog_ID and main_Chapter.
  * There is more, but I do not want to skim the diff again, after
