@@ -776,47 +776,45 @@ class Item extends ItemLight
 			}
 			else
 			{	// Try loading from DB cache, including all items in MainList/ItemList.
-				global $DB, $MainList, $ItemList;
+				global $DB;
 
-				if( $MainList || $ItemList )
-				{
-					if( ! isset($ItemPrerenderingCache[$format]) )
-					{ // only do the prefetch loading once.
-						$prefetch_IDs = $this->get_prefetch_itemlist_IDs();
+				if( ! isset($ItemPrerenderingCache[$format]) )
+				{ // only do the prefetch loading once.
+					$prefetch_IDs = $this->get_prefetch_itemlist_IDs();
 
-						// Load prerendered content for all items in MainList/ItemList.
-						// We load the current $format only, since it's most likely that only one gets used.
-						$ItemPrerenderingCache[$format] = array();
+					// Load prerendered content for all items in MainList/ItemList.
+					// We load the current $format only, since it's most likely that only one gets used.
+					$ItemPrerenderingCache[$format] = array();
 
-						$rows = $DB->get_results( "
-							SELECT itpr_itm_ID, itpr_format, itpr_renderers, itpr_content_prerendered
-								FROM T_items__prerendering
-							 WHERE itpr_itm_ID IN (".implode(',', $prefetch_IDs).")
-								 AND itpr_format = '".$format."'",
-								 OBJECT, 'Preload prerendered item content for MainList/ItemList ('.$format.')' );
-						foreach($rows as $row)
-						{
-							$row_cache_key = $row->itpr_format.'/'.$row->itpr_renderers;
+					$rows = $DB->get_results( "
+						SELECT itpr_itm_ID, itpr_format, itpr_renderers, itpr_content_prerendered
+							FROM T_items__prerendering
+						 WHERE itpr_itm_ID IN (".implode(',', $prefetch_IDs).")
+							 AND itpr_format = '".$format."'",
+							 OBJECT, 'Preload prerendered item content for MainList/ItemList ('.$format.')' );
+					foreach($rows as $row)
+					{
+						$row_cache_key = $row->itpr_format.'/'.$row->itpr_renderers;
 
-							if( ! isset($ItemPrerenderingCache[$format][$row->itpr_itm_ID]) )
-							{ // init list
-								$ItemPrerenderingCache[$format][$row->itpr_itm_ID] = array();
-							}
-
-							$ItemPrerenderingCache[$format][$row->itpr_itm_ID][$row_cache_key] = $row->itpr_content_prerendered;
+						if( ! isset($ItemPrerenderingCache[$format][$row->itpr_itm_ID]) )
+						{ // init list
+							$ItemPrerenderingCache[$format][$row->itpr_itm_ID] = array();
 						}
 
-						// Set the value for current Item.
-						if( isset($ItemPrerenderingCache[$format][$this->ID][$cache_key]) )
-						{
-							$r = $ItemPrerenderingCache[$format][$this->ID][$cache_key];
-							// Save memory, typically only accessed once.
-							unset($ItemPrerenderingCache[$format][$this->ID][$cache_key]);
-						}
+						$ItemPrerenderingCache[$format][$row->itpr_itm_ID][$row_cache_key] = $row->itpr_content_prerendered;
+					}
+
+					// Set the value for current Item.
+					if( isset($ItemPrerenderingCache[$format][$this->ID][$cache_key]) )
+					{
+						$r = $ItemPrerenderingCache[$format][$this->ID][$cache_key];
+						// Save memory, typically only accessed once.
+						unset($ItemPrerenderingCache[$format][$this->ID][$cache_key]);
 					}
 				}
 				else
-				{ // No MainList/ItemList; only get this item.
+				{ // This item has not been fetched by the initial prefetch query; only get this item.
+					// dh> This is quite unlikely to happen, but you never know.
 					// This gets not added to ItemPrerenderingCache, since it would only waste
 					// memory - an item gets typically only accessed once per page, and even if
 					// it would get accessed more often, there is a cache higher in the chain
@@ -3676,6 +3674,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.82  2009/02/27 20:11:18  blueyed
+ * Streamline code for prefetching of prerendered content.
+ *
  * Revision 1.81  2009/02/27 20:07:47  blueyed
  *  - Add Item::get_prefetch_itemlist_IDs
  *  - Also prefetch prerendered content for ItemList (admin)
