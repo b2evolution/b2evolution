@@ -161,6 +161,7 @@ if( count( $res_stats ) )
 
 	//pre_dump( $chart );
 	echo '<div class="center">';
+	load_funcs('_ext/_swfcharts.php');
 	DrawChart( $chart );
 	echo '</div>';
 
@@ -209,6 +210,9 @@ if( count( $res_stats ) )
 
 /*
  * $Log$
+ * Revision 1.7  2009/02/27 22:57:26  blueyed
+ * Use load_funcs for swfcharts, and especially only include it when needed (in the stats controllers only, not main.inc)
+ *
  * Revision 1.6  2008/02/19 11:11:18  fplanque
  * no message
  *

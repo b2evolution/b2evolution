@@ -318,7 +318,6 @@ load_class('comments/model/_commentlist.class.php');
 load_funcs('_core/ui/forms/_form.funcs.php');
 load_class('_core/ui/forms/_form.class.php');
 load_class('items/model/_itemquery.class.php');
-load_class('_ext/_swfcharts.php');
 $Timer->pause( '_main.inc:requires' );
 
 
@@ -645,6 +644,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.102  2009/02/27 22:57:26  blueyed
+ * Use load_funcs for swfcharts, and especially only include it when needed (in the stats controllers only, not main.inc)
+ *
  * Revision 1.101  2009/02/27 22:25:16  blueyed
  * Fix inclusion of misc.funcs. Includes load_funcs now after all.
  *
