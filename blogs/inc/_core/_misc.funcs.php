@@ -59,6 +59,123 @@ load_funcs('files/model/_file.funcs.php');
 
 
 /**
+ * @todo fp> split into 1 function per case. (typed @return values)
+ *
+ * @return DataObjectCache
+ */
+function & get_Cache( $objectName )
+{
+	global $Plugins;
+	global $$objectName;
+
+	if( isset( $$objectName ) )
+	{	// Cache already exists:
+		return $$objectName;
+	}
+
+	switch( $objectName )
+	{
+		case 'BlogCache':
+			load_class( 'collections/model/_blogcache.class.php' );
+			$BlogCache = new BlogCache(); // COPY (FUNC)
+			return $BlogCache;
+
+		case 'ChapterCache':
+			load_class( 'chapters/model/_chaptercache.class.php' );
+			$ChapterCache = new ChapterCache(); // COPY (FUNC)
+			return $ChapterCache;
+
+		case 'FileCache':
+			load_class( 'files/model/_filecache.class.php' );
+			$FileCache = new FileCache(); // COPY (FUNC)
+			return $FileCache;
+
+		case 'FileRootCache':
+			load_class( 'files/model/_filerootcache.class.php' );
+			$Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
+			return $FileRootCache;
+
+		case 'FiletypeCache':
+			load_class( 'files/model/_filetypecache.class.php' );
+			$Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
+			return $FiletypeCache;
+
+		case 'GoalCache';
+			$GoalCache = new DataObjectCache( 'Goal', false, 'T_track__goal', 'goal_', 'goal_ID', 'goal_name', 'goal_name' ); // COPY (FUNC)
+			return $GoalCache;
+
+		case 'GroupCache':
+			$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'\', T_(\'No group\') )' );
+			return $GroupCache;
+
+		case 'ItemCacheLight';
+			$ItemCacheLight = new DataObjectCache( 'ItemLight', false, 'T_items__item', 'post_', 'post_ID' ); // COPY (FUNC)
+			return $ItemCacheLight;
+
+		case 'ItemCache';
+			load_class( 'items/model/_itemcache.class.php' );
+			$ItemCache = new ItemCache(); // COPY (FUNC)
+			return $ItemCache;
+
+		case 'ItemPrerenderingCache':
+			$ItemPrerenderingCache = array();
+			return $ItemPrerenderingCache;
+
+		case 'ItemTagsCache':
+			$ItemTagsCache = array();
+			return $ItemTagsCache;
+
+		case 'ItemStatusCache':
+			$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_items__status\', \'pst_\', \'pst_ID\', NULL, \'\', T_(\'No status\') )' );
+			return $ItemStatusCache;
+
+		case 'ItemTypeCache':
+			load_class( 'items/model/_itemtypecache.class.php' );
+			$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', 'new ItemTypeCache( \'ptyp_\', \'ptyp_ID\' )' );
+			return $ItemTypeCache;
+
+		case 'LinkCache':
+			load_class( 'items/model/_linkcache.class.php' );
+			$LinkCache = new LinkCache(); // COPY (FUNC)
+			return $LinkCache;
+
+		case 'Plugins_admin':
+			load_class('plugins/model/_plugins_admin.class.php');
+			$Plugins_admin = new Plugins_admin(); // COPY (FUNC)
+			return $Plugins_admin;
+
+		case 'SkinCache':
+			load_class( 'skins/model/_skincache.class.php' );
+			$SkinCache = new SkinCache(); // COPY (FUNC)
+			return $SkinCache;
+
+		case 'UserCache':
+			load_class( 'users/model/_usercache.class.php' );
+			$UserCache = new UserCache(); // COPY (FUNC)
+			return $UserCache;
+
+		case 'WidgetCache':
+			load_class( 'widgets/model/_widgetcache.class.php' );
+			$WidgetCache = new WidgetCache(); // COPY (FUNC)
+			return $WidgetCache;
+
+		case 'EnabledWidgetCache':
+			// This simply instantiates a WidgetCache object, setting the
+			// $enabled_only parameter to true. Using a member variable
+			// instead of per-method parameters to load only the enabled
+			// widgets should be cleaner when there will be more methods
+			// in the WidgetCache class in the future.
+			load_class( 'widgets/model/_widgetcache.class.php' );
+			$EnabledWidgetCache = new WidgetCache( true );
+			return $EnabledWidgetCache;
+
+		default:
+			debug_die( 'getCache(): Unknown Cache type:'.$objectName );
+	}
+}
+
+
+/**
  * Shutdown function: save HIT and update session!
  *
  * This is registered in _main.inc.php with register_shutdown_function()
@@ -3242,6 +3359,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.80  2009/02/27 21:29:31  blueyed
+ * Move get_Cache from class4.funcs to misc.funcs.
+ *
  * Revision 1.79  2009/02/27 00:01:33  blueyed
  * Fix get_base_domain, after IDNA changes - the joy of editing just before committing.. :/
  *
