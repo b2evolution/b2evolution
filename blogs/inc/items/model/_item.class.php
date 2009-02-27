@@ -509,8 +509,8 @@ class Item extends ItemLight
 
 		if( param( 'renderers_displayed', 'integer', 0 ) )
 		{ // use "renderers" value only if it has been displayed (may be empty)
-			$Plugins_admin = & get_Cache('Plugins_admin');
-			$renderers = $Plugins_admin->validate_renderer_list( param( 'renderers', 'array', array() ) );
+			global $Plugins;
+			$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array', array() ) );
 			$this->set( 'renderers', $renderers );
 		}
 		else
@@ -3602,8 +3602,8 @@ class Item extends ItemLight
 	{
 		if( ! isset($this->renderers_validated) )
 		{
-			$Plugins_admin = & get_Cache('Plugins_admin');
-			$this->renderers_validated = $Plugins_admin->validate_renderer_list( $this->get_renderers() );
+			global $Plugins;
+			$this->renderers_validated = $Plugins->validate_renderer_list( $this->get_renderers() );
 		}
 		return $this->renderers_validated;
 	}
@@ -3683,6 +3683,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.84  2009/02/27 20:25:08  blueyed
+ * Move Plugins_admin::validate_renderer_list back to Plugins, since it gets used for displaying items and saves (at least) a load_plugins_table call/query
+ *
  * Revision 1.83  2009/02/27 20:19:33  blueyed
  * Add prefetching of tags for Items in MainList/ItemList (through ItemTagsCache). This results in (N-1) less queries for N items on a typical blog list page.
  *

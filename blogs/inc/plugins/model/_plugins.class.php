@@ -1753,6 +1753,92 @@ class Plugins
 	}
 
 
+	/**
+	 * Validate renderer list.
+	 *
+	 * @param array renderer codes ('default' will include all "opt-out"-ones)
+	 * @return array validated array of renderer codes
+	 */
+	function validate_renderer_list( $renderers = array('default') )
+	{
+		$this->load_plugins_table();
+
+		$validated_renderers = array();
+
+		$index = & $this->index_apply_rendering_codes;
+
+		if( isset( $index['stealth'] ) )
+		{
+			// pre_dump( 'stealth:', $index['stealth'] );
+			$validated_renderers = array_merge( $validated_renderers, $index['stealth'] );
+		}
+		if( isset( $index['always'] ) )
+		{
+			// pre_dump( 'always:', $index['always'] );
+			$validated_renderers = array_merge( $validated_renderers, $index['always'] );
+		}
+
+		if( isset( $index['opt-out'] ) )
+		{
+			foreach( $index['opt-out'] as $l_code )
+			{
+				if( in_array( $l_code, $renderers ) // Option is activated
+					|| in_array( 'default', $renderers ) ) // OR we're asking for default renderer set
+				{
+					// pre_dump( 'opt-out:', $l_code );
+					$validated_renderers[] = $l_code;
+				}
+			}
+		}
+
+		if( isset( $index['opt-in'] ) )
+		{
+			foreach( $index['opt-in'] as $l_code )
+			{
+				if( in_array( $l_code, $renderers ) ) // Option is activated
+				{
+					// pre_dump( 'opt-in:', $l_code );
+					$validated_renderers[] = $l_code;
+				}
+			}
+		}
+		if( isset( $index['lazy'] ) )
+		{
+			foreach( $index['lazy'] as $l_code )
+			{
+				if( in_array( $l_code, $renderers ) ) // Option is activated
+				{
+					// pre_dump( 'lazy:', $l_code );
+					$validated_renderers[] = $l_code;
+				}
+			}
+		}
+
+		// Make sure there's no renderer code with a dot, as the list gets imploded by that when saved:
+		foreach( $validated_renderers as $k => $l_code )
+		{
+			if( empty($l_code) || strpos( $l_code, '.' ) !== false )
+			{
+				unset( $validated_renderers[$k] );
+			}
+			/*
+			dh> not required, now that the method has been moved back to Plugins (from ~_admin)
+			else
+			{ // remove the ones which are not enabled:
+				$Plugin = & $this->get_by_code($l_code);
+				if( ! $Plugin || $Plugin->status != 'enabled' )
+				{
+					unset( $validated_renderers[$k] );
+				}
+			}
+			*/
+		}
+
+		// echo 'validated Renderers: '.count( $validated_renderers );
+		return $validated_renderers;
+	}
+
+
 	// Deprecated stubs: {{{
 
 	/**
@@ -1791,10 +1877,10 @@ class Plugins
 	 */
 	function validate_list( $renderers = array('default') )
 	{
-		global $Debuglog;
+		global $Debuglog, $Plugins;
 		$Debuglog->add('Call to deprecated method Plugins::validate_list()', 'deprecated');
-		$Plugins_admin = & get_Cache('Plugins_admin');
-		return $Plugins_admin->validate_renderer_list($renderers);
+
+		return $Plugins->validate_renderer_list($renderers);
 	}
 
 
@@ -1804,6 +1890,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.7  2009/02/27 20:25:08  blueyed
+ * Move Plugins_admin::validate_renderer_list back to Plugins, since it gets used for displaying items and saves (at least) a load_plugins_table call/query
+ *
  * Revision 1.6  2009/02/27 19:49:19  blueyed
  * doc: Yes, we're lazy. Even if it would not cost much, it costs something.
  *

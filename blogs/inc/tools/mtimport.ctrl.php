@@ -611,8 +611,8 @@ param( 'import_mode', 'string', 'normal' );
 		}
 		else
 		{
-			$Plugins_admin = & get_Cache('Plugins_admin');
-			$default_renderers = $Plugins_admin->validate_renderer_list( array('default') );
+			global $Plugins;
+			$default_renderers = $Plugins->validate_renderer_list( array('default') );
 			$autop = 1;
 		}
 
@@ -1669,6 +1669,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.8  2009/02/27 20:25:08  blueyed
+ * Move Plugins_admin::validate_renderer_list back to Plugins, since it gets used for displaying items and saves (at least) a load_plugins_table call/query
+ *
  * Revision 1.7  2008/12/28 19:02:19  fplanque
  * minor
  *

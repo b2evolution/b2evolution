@@ -1323,89 +1323,6 @@ class Plugins_admin extends Plugins
 
 
 	/**
-	 * Validate renderer list.
-	 *
-	 * @param array renderer codes ('default' will include all "opt-out"-ones)
-	 * @return array validated array of renderer codes
-	 */
-	function validate_renderer_list( $renderers = array('default') )
-	{
-		$this->load_plugins_table();
-
-		$validated_renderers = array();
-
-		$index = & $this->index_apply_rendering_codes;
-
-		if( isset( $index['stealth'] ) )
-		{
-			// pre_dump( 'stealth:', $index['stealth'] );
-			$validated_renderers = array_merge( $validated_renderers, $index['stealth'] );
-		}
-		if( isset( $index['always'] ) )
-		{
-			// pre_dump( 'always:', $index['always'] );
-			$validated_renderers = array_merge( $validated_renderers, $index['always'] );
-		}
-
-		if( isset( $index['opt-out'] ) )
-		{
-			foreach( $index['opt-out'] as $l_code )
-			{
-				if( in_array( $l_code, $renderers ) // Option is activated
-					|| in_array( 'default', $renderers ) ) // OR we're asking for default renderer set
-				{
-					// pre_dump( 'opt-out:', $l_code );
-					$validated_renderers[] = $l_code;
-				}
-			}
-		}
-
-		if( isset( $index['opt-in'] ) )
-		{
-			foreach( $index['opt-in'] as $l_code )
-			{
-				if( in_array( $l_code, $renderers ) ) // Option is activated
-				{
-					// pre_dump( 'opt-in:', $l_code );
-					$validated_renderers[] = $l_code;
-				}
-			}
-		}
-		if( isset( $index['lazy'] ) )
-		{
-			foreach( $index['lazy'] as $l_code )
-			{
-				if( in_array( $l_code, $renderers ) ) // Option is activated
-				{
-					// pre_dump( 'lazy:', $l_code );
-					$validated_renderers[] = $l_code;
-				}
-			}
-		}
-
-		// Make sure there's no renderer code with a dot, as the list gets imploded by that when saved:
-		foreach( $validated_renderers as $k => $l_code )
-		{
-			if( empty($l_code) || strpos( $l_code, '.' ) !== false )
-			{
-				unset( $validated_renderers[$k] );
-			}
-			else
-			{ // remove the ones which are not enabled:
-				$Plugin = & $this->get_by_code($l_code);
-				if( ! $Plugin || $Plugin->status != 'enabled' )
-				{
-					unset( $validated_renderers[$k] );
-				}
-			}
-		}
-
-		// echo 'validated Renderers: '.count( $validated_renderers );
-		return $validated_renderers;
-	}
-
-
-	/**
 	 * Filter (post) contents by calling the relevant filter plugins.
 	 *
 	 * Works very much like render() except that it's called at insert/update time and BEFORE validation.
@@ -1529,6 +1446,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.6  2009/02/27 20:25:08  blueyed
+ * Move Plugins_admin::validate_renderer_list back to Plugins, since it gets used for displaying items and saves (at least) a load_plugins_table call/query
+ *
  * Revision 1.5  2009/02/23 06:12:25  sam2kb
  * Quotes replaced, see http://forums.b2evolution.net/viewtopic.php?t=17994
  *
