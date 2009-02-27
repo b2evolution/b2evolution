@@ -74,6 +74,8 @@ class LinkCache extends DataObjectCache
 	 *
 	 * Loads if necessary
 	 *
+	 * @todo dh> does not get used anywhere (yet)?
+	 *
 	 * @param integer item ID to load links for
 	 * @return array of refs to Link objects
 	 */
@@ -86,7 +88,7 @@ class LinkCache extends DataObjectCache
 	}
 
 
-  /**
+	/**
 	 * Load links for a given Item
 	 *
 	 * Optimization: If the Item happens to be in the current MainList, Links for the whole MainList will be cached.
@@ -133,7 +135,7 @@ class LinkCache extends DataObjectCache
 	}
 
 
-  /**
+	/**
 	 * Load links for a given Item list
 	 *
 	 * @todo cache Link targets before letting the Link constructor handle it
@@ -168,6 +170,9 @@ class LinkCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.4  2009/02/27 19:57:17  blueyed
+ * TODO
+ *
  * Revision 1.3  2008/09/27 07:54:34  fplanque
  * minor
  *
