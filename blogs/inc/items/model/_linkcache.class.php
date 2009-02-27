@@ -99,7 +99,7 @@ class LinkCache extends DataObjectCache
 	 */
 	function load_by_item_ID( $item_ID )
 	{
-		global $DB, $Debuglog, $MainList;
+		global $DB, $Debuglog, $MainList, $ItemList;
 
 		if( isset( $this->cache_item[$item_ID] ) )
 		{
@@ -108,10 +108,19 @@ class LinkCache extends DataObjectCache
 		}
 
 		// Check if this Item is part of the MainList
-		if( isset( $MainList ) && in_array( $item_ID, $MainList->postIDarray ) )
-		{ // YES! We found the current Item in the MainList, let's load/cache the links for the WholeMainList
-			$Debuglog->add( "Loading <strong>$this->objtype(Item #$item_ID)</strong> into cache as part of MainList...");
-			$this->load_by_item_list( $MainList->postIDarray );
+		if( $MainList || $ItemList )
+		{
+			$prefetch_IDs = array();
+			if( $MainList )
+			{
+				$prefetch_IDs = array_merge($prefetch_IDs, $MainList->get_page_ID_array());
+			}
+			if( $ItemList )
+			{
+				$prefetch_IDs = array_merge($prefetch_IDs, $ItemList->get_page_ID_array());
+			}
+			$Debuglog->add( "Loading <strong>$this->objtype(Item #$item_ID)</strong> into cache as part of MainList/ItemList...");
+			$this->load_by_item_list( $prefetch_IDs );
 		}
 		else
 		{	// NO, load Links for this single Item:
@@ -170,6 +179,9 @@ class LinkCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.5  2009/02/27 19:59:26  blueyed
+ * Implement cache prefetching in LinkCache::load_by_item_ID - although it does not get used currently. Untested.
+ *
  * Revision 1.4  2009/02/27 19:57:17  blueyed
  * TODO
  *
