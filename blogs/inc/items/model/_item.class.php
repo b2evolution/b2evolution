@@ -775,22 +775,16 @@ class Item extends ItemLight
 				unset($ItemPrerenderingCache[$format][$this->ID][$cache_key]);
 			}
 			else
-			{	// Try loading from DB cache, including all items in $MainList
-				global $DB, $MainList;
+			{	// Try loading from DB cache, including all items in MainList/ItemList.
+				global $DB, $MainList, $ItemList;
 
-				if( $MainList )
+				if( $MainList || $ItemList )
 				{
 					if( ! isset($ItemPrerenderingCache[$format]) )
 					{ // only do the prefetch loading once.
-						$prefetch_IDs = $MainList->page_ID_array;
+						$prefetch_IDs = $this->get_prefetch_itemlist_IDs();
 
-						// Add the current ID to the list to prefetch, if it's not in the MainList (e.g. featured item).
-						if( ! in_array($this->ID, $prefetch_IDs) )
-						{
-							$prefetch_IDs[] = $this->ID;
-						}
-
-						// Load prerendered content for all items in MainList.
+						// Load prerendered content for all items in MainList/ItemList.
 						// We load the current $format only, since it's most likely that only one gets used.
 						$ItemPrerenderingCache[$format] = array();
 
@@ -799,7 +793,7 @@ class Item extends ItemLight
 								FROM T_items__prerendering
 							 WHERE itpr_itm_ID IN (".implode(',', $prefetch_IDs).")
 								 AND itpr_format = '".$format."'",
-								 OBJECT, 'Preload prerendered item content for MainList ('.$format.')' );
+								 OBJECT, 'Preload prerendered item content for MainList/ItemList ('.$format.')' );
 						foreach($rows as $row)
 						{
 							$row_cache_key = $row->itpr_format.'/'.$row->itpr_renderers;
@@ -822,7 +816,7 @@ class Item extends ItemLight
 					}
 				}
 				else
-				{ // No MainList; only get this item.
+				{ // No MainList/ItemList; only get this item.
 					// This gets not added to ItemPrerenderingCache, since it would only waste
 					// memory - an item gets typically only accessed once per page, and even if
 					// it would get accessed more often, there is a cache higher in the chain
@@ -3652,11 +3646,40 @@ class Item extends ItemLight
 		}
 		return $r;
 	}
+
+
+	/**
+	 * Get a list of item IDs from $MainList and $ItemList, if they are loaded.
+	 * This is used for prefetching item related data for the whole list(s).
+	 * This will at least return the item's ID itself.
+	 * @return array
+	 */
+	function get_prefetch_itemlist_IDs()
+	{
+		global $MainList, $ItemList;
+
+		// Add the current ID to the list to prefetch, if it's not in the MainList/ItemList (e.g. featured item).
+		$r = array($this->ID);
+
+		if( $MainList )
+		{
+			$r = array_merge($r, $MainList->get_page_ID_array());
+		}
+		if( $ItemList )
+		{
+			$r = array_merge($r, $ItemList->get_page_ID_array());
+		}
+		return $r;
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.81  2009/02/27 20:07:47  blueyed
+ *  - Add Item::get_prefetch_itemlist_IDs
+ *  - Also prefetch prerendered content for ItemList (admin)
+ *
  * Revision 1.80  2009/02/27 19:57:05  blueyed
  * doc/TODO
  *
