@@ -80,6 +80,12 @@ class coll_xml_feeds_Widget extends ComponentWidget
 					'note' => T_( 'This is the title to display, $icon$ will be replaced by the feed icon' ),
 					'defaultvalue' => '$icon$ '.T_('XML Feeds'),
 				),
+				'disp_info_link' => array(
+					'label' => T_( 'Info link' ),
+					'type' => 'checkbox',
+					'note' => T_( 'Check this to display an info link' ),
+					'defaultvalue' => 0,
+				),
 				'info_link' => array(
 					'label' => T_( 'New Window' ),
 					'type' => 'checkbox',
@@ -134,26 +140,31 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 		echo $this->disp_params['list_end'];
 
-		/**
-		 * @var AbstractSettings
-		 */
-		global $global_Cache;
 
-		$feedhlp = $global_Cache->get( 'feedhlp' );
-		if( empty( $feedhlp ) )
-		{	// Use basic default: (fp> needs serious update)
-			$feedhlp = array( array( 'http://webreference.fr/2006/08/30/rss_atom_xml', 'What is RSS?' ) );
-		}
+		// Display "info" link, if activated.
+		if( $this->disp_params['disp_info_link'] )
+		{
+			/**
+			 * @var AbstractSettings
+			 */
+			global $global_Cache;
 
-		if( $this->disp_params[ 'info_link' ] )
-		{
-			$link_params = array( 'target' => '_blank' );
+			$feedhlp = $global_Cache->get( 'feedhlp' );
+			if( empty( $feedhlp ) )
+			{	// Use basic default: (fp> needs serious update)
+				$feedhlp = array( array( 'http://webreference.fr/2006/08/30/rss_atom_xml', 'What is RSS?' ) );
+			}
+
+			if( $this->disp_params[ 'info_link' ] )
+			{
+				$link_params = array( 'target' => '_blank' );
+			}
+			else
+			{
+				$link_params = array( 'target' => '' );
+			}
+			display_list( $feedhlp, $this->disp_params['notes_start'], $this->disp_params['notes_end'], ' ', '', '', NULL, 1, $link_params );
 		}
-		else
-		{
-			$link_params = array( 'target' => '' );
-		}
-		display_list( $feedhlp, $this->disp_params['notes_start'], $this->disp_params['notes_end'], ' ', '', '', NULL, 1, $link_params );
 
 		echo $this->disp_params['block_end'];
 
@@ -164,6 +175,9 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.11  2009/02/27 19:51:35  blueyed
+ * XML feeds widget: add a 'disp_info_link' config option, defaulting to false. Since the help is very outdated, it makes no sense to eventually load the global_Cache just for that. Also makes the widget cleaner. Might default to true, when it provides more valuable info.
+ *
  * Revision 1.10  2008/09/15 03:12:22  fplanque
  * help link update
  *
