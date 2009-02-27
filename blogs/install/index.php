@@ -39,7 +39,7 @@ require_once $inc_path.'_core/_class4.funcs.php';
 load_class('_core/model/_log.class.php');
 $Debuglog = & new Log( 'note' );
 $Messages = & new Log('error');
-load_funcs('_core/_misc.funcs.php');
+require_once $inc_path.'_core/_misc.funcs.php';
 require_once $conf_path.'_upgrade.php';
 require_once $inc_path.'_vars.inc.php';
 load_class('/_core/model/db/_db.class.php');
@@ -670,6 +670,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
+ * Revision 1.157  2009/02/27 22:25:16  blueyed
+ * Fix inclusion of misc.funcs. Includes load_funcs now after all.
+ *
  * Revision 1.156  2009/02/26 22:33:22  blueyed
  * Fix messup in last commit.
  *

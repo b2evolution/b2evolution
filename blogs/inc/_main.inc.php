@@ -109,6 +109,12 @@ if (ini_get('register_globals') && !$this->mosConfig_register_globals)
 require_once $inc_path.'_core/_class4.funcs.php';
 
 /**
+ * Miscellaneous functions
+ */
+require_once $inc_path.'/_core/_misc.funcs.php';
+
+
+/**
  * Load logging class
  */
 load_class('_core/model/_log.class.php');
@@ -162,12 +168,6 @@ if( !$debug )
 {
 	$Debuglog = & new Log_noop( 'note' );
 }
-
-
-/**
- * Miscellaneous functions
- */
-require_once $inc_path.'/_core/_misc.funcs.php';
 
 
 /**
@@ -645,6 +645,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.101  2009/02/27 22:25:16  blueyed
+ * Fix inclusion of misc.funcs. Includes load_funcs now after all.
+ *
  * Revision 1.100  2009/02/27 21:33:32  blueyed
  * Move load_funcs from class4.funcs to misc.funcs
  *

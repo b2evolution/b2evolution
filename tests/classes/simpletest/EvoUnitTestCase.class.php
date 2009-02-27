@@ -11,8 +11,6 @@
  */
 require_once( dirname(__FILE__).'/HtmlReporterShowPasses.class.php' );
 
-load_funcs( '_core/_misc.funcs.php' );
-
 load_class( '_core/model/_log.class.php' );
 load_class( 'files/model/_filerootcache.class.php' );
 load_class( 'files/model/_filecache.class.php' );

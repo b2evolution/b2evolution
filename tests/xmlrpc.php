@@ -18,8 +18,8 @@ define( 'EVO_MAIN_INIT', true );
  * class loader
  */
 require_once $inc_path.'_core/_class4.funcs.php';
+require_once $inc_path.'_core/_misc.funcs.php';
 
-load_funcs('_core/_misc.funcs.php');
 load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 
 echo '<h1>XML-RPC tests</h1>';

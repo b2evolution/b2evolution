@@ -12,7 +12,6 @@ require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 global $inc_path;
 
 load_funcs('antispam/model/_antispam.funcs.php');
-load_funcs('_core/_misc.funcs.php');
 load_funcs('_core/_url.funcs.php');
 
 

@@ -47,6 +47,7 @@ define( 'EVO_MAIN_INIT', 'SIMPLETEST' );
 require_once EVODIR.'blogs/conf/_config.php';
 
 require_once $inc_path.'_core/_class4.funcs.php';
+require_once $inc_path.'_core/_misc.funcs.php';
 
 
 /**
