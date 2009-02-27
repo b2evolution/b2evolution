@@ -71,14 +71,12 @@ class Plugins
 	var $index_event_IDs = array();
 
 	/**
-	 * fp> does it cost that much to instantiate plugins right away, now that init is no longer in the constructor?
 	 * @var array of plug_ID => DB row from T_plugins. Used to lazy-instantiate Plugins.
 	 */
 	var $index_ID_rows = array();
 
 	/**
-	 * fp> does it cost that much to instantiate plugins right away, now that init is no longer in the constructor?
-	 * @var array of plug_code => plug_ID. Usedp to lazy-instantiate by code.
+	 * @var array of plug_code => plug_ID. Used to lazy-instantiate by code.
 	 */
 	var $index_code_ID = array();
 
@@ -1806,6 +1804,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.6  2009/02/27 19:49:19  blueyed
+ * doc: Yes, we're lazy. Even if it would not cost much, it costs something.
+ *
  * Revision 1.5  2009/02/26 22:33:22  blueyed
  * Fix messup in last commit.
  *
