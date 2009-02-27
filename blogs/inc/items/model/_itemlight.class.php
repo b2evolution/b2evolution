@@ -880,7 +880,10 @@ class ItemLight extends DataObject
 				$this->extra_cat_IDs = array_unique( $this->extra_cat_IDs );
 				// Invalidate derived property:
 				$this->blog_ID = NULL;
+				unset($this->main_Chapter); // dereference
 				$this->main_Chapter = NULL;
+				unset($this->Blog);
+				$this->Blog = NULL;
 				return $r;
 
 			case 'extra_cat_IDs':
@@ -940,6 +943,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2009/02/27 19:46:55  blueyed
+ * ItemLight::set(main_cat_ID): unset main_Chapter before NULLing it, since it's a reference to the cache object. Also invalidate $Blog when setting main_cat_ID.
+ *
  * Revision 1.14  2009/02/25 22:17:53  blueyed
  * ItemLight: lazily load blog_ID and main_Chapter.
  * There is more, but I do not want to skim the diff again, after
