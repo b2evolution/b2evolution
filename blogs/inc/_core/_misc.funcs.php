@@ -2533,7 +2533,7 @@ function get_base_domain( $url )
 	{
 		return '';
 	}
-	$base_domain = convert_charset($IDNA->decode( $match[0] ), $evo_charset, 'UTF-8');
+	$base_domain = convert_charset(idna_decode($match[0]), $evo_charset, 'UTF-8');
 
 	// Remove any www*. prefix:
 	$base_domain = preg_replace( '~^www.*?\.~i', '', $base_domain );
@@ -3242,6 +3242,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.79  2009/02/27 00:01:33  blueyed
+ * Fix get_base_domain, after IDNA changes - the joy of editing just before committing.. :/
+ *
  * Revision 1.78  2009/02/26 23:33:46  blueyed
  * Update IDNA library to 0.6.2 (includes at least a fix for mbstring.func_overload).
  * Since it is PHP5 only, PHP4 won't benefit from it.
