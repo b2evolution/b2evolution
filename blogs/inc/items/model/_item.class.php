@@ -1399,7 +1399,7 @@ class Item extends ItemLight
 	/**
 	 * Get array of tags.
 	 *
-	 * Load from DB if necessary
+	 * Load from DB if necessary, prefetching any other tags from MainList/ItemList.
 	 *
 	 * @return array
 	 */
@@ -1407,16 +1407,25 @@ class Item extends ItemLight
 	{
 		global $DB;
 
-		if( !isset( $this->tags ) )
+		if( ! isset( $this->tags ) )
 		{
-			$this->tags = $DB->get_col(
-											'SELECT tag_name
-											 	 FROM T_items__itemtag INNER JOIN T_items__tag ON itag_tag_ID = tag_ID
-											 	WHERE itag_itm_ID = '.$this->ID.'
-											 	ORDER BY tag_name', 0, 'Get tags for Item' );
+			$ItemTagsCache = & get_Cache('ItemTagsCache');
+
+			if( empty($ItemTagsCache) )
+			{
+				foreach( $DB->get_results('
+					SELECT itag_itm_ID, tag_name
+						FROM T_items__itemtag INNER JOIN T_items__tag ON itag_tag_ID = tag_ID
+					 WHERE itag_itm_ID IN ('.$DB->quote($this->get_prefetch_itemlist_IDs()).')
+					 ORDER BY tag_name', OBJECT, 'Get tags for items' ) as $row )
+				{
+					$ItemTagsCache[$row->itag_itm_ID][] = $row->tag_name;
+				}
+			}
+
+			$this->tags = isset($ItemTagsCache[$this->ID]) ? $ItemTagsCache[$this->ID] : array();
 		}
 
-		// pre_dump( $this->tags );
 		return $this->tags;
 	}
 
@@ -3674,6 +3683,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.83  2009/02/27 20:19:33  blueyed
+ * Add prefetching of tags for Items in MainList/ItemList (through ItemTagsCache). This results in (N-1) less queries for N items on a typical blog list page.
+ *
  * Revision 1.82  2009/02/27 20:11:18  blueyed
  * Streamline code for prefetching of prerendered content.
  *

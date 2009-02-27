@@ -115,6 +115,10 @@ function & get_Cache( $objectName )
 			$ItemPrerenderingCache = array();
 			return $ItemPrerenderingCache;
 
+		case 'ItemTagsCache':
+			$ItemTagsCache = array();
+			return $ItemTagsCache;
+
 		case 'ItemStatusCache':
 			$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_items__status\', \'pst_\', \'pst_ID\', NULL, \'\', T_(\'No status\') )' );
 			return $ItemStatusCache;
@@ -166,6 +170,9 @@ function & get_Cache( $objectName )
 
 /*
  * $Log$
+ * Revision 1.13  2009/02/27 20:19:33  blueyed
+ * Add prefetching of tags for Items in MainList/ItemList (through ItemTagsCache). This results in (N-1) less queries for N items on a typical blog list page.
+ *
  * Revision 1.12  2009/02/26 22:07:20  blueyed
  * Fix typo
  *
