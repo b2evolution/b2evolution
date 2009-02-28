@@ -81,9 +81,9 @@ $ProfileForm->end_fieldset();
 
 $ProfileForm->begin_fieldset( T_('Password') );
 
-	$ProfileForm->password_input( 'pass1', '', 16, T_('New pass'), array( 'note' => T_('Leave blank to leave the password unchanged.'), 'maxlength' => 50, 'class' => 'bComment' ) );
+	$ProfileForm->password_input( 'pass1', '', 16, T_('New pass'), array( 'note' => T_('Leave blank to leave the password unchanged.'), 'maxlength' => 50, 'class' => 'bComment', 'autocomplete' => 'off' ) );
 	$ProfileForm->password_input( 'pass2', '', 16, T_('Confirm'), array( 'note' => T_('Confirm new password by typing it again.')
-		.' '.sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'class' => 'bComment' ) );
+		.' '.sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'class' => 'bComment', 'autocomplete' => 'off' ) );
 
 $ProfileForm->end_fieldset();
 
@@ -114,6 +114,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.5  2009/02/28 23:51:59  blueyed
+ * Add autocomplete=off to password fields in user profile, so that FF3 does not prefill the first one (only).
+ *
  * Revision 1.4  2008/09/29 08:30:39  fplanque
  * Avatar support
  *

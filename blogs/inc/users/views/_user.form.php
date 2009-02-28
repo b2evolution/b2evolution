@@ -198,9 +198,8 @@ if( $action != 'view_user' )
 { // We can edit the values:
 
 	$Form->begin_fieldset( T_('Password') );
-		// fp> TODO: FF3 will autofill this which is awfully annoying. Another reason to move to multiple tabs and have the password on its own tab.
-		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'note' => ( !empty($edited_User->ID) ? T_('Leave empty if you don\'t want to change the password.') : '' ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0) ) );
-		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'note'=>sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0) ) );
+		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'note' => ( !empty($edited_User->ID) ? T_('Leave empty if you don\'t want to change the password.') : '' ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
+		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'note'=>sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
 
 	$Form->end_fieldset();
 
@@ -488,6 +487,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.7  2009/02/28 23:51:59  blueyed
+ * Add autocomplete=off to password fields in user profile, so that FF3 does not prefill the first one (only).
+ *
  * Revision 1.6  2009/01/13 23:45:59  fplanque
  * User fields proof of concept
  *
