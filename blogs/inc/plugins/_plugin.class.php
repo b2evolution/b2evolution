@@ -2765,6 +2765,10 @@ class Plugin
 		switch( $nm )
 		{
 			case 'Settings':
+				if( $this->ID < 0 )
+				{
+					debug_die('Tried to access "Settings" on a non-installed plugin. ('.$this->classname.'/'.$this->ID.')');
+				}
 				$admin_Plugins->instantiate_Settings( $this, 'Settings' );
 				if( isset($this->Settings) )
 				{
@@ -2773,6 +2777,10 @@ class Plugin
 				break;
 
 			case 'UserSettings':
+				if( $this->ID < 0 )
+				{
+					debug_die('Tried to access "UserSettings" on a non-installed plugin. ('.$this->classname.'/'.$this->ID.')');
+				}
 				$admin_Plugins->instantiate_Settings( $this, 'UserSettings' );
 				if( isset($this->UserSettings) )
 				{
@@ -2793,6 +2801,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.12  2009/02/28 16:47:56  blueyed
+ * Fix Plugins::init_settings: it is not meant to work for uninstalled plugins. Add according debug_die calls for PHP>=5.1 in Plugin::__get.
+ *
  * Revision 1.11  2009/02/25 20:15:21  tblue246
  * L10n:
  * - Remove Gettext functionality (that means we now use our PHP arrays from the _global.php files only).

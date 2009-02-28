@@ -442,12 +442,12 @@ class Plugins
 			$this->sorted_IDs[] = & $Plugin->ID;
 		}
 
+		// Init the Plugins (User)Settings members.
+		$this->init_settings( $Plugin );
+
 		// Stuff only for real/existing Plugins (which exist in DB):
 		if( $Plugin->ID > 0 )
 		{
-			// Instantiate the Plugins (User)Settings members:
-			$this->init_settings( $Plugin );
-
 			$tmp_params = array( 'db_row' => $this->index_ID_rows[$Plugin->ID], 'is_installed' => true );
 			if( $Plugin->PluginInit( $tmp_params ) === false && $this->unregister( $Plugin ) )
 			{
@@ -541,8 +541,7 @@ class Plugins
 		}
 		else
 		{ // This gets called for non-installed Plugins:
-			// Instantiate the Plugins (User)Settings members:
-			$this->init_settings( $Plugin );
+			// We're not instantiating UserSettings/Settings, since that needs a DB backend.
 
 			$tmp_params = array( 'db_row' => array(), 'is_installed' => false );
 			if( $Plugin->PluginInit( $tmp_params ) === false && $this->unregister( $Plugin ) )
@@ -634,6 +633,9 @@ class Plugins
 	 * Init {@link Plugin::$Settings} and {@link Plugin::$UserSettings}, either by
 	 * unsetting them for PHP5's overloading or instantiating them for PHP4.
 	 *
+	 * This only gets used for installed plugins, but we're initing it for PHP 5.1,
+	 * to trigger a helpful error, when e.g. Plugin::Settings gets accessed in PluginInit().
+	 *
 	 * @param Plugin
 	 */
 	function init_settings( & $Plugin )
@@ -649,9 +651,12 @@ class Plugins
 			return;
 		}
 
-		// PHP < 5.1: instantiate now:
-		$this->instantiate_Settings( $Plugin, 'Settings' );
-		$this->instantiate_Settings( $Plugin, 'UserSettings' );
+		// PHP < 5.1: instantiate now, but only for installed plugins (needs DB).
+		if( $Plugin->ID > 0 )
+		{
+			$this->instantiate_Settings( $Plugin, 'Settings' );
+			$this->instantiate_Settings( $Plugin, 'UserSettings' );
+		}
 	}
 
 
@@ -1890,6 +1895,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.8  2009/02/28 16:47:56  blueyed
+ * Fix Plugins::init_settings: it is not meant to work for uninstalled plugins. Add according debug_die calls for PHP>=5.1 in Plugin::__get.
+ *
  * Revision 1.7  2009/02/27 20:25:08  blueyed
  * Move Plugins_admin::validate_renderer_list back to Plugins, since it gets used for displaying items and saves (at least) a load_plugins_table call/query
  *
