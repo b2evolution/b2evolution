@@ -321,7 +321,7 @@ class Plugins_admin extends Plugins
 		{
 			foreach( get_filenames( $subdir, true, false, true, false ) as $filename )
 			{
-				if( ! preg_match( '~/_([^/]+)\.plugin\.php$~', $filename, $match ) && is_file( $filename ) )
+				if( ! (preg_match( '~/_([^/]+)\.plugin\.php$~', $filename, $match ) && is_file( $filename )) )
 				{
 					continue;
 				}
@@ -1446,6 +1446,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.7  2009/02/28 22:49:02  blueyed
+ * Fix check for valid filename in discover.
+ *
  * Revision 1.6  2009/02/27 20:25:08  blueyed
  * Move Plugins_admin::validate_renderer_list back to Plugins, since it gets used for displaying items and saves (at least) a load_plugins_table call/query
  *
