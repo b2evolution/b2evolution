@@ -203,7 +203,7 @@ switch( $action )
 		param( 'conf_db_password', 'string', true );
 		param( 'conf_db_name', 'string', true );
 		param( 'conf_db_host', 'string', true );
-		param( 'conf_db_tableprefix', 'string', true );
+		param( 'conf_db_tableprefix', 'string', 'evo_' );
 		param( 'conf_baseurl', 'string', true );
 		$conf_baseurl = preg_replace( '#(/)?$#', '', $conf_baseurl ).'/'; // force trailing slash
 		param( 'conf_admin_email', 'string', true );
@@ -353,12 +353,14 @@ switch( $action )
 
 				<fieldset>
 					<legend><?php echo T_('Database you want to install into') ?></legend>
+					<p class="note">b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installating b2evolution and
+					provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.</p>
 					<?php
-						form_text( 'conf_db_user', $conf_db_user, 16, T_('MySQL Username'), sprintf( T_('Your username to access the database' ) ), 100 );
-						form_text( 'conf_db_password', $conf_db_password, 16, T_('MySQL Password'), sprintf( T_('Your password to access the database' ) ), 100, '', 'password' );
-						form_text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the database you want to use' ) ), 100);
-						form_text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host/Server'), sprintf( T_('You probably won\'t have to change this' ) ), 120 );
-						form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
+						form_text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ), 120 );
+						form_text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ), 100);
+						form_text( 'conf_db_user', $conf_db_user, 16, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 );
+						form_text( 'conf_db_password', $conf_db_password, 16, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 ); // no need to hyde this. nobody installs b2evolution from a public place
+						// form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
 					?>
 				</fieldset>
 
@@ -367,7 +369,7 @@ switch( $action )
 					<?php
 						form_text( 'conf_baseurl', $conf_baseurl, 50, T_('Base URL'), sprintf( T_('This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine\'s name!' ) ), 120 );
 
-						form_text( 'conf_admin_email', $conf_admin_email, 50, T_('Your email'), sprintf( T_('Will be used in severe error messages so that users can contact you. You will also receive notifications for new user registrations.' ) ), 80 );
+						form_text( 'conf_admin_email', $conf_admin_email, 50, T_('Your email'), sprintf( T_('This is used to create your admin account. You will receive notifications for comments on your blog, etc.' ) ), 80 );
 					?>
 				</fieldset>
 
@@ -670,6 +672,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
+ * Revision 1.158  2009/02/28 18:45:11  fplanque
+ * quick cleanup of the installer
+ *
  * Revision 1.157  2009/02/27 22:25:16  blueyed
  * Fix inclusion of misc.funcs. Includes load_funcs now after all.
  *

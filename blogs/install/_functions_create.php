@@ -698,7 +698,7 @@ And, of course, read the <a href="http://manual.b2evolution.net/Skins_2.0" targe
 	$edited_Item = & new Item();
 	$edited_Item->insert( 1, T_('Image post'), T_('<p>This post has an image attached to it. The image is automatically resized to fit the current skin. You can zoom in by clicking on the thumbnail.</p>
 
-<p>Check out the photoblog (accessible trhough the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>'), $now, $cat_bg );
+<p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>'), $now, $cat_bg );
 	$edit_File = & new File( 'shared', 0, 'monument-valley/monuments.jpg' );
 	$edit_File->link_to_Item( $edited_Item );
 
@@ -827,6 +827,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.256  2009/02/28 18:45:11  fplanque
+ * quick cleanup of the installer
+ *
  * Revision 1.255  2009/02/26 22:33:22  blueyed
  * Fix messup in last commit.
  *
