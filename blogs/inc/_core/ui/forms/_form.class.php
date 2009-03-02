@@ -1719,7 +1719,6 @@ class Form extends Widget
 	 * @param string Field label to be display before the field
 	 * @param string Note
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
-	 *              - 'value': The selected value
 	 *              - 'force_keys_as_values': Use the key of $field_options for "value" attrib always.
 	 *              - Plus all of {@link select_input_options()}.
 	 * @return mixed true (if output) or the generated HTML if not outputting
@@ -1737,27 +1736,43 @@ class Form extends Widget
 		}
 
 		// Build $options_list
-		$options_list = '';
+		$options_list = self::get_select_options_string($field_options, $field_value, $force_keys_as_values);
+
+		return $this->select_input_options( $field_name, $options_list, $field_label, $field_params );
+	}
+
+
+	/**
+	 * Get the OPTION list as string for use in a SELECT.
+	 * @static
+	 * @param array Options
+	 * @param string Selected value (if any)
+	 * @param boolean Force keys from $options as values? (Default: false, only array keys,
+	 *                which are strings will be used).
+	 * @return string
+	 */
+	function get_select_options_string($field_options, $field_value = NULL, $force_keys_as_values = false)
+	{
+		$r = '';
 
 		foreach( $field_options as $l_key => $l_option )
 		{
 			// Get the value attribute from key if is_string():
 			$l_value = ($force_keys_as_values || is_string($l_key)) ? $l_key : $l_option;
 
-			$options_list .= '<option value="'.format_to_output($l_value, 'formvalue').'"';
+			$r .= '<option value="'.format_to_output($l_value, 'formvalue').'"';
 
 			if(
 					( is_array( $field_value ) && in_array( $l_value, $field_value ) ) ||
 					( !is_array( $field_value ) && (string)$l_value == (string)$field_value ) // cast to string so "1,2" is != 1
 				)
 			{
-				$options_list .= ' selected="selected"';
+				$r .= ' selected="selected"';
 			}
 
-			$options_list .= '>'.format_to_output($l_option).'</option>';
+			$r .= '>'.format_to_output($l_option).'</option>';
 		}
-
-		return $this->select_input_options( $field_name, $options_list, $field_label, $field_note, $field_params );
+		return $r;
 	}
 
 
@@ -2805,6 +2820,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.36  2009/03/02 23:46:36  blueyed
+ * Add Form::get_select_options_string as static method for the common task to build an option list only. Extracted out of select_input_array.
+ *
  * Revision 1.35  2009/02/26 22:16:54  blueyed
  * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
  *
