@@ -239,7 +239,7 @@ class DB
 	 * This requires {@link DB::$log_queries} to be true.
 	 * @var boolean
 	 */
-	var $debug_explain_joins = false;
+	var $debug_explain_joins = true;
 
 	/**
 	 * Do we want to output a function backtrace for every query?
@@ -249,14 +249,14 @@ class DB
 	 *
 	 * @var integer
 	 */
-	var $debug_dump_function_trace_for_queries = 0;
+	var $debug_dump_function_trace_for_queries = true;
 
 	/**
 	 * Number of rows we want to dump in debug output (0 disables it)
 	 * This requires {@link DB::$log_queries} to be true.
 	 * @var integer
 	 */
-	var $debug_dump_rows = 0;
+	var $debug_dump_rows = 100;
 
 	/**
 	 * Time in seconds that is considered a fast query (green).
@@ -1183,7 +1183,7 @@ class DB
 
 	/**
 	 * Displays all queries that have been executed
-	 * 
+	 *
 	 * @param boolean Use HTML.
 	 */
 	function dump_queries( $html = true )
@@ -1215,7 +1215,34 @@ class DB
 			return;
 		}
 
-		foreach( $this->queries as $query )
+		// Javascript function to toggle DIVs (EXPLAIN, results, backtraces).
+		if( $html )
+		{
+			echo '<script type="text/javascript">
+				function debug_onclick_toggle_div( div_id, text_show, text_hide ) {
+					var div = document.getElementById(div_id);
+
+					var a = document.createElement("a");
+					a.href= "#";
+					a.style.display = "block";
+					var a_onclick = function() {
+						if( div.style.display == \'\' ) {
+							div.style.display = \'none\';
+							a.innerHTML = text_show;
+						} else {
+							div.style.display = \'\';
+							a.innerHTML = text_hide;
+						}
+						return false;
+					};
+					a.onclick = a_onclick;
+					div.parentNode.insertBefore(a, div);
+					a_onclick();
+				};
+				</script>';
+		}
+
+		foreach( $this->queries as $i => $query )
 		{
 			$count_queries++;
 
@@ -1264,7 +1291,7 @@ class DB
 			{
 				echo 'Rows: '.$query['rows'].' - Time: ';
 			}
-			
+
 			if( $html && $style_time_text )
 			{
 				echo '<span style="'.$style_time_text.'">';
@@ -1299,19 +1326,61 @@ class DB
 			// Explain:
 			if( isset($query['explain']) )
 			{
-				echo $query['explain'];
+				if( $html )
+				{
+					$div_id = 'db_query_explain_'.$i.'_'.md5(serialize($query));
+					echo '<div id="'.$div_id.'">';
+					echo $query['explain'];
+					echo '</div>';
+					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show EXPLAIN", "Hide EXPLAIN");</script>';
+				}
+				else
+				{ // TODO: dh> contains html.
+					echo $query['explain'];
+				}
 			}
 
 			// Results:
 			if( $query['results'] != 'unknown' )
 			{
-				echo $query['results'];
+				if( $html )
+				{
+					$div_id = 'db_query_results_'.$i.'_'.md5(serialize($query));
+					echo '<div id="'.$div_id.'">';
+					echo $query['results'];
+					echo '</div>';
+					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show results", "Hide results");</script>';
+				}
+				else
+				{ // TODO: dh> contains html.
+					echo $query['results'];
+				}
 			}
 
 			// Function trace:
 			if( isset($query['function_trace']) )
 			{
-				echo $query['function_trace'];
+				if( $html )
+				{
+					$div_id = 'db_query_backtrace_'.$i.'_'.md5(serialize($query));
+					echo '<div id="'.$div_id.'">';
+					echo $query['function_trace'];
+					echo '</div>';
+					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show function trace", "Hide function trace");</script>';
+				}
+				else
+				{ // TODO: dh> contains html.
+					echo $query['function_trace'];
+				}
+			}
+
+			if( $html )
+			{
+				echo '<hr />';
+			}
+			else
+			{
+				echo "=============================================\n";
 			}
 
 			$count_rows += $query['rows'];
@@ -1498,6 +1567,14 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.19  2009/03/02 21:36:51  blueyed
+ * Add "toggle" links to EXPLAIN, Results and Function trace lists in
+ * DB::dump_queries.
+ * debug_explain_joins, debug_dump_function_trace_for_queries and
+ * debug_dump_rows follow debug/log_queries now, since they are collapsed
+ * now and provide valuable info.
+ * TODO: those lists contain HTML still, maybe strip tags in them?
+ *
  * Revision 1.18  2009/02/22 17:52:03  blueyed
  * Fix indent
  *
