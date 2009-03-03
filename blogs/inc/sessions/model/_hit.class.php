@@ -36,55 +36,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * @param string referer
- * @return string keyphrase
- */
-function extract_keyphrase_from_referer( $ref )
-{
-	global $evo_charset;
-
-	$kwout = '';
-	if( ($pos_question = strpos( $ref, '?' )) == false )
-	{
-		return NULL;
-	}
-
-	$known_search_params =  array(
-				'q',
-				'as_q',         // Google Advanced Search Query
-				'as_epq',       // Google Advanced Search Query
-				'query',
-				'search',
-				's',            // google.co.uk
-				'p',
-				'kw',
-				'qs',
-				'searchfor',    // mysearch.myway.com
-				'r',
-				'rdata',        // search.ke.voila.fr
-				'string',       // att.net
-				'su',           // suche.web.de
-				'Gw',           // scroogle.org
-				'text',         // yandex.ru
-			);
-
-	$ref_params = explode( '&', substr( $ref, $pos_question+1 ) );
-	foreach( $ref_params as $ref_param )
-	{
-		$param_parts = explode( '=', $ref_param );
-		if( !empty($param_parts[1]) && in_array( $param_parts[0], $known_search_params )	)
-		{ // found "q" query parameter
-			$q = trim(urldecode($param_parts[1]));
-			$q = convert_charset($q, $evo_charset);
-			return $q;
-		}
-	}
-
-	return NULL;
-}
-
-
-/**
  * A hit to a blog.
  *
  * @package evocore
@@ -720,7 +671,7 @@ class Hit
 
 		if( $this->referer_type == 'search' )
 		{
-			$this->_keyphrase = extract_keyphrase_from_referer( $this->referer );
+			$this->_keyphrase = Hit::extract_keyphrase_from_referer( $this->referer );
 		}
 
 		$this->_extracted_keyphrase = true;
@@ -854,10 +805,62 @@ class Hit
 		return false;
 	}
 
+
+	/**
+	 * @static
+	 * @param string referer
+	 * @return string keyphrase
+	 */
+	function extract_keyphrase_from_referer( $ref )
+	{
+		global $evo_charset;
+
+		$kwout = '';
+		if( ($pos_question = strpos( $ref, '?' )) == false )
+		{
+			return NULL;
+		}
+
+		$known_search_params =  array(
+					'q',
+					'as_q',         // Google Advanced Search Query
+					'as_epq',       // Google Advanced Search Query
+					'query',
+					'search',
+					's',            // google.co.uk
+					'p',
+					'kw',
+					'qs',
+					'searchfor',    // mysearch.myway.com
+					'r',
+					'rdata',        // search.ke.voila.fr
+					'string',       // att.net
+					'su',           // suche.web.de
+					'Gw',           // scroogle.org
+					'text',         // yandex.ru
+				);
+
+		$ref_params = explode( '&', substr( $ref, $pos_question+1 ) );
+		foreach( $ref_params as $ref_param )
+		{
+			$param_parts = explode( '=', $ref_param );
+			if( !empty($param_parts[1]) && in_array( $param_parts[0], $known_search_params )	)
+			{ // found "q" query parameter
+				$q = trim(urldecode($param_parts[1]));
+				$q = convert_charset($q, $evo_charset);
+				return $q;
+			}
+		}
+
+		return NULL;
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.18  2009/03/03 20:23:46  blueyed
+ * Move extract_keyphrase_from_referer to Hit class. Otherwise it should get moved to hit.funcs.
+ *
  * Revision 1.17  2009/02/23 20:34:31  blueyed
  * Cleanup whitespace/indent in comments for known_search_params
  *

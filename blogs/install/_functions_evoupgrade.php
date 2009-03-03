@@ -128,7 +128,7 @@ function db_add_col( $table, $col_name, $col_desc )
 	{ // Column exists already, make sure it's the same.
 		$DB->query( 'ALTER TABLE '.$table.' MODIFY COLUMN '.$col_name.' '.$col_desc );
 		return false;
-	}	
+	}
 
 	$DB->query( 'ALTER TABLE '.$table.' ADD COLUMN '.$col_name.' '.$col_desc );
 }
@@ -2176,7 +2176,7 @@ function upgrade_b2evo_tables()
 		$rows = $DB->get_results( $sql, OBJECT, 'get all search hits' );
 		foreach( $rows as $row )
 		{
-			$keyphrase = extract_keyphrase_from_referer( $row->hit_referer );
+			$keyphrase = Hit::extract_keyphrase_from_referer( $row->hit_referer );
 			if( empty( $keyphrase ) )
 			{
 				continue;
@@ -2480,6 +2480,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.284  2009/03/03 20:23:46  blueyed
+ * Move extract_keyphrase_from_referer to Hit class. Otherwise it should get moved to hit.funcs.
+ *
  * Revision 1.283  2009/02/26 22:33:22  blueyed
  * Fix messup in last commit.
  *
