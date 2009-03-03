@@ -2272,7 +2272,7 @@ class Plugin
 			}
 		}
 
-		if ( ( $return = T_( $string, $req_locale, $this->_trans, $this->classname ) ) == $string )
+		if ( ( $return = T_( $string, $req_locale, array( 'ext_transarray' => & $this->_trans, 'plugin_name' => $this->classname ) ) ) == $string )
 		{	// Fallback to global translation file:
 			return T_( $string, $req_locale );
 		}
@@ -2801,6 +2801,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.13  2009/03/03 20:15:49  tblue246
+ * T_(): Adding workaround for PHP 4 compatibility...
+ *
  * Revision 1.12  2009/02/28 16:47:56  blueyed
  * Fix Plugins::init_settings: it is not meant to work for uninstalled plugins. Add according debug_die calls for PHP>=5.1 in Plugin::__get.
  *

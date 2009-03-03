@@ -47,18 +47,17 @@ if( $use_l10n )
 	 *
 	 * @param string String to translate, '' to get language file info (as in gettext spec)
 	 * @param string locale to translate to, '' to use current locale
-	 * @param array Alternate array to use for the caching of the translated strings. NULL to use the internal array.
-	 * @param string Plugin name if you want to use a plugin translation file instead of the global one.
+	 * @param array Array containing the following keys: "ext_transarray" = A reference to an alternate array to use for the caching of the translated strings or NULL to use the internal array; "plugin_name" = Plugin name if you want to use a plugin translation file instead of the global one.
 	 * @return string The translated string or the original string on error.
 	 *
 	 * @internal The last two parameters are used by Plugin::T_().
 	 */
-	function T_( $string, $req_locale = '', $ext_transarray = NULL, $plugin_name = NULL )
+	function T_( $string, $req_locale = '', $plugin_data = array() )
 	{
 		/**
 		 * The translations keyed by locale.
 		 *
-		 * This array is only used if $ext_transarray == NULL.
+		 * This array is only used if $plugin_data['ext_transarray'] === NULL.
 		 * 
 		 * @var array
 		 * @static
@@ -67,6 +66,11 @@ if( $use_l10n )
 
 		global $current_locale, $locales, $locales_path, $plugins_path;
 		global $evo_charset, $Debuglog;
+
+		$plugin_data = array_merge( array(
+								'ext_transarray' => NULL,
+								'plugin_name'    => '',
+								), $plugin_data );
 
 		if( empty( $req_locale ) )
 		{ // By default we use the current locale
@@ -97,7 +101,7 @@ if( $use_l10n )
 
 		// echo "Translating ", $search, " to $messages<br />";
 
-		if ( is_null( $ext_transarray ) )
+		if ( is_null( $plugin_data['ext_transarray'] ) )
 		{	// use our array
 			//$Debuglog->add( 'Using internal array', 'locale' );
 			$trans = & $_trans;
@@ -105,14 +109,14 @@ if( $use_l10n )
 		else
 		{	// use external array:
 			//$Debuglog->add( 'Using external array', 'locale' );
-			$trans = & $ext_transarray;
+			$trans = & $plugin_data['ext_transarray'];
 		}
 
 		if( ! isset( $trans[ $messages ] ) )
 		{ // Translations for current locale have not yet been loaded:
-			if ( ! is_null( $plugin_name ) )
+			if ( $plugin_data['plugin_name'] != '' )
 			{	// Load the plugin's translation file:
-				$path = $plugins_path.$plugin_name.'/locales/'.$messages.'/_global.php';
+				$path = $plugins_path.$plugin_data['plugin_name'].'/locales/'.$messages.'/_global.php';
 			}
 			else
 			{	// Load our global translation file.
@@ -161,7 +165,7 @@ else
 	/**
 	 * @ignore
 	 */
-	function T_( $string, $req_locale = '', $ext_transarray = NULL, $plugin_name = NULL )
+	function T_( $string, $req_locale = '', $plugin_data = array() )
 	{
 		return $string;
 	}
@@ -985,20 +989,15 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.19  2009/03/03 20:15:49  tblue246
+ * T_(): Adding workaround for PHP 4 compatibility...
+ *
  * Revision 1.18  2009/03/03 15:00:22  tblue246
  * PHP 4 compat BREAKS plugin translations!
  *
  * Revision 1.17  2009/03/03 00:52:18  fplanque
  * & $ext_transarray = NULL does not wrok on PHP4
  * PLEASE CONFIRM THAT CODE WORKS WITHOUT &
- * Tblue> This BREAKS plugin translations!! This wasn't a simple "read"
- *        reference, but a "write" reference! The referenced array never
- *        gets updated; when using the $ext_transarray parameter (see
- *        Plugin::T_()), only the first call to T_() returns the translated
- *        string; the next calls fail. Non-plugin translations work, though
- *        (because the $ext_transarray isn't used).
- *        So this probably means rev1.15 has to be reverted in favour of
- *        PHP 4 compatibility. :((
  *
  * Revision 1.16  2009/02/25 23:47:12  blueyed
  * T(): return string always, if messages are not set; not only if $evo_char is defined (and it gets converted); minor doc
