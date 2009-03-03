@@ -71,7 +71,6 @@ $headlines = array();
 
 
 // Investigation for following code by Isaac - http://isaacschlueter.com/
-// $debug = true;
 if( isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) )
 { // Warning: on some IIS installs it it set but empty!
 	$Debuglog->add( 'Getting ReqURI from REQUEST_URI', 'vars' );
@@ -307,6 +306,9 @@ $skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', ar
 
 /*
  * $Log$
+ * Revision 1.35  2009/03/03 20:25:27  blueyed
+ * Minor: drop commented out debug assignment.
+ *
  * Revision 1.34  2009/01/23 17:23:09  fplanque
  * doc/minor
  *
