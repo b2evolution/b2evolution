@@ -2225,6 +2225,38 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 
 /**
+ * If first parameter evaluates to true printf() gets called using the first parameter
+ * as args and the second parameter as print-pattern
+ *
+ * @param mixed variable to test and output if it's true or $disp_none is given
+ * @param string printf-pattern to use (%s gets replaced by $var)
+ * @param string printf-pattern to use, if $var is numeric and > 1 (%s gets replaced by $var)
+ * @param string printf-pattern to use if $var evaluates to false (%s gets replaced by $var)
+ */
+function disp_cond( $var, $disp_one, $disp_more = NULL, $disp_none = NULL )
+{
+	if( is_numeric($var) && $var > 1 )
+	{
+		printf( ( $disp_more === NULL ? $disp_one : $disp_more ), $var );
+		return true;
+	}
+	elseif( $var )
+	{
+		printf( $disp_one, $var );
+		return true;
+	}
+	else
+	{
+		if( $disp_none !== NULL )
+		{
+			printf( $disp_none, $var );
+			return false;
+		}
+	}
+}
+
+
+/**
  * Create IMG tag for an action icon.
  *
  * @param string TITLE text (IMG and A link)
@@ -3369,6 +3401,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.82  2009/03/03 00:45:51  fplanque
+ * dips_cond() actually makes sense as a generally available function
+ *
  * Revision 1.81  2009/02/27 21:33:33  blueyed
  * Move load_funcs from class4.funcs to misc.funcs
  *
