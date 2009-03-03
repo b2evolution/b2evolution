@@ -234,11 +234,11 @@ $Hit = & new Hit(); // This may INSERT a basedomain and a useragent but NOT the 
 
 /**
  * The Session class.
- * It has to be instantiated before the "SessionLoaded" hook.
  */
 load_class('sessions/model/_session.class.php');
 /**
- * The Session object
+ * The Session object.
+ * It has to be instantiated before the "SessionLoaded" hook.
  * @global Session
  * @todo dh> This needs the same "SET NAMES" MySQL-setup as with Session::dbsave() - see the "TODO" with unserialize() in Session::Session()
  * @todo dh> makes no sense in CLI mode (no cookie); Add isset() checks to calls on the $Session object, e.g. below?
@@ -256,7 +256,6 @@ register_shutdown_function( 'shutdown' );
  * @global AbstractSettings
  */
 $global_Cache = & new AbstractSettings( 'T_global__cache', array( 'cach_name' ), 'cach_cache', 0 /* load all */ );
-
 
 
 /**
@@ -367,8 +366,9 @@ locale_activate( $default_locale );
 
 /*
  * Login procedure: {{{
- * TODO: dh> the meat of this login procedure should be moved to an extra file IMHO so that if a session exists (in most cases) it does not trigger parsing the meat of this code
- * !!! fp> a session can and will exist before a user is already logged in.
+ * TODO: dh> the meat of this login procedure should be moved to an extra file,
+ *           so that if a "logged in"-session exists (in most cases) it does not
+ *           trigger parsing the meat of this code.
  */
 if( !isset($login_required) )
 {
@@ -649,6 +649,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.105  2009/03/03 20:14:11  blueyed
+ * doc
+ *
  * Revision 1.104  2009/03/03 20:13:25  blueyed
  * Instantiate "Debuglog" according to "debug" right away, which is known here already.
  *
