@@ -41,6 +41,7 @@ global $edited_Item;
 
 global $AdminUI;
 
+// TODO: dh> What is this for??
 global $debug;
 $debug = 0;
 
@@ -170,6 +171,9 @@ $Results->display( $AdminUI->get_template( 'compact_results' ) );
 
 /*
  * $Log$
+ * Revision 1.4  2009/03/03 20:25:53  blueyed
+ * TODO/question
+ *
  * Revision 1.3  2008/09/23 05:26:38  fplanque
  * Handle attaching files when multiple posts are edited simultaneously
  *
