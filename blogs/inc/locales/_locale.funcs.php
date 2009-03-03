@@ -53,7 +53,7 @@ if( $use_l10n )
 	 *
 	 * @internal The last two parameters are used by Plugin::T_().
 	 */
-	function T_( $string, $req_locale = '', & $ext_transarray = NULL, $plugin_name = NULL )
+	function T_( $string, $req_locale = '', $ext_transarray = NULL, $plugin_name = NULL )
 	{
 		/**
 		 * The translations keyed by locale.
@@ -161,7 +161,7 @@ else
 	/**
 	 * @ignore
 	 */
-	function T_( $string, $req_locale = '', & $ext_transarray = NULL, $plugin_name = NULL )
+	function T_( $string, $req_locale = '', $ext_transarray = NULL, $plugin_name = NULL )
 	{
 		return $string;
 	}
@@ -985,6 +985,10 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.17  2009/03/03 00:52:18  fplanque
+ * & $ext_transarray = NULL does not wrok on PHP4
+ * PLEASE CONFIRM THAT CODE WORKS WITHOUT &
+ *
  * Revision 1.16  2009/02/25 23:47:12  blueyed
  * T(): return string always, if messages are not set; not only if $evo_char is defined (and it gets converted); minor doc
  *
