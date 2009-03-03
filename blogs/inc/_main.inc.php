@@ -125,11 +125,17 @@ load_class('_core/model/_log.class.php');
 /**
  * Debug message log for debugging only (initialized here).
  *
- * If {@link $debug} is off, it will be re-instantiated of class {@link Log_noop} after loading config
- * and perform no operations.
  * @global Log|Log_noop $Debuglog
  */
-$Debuglog = & new Log( 'note' );
+if( $debug )
+{
+	$Debuglog = & new Log( 'note' );
+}
+else
+{
+	$Debuglog = & new Log_noop( 'note' );
+}
+
 
 /**
  * Info & error message log for end user (initialized here)
@@ -166,11 +172,6 @@ elseif( !isset( $locales[$default_locale] ) )
 if( isset( $error_message ) )
 { // error & exit
 	require dirname(__FILE__).'/../skins_adm/conf_error.main.php';
-}
-
-if( !$debug )
-{
-	$Debuglog = & new Log_noop( 'note' );
 }
 
 
@@ -648,6 +649,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.104  2009/03/03 20:13:25  blueyed
+ * Instantiate "Debuglog" according to "debug" right away, which is known here already.
+ *
  * Revision 1.103  2009/03/03 20:04:29  blueyed
  * Only "protect" superglobals if register_globals is on. Please review.
  *
