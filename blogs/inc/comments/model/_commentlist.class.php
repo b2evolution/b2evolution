@@ -58,8 +58,6 @@ class CommentList extends DataObjectList
 		)
 	{
 		global $DB;
-		global $cache_categories;
-		global $pagenow;		// Bleh !
 
 		// Call parent constructor:
 		parent::DataObjectList( 'T_comments', 'comment_', 'comment_ID', 'Item', NULL, $limit );
@@ -169,6 +167,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.10  2009/03/03 20:45:07  blueyed
+ * Drop unnecessary global assignments in CommentList.
+ *
  * Revision 1.9  2009/01/25 19:09:32  blueyed
  * phpdoc fixes
  *
