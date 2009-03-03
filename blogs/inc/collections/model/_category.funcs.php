@@ -113,7 +113,9 @@ function get_the_category_by_ID( $cat_ID, $die = true )
 
 
 /**
- * Get blog for a given cat
+ * Get blog ID for a given cat.
+ * This halts on error.
+ * @return integer
  */
 function get_catblog( $cat_ID )
 {
@@ -473,6 +475,9 @@ function cat_req_dummy()
 
 /*
  * $Log$
+ * Revision 1.4  2009/03/03 20:34:52  blueyed
+ * doc
+ *
  * Revision 1.3  2009/01/28 21:23:22  fplanque
  * Manual ordering of categories
  *

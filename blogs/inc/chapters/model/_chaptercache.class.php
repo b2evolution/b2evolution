@@ -79,7 +79,7 @@ class ChapterCache extends GenericCategoryCache
 	 * @param boolean true if function should die on error
 	 * @param boolean true if function should die on empty/null
  	 * @param integer|NULL NULL for all subsets
-	 * @return reference on cached object
+	 * @return Chapter Reference on cached object or false.
 	 */
 	function & get_by_ID( $req_ID, $halt_on_error = true, $halt_on_empty = true, $subset_ID = NULL )
 	{
@@ -318,6 +318,9 @@ class ChapterCache extends GenericCategoryCache
 
 /*
  * $Log$
+ * Revision 1.6  2009/03/03 20:34:52  blueyed
+ * doc
+ *
  * Revision 1.5  2009/01/28 21:23:22  fplanque
  * Manual ordering of categories
  *
