@@ -283,6 +283,7 @@ function stats_search_keywords( $keyphrase )
 		//           but at least the first option ("evo_substr") should get used otherwise
 		//           (which is kind of crappy though). Note: there are more internal PHP funcs
 		//           that would need wrapping, so overloading appears to be the way to go.
+		// fp> we should just init somewhere that if( ! function_exists('mb_substr') ) function mbsubstr() { return substr() }
 		if( function_exists('mb_substr') )
 		{	// 2-byte unicode strings are cropped to 15 characters
 			// When cropped with 'substr' usually end with junk character
@@ -294,16 +295,10 @@ function stats_search_keywords( $keyphrase )
 		}
 	}
 
-	if( version_compare( PHP_VERSION, '4.3.2', '>=' ) )
-	{	// Convert keyword encoding, some charsets are supported only in PHP 4.3.2 and later.
-		// This fixes encoding problem for Cyrillic keywords
-		// See http://forums.b2evolution.net/viewtopic.php?t=17431
-		return htmlentities( $keyphrase, ENT_COMPAT, $evo_charset );
-	}
-	else
-	{
-		return htmlentities( $keyphrase );
-	}
+	// Convert keyword encoding, some charsets are supported only in PHP 4.3.2 and later.
+	// This fixes encoding problem for Cyrillic keywords
+	// See http://forums.b2evolution.net/viewtopic.php?t=17431
+	return htmlentities( $keyphrase, ENT_COMPAT, $evo_charset );
 }
 
 
@@ -344,6 +339,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.9  2009/03/03 01:27:45  fplanque
+ * I made PHP 4.3.2 the minimum requirement
+ *
  * Revision 1.8  2009/02/24 23:02:29  blueyed
  * TODO/NOTE about conditional usage of mb_substr
  *
