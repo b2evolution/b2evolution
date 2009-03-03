@@ -208,7 +208,7 @@ class code_highlight_plugin extends Plugin
 
 	function DisplayCodeToolbar()
 	{
-		echo '<div class="edit_toolbar">';
+		echo '<div class="code_toolbar">';
 		echo T_('Code').': ';
 		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" class="quicktags" onclick="codespan_tag(\'\');" value="'.T_('codespan').'" />';
 		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" style="margin-left:8px;" class="quicktags" onclick="codeblock_tag(\'\');" value="'.T_('codeblock').'" />';
@@ -631,6 +631,9 @@ class code_highlight_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.21  2009/03/03 13:05:38  afwas
+ * All toolbars have the class 'edit_toolbar'. Changed to 'code_toolbar'
+ *
  * Revision 1.20  2009/01/26 22:56:13  blueyed
  * Revert part of 1.15: no need to fake relative_to_base=true
  *
