@@ -23,6 +23,8 @@
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
+ * @todo dh> Lazily handle properties through getters (and do not detect/do much in the constructor)!
+ *
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
@@ -858,6 +860,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.19  2009/03/03 20:32:11  blueyed
+ * TODO about making Hit more lazy.
+ *
  * Revision 1.18  2009/03/03 20:23:46  blueyed
  * Move extract_keyphrase_from_referer to Hit class. Otherwise it should get moved to hit.funcs.
  *
