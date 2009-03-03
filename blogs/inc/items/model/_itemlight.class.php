@@ -446,6 +446,7 @@ class ItemLight extends DataObject
 		$ChapterCache = & get_Cache( 'ChapterCache' );
 
 		// Load cache for category associations with current posts
+		// TODO: dh> This fails, if $postIDlist is not set! (e.g. in admin)
 		cat_load_postcats_cache();
 
 		if( isset($cache_postcats[$this->ID]) )
@@ -943,6 +944,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2009/03/03 21:32:49  blueyed
+ * TODO/doc about cat_load_postcats_cache
+ *
  * Revision 1.15  2009/02/27 19:46:55  blueyed
  * ItemLight::set(main_cat_ID): unset main_Chapter before NULLing it, since it's a reference to the cache object. Also invalidate $Blog when setting main_cat_ID.
  *

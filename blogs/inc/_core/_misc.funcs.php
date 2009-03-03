@@ -1925,6 +1925,8 @@ function debug_info( $force = false, $force_clean = false )
 		}
 	}
 
+	echo "TEST-RETURN"; return;
+
 	// DEBUGLOG(s) FROM PREVIOUS SESSIONS, after REDIRECT(s) (with list of categories at top):
 	if( isset($Session) && ($sess_Debuglogs = $Session->get('Debuglogs')) && ! empty($sess_Debuglogs) )
 	{
@@ -3401,6 +3403,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.83  2009/03/03 21:32:48  blueyed
+ * TODO/doc about cat_load_postcats_cache
+ *
  * Revision 1.82  2009/03/03 00:45:51  fplanque
  * dips_cond() actually makes sense as a generally available function
  *

@@ -301,7 +301,7 @@ switch( $action )
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		$post_comment_status = $edited_Item->get( 'comment_status' );
-		$post_extracats = postcats_get_byID( $p );
+		$post_extracats = postcats_get_byID( $p ); // NOTE: dh> using $edited_Item->get_Chapters here instead fails (empty list, since no postIDlist).
 
 		$item_tags = implode( ', ', $edited_Item->get_tags() );
 		$trackback_url = '';
@@ -961,6 +961,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.37  2009/03/03 21:32:49  blueyed
+ * TODO/doc about cat_load_postcats_cache
+ *
  * Revision 1.36  2009/02/26 22:02:02  blueyed
  * Fix creating new item, broken with lazily handling blog_ID/main_cat_ID
  *
