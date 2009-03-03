@@ -237,6 +237,9 @@ class DB
 	/**
 	 * Do we want to explain joins?
 	 * This requires {@link DB::$log_queries} to be true.
+	 *
+	 * @todo fp> we'd probably want to group all the advanced debug vars under a single setting now. We might even auto enable it when $debug=2. (And we might actually want to include a $debug="cookie" mode for easy switching with bookmarks or a bookmarklet)
+	 *
 	 * @var boolean
 	 */
 	var $debug_explain_joins = false;
@@ -1567,6 +1570,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.21  2009/03/03 00:59:10  fplanque
+ * doc
+ *
  * Revision 1.20  2009/03/03 00:33:06  fplanque
  * no need to do all that extra processing and html sending by default, even when debug is on.
  *
