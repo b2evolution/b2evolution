@@ -208,7 +208,7 @@ class code_highlight_plugin extends Plugin
 
 	function DisplayCodeToolbar()
 	{
-		echo '<div class="code_toolbar">';
+		echo '<div class="edit_toolbar code_toolbar">';
 		echo T_('Code').': ';
 		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" class="quicktags" onclick="codespan_tag(\'\');" value="'.T_('codespan').'" />';
 		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" style="margin-left:8px;" class="quicktags" onclick="codeblock_tag(\'\');" value="'.T_('codeblock').'" />';
@@ -631,6 +631,9 @@ class code_highlight_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.22  2009/03/03 14:58:15  afwas
+ * Added class 'edit_toolbar'. These toolbars now have two classes (thanks blueyed.)
+ *
  * Revision 1.21  2009/03/03 13:05:38  afwas
  * All toolbars have the class 'edit_toolbar'. Changed to 'code_toolbar'
  *

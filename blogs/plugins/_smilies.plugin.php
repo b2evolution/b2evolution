@@ -221,7 +221,7 @@ XX(      graydead.gif
 			}
 		}
 
-		echo '<div class="smiley_toolbar">'.$grins.'</div>' ;
+		echo '<div class="edit_toolbar smiley_toolbar">'.$grins.'</div>' ;
 
 		return true;
 	}
@@ -400,6 +400,9 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.47  2009/03/03 14:58:14  afwas
+ * Added class 'edit_toolbar'. These toolbars now have two classes (thanks blueyed.)
+ *
  * Revision 1.46  2009/03/03 13:06:44  afwas
  * All toolbars have the class 'edit_toolbar'. Changed to 'smiley_toolbar'
  *
