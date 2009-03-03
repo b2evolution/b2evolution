@@ -1736,7 +1736,7 @@ class Form extends Widget
 		}
 
 		// Build $options_list
-		$options_list = self::get_select_options_string($field_options, $field_value, $force_keys_as_values);
+		$options_list = Form::get_select_options_string($field_options, $field_value, $force_keys_as_values);
 
 		return $this->select_input_options( $field_name, $options_list, $field_label, $field_params );
 	}
@@ -2820,6 +2820,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.37  2009/03/03 00:54:24  fplanque
+ * self:: does not work on PHP4 !!
+ *
  * Revision 1.36  2009/03/02 23:46:36  blueyed
  * Add Form::get_select_options_string as static method for the common task to build an option list only. Extracted out of select_input_array.
  *
