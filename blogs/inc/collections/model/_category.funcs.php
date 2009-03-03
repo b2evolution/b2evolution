@@ -63,8 +63,7 @@ function cat_create(
 	if( $cat_blog_ID == NULL )
 	{
 		if( empty($cat_parent_ID) ) debug_die ( 'cat_create(-) missing parameters!' );
-		$parent_cat = get_the_category_by_ID($cat_parent_ID);
-		$cat_blog_ID = $parent_cat['cat_blog_ID'];
+		$cat_blog_ID = get_catblog($cat_parent_ID);
 	}
 
 	// Dirty temporary fix:
@@ -86,8 +85,8 @@ function cat_create(
  *
  * fplanque: reused "R. U. Serious" optimization here
  * fplanque: added blog ID stuff
- * TODO: move. dis is not a template tag
  *
+ * @deprecated since 3.1.0-alpha. Use ChapterCache instead.
  * @param integer category ID
  * @param boolean die() if category does not exist? (default: true)
  *
@@ -111,7 +110,6 @@ function get_the_category_by_ID( $cat_ID, $die = true )
 }
 
 
-
 /**
  * Get blog ID for a given cat.
  * This halts on error.
@@ -119,8 +117,10 @@ function get_the_category_by_ID( $cat_ID, $die = true )
  */
 function get_catblog( $cat_ID )
 {
-	$cat = get_the_category_by_ID( $cat_ID );
-	return $cat['cat_blog_ID'];
+	$ChapterCache = & get_Cache('ChapterCache');
+	$Chapter = $ChapterCache->get_by_ID($cat_ID);
+
+	return $Chapter->blog_ID;
 }
 
 
@@ -475,6 +475,10 @@ function cat_req_dummy()
 
 /*
  * $Log$
+ * Revision 1.5  2009/03/03 21:21:09  blueyed
+ * Deprecate get_the_category_by_ID and replace its usage with ChapterCache
+ * in core.
+ *
  * Revision 1.4  2009/03/03 20:34:52  blueyed
  * doc
  *

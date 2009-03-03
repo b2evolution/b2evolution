@@ -101,7 +101,8 @@ function blogger_newpost( $m )
 	logIO( 'Main cat: '.$main_cat);
 
 	// Check if category exists
-	if( get_the_category_by_ID( $main_cat, false ) === false )
+	$ChapterCache = & get_Cache('ChapterCache');
+	if( $ChapterCache->get_by_ID( $main_cat, false ) === false )
 	{ // Cat does not exist:
 		// fp> TODO use $Blog->get_default_cat_ID();
 		return xmlrpcs_resperror( 11 ); // User error 11
@@ -206,7 +207,8 @@ function blogger_editpost($m)
 	logIO( 'Main cat: '.$main_cat);
 
 	// Check if category exists
-	if( get_the_category_by_ID( $main_cat, false ) === false )
+	$ChapterCache = & get_Cache('ChapterCache');
+	if( $ChapterCache->get_by_ID( $main_cat, false ) === false )
 	{ // Cat does not exist:
 		// fp> TODO use $Blog->get_default_cat_ID();
 		return xmlrpcs_resperror( 11 ); // User error 11
@@ -614,6 +616,10 @@ $xmlrpc_procs["blogger.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.5  2009/03/03 21:21:10  blueyed
+ * Deprecate get_the_category_by_ID and replace its usage with ChapterCache
+ * in core.
+ *
  * Revision 1.4  2009/02/25 22:17:53  blueyed
  * ItemLight: lazily load blog_ID and main_Chapter.
  * There is more, but I do not want to skim the diff again, after

@@ -1236,12 +1236,15 @@ function blog_load_cache()
 
 
 /**
- * Get name for a given cat
+ * Get name for a given cat ID.
+ *
+ * @return string Cat name in case of success, false on failure.
  */
 function get_catname($cat_ID)
 {
-	$cat = get_the_category_by_ID( $cat_ID );
-	return $cat['cat_name'];
+	$ChapterCache = & get_Cache('ChapterCache');
+	$Chapter = & $ChapterCache->get_by_ID($cat_ID);
+	return $Chapter->name;
 }
 
 
@@ -1280,7 +1283,6 @@ function fieldset_cats()
 		function import_cat_select_before_each( $cat_ID, $level )
 		{	// callback to display sublist element
 			global $current_blog_ID, $blog, $cat, $postdata, $default_main_cat, $action, $tabindex, $allow_cross_posting;
-			$this_cat = get_the_category_by_ID( $cat_ID );
 			echo '<li>';
 
 			if( $allow_cross_posting )
@@ -1301,7 +1303,7 @@ function fieldset_cats()
 					echo ' checked="checked"';
 				echo ' />';
 			}
-			echo ' '.$this_cat['cat_name'];
+			echo ' '.htmlspecialchars(get_catname($cat_ID));
 		}
 
 		function import_cat_select_after_each( $cat_ID, $level )
@@ -1669,6 +1671,10 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.9  2009/03/03 21:21:09  blueyed
+ * Deprecate get_the_category_by_ID and replace its usage with ChapterCache
+ * in core.
+ *
  * Revision 1.8  2009/02/27 20:25:08  blueyed
  * Move Plugins_admin::validate_renderer_list back to Plugins, since it gets used for displaying items and saves (at least) a load_plugins_table call/query
  *

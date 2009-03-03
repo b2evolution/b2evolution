@@ -926,11 +926,12 @@ class ItemListLight extends DataObjectList2
 		if( !empty($this->filters['cat_array']) )
 		{ // We have requested specific categories...
 			$cat_names = array();
+			$ChapterCache = & get_Cache('ChapterCache');
 			foreach( $this->filters['cat_array'] as $cat_ID )
 			{
-				if( ($my_cat = get_the_category_by_ID( $cat_ID, false ) ) !== false )
+				if( ($my_Chapter = & $ChapterCache->get_by_ID($cat_ID, false) ) !== false )
 				{ // It is almost never meaningful to die over an invalid cat when generating title
-					$cat_names[] = $my_cat['cat_name'];
+					$cat_names[] = $my_Chapter->name;
 				}
 			}
 			if( $this->filters['cat_modifier'] == '*' )
@@ -1509,6 +1510,10 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.28  2009/03/03 21:21:09  blueyed
+ * Deprecate get_the_category_by_ID and replace its usage with ChapterCache
+ * in core.
+ *
  * Revision 1.27  2009/02/25 17:18:03  waltercruz
  * Linkroll stuff, take #2
  *

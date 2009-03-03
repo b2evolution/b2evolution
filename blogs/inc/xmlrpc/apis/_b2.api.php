@@ -67,7 +67,8 @@ function b2_newpost($m)
 	logIO( 'Permission granted.' );
 
 	// Check if category exists
-	if( get_the_category_by_ID( $main_cat, false ) === false )
+	$ChapterCache = & get_Cache('ChapterCache');
+	if( $ChapterCache->get_by_ID( $main_cat, false ) === false )
 	{ // Cat does not exist:
 		return xmlrpcs_resperror( 11 );	// User error 11
 	}
@@ -184,6 +185,10 @@ $xmlrpc_procs["b2.getPostURL"] = array(
 
 /*
  * $Log$
+ * Revision 1.5  2009/03/03 21:21:10  blueyed
+ * Deprecate get_the_category_by_ID and replace its usage with ChapterCache
+ * in core.
+ *
  * Revision 1.4  2009/02/25 22:17:53  blueyed
  * ItemLight: lazily load blog_ID and main_Chapter.
  * There is more, but I do not want to skim the diff again, after

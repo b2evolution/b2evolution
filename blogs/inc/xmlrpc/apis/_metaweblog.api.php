@@ -108,7 +108,8 @@ function _mw_get_cat_IDs( $contentstruct, $blog_ID, $empty_struct_ok = false )
 	{ // categories requested to be set:
 
 		// Check if category exists
-		if( get_the_category_by_ID( $cat_IDs[0], false ) === false )
+		$ChapterCache = & get_Cache('ChapterCache');
+		if( $ChapterCache->get_by_ID( $cat_IDs[0], false ) === false )
 		{ // Main cat does not exist:
 			logIO("usererror 5 ...");
 			return new xmlrpcresp(0, $xmlrpcerruser+5, 'Requested category does not exist.'); // user error 5
@@ -695,15 +696,15 @@ function mw_getrecentposts( $m )
 		$authorname = $Item->creator_User->get('preferredname');
 		// need a loop here to extract all categoy names
 		// $extra_cat_IDs is the variable for the rest of the IDs
-		$hope_cat_name = get_the_category_by_ID($Item->main_cat_ID);
+		$hope_Chapter = & $Item->get_main_Chapter();
 		$test = $Item->extra_cat_IDs[0];
-		xmlrpc_debugmsg( 'postcats:'.$hope_cat_name["cat_name"]);
+		xmlrpc_debugmsg( 'postcats:'.$hope_Chapter->name );
 		xmlrpc_debugmsg( 'test:'.$test);
 		$data[] = new xmlrpcval(array(
 				"dateCreated" => new xmlrpcval($post_date,"dateTime.iso8601"),
 				"userid" => new xmlrpcval($Item->creator_user_ID),
 				"postid" => new xmlrpcval($Item->ID),
-				"categories" => new xmlrpcval(array(new xmlrpcval($hope_cat_name["cat_name"])),'array'),
+				"categories" => new xmlrpcval(array(new xmlrpcval($hope_Chapter->name)),'array'),
 				"title" => new xmlrpcval($Item->title),
 				"description" => new xmlrpcval($content),
 				"link" => new xmlrpcval($Item->url),
@@ -831,6 +832,10 @@ $xmlrpc_procs["metaWeblog.getRecentPosts"] = array(
 
 /*
  * $Log$
+ * Revision 1.9  2009/03/03 21:21:10  blueyed
+ * Deprecate get_the_category_by_ID and replace its usage with ChapterCache
+ * in core.
+ *
  * Revision 1.8  2009/02/25 22:17:53  blueyed
  * ItemLight: lazily load blog_ID and main_Chapter.
  * There is more, but I do not want to skim the diff again, after

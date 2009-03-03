@@ -583,7 +583,8 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 
 	$cat_sel_total_count++;
 
-	$this_cat = get_the_category_by_ID( $cat_ID );
+	$ChapterCache = & get_Cache('ChapterCache');
+	$thisChapter = $ChapterCache->get_by_ID($cat_ID);
 	$r = "\n".'<tr class="'.( $total_count%2 ? 'odd' : 'even' ).'">';
 
 	// RADIO for main cat:
@@ -635,7 +636,8 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 				.' for="'.( $allow_cross_posting
 											? 'sel_extracat_'.$cat_ID
 											: 'sel_maincat_'.$cat_ID ).'"'
-				.' style="padding-left:'.($level-1).'em;">'.$this_cat['cat_name'].'</label>'
+				.' style="padding-left:'.($level-1).'em;">'
+				.htmlspecialchars($thisChapter->name).'</label>'
 				."</td></tr>\n";
 
 	return $r;
@@ -823,6 +825,10 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.35  2009/03/03 21:21:09  blueyed
+ * Deprecate get_the_category_by_ID and replace its usage with ChapterCache
+ * in core.
+ *
  * Revision 1.34  2009/02/22 23:14:29  fplanque
  * partial rollback of stuff that can't be right...
  *
