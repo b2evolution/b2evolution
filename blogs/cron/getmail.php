@@ -30,6 +30,8 @@
  * @todo try more exotic email clients like mobile phones
  * @todo tested and working with thunderbird (text, html, signed), yahoo mail (text, html), outlook webmail, K800i
  * @todo Allow the user to choose whether to upload attachments to the blog media folder or to his user root.
+ * @todo dh> messages that are only meant for debugging should not be marked for translation (through T_).
+ *           Remove T_ from all echo_message calls with level 0?!?
  *
  * @version $Id$
  */
@@ -150,7 +152,7 @@ function echo_message( $strmessage , $color = '', $level = 0 )
 }
 
 /**
- * provide sys_get_temp_dir for older versions of PHP.
+ * Provide sys_get_temp_dir for older versions of PHP (< 5.2.1).
  *
  * code posted on php.net by minghong at gmail dot com
  * Based on {@link http://www.phpit.net/article/creating-zip-tar-archives-dynamically-php/2/}
@@ -220,7 +222,7 @@ function tempdir( $dir, $prefix = 'tmp', $mode = 0700 )
 
 
 /**
- * process Header information like subject and date of a mail
+ * Process Header information like subject and date of a mail.
  *
  * @global string The subject of the current message (write)
  * @global string The post date of the current message (write)
@@ -249,10 +251,12 @@ function processHeader( &$header )
 		return false;
 	}
 
+	// Parse Date.
+	// TODO: dh> use strftime (after format validation)? or strptime (PHP>=5.1.0)
 	// of the form '20 Mar 2002 20:32:37'
 	if (!preg_match('#^(.{3}, )?(\d{2}) (.{3}) (\d{4}) (\d{2}):(\d{2}):(\d{2})#', $ddate, $match))
 	{
-		echo_message(T_('Could not parse date header!'), ERROR, 0, $testtrue);
+		echo_message(T_('Could not parse date header!'), ERROR, 0);
 		//pre_dump($ddate);
 		return false;
 	}
@@ -578,10 +582,11 @@ for ( $index = 1; $index <= $imap_obj -> Nmsgs; $index++ )
 	echo_message( T_( 'Message content:' ) . ' <code>' . htmlspecialchars( $content ) . '</code>', INFO, 3 );
 
 	$user_login = trim( $a_authentication[0] );
-	$user_pass = @trim( $a_authentication[1] );
+	// TODO: dh> should the password really get trimmed here?!
+	$user_pass = isset($a_authentication[1]) ? trim($a_authentication[1]) : null;
 
-	echo_message( T_( 'Authenticating user' ) . ': ' . $user_login, INFO, 3 );
 	// authenticate user
+	echo_message( T_( 'Authenticating user' ) . ': ' . $user_login, INFO, 3 );
 	if ( !user_pass_ok( $user_login, $user_pass ) )
 	{
 		echo_message( T_( 'Authentication failed for user ' ) . htmlspecialchars( $user_login ), ERROR, 0 );
@@ -710,6 +715,9 @@ if ( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.33  2009/03/03 20:00:27  blueyed
+ * getmail.php: doc, minor cleanup, TODOs
+ *
  * Revision 1.32  2009/01/23 22:52:29  tblue246
  * Blog by mail: Ensure the month name in the "Date" header is valid.
  *
