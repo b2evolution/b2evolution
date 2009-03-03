@@ -221,7 +221,7 @@ XX(      graydead.gif
 			}
 		}
 
-		echo '<div class="edit_toolbar">'.$grins.'</div>' ;
+		echo '<div class="smiley_toolbar">'.$grins.'</div>' ;
 
 		return true;
 	}
@@ -400,6 +400,9 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.46  2009/03/03 13:06:44  afwas
+ * All toolbars have the class 'edit_toolbar'. Changed to 'smiley_toolbar'
+ *
  * Revision 1.45  2009/01/19 21:41:44  fplanque
  * Too many people find the smiley bar "ugly" :/
  * No longer display it by default
