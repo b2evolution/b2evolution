@@ -71,16 +71,20 @@ define( 'EVO_MAIN_INIT', true );
  * Security check for older PHP versions
  * Contributed by counterpoint / MAMBO team
  */
-$protects = array( '_REQUEST', '_GET', '_POST', '_COOKIE', '_FILES', '_SERVER', '_ENV', 'GLOBALS', '_SESSION' );
-foreach( $protects as $protect )
+// TODO: dh> this makes sense AFAICS. Please review.
+if( ini_get('register_globals') )
 {
-	if(  in_array( $protect, array_keys($_REQUEST) )
-		|| in_array( $protect, array_keys($_GET) )
-		|| in_array( $protect, array_keys($_POST) )
-		|| in_array( $protect, array_keys($_COOKIE) )
-		|| in_array( $protect, array_keys($_FILES) ) )
+	$protects = array( '_REQUEST', '_GET', '_POST', '_COOKIE', '_FILES', '_SERVER', '_ENV', 'GLOBALS', '_SESSION' );
+	foreach( $protects as $protect )
 	{
-		bad_request_die( 'Unacceptable params.' );
+		if(  in_array( $protect, array_keys($_REQUEST) )
+			|| in_array( $protect, array_keys($_GET) )
+			|| in_array( $protect, array_keys($_POST) )
+			|| in_array( $protect, array_keys($_COOKIE) )
+			|| in_array( $protect, array_keys($_FILES) ) )
+		{
+			bad_request_die( 'Unacceptable params.' );
+		}
 	}
 }
 
@@ -644,6 +648,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.103  2009/03/03 20:04:29  blueyed
+ * Only "protect" superglobals if register_globals is on. Please review.
+ *
  * Revision 1.102  2009/02/27 22:57:26  blueyed
  * Use load_funcs for swfcharts, and especially only include it when needed (in the stats controllers only, not main.inc)
  *
