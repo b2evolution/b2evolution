@@ -264,7 +264,7 @@ $Form->begin_form();
 
 			/***************  Link ("chain") icon:  **************/
 
-			if( ! $lFile->is_dir() )
+			// if( ! $lFile->is_dir() )	// fp> OK but you need to include an else:placeholder, otherwise the display is ugly
 			{	// Only provide link/"chain" icons for files.
 				// TODO: dh> provide support for direcories (display included files).
 
@@ -610,6 +610,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.14  2009/03/03 01:01:06  fplanque
+ * ok, but missing blank img
+ *
  * Revision 1.13  2009/02/23 20:50:45  blueyed
  * Only display 'link/chain' icon for files, since dirs are not supported yet.
  *
