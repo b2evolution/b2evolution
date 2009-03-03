@@ -239,7 +239,7 @@ class DB
 	 * This requires {@link DB::$log_queries} to be true.
 	 * @var boolean
 	 */
-	var $debug_explain_joins = true;
+	var $debug_explain_joins = false;
 
 	/**
 	 * Do we want to output a function backtrace for every query?
@@ -249,14 +249,14 @@ class DB
 	 *
 	 * @var integer
 	 */
-	var $debug_dump_function_trace_for_queries = true;
+	var $debug_dump_function_trace_for_queries = 0;
 
 	/**
 	 * Number of rows we want to dump in debug output (0 disables it)
 	 * This requires {@link DB::$log_queries} to be true.
 	 * @var integer
 	 */
-	var $debug_dump_rows = 100;
+	var $debug_dump_rows = 0;
 
 	/**
 	 * Time in seconds that is considered a fast query (green).
@@ -1567,6 +1567,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.20  2009/03/03 00:33:06  fplanque
+ * no need to do all that extra processing and html sending by default, even when debug is on.
+ *
  * Revision 1.19  2009/03/02 21:36:51  blueyed
  * Add "toggle" links to EXPLAIN, Results and Function trace lists in
  * DB::dump_queries.
