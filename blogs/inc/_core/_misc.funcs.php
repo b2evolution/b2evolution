@@ -1753,7 +1753,7 @@ function debug_info( $force = false, $force_clean = false )
 			return;
 		}
 
-		if( $debug < 2 && ( empty($Hit) || $Hit->agent_type != 'browser' ) )
+		if( $debug < 2 && ( empty($Hit) || $Hit->get_agent_type() != 'browser' ) )
 		{	// Don't display if it's not a browser (very needed for proper RSS display btw)
 			// ($Hit is empty e.g. during install)
 			return;
@@ -3403,6 +3403,19 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.84  2009/03/04 00:10:42  blueyed
+ * Make Hit constructor more lazy.
+ *  - Move referer_dom_ID generation/fetching to own method
+ *  - wrap Debuglog additons with "debug"
+ *  - Conditionally call detect_useragent, if required. Move
+ *    vars to methods for this
+ *  - get_user_agent alone does not require detect_useragent
+ * Feel free to revert it (since it changed all the is_foo vars
+ * to methods - PHP5 would allow to use __get to handle legacy
+ * access to those vars however), but please consider also
+ * removing this stuff from HTML classnames, since that is kind
+ * of disturbing/unreliable by itself).
+ *
  * Revision 1.83  2009/03/03 21:32:48  blueyed
  * TODO/doc about cat_load_postcats_cache
  *

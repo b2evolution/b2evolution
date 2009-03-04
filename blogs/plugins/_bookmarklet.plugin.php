@@ -56,7 +56,7 @@ class bookmarklet_plugin extends Plugin
 	{
 		global $Hit, $admin_url;
 
-		if( $Hit->is_NS4 || $Hit->is_gecko || $Hit->is_firefox )
+		if( $Hit->is_NS4() || $Hit->is_gecko() || $Hit->is_firefox() )
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
@@ -64,7 +64,7 @@ class bookmarklet_plugin extends Plugin
 			<?php
 			return true;
 		}
-		elseif( $Hit->is_winIE )
+		elseif( $Hit->is_winIE() )
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
@@ -73,7 +73,7 @@ class bookmarklet_plugin extends Plugin
 			<?php
 			return true;
 		}
-		elseif( $Hit->is_opera )
+		elseif( $Hit->is_opera() )
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
@@ -81,7 +81,7 @@ class bookmarklet_plugin extends Plugin
 			<?php
 			return true;
 		}
-		elseif( $Hit->is_macIE )
+		elseif( $Hit->is_macIE() )
 		{
 			?>
 			<p><?php echo T_('Add this link to your Favorites/Bookmarks:') ?><br />
@@ -105,6 +105,19 @@ class bookmarklet_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.22  2009/03/04 00:10:42  blueyed
+ * Make Hit constructor more lazy.
+ *  - Move referer_dom_ID generation/fetching to own method
+ *  - wrap Debuglog additons with "debug"
+ *  - Conditionally call detect_useragent, if required. Move
+ *    vars to methods for this
+ *  - get_user_agent alone does not require detect_useragent
+ * Feel free to revert it (since it changed all the is_foo vars
+ * to methods - PHP5 would allow to use __get to handle legacy
+ * access to those vars however), but please consider also
+ * removing this stuff from HTML classnames, since that is kind
+ * of disturbing/unreliable by itself).
+ *
  * Revision 1.21  2008/01/22 00:21:24  personman2
  * Fixing bookmarklet to work with Safari, Firefox
  *

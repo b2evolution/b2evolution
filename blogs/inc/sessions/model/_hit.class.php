@@ -101,36 +101,27 @@ class Hit
 
 	/**
 	 * The user agent.
+	 * @see Hit::get_user_agent()
+	 * @access protected
 	 * @var string
 	 */
 	var $user_agent;
 
 	/**
 	 * The user agent name, eg "safari"
+	 * @see Hit::get_agent_name()
+	 * @access protected
 	 * @var string
 	 */
 	var $agent_name;
 
 	/**
 	 * The user agent platform, eg "mac"
+	 * @see Hit::get_agent_platform()
+	 * @access protected
 	 * @var string
 	 */
 	var $agent_platform;
-
-	/**#@+
-	 * Detected browser.
-	 *
-	 * @var integer
-	 */
-	var $is_lynx = false;
-	var $is_firefox = false;
-	var $is_gecko = false;
-	var $is_winIE = false;
-	var $is_macIE = false;
-	var $is_safari = false;
-	var $is_opera = false;
-	var $is_NS4 = false;
-	/**#@-*/
 
 
 	/**
@@ -148,12 +139,16 @@ class Hit
 	 * that are not detected as 'rss', 'robot' or 'browser'.
 	 * 'rss'|'robot'|'browser'|'unknown'
 	 *
+	 * @see Hit::get_agent_type()
+	 * @access protected
 	 * @var string
 	 */
-	var $agent_type = 'unknown';
+	var $agent_type;
 
 	/**
 	 * The ID of the user agent entry in T_useragents.
+	 * @see Hit::get_agent_ID()
+	 * @access protected
 	 * @var integer
 	 */
 	var $agent_ID;
@@ -170,64 +165,24 @@ class Hit
 	 */
 	function Hit()
 	{
-		global $Debuglog, $DB;
+		global $debug;
 
 		// Get the first IP in the list of REMOTE_ADDR and HTTP_X_FORWARDED_FOR
 		$this->IP = get_ip_list( true );
 
 		// Check the REFERER and determine referer_type:
-		$this->detect_referer(); // May EXIT of we are set up to block referer spam.
+		// TODO: dh> move this out of here, too, only if "antispam_block_spam_referers" is true,
+		//           do something about it (here or somewhere else, but early).
+		$this->detect_referer(); // May EXIT if we are set up to block referer spam.
 
-		// Check if we know the base domain:
-		$this->referer_basedomain = get_base_domain($this->referer);
-		if( $this->referer_basedomain )
-		{	// This referer has a base domain
-			// Check if we have met it before:
-			$hit_basedomain = $DB->get_row( '
-				SELECT dom_ID
-				  FROM T_basedomains
-				 WHERE dom_name = '.$DB->quote($this->referer_basedomain) );
-			if( !empty( $hit_basedomain->dom_ID ) )
-			{	// This basedomain has visited before:
-				$this->referer_domain_ID = $hit_basedomain->dom_ID;
-				// fp> The blacklist handling that was here made no sense.
-			}
-			else
-			{	// This is the first time this base domain visits:
-
-				// The INSERT below can fail, probably if we get two simultaneous hits (seen in the demo logfiles)
-				$old_hold_on_error = $DB->halt_on_error;
-				$old_show_errors = $DB->show_errors;
-				$DB->halt_on_error = false;
-				$DB->show_errors = false;
-
-				if( $DB->query( '
-					INSERT INTO T_basedomains( dom_name )
-						VALUES( '.$DB->quote($this->referer_basedomain).' )' ) )
-				{ // INSERTed ok:
-					$this->referer_domain_ID = $DB->insert_id;
-				}
-				else
-				{ // INSERT failed: see, try to select again (may become/stay NULL)
-					$this->referer_domain_ID = $DB->get_var( '
-						SELECT dom_ID
-						  FROM T_basedomains
-						 WHERE dom_name = '.$DB->quote($this->referer_basedomain) );
-				}
-
-				$DB->halt_on_error = $old_hold_on_error;
-				$DB->show_errors = $old_show_errors;
-			}
+		if( $debug )
+		{
+			global $Debuglog;
+			$Debuglog->add( 'IP: '.$this->IP, 'hit' );
+			$Debuglog->add( 'UserAgent: '.$this->get_user_agent(), 'hit' );
+			$Debuglog->add( 'Referer: '.var_export($this->referer, true).'; type='.$this->referer_type, 'hit' );
+			$Debuglog->add( 'Remote Host: '.$this->get_remote_host( false ), 'hit' );
 		}
-
-		// User Agent
-		$this->detect_useragent();
-
-
-		$Debuglog->add( 'IP: '.$this->IP, 'hit' );
-		$Debuglog->add( 'UserAgent: '.$this->user_agent, 'hit' );
-		$Debuglog->add( 'Referer: '.var_export($this->referer, true).'; type='.$this->referer_type, 'hit' );
-		$Debuglog->add( 'Remote Host: '.$this->get_remote_host( false ), 'hit' );
 	}
 
 
@@ -366,93 +321,147 @@ class Hit
 
 
 	/**
+	 * Get referer_domain_ID (ID of the referer in T_basedomains).
+	 *
+	 * @return integer (may be NULL, but should never).
+	 */
+	function get_referer_domain_ID()
+	{
+		if( ! isset($this->referer_domain_ID) )
+		{
+			global $DB;
+			// Check if we know the base domain:
+			$referer_basedomain = get_base_domain($this->referer);
+			if( $referer_basedomain )
+			{	// This referer has a base domain
+				// Check if we have met it before:
+				$hit_basedomain = $DB->get_row( '
+					SELECT dom_ID
+						FROM T_basedomains
+					 WHERE dom_name = '.$DB->quote($referer_basedomain) );
+				if( !empty( $hit_basedomain->dom_ID ) )
+				{	// This basedomain has visited before:
+					$this->referer_domain_ID = $hit_basedomain->dom_ID;
+					// fp> The blacklist handling that was here made no sense.
+				}
+				else
+				{	// This is the first time this base domain visits:
+
+					// The INSERT below can fail, probably if we get two simultaneous hits (seen in the demo logfiles)
+					$DB->save_error_state();
+
+					if( $DB->query( '
+						INSERT INTO T_basedomains( dom_name )
+							VALUES( '.$DB->quote($referer_basedomain).' )' ) )
+					{ // INSERTed ok:
+						$this->referer_domain_ID = $DB->insert_id;
+					}
+					else
+					{ // INSERT failed: see, try to select again (may become/stay NULL)
+						$this->referer_domain_ID = $DB->get_var( '
+							SELECT dom_ID
+								FROM T_basedomains
+							 WHERE dom_name = '.$DB->quote($referer_basedomain) );
+					}
+
+					$DB->restore_error_state();
+				}
+			}
+		}
+		return $this->referer_domain_ID;
+	}
+
+
+	/**
 	 * Set {@link $user_agent} and detect the browser.
 	 * This function also handles the relations with T_useragents and sets {@link $agent_type}.
 	 */
 	function detect_useragent()
 	{
-		global $HTTP_USER_AGENT; // might be set by PHP, give highest priority
+		if( isset($this->agent_type) )
+		{ // already detected.
+			return;
+		}
+
 		global $DB, $Debuglog;
 		global $user_agents;
 		global $skin; // to detect agent_type (gets set in /xmlsrv/atom.php for example)
 
 
-		if( isset($HTTP_USER_AGENT) )
-		{
-			$this->user_agent = $HTTP_USER_AGENT;
-		}
-		elseif( isset($_SERVER['HTTP_USER_AGENT']) )
-		{
-			$this->user_agent = $_SERVER['HTTP_USER_AGENT'];
-		}
+		// Init is_* members.
+		$this->is_lynx = false;
+		$this->is_firefox = false;
+		$this->is_gecko = false;
+		$this->is_winIE = false;
+		$this->is_macIE = false;
+		$this->is_safari = false;
+		$this->is_opera = false;
+		$this->is_NS4 = false;
 
-		if( !empty($this->user_agent) )
+		$this->agent_type = 'unknown';
+		$this->agent_name = '';
+		$this->agent_platform = '';
+
+		$user_agent = $this->get_user_agent();
+
+		if( ! empty($user_agent) )
 		{ // detect browser
-			if(strpos($this->user_agent, 'Lynx') !== false)
+			if(strpos($user_agent, 'Lynx') !== false)
 			{
 				$this->is_lynx = 1;
 				$this->agent_name = 'lynx';
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($this->user_agent, 'Firefox/') !== false)
+			elseif(strpos($user_agent, 'Firefox/') !== false)
 			{
 				$this->is_firefox = 1;
 				$this->agent_name = 'firefox';
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($this->user_agent, 'Gecko/') !== false)	// We don't want to see Safari as Gecko
+			elseif(strpos($user_agent, 'Gecko/') !== false)	// We don't want to see Safari as Gecko
 			{
 				$this->is_gecko = 1;
 				$this->agent_name = 'gecko';
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($this->user_agent, 'MSIE') !== false && strpos($this->user_agent, 'Win') !== false)
+			elseif(strpos($user_agent, 'MSIE') !== false && strpos($user_agent, 'Win') !== false)
 			{
 				$this->is_winIE = 1;
 				$this->agent_name = 'msie';
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($this->user_agent, 'MSIE') !== false && strpos($this->user_agent, 'Mac') !== false)
+			elseif(strpos($user_agent, 'MSIE') !== false && strpos($user_agent, 'Mac') !== false)
 			{
 				$this->is_macIE = 1;
 				$this->agent_name = 'msie';
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($this->user_agent, 'Safari/') !== false)
+			elseif(strpos($user_agent, 'Safari/') !== false)
 			{
 				$this->is_safari = true;
 				$this->agent_name = 'safari';
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($this->user_agent, 'Opera') !== false)
+			elseif(strpos($user_agent, 'Opera') !== false)
 			{
 				$this->is_opera = 1;
 				$this->agent_name = 'opera';
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($this->user_agent, 'Nav') !== false || preg_match('/Mozilla\/4\./', $this->user_agent))
+			elseif(strpos($user_agent, 'Nav') !== false || preg_match('/Mozilla\/4\./', $user_agent))
 			{
 				$this->is_NS4 = 1;
 				$this->agent_name = 'nav4';
 				$this->agent_type = 'browser';
 			}
 
-			if( strpos($this->user_agent, 'Win') !== false)
+			if( strpos($user_agent, 'Win') !== false)
 			{
 				$this->agent_platform = 'win';
 			}
-			elseif( strpos($this->user_agent, 'Mac') !== false)
+			elseif( strpos($user_agent, 'Mac') !== false)
 			{
 				$this->agent_platform = 'mac';
-			}
-
-
-			if( $this->user_agent != strip_tags($this->user_agent) )
-			{ // then they have tried something funky, putting HTML or PHP into the user agent
-				$Debuglog->add( 'detect_useragent(): '.T_('bad char in User Agent'), 'hit');
-				$this->agent_name = '';
-				$this->agent_platform = '';
-				$this->user_agent = '';
 			}
 		}
 		$this->is_IE = (($this->is_macIE) || ($this->is_winIE));
@@ -483,23 +492,6 @@ class Hit
 					$this->agent_type = 'robot';
 				}
 			}
-		}
-
-
-		if( $agnt_data = $DB->get_row( "
-			SELECT agnt_ID FROM T_useragents
-			 WHERE agnt_signature = '".$DB->escape( $this->user_agent )."'
-			   AND agnt_type = '".$this->agent_type."'" ) )
-		{ // this agent (with that type) hit us once before, re-use ID
-			$this->agent_ID = $agnt_data->agnt_ID;
-		}
-		else
-		{ // create new user agent entry
-			$DB->query( "
-				INSERT INTO T_useragents ( agnt_signature, agnt_type )
-				VALUES ( '".$DB->escape( $this->user_agent )."', '".$this->agent_type."' )" );
-
-			$this->agent_ID = $DB->insert_id;
 		}
 	}
 
@@ -645,8 +637,8 @@ class Hit
 				hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
 				hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_blog_ID, hit_remote_addr, hit_agnt_ID )
 			VALUES( '".$Session->ID."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', '".$this->referer_type
-				."', '".$DB->escape($hit_referer)."', ".$DB->null($this->referer_domain_ID).', '.$DB->null($keyp_ID)
-				.', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', ".$this->agent_ID.'
+				."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID)
+				.', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', ".$this->get_agent_ID().'
 			)';
 
 		$DB->query( $sql, 'Record the hit' );
@@ -685,11 +677,109 @@ class Hit
 	/**
 	 * Get the User agent's signature.
 	 *
-	 * @return string
+	 * @return string False, if not provided or empty, if it included tags.
 	 */
 	function get_user_agent()
 	{
+		if( ! isset($this->user_agent) )
+		{
+			global $HTTP_USER_AGENT; // might be set by PHP, give highest priority
+
+			if( isset($HTTP_USER_AGENT) )
+			{
+				$this->user_agent = $HTTP_USER_AGENT;
+			}
+			elseif( isset($_SERVER['HTTP_USER_AGENT']) )
+			{
+				$this->user_agent = $_SERVER['HTTP_USER_AGENT'];
+			}
+			else
+			{
+				$this->user_agent = false;
+			}
+
+			if( $this->user_agent != strip_tags($this->user_agent) )
+			{ // then they have tried something funky, putting HTML or PHP into the user agent
+				$Debuglog->add( 'detect_useragent(): '.T_('bad char in User Agent'), 'hit');
+				$this->user_agent = '';
+			}
+		}
 		return $this->user_agent;
+	}
+
+
+	/**
+	 * Get the User agent's name.
+	 *
+	 * @return string
+	 */
+	function get_agent_name()
+	{
+		if( ! isset($this->agent_name) )
+		{
+			$this->detect_useragent();
+		}
+		return $this->agent_name;
+	}
+
+
+	/**
+	 * Get the User agent's platform.
+	 *
+	 * @return string
+	 */
+	function get_agent_platform()
+	{
+		if( ! isset($this->agent_platform) )
+		{
+			$this->detect_useragent();
+		}
+		return $this->agent_platform;
+	}
+
+
+	/**
+	 * Get the User agent's type.
+	 *
+	 * @return string
+	 */
+	function get_agent_type()
+	{
+		if( ! isset($this->agent_type) )
+		{
+			$this->detect_useragent();
+		}
+		return $this->agent_type;
+	}
+
+
+	/**
+	 * Get DB ID for current user agent. This is used when logging the hit.
+	 *
+	 * @return integer
+	 */
+	function get_agent_ID()
+	{
+		if( ! isset($this->agent_ID) )
+		{
+			global $DB;
+			if( $agnt_ID = $DB->get_var( "
+				SELECT agnt_ID FROM T_useragents
+				 WHERE agnt_signature = ".$DB->quote( $this->get_user_agent() )."
+					 AND agnt_type = ".$DB->quote($this->get_agent_type()) ) )
+			{ // this agent (with that type) hit us once before, re-use ID
+				$this->agent_ID = $agnt_ID;
+			}
+			else
+			{ // create new user agent entry
+				$DB->query( "
+					INSERT INTO T_useragents ( agnt_signature, agnt_type )
+					VALUES ( ".$DB->quote( $this->get_user_agent() ).", ".$DB->quote($this->get_agent_type())." )" );
+
+				$this->agent_ID = $DB->insert_id;
+			}
+		}
+		return $this->agent_ID;
 	}
 
 
@@ -745,7 +835,7 @@ class Hit
 	 */
 	function is_new_view()
 	{
-		if( $this->agent_type == 'robot' )
+		if( $this->get_agent_type() == 'robot' )
 		{	// Robot requests are not considered as (new) views:
 			return false;
 		}
@@ -773,7 +863,7 @@ class Hit
 					 WHERE hit_datetime > '".date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') )."'
 					   AND hit_remote_addr = ".$DB->quote( $this->IP )."
 					   AND hit_uri = '".$DB->escape( substr($ReqURI, 0, 250) )."'
-					   AND agnt_signature = ".$DB->quote($this->user_agent)."
+					   AND agnt_signature = ".$DB->quote($this->get_user_agent())."
 					 LIMIT 1";
 			}
 			if( $DB->get_var( $sql, 0, 0, 'Hit: Check for reload' ) )
@@ -856,10 +946,113 @@ class Hit
 
 		return NULL;
 	}
+
+
+	/**
+	 * Is this Lynx?
+	 * @return boolean
+	 */
+	function is_lynx()
+	{
+		if( ! isset($this->is_lynx) )
+			$this->detect_useragent();
+		return $this->is_lynx;
+	}
+
+	/**
+	 * Is this Firefox?
+	 * @return boolean
+	 */
+	function is_firefox()
+	{
+		if( ! isset($this->is_firefox) )
+			$this->detect_useragent();
+		return $this->is_firefox;
+	}
+
+	/**
+	 * Is this Gecko?
+	 * @return boolean
+	 */
+	function is_gecko()
+	{
+		if( ! isset($this->is_gecko) )
+			$this->detect_useragent();
+		return $this->is_gecko;
+	}
+
+	/**
+	 * Is this WinIE?
+	 * @return boolean
+	 */
+	function is_winIE()
+	{
+		if( ! isset($this->is_winIE) )
+			$this->detect_useragent();
+		return $this->is_winIE;
+	}
+
+	/**
+	 * Is this MacIE?
+	 * @return boolean
+	 */
+	function is_macIE()
+	{
+		if( ! isset($this->is_macIE) )
+			$this->detect_useragent();
+		return $this->is_macIE;
+	}
+
+	/**
+	 * Is this Safari?
+	 * @return boolean
+	 */
+	function is_safari()
+	{
+		if( ! isset($this->is_safari) )
+			$this->detect_useragent();
+		return $this->is_safari;
+	}
+
+	/**
+	 * Is this Opera?
+	 * @return boolean
+	 */
+	function is_opera()
+	{
+		if( ! isset($this->is_opera) )
+			$this->detect_useragent();
+		return $this->is_opera;
+	}
+
+	/**
+	 * Is this Netscape4?
+	 * @return boolean
+	 */
+	function is_NS4()
+	{
+		if( ! isset($this->NS4) )
+			$this->detect_useragent();
+		return $this->is_NS4;
+	}
 }
+
 
 /*
  * $Log$
+ * Revision 1.20  2009/03/04 00:10:42  blueyed
+ * Make Hit constructor more lazy.
+ *  - Move referer_dom_ID generation/fetching to own method
+ *  - wrap Debuglog additons with "debug"
+ *  - Conditionally call detect_useragent, if required. Move
+ *    vars to methods for this
+ *  - get_user_agent alone does not require detect_useragent
+ * Feel free to revert it (since it changed all the is_foo vars
+ * to methods - PHP5 would allow to use __get to handle legacy
+ * access to those vars however), but please consider also
+ * removing this stuff from HTML classnames, since that is kind
+ * of disturbing/unreliable by itself).
+ *
  * Revision 1.19  2009/03/03 20:32:11  blueyed
  * TODO about making Hit more lazy.
  *

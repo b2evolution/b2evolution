@@ -219,7 +219,7 @@ class ItemList2 extends ItemListLight
 
 		// little funky fix for IEwin, rawk on that code
 		global $Hit;
-		if( ($Hit->is_winIE) && (!isset($IEWin_bookmarklet_fix)) )
+		if( ($Hit->is_winIE()) && (!isset($IEWin_bookmarklet_fix)) )
 		{ // QUESTION: Is this still needed? What about $IEWin_bookmarklet_fix? (blueyed)
 			$Item->content = preg_replace('/\%u([0-9A-F]{4,4})/e', "'&#'.base_convert('\\1',16,10). ';'", $Item->content);
 		}
@@ -666,6 +666,19 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.16  2009/03/04 00:10:42  blueyed
+ * Make Hit constructor more lazy.
+ *  - Move referer_dom_ID generation/fetching to own method
+ *  - wrap Debuglog additons with "debug"
+ *  - Conditionally call detect_useragent, if required. Move
+ *    vars to methods for this
+ *  - get_user_agent alone does not require detect_useragent
+ * Feel free to revert it (since it changed all the is_foo vars
+ * to methods - PHP5 would allow to use __get to handle legacy
+ * access to those vars however), but please consider also
+ * removing this stuff from HTML classnames, since that is kind
+ * of disturbing/unreliable by itself).
+ *
  * Revision 1.15  2009/02/19 05:00:20  blueyed
  * Fix (some) indenting.
  *

@@ -125,7 +125,7 @@ class AdminUI extends AdminUI_general
 
 		$r = '<div class="footer">';
 
-   	if( $Hit->is_winIE )
+   	if( $Hit->is_winIE() )
 		{
 		 $r .= '<!--[if lt IE 7]>
 <div style="text-align:center; color:#f00; font-weight:bold;">'.
@@ -389,6 +389,19 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.15  2009/03/04 00:10:43  blueyed
+ * Make Hit constructor more lazy.
+ *  - Move referer_dom_ID generation/fetching to own method
+ *  - wrap Debuglog additons with "debug"
+ *  - Conditionally call detect_useragent, if required. Move
+ *    vars to methods for this
+ *  - get_user_agent alone does not require detect_useragent
+ * Feel free to revert it (since it changed all the is_foo vars
+ * to methods - PHP5 would allow to use __get to handle legacy
+ * access to those vars however), but please consider also
+ * removing this stuff from HTML classnames, since that is kind
+ * of disturbing/unreliable by itself).
+ *
  * Revision 1.14  2008/12/30 23:00:41  fplanque
  * Major waste of time rolling back broken black magic! :(
  * 1) It was breaking the backoffice as soon as $admin_url was not a direct child of $baseurl.

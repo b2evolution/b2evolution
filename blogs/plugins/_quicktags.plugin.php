@@ -50,7 +50,7 @@ class quicktags_plugin extends Plugin
 
 		$simple = ( $params['edit_layout'] == 'simple' );
 
-		if( $Hit->is_lynx )
+		if( $Hit->is_lynx() )
 		{ // let's deactivate quicktags on Lynx, because they don't work there.
 			return false;
 		}
@@ -420,6 +420,19 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.33  2009/03/04 00:10:42  blueyed
+ * Make Hit constructor more lazy.
+ *  - Move referer_dom_ID generation/fetching to own method
+ *  - wrap Debuglog additons with "debug"
+ *  - Conditionally call detect_useragent, if required. Move
+ *    vars to methods for this
+ *  - get_user_agent alone does not require detect_useragent
+ * Feel free to revert it (since it changed all the is_foo vars
+ * to methods - PHP5 would allow to use __get to handle legacy
+ * access to those vars however), but please consider also
+ * removing this stuff from HTML classnames, since that is kind
+ * of disturbing/unreliable by itself).
+ *
  * Revision 1.32  2008/02/13 07:26:23  fplanque
  * quicktags in simple mode
  *

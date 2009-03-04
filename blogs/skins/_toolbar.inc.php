@@ -39,7 +39,7 @@ global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
 global $Hit;
 ?>
 
-<div id="evo_toolbar" class="evo_toolbar_<?php echo $Hit->agent_name; ?>">
+<div id="evo_toolbar" class="evo_toolbar_<?php echo $Hit->get_agent_name(); ?>">
 
 <div class="actions_right">
 	<ul>

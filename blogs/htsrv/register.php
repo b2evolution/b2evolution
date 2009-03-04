@@ -110,7 +110,7 @@ switch( $action )
 		$new_User->set_email( $email );
 		$new_User->set( 'ip', $Hit->IP );
 		$new_User->set( 'domain', $Hit->get_remote_host( true ) );
-		$new_User->set( 'browser', $Hit->user_agent );
+		$new_User->set( 'browser', $Hit->get_user_agent() );
 		$new_User->set_datecreated( $localtimenow );
 		$new_User->set( 'locale', $locale );
 		$newusers_grp_ID = $Settings->get('newusers_grp_ID');
@@ -214,6 +214,19 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.92  2009/03/04 00:10:42  blueyed
+ * Make Hit constructor more lazy.
+ *  - Move referer_dom_ID generation/fetching to own method
+ *  - wrap Debuglog additons with "debug"
+ *  - Conditionally call detect_useragent, if required. Move
+ *    vars to methods for this
+ *  - get_user_agent alone does not require detect_useragent
+ * Feel free to revert it (since it changed all the is_foo vars
+ * to methods - PHP5 would allow to use __get to handle legacy
+ * access to those vars however), but please consider also
+ * removing this stuff from HTML classnames, since that is kind
+ * of disturbing/unreliable by itself).
+ *
  * Revision 1.91  2008/04/13 15:15:59  fplanque
  * attempt to fix email headers for non latin charsets
  *

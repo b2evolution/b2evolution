@@ -432,7 +432,7 @@ class AdminUI_general extends Widget
 		global $Hit;
 
 		// #body_win and .body_firefox (for example) can be used to customize CSS per plaform/browser
-		echo '<body id="body_'.$Hit->agent_platform.'" class="body_'.$Hit->agent_name.'">'."\n";
+		echo '<body id="body_'.$Hit->get_agent_platform().'" class="body_'.$Hit->get_agent_name().'">'."\n";
 
 		if( !empty( $mode ) )
 		{
@@ -1524,7 +1524,7 @@ class AdminUI_general extends Widget
 
 		$r = '';
 
-   	if( $Hit->is_winIE )
+   	if( $Hit->is_winIE() )
 		{
 		 $r .= '<!--[if lt IE 7]>
 <div style="text-align:center; color:#f00; font-weight:bold; margin:1ex;">'.
@@ -1555,6 +1555,19 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.89  2009/03/04 00:10:43  blueyed
+ * Make Hit constructor more lazy.
+ *  - Move referer_dom_ID generation/fetching to own method
+ *  - wrap Debuglog additons with "debug"
+ *  - Conditionally call detect_useragent, if required. Move
+ *    vars to methods for this
+ *  - get_user_agent alone does not require detect_useragent
+ * Feel free to revert it (since it changed all the is_foo vars
+ * to methods - PHP5 would allow to use __get to handle legacy
+ * access to those vars however), but please consider also
+ * removing this stuff from HTML classnames, since that is kind
+ * of disturbing/unreliable by itself).
+ *
  * Revision 1.88  2009/02/26 22:16:54  blueyed
  * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
  *

@@ -207,7 +207,7 @@ JS;
 		add_headline( $initcheckall_script );
 	}}}
 
-	if( $Hit->is_winIE )
+	if( $Hit->is_winIE() )
 	{
 		add_headline( '<!--[if lt IE 7]>
 <style type="text/css">
@@ -224,13 +224,13 @@ div.skin_wrapper_loggedin {
 	// dh> The Datepicker could dynamically load this CSS in document.ready?!
 	// Afwas> Done. Keeping this conversation for reference. The performance may be an issue.
 	// require_css( 'ui.datepicker.css' );
-	
+
 	add_js_headline( 'jQuery(function(){
 			jQuery(\'#item_issue_date, #item_issue_time\').change(function(){
 				jQuery(\'#set_issue_date_to\').attr("checked", "checked")
 			})
 		})' );
-	
+
 	// Add event to the item title field to update document title and init it (important when switching tabs/blogs):
 	global $js_doc_title_prefix;
 	if( isset($js_doc_title_prefix) )
@@ -283,6 +283,19 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.22  2009/03/04 00:10:43  blueyed
+ * Make Hit constructor more lazy.
+ *  - Move referer_dom_ID generation/fetching to own method
+ *  - wrap Debuglog additons with "debug"
+ *  - Conditionally call detect_useragent, if required. Move
+ *    vars to methods for this
+ *  - get_user_agent alone does not require detect_useragent
+ * Feel free to revert it (since it changed all the is_foo vars
+ * to methods - PHP5 would allow to use __get to handle legacy
+ * access to those vars however), but please consider also
+ * removing this stuff from HTML classnames, since that is kind
+ * of disturbing/unreliable by itself).
+ *
  * Revision 1.21  2009/02/23 00:11:21  afwas
  * Added $rsc_url to make the link to css file absolute.
  *
