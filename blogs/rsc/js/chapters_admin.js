@@ -1,5 +1,9 @@
 /**
  * Chapter Admin functions
+
+fp> is this supposed to be working? I can drag category names around but not drop them anywhere.
+    if this is not working, please remove it from CVS.
+
  *
  * This file implements the chapters javascript interface
  *
@@ -280,6 +284,9 @@ var b2evoChapters = new _b2evoChapters();
 
 /*
  * $Log$
+ * Revision 1.3  2009/03/04 01:19:42  fplanque
+ * doc
+ *
  * Revision 1.2  2009/02/22 06:16:10  yabs
  * adding functionality
  *

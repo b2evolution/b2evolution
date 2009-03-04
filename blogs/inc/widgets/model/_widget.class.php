@@ -539,7 +539,7 @@ class ComponentWidget extends DataObject
 		global $timestamp_min, $timestamp_max;
 		$link_Blog = null;
 
-		# we don't have a linkblog_ID: this is the linkroll widget
+		// if we don't have a linkblog_ID: this is the linkroll widget
 		if ( array_key_exists( 'linkblog_ID' , $this->disp_params ) )
 		{
 			$linkblog = $this->disp_params[ 'linkblog_ID' ];
@@ -657,10 +657,10 @@ class ComponentWidget extends DataObject
 						'link_type' => $link_type,
 					) );
 
-// processing overhead issue
-// yabs > added check, selectively uses ItemList2
 				if( $this->disp_params['linkblog_excerpts'] )
 				{ // we want to show some or all of the post content
+					// fp> TODO: it's called excerpt but it doesn't display the excerpt!
+					//           Get the excerpt first, then fall back to teaser if excerpt was empty.
 					$content = $Item->get_content_teaser( 1, false, 'htmlbody' );
 
 					if( $words = $this->disp_params['linkblog_cutoff'] )
@@ -670,15 +670,18 @@ class ComponentWidget extends DataObject
 								'continued_text' => T_( 'continued' ).' &hellip;',
 							 ) );
 					}
-					echo $content;
+					echo ' <span class="excerpt">'.$content.'</span>';
 
+					/* fp> does that really make sense?
+					  we're no longer in a linkblog/linkroll use case here, are we?
 					$Item->more_link( array(
 							'before'    => '',
 							'after'     => '',
 							'link_text' => T_('more').' &raquo;',
 						) );
+						*/
 				}
-// /processing overhead issue
+
 
 				echo $this->disp_params['item_end'];
 			}
@@ -805,6 +808,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.49  2009/03/04 01:19:41  fplanque
+ * doc
+ *
  * Revision 1.48  2009/02/25 17:18:03  waltercruz
  * Linkroll stuff, take #2
  *

@@ -94,8 +94,6 @@ class linkblog_Widget extends ComponentWidget
 					'defaultvalue' => 100,
 					'note' => T_( 'This is the maximum number of links to display.' ),
 				),
-				// fp> put this back once you have a condition test in the display in order not to add extra processing
-				// yabs > added check
 				'linkblog_excerpts' => array(
 					'label' => T_( 'Excerpts' ),
 					'type' => 'checkbox',
@@ -106,7 +104,7 @@ class linkblog_Widget extends ComponentWidget
 					'label' => T_( 'Max Words' ),
 					'type' => 'integer',
 					'defaultvalue' => 40,
-					'note' => T_( 'Max number of words to show in exerpts' ),
+					'note' => T_( 'Max number of words to show in exerpts' ), // this should probably onyl be used when no excerpt was fond and we fall back to teaser text
 				),
 			), parent::get_param_definitions( $params )	);
 
@@ -133,6 +131,9 @@ class linkblog_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.13  2009/03/04 01:19:41  fplanque
+ * doc
+ *
  * Revision 1.12  2009/02/23 08:13:21  yabs
  * Added check for excerpts
  *
