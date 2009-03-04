@@ -1925,8 +1925,6 @@ function debug_info( $force = false, $force_clean = false )
 		}
 	}
 
-	echo "TEST-RETURN"; return;
-
 	// DEBUGLOG(s) FROM PREVIOUS SESSIONS, after REDIRECT(s) (with list of categories at top):
 	if( isset($Session) && ($sess_Debuglogs = $Session->get('Debuglogs')) && ! empty($sess_Debuglogs) )
 	{
@@ -3403,6 +3401,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.85  2009/03/04 00:14:48  blueyed
+ * Remove TEST-RETURN in debug_info, which has slipped in in r1.83
+ *
  * Revision 1.84  2009/03/04 00:10:42  blueyed
  * Make Hit constructor more lazy.
  *  - Move referer_dom_ID generation/fetching to own method
