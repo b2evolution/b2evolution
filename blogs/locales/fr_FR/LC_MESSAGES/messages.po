@@ -12979,8 +12979,8 @@ msgstr "Convertisseur Wiki Links"
 #: ..\..\..\plugins\_wikilinks.plugin.php:38
 msgid "WikiWord links are created with a CamelCased WikiWord, a ((link)), or a [[link ]].<br />\n"
 "\t\t CamelCased words will be exploded to camel_case which should then match a post url title."
-msgstr "Les liens WikiWord sont créés avec la syntaxe CamelCased WikiWord, ((link)), ou [[link ]].<br />\n
-\t\t Les mots CamelCased sont transformés en camel_case lesquels devraient correspondre à une url d'un titre d'article."
+msgstr "Les liens WikiWord sont créés avec la syntaxe CamelCased WikiWord, ((link)), ou [[link ]].<br />\n"
+"\t\t Les mots CamelCased sont transformés en camel_case lesquels devraient correspondre à une url d'un titre d'article."
 
 #: ..\..\..\plugins\adsense_plugin\_adsense.plugin.php:38
 msgid "Easy AdSense insertion into posts."
