@@ -81,10 +81,10 @@ class coll_xml_feeds_Widget extends ComponentWidget
 					'defaultvalue' => '$icon$ '.T_('XML Feeds'),
 				),
 				'disp_info_link' => array(
-					'label' => T_( 'Info link' ),
+					'label' => T_( 'Help link' ),
 					'type' => 'checkbox',
-					'note' => T_( 'Check this to display an info link' ),
-					'defaultvalue' => 0,
+					'note' => T_( 'Check this to display "What is RSS?" link' ),
+					'defaultvalue' => 1,
 				),
 				'info_link' => array(
 					'label' => T_( 'New Window' ),
@@ -175,6 +175,9 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.12  2009/03/04 00:53:42  fplanque
+ * minor
+ *
  * Revision 1.11  2009/02/27 19:51:35  blueyed
  * XML feeds widget: add a 'disp_info_link' config option, defaulting to false. Since the help is very outdated, it makes no sense to eventually load the global_Cache just for that. Also makes the widget cleaner. Might default to true, when it provides more valuable info.
  *
