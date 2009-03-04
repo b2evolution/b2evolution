@@ -72,7 +72,8 @@ define( 'EVO_MAIN_INIT', true );
  * Contributed by counterpoint / MAMBO team
  */
 // TODO: dh> this makes sense AFAICS. Please review.
-if( ini_get('register_globals') )
+// fp> yeah I don't know about that. If you ask me, i'm not taking chances. 
+// if( ini_get('register_globals') )
 {
 	$protects = array( '_REQUEST', '_GET', '_POST', '_COOKIE', '_FILES', '_SERVER', '_ENV', 'GLOBALS', '_SESSION' );
 	foreach( $protects as $protect )
@@ -368,7 +369,9 @@ locale_activate( $default_locale );
  * Login procedure: {{{
  * TODO: dh> the meat of this login procedure should be moved to an extra file,
  *           so that if a "logged in"-session exists (in most cases) it does not
- *           trigger parsing the meat of this code.
+ *           trigger parsing the meat of this code. 
+ * fp> ming you, most hits will be on the font end and will not be loggedin sessions
+ *     However, I agree that the login stuff should only be included when the user is actually attempting to log in.
  */
 if( !isset($login_required) )
 {
@@ -649,6 +652,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.106  2009/03/04 02:04:40  fplanque
+ * better safe than sorry until someone is positive about this
+ *
  * Revision 1.105  2009/03/03 20:14:11  blueyed
  * doc
  *
