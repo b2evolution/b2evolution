@@ -79,8 +79,6 @@ function cat_create(
 
 
 /**
- * get_the_category_by_ID(-)
- *
  * Get category name+blog_id for specified cat ID
  *
  * fplanque: reused "R. U. Serious" optimization here
@@ -203,7 +201,7 @@ function cat_load_cache()
  * @todo dh> why is this limited to the _global_ $postIDlist?!
  *           Really ridiculous, trying to get a list of category names for an Item (which is not in $postIDlist for example.. :/)
  * fp> This is legacy from a quick b2/cafelog hack. This will de deprecated.
- * dh> Only used in ItemLight::get_Chapters now - move it there for now?
+ * dh> Only used in ItemLight::get_Chapters now - move it there for now? fp> no it should stay close to $cache_postcats handling until teh whole thing dies.
  */
 function cat_load_postcats_cache()
 {
@@ -476,6 +474,9 @@ function cat_req_dummy()
 
 /*
  * $Log$
+ * Revision 1.7  2009/03/04 01:57:26  fplanque
+ * doc
+ *
  * Revision 1.6  2009/03/03 21:32:49  blueyed
  * TODO/doc about cat_load_postcats_cache
  *

@@ -41,7 +41,7 @@ global $edited_Item;
 
 global $AdminUI;
 
-// TODO: dh> What is this for??
+// Override $debug in order to keep the display of the iframe neat
 global $debug;
 $debug = 0;
 
@@ -171,6 +171,9 @@ $Results->display( $AdminUI->get_template( 'compact_results' ) );
 
 /*
  * $Log$
+ * Revision 1.5  2009/03/04 01:57:26  fplanque
+ * doc
+ *
  * Revision 1.4  2009/03/03 20:25:53  blueyed
  * TODO/question
  *
