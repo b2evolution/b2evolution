@@ -42,7 +42,7 @@ class links_Widget extends ComponentWidget
 	function links_Widget( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'links' );
+		parent::ComponentWidget( $db_row, 'core', 'links' ); // fp> call this 'linkroll'
 	}
 
 
@@ -51,7 +51,7 @@ class links_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		$title = T_('Linkroll'); // fp >> Call this Linkroll -- EVRYWHERE waltercruz> The class itself? Linkroll_Widget?
+		$title = T_('Linkroll'); // fp >> Call this Linkroll -- EVRYWHERE waltercruz> The class itself? linkroll_Widget? fp> yes!!!! (with lowercase l for the classname)
 		return $title;
 	}
 
@@ -125,6 +125,9 @@ class links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.6  2009/03/04 00:59:19  fplanque
+ * doc
+ *
  * Revision 1.5  2009/02/25 17:18:03  waltercruz
  * Linkroll stuff, take #2
  *
