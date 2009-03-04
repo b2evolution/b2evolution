@@ -101,7 +101,7 @@ class videoplug_plugin extends Plugin
 			return false;
 		}
 
-		echo '<div class="edit_toolbar video_toolbar">';
+		echo '<div class="edit_toolbar" id="video_toolbar">';
 		echo T_('Video').': ';
 		echo '<input type="button" id="video_youtube" title="'.T_('Insert Youtube video').'" class="quicktags" onclick="videotag(\'youtube\');" value="YouTube" />';
 		echo '<input type="button" id="video_google" title="'.T_('Insert Google video').'" class="quicktags" onclick="videotag(\'google\');" value="Google video" />';
@@ -172,6 +172,9 @@ class videoplug_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.19  2009/03/04 02:07:40  fplanque
+ * keep it real
+ *
  * Revision 1.18  2009/03/03 14:58:15  afwas
  * Added class 'edit_toolbar'. These toolbars now have two classes (thanks blueyed.)
  *
