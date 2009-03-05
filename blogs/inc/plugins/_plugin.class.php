@@ -2759,7 +2759,7 @@ class Plugin
 	function & __get( $nm )
 	{
 		global $inc_path;
-		require_once $inc_path.'_core/_class4.funcs.php';
+
 		$admin_Plugins = & get_Cache('Plugins_admin'); // we need Plugins_admin here, because Plugin::BeforeEnable() may use $Settings
 
 		switch( $nm )
@@ -2801,6 +2801,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.14  2009/03/05 23:38:53  blueyed
+ * Merge autoload branch (lp:~blueyed/b2evolution/autoload) into CVS HEAD.
+ *
  * Revision 1.13  2009/03/03 20:15:49  tblue246
  * T_(): Adding workaround for PHP 4 compatibility...
  *

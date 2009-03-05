@@ -34,12 +34,12 @@ if( ! $config_is_done )
 	$rsc_url = '../rsc/';
 }
 
-require_once $inc_path.'_core/_class4.funcs.php';
+require_once $inc_path.'_core/_class'.floor(PHP_VERSION).'.funcs.php';
+require_once $inc_path.'_core/_misc.funcs.php';
 
 load_class('_core/model/_log.class.php');
 $Debuglog = & new Log( 'note' );
 $Messages = & new Log('error');
-require_once $inc_path.'_core/_misc.funcs.php';
 require_once $conf_path.'_upgrade.php';
 require_once $inc_path.'_vars.inc.php';
 load_class('/_core/model/db/_db.class.php');
@@ -672,6 +672,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
+ * Revision 1.159  2009/03/05 23:38:53  blueyed
+ * Merge autoload branch (lp:~blueyed/b2evolution/autoload) into CVS HEAD.
+ *
  * Revision 1.158  2009/02/28 18:45:11  fplanque
  * quick cleanup of the installer
  *

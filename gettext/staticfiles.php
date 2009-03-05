@@ -27,7 +27,7 @@ define( 'EVO_MAIN_INIT', true );
 /**#@+
  * Load required functions
  */
-require_once $inc_path.'_core/_class4.funcs.php';
+require_once $inc_path.'_core/_class'.floor(PHP_VERSION).'.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
 load_class('_core/model/_log.class.php');
 load_funcs('_core/_param.funcs.php');

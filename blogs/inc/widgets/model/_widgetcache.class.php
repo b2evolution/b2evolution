@@ -113,13 +113,14 @@ class WidgetCache extends DataObjectCache
 	{
 		if( $row->wi_type == 'core' )
 		{
-			if( ! load_class( 'widgets/widgets/_'.$row->wi_code.'.widget.php', false ) )
+			if( ! file_exists( 'widgets/widgets/_'.$row->wi_code.'.widget.php' ) )
 			{	// For some reason, that widget doesn't seem to exist... (any more?)
 				// echo "Widget $row->wi_code could not be loaded! ";
 				// TODO: replace with dummy widget in order to give a chance to clean up.
 				$r = NULL;
 				return $r;
 			}
+			require_once 'widgets/widgets/_'.$row->wi_code.'.widget.php';
 			$objtype = $row->wi_code.'_Widget';
 		}
 		else
@@ -151,6 +152,9 @@ class WidgetCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.4  2009/03/05 23:38:53  blueyed
+ * Merge autoload branch (lp:~blueyed/b2evolution/autoload) into CVS HEAD.
+ *
  * Revision 1.3  2009/02/05 21:33:34  tblue246
  * Allow the user to enable/disable widgets.
  * Todo:

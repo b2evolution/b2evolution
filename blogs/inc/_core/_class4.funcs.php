@@ -2,7 +2,7 @@
 /**
  * Function for handling Classes in PHP 4.
  *
- * Note: in PHP 5, another file should be included. It should handle clone for example.
+ * For PHP5, _class5.funcs.php gets used.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -30,13 +30,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Load class file
  */
-function load_class( $class_path, $require = true )
+function load_class( $class_path )
 {
 	global $inc_path;
-	if( ! $require && ! file_exists( $inc_path.$class_path ) )
-	{
-		return false;
-	}
 	require_once $inc_path.$class_path;
 	return true;
 }
@@ -44,6 +40,9 @@ function load_class( $class_path, $require = true )
 
 /*
  * $Log$
+ * Revision 1.16  2009/03/05 23:38:53  blueyed
+ * Merge autoload branch (lp:~blueyed/b2evolution/autoload) into CVS HEAD.
+ *
  * Revision 1.15  2009/02/27 21:33:33  blueyed
  * Move load_funcs from class4.funcs to misc.funcs
  *

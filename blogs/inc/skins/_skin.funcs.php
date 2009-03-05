@@ -502,11 +502,12 @@ function skin_widget( $params )
 	$widget_code = $params['widget'];
 	unset( $params['widget'] );
 
-	if( ! load_class( 'widgets/widgets/_'.$widget_code.'.widget.php', false ) )
+	if( ! file_exists( 'widgets/widgets/_'.$widget_code.'.widget.php' ) )
 	{	// For some reason, that widget doesn't seem to exist... (any more?)
 		echo "Invalid widget code provided [$widget_code]!";
 		return false;
 	}
+	require_once 'widgets/widgets/_'.$widget_code.'.widget.php';
 
 	$widget_classname = $widget_code.'_Widget';
 
@@ -592,6 +593,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.37  2009/03/05 23:38:53  blueyed
+ * Merge autoload branch (lp:~blueyed/b2evolution/autoload) into CVS HEAD.
+ *
  * Revision 1.36  2008/12/20 22:36:33  blueyed
  * Add is_same_url() to compare URLs without taking case of urlencoded parts into account. This is required to prevent infinite redirects in the handling of canonical URLs.
  *

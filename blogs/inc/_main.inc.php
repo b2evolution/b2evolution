@@ -109,9 +109,10 @@ if (ini_get('register_globals') && !$this->mosConfig_register_globals)
 
 
 /**
- * class loader
+ * Class loader.
  */
-require_once $inc_path.'_core/_class4.funcs.php';
+require_once $inc_path.'_core/_class'.floor(PHP_VERSION).'.funcs.php';
+
 
 /**
  * Miscellaneous functions
@@ -652,6 +653,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.107  2009/03/05 23:38:53  blueyed
+ * Merge autoload branch (lp:~blueyed/b2evolution/autoload) into CVS HEAD.
+ *
  * Revision 1.106  2009/03/04 02:04:40  fplanque
  * better safe than sorry until someone is positive about this
  *
