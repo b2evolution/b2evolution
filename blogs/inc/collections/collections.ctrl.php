@@ -152,7 +152,7 @@ switch( $action )
 							'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1 )" );
 
 			// Create default category:
-      load_class( 'chapters/model/_chapter.class.php' );
+			load_class( 'chapters/model/_chapter.class.php' );
 			$edited_Chapter = & new Chapter( NULL, $edited_Blog->ID );
 			$edited_Chapter->set( 'name', T_('Uncategorized') );
 			$edited_Chapter->set( 'urlname', 'main' );
@@ -454,6 +454,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2009/03/05 22:38:23  blueyed
+ * Fix indent
+ *
  * Revision 1.10  2009/01/30 21:04:54  tblue246
  * Doc
  *
