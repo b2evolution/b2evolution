@@ -73,6 +73,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 			</thead>
 			<tbody>
 			<?php
+			load_funcs('sessions/model/_hitlog.funcs.php');
 			$count = 0;
 			foreach( $res_affected_hits as $row_stats )
 			{
@@ -210,6 +211,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.8  2009/03/05 22:39:00  blueyed
+ * Add load_funcs, which was required at some point (can't remember, seen during comparison)
+ *
  * Revision 1.7  2008/04/15 21:53:30  fplanque
  * minor
  *
