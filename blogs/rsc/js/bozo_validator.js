@@ -51,84 +51,22 @@ var bozo = {
 	 * This is designed to track changes on forms whith an ID including '_checkchanges'
 	 */
 	init: function ( )
-	{	// Loop through all forms
-		var date_deb = new Date();
-
+	{
 		// Loop through all forms:
-		for( var i = 0; i < document.forms.length ; i++ )
-		{ // Get the next form element:
-			var el_form = document.forms[i];
-
-			// add submit event on the form to control if there are changes on others forms:
-			addEvent( el_form, 'submit', bozo.validate_submit, false );
-
-			// Get all inputs for this form:
-			all_inputs = el_form.getElementsByTagName( 'input' );
-
-			if( el_form.id.indexOf( '_checkchanges' ) == -1 )
-			{	// The form has no '_checkchanges' ID, we won't react on changes BUT we still need to react on SUBMIT...
-				// Loop through all form inputs:
-				for( var j = 0; j < all_inputs.length; j++ )
-				{	// Get the next input element:
-					var field = all_inputs[j];
-					if( field.type == 'submit' )
-					{	// The input is a submit, so we add a click event to validate_submit function
-						addEvent( field , 'click', bozo.validate_submit, false );
-					}
-					// TODO: handle IMAGE type
-				}
-				continue;
-			}
-
+		jQuery("form")
 			// Initialize this form as having no changes yet:
-			bozo.tab_changes[el_form.id] = 0;
-
-			// Loop through all form inputs:
-			for( var j = 0; j < all_inputs.length; j++ )
-			{	// Get the next input element:
-				var field = all_inputs[j];
-
-				if( field.className.indexOf( '_nocheckchanges' ) == -1  )
-				{	// We want to track changes on this field:
-
-					if( field.type == 'submit' )
-					{	// The input is a submit, so we add no event
-					}
-					// TODO: handle IMAGE type
-					else if( field.type == 'reset' )
-					{	// The input is a reset, so we add a click event to reset_changes function
-						addEvent( field , 'click', bozo.reset_changes, false );
-					}
-					else
-					{	// The input is not a submit/image/reset, so we add a change event:
-						addEvent( field , 'change', bozo.change, false );
-						addEvent( field , 'keypress', bozo.change, false );
-					}
-				}
-			}
-
-			all_textareas = el_form.getElementsByTagName( 'textarea' );
-			// Loop on all form textareas
-			for( var j = 0; j < all_textareas.length; j++ )
-			{
-					var field = all_textareas[j];
-					addEvent( field , 'change', bozo.change, false );
-					addEvent( field , 'keypress', bozo.change, false );
-			}
-
-			all_selects = el_form.getElementsByTagName( 'select' );
-			// Loop on all form selects
-			for( var j = 0; j < all_selects.length; j++ )
-			{
-					var field = all_selects[j];
-					addEvent( field , 'change', bozo.change, false );
-			}
-		}
-
-
-		var date_fin = new Date();
-		var tps = date_fin.getTime() - date_deb.getTime();;
-		//alert( tps );
+			.each( function() { bozo.tab_changes[this.id] = 0; } )
+			// add submit event on the form to control if there are changes on others forms:
+			.submit(bozo.validate_submit)
+			// Filter all "*_checkchanges" forms:
+			.filter("[id$='_checkchanges']")
+			// Hook "click" event for reset elements:
+			.find("input[type=reset]:not([class$=_nocheckchanges])").click(bozo.reset_changes).end()
+			// Hook "change" and "keypress" event for all others:
+			.find("input[type=text], input[type=password], input[type=radio], input[type=checkbox], input[type=file], textarea")
+				.not("[class$=_nocheckchanges]")
+					.bind("change", bozo.change)
+					.bind("keypress", bozo.change);
 	},
 
 
