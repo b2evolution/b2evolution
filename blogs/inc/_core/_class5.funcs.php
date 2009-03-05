@@ -27,12 +27,6 @@
  *
  * @package evocore
  *
- * @todo dh> If class4.funcs.php would use OOP, we would not have to redefine all the methods here!!
- *           Happy maintaining! :/
- *           "Class4" should be a class, and "Class5" should extend it.
- *           This file could include Class4, but then Class4 would need "if( ! function_exists() )"
- *           checks.
- *
  * @author blueyed: Daniel HAHLER.
  *
  * @version $Id$
@@ -183,6 +177,9 @@ function load_class( $class_path, $require = true )
 
 /*
  * $Log$
+ * Revision 1.2  2009/03/05 23:42:43  blueyed
+ * Remove todo
+ *
  * Revision 1.1  2009/03/05 23:38:53  blueyed
  * Merge autoload branch (lp:~blueyed/b2evolution/autoload) into CVS HEAD.
  *
