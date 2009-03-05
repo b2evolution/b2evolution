@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 3.1.0-alpha\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2009-03-05 00:16+0100\n"
+"POT-Creation-Date: 2009-03-05 20:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -468,66 +468,28 @@ msgstr ""
 msgid "Send another message?"
 msgstr ""
 
-#: ..\..\..\cron\getmail.php:52
+#: ..\..\..\cron\getmail.php:51
 msgid "Blog by email feature is not enabled."
 msgstr ""
 
-#: ..\..\..\cron\getmail.php:104
+#: ..\..\..\cron\getmail.php:103
 msgid "You configured test mode in the settings or set $test to 2. Nothing will be posted to the database/mediastore nor will your inbox be altered."
 msgstr ""
 
-#: ..\..\..\cron\getmail.php:113
+#: ..\..\..\cron\getmail.php:112
 #: ..\..\..\inc\settings\views\_features.form.php:78
 msgid "Blog by email"
 msgstr ""
 
-#: ..\..\..\cron\getmail.php:247
-#: ..\..\..\skins\_msgform.disp.php:180
-msgid "Subject"
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:251
-msgid "The subject prefix is not "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:260
+#: ..\..\..\cron\getmail.php:259
 msgid "Could not parse date header!"
 msgstr ""
 
-#: ..\..\..\cron\getmail.php:286
+#: ..\..\..\cron\getmail.php:285
 msgid "Invalid month name in message date string."
 msgstr ""
 
-#: ..\..\..\cron\getmail.php:321
-msgid "Processing attachments"
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:329
-#, php-format
-msgid "Attachment without name. Using \"%s\"."
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:336
-msgid "Invalid filename"
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:348
-msgid "file already exists. Changing filename to: "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:354
-msgid "Saving file to: "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:357
-msgid "Problem saving upload to "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:368
-msgid "Attachment is an image: "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:368
+#: ..\..\..\cron\getmail.php:367
 #: ..\..\..\inc\users\views\_user.form.php:136
 #: ..\..\..\inc\users\views\_user.form.php:146
 #: ..\..\..\inc\users\views\_user.form.php:147
@@ -536,7 +498,7 @@ msgstr ""
 msgid "no"
 msgstr ""
 
-#: ..\..\..\cron\getmail.php:368
+#: ..\..\..\cron\getmail.php:367
 #: ..\..\..\inc\users\views\_user.form.php:136
 #: ..\..\..\inc\users\views\_user.form.php:146
 #: ..\..\..\inc\users\views\_user.form.php:147
@@ -545,158 +507,50 @@ msgstr ""
 msgid "yes"
 msgstr ""
 
-#: ..\..\..\cron\getmail.php:411
+#: ..\..\..\cron\getmail.php:410
 msgid "The php_imap extension is not available to PHP on this server. Please load it in php.ini or ask your hosting provider to do so."
 msgstr ""
 
-#: ..\..\..\cron\getmail.php:414
-msgid "Connecting and authenticating to mail server"
+#. TRANS: %s is the error message
+#: ..\..\..\cron\getmail.php:454
+#, php-format
+msgid "Connection failed: %s"
 msgstr ""
 
-#: ..\..\..\cron\getmail.php:455
-msgid "Connection failed: "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:460
-#: ..\..\..\cron\getmail.php:600
-msgid "Success"
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:463
-msgid "All Tests completed"
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:470
-msgid "Reading messages from server"
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:472
-#: ..\..\..\inc\settings\views\_features.form.php:115
-msgid "messages"
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:477
-#: ..\..\..\skins\_msgform.disp.php:181
-msgid "Message"
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:485
+#: ..\..\..\cron\getmail.php:484
 msgid "Could not create temporary file."
 msgstr ""
 
-#: ..\..\..\cron\getmail.php:504
-#: ..\..\..\cron\getmail.php:567
-msgid " at position "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:504
-msgid "MIME message decoding error: "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:511
-msgid "MIME message decoding successful."
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:514
-msgid "MIME message analyse error: "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:537
-msgid "HTML alternative message part saved as "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:547
-msgid "Plain-text message part saved as "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:557
-msgid " stored as "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:557
-msgid "Attachment: "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:564
-msgid " warnings during decode: "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:567
-msgid "Warning: "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:583
-msgid "Message content:"
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:590
-msgid "Authenticating user"
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:593
-msgid "Authentication failed for user "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:594
-msgid "First line of text in email must be in the format \"username:password\""
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:594
-msgid "Wrong login or password."
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:623
-msgid "Category ID"
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:627
-msgid "Blog ID"
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:634
-msgid "Blog not found: "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:641
+#: ..\..\..\cron\getmail.php:503
 #, php-format
-msgid "Checking permissions for user &laquo;%s&raquo; to post to Blog #%d"
+msgid "MIME message decoding error: %s at position %d."
 msgstr ""
 
-#: ..\..\..\cron\getmail.php:646
-msgid "Permission denied"
+#: ..\..\..\cron\getmail.php:513
+#, php-format
+msgid "MIME message analyse error: %s"
 msgstr ""
 
-#: ..\..\..\cron\getmail.php:652
-msgid "Pass"
+#: ..\..\..\cron\getmail.php:592
+#, php-format
+msgid "Authentication failed for user %s."
 msgstr ""
 
-#: ..\..\..\cron\getmail.php:665
-msgid "Unable to access media directory. No attachments processed"
+#: ..\..\..\cron\getmail.php:633
+#, php-format
+msgid "Blog #%d not found!"
 msgstr ""
 
-#: ..\..\..\cron\getmail.php:673
+#: ..\..\..\cron\getmail.php:645
+msgid "Permission denied."
+msgstr ""
+
+#: ..\..\..\cron\getmail.php:664
+msgid "Unable to access media directory. No attachments processed."
+msgstr ""
+
+#: ..\..\..\cron\getmail.php:672
 msgid "Cannot post, please correct these errors:"
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:692
-msgid "Message posting successfull."
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:693
-msgid "Post title: "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:694
-msgid "Post content: "
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:698
-msgid "Marking message for deletion"
-msgstr ""
-
-#: ..\..\..\cron\getmail.php:706
-#, php-format
-msgid "Deleted %d processed message(s) from inbox"
 msgstr ""
 
 #: ..\..\..\default.php:80
@@ -1970,24 +1824,24 @@ msgstr ""
 msgid "Selection deleted."
 msgstr ""
 
-#: ..\..\..\inc\_main.inc.php:474
-#: ..\..\..\inc\_main.inc.php:485
+#: ..\..\..\inc\_main.inc.php:477
+#: ..\..\..\inc\_main.inc.php:488
 msgid "The login window has expired. Please try again."
 msgstr ""
 
-#: ..\..\..\inc\_main.inc.php:479
+#: ..\..\..\inc\_main.inc.php:482
 msgid "Either you have not enabled cookies or this login window has expired."
 msgstr ""
 
-#: ..\..\..\inc\_main.inc.php:515
+#: ..\..\..\inc\_main.inc.php:518
 msgid "Wrong login/password."
 msgstr ""
 
-#: ..\..\..\inc\_main.inc.php:548
+#: ..\..\..\inc\_main.inc.php:551
 msgid "You must log in!"
 msgstr ""
 
-#: ..\..\..\inc\_main.inc.php:566
+#: ..\..\..\inc\_main.inc.php:569
 msgid "You must validate your email address before you can log in."
 msgstr ""
 
@@ -3387,7 +3241,7 @@ msgstr ""
 msgid "No blog"
 msgstr ""
 
-#: ..\..\..\inc\collections\model\_category.funcs.php:105
+#: ..\..\..\inc\collections\model\_category.funcs.php:103
 #, php-format
 msgid "Requested category %s does not exist!"
 msgstr ""
@@ -9845,6 +9699,10 @@ msgstr ""
 msgid "connection"
 msgstr ""
 
+#: ..\..\..\inc\settings\views\_features.form.php:115
+msgid "messages"
+msgstr ""
+
 #: ..\..\..\inc\settings\views\_features.form.php:116
 msgid "verbose"
 msgstr ""
@@ -10218,7 +10076,7 @@ msgstr ""
 #: ..\..\..\inc\skins\views\_skin_list.view.php:51
 #: ..\..\..\inc\users\views\_group.form.php:101
 #: ..\..\..\inc\users\views\_user_list.view.php:227
-#: ..\..\..\inc\widgets\model\_widget.class.php:712
+#: ..\..\..\inc\widgets\model\_widget.class.php:715
 #: ..\..\..\install\index.php:132
 msgid "Blogs"
 msgstr ""
@@ -11427,10 +11285,6 @@ msgstr ""
 msgid "continued"
 msgstr ""
 
-#: ..\..\..\inc\widgets\model\_widget.class.php:678
-msgid "more"
-msgstr ""
-
 #: ..\..\..\inc\widgets\views\_widget.form.php:32
 #, php-format
 msgid "Edit widget %s in %s"
@@ -11950,11 +11804,11 @@ msgid "XML Feeds"
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_xml_feeds.widget.php:84
-msgid "Info link"
+msgid "Help link"
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_xml_feeds.widget.php:86
-msgid "Check this to display an info link"
+msgid "Check this to display \"What is RSS?\" link"
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_xml_feeds.widget.php:90
@@ -12022,22 +11876,22 @@ msgstr ""
 msgid "This is the maximum number of links to display."
 msgstr ""
 
-#: ..\..\..\inc\widgets\widgets\_linkblog.widget.php:100
+#: ..\..\..\inc\widgets\widgets\_linkblog.widget.php:98
 #: ..\..\..\inc\widgets\widgets\_links.widget.php:92
 msgid "Excerpts"
 msgstr ""
 
-#: ..\..\..\inc\widgets\widgets\_linkblog.widget.php:103
+#: ..\..\..\inc\widgets\widgets\_linkblog.widget.php:101
 #: ..\..\..\inc\widgets\widgets\_links.widget.php:95
 msgid "Show contents for entries"
 msgstr ""
 
-#: ..\..\..\inc\widgets\widgets\_linkblog.widget.php:106
+#: ..\..\..\inc\widgets\widgets\_linkblog.widget.php:104
 #: ..\..\..\inc\widgets\widgets\_links.widget.php:98
 msgid "Max Words"
 msgstr ""
 
-#: ..\..\..\inc\widgets\widgets\_linkblog.widget.php:109
+#: ..\..\..\inc\widgets\widgets\_linkblog.widget.php:107
 #: ..\..\..\inc\widgets\widgets\_links.widget.php:101
 msgid "Max number of words to show in exerpts"
 msgstr ""
@@ -13771,7 +13625,15 @@ msgid "Your email address. (Will <strong>not</strong> be displayed on this site.
 msgstr ""
 
 #: ..\..\..\skins\_msgform.disp.php:180
+msgid "Subject"
+msgstr ""
+
+#: ..\..\..\skins\_msgform.disp.php:180
 msgid "Subject of email message."
+msgstr ""
+
+#: ..\..\..\skins\_msgform.disp.php:181
+msgid "Message"
 msgstr ""
 
 #: ..\..\..\skins\_msgform.disp.php:181
