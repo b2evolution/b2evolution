@@ -493,6 +493,8 @@ function skin_content_meta( $type = 'text/html' )
  */
 function skin_widget( $params )
 {
+	global $inc_path;
+
 	if( empty( $params['widget'] ) )
 	{
 		echo 'No widget code provided!';
@@ -502,16 +504,16 @@ function skin_widget( $params )
 	$widget_code = $params['widget'];
 	unset( $params['widget'] );
 
-	if( ! file_exists( 'widgets/widgets/_'.$widget_code.'.widget.php' ) )
+	if( ! file_exists( $inc_path.'widgets/widgets/_'.$widget_code.'.widget.php' ) )
 	{	// For some reason, that widget doesn't seem to exist... (any more?)
 		echo "Invalid widget code provided [$widget_code]!";
 		return false;
 	}
-	require_once 'widgets/widgets/_'.$widget_code.'.widget.php';
+	require_once $inc_path.'widgets/widgets/_'.$widget_code.'.widget.php';
 
 	$widget_classname = $widget_code.'_Widget';
 
-  /**
+	/**
 	 * @var ComponentWidget
 	 */
 	$Widget = new $widget_classname();	// COPY !!
@@ -520,12 +522,12 @@ function skin_widget( $params )
 }
 
 
-/**
+	/**
 	 * Display a container
 	 *
 	 * @param string
 	 * @param array
- */
+	 */
 function skin_container( $sco_name, $params = array() )
 {
 	global $Skin;
@@ -593,6 +595,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.38  2009/03/06 16:40:26  blueyed
+ * Fix path check/inclusion of widget classes.
+ *
  * Revision 1.37  2009/03/05 23:38:53  blueyed
  * Merge autoload branch (lp:~blueyed/b2evolution/autoload) into CVS HEAD.
  *

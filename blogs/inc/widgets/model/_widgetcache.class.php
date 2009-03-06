@@ -111,16 +111,18 @@ class WidgetCache extends DataObjectCache
 	 */
 	function & new_obj( $row = NULL )
 	{
+		global $inc_path;
+
 		if( $row->wi_type == 'core' )
 		{
-			if( ! file_exists( 'widgets/widgets/_'.$row->wi_code.'.widget.php' ) )
+			if( ! file_exists( $inc_path.'widgets/widgets/_'.$row->wi_code.'.widget.php' ) )
 			{	// For some reason, that widget doesn't seem to exist... (any more?)
 				// echo "Widget $row->wi_code could not be loaded! ";
 				// TODO: replace with dummy widget in order to give a chance to clean up.
 				$r = NULL;
 				return $r;
 			}
-			require_once 'widgets/widgets/_'.$row->wi_code.'.widget.php';
+			require_once $inc_path.'widgets/widgets/_'.$row->wi_code.'.widget.php';
 			$objtype = $row->wi_code.'_Widget';
 		}
 		else
@@ -152,6 +154,9 @@ class WidgetCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.5  2009/03/06 16:40:26  blueyed
+ * Fix path check/inclusion of widget classes.
+ *
  * Revision 1.4  2009/03/05 23:38:53  blueyed
  * Merge autoload branch (lp:~blueyed/b2evolution/autoload) into CVS HEAD.
  *
