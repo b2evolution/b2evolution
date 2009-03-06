@@ -528,7 +528,7 @@ class Hit
 		}
 
 		if( $Plugins->trigger_event_first_true('AppendHitLog', array( 'Hit' => &$this ) ) )
-		{	// Phugin has handled recording
+		{	// Plugin has handled recording
 			return true;
 		}
 
@@ -1040,6 +1040,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.21  2009/03/06 14:11:09  tblue246
+ * doc
+ *
  * Revision 1.20  2009/03/04 00:10:42  blueyed
  * Make Hit constructor more lazy.
  *  - Move referer_dom_ID generation/fetching to own method
