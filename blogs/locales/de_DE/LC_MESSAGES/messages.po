@@ -1,6 +1,6 @@
 # translation of messages.po to German
 # b2evolution - German language file
-# Copyright (C) 2003 François PLANQUE
+# Copyright (C) 2003 FranÃ§ois PLANQUE
 # This file is distributed under the same license as the b2evolution package.
 #
 # Daniel Hahler <daniel@thequod.de>, 2003-2005, 2006, 2007, 2008.
@@ -13,7 +13,7 @@ msgstr ""
 "Last-Translator: Daniel Hahler <launchpad@thequod.de>\n"
 "Language-Team: <en@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Launchpad-Export-Date: 2009-03-04 23:40+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
@@ -92,7 +92,7 @@ msgstr "Vorherige"
 #: ..\..\..\skins_adm\_adminUI_general.class.php:1153
 #: ..\..\..\skins_adm\chicago\_adminUI.class.php:271
 msgid "Next"
-msgstr "Nächste"
+msgstr "NÃ¤chste"
 
 #: ..\..\..\conf\_application.php:41
 msgid "visit b2evolution's website"
@@ -126,7 +126,7 @@ msgstr "Leere Datei"
 
 #: ..\..\..\conf\_icons.php:69
 msgid "Parent folder"
-msgstr "übergeordnetes Verzeichnis"
+msgstr "Ã¼bergeordnetes Verzeichnis"
 
 #: ..\..\..\conf\_icons.php:74
 msgid "Home folder"
@@ -137,7 +137,7 @@ msgstr "Heimverzeichnis"
 #: ..\..\..\inc\files\views\_file_links.view.php:62
 #: ..\..\..\inc\locales\_locale_settings.form.php:284
 msgid "Edit"
-msgstr "Ändern"
+msgstr "Ã„ndern"
 
 #: ..\..\..\conf\_icons.php:84
 #: ..\..\..\conf\_icons.php:276
@@ -179,7 +179,7 @@ msgstr "Del"
 #: ..\..\..\inc\files\views\_file_delete.form.php:71
 #: ..\..\..\inc\files\views\_file_list.inc.php:422
 msgid "Delete"
-msgstr "Löschen"
+msgstr "LÃ¶schen"
 
 #: ..\..\..\conf\_icons.php:105
 msgid "Permissions"
@@ -286,7 +286,7 @@ msgstr "Eigenschaften"
 
 #: ..\..\..\conf\_icons.php:291
 msgid "Publish"
-msgstr "Veröffentlichen"
+msgstr "VerÃ¶ffentlichen"
 
 #: ..\..\..\conf\_icons.php:296
 msgid "Deprecate"
@@ -298,7 +298,7 @@ msgstr "Lokalisieren"
 
 #: ..\..\..\conf\_icons.php:313
 msgid "Close"
-msgstr "Schließen"
+msgstr "SchlieÃŸen"
 
 #: ..\..\..\conf\_icons.php:321
 #: ..\..\..\conf\_icons.php:391
@@ -428,15 +428,15 @@ msgstr "Zugeordnet zu"
 
 #: ..\..\..\conf\_icons.php:474
 msgid "Check all"
-msgstr "Alle Auswählen"
+msgstr "Alle AuswÃ¤hlen"
 
 #: ..\..\..\conf\_icons.php:479
 msgid "Uncheck all"
-msgstr "Alle Abwählen"
+msgstr "Alle AbwÃ¤hlen"
 
 #: ..\..\..\conf\_icons.php:485
 msgid "Reset all filters"
-msgstr "Alle Filter zurücksetzen"
+msgstr "Alle Filter zurÃ¼cksetzen"
 
 #: ..\..\..\conf\_icons.php:491
 msgid "Allow back"
@@ -472,7 +472,7 @@ msgstr "Diese Demo zeigt ein Formular, um den Administrator zu kontaktieren."
 
 #: ..\..\..\contact.php:132
 msgid "Thank you for your message. I will reply as soon as possible."
-msgstr "Danke für deine Nachricht. Ich werde sobald wie möglich antworten."
+msgstr "Danke fÃ¼r deine Nachricht. Ich werde sobald wie mÃ¶glich antworten."
 
 #: ..\..\..\contact.php:135
 msgid "Send another message?"
@@ -488,7 +488,7 @@ msgid ""
 "posted to the database/mediastore nor will your inbox be altered."
 msgstr ""
 "Du hast den Test-Modus aktiviert oder $test auf 2 gesetzt. Nichts wird an "
-"deiner Datenbank, deinem Medienverzeichnis und deiner Mailbox verändert "
+"deiner Datenbank, deinem Medienverzeichnis und deiner Mailbox verÃ¤ndert "
 "werden."
 
 #: ..\..\..\cron\getmail.php:113
@@ -503,7 +503,7 @@ msgstr "Betreff"
 
 #: ..\..\..\cron\getmail.php:251
 msgid "The subject prefix is not "
-msgstr "Der Betreff-Präfix ist nicht "
+msgstr "Der Betreff-PrÃ¤fix ist nicht "
 
 #: ..\..\..\cron\getmail.php:260
 msgid "Could not parse date header!"
@@ -515,7 +515,7 @@ msgstr ""
 
 #: ..\..\..\cron\getmail.php:321
 msgid "Processing attachments"
-msgstr "Verarbeite Anhänge"
+msgstr "Verarbeite AnhÃ¤nge"
 
 #: ..\..\..\cron\getmail.php:329
 #, php-format
@@ -524,11 +524,11 @@ msgstr ""
 
 #: ..\..\..\cron\getmail.php:336
 msgid "Invalid filename"
-msgstr "Ungültiger Dateiname"
+msgstr "UngÃ¼ltiger Dateiname"
 
 #: ..\..\..\cron\getmail.php:348
 msgid "file already exists. Changing filename to: "
-msgstr "Datei existiert bereits. Ändere Dateinamen in: "
+msgstr "Datei existiert bereits. Ã„ndere Dateinamen in: "
 
 #: ..\..\..\cron\getmail.php:354
 msgid "Saving file to: "
@@ -565,8 +565,8 @@ msgid ""
 "The php_imap extension is not available to PHP on this server. Please load "
 "it in php.ini or ask your hosting provider to do so."
 msgstr ""
-"Die php_imap-Erweiterung ist für PHP auf diesem Server nicht verfügbar. "
-"Bitte lade sie in php.ini oder frage deinen Hoster, ob er das für dich tun "
+"Die php_imap-Erweiterung ist fÃ¼r PHP auf diesem Server nicht verfÃ¼gbar. "
+"Bitte lade sie in php.ini oder frage deinen Hoster, ob er das fÃ¼r dich tun "
 "kann."
 
 #: ..\..\..\cron\getmail.php:414
@@ -602,7 +602,7 @@ msgstr "Nachricht"
 
 #: ..\..\..\cron\getmail.php:485
 msgid "Could not create temporary file."
-msgstr "Konnte temporäre Datei nicht erzeugen"
+msgstr "Konnte temporÃ¤re Datei nicht erzeugen"
 
 #: ..\..\..\cron\getmail.php:504
 #: ..\..\..\cron\getmail.php:567
@@ -639,7 +639,7 @@ msgstr "Anhang: "
 
 #: ..\..\..\cron\getmail.php:564
 msgid " warnings during decode: "
-msgstr " Fehler während der Dekodierung: "
+msgstr " Fehler wÃ¤hrend der Dekodierung: "
 
 #: ..\..\..\cron\getmail.php:567
 msgid "Warning: "
@@ -655,7 +655,7 @@ msgstr "Authentifiziere Benutzer"
 
 #: ..\..\..\cron\getmail.php:593
 msgid "Authentication failed for user "
-msgstr "Authentifizierung fehlgeschlagen für Benutzer "
+msgstr "Authentifizierung fehlgeschlagen fÃ¼r Benutzer "
 
 #: ..\..\..\cron\getmail.php:594
 msgid ""
@@ -684,7 +684,7 @@ msgstr "Blog nicht gefunden: "
 #, php-format
 msgid "Checking permissions for user &laquo;%s&raquo; to post to Blog #%d"
 msgstr ""
-"Überprüfe Berechtigungen für Benutzer &laquo;%s&raquo; zum Schreiben in Blog "
+"ÃœberprÃ¼fe Berechtigungen fÃ¼r Benutzer &laquo;%s&raquo; zum Schreiben in Blog "
 "#%d."
 
 #: ..\..\..\cron\getmail.php:646
@@ -698,7 +698,7 @@ msgstr "OK"
 #: ..\..\..\cron\getmail.php:665
 msgid "Unable to access media directory. No attachments processed"
 msgstr ""
-"Kann nicht auf Medienverzeichnis zugreifen. Keine Anhänge wurden verarbeitet."
+"Kann nicht auf Medienverzeichnis zugreifen. Keine AnhÃ¤nge wurden verarbeitet."
 
 #: ..\..\..\cron\getmail.php:673
 msgid "Cannot post, please correct these errors:"
@@ -718,12 +718,12 @@ msgstr "Beitragsinhalt: "
 
 #: ..\..\..\cron\getmail.php:698
 msgid "Marking message for deletion"
-msgstr "Markiere Nachricht zur Löschung"
+msgstr "Markiere Nachricht zur LÃ¶schung"
 
 #: ..\..\..\cron\getmail.php:706
 #, php-format
 msgid "Deleted %d processed message(s) from inbox"
-msgstr "%d verarbeitete Nachricht(en) aus dem Posteingang gelöscht"
+msgstr "%d verarbeitete Nachricht(en) aus dem Posteingang gelÃ¶scht"
 
 #: ..\..\..\default.php:80
 msgid "Default page"
@@ -738,7 +738,7 @@ msgid ""
 "b2evolution is installed and ready but you haven't created any blog on this "
 "system yet."
 msgstr ""
-"b2evolution ist installiert und einsatzfähig, aber es wurde noch kein Blog "
+"b2evolution ist installiert und einsatzfÃ¤hig, aber es wurde noch kein Blog "
 "angelegt."
 
 #: ..\..\..\default.php:116
@@ -770,11 +770,11 @@ msgstr "Blog #%d"
 
 #: ..\..\..\default.php:163
 msgid "Add a new blog"
-msgstr "Füge ein Blog hinzu"
+msgstr "FÃ¼ge ein Blog hinzu"
 
 #: ..\..\..\default.php:173
 msgid "Bonus templates &amp; features"
-msgstr "Zusätzliche Vorlagen &amp; Features"
+msgstr "ZusÃ¤tzliche Vorlagen &amp; Features"
 
 #: ..\..\..\default.php:174
 msgid ""
@@ -783,8 +783,8 @@ msgid ""
 "their PHP template."
 msgstr ""
 "Diese Vorlagen demonstrieren erweiterte Anwendungen von b2evolution. Es "
-"werden hierfür keine Skins verwendet. Um das Aussehen und Verhalten zu "
-"ändern, müssen die PHP-Vorlagen bearbeitet werden."
+"werden hierfÃ¼r keine Skins verwendet. Um das Aussehen und Verhalten zu "
+"Ã¤ndern, mÃ¼ssen die PHP-Vorlagen bearbeitet werden."
 
 #: ..\..\..\default.php:181
 msgid "Blog #1 called through a custom template (not a skin)"
@@ -806,7 +806,7 @@ msgstr ""
 
 #: ..\..\..\default.php:188
 msgid "Summary of latest posts in all blogs"
-msgstr "Zusammenfassung der letzten Einträge aller Blogs"
+msgstr "Zusammenfassung der letzten EintrÃ¤ge aller Blogs"
 
 #: ..\..\..\default.php:189
 msgid "The page you're looking at"
@@ -814,7 +814,7 @@ msgstr "Die Seite die du gerade betrachtest"
 
 #: ..\..\..\default.php:190
 msgid "A standalone admin-contact page for your site"
-msgstr "Ein alleinstehendes Admin-Kontaktformular für die Website"
+msgstr "Ein alleinstehendes Admin-Kontaktformular fÃ¼r die Website"
 
 #: ..\..\..\default.php:209
 msgid "Contact the admin"
@@ -836,16 +836,16 @@ msgstr "Bitte gib deine E-Mail an."
 
 #: ..\..\..\htsrv\comment_post.php:136
 msgid "Supplied name is invalid."
-msgstr "Der angegebene Name ist ungültig."
+msgstr "Der angegebene Name ist ungÃ¼ltig."
 
 #: ..\..\..\htsrv\comment_post.php:142
 #: ..\..\..\htsrv\message_send.php:132
 msgid "Supplied email address is invalid."
-msgstr "Die angegebene E-Mail-Adresse ist ungültig."
+msgstr "Die angegebene E-Mail-Adresse ist ungÃ¼ltig."
 
 #: ..\..\..\htsrv\comment_post.php:160
 msgid "Supplied website address is invalid: "
-msgstr "Die angegebene Website-Adresse ist ungültig: "
+msgstr "Die angegebene Website-Adresse ist ungÃ¼ltig: "
 
 #: ..\..\..\htsrv\comment_post.php:176
 msgid "Please do not send empty comments."
@@ -866,7 +866,7 @@ msgstr "Kann Kommentar nicht verarbeiten, bitte korrigiere diese Fehler:"
 
 #: ..\..\..\htsrv\comment_post.php:279
 msgid "Back to comment editing"
-msgstr "Zurück zum Editieren des Kommentars"
+msgstr "ZurÃ¼ck zum Editieren des Kommentars"
 
 #: ..\..\..\htsrv\comment_post.php:296
 msgid "This is a preview only! Do not forget to send your comment!"
@@ -875,13 +875,13 @@ msgstr ""
 
 #: ..\..\..\htsrv\comment_post.php:376
 msgid "Your comment has been submitted."
-msgstr "Dein Kommentar wurde übermittelt."
+msgstr "Dein Kommentar wurde Ã¼bermittelt."
 
 #: ..\..\..\htsrv\comment_post.php:383
 msgid ""
 "Your comment has been submitted. It will appear once it has been approved."
 msgstr ""
-"Dein Kommentar wurde übermittelt. Er wird erscheinen, sobald er freigegeben "
+"Dein Kommentar wurde Ã¼bermittelt. Er wird erscheinen, sobald er freigegeben "
 "wurde."
 
 #: ..\..\..\htsrv\login.php:83
@@ -891,19 +891,19 @@ msgid ""
 "been sent to your registered email address."
 msgstr ""
 "Wenn du dein Login richtig angegeben hast, wurde ein Link, mit dem du dein "
-"Passwort ändern kannst, an deine hier registrierte E-Mail-Adresse verschickt."
+"Passwort Ã¤ndern kannst, an deine hier registrierte E-Mail-Adresse verschickt."
 
 #: ..\..\..\htsrv\login.php:93
 msgid "You cannot reset this account in demo mode."
-msgstr "Du kannst diesen Account im Demo-Modus nicht zurücksetzen."
+msgstr "Du kannst diesen Account im Demo-Modus nicht zurÃ¼cksetzen."
 
 #: ..\..\..\htsrv\login.php:105
 msgid ""
 "You have no email address with your profile, therefore we cannot reset your "
 "password."
 msgstr ""
-"Du hast keine E-Mail-Adresse in deinem Profil, deshalb können wir das "
-"Passwort nicht zurücksetzen."
+"Du hast keine E-Mail-Adresse in deinem Profil, deshalb kÃ¶nnen wir das "
+"Passwort nicht zurÃ¼cksetzen."
 
 #: ..\..\..\htsrv\login.php:106
 msgid "Please try contacting the admin."
@@ -913,7 +913,7 @@ msgstr "Bitte versuche, den Admin zu kontaktieren."
 msgid ""
 "Somebody (presumably you) has requested a password change for your account."
 msgstr ""
-"Jemand (vermutlich du) hat eine Passwortänderung für deinen Account "
+"Jemand (vermutlich du) hat eine PasswortÃ¤nderung fÃ¼r deinen Account "
 "angefordert."
 
 #: ..\..\..\htsrv\login.php:114
@@ -924,7 +924,7 @@ msgstr "Login:"
 
 #: ..\..\..\htsrv\login.php:115
 msgid "Link to change your password:"
-msgstr "Link, um dein Passwort zu ändern:"
+msgstr "Link, um dein Passwort zu Ã¤ndern:"
 
 #: ..\..\..\htsrv\login.php:122
 #: ..\..\..\htsrv\message_send.php:81
@@ -939,7 +939,7 @@ msgid ""
 "For security reasons the link is only valid for your current session (by "
 "means of your session cookie)."
 msgstr ""
-"Aus Sicherheitsgründen ist der Link nur für deine momentane Session gültig "
+"Aus SicherheitsgrÃ¼nden ist der Link nur fÃ¼r deine momentane Session gÃ¼ltig "
 "(im Sinne deines Session-Cookies)."
 
 #: ..\..\..\htsrv\login.php:125
@@ -947,19 +947,19 @@ msgid ""
 "If it was not you that requested this password change, simply ignore this "
 "mail."
 msgstr ""
-"Wenn du keine Passwortänderung angefordert hast, ignoriere diese E-Mail "
+"Wenn du keine PasswortÃ¤nderung angefordert hast, ignoriere diese E-Mail "
 "einfach."
 
 #: ..\..\..\htsrv\login.php:127
 #, php-format
 msgid "Password change request for %s"
-msgstr "Angeforderte Passwortänderung für %s"
+msgstr "Angeforderte PasswortÃ¤nderung fÃ¼r %s"
 
 #: ..\..\..\htsrv\login.php:129
 msgid ""
 "Sorry, the email with the link to reset your password could not be sent."
 msgstr ""
-"Entschuldige, die E-Mail mit dem Link, um dein Passwort zurückzusetzen, "
+"Entschuldige, die E-Mail mit dem Link, um dein Passwort zurÃ¼ckzusetzen, "
 "konnte nicht verschickt werden."
 
 #: ..\..\..\htsrv\login.php:130
@@ -971,14 +971,14 @@ msgid ""
 "Possible reason: the PHP mail() function may have been disabled on the "
 "server."
 msgstr ""
-"Mögliche Ursache: die mail()-Funktion von PHP könnte auf dem Server "
+"MÃ¶gliche Ursache: die mail()-Funktion von PHP kÃ¶nnte auf dem Server "
 "deaktiviert worden sein."
 
 #: ..\..\..\htsrv\login.php:156
 #: ..\..\..\htsrv\login.php:173
 msgid "Invalid password change request! Please try again..."
 msgstr ""
-"Ungültige Anforderung zur Passwortänderung! Bitte versuche es erneut..."
+"UngÃ¼ltige Anforderung zur PasswortÃ¤nderung! Bitte versuche es erneut..."
 
 #: ..\..\..\htsrv\login.php:164
 #: ..\..\..\htsrv\login.php:218
@@ -993,7 +993,7 @@ msgstr ""
 #: ..\..\..\htsrv\login.php:183
 msgid "Please change your password to something you remember now."
 msgstr ""
-"Bitte ändere dein Passwort jetzt in etwas, an das du dich erinnern kannst."
+"Bitte Ã¤ndere dein Passwort jetzt in etwas, an das du dich erinnern kannst."
 
 #: ..\..\..\htsrv\login.php:202
 msgid "Your account has already been validated."
@@ -1002,7 +1002,7 @@ msgstr "Deine E-Mail-Adresse wurde bereits validiert."
 #: ..\..\..\htsrv\login.php:210
 #: ..\..\..\htsrv\login.php:228
 msgid "Invalid email address validation request!"
-msgstr "Ungültige Anforderung, um deine E-Mail-Adresse zu validieren."
+msgstr "UngÃ¼ltige Anforderung, um deine E-Mail-Adresse zu validieren."
 
 #: ..\..\..\htsrv\login.php:238
 msgid "Please login to validate your account."
@@ -1053,7 +1053,7 @@ msgid ""
 "You have no email address with your profile, therefore we cannot validate "
 "it. Please give your email address below."
 msgstr ""
-"Du hast keine E-Mail-Adresse in deinem Profil, deshalb können wir sie nicht "
+"Du hast keine E-Mail-Adresse in deinem Profil, deshalb kÃ¶nnen wir sie nicht "
 "validieren. Bitte gib deine E-Mail-Adresse unten an."
 
 #: ..\..\..\htsrv\login.php:344
@@ -1070,7 +1070,7 @@ msgstr ""
 "durch eine automatische Weiterleitung geschieht, wird dich das von einer "
 "erfolgreichen Anmeldung abhalten. Du musst entweder deine Webserver-"
 "Konfiguration oder deine %s-Konfiguration berichtigen, damit diese beiden "
-"URLs übereinstimmen."
+"URLs Ã¼bereinstimmen."
 
 #: ..\..\..\htsrv\login.php:383
 #, php-format
@@ -1082,7 +1082,7 @@ msgid ""
 msgstr ""
 "WARNUNG: Du versuchst, dich auf <strong>%s</strong> einzuloggen, aber deine "
 "Cookie-Domain ist <strong>%s</strong>. Du wirst dich nicht erfolgreich "
-"einloggen können, bis du deine Cookie-Domain in deiner %s-Konfiguration "
+"einloggen kÃ¶nnen, bis du deine Cookie-Domain in deiner %s-Konfiguration "
 "berichtigt hast."
 
 #: ..\..\..\htsrv\message_send.php:62
@@ -1091,14 +1091,14 @@ msgid ""
 "message form."
 msgstr ""
 "Alle deine Kommentare wurden markiert, so dass sie nicht mehr erlauben, dich "
-"über eine Nachrichtenformular zu kontaktieren."
+"Ã¼ber eine Nachrichtenformular zu kontaktieren."
 
 #: ..\..\..\htsrv\message_send.php:68
 msgid ""
 "The request not to receive emails through a message form for your comments "
 "failed."
 msgstr ""
-"Die Anforderung, keine E-Mails mehr über ein Nachrichtenformular zu "
+"Die Anforderung, keine E-Mails mehr Ã¼ber ein Nachrichtenformular zu "
 "empfangen, ist fehlgeschlagen."
 
 #: ..\..\..\htsrv\message_send.php:77
@@ -1108,10 +1108,10 @@ msgid ""
 "\n"
 "To confirm that this request is from you, please click on the following link:"
 msgstr ""
-"Wir haben eine Anforderung erhalten, dass du keine E-Mails mehr über\n"
-"ein Nachrichtenformular erhalten möchtest.\n"
+"Wir haben eine Anforderung erhalten, dass du keine E-Mails mehr Ã¼ber\n"
+"ein Nachrichtenformular erhalten mÃ¶chtest.\n"
 "\n"
-"Um zu bestätigen, dass die Anforderung von dir kam, klicke bitte auf den\n"
+"Um zu bestÃ¤tigen, dass die Anforderung von dir kam, klicke bitte auf den\n"
 "folgenden Link:"
 
 #: ..\..\..\htsrv\message_send.php:84
@@ -1120,16 +1120,16 @@ msgstr "Wenn du das nicht angefordert hast, ignoriere diese E-Mail einfach."
 
 #: ..\..\..\htsrv\message_send.php:86
 msgid "Confirm opt-out for emails through message form"
-msgstr "Bestätige Opt-out für E-Mails über Nachrichtenformular"
+msgstr "BestÃ¤tige Opt-out fÃ¼r E-Mails Ã¼ber Nachrichtenformular"
 
 #: ..\..\..\htsrv\message_send.php:88
 msgid ""
 "An email has been sent to you, with a link to confirm your request not to "
 "receive emails through the comments you have made on this blog."
 msgstr ""
-"Eine E-Mail wurde an dich versendet. Sie enthält einen Link, mit dem du die "
+"Eine E-Mail wurde an dich versendet. Sie enthÃ¤lt einen Link, mit dem du die "
 "Anforderung, keine E-Mails mehr durch in diesem Blog hinterlassene "
-"Kommentare zu empfangen, bestätigen kannst."
+"Kommentare zu empfangen, bestÃ¤tigen kannst."
 
 #: ..\..\..\htsrv\message_send.php:94
 #: ..\..\..\htsrv\message_send.php:300
@@ -1146,7 +1146,7 @@ msgstr "Bitte schicke keine leeren Nachrichten."
 
 #: ..\..\..\htsrv\message_send.php:146
 msgid "The supplied message is invalid / appears to be spam."
-msgstr "Die übersendete Nachricht ist ungültig / scheint Spam zu sein."
+msgstr "Die Ã¼bersendete Nachricht ist ungÃ¼ltig / scheint Spam zu sein."
 
 #: ..\..\..\htsrv\message_send.php:157
 msgid "Message sent from your comment:"
@@ -1159,7 +1159,7 @@ msgstr "Nachricht gesendet von deinem Beitrag:"
 #: ..\..\..\htsrv\message_send.php:233
 msgid "You can edit your profile to not reveive mails through a form:"
 msgstr ""
-"Du kannst dein Profil editieren, um keine E-Mails über ein Formular zu "
+"Du kannst dein Profil editieren, um keine E-Mails Ã¼ber ein Formular zu "
 "empfangen:"
 
 #: ..\..\..\htsrv\message_send.php:240
@@ -1167,7 +1167,7 @@ msgid ""
 "Click on the following link to not receive e-mails on your comments\n"
 "for this e-mail address anymore:"
 msgstr ""
-"Klicke auf den folgenden Link, um für diese E-Mail-Adresse keine\n"
+"Klicke auf den folgenden Link, um fÃ¼r diese E-Mail-Adresse keine\n"
 "E-Mails mehr durch Kommentare zu bekommen:"
 
 #: ..\..\..\htsrv\message_send.php:261
@@ -1176,13 +1176,13 @@ msgstr "Kann die E-Mail nicht versenden, bitte berichtige diese Fehler:"
 
 #: ..\..\..\htsrv\message_send.php:262
 msgid "Back to email editing"
-msgstr "Zurück zum Editieren der E-Mail"
+msgstr "ZurÃ¼ck zum Editieren der E-Mail"
 
 #: ..\..\..\htsrv\message_send.php:270
 #: ..\..\..\htsrv\message_send.php:278
 #, php-format
 msgid "This message was sent via the messaging system on %s."
-msgstr "Diese Nachricht wurde über den Nachrichtendienst von %s gesendet."
+msgstr "Diese Nachricht wurde Ã¼ber den Nachrichtendienst von %s gesendet."
 
 #: ..\..\..\htsrv\message_send.php:296
 msgid "Your message has been sent."
@@ -1200,7 +1200,7 @@ msgstr "Du bist nicht angemeldet."
 #: ..\..\..\htsrv\subs_update.php:61
 #: ..\..\..\htsrv\subs_update.php:75
 msgid "Back to profile"
-msgstr "Zurück zum Profil"
+msgstr "ZurÃ¼ck zum Profil"
 
 #: ..\..\..\htsrv\profile_update.php:100
 #: ..\..\..\htsrv\subs_update.php:74
@@ -1212,14 +1212,14 @@ msgstr ""
 #: ..\..\..\htsrv\profile_update.php:138
 #: ..\..\..\inc\users\users.ctrl.php:413
 msgid "Your profile has not been changed."
-msgstr "Dein Profil wurde nicht verändert."
+msgstr "Dein Profil wurde nicht verÃ¤ndert."
 
 #: ..\..\..\htsrv\register.php:96
 #, php-format
 msgid ""
 "The login &laquo;%s&raquo; is already registered, please choose another one."
 msgstr ""
-"Der Login &laquo;%s&raquo; ist schon vergeben, bitte wähle einen anderen."
+"Der Login &laquo;%s&raquo; ist schon vergeben, bitte wÃ¤hle einen anderen."
 
 #: ..\..\..\htsrv\register.php:143
 msgid "No user account has been created!"
@@ -1249,7 +1249,7 @@ msgstr "Dein Profil & Abo wurde aktualisiert."
 #: ..\..\..\htsrv\trackback.php:121
 #: ..\..\..\inc\users\model\_user.funcs.php:503
 msgid "Supplied URL is invalid: "
-msgstr "Angegebene URL ist ungültig: "
+msgstr "Angegebene URL ist ungÃ¼ltig: "
 
 #: ..\..\..\htsrv\trackback.php:152
 msgid "Please do not send empty comment"
@@ -1329,19 +1329,19 @@ msgid ""
 "The skin [%s] set for blog [%s] does not exist. It must be properly set in "
 "the <a %s>blog properties</a> or properly overriden in a stub file."
 msgstr ""
-"Der Skin [%s] für Blog [%s] existiert nicht. Er muss in den <a "
-"%s>Blogeigenschaften</a> gesetzt oder in einer Stub-Datei überschrieben "
+"Der Skin [%s] fÃ¼r Blog [%s] existiert nicht. Er muss in den <a "
+"%s>Blogeigenschaften</a> gesetzt oder in einer Stub-Datei Ã¼berschrieben "
 "werden."
 
 #: ..\..\..\inc\_core\__core.init.php:150
 #: ..\..\..\skins\_toolbar.inc.php:109
 #: ..\..\..\skins\_toolbar.inc.php:156
 msgid "Dashboard"
-msgstr "Übersicht"
+msgstr "Ãœbersicht"
 
 #: ..\..\..\inc\_core\__core.init.php:156
 msgid "Posts / Comments"
-msgstr "Beiträge / Kommentare"
+msgstr "BeitrÃ¤ge / Kommentare"
 
 #: ..\..\..\inc\_core\__core.init.php:167
 #: ..\..\..\inc\_core\__core.init.php:320
@@ -1523,20 +1523,20 @@ msgstr ""
 #: ..\..\..\inc\_core\_misc.funcs.php:1603
 #: ..\..\..\inc\_core\_misc.funcs.php:1710
 msgid "Additional information about this error:"
-msgstr "Zusätzliche Informationen zu diesem Fehler:"
+msgstr "ZusÃ¤tzliche Informationen zu diesem Fehler:"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:1597
 #: ..\..\..\inc\_core\_misc.funcs.php:1704
 msgid "Go back to home page"
-msgstr "Gehe zurück zur Startseite"
+msgstr "Gehe zurÃ¼ck zur Startseite"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:1701
 msgid "Bad Request!"
-msgstr "Ungültige Anforderung!"
+msgstr "UngÃ¼ltige Anforderung!"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:1702
 msgid "The parameters of your request are invalid."
-msgstr "Die Parameter der Anforderung sind ungültig."
+msgstr "Die Parameter der Anforderung sind ungÃ¼ltig."
 
 #: ..\..\..\inc\_core\_misc.funcs.php:1703
 msgid ""
@@ -1560,7 +1560,7 @@ msgstr "DB-Host"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:2046
 msgid "DB tables prefix"
-msgstr "DB-Tabellenpräfix"
+msgstr "DB-TabellenprÃ¤fix"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:2047
 msgid "DB connection charset"
@@ -1575,7 +1575,7 @@ msgstr "Anleitung"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:2920
 msgid "Open relevant page in online manual"
-msgstr "Entsprechende Seite in der Onlinehilfe öffnen"
+msgstr "Entsprechende Seite in der Onlinehilfe Ã¶ffnen"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:3335
 msgid "Date issued (Default)"
@@ -1591,7 +1591,7 @@ msgstr "Erstellungsdatum"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:3340
 msgid "Date last modified"
-msgstr "Veränderungsdatum"
+msgstr "VerÃ¤nderungsdatum"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:3341
 #: ..\..\..\inc\collections\views\_coll_general.form.php:64
@@ -1607,11 +1607,11 @@ msgstr "URL-\"Dateiname\""
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:166
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:115
 msgid "Priority"
-msgstr "Priorität"
+msgstr "PrioritÃ¤t"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:3343
 msgid "Random order!"
-msgstr "Zufällige Anordnung!"
+msgstr "ZufÃ¤llige Anordnung!"
 
 #: ..\..\..\inc\_core\_param.funcs.php:110
 #, php-format
@@ -1622,25 +1622,25 @@ msgstr "Der Parameter &laquo;%s&raquo; ist erforderlich!"
 #: ..\..\..\inc\_core\_param.funcs.php:251
 #, php-format
 msgid "Illegal value received for parameter &laquo;%s&raquo;!"
-msgstr "Illegalen Wert für Parameter &laquo;%s&raquo; empfangen!"
+msgstr "Illegalen Wert fÃ¼r Parameter &laquo;%s&raquo; empfangen!"
 
 #: ..\..\..\inc\_core\_param.funcs.php:493
 #: ..\..\..\inc\users\model\_user.funcs.php:494
 msgid "The email address is invalid."
-msgstr "Die E-Mail-Adresse ist ungültig."
+msgstr "Die E-Mail-Adresse ist ungÃ¼ltig."
 
 #: ..\..\..\inc\_core\_param.funcs.php:516
 #, php-format
 msgid "Supplied URL is invalid. (%s)"
-msgstr "Angegebene URL ist ungültig. (%s)"
+msgstr "Angegebene URL ist ungÃ¼ltig. (%s)"
 
 #: ..\..\..\inc\_core\_param.funcs.php:788
 msgid "Please enter a valid time."
-msgstr "Bitte gib eine gültige Zeit an."
+msgstr "Bitte gib eine gÃ¼ltige Zeit an."
 
 #: ..\..\..\inc\_core\_param.funcs.php:974
 msgid "The phone number is invalid."
-msgstr "Die Telefonnummer ist ungültig."
+msgstr "Die Telefonnummer ist ungÃ¼ltig."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1005
 #: ..\..\..\inc\_core\_param.funcs.php:1010
@@ -1651,7 +1651,7 @@ msgstr "Bitte gib dein Passwort zweimal an."
 #: ..\..\..\inc\_core\_param.funcs.php:1017
 #: ..\..\..\inc\users\model\_user.funcs.php:524
 msgid "You typed two different passwords."
-msgstr "Du hast zwei verschiedene Passwörter angegeben."
+msgstr "Du hast zwei verschiedene PasswÃ¶rter angegeben."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1023
 #: ..\..\..\inc\users\model\_user.funcs.php:528
@@ -1662,26 +1662,26 @@ msgstr "Das Passwort muss mindestens %d Zeichen lang sein."
 #: ..\..\..\inc\_core\_param.funcs.php:1579
 #: ..\..\..\inc\_core\_param.funcs.php:1583
 msgid "Invalid XHTML."
-msgstr "Ungültiges XHTML."
+msgstr "UngÃ¼ltiges XHTML."
 
 #: ..\..\..\inc\_core\_param.funcs.php:1691
 #: ..\..\..\inc\_core\_param.funcs.php:1697
 msgid "Illegal content found (spam?)"
-msgstr "Ungültiger Inhalt gefunden (Spam?)"
+msgstr "UngÃ¼ltiger Inhalt gefunden (Spam?)"
 
 #: ..\..\..\inc\_core\_param.funcs.php:1692
 #, php-format
 msgid "Illegal content found: blacklisted word \"%s\""
-msgstr "Ungültiger Inhalt gefunden: gebanntes Wort \"%s\""
+msgstr "UngÃ¼ltiger Inhalt gefunden: gebanntes Wort \"%s\""
 
 #: ..\..\..\inc\_core\_param.funcs.php:1698
 #, php-format
 msgid "Illegal content found: blacklisted word &laquo;%s&raquo;"
-msgstr "Ungültiger Inhalt gefunden: gebanntes Wort &laquo;%s&raquo;"
+msgstr "UngÃ¼ltiger Inhalt gefunden: gebanntes Wort &laquo;%s&raquo;"
 
 #: ..\..\..\inc\_core\_param.funcs.php:1752
 msgid "Illegal CSS markup found: "
-msgstr "Ungültiges CSS gefunden: "
+msgstr "UngÃ¼ltiges CSS gefunden: "
 
 #: ..\..\..\inc\_core\_param.funcs.php:1763
 msgid "Illegal javascript markup found: "
@@ -1701,7 +1701,7 @@ msgid ""
 "(Note: To get rid of the above validation warnings, you can deactivate "
 "unwanted validation rules in your <a %s>Group settings</a>.)"
 msgstr ""
-"(Hinweis: Um diese Warnungen nicht mehr zu sehen, kannst du ungewünschte "
+"(Hinweis: Um diese Warnungen nicht mehr zu sehen, kannst du ungewÃ¼nschte "
 "Validierungsregeln in deinen <a %s>Gruppeneinstellungen</a> deaktivieren.)"
 
 #: ..\..\..\inc\_core\_template.funcs.php:234
@@ -1766,7 +1766,7 @@ msgstr "Benutzer"
 
 #: ..\..\..\inc\_core\_url.funcs.php:63
 msgid "Invalid URL $code$ format"
-msgstr "Ungültiges URL-$code$-Format"
+msgstr "UngÃ¼ltiges URL-$code$-Format"
 
 #: ..\..\..\inc\_core\_url.funcs.php:75
 #: ..\..\..\inc\_core\_url.funcs.php:100
@@ -1786,33 +1786,33 @@ msgstr "URI-Schema nicht erlaubt."
 #: ..\..\..\inc\_core\_url.funcs.php:83
 #, php-format
 msgid "Invalid email link: %s."
-msgstr "Ungültiger E-Mail-Link: %s."
+msgstr "UngÃ¼ltiger E-Mail-Link: %s."
 
 #: ..\..\..\inc\_core\_url.funcs.php:84
 msgid "Invalid email link."
-msgstr "Ungültiger E-Mail-Link."
+msgstr "UngÃ¼ltiger E-Mail-Link."
 
 #: ..\..\..\inc\_core\_url.funcs.php:89
 #, php-format
 msgid "Supplied email address (%s) is invalid."
-msgstr "Die angegebene E-Mail-Adresse (%s) ist ungültig."
+msgstr "Die angegebene E-Mail-Adresse (%s) ist ungÃ¼ltig."
 
 #: ..\..\..\inc\_core\_url.funcs.php:90
 msgid "Invalid email address."
-msgstr "Ungültige E-Mail-Adresse."
+msgstr "UngÃ¼ltige E-Mail-Adresse."
 
 #: ..\..\..\inc\_core\_url.funcs.php:106
 msgid "Invalid class ID format"
-msgstr "Ungültiges Format der Klassen-ID"
+msgstr "UngÃ¼ltiges Format der Klassen-ID"
 
 #: ..\..\..\inc\_core\_url.funcs.php:143
 #, php-format
 msgid "Invalid URL format (%s)."
-msgstr "Ungültiges URL-Format (%s)."
+msgstr "UngÃ¼ltiges URL-Format (%s)."
 
 #: ..\..\..\inc\_core\_url.funcs.php:144
 msgid "Invalid URL format."
-msgstr "Ungültiges URL-Format."
+msgstr "UngÃ¼ltiges URL-Format."
 
 #: ..\..\..\inc\_core\_url.funcs.php:161
 #, php-format
@@ -1850,22 +1850,22 @@ msgstr "URL nicht erlaubt"
 
 #: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:392
 msgid "The following relations prevent deletion:"
-msgstr "Die folgenden Zugehörigkeiten verhindern die Löschung:"
+msgstr "Die folgenden ZugehÃ¶rigkeiten verhindern die LÃ¶schung:"
 
 #: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:394
 msgid "Please delete related objects before you proceed."
-msgstr "Bitte lösche zunächst die zugehörigen Objekte."
+msgstr "Bitte lÃ¶sche zunÃ¤chst die zugehÃ¶rigen Objekte."
 
 #: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:423
 msgid "WARNING: Deleting this object will also delete:"
-msgstr "WARNUNG: Das Löschen dieses Objektes wird auch folgendes löschen:"
+msgstr "WARNUNG: Das LÃ¶schen dieses Objektes wird auch folgendes lÃ¶schen:"
 
 #: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:428
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:541
 #: ..\..\..\inc\collections\collections.ctrl.php:397
 #: ..\..\..\inc\plugins\plugins.ctrl.php:933
 msgid "THIS CANNOT BE UNDONE!"
-msgstr "DAS KANN NICHT RÜCKGÄNGIG GEMACHT WERDEN!"
+msgstr "DAS KANN NICHT RÃœCKGÃ„NGIG GEMACHT WERDEN!"
 
 #: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:436
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:555
@@ -1900,17 +1900,17 @@ msgstr "Erstellt am %s"
 #: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:637
 #, php-format
 msgid "Last mod on %s by %s"
-msgstr "Letzte Änderung am %s von %s"
+msgstr "Letzte Ã„nderung am %s von %s"
 
 #: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:642
 #, php-format
 msgid "Last mod by %s"
-msgstr "Letzte Änderung von %s"
+msgstr "Letzte Ã„nderung von %s"
 
 #: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:647
 #, php-format
 msgid "Last mod on %s"
-msgstr "Letzte Änderung am %s"
+msgstr "Letzte Ã„nderung am %s"
 
 # TRANS: the default value for option lists where "None" is allowed
 #. TRANS: the default value for option lists where "None" is allowed
@@ -1926,7 +1926,7 @@ msgstr "kein"
 #: ..\..\..\inc\generic\model\_genericorderedcache.class.php:67
 #: ..\..\..\inc\generic\model\_genericorderedcache.class.php:120
 msgid "Cannot edit entry!"
-msgstr "Kann Eintrag nicht ändern!"
+msgstr "Kann Eintrag nicht Ã¤ndern!"
 
 #: ..\..\..\inc\_core\model\dataobjects\_dataobjectlist2.class.php:248
 #: ..\..\..\inc\_core\model\dataobjects\_dataobjectlist2.class.php:301
@@ -1978,7 +1978,7 @@ msgstr "Filter"
 #: ..\..\..\inc\_core\ui\_uiwidget.class.php:828
 #: ..\..\..\inc\files\model\_filelist.class.php:659
 msgid "Change Order"
-msgstr "Ändere Sortierung"
+msgstr "Ã„ndere Sortierung"
 
 #: ..\..\..\inc\_core\ui\_uiwidget.class.php:801
 #: ..\..\..\skins_adm\_adminUI_general.class.php:1018
@@ -2021,8 +2021,8 @@ msgid ""
 "You have modified this form but you haven't submitted it yet.\\nYou are "
 "about to lose your edits.\\nAre you sure?"
 msgstr ""
-"Du hast dieses Formular verändert, aber noch nicht abgeschickt.\\nDu bist "
-"dabei, deine Änderungen zu verlieren.\\nBist du sicher?"
+"Du hast dieses Formular verÃ¤ndert, aber noch nicht abgeschickt.\\nDu bist "
+"dabei, deine Ã„nderungen zu verlieren.\\nBist du sicher?"
 
 #: ..\..\..\inc\_core\ui\forms\_form.class.php:1303
 #, php-format
@@ -2030,26 +2030,26 @@ msgid ""
 "You have modified the form \\\"%s\\\"\\nbut you haven't submitted it yet.\\"
 "nYou are about to lose your edits.\\nAre you sure?"
 msgstr ""
-"Du hast das Formular \\\"%s\\\" verändert,\\naber noch nicht abgeschickt.\\"
-"nDu bist dabei, deine Änderungen zu verlieren.\\nBist du sicher?"
+"Du hast das Formular \\\"%s\\\" verÃ¤ndert,\\naber noch nicht abgeschickt.\\"
+"nDu bist dabei, deine Ã„nderungen zu verlieren.\\nBist du sicher?"
 
 #: ..\..\..\inc\_core\ui\results\_results.class.php:1428
 #: ..\..\..\inc\widgets\views\_widget_list.view.php:151
 msgid "Move up!"
-msgstr "Aufwärts bewegen!"
+msgstr "AufwÃ¤rts bewegen!"
 
 #: ..\..\..\inc\_core\ui\results\_results.class.php:1433
 msgid "Move down! (reverse sort)"
-msgstr "Abwärts bewegen! (umgekehrte Sortierung)"
+msgstr "AbwÃ¤rts bewegen! (umgekehrte Sortierung)"
 
 #: ..\..\..\inc\_core\ui\results\_results.class.php:1448
 #: ..\..\..\inc\widgets\views\_widget_list.view.php:159
 msgid "Move down!"
-msgstr "Abwärts bewegen!"
+msgstr "AbwÃ¤rts bewegen!"
 
 #: ..\..\..\inc\_core\ui\results\_results.class.php:1453
 msgid "Move up! (reverse sort)"
-msgstr "Aufwärts bewegen! (umgekehrte Sortierung)"
+msgstr "AufwÃ¤rts bewegen! (umgekehrte Sortierung)"
 
 #: ..\..\..\inc\_core\ui\results\_results.class.php:1743
 #: ..\..\..\inc\items\model\_item.funcs.php:682
@@ -2111,11 +2111,11 @@ msgstr "Bitte gib einen Auswahlnamen an."
 
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:488
 msgid "Obsolete selection entries deleted."
-msgstr "Veraltete Auswahleinträge gelöscht."
+msgstr "Veraltete AuswahleintrÃ¤ge gelÃ¶scht."
 
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:503
 msgid "New selections entries inserted."
-msgstr "Neue Auswahleinträge eingefügt."
+msgstr "Neue AuswahleintrÃ¤ge eingefÃ¼gt."
 
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:515
 msgid "Selection copied."
@@ -2128,25 +2128,25 @@ msgstr "Auswahllinks kopiert."
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:537
 #, php-format
 msgid "Delete selection &laquo;%s&raquo;?"
-msgstr "Lösche Auswahl &laquo;%s&raquo;?"
+msgstr "LÃ¶sche Auswahl &laquo;%s&raquo;?"
 
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:539
 msgid "Cascading deletes!"
-msgstr "Kaskadierende Löschung!"
+msgstr "Kaskadierende LÃ¶schung!"
 
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:576
 msgid "Selection attachments deleted."
-msgstr "Auswahlanhänge gelöscht."
+msgstr "AuswahlanhÃ¤nge gelÃ¶scht."
 
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:580
 msgid "Selection deleted."
-msgstr "Auswahl gelöscht."
+msgstr "Auswahl gelÃ¶scht."
 
 #: ..\..\..\inc\_main.inc.php:477
 #: ..\..\..\inc\_main.inc.php:488
 msgid "The login window has expired. Please try again."
 msgstr ""
-"Das Gültigkeit des Login-Fensters ist abgelaufen. Bitte versuche es erneut."
+"Das GÃ¼ltigkeit des Login-Fensters ist abgelaufen. Bitte versuche es erneut."
 
 #: ..\..\..\inc\_main.inc.php:482
 msgid "Either you have not enabled cookies or this login window has expired."
@@ -2300,7 +2300,7 @@ msgstr "Februar"
 #: ..\..\..\inc\_vars.inc.php:236
 #: ..\..\..\skins_adm\_html_header.inc.php:254
 msgid "March"
-msgstr "März"
+msgstr "MÃ¤rz"
 
 #: ..\..\..\inc\_vars.inc.php:237
 #: ..\..\..\skins_adm\_html_header.inc.php:254
@@ -2364,7 +2364,7 @@ msgstr "Feb"
 #. TRANS: abbrev. for March
 #: ..\..\..\inc\_vars.inc.php:254
 msgid "Mar"
-msgstr "Mär"
+msgstr "MÃ¤r"
 
 # TRANS: abbrev. for April
 #. TRANS: abbrev. for April
@@ -2426,7 +2426,7 @@ msgstr "Dez"
 #: ..\..\..\inc\items\model\_item.funcs.php:739
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:95
 msgid "Published"
-msgstr "Veröffentlicht"
+msgstr "VerÃ¶ffentlicht"
 
 #: ..\..\..\inc\_vars.inc.php:277
 #: ..\..\..\inc\collections\views\_coll_features.form.php:92
@@ -2445,7 +2445,7 @@ msgstr "Umgeleitet"
 #: ..\..\..\inc\items\model\_item.funcs.php:742
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:98
 msgid "Protected"
-msgstr "Geschützt"
+msgstr "GeschÃ¼tzt"
 
 #: ..\..\..\inc\_vars.inc.php:280
 #: ..\..\..\inc\items\model\_item.funcs.php:745
@@ -2466,24 +2466,24 @@ msgid ""
 "The keyword &laquo;%s&raquo; is too short, it has to be a minimum of 5 "
 "characters!"
 msgstr ""
-"Das Schlüsselwort &laquo;%s&raquo; ist zu kurz, es muss mindestens 5 Zeichen "
+"Das SchlÃ¼sselwort &laquo;%s&raquo; ist zu kurz, es muss mindestens 5 Zeichen "
 "lang sein!"
 
 #: ..\..\..\inc\antispam\antispam_list.ctrl.php:83
 #, php-format
 msgid "Deleted %d logged hits matching &laquo;%s&raquo;."
-msgstr "Es wurden %d geloggte Hits, &laquo;%s&raquo; betreffend, gelöscht."
+msgstr "Es wurden %d geloggte Hits, &laquo;%s&raquo; betreffend, gelÃ¶scht."
 
 #: ..\..\..\inc\antispam\antispam_list.ctrl.php:93
 #, php-format
 msgid "Deleted %d comments matching &laquo;%s&raquo;."
-msgstr "Es wurden %d Kommentare, &laquo;%s&raquo; betreffend, gelöscht."
+msgstr "Es wurden %d Kommentare, &laquo;%s&raquo; betreffend, gelÃ¶scht."
 
 #: ..\..\..\inc\antispam\antispam_list.ctrl.php:100
 #, php-format
 msgid "The keyword &laquo;%s&raquo; has been blacklisted locally."
 msgstr ""
-"Das Schlüsselwort &laquo;%s&raquo; wurde auf die lokale schwarze Liste "
+"Das SchlÃ¼sselwort &laquo;%s&raquo; wurde auf die lokale schwarze Liste "
 "gesetzt."
 
 #: ..\..\..\inc\antispam\antispam_list.ctrl.php:123
@@ -2506,7 +2506,7 @@ msgstr "Standardeinstellungen wiederhergestellt."
 #: ..\..\..\inc\settings\features.ctrl.php:102
 #: ..\..\..\inc\settings\features.ctrl.php:193
 msgid "Settings have not changed."
-msgstr "Einstellungen wurden nicht verändert."
+msgstr "Einstellungen wurden nicht verÃ¤ndert."
 
 #: ..\..\..\inc\antispam\antispam_settings.ctrl.php:70
 #: ..\..\..\inc\antispam\antispam_settings.ctrl.php:73
@@ -2546,20 +2546,20 @@ msgstr "Fordere Missbrauchsliste von %s an."
 
 #: ..\..\..\inc\antispam\model\_antispam.funcs.php:247
 msgid "Incomplete reponse."
-msgstr "Unvollständige Antwort."
+msgstr "UnvollstÃ¤ndige Antwort."
 
 #: ..\..\..\inc\antispam\model\_antispam.funcs.php:255
 msgid "No new blacklisted strings are available."
-msgstr "Es sind keine neuen Einträge in der Schwarzen Liste verfügbar."
+msgstr "Es sind keine neuen EintrÃ¤ge in der Schwarzen Liste verfÃ¼gbar."
 
 #: ..\..\..\inc\antispam\model\_antispam.funcs.php:259
 msgid "Adding strings to local blacklist:"
-msgstr "Füge Zeichenketten zur lokalen Schwarzen Liste hinzu:"
+msgstr "FÃ¼ge Zeichenketten zur lokalen Schwarzen Liste hinzu:"
 
 #: ..\..\..\inc\antispam\model\_antispam.funcs.php:264
 #: ..\..\..\inc\antispam\model\_antispam.funcs.php:269
 msgid "Adding:"
-msgstr "Füge hinzu:"
+msgstr "FÃ¼ge hinzu:"
 
 #: ..\..\..\inc\antispam\model\_antispam.funcs.php:265
 msgid "OK."
@@ -2581,7 +2581,7 @@ msgstr "Fertig."
 
 #: ..\..\..\inc\antispam\model\_antispam.funcs.php:286
 msgid "Invalid reponse."
-msgstr "Ungültige Antwort."
+msgstr "UngÃ¼ltige Antwort."
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:32
 #: ..\..\..\inc\cron\views\_cronjob.form.php:32
@@ -2591,17 +2591,17 @@ msgstr "Abbrechen!"
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:34
 msgid "Confirm ban & delete"
-msgstr "Bestätige Verbot & Löschen"
+msgstr "BestÃ¤tige Verbot & LÃ¶schen"
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:53
 #, php-format
 msgid "No log-hits match the keyword [%s]."
-msgstr "Keine Log-Hits betreffen das Schlüsselwort [%s]."
+msgstr "Keine Log-Hits betreffen das SchlÃ¼sselwort [%s]."
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:61
 #, php-format
 msgid "Delete the following %s referer hits:"
-msgstr "Lösche die folgenden %s Referer-Hits:"
+msgstr "LÃ¶sche die folgenden %s Referer-Hits:"
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:67
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:122
@@ -2640,12 +2640,12 @@ msgstr "Ziel-URL"
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:108
 #, php-format
 msgid "No comments match the keyword [%s]."
-msgstr "Keine Kommentare betreffen das Schlüsselwort [%s]."
+msgstr "Keine Kommentare betreffen das SchlÃ¼sselwort [%s]."
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:116
 #, php-format
 msgid "Delete the following %s comments:"
-msgstr "Lösche die folgenden %s Kommentare:"
+msgstr "LÃ¶sche die folgenden %s Kommentare:"
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:123
 #: ..\..\..\inc\comments\model\_comment.class.php:1258
@@ -2686,22 +2686,22 @@ msgstr "Aktion"
 #: ..\..\..\inc\items\model\_item.class.php:2201
 #: ..\..\..\skins\photoblog\index.main.php:193
 msgid "Edit..."
-msgstr "Ändern..."
+msgstr "Ã„ndern..."
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:166
 #, php-format
 msgid "The keyword [%s] is already handled by the blacklist."
-msgstr "Das Schlüsselwort [%s] ist bereits in der Blacklist."
+msgstr "Das SchlÃ¼sselwort [%s] ist bereits in der Blacklist."
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:174
 #, php-format
 msgid "Blacklist the keyword [%s] locally."
-msgstr "Verbiete das Schlüsselwort [%s] lokal."
+msgstr "Verbiete das SchlÃ¼sselwort [%s] lokal."
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:185
 #, php-format
 msgid "Report the keyword [%s] as abuse to b2evolution.net."
-msgstr "Berichte Missbrauch des Schlüsselwortes [%s] an b2evolution.net."
+msgstr "Berichte Missbrauch des SchlÃ¼sselwortes [%s] an b2evolution.net."
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:187
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:60
@@ -2711,12 +2711,12 @@ msgstr "Servicebedingungen"
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:194
 msgid "Perform selected operations"
-msgstr "Ausgewählte Operationen ausführen"
+msgstr "AusgewÃ¤hlte Operationen ausfÃ¼hren"
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:201
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:35
 msgid "Add a banned keyword"
-msgstr "Füge ein verbotenes Schlüsselwort hinzu"
+msgstr "FÃ¼ge ein verbotenes SchlÃ¼sselwort hinzu"
 
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:204
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:38
@@ -2726,7 +2726,7 @@ msgstr ""
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:209
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:43
 msgid "Check & ban..."
-msgstr "Überprüfen & Verbieten..."
+msgstr "ÃœberprÃ¼fen & Verbieten..."
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:26
 msgid "Antispam settings"
@@ -2743,16 +2743,16 @@ msgid ""
 "Any URL containing one of the following keywords will be banned from posts, "
 "comments and logs."
 msgstr ""
-"Jede URL, die eines der folgenden Schlüsselwörter enthält, wird aus "
-"Beiträgen, Kommentaren und Logs entfernt."
+"Jede URL, die eines der folgenden SchlÃ¼sselwÃ¶rter enthÃ¤lt, wird aus "
+"BeitrÃ¤gen, Kommentaren und Logs entfernt."
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:50
 msgid ""
 "If a keyword restricts legitimate domains, click on the green tick to stop "
 "banning with this keyword."
 msgstr ""
-"Falls ein Schlüsselwort legitime Domains einschränkt, klicke auf den grünen "
-"Haken, um das Verbot des Schlüsselwortes aufzuheben."
+"Falls ein SchlÃ¼sselwort legitime Domains einschrÃ¤nkt, klicke auf den grÃ¼nen "
+"Haken, um das Verbot des SchlÃ¼sselwortes aufzuheben."
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:59
 msgid "Request abuse update from centralized blacklist!"
@@ -2760,7 +2760,7 @@ msgstr "Fordere Missbrauchs-Update von zentraler Schwarzen Liste an!"
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:89
 msgid "Banned keywords blacklist"
-msgstr "Liste verbotener Schlüsselwörter"
+msgstr "Liste verbotener SchlÃ¼sselwÃ¶rter"
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:99
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:154
@@ -2769,7 +2769,7 @@ msgstr "Liste verbotener Schlüsselwörter"
 #: ..\..\..\inc\sessions\_sessions.init.php:132
 #: ..\..\..\inc\users\views\_user_list.view.php:101
 msgid "Keywords"
-msgstr "Schlüsselwörter"
+msgstr "SchlÃ¼sselwÃ¶rter"
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:99
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:141
@@ -2780,11 +2780,11 @@ msgstr "Durch Leerzeichen trennen"
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:105
 msgid "All keywords"
-msgstr "Alle Schlüsselwörter"
+msgstr "Alle SchlÃ¼sselwÃ¶rter"
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:115
 msgid "Keyword"
-msgstr "Schlüsselwort"
+msgstr "SchlÃ¼sselwort"
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:133
 msgid "Local"
@@ -2817,11 +2817,11 @@ msgstr "Berichten"
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:170
 msgid "Check hit-logs and comments for this keyword!"
-msgstr "Überprüfe Hit-Logs und Kommentare für dieses Schlüsselwort!"
+msgstr "ÃœberprÃ¼fe Hit-Logs und Kommentare fÃ¼r dieses SchlÃ¼sselwort!"
 
 #: ..\..\..\inc\antispam\views\_antispam_list.view.php:171
 msgid "Re-check"
-msgstr "nachprüfen"
+msgstr "nachprÃ¼fen"
 
 # TRANS: file actions; edit, rename, copy, ..
 #. TRANS: file actions; edit, rename, copy, ..
@@ -2859,24 +2859,24 @@ msgid ""
 "(-100 to 100). Automatically publish feedbacks with a spam karma below this "
 "value."
 msgstr ""
-"(-100 bis 100). Veröffentliche Feedback mit Spam Karma unterhalb dieses "
+"(-100 bis 100). VerÃ¶ffentliche Feedback mit Spam Karma unterhalb dieses "
 "Wertes automatisch."
 
 #: ..\..\..\inc\antispam\views\_antispam_settings.form.php:54
 msgid "Publishing threshold"
-msgstr "Veröffentlichungsschwellwert"
+msgstr "VerÃ¶ffentlichungsschwellwert"
 
 #: ..\..\..\inc\antispam\views\_antispam_settings.form.php:55
 msgid ""
 "(-100 to 100). Automatically delete feedbacks with a spam karma over this "
 "value."
 msgstr ""
-"(-100 bis 100). Lösche Feedbacks mit einem Spam Karma überhalb dieses Wertes "
+"(-100 bis 100). LÃ¶sche Feedbacks mit einem Spam Karma Ã¼berhalb dieses Wertes "
 "automatisch."
 
 #: ..\..\..\inc\antispam\views\_antispam_settings.form.php:55
 msgid "Deletion threshold"
-msgstr "Löschungsschwellwert"
+msgstr "LÃ¶schungsschwellwert"
 
 # TRANS: %s gets replaced by the translation for this setting
 #. TRANS: %s gets replaced by the translation for this setting
@@ -2892,7 +2892,7 @@ msgstr ""
 #: ..\..\..\inc\antispam\views\_antispam_settings.form.php:57
 #: ..\..\..\inc\collections\views\_coll_features.form.php:95
 msgid "New feedback status"
-msgstr "Status für neuen Feedback"
+msgstr "Status fÃ¼r neuen Feedback"
 
 #: ..\..\..\inc\antispam\views\_antispam_settings.form.php:63
 msgid "Block spam referers"
@@ -2917,7 +2917,7 @@ msgstr ""
 
 #: ..\..\..\inc\antispam\views\_antispam_settings.form.php:70
 msgid "Spam detection relevance weight"
-msgstr "Relevanz-Gewicht für Spamerkennung"
+msgstr "Relevanz-Gewicht fÃ¼r Spamerkennung"
 
 #: ..\..\..\inc\antispam\views\_antispam_settings.form.php:72
 msgid "This defines the weight of the plugin, in relation to the others."
@@ -2989,7 +2989,7 @@ msgstr "Aktualisieren"
 #: ..\..\..\skins\_profile.disp.php:110
 #: ..\..\..\skins\_subs.disp.php:112
 msgid "Reset"
-msgstr "Zurücksetzen"
+msgstr "ZurÃ¼cksetzen"
 
 #: ..\..\..\inc\antispam\views\_antispam_settings.form.php:93
 #: ..\..\..\inc\files\views\_file_settings.form.php:238
@@ -3017,7 +3017,7 @@ msgstr ""
 
 #: ..\..\..\inc\chapters\chapters.ctrl.php:48
 msgid "Cannot delete category"
-msgstr "Kann Kategorie nicht löschen"
+msgstr "Kann Kategorie nicht lÃ¶schen"
 
 #: ..\..\..\inc\chapters\chapters.ctrl.php:61
 #: ..\..\..\inc\collections\coll_settings.ctrl.php:196
@@ -3084,21 +3084,21 @@ msgstr ""
 #: ..\..\..\inc\generic\inc\_generic_recursive_listeditor.php:190
 #, php-format
 msgid "Element &laquo;%s&raquo; deleted."
-msgstr "Element &laquo;%s&raquo; gelöscht."
+msgstr "Element &laquo;%s&raquo; gelÃ¶scht."
 
 #: ..\..\..\inc\chapters\chapters.ctrl.php:311
 #: ..\..\..\inc\generic\inc\_generic_listeditor.php:223
 #: ..\..\..\inc\generic\inc\_generic_recursive_listeditor.php:201
 #, php-format
 msgid "Cannot delete element &laquo;%s&raquo;"
-msgstr "Kann Element &laquo;%s&raquo; nicht löschen"
+msgstr "Kann Element &laquo;%s&raquo; nicht lÃ¶schen"
 
 #: ..\..\..\inc\chapters\chapters.ctrl.php:371
 #: ..\..\..\inc\generic\inc\_generic_listeditor.php:268
 #: ..\..\..\inc\generic\inc\_generic_recursive_listeditor.php:239
 #, php-format
 msgid "Delete element &laquo;%s&raquo;?"
-msgstr "Lösche Element &laquo;%s&raquo;?"
+msgstr "LÃ¶sche Element &laquo;%s&raquo;?"
 
 #: ..\..\..\inc\chapters\views\_chapter.form.php:46
 #: ..\..\..\inc\comments\views\_comment.form.php:38
@@ -3151,7 +3151,7 @@ msgstr "Blog"
 
 #: ..\..\..\inc\chapters\views\_chapter.form.php:65
 msgid "Parent category"
-msgstr "Überkategorie"
+msgstr "Ãœberkategorie"
 
 # TRANS: file name
 #. TRANS: file name
@@ -3229,11 +3229,11 @@ msgstr "Neu..."
 #: ..\..\..\inc\chapters\views\_chapter_list.view.php:120
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:79
 msgid "Delete..."
-msgstr "Löschen..."
+msgstr "LÃ¶schen..."
 
 #: ..\..\..\inc\chapters\views\_chapter_list.view.php:176
 msgid "Categories for blog:"
-msgstr "Kategorien für Blog:"
+msgstr "Kategorien fÃ¼r Blog:"
 
 #: ..\..\..\inc\chapters\views\_chapter_list.view.php:178
 msgid "Create a new category..."
@@ -3303,7 +3303,7 @@ msgstr ""
 
 #: ..\..\..\inc\collections\coll_settings.ctrl.php:63
 msgid "Sorry, you have no permission to edit blog properties."
-msgstr "Sorry, du hast keine Rechte, um Blogeigenschaften zu ändern."
+msgstr "Sorry, du hast keine Rechte, um Blogeigenschaften zu Ã¤ndern."
 
 #: ..\..\..\inc\collections\coll_settings.ctrl.php:111
 #: ..\..\..\inc\collections\coll_settings.ctrl.php:119
@@ -3314,7 +3314,7 @@ msgstr "Blogeinstellungen wurden aktualisiert"
 
 #: ..\..\..\inc\collections\coll_settings.ctrl.php:135
 msgid "The blog skin has been changed."
-msgstr "Das Blogskin wurde geändert."
+msgstr "Das Blogskin wurde geÃ¤ndert."
 
 #: ..\..\..\inc\collections\coll_settings.ctrl.php:154
 msgid "Caching has been enabled for this blog."
@@ -3374,20 +3374,20 @@ msgstr ""
 #: ..\..\..\inc\collections\collections.ctrl.php:241
 #, php-format
 msgid "Blog &laquo;%s&raquo; deleted."
-msgstr "Blog &laquo;%s&raquo; gelöscht."
+msgstr "Blog &laquo;%s&raquo; gelÃ¶scht."
 
 #: ..\..\..\inc\collections\collections.ctrl.php:263
 #, php-format
 msgid "Generating static page for blog [%s]"
-msgstr "Generiere statische Seite für Blog [%s]"
+msgstr "Generiere statische Seite fÃ¼r Blog [%s]"
 
 #: ..\..\..\inc\collections\collections.ctrl.php:271
 msgid "You haven't defined a source file for this blog!"
-msgstr "Du hast keine Quelldatei für dieses Blog festgelegt!"
+msgstr "Du hast keine Quelldatei fÃ¼r dieses Blog festgelegt!"
 
 #: ..\..\..\inc\collections\collections.ctrl.php:278
 msgid "You haven't defined a static file for this blog!"
-msgstr "Du hast keine statische Datei für dieses Blog angegeben!"
+msgstr "Du hast keine statische Datei fÃ¼r dieses Blog angegeben!"
 
 #: ..\..\..\inc\collections\collections.ctrl.php:313
 msgid "File cannot be written!"
@@ -3399,8 +3399,8 @@ msgid ""
 "You should check the file permissions for [%s]. See <a %s>online manual on "
 "file permissions</a>."
 msgstr ""
-"Du solltest die Dateirechte von [%s] überprüfen. Siehe auch <a "
-"%s>Onlineanleitung über Dateirechte</a>."
+"Du solltest die Dateirechte von [%s] Ã¼berprÃ¼fen. Siehe auch <a "
+"%s>Onlineanleitung Ã¼ber Dateirechte</a>."
 
 #: ..\..\..\inc\collections\collections.ctrl.php:320
 #, php-format
@@ -3410,25 +3410,25 @@ msgstr "Die statische Datei &laquo;%s&raquo; wurde erstellt."
 #: ..\..\..\inc\collections\collections.ctrl.php:393
 #, php-format
 msgid "Delete blog [%s]?"
-msgstr "Lösche Blog [%s]?"
+msgstr "LÃ¶sche Blog [%s]?"
 
 #: ..\..\..\inc\collections\collections.ctrl.php:395
 msgid ""
 "Deleting this blog will also delete all its categories, posts and comments!"
 msgstr ""
-"Das Löschen des Blogs wird auch alle seine Kategorien, Einträge und "
-"Kommentare löschen!"
+"Das LÃ¶schen des Blogs wird auch alle seine Kategorien, EintrÃ¤ge und "
+"Kommentare lÃ¶schen!"
 
 #: ..\..\..\inc\collections\collections.ctrl.php:416
 #, php-format
 msgid "Also try to delete static file [<strong><a %s>%s</a></strong>]"
 msgstr ""
-"Versuche auch statische Datei [<strong><a %s>%s</a></strong>] zu löschen"
+"Versuche auch statische Datei [<strong><a %s>%s</a></strong>] zu lÃ¶schen"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:148
 #, php-format
 msgid "%d related categories"
-msgstr "%d zugehörige Kategorien"
+msgstr "%d zugehÃ¶rige Kategorien"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:152
 #, php-format
@@ -3495,7 +3495,7 @@ msgstr "Standardblog"
 #: ..\..\..\inc\collections\model\_blog.class.php:295
 #: ..\..\..\inc\collections\model\_blog.class.php:320
 msgid "Invalid category prefix."
-msgstr "Ungültiges Kategorienprefix."
+msgstr "UngÃ¼ltiges Kategorienprefix."
 
 #: ..\..\..\inc\collections\model\_blog.class.php:348
 #, php-format
@@ -3547,13 +3547,13 @@ msgstr "Du musst einen URL Blog-Namen angeben!"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:517
 msgid "The url name is invalid."
-msgstr "Der URL-Name ist ungültig."
+msgstr "Der URL-Name ist ungÃ¼ltig."
 
 #: ..\..\..\inc\collections\model\_blog.class.php:526
 msgid ""
 "This URL name is already in use by another blog. Please choose another name."
 msgstr ""
-"Dieser URL-Name wird schon von einem anderen Blog benutzt. Bitte wähle einen "
+"Dieser URL-Name wird schon von einem anderen Blog benutzt. Bitte wÃ¤hle einen "
 "anderen Namen."
 
 #: ..\..\..\inc\collections\model\_blog.class.php:541
@@ -3593,7 +3593,7 @@ msgstr "Pfad des Medienverzeichnis"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:596
 msgid "You must provide the full path of the media directory."
-msgstr "Du musst den vollständigen Pfad des Medienverzeichnisses angeben."
+msgstr "Du musst den vollstÃ¤ndigen Pfad des Medienverzeichnisses angeben."
 
 #: ..\..\..\inc\collections\model\_blog.class.php:617
 msgid "You must provide the media subdirectory."
@@ -3602,7 +3602,7 @@ msgstr "Du musst das Medienunterverzeichnis angeben."
 #: ..\..\..\inc\collections\model\_blog.class.php:624
 #, php-format
 msgid "Invalid subdirectory &laquo;%s&raquo;."
-msgstr "Ungültiges Unterverzeichnis &laquo;%s&raquo;."
+msgstr "UngÃ¼ltiges Unterverzeichnis &laquo;%s&raquo;."
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1302
 #, php-format
@@ -3611,7 +3611,7 @@ msgid ""
 "the parent directory is not writable or does not exist."
 msgstr ""
 "Das Blog-Medienverzeichnis &laquo;%s&raquo; konnte nicht erstellt werden, "
-"weil das übergeordnete Verzeichnis nicht beschreibbar ist oder nicht "
+"weil das Ã¼bergeordnete Verzeichnis nicht beschreibbar ist oder nicht "
 "existiert."
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1311
@@ -3630,36 +3630,36 @@ msgstr ""
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1729
 msgid "Deleted post-categories"
-msgstr "Eintrags-Kategorien gelöscht"
+msgstr "Eintrags-Kategorien gelÃ¶scht"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1736
 msgid "Deleted comments on blog's posts"
-msgstr "Kommentare zu Blogeinträgen gelöscht"
+msgstr "Kommentare zu BlogeintrÃ¤gen gelÃ¶scht"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1744
 msgid "Deleted blog's posts"
-msgstr "Blogeinträge gelöscht"
+msgstr "BlogeintrÃ¤ge gelÃ¶scht"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1753
 msgid "Deleted blog's categories"
-msgstr "Blogkategorien gelöscht"
+msgstr "Blogkategorien gelÃ¶scht"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1766
 #, php-format
 msgid ""
 "ERROR! Could not delete! You will have to delete the file [%s] by hand."
 msgstr ""
-"FEHLER! Löschen fehlgeschlagen! Du wirst die Datei [%s] von Hand löschen "
-"müssen."
+"FEHLER! LÃ¶schen fehlgeschlagen! Du wirst die Datei [%s] von Hand lÃ¶schen "
+"mÃ¼ssen."
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1770
 #, php-format
 msgid "Could not delete static file [%s]"
-msgstr "Konnte statische Datei nicht löschen [%s]"
+msgstr "Konnte statische Datei nicht lÃ¶schen [%s]"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:1775
 msgid "Deleted blog's static file"
-msgstr "Statische Datei des Blogs gelöscht"
+msgstr "Statische Datei des Blogs gelÃ¶scht"
 
 #: ..\..\..\inc\collections\model\_blog.funcs.php:419
 msgid "The requested blog does not exist (any more?)"
@@ -3836,7 +3836,7 @@ msgstr ""
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:154
 msgid "This is is used in meta tag keywords. NO HTML!"
 msgstr ""
-"Dies wird für Meta-Tag Schlüsselwörter (im Kopf der HTML-Datei) verwendet. "
+"Dies wird fÃ¼r Meta-Tag SchlÃ¼sselwÃ¶rter (im Kopf der HTML-Datei) verwendet. "
 "KEIN HTML!"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:155
@@ -3947,7 +3947,7 @@ msgstr "Feedback Optionen"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:72
 msgid "Allow on all posts"
-msgstr "Erlaubt bei allen Einträgen"
+msgstr "Erlaubt bei allen EintrÃ¤gen"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:72
 msgid "Always allow comments on every post"
@@ -3959,7 +3959,7 @@ msgstr "Kann beim Erstellen deaktiviert werden"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:74
 msgid "Comments can be disabled on each post separatly"
-msgstr "Kommentare können bei jedem Beitrag deaktiviert werden"
+msgstr "Kommentare kÃ¶nnen bei jedem Beitrag deaktiviert werden"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:76
 msgid "Never allow any comments in this blog"
@@ -3994,7 +3994,7 @@ msgid ""
 "(unless overriden by plugins)."
 msgstr ""
 "Dieser Status wird allen neuen Kommentaren/Trackbacks von Nicht-Moderatoren "
-"zugewiesen (solange er nicht von Plugins überschrieben wird)"
+"zugewiesen (solange er nicht von Plugins Ã¼berschrieben wird)"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:113
 msgid "RSS/Atom feeds"
@@ -4035,7 +4035,7 @@ msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:121
 msgid "Posts in feeds"
-msgstr "Einträge in Feeds"
+msgstr "EintrÃ¤ge in Feeds"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:125
 msgid "Multiple authors"
@@ -4115,19 +4115,19 @@ msgstr "E-Mail Abos"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:162
 msgid "List of public blogs"
-msgstr "Liste der öffentlichen Blogs"
+msgstr "Liste der Ã¶ffentlichen Blogs"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:163
 msgid ""
 "Check this if you want this blog to be advertised in the list of all public "
 "blogs on this system."
 msgstr ""
-"Wähle dies aus, um das Blog in der Liste aller öffentlichen Blogs auf diesem "
+"WÃ¤hle dies aus, um das Blog in der Liste aller Ã¶ffentlichen Blogs auf diesem "
 "System anzuzeigen."
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:163
 msgid "Include in public blog list"
-msgstr "In öffentliche Blogliste einbeziehen"
+msgstr "In Ã¶ffentliche Blogliste einbeziehen"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:169
 msgid "Skin and style"
@@ -4135,7 +4135,7 @@ msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:174
 msgid "Allow customized blog CSS file"
-msgstr "Erlaube angepasste CSS Datei für Blogs"
+msgstr "Erlaube angepasste CSS Datei fÃ¼r Blogs"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:174
 msgid ""
@@ -4145,7 +4145,7 @@ msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:175
 msgid "Allow user customized CSS file for this blog"
-msgstr "Erlaube benutzerangepasste CSS Datei für dieses Blog"
+msgstr "Erlaube benutzerangepasste CSS Datei fÃ¼r dieses Blog"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:175
 msgid ""
@@ -4201,7 +4201,7 @@ msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:80
 msgid "Determines the language of the navigation links on the blog."
-msgstr "Legt die Sprache der Navigations-Links fürs Blog fest."
+msgstr "Legt die Sprache der Navigations-Links fÃ¼rs Blog fest."
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:80
 msgid "Main Locale"
@@ -4245,7 +4245,7 @@ msgstr "Richtung"
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:92
 msgid "posts"
-msgstr "Einträge"
+msgstr "EintrÃ¤ge"
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:93
 msgid "Display unit"
@@ -4261,7 +4261,7 @@ msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:94
 msgid "Posts/Days per page"
-msgstr "Einträge/Tage pro Seite"
+msgstr "EintrÃ¤ge/Tage pro Seite"
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:96
 msgid "monthly"
@@ -4269,15 +4269,15 @@ msgstr "monatlich"
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:97
 msgid "weekly"
-msgstr "wöchentlich"
+msgstr "wÃ¶chentlich"
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:98
 msgid "daily"
-msgstr "täglich"
+msgstr "tÃ¤glich"
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:99
 msgid "post by post"
-msgstr "Eintrag für Eintrag"
+msgstr "Eintrag fÃ¼r Eintrag"
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:100
 msgid "Archive grouping"
@@ -4352,7 +4352,7 @@ msgstr "Ist<br />Mitglied"
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:247
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:255
 msgid "Permission to read protected posts"
-msgstr "Erlaubnis, geschützte Einträge zu lesen"
+msgstr "Erlaubnis, geschÃ¼tzte EintrÃ¤ge zu lesen"
 
 # TRANS: SHORT table header on TWO lines
 #. TRANS: SHORT table header on TWO lines
@@ -4369,7 +4369,7 @@ msgstr "Erlaubnis, geschützte Einträge zu lesen"
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:280
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:288
 msgid "Can post/edit with following statuses:"
-msgstr "Kann folgende Einträge machen/ändern:"
+msgstr "Kann folgende EintrÃ¤ge machen/Ã¤ndern:"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:247
@@ -4386,7 +4386,7 @@ msgstr ""
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:256
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:262
 msgid "Permission to post into this blog with protected status"
-msgstr "Erlaubnis, um geschützte Einträge in diesem Blog zu erstellen"
+msgstr "Erlaubnis, um geschÃ¼tzte EintrÃ¤ge in diesem Blog zu erstellen"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:261
@@ -4397,7 +4397,7 @@ msgstr ""
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:263
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:269
 msgid "Permission to post into this blog with private status"
-msgstr "Erlaubnis, um private Einträge in diesem Blog zu erstellen"
+msgstr "Erlaubnis, um private EintrÃ¤ge in diesem Blog zu erstellen"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:268
@@ -4408,7 +4408,7 @@ msgstr ""
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:270
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:276
 msgid "Permission to post into this blog with draft status"
-msgstr "Erlaubnis, um Entwürfe in diesem Blog zu erstellen"
+msgstr "Erlaubnis, um EntwÃ¼rfe in diesem Blog zu erstellen"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:275
@@ -4419,7 +4419,7 @@ msgstr ""
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:277
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:283
 msgid "Permission to post into this blog with deprecated status"
-msgstr "Erlaubnis, um missbilligte Einträge in diesem Blog zu erstellen"
+msgstr "Erlaubnis, um missbilligte EintrÃ¤ge in diesem Blog zu erstellen"
 
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:283
@@ -4443,24 +4443,24 @@ msgstr ""
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:318
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:323
 msgid "Delete<br />posts"
-msgstr "Lösche<br />Einträge"
+msgstr "LÃ¶sche<br />EintrÃ¤ge"
 
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:322
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:327
 msgid "Permission to delete posts in this blog"
-msgstr "Erlaubnis, um Einträge in diesem Blog zu löschen"
+msgstr "Erlaubnis, um EintrÃ¤ge in diesem Blog zu lÃ¶schen"
 
 # TRANS: SHORT table header on TWO lines
 #. TRANS: SHORT table header on TWO lines
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:327
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:332
 msgid "Edit<br />comts"
-msgstr "Ändere<br />Komm"
+msgstr "Ã„ndere<br />Komm"
 
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:331
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:336
 msgid "Permission to edit comments in this blog"
-msgstr "Erlaubnis, um Kommentare in diesem Blog zu ändern"
+msgstr "Erlaubnis, um Kommentare in diesem Blog zu Ã¤ndern"
 
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:336
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:346
@@ -4479,7 +4479,7 @@ msgstr "Kats"
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:341
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:346
 msgid "Permission to edit categories for this blog"
-msgstr "Erlaubnis zum Ändern der Kategorien für dieses Blog"
+msgstr "Erlaubnis zum Ã„ndern der Kategorien fÃ¼r dieses Blog"
 
 # TRANS: Short for blog features
 #. TRANS: Short for blog features
@@ -4491,7 +4491,7 @@ msgstr "Feat."
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:351
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:356
 msgid "Permission to edit blog features"
-msgstr "Erlaubnis, um Blog-Features zu ändern"
+msgstr "Erlaubnis, um Blog-Features zu Ã¤ndern"
 
 # TRANS: Short for advanced
 #. TRANS: Short for advanced
@@ -4541,7 +4541,7 @@ msgstr "Schreiben"
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:390
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:395
 msgid "Permission to change the blog's media folder content"
-msgstr "Erlaubnis, um den Inhalt der Medienbibliothek zu verändern"
+msgstr "Erlaubnis, um den Inhalt der Medienbibliothek zu verÃ¤ndern"
 
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:403
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:408
@@ -4617,7 +4617,7 @@ msgstr ""
 #: ..\..\..\inc\collections\views\_coll_list.view.php:53
 msgid "Sorry, you have no permission to edit/view any blog's properties."
 msgstr ""
-"Sorry, du hast keine Rechte, um Blogeigenschaften zu ändern oder anzugucken."
+"Sorry, du hast keine Rechte, um Blogeigenschaften zu Ã¤ndern oder anzugucken."
 
 #: ..\..\..\inc\collections\views\_coll_list.view.php:57
 msgid "No blog has been created yet!"
@@ -4675,7 +4675,7 @@ msgstr "Editiere Kategorien..."
 
 #: ..\..\..\inc\collections\views\_coll_list.view.php:195
 msgid "Delete this blog..."
-msgstr "Lösche dieses Blog..."
+msgstr "LÃ¶sche dieses Blog..."
 
 #: ..\..\..\inc\collections\views\_coll_sel_type.view.php:20
 msgid "What kind of blog would you like to create?"
@@ -5079,7 +5079,7 @@ msgstr "Aktueller Standard:"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:159
 msgid "Explicit param on index.php"
-msgstr "Ausdrücklicher Parameter auf index.php"
+msgstr "AusdrÃ¼cklicher Parameter auf index.php"
 
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:164
 msgid "Extra path on index.php"
@@ -5147,7 +5147,7 @@ msgstr "Kommentar wurde aktualisiert."
 
 #: ..\..\..\inc\comments\_comments.ctrl.php:157
 msgid "Comment has been published."
-msgstr "Kommentar wurde veröffentlicht."
+msgstr "Kommentar wurde verÃ¶ffentlicht."
 
 #: ..\..\..\inc\comments\_comments.ctrl.php:169
 msgid "Comment has been deprecated."
@@ -5155,7 +5155,7 @@ msgstr ""
 
 #: ..\..\..\inc\comments\_comments.ctrl.php:182
 msgid "Comment has been deleted."
-msgstr "Kommentar wurde gelöscht."
+msgstr "Kommentar wurde gelÃ¶scht."
 
 #: ..\..\..\inc\comments\_trackback.funcs.php:46
 msgid "Excerpt sent in trackbacks:"
@@ -5181,7 +5181,7 @@ msgstr "Unbekannter Fehler"
 msgid ""
 "No valid trackback response. Maybe the given url is not a Trackback url."
 msgstr ""
-"Keine gültige Trackbackantwort. Vielleicht ist der angegebene URL kein "
+"Keine gÃ¼ltige Trackbackantwort. Vielleicht ist der angegebene URL kein "
 "Trackback URL."
 
 #: ..\..\..\inc\comments\_trackback.funcs.php:191
@@ -5222,11 +5222,11 @@ msgstr "Diesen Kommentar editieren"
 #: ..\..\..\inc\items\model\_item.class.php:2106
 #: ..\..\..\inc\items\model\_item.class.php:2110
 msgid "Delete!"
-msgstr "Löschen!"
+msgstr "LÃ¶schen!"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:638
 msgid "Delete this comment"
-msgstr "Lösche diesen Kommentar"
+msgstr "LÃ¶sche diesen Kommentar"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:651
 #: ..\..\..\inc\comments\model\_comment.class.php:659
@@ -5244,11 +5244,11 @@ msgstr "Missbillige diesen Kommentar!"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:756
 msgid "Publish!"
-msgstr "Veröffentlichen!"
+msgstr "VerÃ¶ffentlichen!"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:757
 msgid "Publish this comment!"
-msgstr "Veröffentliche diesen Kommentar!"
+msgstr "VerÃ¶ffentliche diesen Kommentar!"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:831
 msgid "Send email to comment author"
@@ -5324,7 +5324,7 @@ msgstr ""
 #: ..\..\..\inc\comments\model\_comment.class.php:1281
 #: ..\..\..\inc\items\model\_item.class.php:3419
 msgid "Edit/Delete"
-msgstr "Ändern/Löschen"
+msgstr "Ã„ndern/LÃ¶schen"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:1282
 #: ..\..\..\inc\items\model\_item.class.php:3421
@@ -5411,15 +5411,15 @@ msgstr "Sichtbarkeit"
 
 #: ..\..\..\inc\comments\views\_comment.form.php:214
 msgid "Published (Public)"
-msgstr "Veröffentlicht (öffentlich)"
+msgstr "VerÃ¶ffentlicht (Ã¶ffentlich)"
 
 #: ..\..\..\inc\comments\views\_comment.form.php:215
 msgid "Draft (Not published!)"
-msgstr "Entwurf (nicht veröffentlicht!)"
+msgstr "Entwurf (nicht verÃ¶ffentlicht!)"
 
 #: ..\..\..\inc\comments\views\_comment.form.php:216
 msgid "Deprecated (Not published!)"
-msgstr "Missbilligt (nicht veröffentlicht!)"
+msgstr "Missbilligt (nicht verÃ¶ffentlicht!)"
 
 #: ..\..\..\inc\comments\views\_comment.form.php:221
 #: ..\..\..\inc\widgets\widgets\_links.widget.php:82
@@ -5491,11 +5491,11 @@ msgstr ""
 
 #: ..\..\..\inc\cron\cronjobs.ctrl.php:136
 msgid "Invalid job type"
-msgstr "Ungültiger Jobtyp"
+msgstr "UngÃ¼ltiger Jobtyp"
 
 #: ..\..\..\inc\cron\cronjobs.ctrl.php:140
 msgid "Please enter a valid date."
-msgstr "Bitte gib ein gültiges Datum an."
+msgstr "Bitte gib ein gÃ¼ltiges Datum an."
 
 #: ..\..\..\inc\cron\cronjobs.ctrl.php:170
 msgid "New job has been scheduled."
@@ -5504,12 +5504,12 @@ msgstr "Ein neuer Job wurde eingeplant."
 #: ..\..\..\inc\cron\cronjobs.ctrl.php:196
 #, php-format
 msgid "Job #%d is currently running. It cannot be deleted."
-msgstr "Job #%d läuft derzeit. Er kann nicht gelöscht werden."
+msgstr "Job #%d lÃ¤uft derzeit. Er kann nicht gelÃ¶scht werden."
 
 #: ..\..\..\inc\cron\cronjobs.ctrl.php:210
 #, php-format
 msgid "Scheduled job #%d deleted."
-msgstr "Geplanter Job #%d gelöscht."
+msgstr "Geplanter Job #%d gelÃ¶scht."
 
 #: ..\..\..\inc\cron\cronjobs.ctrl.php:227
 #, php-format
@@ -5594,7 +5594,7 @@ msgstr "Geplant um"
 
 #: ..\..\..\inc\cron\views\_cronjob.view.php:59
 msgid "Execution details"
-msgstr "Ausführungsdetails"
+msgstr "AusfÃ¼hrungsdetails"
 
 #: ..\..\..\inc\cron\views\_cronjob.view.php:63
 #: ..\..\..\inc\cron\views\_cronjob.view.php:67
@@ -5638,7 +5638,7 @@ msgstr "Gestartet"
 
 #: ..\..\..\inc\cron\views\_cronjob_list.view.php:89
 msgid "Timed out"
-msgstr "Zeit überschritten"
+msgstr "Zeit Ã¼berschritten"
 
 #: ..\..\..\inc\cron\views\_cronjob_list.view.php:90
 msgid "Error"
@@ -5682,7 +5682,7 @@ msgstr "Wiederholen"
 
 #: ..\..\..\inc\cron\views\_cronjob_list.view.php:147
 msgid "Delete this job!"
-msgstr "Lösche diesen Job!"
+msgstr "LÃ¶sche diesen Job!"
 
 #: ..\..\..\inc\cron\views\_cronjob_list.view.php:166
 msgid "Execute pending jobs in a popup window now!"
@@ -5718,7 +5718,7 @@ msgstr "Schreibe neuen Eintrag..."
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:228
 msgid "Recently edited"
-msgstr "Kürzlich editiert"
+msgstr "KÃ¼rzlich editiert"
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:283
 msgid "Getting started"
@@ -5857,23 +5857,23 @@ msgstr ""
 #: ..\..\..\inc\files\file_settings.ctrl.php:132
 #, php-format
 msgid "Maximum allowed filesize must be between %d and %d KB."
-msgstr "Die maximal erlaubte Dateigrösse muss zwischen %d und %d KB liegen."
+msgstr "Die maximal erlaubte DateigrÃ¶sse muss zwischen %d und %d KB liegen."
 
 #: ..\..\..\inc\files\file_settings.ctrl.php:137
 msgid "Valid filename pattern is not a regular expression!"
-msgstr "Das Muster für gültige Dateinamen ist kein regulärer Ausdruck."
+msgstr "Das Muster fÃ¼r gÃ¼ltige Dateinamen ist kein regulÃ¤rer Ausdruck."
 
 #: ..\..\..\inc\files\file_settings.ctrl.php:142
 msgid "Valid dirname pattern is not a regular expression!"
-msgstr "Das Muster für gültige Verzeichnisnamen ist kein regulärer Ausdruck!"
+msgstr "Das Muster fÃ¼r gÃ¼ltige Verzeichnisnamen ist kein regulÃ¤rer Ausdruck!"
 
 #: ..\..\..\inc\files\file_settings.ctrl.php:151
 msgid "File settings updated."
-msgstr "Einstellungen für Dateien aktualisiert."
+msgstr "Einstellungen fÃ¼r Dateien aktualisiert."
 
 #: ..\..\..\inc\files\file_types.ctrl.php:53
 msgid "Cannot edit file type!"
-msgstr "Kann Dateityp nicht ändern!"
+msgstr "Kann Dateityp nicht Ã¤ndern!"
 
 #: ..\..\..\inc\files\file_types.ctrl.php:54
 msgid "Requested file type does not exist any longer."
@@ -5881,7 +5881,7 @@ msgstr "Der angeforderte Dateityp existiert nicht mehr."
 
 #: ..\..\..\inc\files\file_types.ctrl.php:73
 msgid "Add a file type..."
-msgstr "Füge einen Dateityp hinzu..."
+msgstr "FÃ¼ge einen Dateityp hinzu..."
 
 #: ..\..\..\inc\files\file_types.ctrl.php:85
 msgid "Copy file type..."
@@ -5896,7 +5896,7 @@ msgstr "Neuer Dateityp wurde erstellt."
 #: ..\..\..\inc\sessions\goals.ctrl.php:97
 #: ..\..\..\inc\sessions\views\_goal.form.php:53
 msgid "Record, then Create Similar"
-msgstr "Aufzeichen, dann ähnlichen erstellen"
+msgstr "Aufzeichen, dann Ã¤hnlichen erstellen"
 
 #: ..\..\..\inc\files\file_types.ctrl.php:118
 #: ..\..\..\inc\files\views\_filetype.form.php:100
@@ -5912,17 +5912,17 @@ msgstr "Dateityp aktualisiert."
 #: ..\..\..\inc\files\file_types.ctrl.php:160
 #, php-format
 msgid "File type &laquo;%s&raquo; deleted."
-msgstr "Dateityp &laquo;%s&raquo; gelöscht."
+msgstr "Dateityp &laquo;%s&raquo; gelÃ¶scht."
 
 #: ..\..\..\inc\files\file_types.ctrl.php:169
 #, php-format
 msgid "Cannot delete file type &laquo;%s&raquo;"
-msgstr "Kann Dateityp &laquo;%s&raquo; nicht löschen"
+msgstr "Kann Dateityp &laquo;%s&raquo; nicht lÃ¶schen"
 
 #: ..\..\..\inc\files\file_types.ctrl.php:199
 #, php-format
 msgid "Delete file type &laquo;%s&raquo;?"
-msgstr "Lösche Dateityp &laquo;%s&raquo;?"
+msgstr "LÃ¶sche Dateityp &laquo;%s&raquo;?"
 
 #: ..\..\..\inc\files\files.ctrl.php:101
 msgid "Requested item does not exist any longer."
@@ -6047,7 +6047,7 @@ msgstr ""
 #: ..\..\..\inc\files\files.ctrl.php:1165
 #: ..\..\..\inc\files\views\_file_list.inc.php:563
 msgid "Nothing selected."
-msgstr "Nichts ausgewählt."
+msgstr "Nichts ausgewÃ¤hlt."
 
 #: ..\..\..\inc\files\files.ctrl.php:594
 msgid "Please provide the name of the archive."
@@ -6059,7 +6059,7 @@ msgstr "Bitte gib einen Archivnamen an."
 #: ..\..\..\inc\files\files.ctrl.php:1279
 msgid "You have no permission to edit/modify files."
 msgstr ""
-"Du hast keine Berechtigung, um Dateien zu editieren oder zu verändern."
+"Du hast keine Berechtigung, um Dateien zu editieren oder zu verÃ¤ndern."
 
 #: ..\..\..\inc\files\files.ctrl.php:701
 #, php-format
@@ -6079,28 +6079,28 @@ msgstr "&laquo;%s&raquo; wurde erfolgreich in &laquo;%s&raquo; umbenannt."
 #: ..\..\..\inc\files\files.ctrl.php:760
 #, php-format
 msgid "The directory &laquo;%s&raquo; has been deleted."
-msgstr "Das Verzeichnis &laquo;%s&raquo; wurde gelöscht."
+msgstr "Das Verzeichnis &laquo;%s&raquo; wurde gelÃ¶scht."
 
 #: ..\..\..\inc\files\files.ctrl.php:761
 #, php-format
 msgid "The file &laquo;%s&raquo; has been deleted."
-msgstr "Die Datei &laquo;%s&raquo; wurde gelöscht."
+msgstr "Die Datei &laquo;%s&raquo; wurde gelÃ¶scht."
 
 #: ..\..\..\inc\files\files.ctrl.php:766
 #: ..\..\..\inc\files\files.ctrl.php:1451
 #, php-format
 msgid "Could not delete the directory &laquo;%s&raquo; (not empty?)."
-msgstr "Konnte das Verzeichnis &laquo;%s&raquo; nicht löschen (nicht leer?)."
+msgstr "Konnte das Verzeichnis &laquo;%s&raquo; nicht lÃ¶schen (nicht leer?)."
 
 #: ..\..\..\inc\files\files.ctrl.php:767
 #: ..\..\..\inc\files\files.ctrl.php:1451
 #, php-format
 msgid "Could not delete the file &laquo;%s&raquo;."
-msgstr "Konnte die Datei &laquo;%s&raquo; nicht löschen."
+msgstr "Konnte die Datei &laquo;%s&raquo; nicht lÃ¶schen."
 
 #: ..\..\..\inc\files\files.ctrl.php:785
 msgid "cannot be deleted because of the following relations"
-msgstr "kann auf Grund der folgenden Beziehungen nicht gelöscht werden"
+msgstr "kann auf Grund der folgenden Beziehungen nicht gelÃ¶scht werden"
 
 #: ..\..\..\inc\files\files.ctrl.php:827
 msgid "No destination blog is selected."
@@ -6129,12 +6129,12 @@ msgstr ""
 #: ..\..\..\inc\files\files.ctrl.php:1021
 #, php-format
 msgid "File properties for &laquo;%s&raquo; have been updated."
-msgstr "Dateieigenschaften für &laquo;%s&raquo; wurde aktualisiert."
+msgstr "Dateieigenschaften fÃ¼r &laquo;%s&raquo; wurde aktualisiert."
 
 #: ..\..\..\inc\files\files.ctrl.php:1025
 #, php-format
 msgid "File properties for &laquo;%s&raquo; have not changed."
-msgstr "Dateieigenschaften für &laquo;%s&raquo; wurden nicht verändert."
+msgstr "Dateieigenschaften fÃ¼r &laquo;%s&raquo; wurden nicht verÃ¤ndert."
 
 #: ..\..\..\inc\files\files.ctrl.php:1057
 msgid "User avatar modified."
@@ -6142,12 +6142,12 @@ msgstr ""
 
 #: ..\..\..\inc\files\files.ctrl.php:1102
 msgid "Selected file has been linked to item."
-msgstr "Die ausgewählte Datei wurde mit dem Element verlinkt."
+msgstr "Die ausgewÃ¤hlte Datei wurde mit dem Element verlinkt."
 
 #: ..\..\..\inc\files\files.ctrl.php:1140
 #, php-format
 msgid "Link from &laquo;%s&raquo; deleted."
-msgstr "Link von &laquo;%s&raquo; gelöscht."
+msgstr "Link von &laquo;%s&raquo; gelÃ¶scht."
 
 #: ..\..\..\inc\files\files.ctrl.php:1177
 msgid "You have to give a default permission!"
@@ -6165,19 +6165,19 @@ msgstr "Lesen-Schreiben"
 #: ..\..\..\inc\files\files.ctrl.php:1221
 #, php-format
 msgid "Permissions for &laquo;%s&raquo; have not been changed."
-msgstr "Berechtigungen für &laquo;%s&raquo; wurden nicht verändert."
+msgstr "Berechtigungen fÃ¼r &laquo;%s&raquo; wurden nicht verÃ¤ndert."
 
 #: ..\..\..\inc\files\files.ctrl.php:1212
 #, php-format
 msgid "Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;."
 msgstr ""
-"Konnte die Berechtigungen für &laquo;%s&raquo; nicht auf &laquo;%s&raquo; "
+"Konnte die Berechtigungen fÃ¼r &laquo;%s&raquo; nicht auf &laquo;%s&raquo; "
 "setzen."
 
 #: ..\..\..\inc\files\files.ctrl.php:1225
 #, php-format
 msgid "Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;."
-msgstr "Berechtigungen für &laquo;%s&raquo; auf &laquo;%s&raquo; gesetzt."
+msgstr "Berechtigungen fÃ¼r &laquo;%s&raquo; auf &laquo;%s&raquo; gesetzt."
 
 #: ..\..\..\inc\files\files.ctrl.php:1324
 msgid "No source files!"
@@ -6188,7 +6188,7 @@ msgid ""
 "Source and target files are the same. Please choose another name or "
 "directory."
 msgstr ""
-"Quell- und Zieldatei sind identisch. Bitte wähle einen anderen Namen oder "
+"Quell- und Zieldatei sind identisch. Bitte wÃ¤hle einen anderen Namen oder "
 "ein anderes Verzeichnis."
 
 #: ..\..\..\inc\files\files.ctrl.php:1400
@@ -6197,7 +6197,7 @@ msgid ""
 "Cannot overwrite the file &laquo;%s&raquo; because of the following relations"
 msgstr ""
 "Kann die Datei &laquo;%s&raquo; auf Grund der folgenden Beziehungen nicht "
-"überschreiben"
+"Ã¼berschreiben"
 
 #: ..\..\..\inc\files\files.ctrl.php:1425
 #, php-format
@@ -6265,7 +6265,7 @@ msgstr "&lt;Ordner&gt;"
 #: ..\..\..\inc\files\model\_file.class.php:1457
 #: ..\..\..\inc\files\views\_file_list.inc.php:260
 msgid "Open in a new window"
-msgstr "In einem neuem Fenster öffnen"
+msgstr "In einem neuem Fenster Ã¶ffnen"
 
 #: ..\..\..\inc\files\model\_file.funcs.php:64
 msgid "Empty"
@@ -6326,7 +6326,7 @@ msgstr "Terabytes"
 #: ..\..\..\inc\files\model\_file.funcs.php:440
 #, php-format
 msgid "&laquo;%s&raquo; is not a valid filename."
-msgstr "&laquo;%s&raquo; ist kein gültiger Dateiname."
+msgstr "&laquo;%s&raquo; ist kein gÃ¼ltiger Dateiname."
 
 #: ..\..\..\inc\files\model\_file.funcs.php:456
 #, php-format
@@ -6341,27 +6341,27 @@ msgstr "&laquo;%s&raquo; hat eine nicht erkannte Erweiterung."
 #: ..\..\..\inc\files\model\_file.funcs.php:466
 #, php-format
 msgid "&laquo;%s&raquo; has not a valid extension."
-msgstr "&laquo;%s&raquo; hat keine gültige Erweiterung."
+msgstr "&laquo;%s&raquo; hat keine gÃ¼ltige Erweiterung."
 
 #: ..\..\..\inc\files\model\_file.funcs.php:500
 #, php-format
 msgid "&laquo;%s&raquo; is not a valid directory name."
-msgstr "&laquo;%s&raquo; ist kein gültiger Verzeichnisname."
+msgstr "&laquo;%s&raquo; ist kein gÃ¼ltiger Verzeichnisname."
 
 #: ..\..\..\inc\files\model\_file.funcs.php:620
 #: ..\..\..\inc\files\model\_file.funcs.php:622
 msgid "Open this directory in the file manager"
-msgstr "Öffne dieses Verzeichnis im Dateimanager"
+msgstr "Ã–ffne dieses Verzeichnis im Dateimanager"
 
 #: ..\..\..\inc\files\model\_filelist.class.php:327
 #, php-format
 msgid "Cannot open directory &laquo;%s&raquo;!"
-msgstr "Kann Verzeichnis &laquo;%s&raquo; nicht öffnen!"
+msgstr "Kann Verzeichnis &laquo;%s&raquo; nicht Ã¶ffnen!"
 
 #: ..\..\..\inc\files\model\_filelist.class.php:747
 #, php-format
 msgid "The filter &laquo;%s&raquo; is not a regular expression."
-msgstr "Der Filter &laquo;%s&raquo; ist kein regulärer Ausdruck."
+msgstr "Der Filter &laquo;%s&raquo; ist kein regulÃ¤rer Ausdruck."
 
 #: ..\..\..\inc\files\model\_filelist.class.php:790
 msgid "No filter"
@@ -6369,7 +6369,7 @@ msgstr "Kein Filter"
 
 #: ..\..\..\inc\files\model\_filelist.class.php:795
 msgid "regular expression"
-msgstr "Regulärer Ausdruck"
+msgstr "RegulÃ¤rer Ausdruck"
 
 #: ..\..\..\inc\files\model\_filelist.class.php:1225
 msgid "No directory."
@@ -6406,7 +6406,7 @@ msgstr "Bitte gib Dateierweiterungen durch Leerzeichen getrennt an."
 
 #: ..\..\..\inc\files\model\_filetype.class.php:102
 msgid "Invalid file extensions format."
-msgstr "Ungültiges Dateierweiterungs-Format."
+msgstr "UngÃ¼ltiges Dateierweiterungs-Format."
 
 #: ..\..\..\inc\files\model\_filetype.class.php:108
 #: ..\..\..\inc\generic\model\_genericelement.class.php:91
@@ -6431,11 +6431,11 @@ msgstr "Upload ist deaktiviert."
 #: ..\..\..\inc\files\upload.ctrl.php:206
 msgid "You have no permission to add/upload files."
 msgstr ""
-"Du hast keine Berechtigung, um Dateien hinzuzufügen oder hochzuladen."
+"Du hast keine Berechtigung, um Dateien hinzuzufÃ¼gen oder hochzuladen."
 
 #: ..\..\..\inc\files\upload.ctrl.php:249
 msgid "Please select a local file to upload."
-msgstr "Bitte wähle eine lokale Datei zum Hochladen aus."
+msgstr "Bitte wÃ¤hle eine lokale Datei zum Hochladen aus."
 
 #. TRANS: %s will be replaced by the difference
 #: ..\..\..\inc\files\upload.ctrl.php:259
@@ -6446,7 +6446,7 @@ msgstr ""
 #: ..\..\..\inc\files\upload.ctrl.php:277
 msgid "The file exceeds the upload_max_filesize directive in php.ini."
 msgstr ""
-"Die Datei überschreitet die upload_max_filesize Einstellung in php.ini."
+"Die Datei Ã¼berschreitet die upload_max_filesize Einstellung in php.ini."
 
 #: ..\..\..\inc\files\upload.ctrl.php:282
 msgid "The file was only partially uploaded."
@@ -6458,7 +6458,7 @@ msgstr "Es wurde keine Datei hochgeladen."
 
 #: ..\..\..\inc\files\upload.ctrl.php:295
 msgid "Missing a temporary folder (upload_tmp_dir in php.ini)."
-msgstr "Kein temporärer Ordner vorhanden (upload_tmp_dir in php.ini)."
+msgstr "Kein temporÃ¤rer Ordner vorhanden (upload_tmp_dir in php.ini)."
 
 #: ..\..\..\inc\files\upload.ctrl.php:300
 msgid "Unknown error."
@@ -6482,7 +6482,7 @@ msgstr ""
 msgid ""
 "Could not change permissions of &laquo;%s&raquo; to default chmod setting."
 msgstr ""
-"Konnte die Berechtigungen für &laquo;%s&raquo; nicht auf die Standard-"
+"Konnte die Berechtigungen fÃ¼r &laquo;%s&raquo; nicht auf die Standard-"
 "Berechtigungen setzen."
 
 #: ..\..\..\inc\files\upload.ctrl.php:366
@@ -6496,7 +6496,7 @@ msgstr "Hier ist der Code, um es anzuzeigen:"
 
 #: ..\..\..\inc\files\upload.ctrl.php:374
 msgid "Add the code to your post !"
-msgstr "Füge diesen Code zu deinem Eintrag hinzu !"
+msgstr "FÃ¼ge diesen Code zu deinem Eintrag hinzu !"
 
 #: ..\..\..\inc\files\views\_file_browse.view.php:73
 msgid "Upload..."
@@ -6512,7 +6512,7 @@ msgstr ""
 
 #: ..\..\..\inc\files\views\_file_browse.view.php:92
 msgid "Filter is a regular expression"
-msgstr "Filter ist ein regulärer Ausdruck"
+msgstr "Filter ist ein regulÃ¤rer Ausdruck"
 
 #: ..\..\..\inc\files\views\_file_browse.view.php:102
 #: ..\..\..\inc\files\views\_file_list.inc.php:457
@@ -6528,7 +6528,7 @@ msgstr "RegExp"
 #: ..\..\..\inc\files\views\_file_browse.view.php:125
 #: ..\..\..\inc\files\views\_file_browse.view.php:126
 msgid "Unset filter"
-msgstr "Filter zurücksetzen"
+msgstr "Filter zurÃ¼cksetzen"
 
 #: ..\..\..\inc\files\views\_file_browse.view.php:182
 msgid "Change root"
@@ -6693,7 +6693,7 @@ msgstr ""
 #: ..\..\..\inc\files\views\_file_browse_set.form.php:72
 #: ..\..\..\inc\files\views\_file_list.inc.php:135
 msgid "Last change"
-msgstr "Letzte Änderung"
+msgstr "Letzte Ã„nderung"
 
 #: ..\..\..\inc\files\views\_file_browse_set.form.php:72
 msgid "Long format"
@@ -6781,11 +6781,11 @@ msgstr "Beende Kopieren/Verschieben-Modus!"
 
 #: ..\..\..\inc\files\views\_file_copy_move.form.php:77
 msgid "Check to overwrite the existing file"
-msgstr "Auswählen, um die existierende Datei zu überschreiben"
+msgstr "AuswÃ¤hlen, um die existierende Datei zu Ã¼berschreiben"
 
 #: ..\..\..\inc\files\views\_file_copy_move.form.php:77
 msgid "Overwrite"
-msgstr "Überschreiben"
+msgstr "Ãœberschreiben"
 
 #: ..\..\..\inc\files\views\_file_copy_move.form.php:81
 #: ..\..\..\inc\files\views\_file_rename.form.php:59
@@ -6798,11 +6798,11 @@ msgstr "Du befindest dich im Kopieren/Verschieben-Modus."
 
 #: ..\..\..\inc\files\views\_file_copy_move.form.php:90
 msgid "Please navigate to the desired target location."
-msgstr "Bitte navigiere zum gewünschten Zielort."
+msgstr "Bitte navigiere zum gewÃ¼nschten Zielort."
 
 #: ..\..\..\inc\files\views\_file_delete.form.php:45
 msgid "Cancel delete!"
-msgstr "Löschen abbrechen!"
+msgstr "LÃ¶schen abbrechen!"
 
 #: ..\..\..\inc\files\views\_file_delete.form.php:54
 msgid "Confirm delete"
@@ -6810,11 +6810,11 @@ msgstr ""
 
 #: ..\..\..\inc\files\views\_file_delete.form.php:57
 msgid "Do you really want to delete the following files?"
-msgstr "Möchtest du wirklich die folgenden Dateien löschen?"
+msgstr "MÃ¶chtest du wirklich die folgenden Dateien lÃ¶schen?"
 
 #: ..\..\..\inc\files\views\_file_delete.form.php:58
 msgid "Do you really want to delete the following file?"
-msgstr "Möchtest du wirklich die folgende Datei löschen?"
+msgstr "MÃ¶chtest du wirklich die folgende Datei lÃ¶schen?"
 
 #: ..\..\..\inc\files\views\_file_download.form.php:40
 msgid "Cancel download!"
@@ -6839,7 +6839,7 @@ msgstr "Schliesse Unterordner aus"
 #: ..\..\..\inc\files\views\_file_download.form.php:52
 msgid "This will exclude subdirectories of selected directories."
 msgstr ""
-"Dies wird Unterverzeichnisse von ausgewählten Verzeichnissen aussschliessen."
+"Dies wird Unterverzeichnisse von ausgewÃ¤hlten Verzeichnissen aussschliessen."
 
 #: ..\..\..\inc\files\views\_file_download.form.php:55
 msgid "Files to download"
@@ -6870,7 +6870,7 @@ msgstr "Editiere diesen Eintrag..."
 
 #: ..\..\..\inc\files\views\_file_links.view.php:66
 msgid "Quit link mode!"
-msgstr "Verlasse Verknüpfungs-Modus!"
+msgstr "Verlasse VerknÃ¼pfungs-Modus!"
 
 # TRANS: file/directory path
 #. TRANS: file/directory path
@@ -6889,7 +6889,7 @@ msgstr "Lokalisiere diese Datei!"
 #: ..\..\..\inc\items\views\_item_links.view.php:157
 #: ..\..\..\inc\items\views\inc\_item_links.inc.php:164
 msgid "Delete this link!"
-msgstr "Lösche diese Verknüpfung!"
+msgstr "LÃ¶sche diese VerknÃ¼pfung!"
 
 #: ..\..\..\inc\files\views\_file_links.view.php:151
 #, php-format
@@ -6898,7 +6898,7 @@ msgstr ""
 
 #: ..\..\..\inc\files\views\_file_list.inc.php:103
 msgid "Go to parent folder"
-msgstr "Zum übergeordneten Verzeichnis"
+msgstr "Zum Ã¼bergeordneten Verzeichnis"
 
 #: ..\..\..\inc\files\views\_file_list.inc.php:110
 #: ..\..\..\inc\items\views\_item_links.view.php:81
@@ -6910,7 +6910,7 @@ msgstr ""
 #. TRANS: file size
 #: ..\..\..\inc\files\views\_file_list.inc.php:131
 msgid "Size"
-msgstr "Größe"
+msgstr "GrÃ¶ÃŸe"
 
 # TRANS: file's permissions (short)
 #. TRANS: file's permissions (short)
@@ -6920,7 +6920,7 @@ msgstr "Rechte"
 
 #: ..\..\..\inc\files\views\_file_list.inc.php:175
 msgid "Select this file"
-msgstr "Wähle diese Datei"
+msgstr "WÃ¤hle diese Datei"
 
 #: ..\..\..\inc\files\views\_file_list.inc.php:205
 #: ..\..\..\inc\files\views\_file_list.inc.php:216
@@ -6934,7 +6934,7 @@ msgstr "Verlinke diese Datei!"
 
 #: ..\..\..\inc\files\views\_file_list.inc.php:371
 msgid "Edit permissions"
-msgstr "Berechtigungen ändern"
+msgstr "Berechtigungen Ã¤ndern"
 
 #: ..\..\..\inc\files\views\_file_list.inc.php:407
 msgid "Edit file..."
@@ -6987,7 +6987,7 @@ msgstr ""
 
 #: ..\..\..\inc\files\views\_file_permissions.form.php:49
 msgid "Change permissions"
-msgstr "Rechte ändern"
+msgstr "Rechte Ã¤ndern"
 
 #: ..\..\..\inc\files\views\_file_permissions.form.php:60
 #: ..\..\..\inc\files\views\_file_permissions.form.php:64
@@ -7033,7 +7033,7 @@ msgstr "Langer Titel"
 #: ..\..\..\inc\files\views\_file_properties.form.php:53
 #: ..\..\..\inc\files\views\_file_properties.form.php:59
 msgid "This is a longer descriptive title"
-msgstr "Dies ist ein längerer, beschreibender Titel"
+msgstr "Dies ist ein lÃ¤ngerer, beschreibender Titel"
 
 #: ..\..\..\inc\files\views\_file_properties.form.php:54
 #: ..\..\..\inc\files\views\_file_properties.form.php:60
@@ -7043,7 +7043,7 @@ msgstr "Alternativer Text"
 #: ..\..\..\inc\files\views\_file_properties.form.php:54
 #: ..\..\..\inc\files\views\_file_properties.form.php:60
 msgid "This is useful for images"
-msgstr "Dies ist nützlich für Bilder"
+msgstr "Dies ist nÃ¼tzlich fÃ¼r Bilder"
 
 #: ..\..\..\inc\files\views\_file_properties.form.php:55
 #: ..\..\..\inc\files\views\_file_properties.form.php:61
@@ -7068,7 +7068,7 @@ msgstr "Aktiviere Dateimanager"
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:176
 msgid "Check to enable the Filemanager."
-msgstr "Auswählen, um den Dateimanager zu aktivieren."
+msgstr "AuswÃ¤hlen, um den Dateimanager zu aktivieren."
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:179
 msgid "Accessible file roots"
@@ -7076,7 +7076,7 @@ msgstr ""
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:180
 msgid "Check to enable root directories for blogs."
-msgstr "Auswählen, um Wurzelverzeichnisse für Blogs zu aktivieren."
+msgstr "AuswÃ¤hlen, um Wurzelverzeichnisse fÃ¼r Blogs zu aktivieren."
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:180
 msgid "Enable blog directories"
@@ -7084,7 +7084,7 @@ msgstr "Aktiviere Blog-Ordner"
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:181
 msgid "Check to enable root directories for users."
-msgstr "Auswählen, um Wurzelverzeichnisse für Benutzer zu aktivieren."
+msgstr "AuswÃ¤hlen, um Wurzelverzeichnisse fÃ¼r Benutzer zu aktivieren."
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:181
 msgid "Enable user directories"
@@ -7112,7 +7112,7 @@ msgstr ""
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:187
 msgid "Check to enable creation of directories."
-msgstr "Auswählen, um das Erstellen von Ordnern zu ermöglichen."
+msgstr "AuswÃ¤hlen, um das Erstellen von Ordnern zu ermÃ¶glichen."
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:187
 msgid "Enable creation of folders"
@@ -7120,7 +7120,7 @@ msgstr ""
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:188
 msgid "Check to enable creation of files."
-msgstr "Auswählen, um das Erstellen von Dateien zu aktivieren."
+msgstr "AuswÃ¤hlen, um das Erstellen von Dateien zu aktivieren."
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:188
 msgid "Enable creation of files"
@@ -7132,7 +7132,7 @@ msgstr ""
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:190
 msgid "Check to allow uploading files in general."
-msgstr "Auswählen, um allgemein das Hochladen zu erlauben."
+msgstr "AuswÃ¤hlen, um allgemein das Hochladen zu erlauben."
 
 #. TRANS: first %s is setting/var name, second is file name, third is limit value
 #: ..\..\..\inc\files\views\_file_settings.form.php:191
@@ -7171,21 +7171,21 @@ msgstr ""
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:212
 msgid "Valid filename"
-msgstr "Gültiger Dateiname"
+msgstr "GÃ¼ltiger Dateiname"
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:213
 #: ..\..\..\inc\files\views\_file_settings.form.php:223
 msgid "Regular expression"
-msgstr "Regulärer Ausdruck"
+msgstr "RegulÃ¤rer Ausdruck"
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:222
 msgid "Valid dirname"
-msgstr "Gültiger Verzeichnisname"
+msgstr "GÃ¼ltiger Verzeichnisname"
 
 #: ..\..\..\inc\files\views\_file_upload.view.php:157
 #: ..\..\..\inc\files\views\_file_upload.view.php:267
 msgid "Choose a file"
-msgstr "Wähle eine Datei"
+msgstr "WÃ¤hle eine Datei"
 
 #: ..\..\..\inc\files\views\_file_upload.view.php:162
 #: ..\..\..\inc\files\views\_file_upload.view.php:274
@@ -7195,7 +7195,7 @@ msgstr "Dateiname auf Server (optional)"
 #: ..\..\..\inc\files\views\_file_upload.view.php:164
 #: ..\..\..\inc\files\views\_file_upload.view.php:283
 msgid "Alternative text (useful for images)"
-msgstr "Alternativer Text (nützlich für Bilder)"
+msgstr "Alternativer Text (nÃ¼tzlich fÃ¼r Bilder)"
 
 #: ..\..\..\inc\files\views\_file_upload.view.php:165
 #: ..\..\..\inc\files\views\_file_upload.view.php:288
@@ -7220,7 +7220,7 @@ msgstr ""
 
 #: ..\..\..\inc\files\views\_file_upload.view.php:232
 msgid "Some file uploads failed. Please check the errors below."
-msgstr "Es sind Uploads fehlgeschlagen. Bitte überprüfe die Fehler unten."
+msgstr "Es sind Uploads fehlgeschlagen. Bitte Ã¼berprÃ¼fe die Fehler unten."
 
 #: ..\..\..\inc\files\views\_file_upload.view.php:236
 msgid "Files to upload"
@@ -7230,11 +7230,11 @@ msgstr "Hochzuladende Dateien"
 #. TRANS: will be displayed as title for failed file uploads
 #: ..\..\..\inc\files\views\_file_upload.view.php:255
 msgid "Invalid submission."
-msgstr "Ungültige Übertragung."
+msgstr "UngÃ¼ltige Ãœbertragung."
 
 #: ..\..\..\inc\files\views\_file_upload.view.php:302
 msgid "Add another file"
-msgstr "Eine weitere Datei hinzufügen"
+msgstr "Eine weitere Datei hinzufÃ¼gen"
 
 #: ..\..\..\inc\files\views\_file_upload.view.php:305
 msgid "Upload to server now"
@@ -7246,11 +7246,11 @@ msgstr "Erlaubte Dateierweiterungen"
 
 #: ..\..\..\inc\files\views\_file_upload.view.php:325
 msgid "Maximum allowed file size"
-msgstr "Maximal erlaubte Dateigrösse"
+msgstr "Maximal erlaubte DateigrÃ¶sse"
 
 #: ..\..\..\inc\files\views\_filetype.form.php:51
 msgid "Delete this filetype!"
-msgstr "Lösche diesen Dateityp!"
+msgstr "LÃ¶sche diesen Dateityp!"
 
 #: ..\..\..\inc\files\views\_filetype.form.php:54
 #: ..\..\..\inc\files\views\_filetype_list.view.php:128
@@ -7293,23 +7293,23 @@ msgstr "Lass den Browser die Datei in einem Popup behandeln. lassen"
 
 #: ..\..\..\inc\files\views\_filetype.form.php:72
 msgid "Open with browser (popup)"
-msgstr "Öffnen im Browser (Popup)"
+msgstr "Ã–ffnen im Browser (Popup)"
 
 #: ..\..\..\inc\files\views\_filetype.form.php:73
 msgid "Open with text viewer (popup)"
-msgstr "Öffnen in Textanzeige (Popup)"
+msgstr "Ã–ffnen in Textanzeige (Popup)"
 
 #: ..\..\..\inc\files\views\_filetype.form.php:73
 msgid "Use the online text viewer (recommended for .txt)"
-msgstr "Benutze den Online-Text-Anzeiger (empfohlen für .txt)"
+msgstr "Benutze den Online-Text-Anzeiger (empfohlen fÃ¼r .txt)"
 
 #: ..\..\..\inc\files\views\_filetype.form.php:74
 msgid "Open with image viewer (popup)"
-msgstr "Öffnen mit Bildbetrachter (Popup)"
+msgstr "Ã–ffnen mit Bildbetrachter (Popup)"
 
 #: ..\..\..\inc\files\views\_filetype.form.php:74
 msgid "Use the online image viewer (recommended for .gif .png .jpg)"
-msgstr "Benutze den Online-Bildbetrachter (empfohlen für .gif .png .jpg)"
+msgstr "Benutze den Online-Bildbetrachter (empfohlen fÃ¼r .gif .png .jpg)"
 
 #: ..\..\..\inc\files\views\_filetype.form.php:75
 msgid ""
@@ -7318,12 +7318,12 @@ msgid ""
 "file types."
 msgstr ""
 "Lass den Browser die Datei in einem Popup behandeln. Beachte: wenn du nicht "
-"möchtest, dass sich Word im IE öffnet, musst du \"im selben Fenster "
-"anzeigen\" für den Windows-Dateityp demarkieren."
+"mÃ¶chtest, dass sich Word im IE Ã¶ffnet, musst du \"im selben Fenster "
+"anzeigen\" fÃ¼r den Windows-Dateityp demarkieren."
 
 #: ..\..\..\inc\files\views\_filetype.form.php:75
 msgid "Open with external app (no popup)"
-msgstr "Öffne mit externer Anwendung (kein Popup)"
+msgstr "Ã–ffne mit externer Anwendung (kein Popup)"
 
 #: ..\..\..\inc\files\views\_filetype.form.php:76
 msgid "Download to disk (no popup)"
@@ -7346,7 +7346,7 @@ msgstr "Erlaube HochladenDatei hochladen"
 #: ..\..\..\inc\files\views\_filetype.form.php:95
 msgid "Check to allow uploading and renaming of this file type"
 msgstr ""
-"Auswählen, um Hochladen und Umbenennen für diesen Dateityp zu erlauben"
+"AuswÃ¤hlen, um Hochladen und Umbenennen fÃ¼r diesen Dateityp zu erlauben"
 
 #: ..\..\..\inc\files\views\_filetype_list.view.php:43
 msgid "File types list"
@@ -7355,7 +7355,7 @@ msgstr "Dateitypenliste"
 #: ..\..\..\inc\files\views\_filetype_list.view.php:59
 #: ..\..\..\inc\files\views\_filetype_list.view.php:120
 msgid "Edit this file type..."
-msgstr "Ändere diesen Dateityp..."
+msgstr "Ã„ndere diesen Dateityp..."
 
 #: ..\..\..\inc\files\views\_filetype_list.view.php:122
 msgid "Duplicate this file type..."
@@ -7363,7 +7363,7 @@ msgstr "Duplizieren diesen Dateityp..."
 
 #: ..\..\..\inc\files\views\_filetype_list.view.php:124
 msgid "Delete this file type!"
-msgstr "Lösche diesen Dateityp!"
+msgstr "LÃ¶sche diesen Dateityp!"
 
 #: ..\..\..\inc\files\views\_filetype_list.view.php:128
 msgid "Create a new file type..."
@@ -7405,7 +7405,7 @@ msgstr ""
 
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:150
 msgid "Add element"
-msgstr "Element hinzufügen"
+msgstr "Element hinzufÃ¼gen"
 
 #: ..\..\..\inc\items\item_statuses.ctrl.php:52
 #: ..\..\..\inc\items\item_types.ctrl.php:48
@@ -7416,7 +7416,7 @@ msgstr "%d verwandte Elemente"
 
 #: ..\..\..\inc\items\item_statuses.ctrl.php:55
 msgid "Cannot delete item status"
-msgstr "Kann Eintragsstatus nicht löschen"
+msgstr "Kann Eintragsstatus nicht lÃ¶schen"
 
 #: ..\..\..\inc\items\item_types.ctrl.php:36
 msgid "Item/Post/Page types"
@@ -7505,7 +7505,7 @@ msgstr ""
 #: ..\..\..\inc\items\items.ctrl.php:761
 #: ..\..\..\inc\items\model\_item.class.php:2114
 msgid "Delete this post"
-msgstr "Lösche diesen Eintrag"
+msgstr "LÃ¶sche diesen Eintrag"
 
 #: ..\..\..\inc\items\items.ctrl.php:762
 msgid "delete"
@@ -7529,7 +7529,7 @@ msgstr ""
 #. TRANS: Priority name
 #: ..\..\..\inc\items\model\_item.class.php:220
 msgid "1 - Highest"
-msgstr "1 - Höchste"
+msgstr "1 - HÃ¶chste"
 
 # TRANS: Priority name
 #. TRANS: Priority name
@@ -7568,11 +7568,11 @@ msgstr ""
 #: ..\..\..\inc\items\model\_item.class.php:429
 #: ..\..\..\inc\items\model\_itemlist.class.php:125
 msgid "Please enter a valid issue date."
-msgstr "Bitte gib ein gültiges Ausgabedatum an."
+msgstr "Bitte gib ein gÃ¼ltiges Ausgabedatum an."
 
 #: ..\..\..\inc\items\model\_item.class.php:496
 msgid "Please enter a valid deadline."
-msgstr "Bitte gib einen gültigen Stichtag an."
+msgstr "Bitte gib einen gÃ¼ltigen Stichtag an."
 
 #: ..\..\..\inc\items\model\_item.class.php:539
 msgid "Please provide a title."
@@ -7588,12 +7588,12 @@ msgstr ""
 
 #: ..\..\..\inc\items\model\_item.class.php:697
 msgid "Comments are closed for this post."
-msgstr "Kommentare sind für diesen Beitrag deaktiviert."
+msgstr "Kommentare sind fÃ¼r diesen Beitrag deaktiviert."
 
 #: ..\..\..\inc\items\model\_item.class.php:713
 msgid "This post is not published. You cannot leave comments."
 msgstr ""
-"Dieser Eintrag ist nicht veröffentlicht. Du kannst keinen Kommentar "
+"Dieser Eintrag ist nicht verÃ¶ffentlicht. Du kannst keinen Kommentar "
 "hinterlassen."
 
 # TRANS: this is the default text for the extended post "more" link
@@ -7659,7 +7659,7 @@ msgstr "Zeige Kommentare / Hinterlasse Kommentar"
 
 #: ..\..\..\inc\items\model\_item.class.php:1831
 msgid "Display trackbacks / Get trackback address for this post"
-msgstr "Zeige Trackbacks / Trackback Adresse für diesen Eintrag"
+msgstr "Zeige Trackbacks / Trackback Adresse fÃ¼r diesen Eintrag"
 
 #: ..\..\..\inc\items\model\_item.class.php:1832
 msgid "Send a trackback"
@@ -7705,11 +7705,11 @@ msgstr "Moderieren..."
 
 #: ..\..\..\inc\items\model\_item.class.php:2262
 msgid "Publish NOW!"
-msgstr "JETZT veröffentlichen"
+msgstr "JETZT verÃ¶ffentlichen"
 
 #: ..\..\..\inc\items\model\_item.class.php:2263
 msgid "Publish now using current date and time."
-msgstr "Veröffentliche jetzt mit aktuellem Datum und Zeit."
+msgstr "VerÃ¶ffentliche jetzt mit aktuellem Datum und Zeit."
 
 #: ..\..\..\inc\items\model\_item.class.php:2309
 msgid "Deprecate this post!"
@@ -7830,11 +7830,11 @@ msgstr "Extra"
 #: ..\..\..\inc\items\model\_item.funcs.php:596
 #: ..\..\..\inc\tools\mtimport.ctrl.php:1301
 msgid "Select as MAIN category"
-msgstr "Wähle als HAUPT-Kategorie"
+msgstr "WÃ¤hle als HAUPT-Kategorie"
 
 #: ..\..\..\inc\items\model\_item.funcs.php:620
 msgid "Select as an additional category"
-msgstr "Wähle als eine zusätzliche Kategorie"
+msgstr "WÃ¤hle als eine zusÃ¤tzliche Kategorie"
 
 #: ..\..\..\inc\items\model\_item.funcs.php:678
 #: ..\..\..\inc\users\views\_user.form.php:321
@@ -7844,7 +7844,7 @@ msgstr "Wähle als eine zusätzliche Kategorie"
 #: ..\..\..\skins\_subs.disp.php:96
 #: ..\..\..\skins\_user.disp.php:91
 msgid "Posts"
-msgstr "Einträge"
+msgstr "EintrÃ¤ge"
 
 #: ..\..\..\inc\items\model\_item.funcs.php:686
 msgid "Intros"
@@ -7899,7 +7899,7 @@ msgstr ""
 #: ..\..\..\inc\items\model\_itemlight.class.php:127
 #, php-format
 msgid "%d links to source items"
-msgstr "%d Links zu übergeordneten Elementen"
+msgstr "%d Links zu Ã¼bergeordneten Elementen"
 
 #: ..\..\..\inc\items\model\_itemlight.class.php:128
 #, php-format
@@ -7927,7 +7927,7 @@ msgstr ""
 #. on these cats to browse them, this is the default href title displayed there
 #: ..\..\..\inc\items\model\_itemlight.class.php:377
 msgid "Browse category"
-msgstr "Wähle Kategorie"
+msgstr "WÃ¤hle Kategorie"
 
 #: ..\..\..\inc\items\model\_itemlight.class.php:697
 #: ..\..\..\skins\basic\index.main.php:145
@@ -7936,7 +7936,7 @@ msgstr "Permanenter Link zum ganzen Eintrag"
 
 #: ..\..\..\inc\items\model\_itemlist.class.php:215
 msgid "Invalid post, please correct these errors:"
-msgstr "Ungültiger Eintrag, bitte korrigiere diese Fehler:"
+msgstr "UngÃ¼ltiger Eintrag, bitte korrigiere diese Fehler:"
 
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:462
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:463
@@ -7945,11 +7945,11 @@ msgstr "Ungültiger Eintrag, bitte korrigiere diese Fehler:"
 #: ..\..\..\inc\sessions\views\_stats_search_keywords.view.php:38
 #: ..\..\..\inc\sessions\views\_stats_search_keywords.view.php:46
 msgid "Invalid date"
-msgstr "Ungültiges Datum"
+msgstr "UngÃ¼ltiges Datum"
 
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:915
 msgid "Invalid request"
-msgstr "Ungültige Anforderung"
+msgstr "UngÃ¼ltige Anforderung"
 
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:949
 msgid "All but "
@@ -7957,7 +7957,7 @@ msgstr "Alles ausser "
 
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:981
 msgid "Archives for"
-msgstr "Archiv für"
+msgstr "Archiv fÃ¼r"
 
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:990
 #: ..\..\..\plugins\_archives.plugin.php:241
@@ -7966,7 +7966,7 @@ msgstr "Woche"
 
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:1000
 msgid "Keyword(s)"
-msgstr "Schlüsselwort(e)"
+msgstr "SchlÃ¼sselwort(e)"
 
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:1014
 msgid "Author(s)"
@@ -8002,7 +8002,7 @@ msgstr "Ende bei"
 
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:1095
 msgid "Hide future"
-msgstr "Verstecke zukünftige"
+msgstr "Verstecke zukÃ¼nftige"
 
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:1128
 #, php-format
@@ -8017,7 +8017,7 @@ msgstr ""
 #: ..\..\..\inc\items\model\_itemtype.class.php:60
 #, php-format
 msgid "%d related collections"
-msgstr "%d zugehörige Ansammlungen"
+msgstr "%d zugehÃ¶rige Ansammlungen"
 
 #: ..\..\..\inc\items\views\_item_expert.form.php:93
 #: ..\..\..\inc\items\views\_item_simple.form.php:119
@@ -8110,7 +8110,7 @@ msgstr ""
 #: ..\..\..\inc\items\views\_item_expert.form.php:357
 #: ..\..\..\inc\items\views\_item_simple.form.php:231
 msgid "Visibility / Sharing"
-msgstr "Sichtbarkeit / Verfügbarkeit"
+msgstr "Sichtbarkeit / VerfÃ¼gbarkeit"
 
 #: ..\..\..\inc\items\views\_item_expert.form.php:368
 msgid "Text Renderers"
@@ -8119,7 +8119,7 @@ msgstr "Textumwandler (Renderer)"
 #: ..\..\..\inc\items\views\_item_expert.form.php:383
 #: ..\..\..\inc\items\views\_item_simple.form.php:247
 msgid "Visitors can leave comments on this post."
-msgstr "Besucher können Kommentare zu diesem Eintrag hinterlassen."
+msgstr "Besucher kÃ¶nnen Kommentare zu diesem Eintrag hinterlassen."
 
 #: ..\..\..\inc\items\views\_item_expert.form.php:384
 #: ..\..\..\inc\items\views\_item_simple.form.php:248
@@ -8129,7 +8129,7 @@ msgstr "Offen"
 #: ..\..\..\inc\items\views\_item_expert.form.php:386
 #: ..\..\..\inc\items\views\_item_simple.form.php:250
 msgid "Visitors can NOT leave comments on this post."
-msgstr "Besucher können KEINE Kommentare zu diesem Eintrag hinterlassen."
+msgstr "Besucher kÃ¶nnen KEINE Kommentare zu diesem Eintrag hinterlassen."
 
 #: ..\..\..\inc\items\views\_item_expert.form.php:387
 #: ..\..\..\inc\items\views\_item_simple.form.php:251
@@ -8139,7 +8139,7 @@ msgstr "Geschlossen"
 #: ..\..\..\inc\items\views\_item_expert.form.php:389
 #: ..\..\..\inc\items\views\_item_simple.form.php:253
 msgid "Visitors cannot see nor leave comments on this post."
-msgstr "Besucher können Kommentare weder sehen noch hinterlassen."
+msgstr "Besucher kÃ¶nnen Kommentare weder sehen noch hinterlassen."
 
 #: ..\..\..\inc\items\views\_item_expert.form.php:390
 #: ..\..\..\inc\items\views\_item_simple.form.php:254
@@ -8169,7 +8169,7 @@ msgstr ""
 
 #: ..\..\..\inc\items\views\_item_list_full.view.php:69
 msgid "Full posts"
-msgstr "Vollständige Einträge"
+msgstr "VollstÃ¤ndige EintrÃ¤ge"
 
 #: ..\..\..\inc\items\views\_item_list_full.view.php:72
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:65
@@ -8177,7 +8177,7 @@ msgstr "Vollständige Einträge"
 #: ..\..\..\inc\items\views\_item_list_table.view.php:220
 #: ..\..\..\inc\items\views\_item_list_track.view.php:244
 msgid "Reset all filters!"
-msgstr "Alle Filter zurücksetzen!"
+msgstr "Alle Filter zurÃ¼cksetzen!"
 
 #: ..\..\..\inc\items\views\_item_list_full.view.php:72
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:65
@@ -8258,7 +8258,7 @@ msgstr "Pingbacks"
 
 #: ..\..\..\inc\items\views\_item_list_full.view.php:327
 msgid "No feedback for this post yet..."
-msgstr "bisher kein Feedback für diesen Eintrag..."
+msgstr "bisher kein Feedback fÃ¼r diesen Eintrag..."
 
 #: ..\..\..\inc\items\views\_item_list_full.view.php:352
 #: ..\..\..\skins\_item_comment_form.inc.php:130
@@ -8276,7 +8276,7 @@ msgstr "Kommentar"
 
 #: ..\..\..\inc\items\views\_item_list_full.view.php:360
 msgid "(Line breaks become &lt;br&gt;)"
-msgstr "(Zeilenumbrüche werden zu &lt;br&gt;)"
+msgstr "(ZeilenumbrÃ¼che werden zu &lt;br&gt;)"
 
 #: ..\..\..\inc\items\views\_item_list_full.view.php:365
 #: ..\..\..\skins\_item_comment_form.inc.php:200
@@ -8294,7 +8294,7 @@ msgstr "Suche"
 
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:80
 msgid "Posts to show"
-msgstr "Anzuzeigende Einträge"
+msgstr "Anzuzeigende EintrÃ¤ge"
 
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:85
 msgid "Past"
@@ -8306,11 +8306,11 @@ msgstr "Zukunft"
 
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:95
 msgid "Public"
-msgstr "Öffentlich"
+msgstr "Ã–ffentlich"
 
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:98
 msgid "Members only"
-msgstr "Nur für Mitglieder"
+msgstr "Nur fÃ¼r Mitglieder"
 
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:101
 msgid "You only"
@@ -8319,11 +8319,11 @@ msgstr "Nur du"
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:104
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:107
 msgid "Not published!"
-msgstr "Nicht veröffentlicht!"
+msgstr "Nicht verÃ¶ffentlicht!"
 
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:119
 msgid "Title / Text contains"
-msgstr "Titel / Text enthält"
+msgstr "Titel / Text enthÃ¤lt"
 
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:130
 msgid "AND"
@@ -8450,7 +8450,7 @@ msgstr ""
 
 #: ..\..\..\inc\items\views\inc\_item_links.inc.php:180
 msgid "Link a file..."
-msgstr "Verknüpfe eine Datei..."
+msgstr "VerknÃ¼pfe eine Datei..."
 
 #: ..\..\..\inc\items\views\inc\_item_links.inc.php:181
 msgid "Link files"
@@ -8479,7 +8479,7 @@ msgid ""
 "two letters should be a <a %s>ISO 3166 country code</a>."
 msgstr ""
 "Die ersten zwei Buchstaben sollten ein <a %s>ISO 639 Sprachcode</a> sein. "
-"Die letzten zwei Buchstaben sollten ein <a %s>ISO 3166 Ländercode</a> sein."
+"Die letzten zwei Buchstaben sollten ein <a %s>ISO 3166 LÃ¤ndercode</a> sein."
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:86
 #: ..\..\..\inc\locales\_locale_settings.form.php:275
@@ -8488,7 +8488,7 @@ msgstr "Eingeschaltet"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:86
 msgid "Should this locale be available to users?"
-msgstr "Soll diese Locale für Benutzer verfügbar sein?"
+msgstr "Soll diese Locale fÃ¼r Benutzer verfÃ¼gbar sein?"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:88
 msgid "name of the locale"
@@ -8542,9 +8542,9 @@ msgid ""
 "detecting browser language. Priority also affects the order in which locales "
 "are displayed in dropdown boxes, etc."
 msgstr ""
-"1 ist höchste. Priorität ist wichtig, wenn eine Locale aus einem Sprach-Code "
-"ausgewählt wird und mehrere Locales zu einer Sprache passen; das kann "
-"passieren, wenn die Sprache des Browsers erkannt wird. Priorität hat "
+"1 ist hÃ¶chste. PrioritÃ¤t ist wichtig, wenn eine Locale aus einem Sprach-Code "
+"ausgewÃ¤hlt wird und mehrere Locales zu einer Sprache passen; das kann "
+"passieren, wenn die Sprache des Browsers erkannt wird. PrioritÃ¤t hat "
 "ausserdem Einfluss darauf, in welcher Reihenfolge Locales in Dropdown-Boxen "
 "angezeigt werden, etc."
 
@@ -8597,7 +8597,7 @@ msgstr ""
 msgid ""
 "d - day of the month, 2 digits with leading zeros; i.e. \"01\" to \"31\""
 msgstr ""
-"d - Tag des Monats, 2 Nummern mit führender Null; d.h. \"01\" bis \"31\""
+"d - Tag des Monats, 2 Nummern mit fÃ¼hrender Null; d.h. \"01\" bis \"31\""
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:127
 msgid "D - day of the week, textual, 3 letters; i.e. \"Fri\""
@@ -8614,12 +8614,12 @@ msgstr "F - Monat, textlich, lang; zB \"Januar\""
 #: ..\..\..\inc\locales\_locale_settings.form.php:130
 msgid "g - hour, 12-hour format without leading zeros; i.e. \"1\" to \"12\""
 msgstr ""
-"g - Stunde, 12-Stunden Format ohne führende Null; d.h. \"1\" bis \"12\""
+"g - Stunde, 12-Stunden Format ohne fÃ¼hrende Null; d.h. \"1\" bis \"12\""
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:131
 msgid "G - hour, 24-hour format without leading zeros; i.e. \"0\" to \"23\""
 msgstr ""
-"G - Stunde, 24-Stunden Format ohne führende Null; d.h. \"0\" bis \"23\""
+"G - Stunde, 24-Stunden Format ohne fÃ¼hrende Null; d.h. \"0\" bis \"23\""
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:132
 msgid "h - hour, 12-hour format; i.e. \"01\" to \"12\""
@@ -8639,7 +8639,7 @@ msgstr "I (grosses I) - \"1\" falls Sommerzeit, ansonsten \"0\"."
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:136
 msgid "j - day of the month without leading zeros; i.e. \"1\" to \"31\""
-msgstr "j - Tag des Monats ohne führende Null; d.h. \"1\" bis \"31\""
+msgstr "j - Tag des Monats ohne fÃ¼hrende Null; d.h. \"1\" bis \"31\""
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:137
 msgid "l (lowercase \"L\") - day of the week, textual, long; i.e. \"Friday\""
@@ -8647,7 +8647,7 @@ msgstr "l (kleines \"L\") - Tag der Woche, textlich, lang; zB \"Freitag\""
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:138
 msgid "L - boolean for whether it is a leap year; i.e. \"0\" or \"1\""
-msgstr "L - Boolean für Schaltjahr; entweder \"0\" oder \"1\""
+msgstr "L - Boolean fÃ¼r Schaltjahr; entweder \"0\" oder \"1\""
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:139
 msgid "m - month; i.e. \"01\" to \"12\""
@@ -8659,7 +8659,7 @@ msgstr "M - Monat, textlich, 3 Buchstaben; zB \"Jan\""
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:141
 msgid "n - month without leading zeros; i.e. \"1\" to \"12\""
-msgstr "n - Monat ohne führende Null; d.h. \"1\" bis \"12\""
+msgstr "n - Monat ohne fÃ¼hrende Null; d.h. \"1\" bis \"12\""
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:142
 msgid "O - Difference to Greenwich time (GMT) in hours; i.e. \"+0200\""
@@ -8723,12 +8723,12 @@ msgid ""
 "always positive."
 msgstr ""
 "Z - Zeitzonen-Offset in Sekunden (d.h. \"-43200\" bis \"43200\"). Der Offset "
-"für Zeitzonen westlich von UTC ist immer negatic, und für diejenigen östlich "
+"fÃ¼r Zeitzonen westlich von UTC ist immer negatic, und fÃ¼r diejenigen Ã¶stlich "
 "von UTC immer positiv."
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:156
 msgid "isoZ - full ISO 8601 format, equivalent to Y-m-d\\TH:i:s\\Z"
-msgstr "isoZ - volles ISO 8601 Format, äquivalent zu Y-m-d\\TH:i:s\\Z"
+msgstr "isoZ - volles ISO 8601 Format, Ã¤quivalent zu Y-m-d\\TH:i:s\\Z"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:157
 msgid ""
@@ -8774,19 +8774,19 @@ msgid ""
 "Overridden by browser config, user locale or blog locale (in this order)."
 msgstr ""
 "Wird von Browser-Einstellungen, Benutzer-Locale oder Blog-Locale "
-"überschrieben (in dieser Reihenfolge)."
+"Ã¼berschrieben (in dieser Reihenfolge)."
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:257
 msgid "Available locales"
-msgstr "Verfügbare Locales"
+msgstr "VerfÃ¼gbare Locales"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:262
 msgid "Hide translation info"
-msgstr "Verstecke Übersetzungs-Infos"
+msgstr "Verstecke Ãœbersetzungs-Infos"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:266
 msgid "Show translation info"
-msgstr "Zeige Übersetzungs-Infos"
+msgstr "Zeige Ãœbersetzungs-Infos"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:277
 msgid "Date fmt"
@@ -8800,7 +8800,7 @@ msgstr "Zeitformat"
 msgid ""
 "Day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc"
 msgstr ""
-"Tag zu Beginn der Woche: 0 für Sonntag, 1 für Montag, 2 für Dienstag, etc"
+"Tag zu Beginn der Woche: 0 fÃ¼r Sonntag, 1 fÃ¼r Montag, 2 fÃ¼r Dienstag, etc"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:290
 msgid "Strings"
@@ -8808,7 +8808,7 @@ msgstr "Zeichenketten"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:291
 msgid "Translated"
-msgstr "Übersetzt"
+msgstr "Ãœbersetzt"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:295
 #: ..\..\..\inc\locales\_locale_settings.form.php:480
@@ -8823,11 +8823,11 @@ msgstr ""
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:366
 msgid "Move priority up"
-msgstr "Erhöhe Priorität"
+msgstr "ErhÃ¶he PrioritÃ¤t"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:375
 msgid "Move priority down"
-msgstr "Verringere Priorität"
+msgstr "Verringere PrioritÃ¤t"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:382
 msgid "Copy locale"
@@ -8863,20 +8863,20 @@ msgstr "Regionale Einstellungen aktualisiert."
 #, php-format
 msgid "Deleted settings for locale &laquo;%s&raquo; in database."
 msgstr ""
-"Die Einstellungen für die Sprache &laquo;%s&raquo; wurden aus der Datenbank "
-"gelöscht."
+"Die Einstellungen fÃ¼r die Sprache &laquo;%s&raquo; wurden aus der Datenbank "
+"gelÃ¶scht."
 
 #: ..\..\..\inc\locales\locales.ctrl.php:147
 #, php-format
 msgid "Inserted (and disabled) locale &laquo;%s&raquo; into database."
 msgstr ""
-"Die Sprache &laquo;%s&raquo; wurde in die Datenbank eingefügt (und "
+"Die Sprache &laquo;%s&raquo; wurde in die Datenbank eingefÃ¼gt (und "
 "deaktiviert)."
 
 #: ..\..\..\inc\locales\locales.ctrl.php:152
 #, php-format
 msgid "Inserted locale &laquo;%s&raquo; into database."
-msgstr "Die Sprache &laquo;%s&raquo; wurde in die Datenbank eingefügt."
+msgstr "Die Sprache &laquo;%s&raquo; wurde in die Datenbank eingefÃ¼gt."
 
 #: ..\..\..\inc\locales\locales.ctrl.php:164
 #, php-format
@@ -8896,11 +8896,11 @@ msgstr "Datei <code>%s</code> nicht gefunden."
 #: ..\..\..\inc\locales\locales.ctrl.php:356
 #, php-format
 msgid "Deleted locale &laquo;%s&raquo; from database."
-msgstr "Die Sprache &laquo;%s&raquo; wurde aus der Datenbank gelöscht."
+msgstr "Die Sprache &laquo;%s&raquo; wurde aus der Datenbank gelÃ¶scht."
 
 #: ..\..\..\inc\locales\locales.ctrl.php:410
 msgid "Switched priorities."
-msgstr "Prioritäten getauscht."
+msgstr "PrioritÃ¤ten getauscht."
 
 #: ..\..\..\inc\plugins\_plugin.class.php:336
 msgid "No desc available"
@@ -8908,7 +8908,7 @@ msgstr "keine Beschreibung"
 
 #: ..\..\..\inc\plugins\_plugin.class.php:340
 msgid "No description available"
-msgstr "Keine Beschreibung verfügbar"
+msgstr "Keine Beschreibung verfÃ¼gbar"
 
 #: ..\..\..\inc\plugins\_plugin.class.php:714
 msgid "My Tab"
@@ -8930,12 +8930,12 @@ msgstr "Editiere Plugin-Einstellungen"
 
 #: ..\..\..\inc\plugins\_plugin.funcs.php:299
 msgid "Delete set!"
-msgstr "Lösche Datensatz!"
+msgstr "LÃ¶sche Datensatz!"
 
 #: ..\..\..\inc\plugins\_plugin.funcs.php:359
 #, php-format
 msgid "Add a new set of &laquo;%s&raquo;"
-msgstr "Füge neuen Satz von &laquo;%s&raquo; hinzu"
+msgstr "FÃ¼ge neuen Satz von &laquo;%s&raquo; hinzu"
 
 #: ..\..\..\inc\plugins\_plugin.funcs.php:362
 msgid "New set"
@@ -8982,23 +8982,23 @@ msgstr ""
 msgid ""
 "The value is invalid. It must match the regular expression &laquo;%s&raquo;."
 msgstr ""
-"Der Wert ist ungültig. Er muss zu dem regulären Ausdruck &laquo;%s&raquo; "
+"Der Wert ist ungÃ¼ltig. Er muss zu dem regulÃ¤ren Ausdruck &laquo;%s&raquo; "
 "passen."
 
 #: ..\..\..\inc\plugins\_plugin.funcs.php:926
 #, php-format
 msgid "The value is invalid. It must be in the range from %s to %s."
-msgstr "Der Wert ist ungültig. Er muss im Bereich von %s bis %s sein."
+msgstr "Der Wert ist ungÃ¼ltig. Er muss im Bereich von %s bis %s sein."
 
 #: ..\..\..\inc\plugins\_plugin.funcs.php:930
 #, php-format
 msgid "The value is invalid. It must be smaller than %s."
-msgstr "Der Wert ist ungültig. Er muss kleiner als %s sein."
+msgstr "Der Wert ist ungÃ¼ltig. Er muss kleiner als %s sein."
 
 #: ..\..\..\inc\plugins\_plugin.funcs.php:934
 #, php-format
 msgid "The value is invalid. It must be greater than %s."
-msgstr "Der Wert ist ungültig. Er muss grösser als %s sein."
+msgstr "Der Wert ist ungÃ¼ltig. Er muss grÃ¶sser als %s sein."
 
 #: ..\..\..\inc\plugins\model\_plugins_admin.class.php:464
 msgid "The plugin cannot be installed again."
@@ -9010,11 +9010,11 @@ msgstr "Die Installation des Plugins ist fehlgeschlagen."
 
 #: ..\..\..\inc\plugins\model\_plugins_admin.class.php:492
 msgid "Some plugin dependencies are not fulfilled:"
-msgstr "Einige Pluginabhängigkeiten sind nicht erfüllt:"
+msgstr "Einige PluginabhÃ¤ngigkeiten sind nicht erfÃ¼llt:"
 
 #: ..\..\..\inc\plugins\model\_plugins_admin.class.php:833
 msgid "The maximum length of a plugin code is 32 characters."
-msgstr "Die maximale Länge eines Plugin-Codes ist 32 Zeichen."
+msgstr "Die maximale LÃ¤nge eines Plugin-Codes ist 32 Zeichen."
 
 #: ..\..\..\inc\plugins\model\_plugins_admin.class.php:839
 msgid "The plugin code cannot include a dot!"
@@ -9113,7 +9113,7 @@ msgstr "Die Datenbank wurde aktualisiert."
 #: ..\..\..\inc\plugins\plugins.ctrl.php:112
 #: ..\..\..\install\_functions_evoupgrade.php:2434
 msgid "The DB schema has been changed since confirmation."
-msgstr "Das Datenbank-Schema wurde verändert, seitdem es bestätigt wurde."
+msgstr "Das Datenbank-Schema wurde verÃ¤ndert, seitdem es bestÃ¤tigt wurde."
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:181
 #: ..\..\..\inc\plugins\plugins.ctrl.php:218
@@ -9132,7 +9132,7 @@ msgstr "Das Plugin mit der ID %d ist bereits deaktiviert."
 #: ..\..\..\inc\plugins\plugins.ctrl.php:194
 msgid "The plugin cannot be disabled because of the following dependencies:"
 msgstr ""
-"Das Plugin kann aufgrund dser folgenden Abhängigkeiten nicht deaktiviert "
+"Das Plugin kann aufgrund dser folgenden AbhÃ¤ngigkeiten nicht deaktiviert "
 "werden:"
 
 #. TRANS: plugin name, class name and ID
@@ -9174,7 +9174,7 @@ msgstr "Die Plugins wurden neu geladen."
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:312
 msgid "Plugins have not changed."
-msgstr "Plugins wurden nicht geändert."
+msgstr "Plugins wurden nicht geÃ¤ndert."
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:356
 #, php-format
@@ -9185,7 +9185,7 @@ msgstr "Das Plugin &laquo;%s&raquo; wurde installiert."
 msgid ""
 "The plugin cannot be uninstalled because of the following dependencies:"
 msgstr ""
-"Das Plugin kann auf Grund der folgenden Abhängigkeiten nicht deinstalliert "
+"Das Plugin kann auf Grund der folgenden AbhÃ¤ngigkeiten nicht deinstalliert "
 "werden:"
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:419
@@ -9195,7 +9195,7 @@ msgstr "Konnte Plugin #%d nicht deinstallieren."
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:435
 msgid "Dropped the table(s) of the plugin."
-msgstr "Die Tabellen für das Plugin wurden gelöscht."
+msgstr "Die Tabellen fÃ¼r das Plugin wurden gelÃ¶scht."
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:448
 #, php-format
@@ -9223,12 +9223,12 @@ msgstr "Plugin Code aktualisiert."
 #: ..\..\..\inc\plugins\plugins.ctrl.php:542
 #: ..\..\..\inc\plugins\plugins.ctrl.php:710
 msgid "Plugin priority must be numeric (0-100)."
-msgstr "Plugin-Priorität muss numerisch sein."
+msgstr "Plugin-PrioritÃ¤t muss numerisch sein."
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:547
 #: ..\..\..\inc\plugins\plugins.ctrl.php:717
 msgid "Plugin priority updated."
-msgstr "Plugin-Priorität aktualisiert."
+msgstr "Plugin-PrioritÃ¤t aktualisiert."
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:558
 #: ..\..\..\inc\plugins\plugins.ctrl.php:724
@@ -9257,7 +9257,7 @@ msgstr "Bearbeite Plugin &laquo;%s&raquo; (ID %d)"
 #: ..\..\..\inc\plugins\plugins.ctrl.php:815
 #, php-format
 msgid "Help for plugin &laquo;%s&raquo;"
-msgstr "Hilfe für Plugin &laquo;%s&raquo;"
+msgstr "Hilfe fÃ¼r Plugin &laquo;%s&raquo;"
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:818
 msgid "External help page"
@@ -9275,7 +9275,7 @@ msgstr ""
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:875
 msgid "The plugin needs the following database changes."
-msgstr "Das Plugin benötigt die folgenden Datenbankänderungen."
+msgstr "Das Plugin benÃ¶tigt die folgenden DatenbankÃ¤nderungen."
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:879
 #: ..\..\..\install\_functions_evoupgrade.php:2458
@@ -9283,7 +9283,7 @@ msgid ""
 "The following database changes will be carried out. If you are not sure what "
 "this means, it will probably be alright."
 msgstr ""
-"Die folgenden Datenbankanfragen werden ausgeführt. Wenn du nicht weisst, was "
+"Die folgenden Datenbankanfragen werden ausgefÃ¼hrt. Wenn du nicht weisst, was "
 "das bedeutet, wird es wahrscheinlich in Ordnung sein."
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:892
@@ -9304,7 +9304,7 @@ msgstr "Deinstalliere Plugin #%d (%s)"
 #: ..\..\..\inc\plugins\plugins.ctrl.php:920
 msgid "Uninstalling this plugin will also delete its database tables:"
 msgstr ""
-"Das Deinstallieren des Pluigins wird auch seine Datenbanktabellen löschen:"
+"Das Deinstallieren des Pluigins wird auch seine Datenbanktabellen lÃ¶schen:"
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:962
 msgid "Close info!"
@@ -9325,8 +9325,8 @@ msgid ""
 "It is only necessary to call the plugin by code (SkinTag) or when using it "
 "as a Renderer."
 msgstr ""
-"Dieser 32 Zeichen-Code identifiziert die Funktionalität dieses Plugins "
-"eindeutig. Er ist nur notwendig, um das Plugin über seinen Code aufzurufen "
+"Dieser 32 Zeichen-Code identifiziert die FunktionalitÃ¤t dieses Plugins "
+"eindeutig. Er ist nur notwendig, um das Plugin Ã¼ber seinen Code aufzurufen "
 "(SkinTag) oder wenn es als Renderer benutzt wird."
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:971
@@ -9336,7 +9336,7 @@ msgstr "Kurze Beschreibung"
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:972
 msgid "Long desc"
-msgstr "Ausführliche Beschreibung"
+msgstr "AusfÃ¼hrliche Beschreibung"
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:977
 #: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:54
@@ -9397,7 +9397,7 @@ msgstr "Wann soll Rendering abgewendet werden?"
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:195
 msgid "The code to call the plugin by code (SkinTag) or as Renderer."
 msgstr ""
-"Der Code, um ein Plugin über Code aufzurufen (SkinTag) oder für Renderer."
+"Der Code, um ein Plugin Ã¼ber Code aufzurufen (SkinTag) oder fÃ¼r Renderer."
 
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:220
 #: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:124
@@ -9420,7 +9420,7 @@ msgstr "Deinstalliere dieses Plugin!"
 
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:262
 msgid "Reload events and codes for installed plugins."
-msgstr "Lade Events und Codes für installierte Plugins neu."
+msgstr "Lade Events und Codes fÃ¼r installierte Plugins neu."
 
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:262
 msgid "Reload plugins"
@@ -9523,7 +9523,7 @@ msgid ""
 "Only change this, if you know what you are doing."
 msgstr ""
 "Warnung: durch das Deaktivieren von Plugin Ereignissen beeinflusst du das "
-"Verhalten des Plugins! Ändere es nur, wenn du weisst, was du tust."
+"Verhalten des Plugins! Ã„ndere es nur, wenn du weisst, was du tust."
 
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:158
 msgid "This plugin has no registered events."
@@ -9660,7 +9660,7 @@ msgstr ""
 
 #: ..\..\..\inc\sessions\model\_hit.class.php:703
 msgid "bad char in User Agent"
-msgstr "böses Zeichen in User Agent"
+msgstr "bÃ¶ses Zeichen in User Agent"
 
 #: ..\..\..\inc\sessions\model\_hitlist.class.php:128
 msgid "Pruning has already been done today"
@@ -9673,7 +9673,7 @@ msgstr ""
 
 #: ..\..\..\inc\sessions\stats.ctrl.php:50
 msgid "View Stats for Blog:"
-msgstr "Betrachte Statistiken für Blog:"
+msgstr "Betrachte Statistiken fÃ¼r Blog:"
 
 #: ..\..\..\inc\sessions\stats.ctrl.php:61
 msgid "Sorry, there is no blog you have permission to view stats for."
@@ -9682,31 +9682,31 @@ msgstr ""
 #: ..\..\..\inc\sessions\stats.ctrl.php:81
 #, php-format
 msgid "Changed hit #%d type to: %s."
-msgstr "Hit #%d Typ zu %s geändert."
+msgstr "Hit #%d Typ zu %s geÃ¤ndert."
 
 #: ..\..\..\inc\sessions\stats.ctrl.php:93
 #, php-format
 msgid "Deleted hit #%d."
-msgstr "Hit #%d gelöscht."
+msgstr "Hit #%d gelÃ¶scht."
 
 #: ..\..\..\inc\sessions\stats.ctrl.php:97
 #, php-format
 msgid "Could not delete hit #%d."
-msgstr "Konnte Hit #%d nicht löschen."
+msgstr "Konnte Hit #%d nicht lÃ¶schen."
 
 # TRANS: %s is a date
 #. TRANS: %s is a date
 #: ..\..\..\inc\sessions\stats.ctrl.php:109
 #, php-format
 msgid "Deleted %d hits for %s."
-msgstr "%d Hits für %s gelöscht."
+msgstr "%d Hits fÃ¼r %s gelÃ¶scht."
 
 # TRANS: %s is a date
 #. TRANS: %s is a date
 #: ..\..\..\inc\sessions\stats.ctrl.php:113
 #, php-format
 msgid "No hits deleted for %s."
-msgstr "Keine Hits für %s gelöscht."
+msgstr "Keine Hits fÃ¼r %s gelÃ¶scht."
 
 #: ..\..\..\inc\sessions\views\_goal.form.php:31
 msgid "Delete this goal!"
@@ -9778,7 +9778,7 @@ msgstr ""
 
 #: ..\..\..\inc\sessions\views\_stats_browserhits.view.php:160
 msgid "Refering searches"
-msgstr "Überweisende Suchen"
+msgstr "Ãœberweisende Suchen"
 
 #: ..\..\..\inc\sessions\views\_stats_browserhits.view.php:161
 msgid "Referers"
@@ -9805,7 +9805,7 @@ msgstr ""
 #: ..\..\..\inc\sessions\views\_stats_summary.view.php:150
 #: ..\..\..\inc\sessions\views\_stats_summary.view.php:182
 msgid "Prune hits for this date!"
-msgstr "Entferne hits für dieses Datum!"
+msgstr "Entferne hits fÃ¼r dieses Datum!"
 
 #: ..\..\..\inc\sessions\views\_stats_direct.view.php:37
 #: ..\..\..\inc\sessions\views\_stats_direct.view.php:49
@@ -9831,7 +9831,7 @@ msgstr "Zeitformat"
 #: ..\..\..\inc\sessions\views\_stats_referers.view.php:69
 #: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:66
 msgid "Delete this hit!"
-msgstr "Lösche diesen Hit!"
+msgstr "LÃ¶sche diesen Hit!"
 
 #: ..\..\..\inc\sessions\views\_stats_direct.view.php:82
 #: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:154
@@ -9889,7 +9889,7 @@ msgstr ""
 #: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:76
 #: ..\..\..\inc\sessions\views\_stats_search_keywords.view.php:220
 msgid "Search keywords"
-msgstr "Suchwörter"
+msgstr "SuchwÃ¶rter"
 
 #: ..\..\..\inc\sessions\views\_stats_goals.view.php:82
 msgid "Redirect to"
@@ -10020,8 +10020,8 @@ msgid ""
 "These are hits from people who came to this blog system through a search "
 "engine. (Search engines must be listed in /conf/_stats.php)"
 msgstr ""
-"Dies sind Hits von Leuten, die über eine Suchmaschine zu diesem Blogsystem "
-"kamen. (Suchmaschinen müssen in /conf/_stats.php angegeben werden)"
+"Dies sind Hits von Leuten, die Ã¼ber eine Suchmaschine zu diesem Blogsystem "
+"kamen. (Suchmaschinen mÃ¼ssen in /conf/_stats.php angegeben werden)"
 
 #: ..\..\..\inc\sessions\views\_stats_robots.view.php:37
 #, php-format
@@ -10044,7 +10044,7 @@ msgstr "Roboter"
 
 #: ..\..\..\inc\sessions\views\_stats_search_engines.view.php:40
 msgid "Top refering search engines"
-msgstr "Top überweisende Suchmaschinen"
+msgstr "Top Ã¼berweisende Suchmaschinen"
 
 #: ..\..\..\inc\sessions\views\_stats_search_engines.view.php:50
 #: ..\..\..\inc\sessions\views\_stats_search_keywords.view.php:210
@@ -10175,7 +10175,7 @@ msgstr "Benutzerlevel muss zwischen %d und %d liegen."
 #: ..\..\..\inc\settings\settings.ctrl.php:75
 #, php-format
 msgid "Minimun password length must be between %d and %d."
-msgstr "Die minimale Passwordlänge muss zwischen %d und %d liegen."
+msgstr "Die minimale PasswordlÃ¤nge muss zwischen %d und %d liegen."
 
 #: ..\..\..\inc\settings\settings.ctrl.php:86
 #, php-format
@@ -10188,8 +10188,8 @@ msgid ""
 "Warning: your session timeout is just %d seconds. Your users may have to re-"
 "login often!"
 msgstr ""
-"Warnung: das Session-Timeout beträgt nur %d Sekunden. Die Benutzer könnten "
-"sich oft neu einloggen müssen!"
+"Warnung: das Session-Timeout betrÃ¤gt nur %d Sekunden. Die Benutzer kÃ¶nnten "
+"sich oft neu einloggen mÃ¼ssen!"
 
 #: ..\..\..\inc\settings\settings.ctrl.php:94
 #, php-format
@@ -10230,7 +10230,7 @@ msgstr "Onlinehilfe-Links"
 #: ..\..\..\inc\settings\views\_features.form.php:63
 msgid "Online help links provide context sensitive help to certain features."
 msgstr ""
-"Links zur Onlinehilfe stellen kontextsensitive Hilfe für bestimmte Features "
+"Links zur Onlinehilfe stellen kontextsensitive Hilfe fÃ¼r bestimmte Features "
 "bereit."
 
 #: ..\..\..\inc\settings\views\_features.form.php:70
@@ -10296,7 +10296,7 @@ msgstr "POP3"
 
 #: ..\..\..\inc\settings\views\_features.form.php:88
 msgid "Choose a method to retrieve the emails."
-msgstr "Wähle eine Methode, um die E-Mails abzuholen."
+msgstr "WÃ¤hle eine Methode, um die E-Mails abzuholen."
 
 # TRANS: E-Mail retrieval method
 #. TRANS: E-Mail retrieval method
@@ -10355,7 +10355,7 @@ msgstr "Password zur Authentifikation am Mailserver."
 
 #: ..\..\..\inc\settings\views\_features.form.php:105
 msgid "By default emailed posts will have this category."
-msgstr "Die Standardkategorie für Einträge durch E-Mails."
+msgstr "Die Standardkategorie fÃ¼r EintrÃ¤ge durch E-Mails."
 
 #: ..\..\..\inc\settings\views\_features.form.php:105
 msgid "Default Category ID"
@@ -10372,7 +10372,7 @@ msgstr "Betreffs-Prefix"
 
 #: ..\..\..\inc\settings\views\_features.form.php:113
 msgid "Perform Server Test"
-msgstr "Servertest durchführen"
+msgstr "Servertest durchfÃ¼hren"
 
 #: ..\..\..\inc\settings\views\_features.form.php:114
 msgid "connection"
@@ -10380,15 +10380,15 @@ msgstr "Verbindung"
 
 #: ..\..\..\inc\settings\views\_features.form.php:116
 msgid "verbose"
-msgstr "ausführlich"
+msgstr "ausfÃ¼hrlich"
 
 #: ..\..\..\inc\settings\views\_features.form.php:121
 msgid "Hide extra options"
-msgstr "Verstecke zusätzliche Optionen"
+msgstr "Verstecke zusÃ¤tzliche Optionen"
 
 #: ..\..\..\inc\settings\views\_features.form.php:121
 msgid "Show extra options..."
-msgstr "Zeige zusätzliche Optionen"
+msgstr "Zeige zusÃ¤tzliche Optionen"
 
 #: ..\..\..\inc\settings\views\_features.form.php:127
 msgid "Do not validate certificate"
@@ -10412,7 +10412,7 @@ msgstr ""
 
 #: ..\..\..\inc\settings\views\_features.form.php:131
 msgid "Add &lt;BR /&gt; tags to mail/MMS posts."
-msgstr "Füge &lt;br /&gt; Tags zu Mail/MMS-Einträgen hinzu."
+msgstr "FÃ¼ge &lt;br /&gt; Tags zu Mail/MMS-EintrÃ¤gen hinzu."
 
 #: ..\..\..\inc\settings\views\_features.form.php:131
 msgid "Email/MMS Auto-BR"
@@ -10420,7 +10420,7 @@ msgstr "E-Mail/MSS Auto-BR"
 
 #: ..\..\..\inc\settings\views\_features.form.php:133
 msgid "Body Terminator"
-msgstr "Inhaltsbeschränker"
+msgstr "InhaltsbeschrÃ¤nker"
 
 #: ..\..\..\inc\settings\views\_features.form.php:133
 msgid ""
@@ -10431,7 +10431,7 @@ msgstr ""
 
 #: ..\..\..\inc\settings\views\_features.form.php:135
 msgid "Check to run Blog by Email in test mode."
-msgstr "Auswählen, um Bloggen per E-Mail im Testmodus zu betreiben."
+msgstr "AuswÃ¤hlen, um Bloggen per E-Mail im Testmodus zu betreiben."
 
 #: ..\..\..\inc\settings\views\_features.form.php:135
 msgid "Test Mode"
@@ -10533,11 +10533,11 @@ msgstr "Erlaube neuen Benutzern, sich selbst zu registrieren."
 
 #: ..\..\..\inc\settings\views\_general.form.php:69
 msgid "New users can register"
-msgstr "Neue Benutzer können sich anmelden"
+msgstr "Neue Benutzer kÃ¶nnen sich anmelden"
 
 #: ..\..\..\inc\settings\views\_general.form.php:72
 msgid "Group for new users"
-msgstr "Gruppe für neue Benutzer"
+msgstr "Gruppe fÃ¼r neue Benutzer"
 
 #: ..\..\..\inc\settings\views\_general.form.php:72
 msgid "Groups determine user roles and permissions."
@@ -10545,7 +10545,7 @@ msgstr "Gruppen legen Benutzerrollen und Rechte fest."
 
 #: ..\..\..\inc\settings\views\_general.form.php:74
 msgid "Level for new users"
-msgstr "Level für neue Benutzer"
+msgstr "Level fÃ¼r neue Benutzer"
 
 #: ..\..\..\inc\settings\views\_general.form.php:74
 msgid "Levels determine hierarchy of users in blogs."
@@ -10560,7 +10560,7 @@ msgid ""
 "Check to require users to validate their email by clicking a link sent to "
 "them."
 msgstr ""
-"Auswählen, damit Benutzer ihre E-Mail validieren müssen, indem sie auf einen "
+"AuswÃ¤hlen, damit Benutzer ihre E-Mail validieren mÃ¼ssen, indem sie auf einen "
 "Link klicken, der ihnen geschickt wird."
 
 #: ..\..\..\inc\settings\views\_general.form.php:82
@@ -10571,12 +10571,12 @@ msgstr ""
 msgid ""
 "Check to require users to re-validate when they change their email address."
 msgstr ""
-"Auswählen, damit Benutzer bei Änderung ihrer E-Mail-Adresse sich erneut "
-"validieren müssen."
+"AuswÃ¤hlen, damit Benutzer bei Ã„nderung ihrer E-Mail-Adresse sich erneut "
+"validieren mÃ¼ssen."
 
 #: ..\..\..\inc\settings\views\_general.form.php:84
 msgid "Validate email changes"
-msgstr "Validiere E-Mail Änderungen"
+msgstr "Validiere E-Mail Ã„nderungen"
 
 #: ..\..\..\inc\settings\views\_general.form.php:90
 msgid "Security options"
@@ -10584,7 +10584,7 @@ msgstr "Sicherheits-Optionen"
 
 #: ..\..\..\inc\settings\views\_general.form.php:92
 msgid "Minimum password length"
-msgstr "Minimale Passwortlänge"
+msgstr "Minimale PasswortlÃ¤nge"
 
 #: ..\..\..\inc\settings\views\_general.form.php:92
 msgid "characters."
@@ -10716,7 +10716,7 @@ msgstr ""
 
 #: ..\..\..\inc\skins\views\_coll_skin.view.php:27
 msgid "Choose a skin"
-msgstr "Wähle ein Skin"
+msgstr "WÃ¤hle ein Skin"
 
 #: ..\..\..\inc\skins\views\_coll_skin.view.php:31
 msgid "Manage installed skins..."
@@ -10814,7 +10814,7 @@ msgstr "Benutzergruppe"
 #: ..\..\..\inc\users\views\_user.form.php:108
 #, php-format
 msgid "See <a %s>online manual</a> for details."
-msgstr "Siehe <a %s>Online-Anleitung</a> für Details."
+msgstr "Siehe <a %s>Online-Anleitung</a> fÃ¼r Details."
 
 #: ..\..\..\inc\tools\mtimport.ctrl.php:339
 #: ..\..\..\inc\users\views\_user_list.view.php:237
@@ -10829,12 +10829,12 @@ msgid ""
 "Select main category in target blog and optionally check additional "
 "categories"
 msgstr ""
-"Wähle die Hauptkategorie im Ziel-Blog und markiere optional weitere "
+"WÃ¤hle die Hauptkategorie im Ziel-Blog und markiere optional weitere "
 "Kategorien"
 
 #: ..\..\..\inc\tools\mtimport.ctrl.php:1290
 msgid "Select as an additionnal category"
-msgstr "Wähle als zusätzliche Kategorie"
+msgstr "WÃ¤hle als zusÃ¤tzliche Kategorie"
 
 #: ..\..\..\inc\tools\system.ctrl.php:78
 msgid ""
@@ -10891,11 +10891,11 @@ msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:129
 msgid "Deleted"
-msgstr "Gelöscht"
+msgstr "GelÃ¶scht"
 
 #: ..\..\..\inc\tools\system.ctrl.php:129
 msgid "Not deleted"
-msgstr "Nicht gelöscht"
+msgstr "Nicht gelÃ¶scht"
 
 #: ..\..\..\inc\tools\system.ctrl.php:132
 msgid ""
@@ -11089,7 +11089,7 @@ msgstr "Movable Type Import"
 msgid ""
 "Use MT's export functionnality to create a .TXT file containing your posts;"
 msgstr ""
-"Benutze MT's Export-Funktion, um eine .TXT-Datei mit deinen Einträgen zu "
+"Benutze MT's Export-Funktion, um eine .TXT-Datei mit deinen EintrÃ¤gen zu "
 "erzeugen;"
 
 #: ..\..\..\inc\tools\tools.ctrl.php:116
@@ -11125,12 +11125,12 @@ msgstr ""
 #: ..\..\..\inc\users\model\_user.class.php:137
 #, php-format
 msgid "%d posts last edited by this user"
-msgstr "%d Einträge zuletzt von diesem Benutzer editiert"
+msgstr "%d EintrÃ¤ge zuletzt von diesem Benutzer editiert"
 
 #: ..\..\..\inc\users\model\_user.class.php:138
 #, php-format
 msgid "%d posts assigned to this user"
-msgstr "%d Einträge diesem Benutzer zugeordnet"
+msgstr "%d EintrÃ¤ge diesem Benutzer zugeordnet"
 
 #: ..\..\..\inc\users\model\_user.class.php:139
 #, php-format
@@ -11150,7 +11150,7 @@ msgstr "%d Benutzereinstellungen in Kollektionen"
 #: ..\..\..\inc\users\model\_user.class.php:145
 #, php-format
 msgid "%d sessions opened by this user"
-msgstr "%d Sessions von diesem Benutzer geöffnet"
+msgstr "%d Sessions von diesem Benutzer geÃ¶ffnet"
 
 #: ..\..\..\inc\users\model\_user.class.php:146
 #, php-format
@@ -11160,7 +11160,7 @@ msgstr "%d Benutzerrechte in Blogs"
 #: ..\..\..\inc\users\model\_user.class.php:148
 #, php-format
 msgid "%d posts created by this user"
-msgstr "%d Einträge erstellt von diesem Benutzer"
+msgstr "%d EintrÃ¤ge erstellt von diesem Benutzer"
 
 #: ..\..\..\inc\users\model\_user.class.php:309
 #, php-format
@@ -11169,7 +11169,7 @@ msgid ""
 "the parent directory is not writable or does not exist."
 msgstr ""
 "Das Benutzer-Medienverzeichnis &laquo;%s&raquo; kann nicht erstellt werden, "
-"weil das übergeordnete Verzeichnis nicht schreibbar ist oder nicht existiert."
+"weil das Ã¼bergeordnete Verzeichnis nicht schreibbar ist oder nicht existiert."
 
 #: ..\..\..\inc\users\model\_user.class.php:318
 #, php-format
@@ -11330,7 +11330,7 @@ msgstr ""
 
 #: ..\..\..\inc\users\users.ctrl.php:92
 msgid "Cannot edit user!"
-msgstr "Kann Benutzer nicht ändern!"
+msgstr "Kann Benutzer nicht Ã¤ndern!"
 
 #: ..\..\..\inc\users\users.ctrl.php:113
 msgid "You have no permission to edit other users!"
@@ -11339,11 +11339,11 @@ msgstr "Du hast keine Berechtigung, um andere Benutzer zu editieren!"
 #: ..\..\..\inc\users\users.ctrl.php:120
 msgid "You cannot edit the admin and demouser profile in demo mode!"
 msgstr ""
-"Du kannst das Admin- oder Demouser-Profil im Demo-Modus nicht ändern!"
+"Du kannst das Admin- oder Demouser-Profil im Demo-Modus nicht Ã¤ndern!"
 
 #: ..\..\..\inc\users\users.ctrl.php:144
 msgid "Cannot edit group!"
-msgstr "Kann Gruppe nicht ändern!"
+msgstr "Kann Gruppe nicht Ã¤ndern!"
 
 #: ..\..\..\inc\users\users.ctrl.php:145
 msgid "Requested group does not exist any longer."
@@ -11359,7 +11359,7 @@ msgid ""
 "&laquo;demouser&raquo; in demo mode!"
 msgstr ""
 "Du kannst die Gruppen &laquo;admin&raquo; oder &laquo;demouser&raquo; im "
-"Demo-Modus nicht ändern!"
+"Demo-Modus nicht Ã¤ndern!"
 
 #: ..\..\..\inc\users\users.ctrl.php:214
 #, php-format
@@ -11379,7 +11379,7 @@ msgstr "Du musst ein Login angeben!"
 msgid ""
 "This login already exists. Do you want to <a %s>edit the existing user</a>?"
 msgstr ""
-"Der Login existiert bereits. Möchtest du <a %s>den existierenden Benutzer "
+"Der Login existiert bereits. MÃ¶chtest du <a %s>den existierenden Benutzer "
 "editieren</a>?"
 
 #: ..\..\..\inc\users\users.ctrl.php:334
@@ -11411,28 +11411,28 @@ msgstr ""
 #: ..\..\..\inc\users\users.ctrl.php:492
 #: ..\..\..\inc\users\users.ctrl.php:571
 msgid "Usersettings of Plugins have been updated."
-msgstr "Benutzereinstellungen für Plugins wurden aktualisiert."
+msgstr "Benutzereinstellungen fÃ¼r Plugins wurden aktualisiert."
 
 #: ..\..\..\inc\users\users.ctrl.php:593
 msgid "Invalid promotion."
-msgstr "Ungültige Beförderung."
+msgstr "UngÃ¼ltige BefÃ¶rderung."
 
 #: ..\..\..\inc\users\users.ctrl.php:604
 msgid "User level changed."
-msgstr "Benutzerlevel geändert."
+msgstr "Benutzerlevel geÃ¤ndert."
 
 #: ..\..\..\inc\users\users.ctrl.php:623
 msgid "You can't delete yourself!"
-msgstr "Du kannst dich nicht selbst löschen!"
+msgstr "Du kannst dich nicht selbst lÃ¶schen!"
 
 #: ..\..\..\inc\users\users.ctrl.php:629
 msgid "You can't delete User #1!"
-msgstr "Du kannst Benutzer #1 nicht löschen!"
+msgstr "Du kannst Benutzer #1 nicht lÃ¶schen!"
 
 #: ..\..\..\inc\users\users.ctrl.php:639
 #, php-format
 msgid "User &laquo;%s&raquo; [%s] deleted."
-msgstr "Benutzer &laquo;%s&raquo; [%s] gelöscht."
+msgstr "Benutzer &laquo;%s&raquo; [%s] gelÃ¶scht."
 
 #: ..\..\..\inc\users\users.ctrl.php:643
 #, php-format
@@ -11442,7 +11442,7 @@ msgstr ""
 #: ..\..\..\inc\users\users.ctrl.php:657
 #, php-format
 msgid "Cannot delete User &laquo;%s&raquo; [%s]"
-msgstr "Kann den Benutzer &laquo;%s&raquo; [%s] nicht löschen"
+msgstr "Kann den Benutzer &laquo;%s&raquo; [%s] nicht lÃ¶schen"
 
 #: ..\..\..\inc\users\users.ctrl.php:661
 #, php-format
@@ -11459,7 +11459,7 @@ msgid ""
 "This group name already exists! Do you want to <a %s>edit the existing "
 "group</a>?"
 msgstr ""
-"Der Gruppenname existiert bereits! Möchtest du <a %s>diese Gruppe "
+"Der Gruppenname existiert bereits! MÃ¶chtest du <a %s>diese Gruppe "
 "editieren</a>?"
 
 #: ..\..\..\inc\users\users.ctrl.php:780
@@ -11472,26 +11472,26 @@ msgstr "Gruppe aktualisiert."
 
 #: ..\..\..\inc\users\users.ctrl.php:801
 msgid "You can't delete Group #1!"
-msgstr "Du kannst Gruppe #1 nicht löschen!"
+msgstr "Du kannst Gruppe #1 nicht lÃ¶schen!"
 
 #: ..\..\..\inc\users\users.ctrl.php:807
 msgid "You can't delete the default group for new users!"
-msgstr "Du kannst die Standard-Gruppe für neue Benutzer nicht löschen!"
+msgstr "Du kannst die Standard-Gruppe fÃ¼r neue Benutzer nicht lÃ¶schen!"
 
 #: ..\..\..\inc\users\users.ctrl.php:814
 #, php-format
 msgid "Group &laquo;%s&raquo; deleted."
-msgstr "Gruppe &laquo;%s&raquo; gelöscht."
+msgstr "Gruppe &laquo;%s&raquo; gelÃ¶scht."
 
 #: ..\..\..\inc\users\users.ctrl.php:824
 #, php-format
 msgid "Cannot delete Group &laquo;%s&raquo;"
-msgstr "Kann Gruppe &laquo;%s&raquo; nicht löschen"
+msgstr "Kann Gruppe &laquo;%s&raquo; nicht lÃ¶schen"
 
 #: ..\..\..\inc\users\users.ctrl.php:865
 #, php-format
 msgid "Delete user &laquo;%s&raquo; [%s]?"
-msgstr "Lösche Benutzer &laquo;%s&raquo; [%s]?"
+msgstr "LÃ¶sche Benutzer &laquo;%s&raquo; [%s]?"
 
 #: ..\..\..\inc\users\users.ctrl.php:869
 #, php-format
@@ -11501,7 +11501,7 @@ msgstr ""
 #: ..\..\..\inc\users\users.ctrl.php:884
 #, php-format
 msgid "Delete group &laquo;%s&raquo;?"
-msgstr "Lösche Gruppe &laquo;%s&raquo;?"
+msgstr "LÃ¶sche Gruppe &laquo;%s&raquo;?"
 
 #: ..\..\..\inc\users\views\_group.form.php:56
 msgid "Creating new group"
@@ -11509,7 +11509,7 @@ msgstr "Erstelle neue Gruppe"
 
 #: ..\..\..\inc\users\views\_group.form.php:60
 msgid "Editing group:"
-msgstr "Ändere Gruppe:"
+msgstr "Ã„ndere Gruppe:"
 
 #: ..\..\..\inc\users\views\_group.form.php:60
 msgid "Viewing group:"
@@ -11525,7 +11525,7 @@ msgstr "Details ansehen"
 
 #: ..\..\..\inc\users\views\_group.form.php:73
 msgid "Edit/delete all"
-msgstr "Ändern/Löschen aller"
+msgstr "Ã„ndern/LÃ¶schen aller"
 
 #: ..\..\..\inc\users\views\_group.form.php:84
 msgid "Hidden"
@@ -11724,7 +11724,7 @@ msgstr "Erstelle neues Benutzerprofil"
 
 #: ..\..\..\inc\users\views\_user.form.php:84
 msgid "Profile for:"
-msgstr "Profil für:"
+msgstr "Profil fÃ¼r:"
 
 #: ..\..\..\inc\users\views\_user.form.php:111
 #: ..\..\..\inc\users\views\_user.form.php:115
@@ -11756,7 +11756,7 @@ msgstr ""
 #: ..\..\..\skins\_profile.disp.php:62
 msgid "Check this to allow receiving emails through a message form."
 msgstr ""
-"Auswählen, um E-Mails über ein Nachrichtenformular empfangen zu können."
+"AuswÃ¤hlen, um E-Mails Ã¼ber ein Nachrichtenformular empfangen zu kÃ¶nnen."
 
 #: ..\..\..\inc\users\views\_user.form.php:138
 #: ..\..\..\inc\users\views\_user.form.php:147
@@ -11801,7 +11801,7 @@ msgstr ""
 #: ..\..\..\inc\users\views\_user.form.php:187
 #: ..\..\..\skins\_profile.disp.php:77
 msgid "Identity shown"
-msgstr "Angezeigte Identiät"
+msgstr "Angezeigte IdentiÃ¤t"
 
 #: ..\..\..\inc\users\views\_user.form.php:173
 #: ..\..\..\skins\_profile.disp.php:78
@@ -11829,7 +11829,7 @@ msgstr ""
 
 #: ..\..\..\inc\users\views\_user.form.php:201
 msgid "Leave empty if you don't want to change the password."
-msgstr "Leer lassen, wenn du dein Passwort nicht ändern möchtest."
+msgstr "Leer lassen, wenn du dein Passwort nicht Ã¤ndern mÃ¶chtest."
 
 #: ..\..\..\inc\users\views\_user.form.php:201
 msgid "New password"
@@ -11837,7 +11837,7 @@ msgstr "Neues Passwort"
 
 #: ..\..\..\inc\users\views\_user.form.php:202
 msgid "Confirm new password"
-msgstr "Bestätige neues Passwort"
+msgstr "BestÃ¤tige neues Passwort"
 
 #: ..\..\..\inc\users\views\_user.form.php:202
 #: ..\..\..\skins\_profile.disp.php:86
@@ -11859,7 +11859,7 @@ msgstr "Bevorzugte Locale"
 #: ..\..\..\inc\users\views\_user.form.php:226
 #: ..\..\..\inc\users\views\_user.form.php:251
 msgid "Preferred locale for admin interface, notifications, etc."
-msgstr "Bevorzugte Locale für Adminbereich, Benachrichtigungen, etc."
+msgstr "Bevorzugte Locale fÃ¼r Adminbereich, Benachrichtigungen, etc."
 
 #: ..\..\..\inc\users\views\_user.form.php:228
 #: ..\..\..\inc\users\views\_user.form.php:253
@@ -11881,11 +11881,11 @@ msgstr "Anzeige von Aktionsicons"
 
 #: ..\..\..\inc\users\views\_user.form.php:233
 msgid "1:more action words ... 5:less action words"
-msgstr "1:mehr Aktionswörter ... 5:weniger Aktionswörter"
+msgstr "1:mehr AktionswÃ¶rter ... 5:weniger AktionswÃ¶rter"
 
 #: ..\..\..\inc\users\views\_user.form.php:233
 msgid "Action word display"
-msgstr "Anzeige von Aktionswörtern"
+msgstr "Anzeige von AktionswÃ¶rtern"
 
 #: ..\..\..\inc\users\views\_user.form.php:236
 msgid ""
@@ -11901,15 +11901,15 @@ msgstr "Zeige Iconlegende"
 
 #: ..\..\..\inc\users\views\_user.form.php:239
 msgid "Control form closing"
-msgstr "Überwache Schliessen von Formularen"
+msgstr "Ãœberwache Schliessen von Formularen"
 
 #: ..\..\..\inc\users\views\_user.form.php:239
 msgid ""
 "This will alert you if you fill in data into a form and try to leave the "
 "form before submitting the data."
 msgstr ""
-"Dies wird dich warnen, wenn du Daten in einem Formular geändert hast und "
-"versuchst, das Formular zu verlassen, bevor die Daten übertragen wurden."
+"Dies wird dich warnen, wenn du Daten in einem Formular geÃ¤ndert hast und "
+"versuchst, das Formular zu verlassen, bevor die Daten Ã¼bertragen wurden."
 
 #: ..\..\..\inc\users\views\_user.form.php:242
 msgid "Focus on first field"
@@ -12009,7 +12009,7 @@ msgstr "Gruppen & Benutzer"
 
 #: ..\..\..\inc\users\views\_user_list.view.php:89
 msgid "Add user"
-msgstr "Benutzer hinzufügen"
+msgstr "Benutzer hinzufÃ¼gen"
 
 #: ..\..\..\inc\users\views\_user_list.view.php:89
 msgid "Create a new user..."
@@ -12017,7 +12017,7 @@ msgstr ""
 
 #: ..\..\..\inc\users\views\_user_list.view.php:90
 msgid "Add group"
-msgstr "Gruppe hinzufügen"
+msgstr "Gruppe hinzufÃ¼gen"
 
 #: ..\..\..\inc\users\views\_user_list.view.php:90
 msgid "Create a new group..."
@@ -12025,7 +12025,7 @@ msgstr ""
 
 #: ..\..\..\inc\users\views\_user_list.view.php:126
 msgid "default group for new users"
-msgstr "Standard-Gruppe für neue Benutzer"
+msgstr "Standard-Gruppe fÃ¼r neue Benutzer"
 
 #: ..\..\..\inc\users\views\_user_list.view.php:133
 msgid "Edit this group..."
@@ -12037,7 +12037,7 @@ msgstr "Diese Gruppe duplizieren..."
 
 #: ..\..\..\inc\users\views\_user_list.view.php:139
 msgid "Delete this group!"
-msgstr "Lösche diese Gruppe!"
+msgstr "LÃ¶sche diese Gruppe!"
 
 #: ..\..\..\inc\users\views\_user_list.view.php:252
 msgid "Decrease user level"
@@ -12057,7 +12057,7 @@ msgstr "Diesen Benutzer duplizieren..."
 
 #: ..\..\..\inc\users\views\_user_list.view.php:286
 msgid "Delete this user!"
-msgstr "Lösche diesen Benutzer!"
+msgstr "LÃ¶sche diesen Benutzer!"
 
 #: ..\..\..\inc\widgets\model\_widget.class.php:167
 #: ..\..\..\inc\widgets\model\_widget.class.php:199
@@ -12207,7 +12207,7 @@ msgstr ""
 #, php-format
 msgid "Widget &laquo;%s&raquo; has been added to container &laquo;%s&raquo;."
 msgstr ""
-"Widget &laquo;%s&raquo; wurde dem Container &laquo;%s&raquo; hinzugefügt."
+"Widget &laquo;%s&raquo; wurde dem Container &laquo;%s&raquo; hinzugefÃ¼gt."
 
 #: ..\..\..\inc\widgets\widgets.ctrl.php:193
 msgid "Widget settings have been updated"
@@ -12426,7 +12426,7 @@ msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:125
 msgid "Recently"
-msgstr "kürzlich"
+msgstr "kÃ¼rzlich"
 
 #: ..\..\..\inc\widgets\widgets\_coll_logo.widget.php:54
 msgid "Image / Blog logo"
@@ -12585,7 +12585,7 @@ msgstr ""
 #: ..\..\..\plugins\_calendar.plugin.php:485
 #, php-format
 msgid "%d posts"
-msgstr "%d Einträge"
+msgstr "%d EintrÃ¤ge"
 
 #: ..\..\..\inc\widgets\widgets\_coll_tagline.widget.php:54
 msgid "Blog tagline"
@@ -12831,7 +12831,7 @@ msgstr "Tag <code>body</code> kann nur einmal benutzt werden!"
 
 #: ..\..\..\inc\xhtml_validator\_xhtml_validator.class.php:245
 msgid "Illegal tag"
-msgstr "Ungültiger Tag"
+msgstr "UngÃ¼ltiger Tag"
 
 #: ..\..\..\inc\xhtml_validator\_xhtml_validator.class.php:252
 #, php-format
@@ -12850,7 +12850,7 @@ msgstr ""
 
 #: ..\..\..\inc\xhtml_validator\_xhtml_validator.class.php:271
 msgid "Found invalid URL: "
-msgstr "Ungültiger URL gefunden: "
+msgstr "UngÃ¼ltiger URL gefunden: "
 
 #: ..\..\..\inc\xhtml_validator\_xhtml_validator.class.php:295
 #, php-format
@@ -12860,7 +12860,7 @@ msgstr "Tag &lt;%s&gt; darf keine Daten enthalten"
 #: ..\..\..\install\_functions_create.php:367
 #, php-format
 msgid "This is the long description for the blog named '%s'. %s"
-msgstr "Dies ist eine lange Beschreibung für das Blog namens '%s'. %s"
+msgstr "Dies ist eine lange Beschreibung fÃ¼r das Blog namens '%s'. %s"
 
 #: ..\..\..\install\_functions_create.php:372
 #: ..\..\..\install\_functions_create.php:385
@@ -12872,7 +12872,7 @@ msgstr "%s Titel"
 #: ..\..\..\install\_functions_create.php:388
 #, php-format
 msgid "Tagline for %s"
-msgstr "Untertitel für %s"
+msgstr "Untertitel fÃ¼r %s"
 
 #: ..\..\..\install\_functions_create.php:396
 msgid ""
@@ -12880,7 +12880,7 @@ msgid ""
 "blogs where it will display your favorite/related links."
 msgstr ""
 "Der Hauptzweck dieses Blogs ist es, in der seitlichen Leiste der anderen "
-"Blogs eingefügt zu werden und dort deine favorisierten/verwandten Links "
+"Blogs eingefÃ¼gt zu werden und dort deine favorisierten/verwandten Links "
 "anzuzeigen."
 
 #: ..\..\..\install\_functions_create.php:401
@@ -13223,13 +13223,13 @@ msgid ""
 "Hi, this is a comment.<br />To delete a comment, just log in, and view the "
 "posts' comments, there you will have the option to edit or delete them."
 msgstr ""
-"Hi, dies ist ein Kommentar.<br />Um einen Kommentar zu löschen, log dich "
+"Hi, dies ist ein Kommentar.<br />Um einen Kommentar zu lÃ¶schen, log dich "
 "einfach ein und betrachte die Kommentare des Eintrags. Von dort aus hast du "
-"die Option zum Editieren oder Löschen."
+"die Option zum Editieren oder LÃ¶schen."
 
 #: ..\..\..\install\_functions_evoupgrade.php:243
 msgid "Checking DB schema version..."
-msgstr "Überprüfe DB-Schema Version..."
+msgstr "ÃœberprÃ¼fe DB-Schema Version..."
 
 #: ..\..\..\install\_functions_evoupgrade.php:254
 msgid "This version is too old!"
@@ -13237,21 +13237,21 @@ msgstr "Diese Version ist zu alt!"
 
 #: ..\..\..\install\_functions_evoupgrade.php:255
 msgid "This version is too recent! We cannot downgrade to it!"
-msgstr "Diese Version ist zu neu! Wir können nicht dorthin downgraden!"
+msgstr "Diese Version ist zu neu! Wir kÃ¶nnen nicht dorthin downgraden!"
 
 #: ..\..\..\install\_functions_evoupgrade.php:621
 #, php-format
 msgid ""
 "It appears that the following blog stub names are used more than once: ['%s']"
 msgstr ""
-"Es scheint, als würden die folgenden Blog-Stub-Namen mehr als einmal "
+"Es scheint, als wÃ¼rden die folgenden Blog-Stub-Namen mehr als einmal "
 "benutzt: ['%s']"
 
 #: ..\..\..\install\_functions_evoupgrade.php:623
 #, php-format
 msgid "I can't upgrade until you make them unique. DB field: [%s]"
 msgstr ""
-"Wir können nicht upgraden, bevor du sie einzigartig machst. DB-Feld: [%s]"
+"Wir kÃ¶nnen nicht upgraden, bevor du sie einzigartig machst. DB-Feld: [%s]"
 
 #: ..\..\..\install\_functions_evoupgrade.php:2418
 msgid "The database schema is up to date."
@@ -13266,7 +13266,7 @@ msgid ""
 "The version number is correct, but we have detected changes in the database "
 "schema. This can happen with CVS versions..."
 msgstr ""
-"Die Versionsnummer ist korrekt, aber wir haben Änderungen im Datenbankschema "
+"Die Versionsnummer ist korrekt, aber wir haben Ã„nderungen im Datenbankschema "
 "festgestellt. Dies kann mit CVS Versionen vorkommen..."
 
 #: ..\..\..\install\_functions_evoupgrade.php:2467
@@ -13300,10 +13300,10 @@ msgid ""
 "to you when you install b2evolution. If you lose it, you will have to delete "
 "the database tables and re-install anew."
 msgstr ""
-"Achte auf das Passwort! Es ist ein <em>zufälliges</em> Passwort, das dir bei "
-"der Installation generiert wird. Natürlich kannst du es in deinem "
-"Benutzerprofil ändern, aber falls du es verlierst, wirst du die Datenbank-"
-"Tabellen löschen und neu installieren müssen."
+"Achte auf das Passwort! Es ist ein <em>zufÃ¤lliges</em> Passwort, das dir bei "
+"der Installation generiert wird. NatÃ¼rlich kannst du es in deinem "
+"Benutzerprofil Ã¤ndern, aber falls du es verlierst, wirst du die Datenbank-"
+"Tabellen lÃ¶schen und neu installieren mÃ¼ssen."
 
 #: ..\..\..\install\index.php:83
 msgid "Upgrade from a previous version"
@@ -13320,7 +13320,7 @@ msgstr "Upgrade von Cafelog/b2"
 #: ..\..\..\install\index.php:95
 #: ..\..\..\install\index.php:439
 msgid "Delete b2evolution tables"
-msgstr "Lösche b2evolution-Tabellen"
+msgstr "LÃ¶sche b2evolution-Tabellen"
 
 #: ..\..\..\install\index.php:99
 #: ..\..\..\install\index.php:344
@@ -13333,7 +13333,7 @@ msgstr "b2evo Installer"
 
 #: ..\..\..\install\index.php:127
 msgid "Installer for version "
-msgstr "Installer für Version "
+msgstr "Installer fÃ¼r Version "
 
 #: ..\..\..\install\index.php:132
 msgid "After install"
@@ -13355,8 +13355,8 @@ msgstr "PHP Info"
 msgid ""
 "Check your database config settings below and update them if necessary..."
 msgstr ""
-"Überprüfe deine Datenbank-Konfiguration unten und aktualisiere sie, wenn "
-"nötig..."
+"ÃœberprÃ¼fe deine Datenbank-Konfiguration unten und aktualisiere sie, wenn "
+"nÃ¶tig..."
 
 #: ..\..\..\install\index.php:170
 #: ..\..\..\install\index.php:179
@@ -13365,7 +13365,7 @@ msgid ""
 "The minimum requirement for this version of b2evolution is %s version %s but "
 "you are trying to use version %s!"
 msgstr ""
-"Die Mindestvoraussetung für diese Version von b2evolution ist %s Version %s, "
+"Die Mindestvoraussetung fÃ¼r diese Version von b2evolution ist %s Version %s, "
 "aber du versuchst Version %s zu benutzen!"
 
 #: ..\..\..\install\index.php:224
@@ -13373,8 +13373,8 @@ msgid ""
 "It seems that the database config settings you entered don't work. Please "
 "check them carefully and try again..."
 msgstr ""
-"Es scheint, als würden die Datenbank-Einstellungen die du angegeben hast "
-"nicht funktionieren. Bitte überprüfe sie sorgfältig und versuche es "
+"Es scheint, als wÃ¼rden die Datenbank-Einstellungen die du angegeben hast "
+"nicht funktionieren. Bitte Ã¼berprÃ¼fe sie sorgfÃ¤ltig und versuche es "
 "nochmal..."
 
 #: ..\..\..\install\index.php:270
@@ -13385,7 +13385,7 @@ msgstr "Update der Konfigurationsdatei"
 #, php-format
 msgid "We cannot automatically update your config file [%s]!"
 msgstr ""
-"Wir können deine Konfigurationsdatei [%s] nicht automatisch aktualisieren!"
+"Wir kÃ¶nnen deine Konfigurationsdatei [%s] nicht automatisch aktualisieren!"
 
 #: ..\..\..\install\index.php:272
 msgid "There are two ways to deal with this:"
@@ -13396,8 +13396,8 @@ msgid ""
 "You can allow the installer to update the config file by changing its "
 "permissions:"
 msgstr ""
-"Du kannst dem Installer erlauben, die Konfigurationsdatei zu ändern, indem "
-"du ihre Berechtigung änderst:"
+"Du kannst dem Installer erlauben, die Konfigurationsdatei zu Ã¤ndern, indem "
+"du ihre Berechtigung Ã¤nderst:"
 
 #: ..\..\..\install\index.php:276
 #, php-format
@@ -13405,12 +13405,12 @@ msgid ""
 "<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about "
 "permissions</a>."
 msgstr ""
-"<code>chmod 666 %s</code>. Falls nötig, siehe <a %s>Onlineanleitung über "
+"<code>chmod 666 %s</code>. Falls nÃ¶tig, siehe <a %s>Onlineanleitung Ã¼ber "
 "Dateirechte</a>."
 
 #: ..\..\..\install\index.php:277
 msgid "Come back to this page and refresh/reload."
-msgstr "Komme zurück auf diese Seite und lade sie neu."
+msgstr "Komme zurÃ¼ck auf diese Seite und lade sie neu."
 
 #: ..\..\..\install\index.php:281
 msgid "Alternatively, you can update the config file manually:"
@@ -13419,11 +13419,11 @@ msgstr ""
 
 #: ..\..\..\install\index.php:283
 msgid "Open the _basic_config.php file locally with a text editor."
-msgstr "Öffne die _basic_config.php Datei lokal in einem Texteditor."
+msgstr "Ã–ffne die _basic_config.php Datei lokal in einem Texteditor."
 
 #: ..\..\..\install\index.php:284
 msgid "Delete all contents!"
-msgstr "Lösche den gesamten Inhalt!"
+msgstr "LÃ¶sche den gesamten Inhalt!"
 
 #: ..\..\..\install\index.php:285
 msgid "Copy the contents from the box below."
@@ -13436,11 +13436,11 @@ msgid ""
 "file.</strong> Any space, tab, newline or blank line at the end of the conf "
 "file may prevent cookies from being set when you try to log in later."
 msgstr ""
-"Füge ihn in deinen lokalen Texteditor ein. <strong>ACHTUNG: gehe sicher, "
+"FÃ¼ge ihn in deinen lokalen Texteditor ein. <strong>ACHTUNG: gehe sicher, "
 "dass es ABSOLUT KEINEN WHITESPACE nach dem letzten <code>?&gt;</code> in der "
 "Datei gibt.</strong> Jedes Leerzeichen, Tab oder neue Zeile am Ende der "
-"Konfigurationsdatei könnte verhindern, dass Cookies gesetzt werden, wenn du "
-"versuchst, dich später einzuloggen."
+"Konfigurationsdatei kÃ¶nnte verhindern, dass Cookies gesetzt werden, wenn du "
+"versuchst, dich spÃ¤ter einzuloggen."
 
 #: ..\..\..\install\index.php:287
 msgid "Save the new _basic_config.php file locally."
@@ -13470,7 +13470,7 @@ msgid ""
 "the form below."
 msgstr ""
 "Deine Basis-Konfigurationsdatei wurde noch nicht editiert. Du kannst das "
-"durch Ausfüllen des unteren Formulars machen."
+"durch AusfÃ¼llen des unteren Formulars machen."
 
 #: ..\..\..\install\index.php:348
 msgid ""
@@ -13481,7 +13481,7 @@ msgstr ""
 
 #: ..\..\..\install\index.php:355
 msgid "Database you want to install into"
-msgstr "Datenbank in die du installieren möchtest"
+msgstr "Datenbank in die du installieren mÃ¶chtest"
 
 #: ..\..\..\install\index.php:359
 #: ..\..\..\install\index.php:494
@@ -13532,8 +13532,8 @@ msgid ""
 "machine, in order for login cookies to work, you MUST use "
 "http://<strong>localhost</strong>/path... Do NOT use your machine's name!"
 msgstr ""
-"Hier wird b2evo und deine Blogs standardmässig liegen. ÜBERPRÜFE DIES "
-"SORGFÄLTIG oder vieles wird nicht funktionieren. Falls du b2evolution auf "
+"Hier wird b2evo und deine Blogs standardmÃ¤ssig liegen. ÃœBERPRÃœFE DIES "
+"SORGFÃ„LTIG oder vieles wird nicht funktionieren. Falls du b2evolution auf "
 "deiner lokalen Maschine testen willst, MUSST du "
 "http://<strong>localhost</strong>/pfad benutzen, damit Cookies "
 "funktionieren... Benutze NICHT deinen Computernamen!"
@@ -13558,7 +13558,7 @@ msgstr "Wie willst du b2evolution installieren?"
 
 #: ..\..\..\install\index.php:410
 msgid "The installation can be done in different ways. Choose one:"
-msgstr "Die Installation kann auf verschiedene Weise erfolgen. Wähle eine:"
+msgstr "Die Installation kann auf verschiedene Weise erfolgen. WÃ¤hle eine:"
 
 #: ..\..\..\install\index.php:419
 msgid "<strong>New Install</strong>: Install b2evolution database tables."
@@ -13571,8 +13571,8 @@ msgid ""
 "Also install sample blogs &amp; sample contents. The sample posts explain "
 "several features of b2evolution. This is highly recommended for new users."
 msgstr ""
-"Installiere auch Beispielblogs &amp; Beispielinhalte. Die Beispieleinträge "
-"erklären verschiedene Features von b2evolution. Dies wird neuen Benutzern "
+"Installiere auch Beispielblogs &amp; Beispielinhalte. Die BeispieleintrÃ¤ge "
+"erklÃ¤ren verschiedene Features von b2evolution. Dies wird neuen Benutzern "
 "sehr empfohlen."
 
 #: ..\..\..\install\index.php:432
@@ -13582,9 +13582,9 @@ msgid ""
 "current version. <strong>WARNING:</strong> If you have modified your "
 "database, this operation may fail. Make sure you have a backup."
 msgstr ""
-"<strong>Upgrade von einer früheren b2evolution Version</strong>: Upgrade "
+"<strong>Upgrade von einer frÃ¼heren b2evolution Version</strong>: Upgrade "
 "deine Datenbank-Tabellen, um sie mit der jetzigen Version kompatibel zu "
-"machen! <strong>WARNUNG:</strong> Wenn du deine Datenbank verändert hast, "
+"machen! <strong>WARNUNG:</strong> Wenn du deine Datenbank verÃ¤ndert hast, "
 "kann diese Operation fehlschlagen. Stelle sicher, dass du ein Backup hast."
 
 #: ..\..\..\install\index.php:440
@@ -13595,10 +13595,10 @@ msgid ""
 "lost!!!</strong> Any non-b2evolution tables will remain untouched though."
 msgstr ""
 "Falls du schon b2evolution-Tabellen installiert hast und neu anfangen "
-"möchtest, musst du die b2evolution-Tabellen vor einer neuen Installation "
-"löschen. <strong>WARNUNG: All deine b2evolution-Datenbank-Tabellen und Daten "
+"mÃ¶chtest, musst du die b2evolution-Tabellen vor einer neuen Installation "
+"lÃ¶schen. <strong>WARNUNG: All deine b2evolution-Datenbank-Tabellen und Daten "
 "werden verloren sein!!!</strong> Andere Datenbank-Tabellen, falls vorhanden, "
-"werden in keinster Weise berührt."
+"werden in keinster Weise berÃ¼hrt."
 
 #: ..\..\..\install\index.php:443
 msgid ""
@@ -13606,8 +13606,8 @@ msgid ""
 "want to do this in rare occasions where you may have moved your b2evolution "
 "files or database to a different location..."
 msgstr ""
-"<strong>Ändere deine Basis-Konfiguration</strong> (siehe Zusammenfassung "
-"unten): Du wirst das nur in seltenen Fällen machen wollen, wenn du deine "
+"<strong>Ã„ndere deine Basis-Konfiguration</strong> (siehe Zusammenfassung "
+"unten): Du wirst das nur in seltenen FÃ¤llen machen wollen, wenn du deine "
 "b2evolution-Dateien oder -Datenbank verschoben hast..."
 
 #: ..\..\..\install\index.php:449
@@ -13622,12 +13622,12 @@ msgid ""
 "Are you sure you want to delete your existing %s tables?\\nDo you have a "
 "backup?"
 msgstr ""
-"Bist du sicher, dass du die %s Tabellen löschen möchtest?\\nHast du ein "
+"Bist du sicher, dass du die %s Tabellen lÃ¶schen mÃ¶chtest?\\nHast du ein "
 "Backup?"
 
 #: ..\..\..\install\index.php:460
 msgid "Need to start anew?"
-msgstr "Möchtest du neu anfangen?"
+msgstr "MÃ¶chtest du neu anfangen?"
 
 #: ..\..\..\install\index.php:461
 msgid ""
@@ -13637,10 +13637,10 @@ msgid ""
 "reasons, this feature is disabled by default."
 msgstr ""
 "Wenn du schon vorher b2evolution-Tabellen installiert hast und neu anfangen "
-"möchtest, musst du die b2evolution-Tabellen löschen bevor du eine neu "
-"installieren kannst. b2evolution kann seine eigenen DB-Tabellen für dich "
-"löschen, aber aus offensichtlichen Sicherheitsgründen ist diese Funktion "
-"standardmässig abgeschaltet."
+"mÃ¶chtest, musst du die b2evolution-Tabellen lÃ¶schen bevor du eine neu "
+"installieren kannst. b2evolution kann seine eigenen DB-Tabellen fÃ¼r dich "
+"lÃ¶schen, aber aus offensichtlichen SicherheitsgrÃ¼nden ist diese Funktion "
+"standardmÃ¤ssig abgeschaltet."
 
 #: ..\..\..\install\index.php:480
 msgid "Base config recap..."
@@ -13652,12 +13652,12 @@ msgid ""
 "If you don't see correct settings here, STOP before going any further, and "
 "<a %s>update your base configuration</a>."
 msgstr ""
-"Falls du hier keine korrekten Werte siehst, HÖR AUF weiterzumachen und <a "
+"Falls du hier keine korrekten Werte siehst, HÃ–R AUF weiterzumachen und <a "
 "%s>passe deine Basis-Konfiguration an</a>."
 
 #: ..\..\..\install\index.php:492
 msgid "(Set, but not shown for security reasons)"
-msgstr "(Gesetzt, aber aus Sicherheitsgründen nicht angezeigt)"
+msgstr "(Gesetzt, aber aus SicherheitsgrÃ¼nden nicht angezeigt)"
 
 #: ..\..\..\install\index.php:493
 msgid "MySQL Database name"
@@ -13684,17 +13684,17 @@ msgstr "Upgrade erfolgreich beendet!"
 msgid ""
 "Now you can <a %s>log in</a> with your usual %s username and password."
 msgstr ""
-"Jetzt kannst du dich mit deinem üblichen %2$s Benutzernamen und Passwort <a "
+"Jetzt kannst du dich mit deinem Ã¼blichen %2$s Benutzernamen und Passwort <a "
 "%1$s>einloggen</a>."
 
 #: ..\..\..\install\index.php:535
 msgid "Deleting b2evolution tables from the datatase..."
-msgstr "Lösche b2evolution-Tabellen aus der Datenbank..."
+msgstr "LÃ¶sche b2evolution-Tabellen aus der Datenbank..."
 
 #: ..\..\..\install\index.php:540
 msgid "For security reasons, the reset feature is disabled by default."
 msgstr ""
-"Aus Sicherheitsgründen ist die Reset-Funktion standardmässig ausgeschaltet."
+"Aus SicherheitsgrÃ¼nden ist die Reset-Funktion standardmÃ¤ssig ausgeschaltet."
 
 # TRANS: %s gets replaced by app name, usually "b2evolution"
 #. TRANS: %s gets replaced by app name, usually "b2evolution"
@@ -13704,16 +13704,16 @@ msgid ""
 "Are you sure you want to delete your existing %s tables?\n"
 "Do you have a backup?"
 msgstr ""
-"Bist du sicher, dass du die %s Tabellen löschen möchtest?\n"
+"Bist du sicher, dass du die %s Tabellen lÃ¶schen mÃ¶chtest?\n"
 "Hast du ein Backup?"
 
 #: ..\..\..\install\index.php:601
 msgid "Reset done!"
-msgstr "Zurücksetzung beendet!"
+msgstr "ZurÃ¼cksetzung beendet!"
 
 #: ..\..\..\install\index.php:602
 msgid "Back to menu"
-msgstr "Zurück zum Menu"
+msgstr "ZurÃ¼ck zum Menu"
 
 #: ..\..\..\install\index.php:621
 msgid "Language / Locale"
@@ -13721,7 +13721,7 @@ msgstr "Sprache / Locale"
 
 #: ..\..\..\install\index.php:622
 msgid "Choose a default language/locale for your b2evo installation."
-msgstr "Wähle eine Standard-Sprache/Locale für deine b2evo Installation."
+msgstr "WÃ¤hle eine Standard-Sprache/Locale fÃ¼r deine b2evo Installation."
 
 #: ..\..\..\install\index.php:651
 msgid "Find a host"
@@ -13745,15 +13745,15 @@ msgstr "Deutsch (DE)"
 
 #: ..\..\..\locales\fr_FR\fr-BE.locale.php:13
 msgid "French (BE)"
-msgstr "Französisch (BE)"
+msgstr "FranzÃ¶sisch (BE)"
 
 #: ..\..\..\locales\fr_FR\fr-CA.locale.php:13
 msgid "French (CA)"
-msgstr "Französisch (CA)"
+msgstr "FranzÃ¶sisch (CA)"
 
 #: ..\..\..\locales\fr_FR\fr-FR.locale.php:13
 msgid "French (FR)"
-msgstr "Französisch (FR)"
+msgstr "FranzÃ¶sisch (FR)"
 
 #: ..\..\..\multiblogs.php:128
 msgid "Multiblog demo"
@@ -13777,7 +13777,7 @@ msgstr "Dieser Vorlagentag zeigt eine Liste von Beitragsarchiven."
 #: ..\..\..\plugins\_archives.plugin.php:69
 msgid "Archives can be grouped monthly, daily, weekly or post by post."
 msgstr ""
-"Archive können monatlich, wöchentlich, täglich oder Beitrag für Beitrag "
+"Archive kÃ¶nnen monatlich, wÃ¶chentlich, tÃ¤glich oder Beitrag fÃ¼r Beitrag "
 "archiviert werden."
 
 #: ..\..\..\plugins\_archives.plugin.php:153
@@ -13811,11 +13811,11 @@ msgstr ""
 
 #: ..\..\..\plugins\_auto_p.plugin.php:67
 msgid "Line breaks"
-msgstr "Zeilenumbrüche"
+msgstr "ZeilenumbrÃ¼che"
 
 #: ..\..\..\plugins\_auto_p.plugin.php:70
 msgid "Make line breaks (&lt;br /&gt;) for single newlines."
-msgstr "Erstelle Zeilenumbrüche (&lt;br /&gt;) für einfache Zeilenumbrüche."
+msgstr "Erstelle ZeilenumbrÃ¼che (&lt;br /&gt;) fÃ¼r einfache ZeilenumbrÃ¼che."
 
 #: ..\..\..\plugins\_auto_p.plugin.php:73
 msgid "Add P tags in blocks (e.g. DIV)"
@@ -13850,7 +13850,7 @@ msgid ""
 "Available tags are: [b] [i] [u] [s] [color=...] [size=...] [font=...] [code] "
 "[quote] [list=1] [list=a] [list] [*]"
 msgstr ""
-"Verfügbare Tags sind: [b] [i] [u] [s] [color=...] [size=...] [font=...] "
+"VerfÃ¼gbare Tags sind: [b] [i] [u] [s] [color=...] [size=...] [font=...] "
 "[code] [quote] [list=1] [list=a] [list] [*]"
 
 #: ..\..\..\plugins\_bbcode.plugin.php:58
@@ -13912,7 +13912,7 @@ msgstr "Erlaube Bookmarklet-Blogging."
 #: ..\..\..\plugins\_bookmarklet.plugin.php:43
 msgid "Adds a tool allowing blogging through a bookmarklet."
 msgstr ""
-"Fügt ein Tool hinzu, das es erlaubt durch ein Bookmarklet zu bloggen."
+"FÃ¼gt ein Tool hinzu, das es erlaubt durch ein Bookmarklet zu bloggen."
 
 #: ..\..\..\plugins\_bookmarklet.plugin.php:62
 #: ..\..\..\plugins\_bookmarklet.plugin.php:70
@@ -13920,7 +13920,7 @@ msgstr ""
 #: ..\..\..\plugins\_bookmarklet.plugin.php:87
 #: ..\..\..\plugins\_bookmarklet.plugin.php:95
 msgid "Add this link to your Favorites/Bookmarks:"
-msgstr "Füge diesen Link zu deinen Favoriten/Lesezeichen hinzu:"
+msgstr "FÃ¼ge diesen Link zu deinen Favoriten/Lesezeichen hinzu:"
 
 #: ..\..\..\plugins\_bookmarklet.plugin.php:63
 #: ..\..\..\plugins\_bookmarklet.plugin.php:71
@@ -13936,7 +13936,7 @@ msgstr "Der Skin Tag zeigt einen navigierbaren Kalendar an."
 
 #: ..\..\..\plugins\_calendar.plugin.php:69
 msgid "Days containing posts are highlighted."
-msgstr "Tage mit Einträgen werden hervorgehoben."
+msgstr "Tage mit EintrÃ¤gen werden hervorgehoben."
 
 #: ..\..\..\plugins\_calendar.plugin.php:87
 msgid "Display caption"
@@ -14015,17 +14015,17 @@ msgstr "Voriger Monat (%04d-%02d)"
 #: ..\..\..\plugins\_calendar.plugin.php:1081
 #, php-format
 msgid "Next month (%04d-%02d)"
-msgstr "Nächster Monat (%04d-%02d)"
+msgstr "NÃ¤chster Monat (%04d-%02d)"
 
 #: ..\..\..\plugins\_calendar.plugin.php:1133
 #, php-format
 msgid "Next year (%04d-%02d)"
-msgstr "Nächstes Jahr (%04d-%02d)"
+msgstr "NÃ¤chstes Jahr (%04d-%02d)"
 
 #: ..\..\..\plugins\_calendar.plugin.php:1134
 #, php-format
 msgid "Next year (%04d)"
-msgstr "Nächstes Jahr (%04d)"
+msgstr "NÃ¤chstes Jahr (%04d)"
 
 #: ..\..\..\plugins\_generic_ping.plugin.php:66
 msgid "Generic Ping plugin"
@@ -14120,7 +14120,7 @@ msgstr ""
 
 #: ..\..\..\plugins\_quicktags.plugin.php:33
 msgid "Easy HTML tags inserting"
-msgstr "Einfaches Einfügen von HTML-Tags"
+msgstr "Einfaches EinfÃ¼gen von HTML-Tags"
 
 #: ..\..\..\plugins\_quicktags.plugin.php:34
 msgid ""
@@ -14146,7 +14146,7 @@ msgstr ""
 
 #: ..\..\..\plugins\_quicktags.plugin.php:121
 msgid "STRong [Alt-S]"
-msgstr "kräftig [Alt-S]"
+msgstr "krÃ¤ftig [Alt-S]"
 
 #: ..\..\..\plugins\_quicktags.plugin.php:129
 msgid "EMphasis [Alt-E]"
@@ -14198,7 +14198,7 @@ msgstr "kein Teaser (Lockartikel) wenn &quot;Lies Mehr..&quot; [Alt-T]"
 
 #: ..\..\..\plugins\_quicktags.plugin.php:235
 msgid "next page [Alt-Q]"
-msgstr "nächste Seite [Alt-Q]"
+msgstr "nÃ¤chste Seite [Alt-Q]"
 
 #: ..\..\..\plugins\_quicktags.plugin.php:321
 msgid "Close all tags"
@@ -14227,8 +14227,8 @@ msgstr "Benutze Smilies Toolbar"
 #: ..\..\..\plugins\_smilies.plugin.php:82
 msgid "This is the default setting. Users can override it in their profile."
 msgstr ""
-"Dies ist die Standardeinstellung. Benutzer können es in ihrem Profil "
-"überschreiben."
+"Dies ist die Standardeinstellung. Benutzer kÃ¶nnen es in ihrem Profil "
+"Ã¼berschreiben."
 
 #: ..\..\..\plugins\_smilies.plugin.php:86
 msgid "Check to also render smilies in comments."
@@ -14306,7 +14306,7 @@ msgstr "Wer ist online?"
 
 #: ..\..\..\plugins\_whosonline.plugin.php:296
 msgid "Guest Users:"
-msgstr "Gäste:"
+msgstr "GÃ¤ste:"
 
 #: ..\..\..\plugins\_wikilinks.plugin.php:37
 msgid "Wiki Links converter"
@@ -14375,19 +14375,19 @@ msgstr "Erkenne doppelte Feedbacks"
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:81
 msgid "Check this to check comments and trackback for duplicate content."
 msgstr ""
-"Auswählen, um Kommentare und Trackbacks auf doppelten, schon vorhandenen "
-"Inhalt zu überprüfen."
+"AuswÃ¤hlen, um Kommentare und Trackbacks auf doppelten, schon vorhandenen "
+"Inhalt zu Ã¼berprÃ¼fen."
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:86
 msgid "Feedback sensitivity to links"
-msgstr "Feedback-Sensitivität für Links"
+msgstr "Feedback-SensitivitÃ¤t fÃ¼r Links"
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:87
 msgid ""
 "If a comment has more than this number of links in it, it will get 100 "
 "percent spam karma. -1 to disable it."
 msgstr ""
-"Wenn ein Kommentar mehr als diese Anzahl an Links enthält, bekommt er 100 "
+"Wenn ein Kommentar mehr als diese Anzahl an Links enthÃ¤lt, bekommt er 100 "
 "Prozent Spam-Karma. -1 um es zu deaktivieren."
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:94
@@ -14399,20 +14399,20 @@ msgid ""
 "hours. For how long should rel=\"nofollow\" be applied to comment links? (0 "
 "means never, -1 means always)"
 msgstr ""
-"Stunden. Für wie lange soll rel=\"nofollow\" für Links in Kommentaren "
+"Stunden. FÃ¼r wie lange soll rel=\"nofollow\" fÃ¼r Links in Kommentaren "
 "angewendet werden? (0 heisst nie, -1 heisst immer)"
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:102
 msgid "Check referers for URL"
-msgstr "Überprüfe Referer auf URL"
+msgstr "ÃœberprÃ¼fe Referer auf URL"
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:103
 msgid ""
 "Check refering pages, if they contain our URL. This may generate a lot of "
 "additional traffic!"
 msgstr ""
-"Überprüfe verweisende Seiten, ob sie unsere URL beinhalten. Dies kann eine "
-"Menge zusätzlichen Traffic generieren!"
+"ÃœberprÃ¼fe verweisende Seiten, ob sie unsere URL beinhalten. Dies kann eine "
+"Menge zusÃ¤tzlichen Traffic generieren!"
 
 #: ..\..\..\plugins\basic_antispam_plugin\_basic_antispam.plugin.php:119
 msgid "Comments are not allowed from anonymous visitors."
@@ -14629,7 +14629,7 @@ msgstr ""
 #: ..\..\..\skins\basic\_item_feedback.inc.php:231
 #: ..\..\..\skins\glossyblue\_item_feedback.inc.php:357
 msgid "Line breaks become &lt;br /&gt;"
-msgstr "Zeilenumbrüche werden zu &lt;br /&gt;"
+msgstr "ZeilenumbrÃ¼che werden zu &lt;br /&gt;"
 
 #: ..\..\..\skins\_item_comment_form.inc.php:178
 #: ..\..\..\skins\basic\_item_feedback.inc.php:236
@@ -14736,7 +14736,7 @@ msgstr "Nachricht senden"
 
 #: ..\..\..\skins\_profile.disp.php:84
 msgid "Leave blank to leave the password unchanged."
-msgstr "Leerlassen, um das Passwort ungeändert zu lassen."
+msgstr "Leerlassen, um das Passwort ungeÃ¤ndert zu lassen."
 
 #: ..\..\..\skins\_profile.disp.php:84
 msgid "New pass"
@@ -14744,11 +14744,11 @@ msgstr "Neues Passwort"
 
 #: ..\..\..\skins\_profile.disp.php:85
 msgid "Confirm"
-msgstr "Bestätigen"
+msgstr "BestÃ¤tigen"
 
 #: ..\..\..\skins\_profile.disp.php:85
 msgid "Confirm new password by typing it again."
-msgstr "Bestätige dein neues Passwort, indem du es erneut eingibst."
+msgstr "BestÃ¤tige dein neues Passwort, indem du es erneut eingibst."
 
 #: ..\..\..\skins\_profile.disp.php:103
 msgid "AOL I.M."
@@ -14901,14 +14901,14 @@ msgstr ""
 
 #: ..\..\..\skins\basic\_item_feedback.inc.php:92
 msgid "Trackback address for this post:"
-msgstr "Trackback Adresse für diesen Eintrag:"
+msgstr "Trackback Adresse fÃ¼r diesen Eintrag:"
 
 # TRANS: NO comments/trackabcks/pingbacks/ FOR THIS POST...
 #. TRANS: NO comments/trackbacks/pingbacks/ FOR THIS POST...
 #: ..\..\..\skins\basic\_item_feedback.inc.php:121
 #, php-format
 msgid "No %s for this post yet..."
-msgstr "Bisher keine %s für diesen Eintrag..."
+msgstr "Bisher keine %s fÃ¼r diesen Eintrag..."
 
 #: ..\..\..\skins\basic\_item_feedback.inc.php:134
 msgid "Comment from:"
@@ -14937,16 +14937,16 @@ msgstr "Erlaubte XHTML Tags"
 
 #: ..\..\..\skins\basic\_item_feedback.inc.php:236
 msgid "(Set cookies for name, email &amp; url)"
-msgstr "(Setze Cookies für Name, E-Mail &amp; URL)"
+msgstr "(Setze Cookies fÃ¼r Name, E-Mail &amp; URL)"
 
 #: ..\..\..\skins\basic\index.main.php:56
 msgid "Select blog:"
-msgstr "Wähle Blog:"
+msgstr "WÃ¤hle Blog:"
 
 #: ..\..\..\skins\custom\index.main.php:190
 #: ..\..\..\skins\vastitude\index.main.php:164
 msgid "words"
-msgstr "Wörter"
+msgstr "WÃ¶rter"
 
 #: ..\..\..\skins\custom\index.main.php:368
 #: ..\..\..\skins\pixelgreen\index.main.php:307
@@ -15096,7 +15096,7 @@ msgstr "Login Formular"
 
 #: ..\..\..\skins_adm\login\_login_form.main.php:116
 msgid "You will have to accept cookies in order to log in."
-msgstr "Du wirst Cookies akzeptieren müssen, um einloggen zu können."
+msgstr "Du wirst Cookies akzeptieren mÃ¼ssen, um einloggen zu kÃ¶nnen."
 
 #: ..\..\..\skins_adm\login\_login_form.main.php:126
 #: ..\..\..\skins_adm\login\_lostpass_form.main.php:34
@@ -15218,18 +15218,18 @@ msgstr "Zusammenfassungs-Demo"
 #: ..\..\..\summary.php:97
 msgid "This demo template displays a summary of last posts in all blogs"
 msgstr ""
-"Diese Demo-Vorlage zeigt eine Zusammenfassung der letzten Einträge in allen "
+"Diese Demo-Vorlage zeigt eine Zusammenfassung der letzten EintrÃ¤ge in allen "
 "Blogs"
 
 #: ..\..\..\summary.php:158
 msgid "More posts..."
-msgstr "Mehr Einträge..."
+msgstr "Mehr EintrÃ¤ge..."
 
 #~ msgid "Czech (CZ)"
 #~ msgstr "Tschechisch (CZ)"
 
 #~ msgid "Danish (DK)"
-#~ msgstr "Dänisch (DK)"
+#~ msgstr "DÃ¤nisch (DK)"
 
 #~ msgid "Estonia (ET)"
 #~ msgstr "Estland (ET)"
@@ -15280,7 +15280,7 @@ msgstr "Mehr Einträge..."
 #~ msgstr "Italienisch (IT)"
 
 #~ msgid "Icelandic (IS)"
-#~ msgstr "Isländisch (IT)"
+#~ msgstr "IslÃ¤ndisch (IT)"
 
 #~ msgid "Japanese (JP)"
 #~ msgstr "Japanisch (JP)"
@@ -15295,10 +15295,10 @@ msgstr "Mehr Einträge..."
 #~ msgstr "Norwegisch (NO)"
 
 #~ msgid "Dutch (NL)"
-#~ msgstr "Holländisch (NL)"
+#~ msgstr "HollÃ¤ndisch (NL)"
 
 #~ msgid "Dutch (BE)"
-#~ msgstr "Holländisch (BE)"
+#~ msgstr "HollÃ¤ndisch (BE)"
 
 #~ msgid "Portuguese (BR)"
 #~ msgstr "Portugisisch (BR)"
@@ -15325,10 +15325,10 @@ msgstr "Mehr Einträge..."
 #~ msgstr "Thai (TH)"
 
 #~ msgid "Turkish (TR)"
-#~ msgstr "Türkisch (TR)"
+#~ msgstr "TÃ¼rkisch (TR)"
 
 #~ msgid "Turkish utf-8 (TR)"
-#~ msgstr "Türkisch utf-8 (TR)"
+#~ msgstr "TÃ¼rkisch utf-8 (TR)"
 
 #~ msgid "Chinese(S) gb2312 (CN)"
 #~ msgstr "Chinesisch(S) gb2312 (CN)"
@@ -15380,13 +15380,13 @@ msgstr "Mehr Einträge..."
 #~ msgstr "Angegebener Inhalt"
 
 #~ msgid "Mission complete, message deleted."
-#~ msgstr "Mission abgeschlossen, Nachricht gelöscht."
+#~ msgstr "Mission abgeschlossen, Nachricht gelÃ¶scht."
 
 #~ msgid ""
 #~ "The php_imap extension is not available to php on this server. Please "
 #~ "configure a different email retrieval method on the Features tab."
 #~ msgstr ""
-#~ "Die php_imap Erweiterung ist nicht für PHP auf diesem Server installiert. "
+#~ "Die php_imap Erweiterung ist nicht fÃ¼r PHP auf diesem Server installiert. "
 #~ "Bitte konfiguriere eine andere Methode, um E-Mails abzuholen."
 
 #~ msgid "Unhandled email part type"
@@ -15417,7 +15417,7 @@ msgstr "Mehr Einträge..."
 #~ "This URL name is already in use by another category. Please choose another "
 #~ "name."
 #~ msgstr ""
-#~ "Dieser URL-Name wird schon von einer anderen Kategorie benutzt. Bitte wähle "
+#~ "Dieser URL-Name wird schon von einer anderen Kategorie benutzt. Bitte wÃ¤hle "
 #~ "einen anderen Namen."
 
 #~ msgid "URL name"
@@ -15433,7 +15433,7 @@ msgstr "Mehr Einträge..."
 #~ msgstr "Element kann nicht verlinkt werden!"
 
 #~ msgid "Insert IMG tags for selected files"
-#~ msgstr "Füge IMG Tags für ausgewählte Dateien ein"
+#~ msgstr "FÃ¼ge IMG Tags fÃ¼r ausgewÃ¤hlte Dateien ein"
 
 #~ msgid "New post in blog:"
 #~ msgstr "Neuer Eintrag in Blog:"
@@ -15444,22 +15444,22 @@ msgstr "Mehr Einträge..."
 
 #~ msgid "Note: Moving posts across blogs is enabled. Use with caution."
 #~ msgstr ""
-#~ "Beachte: Das Verschieben von Beiträgen zwischen Blogs ist aktiviert. Mit "
+#~ "Beachte: Das Verschieben von BeitrÃ¤gen zwischen Blogs ist aktiviert. Mit "
 #~ "Vorsicht geniessen!"
 
 #~ msgid "Note: Cross posting among multiple blogs is enabled."
-#~ msgstr "Anmerkung: Quer-Einträge in mehrere Blogs sind möglich."
+#~ msgstr "Anmerkung: Quer-EintrÃ¤ge in mehrere Blogs sind mÃ¶glich."
 
 #~ msgid "Note: Cross posting among multiple blogs is currently disabled."
 #~ msgstr ""
-#~ "Anmerkung: Quer-Einträge in mehrere Blogs sind derzeit nicht möglich."
+#~ "Anmerkung: Quer-EintrÃ¤ge in mehrere Blogs sind derzeit nicht mÃ¶glich."
 
 #~ msgid "Note: Cross posting among multiple categories is currently disabled."
 #~ msgstr ""
-#~ "Anmerkung: Quer-Einträge in mehrere Kategorien ist derzeit nicht möglich."
+#~ "Anmerkung: Quer-EintrÃ¤ge in mehrere Kategorien ist derzeit nicht mÃ¶glich."
 
 #~ msgid "Protected (Members only)"
-#~ msgstr "Geschützt (nur Mitglieder)"
+#~ msgstr "GeschÃ¼tzt (nur Mitglieder)"
 
 #~ msgid "Private (You only)"
 #~ msgstr "Privat (nur du)"
@@ -15479,7 +15479,7 @@ msgstr "Mehr Einträge..."
 #~ msgid ""
 #~ "Locales table deleted, defaults from <code>/conf/_locales.php</code> loaded."
 #~ msgstr ""
-#~ "Locale-Tabelle gelöscht, Voreinstellungen aus "
+#~ "Locale-Tabelle gelÃ¶scht, Voreinstellungen aus "
 #~ "<code>/conf/_locales.php</code> geladen."
 
 #~ msgid ""
@@ -15487,7 +15487,7 @@ msgstr "Mehr Einträge..."
 #~ "\t\tYou can escape characters by preceding them with a \\ to print them as-"
 #~ "is."
 #~ msgstr ""
-#~ "Unerkannte Zeichen in der Format-Zeichenkette werden unübersetzt "
+#~ "Unerkannte Zeichen in der Format-Zeichenkette werden unÃ¼bersetzt "
 #~ "ausgegeben.<br />\n"
 #~ "\t\tDu kannst Zeichen mit \\ escapen, um sie als eigentliche Zeichen "
 #~ "auszugeben."
@@ -15496,7 +15496,7 @@ msgstr "Mehr Einträge..."
 #~ msgstr "verwerfe Anpassungen"
 
 #~ msgid "Reset to defaults (delete database table)"
-#~ msgstr "Auf Voreinstellungen zurücksetzen (löscht Datenbank-Tabelle)"
+#~ msgstr "Auf Voreinstellungen zurÃ¼cksetzen (lÃ¶scht Datenbank-Tabelle)"
 
 #~ msgid "not a query - no params!"
 #~ msgstr "keine Anfrage - keine Parameter!"
@@ -15511,10 +15511,10 @@ msgstr "Mehr Einträge..."
 #~ msgstr "IP"
 
 #~ msgid "Check to enable the Blog by email feature."
-#~ msgstr "Auswählen, um Bloggen per E-Mail zu aktivieren."
+#~ msgstr "AuswÃ¤hlen, um Bloggen per E-Mail zu aktivieren."
 
 #~ msgid "POP3 through IMAP extension (experimental)"
-#~ msgstr "POP3 über IMAP-Erweiterung (experimentell)"
+#~ msgstr "POP3 Ã¼ber IMAP-Erweiterung (experimentell)"
 
 #~ msgid ""
 #~ "Port number of your incoming mail server (Defaults: pop3:110 imap:143)."
@@ -15533,7 +15533,7 @@ msgstr "Mehr Einträge..."
 #~ "Administrator."
 
 #~ msgid "Select date"
-#~ msgstr "Datum auswählen"
+#~ msgstr "Datum auswÃ¤hlen"
 
 #~ msgid "No server specified"
 #~ msgstr "Kein Server angegeben"
@@ -15548,7 +15548,7 @@ msgstr "Mehr Einträge..."
 #~ msgstr "Verbindung nicht aufgebaut"
 
 #~ msgid "No password submitted"
-#~ msgstr "Kein Passwort übermittelt"
+#~ msgstr "Kein Passwort Ã¼bermittelt"
 
 #~ msgid "authentication failed "
 #~ msgstr "Authentifizierung fehlgeschlagen "
@@ -15566,7 +15566,7 @@ msgstr "Mehr Einträge..."
 #~ msgstr "POP3 pop_list:"
 
 #~ msgid "Premature end of list"
-#~ msgstr "Verfrühtes Ende der Liste"
+#~ msgstr "VerfrÃ¼htes Ende der Liste"
 
 #~ msgid "POP3 last:"
 #~ msgstr "POP3 last:"
@@ -15599,25 +15599,25 @@ msgstr "Mehr Einträge..."
 #~ msgstr "Befehl fehlgeschlagen"
 
 #~ msgid "Your username to access the database"
-#~ msgstr "Dein Benutzername für den Datenbank-Zugriff"
+#~ msgstr "Dein Benutzername fÃ¼r den Datenbank-Zugriff"
 
 #~ msgid "Your password to access the database"
-#~ msgstr "Dein Passwort für den Datenbank-Zugriff"
+#~ msgstr "Dein Passwort fÃ¼r den Datenbank-Zugriff"
 
 #~ msgid "Name of the database you want to use"
-#~ msgstr "Name der Datenbank, die du benutzen möchtest"
+#~ msgstr "Name der Datenbank, die du benutzen mÃ¶chtest"
 
 #~ msgid "MySQL Host"
 #~ msgstr "MySQL Host"
 
 #~ msgid "You probably won't have to change this"
-#~ msgstr "Du wirst das wahrscheinlich nicht ändern müssen"
+#~ msgstr "Du wirst das wahrscheinlich nicht Ã¤ndern mÃ¼ssen"
 
 #~ msgid ""
 #~ "All DB tables will be prefixed with this. You need to change this only if "
 #~ "you want to have multiple b2evo installations in the same DB."
 #~ msgstr ""
-#~ "Alle DB-Tabellen erhalten damit ein Prefix. Dies muss nur verändert werden, "
+#~ "Alle DB-Tabellen erhalten damit ein Prefix. Dies muss nur verÃ¤ndert werden, "
 #~ "wenn du mehrere b2evo Installationen in der selben DB haben willst."
 
 #~ msgid ""
@@ -15625,7 +15625,7 @@ msgstr "Mehr Einträge..."
 #~ "will also receive notifications for new user registrations."
 #~ msgstr ""
 #~ "Wird in schweren Fehlermeldungen benutzt, so dass Benutzer dich kontaktieren "
-#~ "können. Du wirst hier auch Benachrichtigungen über neue Benutzer-"
+#~ "kÃ¶nnen. Du wirst hier auch Benachrichtigungen Ã¼ber neue Benutzer-"
 #~ "Registrierungen erhalten."
 
 #~ msgid "Clean Permalinks!"
@@ -15714,9 +15714,9 @@ msgstr "Mehr Einträge..."
 #~ "\t\t\tOptionally, it will also mark single line breaks with HTML &lt;BR&gt; "
 #~ "tags."
 #~ msgstr ""
-#~ "Dieser Renderer erkennt Absätze automatisch anhand doppelter Zeilenumbrüche "
+#~ "Dieser Renderer erkennt AbsÃ¤tze automatisch anhand doppelter ZeilenumbrÃ¼che "
 #~ "und markiert sie mit den passenden HTML &lt;P&gt; Tags.<br />\n"
-#~ "\t\t\tOptional kann er auch einfache Zeilenumbrüche mit HTML &lt;BR&gt; Tags "
+#~ "\t\t\tOptional kann er auch einfache ZeilenumbrÃ¼che mit HTML &lt;BR&gt; Tags "
 #~ "markieren."
 
 #~ msgid ""
@@ -15726,7 +15726,7 @@ msgstr "Mehr Einträge..."
 #~ msgstr ""
 #~ "Dieser Renderer konvertiert Textsmilies wie :) zu graphischen Smilies.<br "
 #~ "/>\n"
-#~ "\t\t\tOptional kann er eine Toolbar zum schnellen Einfügen von Smilies in "
+#~ "\t\t\tOptional kann er eine Toolbar zum schnellen EinfÃ¼gen von Smilies in "
 #~ "einen Eintrag anzeigen."
 
 # TRANS: short for "Switch to _B_log"
@@ -15737,10 +15737,10 @@ msgstr "Mehr Einträge..."
 #~ msgstr "Blog #1 durch eine Stub Datei aufgerufen."
 
 #~ msgid "Supplied comment is invalid."
-#~ msgstr "Der angegebene Kommentar ist ungültig."
+#~ msgstr "Der angegebene Kommentar ist ungÃ¼ltig."
 
 #~ msgid "Supplied comment is invalid"
-#~ msgstr "Der angegebene Kommentar ist ungültig."
+#~ msgstr "Der angegebene Kommentar ist ungÃ¼ltig."
 
 #~ msgid "Unallowed CSS markup found: "
 #~ msgstr "Unerlaubtes CSS Markup gefunden: "
@@ -15749,7 +15749,7 @@ msgstr "Mehr Einträge..."
 #~ msgstr "Standard-Linkblog"
 
 #~ msgid "Will be displayed next to this blog (if your skin supports this)."
-#~ msgstr "Wird neben dem Blog angezeigt (falls dein Skin das unterstützt)."
+#~ msgstr "Wird neben dem Blog angezeigt (falls dein Skin das unterstÃ¼tzt)."
 
 #~ msgid "View list only"
 #~ msgstr "Nur Liste ansehen"
@@ -15758,13 +15758,13 @@ msgstr "Mehr Einträge..."
 #~ msgstr "Alle ansehen"
 
 #~ msgid "Add"
-#~ msgstr "Hinzufügen"
+#~ msgstr "HinzufÃ¼gen"
 
 #~ msgid "Add & edit/delete self created"
-#~ msgstr "Hinzufügen & Editieren/Löschen selbst erstellter"
+#~ msgstr "HinzufÃ¼gen & Editieren/LÃ¶schen selbst erstellter"
 
 #~ msgid "Permissions for members of this group"
-#~ msgstr "Rechte für Mitglieder dieser Gruppe"
+#~ msgstr "Rechte fÃ¼r Mitglieder dieser Gruppe"
 
 #~ msgid "Add/Upload"
-#~ msgstr "Hinzufügen/Hochladen"
+#~ msgstr "HinzufÃ¼gen/Hochladen"
