@@ -165,19 +165,17 @@ function __autoload($classname)
  * Load class file. No-op for PHP5, uses __autoload().
  * But handle the case for require=false, where the file gets checked for existence.
  */
-function load_class( $class_path, $require = true )
+function load_class( $class_path )
 {
-	if( ! $require )
-	{
-		global $inc_path;
-		return file_exists( $inc_path.$class_path );
-	}
 	return true;
 }
 
 
 /*
  * $Log$
+ * Revision 1.4  2009/03/06 00:31:04  blueyed
+ * Remove require=false use case from class5.funcs, too.
+ *
  * Revision 1.3  2009/03/06 00:11:27  blueyed
  * Abstract POFile handling to POFile class completely.
  *  - move gettext/pofile.class.php to blogs/inc/locales
