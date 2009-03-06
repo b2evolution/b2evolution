@@ -867,6 +867,19 @@ class Plugin
 	{
 	}
 
+	/**
+	 * Called when a plugin gets called by its @{link $code}.
+	 *
+	 * If you provide this event, b2evolution will assume your plugin
+	 * provides a widget and list it in the "Available widgets" list.
+	 *
+	 * @see $code
+	 * @see Plugins::call_by_code() 
+	 * @param array The array passed to @{link Plugins::call_by_code()}.
+	 */ 
+	function SkinTag( & $params )
+	{
+	}
 
 	/**
 	 * Event handler: Gets asked about a list of skin names that the plugin handles.
@@ -1560,6 +1573,19 @@ class Plugin
 	{
 	}
 
+	/**
+	 * Event handler: Gets called after a trackback has been recorded.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Comment': the trackback (which is a {@link Comment} object with "trackback" type) (by reference)
+	 *        The trackback-params get mapped like this:
+	 *        - "blog_name" => "author"
+	 *        - "url" => "author_url"
+	 *        - "title"/"excerpt" => "comment"
+	 */
+	function AfterTrackbackInsert( & $params )
+	{
+	}
 
 	/**
 	 * Event handler: called to filter the comment's author name (blog name for trackbacks)
@@ -2216,6 +2242,20 @@ class Plugin
 	{
 	}
 
+	/**
+	 * Event handler: Called when a hit gets logged, but before it gets recorded.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Hit': The "Hit" object (by reference).
+	 * 
+	 * @return boolean True if you've handled the recording of the hit, false otherwise.
+	 */
+	function AppendHitLog( & $params )
+	{
+		// Do nothing by default:
+		return false;
+	}
+
 	/*
 	 * Event handlers }}}
 	 */
@@ -2801,6 +2841,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.15  2009/03/06 14:12:27  tblue246
+ * Added missing documentation for Plugin hooks
+ *
  * Revision 1.14  2009/03/05 23:38:53  blueyed
  * Merge autoload branch (lp:~blueyed/b2evolution/autoload) into CVS HEAD.
  *

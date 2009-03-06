@@ -81,7 +81,8 @@ class Plugins_admin extends Plugins
 	 *
 	 *  The max length of event names is 40 chars (T_pluginevents.pevt_event).
 	 *
-	 * @todo Finish/Complete descriptions
+	 * @internal When adding a new event, please make sure to add a description as well.
+	 *           Please also add a new well-documented method to the "Plugin" class.
 	 *
 	 * @return array Name of event (key) => description (value)
 	 */
@@ -92,23 +93,23 @@ class Plugins_admin extends Plugins
 		if( empty( $supported_events ) )
 		{
 			$supported_events = array(
-				'AdminAfterPageFooter' => '',
-				'AdminDisplayEditorButton' => '',
+				'AdminAfterPageFooter' => 'This gets called after the backoffice HTML footer has been displayed.',
+				'AdminDisplayEditorButton' => 'Display action buttons on the edit screen(s)',
 				'AdminDisplayToolbar' => 'Display a toolbar on the edit screen(s)',
-				'AdminDisplayCommentFormFieldset' => '',
-				'AdminDisplayItemFormFieldset' => '',
-				'AdminEndHtmlHead' => '',
-				'AdminAfterMenuInit' => '',
-				'AdminTabAction' => '',
-				'AdminTabPayload' => '',
-				'AdminToolAction' => '',
-				'AdminToolPayload' => '',
+				'AdminDisplayCommentFormFieldset' => 'Display form fieldsets on the backoffice comment editing form',
+				'AdminDisplayItemFormFieldset' => 'Display form fieldsets on the backoffice item editing screen(s)',
+				'AdminEndHtmlHead' => 'This gets called at the end of the HTML HEAD section in backoffice skins',
+				'AdminAfterMenuInit' => 'This gets called after the backoffice menu has been initialized.',
+				'AdminTabAction' => 'This gets called before AdminTabPayload when the Tools tab for the plugin is selected; no output allowed!',
+				'AdminTabPayload' => 'This gets called when the Tools tab for the plugin is selected and content should be displayed.',
+				'AdminToolAction' => '', // Tblue> Not used yet/anymore?
+				'AdminToolPayload' => 'This gets called when the plugin\'s block in the Tools menu should be displayed.',
 
 				'AdminBeforeItemEditCreate' => 'This gets called before a new item gets created from the backoffice.',
 				'AdminBeforeItemEditUpdate' => 'This gets called before an existing item gets updated from the backoffice.',
 				'AdminBeforeItemEditDelete' => 'This gets called before an existing item gets deleted from the backoffice.',
 
-				'AdminBeginPayload' => '',
+				'AdminBeginPayload' => 'This gets called before the main payload in the backoffice is displayed.',
 
 				'CacheObjects' => 'Cache data objects.',
 				'CachePageContent' => 'Cache page content.',
@@ -118,12 +119,12 @@ class Plugins_admin extends Plugins
 				'AfterCommentInsert' => 'Gets called after a comment has been inserted into the database.',
 				'AfterCommentUpdate' => 'Gets called after a comment has been updated in the database.',
 
-				'AfterItemDelete' => '',
-				'PrependItemInsertTransact' => '',
-				'AfterItemInsert' => '',
-				'PrependItemUpdateTransact' => '',
-				'AfterItemUpdate' => '',
-				'AppendItemPreviewTransact' => '',
+				'AfterItemDelete' => 'This gets called after an item has been deleted from the database.',
+				'PrependItemInsertTransact' => 'This gets called before an item is inserted into the database.',
+				'AfterItemInsert' => 'This gets called after an item has been inserted into the database.',
+				'PrependItemUpdateTransact' => 'This gets called before an item gets updated in the database..',
+				'AfterItemUpdate' => 'This gets called after an item has been updated in the database.',
+				'AppendItemPreviewTransact' => 'This gets called when instantiating an item for preview.',
 
  				'FilterItemContents' => 'Filters the content of a post/item right after input.',
  				'UnfilterItemContents' => 'Unfilters the content of a post/item right before editing.',
@@ -139,18 +140,18 @@ class Plugins_admin extends Plugins
 				'DisplayItemAsXml' => 'Called on an item when it gets displayed as XML.',
 				'DisplayItemAsText' => 'Called on an item when it gets displayed as text.',
 
-// fp> These is actually RENDERing, right?
-// TODO: Rename to "DispRender"
+				// fp> These is actually RENDERing, right?
+				// TODO: Rename to "DispRender"
 				'FilterCommentAuthor' => 'Filters the comment author.',
 				'FilterCommentAuthorUrl' => 'Filters the URL of the comment author.',
 				'FilterCommentContent' => 'Filters the content of a comment.',
 
-				'AfterUserDelete' => '',
-				'AfterUserInsert' => '',
-				'AfterUserUpdate' => '',
+				'AfterUserDelete' => 'This gets called after an user has been deleted from the database.',
+				'AfterUserInsert' => 'This gets called after an user has been inserted into the database.',
+				'AfterUserUpdate' => 'This gets called after an user has been updated in the database.',
 
-// fp> This is actually RENDERing, right?
-// TODO: Rename to "DispRender"
+				// fp> This is actually RENDERing, right?
+				// TODO: Rename to "DispRender"
 				'FilterIpAddress' => 'Called when displaying an IP address.',
 
 				'ItemApplyAsRenderer' => 'Asks the plugin if it wants to apply as a renderer for an item.',
@@ -158,15 +159,15 @@ class Plugins_admin extends Plugins
 				'ItemSendPing' => 'Send a ping to a service about new items.',
 				'ItemViewsIncreased' => 'Called when the view counter of an item got increased.',
 
-				'SkinTag' => '',
+				'SkinTag' => 'This method gets invoked when a plugin is called by its code. Providing this method causes the plugin to be listed as a widget.',
 
 				'AppendHitLog' => 'Called when a hit gets logged, but before it gets recorded.',
 
 				'DisplayCommentToolbar' => 'Display a toolbar on the public feedback form',
-				'DisplayCommentFormButton' => '',
-				'DisplayCommentFormFieldset' => '',
-				'DisplayMessageFormButton' => '',
-				'DisplayMessageFormFieldset' => '',
+				'DisplayCommentFormButton' => 'Called in the submit button section of the frontend comment form.',
+				'DisplayCommentFormFieldset' => 'Called at the end of the frontend comment form.',
+				'DisplayMessageFormButton' => 'Called in the submit button section of the frontend message form.',
+				'DisplayMessageFormFieldset' => 'Called at the end of the frontend message form.',
 				'DisplayLoginFormFieldset' => 'Called when displaying the "Login" form.',
 				'DisplayRegisterFormFieldset' => 'Called when displaying the "Register" form.',
 				'DisplayValidateAccountFormFieldset' => 'Called when displaying the "Validate account" form.',
@@ -180,7 +181,7 @@ class Plugins_admin extends Plugins
 
 				'LoginAttempt' => 'Called when a user tries to login.',
 				'LoginAttemptNeedsRawPassword' => 'A plugin has to return true here, if it needs a raw (un-hashed) password in LoginAttempt.',
-				'AlternateAuthentication' => '',
+				'AlternateAuthentication' => 'Called at the end of the login process, if the user did not try to login, the session has no user attached or only the username and no password is given (see Plugin::AlternateAuthentication() for more info).',
 				'MessageFormSent' => 'Called when the "Message to user" form has been submitted.',
 				'MessageFormSentCleanup' => 'Called after a email message has been sent through public form.',
 				'Logout' => 'Called when a user logs out.',
@@ -197,7 +198,7 @@ class Plugins_admin extends Plugins
 				'AppendUserRegistrTransact' => 'Gets appended to the transaction that creates a new user on registration.',
 				'AfterUserRegistration' => 'Gets called after a new user has registered.',
 
-				'SessionLoaded' => '', // gets called after $Session is initialized, quite early.
+				'SessionLoaded' => 'Gets called after $Session is initialized, quite early.',
 
 				'AfterLoginAnonymousUser' => 'Gets called at the end of the login procedure for anonymous visitors.',
 				'AfterLoginRegisteredUser' => 'Gets called at the end of the login procedure for registered users.',
@@ -205,14 +206,13 @@ class Plugins_admin extends Plugins
 				'BeforeBlogDisplay' => 'Gets called before a (part of the blog) gets displayed.',
 				'SkinBeginHtmlHead' => 'Gets called at the top of the HTML HEAD section in a skin.',
 				'SkinEndHtmlBody' => 'Gets called at the end of the skin\'s HTML BODY section.',
-				'DisplayTrackbackAddr' => '',
+				'DisplayTrackbackAddr' => 'Called to display the trackback URL for an item.',
 
 				'GetCronJobs' => 'Gets a list of implemented cron jobs.',
 				'GetProvidedSkins' => 'Get a list of "skins" handled by the plugin.',
 
 				'PluginUserSettingsEditAction' => 'Called as action before editing a user\'s settings.',
 			);
-
 
 			if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )
 			{ // only call this, if we're not in the process of installation, to avoid errors from Plugins in this case!
@@ -1446,6 +1446,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.8  2009/03/06 14:12:28  tblue246
+ * Added missing documentation for Plugin hooks
+ *
  * Revision 1.7  2009/02/28 22:49:02  blueyed
  * Fix check for valid filename in discover.
  *
