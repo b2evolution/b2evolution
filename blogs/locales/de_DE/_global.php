@@ -5,19 +5,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-
-$trans['de_DE'] = array('' => 'Project-Id-Version: messages
-Report-Msgid-Bugs-To: http://fplanque.net/
-POT-Creation-Date: 2009-03-04 16:40+0100
-PO-Revision-Date: 2009-03-04 15:37+0000
-Last-Translator: Daniel Hahler <launchpad@thequod.de>
-Language-Team: <en@li.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8bit
-X-Launchpad-Export-Date: 2009-03-04 23:40+0000
-X-Generator: Launchpad (build Unknown)
-',
+$trans['de_DE'] = array(
+'__meta__' => array('format_version'=>1, 'charset'=>'iso-8859-1'),
+'' => "Project-Id-Version: messages\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2009-03-04 16:40+0100\nPO-Revision-Date: 2009-03-04 15:37+0000\nLast-Translator: Daniel Hahler <launchpad@thequod.de>\nLanguage-Team: <en@li.org>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=ISO-8859-1\nContent-Transfer-Encoding: 8bit\nX-Launchpad-Export-Date: 2009-03-04 23:40+0000\nX-Generator: Launchpad (build Unknown)\n",
 'Categories' => 'Kategorien',
 'Tags' => 'Tags',
 'Previous' => 'Vorherige',
@@ -205,11 +195,7 @@ X-Generator: Launchpad (build Unknown)
 'WARNING: you are trying to log in to <strong>%s</strong> but your cookie domain is <strong>%s</strong>. You will not be able to successfully log in to the requested domain until you fix your cookie domain in your %s configuration.' => 'WARNUNG: Du versuchst, dich auf <strong>%s</strong> einzuloggen, aber deine Cookie-Domain ist <strong>%s</strong>. Du wirst dich nicht erfolgreich einloggen können, bis du deine Cookie-Domain in deiner %s-Konfiguration berichtigt hast.',
 'All your comments have been marked not to allow emailing you through a message form.' => 'Alle deine Kommentare wurden markiert, so dass sie nicht mehr erlauben, dich über eine Nachrichtenformular zu kontaktieren.',
 'The request not to receive emails through a message form for your comments failed.' => 'Die Anforderung, keine E-Mails mehr über ein Nachrichtenformular zu empfangen, ist fehlgeschlagen.',
-'We have received a request that you do not want to receive emails through\na message form on your comments anymore.\n\nTo confirm that this request is from you, please click on the following link:' => 'Wir haben eine Anforderung erhalten, dass du keine E-Mails mehr über
-ein Nachrichtenformular erhalten möchtest.
-
-Um zu bestätigen, dass die Anforderung von dir kam, klicke bitte auf den
-folgenden Link:',
+"We have received a request that you do not want to receive emails through\na message form on your comments anymore.\n\nTo confirm that this request is from you, please click on the following link:" => "Wir haben eine Anforderung erhalten, dass du keine E-Mails mehr über\nein Nachrichtenformular erhalten möchtest.\n\nUm zu bestätigen, dass die Anforderung von dir kam, klicke bitte auf den\nfolgenden Link:",
 'If it was not you that requested this, simply ignore this mail.' => 'Wenn du das nicht angefordert hast, ignoriere diese E-Mail einfach.',
 'Confirm opt-out for emails through message form' => 'Bestätige Opt-out für E-Mails über Nachrichtenformular',
 'An email has been sent to you, with a link to confirm your request not to receive emails through the comments you have made on this blog.' => 'Eine E-Mail wurde an dich versendet. Sie enthält einen Link, mit dem du die Anforderung, keine E-Mails mehr durch in diesem Blog hinterlassene Kommentare zu empfangen, bestätigen kannst.',
@@ -220,8 +206,7 @@ folgenden Link:',
 'Message sent from your comment:' => 'Nachricht gesendet von deinem Kommentar:',
 'Message sent from your post:' => 'Nachricht gesendet von deinem Beitrag:',
 'You can edit your profile to not reveive mails through a form:' => 'Du kannst dein Profil editieren, um keine E-Mails über ein Formular zu empfangen:',
-'Click on the following link to not receive e-mails on your comments\nfor this e-mail address anymore:' => 'Klicke auf den folgenden Link, um für diese E-Mail-Adresse keine
-E-Mails mehr durch Kommentare zu bekommen:',
+"Click on the following link to not receive e-mails on your comments\nfor this e-mail address anymore:" => "Klicke auf den folgenden Link, um für diese E-Mail-Adresse keine\nE-Mails mehr durch Kommentare zu bekommen:",
 'Cannot send email, please correct these errors:' => 'Kann die E-Mail nicht versenden, bitte berichtige diese Fehler:',
 'Back to email editing' => 'Zurück zum Editieren der E-Mail',
 'This message was sent via the messaging system on %s.' => 'Diese Nachricht wurde über den Nachrichtendienst von %s gesendet.',
@@ -377,13 +362,8 @@ E-Mails mehr durch Kommentare zu bekommen:',
 'days' => 'Tage',
 'hours' => 'Stunden',
 'minutes' => 'Minuten',
-'You have modified this form but you haven\'t submitted it yet.\\nYou are about to lose your edits.\\nAre you sure?' => 'Du hast dieses Formular verändert, aber noch nicht abgeschickt.\
-Du bist dabei, deine Änderungen zu verlieren.\
-Bist du sicher?',
-'You have modified the form \\"%s\\"\\nbut you haven\'t submitted it yet.\\nYou are about to lose your edits.\\nAre you sure?' => 'Du hast das Formular \"%s\" verändert,\
-aber noch nicht abgeschickt.\
-Du bist dabei, deine Änderungen zu verlieren.\
-Bist du sicher?',
+"You have modified this form but you haven't submitted it yet.\\nYou are about to lose your edits.\\nAre you sure?" => "Du hast dieses Formular verändert, aber noch nicht abgeschickt.\\nDu bist dabei, deine Änderungen zu verlieren.\\nBist du sicher?",
+"You have modified the form \\\"%s\\\"\\nbut you haven't submitted it yet.\\nYou are about to lose your edits.\\nAre you sure?" => "Du hast das Formular \\\"%s\\\" verändert,\\naber noch nicht abgeschickt.\\nDu bist dabei, deine Änderungen zu verlieren.\\nBist du sicher?",
 'Move up!' => 'Aufwärts bewegen!',
 'Move down! (reverse sort)' => 'Abwärts bewegen! (umgekehrte Sortierung)',
 'Move down!' => 'Abwärts bewegen!',
@@ -1726,8 +1706,7 @@ Bist du sicher?',
 'If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Any non-b2evolution tables will remain untouched though.' => 'Falls du schon b2evolution-Tabellen installiert hast und neu anfangen möchtest, musst du die b2evolution-Tabellen vor einer neuen Installation löschen. <strong>WARNUNG: All deine b2evolution-Datenbank-Tabellen und Daten werden verloren sein!!!</strong> Andere Datenbank-Tabellen, falls vorhanden, werden in keinster Weise berührt.',
 '<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location...' => '<strong>Ändere deine Basis-Konfiguration</strong> (siehe Zusammenfassung unten): Du wirst das nur in seltenen Fällen machen wollen, wenn du deine b2evolution-Dateien oder -Datenbank verschoben hast...',
 'GO!' => 'LOS!',
-'Are you sure you want to delete your existing %s tables?\\nDo you have a backup?' => 'Bist du sicher, dass du die %s Tabellen löschen möchtest?\
-Hast du ein Backup?',
+"Are you sure you want to delete your existing %s tables?\\nDo you have a backup?" => "Bist du sicher, dass du die %s Tabellen löschen möchtest?\\nHast du ein Backup?",
 'Need to start anew?' => 'Möchtest du neu anfangen?',
 'If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.' => 'Wenn du schon vorher b2evolution-Tabellen installiert hast und neu anfangen möchtest, musst du die b2evolution-Tabellen löschen bevor du eine neu installieren kannst. b2evolution kann seine eigenen DB-Tabellen für dich löschen, aber aus offensichtlichen Sicherheitsgründen ist diese Funktion standardmässig abgeschaltet.',
 'Base config recap...' => 'Zusammenfassung der Basis-Konfiguration',
@@ -1740,8 +1719,7 @@ Hast du ein Backup?',
 'Now you can <a %s>log in</a> with your usual %s username and password.' => 'Jetzt kannst du dich mit deinem üblichen %2$s Benutzernamen und Passwort <a %1$s>einloggen</a>.',
 'Deleting b2evolution tables from the datatase...' => 'Lösche b2evolution-Tabellen aus der Datenbank...',
 'For security reasons, the reset feature is disabled by default.' => 'Aus Sicherheitsgründen ist die Reset-Funktion standardmässig ausgeschaltet.',
-'Are you sure you want to delete your existing %s tables?\nDo you have a backup?' => 'Bist du sicher, dass du die %s Tabellen löschen möchtest?
-Hast du ein Backup?',
+"Are you sure you want to delete your existing %s tables?\nDo you have a backup?" => "Bist du sicher, dass du die %s Tabellen löschen möchtest?\nHast du ein Backup?",
 'Reset done!' => 'Zurücksetzung beendet!',
 'Back to menu' => 'Zurück zum Menu',
 'Language / Locale' => 'Sprache / Locale',
