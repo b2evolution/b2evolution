@@ -294,17 +294,12 @@ if( $action == 'merge' )
 
 if( $action == 'convert' )
 { // convert messages.PO files to _global.php
-	if( ! @is_readable( $file_pot ) )
-	{
-		echo "FATAL: $file_pot is not readable!\n";
-		exit(1);
-	}
-
-	require_once dirname(__FILE__).'/pofile.class.php';
+	require_once dirname(__FILE__).'/../blogs/inc/locales/_pofile.class.php';
 
 	foreach( $locales_to_convert as $l_locale )
 	{
 		$l_file_po = $dir_root.'locales/'.$l_locale.'/LC_MESSAGES/messages.po';
+		$global_file_path = $dir_root.'locales/'.$l_locale.'/_global.php';
 
 		echo 'Converting '.$l_locale.'.. ';
 
@@ -315,35 +310,14 @@ if( $action == 'convert' )
 		}
 
 		$POFile = new POFile($l_file_po);
-		$ttrans = $POFile->read(false);
+		$POFile->read(false);
+		$r = $POFile->write_evo_trans($global_file_path, $l_locale);
 
-		$global_file_path = $dir_root.'locales/'.$l_locale.'/_global.php';
-		$fp = fopen( $global_file_path, 'w+' );
-
-		if( ! $fp )
+		if( $r !== true )
 		{
-			echo "Could not open $global_file_path for writing!\n";
+			echo "Error: $r\n";
 			continue;
 		}
-
-		fwrite( $fp, "<?php\n" );
-		fwrite( $fp, "/*\n" );
-		fwrite( $fp, " * Global lang file\n" );
-		fwrite( $fp, " * This file was generated automatically from messages.po\n" );
-		fwrite( $fp, " */\n" );
-		fwrite( $fp, "if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );" );
-		fwrite( $fp, "\n\n" );
-
-
-		fwrite( $fp, "\n\$trans['".$l_locale."'] = array(" );
-		foreach( $ttrans as $msgid => $msginfo )
-		{
-			fwrite( $fp,
-				"'".str_replace( array("'", '\"'), array("\'", '"'), $msgid )
-				."' => '".str_replace( array("'", '\"'), array("\'", '"'), $msginfo['trans'] )."',\n" );
-		}
-		fwrite( $fp, "\n);\n?>" );
-		fclose( $fp );
 
 		echo "[ok]\n";
 	}

@@ -28,13 +28,13 @@ class POFile
 {
 	var $msgids = array();
 
-	function POFile($filename)
+	function POFile($filename=null)
 	{
 		$this->filename = str_replace( '\\', '/', $filename );
 	}
 
 	/**
-	 * adds a MSGID for a specific source file
+	 * Add a MSGID for a specific source file
 	 */
 	function addmsgid( $msgid, $sourcefile = '', $trans = '' )
 	{
@@ -45,11 +45,6 @@ class POFile
 
 		// replace links
 		$msgid = preg_replace('/<a\s+([^>]*)>/', '<a %s>', $msgid);
-
-		// we don't want tabs and returns in the msgid, but we must escape '"'
-		$search = array("\r", "\n", "\t", '"');
-		$replace = array('', ' ', '', '\"');
-		$msgid = str_replace($search, $replace, $msgid);
 
 		if( !isset($this->msgids[ $msgid ]) )
 		{
@@ -63,7 +58,8 @@ class POFile
 	}
 
 	/**
-	 * translates msgid
+	 * Translate msgid
+	 * @param string MSGID
 	 */
 	function translate( $msgid )
 	{
@@ -77,9 +73,6 @@ class POFile
 			// generate clean msgid like in .po files
 			$msgid = preg_replace('/<a\s+([^>]*)>/', '<a %s>', $msgid);
 		}
-
-		// we don't have formatting in the .po files, but escaped '"'
-		$msgid = str_replace( array("\r", "\n", "\t", '"'), array('', ' ', '', '\"'), $msgid);
 
 		if( isset($this->msgids[ $msgid ]) )
 		{
@@ -99,14 +92,14 @@ class POFile
 		}
 	}
 
+
 	/**
-	 * reads .po file
+	 * Read a .po file
 	 *
-	 * this is quite the same as in locales.php for the extract part.
-	 *
+	 * @param boolean Log source info to {@link $Messages}?
 	 * @return array with msgids => array( 'trans' => msgstr )
 	 */
-	function read( $echo_source_info = true )
+	function read( $log_source_info = true )
 	{
 		$lines = file( $this->filename );
 		$lines[] = '';	// Adds a blank line at the end in order to ensure complete handling of the file
@@ -151,12 +144,7 @@ class POFile
 						}
 
 						// Save the string
-						// $ttrans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => '".str_replace( "'", "\'", str_replace( '\"', '"', $msgstr ))."',";
-						// $ttrans[] = "\n\t\"$msgid\" => \"$msgstr\",";
-						#$ttrans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => \"".str_replace( '$', '\$', $msgstr)."\",";
-						$this->msgids[$msgid]['trans']
-							= str_replace( array('\t', '\r', '\n', '\"'), array("\t", "\r", "\n", '"'), $msgstr);
-
+						$this->msgids[$msgid]['trans'] = $msgstr;
 					}
 				}
 				$status = '-';
@@ -190,7 +178,7 @@ class POFile
 				// echo $matches[0],'<br />';
 				$sourcefiles = preg_replace( '@\\\\@', '/', $matches[1] );
 				// $c = preg_match_all( '@ ../../../([^:]*):@', $sourcefiles, $matches);
-				$c = preg_match_all( '@ ../../../([^/:]*)@', $sourcefiles, $matches);
+				$c = preg_match_all( '@ ../../../([^/:]*/?)@', $sourcefiles, $matches);
 				for( $i = 0; $i < $c; $i++ )
 				{
 					$sources[] = $matches[1][$i];
@@ -203,17 +191,95 @@ class POFile
 			}
 		}
 
-		if( $echo_source_info )
+		if( $loc_vars && $log_source_info )
 		{
+			global $Messages;
 			ksort( $loc_vars );
+
+			$list_counts = '';
 			foreach( $loc_vars as $source => $c )
 			{
-				echo $source, ' = ', $c, '<br />';
+				$list_counts .= "\n<li>$source = $c</li>";
 			}
+			$Messages->add( 'Sources and number of strings: <ul>'.$list_counts.'</ul>', 'note' );
 		}
 
-		return( $this->msgids );
+		return $this->msgids;
 	}
+
+
+	/**
+	 * Write POFile::$msgids into $file_path.
+	 *
+	 * @return true|string True on success, string with error on failure
+	 */
+	function write_evo_trans($file_path, $locale)
+	{
+		$fp = fopen( $file_path, 'w+' );
+
+		if( ! $fp )
+		{
+			return "Could not open $file_path for writing!";
+		}
+
+		fwrite( $fp, "<?php\n" );
+		fwrite( $fp, "/*\n" );
+		fwrite( $fp, " * Global lang file\n" );
+		fwrite( $fp, " * This file was generated automatically from messages.po\n" );
+		fwrite( $fp, " */\n" );
+		fwrite( $fp, "if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );" );
+		fwrite( $fp, "\n\n" );
+
+
+		fwrite( $fp, '$trans[\''.$locale."'] = array(\n" );
+
+		// Write meta/format info:
+		$charset = 'utf-8'; // default
+		if( isset($this->msgids['']) )
+		{
+			if( preg_match( '~\\\nContent-Type: text/plain; charset=(.*?);?\\\n~', $this->msgids['']['trans'], $match ) )
+			{
+				$charset = strtolower($match[1]);
+			}
+		}
+		fwrite( $fp, "'__meta__' => array('format_version'=>1, 'charset'=>'$charset'),\n" );
+
+		foreach( $this->msgids as $msgid => $msginfo )
+		{
+			$msgstr = $msginfo['trans'];
+
+			fwrite( $fp, POFile::quote($msgid).' => '.POFile::quote($msgstr).",\n" );
+		}
+		fwrite( $fp, "\n);\n?>" );
+		fclose( $fp );
+
+		return true;
+	}
+
+
+	/**
+	 * Quote a msgid/msgstr, preferrable with single quotes.
+	 *
+	 * Single quotes are preferred, as PHP just handles them as strings and
+	 * does no extra parsing.
+	 * Double quotes are used, if there's \n, \r or \t in the string.
+	 *
+	 * @param string
+	 * @return string Quoted string (either using double or single quotes (preferred))
+	 */
+	function quote($s)
+	{
+		if( preg_match('~\\\\[nrt]~', $s) ) // \r, \n or \t in there
+		{
+			// NOTE: no need to escape '"', as its escaped in .po files already
+			return '"'.str_replace( '$', '\$', $s ).'"';
+		}
+		else
+		{
+			return "'".str_replace( array("'", '\"'), array("\'", '"'), $s )."'";
+		}
+	}
+
 }
 
 
@@ -279,6 +345,7 @@ class POTFile extends POFile
 		log_($count.' msgids written.');
 		return true;
 	}
+
 
 }
 

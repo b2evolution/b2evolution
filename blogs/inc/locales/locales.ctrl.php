@@ -228,125 +228,10 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 			}
 
 
-			// File exists:
-			// Get PO file for that edit_locale:
-			$lines = file($po_file);
-			$lines[] = '';	// Adds a blank line at the end in order to ensure complete handling of the file
-			$all = 0;
-			$fuzzy=0;
-			$untranslated=0;
-			$translated=0;
-			$status='-';
-			$matches = array();
-			$sources = array();
-			$loc_vars = array();
-			$ttrans = array();
-			foreach ($lines as $line)
-			{
-				// echo 'LINE:', $line, '<br />';
-				if(trim($line) == '' )
-				{ // Blank line, go back to base status:
-					if( $status == 't' )
-					{ // ** End of a translation **:
-						if( $msgstr == '' )
-						{
-							$untranslated++;
-							// echo 'untranslated: ', $msgid, '<br />';
-						}
-						else
-						{
-							$translated++;
-
-							// Inspect where the string is used
-							$sources = array_unique( $sources );
-							// echo '<p>sources: ', implode( ', ', $sources ), '</p>';
-							foreach( $sources as $source )
-							{
-								if( !isset( $loc_vars[$source]  ) ) $loc_vars[$source] = 1;
-								else $loc_vars[$source] ++;
-							}
-
-							// Save the string
-							// $ttrans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => '".str_replace( "'", "\'", str_replace( '\"', '"', $msgstr ))."',";
-							// $ttrans[] = "\n\t\"$msgid\" => \"$msgstr\",";
-							$ttrans[] = "\n\t'".str_replace( "'", "\'", str_replace( '\"', '"', $msgid ))."' => \"".str_replace( '$', '\$', $msgstr)."\",";
-
-						}
-					}
-					$status = '-';
-					$msgid = '';
-					$msgstr = '';
-					$sources = array();
-				}
-				elseif( ($status=='-') && preg_match( '#^msgid "(.*)"#', $line, $matches))
-				{ // Encountered an original text
-					$status = 'o';
-					$msgid = $matches[1];
-					// echo 'original: "', $msgid, '"<br />';
-					$all++;
-				}
-				elseif( ($status=='o') && preg_match( '#^msgstr "(.*)"#', $line, $matches))
-				{ // Encountered a translated text
-					$status = 't';
-					$msgstr = $matches[1];
-					// echo 'translated: "', $msgstr, '"<br />';
-				}
-				elseif( preg_match( '#^"(.*)"#', $line, $matches))
-				{ // Encountered a followup line
-					if ($status=='o')
-						$msgid .= $matches[1];
-					elseif ($status=='t')
-						$msgstr .= $matches[1];
-				}
-				elseif( ($status=='-') && preg_match( '@^#:(.*)@', $line, $matches))
-				{ // Encountered a source code location comment
-					// echo $matches[0],'<br />';
-					$sourcefiles = preg_replace( '@\\\\@', '/', $matches[1] );
-					// $c = preg_match_all( '@ ../../../([^:]*):@', $sourcefiles, $matches);
-					$c = preg_match_all( '@ ../../../([^/:]*/?)@', $sourcefiles, $matches);
-					for( $i = 0; $i < $c; $i++ )
-					{
-						$sources[] = $matches[1][$i];
-					}
-					// echo '<br />';
-				}
-				elseif(strpos($line,'#, fuzzy') === 0)
-					$fuzzy++;
-			}
-
-			if( $loc_vars )
-			{
-				ksort( $loc_vars );
-
-				$list_counts = '';
-				foreach( $loc_vars as $source => $c )
-				{
-					$list_counts .= "\n<li>$source = $c";
-				}
-				$Messages->add( 'Sources and number of strings: <ul>'.$list_counts.'</ul>', 'note' );
-			}
-
-			$fp = fopen( $outfile, 'w+' );
-			fwrite( $fp, "<?php\n" );
-			fwrite( $fp, "/*\n" );
-			fwrite( $fp, " * Global lang file\n" );
-			fwrite( $fp, " * This file was generated automatically from messages.po\n" );
-			fwrite( $fp, " */\n" );
-			fwrite( $fp, "if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );" );
-			fwrite( $fp, "\n\n" );
-
-
-			fwrite( $fp, "\n\$trans['".$locales[$edit_locale]['messages']."'] = array(" );
-			// echo '<pre>';
-			foreach( $ttrans as $line )
-			{
-				// echo htmlspecialchars( $line );
-				fwrite( $fp, $line );
-			}
-			// echo '</pre>';
-			fwrite( $fp, "\n);\n?>" );
-			fclose( $fp );
-
+			load_class( 'locales/_pofile.class.php' );
+			$POFile = new POFile($po_file);
+			$POFile->read(true); // adds info about sources to $Messages
+			$POFile->write_evo_trans($outfile, $locales[$edit_locale]['messages']);
 			break;
 
 		case 'deletelocale':
@@ -439,6 +324,18 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2009/03/06 00:11:27  blueyed
+ * Abstract POFile handling to POFile class completely.
+ *  - move gettext/pofile.class.php to blogs/inc/locales
+ *  - use it in locales.ctrl
+ * _global.php generation:
+ *  - use double quotes only when necessary (msgid/msgstr containing e.g. \n),
+ *    this speeds up reading the file a lot
+ *  - add __meta__ key to trans array, used for versioning, so old files still
+ *    get handled (and converted when being read)
+ * Not tested for long in CVS HEAD, but works well in whissip for some time
+ * already.
+ *
  * Revision 1.3  2008/09/07 09:13:28  fplanque
  * Locale definitions are now included in language packs.
  * A bit experimental but it should work...

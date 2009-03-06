@@ -96,11 +96,6 @@ if( $use_l10n )
 
 		$messages = $locales[$req_locale]['messages'];
 
-		// replace special characters to msgid-equivalents
-		$search = str_replace( array("\n", "\r", "\t"), array('\n', '', '\t'), $string );
-
-		// echo "Translating ", $search, " to $messages<br />";
-
 		if ( is_null( $plugin_data['ext_transarray'] ) )
 		{	// use our array
 			//$Debuglog->add( 'Using internal array', 'locale' );
@@ -133,13 +128,53 @@ if( $use_l10n )
 				// echo 'file not found!';
 				$trans[ $messages ] = array();
 			}
+			else
+			{
+				if( ! isset($trans[$messages]['__meta__']) )
+				{ // Unknown/old messages format (< version 1):
+					$Debuglog->add('Found deprecated messages format (no __meta__ info).', 'locales');
+					// Translate keys (e.g. 'foo\nbar') to real strings ("foo\nbar")
+					// Doing this here for all strings, is actually faster than doing it on key lookup (like it has been done before always)
+					foreach($trans[$messages] as $k => $v)
+					{
+						if( ($pos = strpos($k, '\\')) === false )
+						{ // fast-path-skip
+							continue;
+						}
+						// Replace string as done in the good old days:
+						$new_k = str_replace( array('\n', '\r', '\t'), array("\n", "\r", "\t"), $k );
+						if( $new_k != $k )
+						{
+							$trans[$messages][$new_k] = $v;
+							unset($trans[$messages][$k]);
+						}
+					}
+				}
+			}
 		}
 
-		if( isset( $trans[ $messages ][ $search ] ) )
+		if( isset( $trans[ $messages ][ $string ] ) )
 		{ // If the string has been translated:
 			//$Debuglog->add( 'String ['.$string.'] found', 'locale' );
-			$r = $trans[ $messages ][ $search ];
-			$messages_charset = $locales[$req_locale]['charset'];
+			$r = $trans[ $messages ][ $string ];
+			if( isset($trans[$messages]['__meta__']['charset']) )
+			{ // new format: charset in meta data:
+				$messages_charset = $trans[$messages]['__meta__']['charset'];
+			}
+			else
+			{ // old format.. extract charset from content type or fall back to setting from global locale definition:
+				$meta = $trans[$messages][''];
+				if( preg_match( '~^Content-Type: text/plain; charset=(.*);?$~m', $meta, $match ) )
+				{
+					$messages_charset = $match[1];
+				}
+				else
+				{
+					$messages_charset = $locales[$req_locale]['charset'];
+				}
+				// Set it accordingly to new format.
+				$trans[$messages]['__meta__']['charset'] = $messages_charset;
+			}
 		}
 		else
 		{
@@ -989,6 +1024,18 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.20  2009/03/06 00:11:27  blueyed
+ * Abstract POFile handling to POFile class completely.
+ *  - move gettext/pofile.class.php to blogs/inc/locales
+ *  - use it in locales.ctrl
+ * _global.php generation:
+ *  - use double quotes only when necessary (msgid/msgstr containing e.g. \n),
+ *    this speeds up reading the file a lot
+ *  - add __meta__ key to trans array, used for versioning, so old files still
+ *    get handled (and converted when being read)
+ * Not tested for long in CVS HEAD, but works well in whissip for some time
+ * already.
+ *
  * Revision 1.19  2009/03/03 20:15:49  tblue246
  * T_(): Adding workaround for PHP 4 compatibility...
  *

@@ -129,6 +129,7 @@ function __autoload($classname)
 			'genericelement' => $inc_path.'generic/model/_genericelement.class.php',
 			'genericcache' => $inc_path.'generic/model/_genericcache.class.php',
 			'xhtml_validator' => $inc_path.'xhtml_validator/_xhtml_validator.class.php',
+			'pofile' => $inc_path.'locales/_pofile.class.php',
 			'plugins' => $inc_path.'plugins/model/_plugins.class.php',
 			'plugins_admin' => $inc_path.'plugins/model/_plugins_admin.class.php',
 			'pluginsettings' => $inc_path.'plugins/model/_pluginsettings.class.php',
@@ -177,6 +178,18 @@ function load_class( $class_path, $require = true )
 
 /*
  * $Log$
+ * Revision 1.3  2009/03/06 00:11:27  blueyed
+ * Abstract POFile handling to POFile class completely.
+ *  - move gettext/pofile.class.php to blogs/inc/locales
+ *  - use it in locales.ctrl
+ * _global.php generation:
+ *  - use double quotes only when necessary (msgid/msgstr containing e.g. \n),
+ *    this speeds up reading the file a lot
+ *  - add __meta__ key to trans array, used for versioning, so old files still
+ *    get handled (and converted when being read)
+ * Not tested for long in CVS HEAD, but works well in whissip for some time
+ * already.
+ *
  * Revision 1.2  2009/03/05 23:42:43  blueyed
  * Remove todo
  *
