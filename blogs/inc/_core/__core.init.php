@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the init file for the core modules
+ * This is the init file for the core module.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -173,6 +173,7 @@ class _core_Module
 
 		}
 	}
+
 
 	/**
 	 * Builds the 2nd half of the menu. This is the one with the configuration features
@@ -406,15 +407,17 @@ class _core_Module
 						),
 					) );
 		}
-
 	}
-
 }
 
 $_core_Module = & new _core_Module();
 
+
 /*
  * $Log$
+ * Revision 1.6  2009/03/07 21:35:09  blueyed
+ * doc
+ *
  * Revision 1.5  2009/02/24 22:58:19  fplanque
  * Basic version history of post edits
  *

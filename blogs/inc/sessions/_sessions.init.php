@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the init file for the core modules
+ * This is the init file for the session module.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -74,12 +74,12 @@ class sessions_Module
 	function build_menu_1()
 	{
 		global $blog;
-    /**
+		/**
 		 * @var User
 		 */
 		global $current_User;
 		global $Blog;
-    /**
+		/**
 		 * @var AdminUI_general
 		 */
 		global $AdminUI;
@@ -200,7 +200,8 @@ class sessions_Module
 		}
 	}
 
-  /**
+
+	/**
 	 * Builds the 2nd half of the menu. This is the one with the configuration features
 	 *
 	 * At some point this might be displayed differently than the 1st half.
@@ -212,8 +213,12 @@ class sessions_Module
 
 $sessions_Module = & new sessions_Module();
 
+
 /*
  * $Log$
+ * Revision 1.6  2009/03/07 21:35:09  blueyed
+ * doc
+ *
  * Revision 1.5  2008/05/26 19:30:32  fplanque
  * enhanced analytics
  *

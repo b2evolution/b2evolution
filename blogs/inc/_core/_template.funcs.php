@@ -211,6 +211,7 @@ function header_nocache()
  * @todo make it complete with all possible params!
  *
  * @param array params
+ *        - "auto_pilot": "seo_title": Use the SEO title autopilot. (Default: "none")
  */
 function request_title( $params = array() )
 {
@@ -859,6 +860,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.50  2009/03/07 21:35:09  blueyed
+ * doc
+ *
  * Revision 1.49  2009/01/23 22:10:31  afwas
  * Remove javaScript popup calendar to be replaced with jQuery datepicker.
  *
