@@ -105,33 +105,33 @@ class AdminUI_general extends Widget
 	var $title_titlearea;
 	var $title_titlearea_appendix = '';
 
-  /**
-   * Collection List buttons: title for 'all' button
+	/**
+	 * Collection List buttons: title for 'all' button
 	 * @var string
 	 */
 	var $coll_list_all_title = NULL;
-  /**
-   * Collection List buttons: url for 'all' button
+	/**
+	 * Collection List buttons: url for 'all' button
 	 * @var string
 	 */
 	var $coll_list_all_url = '';
-  /**
-   * Collection List buttons: permission name to test on to decide wether or not to display buttons
+	/**
+	 * Collection List buttons: permission name to test on to decide wether or not to display buttons
 	 * @var string
 	 */
 	var $coll_list_permname = NULL;
-  /**
-   * Collection List buttons: minimum level required to display button
+	/**
+	 * Collection List buttons: minimum level required to display button
 	 * @var mixed
 	 */
 	var $coll_list_permlevel = 1;
-  /**
-   * Collection List buttons: params of the url used for the buttons
+	/**
+	 * Collection List buttons: params of the url used for the buttons
 	 * @var array
 	 */
 	var $coll_list_url_params = array();
-  /**
-   * Collection List buttons: javascript to execute on click of a button
+	/**
+	 * Collection List buttons: javascript to execute on click of a button
 	 * @var string
 	 */
 	var $coll_list_onclick = NULL;
@@ -426,7 +426,7 @@ class AdminUI_general extends Widget
 	{
 		global $skins_path, $mode;
 
-    /**
+		/**
 		 * @var Hit
 		 */
 		global $Hit;
@@ -457,6 +457,7 @@ class AdminUI_general extends Widget
 		echo $this->get_body_top();
 	}
 
+
 	/**
 	 * Display body bottom, debug info and close </html>
 	 */
@@ -475,7 +476,6 @@ class AdminUI_general extends Widget
 	 *       The first block uses the "sub" template, the others "block".
 	 *
 	 * @see disp_payload_end()
-	 * @todo check if the plugin event is appropriate. Maybe it should rather go as 'AdminAfterBodyTop' or sth like this.
 	 */
 	function disp_payload_begin()
 	{
@@ -502,7 +502,6 @@ class AdminUI_general extends Widget
 
 			echo $template['begin'];
 		}
-
 	}
 
 
@@ -644,7 +643,7 @@ class AdminUI_general extends Widget
 
 				if( $l_blog_ID == $blog )
 				{
-   				$current_is_displayed = true;
+					$current_is_displayed = true;
 					$buttons .= $template['afterEachSel'];
 				}
 				else
@@ -901,8 +900,6 @@ class AdminUI_general extends Widget
 				{
 					case 0:
 						// main level
-						global $app_shortname, $app_version;
-
 						return array(
 							'before' => '<div id="mainmenu"><ul>',
 							'after' => '</ul></div>',
@@ -1213,27 +1210,24 @@ class AdminUI_general extends Widget
 
 			case 'file_browser':
 				return array(
-						'block_start' => '<div class="block_item">
-															<h3><span style="float:right">$global_icons$</span>$title$</h3>',
-						'block_end' => '</div>',
-					);
+					'block_start' => '<div class="block_item"><h3><span style="float:right">$global_icons$</span>$title$</h3>',
+					'block_end' => '</div>',
+				);
 
 			case 'block_item':
 				return array(
-						'block_start' => '<div class="block_item">
-															<h3><span style="float:right">$global_icons$</span>$title$</h3>',
-						'block_end' => '</div>',
-					);
+					'block_start' => '<div class="block_item"><h3><span style="float:right">$global_icons$</span>$title$</h3>',
+					'block_end' => '</div>',
+				);
 
 			case 'side_item':
 				return array(
-						'block_start' => '<div class="browse_side_item">
-															<h3><span style="float:right">$global_icons$</span>$title$</h3>',
-						'block_end' => '</div>',
-					);
+					'block_start' => '<div class="browse_side_item"><h3><span style="float:right">$global_icons$</span>$title$</h3>',
+					'block_end' => '</div>',
+				);
 
 			default:
-				debug_die( 'Unknown $name for AdminUI::get_template(): '.var_export($name, true) /* PHP 4.2 ! */ );
+				debug_die( 'Unknown $name for AdminUI::get_template(): '.var_export($name, true) );
 		}
 	}
 
@@ -1269,7 +1263,7 @@ class AdminUI_general extends Widget
 
 
 	/**
-	 * Get tghe list of path keys in a given range.
+	 * Get the list of path keys in a given range.
 	 *
 	 * @param integer start index
 	 * @param integer|NULL end index (NULL means same as start index)
@@ -1334,7 +1328,6 @@ class AdminUI_general extends Widget
 
 		$this->path[$level] = $pathKey;
 		$this->pathProps[$level] = $pathProps;
-		// FP> WHY ON EARTH would we want to do that? $this->pathProps[$level] = array_merge( $parentNode, $pathProps );
 
 		// pre_dump( 'set_path_level: ', $level, $pathKey, $this->pathProps[$level] );
 
@@ -1415,7 +1408,7 @@ class AdminUI_general extends Widget
 	}
 
 
-  /**
+	/**
 	 * Init the menus.
 	 *
 	 * Do this as late as possible. Especially after determining the blog ID we work on.
@@ -1433,11 +1426,11 @@ class AdminUI_general extends Widget
 			return;
 		}
 
-    // Let the modules construct the menu:
-    // Part 1:
+		// Let the modules construct the menu:
+		// Part 1:
 		$this->modules_call_method( 'build_menu_1' );
 
-    // Part 2:
+		// Part 2:
 		$this->modules_call_method( 'build_menu_2' );
 
 		// Call AdminAfterMenuInit to notify Plugins that the menu is initialized
@@ -1455,8 +1448,7 @@ class AdminUI_general extends Widget
 
 		foreach( $modules as $module )
 		{
-			$Module = & $GLOBALS[$module.'_Module'];
-			$Module->{$method_name}();
+			$GLOBALS[$module.'_Module']->{$method_name}();
 		}
 	}
 
@@ -1513,8 +1505,10 @@ class AdminUI_general extends Widget
 	}
 
 
-  /**
+	/**
 	 * Get the footer text
+	 *
+	 * @return string
 	 */
 	function get_footer_contents()
 	{
@@ -1524,7 +1518,7 @@ class AdminUI_general extends Widget
 
 		$r = '';
 
-   	if( $Hit->is_winIE() )
+		if( $Hit->is_winIE() )
 		{
 		 $r .= '<!--[if lt IE 7]>
 <div style="text-align:center; color:#f00; font-weight:bold; margin:1ex;">'.
@@ -1537,8 +1531,11 @@ class AdminUI_general extends Widget
 		return $r;
 	}
 
+
 	/**
 	 * Get colors for page elements that can't be controlled by CSS (charts)
+	 *
+	 * @return string
 	 */
 	function get_color( $what )
 	{
@@ -1550,11 +1547,14 @@ class AdminUI_general extends Widget
 		}
 		debug_die( 'unknown color' );
 	}
-
 }
+
 
 /*
  * $Log$
+ * Revision 1.90  2009/03/07 21:32:52  blueyed
+ * Fix doc and indent.
+ *
  * Revision 1.89  2009/03/04 00:10:43  blueyed
  * Make Hit constructor more lazy.
  *  - Move referer_dom_ID generation/fetching to own method
