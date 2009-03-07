@@ -90,7 +90,7 @@ header_content_type( 'text/html' );
 	<?php skin_base_tag(); /* You're not using any skin here but this won't hurt. However it will be very helpfull to have this here when you make the switch to a skin! */ ?>
 	<?php skin_description_tag(); ?>
 	<?php skin_keywords_tag(); ?>
-	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
+	<meta name="generator" content="<?php $app_name.' '.$app_version ?>" /> <!-- Please leave this for stats -->
 	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>

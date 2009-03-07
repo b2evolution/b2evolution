@@ -38,7 +38,7 @@ header_content_type();	// Sets charset!
 		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?></title>
 	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
-	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
+	<meta name="generator" content="<?php echo $app_name.' '.$app_version ?>" /> <!-- Please leave this for stats -->
 	<?php include_headlines() ?>
 </head>
 <body>
