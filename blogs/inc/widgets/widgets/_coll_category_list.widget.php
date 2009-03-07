@@ -140,13 +140,20 @@ class coll_category_list_Widget extends ComponentWidget
 		// Display title if requested
 		$this->disp_title();
 
+		$aggregate_coll_IDs = $Blog->get_setting('aggregate_coll_IDs');
 		if ( $this->disp_params['use_form'] )
 		{	// We want to display a form:
 			echo '<form action="';
 
 			if ( $this->disp_params['link_type'] == 'context' )
 			{	// Preserve current browsing context:
-				echo regenerate_url( 'cats,catsel' );
+				$ignore_str = 'cats,catsel';
+				if ( ! empty( $aggregate_coll_IDs ) )
+				{
+					$ignore_str .= ',blog';
+				}
+			
+				echo regenerate_url( $ignore_str );
 			}
 			else
 			{
@@ -156,7 +163,6 @@ class coll_category_list_Widget extends ComponentWidget
 			echo '" method="get">';
 		}
 
-		$aggregate_coll_IDs = $Blog->get_setting('aggregate_coll_IDs');
 		if( empty($aggregate_coll_IDs) )
 		{ // ____________________ We want to display cats for ONE blog ____________________
 			$tmp_disp = '';
@@ -386,6 +392,9 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.16  2009/03/07 23:14:34  tblue246
+ * Bugfix for bugfix
+ *
  * Revision 1.15  2009/03/07 22:41:13  tblue246
  * Display submit button on category widget when requested (fixes https://bugs.launchpad.net/b2evolution/+bug/194849 ).
  *
