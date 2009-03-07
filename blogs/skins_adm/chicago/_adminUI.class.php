@@ -41,8 +41,6 @@ require_once dirname(__FILE__).'/../_adminUI_general.class.php';
  */
 class AdminUI extends AdminUI_general
 {
-
-
 	/**
 	 * Display doctype + <head>...</head> section
 	 */
@@ -61,12 +59,8 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_page_head()
 	{
-		global $htsrv_url_sensitive, $baseurl, $admin_url, $rsc_url, $Blog;
-		global $app_shortname, $app_version;
-
 		$r = '
 		<div id="header">'
-
 			// Display MAIN menu:
 			.$this->get_html_menu().'
 		</div>
@@ -103,6 +97,7 @@ class AdminUI extends AdminUI_general
 		return $r;
 	}
 
+
 	/**
 	 * Get the end of the HTML <body>. Close open divs, etc...
 	 *
@@ -113,7 +108,8 @@ class AdminUI extends AdminUI_general
 		return "\n</div>\n</div>\n";
 	}
 
-  /**
+
+	/**
 	 * Get the footer text
 	 */
 	function get_footer_contents()
@@ -125,7 +121,7 @@ class AdminUI extends AdminUI_general
 
 		$r = '<div class="footer">';
 
-   	if( $Hit->is_winIE() )
+		if( $Hit->is_winIE() )
 		{
 		 $r .= '<!--[if lt IE 7]>
 <div style="text-align:center; color:#f00; font-weight:bold;">'.
@@ -141,6 +137,7 @@ class AdminUI extends AdminUI_general
 
 		return $r;
 	}
+
 
 	/**
 	 * Get a template by name and depth.
@@ -384,11 +381,14 @@ class AdminUI extends AdminUI_general
 		}
 		debug_die( 'unknown color' );
 	}
-
 }
+
 
 /*
  * $Log$
+ * Revision 1.16  2009/03/07 21:33:54  blueyed
+ * Fix indent, nuke globals.
+ *
  * Revision 1.15  2009/03/04 00:10:43  blueyed
  * Make Hit constructor more lazy.
  *  - Move referer_dom_ID generation/fetching to own method

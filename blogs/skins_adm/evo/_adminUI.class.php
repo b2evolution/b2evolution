@@ -121,10 +121,7 @@ class AdminUI extends AdminUI_general
 	 * @return string
 	 */
 	function get_page_head()
-	{
-		global $current_User, $htsrv_url_sensitive, $baseurl, $admin_url, $rsc_url, $Blog;
-		global $app_shortname, $app_version;
-
+    {
 		$r = '
 		<div id="header">
 			<h1>'.$this->get_title_for_titlearea().'</h1>
@@ -208,6 +205,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.30  2009/03/07 21:35:03  blueyed
+ * Fix indent, nuke globals.
+ *
  * Revision 1.29  2009/01/01 02:19:26  blueyed
  * fix RECOMMIT
  *
