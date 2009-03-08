@@ -7,7 +7,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -666,6 +666,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.17  2009/03/08 23:57:44  fplanque
+ * 2009
+ *
  * Revision 1.16  2009/03/04 00:10:42  blueyed
  * Make Hit constructor more lazy.
  *  - Move referer_dom_ID generation/fetching to own method

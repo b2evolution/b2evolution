@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -2843,6 +2843,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.19  2009/03/08 23:57:45  fplanque
+ * 2009
+ *
  * Revision 1.18  2009/03/08 23:34:29  blueyed
  * Plugin::__get: use $Plugins for instantiating settings. Previously Plugins_admin was used here ("because Plugin::BeforeEnable() may use $Settings"), but that made no sense. Thanks, Tblue.
  *

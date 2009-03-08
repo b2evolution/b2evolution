@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
  */
@@ -45,6 +45,9 @@ echo '</div>';
 
 /*
  * $Log$
+ * Revision 1.3  2009/03/08 23:57:52  fplanque
+ * 2009
+ *
  * Revision 1.2  2008/03/23 23:40:42  fplanque
  * no message
  *

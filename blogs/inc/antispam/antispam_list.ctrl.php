@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -178,6 +178,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2009/03/08 23:57:41  fplanque
+ * 2009
+ *
  * Revision 1.4  2008/04/04 17:02:24  fplanque
  * cleanup of global settings
  *

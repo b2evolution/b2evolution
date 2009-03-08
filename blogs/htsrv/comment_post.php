@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -401,6 +401,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.131  2009/03/08 23:57:36  fplanque
+ * 2009
+ *
  * Revision 1.130  2009/01/27 23:45:41  fplanque
  * theoretically this is a better implementation because the check_perm is supposed to check for perms on the currentblog here.
  * needs some more testing though.

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package plugins
  */
@@ -212,6 +212,9 @@ class adsense_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.5  2009/03/08 23:57:48  fplanque
+ * 2009
+ *
  * Revision 1.4  2009/01/25 19:09:32  blueyed
  * phpdoc fixes
  *

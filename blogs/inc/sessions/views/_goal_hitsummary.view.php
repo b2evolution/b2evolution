@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.com/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -137,6 +137,9 @@ $Table->display_list_end();
 
 /*
  * $Log$
+ * Revision 1.2  2009/03/08 23:57:45  fplanque
+ * 2009
+ *
  * Revision 1.1  2008/04/24 01:56:08  fplanque
  * Goal hit summary
  *

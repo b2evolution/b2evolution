@@ -6,7 +6,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -586,6 +586,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.49  2009/03/08 23:57:47  fplanque
+ * 2009
+ *
  * Revision 1.48  2009/02/26 22:16:54  blueyed
  * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
  *

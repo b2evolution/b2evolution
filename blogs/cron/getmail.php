@@ -23,7 +23,7 @@
  * @author Stephan Knauss
  * @author tblue246: Tilman Blumenbach
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  * This file built upon code from original b2 - http://cafelog.com/
  * @package htsrv
  *
@@ -716,6 +716,9 @@ if( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.36  2009/03/08 23:57:35  fplanque
+ * 2009
+ *
  * Revision 1.35  2009/03/05 19:20:30  blueyed
  * getmail.php: drop T_ usage of uncommon messages (where level>0). This saves the translators 42(!) translations. Also fixed translations to use sprintf and markers for variables.
  *

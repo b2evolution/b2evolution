@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link https://thequod.de/}.
  *
  * {@link db_delta()} is based on dbDelta() from {@link http://wordpress.com Wordpress}, see
@@ -1228,6 +1228,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.8  2009/03/08 23:57:40  fplanque
+ * 2009
+ *
  * Revision 1.7  2009/02/25 21:03:29  blueyed
  * install_make_db_schema_current: Output create table entries in debug mode, too. Not tested.
  *

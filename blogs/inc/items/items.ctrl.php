@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal Open Source relicensing agreement:
  * }}
@@ -961,6 +961,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.38  2009/03/08 23:57:43  fplanque
+ * 2009
+ *
  * Revision 1.37  2009/03/03 21:32:49  blueyed
  * TODO/doc about cat_load_postcats_cache
  *

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal Open Source relicensing agreement:
  * }}
@@ -43,6 +43,9 @@ echo '<p>'.T_('Your selection here will pre-configure your blog in order to opti
 
 /*
  * $Log$
+ * Revision 1.3  2009/03/08 23:57:42  fplanque
+ * 2009
+ *
  * Revision 1.2  2008/01/21 09:35:27  fplanque
  * (c) 2008
  *

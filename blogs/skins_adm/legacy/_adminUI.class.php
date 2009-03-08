@@ -6,7 +6,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -201,6 +201,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.29  2009/03/08 23:57:59  fplanque
+ * 2009
+ *
  * Revision 1.28  2008/12/30 23:00:41  fplanque
  * Major waste of time rolling back broken black magic! :(
  * 1) It was breaking the backoffice as soon as $admin_url was not a direct child of $baseurl.

@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @see http://manual.b2evolution.net/B2_API
  *
@@ -185,6 +185,9 @@ $xmlrpc_procs["b2.getPostURL"] = array(
 
 /*
  * $Log$
+ * Revision 1.6  2009/03/08 23:57:46  fplanque
+ * 2009
+ *
  * Revision 1.5  2009/03/03 21:21:10  blueyed
  * Deprecate get_the_category_by_ID and replace its usage with ChapterCache
  * in core.

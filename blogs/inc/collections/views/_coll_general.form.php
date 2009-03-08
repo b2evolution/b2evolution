@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal Open Source relicensing agreement:
@@ -114,6 +114,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.8  2009/03/08 23:57:42  fplanque
+ * 2009
+ *
  * Revision 1.7  2008/12/28 17:35:51  fplanque
  * increase blog name max length to 255 chars
  *

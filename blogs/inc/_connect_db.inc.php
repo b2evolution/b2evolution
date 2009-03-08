@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @version $Id$
  */
@@ -30,6 +30,9 @@ $DB = & new DB( $db_config );
 
 /*
  * $Log$
+ * Revision 1.12  2009/03/08 23:57:38  fplanque
+ * 2009
+ *
  * Revision 1.11  2008/07/07 05:59:26  fplanque
  * minor / doc / rollback of overzealous indetation "fixes"
  *

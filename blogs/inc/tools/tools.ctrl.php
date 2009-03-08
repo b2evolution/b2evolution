@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
  * @author blueyed: Daniel HAHLER
@@ -154,6 +154,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2009/03/08 23:57:46  fplanque
+ * 2009
+ *
  * Revision 1.5  2008/07/11 23:10:01  blueyed
  * s/insctructions/instructions/g
  *

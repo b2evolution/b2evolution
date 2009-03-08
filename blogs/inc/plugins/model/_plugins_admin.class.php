@@ -6,7 +6,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -1446,6 +1446,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.9  2009/03/08 23:57:45  fplanque
+ * 2009
+ *
  * Revision 1.8  2009/03/06 14:12:28  tblue246
  * Added missing documentation for Plugin hooks
  *

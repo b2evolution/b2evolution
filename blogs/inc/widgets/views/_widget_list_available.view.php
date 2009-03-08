@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -112,6 +112,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.14  2009/03/08 23:57:46  fplanque
+ * 2009
+ *
  * Revision 1.13  2009/02/22 23:40:09  fplanque
  * dirty links widget :/
  *

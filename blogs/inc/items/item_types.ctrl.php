@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -60,6 +60,9 @@ require $inc_path.'generic/inc/_generic_listeditor.php';
 
 /*
  * $Log$
+ * Revision 1.5  2009/03/08 23:57:43  fplanque
+ * 2009
+ *
  * Revision 1.4  2009/01/23 22:08:12  tblue246
  * - Filter reserved post types from dropdown box on the post form (expert tab).
  * - Indent/doc fixes

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package install
  */
@@ -677,6 +677,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.56  2009/03/08 23:57:47  fplanque
+ * 2009
+ *
  * Revision 1.55  2009/01/22 23:26:45  blueyed
  * Fix install-myself test (and stuff around it). Move 'newdb' action from install/index.php to functions_install.php to call it the same as during real install.
  *

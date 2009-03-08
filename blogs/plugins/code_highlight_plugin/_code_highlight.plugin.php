@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2005-2007 by Yabba/Scott - {@link http://astonishme.co.uk/contact/}.
  *
  * {@internal License choice
@@ -631,6 +631,9 @@ class code_highlight_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.23  2009/03/08 23:57:49  fplanque
+ * 2009
+ *
  * Revision 1.22  2009/03/03 14:58:15  afwas
  * Added class 'edit_toolbar'. These toolbars now have two classes (thanks blueyed.)
  *

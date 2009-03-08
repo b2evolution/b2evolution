@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  * (dh please re-add)
  *
  * {@internal License choice
@@ -431,6 +431,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2009/03/08 23:57:42  fplanque
+ * 2009
+ *
  * Revision 1.10  2008/09/29 08:30:43  fplanque
  * Avatar support
  *

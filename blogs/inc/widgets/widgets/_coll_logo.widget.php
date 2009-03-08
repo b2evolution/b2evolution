@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -134,6 +134,9 @@ class coll_logo_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.7  2009/03/08 23:57:46  fplanque
+ * 2009
+ *
  * Revision 1.6  2008/02/13 07:37:55  fplanque
  * renamed Blog Logo widget
  *

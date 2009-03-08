@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -1258,6 +1258,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.4  2009/03/08 23:57:43  fplanque
+ * 2009
+ *
  * Revision 1.3  2009/02/10 22:38:59  blueyed
  *  - Handle more File properties in File class lazily.
  *  - Cleanup recursive size handling:

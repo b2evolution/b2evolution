@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -89,6 +89,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.4  2009/03/08 23:57:46  fplanque
+ * 2009
+ *
  * Revision 1.3  2008/11/26 16:00:21  tblue246
  * Add correct SQL query for counting result rows, enables paging. Fixes http://forums.b2evolution.net/viewtopic.php?t=17280 .
  *

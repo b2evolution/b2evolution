@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package plugins
  * @ignore
@@ -261,6 +261,9 @@ class wikilinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.27  2009/03/08 23:57:48  fplanque
+ * 2009
+ *
  * Revision 1.26  2008/01/21 09:35:41  fplanque
  * (c) 2008
  *

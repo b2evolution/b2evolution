@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -611,6 +611,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.36  2009/03/08 23:57:49  fplanque
+ * 2009
+ *
  * Revision 1.35  2009/02/26 23:33:46  blueyed
  * Update IDNA library to 0.6.2 (includes at least a fix for mbstring.func_overload).
  * Since it is PHP5 only, PHP4 won't benefit from it.

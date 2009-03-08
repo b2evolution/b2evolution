@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -138,6 +138,9 @@ $Results->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.4  2009/03/08 23:57:43  fplanque
+ * 2009
+ *
  * Revision 1.3  2008/01/21 09:35:31  fplanque
  * (c) 2008
  *

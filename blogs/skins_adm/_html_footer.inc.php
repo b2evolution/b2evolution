@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -74,6 +74,9 @@ if( $this->get_path(0) == 'files'
 <?php
 /*
  * $Log$
+ * Revision 1.10  2009/03/08 23:57:56  fplanque
+ * 2009
+ *
  * Revision 1.9  2009/02/19 04:22:45  blueyed
  * Fix for PHP4, as expected.
  *

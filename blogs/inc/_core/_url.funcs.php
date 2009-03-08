@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -712,6 +712,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.27  2009/03/08 23:57:40  fplanque
+ * 2009
+ *
  * Revision 1.26  2009/02/26 23:33:46  blueyed
  * Update IDNA library to 0.6.2 (includes at least a fix for mbstring.func_overload).
  * Since it is PHP5 only, PHP4 won't benefit from it.

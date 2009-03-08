@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @author tor
  *
@@ -240,6 +240,9 @@ $xmlrpc_procs["mt.getPostCategories"] = array(
 
 /*
  * $Log$
+ * Revision 1.4  2009/03/08 23:57:47  fplanque
+ * 2009
+ *
  * Revision 1.3  2009/02/25 22:17:53  blueyed
  * ItemLight: lazily load blog_ID and main_Chapter.
  * There is more, but I do not want to skim the diff again, after

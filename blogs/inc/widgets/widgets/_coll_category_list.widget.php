@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2008 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * {@internal License choice
@@ -366,6 +366,9 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.18  2009/03/08 23:57:46  fplanque
+ * 2009
+ *
  * Revision 1.17  2009/03/08 23:08:35  fplanque
  * rollback: NOT A BUG (this "fix" ads an unwanted button to admin)
  * There should probably be no public setting for the form mode.

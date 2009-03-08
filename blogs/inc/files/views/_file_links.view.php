@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -156,6 +156,9 @@ if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Ite
 
 /*
  * $Log$
+ * Revision 1.9  2009/03/08 23:57:43  fplanque
+ * 2009
+ *
  * Revision 1.8  2009/02/25 22:17:53  blueyed
  * ItemLight: lazily load blog_ID and main_Chapter.
  * There is more, but I do not want to skim the diff again, after

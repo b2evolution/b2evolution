@@ -15,7 +15,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2008 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}.
  * Parts of this file are copyright (c)2004 by Justin Vincent - {@link http://php.justinvincent.com}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -1570,6 +1570,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.22  2009/03/08 23:57:40  fplanque
+ * 2009
+ *
  * Revision 1.21  2009/03/03 00:59:10  fplanque
  * doc
  *
