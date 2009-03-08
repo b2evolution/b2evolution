@@ -36,7 +36,7 @@ header_content_type();	// Sets charset!
 	<?php skin_description_tag(); ?>
 	<?php skin_keywords_tag(); ?>
 	<?php robots_tag(); ?>
-	<meta name="generator" content="<?php echo $app_name.' '.$app_version; ?>" /> <!-- Please leave this for stats -->
+	<meta name="generator" content="b2evolution <?php app_version(); ?>" /> <!-- Please leave this for stats -->
 	<?php
 	if( $Blog->get_setting( 'feed_content' ) != 'none' )
 	{ // auto-discovery urls
