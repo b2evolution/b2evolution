@@ -2792,9 +2792,10 @@ class Plugin
 
 
 	/**
-	 * PHP5 overloading of get method to lazy-load (User)Settings.
+	 * PHP5 overloading of get method to lazy-load (User)Settings, when they get
+	 * accessed.
 	 *
-	 * What happens in PHP4?
+	 * With PHP4, settings get instantiated in Plugins::init_settings right away.
 	 *
 	 * @return Reference to the object or null
 	 */
@@ -2843,6 +2844,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.17  2009/03/08 23:02:19  blueyed
+ * doc
+ *
  * Revision 1.16  2009/03/08 22:37:33  fplanque
  * doc
  *
