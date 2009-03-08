@@ -13,6 +13,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $xmlsrv_url;
+global $app_name, $app_version;
 
 require_js( 'functions.js' );
 require_js( 'rollovers.js' );
