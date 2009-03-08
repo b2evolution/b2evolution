@@ -2802,8 +2802,7 @@ class Plugin
 	function & __get( $nm )
 	{
 		global $inc_path;
-
-		$admin_Plugins = & get_Cache('Plugins_admin'); // we need Plugins_admin here, because Plugin::BeforeEnable() may use $Settings
+		global $Plugins;
 
 		switch( $nm )
 		{
@@ -2812,7 +2811,7 @@ class Plugin
 				{
 					debug_die('Tried to access "Settings" on a non-installed plugin. ('.$this->classname.'/'.$this->ID.')');
 				}
-				$admin_Plugins->instantiate_Settings( $this, 'Settings' );
+				$Plugins->instantiate_Settings( $this, 'Settings' );
 				if( isset($this->Settings) )
 				{
 					return $this->Settings;
@@ -2824,7 +2823,7 @@ class Plugin
 				{
 					debug_die('Tried to access "UserSettings" on a non-installed plugin. ('.$this->classname.'/'.$this->ID.')');
 				}
-				$admin_Plugins->instantiate_Settings( $this, 'UserSettings' );
+				$Plugins->instantiate_Settings( $this, 'UserSettings' );
 				if( isset($this->UserSettings) )
 				{
 					return $this->UserSettings;
@@ -2844,6 +2843,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.18  2009/03/08 23:34:29  blueyed
+ * Plugin::__get: use $Plugins for instantiating settings. Previously Plugins_admin was used here ("because Plugin::BeforeEnable() may use $Settings"), but that made no sense. Thanks, Tblue.
+ *
  * Revision 1.17  2009/03/08 23:02:19  blueyed
  * doc
  *
