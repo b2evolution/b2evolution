@@ -2794,6 +2794,8 @@ class Plugin
 	/**
 	 * PHP5 overloading of get method to lazy-load (User)Settings.
 	 *
+	 * What happens in PHP4?
+	 *
 	 * @return Reference to the object or null
 	 */
 	function & __get( $nm )
@@ -2841,6 +2843,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.16  2009/03/08 22:37:33  fplanque
+ * doc
+ *
  * Revision 1.15  2009/03/06 14:12:27  tblue246
  * Added missing documentation for Plugin hooks
  *

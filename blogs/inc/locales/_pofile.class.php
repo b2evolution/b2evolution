@@ -349,4 +349,10 @@ class POTFile extends POFile
 
 }
 
+/*
+ * $Log$
+ * Revision 1.2  2009/03/08 22:37:39  fplanque
+ * doc
+ *
+ */
 ?>

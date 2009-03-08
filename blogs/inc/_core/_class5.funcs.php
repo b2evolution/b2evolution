@@ -2,7 +2,7 @@
 /**
  * Function for handling Classes in PHP 5.
  *
- * For PHP4, _class4.funcs.php gets used.
+ * In PHP4, _class4.funcs.php should be used instead.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -35,10 +35,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Autoload class files, if the class gets accessed and is not defined yet.
+ * Autoload the required .class.php file when a class is accessed but not defined yet.
  * Requires PHP5.
  */
-function __autoload($classname)
+function __autoload( $classname )
 {
 	global $inc_path, $adminskins_path;
 	static $map_class_path;
@@ -163,7 +163,6 @@ function __autoload($classname)
 
 /**
  * Load class file. No-op for PHP5, uses __autoload().
- * But handle the case for require=false, where the file gets checked for existence.
  */
 function load_class( $class_path )
 {
@@ -173,6 +172,9 @@ function load_class( $class_path )
 
 /*
  * $Log$
+ * Revision 1.5  2009/03/08 22:37:29  fplanque
+ * doc
+ *
  * Revision 1.4  2009/03/06 00:31:04  blueyed
  * Remove require=false use case from class5.funcs, too.
  *

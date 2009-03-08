@@ -2,7 +2,7 @@
 /**
  * Function for handling Classes in PHP 4.
  *
- * For PHP5, _class5.funcs.php gets used.
+ * In PHP5, _class5.funcs.php should be used instead.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -40,6 +40,9 @@ function load_class( $class_path )
 
 /*
  * $Log$
+ * Revision 1.17  2009/03/08 22:37:23  fplanque
+ * doc
+ *
  * Revision 1.16  2009/03/05 23:38:53  blueyed
  * Merge autoload branch (lp:~blueyed/b2evolution/autoload) into CVS HEAD.
  *
