@@ -141,28 +141,6 @@ class coll_category_list_Widget extends ComponentWidget
 		$this->disp_title();
 
 		$aggregate_coll_IDs = $Blog->get_setting('aggregate_coll_IDs');
-		if ( $this->disp_params['use_form'] )
-		{	// We want to display a form:
-			echo '<form action="';
-
-			if ( $this->disp_params['link_type'] == 'context' )
-			{	// Preserve current browsing context:
-				$ignore_str = 'cats,catsel';
-				if ( ! empty( $aggregate_coll_IDs ) )
-				{
-					$ignore_str .= ',blog';
-				}
-			
-				echo regenerate_url( $ignore_str );
-			}
-			else
-			{
-				echo $Blog->gen_blogurl();
-			}
-
-			echo '" method="get">';
-		}
-
 		if( empty($aggregate_coll_IDs) )
 		{ // ____________________ We want to display cats for ONE blog ____________________
 			$tmp_disp = '';
@@ -266,10 +244,6 @@ class coll_category_list_Widget extends ComponentWidget
 				<input type="radio" name="cat" value="*" id="catALL" class="radio" <?php if( $cat_modifier == '*' ) echo 'checked="checked" '?> />
 				<label for="catALL"><?php echo T_('ALL') ?></label>
 			</div>
-			<div class="tile">
-				<input type="submit" name="submit" value="<?php echo T_( 'Set categories' ); ?>" id="catSubmit" class="submit" />
-			</div>
-			</form>
 		<?php
 		}
 
@@ -392,11 +366,10 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.16  2009/03/07 23:14:34  tblue246
- * Bugfix for bugfix
- *
- * Revision 1.15  2009/03/07 22:41:13  tblue246
- * Display submit button on category widget when requested (fixes https://bugs.launchpad.net/b2evolution/+bug/194849 ).
+ * Revision 1.17  2009/03/08 23:08:35  fplanque
+ * rollback: NOT A BUG (this "fix" ads an unwanted button to admin)
+ * There should probably be no public setting for the form mode.
+ * (Or there should be an option for "standalone form".)
  *
  * Revision 1.14  2009/01/23 00:06:25  blueyed
  * Support '*' for aggregate_coll_IDs in coll_category_list.widget, too.
