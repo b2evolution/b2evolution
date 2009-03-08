@@ -1448,7 +1448,8 @@ class AdminUI_general extends Widget
 
 		foreach( $modules as $module )
 		{
-			$GLOBALS[$module.'_Module']->{$method_name}();
+			$Module = & $GLOBALS[$module.'_Module'];
+			$Module->{$method_name}();
 		}
 	}
 
@@ -1552,6 +1553,9 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.91  2009/03/08 22:52:37  fplanque
+ * Partial rollback because I'm not sure mod is PHP4 compatible
+ *
  * Revision 1.90  2009/03/07 21:32:52  blueyed
  * Fix doc and indent.
  *
