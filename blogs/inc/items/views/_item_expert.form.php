@@ -50,7 +50,7 @@ global $pagenow;
 
 
 global $mode, $admin_url;
-global $use_preview, $post_comment_status, $trackback_url, $item_tags;
+global $post_comment_status, $trackback_url, $item_tags;
 global $bozo_start_modified, $creating;
 global $item_title, $item_content;
 global $redirect_to;
@@ -106,7 +106,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	// -- Language chooser BEGIN --
 	$locale_options = locale_options( $edited_Item->get( 'locale' ), false, true );
-	
+
 	if ( is_array( $locale_options ) )
 	{	// We've only one enabled locale.
 		// Tblue> The locale name is not really needed here, but maybe we
@@ -171,12 +171,9 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	// CALL PLUGINS NOW:
 	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'expert' ) );
 
-	if( $use_preview )
-	{ // ---------- PREVIEW ----------
-		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
-
-		$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
-	}
+	// ---------- PREVIEW ----------
+	$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
+	$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
 
 	// ---------- SAVE ----------
 	$next_action = ($creating ? 'create' : 'update');
@@ -407,6 +404,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.42  2009/03/08 21:45:58  fplanque
+ * removed global $use_preview setting for now
+ *
  * Revision 1.41  2009/02/27 23:17:02  afwas
  * Add class 'PreviewButton' to Preview Button.
  *

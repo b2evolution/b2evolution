@@ -43,7 +43,7 @@ global $Settings;
 global $pagenow;
 
 global $mode;
-global $use_preview, $post_comment_status, $trackback_url, $item_tags;
+global $post_comment_status, $trackback_url, $item_tags;
 global $bozo_start_modified, $creating;
 global $item_title, $item_content;
 global $redirect_to;
@@ -159,12 +159,9 @@ for( $i = 1 ; $i <= 3; $i++ )
 	// CALL PLUGINS NOW:
 	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'simple' ) );
 
-	if( $use_preview )
-	{ // ---------- PREVIEW ----------
-		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
-
-		$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
-	}
+	// ---------- PREVIEW ----------
+	$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
+	$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
 
 	// ---------- SAVE ----------
 	$next_action = ($creating ? 'create' : 'update');
@@ -273,6 +270,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.23  2009/03/08 21:46:02  fplanque
+ * removed global $use_preview setting for now
+ *
  * Revision 1.22  2009/02/27 23:17:02  afwas
  * Add class 'PreviewButton' to Preview Button.
  *

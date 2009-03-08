@@ -37,18 +37,6 @@ $allow_cross_posting = 1;
 
 
 /**
- * set this to 1 if you want to use the 'preview' function
- *
- * @todo fp>This should be moved to the backoffice. Checbox for each blog (features). Useful when a blog has no public skin. (Tracker) Should actually be a "has public interface" setting
- *       dh> Preview should be possible without a public skin. And I cannot see why somebody would not want a preview feature. Therefore, this setting should get probably removed.
- *
- * @global boolean $use_preview
- */
-$use_preview = 1;
-
-
-
-/**
  * Locked post type IDs.
  *
  * These post types can't be edited or deleted in the post type editor.
