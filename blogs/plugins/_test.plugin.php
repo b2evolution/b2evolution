@@ -123,6 +123,21 @@ class test_plugin extends Plugin
 				'disabled' => true, // this can be useful if you detect that something cannot be changed. You probably want to add a 'note' then, too.
 				'note' => 'Change the above select input to "Monday" to enable it.',
 			),
+			'select_multiple' => array(
+				'label' => $this->T_( 'Multiple select' ),
+				'type' => 'select',
+				'multiple' => true,
+				'allow_none' => true,
+				'options' => array( 'sci' => $this->T_( 'Scissors' ), 'pap' => $this->T_( 'Paper' ), 'sto' => $this->T_( 'Stone') ),
+				'defaultvalue' => array( 'sci', 'sto' ),
+				'note' => $this-> T_( 'This is a free style Multiple Select. You can choose zero or one or more items' )
+			),
+			/*
+			 * note: The $this->T_( string )function tanslates the string.
+			 * However since it inherits from the class Plugin you will need
+			 * to provide the translation on a per plugin basis. In other
+			 * words: this will not be translated through B2evolution.
+			 */
 			'blog' => array(
 				'label' => 'A blog',
 				'type' => 'select_blog',  // TODO: does not scale with 500 blogs
@@ -741,6 +756,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.76  2009/03/09 10:08:32  afwas
+ * Added a freestyle multiple select option with multiple selected default values.
+ *
  * Revision 1.75  2009/03/08 23:57:48  fplanque
  * 2009
  *
