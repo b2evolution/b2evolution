@@ -21,7 +21,7 @@ $app_version = '3.1.0-alpha';
  * Release date (ISO)
  * @global string
  */
-$app_date = '2009-02-21';
+$app_date = '2009-03-09';
 
 /**
  * This is used to check if the database is up to date.
@@ -39,7 +39,7 @@ $new_db_version = 9920;
 $app_banner = '<a href="http://b2evolution.net/"><img src="'.$rsc_url.'img/b2evolution8.png" width="221" height="65" alt="b2evolution" /></a>';
 
 $app_footer_text = '<a href="http://b2evolution.net/" title="'.T_("visit b2evolution's website")
-		.'"><strong>'.$app_name.' '.$app_version.'</strong></a>
+		.'"><strong>b2evolution '.$app_version.'</strong></a>
 		&ndash;
 		<a href="http://b2evolution.net/about/license.html" class="nobr">'.T_('GPL License').'</a>';
 
