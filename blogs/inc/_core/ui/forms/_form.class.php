@@ -1738,7 +1738,7 @@ class Form extends Widget
 		// Build $options_list
 		$options_list = Form::get_select_options_string($field_options, $field_value, $force_keys_as_values);
 
-		return $this->select_input_options( $field_name, $options_list, $field_label, $field_params );
+		return $this->select_input_options( $field_name, $options_list, $field_label, $field_note, $field_params );
 	}
 
 
@@ -1928,8 +1928,7 @@ class Form extends Widget
 	 * @param integer
 	 * @param string
 	 */
-	function textarea( $field_name, $field_value, $field_rows, $field_label,
-												$field_note = '', $field_cols = 50 , $field_class = '' )
+	function textarea( $field_name, $field_value, $field_rows, $field_label, $field_note = '', $field_cols = 50 , $field_class = '' )
 	{
 		$field_params = array(
 			'note' => $field_note,
@@ -2820,6 +2819,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.39  2009/03/09 10:02:33  afwas
+ * Bugfix: add missing argument.
+ *
  * Revision 1.38  2009/03/08 23:57:41  fplanque
  * 2009
  *
