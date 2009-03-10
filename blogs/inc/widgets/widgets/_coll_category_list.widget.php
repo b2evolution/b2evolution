@@ -73,8 +73,9 @@ class coll_category_list_Widget extends ComponentWidget
 	 * @param array local params
 	 *  - 'title': block title (string, default "Categories")
 	 *  - 'option_all': "All categories" link title, empty to disable (string, default "All")
-	 *  - 'use_form': Add checkboxes to allow selection of multiple categories (boolean)
+	 *  - 'use_form': Add a form with checkboxes to allow selection of multiple categories (boolean)
 	 *  - 'disp_names_for_coll_list': Display blog names, if this is an aggregated blog? (boolean)
+	 *  - 'display_checkboxes': Add checkboxes (but not a complete form) to allow selection of multiple categories (boolean)
 	 */
 	function get_param_definitions( $params )
 	{
@@ -103,6 +104,13 @@ class coll_category_list_Widget extends ComponentWidget
 					'label' => T_('Display blog names'),
 					'defaultvalue' => 1, /* previous behaviour */
 					'note' => T_('Display blog names, if this is an aggregated blog.'),
+				),
+
+			// Hidden, used by the item list sidebar in the backoffice.
+			'display_checkboxes' => array(
+					'label' => 'Internal: Display checkboxes', // This key is required
+					'defaultvalue' => 0,
+					'no_edit' => true,
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -139,6 +147,11 @@ class coll_category_list_Widget extends ComponentWidget
 
 		// Display title if requested
 		$this->disp_title();
+
+		if ( $this->disp_params['use_form'] )
+		{	// We want a complete form:
+			echo '<form method="get" action="', $Blog->gen_blogurl(), '">';
+		}
 
 		$aggregate_coll_IDs = $Blog->get_setting('aggregate_coll_IDs');
 		if( empty($aggregate_coll_IDs) )
@@ -229,7 +242,7 @@ class coll_category_list_Widget extends ComponentWidget
 		}
 
 
-		if( $this->disp_params['use_form'] )
+		if( $this->disp_params['use_form'] || $this->disp_params['display_checkboxes'] )
 		{	// We want to add form fields:
 		?>
 			<div class="tile">
@@ -245,6 +258,15 @@ class coll_category_list_Widget extends ComponentWidget
 				<label for="catALL"><?php echo T_('ALL') ?></label>
 			</div>
 		<?php
+			if ( $this->disp_params['use_form'] )
+			{	// We want a complete form:
+			?>
+				<div class="tile">
+					<input type="submit" name="submit" value="<?php echo T_( 'Set categories' ); ?>" id="catSubmit" class="submit" />
+				</div>
+				</form>
+			<?php
+			}
 		}
 
 		echo $this->disp_params['block_end'];
@@ -278,7 +300,7 @@ class coll_category_list_Widget extends ComponentWidget
 			$r = $this->disp_params['item_start'];
 		}
 
-		if( $this->disp_params['use_form'] )
+		if( $this->disp_params['use_form'] || $this->disp_params['display_checkboxes'] )
 		{	// We want to add form fields:
 			$r .= '<label><input type="checkbox" name="catsel[]" value="'.$Chapter->ID.'" class="checkbox"';
 			if( in_array( $Chapter->ID, $cat_array ) )
@@ -301,7 +323,7 @@ class coll_category_list_Widget extends ComponentWidget
 
 		$r .= '">'.$Chapter->dget('name').'</a>';
 
-		if( $this->disp_params['use_form'] )
+		if( $this->disp_params['use_form'] || $this->disp_params['display_checkboxes'] )
 		{	// We want to add form fields:
 			$r .= '</label>';
 		}
@@ -366,6 +388,9 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.19  2009/03/10 13:53:04  tblue246
+ * Fixing the "Category list" widget again, now hopefully without making the backoffice sidebar look ugly...
+ *
  * Revision 1.18  2009/03/08 23:57:46  fplanque
  * 2009
  *
@@ -373,6 +398,12 @@ class coll_category_list_Widget extends ComponentWidget
  * rollback: NOT A BUG (this "fix" ads an unwanted button to admin)
  * There should probably be no public setting for the form mode.
  * (Or there should be an option for "standalone form".)
+ *
+ * Revision 1.16  2009/03/07 23:14:34  tblue246
+ * Bugfix for bugfix
+ *
+ * Revision 1.15  2009/03/07 22:41:13  tblue246
+ * Display submit button on category widget when requested (fixes https://bugs.launchpad.net/b2evolution/+bug/194849 ).
  *
  * Revision 1.14  2009/01/23 00:06:25  blueyed
  * Support '*' for aggregate_coll_IDs in coll_category_list.widget, too.

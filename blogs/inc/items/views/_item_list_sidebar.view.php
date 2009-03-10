@@ -238,7 +238,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 				'block_title_start' => '<legend>',
 				'block_title_end' => '</legend>',
 				'link_type' => 'context',
-				'use_form' => 1,
+				'display_checkboxes' => 1,
 			) );
 		// ---------------------------------- END OF CATEGORY LIST ---------------------------------
 
@@ -270,6 +270,9 @@ echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.14  2009/03/10 13:53:18  tblue246
+ * Fixing the "Category list" widget again, now hopefully without making the backoffice sidebar look ugly...
+ *
  * Revision 1.13  2009/03/08 23:57:44  fplanque
  * 2009
  *
