@@ -1189,8 +1189,8 @@ function memorize_param( $var, $type, $default, $value = NULL )
 		$global_param_list = array();
 	}
 
-	$Debuglog->add( "memorize_param: $var $type default=$default"
-			.(is_null($value) ? '' : " value=$value"), 'params');
+	$Debuglog->add( "memorize_param: $var $type default=$default".(is_null($value) ? '' : " value=$value"), 'params');
+	// echo "<br>memorize_param: $var $type default=$default".(is_null($value) ? '' : " value=$value");
 
 	$global_param_list[$var] = array( 'type' => $type, 'default' => (($default===true) ? NULL : $default) );
 
@@ -1348,7 +1348,8 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $glue = '&a
 		}
 		if( $skip )
 		{ // we don't want to include that param
-			// if( isset($Debuglog) ) $Debuglog->add( 'regenerate_url(): EXPLICIT IGNORE '.$var, 'params' );
+			// echo 'regenerate_url(): EXPLICIT IGNORE '.$var;
+			// $Debuglog->add( 'regenerate_url(): EXPLICIT IGNORE '.$var, 'params' );
 			continue;
 		}
 
@@ -1357,7 +1358,8 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $glue = '&a
 		{ // Value is not set to default value:
 			// Note: sometimes we will want to include an empty value, especially blog=0 ! In that case we set the default for blog to -1.
 			// echo "adding $var \n";
-			// if( isset($Debuglog) ) $Debuglog->add( "regenerate_url(): Using var=$var, type=$type, defval=[$defval], val=[$value]", 'params' );
+			// $Debuglog->add( "regenerate_url(): Using var=$var, type=$type, defval=[$defval], val=[$value]", 'params' );
+			// echo "regenerate_url(): Using var=$var, type=$type, defval=[$defval], val=[$value]";
 
 			if( $type === 'array' )
 			{ // there is a special formatting in case of arrays
@@ -1372,9 +1374,10 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $glue = '&a
 				$params[] = $var.'='.rawurlencode($value);
 			}
 		}
-		else
+		else // if( $var == 's' )
 		{
-			// if( isset($Debuglog) ) $Debuglog->add( "regenerate_url(): DEFAULT ignore var=$var, type=$type, defval=[$defval], val=[$value]", 'params' );
+			// $Debuglog->add( "regenerate_url(): DEFAULT ignore var=$var, type=$type, defval=[$defval], val=[$value]", 'params' );
+			// echo "regenerate_url(): DEFAULT ignore var=$var, type=$type, defval=[$defval], val=[$value]";
 		}
 	}
 
@@ -1912,6 +1915,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.27  2009/03/13 00:52:38  fplanque
+ * debug stuff
+ *
  * Revision 1.26  2009/03/08 23:57:39  fplanque
  * 2009
  *
