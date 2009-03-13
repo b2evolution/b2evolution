@@ -2330,6 +2330,22 @@ function upgrade_b2evo_tables()
 	$DB->query( "UPDATE T_items__type SET ptyp_name = 'Linkroll item' WHERE ptyp_ID = 3000" );
 	task_end();
 
+	task_begin( 'Updating items table...' );
+	$DB->query( "ALTER TABLE T_items__item ENGINE=innodb" );
+	task_end();
+
+	task_begin( 'Creating versions table...' );
+	$DB->query( "CREATE TABLE T_items__version (
+            iver_itm_ID        INT UNSIGNED NOT NULL ,
+            iver_edit_user_ID  INT UNSIGNED NOT NULL ,
+            iver_edit_datetime DATETIME NOT NULL ,
+            iver_status        ENUM('published','deprecated','protected','private','draft','redirected') NULL ,
+            iver_title         TEXT NULL ,
+            iver_content       MEDIUMTEXT NULL ,
+            INDEX iver_itm_ID ( iver_itm_ID )
+            ) ENGINE = innodb" );
+	task_end();
+
 
 	/* Wait until we're sure and no longer experimental for that one...
 	task_begin( 'Moving user data to fields' );
@@ -2480,6 +2496,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.286  2009/03/13 00:43:05  fplanque
+ * no message
+ *
  * Revision 1.285  2009/03/08 23:57:47  fplanque
  * 2009
  *

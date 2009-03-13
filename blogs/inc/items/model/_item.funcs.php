@@ -261,7 +261,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	if( !empty($orig_title) && $urltitle != $orig_title )
 	{
-		$Messages->add( sprintf(T_('Warning: In order to avoid a conflict, the URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'error' );
+		$Messages->add( sprintf(T_('Warning: the URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'error' );
 	}
 
 	return $urltitle;
@@ -825,6 +825,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.37  2009/03/13 00:43:05  fplanque
+ * no message
+ *
  * Revision 1.36  2009/03/08 23:57:44  fplanque
  * 2009
  *

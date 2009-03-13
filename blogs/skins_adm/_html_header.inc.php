@@ -43,13 +43,17 @@ header_content_type( 'text/html' );
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<title><?php echo $this->get_html_title(); ?></title>
-	<meta name="ROBOTS" content="NOINDEX, NOFOLLOW" />
 	<?php
+	global $robots_index, $robots_follow;
+	$robots_index = false;
+	$robots_follow = false;
+	robots_tag();
+
 	global $rsc_path, $rsc_url, $htsrv_url;
 
 	add_js_headline( "// Paths used by JS functions:
-		var imgpath_expand = '" . get_icon( 'expand', 'url' ) . "';
-		var imgpath_collapse = '" . get_icon( 'collapse', 'url' ) . "';
+		var imgpath_expand = '".get_icon( 'expand', 'url' )."';
+		var imgpath_collapse = '".get_icon( 'collapse', 'url' )."';
 		var htsrv_url = '$htsrv_url';" );
 
  	require_js( '#jquery#' );
@@ -283,6 +287,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.24  2009/03/13 00:43:05  fplanque
+ * no message
+ *
  * Revision 1.23  2009/03/08 23:57:56  fplanque
  * 2009
  *
