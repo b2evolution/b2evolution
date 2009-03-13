@@ -43,7 +43,7 @@ $Timer->start( '_blog_main.inc' );
  *
  * In most cases $blog should be set by a stub file and the param() call below will just check that it's an integer.
  *
- * Note we do NOT memorize the param as we don't want it in regenearet_url() calls.
+ * Note we do NOT memorize the param as we don't want it in regenerate_url() calls.
  * Whenever we do, index.php will already have called param() with memorize=true
  *
  * In some cases $blog will not have been set before and it will be set with the param() call below.
@@ -592,6 +592,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.113  2009/03/13 01:34:07  blueyed
+ * fix doc. It is 2009, you may want to use autocompletion of $EDITOR.. ^^
+ *
  * Revision 1.112  2009/03/13 00:56:55  fplanque
  * Better handling of blog param for cleaner URLs.
  * A lot of testing was involved but I have tested many versions before reducing it to the max.
