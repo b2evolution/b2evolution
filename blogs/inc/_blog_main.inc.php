@@ -592,11 +592,14 @@ else
 
 /*
  * $Log$
+ * Revision 1.116  2009/03/13 21:42:42  blueyed
+ * fix typo
+ *
  * Revision 1.115  2009/03/13 14:22:40  tblue246
  * (temp)skin param: Only allow the use of installed skins.
  *
  * Revision 1.114  2009/03/13 02:45:32  fplanque
- * schlecte laune, go to sleep
+ * schlechte laune, go to sleep
  *
  * Revision 1.112  2009/03/13 00:56:55  fplanque
  * Better handling of blog param for cleaner URLs.
