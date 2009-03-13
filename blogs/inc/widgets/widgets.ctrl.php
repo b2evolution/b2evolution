@@ -32,6 +32,11 @@ load_class( 'widgets/model/_widget.class.php' );
 param( 'action', 'string', 'list' );
 param( 'display_mode', 'string', 'normal' );
 $display_mode = ( in_array( $display_mode, array( 'js', 'normal' ) ) ? $display_mode : 'normal' );
+if( $display_mode == 'js' )
+{	// Javascript in debug mode conflicts/fails.
+	// fp> TODO: either fix the debug javascript or have an easy way to disable JS in the debug output.
+	$debug = 0;
+}
 // This should probably be handled with teh existing $mode var
 
 /*
@@ -481,6 +486,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2009/03/13 00:59:20  fplanque
+ * fixing debug mode
+ *
  * Revision 1.19  2009/03/08 23:57:46  fplanque
  * 2009
  *
