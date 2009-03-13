@@ -676,8 +676,15 @@ class Plugins
 
 		$Timer->resume( 'plugins_inst_'.$set_type );
 
-		// call Plugin::GetDefaultSettings() or Plugin::GetDefaultUserSettings():
-		$defaults = $this->call_method( $Plugin->ID, 'GetDefault'.$set_type, $params = array('for_editing'=>false) );
+		// Call Plugin::GetDefaultSettings() or Plugin::GetDefaultUserSettings():
+		// This does not use call_method, since the plugin may not be accessible through get_by_ID().
+		// This may happen, if Plugin(User)Settings get accessed in PluginInit (which is allowed
+		// when is_installed=true).
+		$method = 'GetDefault'.$set_type;
+		$params = array('for_editing'=>false);
+		$Timer->resume( $Plugin->classname.'_(#'.$Plugin->ID.')' );
+		$defaults = $Plugin->$method( $params );
+		$Timer->pause( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 
 		if( empty($defaults) )
 		{	// No settings, no need to instantiate.
@@ -1895,6 +1902,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.10  2009/03/13 01:27:12  blueyed
+ * Plugins: instantiate_Settings: call GetDefault(User)Settings directly, not through call_method, since that failed during PluginInit (due to the switch from Plugins_admin to Plugins in Plugin::__get).
+ *
  * Revision 1.9  2009/03/08 23:57:45  fplanque
  * 2009
  *
