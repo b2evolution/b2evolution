@@ -198,16 +198,19 @@ class Form extends Widget
 		// Add any GET params from $form_action as hidden inputs.
 		// This is required for GET method at least, and may make
 		// sense for POST, too. fp> I think it does.
-		// fp> TODO: this should probably remove params from $form_action
-		if( $form_method == 'get' && strpos($form_action, '?') )
+		if( strpos($form_action, '?') )
 		{
-			$query_str = substr($form_action, strpos($form_action, '?')+1);
-			$query_args = explode('&', $query_str);
+			$pos_args = strpos($form_action, '?');
+			$query_str = substr($form_action, $pos_args+1);
+			// Split args by "&" (but leave "&amp;" alone).
+			$query_args = preg_split('~&(?!amp;)~', $query_str, -1, PREG_SPLIT_NO_EMPTY);
 			foreach( $query_args as $query_arg )
 			{
 				list($field_name, $field_value) = explode('=', $query_arg, 2);
 				$this->hidden($field_name, $field_value);
 			}
+			// Remove params.
+			$form_action = substr($form_action, 0, $pos_args);
 		}
 	}
 
@@ -2819,6 +2822,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.40  2009/03/13 01:25:48  blueyed
+ * Form: remove params from form_action, also for POST now.
+ *
  * Revision 1.39  2009/03/09 10:02:33  afwas
  * Bugfix: add missing argument.
  *
