@@ -672,12 +672,6 @@ function init_list_mode()
 				) );
 			break;
 
-		case 'linkroll':
-			$ItemList->set_default_filters( array(
-					'types' => '2', // Links
-				) );
-			break;
-
 		case 'tracker':
 			// In tracker mode, we want a different default sort:
 			$ItemList->set_default_filters( array(
@@ -967,6 +961,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.40  2009/03/13 03:45:02  fplanque
+ * there is no bug. rollback.
+ *
  * Revision 1.39  2009/03/13 03:07:55  waltercruz
  * fixing bug in listing
  *
