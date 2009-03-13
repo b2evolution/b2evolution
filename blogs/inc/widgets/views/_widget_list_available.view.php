@@ -26,27 +26,27 @@ $core_componentwidget_defs = array(
 			'free_html',
 			'coll_logo',
 		'*'.T_('Different ways of listing the blog contents'),
-			'coll_category_list',
-			'coll_tag_cloud',
 			'coll_post_list',
 			'coll_page_list',
 			'coll_comment_list',
+			'links',
 			'coll_media_index',
+			'linkblog',
+		'*'.T_('Blog navigation'),
+			'coll_tag_cloud',
+			'coll_category_list',
+			'coll_common_links',
+			'coll_search_form',
 			'coll_xml_feeds',
+			'menu_link',
 		'*'.T_('Meta info for the blog'),
 			'coll_title',
 			'coll_tagline',
 			'coll_longdesc',
-		'*'.T_('Blog navigation'),
-			'menu_link',
-			'coll_common_links',
-			'coll_search_form',
-			'user_tools',
 		'*'.T_('Other'),
 			'colls_list_public',
 			'colls_list_owner',
-			'linkblog',
-			'links', // fp> TODO: call that linkroll
+			'user_tools',
 	);
 $i = 0;
 foreach( $core_componentwidget_defs as $code )
@@ -112,6 +112,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.15  2009/03/13 00:58:52  fplanque
+ * making sense of widgets -- work in progress
+ *
  * Revision 1.14  2009/03/08 23:57:46  fplanque
  * 2009
  *

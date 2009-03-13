@@ -61,7 +61,7 @@ class linkblog_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display list of entries from the linkblog, grouped by category.');
+		return T_('Display blog entries, grouped by category.');
 	}
 
 
@@ -83,10 +83,10 @@ class linkblog_Widget extends ComponentWidget
 					'note' => T_( 'This is the title to display in your skin.' ),
 				),
 				'linkblog_ID' => array(
-					'label' => T_( 'Linkblog' ),
+					'label' => T_( 'Blog ID' ),
 					'size' => 4,
 					'defaultvalue' => $Blog->get('links_blog_ID'),	// Here we conveniently recycle the previous value from its deprecated links_blog_ID param. We will eventually drop that field from the database.
-					'note' => T_( 'This is the ID number of the blog to use as a linkblog.' ),
+					'note' => T_( 'This is the ID number of the blog to display.' ),
 				),
 				'linkblog_limit' => array(
 					'label' => T_( 'Display' ),
@@ -131,6 +131,9 @@ class linkblog_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.15  2009/03/13 00:58:52  fplanque
+ * making sense of widgets -- work in progress
+ *
  * Revision 1.14  2009/03/08 23:57:46  fplanque
  * 2009
  *
