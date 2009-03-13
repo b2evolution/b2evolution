@@ -444,6 +444,7 @@ if( !empty( $tempskin ) )
 	$skin = $tempskin;
 }
 
+$SkinCache = & get_cache( 'SkinCache' );
 if( isset( $skin ) )
 {	// A skin has been requested by folder_name (url or stub):
 
@@ -453,14 +454,12 @@ if( isset( $skin ) )
 		debug_die( 'The requested skin name is invalid.' );
 	}
 
-	// TODO: access to uninstalled skins for preview only for authorized users only)
-	// TODO: in other cases, load the installed version
-	// TODO: take care about *all* RSS feeds
 	load_class( 'skins/model/_skin.class.php' );
 	$Skin = & new Skin( NULL, $skin );
 
 	if( $Skin->type == 'feed' )
-	{	// Check if we actually allow the display of the feed; last chance to revert to 404 displayed in default skin
+	{	// Check if we actually allow the display of the feed; last chance to revert to 404 displayed in default skin.
+		// Note: Skins with the type "feed" can be always accessed, even when they're not installed.
 		if( $Blog->get_setting('feed_content') == 'none' )
 		{ // We don't want to provide feeds; revert to 404!
 			unset( $skin );
@@ -469,14 +468,15 @@ if( isset( $skin ) )
 			$disp_detail = '404-feeds-disabled';
 		}
 	}
+	else if ( skin_exists( $skin ) && ! $SkinCache->get_by_folder( $skin, false ) )
+	{	// The requested skin is not a feed skin and exists in the file system, but isn't installed:
+		debug_die( sprintf( T_( 'The skin [%s] is not installed on this system.' ), htmlspecialchars( $skin ) ) );
+	}
 }
 
 if( !isset( $skin ) )	// Note: if $skin is set to '', then we want to do a "no skin" display
 { // Use default skin from the database
-	$SkinCache = & get_cache( 'SkinCache' );
-
 	$Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
-
 	$skin = $Skin->folder;
 }
 
@@ -592,6 +592,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.115  2009/03/13 14:22:40  tblue246
+ * (temp)skin param: Only allow the use of installed skins.
+ *
  * Revision 1.114  2009/03/13 02:45:32  fplanque
  * schlecte laune, go to sleep
  *
