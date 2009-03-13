@@ -718,6 +718,30 @@ class Form extends Widget
 		// Don't keep that attrib in the list:
 		unset( $field_params['date_format'] );
 
+		// Convert PHP date format to JS library date format:
+		// NOTE: when editing/extending this here, you probably also have to adjust param_check_date()!
+		$js_date_format = preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
+			if( $m[1] == "\\\" ) return "\\\".$m[0]; // leave escaped
+			switch( $m[2] )
+			{
+				case "d": return "dd"; // day, 01-31
+				case "j": return "d"; // day, 1-31
+				case "l": return "EE"; // weekday (name)
+				case "D": return "E"; // weekday (abbr)
+				case "e": return ""; // weekday letter, not supported
+
+				case "m": return "MM"; // month, 01-12
+				case "n": return "M"; // month, 1-12
+				case "F": return "MMM"; // full month name; "name or abbr" in date.js
+				case "M": return "NNN"; // month name abbr
+
+				case "y": return "yy"; // year, 00-99
+				case "Y": return "yyyy"; // year, XXXX
+				default:
+					return $m[0];
+			}' ), $date_format );
+		#pre_dump( $js_date_format );
+
 		if( param_has_error( $field_name ) )
 		{ // There is an error message for this field:
 
@@ -748,10 +772,12 @@ class Form extends Widget
 		}
 		unset( $field_params['add_date_format_note'] );
 
+
 		if( !isset($field_params['size']) )
 		{ // Get size out of $date_format if not explicitly set
-			$field_params['size'] = strlen( $date_format ) + 5;
+			$field_params['size'] = strlen( $js_date_format );
 		}
+
 		/*
 		dh> do not use maxlength by default. Makes no sense IMHO and fails with dateformats like "j \d\e F, Y"
 		if( !isset($field_params['maxlength']) )
@@ -2822,6 +2848,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.41  2009/03/13 01:26:22  blueyed
+ * Form: date_input: re-add js_date_format calculation for input field length. Removed by afwas in r6525 (CVS 1.31), and ACKed to re-add it.
+ *
  * Revision 1.40  2009/03/13 01:25:48  blueyed
  * Form: remove params from form_action, also for POST now.
  *
