@@ -592,8 +592,8 @@ else
 
 /*
  * $Log$
- * Revision 1.113  2009/03/13 01:34:07  blueyed
- * fix doc. It is 2009, you may want to use autocompletion of $EDITOR.. ^^
+ * Revision 1.114  2009/03/13 02:45:32  fplanque
+ * schlecte laune, go to sleep
  *
  * Revision 1.112  2009/03/13 00:56:55  fplanque
  * Better handling of blog param for cleaner URLs.
