@@ -81,7 +81,7 @@ foreach( $core_componentwidget_defs as $code )
 /**
  * @var Plugins
  */
-global $Plugins;
+global $Plugins, $Debuglog;
 
 $Plugin_array = $Plugins->get_list_by_event( 'SkinTag' );
 // Remove the plugins, which have no code, because this gets used to install them:
@@ -89,7 +89,7 @@ foreach( $Plugin_array as $k => $v )
 {
 	if( empty($v->code) )
 	{
-		$GLOBALS['Debuglog']->add( sprintf('Removing plugin %s (#%d) from list of widgets, because of empty code.', $v->classname, $v->ID), 'plugins' );
+		$Debuglog->add( sprintf('Removing plugin %s (#%d) from list of widgets, because of empty code.', $v->classname, $v->ID), 'plugins' );
 		unset($Plugin_array[$k]);
 	}
 }
@@ -113,6 +113,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.17  2009/03/13 02:45:55  fplanque
+ * normalized
+ *
  * Revision 1.16  2009/03/13 01:25:11  blueyed
  * Add Debuglog entry if a widget gets removed out of the installable list because of empty plugin code
  *
