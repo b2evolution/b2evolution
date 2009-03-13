@@ -58,6 +58,15 @@ class coll_category_list_Widget extends ComponentWidget
 
 
 	/**
+	 * Get a very short desc. Used in the widget list.
+	 */
+	function get_short_desc()
+	{
+		return format_to_output($this->disp_params['title']);
+	}
+
+
+	/**
 	 * Get short description
 	 */
 	function get_desc()
@@ -150,7 +159,7 @@ class coll_category_list_Widget extends ComponentWidget
 
 		if ( $this->disp_params['use_form'] )
 		{	// We want a complete form:
-			echo '<form method="get" action="', $Blog->gen_blogurl(), '">';
+			echo '<form method="get" action="'.$Blog->gen_blogurl().'">';
 		}
 
 		$aggregate_coll_IDs = $Blog->get_setting('aggregate_coll_IDs');
@@ -258,11 +267,11 @@ class coll_category_list_Widget extends ComponentWidget
 				<label for="catALL"><?php echo T_('ALL') ?></label>
 			</div>
 		<?php
-			if ( $this->disp_params['use_form'] )
+			if( $this->disp_params['use_form'] )
 			{	// We want a complete form:
 			?>
 				<div class="tile">
-					<input type="submit" name="submit" value="<?php echo T_( 'Set categories' ); ?>" id="catSubmit" class="submit" />
+					<input type="submit" value="<?php echo T_( 'Filter categories' ); ?>" />
 				</div>
 				</form>
 			<?php
@@ -388,6 +397,10 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.20  2009/03/13 02:32:07  fplanque
+ * Cleaned up widgets.
+ * Removed stupid widget_name param.
+ *
  * Revision 1.19  2009/03/10 13:53:04  tblue246
  * Fixing the "Category list" widget again, now hopefully without making the backoffice sidebar look ugly...
  *

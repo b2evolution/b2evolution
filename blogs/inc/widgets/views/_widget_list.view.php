@@ -130,12 +130,8 @@ function display_container( $container, $legend_suffix = '' )
 
 			$Table->display_col_start();
 			$ComponentWidget->init_display( array() );
-			$widget_name =  '<strong>'.$ComponentWidget->disp_params[ 'widget_name' ].'</strong>';
-			if( $ComponentWidget->disp_params[ 'widget_name' ] != $ComponentWidget->get_short_desc() )
-			{	// The name is customized and the short desc may be relevant additional info
-				$widget_name .= ' ('.$ComponentWidget->get_short_desc().')';
-			}
-			echo '<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID).'" class="widget_name">'.$widget_name.'</a>';
+			echo '<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID).'" class="widget_name">'
+						.$ComponentWidget->get_desc_for_list().'</a>';
 			$Table->display_col_end();
 
 			// Note: this is totally useless, but we need more cols for the screen to feel "right":
@@ -216,6 +212,10 @@ echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear">';
 
 /*
  * $Log$
+ * Revision 1.15  2009/03/13 02:32:08  fplanque
+ * Cleaned up widgets.
+ * Removed stupid widget_name param.
+ *
  * Revision 1.14  2009/03/08 23:57:46  fplanque
  * 2009
  *

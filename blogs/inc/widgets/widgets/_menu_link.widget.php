@@ -67,8 +67,6 @@ class menu_link_Widget extends ComponentWidget
 
 	/**
 	 * Get a very short desc. Used in the widget list.
-	 *
-	 * MAY be overriden by core widgets. Example: menu link widget.
 	 */
 	function get_short_desc()
 	{
@@ -118,10 +116,7 @@ class menu_link_Widget extends ComponentWidget
 				),
 			), parent::get_param_definitions( $params )	);
 
-		$r['widget_name']['defaultvalue'] = $menu_link_widget_link_types['home'].' '.T_('link');
-
 		return $r;
-
 	}
 
 
@@ -187,6 +182,10 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.9  2009/03/13 02:32:07  fplanque
+ * Cleaned up widgets.
+ * Removed stupid widget_name param.
+ *
  * Revision 1.8  2009/03/08 23:57:46  fplanque
  * 2009
  *

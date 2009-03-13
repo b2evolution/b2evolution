@@ -55,6 +55,15 @@ class coll_xml_feeds_Widget extends ComponentWidget
 	}
 
 
+	/**
+	 * Get a very short desc. Used in the widget list.
+	 */
+	function get_short_desc()
+	{
+		return format_to_output($this->get_title());
+	}
+
+
   /**
 	 * Get short description
 	 */
@@ -95,7 +104,17 @@ class coll_xml_feeds_Widget extends ComponentWidget
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
+	}
 
+
+	function get_title()
+	{
+		global $rsc_url;
+
+		$title = str_replace( '$icon$', '<img src="'.$rsc_url.'icons/feed-icon-16x16.gif" width="16" height="16" class="top" alt="" /> ', $this->disp_params['title']);
+		// fp> TODO: support for different icon sizes and backgrounds (at least black and white; mid grey would be cool also)
+
+		return $title;
 	}
 
 
@@ -106,7 +125,6 @@ class coll_xml_feeds_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $rsc_url;
 		global $Blog;
 
 		$this->init_display( $params );
@@ -114,9 +132,7 @@ class coll_xml_feeds_Widget extends ComponentWidget
 		// Available XML feeds:
 		echo $this->disp_params['block_start'];
 
-		$title = str_replace( '$icon$', '<img src="'.$rsc_url.'icons/feed-icon-16x16.gif" width="16" height="16" class="top" alt="" /> ', $this->disp_params['title']);
-			// fp> TODO: support for different icon sizes and backgrounds (at least black and white; mid grey would be cool also)
-		$this->disp_title( $title );
+		$this->disp_title( $this->get_title() );
 
 		echo $this->disp_params['list_start'];
 
@@ -175,6 +191,10 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.14  2009/03/13 02:32:07  fplanque
+ * Cleaned up widgets.
+ * Removed stupid widget_name param.
+ *
  * Revision 1.13  2009/03/08 23:57:46  fplanque
  * 2009
  *

@@ -200,12 +200,7 @@ switch( $action )
 			{
 				case 'js' : // js reply
 					$edited_ComponentWidget->init_display( array() );
-					$widget_name =  '<strong>'.$edited_ComponentWidget->disp_params[ 'widget_name' ].'</strong>';
-					if( $edited_ComponentWidget->disp_params[ 'widget_name' ] != $edited_ComponentWidget->get_short_desc() )
-					{	// The name is customized and the short desc may be relevant additional info
-						$widget_name .= ' ('.$edited_ComponentWidget->get_short_desc().')';
-					}
-					send_javascript_message(array( 'widgetSettingsCallback' => array( $edited_ComponentWidget->ID, $widget_name ), 'closeWidgetSettings' => array() ), true );
+					send_javascript_message(array( 'widgetSettingsCallback' => array( $edited_ComponentWidget->ID, $edited_ComponentWidget->get_desc_for_list() ), 'closeWidgetSettings' => array() ), true );
 					break;
 			}
 			$action = 'list';
@@ -486,6 +481,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2009/03/13 02:32:08  fplanque
+ * Cleaned up widgets.
+ * Removed stupid widget_name param.
+ *
  * Revision 1.20  2009/03/13 00:59:20  fplanque
  * fixing debug mode
  *

@@ -57,6 +57,15 @@ class linkblog_Widget extends ComponentWidget
 
 
 	/**
+	 * Get a very short desc. Used in the widget list.
+	 */
+	function get_short_desc()
+	{
+		return format_to_output($this->disp_params['title']);
+	}
+
+
+	/**
 	 * Get short description
 	 */
 	function get_desc()
@@ -131,6 +140,10 @@ class linkblog_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.16  2009/03/13 02:32:07  fplanque
+ * Cleaned up widgets.
+ * Removed stupid widget_name param.
+ *
  * Revision 1.15  2009/03/13 00:58:52  fplanque
  * making sense of widgets -- work in progress
  *

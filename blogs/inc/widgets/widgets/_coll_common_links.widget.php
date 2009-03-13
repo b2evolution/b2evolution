@@ -55,6 +55,15 @@ class coll_common_links_Widget extends ComponentWidget
 	}
 
 
+	/**
+	 * Get a very short desc. Used in the widget list.
+	 */
+	function get_short_desc()
+	{
+		return format_to_output($this->disp_params['title']);
+	}
+
+
   /**
 	 * Get short description
 	 */
@@ -73,6 +82,12 @@ class coll_common_links_Widget extends ComponentWidget
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
+				'title' => array(
+					'label' => t_('Block title'),
+					'note' => T_( 'Title to display in your skin.' ),
+					'size' => 40,
+					'defaultvalue' => '',
+				),
 				'show_recently' => array(
 					'type' => 'checkbox',
 					'label' => T_('Show "Recently"'),
@@ -117,6 +132,10 @@ class coll_common_links_Widget extends ComponentWidget
 
 		// Collection common links:
 		echo $this->disp_params['block_start'];
+
+		// Display title if requested
+		$this->disp_title();
+
 		echo $this->disp_params['list_start'];
 
 		if( $this->disp_params['show_recently'] )
@@ -159,6 +178,10 @@ class coll_common_links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.8  2009/03/13 02:32:07  fplanque
+ * Cleaned up widgets.
+ * Removed stupid widget_name param.
+ *
  * Revision 1.7  2009/03/08 23:57:46  fplanque
  * 2009
  *

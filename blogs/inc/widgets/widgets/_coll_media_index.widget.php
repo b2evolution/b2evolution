@@ -124,6 +124,15 @@ class coll_media_index_Widget extends ComponentWidget
 	}
 
 
+	/**
+	 * Get a very short desc. Used in the widget list.
+	 */
+	function get_short_desc()
+	{
+		return format_to_output($this->disp_params['title']);
+	}
+
+
   /**
 	 * Get short description
 	 */
@@ -280,6 +289,10 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.6  2009/03/13 02:32:07  fplanque
+ * Cleaned up widgets.
+ * Removed stupid widget_name param.
+ *
  * Revision 1.5  2009/03/08 23:57:46  fplanque
  * 2009
  *

@@ -56,6 +56,17 @@ class coll_title_Widget extends ComponentWidget
 
 
 	/**
+	 * Get a very short desc. Used in the widget list.
+	 */
+	function get_short_desc()
+	{
+		global $Blog;
+
+		return $Blog->dget( 'name', 'htmlbody' );
+	}
+
+
+	/**
 	 * Get short description
 	 */
 	function get_desc()
@@ -63,25 +74,6 @@ class coll_title_Widget extends ComponentWidget
 		global $Blog;
 		return sprintf( T_('&laquo;%s&raquo; from the blog\'s <a %s>general settings</a>.'),
 				'<strong>'.$Blog->dget('name').'</strong>', 'href="?ctrl=coll_settings&tab=general&blog='.$Blog->ID.'"' );
-	}
-
-
- 	/**
-	 * Get definitions for editable params
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @param local params like 'for_editing' => true
-	 */
-	function get_param_definitions( $params )
-	{
-		global $Blog;
-
-		$r = parent::get_param_definitions( $params );
-
-		$r['widget_name']['defaultvalue'] = $Blog->get_maxlen_name(50);
-
-		return $r;
-
 	}
 
 
@@ -113,6 +105,10 @@ class coll_title_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.10  2009/03/13 02:32:07  fplanque
+ * Cleaned up widgets.
+ * Removed stupid widget_name param.
+ *
  * Revision 1.9  2009/03/08 23:57:46  fplanque
  * 2009
  *

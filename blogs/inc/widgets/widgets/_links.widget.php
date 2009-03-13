@@ -57,6 +57,15 @@ class links_Widget extends ComponentWidget
 
 
 	/**
+	 * Get a very short desc. Used in the widget list.
+	 */
+	function get_short_desc()
+	{
+		return format_to_output($this->disp_params['title']);
+	}
+
+
+	/**
 	 * Get short description
 	 */
 	function get_desc()
@@ -125,6 +134,10 @@ class links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.9  2009/03/13 02:32:07  fplanque
+ * Cleaned up widgets.
+ * Removed stupid widget_name param.
+ *
  * Revision 1.8  2009/03/13 00:54:37  fplanque
  * calling it "sidebar links"
  *

@@ -141,12 +141,6 @@ class ComponentWidget extends DataObject
 		{
 			autoform_set_param_from_request( $parname, $parmeta, $this, 'Widget' );
 		}
-
-		// SPECIAL treatments:
-		if( empty($this->param_array['widget_name']) )
-		{	// Default name, don't store:
-			$this->set( 'widget_name', $this->get_name() );
-		}
 	}
 
 
@@ -183,6 +177,29 @@ class ComponentWidget extends DataObject
 
 
 	/**
+	 * Get a clean description to display in the widget list
+	 */
+	function get_desc_for_list()
+	{
+		$name = $this->get_name();
+
+		if( $this->type == 'plugin' )
+		{
+			return '<strong>'.$name.'</strong> ('.T_('Plugin').')';
+		}
+
+		$short_desc = $this->get_short_desc();
+
+		if( $name == $short_desc || empty($short_desc) )
+		{
+			return '<strong>'.$name.'</strong>';
+		}
+
+		return '<strong>'.$short_desc.'</strong> ('.$name.')';
+	}
+
+
+	/**
 	 * Get desc of widget
 	 *
 	 * Should be overriden by core widgets
@@ -212,19 +229,13 @@ class ComponentWidget extends DataObject
 	function get_param_definitions( $params )
 	{
 		$r = array(
-				'widget_name' => array(
-					'label' => T_( 'Name' ),
-					'size' => 20,
-					'note' => T_( 'Name displayed on your widget list.'),
-					'defaultvalue' => $this->get_name(),
-				),
 				'widget_css_class' => array(
-					'label' => T_( 'CSS Class' ),
+					'label' => '<span class="dimmed">'.T_( 'CSS Class' ).'</span>',
 					'size' => 20,
 					'note' => T_( 'Replaces $wi_class$ in your skins containers.'),
 				),
 				'widget_ID' => array(
-					'label' => T_( 'DOM ID' ),
+					'label' => '<span class="dimmed">'.T_( 'DOM ID' ).'</span>',
 					'size' => 20,
 					'note' => T_( 'Replaces $wi_ID$ in your skins containers.'),
 				),
@@ -385,7 +396,7 @@ class ComponentWidget extends DataObject
 		if( false )
 		{	// DEBUG:
 			$params['block_start'] = '<div class="debug_widget"><div class="debug_widget_name"><span class="debug_container_action"><a href="'
-						.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'.$params[ 'widget_name' ].'</div><div class="$wi_class$">';
+						.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>'.$this->get_name().'</div><div class="$wi_class$">';
 			$params['block_end'] = '</div></div>';
 		}
 
@@ -698,7 +709,7 @@ class ComponentWidget extends DataObject
 
 		echo $this->disp_params['block_start'];
 
-		$this->disp_title( T_('Blogs') );
+		$this->disp_title();
 
 		echo $this->disp_params['list_start'];
 
@@ -794,6 +805,10 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.52  2009/03/13 02:32:07  fplanque
+ * Cleaned up widgets.
+ * Removed stupid widget_name param.
+ *
  * Revision 1.51  2009/03/13 00:54:38  fplanque
  * calling it "sidebar links"
  *

@@ -46,32 +46,21 @@ class coll_search_form_Widget extends ComponentWidget
 	}
 
 
-  /**
-   * Get definitions for editable params
-   *
-	 * @see Plugin::GetDefaultSettings()
-	 * @param local params like 'for_editing' => true
-	 */
-	function get_param_definitions( $params )
-	{
-		$r = array_merge( array(
-				'disp_search_options' => array(
-					'label' => T_( 'Search options' ),
-					'note' => T_( 'Display radio buttons for "All Words", "Some Word" and "Entire Phrase"' ),
-					'type' => 'checkbox',
-					'defaultvalue' => true,
-				),
-			), parent::get_param_definitions( $params )	);
-
-		return $r;
-	}
-
 	/**
 	 * Get name of widget
 	 */
 	function get_name()
 	{
-		return T_('Content Search Form');
+		return T_('Search Form');
+	}
+
+
+	/**
+	 * Get a very short desc. Used in the widget list.
+	 */
+	function get_short_desc()
+	{
+		return format_to_output($this->disp_params['title']);
 	}
 
 
@@ -81,6 +70,33 @@ class coll_search_form_Widget extends ComponentWidget
 	function get_desc()
 	{
 		return T_('Display search form');
+	}
+
+
+  /**
+   * Get definitions for editable params
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		$r = array_merge( array(
+				'title' => array(
+					'label' => t_('Block title'),
+					'note' => T_( 'Title to display in your skin.' ),
+					'size' => 40,
+					'defaultvalue' => T_('Search'),
+				),
+				'disp_search_options' => array(
+					'label' => T_( 'Search options' ),
+					'note' => T_( 'Display radio buttons for "All Words", "Some Word" and "Entire Phrase"' ),
+					'type' => 'checkbox',
+					'defaultvalue' => true,
+				),
+			), parent::get_param_definitions( $params )	);
+
+		return $r;
 	}
 
 
@@ -98,7 +114,7 @@ class coll_search_form_Widget extends ComponentWidget
 		// Collection search form:
 		echo $this->disp_params['block_start'];
 
-		$this->disp_title( T_('Search') );
+		$this->disp_title();
 
 		form_formstart( $Blog->gen_blogurl(), 'search', 'SearchForm' );
 		echo '<p>';
@@ -127,6 +143,10 @@ class coll_search_form_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.11  2009/03/13 02:32:07  fplanque
+ * Cleaned up widgets.
+ * Removed stupid widget_name param.
+ *
  * Revision 1.10  2009/03/08 23:57:46  fplanque
  * 2009
  *
