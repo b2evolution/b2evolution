@@ -150,7 +150,7 @@ function & get_featured_Item()
 		$FeaturedList->set_filters( array(
 				'featured' => 1,  // Featured posts only (TODO!)
 				// Types will already be reset to defaults here
-			) );
+			), false /* Do NOT memorize!! */ );
 
 		// Run the query:
 		$FeaturedList->query();
@@ -691,7 +691,7 @@ function attach_browse_tabs()
 						'href' => 'admin.php?ctrl=items&amp;tab=podcasts&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 					'links' => array(
-						'text' => T_('Linkroll'),
+						'text' => T_('Sidebar links'),
 						'href' => 'admin.php?ctrl=items&amp;tab=links&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 				)
@@ -825,8 +825,8 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
- * Revision 1.37  2009/03/13 00:43:05  fplanque
- * no message
+ * Revision 1.38  2009/03/13 00:53:13  fplanque
+ * super nasty sneaky bug
  *
  * Revision 1.36  2009/03/08 23:57:44  fplanque
  * 2009
