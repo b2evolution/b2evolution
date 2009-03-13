@@ -2325,9 +2325,11 @@ function upgrade_b2evo_tables()
 
 	// Should get moved into the next $old_db_version block:
 
-	// Rename previously reserved type to "Linkroll item".
 	task_begin( 'Updating item types...' );
-	$DB->query( "UPDATE T_items__type SET ptyp_name = 'Linkroll item' WHERE ptyp_ID = 3000" );
+	$DB->query( "
+		REPLACE INTO T_items__type ( ptyp_ID, ptyp_name )
+		VALUES ( 3000, 'Sidebar link' )" );
+	echo "OK.<br />\n";
 	task_end();
 
 	task_begin( 'Updating items table...' );
@@ -2496,8 +2498,8 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
- * Revision 1.286  2009/03/13 00:43:05  fplanque
- * no message
+ * Revision 1.287  2009/03/13 00:57:35  fplanque
+ * calling it "sidebar links"
  *
  * Revision 1.285  2009/03/08 23:57:47  fplanque
  * 2009

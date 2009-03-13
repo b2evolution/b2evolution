@@ -206,7 +206,6 @@ function create_default_data()
 	$DB->query( "
 		INSERT INTO T_items__type ( ptyp_ID, ptyp_name )
 		VALUES ( 1, 'Post' ),
-					 ( 2, 'Link' ),
 					 ( 1000, 'Page' ),
 					 ( 1500, 'Intro-Main' ),
 					 ( 1520, 'Intro-Cat' ),
@@ -214,7 +213,7 @@ function create_default_data()
 					 ( 1570, 'Intro-Sub' ),
 					 ( 1600, 'Intro-All' ),
 					 ( 2000, 'Podcast' ),
-					 ( 3000, 'Reserved' ),
+					 ( 3000, 'Sidebar link' ),
 					 ( 4000, 'Reserved' ),
 					 ( 5000, 'Reserved' ) " );
 	echo "OK.<br />\n";
@@ -827,6 +826,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.258  2009/03/13 00:57:35  fplanque
+ * calling it "sidebar links"
+ *
  * Revision 1.257  2009/03/08 23:57:47  fplanque
  * 2009
  *

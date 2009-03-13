@@ -155,7 +155,7 @@ class ItemListLight extends DataObjectList2
 				'ymdhms_min' => NULL,
 				'ymdhms_max' => NULL,
 				'statuses' => NULL,
-				'types' => '-1000,1500,1520,1530,1570,1600,3000',	// All types except pages, intros and linkroll
+				'types' => '-1000,1500,1520,1530,1570,1600,3000',	// All types except pages, intros and sidebar links
 				'visibility_array' => array( 'published', 'protected', 'private' ),
 				'orderby' => $this->Blog->get_setting('orderby'),
 				'order' => $this->Blog->get_setting('orderdir'),
@@ -1510,6 +1510,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.30  2009/03/13 00:54:37  fplanque
+ * calling it "sidebar links"
+ *
  * Revision 1.29  2009/03/08 23:57:44  fplanque
  * 2009
  *

@@ -245,7 +245,7 @@ if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) 
 
 		case 'links':
 			$label = T_('New link');
-			$title = T_('Add a link to the linkroll...');
+			$title = T_('Add a sidebar link...');
 			$new_ptyp_ID = 3000;
 			break;
 
@@ -273,6 +273,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.16  2009/03/13 00:54:37  fplanque
+ * calling it "sidebar links"
+ *
  * Revision 1.15  2009/03/08 23:57:44  fplanque
  * 2009
  *

@@ -581,8 +581,7 @@ class ComponentWidget extends DataObject
 			compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $linkblog );
 		}
 		else
-		{
-			// we are using a linkroll (type=3000)
+		{ // we are using a linkroll (type=3000)
 			$link_Blog = $Blog;
 			compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $Blog->ID );
 		}
@@ -598,32 +597,19 @@ class ComponentWidget extends DataObject
 			$LinkblogList = & new ItemListLight( $link_Blog, $timestamp_min, $timestamp_max, $limit );
 		}
 
-		if ( array_key_exists( 'linkblog_ID' , $this->disp_params ) )
-		{
-			// Filters for linkblogs
-			$LinkblogList->set_filters( array(
-					'cat_array' => $linkblog_cat_array,
-					'cat_modifier' => $linkblog_cat_modifier,
-					'orderby' => 'main_cat_ID title',
-					'order' => 'ASC',
-					'unit' => 'posts',
-			), false ); // we don't want to memorise these params
-
-		}
-		else
-		{
-			// Filters for linkroll
-			// waltercruz> don't know if this is the best way. Should I create a array 
-			// and add a 'types' key in the else clause?
-			$LinkblogList->set_filters( array(
+		$filters = array(
 				'cat_array' => $linkblog_cat_array,
 				'cat_modifier' => $linkblog_cat_modifier,
 				'orderby' => 'main_cat_ID title',
 				'order' => 'ASC',
 				'unit' => 'posts',
-				'types' => '3000',
-			), false ); // we don't want to memorise these params
+			);
+
+		if( ! array_key_exists( 'linkblog_ID' , $this->disp_params ) )
+		{ // Filters for linkroll
+			$filters['types'] = '3000';
 		}
+		$LinkblogList->set_filters( $filters, false ); // we don't want to memorize these params
 
 		// Run the query:
 		$LinkblogList->query();
@@ -808,6 +794,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.51  2009/03/13 00:54:38  fplanque
+ * calling it "sidebar links"
+ *
  * Revision 1.50  2009/03/08 23:57:46  fplanque
  * 2009
  *
