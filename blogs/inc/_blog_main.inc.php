@@ -37,22 +37,19 @@ load_class('items/model/_itemlist.class.php');
 
 $Timer->start( '_blog_main.inc' );
 
-// Getting GET or POST parameters:
 
 /*
  * blog ID. This is a little bit special.
- * If it has been explicitely memorized already, we don't touch it.
- * Note: explicitely != auto_register_globals != stub file just setting it with $blog=x
- * Note: stub files should probably memorize the param explicitely!
+ *
+ * In most cases $blog should be set by a stub file and the param() call below will just check that it's an integer.
+ *
+ * Note we do NOT memorize the param as we don't want it in regenearet_url() calls.
+ * Whenever we do, index.php will already have called param() with memorize=true
+ *
+ * In some cases $blog will not have been set before and it will be set with the param() call below.
+ * Currently, this only happens with the old /xmlsrv/ RSS stubs.
  */
-if( ! param_ismemorized('blog') )
-{	// Not explicitely memorized yet, get param from GET or auto_register_globals OR a stub $blog = x:
-	$Debuglog->add( 'blog param not memorized before _blog_main.inc', 'params' );
-	// We default to 0 here because the param should always be included in regenerate_url() when present.
-	// This will prevent weird indexing/search results in case the default changes after indexing.
-  // On some occasions, we'll manually filter it out of regenerate_url() because we know we go through a stub for example.
-	param( 'blog', 'integer', 0, true );
-}
+param( 'blog', 'integer', '', false );
 
 // Getting current blog info:
 $BlogCache = & get_Cache( 'BlogCache' );
@@ -595,6 +592,11 @@ else
 
 /*
  * $Log$
+ * Revision 1.112  2009/03/13 00:56:55  fplanque
+ * Better handling of blog param for cleaner URLs.
+ * A lot of testing was involved but I have tested many versions before reducing it to the max.
+ * I hope this final version has no side effects.
+ *
  * Revision 1.111  2009/03/08 23:57:38  fplanque
  * 2009
  *
