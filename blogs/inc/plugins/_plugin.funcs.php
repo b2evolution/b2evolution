@@ -37,7 +37,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Recursive helper function to display a field of the plugin's settings (by manipulating a Form).
  *
- * This gets used for PluginSettings ("Edit plugin") and PluginUserSettings ("Edit user settings").
+ * Used for PluginSettings ("Edit plugin") and PluginUserSettings ("Edit user settings") as well as widgets.
  *
  * @todo dh> Allow to move setting sets up and down (order). Control goes into /inc/CONTROL/settings/plugins.php.
  * @todo NOTE: fp> I'm using this outside of Plugins; I'm not sure about proper factorization yet.
@@ -235,7 +235,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 		case 'select':
 			$params['force_keys_as_values'] = true; // so that numeric keys get used as values! autoform_validate_param_value() checks for the keys only.
-			$Form->select_input_array( $input_name, $set_value, $parmeta['options'], $set_label, NULL, $params );
+			$Form->select_input_array( $input_name, $set_value, $parmeta['options'], $set_label, $parmeta['note'], $params );
 			break;
 
 		case 'select_blog':
@@ -1003,6 +1003,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /*
  * $Log$
+ * Revision 1.7  2009/03/13 02:32:33  fplanque
+ * bugfix
+ *
  * Revision 1.6  2009/03/08 23:57:45  fplanque
  * 2009
  *
