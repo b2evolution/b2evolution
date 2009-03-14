@@ -67,6 +67,11 @@ class coll_page_list_Widget extends ComponentWidget
 					'type' => 'checkbox',
 					'defaultvalue' => false,
 				),
+				'blog_ID' => array(
+					'label' => T_( 'Blog' ),
+					'note' => T_( 'ID of the blog to use, leave empty for the current blog.' ),
+					'size' => 4,
+				),
 				'order_by' => array(
 					'label' => T_('Order by'),
 					'note' => T_('How to sort the items'),
@@ -87,16 +92,34 @@ class coll_page_list_Widget extends ComponentWidget
 					'size' => 4,
 					'defaultvalue' => 20,
 				),
+				'item_title_link_type' => array(
+					'label' => T_('Link titles'),
+					'note' => T_('Where should titles be linked to?'),
+					'type' => 'select',
+					'options' => array(
+							'permalink'   => T_('Item permalink'),
+							'linkto_url'  => T_('Item URL'),
+							'none'        => T_('Nowhere'),
+						),
+					'defaultvalue' => 'permalink',
+				),
 				'disp_excerpt' => array(
 					'label' => T_( 'Excerpt' ),
-					'note' => T_( 'Display item excerpt.' ),
+					'note' => T_( 'Display excerpt for each item.' ),
 					'type' => 'checkbox',
 					'defaultvalue' => false,
 				),
-				'blog_ID' => array(
-					'label' => T_( 'Blog' ),
-					'note' => T_( 'ID of the blog to use, leave empty for the current blog.' ),
-					'size' => 4,
+				'disp_teaser' => array(
+					'label' => T_( 'Teaser' ),
+					'type' => 'checkbox',
+					'defaultvalue' => false,
+					'note' => T_( 'Display teaser for each item.' ),
+				),
+				'disp_teaser_maxwords' => array(
+					'label' => T_( 'Max Words' ),
+					'type' => 'integer',
+					'defaultvalue' => 20,
+					'note' => T_( 'Max number of words for the teasers' ),
 				),
 			), parent::get_param_definitions( $params )	);
 
@@ -150,6 +173,9 @@ class coll_page_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.13  2009/03/14 03:02:56  fplanque
+ * Moving towards an universal item list widget, step 1
+ *
  * Revision 1.12  2009/03/13 02:32:07  fplanque
  * Cleaned up widgets.
  * Removed stupid widget_name param.

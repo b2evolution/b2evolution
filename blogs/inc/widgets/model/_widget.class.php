@@ -486,7 +486,16 @@ class ComponentWidget extends DataObject
 		// Create ItemList
 		// Note: we pass a widget specific prefix in order to make sure to never interfere with the mainlist
 		$limit = $this->disp_params[ 'limit' ];
-		$ItemList = & new ItemListLight( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCacheLight', $this->code.'_' );
+
+		if( $this->disp_params['disp_teaser'] )
+		{ // We want to show some of the post content, we need to load more info: use ItemList2
+			$ItemList = & new ItemList2( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCache', $this->code.'_' );
+		}
+		else
+		{ // no excerpts, use ItemListLight
+			$ItemList = & new ItemListLight( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCacheLight', $this->code.'_' );
+		}
+
 		// Filter list:
 		if( $what == 'pages' )
 		{
@@ -524,11 +533,9 @@ class ComponentWidget extends DataObject
 		while( $Item = & $ItemList->get_item() )
 		{
 			echo $this->disp_params['item_start'];
-			$Item->title( array(
-					'link_type' => 'permalink',
-				) );
-			if( $this->disp_params[ 'disp_excerpt' ] )
-				echo '<p>'.$Item->dget( 'excerpt', 'htmlbody' ).'</p>';// no formatting in excerpts
+
+			// Display contents of the Item depending on widget params:
+			$this->disp_contents( $Item );
 
 			echo $this->disp_params['item_end'];
 		}
@@ -541,10 +548,8 @@ class ComponentWidget extends DataObject
 
 	/**
 	 * List of items by category
-	 *
-	 * @param array MUST contain at least the basic display params
 	 */
-	function disp_cat_item_list( $link_type = 'linkto_url' )
+	function disp_cat_item_list()
 	{
 		global $BlogCache, $Blog;
 		global $timestamp_min, $timestamp_max;
@@ -584,7 +589,7 @@ class ComponentWidget extends DataObject
 		$linkblog_cat_array = array();
 		$linkblog_cat_modifier = '';
 
-		$limit = ( $this->disp_params[ 'linkblog_limit' ] ? $this->disp_params[ 'linkblog_limit' ] : 1000 ); // Note: 1000 will already kill the display
+		$limit = $this->disp_params[ 'limit' ];
 
 		if ( array_key_exists( 'linkblog_ID' , $this->disp_params ) )
 		{ // fp> document when this case happens vs not.
@@ -597,22 +602,20 @@ class ComponentWidget extends DataObject
 			compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $Blog->ID );
 		}
 
-	// fp> ItemList2 instead of ItemListLight adds processing overhead. Not wanted.
-	//	$LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $limit );
-		if( $this->disp_params['linkblog_excerpts'] )
-		{ // we want to show some or all of the post content, use ItemList2
-			$LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $limit );
+		if( $this->disp_params['disp_teaser'] )
+		{ // We want to show some of the post content, we need to load more info: use ItemList2
+			$LinkblogList = & new ItemList2( $link_Blog, $timestamp_min, $timestamp_max, $limit, 'ItemCache', $this->code.'_' );
 		}
 		else
 		{ // no excerpts, use ItemListLight
-			$LinkblogList = & new ItemListLight( $link_Blog, $timestamp_min, $timestamp_max, $limit );
+			$LinkblogList = & new ItemListLight( $link_Blog, $timestamp_min, $timestamp_max, $limit, 'ItemCacheLight', $this->code.'_' );
 		}
 
 		$filters = array(
 				'cat_array' => $linkblog_cat_array,
 				'cat_modifier' => $linkblog_cat_modifier,
-				'orderby' => 'main_cat_ID title',
-				'order' => 'ASC',
+				'orderby' => 'main_cat_ID '.$this->disp_params[ 'order_by' ],
+				'order' => $this->disp_params[ 'order_dir' ],
 				'unit' => 'posts',
 			);
 
@@ -650,35 +653,8 @@ class ComponentWidget extends DataObject
 			{
 				echo $this->disp_params['item_start'];
 
-				$Item->title( array(
-						'link_type' => $link_type,
-					) );
-
-				if( $this->disp_params['linkblog_excerpts'] )
-				{ // we want to show some or all of the post content
-					// fp> TODO: it's called excerpt but it doesn't display the excerpt!
-					//           Get the excerpt first, then fall back to teaser if excerpt was empty.
-					$content = $Item->get_content_teaser( 1, false, 'htmlbody' );
-
-					if( $words = $this->disp_params['linkblog_cutoff'] )
-					{ // limit number of words
-						$content = strmaxwords( $content, $words, array(
-								'continued_link' => $Item->get_permanent_url(),
-								'continued_text' => T_( 'continued' ).' &hellip;',
-							 ) );
-					}
-					echo ' <span class="excerpt">'.$content.'</span>';
-
-					/* fp> does that really make sense?
-					  we're no longer in a linkblog/linkroll use case here, are we?
-					$Item->more_link( array(
-							'before'    => '',
-							'after'     => '',
-							'link_text' => T_('more').' &raquo;',
-						) );
-						*/
-				}
-
+				// Display contents of the Item depending on widget params:
+				$this->disp_contents( $Item );
 
 				echo $this->disp_params['item_end'];
 			}
@@ -692,6 +668,47 @@ class ComponentWidget extends DataObject
 		echo $this->disp_params['list_end'];
 
 		echo $this->disp_params['block_end'];
+	}
+
+
+	/**
+	 * Support function for above
+	 *
+	 * @param Item
+	 */
+	function disp_contents( & $Item )
+	{
+		$Item->title( array(
+				'link_type' => $this->disp_params['item_title_link_type'],
+			) );
+
+		if( $this->disp_params[ 'disp_excerpt' ] )
+		{
+			echo '<p>'.$Item->dget( 'excerpt', 'htmlbody' ).'</p>'; // Excerpts are plain text -- no html (at least for now)
+		}
+
+		if( $this->disp_params['disp_teaser'] )
+		{ // we want to show some or all of the post content
+			$content = $Item->get_content_teaser( 1, false, 'htmlbody' );
+
+			if( $words = $this->disp_params['disp_teaser_maxwords'] )
+			{ // limit number of words
+				$content = strmaxwords( $content, $words, array(
+						'continued_link' => $Item->get_permanent_url(),
+						'continued_text' => '&hellip;',
+					 ) );
+			}
+			echo ' <span class="excerpt">'.$content.'</span>';
+
+			/* fp> does that really make sense?
+				we're no longer in a linkblog/linkroll use case here, are we?
+			$Item->more_link( array(
+					'before'    => '',
+					'after'     => '',
+					'link_text' => T_('more').' &raquo;',
+				) );
+				*/
+		}
 	}
 
 
@@ -805,6 +822,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.53  2009/03/14 03:02:56  fplanque
+ * Moving towards an universal item list widget, step 1
+ *
  * Revision 1.52  2009/03/13 02:32:07  fplanque
  * Cleaned up widgets.
  * Removed stupid widget_name param.
@@ -876,208 +896,5 @@ class ComponentWidget extends DataObject
  * Revision 1.31  2008/01/12 18:21:50  blueyed
  *  - use $timestamp_min, $timestamp_max for ItemListLight instances (fixes displaying of posts from the future in coll_post_list widget
  * - typo, todo, fix indent
- *
- * Revision 1.30  2008/01/11 19:18:30  fplanque
- * bugfixes
- *
- * Revision 1.29  2008/01/06 17:52:50  fplanque
- * minor/doc
- *
- * Revision 1.27  2007/12/26 20:04:54  fplanque
- * minor
- *
- * Revision 1.26  2007/12/26 18:15:29  fplanque
- * minor
- *
- * Revision 1.25  2007/12/24 14:21:04  yabs
- * adding params
- *
- * Revision 1.24  2007/12/24 12:06:07  yabs
- * bugfix "order" is a reserved name, used by wi_order
- *
- * Revision 1.23  2007/12/24 11:00:47  yabs
- * adding random order
- *
- * Revision 1.22  2007/12/23 18:11:53  yabs
- * bug fix
- *
- * Revision 1.21  2007/12/23 17:47:59  fplanque
- * fixes
- *
- * Revision 1.20  2007/12/23 16:16:17  fplanque
- * Wording improvements
- *
- * Revision 1.19  2007/12/23 15:44:22  yabs
- * adding params
- *
- * Revision 1.18  2007/12/23 15:07:07  fplanque
- * Clean widget name
- *
- * Revision 1.17  2007/12/23 14:14:25  fplanque
- * Enhanced widget name display
- *
- * Revision 1.16  2007/12/23 13:00:37  yabs
- * doc & validation
- *
- * Revision 1.15  2007/12/22 21:09:53  fplanque
- * meh!!
- *
- * Revision 1.14  2007/12/22 19:52:55  yabs
- * cleanup from adding core params
- *
- * Revision 1.13  2007/12/22 17:02:14  yabs
- * adding core parameters for css id/classname and widget list title
- *
- * Revision 1.12  2007/12/20 22:59:34  fplanque
- * TagCloud widget prototype
- *
- * Revision 1.11  2007/12/20 10:48:51  fplanque
- * doc
- *
- * Revision 1.10  2007/12/18 10:26:58  yabs
- * adding params
- *
- * Revision 1.9  2007/11/04 01:10:57  fplanque
- * skin cleanup continued
- *
- * Revision 1.8  2007/11/03 04:56:04  fplanque
- * permalink / title links cleanup
- *
- * Revision 1.7  2007/09/24 12:08:24  yabs
- * minor bug fix
- *
- * Revision 1.6  2007/09/23 18:57:15  fplanque
- * filter handling fixes
- *
- * Revision 1.5  2007/09/17 18:03:52  blueyed
- * Fixed cases for no $Blog, e.g. with contact.php
- *
- * Revision 1.4  2007/09/04 19:48:33  fplanque
- * small fixes
- *
- * Revision 1.3  2007/06/30 20:37:50  fplanque
- * fixes
- *
- * Revision 1.2  2007/06/29 00:25:02  fplanque
- * minor
- *
- * Revision 1.1  2007/06/25 11:01:57  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.11  2007/06/23 00:12:38  fplanque
- * cleanup
- *
- * Revision 1.10  2007/06/21 23:28:18  blueyed
- * todos
- *
- * Revision 1.9  2007/06/21 00:44:36  fplanque
- * linkblog now a widget
- *
- * Revision 1.8  2007/06/20 23:12:51  fplanque
- * "Who's online" moved to a plugin
- *
- * Revision 1.7  2007/06/20 21:42:13  fplanque
- * implemented working widget/plugin params
- *
- * Revision 1.6  2007/06/20 14:25:00  fplanque
- * fixes
- *
- * Revision 1.5  2007/06/20 13:19:29  fplanque
- * Free html widget
- *
- * Revision 1.4  2007/06/20 00:48:18  fplanque
- * some real life widget settings
- *
- * Revision 1.3  2007/06/19 20:42:53  fplanque
- * basic demo of widget params handled by autoform_*
- *
- * Revision 1.2  2007/06/19 00:03:26  fplanque
- * doc / trying to make sense of automatic settings forms generation.
- *
- * Revision 1.1  2007/06/18 21:25:47  fplanque
- * one class per core widget
- *
- * Revision 1.26  2007/05/28 15:18:30  fplanque
- * cleanup
- *
- * Revision 1.25  2007/05/28 01:36:24  fplanque
- * enhanced blog list widget
- *
- * Revision 1.24  2007/05/09 01:58:57  fplanque
- * Widget to display other blogs from same owner
- *
- * Revision 1.23  2007/05/09 01:00:24  fplanque
- * optimized querying for blog lists
- *
- * Revision 1.22  2007/05/08 00:42:07  fplanque
- * public blog list as a widget
- *
- * Revision 1.21  2007/05/07 23:26:19  fplanque
- * public blog list as a widget
- *
- * Revision 1.20  2007/04/26 00:11:06  fplanque
- * (c) 2007
- *
- * Revision 1.19  2007/03/27 18:00:13  blueyed
- * Fixed E_FATAL: "Cannot redeclare ComponentWidget::$order"; doc
- *
- * Revision 1.18  2007/03/26 17:12:40  fplanque
- * allow moving of widgets
- *
- * Revision 1.17  2007/03/26 14:21:30  fplanque
- * better defaults for pages implementation
- *
- * Revision 1.16  2007/03/26 12:59:18  fplanque
- * basic pages support
- *
- * Revision 1.15  2007/03/25 13:19:17  fplanque
- * temporarily disabled dynamic and static urls.
- * may become permanent in favor of a caching mechanism.
- *
- * Revision 1.14  2007/03/04 21:46:39  fplanque
- * category directory / albums
- *
- * Revision 1.13  2007/02/05 00:35:43  fplanque
- * small adjustments
- *
- * Revision 1.12  2007/01/25 13:41:50  fplanque
- * wording
- *
- * Revision 1.11  2007/01/14 03:24:30  fplanque
- * widgets complete proof of concept with multiple skins
- *
- * Revision 1.10  2007/01/14 01:32:11  fplanque
- * more widgets supported! :)
- *
- * Revision 1.9  2007/01/13 22:28:12  fplanque
- * doc
- *
- * Revision 1.8  2007/01/13 18:40:33  fplanque
- * SkinTag/Widget plugins now get displayed inside of the containers.
- * next step: adapt all default skins to use this.
- *
- * Revision 1.7  2007/01/13 14:35:42  blueyed
- * todo: $Plugin should be a ref?!
- *
- * Revision 1.6  2007/01/13 04:10:44  fplanque
- * implemented "add" support for plugin widgets
- *
- * Revision 1.5  2007/01/12 02:40:26  fplanque
- * widget default params proof of concept
- * (param customization to be done)
- *
- * Revision 1.4  2007/01/11 20:44:19  fplanque
- * skin containers proof of concept
- * (no params handling yet though)
- *
- * Revision 1.3  2007/01/11 02:57:25  fplanque
- * implemented removing widgets from containers
- *
- * Revision 1.2  2007/01/08 23:45:48  fplanque
- * A little less rough widget manager...
- * (can handle multiple instances of same widget and remembers order)
- *
- * Revision 1.1  2007/01/08 21:55:42  fplanque
- * very rough widget handling
  */
 ?>

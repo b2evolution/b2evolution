@@ -91,23 +91,54 @@ class links_Widget extends ComponentWidget
 					'defaultvalue' => T_('Links'),
 					'note' => T_( 'This is the title to display in your skin.' ),
 				),
-				'linkblog_limit' => array(
-					'label' => T_( 'Display' ),
-					'size' => 4,
-					'defaultvalue' => 100,
-					'note' => T_( 'This is the maximum number of links to display.' ),
+				'order_by' => array(
+					'label' => T_('Order by'),
+					'note' => T_('How to sort the items'),
+					'type' => 'select',
+					'options' => get_available_sort_options(),
+					'defaultvalue' => 'title',
 				),
-				'linkblog_excerpts' => array(
-					'label' => T_( 'Excerpts' ),
+				'order_dir' => array(
+					'label' => T_('Direction'),
+					'note' => T_('How to sort the items'),
+					'type' => 'select',
+					'options' => array( 'ASC'  => T_('Ascending'), 'DESC' => T_('Descending') ),
+					'defaultvalue' => 'ASC',
+				),
+				'limit' => array(
+					'label' => T_( 'Limit' ),
+					'size' => 4,
+					'defaultvalue' => 20,
+					'note' => T_( 'Maximum number of items to display.' ),
+				),
+				'item_title_link_type' => array(
+					'label' => T_('Link titles'),
+					'note' => T_('Where should titles be linked to?'),
+					'type' => 'select',
+					'options' => array(
+							'permalink'   => T_('Item permalink'),
+							'linkto_url'  => T_('Item URL'),
+							'none'        => T_('Nowhere'),
+						),
+					'defaultvalue' => 'linkto_url',
+				),
+				'disp_excerpt' => array(
+					'label' => T_( 'Excerpt' ),
+					'note' => T_( 'Display excerpt for each item.' ),
 					'type' => 'checkbox',
 					'defaultvalue' => false,
-					'note' => T_( 'Show contents for entries' ),
 				),
-				'linkblog_cutoff' => array(
+				'disp_teaser' => array(
+					'label' => T_( 'Teaser' ),
+					'type' => 'checkbox',
+					'defaultvalue' => false,
+					'note' => T_( 'Display teaser for each item.' ),
+				),
+				'disp_teaser_maxwords' => array(
 					'label' => T_( 'Max Words' ),
 					'type' => 'integer',
-					'defaultvalue' => 40,
-					'note' => T_( 'Max number of words to show in exerpts' ),
+					'defaultvalue' => 20,
+					'note' => T_( 'Max number of words for the teasers' ),
 				),
 			), parent::get_param_definitions( $params )	);
 
@@ -134,6 +165,9 @@ class links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.10  2009/03/14 03:02:56  fplanque
+ * Moving towards an universal item list widget, step 1
+ *
  * Revision 1.9  2009/03/13 02:32:07  fplanque
  * Cleaned up widgets.
  * Removed stupid widget_name param.
