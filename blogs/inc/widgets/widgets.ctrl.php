@@ -464,7 +464,7 @@ switch( $action )
 
 		// this will be enabled if js available:
 		echo '<div class="available_widgets">'."\n";
-		echo '<div class="available_widgets_toolbar"><a href="#" class="floatright" style="padding: 1px 0;">'.get_icon('close').'</a>'.T_( 'Select widget to add:' ).'</div>'."\n";
+		echo '<div class="available_widgets_toolbar"><a href="#" class="rollover floatright" style="padding: 1px 0;">'.get_icon('close').'</a>'.T_( 'Select widget to add:' ).'</div>'."\n";
 		echo '<div id="available_widgets_inner">'."\n";
 		$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );
 		echo '</div></div>'."\n";
@@ -483,6 +483,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2009/03/14 21:50:46  fplanque
+ * still cleaning up...
+ *
  * Revision 1.23  2009/03/14 20:53:41  fplanque
  * Fixed the add widget links so that you now know what you can click on or not
  *

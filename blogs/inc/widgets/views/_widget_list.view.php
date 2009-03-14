@@ -43,7 +43,7 @@ function display_container( $container, $legend_suffix = '' )
 	$table_id = str_replace( ' ', '_', $container ); // fp> Using the container name which has special chars is a bad idea. Counter would be better
 
 	$Table->global_icon( T_('Add a widget...'), 'new',
-			regenerate_url( '', 'action=new&amp;container='.rawurlencode($container) ), /* TRANS: note this is NOT a NEW widget */ '<span class="add_new_widget_text">'.T_('Add widget').'</span> &raquo;', 3, 4, array( 'id' => 'add_new_'.$table_id ) );
+			regenerate_url( '', 'action=new&amp;container='.rawurlencode($container) ), /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, array( 'id' => 'add_new_'.$table_id ) );
 
 	$Table->cols = array(
 			array(
@@ -212,6 +212,9 @@ echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear">';
 
 /*
  * $Log$
+ * Revision 1.16  2009/03/14 21:50:46  fplanque
+ * still cleaning up...
+ *
  * Revision 1.15  2009/03/13 02:32:08  fplanque
  * Cleaned up widgets.
  * Removed stupid widget_name param.

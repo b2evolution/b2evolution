@@ -76,11 +76,6 @@ jQuery(document).ready(function()
 	// get rid of the odd/even classes and add our own class:
 	jQuery( ".odd" ).addClass( "widget_row" ).removeClass( ".odd" );
 	jQuery( ".even" ).addClass( "widget_row" ).removeClass( ".even" );
-	// Intercept normal "add new widget" action:
-	jQuery( ".fieldset_title_bg > span > a" ).each( function()
-	{
-		jQuery( this ).replaceWith( '<span class="add_new_widget" id="'+( jQuery( this ).attr( "id" ) )+'" title="'+( jQuery( this ).attr( 'title' ) )+'">'+jQuery( this ).find( '.add_new_widget_text' ).html()+'</span>' );
-	});
 
 	// make container title droppable -- fp> This works but gives no visual feedback. It would actually be cool to drop 'after' the current line in which case dropping on the title would make sense
 	jQuery( '.fieldset_title' ).each( function(){
@@ -457,7 +452,7 @@ function T_( native_string )
 function convertAvailableList()
 {
 	// Open list on click, not on hover!
-	jQuery( '.add_new_widget' ).bind( 'click', function(e)
+	jQuery( ".fieldset_title_bg > span > a" ).attr( 'href', '#' ).bind( 'click', function(e)
 	{
 		offset = jQuery( this ).offset();
 		y = offset.top;
@@ -470,11 +465,17 @@ function convertAvailableList()
 			{top : y,
 			right: jQuery( document ).width() - offset.left - jQuery( this ).width() } )
 			.addClass( 'available_widgets_active' ).attr( 'id', 'available_'+jQuery( this ).attr( "id" ) );
+
+		// cancel default href action:
+		return false;
 	});
 
 	// Close action:
-	jQuery( '.available_widgets_toolbar > a' ).bind( 'click', function(e){
+	jQuery( '.available_widgets_toolbar > a' ).bind( 'click', function(e)
+	{
 		jQuery('.available_widgets').removeClass( 'available_widgets_active' );
+		// cancel default href action:
+		return false;
 	});
 
 	jQuery( ".available_widgets li" ).each( function()
@@ -487,6 +488,8 @@ function convertAvailableList()
 		// replace href with JS addnewwidget action:
 		jQuery( this ).children( 'a' ).attr( 'href', '#' ).bind( 'click', function(){
 			addNewWidget( this, the_link );
+			// cancel default href action:
+			return false;
 		});
 	});
 }
@@ -498,6 +501,7 @@ function convertAvailableList()
 function addNewWidget( widget_list_item, admin_call )
 {
 	jQuery( '.available_widgets' ).removeClass( 'available_widgets_active' );// close open windows
+
 	var widget_id = jQuery( widget_list_item ).attr( "id" );
 	jQuery( widget_list_item ).attr( "id", widget_id );
 
