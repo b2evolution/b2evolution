@@ -3090,7 +3090,11 @@ class Item extends ItemLight
 	{
 		if( empty($this->excerpt) )
 		{
-			$this->set( 'excerpt', substr( strip_tags($this->content), 0, 100 ) );
+			$excerpt =  substr( strip_tags($this->content), 0, 100 );
+			if( !empty($excerpt) )
+			{	// We finally have something to act as an excerpt...
+				$this->set( 'excerpt', $excerpt );
+			}
 		}
 	}
 
@@ -3702,6 +3706,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.87  2009/03/14 03:34:05  fplanque
+ * blop
+ *
  * Revision 1.86  2009/03/14 03:28:40  fplanque
  * Quick and dirty "excerpts should not stay empty".
  *
