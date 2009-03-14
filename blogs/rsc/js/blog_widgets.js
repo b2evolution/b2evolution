@@ -99,7 +99,7 @@ jQuery(document).ready(function()
 				sendWidgetOrder(); // send the new order to the server
 			}
 		});
-	} );
+	});
 
 	// grab the widget ID out of the "delete" url and add as ID to parent row:
 	jQuery( '.widget_row td:nth-child(5)' ).each( function()
@@ -166,19 +166,6 @@ jQuery(document).ready(function()
 	current_widgets = getWidgetOrder(); // save current widget order
 
 	doFade( ".fadeout-ffff00" );// highlight any changed widgets
-
-	jQuery( '.widget_actions' ).bind( 'mouseover', function( e )
-	{ // need to disable draggable to allow icons to be clicked :-S
-		jQuery( this ).parent().draggable( 'disable' );
-		return false;
-	});
-
-	jQuery( '.widget_actions' ).bind( 'mouseleave', function( e )
-	{ // re-enable draggable functionality
-		jQuery( this ).parent().draggable( 'enable' );
-		return false;
-	});
-
 });
 
 
@@ -393,6 +380,7 @@ function deleteWidget( widget )
 			colourWidgets(); // redo widget colours
 			sendWidgetOrder(); // update the server
 		});
+	return false;
 }
 
 /**
@@ -402,7 +390,9 @@ function deleteWidget( widget )
 function editWidget( widget )
 {
 	jQuery( '#server_messages' ).html( '' );
-	SendAdminRequest( "widgets", "edit", "wi_ID="+widget.substr( 6, widget.length ) );
+	msg = "wi_ID="+widget.substr( 6, widget.length );
+	SendAdminRequest( "widgets", "edit", msg );
+	return false;
 }
 
 function widgetSettings( the_html )
@@ -512,6 +502,7 @@ function addNewWidget( widget_list_item, admin_call )
 	SendAdminRequest( 'widgets', 'create', admin_call+"&container="+destination );
 }
 
+
 /**
  * Adds a new widget to a container
  *
@@ -546,24 +537,25 @@ function addNewWidgetCallback( wi_ID, container, wi_order, wi_name )
  */
 function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled )
 {
-//	window.alert( wi_ID + ' : ' + container + ' : ' + wi_name + ' : ' +wi_class );
-	var newWidget = jQuery( '<li id="'+wi_ID+'" class="draggable_widget"><span class="widget_name">'+wi_name+'</span></li>' );
+	//	window.alert( wi_ID + ' : ' + container + ' : ' + wi_name + ' : ' +wi_class );
+	var newWidget = jQuery( '<li id="'+wi_ID+'" class="draggable_widget"><a class="widget_name" href="#" onclick="return editWidget( \''+wi_ID+'\' );">'+wi_name+'</a></li>' );
 	if( wi_class )
 	{ // add class
 		jQuery( newWidget ).addClass( wi_class );
 	}
 
 	// Add state indicator:
-	jQuery( newWidget ).prepend( jQuery( '<span class="widget_state"></span>' ).prepend(
-											wi_enabled ? enabled_icon_tag : disabled_icon_tag ) );
+	jQuery( newWidget ).prepend( jQuery( '<span class="widget_state">'+( wi_enabled ? enabled_icon_tag : disabled_icon_tag )+'</span>' ) );
 
-	var actionIcons = jQuery( '<span class="widget_actions"></span>' ); // container for action icons
-	jQuery( actionIcons ).prepend( jQuery( delete_icon_tag ).attr( 'onclick', 'deleteWidget( "'+wi_ID+'" );' ) );	// add delete action
-	jQuery( actionIcons ).prepend( jQuery( edit_icon_tag ).attr( 'onclick', 'editWidget( "'+wi_ID+'" );' ) );	// add edit action
-	jQuery( actionIcons ).prepend( jQuery( '<span class="toggle_action">' + ( wi_enabled ? deactivate_icon_tag : activate_icon_tag ) + '</span>' ).attr( 'onclick', 'toggleWidget( "' + wi_ID + '" );' ) ); // add toggle action
+	// Add action icons:
+	var actionIcons = jQuery( '<span class="widget_actions"><a href="#" class="toggle_action" onclick="return toggleWidget( \''+wi_ID+'\' );">'
+				+( wi_enabled ? deactivate_icon_tag : activate_icon_tag )+'</a><a href="#" onclick="return editWidget( \''+wi_ID+'\' );">'
+				+edit_icon_tag+'</a><a href="#" onclick="return deleteWidget( \''+wi_ID+'\' );">'
+				+delete_icon_tag+'</a></span>' );
 	jQuery( newWidget ).prepend( actionIcons ); // add widget action icons
 
 	jQuery( '#container_'+container ).append( newWidget );	// add widget to container
+
 	makeDragnDrop( '#'+wi_ID );
 	colourWidgets();	// recolour the widgets
 }
@@ -577,6 +569,7 @@ function toggleWidget( wi_ID )
 {
 	//console.log( 'Toggling widget #' + wi_ID.substr( 6 ) );
 	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ) );
+	return false;
 }
 
 /**
