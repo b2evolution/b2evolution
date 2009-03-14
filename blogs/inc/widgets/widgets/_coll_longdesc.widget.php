@@ -114,9 +114,8 @@ class coll_longdesc_Widget extends ComponentWidget
 		// Display title if requested
 		$this->disp_title();
 
-		echo '<p>';
 		$Blog->disp( 'longdesc', 'htmlbody' );
-		echo '</p>';
+
 		echo $this->disp_params['block_end'];
 
 		return true;
@@ -126,6 +125,9 @@ class coll_longdesc_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.8  2009/03/14 15:27:01  blueyed
+ * coll_longdesc_Widget: do not add hardcoded P tags around the long desc, which can be html itself
+ *
  * Revision 1.7  2009/03/13 02:32:07  fplanque
  * Cleaned up widgets.
  * Removed stupid widget_name param.
