@@ -684,7 +684,11 @@ class ComponentWidget extends DataObject
 
 		if( $this->disp_params[ 'disp_excerpt' ] )
 		{
-			echo '<p>'.$Item->dget( 'excerpt', 'htmlbody' ).'</p>'; // Excerpts are plain text -- no html (at least for now)
+			$excerpt = $Item->dget( 'excerpt', 'htmlbody' );
+			if( !empty($excerpt) )
+			{	// Note: Excerpts are plain text -- no html (at least for now)
+				echo '<div class="item_excerpt">'.$excerpt.'</div>';
+			}
 		}
 
 		if( $this->disp_params['disp_teaser'] )
@@ -698,7 +702,7 @@ class ComponentWidget extends DataObject
 						'continued_text' => '&hellip;',
 					 ) );
 			}
-			echo ' <span class="excerpt">'.$content.'</span>';
+			echo '<div class="item_content">'.$content.'</div>';
 
 			/* fp> does that really make sense?
 				we're no longer in a linkblog/linkroll use case here, are we?
@@ -822,6 +826,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.54  2009/03/14 03:28:00  fplanque
+ * tiny cleanup
+ *
  * Revision 1.53  2009/03/14 03:02:56  fplanque
  * Moving towards an universal item list widget, step 1
  *
