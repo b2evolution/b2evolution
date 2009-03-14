@@ -459,7 +459,7 @@ if( isset( $skin ) )
 
 	if( $Skin->type == 'feed' )
 	{	// Check if we actually allow the display of the feed; last chance to revert to 404 displayed in default skin.
-		// Note: Skins with the type "feed" can be always accessed, even when they're not installed.
+		// Note: Skins with the type "feed" can always be accessed, even when they're not installed.
 		if( $Blog->get_setting('feed_content') == 'none' )
 		{ // We don't want to provide feeds; revert to 404!
 			unset( $skin );
@@ -592,6 +592,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.118  2009/03/14 19:22:29  fplanque
+ * minor
+ *
  * Revision 1.117  2009/03/13 21:43:12  blueyed
  * fix doc
  *

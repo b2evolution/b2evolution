@@ -165,10 +165,9 @@ class coll_xml_feeds_Widget extends ComponentWidget
 			 */
 			global $global_Cache;
 
-			// Tblue> TODO: Localization for the link title??
 			$feedhlp = $global_Cache->get( 'feedhlp' );
 			if( empty( $feedhlp ) )
-			{	// Use basic default: (fp> needs serious update)
+			{	// Use basic default: (fp> needs serious update) -- Note: no localization because destination is in English anyway.
 				$feedhlp = array( array( 'http://webreference.fr/2006/08/30/rss_atom_xml', 'What is RSS?' ) );
 			}
 
@@ -192,6 +191,9 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.16  2009/03/14 19:22:30  fplanque
+ * minor
+ *
  * Revision 1.15  2009/03/13 14:20:50  tblue246
  * doc
  *
