@@ -124,13 +124,13 @@ jQuery(document).ready(function()
 		{ // grab each widget in container
 			var widget = jQuery( this ).attr( "id" );
 			the_widgets[ container ][ widget ] = new Array();
-			the_widgets[ container ][ widget ]["name"] = jQuery( "#"+widget).find('.widget_name' ).html();
+			the_widgets[ container ][ widget ]["name"] = jQuery( "#"+widget ).find('.widget_name' ).html();
 			the_widgets[ container ][ widget ]["class"] = jQuery( this ).attr( "className" );
 			the_widgets[ container ][ widget ]["enabled"] = jQuery( "#" + widget ).find( '.widget_is_enabled' ).size() > 0 ? 1 : 0;
 		} );
 	});
 
-	// create new container for each currrent container
+	// create new container for each current container
 	for( container in the_widgets )
 	{	// loop through each container
 		var is_droppable = !jQuery( '#'+container ).hasClass( "no-drop" );
