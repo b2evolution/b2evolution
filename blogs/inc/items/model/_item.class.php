@@ -2945,6 +2945,8 @@ class Item extends ItemLight
 
 		$this->update_renderers_from_Plugins();
 
+		$this->update_excerpt();
+
 		// TODO: allow a plugin to cancel update here (by returning false)?
 		$Plugins->trigger_event( 'PrependItemInsertTransact', $params = array( 'Item' => & $this ) );
 
@@ -2993,6 +2995,8 @@ class Item extends ItemLight
 		}
 
 		$this->update_renderers_from_Plugins();
+
+		$this->update_excerpt();
 
 		// TODO: dh> allow a plugin to cancel update here (by returning false)?
 		$Plugins->trigger_event( 'PrependItemUpdateTransact', $params = array( 'Item' => & $this ) );
@@ -3073,6 +3077,21 @@ class Item extends ItemLight
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Quick and dirty "excerpts should not stay empty".
+	 *
+	 * @todo have a maxlength param for excerpts in blog properties
+	 * @todo crop at word boundary, maybe even sentence boundary.
+	 */
+	function update_excerpt()
+	{
+		if( empty($this->excerpt) )
+		{
+			$this->set( 'excerpt', substr( strip_tags($this->content), 0, 100 ) );
+		}
 	}
 
 
@@ -3683,6 +3702,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.86  2009/03/14 03:28:40  fplanque
+ * Quick and dirty "excerpts should not stay empty".
+ *
  * Revision 1.85  2009/03/08 23:57:43  fplanque
  * 2009
  *
