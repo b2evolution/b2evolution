@@ -64,26 +64,35 @@ var reorder_delay_remaining = 0;
  *
  * Activates the new interface if javascript enabled
  */
-jQuery(document).ready(function(){
+jQuery(document).ready(function()
+{
 	// grab some constants
 	edit_icon_tag = jQuery( '.edit_icon_hook' ).find( 'a' ).html();// grab the edit icon
 	delete_icon_tag = jQuery( '.delete_icon_hook' ).find( 'a' ).html();// grab the delete icon
 
 	// Modify the current widgets screen
-	jQuery( ".new_widget" ).parent().parent().remove();// remove the "no widgets yet" placeholder
-	jQuery( ".odd" ).addClass( "widget_row" ).removeClass( ".odd" ); // get rid of the odd class and add our own class
-	jQuery( ".even" ).addClass( "widget_row" ).removeClass( ".even" ); // get rid of the even class and add our own class
-	jQuery( ".fieldset_title_bg > span > a" ).each( function(){ // Intercept normal "add new widget" action
-			jQuery( this ).replaceWith( '<span class="add_new_widget" id="'+( jQuery( this ).attr( "id" ) )+'" title="'+( jQuery( this ).attr( 'title' ) )+'">'+jQuery( this ).find( '.add_new_widget_text' ).html()+'</span>' );
+	// remove the "no widgets yet" placeholder:
+	jQuery( ".new_widget" ).parent().parent().remove();
+	// get rid of the odd/even classes and add our own class:
+	jQuery( ".odd" ).addClass( "widget_row" ).removeClass( ".odd" );
+	jQuery( ".even" ).addClass( "widget_row" ).removeClass( ".even" );
+	// Intercept normal "add new widget" action:
+	jQuery( ".fieldset_title_bg > span > a" ).each( function()
+	{
+		jQuery( this ).replaceWith( '<span class="add_new_widget" id="'+( jQuery( this ).attr( "id" ) )+'" title="'+( jQuery( this ).attr( 'title' ) )+'">'+jQuery( this ).find( '.add_new_widget_text' ).html()+'</span>' );
 	});
-	jQuery( '.fieldset_title' ).each( function(){ // make container title droppable
-		jQuery( this ).droppable({
-		accept: ".draggable_widget", // classname of objects that can be dropped
-		hoverClass: "droppable-hover", // classname when object is over this one
-		greedy: true, // stops propogation if over more than one
-		tolerance : "pointer", // droppable active when cursor over
-		delay: 1000,
-		drop: function(ev, ui) {	// function called when object dropped
+
+	// make container title droppable -- fp> does this work? It would actually be cool to drop 'after' the current line in which case dropping on the title would make sense
+	jQuery( '.fieldset_title' ).each( function(){
+		jQuery( this ).droppable(
+		{
+			accept: ".draggable_widget", // classname of objects that can be dropped
+			hoverClass: "droppable-hover", // classname when object is over this one
+			greedy: true, // stops propogation if over more than one
+			tolerance : "pointer", // droppable active when cursor over
+			delay: 1000,
+			drop: function(ev, ui)
+			{	// function called when object dropped
 				jQuery( ".fade_me" ).removeClass( "fade_me" ); // remove any existing fades
 				jQuery( '.available_widgets' ).removeClass( 'available_widgets_active' ); // close any open windows
 
@@ -97,20 +106,22 @@ jQuery(document).ready(function(){
 		});
 	} );
 
-
-	// grab the widget ID out of the "delete" url and add as ID to parent row
-	jQuery( '.widget_row td:nth-child(5)' ).each( function(){
+	// grab the widget ID out of the "delete" url and add as ID to parent row:
+	jQuery( '.widget_row td:nth-child(5)' ).each( function()
+	{
 		var widget_id = jQuery( this ).find( 'a' ).attr( "href" );
 		widget_id = widget_id.substr( widget_id.indexOf( "wi_ID=" ) + 6, widget_id.length ); // extract ID
 		jQuery( this ).parent().attr( "id", "wi_ID_"+widget_id ); // add ID to parent row
 	});
 
-	// time to convert the tables
+	// Convert the tables:
 	var the_widgets = new Array();
-	jQuery( ".grouped" ).each( function(){ // grab each container
+	jQuery( ".grouped" ).each( function()
+	{ // grab each container
 		var container = jQuery( this ).attr( "id" );
 		the_widgets[ container ] = new Array();
-		jQuery( "#"+container+" .widget_row" ).each( function(){ // grab each widget in container
+		jQuery( "#"+container+" .widget_row" ).each( function()
+		{ // grab each widget in container
 			var widget = jQuery( this ).attr( "id" );
 			the_widgets[ container ][ widget ] = new Array();
 			the_widgets[ container ][ widget ]["name"] = jQuery( "#"+widget).find('.widget_name' ).html();
@@ -137,19 +148,22 @@ jQuery(document).ready(function(){
 		}
 	}
 
-	jQuery( '.no-drop .draggable_widget').droppable( "disable" ); // disable dropping on empty containers
-	jQuery( '.draggable_widget' ).bind( 'mousedown', function(){ // hide any available widgets panes
-				if( !jQuery( this ).hasClass( 'new_widget' ) )
-				{	// we're dragging a current widget
-					jQuery( '.available_widgets_active' ).removeClass( 'available_widgets_active' );// close any open "available widgets" screens
-				}
+	// disable dropping on empty containers:
+	jQuery( '.no-drop .draggable_widget').droppable( "disable" );
+	jQuery( '.draggable_widget' ).bind( 'mousedown', function()
+	{ // hide any available widgets panes
+		if( !jQuery( this ).hasClass( 'new_widget' ) )
+		{	// we're dragging a current widget, close any open "available widgets" screens
+			jQuery( '.available_widgets_active' ).removeClass( 'available_widgets_active' );
+		}
 	});
 
 	colourWidgets(); // add odd/even classes to widgets
 
 	convertAvailableList(); // converts available widgets list to something we can work with
 
-	jQuery( 'body' ).append( '<div id="screen_mask"></div><div id="widget_settings"></div>' );// add placeholder for widgets settings form
+	// add placeholder for widgets settings form:
+	jQuery( 'body' ).append( '<div id="screen_mask"></div><div id="widget_settings"></div>' );
 	jQuery( '#screen_mask' ).bind( 'click', function(){
 		jQuery( this ).removeClass( 'screen_mask_active' );
 		jQuery( '#widget_settings' ).removeClass( 'widget_settings_active' );
@@ -158,12 +172,14 @@ jQuery(document).ready(function(){
 
 	doFade( ".fadeout-ffff00" );// highlight any changed widgets
 
-	jQuery( '.widget_actions' ).bind( 'mouseover', function( e ){ // need to disable draggable to allow icons to be clicked :-S
+	jQuery( '.widget_actions' ).bind( 'mouseover', function( e )
+	{ // need to disable draggable to allow icons to be clicked :-S
 		jQuery( this ).parent().draggable( 'disable' );
 		return false;
 	});
 
-	jQuery( '.widget_actions' ).bind( 'mouseleave', function( e ){ // re-enable draggable functionality
+	jQuery( '.widget_actions' ).bind( 'mouseleave', function( e )
+	{ // re-enable draggable functionality
 		jQuery( this ).parent().draggable( 'enable' );
 		return false;
 	});
@@ -190,14 +206,15 @@ function makeDragnDrop( selector )
  */
 function makeDraggable( selector )
 {
-	jQuery( selector ).draggable({
-			helper: "clone", // use a copy of the image
-			scroll: true, // scroll the window during dragging
-			scrollSensitivity: 100, // distance from edge before scoll occurs
-			zIndex: 999, // z-index whilst dragging
-			opacity: .8, // opacity whilst dragging
-			cursor: "move" // change the cursor whilst dragging
-		}).addClass( "draggable_widget" ); // add our css class
+	jQuery( selector ).draggable(
+	{
+		helper: "clone", // use a copy of the image
+		scroll: true, // scroll the window during dragging
+		scrollSensitivity: 100, // distance from edge before scoll occurs
+		zIndex: 999, // z-index whilst dragging
+		opacity: .8, // opacity whilst dragging
+		cursor: "move" // change the cursor whilst dragging
+	}).addClass( "draggable_widget" ); // add our css class
 }
 
 /**
@@ -207,40 +224,42 @@ function makeDraggable( selector )
  */
 function makeDroppable( selector )
 {
-	jQuery( selector ).droppable({
+	jQuery( selector ).droppable(
+	{
 		accept: ".draggable_widget", // classname of objects that can be dropped
 		hoverClass: "droppable-hover", // classname when object is over this one
 		greedy: true, // stops propogation if over more than one
 		tolerance : "pointer", // droppable active when cursor over
 		delay: 1000,
-		drop: function(ev, ui) {	// function called when object dropped
-				jQuery( ".fade_me" ).removeClass( "fade_me" ); // remove any existing fades
-				jQuery( '.available_widgets' ).removeClass( 'available_widgets_active' ); // close any open windows
-				if( !jQuery( this ).hasClass( "available_widgets" ) )
-				{	// we're not deleting it
-					if( jQuery( ui.draggable ).hasClass( "new_widget" ) )
-					{	// this is a new widget, we need to treat it diffently
-						addNewWidget( ui.draggable, this ); // add as new widget
-					}
-					else
-					{	// this is an existing widget, just move it
-						jQuery( ui.draggable ).insertBefore( this ); // add the dragged widget before this widget
-						jQuery( ui.draggable ).addClass( "fade_me server_update" ); // add fade class
-						jQuery( ui.draggable ).droppable( "enable" );	// enable dropping if disabled
-					}
+		drop: function(ev, ui)
+		{	// function called when object dropped
+			jQuery( ".fade_me" ).removeClass( "fade_me" ); // remove any existing fades
+			jQuery( '.available_widgets' ).removeClass( 'available_widgets_active' ); // close any open windows
+			if( !jQuery( this ).hasClass( "available_widgets" ) )
+			{	// we're not deleting it
+				if( jQuery( ui.draggable ).hasClass( "new_widget" ) )
+				{	// this is a new widget, we need to treat it diffently
+					addNewWidget( ui.draggable, this ); // add as new widget
 				}
 				else
-				{ // we might be deleting the widget
-					if(  !jQuery( ui.draggable ).hasClass( "new_widget" ) )
-					{ // we're deleting it
-						jQuery( ui.draggable ).remove();
-					}
+				{	// this is an existing widget, just move it
+					jQuery( ui.draggable ).insertBefore( this ); // add the dragged widget before this widget
+					jQuery( ui.draggable ).addClass( "fade_me server_update" ); // add fade class
+					jQuery( ui.draggable ).droppable( "enable" );	// enable dropping if disabled
 				}
-				doFade( ".fade_me" ); // fade the widget
-				colourWidgets();
-				sendWidgetOrder();// send the new order to the server
 			}
-		});
+			else
+			{ // we might be deleting the widget
+				if(  !jQuery( ui.draggable ).hasClass( "new_widget" ) )
+				{ // we're deleting it
+					jQuery( ui.draggable ).remove();
+				}
+			}
+			doFade( ".fade_me" ); // fade the widget
+			colourWidgets();
+			sendWidgetOrder();// send the new order to the server
+		}
+	});
 }
 
 /**
@@ -437,13 +456,16 @@ function T_( native_string )
  */
 function convertAvailableList()
 {
-	jQuery( '.add_new_widget' ).bind( 'mouseover', function(e){
+	// Open list on click, not on hover!
+	jQuery( '.add_new_widget' ).bind( 'click', function(e)
+	{
 		offset = jQuery( this ).offset();
 		jQuery( '.available_widgets' ).css( {top : offset.top, right: jQuery( 'body' ).width() - offset.left - jQuery( this ).width() } ).addClass( 'available_widgets_active' ).attr( 'id', 'available_'+jQuery( this ).attr( "id" ) );
 	});
 
-	jQuery( '.available_widgets' ).bind( 'mouseleave', function(e){
-		jQuery( this ).removeClass( 'available_widgets_active' );
+	// Close action:
+	jQuery( '.available_widgets_toolbar > a' ).bind( 'click', function(e){
+		jQuery('.available_widgets').removeClass( 'available_widgets_active' );
 	});
 
 	jQuery( ".available_widgets li" ).each( function(){ // shuffle things around
@@ -455,10 +477,6 @@ function convertAvailableList()
 			addNewWidget( this, the_link );
 		});
 	});
-
-	jQuery( '<div class="available_widgets_toolbar"></div>' ).prependTo( '.available_widgets' );
-	jQuery( '.available_widgets_toolbar' ).html( jQuery( '.available_widgets > legend' ).html() );
-	jQuery( '.available_widgets > legend' ).remove();
 }
 
 
@@ -520,7 +538,7 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 	}
 
 	// Add state indicator:
-	jQuery( newWidget ).prepend( jQuery( '<span class="widget_state"></span>' ).prepend( 
+	jQuery( newWidget ).prepend( jQuery( '<span class="widget_state"></span>' ).prepend(
 											wi_enabled ? enabled_icon_tag : disabled_icon_tag ) );
 
 	var actionIcons = jQuery( '<span class="widget_actions"></span>' ); // container for action icons

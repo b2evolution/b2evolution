@@ -461,11 +461,13 @@ switch( $action )
 		$AdminUI->disp_payload_begin();
 
 		// Display VIEW:
-		echo '<fieldset class="available_widgets">'."\n"; // this will be enabled if js available
-		echo '<legend>'.T_( 'Add new widget' ).'</legend>'."\n";
+
+		// this will be enabled if js available:
+		echo '<div class="available_widgets">'."\n";
+		echo '<div class="available_widgets_toolbar"><a href="#" class="floatright" style="padding: 2px;">'.get_icon('close').'</a>'.T_( 'Add new widget' ).'</div>'."\n";
 		echo '<div id="available_widgets_inner">'."\n";
 		$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );
-		echo '</div></fieldset><!-- /available_widgets -->'."\n";
+		echo '</div></div><!-- /available_widgets -->'."\n";
 
 		// Display VIEW:
 		$AdminUI->disp_view( 'widgets/views/_widget_list.view.php' );
@@ -481,6 +483,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2009/03/14 20:01:05  fplanque
+ * stop the clickless nonsense that opens and closes without your consent
+ *
  * Revision 1.21  2009/03/13 02:32:08  fplanque
  * Cleaned up widgets.
  * Removed stupid widget_name param.
