@@ -82,7 +82,7 @@ jQuery(document).ready(function()
 		jQuery( this ).replaceWith( '<span class="add_new_widget" id="'+( jQuery( this ).attr( "id" ) )+'" title="'+( jQuery( this ).attr( 'title' ) )+'">'+jQuery( this ).find( '.add_new_widget_text' ).html()+'</span>' );
 	});
 
-	// make container title droppable -- fp> does this work? It would actually be cool to drop 'after' the current line in which case dropping on the title would make sense
+	// make container title droppable -- fp> This works but gives no visual feedback. It would actually be cool to drop 'after' the current line in which case dropping on the title would make sense
 	jQuery( '.fieldset_title' ).each( function(){
 		jQuery( this ).droppable(
 		{
@@ -460,7 +460,16 @@ function convertAvailableList()
 	jQuery( '.add_new_widget' ).bind( 'click', function(e)
 	{
 		offset = jQuery( this ).offset();
-		jQuery( '.available_widgets' ).css( {top : offset.top, right: jQuery( 'body' ).width() - offset.left - jQuery( this ).width() } ).addClass( 'available_widgets_active' ).attr( 'id', 'available_'+jQuery( this ).attr( "id" ) );
+		y = offset.top;
+		// can't dislay any lower than this!:
+		// max_y = jQuery( window ).height() - jQuery( '.available_widgets' ).height(); // this doesn't work when window is scrolled :(
+		max_y = jQuery( document ).height() - 10 - jQuery( '.available_widgets' ).height();
+		if( max_y < 20 ) { max_y = 20 };
+		if( y > max_y ) { y = max_y };
+		jQuery( '.available_widgets' ).css(
+			{top : y,
+			right: jQuery( document ).width() - offset.left - jQuery( this ).width() } )
+			.addClass( 'available_widgets_active' ).attr( 'id', 'available_'+jQuery( this ).attr( "id" ) );
 	});
 
 	// Close action:
@@ -468,12 +477,15 @@ function convertAvailableList()
 		jQuery('.available_widgets').removeClass( 'available_widgets_active' );
 	});
 
-	jQuery( ".available_widgets li" ).each( function(){ // shuffle things around
+	jQuery( ".available_widgets li" ).each( function()
+	{ // shuffle things around
 		jQuery( this ).addClass( "new_widget" ); // add hook for detecting new widgets
+
 		var the_link = jQuery( this ).children( 'a' ).attr( 'href' ); // grab the url
 		the_link = the_link.substr( the_link.indexOf( '&type' ) + 1, the_link.length );
-		jQuery( this ).children( 'a' ).replaceWith( jQuery( this ).children( 'a' ).html() ); // remove the link
-		jQuery( this ).find( 'strong' ).bind( 'click', function(){ // enable add new widget action
+
+		// replace href with JS addnewwidget action:
+		jQuery( this ).children( 'a' ).attr( 'href', '#' ).bind( 'click', function(){
 			addNewWidget( this, the_link );
 		});
 	});
