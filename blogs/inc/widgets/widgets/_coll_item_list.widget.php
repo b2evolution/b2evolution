@@ -59,10 +59,12 @@ class coll_item_list_Widget extends ComponentWidget
 		 */
 		$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
 
-		$item_type_options = $ItemTypeCache->get_option_array();
-		// It would be better if the following appeared on top, but the 'select' param type does not handle custom orders
-		$item_type_options['#'] = T_('Default');
-		$item_type_options[''] = T_('All');
+		$item_type_options = array_merge(
+			array(
+				'#' => T_('Default'),
+				''  => T_('All'),
+			),
+			$ItemTypeCache->get_option_array() );
 
 		$r = array_merge( array(
 				'title' => array(
@@ -361,6 +363,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.4  2009/03/15 23:09:09  blueyed
+ * coll_item_list_widget: fix order as per todo
+ *
  * Revision 1.3  2009/03/15 22:48:16  fplanque
  * refactoring... final step :)
  *
