@@ -29,10 +29,10 @@ $core_componentwidget_defs = array(
 			'coll_item_list',			// Universal Item List
 			'coll_post_list',			// Simple List
 			'coll_page_list',			// Simple List
-			'links',
-			'linkblog',
-			'coll_comment_list',
+			'links',		          // Simple List
+			'linkblog',	        	// Simple List
 			'coll_media_index',
+			'coll_comment_list',
 		'*'.T_('Blog navigation'),
 			'coll_tag_cloud',
 			'coll_category_list',
@@ -114,6 +114,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.20  2009/03/15 22:48:16  fplanque
+ * refactoring... final step :)
+ *
  * Revision 1.19  2009/03/15 20:54:53  fplanque
  * minor cleanup
  *

@@ -434,7 +434,7 @@ function install_basic_widgets()
 							  WHERE blog_ID <> 2' );
 	// Add linkblog to blog Sidebars for blog A & B:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-							 SELECT blog_ID, "Sidebar", 8, "core", "linkblog", \'a:6:{s:5:"title";s:8:"Blogroll";s:11:"linkblog_ID";s:1:"3";s:14:"linkblog_limit";s:3:"100";s:11:"widget_name";s:8:"Linkblog";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\'
+							 SELECT blog_ID, "Sidebar", 8, "core", "linkblog", "'.$DB->escape(serialize(array('blog_ID'=>3))).'"
 							   FROM T_blogs
 							  WHERE blog_ID <= 2' );
 	// Add XML feeds to all blogs Sidebars:
@@ -677,6 +677,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.57  2009/03/15 22:48:16  fplanque
+ * refactoring... final step :)
+ *
  * Revision 1.56  2009/03/08 23:57:47  fplanque
  * 2009
  *

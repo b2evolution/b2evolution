@@ -106,10 +106,8 @@ class coll_page_list_Widget extends coll_item_list_Widget
 	 */
 	function display( $params )
 	{
-		$this->init_display( $params );
-
 		// Force some params (because this is a simplified widget):
-		$this->disp_params['item_type'] = '1000';	// Use item types 1000 (pages) only
+		$params['item_type'] = '1000';	// Use item types 1000 (pages) only
 
 		parent::display( $params );
 
@@ -120,6 +118,9 @@ class coll_page_list_Widget extends coll_item_list_Widget
 
 /*
  * $Log$
+ * Revision 1.16  2009/03/15 22:48:16  fplanque
+ * refactoring... final step :)
+ *
  * Revision 1.15  2009/03/15 21:40:23  fplanque
  * killer factoring
  *

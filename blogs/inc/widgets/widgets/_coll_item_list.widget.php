@@ -59,6 +59,11 @@ class coll_item_list_Widget extends ComponentWidget
 		 */
 		$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
 
+		$item_type_options = $ItemTypeCache->get_option_array();
+		// It would be better if the following appeared on top, but the 'select' param type does not handle custom orders
+		$item_type_options['#'] = T_('Default');
+		$item_type_options[''] = T_('All');
+
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_('Block title'),
@@ -76,10 +81,7 @@ class coll_item_list_Widget extends ComponentWidget
 					'label' => T_('Item type'),
 					'note' => T_('What kind of items do you want to list?'),
 					'type' => 'select',
-					'options' => array_merge( array(
-							'#' => T_('Default'),
-							'' => T_('All'),
-						), $ItemTypeCache->get_option_array() ),
+					'options' => $item_type_options,
 					'defaultvalue' => '#',
 				),
 				'blog_ID' => array(
@@ -145,6 +147,8 @@ class coll_item_list_Widget extends ComponentWidget
 					'note' => T_( 'Max number of words for the teasers.' ),
 				),
 			), parent::get_param_definitions( $params )	);
+
+		// pre_dump( $r['item_type']['options'] );
 
 		return $r;
 	}
@@ -247,6 +251,8 @@ class coll_item_list_Widget extends ComponentWidget
 			$filters['cat_modifier'] = $linkblog_cat_modifier;
 		}
 
+		// pre_dump( $filters );
+
 		$ItemList->set_filters( $filters, false ); // we don't want to memorize these params
 
 		// Run the query:
@@ -277,13 +283,8 @@ class coll_item_list_Widget extends ComponentWidget
 				echo $this->disp_params['group_start'];
 
 				while( $Item = & $ItemList->get_item() )
-				{
-					echo $this->disp_params['item_start'];
-
-					// Display contents of the Item depending on widget params:
+				{	// Display contents of the Item depending on widget params:
 					$this->disp_contents( $Item );
-
-					echo $this->disp_params['item_end'];
 				}
 
 				// Close cat
@@ -297,13 +298,8 @@ class coll_item_list_Widget extends ComponentWidget
 			 * @var ItemLight (or Item)
 			 */
 			while( $Item = & $ItemList->get_item() )
-			{
-				echo $this->disp_params['item_start'];
-
-				// Display contents of the Item depending on widget params:
+			{ // Display contents of the Item depending on widget params:
 				$this->disp_contents( $Item );
-
-				echo $this->disp_params['item_end'];
 			}
 		}
 
@@ -312,11 +308,62 @@ class coll_item_list_Widget extends ComponentWidget
 		echo $this->disp_params['block_end'];
 	}
 
+
+	/**
+	 * Support function for above
+	 *
+	 * @param Item
+	 */
+	function disp_contents( & $Item )
+	{
+		echo $this->disp_params['item_start'];
+
+		$Item->title( array(
+				'link_type' => $this->disp_params['item_title_link_type'],
+			) );
+
+		if( $this->disp_params[ 'disp_excerpt' ] )
+		{
+			$excerpt = $Item->dget( 'excerpt', 'htmlbody' );
+			if( !empty($excerpt) )
+			{	// Note: Excerpts are plain text -- no html (at least for now)
+				echo '<div class="item_excerpt">'.$excerpt.'</div>';
+			}
+		}
+
+		if( $this->disp_params['disp_teaser'] )
+		{ // we want to show some or all of the post content
+			$content = $Item->get_content_teaser( 1, false, 'htmlbody' );
+
+			if( $words = $this->disp_params['disp_teaser_maxwords'] )
+			{ // limit number of words
+				$content = strmaxwords( $content, $words, array(
+						'continued_link' => $Item->get_permanent_url(),
+						'continued_text' => '&hellip;',
+					 ) );
+			}
+			echo '<div class="item_content">'.$content.'</div>';
+
+			/* fp> does that really make sense?
+				we're no longer in a linkblog/linkroll use case here, are we?
+			$Item->more_link( array(
+					'before'    => '',
+					'after'     => '',
+					'link_text' => T_('more').' &raquo;',
+				) );
+				*/
+		}
+
+		echo $this->disp_params['item_end'];
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.3  2009/03/15 22:48:16  fplanque
+ * refactoring... final step :)
+ *
  * Revision 1.2  2009/03/15 21:40:23  fplanque
  * killer factoring
  *

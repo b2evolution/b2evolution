@@ -77,7 +77,7 @@ class linkblog_Widget extends coll_item_list_Widget
 	 */
 	function get_name()
 	{
-		return T_('Linkblog');
+		return T_('Simple Linkblog Links list');
 	}
 
 
@@ -95,7 +95,7 @@ class linkblog_Widget extends coll_item_list_Widget
 	 */
 	function get_desc()
 	{
-		return T_('Simplified Item list for listing posts.');
+		return T_('Simplified Item list for listing links from another blog.');
 	}
 
 
@@ -116,11 +116,11 @@ class linkblog_Widget extends coll_item_list_Widget
 		{	// We want to try and use previous defaults:
 			if( !empty( $this->disp_params['linkblog_ID'] ) )
 			{
-				$this->disp_params['blog_ID'] = $this->disp_params['linkblog_ID'];
+				$params['blog_ID'] = $this->disp_params['linkblog_ID'];
 			}
 			else
 			{ // Recycle the previous value from deprecated links_blog_ID param. We will eventually drop that field from the database.
-				$this->disp_params['blog_ID'] = $Blog->get('links_blog_ID');
+				$params['blog_ID'] = $Blog->get('links_blog_ID');
 			}
 		}
 
@@ -133,6 +133,9 @@ class linkblog_Widget extends coll_item_list_Widget
 
 /*
  * $Log$
+ * Revision 1.21  2009/03/15 22:48:16  fplanque
+ * refactoring... final step :)
+ *
  * Revision 1.20  2009/03/15 21:56:22  fplanque
  * factoring benefits are now falling into place...
  *

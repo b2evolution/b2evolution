@@ -25,7 +25,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'widgets/model/_widget.class.php' );
+load_class( 'widgets/widgets/_coll_item_list.widget.php' );
 
 /**
  * links_widget class
@@ -34,7 +34,7 @@ load_class( 'widgets/model/_widget.class.php' );
  *
  * @package evocore
  */
-class links_Widget extends ComponentWidget
+class links_Widget extends coll_item_list_Widget
 {
 	/**
 	 * Constructor
@@ -47,12 +47,37 @@ class links_Widget extends ComponentWidget
 
 
 	/**
+	 * Get definitions for editable params
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		// This is derived from coll_post_list_Widget, so we DO NOT ADD ANY param here!
+		$r = parent::get_param_definitions( $params );
+		// We only change the defaults and hide some params.
+		$r['title']['defaultvalue'] = T_('Links');
+		$r['title_link']['no_edit'] = true;
+		$r['item_type']['no_edit'] = true;
+		$r['blog_ID']['no_edit'] = true;
+		$r['item_title_link_type']['no_edit'] = true;
+		$r['disp_excerpt']['no_edit'] = true;
+		$r['disp_teaser']['no_edit'] = true;
+		$r['disp_teaser_maxwords']['no_edit'] = true;
+		$r['widget_css_class']['no_edit'] = true;
+		$r['widget_ID']['no_edit'] = true;
+
+		return $r;
+	}
+
+
+	/**
 	 * Get name of widget
 	 */
 	function get_name()
 	{
-		$title = T_('Links list');
-		return $title;
+		return T_('Simple Sidebar Links list');
 	}
 
 
@@ -70,80 +95,7 @@ class links_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('List of sidebar links (grouped by category), click goes to link destination.');
-	}
-
-
-	/**
-	 * Get definitions for editable params
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @param local params like 'for_editing' => true
-	 */
-	function get_param_definitions( $params )
-	{
-		global $Blog;
-		// Demo data:
-		$r = array_merge( array(
-				'title' => array(
-					'label' => 'Block title',
-					'size' => 60,
-					'defaultvalue' => T_('Links'),
-					'note' => T_( 'This is the title to display in your skin.' ),
-				),
-				'order_by' => array(
-					'label' => T_('Order by'),
-					'note' => T_('How to sort the items'),
-					'type' => 'select',
-					'options' => get_available_sort_options(),
-					'defaultvalue' => 'title',
-				),
-				'order_dir' => array(
-					'label' => T_('Direction'),
-					'note' => T_('How to sort the items'),
-					'type' => 'select',
-					'options' => array( 'ASC'  => T_('Ascending'), 'DESC' => T_('Descending') ),
-					'defaultvalue' => 'ASC',
-				),
-				'limit' => array(
-					'label' => T_( 'Limit' ),
-					'size' => 4,
-					'defaultvalue' => 20,
-					'note' => T_( 'Maximum number of items to display.' ),
-				),
-				'item_title_link_type' => array(
-					'label' => T_('Link titles'),
-					'note' => T_('Where should titles be linked to?'),
-					'type' => 'select',
-					'options' => array(
-							'auto'        => T_('Automatic'),
-							'permalink'   => T_('Item permalink'),
-							'linkto_url'  => T_('Item URL'),
-							'none'        => T_('Nowhere'),
-						),
-					'defaultvalue' => 'auto',
-				),
-				'disp_excerpt' => array(
-					'label' => T_( 'Excerpt' ),
-					'note' => T_( 'Display excerpt for each item.' ),
-					'type' => 'checkbox',
-					'defaultvalue' => false,
-				),
-				'disp_teaser' => array(
-					'label' => T_( 'Teaser' ),
-					'type' => 'checkbox',
-					'defaultvalue' => false,
-					'note' => T_( 'Display teaser for each item.' ),
-				),
-				'disp_teaser_maxwords' => array(
-					'label' => T_( 'Max Words' ),
-					'type' => 'integer',
-					'defaultvalue' => 20,
-					'note' => T_( 'Max number of words for the teasers' ),
-				),
-			), parent::get_param_definitions( $params )	);
-
-		return $r;
+		return T_('Simplified Item list for listing Sidebar links.');
 	}
 
 
@@ -154,10 +106,10 @@ class links_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		$this->init_display( $params );
+		// Force some params (because this is a simplified widget):
+		$params['item_type'] = '3000';	// Use item types 3000 (sidebar links) only
 
-		// List of pages:
-		$this->disp_cat_item_list();
+		parent::display( $params );
 
 		return true;
 	}
@@ -166,6 +118,9 @@ class links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.12  2009/03/15 22:48:16  fplanque
+ * refactoring... final step :)
+ *
  * Revision 1.11  2009/03/15 02:16:35  fplanque
  * auto link option for titles
  *
