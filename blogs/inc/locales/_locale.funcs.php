@@ -140,7 +140,7 @@ if( $use_l10n )
 			{
 				if( ! isset($trans[$messages]['__meta__']) )
 				{ // Unknown/old messages format (< version 1):
-					$Debuglog->add('Found deprecated messages format (no __meta__ info).', 'locales');
+					$Debuglog->add( 'Found deprecated messages format (no __meta__ info).', 'locale' );
 					// Translate keys (e.g. 'foo\nbar') to real strings ("foo\nbar")
 					// Doing this here for all strings, is actually faster than doing it on key lookup (like it has been done before always)
 					foreach($trans[$messages] as $k => $v)
@@ -1037,6 +1037,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.24  2009/03/15 23:07:56  tblue246
+ * minor
+ *
  * Revision 1.23  2009/03/15 12:44:39  tblue246
  * doc
  *
