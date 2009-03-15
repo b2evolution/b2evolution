@@ -25,7 +25,6 @@
  *
  * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  * This file built upon code from original b2 - http://cafelog.com/
- * @package htsrv
  *
  * @todo check different encodings. only tested with iso-8859-1
  * @todo try more exotic email clients like mobile phones
@@ -716,6 +715,9 @@ if( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.37  2009/03/15 15:04:22  tblue246
+ * minor
+ *
  * Revision 1.36  2009/03/08 23:57:35  fplanque
  * 2009
  *
