@@ -395,9 +395,12 @@ function editWidget( widget )
 	return false;
 }
 
+/*
+ * This is called when we get the response from the server:
+ */
 function widgetSettings( the_html )
 {
-	jQuery( '#screen_mask' ).addClass( 'screen_mask_active' );
+	jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
 	jQuery( '#widget_settings' ).addClass( 'widget_settings_active' ).html( the_html );
 	jQuery( '#widget_settings' ).prepend( jQuery( '#server_messages' ) );
 	AttachServerRequest( 'form' ); // send form via hidden iframe
@@ -417,7 +420,7 @@ function widgetSettingsCallback( the_widget, the_name )
 
 function closeWidgetSettings()
 {
-	jQuery( '#screen_mask' ).removeClass( 'screen_mask_active' );
+	jQuery( '#screen_mask' ).hide();
 	jQuery( '#widget_settings' ).removeClass( 'widget_settings_active' );
 	jQuery( '#server_messages' ).insertBefore( '.available_widgets' );
 	return false;

@@ -154,20 +154,17 @@ cursor:pointer;
  */
 #screen_mask{
 position:fixed;
-left:-300%;
-top:-300%;
-background:#000;
-opacity:.5;
+top: 0;
+left: 0;
+background: #000;
+height: 100%;
+width: 100%;
+display:none;
 z-index:998;
 }
 
 #widget_settings{
 display:none;
-}
-
-.screen_mask_active{
-bottom:0;
-right:0;
 }
 
 #widget_settings.widget_settings_active{
