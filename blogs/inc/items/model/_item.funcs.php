@@ -172,8 +172,9 @@ function & get_featured_Item()
  * We allow up to 200 chars (which is ridiculously long) for WP import compatibility.
  *
  * @internal Tblue> What is the purpose of $query_only? Querying the DB
- *		but not modifying the URL title makes no sense to me, maybe it
- *		would be better to disable the entire query instead.
+ *                  but not modifying the URL title makes no sense to me,
+ *                  maybe it would be better to disable the entire query
+ *                  instead.
  *
  * @param string url title to validate
  * @param string real title to use as a source if $urltitle is empty (encoded in $evo_charset)
@@ -825,6 +826,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.39  2009/03/15 12:33:00  tblue246
+ * minor
+ *
  * Revision 1.38  2009/03/13 00:53:13  fplanque
  * super nasty sneaky bug
  *
