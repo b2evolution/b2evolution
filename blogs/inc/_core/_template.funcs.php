@@ -544,6 +544,73 @@ function require_css( $css_file, $relative_to_base = false, $title = NULL, $medi
 
 
 /**
+ * Memorize that a specific js helper will be required by the current page.
+ * All requested helpers will be included in the page head only once (when headlines is called)
+ * All requested helpers will add their required translation strings and any other settings
+ *
+ * @param string helper, name of the required helper
+ */
+function require_js_helper( $helper = '' )
+{
+	static $helpers;
+
+	if( empty( $helpers ) || !in_array( $helper, $helpers ) )
+	{ // add the helper
+		switch( $helper )
+		{
+			case 'helper' : // main helper object required
+				global $debug;
+				require_js( '#jquery#' ); // dependency
+				require_js( 'helper.js' );
+				add_js_headline('jQuery(document).ready(function()
+		{
+			b2evoHelper.Init({
+				debug:'.( $debug ? 'true' : 'false' ).'
+			});
+		});');
+				break;
+
+			case 'communications' : // communications object required
+				require_js_helper('helper'); // dependency
+
+				global $dispatcher;
+				require_js( 'communication.js' );
+				add_js_headline('jQuery(document).ready(function()
+		{
+			b2evoCommunications.Init({
+				dispatcher:"'.$dispatcher.'"
+			});
+		});' );
+				// add translation strings
+				T_('Update cancelled', NULL, array( 'for_helper' => true ) );
+				T_('Update paused', NULL, array( 'for_helper' => true ) );
+				T_('Changes pending', NULL, array( 'for_helper' => true ) );
+				T_('Saving changes', NULL, array( 'for_helper' => true ) );
+				break;
+		}
+		// add to list of loaded helpers
+		$helpers[] = $helper;
+	}
+}
+
+/**
+ * Memorize that a specific translation will be required by the current page.
+ * All requested translations will be included in the page body only once (when footerlines is called)
+ *
+ * @param string string, untranslated string
+ * @param string translation, translated string
+ */
+function add_js_translation( $string, $translation )
+{
+	global $js_translations;
+	if( $string != $translation )
+	{ // it's translated
+		$js_translations[ $string ] = $translation;
+	}
+}
+
+
+/**
  * Add a headline, which then gets output in the HTML HEAD section.
  * If you want to include CSS or JavaScript files, please use
  * {@link require_css()} and {@link require_js()} instead.
@@ -598,6 +665,38 @@ function include_headlines()
 	{
 		echo "\n\t<!-- headlines: -->\n\t".implode( "\n\t", $headlines );
 		echo "\n\n";
+	}
+}
+
+
+/**
+ * Outputs the collected translation lines before </body>
+ *
+ * yabs > Should this be expanded to similar functionality to headlines?
+ *
+ * @see add_js_translation()
+ */
+function include_footerlines()
+{
+	global $js_translations;
+	if( empty( $js_translations ) )
+	{ // nothing to do
+		return;
+	}
+	$r = '';
+
+	foreach( $js_translations as $string => $translation )
+	{ // output each translation
+		if( $string != $translation )
+		{ // this is translated
+			$r .= '<div><span class="b2evo_t_string">'.$string.'</span><span class="b2evo_translation">'.$translation.'</span></div>'."\n";
+		}
+	}
+	if( $r )
+	{ // we have some translations
+		echo '<div id="b2evo_translations" style="display:none;">'."\n";
+		echo $r;
+		echo '</div>'."\n";
 	}
 }
 
@@ -860,6 +959,10 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.52  2009/03/15 08:36:18  yabs
+ * Adding helper functions
+ * Adding translation strings for b2evoHelper object
+ *
  * Revision 1.51  2009/03/08 23:57:39  fplanque
  * 2009
  *
