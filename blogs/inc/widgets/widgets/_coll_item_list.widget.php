@@ -87,6 +87,13 @@ class coll_item_list_Widget extends ComponentWidget
 					'note' => T_( 'ID of the blog to use, leave empty for the current blog.' ),
 					'size' => 4,
 				),
+				'item_group_by' => array(
+					'label' => T_('Group by'),
+					'note' => T_('Do you want to group the Items?'),
+					'type' => 'select',
+					'options' => array( 'none'  => T_('None'), 'chapter' => T_('By category/chapter') ),
+					'defaultvalue' => 'none',
+				),
 				'order_by' => array(
 					'label' => T_('Order by'),
 					'note' => T_('How to sort the items'),
@@ -177,28 +184,20 @@ class coll_item_list_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		$this->init_display( $params );
-
-		// List of posts:
-		$this->disp_item_list();
-
-		return true;
-	}
-
-
-	/**
-	 * List of items
-	 *
-	 * @param string 'pages' or 'posts'
-	 */
-	function disp_item_list()
-	{
-		global $Blog;
+		global $BlogCache, $Blog;
 		global $timestamp_min, $timestamp_max;
 
-		$blogCache = get_Cache( 'BlogCache' );
-		// TODO: dh> does it make sense to die in $blogCache, in case the blog does not exist anymore?
-		$listBlog = ( $this->disp_params[ 'blog_ID' ] ? $blogCache->get_by_ID( $this->disp_params[ 'blog_ID' ] ) : $Blog );
+		$this->init_display( $params );
+
+		$listBlog = ( $this->disp_params[ 'blog_ID' ] ? $BlogCache->get_by_ID( $this->disp_params[ 'blog_ID' ], false ) : $Blog );
+
+		if( empty($listBlog) )
+		{
+			echo $this->disp_params['block_start'];
+			echo T_('The requested Blog doesn\'t exist any more!');
+			echo $this->disp_params['block_end'];
+			return;
+		}
 
 		// Create ItemList
 		// Note: we pass a widget specific prefix in order to make sure to never interfere with the mainlist
@@ -225,7 +224,30 @@ class coll_item_list_Widget extends ComponentWidget
 			$filters['types'] = $this->disp_params['item_type'];
 		}
 
-		$ItemList->set_filters( $filters, false );
+		$chapter_mode = false;
+		if( $this->disp_params['item_group_by'] == 'chapter' )
+		{	// Group by chapter:
+			$chapter_mode = true;
+
+			# This is the list of categories to restrict the linkblog to (cats will be displayed recursively)
+			# Example: $linkblog_cat = '4,6,7';
+			$linkblog_cat = '';
+
+			# This is the array if categories to restrict the linkblog to (non recursive)
+			# Example: $linkblog_catsel = array( 4, 6, 7 );
+			$linkblog_catsel = array();
+
+			// Compile cat array stuff:
+			$linkblog_cat_array = array();
+			$linkblog_cat_modifier = '';
+
+			compile_cat_array( $linkblog_cat, $linkblog_catsel, /* by ref */ $linkblog_cat_array, /* by ref */  $linkblog_cat_modifier, $listBlog->ID );
+
+			$filters['cat_array'] = $linkblog_cat_array;
+			$filters['cat_modifier'] = $linkblog_cat_modifier;
+		}
+
+		$ItemList->set_filters( $filters, false ); // we don't want to memorize these params
 
 		// Run the query:
 		$ItemList->query();
@@ -238,19 +260,51 @@ class coll_item_list_Widget extends ComponentWidget
 		echo $this->disp_params['block_start'];
 
 		$title = sprintf( ( $this->disp_params[ 'title_link' ] ? '<a href="'.$listBlog->gen_blogurl().'" rel="nofollow">%s</a>' : '%s' ), $this->disp_params[ 'title' ] );
-
 		$this->disp_title( $title );
 
 		echo $this->disp_params['list_start'];
 
-		while( $Item = & $ItemList->get_item() )
-		{
-			echo $this->disp_params['item_start'];
+		if( $chapter_mode )
+		{	// List grouped by chapter/category:
+			/**
+			 * @var ItemLight (or Item)
+			 */
+			while( $Item = & $ItemList->get_category_group() )
+			{
+				// Open new cat:
+				echo $this->disp_params['item_start'];
+				$Item->main_category();
+				echo $this->disp_params['group_start'];
 
-			// Display contents of the Item depending on widget params:
-			$this->disp_contents( $Item );
+				while( $Item = & $ItemList->get_item() )
+				{
+					echo $this->disp_params['item_start'];
 
-			echo $this->disp_params['item_end'];
+					// Display contents of the Item depending on widget params:
+					$this->disp_contents( $Item );
+
+					echo $this->disp_params['item_end'];
+				}
+
+				// Close cat
+				echo $this->disp_params['group_end'];
+				echo $this->disp_params['item_end'];
+			}
+		}
+		else
+		{	// Plain list:
+			/**
+			 * @var ItemLight (or Item)
+			 */
+			while( $Item = & $ItemList->get_item() )
+			{
+				echo $this->disp_params['item_start'];
+
+				// Display contents of the Item depending on widget params:
+				$this->disp_contents( $Item );
+
+				echo $this->disp_params['item_end'];
+			}
 		}
 
 		echo $this->disp_params['list_end'];
@@ -263,6 +317,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2009/03/15 21:40:23  fplanque
+ * killer factoring
+ *
  * Revision 1.1  2009/03/15 20:35:18  fplanque
  * Universal Item List proof of concept
  *

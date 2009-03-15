@@ -111,8 +111,7 @@ class coll_page_list_Widget extends coll_item_list_Widget
 		// Force some params (because this is a simplified widget):
 		$this->disp_params['item_type'] = '1000';	// Use item types 1000 (pages) only
 
-		// List of posts:
-		$this->disp_item_list();
+		parent::display( $params );
 
 		return true;
 	}
@@ -121,6 +120,9 @@ class coll_page_list_Widget extends coll_item_list_Widget
 
 /*
  * $Log$
+ * Revision 1.15  2009/03/15 21:40:23  fplanque
+ * killer factoring
+ *
  * Revision 1.14  2009/03/15 20:35:18  fplanque
  * Universal Item List proof of concept
  *
