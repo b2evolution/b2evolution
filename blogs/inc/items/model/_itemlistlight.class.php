@@ -287,8 +287,8 @@ class ItemListLight extends DataObjectList2
 			/*
 			 * Specific Item selection?
 			 */
-			memorize_param( $this->param_prefix.'m', 'integer', $this->default_filters['ymdhms'], $this->filters['ymdhms'] );          // YearMonth(Day) to display
-			memorize_param( $this->param_prefix.'w', 'integer', $this->default_filters['week'], $this->filters['week'] );            // Week number
+			memorize_param( $this->param_prefix.'m', '/^\d{4}(0[1-9]|1[0-2])?(?(1)(0[1-9]|[12][0-9]|3[01])?)(?(2)([01][0-9]|2[0-3])?)(?(3)([0-5][0-9]){0,2})$/', $this->default_filters['ymdhms'], $this->filters['ymdhms'] );          // YearMonth(Day) to display
+			memorize_param( $this->param_prefix.'w', '/^(0?[0-9]|[1-4][0-9]|5[0-3])$/', $this->default_filters['week'], $this->filters['week'] );            // Week number
 			memorize_param( $this->param_prefix.'dstart', 'integer', $this->default_filters['ymdhms_min'], $this->filters['ymdhms_min'] ); // YearMonth(Day) to start at
 			memorize_param( $this->param_prefix.'dstop', 'integer', $this->default_filters['ymdhms_max'], $this->filters['ymdhms_max'] ); // YearMonth(Day) to start at
 
@@ -456,8 +456,8 @@ class ItemListLight extends DataObjectList2
 		/*
 		 * If a timeframe is specified in the querystring, restrict to that timeframe:
 		 */
-		$this->filters['ymdhms'] = param( $this->param_prefix.'m', 'integer', $this->default_filters['ymdhms'], true );          // YearMonth(Day) to display
-		$this->filters['week'] = param( $this->param_prefix.'w', 'integer', $this->default_filters['week'], true );            // Week number
+		$this->filters['ymdhms'] = param( $this->param_prefix.'m', '/^\d{4}(0[1-9]|1[0-2])?(?(1)(0[1-9]|[12][0-9]|3[01])?)(?(2)([01][0-9]|2[0-3])?)(?(3)([0-5][0-9]){0,2})$/', $this->default_filters['ymdhms'], true ); // YearMonth(Day) to display
+		$this->filters['week'] = param( $this->param_prefix.'w', '/^(0?[0-9]|[1-4][0-9]|5[0-3])$/', $this->default_filters['week'], true ); // Week number (0?0-53)
 
 		$this->filters['ymdhms_min'] = param_compact_date( $this->param_prefix.'dstart', $this->default_filters['ymdhms_min'], true, T_( 'Invalid date' ) ); // YearMonth(Day) to start at
 		$this->filters['ymdhms_max'] = param_compact_date( $this->param_prefix.'dstop', $this->default_filters['ymdhms_max'], true, T_( 'Invalid date' ) ); // YearMonth(Day) to stop at
@@ -982,7 +982,7 @@ class ItemListLight extends DataObjectList2
 
 			if( !empty( $my_day ) )
 			{	// We also want to display a day
-				$arch .= ", $my_day";
+				$arch .= ', '.$my_day;
 			}
 
 			if( !empty($this->filters['week']) || ($this->filters['week'] === 0) ) // Note: week # can be 0
@@ -1510,6 +1510,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.31  2009/03/15 21:02:33  tblue246
+ * Check m and w parameters (fixes a PHP notice when specifying an invalid month).
+ *
  * Revision 1.30  2009/03/13 00:54:37  fplanque
  * calling it "sidebar links"
  *
