@@ -19,6 +19,7 @@
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author yabs {@link http://innervisions.org.uk/ }
+ * @author fplanque {@link http://fplanque.com/ }
  */
 
 
@@ -66,7 +67,7 @@ var reorder_delay_remaining = 0;
  */
 jQuery(document).ready(function()
 {
-	// grab some constants
+	// grab some constants -- fp> TODO: this is flawed. Fails when starting with an empty blog having ZERO widgets. Init that in .php
 	edit_icon_tag = jQuery( '.edit_icon_hook' ).find( 'a' ).html();// grab the edit icon
 	delete_icon_tag = jQuery( '.delete_icon_hook' ).find( 'a' ).html();// grab the delete icon
 
@@ -282,8 +283,9 @@ function sendWidgetOrder()
  *
  * Highlights the updated widgets and resets their odd/even style
  */
-function sendWidgetOrderCallback()
+function sendWidgetOrderCallback( server_response )
 {
+	// alert( server_response+' vs '+blog );
 	doFade( '.server_updating' ); // highlight updated widgets
 	jQuery( '.server_updating' ).removeClass( 'server_updating' ); // remove "needs updating"
 	colourWidgets(); // redo widget odd/even colours
@@ -304,7 +306,8 @@ function bufferedServerCall()
 		{ // we're still pending
 			window.clearTimeout( reorder_widgets_queue );// reset the timeout
 			reorder_delay_remaining -= 100; // reduce the delay
-			jQuery( '#server_messages' ).html( '<div class="log_container"><div class="log_error">'+T_( 'Changes pending' )+' <strong>' + str_repeat( '.', reorder_delay_remaining / 100 )+'</strong></div></div>' ); // update pending message
+			jQuery( '#server_messages' ).html( '<div class="log_container"><div class="log_error">'
+							+T_( 'Changes pending' )+' <strong>' + str_repeat( '.', reorder_delay_remaining / 100 )+'</strong></div></div>' ); // update pending message
 			reorder_widgets_queue = window.setTimeout( 'bufferedServerCall()', 100 ); // set timeout
 			jQuery( '.server_update' ).removeClass( 'server_update' ).addClass( 'pending_update' ); // set "needs updating"
 			return; // continue waiting
@@ -315,15 +318,17 @@ function bufferedServerCall()
 		current_widgets = new_widget_order; // store current order
 		jQuery( '.pending_update' ).removeClass( 'pending_update' ).addClass( 'server_updating' ); // change class to "updating"
 
-		SendAdminRequest( 'widgets', 're-order', current_widgets ); // send current order to server
+		SendAdminRequest( 'widgets', 're-order', new_widget_order ); // send current order to server
 	}
 	else
 	{	// widget order either hasn't changed or has been changed back to original order
-		jQuery( '#server_messages' ).html( '<div class="log_container"><div class="log_message">'+T_( 'WOW, you managed to shufffle the widgets back into their original order ..... well done .... update cancelled' )+'</div></a>' ); // inform user
+		jQuery( '#server_messages' ).html( '<div class="log_container"><div class="log_message">'
+						+T_( 'WOW, you managed to shufffle the widgets back into their original order ..... well done .... update cancelled' )+'</div></a>' ); // inform user
 		jQuery( '.pending_update' ).removeClass( 'pending_update' ); // remove "needs updating"
 		colourWidgets(); // redo widget colours
 	}
 }
+
 
 /**
  * Gets the current widget order
@@ -334,7 +339,8 @@ function getWidgetOrder()
 {
 	// need to get every container, then every widget in container and send the lot to the server
 	var containers = new Array()
-	jQuery( '.widget_container' ).each(function(){
+	jQuery( '.widget_container' ).each(function()
+	{
 		var container_name = jQuery( this ).attr('id');
 		containers[ container_name ] = '';
 		jQuery( '#'+container_name+' .draggable_widget' ).each( function(){
@@ -344,15 +350,22 @@ function getWidgetOrder()
 			}
 		});
 	});
+
 	var query_string = '';
 	var containers_list = '';
 	for( container in containers )
 	{
+		query_string += container+'='+containers[container]+'&';
 		containers_list += container+',';
-		query_string += container + '=' + containers[container] + '&';
 	}
-	return query_string + 'container_list='+containers_list;
+
+	var r = 'blog='+blog+'&'+query_string+'container_list='+containers_list;
+
+	console.log( r );
+
+	return r;
 }
+
 
 /**
  * Redo odd / even classes
@@ -384,9 +397,8 @@ function deleteWidget( widget )
 }
 
 /**
- * Functions for playing with widget settings
+ * Request edit screen from server...
  */
-
 function editWidget( widget )
 {
 	jQuery( '#server_messages' ).html( '' );
@@ -448,10 +460,10 @@ function convertAvailableList()
 	jQuery( ".fieldset_title_bg > span > a" ).attr( 'href', '#' ).bind( 'click', function(e)
 	{
 		offset = jQuery( this ).offset();
-		y = offset.top;
+		var y = offset.top;
 		// can't dislay any lower than this!:
-		// max_y = jQuery( window ).height() - jQuery( '.available_widgets' ).height(); // this doesn't work when window is scrolled :(
-		max_y = jQuery( document ).height() - 10 - jQuery( '.available_widgets' ).height();
+		// var max_y = jQuery( window ).height() - jQuery( '.available_widgets' ).height(); // this doesn't work when window is scrolled :(
+		var max_y = jQuery( document ).height() - 10 - jQuery( '.available_widgets' ).height();
 		if( max_y < 20 ) { max_y = 20 };
 		if( y > max_y ) { y = max_y };
 		jQuery( '.available_widgets' ).css(

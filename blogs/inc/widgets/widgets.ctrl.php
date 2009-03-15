@@ -57,14 +57,14 @@ switch( $action )
 		break;
 
 	case 're-order' : // js request
-		param( 'container_list', 'string' );
+		param( 'container_list', 'string', true );
 		$containers_list = explode( ',', $container_list );
 		$containers = array();
 		foreach( $containers_list as $a_container )
-		{	// add each container and grab it's widgets
+		{	// add each container and grab its widgets:
 			if( $container_name = trim( str_replace( array( 'container_', '_' ), array( '', ' ' ), $a_container ), ',' ) )
 			{
-				$containers[ $container_name ] = explode( ',', param( trim( $a_container, ',' ), 'string' ) );
+				$containers[ $container_name ] = explode( ',', param( trim( $a_container, ',' ), 'string', true ) );
 			}
 		}
 		break;
@@ -341,20 +341,21 @@ switch( $action )
 					$DB->query( 'UPDATE T_widget
 													SET wi_order = '.$order.',
 															wi_sco_name = '.$DB->quote( $container ).'
-												WHERE wi_ID = '.$widget );
+												WHERE wi_ID = '.$widget.'
+												  AND wi_coll_ID = '.$Blog->ID );	// Doh! Don't trust the client request!!
 				}
 			}
 		}
 
-		// Cleanup deleted widgets and empty temp containers (fp> what do you mean 'and empty temp containers' ??? wi_order < 1 should be enough for all scenarios, no?)
+		// Cleanup deleted widgets and empty temp containers
 		$DB->query( 'DELETE FROM T_widget
 									WHERE wi_order < 1
-										 OR wi_sco_name LIKE \'temp_%\'' );
+										AND wi_coll_ID = '.$Blog->ID ); // Doh! Don't touch other blogs!
 
 		$DB->commit();
 
  		$Messages->add( T_( 'Widgets updated' ), 'success' );
- 		send_javascript_message( array( 'sendWidgetOrderCallback' => array() ) ); // exits() automatically
+ 		send_javascript_message( array( 'sendWidgetOrderCallback' => array( 'blog='.$Blog->ID ) ) ); // exits() automatically
  		break;
 
 	default:
@@ -468,6 +469,13 @@ switch( $action )
 		echo '<div id="available_widgets_inner">'."\n";
 		$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );
 		echo '</div></div>'."\n";
+		echo '
+		<script type="text/javascript">
+			<!--
+			var blog = '.$Blog->ID.';
+			// -->
+		</script>
+		';
 
 		// Display VIEW:
 		$AdminUI->disp_view( 'widgets/views/_widget_list.view.php' );
@@ -483,6 +491,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2009/03/15 01:32:35  fplanque
+ * fixed yabbariffic bug that killed widgets when editing 2 different blogs at the same time
+ *
  * Revision 1.24  2009/03/14 21:50:46  fplanque
  * still cleaning up...
  *
@@ -531,80 +542,5 @@ $AdminUI->disp_global_footer();
  * Revision 1.11  2008/10/02 23:33:08  blueyed
  * - require_js(): remove dirty dependency handling for communication.js.
  * - Add add_js_headline() for adding inline JS and use it for admin already.
- *
- * Revision 1.10  2008/07/04 06:23:54  yabs
- * minor bug fix
- *
- * Revision 1.9  2008/07/03 09:52:51  yabs
- * widget UI
- *
- * Revision 1.8  2008/01/21 09:35:36  fplanque
- * (c) 2008
- *
- * Revision 1.7  2008/01/05 02:28:17  fplanque
- * enhanced blog selector (bloglist_buttons)
- *
- * Revision 1.6  2007/12/23 17:47:59  fplanque
- * fixes
- *
- * Revision 1.5  2007/12/23 14:14:26  fplanque
- * Enhanced widget name display
- *
- * Revision 1.4  2007/12/23 13:01:14  yabs
- * behaviour change - after install display widget settings form
- *
- * Revision 1.3  2007/12/22 19:52:17  yabs
- * cleanup from adding core params
- *
- * Revision 1.2  2007/12/22 16:56:35  yabs
- * adding core parameters for css id/classname and widget list title
- *
- * Revision 1.1  2007/06/25 11:01:54  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.14  2007/06/23 22:05:17  fplanque
- * fixes
- *
- * Revision 1.13  2007/06/22 23:46:43  fplanque
- * bug fixes
- *
- * Revision 1.12  2007/06/19 20:42:53  fplanque
- * basic demo of widget params handled by autoform_*
- *
- * Revision 1.11  2007/06/19 00:03:27  fplanque
- * doc / trying to make sense of automatic settings forms generation.
- *
- * Revision 1.10  2007/06/18 21:25:47  fplanque
- * one class per core widget
- *
- * Revision 1.9  2007/04/26 00:11:07  fplanque
- * (c) 2007
- *
- * Revision 1.8  2007/03/26 17:12:40  fplanque
- * allow moving of widgets
- *
- * Revision 1.7  2007/01/14 01:32:11  fplanque
- * more widgets supported! :)
- *
- * Revision 1.6  2007/01/13 04:10:44  fplanque
- * implemented "add" support for plugin widgets
- *
- * Revision 1.5  2007/01/12 05:15:07  fplanque
- * minor fix
- *
- * Revision 1.4  2007/01/12 02:40:26  fplanque
- * widget default params proof of concept
- * (param customization to be done)
- *
- * Revision 1.3  2007/01/11 02:57:25  fplanque
- * implemented removing widgets from containers
- *
- * Revision 1.2  2007/01/08 23:45:48  fplanque
- * A little less rough widget manager...
- * (can handle multiple instances of same widget and remembers order)
- *
- * Revision 1.1  2007/01/08 21:55:42  fplanque
- * very rough widget handling
- *
  */
 ?>
