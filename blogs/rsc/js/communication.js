@@ -30,9 +30,10 @@
  */
 jQuery(document).ready(function()
 {
-	jQuery( '<div id="server_messages"></div>' ).prependTo( '.pblock' );// placeholder for error/success messages
-	jQuery( '<iframe id="server_postback" name="server_postback"></iframe>' ).appendTo( 'body' ); // used for POST requests
-	jQuery( '#server_postback' ).css( { position:'absolute',left:"-1000em",top:"-1000em" } );
+	// placeholder for error/success messages:
+	jQuery( '<div id="server_messages"></div>' ).prependTo( '.pblock' );
+	// used for POST requests:
+	jQuery( '<iframe id="server_postback" name="server_postback"></iframe>' ).appendTo( 'body' ).css( { position:'absolute',left:"-1000em",top:"-1000em" } );
 });
 
 
@@ -86,6 +87,7 @@ function AttachServerRequest( whichForm )
 function DisplayServerMessages( messages )
 {	// display any server messages and highlight them
 	jQuery( '#server_messages' ).html( messages );
+
 	// highlight success message
 	jQuery( '#server_messages .log_success' ).animate({
 			backgroundColor: "#88ff88"
@@ -93,6 +95,7 @@ function DisplayServerMessages( messages )
 			backgroundColor: "#ffffff"
 		},"fast", "", function(){jQuery( this ).removeAttr( "style" );
 	});
+
 	// highlight error message
 	jQuery( '#server_messages > .log_error' ).animate({
 			backgroundColor: "#ff8888"
@@ -105,9 +108,7 @@ function DisplayServerMessages( messages )
 
 /**
  * Potential replacement code ( once finished )
- *
  */
-
 var _b2evoCommunications = function()
 {
 	var me; // reference to self
@@ -292,20 +293,3 @@ var _b2evoCommunications = function()
 
 // create instance of the communications object
 var b2evoCommunications = new _b2evoCommunications();
-
-
-/*
- * $Log$
- * Revision 1.6  2009/02/23 08:52:20  yabs
- * minor
- *
- * Revision 1.5  2009/02/22 06:15:28  yabs
- * adding functionality
- *
- * Revision 1.4  2009/02/18 16:23:34  yabs
- * Correcting typo
- *
- * Revision 1.3  2009/02/18 09:57:51  yabs
- * Updating drag n drop
- *
- */
