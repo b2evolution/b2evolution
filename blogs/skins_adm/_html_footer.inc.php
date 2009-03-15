@@ -64,6 +64,8 @@ if( $this->get_path(0) == 'files'
 	<?php
 }
 
+include_footerlines(); // enables translation strings for js
+
 ?>
 
 <!-- End of skin_wrapper -->
@@ -74,6 +76,9 @@ if( $this->get_path(0) == 'files'
 <?php
 /*
  * $Log$
+ * Revision 1.11  2009/03/15 08:39:35  yabs
+ * Adding translation strings for b2evoHelper object
+ *
  * Revision 1.10  2009/03/08 23:57:56  fplanque
  * 2009
  *

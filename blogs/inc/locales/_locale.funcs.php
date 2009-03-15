@@ -47,18 +47,18 @@ if( $use_l10n )
 	 *
 	 * @param string String to translate, '' to get language file info (as in gettext spec)
 	 * @param string locale to translate to, '' to use current locale
-	 * @param array Array containing the following keys: "ext_transarray" = A reference to an alternate array to use for the caching of the translated strings or NULL to use the internal array; "plugin_name" = Plugin name if you want to use a plugin translation file instead of the global one.
+	 * @param array Array containing the following keys: "ext_transarray" = A reference to an alternate array to use for the caching of the translated strings or NULL to use the internal array; "plugin_name" = Plugin name if you want to use a plugin translation file instead of the global one; (boolean) "for_helper", is the translation for the b2evoHelper object.
 	 * @return string The translated string or the original string on error.
 	 *
 	 * @internal The last two parameters are used by Plugin::T_().
 	 */
-	function T_( $string, $req_locale = '', $plugin_data = array() )
+	function T_( $string, $req_locale = '', $params = array() )
 	{
 		/**
 		 * The translations keyed by locale.
 		 *
-		 * This array is only used if $plugin_data['ext_transarray'] === NULL.
-		 * 
+		 * This array is only used if $params['ext_transarray'] === NULL.
+		 *
 		 * @var array
 		 * @static
 		 */
@@ -67,10 +67,11 @@ if( $use_l10n )
 		global $current_locale, $locales, $locales_path, $plugins_path;
 		global $evo_charset, $Debuglog;
 
-		$plugin_data = array_merge( array(
+		$params = array_merge( array(
 								'ext_transarray' => NULL,
 								'plugin_name'    => '',
-								), $plugin_data );
+								'for_helper' => false,
+								), $params );
 
 		if( empty( $req_locale ) )
 		{ // By default we use the current locale
@@ -96,7 +97,7 @@ if( $use_l10n )
 
 		$messages = $locales[$req_locale]['messages'];
 
-		if ( is_null( $plugin_data['ext_transarray'] ) )
+		if ( is_null( $params['ext_transarray'] ) )
 		{	// use our array
 			//$Debuglog->add( 'Using internal array', 'locale' );
 			$trans = & $_trans;
@@ -104,21 +105,21 @@ if( $use_l10n )
 		else
 		{	// use external array:
 			//$Debuglog->add( 'Using external array', 'locale' );
-			$trans = & $plugin_data['ext_transarray'];
+			$trans = & $params['ext_transarray'];
 		}
 
 		if( ! isset( $trans[ $messages ] ) )
 		{ // Translations for current locale have not yet been loaded:
-			if ( $plugin_data['plugin_name'] != '' )
+			if ( $params['plugin_name'] != '' )
 			{	// Load the plugin's translation file:
-				$path = $plugins_path.$plugin_data['plugin_name'].'/locales/'.$messages.'/_global.php';
+				$path = $plugins_path.$params['plugin_name'].'/locales/'.$messages.'/_global.php';
 			}
 			else
 			{	// Load our global translation file.
 				$path = $locales_path.$messages.'/_global.php';
 			}
 			$Debuglog->add( 'Loading file: '.$path, 'locale' );
-			
+
 			if( file_exists( $path ) )
 			{
 				include_once $path;
@@ -189,6 +190,11 @@ if( $use_l10n )
 			$r = convert_charset( $r, $evo_charset, $messages_charset );
 		}
 
+		if( $params['for_helper'] )
+		{ // translation is for the b2evoHelper object
+			add_js_translation( $string, $r );
+		}
+
 		//$Debuglog->add( 'Result: ['.$r.']', 'locale' );
 		return $r;
 	}
@@ -200,7 +206,7 @@ else
 	/**
 	 * @ignore
 	 */
-	function T_( $string, $req_locale = '', $plugin_data = array() )
+	function T_( $string, $req_locale = '', $params = array() )
 	{
 		return $string;
 	}
@@ -1024,6 +1030,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.22  2009/03/15 08:37:08  yabs
+ * Adding translation strings for b2evoHelper object
+ *
  * Revision 1.21  2009/03/08 23:57:45  fplanque
  * 2009
  *
