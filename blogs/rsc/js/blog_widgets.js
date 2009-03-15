@@ -65,7 +65,7 @@ var reorder_delay_remaining = 0;
  *
  * Activates the new interface if javascript enabled
  */
-jQuery(document).ready(function()
+jQuery(document).ready( function()
 {
 	// grab some constants -- fp> TODO: this is flawed. Fails when starting with an empty blog having ZERO widgets. Init that in .php
 	edit_icon_tag = jQuery( '.edit_icon_hook' ).find( 'a' ).html();// grab the edit icon
@@ -158,12 +158,6 @@ jQuery(document).ready(function()
 
 	convertAvailableList(); // converts available widgets list to something we can work with
 
-	// add placeholder for widgets settings form:
-	jQuery( 'body' ).append( '<div id="screen_mask"></div><div id="widget_settings"></div>' );
-	jQuery( '#screen_mask' ).bind( 'click', function(){
-		jQuery( this ).removeClass( 'screen_mask_active' );
-		jQuery( '#widget_settings' ).removeClass( 'widget_settings_active' );
-	});
 	current_widgets = getWidgetOrder(); // save current widget order
 
 	doFade( ".fadeout-ffff00" );// highlight any changed widgets
@@ -361,7 +355,7 @@ function getWidgetOrder()
 
 	var r = 'blog='+blog+'&'+query_string+'container_list='+containers_list;
 
-	console.log( r );
+	// console.log( r );
 
 	return r;
 }
@@ -412,29 +406,26 @@ function editWidget( widget )
  */
 function widgetSettings( the_html )
 {
-	jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
-	jQuery( '#widget_settings' ).addClass( 'widget_settings_active' ).html( the_html );
+	// add placeholder for widgets settings form:
+	jQuery( 'body' ).append( '<div id="screen_mask"></div><div id="widget_settings"></div>' );
+	jQuery( '#screen_mask' ).bind( 'click', closeWidgetSettings ).fadeTo(1,0.5).fadeIn(200);
+	jQuery( '#widget_settings' ).html( the_html ).addClass( 'widget_settings_active' );
 	jQuery( '#widget_settings' ).prepend( jQuery( '#server_messages' ) );
 	AttachServerRequest( 'form' ); // send form via hidden iframe
-	jQuery( '#widget_settings > form > span > a' ).bind( 'click', function(){
-		return closeWidgetSettings();
-	});
+	jQuery( '#widget_settings > form > span > a' ).bind( 'click', closeWidgetSettings );
 }
 
 function widgetSettingsCallback( the_widget, the_name )
 {
-	jQuery( '.fade_me' ).removeClass( 'fade_me' );
 	jQuery( '#wi_ID_'+the_widget+' .widget_name' ).html( the_name );
-	jQuery( '#wi_ID_'+the_widget ).addClass( 'fade_me' );
-
-	doFade( '.fade_me' );
 }
 
 function closeWidgetSettings()
 {
-	jQuery( '#screen_mask' ).hide();
-	jQuery( '#widget_settings' ).removeClass( 'widget_settings_active' );
+	jQuery( '#widget_settings' ).hide(); // removeClass( 'widget_settings_active' );
 	jQuery( '#server_messages' ).insertBefore( '.available_widgets' );
+	jQuery( '#widget_settings' ).remove();
+	jQuery( '#screen_mask' ).remove();
 	return false;
 }
 
