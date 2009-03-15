@@ -392,3 +392,13 @@ div.menu3 .current {
 div.menu3 .current a {
 	color: #f00;
 }
+
+
+ul.widget_list {
+	list-style: none;
+	padding-left: 1em;
+	margin-left: 0;
+}
+ul.widget_list li {
+	margin-bottom: 3px;
+}

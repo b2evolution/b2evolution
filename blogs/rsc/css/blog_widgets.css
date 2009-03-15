@@ -1,8 +1,6 @@
 /**
  * @todo yabs > : this needs sorting out once everything works
- *
  */
-
 #save_layout{
 float:left;
 margin:0 2em 0 0;
@@ -120,34 +118,22 @@ display:block;
 }
 
 #available_widgets_inner{
-padding:1em 0 1em 1em;
+padding: 1em;
 height:300px;
 overflow:auto;
 }
 
-.available_widgets h2{
-display:none;
+.available_widgets h2 {
+	display:none;
 }
 
-.available_widgets h3{
-font-size:94%;
+.available_widgets h3 {
+	margin-top: 0;
 }
 
-.available_widgets ul{
-list-style:none;
-margin:0;
-padding:0;
+.available_widgets ul {
+	padding-bottom: 1em;
 }
-
-.available_widgets li{
-margin:0;
-padding:4px;
-}
-
-.available_widgets strong{
-cursor:pointer;
-}
-
 
 /**
  * Widget settings page

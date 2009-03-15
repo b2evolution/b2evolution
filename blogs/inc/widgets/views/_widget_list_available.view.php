@@ -59,7 +59,7 @@ foreach( $core_componentwidget_defs as $code )
 		{
 			echo '</ul>';
 		}
-		echo '<h3>'.substr( $code, 1 ).':</h3><ul>';
+		echo '<h3>'.substr( $code, 1 ).':</h3><ul class="widget_list">';
 	}
 	else
 	{
@@ -98,7 +98,7 @@ if( ! empty($Plugin_array) )
 { // We have some plugins
 
 	echo '</ul>';
-	echo '<h3>'.T_('Plugins').':</h3><ul>';
+	echo '<h3>'.T_('Plugins').':</h3><ul class="widget_list">';
 
 	foreach( $Plugin_array as $ID => $Plugin )
 	{
@@ -114,6 +114,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.19  2009/03/15 20:54:53  fplanque
+ * minor cleanup
+ *
  * Revision 1.18  2009/03/15 20:35:18  fplanque
  * Universal Item List proof of concept
  *
