@@ -171,15 +171,10 @@ function & get_featured_Item()
  * Using title as a source if url title is empty.
  * We allow up to 200 chars (which is ridiculously long) for WP import compatibility.
  *
- * @internal Tblue> What is the purpose of $query_only? Querying the DB
- *                  but not modifying the URL title makes no sense to me,
- *                  maybe it would be better to disable the entire query
- *                  instead.
- *
  * @param string url title to validate
  * @param string real title to use as a source if $urltitle is empty (encoded in $evo_charset)
  * @param integer ID of post
- * @param boolean Query the DB, but don't modify the URL title if the title already exists (Useful if you only want to alert the pro user without making changes for him?)
+ * @param boolean Query the DB, but don't modify the URL title if the title already exists (Useful if you only want to alert the pro user without making changes for him)
  * @param string The prefix of the database column names (e. g. "post_" for post_urltitle)
  * @param string The name of the post ID column
  * @param string The name of the DB table to use
@@ -826,6 +821,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.40  2009/03/15 18:46:37  fplanque
+ * please don't do whitespace edits
+ *
  * Revision 1.39  2009/03/15 12:33:00  tblue246
  * minor
  *

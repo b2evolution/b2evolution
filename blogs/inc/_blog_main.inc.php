@@ -470,8 +470,7 @@ if( isset( $skin ) )
 	}
 	else if ( skin_exists( $skin ) && ! $SkinCache->get_by_folder( $skin, false ) )
 	{	// The requested skin is not a feed skin and exists in the file system, but isn't installed:
-		debug_die( sprintf( T_( 'The skin [%s] is not installed on this system.' ),
-								htmlspecialchars( $skin ) ) );
+		debug_die( sprintf( T_( 'The skin [%s] is not installed on this system.' ), htmlspecialchars( $skin ) ) );
 	}
 }
 
@@ -593,6 +592,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.120  2009/03/15 18:46:37  fplanque
+ * please don't do whitespace edits
+ *
  * Revision 1.119  2009/03/15 12:32:59  tblue246
  * minor
  *
