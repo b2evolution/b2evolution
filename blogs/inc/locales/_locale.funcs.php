@@ -47,10 +47,17 @@ if( $use_l10n )
 	 *
 	 * @param string String to translate, '' to get language file info (as in gettext spec)
 	 * @param string locale to translate to, '' to use current locale
-	 * @param array Array containing the following keys: "ext_transarray" = A reference to an alternate array to use for the caching of the translated strings or NULL to use the internal array; "plugin_name" = Plugin name if you want to use a plugin translation file instead of the global one; (boolean) "for_helper", is the translation for the b2evoHelper object.
+	 * @param array Array containing the following keys:
+	 *              - 'ext_transarray': A reference to an alternate array
+	 *                                  to use for the caching of the
+	 *                                  translated strings or NULL to use
+	 *                                  the internal array.
+	 *              - 'plugin_name': Plugin name if you want to use a plugin
+	 *                               translation file instead of the global one.
+	 *              - 'for_helper': (boolean) Is the translation for the b2evoHelper object?
 	 * @return string The translated string or the original string on error.
 	 *
-	 * @internal The last two parameters are used by Plugin::T_().
+	 * @internal The last parameter is used by e. g. Plugin::T_().
 	 */
 	function T_( $string, $req_locale = '', $params = array() )
 	{
@@ -1030,6 +1037,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.23  2009/03/15 12:44:39  tblue246
+ * doc
+ *
  * Revision 1.22  2009/03/15 08:37:08  yabs
  * Adding translation strings for b2evoHelper object
  *
