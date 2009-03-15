@@ -154,7 +154,7 @@ class ItemTypeCache extends DataObjectCache
 	 * Returns a form option list which only contains unreserved post types.
 	 *
 	 * @see $posttypes_reserved_IDs
-	 * 
+	 *
 	 * @param integer The selected ID.
 	 * @param boolean Provide a choice for "none" with ID ''
 	 * @param string  Callback method name.
@@ -166,10 +166,23 @@ class ItemTypeCache extends DataObjectCache
 
 		return $this->get_option_list( $default, $allow_none, $method, $posttypes_reserved_IDs );
 	}
+
+	/**
+	 * For use by Universal Item List widget
+	 */
+	function get_option_array()
+	{
+		global $posttypes_reserved_IDs;
+
+		return parent::get_option_array( 'get_name', $posttypes_reserved_IDs );
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.5  2009/03/15 20:35:18  fplanque
+ * Universal Item List proof of concept
+ *
  * Revision 1.4  2009/03/08 23:57:44  fplanque
  * 2009
  *

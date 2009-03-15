@@ -25,7 +25,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'widgets/model/_widget.class.php' );
+load_class( 'widgets/widgets/_coll_item_list.widget.php' );
 
 /**
  * ComponentWidget Class
@@ -34,7 +34,7 @@ load_class( 'widgets/model/_widget.class.php' );
  *
  * @package evocore
  */
-class coll_post_list_Widget extends ComponentWidget
+class coll_post_list_Widget extends coll_item_list_Widget
 {
 	/**
 	 * Constructor
@@ -54,74 +54,19 @@ class coll_post_list_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		$r = array_merge( array(
-				'title' => array(
-					'label' => T_('Block title'),
-					'note' => T_('Title to display in your skin.'),
-					'size' => 60,
-					'defaultvalue' => T_('Contents'),
-				),
-				'title_link' => array(
-					'label' => T_('Link to blog'),
-					'note' => T_('Link the block title to the blog?'),
-					'type' => 'checkbox',
-					'defaultvalue' => false,
-				),
-				'blog_ID' => array(
-					'label' => T_( 'Blog' ),
-					'note' => T_( 'ID of the blog to use, leave empty for the current blog.' ),
-					'size' => 4,
-				),
-				'order_by' => array(
-					'label' => T_('Order by'),
-					'note' => T_('How to sort the items'),
-					'type' => 'select',
-					'options' => get_available_sort_options(),
-					'defaultvalue' => 'datestart',
-				),
-				'order_dir' => array(
-					'label' => T_('Direction'),
-					'note' => T_('How to sort the items'),
-					'type' => 'select',
-					'options' => array( 'ASC'  => T_('Ascending'), 'DESC' => T_('Descending') ),
-					'defaultvalue' => 'DESC',
-				),
-				'limit' => array(
-					'label' => T_( 'Limit' ),
-					'note' => T_( 'Maximum number of items to display.' ),
-					'size' => 4,
-					'defaultvalue' => 20,
-				),
-				'item_title_link_type' => array(
-					'label' => T_('Link titles'),
-					'note' => T_('Where should titles be linked to?'),
-					'type' => 'select',
-					'options' => array(
-							'permalink'   => T_('Item permalink'),
-							'linkto_url'  => T_('Item URL'),
-							'none'        => T_('Nowhere'),
-						),
-					'defaultvalue' => 'permalink',
-				),
-				'disp_excerpt' => array(
-					'label' => T_( 'Excerpt' ),
-					'note' => T_( 'Display excerpt for each item.' ),
-					'type' => 'checkbox',
-					'defaultvalue' => false,
-				),
-				'disp_teaser' => array(
-					'label' => T_( 'Teaser' ),
-					'type' => 'checkbox',
-					'defaultvalue' => false,
-					'note' => T_( 'Display teaser for each item.' ),
-				),
-				'disp_teaser_maxwords' => array(
-					'label' => T_( 'Max Words' ),
-					'type' => 'integer',
-					'defaultvalue' => 20,
-					'note' => T_( 'Max number of words for the teasers' ),
-				),
-			), parent::get_param_definitions( $params )	);
+		// This is derived from coll_post_list_Widget, so we DO NOT ADD ANY param here!
+		$r = parent::get_param_definitions( $params );
+		// We only change the defaults and hide some params.
+		$r['title']['defaultvalue'] = T_('Contents');
+		$r['title_link']['no_edit'] = true;
+		$r['item_type']['no_edit'] = true;
+		$r['blog_ID']['no_edit'] = true;
+		$r['item_title_link_type']['no_edit'] = true;
+		$r['disp_excerpt']['no_edit'] = true;
+		$r['disp_teaser']['no_edit'] = true;
+		$r['disp_teaser_maxwords']['no_edit'] = true;
+		$r['widget_css_class']['no_edit'] = true;
+		$r['widget_ID']['no_edit'] = true;
 
 		return $r;
 	}
@@ -132,7 +77,7 @@ class coll_post_list_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Post list');
+		return T_('Simple Post list');
 	}
 
 
@@ -150,7 +95,7 @@ class coll_post_list_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('List of posts; click goes to post.');
+		return T_('Simplified Item list for listing posts.');
 	}
 
 
@@ -163,8 +108,11 @@ class coll_post_list_Widget extends ComponentWidget
 	{
 		$this->init_display( $params );
 
+		// Force some params (because this is a simplified widget):
+		$this->disp_params['item_type'] = '#';	// Use default item types
+
 		// List of posts:
-		$this->disp_item_list( 'posts' );
+		$this->disp_item_list();
 
 		return true;
 	}
@@ -173,6 +121,9 @@ class coll_post_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.15  2009/03/15 20:35:18  fplanque
+ * Universal Item List proof of concept
+ *
  * Revision 1.14  2009/03/14 03:02:56  fplanque
  * Moving towards an universal item list widget, step 1
  *
@@ -191,36 +142,5 @@ class coll_post_list_Widget extends ComponentWidget
  *
  * Revision 1.9  2008/01/12 17:36:39  blueyed
  * fix indent
- *
- * Revision 1.8  2007/12/26 23:12:48  yabs
- * changing RANDOM to RAND
- *
- * Revision 1.7  2007/12/26 20:04:54  fplanque
- * minor
- *
- * Revision 1.6  2007/12/24 14:21:17  yabs
- * adding params
- *
- * Revision 1.5  2007/12/24 12:05:31  yabs
- * bugfix "order" is a reserved name, used by wi_order
- *
- * Revision 1.4  2007/12/24 11:01:22  yabs
- * adding random order
- *
- * Revision 1.3  2007/12/23 16:16:18  fplanque
- * Wording improvements
- *
- * Revision 1.2  2007/12/23 15:44:39  yabs
- * adding params
- *
- * Revision 1.1  2007/06/25 11:02:18  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.2  2007/06/20 21:42:13  fplanque
- * implemented working widget/plugin params
- *
- * Revision 1.1  2007/06/18 21:25:47  fplanque
- * one class per core widget
- *
  */
 ?>

@@ -26,12 +26,13 @@ $core_componentwidget_defs = array(
 			'free_html',
 			'coll_logo',
 		'*'.T_('Different ways of listing the blog contents'),
-			'coll_post_list',
-			'coll_page_list',
-			'coll_comment_list',
+			'coll_item_list',			// Universal Item List
+			'coll_post_list',			// Simple List
+			'coll_page_list',			// Simple List
 			'links',
-			'coll_media_index',
 			'linkblog',
+			'coll_comment_list',
+			'coll_media_index',
 		'*'.T_('Blog navigation'),
 			'coll_tag_cloud',
 			'coll_category_list',
@@ -113,6 +114,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.18  2009/03/15 20:35:18  fplanque
+ * Universal Item List proof of concept
+ *
  * Revision 1.17  2009/03/13 02:45:55  fplanque
  * normalized
  *

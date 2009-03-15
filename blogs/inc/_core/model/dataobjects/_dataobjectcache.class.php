@@ -284,7 +284,7 @@ class DataObjectCache
 		{	// we can't access NULL as an object
 			return $db_row;
 		}
-		
+
 		// Get ID of the object we'ere preparing to instantiate...
 		$obj_ID = $db_row->{$this->dbIDname};
 
@@ -587,7 +587,7 @@ class DataObjectCache
 			{	// Ignore this ID
 				continue;
 			}
-			
+
 			$r .=  '<option value="'.$loop_Obj->ID.'"';
 			if( $loop_Obj->ID == $default ) $r .= ' selected="selected"';
 			$r .= '>';
@@ -598,11 +598,53 @@ class DataObjectCache
 		return $r;
 	}
 
+
+	/**
+	 * Returns option array with cache contents
+	 *
+	 * Load the cache if necessary
+	 *
+	 * @param string Callback method name
+	 * @param array IDs to ignore.
+	 * @return string
+	 */
+	function get_option_array( $method = 'get_name', $ignore_IDs = array() )
+	{
+		if( ! $this->all_loaded && $this->load_all )
+		{ // We have not loaded all items so far, but we're allowed to.
+			if ( empty( $ignore_IDs ) )
+			{	// just load all items
+				$this->load_all();
+			}
+			else
+			{	// only load those items not listed in $ignore_IDs
+				$this->load_list( implode( ',', $ignore_IDs ), true );
+			}
+		}
+
+		$r = array();
+
+		foreach( $this->cache as $loop_Obj )
+		{
+			if( in_array( $loop_Obj->ID, $ignore_IDs ) )
+			{	// Ignore this ID
+				continue;
+			}
+
+			$r[$loop_Obj->ID] = $loop_Obj->$method();
+		}
+
+		return $r;
+	}
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.9  2009/03/15 20:35:18  fplanque
+ * Universal Item List proof of concept
+ *
  * Revision 1.8  2009/03/08 23:57:40  fplanque
  * 2009
  *

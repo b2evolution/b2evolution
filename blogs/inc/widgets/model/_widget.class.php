@@ -470,83 +470,6 @@ class ComponentWidget extends DataObject
 
 
 	/**
-	 * List of items
-	 *
-	 * @param string 'pages' or 'posts'
-	 */
-	function disp_item_list( $what )
-	{
-		global $Blog;
-		global $timestamp_min, $timestamp_max;
-
-		$blogCache = get_Cache( 'BlogCache' );
-		// TODO: dh> does it make sense to die in $blogCache, in case the blog does not exist anymore?
-		$listBlog = ( $this->disp_params[ 'blog_ID' ] ? $blogCache->get_by_ID( $this->disp_params[ 'blog_ID' ] ) : $Blog );
-
-		// Create ItemList
-		// Note: we pass a widget specific prefix in order to make sure to never interfere with the mainlist
-		$limit = $this->disp_params[ 'limit' ];
-
-		if( $this->disp_params['disp_teaser'] )
-		{ // We want to show some of the post content, we need to load more info: use ItemList2
-			$ItemList = & new ItemList2( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCache', $this->code.'_' );
-		}
-		else
-		{ // no excerpts, use ItemListLight
-			$ItemList = & new ItemListLight( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCacheLight', $this->code.'_' );
-		}
-
-		// Filter list:
-		if( $what == 'pages' )
-		{
-			$ItemList->set_filters( array(
-					'types' => '1000',					// Restrict to type 1000 (pages)
-					'orderby' => $this->disp_params[ 'order_by' ],
-					'order' => $this->disp_params[ 'order_dir' ],
-					'unit' => 'posts',
-				), false );
-		}
-		else
-		{	// post list
-			$ItemList->set_filters( array(
-					'orderby' => $this->disp_params[ 'order_by' ],
-					'order' => $this->disp_params[ 'order_dir' ],
-					'unit' => 'posts',						// We want to advertise all items (not just a page or a day)
-				) );
-		}
-		// Run the query:
-		$ItemList->query();
-
-		if( ! $ItemList->result_num_rows )
-		{	// Nothing to display:
-			return;
-		}
-
-		echo $this->disp_params['block_start'];
-
-		$title = sprintf( ( $this->disp_params[ 'title_link' ] ? '<a href="'.$listBlog->gen_blogurl().'" rel="nofollow">%s</a>' : '%s' ), $this->disp_params[ 'title' ] );
-
-		$this->disp_title( $title );
-
-		echo $this->disp_params['list_start'];
-
-		while( $Item = & $ItemList->get_item() )
-		{
-			echo $this->disp_params['item_start'];
-
-			// Display contents of the Item depending on widget params:
-			$this->disp_contents( $Item );
-
-			echo $this->disp_params['item_end'];
-		}
-
-		echo $this->disp_params['list_end'];
-
-		echo $this->disp_params['block_end'];
-	}
-
-
-	/**
 	 * List of items by category
 	 */
 	function disp_cat_item_list()
@@ -826,6 +749,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.55  2009/03/15 20:35:18  fplanque
+ * Universal Item List proof of concept
+ *
  * Revision 1.54  2009/03/14 03:28:00  fplanque
  * tiny cleanup
  *
