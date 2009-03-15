@@ -407,8 +407,10 @@ function editWidget( widget )
 function widgetSettings( the_html )
 {
 	// add placeholder for widgets settings form:
-	jQuery( 'body' ).append( '<div id="screen_mask"></div><div id="widget_settings"></div>' );
-	jQuery( '#screen_mask' ).bind( 'click', closeWidgetSettings ).fadeTo(1,0.5).fadeIn(200);
+	jQuery( 'body' ).append( '<div id="screen_mask" onclick="closeWidgetSettings()"></div><div id="widget_settings"></div>' );
+	// var evobar_height = jQuery( '#evo_toolbar' ).height();
+	// jQuery( '#screen_mask' ).css({ top: evobar_height });
+	jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
 	jQuery( '#widget_settings' ).html( the_html ).addClass( 'widget_settings_active' );
 	jQuery( '#widget_settings' ).prepend( jQuery( '#server_messages' ) );
 	AttachServerRequest( 'form' ); // send form via hidden iframe
