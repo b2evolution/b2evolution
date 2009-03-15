@@ -143,6 +143,7 @@ $Form->begin_fieldset( T_('Main page / post list').get_manual_link('main_page_se
 	$Form->radio( 'title_link_type', $edited_Blog->get_setting( 'title_link_type' ), array(
 			  array( 'permalink', T_('Link to the permanent url of the post') ),
 			  array( 'linkto_url', T_('Link to the "link to URL" specified in the post (if any)') ),
+			  array( 'auto', T_('Link to the "link to URL" if specified, otherwise fall back to permanent url') ),
 			  array( 'none', T_('No links on titles') ),
 			), T_('Post titles'), true );
 	// TODO: checkbox display "permalink" separately from the title
@@ -311,6 +312,9 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.15  2009/03/15 02:16:35  fplanque
+ * auto link option for titles
+ *
  * Revision 1.14  2009/03/08 23:57:42  fplanque
  * 2009
  *

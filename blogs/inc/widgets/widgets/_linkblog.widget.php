@@ -133,7 +133,7 @@ class linkblog_Widget extends ComponentWidget
 							'linkto_url'  => T_('Item URL'),
 							'none'        => T_('Nowhere'),
 						),
-					'defaultvalue' => 'linkto_url',
+					'defaultvalue' => 'auto',
 				),
 				'disp_teaser' => array(
 					'label' => T_( 'Teaser' ),
@@ -172,7 +172,7 @@ class linkblog_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.18  2009/03/15 02:16:35  fplanque
+ * Revision 1.19  2009/03/15 02:19:47  fplanque
  * auto link option for titles
  *
  * Revision 1.17  2009/03/14 03:02:56  fplanque

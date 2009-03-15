@@ -116,11 +116,12 @@ class links_Widget extends ComponentWidget
 					'note' => T_('Where should titles be linked to?'),
 					'type' => 'select',
 					'options' => array(
+							'auto'        => T_('Automatic'),
 							'permalink'   => T_('Item permalink'),
 							'linkto_url'  => T_('Item URL'),
 							'none'        => T_('Nowhere'),
 						),
-					'defaultvalue' => 'linkto_url',
+					'defaultvalue' => 'auto',
 				),
 				'disp_excerpt' => array(
 					'label' => T_( 'Excerpt' ),
@@ -165,6 +166,9 @@ class links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.11  2009/03/15 02:16:35  fplanque
+ * auto link option for titles
+ *
  * Revision 1.10  2009/03/14 03:02:56  fplanque
  * Moving towards an universal item list widget, step 1
  *

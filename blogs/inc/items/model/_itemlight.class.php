@@ -784,6 +784,10 @@ class ItemLight extends DataObject
 
 		switch( $params['link_type'] )
 		{
+			case 'auto':
+				$url = ( empty($this->url) ? $this->get_permanent_url() : $this->url );
+				break;
+
 			case 'permalink':
 				$url = $this->get_permanent_url();
 				break;
@@ -944,6 +948,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2009/03/15 02:16:35  fplanque
+ * auto link option for titles
+ *
  * Revision 1.17  2009/03/08 23:57:44  fplanque
  * 2009
  *
