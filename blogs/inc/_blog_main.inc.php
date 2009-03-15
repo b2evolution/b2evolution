@@ -195,7 +195,7 @@ if( $resolve_extra_path )
 				$pb = 1;   // Display pingbacks
 
 				$path_element = $path_elements[count($path_elements)-1];
-				if( preg_match( "#^p([0-9]+)$#", $path_element, $req_post ) )
+				if( preg_match( '#^p([0-9]+)$#', $path_element, $req_post ) )
 				{ // The last param is of the form p000
 					// echo 'post number';
 					$p = $req_post[1];		// Post to display
@@ -592,6 +592,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.121  2009/03/15 21:01:28  tblue246
+ * minor
+ *
  * Revision 1.120  2009/03/15 18:46:37  fplanque
  * please don't do whitespace edits
  *
