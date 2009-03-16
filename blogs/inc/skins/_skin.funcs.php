@@ -385,13 +385,20 @@ function skin_base_tag()
  */
 function skin_description_tag()
 {
-	global $Blog;
+	global $Blog, $disp, $MainList;
 
 	$r = '';
 
 	if( is_default_page() && !empty($Blog) )
 	{
 		$r = $Blog->get('shortdesc');
+	}
+	else if ( in_array( $disp, array( 'single','page') ) )
+	{
+		// walter> let's generate a description from the excerpt, now that we have auto-excerpts, if
+		// ok I will add that information on post screen
+		$Item = & $MainList->get_by_idx( 0 );
+		$r = preg_replace( '|[\r\n]+|', '', $Item->get('excerpt') );
 	}
 
 	if( !empty($r) )
@@ -595,6 +602,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.40  2009/03/16 16:00:27  waltercruz
+ * Auto meta description
+ *
  * Revision 1.39  2009/03/08 23:57:45  fplanque
  * 2009
  *
