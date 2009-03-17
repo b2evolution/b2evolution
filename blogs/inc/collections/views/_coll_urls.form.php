@@ -256,7 +256,7 @@ $Form->begin_fieldset( T_('Tag page URLs') );
 								.url_add_tail( $blogurl, '<strong>/mytag-</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
 				array( 'colon', T_('Use extra-path').': '.'trailing colon', T_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/mytag:</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
-				array( 'semicol', T_('Use extra-path').': '.'Trailing semi-colon (NOT recommended)', T_('E-g: ')
+				array( 'semicolon', T_('Use extra-path').': '.'Trailing semi-colon (NOT recommended)', T_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/mytag;</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
 			), T_('Tag page URLs'), true );
 
@@ -312,6 +312,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.20  2009/03/17 02:00:26  waltercruz
+ * blogs/inc/_blog_main.inc.php
+ *
  * Revision 1.19  2009/03/08 23:57:42  fplanque
  * 2009
  *

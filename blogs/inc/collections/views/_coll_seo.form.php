@@ -251,7 +251,7 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo') );
 								.url_add_tail( $blogurl, '<strong>/mytag-</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
 				array( 'colon', T_('Use extra-path').': '.'trailing colon', T_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/mytag:</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
-				array( 'semicol', T_('Use extra-path').': '.'Trailing semi-colon (NOT recommended)', T_('E-g: ')
+				array( 'semicolon', T_('Use extra-path').': '.'Trailing semi-colon (NOT recommended)', T_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/mytag;</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
 			), T_('Tag page URLs'), true );
 
@@ -312,6 +312,9 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.16  2009/03/17 02:00:26  waltercruz
+ * blogs/inc/_blog_main.inc.php
+ *
  * Revision 1.15  2009/03/15 02:16:35  fplanque
  * auto link option for titles
  *
