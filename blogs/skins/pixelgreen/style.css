@@ -58,11 +58,10 @@ img.float-left {
   margin: 5px 15px 5px 0px;
 }
 
-code {
-  margin: 5px 0;
+div.codeblock {
+  margin: 1ex 2ex 1ex 3ex;
   padding: 10px;
   text-align: left;
-  display: block;
   overflow: auto;
   font: 500 1em/1.5em 'Lucida Console', 'courier new', monospace;
   /* white-space: pre; */
