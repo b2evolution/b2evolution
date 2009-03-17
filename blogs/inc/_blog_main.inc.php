@@ -171,12 +171,7 @@ if( $resolve_extra_path )
 		{
 			// Does the pathinfo end with a / or a ; ?
 			$last_char = substr( $path_string, -1 );
-
-			// Solving the issue in http://forums.b2evolution.net/viewtopic.php?p=89079
-			$tag_links = $Blog->get_setting( 'tag_links' );
-			$tag_simbol_map = array('colon' => ':', 'dash' => '-', 'semicolon' => ';');
-
-			if( $tag_links != 'param' && $last_char == $tag_simbol_map[$tag_links] )
+			if( $last_char == '-' || $last_char == ':'|| $last_char == ';' )
 			{	// - : or ; -> We'll consider this to be a tag page
 				$last_part = $path_elements[count($path_elements)-1];
 				$tag = substr( $last_part, 0, strlen($last_part)-1 );
@@ -597,8 +592,8 @@ else
 
 /*
  * $Log$
- * Revision 1.122  2009/03/17 02:03:28  waltercruz
- * Fixing the tag urls, the semicolon was broken (form saved semicol, blog class search for semicolon, and changed to colon as default. This commit try to fix the issue pointed in http://forums.b2evolution.net/viewtopic.php?p=89079
+ * Revision 1.123  2009/03/17 14:01:20  waltercruz
+ * rollbaking my broken commit
  *
  * Revision 1.121  2009/03/15 21:01:28  tblue246
  * minor
