@@ -49,6 +49,7 @@ param( 'newuser_lastname', 'string', '' );
 param( 'newuser_nickname', 'string', '' );
 param( 'newuser_idmode', 'string', '' );
 param( 'newuser_locale', 'string', $default_locale );
+param( 'newuser_admin_toolbar', 'integer', '' );
 param( 'newuser_icq', 'string', '' );
 param( 'newuser_aim', 'string', '' );
 param( 'newuser_msn', 'string', '' );
@@ -132,6 +133,10 @@ $current_User->set( 'showonline', $newuser_showonline );
 if( $current_User->dbupdate() )
 {
 	$Messages->add( T_('Your profile has been updated.'), 'success' );
+	
+	$UserSettings->set( 'admin_toolbar', $newuser_admin_toolbar, $current_User->ID );
+	// Update user settings:
+	if( $UserSettings->dbupdate() ) $Messages->add( T_('User feature settings have been changed.'), 'success');
 }
 else
 {
@@ -145,6 +150,10 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.56  2009/03/17 23:27:40  sam2kb
+ * Let users choose whether they want to display the administration toolbar in skin or not
+ * see http://forums.b2evolution.net/viewtopic.php?t=18269
+ *
  * Revision 1.55  2009/03/08 23:57:37  fplanque
  * 2009
  *

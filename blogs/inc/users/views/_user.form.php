@@ -243,6 +243,9 @@ $Form->begin_fieldset( T_('Preferences') );
 
 		// Number of results per page
 		$Form->text( 'edited_user_results_per_page', $UserSettings->get( 'results_per_page', $edited_User->ID ), 3, T_('Results per page'), T_('Number of rows displayed in results tables.') );
+		
+		// To display or hide admin toolbar in skin
+		$Form->checkbox( 'edited_user_admin_toolbar', $UserSettings->get( 'admin_toolbar', $edited_User->ID ), T_('Display admin toolbar'), T_('Display an administration toolbar in skin.') );
 
 	}
 	else
@@ -487,6 +490,10 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.9  2009/03/17 23:27:41  sam2kb
+ * Let users choose whether they want to display the administration toolbar in skin or not
+ * see http://forums.b2evolution.net/viewtopic.php?t=18269
+ *
  * Revision 1.8  2009/03/08 23:57:46  fplanque
  * 2009
  *
