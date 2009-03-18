@@ -2589,7 +2589,7 @@ class Item extends ItemLight
 				}
 				if( $links )
 				{	// We want links
-					echo '<a href="'.$this->Blog->gen_tag_url( $tag ).'" rel="tag">';
+					echo '<a href="'.$this->Blog->gen_tag_url( $tag ).'">';  // red add  rel="tag"  when compatible with micro format spec
 				}
 				echo htmlspecialchars( $tag );
 				if( $links )
@@ -3706,6 +3706,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.88  2009/03/18 01:09:11  fplanque
+ * rel="tag" implementation does not comply with spec
+ *
  * Revision 1.87  2009/03/14 03:34:05  fplanque
  * blop
  *
