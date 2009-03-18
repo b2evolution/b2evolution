@@ -456,7 +456,10 @@ if( !$Messages->count('error') )
 			$UserSettings->set( 'admin_toolbar', $edited_user_admin_toolbar, $edited_User->ID );
 
 			// Update user settings:
-			if( $UserSettings->dbupdate() ) $Messages->add( T_('User feature settings have been changed.'), 'success');
+			if( $UserSettings->dbupdate() )
+			{
+				$Messages->add( T_('User feature settings have been changed.'), 'success');
+			}
 
 			// PluginUserSettings
 			$any_plugin_settings_updated = false;
@@ -910,6 +913,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2009/03/18 15:31:18  tblue246
+ * minor
+ *
  * Revision 1.13  2009/03/17 23:27:41  sam2kb
  * Let users choose whether they want to display the administration toolbar in skin or not
  * see http://forums.b2evolution.net/viewtopic.php?t=18269
