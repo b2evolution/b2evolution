@@ -136,7 +136,10 @@ if( $current_User->dbupdate() )
 	
 	$UserSettings->set( 'admin_toolbar', $newuser_admin_toolbar, $current_User->ID );
 	// Update user settings:
-	if( $UserSettings->dbupdate() ) $Messages->add( T_('User feature settings have been changed.'), 'success');
+	if( $UserSettings->dbupdate() )
+	{
+		$Messages->add( T_('User feature settings have been changed.'), 'success');
+	}
 }
 else
 {
@@ -150,6 +153,10 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.57  2009/03/18 15:20:57  tblue246
+ * - Changed description for the user setting "admin_toolbar".
+ * - Minor (coding style).
+ *
  * Revision 1.56  2009/03/17 23:27:40  sam2kb
  * Let users choose whether they want to display the administration toolbar in skin or not
  * see http://forums.b2evolution.net/viewtopic.php?t=18269

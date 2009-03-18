@@ -93,7 +93,7 @@ $ProfileForm->begin_fieldset( T_('Preferences') );
 	$ProfileForm->select( 'newuser_locale', $current_User->get( 'locale' ), 'locale_options_return', T_('Preferred locale'), '', 'bComment' );
 	
 	global $UserSettings;
-	$ProfileForm->checkbox( 'newuser_admin_toolbar', $UserSettings->get( 'admin_toolbar' ), T_('Display admin toolbar'), T_('Display an administration toolbar in skin.') );
+	$ProfileForm->checkbox( 'newuser_admin_toolbar', $UserSettings->get( 'admin_toolbar' ), T_('Display admin toolbar'), T_('Display an administration toolbar on top of the skin.') );
 
 $ProfileForm->end_fieldset();
 
@@ -117,6 +117,10 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.8  2009/03/18 15:20:58  tblue246
+ * - Changed description for the user setting "admin_toolbar".
+ * - Minor (coding style).
+ *
  * Revision 1.7  2009/03/17 23:27:41  sam2kb
  * Let users choose whether they want to display the administration toolbar in skin or not
  * see http://forums.b2evolution.net/viewtopic.php?t=18269
