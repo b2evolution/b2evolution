@@ -72,6 +72,7 @@ class UserSettings extends AbstractSettings
 		'login_multiple_sessions' => 1, 	// allow multiple concurrent sessions? (PARAMOUNT ON DEMO SERVER)
 
 		'results_per_page' => 20,
+		'admin_toolbar' => 1,
 	);
 
 
@@ -210,6 +211,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.5  2009/03/18 15:11:03  tblue246
+ * Add default value for the user setting "admin_toolbar".
+ *
  * Revision 1.4  2009/03/08 23:57:46  fplanque
  * 2009
  *
