@@ -552,6 +552,32 @@ $debug_xmlrpc_logging = 0;
  */
 $cron_timeout_delay = 1800; // 30 minutes
 
+/**
+ * Enable a workaround to allow accessing posts with URL titles ending with
+ * a dash (workaround for old bug).
+ * 
+ * In b2evolution v2.4.5 new tag URLs were introduced: You could choose
+ * to have tag URLs ending with a dash. This lead to problems with post
+ * URL titles accidentially ending with a dash (today, URL titles cannot
+ * end with a dash anymore): Instead of displaying the post, the post
+ * title was handled as a tag name. When this setting is enabled, all tag
+ * names which are exactly 40 chars long and end with a dash are handled
+ * in the following way:
+ * Try to find a post with the given tag name as the URL title. If there
+ * is a matching post, display it; otherwise, display the normal tag page.
+ *
+ * This setting is enabled by default, but we recommend turning it off if
+ * you don't have any URL titles ending with a dash.
+ * 
+ * Note: If you use a 39 chars-long tag name, have an URL title which is
+ * the same as the tag *but* additionally a dash at the end and you use
+ * the dash as a tag URL "marker", you won't be able to access either the
+ * post or the tag page, depending on the value of this setting.
+ *
+ * @global boolean $tags_dash_fix
+ */
+$tags_dash_fix = 1;
+
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
 $evonetsrv_host = 'rpc.b2evolution.net';

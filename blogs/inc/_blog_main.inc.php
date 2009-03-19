@@ -170,11 +170,11 @@ if( $resolve_extra_path )
 		if( count($path_elements) )
 		{
 			// Does the pathinfo end with a / or a ; ?
-			$last_char = substr( $path_string, -1 );
-			if( $last_char == '-' || $last_char == ':'|| $last_char == ';' )
+			$last_part = $path_elements[count( $path_elements )-1];
+			$last_char = substr( $last_part, -1 );
+			if( ( $last_char == '-' && ! $tags_dash_fix ) || $last_char == ':'|| $last_char == ';' )
 			{	// - : or ; -> We'll consider this to be a tag page
-				$last_part = $path_elements[count($path_elements)-1];
-				$tag = substr( $last_part, 0, strlen($last_part)-1 );
+				$tag = substr( $last_part, 0, -1 );
 				$tag = urldecode($tag);
 				$tag = strip_tags($tag);	// security
 				// pre_dump( $tag );
@@ -185,8 +185,11 @@ if( $resolve_extra_path )
 					$posts = $Blog->get_setting( 'posts_per_page' );
 				}
 			}
-			elseif( $last_char != '/' )
-			{ // NO ENDING SLASH -> We'll consider this to be a ref to a post:
+			elseif( ( $tags_dash_fix && $last_char == '-' && strlen( $last_part ) == 40 ) || $last_char != '/' )
+			{	// NO ENDING SLASH or ends with a dash, is 40 chars long
+				// and $tags_dash_fix is true -> We'll consider this to
+				// be a ref to a post.
+				
 				// Set a lot of defaults as if we had received a complex URL:
 				$m = '';
 				$more = 1; // Display the extended entries' text
@@ -194,22 +197,19 @@ if( $resolve_extra_path )
 				$tb = 1;   // Display trackbacks
 				$pb = 1;   // Display pingbacks
 
-				$path_element = $path_elements[count($path_elements)-1];
-				if( preg_match( '#^p([0-9]+)$#', $path_element, $req_post ) )
+				if( preg_match( '#^p([0-9]+)$#', $last_part, $req_post ) )
 				{ // The last param is of the form p000
 					// echo 'post number';
 					$p = $req_post[1];		// Post to display
 				}
 				else
 				{ // Last param is a string, we'll consider this to be a post urltitle
-					$title = $path_element;
+					$title = $last_part;
 					// echo 'post title : ', $title;
 				}
 			}
 			else
 			{	// ENDING SLASH -> we are looking for a daterange OR a chapter:
-
-				$last_part = $path_elements[count($path_elements)-1];
 				// echo $last_part;
 				if( preg_match( '|^w?[0-9]+$|', $last_part ) )
 				{ // Last part is a number or a "week" number:
@@ -317,6 +317,7 @@ if( !empty($p) || !empty($title) )
 	}
 	else
 	{	// Get from post title:
+		$orig_title = $title;
 		$title = preg_replace( '/[^A-Za-z0-9_]/', '-', $title );
 		$Item = & $ItemCache->get_by_urltitle( $title, false );
 	}
@@ -326,8 +327,9 @@ if( !empty($p) || !empty($title) )
 		// fp> TODO: ->viewing_allowed() for draft, private, protected and deprecated...
 
 		$title_fallback = false;
+		$tag_fallback = ( $tags_dash_fix && substr( $orig_title, -1 ) == '-' && strlen( $orig_title ) == 40 );
 
-		if( !empty($title) && empty($already_looked_into_chapters) )
+		if( ! $tag_fallback && !empty($title) && empty($already_looked_into_chapters) )
 		{	// Let's try to fall back to a category/chapter...
 			$ChapterCache = & get_Cache( 'ChapterCache' );
 			/**
@@ -349,6 +351,10 @@ if( !empty($p) || !empty($title) )
 
 		if( !empty($title) )
 		{	// Let's try to fall back to a tag...
+			if ( $tag_fallback )
+			{
+				$title = substr( $orig_title, 0, -1 );
+			}
 			if( $Blog->get_tag_post_count( $title ) )
 			{ // We could match a tag from the extra path:
 				$tag = $title;
@@ -592,6 +598,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.124  2009/03/19 15:05:05  tblue246
+ * Trying to fix the post URL dash issue.
+ *
  * Revision 1.123  2009/03/17 14:01:20  waltercruz
  * rollbaking my broken commit
  *
