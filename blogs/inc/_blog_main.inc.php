@@ -172,7 +172,7 @@ if( $resolve_extra_path )
 			// Does the pathinfo end with a / or a ; ?
 			$last_part = $path_elements[count( $path_elements )-1];
 			$last_char = substr( $last_part, -1 );
-			if( ( $last_char == '-' && ! $tags_dash_fix ) || $last_char == ':'|| $last_char == ';' )
+			if( ( $last_char == '-' && ( ! $tags_dash_fix || strlen( $last_part ) != 40 ) ) || $last_char == ':'|| $last_char == ';' )
 			{	// - : or ; -> We'll consider this to be a tag page
 				$tag = substr( $last_part, 0, -1 );
 				$tag = urldecode($tag);
@@ -598,6 +598,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.125  2009/03/19 15:38:47  tblue246
+ * Ugly bug fix for workaround
+ *
  * Revision 1.124  2009/03/19 15:05:05  tblue246
  * Trying to fix the post URL dash issue.
  *
