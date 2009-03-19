@@ -172,7 +172,8 @@ if( $resolve_extra_path )
 			// Does the pathinfo end with a / or a ; ?
 			$last_part = $path_elements[count( $path_elements )-1];
 			$last_char = substr( $last_part, -1 );
-			if( ( $last_char == '-' && ( ! $tags_dash_fix || strlen( $last_part ) != 40 ) ) || $last_char == ':'|| $last_char == ';' )
+			$last_len  = strlen( $last_part );
+			if( ( $last_char == '-' && ( ! $tags_dash_fix || $last_len != 40 ) ) || $last_char == ':'|| $last_char == ';' )
 			{	// - : or ; -> We'll consider this to be a tag page
 				$tag = substr( $last_part, 0, -1 );
 				$tag = urldecode($tag);
@@ -185,7 +186,7 @@ if( $resolve_extra_path )
 					$posts = $Blog->get_setting( 'posts_per_page' );
 				}
 			}
-			elseif( ( $tags_dash_fix && $last_char == '-' && strlen( $last_part ) == 40 ) || $last_char != '/' )
+			elseif( ( $tags_dash_fix && $last_char == '-' && $last_len == 40 ) || $last_char != '/' )
 			{	// NO ENDING SLASH or ends with a dash, is 40 chars long
 				// and $tags_dash_fix is true -> We'll consider this to
 				// be a ref to a post.
@@ -598,6 +599,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.126  2009/03/19 16:08:07  tblue246
+ * minor
+ *
  * Revision 1.125  2009/03/19 15:38:47  tblue246
  * Ugly bug fix for workaround
  *
