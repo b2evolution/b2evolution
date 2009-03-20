@@ -60,6 +60,7 @@ class coll_page_list_Widget extends coll_item_list_Widget
 		$r['title']['defaultvalue'] = T_('Pages');
 		$r['title_link']['no_edit'] = true;
 		$r['item_type']['no_edit'] = true;
+		$r['follow_mainlist']['no_edit'] = true;
 		$r['blog_ID']['no_edit'] = true;
 		$r['item_title_link_type']['no_edit'] = true;
 		$r['disp_excerpt']['no_edit'] = true;
@@ -118,6 +119,9 @@ class coll_page_list_Widget extends coll_item_list_Widget
 
 /*
  * $Log$
+ * Revision 1.17  2009/03/20 23:20:16  fplanque
+ * Related posts widget
+ *
  * Revision 1.16  2009/03/15 22:48:16  fplanque
  * refactoring... final step :)
  *

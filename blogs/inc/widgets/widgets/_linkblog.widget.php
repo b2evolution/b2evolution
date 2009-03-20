@@ -59,6 +59,7 @@ class linkblog_Widget extends coll_item_list_Widget
 		// We only change the defaults and hide some params.
 		$r['title']['defaultvalue'] = T_('Linkblog');
 		$r['title_link']['no_edit'] = true;
+		$r['follow_mainlist']['no_edit'] = true;
 		$r['blog_ID']['defaultvalue'] = 0;		// zero is a magic number that we'll use to try and use defaults used in previous versions of B2evo
 		$r['item_group_by']['defaultvalue'] = 'chapter';
 		$r['item_title_link_type']['no_edit'] = true;
@@ -133,6 +134,9 @@ class linkblog_Widget extends coll_item_list_Widget
 
 /*
  * $Log$
+ * Revision 1.22  2009/03/20 23:20:16  fplanque
+ * Related posts widget
+ *
  * Revision 1.21  2009/03/15 22:48:16  fplanque
  * refactoring... final step :)
  *

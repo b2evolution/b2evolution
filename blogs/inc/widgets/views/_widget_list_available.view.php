@@ -28,6 +28,7 @@ $core_componentwidget_defs = array(
 		'*'.T_('Different ways of listing the blog contents'),
 			'coll_item_list',			// Universal Item List
 			'coll_post_list',			// Simple List
+			'coll_related_post_list',			// Simple List
 			'coll_page_list',			// Simple List
 			'links',		          // Simple List
 			'linkblog',	        	// Simple List
@@ -114,6 +115,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.21  2009/03/20 23:20:16  fplanque
+ * Related posts widget
+ *
  * Revision 1.20  2009/03/15 22:48:16  fplanque
  * refactoring... final step :)
  *
