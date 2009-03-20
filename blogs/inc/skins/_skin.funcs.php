@@ -393,6 +393,7 @@ function skin_description_tag()
 	{
 		$r = $Blog->get('shortdesc');
 	}
+	/* There needs to be an SEO setting to enable 'Use except as meta description for posts and pages
 	else if ( in_array( $disp, array( 'single','page') ) )
 	{
 		// walter> let's generate a description from the excerpt, now that we have auto-excerpts, if
@@ -400,7 +401,8 @@ function skin_description_tag()
 		$Item = & $MainList->get_by_idx( 0 );
 		$r = preg_replace( '|[\r\n]+|', '', $Item->get('excerpt') );
 	}
-
+	*/
+	
 	if( !empty($r) )
 	{
 		echo '<meta name="description" content="'.format_to_output( $r, 'htmlattr' )."\" />\n";
@@ -602,6 +604,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.41  2009/03/20 03:41:02  fplanque
+ * todo
+ *
  * Revision 1.40  2009/03/16 16:00:27  waltercruz
  * Auto meta description
  *
