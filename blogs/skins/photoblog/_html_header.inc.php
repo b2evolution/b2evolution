@@ -13,8 +13,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $UserSettings;
-
 require_js( 'functions.js' );
 require_js( 'rollovers.js' );
 
@@ -66,7 +64,7 @@ require $skins_path.'_toolbar.inc.php';
 // ------------------------------- END OF TOOLBAR --------------------------------
 
 echo "\n";
-if( is_logged_in() && $UserSettings->get('admin_toolbar') )
+if( is_logged_in() )
 {
 	echo '<div id="skin_wrapper" class="skin_wrapper_loggedin">';
 }

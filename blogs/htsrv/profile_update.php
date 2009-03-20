@@ -49,7 +49,6 @@ param( 'newuser_lastname', 'string', '' );
 param( 'newuser_nickname', 'string', '' );
 param( 'newuser_idmode', 'string', '' );
 param( 'newuser_locale', 'string', $default_locale );
-param( 'newuser_admin_toolbar', 'integer', 0 );
 param( 'newuser_icq', 'string', '' );
 param( 'newuser_aim', 'string', '' );
 param( 'newuser_msn', 'string', '' );
@@ -128,6 +127,7 @@ $current_User->set( 'allow_msgform', $newuser_allow_msgform );
 $current_User->set( 'notify', $newuser_notify );
 $current_User->set( 'showonline', $newuser_showonline );
 
+
 // Set Messages into user's session, so they get restored on the next page (after redirect):
 if( $current_User->dbupdate() )
 {
@@ -138,13 +138,6 @@ else
 	$Messages->add( T_('Your profile has not been changed.'), 'note' );
 }
 
-$UserSettings->set( 'admin_toolbar', $newuser_admin_toolbar, $current_User->ID );
-
-// Update user settings:
-if( $UserSettings->dbupdate() )
-{
-	$Messages->add( T_('User feature settings have been changed.'), 'success');
-}
 
 header_nocache();
 // redirect Will save $Messages into Session:
@@ -152,16 +145,8 @@ header_redirect();
 
 /*
  * $Log$
- * Revision 1.58  2009/03/18 15:31:18  tblue246
- * minor
- *
- * Revision 1.57  2009/03/18 15:20:57  tblue246
- * - Changed description for the user setting "admin_toolbar".
- * - Minor (coding style).
- *
- * Revision 1.56  2009/03/17 23:27:40  sam2kb
- * Let users choose whether they want to display the administration toolbar in skin or not
- * see http://forums.b2evolution.net/viewtopic.php?t=18269
+ * Revision 1.59  2009/03/20 03:38:04  fplanque
+ * rollback -- http://forums.b2evolution.net/viewtopic.php?t=18269
  *
  * Revision 1.55  2009/03/08 23:57:37  fplanque
  * 2009

@@ -22,18 +22,15 @@ if( ! is_logged_in() )
 	return;
 }
 
-global $Blog, $UserSettings;
-global $is_admin_page, $localtimenow;
+global $Blog;
 
-if( ! $is_admin_page && ! $UserSettings->get('admin_toolbar') )
-{
-	return;
-}
+global $is_admin_page, $localtimenow;
 
 /**
  * @var User
  */
 global $current_User;
+
 global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
 
 /**

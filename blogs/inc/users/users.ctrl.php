@@ -337,7 +337,6 @@ if( !$Messages->count('error') )
 			param( 'edited_user_bozo', 'integer', 0 );
 			param( 'edited_user_focusonfirst', 'integer', 0 );
 			param( 'edited_user_results_per_page', 'integer', null );
-			param( 'edited_user_admin_toolbar', 'integer', 0 );
 
 
 			// EXPERIMENTAL user fields:
@@ -451,9 +450,6 @@ if( !$Messages->count('error') )
 			{
 				$UserSettings->set( 'results_per_page', $edited_user_results_per_page, $edited_User->ID );
 			}
-			
-			// Admin toolbar in skin
-			$UserSettings->set( 'admin_toolbar', $edited_user_admin_toolbar, $edited_User->ID );
 
 			// Update user settings:
 			if( $UserSettings->dbupdate() )
@@ -913,12 +909,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.14  2009/03/18 15:31:18  tblue246
- * minor
- *
- * Revision 1.13  2009/03/17 23:27:41  sam2kb
- * Let users choose whether they want to display the administration toolbar in skin or not
- * see http://forums.b2evolution.net/viewtopic.php?t=18269
+ * Revision 1.15  2009/03/20 03:38:04  fplanque
+ * rollback -- http://forums.b2evolution.net/viewtopic.php?t=18269
  *
  * Revision 1.12  2009/03/08 23:57:46  fplanque
  * 2009
