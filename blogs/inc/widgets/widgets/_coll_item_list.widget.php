@@ -86,7 +86,6 @@ class coll_item_list_Widget extends ComponentWidget
 					'options' => $item_type_options,
 					'defaultvalue' => '#',
 				),
-				/*
 				'follow_mainlist' => array(
 					'label' => T_('Follow Main List'),
 					'note' => T_('Do you want to restrict to contents related to what is displayed in the main area?'),
@@ -94,7 +93,6 @@ class coll_item_list_Widget extends ComponentWidget
 					'options' => array( 'no'  => T_('No'), 'tags' => T_('By tags') ), // may be extended
 					'defaultvalue' => 'none',
 				),
-				*/
 				'blog_ID' => array(
 					'label' => T_( 'Blog' ),
 					'note' => T_( 'ID of the blog to use, leave empty for the current blog.' ),
@@ -199,6 +197,10 @@ class coll_item_list_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
+		/**
+		 * @var ItemList2
+		 */
+		global $MainList;
 		global $BlogCache, $Blog;
 		global $timestamp_min, $timestamp_max;
 
@@ -237,6 +239,25 @@ class coll_item_list_Widget extends ComponentWidget
 		if( $this->disp_params['item_type'] != '#' )
 		{	// Not "default", restrict to a specific type (or '' for all)
 			$filters['types'] = $this->disp_params['item_type'];
+		}
+
+		if( $this->disp_params['follow_mainlist'] == 'tags' )
+		{	// Restrict to Item tagged with some tag used in the Mainlist:
+
+			if( ! isset($MainList) )
+			{	// Nothing to follow, don't display anything
+				return false;
+			}
+
+			$all_tags = $MainList->get_all_tags();
+			if( empty($all_tags) )
+			{	// Nothing to follow, don't display anything
+				return false;
+			}
+
+			$filters['tags'] = implode(',',$all_tags);
+
+			// fp> TODO: in addition to just filtering, offer ordering in a way where the posts with the most matching tags come first
 		}
 
 		$chapter_mode = false;
@@ -372,8 +393,8 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
- * Revision 1.5  2009/03/20 04:04:07  fplanque
- * minor
+ * Revision 1.6  2009/03/20 22:44:04  fplanque
+ * Related Items -- Proof of Concept
  *
  * Revision 1.4  2009/03/15 23:09:09  blueyed
  * coll_item_list_widget: fix order as per todo

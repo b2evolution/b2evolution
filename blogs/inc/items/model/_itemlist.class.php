@@ -317,6 +317,35 @@ class ItemList2 extends ItemListLight
 
 
 	/**
+	 * Get all tags used in current ItemList
+	 *
+	 * @todo caching in case of multiple calls
+	 *
+	 * @return array
+	 */
+	function get_all_tags()
+	{
+		$all_tags = array();
+
+		for( $i=0; $i<$this->result_num_rows; $i++ )
+		{
+			/**
+			 * @var Item
+			 */
+			$l_Item = & $this->get_by_idx( $i );
+			$l_tags = $l_Item->get_tags();
+			$all_tags = array_merge( $all_tags, $l_tags );
+		}
+
+		// Keep each tag only once:
+		$all_tags = array_unique( $all_tags );
+
+		return $all_tags;
+	}
+
+
+
+	/**
 	 * Returns values needed to make sort links for a given column
 	 *
 	 * Returns an array containing the following values:
@@ -666,6 +695,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.18  2009/03/20 22:44:04  fplanque
+ * Related Items -- Proof of Concept
+ *
  * Revision 1.17  2009/03/08 23:57:44  fplanque
  * 2009
  *
