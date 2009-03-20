@@ -567,11 +567,15 @@ $cron_timeout_delay = 1800; // 30 minutes
  * is a matching post, display it; otherwise, display the normal tag page.
  *
  * Note: If you use a 39 chars-long tag name, have an URL title which is
- * the same as the tag *but* additionally a dash at the end and you use
- * the dash as a tag URL "marker", you won't be able to access either the
- * post or the tag page, depending on the value of this setting.
+ * the same as the tag *but* additionally has a dash at the end and you
+ * use the dash as a tag URL "marker", you won't be able to access either
+ * the post or the tag page, depending on the value of this setting.
  *
  * @global boolean $tags_dash_fix
+ *
+ * @internal Tblue> We perhaps should notify the user if we detect bogus
+ *                  post URLs (check on upgrade?) and recommend enabling
+ *                  this setting.
  */
 $tags_dash_fix = 0;
 
