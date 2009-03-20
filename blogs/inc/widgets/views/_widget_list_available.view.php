@@ -30,7 +30,7 @@ $core_componentwidget_defs = array(
 			'coll_post_list',			// Simple List
 			'coll_related_post_list',			// Simple List
 			'coll_page_list',			// Simple List
-			'links',		          // Simple List
+			'coll_link_list',     // Simple List
 			'linkblog',	        	// Simple List
 			'coll_media_index',
 			'coll_comment_list',
@@ -115,6 +115,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.22  2009/03/20 23:28:31  fplanque
+ * renamed coll_link_list widget
+ *
  * Revision 1.21  2009/03/20 23:20:16  fplanque
  * Related posts widget
  *

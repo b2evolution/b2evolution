@@ -34,15 +34,15 @@ load_class( 'widgets/widgets/_coll_item_list.widget.php' );
  *
  * @package evocore
  */
-class links_Widget extends coll_item_list_Widget
+class coll_link_list_Widget extends coll_item_list_Widget
 {
 	/**
 	 * Constructor
 	 */
-	function links_Widget( $db_row = NULL )
+	function coll_link_list_Widget( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::ComponentWidget( $db_row, 'core', 'links' );
+		parent::ComponentWidget( $db_row, 'core', 'coll_link_list' );
 	}
 
 
@@ -119,8 +119,8 @@ class links_Widget extends coll_item_list_Widget
 
 /*
  * $Log$
- * Revision 1.13  2009/03/20 23:20:16  fplanque
- * Related posts widget
+ * Revision 1.1  2009/03/20 23:28:31  fplanque
+ * renamed coll_link_list widget
  *
  * Revision 1.12  2009/03/15 22:48:16  fplanque
  * refactoring... final step :)
