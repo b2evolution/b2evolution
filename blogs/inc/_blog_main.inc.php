@@ -352,7 +352,7 @@ if( !empty($p) || !empty($title) )
 
 		if( !empty($title) )
 		{	// Let's try to fall back to a tag...
-			if ( $tag_fallback )
+			if( $tag_fallback )
 			{
 				$title = substr( $orig_title, 0, -1 );
 			}
@@ -599,6 +599,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.127  2009/03/20 03:55:50  fplanque
+ * (explain to me why it's better to have the fix enabled by default)
+ *
  * Revision 1.126  2009/03/19 16:08:07  tblue246
  * minor
  *

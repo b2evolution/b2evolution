@@ -566,9 +566,6 @@ $cron_timeout_delay = 1800; // 30 minutes
  * Try to find a post with the given tag name as the URL title. If there
  * is a matching post, display it; otherwise, display the normal tag page.
  *
- * This setting is enabled by default, but we recommend turning it off if
- * you don't have any URL titles ending with a dash.
- * 
  * Note: If you use a 39 chars-long tag name, have an URL title which is
  * the same as the tag *but* additionally a dash at the end and you use
  * the dash as a tag URL "marker", you won't be able to access either the
@@ -576,7 +573,7 @@ $cron_timeout_delay = 1800; // 30 minutes
  *
  * @global boolean $tags_dash_fix
  */
-$tags_dash_fix = 1;
+$tags_dash_fix = 0;
 
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
