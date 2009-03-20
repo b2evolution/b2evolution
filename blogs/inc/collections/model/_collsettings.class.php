@@ -78,7 +78,7 @@ class CollectionSettings extends AbstractSettings
 			'chapter_noindex' => '1',						// META NOINDEX on Category pages
 			'category_prefix' => '',
 
-			'tag_links'  => 'colon',					// 'param', 'semicol'
+			'tag_links'  => 'colon',					// 'param', 'semicolon'
 			'canonical_tag_urls' => 1,					// Redirect tag pages to their canonical Url?
 			'tag_posts_per_page' => NULL,
 			'tag_noindex' => '1',				      	// META NOINDEX on Tag pages
@@ -141,6 +141,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.28  2009/03/20 04:04:07  fplanque
+ * minor
+ *
  * Revision 1.27  2009/03/08 23:57:42  fplanque
  * 2009
  *
