@@ -468,6 +468,7 @@ class Blog extends DataObject
 			$this->set_setting( 'title_link_type',  param( 'title_link_type', 'string', '' ) );
 			$this->set_setting( 'permalinks',  param( 'permalinks', 'string', '' ) );
 			$this->set_setting( '404_response',  param( '404_response', 'string', '' ) );
+			$this->set_setting( 'excerpts_meta_description',  param( 'excerpts_meta_description', 'integer', 0 ) );
 		}
 
 
@@ -2017,6 +2018,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.56  2009/03/21 00:38:15  waltercruz
+ * Addind SEO setting for excerpts as meta description
+ *
  * Revision 1.55  2009/03/08 23:57:42  fplanque
  * 2009
  *

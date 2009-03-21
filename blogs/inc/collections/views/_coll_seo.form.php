@@ -180,6 +180,9 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 	$Form->checkbox( 'canonical_item_urls', $edited_Blog->get_setting( 'canonical_item_urls' ),
 			T_('Make canonical'), T_('301 redirect to canonical URL') );
 
+	$Form->checkbox( 'excerpts_meta_description', $edited_Blog->get_setting( 'excerpts_meta_description' ),
+			T_('Excerpts as meta description'), T_('Use except as meta description for posts and pages') );
+
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_seo') );
@@ -312,6 +315,9 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.17  2009/03/21 00:38:15  waltercruz
+ * Addind SEO setting for excerpts as meta description
+ *
  * Revision 1.16  2009/03/17 02:00:26  waltercruz
  * blogs/inc/_blog_main.inc.php
  *
