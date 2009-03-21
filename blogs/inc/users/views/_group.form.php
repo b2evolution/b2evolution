@@ -116,7 +116,7 @@ $Form->begin_fieldset( T_('Blogging permissions').get_manual_link('group_propert
 
 	$Form->checklist( array(
 						array( 'prevent_css_tweaks', 1, T_('Prevent CSS tweaks'), ! $edited_Group->get('perm_xhtml_css_tweaks'), false,
-											T_('WARNING: if allowed, users can easily deface the site, add hidden text, etc.') ),
+											T_('WARNING: if allowed, users may deface the site, add hidden text, etc.') ),
 						array( 'prevent_iframes', 1, T_('Prevent iframes'), ! $edited_Group->get('perm_xhtml_iframes'), false,
 											T_('WARNING: if allowed, users may do XSS hacks, steal passwords from other users, etc.') ),
 						array( 'prevent_javascript', 1, T_('Prevent javascript'), ! $edited_Group->get('perm_xhtml_javascript'), false,
@@ -196,6 +196,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.7  2009/03/21 22:55:15  fplanque
+ * Adding TinyMCE -- lowfat version
+ *
  * Revision 1.6  2009/03/08 23:57:46  fplanque
  * 2009
  *

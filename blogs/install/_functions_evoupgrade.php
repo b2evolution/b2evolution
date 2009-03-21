@@ -2321,33 +2321,37 @@ function upgrade_b2evo_tables()
 		db_add_col( 'T_widget', 'wi_enabled', 'tinyint(1) NOT NULL DEFAULT 1 AFTER wi_order' );
 		task_end();
 	}
+	if( $old_db_version < 9930 )
+	{	// 3.1 continued
+		task_begin( 'Updating item types...' );
+		$DB->query( "
+			REPLACE INTO T_items__type ( ptyp_ID, ptyp_name )
+			VALUES ( 3000, 'Sidebar link' )" );
+		echo "OK.<br />\n";
+		task_end();
 
+		task_begin( 'Updating items table...' );
+		$DB->query( "ALTER TABLE T_items__item ENGINE=innodb" );
+		task_end();
 
-	// Should get moved into the next $old_db_version block:
+		task_begin( 'Creating versions table...' );
+		$DB->query( "CREATE TABLE T_items__version (
+	            iver_itm_ID        INT UNSIGNED NOT NULL ,
+	            iver_edit_user_ID  INT UNSIGNED NOT NULL ,
+	            iver_edit_datetime DATETIME NOT NULL ,
+	            iver_status        ENUM('published','deprecated','protected','private','draft','redirected') NULL ,
+	            iver_title         TEXT NULL ,
+	            iver_content       MEDIUMTEXT NULL ,
+	            INDEX iver_itm_ID ( iver_itm_ID )
+	            ) ENGINE = innodb" );
+		task_end();
 
-	task_begin( 'Updating item types...' );
-	$DB->query( "
-		REPLACE INTO T_items__type ( ptyp_ID, ptyp_name )
-		VALUES ( 3000, 'Sidebar link' )" );
-	echo "OK.<br />\n";
-	task_end();
-
-	task_begin( 'Updating items table...' );
-	$DB->query( "ALTER TABLE T_items__item ENGINE=innodb" );
-	task_end();
-
-	task_begin( 'Creating versions table...' );
-	$DB->query( "CREATE TABLE T_items__version (
-            iver_itm_ID        INT UNSIGNED NOT NULL ,
-            iver_edit_user_ID  INT UNSIGNED NOT NULL ,
-            iver_edit_datetime DATETIME NOT NULL ,
-            iver_status        ENUM('published','deprecated','protected','private','draft','redirected') NULL ,
-            iver_title         TEXT NULL ,
-            iver_content       MEDIUMTEXT NULL ,
-            INDEX iver_itm_ID ( iver_itm_ID )
-            ) ENGINE = innodb" );
-	task_end();
-
+		task_begin( 'Updating group permissions...' );
+		$DB->query( "UPDATE T_groups
+										SET grp_perm_xhtml_css_tweaks = 1
+									WHERE grp_ID <= 3" );
+		task_end();
+	}
 
 	/* Wait until we're sure and no longer experimental for that one...
 	task_begin( 'Moving user data to fields' );
@@ -2498,6 +2502,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.288  2009/03/21 22:55:15  fplanque
+ * Adding TinyMCE -- lowfat version
+ *
  * Revision 1.287  2009/03/13 00:57:35  fplanque
  * calling it "sidebar links"
  *

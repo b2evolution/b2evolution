@@ -99,6 +99,7 @@ function create_default_data()
 	$Group_Admins->set( 'perm_options', 'edit' );
 	$Group_Admins->set( 'perm_templates', 1 );
 	$Group_Admins->set( 'perm_users', 'edit' );
+	$Group_Admins->set( 'perm_xhtml_css_tweaks', 1 );
 	$Group_Admins->dbinsert();
 
 	$Group_Privileged = new Group(); // COPY !
@@ -111,6 +112,7 @@ function create_default_data()
 	$Group_Privileged->set( 'perm_options', 'view' );
 	$Group_Privileged->set( 'perm_templates', 0 );
 	$Group_Privileged->set( 'perm_users', 'view' );
+	$Group_Privileged->set( 'perm_xhtml_css_tweaks', 1 );
 	$Group_Privileged->dbinsert();
 
 	$Group_Bloggers = new Group(); // COPY !
@@ -123,6 +125,7 @@ function create_default_data()
 	$Group_Bloggers->set( 'perm_options', 'none' );
 	$Group_Bloggers->set( 'perm_templates', 0 );
 	$Group_Bloggers->set( 'perm_users', 'none' );
+	$Group_Bloggers->set( 'perm_xhtml_css_tweaks', 1 );
 	$Group_Bloggers->dbinsert();
 
 	$Group_Users = new Group(); // COPY !
@@ -826,6 +829,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.259  2009/03/21 22:55:15  fplanque
+ * Adding TinyMCE -- lowfat version
+ *
  * Revision 1.258  2009/03/13 00:57:35  fplanque
  * calling it "sidebar links"
  *

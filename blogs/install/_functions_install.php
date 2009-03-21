@@ -359,6 +359,13 @@ function install_basic_plugins( $old_db_version = 0 )
 		$Plugins_admin->install( 'ping_pingomatic_plugin' );
 		echo "OK.<br />\n";
 	}
+
+	if( $old_db_version < 9930 )
+	{ // Upgrade to 3.1.0
+		echo 'Installing wysiwyg plugin... ';
+		$Plugins_admin->install( 'tinymce_plugin' );
+		echo "OK.<br />\n";
+	}
 }
 
 
@@ -677,6 +684,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.58  2009/03/21 22:55:15  fplanque
+ * Adding TinyMCE -- lowfat version
+ *
  * Revision 1.57  2009/03/15 22:48:16  fplanque
  * refactoring... final step :)
  *

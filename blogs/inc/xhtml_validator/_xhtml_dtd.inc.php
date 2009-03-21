@@ -136,7 +136,7 @@ else
 }
 
 // Allowed Attribute classes
-$A_coreattrs = 'class title'.( $allow_css_tweaks ? ' id style' : '' )
+$A_coreattrs = 'class title'.( $allow_css_tweaks ? ' style' : '' )					// 'id' is really nasty
 					.( $allow_javascript ? ' onmouseover onmouseout onclick' : '' );
 $A_i18n = 'lang xml:lang dir';
 $A_attrs = $A_coreattrs.' '.$A_i18n;
@@ -457,7 +457,7 @@ $C_E_a_content = '#PCDATA '.$C_E_special.' '.$C_E_fontstyle.' '.$C_E_phrase.' '.
 $C_E_pre_content = '#PCDATA a '.$C_E_fontstyle.' '.$C_E_phrase.' '.$C_E_special_pre.' '.$C_E_misc_inline;
 
 // Allowed Attribute classes
-$C_A_coreattrs = 'class title'.( $comments_allow_css_tweaks ? ' id style' : '' );
+$C_A_coreattrs = 'class title'.( $comments_allow_css_tweaks ? ' style' : '' );  // 'id' is really nasty
 $C_A_i18n = 'lang xml:lang dir';
 $C_A_attrs = $C_A_coreattrs.' '.$C_A_i18n;
 $C_A_cellhalign = 'align char charoff';
@@ -567,6 +567,9 @@ $comments_allowed_attributes = array
 
 /*
  * $Log$
+ * Revision 1.6  2009/03/21 22:55:15  fplanque
+ * Adding TinyMCE -- lowfat version
+ *
  * Revision 1.5  2009/03/08 23:57:46  fplanque
  * 2009
  *
