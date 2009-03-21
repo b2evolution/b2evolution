@@ -697,7 +697,7 @@ class Hit
 			{
 				$this->user_agent = false;
 			}
-
+			$this->user_agent = substr( $this->user_agent, 0, 250 ); 
 			if( $this->user_agent != strip_tags($this->user_agent) )
 			{ // then they have tried something funky, putting HTML or PHP into the user agent
 				$Debuglog->add( 'detect_useragent(): '.T_('bad char in User Agent'), 'hit');
@@ -1040,6 +1040,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.23  2009/03/21 01:00:41  waltercruz
+ * Fixing http://forums.b2evolution.net//viewtopic.php?p=89122
+ *
  * Revision 1.22  2009/03/08 23:57:45  fplanque
  * 2009
  *

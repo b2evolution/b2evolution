@@ -110,7 +110,9 @@ switch( $action )
 		$new_User->set_email( $email );
 		$new_User->set( 'ip', $Hit->IP );
 		$new_User->set( 'domain', $Hit->get_remote_host( true ) );
-		$new_User->set( 'browser', $Hit->get_user_agent() );
+		// walter > about http://forums.b2evolution.net//viewtopic.php?p=89122
+		// will fix it here rather than Hit class, as the useragents table can fit it
+		$new_User->set( 'browser', substr( $Hit->get_user_agent(), 0 , 200) );
 		$new_User->set_datecreated( $localtimenow );
 		$new_User->set( 'locale', $locale );
 		$newusers_grp_ID = $Settings->get('newusers_grp_ID');
@@ -214,6 +216,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.94  2009/03/21 01:00:41  waltercruz
+ * Fixing http://forums.b2evolution.net//viewtopic.php?p=89122
+ *
  * Revision 1.93  2009/03/08 23:57:37  fplanque
  * 2009
  *
