@@ -1,0 +1,31 @@
+/* Styles for TinyMCE's iframe/editable area */
+
+body.mceContentBody {
+	font: 13px/19px Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
+	padding: 0.6em;
+	margin: 0;
+}
+
+body.mceForceColors {
+	background:#fff;
+	color:#000;
+}
+
+h1,h2,h3,h4,h5,h6 {
+	font-family: Helvetica, Arial, sans-serif;
+}
+h1 {font-size: 2em}
+h2 {font-size: 1.5em}
+h3 {font-size: 1.17em}
+h4 {font-size: 1em}
+h5 {font-size: .83em}
+h6 {font-size: .75em}
+
+td {
+	font: 13px/19px Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
+}
+
+pre {
+	font: 12px/18px "Courier New", monospace;
+}
+

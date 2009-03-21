@@ -1,0 +1,19 @@
+Information about this directory:
+---------------------------------
+
+This is the jscripts/tiny_mce/ directory from TinyMCE 3.2.2.1
+
+The tiny_mce_gzip.php from tinymce_compressor_php 2.0.2 is included and used by default.
+
+Patched files:
+--------------
+
+ - tiny_mce_gzip.php
+ - css
+
+TinyMCE language packages:
+--------------------------
+language    revison  status	     package date
+
+French      8.1      Complete    2008-09-22
+German      10.0     Complete    2008-09-22
