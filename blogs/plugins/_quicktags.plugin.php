@@ -23,6 +23,7 @@ class quicktags_plugin extends Plugin
 	var $name = 'Quick Tags';
 	var $priority = 30;
 	var $version = '2.4.1';
+	var $group = 'editor';
 	var $number_of_installs = 1;
 
 	/**
@@ -420,6 +421,9 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.35  2009/03/21 23:00:21  fplanque
+ * minor
+ *
  * Revision 1.34  2009/03/08 23:57:47  fplanque
  * 2009
  *
