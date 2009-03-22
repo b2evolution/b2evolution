@@ -29,6 +29,7 @@ global $Blog;
 global $ItemList;
 
 global $edit_item_url, $delete_item_url;
+global $tab;
 
 if( $highlight = param( 'highlight', 'integer', NULL ) )
 {	// There are lines we want to highlight:
@@ -83,16 +84,26 @@ if( $Blog->get_setting( 'aggregate_coll_IDs' ) )
 		);
 }
 
-
-// Author:
-$ItemList->cols[] = array(
-		'th' => T_('Author'),
-		'th_class' => 'nowrap',
-		'td_class' => 'nowrap',
-		'order' => 'creator_user_ID',
-		'td' => '@get(\'t_author\')@',
-	);
-
+if( $tab == 'intros' )
+{ // Author:
+	$ItemList->cols[] = array(
+			'th' => T_('Type'),
+			'th_class' => 'nowrap',
+			'td_class' => 'nowrap',
+			'order' => 'ptyp_ID',
+			'td' => '@type()@',
+		);
+}
+else
+{ // Author:
+	$ItemList->cols[] = array(
+			'th' => T_('Author'),
+			'th_class' => 'nowrap',
+			'td_class' => 'nowrap',
+			'order' => 'creator_user_ID',
+			'td' => '@get(\'t_author\')@',
+		);
+}
 
 /**
  * Task title
@@ -222,7 +233,6 @@ if( $ItemList->is_filtered() )
 
 if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 {	// We have permission to add a post with at least one status:
-	global $tab;
 	switch( $tab )
 	{
 		case 'pages':
@@ -273,6 +283,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.17  2009/03/22 17:19:37  fplanque
+ * better intro posts handling
+ *
  * Revision 1.16  2009/03/13 00:54:37  fplanque
  * calling it "sidebar links"
  *

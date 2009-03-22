@@ -3304,6 +3304,16 @@ class Item extends ItemLight
 			return false;
 		}
 
+		if( in_array( $this->ptyp_ID, array( 1500,1520,1530,1570,1600,3000 ) ) )
+		{
+			// TODO: discard any notification that may be pending!
+			if( $verbose )
+			{
+				$Messages->add( T_('This post type doesn\'t need notifications...'), 'note' );
+			}
+			return false;
+		}
+
 		if( $notifications_mode == 'immediate' )
 		{	// We want to do the post processing immediately:
 			// send outbound pings:
@@ -3706,6 +3716,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.89  2009/03/22 17:19:37  fplanque
+ * better intro posts handling
+ *
  * Revision 1.88  2009/03/18 01:09:11  fplanque
  * rel="tag" implementation does not comply with spec
  *

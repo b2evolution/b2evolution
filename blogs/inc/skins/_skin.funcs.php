@@ -91,10 +91,18 @@ function skin_init( $disp )
 		// CONTENT PAGES:
 		case 'single':
 			$seo_page_type = 'Single post page';
+			if( ! $MainList->result_num_rows )
+			{	// There is nothing to display for this page, don't index it!
+				$robots_index = false;
+			}
 			break;
 
 		case 'page':
 			$seo_page_type = '"Page" page';
+			if( ! $MainList->result_num_rows )
+			{	// There is nothing to display for this page, don't index it!
+				$robots_index = false;
+			}
 			break;
 
 		case 'posts':
@@ -253,6 +261,8 @@ function skin_init( $disp )
 			// How do we want do deal with it?
 			skin_404_header();
 			// This MAY or MAY not have exited -- will exit on 30x redirect, otherwise will return here.
+			// Just in case some dumb robot needs extra directives on this:
+			$robots_index = false;
 			break;
 	}
 
@@ -398,7 +408,7 @@ function skin_description_tag()
 		$Item = & $MainList->get_by_idx( 0 );
 		$r = preg_replace( '|[\r\n]+|', '', $Item->get('excerpt') );
 	}
-	
+
 	if( !empty($r) )
 	{
 		echo '<meta name="description" content="'.format_to_output( $r, 'htmlattr' )."\" />\n";
@@ -600,6 +610,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.44  2009/03/22 17:19:37  fplanque
+ * better intro posts handling
+ *
  * Revision 1.43  2009/03/22 16:12:03  fplanque
  * minor
  *

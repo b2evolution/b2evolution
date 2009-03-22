@@ -25,7 +25,7 @@ param( 'cat_focus', 'string', 'main' );
 // Filter list:
 $MainList->set_filters( array(
 		'visibility_array' => array( 'published' ),  // We only want to advertised published items
-		'types' => NULL,						// ALL types (including pages)
+		'types' => '-1500,1520,1530,1570,1600,3000',	// INCLUDE pages BUT STILL EXCLUDE intros and sidebar links
 	  'unit' => 'all',						// We want to advertise all items (not just a page or a day)
 	  'cat_focus' => $cat_focus,
 	) );
