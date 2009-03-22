@@ -181,7 +181,7 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 			T_('Make canonical'), T_('301 redirect to canonical URL') );
 
 	$Form->checkbox( 'excerpts_meta_description', $edited_Blog->get_setting( 'excerpts_meta_description' ),
-			T_('Excerpts as meta description'), T_('Use except as meta description for posts and pages') );
+			T_('Meta description'), T_('Use excerpt as meta description for posts and pages') );
 
 $Form->end_fieldset();
 
@@ -315,6 +315,9 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.18  2009/03/22 16:12:02  fplanque
+ * minor
+ *
  * Revision 1.17  2009/03/21 00:38:15  waltercruz
  * Addind SEO setting for excerpts as meta description
  *

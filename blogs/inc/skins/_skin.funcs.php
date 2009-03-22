@@ -390,13 +390,11 @@ function skin_description_tag()
 	$r = '';
 
 	if( is_default_page() && !empty($Blog) )
-	{
+	{	// Description for the blog:
 		$r = $Blog->get('shortdesc');
 	}
-	else if ( $Blog->get_setting( 'excerpts_meta_description' ) && in_array( $disp, array( 'single','page') ) )
-	{
-		// walter> let's generate a description from the excerpt, now that we have auto-excerpts, if
-		// ok I will add that information on post screen
+	elseif( $Blog->get_setting( 'excerpts_meta_description' ) && in_array( $disp, array( 'single','page') ) )
+	{	// Excerpt for the current single post:
 		$Item = & $MainList->get_by_idx( 0 );
 		$r = preg_replace( '|[\r\n]+|', '', $Item->get('excerpt') );
 	}
@@ -602,6 +600,9 @@ function skin_exists( $name, $filename = 'index.main.php' )
 
 /*
  * $Log$
+ * Revision 1.43  2009/03/22 16:12:03  fplanque
+ * minor
+ *
  * Revision 1.42  2009/03/21 00:38:15  waltercruz
  * Addind SEO setting for excerpts as meta description
  *
