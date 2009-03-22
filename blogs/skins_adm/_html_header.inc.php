@@ -58,13 +58,22 @@ header_content_type( 'text/html' );
 
  	require_js( '#jquery#' );
  	require_js( '#jqueryUI#' );
- 	// script allowing to check and uncheck all boxes in forms
  	require_js( 'functions.js');
-	require_js( 'form_extensions.js');
-	// Afwas > are these two used or part of the javaScript popup calendar?
-	// require_js( 'anchorposition.js');
-	//	require_js( 'popupwindow.js' );
+	require_js( 'form_extensions.js'); // script allowing to check and uncheck all boxes in forms -- TODO: jQueryfy
 	require_js( 'rollovers.js' );
+
+	// Superfish menus:
+	require_js( 'hoverintent.js' );
+	require_js( 'superfish.js' );
+	add_js_headline( '
+		jQuery( function() {
+			jQuery("ul.sf-menu").superfish({
+	            delay: 500, // mouseout
+	            animation: {opacity:"show",height:"show"},
+	            speed: "fast"
+	        });
+		} )');
+
 	require_js( 'extracats.js' );
 	require_js( 'dynamic_select.js' );
 	require_js( 'admin.js' );
@@ -287,6 +296,11 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.25  2009/03/22 23:39:33  fplanque
+ * new evobar Menu structure
+ * Superfish jQuery menu library
+ * + removed obsolete JS includes
+ *
  * Revision 1.24  2009/03/13 00:43:05  fplanque
  * no message
  *

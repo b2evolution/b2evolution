@@ -2308,7 +2308,8 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 	}
 
 	// "use_js_popup": open link in a JS popup
-	if( ! empty($link_attribs['use_js_popup']) )
+	// TODO: this needs to be rewritten with jQuery instead
+	if( false && ! empty($link_attribs['use_js_popup']) )
 	{
 		$popup_js = 'var win = new PopupWindow(); win.setUrl( \''.$link_attribs['href'].'\' ); win.setSize(  ); ';
 
@@ -3401,6 +3402,11 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.87  2009/03/22 23:39:33  fplanque
+ * new evobar Menu structure
+ * Superfish jQuery menu library
+ * + removed obsolete JS includes
+ *
  * Revision 1.86  2009/03/08 23:57:39  fplanque
  * 2009
  *

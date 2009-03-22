@@ -86,22 +86,12 @@ class sessions_Module
 
 		if( $current_User->check_perm( 'stats', 'list' ) )
 		{	// Permission to view stats for user's blogs:
-			if( $current_User->check_perm( 'stats', 'view' ) )
-			{	// We have permission to view all stats,
-				// we'll assume that we want to view th aggregate stats and not the current blog stats
-				// fp> TODO: it might be useful to have a user pref for [View aggregate stats by default] vs [View current blog stats by default]
-				$default = 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog=0';
-			}
-			else
-			{
-				$default = 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=global';
-			}
 			$AdminUI->add_menu_entries(
 					NULL, // root
 					array(
 						'stats' => array(
 							'text' => T_('Stats'),
-							'href' => $default,
+							'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=global',
 							'entries' => array(
 								'summary' => array(
 									'text' => T_('Hit summary'),
@@ -216,6 +206,11 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.8  2009/03/22 23:39:33  fplanque
+ * new evobar Menu structure
+ * Superfish jQuery menu library
+ * + removed obsolete JS includes
+ *
  * Revision 1.7  2009/03/08 23:57:45  fplanque
  * 2009
  *
