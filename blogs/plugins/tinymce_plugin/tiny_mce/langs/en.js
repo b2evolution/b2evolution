@@ -150,8 +150,8 @@ no_sug:"No suggestions",
 no_mpell:"No misspellings found."
 },
 moreseparator:{
-desc:"Insert more separator."
+desc:"Insert more separator"
 },
 pagebreak:{
-desc:"Insert page break."
+desc:"Insert page break"
 }}});

@@ -149,6 +149,9 @@ sug:"Vorschl\u00E4ge",
 no_sug:"Keine Vorschl\u00E4ge",
 no_mpell:"Keine Rechtschreibfehler gefunden."
 },
+moreseparator:{
+desc:"\"Mehr\"-Trenner einf\u00FCgen"
+},
 pagebreak:{
-desc:"Seitenumbruch Einf\u00FCgen."
+desc:"Seitenumbruch einf\u00FCgen"
 }}});

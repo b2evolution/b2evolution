@@ -150,5 +150,5 @@ no_sug:"Aucune suggestions",
 no_mpell:"Aucune erreur trouv\u00E9e."
 },
 pagebreak:{
-desc:"Ins\u00E9rer saut de page."
+desc:"Ins\u00E9rer saut de page"
 }}});
