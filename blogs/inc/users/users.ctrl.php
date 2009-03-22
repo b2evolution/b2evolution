@@ -645,7 +645,7 @@ if( !$Messages->count('error') )
 				{
 					$msg = sprintf( T_('User &laquo;%s&raquo; deleted.'), $edited_User->dget( 'login' ) );
 				}
-				
+
 				$edited_User->dbdelete( $Messages );
 				unset($edited_User);
 				forget_param('user_ID');
@@ -663,7 +663,7 @@ if( !$Messages->count('error') )
 				{
 					$msg = sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $edited_User->dget( 'login' ) );
 				}
-				
+
 				if( ! $edited_User->check_delete( $msg ) )
 				{	// There are restrictions:
 					$action = 'view_user';
@@ -755,7 +755,7 @@ if( !$Messages->count('error') )
 			$edited_Group->set( 'perm_bypass_antispam', param( 'apply_antispam', 'integer', 0 ) ? 0 : 1 );
 			$edited_Group->set( 'perm_xhtmlvalidation', param( 'perm_xhtmlvalidation', 'string', true ) );
 			$edited_Group->set( 'perm_xhtmlvalidation_xmlrpc', param( 'perm_xhtmlvalidation_xmlrpc', 'string', true ) );
-			$edited_Group->set( 'perm_xhtml_css_tweaks', param( 'prevent_css_tweaks', 'integer', 0 ) ? 0 : 1 );
+			$edited_Group->set( 'perm_xhtml_css_tweaks', param( 'allow_css_tweaks', 'integer', 0 ) );
 			$edited_Group->set( 'perm_xhtml_iframes', param( 'prevent_iframes', 'integer', 0 ) ? 0 : 1 );
 			$edited_Group->set( 'perm_xhtml_javascript', param( 'prevent_javascript', 'integer', 0 ) ? 0 : 1 );
 			$edited_Group->set( 'perm_xhtml_objects', param( 'prevent_objects', 'integer', 0 ) ? 0 : 1 );
@@ -871,7 +871,7 @@ switch( $action )
 			{
 				$msg = sprintf( T_('Delete user &laquo;%s&raquo;?'), $edited_User->dget( 'login' ) );
 			}
-			
+
 			$edited_User->confirm_delete( $msg, $action, get_memorized( 'action' ) );
 		case 'new_user':
 		case 'view_user':
@@ -909,6 +909,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2009/03/22 08:05:28  yabs
+ * Adding more settings for css tweaks for posts
+ *
  * Revision 1.15  2009/03/20 03:38:04  fplanque
  * rollback -- http://forums.b2evolution.net/viewtopic.php?t=18269
  *

@@ -136,7 +136,41 @@ else
 }
 
 // Allowed Attribute classes
-$A_coreattrs = 'class title'.( $allow_css_tweaks ? ' style' : '' )					// 'id' is really nasty
+switch( $allow_css_tweaks )
+{
+	case 7 : // all
+		$post_css_tweaks = ' id class style';
+		break;
+
+	case 6 : // id and style only
+		$post_css_tweaks = ' id style';
+		break;
+
+	case 5 : // id and class only
+		$post_css_tweaks = ' id class';
+		break;
+
+	case 4 : // class and style only
+		$post_css_tweaks = ' class style';
+		break;
+
+	case 3 : // id only
+		$post_css_tweaks = ' id';
+		break;
+
+	case 2 : // class only
+		$post_css_tweaks = ' class';
+		break;
+
+	case 1 : // style only
+		$post_css_tweaks = ' style';
+		break;
+
+	case 0 : // no tweaks
+	default :
+		$post_css_tweaks = ''; // no tweaks
+}
+$A_coreattrs = 'title'.$post_css_tweaks					// level of allowed tweaks can be set in admin
 					.( $allow_javascript ? ' onmouseover onmouseout onclick' : '' );
 $A_i18n = 'lang xml:lang dir';
 $A_attrs = $A_coreattrs.' '.$A_i18n;
@@ -567,6 +601,9 @@ $comments_allowed_attributes = array
 
 /*
  * $Log$
+ * Revision 1.7  2009/03/22 08:04:34  yabs
+ * Adding more settings for css tweaks for posts
+ *
  * Revision 1.6  2009/03/21 22:55:15  fplanque
  * Adding TinyMCE -- lowfat version
  *
