@@ -399,17 +399,17 @@ function unautobrize_callback( $content )
 	return($content);
 }
 
-/*
- * zeroise(-)
+/**
+ * Add leading zeroes to a number when necessary.
+ *
+ * @param string The original number.
+ * @param integer How many digits shall the number have?
+ * @return string The padded number.
  */
-function zeroise($number, $threshold)
-{ // function to add leading zeros when necessary
-	$l = strlen($number);
-	if ($l < $threshold)
-		for ($i = 0; $i < ($threshold - $l); $i = $i + 1) { $number='0'.$number;	}
-	return($number);
+function zeroise( $number, $threshold )
+{
+	return str_pad( $number, $threshold, '0', STR_PAD_LEFT );
 }
-
 
 /**
  * Crop string to maxlen with &hellip; at the end if needed.
@@ -3416,6 +3416,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.91  2009/03/23 13:22:34  tblue246
+ * Simplify zeroise() function
+ *
  * Revision 1.90  2009/03/23 13:00:08  tblue246
  * minor
  *
