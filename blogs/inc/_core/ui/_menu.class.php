@@ -164,10 +164,15 @@ class Menu extends Widget
 	 */
 	function get_html_menu( $path = NULL, $template = 'main', $level = 0 )
 	{
-
 		global $current_User;
 
 		$r = '';
+
+		if( is_null($path) )
+		{
+			$path = array();
+		}
+
 		$templateForLevel = $this->get_template( $template, $level );
 
 		if( !( $menuEntries = $this->get_menu_entries($path) ) )
@@ -243,8 +248,8 @@ class Menu extends Widget
 				{ // Highlight selected entry
 					if( isset( $templateForLevel['_props']['recurse'] )
 							&& $templateForLevel['_props']['recurse'] != 'no'
-							&& ( $recursePath = array_merge( (array)$path, (array)$loop_key ) )
-							&& ($this->get_menu_entries($recursePath) ) )
+							&& ( $recursePath = array_merge( $path, array($loop_key) ) )
+							&& $this->get_menu_entries($recursePath) )
 					{
 						$r .= isset($templateForLevel['beforeEachSelWithSub']) ? $templateForLevel['beforeEachSelWithSub'] : $templateForLevel['beforeEachSel'];
 						$r .= $anchor;
@@ -267,8 +272,8 @@ class Menu extends Widget
 				{	// Not selected entry
 					if( isset( $templateForLevel['_props']['recurse'] )
 							&& $templateForLevel['_props']['recurse'] == 'always'
-							&& ( $recursePath = array_merge( (array)$path, (array)$loop_key ) )
-							&& ($this->get_menu_entries($recursePath) ) )
+							&& ( $recursePath = array_merge( $path, array($loop_key) ) )
+							&& $this->get_menu_entries($recursePath) )
 					{
 						$r .= isset($templateForLevel['beforeEachWithSub']) ? $templateForLevel['beforeEachWithSub'] : $templateForLevel['beforeEachSel'];
 						$r .= $anchor;
@@ -328,6 +333,9 @@ class Menu extends Widget
 
 /*
  * $Log$
+ * Revision 1.3  2009/03/23 12:21:31  fplanque
+ * cleaner fix (I guess)
+ *
  * Revision 1.2  2009/03/23 11:51:51  tblue246
  * Fixing array_merge() notices
  *
