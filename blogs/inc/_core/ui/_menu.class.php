@@ -241,9 +241,20 @@ class Menu extends Widget
 				{
 					$anchor .= ' title="'.$loop_details['title'].'"';
 				}
+
+				// CLASS
+				$class = '';
+				if( !empty( $loop_details['class'] ) )
+				{	// disabled
+					$class .= ' '.$loop_details['class'];
+				}
 				if( !empty( $loop_details['disabled'] ) )
 				{	// disabled
-					$anchor .= ' class="'.$templateForLevel['disabled_class'].'"';
+					$class .= ' '.$templateForLevel['disabled_class'];
+				}
+				if( !empty($class) )
+				{	// disabled
+					$anchor .= ' class="'.trim($class).'"';
 				}
 
 				$anchor .= '>'.format_to_output( $loop_details['text'], 'htmlbody' )."</a>";
@@ -313,9 +324,10 @@ class Menu extends Widget
 	{
 		switch( $name )
 		{
-			case 'evobar':
+			case 'sf-menu-left':
+			case 'sf-menu-right':
 				return array(
-					'before' => '<ul class="sf-menu">',
+					'before' => '<ul class="sf-menu '.$name.'">',
 					'after' => '</ul>',
 					'beforeEach' => '<li>',
 					'afterEach' => '</li>',
@@ -337,8 +349,8 @@ class Menu extends Widget
 
 /*
  * $Log$
- * Revision 1.5  2009/03/23 20:59:26  fplanque
- * minor
+ * Revision 1.6  2009/03/23 22:19:45  fplanque
+ * evobar right menu is now also customizable by plugins
  *
  * Revision 1.4  2009/03/23 12:38:21  tblue246
  * get_html_menu(): Also handle the case when $path is a string

@@ -134,7 +134,7 @@ class _core_Module
 		/**
 		 * @var Menu
 		 */
-		global $Menu;
+		global $topleft_Menu, $topright_Menu;
 		global $current_User;
 		global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
 		global $Blog, $blog;
@@ -320,6 +320,19 @@ class _core_Module
 								'href' => 'http://manual.b2evolution.net/',
 								'target' => '_blank',
 							),
+						'info_sep' => array(
+								'separator' => true,
+							),
+						'twitter' => array(
+								'text' => T_('b2evolution on twitter'),
+								'href' => 'http://twitter.com/b2evolution',
+								'target' => '_blank',
+							),
+						'facebook' => array(
+								'text' => T_('b2evolution on facebook'),
+								'href' => 'http://www.facebook.com/pages/b2evolution/63634905896',
+								'target' => '_blank',
+							),
 						),
 				);
 
@@ -403,11 +416,105 @@ class _core_Module
 					'text' => $debug_text,
 					'disabled' => true,
 				);
+		}
 
+		$topleft_Menu->add_menu_entries( NULL, $entries );
+
+
+		/*
+		 * RIGHT MENU
+		 */
+		global $localtimenow, $is_admin_page;
+
+		$entries = array(
+			'userprefs' => array(
+					'text' => $current_User->get_avatar_imgtag( 'crop-15x15', '', 'top' ).' <strong>'.$current_User->login.'</strong>',
+					'href' => get_user_profile_url(),
+					'entries' => array(
+						'profile' => array(
+								'text' => T_('Edit user profile').'&hellip;',
+								'href' => get_user_profile_url(),
+							),
+						),
+				),
+			'time' => array(
+					'text' => date( locale_shorttimefmt(), $localtimenow ),
+					'disabled' => true,
+				),
+		);
+
+		if( $subs_url = get_user_subs_url() )
+		{
+			$entries['userprefs']['entries']['subscriptions'] = array(
+					'text' => T_('Email subscriptions').'&hellip;',
+					'href' => $subs_url,
+				);
+		}
+
+		// ADMIN SKINS:
+		if( $is_admin_page )
+		{
+			$admin_skins = get_admin_skins();
+			if( count( $admin_skins ) > 1 )
+			{	// We have several admin skins available: display switcher:
+				$entries['userprefs']['entries']['admskins_sep'] = array(
+						'separator' => true,
+					);
+				$entries['userprefs']['entries']['admskins'] = array(
+						'text' => T_('Admin skin'),
+					);
+				foreach( $admin_skins as $admin_skin )
+				{
+					$entries['userprefs']['entries']['admskins']['entries'][$admin_skin] = array(
+							'text' => $admin_skin,
+							'href' => 'admin.php?ctrl=users&amp;action=change_admin_skin&amp;new_admin_skin='.rawurlencode($admin_skin),
+						);
+				}
+			}
 		}
 
 
-		$Menu->add_menu_entries( NULL, $entries );
+		$entries['userprefs']['entries']['logout_sep'] = array(
+				'separator' => true,
+			);
+		$entries['userprefs']['entries']['logout'] = array(
+				'text' => T_('Logout'),
+				'href' => get_user_logout_url(),
+			);
+
+		if( $is_admin_page )
+		{
+			if( !empty( $Blog ) )
+			{
+				$entries['abswitch'] = array(
+						'text' => T_('Blog').' '.get_icon('switch-to-blog'),
+						'href' => $Blog->get( 'url' ),
+					);
+			}
+			else
+			{
+				$entries['abswitch'] = array(
+						'text' => T_('Home').' '.get_icon('switch-to-blog'),
+						'href' => $home_url,
+					);
+			}
+		}
+		else
+		{
+			$entries['abswitch'] = array(
+					'text' => T_('Admin').' '.get_icon('switch-to-admin'),
+					'href' => $admin_url,
+				);
+		}
+
+		$entries['logout'] = array(
+				'text' => T_('Logout').' '.get_icon('close'),
+				'class' => 'rollover',
+				'href' => get_user_logout_url(),
+			);
+
+
+		$topright_Menu->add_menu_entries( NULL, $entries );
 
 	}
 
@@ -701,6 +808,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.10  2009/03/23 22:19:43  fplanque
+ * evobar right menu is now also customizable by plugins
+ *
  * Revision 1.9  2009/03/23 18:27:48  waltercruz
  * Fixing warn when blog=0
  *

@@ -76,7 +76,7 @@ class sessions_Module
 		/**
 		 * @var Menu
 		 */
-		global $Menu;
+		global $topleft_Menu;
 		global $current_User;
 		global $admin_url;
 		global $Blog;
@@ -92,19 +92,19 @@ class sessions_Module
 				'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$Blog->ID,
 			);
 
-			$Menu->add_menu_entries( 'manage', $entries );
+			$topleft_Menu->add_menu_entries( 'manage', $entries );
 		}
 
 		if( $current_User->check_perm( 'stats', 'view' ) )
 		{	// We have permission to view all stats
 
 			// TODO: this is hackish and would require a proper function call
-			$Menu->_menus['entries']['tools']['disabled'] = false;
+			$topleft_Menu->_menus['entries']['tools']['disabled'] = false;
 
 			// TODO: this is hackish and would require a proper function call
-			if( ! empty($Menu->_menus['entries']['tools']['entries']) )
+			if( ! empty($topleft_Menu->_menus['entries']['tools']['entries']) )
 			{	// There are already entries aboce, insert a separator:
-				$Menu->add_menu_entries( 'tools', array(
+				$topleft_Menu->add_menu_entries( 'tools', array(
 						'stats_sep' => array(
 								'separator' => true,
 							),
@@ -127,7 +127,7 @@ class sessions_Module
 					 ),
 				);
 
-			$Menu->add_menu_entries( 'tools', $entries );
+			$topleft_Menu->add_menu_entries( 'tools', $entries );
 		}
 	}
 
@@ -270,6 +270,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.10  2009/03/23 22:19:45  fplanque
+ * evobar right menu is now also customizable by plugins
+ *
  * Revision 1.9  2009/03/23 04:09:43  fplanque
  * Best. Evobar. Menu. Ever.
  * menu is now extensible by plugins

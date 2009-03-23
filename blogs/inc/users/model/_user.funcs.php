@@ -233,7 +233,7 @@ function user_logout_link( $before = '', $after = '', $link_text = '', $link_tit
  */
 function get_user_logout_link( $before = '', $after = '', $link_text = '', $link_title = '#', $params = array() )
 {
-	global $admin_url, $baseurl, $htsrv_url_sensitive, $current_User, $is_admin_page, $Blog;
+	global $current_User;
 
 	if( ! is_logged_in() )
 	{
@@ -242,6 +242,31 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
 
 	if( $link_text == '' ) $link_text = T_('Logout');
 	if( $link_title == '#' ) $link_title = T_('Logout from your account');
+
+	$r = $before;
+	$r .= '<a href="'.get_user_logout_url().'"';
+	$r .= get_field_attribs_as_string( $params, false );
+	$r .= ' title="'.$link_title.'">';
+	$r .= sprintf( $link_text, $current_User->login );
+	$r .= '</a>';
+	$r .= $after;
+	return $r;
+}
+
+
+/**
+ * Get the URL for the logout button
+ *
+ * @return string
+ */
+function get_user_logout_url()
+{
+	global $admin_url, $baseurl, $htsrv_url_sensitive, $is_admin_page, $Blog;
+
+	if( ! is_logged_in() )
+	{
+		return false;
+	}
 
 	if( $is_admin_page )
 	{
@@ -256,21 +281,13 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
   		// Alternative: return to the login page (fp> a basic user would be pretty lost on that login page)
   		// $redirect_to = url_rel_to_same_host($admin_url, $htsrv_url_sensitive);
 		}
-
 	}
 	else
 	{	// Return to current blog page:
 		$redirect_to = url_rel_to_same_host(regenerate_url('','','','&'), $htsrv_url_sensitive);
 	}
 
-	$r = $before;
-	$r .= '<a href="'.$htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.rawurlencode($redirect_to).'"';
-	$r .= get_field_attribs_as_string( $params, false );
-	$r .= ' title="'.$link_title.'">';
-	$r .= sprintf( $link_text, $current_User->login );
-	$r .= '</a>';
-	$r .= $after;
-	return $r;
+	return $htsrv_url_sensitive.'login.php?action=logout&amp;redirect_to='.rawurlencode($redirect_to);
 }
 
 
@@ -350,7 +367,7 @@ function user_profile_link( $before = '', $after = '', $link_text = '', $link_ti
  */
 function get_user_profile_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $current_User, $Blog, $is_admin_page, $admin_url, $ReqURI;
+	global $current_User;
 
 	if( ! is_logged_in() )
 	{
@@ -367,17 +384,8 @@ function get_user_profile_link( $before = '', $after = '', $link_text = '', $lin
 	}
 	if( $link_title == '#' ) $link_title = T_('Edit your profile');
 
-	if( $is_admin_page || empty( $Blog ) )
-	{
-		$url = $admin_url.'?ctrl=users&amp;user_ID='.$current_User->ID;
-	}
-	else
-	{
-		$url = url_add_param( $Blog->gen_blogurl(), 'disp=profile&amp;redirect_to='.rawurlencode($ReqURI) );
-	}
-
 	$r = $before
-		.'<a href="'.$url.'" title="'.$link_title.'">'
+		.'<a href="'.get_user_profile_url().'" title="'.$link_title.'">'
 		.sprintf( $link_text, $current_User->login )
 		.'</a>'
 		.$after;
@@ -387,11 +395,53 @@ function get_user_profile_link( $before = '', $after = '', $link_text = '', $lin
 
 
 /**
+ * Get URL to edit user profile
+ */
+function get_user_profile_url()
+{
+	global $current_User, $Blog, $is_admin_page, $admin_url, $ReqURI;
+
+	if( $is_admin_page || empty( $Blog ) )
+	{
+		$url = $admin_url.'?ctrl=users&amp;user_ID='.$current_User->ID;
+	}
+	else
+	{
+		$url = url_add_param( $Blog->gen_blogurl(), 'disp=profile&amp;redirect_to='.rawurlencode($ReqURI) );
+	}
+
+	return $url;
+}
+
+
+/**
  * Template tag: Provide a link to subscription screen
  */
 function user_subs_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
 {
-	global $current_User, $Blog, $is_admin_page;
+	global $current_User, $Blog;
+
+	if( ! $url = get_user_subs_url() )
+	{
+		return false;
+	}
+
+	if( $link_text == '' ) $link_text = T_('Subscribe');
+	if( $link_title == '#' ) $link_title = T_('Subscribe to email notifications');
+
+	echo $before;
+	echo '<a href="'.$url.'" title="', $link_title, '">';
+	printf( $link_text, $current_User->login );
+	echo '</a>';
+	echo $after;
+}
+
+/**
+ * Template tag: Provide url to subscription screen
+ */
+function get_user_subs_url()
+{
+	global $Blog, $is_admin_page;
 
 	if( ! is_logged_in() || $is_admin_page )
 	{
@@ -403,15 +453,7 @@ function user_subs_link( $before = '', $after = '', $link_text = '', $link_title
 		return false;
 	}
 
-	if( $link_text == '' ) $link_text = T_('Subscribe');
-	if( $link_title == '#' ) $link_title = T_('Subscribe to email notifications');
-
-	echo $before;
-	echo '<a href="'.url_add_param( $Blog->gen_blogurl(), 'disp=subs&amp;redirect_to='.rawurlencode( url_rel_to_same_host(regenerate_url('','','','&'), $Blog->gen_blogurl())) )
-			.'" title="', $link_title, '">';
-	printf( $link_text, $current_User->login );
-	echo '</a>';
-	echo $after;
+	return url_add_param( $Blog->gen_blogurl(), 'disp=subs&amp;redirect_to='.rawurlencode( url_rel_to_same_host(regenerate_url('','','','&'), $Blog->gen_blogurl())));
 }
 
 
@@ -542,6 +584,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.10  2009/03/23 22:19:46  fplanque
+ * evobar right menu is now also customizable by plugins
+ *
  * Revision 1.9  2009/03/08 23:57:46  fplanque
  * 2009
  *

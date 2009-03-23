@@ -203,11 +203,11 @@ div#evo_toolbar.evo_toolbar_safari li ul li a:hover {
 }
 */
 
-div#evo_toolbar .time {
+/*div#evo_toolbar .time {
 	margin: 4px 1ex;
 	color: GrayText;
 }
-
+*/
 div#evo_toolbar img {
 	position: relative;
 	top: -2px;
