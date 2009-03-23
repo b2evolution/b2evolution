@@ -168,7 +168,6 @@ class Menu extends Widget
 		global $current_User;
 
 		$r = '';
-
 		$templateForLevel = $this->get_template( $template, $level );
 
 		if( !( $menuEntries = $this->get_menu_entries($path) ) )
@@ -244,7 +243,7 @@ class Menu extends Widget
 				{ // Highlight selected entry
 					if( isset( $templateForLevel['_props']['recurse'] )
 							&& $templateForLevel['_props']['recurse'] != 'no'
-							&& ( $recursePath = array_merge( $path, $loop_key ) )
+							&& ( $recursePath = array_merge( (array)$path, (array)$loop_key ) )
 							&& ($this->get_menu_entries($recursePath) ) )
 					{
 						$r .= isset($templateForLevel['beforeEachSelWithSub']) ? $templateForLevel['beforeEachSelWithSub'] : $templateForLevel['beforeEachSel'];
@@ -268,7 +267,7 @@ class Menu extends Widget
 				{	// Not selected entry
 					if( isset( $templateForLevel['_props']['recurse'] )
 							&& $templateForLevel['_props']['recurse'] == 'always'
-							&& ( $recursePath = array_merge( $path, $loop_key ) )
+							&& ( $recursePath = array_merge( (array)$path, (array)$loop_key ) )
 							&& ($this->get_menu_entries($recursePath) ) )
 					{
 						$r .= isset($templateForLevel['beforeEachWithSub']) ? $templateForLevel['beforeEachWithSub'] : $templateForLevel['beforeEachSel'];
@@ -329,6 +328,9 @@ class Menu extends Widget
 
 /*
  * $Log$
+ * Revision 1.2  2009/03/23 11:51:51  tblue246
+ * Fixing array_merge() notices
+ *
  * Revision 1.1  2009/03/23 04:09:43  fplanque
  * Best. Evobar. Menu. Ever.
  * menu is now extensible by plugins
