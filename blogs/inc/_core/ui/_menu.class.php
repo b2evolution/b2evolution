@@ -172,6 +172,10 @@ class Menu extends Widget
 		{
 			$path = array();
 		}
+		else if ( ! is_array( $path ) )
+		{
+			$path = array( $path );
+		}
 
 		$templateForLevel = $this->get_template( $template, $level );
 
@@ -333,6 +337,9 @@ class Menu extends Widget
 
 /*
  * $Log$
+ * Revision 1.4  2009/03/23 12:38:21  tblue246
+ * get_html_menu(): Also handle the case when $path is a string
+ *
  * Revision 1.3  2009/03/23 12:21:31  fplanque
  * cleaner fix (I guess)
  *
