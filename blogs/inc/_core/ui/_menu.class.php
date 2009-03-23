@@ -172,7 +172,7 @@ class Menu extends Widget
 		{
 			$path = array();
 		}
-		else if ( ! is_array( $path ) )
+		elseif( ! is_array( $path ) )
 		{
 			$path = array( $path );
 		}
@@ -337,6 +337,9 @@ class Menu extends Widget
 
 /*
  * $Log$
+ * Revision 1.5  2009/03/23 20:59:26  fplanque
+ * minor
+ *
  * Revision 1.4  2009/03/23 12:38:21  tblue246
  * get_html_menu(): Also handle the case when $path is a string
  *
