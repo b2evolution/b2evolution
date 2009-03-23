@@ -1598,7 +1598,7 @@ function debug_die( $additional_info = '', $params = array() )
 
 	if( $is_cli )
 	{ // Command line interface, e.g. in cron_exec.php:
-		echo '== '.T_('An unexpected error has occured!')." ==\n";
+		echo '== '.T_('An unexpected error has occurred!')." ==\n";
 		echo T_('If this error persists, please report it to the administrator.')."\n";
 		echo T_('Additional information about this error:')."\n";
 		echo strip_tags( $additional_info )."\n\n";
@@ -3416,6 +3416,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.89  2009/03/23 12:59:10  tblue246
+ * minor
+ *
  * Revision 1.88  2009/03/23 04:09:43  fplanque
  * Best. Evobar. Menu. Ever.
  * menu is now extensible by plugins
