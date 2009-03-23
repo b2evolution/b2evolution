@@ -3,8 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pt-BR" lang="pt-BR">
 <head>
 	
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>pacote do b2evo: Instalando o b2evolution do princípio</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>pacote do b2evo: Instalando o b2evolution do princÃ­pio</title>
 
 	<meta name="viewport" content="width = 750" />
 	<link href="../blogs/rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
@@ -17,38 +17,38 @@
 
 	<div class="wrapper1">
 	<div class="wrapper2">
-		<span class="version_top">Versão 3.0.0-alpha</span>	
+		<span class="version_top">VersÃ£o 3.1.0-beta</span>	
 	
 		<a href="http://b2evolution.net/" target="_blank"><img src="../blogs/rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
 		
 		<div class="menu_top"> 
-			<span class="floatright"> Depois da instalação: <a href="../blogs/index.php">Blogs</a> &bull; <a href="../blogs/admin.php">Administração</a> </span> 
-			Antes da instalação: <a href="../index.pt-BR.html">Olá!</a> &bull; <a href="changes.html">Mudanças</a> &bull; <a href="../blogs/install/index.php?locale=pt-BR">Instalador</a> 		</div>
+			<span class="floatright"> Depois da instalaÃ§Ã£o: <a href="../blogs/index.php">Blogs</a> &bull; <a href="../blogs/admin.php">AdministraÃ§Ã£o</a> </span> 
+			Antes da instalaÃ§Ã£o: <a href="../index.pt-BR.html">OlÃ¡!</a> &bull; <a href="changes.html">MudanÃ§as</a> &bull; <a href="../blogs/install/index.php?locale=pt-BR">Instalador</a> 		</div>
 		
 		
 		<div class="block1">
 		<div class="block2">
 		<div class="block3">
 
-			<h1>Instalando o b2evolution do princípio</h1>
+			<h1>Instalando o b2evolution do princÃ­pio</h1>
 			
-			<p>Para instalar o b2evolution você precisará de um servidor web com suporte a PHP/MySQL  (veja os <a href="http://manual.b2evolution.net/System_requirements" target="_blank">requerimentos</a>). Alugar um servidor rápido de uma empresa de hospedagem respeitável está ficando mais barato a cada dia. Verifique nossas  <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php">hospedagens recomendadas</a>. </p>
-			<p class="note">Antes de iniciar, por favor repare que algumas caracteristicas de rede do b2evolution requerem que você concorde com os nossos simples<a href="http://b2evolution.net/about/terms.html">Termos de serviço</a>.</p>
-			<p>Agora que você descompactou a distribuição do b2evolution:</p>
+			<p>Para instalar o b2evolution vocÃª precisarÃ¡ de um servidor web com suporte a PHP/MySQL  (veja os <a href="http://manual.b2evolution.net/System_requirements" target="_blank">requerimentos</a>). Alugar um servidor rÃ¡pido de uma empresa de hospedagem respeitÃ¡vel estÃ¡ ficando mais barato a cada dia. Verifique nossas  <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php">hospedagens recomendadas</a>. </p>
+			<p class="note">Antes de iniciar, por favor repare que algumas caracteristicas de rede do b2evolution requerem que vocÃª concorde com os nossos simples<a href="http://b2evolution.net/about/terms.html">Termos de serviÃ§o</a>.</p>
+			<p>Agora que vocÃª descompactou a distribuiÃ§Ã£o do b2evolution:</p>
 			<ol class="expanded">
-				<li>No seu servidor, tente criar um novo banco de dados do MySQL (vazio) para o b2evolution (Você pode chamá-lo de"b2evolution", por exemplo. O procedimento exato para criar um novo banco de dados depende da configuração do seu servidor. Como uma alternativa, você pode também usar um banco de dados existente que o b2evolution deverá compartilhar com outras aplicações.)<br />
+				<li>No seu servidor, tente criar um novo banco de dados do MySQL (vazio) para o b2evolution (VocÃª pode chamÃ¡-lo de"b2evolution", por exemplo. O procedimento exato para criar um novo banco de dados depende da configuraÃ§Ã£o do seu servidor. Como uma alternativa, vocÃª pode tambÃ©m usar um banco de dados existente que o b2evolution deverÃ¡ compartilhar com outras aplicaÃ§Ãµes.)<br />
 				<br />
-				<span class="note"><strong>Nota:</strong> O b2evolution irá criar cerca de 25 tabelas no banco de dados que você selecionar. Se você não mudar a configuração, os nome de todas essas tabelas serão prefixados com evo_ . A menos que você já tenha uma aplicação usando o mesmo prefixo, isso torna seguro instalar o b2evolution em um banco de dados compartilhado com outras aplicações. Suas tabelas existentes não serão afetadas de forma nenhuma.</span></li>
+				<span class="note"><strong>Nota:</strong> O b2evolution irÃ¡ criar cerca de 25 tabelas no banco de dados que vocÃª selecionar. Se vocÃª nÃ£o mudar a configuraÃ§Ã£o, os nome de todas essas tabelas serÃ£o prefixados com evo_ . A menos que vocÃª jÃ¡ tenha uma aplicaÃ§Ã£o usando o mesmo prefixo, isso torna seguro instalar o b2evolution em um banco de dados compartilhado com outras aplicaÃ§Ãµes. Suas tabelas existentes nÃ£o serÃ£o afetadas de forma nenhuma.</span></li>
 				<li>Envie os arquivos do b2evolution para o seu website.<br />
 				<br />
-				<span class="note"><strong>Nota: </strong>Somente o conteúdo do diretório <code>/blogs</code> precisa ser enviado para o seu site. Se você quer que o b2evolution sirva a página inicial do seu site, envie o conteúdo do diretório<code>/blogs</code> para a raiz do seu website. Se não, é melhor enviar os arquivos para um  subdiretório no seu servidor.  Você pode mandar o nome do subdiretório como <code>/blogs</code>,mas pode também escolher outro nome.<br />
+				<span class="note"><strong>Nota: </strong>Somente o conteÃºdo do diretÃ³rio <code>/blogs</code> precisa ser enviado para o seu site. Se vocÃª quer que o b2evolution sirva a pÃ¡gina inicial do seu site, envie o conteÃºdo do diretÃ³rio<code>/blogs</code> para a raiz do seu website. Se nÃ£o, Ã© melhor enviar os arquivos para um  subdiretÃ³rio no seu servidor.  VocÃª pode mandar o nome do subdiretÃ³rio como <code>/blogs</code>,mas pode tambÃ©m escolher outro nome.<br />
 				</span>
 			<br />
-			Vamos assumir que você instalou o conteúdo da pasta blogs para  <code>http://yoursite.com/yourfolder</code> ...</li>
-				<li>Execute o script de instalação no seu servidor. Ele está localizado em  <code>http://seusite.com/suapasta/install</code> . Então, simplesmente siga as instruções na tela.<br /> <br /> O instalador irá perguntar algumas coisas, criar as tabelas necessárias e configurar o b2evollution para você. </li>
-			<li>Verifique para garantir que a nova instalação funcione.</li>
-			<li>Em servidores de produção, é recomendado que você remova o subdiretório <code>/install</code>.</li>
-			<li>Depois que a instação básica estiver concluída, existem alguns <a href="http://manual.b2evolution.net/Tricky_stuff">truques com os quais você deve tomar cuidado</a> (manual online).</li>
+			Vamos assumir que vocÃª instalou o conteÃºdo da pasta blogs para  <code>http://yoursite.com/yourfolder</code> ...</li>
+				<li>Execute o script de instalaÃ§Ã£o no seu servidor. Ele estÃ¡ localizado em  <code>http://seusite.com/suapasta/install</code> . EntÃ£o, simplesmente siga as instruÃ§Ãµes na tela.<br /> <br /> O instalador irÃ¡ perguntar algumas coisas, criar as tabelas necessÃ¡rias e configurar o b2evollution para vocÃª. </li>
+			<li>Verifique para garantir que a nova instalaÃ§Ã£o funcione.</li>
+			<li>Em servidores de produÃ§Ã£o, Ã© recomendado que vocÃª remova o subdiretÃ³rio <code>/install</code>.</li>
+			<li>Depois que a instaÃ§Ã£o bÃ¡sica estiver concluÃ­da, existem alguns <a href="http://manual.b2evolution.net/Tricky_stuff">truques com os quais vocÃª deve tomar cuidado</a> (manual online).</li>
 			</ol>
 			
 		</div>
@@ -60,10 +60,10 @@
 	<div class="body_fade_out">
 		
 	<div class="menu_bottom">
-			Recursos online: <a href="http://b2evolution.net/" target="_blank">sítio oficial</a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank">Encontre um host</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">Manual</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">Fóruns</a>
+			Recursos online: <a href="http://b2evolution.net/" target="_blank">sÃ­tio oficial</a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank">Encontre um host</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">Manual</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">FÃ³runs</a>
 		</div>
 	
-	<div class="copyright"><a href="http://b2evolution.net/about/license.html" target="_blank">Copyright &copy; 2003-2008 by Fran&ccedil;ois Planque &amp; others &middot; Licença GNU GPL</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contato</a></div>
+	<div class="copyright"><a href="http://b2evolution.net/about/license.html" target="_blank">Copyright &copy; 2003-2009 by Fran&ccedil;ois Planque &amp; others &middot; LicenÃ§a GNU GPL</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contato</a></div>
 		
 	</div>
 	</div>

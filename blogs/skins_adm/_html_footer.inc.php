@@ -64,6 +64,7 @@ if( $this->get_path(0) == 'files'
 	<?php
 }
 
+// fp TODO: check if this makes sense here
 include_footerlines(); // enables translation strings for js
 
 ?>
@@ -76,6 +77,9 @@ include_footerlines(); // enables translation strings for js
 <?php
 /*
  * $Log$
+ * Revision 1.12  2009/03/23 23:29:01  fplanque
+ * version bump
+ *
  * Revision 1.11  2009/03/15 08:39:35  yabs
  * Adding translation strings for b2evoHelper object
  *

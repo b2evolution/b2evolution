@@ -3,8 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pt-BR" lang="pt-BR">
 <head>
 	
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>pacote do b2evo: Atualizando a partir de uma vers�o anterior do b2evolution</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>pacote do b2evo: Atualizando a partir de uma versão anterior do b2evolution</title>
 
 	<meta name="viewport" content="width = 750" />
 	<link href="../blogs/rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
@@ -17,38 +17,35 @@
 
 	<div class="wrapper1">
 	<div class="wrapper2">
-		<span class="version_top">Vers�o 3.0.0-alpha</span>	
+		<span class="version_top">Versão 3.1.0-beta</span>	
 	
 		<a href="http://b2evolution.net/" target="_blank"><img src="../blogs/rsc/img/distrib/b2evolution-logo.gif" alt="b2evolution" width="237" height="92" /></a>
 		
 		<div class="menu_top"> 
-			<span class="floatright"> Depois da instala��o: <a href="../blogs/index.php">Blogs</a> &bull; <a href="../blogs/admin.php">Administra��o</a> </span> 
-			Antes da instala��o: <a href="../index.pt-BR.html">Ol�!</a> &bull; <a href="changes.html">Mudan�as</a> &bull; <a href="../blogs/install/index.php?locale=pt-BR">Instalador</a> 		</div>
+			<span class="floatright"> Depois da instalação: <a href="../blogs/index.php">Blogs</a> &bull; <a href="../blogs/admin.php">Administração</a> </span> 
+			Antes da instalação: <a href="../index.pt-BR.html">Olá!</a> &bull; <a href="changes.html">Mudanças</a> &bull; <a href="../blogs/install/index.php?locale=pt-BR">Instalador</a> 		</div>
 		
 		
 		<div class="block1">
 		<div class="block2">
 		<div class="block3">
 		
-		<h1>Atualizando a partir de uma vers�o anterior do b2evolution</h1>
-		<p class="note">Antes de iniciar, por favor repare que algumas caracteristicas de rede do b2evolution requerem que voc� concorde com os nossos simples<a href="http://b2evolution.net/about/terms.html" target="_blank">Termos de servi�o</a>.</p>
+		<h1>Atualizando a partir de uma versão anterior do b2evolution</h1>
+		<p class="note">Antes de iniciar, por favor repare que algumas caracteristicas de rede do b2evolution requerem que você concorde com os nossos simples<a href="http://b2evolution.net/about/terms.html" target="_blank">Termos de serviço</a>.</p>
 		<ol class="expanded">
-			<li>Backup all your b2evolution files. Take special care of the files you may have modified, including <strong>/conf</strong>, <strong>/skins</strong>, <strong>/plugins</strong>, your <strong>/media</strong> directory and possibly stubfiles, hacks or custom templates...</li>
-			<li>Voc� deve tamb�m fazer uma c�pia de seguran�a do seu banco de dados se voc� puder. Essa funcionalidade deve ser fornecida a voc� pelo seu servidor de hospedagem.</li>
-			<li>If you are upgrading from a version prior to 2.0, we highly recommend you clean up outdated files. To achieve this, delete your b2evolution folders <strong>except /media</strong>. Folders to delete include /admin, /conf, /cron, /htsrv, /inc, /install, /plugins, /skins, /skins_adm, /xmlsrv. Depending on your version, you may not have all of these folders on your server. Also, again, make sure you have a backup before deleting.</li>
+			<li>Faça o backup de todos o seus arquivos do b2evolution. Tome um cuidado especial com arquivos que você possa ter modificado, incluindo <strong>/conf</strong>, <strong>skins</strong>, <strong>plugins</strong>, seus diretório de <strong>mídia</strong> e possíveis arquivos de stub, hacks ou templates personalizados...</li>
+			<li>Você deve também fazer uma cópia de segurança do seu banco de dados se você puder. Essa funcionalidade deve ser fornecida a você pelo seu servidor de hospedagem.</li>
+			<li>Se você está atualizando a partir de uma versão anterior ao  2.0, nós recomendados que você limpe seus arquivos desatualizados. Para atingir isso, remova seus diretórios do b2evolution, <strong>exceto o /media</strong>. Diretórios a serem removidos incluem /admin, /conf, /cron, /htsrv, /inc, /install, /plugins, /skins, /skins_adm, /xmlsrv. Dependendo da sua versão, você pode não ter todos esses diretórios no seu servidor. Novamente, verifique que o seu backup esteja ok antes de remover esses arquivos.</li>
 			<li>Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you cannot reuse your  /conf files, default skin templates or default plugins as they are.<br />
 				<br />
 				Since your custom skins and custom plugins should be using different names, they will not be overwritten. Same for your media files.<br />
 				<br />
 				The one file you must absolutely restore from your backup (see step 1) though is <code>/blogs/conf/_basic_config.php</code>. You will need to either restore or recreate that file in order to proceed with upgrade.</li>
-			<li>Run the installation/upgrade script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code>/ . Then, simply follow the on screen instructions.<br />
-		<br />
-		The installer/upgrader will  allow you to run a database upgrade from <strong>any</strong> b2evolution version to the new one.</li>
-			<li>Verifique para garantir que a nova instala��o funcione.</li>
-			<li>Verifique o manual online para <a href="http://manual.b2evolution.net/Upgrade_from_an_older_version" target="_blank"> instru��es espec�ficas de atualiza��o</a> para a sua nova vers�o do b2evolution.</li>
-			<li>Em servidores de produ��o, � recomendado que voc� remova o subdiret�rio <code>/install</code>.</li>
-			<li>If you had hacks or other customizations to the core files, your can bring those back now.
-		We recommend you get yourself a diff/merge tool like <a href="http://winmerge.sourceforge.net/" target="_blank">WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly.</li>
+			<li>Execute o script de instalação no seu servidor. Ele está localizado em  <code>http://seusite.com/seudiretoriodosblogs/install</code> . Então, simplesmente siga as instruções na tela.<br /> <br /> O instalador permitirá que você execute uma atualização do banco de dados de <strong>qualquer</strong> versão anterior do b2evolution para a nova.</li>
+			<li>Verifique para garantir que a nova instalação funcione.</li>
+			<li>Verifique o manual online para <a href="http://manual.b2evolution.net/Upgrade_from_an_older_version" target="_blank"> instruções específicas de atualização</a> para a sua nova versão do b2evolution.</li>
+			<li>Em servidores de produção, é recomendado que você remova o subdiretório <code>/install</code>.</li>
+			<li>Se você tinha hacks ou outras personalizações no core do b2evolution, você pode trazê-los de volta. Recomendamos que você use uma ferramente de diff/merge como <a href="http://winmerge.sourceforge.net/" target="_blank">WinMerge</a>. Isso irá permitir que você facilmente compare os seus arquivos antigos (que você fez backup) com os novos (até mesmo diretórios completos por vez) e mostrar as mudanças necessárias.</li>
 			</ol>
 		
 		</div>
@@ -61,10 +58,10 @@
 	<div class="body_fade_out">
 		
 	<div class="menu_bottom">
-			Recursos online: <a href="http://b2evolution.net/" target="_blank">s�tio oficial</a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank">Encontre um host</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">Manual</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">F�runs</a>
+			Recursos online: <a href="http://b2evolution.net/" target="_blank">sítio oficial</a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank">Encontre um host</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">Manual</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">Fóruns</a>
 		</div>
 	
-	<div class="copyright"><a href="http://b2evolution.net/about/license.html" target="_blank">Copyright &copy; 2003-2008 by Fran&ccedil;ois Planque &amp; others &middot; Licen�a GNU GPL</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contato</a></div>
+	<div class="copyright"><a href="http://b2evolution.net/about/license.html" target="_blank">Copyright &copy; 2003-2009 by Fran&ccedil;ois Planque &amp; others &middot; Licença GNU GPL</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contato</a></div>
 		
 	</div>
 	</div>
