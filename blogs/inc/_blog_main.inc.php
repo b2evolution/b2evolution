@@ -451,7 +451,6 @@ if( !empty( $tempskin ) )
 	$skin = $tempskin;
 }
 
-$SkinCache = & get_cache( 'SkinCache' );
 if( isset( $skin ) )
 {	// A skin has been requested by folder_name (url or stub):
 
@@ -475,7 +474,7 @@ if( isset( $skin ) )
 			$disp_detail = '404-feeds-disabled';
 		}
 	}
-	else if ( skin_exists( $skin ) && ! $SkinCache->get_by_folder( $skin, false ) )
+	else if ( skin_exists( $skin ) && ! skin_installed( $skin ) )
 	{	// The requested skin is not a feed skin and exists in the file system, but isn't installed:
 		debug_die( sprintf( T_( 'The skin [%s] is not installed on this system.' ), htmlspecialchars( $skin ) ) );
 	}
@@ -483,6 +482,7 @@ if( isset( $skin ) )
 
 if( !isset( $skin ) )	// Note: if $skin is set to '', then we want to do a "no skin" display
 { // Use default skin from the database
+	$SkinCache = & get_cache( 'SkinCache' );
 	$Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
 	$skin = $Skin->folder;
 }
@@ -599,6 +599,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.128  2009/03/23 12:19:19  tblue246
+ * (temp)skin param: Allow plugin-provided skins
+ *
  * Revision 1.127  2009/03/20 03:55:50  fplanque
  * (explain to me why it's better to have the fix enabled by default)
  *

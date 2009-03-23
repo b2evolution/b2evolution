@@ -607,9 +607,31 @@ function skin_exists( $name, $filename = 'index.main.php' )
 	return false;
 }
 
+/**
+ * Check if a skin is installed.
+ *
+ * This can either be a regular skin or a skin provided by a plugin.
+ *
+ * @param Skin name (directory name)
+ * @return boolean True if the skin is installed, false otherwise.
+ */
+function skin_installed( $name )
+{
+	$SkinCache = & get_Cache( 'SkinCache' );
+
+	if ( skin_provided_by_plugin( $name ) || $SkinCache->get_by_folder( $name, false ) )
+	{
+		return true;
+	}
+
+	return false;
+}
 
 /*
  * $Log$
+ * Revision 1.45  2009/03/23 12:19:20  tblue246
+ * (temp)skin param: Allow plugin-provided skins
+ *
  * Revision 1.44  2009/03/22 17:19:37  fplanque
  * better intro posts handling
  *
