@@ -137,7 +137,8 @@ class _core_Module
 		global $Menu;
 		global $current_User;
 		global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
-		global $Blog;
+		global $Blog, $blog;
+
 		global $Settings;
 
 		$entries = array(
@@ -264,7 +265,7 @@ class _core_Module
 			{	// FM enabled and permission to view files:
 				$entries['manage']['entries']['files'] = array(
 						'text' => T_('Files').'&hellip;',
-						'href' => $admin_url.'?ctrl=files&amp;blog='.$Blog->ID,
+						'href' => $admin_url.'?ctrl=files&amp;blog='.$blog,
 					);
 			}
 
@@ -700,6 +701,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.9  2009/03/23 18:27:48  waltercruz
+ * Fixing warn when blog=0
+ *
  * Revision 1.8  2009/03/23 04:09:43  fplanque
  * Best. Evobar. Menu. Ever.
  * menu is now extensible by plugins
