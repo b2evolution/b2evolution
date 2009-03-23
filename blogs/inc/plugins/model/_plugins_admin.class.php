@@ -99,6 +99,7 @@ class Plugins_admin extends Plugins
 				'AdminDisplayCommentFormFieldset' => 'Display form fieldsets on the backoffice comment editing form',
 				'AdminDisplayItemFormFieldset' => 'Display form fieldsets on the backoffice item editing screen(s)',
 				'AdminEndHtmlHead' => 'This gets called at the end of the HTML HEAD section in backoffice skins',
+				'AdminAfterEvobarInit' => 'This gets called after the Evobar menu has been initialized.',
 				'AdminAfterMenuInit' => 'This gets called after the backoffice menu has been initialized.',
 				'AdminTabAction' => 'This gets called before AdminTabPayload when the Tools tab for the plugin is selected; no output allowed!',
 				'AdminTabPayload' => 'This gets called when the Tools tab for the plugin is selected and content should be displayed.',
@@ -1446,6 +1447,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.10  2009/03/23 23:05:34  fplanque
+ * Demo of how to tap into menu structure from a plugin.
+ *
  * Revision 1.9  2009/03/08 23:57:45  fplanque
  * 2009
  *

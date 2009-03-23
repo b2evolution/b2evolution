@@ -162,7 +162,7 @@ class test_plugin extends Plugin
 				'min_count' => 0,
 				'max_count' => 3,
 				'multiple' => 'true',
-				'allow_none' => true,			
+				'allow_none' => true,
 				'note' => 'Allows none or one or more than one user (up to three in this example)',
 				'entries' => array(
 					'user' => array(
@@ -434,8 +434,33 @@ class test_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Gets invoked in /toolbar.inc.php after the menu structure is built.
+	 *
+	 * @see Plugin::AdminAfterEvobarInit()
+	 */
+	function AdminAfterEvobarInit()
+	{
+
+		// The following is a tiny bit hackish and should probably be abstracted a bit, but just a little bit
+		// The idea is too let plugins hook pretty much anywhere into the menu structure, including Left AND Right menus.
+
+		global $topleft_Menu;
+		$topleft_Menu->add_menu_entries( 'tools', array(
+				'urls_sep' => array(
+						'separator' => true,
+					),
+				'urls' => array(
+						'text' => 'Test plugin&hellip;',
+						'href' => $this->get_tools_tab_url(),
+					),
+			) );
+
+	}
+
+
+	/**
 	 * Event handler: Gets invoked in /admin.php for every backoffice page after
-	 *                the menu structure is build. You can use the {@link $AdminUI} object
+	 *                the menu structure is built. You can use the {@link $AdminUI} object
 	 *                to modify it.
 	 *
 	 * This is the hook to register menu entries. See {@link register_menu_entry()}.
@@ -756,6 +781,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.77  2009/03/23 23:04:43  fplanque
+ * Demo of how to tap into menu structure from a plugin.
+ *
  * Revision 1.76  2009/03/09 10:08:32  afwas
  * Added a freestyle multiple select option with multiple selected default values.
  *

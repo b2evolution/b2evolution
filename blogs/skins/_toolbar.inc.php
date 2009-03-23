@@ -40,6 +40,8 @@ global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
  */
 global $Hit;
 
+global $Plugins;
+
 load_class( '_core/ui/_menu.class.php' );
 
 /**
@@ -57,6 +59,9 @@ $topright_Menu = new Menu();
 
 // Let the modules construct the menu:
 modules_call_method( 'build_evobar_menu' );
+
+// Call AdminAfterToolbarInit to notify Plugins that the toolbar menus are initialized. Plugins can add entries.
+$Plugins->trigger_event( 'AdminAfterEvobarInit' );
 
 ?>
 

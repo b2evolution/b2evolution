@@ -701,6 +701,15 @@ class Plugin
 
 	// Admin/backoffice events (without events specific to Items or Comments): {{{
 
+
+	/**
+	 * Event handler: Gets invoked in /toolbar.inc.php after the menu structure is built.
+	 */
+	function AdminAfterEvobarInit()
+	{
+	}
+
+
 	/**
 	 * Event handler: Gets invoked in /admin.php for every backoffice page after
 	 *                the menu structure is built. You could use the {@link $AdminUI} object
@@ -874,9 +883,9 @@ class Plugin
 	 * provides a widget and list it in the "Available widgets" list.
 	 *
 	 * @see $code
-	 * @see Plugins::call_by_code() 
+	 * @see Plugins::call_by_code()
 	 * @param array The array passed to @{link Plugins::call_by_code()}.
-	 */ 
+	 */
 	function SkinTag( & $params )
 	{
 	}
@@ -2247,7 +2256,7 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Hit': The "Hit" object (by reference).
-	 * 
+	 *
 	 * @return boolean True if you've handled the recording of the hit, false otherwise.
 	 */
 	function AppendHitLog( & $params )
@@ -2466,9 +2475,21 @@ class Plugin
 		global $AdminUI;
 
 		$menu_entry_props['text'] = $text;
-		$menu_entry_props['href'] = 'admin.php?ctrl=tools&amp;tab=plug_ID_'.$this->ID;
+		$menu_entry_props['href'] = $this->get_tools_tab_url();
 
 		$AdminUI->add_menu_entries( $path, array( 'plug_ID_'.$this->ID => $menu_entry_props ) );
+	}
+
+
+	/**
+	 * Get URL for the tools tab for this plugin.
+	 *
+	 * The tools tab must be provided with AdminTabPayload()
+	 */
+	function get_tools_tab_url()
+	{
+		global $admin_url;
+		return $admin_url.'?ctrl=tools&amp;tab=plug_ID_'.$this->ID;
 	}
 
 
@@ -2843,6 +2864,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.20  2009/03/23 23:04:43  fplanque
+ * Demo of how to tap into menu structure from a plugin.
+ *
  * Revision 1.19  2009/03/08 23:57:45  fplanque
  * 2009
  *
