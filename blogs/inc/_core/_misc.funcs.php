@@ -59,6 +59,20 @@ load_funcs('files/model/_file.funcs.php');
 
 
 /**
+ * Call a method for all modules in a row
+ */
+function modules_call_method( $method_name )
+{
+	global $modules;
+
+	foreach( $modules as $module )
+	{
+		$Module = & $GLOBALS[$module.'_Module'];
+		$Module->{$method_name}();
+	}
+}
+
+/**
  * @todo fp> split into 1 function per case. (typed @return values)
  *
  * @return DataObjectCache
@@ -3402,6 +3416,10 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.88  2009/03/23 04:09:43  fplanque
+ * Best. Evobar. Menu. Ever.
+ * menu is now extensible by plugins
+ *
  * Revision 1.87  2009/03/22 23:39:33  fplanque
  * new evobar Menu structure
  * Superfish jQuery menu library

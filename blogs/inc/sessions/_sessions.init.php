@@ -69,6 +69,70 @@ $ctrl_mappings['goals'] = 'sessions/goals.ctrl.php';
 class sessions_Module
 {
 	/**
+	 * Build the evobar menu
+	 */
+	function build_evobar_menu()
+	{
+		/**
+		 * @var Menu
+		 */
+		global $Menu;
+		global $current_User;
+		global $admin_url;
+		global $Blog;
+
+		if( !empty($Blog) && $current_User->check_perm( 'stats', 'list' ) )
+		{	// Permission to view stats for user's blogs:
+			$entries = array();
+			$entries['stats_sep'] = array(
+				'separator' => true,
+			);
+			$entries['stats'] = array(
+				'text' => T_('Blog stats').'&hellip;',
+				'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$Blog->ID,
+			);
+
+			$Menu->add_menu_entries( 'manage', $entries );
+		}
+
+		if( $current_User->check_perm( 'stats', 'view' ) )
+		{	// We have permission to view all stats
+
+			// TODO: this is hackish and would require a proper function call
+			$Menu->_menus['entries']['tools']['disabled'] = false;
+
+			// TODO: this is hackish and would require a proper function call
+			if( ! empty($Menu->_menus['entries']['tools']['entries']) )
+			{	// There are already entries aboce, insert a separator:
+				$Menu->add_menu_entries( 'tools', array(
+						'stats_sep' => array(
+								'separator' => true,
+							),
+					)
+				);
+			}
+
+			$entries = array(
+				'stats' => array(
+						'text' => T_('Global Stats').'&hellip;',
+						'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog=0',
+					 ),
+				'sessions' => array(
+						'text' => T_('User sessions').'&hellip;',
+						'href' => $admin_url.'?ctrl=stats&amp;tab=sessions&amp;tab3=global&amp;blog=0',
+					 ),
+				'goals' => array(
+						'text' => T_('Goals').'&hellip;',
+						'href' => $admin_url.'?ctrl=stats&amp;tab=goals&amp;tab3=global&amp;blog=0',
+					 ),
+				);
+
+			$Menu->add_menu_entries( 'tools', $entries );
+		}
+	}
+
+
+	/**
 	 * Builds the 1st half of the menu. This is the one with the most important features
 	 */
 	function build_menu_1()
@@ -206,6 +270,10 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.9  2009/03/23 04:09:43  fplanque
+ * Best. Evobar. Menu. Ever.
+ * menu is now extensible by plugins
+ *
  * Revision 1.8  2009/03/22 23:39:33  fplanque
  * new evobar Menu structure
  * Superfish jQuery menu library

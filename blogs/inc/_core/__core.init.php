@@ -127,6 +127,291 @@ $ctrl_mappings = array(
 class _core_Module
 {
 	/**
+	 * Build teh evobar menu
+	 */
+	function build_evobar_menu()
+	{
+		/**
+		 * @var Menu
+		 */
+		global $Menu;
+		global $current_User;
+		global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
+		global $Blog;
+		global $Settings;
+
+		$entries = array(
+			'b2evo' => array(
+					'text' => '<strong>b2evolution</strong>',
+					'href' => $home_url,
+				),
+			'dashboard' => array(
+					'text' => T_('Dashboard'),
+					'href' => $admin_url,
+					'title' => T_('Go to admin dashboard'),
+				),
+			'see' => array(
+					'text' => T_('See'),
+					'href' => $home_url,
+					'title' => T_('See the home page'),
+				),
+			'write' => array(
+					'text' => T_('Write'),
+					'title' => T_('No blog is currently selected'),
+					'disabled' => true,
+				),
+			'manage' => array(
+					'text' => T_('Manage'),
+					'title' => T_('No blog is currently selected'),
+					'disabled' => true,
+				),
+			'customize' => array(
+					'text' => T_('Customize'),
+					'title' => T_('No blog is currently selected'),
+					'disabled' => true,
+				),
+			'tools' => array(
+					'text' => T_('Tools'),
+					'disabled' => true,
+				),
+		);
+
+		if( !empty($Blog) )
+		{	// A blog is currently selected:
+			$entries['dashboard']['href'] = $admin_url.'?blog='.$Blog->ID;
+			$entries['see']['href'] = $Blog->get( 'url' );
+
+
+			$entries['see']['title'] = T_('See the public view of this blog');
+
+
+			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+			{	// We have permission to add a post with at least one status:
+				$entries['write']['href'] = $admin_url.'?ctrl=items&amp;action=new&amp;blog='.$Blog->ID;
+				$entries['write']['disabled'] = false;
+				$entries['write']['title'] = T_('Write a new post into this blog');
+			}
+			else
+			{
+				$entries['write']['title'] = T_('You don\'t have permission to post into this blog');
+			}
+
+
+ 			$items_url = $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=restore';
+			$entries['manage']['href'] = $items_url;
+			$entries['manage']['disabled'] = false;
+			$entries['manage']['title'] = T_('Manage the contents of this blog');
+			$entries['manage']['entries'] = array(
+					'posts' => array(
+							'text' => T_('Posts').'&hellip;',
+							'href' => $items_url.'&amp;tab=list',
+						),
+					'pages' => array(
+							'text' => T_('Pages').'&hellip;',
+							'href' => $items_url.'&amp;tab=pages',
+						),
+					'intros' => array(
+							'text' => T_('Intro posts').'&hellip;',
+							'href' => $items_url.'&amp;tab=intros',
+						),
+					'podcasts' => array(
+							'text' => T_('Podcast episodes').'&hellip;',
+							'href' => $items_url.'&amp;tab=podcasts',
+						),
+					'links' => array(
+							'text' => T_('Sidebar links').'&hellip;',
+							'href' => $items_url.'&amp;tab=links',
+						),
+				);
+			if( $Blog->get_setting( 'use_workflow' ) )
+			{	// We want to use workflow properties for this blog:
+				$entries['manage']['entries']['tracker'] = array(
+						'text' => T_('Tracker').'&hellip;',
+						'href' => $items_url.'&amp;tab=tracker',
+					);
+			}
+			$entries['manage']['entries']['full'] = array(
+					'text' => T_('All Items').'&hellip;',
+					'href' => $items_url.'&amp;tab=full',
+				);
+		}
+
+
+		$perm_comments = (! empty($Blog)) && $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID );
+		$perm_files = $Settings->get( 'fm_enabled' ) && $current_User->check_perm( 'files', 'view' );
+		$perm_chapters = (! empty($Blog)) && $current_User->check_perm( 'blog_cats', 'edit', false, $Blog->ID );
+
+		if( $perm_comments || $perm_files || $perm_chapters )
+		{
+			$entries['manage']['disabled'] = false;
+
+			if( ! empty($entries['manage']['entries']) )
+			{	// There are already entries aboce, insert a separator:
+				$entries['manage']['entries'][] = array(
+					'separator' => true,
+				);
+			}
+
+			if( $perm_comments )
+			{	// Comments:
+				$entries['manage']['entries']['comments'] = array(
+						'text' => T_('Comments').'&hellip;',
+						'href' => $admin_url.'?ctrl=comments&amp;blog='.$Blog->ID,
+					);
+			}
+
+			if( $perm_files )
+			{	// FM enabled and permission to view files:
+				$entries['manage']['entries']['files'] = array(
+						'text' => T_('Files').'&hellip;',
+						'href' => $admin_url.'?ctrl=files&amp;blog='.$Blog->ID,
+					);
+			}
+
+			if( $perm_chapters )
+			{	// Chapters:
+				$entries['manage']['entries']['chapters'] = array(
+						'text' => T_('Categories').'&hellip;',
+						'href' => $admin_url.'?ctrl=chapters&amp;blog='.$Blog->ID,
+					);
+			}
+		}
+
+
+
+		if( $current_User->check_perm( 'options', 'view' ) )
+		{	// Permission to access system info
+			$entries['b2evo']['entries']['system'] = array(
+					'text' => T_('About this system').'&hellip;',
+					'href' => $admin_url.'?ctrl=system',
+				);
+			$entries['b2evo']['entries'][] = array(
+					'separator' => true,
+				);
+		}
+
+		if( $current_User->check_perm( 'blogs', 'create' ) )
+		{
+			$entries['b2evo']['entries']['newblog'] = array(
+					'text' => T_('Create new blog').'&hellip;',
+					'href' => $admin_url.'?ctrl=collections&amp;action=new',
+				);
+			$entries['b2evo']['entries'][] = array(
+					'separator' => true,
+				);
+		}
+
+		$entries['b2evo']['entries']['info'] = array(
+				'text' => T_('More info'),
+				'entries' => array(
+						'b2evonet' => array(
+								'text' => T_('Open b2evolution.net'),
+								'href' => 'http://b2evolution.net/',
+								'target' => '_blank',
+							),
+						'forums' => array(
+								'text' => T_('Open Support forums'),
+								'href' => 'http://forums.b2evolution.net/',
+								'target' => '_blank',
+							),
+						'manual' => array(
+								'text' => T_('Open Online manual'),
+								'href' => 'http://manual.b2evolution.net/',
+								'target' => '_blank',
+							),
+						),
+				);
+
+
+		// CUSTOMIZE:
+		if( !empty($Blog) && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+		{	// We have permission to edit blog properties:
+			$blog_param = '&amp;blog='.$Blog->ID;
+
+			$entries['customize']['href'] = $admin_url.'?ctrl=widgets'.$blog_param;
+			$entries['customize']['disabled'] = false;
+			$entries['customize']['title'] = T_('Customize this blog');
+
+			$entries['customize']['entries'] = array(
+				'general' => array(
+						'text' => T_('Blog properties').'&hellip;',
+						'href' => $admin_url.'?ctrl=coll_settings'.$blog_param,
+					),
+				'features' => array(
+						'text' => T_('Blog features').'&hellip;',
+						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=features'.$blog_param,
+					),
+				'skin' => array(
+						'text' => T_('Blog skin').'&hellip;',
+						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin'.$blog_param,
+					),
+				'widgets' => array(
+						'text' => T_('Blog widgets').'&hellip;',
+						'href' => $admin_url.'?ctrl=widgets'.$blog_param,
+					),
+				'urls' => array(
+						'text' => T_('Blog URLs').'&hellip;',
+						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=urls'.$blog_param,
+					),
+			);
+		}
+
+
+		// TOOLS:
+		$perm_spam = $current_User->check_perm( 'spamblacklist', 'view', false );
+		$perm_options = $current_User->check_perm( 'options', 'view' );
+		if( $perm_spam || $perm_options )
+		{	// Permission to view settings:
+			if( $perm_spam )
+			{
+				$entries['tools']['entries']['antispam'] = array(
+						'text' => T_('Antispam blacklist').'&hellip;',
+						'href' => $admin_url.'?ctrl=antispam',
+					);
+			}
+
+			if( $perm_options )
+			{
+				$entries['tools']['entries']['crontab'] = array(
+						'text' => T_('Scheduler').'&hellip;',
+						'href' => $admin_url.'?ctrl=crontab',
+					);
+			}
+		}
+
+		if( $debug )
+		{
+			$debug_text = 'DEBUG: ';
+			if( !empty($seo_page_type) )
+			{	// Set in skin_init()
+				$debug_text = $seo_page_type.': ';
+			}
+			if( $robots_index === false )
+			{
+				$debug_text .= 'NO INDEX';
+			}
+			else
+			{
+				$debug_text .= 'do index';
+			}
+
+			$entries['tools']['entries']['noindex_sep'] = array(
+					'separator' => true,
+				);
+			$entries['tools']['entries']['noindex'] = array(
+					'text' => $debug_text,
+					'disabled' => true,
+				);
+
+		}
+
+
+		$Menu->add_menu_entries( NULL, $entries );
+
+	}
+
+
+	/**
 	 * Builds the 1st half of the menu. This is the one with the most important features
 	 */
 	function build_menu_1()
@@ -415,6 +700,10 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.8  2009/03/23 04:09:43  fplanque
+ * Best. Evobar. Menu. Ever.
+ * menu is now extensible by plugins
+ *
  * Revision 1.7  2009/03/08 23:57:38  fplanque
  * 2009
  *

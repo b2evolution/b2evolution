@@ -31,7 +31,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-load_class( '_core/ui/_uiwidget.class.php' );
+load_class( '_core/ui/_menu.class.php' );
 
 
 /**
@@ -44,7 +44,7 @@ load_class( '_core/ui/_uiwidget.class.php' );
  * @package admin
  * @todo CODE DOCUMENTATION!!!
  */
-class AdminUI_general extends Widget
+class AdminUI_general extends Menu
 {
 	/**
 	 * Visual path seperator (used in html title, ..)
@@ -55,16 +55,6 @@ class AdminUI_general extends Widget
 
 	/*-------------------------------------------------------------------*/
 	/*- The members below should not get overridden in a derived class. -*/
-
-	/**
-	 * The menus.
-	 *
-	 * Use {@link add_menu_entries()} to add them here.
-	 *
-	 * @access protected
-	 * @var array
-	 */
-	var $_menus = array();
 
 	/**
 	 * The path of the current selected menu entry.
@@ -156,38 +146,6 @@ class AdminUI_general extends Widget
 	 */
 	function init_templates()
 	{
-	}
-
-
-	/**
-	 * Add menu entries to the list of entries for a given path.
-	 *
-	 * @param NULL|string|array The path to add the entries to. See {@link get_node_by_path()}.
-	 * @param array Menu entries to add (key (string) => entry (array)).
-	 *   An entry can have the following keys:
-	 *     'text': Text/Caption for this entry.
-	 *     'href': The link for this entry.
-	 *     'style': CSS style for this entry.
-	 *     'onclick': onclick property for this entry.
-	 *     'name': name attribute of the link/entry.
-	 *     'entries': array of sub-entries
-	 */
-	function add_menu_entries( $path, $entries )
-	{
-		// Get a reference to the node in the menu list.
-		$node = & $this->get_node_by_path( $path, true );
-
-		/*
-		if( !is_array($node) )
-		{
-			debug_die( 'add_menu_entries() with non-existing path!' );
-		}
-		*/
-
-		foreach( $entries as $l_key => $l_menu_props )
-		{
-			$node['entries'][$l_key] = $l_menu_props;
-		}
 	}
 
 
@@ -386,24 +344,6 @@ class AdminUI_general extends Widget
 		}
 
 		return false;
-	}
-
-
-	/**
-	 * Get a menu, any level.
-	 *
-	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
-	 * @param string The template name, see {@link get_template()}.
-	 */
-	function get_html_menu( $path = NULL, $template = 'main' )
-	{
-		/* debug:
-		$r = ' dispMenu-BEGIN ';
-		$r .= $this->get_html_menu_entries( $path, $template );
-		$r .= ' dispMenu-END ';
-		return $r;
-		*/
-		return $this->get_html_menu_entries( $path, $template );
 	}
 
 
@@ -706,184 +646,7 @@ class AdminUI_general extends Widget
 
 
 	/**
-	 * Get the HTML for the menu entries of a specific path.
-	 *
-	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
-	 * @param string Template name, see {@link get_template()}.
-	 * @param int Depth (recursion)
-	 * @return string The HTML for the menu.
-	 */
-	function get_html_menu_entries( $path, $template, $depth = 0 )
-	{
-		global $current_User;
-
-		$r = '';
-
-		$templateForLevel = $this->get_template( $template, $depth );
-
-		if( !( $menuEntries = $this->get_menu_entries($path) ) )
-		{	// No menu entries at this level
-			if( isset($templateForLevel['empty']) )
-			{
-				$r .= $templateForLevel['empty'];
-			}
-		}
-		else
-		{	// There are entries to display:
-			$r .= $templateForLevel['before'];
-
-			$selected = $this->get_selected($path);
-
-			foreach( $menuEntries as $loop_key => $loop_details )
-			{
-				$anchor = '<a href="';
-
-				if( isset( $loop_details['href'] ) )
-				{
-					$anchor .= $loop_details['href'];
-				}
-				elseif( !empty($loop_details['href_eval']) )
-				{ // Useful for passing dynamic context vars (fp>> I AM using it)
-					$anchor .= eval( $loop_details['href_eval'] );
-				}
-				else
-				{
-					$anchor .= regenerate_url( 'tab', 'tab='.$loop_key );
-				}
-				$anchor .= '"';
-				if( isset($loop_details['style']) )
-				{
-					$anchor .= ' style="'.$loop_details['style'].'"';
-				}
-				if( isset($loop_details['onclick']) )
-				{
-					$anchor .= ' onclick="'.$loop_details['onclick'].'"';
-				}
-				if( isset($loop_details['name']) )
-				{
-					$anchor .= ' name="'.$loop_details['name'].'"';
-				}
-
-				$anchor .= '>'.format_to_output( $loop_details['text'], 'htmlbody' )."</a>";
-
-				if( $loop_key == $selected )
-				{ // Highlight selected entry
-					if( !empty( $templateForLevel['_props']['recurseSelected'] )
-							&& ( $recursePath = array_merge( $path, $loop_key ) )
-							&& ($this->get_menu_entries($recursePath) ) )
-					{
-						$r .= isset($templateForLevel['beforeEachSelWithSub'])
-							? $templateForLevel['beforeEachSelWithSub']
-							: $templateForLevel['beforeEachSel'];
-						$r .= $anchor;
-
-						// Recurse:
-						$r .= $this->get_html_menu_entries( $recursePath, $template, $depth+1 );
-
-						$r .= isset($templateForLevel['afterEachSelWithSub'])
-							? $templateForLevel['afterEachSelWithSub']
-							: $templateForLevel['afterEachSel'];
-					}
-					else
-					{
-						$r .= $templateForLevel['beforeEachSel'];
-						$r .= $anchor;
-						$r .= $templateForLevel['afterEachSel'];
-					}
-				}
-				else
-				{
-					$r .= $templateForLevel['beforeEach'];
-					$r .= $anchor;
-					$r .= $templateForLevel['afterEach'];
-				}
-			}
-			$r .= $templateForLevel['after'];
-		}
-
-		return $r;
-	}
-
-
-	/**
-	 * Get menu entries for a given path.
-	 *
-	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
-	 * @return array The menu entries (may be empty).
-	 */
-	function get_menu_entries( $path )
-	{
-		$node = & $this->get_node_by_path( $path );
-
-		return isset( $node['entries'] ) ? $node['entries'] : array();
-	}
-
-
-	/**
-	 * Get the key of a selected entry for a path.
-	 *
-	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
-	 * @return string|false
-	 */
-	function get_selected( $path )
-	{
-		$node = & $this->get_node_by_path($path);
-
-		if( isset($node['selected']) )
-		{
-			return $node['selected'];
-		}
-
-		return false;
-	}
-
-
-	/**
-	 * Get the reference of a node from the menu entries using a path.
-	 *
-	 * @param array|string|NULL The path. NULL means root, string means child of root,
-	 *                          array means path below root.
-	 *                          (eg <code>array('options', 'general')</code>).
-	 * @param boolean Should the node be created if it does not exist already?
-	 * @return array|false The node as array or false, if the path does not exist (and we do not $createIfNotExisting).
-	 */
-	function & get_node_by_path( $path, $createIfNotExisting = false )
-	{
-		if( is_null($path) )
-		{ // root element
-			$path = array();
-		}
-		elseif( ! is_array($path) )
-		{
-			$path = array($path);
-		}
-
-		$node = & $this->_menus;
-		foreach( $path as $lStep )
-		{
-			if( ! isset($node['entries'][$lStep]) )
-			{
-				if( $createIfNotExisting )
-				{
-					$node['entries'][$lStep] = array();
-				}
-				else
-				{
-					$r = false;
-					return $r;
-				}
-			}
-			$node = & $node['entries'][$lStep];
-		}
-
-		return $node;
-	}
-
-
-	/**
-	 * Get a template by name and depth.
-	 *
-	 * Templates can handle multiple depth levels
+	 * Get a template by name.
 	 *
 	 * This is a method (and not a member array) to allow dynamic generation and T_()
 	 *
@@ -891,44 +654,27 @@ class AdminUI_general extends Widget
 	 * @param integer Nesting level (start at 0)
 	 * @return array Associative array which defines layout and optionally properties.
 	 */
-	function get_template( $name, $depth = 0 )
+	function get_template( $name, $level = 0 )
 	{
 		switch( $name )
 		{
 			case 'main':
-				switch( $depth )
-				{
-					case 0:
-						// main level
-						return array(
-							'before' => '<div id="mainmenu"><ul>',
-							'after' => '</ul></div>',
-							'beforeEach' => '<li>',
-							'afterEach' => '</li>',
-							'beforeEachSel' => '<li class="current">',
-							'afterEachSel' => '</li>',
-							'beforeEachSelWithSub' => '<li class="parent">',
-							'afterEachSelWithSub' => '</li>',
-							'_props' => array(
-								/**
-								 * @todo Move to new skin (recurse for subentries if an entry is selected)
-								'recurseSelected' => true,
-								*/
-							),
-						);
-
-					default:
-						// any sublevel
-						return array(
-							'before' => '<ul class="submenu">',
-							'after' => '</ul>',
-							'beforeEach' => '<li>',
-							'afterEach' => '</li>',
-							'beforeEachSel' => '<li class="current">',
-							'afterEachSel' => '</li>',
-						);
-				}
-
+				return array(
+					'before' => '<div id="mainmenu"><ul>',
+					'after' => '</ul></div>',
+					'beforeEach' => '<li>',
+					'afterEach' => '</li>',
+					'beforeEachSel' => '<li class="current">',
+					'afterEachSel' => '</li>',
+					'beforeEachSelWithSub' => '<li class="parent">',
+					'afterEachSelWithSub' => '</li>',
+					'_props' => array(
+						/**
+						 * @todo Move to new skin (recurse for subentries if an entry is selected)
+						'recurseSelected' => true,
+						*/
+					),
+				);
 				break;
 
 
@@ -1428,29 +1174,14 @@ class AdminUI_general extends Widget
 
 		// Let the modules construct the menu:
 		// Part 1:
-		$this->modules_call_method( 'build_menu_1' );
+		modules_call_method( 'build_menu_1' );
 
 		// Part 2:
-		$this->modules_call_method( 'build_menu_2' );
+		modules_call_method( 'build_menu_2' );
 
 		// Call AdminAfterMenuInit to notify Plugins that the menu is initialized
 		// E.g. the livehits_plugin and weather_plugin use it for adding a menu entry.
 		$Plugins->trigger_event( 'AdminAfterMenuInit' );
-	}
-
-
-	/**
-	 * Call a method for all modules in a row
-	 */
-	function modules_call_method( $method_name )
-	{
-		global $modules;
-
-		foreach( $modules as $module )
-		{
-			$Module = & $GLOBALS[$module.'_Module'];
-			$Module->{$method_name}();
-		}
 	}
 
 
@@ -1553,6 +1284,10 @@ class AdminUI_general extends Widget
 
 /*
  * $Log$
+ * Revision 1.93  2009/03/23 04:09:43  fplanque
+ * Best. Evobar. Menu. Ever.
+ * menu is now extensible by plugins
+ *
  * Revision 1.92  2009/03/08 23:57:56  fplanque
  * 2009
  *

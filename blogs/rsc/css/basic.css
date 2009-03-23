@@ -331,6 +331,10 @@ ul.sf-menu li li li.sfHover ul {
 	border-bottom-color: ThreeDShadow;
 }
 
+.sf-menu a.disabled {
+	color: GrayText;
+}
+
 .sf-menu li:hover, .sf-menu li.sfHover,
 .sf-menu a:focus, .sf-menu a:hover, .sf-menu a:active {
 	text-decoration: none;
