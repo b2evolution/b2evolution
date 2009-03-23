@@ -1606,7 +1606,7 @@ function debug_die( $additional_info = '', $params = array() )
 	else
 	{
 		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
-		echo '<h3 style="color:#f00;">'.T_('An unexpected error has occured!').'</h3>';
+		echo '<h3 style="color:#f00;">'.T_('An unexpected error has occurred!').'</h3>';
 		echo '<p>'.T_('If this error persists, please report it to the administrator.').'</p>';
 		echo '<p><a href="'.$baseurl.'">'.T_('Go back to home page').'</a></p>';
 		echo '</div>';
@@ -3416,6 +3416,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.90  2009/03/23 13:00:08  tblue246
+ * minor
+ *
  * Revision 1.89  2009/03/23 12:59:10  tblue246
  * minor
  *
