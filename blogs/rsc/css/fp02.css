@@ -7,6 +7,7 @@
 @import url("blog_elements.css");	/* Import standard blog elements styles */
 
 div.main {
+	clear: both;
 	margin-right: 0px;
 	margin-left: 0px;
 }
@@ -218,18 +219,16 @@ caption {
 	font-weight: bold;
 }
 
-A 			{
-}
-A:link		{
+a {
 	color: #0066CC;
 }
-A:visited	{
+a:visited	{
 	color: #009999;
 }
-A:active	{
+a:active	{
 	color: #003399;
 }
-A:hover		{
+a:hover		{
 	color: #003399;
 }
 h1 {
@@ -250,13 +249,6 @@ h4 {
 table.wide {
 	width: 100%;
 	clear: both;
-}
-td.cartouche {
-	font-size: 84%;
-	color: #009999;
-	background-color: #FFFFFF;
-	padding: 1px 4px;
-	border: 1px solid #33CCCC;
 }
 table.thin
 {
@@ -333,21 +325,7 @@ body {
 }
 div.pageHeader {
 	background-color: #33CCCC;
-	width: 100%;
-}
-div.pageHeaderContent {
-	padding-left: 5px;
-	padding-top: 2px;
-	padding-right: 0px;
-	padding-bottom: 0px;
-	font-weight: bold;
-	font-size: 84%;
-	width: 90ex;
-	text-align: left;
-	margin-right: auto;
-	margin-left: auto;
-	/* border: 1px solid #990000; */
-
+	padding: 3px 1ex 6px;
 }
 div.pageTitle {
 	white-space: nowrap;
@@ -358,8 +336,6 @@ div.pageTitle {
 	background-color: #33CCCC;
 	border: 1px solid #FFFFFF;
 	margin-top: 3px;
-	float: left;
-	width: 100%;
 }
 h1#pageTitle {
 	color: #FFFFFF;
@@ -371,16 +347,9 @@ h1#pageTitle {
 
 div.NavBar {
 	clear: both;
-	height: 1ex;
+	height: 2em;
 }
-.pageHeaderEnd {
-	clear: both;
-	margin-top: 0px;
-	margin-bottom: 0px;
-	padding: 0px;
-	height: 5px;
-	font-size: 0ex;
-}
+
 a.NavButton {
 	text-decoration: none;
 	background-color: #33AAAA;
@@ -391,7 +360,6 @@ a.NavButton {
 	padding-left: 4px;
 	white-space: nowrap;
 	margin-right: 3px;
-	margin-top: 3px;
 	display: block;
 	width: 14ex;
 	float: left;
@@ -407,7 +375,6 @@ a.NavButtonCurr {
 	padding-bottom: 2px;
 	padding-left: 4px;
 	white-space: nowrap;
-	margin-top: 3px;
 	margin-right: 3px;
 	display: block;
 	width: 14ex;
@@ -446,57 +413,57 @@ a.NavButton2Curr {
 	float: left;
 }
 
-A.NavButton:link		{
+a.NavButton:link		{
 	color: #FFFFFF;
 }
-A.NavButton:visited	{
+a.NavButton:visited	{
 	color: #FFFFFF;
 }
-A.NavButton:active	{
+a.NavButton:active	{
 	color: #FFFFFF;
 }
-A.NavButton:hover		{
+a.NavButton:hover		{
 	color: #FFFFFF;
 	background-color: #33CCCC;
 	/* text-decoration: underline; */
 }
-A.NavButtonCurr:link		{
+a.NavButtonCurr:link		{
 	color: #FFFFFF;
 }
-A.NavButtonCurr:visited	{
+a.NavButtonCurr:visited	{
 	color: #FFFFFF;
 }
-A.NavButtonCurr:active	{
+a.NavButtonCurr:active	{
 	color: #FFFFFF;
 }
-A.NavButtonCurr:hover		{
+a.NavButtonCurr:hover		{
 	color: #338888;
 	/* text-decoration: underline; */
 }
-A.NavButton2:link		{
+a.NavButton2:link		{
 	color: #FFFFFF;
 }
-A.NavButton2:visited	{
+a.NavButton2:visited	{
 	color: #FFFFFF;
 }
-A.NavButton2:active	{
+a.NavButton2:active	{
 	color: #FFFFFF;
 }
-A.NavButton2:hover		{
+a.NavButton2:hover		{
 	color: #FFFFFF;
 	background-color: #33CCCC;
 	/* text-decoration: underline; */
 }
-A.NavButton2Curr:link		{
+a.NavButton2Curr:link		{
 	color: #FFFFFF;
 }
-A.NavButton2Curr:visited	{
+a.NavButton2Curr:visited	{
 	color: #FFFFFF;
 }
-A.NavButton2Curr:active	{
+a.NavButton2Curr:active	{
 	color: #FFFFFF;
 }
-A.NavButton2Curr:hover		{
+a.NavButton2Curr:hover		{
 	color: #33AAAA;
 	/* text-decoration: underline; */
 }
@@ -511,4 +478,14 @@ A.NavButton2Curr:hover		{
 	padding-top: 6px;
 	padding-bottom: 4px;
 	padding-left: 6px;
+}
+
+div.footer {
+	background-color:#33CCCC;
+	padding: 3px 1ex;
+	color: #fff;
+	clear: both;
+}
+div.footer a {
+	color: #fff;
 }

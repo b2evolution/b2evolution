@@ -38,6 +38,8 @@ param( 'return', 'integer', 0 );
 
 // Note: This is an interactive page: not a good candidate for caching.
 
+add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
+
 header_content_type( 'text/html' );
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -45,23 +47,31 @@ header_content_type( 'text/html' );
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
 <title><?php echo T_('Contact Form Demo'); ?></title>
-<!-- InstanceEndEditable -->
+<!-- InstanceEndEditable --> 
 <link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 <!-- InstanceBeginEditable name="head" -->
- <!-- InstanceEndEditable -->
+	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
+ <!-- InstanceEndEditable --> 
 </head>
 <body>
 <!-- InstanceBeginEditable name="ToolBar" -->
-	<?php
-		// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
-		require $skins_path.'_toolbar.inc.php';
-		// ------------------------------- END OF TOOLBAR --------------------------------
-	?>
+<?php
+	// ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
+	require $skins_path.'_toolbar.inc.php';
+	// ------------------------------- END OF TOOLBAR --------------------------------
+	echo "\n";
+	if( is_logged_in() )
+	{
+		echo '<div id="skin_wrapper" class="skin_wrapper_loggedin">';
+	}
+	else
+	{
+		echo '<div id="skin_wrapper" class="skin_wrapper_anonymous">';
+	}
+	echo "\n";
+?>
 <!-- InstanceEndEditable -->
-
 <div class="pageHeader">
-<div class="pageHeaderContent">
-
 <!-- InstanceBeginEditable name="NavBar2" -->
 <?php
 	// --------------------------------- START OF BLOG LIST --------------------------------
@@ -84,15 +94,8 @@ header_content_type( 'text/html' );
 	// ---------------------------------- END OF BLOG LIST ---------------------------------
 ?>
 <!-- InstanceEndEditable -->
-
-<div class="NavBar">
 <div class="pageTitle">
 <h1 id="pageTitle"><!-- InstanceBeginEditable name="PageTitle" --><?php echo T_('Contact Form Demo') ?><!-- InstanceEndEditable --></h1>
-</div>
-</div>
-
-<div class="pageHeaderEnd"></div>
-
 </div>
 </div>
 
@@ -142,17 +145,10 @@ header_content_type( 'text/html' );
 
 
 <!-- InstanceEndEditable --></div>
-<table cellspacing="3" class="wide">
-  <tr>
-  <td class="cartouche">Original page design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> </td>
-
-	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="rsc/img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></td>
-  </tr>
-</table>
+<div class="footer">
+This is a demo page for <a href="http://b2evolution.net/">b2evolution</a>.
 <!-- InstanceBeginEditable name="Baseline" -->
-<?php
-	debug_info();
-?>
-<!-- InstanceEndEditable -->
+<?php echo '</div>' ?>
+<!-- InstanceEndEditable --></div>
 </body>
 <!-- InstanceEnd --></html>

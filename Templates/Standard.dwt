@@ -12,21 +12,11 @@
 <body>
 <!-- TemplateBeginEditable name="ToolBar" -->
 <!-- TemplateEndEditable -->
-
 <div class="pageHeader">
-<div class="pageHeaderContent">
-
 <!-- TemplateBeginEditable name="NavBar2" -->
 <!-- TemplateEndEditable -->
-
-<div class="NavBar">
 <div class="pageTitle">
 <h1 id="pageTitle"><!-- TemplateBeginEditable name="PageTitle" -->my b2evolution: ...<!-- TemplateEndEditable --></h1>
-</div>
-</div>
-
-<div class="pageHeaderEnd"></div>
-	  
 </div>
 </div>
 
@@ -35,15 +25,9 @@
 
 
 <div class="main"><!-- TemplateBeginEditable name="Main" -->
-<p>Main</p>
 <!-- TemplateEndEditable --></div>
-<table cellspacing="3" class="wide">
-  <tr> 
-  <td class="cartouche">Original page design by <a href="http://fplanque.net/">Fran&ccedil;ois PLANQUE</a> </td>
-    
-	<td class="cartouche" align="right"> <a href="http://b2evolution.net/" title="b2evolution home"><img src="../blogs/rsc/img/b2evolution_button.png" alt="b2evolution" width="80" height="15" class="middle" /></a></td>
-  </tr>
-</table>
-<!-- TemplateBeginEditable name="Baseline" --><!-- TemplateEndEditable -->
+<div class="footer">
+This is a demo page for <a href="http://b2evolution.net/">b2evolution</a>.
+<!-- TemplateBeginEditable name="Baseline" --><!-- TemplateEndEditable --></div>
 </body>
 </html>
