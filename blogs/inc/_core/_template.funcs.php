@@ -653,6 +653,28 @@ function add_css_headline($headline)
 
 
 /**
+ * Registers all the javascripts needed by the toolbar menu
+ */
+function add_js_for_toolbar()
+{
+	require_js( '#jquery#' );
+	require_js( 'functions.js' );	// for rollovers AddEvent - TODO: change to jQuery
+	require_js( 'rollovers.js' );	// TODO: change to jQuery
+	// Superfish menus:
+	require_js( 'hoverintent.js' );
+	require_js( 'superfish.js' );
+	add_js_headline( '
+		jQuery( function() {
+			jQuery("ul.sf-menu").superfish({
+	            delay: 500, // mouseout
+	            animation: {opacity:"show",height:"show"},
+	            speed: "fast"
+	        });
+		} )');
+}
+
+
+/**
  * Outputs the collected HTML HEAD lines.
  * @see add_headline()
  * @return string
@@ -959,6 +981,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.53  2009/03/24 22:11:58  fplanque
+ * Packaged inclusion of javascript for the toolbar
+ *
  * Revision 1.52  2009/03/15 08:36:18  yabs
  * Adding helper functions
  * Adding translation strings for b2evoHelper object

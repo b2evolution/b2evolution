@@ -14,20 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $xmlsrv_url;
 
-require_js( '#jquery#' );
-require_js( 'functions.js' );
-require_js( 'rollovers.js' );
-// Superfish menus:
-require_js( 'hoverintent.js' );
-require_js( 'superfish.js' );
-add_js_headline( '
-	jQuery( function() {
-		jQuery("ul.sf-menu").superfish({
-            delay: 500, // mouseout
-            animation: {opacity:"show",height:"show"},
-            speed: "fast"
-        });
-	} )');
+add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 
 header_content_type();	// Sets charset!
 ?>

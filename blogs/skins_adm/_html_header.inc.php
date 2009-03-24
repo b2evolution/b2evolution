@@ -56,23 +56,11 @@ header_content_type( 'text/html' );
 		var imgpath_collapse = '".get_icon( 'collapse', 'url' )."';
 		var htsrv_url = '$htsrv_url';" );
 
- 	require_js( '#jquery#' );
- 	require_js( '#jqueryUI#' );
- 	require_js( 'functions.js');
-	require_js( 'form_extensions.js'); // script allowing to check and uncheck all boxes in forms -- TODO: jQueryfy
-	require_js( 'rollovers.js' );
+	add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 
-	// Superfish menus:
-	require_js( 'hoverintent.js' );
-	require_js( 'superfish.js' );
-	add_js_headline( '
-		jQuery( function() {
-			jQuery("ul.sf-menu").superfish({
-	            delay: 500, // mouseout
-	            animation: {opacity:"show",height:"show"},
-	            speed: "fast"
-	        });
-		} )');
+ 	require_js( '#jqueryUI#' );
+
+	require_js( 'form_extensions.js'); // script allowing to check and uncheck all boxes in forms -- TODO: jQueryfy
 
 	require_js( 'extracats.js' );
 	require_js( 'dynamic_select.js' );
@@ -296,6 +284,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.26  2009/03/24 22:11:58  fplanque
+ * Packaged inclusion of javascript for the toolbar
+ *
  * Revision 1.25  2009/03/22 23:39:33  fplanque
  * new evobar Menu structure
  * Superfish jQuery menu library
