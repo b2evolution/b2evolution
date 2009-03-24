@@ -130,7 +130,7 @@ if( $resolve_extra_path )
 		// echo "path=[$path_string]<br />";
 
 		// Replace encoded ";" and ":" with regular chars (used for tags)
-		// TODO: dh> why not urldecode it altogether?
+		// TODO: dh> why not urldecode it altogether? fp> would prolly make sense but requires testing -- note: check with tags (move urldecode from tags up here)
 		// TODO: PHP5: use str_ireplace
 		$path_string = str_replace(
 			array('%3b', '%3B', '%3a', '%3A'),
@@ -170,8 +170,8 @@ if( $resolve_extra_path )
 		if( count($path_elements) )
 		{
 			// Does the pathinfo end with a / or a ; ?
+			$last_char = substr( $path_string, -1 );
 			$last_part = $path_elements[count( $path_elements )-1];
-			$last_char = substr( $last_part, -1 );
 			$last_len  = strlen( $last_part );
 			if( ( $last_char == '-' && ( ! $tags_dash_fix || $last_len != 40 ) ) || $last_char == ':'|| $last_char == ';' )
 			{	// - : or ; -> We'll consider this to be a tag page
@@ -187,10 +187,10 @@ if( $resolve_extra_path )
 				}
 			}
 			elseif( ( $tags_dash_fix && $last_char == '-' && $last_len == 40 ) || $last_char != '/' )
-			{	// NO ENDING SLASH or ends with a dash, is 40 chars long
-				// and $tags_dash_fix is true -> We'll consider this to
-				// be a ref to a post.
-				
+			{	// NO ENDING SLASH or ends with a dash, is 40 chars long and $tags_dash_fix is true
+				// -> We'll consider this to be a ref to a post.
+				$Debuglog->add( 'We consider this o be a ref to a post - last char: '.$last_char, 'params' );
+
 				// Set a lot of defaults as if we had received a complex URL:
 				$m = '';
 				$more = 1; // Display the extended entries' text
@@ -211,10 +211,12 @@ if( $resolve_extra_path )
 			}
 			else
 			{	// ENDING SLASH -> we are looking for a daterange OR a chapter:
+				$Debuglog->add( 'Last part: '.$last_part , 'params' );
 				// echo $last_part;
 				if( preg_match( '|^w?[0-9]+$|', $last_part ) )
 				{ // Last part is a number or a "week" number:
 					$i=0;
+					$Debuglog->add( 'Last part is a number or a "week" number: '.$path_elements[$i] , 'params' );
 					// echo $path_elements[$i];
 					if( isset( $path_elements[$i] ) )
 					{
@@ -599,6 +601,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.129  2009/03/24 21:03:56  fplanque
+ * Surely enough, everytime someone touches the resolver, they break it!
+ * Stop playing with it!
+ *
  * Revision 1.128  2009/03/23 12:19:19  tblue246
  * (temp)skin param: Allow plugin-provided skins
  *
