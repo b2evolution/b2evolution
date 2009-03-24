@@ -31,16 +31,12 @@
 		<div class="block3">
 		
 		<h1>Atualizando a partir de uma versão anterior do b2evolution</h1>
-		<p class="note">Antes de iniciar, por favor repare que algumas caracteristicas de rede do b2evolution requerem que você concorde com os nossos simples<a href="http://b2evolution.net/about/terms.html" target="_blank">Termos de serviço</a>.</p>
+		<p class="note">Antes de iniciar, note que algumas características de rede do b2evolution requerem que você concorde com os nossos simples <a href="http://b2evolution.net/about/terms.html" target="_blank">Termos de serviço</a>.</p>
 		<ol class="expanded">
 			<li>Faça o backup de todos o seus arquivos do b2evolution. Tome um cuidado especial com arquivos que você possa ter modificado, incluindo <strong>/conf</strong>, <strong>skins</strong>, <strong>plugins</strong>, seus diretório de <strong>mídia</strong> e possíveis arquivos de stub, hacks ou templates personalizados...</li>
 			<li>Você deve também fazer uma cópia de segurança do seu banco de dados se você puder. Essa funcionalidade deve ser fornecida a você pelo seu servidor de hospedagem.</li>
 			<li>Se você está atualizando a partir de uma versão anterior ao  2.0, nós recomendados que você limpe seus arquivos desatualizados. Para atingir isso, remova seus diretórios do b2evolution, <strong>exceto o /media</strong>. Diretórios a serem removidos incluem /admin, /conf, /cron, /htsrv, /inc, /install, /plugins, /skins, /skins_adm, /xmlsrv. Dependendo da sua versão, você pode não ter todos esses diretórios no seu servidor. Novamente, verifique que o seu backup esteja ok antes de remover esses arquivos.</li>
-			<li>Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you cannot reuse your  /conf files, default skin templates or default plugins as they are.<br />
-				<br />
-				Since your custom skins and custom plugins should be using different names, they will not be overwritten. Same for your media files.<br />
-				<br />
-				The one file you must absolutely restore from your backup (see step 1) though is <code>/blogs/conf/_basic_config.php</code>. You will need to either restore or recreate that file in order to proceed with upgrade.</li>
+			<li>Envie <strong>todos os arquivos novos do b2evolution da pasta /blogs </strong> para o seu site. Repetimos: <strong>TODOS OS ARQUIVOS</strong>! E isso significa que você não pode reutilizar seus arquivos no  /conf, skins padrão ou plugins padrão que você tenha.<br /> <br /> Como seus skins personalizados e plugins personalizados devel usar nomes diferentess, eles não serão sobrescritos. O mesmo vale para os seus arquivos de mídia. <br /> <br /> O único arquivo que você deve absolutamente restaurar do seu backup (veja o passo 1) é o <code>/blogs/_basic_config.php</code>. Você irá precisar restaurar ou recriar esse arquivo para proceder com a atualização.</li>
 			<li>Execute o script de instalação no seu servidor. Ele está localizado em  <code>http://seusite.com/seudiretoriodosblogs/install</code> . Então, simplesmente siga as instruções na tela.<br /> <br /> O instalador permitirá que você execute uma atualização do banco de dados de <strong>qualquer</strong> versão anterior do b2evolution para a nova.</li>
 			<li>Verifique para garantir que a nova instalação funcione.</li>
 			<li>Verifique o manual online para <a href="http://manual.b2evolution.net/Upgrade_from_an_older_version" target="_blank"> instruções específicas de atualização</a> para a sua nova versão do b2evolution.</li>
