@@ -654,6 +654,8 @@ function add_css_headline($headline)
 
 /**
  * Registers all the javascripts needed by the toolbar menu
+ *
+ * @todo fp> include basic.css ? -- rename to add_headlines_for* -- potential problem with inclusion order of CSS files!!
  */
 function add_js_for_toolbar()
 {
@@ -981,6 +983,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.54  2009/03/24 23:36:52  fplanque
+ * minor
+ *
  * Revision 1.53  2009/03/24 22:11:58  fplanque
  * Packaged inclusion of javascript for the toolbar
  *
