@@ -335,6 +335,11 @@ function install_basic_plugins( $old_db_version = 0 )
 {
 	$Plugins_admin = & get_Cache('Plugins_admin');
 
+	// Create global $Plugins instance, which is required during installation of basic plugins,
+	// not only for the ones getting installed, but also during e.g. count_regs(), which instantiates
+	// each plugin (which may then use (User)Settings in PluginInit (through Plugin::__get)).
+	$GLOBALS['Plugins'] = & $Plugins_admin;
+
 	if( $old_db_version < 9100 )
 	{
 		echo 'Installing default plugins... ';
@@ -684,6 +689,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.59  2009/03/24 23:57:07  blueyed
+ * Fix error in PHP5 during upgrade, when existing plugins are using Plugin(User)Settings in PluginInit. This needs a global Plugins instance, which is a reference to Plugins_admin during installation now.
+ *
  * Revision 1.58  2009/03/21 22:55:15  fplanque
  * Adding TinyMCE -- lowfat version
  *

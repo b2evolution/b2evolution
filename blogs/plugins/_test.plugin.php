@@ -74,6 +74,12 @@ class test_plugin extends Plugin
 	{
 		$this->short_desc = 'Test plugin';
 		$this->long_desc = 'This plugin responds to virtually all possible plugin events :P';
+
+		// Trigger plugin settings instantiation (for testing).
+		if( $params['is_installed'] )
+		{
+			$this->Settings->get('foo');
+		}
 	}
 
 
@@ -781,6 +787,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.78  2009/03/24 23:57:07  blueyed
+ * Fix error in PHP5 during upgrade, when existing plugins are using Plugin(User)Settings in PluginInit. This needs a global Plugins instance, which is a reference to Plugins_admin during installation now.
+ *
  * Revision 1.77  2009/03/23 23:04:43  fplanque
  * Demo of how to tap into menu structure from a plugin.
  *
