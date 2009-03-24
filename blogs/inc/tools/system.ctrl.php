@@ -182,7 +182,7 @@ $mysql_version = $DB->get_version();
 init_system_check( 'MySQL version', $DB->version_long );
 if( version_compare( $mysql_version, '4.0' ) < 0 )
 {
-	disp_system_check( 'error', T_('This version is too old. The minium recommended MySQL version is 4.1.') );
+	disp_system_check( 'error', T_('This version is too old. The minimum recommended MySQL version is 4.1.') );
 }
 elseif( version_compare( $mysql_version, '4.1' ) < 0 )
 {
@@ -499,6 +499,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2009/03/24 20:05:59  waltercruz
+ * mispelled word
+ *
  * Revision 1.16  2009/03/08 23:57:46  fplanque
  * 2009
  *
