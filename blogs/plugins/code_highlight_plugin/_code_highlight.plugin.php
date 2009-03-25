@@ -462,8 +462,8 @@ class code_highlight_plugin extends Plugin
 		add_css_headline('/* AstonishMe code plugin styles */'
 			.'.amc0,.amc1,.amc2,.amc3,.amc4,.amc5,.amc6,.amc7,.amc8,.amc9 {'
 			.'background:url('.$this->get_plugin_url().'img/numbers.gif) no-repeat; }');
-        
-		require_css($this->get_plugin_url().'amcode.css');
+
+		require_css($this->get_plugin_url().'amcode.css',true);
 
 		// TODO: dh> move this to a IE-specific file, e.g. add_css_headline, but which is specific for IE
 		//           Or easier: fix it with a hack in amcode.css itself?!
@@ -631,6 +631,9 @@ class code_highlight_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.24  2009/03/25 00:59:44  fplanque
+ * fix
+ *
  * Revision 1.23  2009/03/08 23:57:49  fplanque
  * 2009
  *
