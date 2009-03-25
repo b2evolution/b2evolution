@@ -55,22 +55,3 @@ $Item->images( array(
 			) );
 	?>
 </div>
-
-<?php
-/*
- * $Log$
- * Revision 1.4  2008/01/21 09:35:43  fplanque
- * (c) 2008
- *
- * Revision 1.3  2008/01/17 14:38:33  fplanque
- * Item Footer template tag
- *
- * Revision 1.2  2007/11/04 01:10:57  fplanque
- * skin cleanup continued
- *
- * Revision 1.1  2007/06/23 22:09:30  fplanque
- * feedback and item content templates.
- * Interim check-in before massive changes ahead.
- *
- */
-?>

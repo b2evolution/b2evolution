@@ -97,13 +97,3 @@ $Comment = & $params['Comment'];
   echo $params['comment_end'];
 ?>
 <!-- ========== END of a COMMENT/TB/PB ========== -->
-<?php
-
-/*
- * $Log$
- * Revision 1.1  2008/04/15 17:52:15  fplanque
- * Terrafirma / Node 33 > Sadish > Skin Fakotry > v2
- *
- */
-?>
-

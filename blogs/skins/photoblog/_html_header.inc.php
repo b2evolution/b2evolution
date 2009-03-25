@@ -13,8 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-require_js( 'functions.js' );
-require_js( 'rollovers.js' );
+add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 
 header_content_type();	// Sets charset!
 ?>
