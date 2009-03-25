@@ -32,49 +32,7 @@ div.podplayer {
 	margin: 1em 0;
 }
 
-.FigZone {
-	text-align: center;
-	margin: 8px;
-}
-.FigCent240 {
-	width: 240px;
-	color: #fff;
-	background-color: #000;
-	padding: 12px;
-	margin: 0ex auto;
-	border: 1px solid #fff;
-	text-align: center;
-}
-.FigCent320 {
-	width: 320px;
-	color: #fff;
-	background-color: #000;
-	padding: 12px;
-	margin: 0ex auto;
-	border: 1px solid #fff;
-	text-align: center;
-}
-.FigZone img {
-	border: none;
-	margin-bottom: 8px;
-	text-align: center;
-}
-.FigZone a {
-	color: #fff;
-	text-decoration: none;
-}
-.FigZone a:link {
-	color: #fff;
-}
-.FigZone a:visited {
-	color: #fff;
-}
-.FigZone a:active {
-	color: #fff;
-}
-
-a.permalink_right,
-span.bIcons
+a.permalink_right
 {
 	float: right;
 	border: 0px;
