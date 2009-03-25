@@ -50,7 +50,7 @@ div#fileman_toolbars_bottom {
 }
 
 #fmbar_filter,
-#fmbar_reloadhint {
+#fm_reloadhint {
 	display: inline;
 	white-space: nowrap;
 }
