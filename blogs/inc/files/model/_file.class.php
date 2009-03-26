@@ -227,18 +227,23 @@ class File extends DataObject
 		// Memorize filepath:
 		$FileRootCache = & get_Cache( 'FileRootCache' );
 		$this->_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID );
-		$this->_rdfp_rel_path = no_trailing_slash(str_replace( '\\', '/', $rdfp_rel_path ));
-		$this->_adfp_full_path = $this->_FileRoot->ads_path.$this->_rdfp_rel_path;
-		$this->_name = basename( $this->_adfp_full_path );
-		$this->_dir = dirname( $this->_adfp_full_path ).'/';
-		$this->_md5ID = md5( $this->_adfp_full_path );
 
-		// Initializes file properties (type, size, perms...)
-		$this->load_properties();
+		// If there's a valid file root, handle extra stuff. This should not get done when the FileRoot is invalid.
+		if( $this->_FileRoot )
+		{
+			$this->_rdfp_rel_path = no_trailing_slash(str_replace( '\\', '/', $rdfp_rel_path ));
+			$this->_adfp_full_path = $this->_FileRoot->ads_path.$this->_rdfp_rel_path;
+			$this->_name = basename( $this->_adfp_full_path );
+			$this->_dir = dirname( $this->_adfp_full_path ).'/';
+			$this->_md5ID = md5( $this->_adfp_full_path );
 
-		if( $load_meta )
-		{ // Try to load DB meta info:
-			$this->load_meta();
+			// Initializes file properties (type, size, perms...)
+			$this->load_properties();
+
+			if( $load_meta )
+			{ // Try to load DB meta info:
+				$this->load_meta();
+			}
 		}
 	}
 
@@ -284,7 +289,7 @@ class File extends DataObject
 			}
 			else
 			{ // No meta data...
-				$Debuglog->add( "No metadata could be loaded for {$this->_FileRoot->ID}:$this->_rdfp_rel_path", 'files' );
+				$Debuglog->add( sprintf('No metadata could be loaded for %d:%s', $this->_FileRoot ? $this->_FileRoot->ID : 'FALSE', $this->_rdfp_rel_path), 'files' );
 				$this->meta = 'notfound';
 
 				if( $force_creation )
@@ -1901,6 +1906,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2009/03/26 22:45:29  blueyed
+ * File class: handle invalid Fileroot more gracefully, without throwing E_NOTICEs. This happened when disabling user media dirs and the avatar thingy kicked in. See http://forums.b2evolution.net/viewtopic.php?p=89531#89531
+ *
  * Revision 1.31  2009/03/26 22:23:36  blueyed
  * Fix doc
  *
