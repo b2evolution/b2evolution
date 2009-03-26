@@ -1292,7 +1292,7 @@ class Blog extends DataObject
 				return false;
 		}
 
-		// TODO: use a File object here (to access perms, ..) when FileCache::get_by_path() is provided.
+		// TODO: use a File object here (to access perms, ..), using FileCache::get_by_root_and_path().
 		if( $create && ! is_dir( $mediadir ) )
 		{
 			// TODO: Link to some help page(s) with errors!
@@ -2018,6 +2018,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.57  2009/03/26 22:23:36  blueyed
+ * Fix doc
+ *
  * Revision 1.56  2009/03/21 00:38:15  waltercruz
  * Addind SEO setting for excerpts as meta description
  *

@@ -38,7 +38,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Represents a file or folder on disk. Optionnaly stores meta data from DB.
  *
- * Use {@link FileCache::get_by_path()} to create an instance.
+ * Use {@link FileCache::get_by_root_and_path()} to create an instance.
  * This is based on {@link DataObject} for the meta data.
  *
  * @package evocore
@@ -201,7 +201,7 @@ class File extends DataObject
 
 
 	/**
-	 * Constructor, not meant to be called directly. Use {@link FileCache::get_by_path()}
+	 * Constructor, not meant to be called directly. Use {@link FileCache::get_by_root_and_path()}
 	 * instead, which provides caching and checks that only one object for
 	 * a unique file exists (references).
 	 *
@@ -1901,6 +1901,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.31  2009/03/26 22:23:36  blueyed
+ * Fix doc
+ *
  * Revision 1.30  2009/03/08 23:57:42  fplanque
  * 2009
  *
