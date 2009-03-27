@@ -70,10 +70,10 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 					);
 			}
 
-			$query = "SELECT comment_post_ID, comment_type, comment_status, COUNT(*) AS type_count
-								  FROM T_comments
-								 WHERE comment_post_ID IN ($postIDlist)
-								 GROUP BY comment_post_ID, comment_type, comment_status";
+			$query = 'SELECT comment_post_ID, comment_type, comment_status, COUNT(*) AS type_count
+								 FROM T_comments
+								 WHERE comment_post_ID IN ('.$postIDlist.')
+								 GROUP BY comment_post_ID, comment_type, comment_status';
 
 			foreach( $DB->get_results( $query ) as $row )
 			{
@@ -220,6 +220,9 @@ function comments_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.5  2009/03/27 02:08:29  sam2kb
+ * Minor. Believe it or not, but this little thing produced MYSQL error on php4 because the $postIDlist was always empty.
+ *
  * Revision 1.4  2009/03/08 23:57:42  fplanque
  * 2009
  *
