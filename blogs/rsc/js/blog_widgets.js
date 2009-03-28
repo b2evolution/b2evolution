@@ -122,7 +122,7 @@ jQuery(document).ready( function()
 			the_widgets[ container ][ widget ] = new Array();
 			the_widgets[ container ][ widget ]["name"] = jQuery( "#"+widget ).find('.widget_name' ).html();
 			the_widgets[ container ][ widget ]["class"] = jQuery( this ).attr( "className" );
-			the_widgets[ container ][ widget ]["enabled"] = jQuery( "#" + widget ).find( '.widget_is_enabled' ).size() > 0 ? 1 : 0;
+			the_widgets[ container ][ widget ]["enabled"] = jQuery( '#' + widget + ' .widget_is_enabled' ).size();
 		} );
 	});
 
@@ -452,16 +452,21 @@ function convertAvailableList()
 	// Open list on click, not on hover!
 	jQuery( ".fieldset_title_bg > span > a" ).attr( 'href', '#' ).bind( 'click', function(e)
 	{
+		/* In Opera, we cannot use the "document" height/width because a
+		 * wrong value is returned, so we use the "window" height/width. */
+		var doc_width  = jQuery( typeof opera == 'object' ? window : document ).width();
+		var doc_height = jQuery( typeof opera == 'object' ? window : document ).height();
+		
 		offset = jQuery( this ).offset();
 		var y = offset.top;
 		// can't dislay any lower than this!:
 		// var max_y = jQuery( window ).height() - jQuery( '.available_widgets' ).height(); // this doesn't work when window is scrolled :(
-		var max_y = jQuery( document ).height() - 10 - jQuery( '.available_widgets' ).height();
+		var max_y = doc_height - 10 - jQuery( '.available_widgets' ).height();
 		if( max_y < 20 ) { max_y = 20 };
 		if( y > max_y ) { y = max_y };
 		jQuery( '.available_widgets' ).css(
 			{top : y,
-			right: jQuery( document ).width() - offset.left - jQuery( this ).width() } )
+			right: doc_width - offset.left - jQuery( this ).width() } )
 			.addClass( 'available_widgets_active' ).attr( 'id', 'available_'+jQuery( this ).attr( "id" ) );
 
 		// cancel default href action:
