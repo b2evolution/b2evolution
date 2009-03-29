@@ -461,7 +461,7 @@ function convertAvailableList()
 		if( y > max_y ) { y = max_y };
 		jQuery( '.available_widgets' ).css(
 			{top : y,
-			right: jQuery( window ).width() - offset.left - jQuery( this ).width() } )
+			right: jQuery( typeof opera == 'object' ? window : document ).width() - offset.left - jQuery( this ).width() } )
 			.addClass( 'available_widgets_active' ).attr( 'id', 'available_'+jQuery( this ).attr( "id" ) );
 
 		// cancel default href action:
@@ -576,7 +576,8 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 function toggleWidget( wi_ID )
 {
 	//console.log( 'Toggling widget #' + wi_ID.substr( 6 ) );
-	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ) );
+	var datetime = new Date();
+	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ) + '&nocache_dummy=' + datetime.getTime() );
 	return false;
 }
 
