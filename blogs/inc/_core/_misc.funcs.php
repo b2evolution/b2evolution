@@ -3315,6 +3315,8 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 	else
 	{	// we want to send as js
 		header( 'Content-Type: text/javascript' );
+		header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+		header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 		echo $output;
 	}
 
@@ -3416,6 +3418,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.92  2009/03/31 00:55:53  waltercruz
+ * We can have some problem with server headers and javascript caching
+ *
  * Revision 1.91  2009/03/23 13:22:34  tblue246
  * Simplify zeroise() function
  *
