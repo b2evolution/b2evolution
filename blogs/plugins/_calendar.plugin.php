@@ -590,20 +590,18 @@ class Calendar
 		else
 		{ // mode is 'year'
 			// Find months with posts
-			$arc_sql = 'SELECT COUNT(DISTINCT '.$this->dbIDname.') AS item_count, EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) AS mymonth
-									FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
-												INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-									WHERE EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) = \''.$this->year.'\' '
-										.$this->ItemQuery->get_where( ' AND ' ).'
-									GROUP BY mymonth '.$this->ItemQuery->get_group_by( ', ' );
+			$arc_sql = '
+				SELECT COUNT(DISTINCT '.$this->dbIDname.') AS item_count, EXTRACT(MONTH FROM '.$this->dbprefix.'datestart) AS mymonth
+				  FROM ('.$this->dbtable.' INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID)
+				 INNER JOIN T_categories ON postcat_cat_ID = cat_ID
+				 WHERE EXTRACT(YEAR FROM '.$this->dbprefix.'datestart) = \''.$this->year.'\' '
+				       .$this->ItemQuery->get_where( ' AND ' ).'
+				 GROUP BY mymonth '.$this->ItemQuery->get_group_by( ', ' );
 			$arc_result = $DB->get_results( $arc_sql, ARRAY_A );
 
-			if( $DB->num_rows > 0 )
-			{ // OK we have a month with posts!
-				foreach( $arc_result as $arc_row )
-				{
-					$monthswithposts[ $arc_row['mymonth'] ] = $arc_row['item_count'];
-				}
+			foreach( $arc_result as $arc_row )
+			{
+				$monthswithposts[ $arc_row['mymonth'] ] = $arc_row['item_count'];
 			}
 		}
 
@@ -1145,6 +1143,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.55  2009/03/31 20:24:30  blueyed
+ * Beautify code.
+ *
  * Revision 1.54  2009/03/08 23:57:47  fplanque
  * 2009
  *
