@@ -63,7 +63,7 @@ $Form->begin_form( 'bComment' );
 
 	$Form->begin_fieldset( T_('Blog subscriptions') );
 
-		// Gte those blogs for which we have already subscriptions (for this user)
+		// Get those blogs for which we have already subscriptions (for this user)
 		$sql = 'SELECT blog_ID, blog_shortname, sub_items, sub_comments
 		          FROM T_blogs INNER JOIN T_subscriptions ON ( blog_ID = sub_coll_ID AND sub_user_ID = '.$current_User->ID.' )
 		          			INNER JOIN T_coll_settings ON ( blog_ID = cset_coll_ID AND cset_name = "allow_subscriptions" AND cset_value = "1" )
@@ -114,6 +114,9 @@ $Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.5  2009/03/31 20:17:05  blueyed
+ * Fix typo
+ *
  * Revision 1.4  2009/03/08 23:57:56  fplanque
  * 2009
  *
