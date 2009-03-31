@@ -72,7 +72,7 @@ define( 'EVO_MAIN_INIT', true );
  * Contributed by counterpoint / MAMBO team
  */
 // TODO: dh> this makes sense AFAICS. Please review.
-// fp> yeah I don't know about that. If you ask me, i'm not taking chances. 
+// fp> yeah I don't know about that. If you ask me, i'm not taking chances.
 // if( ini_get('register_globals') )
 {
 	$protects = array( '_REQUEST', '_GET', '_POST', '_COOKIE', '_FILES', '_SERVER', '_ENV', 'GLOBALS', '_SESSION' );
@@ -84,6 +84,7 @@ define( 'EVO_MAIN_INIT', true );
 			|| in_array( $protect, array_keys($_COOKIE) )
 			|| in_array( $protect, array_keys($_FILES) ) )
 		{
+			require_once $inc_path.'/_core/_misc.funcs.php';
 			bad_request_die( 'Unacceptable params.' );
 		}
 	}
@@ -370,7 +371,7 @@ locale_activate( $default_locale );
  * Login procedure: {{{
  * TODO: dh> the meat of this login procedure should be moved to an extra file,
  *           so that if a "logged in"-session exists (in most cases) it does not
- *           trigger parsing the meat of this code. 
+ *           trigger parsing the meat of this code.
  * fp> ming you, most hits will be on the font end and will not be loggedin sessions
  *     However, I agree that the login stuff should only be included when the user is actually attempting to log in.
  */
@@ -653,6 +654,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.109  2009/03/31 21:57:00  blueyed
+ * bad_request_die for protecting globals requires _misc.funcs.php
+ *
  * Revision 1.108  2009/03/08 23:57:38  fplanque
  * 2009
  *
