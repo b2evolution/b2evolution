@@ -133,7 +133,7 @@ class coll_media_index_Widget extends ComponentWidget
 	}
 
 
-  /**
+	/**
 	 * Get short description
 	 */
 	function get_desc()
@@ -205,8 +205,7 @@ class coll_media_index_Widget extends ComponentWidget
 
 		$nb_cols = $this->disp_params[ 'grid_nb_cols' ];
 		$count = 0;
-		$prev_post_ID = 0;
-    /**
+		/**
 		 * @var File
 		 */
 		while( $File = & $FileList->get_next() )
@@ -221,20 +220,13 @@ class coll_media_index_Widget extends ComponentWidget
 			{
 				if( $count % $nb_cols == 0 )
 				{
-      		echo $this->disp_params[ 'grid_colstart' ];
+					echo $this->disp_params[ 'grid_colstart' ];
 				}
 				echo $this->disp_params[ 'grid_cellstart' ];
 			}
 			else
 			{
 				echo $this->disp_params[ 'item_start' ];
-			}
-
-			$post_ID = $FileList->rows[$FileList->current_idx-1]->post_ID;
-			if( $post_ID != $prev_post_ID )
-			{
-				$prev_post_ID = $post_ID;
-				$count++;
 			}
 
 			// 1/ Hack a dirty permalink( will redirect to canonical):
@@ -251,17 +243,19 @@ class coll_media_index_Widget extends ComponentWidget
 			echo $File->get_thumb_imgtag( $this->disp_params['thumb_size'] );
 			echo '</a>';
 
+			++$count;
+
 			if( $layout == 'grid' )
 			{
-     		echo $this->disp_params[ 'grid_cellend' ];
+				echo $this->disp_params[ 'grid_cellend' ];
 				if( $count % $nb_cols == 0 )
 				{
-      		echo $this->disp_params[ 'grid_colend' ];
+					echo $this->disp_params[ 'grid_colend' ];
 				}
 			}
 			else
 			{
-      	echo $this->disp_params[ 'item_end' ];
+				echo $this->disp_params[ 'item_end' ];
 			}
 		}
 
@@ -269,16 +263,15 @@ class coll_media_index_Widget extends ComponentWidget
 		{
 			if( $count && ( $count % $nb_cols != 0 ) )
 			{
-     		echo $this->disp_params[ 'grid_colend' ];
+				echo $this->disp_params[ 'grid_colend' ];
 			}
 
 			echo $this->disp_params[ 'grid_end' ];
 		}
 		else
 		{
-      echo $this->disp_params[ 'list_end' ];
+			echo $this->disp_params[ 'list_end' ];
 		}
-
 
 		echo $this->disp_params[ 'block_end' ];
 
@@ -289,6 +282,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.7  2009/03/31 18:28:25  tblue246
+ * Fixing http://forums.b2evolution.net/viewtopic.php?t=18387
+ *
  * Revision 1.6  2009/03/13 02:32:07  fplanque
  * Cleaned up widgets.
  * Removed stupid widget_name param.
