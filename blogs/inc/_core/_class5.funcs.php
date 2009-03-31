@@ -41,7 +41,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function evocms_autoload_class( $classname )
 {
-	global $inc_path, $adminskins_path;
 	static $map_class_path;
 
 	/*
@@ -50,6 +49,7 @@ function evocms_autoload_class( $classname )
 	*/
 	if( ! isset($map_class_path) )
 	{
+		global $inc_path, $adminskins_path;
 		$_map_class_path = array(
 			/* SPECIAL: several classes in one file. */
 			'table' => $inc_path.'_core/ui/_uiwidget.class.php',
@@ -196,6 +196,9 @@ function load_class( $class_path )
 
 /*
  * $Log$
+ * Revision 1.11  2009/03/31 22:17:55  blueyed
+ * evocms_autoload_class: move global assignments to the block where they get used.
+ *
  * Revision 1.10  2009/03/23 13:33:21  tblue246
  * Fix fatal errors (PHP5 autoloading). Sigh.
  *
