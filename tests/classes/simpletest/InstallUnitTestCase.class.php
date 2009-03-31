@@ -26,7 +26,7 @@ class InstallUnitTestCase extends DbUnitTestCase
 	 *
 	 * @see install_basic_plugins()
 	 */
-	var $nr_of_basic_plugins = 10;
+	var $nr_of_basic_plugins = 11;
 
 
 	/**
