@@ -369,8 +369,10 @@ class ComponentWidget extends DataObject
 					'link_default_class' => 'default',
 					'item_text_start' => '',
 					'item_text_end' => '',
+					'item_text' => '%s',
 					'item_selected_start' => '<li class="selected">',
 					'item_selected_end' => '</li>',
+					'item_selected_text' => '%s',
 					'grid_start' => '<table cellspacing="1" class="widget_grid">',
 					'grid_end' => '</table>',
 					'grid_nb_cols' => 2,
@@ -523,7 +525,7 @@ class ComponentWidget extends DataObject
 			if( $Blog && $l_blog_ID == $Blog->ID )
 			{ // This is the blog being displayed on this page:
 				echo $this->disp_params['item_selected_text_start'];
-				echo $l_Blog->dget( 'shortname', 'htmlbody' );
+				printf( $this->disp_params['item_selected_text'], $l_Blog->dget( 'shortname', 'htmlbody' ) );
 				echo $this->disp_params['item_selected_text_end'];
 				echo '</a>';
 				echo $this->disp_params['item_selected_end'];
@@ -531,7 +533,7 @@ class ComponentWidget extends DataObject
 			else
 			{
 				echo $this->disp_params['item_text_start'];
-				echo $l_Blog->dget( 'shortname', 'htmlbody' );
+				printf( $this->disp_params['item_text'], $l_Blog->dget( 'shortname', 'htmlbody' ) );
 				echo $this->disp_params['item_text_end'];
 				echo '</a>';
 				echo $this->disp_params['item_end'];
@@ -579,6 +581,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.57  2009/04/02 22:55:50  blueyed
+ * ComponentWidget::disp_coll_list: add 'item_text' and 'item_selected_text' params, where %s gets replaced by theshort name. ('%s' being the default)
+ *
  * Revision 1.56  2009/03/15 22:48:16  fplanque
  * refactoring... final step :)
  *
