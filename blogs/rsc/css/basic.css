@@ -132,6 +132,8 @@ div#evo_toolbar {
 	height: 21px;
 	width:100%;		/* Safari Windows */
 	-webkit-text-size-adjust: none; /* iPhone */
+
+	overflow:hidden;
 }
 
 
@@ -211,7 +213,6 @@ ul.sf-menu li li li.sfHover ul {
 
 /*** DEMO SKIN ***/
 .sf-menu {
-	float:			left;
 	margin-bottom:	1em;
 }
 .sf-menu a {
