@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the xyz Widget class.
+ * This file implements the coll_common_links_Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -28,9 +28,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'widgets/model/_widget.class.php' );
 
 /**
- * ComponentWidget Class
+ * ComponentWidget: Common navigation links.
  *
  * A ComponentWidget is a displayable entity that can be placed into a Container on a web page.
+ *
+ * @todo dh> why are "STRONG" tags hardcoded here? can this get dropped/removed? should the style
+ *           get adjusted to use font-weight:bold then?
  *
  * @package evocore
  */
@@ -64,7 +67,7 @@ class coll_common_links_Widget extends ComponentWidget
 	}
 
 
-  /**
+	/**
 	 * Get short description
 	 */
 	function get_desc()
@@ -73,9 +76,9 @@ class coll_common_links_Widget extends ComponentWidget
 	}
 
 
-  /**
-   * Get definitions for editable params
-   *
+	/**
+	 * Get definitions for editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
 	 */
@@ -178,6 +181,9 @@ class coll_common_links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.9  2009/04/06 23:19:07  blueyed
+ * coll_common_links_Widget: TODO about hardcoded strong tags, doc, indent.
+ *
  * Revision 1.8  2009/03/13 02:32:07  fplanque
  * Cleaned up widgets.
  * Removed stupid widget_name param.
