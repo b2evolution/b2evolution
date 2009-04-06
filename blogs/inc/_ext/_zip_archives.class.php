@@ -708,6 +708,9 @@ class zip_file extends archive
 
 /*
  * $Log$
+ * Revision 1.1  2009/04/06 20:18:29  sam2kb
+ * class renamed, see http://forums.b2evolution.net/viewtopic.php?t=18455
+ *
  * Revision 1.3  2009/03/08 23:57:41  fplanque
  * 2009
  *

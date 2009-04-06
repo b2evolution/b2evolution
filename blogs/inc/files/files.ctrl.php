@@ -605,7 +605,7 @@ switch( $action )
 		}
 
 		// Downloading
-		load_class('_ext/_zip_archives.php');
+		load_class('_ext/_zip_archives.class.php');
 
 		$arraylist = $selected_Filelist->get_array( 'get_rdfs_rel_path' );
 
@@ -1657,6 +1657,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.26  2009/04/06 20:20:11  sam2kb
+ * class renamed, see http://forums.b2evolution.net/viewtopic.php?t=18455
+ *
  * Revision 1.25  2009/03/08 23:57:42  fplanque
  * 2009
  *
