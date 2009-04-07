@@ -108,7 +108,7 @@ function evocms_autoload_class( $classname )
 			'hitlist' => $inc_path.'sessions/model/_hitlist.class.php',
 			'hit' => $inc_path.'sessions/model/_hit.class.php',
 			'goal' => $inc_path.'sessions/model/_goal.class.php',
-			'zip_archives' => $inc_path.'_ext/_zip_archives.class.php',
+			'zip_file' => $inc_path.'_ext/_zip_archives.class.php',
 			'idna_convert' => $inc_path.'_ext/idna/_idna_convert.class.php',
 			'item' => $inc_path.'items/model/_item.class.php',
 			'itemlistlight' => $inc_path.'items/model/_itemlistlight.class.php',
@@ -197,6 +197,9 @@ function load_class( $class_path )
 
 /*
  * $Log$
+ * Revision 1.13  2009/04/07 19:23:43  tblue246
+ * Fixing sam2kb's fix. See http://forums.b2evolution.net/viewtopic.php?t=18455
+ *
  * Revision 1.12  2009/04/06 20:36:21  sam2kb
  * class zip_archives renamed, see http://forums.b2evolution.net/viewtopic.php?t=18455
  *
