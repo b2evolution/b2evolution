@@ -132,8 +132,6 @@ div#evo_toolbar {
 	height: 21px;
 	width:100%;		/* Safari Windows */
 	-webkit-text-size-adjust: none; /* iPhone */
-
-	overflow:hidden;
 }
 
 
