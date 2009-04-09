@@ -32,7 +32,7 @@ require_once $inc_path.'_core/_misc.funcs.php';
 load_class('_core/model/_log.class.php');
 load_funcs('_core/_param.funcs.php');
 load_funcs('_core/ui/forms/_form.funcs.php');
-require dirname(__FILE__).'/pofile.class.php';
+load_class('locales/_pofile.class.php');
 /**#@-*/
 
 $Debuglog = new Log();
@@ -46,7 +46,7 @@ $pofilepath = dirname(__FILE__).'/langfiles';
 define( 'TRANSTAG_OPEN', '{{{' );
 define( 'TRANSTAG_CLOSE', '}}}' );
 define( 'CHDIR_TO_BLOGS', '..' );
-define( 'STATIC_POT', $pofilepath.'\static.POT' );
+define( 'STATIC_POT', $pofilepath.'/static.POT' );
 define( 'DEFAULT_TARGET', 'en-US' );
 define( 'DEFAULT_CHARSET', 'iso-8859-1' );
 
