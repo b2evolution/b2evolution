@@ -152,6 +152,7 @@ div#evo_toolbar .actions_right {
 div#evo_toolbar img {
 	position: relative;
 	top: -2px;
+	vertical-align: top; /* required in strict mode (where no 'align="top"' gets added to IMGs, FF3). Otherwise text next to the img wraps out of the evobar */
 }
 
 /* *** SuperFish *** */
