@@ -252,7 +252,10 @@ switch( $action )
 				{ // assign line numbers
 					$lm++;
 				}
-				$POTFile->addmsgid( $match[0], $srcfile.':'.($lm + 1) );
+
+				// remove newlines, tabs and carriage returns:
+				$msgid = preg_replace( '|[\n\t\r]+|', ' ', $match[0] );
+				$POTFile->addmsgid( $msgid, $srcfile.':'.($lm + 1) );
 				#log_(' ['.$srcfile.':'.($lm + 1).']<br />');
 			}
 		}
@@ -373,7 +376,7 @@ switch( $action )
 
 				if( $targetmessagefile != '' )
 				{ // translate everything
-					$text = preg_replace( '/'.TRANSTAG_OPEN.'(.*?)'.TRANSTAG_CLOSE.'/es', '$POFile->translate(stripslashes(\'$1\'))', $text );
+					$text = preg_replace( '/'.TRANSTAG_OPEN.'(.*?)'.TRANSTAG_CLOSE.'/es', '$POFile->translate( preg_replace( \'|[\n\t\r]+|\', \' \', stripslashes( \'$1\' ) ) )', $text );
 
 					if( strpos( $text, TRANSTAG_OPEN ) !== false )
 					{ // there are still tags.
