@@ -279,17 +279,11 @@ msgid "If you are upgrading from a version prior to 2.0, we highly recommend you
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:38
-msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you cannot reuse your  /conf files, default skin templates or default plugins as they are.<br />
-				<br />
-				Since your custom skins and custom plugins should be using different names, they will not be overwritten. Same for your media files.<br />
-				<br />
-				The one file you must absolutely restore from your backup (see step 1) though is <code>/blogs/conf/_basic_config.php</code>. You will need to either restore or recreate that file in order to proceed with upgrade."
+msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you cannot reuse your  /conf files, default skin templates or default plugins as they are.<br />\n\t\t\t\t<br />\n\t\t\t\tSince your custom skins and custom plugins should be using different names, they will not be overwritten. Same for your media files.<br />\n\t\t\t\t<br />\n\t\t\t\tThe one file you must absolutely restore from your backup (see step 1) though is <code>/blogs/conf/_basic_config.php</code>. You will need to either restore or recreate that file in order to proceed with upgrade."
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:43
-msgid "Run the installation/upgrade script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code>/ . Then, simply follow the on screen instructions.<br />
-		<br />
-		The installer/upgrader will  allow you to run a database upgrade from <strong>any</strong> b2evolution version to the new one."
+msgid "Run the installation/upgrade script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code>/ . Then, simply follow the on screen instructions.<br />\n\t\t<br />\n\t\tThe installer/upgrader will  allow you to run a database upgrade from <strong>any</strong> b2evolution version to the new one."
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:46
@@ -307,8 +301,7 @@ msgid "On production servers, it is recommended that you delete the <code>/insta
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:49
-msgid "If you had hacks or other customizations to the core files, your can bring those back now.
-		We recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly."
+msgid "If you had hacks or other customizations to the core files, your can bring those back now.\n\t\tWe recommend you get yourself a diff/merge tool like <a %s>WinMerge</a>. This will allow you to easily compare your old (backuped) files with the new files (even whole directories at once) and report changes accordingly."
 msgstr ""
 
 #: ../../doc/install_new.src.html:34
@@ -320,7 +313,7 @@ msgid "Once you have unzipped the b2evolution distribution on your local compute
 msgstr ""
 
 #: ../../doc/install_new.src.html:38
-msgid "On your server, try to create a new (empty) MySQL database for b2evolution (For example, you can call it "b2evolution". The exact procedure to create a new database depends on your host/server setup. Alternatively, you can also use an existing database which b2evolution will share with existing applications.)"
+msgid "On your server, try to create a new (empty) MySQL database for b2evolution (For example, you can call it \"b2evolution\". The exact procedure to create a new database depends on your host/server setup. Alternatively, you can also use an existing database which b2evolution will share with existing applications.)"
 msgstr ""
 
 #: ../../doc/install_new.src.html:40
@@ -345,9 +338,7 @@ msgid "Let's assume you install the contents of the blogs folder to <code>http:/
 msgstr ""
 
 #: ../../doc/install_new.src.html:47
-msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> . Then, simply follow the on screen instructions.<br />
-			<br />
-			The installer will ask you a few questions, create required database tables and configure b2evolution for you."
+msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> . Then, simply follow the on screen instructions.<br />\n\t\t\t<br />\n\t\t\tThe installer will ask you a few questions, create required database tables and configure b2evolution for you."
 msgstr ""
 
 #: ../../doc/install_new.src.html:52
