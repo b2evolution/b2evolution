@@ -2577,6 +2577,8 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 			$r = '<img src="'.$rsc_url.$blank_icon['file'].'" ';
 
+			// TODO: dh> add this only for !$use_strict, like above?
+			// TODO: dh> why not only use CSS for this? (adding vertical-align:top to "img")
 			// Include non CSS fallbacks:
 			$r .= 'border="0" align="top" ';
 
@@ -3418,6 +3420,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.94  2009/04/10 13:38:04  blueyed
+ * TODOs about usage of 'border="0" align="top" for image tags.
+ *
  * Revision 1.93  2009/03/31 01:01:02  waltercruz
  * minor
  *
