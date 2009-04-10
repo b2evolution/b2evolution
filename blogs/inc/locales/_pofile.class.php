@@ -45,6 +45,9 @@ class POFile
 
 		// replace links
 		$msgid = preg_replace('/<a\s+([^>]*)>/', '<a %s>', $msgid);
+		// replace newlines, tabs, carriage returns and double quotes:
+		$msgid = str_replace( array( "\n", "\t", "\r", '"' ),
+							  array( '\n', '\t', '\r', '\"' ), $msgid );
 
 		if( !isset($this->msgids[ $msgid ]) )
 		{
@@ -73,6 +76,9 @@ class POFile
 			// generate clean msgid like in .po files
 			$msgid = preg_replace('/<a\s+([^>]*)>/', '<a %s>', $msgid);
 		}
+		// replace newlines, tabs, carriage returns and double quotes:
+		$msgid = str_replace( array( "\n", "\t", "\r", '"' ),
+							  array( '\n', '\t', '\r', '\"' ), $msgid );
 
 		if( isset($this->msgids[ $msgid ]) )
 		{
@@ -83,7 +89,8 @@ class POFile
 				$trans = vsprintf($trans, $aparams);
 			}
 
-			return $trans;
+			return str_replace( array( '\n', '\t', '\r', '\"' ),
+								array( "\n", "\t", "\r", '"' ), $trans );
 		}
 		else
 		{
@@ -351,6 +358,9 @@ class POTFile extends POFile
 
 /*
  * $Log$
+ * Revision 1.3  2009/04/10 11:30:35  tblue246
+ * "Translate" msgids and msgstrs properly
+ *
  * Revision 1.2  2009/03/08 22:37:39  fplanque
  * doc
  *
