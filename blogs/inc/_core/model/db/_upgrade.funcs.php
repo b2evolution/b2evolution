@@ -1194,7 +1194,7 @@ function install_make_db_schema_current( $display = true )
 					echo $itemlist[0]['note']."<br />\n";
 					foreach( $itemlist[0]['queries'] as $query )
 					{ // should be just one, but just in case
-						if( $debug )
+						if( $debug >= 2 )
 						{
 							pre_dump( $query );
 						}
@@ -1228,6 +1228,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.9  2009/04/11 23:24:49  fplanque
+ * blep
+ *
  * Revision 1.8  2009/03/08 23:57:40  fplanque
  * 2009
  *
