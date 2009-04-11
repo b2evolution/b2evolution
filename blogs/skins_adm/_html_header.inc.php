@@ -226,6 +226,7 @@ div.skin_wrapper_loggedin {
 	// Afwas> Done. Keeping this conversation for reference. The performance may be an issue.
 	// require_css( 'ui.datepicker.css' );
 
+	// Autoselect "change date" is the date is changed. fp> TODO: This has NOTHING TO DO in the generic header!!!
 	add_js_headline( 'jQuery(function(){
 			jQuery(\'#item_issue_date, #item_issue_time\').change(function(){
 				jQuery(\'#set_issue_date_to\').attr("checked", "checked")
@@ -258,7 +259,7 @@ div.skin_wrapper_loggedin {
 			for (i=0;i<dayNamesMin.length;i++)
 				dayNamesMin[i] = dayNamesMin[i].substr(0, 2)
 
-			jQuery("#item_issue_date, #item_deadline").datepicker({
+			jQuery(".form_date_input").datepicker({
 				beforeShow: function(){ // Dynamically add stylesheet just before display
 					jQuery(document.createElement(\'link\'))
 						.attr({type: \'text/css\', href: \'' . $rsc_url . 'css/ui.datepicker.css\', rel: \'stylesheet\', media: \'screen\'})
@@ -284,6 +285,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.27  2009/04/11 23:50:34  fplanque
+ * diiiiiirtyyyyy
+ *
  * Revision 1.26  2009/03/24 22:11:58  fplanque
  * Packaged inclusion of javascript for the toolbar
  *
