@@ -69,7 +69,7 @@ $Form->begin_fieldset( T_('After each new post...').get_manual_link('after_each_
 		array(
 			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('No notification about your new content will be sent out.') ),
 			array( 'value'=>'immediate', 'label'=>T_('Immediate'), 'note'=>T_('This is guaranteed to work but may create an annoying delay after each post.') ),
-			array( 'value'=>'cron', 'label'=>T_('Asynchronous'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up. You could notify news every minute.') )
+			array( 'value'=>'cron', 'label'=>T_('Asynchronous'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up.') )
 		),
 		T_('Outbound pings & email notifications'),
 		array( 'lines' => true ) );
@@ -206,6 +206,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.13  2009/04/11 17:18:56  tblue246
+ * "You could notify news every minute.": What is this supposed to mean exactly? Wouldn't the wiki be a better place for this note?
+ *
  * Revision 1.12  2009/03/08 23:57:45  fplanque
  * 2009
  *
