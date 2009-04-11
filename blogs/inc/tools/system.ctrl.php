@@ -348,7 +348,7 @@ else
 	}
 	elseif( $memory_limit < 12288 )
 	{
-		disp_system_check( 'warining', T_('The memory_limit is low. Some features of b2evolution may fail to work;') );
+		disp_system_check( 'warning', T_('The memory_limit is low. Some features of b2evolution may fail to work;') );
 	}
 	else
 	{
@@ -499,6 +499,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2009/04/11 15:19:28  tblue246
+ * typo
+ *
  * Revision 1.17  2009/03/24 20:05:59  waltercruz
  * mispelled word
  *
