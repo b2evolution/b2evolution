@@ -112,11 +112,11 @@ function system_check_process_user()
 		}
 
 		$running_as = sprintf( '%s (uid %s)',
-			($process_user ? $process_user : '?'), ($process_uid ? $process_uid : '?') );
+			($process_user ? $process_user : '?'), $process_uid );
 	}
 	else
 	{
-		$running_as = '('.T_('Unkown').')';
+		$running_as = '('.T_('Unknown').')';
 	}
 
 	return array( $process_uid, $process_user, $running_as );
@@ -213,6 +213,9 @@ function system_check_gd_version()
 
 /*
  * $Log$
+ * Revision 1.3  2009/04/11 15:33:56  tblue246
+ * Typo + Fixed possible bug when UID == 0 (also, posix_geteuid() does not return a special value on error).
+ *
  * Revision 1.2  2009/03/08 23:57:46  fplanque
  * 2009
  *
