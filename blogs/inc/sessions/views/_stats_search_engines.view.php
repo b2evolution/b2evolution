@@ -49,7 +49,7 @@ if( count( $res_stats ) )
 		<tr>
 			<th class="firstcol"><?php echo T_('Search engine') ?></th>
 			<th><?php echo T_('Hits') ?></th>
-			<th class="lastcol"><?php echo T_('% of total') ?></th>
+			<th class="lastcol"><?php echo /* xgettext:no-php-format */ T_('% of total') ?></th>
 		</tr>
 		<?php
 		$count = 0;
@@ -72,6 +72,9 @@ if( count( $res_stats ) )
 
 /*
  * $Log$
+ * Revision 1.3  2009/04/11 23:45:47  tblue246
+ * Fix translation problems
+ *
  * Revision 1.2  2009/03/08 23:57:45  fplanque
  * 2009
  *

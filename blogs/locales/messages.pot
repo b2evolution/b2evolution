@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 3.1.0-beta\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2009-04-09 22:47+0200\n"
+"POT-Creation-Date: 2009-04-12 01:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 
 #: ..\..\..\a_noskin.php:231
 #: ..\..\..\inc\_core\__core.init.php:275
-#: ..\..\..\inc\_core\__core.init.php:654
+#: ..\..\..\inc\_core\__core.init.php:655
 #: ..\..\..\inc\items\model\_item.funcs.php:480
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:895
 #: ..\..\..\inc\items\views\_item_list_full.view.php:190
@@ -988,7 +988,7 @@ msgid "File"
 msgstr ""
 
 #: ..\..\..\htsrv\viewfile.php:133
-#: ..\..\..\inc\_core\_misc.funcs.php:3355
+#: ..\..\..\inc\_core\_misc.funcs.php:3357
 #: ..\..\..\inc\collections\views\_coll_general.form.php:52
 #: ..\..\..\inc\files\views\_file_links.view.php:112
 #: ..\..\..\inc\items\model\_item.class.php:3428
@@ -1052,7 +1052,7 @@ msgid "The skin [%s] set for blog [%s] does not exist. It must be properly set i
 msgstr ""
 
 #: ..\..\..\inc\_core\__core.init.php:150
-#: ..\..\..\inc\_core\__core.init.php:543
+#: ..\..\..\inc\_core\__core.init.php:544
 msgid "Dashboard"
 msgstr ""
 
@@ -1089,8 +1089,8 @@ msgid "Customize"
 msgstr ""
 
 #: ..\..\..\inc\_core\__core.init.php:175
-#: ..\..\..\inc\_core\__core.init.php:760
-#: ..\..\..\inc\_core\__core.init.php:793
+#: ..\..\..\inc\_core\__core.init.php:761
+#: ..\..\..\inc\_core\__core.init.php:794
 msgid "Tools"
 msgstr ""
 
@@ -1158,8 +1158,8 @@ msgid "All Items"
 msgstr ""
 
 #: ..\..\..\inc\_core\__core.init.php:267
-#: ..\..\..\inc\_core\__core.init.php:560
-#: ..\..\..\inc\_core\__core.init.php:714
+#: ..\..\..\inc\_core\__core.init.php:561
+#: ..\..\..\inc\_core\__core.init.php:715
 #: ..\..\..\inc\files\views\_file_browse_set.form.php:56
 #: ..\..\..\inc\items\views\_item_list_table.view.php:207
 #: ..\..\..\inc\users\views\_group.form.php:151
@@ -1238,7 +1238,7 @@ msgid "Antispam blacklist"
 msgstr ""
 
 #: ..\..\..\inc\_core\__core.init.php:390
-#: ..\..\..\inc\_core\__core.init.php:764
+#: ..\..\..\inc\_core\__core.init.php:765
 msgid "Scheduler"
 msgstr ""
 
@@ -1246,19 +1246,19 @@ msgstr ""
 msgid "Edit user profile"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:449
+#: ..\..\..\inc\_core\__core.init.php:450
 #: ..\..\..\inc\collections\views\_coll_features.form.php:157
 msgid "Email subscriptions"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:464
+#: ..\..\..\inc\_core\__core.init.php:465
 #: ..\..\..\inc\users\views\_user.form.php:228
 #: ..\..\..\inc\users\views\_user.form.php:253
 msgid "Admin skin"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:481
-#: ..\..\..\inc\_core\__core.init.php:511
+#: ..\..\..\inc\_core\__core.init.php:482
+#: ..\..\..\inc\_core\__core.init.php:512
 #: ..\..\..\inc\users\model\_user.funcs.php:243
 #: ..\..\..\inc\widgets\widgets\_user_tools.widget.php:76
 #: ..\..\..\skins_adm\_access_denied.main.php:23
@@ -1267,7 +1267,7 @@ msgstr ""
 msgid "Logout"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:490
+#: ..\..\..\inc\_core\__core.init.php:491
 #: ..\..\..\inc\chapters\views\_chapter.form.php:62
 #: ..\..\..\inc\collections\model\_blog.class.php:225
 #: ..\..\..\inc\comments\model\_comment.class.php:1241
@@ -1281,13 +1281,13 @@ msgstr ""
 msgid "Blog"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:497
+#: ..\..\..\inc\_core\__core.init.php:498
 #: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:165
 #: ..\..\..\skins_adm\login\_reg_disabled.main.php:40
 msgid "Home"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:505
+#: ..\..\..\inc\_core\__core.init.php:506
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:97
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:102
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:107
@@ -1303,48 +1303,48 @@ msgstr ""
 msgid "Admin"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:549
+#: ..\..\..\inc\_core\__core.init.php:550
 msgid "Posts / Comments"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:561
+#: ..\..\..\inc\_core\__core.init.php:562
 msgid "File management"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:596
-#: ..\..\..\inc\_core\__core.init.php:627
+#: ..\..\..\inc\_core\__core.init.php:597
+#: ..\..\..\inc\_core\__core.init.php:628
 msgid "Blog settings"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:636
-#: ..\..\..\inc\_core\__core.init.php:696
+#: ..\..\..\inc\_core\__core.init.php:637
+#: ..\..\..\inc\_core\__core.init.php:697
 #: ..\..\..\inc\users\views\_group.form.php:76
 msgid "General"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:639
-#: ..\..\..\inc\_core\__core.init.php:699
+#: ..\..\..\inc\_core\__core.init.php:640
+#: ..\..\..\inc\_core\__core.init.php:700
 msgid "Features"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:642
+#: ..\..\..\inc\_core\__core.init.php:643
 #: ..\..\..\inc\collections\views\_coll_features.form.php:173
 msgid "Skin"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:645
+#: ..\..\..\inc\_core\__core.init.php:646
 msgid "Widgets"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:663
+#: ..\..\..\inc\_core\__core.init.php:664
 msgid "URLs"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:666
+#: ..\..\..\inc\_core\__core.init.php:667
 msgid "SEO"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:669
+#: ..\..\..\inc\_core\__core.init.php:670
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:102
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:101
 #: ..\..\..\inc\files\views\_file_browse_set.form.php:52
@@ -1353,84 +1353,84 @@ msgstr ""
 msgid "Advanced"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:677
+#: ..\..\..\inc\_core\__core.init.php:678
 msgid "User perms"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:680
+#: ..\..\..\inc\_core\__core.init.php:681
 msgid "Group perms"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:692
+#: ..\..\..\inc\_core\__core.init.php:693
 #: ..\..\..\inc\files\views\_file_browse_set.form.php:56
 #: ..\..\..\skins\_subs.disp.php:54
 msgid "Global settings"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:702
+#: ..\..\..\inc\_core\__core.init.php:703
 msgid "Skins install"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:705
+#: ..\..\..\inc\_core\__core.init.php:706
 msgid "Plugins install"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:708
-#: ..\..\..\inc\_core\__core.init.php:777
-#: ..\..\..\inc\_core\__core.init.php:797
+#: ..\..\..\inc\_core\__core.init.php:709
+#: ..\..\..\inc\_core\__core.init.php:778
+#: ..\..\..\inc\_core\__core.init.php:798
 #: ..\..\..\inc\users\views\_group.form.php:161
 msgid "Antispam"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:711
+#: ..\..\..\inc\_core\__core.init.php:712
 msgid "Regional"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:717
+#: ..\..\..\inc\_core\__core.init.php:718
 #: ..\..\..\inc\files\views\_file_browse_set.form.php:56
 msgid "File types"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:720
+#: ..\..\..\inc\_core\__core.init.php:721
 msgid "Post types"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:721
+#: ..\..\..\inc\_core\__core.init.php:722
 msgid "Post types management"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:724
+#: ..\..\..\inc\_core\__core.init.php:725
 #: ..\..\..\inc\items\item_statuses.ctrl.php:41
 msgid "Post statuses"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:725
+#: ..\..\..\inc\_core\__core.init.php:726
 msgid "Post statuses management"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:737
+#: ..\..\..\inc\_core\__core.init.php:738
 #: ..\..\..\inc\sessions\_sessions.init.php:221
 msgid "Users"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:738
+#: ..\..\..\inc\_core\__core.init.php:739
 msgid "User management"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:747
+#: ..\..\..\inc\_core\__core.init.php:748
 msgid "My profile"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:748
+#: ..\..\..\inc\_core\__core.init.php:749
 #: ..\..\..\inc\_core\_template.funcs.php:287
 msgid "User profile"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:767
+#: ..\..\..\inc\_core\__core.init.php:768
 msgid "System"
 msgstr ""
 
-#: ..\..\..\inc\_core\__core.init.php:784
+#: ..\..\..\inc\_core\__core.init.php:785
 #: ..\..\..\inc\antispam\views\_antispam_settings.form.php:61
 #: ..\..\..\multiblogs.php:413
 msgid "Misc"
@@ -1508,39 +1508,39 @@ msgstr ""
 msgid "DB connection charset"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2935
+#: ..\..\..\inc\_core\_misc.funcs.php:2937
 #: ..\..\..\inc\chapters\views\_chapter_list.view.php:239
 #: ..\..\..\inc\settings\views\_features.form.php:192
 #: ..\..\..\install\index.php:651
 msgid "Manual"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2935
+#: ..\..\..\inc\_core\_misc.funcs.php:2937
 msgid "Open relevant page in online manual"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3352
+#: ..\..\..\inc\_core\_misc.funcs.php:3354
 msgid "Date issued (Default)"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3353
+#: ..\..\..\inc\_core\_misc.funcs.php:3355
 msgid "Order (as explicitely specified)"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3356
+#: ..\..\..\inc\_core\_misc.funcs.php:3358
 msgid "Date created"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3357
+#: ..\..\..\inc\_core\_misc.funcs.php:3359
 msgid "Date last modified"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3358
+#: ..\..\..\inc\_core\_misc.funcs.php:3360
 #: ..\..\..\inc\collections\views\_coll_general.form.php:64
 msgid "URL \"filename\""
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3359
+#: ..\..\..\inc\_core\_misc.funcs.php:3361
 #: ..\..\..\inc\items\views\_item_expert.form.php:260
 #: ..\..\..\inc\items\views\_item_list_full.view.php:178
 #: ..\..\..\inc\locales\_locale_settings.form.php:95
@@ -1551,7 +1551,7 @@ msgstr ""
 msgid "Priority"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3360
+#: ..\..\..\inc\_core\_misc.funcs.php:3362
 msgid "Random order!"
 msgstr ""
 
@@ -5903,6 +5903,7 @@ msgstr ""
 #: ..\..\..\inc\sessions\views\_stats_summary.view.php:135
 #: ..\..\..\inc\sessions\views\_stats_useragents.view.php:102
 #: ..\..\..\inc\sessions\views\_stats_useragents.view.php:111
+#: ..\..\..\inc\tools\model\_system.funcs.php:119
 #: ..\..\..\inc\widgets\model\_widget.class.php:164
 #: ..\..\..\inc\widgets\model\_widget.class.php:219
 msgid "Unknown"
@@ -9470,7 +9471,7 @@ msgstr ""
 
 #: ..\..\..\inc\sessions\views\_stats_referers.view.php:174
 #: ..\..\..\inc\sessions\views\_stats_search_engines.view.php:52
-#, php-format
+#, no-php-format
 msgid "% of total"
 msgstr ""
 
@@ -9706,7 +9707,8 @@ msgid "Asynchronous"
 msgstr ""
 
 #: ..\..\..\inc\settings\views\_features.form.php:72
-msgid "Recommended if you have your scheduled jobs properly set up. You could notify news every minute."
+#: ..\..\..\inc\settings\views\_features.form.php:172
+msgid "Recommended if you have your scheduled jobs properly set up."
 msgstr ""
 
 #: ..\..\..\inc\settings\views\_features.form.php:74
@@ -9905,10 +9907,6 @@ msgstr ""
 
 #: ..\..\..\inc\settings\views\_features.form.php:171
 msgid "With a scheduled job"
-msgstr ""
-
-#: ..\..\..\inc\settings\views\_features.form.php:172
-msgid "Recommended if you have your scheduled jobs properly set up."
 msgstr ""
 
 #: ..\..\..\inc\settings\views\_features.form.php:173
@@ -10212,7 +10210,6 @@ msgstr ""
 msgid "Skins available for installation"
 msgstr ""
 
-#: ..\..\..\inc\tools\model\_system.funcs.php:119
 #: ..\..\..\inc\tools\model\_system.funcs.php:149
 msgid "Unkown"
 msgstr ""
