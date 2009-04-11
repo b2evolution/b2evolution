@@ -191,6 +191,7 @@ $user_agents = array(
 	array('aggregator', 'SharpReader/',	'SharpReader'),
 	array('aggregator', 'Straw ',	'Straw'),
 	array('aggregator', 'YandexBlog', 'YandexBlog'),
+	array('aggregator', ' Planet/', 'Planet Feed Reader'),
 );
 
 
