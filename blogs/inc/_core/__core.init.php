@@ -440,6 +440,7 @@ class _core_Module
 			'time' => array(
 					'text' => date( locale_shorttimefmt(), $localtimenow ),
 					'disabled' => true,
+					'class' => 'noborder',
 				),
 		);
 
@@ -808,6 +809,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.11  2009/04/11 13:52:03  tblue246
+ * evobar: Do not display a border when hovering the time
+ *
  * Revision 1.10  2009/03/23 22:19:43  fplanque
  * evobar right menu is now also customizable by plugins
  *

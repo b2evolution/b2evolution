@@ -283,6 +283,10 @@ ul.sf-menu li li li.sfHover ul {
 	color: GrayText;
 }
 
+.sf-menu a.noborder {
+	border: none;
+}
+
 .sf-menu li:hover, .sf-menu li.sfHover,
 .sf-menu a:focus, .sf-menu a:hover, .sf-menu a:active {
 	text-decoration: none;
