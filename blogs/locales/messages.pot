@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 3.1.0-beta\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2009-04-12 01:42+0200\n"
+"POT-Creation-Date: 2009-04-12 18:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2118,43 +2118,43 @@ msgstr ""
 
 #. TRANS: abbrev. for Sunday
 #: ..\..\..\inc\_vars.inc.php:202
-#: ..\..\..\skins_adm\_html_header.inc.php:256
+#: ..\..\..\skins_adm\_html_header.inc.php:257
 msgid "Sun"
 msgstr ""
 
 #. TRANS: abbrev. for Monday
 #: ..\..\..\inc\_vars.inc.php:204
-#: ..\..\..\skins_adm\_html_header.inc.php:256
+#: ..\..\..\skins_adm\_html_header.inc.php:257
 msgid "Mon"
 msgstr ""
 
 #. TRANS: abbrev. for Tuesday
 #: ..\..\..\inc\_vars.inc.php:206
-#: ..\..\..\skins_adm\_html_header.inc.php:256
+#: ..\..\..\skins_adm\_html_header.inc.php:257
 msgid "Tue"
 msgstr ""
 
 #. TRANS: abbrev. for Wednesday
 #: ..\..\..\inc\_vars.inc.php:208
-#: ..\..\..\skins_adm\_html_header.inc.php:256
+#: ..\..\..\skins_adm\_html_header.inc.php:257
 msgid "Wed"
 msgstr ""
 
 #. TRANS: abbrev. for Thursday
 #: ..\..\..\inc\_vars.inc.php:210
-#: ..\..\..\skins_adm\_html_header.inc.php:256
+#: ..\..\..\skins_adm\_html_header.inc.php:257
 msgid "Thu"
 msgstr ""
 
 #. TRANS: abbrev. for Friday
 #: ..\..\..\inc\_vars.inc.php:212
-#: ..\..\..\skins_adm\_html_header.inc.php:256
+#: ..\..\..\skins_adm\_html_header.inc.php:257
 msgid "Fri"
 msgstr ""
 
 #. TRANS: abbrev. for Saturday
 #: ..\..\..\inc\_vars.inc.php:214
-#: ..\..\..\skins_adm\_html_header.inc.php:256
+#: ..\..\..\skins_adm\_html_header.inc.php:257
 msgid "Sat"
 msgstr ""
 
@@ -2196,22 +2196,22 @@ msgid " S  "
 msgstr ""
 
 #: ..\..\..\inc\_vars.inc.php:234
-#: ..\..\..\skins_adm\_html_header.inc.php:255
+#: ..\..\..\skins_adm\_html_header.inc.php:256
 msgid "January"
 msgstr ""
 
 #: ..\..\..\inc\_vars.inc.php:235
-#: ..\..\..\skins_adm\_html_header.inc.php:255
+#: ..\..\..\skins_adm\_html_header.inc.php:256
 msgid "February"
 msgstr ""
 
 #: ..\..\..\inc\_vars.inc.php:236
-#: ..\..\..\skins_adm\_html_header.inc.php:255
+#: ..\..\..\skins_adm\_html_header.inc.php:256
 msgid "March"
 msgstr ""
 
 #: ..\..\..\inc\_vars.inc.php:237
-#: ..\..\..\skins_adm\_html_header.inc.php:255
+#: ..\..\..\skins_adm\_html_header.inc.php:256
 msgid "April"
 msgstr ""
 
@@ -2221,37 +2221,37 @@ msgid "May "
 msgstr ""
 
 #: ..\..\..\inc\_vars.inc.php:240
-#: ..\..\..\skins_adm\_html_header.inc.php:255
+#: ..\..\..\skins_adm\_html_header.inc.php:256
 msgid "June"
 msgstr ""
 
 #: ..\..\..\inc\_vars.inc.php:241
-#: ..\..\..\skins_adm\_html_header.inc.php:255
+#: ..\..\..\skins_adm\_html_header.inc.php:256
 msgid "July"
 msgstr ""
 
 #: ..\..\..\inc\_vars.inc.php:242
-#: ..\..\..\skins_adm\_html_header.inc.php:255
+#: ..\..\..\skins_adm\_html_header.inc.php:256
 msgid "August"
 msgstr ""
 
 #: ..\..\..\inc\_vars.inc.php:243
-#: ..\..\..\skins_adm\_html_header.inc.php:255
+#: ..\..\..\skins_adm\_html_header.inc.php:256
 msgid "September"
 msgstr ""
 
 #: ..\..\..\inc\_vars.inc.php:244
-#: ..\..\..\skins_adm\_html_header.inc.php:255
+#: ..\..\..\skins_adm\_html_header.inc.php:256
 msgid "October"
 msgstr ""
 
 #: ..\..\..\inc\_vars.inc.php:245
-#: ..\..\..\skins_adm\_html_header.inc.php:255
+#: ..\..\..\skins_adm\_html_header.inc.php:256
 msgid "November"
 msgstr ""
 
 #: ..\..\..\inc\_vars.inc.php:246
-#: ..\..\..\skins_adm\_html_header.inc.php:255
+#: ..\..\..\skins_adm\_html_header.inc.php:256
 msgid "December"
 msgstr ""
 
@@ -2277,7 +2277,7 @@ msgstr ""
 
 #. TRANS: abbrev. for May
 #: ..\..\..\inc\_vars.inc.php:258
-#: ..\..\..\skins_adm\_html_header.inc.php:255
+#: ..\..\..\skins_adm\_html_header.inc.php:256
 msgid "May"
 msgstr ""
 
@@ -9148,7 +9148,7 @@ msgid "n.a."
 msgstr ""
 
 #: ..\..\..\inc\sessions\stats.ctrl.php:50
-msgid "View Stats for Blog:"
+msgid "View Stats:"
 msgstr ""
 
 #: ..\..\..\inc\sessions\stats.ctrl.php:61
@@ -12073,8 +12073,7 @@ msgid "Menu link"
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:79
-#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:115
-msgid "link"
+msgid " link"
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:94
@@ -12083,6 +12082,10 @@ msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:111
 msgid "What do you want to link to?"
+msgstr ""
+
+#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:115
+msgid "link"
 msgstr ""
 
 #: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:153
