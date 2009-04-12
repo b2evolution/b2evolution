@@ -46,7 +46,7 @@ $pofilepath = dirname(__FILE__).'/langfiles';
 define( 'TRANSTAG_OPEN', '{{{' );
 define( 'TRANSTAG_CLOSE', '}}}' );
 define( 'CHDIR_TO_BLOGS', '..' );
-define( 'STATIC_POT', $pofilepath.'/static.POT' );
+define( 'STATIC_POT', $pofilepath.'/static.pot' );
 define( 'DEFAULT_TARGET', 'en-US' );
 define( 'DEFAULT_CHARSET', 'iso-8859-1' );
 
