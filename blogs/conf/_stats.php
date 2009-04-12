@@ -192,6 +192,7 @@ $user_agents = array(
 	array('aggregator', 'Straw ',	'Straw'),
 	array('aggregator', 'YandexBlog', 'YandexBlog'),
 	array('aggregator', ' Planet/', 'Planet Feed Reader'),
+	array('aggregator', 'UniversalFeedParser/', 'Universal Feed Parser'),
 );
 
 
