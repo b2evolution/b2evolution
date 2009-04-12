@@ -76,7 +76,7 @@ class menu_link_Widget extends ComponentWidget
 
 		if( !empty($this->param_array['link_type']) )
 		{
-			return $menu_link_widget_link_types[$this->param_array['link_type']].' '.T_('link');
+			return $menu_link_widget_link_types[$this->param_array['link_type']].T_(' link');
 		}
 		else
 		{
@@ -182,6 +182,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.10  2009/04/12 09:41:16  tblue246
+ * Fix translation string
+ *
  * Revision 1.9  2009/03/13 02:32:07  fplanque
  * Cleaned up widgets.
  * Removed stupid widget_name param.
