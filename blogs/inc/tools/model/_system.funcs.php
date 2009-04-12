@@ -30,22 +30,22 @@ function system_check_media_dir()
 
 	if( ! is_dir( $media_path ) )
 	{
-		$mediadir_msg = 'Media directory doesn\'t exist.';
+		$mediadir_msg = T_( 'Media directory doesn\'t exist.' );
 		$mediadir_status = 'error';
 	}
 	elseif( ! is_readable( $media_path ) )
 	{
-		$mediadir_msg = 'Media directory is not readable.';
+		$mediadir_msg = T_( 'Media directory is not readable.' );
 		$mediadir_status = 'error';
 	}
 	elseif( ! is_writable( $media_path ) )
 	{
-		$mediadir_msg = 'Media directory is not writable.';
+		$mediadir_msg = T_( 'Media directory is not writable.' );
 		$mediadir_status = 'error';
 	}
 	else
 	{
-		$mediadir_msg = 'Ok';
+		$mediadir_msg = T_( 'Ok' );
 		$mediadir_status = 'ok';
 	}
 
@@ -146,7 +146,7 @@ function system_check_process_group()
 	}
 	else
 	{
-		$running_as = '('.T_('Unkown').')';
+		$running_as = '('.T_('Unknown').')';
 	}
 
 	return array( $process_gid, $process_group, $running_as );
@@ -213,6 +213,9 @@ function system_check_gd_version()
 
 /*
  * $Log$
+ * Revision 1.4  2009/04/12 20:15:38  tblue246
+ * Make more strings available for translation
+ *
  * Revision 1.3  2009/04/11 15:33:56  tblue246
  * Typo + Fixed possible bug when UID == 0 (also, posix_geteuid() does not return a special value on error).
  *

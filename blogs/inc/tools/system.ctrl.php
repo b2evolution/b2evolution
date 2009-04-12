@@ -94,7 +94,7 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Version:
 $app_timestamp = mysql2timestamp( $app_date );
-init_system_check( 'b2evolution version', $app_version.' released on '.date_i18n( locale_datefmt(), $app_timestamp ) );
+init_system_check( T_( 'b2evolution version' ), sprintf( /* TRANS: First %s: App version, second %s: release date */ T_( '%s released on %s' ), $app_version, date_i18n( locale_datefmt(), $app_timestamp ) ) );
 $app_age = ($localtimenow - $app_timestamp) / 3600 / 24 / 30;	// approx age in months
 if( $app_age > 12 )
 {
@@ -120,19 +120,19 @@ if( $mediadir_status == 'error' )
 	$mediadir_long = '<p>'.T_('You will not be able to upload files/images and b2evolution will not be able to generate thumbnails.')."</p>\n"
 	.'<p>'.T_('Your host requires that you set special file permissions on your media directory.').get_manual_link('media_file_permission_errors')."</p>\n";
 }
-init_system_check( 'Media directory', $mediadir_msg.' - '.$media_path );
+init_system_check( T_( 'Media directory' ), $mediadir_msg.' - '.$media_path );
 disp_system_check( $mediadir_status, $mediadir_long );
 
 
 // /install/ folder deleted?
 $install_removed = system_check_install_removed();
-init_system_check( 'Install folder', $install_removed ?  T_('Deleted') : T_('Not deleted').' - '.$basepath.$install_subdir );
+init_system_check( T_( 'Install folder' ), $install_removed ?  T_('Deleted') : T_('Not deleted').' - '.$basepath.$install_subdir );
 if( ! $install_removed )
 {
 	disp_system_check( 'warning', T_('For maximum security, it is recommended that you delete your /blogs/install/ folder once you are done with install or upgrade.') );
 
 	// Database reset allowed?
-	init_system_check( 'Database reset', $allow_evodb_reset ?  T_('Allowed!') : T_('Forbidden') );
+	init_system_check( T_( 'Database reset' ), $allow_evodb_reset ?  T_('Allowed!') : T_('Forbidden') );
 	if( $allow_evodb_reset )
 	{
   	disp_system_check( 'error', '<p>'.T_('Currently, anyone who accesses your install folder could entirely reset your b2evolution database.')."</p>\n"
@@ -159,13 +159,13 @@ $block_item_Widget->disp_template_raw( 'block_end' );
 $block_item_Widget->title = T_('Time');
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
-init_system_check( 'Server time', date_i18n( locale_datetimefmt( ' - ' ), $servertimenow ) );
+init_system_check( T_( 'Server time' ), date_i18n( locale_datetimefmt( ' - ' ), $servertimenow ) );
 disp_system_check( 'note' );
 
-init_system_check( 'GMT / UTC time', gmdate( locale_datetimefmt( ' - ' ), $servertimenow ) );
+init_system_check( T_( 'GMT / UTC time' ), gmdate( locale_datetimefmt( ' - ' ), $servertimenow ) );
 disp_system_check( 'note' );
 
-init_system_check( 'b2evolution time', date_i18n( locale_datetimefmt( ' - ' ), $localtimenow ) );
+init_system_check( T_( 'b2evolution time' ), date_i18n( locale_datetimefmt( ' - ' ), $localtimenow ) );
 disp_system_check( 'note' );
 
 $block_item_Widget->disp_template_raw( 'block_end' );
@@ -179,7 +179,7 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Version:
 $mysql_version = $DB->get_version();
-init_system_check( 'MySQL version', $DB->version_long );
+init_system_check( T_( 'MySQL version' ), $DB->version_long );
 if( version_compare( $mysql_version, '4.0' ) < 0 )
 {
 	disp_system_check( 'error', T_('This version is too old. The minimum recommended MySQL version is 4.1.') );
@@ -195,7 +195,7 @@ else
 
 // UTF8 support?
 $ok = system_check_db_utf8();
-init_system_check( 'MySQL UTF-8 support', $ok ?  T_('Yes') : T_('No') );
+init_system_check( T_( 'MySQL UTF-8 support' ), $ok ?  T_('Yes') : T_('No') );
 if( ! $ok )
 {
 	disp_system_check( 'warning', T_('UTF-8 is not supported by your MySQL server.') ); // fp> TODO: explain why this is bad. Better yet: try to detect if we really need it, base don other conf variables.
@@ -217,18 +217,18 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // User ID:
 list( $uid, $uname, $running_as ) = system_check_process_user();
-init_system_check( 'PHP running as USER:', $running_as );
+init_system_check( T_( 'PHP running as USER:' ), $running_as );
 disp_system_check( 'note' );
 
 
 // Group ID:
 list( $gid, $gname, $running_as ) = system_check_process_group();
-init_system_check( 'PHP running as GROUP:', $running_as );
+init_system_check( T_( 'PHP running as GROUP:' ), $running_as );
 disp_system_check( 'note' );
 
 
 // PHP version
-init_system_check( 'PHP version', PHP_VERSION );
+init_system_check( T_( 'PHP version' ), PHP_VERSION );
 if( version_compare( PHP_VERSION, '4.1', '<' ) )
 {
 	disp_system_check( 'error', T_('This version is too old. b2evolution will not run correctly. You must ask your host to upgrade PHP before you can run b2evolution.') );
@@ -358,7 +358,7 @@ else
 
 
 // mbstring extension
-init_system_check( 'PHP mbstring extension', extension_loaded('mbstring') ?  T_('Loaded') : T_('Not loaded') );
+init_system_check( T_( 'PHP mbstring extension' ), extension_loaded('mbstring') ?  T_('Loaded') : T_('Not loaded') );
 if( ! extension_loaded('mbstring' ) )
 {
 	disp_system_check( 'warning', T_('b2evolution will not be able to convert character sets and special characters/languages may not be displayed correctly. Enable the mbstring extension in your php.ini file or ask your hosting provider about it.') );
@@ -370,7 +370,7 @@ else
 
 
 // XML extension
-init_system_check( 'PHP XML extension', extension_loaded('xml') ?  T_('Loaded') : T_('Not loaded') );
+init_system_check( T_( 'PHP XML extension' ), extension_loaded('xml') ?  T_('Loaded') : T_('Not loaded') );
 if( ! extension_loaded('xml' ) )
 {
 	disp_system_check( 'warning', T_('The XML extension is not loaded.') ); // fp> This message only repeats the exact same info that is already displayed. Not helpful.
@@ -385,7 +385,7 @@ else
 
 // IMAP extension
 $imap_loaded = extension_loaded( 'imap' );
-init_system_check( 'PHP IMAP extension', $imap_loaded ? T_( 'Loaded' ) : T_( 'Not loaded' ) );
+init_system_check( T_( 'PHP IMAP extension' ), $imap_loaded ? T_( 'Loaded' ) : T_( 'Not loaded' ) );
 if ( ! $imap_loaded )
 {
 	disp_system_check( 'warning', T_( 'You will not be able to use the Blog  by email feature of b2evolution. Enable the IMAP extension in your php.ini file or ask your hosting provider about it.' ) );
@@ -411,7 +411,7 @@ $block_item_Widget->title = T_('GD Library (image handling)');
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 $gd_version = system_check_gd_version();
-init_system_check( 'GD Library version', isset($gd_version) ? $gd_version : T_('Not installed') );
+init_system_check( T_( 'GD Library version' ), isset($gd_version) ? $gd_version : T_('Not installed') );
 if( ! isset($gd_version) )
 {
 	disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for images. Enable the gd2 extension in your php.ini file or ask your hosting provider about it.') );
@@ -423,7 +423,7 @@ else
 	$gd_info = gd_info();
 
 	// JPG:
-	init_system_check( 'GD JPG Support', !empty($gd_info['JPG Support']) ? T_('Read/Write') : T_('No') );
+	init_system_check( T_( 'GD JPG Support' ), !empty($gd_info['JPG Support']) ? T_('Read/Write') : T_('No') );
 	if( empty($gd_info['JPG Support']) )
 	{
 		disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for JPG images.') );
@@ -434,7 +434,7 @@ else
 	}
 
 	// PNG:
-	init_system_check( 'GD PNG Support', !empty($gd_info['PNG Support']) ? T_('Read/Write') : T_('No') );
+	init_system_check( T_( 'GD PNG Support' ), !empty($gd_info['PNG Support']) ? T_('Read/Write') : T_('No') );
 	if( empty($gd_info['PNG Support']) )
 	{
 		disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for PNG images.') );
@@ -457,7 +457,7 @@ else
 	{
 		$gif_support = T_('No');
 	}
-	init_system_check( 'GD GIF Support', $gif_support );
+	init_system_check( T_( 'GD GIF Support' ), $gif_support );
 	if( $gif_support == T_('No') )
 	{
 		disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for GIF images.') );
@@ -499,6 +499,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2009/04/12 20:15:38  tblue246
+ * Make more strings available for translation
+ *
  * Revision 1.18  2009/04/11 15:19:28  tblue246
  * typo
  *
