@@ -76,7 +76,8 @@ class menu_link_Widget extends ComponentWidget
 
 		if( !empty($this->param_array['link_type']) )
 		{
-			return $menu_link_widget_link_types[$this->param_array['link_type']].T_(' link');
+			// TRANS: %s is the link type, e. g. "Blog home" or "Log in form"
+			return sprintf( T_( '%s link' ), $menu_link_widget_link_types[$this->param_array['link_type']] );
 		}
 		else
 		{
@@ -182,6 +183,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.11  2009/04/12 21:52:56  tblue246
+ * Fixed translation string
+ *
  * Revision 1.10  2009/04/12 09:41:16  tblue246
  * Fix translation string
  *
