@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 3.1.0-beta\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2009-04-12 18:04+0200\n"
+"POT-Creation-Date: 2009-04-13 00:13+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgstr ""
 #: ..\..\..\inc\settings\views\_features.form.php:188
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:95
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:163
-#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:143
+#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:144
 #: ..\..\..\multiblogs.php:194
 #: ..\..\..\skins\asevo\index.main.php:184
 #: ..\..\..\skins\basic\index.main.php:153
@@ -1282,7 +1282,7 @@ msgid "Blog"
 msgstr ""
 
 #: ..\..\..\inc\_core\__core.init.php:498
-#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:165
+#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:166
 #: ..\..\..\skins_adm\login\_reg_disabled.main.php:40
 msgid "Home"
 msgstr ""
@@ -1664,7 +1664,7 @@ msgstr ""
 #: ..\..\..\inc\comments\_comments.ctrl.php:192
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:170
 #: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:35
-#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:148
+#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:149
 #: ..\..\..\skins\photoblog\_body_footer.inc.php:31
 msgid "Latest comments"
 msgstr ""
@@ -3591,6 +3591,7 @@ msgstr ""
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:372
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:381
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:390
+#: ..\..\..\inc\tools\system.ctrl.php:123
 msgid "Media directory"
 msgstr ""
 
@@ -5904,6 +5905,7 @@ msgstr ""
 #: ..\..\..\inc\sessions\views\_stats_useragents.view.php:102
 #: ..\..\..\inc\sessions\views\_stats_useragents.view.php:111
 #: ..\..\..\inc\tools\model\_system.funcs.php:119
+#: ..\..\..\inc\tools\model\_system.funcs.php:149
 #: ..\..\..\inc\widgets\model\_widget.class.php:164
 #: ..\..\..\inc\widgets\model\_widget.class.php:219
 msgid "Unknown"
@@ -7934,7 +7936,7 @@ msgstr ""
 
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:251
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:155
-#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:138
+#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:139
 #: ..\..\..\plugins\_archives.plugin.php:127
 #: ..\..\..\skins\basic\index.main.php:249
 msgid "Archives"
@@ -10210,8 +10212,20 @@ msgstr ""
 msgid "Skins available for installation"
 msgstr ""
 
-#: ..\..\..\inc\tools\model\_system.funcs.php:149
-msgid "Unkown"
+#: ..\..\..\inc\tools\model\_system.funcs.php:33
+msgid "Media directory doesn't exist."
+msgstr ""
+
+#: ..\..\..\inc\tools\model\_system.funcs.php:38
+msgid "Media directory is not readable."
+msgstr ""
+
+#: ..\..\..\inc\tools\model\_system.funcs.php:43
+msgid "Media directory is not writable."
+msgstr ""
+
+#: ..\..\..\inc\tools\model\_system.funcs.php:48
+msgid "Ok"
 msgstr ""
 
 #: ..\..\..\inc\tools\mtimport.ctrl.php:337
@@ -10257,6 +10271,16 @@ msgstr ""
 msgid "If possible, change this setting to <code>%s</code> in your php.ini or ask your hosting provider about it."
 msgstr ""
 
+#. TRANS: First %s: App version, second %s: release date
+#: ..\..\..\inc\tools\system.ctrl.php:97
+#, php-format
+msgid "%s released on %s"
+msgstr ""
+
+#: ..\..\..\inc\tools\system.ctrl.php:97
+msgid "b2evolution version"
+msgstr ""
+
 #: ..\..\..\inc\tools\system.ctrl.php:101
 #, php-format
 msgid "This version is old. You should check for newer releases on <a %s>b2evolution.net</a>."
@@ -10280,6 +10304,10 @@ msgid "Deleted"
 msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:129
+msgid "Install folder"
+msgstr ""
+
+#: ..\..\..\inc\tools\system.ctrl.php:129
 msgid "Not deleted"
 msgstr ""
 
@@ -10289,6 +10317,10 @@ msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:135
 msgid "Allowed!"
+msgstr ""
+
+#: ..\..\..\inc\tools\system.ctrl.php:135
+msgid "Database reset"
 msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:135
@@ -10312,8 +10344,24 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
+#: ..\..\..\inc\tools\system.ctrl.php:162
+msgid "Server time"
+msgstr ""
+
+#: ..\..\..\inc\tools\system.ctrl.php:165
+msgid "GMT / UTC time"
+msgstr ""
+
+#: ..\..\..\inc\tools\system.ctrl.php:168
+msgid "b2evolution time"
+msgstr ""
+
 #: ..\..\..\inc\tools\system.ctrl.php:177
 msgid "MySQL"
+msgstr ""
+
+#: ..\..\..\inc\tools\system.ctrl.php:182
+msgid "MySQL version"
 msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:185
@@ -10322,6 +10370,10 @@ msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:189
 msgid "This version is not guaranteed to work. The minium recommended MySQL version is 4.1."
+msgstr ""
+
+#: ..\..\..\inc\tools\system.ctrl.php:198
+msgid "MySQL UTF-8 support"
 msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:198
@@ -10335,6 +10387,18 @@ msgstr ""
 #: ..\..\..\inc\tools\system.ctrl.php:214
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:216
 msgid "PHP"
+msgstr ""
+
+#: ..\..\..\inc\tools\system.ctrl.php:220
+msgid "PHP running as USER:"
+msgstr ""
+
+#: ..\..\..\inc\tools\system.ctrl.php:226
+msgid "PHP running as GROUP:"
+msgstr ""
+
+#: ..\..\..\inc\tools\system.ctrl.php:231
+msgid "PHP version"
 msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:234
@@ -10381,12 +10445,24 @@ msgstr ""
 msgid "Not loaded"
 msgstr ""
 
+#: ..\..\..\inc\tools\system.ctrl.php:361
+msgid "PHP mbstring extension"
+msgstr ""
+
 #: ..\..\..\inc\tools\system.ctrl.php:364
 msgid "b2evolution will not be able to convert character sets and special characters/languages may not be displayed correctly. Enable the mbstring extension in your php.ini file or ask your hosting provider about it."
 msgstr ""
 
+#: ..\..\..\inc\tools\system.ctrl.php:373
+msgid "PHP XML extension"
+msgstr ""
+
 #: ..\..\..\inc\tools\system.ctrl.php:376
 msgid "The XML extension is not loaded."
+msgstr ""
+
+#: ..\..\..\inc\tools\system.ctrl.php:388
+msgid "PHP IMAP extension"
 msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:391
@@ -10398,11 +10474,19 @@ msgid "GD Library (image handling)"
 msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:414
+msgid "GD Library version"
+msgstr ""
+
+#: ..\..\..\inc\tools\system.ctrl.php:414
 msgid "Not installed"
 msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:417
 msgid "You will not be able to automatically generate thumbnails for images. Enable the gd2 extension in your php.ini file or ask your hosting provider about it."
+msgstr ""
+
+#: ..\..\..\inc\tools\system.ctrl.php:426
+msgid "GD JPG Support"
 msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:426
@@ -10415,8 +10499,16 @@ msgstr ""
 msgid "You will not be able to automatically generate thumbnails for JPG images."
 msgstr ""
 
+#: ..\..\..\inc\tools\system.ctrl.php:437
+msgid "GD PNG Support"
+msgstr ""
+
 #: ..\..\..\inc\tools\system.ctrl.php:440
 msgid "You will not be able to automatically generate thumbnails for PNG images."
+msgstr ""
+
+#: ..\..\..\inc\tools\system.ctrl.php:460
+msgid "GD GIF Support"
 msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:463
@@ -10582,7 +10674,7 @@ msgid "Send email to user"
 msgstr ""
 
 #: ..\..\..\inc\users\model\_user.funcs.php:105
-#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:159
+#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:160
 msgid "Log in"
 msgstr ""
 
@@ -12072,23 +12164,25 @@ msgstr ""
 msgid "Menu link"
 msgstr ""
 
-#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:79
-msgid " link"
+#. TRANS: %s is the link type, e. g. "Blog home" or "Log in form"
+#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:80
+#, php-format
+msgid "%s link"
 msgstr ""
 
-#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:94
+#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:95
 msgid "Display a configurable menu entry/link"
 msgstr ""
 
-#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:111
+#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:112
 msgid "What do you want to link to?"
 msgstr ""
 
-#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:115
+#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:116
 msgid "link"
 msgstr ""
 
-#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:153
+#: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:154
 #: ..\..\..\skins\_body_footer.inc.php:23
 #: ..\..\..\skins\_user.disp.php:55
 #: ..\..\..\skins\_user.disp.php:59
