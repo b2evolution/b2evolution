@@ -1586,16 +1586,6 @@ function debug_die( $additional_info = '', $params = array() )
 		'status' => '500 Internal Server Error',
    		), $params );
 
-	// Attempt to output an error header (will not work if the output buffer has already flushed once):
-	// This should help preventing indexing robots from indexing the error :P
-	if( ! headers_sent() )
-	{
-		load_funcs('_core/_template.funcs.php');
-		header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
-		$status_header = $_SERVER['SERVER_PROTOCOL'].' '.$params['status'];
-		header($status_header);
-	}
-
 	if( $is_cli )
 	{ // Command line interface, e.g. in cron_exec.php:
 		echo '== '.T_('An unexpected error has occurred!')." ==\n";
@@ -1605,6 +1595,16 @@ function debug_die( $additional_info = '', $params = array() )
 	}
 	else
 	{
+		// Attempt to output an error header (will not work if the output buffer has already flushed once):
+		// This should help preventing indexing robots from indexing the error :P
+		if( ! headers_sent() )
+		{
+			load_funcs('_core/_template.funcs.php');
+			header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
+			$status_header = $_SERVER['SERVER_PROTOCOL'].' '.$params['status'];
+			header($status_header);
+		}
+
 		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
 		echo '<h3 style="color:#f00;">'.T_('An unexpected error has occurred!').'</h3>';
 		echo '<p>'.T_('If this error persists, please report it to the administrator.').'</p>';
@@ -3420,6 +3420,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.95  2009/04/12 20:57:06  blueyed
+ * debug_die: move sending of status-header to not-in-CLI block.
+ *
  * Revision 1.94  2009/04/10 13:38:04  blueyed
  * TODOs about usage of 'border="0" align="top" for image tags.
  *
