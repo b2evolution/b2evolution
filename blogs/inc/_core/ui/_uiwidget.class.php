@@ -197,6 +197,10 @@ class Widget
 				// Results title:
 				return $this->title;
 
+			case 'no_results':
+				// No Results text:
+				return $this->no_results_text;
+
 			default:
 				return $matches[1];
 		}
@@ -270,6 +274,12 @@ class Table extends Widget
 	 * URL param names
 	 */
 	var $param_prefix;
+
+
+	/**
+	 * Parameters for the filter area:
+	 */
+	var $filter_area;
 
 
 	/**
@@ -389,7 +399,7 @@ class Table extends Widget
 		}
 		echo $option_title.'</a>:';
 
-		//_____________________________ Filters preset ___________________________________________
+		//____________________________________ Filters preset ____________________________________
 
 		if( !empty( $this->{$area_name}['presets'] ) )
 		{ // We have preset filters
@@ -444,7 +454,7 @@ class Table extends Widget
 					$ignore = $this->page_param;
 				}
 
-				$this->Form = new Form( regenerate_url( $ignore ), $this->param_prefix.'form_search', 'post', 'blockspan' ); // COPY!!
+				$this->Form = new Form( regenerate_url( $ignore, '', '', '&' ), $this->param_prefix.'form_search', 'post', 'blockspan' ); // COPY!!
 
 				$this->Form->begin_form( '' );
 			}
@@ -509,8 +519,6 @@ class Table extends Widget
 		if( $this->total_pages == 0 )
 		{ // There are no results! Nothing to display!
 			echo $this->replace_vars( $this->params['no_results_start'] );
-			echo $this->no_results_text;
-			echo $this->replace_vars( $this->params['no_results_end'] );
 		}
 		else
 		{	// We have rows to display:
@@ -528,6 +536,7 @@ class Table extends Widget
 	{
 		if( $this->total_pages == 0 )
 		{ // There are no results! Nothing to display!
+			echo $this->replace_vars( $this->params['no_results_end'] );
 		}
 		else
 		{	// We have rows to display:
@@ -995,6 +1004,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.10  2009/04/13 20:51:03  fplanque
+ * long overdue cleanup of "no results" display: putting filter sback in right position
+ *
  * Revision 1.9  2009/03/08 23:57:41  fplanque
  * 2009
  *

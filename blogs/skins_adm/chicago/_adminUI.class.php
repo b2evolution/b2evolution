@@ -275,12 +275,9 @@ class AdminUI extends AdminUI_general
 					'footer_end' => "</div>\n\n",
 					'no_results_start' => '<div class="fieldset_title"><div class="fieldset_title_right"><div class="fieldset_title_bg">
 																		<span style="float:right">$global_icons$</span>$title$
-																	</div></div></div>'
-																."\n\n"
-																.'<table class="grouped" cellspacing="0">'
-								                ."\n"
-								                .'<tr class="lastline"><td class="firstcol lastcol">',
-					'no_results_end'   => '</td></tr>'
+																	</div></div></div>'."\n\n"
+																.'<table class="grouped" cellspacing="0">'."\n",
+					'no_results_end'   => '<tr class="lastline"><td class="firstcol lastcol">$no_results$</td></tr>'
 								                .'</table>'."\n\n",
 				'after' => '</div>',
 				'sort_type' => 'basic'
@@ -386,6 +383,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.18  2009/04/13 20:51:03  fplanque
+ * long overdue cleanup of "no results" display: putting filter sback in right position
+ *
  * Revision 1.17  2009/03/08 23:57:56  fplanque
  * 2009
  *

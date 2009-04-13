@@ -220,12 +220,6 @@ class Results extends Table
 
 
 	/**
-	 * Parameters for the filter area:
-	 */
-	var $filter_area;
-
-
-	/**
 	 * Parameters for the functions area (to display functions at the end of results array):
 	 */
 	var $functions_area;
@@ -1823,6 +1817,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.24  2009/04/13 20:51:03  fplanque
+ * long overdue cleanup of "no results" display: putting filter sback in right position
+ *
  * Revision 1.23  2009/03/08 23:57:41  fplanque
  * 2009
  *

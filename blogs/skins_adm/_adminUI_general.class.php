@@ -817,9 +817,8 @@ class AdminUI_general extends Menu
 					'footer_end' => "</div>\n\n",
 					'no_results_start' => '<table class="grouped" cellspacing="0">'."\n\n"
 								                .'<tr><th class="title"><span style="float:right">$global_icons$</span>'
-								                .'$title$</th></tr>'."\n"
-								                .'<tr class="lastline"><td class="firstcol lastcol">',
-					'no_results_end'   => '</td></tr>'
+								                .'$title$</th></tr>'."\n",
+					'no_results_end'   => '<tr class="lastline"><td class="firstcol lastcol">$no_results$</td></tr>'
 								                .'</table>'."\n\n",
 				'after' => '</div>',
 				'sort_type' => 'basic'
@@ -901,9 +900,8 @@ class AdminUI_general extends Menu
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
-					'no_results_start' => '<table class="grouped" cellspacing="0">'."\n\n"
-								                .'<tr class="lastline"><td class="firstcol lastcol">',
-					'no_results_end'   => '</td></tr>'
+					'no_results_start' => '<table class="grouped" cellspacing="0">'."\n\n",
+					'no_results_end'   => '<tr class="lastline"><td class="firstcol lastcol">$no_results$</td></tr>'
 								                .'</table>'."\n\n",
 				'after' => '</div>',
 				'sort_type' => 'basic'
@@ -1284,6 +1282,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.94  2009/04/13 20:51:03  fplanque
+ * long overdue cleanup of "no results" display: putting filter sback in right position
+ *
  * Revision 1.93  2009/03/23 04:09:43  fplanque
  * Best. Evobar. Menu. Ever.
  * menu is now extensible by plugins
