@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 3.1.0-beta\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2009-04-13 13:33+0200\n"
+"POT-Creation-Date: 2009-04-13 16:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -10372,7 +10372,7 @@ msgid "This version is too old. The minimum recommended MySQL version is 4.1."
 msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:189
-msgid "This version is not guaranteed to work. The minium recommended MySQL version is 4.1."
+msgid "This version is not guaranteed to work. The minimum recommended MySQL version is 4.1."
 msgstr ""
 
 #: ..\..\..\inc\tools\system.ctrl.php:198
