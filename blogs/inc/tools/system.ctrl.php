@@ -186,7 +186,7 @@ if( version_compare( $mysql_version, '4.0' ) < 0 )
 }
 elseif( version_compare( $mysql_version, '4.1' ) < 0 )
 {
-	disp_system_check( 'warning', T_('This version is not guaranteed to work. The minium recommended MySQL version is 4.1.') );
+	disp_system_check( 'warning', T_('This version is not guaranteed to work. The minimum recommended MySQL version is 4.1.') );
 }
 else
 {
@@ -499,6 +499,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2009/04/13 14:50:22  tblue246
+ * Typo, bugfix
+ *
  * Revision 1.19  2009/04/12 20:15:38  tblue246
  * Make more strings available for translation
  *

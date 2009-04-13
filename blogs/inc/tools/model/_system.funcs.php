@@ -142,7 +142,7 @@ function system_check_process_group()
 		}
 
 		$running_as = sprintf( '%s (gid %s)',
-			($process_group ? $process_group : '?'), ($process_gid ? $process_gid : '?') );
+			($process_group ? $process_group : '?'), $process_gid );
 	}
 	else
 	{
@@ -213,6 +213,9 @@ function system_check_gd_version()
 
 /*
  * $Log$
+ * Revision 1.5  2009/04/13 14:50:22  tblue246
+ * Typo, bugfix
+ *
  * Revision 1.4  2009/04/12 20:15:38  tblue246
  * Make more strings available for translation
  *
