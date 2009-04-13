@@ -12,7 +12,7 @@
 $locale_defs['de-DE'] = array(
 		'name' => NT_('German (DE)'),
 		'messages' => 'de_DE',
-		'charset' => 'utf-8',
+		'charset' => 'iso-8859-1',
 		'datefmt' => 'd.m.y',
 		'timefmt' => 'H:i:s',
 		'startofweek' => 1,
