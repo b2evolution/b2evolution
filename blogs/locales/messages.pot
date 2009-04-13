@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 3.1.0-beta\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2009-04-13 00:13+0200\n"
+"POT-Creation-Date: 2009-04-13 13:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1455,17 +1455,17 @@ msgstr ""
 msgid "Response"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1601
+#: ..\..\..\inc\_core\_misc.funcs.php:1591
 #: ..\..\..\inc\_core\_misc.funcs.php:1609
 msgid "An unexpected error has occurred!"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1602
+#: ..\..\..\inc\_core\_misc.funcs.php:1592
 #: ..\..\..\inc\_core\_misc.funcs.php:1610
 msgid "If this error persists, please report it to the administrator."
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1603
+#: ..\..\..\inc\_core\_misc.funcs.php:1593
 #: ..\..\..\inc\_core\_misc.funcs.php:1617
 #: ..\..\..\inc\_core\_misc.funcs.php:1724
 msgid "Additional information about this error:"
@@ -1509,8 +1509,6 @@ msgid "DB connection charset"
 msgstr ""
 
 #: ..\..\..\inc\_core\_misc.funcs.php:2937
-#: ..\..\..\inc\chapters\views\_chapter_list.view.php:239
-#: ..\..\..\inc\settings\views\_features.form.php:192
 #: ..\..\..\install\index.php:651
 msgid "Manual"
 msgstr ""
@@ -3110,7 +3108,12 @@ msgstr ""
 
 #: ..\..\..\inc\chapters\views\_chapter_list.view.php:239
 #: ..\..\..\inc\settings\views\_features.form.php:191
-msgid "Alphabetical"
+msgid "alphabetical"
+msgstr ""
+
+#: ..\..\..\inc\chapters\views\_chapter_list.view.php:239
+#: ..\..\..\inc\settings\views\_features.form.php:192
+msgid "manual"
 msgstr ""
 
 #: ..\..\..\inc\chapters\views\_chapter_move.form.php:46
