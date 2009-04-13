@@ -188,8 +188,8 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Categories').get_manual_link('categories_global_settings'), array( 'id'=>'categories') );
 	$Form->checkbox_input( 'allow_moving_chapters', $Settings->get('allow_moving_chapters'), T_('Allow moving categories'), array( 'note' => T_('Check to allow moving categories accross blogs. (Caution: can break pre-existing permalinks!)' ) ) );
 	$Form->radio_input( 'chapter_ordering', $Settings->get('chapter_ordering'), array(
-					array( 'value'=>'alpha', 'label'=>T_('Alphabetical') ),
-					array( 'value'=>'manual', 'label'=>T_('Manual') ),
+					array( 'value'=>'alpha', 'label'=>T_('alphabetical') ),
+					array( 'value'=>'manual', 'label'=>T_('manual') ),
 			 ), T_('Ordering of categories') );
 $Form->end_fieldset();
 
@@ -206,6 +206,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.14  2009/04/13 11:33:34  tblue246
+ * Fix translation conflict
+ *
  * Revision 1.13  2009/04/11 17:18:56  tblue246
  * "You could notify news every minute.": What is this supposed to mean exactly? Wouldn't the wiki be a better place for this note?
  *
