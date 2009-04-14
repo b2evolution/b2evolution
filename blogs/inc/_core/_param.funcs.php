@@ -1230,6 +1230,10 @@ function param_ismemorized( $var )
  * Set the value of a param (by force! :P)
  *
  * Same as setting a global, except you don't need a global declaration in your function.
+ *
+ * @param string Param name
+ * @param mixed Value
+ * @return mixed Value
  */
 function set_param( $var, $value )
 {
@@ -1915,6 +1919,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.29  2009/04/14 21:14:53  blueyed
+ * doc
+ *
  * Revision 1.28  2009/04/14 01:17:28  fplanque
  * better handling of colselect
  *
