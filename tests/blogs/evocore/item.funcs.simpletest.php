@@ -64,6 +64,10 @@ class ItemFuncsTestCase extends EvoUnitTestCase
 		$evo_charset = $old_evo_charset;
 	}
 
+
+	/**
+	 * Test {@link bpost_count_words()}.
+	 */
 	function test_bpost_count_words()
 	{
 		global $evo_charset;
@@ -84,6 +88,7 @@ class ItemFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( bpost_count_words( 'möre (again 3) ümläüts... öö üü ää ÄÄ ÖÖ ÜÜ' ), 9 );
 		$this->assertEqual( bpost_count_words( 'russian: Расширенные возможности - это удобный' ), 5 );
 		$this->assertEqual( bpost_count_words( 'A versão foi apelidade de Tilqi, porque era aniversário dele. numbers: 42' ), 11 );
+		$this->assertEqual( bpost_count_words( 'HTML tags -> <a href="http://b2evolution.net" target="_blank">visit b2evo!</a>. Some other chars: "\' \' " <<< < >>> > ``` -- versão удобный überladen' ), 10 ); 
 
 		$evo_charset = $old_evo_charset;
 	}
