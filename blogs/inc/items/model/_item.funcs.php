@@ -338,16 +338,20 @@ function get_postdata($postid)
  *
  * @internal PHP's str_word_count() is not accurate. Inaccuracy reported
  *           by sam2kb: http://forums.b2evolution.net/viewtopic.php?t=16596
- * @todo Tblue> The regexp doesn't work with all charsets (e. g. ISO-8859-1).
- *              Also, libpcre segfaults on some characters when ISO-8859-1 is
- *              used!! :(
  */
 function bpost_count_words( $str )
 {
-	$words = preg_split( '#\s+#', trim( strip_tags( $str ) ) );
-	$words = array_filter( $words,
-				create_function( '$v', 'return preg_match( \'#[a-z\p{L}]#i\', $v );' ) );
-	return count( $words );
+	$count = 0;
+
+	foreach( preg_split( '#\s+#', trim( strip_tags( convert_charset( $str, 'UTF-8' ) ) ) ) as $word )
+	{
+		if( preg_match( '#\pL#', $word ) )
+		{
+			++$count;
+		}
+	}
+	
+	return $count;
 }
 
 
@@ -824,6 +828,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.42  2009/04/14 14:57:48  tblue246
+ * Trying to fix bpost_count_words()
+ *
  * Revision 1.41  2009/04/13 22:33:23  tblue246
  * Doc
  *
