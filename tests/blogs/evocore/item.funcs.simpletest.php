@@ -31,34 +31,63 @@ class ItemFuncsTestCase extends EvoUnitTestCase
 	{
 		global $evo_charset;
 
-		$old_evo_charset = $evo_charset;
-		$evo_charset = 'ISO-8859-1';
-		$this->assertEqual( urltitle_validate( '  ', " :: �� c'est \"VRAIMENT\" t�a! " ), 'ca-c-est-vraiment-toa' );
-		$this->assertEqual( urltitle_validate( '  ', " :: �� c'est_t�a! " ), 'ca-c-est_toa' );
-		$this->assertEqual( urltitle_validate( '  ', " :: �� * c'est_t�a! * *" ), 'ca-c-est_toa' );
-		$this->assertEqual( urltitle_validate( '', 'La diff�rence entre acronym et abbr...-452' ), 'la-difference-entre-acronym-et-abbr-452' );
-		$this->assertEqual( urltitle_validate( '', 'La diff�rence entre acronym et abbr..._452' ), 'la-difference-entre-acronym-et-abbr-452' );
-		$this->assertEqual( urltitle_validate( '', 'La diff�rence entre acronym et abbr_452' ), 'la-difference-entre-acronym-et-abbr-452' );
-		// Test length cropping
-		$this->assertEqual( urltitle_validate( '', 'La subtile diff�rence entre acronym et abbr..._452' ), 'la-subtile-difference-entre-acronym-et-a-452' );
-		$this->assertEqual( urltitle_validate( '', 'La subtile diff�rence entre acronym et abbr...-452' ), 'la-subtile-difference-entre-acronym-et-a-452' );
-
-		if( ! can_convert_charsets('ISO-8859-1', 'UTF-8') || ! can_convert_charsets('UTF-8', 'ISO-8859-1') )
+		if( ! can_convert_charsets( 'ISO-8859-1', 'UTF-8' ) )
 		{
-			echo "Skipping tests (cannot convert charsets)...<br />\n";
+			echo 'Skipping tests (cannot convert charsets)...<br />', "\n";
 			return;
 		}
 
-		$this->assertEqual( urltitle_validate('', '�����'), 'aeoeueue' );
+		$old_evo_charset = $evo_charset;
+		$evo_charset = 'ISO-8859-1';
 
+		// For ISO-8859-1:
+		foreach( array(
+					//     arg1               arg2                    expected result
+					array( '  ', ' :: çà c\'est "VRAIMENT" tôa! ', 'ca-c-est-vraiment-toa' ),
+					array( '  ', ' :: çà c\'est_tôa! ', 'ca-c-est_toa' ),
+					array( '  ', ' :: çà * c\'est_tôa! * *', 'ca-c-est_toa' ),
+					array( '', 'La différence entre acronym et abbr...-452', 'la-difference-entre-acronym-et-abbr-452' ),
+					array( '', 'La différence entre acronym et abbr...-452', 'la-difference-entre-acronym-et-abbr-452' ),
+					array( '', 'La différence entre acronym et abbr_452', 'la-difference-entre-acronym-et-abbr-452' ),
+					array( '', 'La subtile différence entre acronym et abbr..._452', 'la-subtile-difference-entre-acronym-et-abbr-452' ),
+					array( '', 'La subtile différence entre acronym et abbr..._452', 'la-subtile-difference-entre-acronym-et-abbr-452' ),
+					array( '', 'Äöüùé', 'aeoeueue' ),
+				) as $test )
+		{
+			$this->assertEqual( urltitle_validate( $test[0], convert_charset( $test[1], 'ISO-8859-1', 'UTF-8' ) ), $test[2] );
+		}
+
+		// For UTF-8:
 		$evo_charset = 'UTF-8';
-		$this->assertEqual( urltitle_validate('', convert_charset('�����', 'UTF-8', 'ISO-8859-1')), 'aeoeueue' );
+		$this->assertEqual( urltitle_validate( '', 'Äöüùé' ), 'aeoeueue' );
 
 		$evo_charset = $old_evo_charset;
 	}
 
-}
+	function test_bpost_count_words()
+	{
+		global $evo_charset;
 
+		if( ! can_convert_charsets( 'ISO-8859-1', 'UTF-8' ) )
+		{
+			echo 'Skipping tests (cannot convert charsets)...<br />', "\n";
+			return;
+		}
+
+		$old_evo_charset = $evo_charset;
+		$evo_charset = 'ISO-8859-1';
+
+		$this->assertEqual( bpost_count_words( convert_charset( 'eine gleichung wie 1 + 2 = 9 /', 'ISO-8859-1', 'UTF-8' ) ), 3 );
+		$this->assertEqual( bpost_count_words( convert_charset( 'mixed with the 3 ümläuts: äää ööö üüü ÄÄÄ ÖÖÖ	ÜÜÜ', 'ISO-8859-1', 'UTF-8' ) ), 10 );
+
+		$evo_charset = 'UTF-8';
+		$this->assertEqual( bpost_count_words( 'möre (again 3) ümläüts... öö üü ää ÄÄ ÖÖ ÜÜ' ), 9 );
+		$this->assertEqual( bpost_count_words( 'russian: Расширенные возможности - это удобный' ), 5 );
+		$this->assertEqual( bpost_count_words( 'A versão foi apelidade de Tilqi, porque era aniversário dele. numbers: 42' ), 11 );
+
+		$evo_charset = $old_evo_charset;
+	}
+}
 
 if( !isset( $this ) )
 { // Called directly, run the TestCase alone
