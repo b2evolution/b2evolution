@@ -7,7 +7,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $trans['de_DE'] = array(
 '__meta__' => array('format_version'=>1, 'charset'=>'iso-8859-1'),
-'' => "Project-Id-Version: b2evolution 3.1.0-beta\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2009-04-13 16:56+0200\nPO-Revision-Date: 2009-04-13 16:00+0000\nLast-Translator: Tilman Blumenbach <Unknown>\nLanguage-Team: Tilman Blumenbach <tilman (at) ax86 (dot) net>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=ISO-8859-1\nContent-Transfer-Encoding: 8bit\nX-Launchpad-Export-Date: 2009-04-13 16:08+0000\nX-Generator: Launchpad (build Unknown)\nX-Poedit-Country: GERMANY\nX-Poedit-Language: German\nX-Poedit-SourceCharset: iso-8859-1\nX-Poedit-Basepath: /home/tilman/public_html/b2evo/cvs/HEAD/blogs/locales/de_DE/LC_MESSAGES\n",
+'' => "Project-Id-Version: b2evolution 3.1.0-beta\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2009-04-13 16:56+0200\nPO-Revision-Date: 2009-04-13 16:50+0000\nLast-Translator: Tilman Blumenbach <Unknown>\nLanguage-Team: Tilman Blumenbach <tilman (at) ax86 (dot) net>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=ISO-8859-1\nContent-Transfer-Encoding: 8bit\nX-Launchpad-Export-Date: 2009-04-14 16:36+0000\nX-Generator: Launchpad (build Unknown)\nX-Poedit-Country: GERMANY\nX-Poedit-Language: German\nX-Poedit-SourceCharset: iso-8859-1\nX-Poedit-Basepath: /home/tilman/public_html/b2evo/cvs/HEAD/blogs/locales/de_DE/LC_MESSAGES\n",
 'Categories' => 'Kategorien',
 'Tags' => 'Schlagworte',
 'Previous' => 'Vorherige',
@@ -665,7 +665,7 @@ $trans['de_DE'] = array(
 'RSS2 Feed URL' => 'RSS2-Feed-URL',
 'Example: Your Feedburner RSS2 URL' => 'Beispiel: Ihr Feedburner-RSS2-URL',
 'Aggregation' => 'Aggregation',
-'Blogs to aggregate' => 'Blog zum Aggregieren',
+'Blogs to aggregate' => 'Zu aggregierende Blogs',
 'List blog IDs separated by ,' => 'Blog-IDs durch , (Komma) getrennt auflisten',
 'Caching' => 'Caching',
 'Cache rendered blog pages' => 'Gerenderte Blogseiten zwischenspeichern',
