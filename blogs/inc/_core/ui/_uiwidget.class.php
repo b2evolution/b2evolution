@@ -468,6 +468,7 @@ class Table extends Widget
 			if( $create_new_form )
 			{	// We do not already have a form surrounding the whole result list:
 				$this->Form->end_form( '' );
+				unset( $this->Form );	// forget about this temporary form
 			}
 		}
 
@@ -562,13 +563,11 @@ class Table extends Widget
 			echo $this->replace_vars( $this->params['head_title'] );
 		}
 
+		// DISPLAY FILTERS:
+		$this->display_filters();
 
 		// DISPLAY COL SELECTION
 		$this->display_colselect();
-
-
-		// DISPLAY FILTERS:
-		$this->display_filters();
 
 
 		// DISPLAY COLUMN HEADERS:
@@ -1004,6 +1003,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.11  2009/04/14 01:17:28  fplanque
+ * better handling of colselect
+ *
  * Revision 1.10  2009/04/13 20:51:03  fplanque
  * long overdue cleanup of "no results" display: putting filter sback in right position
  *

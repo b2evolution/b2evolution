@@ -1233,7 +1233,7 @@ function param_ismemorized( $var )
  */
 function set_param( $var, $value )
 {
-	$GLOBALS[$var] = $value;
+	return $GLOBALS[$var] = $value;
 }
 
 
@@ -1915,6 +1915,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.28  2009/04/14 01:17:28  fplanque
+ * better handling of colselect
+ *
  * Revision 1.27  2009/03/13 00:52:38  fplanque
  * debug stuff
  *

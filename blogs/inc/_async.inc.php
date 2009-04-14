@@ -40,28 +40,22 @@ if( !empty( $expand ) )
 
 if( !empty($set_target) )
 {
-	switch( $set_target )
-	{
-		case 'antispam_filters':
-		case 'crontab_filters':
-		case 'refdom_filters':	// referring domains
-		case 'uagnt_filters':	// user agents
-		case 'user_filters':
-		case 'sess_filters':
-		case 'hits_filters':
-			// We have a valid value:
-			$Session->set( $set_target, $set_status );
-			break;
-
-		default:
-			// Warning: you may not see this on AJAX calls
-			echo( 'Cannot ['.$set_status.'] unknown param ['.$set_target.']' );
+	if( preg_match( '/_(filters|colselect)$/', $set_target) )
+	{	// accept all _filters and _colselect open/close requests!
+		// We have a valid value:
+		$Session->set( $set_target, $set_status );
+	}
+	else
+	{	// Warning: you may not see this on AJAX calls
+		echo( 'Cannot ['.$set_status.'] unknown param ['.$set_target.']' );
 	}
 }
 
-
 /*
  * $Log$
+ * Revision 1.13  2009/04/14 01:17:28  fplanque
+ * better handling of colselect
+ *
  * Revision 1.12  2009/03/08 23:57:38  fplanque
  * 2009
  *
