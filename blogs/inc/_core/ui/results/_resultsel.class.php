@@ -117,7 +117,7 @@ class ResultSel extends Results
 			return;
 		}
 
-		$this->Form = new Form( regenerate_url(), $this->param_prefix.'selections_checkchanges', 'post', 'none' ); // COPY!!
+		$this->Form = new Form( regenerate_url('', '', '', '&'), $this->param_prefix.'selections_checkchanges', 'post', 'none' ); // COPY!!
 
 		$this->Form->begin_form( '' );
 
@@ -163,45 +163,45 @@ class ResultSel extends Results
 		$this->Form->end_form();
 	}
 
-	
+
 	/**
 	 * Display functions
 	 */
 	function display_functions()
 	{
 		$this->functions_area = array( 'callback' => array( 'this', 'selection_menu' ) );
-		
+
 		parent::display_functions();
 	}
-		
-		
+
+
 	/**
 	 * Callback for selection menu
 	 */
 	function selection_menu()
 	{
 		global $item_ID_array, $current_User;
-	
+
 		$can_edit = $current_User->check_perm( 'selections', 'edit' );
-	
+
 		if( $can_edit )
 		{ // links to check all and uncheck all
 			echo $this->Form->check_all();
 		}
-	
+
 		if( $current_User->check_perm( 'selections', 'view' ) )
 		{
 			// construction of the select menu :
 			$selection_name = selection_select_tag( $this->param_prefix, $this->table_selections, $this->field_sel_name, $this->field_sel_ID, $this->current_selection_ID );
 		}
-		
+
 		if( $can_edit )
 		{
 			$this->Form->text( 'selection_'.$this->param_prefix.'name', $selection_name, 25, T_('Selection name'), '', 60 );
-	
+
 			// List of IDs displayed on this page (needed for deletes):
 			$this->Form->hidden( 'item_ID_list', implode( $item_ID_array, ',' ) );
-	
+
 			// actionArray[update_selection] is experimental
 			$this->Form->submit( array( 'actionArray[update_'.$this->param_prefix.'selection]', T_('Update selection'), 'SaveButton' ) );
 		}
@@ -278,7 +278,7 @@ function selection_checkbox( $item_ID, $param_prefix )
 		{	// already in selection:
 			$r .= '*';
 		}
-		else 
+		else
 		{
 			$r .= '&nbsp;';
 		}
@@ -352,9 +352,9 @@ function selection_select_tag(
 
 /**
  * Handle selection action
- * 
- * Determine if we need to perform an action to the current selection and do it in this case. 
- *  
+ *
+ * Determine if we need to perform an action to the current selection and do it in this case.
+ *
  * @param integer the current selection id
  * @param string prefix (cont_, etab_, firm_, ..)
  * @param string selection prefix (cocs_, etes_, fifs_, ..)
@@ -363,9 +363,9 @@ function handle_selection_actions( $selection_ID, $prefix, $prefix_sel )
 {
 	// previous selection ID, need it to check for updating sel (no javascript possibility)
 	$previous_sel_ID = param( $prefix.'previous_sel_ID', 'integer', 0, true );
-	
+
 	if( $selection_ID == $previous_sel_ID ) // the databse has to be updated
-	{	// The selected ID is the same than the edited one in the previous page 	
+	{	// The selected ID is the same than the edited one in the previous page
 		if( $selection_ID == 0 )
 		{ // A new selection must be created
 			$action = 'create';
@@ -382,7 +382,7 @@ function handle_selection_actions( $selection_ID, $prefix, $prefix_sel )
 	}
 }
 
-		
+
 /**
  * Manages the various database changes to make on selections
  *
@@ -396,21 +396,21 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 { // the form has been submitted to act on the database and not only to change the display
 
 	global $DB, $Messages, $confirm, $item_ID_list, $current_User;
-	
+
 	$items = param( $prefix.'items', 'array', array(), false );	// do NOT memorize // ?????????????
 	param( 'item_ID_list', 'string', '', false );
-	
+
 	$current_User->check_perm( 'selections', 'edit', true );
 
 
-	// Set global vars, selection_.prefix.ID, selection_.prefix_name 
+	// Set global vars, selection_.prefix.ID, selection_.prefix_name
 	$selection_prefix_ID = 'selection_'.$prefix.'ID';
 	$selection_prefix_name = 'selection_'.$prefix.'name';
 	global $$selection_prefix_ID, $$selection_prefix_name;
-	
+
 	// Moche ms bon...
 	$selections_table = 'T_'.substr($prefix,0,strlen($prefix)-1).'selections';
-	$sel_table = 'T_'.$prefix.substr($prefix,0,1).'sel';	
+	$sel_table = 'T_'.$prefix.substr($prefix,0,1).'sel';
 	$selections_table_name = substr($prefix,0,1).'sel_name';
 	$selections_table_id = substr($prefix,0,1).'sel_ID';
 	$sel_table_selection = $prefix_sel.$selections_table_id;
@@ -543,7 +543,7 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 					<p>
 
 				<?php
-					$Form = & new Form( regenerate_url(), 'form_confirm', 'post', '' );
+					$Form = & new Form( regenerate_url('', '', '', '&'), 'form_confirm', 'post', '' );
 
 					$action = '';
 
@@ -554,11 +554,11 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 					$Form->hidden( 'confirm', 1 );
 					$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton' ) );
 					$Form->end_form();
-					
+
 					unset( $Form );
 
-					$Form = & new Form( regenerate_url(), 'form_cancel', 'post', '' );
-					
+					$Form = & new Form( regenerate_url('', '', '', '&'), 'form_cancel', 'post', '' );
+
 					$Form->begin_form( 'inline' );
 					$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
 					$Form->end_form();
@@ -595,6 +595,9 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 
 /*
  * $Log$
+ * Revision 1.5  2009/04/14 22:25:26  blueyed
+ * Use '&' as glue for all regenerate_url calls used in Form constructor.
+ *
  * Revision 1.4  2009/03/08 23:57:41  fplanque
  * 2009
  *
