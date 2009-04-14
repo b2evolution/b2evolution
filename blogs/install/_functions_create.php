@@ -67,7 +67,7 @@ function create_tables()
 function create_default_data()
 {
 	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
-	global $DB;
+	global $DB, $locales, $current_locale;
 
 	// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
 	load_class('plugins/model/_plugins_admin_no_db.class.php');
@@ -248,6 +248,25 @@ function create_default_data()
 			(17, 'mov', 'Quicktime video', 'video/quicktime', '', 'browser', 1)
 		" );
 	echo "OK.<br />\n";
+
+	if ( ! empty( $current_locale ) && ! $locales[$current_locale]['enabled'] )
+	{	// The chosen locale is not enabled, make sure the user sees his new system localized.
+		echo 'Activating default locale... ';
+		$DB->query( 'INSERT INTO T_locales '
+				   .'( loc_locale, loc_charset, loc_datefmt, loc_timefmt, '
+				   .'loc_startofweek, loc_name, loc_messages, loc_priority, '
+				   .'loc_enabled ) '
+				   .'VALUES ( '.$DB->quote( $current_locale ).', '
+				   .$DB->quote( $locales[$current_locale]['charset'] ).', '
+				   .$DB->quote( $locales[$current_locale]['datefmt'] ).', '
+				   .$DB->quote( $locales[$current_locale]['timefmt'] ).', '
+				   .$DB->quote( $locales[$current_locale]['startofweek'] ).', '
+				   .$DB->quote( $locales[$current_locale]['name'] ).', '
+				   .$DB->quote( $locales[$current_locale]['messages'] ).', '
+				   .$DB->quote( $locales[$current_locale]['priority'] ).', '
+				   .' 1)' );
+		echo 'OK.<br />', "\n";
+	}
 
 	create_default_settings();
 
@@ -829,6 +848,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.260  2009/04/14 15:44:41  tblue246
+ * Make sure the locale chosen at install time is enabled, so the user sees his new system in his language.
+ *
  * Revision 1.259  2009/03/21 22:55:15  fplanque
  * Adding TinyMCE -- lowfat version
  *
