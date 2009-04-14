@@ -333,6 +333,9 @@ function get_postdata($postid)
 /**
  * Returns the number of the words in a string, sans HTML
  *
+ * @todo dh> Test if http://de3.php.net/manual/en/function.str-word-count.php#85579 works better/faster
+ *           (only one preg_* call and no loop).
+ *
  * @param string The string.
  * @return integer Number of words.
  *
@@ -828,6 +831,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.43  2009/04/14 22:30:05  blueyed
+ * TODO for bpost_count_words
+ *
  * Revision 1.42  2009/04/14 14:57:48  tblue246
  * Trying to fix bpost_count_words()
  *
