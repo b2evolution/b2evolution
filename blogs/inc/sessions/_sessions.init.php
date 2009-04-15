@@ -119,11 +119,11 @@ class sessions_Module
 					 ),
 				'sessions' => array(
 						'text' => T_('User sessions').'&hellip;',
-						'href' => $admin_url.'?ctrl=stats&amp;tab=sessions&amp;tab3=global&amp;blog=0',
+						'href' => $admin_url.'?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0',
 					 ),
 				'goals' => array(
 						'text' => T_('Goals').'&hellip;',
-						'href' => $admin_url.'?ctrl=stats&amp;tab=goals&amp;tab3=global&amp;blog=0',
+						'href' => $admin_url.'?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0',
 					 ),
 				);
 
@@ -270,6 +270,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.11  2009/04/15 13:17:20  tblue246
+ * bugfixes
+ *
  * Revision 1.10  2009/03/23 22:19:45  fplanque
  * evobar right menu is now also customizable by plugins
  *
