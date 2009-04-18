@@ -14,13 +14,13 @@ msgstr ""
 "Project-Id-Version: b2evolution 3.1.0-beta\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2009-04-13 16:56+0200\n"
-"PO-Revision-Date: 2009-04-13 16:50+0000\n"
+"PO-Revision-Date: 2009-04-15 16:34+0000\n"
 "Last-Translator: Tilman Blumenbach <Unknown>\n"
 "Language-Team: Tilman Blumenbach <tilman (at) ax86 (dot) net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-04-14 16:36+0000\n"
+"X-Launchpad-Export-Date: 2009-04-18 18:08+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: GERMANY\n"
 "X-Poedit-Language: German\n"
@@ -12039,7 +12039,7 @@ msgstr "Nur ansehen"
 
 #: ..\..\..\inc\users\views\_group.form.php:163
 msgid "Check to allow access to skin files."
-msgstr "Auswählen, um den Zugriff aus Skin-Dateien zu erlauben"
+msgstr "Auswählen, um den Zugriff auf Skin-Dateien zu erlauben"
 
 #: ..\..\..\inc\users\views\_group.form.php:171
 #: ..\..\..\inc\users\views\_group.form.php:175

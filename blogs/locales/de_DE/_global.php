@@ -7,7 +7,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $trans['de_DE'] = array(
 '__meta__' => array('format_version'=>1, 'charset'=>'iso-8859-1'),
-'' => "Project-Id-Version: b2evolution 3.1.0-beta\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2009-04-13 16:56+0200\nPO-Revision-Date: 2009-04-13 16:50+0000\nLast-Translator: Tilman Blumenbach <Unknown>\nLanguage-Team: Tilman Blumenbach <tilman (at) ax86 (dot) net>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=ISO-8859-1\nContent-Transfer-Encoding: 8bit\nX-Launchpad-Export-Date: 2009-04-14 16:36+0000\nX-Generator: Launchpad (build Unknown)\nX-Poedit-Country: GERMANY\nX-Poedit-Language: German\nX-Poedit-SourceCharset: iso-8859-1\nX-Poedit-Basepath: /home/tilman/public_html/b2evo/cvs/HEAD/blogs/locales/de_DE/LC_MESSAGES\n",
+'' => "Project-Id-Version: b2evolution 3.1.0-beta\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2009-04-13 16:56+0200\nPO-Revision-Date: 2009-04-15 16:34+0000\nLast-Translator: Tilman Blumenbach <Unknown>\nLanguage-Team: Tilman Blumenbach <tilman (at) ax86 (dot) net>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=ISO-8859-1\nContent-Transfer-Encoding: 8bit\nX-Launchpad-Export-Date: 2009-04-18 18:08+0000\nX-Generator: Launchpad (build Unknown)\nX-Poedit-Country: GERMANY\nX-Poedit-Language: German\nX-Poedit-SourceCharset: iso-8859-1\nX-Poedit-Basepath: /home/tilman/public_html/b2evo/cvs/HEAD/blogs/locales/de_DE/LC_MESSAGES\n",
 'Categories' => 'Kategorien',
 'Tags' => 'Schlagworte',
 'Previous' => 'Vorherige',
@@ -2313,7 +2313,7 @@ $trans['de_DE'] = array(
 'This setting will further restrict any media file permissions on specific blogs.' => 'Diese Einstellung wird jegliche Mediendateien-Berechtigungen der jeweiligen Blogs weiter einschr‰nken.',
 'System admin permissions' => 'Systemadministrations-Berechtigungen',
 'View only' => 'Nur ansehen',
-'Check to allow access to skin files.' => 'Ausw‰hlen, um den Zugriff aus Skin-Dateien zu erlauben',
+'Check to allow access to skin files.' => 'Ausw‰hlen, um den Zugriff auf Skin-Dateien zu erlauben',
 'Users & Groups' => 'Benutzer & Gruppen',
 'Settings' => 'Einstellungen',
 'Close user profile!' => 'Benutzerprofil schlieﬂen!',
