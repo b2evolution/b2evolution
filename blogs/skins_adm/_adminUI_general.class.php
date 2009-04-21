@@ -24,7 +24,7 @@
  * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE.
  *
- * @todo Refactor to allow easier contributions! (blueyed)
+ * @todo dh> Refactor to allow easier contributions!
  *
  * @version $Id$
  */
@@ -1282,6 +1282,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.95  2009/04/21 19:19:49  blueyed
+ * doc/normalization
+ *
  * Revision 1.94  2009/04/13 20:51:03  fplanque
  * long overdue cleanup of "no results" display: putting filter sback in right position
  *

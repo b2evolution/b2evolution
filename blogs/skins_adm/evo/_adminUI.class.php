@@ -1,7 +1,6 @@
 <?php
 /**
- * This file implements the Admin UI class.
- * Alternate admin skins should derive from this class.
+ * This file implements the Admin UI class for the evo skin.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -144,23 +143,10 @@ class AdminUI extends AdminUI_general
 			case 'main':
 				// main level
 				global $app_shortname, $app_version;
-
-				return array(
-					'before' => '<div id="mainmenu"><ul>',
-					'after' => "</ul>\n<p class=\"center\">$app_shortname v <strong>$app_version</strong></p>\n</div>",
-					'beforeEach' => '<li>',
-					'afterEach' => '</li>',
-					'beforeEachSel' => '<li class="current">',
-					'afterEachSel' => '</li>',
-					'beforeEachSelWithSub' => '<li class="parent">',
-					'afterEachSelWithSub' => '</li>',
-					'_props' => array(
-						/**
-						 * @todo Move to new skin (recurse for subentries if an entry is selected)
-						'recurseSelected' => true,
-						*/
-					),
-				);
+				
+				$r = parent::get_template( $name, $depth );
+				$r['after'] = "</ul>\n<p class=\"center\">$app_shortname v <strong>$app_version</strong></p>\n</div>";
+				return $r;
 				break;
 
 
@@ -205,6 +191,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.32  2009/04/21 19:19:50  blueyed
+ * doc/normalization
+ *
  * Revision 1.31  2009/03/08 23:57:58  fplanque
  * 2009
  *
