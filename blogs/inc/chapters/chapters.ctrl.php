@@ -271,7 +271,7 @@ switch( $action )
 		$GenericCategoryCache->move_Chapter_subtree( $edited_GenericCategory->ID, $subset_ID, $cat_coll_ID );
 
 		$dest_Blog = & $BlogCache->get_by_ID( $cat_coll_ID );
-		$Messages->add( sprintf( T_('The category &laquo;%s&raquo; has been moved (with children) to &laquo;%s&raquo;\'s root. You may want to nest it in another parent category below...'), $edited_GenericCategory->dget('name'), $dest_Blog->dget( 'shortname' )  ), 'success' );
+		$Messages->add( /* TRANS: first %s is the moved categorie's name, the second one the new parent category */ sprintf( T_('The category &laquo;%s&raquo; has been moved (with children) to &laquo;%s&raquo;\'s root. You may want to nest it in another parent category below...'), $edited_GenericCategory->dget('name'), $dest_Blog->dget( 'shortname' )  ), 'success' );
 
 		header_redirect( url_add_param( $admin_url, 'ctrl=chapters&action=edit&blog='.$cat_coll_ID.'&cat_ID='.$cat_ID, '&' ) );	// will save $Messages
 		/* EXIT */
@@ -426,6 +426,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2009/04/21 20:52:49  blueyed
+ * trans comment
+ *
  * Revision 1.9  2009/03/08 23:57:41  fplanque
  * 2009
  *
