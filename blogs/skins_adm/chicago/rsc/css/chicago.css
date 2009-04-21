@@ -57,6 +57,7 @@ a:hover {
 	margin: 0;
 	padding: 0 14px;
 	height: 23px;
+	overflow:hidden; /* do not wrap inner LIs */
 }
 
 /*
@@ -73,6 +74,7 @@ a:hover {
 	margin: 0;
 	padding: 0 14px;
 	height: 23px;
+	overflow:hidden; /* do not wrap inner LIs */
 }
 
 #mainmenu li,
