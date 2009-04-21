@@ -1464,11 +1464,12 @@ class Item extends ItemLight
 			$this->tags = preg_split( '/[;,]+/', $tags );
 		}
 
+		/* fplanque> The following kills special chars like é on my blog (latin 1) -- mb_detect_encoding() is now officially banned from being used anywhere
 		if( function_exists( 'mb_strtolower' ) && function_exists( 'mb_detect_encoding' ) )
 		{	// fp> TODO: instead of those "when used" ifs, it would make more sense to redefine mb_strtolower beforehand if it doesn"t exist (it would then just be a fallback to the strtolower + a Debuglog->add() )
 			array_walk( $this->tags, create_function( '& $tag', '$tag = mb_strtolower(trim($tag), mb_detect_encoding($tag));' ) );
 		}
-		else
+		else */
 		{
 			array_walk( $this->tags, create_function( '& $tag', '$tag = strtolower(trim($tag));' ) );
 		}
@@ -3716,6 +3717,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.90  2009/04/21 22:31:35  fplanque
+ * rollback of special character killer
+ *
  * Revision 1.89  2009/03/22 17:19:37  fplanque
  * better intro posts handling
  *
