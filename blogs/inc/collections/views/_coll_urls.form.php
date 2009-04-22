@@ -37,7 +37,6 @@ global $Debuglog;
 
 ?>
 <script type="text/javascript">
-	<!--
 	// Script to update the Blog URL preview:
 	var blog_baseurl = '<?php echo str_replace( "'", "\'", $edited_Blog->gen_baseurl() ); ?>';
 
@@ -74,7 +73,7 @@ global $Debuglog;
 	function show_hide_tag_prefix(ob)
 	{
 		var fldset = document.getElementById( 'tag_prefix_container' );
-		if( ob.value == 'param_num' )
+		if( ob.value == 'param' )
 		{
 			fldset.style.display = 'none';
 		}
@@ -83,7 +82,6 @@ global $Debuglog;
 			fldset.style.display = '';
 		}
 	}
-	//-->
 </script>
 
 
@@ -267,14 +265,8 @@ $Form->begin_fieldset( T_('Tag page URLs') );
 														array('maxlength' => 120) );
 		echo '</div>';
 		if( $edited_Blog->get_setting( 'tag_links' ) == 'param' )
-		{ ?>
-		<script type="text/javascript">
-			<!--
-			var fldset = document.getElementById( 'tag_prefix_container' );
-			fldset.style.display = 'none';
-			//-->
-		</script>
-		<?php
+		{
+			echo '<script type="text/javascript">jQuery("#tag_prefix_container").hide();</script>';
 		}
 
 $Form->end_fieldset();
@@ -312,6 +304,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.21  2009/04/22 20:27:17  blueyed
+ * Fix hiding of 'Prefix' box for 'Tag page URLs' select. Use jQuery for easy hide-on-init.
+ *
  * Revision 1.20  2009/03/17 02:00:26  waltercruz
  * blogs/inc/_blog_main.inc.php
  *

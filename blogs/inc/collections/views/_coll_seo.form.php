@@ -31,7 +31,6 @@ global $rsc_url;
 
 ?>
 <script type="text/javascript">
-	<!--
 	function show_hide_chapter_prefix(ob)
 	{
 		var fldset = document.getElementById( 'category_prefix_container' );
@@ -49,7 +48,7 @@ global $rsc_url;
 	function show_hide_tag_prefix(ob)
 	{
 		var fldset = document.getElementById( 'tag_prefix_container' );
-		if( ob.value == 'param_num' )
+		if( ob.value == 'param' )
 		{
 			fldset.style.display = 'none';
 		}
@@ -58,7 +57,6 @@ global $rsc_url;
 			fldset.style.display = '';
 		}
 	}
-	//-->
 </script>
 
 <?php
@@ -265,14 +263,8 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo') );
 													array('maxlength' => 120) );
 	echo '</div>';
 	if( $edited_Blog->get_setting( 'tag_links' ) == 'param' )
-	{ ?>
-	<script type="text/javascript">
-		<!--
-		var fldset = document.getElementById( 'tag_prefix_container' );
-		fldset.style.display = 'none';
-		//-->
-	</script>
-	<?php
+	{
+		echo '<script type="text/javascript">jQuery("#tag_prefix_container").hide();</script>';
 	}
 
 	$Form->checkbox( 'canonical_tag_urls', $edited_Blog->get_setting( 'canonical_tag_urls' ), T_('Make canonical'), T_('301 redirect to canonical URL') );
@@ -315,6 +307,9 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.19  2009/04/22 20:27:17  blueyed
+ * Fix hiding of 'Prefix' box for 'Tag page URLs' select. Use jQuery for easy hide-on-init.
+ *
  * Revision 1.18  2009/03/22 16:12:02  fplanque
  * minor
  *
