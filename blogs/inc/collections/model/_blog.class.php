@@ -1149,6 +1149,7 @@ class Blog extends DataObject
 					case 'dash':
 						$trailer = '-';
 						break;
+					case 'semicol': // dh> TODO: old value. I had this in my DB. Convert this during upgrade?
 					case 'semicolon':
 						$trailer = ';';
 						break;
@@ -1156,8 +1157,8 @@ class Blog extends DataObject
 						$trailer = ':';
 						break;
 					case 'prefix-only':
-						$trailer = '';
 					default:
+						$trailer = '';
 				}
 				$tag_prefix = $this->get_setting('tag_prefix');
 				if( !empty( $tag_prefix ) )
@@ -2030,6 +2031,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.59  2009/04/22 23:32:39  blueyed
+ * Fix switch in gen_tag_url
+ *
  * Revision 1.58  2009/04/22 22:46:33  blueyed
  * Add support for rel=tag in tag URLs. This adds a new tag_links mode 'prefix-only', which requires a prefix (default: tag) and uses no suffix (dash/colon/semicolon). Also adds more JS juice and cleans up/normalized previously existing JS. Not much tested, but implemented as discussed on ML.
  *
