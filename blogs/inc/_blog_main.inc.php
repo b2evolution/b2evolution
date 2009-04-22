@@ -138,17 +138,7 @@ if( $resolve_extra_path )
 			$path_string );
 
 		// Slice the path:
-		$path_split = explode( '/', $path_string, 20 );
-
-		// Remove empty slots:
-		$path_elements = array();
-		foreach( $path_split as $path_element )
-		{
-			if( !empty( $path_element ) )
-			{
-				$path_elements[] = $path_element;
-			}
-		}
+		$path_elements = preg_split( '~/~', $path_string, 20, PREG_SPLIT_NO_EMPTY );
 		// pre_dump( '',$path_elements );
 
 		if( isset( $path_elements[0] ) && preg_match( '#.*\.php[0-9]?$#', $path_elements[0] ) )
@@ -601,6 +591,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.130  2009/04/22 20:11:42  blueyed
+ * Use preg_split instead of split and manually removing empty slots/parts. Less code and faster in benchmark.
+ *
  * Revision 1.129  2009/03/24 21:03:56  fplanque
  * Surely enough, everytime someone touches the resolver, they break it!
  * Stop playing with it!
