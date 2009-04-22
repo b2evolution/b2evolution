@@ -1093,7 +1093,7 @@ class DB
 		// print main results
 		if( $this->last_result )
 		{
-			foreach( $this->get_results(NULL,ARRAY_N) as $one_row )
+			while( $one_row = $this->get_row(NULL,ARRAY_N) )
 			{
 				$i++;
 				if( $i >= $max_lines )
@@ -1570,6 +1570,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.23  2009/04/22 19:27:36  blueyed
+ * debug_get_rows_table: use get_row instead of get_results, since it stops after 'max rows'.
+ *
  * Revision 1.22  2009/03/08 23:57:40  fplanque
  * 2009
  *
