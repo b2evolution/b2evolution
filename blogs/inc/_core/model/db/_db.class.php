@@ -1087,19 +1087,13 @@ class DB
 		}
 		$r .= '</tr>';
 
-		$i=0;
-
 		// ======================================================
 		// print main results
 		if( $this->last_result )
 		{
-			while( $one_row = $this->get_row(NULL,ARRAY_N) )
+			for( $i = 0, $n = min(count($this->last_result), $max_lines); $i < $n; $i++ )
 			{
-				$i++;
-				if( $i >= $max_lines )
-				{
-					break;
-				}
+				$one_row = $this->get_row(NULL, ARRAY_N, $i);
 				$r .= '<tr>';
 				foreach( $one_row as $item )
 				{
@@ -1570,6 +1564,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.24  2009/04/22 19:43:02  blueyed
+ * debug_get_rows_table: use get_row (and properly for HEAD, where it does not default to NULL/next row (fixing r1.23)
+ *
  * Revision 1.23  2009/04/22 19:27:36  blueyed
  * debug_get_rows_table: use get_row instead of get_results, since it stops after 'max rows'.
  *
