@@ -83,6 +83,7 @@ class CollectionSettings extends AbstractSettings
 			'tag_posts_per_page' => NULL,
 			'tag_noindex' => '1',				      	// META NOINDEX on Tag pages
 			'tag_prefix' => '',
+			'tag_rel_attrib' => 1,              // rel="tag" attribute for tag links (http://microformats.org/wiki/rel-tag)
 
 			'single_links'   => 'ymd',
 			'permalinks'     => 'single',				// single, archive, subchap
@@ -141,6 +142,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.29  2009/04/22 22:46:33  blueyed
+ * Add support for rel=tag in tag URLs. This adds a new tag_links mode 'prefix-only', which requires a prefix (default: tag) and uses no suffix (dash/colon/semicolon). Also adds more JS juice and cleans up/normalized previously existing JS. Not much tested, but implemented as discussed on ML.
+ *
  * Revision 1.28  2009/03/20 04:04:07  fplanque
  * minor
  *

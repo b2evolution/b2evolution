@@ -314,13 +314,23 @@ class Blog extends DataObject
 
 		if( param( 'tag_prefix', 'string', NULL) !== NULL )
 		{
-			$category_prefix = get_param( 'tag_prefix' );
-			if( ! preg_match( '|^([A-Za-z0-9\-_]+(/[A-Za-z0-9\-_]+)*)?$|', $category_prefix) )
+			$tag_prefix = get_param( 'tag_prefix' );
+			if( ! preg_match( '|^([A-Za-z0-9\-_]+(/[A-Za-z0-9\-_]+)*)?$|', $tag_prefix) )
 			{
-				param_error( 'tag_prefix', T_('Invalid category prefix.') );
+				param_error( 'tag_prefix', T_('Invalid tag prefix.') );
 			}
-			$this->set_setting( 'tag_prefix', $category_prefix);
+			$this->set_setting( 'tag_prefix', $tag_prefix);
 		}
+
+		// Default to "tag", if "prefix-only" is used, but not tag_prefix provided.
+		if( get_param('tag_links') == 'prefix-only' && ! strlen(param( 'tag_prefix', 'string', NULL)) )
+		{
+			$this->set_setting( 'tag_prefix', 'tag' );
+		}
+
+		// Use rel="tag" attribute? (checkbox)
+		$this->set_setting( 'tag_rel_attib', param('tag_rel_attib', 'integer', 0) );
+
 
 		if( param( 'chapter_posts_per_page', 'integer', NULL ) !== NULL )
 		{ // Chapter link type:
@@ -1143,9 +1153,11 @@ class Blog extends DataObject
 						$trailer = ';';
 						break;
 					case 'colon':
-					default:
 						$trailer = ':';
 						break;
+					case 'prefix-only':
+						$trailer = '';
+					default:
 				}
 				$tag_prefix = $this->get_setting('tag_prefix');
 				if( !empty( $tag_prefix ) )
@@ -2018,6 +2030,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.58  2009/04/22 22:46:33  blueyed
+ * Add support for rel=tag in tag URLs. This adds a new tag_links mode 'prefix-only', which requires a prefix (default: tag) and uses no suffix (dash/colon/semicolon). Also adds more JS juice and cleans up/normalized previously existing JS. Not much tested, but implemented as discussed on ML.
+ *
  * Revision 1.57  2009/03/26 22:23:36  blueyed
  * Fix doc
  *

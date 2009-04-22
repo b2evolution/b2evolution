@@ -69,19 +69,6 @@ global $Debuglog;
 			fldset.style.display = '';
 		}
 	}
-
-	function show_hide_tag_prefix(ob)
-	{
-		var fldset = document.getElementById( 'tag_prefix_container' );
-		if( ob.value == 'param' )
-		{
-			fldset.style.display = 'none';
-		}
-		else
-		{
-			fldset.style.display = '';
-		}
-	}
 </script>
 
 
@@ -230,6 +217,7 @@ $Form->begin_fieldset( T_('Category URLs') );
 														T_('An optional prefix to be added to the URLs of the categories'),
 														array('maxlength' => 120) );
 		echo '</div>';
+
 		if( $edited_Blog->get_setting( 'chapter_links' ) == 'param_num' )
 		{ ?>
 		<script type="text/javascript">
@@ -244,34 +232,62 @@ $Form->begin_fieldset( T_('Category URLs') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Tag page URLs') );
+$Form->begin_fieldset( T_('Tag page URLs'), array('id'=>'tag_links_fieldset') );
 
 	$Form->radio( 'tag_links', $edited_Blog->get_setting('tag_links'),
 		array(
-				array( 'param', T_('Use param'), T_('E-g: ')
-								.url_add_param( $blogurl, '<strong>tag=mytag</strong>' ),'', 'onclick="show_hide_tag_prefix(this);"'),
-				array( 'dash', T_('Use extra-path').': '.'trailing dash', T_('E-g: ')
-								.url_add_tail( $blogurl, '<strong>/mytag-</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
-				array( 'colon', T_('Use extra-path').': '.'trailing colon', T_('E-g: ')
-								.url_add_tail( $blogurl, '<strong>/mytag:</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
-				array( 'semicolon', T_('Use extra-path').': '.'Trailing semi-colon (NOT recommended)', T_('E-g: ')
-								.url_add_tail( $blogurl, '<strong>/mytag;</strong>' ), '', 'onclick="show_hide_tag_prefix(this);"' ),
-			), T_('Tag page URLs'), true );
+			array( 'param', T_('Use param'), T_('E-g: ')
+				.url_add_param( $blogurl, '<strong>tag=mytag</strong>' ) ),
+			array( 'prefix-only', T_('Use extra-path').': '.'Use URL path prefix only (recommended)', T_('E-g: ')
+				.url_add_tail( $blogurl, '<strong>/<span class="tag_links_tag_prefix"></span>mytag</strong>' ) ),
+			array( 'dash', T_('Use extra-path').': '.'trailing dash', T_('E-g: ')
+				.url_add_tail( $blogurl, '<strong>/<span class="tag_links_tag_prefix"></span>mytag-</strong>' ) ),
+			array( 'colon', T_('Use extra-path').': '.'trailing colon', T_('E-g: ')
+				.url_add_tail( $blogurl, '<strong>/<span class="tag_links_tag_prefix"></span>mytag:</strong>' ) ),
+			array( 'semicolon', T_('Use extra-path').': '.'trailing semi-colon (NOT recommended)', T_('E-g: ')
+				.url_add_tail( $blogurl, '<strong>/<span class="tag_links_tag_prefix"></span>mytag;</strong>' ) ),
+		), T_('Tag page URLs'), true );
 
 
-		echo '<div id="tag_prefix_container">';
-			$Form->text_input( 'tag_prefix', $edited_Blog->get_setting( 'tag_prefix' ), 30, T_('Prefix'),
-														T_('An optional prefix to be added to the URLs of the tag pages'),
-														array('maxlength' => 120) );
-		echo '</div>';
-		if( $edited_Blog->get_setting( 'tag_links' ) == 'param' )
-		{
-			echo '<script type="text/javascript">jQuery("#tag_prefix_container").hide();</script>';
-		}
+	$Form->text_input( 'tag_prefix', $edited_Blog->get_setting( 'tag_prefix' ), 30, T_('Prefix'),
+		T_('An optional prefix to be added to the URLs of the tag pages'),
+		array('maxlength' => 120) );
+
+	$Form->checkbox( 'tag_rel_attrib', $edited_Blog->get_setting( 'tag_rel_attrib' ), T_('Rel attribute'),
+		sprintf( T_('Add <a %s>rel="tag" attribute</a> to tag links.'), 'href="http://microformats.org/wiki/rel-tag"' ) );
 
 $Form->end_fieldset();
 
+// Javascript juice for the tag fields.
+?>
+<script type="text/javascript">
+jQuery("#tag_links_fieldset input[type=radio]").click( function()
+{
+	// Disable tag_prefix, if "param" is used.
+	jQuery('#tag_prefix').attr("disabled", this.value == 'param' ? "disabled" : "");
+	// Disable tag_rel_attrib, if "prefix-only" is not used.
+	jQuery('#tag_rel_attrib').attr("disabled", this.value == 'prefix-only' ? "" : "disabled");
 
+	// NOTE: dh> ".closest('fieldset').andSelf()" is required for the add-field_required-class-to-fieldset-hack. Remove as appropriate.
+	if( this.value == 'prefix-only' )
+		jQuery('#tag_prefix').closest('fieldset').andSelf().addClass('field_required');
+	else
+		jQuery('#tag_prefix').closest('fieldset').andSelf().removeClass('field_required');
+} ).filter(":checked").click();
+
+// Set text of span.tag_links_tag_prefix according to this field, defaulting to "tag" for "prefix-only".
+jQuery("#tag_prefix").keyup( function() {
+	jQuery("span.tag_links_tag_prefix").each(
+		function() {
+			var newval = ((jQuery("#tag_prefix").val().length || jQuery(this).closest("div").find("input[type=radio]").attr("value") != "prefix-only") ? jQuery("#tag_prefix").val() : "tag");
+			if( newval.length ) newval += "/";
+			jQuery(this).text( newval );
+		}
+	) } ).keyup();
+</script>
+
+
+<?php
 $Form->begin_fieldset( T_('Single post URLs') );
 
 	$Form->radio( 'single_links', $edited_Blog->get_setting('single_links'),
@@ -304,6 +320,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.22  2009/04/22 22:46:34  blueyed
+ * Add support for rel=tag in tag URLs. This adds a new tag_links mode 'prefix-only', which requires a prefix (default: tag) and uses no suffix (dash/colon/semicolon). Also adds more JS juice and cleans up/normalized previously existing JS. Not much tested, but implemented as discussed on ML.
+ *
  * Revision 1.21  2009/04/22 20:27:17  blueyed
  * Fix hiding of 'Prefix' box for 'Tag page URLs' select. Use jQuery for easy hide-on-init.
  *

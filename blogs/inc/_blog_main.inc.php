@@ -159,120 +159,136 @@ if( $resolve_extra_path )
 		// Do we still have extra path info to decode?
 		if( count($path_elements) )
 		{
-			// Does the pathinfo end with a / or a ; ?
-			$last_char = substr( $path_string, -1 );
-			$last_part = $path_elements[count( $path_elements )-1];
-			$last_len  = strlen( $last_part );
-			if( ( $last_char == '-' && ( ! $tags_dash_fix || $last_len != 40 ) ) || $last_char == ':'|| $last_char == ';' )
-			{	// - : or ; -> We'll consider this to be a tag page
-				$tag = substr( $last_part, 0, -1 );
-				$tag = urldecode($tag);
-				$tag = strip_tags($tag);	// security
-				// pre_dump( $tag );
-
+			// Is this a tag ("prefix-only" mode)?
+			if( $Blog->get_setting('tag_links') == 'prefix-only'
+				&& $path_elements[0] == $Blog->get_setting('tag_prefix')
+				&& isset($path_elements[1]) )
+			{
+				$tag = strip_tags(urldecode($path_elements[1]));
 				// # of posts per page:
- 				if( ! $posts = $Blog->get_setting( 'tag_posts_per_page' ) )
+				if( ! $posts = $Blog->get_setting( 'tag_posts_per_page' ) )
 				{ // use blog default
 					$posts = $Blog->get_setting( 'posts_per_page' );
 				}
 			}
-			elseif( ( $tags_dash_fix && $last_char == '-' && $last_len == 40 ) || $last_char != '/' )
-			{	// NO ENDING SLASH or ends with a dash, is 40 chars long and $tags_dash_fix is true
-				// -> We'll consider this to be a ref to a post.
-				$Debuglog->add( 'We consider this o be a ref to a post - last char: '.$last_char, 'params' );
+			else
+			{
+				// Does the pathinfo end with a / or a ; ?
+				$last_char = substr( $path_string, -1 );
+				$last_part = $path_elements[count( $path_elements )-1];
+				$last_len  = strlen( $last_part );
+				if( ( $last_char == '-' && ( ! $tags_dash_fix || $last_len != 40 ) ) || $last_char == ':'|| $last_char == ';' )
+				{	// - : or ; -> We'll consider this to be a tag page
+					// Old-style tag pages, redirect:
+					$tag = substr( $last_part, 0, -1 );
+					$tag = urldecode($tag);
+					$tag = strip_tags($tag);	// security
+					// pre_dump( $tag );
 
-				// Set a lot of defaults as if we had received a complex URL:
-				$m = '';
-				$more = 1; // Display the extended entries' text
-				$c = 1;    // Display comments
-				$tb = 1;   // Display trackbacks
-				$pb = 1;   // Display pingbacks
+					// # of posts per page:
+					if( ! $posts = $Blog->get_setting( 'tag_posts_per_page' ) )
+					{ // use blog default
+						$posts = $Blog->get_setting( 'posts_per_page' );
+					}
+				}
+				elseif( ( $tags_dash_fix && $last_char == '-' && $last_len == 40 ) || $last_char != '/' )
+				{	// NO ENDING SLASH or ends with a dash, is 40 chars long and $tags_dash_fix is true
+					// -> We'll consider this to be a ref to a post.
+					$Debuglog->add( 'We consider this o be a ref to a post - last char: '.$last_char, 'params' );
 
-				if( preg_match( '#^p([0-9]+)$#', $last_part, $req_post ) )
-				{ // The last param is of the form p000
-					// echo 'post number';
-					$p = $req_post[1];		// Post to display
+					// Set a lot of defaults as if we had received a complex URL:
+					$m = '';
+					$more = 1; // Display the extended entries' text
+					$c = 1;    // Display comments
+					$tb = 1;   // Display trackbacks
+					$pb = 1;   // Display pingbacks
+
+					if( preg_match( '#^p([0-9]+)$#', $last_part, $req_post ) )
+					{ // The last param is of the form p000
+						// echo 'post number';
+						$p = $req_post[1];		// Post to display
+					}
+					else
+					{ // Last param is a string, we'll consider this to be a post urltitle
+						$title = $last_part;
+						// echo 'post title : ', $title;
+					}
 				}
 				else
-				{ // Last param is a string, we'll consider this to be a post urltitle
-					$title = $last_part;
-					// echo 'post title : ', $title;
-				}
-			}
-			else
-			{	// ENDING SLASH -> we are looking for a daterange OR a chapter:
-				$Debuglog->add( 'Last part: '.$last_part , 'params' );
-				// echo $last_part;
-				if( preg_match( '|^w?[0-9]+$|', $last_part ) )
-				{ // Last part is a number or a "week" number:
-					$i=0;
-					$Debuglog->add( 'Last part is a number or a "week" number: '.$path_elements[$i] , 'params' );
-					// echo $path_elements[$i];
-					if( isset( $path_elements[$i] ) )
-					{
-						if( is_numeric( $path_elements[$i] ) )
-						{ // We'll consider this to be the year
-							$m = $path_elements[$i++];
-							$Debuglog->add( 'Setting year from extra path info. $m=' . $m , 'params' );
+				{	// ENDING SLASH -> we are looking for a daterange OR a chapter:
+					$Debuglog->add( 'Last part: '.$last_part , 'params' );
+					// echo $last_part;
+					if( preg_match( '|^w?[0-9]+$|', $last_part ) )
+					{ // Last part is a number or a "week" number:
+						$i=0;
+						$Debuglog->add( 'Last part is a number or a "week" number: '.$path_elements[$i] , 'params' );
+						// echo $path_elements[$i];
+						if( isset( $path_elements[$i] ) )
+						{
+							if( is_numeric( $path_elements[$i] ) )
+							{ // We'll consider this to be the year
+								$m = $path_elements[$i++];
+								$Debuglog->add( 'Setting year from extra path info. $m=' . $m , 'params' );
 
-							// Also use the prefered posts per page for archives (may be NULL, in which case the blog default will be used later on)
-							if( ! $posts = $Blog->get_setting( 'archive_posts_per_page' ) )
+								// Also use the prefered posts per page for archives (may be NULL, in which case the blog default will be used later on)
+								if( ! $posts = $Blog->get_setting( 'archive_posts_per_page' ) )
+								{ // use blog default
+									$posts = $Blog->get_setting( 'posts_per_page' );
+								}
+
+								if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
+								{ // We'll consider this to be the month
+									$m .= $path_elements[$i++];
+									$Debuglog->add( 'Setting month from extra path info. $m=' . $m , 'params' );
+
+									if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
+									{ // We'll consider this to be the day
+										$m .= $path_elements[$i++];
+										$Debuglog->add( 'Setting day from extra path info. $m=' . $m , 'params' );
+									}
+								}
+								elseif( isset( $path_elements[$i] ) && substr( $path_elements[$i], 0, 1 ) == 'w' )
+								{ // We consider this a week number
+									$w = substr( $path_elements[$i], 1, 2 );
+								}
+							}
+							else
+							{	// We did not get a number/year...
+								$disp = '404';
+								$disp_detail = '404-malformed_url-missing_year';
+							}
+						}
+					}
+					elseif( preg_match( '|^[A-Za-z0-9\-_]+$|', $last_part ) )	// UNDERSCORES for catching OLD URLS!!!
+					{	// We are pointing to a chapter/category:
+						$ChapterCache = & get_Cache( 'ChapterCache' );
+						/**
+						 * @var Chapter
+						 */
+						$Chapter = & $ChapterCache->get_by_urlname( $last_part, false );
+						if( empty( $Chapter ) )
+						{	// We could not match a chapter...
+							// We are going to consider this to be a post title with a misplaced trailing slash.
+							// That happens when upgrading from WP for example.
+							$title = $last_part; // Will be sought later
+							$already_looked_into_chapters = true;
+						}
+						else
+						{	// We could match a chapter from the extra path:
+							$cat = $Chapter->ID;
+							// Also use the prefered posts per page for a cat
+							if( ! $posts = $Blog->get_setting( 'chapter_posts_per_page' ) )
 							{ // use blog default
 								$posts = $Blog->get_setting( 'posts_per_page' );
 							}
-
-							if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
-							{ // We'll consider this to be the month
-								$m .= $path_elements[$i++];
-								$Debuglog->add( 'Setting month from extra path info. $m=' . $m , 'params' );
-
-								if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
-								{ // We'll consider this to be the day
-									$m .= $path_elements[$i++];
-									$Debuglog->add( 'Setting day from extra path info. $m=' . $m , 'params' );
-								}
-							}
-							elseif( isset( $path_elements[$i] ) && substr( $path_elements[$i], 0, 1 ) == 'w' )
-							{ // We consider this a week number
-								$w = substr( $path_elements[$i], 1, 2 );
-							}
 						}
-						else
-						{	// We did not get a number/year...
-							$disp = '404';
-							$disp_detail = '404-malformed_url-missing_year';
-						}
-					}
-				}
-				elseif( preg_match( '|^[A-Za-z0-9\-_]+$|', $last_part ) )	// UNDERSCORES for catching OLD URLS!!!
-				{	// We are pointing to a chapter/category:
-					$ChapterCache = & get_Cache( 'ChapterCache' );
-					/**
-					 * @var Chapter
-					 */
-					$Chapter = & $ChapterCache->get_by_urlname( $last_part, false );
-					if( empty( $Chapter ) )
-					{	// We could not match a chapter...
-						// We are going to consider this to be a post title with a misplaced trailing slash.
-						// That happens when upgrading from WP for example.
-						$title = $last_part; // Will be sought later
-						$already_looked_into_chapters = true;
 					}
 					else
-					{	// We could match a chapter from the extra path:
-						$cat = $Chapter->ID;
-						// Also use the prefered posts per page for a cat
-						if( ! $posts = $Blog->get_setting( 'chapter_posts_per_page' ) )
-						{ // use blog default
-							$posts = $Blog->get_setting( 'posts_per_page' );
-						}
-			    }
-				}
-				else
-				{	// We did not get anything we can decode...
-					// echo 'neither number nor cat';
-					$disp = '404';
-					$disp_detail = '404-malformed_url-bad_char';
+					{	// We did not get anything we can decode...
+						// echo 'neither number nor cat';
+						$disp = '404';
+						$disp_detail = '404-malformed_url-bad_char';
+					}
 				}
 			}
 		}
@@ -591,6 +607,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.131  2009/04/22 22:46:33  blueyed
+ * Add support for rel=tag in tag URLs. This adds a new tag_links mode 'prefix-only', which requires a prefix (default: tag) and uses no suffix (dash/colon/semicolon). Also adds more JS juice and cleans up/normalized previously existing JS. Not much tested, but implemented as discussed on ML.
+ *
  * Revision 1.130  2009/04/22 20:11:42  blueyed
  * Use preg_split instead of split and manually removing empty slots/parts. Less code and faster in benchmark.
  *

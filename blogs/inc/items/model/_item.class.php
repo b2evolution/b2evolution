@@ -2590,7 +2590,12 @@ class Item extends ItemLight
 				}
 				if( $links )
 				{	// We want links
-					echo '<a href="'.$this->Blog->gen_tag_url( $tag ).'">';  // red add  rel="tag"  when compatible with micro format spec
+					echo '<a ';
+					if( $this->Blog->get_setting('tag_rel_attrib') && $this->Blog->get_setting('tag_links') == 'prefix-only' )
+					{
+						echo 'rel="tag" ';
+					}
+					echo 'href="'.$this->Blog->gen_tag_url( $tag ).'">';
 				}
 				echo htmlspecialchars( $tag );
 				if( $links )
@@ -3717,6 +3722,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.91  2009/04/22 22:46:34  blueyed
+ * Add support for rel=tag in tag URLs. This adds a new tag_links mode 'prefix-only', which requires a prefix (default: tag) and uses no suffix (dash/colon/semicolon). Also adds more JS juice and cleans up/normalized previously existing JS. Not much tested, but implemented as discussed on ML.
+ *
  * Revision 1.90  2009/04/21 22:31:35  fplanque
  * rollback of special character killer
  *
