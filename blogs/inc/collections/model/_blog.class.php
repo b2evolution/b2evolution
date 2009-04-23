@@ -1181,6 +1181,34 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get a link (A tag) to the tag page of a given tag.
+	 *
+	 * @param string Tag
+	 * @param string Link text (defaults to tag name)
+	 * @param array Additional attributes for the A tag (href gets overridden).
+	 * @return string The A tag
+	 */
+	function get_tag_link( $tag, $text = NULL, $attribs = array() )
+	{
+		if( $this->get_setting('tag_rel_attrib') && $this->get_setting('tag_links') == 'prefix-only' )
+		{	// add rel=tag attrib
+			if( ! isset($attribs['rel']) )
+				$attribs['rel'] = 'tag';
+			else
+				$attribs['rel'] .= ' tag';
+		}
+		$attribs['href'] = $this->gen_tag_url( $tag );
+
+		if( is_null($text) )
+		{
+			$text = $tag;
+		}
+
+		return '<a '.get_field_attribs_as_string($attribs).'>'.$text.'</a>';
+	}
+
+
+	/**
 	 * Get allowed post status for current user in this blog
 	 *
 	 * @todo make default a Blog param
@@ -2031,6 +2059,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.60  2009/04/23 19:51:40  blueyed
+ * Add Blog::get_tag_link, use it where appropriate.
+ *
  * Revision 1.59  2009/04/22 23:32:39  blueyed
  * Fix switch in gen_tag_url
  *

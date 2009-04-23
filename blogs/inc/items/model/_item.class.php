@@ -2588,19 +2588,14 @@ class Item extends ItemLight
 				{
 					echo $params['separator'];
 				}
+
 				if( $links )
 				{	// We want links
-					echo '<a ';
-					if( $this->Blog->get_setting('tag_rel_attrib') && $this->Blog->get_setting('tag_links') == 'prefix-only' )
-					{
-						echo 'rel="tag" ';
-					}
-					echo 'href="'.$this->Blog->gen_tag_url( $tag ).'">';
+					echo $this->Blog->get_tag_link( $tag );
 				}
-				echo htmlspecialchars( $tag );
-				if( $links )
+				else
 				{
-					echo '</a>';
+					echo $tag;
 				}
 			}
 
@@ -3722,6 +3717,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.92  2009/04/23 19:51:40  blueyed
+ * Add Blog::get_tag_link, use it where appropriate.
+ *
  * Revision 1.91  2009/04/22 22:46:34  blueyed
  * Add support for rel=tag in tag URLs. This adds a new tag_links mode 'prefix-only', which requires a prefix (default: tag) and uses no suffix (dash/colon/semicolon). Also adds more JS juice and cleans up/normalized previously existing JS. Not much tested, but implemented as discussed on ML.
  *

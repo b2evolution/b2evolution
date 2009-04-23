@@ -201,8 +201,10 @@ class coll_tag_cloud_Widget extends ComponentWidget
 				? '&laquo;'.format_to_output($row->tag_name, 'htmlbody').'&raquo;'
 				: format_to_output($row->tag_name, 'htmlbody');
 			$size = floor( $row->tag_count * $size_span / $count_span + $min_size );
-			echo '<a href="'.$Blog->gen_tag_url( $row->tag_name ).'" style="font-size: '.$size.'pt;" title="'
-						.sprintf( T_('%d posts'), $row->tag_count ).'">'.$tag_name_disp.'</a>';
+
+			echo $Blog->get_tag_link( $row->tag_name, $tag_name_disp, array(
+				'style' => 'font-size: '.$size.'pt;',
+				'title' => sprintf( T_('%d posts'), $row->tag_count ) ) );
 			$count++;
 		}
 		echo $this->disp_params['tag_cloud_end'];
@@ -222,6 +224,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.19  2009/04/23 19:51:40  blueyed
+ * Add Blog::get_tag_link, use it where appropriate.
+ *
  * Revision 1.18  2009/03/13 02:32:07  fplanque
  * Cleaned up widgets.
  * Removed stupid widget_name param.
