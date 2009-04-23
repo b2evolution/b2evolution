@@ -159,6 +159,7 @@ if( $resolve_extra_path )
 		// Do we still have extra path info to decode?
 		if( count($path_elements) )
 		{
+			// TODO: dh> add plugin hook here, which would allow to handle path elements (name spaces in clean URLs), and to override internal functionality (e.g. handle tags in a different way).
 			// Is this a tag ("prefix-only" mode)?
 			if( $Blog->get_setting('tag_links') == 'prefix-only'
 				&& $path_elements[0] == $Blog->get_setting('tag_prefix')
@@ -607,6 +608,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.132  2009/04/23 19:50:35  blueyed
+ * TODO
+ *
  * Revision 1.131  2009/04/22 22:46:33  blueyed
  * Add support for rel=tag in tag URLs. This adds a new tag_links mode 'prefix-only', which requires a prefix (default: tag) and uses no suffix (dash/colon/semicolon). Also adds more JS juice and cleans up/normalized previously existing JS. Not much tested, but implemented as discussed on ML.
  *
