@@ -84,10 +84,10 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('External Feeds').get_manual_link('external_feeds') );
-	$Form->text_input( 'atom_redirect', $edited_Blog->get_setting( 'atom_redirect' ), 100, T_('Atom Feed URL'),
-											T_('Example: Your Feedburner Atom URL'));
-	$Form->text_input( 'rss2_redirect', $edited_Blog->get_setting( 'rss2_redirect' ), 100, T_('RSS2 Feed URL'),
-											T_('Example: Your Feedburner RSS2 URL'));
+	$Form->text_input( 'atom_redirect', $edited_Blog->get_setting( 'atom_redirect' ), 50, T_('Atom Feed URL'),
+					   T_('Example: Your Feedburner Atom URL'), array( 'maxlength' => 255 ) );
+	$Form->text_input( 'rss2_redirect', $edited_Blog->get_setting( 'rss2_redirect' ), 50, T_('RSS2 Feed URL'),
+					   T_('Example: Your Feedburner RSS2 URL'), array( 'maxlength' => 255 ) );
 $Form->end_fieldset();
 
 
@@ -181,6 +181,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.16  2009/04/24 14:03:25  waltercruz
+ * Fixing the atom and rss redirect lengths
+ *
  * Revision 1.15  2009/04/20 14:09:18  waltercruz
  * Increasing the length of feed redirector URL
  *
