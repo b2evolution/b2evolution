@@ -656,6 +656,7 @@ function add_css_headline($headline)
  * Registers all the javascripts needed by the toolbar menu
  *
  * @todo fp> include basic.css ? -- rename to add_headlines_for* -- potential problem with inclusion order of CSS files!!
+ *       dh> would be nice to have the batch of CSS in a separate file. basic.css would get included first always, then e.g. this toolbar.css.
  */
 function add_js_for_toolbar()
 {
@@ -988,6 +989,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.56  2009/04/26 23:27:58  blueyed
+ * doc
+ *
  * Revision 1.55  2009/04/26 23:26:35  blueyed
  * add_js_for_toolbar: return if not logged in.
  *
