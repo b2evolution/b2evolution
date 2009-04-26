@@ -659,6 +659,11 @@ function add_css_headline($headline)
  */
 function add_js_for_toolbar()
 {
+	if( ! is_logged_in() )
+	{ // the toolbar (blogs/skins/_toolbar.inc.php) gets only used when logged in.
+		return;
+	}
+
 	require_js( '#jquery#' );
 	require_js( 'functions.js' );	// for rollovers AddEvent - TODO: change to jQuery
 	require_js( 'rollovers.js' );	// TODO: change to jQuery
@@ -983,6 +988,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.55  2009/04/26 23:26:35  blueyed
+ * add_js_for_toolbar: return if not logged in.
+ *
  * Revision 1.54  2009/03/24 23:36:52  fplanque
  * minor
  *
