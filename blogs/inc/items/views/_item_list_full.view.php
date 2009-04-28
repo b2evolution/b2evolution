@@ -176,7 +176,7 @@ while( $Item = & $ItemList->get_item() )
 				echo '<br />';
 				$Item->type( T_('Type').': <span class="bType">', '</span> &nbsp; ' );
 				$Item->priority( T_('Priority').': <span class="bPriority">', '</span> &nbsp; ' );
-				$Item->assigned_to( T_('Assigned to:').' <span class="bAssignee">', '</span> &nbsp; ' );
+				$Item->assigned_to( T_('Assigned to').': <span class="bAssignee">', '</span> &nbsp; ' );
 				$Item->extra_status( T_('Task Status').': <span class="bExtStatus">', '</span>' );
 				echo '&nbsp;';
 
@@ -392,6 +392,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.19  2009/04/28 19:10:06  blueyed
+ * trans fix, simplification. might want to use %s here?
+ *
  * Revision 1.18  2009/03/08 23:57:44  fplanque
  * 2009
  *
