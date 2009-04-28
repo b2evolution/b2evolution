@@ -740,7 +740,7 @@ class Form extends Widget
 				default:
 					return $m[0];
 			}' ), $date_format );
-		#pre_dump( $js_date_format );
+
 
 		if( param_has_error( $field_name ) )
 		{ // There is an error message for this field:
@@ -761,6 +761,10 @@ class Form extends Widget
 
 			// Get DATE part of datetime and format it to locale format:
 			$field_params['value'] = mysql2date( $date_format, $field_value );
+			if( ! $field_params['value'] )
+			{ // Conversion failed (e.g. for dates before ~1902 / PHP < 5.1 (Windows) / 32bit / without DateTime support), use the original value (better than 1970-01-01 anyway!).
+				$field_params['value'] = $field_value;
+			}
 		}
 
 
@@ -2848,6 +2852,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.42  2009/04/28 19:54:41  blueyed
+ * Form::date_input: use the input if date conversion failed
+ *
  * Revision 1.41  2009/03/13 01:26:22  blueyed
  * Form: date_input: re-add js_date_format calculation for input field length. Removed by afwas in r6525 (CVS 1.31), and ACKed to re-add it.
  *
