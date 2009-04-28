@@ -175,9 +175,13 @@ while( $Item = & $ItemList->get_item() )
 
 				echo '<br />';
 				$Item->type( T_('Type').': <span class="bType">', '</span> &nbsp; ' );
-				$Item->priority( T_('Priority').': <span class="bPriority">', '</span> &nbsp; ' );
-				$Item->assigned_to( T_('Assigned to').': <span class="bAssignee">', '</span> &nbsp; ' );
-				$Item->extra_status( T_('Task Status').': <span class="bExtStatus">', '</span>' );
+
+				if( $Blog->get_setting( 'use_workflow' ) )
+				{ // Only display workflow properties, if activated for this blog.
+					$Item->priority( T_('Priority').': <span class="bPriority">', '</span> &nbsp; ' );
+					$Item->assigned_to( T_('Assigned to').': <span class="bAssignee">', '</span> &nbsp; ' );
+					$Item->extra_status( T_('Task Status').': <span class="bExtStatus">', '</span>' );
+				}
 				echo '&nbsp;';
 
 				echo '<div class="bSmallHeadRight"><span class="bViews">';
@@ -392,6 +396,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.20  2009/04/28 19:19:33  blueyed
+ * Full item list: do not display workflow properties, if not activated for this blog.
+ *
  * Revision 1.19  2009/04/28 19:10:06  blueyed
  * trans fix, simplification. might want to use %s here?
  *
