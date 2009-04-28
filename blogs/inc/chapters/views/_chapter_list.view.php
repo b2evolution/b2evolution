@@ -173,7 +173,7 @@ $callbacks = array(
 
 $Table = & new Table();
 
-$Table->title = T_('Categories for blog:').' '.$Blog->get_maxlen_name( 50 );
+$Table->title = sprintf( T_('Categories for blog: %s'), $Blog->get_maxlen_name( 50 ) );
 
 $Table->global_icon( T_('Create a new category...'), 'new', regenerate_url( 'action,'.$GenericCategoryCache->dbIDname, 'action=new' ), T_('New category').' &raquo;', 3, 4  );
 
@@ -241,6 +241,9 @@ echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categori
 
 /*
  * $Log$
+ * Revision 1.16  2009/04/28 19:52:39  blueyed
+ * trans fix
+ *
  * Revision 1.15  2009/04/13 11:33:33  tblue246
  * Fix translation conflict
  *
