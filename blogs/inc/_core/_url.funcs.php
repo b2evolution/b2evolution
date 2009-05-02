@@ -254,152 +254,153 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 {
 	$info = array(
 		'error' => '',
-		'status' => NULL );
+		'status' => NULL,
+		'used_method' => NULL,
+	);
 
-	// CURL:
-	if( extension_loaded('curl') )
-	{
-		// echo 'curl'; flush();
-
+	if( extension_loaded( 'curl' ) )
+	{	// CURL:
 		$info['used_method'] = 'curl';
 
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-		if( ! empty($params['method']) && $params['method'] == 'HEAD'  )
-		{
-			curl_setopt($ch, CURLOPT_NOBODY, true);
-		}
-		$r = curl_exec($ch);
+		curl_setopt( $ch, CURLOPT_URL, $url );
+		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+		curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, $timeout );
+		curl_setopt( $ch, CURLOPT_TIMEOUT, $timeout );
+		$r = curl_exec( $ch );
 
-		$info['status'] = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		$info['error'] = curl_error($ch);
-		if( curl_errno($ch) )
+		$info['status'] = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+		$info['error'] = curl_error( $ch );
+		if( ( $errno = curl_errno( $ch ) ) )
 		{
-			$info['error'] .= '(#'.curl_errno($ch).')';
+			$info['error'] .= ' (#'.$errno.')';
 		}
-		curl_close($ch);
+		curl_close( $ch );
 
 		return $r;
 	}
-
-
-	// FSOCKOPEN:
-	if( function_exists('fsockopen') ) // may have been disabled
-	{
-		// echo 'fsockopen'; flush();
-
+	else if( function_exists( 'fsockopen' ) ) // may have been disabled
+	{	// FSOCKOPEN:
 		$info['used_method'] = 'fsockopen';
-		$url_parsed = parse_url($url);
-		if( empty($url_parsed['scheme']) )
+		
+		if ( ( $url_parsed = @parse_url( $url ) ) === false )
 		{
-			$url_parsed = parse_url('http://'.$url);
+			$info['error'] = 'Could not parse URL';
+			return false;
 		}
 
 		$host = $url_parsed['host'];
-		$port = ( empty($url_parsed['port']) ? 80 : $url_parsed['port'] );
-		$path = empty($url_parsed['path']) ? '/' : $url_parsed['path'];
-		if( ! empty($url_parsed['query']) )
+		$port = empty( $url_parsed['port'] ) ? 80 : $url_parsed['port'];
+		$path = empty( $url_parsed['path'] ) ? '/' : $url_parsed['path'];
+		if( ! empty( $url_parsed['query'] ) )
 		{
 			$path .= '?'.$url_parsed['query'];
 		}
 
-		$out = "GET $path HTTP/1.1\r\n";
+		$out = 'GET '.$path.' HTTP/1.1'."\r\n";
 		$out .= 'Host: '.$host;
-		if( !empty($url_parsed['port']) )
+		if( ! empty( $url_parsed['port'] ) )
 		{	// we don't want to add :80 if not specified. remote end may not resolve it. (e-g b2evo multiblog does not)
 			$out .= ':'.$port;
 		}
-		$out .= "\r\nConnection: Close\r\n\r\n";
+		$out .= "\r\n".'Connection: Close'."\r\n\r\n";
 
-		// pre_dump($out);
-
-		$fp = @fsockopen($host, $port, $errno, $errstr, $timeout);
+		$fp = @fsockopen( $host, $port, $errno, $errstr, $timeout );
 		if( ! $fp )
 		{
 			$info['error'] = $errstr.' (#'.$errno.')';
 			return false;
 		}
 
-		// Set timeout for data:
-		if( function_exists('stream_set_timeout') )
-			stream_set_timeout( $fp, $timeout ); // PHP 4.3.0
-		else
-			socket_set_timeout( $fp, $timeout ); // PHP 4
-
 		// Send request:
-		fwrite($fp, $out);
+		fwrite( $fp, $out );
+
+		// Set timeout for data:
+		if( function_exists( 'stream_set_timeout' ) )
+		{
+			stream_set_timeout( $fp, $timeout ); // PHP 4.3.0
+		}
+		else
+		{
+			socket_set_timeout( $fp, $timeout ); // PHP 4
+		}
 
 		// Read response:
 		$r = '';
 		// First line:
-		$s = fgets($fp, 4096);
+		$s = fgets( $fp );
 		if( ! preg_match( '~^HTTP/\d+\.\d+ (\d+)~', $s, $match ) )
 		{
+			$info['error'] = 'Invalid response.';
+			fclose( $fp );
+			return false;
+		}
+		$info['status'] = $match[1];
+
+		while( ! feof( $fp ) )
+		{
+			$r .= fgets( $fp );
+		}
+		fclose($fp);
+
+		if ( ( $pos = strpos( $r, "\r\n\r\n" ) ) === false )
+		{
+			$info['error'] = 'Could not locate end of headers';
+			return false;
+		}
+
+		return substr( $r, $pos + 4 );
+	}
+	else if( ini_get( 'allow_url_fopen' ) )
+	{	// URL FOPEN:
+		$info['used_method'] = 'fopen';
+
+		$fp = @fopen( $url, 'r' );
+		if( ! $fp )
+		{	// Check whether we got HTTP code 404:
+			if( isset( $http_response_header ) )
+			{
+				for( $i = count( $http_response_header ) - 1; $i >= 0; --$i )
+				{
+					if ( preg_match( '|^HTTP/\d+\.\d+ 404 |', $http_response_header[$i] ) )
+					{
+						$info['status'] = 404;
+						return '';
+					}
+				}
+			}
+
+			$info['error'] = 'fopen() failed';
+			return false;
+		}
+		
+		for( $i = count( $http_response_header ) - 1; $i >= 0; --$i )
+		{	// Get the *last* HTTP header (this is needed because we could have been redirected):
+			if ( preg_match( '|^HTTP/\d+\.\d+ (\d+)|', $http_response_header[$i], $match ) )
+			{
+				$info['status'] = $match[1];
+				break;
+			}
+		}
+		if ( $info['status'] === NULL )
+		{	// No header found:
 			$info['error'] = 'Invalid response.';
 			$r = false;
 		}
 		else
 		{
-			$info['status'] = $match[1];
-
-			$foundBody = false;
-			while( ! feof($fp) )
+			$r = '';
+			while( ! feof( $fp ) )
 			{
-				$s = fgets($fp, 4096);
-				if( $s == "\r\n" )
-				{
-					$foundBody = true;
-					continue;
-				}
-				if( $foundBody )
-				{
-					$r .= $s;
-				}
+				$r .= fgets( $fp );
 			}
 		}
-		fclose($fp);
+		
+		fclose( $fp );
 		return $r;
 	}
 
-
-	// URL FOPEN:
-	if( ini_get('allow_url_fopen') && function_exists('stream_get_meta_data') /* PHP 4.3, may also be disabled!? */ )
-	{
-		//echo 'fopen'; flush();
-
-		$info['used_method'] = 'fopen';
-
-		$fp = @fopen($url, 'r');
-		if( $fp )
-		{ // this will be false e.g. for "404", but it's not trivial to get the status error for this, so we retry with fsockopen further down
-			// headers:
-			$meta = stream_get_meta_data($fp);
-			if( ! $meta || ! preg_match( '~^HTTP/\d+\.\d+ (\d+)~', $meta['wrapper_data'][0], $match ) )
-			{
-				$info['error'] = 'Invalid response.';
-				$r = false;
-			}
-			else
-			{
-				$info['status'] = $match[1];
-				$r = '';
-				while( $buf = fread($fp, 4096) )
-				{ //read the complete file (binary safe)
-					$r .= $buf;
-				}
-			}
-			fclose($fp);
-
-			return $r;
-		}
-	}
-
-
 	// All failed:
-	$info['used_method'] = NULL;
 	$info['error'] = 'No method available to access URL!';
 	return false;
 }
@@ -712,6 +713,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.28  2009/05/02 19:14:42  tblue246
+ * Improved fetch_remote_page(). e. g. if fopen() returns false, check if this was caused by an HTTP response with the status code 404.
+ *
  * Revision 1.27  2009/03/08 23:57:40  fplanque
  * 2009
  *
