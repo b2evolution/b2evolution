@@ -283,7 +283,9 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 	{	// FSOCKOPEN:
 		$info['used_method'] = 'fsockopen';
 		
-		if ( ( $url_parsed = @parse_url( $url ) ) === false )
+		if ( ( $url_parsed = @parse_url( $url ) ) === false
+		     || ( ! isset( $url_parsed['scheme'] )
+				&& ( $url_parsed = @parse_url( 'http://'.$url ) ) === false ) )
 		{
 			$info['error'] = 'Could not parse URL';
 			return false;
@@ -713,6 +715,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.29  2009/05/02 20:36:55  tblue246
+ * fetch_remote_page(): Allow the use of URLs without a scheme (assume "http://").
+ *
  * Revision 1.28  2009/05/02 19:14:42  tblue246
  * Improved fetch_remote_page(). e. g. if fopen() returns false, check if this was caused by an HTTP response with the status code 404.
  *
