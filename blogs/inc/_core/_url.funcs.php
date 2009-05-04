@@ -237,17 +237,44 @@ function get_allowed_uri_schemes( $context = 'posting' )
 
 
 /**
+ * Get the last HTTP status code received by the HTTP/HTTPS wrapper of PHP.
+ *
+ * @internal Tblue> The $http_response_header array seems only to be only
+ *                  available in the same scope as the (e. g.) fopen() call?!
+ * 
+ * @param array The $http_response_header array (by reference).
+ * @return integer|boolean False if no HTTP status header could be found,
+ *                         the HTTP status code otherwise.
+ */
+function _http_wrapper_last_status( & $headers )
+{
+	for( $i = count( $headers ) - 1; $i >= 0; --$i )
+	{
+		if( preg_match( '|^HTTP/\d+\.\d+ (\d+)|', $headers[$i], $matches ) )
+		{
+			return $matches[1];
+		}
+	}
+
+	return false;
+}
+
+
+/**
  * Fetch remote page
  *
- * Attempt to retrieve a remote page, first with cURL, then fsockopen, then fopen.
+ * Attempt to retrieve a remote page using a HTTP GET request, first with
+ * cURL, then fsockopen, then fopen.
  *
  * @todo dh> Should we try remaining methods, if the previous one(s) failed?
+ * 
  * @param string URL
  * @param array Info (by reference)
  *        'error': holds error message, if any
  *        'status': HTTP status (e.g. 200 or 404)
  *        'used_method': Used method ("curl", "fopen", "fsockopen" or null if no method
  *                       is available)
+ * @param integer Timeout
  * @return string|false The remote page as a string; false in case of error
  */
 function fetch_remote_page( $url, & $info, $timeout = 15 )
@@ -264,7 +291,7 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 
 		$ch = curl_init();
 		curl_setopt( $ch, CURLOPT_URL, $url );
-		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
+		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, $timeout );
 		curl_setopt( $ch, CURLOPT_TIMEOUT, $timeout );
 		$r = curl_exec( $ch );
@@ -283,9 +310,7 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 	{	// FSOCKOPEN:
 		$info['used_method'] = 'fsockopen';
 		
-		if ( ( $url_parsed = @parse_url( $url ) ) === false
-		     || ( ! isset( $url_parsed['scheme'] )
-				&& ( $url_parsed = @parse_url( 'http://'.$url ) ) === false ) )
+		if ( ( $url_parsed = @parse_url( $url ) ) === false )
 		{
 			$info['error'] = 'Could not parse URL';
 			return false;
@@ -359,38 +384,25 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 
 		$fp = @fopen( $url, 'r' );
 		if( ! $fp )
-		{	// Check whether we got HTTP code 404:
-			if( isset( $http_response_header ) )
-			{
-				for( $i = count( $http_response_header ) - 1; $i >= 0; --$i )
-				{
-					if ( preg_match( '|^HTTP/\d+\.\d+ 404 |', $http_response_header[$i] ) )
-					{
-						$info['status'] = 404;
-						return '';
-					}
-				}
+		{
+			if( isset( $http_response_header )
+			    && ( $code = _http_wrapper_last_status( $http_response_header ) ) !== false )
+			{	// fopen() returned false because it got a "bad" HTTP code:
+				$info['code'] = $code;
+				return '';
 			}
 
 			$info['error'] = 'fopen() failed';
 			return false;
 		}
-		
-		for( $i = count( $http_response_header ) - 1; $i >= 0; --$i )
-		{	// Get the *last* HTTP header (this is needed because we could have been redirected):
-			if ( preg_match( '|^HTTP/\d+\.\d+ (\d+)|', $http_response_header[$i], $match ) )
-			{
-				$info['status'] = $match[1];
-				break;
-			}
-		}
-		if ( $info['status'] === NULL )
-		{	// No header found:
-			$info['error'] = 'Invalid response.';
+		else if ( ( $code = _http_wrapper_last_status( $http_response_header ) ) === false )
+		{
+			$info['error'] = 'Invalid response';
 			$r = false;
 		}
 		else
 		{
+			$info['code'] = $code;
 			$r = '';
 			while( ! feof( $fp ) )
 			{
@@ -715,6 +727,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.30  2009/05/04 11:12:51  tblue246
+ * minor
+ *
  * Revision 1.29  2009/05/02 20:36:55  tblue246
  * fetch_remote_page(): Allow the use of URLs without a scheme (assume "http://").
  *
