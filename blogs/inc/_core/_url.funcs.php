@@ -395,7 +395,9 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 			$info['error'] = 'fopen() failed';
 			return false;
 		}
-		else if ( ( $code = _http_wrapper_last_status( $http_response_header ) ) === false )
+		// Check just to be sure:
+		else if ( ! isset( $http_response_header )
+		          || ( $code = _http_wrapper_last_status( $http_response_header ) ) === false )
 		{
 			$info['error'] = 'Invalid response';
 			$r = false;
@@ -727,6 +729,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.31  2009/05/04 11:28:32  tblue246
+ * error checking
+ *
  * Revision 1.30  2009/05/04 11:12:51  tblue246
  * minor
  *
