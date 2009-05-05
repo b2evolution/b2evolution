@@ -135,6 +135,14 @@ class Form extends Widget
 
 
 	/**
+	 * A list of input field names that have been used in the form.
+	 * This gets used in {@link hiddens_by_key()} to exclude those.
+	 * @var array
+	 */
+	var $included_input_field_names = array();
+
+
+	/**
 	 * Constructor
 	 *
 	 * @param string the action destination of the form (NULL for pagenow)
@@ -742,13 +750,17 @@ class Form extends Widget
 			}' ), $date_format );
 
 
-		if( param_has_error( $field_name ) )
+		if( param_has_error( $field_name )
+			&&  ! preg_match('~^\d\d\d\d-\d\d-\d\d(?: \d\d:\d\d:\d\d)?$~', $field_value) )
 		{ // There is an error message for this field:
 
-			// We do not try to format the date, we keep the erroneous date.
+			// We do not try to format the date, we keep the erroneous date (if it is not obviously valid).
+			// We could have used param_error() ourself (e.g. "date outside of range"), and the erroneous
+			// field should have the correct format.
+
 			//echo 'error on '.$field_name.' keep erroneous entry intact ';
 
-			$field_params['value'] = trim(substr( $field_value, 0, 10 ));
+			$field_params['value'] = trim(substr( $field_value, 0, 10 )); // TODO: dh> why not use the real original here?!
 		}
 		else
 		{ // Make the date value clean for display:
@@ -982,7 +994,7 @@ class Form extends Widget
 
 
 	/**
-	 * Buil a select input field number
+	 * Build a select input field number
 	 * @access private
 	 *
 	 * @param string 	field value of selected
@@ -2244,6 +2256,9 @@ class Form extends Widget
 	/**
 	 * Builds an hidden input tag, overwriting any previous hidden values (except for "foo[]").
 	 *
+	 * This generates no output and returns nothing: the hidden fields get added to {@link $hiddens},
+	 * and get appended to the end of the form.
+	 *
 	 * @param string Field name
 	 * @param string Field value
 	 * @param array Optional params. This is e.g. useful for "id".
@@ -2327,7 +2342,7 @@ class Form extends Widget
 	 *
 	 * @uses Form::hidden()
 	 * @param array associative array ( name => value ) of hidden fields.
-	 * @param array|NULL A list of keys to ignore.
+	 * @param array|NULL A list of keys to ignore. This defaults to {@link $included_input_field_names}.
 	 */
 	function hiddens_by_key( $hiddens, $exclude = NULL )
 	{
@@ -2336,6 +2351,12 @@ class Form extends Widget
 			$save_output = $this->output;
 			$this->output = false;
 		}
+
+		if( is_null($exclude) )
+		{
+			$exclude = $this->included_input_field_names;
+		}
+
 		foreach( $hiddens as $l_name => $l_value )
 		{
 			if( isset($exclude) && in_array( $l_name, $exclude ) )
@@ -2597,6 +2618,7 @@ class Form extends Widget
 	 *    - input_suffix: Text after <input /> (string, default "\n")
 	 *    - input_help: Gets used as default value on empty input (type=text)
 	 *      elements. It gets attached through JavaScript (onfocus, onblur and form.onsubmit).
+	 *    - format_to_output: Use format_to_output in get_field_attribs_as_string? (boolean, default True)
 	 *
 	 * @return string The <input /> element.
 	 */
@@ -2634,8 +2656,18 @@ class Form extends Widget
 			unset($field_params['input_help']); // no HTML attribute
 		}
 
+		if( isset($field_params['format_to_output']) )
+		{
+			$format_to_output = $field_params['format_to_output'];
+			unset($field_params['format_to_output']);
+		}
+		else
+		{
+			$format_to_output = true;
+		}
+
 		$r = $input_prefix
-			.'<input'.get_field_attribs_as_string( $field_params ).' />'
+			.'<input'.get_field_attribs_as_string( $field_params, $format_to_output ).' />'
 			.$input_suffix;
 
 		return $r;
@@ -2791,6 +2823,9 @@ class Form extends Widget
 			{
 				$this->_common_params['id'] = $field_params['id'];
 			}
+
+			// Remember the field name, so hiddens_by_key can skip it.
+			$this->included_input_field_names[] = $field_params['name'];
 		}
 
 		// Mark required fields:
@@ -2852,6 +2887,12 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.43  2009/05/05 22:35:10  blueyed
+ * Form: - get_input_element: add support for 'format_to_output'=false, useful for values in buttons.
+ *  - included_input_field_names: remember used input field names and exclude those by default in hiddens_by_key (useful if you use _POST there)
+ *  - accept iso dates in date_input, if there are errors (which may come from a custom param_error call)
+ *  - doc
+ *
  * Revision 1.42  2009/04/28 19:54:41  blueyed
  * Form::date_input: use the input if date conversion failed
  *
