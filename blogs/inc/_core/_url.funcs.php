@@ -310,7 +310,8 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 	{	// FSOCKOPEN:
 		$info['used_method'] = 'fsockopen';
 		
-		if ( ( $url_parsed = @parse_url( $url ) ) === false )
+		if ( ( $url_parsed = @parse_url( $url ) ) === false
+			 || ! isset( $url_parsed['host'] ) )
 		{
 			$info['error'] = 'Could not parse URL';
 			return false;
@@ -729,6 +730,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.32  2009/05/05 19:00:30  tblue246
+ * More error checking...
+ *
  * Revision 1.31  2009/05/04 11:28:32  tblue246
  * error checking
  *
