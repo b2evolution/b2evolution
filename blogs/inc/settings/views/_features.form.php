@@ -159,7 +159,7 @@ $Form->begin_fieldset( T_('Hit & session logging').get_manual_link('hit_logging'
 			array(
 				'value'=>'off',
 				'label'=>T_('Off'),
-				'note'=>T_('Not recommended! Your database will grow very large!!'),
+				'note'=>T_('Not recommended! Your database will grow very large!'),
 				'onclick'=>'jQuery("#auto_prune_stats_container").hide();' ),
 			array(
 				'value'=>'page',
@@ -206,6 +206,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.15  2009/05/06 06:40:17  sam2kb
+ * minor
+ *
  * Revision 1.14  2009/04/13 11:33:34  tblue246
  * Fix translation conflict
  *
