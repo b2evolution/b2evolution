@@ -751,7 +751,7 @@ class Form extends Widget
 
 
 		if( param_has_error( $field_name )
-			&&  ! preg_match( '~^\d{4}(?:-\d{2}){2}(?: \d{2}(?::\d{2}){2})?$~', $field_value ) )
+			&&  ! preg_match('~^\d\d\d\d-\d\d-\d\d(?: \d\d:\d\d:\d\d)?$~', $field_value) )
 		{ // There is an error message for this field:
 
 			// We do not try to format the date, we keep the erroneous date (if it is not obviously valid).
@@ -2887,8 +2887,8 @@ class Form extends Widget
 
 /*
  * $Log$
- * Revision 1.44  2009/05/06 14:17:00  tblue246
- * Nicer RegExp
+ * Revision 1.45  2009/05/08 20:22:47  blueyed
+ * Revert r1.44, not more readable. ACKed by tblue246.
  *
  * Revision 1.43  2009/05/05 22:35:10  blueyed
  * Form: - get_input_element: add support for 'format_to_output'=false, useful for values in buttons.
