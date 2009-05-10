@@ -765,17 +765,20 @@ switch( $action )
 	case 'disp_help_plain': // just the help, without any payload
 		param( 'plugin_class', 'string', true );
 
-		$edit_Plugin = & $admin_Plugins->register( $plugin_class );
+		if( ! ( $edit_Plugin = & $admin_Plugins->get_by_classname( $plugin_class ) ) )
+		{	// Plugin is not installed:
+			$edit_Plugin = & $admin_Plugins->register( $plugin_class );
 
-		if( is_string($edit_Plugin) )
-		{
-			$Messages->add($edit_Plugin, 'error');
-			$edit_Plugin = false;
-			$action = 'list';
-		}
-		else
-		{
-			$admin_Plugins->unregister( $edit_Plugin );
+			if( is_string($edit_Plugin) )
+			{
+				$Messages->add($edit_Plugin, 'error');
+				$edit_Plugin = false;
+				$action = 'list';
+			}
+			else
+			{
+				$admin_Plugins->unregister( $edit_Plugin, true /* force */ );
+			}
 		}
 
 		break;
@@ -1039,6 +1042,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2009/05/10 17:00:45  tblue246
+ * Fix plugin info screen
+ *
  * Revision 1.8  2009/03/08 23:57:45  fplanque
  * 2009
  *
