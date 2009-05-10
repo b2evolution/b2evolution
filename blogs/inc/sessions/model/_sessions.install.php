@@ -97,6 +97,7 @@ $schema_queries['T_hitlog'] = array(
 			hit_referer           VARCHAR(250) DEFAULT NULL,
 			hit_referer_dom_ID    INT UNSIGNED DEFAULT NULL,
 			hit_keyphrase_keyp_ID INT UNSIGNED DEFAULT NULL,
+			hit_serprank					INT UNSIGNED DEFAULT NULL,
 			hit_blog_ID           int(11) UNSIGNED NULL DEFAULT NULL,
 			hit_remote_addr       VARCHAR(40) DEFAULT NULL,
 			hit_agnt_ID           INT UNSIGNED NULL,
@@ -118,7 +119,7 @@ $schema_queries['T_hitlog'] = array(
 		//     The best solution would indeed be to write to a non indexed MyISAM table
 		//     and then to consolidate the data once per day/hour (not sure) to tables that will be used for viewing stats
 		//     ALSO ideally we would not keep all the hit data but only CONSOLIDATED data
-		//     needed for reports, e-g: this date = this many hits of type browser/robot/rss etc but not necessarilly the detail		
+		//     needed for reports, e-g: this date = this many hits of type browser/robot/rss etc but not necessarilly the detail
 		//     MAYBE a 2 step process would make sense?
 		//      1) write to MyISAM and cron every x minutes to replicate to indexed table
 		//      2) consolidate once a day
@@ -150,6 +151,9 @@ $schema_queries['T_track__goalhit'] = array(
 
 /*
  * $Log$
+ * Revision 1.8  2009/05/10 00:28:51  fplanque
+ * serp rank logging
+ *
  * Revision 1.7  2009/03/08 23:57:45  fplanque
  * 2009
  *

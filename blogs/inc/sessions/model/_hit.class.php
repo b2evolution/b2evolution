@@ -154,8 +154,13 @@ class Hit
 	var $agent_ID;
 
 
+	/**
+	 * Extracted from search referers:
+	 */
 	var $_extracted_keyphrase = false;
 	var $_keyphrase = NULL;
+	var $_extracted_serprank = false;
+	var $_serprank = NULL;
 
 
 	/**
@@ -253,7 +258,9 @@ class Hit
 		// reloads on these... and that would be a problem!
 		foreach( $self_referer_list as $self_referer )
 		{
-			if( strpos( $this->referer, $self_referer ) !== false
+			$pos = strpos( $this->referer, $self_referer );
+			// If not starting within in the first 12 chars it's probably an url param as in &url=http://this_blog.com
+			if( $pos !== false && $pos <= 12
 				&& ! ($debug && strpos( $this->referer, '/search.html' ) ) ) // search simulation
 			{
 				// This type may be superseeded by admin page
@@ -273,10 +280,13 @@ class Hit
 		// reloads on these... and that would be a problem!
 		foreach( $blackList as $lBlacklist )
 		{
-			if( strpos( $this->referer, $lBlacklist ) !== false )
+			$pos = strpos( $this->referer, $lBlacklist );
+			// If not starting within in the first 12 chars it's probably an url param as in &url=http://this_blog.com
+			if( $pos !== false && $pos <= 12 )
 			{
 				// This type may be superseeded by admin page
-				if( ! $this->detect_admin_page() )
+				// fp> 2009-05-10: because of the 12 char limit above the following is probably no longer needed. Please enable it back if anyone has a problem with admin being detected as blacklist
+				// if( ! $this->detect_admin_page() )
 				{	// Not an admin page:
 					$Debuglog->add( 'detect_referer(): blacklist ('.$lBlacklist.')', 'hit' );
 					$this->referer_type = 'blacklist';
@@ -609,8 +619,8 @@ class Hit
 		$hit_uri = substr($ReqURI, 0, 250); // VARCHAR(250) and likely to be longer
 		$hit_referer = substr($this->referer, 0, 250); // VARCHAR(250) and likely to be longer
 
+		// Extract the keyphrase from search referers:
 		$keyphrase = $this->get_keyphrase();
-
 
 		$keyp_ID = NULL;
 		if( !empty( $keyphrase ) )
@@ -631,14 +641,17 @@ class Hit
 			}
 		}
 
+		// Extract the serprank from search referers:
+		$serprank = $this->get_serprank();
+
 		// insert hit into DB table:
 		$sql = "
 			INSERT INTO T_hitlog(
 				hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
-				hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_blog_ID, hit_remote_addr, hit_agnt_ID )
+				hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agnt_ID )
 			VALUES( '".$Session->ID."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', '".$this->referer_type
 				."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID)
-				.', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', ".$this->get_agent_ID().'
+				.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', ".$this->get_agent_ID().'
 			)';
 
 		$DB->query( $sql, 'Record the hit' );
@@ -654,7 +667,7 @@ class Hit
 
 
 	/**
-	 * Get the keyphrase in the referer
+	 * Get the keyphrase from the referer
 	 */
 	function get_keyphrase()
 	{
@@ -671,6 +684,27 @@ class Hit
 		$this->_extracted_keyphrase = true;
 
 		return $this->_keyphrase;
+	}
+
+
+	/**
+	 * Get the serprank from the referer
+	 */
+	function get_serprank()
+	{
+		if( !empty( $this->_extracted_serprank ) )
+		{
+			return $this->_extracted_serprank;
+		}
+
+		if( $this->referer_type == 'search' )
+		{
+			$this->_serprank = Hit::extract_serprank_from_referer( $this->referer );
+		}
+
+		$this->_extracted_serprank = true;
+
+		return $this->_serprank;
 	}
 
 
@@ -705,7 +739,7 @@ class Hit
 			}
 			else
 			{
-				$this->user_agent = substr( $this->user_agent, 0, 250 ); 		
+				$this->user_agent = substr( $this->user_agent, 0, 250 );
 			}
 		}
 		return $this->user_agent;
@@ -903,6 +937,10 @@ class Hit
 
 
 	/**
+	 * Extract the keyphrase from a search engine referer url
+	 *
+	 * Typically http://google.com?s=keyphraz returns keyphraz
+	 *
 	 * @static
 	 * @param string referer
 	 * @return string keyphrase
@@ -946,6 +984,26 @@ class Hit
 				$q = convert_charset($q, $evo_charset);
 				return $q;
 			}
+		}
+
+		return NULL;
+	}
+
+
+	/**
+	 * Extract the "serp rank" from a search engine referer url
+	 *
+	 * Typically http://google.com?s=keyphraz&start=18 returns 18
+	 *
+	 * @static
+	 * @param string referer
+	 * @return string keyphrase
+	 */
+	function extract_serprank_from_referer( $ref )
+	{
+		if( preg_match( '/[?&](start|cd)=([0-9]+)/i', $ref, $matches ) )
+		{
+			return $matches[2];
 		}
 
 		return NULL;
@@ -1044,6 +1102,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.25  2009/05/10 00:28:51  fplanque
+ * serp rank logging
+ *
  * Revision 1.24  2009/03/21 23:00:21  fplanque
  * minor
  *

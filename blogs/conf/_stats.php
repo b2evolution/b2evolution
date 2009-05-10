@@ -17,7 +17,10 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * This should typically include this site and maybe other subdomains of this site.
  *
  * The following substrings will be looked up in the referer http header
- * in order to identify referers to hide in the logs
+ * in order to identify referers to hide in the logs.
+ *
+ * The string must start within the 12 FISRT CHARS of the referer or it will be ignored.
+ * note: http://abc.com is already 14 chars. 12 for safety.
  *
  * WARNING: you should *NOT* use a slash at the end of simple domain names, as
  * older Netscape browsers will not send these. For example you should list
@@ -25,10 +28,6 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  *
  * @todo move to admin interface (T_basedomains list editor), but use for upgrading
  * @todo handle multiple blog roots.
- * @todo dh> "://$basehost" also matches images.google.com referrer URLs
- *            (which include the basehost)!
- *        Blacklists for Referrers should probably match at the beginning
- *        of the referrer URL (also for $blackList).
  *
  * @global array
  */
@@ -48,6 +47,9 @@ $self_referer_list = array(
  * in order to identify referers to hide in the logs
  *
  * THIS IS NOT FOR SPAM! Use the Antispam features in the admin section to control spam!
+ *
+ * The string must start within the 12 FISRT CHARS of the referer or it will be ignored.
+ * note: http://abc.com is already 14 chars. 12 for safety.
  *
  * WARNING: you should *NOT* use a slash at the end of simple domain names, as
  * older Netscape browsers will not send these. For example you should list
@@ -86,7 +88,7 @@ $blackList = array(
  * @global array $search_engines
  */
 $search_engines = array(
-	'//www.google.',
+	'//www.google.', // q=  and optional start= or cd= when using ajax
 	'ask.com/web', // q=
 	'.hotbot.',
 	'.altavista.',

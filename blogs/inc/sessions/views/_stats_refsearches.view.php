@@ -35,7 +35,8 @@ global $blog, $admin_url, $rsc_url;
 
 // Create result set:
 $Results = & new Results( "
-	 	 SELECT hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname, keyp_phrase
+	 	 SELECT hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname,
+	 	 				keyp_phrase, hit_serprank
 		 	 FROM T_hitlog INNER JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
 					  INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
 					  LEFT JOIN T_track__keyphrase ON hit_keyphrase_keyp_ID = keyp_ID
@@ -78,6 +79,14 @@ $Results->cols[] = array(
 		'td' => '%stats_search_keywords( #keyp_phrase# )%',
 	);
 
+// Serp Rank:
+$Results->cols[] = array(
+		'th' => T_('SR'),
+		'order' => 'hit_serprank',
+		'td_class' => 'center',
+		'td' => '$hit_serprank$',
+	);
+
 // Target Blog:
 if( empty($blog) )
 {
@@ -109,6 +118,9 @@ echo '<p class="notes">'.T_('These are hits from people who came to this blog sy
 
 /*
  * $Log$
+ * Revision 1.8  2009/05/10 00:28:51  fplanque
+ * serp rank logging
+ *
  * Revision 1.7  2009/03/08 23:57:45  fplanque
  * 2009
  *

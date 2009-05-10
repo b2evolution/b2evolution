@@ -40,7 +40,7 @@ $remote_IP = param( 'remote_IP', 'string', NULL, true );
 
 // Create result set:
 $sql = 'SELECT hit_ID, sess_ID, hit_datetime, hit_referer_type, hit_uri, hit_blog_ID, hit_referer, hit_remote_addr,
-								user_login, agnt_type, blog_shortname, dom_name, goal_name, keyp_phrase
+								user_login, agnt_type, blog_shortname, dom_name, goal_name, keyp_phrase, hit_serprank
 					FROM T_hitlog LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
 							  LEFT JOIN T_track__keyphrase ON hit_keyphrase_keyp_ID = keyp_ID
 								LEFT JOIN T_sessions ON hit_sess_ID = sess_ID
@@ -136,6 +136,14 @@ $Results->cols[] = array(
 		'td' => '%stats_search_keywords( #keyp_phrase# )%',
 	);
 
+// Serp Rank:
+$Results->cols[] = array(
+		'th' => T_('SR'),
+		'order' => 'hit_serprank',
+		'td_class' => 'center',
+		'td' => '$hit_serprank$',
+	);
+
 $Results->cols[] = array(
 		'th' => T_('Goal'),
 		'order' => 'goal_name',
@@ -169,6 +177,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.4  2009/05/10 00:28:51  fplanque
+ * serp rank logging
+ *
  * Revision 1.3  2009/03/08 23:57:45  fplanque
  * 2009
  *

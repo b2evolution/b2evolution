@@ -2351,7 +2351,17 @@ function upgrade_b2evo_tables()
 										SET grp_perm_xhtml_css_tweaks = 1
 									WHERE grp_ID <= 3" );
 		task_end();
+
+		set_upgrade_checkpoint( '9930' );
 	}
+
+	if( $old_db_version < 9940 )
+	{	// 3.2
+		task_begin( 'Updating hitlog table...' );
+		$DB->query( "ALTER TABLE T_hitlog ADD COLUMN hit_serprank INT UNSIGNED DEFAULT NULL AFTER hit_keyphrase_keyp_ID" );
+		task_end();
+	}
+
 
 	/* Wait until we're sure and no longer experimental for that one...
 	task_begin( 'Moving user data to fields' );
@@ -2502,6 +2512,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.289  2009/05/10 00:28:51  fplanque
+ * serp rank logging
+ *
  * Revision 1.288  2009/03/21 22:55:15  fplanque
  * Adding TinyMCE -- lowfat version
  *
