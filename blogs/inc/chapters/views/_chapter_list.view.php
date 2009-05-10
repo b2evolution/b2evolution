@@ -236,11 +236,14 @@ if( ! $Settings->get('allow_moving_chapters') )
 }
 
 echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categories is currently set to %s in the %sglobal settings%s.'),
-	$Settings->get('chapter_ordering') == 'manual' ? T_('manual') : T_('alphabetical'), '<a href="admin.php?ctrl=features#categories">', '</a>' ).'</p> ';
+	$Settings->get('chapter_ordering') == 'manual' ? /* TRANS: Manual here = "by hand" */ T_('Manual ') : T_('Alphabetical'), '<a href="admin.php?ctrl=features#categories">', '</a>' ).'</p> ';
 
 
 /*
  * $Log$
+ * Revision 1.17  2009/05/10 00:34:26  fplanque
+ * better TRANS fix
+ *
  * Revision 1.16  2009/04/28 19:52:39  blueyed
  * trans fix
  *
