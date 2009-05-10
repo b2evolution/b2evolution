@@ -2578,8 +2578,7 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 			$r = '<img src="'.$rsc_url.$blank_icon['file'].'" ';
 
 			// TODO: dh> add this only for !$use_strict, like above?
-			// TODO: dh> why not only use CSS for this? (adding vertical-align:top to "img")
-			// Include non CSS fallbacks:
+			// Include non CSS fallbacks (needed by bozos... and basic skin):
 			$r .= 'border="0" align="top" ';
 
 			// Include class (will default to "noicon"):
@@ -3420,6 +3419,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.96  2009/05/10 00:30:33  fplanque
+ * doc
+ *
  * Revision 1.95  2009/04/12 20:57:06  blueyed
  * debug_die: move sending of status-header to not-in-CLI block.
  *
