@@ -757,7 +757,7 @@ function is_absolute_pathname($path)
 	}
 
 	if( is_windows() )
-	{ // windows e-g: (note: "XY:" would actually be a valid drive ID in windows)
+	{ // windows e-g: (note: "XY:" would actually be a valid drive ID in windows); dh> reference? (http://en.wikipedia.org/wiki/Drive_letter_assignment only talks about 26 drives (apart from using "subst", which does not work with "XY:") (Windows XP))
 		return ( $pathlen > 1 && $path[1] == ':' );
 	}
 	else
@@ -771,6 +771,9 @@ function is_absolute_pathname($path)
 
 /*
  * $Log$
+ * Revision 1.16  2009/05/11 19:38:46  blueyed
+ * @fp: note/todo
+ *
  * Revision 1.15  2009/03/08 23:57:43  fplanque
  * 2009
  *
