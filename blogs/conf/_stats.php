@@ -28,6 +28,11 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  *
  * @todo move to admin interface (T_basedomains list editor), but use for upgrading
  * @todo handle multiple blog roots.
+ * @todo If $basehost already begins with "www.", the pure domain will not
+ *       be counted as a self referrer. Possible solution: Strip the "www."
+ *       from $basehost - for "www.example.com" this would give "://example.com"
+ *       and "://www.example.com", which would be correct (currently it
+ *       gives "://www.example.com" and "://www.www.example.com").
  *
  * @global array
  */
@@ -48,7 +53,7 @@ $self_referer_list = array(
  *
  * THIS IS NOT FOR SPAM! Use the Antispam features in the admin section to control spam!
  *
- * The string must start within the 12 FISRT CHARS of the referer or it will be ignored.
+ * The string must start within the 12 FIRST CHARS of the referer or it will be ignored.
  * note: http://abc.com is already 14 chars. 12 for safety.
  *
  * WARNING: you should *NOT* use a slash at the end of simple domain names, as
