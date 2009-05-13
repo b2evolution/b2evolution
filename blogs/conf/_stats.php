@@ -19,7 +19,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  * The following substrings will be looked up in the referer http header
  * in order to identify referers to hide in the logs.
  *
- * The string must start within the 12 FISRT CHARS of the referer or it will be ignored.
+ * The string must start within the 12 FIRST CHARS of the referer or it will be ignored.
  * note: http://abc.com is already 14 chars. 12 for safety.
  *
  * WARNING: you should *NOT* use a slash at the end of simple domain names, as
