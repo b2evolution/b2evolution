@@ -136,15 +136,15 @@ $timeout_online_user = 300; // Default: 5 minutes (300s).
 
 // Get hostname out of baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
-if( preg_match( '#^(https?://(.+?)(:(.+?))?)(/.*)$#', $baseurl, $matches ) )
+if( preg_match( '#^(https?://(.+?)(?::(.+?))?)(/.*)$#', $baseurl, $matches ) )
 {
 	$baseurlroot = $matches[1]; // no ending slash!
 	// echo "baseurlroot=$baseurlroot <br />";
 	$basehost = $matches[2];
 	// echo "basehost=$basehost <br />";
-	$baseport =  $matches[4];
+	$baseport =  $matches[3];
 	// echo "baseport=$baseport <br />";
-	$basesubpath =  $matches[5];
+	$basesubpath =  $matches[4];
 	// echo "basesubpath=$basesubpath <br />";
 }
 else
