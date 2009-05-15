@@ -203,10 +203,8 @@ class Form extends Widget
 		$this->switch_layout( NULL );	// "restore" saved layout.
 
 
-		// Add any GET params from $form_action as hidden inputs.
-		// This is required for GET method at least, but would interfere
-		// with POST (converting GET vars to POST). Also, both GET and
-		// POST get submitted (independently) for method=POST.
+		// Add any GET params from $form_action as hidden inputs (GET forms only)
+		// Otherwise those params would be overwritten by the form submit and lost.
 		if( strpos($this->form_action, '?') !== false && $this->form_method == 'get' )
 		{
 			$pos_args = strpos($this->form_action, '?');
@@ -762,7 +760,7 @@ class Form extends Widget
 
 			//echo 'error on '.$field_name.' keep erroneous entry intact ';
 
-			$field_params['value'] = trim(substr( $field_value, 0, 10 )); // TODO: dh> why not use the real original here?!
+			$field_params['value'] = trim(substr( $field_value, 0, 10 )); // TODO: dh> why not use the real original here?! fp> AFAICR we needed to strip off the time part			
 		}
 		else
 		{ // Make the date value clean for display:
@@ -2373,6 +2371,7 @@ class Form extends Widget
 		{
 			$exclude = $this->included_input_field_names;
 		}
+		// fp> else we should probably merge... ?
 
 		foreach( $hiddens as $l_name => $l_value )
 		{
@@ -2904,6 +2903,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.47  2009/05/15 19:08:00  fplanque
+ * doc
+ *
  * Revision 1.46  2009/05/15 18:50:03  blueyed
  * Form class:
  *  - do not extract params from action_url into hiddens for POST

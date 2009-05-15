@@ -439,6 +439,7 @@ class _core_Module
 				),
 			'time' => array(
 					'text' => date( locale_shorttimefmt(), $localtimenow ),
+					// fp> TODO href to Timezone settings if permission
 					'disabled' => true,
 					'class' => 'noborder',
 				),
@@ -809,6 +810,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.12  2009/05/15 19:08:00  fplanque
+ * doc
+ *
  * Revision 1.11  2009/04/11 13:52:03  tblue246
  * evobar: Do not display a border when hovering the time
  *
