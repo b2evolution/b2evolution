@@ -1,23 +1,21 @@
 <html>
 <head>
-	<title>Setting up Simple Test for b2evo</title>
+	<title>Setting up SimpleTest for b2evo</title>
 </head>
 
 <body>
 
-<h1>Setting up Simple Test for b2evo</h1>
+<h1>Setting up SimpleTest for b2evo</h1>
 
-<h2>1. Get the Simple Test framework</h2>
+<h2>1. Get the SimpleTest framework</h2>
 
-<p>If you want to run the <a href="http://www.lastcraft.com/simple_test.php">Simple Test</a> cases in /tests, you'll have to get the
+<p>If you want to run the <a href="http://simpletest.sourceforge.net/">SimpleTest</a> cases in /tests, you'll have to get the
 simpletest framework. Of course.</p>
 
 <p>You can
-<a href="http://sourceforge.net/project/showfiles.php?group_id=76550">download it from SourceForge</a> or get it straight from CVS (password is empty):</p>
-
+<a href="http://sourceforge.net/project/showfiles.php?group_id=76550">download it from SourceForge</a> or get it straight from Subversion:</p>
 <pre>
-cvs -d:pserver:anonymous@simpletest.cvs.sourceforge.net:/cvsroot/simpletest login
-cvs -z3 -d:pserver:anonymous@simpletest.cvs.sourceforge.net:/cvsroot/simpletest co simpletest
+svn co https://simpletest.svn.sourceforge.net/svnroot/simpletest/simpletest/trunk simpletest
 </pre>
 
 Put it into the /tests/simpletest directory.
@@ -34,7 +32,7 @@ define( 'SIMPLETEST_DIR', '/your/path/with/trailing/slash/' );
 		is).</p>
 </font></blockquote>
 
-<h2>2. Configure the Simple Test framework</h2>
+<h2>2. Configure the SimpleTest framework</h2>
 
 <p>Edit /test/config.php .
 </p>
