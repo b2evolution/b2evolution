@@ -1873,8 +1873,8 @@ function balance_tags( $text )
 
 			// Tag Cleaning
 
-			// Push if not img or br or hr
-			if($tag != 'br' && $tag != 'img' && $tag != 'hr' && $tag != 'param')
+			// Push if not img, br, hr, param or input
+			if($tag != 'br' && $tag != 'img' && $tag != 'hr' && $tag != 'param' && $tag != 'input')
 			{
 				$stacksize = array_push ($tagstack, $tag);
 				$closing = '>';
@@ -1919,6 +1919,10 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.30  2009/05/15 14:02:36  sam2kb
+ * <input /> is a self-closing tag and doesn't need any evo help ;)
+ * See http://forums.b2evolution.net/viewtopic.php?p=90791#90791
+ *
  * Revision 1.29  2009/04/14 21:14:53  blueyed
  * doc
  *
