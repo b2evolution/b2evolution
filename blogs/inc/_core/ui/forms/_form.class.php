@@ -147,9 +147,9 @@ class Form extends Widget
 	 *
 	 * @param string the action destination of the form (NULL for pagenow)
 	 * @param string the name of the form (will be used as an ID)
-	 * @param string the action to execute when the form is submitted
 	 * @param string the method used to send data ("post" (Default), "get")
 	 * @param string the form layout : 'fieldset', 'table' or '' (NULL means: if there is an {@link $AdminUI} object get it from there, otherwise use 'fieldset')
+	 * @param string Form encoding ("application/x-www-form-urlencoded" (default), "multipart/form-data" (uploads))
 	 */
 	function Form( $form_action = NULL, $form_name = '', $form_method = 'post', $layout = NULL, $enctype = '' )
 	{
@@ -204,21 +204,23 @@ class Form extends Widget
 
 
 		// Add any GET params from $form_action as hidden inputs.
-		// This is required for GET method at least, and may make
-		// sense for POST, too. fp> I think it does.
-		if( strpos($form_action, '?') )
+		// This is required for GET method at least, but would interfere
+		// with POST (converting GET vars to POST). Also, both GET and
+		// POST get submitted (independently) for method=POST.
+		if( strpos($this->form_action, '?') !== false && $this->form_method == 'get' )
 		{
-			$pos_args = strpos($form_action, '?');
-			$query_str = substr($form_action, $pos_args+1);
+			$pos_args = strpos($this->form_action, '?');
+			$query_str = substr($this->form_action, $pos_args+1);
 			// Split args by "&" (but leave "&amp;" alone).
 			$query_args = preg_split('~&(?!amp;)~', $query_str, -1, PREG_SPLIT_NO_EMPTY);
 			foreach( $query_args as $query_arg )
 			{
 				list($field_name, $field_value) = explode('=', $query_arg, 2);
-				$this->hidden($field_name, $field_value);
+				// Remember all pairs, and add them in end_form (so that used fieldnames can be skipped):
+				$this->possible_hiddens_from_action[] = array($field_name, $field_value);
 			}
 			// Remove params.
-			$form_action = substr($form_action, 0, $pos_args);
+			$this->form_action = substr($form_action, 0, $pos_args);
 		}
 	}
 
@@ -1395,6 +1397,18 @@ class Form extends Widget
 
 		$r .= $this->formend;
 
+		// Add hiddens extracted from Form action:
+		if( ! empty($this->possible_hiddens_from_action) )
+		{
+			foreach($this->possible_hiddens_from_action as $pair)
+			{
+				list($name, $value) = $pair;
+				if( ! in_array($name, $this->included_input_field_names) )
+				{
+					$this->hidden($name, $value);
+				}
+			}
+		}
 
 		// Display all buffered hidden fields in a 0 height DIV (for XHTML):
 		$r .= '<div style="height:0">'.implode( '', $this->hiddens ).'</div>';
@@ -2259,6 +2273,9 @@ class Form extends Widget
 	 * This generates no output and returns nothing: the hidden fields get added to {@link $hiddens},
 	 * and get appended to the end of the form.
 	 *
+	 * This generates no output and returns nothing: the hidden fields get added to {@link $hiddens},
+	 * and get appended to the end of the form.
+	 *
 	 * @param string Field name
 	 * @param string Field value
 	 * @param array Optional params. This is e.g. useful for "id".
@@ -2887,6 +2904,14 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.46  2009/05/15 18:50:03  blueyed
+ * Form class:
+ *  - do not extract params from action_url into hiddens for POST
+ *  - actually remove "converted" params from action_url
+ *  - make this work for action_url starting with "?", too
+ *  - do not move params from action_url to params, if they get used in fields
+ *  - doc fix
+ *
  * Revision 1.45  2009/05/08 20:22:47  blueyed
  * Revert r1.44, not more readable. ACKed by tblue246.
  *

@@ -13,7 +13,7 @@ require_once dirname(__FILE__).'/../../config.simpletest.php';
 load_class( '_core/ui/forms/_form.class.php' );
 
 
-Mock::generatePartial( 'Form', 'FormTestVersion', array('hidden') );
+Mock::generatePartial('Form', 'MockFormHidden', array('hidden'));
 
 
 /**
@@ -48,7 +48,7 @@ class FormTestCase extends EvoUnitTestCase
 			'b' => '6',
 		);
 
-		$Form = new FormTestVersion( $this );
+		$Form = new MockFormHidden( $this );
 		$Form->output = true;
 
 		$Form->expectCallCount( 'hidden', 6 );
@@ -64,6 +64,41 @@ class FormTestCase extends EvoUnitTestCase
 
 		// check that $form->output got not changed:
 		$this->assertEqual( $Form->output, true );
+	}
+
+
+	/**
+	 * Test if params from "action" get handled correctly as hiddens.
+	 */
+	function test_hiddens_from_action()
+	{
+		// GET:
+		$Form = new MockFormHidden( $this );
+		$Form->expectCallCount( 'hidden', 3 );
+		$Form->expectAt( 0, 'hidden', array( 'name', '1' ) );
+		$Form->expectAt( 1, 'hidden', array( 'name[]', '2' ) );
+		$Form->expectAt( 2, 'hidden', array( 'name[]', '3' ) );
+
+		$Form->Form('?name=1&name[]=2&name[]=3&k=v&k[]=v', '', 'get');
+		$Form->output = false;
+		$Form->begin_form();
+		// Add a field with one of the action param names, which should skip "k" from being used as hidden.
+		$Form->text_input('k', 'v2', 1, 'label');
+		$Form->text_input('k[]', '1', 1, 'label');
+		$Form->end_form();
+		$this->assertEqual($Form->form_action, '');
+
+
+		// POST:
+		// No call to hidden should get performed and params should stay in form_action.
+		$Form = new MockFormHidden( $this );
+		$Form->expectCallCount( 'hidden', 0 );
+
+		$Form->Form('?name=1&name[]=2&name[]=3', '', 'post');
+		$Form->begin_form();
+		$Form->end_form();
+
+		$this->assertEqual($Form->form_action, '?name=1&name[]=2&name[]=3');
 	}
 
 }
