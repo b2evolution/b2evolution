@@ -25,6 +25,9 @@ global $edited_Goal;
 global $action;
 $creating = is_create_action( $action );
 
+// These params need to be memorized and passed through regenerated urls: (this allows to come back to the right list order & page)
+param( 'results_goals_page', 'integer', '', true );
+param( 'results_goals_order', 'string', '', true );
 
 $Form = & new Form( NULL, 'goal_checkchanges', 'post', 'compact' );
 
@@ -33,8 +36,8 @@ $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) )
 
 $Form->begin_form( 'fform', $creating ?  T_('New goal') : T_('Goal') );
 
-	$Form->hidden_ctrl();
 	$Form->hidden( 'action', $creating ? 'create' : 'update' );
+	$Form->hiddens_by_key( get_memorized( 'action' ) ); // (this allows to come back to the right list order & page)
 
 	if( ! $creating ) $Form->hidden( 'goal_ID', $edited_Goal->ID );
 
@@ -62,6 +65,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.3  2009/05/16 00:28:04  fplanque
+ * Return to the right list page & order after editing.
+ *
  * Revision 1.2  2009/03/08 23:57:45  fplanque
  * 2009
  *
