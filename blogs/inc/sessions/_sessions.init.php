@@ -123,7 +123,7 @@ class sessions_Module
 					 ),
 				'goals' => array(
 						'text' => T_('Goals').'&hellip;',
-						'href' => $admin_url.'?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0',
+						'href' => $admin_url.'?ctrl=goals',
 					 ),
 				);
 
@@ -233,15 +233,15 @@ class sessions_Module
 						 	),
 						'goals' => array(
 							'text' => T_('Goals'),
-							'href' => 'admin.php?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0',
+							'href' => 'admin.php?ctrl=goals',
 							'entries' => array(
-								'hits' => array(
-									'text' => T_('Goal hits'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0'
-									),
 								'goals' => array(
 									'text' => T_('Goals'),
 									'href' => 'admin.php?ctrl=goals'
+									),
+								'hits' => array(
+									'text' => T_('Goal hits'),
+									'href' => 'admin.php?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0'
 									),
 								'stats' => array(
 									'text' => T_('Stats'),
@@ -270,6 +270,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.12  2009/05/16 00:29:41  fplanque
+ * better menu structure (load the fastest page by default)
+ *
  * Revision 1.11  2009/04/15 13:17:20  tblue246
  * bugfixes
  *
