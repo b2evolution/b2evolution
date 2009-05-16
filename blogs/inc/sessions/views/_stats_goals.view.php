@@ -74,7 +74,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Key'),
 		'order' => 'goal_key',
-		'td' => '$goal_key$',
+		'td' => '<a href="%regenerate_url( \'action\', \'goal_ID=$goal_ID$&amp;action=edit\')%">$goal_key$</a>',
  	);
 
 
@@ -116,6 +116,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.4  2009/05/16 00:28:31  fplanque
+ * edit link
+ *
  * Revision 1.3  2009/03/08 23:57:45  fplanque
  * 2009
  *
