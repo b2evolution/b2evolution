@@ -47,7 +47,7 @@ if( $tab == 'sessions' && (!$perm_view_all || $blog != 0) )
 }
 $tab3 = param( 'tab3', 'string', '', true );
 $AdminUI->set_path( 'stats', $tab, $tab3 );
-$AdminUI->title = T_('View Stats:');
+$AdminUI->title = T_('Stats');
 
 param( 'action', 'string' );
 
@@ -236,6 +236,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2009/05/16 00:31:45  fplanque
+ * AFAICS this only appears in the title tag
+ *
  * Revision 1.11  2009/04/12 09:29:47  tblue246
  * minor
  *
