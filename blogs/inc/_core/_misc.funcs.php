@@ -746,7 +746,7 @@ function make_clickable_callback( $text, $moredelim = '&amp;' )
 {
 	$pattern_domain = '([a-z0-9\-]+\.[a-z0-9\-.\~]+)'; // a domain name (not very strict)
 	$text = preg_replace(
-		array( '#(^|[\s>])(https?|mailto)://([^<>{}\s]+[^.,<>{}\s])#i',
+		array( '#(^|[\s>"])(https?|mailto)://([^"<>{}\s]+[^".,<>{}\s])#i',
 			'#(^|[\s>])aim:([^,<\s]+)#i',
 			'#(^|[\s>])icq:(\d+)#i',
 			'#(^|[\s>])www\.'.$pattern_domain.'((?:/[^<\s]*)?[^.,\s])#i',
@@ -3419,6 +3419,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.97  2009/05/17 17:40:24  fplanque
+ * minor
+ *
  * Revision 1.96  2009/05/10 00:30:33  fplanque
  * doc
  *
