@@ -322,7 +322,7 @@ class Blog extends DataObject
 			$this->set_setting( 'tag_prefix', $tag_prefix);
 		}
 
-		// Default to "tag", if "prefix-only" is used, but not tag_prefix provided.
+		// Default to "tag", if "prefix-only" is used, but no tag_prefix was provided.
 		if( get_param('tag_links') == 'prefix-only' && ! strlen(param( 'tag_prefix', 'string', NULL)) )
 		{
 			$this->set_setting( 'tag_prefix', 'tag' );
@@ -1181,17 +1181,17 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get a link (A tag) to the tag page of a given tag.
+	 * Get a link (<a href>) to the tag page of a given tag.
 	 *
 	 * @param string Tag
 	 * @param string Link text (defaults to tag name)
 	 * @param array Additional attributes for the A tag (href gets overridden).
-	 * @return string The A tag
+	 * @return string The <a href> link
 	 */
 	function get_tag_link( $tag, $text = NULL, $attribs = array() )
 	{
 		if( $this->get_setting('tag_rel_attrib') && $this->get_setting('tag_links') == 'prefix-only' )
-		{	// add rel=tag attrib
+		{	// add rel=tag attrib -- valid only if the last part of the url is the tag name
 			if( ! isset($attribs['rel']) )
 				$attribs['rel'] = 'tag';
 			else
@@ -2059,6 +2059,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.61  2009/05/17 19:51:10  fplanque
+ * minor/doc
+ *
  * Revision 1.60  2009/04/23 19:51:40  blueyed
  * Add Blog::get_tag_link, use it where appropriate.
  *

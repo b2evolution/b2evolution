@@ -2595,7 +2595,7 @@ class Item extends ItemLight
 				}
 				else
 				{
-					echo $tag;
+					echo htmlspecialchars($tag);
 				}
 			}
 
@@ -3717,6 +3717,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.93  2009/05/17 19:51:10  fplanque
+ * minor/doc
+ *
  * Revision 1.92  2009/04/23 19:51:40  blueyed
  * Add Blog::get_tag_link, use it where appropriate.
  *

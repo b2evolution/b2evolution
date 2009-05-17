@@ -78,12 +78,12 @@ class CollectionSettings extends AbstractSettings
 			'chapter_noindex' => '1',						// META NOINDEX on Category pages
 			'category_prefix' => '',
 
-			'tag_links'  => 'colon',					// 'param', 'semicolon'
+			'tag_links'  => 'colon',						// 'param', 'semicolon' -- fp> we want this changed to prefix only for new blogs only
 			'canonical_tag_urls' => 1,					// Redirect tag pages to their canonical Url?
 			'tag_posts_per_page' => NULL,
 			'tag_noindex' => '1',				      	// META NOINDEX on Tag pages
-			'tag_prefix' => '',
-			'tag_rel_attrib' => 1,              // rel="tag" attribute for tag links (http://microformats.org/wiki/rel-tag)
+			'tag_prefix' => '',									// fp> fp> we want this changed to prefix only for new blogs only
+			'tag_rel_attrib' => 1,              // rel="tag" attribute for tag links (http://microformats.org/wiki/rel-tag) -- valid only in prefix-only mode
 
 			'single_links'   => 'ymd',
 			'permalinks'     => 'single',				// single, archive, subchap
@@ -142,6 +142,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.30  2009/05/17 19:51:10  fplanque
+ * minor/doc
+ *
  * Revision 1.29  2009/04/22 22:46:33  blueyed
  * Add support for rel=tag in tag URLs. This adds a new tag_links mode 'prefix-only', which requires a prefix (default: tag) and uses no suffix (dash/colon/semicolon). Also adds more JS juice and cleans up/normalized previously existing JS. Not much tested, but implemented as discussed on ML.
  *

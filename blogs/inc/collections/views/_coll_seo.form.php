@@ -266,7 +266,7 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo'), array('
 <script type="text/javascript">
 jQuery("#tag_links_fieldset input[type=radio]").click( function()
 {
-	// Disable tag_prefix, if "param" is used.
+	// Disable tag_prefix, if "param" is used. fp> TODO: visual feedback that this is disabled
 	jQuery('#tag_prefix').attr("disabled", this.value == 'param' ? "disabled" : "");
 	// Disable tag_rel_attrib, if "prefix-only" is not used.
 	jQuery('#tag_rel_attrib').attr("disabled", this.value == 'prefix-only' ? "" : "disabled");
@@ -321,6 +321,9 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.21  2009/05/17 19:51:10  fplanque
+ * minor/doc
+ *
  * Revision 1.20  2009/04/22 22:46:33  blueyed
  * Add support for rel=tag in tag URLs. This adds a new tag_links mode 'prefix-only', which requires a prefix (default: tag) and uses no suffix (dash/colon/semicolon). Also adds more JS juice and cleans up/normalized previously existing JS. Not much tested, but implemented as discussed on ML.
  *

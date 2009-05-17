@@ -757,7 +757,7 @@ function is_absolute_pathname($path)
 	}
 
 	if( is_windows() )
-	{ // windows e-g: (note: "XY:" would actually be a valid drive ID in windows); dh> reference? (http://en.wikipedia.org/wiki/Drive_letter_assignment only talks about 26 drives (apart from using "subst", which does not work with "XY:") (Windows XP))
+	{ // windows e-g: (note: "XY:" can actually happen as a drive ID in windows; I have seen it once in 2009 on MY XP sp3 after plugin in & plugin out an USB stick like 26 times over 26 days! (with sleep/hibernate in between)
 		return ( $pathlen > 1 && $path[1] == ':' );
 	}
 	else
@@ -771,6 +771,9 @@ function is_absolute_pathname($path)
 
 /*
  * $Log$
+ * Revision 1.17  2009/05/17 19:51:10  fplanque
+ * minor/doc
+ *
  * Revision 1.16  2009/05/11 19:38:46  blueyed
  * @fp: note/todo
  *
