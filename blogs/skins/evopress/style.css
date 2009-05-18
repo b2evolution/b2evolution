@@ -5,11 +5,8 @@
 */
 
 @import url("../../rsc/css/basic.css");	/* Import basic styles */
-@import url("../../rsc/css/img.css");	/* Import standard image styles */
-@import url("../../rsc/css/blog_default.css");	/* Import default blog navigation styles */
+@import url("../../rsc/css/blog_base.css");	/* Import default blog navigation styles */
 @import url("item.css");	/* Import blog content styles */
-@import url("../../rsc/css/forms.css");	/* Import default form styles */
-@import url("../../rsc/css/comments.css");	/* Import default comment styles */
 
 
 /* Begin Typography & Colors */
