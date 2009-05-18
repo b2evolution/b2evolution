@@ -358,11 +358,11 @@ $schema_queries = array(
 			PRIMARY KEY (itpr_itm_ID, itpr_format)
 		)' ),
 
-	'T_items__version' => array(
+	'T_items__version' => array(	// fp> made iver_edit_user_ID NULL because of INSERT INTO SELECT statement that can try to write NULL
 		'Creating item versions table',
 		"CREATE TABLE T_items__version (
 			iver_itm_ID        INT UNSIGNED NOT NULL ,
-			iver_edit_user_ID  INT UNSIGNED NOT NULL ,
+			iver_edit_user_ID  INT UNSIGNED NULL ,
 			iver_edit_datetime DATETIME NOT NULL ,
 			iver_status        ENUM('published','deprecated','protected','private','draft','redirected') NULL ,
 			iver_title         TEXT NULL ,
@@ -572,6 +572,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.16  2009/05/18 02:51:05  fplanque
+ * minor
+ *
  * Revision 1.15  2009/03/08 23:57:40  fplanque
  * 2009
  *
