@@ -23,6 +23,12 @@ code {
 .top {
 	vertical-align: top;
 }
+.middle {
+	vertical-align: middle;
+}
+.bottom {
+	vertical-align: bottom;
+}
 .floatleft {
 	float: left;
 }
@@ -78,3 +84,15 @@ a.discreet {
 	text-decoration: none;
 }
 
+img.leftmargin {
+	float:left;
+	margin-right:1ex;
+	margin-top:.2ex;
+	margin-bottom:.2ex;
+}
+img.rightmargin {
+	float:right;
+	margin-left:1ex;
+	margin-top:.2ex;
+	margin-bottom:.2ex;
+}

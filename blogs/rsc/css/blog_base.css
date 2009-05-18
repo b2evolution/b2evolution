@@ -99,3 +99,75 @@ div.error_404,
 div.error_additional_content {
 	margin: 1em;
 }
+
+
+/* Styles for comments */
+div.bComment, /* Entire comment block */
+form.bComment /* New comment form */
+{
+	margin: 1ex 2ex;
+	padding: 0 1ex;
+	border: 1px dotted #999;
+}
+#comment_preview {
+	background-color: #eee;
+}
+div.bCommentTitle {
+	margin: 1ex 0;
+	font-weight: bold;
+}
+div.bCommentSmallPrint {
+	clear: both;
+	font-size: 78%;
+	margin: 1ex 0;
+}
+
+div.moderation_msg
+{
+	margin: 1ex 2ex;
+	padding: 0 1ex;
+	border: 1px dotted #fa9;
+	color: #e70;
+}
+
+div.feedback_feed_msg {
+	margin: 2em 2ex;
+	text-align: right;
+}
+
+
+/* 18/80% forms: comments and profile */
+form.bComment fieldset
+{	/* one form line */
+	border: none;
+	margin: 2ex 0ex;
+	padding: 0ex;
+	/* border: 1px solid #00f; */
+}
+form.bComment fieldset label {
+	font-weight: bold;
+}
+form.bComment fieldset div.label
+{ /* label of form line */
+	float: left;
+	width: 18%;
+	text-align: right;
+	padding-top: .5ex;
+	font-weight: bold;
+	/* border: 1px solid #f00; */
+}
+form.bComment fieldset div.input
+{ /* input zone of form line */
+	margin: 0 0 0 20%;
+	/* border: 1px solid #f00; */
+}
+form.bComment fieldset.input{
+	margin: 0;
+	/* border: 1px solid #0f0; */
+}
+form.bComment fieldset div.info
+{ /* info zone of form line */
+	margin: 0 0 0 20%;
+	padding-top: .5ex;
+	/* border: 1px solid #f00;*/
+}
