@@ -251,7 +251,7 @@ function create_default_data()
 
 	if ( ! empty( $current_locale ) && ! $locales[$current_locale]['enabled'] )
 	{	// The chosen locale is not enabled, make sure the user sees his new system localized.
-		echo 'Activating default locale... ';
+		echo 'Activating selected default locale... ';
 		$DB->query( 'INSERT INTO T_locales '
 				   .'( loc_locale, loc_charset, loc_datefmt, loc_timefmt, '
 				   .'loc_startofweek, loc_name, loc_messages, loc_priority, '
@@ -848,6 +848,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.261  2009/05/18 03:59:39  fplanque
+ * minor/doc
+ *
  * Revision 1.260  2009/04/14 15:44:41  tblue246
  * Make sure the locale chosen at install time is enabled, so the user sees his new system in his language.
  *

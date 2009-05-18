@@ -34,6 +34,7 @@ load_class( 'widgets/model/_widget.class.php' );
  *
  * @todo dh> why are "STRONG" tags hardcoded here? can this get dropped/removed? should the style
  *           get adjusted to use font-weight:bold then?
+ * fp> yes but make sure to put the font-weight in a place where it applies to all (existing) skins by default; e-g blog_base.css
  *
  * @package evocore
  */
@@ -181,6 +182,9 @@ class coll_common_links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.10  2009/05/18 03:59:39  fplanque
+ * minor/doc
+ *
  * Revision 1.9  2009/04/06 23:19:07  blueyed
  * coll_common_links_Widget: TODO about hardcoded strong tags, doc, indent.
  *

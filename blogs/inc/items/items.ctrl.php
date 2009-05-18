@@ -804,6 +804,9 @@ if( !empty($tab) )
 }
 
 
+// Load the appropriate blog navigation styles (including calendar, comment forms...):
+require_css( $rsc_url.'css/blog_base.css' );
+
 // Load the appropriate ITEM/POST styles depending on the blog's skin:
 if( ! empty( $Blog->skin_ID) )
 {
@@ -976,6 +979,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.42  2009/05/18 03:59:39  fplanque
+ * minor/doc
+ *
  * Revision 1.41  2009/05/18 02:59:15  fplanque
  * Skins can now have an item.css file to specify content formats. Used in TinyMCE.
  * Note there are temporarily too many CSS files.

@@ -599,9 +599,12 @@ class Calendar
 				 GROUP BY mymonth '.$this->ItemQuery->get_group_by( ', ' );
 			$arc_result = $DB->get_results( $arc_sql, ARRAY_A );
 
-			foreach( $arc_result as $arc_row )
-			{
-				$monthswithposts[ $arc_row['mymonth'] ] = $arc_row['item_count'];
+			if( $DB->num_rows > 0 )
+			{ // OK we have a month with posts! // fp>dh why did you removed that?
+				foreach( $arc_result as $arc_row )
+				{
+					$monthswithposts[ $arc_row['mymonth'] ] = $arc_row['item_count'];
+				}
 			}
 		}
 
@@ -1143,6 +1146,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.56  2009/05/18 03:59:39  fplanque
+ * minor/doc
+ *
  * Revision 1.55  2009/03/31 20:24:30  blueyed
  * Beautify code.
  *
