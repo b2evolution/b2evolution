@@ -115,7 +115,7 @@ $schema_queries = array(
 		"CREATE TABLE T_users__fielddefs (
 			ufdf_ID int(10) unsigned NOT NULL,
 			ufdf_type char(8) NOT NULL,
-			ufdf_name varchar(255) collate latin1_general_ci NOT NULL,
+			ufdf_name varchar(255) NOT NULL,
 			PRIMARY KEY (ufdf_ID)
 		)" ),
 
@@ -572,6 +572,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.17  2009/05/18 21:01:05  sam2kb
+ * No collation should defined here. Returns MySQL error.
+ *
  * Revision 1.16  2009/05/18 02:51:05  fplanque
  * minor
  *
