@@ -2,7 +2,8 @@
 
 @import url("../../rsc/css/basic.css");	/* Import basic styles */
 @import url("../../rsc/css/img.css");	/* Import standard image styles */
-@import url("../../rsc/css/blog_elements.css");	/* Import standard blog elements styles */
+@import url("../../rsc/css/blog_base.css");	/* Default styles for the blog navigation */
+@import url("../../rsc/css/item_base.css");	/* Default styles for the post CONTENT */
 @import url("../../rsc/css/forms.css");	/* Import default form styles */
 @import url("../../rsc/css/comments.css");	/* Import default comment styles */
 
@@ -39,7 +40,7 @@ div.outerwrap /* Main rounded content zone */
 div.innerwrap /* Main white content zone */
 {
 	padding: 0;
-	border: 1px solid #fff; /* needed to force inner paddings */ 
+	border: 1px solid #fff; /* needed to force inner paddings */
 	background-color:#fff;
 }
 div.pageHeader /* Title zone */
@@ -174,7 +175,7 @@ div.pageHeader div.widget_core_coll_tagline {
 }
 
 
-/* 
+/*
  * Styles for posts
  */
 .bPost, .bPostpublished
@@ -211,7 +212,7 @@ h3.bTitle a {
 	margin: 1ex;
 }
 
-input.bComment, 
+input.bComment,
 textarea.bComment
 {
 	background-color: #eee;
@@ -230,7 +231,7 @@ select.bComment		/* Used by the profile form */
 
 
 /*
- * Styles for sidebar (right) 
+ * Styles for sidebar (right)
  */
 .bSideItem {
 	margin: 2ex;
@@ -285,7 +286,7 @@ table.bCalendarTable caption {
 }
 table.bCalendarTable {
 	border: solid 1px #ccc;
-	border-collapse: separate; 
+	border-collapse: separate;
 }
 table.bCalendarTable a {
 	color: #06a3c4;

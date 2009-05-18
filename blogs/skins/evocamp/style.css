@@ -6,7 +6,8 @@
 
 @import url("../../rsc/css/basic.css");	/* Import basic styles */
 @import url("../../rsc/css/img.css");	/* Import standard image styles */
-@import url("../../rsc/css/blog_elements.css");	/* Import standard blog elements styles */
+@import url("../../rsc/css/blog_default.css");	/* Import default blog navigation styles */
+@import url("item.css");	/* Import blog content styles */
 @import url("../../rsc/css/forms.css");	/* Import default form styles */
 @import url("../../rsc/css/comments.css");	/* Import default comment styles */
 
@@ -369,36 +370,6 @@ list-style-type: none;
 list-style-type:none;
 background: url(img/zekebullet.gif) 0 4px no-repeat;
 padding: 0 0 2px 14px;
-}
-
-p {
-margin-top: 0px;
-margin-bottom: 15px;
-}
-
-acronym, abbr, span.caps {
-cursor: help;
-}
-
-acronym, abbr {
-border-bottom: 1px dotted #999;
-}
-
-* html acronym, abbr {
-border-bottom: 1px dashed #999;
-}
-
-blockquote {
-border-left:5px solid #330000;
-padding-left:5px;
-}
-
-.center {
-text-align: center;
-}
-
-a img, img a {
-border: none;
 }
 
 

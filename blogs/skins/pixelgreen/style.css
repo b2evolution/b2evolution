@@ -8,7 +8,8 @@
  *******************************************/
  @import url("../../rsc/css/basic.css");	/* Import basic styles */
  @import url("../../rsc/css/img.css");	/* Import standard image styles */
- @import url("../../rsc/css/blog_elements.css");	/* Import standard blog elements styles */
+@import url("../../rsc/css/blog_base.css");	/* Default styles for the blog navigation */
+@import url("../../rsc/css/item_base.css");	/* Default styles for the post CONTENT */
  @import url("../../rsc/css/forms.css");	/* Import default form styles */
  @import url("../../rsc/css/comments.css");	/* Import default comment styles */
 

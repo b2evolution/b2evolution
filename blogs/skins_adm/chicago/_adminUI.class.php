@@ -42,13 +42,12 @@ require_once dirname(__FILE__).'/../_adminUI_general.class.php';
 class AdminUI extends AdminUI_general
 {
 	/**
-	 * Display doctype + <head>...</head> section
+	 * This function should init the templates - like adding Javascript through the {@link add_headline()} method.
 	 */
-	function disp_html_head()
+	function init_templates()
 	{
+		// This is included before controller specifc require_css() calls:
 		require_css( 'skins_adm/chicago/rsc/css/chicago.css', true );
-
-		parent::disp_html_head();
 	}
 
 
@@ -383,6 +382,11 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.19  2009/05/18 02:59:16  fplanque
+ * Skins can now have an item.css file to specify content formats. Used in TinyMCE.
+ * Note there are temporarily too many CSS files.
+ * Two ways of solving is: smart resource bundles and/or merge files that have only marginal benefit in being separate
+ *
  * Revision 1.18  2009/04/13 20:51:03  fplanque
  * long overdue cleanup of "no results" display: putting filter sback in right position
  *

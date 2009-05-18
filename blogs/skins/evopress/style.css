@@ -6,7 +6,8 @@
 
 @import url("../../rsc/css/basic.css");	/* Import basic styles */
 @import url("../../rsc/css/img.css");	/* Import standard image styles */
-@import url("../../rsc/css/blog_elements.css");	/* Import standard blog elements styles */
+@import url("../../rsc/css/blog_default.css");	/* Import default blog navigation styles */
+@import url("item.css");	/* Import blog content styles */
 @import url("../../rsc/css/forms.css");	/* Import default form styles */
 @import url("../../rsc/css/comments.css");	/* Import default comment styles */
 
@@ -67,12 +68,6 @@ border-bottom: 1px solid #ddd;
 #footer {
 background: url('img/kubrickfooter.jpg') no-repeat bottom;
 border: none;
-}
-
-small {
-font-family: Arial, Helvetica, Sans-Serif;
-font-size: 0.9em;
-line-height: 1.5em;
 }
 
 h1, h2, h3 {
@@ -151,18 +146,8 @@ font-weight: normal;
 font: 1em 'Lucida Grande', Verdana, Arial, Sans-Serif;
 }
 
-small, #sidebar ul ul li, #sidebar ul ol li, .nocomments, .postmetadata, blockquote, strike {
+#sidebar ul ul li, #sidebar ul ol li, .nocomments, .postmetadata {
 color: #777;
-}
-
-code {
-font: 1.1em 'Courier New', Courier, Fixed;
-}
-
-acronym, abbr, span.caps
-{
-font-size: 0.9em;
-letter-spacing: .07em;
 }
 
 a, h2 a:hover, h3 a:hover {
@@ -367,38 +352,6 @@ float: left
 /* End Images */
 
 
-
-/* Begin Lists
-
-Special stylized non-IE bullets
-Do not work in Internet Explorer, which merely default to normal bullets. */
-
-html>body .bText ul {
-margin-left: 0px;
-padding: 0 0 0 30px;
-list-style: none;
-padding-left: 10px;
-text-indent: -10px;
-}
-
-html>body .bText li {
-margin: 7px 0 8px 10px;
-}
-
-.bText ul li:before, #sidebar ul ul li:before {
-content: "\00BB \0020";
-}
-
-.bText ol {
-padding: 0 0 0 35px;
-margin: 0;
-}
-
-.bText ol li {
-margin: 0;
-padding: 0;
-}
-
 .postmetadata ul, .postmetadata li {
 display: inline;
 list-style-type: none;
@@ -428,16 +381,10 @@ margin: 5px 0 0 10px;
 margin: 0 0 0 10px;
 }
 
-ol li, #sidebar ul ol li {
-list-style: decimal outside;
-}
-
 #sidebar ul ul li, #sidebar ul ol li {
 margin: 3px 0 0;
 padding: 0;
 }
-/* End bText Lists */
-
 
 
 
@@ -482,36 +429,11 @@ padding: 2px;
 
 
 /* Begin Various Tags & Classes */
-acronym, abbr, span.caps {
-cursor: help;
-}
-
-acronym, abbr {
-border-bottom: 1px dashed #999;
-}
-
-blockquote {
-margin: 15px 30px 0 10px;
-padding-left: 20px;
-border-left: 5px solid #ddd;
-}
-
-blockquote cite {
-margin: 5px 0 0;
-display: block;
-}
-
-.center {
-text-align: center;
-}
 
 hr {
 display: none;
 }
 
-a img {
-border: none;
-}
 
 .navigation {
 display: block;

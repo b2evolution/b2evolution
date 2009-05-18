@@ -1,0 +1,101 @@
+/**
+ * These are the generic styles that are common to "all" skins.
+ *
+ * This is for the blog NAVIGATION and global page layout. See item_base.css for the post CONTENT styles.
+ *
+ * Override this with style.css in your skin folder.
+ */
+
+table.prevnext_post {
+	width: 95%;
+	margin: 0 auto;
+}
+table.prevnext_post a {
+	text-decoration: none;
+}
+
+div.featured_post {
+	border: 1px solid #ccc;
+	padding: 14px;
+	margin: 1ex 0;
+}
+div.featured_post h2 {
+	margin-top: 6px;
+}
+
+a.permalink_right
+{
+	float: right;
+	border: 0px;
+	margin: 0 0 0 1em;
+}
+
+p.baseline a.contact_link,
+a.contact_link {
+	text-decoration: underline;
+}
+
+/* Calendar: */
+table.bCalendarTable caption {
+	font-size: 105%;
+	font-weight: bold;
+	margin: auto;
+	padding: 3px 0;
+	white-space: nowrap;
+}
+table.bCalendarTable {
+	margin: 0 auto 1em auto;
+	font-size: 77%;
+	border-collapse: separate;
+	border-spacing: 0px;
+}
+tr.bCalendarRow {
+	text-align: center;
+}
+th.bCalendarHeaderCell {
+	color: #999;
+	font-size: 84%;
+	width: 4ex;
+}
+td.bCalendarCell,
+td.bCalendarLinkPost,
+td.bCalendarEmptyCell {
+	width: 4ex;
+	padding: 2px 0;
+}
+.bCalendarLinkPost {
+	font-weight: bold;
+}
+#bCalendarToday {
+	background-color: #f6eeee;
+	border: 1px solid #900;
+}
+
+/* TODO: not very unique IDs! (prev/next) - used in Calendar at least*/
+td#prev,
+td#next {
+	font-weight: bold;
+	font-size: 105%;
+	padding: .5ex;
+	white-space: nowrap;
+}
+td#prev a,
+td#next a {
+	padding: .5ex;
+}
+td#prev {
+	text-align:left;
+}
+td#next {
+	text-align:right;
+}
+
+
+div.powered_by {
+	margin: 16px 0;
+	text-align: center;
+}
+div.error_404,
+div.error_additional_content {
+	margin: 1em;
+}

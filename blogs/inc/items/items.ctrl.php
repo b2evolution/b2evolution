@@ -803,6 +803,21 @@ if( !empty($tab) )
 	$AdminUI->append_path_level( $tab );
 }
 
+
+// Load the appropriate ITEM/POST styles depending on the blog's skin:
+if( ! empty( $Blog->skin_ID) )
+{
+	$SkinCache = & get_Cache( 'SkinCache' );
+	/**
+	 * @var Skin
+	 */
+	$Skin = $SkinCache->get_by_ID( $Blog->skin_ID );
+	require_css( $skins_url.$Skin->folder.'/item.css' );		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
+				// else: $item_css_url = $rsc_url.'css/item_base.css';
+}
+// else item_default.css ? is it still possible to have no skin set?
+
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -961,6 +976,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.41  2009/05/18 02:59:15  fplanque
+ * Skins can now have an item.css file to specify content formats. Used in TinyMCE.
+ * Note there are temporarily too many CSS files.
+ * Two ways of solving is: smart resource bundles and/or merge files that have only marginal benefit in being separate
+ *
  * Revision 1.40  2009/03/13 03:45:02  fplanque
  * there is no bug. rollback.
  *

@@ -1,0 +1,42 @@
+/**
+ * These are the styles that are used INSIDE of a blog item/post.
+ *
+ * The skin should include this into its design,
+ * but this should ALSO be included in the backoffice when viewing/editing posts.
+ */
+
+@import url("../../rsc/css/item_base.css");	/* Import default blog elements styles */
+
+
+p {
+margin-top: 0px;
+margin-bottom: 15px;
+}
+
+acronym, abbr, span.caps {
+cursor: help;
+}
+
+acronym, abbr {
+border-bottom: 1px dotted #999;
+}
+
+* html acronym, abbr {
+border-bottom: 1px dashed #999;
+}
+
+blockquote {
+	border: none;
+	background: none;
+	border-left:5px solid #330000;
+	padding-left:5px;
+}
+
+.center {
+text-align: center;
+}
+
+a img, img a {
+border: none;
+}
+

@@ -1,0 +1,80 @@
+/*
+ * These are now the real basic styles that once used to be in basic.css
+ * These are included in basic.css but also in item_base.css so they are available in WYSIWYG editors
+ */
+
+code {
+	font-size: 107%;
+}
+.nobr,
+.nowrap,
+.line {
+	white-space: nowrap;
+}
+.left {
+	text-align: left;
+}
+.center {
+	text-align: center;
+}
+.right {
+	text-align: right;
+}
+.top {
+	vertical-align: top;
+}
+.floatleft {
+	float: left;
+}
+.floatright {
+	float: right;
+}
+.clear{
+	clear: both;
+}
+.border {
+	border: 1px solid #000;
+}
+.small {
+	font-size: 84%;
+}
+.small_details {
+	font-size: 84%;
+	color: #555;
+}
+.note,
+.notes,
+.dimmed {
+	font-size: 84%;
+	color: #999;
+	font-weight:normal;
+}
+.red {
+	color: #f00;
+}
+.green {
+	color: #0c0
+}
+acronym,
+abbr {
+	border-bottom: 1px dotted #000;
+	cursor: help;
+}
+
+del {
+	color: #999999;
+}
+ins {
+	color: #009999;
+	text-decoration: none;
+}
+
+.expanded li {
+	margin-top: 1ex;
+	margin-bottom: 1ex;
+}
+
+a.discreet {
+	text-decoration: none;
+}
+

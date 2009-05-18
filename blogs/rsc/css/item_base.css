@@ -1,0 +1,54 @@
+/**
+ * These are the default styles that are used INSIDE of a blog post.
+ * Override this with an item.css file in your skin folder.
+ *
+ * The skin should @import this into its style.css,
+ * but this is ALSO included in the backoffice when viewing/editing posts.
+ */
+
+@import url("basic_styles.css");	/* Import the REAL basic styles */
+
+blockquote {
+	border: 2px dotted #ccc;
+	background-color: #eee;
+	margin: 1em 2em;
+	padding: 0 1ex;
+}
+
+pre {
+	overflow:hidden;
+}
+
+div.codeblock {
+	background-color: #eee;
+	border: 1px dotted #aaa;
+	margin: 1ex;
+	padding: 1ex;
+	overflow: auto;
+}
+div.codeblock pre {
+	margin: 0;
+}
+
+div.videoblock {
+	text-align: center;
+	margin:auto;
+	overflow: auto;
+}
+
+div.podplayer {
+	margin: 1em 0;
+}
+
+
+.bMore {
+	text-align: left;
+}
+.bMore a {
+	font-weight: bold;
+	font-size: 110%;
+}
+
+span.NonExistentWikiWord {
+	border-bottom: 1px dotted #ccc;
+}

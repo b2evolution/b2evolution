@@ -1,4 +1,9 @@
-/* Basic styles */
+/*
+ * Obviously, this file no longer contains only basic styles.
+ * It now also contains all sorts of base styles like the toolbar and debug for backward comaptibility with older skins... :/
+ */
+
+@import url("basic_styles.css");	/* Import the REAL basic styles */
 
 body {
 	padding: 0;
@@ -6,80 +11,6 @@ body {
 }
 
 
-blockquote {
-	border: 2px dotted #ccc;
-	background-color: #eee;
-	margin: 1em 2em;
-	padding: 0 1ex;
-}
-
-acronym,
-abbr {
-	border-bottom: 1px dotted #000;
-	cursor: help;
-}
-
-del {
-	color: #999999;
-}
-ins {
-	color: #009999;
-	text-decoration: none;
-}
-code {
-	font-size: 107%;
-}
-
-
-.nobr,
-.nowrap,
-.line {
-	white-space: nowrap;
-}
-.left {
-	text-align: left;
-}
-.center {
-	text-align: center;
-}
-.right {
-	text-align: right;
-}
-.top {
-	vertical-align: top;
-}
-.floatleft {
-	float: left;
-}
-.floatright {
-	float: right;
-}
-.clear{
-	clear: both;
-}
-.border {
-	border: 1px solid #000;
-}
-.small {
-	font-size: 84%;
-}
-.small_details {
-	font-size: 84%;
-	color: #555;
-}
-.note,
-.notes,
-.dimmed {
-	font-size: 84%;
-	color: #999;
-	font-weight:normal;
-}
-.red {
-	color: #f00;
-}
-.green {
-	color: #0c0
-}
 .shrinkwrap {
 	width: 1%;
 	white-space:nowrap;
@@ -96,19 +27,10 @@ code {
 	white-space: nowrap;
 }
 
-a.discrete {
-	text-decoration: none;
-}
 a.selected {
 	font-weight: bold;
 }
 
-ul.expanded li,
-ol.expanded li
-{
-	margin-top: 2ex;
-	margin-bottom: 2ex;
-}
 
 
 /*

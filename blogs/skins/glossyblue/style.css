@@ -1,4 +1,4 @@
-/*  
+/*
 Theme Name: GlossyBlue
 Theme URI: http://www.ndesign-studio.com
 Description: glossy theme designed by <a href="http://www.ndesign-studio.com">N.Design Studio</a>.
@@ -17,7 +17,8 @@ Author URI: http://www.ndesign-studio.com
 */
 @import url(../../rsc/css/basic.css);	/* Import basic styles */
 @import url(../../rsc/css/img.css);	/* Import standard image styles */
-@import url(../../rsc/css/blog_elements.css);	/* Import standard blog elements styles */
+@import url("../../rsc/css/blog_base.css");	/* Default styles for the blog navigation */
+@import url("../../rsc/css/item_base.css");	/* Default styles for the post CONTENT */
 @import url(../../rsc/css/forms.css);	/* Import default form styles */
 @import url(../../rsc/css/comments.css);	/* Import default comment styles */
 
@@ -420,7 +421,7 @@ li.widget_plugin_evo_Arch ul li{
 	padding-left: 20px !important;
 }
 /*pages widget */
-ul.list-page li, li.widget_pages li, 
+ul.list-page li, li.widget_pages li,
 li.widget_recent_entries li,
 li.widget_core_coll_page_list ul li{
 	background: url(img/mini-page.gif) no-repeat  !important;
@@ -452,7 +453,7 @@ li.widget_calendar td {
 form.search p {
 	display: inline;
 }
-#searchform .SearchField, 
+#searchform .SearchField,
 .search .SearchField {
 	border:1px solid #203346;
 	width: 135px;

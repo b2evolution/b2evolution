@@ -640,8 +640,9 @@ class tinymce_plugin extends Plugin
 	 */
 	function get_tmce_init( $edit_layout )
 	{
+		global $Blog;
 		global $Plugins;
-		global $localtimenow, $debug, $rsc_url;
+		global $localtimenow, $debug, $rsc_url, $skins_url;
 		global $UserSettings;
 
 		$tmce_plugins_array = array( 'more', 'pagebreak', 'searchreplace', 'inlinepopups', 'table', 'media', 'visualchars', 'nonbreaking', 'safari', 'fullscreen' );
@@ -773,9 +774,25 @@ class tinymce_plugin extends Plugin
 		$init_options[] = 'language : "'.$tmce_language.'"';
 		// body_class : "my_class"
 		// CSS used in the iframe/editable area: -- http://wiki.moxiecode.com/index.php/TinyMCE:Configuration/content_css
-		// note: $version may not be needed below because of automatic suffix? notrsure..
+		// note: $version may not be needed below because of automatic suffix? not sure..
 		// TODO: we don't want all of basic.css here
-		$init_options[] = 'content_css : "'.$rsc_url.'css/basic.css,'.$this->get_plugin_url().'editor.css?v='.($debug ? $localtimenow : $this->version ).'"';
+
+			// Load the appropriate ITEM/POST styles depending on the blog's skin:
+			if( ! empty( $Blog->skin_ID) )
+			{
+				$SkinCache = & get_Cache( 'SkinCache' );
+				/**
+				 * @var Skin
+				 */
+				$Skin = $SkinCache->get_by_ID( $Blog->skin_ID );
+				$item_css_url = $skins_url.$Skin->folder.'/item.css';
+				// else: $item_css_url = $rsc_url.'css/item_base.css';
+				$content_css = ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
+			}
+			// else item_default.css -- is it still possible to have no skin ?
+
+		$init_options[] = 'content_css : "'.$this->get_plugin_url().'editor.css?v='.($debug ? $localtimenow : $this->version )
+									.$content_css.'"';
 		// Generated HTML code options:
 		// do not make the path relative to "document_base_url":
 		$init_options[] = 'relative_urls : false';

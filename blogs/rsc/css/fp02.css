@@ -4,7 +4,8 @@
 @import url("forms.css");	/* Import default form styles */
 @import url("comments.css");	/* Import default comment styles */
 @import url("img.css");	/* Import standard image styles */
-@import url("blog_elements.css");	/* Import standard blog elements styles */
+@import url("blog_base.css");	/* Default styles for the blog navigation */
+@import url("item_base.css");	/* Default styles for the post CONTENT */
 
 div.main {
 	clear: both;
