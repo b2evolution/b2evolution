@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // EXTERNAL FEED PROVIDER?
 $atom_redirect = $Blog->get_setting( 'atom_redirect' );
-if ( ! empty( $atom_redirect ) && $redir == 'yes' )
+if ( ! empty( $atom_redirect ) && empty( $Chapter ) && $redir == 'yes' )
 {
 	header_redirect( $atom_redirect, 301 );
 	exit( 0 );
