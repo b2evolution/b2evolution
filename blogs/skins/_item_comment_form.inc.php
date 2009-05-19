@@ -157,7 +157,7 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	// Message field:
 	$note = '';
 	// $note = T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags));
-	$Form->textarea( 'p', $comment_content, $params['textarea_lines'], T_('Comment text'), $note, 40, 'bComment' );
+	$Form->textarea( 'p', $comment_content, $params['textarea_lines'], T_('Comment text'), $note, 80, 'bComment' );
 
 	// set b2evoCanvas for plugins
 	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "p" );</script>';
@@ -215,6 +215,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.11  2009/05/19 19:08:35  blueyed
+ * Make comment textarea wider (40 cols => 80 cols). This provides a better editing experience - most users do not have Vimperator installed to work around such a small textarea (RTE enabling is another thing) ;)
+ *
  * Revision 1.10  2009/03/08 23:57:56  fplanque
  * 2009
  *
