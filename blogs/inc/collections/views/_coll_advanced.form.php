@@ -104,7 +104,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	$Form->end_fieldset();
 
 
-	$Form->begin_fieldset( '[Deprecated] '.T_('Static file generation').' ['.T_('Admin').']' );
+	$Form->begin_fieldset( '['. T_('Deprecated'). '] '.T_('Static file generation').' ['.T_('Admin').']' );
 		$Form->text_input( 'source_file', $edited_Blog->get_setting( 'source_file' ), 25, T_('Source file'),
 												T_('.php (stub) file used to generate the static homepage.'),
 												array( 'input_prefix' => "<code>$basepath</code>", 'maxlength' => 255 ) );
@@ -181,6 +181,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.17  2009/05/19 15:40:54  waltercruz
+ * Little i18n fix
+ *
  * Revision 1.16  2009/04/24 14:03:25  waltercruz
  * Fixing the atom and rss redirect lengths
  *
