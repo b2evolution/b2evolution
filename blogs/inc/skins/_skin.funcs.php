@@ -182,7 +182,7 @@ function skin_init( $disp )
 						}
 					}
 				}
-				elseif( array_diff( $active_filters, array( 'ymdhms', 'week', 'page' ) ) == array() )
+				elseif( array_diff( $active_filters, array( 'ymdhms', 'week', 'posts', 'page' ) ) == array() ) // fp> added 'posts' 2009-05-19; can't remember why it's not in there
 				{ // This is an archive page
 					// echo 'archive page';
 					$disp_detail = 'posts-date';
@@ -194,6 +194,7 @@ function skin_init( $disp )
 				}
 				else
 				{	// Other filtered pages:
+					// pre_dump( $active_filters );
 					$disp_detail = 'posts-filtered';
 					$seo_page_type = 'Other filtered page';
 					if( $Blog->get_setting( 'filtered_noindex' ) )
@@ -629,6 +630,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.46  2009/05/19 14:34:32  fplanque
+ * Category, tag, archive and serahc page snow only display post excerpts by default. (Requires a 3.x skin; otherwise the skin will display full posts as before). This can be controlled with the ''content_mode'' param in the skin tags.
+ *
  * Revision 1.45  2009/03/23 12:19:20  tblue246
  * (temp)skin param: Allow plugin-provided skins
  *

@@ -1010,8 +1010,13 @@ class File extends DataObject
 			}
 
 			if( $image_link_to == 'original' )
+			{	// special case
+				$image_link_to = $this->get_url();
+			}
+
+			if( !empty( $image_link_to ) )
 			{
-				$img = '<a href="'.$this->get_url().'">'.$img.'</a>';
+				$img = '<a href="'.$image_link_to.'">'.$img.'</a>';
 			}
 
 			$r .= $img;
@@ -1906,6 +1911,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.33  2009/05/19 14:34:31  fplanque
+ * Category, tag, archive and serahc page snow only display post excerpts by default. (Requires a 3.x skin; otherwise the skin will display full posts as before). This can be controlled with the ''content_mode'' param in the skin tags.
+ *
  * Revision 1.32  2009/03/26 22:45:29  blueyed
  * File class: handle invalid Fileroot more gracefully, without throwing E_NOTICEs. This happened when disabling user media dirs and the avatar thingy kicked in. See http://forums.b2evolution.net/viewtopic.php?p=89531#89531
  *

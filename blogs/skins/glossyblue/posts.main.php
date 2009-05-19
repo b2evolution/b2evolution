@@ -115,11 +115,15 @@ while( $Item = & mainlist_get_item() )
 									'use_popup' => false,
 								) ); ?></span>
 	  </div>
-
 		<?php
 			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 			skin_include( '_item_content.inc.php', array(
-					'image_size'	=>	'fit-400x320',
+					'content_mode' => 'auto',	// Can be 'excerpt' or 'full'. 'auto' will auto select depending on $disp-detail
+					'content_start_excerpt' => '<div class="content_excerpt entry">',
+					'content_end_excerpt'   => '</div>',
+					'content_start_full'    => '<div class="content_full">',
+					'content_end_full'      => '</div>',
+					'image_size'	          => 'fit-400x320',
 				) );
 			// Note: You can customize the default item feedback by copying the generic
 			// /skins/_item_feedback.inc.php file into the current skin folder.

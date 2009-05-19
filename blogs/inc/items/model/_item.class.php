@@ -925,6 +925,47 @@ class Item extends ItemLight
 
 
 	/**
+	 * Display excerpt of item
+	 */
+	function excerpt( $params )
+	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'              => '<div class="excerpt">',
+				'after'               => '</div>',
+				'excerpt_before_more' => ' <span class="excerpt_more">',
+				'excerpt_after_more'  => '</span>',
+				'excerpt_more_text'   => T_('more').' &raquo;',
+				'format'              => 'htmlbody',
+				'allow_empty'         => false,						// force generation if excert empty
+				'update_db'           => true,						// update the DB id we generated an excerpt
+			), $params );
+
+		if( ! $params['allow_empty'] )
+		{	// Make sure excerpt is not empty...
+			if( $this->update_excerpt() && $params['update_db'] )
+			{	// We have updated... let's also update the DB:
+				$this->dbsave();
+			}
+		}
+
+		$r = $this->excerpt;
+
+		if( !empty($r) )
+		{
+			echo $params['before'];
+			echo format_to_output( $this->excerpt, $params['format'] );
+			if( !empty( $params['excerpt_more_text'] ) )
+			{
+				echo $params['excerpt_before_more'];
+				echo '<a href="'.$this->get_permanent_url().'">'.$params['excerpt_more_text'].'</a>';
+				echo $params['excerpt_after_more'];
+			}
+			echo $params['after'];
+		}
+	}
+
+	/**
 	 * Make sure, the pages have been obtained (and split up_ from prerendered cache.
 	 *
 	 * @param string Format, used to retrieve the matching cache; see {@link format_to_output()}
@@ -1651,7 +1692,7 @@ class Item extends ItemLight
 				'after_image' =>         '</div>',
 				'after' =>               '</div>',
 				'image_size' =>          'fit-720x500',
-				'image_link_to' =>       'original',
+				'image_link_to' =>       'original',  // Can be 'orginal' (image) or 'single' (this post)
 				'limit' =>               1000,	// Max # of images displayed
 			), $params );
 
@@ -1676,8 +1717,14 @@ class Item extends ItemLight
 				// fp> TODO: maybe this property should be stored in link_ltype_ID
 				continue;
 			}
+
+			$link_to = $params['image_link_to']; // Can be 'orginal' (image) or 'single' (this post)
+			if( $link_to == 'single' )
+			{
+				$link_to = $this->get_permanent_url( $link_to );
+			}
 			// Generate the IMG tag with all the alt, title and desc if available
-			$r .= $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $params['image_link_to'] );
+			$r .= $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $link_to );
 		}
 
 		if( !empty($r) )
@@ -3086,17 +3133,28 @@ class Item extends ItemLight
 	 *
 	 * @todo have a maxlength param for excerpts in blog properties
 	 * @todo crop at word boundary, maybe even sentence boundary.
+	 *
+	 * @return boolean true if excerpt has been changed
 	 */
-	function update_excerpt()
+	function update_excerpt( $crop_length = 254, $suffix = '&hellip;' )
 	{
 		if( empty($this->excerpt) )
 		{
-			$excerpt =  substr( strip_tags($this->content), 0, 100 );
+			$stripped_content = trim(strip_tags($this->content));
+			$excerpt = trim( substr( $stripped_content, 0, $crop_length ) );
 			if( !empty($excerpt) )
 			{	// We finally have something to act as an excerpt...
+				if( strlen( $excerpt ) < strlen( $stripped_content ) )
+				{	// If excepr shorter than original content, add suffix:
+					$excerpt .= $suffix;
+				}
+
 				$this->set( 'excerpt', $excerpt );
+				return true;
 			}
 		}
+
+		return false;
 	}
 
 
@@ -3717,6 +3775,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.94  2009/05/19 14:34:31  fplanque
+ * Category, tag, archive and serahc page snow only display post excerpts by default. (Requires a 3.x skin; otherwise the skin will display full posts as before). This can be controlled with the ''content_mode'' param in the skin tags.
+ *
  * Revision 1.93  2009/05/17 19:51:10  fplanque
  * minor/doc
  *

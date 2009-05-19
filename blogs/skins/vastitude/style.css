@@ -118,8 +118,8 @@ a img {border:0px; vertical-align:middle;}
 div.head {padding-bottom:5px;}
 div.bSmallHead {font-size:0.9em; margin:-5px 0 15px 0;}
 div.bSmallHead img {padding-bottom:2px;}
-div.bSmallPrint {font-size:0.8em;margin-bottom:20px;padding:20px 0 5px; border-bottom:1px solid #9e7d55;float:left;}
-html>body div.bSmallPrint {margin-bottom:30px;padding-bottom:5px;float:left;}
+div.bSmallPrint {font-size:0.8em;margin-bottom:20px;padding:20px 0 5px; border-bottom:1px solid #9e7d55;}
+html>body div.bSmallPrint {margin-bottom:30px;padding-bottom:5px;}
 div.bSmallPrint a img {margin-bottom:0px;margin-right:4px;}
 a.permalink_right {float:right;}
 

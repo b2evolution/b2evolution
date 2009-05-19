@@ -210,7 +210,8 @@ skin_include( '_html_header.inc.php' );
 			<?php
 				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 				skin_include( '_item_content.inc.php', array(
-						'image_size'	=>	'',
+						'content_mode'           => 'full', // We want regular "full" content, even in category browsing: i-e no except or thumbnail
+						'image_size'	           =>	'',
 						'url_link_text_template' => '', // link will be displayed (except player if podcast)
 					) );
 				// Note: You can customize the default item feedback by copying the generic

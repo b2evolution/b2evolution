@@ -161,6 +161,8 @@ skin_include( '_html_header.inc.php' );
 					<?php
 						// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 						skin_include( '_item_content.inc.php', array(
+								'excerpt_before_text' => '<div class="excerpt"><p>',
+								'excerpt_after_text'  => '</p></div>',
 								'image_size'	=>	'fit-400x320',
 							) );
 						// Note: You can customize the default item feedback by copying the generic

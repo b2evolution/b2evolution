@@ -226,10 +226,6 @@ display: block;
 margin: 0;
 }
 
-.narrowcolumn .postmetadata {
-padding-top: 5px;
-}
-
 .widecolumn .postmetadata {
 margin: 30px 0;
 }
@@ -254,6 +250,7 @@ clear: left;
 	clear: both;
 	text-align: center;
 	color: #777;
+	margin: 1ex 0;
 }
 
 #footer {

@@ -212,7 +212,8 @@ while( $Item = & mainlist_get_item() )
 		<?php
 			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 			skin_include( '_item_content.inc.php', array(
-					'image_size'	=>	'fit-400x320',
+					'content_mode' => 'auto',	// Can be 'excerpt' or 'full'. 'auto' will auto select depending on $disp-detail
+					'image_size'	 =>	'fit-400x320',
 				) );
 			// Note: You can customize the default item feedback by copying the generic
 			// /skins/_item_feedback.inc.php file into the current skin folder.
