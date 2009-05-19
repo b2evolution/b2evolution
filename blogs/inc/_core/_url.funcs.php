@@ -239,9 +239,6 @@ function get_allowed_uri_schemes( $context = 'posting' )
 /**
  * Get the last HTTP status code received by the HTTP/HTTPS wrapper of PHP.
  *
- * @internal Tblue> The $http_response_header array seems only to be only
- *                  available in the same scope as the (e. g.) fopen() call?!
- * 
  * @param array The $http_response_header array (by reference).
  * @return integer|boolean False if no HTTP status header could be found,
  *                         the HTTP status code otherwise.
@@ -730,6 +727,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.33  2009/05/19 19:19:59  blueyed
+ * doc. yes. ;)
+ *
  * Revision 1.32  2009/05/05 19:00:30  tblue246
  * More error checking...
  *
