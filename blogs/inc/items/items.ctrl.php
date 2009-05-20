@@ -478,6 +478,10 @@ switch( $action )
 		if( $edited_Item->status == 'published' )
 		{	// fp> I noticed that after publishing a new post, I always want to see how the blog looks like
 		  // If anyone doesn't want that, we can make this optional...
+		  /* Tblue> This gets annoying if you want to edit multiple (already
+					published) posts in a row... Maybe we shouldn't redirect
+					to the blog when we're updating a post which is already
+					published? */
 			$edited_Item->load_Blog();
 		  $redirect_to = $edited_Item->Blog->gen_blogurl();
 		}
@@ -999,6 +1003,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.44  2009/05/20 17:55:13  tblue246
+ * Comment about "redirect to blog after post has been published"
+ *
  * Revision 1.43  2009/05/20 14:12:25  fplanque
  * The blog is now always displayed after publishign a post.
  *
