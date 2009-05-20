@@ -166,7 +166,7 @@ $search_engines = array(
  */
 $user_agents = array(
 	// Robots:
-	array('robot', 'Googlebot/', 'Google (Googlebot)' ), // sam2kb> Should we remove the slash here? There are also "Googlebot-Image", "Googlebot-Mobile", "Googlebot-Sitemaps"
+	array('robot', 'Googlebot', 'Google (Googlebot)' ), // removed slash in order to also match "Googlebot-Image", "Googlebot-Mobile", "Googlebot-Sitemaps"
 	array('robot', 'Slurp/', 'Inktomi (Slurp)' ),
 	array('robot', 'Yahoo! Slurp;', 'Yahoo (Slurp)' ),
 	array('robot', 'msnbot/', 'MSN Search (msnbot)' ),
