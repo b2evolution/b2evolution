@@ -50,7 +50,7 @@ function skin_init( $disp )
 	global $robots_index;
 	global $seo_page_type;
 
-	global $redir, $ReqHost, $ReqURI;
+	global $redir, $ReqHost, $ReqURI, $m, $w;
 
 	global $Chapter;
 	global $Debuglog;
@@ -242,6 +242,24 @@ function skin_init( $disp )
 					// echo 'archive page';
 					$disp_detail = 'posts-date';
 					$seo_page_type = 'Date archive page';
+
+					if( ($Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
+							|| $Blog->get_setting( 'relcanonical_archive_urls' ) )
+					{ // Check if the URL was canonical:
+						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w );
+						if( ! is_same_url($ReqHost.$ReqURI, $canonical_url) )
+						{
+							if( $Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
+							{	// REDIRECT TO THE CANONICAL URL:
+								header_redirect( $canonical_url, true );
+							}
+							else
+							{	// Use rel="canoncial":
+								add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
+							}
+						}
+					}
+
 					if( $Blog->get_setting( 'archive_noindex' ) )
 					{	// We prefer robots not to index archive pages:
 						$robots_index = false;
@@ -702,6 +720,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.48  2009/05/20 18:27:09  fplanque
+ * canonical support for date archives
+ *
  * Revision 1.47  2009/05/20 12:58:17  fplanque
  * Homepage: option to 301 redirect to canonical homepage.
  * Option to support rel="canonical" instead of or when 301 redirect cannot be used.

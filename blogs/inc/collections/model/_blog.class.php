@@ -463,6 +463,8 @@ class Blog extends DataObject
 			$this->set_setting( 'relcanonical_homepage',  param( 'relcanonical_homepage', 'integer', 0 ) );
 			$this->set_setting( 'canonical_item_urls',  param( 'canonical_item_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_item_urls',  param( 'relcanonical_item_urls', 'integer', 0 ) );
+			$this->set_setting( 'canonical_archive_urls',  param( 'canonical_archive_urls', 'integer', 0 ) );
+			$this->set_setting( 'relcanonical_archive_urls',  param( 'relcanonical_archive_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_cat_urls',  param( 'canonical_cat_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_cat_urls',  param( 'relcanonical_cat_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_tag_urls',  param( 'canonical_tag_urls', 'integer', 0 ) );
@@ -838,6 +840,8 @@ class Blog extends DataObject
 				$this->set_setting( 'relcanonical_homepage', 1 );
 				$this->set_setting( 'canonical_item_urls', 1 );
 				$this->set_setting( 'relcanonical_item_urls', 1 );
+				$this->set_setting( 'canonical_archive_urls', 1 );
+				$this->set_setting( 'relcanonical_archive_urls', 1 );
 				$this->set_setting( 'canonical_cat_urls', 1 );
 				$this->set_setting( 'relcanonical_cat_urls', 1 );
 				$this->set_setting( 'canonical_tag_urls', 1 );
@@ -878,6 +882,8 @@ class Blog extends DataObject
 				$this->set_setting( 'relcanonical_homepage', 1 );
 				$this->set_setting( 'canonical_item_urls', 1 );
 				$this->set_setting( 'relcanonical_item_urls', 1 );
+				$this->set_setting( 'canonical_archive_urls', 1 );
+				$this->set_setting( 'relcanonical_archive_urls', 1 );
 				$this->set_setting( 'canonical_cat_urls', 1 );
 				$this->set_setting( 'relcanonical_cat_urls', 1 );
 				$this->set_setting( 'canonical_tag_urls', 1 );
@@ -918,6 +924,8 @@ class Blog extends DataObject
 				$this->set_setting( 'relcanonical_homepage', 1 );
 				$this->set_setting( 'canonical_item_urls', 1 );
 				$this->set_setting( 'relcanonical_item_urls', 1 );
+				$this->set_setting( 'canonical_archive_urls', 1 );
+				$this->set_setting( 'relcanonical_archive_urls', 1 );
 				$this->set_setting( 'canonical_cat_urls', 1 );
 				$this->set_setting( 'relcanonical_cat_urls', 1 );
 				$this->set_setting( 'canonical_tag_urls', 1 );
@@ -958,6 +966,8 @@ class Blog extends DataObject
 				$this->set_setting( 'relcanonical_homepage', 1 );
 				$this->set_setting( 'canonical_item_urls', 1 );
 				$this->set_setting( 'relcanonical_item_urls', 1 );
+				$this->set_setting( 'canonical_archive_urls', 1 );
+				$this->set_setting( 'relcanonical_archive_urls', 1 );
 				$this->set_setting( 'canonical_cat_urls', 1 );
 				$this->set_setting( 'relcanonical_cat_urls', 1 );
 				$this->set_setting( 'canonical_tag_urls', 1 );
@@ -998,6 +1008,8 @@ class Blog extends DataObject
 				$this->set_setting( 'relcanonical_homepage', 1 );
 				$this->set_setting( 'canonical_item_urls', 1 );
 				$this->set_setting( 'relcanonical_item_urls', 1 );
+				$this->set_setting( 'canonical_archive_urls', 1 );
+				$this->set_setting( 'relcanonical_archive_urls', 1 );
 				$this->set_setting( 'canonical_cat_urls', 1 );
 				$this->set_setting( 'relcanonical_cat_urls', 1 );
 				$this->set_setting( 'canonical_tag_urls', 1 );
@@ -1064,7 +1076,7 @@ class Blog extends DataObject
 				$datestring .= zeroise($day,2).$separator;
 			}
 		}
-		elseif( $week !== '' )  // Note: week # can be 0 !
+		elseif( !is_null($week) && $week !== '' )  // Note: week # can be 0 !
 		{
 			if( $archive_links == 'param' )
 			{	// We reference by Query
@@ -2089,6 +2101,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.63  2009/05/20 18:27:09  fplanque
+ * canonical support for date archives
+ *
  * Revision 1.62  2009/05/20 12:58:16  fplanque
  * Homepage: option to 301 redirect to canonical homepage.
  * Option to support rel="canonical" instead of or when 301 redirect cannot be used.

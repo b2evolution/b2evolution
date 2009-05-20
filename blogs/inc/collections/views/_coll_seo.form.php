@@ -186,6 +186,11 @@ $Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_s
 								.url_add_tail( $blogurl, '<strong>/2007/12/31/</strong>' ) ),
 			), T_('Date archive URLs'), true );
 
+	$Form->checklist( array(
+		array( 'canonical_archive_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_archive_urls' ) ),
+		array( 'relcanonical_archive_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_archive_urls' ) ),
+		), 'canonical_archive_urls_options', T_('Make canonical') );
+
 	$Form->checkbox( 'archive_noindex', $edited_Blog->get_setting( 'archive_noindex' ), T_('Indexing'), T_('META NOINDEX') );
 	$Form->checkbox( 'archive_nofollowto', $edited_Blog->get_setting( 'archive_nofollowto' ), T_('Follow TO'), T_('NOFOLLOW on links to').' '.T_('date archives') );
 
@@ -334,6 +339,9 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.23  2009/05/20 18:27:09  fplanque
+ * canonical support for date archives
+ *
  * Revision 1.22  2009/05/20 12:58:17  fplanque
  * Homepage: option to 301 redirect to canonical homepage.
  * Option to support rel="canonical" instead of or when 301 redirect cannot be used.

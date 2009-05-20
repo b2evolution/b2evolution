@@ -72,6 +72,8 @@ class CollectionSettings extends AbstractSettings
 
 			'archive_mode'   => 'monthly',			// monthly, weekly, daily, postbypost
 			'archive_links'  => 'extrapath',		// param, extrapath
+			'canonical_archive_urls' => 1,					// Redirect archives to their canonical URL?
+			'relcanonical_archive_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'archive_posts_per_page' => '100',
 			'archive_noindex' => '1',						// META NOINDEX on Archive pages
 			'archive_nofollowto' => '0',        // NOFOLLOW on links to archive pages
@@ -148,6 +150,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.32  2009/05/20 18:27:09  fplanque
+ * canonical support for date archives
+ *
  * Revision 1.31  2009/05/20 12:58:17  fplanque
  * Homepage: option to 301 redirect to canonical homepage.
  * Option to support rel="canonical" instead of or when 301 redirect cannot be used.
