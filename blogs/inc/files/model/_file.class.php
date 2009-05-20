@@ -1033,8 +1033,8 @@ class File extends DataObject
 		else
 		{	// Make an A HREF link:
 			$r = '<a href="'.$this->get_url()
-						.'" title="'.$this->dget('desc', 'htmlattr').'">'
-						.$this->dget('title').'</a>';
+						.'"'.( $this->get('desc') ? ' title="'.$this->dget('desc', 'htmlattr') : '' ).'">'
+						.( $this->get('title') ? $this->dget('title') : T_( 'attached file' ) ).'</a>';
 		}
 
 		return $r;
@@ -1911,6 +1911,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.34  2009/05/20 17:26:22  yabs
+ * minor bug fixes
+ *
  * Revision 1.33  2009/05/19 14:34:31  fplanque
  * Category, tag, archive and serahc page snow only display post excerpts by default. (Requires a 3.x skin; otherwise the skin will display full posts as before). This can be controlled with the ''content_mode'' param in the skin tags.
  *
