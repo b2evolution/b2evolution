@@ -166,7 +166,7 @@ $search_engines = array(
  */
 $user_agents = array(
 	// Robots:
-	array('robot', 'Googlebot/', 'Google (Googlebot)' ),
+	array('robot', 'Googlebot/', 'Google (Googlebot)' ), // sam2kb> Should we remove the slash here? There are also "Googlebot-Image", "Googlebot-Mobile", "Googlebot-Sitemaps"
 	array('robot', 'Slurp/', 'Inktomi (Slurp)' ),
 	array('robot', 'Yahoo! Slurp;', 'Yahoo (Slurp)' ),
 	array('robot', 'msnbot/', 'MSN Search (msnbot)' ),
@@ -183,7 +183,8 @@ $user_agents = array(
 	array('robot', 'Bitacle bot/', 'Bitacle' ),
 	array('robot', 'Sphere Scout', 'Sphere Scout' ),
 	array('robot', 'Gigabot/', 'Gigablast (Gigabot)' ),
-	array('robot', 'Yandex', 'Yandex' ),
+	array('robot', 'Yandex/', 'Yandex' ),
+	array('robot', 'Mail.Ru/', 'Mail.Ru' ),
 	// Unknown robots:
 	array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:
