@@ -121,6 +121,11 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Main page / post list').get_manual_link('main_page_seo') );
 	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Default blog page'), T_('META NOINDEX') );
+	$Form->checklist( array(
+		array( 'canonical_homepage', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_homepage' ) ),
+		array( 'relcanonical_homepage', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_homepage' ) ),
+		), 'canonical_homepage_options', T_('Make canonical') );
+
 	$Form->checkbox( 'paged_noindex', $edited_Blog->get_setting( 'paged_noindex' ), T_('"Next" blog pages'), T_('META NOINDEX').' - '.T_('Page 2,3,4...') );
 	$Form->checkbox( 'paged_nofollowto', $edited_Blog->get_setting( 'paged_nofollowto' ), '', T_('NOFOLLOW on links to').' '.T_('Page 2,3,4...') );
 
@@ -161,8 +166,10 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 								.url_add_tail( $blogurl, '<strong>/cat/subcat/post-title</strong>' ) ),
 			), T_('Permalink scheme'), true );
 
-	$Form->checkbox( 'canonical_item_urls', $edited_Blog->get_setting( 'canonical_item_urls' ),
-			T_('Make canonical'), T_('301 redirect to canonical URL') );
+	$Form->checklist( array(
+		array( 'canonical_item_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_item_urls' ) ),
+		array( 'relcanonical_item_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_item_urls' ) ),
+		), 'canonical_item_urls_options', T_('Make canonical') );
 
 	$Form->checkbox( 'excerpts_meta_description', $edited_Blog->get_setting( 'excerpts_meta_description' ),
 			T_('Meta description'), T_('Use excerpt as meta description for posts and pages') );
@@ -217,7 +224,10 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo'
 		<?php
 		}
 
-	$Form->checkbox( 'canonical_cat_urls', $edited_Blog->get_setting( 'canonical_cat_urls' ), T_('Make canonical'), T_('301 redirect to canonical URL') );
+	$Form->checklist( array(
+		array( 'canonical_cat_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_cat_urls' ) ),
+		array( 'relcanonical_cat_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_cat_urls' ) ),
+		), 'canonical_cat_urls_options', T_('Make canonical') );
 
 	$Form->checkbox( 'chapter_noindex', $edited_Blog->get_setting( 'chapter_noindex' ), T_('Indexing'), T_('META NOINDEX') );
 
@@ -252,7 +262,10 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo'), array('
 	$Form->checkbox( 'tag_rel_attrib', $edited_Blog->get_setting( 'tag_rel_attrib' ), T_('Rel attribute'),
 		sprintf( T_('Add <a %s>rel="tag" attribute</a> to tag links.'), 'href="http://microformats.org/wiki/rel-tag"' ) );
 
-	$Form->checkbox( 'canonical_tag_urls', $edited_Blog->get_setting( 'canonical_tag_urls' ), T_('Make canonical'), T_('301 redirect to canonical URL') );
+	$Form->checklist( array(
+		array( 'canonical_tag_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_tag_urls' ) ),
+		array( 'relcanonical_tag_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_tag_urls' ) ),
+		), 'canonical_tag_urls_options', T_('Make canonical') );
 
 	$Form->checkbox( 'tag_noindex', $edited_Blog->get_setting( 'tag_noindex' ), T_('Indexing'), T_('META NOINDEX') );
 
@@ -321,6 +334,10 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.22  2009/05/20 12:58:17  fplanque
+ * Homepage: option to 301 redirect to canonical homepage.
+ * Option to support rel="canonical" instead of or when 301 redirect cannot be used.
+ *
  * Revision 1.21  2009/05/17 19:51:10  fplanque
  * minor/doc
  *

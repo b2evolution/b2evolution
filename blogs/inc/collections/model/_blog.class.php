@@ -459,9 +459,14 @@ class Blog extends DataObject
 
 		if( in_array( 'seo', $groups ) )
 		{ // we want to load the workflow checkboxes:
+			$this->set_setting( 'canonical_homepage',  param( 'canonical_homepage', 'integer', 0 ) );
+			$this->set_setting( 'relcanonical_homepage',  param( 'relcanonical_homepage', 'integer', 0 ) );
 			$this->set_setting( 'canonical_item_urls',  param( 'canonical_item_urls', 'integer', 0 ) );
+			$this->set_setting( 'relcanonical_item_urls',  param( 'relcanonical_item_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_cat_urls',  param( 'canonical_cat_urls', 'integer', 0 ) );
+			$this->set_setting( 'relcanonical_cat_urls',  param( 'relcanonical_cat_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_tag_urls',  param( 'canonical_tag_urls', 'integer', 0 ) );
+			$this->set_setting( 'relcanonical_tag_urls',  param( 'relcanonical_tag_urls', 'integer', 0 ) );
 			$this->set_setting( 'default_noindex',  param( 'default_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_noindex',  param( 'paged_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_nofollowto',  param( 'paged_nofollowto', 'integer', 0 ) );
@@ -829,9 +834,14 @@ class Blog extends DataObject
 				$this->set_setting( 'tag_links', 'colon' );
 				$this->set_setting( 'single_links', 'ymd' );
 
+				$this->set_setting( 'canonical_homepage', 1 );
+				$this->set_setting( 'relcanonical_homepage', 1 );
 				$this->set_setting( 'canonical_item_urls', 1 );
+				$this->set_setting( 'relcanonical_item_urls', 1 );
 				$this->set_setting( 'canonical_cat_urls', 1 );
+				$this->set_setting( 'relcanonical_cat_urls', 1 );
 				$this->set_setting( 'canonical_tag_urls', 1 );
+				$this->set_setting( 'relcanonical_tag_urls', 1 );
 
 				$this->set_setting( 'category_prefix', '' );
 				$this->set_setting( 'tag_prefix', '' );
@@ -864,9 +874,14 @@ class Blog extends DataObject
 				$this->set_setting( 'tag_links', 'colon' );
 				$this->set_setting( 'single_links', 'short' );
 
+				$this->set_setting( 'canonical_homepage', 1 );
+				$this->set_setting( 'relcanonical_homepage', 1 );
 				$this->set_setting( 'canonical_item_urls', 1 );
+				$this->set_setting( 'relcanonical_item_urls', 1 );
 				$this->set_setting( 'canonical_cat_urls', 1 );
+				$this->set_setting( 'relcanonical_cat_urls', 1 );
 				$this->set_setting( 'canonical_tag_urls', 1 );
+				$this->set_setting( 'relcanonical_tag_urls', 1 );
 
 				$this->set_setting( 'category_prefix', '' );
 				$this->set_setting( 'tag_prefix', '' );
@@ -899,9 +914,14 @@ class Blog extends DataObject
 				$this->set_setting( 'tag_links', 'colon' );
 				$this->set_setting( 'single_links', 'chapters' );
 
+				$this->set_setting( 'canonical_homepage', 1 );
+				$this->set_setting( 'relcanonical_homepage', 1 );
 				$this->set_setting( 'canonical_item_urls', 1 );
+				$this->set_setting( 'relcanonical_item_urls', 1 );
 				$this->set_setting( 'canonical_cat_urls', 1 );
+				$this->set_setting( 'relcanonical_cat_urls', 1 );
 				$this->set_setting( 'canonical_tag_urls', 1 );
+				$this->set_setting( 'relcanonical_tag_urls', 1 );
 
 				$this->set_setting( 'category_prefix', '' );
 				$this->set_setting( 'tag_prefix', '' );
@@ -934,9 +954,14 @@ class Blog extends DataObject
 				$this->set_setting( 'tag_links', 'colon' );
 				$this->set_setting( 'single_links', 'short' );
 
+				$this->set_setting( 'canonical_homepage', 1 );
+				$this->set_setting( 'relcanonical_homepage', 1 );
 				$this->set_setting( 'canonical_item_urls', 1 );
+				$this->set_setting( 'relcanonical_item_urls', 1 );
 				$this->set_setting( 'canonical_cat_urls', 1 );
+				$this->set_setting( 'relcanonical_cat_urls', 1 );
 				$this->set_setting( 'canonical_tag_urls', 1 );
+				$this->set_setting( 'relcanonical_tag_urls', 1 );
 
 				$this->set_setting( 'category_prefix', '' );
 				$this->set_setting( 'tag_prefix', '' );
@@ -969,9 +994,14 @@ class Blog extends DataObject
 				$this->set_setting( 'tag_links', 'colon' );
 				$this->set_setting( 'single_links', 'chapters' );
 
+				$this->set_setting( 'canonical_homepage', 1 );
+				$this->set_setting( 'relcanonical_homepage', 1 );
 				$this->set_setting( 'canonical_item_urls', 1 );
+				$this->set_setting( 'relcanonical_item_urls', 1 );
 				$this->set_setting( 'canonical_cat_urls', 1 );
+				$this->set_setting( 'relcanonical_cat_urls', 1 );
 				$this->set_setting( 'canonical_tag_urls', 1 );
+				$this->set_setting( 'relcanonical_tag_urls', 1 );
 
 				$this->set_setting( 'category_prefix', 'category' );
 				$this->set_setting( 'tag_prefix', 'tag' );
@@ -2059,6 +2089,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.62  2009/05/20 12:58:16  fplanque
+ * Homepage: option to 301 redirect to canonical homepage.
+ * Option to support rel="canonical" instead of or when 301 redirect cannot be used.
+ *
  * Revision 1.61  2009/05/17 19:51:10  fplanque
  * minor/doc
  *

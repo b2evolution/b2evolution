@@ -415,38 +415,9 @@ elseif( $disp == 'posts' && !empty($Item) )
 		$disp = 'single';
 	}
 
-	if( $redir == 'yes' )
-	{ // $redir=no here allows to force a 'single post' URL for commenting
-
-		// Check if the post has 'redirected' status:
-		if( $Item->status == 'redirected' )
-		{	// Redirect to the URL specified in the post:
-			$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'].' );
-			header_redirect( $Item->url, true );
-		}
-
-		// Check if we want to redirect to a canonical URL for the post
-		// Please document encountered problems.
-		if( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
-		{	// We want to redirect to the Item's canonical URL:
-
-			$canonical_url = $Item->get_permanent_url( '', '', '&' );
-
-			// fp> why are we cropping params?
-			$requested_crop = preg_replace( '¤\?.*$¤', '', $ReqHost.$ReqURI );
-			$canonical_crop = preg_replace( '¤\?.*$¤', '', $canonical_url );
-			// pre_dump( '', $requested_crop, $canonical_crop );
-
-			if( ! is_same_url($requested_crop, $canonical_crop) )
-			{	// The requested URL does not look like the canonical URL for this post,
-				// REDIRECT TO THE CANONICAL URL:
-				// fp> TODO: we might be losing additional params, it would be better to keep them... (but we have redir=no for that)
-				$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].' );
-				header_redirect( $canonical_url, true );
-				// EXITED.
-			}
-		}
-	}
+	// fp> note: the redirecting code that was here moved to skin_init() with the other redirecting code.
+	// That feels more consistent and may also allow some skins to handle redirects differently (framing?)
+	// I hope I didn't screw that up... but it felt like the historical reasons for this to be here no longer applied.
 }
 
 
@@ -609,6 +580,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.134  2009/05/20 12:58:14  fplanque
+ * Homepage: option to 301 redirect to canonical homepage.
+ * Option to support rel="canonical" instead of or when 301 redirect cannot be used.
+ *
  * Revision 1.133  2009/05/20 12:56:34  fplanque
  * made tga-prefix-only  mode matching more strict
  *

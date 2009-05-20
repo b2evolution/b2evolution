@@ -61,6 +61,10 @@ class CollectionSettings extends AbstractSettings
 			'allow_rating'   => 'never',
 
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
+			'relcanonical_item_urls' => 1,			// If no 301, fall back to rel="canoncial" ?
+
+			'canonical_homepage' => 1,					// Redirect homepage to its canonical Url?
+			'relcanonical_homepage' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'default_noindex' => '0',						// META NOINDEX on Default blog page
 
 			'paged_noindex' => '1',							// META NOINDEX on following blog pages
@@ -73,13 +77,15 @@ class CollectionSettings extends AbstractSettings
 			'archive_nofollowto' => '0',        // NOFOLLOW on links to archive pages
 
 			'chapter_links'  => 'chapters',			// 'param_num', 'subchap', 'chapters'
-			'canonical_cat_urls' => 1,					// Redirect categories to their canonical Url?
+			'canonical_cat_urls' => 1,					// Redirect categories to their canonical URL?
+			'relcanonical_cat_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'chapter_posts_per_page' => NULL,
 			'chapter_noindex' => '1',						// META NOINDEX on Category pages
 			'category_prefix' => '',
 
 			'tag_links'  => 'colon',						// 'param', 'semicolon' -- fp> we want this changed to prefix only for new blogs only
 			'canonical_tag_urls' => 1,					// Redirect tag pages to their canonical Url?
+			'relcanonical_tag_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'tag_posts_per_page' => NULL,
 			'tag_noindex' => '1',				      	// META NOINDEX on Tag pages
 			'tag_prefix' => '',									// fp> fp> we want this changed to prefix only for new blogs only
@@ -142,6 +148,10 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.31  2009/05/20 12:58:17  fplanque
+ * Homepage: option to 301 redirect to canonical homepage.
+ * Option to support rel="canonical" instead of or when 301 redirect cannot be used.
+ *
  * Revision 1.30  2009/05/17 19:51:10  fplanque
  * minor/doc
  *

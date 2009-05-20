@@ -760,7 +760,7 @@ class Form extends Widget
 
 			//echo 'error on '.$field_name.' keep erroneous entry intact ';
 
-			$field_params['value'] = trim(substr( $field_value, 0, 10 )); // TODO: dh> why not use the real original here?! fp> AFAICR we needed to strip off the time part			
+			$field_params['value'] = trim(substr( $field_value, 0, 10 )); // TODO: dh> why not use the real original here?! fp> AFAICR we needed to strip off the time part
 		}
 		else
 		{ // Make the date value clean for display:
@@ -1450,9 +1450,9 @@ class Form extends Widget
 	 *
 	 * the two-dimension array must indicate, for each checkbox:
 	 *  - the name,
-	 *  - the value,
+	 *  - the value -- in practice this will often be just 1
 	 *  - the comment to put between <input> and <br />
-	 *  - a boolean indicating whether the box must be checked or not
+	 *  - "effective value": a boolean indicating whether the box should be checked or not on display
 	 *  - an optional boolean indicating whether the box is disabled or not
 	 *  - an optional note
 	 *  - 'required': is the box required to be checked (boolean; default: false)
@@ -2903,6 +2903,10 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.48  2009/05/20 12:58:14  fplanque
+ * Homepage: option to 301 redirect to canonical homepage.
+ * Option to support rel="canonical" instead of or when 301 redirect cannot be used.
+ *
  * Revision 1.47  2009/05/15 19:08:00  fplanque
  * doc
  *

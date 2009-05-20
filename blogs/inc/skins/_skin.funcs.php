@@ -42,6 +42,11 @@ function skin_init( $disp )
 	 */
 	global $Blog;
 
+	/**
+	 * @var Item
+	 */
+	global $Item;
+
 	global $robots_index;
 	global $seo_page_type;
 
@@ -90,15 +95,54 @@ function skin_init( $disp )
 	{
 		// CONTENT PAGES:
 		case 'single':
-			$seo_page_type = 'Single post page';
-			if( ! $MainList->result_num_rows )
-			{	// There is nothing to display for this page, don't index it!
-				$robots_index = false;
-			}
-			break;
-
 		case 'page':
-			$seo_page_type = '"Page" page';
+			if( $disp == 'single' )
+			{
+				$seo_page_type = '"Page" page';
+			}
+			else
+			{
+				$seo_page_type = 'Single post page';
+			}
+
+			// Check if the post has 'redirected' status:
+			if( $Item->status == 'redirected' && $redir == 'yes' )
+			{	// $redir=no here allows to force a 'single post' URL for commenting
+				// Redirect to the URL specified in the post:
+				$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'].' );
+				header_redirect( $Item->url, true );
+			}
+
+			// Check if we want to redirect to a canonical URL for the post
+			// Please document encountered problems.
+			if( ( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
+					|| $Blog->get_setting( 'relcanonical_item_urls' ) )
+			{	// We want to redirect to the Item's canonical URL:
+
+				$canonical_url = $Item->get_permanent_url( '', '', '&' );
+
+				// fp> why gave we been cropping params?
+				// $requested_crop = preg_replace( '¤\?.*$¤', '', $ReqHost.$ReqURI );
+				// $canonical_crop = preg_replace( '¤\?.*$¤', '', $canonical_url );
+				// pre_dump( '', $requested_crop, $canonical_crop );
+
+				// if( ! is_same_url($requested_crop, $canonical_crop) )
+				if( ! is_same_url( $ReqHost.$ReqURI, $canonical_url) )
+				{	// The requested URL does not look like the canonical URL for this post...
+					// fp> TODO: we might be losing additional params, it would be better to keep them... (but we have redir=no for that)
+					if( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
+					{	// REDIRECT TO THE CANONICAL URL:
+						$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].' );
+						header_redirect( $canonical_url, true );
+					}
+					else
+					{	// Use rel="canoncial":
+						add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
+					}
+					// EXITED.
+				}
+			}
+
 			if( ! $MainList->result_num_rows )
 			{	// There is nothing to display for this page, don't index it!
 				$robots_index = false;
@@ -137,7 +181,8 @@ function skin_init( $disp )
 						// BUT: - this can resolved to including children
 						//      - selecting exactly one cat through catsel[] is NOT OK since not equivalent (will exclude children)
 						// echo 'SINGLE CAT PAGE';
-						if( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
+						if( ( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
+							|| $Blog->get_setting( 'relcanonical_cat_urls' ) )
 						{ // Check if the URL was canonical:
 							if( !isset( $Chapter ) )
 							{
@@ -151,11 +196,16 @@ function skin_init( $disp )
 							{
 								$canonical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
 								if( ! is_same_url($ReqHost.$ReqURI, $canonical_url) )
-								{
-									// REDIRECT TO THE CANONICAL URL:
-									// fp> TODO: we're going to lose the additional params, it would be better to keep them...
+								{	// fp> TODO: we're going to lose the additional params, it would be better to keep them...
 									// fp> what additional params actually?
-									header_redirect( $canonical_url, true );
+									if( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
+									{	// REDIRECT TO THE CANONICAL URL:
+										header_redirect( $canonical_url, true );
+									}
+									else
+									{	// Use rel="canoncial":
+										add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
+									}
 								}
 							}
 						}
@@ -170,15 +220,20 @@ function skin_init( $disp )
 						$robots_index = false;
 					}
 
-					if( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
+					if( ( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
+							|| $Blog->get_setting( 'relcanonical_tag_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
 						if( ! is_same_url($ReqHost.$ReqURI, $canonical_url) )
 						{
-							// REDIRECT TO THE CANONICAL URL:
-							// fp> TODO: we're going to lose the additional params, it would be better to keep them...
-							// fp> what additional params actually?
-							header_redirect( $canonical_url, true );
+							if( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
+							{	// REDIRECT TO THE CANONICAL URL:
+								header_redirect( $canonical_url, true );
+							}
+							else
+							{	// Use rel="canoncial":
+								add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
+							}
 						}
 					}
 				}
@@ -207,6 +262,23 @@ function skin_init( $disp )
 			{	// This is the default blog page
 				$disp_detail = 'posts-default';
 				$seo_page_type = 'Default page';
+				if( ($Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
+						|| $Blog->get_setting( 'relcanonical_homepage' ) )
+				{ // Check if the URL was canonical:
+					$canonical_url = $Blog->gen_blogurl();
+					if( ! is_same_url($ReqHost.$ReqURI, $canonical_url) )
+					{
+						if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
+						{	// REDIRECT TO THE CANONICAL URL:
+							header_redirect( $canonical_url, true );
+						}
+						else
+						{	// Use rel="canoncial":
+							add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
+						}
+					}
+				}
+
 				if( $Blog->get_setting( 'default_noindex' ) )
 				{	// We prefer robots not to index archive pages:
 					$robots_index = false;
@@ -630,6 +702,10 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.47  2009/05/20 12:58:17  fplanque
+ * Homepage: option to 301 redirect to canonical homepage.
+ * Option to support rel="canonical" instead of or when 301 redirect cannot be used.
+ *
  * Revision 1.46  2009/05/19 14:34:32  fplanque
  * Category, tag, archive and serahc page snow only display post excerpts by default. (Requires a 3.x skin; otherwise the skin will display full posts as before). This can be controlled with the ''content_mode'' param in the skin tags.
  *

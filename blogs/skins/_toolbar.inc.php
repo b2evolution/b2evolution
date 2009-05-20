@@ -26,7 +26,7 @@ global $Blog;
 
 global $Settings;
 
-global $is_admin_page, $localtimenow;
+global $is_admin_page, $localtimenow, $disp_detail;
 
 /**
  * @var User
@@ -78,6 +78,11 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
 		{ // We are already in admin or we have permission to view admin options:
 			// Display evobar menu:
 			echo $topleft_Menu->get_html_menu( NULL, 'sf-menu-left' );
+
+			if( $debug )
+			{
+				echo '<div style="position:absolute;left:80ex;top:2px;color:#999">'.$disp_detail.'</div>';
+			}
 		}
  		?>
 	</ul>
