@@ -390,6 +390,14 @@ switch( $action )
 			$action = 'edit';	// It's basically as if we had updated
 			break;
 		}
+
+		if( $edited_Item->status == 'published' )
+		{	// fp> I noticed that after publishing a new post, I always want to see how the blog looks like
+		  // If anyone doesn't want that, we can make this optional...
+			$edited_Item->load_Blog();
+		  $redirect_to = $edited_Item->Blog->gen_blogurl();
+		}
+
 		// REDIRECT / EXIT
 		header_redirect( $redirect_to );
 		// Switch to list mode:
@@ -467,6 +475,13 @@ switch( $action )
 			break;
 		}
 
+		if( $edited_Item->status == 'published' )
+		{	// fp> I noticed that after publishing a new post, I always want to see how the blog looks like
+		  // If anyone doesn't want that, we can make this optional...
+			$edited_Item->load_Blog();
+		  $redirect_to = $edited_Item->Blog->gen_blogurl();
+		}
+
 		// REDIRECT / EXIT
 		header_redirect( $redirect_to );
 		// Switch to list mode:
@@ -497,6 +512,11 @@ switch( $action )
 		$edited_Item->handle_post_processing();
 
 		$Messages->add( T_('Post has been published.'), 'success' );
+
+		// fp> I noticed that after publishing a new post, I always want to see how the blog looks like
+		// If anyone doesn't want that, we can make this optional...
+		$edited_Item->load_Blog();
+		$redirect_to = $edited_Item->Blog->gen_blogurl();
 
 		// REDIRECT / EXIT
 		header_redirect( $redirect_to );
@@ -979,6 +999,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.43  2009/05/20 14:12:25  fplanque
+ * The blog is now always displayed after publishign a post.
+ *
  * Revision 1.42  2009/05/18 03:59:39  fplanque
  * minor/doc
  *
