@@ -162,11 +162,13 @@ if( $resolve_extra_path )
 			// TODO: dh> add plugin hook here, which would allow to handle path elements (name spaces in clean URLs), and to override internal functionality (e.g. handle tags in a different way).
 			// Is this a tag ("prefix-only" mode)?
 			if( $Blog->get_setting('tag_links') == 'prefix-only'
+				&& count($path_elements) == 2
 				&& $path_elements[0] == $Blog->get_setting('tag_prefix')
 				&& isset($path_elements[1]) )
 			{
 				$tag = strip_tags(urldecode($path_elements[1]));
-				// # of posts per page:
+
+				// # of posts per page for tag page:
 				if( ! $posts = $Blog->get_setting( 'tag_posts_per_page' ) )
 				{ // use blog default
 					$posts = $Blog->get_setting( 'posts_per_page' );
@@ -180,7 +182,6 @@ if( $resolve_extra_path )
 				$last_len  = strlen( $last_part );
 				if( ( $last_char == '-' && ( ! $tags_dash_fix || $last_len != 40 ) ) || $last_char == ':'|| $last_char == ';' )
 				{	// - : or ; -> We'll consider this to be a tag page
-					// Old-style tag pages, redirect:
 					$tag = substr( $last_part, 0, -1 );
 					$tag = urldecode($tag);
 					$tag = strip_tags($tag);	// security
@@ -608,6 +609,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.133  2009/05/20 12:56:34  fplanque
+ * made tga-prefix-only  mode matching more strict
+ *
  * Revision 1.132  2009/04/23 19:50:35  blueyed
  * TODO
  *
