@@ -105,7 +105,6 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 		'redirect_to' => & $redirect_to,
 	) );
 
-
 $commented_Item->get_Blog(); // Make sure Blog is loaded (will be needed wether logged in or not)
 
 if( $User )
@@ -297,7 +296,7 @@ if( $action == 'preview' )
 
 	// Passthrough comment_cookies & comment_allow_msgform params:
 	// fp> moved this down here in order to keep return URLs clean whenever this is not needed.
-	$redirect_to = url_add_param($redirect_to, 'comment_cookies='.$comment_cookies
+	$redirect_to = url_add_param($redirect_to, 'redir=no&comment_cookies='.$comment_cookies
 		.'&comment_allow_msgform='.$comment_allow_msgform, '&');
 
 	$redirect_to .= '#comment_preview';
@@ -401,6 +400,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.132  2009/05/20 13:53:34  fplanque
+ * Return to a clean url after posting a comment
+ *
  * Revision 1.131  2009/03/08 23:57:36  fplanque
  * 2009
  *

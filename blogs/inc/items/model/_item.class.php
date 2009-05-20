@@ -1815,6 +1815,23 @@ class Item extends ItemLight
 
 
 	/**
+	 * Get URL to display the post comments.
+	 *
+	 * @return string
+	 */
+	function get_feedback_url( $popup = false, $glue = '&amp;' )
+	{
+		$url = $this->get_single_url( 'auto', '', $glue );
+		if( $popup )
+		{
+			$url = url_add_param( $url, 'disp=feedback-popup', $glue );
+		}
+
+		return $url;
+	}
+
+
+	/**
 	 * Template function: Displays link to feedback page (under some conditions)
 	 *
 	 * @param array
@@ -1909,7 +1926,7 @@ class Item extends ItemLight
 
 		if( $params['url'] == '#' )
 		{ // We want a link to single post:
-			$params['url'] = $this->get_single_url( 'auto' );
+			$params['url'] = $this->get_feedback_url();
 		}
 
 		// Anchor position
@@ -3775,6 +3792,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.95  2009/05/20 13:53:49  fplanque
+ * Return to a clean url after posting a comment
+ *
  * Revision 1.94  2009/05/19 14:34:31  fplanque
  * Category, tag, archive and serahc page snow only display post excerpts by default. (Requires a 3.x skin; otherwise the skin will display full posts as before). This can be controlled with the ''content_mode'' param in the skin tags.
  *

@@ -662,7 +662,7 @@ function add_js_for_toolbar()
 {
 	if( ! is_logged_in() )
 	{ // the toolbar (blogs/skins/_toolbar.inc.php) gets only used when logged in.
-		return;
+		return false;
 	}
 
 	require_js( '#jquery#' );
@@ -679,6 +679,8 @@ function add_js_for_toolbar()
 	            speed: "fast"
 	        });
 		} )');
+
+	return true;
 }
 
 
@@ -989,6 +991,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.57  2009/05/20 13:53:45  fplanque
+ * Return to a clean url after posting a comment
+ *
  * Revision 1.56  2009/04/26 23:27:58  blueyed
  * doc
  *

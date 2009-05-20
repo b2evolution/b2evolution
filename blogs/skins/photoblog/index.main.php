@@ -23,6 +23,7 @@ if( version_compare( $app_version, '2.4.1' ) < 0 )
 // Do inits depending on current $disp:
 skin_init( $disp );
 
+require_js( 'functions.js' );	// for opening popup window (comments)
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php' );

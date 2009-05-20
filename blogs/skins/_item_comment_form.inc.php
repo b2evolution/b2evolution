@@ -97,6 +97,10 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	}
 	else
 	{
+		// Get values that may have been passed through after a preview
+		param( 'comment_cookies', 'integer', NULL );
+		param( 'comment_allow_msgform', 'integer', NULL ); // checkbox
+
 		if( is_null($comment_cookies) )
 		{ // "Remember me" checked, if remembered before:
 			$comment_cookies = isset($_COOKIE[$cookie_name]) || isset($_COOKIE[$cookie_email]) || isset($_COOKIE[$cookie_url]);
@@ -120,9 +124,11 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 			// Make sure we get back to the right page (on the right domain)
 			// fp> TODO: check if we can use the permalink instead but we must check that application wide,
 			// that is to say: check with the comments in a pop-up etc...
-			url_rel_to_same_host(regenerate_url( '', '', $Blog->get('blogurl'), '&' ), $htsrv_url)
+			// url_rel_to_same_host(regenerate_url( '', '', $Blog->get('blogurl'), '&' ), $htsrv_url)
 			// fp> what we need is a regenerate_url that will work in permalinks
-			);
+			// fp> below is a simpler approach:
+			$Item->get_feedback_url( $disp == 'feedback-popup', '&' )
+		);
 
 	if( is_logged_in() )
 	{ // User is logged in:
@@ -215,6 +221,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.12  2009/05/20 13:53:51  fplanque
+ * Return to a clean url after posting a comment
+ *
  * Revision 1.11  2009/05/19 19:08:35  blueyed
  * Make comment textarea wider (40 cols => 80 cols). This provides a better editing experience - most users do not have Vimperator installed to work around such a small textarea (RTE enabling is another thing) ;)
  *
