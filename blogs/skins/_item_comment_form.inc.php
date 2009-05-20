@@ -163,7 +163,7 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	// Message field:
 	$note = '';
 	// $note = T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags));
-	$Form->textarea( 'p', $comment_content, $params['textarea_lines'], T_('Comment text'), $note, 80, 'bComment' );
+	$Form->textarea( 'p', $comment_content, $params['textarea_lines'], T_('Comment text'), $note, 40, 'bComment' );
 
 	// set b2evoCanvas for plugins
 	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "p" );</script>';
@@ -221,6 +221,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.13  2009/05/20 13:56:57  fplanque
+ * Huh? Textarea is styled wide with CSS. On non CSS supporting browsers you don't want it to be larger than the screen might be.
+ *
  * Revision 1.12  2009/05/20 13:53:51  fplanque
  * Return to a clean url after posting a comment
  *
