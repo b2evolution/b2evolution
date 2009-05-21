@@ -1740,7 +1740,7 @@ class Item extends ItemLight
 	
 	
 	/**
-	 * Display the files linked to the current Item
+	 * Display the attachments/files linked to the current Item
 	 *
 	 * @param array Array of params
 	 * @param string Output format, see {@link format_to_output()}
@@ -1752,7 +1752,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get block of files linked to the current Item
+	 * Get block of attchements/files linked to the current Item
 	 *
 	 * @param array Array of params
 	 * @param string Output format, see {@link format_to_output()}
@@ -1767,6 +1767,7 @@ class Item extends ItemLight
 				'after_file_size' =>     '</span>',
 				'after_file' =>          '</li>',
 				'after' =>               '</ul>',
+			// fp> TODO: we should only have one limit param. Or is there a good reason for having two?
 				'limit_files' =>         1000, // Max # of files displayed
 				'limit' =>               1000, 
 			), $params );
@@ -1785,16 +1786,23 @@ class Item extends ItemLight
 		$File = NULL;
 		while( ( $File = & $FileList->get_next() ) && $params['limit_files'] > $i )
 		{
+			/* fp> I think we don't want to waste time stating files on the public interface. The admin will fix missing files :p
 			if( ! $File->exists() )
-			{
+			{	
 				global $Debuglog;
 				$Debuglog->add(sprintf('File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path()), array('error', 'files'));
 				continue;
 			}
-			if( $File->is_image() || $File->is_dir() )
-			{	// Skip images and directories
+			*/
+
+			if( $File->is_image() )
+			{	// Skip images because these are displayed inline already
+				// fp> TODO: have a setting for each linke dfile to decide whether it should be displayed inline or as an attachment
 				continue;
 			}
+			
+			// fp> note: it actually makes sense to show directories if the admin chose to link a directory
+			// it may be a convenient way to link 1000 files at once... or even a whole source code tree of folders & files... and let apache do the navigation
 
 			$r_file[$i] = $params['before_file'];
 			$r_file[$i] .= action_icon( T_('Download file'), 'download', $File->get_url(), '', 5 ).' ';
@@ -3870,6 +3878,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.98  2009/05/21 13:05:59  fplanque
+ * doc + moved attachments below post in skins
+ *
  * Revision 1.97  2009/05/21 10:37:54  tblue246
  * Minor/doc
  *

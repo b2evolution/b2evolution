@@ -45,9 +45,10 @@ $params = array_merge( array(
 		'excerpt_before_more' => ' <span class="excerpt_more">',
 		'excerpt_after_more'  => '</span>',
 		'excerpt_more_text'   => T_('more').' &raquo;',
+	// fp> todo: rename 'files' to 'attach' (as in attachments)
 		'limit_files'         => 1000,
-		'file_list_start'     => '<ul class="bFiles">',
-		'file_list_end'       => '</ul>',
+		'file_list_start'     => '<div class="attchments"><h3>'.T_('Attachments').':</h3><ul>',
+		'file_list_end'       => '</ul></div>',
 		'file_start'          => '<li>',
 		'file_end'            => '</li>',
 		'before_file_size'    => ' <span class="file_size">',
@@ -152,21 +153,6 @@ switch( $content_mode )
 					'image_size' =>          $params['image_size'],
 				) );
 		}
-		
-		
-		if( !empty($params['limit_files']) )
-		{
-			// Display files that are linked to this post:
-			$Item->files( array(
-					'before' =>              $params['file_list_start'],
-					'before_file' =>         $params['file_start'],
-					'before_file_size' =>    $params['before_file_size'],
-					'after_file_size' =>     $params['after_file_size'],
-					'after_file' =>          $params['file_end'],
-					'after' =>               $params['file_list_end'],
-					'limit_files' =>         $params['limit_files'],
-				) );
-		}
 
 		?>
 		<div class="bText">
@@ -211,11 +197,29 @@ switch( $content_mode )
 			?>
 		</div>
 		<?php
+		
+		
+		if( !empty($params['limit_files']) )
+		{	// Display attachments/files that are linked to this post:
+			$Item->files( array(
+					'before' =>              $params['file_list_start'],
+					'before_file' =>         $params['file_start'],
+					'before_file_size' =>    $params['before_file_size'],
+					'after_file_size' =>     $params['after_file_size'],
+					'after_file' =>          $params['file_end'],
+					'after' =>               $params['file_list_end'],
+					'limit_files' =>         $params['limit_files'],
+				) );
+		}
+
 		echo $params['content_end_full'];
 
 }
 /*
  * $Log$
+ * Revision 1.16  2009/05/21 13:05:59  fplanque
+ * doc + moved attachments below post in skins
+ *
  * Revision 1.15  2009/05/21 12:34:39  fplanque
  * Options to select how much content to display (excerpt|teaser|normal) on different types of pages.
  *
