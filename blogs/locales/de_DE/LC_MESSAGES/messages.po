@@ -13,14 +13,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 3.1.0-beta\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2009-04-13 16:56+0200\n"
-"PO-Revision-Date: 2009-04-15 16:34+0000\n"
+"POT-Creation-Date: 2009-05-17 20:08+0200\n"
+"PO-Revision-Date: 2009-05-21 13:00+0000\n"
 "Last-Translator: Tilman Blumenbach <Unknown>\n"
 "Language-Team: Tilman Blumenbach <tilman (at) ax86 (dot) net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-04-18 18:08+0000\n"
+"X-Launchpad-Export-Date: 2009-05-21 13:08+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: GERMANY\n"
 "X-Poedit-Language: German\n"
@@ -31,9 +31,9 @@ msgstr ""
 #: ..\..\..\a_noskin.php:231
 #: ..\..\..\inc\_core\__core.init.php:275
 #: ..\..\..\inc\_core\__core.init.php:655
-#: ..\..\..\inc\items\model\_item.funcs.php:480
+#: ..\..\..\inc\items\model\_item.funcs.php:490
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:895
-#: ..\..\..\inc\items\views\_item_list_full.view.php:190
+#: ..\..\..\inc\items\views\_item_list_full.view.php:194
 #: ..\..\..\inc\settings\views\_features.form.php:188
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:95
 #: ..\..\..\inc\widgets\widgets\_coll_common_links.widget.php:163
@@ -50,10 +50,10 @@ msgid "Categories"
 msgstr "Kategorien"
 
 #: ..\..\..\a_noskin.php:255
-#: ..\..\..\inc\items\model\_item.class.php:2566
+#: ..\..\..\inc\items\model\_item.class.php:2567
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:897
 #: ..\..\..\inc\items\views\_item_expert.form.php:226
-#: ..\..\..\inc\items\views\_item_list_full.view.php:247
+#: ..\..\..\inc\items\views\_item_list_full.view.php:251
 #: ..\..\..\inc\items\views\_item_simple.form.php:202
 #: ..\..\..\skins\asevo\index.main.php:194
 #: ..\..\..\skins\custom\index.main.php:229
@@ -85,7 +85,7 @@ msgstr "Schlagworte"
 #: ..\..\..\skins\photoblog\index.main.php:93
 #: ..\..\..\skins\photoblog\index.main.php:111
 #: ..\..\..\skins_adm\_adminUI_general.class.php:809
-#: ..\..\..\skins_adm\_adminUI_general.class.php:895
+#: ..\..\..\skins_adm\_adminUI_general.class.php:894
 #: ..\..\..\skins_adm\chicago\_adminUI.class.php:267
 msgid "Previous"
 msgstr "Vorherige"
@@ -100,7 +100,7 @@ msgstr "Vorherige"
 #: ..\..\..\skins\photoblog\index.main.php:94
 #: ..\..\..\skins\photoblog\index.main.php:107
 #: ..\..\..\skins_adm\_adminUI_general.class.php:810
-#: ..\..\..\skins_adm\_adminUI_general.class.php:896
+#: ..\..\..\skins_adm\_adminUI_general.class.php:895
 #: ..\..\..\skins_adm\chicago\_adminUI.class.php:268
 msgid "Next"
 msgstr "Nächste"
@@ -219,7 +219,7 @@ msgstr "Zuklappen"
 
 #: ..\..\..\conf\_icons.php:229
 #: ..\..\..\inc\cron\views\_cronjob_list.view.php:72
-#: ..\..\..\inc\items\model\_item.funcs.php:444
+#: ..\..\..\inc\items\model\_item.funcs.php:454
 msgid "Refresh"
 msgstr "Aktualisieren"
 
@@ -275,7 +275,7 @@ msgid "Website"
 msgstr "Webseite"
 
 #: ..\..\..\conf\_icons.php:271
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1848
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1864
 #: ..\..\..\inc\collections\collections.ctrl.php:75
 #: ..\..\..\inc\files\views\_file_browse.view.php:319
 msgid "New"
@@ -363,7 +363,7 @@ msgstr "Kalender"
 
 #: ..\..\..\conf\_icons.php:397
 #: ..\..\..\conf\_icons.php:403
-#: ..\..\..\inc\plugins\plugins.ctrl.php:993
+#: ..\..\..\inc\plugins\plugins.ctrl.php:996
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:226
 #: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:55
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:78
@@ -401,9 +401,9 @@ msgstr "Geblockt"
 #: ..\..\..\inc\_core\__core.init.php:259
 #: ..\..\..\inc\collections\views\_coll_features.form.php:78
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:321
-#: ..\..\..\inc\items\model\_item.funcs.php:715
+#: ..\..\..\inc\items\model\_item.funcs.php:725
 #: ..\..\..\inc\items\views\_item_expert.form.php:377
-#: ..\..\..\inc\items\views\_item_list_full.view.php:318
+#: ..\..\..\inc\items\views\_item_list_full.view.php:322
 #: ..\..\..\inc\items\views\_item_simple.form.php:241
 #: ..\..\..\inc\widgets\widgets\_coll_xml_feeds.widget.php:153
 #: ..\..\..\skins\_subs.disp.php:85
@@ -422,14 +422,15 @@ msgstr "Runter"
 
 #: ..\..\..\conf\_icons.php:454
 #: ..\..\..\conf\_icons.php:459
-#: ..\..\..\inc\_core\ui\results\_results.class.php:1470
-#: ..\..\..\inc\_core\ui\results\_results.class.php:1480
+#: ..\..\..\inc\_core\ui\results\_results.class.php:1464
+#: ..\..\..\inc\_core\ui\results\_results.class.php:1474
 msgid "Sort by order"
 msgstr "Nach Folge sortieren"
 
 #: ..\..\..\conf\_icons.php:469
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:1027
 #: ..\..\..\inc\items\views\_item_expert.form.php:264
+#: ..\..\..\inc\items\views\_item_list_full.view.php:182
 msgid "Assigned to"
 msgstr "Zugeordnet zu"
 
@@ -1131,11 +1132,11 @@ msgid "File"
 msgstr "Datei"
 
 #: ..\..\..\htsrv\viewfile.php:133
-#: ..\..\..\inc\_core\_misc.funcs.php:3357
+#: ..\..\..\inc\_core\_misc.funcs.php:3356
 #: ..\..\..\inc\collections\views\_coll_general.form.php:52
 #: ..\..\..\inc\files\views\_file_links.view.php:112
-#: ..\..\..\inc\items\model\_item.class.php:3428
-#: ..\..\..\inc\items\model\_item.class.php:3438
+#: ..\..\..\inc\items\model\_item.class.php:3429
+#: ..\..\..\inc\items\model\_item.class.php:3439
 #: ..\..\..\inc\items\views\_item_expert.form.php:101
 #: ..\..\..\inc\items\views\_item_list_table.view.php:141
 #: ..\..\..\inc\items\views\_item_simple.form.php:128
@@ -1184,12 +1185,12 @@ msgstr "Ende der Datei (EOF)"
 msgid "The file &laquo;%s&raquo; could not be accessed!"
 msgstr "Auf die Datei &laquo;%s&raquo; konnte nicht zugegriffen werden!"
 
-#: ..\..\..\inc\_blog_main.inc.php:481
+#: ..\..\..\inc\_blog_main.inc.php:488
 #, php-format
 msgid "The skin [%s] is not installed on this system."
 msgstr "Der Skin [%s] ist auf diesem System nicht installiert."
 
-#: ..\..\..\inc\_blog_main.inc.php:495
+#: ..\..\..\inc\_blog_main.inc.php:502
 #, php-format
 msgid ""
 "The skin [%s] set for blog [%s] does not exist. It must be properly set in "
@@ -1259,7 +1260,7 @@ msgid "Manage the contents of this blog"
 msgstr "Die Inhalte dieses Blogs verwalten"
 
 #: ..\..\..\inc\_core\__core.init.php:207
-#: ..\..\..\inc\items\model\_item.funcs.php:674
+#: ..\..\..\inc\items\model\_item.funcs.php:684
 #: ..\..\..\inc\users\views\_user.form.php:321
 #: ..\..\..\inc\widgets\widgets\_coll_xml_feeds.widget.php:152
 #: ..\..\..\skins\_profile.disp.php:100
@@ -1270,14 +1271,14 @@ msgid "Posts"
 msgstr "Einträge"
 
 #: ..\..\..\inc\_core\__core.init.php:211
-#: ..\..\..\inc\_core\ui\results\_results.class.php:1743
-#: ..\..\..\inc\items\model\_item.funcs.php:678
+#: ..\..\..\inc\_core\ui\results\_results.class.php:1737
+#: ..\..\..\inc\items\model\_item.funcs.php:688
 #: ..\..\..\inc\items\views\_item_list_full.view.php:101
 #: ..\..\..\inc\items\views\_item_list_full.view.php:105
 #: ..\..\..\inc\widgets\widgets\_coll_page_list.widget.php:60
 #: ..\..\..\skins_adm\_adminUI_general.class.php:747
 #: ..\..\..\skins_adm\_adminUI_general.class.php:803
-#: ..\..\..\skins_adm\_adminUI_general.class.php:889
+#: ..\..\..\skins_adm\_adminUI_general.class.php:888
 #: ..\..\..\skins_adm\chicago\_adminUI.class.php:201
 #: ..\..\..\skins_adm\chicago\_adminUI.class.php:261
 msgid "Pages"
@@ -1292,12 +1293,12 @@ msgid "Podcast episodes"
 msgstr "Podcast-Episoden"
 
 #: ..\..\..\inc\_core\__core.init.php:223
-#: ..\..\..\inc\items\model\_item.funcs.php:690
+#: ..\..\..\inc\items\model\_item.funcs.php:700
 msgid "Sidebar links"
 msgstr "Seitenleistenlinks"
 
 #: ..\..\..\inc\_core\__core.init.php:230
-#: ..\..\..\inc\items\model\_item.funcs.php:702
+#: ..\..\..\inc\items\model\_item.funcs.php:712
 msgid "Tracker"
 msgstr "Tracker"
 
@@ -1316,7 +1317,7 @@ msgstr "Dateien"
 
 #: ..\..\..\inc\_core\__core.init.php:286
 #: ..\..\..\inc\tools\system.ctrl.php:84
-#: ..\..\..\install\_functions_create.php:584
+#: ..\..\..\install\_functions_create.php:603
 msgid "About this system"
 msgstr "Über dieses System"
 
@@ -1410,8 +1411,8 @@ msgstr "Admin-Skin"
 #: ..\..\..\inc\users\model\_user.funcs.php:243
 #: ..\..\..\inc\widgets\widgets\_user_tools.widget.php:76
 #: ..\..\..\skins_adm\_access_denied.main.php:23
+#: ..\..\..\skins_adm\_adminUI_general.class.php:1222
 #: ..\..\..\skins_adm\_adminUI_general.class.php:1224
-#: ..\..\..\skins_adm\_adminUI_general.class.php:1226
 msgid "Logout"
 msgstr "Abmelden"
 
@@ -1419,10 +1420,10 @@ msgstr "Abmelden"
 #: ..\..\..\inc\chapters\views\_chapter.form.php:62
 #: ..\..\..\inc\collections\model\_blog.class.php:225
 #: ..\..\..\inc\comments\model\_comment.class.php:1241
-#: ..\..\..\inc\items\model\_item.class.php:3428
-#: ..\..\..\inc\items\model\_item.class.php:3433
+#: ..\..\..\inc\items\model\_item.class.php:3429
+#: ..\..\..\inc\items\model\_item.class.php:3434
 #: ..\..\..\inc\items\views\_item_list_table.view.php:80
-#: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:147
+#: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:155
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:92
 #: ..\..\..\inc\widgets\widgets\_coll_item_list.widget.php:97
 #: ..\..\..\inc\widgets\widgets\_coll_media_index.widget.php:108
@@ -1442,7 +1443,7 @@ msgstr "Start"
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:121
 #: ..\..\..\inc\collections\views\_coll_features.form.php:169
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:464
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:120
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:105
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:470
 #: ..\..\..\inc\sessions\views\_stats_browserhits.view.php:166
 #: ..\..\..\inc\users\model\_user.funcs.php:332
@@ -1662,39 +1663,39 @@ msgstr "DB-Tabellenpräfix"
 msgid "DB connection charset"
 msgstr "DB-Verbindungszeichensatz"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2937
+#: ..\..\..\inc\_core\_misc.funcs.php:2936
 #: ..\..\..\install\index.php:651
 msgid "Manual"
 msgstr "Anleitung"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2937
+#: ..\..\..\inc\_core\_misc.funcs.php:2936
 msgid "Open relevant page in online manual"
 msgstr "Entsprechende Seite in der Onlinehilfe öffnen"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3354
+#: ..\..\..\inc\_core\_misc.funcs.php:3353
 msgid "Date issued (Default)"
 msgstr "Veröffentlichungsdatum (Standard)"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3355
+#: ..\..\..\inc\_core\_misc.funcs.php:3354
 msgid "Order (as explicitely specified)"
 msgstr "Anordnung (wie angegeben)"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3358
+#: ..\..\..\inc\_core\_misc.funcs.php:3357
 msgid "Date created"
 msgstr "Erstellungsdatum"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3359
+#: ..\..\..\inc\_core\_misc.funcs.php:3358
 msgid "Date last modified"
 msgstr "Datum der letzten Veränderung"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3360
+#: ..\..\..\inc\_core\_misc.funcs.php:3359
 #: ..\..\..\inc\collections\views\_coll_general.form.php:64
 msgid "URL \"filename\""
 msgstr "URL-\"Dateiname\""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3361
+#: ..\..\..\inc\_core\_misc.funcs.php:3360
 #: ..\..\..\inc\items\views\_item_expert.form.php:260
-#: ..\..\..\inc\items\views\_item_list_full.view.php:178
+#: ..\..\..\inc\items\views\_item_list_full.view.php:181
 #: ..\..\..\inc\locales\_locale_settings.form.php:95
 #: ..\..\..\inc\locales\_locale_settings.form.php:281
 #: ..\..\..\inc\locales\_locale_settings.form.php:315
@@ -1703,7 +1704,7 @@ msgstr "URL-\"Dateiname\""
 msgid "Priority"
 msgstr "Priorität"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3362
+#: ..\..\..\inc\_core\_misc.funcs.php:3361
 msgid "Random order!"
 msgstr "Zufällige Anordnung!"
 
@@ -1753,43 +1754,43 @@ msgstr "Sie haben zwei verschiedene Passwörter angegeben."
 msgid "The minimum password length is %d characters."
 msgstr "Das Passwort muss mindestens %d Zeichen lang sein."
 
-#: ..\..\..\inc\_core\_param.funcs.php:1582
 #: ..\..\..\inc\_core\_param.funcs.php:1586
+#: ..\..\..\inc\_core\_param.funcs.php:1590
 msgid "Invalid XHTML."
 msgstr "Ungültiges XHTML."
 
-#: ..\..\..\inc\_core\_param.funcs.php:1694
-#: ..\..\..\inc\_core\_param.funcs.php:1700
+#: ..\..\..\inc\_core\_param.funcs.php:1698
+#: ..\..\..\inc\_core\_param.funcs.php:1704
 msgid "Illegal content found (spam?)"
 msgstr "Ungültiger Inhalt gefunden (Spam?)"
 
-#: ..\..\..\inc\_core\_param.funcs.php:1695
+#: ..\..\..\inc\_core\_param.funcs.php:1699
 #, php-format
 msgid "Illegal content found: blacklisted word \"%s\""
 msgstr "Ungültiger Inhalt gefunden: gebanntes Wort \"%s\""
 
-#: ..\..\..\inc\_core\_param.funcs.php:1701
+#: ..\..\..\inc\_core\_param.funcs.php:1705
 #, php-format
 msgid "Illegal content found: blacklisted word &laquo;%s&raquo;"
 msgstr "Ungültiger Inhalt gefunden: gebanntes Wort &laquo;%s&raquo;"
 
-#: ..\..\..\inc\_core\_param.funcs.php:1755
+#: ..\..\..\inc\_core\_param.funcs.php:1759
 msgid "Illegal CSS markup found: "
 msgstr "Ungültiges CSS gefunden: "
 
-#: ..\..\..\inc\_core\_param.funcs.php:1766
+#: ..\..\..\inc\_core\_param.funcs.php:1770
 msgid "Illegal javascript markup found: "
 msgstr "Illegales Javascript gefunden: "
 
-#: ..\..\..\inc\_core\_param.funcs.php:1774
+#: ..\..\..\inc\_core\_param.funcs.php:1778
 msgid "Illegal frame markup found: "
 msgstr "Illegaler Frame gefunden: "
 
-#: ..\..\..\inc\_core\_param.funcs.php:1782
+#: ..\..\..\inc\_core\_param.funcs.php:1786
 msgid "Illegal object markup found: "
 msgstr "Illegales Object gefunden: "
 
-#: ..\..\..\inc\_core\_param.funcs.php:1794
+#: ..\..\..\inc\_core\_param.funcs.php:1798
 #, php-format
 msgid ""
 "(Note: To get rid of the above validation warnings, you can deactivate "
@@ -1799,13 +1800,13 @@ msgstr ""
 "Validierungsregeln in Ihren <a %s>Gruppeneinstellungen</a> deaktivieren.)"
 
 #: ..\..\..\inc\_core\_template.funcs.php:235
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:204
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:188
 #: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:33
 msgid "Archive directory"
 msgstr "Archivverzeichnis"
 
 #: ..\..\..\inc\_core\_template.funcs.php:236
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:243
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:227
 #: ..\..\..\inc\widgets\widgets\_menu_link.widget.php:34
 msgid "Category directory"
 msgstr "Kategorieverzeichnis"
@@ -1849,7 +1850,7 @@ msgstr "VORSCHAU"
 
 #: ..\..\..\inc\_core\_template.funcs.php:323
 #: ..\..\..\inc\items\views\_item_history.view.php:60
-#: ..\..\..\inc\items\views\_item_list_full.view.php:349
+#: ..\..\..\inc\items\views\_item_list_full.view.php:353
 #: ..\..\..\inc\sessions\views\_stats_goalhits.view.php:136
 #: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:100
 #: ..\..\..\skins\_item_comment_form.inc.php:129
@@ -1975,14 +1976,14 @@ msgstr "WARNUNG: Das Löschen dieses Objektes wird auch folgendes löschen:"
 #: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:428
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:541
 #: ..\..\..\inc\collections\collections.ctrl.php:397
-#: ..\..\..\inc\plugins\plugins.ctrl.php:933
+#: ..\..\..\inc\plugins\plugins.ctrl.php:936
 msgid "THIS CANNOT BE UNDONE!"
 msgstr "DIES KANN NICHT RÜCKGÄNGIG GEMACHT WERDEN!"
 
 #: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:436
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:555
 #: ..\..\..\inc\collections\collections.ctrl.php:421
-#: ..\..\..\inc\plugins\plugins.ctrl.php:935
+#: ..\..\..\inc\plugins\plugins.ctrl.php:938
 #: ..\..\..\install\index.php:561
 msgid "I am sure!"
 msgstr "Ich bin mir sicher!"
@@ -2061,74 +2062,74 @@ msgstr "Dieses Element ist bereits ganz unten."
 msgid "Legend"
 msgstr "Legende"
 
-#: ..\..\..\inc\_core\ui\_uiwidget.class.php:287
+#: ..\..\..\inc\_core\ui\_uiwidget.class.php:297
 msgid "No results."
 msgstr "Keine Ergebnisse."
 
-#: ..\..\..\inc\_core\ui\_uiwidget.class.php:482
+#: ..\..\..\inc\_core\ui\_uiwidget.class.php:493
 #: ..\..\..\inc\files\views\_file_browse.view.php:119
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:184
 msgid "Apply"
 msgstr "Anwenden"
 
-#: ..\..\..\inc\_core\ui\_uiwidget.class.php:482
+#: ..\..\..\inc\_core\ui\_uiwidget.class.php:493
 #: ..\..\..\inc\files\views\_file_browse_set.form.php:67
 #: ..\..\..\inc\widgets\widgets\_coll_media_index.widget.php:82
 msgid "Columns"
 msgstr "Spalten"
 
-#: ..\..\..\inc\_core\ui\_uiwidget.class.php:498
+#: ..\..\..\inc\_core\ui\_uiwidget.class.php:509
 msgid "Filter list"
 msgstr "Liste filtern"
 
-#: ..\..\..\inc\_core\ui\_uiwidget.class.php:498
+#: ..\..\..\inc\_core\ui\_uiwidget.class.php:509
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:62
 msgid "Filters"
 msgstr "Filter"
 
-#: ..\..\..\inc\_core\ui\_uiwidget.class.php:795
-#: ..\..\..\inc\_core\ui\_uiwidget.class.php:828
+#: ..\..\..\inc\_core\ui\_uiwidget.class.php:803
+#: ..\..\..\inc\_core\ui\_uiwidget.class.php:836
 #: ..\..\..\inc\files\model\_filelist.class.php:659
 msgid "Change Order"
 msgstr "Sortierung ändern"
 
-#: ..\..\..\inc\_core\ui\_uiwidget.class.php:801
+#: ..\..\..\inc\_core\ui\_uiwidget.class.php:809
 #: ..\..\..\skins_adm\_adminUI_general.class.php:761
 #: ..\..\..\skins_adm\_adminUI_general.class.php:763
-#: ..\..\..\skins_adm\_adminUI_general.class.php:847
-#: ..\..\..\skins_adm\_adminUI_general.class.php:849
+#: ..\..\..\skins_adm\_adminUI_general.class.php:846
+#: ..\..\..\skins_adm\_adminUI_general.class.php:848
 #: ..\..\..\skins_adm\chicago\_adminUI.class.php:219
 #: ..\..\..\skins_adm\chicago\_adminUI.class.php:221
 msgid "Ascending order"
 msgstr "Aufsteigende Sortierung"
 
-#: ..\..\..\inc\_core\ui\_uiwidget.class.php:806
+#: ..\..\..\inc\_core\ui\_uiwidget.class.php:814
 #: ..\..\..\skins_adm\_adminUI_general.class.php:765
 #: ..\..\..\skins_adm\_adminUI_general.class.php:767
-#: ..\..\..\skins_adm\_adminUI_general.class.php:851
-#: ..\..\..\skins_adm\_adminUI_general.class.php:853
+#: ..\..\..\skins_adm\_adminUI_general.class.php:850
+#: ..\..\..\skins_adm\_adminUI_general.class.php:852
 #: ..\..\..\skins_adm\chicago\_adminUI.class.php:223
 #: ..\..\..\skins_adm\chicago\_adminUI.class.php:225
 msgid "Descending order"
 msgstr "Absteigende Sortierung"
 
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1032
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1048
 #: ..\..\..\inc\collections\views\_coll_general.form.php:91
 #: ..\..\..\inc\cron\views\_cronjob.view.php:44
 msgid "days"
 msgstr "Tage"
 
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1041
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1057
 #: ..\..\..\inc\cron\views\_cronjob.view.php:48
 msgid "hours"
 msgstr "Stunden"
 
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1051
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1067
 #: ..\..\..\inc\cron\views\_cronjob.view.php:52
 msgid "minutes"
 msgstr "Minuten"
 
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1328
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1344
 msgid ""
 "You have modified this form but you haven't submitted it yet.\\nYou are "
 "about to lose your edits.\\nAre you sure?"
@@ -2136,7 +2137,7 @@ msgstr ""
 "Sie haben dieses Formular verändert, aber noch nicht abgeschickt.\\nSie sind "
 "dabei, Ihre Änderungen zu verlieren.\\nSind Sie sicher?"
 
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1332
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1348
 #, php-format
 msgid ""
 "You have modified the form \\\"%s\\\"\\nbut you haven't submitted it yet.\\"
@@ -2145,33 +2146,33 @@ msgstr ""
 "Sie haben das Formular \\\"%s\\\" verändert,\\naber noch nicht abgeschickt.\\"
 "nSie sind dabei, Ihre Änderungen zu verlieren.\\nSind Sie sicher?"
 
-#: ..\..\..\inc\_core\ui\results\_results.class.php:1428
+#: ..\..\..\inc\_core\ui\results\_results.class.php:1422
 #: ..\..\..\inc\widgets\views\_widget_list.view.php:147
 msgid "Move up!"
 msgstr "Aufwärts bewegen!"
 
-#: ..\..\..\inc\_core\ui\results\_results.class.php:1433
+#: ..\..\..\inc\_core\ui\results\_results.class.php:1427
 msgid "Move down! (reverse sort)"
 msgstr "Abwärts bewegen! (umgekehrte Sortierung)"
 
-#: ..\..\..\inc\_core\ui\results\_results.class.php:1448
+#: ..\..\..\inc\_core\ui\results\_results.class.php:1442
 #: ..\..\..\inc\widgets\views\_widget_list.view.php:155
 msgid "Move down!"
 msgstr "Abwärts bewegen!"
 
-#: ..\..\..\inc\_core\ui\results\_results.class.php:1453
+#: ..\..\..\inc\_core\ui\results\_results.class.php:1447
 msgid "Move up! (reverse sort)"
 msgstr "Aufwärts bewegen! (umgekehrte Sortierung)"
 
 # TRANS: Pages x _to_ y
 #. TRANS: Pages x _to_ y
-#: ..\..\..\inc\_core\ui\results\_results.class.php:1743
+#: ..\..\..\inc\_core\ui\results\_results.class.php:1737
 #: ..\..\..\inc\sessions\views\_stats_goalhits.view.php:113
 #: ..\..\..\inc\sessions\views\_stats_search_keywords.view.php:182
 msgid "to"
 msgstr "bis"
 
-#: ..\..\..\inc\_core\ui\results\_results.class.php:1792
+#: ..\..\..\inc\_core\ui\results\_results.class.php:1786
 msgid "Sorry, there is nothing to display..."
 msgstr "Entschuldigung, es gibt nichts anzuzeigen..."
 
@@ -2523,39 +2524,39 @@ msgstr "Dez"
 
 #: ..\..\..\inc\_vars.inc.php:276
 #: ..\..\..\inc\collections\views\_coll_features.form.php:91
-#: ..\..\..\inc\items\model\_item.funcs.php:735
+#: ..\..\..\inc\items\model\_item.funcs.php:745
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:95
 msgid "Published"
 msgstr "Veröffentlicht"
 
 #: ..\..\..\inc\_vars.inc.php:277
 #: ..\..\..\inc\collections\views\_coll_features.form.php:92
-#: ..\..\..\inc\items\model\_item.funcs.php:747
+#: ..\..\..\inc\items\model\_item.funcs.php:757
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:107
 msgid "Deprecated"
 msgstr "Missbilligt"
 
 #: ..\..\..\inc\_vars.inc.php:278
-#: ..\..\..\inc\items\model\_item.funcs.php:750
+#: ..\..\..\inc\items\model\_item.funcs.php:760
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:110
 msgid "Redirected"
 msgstr "Umgeleitet"
 
 #: ..\..\..\inc\_vars.inc.php:279
-#: ..\..\..\inc\items\model\_item.funcs.php:738
+#: ..\..\..\inc\items\model\_item.funcs.php:748
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:98
 msgid "Protected"
 msgstr "Geschützt"
 
 #: ..\..\..\inc\_vars.inc.php:280
-#: ..\..\..\inc\items\model\_item.funcs.php:741
+#: ..\..\..\inc\items\model\_item.funcs.php:751
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:101
 msgid "Private"
 msgstr "Privat"
 
 #: ..\..\..\inc\_vars.inc.php:281
 #: ..\..\..\inc\collections\views\_coll_features.form.php:90
-#: ..\..\..\inc\items\model\_item.funcs.php:744
+#: ..\..\..\inc\items\model\_item.funcs.php:754
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:104
 msgid "Draft"
 msgstr "Entwurf"
@@ -2673,7 +2674,7 @@ msgstr "Neuer Zeitstempel der letzten Aktualisierung"
 
 #: ..\..\..\inc\antispam\model\_antispam.funcs.php:281
 #: ..\..\..\inc\cron\jobs\_post_notifications.job.php:64
-#: ..\..\..\inc\items\model\_item.class.php:3469
+#: ..\..\..\inc\items\model\_item.class.php:3470
 msgid "Done."
 msgstr "Erledigt."
 
@@ -2716,7 +2717,7 @@ msgstr "Datum"
 #: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:126
 #: ..\..\..\inc\sessions\views\_stats_referers.view.php:63
 #: ..\..\..\inc\sessions\views\_stats_referers.view.php:171
-#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:59
+#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:60
 msgid "Referer"
 msgstr "Referrer"
 
@@ -2727,7 +2728,7 @@ msgstr "Referrer-IP"
 #: ..\..\..\inc\antispam\views\_antispam_ban.form.php:70
 #: ..\..\..\inc\sessions\views\_stats_direct.view.php:74
 #: ..\..\..\inc\sessions\views\_stats_referers.view.php:108
-#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:85
+#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:94
 msgid "Target Blog"
 msgstr "Zielblog"
 
@@ -2750,8 +2751,8 @@ msgstr "Lösche die folgenden %s Kommentare:"
 #: ..\..\..\inc\comments\model\_comment.class.php:1263
 #: ..\..\..\inc\comments\views\_comment.form.php:70
 #: ..\..\..\inc\comments\views\_comment.form.php:89
-#: ..\..\..\inc\items\model\_item.class.php:3428
-#: ..\..\..\inc\items\model\_item.class.php:3436
+#: ..\..\..\inc\items\model\_item.class.php:3429
+#: ..\..\..\inc\items\model\_item.class.php:3437
 #: ..\..\..\inc\items\views\_item_list_table.view.php:100
 msgid "Author"
 msgstr "Autor"
@@ -2781,7 +2782,7 @@ msgstr "Aktion"
 #: ..\..\..\inc\generic\views\_generic_ordered_list.inc.php:112
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:74
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:78
-#: ..\..\..\inc\items\model\_item.class.php:2201
+#: ..\..\..\inc\items\model\_item.class.php:2202
 #: ..\..\..\skins\photoblog\index.main.php:193
 msgid "Edit..."
 msgstr "Bearbeiten..."
@@ -3049,8 +3050,8 @@ msgstr "Aktualisieren"
 #: ..\..\..\inc\collections\views\_coll_features.form.php:183
 #: ..\..\..\inc\collections\views\_coll_general.form.php:111
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:512
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:312
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:309
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:318
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:317
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:518
 #: ..\..\..\inc\cron\views\_cronjob.form.php:55
 #: ..\..\..\inc\files\views\_file_browse_set.form.php:90
@@ -3165,6 +3166,7 @@ msgstr "Element aktualisiert."
 msgid "Category has not been moved."
 msgstr "Kategorie wurde nicht verschoben."
 
+#. TRANS: first %s is the moved category's name, the second one the new parent category
 #: ..\..\..\inc\chapters\chapters.ctrl.php:274
 #, php-format
 msgid ""
@@ -3215,7 +3217,7 @@ msgstr "Bearbeiten abbrechen!"
 
 #: ..\..\..\inc\chapters\views\_chapter.form.php:48
 #: ..\..\..\inc\generic\views\_generic_category.form.php:47
-#: ..\..\..\inc\items\model\_item.funcs.php:559
+#: ..\..\..\inc\items\model\_item.funcs.php:569
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:894
 msgid "Category"
 msgstr "Kategorie"
@@ -3249,7 +3251,7 @@ msgstr "Übergeordnete Kategorie"
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:160
 #: ..\..\..\inc\locales\_locale_settings.form.php:87
 #: ..\..\..\inc\locales\_locale_settings.form.php:276
-#: ..\..\..\inc\plugins\plugins.ctrl.php:967
+#: ..\..\..\inc\plugins\plugins.ctrl.php:970
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:72
 #: ..\..\..\inc\sessions\views\_goal.form.php:41
 #: ..\..\..\inc\sessions\views\_stats_goals.view.php:69
@@ -3312,10 +3314,6 @@ msgstr "Neu..."
 msgid "Delete..."
 msgstr "Löschen..."
 
-#: ..\..\..\inc\chapters\views\_chapter_list.view.php:176
-msgid "Categories for blog:"
-msgstr "Kategorien für Blog:"
-
 #: ..\..\..\inc\chapters\views\_chapter_list.view.php:178
 msgid "Create a new category..."
 msgstr "Eine neue Kategorie erstellen..."
@@ -3327,7 +3325,7 @@ msgstr "Eine neue Kategorie erstellen..."
 #: ..\..\..\inc\generic\views\_generic_ordered_list.inc.php:63
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:159
 #: ..\..\..\inc\items\views\_item_list_track.view.php:159
-#: ..\..\..\inc\plugins\plugins.ctrl.php:975
+#: ..\..\..\inc\plugins\plugins.ctrl.php:978
 #: ..\..\..\inc\sessions\views\_stats_goals.view.php:62
 #: ..\..\..\inc\sessions\views\_stats_sessions_list.view.php:71
 #: ..\..\..\inc\users\views\_group.form.php:63
@@ -3360,16 +3358,6 @@ msgid ""
 msgstr ""
 "<strong>Hinweis:</strong> Das Sortieren von Kategorien ist in den "
 "%2$sglobalen Einstellungen%3$s zur Zeit auf %1$s gesetzt."
-
-#: ..\..\..\inc\chapters\views\_chapter_list.view.php:239
-#: ..\..\..\inc\settings\views\_features.form.php:191
-msgid "alphabetical"
-msgstr "alphabetisch"
-
-#: ..\..\..\inc\chapters\views\_chapter_list.view.php:239
-#: ..\..\..\inc\settings\views\_features.form.php:192
-msgid "manual"
-msgstr "manuell"
 
 #: ..\..\..\inc\chapters\views\_chapter_move.form.php:46
 msgid "Cancel move!"
@@ -3590,77 +3578,76 @@ msgid "Standard blog"
 msgstr "Normales Blog"
 
 #: ..\..\..\inc\collections\model\_blog.class.php:295
-#: ..\..\..\inc\collections\model\_blog.class.php:320
 msgid "Invalid category prefix."
 msgstr "Ungültiges Kategorienpräfix."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:348
+#: ..\..\..\inc\collections\model\_blog.class.php:358
 #, php-format
 msgid "Items/days per page must be between %d and %d."
 msgstr ""
 "Die Anzahl der Einträge/Tage pro Seite muss zwischen %d und %d liegen."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:361
+#: ..\..\..\inc\collections\model\_blog.class.php:371
 #, php-format
 msgid "Items per feed must be between %d and %d."
 msgstr "Die Anzahl der Einträge pro Feed muss zwischen %d und %d liegen."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:382
+#: ..\..\..\inc\collections\model\_blog.class.php:392
 msgid "Invalid tagline"
 msgstr "Ungültiger Slogan"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:387
+#: ..\..\..\inc\collections\model\_blog.class.php:397
 msgid "Invalid long description"
 msgstr "Ungültige Langbeschreibung"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:393
+#: ..\..\..\inc\collections\model\_blog.class.php:403
 msgid "Invalid blog footer"
 msgstr "Ungültige Blog-Fußzeile"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:398
+#: ..\..\..\inc\collections\model\_blog.class.php:408
 msgid "Invalid single post footer"
 msgstr "Ungültige Fußzeile für einzelne Einträge"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:403
+#: ..\..\..\inc\collections\model\_blog.class.php:413
 msgid "Invalid RSS footer"
 msgstr "Ungültige RSS-Fußzeile"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:408
+#: ..\..\..\inc\collections\model\_blog.class.php:418
 msgid "Invalid Blog Notes"
 msgstr "Ungültige Blognotizen"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:411
+#: ..\..\..\inc\collections\model\_blog.class.php:421
 #, php-format
 msgid "Max credits must be between %d and %d."
 msgstr "Max. Nennungen muss zwischen %d und %d liegen."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:500
+#: ..\..\..\inc\collections\model\_blog.class.php:510
 #, php-format
 msgid "User &laquo;%s&raquo; does not exist!"
 msgstr "Benutzer &laquo;%s&raquo; existiert nicht!"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:512
+#: ..\..\..\inc\collections\model\_blog.class.php:522
 msgid "You must provide an URL blog name!"
 msgstr "Sie müssen einen URL-Namen für dieses Blog angeben!"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:518
+#: ..\..\..\inc\collections\model\_blog.class.php:528
 msgid "The url name is invalid."
 msgstr "Der URL-Name ist ungültig."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:527
+#: ..\..\..\inc\collections\model\_blog.class.php:537
 msgid ""
 "This URL name is already in use by another blog. Please choose another name."
 msgstr ""
 "Dieser URL-Name wird bereits von einem anderen Blog verwendet. Bitte wählen "
 "Sie einen anderen Namen."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:542
 #: ..\..\..\inc\collections\model\_blog.class.php:552
+#: ..\..\..\inc\collections\model\_blog.class.php:562
 msgid "Blog Folder URL"
 msgstr "Blog-Verzeichnis-URL"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:543
-#: ..\..\..\inc\collections\model\_blog.class.php:602
+#: ..\..\..\inc\collections\model\_blog.class.php:553
+#: ..\..\..\inc\collections\model\_blog.class.php:612
 msgid ""
 "You must provide an absolute URL (starting with <code>http://</code> or "
 "<code>https://</code>)!"
@@ -3668,7 +3655,7 @@ msgstr ""
 "Sie müssen einen absoluten URL (beginnend mit <code>http://</code> oder "
 "<code>https://</code>) angeben!"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:553
+#: ..\..\..\inc\collections\model\_blog.class.php:563
 msgid ""
 "You must provide a relative URL (without <code>http://</code> or "
 "<code>https://</code>)!"
@@ -3676,33 +3663,33 @@ msgstr ""
 "Sie müssen einen relativen URL (ohne <code>http://</code> oder "
 "<code>https://</code>) angeben!"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:571
+#: ..\..\..\inc\collections\model\_blog.class.php:581
 msgid "Invalid aggregate blog ID list!"
 msgstr "Ungültige Blog-ID-Liste für Blogaggregation!"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:597
-#: ..\..\..\inc\collections\model\_blog.class.php:601
-#: ..\..\..\inc\collections\model\_blog.class.php:609
-#: ..\..\..\inc\collections\model\_blog.class.php:618
-#: ..\..\..\inc\collections\model\_blog.class.php:625
-#: ..\..\..\inc\collections\model\_blog.class.php:633
+#: ..\..\..\inc\collections\model\_blog.class.php:607
+#: ..\..\..\inc\collections\model\_blog.class.php:611
+#: ..\..\..\inc\collections\model\_blog.class.php:619
+#: ..\..\..\inc\collections\model\_blog.class.php:628
+#: ..\..\..\inc\collections\model\_blog.class.php:635
+#: ..\..\..\inc\collections\model\_blog.class.php:643
 msgid "Media dir location"
 msgstr "Medienverzeichnis-Pfad"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:597
+#: ..\..\..\inc\collections\model\_blog.class.php:607
 msgid "You must provide the full path of the media directory."
 msgstr "Sie müssen den vollen Pfad des Verzeichnisses angeben."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:618
+#: ..\..\..\inc\collections\model\_blog.class.php:628
 msgid "You must provide the media subdirectory."
 msgstr "Sie müssen das Medien-Unterverzeichnis angeben."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:625
+#: ..\..\..\inc\collections\model\_blog.class.php:635
 #, php-format
 msgid "Invalid subdirectory &laquo;%s&raquo;."
 msgstr "Ungültiges Unterverzeichnis &laquo;%s&raquo;."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1303
+#: ..\..\..\inc\collections\model\_blog.class.php:1344
 #, php-format
 msgid ""
 "The blog's media directory &laquo;%s&raquo; could not be created, because "
@@ -3711,13 +3698,13 @@ msgstr ""
 "Das Blog-Medienverzeichnis &laquo;%s&raquo; konnte nicht erstellt werden, da "
 "das übergeordnete Verzeichnis nicht beschreibbar ist oder nicht existiert."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1312
+#: ..\..\..\inc\collections\model\_blog.class.php:1353
 #, php-format
 msgid "The blog's media directory &laquo;%s&raquo; could not be created."
 msgstr ""
 "Das Blog-Medienverzeichnis &laquo;%s&raquo; konnte nicht erstellt werden."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1326
+#: ..\..\..\inc\collections\model\_blog.class.php:1367
 #, php-format
 msgid ""
 "The blog's media directory &laquo;%s&raquo; has been created with "
@@ -3726,23 +3713,23 @@ msgstr ""
 "Das Blog-Medienverzeichnis &laquo;%s&raquo; wurde mit den Rechten %s "
 "erstellt."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1730
+#: ..\..\..\inc\collections\model\_blog.class.php:1771
 msgid "Deleted post-categories"
 msgstr "Eintragskategorien gelöscht"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1737
+#: ..\..\..\inc\collections\model\_blog.class.php:1778
 msgid "Deleted comments on blog's posts"
 msgstr "Kommentare zu den Blogeinträgen gelöscht"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1745
+#: ..\..\..\inc\collections\model\_blog.class.php:1786
 msgid "Deleted blog's posts"
 msgstr "Blogeinträge gelöscht"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1754
+#: ..\..\..\inc\collections\model\_blog.class.php:1795
 msgid "Deleted blog's categories"
 msgstr "Blogkategorien gelöscht"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1767
+#: ..\..\..\inc\collections\model\_blog.class.php:1808
 #, php-format
 msgid ""
 "ERROR! Could not delete! You will have to delete the file [%s] by hand."
@@ -3750,12 +3737,12 @@ msgstr ""
 "FEHLER! Konnte nicht löschen! Sie werden die Datei [%s] von Hand löschen "
 "müssen."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1771
+#: ..\..\..\inc\collections\model\_blog.class.php:1812
 #, php-format
 msgid "Could not delete static file [%s]"
 msgstr "Konnte statische Datei [%s] nicht löschen"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1776
+#: ..\..\..\inc\collections\model\_blog.class.php:1817
 msgid "Deleted blog's static file"
 msgstr "Statische Datei des Blogs gelöscht"
 
@@ -3983,8 +3970,8 @@ msgstr "Max. Fußzeilen-Dankeslinks"
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:178
 #: ..\..\..\inc\collections\views\_coll_features.form.php:182
 #: ..\..\..\inc\collections\views\_coll_general.form.php:110
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:311
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:308
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:317
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:316
 #: ..\..\..\inc\comments\views\_comment.form.php:128
 #: ..\..\..\inc\locales\_locale_settings.form.php:504
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:179
@@ -4025,7 +4012,7 @@ msgid "No title field"
 msgstr "Kein Titelfeld"
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:61
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:148
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:132
 msgid "Post titles"
 msgstr "Eintragstitel"
 
@@ -4071,7 +4058,7 @@ msgstr ""
 "ermöglichen, Trackbacks an andere Blogs zu senden."
 
 #: ..\..\..\inc\collections\views\_coll_features.form.php:87
-#: ..\..\..\inc\items\views\_item_list_full.view.php:318
+#: ..\..\..\inc\items\views\_item_list_full.view.php:322
 #: ..\..\..\skins\basic\_item_feedback.inc.php:79
 msgid "Trackbacks"
 msgstr "Trackbacks"
@@ -4602,7 +4589,7 @@ msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:368
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:373
-#: ..\..\..\inc\files\files.ctrl.php:1521
+#: ..\..\..\inc\files\files.ctrl.php:1522
 #: ..\..\..\inc\files\upload.ctrl.php:408
 #: ..\..\..\inc\files\views\_file_browse.view.php:73
 #: ..\..\..\inc\files\views\_filetype_list.view.php:106
@@ -4733,7 +4720,7 @@ msgid "Full Name"
 msgstr "Voller Name"
 
 #: ..\..\..\inc\collections\views\_coll_list.view.php:121
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:120
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:105
 msgid "Blog URL"
 msgstr "Blog-URL"
 
@@ -4806,11 +4793,11 @@ msgstr ""
 "zu einem späteren Zeitpunkt ändern und jeder Blogtyp kann jederzeit in einen "
 "anderen umgewandelt werden."
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:77
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:61
 msgid "SEO Presets"
 msgstr "SEO-Voreinstellungen"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:132
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:116
 #, php-format
 msgid ""
 "You can review the SEO settings recommended by <strong>%s</strong> below. "
@@ -4820,51 +4807,51 @@ msgstr ""
 "überprüfen. Klicken Sie auf die \"Speichern!\"-Schaltfläche, um diese "
 "Einstellungen zu übernehmen."
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:138
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:122
 msgid "Main page / post list"
 msgstr "Startseite / Eintragsliste"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:139
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:123
 msgid "Default blog page"
 msgstr "Standard-Blogstartseite"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:139
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:140
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:198
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:204
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:238
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:243
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:280
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:289
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:292
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:294
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:296
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:123
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:124
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:182
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:188
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:222
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:227
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:257
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:295
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:298
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:300
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:302
 msgid "META NOINDEX"
 msgstr "META NOINDEX"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:140
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:124
 msgid "\"Next\" blog pages"
 msgstr "\"Nächste\"-Blogseiten"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:140
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:141
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:124
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:125
 msgid "Page 2,3,4..."
 msgstr "Seite 2,3,4..."
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:141
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:199
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:125
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:183
 msgid "NOFOLLOW on links to"
 msgstr "NOFOLLOW für Links zu"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:144
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:128
 msgid "Link to the permanent url of the post"
 msgstr "Link zum permanenten URL für den Eintrag"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:145
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:129
 msgid "Link to the \"link to URL\" specified in the post (if any)"
 msgstr "Im Eintrag angegebener URL, falls vorhanden (\"Verweis auf URL\")"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:146
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:130
 msgid ""
 "Link to the \"link to URL\" if specified, otherwise fall back to permanent "
 "url"
@@ -4872,306 +4859,310 @@ msgstr ""
 "Zum \"Verweis auf URL\" verlinken, wenn vorhanden, ansonsten den permanenten "
 "URL benutzen"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:147
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:131
 msgid "No links on titles"
 msgstr "Titel nicht verlinken"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:151
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:135
 msgid "Link to single post"
 msgstr "Link zum einzelnen Eintrag"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:152
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:136
 msgid "Link to post in archive"
 msgstr "Link zum Eintrag im Archiv"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:153
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:137
 msgid "Link to post in sub-category"
 msgstr "Link zum Eintrag in Unterkategorie"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:154
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:138
 msgid "Permalinks"
 msgstr "Permalinks"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:158
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:142
 msgid "Single post pages / \"Permalink\" pages"
 msgstr "Seiten für einzelne Einträge / \"Permalink\"-Seiten"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:162
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:164
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:166
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:168
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:170
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:172
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:174
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:146
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:148
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:150
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:152
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:154
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:156
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:158
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:160
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:176
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:192
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:194
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:212
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:214
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:216
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:251
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:253
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:255
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:257
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:178
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:196
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:198
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:200
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:235
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:237
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:239
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:241
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:243
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:193
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:195
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:206
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:208
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:210
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:221
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:223
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:225
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:253
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:255
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:257
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:259
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:287
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:289
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:291
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:293
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:239
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:241
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:243
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:245
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:247
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:295
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:297
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:299
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:301
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:303
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:305
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:307
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:309
 msgid "E-g: "
 msgstr "z. B.: "
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:162
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:287
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:146
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:295
 msgid "Use param: post ID"
 msgstr "Parameter benutzen: Eintrags-ID"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:164
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:289
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:148
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:297
 msgid "Use param: post title"
 msgstr "Parameter benutzen: Eintragstitel"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:166
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:291
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:150
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:299
 msgid "Use extra-path: post title"
 msgstr "Extra-Path benutzen: Eintragstitel"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:168
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:293
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:152
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:301
 msgid "Use extra-path: year"
 msgstr "Extra-Path benutzen: Jahr"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:170
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:295
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:154
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:303
 msgid "Use extra-path: year & month"
 msgstr "Extra-Path benutzen: Jahr & Monat"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:172
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:297
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:156
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:305
 msgid "Use extra-path: year, month & day"
 msgstr "Extra-Path benutzen: Jahr, Monat & Tag"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:174
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:214
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:223
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:299
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:158
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:198
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:208
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:307
 msgid "Use extra-path: sub-category"
 msgstr "Extra-Path benutzen: Unterkategorie"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:176
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:216
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:225
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:301
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:160
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:200
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:210
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:309
 msgid "Use extra-path: category path"
 msgstr "Extra-Path benutzen: Kategorien-Pfad"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:178
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:162
 msgid "Permalink scheme"
 msgstr "Permalink-Schema"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:181
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:236
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:278
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:165
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:220
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:255
 msgid "301 redirect to canonical URL"
 msgstr "301-Weiterleitung zu kanonischem URL"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:181
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:236
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:278
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:165
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:220
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:255
 msgid "Make canonical"
 msgstr "Kanonisch machen"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:184
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:168
 msgid "Meta description"
 msgstr "Meta-Beschreibung"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:184
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:168
 msgid "Use excerpt as meta description for posts and pages"
 msgstr "Auszug als Meta-Beschreibung für Einträge und Seiten verwenden"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:188
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:172
 msgid "\"By date\" archives"
 msgstr "\"Nach Datum\"-Archive"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:192
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:251
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:208
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:253
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:176
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:235
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:193
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:239
 msgid "Use param"
 msgstr "Parameter benutzen"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:194
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:253
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:255
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:257
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:210
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:255
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:257
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:259
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:178
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:237
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:239
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:241
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:243
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:195
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:241
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:243
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:245
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:247
 msgid "Use extra-path"
 msgstr "Extra-Path benutzen"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:196
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:204
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:212
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:180
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:189
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:197
 msgid "Date archive URLs"
 msgstr "Datumsarchiv-URLs"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:198
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:238
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:280
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:182
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:222
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:257
 msgid "Indexing"
 msgstr "Indexierung"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:199
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:183
 msgid "Follow TO"
 msgstr "Nofollow"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:199
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:183
 msgid "date archives"
 msgstr "Datumsarchive"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:201
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:240
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:282
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:185
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:224
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:259
 msgid "Posts per page"
 msgstr "Einträge pro Seite"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:202
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:241
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:283
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:186
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:225
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:260
 msgid "Leave empty to use blog default"
 msgstr "Leer lassen, um Blogstandard zu benutzen"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:208
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:192
 msgid "Category pages"
 msgstr "Kategorieseiten"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:212
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:221
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:196
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:206
 msgid "Use param: cat ID"
 msgstr "Parameter benutzen: Kat.-ID"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:218
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:217
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:227
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:202
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:202
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:212
 msgid "Category URLs"
 msgstr "Kategorie-URLs"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:221
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:263
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:231
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:265
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:205
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:248
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:216
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:252
 msgid "Prefix"
 msgstr "Präfix"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:222
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:232
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:206
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:217
 msgid "An optional prefix to be added to the URLs of the categories"
 msgstr ""
 "Ein optionales Präfix, das zu den Kategorie-URLs hinzugefügt werden soll"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:247
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:231
 msgid "Tag pages"
 msgstr "Schlagwortseiten"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:259
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:245
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:235
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:249
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:261
 msgid "Tag page URLs"
 msgstr "Schlagwortseiten-URLs"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:264
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:266
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:249
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:253
 msgid "An optional prefix to be added to the URLs of the tag pages"
 msgstr ""
 "Ein optionales Präfix, das zu den URLs der Schlagwortseiten hinzugefügt "
 "werden soll"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:288
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:294
 msgid "Other pages"
 msgstr "Andere Seiten"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:289
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:295
 msgid "Filtered by keyword search, by author, etc."
 msgstr "Gefiltert nach Stichwortsuche, nach Autor etc."
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:289
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:295
 msgid "Other filtered posts pages"
 msgstr "Andere gefilterte Eintragsseiten"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:291
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:297
 msgid "Comment popups"
 msgstr "Kommentar-Popups"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:292
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:298
 msgid "For skins with comment popups only."
 msgstr "Nur für Skins mit Kommentarpopups."
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:293
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:299
 msgid "Contact forms"
 msgstr "Kontaktformulare"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:294
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:300
 msgid ""
 "WARNING: Letting search engines index contact forms will attract spam."
 msgstr ""
 "WARNUNG: Wenn Sie Suchmaschinen das Indexieren von Kontaktformularen "
 "erlauben, könnten Sie und andere Benutzer Spam erhalten."
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:295
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:301
 msgid "Other special pages"
 msgstr "Andere Spezialseiten"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:296
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:302
 msgid "Pages with no index setting of their own... yet."
 msgstr "Seiten ohne eigene Indexierungseinstellung"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:299
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:305
 msgid "200 \"OK\" response"
 msgstr "200 \"OK\"-Antwort"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:300
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:306
 msgid "301 redirect to main page"
 msgstr "301-Weiterleitung zur Hauptseite"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:301
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:307
 msgid "302 redirect to main page"
 msgstr "302-Weiterleitung zur Hauptseite"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:302
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:308
 msgid "303 redirect to main page"
 msgstr "303-Weiterleitung zur Hauptseite"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:303
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:309
 msgid "404 \"Not found\" response"
 msgstr "404 \"Nicht gefunden\"-Antwort"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:304
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:310
 msgid "410 \"Gone\" response"
 msgstr "410 \"Nicht mehr verfügbar\"-Antwort"
 
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:305
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:311
 msgid "404 \"Not Found\" response"
 msgstr "404 \"Nicht gefunden\"-Antwort"
 
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:125
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:110
 msgid "Blog URL name"
 msgstr "Blog-URL-Name"
 
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:125
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:110
 msgid ""
 "Used to uniquely identify this blog. Appears in URLs and gets used as "
 "default for the media location (see the advanced tab)."
@@ -5179,58 +5170,58 @@ msgstr ""
 "Wird verwendet, um das Blog eindeutig zu identifizieren. Erscheint in URLs "
 "und wird als Standard für den Medienort verwendet (siehe \"Erweitert\"-Tab)."
 
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:140
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:146
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:125
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:131
 msgid ""
 "WARNING: it is highly recommended that this ends in with a / or .php !"
 msgstr ""
 "WARNUNG: Es ist sehr zu empfehlen, dass dies mit / (Schrägstrich) oder .php "
 "endet!"
 
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:151
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:136
 msgid "Default blog in index.php"
 msgstr "Standardblog für index.php"
 
 #. TRANS: NO current default blog
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:153
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:138
 msgid "No default blog is currently set"
 msgstr "Zur Zeit ist kein Standardblog gesetzt"
 
 #. TRANS: current default blog
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:154
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:139
 msgid "Current default :"
 msgstr "Derzeitiges Standardblog:"
 
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:159
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:144
 msgid "Explicit param on index.php"
 msgstr "Expliziter Parameter an index.php"
 
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:164
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:149
 msgid "Extra path on index.php"
 msgstr "Extra-Path an index.php"
 
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:169
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:154
 msgid "Relative to baseurl"
 msgstr "Relativ zum Basis-URL"
 
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:179
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:164
 msgid "Subdomain of basedomain"
 msgstr "Subdomain der Basisdomain"
 
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:184
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:169
 msgid "Absolute URL"
 msgstr "Absoluter URL"
 
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:193
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:178
 msgid "Blog base URL"
 msgstr "Blog-Basis-URL"
 
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:199
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:184
 msgid "URL preview"
 msgstr "URL-Vorschau"
 
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:283
-#: ..\..\..\inc\collections\views\_coll_urls.form.php:303
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:291
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:311
 msgid "Single post URLs"
 msgstr "URLs für einzelne Einträge"
 
@@ -5342,8 +5333,8 @@ msgstr "Diesen Kommentar bearbeiten"
 #: ..\..\..\inc\comments\model\_comment.class.php:635
 #: ..\..\..\inc\generic\views\_generic_list.inc.php:107
 #: ..\..\..\inc\generic\views\_generic_ordered_list.inc.php:114
-#: ..\..\..\inc\items\model\_item.class.php:2106
-#: ..\..\..\inc\items\model\_item.class.php:2110
+#: ..\..\..\inc\items\model\_item.class.php:2107
+#: ..\..\..\inc\items\model\_item.class.php:2111
 msgid "Delete!"
 msgstr "Löschen!"
 
@@ -5359,7 +5350,7 @@ msgstr ""
 "gemacht werden!"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:695
-#: ..\..\..\inc\items\model\_item.class.php:2308
+#: ..\..\..\inc\items\model\_item.class.php:2309
 msgid "Deprecate!"
 msgstr "Missbilligen!"
 
@@ -5430,8 +5421,8 @@ msgstr "Eintrag"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:1252
 #: ..\..\..\inc\comments\model\_comment.class.php:1265
-#: ..\..\..\inc\items\model\_item.class.php:3428
-#: ..\..\..\inc\items\model\_item.class.php:3441
+#: ..\..\..\inc\items\model\_item.class.php:3429
+#: ..\..\..\inc\items\model\_item.class.php:3442
 msgid "Url"
 msgstr "URL"
 
@@ -5447,18 +5438,18 @@ msgid "Rating"
 msgstr "Bewertung"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:1281
-#: ..\..\..\inc\items\model\_item.class.php:3452
+#: ..\..\..\inc\items\model\_item.class.php:3453
 msgid "Edit/Delete"
 msgstr "Bearbeiten/Löschen"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:1282
-#: ..\..\..\inc\items\model\_item.class.php:3454
+#: ..\..\..\inc\items\model\_item.class.php:3455
 msgid "Edit your subscriptions/notifications"
 msgstr "Bearbeiten Sie Ihre Abonnements/Benachrichtigungen"
 
 #: ..\..\..\inc\comments\model\_comment.funcs.php:192
-#: ..\..\..\inc\items\model\_item.class.php:1814
-#: ..\..\..\inc\items\views\_item_list_full.view.php:337
+#: ..\..\..\inc\items\model\_item.class.php:1815
+#: ..\..\..\inc\items\views\_item_list_full.view.php:341
 #: ..\..\..\skins\_item_comment_form.inc.php:107
 #: ..\..\..\skins\basic\_item_feedback.inc.php:166
 #: ..\..\..\skins\glossyblue\_item_feedback.inc.php:295
@@ -5466,17 +5457,17 @@ msgid "Leave a comment"
 msgstr "Einen Kommentar hinterlassen"
 
 #: ..\..\..\inc\comments\model\_comment.funcs.php:193
-#: ..\..\..\inc\items\model\_item.class.php:1821
-#: ..\..\..\inc\items\model\_item.class.php:1932
-#: ..\..\..\inc\items\views\_item_list_full.view.php:284
+#: ..\..\..\inc\items\model\_item.class.php:1822
+#: ..\..\..\inc\items\model\_item.class.php:1933
+#: ..\..\..\inc\items\views\_item_list_full.view.php:288
 msgid "1 comment"
 msgstr "1 Kommentar"
 
 #: ..\..\..\inc\comments\model\_comment.funcs.php:194
-#: ..\..\..\inc\items\model\_item.class.php:1822
-#: ..\..\..\inc\items\model\_item.class.php:1933
+#: ..\..\..\inc\items\model\_item.class.php:1823
+#: ..\..\..\inc\items\model\_item.class.php:1934
 #: ..\..\..\inc\items\model\_itemlight.class.php:134
-#: ..\..\..\inc\items\views\_item_list_full.view.php:284
+#: ..\..\..\inc\items\views\_item_list_full.view.php:288
 #, php-format
 msgid "%d comments"
 msgstr "%d Kommentare"
@@ -5516,7 +5507,7 @@ msgid "Comment date"
 msgstr "Kommentardatum"
 
 #: ..\..\..\inc\comments\views\_comment.form.php:166
-#: ..\..\..\inc\items\views\_item_list_full.view.php:360
+#: ..\..\..\inc\items\views\_item_list_full.view.php:364
 #: ..\..\..\skins\_item_comment_form.inc.php:171
 #: ..\..\..\skins\basic\_item_feedback.inc.php:231
 #: ..\..\..\skins\glossyblue\_item_feedback.inc.php:356
@@ -5787,7 +5778,7 @@ msgid "Attention"
 msgstr "Aufmerksamkeit"
 
 #: ..\..\..\inc\cron\views\_cronjob_list.view.php:99
-#: ..\..\..\inc\items\model\_item.funcs.php:670
+#: ..\..\..\inc\items\model\_item.funcs.php:680
 #: ..\..\..\inc\sessions\goals.ctrl.php:162
 #: ..\..\..\inc\sessions\stats.ctrl.php:120
 #: ..\..\..\inc\sessions\views\_goal_hitsummary.view.php:85
@@ -6086,7 +6077,7 @@ msgstr "Kann kein Verzeichnis ohne Namen erstellen."
 
 #: ..\..\..\inc\files\files.ctrl.php:397
 #: ..\..\..\inc\files\files.ctrl.php:441
-#: ..\..\..\inc\files\files.ctrl.php:1381
+#: ..\..\..\inc\files\files.ctrl.php:1382
 #: ..\..\..\inc\files\upload.ctrl.php:330
 #, php-format
 msgid "The file &laquo;%s&raquo; already exists."
@@ -6127,7 +6118,7 @@ msgid "Your user settings have been updated."
 msgstr "Ihre Benutzereinstellungen wurden aktualisiert."
 
 #: ..\..\..\inc\files\files.ctrl.php:501
-#: ..\..\..\inc\files\files.ctrl.php:971
+#: ..\..\..\inc\files\files.ctrl.php:972
 #, php-format
 msgid "You are not allowed to edit &laquo;%s&raquo;."
 msgstr "Sie dürfen &laquo;%s&raquo; nicht bearbeiten."
@@ -6143,152 +6134,152 @@ msgid "The file &laquo;%s&raquo; could not be updated."
 msgstr "Die Datei &laquo;%s&raquo; konnte nicht aktualisiert werden."
 
 #: ..\..\..\inc\files\files.ctrl.php:583
-#: ..\..\..\inc\files\files.ctrl.php:653
-#: ..\..\..\inc\files\files.ctrl.php:745
-#: ..\..\..\inc\files\files.ctrl.php:809
-#: ..\..\..\inc\files\files.ctrl.php:1044
-#: ..\..\..\inc\files\files.ctrl.php:1084
-#: ..\..\..\inc\files\files.ctrl.php:1165
+#: ..\..\..\inc\files\files.ctrl.php:654
+#: ..\..\..\inc\files\files.ctrl.php:746
+#: ..\..\..\inc\files\files.ctrl.php:810
+#: ..\..\..\inc\files\files.ctrl.php:1045
+#: ..\..\..\inc\files\files.ctrl.php:1085
+#: ..\..\..\inc\files\files.ctrl.php:1166
 #: ..\..\..\inc\files\views\_file_list.inc.php:563
 msgid "Nothing selected."
 msgstr "Nichts ausgewählt."
 
-#: ..\..\..\inc\files\files.ctrl.php:594
+#: ..\..\..\inc\files\files.ctrl.php:595
 msgid "Please provide the name of the archive."
 msgstr "Bitte geben Sie einen Archivnamen an."
 
-#: ..\..\..\inc\files\files.ctrl.php:644
-#: ..\..\..\inc\files\files.ctrl.php:738
-#: ..\..\..\inc\files\files.ctrl.php:1158
-#: ..\..\..\inc\files\files.ctrl.php:1279
+#: ..\..\..\inc\files\files.ctrl.php:645
+#: ..\..\..\inc\files\files.ctrl.php:739
+#: ..\..\..\inc\files\files.ctrl.php:1159
+#: ..\..\..\inc\files\files.ctrl.php:1280
 msgid "You have no permission to edit/modify files."
 msgstr "Sie haben keine Rechte, um Dateien zu bearbeiten oder zu verändern."
 
-#: ..\..\..\inc\files\files.ctrl.php:701
+#: ..\..\..\inc\files\files.ctrl.php:702
 #, php-format
 msgid "&laquo;%s&raquo; has not been renamed"
 msgstr "&laquo;%s&raquo; wurde nicht umbenannt."
 
-#: ..\..\..\inc\files\files.ctrl.php:707
+#: ..\..\..\inc\files\files.ctrl.php:708
 #, php-format
 msgid "&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; konnte nicht in &laquo;%s&raquo; umbenannt werden."
 
-#: ..\..\..\inc\files\files.ctrl.php:721
+#: ..\..\..\inc\files\files.ctrl.php:722
 #, php-format
 msgid "&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; wurde erfolgreich in &laquo;%s&raquo; umbenannt."
 
-#: ..\..\..\inc\files\files.ctrl.php:760
+#: ..\..\..\inc\files\files.ctrl.php:761
 #, php-format
 msgid "The directory &laquo;%s&raquo; has been deleted."
 msgstr "Das Verzeichnis &laquo;%s&raquo; wurde gelöscht."
 
-#: ..\..\..\inc\files\files.ctrl.php:761
+#: ..\..\..\inc\files\files.ctrl.php:762
 #, php-format
 msgid "The file &laquo;%s&raquo; has been deleted."
 msgstr "Die Datei &laquo;%s&raquo; wurde gelöscht."
 
-#: ..\..\..\inc\files\files.ctrl.php:766
-#: ..\..\..\inc\files\files.ctrl.php:1451
+#: ..\..\..\inc\files\files.ctrl.php:767
+#: ..\..\..\inc\files\files.ctrl.php:1452
 #, php-format
 msgid "Could not delete the directory &laquo;%s&raquo; (not empty?)."
 msgstr "Konnte das Verzeichnis &laquo;%s&raquo; nicht löschen (nicht leer?)."
 
-#: ..\..\..\inc\files\files.ctrl.php:767
-#: ..\..\..\inc\files\files.ctrl.php:1451
+#: ..\..\..\inc\files\files.ctrl.php:768
+#: ..\..\..\inc\files\files.ctrl.php:1452
 #, php-format
 msgid "Could not delete the file &laquo;%s&raquo;."
 msgstr "Konnte die Datei &laquo;%s&raquo; nicht löschen."
 
-#: ..\..\..\inc\files\files.ctrl.php:785
+#: ..\..\..\inc\files\files.ctrl.php:786
 msgid "cannot be deleted because of the following relations"
 msgstr "kann auf Grund der folgenden Beziehungen nicht gelöscht werden"
 
-#: ..\..\..\inc\files\files.ctrl.php:827
+#: ..\..\..\inc\files\files.ctrl.php:828
 msgid "No destination blog is selected."
 msgstr "Es wurde kein Zielblog ausgewählt."
 
-#: ..\..\..\inc\files\files.ctrl.php:836
+#: ..\..\..\inc\files\files.ctrl.php:837
 msgid "Sorry, you have no permission to post into this blog."
 msgstr ""
 "Entschuldigung, Sie haben keine Rechte, um Einträge in diesem Blog zu "
 "erstellen."
 
-#: ..\..\..\inc\files\files.ctrl.php:873
-#: ..\..\..\inc\files\files.ctrl.php:904
+#: ..\..\..\inc\files\files.ctrl.php:874
+#: ..\..\..\inc\files\files.ctrl.php:905
 #, php-format
 msgid "Cannot post &laquo;%s&raquo; because it is not an image."
 msgstr "Kann &laquo;%s&raquo; nicht verwenden, weil es kein Bild ist."
 
-#: ..\..\..\inc\files\files.ctrl.php:889
+#: ..\..\..\inc\files\files.ctrl.php:890
 #, php-format
 msgid "&laquo;%s&raquo; has been attached."
 msgstr "&laquo;%s&raquo; wurde angehängt."
 
-#: ..\..\..\inc\files\files.ctrl.php:939
+#: ..\..\..\inc\files\files.ctrl.php:940
 #, php-format
 msgid "&laquo;%s&raquo; has been posted."
 msgstr "&laquo;%s&raquo; wurde erstellt."
 
-#: ..\..\..\inc\files\files.ctrl.php:1021
+#: ..\..\..\inc\files\files.ctrl.php:1022
 #, php-format
 msgid "File properties for &laquo;%s&raquo; have been updated."
 msgstr "Dateieigenschaften für &laquo;%s&raquo; wurde aktualisiert."
 
-#: ..\..\..\inc\files\files.ctrl.php:1025
+#: ..\..\..\inc\files\files.ctrl.php:1026
 #, php-format
 msgid "File properties for &laquo;%s&raquo; have not changed."
 msgstr "Dateieigenschaften für &laquo;%s&raquo; wurden nicht verändert."
 
-#: ..\..\..\inc\files\files.ctrl.php:1057
+#: ..\..\..\inc\files\files.ctrl.php:1058
 msgid "User avatar modified."
 msgstr "Benutzeravatar geändert."
 
-#: ..\..\..\inc\files\files.ctrl.php:1102
+#: ..\..\..\inc\files\files.ctrl.php:1103
 msgid "Selected file has been linked to item."
 msgstr "Die ausgewählte Datei wurde mit dem Element verknüpft."
 
-#: ..\..\..\inc\files\files.ctrl.php:1140
+#: ..\..\..\inc\files\files.ctrl.php:1141
 #, php-format
 msgid "Link from &laquo;%s&raquo; deleted."
 msgstr "Link von &laquo;%s&raquo; gelöscht."
 
-#: ..\..\..\inc\files\files.ctrl.php:1177
+#: ..\..\..\inc\files\files.ctrl.php:1178
 msgid "You have to give a default permission!"
 msgstr "Sie müssen Standardrechte angeben!"
 
-#: ..\..\..\inc\files\files.ctrl.php:1184
+#: ..\..\..\inc\files\files.ctrl.php:1185
 msgid "Read-only"
 msgstr "Nur-Lesen"
 
-#: ..\..\..\inc\files\files.ctrl.php:1185
+#: ..\..\..\inc\files\files.ctrl.php:1186
 msgid "Read and write"
 msgstr "Lesen-Schreiben"
 
-#: ..\..\..\inc\files\files.ctrl.php:1199
-#: ..\..\..\inc\files\files.ctrl.php:1221
+#: ..\..\..\inc\files\files.ctrl.php:1200
+#: ..\..\..\inc\files\files.ctrl.php:1222
 #, php-format
 msgid "Permissions for &laquo;%s&raquo; have not been changed."
 msgstr "Berechtigungen für &laquo;%s&raquo; wurden nicht verändert."
 
-#: ..\..\..\inc\files\files.ctrl.php:1212
+#: ..\..\..\inc\files\files.ctrl.php:1213
 #, php-format
 msgid "Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;."
 msgstr ""
 "Konnte die Berechtigungen für &laquo;%s&raquo; nicht auf &laquo;%s&raquo; "
 "setzen."
 
-#: ..\..\..\inc\files\files.ctrl.php:1225
+#: ..\..\..\inc\files\files.ctrl.php:1226
 #, php-format
 msgid "Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;."
 msgstr "Berechtigungen für &laquo;%s&raquo; auf &laquo;%s&raquo; gesetzt."
 
-#: ..\..\..\inc\files\files.ctrl.php:1324
+#: ..\..\..\inc\files\files.ctrl.php:1325
 msgid "No source files!"
 msgstr "Keine Quelldateien!"
 
-#: ..\..\..\inc\files\files.ctrl.php:1374
+#: ..\..\..\inc\files\files.ctrl.php:1375
 msgid ""
 "Source and target files are the same. Please choose another name or "
 "directory."
@@ -6296,7 +6287,7 @@ msgstr ""
 "Quell- und Zieldatei sind identisch. Bitte wählen Sie einen anderen Namen "
 "oder ein anderes Verzeichnis."
 
-#: ..\..\..\inc\files\files.ctrl.php:1400
+#: ..\..\..\inc\files\files.ctrl.php:1401
 #, php-format
 msgid ""
 "Cannot overwrite the file &laquo;%s&raquo; because of the following relations"
@@ -6304,27 +6295,27 @@ msgstr ""
 "Kann die Datei &laquo;%s&raquo; auf Grund der folgenden Beziehungen nicht "
 "überschreiben"
 
-#: ..\..\..\inc\files\files.ctrl.php:1425
+#: ..\..\..\inc\files\files.ctrl.php:1426
 #, php-format
 msgid "Copied &laquo;%s&raquo; to &laquo;%s&raquo;."
 msgstr "&laquo;%s&raquo; nach &laquo;%s&raquo; kopiert."
 
-#: ..\..\..\inc\files\files.ctrl.php:1435
+#: ..\..\..\inc\files\files.ctrl.php:1436
 #, php-format
 msgid "Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;."
 msgstr "Konnte &laquo;%s&raquo; nicht nach &laquo;%s&raquo; kopieren."
 
-#: ..\..\..\inc\files\files.ctrl.php:1464
+#: ..\..\..\inc\files\files.ctrl.php:1465
 #, php-format
 msgid "Moved &laquo;%s&raquo; to &laquo;%s&raquo;."
 msgstr "&laquo;%s&raquo; nach &laquo;%s&raquo; verschoben."
 
-#: ..\..\..\inc\files\files.ctrl.php:1479
+#: ..\..\..\inc\files\files.ctrl.php:1480
 #, php-format
 msgid "Could not move &laquo;%s&raquo; to &laquo;%s&raquo;."
 msgstr "Konnte &laquo;%s&raquo; nicht nach &laquo;%s&raquo; verschieben."
 
-#: ..\..\..\inc\files\files.ctrl.php:1518
+#: ..\..\..\inc\files\files.ctrl.php:1519
 #: ..\..\..\inc\files\upload.ctrl.php:405
 msgid "Browse"
 msgstr "Durchsuchen"
@@ -6977,7 +6968,7 @@ msgid "View this post..."
 msgstr "Diesen Eintrag ansehen..."
 
 #: ..\..\..\inc\files\views\_file_links.view.php:62
-#: ..\..\..\inc\items\model\_item.class.php:2203
+#: ..\..\..\inc\items\model\_item.class.php:2204
 msgid "Edit this post..."
 msgstr "Diesen Eintrag bearbeiten..."
 
@@ -7630,7 +7621,7 @@ msgid "Expert"
 msgstr "Experte"
 
 #: ..\..\..\inc\items\items.ctrl.php:761
-#: ..\..\..\inc\items\model\_item.class.php:2114
+#: ..\..\..\inc\items\model\_item.class.php:2115
 msgid "Delete this post"
 msgstr "Lösche diesen Eintrag"
 
@@ -7639,8 +7630,8 @@ msgid "delete"
 msgstr "Löschen"
 
 #: ..\..\..\inc\items\items.ctrl.php:763
-#: ..\..\..\inc\items\model\_item.class.php:2127
-#: ..\..\..\inc\items\model\_item.class.php:2135
+#: ..\..\..\inc\items\model\_item.class.php:2128
+#: ..\..\..\inc\items\model\_item.class.php:2136
 msgid "You are about to delete this post!\\nThis cannot be undone!"
 msgstr ""
 "Sie sind dabei, diesen Eintrag zu löschen!\\nDas kann nicht rückgängig "
@@ -7743,16 +7734,16 @@ msgstr "Mehr lesen"
 msgid "Follow up:"
 msgstr "Fortsetzung:"
 
-#: ..\..\..\inc\items\model\_item.class.php:1520
+#: ..\..\..\inc\items\model\_item.class.php:1521
 msgid "Send email to post author"
 msgstr "Sende eine E-Mail an den Eintragsautor"
 
-#: ..\..\..\inc\items\model\_item.class.php:1554
+#: ..\..\..\inc\items\model\_item.class.php:1555
 msgid "Send email to assigned user"
 msgstr "E-Mail an den zugeordneten Benutzer schicken"
 
-#: ..\..\..\inc\items\model\_item.class.php:1582
-#: ..\..\..\inc\items\views\_item_list_full.view.php:237
+#: ..\..\..\inc\items\model\_item.class.php:1583
+#: ..\..\..\inc\items\views\_item_list_full.view.php:241
 #: ..\..\..\skins\_item_content.inc.php:86
 #: ..\..\..\skins\basic\_item_content.inc.php:48
 #: ..\..\..\skins\custom\index.main.php:138
@@ -7761,172 +7752,172 @@ msgstr "E-Mail an den zugeordneten Benutzer schicken"
 msgid "Pages:"
 msgstr "Seiten:"
 
-#: ..\..\..\inc\items\model\_item.class.php:1745
+#: ..\..\..\inc\items\model\_item.class.php:1746
 msgid "Comment feed for this post"
 msgstr "Kommentar-Feed für diesen Eintrag"
 
-#: ..\..\..\inc\items\model\_item.class.php:1802
+#: ..\..\..\inc\items\model\_item.class.php:1803
 msgid "Display feedback / Leave a comment"
 msgstr "Zeige Feedback / Hinterlasse einen Kommentar"
 
-#: ..\..\..\inc\items\model\_item.class.php:1803
+#: ..\..\..\inc\items\model\_item.class.php:1804
 msgid "Send feedback"
 msgstr "Sende Feedback"
 
-#: ..\..\..\inc\items\model\_item.class.php:1804
-#: ..\..\..\inc\items\model\_item.class.php:1926
+#: ..\..\..\inc\items\model\_item.class.php:1805
+#: ..\..\..\inc\items\model\_item.class.php:1927
 msgid "1 feedback"
 msgstr "1 Feedback"
 
-#: ..\..\..\inc\items\model\_item.class.php:1805
-#: ..\..\..\inc\items\model\_item.class.php:1927
+#: ..\..\..\inc\items\model\_item.class.php:1806
+#: ..\..\..\inc\items\model\_item.class.php:1928
 #: ..\..\..\inc\items\views\_item_list_table.view.php:123
 #: ..\..\..\inc\items\views\_item_list_track.view.php:88
 #, php-format
 msgid "%d feedbacks"
 msgstr "%d Feedbacks"
 
-#: ..\..\..\inc\items\model\_item.class.php:1809
+#: ..\..\..\inc\items\model\_item.class.php:1810
 msgid "Display comments / Leave a comment"
 msgstr "Zeige Kommentare / Hinterlasse Kommentar"
 
-#: ..\..\..\inc\items\model\_item.class.php:1831
+#: ..\..\..\inc\items\model\_item.class.php:1832
 msgid "Display trackbacks / Get trackback address for this post"
 msgstr "Zeige Trackbacks / Trackback-Adresse für diesen Eintrag"
 
-#: ..\..\..\inc\items\model\_item.class.php:1832
+#: ..\..\..\inc\items\model\_item.class.php:1833
 msgid "Send a trackback"
 msgstr "Einen Trackback senden"
 
-#: ..\..\..\inc\items\model\_item.class.php:1833
-#: ..\..\..\inc\items\model\_item.class.php:1938
+#: ..\..\..\inc\items\model\_item.class.php:1834
+#: ..\..\..\inc\items\model\_item.class.php:1939
 msgid "1 trackback"
 msgstr "1 Trackback"
 
-#: ..\..\..\inc\items\model\_item.class.php:1834
-#: ..\..\..\inc\items\model\_item.class.php:1939
+#: ..\..\..\inc\items\model\_item.class.php:1835
+#: ..\..\..\inc\items\model\_item.class.php:1940
 #, php-format
 msgid "%d trackbacks"
 msgstr "%d Trackbacks"
 
-#: ..\..\..\inc\items\model\_item.class.php:1845
+#: ..\..\..\inc\items\model\_item.class.php:1846
 msgid "Display pingbacks"
 msgstr "Pingbacks anzeigen"
 
-#: ..\..\..\inc\items\model\_item.class.php:1846
+#: ..\..\..\inc\items\model\_item.class.php:1847
 msgid "No pingback yet"
 msgstr "Noch kein Pingback"
 
-#: ..\..\..\inc\items\model\_item.class.php:1847
-#: ..\..\..\inc\items\model\_item.class.php:1945
+#: ..\..\..\inc\items\model\_item.class.php:1848
+#: ..\..\..\inc\items\model\_item.class.php:1946
 msgid "1 pingback"
 msgstr "1 Pingback"
 
-#: ..\..\..\inc\items\model\_item.class.php:1848
-#: ..\..\..\inc\items\model\_item.class.php:1946
+#: ..\..\..\inc\items\model\_item.class.php:1849
+#: ..\..\..\inc\items\model\_item.class.php:1947
 #, php-format
 msgid "%d pingbacks"
 msgstr "%d Pingbacks"
 
-#: ..\..\..\inc\items\model\_item.class.php:2004
+#: ..\..\..\inc\items\model\_item.class.php:2005
 msgid "Moderate these feedbacks"
 msgstr "Moderiere diese Feedbacks"
 
-#: ..\..\..\inc\items\model\_item.class.php:2004
+#: ..\..\..\inc\items\model\_item.class.php:2005
 msgid "Moderate..."
 msgstr "Moderieren..."
 
-#: ..\..\..\inc\items\model\_item.class.php:2262
+#: ..\..\..\inc\items\model\_item.class.php:2263
 msgid "Publish NOW!"
 msgstr "JETZT veröffentlichen"
 
-#: ..\..\..\inc\items\model\_item.class.php:2263
+#: ..\..\..\inc\items\model\_item.class.php:2264
 msgid "Publish now using current date and time."
 msgstr "Veröffentliche jetzt mit aktuellem Datum und Zeit."
 
-#: ..\..\..\inc\items\model\_item.class.php:2309
+#: ..\..\..\inc\items\model\_item.class.php:2310
 msgid "Deprecate this post!"
 msgstr "Missbillige diesen Eintrag!"
 
 #. TRANS: "None" select option
-#: ..\..\..\inc\items\model\_item.class.php:2365
+#: ..\..\..\inc\items\model\_item.class.php:2366
 msgid "No priority"
 msgstr "Kein Priorität"
 
-#: ..\..\..\inc\items\model\_item.class.php:2485
+#: ..\..\..\inc\items\model\_item.class.php:2486
 msgid "Configure plugins"
 msgstr "Plugins konfigurieren"
 
-#: ..\..\..\inc\items\model\_item.class.php:2485
+#: ..\..\..\inc\items\model\_item.class.php:2486
 msgid "No renderer plugins are installed."
 msgstr "Es sind keine Render-Plugins installiert."
 
-#: ..\..\..\inc\items\model\_item.class.php:2764
+#: ..\..\..\inc\items\model\_item.class.php:2765
 msgid "No views"
 msgstr "Keine Ansichten"
 
-#: ..\..\..\inc\items\model\_item.class.php:2768
+#: ..\..\..\inc\items\model\_item.class.php:2769
 msgid "1 view"
 msgstr "1 Ansicht"
 
-#: ..\..\..\inc\items\model\_item.class.php:2772
+#: ..\..\..\inc\items\model\_item.class.php:2773
 #, php-format
 msgid "%d views"
 msgstr "%d Ansichten"
 
-#: ..\..\..\inc\items\model\_item.class.php:3281
+#: ..\..\..\inc\items\model\_item.class.php:3282
 msgid "Post had already pinged: skipping notifications..."
 msgstr "Eintrag wurde bereits gepingt: Überspringe Benachrichtigungen..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3292
+#: ..\..\..\inc\items\model\_item.class.php:3293
 msgid "Post processing already pending..."
 msgstr "Nachverarbeitung bereits in Vorbereitung..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3302
+#: ..\..\..\inc\items\model\_item.class.php:3303
 msgid "Post not publicly published: skipping notifications..."
 msgstr ""
 "Eintrag nicht öffentlich publiziert: Überspringe Benachrichtigungen..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3312
+#: ..\..\..\inc\items\model\_item.class.php:3313
 msgid "This post type doesn't need notifications..."
 msgstr "Diese Eintragstyp benötigt keine Benachrichtigungen..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3330
+#: ..\..\..\inc\items\model\_item.class.php:3331
 msgid "Scheduling asynchronous notifications..."
 msgstr "Plane asynchrone Benachrichtigungen..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3342
+#: ..\..\..\inc\items\model\_item.class.php:3343
 #, php-format
 msgid "Send notifications for &laquo;%s&raquo;"
 msgstr "Sende Benachrichtigungen für &laquo;%s&raquo;"
 
-#: ..\..\..\inc\items\model\_item.class.php:3386
+#: ..\..\..\inc\items\model\_item.class.php:3387
 msgid "Notifying subscribed users..."
 msgstr "Benachrichtige Abonnenten..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3409
+#: ..\..\..\inc\items\model\_item.class.php:3410
 msgid "No-one to notify."
 msgstr "Niemand zum Benachrichtigen."
 
-#: ..\..\..\inc\items\model\_item.class.php:3428
-#: ..\..\..\inc\items\model\_item.class.php:3443
+#: ..\..\..\inc\items\model\_item.class.php:3429
+#: ..\..\..\inc\items\model\_item.class.php:3444
 msgid "Content"
 msgstr "Inhalt"
 
-#: ..\..\..\inc\items\model\_item.class.php:3430
+#: ..\..\..\inc\items\model\_item.class.php:3431
 #, php-format
 msgid "[%s] New post: \"%s\""
 msgstr "[%s] Neuer Eintrag: \"%s\""
 
-#: ..\..\..\inc\items\model\_item.class.php:3459
+#: ..\..\..\inc\items\model\_item.class.php:3460
 msgid "Notifying:"
 msgstr "Benachrichtige:"
 
-#: ..\..\..\inc\items\model\_item.class.php:3493
+#: ..\..\..\inc\items\model\_item.class.php:3494
 msgid "Skipping pings (Running on localhost)."
 msgstr "Überspringe Pings (laufe auf localhost)."
 
-#: ..\..\..\inc\items\model\_item.class.php:3502
+#: ..\..\..\inc\items\model\_item.class.php:3503
 #, php-format
 msgid "Pinging %s..."
 msgstr "Pinge %s..."
@@ -7936,80 +7927,80 @@ msgstr "Pinge %s..."
 msgid "Warning: the URL slug has been changed to &laquo;%s&raquo;."
 msgstr "WARNUNG: Die URL-Schlagzeile wurde zu &laquo;%s&raquo; geändert."
 
-#: ..\..\..\inc\items\model\_item.funcs.php:426
+#: ..\..\..\inc\items\model\_item.funcs.php:436
 #: ..\..\..\inc\items\views\_item_links.view.php:60
 #: ..\..\..\inc\items\views\inc\_item_links.inc.php:51
 msgid "Attachments"
 msgstr "Anhänge"
 
 #. TRANS: This is the value of an input submit button
-#: ..\..\..\inc\items\model\_item.funcs.php:433
+#: ..\..\..\inc\items\model\_item.funcs.php:443
 msgid "Save & start attaching files"
 msgstr "Speichern & Dateien anhängen"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:454
+#: ..\..\..\inc\items\model\_item.funcs.php:464
 msgid "Attach files (popup)"
 msgstr "Dateien anhängen (Popup)"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:530
+#: ..\..\..\inc\items\model\_item.funcs.php:540
 msgid "Add a new category"
 msgstr "Eine neue Kategorie hinzufügen"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:554
+#: ..\..\..\inc\items\model\_item.funcs.php:564
 msgid "Main"
 msgstr "Haupt"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:557
+#: ..\..\..\inc\items\model\_item.funcs.php:567
 msgid "Extra"
 msgstr "Extra"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:592
+#: ..\..\..\inc\items\model\_item.funcs.php:602
 #: ..\..\..\inc\tools\mtimport.ctrl.php:1301
 msgid "Select as MAIN category"
 msgstr "Wähle als HAUPT-Kategorie"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:616
+#: ..\..\..\inc\items\model\_item.funcs.php:626
 msgid "Select as an additional category"
 msgstr "Wähle als eine zusätzliche Kategorie"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:682
+#: ..\..\..\inc\items\model\_item.funcs.php:692
 msgid "Intros"
 msgstr "Intros"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:686
+#: ..\..\..\inc\items\model\_item.funcs.php:696
 msgid "Podcasts"
 msgstr "Podcasts"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:735
+#: ..\..\..\inc\items\model\_item.funcs.php:745
 msgid "(Public)"
 msgstr "(Öffentlich)"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:738
+#: ..\..\..\inc\items\model\_item.funcs.php:748
 msgid "(Members only)"
 msgstr "(Nur Mitglieder)"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:741
+#: ..\..\..\inc\items\model\_item.funcs.php:751
 msgid "(You only)"
 msgstr "(Nur Sie)"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:744
-#: ..\..\..\inc\items\model\_item.funcs.php:747
+#: ..\..\..\inc\items\model\_item.funcs.php:754
+#: ..\..\..\inc\items\model\_item.funcs.php:757
 msgid "(Not published!)"
 msgstr "(Nicht veröffentlicht!)"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:750
+#: ..\..\..\inc\items\model\_item.funcs.php:760
 msgid "(301)"
 msgstr "(301)"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:765
+#: ..\..\..\inc\items\model\_item.funcs.php:775
 msgid "Issue date"
 msgstr "Veröffentlichungsdatum"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:769
+#: ..\..\..\inc\items\model\_item.funcs.php:779
 msgid "Update issue date to NOW"
 msgstr "Veröffentlichungsdatum auf JETZT setzen"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:778
+#: ..\..\..\inc\items\model\_item.funcs.php:788
 msgid "Set to"
 msgstr "Setzen auf"
 
@@ -8214,7 +8205,7 @@ msgid "(Separate by space)"
 msgstr "(durch Leerzeichen trennen)"
 
 #: ..\..\..\inc\items\views\_item_expert.form.php:321
-#: ..\..\..\install\_functions_create.php:629
+#: ..\..\..\install\_functions_create.php:648
 msgid "Featured post"
 msgstr "Sondereintrag"
 
@@ -8311,8 +8302,8 @@ msgstr "1 Seite"
 #: ..\..\..\inc\items\views\_item_list_full.view.php:110
 #: ..\..\..\skins_adm\_adminUI_general.class.php:813
 #: ..\..\..\skins_adm\_adminUI_general.class.php:814
+#: ..\..\..\skins_adm\_adminUI_general.class.php:898
 #: ..\..\..\skins_adm\_adminUI_general.class.php:899
-#: ..\..\..\skins_adm\_adminUI_general.class.php:900
 #: ..\..\..\skins_adm\chicago\_adminUI.class.php:271
 #: ..\..\..\skins_adm\chicago\_adminUI.class.php:272
 msgid "..."
@@ -8337,65 +8328,61 @@ msgstr "von"
 msgid "level:"
 msgstr "Level:"
 
-#: ..\..\..\inc\items\views\_item_list_full.view.php:179
-msgid "Assigned to:"
-msgstr "Zugeordnet zu:"
-
-#: ..\..\..\inc\items\views\_item_list_full.view.php:180
+#: ..\..\..\inc\items\views\_item_list_full.view.php:183
 msgid "Task Status"
 msgstr "Aufgabenstatus"
 
-#: ..\..\..\inc\items\views\_item_list_full.view.php:259
+#: ..\..\..\inc\items\views\_item_list_full.view.php:263
 msgid "View..."
 msgstr "Ansehen..."
 
-#: ..\..\..\inc\items\views\_item_list_full.view.php:269
+#: ..\..\..\inc\items\views\_item_list_full.view.php:273
 msgid "Files..."
 msgstr "Dateien..."
 
 # TRANS: Link to comments for current post
 #. TRANS: Link to comments for current post
-#: ..\..\..\inc\items\views\_item_list_full.view.php:284
+#: ..\..\..\inc\items\views\_item_list_full.view.php:288
 msgid "no comment"
 msgstr "kein Kommentar"
 
-#: ..\..\..\inc\items\views\_item_list_full.view.php:286
+#: ..\..\..\inc\items\views\_item_list_full.view.php:290
 #, php-format
 msgid "%d Trackbacks"
 msgstr "%d Trackbacks"
 
-#: ..\..\..\inc\items\views\_item_list_full.view.php:286
+#: ..\..\..\inc\items\views\_item_list_full.view.php:290
 msgid "1 Trackback"
 msgstr "1 Trackback"
 
-#: ..\..\..\inc\items\views\_item_list_full.view.php:318
+#: ..\..\..\inc\items\views\_item_list_full.view.php:322
 #: ..\..\..\skins\basic\_item_feedback.inc.php:84
 msgid "Pingbacks"
 msgstr "Pingbacks"
 
-#: ..\..\..\inc\items\views\_item_list_full.view.php:327
+#: ..\..\..\inc\items\views\_item_list_full.view.php:331
 msgid "No feedback for this post yet..."
 msgstr "Bisher kein Feedback für diesen Eintrag..."
 
-#: ..\..\..\inc\items\views\_item_list_full.view.php:352
+#: ..\..\..\inc\items\views\_item_list_full.view.php:356
 #: ..\..\..\skins\_item_comment_form.inc.php:130
 #: ..\..\..\skins\basic\_item_feedback.inc.php:189
 #: ..\..\..\skins\glossyblue\_item_feedback.inc.php:317
 msgid "Edit profile"
 msgstr "Profil bearbeiten"
 
-#: ..\..\..\inc\items\views\_item_list_full.view.php:356
+#: ..\..\..\inc\items\views\_item_list_full.view.php:360
 #: ..\..\..\skins\_item_comment_form.inc.php:160
 #: ..\..\..\skins\basic\_item_feedback.inc.php:220
 #: ..\..\..\skins\glossyblue\_item_feedback.inc.php:345
 msgid "Comment text"
 msgstr "Kommentar"
 
-#: ..\..\..\inc\items\views\_item_list_full.view.php:360
+#: ..\..\..\inc\items\views\_item_list_full.view.php:364
 msgid "(Line breaks become &lt;br&gt;)"
 msgstr "(Zeilenumbrüche werden zu &lt;br&gt;)"
 
-#: ..\..\..\inc\items\views\_item_list_full.view.php:365
+#: ..\..\..\inc\items\views\_item_list_full.view.php:369
 #: ..\..\..\skins\_item_comment_form.inc.php:200
 #: ..\..\..\skins\basic\_item_feedback.inc.php:244
 #: ..\..\..\skins\glossyblue\_item_feedback.inc.php:387
@@ -9049,7 +9036,7 @@ msgid "Local documentation of the plugin"
 msgstr "Lokale Dokumentation des Plugins"
 
 #: ..\..\..\inc\plugins\_plugin.class.php:2811
-#: ..\..\..\inc\plugins\plugins.ctrl.php:958
+#: ..\..\..\inc\plugins\plugins.ctrl.php:961
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:126
 msgid "Edit plugin settings!"
 msgstr "Plugin-Einstellungen bearbeiten!"
@@ -9247,7 +9234,7 @@ msgid "The database has been updated."
 msgstr "Die Datenbank wurde aktualisiert."
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:112
-#: ..\..\..\install\_functions_evoupgrade.php:2456
+#: ..\..\..\install\_functions_evoupgrade.php:2466
 msgid "The DB schema has been changed since confirmation."
 msgstr "Das Datenbank-Schema wurde verändert, seitdem es bestätigt wurde."
 
@@ -9385,36 +9372,36 @@ msgstr "Plugin-Ereignisse wurden aktualisiert."
 msgid "The plugin has been disabled."
 msgstr "Das Plugin wurde deaktiviert."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:798
+#: ..\..\..\inc\plugins\plugins.ctrl.php:801
 #, php-format
 msgid "Edit plugin &laquo;%s&raquo; (ID %d)"
 msgstr "Bearbeite Plugin &laquo;%s&raquo; (ID %d)"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:815
+#: ..\..\..\inc\plugins\plugins.ctrl.php:818
 #, php-format
 msgid "Help for plugin &laquo;%s&raquo;"
 msgstr "Hilfe für Plugin &laquo;%s&raquo;"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:818
+#: ..\..\..\inc\plugins\plugins.ctrl.php:821
 msgid "External help page"
 msgstr "Externe Hilfeseite"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:871
+#: ..\..\..\inc\plugins\plugins.ctrl.php:874
 msgid "Cancel installation!"
 msgstr "Installation abbrechen!"
 
 #. TRANS: %d is ID, %d name
-#: ..\..\..\inc\plugins\plugins.ctrl.php:873
+#: ..\..\..\inc\plugins\plugins.ctrl.php:876
 #, php-format
 msgid "Finish setup for plugin #%d (%s)"
 msgstr "Installation für Plugin #%d (%s) abschließen"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:875
+#: ..\..\..\inc\plugins\plugins.ctrl.php:878
 msgid "The plugin needs the following database changes."
 msgstr "Das Plugin benötigt die folgenden Datenbankänderungen."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:879
-#: ..\..\..\install\_functions_evoupgrade.php:2480
+#: ..\..\..\inc\plugins\plugins.ctrl.php:882
+#: ..\..\..\install\_functions_evoupgrade.php:2490
 msgid ""
 "The following database changes will be carried out. If you are not sure what "
 "this means, it will probably be alright."
@@ -9422,40 +9409,40 @@ msgstr ""
 "Die folgenden Datenbankänderungen werden ausgeführt. Wenn Sie nicht wissen, "
 "was das bedeutet, wird es wahrscheinlich in Ordnung sein."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:892
+#: ..\..\..\inc\plugins\plugins.ctrl.php:895
 msgid "Install!"
 msgstr "Installieren!"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:914
+#: ..\..\..\inc\plugins\plugins.ctrl.php:917
 msgid "Cancel uninstall!"
 msgstr "Installation abbrechen!"
 
 # TRANS: %d is ID, %d name
 #. TRANS: %d is ID, %d name
-#: ..\..\..\inc\plugins\plugins.ctrl.php:916
+#: ..\..\..\inc\plugins\plugins.ctrl.php:919
 #, php-format
 msgid "Uninstall plugin #%d (%s)"
 msgstr "Plugin #%d (%s) deinstallieren"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:920
+#: ..\..\..\inc\plugins\plugins.ctrl.php:923
 msgid "Uninstalling this plugin will also delete its database tables:"
 msgstr ""
 "Das Deinstallieren des Pluigins wird auch seine Datenbanktabellen löschen:"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:962
+#: ..\..\..\inc\plugins\plugins.ctrl.php:965
 msgid "Close info!"
 msgstr "Schließe Info!"
 
 # TRANS: Code of a plugin
 #. TRANS: Code of a plugin
-#: ..\..\..\inc\plugins\plugins.ctrl.php:968
+#: ..\..\..\inc\plugins\plugins.ctrl.php:971
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:194
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:114
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:212
 msgid "Code"
 msgstr "Code"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:970
+#: ..\..\..\inc\plugins\plugins.ctrl.php:973
 msgid ""
 "This 32 character code uniquely identifies the functionality of this plugin. "
 "It is only necessary to call the plugin by code (SkinTag) or when using it "
@@ -9465,29 +9452,29 @@ msgstr ""
 "eindeutig. Er ist nur notwendig, um das Plugin über seinen Code aufzurufen "
 "(SkinTag) oder wenn es als Renderer benutzt wird."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:971
+#: ..\..\..\inc\plugins\plugins.ctrl.php:974
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:74
 msgid "Short desc"
 msgstr "Kurze Beschreibung"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:972
+#: ..\..\..\inc\plugins\plugins.ctrl.php:975
 msgid "Long desc"
 msgstr "Ausführliche Beschreibung"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:977
+#: ..\..\..\inc\plugins\plugins.ctrl.php:980
 #: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:54
 msgid "Version"
 msgstr "Version"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:978
+#: ..\..\..\inc\plugins\plugins.ctrl.php:981
 msgid "Classname"
 msgstr "Klassenname"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:979
+#: ..\..\..\inc\plugins\plugins.ctrl.php:982
 msgid "Class file"
 msgstr "Klassendatei"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:1009
+#: ..\..\..\inc\plugins\plugins.ctrl.php:1012
 #: ..\..\..\inc\skins\model\_skin.class.php:391
 #: ..\..\..\inc\skins\model\_skin.class.php:433
 #: ..\..\..\inc\skins\model\_skin.class.php:434
@@ -9704,7 +9691,7 @@ msgstr "Stats"
 
 #: ..\..\..\inc\sessions\_sessions.init.php:161
 msgid "Hit summary"
-msgstr "Zugriffszusammenfassung"
+msgstr "Zusammenfassung"
 
 #: ..\..\..\inc\sessions\_sessions.init.php:165
 msgid "Global hits"
@@ -9811,7 +9798,7 @@ msgstr "%d verwandte Zieltreffer"
 msgid "Default value must be a number."
 msgstr "Standardwert muss eine Zahl sein."
 
-#: ..\..\..\inc\sessions\model\_hit.class.php:703
+#: ..\..\..\inc\sessions\model\_hit.class.php:737
 msgid "bad char in User Agent"
 msgstr "böses Zeichen in User Agent"
 
@@ -9868,7 +9855,7 @@ msgstr "Dieses Ziel löschen!"
 
 #: ..\..\..\inc\sessions\views\_goal.form.php:34
 #: ..\..\..\inc\sessions\views\_stats_goalhits.view.php:176
-#: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:140
+#: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:148
 #: ..\..\..\inc\sessions\views\_stats_search_keywords.view.php:189
 msgid "Goal"
 msgstr "Ziel"
@@ -9982,28 +9969,28 @@ msgstr ""
 #: ..\..\..\inc\sessions\views\_stats_goalhits.view.php:142
 #: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:106
 #: ..\..\..\inc\sessions\views\_stats_referers.view.php:55
-#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:51
+#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:52
 msgid "Date Time"
 msgstr "Datum Zeit"
 
 #: ..\..\..\inc\sessions\views\_stats_direct.view.php:66
 #: ..\..\..\inc\sessions\views\_stats_referers.view.php:69
-#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:66
+#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:67
 msgid "Delete this hit!"
 msgstr "Lösche diese Zugriffsaufzeichnung!"
 
 #: ..\..\..\inc\sessions\views\_stats_direct.view.php:82
-#: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:154
+#: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:162
 #: ..\..\..\inc\sessions\views\_stats_referers.view.php:116
-#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:93
+#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:102
 msgid "Requested URI"
 msgstr "Angeforderter URI"
 
 #: ..\..\..\inc\sessions\views\_stats_direct.view.php:89
 #: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:81
-#: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:160
+#: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:168
 #: ..\..\..\inc\sessions\views\_stats_referers.view.php:123
-#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:100
+#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:109
 #: ..\..\..\inc\sessions\views\_stats_sessions_list.view.php:93
 msgid "Remote IP"
 msgstr "Entfernte IP"
@@ -10045,7 +10032,7 @@ msgstr "Benutzeragent"
 
 #: ..\..\..\inc\sessions\views\_stats_goalhits.view.php:170
 #: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:134
-#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:76
+#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:77
 #: ..\..\..\inc\sessions\views\_stats_search_keywords.view.php:220
 msgid "Search keywords"
 msgstr "Suchwörter"
@@ -10171,11 +10158,11 @@ msgstr "% vom Gesamtwert"
 msgid "Total referers"
 msgstr "Referrer insgesamt"
 
-#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:47
+#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:48
 msgid "Search browser hits"
 msgstr "Such-Browserzugriffe"
 
-#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:108
+#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:117
 msgid ""
 "These are hits from people who came to this blog system through a search "
 "engine. (Search engines must be listed in /conf/_stats.php)"
@@ -10639,10 +10626,6 @@ msgstr "auf jeder Admin-Seite"
 msgid "Log hits"
 msgstr "Zugriffe aufzeichnen"
 
-#: ..\..\..\inc\settings\views\_features.form.php:162
-msgid "Not recommended! Your database will grow very large!!"
-msgstr "Nicht empfohlen! Ihre Datenbank wird sehr groß werden!!"
-
 #: ..\..\..\inc\settings\views\_features.form.php:166
 msgid "On every page"
 msgstr "Auf jeder Seite"
@@ -10692,6 +10675,14 @@ msgid ""
 msgstr ""
 "Aktivieren, um das Verschieben von Kategorien zwischen Blogs zu erlauben. "
 "(Achtung: Kann bereits existierende Permalinks unbenutzbar machen!)"
+
+#: ..\..\..\inc\settings\views\_features.form.php:191
+msgid "alphabetical"
+msgstr "alphabetisch"
+
+#: ..\..\..\inc\settings\views\_features.form.php:192
+msgid "manual"
+msgstr "manuell"
 
 #: ..\..\..\inc\settings\views\_features.form.php:193
 msgid "Ordering of categories"
@@ -13035,7 +13026,7 @@ msgstr "Minimale Größe"
 msgid "Max size"
 msgstr "Maximale Größe"
 
-#: ..\..\..\inc\widgets\widgets\_coll_tag_cloud.widget.php:205
+#: ..\..\..\inc\widgets\widgets\_coll_tag_cloud.widget.php:207
 #: ..\..\..\plugins\_calendar.plugin.php:483
 #: ..\..\..\plugins\_calendar.plugin.php:485
 #, php-format
@@ -13283,24 +13274,24 @@ msgstr "Ungültiger URL gefunden: "
 msgid "Tag &lt;%s&gt; may not contain raw character data"
 msgstr "Tag &lt;%s&gt; darf keine reinen Zeichendaten enthalten"
 
-#: ..\..\..\install\_functions_create.php:369
+#: ..\..\..\install\_functions_create.php:388
 #, php-format
 msgid "This is the long description for the blog named '%s'. %s"
 msgstr "Dies ist eine lange Beschreibung für das Blog namens '%s'. %s"
 
-#: ..\..\..\install\_functions_create.php:374
-#: ..\..\..\install\_functions_create.php:387
+#: ..\..\..\install\_functions_create.php:393
+#: ..\..\..\install\_functions_create.php:406
 #, php-format
 msgid "%s Title"
 msgstr "%s-Titel"
 
-#: ..\..\..\install\_functions_create.php:380
-#: ..\..\..\install\_functions_create.php:390
+#: ..\..\..\install\_functions_create.php:399
+#: ..\..\..\install\_functions_create.php:409
 #, php-format
 msgid "Tagline for %s"
 msgstr "Slogan für %s"
 
-#: ..\..\..\install\_functions_create.php:398
+#: ..\..\..\install\_functions_create.php:417
 msgid ""
 "The main purpose for this blog is to be included as a side item to other "
 "blogs where it will display your favorite/related links."
@@ -13309,19 +13300,19 @@ msgstr ""
 "Blogs eingefügt zu werden und dort Ihre favorisierten/verwandten Links "
 "anzuzeigen."
 
-#: ..\..\..\install\_functions_create.php:403
+#: ..\..\..\install\_functions_create.php:422
 msgid "Some interesting links..."
 msgstr "Einige interessante Links..."
 
-#: ..\..\..\install\_functions_create.php:411
+#: ..\..\..\install\_functions_create.php:430
 msgid "This is a photoblog, optimized for displaying photos."
 msgstr "Das ist ein Fotoblog, optimiert zum Darstellen von Fotos."
 
-#: ..\..\..\install\_functions_create.php:416
+#: ..\..\..\install\_functions_create.php:435
 msgid "This blog shows photos..."
 msgstr "Dieses Blog zeigt Fotos..."
 
-#: ..\..\..\install\_functions_create.php:457
+#: ..\..\..\install\_functions_create.php:476
 msgid ""
 "<p>This is the first post.</p>\n"
 "\n"
@@ -13331,11 +13322,11 @@ msgstr ""
 "\n"
 "<p>Er erscheint in einer einzelnen Kategorie.</p>"
 
-#: ..\..\..\install\_functions_create.php:457
+#: ..\..\..\install\_functions_create.php:476
 msgid "First Post"
 msgstr "Erster Eintrag"
 
-#: ..\..\..\install\_functions_create.php:464
+#: ..\..\..\install\_functions_create.php:483
 msgid ""
 "<p>This is the second post.</p>\n"
 "\n"
@@ -13345,31 +13336,31 @@ msgstr ""
 "\n"
 "<p>Er erscheint in mehreren Kategorien.</p>"
 
-#: ..\..\..\install\_functions_create.php:464
+#: ..\..\..\install\_functions_create.php:483
 msgid "Second post"
 msgstr "Zweiter Eintrag"
 
-#: ..\..\..\install\_functions_create.php:479
+#: ..\..\..\install\_functions_create.php:498
 msgid "Bus Stop Ahead"
 msgstr "Bushaltestelle voraus"
 
-#: ..\..\..\install\_functions_create.php:487
+#: ..\..\..\install\_functions_create.php:506
 msgid "John Ford Point"
 msgstr "John Ford Point"
 
-#: ..\..\..\install\_functions_create.php:495
+#: ..\..\..\install\_functions_create.php:514
 msgid "Monuments"
 msgstr "Monumente"
 
-#: ..\..\..\install\_functions_create.php:503
+#: ..\..\..\install\_functions_create.php:522
 msgid "Road to Monument Valley"
 msgstr "Straße zum Monument Valley"
 
-#: ..\..\..\install\_functions_create.php:511
+#: ..\..\..\install\_functions_create.php:530
 msgid "Monument Valley"
 msgstr "Monument Valley"
 
-#: ..\..\..\install\_functions_create.php:511
+#: ..\..\..\install\_functions_create.php:530
 msgid ""
 "This is a short photo album demo. Use the arrows to navigate between photos. "
 "Click on \"Index\" to see a thumbnail index."
@@ -13378,7 +13369,7 @@ msgstr ""
 "Fotos zu navigieren. Klicken Sie auf \"Index\", um einen Index mit "
 "Vorschaubildern zu sehen."
 
-#: ..\..\..\install\_functions_create.php:561
+#: ..\..\..\install\_functions_create.php:580
 #, php-format
 msgid ""
 "This blog is powered by b2evolution.\n"
@@ -13402,23 +13393,23 @@ msgstr ""
 "Falls nötig, kann ein Skin Infoseiten anders als normale Einträge "
 "formatieren."
 
-#: ..\..\..\install\_functions_create.php:572
+#: ..\..\..\install\_functions_create.php:591
 msgid "About Blog B"
 msgstr "Über Blog B"
 
-#: ..\..\..\install\_functions_create.php:572
+#: ..\..\..\install\_functions_create.php:591
 msgid "Blog B"
 msgstr "Blog B"
 
-#: ..\..\..\install\_functions_create.php:578
+#: ..\..\..\install\_functions_create.php:597
 msgid "About Blog A"
 msgstr "Über Blog A"
 
-#: ..\..\..\install\_functions_create.php:578
+#: ..\..\..\install\_functions_create.php:597
 msgid "Blog A"
 msgstr "Blog A"
 
-#: ..\..\..\install\_functions_create.php:584
+#: ..\..\..\install\_functions_create.php:603
 msgid ""
 "This blog platform is powered by b2evolution.\n"
 "\n"
@@ -13445,16 +13436,16 @@ msgstr ""
 "Falls nötig, kann ein Skin Infoseiten anders als normale Einträge "
 "formatieren."
 
-#: ..\..\..\install\_functions_create.php:607
+#: ..\..\..\install\_functions_create.php:626
 msgid "Main Intro post"
 msgstr "Haupt-Intro-Eintrag"
 
-#: ..\..\..\install\_functions_create.php:607
+#: ..\..\..\install\_functions_create.php:626
 msgid "This is the main intro post. It appears on the homepage only."
 msgstr ""
 "Das ist der Haupt-Intro-Eintrag. Er erscheint nur auf der Hauptseite."
 
-#: ..\..\..\install\_functions_create.php:613
+#: ..\..\..\install\_functions_create.php:632
 msgid ""
 "This uses post type \"Intro-Cat\" and is attached to the desired "
 "Category(ies)."
@@ -13462,22 +13453,22 @@ msgstr ""
 "Dies benutzt den Eintragstyp \"Intro-Cat\" und ist in die gewünschten "
 "Kategorien eingeordnet."
 
-#: ..\..\..\install\_functions_create.php:613
+#: ..\..\..\install\_functions_create.php:632
 msgid "b2evolution tips category &ndash; Sub Intro post"
 msgstr "b2evolution-Tipps-Kategorie &ndash; untergeordneter Intro-Eintrag"
 
-#: ..\..\..\install\_functions_create.php:619
+#: ..\..\..\install\_functions_create.php:638
 msgid ""
 "This uses post type \"Intro-Tag\" and is tagged with the desired Tag(s)."
 msgstr ""
 "Dies benutzt den Eintragstyp \"Intro-Tag\" und ist mit den gewünschten "
 "Schlagworten versehen."
 
-#: ..\..\..\install\_functions_create.php:619
+#: ..\..\..\install\_functions_create.php:638
 msgid "Widgets tag &ndash; Sub Intro post"
 msgstr "Widgets-Schlagwort &ndash; untergeordneter Intro-Eintrag"
 
-#: ..\..\..\install\_functions_create.php:629
+#: ..\..\..\install\_functions_create.php:648
 msgid ""
 "This is a demo of a featured post.\n"
 "\n"
@@ -13497,11 +13488,11 @@ msgstr ""
 "Beachten Sie, dass Sondereinträge nicht in der normalen Artikelabfolge "
 "erscheinen."
 
-#: ..\..\..\install\_functions_create.php:641
+#: ..\..\..\install\_functions_create.php:660
 msgid "Apache optimization..."
 msgstr "Apache-Optimierung..."
 
-#: ..\..\..\install\_functions_create.php:641
+#: ..\..\..\install\_functions_create.php:660
 msgid ""
 "In the <code>/blogs</code> folder there is a file called "
 "[<code>sample.htaccess</code>]. You should try renaming it to "
@@ -13522,7 +13513,7 @@ msgstr ""
 "benutzen. Sollte das passieren, wenn Sie die Datei umbenennen, entfernen Sie "
 "sie einfach und alles wird in Ordnung sein."
 
-#: ..\..\..\install\_functions_create.php:649
+#: ..\..\..\install\_functions_create.php:668
 msgid ""
 "By default, blogs are displayed using a skin. (More on skins in another "
 "post.)\n"
@@ -13582,15 +13573,15 @@ msgstr ""
 "die richtige Zugriffsmethode/den richtigen URL für Ihr Blog einstellen - "
 "sonst werden Permalinks nicht ordnungsgemäß funktionieren."
 
-#: ..\..\..\install\_functions_create.php:649
+#: ..\..\..\install\_functions_create.php:668
 msgid "Skins, Stubs, Templates &amp; website integration..."
 msgstr "Skins, Stubs, Templates &amp; Webseiten-Integration..."
 
-#: ..\..\..\install\_functions_create.php:669
+#: ..\..\..\install\_functions_create.php:688
 msgid "About widgets..."
 msgstr "Über Widgets..."
 
-#: ..\..\..\install\_functions_create.php:669
+#: ..\..\..\install\_functions_create.php:688
 msgid ""
 "b2evolution blogs are installed with a default selection of Widgets. For "
 "example, the sidebar of this blog includes widgets like a calendar, a search "
@@ -13619,11 +13610,11 @@ msgstr ""
 "alte benutzen. Stellen Sie sicher, dass Sie Ihre Widgets in Container "
 "einsortieren, die im von Ihnen benutzten Skin existieren."
 
-#: ..\..\..\install\_functions_create.php:681
+#: ..\..\..\install\_functions_create.php:700
 msgid "About skins..."
 msgstr "Über Skins..."
 
-#: ..\..\..\install\_functions_create.php:681
+#: ..\..\..\install\_functions_create.php:700
 msgid ""
 "By default, b2evolution blogs are displayed using a skin.\n"
 "\n"
@@ -13668,7 +13659,7 @@ msgstr ""
 "Lesen Sie auch die <a href=\"http://manual.b2evolution.net/Skins_2.0\" "
 "target=\"_blank\">Skin-Anleitung</a>!"
 
-#: ..\..\..\install\_functions_create.php:701
+#: ..\..\..\install\_functions_create.php:720
 msgid ""
 "<p>This post has an image attached to it. The image is automatically resized "
 "to fit the current skin. You can zoom in by clicking on the thumbnail.</p>\n"
@@ -13685,15 +13676,15 @@ msgstr ""
 "Seite) an, um einen komplett anderen, mehr auf die Fotos als den Blog-Text "
 "konzentrierten Skin zu sehen.</p>"
 
-#: ..\..\..\install\_functions_create.php:701
+#: ..\..\..\install\_functions_create.php:720
 msgid "Image post"
 msgstr "Bildeintrag"
 
-#: ..\..\..\install\_functions_create.php:711
+#: ..\..\..\install\_functions_create.php:730
 msgid "This is a multipage post"
 msgstr "Dies ist ein mehrseitiger Eintrag"
 
-#: ..\..\..\install\_functions_create.php:711
+#: ..\..\..\install\_functions_create.php:730
 msgid ""
 "This is page 1 of a multipage post.\n"
 "\n"
@@ -13732,11 +13723,11 @@ msgstr ""
 "\n"
 "Dies ist die letzte Seite."
 
-#: ..\..\..\install\_functions_create.php:733
+#: ..\..\..\install\_functions_create.php:752
 msgid "Extended post with no teaser"
 msgstr "Erweiterter Eintrag ohne Teaser"
 
-#: ..\..\..\install\_functions_create.php:733
+#: ..\..\..\install\_functions_create.php:752
 msgid ""
 "This is an extended post with no teaser. This means that you won't see this "
 "teaser any more when you click the \"more\" link.\n"
@@ -13755,11 +13746,11 @@ msgstr ""
 "Dies ist der erweiterte Text. Sie sehen ihn nur, wenn Sie auf den \"mehr\"-"
 "Link geklickt haben."
 
-#: ..\..\..\install\_functions_create.php:743
+#: ..\..\..\install\_functions_create.php:762
 msgid "Extended post"
 msgstr "Erweiterter Eintrag"
 
-#: ..\..\..\install\_functions_create.php:743
+#: ..\..\..\install\_functions_create.php:762
 msgid ""
 "This is an extended post. This means you only see this small teaser by "
 "default and you must click on the link below to see more.\n"
@@ -13778,7 +13769,7 @@ msgstr ""
 "Dies ist der erweiterte Text. Sie sehen ihn nur, wenn Sie auf den \"mehr\"-"
 "Link geklickt haben."
 
-#: ..\..\..\install\_functions_create.php:753
+#: ..\..\..\install\_functions_create.php:772
 msgid ""
 "Four blogs have been created with sample contents:\n"
 "<ul>\n"
@@ -13815,11 +13806,11 @@ msgstr ""
 "Blogs hinzufügen, unerwünschte Blogs löschen und bestehende Blogs anpassen "
 "(Titel, Seitenleiste, Skin, Widgets, etc.)."
 
-#: ..\..\..\install\_functions_create.php:753
+#: ..\..\..\install\_functions_create.php:772
 msgid "Welcome to b2evolution!"
 msgstr "Willkommen zu b2evolution!"
 
-#: ..\..\..\install\_functions_create.php:780
+#: ..\..\..\install\_functions_create.php:799
 msgid ""
 "Hi, this is a comment.<br />To delete a comment, just log in, and view the "
 "posts' comments, there you will have the option to edit or delete them."
@@ -13854,15 +13845,15 @@ msgid "I can't upgrade until you make them unique. DB field: [%s]"
 msgstr ""
 "Ich kann nicht upgraden, bevor Sie sie einzigartig machen. DB-Feld: [%s]"
 
-#: ..\..\..\install\_functions_evoupgrade.php:2440
+#: ..\..\..\install\_functions_evoupgrade.php:2450
 msgid "The database schema is up to date."
 msgstr "Das Datenbankschema befindet sich auf dem aktuellsten Stand."
 
-#: ..\..\..\install\_functions_evoupgrade.php:2471
+#: ..\..\..\install\_functions_evoupgrade.php:2481
 msgid "Upgrade database"
 msgstr "Datenbank aktualisieren"
 
-#: ..\..\..\install\_functions_evoupgrade.php:2478
+#: ..\..\..\install\_functions_evoupgrade.php:2488
 msgid ""
 "The version number is correct, but we have detected changes in the database "
 "schema. This can happen with CVS versions..."
@@ -13870,7 +13861,7 @@ msgstr ""
 "Die Versionsnummer ist korrekt, aber wir haben Änderungen im Datenbankschema "
 "festgestellt. Dies kann bei CVS-Versionen vorkommen..."
 
-#: ..\..\..\install\_functions_evoupgrade.php:2489
+#: ..\..\..\install\_functions_evoupgrade.php:2499
 msgid "Upgrade database!"
 msgstr "Datenbank aktualisieren!"
 
@@ -14305,7 +14296,6 @@ msgid "For security reasons, the reset feature is disabled by default."
 msgstr ""
 "Aus Sicherheitsgründen ist die Reset-Funktion standardmäßig ausgeschaltet."
 
-# TRANS: %s gets replaced by app name, usually "b2evolution"
 #. TRANS: %s gets replaced by app name, usually "b2evolution"
 #: ..\..\..\install\index.php:553
 #, php-format
@@ -14313,7 +14303,7 @@ msgid ""
 "Are you sure you want to delete your existing %s tables?\n"
 "Do you have a backup?"
 msgstr ""
-"Sind Sie sicher, dass Sie die %s-Tabellen löschen möchten?\n"
+"Sind Sie sicher, dass Sie Ihre bestehenden %s-Tabellen löschen möchten?\n"
 "Haben Sie ein Backup?"
 
 #: ..\..\..\install\index.php:601
@@ -15910,7 +15900,7 @@ msgstr ""
 msgid "Exit to blogs"
 msgstr "Zu den Blogs"
 
-#: ..\..\..\skins_adm\_adminUI_general.class.php:1257
+#: ..\..\..\skins_adm\_adminUI_general.class.php:1255
 #: ..\..\..\skins_adm\chicago\_adminUI.class.php:128
 msgid ""
 "WARNING: Internet Explorer 6 may not able to display this admin skin "
@@ -16082,18 +16072,49 @@ msgstr ""
 msgid "More posts..."
 msgstr "Mehr Einträge..."
 
-#~ msgid ""
-#~ "Recommended if you have your scheduled jobs properly set up. You could "
-#~ "notify news every minute."
-#~ msgstr ""
-#~ "Empfohlen, wenn Sie Ihre geplanten Jobs ordnungsgemäß konfiguriert haben."
+#~ msgid "Categories for blog:"
+#~ msgstr "Kategorien für Blog:"
 
-#~ msgid "Unkown"
-#~ msgstr "Unbekannt"
+#~ msgid "Assigned to:"
+#~ msgstr "Zugeordnet zu:"
 
-#~ msgid ""
-#~ "This version is not guaranteed to work. The minium recommended MySQL version "
-#~ "is 4.1."
-#~ msgstr ""
-#~ "Es wird nicht garantiert, dass diese Version funktioniert. Wir empfehlen "
-#~ "mindestens die MySQL-Version 4.1."
+#~ msgid "Not recommended! Your database will grow very large!!"
+#~ msgstr "Nicht empfohlen! Ihre Datenbank wird sehr groß werden!!"
+
+#: ..\..\..\inc\chapters\views\_chapter_list.view.php:176
+#, php-format
+msgid "Categories for blog: %s"
+msgstr "Kategorien für Blog: %s"
+
+#: ..\..\..\inc\chapters\views\_chapter_list.view.php:239
+msgid "Alphabetical"
+msgstr "Alphabetisch"
+
+#. TRANS: Manual here = "by hand"
+#: ..\..\..\inc\chapters\views\_chapter_list.view.php:239
+msgid "Manual "
+msgstr "Manuell "
+
+#: ..\..\..\inc\collections\model\_blog.class.php:320
+msgid "Invalid tag prefix."
+msgstr "Ungültiges Schlagwortpräfix"
+
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:252
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:256
+msgid "Rel attribute"
+msgstr "Rel-Attribut"
+
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:253
+#: ..\..\..\inc\collections\views\_coll_urls.form.php:257
+#, php-format
+msgid "Add <a %s>rel=\"tag\" attribute</a> to tag links."
+msgstr "Ein <a %s>rel=\"tag\"-Attribut</a> zu Schlagwort-Links hinzufügen."
+
+#: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:141
+#: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:84
+msgid "SR"
+msgstr "SR"
+
+#: ..\..\..\inc\settings\views\_features.form.php:162
+msgid "Not recommended! Your database will grow very large!"
+msgstr "Nicht empfohlen! Ihre Datenbank wird sehr groß werden!"
