@@ -479,7 +479,8 @@ switch( $action )
 
 		/* fp> I noticed that after publishing a new post, I always want
 		 *     to see how the blog looks like. If anyone doesn't want that,
-		 *     we can make this optional... */
+		 *     we can make this optional... 
+		 */
 		if( ! $was_published && $edited_Item->status == 'published' )
 		{	/* The post's last status wasn't "published", but we're going
 			   to publish it now. Redirect to the blog: */
@@ -1004,6 +1005,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.46  2009/05/21 12:34:39  fplanque
+ * Options to select how much content to display (excerpt|teaser|normal) on different types of pages.
+ *
  * Revision 1.45  2009/05/20 20:09:01  tblue246
  * When updating and publishing a post, only redirect to the blog when the post's status wasn't set to 'published' before.
  *

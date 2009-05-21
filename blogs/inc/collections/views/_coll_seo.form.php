@@ -136,6 +136,14 @@ $Form->begin_fieldset( T_('Main page / post list').get_manual_link('main_page_se
 			  array( 'none', T_('No links on titles') ),
 			), T_('Post titles'), true );
 	// TODO: checkbox display "permalink" separately from the title
+
+	$Form->radio( 'main_content', $edited_Blog->get_setting('main_content'),
+		array(
+				array( 'excerpt', T_('Post excerpts') ),
+				array( 'normal', T_('Standard post contents (stopping at "&lt;!-- more -->")') ),
+				array( 'full', T_('Full post contents (including after "&lt;!-- more -->")') ),
+			), T_('Post contents'), true );
+
  	$Form->radio( 'permalinks', $edited_Blog->get_setting('permalinks'), array(
 			  array( 'single', T_('Link to single post') ),
 			  array( 'archive', T_('Link to post in archive') ),
@@ -194,6 +202,13 @@ $Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_s
 	$Form->checkbox( 'archive_noindex', $edited_Blog->get_setting( 'archive_noindex' ), T_('Indexing'), T_('META NOINDEX') );
 	$Form->checkbox( 'archive_nofollowto', $edited_Blog->get_setting( 'archive_nofollowto' ), T_('Follow TO'), T_('NOFOLLOW on links to').' '.T_('date archives') );
 
+	$Form->radio( 'archive_content', $edited_Blog->get_setting('archive_content'),
+		array(
+				array( 'excerpt', T_('Post excerpts') ),
+				array( 'normal', T_('Standard post contents (stopping at "&lt;!-- more -->")') ),
+				array( 'full', T_('Full post contents (including after "&lt;!-- more -->")') ),
+			), T_('Post contents'), true );
+
 	$Form->text( 'archive_posts_per_page', $edited_Blog->get_setting('archive_posts_per_page'), 4, T_('Posts per page'),
 								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
 
@@ -236,12 +251,20 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo'
 
 	$Form->checkbox( 'chapter_noindex', $edited_Blog->get_setting( 'chapter_noindex' ), T_('Indexing'), T_('META NOINDEX') );
 
+	$Form->radio( 'chapter_content', $edited_Blog->get_setting('chapter_content'),
+		array(
+				array( 'excerpt', T_('Post excerpts') ),
+				array( 'normal', T_('Standard post contents (stopping at "&lt;!-- more -->")') ),
+				array( 'full', T_('Full post contents (including after "&lt;!-- more -->")') ),
+			), T_('Post contents'), true );
+
 	$Form->text( 'chapter_posts_per_page', $edited_Blog->get_setting('chapter_posts_per_page'), 4, T_('Posts per page'),
 								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
 
 	$Form->checkbox( 'catdir_noindex', $edited_Blog->get_setting( 'catdir_noindex' ), T_('Category directory'), T_('META NOINDEX') );
 
 	$Form->end_fieldset();
+
 
 $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo'), array('id'=>'tag_links_fieldset') );
 
@@ -273,6 +296,13 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo'), array('
 		), 'canonical_tag_urls_options', T_('Make canonical') );
 
 	$Form->checkbox( 'tag_noindex', $edited_Blog->get_setting( 'tag_noindex' ), T_('Indexing'), T_('META NOINDEX') );
+
+	$Form->radio( 'tag_content', $edited_Blog->get_setting('tag_content'),
+		array(
+				array( 'excerpt', T_('Post excerpts') ),
+				array( 'normal', T_('Standard post contents (stopping at "&lt;!-- more -->")') ),
+				array( 'full', T_('Full post contents (including after "&lt;!-- more -->")') ),
+			), T_('Post contents'), true );
 
 	$Form->text( 'tag_posts_per_page', $edited_Blog->get_setting('tag_posts_per_page'), 4, T_('Posts per page'),
 								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
@@ -309,9 +339,18 @@ jQuery("#tag_prefix").keyup( function() {
 
 
 <?php
-$Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
+$Form->begin_fieldset( T_('Other filtered pages').get_manual_link('other_filtered_pages_seo') );
 	$Form->checkbox( 'filtered_noindex', $edited_Blog->get_setting( 'filtered_noindex' ), T_('Other filtered posts pages'), T_('META NOINDEX').' - '.T_('Filtered by keyword search, by author, etc.') );
 
+	$Form->radio( 'filtered_content', $edited_Blog->get_setting('filtered_content'),
+		array(
+				array( 'excerpt', T_('Post excerpts') ),
+				array( 'normal', T_('Standard post contents (stopping at "&lt;!-- more -->")') ),
+				array( 'full', T_('Full post contents (including after "&lt;!-- more -->")') ),
+			), T_('Post contents'), true );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
 	$Form->checkbox( 'feedback-popup_noindex', $edited_Blog->get_setting( 'feedback-popup_noindex' ), T_('Comment popups'),
 										T_('META NOINDEX').' - '.T_('For skins with comment popups only.') );
 	$Form->checkbox( 'msgform_noindex', $edited_Blog->get_setting( 'msgform_noindex' ), T_('Contact forms'),
@@ -327,7 +366,6 @@ $Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
 				array( '404', T_('404 "Not found" response') ),
 				array( '410', T_('410 "Gone" response') ),
 			), T_('404 "Not Found" response'), true );
-
 $Form->end_fieldset();
 
 
@@ -339,6 +377,9 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.24  2009/05/21 12:34:39  fplanque
+ * Options to select how much content to display (excerpt|teaser|normal) on different types of pages.
+ *
  * Revision 1.23  2009/05/20 18:27:09  fplanque
  * canonical support for date archives
  *

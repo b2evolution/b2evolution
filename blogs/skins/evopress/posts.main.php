@@ -122,6 +122,8 @@ if( $Item = & get_featured_Item() )
 		<?php
 			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 			skin_include( '_item_content.inc.php', array(
+					'content_mode'   => 'auto',
+					'intro_mode'     => 'normal',
 					'image_size' => 'fit-400x320',
 					'force_more' => true,
 				) );

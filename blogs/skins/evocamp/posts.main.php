@@ -101,6 +101,8 @@ skin_include( '_body_header.inc.php' );
 			<?php
 				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
 				skin_include( '_item_content.inc.php', array(
+						'content_mode'   => 'auto',
+						'intro_mode'     => 'normal',
 						'image_size'     => 'fit-400x320',
 						'more_link_text' => T_('Read more'),
 					) );

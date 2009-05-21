@@ -18,7 +18,9 @@ global $disp_detail;
 
 // Default params:
 $params = array_merge( array(
-		'content_mode'        => 'auto',	// Can be 'excerpt' or 'full'. 'auto' will auto select depending on $disp-detail
+		'content_mode'        => 'auto',	// Can be 'excerpt', 'normal' or 'full'. 'auto' will auto select depending on backoffice SEO settings for $disp-detail
+		'intro_mode'     		  => 'auto',	// same as above. This will typically be forced to "normal" when displaying an intro section so that ontro posts always display as normal there
+		'force_more'  				=> false,		// This will be set to true id 'content_mode' resolves to 'full'.
 		'content_start_excerpt' => '<div class="content_excerpt">',
 		'content_end_excerpt' => '</div>',
 		'content_start_full'  => '<div class="content_full">',
@@ -54,33 +56,39 @@ $params = array_merge( array(
 
 
 // Determine content mode to use..
-$content_mode = $params['content_mode'];
+if( $Item->is_intro() )
+{
+	$content_mode = $params['intro_mode'];
+}
+else
+{
+	$content_mode = $params['content_mode'];
+}
 if( $content_mode == 'auto' )
 {
 	// echo $disp_detail;
 	switch( $disp_detail )
 	{
 		case 'posts-cat':
-		case 'posts-tag':
-		case 'posts-date':
-
-		case 'posts-filtered': // This one feels a bit risky to put to 'excerpt' by default... so remove it if controversy. However this is the mode for search results... so it kind amakes sense to have reduced results.
-
-			// fp> TODO: there should be (SEO) settings in the backoffice to easily enable/disable except mode or each disp type
-			// (right now it requires changing the content_mode param in the skin)
-
-			// fp> note that at the same time it woudl be useful to have individual (for each disp type) settings for $posts aka number of results per page
-
-			// Reduced/excerpt display:
-			$content_mode = 'excerpt';
+			$content_mode = $Blog->get_setting('chapter_content');
 			break;
 
+		case 'posts-tag':
+			$content_mode = $Blog->get_setting('tag_content');
+			break;
+
+		case 'posts-date':
+			$content_mode = $Blog->get_setting('archive_content');
+			break;
+
+		case 'posts-filtered':
+			$content_mode = $Blog->get_setting('filtered_content');
+			break;
 
 		case 'posts-default':  // home page 1
 		case 'posts-next':		 // next page 2, 3, etc
 		default:
-			$content_mode = 'full';
-			// Regular/"full" post display:
+			$content_mode = $Blog->get_setting('main_content');
 	}
 }
 
@@ -119,6 +127,9 @@ switch( $content_mode )
 		break;
 
 	case 'full':
+		$params['force_more'] = true;
+		/* continue down */
+	case 'normal':
 	default:
 		// Full dislpay:
 		echo $params['content_start_full'];
@@ -205,6 +216,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.15  2009/05/21 12:34:39  fplanque
+ * Options to select how much content to display (excerpt|teaser|normal) on different types of pages.
+ *
  * Revision 1.14  2009/05/21 04:53:37  sam2kb
  * Display a list of files attached to post
  * See http://forums.b2evolution.net/viewtopic.php?t=18749

@@ -332,6 +332,27 @@ class Blog extends DataObject
 		$this->set_setting( 'tag_rel_attib', param('tag_rel_attib', 'integer', 0) );
 
 
+		if( param( 'chapter_content', 'string', NULL ) !== NULL )
+		{ // What kind of content in chapter pages?
+			$this->set_setting( 'chapter_content', get_param( 'chapter_content' ) );
+		}
+		if( param( 'tag_content', 'string', NULL ) !== NULL )
+		{ // What kind of content in chapter pages?
+			$this->set_setting( 'tag_content', get_param( 'tag_content' ) );
+		}
+		if( param( 'archive_content', 'string', NULL ) !== NULL )
+		{ // What kind of content in chapter pages?
+			$this->set_setting( 'archive_content', get_param( 'archive_content' ) );
+		}
+		if( param( 'filtered_content', 'string', NULL ) !== NULL )
+		{ // What kind of content in chapter pages?
+			$this->set_setting( 'filtered_content', get_param( 'filtered_content' ) );
+		}
+		if( param( 'main_content', 'string', NULL ) !== NULL )
+		{ // What kind of content in chapter pages?
+			$this->set_setting( 'main_content', get_param( 'main_content' ) );
+		}
+
 		if( param( 'chapter_posts_per_page', 'integer', NULL ) !== NULL )
 		{ // Chapter link type:
 			$this->set_setting( 'chapter_posts_per_page', get_param( 'chapter_posts_per_page' ), true );
@@ -2101,6 +2122,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.64  2009/05/21 12:34:39  fplanque
+ * Options to select how much content to display (excerpt|teaser|normal) on different types of pages.
+ *
  * Revision 1.63  2009/05/20 18:27:09  fplanque
  * canonical support for date archives
  *
