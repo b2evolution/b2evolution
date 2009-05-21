@@ -1742,7 +1742,7 @@ class Item extends ItemLight
 	/**
 	 * Display the files linked to the current Item
 	 *
-	 * @param array of params
+	 * @param array Array of params
 	 * @param string Output format, see {@link format_to_output()}
 	 */
 	function files( $params = array(), $format = 'htmlbody' )
@@ -1754,8 +1754,9 @@ class Item extends ItemLight
 	/**
 	 * Get block of files linked to the current Item
 	 *
-	 * @param array of params
+	 * @param array Array of params
 	 * @param string Output format, see {@link format_to_output()}
+	 * @return string HTML
 	 */
 	function get_files( $params = array(), $format = 'htmlbody' )
 	{
@@ -1782,7 +1783,7 @@ class Item extends ItemLight
 		 * @var File
 		 */
 		$File = NULL;
-		while( $File = & $FileList->get_next() && $params['limit_files'] > $i )
+		while( ( $File = & $FileList->get_next() ) && $params['limit_files'] > $i )
 		{
 			if( ! $File->exists() )
 			{
@@ -3869,6 +3870,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.97  2009/05/21 10:37:54  tblue246
+ * Minor/doc
+ *
  * Revision 1.96  2009/05/21 04:53:37  sam2kb
  * Display a list of files attached to post
  * See http://forums.b2evolution.net/viewtopic.php?t=18749
