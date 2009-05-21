@@ -22,19 +22,19 @@ $params = array_merge( array(
 		'content_start_excerpt' => '<div class="content_excerpt">',
 		'content_end_excerpt' => '</div>',
 		'content_start_full'  => '<div class="content_full">',
-		'content_end_full' => '</div>',
+		'content_end_full'    => '</div>',
 		'before_images'       => '<div class="bImages">',
 		'before_image'        => '<div class="image_block">',
 		'before_image_legend' => '<div class="image_legend">',
 		'after_image_legend'  => '</div>',
 		'after_image'         => '</div>',
 		'after_images'        => '</div>',
-		'image_size'	        => 'fit-400x320',
-		'excerpt_image_size'	=> 'fit-80x80',
+		'image_size'          => 'fit-400x320',
+		'excerpt_image_size'  => 'fit-80x80',
 		'before_url_link'     => '<p class="post_link">'.T_('Link:').' ',
 		'after_url_link'      => '</p>',
 		'url_link_text_template' => '$url$',
-		'force_more'  				=> false,
+		'force_more'          => false,
 		'before_more_link'    => '<p class="bMore">',
 		'after_more_link'     => '</p>',
 		'more_link_text'      => '#',
@@ -43,6 +43,13 @@ $params = array_merge( array(
 		'excerpt_before_more' => ' <span class="excerpt_more">',
 		'excerpt_after_more'  => '</span>',
 		'excerpt_more_text'   => T_('more').' &raquo;',
+		'limit_files'         => 1000,
+		'file_list_start'     => '<ul class="bFiles">',
+		'file_list_end'       => '</ul>',
+		'file_start'          => '<li>',
+		'file_end'            => '</li>',
+		'before_file_size'    => ' <span class="file_size">',
+		'after_file_size'     => '</span>',
 	), $params );
 
 
@@ -131,7 +138,22 @@ switch( $content_mode )
 					'after_image_legend' =>  $params['after_image_legend'],
 					'after_image' =>         $params['after_image_legend'],
 					'after' =>               $params['after_images'],
-					'image_size' =>					 $params['image_size'],
+					'image_size' =>          $params['image_size'],
+				) );
+		}
+		
+		
+		if( !empty($params['limit_files']) )
+		{
+			// Display files that are linked to this post:
+			$Item->files( array(
+					'before' =>              $params['file_list_start'],
+					'before_file' =>         $params['file_start'],
+					'before_file_size' =>    $params['before_file_size'],
+					'after_file_size' =>     $params['after_file_size'],
+					'after_file' =>          $params['file_end'],
+					'after' =>               $params['file_list_end'],
+					'limit_files' =>         $params['limit_files'],
 				) );
 		}
 
@@ -183,6 +205,10 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.14  2009/05/21 04:53:37  sam2kb
+ * Display a list of files attached to post
+ * See http://forums.b2evolution.net/viewtopic.php?t=18749
+ *
  * Revision 1.13  2009/05/19 14:34:32  fplanque
  * Category, tag, archive and serahc page snow only display post excerpts by default. (Requires a 3.x skin; otherwise the skin will display full posts as before). This can be controlled with the ''content_mode'' param in the skin tags.
  *

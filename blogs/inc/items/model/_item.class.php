@@ -1737,6 +1737,83 @@ class Item extends ItemLight
 
 		return $r;
 	}
+	
+	
+	/**
+	 * Display the files linked to the current Item
+	 *
+	 * @param array of params
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function files( $params = array(), $format = 'htmlbody' )
+	{
+		echo $this->get_files( $params, $format );
+	}
+
+
+	/**
+	 * Get block of files linked to the current Item
+	 *
+	 * @param array of params
+	 * @param string Output format, see {@link format_to_output()}
+	 */
+	function get_files( $params = array(), $format = 'htmlbody' )
+	{
+		$params = array_merge( array(
+				'before' =>              '<ul class="bFiles">',
+				'before_file' =>         '<li>',
+				'before_file_size' =>    ' <span class="file_size">',
+				'after_file_size' =>     '</span>',
+				'after_file' =>          '</li>',
+				'after' =>               '</ul>',
+				'limit_files' =>         1000, // Max # of files displayed
+				'limit' =>               1000, 
+			), $params );
+
+		// Get list of attached files
+		$FileList = $this->get_attachment_FileList( $params['limit'] );
+		
+		load_funcs('files/model/_file.funcs.php');
+
+		$r = '';
+		$i = 0;
+		$r_file = array();
+		/**
+		 * @var File
+		 */
+		$File = NULL;
+		while( $File = & $FileList->get_next() && $params['limit_files'] > $i )
+		{
+			if( ! $File->exists() )
+			{
+				global $Debuglog;
+				$Debuglog->add(sprintf('File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path()), array('error', 'files'));
+				continue;
+			}
+			if( $File->is_image() || $File->is_dir() )
+			{	// Skip images and directories
+				continue;
+			}
+
+			$r_file[$i] = $params['before_file'];
+			$r_file[$i] .= action_icon( T_('Download file'), 'download', $File->get_url(), '', 5 ).' ';
+			$r_file[$i] .= $File->get_view_link( $File->get_name() );
+			$r_file[$i] .= $params['before_file_size'].'('.bytesreadable( $File->get_size() ).')'.$params['after_file_size'];
+			$r_file[$i] .= $params['after_file'];
+			
+			$i++;
+		}
+
+		if( !empty($r_file) )
+		{
+			$r = $params['before'].implode( "\n", $r_file ).$params['after'];
+
+			// Character conversions
+			$r = format_to_output( $r, $format );
+		}
+		
+		return $r;
+	}
 
 
 	/**
@@ -3792,6 +3869,10 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.96  2009/05/21 04:53:37  sam2kb
+ * Display a list of files attached to post
+ * See http://forums.b2evolution.net/viewtopic.php?t=18749
+ *
  * Revision 1.95  2009/05/20 13:53:49  fplanque
  * Return to a clean url after posting a comment
  *
