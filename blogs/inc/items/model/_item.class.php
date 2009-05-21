@@ -1752,7 +1752,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get block of attchements/files linked to the current Item
+	 * Get block of attachments/files linked to the current Item
 	 *
 	 * @param array Array of params
 	 * @param string Output format, see {@link format_to_output()}
@@ -3878,6 +3878,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.99  2009/05/21 14:01:32  tblue246
+ * Minor (fixed doc typo)
+ *
  * Revision 1.98  2009/05/21 13:05:59  fplanque
  * doc + moved attachments below post in skins
  *
