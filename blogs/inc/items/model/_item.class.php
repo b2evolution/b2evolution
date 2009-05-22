@@ -1768,6 +1768,7 @@ class Item extends ItemLight
 				'after_file' =>          '</li>',
 				'after' =>               '</ul>',
 			// fp> TODO: we should only have one limit param. Or is there a good reason for having two?
+			// sam2kb> It's needed only for flexibility, in the meantime if user attaches 200 files he expects to see all of them in skin, I think.
 				'limit_files' =>         1000, // Max # of files displayed
 				'limit' =>               1000, 
 			), $params );
@@ -1797,12 +1798,13 @@ class Item extends ItemLight
 
 			if( $File->is_image() )
 			{	// Skip images because these are displayed inline already
-				// fp> TODO: have a setting for each linke dfile to decide whether it should be displayed inline or as an attachment
+				// fp> TODO: have a setting for each linked file to decide whether it should be displayed inline or as an attachment
 				continue;
 			}
 			
 			// fp> note: it actually makes sense to show directories if the admin chose to link a directory
 			// it may be a convenient way to link 1000 files at once... or even a whole source code tree of folders & files... and let apache do the navigation
+			// sam2kb> I agree
 
 			$r_file[$i] = $params['before_file'];
 			$r_file[$i] .= action_icon( T_('Download file'), 'download', $File->get_url(), '', 5 ).' ';
@@ -3878,6 +3880,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.100  2009/05/22 06:35:13  sam2kb
+ * minor, doc
+ *
  * Revision 1.99  2009/05/21 14:01:32  tblue246
  * Minor (fixed doc typo)
  *
