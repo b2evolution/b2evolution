@@ -19,8 +19,8 @@ global $disp_detail;
 // Default params:
 $params = array_merge( array(
 		'content_mode'        => 'auto',	// Can be 'excerpt', 'normal' or 'full'. 'auto' will auto select depending on backoffice SEO settings for $disp-detail
-		'intro_mode'     		  => 'auto',	// same as above. This will typically be forced to "normal" when displaying an intro section so that ontro posts always display as normal there
-		'force_more'  				=> false,		// This will be set to true id 'content_mode' resolves to 'full'.
+		'intro_mode'          => 'auto',	// same as above. This will typically be forced to "normal" when displaying an intro section so that intro posts always display as normal there
+		'force_more'          => false,		// This will be set to true id 'content_mode' resolves to 'full'.
 		'content_start_excerpt' => '<div class="content_excerpt">',
 		'content_end_excerpt' => '</div>',
 		'content_start_full'  => '<div class="content_full">',
@@ -36,7 +36,6 @@ $params = array_merge( array(
 		'before_url_link'     => '<p class="post_link">'.T_('Link:').' ',
 		'after_url_link'      => '</p>',
 		'url_link_text_template' => '$url$',
-		'force_more'          => false,
 		'before_more_link'    => '<p class="bMore">',
 		'after_more_link'     => '</p>',
 		'more_link_text'      => '#',
@@ -217,6 +216,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.17  2009/05/22 06:35:58  sam2kb
+ * minor
+ *
  * Revision 1.16  2009/05/21 13:05:59  fplanque
  * doc + moved attachments below post in skins
  *
