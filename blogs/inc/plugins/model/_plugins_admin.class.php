@@ -413,8 +413,8 @@ class Plugins_admin extends Plugins
 
 		// TODO: dh> only match in the relevant "class block"
 		if( preg_match_all( '~^\s*function\s+(\w+)~mi', $classfile_contents, $matches ) )
-		{
-			$plugin_class_methods = $matches[1];
+		{	// sam2kb> array_unique is needed to prevent "Duplicate entry" errors
+			$plugin_class_methods = array_unique($matches[1]);
 		}
 		else
 		{
@@ -1447,6 +1447,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.11  2009/05/22 17:36:50  sam2kb
+ * Added array_unique to prevent "Duplicate entry" errors
+ *
  * Revision 1.10  2009/03/23 23:05:34  fplanque
  * Demo of how to tap into menu structure from a plugin.
  *
