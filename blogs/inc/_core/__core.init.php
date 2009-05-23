@@ -643,6 +643,9 @@ class _core_Module
 							'skin' => array(
 								'text' => T_('Skin'),
 								'href' => 'admin.php?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog, ),
+							'skin_settings' => array(
+								'text' => T_('Skin settings'),
+								'href' => 'admin.php?ctrl=coll_settings&amp;tab=skin_settings&amp;blog='.$blog, ),
 							'widgets' => array(
 								'text' => T_('Widgets'),
 								'href' => 'admin.php?ctrl=widgets&amp;blog='.$blog, ),
@@ -810,6 +813,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.13  2009/05/23 22:49:10  fplanque
+ * skin settings
+ *
  * Revision 1.12  2009/05/15 19:08:00  fplanque
  * doc
  *

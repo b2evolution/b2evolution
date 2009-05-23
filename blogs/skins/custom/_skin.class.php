@@ -36,10 +36,35 @@ class custom_Skin extends Skin
 	{
 		return 'normal';
 	}
+
+
+	/**
+   * Get definitions for editable params
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		$r = array_merge( array(
+				'logo_file' => array(
+					'label' => T_('Header Background Color'),
+					'note' => T_('E-g: #ff0000 for red'),
+					'defaultvalue' => '#78a',
+					'valid_pattern' => array( 'pattern'=>'¤^(#([a-f0-9]{3}){1,2})?$¤i',
+																		'error'=>T_('Invalid color code.') ),
+				),
+			), parent::get_param_definitions( $params )	);
+
+		return $r;
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.2  2009/05/23 22:49:10  fplanque
+ * skin settings
+ *
  * Revision 1.1  2009/05/23 20:20:17  fplanque
  * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
  *

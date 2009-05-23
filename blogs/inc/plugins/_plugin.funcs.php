@@ -46,7 +46,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param string Settings path, e.g. 'locales[0]' or 'setting'
  * @param array Meta data for this setting.
  * @param Form (by reference)
- * @param string Settings type ('Settings' or 'UserSettings' or 'Widget')
+ * @param string Settings type ('Settings' or 'UserSettings' or 'Widget' or 'Skin')
  * @param Plugin|Widget
  * @param mixed Target (User object for 'UserSettings')
  * @param mixed Value to really use (used for recursion into array type settings)
@@ -179,6 +179,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	{
 		switch( $set_type )
 		{
+			case 'Skin':
+				$set_value = $Obj->get_param( $parname );
+				$error_value = NULL;
+				break;
+
 			case 'Widget':
 				$set_value = $Obj->get_param( $parname );
 				$error_value = NULL;
@@ -1003,6 +1008,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /*
  * $Log$
+ * Revision 1.8  2009/05/23 22:49:10  fplanque
+ * skin settings
+ *
  * Revision 1.7  2009/03/13 02:32:33  fplanque
  * bugfix
  *

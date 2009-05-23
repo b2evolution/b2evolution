@@ -46,6 +46,9 @@ if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm 
 	if( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
 	{	// Selected a new blog:
 		$BlogCache = & get_Cache( 'BlogCache' );
+		/**
+		 * @var Blog
+		 */
 		$Blog = & $BlogCache->get_by_ID( $blog );
 	}
 
@@ -67,6 +70,16 @@ else
 
 memorize_param( 'blog', 'integer', -1 );	// Needed when generating static page for example
 
+if( $tab == 'skin_settings' )
+{
+	$SkinCache = & get_Cache( 'SkinCache' );
+	/**
+	 * @var Skin
+	 */
+	$edited_Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
+}
+
+
 if( ( $tab == 'perm' || $tab == 'permgroup' )
 	&& ( empty($blog) || ! $Blog->advanced_perms ) )
 {	// We're trying to access advanced perms but they're disabled!
@@ -76,7 +89,6 @@ if( ( $tab == 'perm' || $tab == 'permgroup' )
 		$action = 'edit';
 	}
 }
-
 
 /**
  * Perform action:
@@ -135,6 +147,16 @@ switch( $action )
 					$Messages->add( T_('The blog skin has been changed.')
 										.' <a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
 					header_redirect( $edited_Blog->gen_blogurl() );
+				}
+				break;
+
+			case 'skin_settings':
+				// Update params/Settings
+				$edited_Skin->load_params_from_Request();
+
+				if(	! param_errors_detected() )
+				{	// Update settings:
+					$Messages->add( 'TODO', 'error' );
 				}
 				break;
 
@@ -222,6 +244,10 @@ switch( $AdminUI->get_path(1) )
 		$AdminUI->disp_view( 'skins/views/_coll_skin.view.php' );
 		break;
 
+	case 'skin_settings':
+		$AdminUI->disp_view( 'skins/views/_coll_skin_settings.form.php' );
+		break;
+
 	case 'urls':
 		$AdminUI->disp_view( 'collections/views/_coll_urls.form.php' );
 		break;
@@ -253,6 +279,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2009/05/23 22:49:10  fplanque
+ * skin settings
+ *
  * Revision 1.16  2009/03/08 23:57:42  fplanque
  * 2009
  *

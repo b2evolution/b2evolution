@@ -139,6 +139,21 @@ class Skin extends DataObject
 
 
 	/**
+	 * Load params
+	 */
+	function load_params_from_Request()
+	{
+		load_funcs('plugins/_plugin.funcs.php');
+
+		// Loop through all widget params:
+		foreach( $this->get_param_definitions( array('for_editing'=>true) ) as $parname => $parmeta )
+		{
+			autoform_set_param_from_request( $parname, $parmeta, $this, 'Widget' );
+		}
+	}
+
+
+	/**
 	 * Display a container
 	 *
 	 * @todo fp> if it doesn't get any skin specific, move it outta here! :P
@@ -451,7 +466,52 @@ class Skin extends DataObject
 	 */
 	function get_param_definitions( $params )
 	{
-		// Note: yabba wants default image sizes to be accessible from plugins
+		$r = array();
+
+		return $r;
+	}
+
+
+	/**
+ 	 * param value
+ 	 *
+	 */
+	function get_param( $parname )
+	{
+		/*
+		$this->load_param_array();
+		if( isset( $this->param_array[$parname] ) )
+		{	// We have a value for this param:
+			return $this->param_array[$parname];
+		}
+		*/
+
+		// Try default values:
+		$params = $this->get_param_definitions( NULL );
+		if( isset( $params[$parname]['defaultvalue'] ) )
+		{	// We ahve a default value:
+			return $params[$parname]['defaultvalue'] ;
+		}
+
+		return NULL;
+	}
+
+
+	/**
+	 * Set param value
+	 *
+	 * @param string parameter name
+	 * @param mixed parameter value
+	 */
+	function set_param( $parname, $parvalue )
+	{
+
+		// fp> RFC: where do we save params?
+		// I'm about to create a new table:
+		// T_skins__params( coll_ID INT, skin_ID INT, params TEXT )
+		// I am wondering if I should extend T_coll_settings instead to somehow provide TEXT long storage
+		// I am wondering if I should extend T_coll_settings instead to somehow provide TEXT long storage
+
 	}
 
 }
@@ -459,6 +519,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2009/05/23 22:49:10  fplanque
+ * skin settings
+ *
  * Revision 1.13  2009/05/23 20:20:18  fplanque
  * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
  *
