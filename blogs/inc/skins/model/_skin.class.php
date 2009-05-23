@@ -510,7 +510,7 @@ class Skin extends DataObject
 		// I'm about to create a new table:
 		// T_skins__params( coll_ID INT, skin_ID INT, params TEXT )
 		// I am wondering if I should extend T_coll_settings instead to somehow provide TEXT long storage
-		// I am wondering if I should extend T_coll_settings instead to somehow provide TEXT long storage
+		// Or maybe just use coll settings nicely, one param at a time...
 
 	}
 
@@ -519,6 +519,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2009/05/23 22:57:32  fplanque
+ * skin settings
+ *
  * Revision 1.14  2009/05/23 22:49:10  fplanque
  * skin settings
  *
