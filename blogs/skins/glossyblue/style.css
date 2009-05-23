@@ -218,6 +218,18 @@ div#page_top li a.selected {
 	margin-left: 10px;
 	width: 430px;
 }
+.featured_post .post-title {	/* intros... */
+	margin-left: 0;
+	width: 450px;
+}
+.bPost_ptyp1 .post-title { /* real feature */
+	margin-left: 10px;
+	width: 400px;
+}
+
+div.featured_post {
+	padding-bottom: 0;
+}
 
 .entry {
 	clear: both;

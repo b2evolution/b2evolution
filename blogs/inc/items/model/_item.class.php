@@ -1737,8 +1737,8 @@ class Item extends ItemLight
 
 		return $r;
 	}
-	
-	
+
+
 	/**
 	 * Display the attachments/files linked to the current Item
 	 *
@@ -1770,12 +1770,12 @@ class Item extends ItemLight
 			// fp> TODO: we should only have one limit param. Or is there a good reason for having two?
 			// sam2kb> It's needed only for flexibility, in the meantime if user attaches 200 files he expects to see all of them in skin, I think.
 				'limit_files' =>         1000, // Max # of files displayed
-				'limit' =>               1000, 
+				'limit' =>               1000,
 			), $params );
 
 		// Get list of attached files
 		$FileList = $this->get_attachment_FileList( $params['limit'] );
-		
+
 		load_funcs('files/model/_file.funcs.php');
 
 		$r = '';
@@ -1789,7 +1789,7 @@ class Item extends ItemLight
 		{
 			/* fp> I think we don't want to waste time stating files on the public interface. The admin will fix missing files :p
 			if( ! $File->exists() )
-			{	
+			{
 				global $Debuglog;
 				$Debuglog->add(sprintf('File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path()), array('error', 'files'));
 				continue;
@@ -1801,17 +1801,16 @@ class Item extends ItemLight
 				// fp> TODO: have a setting for each linked file to decide whether it should be displayed inline or as an attachment
 				continue;
 			}
-			
+
 			// fp> note: it actually makes sense to show directories if the admin chose to link a directory
 			// it may be a convenient way to link 1000 files at once... or even a whole source code tree of folders & files... and let apache do the navigation
-			// sam2kb> I agree
 
 			$r_file[$i] = $params['before_file'];
 			$r_file[$i] .= action_icon( T_('Download file'), 'download', $File->get_url(), '', 5 ).' ';
 			$r_file[$i] .= $File->get_view_link( $File->get_name() );
 			$r_file[$i] .= $params['before_file_size'].'('.bytesreadable( $File->get_size() ).')'.$params['after_file_size'];
 			$r_file[$i] .= $params['after_file'];
-			
+
 			$i++;
 		}
 
@@ -1822,7 +1821,7 @@ class Item extends ItemLight
 			// Character conversions
 			$r = format_to_output( $r, $format );
 		}
-		
+
 		return $r;
 	}
 
@@ -2675,6 +2674,24 @@ class Item extends ItemLight
 		}
 
 		echo $params['after'];
+	}
+
+
+	/**
+	 * Output classes for the Item <div>
+	 */
+	function div_classes( $params = array() )
+	{
+		global $post_statuses;
+
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'item_class'        => 'bPost',
+				'item_type_class'   => 'bPost_ptyp',
+				'item_status_class' => 'bPost',
+			), $params );
+
+		echo $params['item_class'].' '.$params['item_type_class'].$this->ptyp_ID.' '.$params['item_status_class'].$this->status;
 	}
 
 
@@ -3880,6 +3897,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.101  2009/05/23 14:12:42  fplanque
+ * All default skins now support featured posts and intro posts.
+ *
  * Revision 1.100  2009/05/22 06:35:13  sam2kb
  * minor, doc
  *

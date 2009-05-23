@@ -302,3 +302,9 @@ input.bComment,
 input.SearchField {
 	background-color: #fff0f8;
 }
+
+
+div.featured_post {
+	margin: 1ex 1ex 1ex 1em;
+	padding: 0 1ex;
+}

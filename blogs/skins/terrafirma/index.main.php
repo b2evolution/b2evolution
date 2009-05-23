@@ -18,9 +18,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( version_compare( $app_version, '2.4.1' ) < 0 )
-{ // Older 2.x skins work on newer 2.x b2evo versions, but newer 2.x skins may not work on older 2.x b2evo versions.
-	die( 'This skin is designed for b2evolution 2.4.1 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
+if( version_compare( $app_version, '3.0' ) < 0 )
+{ // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
+	die( 'This skin is designed for b2evolution 3.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
 
 // This is the main template; it may be used to display very different things.
@@ -128,122 +128,34 @@ skin_include( '_html_header.inc.php' );
 				?>
 
 				<?php
+				// Go Grab the featured post:
+				if( $Item = & get_featured_Item() )
+				{	// We have a featured/intro post to display:
+					// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
+					skin_include( '_item_block.inc.php', array(
+							'feature_block' => true,
+							'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
+							'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
+							'item_class'   => 'bPost featured_post',
+							'image_size'	 =>	'fit-400x320',
+						) );
+					// ----------------------------END ITEM BLOCK  ----------------------------
+				}
+				?>
+
+				<?php
 					// --------------------------------- START OF POSTS -------------------------------------
 					// Display message if no post:
 					display_if_empty();
 
 					while( $Item = & mainlist_get_item() )
-					{	// For each blog post, do everything below up to the closing curly brace "}"
-					?>
-
-					<div id="<?php $Item->anchor_id() ?>" class="bPost bPost<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
-
-						<?php
-							$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
-						?>
-
-						<div class="bSmallHead">
-						<div class="date">
-						<?php
-							$Item->author( array(
-							'before'    => '<em class="user">',
-							'after'     => '</em><br />',
-									) );
-
-							$Item->issue_date( array(
-									'before'    => '<em class="bPostdate">',
-									'after'     => '</em>',
-								));
-						?>
-						</div>
-						<h2 class="bTitle"><?php $Item->title(); ?></h2>
-						</div>
-
-						<?php
-							// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-							skin_include( '_item_content.inc.php', array(
-									'image_size'	=>	'fit-400x320',
-								) );
-							// Note: You can customize the default item feedback by copying the generic
-							// /skins/_item_feedback.inc.php file into the current skin folder.
-							// -------------------------- END OF POST CONTENT -------------------------
-						?>
-
-						<?php
-							// List all tags attached to this post:
-							$Item->tags( array(
-									'before' =>         '<div class="post-tags">'.T_('Tags').': ',
-									'after' =>          '</div>',
-									'separator' =>      ', ',
-								) );
-						?>
-
-						<div class="bSmallPrint">
-							<ul>
-							<?php
-							$Item->edit_link( array( // Link to backoffice for editing
-								'before'    => '<li>',
-								'after'     => '</li>',
-							) ); ?>
-
-							<li class="readmore">
-							<?php
-							$Item->categories( array(
-								'before'          => '',
-								'after'           => '',
-								'include_main'    => true,
-								'include_other'   => true,
-								'include_external'=> true,
-								'link_categories' => true,
+					{	// For each blog post:
+						// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
+						skin_include( '_item_block.inc.php', array(
+								'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
+								'image_size'	 =>	'fit-400x320',
 							) );
-							 ?>
-							</li>
-							<li class="comments">
-							<?php
-							// Link to comments, trackbacks, etc.:
-							$Item->feedback_link( array(
-											'type' => 'comments',
-											'link_before' => '',
-											'link_after' => '',
-											'link_text_zero' => '#',
-											'link_text_one' => '#',
-											'link_text_more' => '#',
-											'link_title' => '#',
-											'use_popup' => false,
-										) );
-
-							// Link to comments, trackbacks, etc.:
-							$Item->feedback_link( array(
-											'type' => 'trackbacks',
-											'link_before' => ' &bull; ',
-											'link_after' => '',
-											'link_text_zero' => '#',
-											'link_text_one' => '#',
-											'link_text_more' => '#',
-											'link_title' => '#',
-											'use_popup' => false,
-										) );
-							?>
-							</li>
-							</ul>
-							</div>
-
-						<?php
-							// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-							skin_include( '_item_feedback.inc.php', array(
-									'before_section_title' => '<h3>',
-									'after_section_title'  => '</h3>',
-								) );
-							// Note: You can customize the default item feedback by copying the generic
-							// /skins/_item_feedback.inc.php file into the current skin folder.
-							// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
-						?>
-
-						<?php
-							locale_restore_previous();	// Restore previous locale (Blog locale)
-						?>
-					</div>
-					<?php
+						// ----------------------------END ITEM BLOCK  ----------------------------
 					} // ---------------------------------- END OF POSTS ------------------------------------
 				?>
 

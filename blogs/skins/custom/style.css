@@ -339,3 +339,8 @@ th.bCalendarHeaderCell {
 #bCalendarToday {
 	background-color: #bce;
 }
+
+div.featured_post {
+	margin: 0 2ex;
+	padding: 0 1ex;
+}

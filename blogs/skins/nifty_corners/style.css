@@ -199,7 +199,8 @@ h3.bTitle {
 h3.bTitle a {
 	color: #fff;
 }
-.bText {
+.bText,
+.excerpt {
 	margin: 0 1ex 0;
 }
 .bSmallPrint
@@ -320,4 +321,13 @@ textarea.bComment,
 input.bComment,
 input.SearchField {
 	background-color: #E2F1F4;
+}
+
+
+
+div.featured_post {
+	margin: 0 1ex ;
+	border-color: #06A3C4;
+	border-top: none;
+	padding: 1px 0 0 0;
 }

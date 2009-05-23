@@ -371,3 +371,8 @@ div.top_menu a:hover {
 div.top_menu a.selected {
 	text-decoration: underline;
 }
+
+div.featured_post {
+	margin: 0 0 2ex 30px;
+	padding-bottom: 20px;
+}

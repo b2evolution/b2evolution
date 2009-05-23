@@ -14,9 +14,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( version_compare( $app_version, '2.4.1' ) < 0 )
-{ // Older 2.x skins work on newer 2.x b2evo versions, but newer 2.x skins may not work on older 2.x b2evo versions.
-	die( 'This skin is designed for b2evolution 2.4.1 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
+if( version_compare( $app_version, '3.0' ) < 0 )
+{ // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
+	die( 'This skin is designed for b2evolution 3.0 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
 
 // This is the main template; it may be used to display very different things.
@@ -135,150 +135,32 @@ skin_include( '_html_header.inc.php' );
 	?>
 
 	<?php
+	// Go Grab the featured post:
+	if( $Item = & get_featured_Item() )
+	{	// We have a featured/intro post to display:
+		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
+		skin_include( '_item_block.inc.php', array(
+				'feature_block' => true,
+				'content_mode' => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
+				'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
+				'item_class'   => 'featured_post',
+			) );
+		// ----------------------------END ITEM BLOCK  ----------------------------
+	}
+	?>
+
+	<?php
 	// ------------------------------------ START OF POSTS ----------------------------------------
 	// Display message if no post:
 	display_if_empty();
 
 	while( $Item = & mainlist_get_item() )
-	{	// For each blog post, do everything below up to the closing curly brace "}"
-	?>
-
-	<div id="<?php $Item->anchor_id() ?>" class="bPost bPost<?php $Item->status_raw() ?>" lang="<?php $Item->lang() ?>">
-
-		<?php
-			$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
-		?>
-
-		<?php
-			// Display images that are linked to this post:
-			$Item->images( array(
-					'before' =>              '<div class="bImages">',
-					'before_image' =>        '<div class="image_block">',
-					'before_image_legend' => '<div class="image_legend">',
-					'after_image_legend' =>  '</div>',
-					'after_image' =>         '</div>',
-					'after' =>               '</div>',
-					'image_size' =>          'fit-720x500'
-				) );
-		?>
-
-
-		<div class="bDetails">
-
-			<div class="bSmallHead">
-
-				<?php
-					// Link to comments, trackbacks, etc.:
-					$Item->feedback_link( array(
-									'type' => 'feedbacks',
-									'link_before' => '<div class="action_right">',
-									'link_after' => '</div>',
-									'link_text_zero' => get_icon( 'nocomment' ),
-									'link_text_one' => get_icon( 'comments' ),
-									'link_text_more' => get_icon( 'comments' ),
-									'link_title' => '#',
-									'use_popup' => true,
-								) );
-
-					$Item->permanent_link( array(
-							'before'    => '<div class="action_right">',
-							'after'     => '</div>',
-							'text' => T_('Permalink'),
-						) );
-				?>
-
-				<?php
-					$Item->edit_link( array( // Link to backoffice for editing
-							'before'    => '<div class="action_right">',
-							'after'     => '</div>',
-							'text'      => T_('Edit...'),
-              'title'     => T_('Edit title/description...'),
-						) );
-				?>
-
-				<h3 class="bTitle"><?php $Item->title(); ?></h3>
-
-				<?php
-					$Item->issue_date( array(
-							'before'      => '<span class="timestamp">',
-							'after'       => '</span>',
-							'date_format' => locale_datefmt().' H:i',
-						) );
-				?>
-
-			</div>
-
-			<?php
-				// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-				skin_include( '_item_content.inc.php', array(
-						'content_mode'           => 'full', // We want regular "full" content, even in category browsing: i-e no except or thumbnail
-						'image_size'	           =>	'',
-						'url_link_text_template' => '', // link will be displayed (except player if podcast)
-					) );
-				// Note: You can customize the default item feedback by copying the generic
-				// /skins/_item_feedback.inc.php file into the current skin folder.
-				// -------------------------- END OF POST CONTENT -------------------------
-			?>
-
-			<div class="bSmallPrint">
-			<?php
-				$Item->author( array(
-						'before'    => T_('By').' ',
-						'after'     => ' &bull; ',
-					) );
-			?>
-
-			<?php
-				$Item->categories( array(
-					'before'          => T_('Albums').': ',
-					'after'           => ' ',
-					'include_main'    => true,
-					'include_other'   => true,
-					'include_external'=> true,
-					'link_categories' => true,
-				) );
-			?>
-
-			<?php
-				// List all tags attached to this post:
-				$Item->tags( array(
-						'before' =>         ' &bull; '.T_('Tags').': ',
-						'after' =>          ' ',
-						'separator' =>      ', ',
-					) );
-			?>
-
-			<?php
-				// URL link, if the post has one:
-				$Item->url_link( array(
-						'before'        => ' &bull; '.T_('Link').': ',
-						'after'         => ' ',
-						'text_template' => '$url$',
-						'url_template'  => '$url$',
-						'target'        => '',
-						'podcast'       => false,        // DO NOT display mp3 player if post type is podcast
-					) );
-			?>
-
-			</div>
-		</div>
-
-		<?php
-			// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-			skin_include( '_item_feedback.inc.php', array(
-					'before_section_title' => '<h4>',
-					'after_section_title'  => '</h4>',
-				) );
-			// Note: You can customize the default item feedback by copying the generic
-			// /skins/_item_feedback.inc.php file into the current skin folder.
-			// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
-		?>
-
-		<?php
-			locale_restore_previous();	// Restore previous locale (Blog locale)
-		?>
-	</div>
-	<?php
+	{	// For each blog post:
+		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
+		skin_include( '_item_block.inc.php', array(
+				'content_mode'  => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
+			) );
+		// ----------------------------END ITEM BLOCK  ----------------------------
 	} // ---------------------------------- END OF POSTS ------------------------------------
 	?>
 

@@ -651,3 +651,8 @@ div.PageTop a.selected:hover {
 	text-decoration: underline;
 	color: #FFFF99;
 }
+
+
+div.featured_post {
+	padding: 8px 8px 0 8px;
+}

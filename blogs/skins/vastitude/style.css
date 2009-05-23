@@ -27,7 +27,7 @@ body, .subtitle {color:#3c2d21;}
 .topicons {color:#999; visibility:hidden;}
 .topicons a {color:#444;}
 .topicons a:hover {color:#000;}
-h1, .subtitle h1, .subtitle h1 a, .submenu, .leftside h1, div.bSmallHead, #quote, .rightside h3, .rightside h4, .rightside h4 a, .footer, .pagefoot {color:#4b3528;}
+h1, .subtitle h1, .subtitle h1 a, .submenu, .leftside h1, div.bSmallHead, #quote, .rightside h3, .rightside h4, .rightside h4 a, .footer, .pagefoot, .post_date {color:#4b3528;}
 blockquote {color:#523a2c;}
 .rightside h2 {color:#964122;}
 .subtext {color:#BBB;}
@@ -136,7 +136,6 @@ img.rightmargin {float:right; margin-left:2ex; margin-top:.7ex; margin-bottom:.2
 .log_success {margin:0px 0px 20px 40px; padding:10px 0px; text-align:center; background-color:#6b4634; border:1px solid #937d55;}
 blockquote {margin:30px 60px 30px 30px; background:url(img/vast_blockquote.gif) top left no-repeat;font-size:1.05em;}
 blockquote p {margin-left:38px;}
-code {font-size:1.1em;text-align:left;padding:0 10px 10px 12px;display:block;width:500px;overflow:auto;}
 
 table.invisible {width:462px;}
 table.invisible td.left {vertical-align:top; width:10px;}
@@ -275,4 +274,9 @@ html>body .footer ul{padding:0;}
 div.powered_by {
 	text-align: center;
 	margin-top: 30px;
+}
+
+.post_date {
+	font-size: 0.9em;
+	font-weight: bold;
 }
