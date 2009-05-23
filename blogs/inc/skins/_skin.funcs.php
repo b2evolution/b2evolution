@@ -628,18 +628,38 @@ function skin_widget( $params )
 }
 
 
-	/**
-	 * Display a container
-	 *
-	 * @param string
-	 * @param array
-	 */
+/**
+ * Display a container
+ *
+ * @param string
+ * @param array
+ */
 function skin_container( $sco_name, $params = array() )
 {
 	global $Skin;
 
 	$Skin->container( $sco_name, $params );
 }
+
+
+/**
+ * Install a skin
+ *
+ * @todo do not install if skin doesn't exist. Important for upgrade. Need to NOT fail if ZERO skins installed though :/
+ *
+ * @param string
+ * @return Skin
+ */
+function & skin_install( $skin_folder )
+{
+	$SkinCache = & get_cache( 'SkinCache' );
+	$Skin = & $SkinCache->new_obj( NULL, $skin_folder );
+
+	$Skin->install();
+
+	return $Skin;
+}
+
 
 /**
  * Checks if a skin is provided by a plugin.
@@ -684,7 +704,7 @@ function skin_exists( $name, $filename = 'index.main.php' )
 {
 	global $skins_path;
 
-	if( is_readable( $skins_path.$name.'/'.$filename ) )
+	if( skin_file_exists( $name, $filename ) )
 	{
 		return true;
 	}
@@ -698,6 +718,27 @@ function skin_exists( $name, $filename = 'index.main.php' )
 	return false;
 }
 
+
+/**
+ * Checks if a specific file exists for a skin.
+ *
+ * @param skin name (directory name)
+ * @param file name
+ * @return boolean true is exists, false if not
+ */
+function skin_file_exists( $name, $filename = 'index.main.php' )
+{
+	global $skins_path;
+
+	if( is_readable( $skins_path.$name.'/'.$filename ) )
+	{
+		return true;
+	}
+
+	return false;
+}
+
+
 /**
  * Check if a skin is installed.
  *
@@ -710,7 +751,7 @@ function skin_installed( $name )
 {
 	$SkinCache = & get_Cache( 'SkinCache' );
 
-	if ( skin_provided_by_plugin( $name ) || $SkinCache->get_by_folder( $name, false ) )
+	if( skin_provided_by_plugin( $name ) || $SkinCache->get_by_folder( $name, false ) )
 	{
 		return true;
 	}
@@ -718,8 +759,12 @@ function skin_installed( $name )
 	return false;
 }
 
+
 /*
  * $Log$
+ * Revision 1.49  2009/05/23 20:20:18  fplanque
+ * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
+ *
  * Revision 1.48  2009/05/20 18:27:09  fplanque
  * canonical support for date archives
  *

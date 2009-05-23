@@ -46,7 +46,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 
 	$Form->begin_fieldset( T_('Skin properties') );
 
-		Skin::disp_skinshot( $edited_Skin->folder );
+		Skin::disp_skinshot( $edited_Skin->folder, $edited_Skin->name );
 
 		$Form->text_input( 'skin_name', $edited_Skin->name, 32, T_('Skin name'), T_('As seen by blog owners'), array( 'required'=>true ) );
 
@@ -78,6 +78,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.5  2009/05/23 20:20:18  fplanque
+ * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
+ *
  * Revision 1.4  2009/03/08 23:57:46  fplanque
  * 2009
  *

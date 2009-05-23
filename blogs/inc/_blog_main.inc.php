@@ -429,7 +429,9 @@ elseif( $disp == 'posts' && !empty($Item) )
 param( 'tempskin', 'string', '', true );
 if( !empty( $tempskin ) )
 { // This will be handled like any other skin:
+	// TODO: maybe restrict that to authorized users
 	$skin = $tempskin;
+	$redir = 'no';	// By definition, we want to see the temporary skin
 }
 
 if( isset( $skin ) )
@@ -441,8 +443,8 @@ if( isset( $skin ) )
 		debug_die( 'The requested skin name is invalid.' );
 	}
 
-	load_class( 'skins/model/_skin.class.php' );
-	$Skin = & new Skin( NULL, $skin );
+	$SkinCache = & get_cache( 'SkinCache' );
+	$Skin = & $SkinCache->new_obj( NULL, $skin );
 
 	if( $Skin->type == 'feed' )
 	{	// Check if we actually allow the display of the feed; last chance to revert to 404 displayed in default skin.
@@ -455,13 +457,13 @@ if( isset( $skin ) )
 			$disp_detail = '404-feeds-disabled';
 		}
 	}
-	else if ( skin_exists( $skin ) && ! skin_installed( $skin ) )
+	elseif( skin_exists( $skin ) && ! skin_installed( $skin ) )
 	{	// The requested skin is not a feed skin and exists in the file system, but isn't installed:
 		debug_die( sprintf( T_( 'The skin [%s] is not installed on this system.' ), htmlspecialchars( $skin ) ) );
 	}
 }
 
-if( !isset( $skin ) )	// Note: if $skin is set to '', then we want to do a "no skin" display
+if( !isset( $skin ) && !empty($Blog->skin_ID) )	// Note: if $skin is set to '', then we want to do a "no skin" display
 { // Use default skin from the database
 	$SkinCache = & get_cache( 'SkinCache' );
 	$Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
@@ -580,6 +582,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.135  2009/05/23 20:20:18  fplanque
+ * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
+ *
  * Revision 1.134  2009/05/20 12:58:14  fplanque
  * Homepage: option to 301 redirect to canonical homepage.
  * Option to support rel="canonical" instead of or when 301 redirect cannot be used.

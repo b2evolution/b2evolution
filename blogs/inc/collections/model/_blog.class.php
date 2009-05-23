@@ -1486,6 +1486,8 @@ class Blog extends DataObject
 	/**
 	 * Get URL to display the blog with a temporary skin.
 	 *
+	 * This is used to construct the various RSS/Atom feeds
+	 *
 	 * @param string
 	 * @param string
 	 * @param boolean
@@ -2122,6 +2124,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.65  2009/05/23 20:20:18  fplanque
+ * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
+ *
  * Revision 1.64  2009/05/21 12:34:39  fplanque
  * Options to select how much content to display (excerpt|teaser|normal) on different types of pages.
  *

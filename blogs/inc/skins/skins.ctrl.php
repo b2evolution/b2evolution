@@ -21,7 +21,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'skins/model/_skin.class.php' );
+load_funcs( 'skins/_skin.funcs.php' );
 
 // Check permission to display:
 $current_User->check_perm( 'options', 'view', true );
@@ -51,13 +51,17 @@ switch( $action )
 {
 	case 'create':
 		param( 'skin_folder', 'string', true );
+		// Check validity of requested skin name:
+		if( preg_match( '~([^-A-Za-z0-9._]|\.\.)~', $skin_folder ) )
+		{
+			debug_die( 'The requested skin name is invalid.' );
+		}
 
 		// Check permission to edit:
 		$current_User->check_perm( 'options', 'edit', true );
 
 		// CREATE NEW SKIN:
-		$edited_Skin = & new Skin();
-		$edited_Skin->install( $skin_folder );
+		$edited_Skin = & skin_install( $skin_folder );
 
 		$Messages->add( T_('Skin has been installed.'), 'success' );
 
@@ -193,6 +197,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2009/05/23 20:20:18  fplanque
+ * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
+ *
  * Revision 1.4  2009/03/08 23:57:45  fplanque
  * 2009
  *

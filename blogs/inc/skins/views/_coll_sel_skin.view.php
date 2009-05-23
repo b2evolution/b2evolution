@@ -33,13 +33,16 @@ foreach( $SkinCache->cache as $Skin )
 	}
 
 	// Display skinshot:
-	Skin::disp_skinshot( $Skin->folder, 'pick', false, '?ctrl=collections&amp;action=new-name&amp;kind='.$kind.'&amp;skin_ID='.$Skin->ID );
+	Skin::disp_skinshot( $Skin->folder, $Skin->name, 'pick', false, '?ctrl=collections&amp;action=new-name&amp;kind='.$kind.'&amp;skin_ID='.$Skin->ID );
 }
 
 echo '<div class="clear"></div>';
 
 /*
  * $Log$
+ * Revision 1.4  2009/05/23 20:20:18  fplanque
+ * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
+ *
  * Revision 1.3  2009/03/08 23:57:45  fplanque
  * 2009
  *
@@ -50,5 +53,4 @@ echo '<div class="clear"></div>';
  * MODULES (refactored MVC)
  *
  */
- 
 ?>

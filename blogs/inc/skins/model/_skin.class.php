@@ -49,7 +49,7 @@ class Skin extends DataObject
 	 *
 	 * @param table Database row
 	 */
-	function Skin( $db_row = NULL, $skin_folder = NULL, $name = NULL )
+	function Skin( $db_row = NULL, $skin_folder = NULL )
 	{
 		// Call parent constructor:
 		parent::DataObject( 'T_skins__skin', 'skin_', 'skin_ID' );
@@ -64,7 +64,9 @@ class Skin extends DataObject
 
 		if( is_null($db_row) )
 		{	// We are creating an object here:
-			$this->init( $skin_folder, $name );
+			$this->set( 'folder', $skin_folder );
+			$this->set( 'name', $this->get_default_name() );
+			$this->set( 'type', $this->get_default_type() );
 		}
 		else
 		{	// Wa are loading an object:
@@ -77,30 +79,10 @@ class Skin extends DataObject
 
 
   /**
-	 *
-	 * @param string
-	 * @param string NULL for default  (used by installer; TODO: override with class for Atom ans RSS 2.0)
+	 * Install current skin to DB
 	 */
-	function init( $skin_folder, $name = NULL )
+	function install()
 	{
-		$this->set( 'folder', $skin_folder );	// Must be set before name for get_default_name() to work
-		$this->set( 'name', empty( $name ) ? $this->get_default_name() : $name );
-		$this->set( 'type', substr($skin_folder,0,1) == '_' ? 'feed' : 'normal' );
-	}
-
-
-	/**
-	 * Install a skin
-	 *
-	 * @todo do not install if skin doesn't exist. Important for upgrade. Need to NOT fail if ZERO skins installed though :/
-	 *
-	 * @param string
-	 * @param string NULL for default  (used by installer; TODO: override with class for Atom ans RSS 2.0)
-	 */
-	function install( $skin_folder, $name = NULL )
-	{
-		$this->init( $skin_folder, $name );
-
 		// Look for containers in skin file:
 		$this->discover_containers();
 
@@ -118,6 +100,16 @@ class Skin extends DataObject
 		return $this->folder;
 	}
 
+
+  /**
+	 * Get default type for the skin.
+	 */
+	function get_default_type()
+	{
+		return (substr($this->folder,0,1) == '_' ? 'feed' : 'normal');
+	}
+
+
 	/**
 	 * Get the customized name for the skin.
 	 */
@@ -125,6 +117,7 @@ class Skin extends DataObject
 	{
 		return $this->name;
 	}
+
 
 	/**
 	 * Load data from Request form fields.
@@ -377,7 +370,7 @@ class Skin extends DataObject
 	 *
 	 * @static
 	 */
-	function disp_skinshot( $skin_folder, $function = NULL, $selected = false, $select_url = NULL, $function_url = NULL )
+	function disp_skinshot( $skin_folder, $skin_name, $function = NULL, $selected = false, $select_url = NULL, $function_url = NULL )
 	{
 		global $skins_path, $skins_url;
 
@@ -441,17 +434,34 @@ class Skin extends DataObject
 			}
 			echo '</div>';
 		}
-		echo '<strong>'.$skin_folder.'</strong>';
+		echo '<strong>'.$skin_name.'</strong>';
 		echo '</div>';
 		echo '</div>';
 	}
 
+
+
+	/**
+   * Get definitions for editable params
+   *
+   * @todo this is destined to be overridden by derived Skin classes
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		// Note: yabba wants default image sizes to be accessible from plugins
+	}
 
 }
 
 
 /*
  * $Log$
+ * Revision 1.13  2009/05/23 20:20:18  fplanque
+ * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
+ *
  * Revision 1.12  2009/03/08 23:57:45  fplanque
  * 2009
  *

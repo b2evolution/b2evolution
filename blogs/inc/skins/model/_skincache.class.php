@@ -31,6 +31,8 @@ load_class('_core/model/dataobjects/_dataobjectcache.class.php');
 
 load_class( 'skins/model/_skin.class.php' );
 
+load_funcs( 'skins/_skin.funcs.php' );
+
 /**
  * Skin Cache Class
  *
@@ -75,6 +77,8 @@ class SkinCache extends DataObjectCache
 	 * Get an object from cache by its folder name.
 	 *
 	 * Load the object into cache, if necessary.
+	 *
+	 * This is used to get a skin for an RSS/Aom type; also to check if a skin is installed.
 	 *
 	 * @param string folder name of object to load
 	 * @param boolean false if you want to return false on error
@@ -147,11 +151,45 @@ class SkinCache extends DataObjectCache
 	}
 
 
-}
+	/**
+	 * Instanciate a new object within this cache
+	 */
+	function & new_obj( $row = NULL, $skin_folder = NULL )
+	{
+		if( is_null($skin_folder) )
+		{	// This happens when using the default skin
+			$skin_folder = $row->skin_folder;
+		}
 
+		// Check if we have a custom class derived from Skin:
+		if( skin_file_exists( $skin_folder, '_skin.class.php' ) )
+		{
+			global $skins_path;
+			require_once( $skins_path.$skin_folder.'/_skin.class.php' );
+			$objtype = $skin_folder.'_Skin';
+			if( ! class_exists($objtype) )
+			{
+				debug_die( 'There seems to be a _skin.class.php file in the skin directory ['.$skin_folder.'], but it does not contain a properly named class. Expected class name is: '.$objtype );
+			}
+		}
+		else
+		{
+			$objtype = 'Skin';
+		}
+
+		// Instantiate a custom object
+		$obj = new $objtype( $row, $skin_folder ); // COPY !!
+
+		return $obj;
+	}
+
+}
 
 /*
  * $Log$
+ * Revision 1.4  2009/05/23 20:20:18  fplanque
+ * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
+ *
  * Revision 1.3  2009/03/08 23:57:45  fplanque
  * 2009
  *

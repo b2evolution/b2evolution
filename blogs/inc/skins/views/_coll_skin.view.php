@@ -50,7 +50,7 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 		$preview_url = url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode($Skin->folder) );
 
 		// Display skinshot:
-		Skin::disp_skinshot( $Skin->folder, 'select', $selected, $select_url, $preview_url );
+		Skin::disp_skinshot( $Skin->folder, $Skin->name, 'select', $selected, $select_url, $preview_url );
 	}
 
 	echo '<div class="clear"></div>';
@@ -59,6 +59,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.5  2009/05/23 20:20:18  fplanque
+ * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
+ *
  * Revision 1.4  2009/03/08 23:57:45  fplanque
  * 2009
  *

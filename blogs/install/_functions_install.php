@@ -262,56 +262,32 @@ function create_default_settings( $override = array() )
  */
 function install_basic_skins()
 {
-	load_class( 'skins/model/_skin.class.php' );
+	load_funcs( 'skins/_skin.funcs.php' );
 
 	echo 'Installing default skins... ';
 
 	// Note: Skin #1 will we used by Blog A
-	$Skin = new Skin();
-	$Skin->install( 'evopress' );
+	skin_install( 'evopress' );
 
 	// Note: Skin #2 will we used by Blog B
-	$Skin = new Skin();
-	$Skin->install( 'evocamp' );
+	skin_install( 'evocamp' );
 
 	// Note: Skin #3 will we used by Linkblog
-	$Skin = new Skin();
-	$Skin->install( 'miami_blue' );
+	skin_install( 'miami_blue' );
 
 	// Note: Skin #4 will we used by Photoblog
-	$Skin = new Skin();
-	$Skin->install( 'photoblog' );
+	skin_install( 'photoblog' );
 
-	$Skin = new Skin();
-	$Skin->install( 'asevo' );
-
-	$Skin = new Skin();
-	$Skin->install( 'custom' );
-
-	$Skin = new Skin();
-	$Skin->install( 'glossyblue' );
-
-	$Skin = new Skin();
-	$Skin->install( 'natural_pink' );
-
-	$Skin = new Skin();
-	$Skin->install( 'nifty_corners' );
-
-	$Skin = new Skin();
-	$Skin->install( 'pixelgreen' );
-
-	$Skin = new Skin();
-	$Skin->install( 'terrafirma' );
-
-	$Skin = new Skin();
-	$Skin->install( 'vastitude' );
-
-
-	$Skin = new Skin();
-	$Skin->install( '_atom', 'Atom' );
-
-	$Skin = new Skin();
-	$Skin->install( '_rss2', 'RSS 2.0' );
+	skin_install( 'asevo' );
+	skin_install( 'custom' );
+	skin_install( 'glossyblue' );
+	skin_install( 'natural_pink' );
+	skin_install( 'nifty_corners' );
+	skin_install( 'pixelgreen' );
+	skin_install( 'terrafirma' );
+	skin_install( 'vastitude' );
+	skin_install( '_atom' );
+	skin_install( '_rss2' );
 
 	echo "OK.<br />\n";
 }
@@ -689,6 +665,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.60  2009/05/23 20:20:18  fplanque
+ * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
+ *
  * Revision 1.59  2009/03/24 23:57:07  blueyed
  * Fix error in PHP5 during upgrade, when existing plugins are using Plugin(User)Settings in PluginInit. This needs a global Plugins instance, which is a reference to Plugins_admin during installation now.
  *

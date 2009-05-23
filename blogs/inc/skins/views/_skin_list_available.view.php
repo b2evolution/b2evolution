@@ -52,7 +52,7 @@ foreach( $skin_folders as $skin_folder )
 
 	// Display skinshot:
 	$function_url = '?ctrl=skins&amp;action=create&amp;skin_folder='.rawurlencode($skin_folder).'&amp;redirect_to='.rawurlencode($redirect_to);
-	Skin::disp_skinshot( $skin_folder, 'install', false, NULL, $function_url );
+	Skin::disp_skinshot( $skin_folder, $skin_folder, 'install', false, NULL, $function_url );
 }
 
 echo '<div class="clear"></div>';
@@ -60,6 +60,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.7  2009/05/23 20:20:18  fplanque
+ * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
+ *
  * Revision 1.6  2009/03/08 23:57:46  fplanque
  * 2009
  *

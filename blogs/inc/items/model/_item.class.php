@@ -1897,7 +1897,7 @@ class Item extends ItemLight
 	{
 		$this->load_Blog();
 
-		return url_add_param( $this->Blog->get_tempskin_url( $skin_folder_name ), 'disp=comments&amp;p='.$this->ID);
+		return url_add_param( $this->Blog->get_tempskin_url( $skin_folder_name ), 'disp=comments&amp;p='.$this->ID );
 	}
 
 
@@ -3897,6 +3897,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.102  2009/05/23 20:20:18  fplanque
+ * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
+ *
  * Revision 1.101  2009/05/23 14:12:42  fplanque
  * All default skins now support featured posts and intro posts.
  *
