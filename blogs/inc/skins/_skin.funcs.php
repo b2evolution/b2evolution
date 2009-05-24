@@ -47,6 +47,11 @@ function skin_init( $disp )
 	 */
 	global $Item;
 
+	/**
+	 * @var Skin
+	 */
+	global $Skin;
+
 	global $robots_index;
 	global $seo_page_type;
 
@@ -360,6 +365,9 @@ function skin_init( $disp )
 	// dummy var for backward compatibility with versions < 2.4.1 -- prevents "Undefined variable"
 	global $global_Cache, $credit_links;
 	$credit_links = $global_Cache->get( 'creds' );
+
+	// Initialize displaying....
+	$Skin->display_init();
 }
 
 
@@ -762,6 +770,12 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.50  2009/05/24 21:14:38  fplanque
+ * _skin.class.php can now provide skin specific settings.
+ * Demo: the custom skin has configurable header colors.
+ * The settings can be changed through Blog Settings > Skin Settings.
+ * Anyone is welcome to extend those settings for any skin you like.
+ *
  * Revision 1.49  2009/05/23 20:20:18  fplanque
  * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
  *

@@ -156,7 +156,8 @@ switch( $action )
 
 				if(	! param_errors_detected() )
 				{	// Update settings:
-					$Messages->add( 'TODO', 'error' );
+					$edited_Skin->dbupdate_settings();
+					$Messages->add( T_('Skin settings have been updated'), 'success' );
 				}
 				break;
 
@@ -279,6 +280,12 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2009/05/24 21:14:38  fplanque
+ * _skin.class.php can now provide skin specific settings.
+ * Demo: the custom skin has configurable header colors.
+ * The settings can be changed through Blog Settings > Skin Settings.
+ * Anyone is welcome to extend those settings for any skin you like.
+ *
  * Revision 1.17  2009/05/23 22:49:10  fplanque
  * skin settings
  *

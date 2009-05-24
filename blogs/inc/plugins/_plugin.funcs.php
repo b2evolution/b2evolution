@@ -180,7 +180,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		switch( $set_type )
 		{
 			case 'Skin':
-				$set_value = $Obj->get_param( $parname );
+				$set_value = $Obj->get_setting( $parname );
 				$error_value = NULL;
 				break;
 
@@ -684,6 +684,11 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 	// Validate form values:
 	switch( $set_type )
 	{
+		case 'Skin':
+			$error_value = NULL;
+			$Obj->set_setting( $parname, $l_value );
+			break;
+
 		case 'Widget':
 			$error_value = NULL;
 			$Obj->set( $parname, $l_value );
@@ -1008,6 +1013,12 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /*
  * $Log$
+ * Revision 1.9  2009/05/24 21:14:38  fplanque
+ * _skin.class.php can now provide skin specific settings.
+ * Demo: the custom skin has configurable header colors.
+ * The settings can be changed through Blog Settings > Skin Settings.
+ * Anyone is welcome to extend those settings for any skin you like.
+ *
  * Revision 1.8  2009/05/23 22:49:10  fplanque
  * skin settings
  *

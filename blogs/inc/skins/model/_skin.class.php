@@ -148,7 +148,7 @@ class Skin extends DataObject
 		// Loop through all widget params:
 		foreach( $this->get_param_definitions( array('for_editing'=>true) ) as $parname => $parmeta )
 		{
-			autoform_set_param_from_request( $parname, $parmeta, $this, 'Widget' );
+			autoform_set_param_from_request( $parname, $parmeta, $this, 'Skin' );
 		}
 	}
 
@@ -473,18 +473,25 @@ class Skin extends DataObject
 
 
 	/**
- 	 * param value
+ 	 * Get a skin specific param value from current Blog
  	 *
 	 */
-	function get_param( $parname )
+	function get_setting( $parname )
 	{
-		/*
-		$this->load_param_array();
-		if( isset( $this->param_array[$parname] ) )
+		/**
+		 * @var Blog
+		 */
+		global $Blog;
+
+		// Name of the setting in the blog settings:
+		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
+
+		$value = $Blog->get_setting( $blog_setting_name );
+
+		if( ! is_null( $value ) )
 		{	// We have a value for this param:
-			return $this->param_array[$parname];
+			return $value;
 		}
-		*/
 
 		// Try default values:
 		$params = $this->get_param_definitions( NULL );
@@ -498,27 +505,59 @@ class Skin extends DataObject
 
 
 	/**
-	 * Set param value
+	 * Set a skin specific param value for current Blog
 	 *
 	 * @param string parameter name
 	 * @param mixed parameter value
 	 */
-	function set_param( $parname, $parvalue )
+	function set_setting( $parname, $parvalue )
 	{
+		/**
+		 * @var Blog
+		 */
+		global $Blog;
 
-		// fp> RFC: where do we save params?
-		// I'm about to create a new table:
-		// T_skins__params( coll_ID INT, skin_ID INT, params TEXT )
-		// I am wondering if I should extend T_coll_settings instead to somehow provide TEXT long storage
-		// Or maybe just use coll settings nicely, one param at a time...
+		// Name of the setting in the blog settings:
+		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
 
+		$Blog->set_setting( $blog_setting_name, $parvalue );
 	}
 
+
+	/**
+	 * Save skin specific settings for current blgo to DB
+	 */
+	function dbupdate_settings()
+	{
+		/**
+		 * @var Blog
+		 */
+		global $Blog;
+
+		$Blog->dbupdate();
+	}
+
+
+	/**
+	 * Get ready for displaying the skin.
+	 *
+	 * This may register some CSS or JS...
+	 */
+	function display_init()
+	{
+		// override in specific skins...
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.16  2009/05/24 21:14:38  fplanque
+ * _skin.class.php can now provide skin specific settings.
+ * Demo: the custom skin has configurable header colors.
+ * The settings can be changed through Blog Settings > Skin Settings.
+ * Anyone is welcome to extend those settings for any skin you like.
+ *
  * Revision 1.15  2009/05/23 22:57:32  fplanque
  * skin settings
  *

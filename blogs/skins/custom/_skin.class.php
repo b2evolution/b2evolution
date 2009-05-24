@@ -47,10 +47,17 @@ class custom_Skin extends Skin
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
-				'logo_file' => array(
+				'head_bg_color' => array(
 					'label' => T_('Header Background Color'),
 					'note' => T_('E-g: #ff0000 for red'),
 					'defaultvalue' => '#78a',
+					'valid_pattern' => array( 'pattern'=>'¤^(#([a-f0-9]{3}){1,2})?$¤i',
+																		'error'=>T_('Invalid color code.') ),
+				),
+				'menu_bg_color' => array(
+					'label' => T_('Menu Background Color'),
+					'note' => T_('E-g: #ff0000 for red'),
+					'defaultvalue' => '#ddd',
 					'valid_pattern' => array( 'pattern'=>'¤^(#([a-f0-9]{3}){1,2})?$¤i',
 																		'error'=>T_('Invalid color code.') ),
 				),
@@ -58,10 +65,53 @@ class custom_Skin extends Skin
 
 		return $r;
 	}
+
+
+	/**
+	 * Get ready for displaying the skin.
+	 *
+	 * This may register some CSS or JS...
+	 */
+	function display_init()
+	{
+		// call parent:
+		parent::display_init();
+
+		// Add custom CSS:
+		$custom_css = '';
+
+		if( $bg_color = $this->get_setting( 'head_bg_color') )
+		{	// Custom Header background color:
+			$custom_css .= '	div.pageHeader { background-color: '.$bg_color." }\n";
+		}
+
+		if( $bg_color = $this->get_setting( 'menu_bg_color') )
+		{	// Custom Meu background color:
+			$custom_css .= '	div.top_menu ul { background-color: '.$bg_color." }\n";
+		}
+
+		if( !empty( $custom_css ) )
+		{
+			$custom_css = '
+	<style type="text/css">
+	<!--
+'.$custom_css.'	-->
+	</style>';
+			add_headline( $custom_css );
+		}
+
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.3  2009/05/24 21:14:38  fplanque
+ * _skin.class.php can now provide skin specific settings.
+ * Demo: the custom skin has configurable header colors.
+ * The settings can be changed through Blog Settings > Skin Settings.
+ * Anyone is welcome to extend those settings for any skin you like.
+ *
  * Revision 1.2  2009/05/23 22:49:10  fplanque
  * skin settings
  *
