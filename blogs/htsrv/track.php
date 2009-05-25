@@ -51,6 +51,7 @@ if( !empty($Goal->goal_redir_url) )
 
 	if( preg_match( '/\$([a-z_]+)\$/i', $redir_url, $matches ) )
 	{	// We want to replace a special code like $hit_ID$ in the redir URL:
+		// Tblue> What about using preg_replace_callback() to do this?
 		// echo $matches[1];
 		switch( $matches[1] )
 		{
@@ -101,6 +102,9 @@ $DB->query( $sql );
 
 /*
  * $Log$
+ * Revision 1.2  2009/05/25 19:37:50  tblue246
+ * Doc/question
+ *
  * Revision 1.1  2009/05/25 19:11:58  fplanque
  * Added goal tracke
  *
