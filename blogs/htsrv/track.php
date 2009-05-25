@@ -65,7 +65,7 @@ if( !empty($Goal->goal_redir_url) )
 
 	header( 'HTTP/1.1 302 Found' );
 	header( 'Location: '.$redir_url, true, 302 ); // explictly setting the status is required for (fast)cgi
-	echo str_pad( '', 1024 );
+	echo str_repeat( ' ', 1024 );
 	flush();
 	// At this point Firefox 2 will redirect without waiting for the end of the page, but IE7 will not :/
 }
@@ -102,6 +102,9 @@ $DB->query( $sql );
 
 /*
  * $Log$
+ * Revision 1.3  2009/05/25 19:40:53  tblue246
+ * Use str_repeat() instead of str_pad()
+ *
  * Revision 1.2  2009/05/25 19:37:50  tblue246
  * Doc/question
  *
