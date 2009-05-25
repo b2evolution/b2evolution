@@ -484,6 +484,11 @@ $Form->begin_form();
 				$field_options['make_posts'] = T_('Make multiple posts (1 per image)');
 			}
 
+			if( $mode == 'upload' )
+			{	// We are uploading in a popup opened by an edit screen
+				$field_options['img_tag'] = T_('Insert IMG/link into post');
+			}
+
 			if( $current_User->check_perm( 'files', 'edit' ) )
 			{ // User can edit:
 				$field_options['rename'] = T_('Rename files...');
@@ -508,10 +513,10 @@ $Form->begin_form();
 
 			$Form->switch_layout( 'none' );
 			$Form->select_input_array( 'group_action', $action, $field_options, ' &mdash; <strong>'.T_('With selected files').'</strong>' );
-			$Form->submit_input( array( 'name'=>'actionArray[group_action]', 'value'=>T_('Go!') ) );
+			$Form->submit_input( array( 'name'=>'actionArray[group_action]', 'value'=>T_('Go!'), 'onclick'=>'return js_act_on_selected();' ) );
 			$Form->switch_layout( NULL );
 
-
+			/* fp> the following has been integrated into the select.
 			if( $mode == 'upload' )
 			{	// We are uploading in a popup opened by an edit screen
 				?>
@@ -524,6 +529,7 @@ $Form->begin_form();
 					onclick="insert_tag_for_selected_files(); return false;" />
 				<?php
 			}
+			*/
 			?>
 			</td>
 		</tr>
@@ -541,6 +547,20 @@ $Form->begin_form();
 		?>
 		<script type="text/javascript">
 			<!--
+			function js_act_on_selected()
+			{
+				// There may be an easier selector than below but couldn't make sense of it :(
+				selected_value = jQuery('#group_action option:selected').attr('value');
+				if( selected_value == 'img_tag' )
+				{
+					insert_tag_for_selected_files();
+					return false;
+				}
+
+				// other actions:
+				return true;
+			}
+
 			/**
 			 * Check if files are selected.
 			 *
@@ -610,6 +630,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.16  2009/05/25 20:24:20  fplanque
+ * cleaned up some more UI
+ *
  * Revision 1.15  2009/03/08 23:57:43  fplanque
  * 2009
  *
