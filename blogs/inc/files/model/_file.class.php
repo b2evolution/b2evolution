@@ -1032,9 +1032,11 @@ class File extends DataObject
 		}
 		else
 		{	// Make an A HREF link:
-			$r = '<a href="'.$this->get_url()
-						.'"'.( $this->get('desc') ? ' title="'.$this->dget('desc', 'htmlattr') : '' ).'">'
-						.( $this->get('title') ? $this->dget('title') : T_( 'attached file' ) ).'</a>';
+			$r = '<a href="'.$this->get_url().'"'
+						// title
+						.( $this->get('desc') ? ' title="'.$this->dget('desc', 'htmlattr').'"' : '' ).'>'
+						// link text
+						.( $this->get('title') ? $this->dget('title') : $this->dget('name') ).'</a>';
 		}
 
 		return $r;
@@ -1911,6 +1913,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.35  2009/05/25 19:47:45  fplanque
+ * better linking of files
+ *
  * Revision 1.34  2009/05/20 17:26:22  yabs
  * minor bug fixes
  *

@@ -353,7 +353,7 @@ function bpost_count_words( $str )
 			++$count;
 		}
 	}
-	
+
 	return $count;
 }
 
@@ -433,7 +433,7 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 	global $current_User;
 	global $Settings;
 
-	$fieldset_title = T_('Attachments').get_manual_link('post_attachments_fieldset');
+	$fieldset_title = T_('Images &amp; Attachments').get_manual_link('post_attachments_fieldset');
 
 	if( $creating )
 	{	// Creating new post
@@ -461,7 +461,7 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 			$fieldset_title .= ' - <a href="admin.php?ctrl=files&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID
 						.'" onclick="return pop_up_window( \'admin.php?ctrl=files&amp;mode=upload&amp;iframe_name='
 						.$iframe_name.'&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID.'\', \'fileman_upload\', 1000 )">'
-						.get_icon( 'folder', 'imgtag' ).' '.T_('Attach files (popup)').'</a>';
+						.get_icon( 'folder', 'imgtag' ).' '.T_('Add/Link files').'</a> <span class="note">(popup)</span>';
 		}
 
 		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_links' ) );
@@ -831,6 +831,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.44  2009/05/25 19:47:45  fplanque
+ * better linking of files
+ *
  * Revision 1.43  2009/04/14 22:30:05  blueyed
  * TODO for bpost_count_words
  *
