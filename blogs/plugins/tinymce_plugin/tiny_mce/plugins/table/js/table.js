@@ -203,30 +203,7 @@ function insertTable() {
 	html += "</table>";
 
 	inst.execCommand('mceBeginUndoLevel');
-
-	// Move table
-	if (inst.settings.fix_table_elements) {
-		var bm = inst.selection.getBookmark(), patt = '';
-
-		inst.execCommand('mceInsertContent', false, '<br class="_mce_marker" />');
-
-		tinymce.each('h1,h2,h3,h4,h5,h6,p'.split(','), function(n) {
-			if (patt)
-				patt += ',';
-
-			patt += n + ' ._mce_marker';
-		});
-
-		tinymce.each(inst.dom.select(patt), function(n) {
-			inst.dom.split(inst.dom.getParent(n, 'h1,h2,h3,h4,h5,h6,p'), n);
-		});
-
-		dom.setOuterHTML(dom.select('._mce_marker')[0], html);
-
-		inst.selection.moveToBookmark(bm);
-	} else
-		inst.execCommand('mceInsertContent', false, html);
-
+	inst.execCommand('mceInsertContent', false, html);
 	inst.addVisual();
 	inst.execCommand('mceEndUndoLevel');
 

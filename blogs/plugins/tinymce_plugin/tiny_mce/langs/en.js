@@ -153,5 +153,5 @@ moreseparator:{
 desc:"Insert more separator"
 },
 pagebreak:{
-desc:"Insert page break"
+desc:"Insert page break."
 }}});
