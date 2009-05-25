@@ -398,12 +398,13 @@ class Plugins_admin extends Plugins
 			return array();
 		}
 
-		$classfile_contents = @file_get_contents( $Plugin->classfile_path );
-		if( ! is_string($classfile_contents) )
+		if( ( $classfile_contents = @file_get_contents( $Plugin->classfile_path ) ) === false )
 		{
 			$Debuglog->add( 'get_registered_events(): "'.$Plugin->classfile_path.'" could not get read.', array('plugins', 'error') );
 			return array();
 		}
+
+		$supported_events = array_keys( $this->get_supported_events() );
 
 		// TODO: allow optional Plugin callback to get list of methods. Like Plugin::GetRegisteredEvents().
 		// fp> bloated. what problem does it solve?
@@ -412,24 +413,36 @@ class Plugins_admin extends Plugins
 		//     The whole point of such a base class would be to simplify writing a captcha plugin and IMHO it's "bloated" to force a whole block of methods into it that do only call the parent method.
 
 		// TODO: dh> only match in the relevant "class block"
-		if( preg_match_all( '~^\s*function\s+(\w+)~mi', $classfile_contents, $matches ) )
-		{	// sam2kb> array_unique is needed to prevent "Duplicate entry" errors
-			$plugin_class_methods = array_unique($matches[1]);
+		$had_func_token = false;
+		foreach( token_get_all( $classfile_contents ) as $token )
+		{
+			if( ! is_array( $token ) )
+			{
+				continue;
+			}
+
+			if( $had_func_token && $token[0] == T_STRING
+				&& ! in_array( $token[1], $plugin_class_methods )
+				&& in_array( $token[1], $supported_events ) )
+			{	// We got the function name, it is unique and one of our events:
+				$plugin_class_methods[] = $token[1];
+				$had_func_token = false;
+			}
+			else if( ! $had_func_token && $token[0] == T_FUNCTION )
+			{	// Begin searching for the function name:
+				$had_func_token = true;
+			}
 		}
-		else
+		
+		if( ! count( $plugin_class_methods ) )
 		{
 			$Debuglog->add( 'No functions found in file "'.$Plugin->classfile_path.'".', array('plugins', 'error') );
 			return array();
 		}
 
-		$supported_events = $this->get_supported_events();
-		$supported_events = array_keys($supported_events);
-		$verified_events = array_intersect( $plugin_class_methods, $supported_events );
-
 		$Timer->pause( 'plugins_detect_events' );
 
-		// TODO: Report, when difference in $events_verified and what getRegisteredEvents() returned
-		return $verified_events;
+		return $plugin_class_methods;
 	}
 
 
@@ -1447,6 +1460,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.12  2009/05/25 21:10:07  tblue246
+ * Plugins_admin::get_registered_events(): Use PHP's tokenizer instead of preg_match_all()
+ *
  * Revision 1.11  2009/05/22 17:36:50  sam2kb
  * Added array_unique to prevent "Duplicate entry" errors
  *
