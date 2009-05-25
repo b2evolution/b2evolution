@@ -600,13 +600,13 @@ If needed, a skin can format info pages differently from regular posts.");
 	// Insert a PAGE:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("About this system"), T_("This blog platform is powered by b2evolution.
+	$edited_Item->insert( 1, T_("About this system"), T_("<p>This blog platform is powered by b2evolution.</p>
 
-You are currently looking at an info page about this system. It is cross-posted among the 3 demo blogs. Thus, this page will be linked on each of these blogs.
+<p>You are currently looking at an info page about this system. It is cross-posted among the demo blogs. Thus, this page will be linked on each of these blogs.</p>
 
-Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.
+<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.</p>
 
-If needed, a skin can format info pages differently from regular posts."), $now, $cat_ann_a,
+<p>If needed, a skin can format info pages differently from regular posts.</p>"), $now, $cat_ann_a,
 		array( $cat_ann_a, $cat_ann_b, $cat_linkblog_b2evo ), 'published', '#', '', '', 'open', array('default'), 1000 );
 	$edit_File = & new File( 'shared', 0, 'logos/b2evolution8.png' );
 	$edit_File->link_to_Item( $edited_Item );
@@ -645,11 +645,11 @@ If needed, a skin can format info pages differently from regular posts."), $now,
 	// TODO: move to Blog A
 	$now = date('Y-m-d H:i:s', $timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("Featured post"), T_("This is a demo of a featured post.
+	$edited_Item->insert( 1, T_("Featured post"), T_("<p>This is a demo of a featured post.</p>
 
-It will be featured whenever we have no specific \"Intro\" post to display for the current request. To see it in action, try displaying the \"Announcements\" category.
+<p>It will be featured whenever we have no specific \"Intro\" post to display for the current request. To see it in action, try displaying the \"Announcements\" category.</p>
 
-Also note that when the post is featured, it does not appear in the regular post flow."),
+<p>Also note that when the post is featured, it does not appear in the regular post flow.</p>"),
 	$now, $cat_b2evo, array( $cat_ann_b ) );
 	$edited_Item->set( 'featured', 1 );
 	$edited_Item->dbsave();
@@ -657,27 +657,27 @@ Also note that when the post is featured, it does not appear in the regular post
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("Apache optimization..."), T_("In the <code>/blogs</code> folder there is a file called [<code>sample.htaccess</code>]. You should try renaming it to [<code>.htaccess</code>].
+	$edited_Item->insert( 1, T_("Apache optimization..."), T_("<p>In the <code>/blogs</code> folder there is a file called [<code>sample.htaccess</code>]. You should try renaming it to [<code>.htaccess</code>].</p>
 
-This will optimize the way b2evolution is handled by the webserver (if you are using Apache). This file is not active by default because a few hosts would display an error right away when you try to use it. If this happens to you when you rename the file, just remove it and you'll be fine."),
+<p>This will optimize the way b2evolution is handled by the webserver (if you are using Apache). This file is not active by default because a few hosts would display an error right away when you try to use it. If this happens to you when you rename the file, just remove it and you'll be fine.</p>"),
 												$now, $cat_b2evo, array( $cat_ann_b ) );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("Skins, Stubs, Templates &amp; website integration..."), T_("By default, blogs are displayed using a skin. (More on skins in another post.)
+	$edited_Item->insert( 1, T_("<p>Skins, Stubs, Templates &amp; website integration..."), T_("By default, blogs are displayed using a skin. (More on skins in another post.)</p>
 
-This means, blogs are accessed through '<code>index.php</code>', which loads default parameters from the database and then passes on the display job to a skin.
+<p>This means, blogs are accessed through '<code>index.php</code>', which loads default parameters from the database and then passes on the display job to a skin.</p>
 
-Alternatively, if you don't want to use the default DB parameters and want to, say, force a skin, a category or a specific linkblog, you can create a stub file like the provided '<code>a_stub.php</code>' and call your blog through this stub instead of index.php .
+<p>Alternatively, if you don't want to use the default DB parameters and want to, say, force a skin, a category or a specific linkblog, you can create a stub file like the provided '<code>a_stub.php</code>' and call your blog through this stub instead of index.php .</p>
 
-Finally, if you need to do some very specific customizations to your blog, you may use plain templates instead of skins. In this case, call your blog through a full template, like the provided '<code>a_noskin.php</code>'.
+<p>Finally, if you need to do some very specific customizations to your blog, you may use plain templates instead of skins. In this case, call your blog through a full template, like the provided '<code>a_noskin.php</code>'.</p>
 
-If you want to integrate a b2evolution blog into a complex website, you'll probably want to do it by copy/pasting code from <code>a_noskin.php</code> into a page of your website.
+<p>If you want to integrate a b2evolution blog into a complex website, you'll probably want to do it by copy/pasting code from <code>a_noskin.php</code> into a page of your website.</p>
 
-You will find more information in the stub/template files themselves. Open them in a text editor and read the comments in there.
+<p>You will find more information in the stub/template files themselves. Open them in a text editor and read the comments in there.</p>
 
-Either way, make sure you go to the blogs admin and set the correct access method/URL for your blog. Otherwise, the permalinks will not function properly."), $now, $cat_b2evo );
+<p>Either way, make sure you go to the blogs admin and set the correct access method/URL for your blog. Otherwise, the permalinks will not function properly.</p>"), $now, $cat_b2evo );
 	$edited_Item->set_tags_from_string( 'skins' );
 	//$edited_Item->dbsave();
 	$edited_Item->insert_update_tags( 'update' );
@@ -685,11 +685,11 @@ Either way, make sure you go to the blogs admin and set the correct access metho
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("About widgets..."), T_('b2evolution blogs are installed with a default selection of Widgets. For example, the sidebar of this blog includes widgets like a calendar, a search field, a list of categories, a list of XML feeds, etc.
+	$edited_Item->insert( 1, T_("About widgets..."), T_('<p>b2evolution blogs are installed with a default selection of Widgets. For example, the sidebar of this blog includes widgets like a calendar, a search field, a list of categories, a list of XML feeds, etc.</p>
 
-You can add, remove and reorder widgets from the Blog Settings tab in the admin interface.
+<p>You can add, remove and reorder widgets from the Blog Settings tab in the admin interface.</p>
 
-Note: to be displayed widgets are placed in containers. Each container appears in a specific place on a skin. If you change the skin of your blog, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.'), $now, $cat_b2evo );
+<p>Note: to be displayed widgets are placed in containers. Each container appears in a specific place on a skin. If you change the skin of your blog, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.</p>'), $now, $cat_b2evo );
 	$edited_Item->set_tags_from_string( 'widgets' );
 	//$edited_Item->dbsave();
 	$edited_Item->insert_update_tags( 'update' );
@@ -697,17 +697,17 @@ Note: to be displayed widgets are placed in containers. Each container appears i
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("About skins..."), T_('By default, b2evolution blogs are displayed using a skin.
+	$edited_Item->insert( 1, T_("About skins..."), T_('<p>By default, b2evolution blogs are displayed using a skin.</p>
 
-You can change the skin used by any blog by editing the blog settings in the admin interface.
+<p>You can change the skin used by any blog by editing the blog settings in the admin interface.</p>
 
-You can download additional skins from the <a href="http://skins.b2evolution.net/" target="_blank">skin site</a>. To install them, unzip them in the /blogs/skins directory, then go to General Settings &gt; Skins in the admin interface and click on "Install new".
+<p>You can download additional skins from the <a href="http://skins.b2evolution.net/" target="_blank">skin site</a>. To install them, unzip them in the /blogs/skins directory, then go to General Settings &gt; Skins in the admin interface and click on "Install new".</p>
 
-You can also create your own skins by duplicating, renaming and customizing any existing skin folder from the /blogs/skins directory.
+<p>You can also create your own skins by duplicating, renaming and customizing any existing skin folder from the /blogs/skins directory.</p>
 
-To start customizing a skin, open its "<code>index.main.php</code>" file in an editor and read the comments in there. Note: you can also edit skins in the "Files" tab of the admin interface.
+<p>To start customizing a skin, open its "<code>index.main.php</code>" file in an editor and read the comments in there. Note: you can also edit skins in the "Files" tab of the admin interface.</p>
 
-And, of course, read the <a href="http://manual.b2evolution.net/Skins_2.0" target="_blank">manual on skins</a>!'), $now, $cat_b2evo );
+<p>And, of course, read the <a href="http://manual.b2evolution.net/Skins_2.0" target="_blank">manual on skins</a>!</p>'), $now, $cat_b2evo );
 	$edited_Item->set_tags_from_string( 'skins' );
 	$edited_Item->set( 'featured', 1 );
 	$edited_Item->dbsave();
@@ -727,49 +727,50 @@ And, of course, read the <a href="http://manual.b2evolution.net/Skins_2.0" targe
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_('This is a multipage post'), T_('This is page 1 of a multipage post.
+	$edited_Item->insert( 1, T_('This is a multipage post'), T_('<p>This is page 1 of a multipage post.</p>
 
-You can see the other pages by clicking on the links below the text.
-
-<!--nextpage-->
-
-This is page 2.
+<p>You can see the other pages by clicking on the links below the text.</p>
 
 <!--nextpage-->
 
-This is page 3.
+<p>This is page 2.</p>
 
 <!--nextpage-->
 
-This is page 4.
+<p>This is page 3.</p>
 
-It is the last page.'), $now, $cat_bg );
+<!--nextpage-->
+
+<p>This is page 4.</p>
+
+<p>It is the last page.</p>'), $now, $cat_bg );
 
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_('Extended post with no teaser'), T_('This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.
+	$edited_Item->insert( 1, T_('Extended post with no teaser'), T_('<p>This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.</p>
 
 <!--more--><!--noteaser-->
 
-This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_bg );
+<p>This is the extended text. You only see it when you have clicked the "more" link.</p>'), $now, $cat_bg );
 
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_('Extended post'), T_('This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.
+	$edited_Item->insert( 1, T_('Extended post'), T_('<p>This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.</p>
 
 <!--more-->
 
-This is the extended text. You only see it when you have clicked the "more" link.'), $now, $cat_bg );
+<p>This is the extended text. You only see it when you have clicked the "more" link.</p>'), $now, $cat_bg );
 
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("Welcome to b2evolution!"), T_("Four blogs have been created with sample contents:
+	$edited_Item->insert( 1, T_("Welcome to b2evolution!"), T_("<p>Four blogs have been created with sample contents:</p>
+
 <ul>
 	<li><strong>Blog A</strong>: You are currently looking at it. It contains a few sample posts, using simple features of b2evolution.</li>
 	<li><strong>Blog B</strong>: You can access it from a link at the top of the page. It contains information about more advanced features.</li>
@@ -777,7 +778,7 @@ This is the extended text. You only see it when you have clicked the "more" link
 	<li><strong>Photoblog</strong>: This blog is an example of how you can use b2evolution to showcase photos, with one photo per page as well as a thumbnail index.</li>
 </ul>
 
-You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, skin, widgets, etc.) from the Blog Settings tab in the admin interface."), $now, $cat_ann_a );
+<p>You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, skin, widgets, etc.) from the Blog Settings tab in the admin interface.</p>"), $now, $cat_ann_a );
 	$edit_File = & new File( 'shared', 0, 'logos/b2evolution8.png' );
 	$edit_File->link_to_Item( $edited_Item );
 
@@ -848,6 +849,9 @@ You can add new blogs, delete unwanted blogs and customize existing blogs (title
 
 /*
  * $Log$
+ * Revision 1.262  2009/05/25 18:32:57  fplanque
+ * added <p> tags so that posts show up cleanly in tinymce
+ *
  * Revision 1.261  2009/05/18 03:59:39  fplanque
  * minor/doc
  *
