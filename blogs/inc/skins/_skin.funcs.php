@@ -55,7 +55,7 @@ function skin_init( $disp )
 	global $robots_index;
 	global $seo_page_type;
 
-	global $redir, $ReqHost, $ReqURI, $m, $w;
+	global $redir, $ReqHost, $ReqURI, $m, $w, $preview;
 
 	global $Chapter;
 	global $Debuglog;
@@ -120,8 +120,9 @@ function skin_init( $disp )
 
 			// Check if we want to redirect to a canonical URL for the post
 			// Please document encountered problems.
-			if( ( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
-					|| $Blog->get_setting( 'relcanonical_item_urls' ) )
+			if( ! $preview
+					&& (( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
+								|| $Blog->get_setting( 'relcanonical_item_urls' ) ) )
 			{	// We want to redirect to the Item's canonical URL:
 
 				$canonical_url = $Item->get_permanent_url( '', '', '&' );
@@ -770,6 +771,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.51  2009/05/25 19:39:50  fplanque
+ * bugfix
+ *
  * Revision 1.50  2009/05/24 21:14:38  fplanque
  * _skin.class.php can now provide skin specific settings.
  * Demo: the custom skin has configurable header colors.
