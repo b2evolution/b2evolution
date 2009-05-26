@@ -55,7 +55,7 @@ class archives_plugin extends Plugin
 	var $name = 'Archives Widget';
 	var $code = 'evo_Arch';
 	var $priority = 50;
-	var $version = '3.0';
+	var $version = '3.2';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 
@@ -297,6 +297,27 @@ class archives_plugin extends Plugin
 
 		return true;
 	}
+
+	
+  /**
+   * Get definitions for widget specific editable params
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_widget_param_definitions( $params )
+	{
+		$r = array(
+			'limit' => array(
+				'label' => T_( 'Limit' ),
+				'note' => T_( 'Maximum number of items to display.' ),
+				'size' => 4,
+				'defaultvalue' => 12,
+			),
+		);
+		return $r;
+	}
+
 }
 
 
@@ -586,6 +607,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.50  2009/05/26 22:18:23  fplanque
+ * fix limit (and make it configurable)
+ *
  * Revision 1.49  2009/03/08 23:57:47  fplanque
  * 2009
  *
