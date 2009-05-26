@@ -179,6 +179,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	{
 		switch( $set_type )
 		{
+			case 'CollSettings':
+				$set_value = $Obj->get_coll_setting( $parname, $set_target );
+				$error_value = NULL;
+				break;
+
 			case 'Skin':
 				$set_value = $Obj->get_setting( $parname );
 				$error_value = NULL;
@@ -684,6 +689,11 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 	// Validate form values:
 	switch( $set_type )
 	{
+		case 'CollSettings':
+			$error_value = NULL;
+			$Obj->set_coll_setting( $parname, $l_value );
+			break;
+
 		case 'Skin':
 			$error_value = NULL;
 			$Obj->set_setting( $parname, $l_value );
@@ -1013,6 +1023,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /*
  * $Log$
+ * Revision 1.10  2009/05/26 19:31:59  fplanque
+ * Plugins can now have Settings that are specific to each blog.
+ *
  * Revision 1.9  2009/05/24 21:14:38  fplanque
  * _skin.class.php can now provide skin specific settings.
  * Demo: the custom skin has configurable header colors.

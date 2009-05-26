@@ -458,21 +458,20 @@ if( !$Messages->count('error') )
 			}
 
 			// PluginUserSettings
+			load_funcs('plugins/_plugin.funcs.php');
+
 			$any_plugin_settings_updated = false;
 			$Plugins->restart();
 			while( $loop_Plugin = & $Plugins->get_next() )
 			{
 				$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
-
 				if( empty($pluginusersettings) )
 				{
 					continue;
 				}
 
-				load_funcs('plugins/_plugin.funcs.php');
-
 				// Loop through settings for this plugin:
-				foreach( $loop_Plugin->GetDefaultUserSettings( $dummy = array('for_editing' => true) ) as $set_name => $set_meta )
+				foreach( $pluginusersettings as $set_name => $set_meta )
 				{
 					autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'UserSettings', $edited_User );
 				}
@@ -645,7 +644,7 @@ if( !$Messages->count('error') )
 				{
 					$msg = sprintf( T_('User &laquo;%s&raquo; deleted.'), $edited_User->dget( 'login' ) );
 				}
-				
+
 				$edited_User->dbdelete( $Messages );
 				unset($edited_User);
 				forget_param('user_ID');
@@ -663,7 +662,7 @@ if( !$Messages->count('error') )
 				{
 					$msg = sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $edited_User->dget( 'login' ) );
 				}
-				
+
 				if( ! $edited_User->check_delete( $msg ) )
 				{	// There are restrictions:
 					$action = 'view_user';
@@ -871,7 +870,7 @@ switch( $action )
 			{
 				$msg = sprintf( T_('Delete user &laquo;%s&raquo;?'), $edited_User->dget( 'login' ) );
 			}
-			
+
 			$edited_User->confirm_delete( $msg, $action, get_memorized( 'action' ) );
 		case 'new_user':
 		case 'view_user':
@@ -909,6 +908,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2009/05/26 19:31:59  fplanque
+ * Plugins can now have Settings that are specific to each blog.
+ *
  * Revision 1.17  2009/03/22 17:20:32  fplanque
  * I think I forgot that earlier
  *

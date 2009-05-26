@@ -2823,11 +2823,62 @@ class Plugin
 	 * Interface methods }}}
 	 */
 
+	/**
+ 	 * Get a skin specific param value from current Blog
+ 	 *
+ 	 * @param string
+ 	 * @param Blog collection
+	 */
+	function get_coll_setting( $parname, & $Blog )
+	{
+		// Name of the setting in the blog settings:
+		$blog_setting_name = 'plugin'.$this->ID.'_'.$parname;
+
+		$value = $Blog->get_setting( $blog_setting_name );
+
+		if( ! is_null( $value ) )
+		{	// We have a value for this param:
+			return $value;
+		}
+
+		// Try default values:
+		$params = $this->get_coll_setting_definitions( $tmp_params = array('for_editing'=>true) );
+		if( isset( $params[$parname]['defaultvalue'] ) )
+		{	// We ahve a default value:
+			return $params[$parname]['defaultvalue'] ;
+		}
+
+		return NULL;
+	}
+
+
+	/**
+	 * Set a skin specific param value for current Blog
+	 *
+	 * @param string parameter name
+	 * @param mixed parameter value
+	 */
+	function set_coll_setting( $parname, $parvalue )
+	{
+		/**
+		 * @var Blog
+		 */
+		global $Blog;
+
+		// Name of the setting in the blog settings:
+		$blog_setting_name = 'plugin'.$this->ID.'_'.$parname;
+		$Blog->set_setting( $blog_setting_name, $parvalue );
+	}
+
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.22  2009/05/26 19:31:58  fplanque
+ * Plugins can now have Settings that are specific to each blog.
+ *
  * Revision 1.21  2009/05/26 18:29:11  fplanque
  * yeah I know I just fucked up the PHP doc on that but now I can actually READ the options and make sense of them for the first time ever!
  * No, adding tons of HTML markup in teh comments is not a good idea.

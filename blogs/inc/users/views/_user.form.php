@@ -270,7 +270,7 @@ if( $action != 'view_user' )
 	while( $loop_Plugin = & $Plugins->get_next() )
 	{
 		if( ! $loop_Plugin->UserSettings /* NOTE: this triggers autoloading in PHP5, which is needed for the "hackish" isset($this->UserSettings)-method to see if the settings are queried for editing (required before 1.9) */
-			&& ! $Plugins->has_event($loop_Plugin->ID, 'PluginSettingsEditDisplayAfter') )
+			&& ! $Plugins->has_event($loop_Plugin->ID, 'PluginSettingsEditDisplayAfter') ) // What do we care about this event for?
 		{
 			continue;
 		}
@@ -291,8 +291,10 @@ if( $action != 'view_user' )
 			}
 		}
 
+		// fp> what's a use case for this event? (I soooo want to nuke it...)
 		$Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsEditDisplayAfter',
 			$tmp_params = array( 'Form' => & $Form, 'User' => $edited_User ) );
+
 		$has_contents = strlen( ob_get_contents() );
 		$Form->end_fieldset();
 
@@ -487,6 +489,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.12  2009/05/26 19:32:00  fplanque
+ * Plugins can now have Settings that are specific to each blog.
+ *
  * Revision 1.11  2009/03/20 03:38:04  fplanque
  * rollback -- http://forums.b2evolution.net/viewtopic.php?t=18269
  *

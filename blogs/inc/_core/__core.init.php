@@ -646,6 +646,9 @@ class _core_Module
 							'skin_settings' => array(
 								'text' => T_('Skin settings'),
 								'href' => 'admin.php?ctrl=coll_settings&amp;tab=skin_settings&amp;blog='.$blog, ),
+							'plugin_settings' => array(
+								'text' => T_('Plugin settings'),
+								'href' => 'admin.php?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$blog, ),
 							'widgets' => array(
 								'text' => T_('Widgets'),
 								'href' => 'admin.php?ctrl=widgets&amp;blog='.$blog, ),
@@ -704,7 +707,7 @@ class _core_Module
 									'text' => T_('Features'),
 									'href' => 'admin.php?ctrl=features' ),
 								'skins' => array(
-									'text' => T_('Skins install'),
+									'text' => T_('Skins'),
 									'href' => 'admin.php?ctrl=skins'),
 								'plugins' => array(
 									'text' => T_('Plugins'),
@@ -813,6 +816,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.15  2009/05/26 19:31:49  fplanque
+ * Plugins can now have Settings that are specific to each blog.
+ *
  * Revision 1.14  2009/05/26 18:41:46  blueyed
  * Rename "Plugins install" to "Plugins". Shorter and it includes setup, too.
  *

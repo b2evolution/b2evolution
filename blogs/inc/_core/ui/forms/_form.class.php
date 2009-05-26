@@ -2361,7 +2361,7 @@ class Form extends Widget
 	 *
 	 * @uses Form::hidden()
 	 * @param array associative array ( name => value ) of hidden fields.
-	 * @param array|NULL A list of keys to ignore, additionally to {@link $included_input_field_names}.
+	 * @param array|NULL A list of keys to ignore, in addition to {@link $included_input_field_names}.
 	 */
 	function hiddens_by_key( $hiddens, $exclude = NULL )
 	{
@@ -2912,6 +2912,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.52  2009/05/26 19:31:54  fplanque
+ * Plugins can now have Settings that are specific to each blog.
+ *
  * Revision 1.51  2009/05/26 18:26:29  blueyed
  * doc
  *

@@ -161,6 +161,33 @@ switch( $action )
 				}
 				break;
 
+			case 'plugin_settings':
+				// Update Plugin params/Settings
+				load_funcs('plugins/_plugin.funcs.php');
+
+				$Plugins->restart();
+				while( $loop_Plugin = & $Plugins->get_next() )
+				{
+					$pluginsettings = $loop_Plugin->get_coll_setting_definitions( $tmp_params = array('for_editing'=>true) );
+					if( empty($pluginsettings) )
+					{
+						continue;
+					}
+
+					// Loop through settings for this plugin:
+					foreach( $pluginsettings as $set_name => $set_meta )
+					{
+						autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'CollSettings', $Blog );
+					}
+				}
+
+				if(	! param_errors_detected() )
+				{	// Update settings:
+					$Blog->dbupdate();
+					$Messages->add( T_('Plugin settings have been updated'), 'success' );
+				}
+				break;
+
 			case 'advanced':
 				$old_cache_status = $edited_Blog->get_setting('cache_enabled');
 				if( $edited_Blog->load_from_Request( array( 'pings', 'cache' ) ) )
@@ -249,6 +276,10 @@ switch( $AdminUI->get_path(1) )
 		$AdminUI->disp_view( 'skins/views/_coll_skin_settings.form.php' );
 		break;
 
+	case 'plugin_settings':
+		$AdminUI->disp_view( 'collections/views/_coll_plugin_settings.form.php' );
+		break;
+
 	case 'urls':
 		$AdminUI->disp_view( 'collections/views/_coll_urls.form.php' );
 		break;
@@ -280,6 +311,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2009/05/26 19:31:56  fplanque
+ * Plugins can now have Settings that are specific to each blog.
+ *
  * Revision 1.18  2009/05/24 21:14:38  fplanque
  * _skin.class.php can now provide skin specific settings.
  * Demo: the custom skin has configurable header colors.
