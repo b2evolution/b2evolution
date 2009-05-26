@@ -250,10 +250,17 @@ class Plugins
 	 *
 	 * @param Plugin
 	 * @param string New status ("enabled", "disabled", "needs_config", "broken")
+	 * @return boolean True on success, false on failure.
 	 */
 	function set_Plugin_status( & $Plugin, $status )
 	{
 		global $DB, $Debuglog;
+
+		if( $Plugin->status == $status
+			&& $DB->query( "SELECT plug_status FROM T_plugins WHERE plug_ID = ".$DB->quote($Plugin->ID), 'set_Plugin_status safety net' ) == $status )
+		{
+			return true;
+		}
 
 		$DB->query( "UPDATE T_plugins SET plug_status = '".$status."' WHERE plug_ID = '".$Plugin->ID."'" );
 
@@ -274,6 +281,8 @@ class Plugins
 		$Plugin->status = $status;
 
 		$Debuglog->add( 'Set status for plugin #'.$Plugin->ID.' to "'.$status.'"!', 'plugins' );
+
+		return true;
 	}
 
 
@@ -1904,6 +1913,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.12  2009/05/26 20:14:07  blueyed
+ * BeforeDisable now gets triggered only if status gets changed to disabled. Also do not update status, if it would be the same, but add safety net (which rather should be an assert prolly).
+ *
  * Revision 1.11  2009/05/26 19:47:43  blueyed
  * doc
  *

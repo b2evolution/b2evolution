@@ -960,7 +960,6 @@ class Plugin
 	 *
 	 * Use this, if your plugin needs configuration before it can be used.
 	 *
-	 * @todo dh> Call this from Plugins::set_Plugin_status()?
 	 * @return true|string True, if the plugin can be enabled/activated,
 	 *                     a string with an error/note otherwise.
 	 */
@@ -975,8 +974,6 @@ class Plugin
 	 * disabled.
 	 *
 	 * You cannot prevent this, but only clean up stuff, if you have to.
-	 *
-	 * @todo dh> Only call this from Plugins::set_Plugin_status(), if it has not been disabled before?! ("status change")
 	 */
 	function BeforeDisable()
 	{
@@ -2489,7 +2486,7 @@ class Plugin
 			return false;
 		}
 
-		$Plugins->set_Plugin_status( $this, $status );
+		return $Plugins->set_Plugin_status( $this, $status );
 	}
 
 
@@ -2876,6 +2873,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.23  2009/05/26 20:14:10  blueyed
+ * BeforeDisable now gets triggered only if status gets changed to disabled. Also do not update status, if it would be the same, but add safety net (which rather should be an assert prolly).
+ *
  * Revision 1.22  2009/05/26 19:31:58  fplanque
  * Plugins can now have Settings that are specific to each blog.
  *
