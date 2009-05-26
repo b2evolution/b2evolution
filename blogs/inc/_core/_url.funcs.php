@@ -264,6 +264,7 @@ function _http_wrapper_last_status( & $headers )
  * cURL, then fsockopen, then fopen.
  *
  * @todo dh> Should we try remaining methods, if the previous one(s) failed?
+ * @todo Tblue> Also allow HTTP POST.
  *
  * @param string URL
  * @param array Info (by reference)
@@ -727,6 +728,13 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.35  2009/05/26 17:18:36  tblue246
+ * - Twitter plugin:
+ * 	- removed unnecessary BeforeEnable() method.
+ * 	- Todo: Do not depend on cURL
+ * 	- Minor code improvements
+ * - fetch_remote_page(): Todo about supporting HTTP POST requests
+ *
  * Revision 1.34  2009/05/26 16:16:50  fplanque
  * minor
  *

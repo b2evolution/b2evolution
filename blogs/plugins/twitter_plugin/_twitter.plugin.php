@@ -28,6 +28,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * This plugin will post to your twitter account when you have added a post to your blog.
  *
  * @todo use OAuth -- http://www.jaisenmathai.com/blog/2009/03/31/how-to-quickly-integrate-with-twitters-oauth-api-using-php/
+ * @todo Tblue> Do not use cURL, or at least do not depend on it! We could
+ *              clone/modify {@link fetch_remote_page()} to be able to do
+ *              HTTP POST requests.
  */
 class twitter_plugin extends Plugin
 {
@@ -68,6 +71,8 @@ class twitter_plugin extends Plugin
 	/**
 	 * Event handler: Called before the plugin is going to be installed.
 	 *
+	 * @todo Tblue> Do not depend on cURL.
+	 * 
 	 * @return true|string True, if the plugin can be enabled/activated,
 	 *                     a string with an error/note otherwise.
 	 */
@@ -76,24 +81,6 @@ class twitter_plugin extends Plugin
 		if( ! extension_loaded( 'curl' ) )
 		{	// CURL not available :'(
 			return T_('The twitter plugin needs the PHP CURL extension to be enabled.');
-		}
-
-		// OK:
-		return true;
-	}
-
-
-	/**
-	 * Check if the plugin can be enabled:
-	 *
-	 * @return string|NULL
-	 */
-	function BeforeEnable()
-	{
-
-		if( empty($this->code) )
-		{
-			return T_('The twitter plugin needs a non-empty code.');
 		}
 
 		// OK:
@@ -112,7 +99,7 @@ class twitter_plugin extends Plugin
 		$perm_url = $params['Item']->get_permanent_url();
 		$update_text = $this->UserSettings->get( 'twitterlution_update_text' );
 
-		$status = "$update_text $title $perm_url";	// keep as compact as possible
+		$status = $update_text.' '.$title.' '.$perm_url;	// keep as compact as possible
 
 		$username = $this->UserSettings->get( 'twitterlution_username' );
 		$password = $this->UserSettings->get( 'twitterlution_password' );
@@ -123,7 +110,7 @@ class twitter_plugin extends Plugin
 		curl_setopt( $session, CURLOPT_HTTPAUTH, CURLAUTH_BASIC );
 		curl_setopt( $session, CURLOPT_HEADER, false );
 		curl_setopt( $session, CURLOPT_CONNECTTIMEOUT, 5);
-		curl_setopt( $session, CURLOPT_USERPWD, "$username:$password" );
+		curl_setopt( $session, CURLOPT_USERPWD, $username.':'.$password );
 		curl_setopt( $session, CURLOPT_RETURNTRANSFER, 1 );
 		curl_setopt( $session, CURLOPT_POST, 1);
 		$result = curl_exec ( $session );
@@ -165,6 +152,13 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.2  2009/05/26 17:18:36  tblue246
+ * - Twitter plugin:
+ * 	- removed unnecessary BeforeEnable() method.
+ * 	- Todo: Do not depend on cURL
+ * 	- Minor code improvements
+ * - fetch_remote_page(): Todo about supporting HTTP POST requests
+ *
  * Revision 1.1  2009/05/26 17:00:04  fplanque
  * added twitter plugin + better auto-install code for plugins in general
  *
