@@ -385,108 +385,57 @@ class Plugin
 	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
 	 * and assign an array with the following keys to them (only 'label' is required):
 	 *
-	 *   <ul><li>
-	 *   'label': Name/Title of the param, gets displayed as label for the input field, or
+	 * 'label': Name/Title of the param, gets displayed as label for the input field, or
 	 *              as "legend" tag with types "array" and "fieldset".
-	 *   </li><li>
-	 *   'defaultvalue': Default value for the setting, defaults to '' (empty string)
-	 *   </li><li>
-	 *   'type', which can be:
-	 *     <ul><li>
+	 * 'defaultvalue': Default value for the setting, defaults to '' (empty string)
+	 * 'type', which can be:
 	 *     'text' (default): a simple string
-	 *     </li><li>
-	 *     'html_input' : like text, but allows html
-	 *     </li><li>
 	 *     'password': like text, but hidden during input
-	 *     </li><li>
+	 *     'html_input' : like text, but allows html
 	 *     'checkbox': either 0 or 1
-	 *     </li><li>
-	 *     'integer': a number (no float, can have leading "+" or "-")
-	 *                  (like 'text' for input, but gets validated when submitting)
-	 *     </li><li>
-	 *     'float': a floating number (can have leading "+" or "-", e.g. "+1", "-0.05")
-	 *                  (like 'text' for input, but gets validated when submitting)
-	 *     </li><li>
+	 *     'integer': a number (no float, can have leading "+" or "-") (like 'text' for input, but gets validated when submitting)
+	 *     'float': a floating number (can have leading "+" or "-", e.g. "+1", "-0.05") (like 'text' for input, but gets validated when submitting)
 	 *     'textarea': several lines of input. The following can be set for this type:
-	 *       <ul><li>
-	 *       'rows': number of rows
-	 *       </li><li>
-	 *       'cols': number of columns
-	 *       </li></ul>
-	 *     </li><li>
+	 *         'rows': number of rows
+	 *         'cols': number of columns
 	 *     'html_textarea': like textarea, but allows html
-	 *     </li><li>
 	 *     'select': a drop down field; you must set 'options' for it:
-	 *       <ul><li>
-	 *       'options': an array of options ('value' => 'description'), see {@link Form::select_input_array()}.
-	 *       </li></ul>
-	 *     </li><li>
-	 *     'select_blog': a drop down field, providing all existing blogs (Blog ID is the value or "" if "allow_none" is true)
-	 *                    (WARNING: does not scale - not recommended)
-	 *     </li><li>
+	 *         'options': an array of options ('value' => 'description'), see {@link Form::select_input_array()}.
+	 *     'select_blog': a drop down field, providing all existing blogs (Blog ID is the value or "" if "allow_none" is true) (WARNING: does not scale - not recommended)
 	 *     'select_group': a drop down field, providing all existing groups (Group ID is the value or "" if "allow_none" is true)
-	 *     </li><li>
-	 *     'select_user': a drop down field, providing all existing groups (User ID is the value or "" if "allow_none" is true)
-	 *                    (WARNING: does not scale - not recommended)
-	 *     </li><li>
+	 *     'select_user': a drop down field, providing all existing groups (User ID is the value or "" if "allow_none" is true) (WARNING: does not scale - not recommended)
 	 *     'array': a subset of settings. The value gets automagically (un)serialized through get() and set().
-	 *       The following keys apply to this type:
-	 *       <ul><li>
-	 *       'entries': an array with meta information about sub-settings
-	 *           (which can be everything from the top-level, except: "valid_pattern", "valid_range").
-	 *           Note: currently there's no type forcing or checking
+	 *         The following keys apply to this type:
+	 *        'entries': an array with meta information about sub-settings
+	 *             (which can be everything from the top-level, except: "valid_pattern", "valid_range").
+	 *             Note: currently there's no type forcing or checking
 	 *                 for sub-entries involved (e.g., if you have an entry of type "integer", you could get
 	 *                 a non-numeric string there).
-	 * fp> TODO: !!!! very unsafe
-	 *       </li><li>
-	 *       'key': defines the key to use for each entry. This may be a text input for example
+	 *         fp> TODO: !!!! very unsafe
+	 *        'key': defines the key to use for each entry. This may be a text input for example
 	 *              (with label, note etc). (optional, default is numeric keys, which are not editable)
-	 *       </li><li>
 	 *       'max_count': maximum count of sets (optional, default is no restriction)
-	 *       </li><li>
 	 *       'min_count': minimum count of sets (optional, default is no restriction)
-	 *       </li></ul>
-	 *     </li></ul>
-	 *   </li><li>
-	 *   'note' (gets displayed as a note to the param field),
-	 *   </li><li>
-	 *   'size': Size of the HTML input field (applies to types 'text', 'password' and 'integer'; defaults to 15)
-	 *   </li><li>
-	 *   'maxlength': maxlength attribute for the input field (See 'size' above; defaults to no limit)
-	 *   </li><li>
-	 *   'disabled': if true, it adds a 'disabled="disabled"' html attribute to the element and the value cannot be changed
-	 *   </li><li>
-	 *   'no_edit': if true, the setting is not editable. This is useful for internal settings.
-	 *   </li><li>
-	 *   'allow_none': set this to true to have "None" in the options list for types
-	 *                   'select_group' and 'select_user'.
-	 *   </li><li>
-	 *   'valid_pattern': A regular expression pattern that the value must match.
+	 * 'note' (gets displayed as a note to the param field),
+	 * 'size': Size of the HTML input field (applies to types 'text', 'password' and 'integer'; defaults to 15)
+	 * 'maxlength': maxlength attribute for the input field (See 'size' above; defaults to no limit)
+	 * 'disabled': if true, it adds a 'disabled="disabled"' html attribute to the element and the value cannot be changed
+	 * 'no_edit': if true, the setting is not editable. This is useful for internal settings.
+	 * 'allow_none': set this to true to have "None" in the options list for types 'select_group' and 'select_user'.
+	 * 'valid_pattern': A regular expression pattern that the value must match.
 	 *                      This is either just a regexp pattern as string or an array
 	 *                      with the keys 'pattern' and 'error' to define a custom error message.
-	 *   </li><li>
-	 *   'valid_range': An array with keys 'min', 'max' and (optionally) 'error' to define
+	 * 'valid_range': An array with keys 'min', 'max' and (optionally) 'error' to define
 	 *                    a custom error message. At least "min" or "max" must be given.
-	 *   </li><li>
-	 *   'help': can be:
-	 *          <ul><li>
+	 * 'help': can be:
 	 *          '#anchor': anchor that gets appended to {@link $help_url}
-	 *          </li><li>
 	 *          true: the settings name/key gets transformed to an html ID and gets used as anchor to {@link $help_url}.
-	 *          </li><li>
 	 *          'http://example.com/uri': a full URL (starting with http:// or https://)
-	 *          </li></ul>
-	 *   </li><li>
-	 *   'layout': Use this to visually group your settings.
+	 * 'layout': Use this to visually group your settings.
 	 *               Either 'begin_fieldset', 'end_fieldset' or 'separator'. You can use 'label' for 'begin_fieldset'.
-	 *   </li><li>
-	 *   'multiple': This allows to select multiple values in a SELECT (including select_*) (boolean)
-	 *               (since EVO_NEXT_VERSION)
-	 *   </li><li>
-	 *   'id', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols', 'rows', 'maxlength':
+	 * 'multiple': This allows to select multiple values in a SELECT (including select_*) (boolean)
+	 * 'id', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols', 'rows', 'maxlength':
 	 *       get passed through as attributes to the form/input element.
-	 *   </li></ul>
-	 *
 	 *
 	 * e.g.:
 	 * <code>
@@ -539,6 +488,21 @@ class Plugin
 	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
 	function GetDefaultUserSettings( & $params )
+	{
+		return array();
+	}
+
+
+	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$UserSettings}.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_coll_setting_definitions( & $params )
 	{
 		return array();
 	}
@@ -2864,6 +2828,11 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.21  2009/05/26 18:29:11  fplanque
+ * yeah I know I just fucked up the PHP doc on that but now I can actually READ the options and make sense of them for the first time ever!
+ * No, adding tons of HTML markup in teh comments is not a good idea.
+ * If using ascii lists doesn't resolve to html lists, it's not the comments that ,need to be fixed, it's phpdoc.
+ *
  * Revision 1.20  2009/03/23 23:04:43  fplanque
  * Demo of how to tap into menu structure from a plugin.
  *
