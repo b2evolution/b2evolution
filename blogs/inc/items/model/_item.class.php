@@ -3686,13 +3686,20 @@ class Item extends ItemLight
 
 				$r = $Plugin->ItemSendPing( $params );
 
-				if( isset($params['xmlrpcresp']) && is_a($params['xmlrpcresp'], 'xmlrpcresp') )
+				if( !empty($params['xmlrpcresp']) )
 				{
-					// dh> TODO: let xmlrpc_displayresult() handle $Messages (e.g. "error", but should be connected/after the "Pinging %s..." from above)
-					ob_start();
-					xmlrpc_displayresult( $params['xmlrpcresp'], true );
-					$Messages->add( ob_get_contents(), 'note' );
-					ob_end_clean();
+					if( is_a($params['xmlrpcresp'], 'xmlrpcresp') )
+					{
+						// dh> TODO: let xmlrpc_displayresult() handle $Messages (e.g. "error", but should be connected/after the "Pinging %s..." from above)
+						ob_start();
+						xmlrpc_displayresult( $params['xmlrpcresp'], true );
+						$Messages->add( ob_get_contents(), 'note' );
+						ob_end_clean();
+					}
+					else
+					{
+						$Messages->add( $params['xmlrpcresp'], 'note' );
+					}
 				}
 			}
 		}
@@ -3898,6 +3905,10 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.104  2009/05/26 17:29:46  fplanque
+ * A little bit of error management
+ * (ps: BeforeEnable unecessary? how so?)
+ *
  * Revision 1.103  2009/05/26 16:16:38  fplanque
  * minor
  *

@@ -89,10 +89,37 @@ class twitter_plugin extends Plugin
 
 
 	/**
+	 * Check if the plugin can be enabled:
+	 *
+	 * @return string|NULL
+	 */
+	function BeforeEnable()
+	{
+
+		if( empty($this->code) )
+		{
+			return T_('The twitter plugin needs a non-empty code.');
+		}
+
+		// OK:
+		return true;
+	}
+
+
+	/**
 	 * Post to Twitter.
+	 *
+	 * @return boolean Was the ping successful?
 	 */
 	function ItemSendPing( & $params )
 	{
+		$username = $this->UserSettings->get( 'twitterlution_username' );
+		$password = $this->UserSettings->get( 'twitterlution_password' );
+		if( empty($username) || empty($password) )
+		{
+			$params['xmlrpcresp'] = T_('You must configure a twitter username/password before you can post to twitter.');
+			return false;
+		}
 
 		//$item_Blog = $params['Item']->get_Blog();
 		$title =  $params['Item']->dget('title', 'xml');
@@ -100,9 +127,6 @@ class twitter_plugin extends Plugin
 		$update_text = $this->UserSettings->get( 'twitterlution_update_text' );
 
 		$status = $update_text.' '.$title.' '.$perm_url;	// keep as compact as possible
-
-		$username = $this->UserSettings->get( 'twitterlution_username' );
-		$password = $this->UserSettings->get( 'twitterlution_password' );
 
 		$session = curl_init();
 		curl_setopt( $session, CURLOPT_URL, 'http://twitter.com/statuses/update.xml' );
@@ -113,16 +137,20 @@ class twitter_plugin extends Plugin
 		curl_setopt( $session, CURLOPT_USERPWD, $username.':'.$password );
 		curl_setopt( $session, CURLOPT_RETURNTRANSFER, 1 );
 		curl_setopt( $session, CURLOPT_POST, 1);
-		$result = curl_exec ( $session );
+		$result = curl_exec ( $session ); // will be an XML message
 		curl_close( $session );
-		// check for success or failure
-		if (empty($result)) {
-			//echo "<br/>" . $result;
+
+		if( empty($result) )
+		{
 			return false;
-		} else {
-		     	//echo "<br/>" . $result;
-			return true;
 		}
+		elseif( preg_match( '¤<error>(.*)</error>¤', $result, $matches ) )
+		{
+			$params['xmlrpcresp'] = $matches[1];
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -152,6 +180,10 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.3  2009/05/26 17:29:46  fplanque
+ * A little bit of error management
+ * (ps: BeforeEnable unecessary? how so?)
+ *
  * Revision 1.2  2009/05/26 17:18:36  tblue246
  * - Twitter plugin:
  * 	- removed unnecessary BeforeEnable() method.
@@ -161,7 +193,6 @@ class twitter_plugin extends Plugin
  *
  * Revision 1.1  2009/05/26 17:00:04  fplanque
  * added twitter plugin + better auto-install code for plugins in general
- *
  *
  * v0.4 - Added the ability to customize the update text.
  * v0.3 - Removed echo of success or failure as this was causing a problem with the latest b2evolution
