@@ -2184,6 +2184,9 @@ class Form extends Widget
 	 *
 	 * Array entries with numeric (deprecated) keys are converted to their equivalent string indexes.
 	 *
+	 * You probably want to use {@link buttons_input()}, which uses
+	 * {@link $buttonsstart}/{@link $buttonsend} to align the buttons properly.
+	 *
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - type: The type attribute (string, default 'submit')
 	 * @return mixed true (if output) or the generated HTML if not outputting
@@ -2205,9 +2208,12 @@ class Form extends Widget
 
 
 	/**
-	 * Builds a button
+	 * Builds a button.
 	 *
-	 * the array must contain :
+	 * You probably want to use {@link buttons_input()}, which uses
+	 * {@link $buttonsstart}/{@link $buttonsend} to align the buttons properly.
+	 *
+	 * The array must contain :
 	 *  - the button type
 	 *  - the name (optional)
 	 *  - the value (optional)
@@ -2268,9 +2274,6 @@ class Form extends Widget
 
 	/**
 	 * Builds an hidden input tag, overwriting any previous hidden values (except for "foo[]").
-	 *
-	 * This generates no output and returns nothing: the hidden fields get added to {@link $hiddens},
-	 * and get appended to the end of the form.
 	 *
 	 * This generates no output and returns nothing: the hidden fields get added to {@link $hiddens},
 	 * and get appended to the end of the form.
@@ -2405,7 +2408,10 @@ class Form extends Widget
 
 
 	/**
-	 * Builds a submit input tag
+	 * Builds a submit input tag.
+	 *
+	 * You probably want to use {@link buttons_input()}, which uses
+	 * {@link $buttonsstart}/{@link $buttonsend} to align the buttons properly.
 	 *
 	 * the array must contain :
 	 *  - the name (optional)
@@ -2414,21 +2420,21 @@ class Form extends Widget
 	 *  - the onclick attribute (optional)
 	 *  - the style (optional)
 	 *
-	 * @todo Use <div class="input"> for layout == 'fieldset' (property).
-	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
-	 *              Nothing yet.
+	 * @param array Optional params. See {@link $_common_params}.
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function submit_input( $field_params = array() )
 	{
 		$field_params['type'] = 'submit';
-
 		return $this->button_input( $field_params );
 	}
 
 
 	/**
 	 * Builds a submit input tag
+	 *
+	 * You probably want to use {@link buttons_input()}, which uses
+	 * {@link $buttonsstart}/{@link $buttonsend} to align the buttons properly.
 	 *
 	 * the array must contain :
 	 *  - the name (optional)
@@ -2443,7 +2449,6 @@ class Form extends Widget
 	function submit( $options )
 	{
 		array_unshift( $options, 'submit' );
-
 		return $this->button( $options );
 	}
 
@@ -2907,6 +2912,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.51  2009/05/26 18:26:29  blueyed
+ * doc
+ *
  * Revision 1.50  2009/05/26 18:25:30  blueyed
  * Form: date_input: in case of malformed date: Keep original value, but strip off the time part (if any)
  *
