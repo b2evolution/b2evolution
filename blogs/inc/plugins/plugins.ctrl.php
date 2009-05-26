@@ -43,7 +43,10 @@ $UserSettings->param_Request( 'plugins_disp_avail', 'plugins_disp_avail', 'integ
 // Check permission to display:
 $current_User->check_perm( 'options', 'view', true );
 
-$admin_Plugins = get_Cache( 'Plugins_admin' );
+/**
+ * @var Plugins_admin
+ */
+$admin_Plugins = & get_Cache( 'Plugins_admin' );
 $admin_Plugins->restart();
 
 // Pre-walk list of plugins
@@ -178,7 +181,7 @@ switch( $action )
 
 		if( empty($edit_Plugin) )
 		{
-			$Messages->add( sprintf( T_( 'The plugin with ID %d could not get instantiated.' ), $plugin_ID ), 'error' );
+			$Messages->add( sprintf( T_( 'The plugin with ID %d could not be instantiated.' ), $plugin_ID ), 'error' );
 			break;
 		}
 		if( $edit_Plugin->status != 'enabled' )
@@ -215,7 +218,7 @@ switch( $action )
 
 		if( empty($edit_Plugin) )
 		{
-			$Messages->add( sprintf( T_( 'The plugin with ID %d could not get instantiated.' ), $plugin_ID ), 'error' );
+			$Messages->add( sprintf( T_( 'The plugin with ID %d could not be instantiated.' ), $plugin_ID ), 'error' );
 			break;
 		}
 		if( $edit_Plugin->status == 'enabled' )
@@ -225,7 +228,7 @@ switch( $action )
 		}
 		if( $edit_Plugin->status == 'broken' )
 		{
-			$Messages->add( sprintf( T_( 'The plugin is in a broken state. It cannot get enabled.' ), $plugin_ID ), 'error' );
+			$Messages->add( sprintf( T_( 'The plugin is in a broken state. It cannot be enabled.' ), $plugin_ID ), 'error' );
 			break;
 		}
 
@@ -342,7 +345,7 @@ switch( $action )
 
 			if( ! is_a($edit_Plugin, 'Plugin') )
 			{
-				$Messages->add( sprintf( T_( 'The plugin with ID %d could not get instantiated.' ), $plugin_ID ), 'error' );
+				$Messages->add( sprintf( T_( 'The plugin with ID %d could not be instantiated.' ), $plugin_ID ), 'error' );
 				$action = 'list';
 				break;
 			}
@@ -395,7 +398,7 @@ switch( $action )
 
 		if( empty($edit_Plugin) )
 		{
-			$Messages->add( sprintf( T_( 'The plugin with ID %d could not get instantiated.' ), $plugin_ID ), 'error' );
+			$Messages->add( sprintf( T_( 'The plugin with ID %d could not be instantiated.' ), $plugin_ID ), 'error' );
 			break;
 		}
 
@@ -1042,6 +1045,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2009/05/26 16:56:55  fplanque
+ * keeping cool on the gets...
+ *
  * Revision 1.9  2009/05/10 17:00:45  tblue246
  * Fix plugin info screen
  *
