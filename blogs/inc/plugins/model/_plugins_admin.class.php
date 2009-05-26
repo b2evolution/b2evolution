@@ -417,19 +417,23 @@ class Plugins_admin extends Plugins
 		foreach( token_get_all( $classfile_contents ) as $token )
 		{
 			if( ! is_array( $token ) )
-			{
+			{	// Single characters does not interest us:
 				continue;
 			}
 
-			if( $had_func_token && $token[0] == T_STRING
-				&& ! in_array( $token[1], $plugin_class_methods )
-				&& in_array( $token[1], $supported_events ) )
-			{	// We got the function name, it is unique and one of our events:
-				$plugin_class_methods[] = $token[1];
+			if( $had_func_token && $token[0] == T_STRING )
+			{	// We got a function name...
+				if( ! in_array( $token[1], $plugin_class_methods )
+					&& in_array( $token[1], $supported_events ) )
+				{	// ...and it is unique and matches one of our supported events:
+					$plugin_class_methods[] = $token[1];
+				}
+
+				// Search for the next "function" token:
 				$had_func_token = false;
 			}
-			else if( ! $had_func_token && $token[0] == T_FUNCTION )
-			{	// Begin searching for the function name:
+			elseif( ! $had_func_token && $token[0] == T_FUNCTION )
+			{	// Begin searching for the function name which must be a T_STRING:
 				$had_func_token = true;
 			}
 		}
@@ -1460,6 +1464,11 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.13  2009/05/26 12:48:11  tblue246
+ * - Plugins_admin::get_registered_events(): Fixed possible bug.
+ * - Added test case for Plugins_admin::get_registered_events().
+ * - Added a sample plugin for the test case.
+ *
  * Revision 1.12  2009/05/25 21:10:07  tblue246
  * Plugins_admin::get_registered_events(): Use PHP's tokenizer instead of preg_match_all()
  *

@@ -74,6 +74,21 @@ class PluginsTestCase extends DbUnitTestCase
 
 
 	/**
+	 * Test discovery of plugin events from a plugin file.
+	 *
+	 * @see Plugins_admin::get_registered_events()
+	 */
+	function test_get_registered_events()
+	{
+		$c_Plugin = & $this->Plugins->register( 'simpletests_c_plugin', 0, -1, NULL, dirname( __FILE__ ).'/__simpletests_c.plugin.php' );
+		$this->assertEqual( $this->Plugins->get_registered_events( $c_Plugin ), array(
+			'AdminBeginPayload',
+			'AdminEndHtmlHead',
+		) );
+	}
+
+
+	/**
 	 * Test dependencies.
 	 */
 	function test_dependencies_api()
