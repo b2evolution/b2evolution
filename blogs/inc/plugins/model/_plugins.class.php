@@ -1636,9 +1636,11 @@ class Plugins
 
 
 	/**
-	 * Has a plugin a specific event registered/enabled?
+	 * Has a plugin a specific event registered and enabled?
 	 *
 	 * @todo fp> The plugin should discover its events itself / This question should be asked to the Plugin itself.
+	 *       dh> Well, "discover" means to look up if it has a given method; this does not appear to belong into the Plugin class.
+	 *           A plugin won't also really know if some event is enabled or disabled.
 	 *
 	 * @param integer
 	 * @param string
@@ -1902,6 +1904,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.11  2009/05/26 19:47:43  blueyed
+ * doc
+ *
  * Revision 1.10  2009/03/13 01:27:12  blueyed
  * Plugins: instantiate_Settings: call GetDefault(User)Settings directly, not through call_method, since that failed during PluginInit (due to the switch from Plugins_admin to Plugins in Plugin::__get).
  *
