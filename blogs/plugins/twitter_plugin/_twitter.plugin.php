@@ -184,6 +184,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.6  2009/05/26 18:30:02  tblue246
+ * Doc, again
+ *
  * Revision 1.5  2009/05/26 18:22:47  fplanque
  * better settings
  *
@@ -194,7 +197,12 @@ class twitter_plugin extends Plugin
  * A little bit of error management
  * (ps: BeforeEnable unecessary? how so?)
  * Tblue> I don't think the plugin code will be empty (unless the user
- *        modifies it, but why should he do that...)? fp> why should we not check it? -- If user can fuck up, user WILL fuck up. Mind you it happened to me without even touching the setting; just by installing the plugin with a wrong class name.
+ *        modifies it, but why should he do that...)?
+ * fp> why should we not check it? -- If user can fuck up, user WILL fuck
+ *     up. Mind you it happened to me without even touching the setting;
+ *     just by installing the plugin with a wrong class name.
+ * Tblue> OK, the check doesn't hurt anyway. :-) "Better safe than sorry"
+ *        (or summat).
  *
  * Revision 1.2  2009/05/26 17:18:36  tblue246
  * - Twitter plugin:
