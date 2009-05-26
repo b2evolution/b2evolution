@@ -3658,7 +3658,7 @@ class Item extends ItemLight
 	 */
 	function send_outbound_pings( $verbose = true )
 	{
-		global $Plugins, $baseurl, $Messages, $evonetsrv_host;
+		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $test_pings_for_real;
 
 		load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 
@@ -3667,7 +3667,8 @@ class Item extends ItemLight
 
 		if( (preg_match( '#^http://localhost[/:]#', $baseurl)
 				|| preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) /* domain ending in ".local" */
-			&& $evonetsrv_host != 'localhost' )	// OK if we are pinging locally anyway ;)
+			&& $evonetsrv_host != 'localhost'	// OK if we are pinging locally anyway ;)
+			&& empty($test_pings_for_real) )
 		{
 			if( $verbose )
 			{
@@ -3897,6 +3898,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.103  2009/05/26 16:16:38  fplanque
+ * minor
+ *
  * Revision 1.102  2009/05/23 20:20:18  fplanque
  * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
  *

@@ -264,7 +264,7 @@ function _http_wrapper_last_status( & $headers )
  * cURL, then fsockopen, then fopen.
  *
  * @todo dh> Should we try remaining methods, if the previous one(s) failed?
- * 
+ *
  * @param string URL
  * @param array Info (by reference)
  *        'error': holds error message, if any
@@ -303,10 +303,10 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 
 		return $r;
 	}
-	else if( function_exists( 'fsockopen' ) ) // may have been disabled
+	elseif( function_exists( 'fsockopen' ) ) // may have been disabled
 	{	// FSOCKOPEN:
 		$info['used_method'] = 'fsockopen';
-		
+
 		if ( ( $url_parsed = @parse_url( $url ) ) === false
 			 || ! isset( $url_parsed['host'] ) )
 		{
@@ -376,7 +376,7 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 
 		return substr( $r, $pos + 4 );
 	}
-	else if( ini_get( 'allow_url_fopen' ) )
+	elseif( ini_get( 'allow_url_fopen' ) )
 	{	// URL FOPEN:
 		$info['used_method'] = 'fopen';
 
@@ -409,7 +409,7 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 				$r .= fgets( $fp );
 			}
 		}
-		
+
 		fclose( $fp );
 		return $r;
 	}
@@ -706,7 +706,7 @@ function idna_encode( $url )
 /**
  * Decode IDNA puny-code ("xn--..") to UTF-8 name.
  *
- * @param string 
+ * @param string
  * @return string The decoded puny-code ("xn--..") (UTF8!)
  */
 function idna_decode( $url )
@@ -727,6 +727,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.34  2009/05/26 16:16:50  fplanque
+ * minor
+ *
  * Revision 1.33  2009/05/19 19:19:59  blueyed
  * doc. yes. ;)
  *
