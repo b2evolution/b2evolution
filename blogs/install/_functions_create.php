@@ -536,7 +536,10 @@ function create_demo_contents()
 	// POPULATE THE LINKBLOG:
 
 	// Insert a post into linkblog:
-	$now = date('Y-m-d H:i:s',$timestamp++);
+	// walter : a weird line of code to create a post in the linkblog a minute after the others. 
+    // It will show a bug on linkblog agregation by category
+	$timestamp++;
+	$now = date('Y-m-d H:i:s',$timestamp + 59);
 	$edited_Item = & new Item();
 	$edited_Item->insert( 1, 'Danny', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://personman.com/', 'disabled', array() );
 
@@ -849,6 +852,9 @@ If needed, a skin can format info pages differently from regular posts.");
 
 /*
  * $Log$
+ * Revision 1.263  2009/05/26 20:40:36  waltercruz
+ * Trying to show up a bug on linkblog agregation
+ *
  * Revision 1.262  2009/05/25 18:32:57  fplanque
  * added <p> tags so that posts show up cleanly in tinymce
  *
