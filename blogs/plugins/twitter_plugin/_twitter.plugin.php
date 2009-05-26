@@ -72,7 +72,7 @@ class twitter_plugin extends Plugin
 	 * Event handler: Called before the plugin is going to be installed.
 	 *
 	 * @todo Tblue> Do not depend on cURL.
-	 * 
+	 *
 	 * @return true|string True, if the plugin can be enabled/activated,
 	 *                     a string with an error/note otherwise.
 	 */
@@ -113,8 +113,8 @@ class twitter_plugin extends Plugin
 	 */
 	function ItemSendPing( & $params )
 	{
-		$username = $this->UserSettings->get( 'twitterlution_username' );
-		$password = $this->UserSettings->get( 'twitterlution_password' );
+		$username = $this->UserSettings->get( 'twitter_username' );
+		$password = $this->UserSettings->get( 'twitter_password' );
 		if( empty($username) || empty($password) )
 		{
 			$params['xmlrpcresp'] = T_('You must configure a twitter username/password before you can post to twitter.');
@@ -123,14 +123,14 @@ class twitter_plugin extends Plugin
 
 		//$item_Blog = $params['Item']->get_Blog();
 		$title =  $params['Item']->dget('title', 'xml');
-		$perm_url = $params['Item']->get_permanent_url();
-		$update_text = $this->UserSettings->get( 'twitterlution_update_text' );
-
-		$status = $update_text.' '.$title.' '.$perm_url;	// keep as compact as possible
+		$url = $params['Item']->get_permanent_url();
+		$msg = $this->UserSettings->get( 'twitter_msg_format' );
+		$msg = str_replace( '$title$', $title, $msg );
+		$msg = str_replace( '$url$', $url, $msg );
 
 		$session = curl_init();
 		curl_setopt( $session, CURLOPT_URL, 'http://twitter.com/statuses/update.xml' );
-		curl_setopt( $session, CURLOPT_POSTFIELDS, 'status='.urlencode($status));
+		curl_setopt( $session, CURLOPT_POSTFIELDS, 'status='.urlencode($msg));
 		curl_setopt( $session, CURLOPT_HTTPAUTH, CURLAUTH_BASIC );
 		curl_setopt( $session, CURLOPT_HEADER, false );
 		curl_setopt( $session, CURLOPT_CONNECTTIMEOUT, 5);
@@ -156,21 +156,25 @@ class twitter_plugin extends Plugin
 	/**
 	 * Allowing the user to specify their twitter account name and password.
 	 *
-	 * @return array
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
-	function GetDefaultUserSettings()
+	function GetDefaultUserSettings( & $params )
 	{
 		return array(
-				'twitterlution_username' => array(
-					'label' => T_( 'Your Twitter username' ),
+				'twitter_username' => array(
+					'label' => T_( 'Twitter username' ),
+					'type' => 'text',
 				),
-				'twitterlution_password' => array(
-					'label' => T_( 'Your Twitter password' ),
+				'twitter_password' => array(
+					'label' => T_( 'Twitter password' ),
 					'type' => 'password',
 				),
-				'twitterlution_update_text' => array(
-					'label' => T_( 'Text included in the update' ),
-					'defaultvalue' => T_( 'Just posted' ),
+				'twitter_msg_format' => array(
+					'label' => T_( 'Message format' ),
+					'type' => 'text',
+					'size' => 30,
+					'defaultvalue' => T_( 'Just posted $title$ $url$' ),
+					'note' => T_('$title$ and $url$ will be replaced appropriately.'),
 				),
 			);
 	}
@@ -180,6 +184,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.5  2009/05/26 18:22:47  fplanque
+ * better settings
+ *
  * Revision 1.4  2009/05/26 18:05:12  tblue246
  * Doc
  *
@@ -187,7 +194,7 @@ class twitter_plugin extends Plugin
  * A little bit of error management
  * (ps: BeforeEnable unecessary? how so?)
  * Tblue> I don't think the plugin code will be empty (unless the user
- *        modifies it, but why should he do that...)?
+ *        modifies it, but why should he do that...)? fp> why should we not check it? -- If user can fuck up, user WILL fuck up. Mind you it happened to me without even touching the setting; just by installing the plugin with a wrong class name.
  *
  * Revision 1.2  2009/05/26 17:18:36  tblue246
  * - Twitter plugin:
