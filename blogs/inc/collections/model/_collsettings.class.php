@@ -124,7 +124,7 @@ class CollectionSettings extends AbstractSettings
 			'cache_enabled' => 0,
 			'default_cat_ID' => NULL,						// Default Cat for new posts
 			'require_title' => 'required',  		// Is a title for items required ("required", "optional", "none")
-			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet', // ping plugin codes, separated by comma
+			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet,evo_twitter', // ping plugin codes, separated by comma
 			'allow_subscriptions' => 0,					// Don't all email subscriptions by default
 			'use_workflow' => 0,								// Don't use workflow by default
 			'aggregate_coll_IDs' => '',
@@ -166,6 +166,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.34  2009/05/26 17:36:41  fplanque
+ * Have twitter plugin enabled by default. (it still won't tweet until user enters credentials)
+ *
  * Revision 1.33  2009/05/21 12:34:39  fplanque
  * Options to select how much content to display (excerpt|teaser|normal) on different types of pages.
  *
