@@ -309,6 +309,11 @@ function install_basic_skins()
  */
 function install_basic_plugins( $old_db_version = 0 )
 {
+	/**
+	 * @var Plugins_admin
+	 */
+	global $Plugins_admin;
+
 	$Plugins_admin = & get_Cache('Plugins_admin');
 
 	// Create global $Plugins instance, which is required during installation of basic plugins,
@@ -318,35 +323,70 @@ function install_basic_plugins( $old_db_version = 0 )
 
 	if( $old_db_version < 9100 )
 	{
-		echo 'Installing default plugins... ';
 		// Toolbars:
-		$Plugins_admin->install( 'quicktags_plugin' );
+		install_plugin( 'quicktags_plugin' );
 		// Renderers:
-		$Plugins_admin->install( 'auto_p_plugin' );
-		$Plugins_admin->install( 'autolinks_plugin' );
-		$Plugins_admin->install( 'texturize_plugin' );
-		$Plugins_admin->install( 'smilies_plugin' );
-		$Plugins_admin->install( 'videoplug_plugin' );
+		install_plugin( 'auto_p_plugin' );
+		install_plugin( 'autolinks_plugin' );
+		install_plugin( 'texturize_plugin' );
+		install_plugin( 'smilies_plugin' );
+		install_plugin( 'videoplug_plugin' );
 		// SkinTags:
-		$Plugins_admin->install( 'calendar_plugin' );
-		$Plugins_admin->install( 'archives_plugin' );
-		echo "OK.<br />\n";
+		install_plugin( 'calendar_plugin' );
+		install_plugin( 'archives_plugin' );
 	}
 
 	if( $old_db_version < 9330 )
 	{ // Upgrade to 1.9-beta
-		echo 'Installing default ping plugins... ';
-		$Plugins_admin->install( 'ping_b2evonet_plugin' );
-		$Plugins_admin->install( 'ping_pingomatic_plugin' );
-		echo "OK.<br />\n";
+		install_plugin( 'ping_b2evonet_plugin' );
+		install_plugin( 'ping_pingomatic_plugin' );
 	}
 
 	if( $old_db_version < 9930 )
 	{ // Upgrade to 3.1.0
-		echo 'Installing wysiwyg plugin... ';
-		$Plugins_admin->install( 'tinymce_plugin' );
-		echo "OK.<br />\n";
+		install_plugin( 'tinymce_plugin' );
 	}
+
+	if( $old_db_version < 9940 )
+	{ // Upgrade to 3.2.0
+		install_plugin( 'twitter_plugin' );
+	}
+}
+
+
+/**
+ * @return true on success
+ */
+function install_plugin( $plugin )
+{
+	/**
+	 * @var Plugins_admin
+	 */
+	global $Plugins_admin;
+
+	echo 'Installing plugin: '.$plugin.'... ';
+	$edit_Plugin = & $Plugins_admin->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later
+	if( ! is_a( $edit_Plugin, 'Plugin' ) )
+	{
+		echo $edit_Plugin."<br />\n";
+		return false;
+	}
+
+	// install_plugin_db_schema_action()
+
+	// Try to enable plugin:
+	$enable_return = $edit_Plugin->BeforeEnable();
+	if( $enable_return !== true )
+	{
+		$Plugins_admin->set_Plugin_status( $edit_Plugin, 'disabled' ); // does not unregister it
+		echo $enable_return."<br />\n";
+		return false;
+	}
+
+	$Plugins_admin->set_Plugin_status( $edit_Plugin, 'enabled' );
+
+	echo "OK.<br />\n";
+	return true;
 }
 
 
@@ -665,6 +705,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.61  2009/05/26 17:00:04  fplanque
+ * added twitter plugin + better auto-install code for plugins in general
+ *
  * Revision 1.60  2009/05/23 20:20:18  fplanque
  * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
  *
