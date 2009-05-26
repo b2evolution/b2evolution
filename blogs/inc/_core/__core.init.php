@@ -707,7 +707,7 @@ class _core_Module
 									'text' => T_('Skins install'),
 									'href' => 'admin.php?ctrl=skins'),
 								'plugins' => array(
-									'text' => T_('Plugins install'),
+									'text' => T_('Plugins'),
 									'href' => 'admin.php?ctrl=plugins'),
 								'antispam' => array(
 									'text' => T_('Antispam'),
@@ -813,6 +813,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.14  2009/05/26 18:41:46  blueyed
+ * Rename "Plugins install" to "Plugins". Shorter and it includes setup, too.
+ *
  * Revision 1.13  2009/05/23 22:49:10  fplanque
  * skin settings
  *
