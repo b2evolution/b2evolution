@@ -113,18 +113,35 @@ class twitter_plugin extends Plugin
 	 */
 	function ItemSendPing( & $params )
 	{
-		$username = $this->UserSettings->get( 'twitter_username' );
-		$password = $this->UserSettings->get( 'twitter_password' );
+    /**
+		 * @var Blog
+		 */
+		$item_Blog = $params['Item']->get_Blog();
+
+		// Try to get twitter account for Blog:
+		$username = $this->get_coll_setting( 'twitter_username', $item_Blog );
+		$password = $this->get_coll_setting( 'twitter_password', $item_Blog );
 		if( empty($username) || empty($password) )
-		{
-			$params['xmlrpcresp'] = T_('You must configure a twitter username/password before you can post to twitter.');
-			return false;
+		{ // Not found, fallback to Trying to get twitter account for User:
+			$username = $this->UserSettings->get( 'twitter_username' );
+			$password = $this->UserSettings->get( 'twitter_password' );
+			if( empty($username) || empty($password) )
+			{	// Still no twitter account found:
+				$params['xmlrpcresp'] = T_('You must configure a twitter username/password before you can post to twitter.');
+				return false;
+			}
+			else
+				{	// Get additional params from User Setttings:
+				$msg = $this->UserSettings->get( 'twitter_msg_format' );
+			}
+		}
+		else
+		{	// Get additional params from Blog Setttings:
+			$msg = $this->get_coll_setting( 'twitter_msg_format', $item_Blog );
 		}
 
-		//$item_Blog = $params['Item']->get_Blog();
 		$title =  $params['Item']->dget('title', 'xml');
 		$url = $params['Item']->get_permanent_url();
-		$msg = $this->UserSettings->get( 'twitter_msg_format' );
 		$msg = str_replace( '$title$', $title, $msg );
 		$msg = str_replace( '$url$', $url, $msg );
 
@@ -150,6 +167,7 @@ class twitter_plugin extends Plugin
 			return false;
 		}
 
+		$params['xmlrpcresp'] = T_('Posted to account: @').$username;
 		return true;
 	}
 
@@ -173,6 +191,7 @@ class twitter_plugin extends Plugin
 					'label' => T_( 'Message format' ),
 					'type' => 'text',
 					'size' => 30,
+					'maxlength' => 140,
 					'defaultvalue' => T_( 'Just posted $title$ $url$' ),
 					'note' => T_('$title$ and $url$ will be replaced appropriately.'),
 				),
@@ -180,10 +199,40 @@ class twitter_plugin extends Plugin
 	}
 
 
+	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		return array(
+				'twitter_username' => array(
+					'label' => T_( 'Twitter username' ),
+					'type' => 'text',
+				),
+				'twitter_password' => array(
+					'label' => T_( 'Twitter password' ),
+					'type' => 'password',
+				),
+				'twitter_msg_format' => array(
+					'label' => T_( 'Message format' ),
+					'type' => 'text',
+					'size' => 30,
+					'maxlength' => 140,
+					'defaultvalue' => T_( 'Just posted $title$ $url$' ),
+					'note' => T_('$title$ and $url$ will be replaced appropriately.'),
+				),
+			);
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.7  2009/05/26 19:35:22  fplanque
+ * Twitter plugin: each blog can now notify a different twitter account!
+ *
  * Revision 1.6  2009/05/26 18:30:02  tblue246
  * Doc, again
  *
