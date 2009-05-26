@@ -180,9 +180,14 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.4  2009/05/26 18:05:12  tblue246
+ * Doc
+ *
  * Revision 1.3  2009/05/26 17:29:46  fplanque
  * A little bit of error management
  * (ps: BeforeEnable unecessary? how so?)
+ * Tblue> I don't think the plugin code will be empty (unless the user
+ *        modifies it, but why should he do that...)?
  *
  * Revision 1.2  2009/05/26 17:18:36  tblue246
  * - Twitter plugin:
