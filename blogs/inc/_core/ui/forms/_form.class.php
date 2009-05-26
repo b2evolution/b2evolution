@@ -760,7 +760,8 @@ class Form extends Widget
 
 			//echo 'error on '.$field_name.' keep erroneous entry intact ';
 
-			$field_params['value'] = trim(substr( $field_value, 0, 10 )); // TODO: dh> why not use the real original here?! fp> AFAICR we needed to strip off the time part
+			// Keep original value, but strip off the time part (if any).
+			$field_params['value'] = preg_replace( '~ \d\d:\d\d:\d\d$~', '', $field_value );
 		}
 		else
 		{ // Make the date value clean for display:
@@ -2906,6 +2907,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.50  2009/05/26 18:25:30  blueyed
+ * Form: date_input: in case of malformed date: Keep original value, but strip off the time part (if any)
+ *
  * Revision 1.49  2009/05/26 18:24:00  blueyed
  * Form: hiddens_by_key: merge included_input_field_names always.
  *
