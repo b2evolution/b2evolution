@@ -40,7 +40,7 @@ class twitter_plugin extends Plugin
 	 */
 	var $code = 'evo_twitter';
 	var $priority = 50;
-	var $version = '0.5';
+	var $version = '3.2';
 	var $author = 'Lee Turner';
 	var $help_url = 'http://leeturner.org/twitterlution.php';
 
@@ -61,10 +61,10 @@ class twitter_plugin extends Plugin
 	{
 		$this->name = T_('Twitter plugin');
 		$this->short_desc = $this->T_('Post to your Twitter account when you post to your blog');
-		$this->long_desc = $this->T_('Posts to your Twitter account to update Twitter with details of your blog post. Remember to set your Twitter account info in your user settings in the admin console.');
+		$this->long_desc = $this->T_('Posts to your Twitter account to update Twitter.com with details of your blog post.');
 
 		$this->ping_service_name = 'twitter.com';
-		$this->ping_service_note = $this->long_desc;
+		$this->ping_service_note = $this->T_('Update your twitter account with details about the new post.');
 	}
 
 
@@ -230,6 +230,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.8  2009/05/26 19:48:29  fplanque
+ * Version bump.
+ *
  * Revision 1.7  2009/05/26 19:35:22  fplanque
  * Twitter plugin: each blog can now notify a different twitter account!
  *

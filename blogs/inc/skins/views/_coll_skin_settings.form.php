@@ -66,22 +66,28 @@ $Form->begin_form( 'fform' );
 		$Form->info( T_('Containers'), $container_ul );
 
 	$Form->end_fieldset();
-	
-	if( $skin_params = $edited_Skin->get_param_definitions( $tmp_params = array('for_editing'=>true) ) )
-	{
-		$Form->begin_fieldset( T_('Params') );
-	
+
+	$skin_params = $edited_Skin->get_param_definitions( $tmp_params = array('for_editing'=>true) );
+
+	$Form->begin_fieldset( T_('Params') );
+
+		if( empty($skin_params) )
+		{	// Advertise this feature!!
+			echo '<p>'.T_('This skin does not provide any configurable settings.').'</p>';
+		}
+		else
+		{
 			load_funcs( 'plugins/_plugin.funcs.php' );
-	
+
 			// Loop through all widget params:
 			foreach( $skin_params as $l_name => $l_meta )
 			{
 				// Display field:
 				autoform_display_field( $l_name, $l_meta, $Form, 'Skin', $edited_Skin );
 			}
-	
-		$Form->end_fieldset();
-	}
+		}
+
+	$Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
@@ -89,6 +95,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.3  2009/05/26 19:48:29  fplanque
+ * Version bump.
+ *
  * Revision 1.2  2009/05/26 18:42:51  sam2kb
  * Hide skin params fieldset if no custom params defined
  *
