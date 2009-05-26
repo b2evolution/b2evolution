@@ -2357,7 +2357,7 @@ class Form extends Widget
 	 *
 	 * @uses Form::hidden()
 	 * @param array associative array ( name => value ) of hidden fields.
-	 * @param array|NULL A list of keys to ignore. This defaults to {@link $included_input_field_names}.
+	 * @param array|NULL A list of keys to ignore, additionally to {@link $included_input_field_names}.
 	 */
 	function hiddens_by_key( $hiddens, $exclude = NULL )
 	{
@@ -2371,7 +2371,10 @@ class Form extends Widget
 		{
 			$exclude = $this->included_input_field_names;
 		}
-		// fp> else we should probably merge... ?
+		else
+		{
+			$exclude = array_merge($this->included_input_field_names, $exclude);
+		}
 
 		foreach( $hiddens as $l_name => $l_value )
 		{
@@ -2903,6 +2906,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.49  2009/05/26 18:24:00  blueyed
+ * Form: hiddens_by_key: merge included_input_field_names always.
+ *
  * Revision 1.48  2009/05/20 12:58:14  fplanque
  * Homepage: option to 301 redirect to canonical homepage.
  * Option to support rel="canonical" instead of or when 301 redirect cannot be used.
