@@ -202,6 +202,8 @@ class twitter_plugin extends Plugin
 	/**
 	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
+	 * @todo: ideally we'd want a warning if the twitter ping is not enabled
+	 *
 	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
 	function get_coll_setting_definitions( & $params )
@@ -230,6 +232,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.10  2009/05/27 18:00:04  fplanque
+ * doc
+ *
  * Revision 1.9  2009/05/27 14:02:11  fplanque
  * suggesting a hashtag : #b2p means "b2 post" http://tinyurl.com/qkdtwc
  *
