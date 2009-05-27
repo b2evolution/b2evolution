@@ -3358,6 +3358,7 @@ function get_available_sort_options()
 		'datemodified' => T_('Date last modified'),
 		'urltitle'     => T_('URL "filename"'),
 		'priority'     => T_('Priority'),
+		'views'        => T_('Views'),
 		'RAND'         => T_('Random order!'),
 	);
 }
@@ -3419,6 +3420,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.98  2009/05/27 13:46:50  tblue246
+ * Universal item list: Added option to sort by view (http://forums.b2evolution.net/viewtopic.php?t=18650 )
+ *
  * Revision 1.97  2009/05/17 17:40:24  fplanque
  * minor
  *
