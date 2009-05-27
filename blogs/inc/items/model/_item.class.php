@@ -1787,15 +1787,6 @@ class Item extends ItemLight
 		$File = NULL;
 		while( ( $File = & $FileList->get_next() ) && $params['limit_files'] > $i )
 		{
-			/* fp> I think we don't want to waste time stating files on the public interface. The admin will fix missing files :p
-			if( ! $File->exists() )
-			{
-				global $Debuglog;
-				$Debuglog->add(sprintf('File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path()), array('error', 'files'));
-				continue;
-			}
-			*/
-
 			if( $File->is_image() )
 			{	// Skip images because these are displayed inline already
 				// fp> TODO: have a setting for each linked file to decide whether it should be displayed inline or as an attachment
@@ -3905,6 +3896,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.105  2009/05/27 20:24:44  blueyed
+ * Cleanup
+ *
  * Revision 1.104  2009/05/26 17:29:46  fplanque
  * A little bit of error management
  * (ps: BeforeEnable unecessary? how so?)
