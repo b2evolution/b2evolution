@@ -507,6 +507,7 @@ class Blog extends DataObject
 			$this->set_setting( 'permalinks',  param( 'permalinks', 'string', '' ) );
 			$this->set_setting( '404_response',  param( '404_response', 'string', '' ) );
 			$this->set_setting( 'excerpts_meta_description',  param( 'excerpts_meta_description', 'integer', 0 ) );
+			$this->set_setting( 'categories_meta_description',  param( 'categories_meta_description', 'integer', 0 ) );
 		}
 
 
@@ -2124,6 +2125,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.66  2009/05/27 14:46:33  waltercruz
+ * Using categories description as meta-description for categories pages
+ *
  * Revision 1.65  2009/05/23 20:20:18  fplanque
  * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
  *

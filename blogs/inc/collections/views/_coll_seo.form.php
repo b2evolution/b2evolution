@@ -262,6 +262,8 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo'
 								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
 
 	$Form->checkbox( 'catdir_noindex', $edited_Blog->get_setting( 'catdir_noindex' ), T_('Category directory'), T_('META NOINDEX') );
+	$Form->checkbox( 'categories_meta_description', $edited_Blog->get_setting( 'categories_meta_description' ),
+			T_('Meta description'), T_('Use category description as meta description for category pages') );
 
 	$Form->end_fieldset();
 
@@ -377,6 +379,9 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.25  2009/05/27 14:46:33  waltercruz
+ * Using categories description as meta-description for categories pages
+ *
  * Revision 1.24  2009/05/21 12:34:39  fplanque
  * Options to select how much content to display (excerpt|teaser|normal) on different types of pages.
  *

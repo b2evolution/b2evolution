@@ -495,13 +495,17 @@ function skin_base_tag()
  */
 function skin_description_tag()
 {
-	global $Blog, $disp, $MainList;
+	global $Blog, $disp, $disp_detail, $MainList, $Chapter;
 
 	$r = '';
 
 	if( is_default_page() && !empty($Blog) )
 	{	// Description for the blog:
 		$r = $Blog->get('shortdesc');
+	}
+	elseif( $Blog->get_setting( 'categories_meta_description') && ( $disp_detail == 'posts-cat' ) )
+	{
+		$r = $Chapter->get( 'description' );
 	}
 	elseif( $Blog->get_setting( 'excerpts_meta_description' ) && in_array( $disp, array( 'single','page') ) )
 	{	// Excerpt for the current single post:
@@ -771,6 +775,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.52  2009/05/27 14:46:33  waltercruz
+ * Using categories description as meta-description for categories pages
+ *
  * Revision 1.51  2009/05/25 19:39:50  fplanque
  * bugfix
  *
