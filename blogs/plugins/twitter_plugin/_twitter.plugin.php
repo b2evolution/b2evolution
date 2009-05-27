@@ -192,7 +192,7 @@ class twitter_plugin extends Plugin
 					'type' => 'text',
 					'size' => 30,
 					'maxlength' => 140,
-					'defaultvalue' => T_( 'Just posted $title$ $url$' ),
+					'defaultvalue' => T_( 'Just posted $title$ $url$ #b2p' ),
 					'note' => T_('$title$ and $url$ will be replaced appropriately.'),
 				),
 			);
@@ -220,7 +220,7 @@ class twitter_plugin extends Plugin
 					'type' => 'text',
 					'size' => 30,
 					'maxlength' => 140,
-					'defaultvalue' => T_( 'Just posted $title$ $url$' ),
+					'defaultvalue' => T_( 'Just posted $title$ $url$ #b2p' ),
 					'note' => T_('$title$ and $url$ will be replaced appropriately.'),
 				),
 			);
@@ -230,6 +230,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.9  2009/05/27 14:02:11  fplanque
+ * suggesting a hashtag : #b2p means "b2 post" http://tinyurl.com/qkdtwc
+ *
  * Revision 1.8  2009/05/26 19:48:29  fplanque
  * Version bump.
  *
