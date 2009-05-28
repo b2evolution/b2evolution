@@ -538,27 +538,33 @@ if( !empty( $skin ) )
 			{
 				if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[$disp] ) )
 				{	// The skin has a customized page handler for this display:
+					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (custom to this skin)', 'skin');
 					require $disp_handler;
 				}
 				elseif( $disp_handlers[$disp] == 'posts.main.php' && file_exists( $disp_handler = $ads_current_skin_path.'items.main.php' ) )
 				{	// Compatibility with skins < 2.2.0
+					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (compat with skins < 2.2.0)', 'skin');
 					require $disp_handler;
 				}
 				elseif( $disp_handlers[$disp] == 'comments.main.php' && file_exists( $disp_handler = $ads_current_skin_path.'latestcom.tpl.php' ) )
 				{	// Compatibility with skins < 2.2.0
+					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (compat with skins < 2.2.0)', 'skin');
 					require $disp_handler;
 				}
 				elseif( $disp_handlers[$disp] == 'feedback_popup.main.php' && file_exists( $disp_handler = $ads_current_skin_path.'feedback_popup.tpl.php' ) )
 				{	// Compatibility with skins < 2.2.0
+					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (compat with skins < 2.2.0)', 'skin');
 					require $disp_handler;
 				}
 				else
 				{	// Use the default handler from the skins dir:
+					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (default handler)', 'skin');
 					require $ads_current_skin_path.'index.main.php';
 				}
 			}
 			else
 			{	// Use the default handler from the skins dir:
+				$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (default index handler)', 'skin');
 				require $ads_current_skin_path.'index.main.php';
 			}
 		}
@@ -582,6 +588,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.136  2009/05/28 22:44:37  blueyed
+ * Add info about the included skin display handler to debuglog.
+ *
  * Revision 1.135  2009/05/23 20:20:18  fplanque
  * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
  *
