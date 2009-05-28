@@ -75,7 +75,7 @@ class twitter_plugin extends Plugin
 	{
 		return array(
 				'requires' => array(
-					'app_min' => '3.2.0',
+					'app_min' => '3.2.0-beta',
 				),
 			);
 	}
@@ -245,6 +245,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.12  2009/05/28 14:47:33  fplanque
+ * minor
+ *
  * Revision 1.11  2009/05/28 12:49:48  fplanque
  * no message
  *
