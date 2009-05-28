@@ -475,19 +475,18 @@ class ComponentWidget extends DataObject
 	 * List of collections/blogs
 	 *
 	 * @param array MUST contain at least the basic display params
+	 * @param string possible values: list, form
 	 */
 	function disp_coll_list( $filter = 'public' )
 	{
 		/**
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Blog, $baseurl;
 
 		echo $this->disp_params['block_start'];
 
 		$this->disp_title();
-
-		echo $this->disp_params['list_start'];
 
 		/**
 		 * @var BlogCache
@@ -502,45 +501,73 @@ class ComponentWidget extends DataObject
 		{	// Load all public blogs
 			$blog_array = $BlogCache->load_public( 'ID' );
 		}
-
-		foreach( $blog_array as $l_blog_ID )
-		{	// Loop through all public blogs:
-
-			$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
-
-			if( $Blog && $l_blog_ID == $Blog->ID )
-			{ // This is the blog being displayed on this page:
-  			echo $this->disp_params['item_selected_start'];
-				$link_class = $this->disp_params['link_selected_class'];
+		
+		if( $this->disp_params['type'] == 'list' )
+		{
+			echo $this->disp_params['list_start'];
+	
+			foreach( $blog_array as $l_blog_ID )
+			{	// Loop through all public blogs:
+	
+				$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
+	
+				if( $Blog && $l_blog_ID == $Blog->ID )
+				{ // This is the blog being displayed on this page:
+				echo $this->disp_params['item_selected_start'];
+					$link_class = $this->disp_params['link_selected_class'];
+				}
+				else
+				{
+					echo $this->disp_params['item_start'];
+					$link_class = $this->disp_params['link_default_class'];;
+				}
+	
+				echo '<a href="'.$l_Blog->gen_blogurl().'" class="'.$link_class.'" title="'
+											.$l_Blog->dget( 'name', 'htmlattr' ).'">';
+	
+				if( $Blog && $l_blog_ID == $Blog->ID )
+				{ // This is the blog being displayed on this page:
+					echo $this->disp_params['item_selected_text_start'];
+					printf( $this->disp_params['item_selected_text'], $l_Blog->dget( 'shortname', 'htmlbody' ) );
+					echo $this->disp_params['item_selected_text_end'];
+					echo '</a>';
+					echo $this->disp_params['item_selected_end'];
+				}
+				else
+				{
+					echo $this->disp_params['item_text_start'];
+					printf( $this->disp_params['item_text'], $l_Blog->dget( 'shortname', 'htmlbody' ) );
+					echo $this->disp_params['item_text_end'];
+					echo '</a>';
+					echo $this->disp_params['item_end'];
+				}
 			}
-			else
+	
+			echo $this->disp_params['list_end'];
+		}
+		else
+		{
+			$select_options = '';
+			foreach( $blog_array as $l_blog_ID )
+			{	// Loop through all public blogs:
+				$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
+
+				// Add item select list:
+				$select_options .= '<option value="'.$l_blog_ID.'"';
+				if( $Blog && $l_blog_ID == $Blog->ID )
+				{
+					$select_options .= ' selected="selected"';
+				}
+				$select_options .= '>'.$l_Blog->dget( 'shortname', 'formvalue' ).'</option>'."\n";
+			}
+			
+			if( !empty($select_options) )
 			{
-				echo $this->disp_params['item_start'];
-				$link_class = $this->disp_params['link_default_class'];;
-			}
-
-			echo '<a href="'.$l_Blog->gen_blogurl().'" class="'.$link_class.'" title="'
-										.$l_Blog->dget( 'name', 'htmlattr' ).'">';
-
-			if( $Blog && $l_blog_ID == $Blog->ID )
-			{ // This is the blog being displayed on this page:
-				echo $this->disp_params['item_selected_text_start'];
-				printf( $this->disp_params['item_selected_text'], $l_Blog->dget( 'shortname', 'htmlbody' ) );
-				echo $this->disp_params['item_selected_text_end'];
-				echo '</a>';
-				echo $this->disp_params['item_selected_end'];
-			}
-			else
-			{
-				echo $this->disp_params['item_text_start'];
-				printf( $this->disp_params['item_text'], $l_Blog->dget( 'shortname', 'htmlbody' ) );
-				echo $this->disp_params['item_text_end'];
-				echo '</a>';
-				echo $this->disp_params['item_end'];
+				echo '<form action="'.$baseurl.'" method="get">';
+				echo '<select name="blog" onchange="this.form.submit();">'.$select_options.'</select>';
+				echo '<noscript><input type="submit" value="'.T_('Go').'" /></noscript></form>';
 			}
 		}
-
-		echo $this->disp_params['list_end'];
 
 		echo $this->disp_params['block_end'];
 	}
@@ -581,6 +608,10 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.58  2009/05/28 06:49:05  sam2kb
+ * Blog list widget can be either a "regular list" or a "select menu"
+ * See http://forums.b2evolution.net/viewtopic.php?t=18794
+ *
  * Revision 1.57  2009/04/02 22:55:50  blueyed
  * ComponentWidget::disp_coll_list: add 'item_text' and 'item_selected_text' params, where %s gets replaced by theshort name. ('%s' being the default)
  *

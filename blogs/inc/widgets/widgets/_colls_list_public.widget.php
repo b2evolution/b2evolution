@@ -89,6 +89,13 @@ class colls_list_public_Widget extends ComponentWidget
 					'note' => T_( 'This is the title to display, $icon$ will be replaced by the feed icon' ),
 					'defaultvalue' => T_('All blogs'),
 				),
+				'type' => array(
+					'label' => T_( 'Display type' ),
+					'type' => 'select',
+					'defaultvalue' => 'list',
+					'options' => array( 'list' => T_('List'), 'form' => T_('Select menu') ),
+					'note' => T_( 'How do you want to display blogs?' ),
+				),
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -113,6 +120,10 @@ class colls_list_public_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.5  2009/05/28 06:49:06  sam2kb
+ * Blog list widget can be either a "regular list" or a "select menu"
+ * See http://forums.b2evolution.net/viewtopic.php?t=18794
+ *
  * Revision 1.4  2009/03/13 02:32:07  fplanque
  * Cleaned up widgets.
  * Removed stupid widget_name param.
