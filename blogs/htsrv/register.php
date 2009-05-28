@@ -46,10 +46,8 @@ $login_required = false;
 param( 'action', 'string', '' );
 param( 'login', 'string', '' );
 param( 'email', 'string', '' );
-param( 'locale', 'string', $Settings->get('default_locale') );
 param( 'redirect_to', 'string', '' ); // do not default to $admin_url; "empty" gets handled better in the end (uses $blogurl, if no admin perms).
 
-locale_activate( $locale );
 
 if( ! $Settings->get('newusers_canregister') )
 {
@@ -214,6 +212,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.96  2009/05/28 20:57:23  blueyed
+ * Rolling back additional activation of locale in htsrv (register, login). http://forums.b2evolution.net/viewtopic.php?p=92006#92006
+ *
  * Revision 1.95  2009/03/21 23:00:21  fplanque
  * minor
  *

@@ -45,7 +45,6 @@ require_once $inc_path.'_main.inc.php';
 
 param( 'action', 'string', 'req_login' );
 param( 'mode', 'string', '' );
-param( 'locale', 'string', $Settings->get('default_locale') );
 param( 'login', 'string', '' );
 // echo 'login: ', $login;
 
@@ -53,10 +52,6 @@ param( 'login', 'string', '' );
 // TODO: dh> problem here is that $ReqURI won't include the e.g. "ctrl" param in a POSTed form and therefor the user lands on the default admin page after logging in (again)
 // fp> I think this will fix itself when we do another improvement: 303 redirect after each POST so that we never have an issue with people trying to reload a post
 param( 'redirect_to', 'string', $ReqURI );
-
-// Activate the default locale (otherwise the login page is always in English) - same as on reg page
-// See http://forums.b2evolution.net/viewtopic.php?t=13770
-locale_activate( $locale );
 
 switch( $action )
 {
@@ -422,6 +417,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.106  2009/05/28 20:57:22  blueyed
+ * Rolling back additional activation of locale in htsrv (register, login). http://forums.b2evolution.net/viewtopic.php?p=92006#92006
+ *
  * Revision 1.105  2009/03/08 23:57:36  fplanque
  * 2009
  *
