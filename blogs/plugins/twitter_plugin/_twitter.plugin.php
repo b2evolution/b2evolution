@@ -69,6 +69,19 @@ class twitter_plugin extends Plugin
 
 
 	/**
+	 * We require b2evo 3.2.0 or above.
+	 */
+	function GetDependencies()
+	{
+		return array(
+				'requires' => array(
+					'app_min' => '3.2.0',
+				),
+			);
+	}
+
+
+	/**
 	 * Event handler: Called before the plugin is going to be installed.
 	 *
 	 * @todo Tblue> Do not depend on cURL.
@@ -232,6 +245,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.11  2009/05/28 12:49:48  fplanque
+ * no message
+ *
  * Revision 1.10  2009/05/27 18:00:04  fplanque
  * doc
  *

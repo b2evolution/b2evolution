@@ -2360,6 +2360,11 @@ function upgrade_b2evo_tables()
 		task_begin( 'Updating hitlog table...' );
 		$DB->query( "ALTER TABLE T_hitlog ADD COLUMN hit_serprank INT UNSIGNED DEFAULT NULL AFTER hit_keyphrase_keyp_ID" );
 		task_end();
+
+		task_begin( 'Updating versions table...' );
+		$DB->query( "ALTER TABLE T_items__version
+								CHANGE COLUMN iver_edit_user_ID iver_edit_user_ID  INT UNSIGNED NULL" );
+		task_end();
 	}
 
 
@@ -2512,6 +2517,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.290  2009/05/28 12:49:48  fplanque
+ * no message
+ *
  * Revision 1.289  2009/05/10 00:28:51  fplanque
  * serp rank logging
  *
