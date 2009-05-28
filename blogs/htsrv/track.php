@@ -65,12 +65,16 @@ if( !empty($Goal->goal_redir_url) )
 
 	header( 'HTTP/1.1 302 Found' );
 	header( 'Location: '.$redir_url, true, 302 ); // explictly setting the status is required for (fast)cgi
+	// TODO: dh> str_repeat won't be enough (when gzipped), see http://core.trac.wordpress.org/ticket/8942
+	//           should be probably a more general function and get used in e.g. bad_request_die(), too (if necessary)
 	echo str_repeat( ' ', 1024 );
 	flush();
 	// At this point Firefox 2 will redirect without waiting for the end of the page, but IE7 will not :/
 }
 else
 {	// No redirection specified, we send a blank pixel instead:
+	// TODO: dh> Looks like caching should get prevented here?! (so additional requests arrive here, too)?!
+
 	$blank_gif = $rsc_path.'img/blank.gif';
 
  	header('Content-type: image/gif' );
@@ -102,6 +106,9 @@ $DB->query( $sql );
 
 /*
  * $Log$
+ * Revision 1.4  2009/05/28 19:36:07  blueyed
+ * todos
+ *
  * Revision 1.3  2009/05/25 19:40:53  tblue246
  * Use str_repeat() instead of str_pad()
  *
