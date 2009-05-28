@@ -43,6 +43,7 @@ $Form = & new Form( NULL, 'plugin_settings_checkchanges' );
 // PluginUserSettings
 load_funcs('plugins/_plugin.funcs.php');
 
+$have_plugins = false;
 $Plugins->restart();
 while( $loop_Plugin = & $Plugins->get_next() )
 {
@@ -81,6 +82,7 @@ while( $loop_Plugin = & $Plugins->get_next() )
 
 		$Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 															array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+		$have_plugins = true;
 	}
 	else
 	{ // No content, discard output buffers:
@@ -89,8 +91,16 @@ while( $loop_Plugin = & $Plugins->get_next() )
 	}
 }
 
+if( ! $have_plugins )
+{	// Display a message:
+	echo '<p>', T_( 'There are no plugins providing blog-specific settings.' ), '</p>';
+}
+
 /*
  * $Log$
+ * Revision 1.3  2009/05/28 10:08:56  tblue246
+ * Display a message if there are no plugin settings
+ *
  * Revision 1.2  2009/05/27 16:19:06  fplanque
  * Plugins can now have Settings that are specific to each blog.
  *
