@@ -52,9 +52,7 @@ $Form->begin_form( 'fform' );
 
 	$Form->text( 'login', $login, 16, T_('Login'), '', 20, 'input_text' );
 
-	echo $Form->fieldstart.$Form->inputstart;
-	$Form->submit_input( array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me an email now!'), 'class' => 'ActionButton' ) );
-	echo $Form->inputend.$Form->fieldend;
+	$Form->buttons_input( array(array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me an email now!'), 'class' => 'ActionButton' )) );
 
 	$Form->end_fieldset();;
 
@@ -64,6 +62,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.5  2009/05/28 20:21:28  blueyed
+ * Streamline code to display form buttons.
+ *
  * Revision 1.4  2009/03/08 23:58:01  fplanque
  * 2009
  *

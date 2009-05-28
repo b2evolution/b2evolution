@@ -364,12 +364,7 @@ while( $Item = & $ItemList->get_item() )
 				$Form->checkbox( 'comment_autobr', 1, T_('Auto-BR'), T_('(Line breaks become &lt;br&gt;)'), 'checkbox' );
 			}
 
-			echo $Form->fieldstart;
-			echo $Form->inputstart;
-			$Form->submit( array ('submit', T_('Send comment'), 'SaveButton' ) );
-			echo $Form->inputend;
-			$Form->end_fieldset();
-
+			$Form->buttons_input( array(array('name'=>'submit', 'value'=>T_('Send comment'), 'class'=>'SaveButton' )) );
 			?>
 
 				<div class="clear"></div>
@@ -396,6 +391,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.21  2009/05/28 20:21:27  blueyed
+ * Streamline code to display form buttons.
+ *
  * Revision 1.20  2009/04/28 19:19:33  blueyed
  * Full item list: do not display workflow properties, if not activated for this blog.
  *
