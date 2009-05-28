@@ -437,11 +437,17 @@ function skin_include( $template_name, $params = array() )
 
 	if( file_exists( $ads_current_skin_path.$template_name ) )
 	{	// The skin has a customized handler, use that one instead:
-		require $ads_current_skin_path.$template_name;
+		global $Debuglog;
+		$file = $ads_current_skin_path.$template_name;
+		$Debuglog->add('skin_include ('.($Item ? 'Item #'.$Item->ID : '-').'): '.rel_path_to_base($file), 'skins');
+		require $file;
 	}
 	elseif( file_exists( $skins_path.$template_name ) )
 	{	// Use the default template:
-		require $skins_path.$template_name;
+		global $Debuglog;
+		$file = $skins_path.$template_name;
+		$Debuglog->add('skin_include ('.($Item ? 'Item #'.$Item->ID : '-').'): '.rel_path_to_base($file), 'skins');
+		require $file;
 	}
 	else
 	{
@@ -775,6 +781,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.53  2009/05/28 22:47:10  blueyed
+ * skin_include: add info about the used file to Debuglog
+ *
  * Revision 1.52  2009/05/27 14:46:33  waltercruz
  * Using categories description as meta-description for categories pages
  *
