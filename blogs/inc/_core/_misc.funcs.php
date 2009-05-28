@@ -2197,6 +2197,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	// Convert encoding of message (from internal encoding to the one of the message):
 	// fp> why do we actually convert to $current_charset?
+	// dh> I do not remember. Appears to make sense sending it unconverted in $evo_charset.
 	$message = convert_charset( $message, $current_charset, $evo_charset );
 	// Specify charset and content-type of email
 	$headers['Content-Type'] = 'text/plain; charset='.$current_charset;
@@ -3420,6 +3421,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.100  2009/05/28 22:45:31  blueyed
+ * doc
+ *
  * Revision 1.99  2009/05/28 22:26:13  blueyed
  * doc
  *

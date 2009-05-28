@@ -358,6 +358,8 @@ class Session
 	/**
 	 * Set a data value for the session.
 	 *
+	 * Updated values get saved to the DB automatically on shutdown, in {@link shutdown()}.
+	 *
 	 * @param string Name of the data's key.
 	 * @param mixed The value
 	 * @param integer Time in seconds for data to expire (0 to disable).
@@ -544,6 +546,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.11  2009/05/28 22:46:14  blueyed
+ * doc
+ *
  * Revision 1.10  2009/03/08 23:57:45  fplanque
  * 2009
  *
