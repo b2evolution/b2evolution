@@ -1696,7 +1696,7 @@ function debug_die( $additional_info = '', $params = array() )
  *
  * This should be used when a bad user input is detected?
  *
- * @param string Message to output
+ * @param string Message to output (HTML)
  */
 function bad_request_die( $additional_info = '' )
 {
@@ -3420,6 +3420,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.99  2009/05/28 22:26:13  blueyed
+ * doc
+ *
  * Revision 1.98  2009/05/27 13:46:50  tblue246
  * Universal item list: Added option to sort by view (http://forums.b2evolution.net/viewtopic.php?t=18650 )
  *
