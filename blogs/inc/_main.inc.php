@@ -627,6 +627,7 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale
 
 
 // Init charset handling:
+// TODO: dh> anything translated before this call might have encoding issues (e.g. the login form!)
 init_charsets( $current_charset );
 
 
@@ -654,6 +655,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.110  2009/05/28 23:01:03  blueyed
+ * Add Debuglog when charsets are not setup yet when translating: encoding issues in e.g. login form.. :/
+ *
  * Revision 1.109  2009/03/31 21:57:00  blueyed
  * bad_request_die for protecting globals requires _misc.funcs.php
  *

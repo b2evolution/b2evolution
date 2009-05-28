@@ -196,6 +196,10 @@ if( $use_l10n )
 		{
 			$r = convert_charset( $r, $evo_charset, $messages_charset );
 		}
+		else
+		{
+			$Debuglog->add(sprintf('Warning: evo_charset not set to translate "%s"', htmlspecialchars($string)), 'locale');
+		}
 
 		if( $params['for_helper'] )
 		{ // translation is for the b2evoHelper object
@@ -1037,6 +1041,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.25  2009/05/28 23:01:03  blueyed
+ * Add Debuglog when charsets are not setup yet when translating: encoding issues in e.g. login form.. :/
+ *
  * Revision 1.24  2009/03/15 23:07:56  tblue246
  * minor
  *
