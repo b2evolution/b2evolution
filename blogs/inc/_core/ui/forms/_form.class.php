@@ -2182,8 +2182,6 @@ class Form extends Widget
 	/**
 	 * Builds a button.
 	 *
-	 * Array entries with numeric (deprecated) keys are converted to their equivalent string indexes.
-	 *
 	 * You probably want to use {@link buttons_input()}, which uses
 	 * {@link $buttonsstart}/{@link $buttonsend} to align the buttons properly.
 	 *
@@ -2912,6 +2910,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.53  2009/05/28 20:24:01  blueyed
+ * fix doc
+ *
  * Revision 1.52  2009/05/26 19:31:54  fplanque
  * Plugins can now have Settings that are specific to each blog.
  *
