@@ -103,15 +103,15 @@ function skin_init( $disp )
 		case 'page':
 			if( $disp == 'single' )
 			{
-				$seo_page_type = '"Page" page';
+				$seo_page_type = 'Single post page';
 			}
 			else
 			{
-				$seo_page_type = 'Single post page';
+				$seo_page_type = '"Page" page';
 			}
 
 			// Check if the post has 'redirected' status:
-			if( $Item->status == 'redirected' && $redir == 'yes' )
+			if( ! $preview && $Item->status == 'redirected' && $redir == 'yes' )
 			{	// $redir=no here allows to force a 'single post' URL for commenting
 				// Redirect to the URL specified in the post:
 				$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'].' );
@@ -781,6 +781,10 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.54  2009/05/30 15:35:31  tblue246
+ * - Fixed wrong $seo_page_type contents
+ * - Fixed PHP notice when previewing a post
+ *
  * Revision 1.53  2009/05/28 22:47:10  blueyed
  * skin_include: add info about the used file to Debuglog
  *
