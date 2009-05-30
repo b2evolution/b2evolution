@@ -645,7 +645,8 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
  *
  * It replaces only text which is not between <a> tags already.
  *
- * @uses callback_on_non_matching_blocks()
+ * @todo dh> this should not replace links in tags! currently fails for something
+ *           like '<img src=" http://example.com/" />' (not usual though!)
  *
  * {@internal This function gets tested in misc.funcs.simpletest.php.}}
  *
@@ -733,8 +734,6 @@ function make_clickable( $text, $moredelim = '&amp;' )
 
 /**
  * Callback function for {@link make_clickable()}.
- *
- * @todo IMHO it would be better to use "\b" (word boundary) to match the beginning of links..
  *
  * original function: phpBB, extended here for AIM & ICQ
  * fplanque restricted :// to http:// and mailto://
@@ -3421,6 +3420,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.102  2009/05/30 21:11:58  blueyed
+ * make_clickable: more tests, doc
+ *
  * Revision 1.101  2009/05/30 15:33:51  tblue246
  * make_clickable_callback(): Removed double quotes from first RegExp because it made URLs in tag attributes clickable. Fixes: http://forums.b2evolution.net/viewtopic.php?p=92073
  *

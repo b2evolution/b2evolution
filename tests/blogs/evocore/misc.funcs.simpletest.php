@@ -29,7 +29,6 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 	function test_make_clickable()
 	{
 		foreach( array(
-				'<img src="http://google.com" />' => '<img src="http://google.com" />',
 				'http://b2evolution.net' => '<a href="http://b2evolution.net">http://b2evolution.net</a>',
 				'http://www.logitech.com/index.cfm/products/detailsharmony/US/EN,CRID=2084,CONTENTID=8747' => '<a href="http://www.logitech.com/index.cfm/products/detailsharmony/US/EN,CRID=2084,CONTENTID=8747">http://www.logitech.com/index.cfm/products/detailsharmony/US/EN,CRID=2084,CONTENTID=8747</a>',
 				'Please look at http://this.com, and tell me what you think.' => 'Please look at <a href="http://this.com">http://this.com</a>, and tell me what you think.',
@@ -51,7 +50,11 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 
 				// icq:
 				'wanna chat? icq:878787.' => 'wanna chat? <a href="http://wwp.icq.com/scripts/search.dll?to=878787">878787</a>.',
-									) as $lText => $lExpected )
+
+				'<img src="http://example.com/" />' => '<img src="http://example.com/" />',
+				'<img src=http://example.com/ />' => '<img src=http://example.com/ />',
+				'<div>http://example.com/</div>' => '<div><a href="http://example.com/">http://example.com/</a></div>',
+			) as $lText => $lExpected )
 		{
 			$this->assertEqual( make_clickable($lText), $lExpected );
 		}
