@@ -746,7 +746,7 @@ function make_clickable_callback( $text, $moredelim = '&amp;' )
 {
 	$pattern_domain = '([a-z0-9\-]+\.[a-z0-9\-.\~]+)'; // a domain name (not very strict)
 	$text = preg_replace(
-		array( '#(^|[\s>"])(https?|mailto)://([^"<>{}\s]+[^".,<>{}\s])#i',
+		array( '#(^|[\s>])(https?|mailto)://([^<>{}\s]+[^.,<>{}\s])#i',
 			'#(^|[\s>])aim:([^,<\s]+)#i',
 			'#(^|[\s>])icq:(\d+)#i',
 			'#(^|[\s>])www\.'.$pattern_domain.'((?:/[^<\s]*)?[^.,\s])#i',
@@ -3421,6 +3421,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.101  2009/05/30 15:33:51  tblue246
+ * make_clickable_callback(): Removed double quotes from first RegExp because it made URLs in tag attributes clickable. Fixes: http://forums.b2evolution.net/viewtopic.php?p=92073
+ *
  * Revision 1.100  2009/05/28 22:45:31  blueyed
  * doc
  *
