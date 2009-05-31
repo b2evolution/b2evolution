@@ -108,12 +108,11 @@ class menu_link_Widget extends ComponentWidget
 
 		$r = array_merge( array(
 				'link_type' => array(
-					'label' => 'Link Type',
+					'label' => T_( 'Link Type' ),
 					'note' => T_('What do you want to link to?'),
 					'type' => 'select',
 					'options' => $menu_link_widget_link_types,
 					'defaultvalue' => 'home',
-					'onchange' => 'document.getElementById("edit_plugin_'.$this->ID.'_set_widget_name").value = this.options[this.selectedIndex].text+" '.TS_('link').'";',
 				),
 			), parent::get_param_definitions( $params )	);
 
@@ -183,6 +182,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.12  2009/05/31 20:57:27  tblue246
+ * Translation fix/minor
+ *
  * Revision 1.11  2009/04/12 21:52:56  tblue246
  * Fixed translation string
  *
