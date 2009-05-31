@@ -646,6 +646,9 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 		// Get all date pattern parts. We should get 3 parts!:
 		preg_match_all( '/(?<!\\\\)[A-Za-z]/', $date_format, $parts ); // "(?<!\\\\)" means that the letter is not escaped with "\"
 		//pre_dump( $parts );
+		$day = null;
+		$month = null;
+		$year = null;
 
 		foreach( $parts[0] as $position => $part )
 		{
@@ -1919,6 +1922,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.31  2009/05/31 16:53:26  waltercruz
+ * Trying to avoid some warnings whan date format of locale allows dates like that: 29-05-31 13:26:00 (possible when dateformat from locale is empty)
+ *
  * Revision 1.30  2009/05/15 14:02:36  sam2kb
  * <input /> is a self-closing tag and doesn't need any evo help ;)
  * See http://forums.b2evolution.net/viewtopic.php?p=90791#90791
