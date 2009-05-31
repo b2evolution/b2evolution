@@ -525,7 +525,7 @@ if( !$Messages->count('error') )
 			}
 
 			// Remove all UserSettings where a default exists:
-			foreach( $UserSettings->get_defaults() as $k => $v )
+			foreach( $UserSettings->_defaults as $k => $v )
 			{
 				$UserSettings->delete( $k, $edited_User->ID );
 			}
@@ -908,6 +908,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2009/05/31 05:16:44  sam2kb
+ * This was probably the oldest bug ;)
+ *
  * Revision 1.18  2009/05/26 19:31:59  fplanque
  * Plugins can now have Settings that are specific to each blog.
  *
