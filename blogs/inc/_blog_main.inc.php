@@ -431,7 +431,6 @@ if( !empty( $tempskin ) )
 { // This will be handled like any other skin:
 	// TODO: maybe restrict that to authorized users
 	$skin = $tempskin;
-	$redir = 'no';	// By definition, we want to see the temporary skin
 }
 
 if( isset( $skin ) )
@@ -460,6 +459,10 @@ if( isset( $skin ) )
 	elseif( skin_exists( $skin ) && ! skin_installed( $skin ) )
 	{	// The requested skin is not a feed skin and exists in the file system, but isn't installed:
 		debug_die( sprintf( T_( 'The skin [%s] is not installed on this system.' ), htmlspecialchars( $skin ) ) );
+	}
+	else if( ! empty( $tempskin ) )
+	{
+		$redir = 'no';	// By definition, we want to see the temporary skin
 	}
 }
 
@@ -588,6 +591,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.137  2009/05/31 14:03:31  tblue246
+ * Fix feed redirection (external feed provider). Fixes http://forums.b2evolution.net/viewtopic.php?t=18824
+ *
  * Revision 1.136  2009/05/28 22:44:37  blueyed
  * Add info about the included skin display handler to debuglog.
  *
