@@ -3329,18 +3329,25 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
  * Basic tidy up of strings
  *
  * @author Yabba
+ * @author Tblue
  *
  * @param string $unformatted raw data
  * @return string formatted data
  */
 function format_to_js( $unformatted )
 {
-	$formatted = str_replace(
-			array( "'", "\r", "\n" ),
-			array( '\\\'', '', '' ),
-			$unformatted );
-
-	return $formatted;
+	return preg_replace( array(
+							'|\'|',
+							'|\\\([nrt])|',
+							'|\n|',
+							'|\r|',
+						),
+						array(
+							'\\\'',
+							'\\\\\\\$1',
+							'\n',
+							'\r',
+						), $unformatted );
 }
 
 
@@ -3420,6 +3427,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.103  2009/05/31 19:45:14  tblue246
+ * format_to_js(): Properly translate escape sequences (fixes http://forums.b2evolution.net/viewtopic.php?p=92133)
+ *
  * Revision 1.102  2009/05/30 21:11:58  blueyed
  * make_clickable: more tests, doc
  *
