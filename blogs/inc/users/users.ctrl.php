@@ -525,6 +525,7 @@ if( !$Messages->count('error') )
 			}
 
 			// Remove all UserSettings where a default exists:
+			// Tblue> Why don't we use AbstractSettings::restore_defaults() for this?
 			foreach( $UserSettings->_defaults as $k => $v )
 			{
 				$UserSettings->delete( $k, $edited_User->ID );
@@ -908,6 +909,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2009/05/31 11:37:34  tblue246
+ * doc
+ *
  * Revision 1.19  2009/05/31 05:16:44  sam2kb
  * This was probably the oldest bug ;)
  *
