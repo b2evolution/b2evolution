@@ -2366,7 +2366,14 @@ function upgrade_b2evo_tables()
 								CHANGE COLUMN iver_edit_user_ID iver_edit_user_ID  INT UNSIGNED NULL" );
 		task_end();
 	}
-
+	
+	/* if( $old_db_version < 9950 )
+	{	// 3.2
+		task_begin( 'Upgrading Blogs table... ' );
+		$DB->query( "ALTER TABLE T_blogs CHANGE COLUMN blog_shortname blog_shortname varchar(255) default ''" );
+		task_end();
+	}
+	*/
 
 	/* Wait until we're sure and no longer experimental for that one...
 	task_begin( 'Moving user data to fields' );
@@ -2517,6 +2524,10 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.291  2009/05/31 17:04:42  sam2kb
+ * blog_shortname field extended to 255 characters
+ * Please change the new_db_version
+ *
  * Revision 1.290  2009/05/28 12:49:48  fplanque
  * no message
  *

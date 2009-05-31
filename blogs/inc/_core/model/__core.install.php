@@ -153,7 +153,7 @@ $schema_queries = array(
 		'Creating table for Blogs',
 		"CREATE TABLE T_blogs (
 			blog_ID              int(11) unsigned NOT NULL auto_increment,
-			blog_shortname       varchar(12) NULL default '',
+			blog_shortname       varchar(255) NULL default '',
 			blog_name            varchar(255) NOT NULL default '',
 			blog_owner_user_ID   int(11) unsigned NOT NULL default 1,
 			blog_advanced_perms  TINYINT(1) NOT NULL default 0,
@@ -572,6 +572,10 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.18  2009/05/31 17:04:41  sam2kb
+ * blog_shortname field extended to 255 characters
+ * Please change the new_db_version
+ *
  * Revision 1.17  2009/05/18 21:01:05  sam2kb
  * No collation should defined here. Returns MySQL error.
  *

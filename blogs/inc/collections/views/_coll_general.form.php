@@ -51,7 +51,7 @@ $Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear
 
 	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Title'), T_('Will be displayed on top of the blog.'), 255 );
 
-	$Form->text( 'blog_shortname', $edited_Blog->get( 'shortname', 'formvalue' ), 12, T_('Short name'), T_('Will be used in selection menus and throughout the admin interface.') );
+	$Form->text( 'blog_shortname', $edited_Blog->get( 'shortname', 'formvalue' ), 50, T_('Short name'), T_('Will be used in selection menus and throughout the admin interface.'), 255 );
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// Permission to edit advanced admin settings
@@ -114,6 +114,10 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.9  2009/05/31 17:04:42  sam2kb
+ * blog_shortname field extended to 255 characters
+ * Please change the new_db_version
+ *
  * Revision 1.8  2009/03/08 23:57:42  fplanque
  * 2009
  *
