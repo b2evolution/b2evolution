@@ -466,7 +466,7 @@ a.permalink_right {
 	float: left;
 	padding: 2px 1ex;
 	margin-right: 4px;
-	border: 1px solid #9db0bc !important;
+	border: 1px solid #9db0bc;
 	white-space: nowrap;
 	background: #fefefe url(../img/whitebar24.png) repeat-x center;
 }
