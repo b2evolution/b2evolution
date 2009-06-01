@@ -378,10 +378,12 @@ if( $display_mode == 'normal' )
 	/**
 	 * @internal T_ array of translation strings required by the UI
 	 */
-	var T_ = new Array();
-	T_["Changes pending"] = "'.T_( 'Changes pending' ).'";
-	T_["Saving changes"] = "'.T_( 'Saving changes' ).'";
-	T_["Widget order unchanged"] = "'.T_( 'Widget order unchanged' ).'";
+	var T_arr = new Array();
+	T_arr["Changes pending"] = \''.TS_( 'Changes pending' ).'\';
+	T_arr["Saving changes"] = \''.TS_( 'Saving changes' ).'\';
+	T_arr["Widget order unchanged"] = \''.TS_( 'Widget order unchanged' ).'\';
+	T_arr["Update cancelled"] = \''.TS_( 'Update cancelled' ).'\';
+	T_arr["Update Paused"] = \''.TS_( 'Update Paused' ).'\';
 
 	/**
 	 * Image tags for the JavaScript widget UI.
@@ -491,6 +493,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.26  2009/06/01 12:23:59  tblue246
+ * Translation fixes
+ *
  * Revision 1.25  2009/03/15 01:32:35  fplanque
  * fixed yabbariffic bug that killed widgets when editing 2 different blogs at the same time
  *

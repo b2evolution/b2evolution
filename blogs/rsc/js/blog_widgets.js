@@ -434,13 +434,13 @@ function closeWidgetSettings()
 
 function T_( native_string )
 {
-	if( typeof( T_[ native_string ] ) == "undefined" )
+	if( typeof( T_arr[ native_string ] ) == "undefined" )
 	{ // we don't have a translation
 		return native_string;
 	}
 	else
 	{	// we have a translation
-		return T_[ native_string ];
+		return T_arr[ native_string ];
 	}
 }
 

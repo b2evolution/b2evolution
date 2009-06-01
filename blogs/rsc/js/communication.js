@@ -175,11 +175,11 @@ var _b2evoCommunications = function()
 				switch( ticker_status )
 				{
 					case 'cancel' : // cancel the server call
-						b2evoHelper.DisplayMessage( '<div class="log_message">'+b2evoHelper.T_( 'Update cancelled' )+'</div>' );
+						b2evoHelper.DisplayMessage( '<div class="log_message">'+T_( 'Update cancelled' )+'</div>' );
 						return;
 
 					case 'pause' : // pause the server call
-						b2evoHelper.DisplayMessage( '<div class="log_error">'+b2evoHelper.T_( 'Update Paused' )+' : '+b2evoHelper.str_repeat( '.', params.delay / params.interval )+'</div>' );
+						b2evoHelper.DisplayMessage( '<div class="log_error">'+T_( 'Update Paused' )+' : '+b2evoHelper.str_repeat( '.', params.delay / params.interval )+'</div>' );
 						me.BufferedServerLoop( params );
 						return;
 
@@ -194,12 +194,12 @@ var _b2evoCommunications = function()
 						params.delay -= params.interval;
 						if( params.delay > 0 )
 						{ // still buffered
-							b2evoHelper.DisplayMessage( '<div class="log_error">'+b2evoHelper.T_( 'Changes pending' )+' : '+b2evoHelper.str_repeat( '.', params.delay / params.interval )+'</div>' );
+							b2evoHelper.DisplayMessage( '<div class="log_error">'+T_( 'Changes pending' )+' : '+b2evoHelper.str_repeat( '.', params.delay / params.interval )+'</div>' );
 							me.BufferedServerLoop(params);
 							return;
 						}
 						// send the call;
-						b2evoHelper.DisplayMessage( '<div class="log_message">'+b2evoHelper.T_( 'Saving changes' )+'</div>' );
+						b2evoHelper.DisplayMessage( '<div class="log_message">'+T_( 'Saving changes' )+'</div>' );
 						params.send_callback();
 				}
 			}
