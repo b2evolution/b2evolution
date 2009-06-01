@@ -1488,34 +1488,30 @@ class Item extends ItemLight
 
 
 	/**
-	 * Split tags by space or comma
+	 * Split tags by comma or semicolon
 	 *
 	 * @todo fp> allow tags with spaces when quoted like "long tag". Nota comma should never be allowed in a tag.
  	 *
- 	 * @param string
+ 	 * @param string The tags, separated by comma or semicolon
 	 */
 	function set_tags_from_string( $tags )
 	{
-		if( empty($tags) )
+		if( $tags === '' )
 		{
 			$this->tags = array();
+			return;
 		}
-		else
-		{
-			$this->tags = preg_split( '/[;,]+/', $tags );
-		}
+		$this->tags = preg_split( '/\s*[;,]+\s*/', $tags, -1, PREG_SPLIT_NO_EMPTY );
 
-		/* fplanque> The following kills special chars like é on my blog (latin 1) -- mb_detect_encoding() is now officially banned from being used anywhere
 		if( function_exists( 'mb_strtolower' ) && function_exists( 'mb_detect_encoding' ) )
 		{	// fp> TODO: instead of those "when used" ifs, it would make more sense to redefine mb_strtolower beforehand if it doesn"t exist (it would then just be a fallback to the strtolower + a Debuglog->add() )
-			array_walk( $this->tags, create_function( '& $tag', '$tag = mb_strtolower(trim($tag), mb_detect_encoding($tag));' ) );
+			array_walk( $this->tags, create_function( '& $tag', '$tag = mb_strtolower( $tag, mb_detect_encoding( $tag.\'a\', \'UTF-8, ISO-8859-1, ISO-8859-15\', true ) );' ) );
 		}
-		else */
-		{
-			array_walk( $this->tags, create_function( '& $tag', '$tag = strtolower(trim($tag));' ) );
+		else
+		{	// Tblue> This doesn't work with ISO-8859-1 umlauts like 'Ä' and won't work with UTF-8 either.
+			array_walk( $this->tags, create_function( '& $tag', '$tag = strtolower( $tag );' ) );
 		}
 		$this->tags = array_unique( $this->tags );
-		$this->tags = array_diff( $this->tags, array('') );	// empty element can sneak in when ending with ,,
 		// pre_dump( $this->tags );
 	}
 
@@ -3896,6 +3892,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.106  2009/06/01 11:26:06  tblue246
+ * Item::set_tags_from_string(): a) Code improvements, b) trying to fix issue with umlauts causing SQL errors: http://forums.b2evolution.net/viewtopic.php?t=18213
+ *
  * Revision 1.105  2009/05/27 20:24:44  blueyed
  * Cleanup
  *
