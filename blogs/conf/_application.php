@@ -31,7 +31,7 @@ $app_date = '2009-05-30';
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 9940;
+$new_db_version = 9950;
 
 /**
  * Is displayed on the login screen:

@@ -2367,13 +2367,13 @@ function upgrade_b2evo_tables()
 		task_end();
 	}
 	
-	/* if( $old_db_version < 9950 )
+	if( $old_db_version < 9950 )
 	{	// 3.2
-		task_begin( 'Upgrading Blogs table... ' );
+		task_begin( 'Altering Blogs table... ' );
 		$DB->query( "ALTER TABLE T_blogs CHANGE COLUMN blog_shortname blog_shortname varchar(255) default ''" );
 		task_end();
 	}
-	*/
+	
 
 	/* Wait until we're sure and no longer experimental for that one...
 	task_begin( 'Moving user data to fields' );
@@ -2524,6 +2524,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.292  2009/06/01 16:23:32  sam2kb
+ * new_db_version updated to 9950
+ *
  * Revision 1.291  2009/05/31 17:04:42  sam2kb
  * blog_shortname field extended to 255 characters
  * Please change the new_db_version
