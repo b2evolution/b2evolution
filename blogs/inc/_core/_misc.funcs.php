@@ -3309,13 +3309,14 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 
 	if( $send_as_html )
 	{	// we want to send as a html document
+		header_content_type();
 		echo '<html><head></head><body><script type="text/javascript">'."\n";
 		echo $output;
 		echo '</script></body></html>';
 	}
 	else
 	{	// we want to send as js
-		header( 'Content-Type: text/javascript' );
+		header_content_type( 'text/javascript' );
 		header( 'Cache-Control: no-cache, must-revalidate' );
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		echo $output;
@@ -3427,6 +3428,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.104  2009/06/01 11:57:18  tblue246
+ * send_javascript_message(): Send correct Content-Type header (set charset)
+ *
  * Revision 1.103  2009/05/31 19:45:14  tblue246
  * format_to_js(): Properly translate escape sequences (fixes http://forums.b2evolution.net/viewtopic.php?p=92133)
  *
