@@ -361,10 +361,8 @@ function bpost_count_words( $str )
 						preg_replace( '~[^\w\d\'".!?;,\\\\/:&@-]+~', ' ', $str ),
 						-1, PREG_SPLIT_NO_EMPTY ) );
 	}
-	elseif( version_compare( PHP_VERSION, '4.4.0', '<' )
-			|| ( substr( PHP_VERSION, 0, 2 ) == '5.'
-				 && version_compare( PHP_VERSION, '5.1.0', '<' ) ) )
-	{	// PHP 4 < 4.4.0 or PHP 5 < 5.1.0: PCRE doesn't support \p, use str_word_count()
+	elseif( @preg_match( '|\pL|', 'foo' ) === false )
+	{	// PCRE doesn't support \p, use str_word_count()
 		return str_word_count( $str );
 	}
 
@@ -856,6 +854,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.47  2009/06/01 17:42:47  tblue246
+ * bpost_count_words(): Better PCRE test
+ *
  * Revision 1.46  2009/06/01 16:56:27  tblue246
  * Bugfix
  *
