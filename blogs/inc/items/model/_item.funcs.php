@@ -344,6 +344,29 @@ function get_postdata($postid)
  */
 function bpost_count_words( $str )
 {
+	if( !  function_exists( 'str_word_count' ) )
+	{
+		/* In case str_word_count() doesn't exist (to accomodate PHP < 4.3).
+		 * Code adapted from post by "brettNOSPAM at olwm dot NO_SPAM dot com"
+		 * at PHP documentation page for str_word_count(). A better
+		 * implementation probably exists.
+		 */
+		if( $string === '' )
+		{
+			return 0;
+		}
+
+		return count( preg_split( '|\s+|',
+						preg_replace( '~[^\w\d\'".!?;,\\\\/:&@-]+~', ' ', $str ),
+						-1, PREG_SPLIT_NO_EMPTY ) );
+	}
+	elseif( version_compare( PHP_VERSION, '4.4.0', '<' )
+			|| ( substr( PHP_VERSION, 0, 2 ) == '5.'
+				 && version_compare( PHP_VERSION, '5.1.0', '<' ) ) )
+	{	// PHP 4 < 4.4.0 or PHP 5 < 5.1.0: PCRE doesn't support \p, use str_word_count()
+		return str_word_count( $str );
+	}
+
 	$count = 0;
 
 	foreach( preg_split( '#\s+#', trim( strip_tags( convert_charset( $str, 'UTF-8' ) ) ) ) as $word )
@@ -831,6 +854,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.45  2009/06/01 16:36:54  tblue246
+ * Make bpost_count_words() work with extreme old PHP versions and versions not supporting the PCRE escape \p
+ *
  * Revision 1.44  2009/05/25 19:47:45  fplanque
  * better linking of files
  *
