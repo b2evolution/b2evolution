@@ -344,14 +344,15 @@ function get_postdata($postid)
  */
 function bpost_count_words( $str )
 {
-	if( !  function_exists( 'str_word_count' ) )
+	$str = trim( strip_tags( $str ) );
+	if( ! function_exists( 'str_word_count' ) )
 	{
 		/* In case str_word_count() doesn't exist (to accomodate PHP < 4.3).
 		 * Code adapted from post by "brettNOSPAM at olwm dot NO_SPAM dot com"
 		 * at PHP documentation page for str_word_count(). A better
 		 * implementation probably exists.
 		 */
-		if( $string === '' )
+		if( $str === '' )
 		{
 			return 0;
 		}
@@ -369,7 +370,8 @@ function bpost_count_words( $str )
 
 	$count = 0;
 
-	foreach( preg_split( '#\s+#', trim( strip_tags( convert_charset( $str, 'UTF-8' ) ) ) ) as $word )
+	foreach( preg_split( '#\s+#', convert_charset( $str, 'UTF-8' ), -1,
+							PREG_SPLIT_NO_EMPTY ) as $word )
 	{
 		if( preg_match( '#\pL#', $word ) )
 		{
@@ -854,6 +856,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.46  2009/06/01 16:56:27  tblue246
+ * Bugfix
+ *
  * Revision 1.45  2009/06/01 16:36:54  tblue246
  * Make bpost_count_words() work with extreme old PHP versions and versions not supporting the PCRE escape \p
  *
