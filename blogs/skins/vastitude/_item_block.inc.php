@@ -43,9 +43,9 @@ $params = array_merge( array(
 			<div class="bSmallHeadMisc">
 				<?php
 					$Item->author( array(
-					'before'	=> T_('Written by: <strong>'),
-					'after'		=> T_('</strong>'),
-					) );
+							'before'	=> T_('Written by:').'<strong>',
+							'after'		=> '</strong>',
+						) );
 					echo '<br /> ';
 					echo ' Published on ';
 					$Item->issue_time(array('time_format' => 'F jS, Y',) );
@@ -134,6 +134,9 @@ $params = array_merge( array(
 <?php
 /*
  * $Log$
+ * Revision 1.2  2009/06/02 14:16:02  sam2kb
+ * minor
+ *
  * Revision 1.1  2009/05/23 14:12:42  fplanque
  * All default skins now support featured posts and intro posts.
  *
