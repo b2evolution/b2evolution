@@ -481,11 +481,15 @@ function url_add_param( $url, $param, $glue = '&amp;' )
 		$anchor = '';
 	}
 
-	if( strpos( $url, '?' ) !== false )
+	if( strpos($url, '?') !== false )
 	{ // There are already params in the URL
-		return $url.$glue.$param.$anchor;
+		$r = $url;
+		if( substr($url, -1) != '?' )
+		{ // the "?" is not the last char
+			$r .= $glue;
+		}
+		return $r.$param.$anchor;
 	}
-
 
 	// These are the first params
 	return $url.'?'.$param.$anchor;
@@ -728,6 +732,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.36  2009/06/04 21:20:23  blueyed
+ * Fix url_add_param if last char is question mark. Add and move tests.
+ *
  * Revision 1.35  2009/05/26 17:18:36  tblue246
  * - Twitter plugin:
  * 	- removed unnecessary BeforeEnable() method.

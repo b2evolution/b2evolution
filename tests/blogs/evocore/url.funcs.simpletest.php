@@ -83,6 +83,20 @@ class UrlFuncsTestCase extends EvoUnitTestCase
 	}
 
 
+	/**
+	 * Test {@link url_add_param()}
+	 */
+	function test_url_add_param()
+	{
+		$this->assertEqual( url_add_param('foo', 'bar', '&'), 'foo?bar' );
+		$this->assertEqual( url_add_param('foo#anchor', 'bar', '&'), 'foo?bar#anchor' );
+		
+		$this->assertEqual( url_add_param('foo?', 'bar', '&'), 'foo?bar' );
+		$this->assertEqual( url_add_param('foo?#anchor', 'bar', '&'), 'foo?bar#anchor' );
+		$this->assertEqual( url_add_param('?', 'bar', '&'), '?bar' );
+		$this->assertEqual( url_add_param('?#anchor', 'bar', '&'), '?bar#anchor' );
+		$this->assertEqual( url_add_param('#anchor', 'bar', '&'), '?bar#anchor' );
+	}
 }
 
 
