@@ -82,26 +82,6 @@ class twitter_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called before the plugin is going to be installed.
-	 *
-	 * @todo Tblue> Do not depend on cURL.
-	 *
-	 * @return true|string True, if the plugin can be enabled/activated,
-	 *                     a string with an error/note otherwise.
-	 */
-	function BeforeInstall()
-	{
-		if( ! extension_loaded( 'curl' ) )
-		{	// CURL not available :'(
-			return T_('The twitter plugin needs the PHP CURL extension to be enabled.');
-		}
-
-		// OK:
-		return true;
-	}
-
-
-	/**
 	 * Check if the plugin can be enabled:
 	 *
 	 * @return string|NULL
@@ -154,21 +134,50 @@ class twitter_plugin extends Plugin
 		}
 
 		$title =  $params['Item']->dget('title', 'xml');
+		$excerpt =  $params['Item']->dget('excerpt', 'xml');
 		$url = $params['Item']->get_permanent_url();
 		$msg = str_replace( '$title$', $title, $msg );
+		$msg = str_replace( '$excerpt$', $excerpt, $msg );
 		$msg = str_replace( '$url$', $url, $msg );
 
-		$session = curl_init();
-		curl_setopt( $session, CURLOPT_URL, 'http://twitter.com/statuses/update.xml' );
-		curl_setopt( $session, CURLOPT_POSTFIELDS, 'status='.urlencode($msg));
-		curl_setopt( $session, CURLOPT_HTTPAUTH, CURLAUTH_BASIC );
-		curl_setopt( $session, CURLOPT_HEADER, false );
-		curl_setopt( $session, CURLOPT_CONNECTTIMEOUT, 5);
-		curl_setopt( $session, CURLOPT_USERPWD, $username.':'.$password );
-		curl_setopt( $session, CURLOPT_RETURNTRANSFER, 1 );
-		curl_setopt( $session, CURLOPT_POST, 1);
-		$result = curl_exec ( $session ); // will be an XML message
-		curl_close( $session );
+		if( extension_loaded( 'curl' ) )
+		{ // CURL available
+			$session = curl_init();
+			curl_setopt( $session, CURLOPT_URL, 'http://twitter.com/statuses/update.xml' );
+			curl_setopt( $session, CURLOPT_POSTFIELDS, 'status='.urlencode($msg));
+			curl_setopt( $session, CURLOPT_HTTPAUTH, CURLAUTH_BASIC );
+			curl_setopt( $session, CURLOPT_HEADER, false );
+			curl_setopt( $session, CURLOPT_CONNECTTIMEOUT, 5);
+			curl_setopt( $session, CURLOPT_USERPWD, $username.':'.$password );
+			curl_setopt( $session, CURLOPT_RETURNTRANSFER, 1 );
+			curl_setopt( $session, CURLOPT_POST, 1);
+			$result = curl_exec ( $session ); // will be an XML message
+			curl_close( $session );
+		}
+		else
+		{ // fallback to fsockopen
+			$host = 'twitter.com';
+			$url = '/statuses/update.xml?status='.urlencode( $msg );
+			// Build the header
+			$header = "POST $url HTTP/1.0\r\n";
+			$header .= "Host: $host\r\n";
+			$header .= "Authorization: Basic ".base64_encode("$username:$password")."\r\n";
+			$header .= "Connection: Close\r\n\r\n";
+			if( $fp = fsockopen($host, 80) )
+			{
+				fputs($fp, $header );
+				$result = '';
+				while( !feof( $fp ) )
+				{
+					$result .= fgets( $fp, 1024 );
+				}
+				fclose($fp);
+			}
+			else
+			{ // unable to tweet
+				$params['xmlrpcresp'] = T_('No ping method available, please contact your host about using CURL or fsockopen');
+			}
+		}
 
 		if( empty($result) )
 		{
@@ -206,7 +215,7 @@ class twitter_plugin extends Plugin
 					'size' => 30,
 					'maxlength' => 140,
 					'defaultvalue' => T_( 'Just posted $title$ $url$ #b2p' ),
-					'note' => T_('$title$ and $url$ will be replaced appropriately.'),
+					'note' => T_('$title$, $excerpt$ and $url$ will be replaced appropriately.'),
 				),
 			);
 	}
@@ -236,7 +245,7 @@ class twitter_plugin extends Plugin
 					'size' => 30,
 					'maxlength' => 140,
 					'defaultvalue' => T_( 'Just posted $title$ $url$ #b2p' ),
-					'note' => T_('$title$ and $url$ will be replaced appropriately.'),
+					'note' => T_('$title$, $excerpt$ and $url$ will be replaced appropriately.'),
 				),
 			);
 	}
@@ -245,6 +254,10 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.13  2009/06/04 18:02:48  yabs
+ * Removed CURL requirement.
+ * Added $Item->excerpt as a replacement value ( note : I haven't added any char count check, you may wish to consider adding one )
+ *
  * Revision 1.12  2009/05/28 14:47:33  fplanque
  * minor
  *
