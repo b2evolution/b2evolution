@@ -111,6 +111,10 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		}
 		elseif( $use_default )
 		{	// We haven't set any value yet and we really want one: use default:
+			if( $type == 'array' && $default === '' )
+			{ // Default for type 'array' is array() (otherwise there would be a notice with settype() below)
+				$default = array();
+			}
 			$GLOBALS[$var] = $default;
 			// echo '<br>param(-): '.$var.'='.$GLOBALS[$var].' set by default';
 			// if( isset($Debuglog) ) $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by default', 'params' );
@@ -612,7 +616,7 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 	}
 
 	// Convert PHP date format to regexp pattern:
-	$date_regexp = '~'.preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
+	$date_regexp = '~^'.preg_replace_callback( '~(\\\)?(\w)~', create_function( '$m', '
 		if( $m[1] == "\\\" ) return $m[2]; // escaped
 		switch( $m[2] )
 		{
@@ -622,7 +626,7 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 			case "D": return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_abbrev"])))).")";
 			case "e": // b2evo extension!
 				return "(".str_replace("~", "\~", implode("|", array_map("trim", array_map("T_", $GLOBALS["weekday_letter"])))).")";
-				case "S": return "(st|nd|rd|th)"; // english suffix for day
+			case "S": return "(st|nd|rd|th)"; // english suffix for day
 
 			case "m": return "([0-1]\\d)"; // month, 01-12
 			case "n": return "(1?\\d)"; // month, 1-12
@@ -633,7 +637,7 @@ function param_check_date( $var, $err_msg, $required = false, $date_format = NUL
 			case "Y": return "(\\d{4})"; // year, XXXX
 			default:
 				return $m[0];
-		}' ), $date_format ).'~i'; // case-insensitive?
+		}' ), $date_format ).'$~i'; // case-insensitive?
 	// Allow additional spaces, e.g. "03  May 2007" when format is "d F Y":
 	$date_regexp = preg_replace( '~ +~', '\s+', $date_regexp );
 	// echo $date_format.'...'.$date_regexp;
@@ -1552,6 +1556,8 @@ else
  * It only checks on it and produces error messages.
  * It is NOT (necessarily) safe to use the output.
  *
+ * @todo dh> Not implemented?!
+ *
  * @param string Variable to set
  * @param mixed Default value or TRUE if user input required
  * @param boolean memorize ( see {@link param()} )
@@ -1922,6 +1928,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.32  2009/06/07 20:06:45  blueyed
+ * param: default for array is array(), match whole string for date formats, doc
+ *
  * Revision 1.31  2009/05/31 16:53:26  waltercruz
  * Trying to avoid some warnings whan date format of locale allows dates like that: 29-05-31 13:26:00 (possible when dateformat from locale is empty)
  *
