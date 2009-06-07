@@ -567,6 +567,10 @@ if( !empty( $skin ) )
 			}
 			else
 			{	// Use the default handler from the skins dir:
+				if( empty( $disp_handler ) )
+				{
+					$disp_handler = $disp;
+				}
 				$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (default index handler)', 'skin');
 				require $ads_current_skin_path.'index.main.php';
 			}
@@ -591,6 +595,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.138  2009/06/07 14:22:20  yabs
+ * minor bug fix
+ *
  * Revision 1.137  2009/05/31 14:03:31  tblue246
  * Fix feed redirection (external feed provider). Fixes http://forums.b2evolution.net/viewtopic.php?t=18824
  *
