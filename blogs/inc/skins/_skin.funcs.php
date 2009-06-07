@@ -387,7 +387,6 @@ function is_default_page()
 /**
  * Template tag. Include a sub-template at the current position
  *
- * @todo plugin hook to handle a special disp
  */
 function skin_include( $template_name, $params = array() )
 {
@@ -405,7 +404,7 @@ function skin_include( $template_name, $params = array() )
 		// We are going to include a template based on $disp:
 
 		// Default display handlers:
-		$disp_handlers = array_merge( array(
+		$disp_handlers = array(
 				'disp_404'            => '_404_not_found.disp.php',
 				'disp_arcdir'         => '_arcdir.disp.php',
 				'disp_catdir'         => '_catdir.disp.php',
@@ -419,7 +418,19 @@ function skin_include( $template_name, $params = array() )
 				'disp_single'         => '_single.disp.php',
 				'disp_subs'           => '_subs.disp.php',
 				'disp_user'           => '_user.disp.php',
-			), $params );
+			);
+
+		// now add plugin disp handlers
+		if( $disp_Plugins = $Plugins->get_list_by_event( 'GetDispModes' ) )
+		{
+			foreach( $disp_Plugins as $disp_Plugin )
+			{ // Go through whole list of disp plugins
+				$disp_handlers = $Plugins->call_method( $disp_Plugin->ID, 'GetDispModes', $disp_handlers );
+			}
+		}
+
+		// allow skin overrides
+		$disp_handlers = array_merge( $disp_handlers, $params );
 
 		if( !isset( $disp_handlers['disp_'.$disp] ) )
 		{
@@ -448,6 +459,23 @@ function skin_include( $template_name, $params = array() )
 		$file = $skins_path.$template_name;
 		$Debuglog->add('skin_include ('.($Item ? 'Item #'.$Item->ID : '-').'): '.rel_path_to_base($file), 'skins');
 		require $file;
+	}
+	elseif( !empty( $disp_Plugins ) )
+	{ // disp possibly handled by plugin
+		$disp_handled = false;
+		foreach( $disp_Plugins as $disp_Plugin )
+		{ // Go through whole list of disp plugins
+			$disp_params = array( 'disp' => $disp );
+			$disp_handled = ( $Plugins->call_method( $disp_Plugin->ID, 'HandleDispMode', $disp_params ) ? true : $disp_handled );
+		}
+		if( !$disp_handled )
+		{ // no plugin handled the disp
+			printf( '<div class="skin_error">Sub template [%s] not found.</div>', $template_name );
+			if( !empty($current_User) && $current_User->level == 10 )
+			{
+				printf( '<div class="skin_error">User level 10 help info: [%s]</div>', $ads_current_skin_path.$template_name );
+			}
+		}
 	}
 	else
 	{
@@ -781,6 +809,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.55  2009/06/07 14:24:17  yabs
+ * enabling plugin disp types
+ *
  * Revision 1.54  2009/05/30 15:35:31  tblue246
  * - Fixed wrong $seo_page_type contents
  * - Fixed PHP notice when previewing a post

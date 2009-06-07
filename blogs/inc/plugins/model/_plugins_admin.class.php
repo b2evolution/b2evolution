@@ -213,6 +213,10 @@ class Plugins_admin extends Plugins
 				'GetProvidedSkins' => 'Get a list of "skins" handled by the plugin.',
 
 				'PluginUserSettingsEditAction' => 'Called as action before editing a user\'s settings.',
+
+				// allow plugins to handle $disp modes
+				'GetDispModes' => 'Called when building possible $disp list',
+				'HandleDispMode' => 'Called when displaying $disp',
 			);
 
 			if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )
@@ -437,7 +441,7 @@ class Plugins_admin extends Plugins
 				$had_func_token = true;
 			}
 		}
-		
+
 		if( ! count( $plugin_class_methods ) )
 		{
 			$Debuglog->add( 'No functions found in file "'.$Plugin->classfile_path.'".', array('plugins', 'error') );
@@ -1464,6 +1468,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.14  2009/06/07 14:23:24  yabs
+ * enabling plugin disp types
+ *
  * Revision 1.13  2009/05/26 12:48:11  tblue246
  * - Plugins_admin::get_registered_events(): Fixed possible bug.
  * - Added test case for Plugins_admin::get_registered_events().
