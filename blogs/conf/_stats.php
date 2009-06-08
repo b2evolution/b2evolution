@@ -148,7 +148,8 @@ $search_engines = array(
 	'scroogle.org/', // GW=
 	'cuil.com/',
 	'yandex.ru/yandsearch',
-	'go.mail.ru/search'
+	'go.mail.ru/search',
+	'//www.bing.com' //q=
 );
 
 
