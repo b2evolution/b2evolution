@@ -483,12 +483,6 @@ class Form extends Widget
 		{
 			$field_params['id'] = '';
 		}
-		else
-		{
-			$field_params['id'] = ' id="'.$field_params['class'].'"';
-		}
-
-
 
 		switch( $this->layout )
 		{
@@ -515,7 +509,7 @@ class Form extends Widget
 				// $r = '<fieldset'.get_field_attribs_as_string($field_params).'>'."\n";
 
 				$r = str_replace( '$fieldset_title$', $title, $r );
-				$r = str_replace( '$ID$', $field_params['id'], $r );
+				$r = str_replace( '$ID$', ( $field_params['id'] ? 'fwrap_'.$field_params['id'] : '' ), $r );
 				$r = str_replace( '$class$', $field_params['class'], $r );
 
 				if( empty($legend_params) )
@@ -2927,6 +2921,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.55  2009/06/09 12:00:30  yabs
+ * bug fix
+ *
  * Revision 1.54  2009/06/09 07:41:05  yabs
  * added replacement vars for class && id for fieldset_begin()
  *

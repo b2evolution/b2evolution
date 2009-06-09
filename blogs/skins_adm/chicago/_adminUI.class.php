@@ -291,7 +291,7 @@ class AdminUI extends AdminUI_general
 
 					'title_fmt' => '<div class="fieldset_title_bg" $title_attribs$><span style="float:right">$global_icons$</span>$title$</div></div></div><fieldset>'."\n",
 					'no_title_fmt' => '<div class="fieldset_title_bg" $title_attribs$><span style="float:right">$global_icons$</span>&nbsp;</div></div></div><fieldset>'."\n",
-					'fieldset_begin' => '<div class="fieldset_wrapper$class$"$ID$><h2 $title_attribs$>$fieldset_title$</h2>',
+					'fieldset_begin' => '<div class="fieldset_wrapper$class$" id="$ID$"><h2 $title_attribs$>$fieldset_title$</h2>',
 					'fieldset_end' => '</div>',
 					'fieldstart' => '<fieldset $ID$>'."\n",
 					'labelstart' => '<div class="label">',
@@ -315,7 +315,7 @@ class AdminUI extends AdminUI_general
 					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
 					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
 					'fieldstart' => '<fieldset $ID$>'."\n",
-					'fieldset_begin' => '<div class="fieldset_wrapper$class$"$ID$><div class="fieldset_title"><div class="fieldset_title_right">
+					'fieldset_begin' => '<div class="fieldset_wrapper$class$" id="$ID$"><div class="fieldset_title"><div class="fieldset_title_right">
 																<div class="fieldset_title_bg" $title_attribs$>$fieldset_title$</div></div></div>
 																<fieldset $fieldset_attribs$>'."\n",
 					'fieldset_end' => '</fieldset></div>'."\n",
@@ -382,6 +382,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.21  2009/06/09 11:59:55  yabs
+ * bug fix
+ *
  * Revision 1.20  2009/06/09 07:41:30  yabs
  * added replacement vars for class && id for fieldset_begin()
  *
