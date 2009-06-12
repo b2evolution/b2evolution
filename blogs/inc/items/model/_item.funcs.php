@@ -666,8 +666,9 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 					? 'sel_extracat_'.$cat_ID
 					: 'sel_maincat_'.$cat_ID ).'"'
 				.' style="padding-left:'.($level-1).'em;">'
-				.'<a href="'.htmlspecialchars($thisChapter->get_permanent_url()).'">'
 				.htmlspecialchars($thisChapter->name).'</label>'
+				.'<a href="'.htmlspecialchars($thisChapter->get_permanent_url()).'" title="'.htmlspecialchars(T_('View category in blog.')).'">'
+				.' &nbsp;&raquo;&nbsp; ' // TODO: dh> provide an icon instead?
 				.'</a>'
 				."</td></tr>\n";
 
@@ -856,6 +857,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.49  2009/06/12 22:02:17  blueyed
+ * cat_select: do not link the category name, but add an extra link: cat name is useful for selecting.
+ *
  * Revision 1.48  2009/06/12 21:39:46  blueyed
  * cat_select: link each category name to the permanent url
  *
