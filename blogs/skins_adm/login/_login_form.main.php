@@ -111,7 +111,7 @@ $Form->begin_form( 'fform' );
 		$Form->hidden( 'pwd_hashed', '' ); // gets filled by JS
 	}
 
-	$Form->begin_fieldset();
+	$Form->begin_fieldset('', array('style'=>'border:none')); // TODO: use a class like "noborder" instead?!
 
 	echo '<div class="center notes">'.T_('You will have to accept cookies in order to log in.').'</div>';
 
@@ -224,6 +224,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.12  2009/06/12 18:45:08  blueyed
+ * Make login form more beautiful, by not using an inner border.
+ *
  * Revision 1.11  2009/03/08 23:58:01  fplanque
  * 2009
  *
