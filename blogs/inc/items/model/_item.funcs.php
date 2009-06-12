@@ -663,10 +663,12 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 
 	$r .= '<td class="catsel_name"><label'
 				.' for="'.( $allow_cross_posting
-											? 'sel_extracat_'.$cat_ID
-											: 'sel_maincat_'.$cat_ID ).'"'
+					? 'sel_extracat_'.$cat_ID
+					: 'sel_maincat_'.$cat_ID ).'"'
 				.' style="padding-left:'.($level-1).'em;">'
+				.'<a href="'.htmlspecialchars($thisChapter->get_permanent_url()).'">'
 				.htmlspecialchars($thisChapter->name).'</label>'
+				.'</a>'
 				."</td></tr>\n";
 
 	return $r;
@@ -854,6 +856,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.48  2009/06/12 21:39:46  blueyed
+ * cat_select: link each category name to the permanent url
+ *
  * Revision 1.47  2009/06/01 17:42:47  tblue246
  * bpost_count_words(): Better PCRE test
  *
