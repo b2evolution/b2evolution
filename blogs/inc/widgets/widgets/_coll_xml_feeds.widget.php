@@ -149,8 +149,12 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 			echo $this->disp_params['item_start'];
 			echo $Skin->name.': ';
-			echo '<a href="'.$Blog->get_item_feed_url( $Skin->folder ).'">'.T_('Posts').'</a>, ';
-			echo '<a href="'.$Blog->get_comment_feed_url( $Skin->folder ).'">'.T_('Comments').'</a>';
+			echo '<a href="'.$Blog->get_item_feed_url( $Skin->folder ).'">'.T_('Posts').'</a>';
+			if ( $Blog->allowcomments != 'never' )
+			{
+				echo ', <a href="'.$Blog->get_comment_feed_url( $Skin->folder ).'">'.T_('Comments').'</a>';
+			}
+
 			echo $this->disp_params['item_end'];
 		}
 
@@ -191,6 +195,9 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.17  2009/06/12 13:24:09  waltercruz
+ * Don't show links for blog comments feed if the blog doesn't allow comments
+ *
  * Revision 1.16  2009/03/14 19:22:30  fplanque
  * minor
  *
