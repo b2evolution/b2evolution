@@ -25,9 +25,20 @@
  */
 function b2evonet_get_updates()
 {
+	global $allow_evo_stats;
 	global $DB, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow, $evo_charset;
 	global $Messages, $Settings, $baseurl, $instance_name, $app_name, $app_version, $app_date;
 	global $Debuglog;
+
+	if( !isset( $allow_evo_stats ) )
+	{ // set default
+		$allow_evo_stats = true;
+	}
+
+	if( !$allow_evo_stats )
+	{ // Only EdB will find this, and he'd thank you for it ;)
+		return;
+	}
 
 	$update_every = 3600*12; // 12 hours
 	$attempt_every = 3600*4; // 4 hours
@@ -75,7 +86,7 @@ function b2evonet_get_updates()
 	$message = new xmlrpcmsg(
 								'b2evo.getupdates',                           // Function to be called
 								array(
-									new xmlrpcval( $baseurl, 'string'),					// Unique identifier part 1
+									new xmlrpcval( ( $allow_evo_stats == 'anonymous' /* this might even get EdB to send you stats ;) */ ? md5( $baseurl ) : $baseurl ), 'string'),					// Unique identifier part 1
 									new xmlrpcval( $instance_name, 'string'),		// Unique identifier part 2
 									new xmlrpcval( $app_name, 'string'),		    // Version number
 									new xmlrpcval( $app_version, 'string'),	  	// Version number
@@ -147,6 +158,9 @@ function b2evonet_get_updates()
 
 /*
  * $Log$
+ * Revision 1.18  2009/06/13 13:47:40  yabs
+ * minor
+ *
  * Revision 1.17  2009/03/08 23:57:42  fplanque
  * 2009
  *
