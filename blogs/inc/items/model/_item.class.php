@@ -1490,9 +1490,7 @@ class Item extends ItemLight
 	/**
 	 * Split tags by comma or semicolon
 	 *
-	 * @todo fp> allow tags with spaces when quoted like "long tag". Nota comma should never be allowed in a tag.
- 	 *
- 	 * @param string The tags, separated by comma or semicolon
+	 * @param string The tags, separated by comma or semicolon
 	 */
 	function set_tags_from_string( $tags )
 	{
@@ -1508,7 +1506,7 @@ class Item extends ItemLight
 			array_walk( $this->tags, create_function( '& $tag', '$tag = mb_strtolower( $tag, mb_detect_encoding( $tag.\'a\', \'UTF-8, ISO-8859-1, ISO-8859-15\', true ) );' ) );
 		}
 		else
-		{	// Tblue> This doesn't work with ISO-8859-1 umlauts like 'Ä' and won't work with UTF-8 either.
+		{	// Tblue> Note: This doesn't work with ISO-8859-1 umlauts like 'Ä' and won't work with UTF-8 either.
 			array_walk( $this->tags, create_function( '& $tag', '$tag = strtolower( $tag );' ) );
 		}
 		$this->tags = array_unique( $this->tags );
@@ -3892,6 +3890,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.107  2009/06/13 18:47:01  tblue246
+ * minor
+ *
  * Revision 1.106  2009/06/01 11:26:06  tblue246
  * Item::set_tags_from_string(): a) Code improvements, b) trying to fix issue with umlauts causing SQL errors: http://forums.b2evolution.net/viewtopic.php?t=18213
  *
