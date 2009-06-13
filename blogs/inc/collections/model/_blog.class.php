@@ -353,12 +353,10 @@ class Blog extends DataObject
 			$this->set_setting( 'main_content', get_param( 'main_content' ) );
 		}
 
-		if( param( 'chapter_posts_per_page', 'integer', NULL ) !== NULL )
-		{ // Chapter link type:
-			$this->set_setting( 'chapter_posts_per_page', get_param( 'chapter_posts_per_page' ), true );
-			$this->set_setting( 'tag_posts_per_page', param( 'tag_posts_per_page', 'integer', NULL ), true );
-		}
-
+		// Chapter posts per page:
+		$this->set_setting( 'chapter_posts_per_page', param( 'chapter_posts_per_page', 'integer', NULL ), true );
+		// Tag posts per page:
+		$this->set_setting( 'tag_posts_per_page', param( 'tag_posts_per_page', 'integer', NULL ), true );
 
 		if( param( 'single_links',   'string', NULL ) !== NULL )
 		{ // Single post link type:
@@ -2125,6 +2123,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.67  2009/06/13 20:09:24  tblue246
+ * Fixed stupid bug: Blog settings SEO tab - number of posts on tag pages got not set and could not be reset; latter also applied for the chapter_posts_per_page setting. Ref: http://forums.b2evolution.net/viewtopic.php?t=18935
+ *
  * Revision 1.66  2009/05/27 14:46:33  waltercruz
  * Using categories description as meta-description for categories pages
  *
