@@ -120,6 +120,7 @@ class Hitlist
 		 */
 		global $DB;
 		global $Debuglog, $Settings, $localtimenow;
+		global $Plugins;
 
 		// Prune when $localtime is a NEW day (which will be the 1st request after midnight):
 		$last_prune = $Settings->get( 'auto_prune_stats_done' );
@@ -140,10 +141,34 @@ class Hitlist
 		$smaller_time = min( $sess_prune_before, $time_prune_before );
 		$sess_prune_YMD = date( 'Y-m-d H:i:s', $smaller_time );
 
-		$rows_affected = $DB->query( "
-			DELETE FROM T_sessions
-			WHERE sess_lastseen < '".$sess_prune_YMD."'", 'Autoprune sessions' );
-		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_sessions.', 'hit' );
+		if( $results = $DB->get_results( "
+				SELECT sess_ID FROM T_sessions
+				WHERE sess_lastseen < '".$sess_prune_YMD."'" )
+			)
+		{
+			$affected = array();
+			foreach( $results as $result )
+			{
+				$affected[] = $result->sess_ID;
+			}
+
+			// allow plugins to delete any data based on sessions
+			if( $sess_Plugins = $Plugins->get_list_by_event( 'BeforeSessionsDelete' ) )
+			{
+				foreach( $sess_Plugins as $sess_Plugin )
+				{ // Go through whole list of sess plugins
+					if( $plugins_affected = $Plugins->call_method( $sess_Plugin->ID, 'BeforeSessionsDelete', $affected ) )
+					{ // plugin wants to keep some of the sessions
+						$affected = array_diff( $affected, $plugins_affected );
+					}
+				}
+			}
+			if( !empty( $affected ) )
+			{ // we have some sessions to delete
+				$rows_affected = $DB->query( 'DELETE FOM T_sessions WHERE sess_ID IN( '.implode(',', $affected ).')', 'Autoprune sessions' );
+				$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_sessions.', 'hit' );
+			}
+		}
 
 		// Prune non-referrered basedomains (where the according hits got deleted)
 		// BUT only those with unknown dom_type/dom_status, because otherwise this
@@ -187,6 +212,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.4  2009/06/14 12:17:32  yabs
+ * adding BeforeSessionsDelete trigger to enable plugins to perform housekeeping based on the sessions that are about to be pruned
+ *
  * Revision 1.3  2009/03/08 23:57:45  fplanque
  * 2009
  *

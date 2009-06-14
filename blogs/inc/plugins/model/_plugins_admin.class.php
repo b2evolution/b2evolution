@@ -200,6 +200,7 @@ class Plugins_admin extends Plugins
 				'AfterUserRegistration' => 'Gets called after a new user has registered.',
 
 				'SessionLoaded' => 'Gets called after $Session is initialized, quite early.',
+				'BeforeSessionsDelete' => 'Gets called when sessions are being pruned to enable plugin house cleaning, plugin can return list of sessions they want to keep',
 
 				'AfterLoginAnonymousUser' => 'Gets called at the end of the login procedure for anonymous visitors.',
 				'AfterLoginRegisteredUser' => 'Gets called at the end of the login procedure for registered users.',
@@ -1468,6 +1469,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.15  2009/06/14 12:17:18  yabs
+ * adding BeforeSessionsDelete trigger to enable plugins to perform housekeeping based on the sessions that are about to be pruned
+ *
  * Revision 1.14  2009/06/07 14:23:24  yabs
  * enabling plugin disp types
  *
