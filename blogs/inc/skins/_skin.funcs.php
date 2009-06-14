@@ -425,7 +425,10 @@ function skin_include( $template_name, $params = array() )
 		{
 			foreach( $disp_Plugins as $disp_Plugin )
 			{ // Go through whole list of disp plugins
-				$disp_handlers = $Plugins->call_method( $disp_Plugin->ID, 'GetDispModes', $disp_handlers );
+				if( $plugin_modes = $Plugins->call_method( $disp_Plugin->ID, 'GetDispModes', $disp_handlers ) )
+				{ // plugin provides some custom disp modes
+					$disp_handlers = array_merge( $disp_handlers, $plugin_modes );
+				}
 			}
 		}
 
@@ -809,6 +812,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.56  2009/06/14 06:50:29  yabs
+ * code improvement for plugin custom disp modes
+ *
  * Revision 1.55  2009/06/07 14:24:17  yabs
  * enabling plugin disp types
  *
