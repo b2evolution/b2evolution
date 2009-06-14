@@ -53,7 +53,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = '1.9-dev';
+	var $version = '1.10-dev';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -782,11 +782,51 @@ class test_plugin extends Plugin
 		return rand( $params['min'], $params['max'] );
 	}
 
+
+	/**
+	 * Return list of custom disp types handled by this plugin
+	 *
+	 * @return array $disp_modes : list of disp modes supplied by this plugin
+	 */
+	function GetDispModes()
+	{
+		return array(
+				'disp_test' => '_test.disp.php', // display our test disp
+			);
+	}
+
+
+	/**
+	 * Display our custom disp mode(s)
+	 *
+	 * Only called if disp file doesn't exist in :
+	 * 	/skins/skin/
+	 * 	/skins/
+	 *
+	 * @param mixed array $params
+	 * 		disp > display mode requested
+	 *
+	 * @return did we display?
+	 */
+	function HandleDispMode( $params )
+	{
+		global $plugins_path;
+		$disp = 'disp_'.$params['disp'];
+		$my_modes = $this->GetDispModes( array() );
+		if( isset( $my_modes[$disp] ) )
+		{
+			require_once $plugins_path.'test_plugin/'.$my_modes[$disp];
+			return true;
+		}
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.79  2009/06/14 07:11:04  yabs
+ * adding custom disp mode example
+ *
  * Revision 1.78  2009/03/24 23:57:07  blueyed
  * Fix error in PHP5 during upgrade, when existing plugins are using Plugin(User)Settings in PluginInit. This needs a global Plugins instance, which is a reference to Plugins_admin during installation now.
  *
