@@ -141,17 +141,11 @@ class Hitlist
 		$smaller_time = min( $sess_prune_before, $time_prune_before );
 		$sess_prune_YMD = date( 'Y-m-d H:i:s', $smaller_time );
 
-		if( $results = $DB->get_results( "
+		if( $affected = $DB->get_row( "
 				SELECT sess_ID FROM T_sessions
-				WHERE sess_lastseen < '".$sess_prune_YMD."'" )
+				WHERE sess_lastseen < '".$sess_prune_YMD."'", ARRAY_N )
 			)
 		{
-			$affected = array();
-			foreach( $results as $result )
-			{
-				$affected[] = $result->sess_ID;
-			}
-
 			// allow plugins to delete any data based on sessions
 			if( $sess_Plugins = $Plugins->get_list_by_event( 'BeforeSessionsDelete' ) )
 			{
@@ -212,6 +206,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.5  2009/06/14 14:58:09  blueyed
+ * Use get_row to select sess_IDs for session pruning
+ *
  * Revision 1.4  2009/06/14 12:17:32  yabs
  * adding BeforeSessionsDelete trigger to enable plugins to perform housekeeping based on the sessions that are about to be pruned
  *
