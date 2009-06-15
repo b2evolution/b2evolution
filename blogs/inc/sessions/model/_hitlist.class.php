@@ -159,7 +159,7 @@ class Hitlist
 			}
 			if( !empty( $affected ) )
 			{ // we have some sessions to delete
-				$rows_affected = $DB->query( 'DELETE FOM T_sessions WHERE sess_ID IN( '.implode(',', $affected ).')', 'Autoprune sessions' );
+				$rows_affected = $DB->query( 'DELETE FROM T_sessions WHERE sess_ID IN( '.implode(',', $affected ).')', 'Autoprune sessions' );
 				$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_sessions.', 'hit' );
 			}
 		}
@@ -206,6 +206,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.6  2009/06/15 18:50:50  blueyed
+ * Fix SQL in session pruning: s/FOM/FROM/
+ *
  * Revision 1.5  2009/06/14 14:58:09  blueyed
  * Use get_row to select sess_IDs for session pruning
  *
