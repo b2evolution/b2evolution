@@ -501,16 +501,16 @@ class ComponentWidget extends DataObject
 		{	// Load all public blogs
 			$blog_array = $BlogCache->load_public( 'ID' );
 		}
-		
-		if( $this->disp_params['type'] == 'list' )
+
+		if( $this->disp_params['list_type'] == 'list' )
 		{
 			echo $this->disp_params['list_start'];
-	
+
 			foreach( $blog_array as $l_blog_ID )
 			{	// Loop through all public blogs:
-	
+
 				$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
-	
+
 				if( $Blog && $l_blog_ID == $Blog->ID )
 				{ // This is the blog being displayed on this page:
 				echo $this->disp_params['item_selected_start'];
@@ -521,10 +521,10 @@ class ComponentWidget extends DataObject
 					echo $this->disp_params['item_start'];
 					$link_class = $this->disp_params['link_default_class'];;
 				}
-	
+
 				echo '<a href="'.$l_Blog->gen_blogurl().'" class="'.$link_class.'" title="'
 											.$l_Blog->dget( 'name', 'htmlattr' ).'">';
-	
+
 				if( $Blog && $l_blog_ID == $Blog->ID )
 				{ // This is the blog being displayed on this page:
 					echo $this->disp_params['item_selected_text_start'];
@@ -542,7 +542,7 @@ class ComponentWidget extends DataObject
 					echo $this->disp_params['item_end'];
 				}
 			}
-	
+
 			echo $this->disp_params['list_end'];
 		}
 		else
@@ -560,7 +560,7 @@ class ComponentWidget extends DataObject
 				}
 				$select_options .= '>'.$l_Blog->dget( 'shortname', 'formvalue' ).'</option>'."\n";
 			}
-			
+
 			if( !empty($select_options) )
 			{
 				echo '<form action="'.$baseurl.'" method="get">';
@@ -608,6 +608,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.59  2009/06/18 07:36:06  yabs
+ * bugfix : $type is already a param ;)
+ *
  * Revision 1.58  2009/05/28 06:49:05  sam2kb
  * Blog list widget can be either a "regular list" or a "select menu"
  * See http://forums.b2evolution.net/viewtopic.php?t=18794

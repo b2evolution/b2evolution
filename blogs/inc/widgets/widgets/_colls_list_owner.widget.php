@@ -89,7 +89,7 @@ class colls_list_owner_Widget extends ComponentWidget
 					'note' => T_( 'This is the title to display, $icon$ will be replaced by the feed icon' ),
 					'defaultvalue' => T_('My blogs'),
 				),
-				'type' => array(
+				'list_type' => array(
 					'label' => T_( 'Display type' ),
 					'type' => 'select',
 					'defaultvalue' => 'list',
@@ -120,6 +120,9 @@ class colls_list_owner_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.6  2009/06/18 07:35:53  yabs
+ * bugfix : $type is already a param ;)
+ *
  * Revision 1.5  2009/05/28 06:49:06  sam2kb
  * Blog list widget can be either a "regular list" or a "select menu"
  * See http://forums.b2evolution.net/viewtopic.php?t=18794
