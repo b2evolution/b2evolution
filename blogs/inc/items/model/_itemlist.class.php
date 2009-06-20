@@ -99,6 +99,8 @@ class ItemList2 extends ItemListLight
 		$content = param( 'content', 'html', true );
 		$post_title = param( 'post_title', 'html', true );
 		$post_titletag = param( 'titletag', 'string', true );
+		$post_metadesc = param( 'metadesc', 'string', true );
+		$post_metakeywords = param( 'metakeywords', 'string', true );
 		$post_excerpt = param( 'post_excerpt', 'string', true );
 		$post_url = param( 'post_url', 'string', '' );
 		$post_category = param( 'post_category', 'integer', true );
@@ -169,6 +171,8 @@ class ItemList2 extends ItemListLight
 			'".$DB->escape($content)."' AS post_content,
 			'".$DB->escape($post_title)."' AS post_title,
 			'".$DB->escape($post_titletag)."' AS post_titletag,
+			'".$DB->escape($post_metadesc)."' AS post_metadesc,
+			'".$DB->escape($post_metakeywords)."' AS post_metakeywords,
 			'".$DB->escape($post_excerpt)."' AS post_excerpt,
 			NULL AS post_urltitle,
 			'".$DB->escape($post_url)."' AS post_url,
@@ -695,6 +699,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.19  2009/06/20 17:19:33  leeturner2701
+ * meta desc and meta keywords per blog post
+ *
  * Revision 1.18  2009/03/20 22:44:04  fplanque
  * Related Items -- Proof of Concept
  *

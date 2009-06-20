@@ -2372,6 +2372,12 @@ function upgrade_b2evo_tables()
 		task_begin( 'Altering Blogs table... ' );
 		$DB->query( "ALTER TABLE T_blogs CHANGE COLUMN blog_shortname blog_shortname varchar(255) default ''" );
 		task_end();
+		
+		task_begin( 'Altering Items table... ' );
+		$DB->query( "ALTER TABLE T_items__item
+			ADD COLUMN post_metadesc  VARCHAR(255) NULL DEFAULT NULL AFTER post_titletag,
+			ADD COLUMN post_metakeywords  VARCHAR(255) NULL DEFAULT NULL AFTER post_metadesc" );
+		task_end();
 	}
 	
 
@@ -2524,6 +2530,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.293  2009/06/20 17:19:33  leeturner2701
+ * meta desc and meta keywords per blog post
+ *
  * Revision 1.292  2009/06/01 16:23:32  sam2kb
  * new_db_version updated to 9950
  *

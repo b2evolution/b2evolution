@@ -84,6 +84,10 @@ $Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
 $Form->hidden( 'post_excerpt', $edited_Item->get( 'excerpt' ) );
 $Form->hidden( 'post_urltitle', $edited_Item->get( 'urltitle' ) );
 $Form->hidden( 'titletag', $edited_Item->get( 'titletag' ) );
+$Form->hidden( 'metadesc', $edited_Item->get( 'metadesc' ) );
+$Form->hidden( 'metakeywords', $edited_Item->get( 'metakeywords' ) );
+
+
 if( $Blog->get_setting( 'use_workflow' ) )
 {	// We want to use workflow properties for this blog:
 	$Form->hidden( 'item_priority', $edited_Item->priority );
@@ -270,6 +274,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.25  2009/06/20 17:19:30  leeturner2701
+ * meta desc and meta keywords per blog post
+ *
  * Revision 1.24  2009/03/08 23:57:44  fplanque
  * 2009
  *

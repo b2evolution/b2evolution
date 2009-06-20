@@ -223,6 +223,16 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->text_input( 'titletag', $edited_Item->get('titletag'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
 
+	echo '<tr><td class="label"><label for="metadesc"><strong>'.T_('Description').':</strong></label></td>';
+	echo '<td class="input" width="97%">';
+	$Form->text_input( 'metadesc', $edited_Item->get('metadesc'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
+	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
+	
+	echo '<tr><td class="label"><label for="metakeywords"><strong>'.T_('Keywords').':</strong></label></td>';
+	echo '<td class="input" width="97%">';
+	$Form->text_input( 'metakeywords', $edited_Item->get('metakeywords'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
+	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
+
 	echo '<tr><td class="label"><label for="item_tags"><strong>'.T_('Tags').':</strong> <span class="notes">'.T_('sep by ,').'</span></label></label></td>';
 	echo '<td class="input" width="97%">';
 	$Form->text_input( 'item_tags', $item_tags, 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
@@ -404,6 +414,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.44  2009/06/20 17:19:31  leeturner2701
+ * meta desc and meta keywords per blog post
+ *
  * Revision 1.43  2009/03/08 23:57:44  fplanque
  * 2009
  *

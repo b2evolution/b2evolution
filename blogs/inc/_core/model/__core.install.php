@@ -244,6 +244,8 @@ $schema_queries = array(
 			post_title                  text NOT NULL,
 			post_urltitle               VARCHAR(210) NULL DEFAULT NULL,
 			post_titletag               VARCHAR(255) NULL DEFAULT NULL,
+			post_metadesc               VARCHAR(255) NULL DEFAULT NULL,
+			post_metakeywords           VARCHAR(255) NULL DEFAULT NULL,
 			post_url                    VARCHAR(255) NULL DEFAULT NULL,
 			post_main_cat_ID            int(11) unsigned NOT NULL,
 			post_notifications_status   ENUM('noreq','todo','started','finished') NOT NULL DEFAULT 'noreq',
@@ -572,6 +574,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.19  2009/06/20 17:19:33  leeturner2701
+ * meta desc and meta keywords per blog post
+ *
  * Revision 1.18  2009/05/31 17:04:41  sam2kb
  * blog_shortname field extended to 255 characters
  * Please change the new_db_version

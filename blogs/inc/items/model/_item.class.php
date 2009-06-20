@@ -112,6 +112,16 @@ class Item extends ItemLight
 	var $content;
 
 	var $titletag;
+	
+	/**
+	 * Meta Description tag for this post
+	 */
+	var $metadesc;
+	
+	/**
+	 * Meta keywords for this post
+	 */
+	var $metakeywords;
 
 	/**
 	 * Lazy filled, use split_page()
@@ -252,6 +262,8 @@ class Item extends ItemLight
 			$this->status = $db_row->post_status;
 			$this->content = $db_row->post_content;
 			$this->titletag = $db_row->post_titletag;
+			$this->metadesc = $db_row->post_metadesc;
+			$this->metakeywords = $db_row->post_metakeywords;
 			$this->pst_ID = $db_row->post_pst_ID;
 			$this->datedeadline = $db_row->post_datedeadline;
 			$this->priority = $db_row->post_priority;
@@ -449,6 +461,14 @@ class Item extends ItemLight
 
 		if( param( 'titletag', 'string', NULL ) !== NULL ) {
 			$this->set_from_Request( 'titletag', 'titletag' );
+		}
+		
+		if( param( 'metadesc', 'string', NULL ) !== NULL ) {
+			$this->set_from_Request( 'metadesc', 'metadesc' );
+		}
+		
+		if( param( 'metakeywords', 'string', NULL ) !== NULL ) {
+			$this->set_from_Request( 'metakeywords', 'metakeywords' );
 		}
 
 		if( param( 'item_tags', 'string', NULL ) !== NULL ) {
@@ -1484,6 +1504,24 @@ class Item extends ItemLight
 		}
 
 		return $this->titletag;
+	}
+	
+	/**
+	 * Get the meta description tag
+	 *
+	 */
+	function get_metadesc()
+	{
+		return $this->metadesc;
+	}
+	
+	/**
+	 * Get the meta keyword tag
+	 *
+	 */
+	function get_metakeywords()
+	{
+		return $this->metakeywords;
 	}
 
 
@@ -3890,6 +3928,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.108  2009/06/20 17:19:32  leeturner2701
+ * meta desc and meta keywords per blog post
+ *
  * Revision 1.107  2009/06/13 18:47:01  tblue246
  * minor
  *

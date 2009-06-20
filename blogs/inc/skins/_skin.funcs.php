@@ -549,6 +549,17 @@ function skin_description_tag()
 		$Item = & $MainList->get_by_idx( 0 );
 		$r = preg_replace( '|[\r\n]+|', '', $Item->get('excerpt') );
 	}
+	elseif(in_array( $disp, array( 'single','page')) )
+	{
+		// custom desc for the current single post:
+		$Item = & $MainList->get_by_idx( 0 );
+		$r = $Item->get_metadesc();
+		if( empty($r) )
+		{
+			// default to desc set up in blog settings
+			$r = $Blog->get('shortdesc');
+		}
+	}
 
 	if( !empty($r) )
 	{
@@ -562,7 +573,7 @@ function skin_description_tag()
  */
 function skin_keywords_tag()
 {
-	global $Blog;
+	global $Blog, $disp, $MainList;
 
 	$r = '';
 
@@ -570,6 +581,18 @@ function skin_keywords_tag()
 	{
 		$r = $Blog->get('keywords');
 	}
+	elseif(in_array( $disp, array( 'single','page')) )
+	{
+		// custom keywords for the current single post:
+		$Item = & $MainList->get_by_idx( 0 );
+		$r = $Item->get_metakeywords();
+		if( empty($r) )
+		{
+			// default to keywords set up in blog settings
+			$r = $Blog->get('keywords');
+		}
+	}
+
 
 	if( !empty($r) )
 	{
@@ -812,6 +835,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.57  2009/06/20 17:19:35  leeturner2701
+ * meta desc and meta keywords per blog post
+ *
  * Revision 1.56  2009/06/14 06:50:29  yabs
  * code improvement for plugin custom disp modes
  *
