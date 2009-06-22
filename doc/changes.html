@@ -30,6 +30,15 @@
 		<div class="block3">
 
 			<h1>3.x series</h1>
+			<h2>3.2.0-CVS</h2>
+			<ul>
+				<li>
+					<strong>Skins:</strong>
+					<ul>
+						<li>Skins can now have skin-specific translations ("locales" folder in the skin's folder, directory structure is the same as for plugin translations). (tblue246)</li>
+					</ul>
+				</li>
+			</ul>
 			<h2>3.2.0-beta</h2>
 			<ul>
 				<li><strong>Skins:
@@ -190,11 +199,12 @@
 						<li>You can now specify a different title to be displayed in the &lt;title&gt; tag than the regular title of your post</li>
 					</ul>
 				</li>
-				<li>Logging and stats					</li>
+				<li>Logging and stats
 				<ul>
 					<li>Session and Hit logging as well as debug info display are now done systematically at PHP shutdown. Therefore calls to $Hit-&gt;log() and debug_info() are no longer needed within skins. (It doesn't hurt to let them there either.) </li>
 					<li>Keyphrase logging</li>
 				</ul>
+				</li>
 				<li>More SEO settings:
 					<ul>
 						<li>Customizable 404 pages</li>
@@ -612,17 +622,15 @@
 				<li><strong>Enhanced SEO:</strong>
 					<ul>
 						<li>Automatic XML sitemap generation (fplanque)</li>
+						<li>Made permalinks / URL titles Google friendly (fplanque)</li>
+						<li>Clean category/chapter URLs (fplanque)</li>
+						<li>Added a wide variety of permalink formats to chose from (fplanque)</li>
+						<li>New post visibility status 'redirect': allows to redirect old posts to a new location. (fplanque)</li>
+						<li>301 redirects of post requests to their canonical permalink URL (useful to unify older URLs) (fplanque)</li>
+						<li>301 redirects of category requests to their canonical URL (useful to unify older URLs) (fplanque)</li>
+						<li>All redirects are now either 301 or 303 (No more stinkin' 302s) (fplanque)</li>
 					</ul>
 				</li>
-				<ul>
-					<li>Made permalinks / URL titles Google friendly (fplanque)</li>
-					<li>Clean category/chapter URLs (fplanque)</li>
-					<li>Added a wide variety of permalink formats to chose from (fplanque)</li>
-					<li>New post visibility status 'redirect': allows to redirect old posts to a new location. (fplanque)</li>
-					<li>301 redirects of post requests to their canonical permalink URL (useful to unify older URLs) (fplanque)</li>
-					<li>301 redirects of category requests to their canonical URL (useful to unify older URLs) (fplanque)</li>
-					<li>All redirects are now either 301 or 303 (No more stinkin' 302s) (fplanque)</li>
-				</ul>
 				<li><strong>Enhanced evoCore framework:
 					</strong>
 					<ul>
@@ -1390,7 +1398,7 @@
 			Online resources: <a href="http://b2evolution.net/" target="_blank">Official website</a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank">Find a host</a> &bull; <a href="http://manual.b2evolution.net/" target="_blank">Manual</a> &bull; <a href="http://forums.b2evolution.net/" target="_blank">Forums</a>
 		<!-- InstanceEndEditable --></div>
 	
-	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright © 2003-2009 by François Planque & others · <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a><!-- InstanceEndEditable --></div>
+	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright © 2003-2009 by François Planque &amp; others · <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a><!-- InstanceEndEditable --></div>
 		
 	</div>
 	</div>
