@@ -43,6 +43,13 @@ class Skin extends DataObject
 	 */
 	var $container_list = NULL;
 
+	/**
+	 * The translations keyed by locale. They get loaded through include() of _global.php.
+	 * @see Skin::T_()
+	 * @var array
+	 */
+	var $_trans = array();
+
 
 	/**
 	 * Constructor
@@ -547,11 +554,65 @@ class Skin extends DataObject
 	{
 		// override in specific skins...
 	}
+
+
+	/**
+	 * Translate a given string, in the Skin's context.
+	 *
+	 * This means, that the translation is obtained from the Skin's
+	 * "locales" folder.
+	 *
+	 * It uses the global/regular {@link T_()} function as a fallback.
+	 *
+	 * @param string The string (english), that should be translated
+	 * @param string Requested locale ({@link $current_locale} gets used by default)
+	 * @return string The translated string.
+	 *
+	 * @uses T_()
+	 * @since 3.2.0 (after beta)
+	 */
+	function T_( $string, $req_locale = '' )
+	{
+		global $skins_path;
+
+		if( ( $return = T_( $string, $req_locale, array(
+								'ext_transarray' => & $this->_trans,
+								'alt_basedir'    => $skins_path.$this->folder,
+							) ) ) == $string )
+		{	// This skin did not provide a translation - fallback to global T_():
+			return T_( $string, $req_locale );
+		}
+
+		return $return;
+	}
+
+
+	/**
+	 * Translate and escape single quotes.
+	 *
+	 * This is to be used mainly for Javascript strings.
+	 *
+	 * @param string String to translate
+	 * @param string Locale to use
+	 * @return string The translated and escaped string.
+	 *
+	 * @uses Skin::T_()
+	 * @since 3.2.0 (after beta)
+	 */
+	function TS_( $string, $req_locale = '' )
+	{
+		return str_replace( "'", "\\'", $this->T_( $string, $req_locale ) );
+	}
+
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.17  2009/06/22 19:31:07  tblue246
+ * Skin-specific translations ("locales" folder in the skin's folder, directory structure is the same as for plugins).
+ *
  * Revision 1.16  2009/05/24 21:14:38  fplanque
  * _skin.class.php can now provide skin specific settings.
  * Demo: the custom skin has configurable header colors.

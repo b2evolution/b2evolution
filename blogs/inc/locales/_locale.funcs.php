@@ -47,17 +47,19 @@ if( $use_l10n )
 	 *
 	 * @param string String to translate, '' to get language file info (as in gettext spec)
 	 * @param string locale to translate to, '' to use current locale
-	 * @param array Array containing the following keys:
+	 * @param array Array containing the following keys (all optional):
 	 *              - 'ext_transarray': A reference to an alternate array
 	 *                                  to use for the caching of the
 	 *                                  translated strings or NULL to use
 	 *                                  the internal array.
-	 *              - 'plugin_name': Plugin name if you want to use a plugin
-	 *                               translation file instead of the global one.
+	 *              - 'alt_basedir': Alternate base directory to search
+	 *                               for translations, e. g. a plugin or
+	 *                               skin directory.
 	 *              - 'for_helper': (boolean) Is the translation for the b2evoHelper object?
 	 * @return string The translated string or the original string on error.
 	 *
-	 * @internal The last parameter is used by e. g. Plugin::T_().
+	 * @internal The last parameter/its 'alt_basedir' key is used by
+	 *           Plugin::T_() and Skin::T_().
 	 */
 	function T_( $string, $req_locale = '', $params = array() )
 	{
@@ -76,8 +78,8 @@ if( $use_l10n )
 
 		$params = array_merge( array(
 								'ext_transarray' => NULL,
-								'plugin_name'    => '',
-								'for_helper' => false,
+								'alt_basedir'    => '',
+								'for_helper'     => false,
 								), $params );
 
 		if( empty( $req_locale ) )
@@ -117,9 +119,10 @@ if( $use_l10n )
 
 		if( ! isset( $trans[ $messages ] ) )
 		{ // Translations for current locale have not yet been loaded:
-			if ( $params['plugin_name'] != '' )
-			{	// Load the plugin's translation file:
-				$path = $plugins_path.$params['plugin_name'].'/locales/'.$messages.'/_global.php';
+			if ( $params['alt_basedir'] != '' )
+			{	// Load the translation file from the alternative base dir:
+				//$Debuglog->add( 'Using alternative basedir ['.$params['alt_basedir'].']', 'locale' );
+				$path = $params['alt_basedir'].'/locales/'.$messages.'/_global.php';
 			}
 			else
 			{	// Load our global translation file.
@@ -232,11 +235,11 @@ else
  * @uses T_()
  * @param string String to translate
  * @param string Locale to use
- * @return string
+ * @return string The translated and escaped string.
  */
 function TS_( $string, $req_locale = '' )
 {
-	return str_replace( "'", "\'", T_( $string, $req_locale ) );
+	return str_replace( "'", "\\'", T_( $string, $req_locale ) );
 }
 
 
@@ -1041,6 +1044,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.26  2009/06/22 19:31:06  tblue246
+ * Skin-specific translations ("locales" folder in the skin's folder, directory structure is the same as for plugins).
+ *
  * Revision 1.25  2009/05/28 23:01:03  blueyed
  * Add Debuglog when charsets are not setup yet when translating: encoding issues in e.g. login form.. :/
  *

@@ -2253,11 +2253,11 @@ class Plugin
 	 * This means, that the translation is obtained from the Plugin's "locales" folder.
 	 * @link http://manual.b2evolution.net/Localization#Plugins
 	 *
-	 * It uses the global/regular {@link T_()} function as fallback.
+	 * It uses the global/regular {@link T_()} function as a fallback.
 	 *
 	 * @param string The string (english), that should be translated
 	 * @param string Requested locale ({@link $current_locale} gets used by default)
-	 * @return string
+	 * @return string The translated string.
 	 * @uses T_()
 	 */
 	function T_( $string, $req_locale = '' )
@@ -2282,7 +2282,10 @@ class Plugin
 			}
 		}
 
-		if ( ( $return = T_( $string, $req_locale, array( 'ext_transarray' => & $this->_trans, 'plugin_name' => $this->classname ) ) ) == $string )
+		if ( ( $return = T_( $string, $req_locale, array(
+								'ext_transarray' => & $this->_trans,
+								'alt_basedir'    => $plugins_path.$this->classname,
+							) ) ) == $string )
 		{	// Fallback to global translation file:
 			return T_( $string, $req_locale );
 		}
@@ -2299,11 +2302,11 @@ class Plugin
 	 * @since 2.5.0
 	 * @param string String to translate
 	 * @param string Locale to use
-	 * @return string
+	 * @return string The translated and escaped string.
 	 */
 	function TS_( $string, $req_locale = '' )
 	{
-		return str_replace( "'", "\'", $this->T_( $string, $req_locale ) );
+		return str_replace( "'", "\\'", $this->T_( $string, $req_locale ) );
 	}
 
 
@@ -2873,6 +2876,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.24  2009/06/22 19:31:07  tblue246
+ * Skin-specific translations ("locales" folder in the skin's folder, directory structure is the same as for plugins).
+ *
  * Revision 1.23  2009/05/26 20:14:10  blueyed
  * BeforeDisable now gets triggered only if status gets changed to disabled. Also do not update status, if it would be the same, but add safety net (which rather should be an assert prolly).
  *
