@@ -67,8 +67,6 @@ global $selected_Filelist;
  */
 global $edited_Item;
 
-global $edited_User;
-
 global $Blog;
 
 global $fm_hide_dirtree, $create_name, $ads_list_path;
@@ -630,6 +628,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.17  2009/06/23 20:53:54  tblue246
+ * File browser: Display a help notice when changing an user avatar
+ *
  * Revision 1.16  2009/05/25 20:24:20  fplanque
  * cleaned up some more UI
  *

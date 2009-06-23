@@ -64,6 +64,14 @@ global $fm_FileRoot, $path;
  * @var Item
  */
 global $edited_Item;
+
+global $edited_User;
+
+if( isset( $edited_User ) )
+{	// Display a help notice for setting a new avatar:
+	printf( '<div>'.T_( 'Click on a link %s icon below to change your avatar.' )
+				   .'</div>', get_icon( 'link', 'imgtag', array( 'class'=>'top' ) ) );
+}
 ?>
 
 <!-- FILE BROWSER -->
@@ -382,6 +390,9 @@ global $edited_Item;
 
 /*
  * $Log$
+ * Revision 1.14  2009/06/23 20:53:54  tblue246
+ * File browser: Display a help notice when changing an user avatar
+ *
  * Revision 1.13  2009/03/08 23:57:43  fplanque
  * 2009
  *
