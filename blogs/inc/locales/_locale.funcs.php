@@ -235,11 +235,12 @@ else
  * @uses T_()
  * @param string String to translate
  * @param string Locale to use
+ * @param array  See {@link T_()}
  * @return string The translated and escaped string.
  */
-function TS_( $string, $req_locale = '' )
+function TS_( $string, $req_locale = '', $params = array() )
 {
-	return str_replace( "'", "\\'", T_( $string, $req_locale ) );
+	return str_replace( "'", "\\'", T_( $string, $req_locale, $params ) );
 }
 
 
@@ -1044,6 +1045,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.27  2009/06/23 07:52:02  tblue246
+ * Add missing $param to TS_()
+ *
  * Revision 1.26  2009/06/22 19:31:06  tblue246
  * Skin-specific translations ("locales" folder in the skin's folder, directory structure is the same as for plugins).
  *
