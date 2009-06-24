@@ -46,7 +46,7 @@ class whosonline_plugin extends Plugin
 	 * either in the subclass declaration or in the subclass constructor.
 	 */
 
-	var $name = 'Who\'s online Widget';
+	var $name;
 	var $code = 'evo_WhosOnline';
 	var $priority = 96;
 	var $version = '2.0';
@@ -59,6 +59,7 @@ class whosonline_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
+		$this->name = T_( 'Who\'s online Widget' );
 		$this->short_desc = T_('This skin tag displays a list of whos is online.');
 		$this->long_desc = T_('All logged in users and guest users who have requested a page in the last 5 minutes are listed.');
 	}
@@ -305,6 +306,9 @@ class OnlineSessions
 
 /*
  * $Log$
+ * Revision 1.5  2009/06/24 18:47:54  tblue246
+ * Make widget plugin names translatable
+ *
  * Revision 1.4  2009/03/08 23:57:48  fplanque
  * 2009
  *

@@ -47,7 +47,7 @@ class calendar_plugin extends Plugin
 	 * either in the subclass declaration or in the subclass constructor.
 	 */
 
-	var $name = 'Calendar Widget';
+	var $name;
 	var $code = 'evo_Calr';
 	var $priority = 20;
 	var $version = '3.0';
@@ -65,6 +65,7 @@ class calendar_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
+		$this->name = T_( 'Calendar Widget' );
 		$this->short_desc = T_('This skin tag displays a navigable calendar.');
 		$this->long_desc = T_('Days containing posts are highlighted.');
 
@@ -1146,6 +1147,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.57  2009/06/24 18:47:54  tblue246
+ * Make widget plugin names translatable
+ *
  * Revision 1.56  2009/05/18 03:59:39  fplanque
  * minor/doc
  *

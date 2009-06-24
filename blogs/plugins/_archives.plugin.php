@@ -52,7 +52,7 @@ class archives_plugin extends Plugin
 	 * either in the subclass declaration or in the subclass constructor.
 	 */
 
-	var $name = 'Archives Widget';
+	var $name;
 	var $code = 'evo_Arch';
 	var $priority = 50;
 	var $version = '3.2';
@@ -65,6 +65,7 @@ class archives_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
+		$this->name = T_( 'Archives Widget' );
 		$this->short_desc = T_('This skin tag displays a list of post archives.');
 		$this->long_desc = T_('Archives can be grouped monthly, daily, weekly or post by post.');
 
@@ -607,6 +608,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.51  2009/06/24 18:47:54  tblue246
+ * Make widget plugin names translatable
+ *
  * Revision 1.50  2009/05/26 22:18:23  fplanque
  * fix limit (and make it configurable)
  *
