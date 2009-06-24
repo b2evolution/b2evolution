@@ -668,7 +668,7 @@ If needed, a skin can format info pages differently from regular posts.");
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("<p>Skins, Stubs, Templates &amp; website integration..."), T_("By default, blogs are displayed using a skin. (More on skins in another post.)</p>
+	$edited_Item->insert( 1, T_("Skins, Stubs, Templates &amp; website integration..."), T_("<p>By default, blogs are displayed using a skin. (More on skins in another post.)</p>
 
 <p>This means, blogs are accessed through '<code>index.php</code>', which loads default parameters from the database and then passes on the display job to a skin.</p>
 
@@ -852,6 +852,9 @@ If needed, a skin can format info pages differently from regular posts.");
 
 /*
  * $Log$
+ * Revision 1.264  2009/06/24 03:32:31  sam2kb
+ * minor
+ *
  * Revision 1.263  2009/05/26 20:40:36  waltercruz
  * Trying to show up a bug on linkblog agregation
  *
