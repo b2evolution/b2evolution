@@ -131,8 +131,15 @@ class videoplug_plugin extends Plugin
 					// TODO: verify validation / add for others..
 					switch( tag )
 					{
+						case 'google':
+							if( video_ID.match( /^[0-9-]+$/ ) )
+							{ // valid
+								valid_video_ID = true;
+							}
+							break;
+
 						case 'youtube':
-							if( video_ID.match( /^\w+$/ ) )
+							if( video_ID.match( /^[a-z0-9_-]+$/i ) )
 							{ // valid
 								valid_video_ID = true;
 							}
@@ -172,6 +179,9 @@ class videoplug_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.21  2009/06/26 16:49:55  tblue246
+ * Video plugin: Add JS check for Google Video ID and fix check for Youtube IDs.
+ *
  * Revision 1.20  2009/03/08 23:57:52  fplanque
  * 2009
  *
