@@ -159,10 +159,10 @@ class twitter_plugin extends Plugin
 			$host = 'twitter.com';
 			$url = '/statuses/update.xml?status='.urlencode( $msg );
 			// Build the header
-			$header = "POST $url HTTP/1.0\r\n";
-			$header .= "Host: $host\r\n";
-			$header .= "Authorization: Basic ".base64_encode("$username:$password")."\r\n";
-			$header .= "Connection: Close\r\n\r\n";
+			$header  = 'POST '.$url.' HTTP/1.0'."\r\n";
+			$header .= 'Host: '.$host."\r\n";
+			$header .= 'Authorization: Basic '.base64_encode( $username.':'.$password )."\r\n";
+			$header .= 'Connection: Close'."\r\n\r\n";
 			if( $fp = fsockopen($host, 80) )
 			{
 				fputs($fp, $header );
@@ -254,6 +254,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.14  2009/06/26 22:07:20  tblue246
+ * Minor (single quotes)
+ *
  * Revision 1.13  2009/06/04 18:02:48  yabs
  * Removed CURL requirement.
  * Added $Item->excerpt as a replacement value ( note : I haven't added any char count check, you may wish to consider adding one )
