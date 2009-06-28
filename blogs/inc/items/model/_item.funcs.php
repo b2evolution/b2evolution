@@ -344,28 +344,6 @@ function get_postdata($postid)
  */
 function bpost_count_words( $str )
 {
-	$str = trim( strip_tags( $str ) );
-	if( ! function_exists( 'str_word_count' ) )
-	{
-		/* In case str_word_count() doesn't exist (to accomodate PHP < 4.3).
-		 * Code adapted from post by "brettNOSPAM at olwm dot NO_SPAM dot com"
-		 * at PHP documentation page for str_word_count(). A better
-		 * implementation probably exists.
-		 */
-		if( $str === '' )
-		{
-			return 0;
-		}
-
-		return count( preg_split( '|\s+|',
-						preg_replace( '~[^\w\d\'".!?;,\\\\/:&@-]+~', ' ', $str ),
-						-1, PREG_SPLIT_NO_EMPTY ) );
-	}
-	elseif( @preg_match( '|\pL|', 'foo' ) === false )
-	{	// PCRE doesn't support \p, use str_word_count()
-		return str_word_count( $str );
-	}
-
 	$count = 0;
 
 	foreach( preg_split( '#\s+#', convert_charset( $str, 'UTF-8' ), -1,
@@ -857,6 +835,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.50  2009/06/28 20:02:43  fplanque
+ * ROLLBACK: b2evo requires PHP 4.3 as a minimum version.This is already a very old version. Code to accomodate older versions is bloat.
+ *
  * Revision 1.49  2009/06/12 22:02:17  blueyed
  * cat_select: do not link the category name, but add an extra link: cat name is useful for selecting.
  *
