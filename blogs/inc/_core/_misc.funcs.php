@@ -745,6 +745,9 @@ function make_clickable_callback( $text, $moredelim = '&amp;' )
 {
 	$pattern_domain = '([a-z0-9\-]+\.[a-z0-9\-.\~]+)'; // a domain name (not very strict)
 	$text = preg_replace(
+		/* Tblue> I removed the double quotes from the first RegExp because
+				  it made URLs in tag attributes clickable.
+				  See http://forums.b2evolution.net/viewtopic.php?p=92073 */
 		array( '#(^|[\s>])(https?|mailto)://([^<>{}\s]+[^.,<>{}\s])#i',
 			'#(^|[\s>])aim:([^,<\s]+)#i',
 			'#(^|[\s>])icq:(\d+)#i',
@@ -3428,6 +3431,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.105  2009/06/28 19:21:49  tblue246
+ * minor/doc
+ *
  * Revision 1.104  2009/06/01 11:57:18  tblue246
  * send_javascript_message(): Send correct Content-Type header (set charset)
  *
