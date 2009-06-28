@@ -42,7 +42,16 @@ $params = array_merge( array(
 				'after_image_legend' =>  '</div>',
 				'after_image' =>         '</div>',
 				'after' =>               '</div>',
-				'image_size' =>          'fit-720x500'
+				'image_size' =>          'fit-720x500',
+				/* Comment the above line to use the default image size
+				 * (fit-720x500). Possible values for the image_size
+				 * parameter are:
+				 * fit-720x500, fit-640x480, fit-520x390, fit-400x320,
+				 * fit-320x320, fit-160x160, fit-160x120, fit-80x80,
+				 * crop-80x80, crop-64x64, crop-48x48, crop-32x32,
+				 * crop-15x15
+				 * See also the $thumbnail_sizes array in conf/_advanced.php.
+				 */
 			) );
 	?>
 
@@ -162,6 +171,9 @@ $params = array_merge( array(
 <?php
 /*
  * $Log$
+ * Revision 1.2  2009/06/28 17:37:54  tblue246
+ * Adding list of possible values for the image_size param to Photoblog skin to make life easier for new/unexperienced users.
+ *
  * Revision 1.1  2009/05/23 14:12:42  fplanque
  * All default skins now support featured posts and intro posts.
  *
