@@ -3932,8 +3932,16 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.110  2009/06/28 20:16:06  tblue246
+ * doc :(
+ *
  * Revision 1.109  2009/06/28 19:58:54  fplanque
  * ROLLBACK: REMINDER: "mb_detect_encoding() is now officially banned from being used anywhere"
+ * Tblue> Then remove it from convert_charset(), too (I fear this will
+ *        introduce new problems). mb_detect_encoding() was necessary to
+ *        fix SQL errors caused by umlauts etc. (see commit message for
+ *        rev 1.106). Did you at least try if my code still triggered the
+ *        bug on your blog which caused you to ban mb_detect_encoding()?
  *
  * Revision 1.108  2009/06/20 17:19:32  leeturner2701
  * meta desc and meta keywords per blog post
