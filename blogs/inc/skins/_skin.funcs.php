@@ -463,6 +463,20 @@ function skin_include( $template_name, $params = array() )
 		$Debuglog->add('skin_include ('.($Item ? 'Item #'.$Item->ID : '-').'): '.rel_path_to_base($file), 'skins');
 		require $file;
 	}
+
+	/* fp> I am disabling this to get your attention so you can fix it quickly :p
+
+	1. Every time a plugin wants to handle a disp, it will go through 2 file_exists() which is heavy on the filesystem
+	It would make more sense to have plugin handlers begin with a special char for example '#' and pass handling over to Plugin if we detect that.
+	Making sense?
+
+	2. The disp should only be handled by ONE SINGLE plugin. Correct?
+	So going through a loop here again is a bit of a waste.
+	It would make more sense, I think, for the event handler plugin ID
+	to be stored in $disp_handlers[] array. Maybe something like
+	'disp_user' => '#12'  meaning this is handled by plugin ID 12?
+	Making sense?
+
 	elseif( !empty( $disp_Plugins ) )
 	{ // disp possibly handled by plugin
 		$disp_handled = false;
@@ -480,6 +494,7 @@ function skin_include( $template_name, $params = array() )
 			}
 		}
 	}
+	*/
 	else
 	{
 		printf( '<div class="skin_error">Sub template [%s] not found.</div>', $template_name );
@@ -529,6 +544,8 @@ function skin_base_tag()
 
 /**
  * Template tag
+ *
+ * Note for future mods: we do NOT want to repeat identical content on multiple pages.
  */
 function skin_description_tag()
 {
@@ -536,28 +553,29 @@ function skin_description_tag()
 
 	$r = '';
 
-	if( is_default_page() && !empty($Blog) )
-	{	// Description for the blog:
-		$r = $Blog->get('shortdesc');
-	}
-	elseif( $Blog->get_setting( 'categories_meta_description') && ( $disp_detail == 'posts-cat' ) )
+	if( is_default_page() )
 	{
-		$r = $Chapter->get( 'description' );
-	}
-	elseif( $Blog->get_setting( 'excerpts_meta_description' ) && in_array( $disp, array( 'single','page') ) )
-	{	// Excerpt for the current single post:
-		$Item = & $MainList->get_by_idx( 0 );
-		$r = preg_replace( '|[\r\n]+|', '', $Item->get('excerpt') );
-	}
-	elseif(in_array( $disp, array( 'single','page')) )
-	{
-		// custom desc for the current single post:
-		$Item = & $MainList->get_by_idx( 0 );
-		$r = $Item->get_metadesc();
-		if( empty($r) )
-		{
-			// default to desc set up in blog settings
+		if( !empty($Blog) )
+		{	// Description for the blog:
 			$r = $Blog->get('shortdesc');
+		}
+	}
+	elseif( $disp_detail == 'posts-cat' )
+	{
+		if( $Blog->get_setting( 'categories_meta_description') )
+		{
+			$r = $Chapter->get( 'description' );
+		}
+	}
+	elseif( in_array( $disp, array( 'single', 'page' ) ) )
+	{
+		$Item = & $MainList->get_by_idx( 0 );
+		// custom desc for the current single post:
+		$r = $Item->get_metadesc();
+
+		if( empty( $r )&& $Blog->get_setting( 'excerpts_meta_description' ) )
+		{	// Fall back to excerpt for the current single post:
+			$r = preg_replace( '|[\r\n]+|', '', $Item->get('excerpt') );
 		}
 	}
 
@@ -570,6 +588,8 @@ function skin_description_tag()
 
 /**
  * Template tag
+ *
+ * Note for future mods: we do NOT want to repeat identical content on multiple pages.
  */
 function skin_keywords_tag()
 {
@@ -577,22 +597,25 @@ function skin_keywords_tag()
 
 	$r = '';
 
-	if( is_default_page() && !empty($Blog) )
+	if( is_default_page() )
 	{
-		$r = $Blog->get('keywords');
-	}
-	elseif(in_array( $disp, array( 'single','page')) )
-	{
-		// custom keywords for the current single post:
-		$Item = & $MainList->get_by_idx( 0 );
-		$r = $Item->get_metakeywords();
-		if( empty($r) )
+		if( !empty($Blog) )
 		{
-			// default to keywords set up in blog settings
 			$r = $Blog->get('keywords');
 		}
 	}
+	elseif( in_array( $disp, array( 'single', 'page' ) ) )
+	{	// custom keywords for the current single post:
+		$Item = & $MainList->get_by_idx( 0 );
+		$r = $Item->get_metakeywords();
 
+		/* fp> TODO:
+		if( empty( $r ) && $Blog->get_setting( 'tags_meta_keywords' ) )
+		{	// Fall back to tags for the current single post:
+
+		}
+		*/
+	}
 
 	if( !empty($r) )
 	{
@@ -835,6 +858,12 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.58  2009/06/28 23:55:32  fplanque
+ * Item specific description has priority.
+ * If none provided, fall back to excerpt.
+ * Never include duplicate general description.
+ * Also added TODO for keywords to have a fallback to tags.
+ *
  * Revision 1.57  2009/06/20 17:19:35  leeturner2701
  * meta desc and meta keywords per blog post
  *

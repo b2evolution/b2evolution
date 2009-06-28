@@ -213,7 +213,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		}
 	}
 
-	echo '<tr><td class="label"><label for="post_urltitle" title="'.T_('&quot;slug&quot; to be used in permalinks').'"><strong>'.T_('URL "slug"').':</strong></label></td>';
+	echo '<tr><td class="label"><label for="post_urltitle" title="'.T_('&quot;slug&quot; to be used in permalinks').'"><strong>'.T_('URL title "slug"').':</strong></label></td>';
 	echo '<td class="input" width="97%">';
 	$Form->text_input( 'post_urltitle', $edited_Item->get('urltitle'), 40, '', '', array('maxlength'=>210, 'style'=>'width: 100%;') );
 	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
@@ -223,12 +223,12 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->text_input( 'titletag', $edited_Item->get('titletag'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
 
-	echo '<tr><td class="label"><label for="metadesc"><strong>'.T_('Description').':</strong></label></td>';
+	echo '<tr><td class="label"><label for="metadesc" title="&lt;meta name=&quot;description&quot;&gt;"><strong>'.T_('&lt;meta&gt; desc').':</strong></label></td>';
 	echo '<td class="input" width="97%">';
 	$Form->text_input( 'metadesc', $edited_Item->get('metadesc'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
 	
-	echo '<tr><td class="label"><label for="metakeywords"><strong>'.T_('Keywords').':</strong></label></td>';
+	echo '<tr><td class="label"><label for="metakeywords" title="&lt;meta name=&quot;keywords&quot;&gt;"><strong>'.T_('&lt;meta&gt; keywds').':</strong></label></td>';
 	echo '<td class="input" width="97%">';
 	$Form->text_input( 'metakeywords', $edited_Item->get('metakeywords'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
@@ -414,6 +414,12 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.45  2009/06/28 23:55:32  fplanque
+ * Item specific description has priority.
+ * If none provided, fall back to excerpt.
+ * Never include duplicate general description.
+ * Also added TODO for keywords to have a fallback to tags.
+ *
  * Revision 1.44  2009/06/20 17:19:31  leeturner2701
  * meta desc and meta keywords per blog post
  *
