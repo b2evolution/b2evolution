@@ -67,6 +67,8 @@ global $selected_Filelist;
  */
 global $edited_Item;
 
+global $edited_User;
+
 global $Blog;
 
 global $fm_hide_dirtree, $create_name, $ads_list_path;
@@ -628,6 +630,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.18  2009/06/28 19:39:24  fplanque
+ * why was global $edited_User removed?
+ *
  * Revision 1.17  2009/06/23 20:53:54  tblue246
  * File browser: Display a help notice when changing an user avatar
  *
