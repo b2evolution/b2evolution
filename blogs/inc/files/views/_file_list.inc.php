@@ -630,8 +630,18 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.19  2009/06/28 19:54:59  tblue246
+ * doc
+ *
  * Revision 1.18  2009/06/28 19:39:24  fplanque
  * why was global $edited_User removed?
+ * Tblue> This file gets included by _file_browse.view.php only and
+ *        $edited_User is already declared as global there. But you are
+ *        right, the code is easier to understand if we place a global
+ *        $edited_User here, too. Additionally, it avoids confusing bugs
+ *        if this file should ever get included by some other file then
+ *        _file_browse.view.php. I will re-add the "global" statement to
+ *        v-3-2, sorry for the mess.
  *
  * Revision 1.17  2009/06/23 20:53:54  tblue246
  * File browser: Display a help notice when changing an user avatar
