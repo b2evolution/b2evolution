@@ -1532,22 +1532,26 @@ class Item extends ItemLight
 	 */
 	function set_tags_from_string( $tags )
 	{
-		if( $tags === '' )
+		if( empty($tags) )
 		{
 			$this->tags = array();
-			return;
-		}
-		$this->tags = preg_split( '/\s*[;,]+\s*/', $tags, -1, PREG_SPLIT_NO_EMPTY );
-
-		if( function_exists( 'mb_strtolower' ) && function_exists( 'mb_detect_encoding' ) )
-		{	// fp> TODO: instead of those "when used" ifs, it would make more sense to redefine mb_strtolower beforehand if it doesn"t exist (it would then just be a fallback to the strtolower + a Debuglog->add() )
-			array_walk( $this->tags, create_function( '& $tag', '$tag = mb_strtolower( $tag, mb_detect_encoding( $tag.\'a\', \'UTF-8, ISO-8859-1, ISO-8859-15\', true ) );' ) );
 		}
 		else
-		{	// Tblue> Note: This doesn't work with ISO-8859-1 umlauts like 'Ä' and won't work with UTF-8 either.
-			array_walk( $this->tags, create_function( '& $tag', '$tag = strtolower( $tag );' ) );
+		{
+			$this->tags = preg_split( '/[;,]+/', $tags );
+		}
+
+		/* fplanque> The following kills special chars like é on my blog (latin 1) -- mb_detect_encoding() is now officially banned from being used anywhere
+		if( function_exists( 'mb_strtolower' ) && function_exists( 'mb_detect_encoding' ) )
+		{	// fp> TODO: instead of those "when used" ifs, it would make more sense to redefine mb_strtolower beforehand if it doesn"t exist (it would then just be a fallback to the strtolower + a Debuglog->add() )
+			array_walk( $this->tags, create_function( '& $tag', '$tag = mb_strtolower(trim($tag), mb_detect_encoding($tag));' ) );
+		}
+		else */
+		{
+			array_walk( $this->tags, create_function( '& $tag', '$tag = strtolower(trim($tag));' ) );
 		}
 		$this->tags = array_unique( $this->tags );
+		$this->tags = array_diff( $this->tags, array('') );	// empty element can sneak in when ending with ,,
 		// pre_dump( $this->tags );
 	}
 
@@ -3928,6 +3932,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.109  2009/06/28 19:58:54  fplanque
+ * ROLLBACK: REMINDER: "mb_detect_encoding() is now officially banned from being used anywhere"
+ *
  * Revision 1.108  2009/06/20 17:19:32  leeturner2701
  * meta desc and meta keywords per blog post
  *
