@@ -129,6 +129,9 @@ $antispam_on_message_form = 1;
  *
  * This is for the Who's Online block. Default: 5 minutes (300s).
  *
+ * @todo Tblue> This is used by the "Who's online" widget/plugin
+ *              only and should probably be a plugin setting.
+ *
  * @global integer
  */
 $timeout_online_user = 300; // Default: 5 minutes (300s).
@@ -318,6 +321,10 @@ $cookie_session = 'cookie'.$instance_name.'session';
  *
  * Value in seconds, set this to 0 if you wish to use non permanent cookies (erased when browser is closed).
  * Default: time() + 31536000 (one year from now)
+ *
+ * @internal Tblue> This setting is currently only used for comment meta
+ *                  data cookies, why is it not used for user sessions,
+ *                  too? Bug?
  * 
  * @global int $cookie_expires
  */
@@ -327,6 +334,10 @@ $cookie_expires = time() + 31536000;
  * Expired-time used to erase cookies.
  *
  * Default: time() - 86400 (24 hours ago)
+ *
+ * @internal Tblue> This setting is currently only used for comment meta
+ *                  data cookies, why is it not used for user sessions,
+ *                  too? Bug?
  * 
  * @global int $cookie_expired
  */
