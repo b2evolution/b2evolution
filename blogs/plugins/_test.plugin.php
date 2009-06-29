@@ -791,7 +791,9 @@ class test_plugin extends Plugin
 	function GetDispModes()
 	{
 		return array(
-				'disp_test' => '_test.disp.php', // display our test disp
+// fp> see skin_include() for todos about this
+// TODO: return an array with special codes.
+//				'disp_test' => '_test.disp.php', // display our test disp
 			);
 	}
 
@@ -812,7 +814,7 @@ class test_plugin extends Plugin
 	{
 		global $plugins_path;
 		$disp = 'disp_'.$params['disp'];
-		$my_modes = $this->GetDispModes( array() );
+		$my_modes = $this->GetDispModes( array() );	// fp> TODO: don't use an array from somewhere else, just put a switch case right here.
 		if( isset( $my_modes[$disp] ) )
 		{
 			require_once $plugins_path.'test_plugin/'.$my_modes[$disp];
@@ -824,6 +826,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.80  2009/06/29 02:14:04  fplanque
+ * no message
+ *
  * Revision 1.79  2009/06/14 07:11:04  yabs
  * adding custom disp mode example
  *

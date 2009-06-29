@@ -68,7 +68,7 @@ $Form->begin_fieldset( T_('Properties') );
 
 	$Form->text_input( 'cat_urlname', $edited_Chapter->urlname, 40, T_('URL "slug"'), T_('Used for clean URLs. Must be unique.'), array( 'maxlength' => 255 ) );
 
-	$Form->text_input( 'cat_description', $edited_Chapter->description, 40, T_('Description'), T_('May be used as a title tag'), array( 'maxlength' => 255 ) );
+	$Form->text_input( 'cat_description', $edited_Chapter->description, 40, T_('Description'), T_('May be used as a title tag and/or meta description'), array( 'maxlength' => 255 ) );
 
 	if( $Settings->get('chapter_ordering') == 'manual' )
 	{
@@ -91,6 +91,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.9  2009/06/29 02:14:04  fplanque
+ * no message
+ *
  * Revision 1.8  2009/03/08 23:57:42  fplanque
  * 2009
  *

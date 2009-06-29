@@ -136,6 +136,7 @@ class twitter_plugin extends Plugin
 		$title =  $params['Item']->dget('title', 'xml');
 		$excerpt =  $params['Item']->dget('excerpt', 'xml');
 		$url = $params['Item']->get_permanent_url();
+
 		$msg = str_replace( '$title$', $title, $msg );
 		$msg = str_replace( '$excerpt$', $excerpt, $msg );
 		$msg = str_replace( '$url$', $url, $msg );
@@ -254,6 +255,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.15  2009/06/29 02:14:04  fplanque
+ * no message
+ *
  * Revision 1.14  2009/06/26 22:07:20  tblue246
  * Minor (single quotes)
  *

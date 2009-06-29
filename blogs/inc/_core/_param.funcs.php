@@ -112,7 +112,7 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		elseif( $use_default )
 		{	// We haven't set any value yet and we really want one: use default:
 			if( $type == 'array' && $default === '' )
-			{ // Default for type 'array' is array() (otherwise there would be a notice with settype() below)
+			{ // Change default '' into array() (otherwise there would be a notice with settype() below)
 				$default = array();
 			}
 			$GLOBALS[$var] = $default;
@@ -1928,6 +1928,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.33  2009/06/29 02:14:04  fplanque
+ * no message
+ *
  * Revision 1.32  2009/06/07 20:06:45  blueyed
  * param: default for array is array(), match whole string for date formats, doc
  *

@@ -69,7 +69,7 @@ global $edited_User;
 
 if( isset( $edited_User ) )
 {	// Display a help notice for setting a new avatar:
-	printf( '<div>'.T_( 'Click on a link %s icon below to change your avatar.' )
+	printf( '<div>'.T_( 'Click on a link %s icon below to select the image to use as an avatar.' )
 				   .'</div>', get_icon( 'link', 'imgtag', array( 'class'=>'top' ) ) );
 }
 ?>
@@ -390,6 +390,9 @@ if( isset( $edited_User ) )
 
 /*
  * $Log$
+ * Revision 1.15  2009/06/29 02:14:04  fplanque
+ * no message
+ *
  * Revision 1.14  2009/06/23 20:53:54  tblue246
  * File browser: Display a help notice when changing an user avatar
  *

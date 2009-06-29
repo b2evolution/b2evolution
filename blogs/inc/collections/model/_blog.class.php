@@ -504,8 +504,8 @@ class Blog extends DataObject
 			$this->set_setting( 'title_link_type',  param( 'title_link_type', 'string', '' ) );
 			$this->set_setting( 'permalinks',  param( 'permalinks', 'string', '' ) );
 			$this->set_setting( '404_response',  param( '404_response', 'string', '' ) );
-			$this->set_setting( 'excerpts_meta_description',  param( 'excerpts_meta_description', 'integer', 0 ) );
-			$this->set_setting( 'categories_meta_description',  param( 'categories_meta_description', 'integer', 0 ) );
+			$this->set_setting( 'excerpts_meta_description', param( 'excerpts_meta_description', 'integer', 0 ) );
+			$this->set_setting( 'categories_meta_description', param( 'categories_meta_description', 'integer', 0 ) );
 		}
 
 
@@ -2123,6 +2123,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.68  2009/06/29 02:14:04  fplanque
+ * no message
+ *
  * Revision 1.67  2009/06/13 20:09:24  tblue246
  * Fixed stupid bug: Blog settings SEO tab - number of posts on tag pages got not set and could not be reset; latter also applied for the chapter_posts_per_page setting. Ref: http://forums.b2evolution.net/viewtopic.php?t=18935
  *

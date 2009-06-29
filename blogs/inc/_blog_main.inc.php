@@ -461,8 +461,8 @@ if( isset( $skin ) )
 		debug_die( sprintf( T_( 'The skin [%s] is not installed on this system.' ), htmlspecialchars( $skin ) ) );
 	}
 	else if( ! empty( $tempskin ) )
-	{
-		$redir = 'no';	// By definition, we want to see the temporary skin
+	{ // By definition, we want to see the temporary skin (if we don't use feedburner... )
+		$redir = 'no';	
 	}
 }
 
@@ -561,17 +561,13 @@ if( !empty( $skin ) )
 				}
 				else
 				{	// Use the default handler from the skins dir:
-					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (default handler)', 'skin');
+					$Debuglog->add('blog_main: include '.rel_path_to_base($ads_current_skin_path.'index.main.php').' (default handler)', 'skin');
 					require $ads_current_skin_path.'index.main.php';
 				}
 			}
 			else
 			{	// Use the default handler from the skins dir:
-				if( empty( $disp_handler ) )
-				{
-					$disp_handler = $disp;
-				}
-				$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (default index handler)', 'skin');
+				$Debuglog->add('blog_main: include '.rel_path_to_base($ads_current_skin_path.'index.main.php').' (default index handler)', 'skin');
 				require $ads_current_skin_path.'index.main.php';
 			}
 		}
@@ -595,6 +591,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.139  2009/06/29 02:14:04  fplanque
+ * no message
+ *
  * Revision 1.138  2009/06/07 14:22:20  yabs
  * minor bug fix
  *
