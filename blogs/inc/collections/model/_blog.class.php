@@ -1548,12 +1548,14 @@ class Blog extends DataObject
 				 * @var User
 				 */
 				$owner_User = $this->get_owner_User();
+				/* yabs > why would fullname take priority over users preferred name ?
 				$owner = $owner_User->get( 'fullname' );
 				if( empty($owner) )
 				{
 					$owner = $owner_User->get_preferred_name();
 				}
-				return $owner;
+				*/
+				return $owner_User->get_preferred_name();
 
 			default:
 				return $matches[1];
@@ -2123,6 +2125,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.69  2009/06/29 09:35:22  yabs
+ * changed to $owner$ replacement to users preferred name
+ *
  * Revision 1.68  2009/06/29 02:14:04  fplanque
  * no message
  *
