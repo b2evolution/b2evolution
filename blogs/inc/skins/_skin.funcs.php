@@ -423,11 +423,13 @@ function skin_include( $template_name, $params = array() )
 		// now add plugin disp handlers
 		if( $disp_Plugins = $Plugins->get_list_by_event( 'GetDispModes' ) )
 		{
+			$plugins_disp_handlers = array();
 			foreach( $disp_Plugins as $disp_Plugin )
 			{ // Go through whole list of disp plugins
 				if( $plugin_modes = $Plugins->call_method( $disp_Plugin->ID, 'GetDispModes', $disp_handlers ) )
 				{ // plugin provides some custom disp modes
 					$disp_handlers = array_merge( $disp_handlers, $plugin_modes );
+					$plugins_disp_handlers[ $disp_Plugin->ID ] = array_keys( $plugin_modes ); // store all disp modes a plugin handles
 				}
 			}
 		}
@@ -448,20 +450,23 @@ function skin_include( $template_name, $params = array() )
 			return;
 		}
 	}
-
+	$disp_handled = false;
 	if( file_exists( $ads_current_skin_path.$template_name ) )
 	{	// The skin has a customized handler, use that one instead:
 		global $Debuglog;
 		$file = $ads_current_skin_path.$template_name;
 		$Debuglog->add('skin_include ('.($Item ? 'Item #'.$Item->ID : '-').'): '.rel_path_to_base($file), 'skins');
 		require $file;
+		$disp_handled = true;
 	}
+
 	elseif( file_exists( $skins_path.$template_name ) )
 	{	// Use the default template:
 		global $Debuglog;
 		$file = $skins_path.$template_name;
 		$Debuglog->add('skin_include ('.($Item ? 'Item #'.$Item->ID : '-').'): '.rel_path_to_base($file), 'skins');
 		require $file;
+		$disp_handled = true;
 	}
 
 	/* fp> I am disabling this to get your attention so you can fix it quickly :p
@@ -470,6 +475,9 @@ function skin_include( $template_name, $params = array() )
 	It would make more sense to have plugin handlers begin with a special char for example '#' and pass handling over to Plugin if we detect that.
 	Making sense?
 
+	yabs >
+	this way it allows skins to override the plugins _foo.disp.php.
+
 	2. The disp should only be handled by ONE SINGLE plugin. Correct?
 	So going through a loop here again is a bit of a waste.
 	It would make more sense, I think, for the event handler plugin ID
@@ -477,26 +485,24 @@ function skin_include( $template_name, $params = array() )
 	'disp_user' => '#12'  meaning this is handled by plugin ID 12?
 	Making sense?
 
-	elseif( !empty( $disp_Plugins ) )
-	{ // disp possibly handled by plugin
-		$disp_handled = false;
-		foreach( $disp_Plugins as $disp_Plugin )
+	yabs > yep
+	*/
+	elseif( !empty( $plugins_disp_handlers ) )
+	{ // disp handled by plugin
+		foreach( $plugins_disp_handlers as $plug_ID => $plugin_disp_modes )
 		{ // Go through whole list of disp plugins
-			$disp_params = array( 'disp' => $disp );
-			$disp_handled = ( $Plugins->call_method( $disp_Plugin->ID, 'HandleDispMode', $disp_params ) ? true : $disp_handled );
-		}
-		if( !$disp_handled )
-		{ // no plugin handled the disp
-			printf( '<div class="skin_error">Sub template [%s] not found.</div>', $template_name );
-			if( !empty($current_User) && $current_User->level == 10 )
-			{
-				printf( '<div class="skin_error">User level 10 help info: [%s]</div>', $ads_current_skin_path.$template_name );
+			if( in_array( 'disp_'.$disp, $plugin_disp_modes ) )
+			{ // plugin handles this disp mode
+				$disp_params = array( 'disp' => $disp );
+				$Plugins->call_method( $plug_ID, 'HandleDispMode', $disp_params );
+				$disp_handled = true;
+				break; // no need to go through rest of plugins
 			}
 		}
 	}
-	*/
-	else
-	{
+
+	if( ! $disp_handled )
+	{ // nothing handled the disp mode
 		printf( '<div class="skin_error">Sub template [%s] not found.</div>', $template_name );
 		if( !empty($current_User) && $current_User->level == 10 )
 		{
@@ -858,6 +864,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.59  2009/06/29 09:33:34  yabs
+ * changed plugin disp handling
+ *
  * Revision 1.58  2009/06/28 23:55:32  fplanque
  * Item specific description has priority.
  * If none provided, fall back to excerpt.
