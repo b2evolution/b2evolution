@@ -30,13 +30,8 @@ function b2evonet_get_updates()
 	global $Messages, $Settings, $baseurl, $instance_name, $app_name, $app_version, $app_date;
 	global $Debuglog;
 
-	if( !isset( $allow_evo_stats ) )
-	{ // set default
-		$allow_evo_stats = true;
-	}
-
-	if( !$allow_evo_stats )
-	{ // Only EdB will find this, and he'd thank you for it ;)
+	if( isset( $allow_evo_stats ) && $allow_evo_stats == false )
+	{ // Get outta here as fast as you can, EdB style:
 		return;
 	}
 
@@ -158,6 +153,9 @@ function b2evonet_get_updates()
 
 /*
  * $Log$
+ * Revision 1.19  2009/07/01 23:46:28  fplanque
+ * minor
+ *
  * Revision 1.18  2009/06/13 13:47:40  yabs
  * minor
  *
