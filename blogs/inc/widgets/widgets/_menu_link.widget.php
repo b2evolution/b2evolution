@@ -149,6 +149,11 @@ class menu_link_Widget extends ComponentWidget
 				break;
 
 			case 'ownercontact':
+				$Blog->get_owner_User();
+				if( ! $Blog->owner_User->allow_msgform )
+				{ // user does not allow contact form
+					return;
+				}
 				$url = $Blog->get_contact_url( true );
 				$text = T_('Contact');
 				break;
@@ -182,6 +187,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.13  2009/07/01 09:47:51  yabs
+ * bug fix
+ *
  * Revision 1.12  2009/05/31 20:57:27  tblue246
  * Translation fix/minor
  *
