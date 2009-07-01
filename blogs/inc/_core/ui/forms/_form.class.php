@@ -509,7 +509,7 @@ class Form extends Widget
 				// $r = '<fieldset'.get_field_attribs_as_string($field_params).'>'."\n";
 
 				$r = str_replace( '$fieldset_title$', $title, $r );
-				$r = str_replace( '$ID$', ( $field_params['id'] ? 'fwrap_'.$field_params['id'] : '' ), $r );
+				$r = str_replace( '$id$', $field_params['id'], $r );
 				$r = str_replace( '$class$', $field_params['class'], $r );
 
 				if( empty($legend_params) )
@@ -2921,6 +2921,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.56  2009/07/01 23:34:21  fplanque
+ * made $id$ more predictable
+ *
  * Revision 1.55  2009/06/09 12:00:30  yabs
  * bug fix
  *
