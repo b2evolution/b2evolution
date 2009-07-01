@@ -645,8 +645,8 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 					: 'sel_maincat_'.$cat_ID ).'"'
 				.' style="padding-left:'.($level-1).'em;">'
 				.htmlspecialchars($thisChapter->name).'</label>'
-				.'<a href="'.htmlspecialchars($thisChapter->get_permanent_url()).'" title="'.htmlspecialchars(T_('View category in blog.')).'">'
-				.' &nbsp;&raquo;&nbsp; ' // TODO: dh> provide an icon instead?
+				.' <a href="'.htmlspecialchars($thisChapter->get_permanent_url()).'" title="'.htmlspecialchars(T_('View category in blog.')).'">'
+				.'&nbsp;&raquo;&nbsp; ' // TODO: dh> provide an icon instead? // fp> maybe the A(dmin)/B(log) icon from the toolbar? And also use it for permalinks to posts? 
 				.'</a>'
 				."</td></tr>\n";
 
@@ -835,6 +835,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.51  2009/07/01 23:54:05  fplanque
+ * doc
+ *
  * Revision 1.50  2009/06/28 20:02:43  fplanque
  * ROLLBACK: b2evo requires PHP 4.3 as a minimum version.This is already a very old version. Code to accomodate older versions is bloat.
  *

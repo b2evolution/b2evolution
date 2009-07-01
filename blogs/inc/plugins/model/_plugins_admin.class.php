@@ -216,6 +216,7 @@ class Plugins_admin extends Plugins
 				'PluginUserSettingsEditAction' => 'Called as action before editing a user\'s settings.',
 
 				// allow plugins to handle $disp modes
+		// fp> WARNING: EXPERIMENTAL. API MAY CHANGE.
 				'GetDispModes' => 'Called when building possible $disp list',
 				'HandleDispMode' => 'Called when displaying $disp',
 			);
@@ -1469,6 +1470,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.16  2009/07/01 23:55:48  fplanque
+ * doc
+ *
  * Revision 1.15  2009/06/14 12:17:18  yabs
  * adding BeforeSessionsDelete trigger to enable plugins to perform housekeeping based on the sessions that are about to be pruned
  *
