@@ -86,12 +86,12 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('External Feeds').get_manual_link('external_feeds') );
        
 	$Form->text_input( 'atom_redirect', $edited_Blog->get_setting( 'atom_redirect' ), 50, T_('Atom Feed URL'),
-	'<br />'. T_('Example: Your Feedburner Atom URL')."<br />Original URL: " . 
+	'<br />'. T_('Example: Your Feedburner Atom URL which should replaces the original feed URL.')."<br />Note: the original URL was: " . 
 	url_add_param( $edited_Blog->get_item_feed_url( '_atom' ), 'redir=no'),
 	array('maxlength'=>255, 'class'=>'large') );
        
 	$Form->text_input( 'rss2_redirect', $edited_Blog->get_setting( 'rss2_redirect' ), 50, T_('RSS2 Feed URL'),
-	'<br />' .T_('Example: Your Feedburner RSS2 URL') . "<br />Original URL: ".
+	'<br />'. T_('Example: Your Feedburner RSS2 URL which should replaces the original feed URL.')."<br />Note: the original URL was: " . 
 	url_add_param( $edited_Blog->get_item_feed_url( '_rss2' ), 'redir=no'),
 	array('maxlength'=>255, 'class'=>'large') );
 
@@ -188,6 +188,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.19  2009/07/01 23:39:55  fplanque
+ * UI adjustments
+ *
  * Revision 1.18  2009/06/22 15:08:19  waltercruz
  * Informing the original feed url to the user
  *
