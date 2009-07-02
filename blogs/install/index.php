@@ -166,9 +166,9 @@ if( $config_is_done || (($action != 'start') && ($action != 'default') && ($acti
 		// Check MySQL version
 		$mysql_version = $DB->get_var( 'SELECT VERSION()' );
 		list( $mysl_version_main, $mysl_version_minor ) = explode( '.', $mysql_version );
-		if( ($mysl_version_main * 100 + $mysl_version_minor) < 323 )
+		if( ($mysl_version_main * 100 + $mysl_version_minor) < 410 )
 		{
-			die( '<div class="error"><p class="error"><strong>'.sprintf(T_('The minimum requirement for this version of b2evolution is %s version %s but you are trying to use version %s!'), 'MySQL', '3.23', $mysql_version ).'</strong></p></div>');
+			die( '<div class="error"><p class="error"><strong>'.sprintf(T_('The minimum requirement for this version of b2evolution is %s version %s but you are trying to use version %s!'), 'MySQL', '4.1', $mysql_version ).'</strong></p></div>');
 		}
 	}
 }
@@ -635,6 +635,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.165  2009/07/02 17:33:00  fplanque
+ * only activate ONE locale at install time.
+ *
  * Revision 1.164  2009/07/02 15:43:56  fplanque
  * B2evolution no longer ships with _basic_config.php .
  * It ships with _basic_config.template.php instead.

@@ -76,6 +76,8 @@ $db_config['connection_charset'] = '';
  *
  * This MUST BE in the list below.
  *
+ * @todo this should actually be used by the installer only. After that we should use the value from the DB.
+ *
  * @global string
  */
 $default_locale = 'en-US';
@@ -112,16 +114,7 @@ $locales['en-US'] = array(
 		'timefmt' => 'h:i:s a',
 		'startofweek' => 0,
 		'messages' => 'en_US',
-		'enabled' => 1,
-	);
-$locales['en-GB'] = array(
-		'name' => NT_('English (GB)'), // correct ISO-3166 code
-		'charset' => 'iso-8859-1',
-		'datefmt' => 'd/m/y',
-		'timefmt' => 'h:i:s a',
-		'startofweek' => 1,
-		'messages' => 'en_GB',
-		'enabled' => 1,
+		'enabled' => 0,
 	);
 
 /**

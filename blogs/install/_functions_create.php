@@ -249,8 +249,8 @@ function create_default_data()
 		" );
 	echo "OK.<br />\n";
 
-	if ( ! empty( $current_locale ) && ! $locales[$current_locale]['enabled'] )
-	{	// The chosen locale is not enabled, make sure the user sees his new system localized.
+	if( ! empty( $current_locale ) && ! $locales[$current_locale]['enabled'] )
+	{	// Make sure the user sees his new system localized. (b2evo is no longer supposed to have specific locales enabled by default)
 		echo 'Activating selected default locale... ';
 		$DB->query( 'INSERT INTO T_locales '
 				   .'( loc_locale, loc_charset, loc_datefmt, loc_timefmt, '
@@ -536,7 +536,7 @@ function create_demo_contents()
 	// POPULATE THE LINKBLOG:
 
 	// Insert a post into linkblog:
-	// walter : a weird line of code to create a post in the linkblog a minute after the others. 
+	// walter : a weird line of code to create a post in the linkblog a minute after the others.
     // It will show a bug on linkblog agregation by category
 	$timestamp++;
 	$now = date('Y-m-d H:i:s',$timestamp + 59);
@@ -852,6 +852,9 @@ If needed, a skin can format info pages differently from regular posts.");
 
 /*
  * $Log$
+ * Revision 1.265  2009/07/02 17:32:59  fplanque
+ * only activate ONE locale at install time.
+ *
  * Revision 1.264  2009/06/24 03:32:31  sam2kb
  * minor
  *
