@@ -420,7 +420,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_user'           => '_user.disp.php',
 			);
 
-		// now add plugin disp handlers
+		// 3.3? now add plugin disp handlers
 		if( $disp_Plugins = $Plugins->get_list_by_event( 'GetDispModes' ) )
 		{
 			$plugins_disp_handlers = array();
@@ -429,7 +429,8 @@ function skin_include( $template_name, $params = array() )
 				if( $plugin_modes = $Plugins->call_method( $disp_Plugin->ID, 'GetDispModes', $disp_handlers ) )
 				{ // plugin provides some custom disp modes
 					$disp_handlers = array_merge( $disp_handlers, $plugin_modes );
-					$plugins_disp_handlers[ $disp_Plugin->ID ] = array_keys( $plugin_modes ); // store all disp modes a plugin handles
+ 					// store all disp modes a plugin handles:
+ 					$plugins_disp_handlers[ $disp_Plugin->ID ] = array_keys( $plugin_modes );
 				}
 			}
 		}
@@ -450,6 +451,7 @@ function skin_include( $template_name, $params = array() )
 			return;
 		}
 	}
+
 	$disp_handled = false;
 	if( file_exists( $ads_current_skin_path.$template_name ) )
 	{	// The skin has a customized handler, use that one instead:
@@ -487,7 +489,6 @@ function skin_include( $template_name, $params = array() )
 	Making sense?
 
 	yabs > yep
-	*/
 	elseif( !empty( $plugins_disp_handlers ) )
 	{ // disp handled by plugin
 		foreach( $plugins_disp_handlers as $plug_ID => $plugin_disp_modes )
@@ -501,6 +502,7 @@ function skin_include( $template_name, $params = array() )
 			}
 		}
 	}
+	*/
 
 	if( ! $disp_handled )
 	{ // nothing handled the disp mode
@@ -865,6 +867,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.61  2009/07/02 21:33:45  fplanque
+ * doc / waiting for answer
+ *
  * Revision 1.60  2009/07/02 00:46:46  fplanque
  * doc.
  *
