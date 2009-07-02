@@ -16,15 +16,27 @@ if( defined('EVO_CONFIG_LOADED') )
 }
 
 /**
- * This makes sure the config does not get loaded twice in Windows (when the /conf file is in a path containing Capitals like /Blog/conf).
+ * This makes sure the config does not get loaded twice in Windows
+ * (when the /conf file is in a path containing uppercase letters as in /Blog/conf).
  */
 define( 'EVO_CONFIG_LOADED', true );
 
-require_once  dirname(__FILE__).'/_basic_config.php';			// basic settings
+// basic settings
+if( file_exists(dirname(__FILE__).'/_basic_config.php') )
+{	// Use configured base config:
+	require_once  dirname(__FILE__).'/_basic_config.php';
+}
+else
+{	// Use default template:
+	require_once  dirname(__FILE__).'/_basic_config.template.php';
+}
+
+// DEPRECATED -- You can now have a _basic_config.php file that will not be overwritten by new releases
 if( file_exists(dirname(__FILE__).'/_config_TEST.php') )
 { // Put testing conf in there (For testing, you can also set $install_password here):
 	include_once dirname(__FILE__).'/_config_TEST.php';   	// FOR TESTING / DEVELOPMENT OVERRIDES
 }
+
 require_once  dirname(__FILE__).'/_advanced.php';       	// advanced settings
 require_once  dirname(__FILE__).'/_locales.php';        	// locale settings
 require_once  dirname(__FILE__).'/_formatting.php';     	// formatting settings
@@ -44,6 +56,12 @@ foreach( $modules as $module )
 
 /*
  * $Log$
+ * Revision 1.54  2009/07/02 15:43:55  fplanque
+ * B2evolution no longer ships with _basic_config.php .
+ * It ships with _basic_config.template.php instead.
+ * That way, uploading a new release never overwrites the previous base config.
+ * The installer now creates  _basic_config.php based on _basic_config.template.php + entered form values.
+ *
  * Revision 1.53  2009/01/25 19:09:32  blueyed
  * phpdoc fixes
  *

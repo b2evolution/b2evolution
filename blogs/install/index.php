@@ -230,17 +230,20 @@ switch( $action )
 		}
 		else
 		{
+			$conf_template_filepath = $conf_path.'_basic_config.template.php';
 			$conf_filepath = $conf_path.'_basic_config.php';
-			// Read original:
-			$conf = implode( '', file( $conf_filepath ) );
 
-			if( empty( $conf ) )
+			// Read original:
+			$file_loaded = @file( $conf_template_filepath );
+
+			if( empty( $file_loaded ) )
 			{ // This should actually never happen, just in case...
-				printf( '<p class="error">Could not load original conf file [%s]. Is it missing?</p>', $conf_filepath );
+				printf( '<div class="error"><p class="error">Could not load original conf file [%s]. Is it missing?</p></div>', $conf_filepath );
 				break;
 			}
 
 			// File loaded...
+			$conf = implode( '', $file_loaded );
 			// Update conf:
 			$conf = preg_replace(
 				array(
@@ -272,24 +275,24 @@ switch( $action )
 			{
 				?>
 				<h1><?php echo T_('Config file update') ?></h1>
-				<p><strong><?php printf( T_('We cannot automatically update your config file [%s]!'), $conf_filepath ); ?></strong></p>
+				<p><strong><?php printf( T_('We cannot automatically create or update your config file [%s]!'), $conf_filepath ); ?></strong></p>
 				<p><?php echo T_('There are two ways to deal with this:') ?></p>
 				<ul>
-					<li><strong><?php echo T_('You can allow the installer to update the config file by changing its permissions:') ?></strong>
+					<li><strong><?php echo T_('You can allow the installer to create the config file by changing permissions for the /conf directory:') ?></strong>
 						<ol>
-							<li><?php printf( T_('<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about permissions</a>.'), $conf_filepath, 'href="http://manual.b2evolution.net/Directory_and_file_permissions" target="_blank"' ); ?></li>
+							<li><?php printf( T_('Make sure there is no existing and potentially locked configuration file named <code>%s</code>. If so, please delete it.'), $conf_filepath ); ?></li>
+							<li><?php printf( T_('<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about permissions</a>.'), $conf_path, 'href="http://manual.b2evolution.net/Directory_and_file_permissions" target="_blank"' ); ?></li>
 							<li><?php echo T_('Come back to this page and refresh/reload.') ?></li>
 						</ol>
 						<br />
 					</li>
 					<li><strong><?php echo T_('Alternatively, you can update the config file manually:') ?></strong>
 						<ol>
-							<li><?php echo T_('Open the _basic_config.php file locally with a text editor.') ?></li>
-							<li><?php echo T_('Delete all contents!') ?></li>
+							<li><?php echo T_('Create a new text file with a text editor.') ?></li>
 							<li><?php echo T_('Copy the contents from the box below.') ?></li>
 							<li><?php echo T_('Paste them into your local text editor. <strong>ATTENTION: make sure there is ABSOLUTELY NO WHITESPACE after the final <code>?&gt;</code> in the file.</strong> Any space, tab, newline or blank line at the end of the conf file may prevent cookies from being set when you try to log in later.') ?></li>
-							<li><?php echo T_('Save the new _basic_config.php file locally.') ?></li>
-							<li><?php echo T_('Upload the file to your server, into the /_conf folder.') ?></li>
+							<li><?php echo T_('Save the file locally under the name <code>_basic_config.php</code>') ?></li>
+							<li><?php echo T_('Upload the file to your server, into the <code>/_conf</code> folder.') ?></li>
 							<li><?php printf( T_('<a %s>Call the installer from scratch</a>.'), 'href="index.php?locale='.$default_locale.'"') ?></li>
 						</ol>
 					</li>
@@ -308,7 +311,7 @@ switch( $action )
 				fwrite( $f, $conf );
 				fclose($f);
 
-				printf( '<p>'.T_('Your configuration file [%s] has been successfully updated.').'</p>', $conf_filepath );
+				printf( '<p>'.T_('Your configuration file [%s] has been successfully created.').'</p>', $conf_filepath );
 
 				$tableprefix = $conf_db_tableprefix;
 				$baseurl = $conf_baseurl;
@@ -366,7 +369,7 @@ to
 
 			?>
 
-			<p><?php echo T_('Your base config file has not been edited yet. You can do this by filling in the form below.') ?></p>
+			<p><?php echo T_('The basic configuration file (<code>/conf/_basic_config.php</code>) has not been created yet. You can do automatically generate it by filling out the form below.') ?></p>
 
 			<p><?php echo T_('This is the minimum info we need to set up b2evolution on this server:') ?></p>
 
@@ -472,7 +475,7 @@ to
 					<?php
 				}
 
-				
+
 			if( $allow_evodb_reset != 1 )
 			{
 				echo '<div class="floatright"><a href="index.php?action=deletedb&amp;locale='.$default_locale.'">'.T_('Need to start anew?').'</a></div>';
@@ -632,6 +635,12 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.164  2009/07/02 15:43:56  fplanque
+ * B2evolution no longer ships with _basic_config.php .
+ * It ships with _basic_config.template.php instead.
+ * That way, uploading a new release never overwrites the previous base config.
+ * The installer now creates  _basic_config.php based on _basic_config.template.php + entered form values.
+ *
  * Revision 1.163  2009/07/02 14:53:07  fplanque
  * improved some more
  *
