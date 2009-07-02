@@ -17,7 +17,7 @@
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
- * @package evocore
+ * @package plugins
  *
  * @author blueyed: Daniel HAHLER
  *
@@ -36,7 +36,7 @@ load_class('plugins/model/_plugins.class.php');
  * This extends the basic Plugins by adding all the functionnality needed for administering plugins
  * in addition to just using the already enabled plugins.
  *
- * @package evocore
+ * @package plugins
  */
 class Plugins_admin extends Plugins
 {
@@ -1471,6 +1471,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.18  2009/07/02 21:57:11  blueyed
+ * doc fix: move files and classes to the plugins package
+ *
  * Revision 1.17  2009/07/02 00:01:50  fplanque
  * needs optimization.
  *

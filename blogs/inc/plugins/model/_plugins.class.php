@@ -25,7 +25,7 @@
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
- * @package evocore
+ * @package plugins
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE - {@link http://fplanque.net/}
@@ -46,7 +46,7 @@ load_class('plugins/_plugin.class.php');
  * @todo dh> Currently when a plugin goes into "broken" status (e.g. file not readable), it is "disabled" afterwards.
  *       This should rather remember the old status (e.g. "enabled") and make it enabled again.
  *
- * @package evocore
+ * @package plugins
  */
 class Plugins
 {
@@ -1913,6 +1913,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.13  2009/07/02 21:57:11  blueyed
+ * doc fix: move files and classes to the plugins package
+ *
  * Revision 1.12  2009/05/26 20:14:07  blueyed
  * BeforeDisable now gets triggered only if status gets changed to disabled. Also do not update status, if it would be the same, but add safety net (which rather should be an assert prolly).
  *

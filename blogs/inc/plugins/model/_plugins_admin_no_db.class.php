@@ -17,7 +17,7 @@
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
- * @package evocore
+ * @package plugins
  *
  * @author blueyed: Daniel HAHLER
  *
@@ -59,6 +59,9 @@ class Plugins_admin_no_DB extends Plugins_admin
 
 /*
  * $Log$
+ * Revision 1.4  2009/07/02 21:57:11  blueyed
+ * doc fix: move files and classes to the plugins package
+ *
  * Revision 1.3  2009/03/08 23:57:45  fplanque
  * 2009
  *

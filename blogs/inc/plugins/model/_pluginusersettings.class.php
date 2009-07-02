@@ -23,7 +23,7 @@
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
- * @package evocore
+ * @package plugins
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author blueyed: Daniel HAHLER.
@@ -38,7 +38,7 @@ load_class('settings/model/_abstractsettings.class.php');
 /**
  * Class to handle settings for plugins
  *
- * @package evocore
+ * @package plugins
  */
 class PluginUserSettings extends AbstractSettings
 {
@@ -132,6 +132,9 @@ class PluginUserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.4  2009/07/02 21:57:11  blueyed
+ * doc fix: move files and classes to the plugins package
+ *
  * Revision 1.3  2009/03/08 23:57:45  fplanque
  * 2009
  *
