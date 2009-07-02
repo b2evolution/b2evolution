@@ -89,6 +89,7 @@ class colls_list_owner_Widget extends ComponentWidget
 					'note' => T_( 'This is the title to display, $icon$ will be replaced by the feed icon' ),
 					'defaultvalue' => T_('My blogs'),
 				),
+				/* 3.3? this is borked
 				'list_type' => array(
 					'label' => T_( 'Display type' ),
 					'type' => 'select',
@@ -96,6 +97,7 @@ class colls_list_owner_Widget extends ComponentWidget
 					'options' => array( 'list' => T_('List'), 'form' => T_('Select menu') ),
 					'note' => T_( 'How do you want to display blogs?' ),
 				),
+				*/
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -120,6 +122,9 @@ class colls_list_owner_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.7  2009/07/02 21:50:13  fplanque
+ * commented out unfinished code
+ *
  * Revision 1.6  2009/06/18 07:35:53  yabs
  * bugfix : $type is already a param ;)
  *

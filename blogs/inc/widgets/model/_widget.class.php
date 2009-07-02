@@ -475,7 +475,6 @@ class ComponentWidget extends DataObject
 	 * List of collections/blogs
 	 *
 	 * @param array MUST contain at least the basic display params
-	 * @param string possible values: list, form
 	 */
 	function disp_coll_list( $filter = 'public' )
 	{
@@ -502,7 +501,8 @@ class ComponentWidget extends DataObject
 			$blog_array = $BlogCache->load_public( 'ID' );
 		}
 
-		if( $this->disp_params['list_type'] == 'list' )
+		// 3.3? if( $this->disp_params['list_type'] == 'list' )
+		// fp> TODO: init default value for $this->disp_params['list_type'] to avoid error
 		{
 			echo $this->disp_params['list_start'];
 
@@ -545,7 +545,10 @@ class ComponentWidget extends DataObject
 
 			echo $this->disp_params['list_end'];
 		}
-		else
+		/* 3.3?
+			Problems:
+			-In FF3/XP with skin evoCamp, I click to drop down and it already reloads the page on the same blog.
+			-Missing appropriate CSS so it displays at least half nicely in most of teh default skins
 		{
 			$select_options = '';
 			foreach( $blog_array as $l_blog_ID )
@@ -568,7 +571,7 @@ class ComponentWidget extends DataObject
 				echo '<noscript><input type="submit" value="'.T_('Go').'" /></noscript></form>';
 			}
 		}
-
+		*/
 		echo $this->disp_params['block_end'];
 	}
 
@@ -608,6 +611,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.60  2009/07/02 21:50:13  fplanque
+ * commented out unfinished code
+ *
  * Revision 1.59  2009/06/18 07:36:06  yabs
  * bugfix : $type is already a param ;)
  *
