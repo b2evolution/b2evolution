@@ -26,6 +26,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <?php
 /*
  * $Log$
+ * Revision 1.2  2009/07/02 21:57:39  fplanque
+ * no message
+ *
  * Revision 1.1  2009/06/14 07:11:25  yabs
  * adding custom disp mode example
  *
