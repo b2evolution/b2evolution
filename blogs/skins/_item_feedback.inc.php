@@ -185,8 +185,12 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 
 	// _______________________________________________________________
 
-	// Display link for comments feed:
-	$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
+	if( $Blog->get_setting( 'feed_content' ) != 'none' )
+	{ 
+		// Display link for comments feed:
+		$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
+
+	}
 
 	// _______________________________________________________________
 
@@ -203,6 +207,9 @@ skin_include( '_item_comment_form.inc.php', $params );
 
 /*
  * $Log$
+ * Revision 1.18  2009/07/02 09:37:15  leeturner2701
+ * All default skins now fully support feeds being turned off
+ *
  * Revision 1.17  2009/03/08 23:57:56  fplanque
  * 2009
  *

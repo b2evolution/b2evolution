@@ -85,8 +85,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		Design &amp; icons by <a href="http://www.ndesign-studio.com">N.Design Studio</a>. Skin by <a href="http://www.tenderfeelings.be">Tender Feelings</a> / <?php display_param_link( $skinfaktory_links ) ?>.
 	</div>
 	<div class="alignright">
-		<a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" class="rss">Entries RSS</a>
-		<a href="<?php $Blog->disp( 'comments_rss2_url', 'raw' ) ?>" class="rss">Comments RSS</a>
+		<?php
+		if( $Blog->get_setting( 'feed_content' ) != 'none' )
+		{ 
+		?>
+			<a href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" class="rss">Entries RSS</a>
+			<a href="<?php $Blog->disp( 'comments_rss2_url', 'raw' ) ?>" class="rss">Comments RSS</a>
+		<?php
+		}
+		?>
 		<span class="loginout"><?php user_login_link(); user_logout_link();?></span>
 	</div>
 </div>

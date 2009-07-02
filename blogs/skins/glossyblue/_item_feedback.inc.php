@@ -226,8 +226,12 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 
 	// _______________________________________________________________
 
-	// Display link for comments feed:
-	$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
+	if( $Blog->get_setting( 'feed_content' ) != 'none' )
+	{ 
+		// Display link for comments feed:
+		$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
+
+	}
 
 	// _______________________________________________________________
 
