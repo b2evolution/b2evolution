@@ -469,7 +469,7 @@ function skin_include( $template_name, $params = array() )
 		$disp_handled = true;
 	}
 
-	/* fp> I am disabling this to get your attention so you can fix it quickly :p
+	/* 3.3 ? fp> I am disabling this to get your attention so you can fix it quickly :p
 
 	1. Every time a plugin wants to handle a disp, it will go through 2 file_exists() which is heavy on the filesystem
 	It would make more sense to have plugin handlers begin with a special char for example '#' and pass handling over to Plugin if we detect that.
@@ -477,6 +477,7 @@ function skin_include( $template_name, $params = array() )
 
 	yabs >
 	this way it allows skins to override the plugins _foo.disp.php.
+	fp> this is awfully complex. What's a use case scenario for this?
 
 	2. The disp should only be handled by ONE SINGLE plugin. Correct?
 	So going through a loop here again is a bit of a waste.
@@ -864,6 +865,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.60  2009/07/02 00:46:46  fplanque
+ * doc.
+ *
  * Revision 1.59  2009/06/29 09:33:34  yabs
  * changed plugin disp handling
  *

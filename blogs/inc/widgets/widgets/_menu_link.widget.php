@@ -150,6 +150,7 @@ class menu_link_Widget extends ComponentWidget
 
 			case 'ownercontact':
 				$Blog->get_owner_User();
+				// fp> TODO: move this test into $Blog->get_contact_url( true ); 
 				if( ! $Blog->owner_User->allow_msgform )
 				{ // user does not allow contact form
 					return;
@@ -187,6 +188,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.14  2009/07/02 00:50:59  fplanque
+ * doc.
+ *
  * Revision 1.13  2009/07/01 09:47:51  yabs
  * bug fix
  *
