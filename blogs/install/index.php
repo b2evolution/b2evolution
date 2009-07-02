@@ -201,6 +201,8 @@ switch( $action )
 		 */
 		display_locale_selector();
 
+		block_open();
+		
 		param( 'conf_db_user', 'string', true );
 		param( 'conf_db_password', 'string', true );
 		param( 'conf_db_name', 'string', true );
@@ -324,7 +326,7 @@ switch( $action )
 		 * Start of install procedure:
 		 * -----------------------------------------------------------------------------------
 		 */
-		if( $action == 'start' )
+		if( $action == 'start' || !$config_is_done )
 		{
 			display_locale_selector();
 
@@ -332,7 +334,7 @@ switch( $action )
 
 			echo '<h1>'.T_('Base configuration').'</h1>';
 
-			if( ! ( $allow_evodb_reset == 1 || (!$config_is_done) ) )
+			if( $config_is_done && $allow_evodb_reset != 1 )
 			{
 				echo '<p><strong>Resetting the base configuration is currently disabled for security reasons.</strong></p>';
 				echo '<p>To enable it, please go to the /conf/_basic_config.php file and change:</p>
@@ -638,6 +640,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.162  2009/07/02 13:41:38  fplanque
+ * fix
+ *
  * Revision 1.161  2009/07/02 13:35:23  fplanque
  * Improved installer -- language/locale selection moved to a place where it's visible!
  *
