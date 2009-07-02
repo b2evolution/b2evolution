@@ -480,6 +480,13 @@ function skin_include( $template_name, $params = array() )
 	yabs >
 	this way it allows skins to override the plugins _foo.disp.php.
 	fp> this is awfully complex. What's a use case scenario for this?
+	yabs > As a user, I'm currently developing a shopping cart plugin
+				which would find it really useful to provide view cart/checkout/account
+				whilst still giving skinners the ability to redesign those views
+
+				Obviously that's just a "me" case study.
+
+				If you feel it's bloat then just roll it back ;)
 
 	2. The disp should only be handled by ONE SINGLE plugin. Correct?
 	So going through a loop here again is a bit of a waste.
@@ -867,6 +874,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.62  2009/07/02 22:17:05  yabs
+ * <answer>sorry for the delay</answer>
+ *
  * Revision 1.61  2009/07/02 21:33:45  fplanque
  * doc / waiting for answer
  *
