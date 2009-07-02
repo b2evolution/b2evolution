@@ -94,3 +94,7 @@ form {
 .copyright a:hover {
 	text-decoration: underline;
 }
+
+div.error {
+	margin: 2ex 0 1ex 0;
+}

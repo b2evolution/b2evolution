@@ -185,8 +185,8 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 
 	// _______________________________________________________________
 
-	if( $Blog->get_setting( 'feed_content' ) != 'none' )
-	{ 
+	if( $Blog->get_setting( 'feed_content' ) != 'none' ) 
+	{ // fp: TODO; move this tesqt into feedback_feed_link()
 		// Display link for comments feed:
 		$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
 
@@ -207,6 +207,9 @@ skin_include( '_item_comment_form.inc.php', $params );
 
 /*
  * $Log$
+ * Revision 1.19  2009/07/02 18:08:53  fplanque
+ * minor
+ *
  * Revision 1.18  2009/07/02 09:37:15  leeturner2701
  * All default skins now fully support feeds being turned off
  *

@@ -330,7 +330,7 @@ class _core_Module
 							),
 						'facebook' => array(
 								'text' => T_('b2evolution on facebook'),
-								'href' => 'http://www.facebook.com/pages/b2evolution/63634905896',
+								'href' => 'http://www.facebook.com/b2evolution',
 								'target' => '_blank',
 							),
 						),
@@ -816,6 +816,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.16  2009/07/02 18:08:50  fplanque
+ * minor
+ *
  * Revision 1.15  2009/05/26 19:31:49  fplanque
  * Plugins can now have Settings that are specific to each blog.
  *
