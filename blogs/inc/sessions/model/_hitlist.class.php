@@ -141,6 +141,19 @@ class Hitlist
 		$smaller_time = min( $sess_prune_before, $time_prune_before );
 		$sess_prune_YMD = date( 'Y-m-d H:i:s', $smaller_time );
 
+		$rows_affected = $DB->query( "
+			DELETE FROM T_sessions
+			WHERE sess_lastseen < '".$sess_prune_YMD."'", 'Autoprune sessions' );
+
+		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_sessions.', 'hit' );
+
+/*
+	fp> MAY NOT GO INTO 3.3
+	fp> I am basically ok with this functionality, but code needs to be rewritten
+	so that if there are no plugins registered with that event we use a single request
+	to prune and do not jungle around with a potentially HUGE list of IDs.
+
+
 		if( $affected = $DB->get_row( "
 				SELECT sess_ID FROM T_sessions
 				WHERE sess_lastseen < '".$sess_prune_YMD."'", ARRAY_N )
@@ -163,7 +176,7 @@ class Hitlist
 				$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_sessions.', 'hit' );
 			}
 		}
-
+*/
 		// Prune non-referrered basedomains (where the according hits got deleted)
 		// BUT only those with unknown dom_type/dom_status, because otherwise this
 		//     info is useful when we get hit again.
@@ -206,6 +219,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.7  2009/07/02 00:01:50  fplanque
+ * needs optimization.
+ *
  * Revision 1.6  2009/06/15 18:50:50  blueyed
  * Fix SQL in session pruning: s/FOM/FROM/
  *

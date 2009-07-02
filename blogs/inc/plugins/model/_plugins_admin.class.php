@@ -200,6 +200,7 @@ class Plugins_admin extends Plugins
 				'AfterUserRegistration' => 'Gets called after a new user has registered.',
 
 				'SessionLoaded' => 'Gets called after $Session is initialized, quite early.',
+		// fp> WARNING: EXPERIMENTAL. MAY NOT GO INTO 3.3
 				'BeforeSessionsDelete' => 'Gets called when sessions are being pruned to enable plugin house cleaning, plugin can return list of sessions they want to keep',
 
 				'AfterLoginAnonymousUser' => 'Gets called at the end of the login procedure for anonymous visitors.',
@@ -216,7 +217,7 @@ class Plugins_admin extends Plugins
 				'PluginUserSettingsEditAction' => 'Called as action before editing a user\'s settings.',
 
 				// allow plugins to handle $disp modes
-		// fp> WARNING: EXPERIMENTAL. API MAY CHANGE.
+		// fp> WARNING: EXPERIMENTAL. API MAY CHANGE. MAY NOT GO INTO 3.3
 				'GetDispModes' => 'Called when building possible $disp list',
 				'HandleDispMode' => 'Called when displaying $disp',
 			);
@@ -1470,6 +1471,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.17  2009/07/02 00:01:50  fplanque
+ * needs optimization.
+ *
  * Revision 1.16  2009/07/01 23:55:48  fplanque
  * doc
  *
