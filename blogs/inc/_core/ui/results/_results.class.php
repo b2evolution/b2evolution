@@ -1642,9 +1642,10 @@ class Results extends Table
 	 */
 	function display_prev( $page_url = '' )
 	{
-		if( $this->display_first() != NULL )
+		if( $this->first() > 2 )
 		{ //the list has to be displayed
-			return '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.($this->first()-1), $page_url ).'">'
+			$page_no = ceil($this->first()/2);
+			return '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$page_no, $page_url ).'">'
 								.$this->params['list_prev_text'].'</a>';
 		}
 
@@ -1656,9 +1657,10 @@ class Results extends Table
 	 */
 	function display_next( $page_url = '' )
 	{
-		if( $this->display_last() != NULL )
+		if( $this->last() < $this->total_pages-1 )
 		{ //the list has to be displayed
-			return '<a href="'.regenerate_url( $this->page_param,$this->page_param.'='.($this->last()+1), $page_url ).'">'
+			$page_no = $this->last() + floor(($this->total_pages-$this->last())/2);
+			return '<a href="'.regenerate_url( $this->page_param,$this->page_param.'='.$page_no, $page_url ).'">'
 								.$this->params['list_next_text'].'</a>';
 		}
 	}
@@ -1817,6 +1819,10 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.25  2009/07/02 23:59:33  fplanque
+ * Don't display ... when not needed.
+ * Clicking on ... now brings you to the middle of the interval.
+ *
  * Revision 1.24  2009/04/13 20:51:03  fplanque
  * long overdue cleanup of "no results" display: putting filter sback in right position
  *
