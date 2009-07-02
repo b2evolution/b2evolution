@@ -3932,6 +3932,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.111  2009/07/02 00:39:52  fplanque
+ * doc.
+ *
  * Revision 1.110  2009/06/28 20:16:06  tblue246
  * doc :(
  *
@@ -3942,6 +3945,9 @@ class Item extends ItemLight
  *        fix SQL errors caused by umlauts etc. (see commit message for
  *        rev 1.106). Did you at least try if my code still triggered the
  *        bug on your blog which caused you to ban mb_detect_encoding()?
+ * fp> I know there is an issue. I just really don't like mb_detect_encoding() because it's no reliable.
+ * Why don't you just pass b2evo's encoding? It has to be in a variable somewhere!! (either $evo_charset or $io_charset -- not sure) but the tags do not come in in a random encoding.
+ * I agree mb_detect_encoding() in convert_charset() needs to be killed too.
  *
  * Revision 1.108  2009/06/20 17:19:32  leeturner2701
  * meta desc and meta keywords per blog post
