@@ -641,32 +641,45 @@ class ItemList2 extends ItemListLight
 			case 'order':
 				// We have to integrate a rounding error margin
 				$comp_order_value = $current_Item->order;
+				$and_clause = '';
+
 				if( is_null($comp_order_value) )
-				{	// fall back to only ID
-					$next_Query->WHERE_and( $this->Cache->dbIDname
+				{	// current Item has NULL order
+					if( $operator == ' < ' )
+					{	// This is needed when browsing through a descending ordered list and we reach the limit where orders are not set/NULL (ex: b2evo screenshots)
+						$and_clause .= $this->Cache->dbprefix.$orderby_array[0].' IS NULL AND ';
+					}
+					$and_clause .= $this->Cache->dbIDname
 						.$operator
-						.$current_Item->ID
-					);
-					break;
+						.$current_Item->ID;
 				}
-				$next_Query->WHERE_and( $this->Cache->dbprefix.$orderby_array[0]
-																.$operator
-																.( $operator == ' < ' ? $comp_order_value-0.000000001 : $comp_order_value+0.000000001 )
-																.' OR ( '
-                                  .$this->Cache->dbprefix.$orderby_array[0]
-																	.( $operator == ' < ' ? ' <= '.($comp_order_value+0.000000001) : ' >= '.($comp_order_value-0.000000001) )
-																	.' AND '
-																	.$this->Cache->dbIDname
-																	.$operator
-																	.$current_Item->ID
-																.')'
-															);
+				else
+				{
+					if( $operator == ' < ' )
+					{	// This is needed when browsing through a descending ordered list and we reach the limit where orders are not set/NULL (ex: b2evo screenshots)
+						$and_clause .= $this->Cache->dbprefix.$orderby_array[0].' IS NULL OR ';
+					}
+					$and_clause .= $this->Cache->dbprefix.$orderby_array[0]
+													.$operator
+													.( $operator == ' < ' ? $comp_order_value-0.000000001 : $comp_order_value+0.000000001 )
+													.' OR ( '
+	                          .$this->Cache->dbprefix.$orderby_array[0]
+														.( $operator == ' < ' ? ' <= '.($comp_order_value+0.000000001) : ' >= '.($comp_order_value-0.000000001) )
+														.' AND '
+														.$this->Cache->dbIDname
+														.$operator
+														.$current_Item->ID
+													.')';
+				}
+
+				$next_Query->WHERE_and( $and_clause );
 				break;
 
 			default:
 				echo 'WARNING: unhandled sorting: '.htmlspecialchars( $orderby_array[0] );
 		}
 
+		// echo $next_Query->get_where();
 
 		// GET DATA ROWS:
 
@@ -699,6 +712,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.20  2009/07/02 23:10:41  fplanque
+ * nasty bug fix
+ *
  * Revision 1.19  2009/06/20 17:19:33  leeturner2701
  * meta desc and meta keywords per blog post
  *
