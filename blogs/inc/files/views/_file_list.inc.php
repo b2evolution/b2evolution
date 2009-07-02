@@ -630,6 +630,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.20  2009/07/02 00:26:46  fplanque
+ * doc
+ *
  * Revision 1.19  2009/06/28 19:54:59  tblue246
  * doc
  *
@@ -642,6 +645,7 @@ $Form->begin_form();
  *        if this file should ever get included by some other file then
  *        _file_browse.view.php. I will re-add the "global" statement to
  *        v-3-2, sorry for the mess.
+ * fp> it is used at line 287 in this file !!!
  *
  * Revision 1.17  2009/06/23 20:53:54  tblue246
  * File browser: Display a help notice when changing an user avatar

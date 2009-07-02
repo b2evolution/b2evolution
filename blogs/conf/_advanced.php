@@ -131,6 +131,7 @@ $antispam_on_message_form = 1;
  *
  * @todo Tblue> This is used by the "Who's online" widget/plugin
  *              only and should probably be a plugin setting.
+ * fp> yes, please make it happen if you can.
  *
  * @global integer
  */
@@ -317,27 +318,23 @@ $cookie_session = 'cookie'.$instance_name.'session';
 /**#@-*/
 
 /**
- * Expiration for cookies.
+ * Expiration for comment meta data cookies.
+ *
+ * Note: user sessions use different settings (config in admin)
  *
  * Value in seconds, set this to 0 if you wish to use non permanent cookies (erased when browser is closed).
  * Default: time() + 31536000 (one year from now)
- *
- * @internal Tblue> This setting is currently only used for comment meta
- *                  data cookies, why is it not used for user sessions,
- *                  too? Bug?
  * 
  * @global int $cookie_expires
  */
 $cookie_expires = time() + 31536000;
 
 /**
- * Expired-time used to erase cookies.
+ * Expired-time used to erase comment meta data cookies.
+ *
+ * Note: user sessions use different settings (config in admin)
  *
  * Default: time() - 86400 (24 hours ago)
- *
- * @internal Tblue> This setting is currently only used for comment meta
- *                  data cookies, why is it not used for user sessions,
- *                  too? Bug?
  * 
  * @global int $cookie_expired
  */
