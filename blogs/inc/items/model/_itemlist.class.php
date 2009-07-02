@@ -649,6 +649,10 @@ class ItemList2 extends ItemListLight
 					{	// This is needed when browsing through a descending ordered list and we reach the limit where orders are not set/NULL (ex: b2evo screenshots)
 						$and_clause .= $this->Cache->dbprefix.$orderby_array[0].' IS NULL AND ';
 					}
+					else
+					{ // This is needed when browsing through a descending ordered list and we want to browse back into the posts that have numbers (pb appears if first NULL posts is the highest ID)
+						$and_clause .= $this->Cache->dbprefix.$orderby_array[0].' IS NOT NULL OR ';
+					}
 					$and_clause .= $this->Cache->dbIDname
 						.$operator
 						.$current_Item->ID;
@@ -679,8 +683,6 @@ class ItemList2 extends ItemListLight
 				echo 'WARNING: unhandled sorting: '.htmlspecialchars( $orderby_array[0] );
 		}
 
-		// echo $next_Query->get_where();
-
 		// GET DATA ROWS:
 
 
@@ -697,10 +699,12 @@ class ItemList2 extends ItemListLight
 									.$next_Query->get_order_by()
 									.$next_Query->get_limit();
 
-		// echo $DB->format_query( $step1_sql );
+		//echo $DB->format_query( $step1_sql );
 
 		// Get list of the IDs we need:
 		$next_ID = $DB->get_var( $step1_sql, 0, 0, 'Get ID of next item' );
+
+		//pre_dump( $next_ID );
 
 		// Step 2: get the item (may be NULL):
 		$this->prevnext_Item[$direction] = & $ItemCache->get_by_ID( $next_ID, true, false );
@@ -712,6 +716,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.21  2009/07/02 23:29:40  fplanque
+ * even nastier!
+ *
  * Revision 1.20  2009/07/02 23:10:41  fplanque
  * nasty bug fix
  *
