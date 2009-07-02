@@ -69,13 +69,18 @@ a:hover {
 }
 .block3 {
 	background: url(../img/distrib/block_bottom.gif) no-repeat bottom;
-	padding: 14px 32px 28px 25px;
+	padding: 2px 32px 20px 25px;
 }
 
 h1, h2 {
 	color: #ff9000;
 }
-
+h1 {
+	font-size: 1.9em;
+}
+form {
+	margin-bottom: 12px;;
+}
 
 .copyright {
 	font-size:84%;

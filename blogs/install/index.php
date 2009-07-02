@@ -202,7 +202,7 @@ switch( $action )
 		display_locale_selector();
 
 		block_open();
-		
+
 		param( 'conf_db_user', 'string', true );
 		param( 'conf_db_password', 'string', true );
 		param( 'conf_db_name', 'string', true );
@@ -424,7 +424,7 @@ to
 
 		block_open();
 		?>
-		<h1><?php echo T_('How do you want to install b2evolution?') ?></h1>
+		<h1><?php echo T_('How would you like your b2evolution installed?') ?></h1>
 
 		<?php
 			$old_db_version = get_db_version();
@@ -471,6 +471,12 @@ to
 					<label for="start"><?php echo T_('<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location...')?></label></p>
 					<?php
 				}
+
+				
+			if( $allow_evodb_reset != 1 )
+			{
+				echo '<div class="floatright"><a href="index.php?action=deletedb&amp;locale='.$default_locale.'">'.T_('Need to start anew?').'</a></div>';
+			}
 			?>
 
 			<p>
@@ -481,20 +487,6 @@ to
 			</p>
 			</form>
 		<?php
-		if( $allow_evodb_reset != 1 )
-		{
-			?>
-			<br />
-			<h2><?php echo T_('Need to start anew?') ?></h2>
-			<p><?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.');
-			echo '</p>';
-			echo '<p>To enable it, please go to the /conf/_basic_config.php file and change:</p>
-<pre>$allow_evodb_reset = 0;</pre>
-to
-<pre>$allow_evodb_reset = 1;</pre>
-<p>Then reload this page and a reset option will appear.</p>';
-			echo '<p>This will also allow you to change your base configuration.</p>';
-		}
 
 		block_close();
 
@@ -540,7 +532,7 @@ to
 
 		if( $allow_evodb_reset != 1 )
 		{
-			echo '<p>'.T_('For security reasons, the reset feature is disabled by default.' ).'</p>';
+			echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.');
 			echo( '<p>To enable it, please go to the /conf/_basic_config.php file and change:</p>
 <pre>$allow_evodb_reset = 0;</pre>
 to
@@ -640,6 +632,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.163  2009/07/02 14:53:07  fplanque
+ * improved some more
+ *
  * Revision 1.162  2009/07/02 13:41:38  fplanque
  * fix
  *
