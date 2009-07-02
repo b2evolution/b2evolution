@@ -53,7 +53,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = '1.10-dev';
+	var $version = '3.3';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -821,11 +821,24 @@ class test_plugin extends Plugin
 			return true;
 		}
 	}
+
+
+	/**
+	 * @see Plugin::BeforeSessionsDelete()
+	 */
+	function BeforeSessionsDelete( $params )
+	{
+		$this->debug_log('BeforeSessionsDelete: Could have prevented deletion of '.count($params['IDs']).' sessions.' );
+		return array();
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.81  2009/07/02 22:01:15  blueyed
+ * Fix BeforeSessionsDelete: add it to base plugin class, test plugin and implement FPs requirements.
+ *
  * Revision 1.80  2009/06/29 02:14:04  fplanque
  * no message
  *

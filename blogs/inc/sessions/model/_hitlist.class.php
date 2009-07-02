@@ -139,44 +139,31 @@ class Hitlist
 		// Prune sessions that have timed out and are older than auto_prune_stats
 		$sess_prune_before = ($localtimenow - $Settings->get( 'timeout_sessions' ));
 		$smaller_time = min( $sess_prune_before, $time_prune_before );
-		$sess_prune_YMD = date( 'Y-m-d H:i:s', $smaller_time );
-
-		$rows_affected = $DB->query( "
-			DELETE FROM T_sessions
-			WHERE sess_lastseen < '".$sess_prune_YMD."'", 'Autoprune sessions' );
-
-		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_sessions.', 'hit' );
-
-/*
-	fp> MAY NOT GO INTO 3.3
-	fp> I am basically ok with this functionality, but code needs to be rewritten
-	so that if there are no plugins registered with that event we use a single request
-	to prune and do not jungle around with a potentially HUGE list of IDs.
-
-
-		if( $affected = $DB->get_row( "
-				SELECT sess_ID FROM T_sessions
-				WHERE sess_lastseen < '".$sess_prune_YMD."'", ARRAY_N )
-			)
+		$sql_where = "WHERE sess_lastseen < '".date('Y-m-d H:i:s', $smaller_time)."'";
+		if( $sess_Plugins = $Plugins->get_list_by_event( 'BeforeSessionsDelete' ) )
 		{
-			// allow plugins to delete any data based on sessions
-			if( $sess_Plugins = $Plugins->get_list_by_event( 'BeforeSessionsDelete' ) )
+			if( $affected = $DB->get_col( "SELECT sess_ID FROM T_sessions $sql_where" ) )
 			{
+				// Allow plugins to delete any data based on sessions
 				foreach( $sess_Plugins as $sess_Plugin )
 				{ // Go through whole list of sess plugins
-					if( $plugins_affected = $Plugins->call_method( $sess_Plugin->ID, 'BeforeSessionsDelete', $affected ) )
+					$params = array('IDs' => $affected);
+					if( $plugins_affected = $Plugins->call_method( $sess_Plugin->ID, 'BeforeSessionsDelete', $params ) )
 					{ // plugin wants to keep some of the sessions
 						$affected = array_diff( $affected, $plugins_affected );
 					}
 				}
-			}
-			if( !empty( $affected ) )
-			{ // we have some sessions to delete
-				$rows_affected = $DB->query( 'DELETE FROM T_sessions WHERE sess_ID IN( '.implode(',', $affected ).')', 'Autoprune sessions' );
-				$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_sessions.', 'hit' );
+
+				if( ! empty( $affected ) )
+				{ // we have some sessions to delete
+					$sql_where = 'WHERE sess_ID IN ('.implode(',', $affected).')';
+				}
 			}
 		}
-*/
+
+		$rows_affected = $DB->query( "DELETE FROM T_sessions $sql_where", 'Autoprune sessions' );
+		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_sessions.', 'hit' );
+
 		// Prune non-referrered basedomains (where the according hits got deleted)
 		// BUT only those with unknown dom_type/dom_status, because otherwise this
 		//     info is useful when we get hit again.
@@ -219,6 +206,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.8  2009/07/02 22:01:15  blueyed
+ * Fix BeforeSessionsDelete: add it to base plugin class, test plugin and implement FPs requirements.
+ *
  * Revision 1.7  2009/07/02 00:01:50  fplanque
  * needs optimization.
  *

@@ -2213,6 +2213,19 @@ class Plugin
 	}
 
 	/**
+	 * Event handler: Called before pruning sessions. The plugin can prevent deletion
+	 * of particular sessions, by returning their IDs.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'IDs': list of session IDs that are about to get deleted
+	 * @return array List of IDs that should not get deleted
+	 */
+	function BeforeSessionsDelete( & $params )
+	{
+		return array();
+	}
+
+	/**
 	 * Event handler: Called when a hit gets logged, but before it gets recorded.
 	 *
 	 * @param array Associative array of parameters
@@ -2876,6 +2889,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.25  2009/07/02 22:01:14  blueyed
+ * Fix BeforeSessionsDelete: add it to base plugin class, test plugin and implement FPs requirements.
+ *
  * Revision 1.24  2009/06/22 19:31:07  tblue246
  * Skin-specific translations ("locales" folder in the skin's folder, directory structure is the same as for plugins).
  *
