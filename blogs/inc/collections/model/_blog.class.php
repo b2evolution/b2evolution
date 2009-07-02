@@ -1548,14 +1548,14 @@ class Blog extends DataObject
 				 * @var User
 				 */
 				$owner_User = $this->get_owner_User();
-				/* yabs > why would fullname take priority over users preferred name ?
+				// Full name gets priority over prefered name because it makes more sense for DEFAULT copyright.
+				// Blog owner can set WHATEVER footer text she wants through the admin interface.
 				$owner = $owner_User->get( 'fullname' );
 				if( empty($owner) )
 				{
 					$owner = $owner_User->get_preferred_name();
 				}
-				*/
-				return $owner_User->get_preferred_name();
+				return $owner;
 
 			default:
 				return $matches[1];
@@ -2125,6 +2125,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.70  2009/07/02 00:25:03  fplanque
+ * rollback
+ *
  * Revision 1.69  2009/06/29 09:35:22  yabs
  * changed to $owner$ replacement to users preferred name
  *
