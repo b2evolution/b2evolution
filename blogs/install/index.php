@@ -138,10 +138,10 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 		<!-- InstanceEndEditable --></div>
 
 		<!-- InstanceBeginEditable name="Main" -->
-		<div class="block1">
-		<div class="block2">
-		<div class="block3">
 <?php
+block_open();
+
+// echo $action;
 
 if( $config_is_done || (($action != 'start') && ($action != 'default') && ($action != 'conf')) )
 { // Connect to DB:
@@ -154,7 +154,8 @@ if( $config_is_done || (($action != 'start') && ($action != 'default') && ($acti
 
 	if( $DB->error )
 	{ // restart conf
-		echo '<p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p>';
+		echo '<div class="error"><p class="error">'.T_('Check your database config settings below and update them if necessary...').'</p></div>';
+		display_base_config_recap();
 		$action = 'start';
 	}
 	else
@@ -190,7 +191,6 @@ if( $req_errors = install_validate_requirements() )
 	die;
 }
 
-
 switch( $action )
 {
 	case 'conf':
@@ -199,6 +199,8 @@ switch( $action )
 		 * Write conf file:
 		 * -----------------------------------------------------------------------------------
 		 */
+		display_locale_selector();
+
 		param( 'conf_db_user', 'string', true );
 		param( 'conf_db_password', 'string', true );
 		param( 'conf_db_name', 'string', true );
@@ -322,8 +324,28 @@ switch( $action )
 		 * Start of install procedure:
 		 * -----------------------------------------------------------------------------------
 		 */
-		if( (($action == 'start') && ($allow_evodb_reset == 1)) || (!$config_is_done) )
+		if( $action == 'start' )
 		{
+			display_locale_selector();
+
+			block_open();
+
+			echo '<h1>'.T_('Base configuration').'</h1>';
+
+			if( ! ( $allow_evodb_reset == 1 || (!$config_is_done) ) )
+			{
+				echo '<p><strong>Resetting the base configuration is currently disabled for security reasons.</strong></p>';
+				echo '<p>To enable it, please go to the /conf/_basic_config.php file and change:</p>
+<pre>$allow_evodb_reset = 0;</pre>
+to
+<pre>$allow_evodb_reset = 1;</pre>
+<p>Then reload this page and a reset option will appear.</p>';
+				block_close();
+				break;
+			}
+			else
+			{
+
 			// Set default params if not provided otherwise:
 			param( 'conf_db_user', 'string', $db_config['user'] );
 			param( 'conf_db_password', 'string', $db_config['password'] );
@@ -341,7 +363,6 @@ switch( $action )
 			param( 'conf_admin_email', 'string', $admin_email );
 
 			?>
-			<h1><?php echo T_('Base configuration') ?></h1>
 
 			<p><?php echo T_('Your base config file has not been edited yet. You can do this by filling in the form below.') ?></p>
 
@@ -386,6 +407,7 @@ switch( $action )
 
 			<?php
 			break;
+			}
 		}
 		// if config was already done, move on to main menu:
 
@@ -395,6 +417,10 @@ switch( $action )
 		 * Menu
 		 * -----------------------------------------------------------------------------------
 		 */
+
+		display_locale_selector();
+
+		block_open();
 		?>
 		<h1><?php echo T_('How do you want to install b2evolution?') ?></h1>
 
@@ -460,42 +486,17 @@ switch( $action )
 			<h2><?php echo T_('Need to start anew?') ?></h2>
 			<p><?php echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.');
 			echo '</p>';
-			echo( '<p>To enable it, please go to the /conf/_basic_config.php file and change:</p>
+			echo '<p>To enable it, please go to the /conf/_basic_config.php file and change:</p>
 <pre>$allow_evodb_reset = 0;</pre>
 to
 <pre>$allow_evodb_reset = 1;</pre>
-<p>Then reload this page and a reset option will appear.</p>
-<p>This will also allow you to change your base configuration.</p>');
+<p>Then reload this page and a reset option will appear.</p>';
+			echo '<p>This will also allow you to change your base configuration.</p>';
 		}
-		?>
 
-	</div>
-	</div>
-	</div>
+		block_close();
 
-	<div class="block1">
-	<div class="block2">
-	<div class="block3">
-
-		<h2><?php echo T_('Base config recap...')?></h2>
-
-		<p><?php printf( T_('If you don\'t see correct settings here, STOP before going any further, and <a %s>update your base configuration</a>.'), 'href="index.php?action=start&amp;locale='.$default_locale.'"' ) ?></p>
-
-		<?php
-		if( !isset($conf_db_user) ) $conf_db_user = $db_config['user'];
-		if( !isset($conf_db_password) ) $conf_db_password = $db_config['password'];
-		if( !isset($conf_db_name) ) $conf_db_name = $db_config['name'];
-		if( !isset($conf_db_host) ) $conf_db_host = $db_config['host'];
-
-		echo '<pre>',
-		T_('MySQL Username').': '.$conf_db_user."\n".
-		T_('MySQL Password').': '.(($conf_db_password != 'demopass' ? T_('(Set, but not shown for security reasons)') : 'demopass') )."\n".
-		T_('MySQL Database name').': '.$conf_db_name."\n".
-		T_('MySQL Host/Server').': '.$conf_db_host."\n".
-		T_('MySQL tables prefix').': '.$tableprefix."\n\n".
-		T_('Base URL').': '.$baseurl."\n\n".
-		T_('Admin email').': '.$admin_email.
-		'</pre>';
+		display_base_config_recap();
 		break;
 
 
@@ -604,44 +605,9 @@ to
 		break;
 }
 
+block_close();
 ?>
 
-</div>
-</div>
-</div>
-
-<?php
-// Locales selector:
-if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($action == 'menu') )
-{
-	?>
-	<div class="block1">
-	<div class="block2">
-	<div class="block3">
-	<h2><?php echo T_('Language / Locale')?> - Temporarily misplaced</h2>
-	<p><?php echo T_('Choose a default language/locale for your b2evo installation.')?></p>
-
-	<?php
-	// present available locales on first screen
-	foreach( $locales as $lkey => $lvalue )
-	{
-		if( $default_locale == $lkey ) echo '<strong>';
-		echo ' <a href="index.php?action='.$action.'&amp;locale='.$lkey.'">';
-		locale_flag( $lkey, 'w16px', 'flag', '', true,
-			/* Do not rely on $baseurl/$rsc_url here: */ '../rsc/flags' );
-		echo T_( $lvalue['name'] );
-		echo '</a>';
-		if( $default_locale == $lkey ) echo '</strong>';
-		echo ' &middot; ';
-
-	}
-	?>
-	</div>
-	</div>
-	</div>
-	<?php
-}
-?>
 <!-- InstanceEndEditable -->
 	</div>
 
@@ -672,6 +638,9 @@ if( ($action == 'start') || ($action == 'default') || ($action == 'conf') || ($a
 <?php
 /*
  * $Log$
+ * Revision 1.161  2009/07/02 13:35:23  fplanque
+ * Improved installer -- language/locale selection moved to a place where it's visible!
+ *
  * Revision 1.160  2009/03/08 23:57:47  fplanque
  * 2009
  *

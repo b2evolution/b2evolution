@@ -10,6 +10,110 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * Open a block
+ */
+function block_open()
+{
+	global $block_status;
+	if( isset($block_status) && $block_status == 'open' )
+	{
+		return;
+	}
+	$block_status = 'open';
+	echo '<div class="block1"><div class="block2"><div class="block3">';
+}
+
+/**
+ * Close a block
+ */
+function block_close()
+{
+	global $block_status;
+	if( !isset($block_status) || $block_status == 'closed' )
+	{
+		return;
+	}
+	$block_status = 'closed';
+	echo '</div></div></div>';
+}
+
+/**
+ * Language selector
+ */
+function display_locale_selector()
+{
+	global $locales, $default_locale, $action;
+
+	static $selector_already_displayed = false;
+
+	if( $selector_already_displayed )
+	{
+		return;
+	}
+	$selector_already_displayed = true;
+	block_open();
+	?>
+	<h2><?php echo T_('Language / Locale')?></h2>
+	<form action="index.php" method="get">
+	<?php
+	locale_flag( $default_locale, 'w16px', 'flag', '', true, /* Do not rely on $baseurl/$rsc_url here: */ '../rsc/flags' );
+	echo '<select name="locale" onchange="this.form.submit()">';
+	foreach( $locales as $lkey => $lvalue )
+	{
+		echo '<option';
+		if( $default_locale == $lkey ) echo ' selected="selected"';
+		echo ' value="'.$lkey.'">';
+		echo T_( $lvalue['name'] );
+		echo '</option>';
+	}
+	?>
+	</select>
+	<input type="submit" value="<?php echo T_('Select as default language/locale'); ?>" />
+	</form>
+	<?php
+	block_close();
+}
+
+/**
+ * Base config recap
+ */
+function display_base_config_recap()
+{
+	global $default_locale, $conf_db_user, $conf_db_password, $conf_db_name, $conf_db_host, $db_config, $tableprefix, $baseurl, $admin_email;
+
+	static $base_config_recap_already_displayed = false;
+
+	if( $base_config_recap_already_displayed )
+	{
+		return;
+	}
+	$base_config_recap_already_displayed = true;
+
+	block_open();
+	?>
+	<h2><?php echo T_('Base config recap...')?></h2>
+
+	<p><?php printf( T_('If you don\'t see correct settings here, STOP before going any further, and <a %s>update your base configuration</a>.'), 'href="index.php?action=start&amp;locale='.$default_locale.'"' ) ?></p>
+
+	<?php
+	if( !isset($conf_db_user) ) $conf_db_user = $db_config['user'];
+	if( !isset($conf_db_password) ) $conf_db_password = $db_config['password'];
+	if( !isset($conf_db_name) ) $conf_db_name = $db_config['name'];
+	if( !isset($conf_db_host) ) $conf_db_host = $db_config['host'];
+
+	echo '<pre>',
+	T_('MySQL Username').': '.$conf_db_user."\n".
+	T_('MySQL Password').': '.(($conf_db_password != 'demopass' ? T_('(Set, but not shown for security reasons)') : 'demopass') )."\n".
+	T_('MySQL Database name').': '.$conf_db_name."\n".
+	T_('MySQL Host/Server').': '.$conf_db_host."\n".
+	T_('MySQL tables prefix').': '.$tableprefix."\n\n".
+	T_('Base URL').': '.$baseurl."\n\n".
+	T_('Admin email').': '.$admin_email.
+	'</pre>';
+	block_close();
+}
+
 
 /**
  * Install new DB.
@@ -705,6 +809,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.62  2009/07/02 13:35:19  fplanque
+ * Improved installer -- language/locale selection moved to a place where it's visible!
+ *
  * Revision 1.61  2009/05/26 17:00:04  fplanque
  * added twitter plugin + better auto-install code for plugins in general
  *
