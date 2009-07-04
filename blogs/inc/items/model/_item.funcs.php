@@ -344,6 +344,8 @@ function get_postdata($postid)
  */
 function bpost_count_words( $str )
 {
+	$str = trim( strip_tags( $str ) );
+
 	// Note: The \p escape sequence is available since PHP 4.4.0 and 5.1.0.
 	if( @preg_match( '|\pL|', 'foo' ) === false )
 	{
@@ -841,6 +843,9 @@ function item_link_by_urltitle( $params = array() )
 
 /*
  * $Log$
+ * Revision 1.53  2009/07/04 19:19:08  tblue246
+ * Bugfix
+ *
  * Revision 1.52  2009/07/04 19:14:30  tblue246
  * bpost_count_words(): Use str_word_count if the \p escape sequence is not supported. This is the case for PHP versions before 4.4.0 and 5.1.0.
  *
