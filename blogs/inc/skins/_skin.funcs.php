@@ -585,9 +585,13 @@ function skin_description_tag()
 		}
 	}
 	elseif( in_array( $disp, array( 'single', 'page' ) ) )
-	{
+	{	// custom desc for the current single post:
 		$Item = & $MainList->get_by_idx( 0 );
-		// custom desc for the current single post:
+		if( is_null( $Item ) )
+		{	// This is not an object (happens on an invalid request):
+			return;
+		}
+
 		$r = $Item->get_metadesc();
 
 		if( empty( $r )&& $Blog->get_setting( 'excerpts_meta_description' ) )
@@ -624,6 +628,11 @@ function skin_keywords_tag()
 	elseif( in_array( $disp, array( 'single', 'page' ) ) )
 	{	// custom keywords for the current single post:
 		$Item = & $MainList->get_by_idx( 0 );
+		if( is_null( $Item ) )
+		{	// This is not an object (happens on an invalid request):
+			return;
+		}
+
 		$r = $Item->get_metakeywords();
 
 		/* fp> TODO:
@@ -875,6 +884,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.64  2009/07/04 22:48:04  tblue246
+ * Fix fatal PHP error
+ *
  * Revision 1.63  2009/07/04 01:52:51  fplanque
  * doc
  *
