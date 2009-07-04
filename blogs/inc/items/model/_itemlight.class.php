@@ -775,6 +775,10 @@ class ItemLight extends DataObject
 			{	// This is an intro, do not link title by default:
 				$params['link_type'] = 'none';
 			}
+			else if( $this->ptyp_ID == 3000 )
+			{	// This is a sidebar link, link to its "link to" URL by default:
+				$params['link_type'] = 'linkto_url';
+			}
 			else
 			{	// This is a normal post: use default link strategy from Blog settings:
 				$this->get_Blog();
@@ -948,6 +952,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2009/07/04 23:14:30  tblue246
+ * Backoffice/full post list: Link titles of sidebar links to "link to" URLs by default
+ *
  * Revision 1.18  2009/03/15 02:16:35  fplanque
  * auto link option for titles
  *
