@@ -162,6 +162,12 @@ class Hitlist
 					// fp> I am not sure but it might be more effective to add an AND NOT IN() to the date based where.
 					// What is a typical use case?
 					// There can be hundreds of thousands of sessions about to be deleted.
+					//
+					// yabs > in my case it's to allow outdated carts to be removed when the session's deleted
+					//				it could just as easily accomplish that if passed $smaller_time though
+					//				as it could update sess_lastseen for any session it wanted to keep
+					//				( can only see it wanting to prune it's own data, but you never know )
+					//				this would reduce the memory/sql overheads here ?
 					$sql_where = 'WHERE sess_ID IN ('.implode(',', $affected).')';
 				}
 			}
@@ -212,6 +218,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.10  2009/07/04 08:01:49  yabs
+ * doc
+ *
  * Revision 1.9  2009/07/04 01:52:51  fplanque
  * doc
  *
