@@ -189,7 +189,7 @@ $Form->begin_fieldset( T_('Categories').get_manual_link('categories_global_setti
 	$Form->checkbox_input( 'allow_moving_chapters', $Settings->get('allow_moving_chapters'), T_('Allow moving categories'), array( 'note' => T_('Check to allow moving categories accross blogs. (Caution: can break pre-existing permalinks!)' ) ) );
 	$Form->radio_input( 'chapter_ordering', $Settings->get('chapter_ordering'), array(
 					array( 'value'=>'alpha', 'label'=>T_('Alphabetical') ),
-					array( 'value'=>'manual', 'label'=>T_('Manual') ),
+					array( 'value'=>'manual', 'label'=>T_('Manual ') ),
 			 ), T_('Ordering of categories') );
 $Form->end_fieldset();
 
@@ -206,6 +206,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.17  2009/07/04 15:43:44  sam2kb
+ * "Manual " with space, like in _chapter_list.view.php
+ *
  * Revision 1.16  2009/05/18 03:59:39  fplanque
  * minor/doc
  *
