@@ -31,22 +31,43 @@
 
 			<h1>3.x series</h1>
 
-			<h2>3.3.0-dev</h2>
+			<h2>3.3.0-rc1</h2>
 			<ul>
-				<li>Skins can now have skin-specific translations ("locales" folder in the skin's folder, directory structure is the same as for plugin translations). (tblue246)</li>
-				<li>meta desc and meta keywords per blog post (leeturner2701)</li>
-				<li>Posts excerpts can be used as meta description for posts and pages (walter) ??? wasn't that there before already?</li>
-				<li>Category descriptions can be used as meta description on category pages (walter)</li>
-				<li>Improved installer
+				<li><strong>Skins:
+					</strong>
 					<ul>
-						<li>language/locale selection moved to a place where it's visible! (fplanque)</li>
-						<li>B2evolution no longer ships with _basic_config.php . It ships with _basic_config.template.php instead. That way, uploading a new release never overwrites the previous base config. The installer now creates  _basic_config.php based on _basic_config.template.php + entered form values. (fplanque)</li>
-						<li>Only one locale is now activated by default (the one selected during install). (fplanque)</li>
+						<li>Skins can now have skin-specific translations ("locales" folder in the skin's folder, directory structure is the same as for plugin translations). (tblue246)</li>
+						<li>All skins now support setting RSS feeds to 'none' (leeturner2701)</li>
 					</ul>
 				</li>
-				<li>3.3??? Addition plugin hooks (yabs)</li>
-				<li>Bug fixes (blueyed, tblue, sam2kb, yabs, fplanque)</li>
-			</ul>
+				<li><strong>SEO:
+					</strong>
+					<ul>
+						<li>&lt;meta&gt; desc and &lt;meta&gt; keywords per blog post (leeturner2701)</li>
+						<li>Category descriptions can be used as meta description on category pages (walter)</li>
+					</ul>
+				</li>
+				<li><strong>Installer: </strong>
+					<ul>
+						<li>B2evolution no longer ships with _basic_config.php . It ships with _basic_config.template.php instead. That way, uploading a new release never overwrites the previous base config. The installer now creates  _basic_config.php based on _basic_config.template.php + entered form values. (fplanque)</li>
+						<li>Language/locale selection moved to a place where it's visible! (fplanque)</li>
+						<li>Only one locale is now activated by default (the one selected during install). (fplanque)</li>
+						<li>Simplified main screen (fplanque).</li>
+					</ul>
+				</li>
+				
+					<li><strong>Plugins: </strong></li>
+					<ul>
+						<li>Twitter plugin no longer requires curl (yabs)</li>
+						<li>3.3 TBD??? Additional plugin hooks (yabs, blueyed)</li>
+					</ul>
+					<li><strong>Bug fixes:
+					</strong>
+						<ul>
+						<li>Many! (blueyed, tblue246, sam2kb, yabs, leeturner2701, fplanque)</li>
+						</ul>
+				</li>
+				</ul>
 			<h2>3.2.0-beta</h2>
 			<ul>
 				<li><strong>Skins:
@@ -69,6 +90,7 @@
 								<li>Tag pages: Prefix only mode allows urls like http://.../tag/tag-name with no trailing character (blueyed)</li>
 								<li>Optional rel=&quot;tag&quot; attribute (blueyed)</li>
 								<li>Return to a clean url after posting a comment (fplanque)</li>
+								<li>Posts excerpts can be used as meta description for posts and pages</li>
 					</ul>
 				</li>
 				<li><strong>Logging &amp; stats: </strong>

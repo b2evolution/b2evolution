@@ -487,6 +487,7 @@ function skin_include( $template_name, $params = array() )
 				Obviously that's just a "me" case study.
 
 				If you feel it's bloat then just roll it back ;)
+	fp> it's a fair use case. implementation feels heavy but if I can't come up with anything better, I'll leave it like that. may not put it into 3.3 in order to think some more.
 
 	2. The disp should only be handled by ONE SINGLE plugin. Correct?
 	So going through a loop here again is a bit of a waste.
@@ -874,6 +875,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.63  2009/07/04 01:52:51  fplanque
+ * doc
+ *
  * Revision 1.62  2009/07/02 22:17:05  yabs
  * <answer>sorry for the delay</answer>
  *

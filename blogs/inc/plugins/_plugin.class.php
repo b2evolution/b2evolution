@@ -2212,18 +2212,26 @@ class Plugin
 	{
 	}
 
+
 	/**
-	 * Event handler: Called before pruning sessions. The plugin can prevent deletion
+	 * 3.3? Event handler: Called before pruning sessions. The plugin can prevent deletion
 	 * of particular sessions, by returning their IDs.
 	 *
+	 * Note: There can be hundreds of thousands of sessions about to be deleted.
+	 * Any plugin making use of this may have serious performance/memory issues.
+	 *
+	 * fp> TODO: maybe we should pass the prune cut off date instead.
+	 * What's a use case for this?
+	 *
 	 * @param array Associative array of parameters
-	 *   - 'IDs': list of session IDs that are about to get deleted
+	 *   - 'IDs': list of session IDs that are about to get deleted (WARNING: potentially huge)
 	 * @return array List of IDs that should not get deleted
 	 */
 	function BeforeSessionsDelete( & $params )
 	{
 		return array();
 	}
+
 
 	/**
 	 * Event handler: Called when a hit gets logged, but before it gets recorded.
@@ -2889,6 +2897,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.26  2009/07/04 01:52:51  fplanque
+ * doc
+ *
  * Revision 1.25  2009/07/02 22:01:14  blueyed
  * Fix BeforeSessionsDelete: add it to base plugin class, test plugin and implement FPs requirements.
  *

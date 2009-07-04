@@ -140,11 +140,14 @@ class Hitlist
 		$sess_prune_before = ($localtimenow - $Settings->get( 'timeout_sessions' ));
 		$smaller_time = min( $sess_prune_before, $time_prune_before );
 		$sql_where = "WHERE sess_lastseen < '".date('Y-m-d H:i:s', $smaller_time)."'";
+		// 3.3? Prolly ok.
 		if( $sess_Plugins = $Plugins->get_list_by_event( 'BeforeSessionsDelete' ) )
 		{
+			// Note: There can be hundreds of thousands of sessions about to be deleted.
+			// Any plugin making use of this may have serious performance/memory issues.
 			if( $affected = $DB->get_col( "SELECT sess_ID FROM T_sessions $sql_where" ) )
 			{
-				// Allow plugins to delete any data based on sessions
+				// Allow plugins to delete any additional data for the sessions that are about to be pruned:
 				foreach( $sess_Plugins as $sess_Plugin )
 				{ // Go through whole list of sess plugins
 					$params = array('IDs' => $affected);
@@ -156,6 +159,9 @@ class Hitlist
 
 				if( ! empty( $affected ) )
 				{ // we have some sessions to delete
+					// fp> I am not sure but it might be more effective to add an AND NOT IN() to the date based where.
+					// What is a typical use case?
+					// There can be hundreds of thousands of sessions about to be deleted.
 					$sql_where = 'WHERE sess_ID IN ('.implode(',', $affected).')';
 				}
 			}
@@ -206,6 +212,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.9  2009/07/04 01:52:51  fplanque
+ * doc
+ *
  * Revision 1.8  2009/07/02 22:01:15  blueyed
  * Fix BeforeSessionsDelete: add it to base plugin class, test plugin and implement FPs requirements.
  *
