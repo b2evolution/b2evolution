@@ -1532,26 +1532,22 @@ class Item extends ItemLight
 	 */
 	function set_tags_from_string( $tags )
 	{
-		if( empty($tags) )
+		if( $tags === '' )
 		{
 			$this->tags = array();
+			return;
+		}
+		$this->tags = preg_split( '/\s*[;,]+\s*/', $tags, -1, PREG_SPLIT_NO_EMPTY );
+
+		if( function_exists( 'mb_strtolower' ) )
+		{	// fp> TODO: instead of those "when used" ifs, it would make more sense to redefine mb_strtolower beforehand if it doesn"t exist (it would then just be a fallback to the strtolower + a Debuglog->add() )
+			array_walk( $this->tags, create_function( '& $tag', '$tag = mb_strtolower( $tag, $GLOBALS[\'io_charset\'] );' ) );
 		}
 		else
 		{
-			$this->tags = preg_split( '/[;,]+/', $tags );
-		}
-
-		/* fplanque> The following kills special chars like é on my blog (latin 1) -- mb_detect_encoding() is now officially banned from being used anywhere
-		if( function_exists( 'mb_strtolower' ) && function_exists( 'mb_detect_encoding' ) )
-		{	// fp> TODO: instead of those "when used" ifs, it would make more sense to redefine mb_strtolower beforehand if it doesn"t exist (it would then just be a fallback to the strtolower + a Debuglog->add() )
-			array_walk( $this->tags, create_function( '& $tag', '$tag = mb_strtolower(trim($tag), mb_detect_encoding($tag));' ) );
-		}
-		else */
-		{
-			array_walk( $this->tags, create_function( '& $tag', '$tag = strtolower(trim($tag));' ) );
+			array_walk( $this->tags, create_function( '& $tag', '$tag = strtolower( $tag );' ) );
 		}
 		$this->tags = array_unique( $this->tags );
-		$this->tags = array_diff( $this->tags, array('') );	// empty element can sneak in when ending with ,,
 		// pre_dump( $this->tags );
 	}
 
@@ -3932,6 +3928,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.112  2009/07/04 18:24:54  tblue246
+ * a) Another attempt at fixing Item::set_tags_from_string(). b) Doc @ fp
+ *
  * Revision 1.111  2009/07/02 00:39:52  fplanque
  * doc.
  *
@@ -3948,6 +3947,7 @@ class Item extends ItemLight
  * fp> I know there is an issue. I just really don't like mb_detect_encoding() because it's no reliable.
  * Why don't you just pass b2evo's encoding? It has to be in a variable somewhere!! (either $evo_charset or $io_charset -- not sure) but the tags do not come in in a random encoding.
  * I agree mb_detect_encoding() in convert_charset() needs to be killed too.
+ * Tblue> I now pass $io_charset, since this is what header_content_type() outputs.
  *
  * Revision 1.108  2009/06/20 17:19:32  leeturner2701
  * meta desc and meta keywords per blog post
