@@ -947,11 +947,11 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 				}
 				elseif( isset($meta['valid_range']['max']) )
 				{
-					$param_error = sprintf(T_('The value is invalid. It must be smaller than %s.'), $meta['valid_range']['max']);
+					$param_error = sprintf(T_('The value is invalid. It must be smaller than or equal to %s.'), $meta['valid_range']['max']);
 				}
 				else
 				{
-					$param_error = sprintf(T_('The value is invalid. It must be greater than %s.'), $meta['valid_range']['min']);
+					$param_error = sprintf(T_('The value is invalid. It must be greater than or equal to %s.'), $meta['valid_range']['min']);
 				}
 			}
 
@@ -1023,6 +1023,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /*
  * $Log$
+ * Revision 1.11  2009/07/04 17:42:39  tblue246
+ * Translation fix: Default error messages for min/max values (plugin settings) were badly worded.
+ *
  * Revision 1.10  2009/05/26 19:31:59  fplanque
  * Plugins can now have Settings that are specific to each blog.
  *
