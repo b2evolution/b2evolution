@@ -281,6 +281,7 @@ class coll_item_list_Widget extends ComponentWidget
 
 			$filters['cat_array'] = $linkblog_cat_array;
 			$filters['cat_modifier'] = $linkblog_cat_modifier;
+			$filters['orderby'] = 'main_cat_ID '.$filters['orderby'];
 		}
 
 		// pre_dump( $filters );
@@ -393,6 +394,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.7  2009/07/04 00:54:53  fplanque
+ * bugfix: linkblog cannot make proper groups if posts are not ordered by cat
+ *
  * Revision 1.6  2009/03/20 22:44:04  fplanque
  * Related Items -- Proof of Concept
  *
