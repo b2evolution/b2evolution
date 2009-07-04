@@ -80,6 +80,15 @@ class whosonline_plugin extends Plugin
 				'type' => 'checkbox',
 				'defaultvalue' => true,
 			),
+			'timeout_online_user' => array(
+				'label' => T_( 'Online session timeout' ),
+				'note' => T_( 'seconds. After how much time of inactivity an user is considered to be offline? 300 seconds are 5 minutes.' ),
+				'type' => 'integer',
+				'defaultvalue' => 300,
+				'valid_range' => array(
+					'min' => 1, // 0 would not make sense.
+				),
+			),
 		);
 		return $r;
 	}
@@ -106,8 +115,7 @@ class whosonline_plugin extends Plugin
 		echo T_('Who\'s Online?');
 		echo $params['block_title_end'];
 
-		$OnlineSessions = new OnlineSessions();
-
+		$OnlineSessions = & new OnlineSessions( $params['timeout_online_user'] );
 		$OnlineSessions->display_onliners( $params );
 
 		echo $params['block_end'];
@@ -146,8 +154,27 @@ class OnlineSessions
 	 */
 	var $_registered_Users;
 
+	/**
+	 * Online session timeout in seconds.
+	 *
+	 * Default value: 300 (5 minutes). Set by {@link OnlineSessions::OnlineSessions()}.
+	 * 
+	 * @access protected
+	 */
+	var $_timeout_online_user;
 
 	var $_initialized = false;
+
+
+	/**
+	 * Constructor.
+	 *
+	 * @param integer Online session timeout in seconds.
+	 */
+	function OnlineSessions( $timeout_online_user = 300 )
+	{
+		$this->_timeout_online_user = $timeout_online_user;
+	}
 
 
 	/**
@@ -161,12 +188,12 @@ class OnlineSessions
 		{
 			return true;
 		}
-		global $DB, $localtimenow, $timeout_online_user;
+		global $DB, $localtimenow;
 
 		$this->_count_guests = 0;
 		$this->_registered_Users = array();
 
-		$timeout_YMD = date( 'Y-m-d H:i:s', ($localtimenow - $timeout_online_user) );
+		$timeout_YMD = date( 'Y-m-d H:i:s', ($localtimenow - $this->_timeout_online_user) );
 
 		$UserCache = & get_Cache( 'UserCache' );
 
@@ -306,6 +333,9 @@ class OnlineSessions
 
 /*
  * $Log$
+ * Revision 1.6  2009/07/04 17:43:13  tblue246
+ * Made $timeout_online_user a widget setting
+ *
  * Revision 1.5  2009/06/24 18:47:54  tblue246
  * Make widget plugin names translatable
  *

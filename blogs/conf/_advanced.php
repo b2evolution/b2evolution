@@ -124,20 +124,6 @@ $minimum_comment_interval = 30;
 $antispam_on_message_form = 1;
 
 
-/**
- * Set the length of the online session time out (in seconds).
- *
- * This is for the Who's Online block. Default: 5 minutes (300s).
- *
- * @todo Tblue> This is used by the "Who's online" widget/plugin
- *              only and should probably be a plugin setting.
- * fp> yes, please make it happen if you can.
- *
- * @global integer
- */
-$timeout_online_user = 300; // Default: 5 minutes (300s).
-
-
 // Get hostname out of baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
 if( preg_match( '#^(https?://(.+?)(:(.+?))?)(/.*)$#', $baseurl, $matches ) )
