@@ -401,7 +401,6 @@ class ArchiveList extends Results
 			// Keyword search stuff:
 			$this->ItemQuery->where_keywords( $s, $sentence, $exact );
 
-			// Exclude pages and intros:
 			$this->ItemQuery->where_types( $types );
 		}
 		else
@@ -415,8 +414,8 @@ class ArchiveList extends Results
 			// - - - + * * timestamp restrictions:
 			$this->ItemQuery->where_datestart( '', '', '', '', $timestamp_min, $timestamp_max );
 
-			// Exclude pages and intros:
-			$this->ItemQuery->where_types( '-1000,1500,1520,1530,1570,1600' );
+			// Include all types except pages, intros and sidebar links:
+			$this->ItemQuery->where_types( '-1000,1500,1520,1530,1570,1600,3000' );
 		}
 
 
@@ -608,6 +607,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.52  2009/07/04 22:47:47  tblue246
+ * Archives widget: Do not display sidebar links
+ *
  * Revision 1.51  2009/06/24 18:47:54  tblue246
  * Make widget plugin names translatable
  *
