@@ -21,18 +21,23 @@
  /**
  * Get updates from b2evolution.net
  *
- * @return boolean True if there have been updates.
+ * @return NULL|boolean True if there have been updates, false on error,
+ *                      NULL if the user has turned off updates.
  */
 function b2evonet_get_updates()
 {
-	global $allow_evo_stats;
+	global $allow_evo_stats; // Possible values: true, false, 'anonymous'
 	global $DB, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow, $evo_charset;
 	global $Messages, $Settings, $baseurl, $instance_name, $app_name, $app_version, $app_date;
 	global $Debuglog;
 
-	if( isset( $allow_evo_stats ) && $allow_evo_stats == false )
+	if( ! isset( $allow_evo_stats ) )
+	{	// Set default value:
+		$allow_evo_stats = true; // allow (non-anonymous) stats
+	}
+	if( $allow_evo_stats === false )
 	{ // Get outta here as fast as you can, EdB style:
-		return;
+		return NULL;
 	}
 
 	$update_every = 3600*12; // 12 hours
@@ -153,6 +158,12 @@ function b2evonet_get_updates()
 
 /*
  * $Log$
+ * Revision 1.20  2009/07/04 16:40:56  tblue246
+ * - b2evonet_get_updates():
+ * 	- PHPdoc.
+ * 	- Bugfix: $allow_evo_stats is also used when sending the XML-RPC message (line 89), thus it is not sufficient to only check whether it is set when checking if it equals false (line 38).
+ * 	- The function now explicitly returns NULL when $allow_evo_stats === false.
+ *
  * Revision 1.19  2009/07/01 23:46:28  fplanque
  * minor
  *
