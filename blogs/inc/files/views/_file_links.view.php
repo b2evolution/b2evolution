@@ -148,14 +148,18 @@ if( $mode != 'upload' )
 
 if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 {	// Check that we have permission to edit item:
-	printf( '<div>'.T_('Click on link %s icons below to link additional files to the post: ')
-				.'&laquo;<strong>'.$edited_Item->dget( 'title' ).'</strong>&raquo;</div>', get_icon( 'link', 'imgtag', array('class'=>'top') ) );
+	echo '<div>', sprintf( T_('Click on link %s icons below to link additional files to the post %s.'),
+							get_icon( 'link', 'imgtag', array('class'=>'top') ),
+							'&laquo;<strong>'.$edited_Item->dget( 'title' ).'</strong>&raquo;' ), '</div>';
 }
 
 
 
 /*
  * $Log$
+ * Revision 1.10  2009/07/04 15:58:26  tblue246
+ * Translation fixes and update of German translation
+ *
  * Revision 1.9  2009/03/08 23:57:43  fplanque
  * 2009
  *
