@@ -2126,11 +2126,11 @@ function mail_encode_header_string( $header_str, $mode = 'Q' )
 			$header_str = preg_replace( '¤([^a-z0-9!*+\-/ ])¤ie', 'sprintf("=%02x", ord(StripSlashes("\\1")))', $header_str );
 			$header_str = str_replace( ' ', '_', $header_str );
 
-			$header_str = "=?$evo_charset?Q?".$header_str."?=";
+			$header_str = '=?'.$evo_charset.'?Q?'.$header_str.'?=';
 		}
 		else
 		{ // Base 64 -- Alex RU way:
-			$header_str = "=?$evo_charset?B?".base64_encode( $header_str )."?=";
+			$header_str = '=?'.$evo_charset.'?B?'.base64_encode( $header_str ).'?=';
 		}
 	}
 
@@ -3432,6 +3432,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.107  2009/07/05 17:44:53  tblue246
+ * Minor (single quotes)
+ *
  * Revision 1.106  2009/07/05 16:44:14  sam2kb
  * More strict is_email() allows only ASCII symbols
  *
