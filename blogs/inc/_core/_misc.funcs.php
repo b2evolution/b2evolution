@@ -1063,7 +1063,8 @@ function is_email( $email, $format = 'simple', $return_match = false )
 
 		case 'simple':
 		default:
-			$pattern_email = '/^\S+@[^\.\s]\S*\.[a-z]{2,}$/i';
+			// '/^\S+@[^\.\s]\S*\.[a-z]{2,}$/i'
+			$pattern_email = '~^(([_a-z0-9-]+)(\.[_a-z0-9-]+)*@([a-z0-9-]+)(\.[a-z0-9-]+)*(\.[a-z]{2,}))$~i';
 			break;
 	}
 
@@ -3431,6 +3432,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.106  2009/07/05 16:44:14  sam2kb
+ * More strict is_email() allows only ASCII symbols
+ *
  * Revision 1.105  2009/06/28 19:21:49  tblue246
  * minor/doc
  *
