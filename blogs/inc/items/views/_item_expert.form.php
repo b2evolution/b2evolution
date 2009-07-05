@@ -183,7 +183,18 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 			&& $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID )	// TODO: if we actually set the primary cat to another blog, we may still get an ugly perm die
 			&& $current_User->check_perm( 'edit_timestamp', 'edit', false ) )
 	{	// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
-		$Form->submit( array( 'actionArray['.$next_action.'_publish]', /* TRANS: This is the value of an input submit button */ T_('Publish NOW !'), 'SaveButton' ) );
+		$Form->submit( array(
+			'actionArray['.$next_action.'_publish]',
+			/* TRANS: This is the value of an input submit button */ T_('Publish NOW !'),
+			'SaveButton',
+			'return jQuery( \'input[name="post_status"]:checked\' ).val() != \'protected\' || confirm( \''
+				.TS_( 'You have set this post\'s status to protected but '
+					 .'clicked the "Publish NOW !" button. This will '
+					 .'publish your post and make it available to the '
+					 .'public.\n\nIf this is not what you intended, click '
+					 .'the "Save" button instead.\n\nClick on OK to really '
+					 .'publish this post or on Cancel to continue editing.' ).'\' );',
+		) );
 	}
 
 	echo '</div>';
@@ -414,6 +425,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.46  2009/07/05 01:29:02  tblue246
+ * Ask for confirmation when "1 click-publishing" a post and the post status is set to "protected" (as discussed in: http://forums.b2evolution.net/viewtopic.php?p=93750 )
+ *
  * Revision 1.45  2009/06/28 23:55:32  fplanque
  * Item specific description has priority.
  * If none provided, fall back to excerpt.
