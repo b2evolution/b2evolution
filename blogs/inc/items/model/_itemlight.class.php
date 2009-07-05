@@ -776,7 +776,7 @@ class ItemLight extends DataObject
 				$params['link_type'] = 'none';
 			}
 			else if( $this->ptyp_ID == 3000 )
-			{	// This is a sidebar link, link to its "link to" URL by default:
+			{	// tblue> This is a sidebar link, link to its "link to" URL by default:
 				$params['link_type'] = 'linkto_url';
 			}
 			else
@@ -952,6 +952,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2009/07/05 00:50:29  fplanque
+ * no message
+ *
  * Revision 1.19  2009/07/04 23:14:30  tblue246
  * Backoffice/full post list: Link titles of sidebar links to "link to" URLs by default
  *

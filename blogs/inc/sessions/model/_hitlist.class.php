@@ -168,6 +168,8 @@ class Hitlist
 					//				as it could update sess_lastseen for any session it wanted to keep
 					//				( can only see it wanting to prune it's own data, but you never know )
 					//				this would reduce the memory/sql overheads here ?
+					// fp> Absolutely!! With that scheme there are no huge lists of IDs goign back and forth between MySQL & PHP
+					//     Please modify the plugin hook to work with  $smaller_time (name the param cutoff_timestamp though to make it more cleat what it is)
 					$sql_where = 'WHERE sess_ID IN ('.implode(',', $affected).')';
 				}
 			}
@@ -218,6 +220,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.11  2009/07/05 00:50:29  fplanque
+ * no message
+ *
  * Revision 1.10  2009/07/04 08:01:49  yabs
  * doc
  *
