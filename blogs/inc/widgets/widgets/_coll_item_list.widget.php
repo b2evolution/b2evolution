@@ -120,7 +120,7 @@ class coll_item_list_Widget extends ComponentWidget
 					'defaultvalue' => 'DESC',
 				),
 				'limit' => array(
-					'label' => T_( 'Limit' ),
+					'label' => T_( 'Max items' ),
 					'note' => T_( 'Maximum number of items to display.' ),
 					'size' => 4,
 					'defaultvalue' => 20,
@@ -394,6 +394,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.8  2009/07/05 16:39:10  sam2kb
+ * "Limit" to "Max items"
+ *
  * Revision 1.7  2009/07/04 00:54:53  fplanque
  * bugfix: linkblog cannot make proper groups if posts are not ordered by cat
  *

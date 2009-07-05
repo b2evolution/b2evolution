@@ -310,7 +310,7 @@ class archives_plugin extends Plugin
 	{
 		$r = array(
 			'limit' => array(
-				'label' => T_( 'Limit' ),
+				'label' => T_( 'Max items' ),
 				'note' => T_( 'Maximum number of items to display.' ),
 				'size' => 4,
 				'defaultvalue' => 12,
@@ -607,6 +607,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.53  2009/07/05 16:39:10  sam2kb
+ * "Limit" to "Max items"
+ *
  * Revision 1.52  2009/07/04 22:47:47  tblue246
  * Archives widget: Do not display sidebar links
  *
