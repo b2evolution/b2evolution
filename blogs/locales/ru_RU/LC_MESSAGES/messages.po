@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: b2evolution 3.4-dev\n"
+"Project-Id-Version: b2evolution 3\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2009-07-04 17:46+0200\n"
-"PO-Revision-Date: 2009-07-06 02:07-0500\n"
+"PO-Revision-Date: 2009-07-06 18:36-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "X-Poedit-Language: Russian\n"
 "X-Poedit-Country: RUSSIAN FEDERATION\n"
 "X-Poedit-Basepath: .\n"
-"X-Poedit-SourceCharset: iso-8859-1\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11) ? 0 : ((n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20)) ? 1 : 2);\n"
 "X-Poedit-SearchPath-0: X:\\web\\b2evolution\\b2evolution\n"
 
 #: ..\..\..\a_noskin.php:231
@@ -475,7 +475,7 @@ msgstr "Возможность писать в блог по email отключ�
 
 #: ..\..\..\cron\getmail.php:102
 msgid "You configured test mode in the settings or set $test to 2. Nothing will be posted to the database/mediastore nor will your inbox be altered."
-msgstr ""
+msgstr "В настройках выбран тестовый режим работы или задано значение 2 переменной $test. В таком случае записи НЕ будут созданы и папка Входящие не будет изменена."
 
 #: ..\..\..\cron\getmail.php:111
 #: ..\..\..\inc\settings\views\_features.form.php:78
@@ -483,7 +483,6 @@ msgid "Blog by email"
 msgstr "Блог по email"
 
 #: ..\..\..\cron\getmail.php:258
-#, fuzzy
 msgid "Could not parse date header!"
 msgstr "Не удалось обработать заголовок даты!"
 
@@ -526,12 +525,12 @@ msgstr "Невозможно создать временный файл."
 #: ..\..\..\cron\getmail.php:502
 #, php-format
 msgid "MIME message decoding error: %s at position %d."
-msgstr ""
+msgstr "Ошибка при декодировании MIME сообщения: %s, %d."
 
 #: ..\..\..\cron\getmail.php:512
 #, php-format
 msgid "MIME message analyse error: %s"
-msgstr ""
+msgstr "Ошибка при анализе MIME сообщения: %s"
 
 #: ..\..\..\cron\getmail.php:591
 #, php-format
@@ -1541,7 +1540,7 @@ msgstr "Дата появления (по умолчанию)"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:3365
 msgid "Order (as explicitely specified)"
-msgstr ""
+msgstr "Порядку (явно указан в записи)"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:3368
 msgid "Date created"
@@ -3063,7 +3062,7 @@ msgstr "Имя"
 #: ..\..\..\inc\chapters\views\_chapter.form.php:69
 #: ..\..\..\inc\chapters\views\_chapter_list.view.php:191
 msgid "URL \"slug\""
-msgstr ""
+msgstr "Короткая ссылка"
 
 #: ..\..\..\inc\chapters\views\_chapter.form.php:69
 msgid "Used for clean URLs. Must be unique."
@@ -3082,7 +3081,7 @@ msgstr "Для ручной сортировки рубрик"
 #: ..\..\..\inc\items\views\_item_expert.form.php:342
 #: ..\..\..\inc\items\views\_item_list_full.view.php:144
 msgid "Order"
-msgstr "Сортировать"
+msgstr "Порядок"
 
 #: ..\..\..\inc\chapters\views\_chapter.form.php:82
 #: ..\..\..\inc\files\views\_filetype.form.php:99
@@ -3147,7 +3146,7 @@ msgstr "<strong>Примечание:</strong> Перемещение рубри
 #: ..\..\..\inc\chapters\views\_chapter_list.view.php:238
 #, php-format
 msgid "<strong>Note:</strong> Ordering of categories is currently set to %s in the %sglobal settings%s."
-msgstr "<strong>Примечание:</strong> В %sобщих настройках%s в настоящее время активирована %s сортировка рубрик."
+msgstr "<strong>Примечание:</strong> В настоящее время активирована сортировка рубрик %s в %sобщих настройках%s."
 
 #: ..\..\..\inc\chapters\views\_chapter_list.view.php:239
 #: ..\..\..\inc\settings\views\_features.form.php:191
@@ -4030,13 +4029,13 @@ msgstr "Содержимое / Записи"
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:86
 msgid "Default ordering of posts."
-msgstr "Сортировка записей по умолчанию."
+msgstr "Упорядочить по умолчанию."
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:86
 #: ..\..\..\inc\widgets\widgets\_coll_item_list.widget.php:109
 #: ..\..\..\inc\widgets\widgets\_coll_media_index.widget.php:94
 msgid "Order by"
-msgstr "Сортировать по"
+msgstr "Упорядочить по"
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:88
 #: ..\..\..\inc\widgets\widgets\_coll_item_list.widget.php:119
@@ -4583,7 +4582,7 @@ msgstr "Связать с \"URL ссылка\", если таковая имее
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:136
 msgid "No links on titles"
-msgstr "Не связывать с заголовками"
+msgstr "Без ссылок"
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:145
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:210
@@ -4705,7 +4704,7 @@ msgstr "Схема постоянной ссылки"
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:183
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:266
 msgid "Meta description"
-msgstr "Мета описание"
+msgstr "Мета тег \"description\""
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:183
 msgid "Use excerpt as meta description for posts and pages"
@@ -7545,8 +7544,9 @@ msgid "Warning: the URL slug has been changed to &laquo;%s&raquo;."
 msgstr "Внимание: URL имя файла записи было изменено на &laquo;%s&raquo;."
 
 #: ..\..\..\inc\items\model\_item.funcs.php:437
+#, fuzzy
 msgid "Images &amp; Attachments"
-msgstr ""
+msgstr "Вложения и фото"
 
 #. TRANS: This is the value of an input submit button
 #: ..\..\..\inc\items\model\_item.funcs.php:444
@@ -7776,7 +7776,7 @@ msgstr "используется в постоянной ссылке запис
 
 #: ..\..\..\inc\items\views\_item_expert.form.php:216
 msgid "URL title \"slug\""
-msgstr ""
+msgstr "Короткая ссылка"
 
 #: ..\..\..\inc\items\views\_item_expert.form.php:221
 msgid "&lt;title&gt; tag"
@@ -7833,7 +7833,7 @@ msgstr "(Разделено пробелом)"
 #: ..\..\..\inc\items\views\_item_expert.form.php:331
 #: ..\..\..\install\_functions_create.php:651
 msgid "Featured post"
-msgstr ""
+msgstr "Избранная запись"
 
 #: ..\..\..\inc\items\views\_item_expert.form.php:343
 #: ..\..\..\inc\items\views\_item_expert.form.php:352
@@ -8112,9 +8112,8 @@ msgid "i"
 msgstr "инфо"
 
 #: ..\..\..\inc\items\views\_item_list_table.view.php:206
-#, fuzzy
 msgid "Edit linked files..."
-msgstr "Редактировать прикрепленные файлы..."
+msgstr "Изменить вложенные файлы..."
 
 #: ..\..\..\inc\items\views\_item_list_table.view.php:239
 msgid "New page"
@@ -9697,8 +9696,9 @@ msgid "Unique IP hits"
 msgstr "Хиты уникальных IP"
 
 #: ..\..\..\inc\sessions\views\_stats_search_keywords.view.php:264
+#, fuzzy
 msgid "Cumulative"
-msgstr ""
+msgstr "Суммарно"
 
 #: ..\..\..\inc\sessions\views\_stats_sessions.view.php:45
 #: ..\..\..\inc\sessions\views\_stats_sessions_list.view.php:51
@@ -10095,7 +10095,7 @@ msgstr "Отметьте для разрешения перемещения ру
 
 #: ..\..\..\inc\settings\views\_features.form.php:193
 msgid "Ordering of categories"
-msgstr "Упорядочивание рубрик"
+msgstr "Сортировка рубрик"
 
 #: ..\..\..\inc\settings\views\_general.form.php:42
 msgid "General Settings"
@@ -12642,6 +12642,11 @@ msgid ""
 "\n"
 "<p>Also note that when the post is featured, it does not appear in the regular post flow.</p>"
 msgstr ""
+"<p>Это пример избранной записи.</p>\n"
+"\n"
+"<p>Она будет выводиться первой в случаях, когда не задана специальная \"Интро\" запись для текущего запроса.</p>\n"
+"\n"
+"<p>Заметьте, если запись является избранной, она не появляется в Основном потоке записей.</p>"
 
 #: ..\..\..\install\_functions_create.php:663
 msgid ""
@@ -13755,7 +13760,7 @@ msgstr "Бумага"
 
 #: ..\..\..\plugins\_test.plugin.php:137
 msgid "Scissors"
-msgstr ""
+msgstr "Ножницы"
 
 #: ..\..\..\plugins\_test.plugin.php:137
 msgid "Stone"
@@ -14041,7 +14046,7 @@ msgstr "Контекстное меню"
 
 #: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:83
 msgid "Enable this to use an extra context menu in the editor"
-msgstr ""
+msgstr "Отметьте, для добавления нового контекстного меню в редактор"
 
 #: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:86
 #: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:193
@@ -14051,7 +14056,7 @@ msgstr "Дополнительные свойства"
 
 #: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:89
 msgid "Enable this to add support for pasting easily word and plain text files"
-msgstr ""
+msgstr "Отметьте, чтобы включить поддержку простой вставки из Ворда и простых текстовых файлов"
 
 #: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:92
 msgid "Show XHTML extras"
@@ -14104,7 +14109,7 @@ msgstr "Разрешенные XHTML теги"
 
 #: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:208
 msgid "Enable to add directionality icons to TinyMCE that enables TinyMCE to better handle languages that is written from right to left."
-msgstr ""
+msgstr "Отметьте, чтобы включить значки выбора направления письма (слева-направо и справа-налево)."
 
 #: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:282
 msgid "Toggle between WYSIWYG and plain HTML editor"
@@ -14131,11 +14136,11 @@ msgstr "Плагин Twitter"
 
 #: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:63
 msgid "Post to your Twitter account when you post to your blog"
-msgstr "Дублировать на Twitter записи, созданные вами в блоге"
+msgstr "Дублирует на Twitter записи, созданные вами в блоге"
 
 #: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:64
 msgid "Posts to your Twitter account to update Twitter.com with details of your blog post."
-msgstr ""
+msgstr "Дублирует на ваш аккаунт в Twitter.com записи, созданные вами в блоге."
 
 #: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:67
 msgid "Update your twitter account with details about the new post."
@@ -14147,11 +14152,11 @@ msgstr "Плагину Twitter нужен НЕ пустой код."
 
 #: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:123
 msgid "You must configure a twitter username/password before you can post to twitter."
-msgstr ""
+msgstr "Перед использованием twitter вы должны ввести имя пользователя и пароль учетной записи."
 
 #: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:179
 msgid "No ping method available, please contact your host about using CURL or fsockopen"
-msgstr ""
+msgstr "Пинг невозможен, пожалуйста, свяжитесь с провайдером вашего хостинга для активирования CURL или fsockopen"
 
 #: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:193
 msgid "Posted to account: @"
@@ -14160,7 +14165,7 @@ msgstr "Опубликованно в аккаунт: @"
 #: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:206
 #: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:236
 msgid "Twitter username"
-msgstr ""
+msgstr "Учетная запись Twitter"
 
 #: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:210
 #: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:240
@@ -14175,12 +14180,12 @@ msgstr "Формат сообщений"
 #: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:218
 #: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:248
 msgid "Just posted $title$ $url$ #b2p"
-msgstr ""
+msgstr "Создана запись $title$ $url$ #b2p"
 
 #: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:219
 #: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:249
 msgid "$title$, $excerpt$ and $url$ will be replaced appropriately."
-msgstr ""
+msgstr "$title$, $excerpt$ и $url$ будут замены их реальными значениями."
 
 #: ..\..\..\plugins\videoplug_plugin\_videoplug.plugin.php:38
 msgid "Video plug for a few popular video sites."
@@ -14448,11 +14453,12 @@ msgstr "Отправить сообщение"
 
 #: ..\..\..\skins\_user.disp.php:59
 msgid "This user does not wish to be contacted directly."
-msgstr ""
+msgstr "Этот пользователь не желает получать сообщения."
 
 #: ..\..\..\skins\_user.disp.php:87
+#, fuzzy
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Дополнительно"
 
 #: ..\..\..\skins\asevo\_body_footer.inc.php:45
 #: ..\..\..\skins\custom\index.main.php:293
@@ -14577,12 +14583,12 @@ msgstr "слов"
 
 #: ..\..\..\skins\custom\_skin.class.php:51
 msgid "Header Background Color"
-msgstr ""
+msgstr "Цвет фона шапки"
 
 #: ..\..\..\skins\custom\_skin.class.php:52
 #: ..\..\..\skins\custom\_skin.class.php:59
 msgid "E-g: #ff0000 for red"
-msgstr ""
+msgstr "Пример: #ff0000 (красный)"
 
 #: ..\..\..\skins\custom\_skin.class.php:55
 #: ..\..\..\skins\custom\_skin.class.php:62
@@ -14591,7 +14597,7 @@ msgstr "Недопустимое значение цвета."
 
 #: ..\..\..\skins\custom\_skin.class.php:58
 msgid "Menu Background Color"
-msgstr ""
+msgstr "Цвет фона меню"
 
 #: ..\..\..\skins\custom\index.main.php:262
 #: ..\..\..\skins\pixelgreen\index.main.php:194
