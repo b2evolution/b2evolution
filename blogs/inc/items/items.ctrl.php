@@ -337,7 +337,7 @@ switch( $action )
 			{
 				// Tblue> - Perhaps this should be an error (?).
 				//        - Message contents could be confusing.
-				$Messages->add( sprintf( T_( 'The post has been updated '
+				$Messages->add( sprintf( T_( 'The post has been created '
 											.'but not published because it '
 											.'seems like you wanted to set '
 											.'its status to "%s" instead. '
@@ -1041,6 +1041,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.50  2009/07/06 16:52:15  tblue246
+ * minor
+ *
  * Revision 1.49  2009/07/06 16:04:07  tblue246
  * Moved echo_publishnowbutton_js() to _item.funcs.php
  *
