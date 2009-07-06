@@ -2714,6 +2714,8 @@ class Item extends ItemLight
 				'item_status_class' => 'bPost',
 			), $params );
 
+
+		// TODO: dh> nitpicking: it should use "bPostProtected", not "bPostprotected"..
 		echo $params['item_class'].' '.$params['item_type_class'].$this->ptyp_ID.' '.$params['item_status_class'].$this->status;
 	}
 
@@ -3928,6 +3930,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.114  2009/07/06 21:49:30  blueyed
+ * todo
+ *
  * Revision 1.113  2009/07/06 13:37:16  tblue246
  * - Backoffice, write screen:
  * 	- Hide the "Publish NOW !" button using JavaScript if the post types "Protected" or "Private" are selected.
