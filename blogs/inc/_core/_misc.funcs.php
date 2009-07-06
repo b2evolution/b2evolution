@@ -3373,22 +3373,25 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
  *
  * @author Yabba
  * @author Tblue
- * @todo dh> move back to str_replace and remove the extra tabs
  *
  * @param string $unformatted raw data
  * @return string formatted data
  */
 function format_to_js( $unformatted )
 {
-	return preg_replace( array(
-							'|\'|',
-							'|\\\([nrt])|',
-							'|\n|',
-							'|\r|',
+	return str_replace( array(
+							'\'',
+							'\n',
+							'\r',
+							'\t',
+							"\n",
+							"\r",
 						),
 						array(
 							'\\\'',
-							'\\\\\\\$1',
+							'\\\\n',
+							'\\\\r',
+							'\\\\t',
 							'\n',
 							'\r',
 						), $unformatted );
@@ -3471,6 +3474,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.110  2009/07/06 21:32:52  tblue246
+ * format_to_js(): Use str_replace() instead of preg_replace() -- better performance
+ *
  * Revision 1.109  2009/07/06 21:08:37  blueyed
  * todo
  *
