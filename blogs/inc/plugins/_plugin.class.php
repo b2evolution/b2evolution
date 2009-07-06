@@ -2214,7 +2214,7 @@ class Plugin
 
 
 	/**
-	 * 3.3? Event handler: Called before pruning sessions. The plugin can prevent deletion
+	 * Event handler: Called before pruning sessions. The plugin can prevent deletion
 	 * of particular sessions, by returning their IDs.
 	 *
 	 * Note: There can be hundreds of thousands of sessions about to be deleted.
@@ -2897,6 +2897,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.27  2009/07/06 23:00:33  fplanque
+ * minor
+ *
  * Revision 1.26  2009/07/04 01:52:51  fplanque
  * doc
  *
