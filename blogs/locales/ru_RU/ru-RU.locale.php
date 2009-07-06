@@ -13,7 +13,7 @@ $locale_defs['ru-RU'] = array(
 		'name' => NT_('Russian (RU)'),
 		'messages' => 'ru_RU',
 		'charset' => 'utf-8',
-		'datefmt' => 'd.m.y',
+		'datefmt' => 'j.m.y',
 		'timefmt' => 'H:i:s',
 		'startofweek' => 1,
 	);
