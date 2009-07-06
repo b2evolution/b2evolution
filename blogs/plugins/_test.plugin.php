@@ -828,14 +828,17 @@ class test_plugin extends Plugin
 	 */
 	function BeforeSessionsDelete( $params )
 	{
-		$this->debug_log('BeforeSessionsDelete: Could have prevented deletion of '.count($params['IDs']).' sessions.' );
-		return array();
+		$this->debug_log('BeforeSessionsDelete: Could have prevented the deletion of all sessions older than ' ).date('Y-m-d H:i:s', $params['cutoff_timestamp' ] );
+		return;
 	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.82  2009/07/06 12:44:41  yabs
+ * Modifying BeforeSessionsDelete behaviour
+ *
  * Revision 1.81  2009/07/02 22:01:15  blueyed
  * Fix BeforeSessionsDelete: add it to base plugin class, test plugin and implement FPs requirements.
  *

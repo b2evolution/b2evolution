@@ -139,6 +139,7 @@ class Hitlist
 		// Prune sessions that have timed out and are older than auto_prune_stats
 		$sess_prune_before = ($localtimenow - $Settings->get( 'timeout_sessions' ));
 		$smaller_time = min( $sess_prune_before, $time_prune_before );
+/*
 		$sql_where = "WHERE sess_lastseen < '".date('Y-m-d H:i:s', $smaller_time)."'";
 		// 3.3? Prolly ok.
 		if( $sess_Plugins = $Plugins->get_list_by_event( 'BeforeSessionsDelete' ) )
@@ -169,13 +170,16 @@ class Hitlist
 					//				( can only see it wanting to prune it's own data, but you never know )
 					//				this would reduce the memory/sql overheads here ?
 					// fp> Absolutely!! With that scheme there are no huge lists of IDs goign back and forth between MySQL & PHP
-					//     Please modify the plugin hook to work with  $smaller_time (name the param cutoff_timestamp though to make it more cleat what it is)
+					//     Please modify the plugin hook to work with  $smaller_time (name the param cutoff_timestamp though to make it more clear what it is)
 					$sql_where = 'WHERE sess_ID IN ('.implode(',', $affected).')';
 				}
 			}
 		}
+*/
+		// allow plugins to prune session based data
+		$Plugins->trigger_event( 'BeforeSessionsDelete', $temp_array = array( 'cutoff_timestamp' => $smaller_time ) );
 
-		$rows_affected = $DB->query( "DELETE FROM T_sessions $sql_where", 'Autoprune sessions' );
+		$rows_affected = $DB->query( 'DELETE FROM T_sessions WHERE sess_lastseen < '.$DB->quote(date('Y-m-d H:i:s', $smaller_time)), 'Autoprune sessions' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_sessions.', 'hit' );
 
 		// Prune non-referrered basedomains (where the according hits got deleted)
@@ -220,6 +224,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.12  2009/07/06 12:44:59  yabs
+ * Modifying BeforeSessionsDelete behaviour
+ *
  * Revision 1.11  2009/07/05 00:50:29  fplanque
  * no message
  *
