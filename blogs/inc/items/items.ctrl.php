@@ -758,6 +758,12 @@ function init_list_mode()
 	}
 }
 
+/**
+ * Output JavaScript code to dynamically show or hide the "Publish NOW!"
+ * button depending on the selected post status.
+ *
+ * @param string Are we updating or creating? ('create' or 'update').
+ */
 function echo_publishnowbutton_js( $action )
 {
 	?>
@@ -1062,6 +1068,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.48  2009/07/06 13:45:05  tblue246
+ * PHPdoc for echo_publishnowbutton_js().
+ *
  * Revision 1.47  2009/07/06 13:37:16  tblue246
  * - Backoffice, write screen:
  * 	- Hide the "Publish NOW !" button using JavaScript if the post types "Protected" or "Private" are selected.
