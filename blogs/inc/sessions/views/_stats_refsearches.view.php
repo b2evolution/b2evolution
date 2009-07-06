@@ -65,7 +65,7 @@ if( $current_User->check_perm( 'stats', 'edit' ) )
 {
 	$Results->cols[1]['td'] = '<a href="%regenerate_url( \'action\', \'action=delete&amp;hit_ID=$hit_ID$\')%" title="'
 			.T_('Delete this hit!').'">'.get_icon('delete').'</a> '
-			.'<a href="$hit_referer$">$dom_name$</a>';
+			.'<a href="$hit_referer$" target="_blank">$dom_name$</a>';
 }
 else
 {
@@ -118,6 +118,9 @@ echo '<p class="notes">'.T_('These are hits from people who came to this blog sy
 
 /*
  * $Log$
+ * Revision 1.9  2009/07/06 06:51:03  sam2kb
+ * Added target="_blank" on referer URLs
+ *
  * Revision 1.8  2009/05/10 00:28:51  fplanque
  * serp rank logging
  *

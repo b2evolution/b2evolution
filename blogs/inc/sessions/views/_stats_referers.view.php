@@ -74,7 +74,7 @@ if( $current_User->check_perm( 'stats', 'edit' ) )
 			./* TRANS: Abbrev. for "move to searches" (stats) */ T_('-&gt;S')
 			.'" title="'.T_('Log as a search instead').'" /></a> '
 
-			.'<a href="$hit_referer$">$dom_name$</a>';
+			.'<a href="$hit_referer$" target="_blank">$dom_name$</a>';
 }
 else
 {
@@ -179,7 +179,7 @@ if( count( $res_stats ) )
 	{
 		?>
 		<tr class="<?php echo( $count%2 ? 'odd' : 'even') ?>">
-			<td class="firstcol"><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
+			<td class="firstcol"><a href="<?php stats_referer() ?>" target="_blank"><?php stats_basedomain() ?></a></td>
 			<?php
 			if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{ // user can ban:
@@ -210,6 +210,9 @@ if( count( $res_stats ) )
 
 /*
  * $Log$
+ * Revision 1.10  2009/07/06 06:51:03  sam2kb
+ * Added target="_blank" on referer URLs
+ *
  * Revision 1.9  2009/04/11 23:45:47  tblue246
  * Fix translation problems
  *
