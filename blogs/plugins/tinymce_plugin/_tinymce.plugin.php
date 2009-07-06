@@ -187,16 +187,16 @@ class tinymce_plugin extends Plugin
 					'label' => $this->T_('Context menu'),
 					'type' => 'checkbox',
 					'defaultvalue' => $this->Settings->get('tmce_options_contextmenu'),
-					'note' => $this->T_('Enable this to use an extra content menu in the editor')
+					'note' => $this->T_('Enable this to use an extra context menu in the editor')
 				);
 		$r['tmce_options_paste'] = array( // fp> keep for now
 					'label' => $this->T_('Advanced paste support'),
 					'type' => 'checkbox',
 					'defaultvalue' => $this->Settings->get('tmce_options_paste'),
-					'note' => $this->T_('Enable this to add support for pasting of word and plain text files')
+					'note' => $this->T_('Enable this to add support for pasting easily word and plain text files')
 				);
 		$r['tmce_options_xhtmlxtras'] = array( // keep for now
-					'label' => $this->T_('Show XHTML Extras'),
+					'label' => $this->T_('Show XHTML extras'),
 					'type' => 'checkbox',
 					'defaultvalue' => $this->Settings->get('tmce_options_xhtmlxtras'),
 					'note' => $this->T_('Enable this to add support for XHTML elements (cite, ins, del, abbr, and acronym)')
