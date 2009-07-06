@@ -841,8 +841,41 @@ function item_link_by_urltitle( $params = array() )
 	$Item->permanent_link( $params );
 }
 
+
+/**
+ * Output JavaScript code to dynamically show or hide the "Publish NOW!"
+ * button depending on the selected post status.
+ *
+ * This function is used by the simple and expert write screens.
+ * 
+ * @param string Are we updating or creating? ('create' or 'update').
+ */
+function echo_publishnowbutton_js( $action )
+{
+	?>
+	<script type="text/javascript">
+		jQuery( '#itemform_visibility input[type=radio]' ).click( function()
+		{
+			var publishnow_btn = jQuery( '.edit_actions input[name=actionArray[<?php echo $action; ?>_publish]]' );
+			
+			if( this.value == 'private' || this.value == 'protected' )
+			{	// Hide the "Publish NOW !" button:
+				publishnow_btn.css( 'display', 'none' );
+			}
+			else
+			{	// Show the button:
+				publishnow_btn.css( 'display', 'inline' );
+			}
+		} );
+	</script>
+	<?php
+}
+
 /*
  * $Log$
+ * Revision 1.54  2009/07/06 16:04:08  tblue246
+ * Moved echo_publishnowbutton_js() to _item.funcs.php
+ *
  * Revision 1.53  2009/07/04 19:19:08  tblue246
  * Bugfix
  *
