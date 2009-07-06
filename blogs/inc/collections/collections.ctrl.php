@@ -225,7 +225,7 @@ switch( $action )
 			// We want to highlight the edited object on next list display:
  			// $Session->set( 'fadeout_array', array( 'blog_ID' => array($edited_Blog->ID) ) );
 
-			header_redirect( 'admin.php?ctrl=coll_settings&tab=features&blog='.$edited_Blog->ID ); // will save $Messages into Session
+			header_redirect( $dispatcher.'?ctrl=coll_settings&tab=features&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
 		break;
 
@@ -454,6 +454,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2009/07/06 23:52:24  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.12  2009/03/08 23:57:42  fplanque
  * 2009
  *

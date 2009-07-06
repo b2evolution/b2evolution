@@ -1484,8 +1484,15 @@ class File extends DataObject
 	 * @param string page url for the edit action
 	 */
 	function get_linkedit_link( $link_itm_ID = NULL, $text = NULL, $title = NULL, $no_access_text = NULL,
-											$actionurl = 'admin.php?ctrl=files', $target = '' )
+											$actionurl = '#', $target = '' )
 	{
+		global $dispatcher;
+		
+		if( $actionurl == '#' )
+		{
+			$actionurl = $dispatcher.'?ctrl=files';
+		}
+		
 		if( is_null( $text ) )
 		{	// Use file root+relpath+name by default
 			$text = $this->get_root_and_rel_path();
@@ -1517,8 +1524,15 @@ class File extends DataObject
 	 * @param integer ID of item to link to => will open the FM in link mode
 	 * @return string
 	 */
-	function get_linkedit_url( $link_itm_ID = NULL, $actionurl = 'admin.php?ctrl=files' )
+	function get_linkedit_url( $link_itm_ID = NULL, $actionurl = '#' )
 	{
+		global $dispatcher;
+		
+		if( $actionurl == '#' )
+		{
+			$actionurl = $dispatcher.'?ctrl=files';
+		}
+		
 		if( $this->is_dir() )
 		{
 			$rdfp_path = $this->_rdfp_rel_path;
@@ -1913,6 +1927,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2009/07/06 23:52:24  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.35  2009/05/25 19:47:45  fplanque
  * better linking of files
  *

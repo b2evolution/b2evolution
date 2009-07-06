@@ -33,6 +33,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $dispatcher;
 
 $AdminUI->set_path( 'options', 'plugins' );
 
@@ -818,7 +819,7 @@ switch( $action )
 			exit(0);
 		}
 
-		$title = sprintf( T_('Help for plugin &laquo;%s&raquo;'), '<a href="admin.php?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$edit_Plugin->ID.'">'.$edit_Plugin->name.'</a>' );
+		$title = sprintf( T_('Help for plugin &laquo;%s&raquo;'), '<a href="'.$dispatcher.'?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$edit_Plugin->ID.'">'.$edit_Plugin->name.'</a>' );
 		if( ! empty($edit_Plugin->help_url) )
 		{
 			$title .= ' '.action_icon( T_('External help page'), 'www', $edit_Plugin->help_url );
@@ -1045,6 +1046,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2009/07/06 23:52:24  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.10  2009/05/26 16:56:55  fplanque
  * keeping cool on the gets...
  *

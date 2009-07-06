@@ -20,7 +20,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_Blog;
 
-global $admin_url;
+global $admin_url, $dispatcher;
 
 $block_item_Widget = & new Widget( 'block_item' );
 
@@ -28,8 +28,8 @@ $block_item_Widget->title = T_('Choose a skin');
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
-  $block_item_Widget->global_icon( T_('Manage installed skins...'), 'properties', 'admin.php?ctrl=skins', T_('Manage skins'), 3, 4 );
-  $block_item_Widget->global_icon( T_('Install new skin...'), 'new', 'admin.php?ctrl=skins&amp;action=new&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $admin_url)), T_('Install new'), 3, 4 );
+  $block_item_Widget->global_icon( T_('Manage installed skins...'), 'properties', $dispatcher.'?ctrl=skins', T_('Manage skins'), 3, 4 );
+  $block_item_Widget->global_icon( T_('Install new skin...'), 'new', $dispatcher.'?ctrl=skins&amp;action=new&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $admin_url)), T_('Install new'), 3, 4 );
 }
 
 $block_item_Widget->disp_template_replaced( 'block_start' );
@@ -59,6 +59,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.6  2009/07/06 23:52:25  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.5  2009/05/23 20:20:18  fplanque
  * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
  *

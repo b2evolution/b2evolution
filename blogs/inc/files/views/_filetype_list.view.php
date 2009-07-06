@@ -34,7 +34,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $rsc_url;
+global $rsc_url, $dispatcher;
 
 // Create result set:
 $Results = & new Results(
@@ -55,7 +55,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	$Results->cols[] = array(
 							'th' => T_('Extensions'),
 							'order' => 'ftyp_extensions',
-							'td' => '<strong><a href="admin.php?ctrl=filetypes&amp;ftyp_ID=$ftyp_ID$&amp;action=edit" title="'.
+							'td' => '<strong><a href="'.$dispatcher.'?ctrl=filetypes&amp;ftyp_ID=$ftyp_ID$&amp;action=edit" title="'.
 											T_('Edit this file type...').'">$ftyp_extensions$</a></strong>',
 						);
 }
@@ -133,6 +133,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.5  2009/07/06 23:52:24  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.4  2009/03/08 23:57:43  fplanque
  * 2009
  *

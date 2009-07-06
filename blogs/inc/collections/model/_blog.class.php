@@ -1477,8 +1477,10 @@ class Blog extends DataObject
 	 */
 	function get_filemanager_link()
 	{
+		global $dispatcher;
+		
 		load_class('/files/model/_fileroot.class.php');
-		return 'admin.php?ctrl=files&amp;root='.FileRoot::gen_ID( 'collection', $this->ID );
+		return $dispatcher.'?ctrl=files&amp;root='.FileRoot::gen_ID( 'collection', $this->ID );
 	}
 
 
@@ -2125,6 +2127,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.71  2009/07/06 23:52:24  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.70  2009/07/02 00:25:03  fplanque
  * rollback
  *

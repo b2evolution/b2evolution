@@ -34,7 +34,7 @@ global $edited_Blog;
 
 global $Plugins;
 
-global $basepath, $rsc_url;
+global $basepath, $rsc_url, $dispatcher;
 
 $Form = & new Form( NULL, 'blogadvanced_checkchanges' );
 
@@ -120,7 +120,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 												array( 'input_prefix' => "<code>$basepath</code>", 'maxlength' => 255 ) );
 		if( $current_User->check_perm( 'blog_genstatic', 'any', false, $edited_Blog->ID ) )
 		{
-			$Form->info( T_('Static page'), '<a href="admin.php?ctrl=collections&amp;action=GenStatic&amp;blog='.$edited_Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">'.T_('Generate now!').'</a>' );
+			$Form->info( T_('Static page'), '<a href="'.$dispatcher.'?ctrl=collections&amp;action=GenStatic&amp;blog='.$edited_Blog->ID.'&amp;redir_after_genstatic='.rawurlencode(regenerate_url( '', '', '', '&' )).'">'.T_('Generate now!').'</a>' );
 		}
 	$Form->end_fieldset();
 
@@ -188,6 +188,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.21  2009/07/06 23:52:24  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.20  2009/07/04 15:58:26  tblue246
  * Translation fixes and update of German translation
  *

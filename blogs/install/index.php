@@ -130,7 +130,7 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 
 		<div class="menu_top"><!-- InstanceBeginEditable name="MenuTop" -->
 			<span class="floatright"><?php echo T_('After install') ?>: <a href="../index.php"><?php echo T_('Blogs') ?></a> &middot;
-			<a href="../admin.php"><?php echo T_('Admin') ?></a>
+			<a href="../<?php echo $dispatcher ?>"><?php echo T_('Admin') ?></a>
 			</span>
 		<?php echo T_('Current installation') ?>:
 		<a href="index.php?locale=<?php echo $default_locale ?>"><?php echo T_('Install menu') ?></a> &middot;
@@ -635,6 +635,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.166  2009/07/06 23:52:25  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.165  2009/07/02 17:33:00  fplanque
  * only activate ONE locale at install time.
  *

@@ -34,6 +34,8 @@ load_funcs('sessions/model/_hitlog.funcs.php');
  */
 global $current_User;
 
+global $dispatcher;
+
 // Do we have permission to view all stats (aggregated stats) ?
 $perm_view_all = $current_User->check_perm( 'stats', 'view' );
 
@@ -118,7 +120,7 @@ switch( $action )
 if( $perm_view_all )
 {
 	$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ), T_('All'),
-					'admin.php?ctrl=stats&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0' );
+					$dispatcher.'?ctrl=stats&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0' );
 }
 else
 {	// No permission to view aggregated stats:
@@ -236,6 +238,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2009/07/06 23:52:25  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.12  2009/05/16 00:31:45  fplanque
  * AFAICS this only appears in the title tag
  *

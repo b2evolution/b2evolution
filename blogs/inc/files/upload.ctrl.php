@@ -43,6 +43,8 @@ load_class('files/model/_filelist.class.php');
  */
 global $current_User;
 
+global $dispatcher;
+
 // Check global access permissions:
 if( ! $Settings->get( 'fm_enabled' ) )
 {
@@ -389,7 +391,7 @@ if( isset($_FILES) && count( $_FILES ) )
 	}
 	if( empty($failedFiles) )
 	{ // quick mode or no failed files, Go back to Browsing
-		// header_redirect( 'admin.php?ctrl=files&root='.$fm_FileRoot->ID.'&path='.rawurlencode($path) );
+		// header_redirect( $dispatcher.'?ctrl=files&root='.$fm_FileRoot->ID.'&path='.rawurlencode($path) );
 		header_redirect( regenerate_url( 'ctrl', 'ctrl=files', '', '&' ) );
 	}
 }
@@ -431,6 +433,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2009/07/06 23:52:24  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.11  2009/03/08 23:57:42  fplanque
  * 2009
  *

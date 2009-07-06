@@ -38,6 +38,8 @@ global $current_User;
  */
 global $Blog;
 
+global $dispatcher;
+
 $action = param_action( 'list' );
 
 $AdminUI->set_path( 'items' );	// Sublevel may be attached below
@@ -757,12 +759,12 @@ switch( $action )
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_post_statuses', 'edit',
 						array( 'ctrl' => 'items', 'action' => 'new' ), NULL, '',
-						'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php\', %s )' );
+						'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$dispatcher.'\', %s )' );
 
 		// We don't check the following earlier, because we want the blog switching buttons to be available:
 		if( ! blog_has_cats( $blog ) )
 		{
-			$Messages->add( sprintf( T_('Since this blog has no categories, you cannot post into it. You must <a %s>create categories</a> first.'), 'href="admin.php?ctrl=chapters&amp;blog='.$blog.'"') , 'error' );
+			$Messages->add( sprintf( T_('Since this blog has no categories, you cannot post into it. You must <a %s>create categories</a> first.'), 'href="'.$dispatcher.'?ctrl=chapters&amp;blog='.$blog.'"') , 'error' );
 			$action = 'nil';
 			break;
 		}
@@ -782,14 +784,14 @@ switch( $action )
 				array(
 						'simple' => array(
 							'text' => T_('Simple'),
-							'href' => 'admin.php?ctrl=items&amp;action='.$action.'&amp;tab=simple&amp;'.$tab_switch_params,
-							'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php?tab=simple&amp;blog='.$blog.'\' );',
+							'href' => $dispatcher.'?ctrl=items&amp;action='.$action.'&amp;tab=simple&amp;'.$tab_switch_params,
+							'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$dispatcher.'?tab=simple&amp;blog='.$blog.'\' );',
 							// 'name' => 'switch_to_simple_tab_nocheckchanges', // no bozo check
 							),
 						'expert' => array(
 							'text' => T_('Expert'),
-							'href' => 'admin.php?ctrl=items&amp;action='.$action.'&amp;tab=expert&amp;'.$tab_switch_params,
-							'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \'admin.php?tab=expert&amp;blog='.$blog.'\' );',
+							'href' => $dispatcher.'?ctrl=items&amp;action='.$action.'&amp;tab=expert&amp;'.$tab_switch_params,
+							'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$dispatcher.'?tab=expert&amp;blog='.$blog.'\' );',
 							// 'name' => 'switch_to_expert_tab_nocheckchanges', // no bozo check
 							),
 					)
@@ -1027,6 +1029,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.52  2009/07/06 23:52:24  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.51  2009/07/06 22:49:12  fplanque
  * made some small changes on "publish now" handling.
  * Basically only display it for drafts everywhere.

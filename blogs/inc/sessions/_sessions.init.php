@@ -137,7 +137,7 @@ class sessions_Module
 	 */
 	function build_menu_1()
 	{
-		global $blog;
+		global $blog, $dispatcher;
 		/**
 		 * @var User
 		 */
@@ -155,53 +155,53 @@ class sessions_Module
 					array(
 						'stats' => array(
 							'text' => T_('Stats'),
-							'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=global',
+							'href' => $dispatcher.'?ctrl=stats&amp;tab=summary&amp;tab3=global',
 							'entries' => array(
 								'summary' => array(
 									'text' => T_('Hit summary'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$blog,
+									'href' => $dispatcher.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$blog,
 									'entries' => array(
 										'global' => array(
 											'text' => T_('Global hits'),
-											'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$blog ),
+											'href' => $dispatcher.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog='.$blog ),
 										'browser' => array(
 											'text' => T_('Browser hits'),
-											'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=browser&amp;blog='.$blog ),
+											'href' => $dispatcher.'?ctrl=stats&amp;tab=summary&amp;tab3=browser&amp;blog='.$blog ),
 										'robot' => array(
 											'text' => T_('Robot hits'),
-											'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=robot&amp;blog='.$blog ),
+											'href' => $dispatcher.'?ctrl=stats&amp;tab=summary&amp;tab3=robot&amp;blog='.$blog ),
 										'feed' => array(
 											'text' => T_('RSS/Atom hits'),
-											'href' => 'admin.php?ctrl=stats&amp;tab=summary&amp;tab3=feed&amp;blog='.$blog ),
+											'href' => $dispatcher.'?ctrl=stats&amp;tab=summary&amp;tab3=feed&amp;blog='.$blog ),
 										),
 									),
 								'refsearches' => array(
 									'text' => T_('Search B-hits'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog='.$blog,
+									'href' => $dispatcher.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog='.$blog,
 									'entries' => array(
 										'hits' => array(
 											'text' => T_('Search hits'),
-											'href' => 'admin.php?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog='.$blog ),
+											'href' => $dispatcher.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog='.$blog ),
 										'keywords' => array(
 											'text' => T_('Keywords'),
-											'href' => 'admin.php?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords&amp;blog='.$blog ),
+											'href' => $dispatcher.'?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords&amp;blog='.$blog ),
 										'topengines' => array(
 											'text' => T_('Top engines'),
-											'href' => 'admin.php?ctrl=stats&amp;tab=refsearches&amp;tab3=topengines&amp;blog='.$blog ),
+											'href' => $dispatcher.'?ctrl=stats&amp;tab=refsearches&amp;tab3=topengines&amp;blog='.$blog ),
 										),
 									 ),
 								'referers' => array(
 									'text' => T_('Referered B-hits'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=referers&amp;blog='.$blog ),
+									'href' => $dispatcher.'?ctrl=stats&amp;tab=referers&amp;blog='.$blog ),
 								'other' => array(
 									'text' => T_('Direct B-hits'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=other&amp;blog='.$blog ),
+									'href' => $dispatcher.'?ctrl=stats&amp;tab=other&amp;blog='.$blog ),
 								'useragents' => array(
 									'text' => T_('User agents'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=useragents&amp;blog='.$blog ),
+									'href' => $dispatcher.'?ctrl=stats&amp;tab=useragents&amp;blog='.$blog ),
 								'domains' => array(
 									'text' => T_('Referring domains'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=domains&amp;blog='.$blog ),
+									'href' => $dispatcher.'?ctrl=stats&amp;tab=domains&amp;blog='.$blog ),
 							)
 						),
 					)
@@ -215,37 +215,37 @@ class sessions_Module
 					array(
 						'sessions' => array(
 							'text' => T_('User sessions'),
-							'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0',
+							'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0',
 							'entries' => array(
 								'login' => array(
 									'text' => T_('Users'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0'
+									'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0'
 									),
 								'sessid' => array(
 									'text' => T_('Sessions'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;blog=0'
+									'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;blog=0'
 									),
 								'hits' => array(
 									'text' => T_('Hits'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0'
+									'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0'
 									),
 								),
 						 	),
 						'goals' => array(
 							'text' => T_('Goals'),
-							'href' => 'admin.php?ctrl=goals',
+							'href' => $dispatcher.'?ctrl=goals',
 							'entries' => array(
 								'goals' => array(
 									'text' => T_('Goals'),
-									'href' => 'admin.php?ctrl=goals'
+									'href' => $dispatcher.'?ctrl=goals'
 									),
 								'hits' => array(
 									'text' => T_('Goal hits'),
-									'href' => 'admin.php?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0'
+									'href' => $dispatcher.'?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog=0'
 									),
 								'stats' => array(
 									'text' => T_('Stats'),
-									'href' => 'admin.php?ctrl=goals&amp;tab3=stats'
+									'href' => $dispatcher.'?ctrl=goals&amp;tab3=stats'
 									),
 								),
 							),
@@ -270,6 +270,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.13  2009/07/06 23:52:25  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.12  2009/05/16 00:29:41  fplanque
  * better menu structure (load the fastest page by default)
  *

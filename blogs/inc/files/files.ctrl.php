@@ -57,6 +57,8 @@ load_class('files/model/_filelist.class.php');
  */
 global $current_User;
 
+global $dispatcher;
+
 // Check global access permissions:
 if( ! $Settings->get( 'fm_enabled' ) )
 {
@@ -893,7 +895,7 @@ switch( $action )
 
 				$DB->commit();
 
-				header_redirect( 'admin.php?ctrl=items&action=edit&p='.$edited_Item->ID );	// Will save $Messages
+				header_redirect( $dispatcher.'?ctrl=items&action=edit&p='.$edited_Item->ID );	// Will save $Messages
 				break;
 
 			case 'make_posts':
@@ -942,7 +944,7 @@ switch( $action )
 
 				// Note: we redirect without restoring filter. This should allow to see the new files.
 				// &filter=restore
-				header_redirect( 'admin.php?ctrl=items&blog='.$blog );	// Will save $Messages
+				header_redirect( $dispatcher.'?ctrl=items&blog='.$blog );	// Will save $Messages
 
 				break;
 		}
@@ -1658,6 +1660,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.29  2009/07/06 23:52:24  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.28  2009/04/15 13:17:19  tblue246
  * bugfixes
  *

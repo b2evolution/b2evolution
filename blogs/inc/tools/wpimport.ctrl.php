@@ -27,7 +27,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 </head>
 <body bgcolor="#EEEEEE" text="#000000" link="#0000FF" alink="#FF0000" vlink="#7E0089">
 	<h1>WordPress 2.3 to b2evolution importer</h1>
-	[<a href="admin.php?ctrl=tools">Back to b2evolution</a>]
+	[<a href="<?php echo $dispatcher ?>?ctrl=tools">Back to b2evolution</a>]
 	<p><FONT SIZE="-2">Copyright &copy; 2007 <a href="http://hari.literaryforums.org/2007/10/04/wordpress-to-b2evolution-import-script">V.Harishankar</a>.  Released under the GNU GPL.</FONT></p>
 	<?php
 
@@ -43,7 +43,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 		<p><font color="#FF0000"><strong>Warning!!</strong> Your existing b2evolution posts, categories, tags, comments and users (except admin) will be removed if you run this script. Make sure you have a backup before you proceed.</font></p>
 
-		<FORM action="admin.php?ctrl=wpimport" enctype="multipart/form-data" method="POST" >
+		<FORM action="<?php echo $dispatcher ?>?ctrl=wpimport" enctype="multipart/form-data" method="POST" >
 		<h2>DB Settings</h2>
 		<table>
 			<tbody>
@@ -377,7 +377,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				// Check that slug is not empty. Mind you, in WP it CAN happen!
 				if( empty( $post['slug'] ) )
 				{
-					$post['slug'] = preg_replace( '¤[^A-Za-z0-9]¤', '-', $post['post_id'].'-'.$post['title'] );
+					$post['slug'] = preg_replace( '[^A-Za-z0-9]', '-', $post['post_id'].'-'.$post['title'] );
 					echo '<br /> ** WARNING: generated automatic slug: '.$post['slug'];
 				}
 

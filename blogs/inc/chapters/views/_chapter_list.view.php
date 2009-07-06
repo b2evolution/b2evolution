@@ -229,18 +229,21 @@ $Table->display_list_end();
 echo '<p class="note">'.T_('<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same collection (smallest category number).').'</p>';
 */
 
-global $Settings;
+global $Settings, $dispatcher;
 if( ! $Settings->get('allow_moving_chapters') )
 {	// TODO: check perm
-	echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Moving categories across blogs is currently disabled in the %sglobal settings%s.'), '<a href="admin.php?ctrl=features#categories">', '</a>' ).'</p> ';
+	echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Moving categories across blogs is currently disabled in the %sglobal settings%s.'), '<a href="'.$dispatcher.'?ctrl=features#categories">', '</a>' ).'</p> ';
 }
 
 echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categories is currently set to %s in the %sglobal settings%s.'),
-	$Settings->get('chapter_ordering') == 'manual' ? /* TRANS: Manual here = "by hand" */ T_('Manual ') : T_('Alphabetical'), '<a href="admin.php?ctrl=features#categories">', '</a>' ).'</p> ';
+	$Settings->get('chapter_ordering') == 'manual' ? /* TRANS: Manual here = "by hand" */ T_('Manual ') : T_('Alphabetical'), '<a href="'.$dispatcher.'?ctrl=features#categories">', '</a>' ).'</p> ';
 
 
 /*
  * $Log$
+ * Revision 1.18  2009/07/06 23:52:24  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.17  2009/05/10 00:34:26  fplanque
  * better TRANS fix
  *

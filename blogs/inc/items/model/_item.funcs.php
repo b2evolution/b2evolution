@@ -438,7 +438,7 @@ function statuses_where_clause( $show_statuses = '', $dbprefix = 'post_', $req_b
  */
 function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 {
-	global $admin_url;
+	global $admin_url, $dispatcher;
 	global $current_User;
 	global $Settings;
 
@@ -467,8 +467,8 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 			&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 		{	// Check that we have permission to edit item:
 
-			$fieldset_title .= ' - <a href="admin.php?ctrl=files&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID
-						.'" onclick="return pop_up_window( \'admin.php?ctrl=files&amp;mode=upload&amp;iframe_name='
+			$fieldset_title .= ' - <a href="'.$dispatcher.'?ctrl=files&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID
+						.'" onclick="return pop_up_window( \''.$dispatcher.'?ctrl=files&amp;mode=upload&amp;iframe_name='
 						.$iframe_name.'&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID.'\', \'fileman_upload\', 1000 )">'
 						.get_icon( 'folder', 'imgtag' ).' '.T_('Add/Link files').'</a> <span class="note">(popup)</span>';
 		}
@@ -494,7 +494,7 @@ function cat_select( $Form, $form_fields = true )
 {
 	global $allow_cross_posting, $cache_categories,
 					$blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
-	global $cat_sel_total_count;
+	global $cat_sel_total_count, $dispatcher;
 
 	$Form->begin_fieldset( T_('Categories').get_manual_link('item_categories_fieldset'), array( 'class'=>'extracats', 'id' => 'itemform_categories' ) );
 
@@ -546,7 +546,7 @@ function cat_select( $Form, $form_fields = true )
 
 	if( $current_User->check_perm( 'blog_cats', '', false, $blog ) )
 	{
-		$r .= '<p class="extracatnote"><a href="admin.php?ctrl=chapters&amp;action=new&amp;blog='.$blog.'">'.T_('Add a new category').' &raquo;</a></p>';
+		$r .= '<p class="extracatnote"><a href="'.$dispatcher.'?ctrl=chapters&amp;action=new&amp;blog='.$blog.'">'.T_('Add a new category').' &raquo;</a></p>';
 	}
 
 	if( $cat_sel_total_count > 10 )	// Check in IE for adjusting threshhold. IE lines are FAT
@@ -683,34 +683,34 @@ function cat_select_after_last( $parent_cat_ID, $level )
  */
 function attach_browse_tabs()
 {
-	global $AdminUI, $Blog, $current_User;
+	global $AdminUI, $Blog, $current_User, $dispatcher;
 
 	$AdminUI->add_menu_entries(
 			'items',
 			array(
 					'full' => array(
 						'text' => T_('All'),
-						'href' => 'admin.php?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$Blog->ID,
+						'href' => $dispatcher.'?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 					'list' => array(
 						'text' => T_('Posts'),
-						'href' => 'admin.php?ctrl=items&amp;tab=list&amp;filter=restore&amp;blog='.$Blog->ID,
+						'href' => $dispatcher.'?ctrl=items&amp;tab=list&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 					'pages' => array(
 						'text' => T_('Pages'),
-						'href' => 'admin.php?ctrl=items&amp;tab=pages&amp;filter=restore&amp;blog='.$Blog->ID,
+						'href' => $dispatcher.'?ctrl=items&amp;tab=pages&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 					'intros' => array(
 						'text' => T_('Intros'),
-						'href' => 'admin.php?ctrl=items&amp;tab=intros&amp;filter=restore&amp;blog='.$Blog->ID,
+						'href' => $dispatcher.'?ctrl=items&amp;tab=intros&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 					'podcasts' => array(
 						'text' => T_('Podcasts'),
-						'href' => 'admin.php?ctrl=items&amp;tab=podcasts&amp;filter=restore&amp;blog='.$Blog->ID,
+						'href' => $dispatcher.'?ctrl=items&amp;tab=podcasts&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 					'links' => array(
 						'text' => T_('Sidebar links'),
-						'href' => 'admin.php?ctrl=items&amp;tab=links&amp;filter=restore&amp;blog='.$Blog->ID,
+						'href' => $dispatcher.'?ctrl=items&amp;tab=links&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 				)
 		);
@@ -722,7 +722,7 @@ function attach_browse_tabs()
 				array(
 						'tracker' => array(
 							'text' => T_('Tracker'),
-							'href' => 'admin.php?ctrl=items&amp;tab=tracker&amp;filter=restore&amp;blog='.$Blog->ID,
+							'href' => $dispatcher.'?ctrl=items&amp;tab=tracker&amp;filter=restore&amp;blog='.$Blog->ID,
 							),
 					)
 			);
@@ -735,7 +735,7 @@ function attach_browse_tabs()
 				array(
 						'comments' => array(
 							'text' => T_('Comments'),
-							'href' => 'admin.php?ctrl=comments&amp;blog='.$Blog->ID,
+							'href' => $dispatcher.'?ctrl=comments&amp;blog='.$Blog->ID,
 							),
 					)
 			);
@@ -873,6 +873,9 @@ function echo_publishnowbutton_js( $action )
 
 /*
  * $Log$
+ * Revision 1.56  2009/07/06 23:52:24  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.55  2009/07/06 22:49:11  fplanque
  * made some small changes on "publish now" handling.
  * Basically only display it for drafts everywhere.

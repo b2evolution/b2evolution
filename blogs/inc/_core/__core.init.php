@@ -136,7 +136,7 @@ class _core_Module
 		 */
 		global $topleft_Menu, $topright_Menu;
 		global $current_User;
-		global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
+		global $home_url, $admin_url, $dispatcher, $debug, $seo_page_type, $robots_index;
 		global $Blog, $blog;
 
 		global $Settings;
@@ -469,7 +469,7 @@ class _core_Module
 				{
 					$entries['userprefs']['entries']['admskins']['entries'][$admin_skin] = array(
 							'text' => $admin_skin,
-							'href' => 'admin.php?ctrl=users&amp;action=change_admin_skin&amp;new_admin_skin='.rawurlencode($admin_skin),
+							'href' => $dispatcher.'?ctrl=users&amp;action=change_admin_skin&amp;new_admin_skin='.rawurlencode($admin_skin),
 						);
 				}
 			}
@@ -526,7 +526,7 @@ class _core_Module
 	 */
 	function build_menu_1()
 	{
-		global $blog;
+		global $blog, $dispatcher;
 		/**
 		 * @var User
 		 */
@@ -543,13 +543,13 @@ class _core_Module
 				array(
 					'dashboard' => array(
 						'text' => T_('Dashboard'),
-						'href' => 'admin.php?ctrl=dashboard&amp;blog='.$blog,
+						'href' => $dispatcher.'?ctrl=dashboard&amp;blog='.$blog,
 						'style' => 'font-weight: bold;'
 						),
 
 					'items' => array(
 						'text' => T_('Posts / Comments'),
-						'href' => 'admin.php?ctrl=items&amp;blog='.$blog.'&amp;filter=restore',
+						'href' => $dispatcher.'?ctrl=items&amp;blog='.$blog.'&amp;filter=restore',
 						// Controller may add subtabs
 						),
 					) );
@@ -561,7 +561,7 @@ class _core_Module
 						'files' => array(
 							'text' => T_('Files'),
 							'title' => T_('File management'),
-							'href' => 'admin.php?ctrl=files',
+							'href' => $dispatcher.'?ctrl=files',
 							// Controller may add subtabs
 						),
 					) );
@@ -577,7 +577,7 @@ class _core_Module
 	 */
 	function build_menu_2()
 	{
-		global $blog, $loc_transinfo, $ctrl;
+		global $blog, $loc_transinfo, $ctrl, $dispatcher;
 		/**
 		 * @var User
 		 */
@@ -596,7 +596,7 @@ class _core_Module
 					array(
 						'blogs' => array(
 							'text' => T_('Blog settings'),
-							'href' => 'admin.php?ctrl=collections',
+							'href' => $dispatcher.'?ctrl=collections',
 						),
 					) );
 		}
@@ -611,15 +611,15 @@ class _core_Module
 			// Determine default page based on permissions:
 			if( $coll_settings_perm )
 			{	// Default: show General Blog Settings
-				$default_page = 'admin.php?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog;
+				$default_page = $dispatcher.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog;
 			}
 			elseif( $coll_chapters_perm )
 			{	// Default: show categories
-				$default_page = 'admin.php?ctrl=chapters&amp;blog='.$blog;
+				$default_page = $dispatcher.'?ctrl=chapters&amp;blog='.$blog;
 			}
 			else
 			{	// Default: Show list of blogs
-				$default_page = 'admin.php?ctrl=collections';
+				$default_page = $dispatcher.'?ctrl=collections';
 			}
 
 			$AdminUI->add_menu_entries(
@@ -636,22 +636,22 @@ class _core_Module
 				$AdminUI->add_menu_entries( 'blogs',	array(
 							'general' => array(
 								'text' => T_('General'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog, ),
+								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog, ),
 							'features' => array(
 								'text' => T_('Features'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog, ),
+								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog, ),
 							'skin' => array(
 								'text' => T_('Skin'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog, ),
+								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog, ),
 							'skin_settings' => array(
 								'text' => T_('Skin settings'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=skin_settings&amp;blog='.$blog, ),
+								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=skin_settings&amp;blog='.$blog, ),
 							'plugin_settings' => array(
 								'text' => T_('Plugin settings'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$blog, ),
+								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$blog, ),
 							'widgets' => array(
 								'text' => T_('Widgets'),
-								'href' => 'admin.php?ctrl=widgets&amp;blog='.$blog, ),
+								'href' => $dispatcher.'?ctrl=widgets&amp;blog='.$blog, ),
 						) );
 			}
 
@@ -660,7 +660,7 @@ class _core_Module
 				$AdminUI->add_menu_entries( 'blogs',	array(
 							'chapters' => array(
 								'text' => T_('Categories'),
-								'href' => 'admin.php?ctrl=chapters&amp;blog='.$blog ),
+								'href' => $dispatcher.'?ctrl=chapters&amp;blog='.$blog ),
 						) );
 			}
 
@@ -669,13 +669,13 @@ class _core_Module
 				$AdminUI->add_menu_entries( 'blogs',	array(
 							'urls' => array(
 								'text' => T_('URLs'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=urls&amp;blog='.$blog, ),
+								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=urls&amp;blog='.$blog, ),
 							'seo' => array(
 								'text' => T_('SEO'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=seo&amp;blog='.$blog, ),
+								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=seo&amp;blog='.$blog, ),
 							'advanced' => array(
 								'text' => T_('Advanced'),
-								'href' => 'admin.php?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog, ),
+								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog, ),
 						) );
 
 				if( $Blog && $Blog->advanced_perms )
@@ -683,10 +683,10 @@ class _core_Module
 					$AdminUI->add_menu_entries( 'blogs',	array(
 								'perm' => array(
 									'text' => T_('User perms'), // keep label short
-									'href' => 'admin.php?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog, ),
+									'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog, ),
 								'permgroup' => array(
 									'text' => T_('Group perms'), // keep label short
-									'href' => 'admin.php?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog, ),
+									'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog, ),
 							) );
 				}
 			}
@@ -698,40 +698,40 @@ class _core_Module
 			$AdminUI->add_menu_entries( NULL, array(
 						'options' => array(
 							'text' => T_('Global settings'),
-							'href' => 'admin.php?ctrl=settings',
+							'href' => $dispatcher.'?ctrl=settings',
 							'entries' => array(
 								'general' => array(
 									'text' => T_('General'),
-									'href' => 'admin.php?ctrl=settings' ),
+									'href' => $dispatcher.'?ctrl=settings' ),
 								'features' => array(
 									'text' => T_('Features'),
-									'href' => 'admin.php?ctrl=features' ),
+									'href' => $dispatcher.'?ctrl=features' ),
 								'skins' => array(
 									'text' => T_('Skins'),
-									'href' => 'admin.php?ctrl=skins'),
+									'href' => $dispatcher.'?ctrl=skins'),
 								'plugins' => array(
 									'text' => T_('Plugins'),
-									'href' => 'admin.php?ctrl=plugins'),
+									'href' => $dispatcher.'?ctrl=plugins'),
 								'antispam' => array(
 									'text' => T_('Antispam'),
-									'href' => 'admin.php?ctrl=set_antispam'),
+									'href' => $dispatcher.'?ctrl=set_antispam'),
 								'regional' => array(
 									'text' => T_('Regional'),
-									'href' => 'admin.php?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
+									'href' => $dispatcher.'?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
 								'files' => array(
 									'text' => T_('Files'),
-									'href' => 'admin.php?ctrl=fileset' ),
+									'href' => $dispatcher.'?ctrl=fileset' ),
 								'filetypes' => array(
 									'text' => T_('File types'),
-									'href' => 'admin.php?ctrl=filetypes' ),
+									'href' => $dispatcher.'?ctrl=filetypes' ),
 								'types' => array(
 									'text' => T_('Post types'),
 									'title' => T_('Post types management'),
-									'href' => 'admin.php?ctrl=itemtypes'),
+									'href' => $dispatcher.'?ctrl=itemtypes'),
 								'statuses' => array(
 									'text' => T_('Post statuses'),
 									'title' => T_('Post statuses management'),
-									'href' => 'admin.php?ctrl=itemstatuses'),
+									'href' => $dispatcher.'?ctrl=itemstatuses'),
 							)
 						),
 					) );
@@ -744,7 +744,7 @@ class _core_Module
 						'users' => array(
 						'text' => T_('Users'),
 						'title' => T_('User management'),
-						'href' => 'admin.php?ctrl=users',
+						'href' => $dispatcher.'?ctrl=users',
 					),
 				) );
 		}
@@ -754,7 +754,7 @@ class _core_Module
 						'users' => array(
 						'text' => T_('My profile'),
 						'title' => T_('User profile'),
-						'href' => 'admin.php?ctrl=users',
+						'href' => $dispatcher.'?ctrl=users',
 					),
 				) );
 		}
@@ -766,14 +766,14 @@ class _core_Module
 				$AdminUI->add_menu_entries( NULL, array(
 						'tools' => array(
 							'text' => T_('Tools'),
-							'href' => 'admin.php?ctrl=crontab',
+							'href' => $dispatcher.'?ctrl=crontab',
 							'entries' =>  array(
 								'cron' => array(
 									'text' => T_('Scheduler'),
-									'href' => 'admin.php?ctrl=crontab' ),
+									'href' => $dispatcher.'?ctrl=crontab' ),
 								'system' => array(
 									'text' => T_('System'),
-									'href' => 'admin.php?ctrl=system' ),
+									'href' => $dispatcher.'?ctrl=system' ),
 									),
 								),
 							) );
@@ -783,14 +783,14 @@ class _core_Module
 					$AdminUI->add_menu_entries( 'tools', array(
 									'antispam' => array(
 										'text' => T_('Antispam'),
-										'href' => 'admin.php?ctrl=antispam'	),
+										'href' => $dispatcher.'?ctrl=antispam'	),
 									) );
 				}
 
 				$AdminUI->add_menu_entries( 'tools', array(
 							'' => array(	// fp> '' is dirty
 								'text' => T_('Misc'),
-								'href' => 'admin.php?ctrl=tools' ),
+								'href' => $dispatcher.'?ctrl=tools' ),
 						) );
 		}
 		elseif( $current_User->check_perm( 'spamblacklist', 'view' ) )
@@ -799,11 +799,11 @@ class _core_Module
 			$AdminUI->add_menu_entries( NULL, array(
 						'tools' => array(
 							'text' => T_('Tools'),
-							'href' => 'admin.php?ctrl=antispam',
+							'href' => $dispatcher.'?ctrl=antispam',
 							'entries' =>  array(
 								'antispam' => array(
 									'text' => T_('Antispam'),
-									'href' => 'admin.php?ctrl=antispam'	),
+									'href' => $dispatcher.'?ctrl=antispam'	),
 								),
 						),
 					) );
@@ -816,6 +816,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.17  2009/07/06 23:52:24  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.16  2009/07/02 18:08:50  fplanque
  * minor
  *

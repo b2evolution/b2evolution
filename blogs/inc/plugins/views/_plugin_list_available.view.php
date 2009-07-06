@@ -42,6 +42,8 @@ global $current_User;
  */
 global $admin_Plugins;
 
+global $dispatcher;
+
 $Table = & new Table();
 
 $Table->title = T_('Plugins available for installation');
@@ -172,7 +174,7 @@ while( $loop_Plugin = & $AvailablePlugins->get_next() )
 					     || $registrations < $loop_Plugin->number_of_installs ) )
 			{ // number of installations are not limited or not reached yet and user has "edit options" perms
 				?>
-				[<a href="admin.php?ctrl=plugins&amp;action=install&amp;plugin=<?php echo rawurlencode($loop_Plugin->classname) ?>"><?php
+				[<a href="<?php echo $dispatcher ?>?ctrl=plugins&amp;action=install&amp;plugin=<?php echo rawurlencode($loop_Plugin->classname) ?>"><?php
 					echo T_('Install');
 					if( $registrations )
 					{	// This plugin is already installed
@@ -212,6 +214,9 @@ echo '</p>';
 
 /*
  * $Log$
+ * Revision 1.7  2009/07/06 23:52:24  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.6  2009/03/08 23:57:45  fplanque
  * 2009
  *

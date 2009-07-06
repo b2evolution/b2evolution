@@ -38,6 +38,8 @@ global $current_User;
  */
 global $Settings;
 
+global $dispatcher;
+
 $Form = & new Form( NULL, 'settings_checkchanges' );
 $Form->begin_form( 'fform', T_('General Settings'),
 	// enable all form elements on submit (so values get sent):
@@ -54,7 +56,7 @@ $Form->begin_fieldset( T_('Display options') );
 $BlogCache = & get_Cache( 'BlogCache' );
 
 	$Form->select_input_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default blog to display'), array(
-			'note' => T_('This blog will be displayed on index.php.').' <a href="admin.php?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
+			'note' => T_('This blog will be displayed on index.php.').' <a href="'.$dispatcher.'?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
 			'allow_none' => true,
 			'class' => '',
 			'loop_object_method' => 'get_maxlen_name',
@@ -128,6 +130,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.7  2009/07/06 23:52:25  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.6  2009/03/08 23:57:45  fplanque
  * 2009
  *
