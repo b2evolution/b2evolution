@@ -91,7 +91,7 @@ $Form->begin_fieldset( T_('Content / Posts') );
 								array(  array( 'days', T_('days') ),
 												array( 'posts', T_('posts') ),
 											), T_('Display unit'), false,  T_('Do you want to restrict on the number of days or the number of posts?') );
-	$Form->text( 'posts_per_page', $edited_Blog->get_setting('posts_per_page'), 4, T_('Posts/Days per page'), T_('How many days or posts fo you want to display on the home page?'), 4 );
+	$Form->text( 'posts_per_page', $edited_Blog->get_setting('posts_per_page'), 4, T_('Posts/Days per page'), T_('How many days or posts do you want to display on the home page?'), 4 );
 	$Form->radio( 'archive_mode',  $edited_Blog->get_setting('archive_mode'),
 							array(  array( 'monthly', T_('monthly') ),
 											array( 'weekly', T_('weekly') ),
@@ -114,6 +114,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.11  2009/07/06 12:50:51  sam2kb
+ * Typo fo => do
+ *
  * Revision 1.10  2009/07/01 23:39:55  fplanque
  * UI adjustments
  *
