@@ -420,9 +420,9 @@ function zeroise( $number, $threshold )
  */
 function strmaxlen( $str, $maxlen = 50 )
 {
-	if( strlen( $str ) > $maxlen )
+	if( mb__strlen( $str ) > $maxlen )
 	{
-		$str = substr( $str, 0, $maxlen-1 ).'&hellip;';
+		$str = mb__substr( $str, 0, $maxlen-1 ).'&hellip;';
 	}
 
 	return $str;
@@ -581,6 +581,44 @@ function convert_chars( $content, $flag = 'html' )
 	}
 
 	return( $content );
+}
+
+
+/**
+ * mbstring wrapper for strlen function
+ *
+ * @param string
+ * @return string
+ */
+function mb__strlen( $string )
+{
+	global $current_charset;
+	
+	if( $current_charset != 'iso-8859-1' && function_exists('mb_strlen') )
+	{
+		return mb_strlen( $string, $current_charset );
+	}
+	return strlen($string);
+}
+
+
+/**
+ * mbstring wrapper for substr function
+ *
+ * @param string
+ * @return string
+ */
+function mb__substr( $string, $start = 0, $length = '#' )
+{
+	global $current_charset;
+	
+	if( $length == '#' ) $length = mb__strlen($string);
+	
+	if( $current_charset != 'iso-8859-1' && function_exists('mb_substr') )
+	{
+		return mb_substr( $string, $start, $length, $current_charset );
+	}
+	return substr( $string, $start, $length );
 }
 
 
@@ -3432,6 +3470,10 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.108  2009/07/06 16:28:22  sam2kb
+ * Added mbstring wrappers for strlen and substr functions.
+ * For now altered strmaxlen() function only, if you don't like the implementation feel free to revert.
+ *
  * Revision 1.107  2009/07/05 17:44:53  tblue246
  * Minor (single quotes)
  *
