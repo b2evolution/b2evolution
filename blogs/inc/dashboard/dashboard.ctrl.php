@@ -315,7 +315,7 @@ if( $blog )
 	echo '<ul>';
 		echo '<li><a href="admin.php?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'">'.T_('Write a new post').' &raquo;</a></li>';
 
- 		echo '<li>Browse:<ul>';
+ 		echo '<li>'.T_('Browse').':<ul>';
 		echo '<li><a href="admin.php?ctrl=items&tab=full&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (full)').' &raquo;</a></li>';
 		echo '<li><a href="admin.php?ctrl=items&tab=list&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (list)').' &raquo;</a></li>';
 		echo '<li><a href="admin.php?ctrl=comments&amp;blog='.$Blog->ID.'">'.T_('Comments').' &raquo;</a></li>';
@@ -480,6 +480,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.30  2009/07/06 06:16:11  sam2kb
+ * minor
+ *
  * Revision 1.29  2009/02/25 22:17:53  blueyed
  * ItemLight: lazily load blog_ID and main_Chapter.
  * There is more, but I do not want to skim the diff again, after
