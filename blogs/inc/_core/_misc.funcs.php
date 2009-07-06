@@ -594,7 +594,7 @@ function mb__strlen( $string )
 {
 	global $current_charset;
 	
-	if( $current_charset != 'iso-8859-1' && function_exists('mb_strlen') )
+	if( $current_charset != 'iso-8859-1' && $current_charset != '' && function_exists('mb_strlen') )
 	{
 		return mb_strlen( $string, $current_charset );
 	}
@@ -614,7 +614,7 @@ function mb__substr( $string, $start = 0, $length = '#' )
 	
 	if( $length == '#' ) $length = mb__strlen($string);
 	
-	if( $current_charset != 'iso-8859-1' && function_exists('mb_substr') )
+	if( $current_charset != 'iso-8859-1' && $current_charset != '' && function_exists('mb_substr') )
 	{
 		return mb_substr( $string, $start, $length, $current_charset );
 	}
@@ -3474,6 +3474,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.111  2009/07/06 22:06:32  blueyed
+ * Fixing tests
+ *
  * Revision 1.110  2009/07/06 21:32:52  tblue246
  * format_to_js(): Use str_replace() instead of preg_replace() -- better performance
  *
