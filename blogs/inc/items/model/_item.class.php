@@ -2714,8 +2714,6 @@ class Item extends ItemLight
 				'item_status_class' => 'bPost',
 			), $params );
 
-
-		// TODO: dh> nitpicking: it should use "bPostProtected", not "bPostprotected"..
 		echo $params['item_class'].' '.$params['item_type_class'].$this->ptyp_ID.' '.$params['item_status_class'].$this->status;
 	}
 
@@ -3930,6 +3928,10 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.115  2009/07/06 22:49:11  fplanque
+ * made some small changes on "publish now" handling.
+ * Basically only display it for drafts everywhere.
+ *
  * Revision 1.114  2009/07/06 21:49:30  blueyed
  * todo
  *

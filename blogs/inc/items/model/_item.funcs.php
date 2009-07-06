@@ -858,7 +858,7 @@ function echo_publishnowbutton_js( $action )
 		{
 			var publishnow_btn = jQuery( '.edit_actions input[name=actionArray[<?php echo $action; ?>_publish]]' );
 			
-			if( this.value == 'private' || this.value == 'protected' )
+			if( this.value != 'draft' )
 			{	// Hide the "Publish NOW !" button:
 				publishnow_btn.css( 'display', 'none' );
 			}
@@ -873,6 +873,10 @@ function echo_publishnowbutton_js( $action )
 
 /*
  * $Log$
+ * Revision 1.55  2009/07/06 22:49:11  fplanque
+ * made some small changes on "publish now" handling.
+ * Basically only display it for drafts everywhere.
+ *
  * Revision 1.54  2009/07/06 16:04:08  tblue246
  * Moved echo_publishnowbutton_js() to _item.funcs.php
  *

@@ -332,23 +332,16 @@ switch( $action )
 			{	/* Only use "published" if something other than "private"
 				   or "protected" has been selected: */
 				$post_status = 'published';
+				$set_issue_date = 'now';
 			}
 			else
 			{
 				// Tblue> - Perhaps this should be an error (?).
 				//        - Message contents could be confusing.
-				$Messages->add( sprintf( T_( 'The post has been created '
-											.'but not published because it '
-											.'seems like you wanted to set '
-											.'its status to "%s" instead. '
-											.'If you really want to make '
-											.'it public, manually change '
-											.'its status to "Published" '
-											.'and click the "Save" button.' ),
-									$post_status == 'protected' ? T_( 'Protected' ) : T_( 'Private' ) ), 'note' );
+				$Messages->add( sprintf( T_( 'The post has been created but not published because it seems like you wanted to set its status to "%s" instead.  If you really want to make it public, manually change its status to "Published" and click the "Save" button.' ),
+					$post_status == 'protected' ? T_( 'Protected' ) : T_( 'Private' ) ), 'error' );
 			}
 
-			$set_issue_date = 'now';
 		}
 
 		// make sure main cat is in extracat list and there are no duplicates
@@ -438,23 +431,16 @@ switch( $action )
 			{	/* Only use "published" if something other than "private"
 				   or "protected" has been selected: */
 				$post_status = 'published';
+				$set_issue_date = 'now';
 			}
 			else
 			{
 				// Tblue> - Perhaps this should be an error (?).
 				//        - Message contents could be confusing.
-				$Messages->add( sprintf( T_( 'The post has been updated '
-											.'but not published because it '
-											.'seems like you wanted to set '
-											.'its status to "%s" instead. '
-											.'If you really want to make '
-											.'it public, manually change '
-											.'its status to "Published" '
-											.'and click the "Save" button.' ),
-									$post_status == 'protected' ? T_( 'Protected' ) : T_( 'Private' ) ), 'note' );
+				$Messages->add( sprintf( T_( 'The post has been updated but not published because it seems like you wanted to set its status to "%s" instead. If you really want to make it public, manually change its status to "Published" and click the "Save" button.' ),
+									$post_status == 'protected' ? T_( 'Protected' ) : T_( 'Private' ) ), 'error' );
 			}
 
-			$set_issue_date = 'now';
 		}
 
 		// make sure main cat is in extracat list and there are no duplicates
@@ -1041,6 +1027,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.51  2009/07/06 22:49:12  fplanque
+ * made some small changes on "publish now" handling.
+ * Basically only display it for drafts everywhere.
+ *
  * Revision 1.50  2009/07/06 16:52:15  tblue246
  * minor
  *

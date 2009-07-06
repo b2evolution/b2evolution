@@ -276,7 +276,7 @@ for( $i = 1 ; $i <= 3; $i++ )
 $Form->end_form();
 
 if( $publishnow_displayed )
-{
+{	// fp> TODO: ideally this shoudd not be hacked in *here*
 	echo_publishnowbutton_js( $next_action );
 }
 
@@ -286,6 +286,10 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.28  2009/07/06 22:49:11  fplanque
+ * made some small changes on "publish now" handling.
+ * Basically only display it for drafts everywhere.
+ *
  * Revision 1.27  2009/07/06 13:37:16  tblue246
  * - Backoffice, write screen:
  * 	- Hide the "Publish NOW !" button using JavaScript if the post types "Protected" or "Private" are selected.
