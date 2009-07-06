@@ -598,6 +598,7 @@ function mb__strlen( $string )
 	{
 		return mb_strlen( $string, $current_charset );
 	}
+	
 	return strlen($string);
 }
 
@@ -612,12 +613,16 @@ function mb__substr( $string, $start = 0, $length = '#' )
 {
 	global $current_charset;
 	
-	if( $length == '#' ) $length = mb__strlen($string);
+	if( $length == '#' )
+	{
+		$length = mb__strlen($string);
+	}
 	
 	if( $current_charset != 'iso-8859-1' && $current_charset != '' && function_exists('mb_substr') )
 	{
 		return mb_substr( $string, $start, $length, $current_charset );
 	}
+	
 	return substr( $string, $start, $length );
 }
 
@@ -3474,6 +3479,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.112  2009/07/06 22:30:26  fplanque
+ * no message
+ *
  * Revision 1.111  2009/07/06 22:06:32  blueyed
  * Fixing tests
  *
