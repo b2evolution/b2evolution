@@ -3373,6 +3373,7 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
  *
  * @author Yabba
  * @author Tblue
+ * @todo dh> move back to str_replace and remove the extra tabs
  *
  * @param string $unformatted raw data
  * @return string formatted data
@@ -3470,6 +3471,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.109  2009/07/06 21:08:37  blueyed
+ * todo
+ *
  * Revision 1.108  2009/07/06 16:28:22  sam2kb
  * Added mbstring wrappers for strlen and substr functions.
  * For now altered strmaxlen() function only, if you don't like the implementation feel free to revert.
