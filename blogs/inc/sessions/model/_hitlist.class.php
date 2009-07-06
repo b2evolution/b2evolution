@@ -139,43 +139,6 @@ class Hitlist
 		// Prune sessions that have timed out and are older than auto_prune_stats
 		$sess_prune_before = ($localtimenow - $Settings->get( 'timeout_sessions' ));
 		$smaller_time = min( $sess_prune_before, $time_prune_before );
-/*
-		$sql_where = "WHERE sess_lastseen < '".date('Y-m-d H:i:s', $smaller_time)."'";
-		// 3.3? Prolly ok.
-		if( $sess_Plugins = $Plugins->get_list_by_event( 'BeforeSessionsDelete' ) )
-		{
-			// Note: There can be hundreds of thousands of sessions about to be deleted.
-			// Any plugin making use of this may have serious performance/memory issues.
-			if( $affected = $DB->get_col( "SELECT sess_ID FROM T_sessions $sql_where" ) )
-			{
-				// Allow plugins to delete any additional data for the sessions that are about to be pruned:
-				foreach( $sess_Plugins as $sess_Plugin )
-				{ // Go through whole list of sess plugins
-					$params = array('IDs' => $affected);
-					if( $plugins_affected = $Plugins->call_method( $sess_Plugin->ID, 'BeforeSessionsDelete', $params ) )
-					{ // plugin wants to keep some of the sessions
-						$affected = array_diff( $affected, $plugins_affected );
-					}
-				}
-
-				if( ! empty( $affected ) )
-				{ // we have some sessions to delete
-					// fp> I am not sure but it might be more effective to add an AND NOT IN() to the date based where.
-					// What is a typical use case?
-					// There can be hundreds of thousands of sessions about to be deleted.
-					//
-					// yabs > in my case it's to allow outdated carts to be removed when the session's deleted
-					//				it could just as easily accomplish that if passed $smaller_time though
-					//				as it could update sess_lastseen for any session it wanted to keep
-					//				( can only see it wanting to prune it's own data, but you never know )
-					//				this would reduce the memory/sql overheads here ?
-					// fp> Absolutely!! With that scheme there are no huge lists of IDs goign back and forth between MySQL & PHP
-					//     Please modify the plugin hook to work with  $smaller_time (name the param cutoff_timestamp though to make it more clear what it is)
-					$sql_where = 'WHERE sess_ID IN ('.implode(',', $affected).')';
-				}
-			}
-		}
-*/
 		// allow plugins to prune session based data
 		$Plugins->trigger_event( 'BeforeSessionsDelete', $temp_array = array( 'cutoff_timestamp' => $smaller_time ) );
 
@@ -224,6 +187,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.13  2009/07/06 22:55:11  fplanque
+ * minor
+ *
  * Revision 1.12  2009/07/06 12:44:59  yabs
  * Modifying BeforeSessionsDelete behaviour
  *

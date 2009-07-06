@@ -193,7 +193,7 @@ class tinymce_plugin extends Plugin
 					'label' => $this->T_('Advanced paste support'),
 					'type' => 'checkbox',
 					'defaultvalue' => $this->Settings->get('tmce_options_paste'),
-					'note' => $this->T_('Enable this to add support for pasting easily word and plain text files')
+					'note' => $this->T_('Enable this to add support for easily pasting word and plain text files')
 				);
 		$r['tmce_options_xhtmlxtras'] = array( // keep for now
 					'label' => $this->T_('Show XHTML extras'),

@@ -488,9 +488,12 @@ function skin_include( $template_name, $params = array() )
 
 				If you feel it's bloat then just roll it back ;)
 	fp> it's a fair use case. implementation feels heavy but if I can't come up with anything better, I'll leave it like that. may not put it into 3.3 in order to think some more.
-
 	yabs > I'll leave it to you to enable this code when/if you think it's right
-
+	fp> Actually we'll have to discuss this some more. I think it doesn't make sense like this.
+	I think in your use case, you need specific skins anyways (otherwise the plugin would just display "out of context" pages.
+	So selecting a PHP file should actually be a method of the Skin class and then,
+	your shopping cart enabled skins should just override the Skin class.
+	
 	2. The disp should only be handled by ONE SINGLE plugin. Correct?
 	So going through a loop here again is a bit of a waste.
 	It would make more sense, I think, for the event handler plugin ID
@@ -886,6 +889,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.66  2009/07/06 22:55:11  fplanque
+ * minor
+ *
  * Revision 1.65  2009/07/06 13:00:07  yabs
  * doc
  *

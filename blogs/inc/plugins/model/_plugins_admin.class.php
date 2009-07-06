@@ -201,7 +201,7 @@ class Plugins_admin extends Plugins
 
 				'SessionLoaded' => 'Gets called after $Session is initialized, quite early.',
 		// fp> WARNING: EXPERIMENTAL. MAY NOT GO INTO 3.3
-				'BeforeSessionsDelete' => 'Gets called when sessions are being pruned to enable plugin house cleaning, plugin can change the sess_lastseen timestamp of any sessions they want to keep',
+				'BeforeSessionsDelete' => 'Gets called when sessions are being pruned to enable plugin house cleaning, plugin might change the sess_lastseen timestamp of any sessions they want to keep',
 
 				'AfterLoginAnonymousUser' => 'Gets called at the end of the login procedure for anonymous visitors.',
 				'AfterLoginRegisteredUser' => 'Gets called at the end of the login procedure for registered users.',
@@ -1471,6 +1471,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.20  2009/07/06 22:55:11  fplanque
+ * minor
+ *
  * Revision 1.19  2009/07/06 14:55:06  yabs
  * doc
  *
