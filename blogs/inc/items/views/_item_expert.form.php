@@ -179,6 +179,8 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$next_action = ($creating ? 'create' : 'update');
 	$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton' ) );
 	$Form->submit( array( 'actionArray['.$next_action.']', /* TRANS: This is the value of an input submit button */ T_('Save'), 'SaveButton' ) );
+
+	$publishnow_displayed = false;
 	if( $edited_Item->status == 'draft'
 			&& $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID )	// TODO: if we actually set the primary cat to another blog, we may still get an ugly perm die
 			&& $current_User->check_perm( 'edit_timestamp', 'edit', false ) )
@@ -187,14 +189,8 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 			'actionArray['.$next_action.'_publish]',
 			/* TRANS: This is the value of an input submit button */ T_('Publish NOW !'),
 			'SaveButton',
-			'return jQuery( \'input[name="post_status"]:checked\' ).val() != \'protected\' || confirm( \''
-				.TS_( 'You have set this post\'s status to protected but '
-					 .'clicked the "Publish NOW !" button. This will '
-					 .'publish your post and make it available to the '
-					 .'public.\n\nIf this is not what you intended, click '
-					 .'the "Save" button instead.\n\nClick on OK to really '
-					 .'publish this post or on Cancel to continue editing.' ).'\' );',
 		) );
+		$publishnow_displayed = true;
 	}
 
 	echo '</div>';
@@ -421,10 +417,21 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 // ================================== END OF EDIT FORM ==================================
 $Form->end_form();
 
+if( $publishnow_displayed )
+{
+	echo_publishnowbutton_js( $next_action );
+}
 
 
 /*
  * $Log$
+ * Revision 1.47  2009/07/06 13:37:16  tblue246
+ * - Backoffice, write screen:
+ * 	- Hide the "Publish NOW !" button using JavaScript if the post types "Protected" or "Private" are selected.
+ * 	- Do not publish draft posts whose post status has been set to either "Protected" or "Private" and inform the user (note).
+ * - Backoffice, post lists:
+ * 	- Only display the "Publish NOW!" button for draft posts.
+ *
  * Revision 1.46  2009/07/05 01:29:02  tblue246
  * Ask for confirmation when "1 click-publishing" a post and the post status is set to "protected" (as discussed in: http://forums.b2evolution.net/viewtopic.php?p=93750 )
  *

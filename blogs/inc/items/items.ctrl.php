@@ -324,15 +324,33 @@ switch( $action )
 		// We need early decoding of these in order to check permissions:
 		param( 'post_category', 'integer', true );
 		param( 'post_extracats', 'array', array() );
+		param( 'post_status', 'string', 'published' );
+
 		if( $action == 'create_publish' )
 		{
-			$post_status = 'published';
+			if( ! in_array( $post_status, array( 'private', 'protected' ) ) )
+			{	/* Only use "published" if something other than "private"
+				   or "protected" has been selected: */
+				$post_status = 'published';
+			}
+			else
+			{
+				// Tblue> - Perhaps this should be an error (?).
+				//        - Message contents could be confusing.
+				$Messages->add( sprintf( T_( 'The post has been updated '
+											.'but not published because it '
+											.'seems like you wanted to set '
+											.'its status to "%s" instead. '
+											.'If you really want to make '
+											.'it public, manually change '
+											.'its status to "Published" '
+											.'and click the "Save" button.' ),
+									$post_status == 'protected' ? T_( 'Protected' ) : T_( 'Private' ) ), 'note' );
+			}
+
 			$set_issue_date = 'now';
 		}
-		else
-		{
-			param( 'post_status', 'string', 'published' );
-		}
+
 		// make sure main cat is in extracat list and there are no duplicates
 		$post_extracats[] = $post_category;
 		$post_extracats = array_unique( $post_extracats );
@@ -412,15 +430,33 @@ switch( $action )
 		// We need early decoding of these in order to check permissions:
 		param( 'post_category', 'integer', true );
 		param( 'post_extracats', 'array', array() );
+		param( 'post_status', 'string', 'published' );
+
 		if( $action == 'update_publish' )
 		{
-			$post_status = 'published';
+			if( ! in_array( $post_status, array( 'private', 'protected' ) ) )
+			{	/* Only use "published" if something other than "private"
+				   or "protected" has been selected: */
+				$post_status = 'published';
+			}
+			else
+			{
+				// Tblue> - Perhaps this should be an error (?).
+				//        - Message contents could be confusing.
+				$Messages->add( sprintf( T_( 'The post has been updated '
+											.'but not published because it '
+											.'seems like you wanted to set '
+											.'its status to "%s" instead. '
+											.'If you really want to make '
+											.'it public, manually change '
+											.'its status to "Published" '
+											.'and click the "Save" button.' ),
+									$post_status == 'protected' ? T_( 'Protected' ) : T_( 'Private' ) ), 'note' );
+			}
+
 			$set_issue_date = 'now';
 		}
-		else
-		{
-			param( 'post_status', 'string', 'published' );
-		}
+
 		// make sure main cat is in extracat list and there are no duplicates
 		$post_extracats[] = $post_category;
 		$post_extracats = array_unique( $post_extracats );
@@ -722,6 +758,27 @@ function init_list_mode()
 	}
 }
 
+function echo_publishnowbutton_js( $action )
+{
+	?>
+	<script type="text/javascript">
+		jQuery( '#itemform_visibility input[type=radio]' ).click( function()
+		{
+			var publishnow_btn = jQuery( '.edit_actions input[name=actionArray[<?php echo $action; ?>_publish]]' );
+			
+			if( this.value == 'private' || this.value == 'protected' )
+			{	// Hide the "Publish NOW !" button:
+				publishnow_btn.css( 'display', 'none' );
+			}
+			else
+			{	// Show the button:
+				publishnow_btn.css( 'display', 'inline' );
+			}
+		} );
+	</script>
+	<?php
+}
+
 /**
  * Configure page navigation:
  */
@@ -1005,6 +1062,13 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.47  2009/07/06 13:37:16  tblue246
+ * - Backoffice, write screen:
+ * 	- Hide the "Publish NOW !" button using JavaScript if the post types "Protected" or "Private" are selected.
+ * 	- Do not publish draft posts whose post status has been set to either "Protected" or "Private" and inform the user (note).
+ * - Backoffice, post lists:
+ * 	- Only display the "Publish NOW!" button for draft posts.
+ *
  * Revision 1.46  2009/05/21 12:34:39  fplanque
  * Options to select how much content to display (excerpt|teaser|normal) on different types of pages.
  *

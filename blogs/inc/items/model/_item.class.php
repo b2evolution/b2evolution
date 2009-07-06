@@ -2421,7 +2421,7 @@ class Item extends ItemLight
 	{
 		global $current_User, $admin_url;
 
-		if( in_array($this->status, array('published', 'redirected')) )
+		if( $this->status != 'draft' )
 		{
 			return false;
 		}
@@ -3928,6 +3928,13 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.113  2009/07/06 13:37:16  tblue246
+ * - Backoffice, write screen:
+ * 	- Hide the "Publish NOW !" button using JavaScript if the post types "Protected" or "Private" are selected.
+ * 	- Do not publish draft posts whose post status has been set to either "Protected" or "Private" and inform the user (note).
+ * - Backoffice, post lists:
+ * 	- Only display the "Publish NOW!" button for draft posts.
+ *
  * Revision 1.112  2009/07/04 18:24:54  tblue246
  * a) Another attempt at fixing Item::set_tags_from_string(). b) Doc @ fp
  *
