@@ -607,6 +607,8 @@ function mb__strlen( $string )
  * mbstring wrapper for substr function
  *
  * @param string
+ * @param int start position
+ * @param int string length
  * @return string
  */
 function mb__substr( $string, $start = 0, $length = '#' )
@@ -3479,6 +3481,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.113  2009/07/06 22:48:29  sam2kb
+ * minor
+ *
  * Revision 1.112  2009/07/06 22:30:26  fplanque
  * no message
  *
