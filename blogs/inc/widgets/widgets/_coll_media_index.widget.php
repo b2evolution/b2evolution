@@ -59,7 +59,7 @@ class coll_media_index_Widget extends ComponentWidget
 
 		$r = array_merge( array(
 			'title' => array(
-				'label' => t_('Block title'),
+				'label' => T_('Block title'),
 				'note' => T_( 'Title to display in your skin.' ),
 				'size' => 40,
 				'defaultvalue' => T_('Recent photos'),
@@ -282,6 +282,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.8  2009/07/07 04:52:54  sam2kb
+ * Made some strings translatable
+ *
  * Revision 1.7  2009/03/31 18:28:25  tblue246
  * Fixing http://forums.b2evolution.net/viewtopic.php?t=18387
  *
