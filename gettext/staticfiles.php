@@ -20,7 +20,7 @@
 /**
  * Load config
  */
-require( '../blogs/conf/_config.php' );
+require( dirname( __FILE__ ).'/../blogs/conf/_config.php' );
 
 define( 'EVO_MAIN_INIT', true );
 
