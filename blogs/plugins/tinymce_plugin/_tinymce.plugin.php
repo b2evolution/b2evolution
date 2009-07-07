@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '3.2.0';
+	var $version = '3.3.0';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -219,14 +219,14 @@ class tinymce_plugin extends Plugin
 
 
 	/**
-	 * We require b2evo 1.9-dev or above.
+	 * We require b2evo 3.3+
 	 */
 	function GetDependencies()
 	{
 		return array(
 				'requires' => array(
-					'api_min' => array( 1, 2 ), // obsolete, but required for b2evo 1.8 before 1.8.3
-					'app_min' => '1.9-dev',
+					'api_min' => array( 3, 3 ), // obsolete, but required for b2evo 1.8 before 1.8.3
+					'app_min' => '3.3.0-rc1',
 				),
 			);
 	}
@@ -266,6 +266,12 @@ class tinymce_plugin extends Plugin
 	 */
 	function AdminDisplayEditorButton( & $params )
 	{
+		global $Blog;
+		/**
+		 * @global Item
+		 */
+		global $edited_Item;
+
 		if( $params['target_type'] != 'Item' )
 		{ // only for Items:
 			return;
@@ -302,13 +308,13 @@ class tinymce_plugin extends Plugin
 				if( ! tinyMCE.getInstanceById(id))
 				{
 					tinyMCE.execCommand('mceAddControl', false, id);
-					jQuery.get('<?php echo $this->get_htsrv_url('save_editor_state', array('on'=>1), '&'); ?>');
+					jQuery.get('<?php echo $this->get_htsrv_url('save_editor_state', array('on'=>1, 'blog'=>$Blog->ID, 'item'=>$edited_Item->ID), '&'); ?>');
 					jQuery('#tinymce_plugin_toggle_button').attr('value', 'HTML');
 				}
 				else
 				{
 					tinyMCE.execCommand('mceRemoveControl', false, id);
-					jQuery.get('<?php echo $this->get_htsrv_url('save_editor_state', array('on'=>0), '&'); ?>');
+					jQuery.get('<?php echo $this->get_htsrv_url('save_editor_state', array('on'=>0, 'blog'=>$Blog->ID, 'item'=>$edited_Item->ID), '&'); ?>');
 					jQuery('#tinymce_plugin_toggle_button').attr('value', 'WYSIWYG');
 				}
 				jQuery('#tinymce_plugin_toggle_button').removeAttr("disabled");
@@ -455,13 +461,41 @@ class tinymce_plugin extends Plugin
 
 		<?php
 
-		// If the user has the editor enabled, load it:
 		// fp> todo: there is some confusion here between "enabled for use" and "currently selected"
 		// dh> Don't understand this. Should be the same: a user can either enable or disable the editor.
-		if( $this->UserSettings->get('use_tinymce') )
-		{ // fp> why do we need to wrap in jQuery() here
+		// fp> No: "disabled" intuitively means (for most English speaking people) it's not available (at all) when editing a post.
+		// When people disable they mean: "never ever try to load all that fancy JS for me, thank you"
+
+
+		// pre_dump( $edited_Item->editor_code );
+		if( is_object($edited_Item) && !empty($edited_Item->editor_code) )
+		{	// We have a preference for the current post, follow it:
+			// Use tinyMCE if code matched the code of the current plugin.
+			// fp> Note: this is a temporary solution; in the long term, this will be part of the API and the appropriate plugin will be selected.
+			$use_tinymce = ($edited_Item->editor_code == $this->code);
+		}
+		else
+		{	// We have no pref, fall back to whatever current user has last used:
+
+			// Has the user used MCE last time he edited this particular blog?
+			$use_tinymce = $this->UserSettings->get('use_tinymce_coll'.$Blog->ID );
+			// pre_dump( $use_tinymce_for_this_blog );
+
+			if( is_null($use_tinymce) )
+			{	// We don't know for this blog, check if he used MCE last time he edited anything:
+				$use_tinymce = $this->UserSettings->get('use_tinymce');
+			}
+		}
+
+		if( $use_tinymce )
+		{ // User used MCE last time, load MCE now:
+ 			// fp> why do we need to wrap in jQuery() here?
 			echo '<script type="text/javascript">jQuery( tinymce_plugin_toggleEditor("'.$this->tmce_editor_id.'") );</script>';
 		}
+
+		// We also want to save the 'last used/not-used' state: (if no NULLs, this won't change anything)
+		$this->htsrv_save_editor_state( array('on'=>$use_tinymce, 'blog'=>$Blog->ID, 'item'=>$edited_Item->ID ) );
+
 		return true;
 	}
 
@@ -826,11 +860,32 @@ class tinymce_plugin extends Plugin
 	 */
 	function htsrv_save_editor_state($params)
 	{
+		/**
+		 * @var DB
+		 */
+		global $DB;
+
 		if( ! isset($params['on']) )
 		{
 			return;
 		}
-		$this->UserSettings->set('use_tinymce', (int)$params['on']);
+
+		// fp>This is a super dirty hack that we're going to use only until we have a clean API for handling WYSIWYG editors:
+		if( !empty($params['item']) )
+		{	// Save the status last used by this Item:
+			// fp> TODO: also do that on CREATE post because it won't have been done here:
+			$sql = 'UPDATE T_items__item
+								 SET post_editor_code = '.$DB->quote( (int)$params['on'] ? $this->code : 'html' )
+						.' WHERE post_ID = '.$DB->quote((int)$params['item']);
+			$DB->query( $sql, 'Save editor state for current post' );
+		}
+
+		// Clean:
+		if( !empty($params['blog']) )
+		{	// This is in order to try & recall a specific state for each blog: (will be used for new posts especially)
+			$this->UserSettings->set( 'use_tinymce_coll'.(int)$params['blog'], (int)$params['on'] );
+		}
+		$this->UserSettings->set( 'use_tinymce', (int)$params['on'] );
 		$this->UserSettings->dbupdate();
 	}
 

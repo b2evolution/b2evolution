@@ -2366,20 +2366,27 @@ function upgrade_b2evo_tables()
 								CHANGE COLUMN iver_edit_user_ID iver_edit_user_ID  INT UNSIGNED NULL" );
 		task_end();
 	}
-	
+
 	if( $old_db_version < 9950 )
 	{	// 3.2
 		task_begin( 'Altering Blogs table... ' );
 		$DB->query( "ALTER TABLE T_blogs CHANGE COLUMN blog_shortname blog_shortname varchar(255) default ''" );
 		task_end();
-		
+
 		task_begin( 'Altering Items table... ' );
 		$DB->query( "ALTER TABLE T_items__item
-			ADD COLUMN post_metadesc  VARCHAR(255) NULL DEFAULT NULL AFTER post_titletag,
-			ADD COLUMN post_metakeywords  VARCHAR(255) NULL DEFAULT NULL AFTER post_metadesc" );
+			ADD COLUMN post_metadesc VARCHAR(255) NULL DEFAULT NULL AFTER post_titletag,
+			ADD COLUMN post_metakeywords VARCHAR(255) NULL DEFAULT NULL AFTER post_metadesc
+			ADD COLUMN post_editor_code VARCHAR(32) NULL COMMENT 'Plugin code of the editor used to edit this post' AFTER post_varchar3" );
+		task_end();
+
+		task_begin( 'Forcing AutoP posts to html editor...' );
+			$DB->query( 'UPDATE T_items__item
+											SET post_editor_code = "html"
+										WHERE post_renderers = "default"
+											 OR post_renderers LIKE "%b2WPAutP%"' );
 		task_end();
 	}
-	
 
 	/* Wait until we're sure and no longer experimental for that one...
 	task_begin( 'Moving user data to fields' );
@@ -2530,6 +2537,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.294  2009/07/07 00:34:42  fplanque
+ * Remember whether or not the TinyMCE editor was last used on a per post and per blog basis.
+ *
  * Revision 1.293  2009/06/20 17:19:33  leeturner2701
  * meta desc and meta keywords per blog post
  *

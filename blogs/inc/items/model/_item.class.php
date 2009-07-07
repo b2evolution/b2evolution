@@ -112,12 +112,12 @@ class Item extends ItemLight
 	var $content;
 
 	var $titletag;
-	
+
 	/**
 	 * Meta Description tag for this post
 	 */
 	var $metadesc;
-	
+
 	/**
 	 * Meta keywords for this post
 	 */
@@ -166,6 +166,11 @@ class Item extends ItemLight
 	var $varchar1;
 	var $varchar2;
 	var $varchar3;
+
+	/**
+	 * @var Plugin code used to edit contents of this Item:
+	 */
+	var $editor_code = NULL; // NULL will use whatever editor was last used
 
 	/**
 	 * Have post processing notifications been handled?
@@ -285,6 +290,7 @@ class Item extends ItemLight
 
 			// echo 'renderers=', $db_row->post_renderers;
 			$this->renderers = $db_row->post_renderers;
+			$this->editor_code = $db_row->post_editor_code;
 
 			$this->views = $db_row->post_views;
 		}
@@ -462,11 +468,11 @@ class Item extends ItemLight
 		if( param( 'titletag', 'string', NULL ) !== NULL ) {
 			$this->set_from_Request( 'titletag', 'titletag' );
 		}
-		
+
 		if( param( 'metadesc', 'string', NULL ) !== NULL ) {
 			$this->set_from_Request( 'metadesc', 'metadesc' );
 		}
-		
+
 		if( param( 'metakeywords', 'string', NULL ) !== NULL ) {
 			$this->set_from_Request( 'metakeywords', 'metakeywords' );
 		}
@@ -1505,7 +1511,7 @@ class Item extends ItemLight
 
 		return $this->titletag;
 	}
-	
+
 	/**
 	 * Get the meta description tag
 	 *
@@ -1514,7 +1520,7 @@ class Item extends ItemLight
 	{
 		return $this->metadesc;
 	}
-	
+
 	/**
 	 * Get the meta keyword tag
 	 *
@@ -3928,6 +3934,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.116  2009/07/07 00:34:42  fplanque
+ * Remember whether or not the TinyMCE editor was last used on a per post and per blog basis.
+ *
  * Revision 1.115  2009/07/06 22:49:11  fplanque
  * made some small changes on "publish now" handling.
  * Basically only display it for drafts everywhere.

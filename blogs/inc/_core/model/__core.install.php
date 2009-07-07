@@ -266,6 +266,7 @@ $schema_queries = array(
 			post_varchar1               VARCHAR(255) NULL COMMENT 'Custom varchar value 1',
 			post_varchar2               VARCHAR(255) NULL COMMENT 'Custom varchar value 2',
 			post_varchar3               VARCHAR(255) NULL COMMENT 'Custom varchar value 3',
+			post_editor_code						VARCHAR(32) NULL COMMENT 'Plugin code of the editor used to edit this post',
 			PRIMARY KEY post_ID( post_ID ),
 			UNIQUE post_urltitle( post_urltitle ),
 			INDEX post_datestart( post_datestart ),
@@ -574,6 +575,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.20  2009/07/07 00:34:42  fplanque
+ * Remember whether or not the TinyMCE editor was last used on a per post and per blog basis.
+ *
  * Revision 1.19  2009/06/20 17:19:33  leeturner2701
  * meta desc and meta keywords per blog post
  *
