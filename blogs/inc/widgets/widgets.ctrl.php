@@ -205,6 +205,10 @@ switch( $action )
 			}
 			$action = 'list';
 		}
+		elseif( $display_mode == 'js' )
+		{ // send errors back as js
+			send_javascript_message( array(), true );
+		}
 		break;
 
 
@@ -493,6 +497,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.27  2009/07/07 15:21:10  yabs
+ * Bug fix : error messages are now shown
+ *
  * Revision 1.26  2009/06/01 12:23:59  tblue246
  * Translation fixes
  *
