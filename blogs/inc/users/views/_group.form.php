@@ -81,8 +81,8 @@ $Form->begin_fieldset( T_('General').get_manual_link('group_properties_general')
 	{	// Groups others than #1 can be prevented from editing users
 		$Form->radio( 'edited_grp_perm_admin', $edited_Group->get('perm_admin'),
 				array(  $perm_none_option,
-								array( 'hidden', T_('Hidden') ),
-								array( 'visible', T_('Visible link') ) // TODO: this may be obsolete, especially now we have to evobar
+								array( 'hidden', T_('Hidden (type in admin.php directly)') ),
+								array( 'visible', T_('Visible links to admin in evobar') ) // TODO: this may be obsolete, especially now we have the evobar
 							), T_('Access to Admin area'), false );
 	}
 	else
@@ -196,6 +196,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.10  2009/07/08 22:42:15  fplanque
+ * wording for newbies
+ *
  * Revision 1.9  2009/03/22 16:15:06  fplanque
  * Reverted fugky hack where all possible combiantions pose as a "level"
  * Use one checkbox per attributes class/style/id
