@@ -420,9 +420,9 @@ function zeroise( $number, $threshold )
  */
 function strmaxlen( $str, $maxlen = 50 )
 {
-	if( mb__strlen( $str ) > $maxlen )
+	if( evo_strlen( $str ) > $maxlen )
 	{
-		$str = mb__substr( $str, 0, $maxlen-1 ).'&hellip;';
+		$str = evo_substr( $str, 0, $maxlen-1 ).'&hellip;';
 	}
 
 	return $str;
@@ -590,7 +590,7 @@ function convert_chars( $content, $flag = 'html' )
  * @param string
  * @return string
  */
-function mb__strlen( $string )
+function evo_strlen( $string )
 {
 	global $current_charset;
 	
@@ -611,13 +611,13 @@ function mb__strlen( $string )
  * @param int string length
  * @return string
  */
-function mb__substr( $string, $start = 0, $length = '#' )
+function evo_substr( $string, $start = 0, $length = '#' )
 {
 	global $current_charset;
 	
 	if( $length == '#' )
 	{
-		$length = mb__strlen($string);
+		$length = evo_strlen($string);
 	}
 	
 	if( $current_charset != 'iso-8859-1' && $current_charset != '' && function_exists('mb_substr') )
@@ -3481,6 +3481,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.114  2009/07/08 01:42:44  sam2kb
+ * mb__ prefix replaced with evo_ in mbstring wrapper functions
+ *
  * Revision 1.113  2009/07/06 22:48:29  sam2kb
  * minor
  *
