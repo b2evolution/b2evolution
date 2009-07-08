@@ -205,7 +205,7 @@ class XHTML_Validator
 					break;
 			}
 			$pos = xml_get_current_byte_index($this->parser);
-			$xml_error_string .= ' near <code>'.htmlspecialchars( substr( $xhtml, $this->last_checked_pos, $pos-$this->last_checked_pos+20 ) ).'</code>';
+			$xml_error_string .= ' near <code>'.htmlspecialchars( evo_substr( $xhtml, $this->last_checked_pos, $pos-$this->last_checked_pos+20 ) ).'</code>';
 
 			$this->html_error( T_('Parser error: ').$xml_error_string );
 		}
@@ -328,6 +328,9 @@ class XHTML_Validator
 
 /*
  * $Log$
+ * Revision 1.11  2009/07/08 02:38:55  sam2kb
+ * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
+ *
  * Revision 1.10  2009/03/08 23:57:46  fplanque
  * 2009
  *

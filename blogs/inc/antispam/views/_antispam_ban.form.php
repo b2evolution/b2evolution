@@ -141,10 +141,10 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 				<td><?php echo $row_stats['comment_author_IP'] ?></td>
 				<td><?php
 				$comment_content = strip_tags( $row_stats['comment_content'] );
-				if ( strlen($comment_content) > 70 )
+				if ( evo_strlen($comment_content) > 70 )
 				{
 					// Trail off (truncate and add '...') after 70 chars
-					echo substr($comment_content, 0, 70) . "...";
+					echo evo_substr($comment_content, 0, 70) . "...";
 				}
 				else
 				{
@@ -211,6 +211,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.10  2009/07/08 02:38:55  sam2kb
+ * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
+ *
  * Revision 1.9  2009/03/08 23:57:41  fplanque
  * 2009
  *

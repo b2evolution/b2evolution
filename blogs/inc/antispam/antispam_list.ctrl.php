@@ -60,7 +60,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'spamblacklist', 'edit', true ); // TODO: This should become different for 'edit'/'add' perm level - check for 'add' here.
 
-		$keyword = substr( $keyword, 0, 80 );
+		$keyword = evo_substr( $keyword, 0, 80 );
 		param( 'delhits', 'integer', 0 );
 		param( 'delcomments', 'integer', 0 );
 		param( 'blacklist_locally', 'integer', 0 );
@@ -68,7 +68,7 @@ switch( $action )
 
 		// Check if the string is too short,
 		// it has to be a minimum of 5 characters to avoid being too generic
-		if( strlen($keyword) < 5 )
+		if( evo_strlen($keyword) < 5 )
 		{
 			$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; is too short, it has to be a minimum of 5 characters!'), htmlspecialchars($keyword) ), 'error' );
 			break;
@@ -178,6 +178,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2009/07/08 02:38:55  sam2kb
+ * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
+ *
  * Revision 1.5  2009/03/08 23:57:41  fplanque
  * 2009
  *

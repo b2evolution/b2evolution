@@ -278,7 +278,7 @@ function stats_search_keywords( $keyphrase, $length = 30 )
 	// Save original string
 	$keyphrase_orig = $keyphrase;
 
-	if( strlen( $keyphrase ) > $length )
+	if( evo_strlen( $keyphrase ) > $length )
 	{
 		// TODO: dh> there are other places, where mb_substr should get used, when available!
 		//           Either create a generic wrapper (evo_substr()), or just use
@@ -287,15 +287,7 @@ function stats_search_keywords( $keyphrase, $length = 30 )
 		//           (which is kind of crappy though). Note: there are more internal PHP funcs
 		//           that would need wrapping, so overloading appears to be the way to go.
 		// fp> we should just init somewhere that if( ! function_exists('mb_substr') ) function mbsubstr() { return substr() }
-		if( function_exists('mb_substr') )
-		{	// 2-byte unicode strings are cropped to 15 characters
-			// When cropped with 'substr' usually end with junk character
-			$keyphrase = mb_substr( $keyphrase, 0, $length, $evo_charset ).'...';
-		}
-		else
-		{
-			$keyphrase = substr( $keyphrase, 0, $length ).'...';	// word too long, crop it
-		}
+		$keyphrase = evo_substr( $keyphrase, 0, $length ).'...';	// word too long, crop it
 	}
 
 	// Convert keyword encoding, some charsets are supported only in PHP 4.3.2 and later.
@@ -344,6 +336,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.13  2009/07/08 02:38:55  sam2kb
+ * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
+ *
  * Revision 1.12  2009/07/08 01:45:48  sam2kb
  * Added param $length to stats_search_keywords()
  * Changed keywords length for better accessibility on low resolution screens

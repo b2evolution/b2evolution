@@ -42,7 +42,7 @@ function trackbacks( $post_trackbacks, $content, $post_title, $post_ID )
 {
 	global $Messages;
 
-	$excerpt = (strlen(strip_tags($content)) > 255) ? substr(strip_tags($content), 0, 252).'...' : strip_tags($content);
+	$excerpt = (evo_strlen(strip_tags($content)) > 255) ? evo_substr(strip_tags($content), 0, 252).'...' : strip_tags($content);
 	$Messages->add( T_('Excerpt sent in trackbacks:').' '.$excerpt, 'note' );
 	$trackback_urls = split('( )+', $post_trackbacks,10);		// fplanque: ;
 	foreach($trackback_urls as $tb_url)
@@ -224,6 +224,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.7  2009/07/08 02:38:55  sam2kb
+ * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
+ *
  * Revision 1.6  2009/03/08 23:57:42  fplanque
  * 2009
  *

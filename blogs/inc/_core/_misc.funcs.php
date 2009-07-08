@@ -446,7 +446,7 @@ function strmaxwords( $str, $maxwords = 50, $params = array() )
 		), $params );
 	$open = false;
 	$have_seen_non_whitespace = false;
-	$end = strlen( $str );
+	$end = evo_strlen( $str );
 	for( $i = 0; $i < $end; $i++ )
 	{
 		switch( $char = $str[$i] )
@@ -481,7 +481,7 @@ function strmaxwords( $str, $maxwords = 50, $params = array() )
 	}
 
 	// restrict content to required number of words and balance the tags out
-	$str = balance_Tags( substr( $str, 0, $i ) );
+	$str = balance_Tags( evo_substr( $str, 0, $i ) );
 
 	if( $params['always_continue'] || $maxwords == false )
 	{ // we want a continued text
@@ -3481,6 +3481,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.115  2009/07/08 02:38:54  sam2kb
+ * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
+ *
  * Revision 1.114  2009/07/08 01:42:44  sam2kb
  * mb__ prefix replaced with evo_ in mbstring wrapper functions
  *

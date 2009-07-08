@@ -974,7 +974,7 @@ class Hit
 					'text',         // yandex.ru
 				);
 
-		$ref_params = explode( '&', substr( $ref, $pos_question+1 ) );
+		$ref_params = explode( '&', evo_substr( $ref, $pos_question+1 ) );
 		foreach( $ref_params as $ref_param )
 		{
 			$param_parts = explode( '=', $ref_param );
@@ -1102,6 +1102,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.26  2009/07/08 02:38:55  sam2kb
+ * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
+ *
  * Revision 1.25  2009/05/10 00:28:51  fplanque
  * serp rank logging
  *

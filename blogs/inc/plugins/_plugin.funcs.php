@@ -899,7 +899,7 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 	// Check maxlength:
 	if( isset($meta['maxlength']) )
 	{
-		if( strlen($value) > $meta['maxlength'] )
+		if( evo_strlen($value) > $meta['maxlength'] )
 		{
 			param_error( $param_name, sprintf( T_('The value is too long.'), $value ) );
 		}
@@ -1023,6 +1023,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /*
  * $Log$
+ * Revision 1.12  2009/07/08 02:38:55  sam2kb
+ * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
+ *
  * Revision 1.11  2009/07/04 17:42:39  tblue246
  * Translation fix: Default error messages for min/max values (plugin settings) were badly worded.
  *

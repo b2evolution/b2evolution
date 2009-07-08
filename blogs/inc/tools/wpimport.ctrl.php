@@ -244,7 +244,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			{
 				// insert each tags into the evolution database
 				$query = 'INSERT INTO '.$b2.'items__tag(tag_ID, tag_name)
-									VALUES ( '.$tag_id.', "'.substr($tag['name'],0,50).'" );';
+									VALUES ( '.$tag_id.', "'.evo_substr($tag['name'],0,50).'" );';
 				$flag = mysql_query ($query);
 
 				if(! $flag )
@@ -486,7 +486,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				// query to insert the comments into the b2evolution table
 				$query = 'INSERT INTO '.$b2.'comments (comment_ID, comment_post_ID, comment_type, comment_status, comment_author_ID, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_allow_msgform)
 				VALUES ("'. $comment['comment_id'].'", "'.$comment['post_id'].'", "'.$comment['type'].'", "'
-								.$comment['status'].'", "'.$comment['author_id'].'", "'.substr($comment['author'],0,100).'", "'.$comment['email']
+								.$comment['status'].'", "'.$comment['author_id'].'", "'.evo_substr($comment['author'],0,100).'", "'.$comment['email']
 								.'", "'.$comment['url'].'", "'.$comment['ip'].'", "'.$comment['date'].'", "'.$ccontent.'", "1");';
 
 				$flag = mysql_query ($query);

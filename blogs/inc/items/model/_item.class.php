@@ -3292,10 +3292,10 @@ class Item extends ItemLight
 		if( empty($this->excerpt) )
 		{
 			$stripped_content = trim(strip_tags($this->content));
-			$excerpt = trim( substr( $stripped_content, 0, $crop_length ) );
+			$excerpt = trim( evo_substr( $stripped_content, 0, $crop_length ) );
 			if( !empty($excerpt) )
 			{	// We finally have something to act as an excerpt...
-				if( strlen( $excerpt ) < strlen( $stripped_content ) )
+				if( evo_strlen( $excerpt ) < evo_strlen( $stripped_content ) )
 				{	// If excepr shorter than original content, add suffix:
 					$excerpt .= $suffix;
 				}
@@ -3635,7 +3635,7 @@ class Item extends ItemLight
 				locale_temp_switch($notify_locale);
 
 				// Calculate length for str_pad to align labels:
-				$pad_len = max( strlen(T_('Blog')), strlen(T_('Author')), strlen(T_('Title')), strlen(T_('Url')), strlen(T_('Content')) );
+				$pad_len = max( evo_strlen(T_('Blog')), evo_strlen(T_('Author')), evo_strlen(T_('Title')), evo_strlen(T_('Url')), evo_strlen(T_('Content')) );
 
 				$cache_by_locale[$notify_locale]['subject'] = sprintf( T_('[%s] New post: "%s"'), $edited_Blog->get('shortname'), $this->get('title') );
 
@@ -3934,6 +3934,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.117  2009/07/08 02:38:55  sam2kb
+ * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
+ *
  * Revision 1.116  2009/07/07 00:34:42  fplanque
  * Remember whether or not the TinyMCE editor was last used on a per post and per blog basis.
  *
