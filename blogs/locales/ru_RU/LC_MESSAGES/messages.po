@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 3\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2009-07-04 17:46+0200\n"
-"PO-Revision-Date: 2009-07-06 18:36-0500\n"
+"POT-Creation-Date: 2009-07-07 13:46+0200\n"
+"PO-Revision-Date: 2009-07-07 21:38-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +23,7 @@ msgstr ""
 #: ..\..\..\a_noskin.php:231
 #: ..\..\..\inc\_core\__core.init.php:275
 #: ..\..\..\inc\_core\__core.init.php:662
-#: ..\..\..\inc\items\model\_item.funcs.php:491
+#: ..\..\..\inc\items\model\_item.funcs.php:499
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:895
 #: ..\..\..\inc\items\views\_item_list_full.view.php:194
 #: ..\..\..\inc\settings\views\_features.form.php:188
@@ -42,11 +42,11 @@ msgid "Categories"
 msgstr "Рубрики"
 
 #: ..\..\..\a_noskin.php:255
-#: ..\..\..\inc\items\model\_item.class.php:2763
+#: ..\..\..\inc\items\model\_item.class.php:2765
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:897
-#: ..\..\..\inc\items\views\_item_expert.form.php:236
+#: ..\..\..\inc\items\views\_item_expert.form.php:243
 #: ..\..\..\inc\items\views\_item_list_full.view.php:251
-#: ..\..\..\inc\items\views\_item_simple.form.php:206
+#: ..\..\..\inc\items\views\_item_simple.form.php:213
 #: ..\..\..\skins\asevo\_item_block.inc.php:76
 #: ..\..\..\skins\custom\_item_block.inc.php:92
 #: ..\..\..\skins\evocamp\_item_block.inc.php:97
@@ -209,7 +209,7 @@ msgstr "Свернуть"
 
 #: ..\..\..\conf\_icons.php:229
 #: ..\..\..\inc\cron\views\_cronjob_list.view.php:72
-#: ..\..\..\inc\items\model\_item.funcs.php:455
+#: ..\..\..\inc\items\model\_item.funcs.php:463
 msgid "Refresh"
 msgstr "Обновить"
 
@@ -218,7 +218,7 @@ msgid "Reload"
 msgstr "Перезагрузить"
 
 #: ..\..\..\conf\_icons.php:240
-#: ..\..\..\inc\files\files.ctrl.php:579
+#: ..\..\..\inc\files\files.ctrl.php:581
 #: ..\..\..\inc\files\views\_file_download.form.php:63
 msgid "Download"
 msgstr "Скачать"
@@ -276,7 +276,7 @@ msgstr "Новый"
 #: ..\..\..\inc\chapters\views\_chapter_move.form.php:53
 #: ..\..\..\inc\files\views\_file_properties.form.php:45
 #: ..\..\..\inc\generic\views\_generic_category.form.php:55
-#: ..\..\..\inc\items\views\_item_expert.form.php:329
+#: ..\..\..\inc\items\views\_item_expert.form.php:336
 #: ..\..\..\inc\widgets\views\_widget.form.php:39
 msgid "Properties"
 msgstr "Свойства"
@@ -351,9 +351,9 @@ msgstr "Календарь"
 
 #: ..\..\..\conf\_icons.php:397
 #: ..\..\..\conf\_icons.php:403
-#: ..\..\..\inc\plugins\plugins.ctrl.php:999
+#: ..\..\..\inc\plugins\plugins.ctrl.php:1000
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:226
-#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:55
+#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:57
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:78
 msgid "Help"
 msgstr "Помощь"
@@ -388,11 +388,11 @@ msgstr "Блокировано"
 #: ..\..\..\conf\_icons.php:436
 #: ..\..\..\inc\_core\__core.init.php:259
 #: ..\..\..\inc\collections\views\_coll_features.form.php:78
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:321
-#: ..\..\..\inc\items\model\_item.funcs.php:729
-#: ..\..\..\inc\items\views\_item_expert.form.php:387
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:323
+#: ..\..\..\inc\items\model\_item.funcs.php:737
+#: ..\..\..\inc\items\views\_item_expert.form.php:394
 #: ..\..\..\inc\items\views\_item_list_full.view.php:322
-#: ..\..\..\inc\items\views\_item_simple.form.php:245
+#: ..\..\..\inc\items\views\_item_simple.form.php:252
 #: ..\..\..\inc\widgets\widgets\_coll_xml_feeds.widget.php:155
 #: ..\..\..\skins\_subs.disp.php:85
 #: ..\..\..\skins\_subs.disp.php:97
@@ -417,7 +417,7 @@ msgstr "Сортировка по порядку"
 
 #: ..\..\..\conf\_icons.php:469
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:1027
-#: ..\..\..\inc\items\views\_item_expert.form.php:274
+#: ..\..\..\inc\items\views\_item_expert.form.php:281
 #: ..\..\..\inc\items\views\_item_list_full.view.php:182
 msgid "Assigned to"
 msgstr "Назначено на"
@@ -993,11 +993,11 @@ msgid "File"
 msgstr "Файл"
 
 #: ..\..\..\htsrv\viewfile.php:133
-#: ..\..\..\inc\_core\_misc.funcs.php:3367
+#: ..\..\..\inc\_core\_misc.funcs.php:3417
 #: ..\..\..\inc\collections\views\_coll_general.form.php:52
 #: ..\..\..\inc\files\views\_file_links.view.php:112
-#: ..\..\..\inc\items\model\_item.class.php:3636
-#: ..\..\..\inc\items\model\_item.class.php:3646
+#: ..\..\..\inc\items\model\_item.class.php:3638
+#: ..\..\..\inc\items\model\_item.class.php:3648
 #: ..\..\..\inc\items\views\_item_expert.form.php:101
 #: ..\..\..\inc\items\views\_item_list_table.view.php:141
 #: ..\..\..\inc\items\views\_item_simple.form.php:132
@@ -1012,7 +1012,7 @@ msgstr "Заголовок"
 #: ..\..\..\inc\chapters\views\_chapter.form.php:71
 #: ..\..\..\inc\collections\views\_coll_general.form.php:104
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:210
-#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:53
+#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:55
 #: ..\..\..\inc\widgets\views\_widget.form.php:41
 msgid "Description"
 msgstr "Описание"
@@ -1116,7 +1116,7 @@ msgid "Manage the contents of this blog"
 msgstr "Управлять содержимым этого блога"
 
 #: ..\..\..\inc\_core\__core.init.php:207
-#: ..\..\..\inc\items\model\_item.funcs.php:688
+#: ..\..\..\inc\items\model\_item.funcs.php:696
 #: ..\..\..\inc\users\views\_user.form.php:323
 #: ..\..\..\inc\widgets\widgets\_coll_xml_feeds.widget.php:152
 #: ..\..\..\skins\_profile.disp.php:100
@@ -1128,7 +1128,7 @@ msgstr "Записи"
 
 #: ..\..\..\inc\_core\__core.init.php:211
 #: ..\..\..\inc\_core\ui\results\_results.class.php:1739
-#: ..\..\..\inc\items\model\_item.funcs.php:692
+#: ..\..\..\inc\items\model\_item.funcs.php:700
 #: ..\..\..\inc\items\views\_item_list_full.view.php:101
 #: ..\..\..\inc\items\views\_item_list_full.view.php:105
 #: ..\..\..\inc\widgets\widgets\_coll_page_list.widget.php:60
@@ -1149,12 +1149,12 @@ msgid "Podcast episodes"
 msgstr "Эпизоды подкастов"
 
 #: ..\..\..\inc\_core\__core.init.php:223
-#: ..\..\..\inc\items\model\_item.funcs.php:704
+#: ..\..\..\inc\items\model\_item.funcs.php:712
 msgid "Sidebar links"
 msgstr "Ссылки боковой панели"
 
 #: ..\..\..\inc\_core\__core.init.php:230
-#: ..\..\..\inc\items\model\_item.funcs.php:716
+#: ..\..\..\inc\items\model\_item.funcs.php:724
 msgid "Tracker"
 msgstr "Трекер"
 
@@ -1178,8 +1178,8 @@ msgid "About this system"
 msgstr "Об этой системе"
 
 #: ..\..\..\inc\_core\__core.init.php:297
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:456
-#: ..\..\..\inc\settings\views\_general.form.php:57
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:458
+#: ..\..\..\inc\settings\views\_general.form.php:59
 msgid "Create new blog"
 msgstr "Создать новый блог"
 
@@ -1212,27 +1212,27 @@ msgid "Customize this blog"
 msgstr "Настроить этот блог"
 
 #: ..\..\..\inc\_core\__core.init.php:351
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:348
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:350
 msgid "Blog properties"
 msgstr "Свойства блога"
 
 #: ..\..\..\inc\_core\__core.init.php:355
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:349
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:351
 msgid "Blog features"
 msgstr "Возможности блога"
 
 #: ..\..\..\inc\_core\__core.init.php:359
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:350
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:352
 msgid "Blog skin"
 msgstr "Тема блога"
 
 #: ..\..\..\inc\_core\__core.init.php:363
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:351
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:353
 msgid "Blog widgets"
 msgstr "Виджеты блога"
 
 #: ..\..\..\inc\_core\__core.init.php:367
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:352
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:354
 msgid "Blog URLs"
 msgstr "URLs блога"
 
@@ -1276,8 +1276,8 @@ msgstr "Выход"
 #: ..\..\..\inc\chapters\views\_chapter.form.php:62
 #: ..\..\..\inc\collections\model\_blog.class.php:225
 #: ..\..\..\inc\comments\model\_comment.class.php:1241
-#: ..\..\..\inc\items\model\_item.class.php:3636
-#: ..\..\..\inc\items\model\_item.class.php:3641
+#: ..\..\..\inc\items\model\_item.class.php:3638
+#: ..\..\..\inc\items\model\_item.class.php:3643
 #: ..\..\..\inc\items\views\_item_list_table.view.php:80
 #: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:155
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:92
@@ -1453,110 +1453,110 @@ msgstr "Система"
 msgid "Misc"
 msgstr "Другое"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:757
+#: ..\..\..\inc\_core\_misc.funcs.php:802
 msgid "Hello"
 msgstr "Привет"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1177
-#: ..\..\..\inc\_core\_misc.funcs.php:1224
+#: ..\..\..\inc\_core\_misc.funcs.php:1223
+#: ..\..\..\inc\_core\_misc.funcs.php:1270
 msgid "No response!"
 msgstr "Нет ответа!"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1183
-#: ..\..\..\inc\_core\_misc.funcs.php:1230
+#: ..\..\..\inc\_core\_misc.funcs.php:1229
+#: ..\..\..\inc\_core\_misc.funcs.php:1276
 msgid "Remote error"
 msgstr "Удаленная ошибка"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1207
 #: ..\..\..\inc\_core\_misc.funcs.php:1253
+#: ..\..\..\inc\_core\_misc.funcs.php:1299
 msgid "Response"
 msgstr "Ответ"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1593
-#: ..\..\..\inc\_core\_misc.funcs.php:1611
+#: ..\..\..\inc\_core\_misc.funcs.php:1639
+#: ..\..\..\inc\_core\_misc.funcs.php:1657
 msgid "An unexpected error has occurred!"
 msgstr "Произошла неожиданная ошибка!"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1594
-#: ..\..\..\inc\_core\_misc.funcs.php:1612
+#: ..\..\..\inc\_core\_misc.funcs.php:1640
+#: ..\..\..\inc\_core\_misc.funcs.php:1658
 msgid "If this error persists, please report it to the administrator."
 msgstr "Если эта ошибка не исчезает, пожалуйста, сообщите администратору."
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1595
-#: ..\..\..\inc\_core\_misc.funcs.php:1619
-#: ..\..\..\inc\_core\_misc.funcs.php:1726
+#: ..\..\..\inc\_core\_misc.funcs.php:1641
+#: ..\..\..\inc\_core\_misc.funcs.php:1665
+#: ..\..\..\inc\_core\_misc.funcs.php:1772
 msgid "Additional information about this error:"
 msgstr "Дополнительная информация о данной ошибке:"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1613
-#: ..\..\..\inc\_core\_misc.funcs.php:1720
+#: ..\..\..\inc\_core\_misc.funcs.php:1659
+#: ..\..\..\inc\_core\_misc.funcs.php:1766
 msgid "Go back to home page"
 msgstr "Вернуться к домашней странице"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1717
+#: ..\..\..\inc\_core\_misc.funcs.php:1763
 msgid "Bad Request!"
 msgstr "Ошибочный запрос!"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1718
+#: ..\..\..\inc\_core\_misc.funcs.php:1764
 msgid "The parameters of your request are invalid."
 msgstr "Параметры в вашем запросе недопустимы."
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1719
+#: ..\..\..\inc\_core\_misc.funcs.php:1765
 msgid "If you have obtained this error by clicking on a link INSIDE of this site, please report the bad link to the administrator."
 msgstr "Если вы получили эту ошибку нажимая на ссылку ВНУТРИ сайта, пожалуйста сообщите о плохой ссылке администратору. "
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2059
+#: ..\..\..\inc\_core\_misc.funcs.php:2105
 msgid "DB Username"
 msgstr "Имя пользователя БД"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2060
+#: ..\..\..\inc\_core\_misc.funcs.php:2106
 msgid "DB Database"
 msgstr "База данных"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2061
+#: ..\..\..\inc\_core\_misc.funcs.php:2107
 msgid "DB Host"
 msgstr "Хост БД"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2062
+#: ..\..\..\inc\_core\_misc.funcs.php:2108
 msgid "DB tables prefix"
 msgstr "Префикс таблиц БД"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2063
+#: ..\..\..\inc\_core\_misc.funcs.php:2109
 msgid "DB connection charset"
 msgstr "Кодировка подключения к БД"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2939
+#: ..\..\..\inc\_core\_misc.funcs.php:2985
 #: ..\..\..\install\index.php:614
 msgid "Manual"
 msgstr "Руководство"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2939
+#: ..\..\..\inc\_core\_misc.funcs.php:2985
 msgid "Open relevant page in online manual"
 msgstr "Открыть соответствующую страницу в онлайн руководстве"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3364
+#: ..\..\..\inc\_core\_misc.funcs.php:3414
 msgid "Date issued (Default)"
 msgstr "Дата появления (по умолчанию)"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3365
+#: ..\..\..\inc\_core\_misc.funcs.php:3415
 msgid "Order (as explicitely specified)"
 msgstr "Порядку (явно указан в записи)"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3368
+#: ..\..\..\inc\_core\_misc.funcs.php:3418
 msgid "Date created"
 msgstr "Дата создания"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3369
+#: ..\..\..\inc\_core\_misc.funcs.php:3419
 msgid "Date last modified"
 msgstr "Дата последнего изменения"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3370
+#: ..\..\..\inc\_core\_misc.funcs.php:3420
 #: ..\..\..\inc\collections\views\_coll_general.form.php:64
 msgid "URL \"filename\""
 msgstr "URL (имя файла)"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3371
-#: ..\..\..\inc\items\views\_item_expert.form.php:270
+#: ..\..\..\inc\_core\_misc.funcs.php:3421
+#: ..\..\..\inc\items\views\_item_expert.form.php:277
 #: ..\..\..\inc\items\views\_item_list_full.view.php:181
 #: ..\..\..\inc\locales\_locale_settings.form.php:95
 #: ..\..\..\inc\locales\_locale_settings.form.php:281
@@ -1566,11 +1566,11 @@ msgstr "URL (имя файла)"
 msgid "Priority"
 msgstr "Приоритет"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3372
+#: ..\..\..\inc\_core\_misc.funcs.php:3422
 msgid "Views"
 msgstr "Количество просмотров"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3373
+#: ..\..\..\inc\_core\_misc.funcs.php:3423
 msgid "Random order!"
 msgstr "Вразноброс!"
 
@@ -1830,14 +1830,14 @@ msgstr "ВНИМАНИЕ: Удаление этого объекта также 
 #: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:428
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:541
 #: ..\..\..\inc\collections\collections.ctrl.php:397
-#: ..\..\..\inc\plugins\plugins.ctrl.php:939
+#: ..\..\..\inc\plugins\plugins.ctrl.php:940
 msgid "THIS CANNOT BE UNDONE!"
 msgstr "НЕ МОЖЕТ БЫТЬ ОТМЕНЕНО!"
 
 #: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:436
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:555
 #: ..\..\..\inc\collections\collections.ctrl.php:421
-#: ..\..\..\inc\plugins\plugins.ctrl.php:941
+#: ..\..\..\inc\plugins\plugins.ctrl.php:942
 #: ..\..\..\install\index.php:559
 msgid "I am sure!"
 msgstr "Я уверен!"
@@ -2352,7 +2352,7 @@ msgstr "Дек"
 
 #: ..\..\..\inc\_vars.inc.php:276
 #: ..\..\..\inc\collections\views\_coll_features.form.php:91
-#: ..\..\..\inc\items\model\_item.funcs.php:749
+#: ..\..\..\inc\items\model\_item.funcs.php:757
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:95
 msgid "Published"
 msgstr "Опубликовано"
@@ -2360,32 +2360,36 @@ msgstr "Опубликовано"
 #: ..\..\..\inc\_vars.inc.php:277
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:114
 #: ..\..\..\inc\collections\views\_coll_features.form.php:92
-#: ..\..\..\inc\items\model\_item.funcs.php:761
+#: ..\..\..\inc\items\model\_item.funcs.php:769
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:107
 msgid "Deprecated"
 msgstr "Отклонено"
 
 #: ..\..\..\inc\_vars.inc.php:278
-#: ..\..\..\inc\items\model\_item.funcs.php:764
+#: ..\..\..\inc\items\model\_item.funcs.php:772
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:110
 msgid "Redirected"
 msgstr "Перенаправлено"
 
 #: ..\..\..\inc\_vars.inc.php:279
-#: ..\..\..\inc\items\model\_item.funcs.php:752
+#: ..\..\..\inc\items\items.ctrl.php:344
+#: ..\..\..\inc\items\items.ctrl.php:443
+#: ..\..\..\inc\items\model\_item.funcs.php:760
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:98
 msgid "Protected"
 msgstr "Защищено"
 
 #: ..\..\..\inc\_vars.inc.php:280
-#: ..\..\..\inc\items\model\_item.funcs.php:755
+#: ..\..\..\inc\items\items.ctrl.php:344
+#: ..\..\..\inc\items\items.ctrl.php:443
+#: ..\..\..\inc\items\model\_item.funcs.php:763
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:101
 msgid "Private"
 msgstr "Личное"
 
 #: ..\..\..\inc\_vars.inc.php:281
 #: ..\..\..\inc\collections\views\_coll_features.form.php:90
-#: ..\..\..\inc\items\model\_item.funcs.php:758
+#: ..\..\..\inc\items\model\_item.funcs.php:766
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:104
 msgid "Draft"
 msgstr "Черновик"
@@ -2417,7 +2421,7 @@ msgstr "Удаление записи #%d из черного списка..."
 
 #: ..\..\..\inc\antispam\antispam_settings.ctrl.php:61
 #: ..\..\..\inc\files\file_settings.ctrl.php:75
-#: ..\..\..\inc\plugins\plugins.ctrl.php:735
+#: ..\..\..\inc\plugins\plugins.ctrl.php:736
 #: ..\..\..\inc\settings\features.ctrl.php:98
 msgid "Restored default values."
 msgstr "Восстановлены значения по умолчанию."
@@ -2426,7 +2430,7 @@ msgstr "Восстановлены значения по умолчанию."
 #: ..\..\..\inc\antispam\antispam_settings.ctrl.php:118
 #: ..\..\..\inc\files\file_settings.ctrl.php:79
 #: ..\..\..\inc\files\file_settings.ctrl.php:155
-#: ..\..\..\inc\plugins\plugins.ctrl.php:739
+#: ..\..\..\inc\plugins\plugins.ctrl.php:740
 #: ..\..\..\inc\settings\features.ctrl.php:102
 #: ..\..\..\inc\settings\features.ctrl.php:193
 msgid "Settings have not changed."
@@ -2499,7 +2503,7 @@ msgstr "Новое время последнего обновления"
 
 #: ..\..\..\inc\antispam\model\_antispam.funcs.php:281
 #: ..\..\..\inc\cron\jobs\_post_notifications.job.php:64
-#: ..\..\..\inc\items\model\_item.class.php:3677
+#: ..\..\..\inc\items\model\_item.class.php:3679
 msgid "Done."
 msgstr "Готово."
 
@@ -2576,8 +2580,8 @@ msgstr "Удалить следующие %s комментариев:"
 #: ..\..\..\inc\comments\model\_comment.class.php:1263
 #: ..\..\..\inc\comments\views\_comment.form.php:70
 #: ..\..\..\inc\comments\views\_comment.form.php:89
-#: ..\..\..\inc\items\model\_item.class.php:3636
-#: ..\..\..\inc\items\model\_item.class.php:3644
+#: ..\..\..\inc\items\model\_item.class.php:3638
+#: ..\..\..\inc\items\model\_item.class.php:3646
 #: ..\..\..\inc\items\views\_item_list_table.view.php:100
 msgid "Author"
 msgstr "Автор"
@@ -2607,7 +2611,7 @@ msgstr "Действия"
 #: ..\..\..\inc\generic\views\_generic_ordered_list.inc.php:112
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:74
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:78
-#: ..\..\..\inc\items\model\_item.class.php:2380
+#: ..\..\..\inc\items\model\_item.class.php:2382
 #: ..\..\..\skins\photoblog\_item_block.inc.php:87
 msgid "Edit..."
 msgstr "Изменить"
@@ -2747,7 +2751,7 @@ msgstr "Перепроверить"
 #: ..\..\..\inc\items\views\_item_links.view.php:164
 #: ..\..\..\inc\items\views\inc\_item_links.inc.php:171
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:252
-#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:57
+#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:59
 #: ..\..\..\inc\sessions\views\_stats_goals.view.php:99
 #: ..\..\..\inc\skins\views\_skin_list.view.php:67
 #: ..\..\..\inc\users\views\_user_list.view.php:281
@@ -2873,7 +2877,7 @@ msgstr "Обновить"
 #: ..\..\..\inc\sessions\views\_goal.form.php:57
 #: ..\..\..\inc\sessions\views\_goal.form.php:62
 #: ..\..\..\inc\settings\views\_features.form.php:201
-#: ..\..\..\inc\settings\views\_general.form.php:126
+#: ..\..\..\inc\settings\views\_general.form.php:128
 #: ..\..\..\inc\skins\views\_coll_skin_settings.form.php:93
 #: ..\..\..\inc\skins\views\_skin.form.php:76
 #: ..\..\..\inc\users\views\_group.form.php:189
@@ -3000,7 +3004,7 @@ msgstr "Удалить элемент &laquo;%s&raquo; ?"
 #: ..\..\..\inc\files\views\_filetype.form.php:52
 #: ..\..\..\inc\generic\model\_genericelement.class.php:113
 #: ..\..\..\inc\generic\views\_generic_category.form.php:45
-#: ..\..\..\inc\items\items.ctrl.php:795
+#: ..\..\..\inc\items\items.ctrl.php:819
 #: ..\..\..\inc\sessions\views\_goal.form.php:35
 #: ..\..\..\inc\skins\views\_skin.form.php:39
 #: ..\..\..\inc\users\views\_group.form.php:52
@@ -3011,7 +3015,7 @@ msgstr "Отменить изменения!"
 
 #: ..\..\..\inc\chapters\views\_chapter.form.php:48
 #: ..\..\..\inc\generic\views\_generic_category.form.php:47
-#: ..\..\..\inc\items\model\_item.funcs.php:570
+#: ..\..\..\inc\items\model\_item.funcs.php:578
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:894
 msgid "Category"
 msgstr "Рубрика"
@@ -3044,7 +3048,7 @@ msgstr "Родительская рубрика"
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:160
 #: ..\..\..\inc\locales\_locale_settings.form.php:87
 #: ..\..\..\inc\locales\_locale_settings.form.php:276
-#: ..\..\..\inc\plugins\plugins.ctrl.php:973
+#: ..\..\..\inc\plugins\plugins.ctrl.php:974
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:72
 #: ..\..\..\inc\sessions\views\_goal.form.php:44
 #: ..\..\..\inc\sessions\views\_stats_goals.view.php:69
@@ -3078,7 +3082,7 @@ msgstr "Для ручной сортировки рубрик"
 
 #: ..\..\..\inc\chapters\views\_chapter.form.php:75
 #: ..\..\..\inc\chapters\views\_chapter_list.view.php:197
-#: ..\..\..\inc\items\views\_item_expert.form.php:342
+#: ..\..\..\inc\items\views\_item_expert.form.php:349
 #: ..\..\..\inc\items\views\_item_list_full.view.php:144
 msgid "Order"
 msgstr "Порядок"
@@ -3122,7 +3126,7 @@ msgstr "Создать новую рубрику..."
 #: ..\..\..\inc\generic\views\_generic_ordered_list.inc.php:63
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:159
 #: ..\..\..\inc\items\views\_item_list_track.view.php:159
-#: ..\..\..\inc\plugins\plugins.ctrl.php:981
+#: ..\..\..\inc\plugins\plugins.ctrl.php:982
 #: ..\..\..\inc\sessions\views\_stats_goals.view.php:62
 #: ..\..\..\inc\sessions\views\_stats_sessions_list.view.php:71
 #: ..\..\..\inc\users\views\_group.form.php:63
@@ -3481,33 +3485,33 @@ msgstr "Медиа папка блога &laquo;%s&raquo; не может быт
 msgid "The blog's media directory &laquo;%s&raquo; has been created with permissions %s."
 msgstr "Медиа папка блога &laquo;%s&raquo; создана с разрешениями %s."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1837
+#: ..\..\..\inc\collections\model\_blog.class.php:1839
 msgid "Deleted post-categories"
 msgstr "Удаленны рубрики записей"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1844
+#: ..\..\..\inc\collections\model\_blog.class.php:1846
 msgid "Deleted comments on blog's posts"
 msgstr "Удалены комментарии записей блога"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1852
+#: ..\..\..\inc\collections\model\_blog.class.php:1854
 msgid "Deleted blog's posts"
 msgstr "Удалены записи блога"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1861
+#: ..\..\..\inc\collections\model\_blog.class.php:1863
 msgid "Deleted blog's categories"
 msgstr "Удалены рубрики блога"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1874
+#: ..\..\..\inc\collections\model\_blog.class.php:1876
 #, php-format
 msgid "ERROR! Could not delete! You will have to delete the file [%s] by hand."
 msgstr "ОШИБКА! Невозможно удалить! Вы должны удалить файл [%s] вручную."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1878
+#: ..\..\..\inc\collections\model\_blog.class.php:1880
 #, php-format
 msgid "Could not delete static file [%s]"
 msgstr "Невозможно удалить статичный файл  [%s]"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1883
+#: ..\..\..\inc\collections\model\_blog.class.php:1885
 msgid "Deleted blog's static file"
 msgstr "Удален статичный файл блога"
 
@@ -3579,7 +3583,7 @@ msgid "List blog IDs separated by ,"
 msgstr "Перечислите ID блогов, разделяя их запятыми"
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:109
-#: ..\..\..\inc\settings\views\_general.form.php:115
+#: ..\..\..\inc\settings\views\_general.form.php:117
 msgid "Caching"
 msgstr "Кэширование"
 
@@ -3701,7 +3705,7 @@ msgid "This will be appended to each post in your RSS/Atom feeds."
 msgstr "Будет добавлено к каждой записи в ваших RSS/Atom лентах."
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:169
-#: ..\..\..\inc\items\items.ctrl.php:978
+#: ..\..\..\inc\items\items.ctrl.php:1002
 msgid "Notes"
 msgstr "Примечания"
 
@@ -3730,7 +3734,7 @@ msgstr "Количество ссылок в футере"
 #: ..\..\..\inc\comments\views\_comment.form.php:128
 #: ..\..\..\inc\locales\_locale_settings.form.php:504
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:179
-#: ..\..\..\inc\settings\views\_general.form.php:125
+#: ..\..\..\inc\settings\views\_general.form.php:127
 #: ..\..\..\inc\users\views\_group.form.php:188
 #: ..\..\..\inc\users\views\_user.form.php:475
 msgid "Save !"
@@ -4068,8 +4072,8 @@ msgid "Do you want to restrict on the number of days or the number of posts?"
 msgstr "Вы хотите ограничить по количеству дней или количеству записей?"
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:94
-msgid "How many days or posts fo you want to display on the home page?"
-msgstr "Как много дней или записей вы хотите показывать на домашней странице?"
+msgid "How many days or posts do you want to display on the home page?"
+msgstr "Число дней или записей для показа на домашней странице?"
 
 #: ..\..\..\inc\collections\views\_coll_general.form.php:94
 msgid "Posts/Days per page"
@@ -4129,7 +4133,7 @@ msgstr "Вид"
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:99
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:98
 #: ..\..\..\inc\files\views\_file_browse_set.form.php:85
-#: ..\..\..\inc\items\items.ctrl.php:762
+#: ..\..\..\inc\items\items.ctrl.php:786
 msgid "Simple"
 msgstr "Простой"
 
@@ -4312,8 +4316,8 @@ msgstr "Разрешение редактировать дополнительн
 
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:368
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:373
-#: ..\..\..\inc\files\files.ctrl.php:1522
-#: ..\..\..\inc\files\upload.ctrl.php:408
+#: ..\..\..\inc\files\files.ctrl.php:1524
+#: ..\..\..\inc\files\upload.ctrl.php:410
 #: ..\..\..\inc\files\views\_file_browse.view.php:81
 #: ..\..\..\inc\files\views\_filetype_list.view.php:106
 msgid "Upload"
@@ -5056,8 +5060,8 @@ msgstr "Редактировать этот комментарий"
 #: ..\..\..\inc\comments\model\_comment.class.php:635
 #: ..\..\..\inc\generic\views\_generic_list.inc.php:107
 #: ..\..\..\inc\generic\views\_generic_ordered_list.inc.php:114
-#: ..\..\..\inc\items\model\_item.class.php:2285
-#: ..\..\..\inc\items\model\_item.class.php:2289
+#: ..\..\..\inc\items\model\_item.class.php:2287
+#: ..\..\..\inc\items\model\_item.class.php:2291
 msgid "Delete!"
 msgstr "Удалить!"
 
@@ -5075,7 +5079,7 @@ msgstr ""
 "Это необратимо!"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:695
-#: ..\..\..\inc\items\model\_item.class.php:2487
+#: ..\..\..\inc\items\model\_item.class.php:2489
 msgid "Deprecate!"
 msgstr "Отклонить!"
 
@@ -5144,8 +5148,8 @@ msgstr "Запись"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:1252
 #: ..\..\..\inc\comments\model\_comment.class.php:1265
-#: ..\..\..\inc\items\model\_item.class.php:3636
-#: ..\..\..\inc\items\model\_item.class.php:3649
+#: ..\..\..\inc\items\model\_item.class.php:3638
+#: ..\..\..\inc\items\model\_item.class.php:3651
 msgid "Url"
 msgstr "Url"
 
@@ -5161,17 +5165,17 @@ msgid "Rating"
 msgstr "Оценка"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:1281
-#: ..\..\..\inc\items\model\_item.class.php:3660
+#: ..\..\..\inc\items\model\_item.class.php:3662
 msgid "Edit/Delete"
 msgstr "Изменить / Удалить"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:1282
-#: ..\..\..\inc\items\model\_item.class.php:3662
+#: ..\..\..\inc\items\model\_item.class.php:3664
 msgid "Edit your subscriptions/notifications"
 msgstr "Редактировать ваши подписки / извещения"
 
 #: ..\..\..\inc\comments\model\_comment.funcs.php:192
-#: ..\..\..\inc\items\model\_item.class.php:1993
+#: ..\..\..\inc\items\model\_item.class.php:1995
 #: ..\..\..\inc\items\views\_item_list_full.view.php:341
 #: ..\..\..\skins\_item_comment_form.inc.php:111
 #: ..\..\..\skins\basic\_item_feedback.inc.php:166
@@ -5180,15 +5184,15 @@ msgid "Leave a comment"
 msgstr "Оставить комментарий"
 
 #: ..\..\..\inc\comments\model\_comment.funcs.php:193
-#: ..\..\..\inc\items\model\_item.class.php:2000
-#: ..\..\..\inc\items\model\_item.class.php:2111
+#: ..\..\..\inc\items\model\_item.class.php:2002
+#: ..\..\..\inc\items\model\_item.class.php:2113
 #: ..\..\..\inc\items\views\_item_list_full.view.php:288
 msgid "1 comment"
 msgstr "1 комментарий"
 
 #: ..\..\..\inc\comments\model\_comment.funcs.php:194
-#: ..\..\..\inc\items\model\_item.class.php:2001
-#: ..\..\..\inc\items\model\_item.class.php:2112
+#: ..\..\..\inc\items\model\_item.class.php:2003
+#: ..\..\..\inc\items\model\_item.class.php:2114
 #: ..\..\..\inc\items\model\_itemlight.class.php:134
 #: ..\..\..\inc\items\views\_item_list_full.view.php:288
 #, php-format
@@ -5204,7 +5208,7 @@ msgid "Feedback (Comments, Trackbacks...)"
 msgstr "Отзывы (Комментарии, Трекбеки...)"
 
 #: ..\..\..\inc\comments\views\_comment.form.php:38
-#: ..\..\..\inc\items\items.ctrl.php:795
+#: ..\..\..\inc\items\items.ctrl.php:819
 msgid "cancel"
 msgstr "отмена"
 
@@ -5221,7 +5225,7 @@ msgid "Website URL"
 msgstr "URL сайта"
 
 #: ..\..\..\inc\comments\views\_comment.form.php:147
-#: ..\..\..\inc\items\views\_item_expert.form.php:201
+#: ..\..\..\inc\items\views\_item_expert.form.php:208
 msgid "Advanced properties"
 msgstr "Дополнительные свойства"
 
@@ -5295,12 +5299,12 @@ msgstr "IP адрес"
 
 #: ..\..\..\inc\comments\views\_comment.form.php:235
 #: ..\..\..\inc\comments\views\_comment_list.inc.php:65
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:112
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:114
 msgid "Spam Karma"
 msgstr "Спам карма"
 
 #: ..\..\..\inc\comments\views\_comment_list.inc.php:65
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:112
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:114
 msgid "No Spam Karma"
 msgstr "Нет Spam Karma"
 
@@ -5492,9 +5496,9 @@ msgid "Attention"
 msgstr "Внимание"
 
 #: ..\..\..\inc\cron\views\_cronjob_list.view.php:99
-#: ..\..\..\inc\items\model\_item.funcs.php:684
-#: ..\..\..\inc\sessions\goals.ctrl.php:162
-#: ..\..\..\inc\sessions\stats.ctrl.php:120
+#: ..\..\..\inc\items\model\_item.funcs.php:692
+#: ..\..\..\inc\sessions\goals.ctrl.php:164
+#: ..\..\..\inc\sessions\stats.ctrl.php:122
 #: ..\..\..\inc\sessions\views\_goal_hitsummary.view.php:85
 #: ..\..\..\inc\sessions\views\_stats_goalhits.view.php:123
 #: ..\..\..\inc\sessions\views\_stats_goals.view.php:56
@@ -5524,128 +5528,134 @@ msgstr "Удалить это задание!"
 msgid "Execute pending jobs in a popup window now!"
 msgstr "Запустить ожидающие задания во всплывающем окне сейчас?"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:38
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:40
 msgid "Global"
 msgstr "Список"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:76
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:78
 msgid "Comments awaiting moderation"
 msgstr "Комментарии ожидают одобрения модератором"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:89
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:91
 msgid "in response to"
 msgstr "в ответ на "
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:169
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:171
 msgid "Recent drafts"
 msgstr "Последние черновики"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:225
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:227
 #: ..\..\..\inc\items\views\_item_list_full.view.php:74
 #: ..\..\..\inc\items\views\_item_list_table.view.php:263
 msgid "New post"
 msgstr "Новая запись"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:225
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:227
 #: ..\..\..\inc\items\views\_item_list_full.view.php:74
 #: ..\..\..\inc\items\views\_item_list_table.view.php:264
 msgid "Write a new post..."
 msgstr "Написать новую запись..."
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:228
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:230
 msgid "Recently edited"
 msgstr "Недавно измененные"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:283
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:285
 msgid "Getting started"
 msgstr "Приступим"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:286
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:288
 msgid "Welcome to your new blog's dashboard!"
 msgstr "Добро пожаловать в панель управления вашего нового блога!"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:288
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:290
 msgid "Use the links on the right to write a first post or to customize your blog."
 msgstr "Используйте ссылки справа для написания первой записи или настройки вашего блога."
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:290
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:292
 msgid "You can see your blog page at any time by clicking \"See\" in the b2evolution toolbar at the top of this page."
 msgstr "Вы можете увидеть содержимое вашего блога в любое время нажав \"Просмотр\" на панели инструментов b2evolution, сверху этой страницы."
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:292
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:294
 msgid "You can come back here at any time by clicking \"Manage\" in that same evobar."
 msgstr "Вы можете вернуться сюда в любое время нажав \"Панель управления\" на той же панели."
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:311
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:313
 msgid "Manage your blog"
 msgstr "Управление вашим блогом"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:316
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:318
 msgid "Write a new post"
 msgstr "Написать новую запись"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:319
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:320
+#: ..\..\..\inc\files\files.ctrl.php:1521
+#: ..\..\..\inc\files\upload.ctrl.php:407
+msgid "Browse"
+msgstr "Обзор"
+
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:321
 msgid "Posts (full)"
 msgstr "Записи (полные)"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:320
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:322
 msgid "Posts (list)"
 msgstr "Записи (список)"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:326
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:328
 msgid "Edit categories"
 msgstr "Редактировать рубрики"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:331
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:333
 msgid "Generate static page!"
 msgstr "Генерировать статичную страницу!"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:334
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:336
 msgid "View this blog"
 msgstr "Просмотреть этот блог"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:342
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:344
 msgid "Customize your blog"
 msgstr "Настроить ваш блог"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:376
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:378
 msgid "Select a blog"
 msgstr "Выберите блог"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:401
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:403
 msgid "Updates from b2evolution.net"
 msgstr "Обновления из b2evolution.net"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:445
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:447
 msgid "Administrative tasks"
 msgstr "Административные задачи"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:452
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:454
 msgid "Create new user"
 msgstr "Создать нового пользователя"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:458
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:460
 msgid "Install a skin"
 msgstr "Установить тему"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:459
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:461
 msgid "Install a plugin"
 msgstr "Установить плагин"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:461
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:463
 msgid "Check system &amp; security"
 msgstr "Проверить систему и безопасность"
 
-#: ..\..\..\inc\dashboard\dashboard.ctrl.php:462
+#: ..\..\..\inc\dashboard\dashboard.ctrl.php:464
 msgid "View default page"
 msgstr "Страница по умолчанию"
 
-#: ..\..\..\inc\dashboard\model\_dashboard.funcs.php:64
+#: ..\..\..\inc\dashboard\model\_dashboard.funcs.php:69
 #, php-format
 msgid "Getting updates from %s."
 msgstr "Получение обновлений с %s."
 
-#: ..\..\..\inc\dashboard\model\_dashboard.funcs.php:147
+#: ..\..\..\inc\dashboard\model\_dashboard.funcs.php:152
 msgid "Invalid updates received"
 msgstr "Получены неверные обновления"
 
@@ -5693,14 +5703,14 @@ msgstr "Новый тип файлов создан."
 
 #: ..\..\..\inc\files\file_types.ctrl.php:114
 #: ..\..\..\inc\files\views\_filetype.form.php:101
-#: ..\..\..\inc\sessions\goals.ctrl.php:97
+#: ..\..\..\inc\sessions\goals.ctrl.php:99
 #: ..\..\..\inc\sessions\views\_goal.form.php:56
 msgid "Record, then Create Similar"
 msgstr "Записать, затем создать подобный"
 
 #: ..\..\..\inc\files\file_types.ctrl.php:118
 #: ..\..\..\inc\files\views\_filetype.form.php:100
-#: ..\..\..\inc\sessions\goals.ctrl.php:101
+#: ..\..\..\inc\sessions\goals.ctrl.php:103
 #: ..\..\..\inc\sessions\views\_goal.form.php:55
 msgid "Record, then Create New"
 msgstr "Записать, затем создать новый"
@@ -5724,291 +5734,286 @@ msgstr "Невозможно удалить тип файлов &laquo;%s&raquo;
 msgid "Delete file type &laquo;%s&raquo;?"
 msgstr "Удалить тип файлов &laquo;%s&raquo;?"
 
-#: ..\..\..\inc\files\files.ctrl.php:101
+#: ..\..\..\inc\files\files.ctrl.php:103
 msgid "Requested item does not exist any longer."
 msgstr "Запрашиваемая запись больше не существует."
 
-#: ..\..\..\inc\files\files.ctrl.php:113
+#: ..\..\..\inc\files\files.ctrl.php:115
 #: ..\..\..\inc\users\users.ctrl.php:93
 msgid "Requested user does not exist any longer."
 msgstr "Запрашиваемый пользователь больше не существует."
 
-#: ..\..\..\inc\files\files.ctrl.php:124
+#: ..\..\..\inc\files\files.ctrl.php:126
 msgid "No permission to edit this user."
 msgstr "У вас нет прав на редактирование этого пользователя."
 
-#: ..\..\..\inc\files\files.ctrl.php:172
-#: ..\..\..\inc\files\upload.ctrl.php:115
+#: ..\..\..\inc\files\files.ctrl.php:174
+#: ..\..\..\inc\files\upload.ctrl.php:117
 msgid "You don't have access to the requested root directory."
 msgstr "У вас нет доступа к запрошенной корневой папке."
 
-#: ..\..\..\inc\files\files.ctrl.php:238
-#: ..\..\..\inc\files\upload.ctrl.php:130
+#: ..\..\..\inc\files\files.ctrl.php:240
+#: ..\..\..\inc\files\upload.ctrl.php:132
 msgid "You don't have access to any root directory."
 msgstr "У вас нет доступа ни к одной корневой папке."
 
-#: ..\..\..\inc\files\files.ctrl.php:246
-#: ..\..\..\inc\files\upload.ctrl.php:138
+#: ..\..\..\inc\files\files.ctrl.php:248
+#: ..\..\..\inc\files\upload.ctrl.php:140
 #, php-format
 msgid "The root directory &laquo;%s&raquo; does not exist."
 msgstr "Корневая папка &laquo;%s&raquo; не существует."
 
-#: ..\..\..\inc\files\files.ctrl.php:262
+#: ..\..\..\inc\files\files.ctrl.php:264
 #: ..\..\..\inc\files\model\_fileroot.class.php:133
-#: ..\..\..\inc\files\upload.ctrl.php:150
+#: ..\..\..\inc\files\upload.ctrl.php:152
 #, php-format
 msgid "The directory &laquo;%s&raquo; does not exist."
 msgstr "Каталог &laquo;%s&raquo; не существует."
 
-#: ..\..\..\inc\files\files.ctrl.php:268
-#: ..\..\..\inc\files\upload.ctrl.php:156
+#: ..\..\..\inc\files\files.ctrl.php:270
+#: ..\..\..\inc\files\upload.ctrl.php:158
 msgid "You are not allowed to go outside your root directory!"
 msgstr "Вам не разрешено переходить вне вашей корневой папки!"
 
-#: ..\..\..\inc\files\files.ctrl.php:330
-#: ..\..\..\inc\items\items.ctrl.php:77
+#: ..\..\..\inc\files\files.ctrl.php:332
+#: ..\..\..\inc\items\items.ctrl.php:79
 msgid "Requested link does not exist any longer."
 msgstr "Запрашиваемая ссылка больше не существует."
 
-#: ..\..\..\inc\files\files.ctrl.php:370
+#: ..\..\..\inc\files\files.ctrl.php:372
 msgid "Directory creation is disabled."
 msgstr "Создание папок запрещено."
 
-#: ..\..\..\inc\files\files.ctrl.php:376
+#: ..\..\..\inc\files\files.ctrl.php:378
 msgid "Cannot create a directory without name."
 msgstr "Невозможно создать папку без имени."
 
-#: ..\..\..\inc\files\files.ctrl.php:397
-#: ..\..\..\inc\files\files.ctrl.php:441
-#: ..\..\..\inc\files\files.ctrl.php:1382
-#: ..\..\..\inc\files\upload.ctrl.php:330
+#: ..\..\..\inc\files\files.ctrl.php:399
+#: ..\..\..\inc\files\files.ctrl.php:443
+#: ..\..\..\inc\files\files.ctrl.php:1384
+#: ..\..\..\inc\files\upload.ctrl.php:332
 #, php-format
 msgid "The file &laquo;%s&raquo; already exists."
 msgstr "Файл &laquo;%s&raquo; уже существует."
 
-#: ..\..\..\inc\files\files.ctrl.php:403
+#: ..\..\..\inc\files\files.ctrl.php:405
 #, php-format
 msgid "Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;."
 msgstr "Невозможно создать папку &laquo;%s&raquo; в &laquo;%s&raquo;."
 
-#: ..\..\..\inc\files\files.ctrl.php:406
+#: ..\..\..\inc\files\files.ctrl.php:408
 #, php-format
 msgid "The directory &laquo;%s&raquo; has been created."
 msgstr "Папка &laquo;%s&raquo; была создана."
 
-#: ..\..\..\inc\files\files.ctrl.php:420
+#: ..\..\..\inc\files\files.ctrl.php:422
 msgid "File creation is disabled."
 msgstr "Создание файла запрещено."
 
-#: ..\..\..\inc\files\files.ctrl.php:426
+#: ..\..\..\inc\files\files.ctrl.php:428
 msgid "Cannot create a file without name."
 msgstr "Невозможно создать файл без имени."
 
-#: ..\..\..\inc\files\files.ctrl.php:447
+#: ..\..\..\inc\files\files.ctrl.php:449
 #, php-format
 msgid "Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;."
 msgstr "Невозможно создать файл &laquo;%s&raquo; в &laquo;%s&raquo;."
 
-#: ..\..\..\inc\files\files.ctrl.php:450
+#: ..\..\..\inc\files\files.ctrl.php:452
 #, php-format
 msgid "The file &laquo;%s&raquo; has been created."
 msgstr "Файл &laquo;%s&raquo; был создан."
 
-#: ..\..\..\inc\files\files.ctrl.php:476
+#: ..\..\..\inc\files\files.ctrl.php:478
 msgid "Your user settings have been updated."
 msgstr "Ваши пользовательские настройки были обновлены."
 
-#: ..\..\..\inc\files\files.ctrl.php:501
-#: ..\..\..\inc\files\files.ctrl.php:972
+#: ..\..\..\inc\files\files.ctrl.php:503
+#: ..\..\..\inc\files\files.ctrl.php:974
 #, php-format
 msgid "You are not allowed to edit &laquo;%s&raquo;."
 msgstr "Вам не разрешено редактировать &laquo;%s&raquo;."
 
-#: ..\..\..\inc\files\files.ctrl.php:513
+#: ..\..\..\inc\files\files.ctrl.php:515
 #, php-format
 msgid "The file &laquo;%s&raquo; has been updated."
 msgstr "Файл &laquo;%s&raquo; был обновлен."
 
-#: ..\..\..\inc\files\files.ctrl.php:517
+#: ..\..\..\inc\files\files.ctrl.php:519
 #, php-format
 msgid "The file &laquo;%s&raquo; could not be updated."
 msgstr "Файл &laquo;%s&raquo; не может быть обновлен!"
 
-#: ..\..\..\inc\files\files.ctrl.php:583
-#: ..\..\..\inc\files\files.ctrl.php:654
-#: ..\..\..\inc\files\files.ctrl.php:746
-#: ..\..\..\inc\files\files.ctrl.php:810
-#: ..\..\..\inc\files\files.ctrl.php:1045
-#: ..\..\..\inc\files\files.ctrl.php:1085
-#: ..\..\..\inc\files\files.ctrl.php:1166
+#: ..\..\..\inc\files\files.ctrl.php:585
+#: ..\..\..\inc\files\files.ctrl.php:656
+#: ..\..\..\inc\files\files.ctrl.php:748
+#: ..\..\..\inc\files\files.ctrl.php:812
+#: ..\..\..\inc\files\files.ctrl.php:1047
+#: ..\..\..\inc\files\files.ctrl.php:1087
+#: ..\..\..\inc\files\files.ctrl.php:1168
 #: ..\..\..\inc\files\views\_file_list.inc.php:583
 msgid "Nothing selected."
 msgstr "Ничего не выбрано."
 
-#: ..\..\..\inc\files\files.ctrl.php:595
+#: ..\..\..\inc\files\files.ctrl.php:597
 msgid "Please provide the name of the archive."
 msgstr "Пожалуйста, введите имя архива."
 
-#: ..\..\..\inc\files\files.ctrl.php:645
-#: ..\..\..\inc\files\files.ctrl.php:739
-#: ..\..\..\inc\files\files.ctrl.php:1159
-#: ..\..\..\inc\files\files.ctrl.php:1280
+#: ..\..\..\inc\files\files.ctrl.php:647
+#: ..\..\..\inc\files\files.ctrl.php:741
+#: ..\..\..\inc\files\files.ctrl.php:1161
+#: ..\..\..\inc\files\files.ctrl.php:1282
 msgid "You have no permission to edit/modify files."
 msgstr "У вас нет прав на редактирование / изменение файлов."
 
-#: ..\..\..\inc\files\files.ctrl.php:702
+#: ..\..\..\inc\files\files.ctrl.php:704
 #, php-format
 msgid "&laquo;%s&raquo; has not been renamed"
 msgstr "&laquo;%s&raquo; не был переименован"
 
-#: ..\..\..\inc\files\files.ctrl.php:708
+#: ..\..\..\inc\files\files.ctrl.php:710
 #, php-format
 msgid "&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; не может быть переименован в &laquo;%s&raquo;"
 
-#: ..\..\..\inc\files\files.ctrl.php:722
+#: ..\..\..\inc\files\files.ctrl.php:724
 #, php-format
 msgid "&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;"
 msgstr "&laquo;%s&raquo; был успешно переименован в &laquo;%s&raquo;"
 
-#: ..\..\..\inc\files\files.ctrl.php:761
+#: ..\..\..\inc\files\files.ctrl.php:763
 #, php-format
 msgid "The directory &laquo;%s&raquo; has been deleted."
 msgstr "Папка &laquo;%s&raquo; была удалена."
 
-#: ..\..\..\inc\files\files.ctrl.php:762
+#: ..\..\..\inc\files\files.ctrl.php:764
 #, php-format
 msgid "The file &laquo;%s&raquo; has been deleted."
 msgstr "Файл &laquo;%s&raquo; был удален."
 
-#: ..\..\..\inc\files\files.ctrl.php:767
-#: ..\..\..\inc\files\files.ctrl.php:1452
+#: ..\..\..\inc\files\files.ctrl.php:769
+#: ..\..\..\inc\files\files.ctrl.php:1454
 #, php-format
 msgid "Could not delete the directory &laquo;%s&raquo; (not empty?)."
 msgstr "Невозможно удалить папку &laquo;%s&raquo; (не пустая?)."
 
-#: ..\..\..\inc\files\files.ctrl.php:768
-#: ..\..\..\inc\files\files.ctrl.php:1452
+#: ..\..\..\inc\files\files.ctrl.php:770
+#: ..\..\..\inc\files\files.ctrl.php:1454
 #, php-format
 msgid "Could not delete the file &laquo;%s&raquo;."
 msgstr "Невозможно удалить файл &laquo;%s&raquo;."
 
-#: ..\..\..\inc\files\files.ctrl.php:786
+#: ..\..\..\inc\files\files.ctrl.php:788
 msgid "cannot be deleted because of the following relations"
 msgstr "невозможно удалить из-за следующих связей"
 
-#: ..\..\..\inc\files\files.ctrl.php:828
+#: ..\..\..\inc\files\files.ctrl.php:830
 msgid "No destination blog is selected."
 msgstr "Блог назначения не выбран."
 
-#: ..\..\..\inc\files\files.ctrl.php:837
+#: ..\..\..\inc\files\files.ctrl.php:839
 msgid "Sorry, you have no permission to post into this blog."
 msgstr "Извините, у вас нет разрешений на запись в этом блоге."
 
-#: ..\..\..\inc\files\files.ctrl.php:874
-#: ..\..\..\inc\files\files.ctrl.php:905
+#: ..\..\..\inc\files\files.ctrl.php:876
+#: ..\..\..\inc\files\files.ctrl.php:907
 #, php-format
 msgid "Cannot post &laquo;%s&raquo; because it is not an image."
 msgstr "Невозможно опубликовать &laquo;%s&raquo; потому что это не изображение."
 
-#: ..\..\..\inc\files\files.ctrl.php:890
+#: ..\..\..\inc\files\files.ctrl.php:892
 #, php-format
 msgid "&laquo;%s&raquo; has been attached."
 msgstr "&laquo;%s&raquo; был прикреплен."
 
-#: ..\..\..\inc\files\files.ctrl.php:940
+#: ..\..\..\inc\files\files.ctrl.php:942
 #, php-format
 msgid "&laquo;%s&raquo; has been posted."
 msgstr "&laquo;%s&raquo; был опубликован."
 
-#: ..\..\..\inc\files\files.ctrl.php:1022
+#: ..\..\..\inc\files\files.ctrl.php:1024
 #, php-format
 msgid "File properties for &laquo;%s&raquo; have been updated."
 msgstr "Свойства файла &laquo;%s&raquo; были изменены."
 
-#: ..\..\..\inc\files\files.ctrl.php:1026
+#: ..\..\..\inc\files\files.ctrl.php:1028
 #, php-format
 msgid "File properties for &laquo;%s&raquo; have not changed."
 msgstr "Свойства файла &laquo;%s&raquo; не были изменены."
 
-#: ..\..\..\inc\files\files.ctrl.php:1058
+#: ..\..\..\inc\files\files.ctrl.php:1060
 msgid "User avatar modified."
 msgstr "Аватар пользователя был изменен."
 
-#: ..\..\..\inc\files\files.ctrl.php:1103
+#: ..\..\..\inc\files\files.ctrl.php:1105
 msgid "Selected file has been linked to item."
 msgstr "Выбранный файл связан с записью."
 
-#: ..\..\..\inc\files\files.ctrl.php:1141
+#: ..\..\..\inc\files\files.ctrl.php:1143
 #, php-format
 msgid "Link from &laquo;%s&raquo; deleted."
 msgstr "Ссылка из &laquo;%s&raquo; удалена."
 
-#: ..\..\..\inc\files\files.ctrl.php:1178
+#: ..\..\..\inc\files\files.ctrl.php:1180
 msgid "You have to give a default permission!"
 msgstr "Вы должны дать разрешения по умолчанию!"
 
-#: ..\..\..\inc\files\files.ctrl.php:1185
+#: ..\..\..\inc\files\files.ctrl.php:1187
 msgid "Read-only"
 msgstr "Только чтение"
 
-#: ..\..\..\inc\files\files.ctrl.php:1186
+#: ..\..\..\inc\files\files.ctrl.php:1188
 msgid "Read and write"
 msgstr "Чтение и запись"
 
-#: ..\..\..\inc\files\files.ctrl.php:1200
-#: ..\..\..\inc\files\files.ctrl.php:1222
+#: ..\..\..\inc\files\files.ctrl.php:1202
+#: ..\..\..\inc\files\files.ctrl.php:1224
 #, php-format
 msgid "Permissions for &laquo;%s&raquo; have not been changed."
 msgstr "Разрешения для &laquo;%s&raquo; не были изменены."
 
-#: ..\..\..\inc\files\files.ctrl.php:1213
+#: ..\..\..\inc\files\files.ctrl.php:1215
 #, php-format
 msgid "Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;."
 msgstr "Ошибка установки разрешений &laquo;%s&raquo; для &laquo;%s&raquo;."
 
-#: ..\..\..\inc\files\files.ctrl.php:1226
+#: ..\..\..\inc\files\files.ctrl.php:1228
 #, php-format
 msgid "Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;."
 msgstr "Разрешения для &laquo;%s&raquo; изменены на &laquo;%s&raquo;."
 
-#: ..\..\..\inc\files\files.ctrl.php:1325
+#: ..\..\..\inc\files\files.ctrl.php:1327
 msgid "No source files!"
 msgstr "Нет исходного файла!"
 
-#: ..\..\..\inc\files\files.ctrl.php:1375
+#: ..\..\..\inc\files\files.ctrl.php:1377
 msgid "Source and target files are the same. Please choose another name or directory."
 msgstr "Исходный и целевой файл идентичны. Пожалуйста, выберите другое имя или папку."
 
-#: ..\..\..\inc\files\files.ctrl.php:1401
+#: ..\..\..\inc\files\files.ctrl.php:1403
 #, php-format
 msgid "Cannot overwrite the file &laquo;%s&raquo; because of the following relations"
 msgstr "Невозможно переписать файл &laquo;%s&raquo; из-за следующих связей"
 
-#: ..\..\..\inc\files\files.ctrl.php:1426
+#: ..\..\..\inc\files\files.ctrl.php:1428
 #, php-format
 msgid "Copied &laquo;%s&raquo; to &laquo;%s&raquo;."
 msgstr "Скопирован &laquo;%s&raquo; в &laquo;%s&raquo;."
 
-#: ..\..\..\inc\files\files.ctrl.php:1436
+#: ..\..\..\inc\files\files.ctrl.php:1438
 #, php-format
 msgid "Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;."
 msgstr "Невозможно скопировать &laquo;%s&raquo; в &laquo;%s&raquo;."
 
-#: ..\..\..\inc\files\files.ctrl.php:1465
+#: ..\..\..\inc\files\files.ctrl.php:1467
 #, php-format
 msgid "Moved &laquo;%s&raquo; to &laquo;%s&raquo;."
 msgstr "Перемещен &laquo;%s&raquo; в &laquo;%s&raquo;."
 
-#: ..\..\..\inc\files\files.ctrl.php:1480
+#: ..\..\..\inc\files\files.ctrl.php:1482
 #, php-format
 msgid "Could not move &laquo;%s&raquo; to &laquo;%s&raquo;."
 msgstr "Невозможно переместить &laquo;%s&raquo; в &laquo;%s&raquo;."
-
-#: ..\..\..\inc\files\files.ctrl.php:1519
-#: ..\..\..\inc\files\upload.ctrl.php:405
-msgid "Browse"
-msgstr "Обзор"
 
 #: ..\..\..\inc\files\model\_file.class.php:224
 #, php-format
@@ -6201,67 +6206,67 @@ msgstr "Пожалуйста, введите mime тип."
 msgid "Please enter a file name."
 msgstr "Пожалуйста, введите имя файла."
 
-#: ..\..\..\inc\files\upload.ctrl.php:201
+#: ..\..\..\inc\files\upload.ctrl.php:203
 msgid "Upload is disabled."
 msgstr "Загрузка отключена."
 
-#: ..\..\..\inc\files\upload.ctrl.php:206
+#: ..\..\..\inc\files\upload.ctrl.php:208
 msgid "You have no permission to add/upload files."
 msgstr "У вас нет прав на добавление / загрузку файлов."
 
-#: ..\..\..\inc\files\upload.ctrl.php:249
+#: ..\..\..\inc\files\upload.ctrl.php:251
 msgid "Please select a local file to upload."
 msgstr "Пожалуйста, выберите локальный файл для загрузки."
 
 #. TRANS: %s will be replaced by the difference
-#: ..\..\..\inc\files\upload.ctrl.php:259
+#: ..\..\..\inc\files\upload.ctrl.php:261
 #, php-format
 msgid "The file is too large: %s but the maximum allowed is %s."
 msgstr "Файл слишком большой: %s, а разрешено максимум %s."
 
-#: ..\..\..\inc\files\upload.ctrl.php:277
+#: ..\..\..\inc\files\upload.ctrl.php:279
 msgid "The file exceeds the upload_max_filesize directive in php.ini."
 msgstr "Файл превышает директиву upload_max_filesize  в php.ini."
 
-#: ..\..\..\inc\files\upload.ctrl.php:282
+#: ..\..\..\inc\files\upload.ctrl.php:284
 msgid "The file was only partially uploaded."
 msgstr "Файл был загружен лишь частично."
 
-#: ..\..\..\inc\files\upload.ctrl.php:288
+#: ..\..\..\inc\files\upload.ctrl.php:290
 msgid "No file was uploaded."
 msgstr "Файлы не были загружены."
 
-#: ..\..\..\inc\files\upload.ctrl.php:295
+#: ..\..\..\inc\files\upload.ctrl.php:297
 msgid "Missing a temporary folder (upload_tmp_dir in php.ini)."
 msgstr "Отсутствует временная папка (upload_tmp_dir в php.ini)."
 
-#: ..\..\..\inc\files\upload.ctrl.php:300
+#: ..\..\..\inc\files\upload.ctrl.php:302
 msgid "Unknown error."
 msgstr "Неизвестная ошибка."
 
-#: ..\..\..\inc\files\upload.ctrl.php:308
+#: ..\..\..\inc\files\upload.ctrl.php:310
 msgid "The file does not seem to be a valid upload! It may exceed the upload_max_filesize directive in php.ini."
 msgstr "Файл по видимому загрузился не целиком! Возможно он превысил директиву upload_max_filesize в php.ini."
 
-#: ..\..\..\inc\files\upload.ctrl.php:338
+#: ..\..\..\inc\files\upload.ctrl.php:340
 msgid "An unknown error occurred when moving the uploaded file on the server."
 msgstr "Неизвестная ошибка произошла при перемещении загруженного файла на сервере."
 
-#: ..\..\..\inc\files\upload.ctrl.php:346
+#: ..\..\..\inc\files\upload.ctrl.php:348
 #, php-format
 msgid "Could not change permissions of &laquo;%s&raquo; to default chmod setting."
 msgstr "Невозможно изменить разрешения &laquo;%s&raquo; на значение chmod по умолчанию."
 
-#: ..\..\..\inc\files\upload.ctrl.php:366
+#: ..\..\..\inc\files\upload.ctrl.php:368
 #, php-format
 msgid "The file &laquo;%s&raquo; has been successfully uploaded."
 msgstr "Файл &laquo;%s&raquo; был успешно загружен."
 
-#: ..\..\..\inc\files\upload.ctrl.php:373
+#: ..\..\..\inc\files\upload.ctrl.php:375
 msgid "Here's the code to display it:"
 msgstr "Вот код для его отображения:"
 
-#: ..\..\..\inc\files\upload.ctrl.php:374
+#: ..\..\..\inc\files\upload.ctrl.php:376
 msgid "Add the code to your post !"
 msgstr "Добавить код в вашу запись !"
 
@@ -6629,7 +6634,7 @@ msgid "View this post..."
 msgstr "Просмотреть эту запись..."
 
 #: ..\..\..\inc\files\views\_file_links.view.php:62
-#: ..\..\..\inc\items\model\_item.class.php:2382
+#: ..\..\..\inc\items\model\_item.class.php:2384
 msgid "Edit this post..."
 msgstr "Редактировать эту запись..."
 
@@ -7169,92 +7174,102 @@ msgstr "Типы пунктов / записей / страниц"
 msgid "Cannot delete item type"
 msgstr "Невозможно удалить тип записи"
 
-#: ..\..\..\inc\items\items.ctrl.php:153
+#: ..\..\..\inc\items\items.ctrl.php:155
 msgid "Sorry, you have no permission to post yet."
 msgstr "Извините, у вас нет прав на запись."
 
-#: ..\..\..\inc\items\items.ctrl.php:226
+#: ..\..\..\inc\items\items.ctrl.php:228
 msgid "New post:"
 msgstr "Новая запись:"
 
-#: ..\..\..\inc\items\items.ctrl.php:232
+#: ..\..\..\inc\items\items.ctrl.php:234
 msgid "New page:"
 msgstr "Новая страница:"
 
-#: ..\..\..\inc\items\items.ctrl.php:236
+#: ..\..\..\inc\items\items.ctrl.php:238
 msgid "New intro:"
 msgstr "Новое интро:"
 
-#: ..\..\..\inc\items\items.ctrl.php:240
+#: ..\..\..\inc\items\items.ctrl.php:242
 msgid "New podcast episode:"
 msgstr "Новый эпизод подкаст:"
 
-#: ..\..\..\inc\items\items.ctrl.php:244
+#: ..\..\..\inc\items\items.ctrl.php:246
 msgid "New link:"
 msgstr "Новая ссылка:"
 
-#: ..\..\..\inc\items\items.ctrl.php:286
-#: ..\..\..\inc\items\items.ctrl.php:312
+#: ..\..\..\inc\items\items.ctrl.php:288
+#: ..\..\..\inc\items\items.ctrl.php:314
 msgid "Editing post"
 msgstr "Редактирование записи"
 
-#: ..\..\..\inc\items\items.ctrl.php:288
-#: ..\..\..\inc\items\items.ctrl.php:314
+#: ..\..\..\inc\items\items.ctrl.php:290
+#: ..\..\..\inc\items\items.ctrl.php:316
 #, php-format
 msgid "Editing post #%d: %s"
 msgstr "Редактирование записи #%d: %s"
 
-#: ..\..\..\inc\items\items.ctrl.php:373
-#: ..\..\..\inc\items\items.ctrl.php:461
+#: ..\..\..\inc\items\items.ctrl.php:343
+#, php-format
+msgid "The post has been created but not published because it seems like you wanted to set its status to \"%s\" instead.  If you really want to make it public, manually change its status to \"Published\" and click the \"Save\" button."
+msgstr ""
+
+#: ..\..\..\inc\items\items.ctrl.php:386
+#: ..\..\..\inc\items\items.ctrl.php:485
 msgid "Post not publicly published: skipping trackback..."
 msgstr "Запись опубликована не для всех: пропуск трекбека..."
 
-#: ..\..\..\inc\items\items.ctrl.php:385
+#: ..\..\..\inc\items\items.ctrl.php:398
 msgid "Post has been created."
 msgstr "Запись создана."
 
-#: ..\..\..\inc\items\items.ctrl.php:473
+#: ..\..\..\inc\items\items.ctrl.php:442
+#, php-format
+msgid "The post has been updated but not published because it seems like you wanted to set its status to \"%s\" instead. If you really want to make it public, manually change its status to \"Published\" and click the \"Save\" button."
+msgstr ""
+
+#: ..\..\..\inc\items\items.ctrl.php:497
 msgid "Post has been updated."
 msgstr "Запись обновлена."
 
-#: ..\..\..\inc\items\items.ctrl.php:520
+#: ..\..\..\inc\items\items.ctrl.php:544
 msgid "Post has been published."
 msgstr "Запись опубликована."
 
-#: ..\..\..\inc\items\items.ctrl.php:548
+#: ..\..\..\inc\items\items.ctrl.php:572
 msgid "Post has been deprecated."
 msgstr "Запись отклонена."
 
-#: ..\..\..\inc\items\items.ctrl.php:574
+#: ..\..\..\inc\items\items.ctrl.php:598
 msgid "Post has been deleted."
 msgstr "Запись удалена."
 
-#: ..\..\..\inc\items\items.ctrl.php:610
+#: ..\..\..\inc\items\items.ctrl.php:634
 #, php-format
 msgid "Link has been deleted from &laquo;%s&raquo;."
 msgstr "Ссылка была удалена из &laquo;%s&raquo;."
 
-#: ..\..\..\inc\items\items.ctrl.php:743
+#: ..\..\..\inc\items\items.ctrl.php:767
 #, php-format
 msgid "Since this blog has no categories, you cannot post into it. You must <a %s>create categories</a> first."
 msgstr "Т.к. этот блог не имеет рубрик, вы не можете писать в него. Сначала вы  должны <a %s>создать рубрики</a>."
 
-#: ..\..\..\inc\items\items.ctrl.php:768
+#: ..\..\..\inc\items\items.ctrl.php:792
 msgid "Expert"
 msgstr "Расширенный"
 
-#: ..\..\..\inc\items\items.ctrl.php:787
-#: ..\..\..\inc\items\model\_item.class.php:2293
+#: ..\..\..\inc\items\items.ctrl.php:811
+#: ..\..\..\inc\items\model\_item.class.php:2295
 msgid "Delete this post"
 msgstr "Удалить эту запись"
 
-#: ..\..\..\inc\items\items.ctrl.php:788
+#: ..\..\..\inc\items\items.ctrl.php:812
 msgid "delete"
 msgstr "удалить"
 
-#: ..\..\..\inc\items\items.ctrl.php:789
-#: ..\..\..\inc\items\model\_item.class.php:2306
-#: ..\..\..\inc\items\model\_item.class.php:2314
+#: ..\..\..\inc\items\items.ctrl.php:813
+#: ..\..\..\inc\items\model\_item.class.php:2308
+#: ..\..\..\inc\items\model\_item.class.php:2316
 msgid ""
 "You are about to delete this post!\\n"
 "This cannot be undone!"
@@ -7262,101 +7277,101 @@ msgstr ""
 "Вы собираетесь удалить эту запись! \\n"
 "Это необратимо!"
 
-#: ..\..\..\inc\items\items.ctrl.php:801
+#: ..\..\..\inc\items\items.ctrl.php:825
 msgid "View post & comments"
 msgstr "Просмотр записей и комментариев"
 
-#: ..\..\..\inc\items\items.ctrl.php:807
+#: ..\..\..\inc\items\items.ctrl.php:831
 msgid "Browse blog"
 msgstr "Обзор блога"
 
 #. TRANS: Priority name
-#: ..\..\..\inc\items\model\_item.class.php:230
+#: ..\..\..\inc\items\model\_item.class.php:235
 msgid "1 - Highest"
 msgstr "1 - Наивысший"
 
 #. TRANS: Priority name
-#: ..\..\..\inc\items\model\_item.class.php:231
+#: ..\..\..\inc\items\model\_item.class.php:236
 msgid "2 - High"
 msgstr "2 - Высокий"
 
 #. TRANS: Priority name
-#: ..\..\..\inc\items\model\_item.class.php:232
+#: ..\..\..\inc\items\model\_item.class.php:237
 msgid "3 - Medium"
 msgstr "3 - Средний"
 
 #. TRANS: Priority name
-#: ..\..\..\inc\items\model\_item.class.php:233
+#: ..\..\..\inc\items\model\_item.class.php:238
 msgid "4 - Low"
 msgstr "4 - Низкий"
 
 #. TRANS: Priority name
-#: ..\..\..\inc\items\model\_item.class.php:234
+#: ..\..\..\inc\items\model\_item.class.php:239
 msgid "5 - Lowest"
 msgstr "5 - Низший"
 
-#: ..\..\..\inc\items\model\_item.class.php:418
+#: ..\..\..\inc\items\model\_item.class.php:424
 msgid "This post type is reserved and cannot be used. Please choose another one."
 msgstr "Этот тип записей зарезервирован системой и не может быть использован. Пожалуйста, выберите другой."
 
-#: ..\..\..\inc\items\model\_item.class.php:430
+#: ..\..\..\inc\items\model\_item.class.php:436
 msgid "If you want to redirect this post, you must specify an URL! (Expert mode)"
 msgstr "Если вы хотите перенаправить эту запись, вы должны определить URL! (расширенный режим)"
 
-#: ..\..\..\inc\items\model\_item.class.php:441
+#: ..\..\..\inc\items\model\_item.class.php:447
 #: ..\..\..\inc\items\model\_itemlist.class.php:127
 msgid "Please enter a valid issue date."
 msgstr "Пожалуйста, введите корректную дату создания."
 
-#: ..\..\..\inc\items\model\_item.class.php:516
+#: ..\..\..\inc\items\model\_item.class.php:522
 msgid "Please enter a valid deadline."
 msgstr "Пожалуйста, введите корректный срок."
 
-#: ..\..\..\inc\items\model\_item.class.php:559
+#: ..\..\..\inc\items\model\_item.class.php:565
 msgid "Please provide a title."
 msgstr "Пожалуйста, введите заголовок."
 
-#: ..\..\..\inc\items\model\_item.class.php:563
+#: ..\..\..\inc\items\model\_item.class.php:569
 msgid "Invalid title."
 msgstr "Недопустимый заголовок."
 
-#: ..\..\..\inc\items\model\_item.class.php:566
+#: ..\..\..\inc\items\model\_item.class.php:572
 msgid "Invalid content."
 msgstr "Недопустимое содержимое."
 
-#: ..\..\..\inc\items\model\_item.class.php:717
+#: ..\..\..\inc\items\model\_item.class.php:723
 msgid "Comments are closed for this post."
 msgstr "Комментарии закрыты для этой записи."
 
-#: ..\..\..\inc\items\model\_item.class.php:733
+#: ..\..\..\inc\items\model\_item.class.php:739
 msgid "This post is not published. You cannot leave comments."
 msgstr "Эта запись не опубликована. Вы не можете оставлять комментарии."
 
-#: ..\..\..\inc\items\model\_item.class.php:958
+#: ..\..\..\inc\items\model\_item.class.php:964
 #: ..\..\..\skins\_item_content.inc.php:46
 msgid "more"
 msgstr "больше"
 
 #. TRANS: this is the default text for the extended post "more" link
-#: ..\..\..\inc\items\model\_item.class.php:1370
+#: ..\..\..\inc\items\model\_item.class.php:1376
 #: ..\..\..\skins\evocamp\_item_block.inc.php:24
 msgid "Read more"
 msgstr "Читать далее"
 
 #. TRANS: this is the default text displayed once the more link has been activated
-#: ..\..\..\inc\items\model\_item.class.php:1383
+#: ..\..\..\inc\items\model\_item.class.php:1389
 msgid "Follow up:"
 msgstr "Продолжение:"
 
-#: ..\..\..\inc\items\model\_item.class.php:1598
+#: ..\..\..\inc\items\model\_item.class.php:1600
 msgid "Send email to post author"
 msgstr "Послать email автору записи"
 
-#: ..\..\..\inc\items\model\_item.class.php:1632
+#: ..\..\..\inc\items\model\_item.class.php:1634
 msgid "Send email to assigned user"
 msgstr "Послать email назначенному пользователю"
 
-#: ..\..\..\inc\items\model\_item.class.php:1660
+#: ..\..\..\inc\items\model\_item.class.php:1662
 #: ..\..\..\inc\items\views\_item_list_full.view.php:241
 #: ..\..\..\skins\_item_content.inc.php:188
 #: ..\..\..\skins\basic\_item_content.inc.php:48
@@ -7365,175 +7380,175 @@ msgstr "Послать email назначенному пользователю"
 msgid "Pages:"
 msgstr "Страницы:"
 
-#: ..\..\..\inc\items\model\_item.class.php:1836
+#: ..\..\..\inc\items\model\_item.class.php:1838
 msgid "Download file"
 msgstr "Скачать файл"
 
-#: ..\..\..\inc\items\model\_item.class.php:1907
+#: ..\..\..\inc\items\model\_item.class.php:1909
 msgid "Comment feed for this post"
 msgstr "RSS лента комментариев этой записи"
 
-#: ..\..\..\inc\items\model\_item.class.php:1981
+#: ..\..\..\inc\items\model\_item.class.php:1983
 msgid "Display feedback / Leave a comment"
 msgstr "Показать отзывы / Оставить комментарий"
 
-#: ..\..\..\inc\items\model\_item.class.php:1982
+#: ..\..\..\inc\items\model\_item.class.php:1984
 msgid "Send feedback"
 msgstr "Оставить отзыв"
 
-#: ..\..\..\inc\items\model\_item.class.php:1983
-#: ..\..\..\inc\items\model\_item.class.php:2105
+#: ..\..\..\inc\items\model\_item.class.php:1985
+#: ..\..\..\inc\items\model\_item.class.php:2107
 msgid "1 feedback"
 msgstr "1 отзыв"
 
-#: ..\..\..\inc\items\model\_item.class.php:1984
-#: ..\..\..\inc\items\model\_item.class.php:2106
+#: ..\..\..\inc\items\model\_item.class.php:1986
+#: ..\..\..\inc\items\model\_item.class.php:2108
 #: ..\..\..\inc\items\views\_item_list_table.view.php:123
 #: ..\..\..\inc\items\views\_item_list_track.view.php:88
 #, php-format
 msgid "%d feedbacks"
 msgstr "%d отзывов"
 
-#: ..\..\..\inc\items\model\_item.class.php:1988
+#: ..\..\..\inc\items\model\_item.class.php:1990
 msgid "Display comments / Leave a comment"
 msgstr "Показать / Оставить комментарий"
 
-#: ..\..\..\inc\items\model\_item.class.php:2010
+#: ..\..\..\inc\items\model\_item.class.php:2012
 msgid "Display trackbacks / Get trackback address for this post"
 msgstr "Показать трекбеки / получить адрес трекбека этой записи"
 
-#: ..\..\..\inc\items\model\_item.class.php:2011
+#: ..\..\..\inc\items\model\_item.class.php:2013
 msgid "Send a trackback"
 msgstr "Отправить трекбек"
 
-#: ..\..\..\inc\items\model\_item.class.php:2012
-#: ..\..\..\inc\items\model\_item.class.php:2117
+#: ..\..\..\inc\items\model\_item.class.php:2014
+#: ..\..\..\inc\items\model\_item.class.php:2119
 msgid "1 trackback"
 msgstr "1 Трекбек"
 
-#: ..\..\..\inc\items\model\_item.class.php:2013
-#: ..\..\..\inc\items\model\_item.class.php:2118
+#: ..\..\..\inc\items\model\_item.class.php:2015
+#: ..\..\..\inc\items\model\_item.class.php:2120
 #, php-format
 msgid "%d trackbacks"
 msgstr "%d Трекбеков"
 
-#: ..\..\..\inc\items\model\_item.class.php:2024
+#: ..\..\..\inc\items\model\_item.class.php:2026
 msgid "Display pingbacks"
 msgstr "Показать пинги"
 
-#: ..\..\..\inc\items\model\_item.class.php:2025
+#: ..\..\..\inc\items\model\_item.class.php:2027
 msgid "No pingback yet"
 msgstr "Еще нет пингов"
 
-#: ..\..\..\inc\items\model\_item.class.php:2026
-#: ..\..\..\inc\items\model\_item.class.php:2124
+#: ..\..\..\inc\items\model\_item.class.php:2028
+#: ..\..\..\inc\items\model\_item.class.php:2126
 msgid "1 pingback"
 msgstr "1 Пинг"
 
-#: ..\..\..\inc\items\model\_item.class.php:2027
-#: ..\..\..\inc\items\model\_item.class.php:2125
+#: ..\..\..\inc\items\model\_item.class.php:2029
+#: ..\..\..\inc\items\model\_item.class.php:2127
 #, php-format
 msgid "%d pingbacks"
 msgstr "%d Пингов"
 
-#: ..\..\..\inc\items\model\_item.class.php:2183
+#: ..\..\..\inc\items\model\_item.class.php:2185
 msgid "Moderate these feedbacks"
 msgstr "Модерировать эти отзывы"
 
-#: ..\..\..\inc\items\model\_item.class.php:2183
+#: ..\..\..\inc\items\model\_item.class.php:2185
 msgid "Moderate..."
 msgstr "Модерировать..."
 
-#: ..\..\..\inc\items\model\_item.class.php:2441
+#: ..\..\..\inc\items\model\_item.class.php:2443
 msgid "Publish NOW!"
 msgstr "Опубликовать!"
 
-#: ..\..\..\inc\items\model\_item.class.php:2442
+#: ..\..\..\inc\items\model\_item.class.php:2444
 msgid "Publish now using current date and time."
 msgstr "Опубликовать используя текущую дату и время."
 
-#: ..\..\..\inc\items\model\_item.class.php:2488
+#: ..\..\..\inc\items\model\_item.class.php:2490
 msgid "Deprecate this post!"
 msgstr "Отклонить эту запись!"
 
 #. TRANS: "None" select option
-#: ..\..\..\inc\items\model\_item.class.php:2544
+#: ..\..\..\inc\items\model\_item.class.php:2546
 msgid "No priority"
 msgstr "Без приоритета"
 
-#: ..\..\..\inc\items\model\_item.class.php:2664
+#: ..\..\..\inc\items\model\_item.class.php:2666
 msgid "Configure plugins"
 msgstr "Настроить плагины"
 
-#: ..\..\..\inc\items\model\_item.class.php:2664
+#: ..\..\..\inc\items\model\_item.class.php:2666
 msgid "No renderer plugins are installed."
 msgstr "Нет установленных плагинов обработки."
 
-#: ..\..\..\inc\items\model\_item.class.php:2961
+#: ..\..\..\inc\items\model\_item.class.php:2963
 msgid "No views"
 msgstr "Нет просмотров"
 
-#: ..\..\..\inc\items\model\_item.class.php:2965
+#: ..\..\..\inc\items\model\_item.class.php:2967
 msgid "1 view"
 msgstr "1 просмотр"
 
-#: ..\..\..\inc\items\model\_item.class.php:2969
+#: ..\..\..\inc\items\model\_item.class.php:2971
 #, php-format
 msgid "%d views"
 msgstr "%d просмотров"
 
-#: ..\..\..\inc\items\model\_item.class.php:3489
+#: ..\..\..\inc\items\model\_item.class.php:3491
 msgid "Post had already pinged: skipping notifications..."
 msgstr "Запись уже пинговали: пропускаю уведомления..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3500
+#: ..\..\..\inc\items\model\_item.class.php:3502
 msgid "Post processing already pending..."
 msgstr "Эта запись уже обрабатывается..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3510
+#: ..\..\..\inc\items\model\_item.class.php:3512
 msgid "Post not publicly published: skipping notifications..."
 msgstr "Запись опубликована не для всех: пропуск уведомлений..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3520
+#: ..\..\..\inc\items\model\_item.class.php:3522
 msgid "This post type doesn't need notifications..."
 msgstr "Этот тип записей не требует уведомлений..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3538
+#: ..\..\..\inc\items\model\_item.class.php:3540
 msgid "Scheduling asynchronous notifications..."
 msgstr "Назначение асинхронных уведомлений..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3550
+#: ..\..\..\inc\items\model\_item.class.php:3552
 #, php-format
 msgid "Send notifications for &laquo;%s&raquo;"
 msgstr "Отправка уведомлений для &laquo;%s&raquo;"
 
-#: ..\..\..\inc\items\model\_item.class.php:3594
+#: ..\..\..\inc\items\model\_item.class.php:3596
 msgid "Notifying subscribed users..."
 msgstr "Уведомление подписанных пользователей..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3617
+#: ..\..\..\inc\items\model\_item.class.php:3619
 msgid "No-one to notify."
 msgstr "Некого уведомлять."
 
-#: ..\..\..\inc\items\model\_item.class.php:3636
-#: ..\..\..\inc\items\model\_item.class.php:3651
+#: ..\..\..\inc\items\model\_item.class.php:3638
+#: ..\..\..\inc\items\model\_item.class.php:3653
 msgid "Content"
 msgstr "Содержимое"
 
-#: ..\..\..\inc\items\model\_item.class.php:3638
+#: ..\..\..\inc\items\model\_item.class.php:3640
 #, php-format
 msgid "[%s] New post: \"%s\""
 msgstr "[%s] Новая запись: \"%s\""
 
-#: ..\..\..\inc\items\model\_item.class.php:3667
+#: ..\..\..\inc\items\model\_item.class.php:3669
 msgid "Notifying:"
 msgstr "Уведомление:"
 
-#: ..\..\..\inc\items\model\_item.class.php:3702
+#: ..\..\..\inc\items\model\_item.class.php:3704
 msgid "Skipping pings (Running on localhost)."
 msgstr "Пропуск пинга (Работаем на localhost)."
 
-#: ..\..\..\inc\items\model\_item.class.php:3711
+#: ..\..\..\inc\items\model\_item.class.php:3713
 #, php-format
 msgid "Pinging %s..."
 msgstr "Пинг %s..."
@@ -7543,83 +7558,83 @@ msgstr "Пинг %s..."
 msgid "Warning: the URL slug has been changed to &laquo;%s&raquo;."
 msgstr "Внимание: URL имя файла записи было изменено на &laquo;%s&raquo;."
 
-#: ..\..\..\inc\items\model\_item.funcs.php:437
+#: ..\..\..\inc\items\model\_item.funcs.php:445
 #, fuzzy
 msgid "Images &amp; Attachments"
 msgstr "Вложения и фото"
 
 #. TRANS: This is the value of an input submit button
-#: ..\..\..\inc\items\model\_item.funcs.php:444
+#: ..\..\..\inc\items\model\_item.funcs.php:452
 msgid "Save & start attaching files"
 msgstr "Сохранить и добавить файлы"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:465
+#: ..\..\..\inc\items\model\_item.funcs.php:473
 msgid "Add/Link files"
 msgstr "Добавить/Прикрепить файлы"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:541
+#: ..\..\..\inc\items\model\_item.funcs.php:549
 msgid "Add a new category"
 msgstr "Добавить новую рубрику"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:565
+#: ..\..\..\inc\items\model\_item.funcs.php:573
 msgid "Main"
 msgstr "Основная"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:568
+#: ..\..\..\inc\items\model\_item.funcs.php:576
 msgid "Extra"
 msgstr "Экстра"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:603
-#: ..\..\..\inc\tools\mtimport.ctrl.php:1301
+#: ..\..\..\inc\items\model\_item.funcs.php:611
+#: ..\..\..\inc\tools\mtimport.ctrl.php:1302
 msgid "Select as MAIN category"
 msgstr "Выбрать основную рубрику"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:627
+#: ..\..\..\inc\items\model\_item.funcs.php:635
 msgid "Select as an additional category"
 msgstr "Выбрать дополнительную рубрику"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:648
+#: ..\..\..\inc\items\model\_item.funcs.php:656
 msgid "View category in blog."
 msgstr "Просмотреть рубрику в блоге"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:696
+#: ..\..\..\inc\items\model\_item.funcs.php:704
 msgid "Intros"
 msgstr "Интро"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:700
+#: ..\..\..\inc\items\model\_item.funcs.php:708
 msgid "Podcasts"
 msgstr "Подкасты"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:749
+#: ..\..\..\inc\items\model\_item.funcs.php:757
 msgid "(Public)"
 msgstr "(Публичный)"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:752
+#: ..\..\..\inc\items\model\_item.funcs.php:760
 msgid "(Members only)"
 msgstr "(Только для членов)"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:755
+#: ..\..\..\inc\items\model\_item.funcs.php:763
 msgid "(You only)"
 msgstr "(Только для вас)"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:758
-#: ..\..\..\inc\items\model\_item.funcs.php:761
+#: ..\..\..\inc\items\model\_item.funcs.php:766
+#: ..\..\..\inc\items\model\_item.funcs.php:769
 msgid "(Not published!)"
 msgstr "(Не опубликован!)"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:764
+#: ..\..\..\inc\items\model\_item.funcs.php:772
 msgid "(301)"
 msgstr ""
 
-#: ..\..\..\inc\items\model\_item.funcs.php:779
+#: ..\..\..\inc\items\model\_item.funcs.php:787
 msgid "Issue date"
 msgstr "Дата создания"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:783
+#: ..\..\..\inc\items\model\_item.funcs.php:791
 msgid "Update issue date to NOW"
 msgstr "Обновлять дату создания на текущую"
 
-#: ..\..\..\inc\items\model\_item.funcs.php:792
+#: ..\..\..\inc\items\model\_item.funcs.php:800
 msgid "Set to"
 msgstr "Выбрать вручную"
 
@@ -7765,117 +7780,117 @@ msgid "Save"
 msgstr "Сохранить"
 
 #. TRANS: This is the value of an input submit button
-#: ..\..\..\inc\items\views\_item_expert.form.php:186
-#: ..\..\..\inc\items\views\_item_simple.form.php:178
+#: ..\..\..\inc\items\views\_item_expert.form.php:190
+#: ..\..\..\inc\items\views\_item_simple.form.php:182
 msgid "Publish NOW !"
 msgstr "Опубликовать!"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:216
+#: ..\..\..\inc\items\views\_item_expert.form.php:223
 msgid "&quot;slug&quot; to be used in permalinks"
 msgstr "используется в постоянной ссылке записи"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:216
+#: ..\..\..\inc\items\views\_item_expert.form.php:223
 msgid "URL title \"slug\""
 msgstr "Короткая ссылка"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:221
+#: ..\..\..\inc\items\views\_item_expert.form.php:228
 msgid "&lt;title&gt; tag"
 msgstr "&lt;title&gt; тег"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:226
+#: ..\..\..\inc\items\views\_item_expert.form.php:233
 #, fuzzy
 msgid "&lt;meta&gt; desc"
 msgstr "&lt;meta&gt; desc"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:231
+#: ..\..\..\inc\items\views\_item_expert.form.php:238
 #, fuzzy
 msgid "&lt;meta&gt; keywds"
 msgstr "&lt;meta&gt; keywds"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:236
-#: ..\..\..\inc\items\views\_item_simple.form.php:206
+#: ..\..\..\inc\items\views\_item_expert.form.php:243
+#: ..\..\..\inc\items\views\_item_simple.form.php:213
 msgid "sep by ,"
 msgstr "через запятую"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:251
+#: ..\..\..\inc\items\views\_item_expert.form.php:258
 #: ..\..\..\inc\widgets\widgets\_coll_item_list.widget.php:141
 msgid "Excerpt"
 msgstr "Выдержка"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:252
+#: ..\..\..\inc\items\views\_item_expert.form.php:259
 msgid "(for XML feeds)"
 msgstr "(для лент XML)"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:265
+#: ..\..\..\inc\items\views\_item_expert.form.php:272
 msgid "Workflow properties"
 msgstr "Свойства документооборота"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:280
+#: ..\..\..\inc\items\views\_item_expert.form.php:287
 msgid "Task status"
 msgstr "Статус задачи"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:284
+#: ..\..\..\inc\items\views\_item_expert.form.php:291
 msgid "Deadline"
 msgstr "Срок"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:296
+#: ..\..\..\inc\items\views\_item_expert.form.php:303
 msgid "Additional actions"
 msgstr "Дополнительные действия"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:301
+#: ..\..\..\inc\items\views\_item_expert.form.php:308
 msgid "Trackback URLs"
 msgstr "Трекбэк URL"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:302
+#: ..\..\..\inc\items\views\_item_expert.form.php:309
 msgid "(Separate by space)"
 msgstr "(Разделено пробелом)"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:331
+#: ..\..\..\inc\items\views\_item_expert.form.php:338
 #: ..\..\..\install\_functions_create.php:651
 msgid "Featured post"
 msgstr "Избранная запись"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:343
-#: ..\..\..\inc\items\views\_item_expert.form.php:352
+#: ..\..\..\inc\items\views\_item_expert.form.php:350
+#: ..\..\..\inc\items\views\_item_expert.form.php:359
 msgid "can be decimal"
 msgstr "может быть десятичным"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:364
-#: ..\..\..\inc\items\views\_item_simple.form.php:232
+#: ..\..\..\inc\items\views\_item_expert.form.php:371
+#: ..\..\..\inc\items\views\_item_simple.form.php:239
 msgid "Visibility / Sharing"
 msgstr "Видимость / Доступность"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:375
+#: ..\..\..\inc\items\views\_item_expert.form.php:382
 msgid "Text Renderers"
 msgstr "Обработчики текста"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:390
-#: ..\..\..\inc\items\views\_item_simple.form.php:248
+#: ..\..\..\inc\items\views\_item_expert.form.php:397
+#: ..\..\..\inc\items\views\_item_simple.form.php:255
 msgid "Visitors can leave comments on this post."
 msgstr "Посетители могут оставлять комментарии к этой записи."
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:391
-#: ..\..\..\inc\items\views\_item_simple.form.php:249
+#: ..\..\..\inc\items\views\_item_expert.form.php:398
+#: ..\..\..\inc\items\views\_item_simple.form.php:256
 msgid "Open"
 msgstr "Открыто"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:393
-#: ..\..\..\inc\items\views\_item_simple.form.php:251
+#: ..\..\..\inc\items\views\_item_expert.form.php:400
+#: ..\..\..\inc\items\views\_item_simple.form.php:258
 msgid "Visitors can NOT leave comments on this post."
 msgstr "Посетители НЕ могут оставлять комментарии к этой записи."
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:394
-#: ..\..\..\inc\items\views\_item_simple.form.php:252
+#: ..\..\..\inc\items\views\_item_expert.form.php:401
+#: ..\..\..\inc\items\views\_item_simple.form.php:259
 msgid "Closed"
 msgstr "Закрыто"
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:396
-#: ..\..\..\inc\items\views\_item_simple.form.php:254
+#: ..\..\..\inc\items\views\_item_expert.form.php:403
+#: ..\..\..\inc\items\views\_item_simple.form.php:261
 msgid "Visitors cannot see nor leave comments on this post."
 msgstr "Посетители не могут ни оставлять, ни просматривать комментарии к этой записи."
 
-#: ..\..\..\inc\items\views\_item_expert.form.php:397
-#: ..\..\..\inc\items\views\_item_simple.form.php:255
+#: ..\..\..\inc\items\views\_item_expert.form.php:404
+#: ..\..\..\inc\items\views\_item_simple.form.php:262
 msgid "Disabled"
 msgstr "Запрещено"
 
@@ -7890,7 +7905,6 @@ msgstr "Примечания"
 #: ..\..\..\inc\items\views\_item_links.view.php:60
 #: ..\..\..\inc\items\views\inc\_item_links.inc.php:51
 #: ..\..\..\skins\_item_content.inc.php:49
-#, fuzzy
 msgid "Attachments"
 msgstr "Вложения"
 
@@ -8176,7 +8190,7 @@ msgstr "Создать новую задачу..."
 msgid "New task"
 msgstr "Новая задача"
 
-#: ..\..\..\inc\items\views\_item_simple.form.php:194
+#: ..\..\..\inc\items\views\_item_simple.form.php:201
 #, fuzzy
 msgid "Meta info"
 msgstr "Дополнительно"
@@ -8458,7 +8472,7 @@ msgid "Note: default locale is not enabled."
 msgstr "Примечание: локаль по умолчанию не выбрана."
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:252
-#: ..\..\..\inc\tools\mtimport.ctrl.php:383
+#: ..\..\..\inc\tools\mtimport.ctrl.php:384
 msgid "Default locale"
 msgstr "Локаль по умолчанию"
 
@@ -8608,7 +8622,7 @@ msgid "Local documentation of the plugin"
 msgstr "Локальная документация плагина"
 
 #: ..\..\..\inc\plugins\_plugin.class.php:2796
-#: ..\..\..\inc\plugins\plugins.ctrl.php:964
+#: ..\..\..\inc\plugins\plugins.ctrl.php:965
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:126
 msgid "Edit plugin settings!"
 msgstr "Редактировать настройки плагина!"
@@ -8674,13 +8688,13 @@ msgstr "Зачение недопустимо. Оно должно быть в �
 
 #: ..\..\..\inc\plugins\_plugin.funcs.php:950
 #, php-format
-msgid "The value is invalid. It must be smaller than %s."
-msgstr "Значение недопустимо. Оно должно быть меньше %s."
+msgid "The value is invalid. It must be smaller than or equal to %s."
+msgstr "Значение недопустимо. Оно должно быть меньше либо равным %s."
 
 #: ..\..\..\inc\plugins\_plugin.funcs.php:954
 #, php-format
-msgid "The value is invalid. It must be greater than %s."
-msgstr "Значение недопустимо. Оно должно быть больше %s."
+msgid "The value is invalid. It must be greater than or equal to %s."
+msgstr "Значение недопустимо. Оно должно быть больше либо равным %s."
 
 #: ..\..\..\inc\plugins\model\_plugins_admin.class.php:489
 msgid "The plugin cannot be installed again."
@@ -8771,227 +8785,227 @@ msgstr "Плагин требует версию %s плагина %s, но ус
 msgid "Unknown dependency type (%s). This probably means that the plugin is not compatible and you have to upgrade your %s installation."
 msgstr "Неизвестный тип зависимости (%s). Возможно что плагин не совместим и вам нужно обновить вашу систему %s."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:111
+#: ..\..\..\inc\plugins\plugins.ctrl.php:112
 msgid "The database has been updated."
 msgstr "База данных обновлена."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:115
-#: ..\..\..\install\_functions_evoupgrade.php:2484
+#: ..\..\..\inc\plugins\plugins.ctrl.php:116
+#: ..\..\..\install\_functions_evoupgrade.php:2491
 msgid "The DB schema has been changed since confirmation."
 msgstr "Структура базы данных была изменена после подтверждения."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:184
-#: ..\..\..\inc\plugins\plugins.ctrl.php:221
-#: ..\..\..\inc\plugins\plugins.ctrl.php:348
-#: ..\..\..\inc\plugins\plugins.ctrl.php:401
-#: ..\..\..\inc\plugins\plugins.ctrl.php:486
+#: ..\..\..\inc\plugins\plugins.ctrl.php:185
+#: ..\..\..\inc\plugins\plugins.ctrl.php:222
+#: ..\..\..\inc\plugins\plugins.ctrl.php:349
+#: ..\..\..\inc\plugins\plugins.ctrl.php:402
+#: ..\..\..\inc\plugins\plugins.ctrl.php:487
 #, php-format
 msgid "The plugin with ID %d could not be instantiated."
 msgstr "Плагин с ID %d не может быть распознан."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:189
+#: ..\..\..\inc\plugins\plugins.ctrl.php:190
 #, php-format
 msgid "The plugin with ID %d is already disabled."
 msgstr "Плагин с ID %d уже отключен."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:197
+#: ..\..\..\inc\plugins\plugins.ctrl.php:198
 msgid "The plugin cannot be disabled because of the following dependencies:"
 msgstr "Плагин не может быть отключен  из-за следующих зависимостей:"
 
 #. TRANS: plugin name, class name and ID
-#: ..\..\..\inc\plugins\plugins.ctrl.php:204
+#: ..\..\..\inc\plugins\plugins.ctrl.php:205
 #, php-format
 msgid "Disabled \"%s\" plugin (%s, #%d)."
 msgstr "Отключен плагин \"%s\" (%s, #%d)."
 
 #. TRANS: plugin name, class name and ID
-#: ..\..\..\inc\plugins\plugins.ctrl.php:226
+#: ..\..\..\inc\plugins\plugins.ctrl.php:227
 #, php-format
 msgid "The \"%s\" plugin (%s, #%d) is already enabled."
 msgstr "Плагин \"%s\" (%s, #%d) уже включен."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:231
+#: ..\..\..\inc\plugins\plugins.ctrl.php:232
 msgid "The plugin is in a broken state. It cannot be enabled."
 msgstr "Этот плагин поврежден. Он не может быть включен."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:239
+#: ..\..\..\inc\plugins\plugins.ctrl.php:240
 msgid "The plugin cannot be enabled because of the following dependencies:"
 msgstr "Плагин не может быть включен из-за следующих зависимостей:"
 
 #. TRANS: plugin name, class name and ID
-#: ..\..\..\inc\plugins\plugins.ctrl.php:261
+#: ..\..\..\inc\plugins\plugins.ctrl.php:262
 #, php-format
 msgid "Enabled \"%s\" plugin (%s, #%d)."
 msgstr "Включен плагин \"%s\" (%s, #%d)."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:265
-#: ..\..\..\inc\plugins\plugins.ctrl.php:377
+#: ..\..\..\inc\plugins\plugins.ctrl.php:266
+#: ..\..\..\inc\plugins\plugins.ctrl.php:378
 msgid "The plugin has not been enabled."
 msgstr "Плагин не может быть включен."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:311
+#: ..\..\..\inc\plugins\plugins.ctrl.php:312
 msgid "Plugins have been reloaded."
 msgstr "Плагины были перезагружены."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:315
+#: ..\..\..\inc\plugins\plugins.ctrl.php:316
 msgid "Plugins have not changed."
 msgstr "Плагины не изменились."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:359
+#: ..\..\..\inc\plugins\plugins.ctrl.php:360
 #, php-format
 msgid "Installed plugin &laquo;%s&raquo;."
 msgstr "Установлен плагин &laquo;%s&raquo;."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:409
+#: ..\..\..\inc\plugins\plugins.ctrl.php:410
 msgid "The plugin cannot be uninstalled because of the following dependencies:"
 msgstr "Плагин не может быть удален из-за следующих зависимостей:"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:422
+#: ..\..\..\inc\plugins\plugins.ctrl.php:423
 #, php-format
 msgid "Could not uninstall plugin #%d."
 msgstr "Невозможно удалить плагин #%d."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:438
+#: ..\..\..\inc\plugins\plugins.ctrl.php:439
 msgid "Dropped the table(s) of the plugin."
 msgstr "Очищены таблицы плагинов."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:451
+#: ..\..\..\inc\plugins\plugins.ctrl.php:452
 #, php-format
 msgid "The &laquo;%s&raquo; plugin (#%d) has been uninstalled."
 msgstr "Плагин &laquo;%s&raquo; (#%d) был успешно удален."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:513
+#: ..\..\..\inc\plugins\plugins.ctrl.php:514
 msgid "Plugin name updated."
 msgstr "Имя плагина обновлено."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:528
+#: ..\..\..\inc\plugins\plugins.ctrl.php:529
 msgid "Plugin description updated."
 msgstr "Описание плагина обновлено."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:541
-#: ..\..\..\inc\plugins\plugins.ctrl.php:707
+#: ..\..\..\inc\plugins\plugins.ctrl.php:542
+#: ..\..\..\inc\plugins\plugins.ctrl.php:708
 msgid "Plugin code updated."
 msgstr "Код плагина обновлен."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:545
-#: ..\..\..\inc\plugins\plugins.ctrl.php:713
+#: ..\..\..\inc\plugins\plugins.ctrl.php:546
+#: ..\..\..\inc\plugins\plugins.ctrl.php:714
 msgid "Plugin priority must be numeric (0-100)."
 msgstr "Приоритет плагина должен быть цифровым (0-100)."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:550
-#: ..\..\..\inc\plugins\plugins.ctrl.php:720
+#: ..\..\..\inc\plugins\plugins.ctrl.php:551
+#: ..\..\..\inc\plugins\plugins.ctrl.php:721
 msgid "Plugin priority updated."
 msgstr "Приоритет плагина обновлен."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:561
-#: ..\..\..\inc\plugins\plugins.ctrl.php:727
+#: ..\..\..\inc\plugins\plugins.ctrl.php:562
+#: ..\..\..\inc\plugins\plugins.ctrl.php:728
 msgid "Plugin rendering updated."
 msgstr "Плагин обработки обновлен."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:585
+#: ..\..\..\inc\plugins\plugins.ctrl.php:586
 msgid "Plugin settings have been updated."
 msgstr "Настройки плагина были обновлены."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:611
-#: ..\..\..\inc\plugins\plugins.ctrl.php:746
+#: ..\..\..\inc\plugins\plugins.ctrl.php:612
+#: ..\..\..\inc\plugins\plugins.ctrl.php:747
 msgid "Plugin events have been updated."
 msgstr "События плагина были обновлены."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:621
-#: ..\..\..\inc\plugins\plugins.ctrl.php:756
+#: ..\..\..\inc\plugins\plugins.ctrl.php:622
+#: ..\..\..\inc\plugins\plugins.ctrl.php:757
 msgid "The plugin has been disabled."
 msgstr "Плагин был отключен."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:804
+#: ..\..\..\inc\plugins\plugins.ctrl.php:805
 #, php-format
 msgid "Edit plugin &laquo;%s&raquo; (ID %d)"
 msgstr "Редактировать плагин &laquo;%s&raquo; (ID %d)"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:821
+#: ..\..\..\inc\plugins\plugins.ctrl.php:822
 #, php-format
 msgid "Help for plugin &laquo;%s&raquo;"
 msgstr "Помощь по плагину &laquo;%s&raquo;"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:824
+#: ..\..\..\inc\plugins\plugins.ctrl.php:825
 msgid "External help page"
 msgstr "Внешняя страница помощи"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:877
+#: ..\..\..\inc\plugins\plugins.ctrl.php:878
 msgid "Cancel installation!"
 msgstr "Прервать установку!"
 
 #. TRANS: %d is ID, %d name
-#: ..\..\..\inc\plugins\plugins.ctrl.php:879
+#: ..\..\..\inc\plugins\plugins.ctrl.php:880
 #, php-format
 msgid "Finish setup for plugin #%d (%s)"
 msgstr "Закончена настройка плагина #%d (%s)"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:881
+#: ..\..\..\inc\plugins\plugins.ctrl.php:882
 msgid "The plugin needs the following database changes."
 msgstr "Плагин требует следующих изменений в базе данных."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:885
-#: ..\..\..\install\_functions_evoupgrade.php:2508
+#: ..\..\..\inc\plugins\plugins.ctrl.php:886
+#: ..\..\..\install\_functions_evoupgrade.php:2515
 msgid "The following database changes will be carried out. If you are not sure what this means, it will probably be alright."
 msgstr "Следующие изменения базы будут выполнены. Если вы не знаете что это означает, вероятно все будет хорошо."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:898
+#: ..\..\..\inc\plugins\plugins.ctrl.php:899
 msgid "Install!"
 msgstr "Установить!"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:920
+#: ..\..\..\inc\plugins\plugins.ctrl.php:921
 msgid "Cancel uninstall!"
 msgstr "Прервать удаление!"
 
 #. TRANS: %d is ID, %d name
-#: ..\..\..\inc\plugins\plugins.ctrl.php:922
+#: ..\..\..\inc\plugins\plugins.ctrl.php:923
 #, php-format
 msgid "Uninstall plugin #%d (%s)"
 msgstr "Удалить плагин #%d (%s)."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:926
+#: ..\..\..\inc\plugins\plugins.ctrl.php:927
 msgid "Uninstalling this plugin will also delete its database tables:"
 msgstr "Удалив плагин, вы также удалите его таблицы из базы данных:"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:968
+#: ..\..\..\inc\plugins\plugins.ctrl.php:969
 msgid "Close info!"
 msgstr "Закрыть информацию!"
 
 #. TRANS: Code of a plugin
-#: ..\..\..\inc\plugins\plugins.ctrl.php:974
+#: ..\..\..\inc\plugins\plugins.ctrl.php:975
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:194
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:114
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:212
 msgid "Code"
 msgstr "Код"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:976
+#: ..\..\..\inc\plugins\plugins.ctrl.php:977
 msgid "This 32 character code uniquely identifies the functionality of this plugin. It is only necessary to call the plugin by code (SkinTag) or when using it as a Renderer."
 msgstr "Этот 32-х символьный код определяет назначение плагина. Он необходим для вызова плагина по коду (SkinTag) или при использовании плагина в качестве обработчика."
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:977
+#: ..\..\..\inc\plugins\plugins.ctrl.php:978
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:74
 msgid "Short desc"
 msgstr "Краткое описание"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:978
+#: ..\..\..\inc\plugins\plugins.ctrl.php:979
 msgid "Long desc"
 msgstr "Полное описание"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:983
-#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:54
+#: ..\..\..\inc\plugins\plugins.ctrl.php:984
+#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:56
 msgid "Version"
 msgstr "Версия"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:984
+#: ..\..\..\inc\plugins\plugins.ctrl.php:985
 msgid "Classname"
 msgstr "Имя класса"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:985
+#: ..\..\..\inc\plugins\plugins.ctrl.php:986
 msgid "Class file"
 msgstr "Файл класса"
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:1015
+#: ..\..\..\inc\plugins\plugins.ctrl.php:1016
 #: ..\..\..\inc\skins\model\_skin.class.php:406
 #: ..\..\..\inc\skins\model\_skin.class.php:448
 #: ..\..\..\inc\skins\model\_skin.class.php:449
@@ -9025,7 +9039,7 @@ msgid "En"
 msgstr "Вкл"
 
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:137
-#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:52
+#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:54
 #: ..\..\..\inc\widgets\model\_widget.class.php:188
 msgid "Plugin"
 msgstr "Плагин"
@@ -9039,8 +9053,8 @@ msgid "The code to call the plugin by code (SkinTag) or as Renderer."
 msgstr "Код для вызова плагина из темы (SkinTag) или в качестве обработчика."
 
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:220
-#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:124
-#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:150
+#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:126
+#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:152
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:57
 msgid "Display info"
 msgstr "Показать информацию"
@@ -9075,37 +9089,37 @@ msgstr "Установить новый"
 msgid "Install new plugin..."
 msgstr "Установить новый плагин..."
 
-#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:47
+#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:49
 msgid "Plugins available for installation"
 msgstr "Плагины, доступные для установки"
 
-#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:49
+#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:51
 msgid "Cancel"
 msgstr "Отмена"
 
-#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:49
+#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:51
 #: ..\..\..\inc\skins\views\_skin_list_available.view.php:34
 msgid "Cancel install!"
 msgstr "Отменить установку!"
 
-#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:98
+#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:100
 msgid "Un-Classified"
 msgstr "Не классифицирован"
 
-#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:176
+#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:178
 msgid "Install"
 msgstr "Установить"
 
-#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:204
+#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:206
 msgid "The above plugins are those already installed into your \"plugins\" directory."
 msgstr "Выше перечислены плагины, уже установленные в вашей директории \"plugins\"."
 
-#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:206
+#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:208
 #, php-format
 msgid "You can find more plugins online at %s or other channels."
 msgstr "Вы можете найти доболнительные плагины на %s или из других источников."
 
-#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:208
+#: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:210
 #, php-format
 msgid "To make a plugin available for installation, extract it into the \"%s\" directory on the server."
 msgstr "Чтобы сделать плагин доступным для установки, извлеките его в директорию \"%s\" на вашем сервере."
@@ -9176,7 +9190,7 @@ msgstr "Голы"
 
 #: ..\..\..\inc\sessions\_sessions.init.php:157
 #: ..\..\..\inc\sessions\_sessions.init.php:247
-#: ..\..\..\inc\sessions\stats.ctrl.php:50
+#: ..\..\..\inc\sessions\stats.ctrl.php:52
 #: ..\..\..\inc\users\views\_group.form.php:140
 msgid "Stats"
 msgstr "Статистика"
@@ -9250,33 +9264,33 @@ msgstr "Хиты"
 msgid "Goal hits"
 msgstr "Голы"
 
-#: ..\..\..\inc\sessions\goals.ctrl.php:44
+#: ..\..\..\inc\sessions\goals.ctrl.php:46
 msgid "Cannot edit goal!"
 msgstr "Невозможно изменить гол!"
 
-#: ..\..\..\inc\sessions\goals.ctrl.php:45
+#: ..\..\..\inc\sessions\goals.ctrl.php:47
 msgid "Requested goal does not exist any longer."
 msgstr "Запрашиваемый гол больше не существует."
 
-#: ..\..\..\inc\sessions\goals.ctrl.php:93
+#: ..\..\..\inc\sessions\goals.ctrl.php:95
 msgid "New goal created."
 msgstr "Создан новый гол."
 
-#: ..\..\..\inc\sessions\goals.ctrl.php:127
+#: ..\..\..\inc\sessions\goals.ctrl.php:129
 msgid "Goal updated."
 msgstr "Гол обновлен."
 
-#: ..\..\..\inc\sessions\goals.ctrl.php:143
+#: ..\..\..\inc\sessions\goals.ctrl.php:145
 #, php-format
 msgid "Goal &laquo;%s&raquo; deleted."
 msgstr "Гол &laquo;%s&raquo; успешно удален."
 
-#: ..\..\..\inc\sessions\goals.ctrl.php:152
+#: ..\..\..\inc\sessions\goals.ctrl.php:154
 #, php-format
 msgid "Cannot delete goal &laquo;%s&raquo;"
 msgstr "Невозможно удалить гол &laquo;%s&raquo;"
 
-#: ..\..\..\inc\sessions\goals.ctrl.php:188
+#: ..\..\..\inc\sessions\goals.ctrl.php:190
 #, php-format
 msgid "Delete goal &laquo;%s&raquo;?"
 msgstr "Вы действительно хотите удалить гол &laquo;%s&raquo;?"
@@ -9303,33 +9317,33 @@ msgstr "Очистка уже запускалась сегодня"
 msgid "n.a."
 msgstr "н/д"
 
-#: ..\..\..\inc\sessions\stats.ctrl.php:61
+#: ..\..\..\inc\sessions\stats.ctrl.php:63
 msgid "Sorry, there is no blog you have permission to view stats for."
 msgstr "Извините, у вас нет прав на просмотр статистики блогов."
 
-#: ..\..\..\inc\sessions\stats.ctrl.php:81
+#: ..\..\..\inc\sessions\stats.ctrl.php:83
 #, php-format
 msgid "Changed hit #%d type to: %s."
 msgstr "Изменен тип хита #%d на: %s."
 
-#: ..\..\..\inc\sessions\stats.ctrl.php:93
+#: ..\..\..\inc\sessions\stats.ctrl.php:95
 #, php-format
 msgid "Deleted hit #%d."
 msgstr "Удален хит #%d."
 
-#: ..\..\..\inc\sessions\stats.ctrl.php:97
+#: ..\..\..\inc\sessions\stats.ctrl.php:99
 #, php-format
 msgid "Could not delete hit #%d."
 msgstr "Невозможно удалить хит #%d."
 
 #. TRANS: %s is a date
-#: ..\..\..\inc\sessions\stats.ctrl.php:109
+#: ..\..\..\inc\sessions\stats.ctrl.php:111
 #, php-format
 msgid "Deleted %d hits for %s."
 msgstr "Удалено %d хитов за %s."
 
 #. TRANS: %s is a date
-#: ..\..\..\inc\sessions\stats.ctrl.php:113
+#: ..\..\..\inc\sessions\stats.ctrl.php:115
 #, php-format
 msgid "No hits deleted for %s."
 msgstr "Нет удаленных хитов за %s."
@@ -9545,7 +9559,7 @@ msgstr "Последние хиты"
 #: ..\..\..\inc\sessions\views\_stats_refsearches.view.php:84
 #, fuzzy
 msgid "SR"
-msgstr "Спам"
+msgstr "Serp rank"
 
 #: ..\..\..\inc\sessions\views\_stats_refdomains.view.php:101
 msgid "Regular sites"
@@ -10001,7 +10015,6 @@ msgid "Do not validate certificate"
 msgstr "Не проверять сертификат"
 
 #: ..\..\..\inc\settings\views\_features.form.php:127
-#, fuzzy
 msgid "Do not validate the certificate from the TLS/SSL server. Check this if you are using a self-signed certificate."
 msgstr "Не проверять TLS/SSL сертификат сервера. Отметьте, если вы пользуетесь самоподписанным сертификатом."
 
@@ -10097,115 +10110,115 @@ msgstr "Отметьте для разрешения перемещения ру
 msgid "Ordering of categories"
 msgstr "Сортировка рубрик"
 
-#: ..\..\..\inc\settings\views\_general.form.php:42
+#: ..\..\..\inc\settings\views\_general.form.php:44
 msgid "General Settings"
 msgstr "Основные настройки"
 
-#: ..\..\..\inc\settings\views\_general.form.php:52
+#: ..\..\..\inc\settings\views\_general.form.php:54
 msgid "Display options"
 msgstr "Настройки отображения"
 
-#: ..\..\..\inc\settings\views\_general.form.php:56
+#: ..\..\..\inc\settings\views\_general.form.php:58
 msgid "Default blog to display"
 msgstr "Блог, отображаемый по умолчанию"
 
-#: ..\..\..\inc\settings\views\_general.form.php:57
+#: ..\..\..\inc\settings\views\_general.form.php:59
 msgid "This blog will be displayed on index.php."
 msgstr "Этот блог будет отображен в index.php"
 
-#: ..\..\..\inc\settings\views\_general.form.php:67
+#: ..\..\..\inc\settings\views\_general.form.php:69
 msgid "Default user permissions"
 msgstr "Разрешения пользователя по умолчанию"
 
-#: ..\..\..\inc\settings\views\_general.form.php:69
+#: ..\..\..\inc\settings\views\_general.form.php:71
 msgid "Check to allow new users to register themselves."
 msgstr "Отметьте чтобы разрешить новым пользователям регистрироваться самостоятельно."
 
-#: ..\..\..\inc\settings\views\_general.form.php:69
+#: ..\..\..\inc\settings\views\_general.form.php:71
 msgid "New users can register"
 msgstr "Разрешить регистрироваться новым пользователям"
 
-#: ..\..\..\inc\settings\views\_general.form.php:72
+#: ..\..\..\inc\settings\views\_general.form.php:74
 msgid "Group for new users"
 msgstr "Группа для новых пользователей"
 
-#: ..\..\..\inc\settings\views\_general.form.php:72
+#: ..\..\..\inc\settings\views\_general.form.php:74
 msgid "Groups determine user roles and permissions."
 msgstr "Группы определяют права и разрешения пользователей."
 
-#: ..\..\..\inc\settings\views\_general.form.php:74
+#: ..\..\..\inc\settings\views\_general.form.php:76
 msgid "Level for new users"
 msgstr "Уровень для новых пользователей"
 
-#: ..\..\..\inc\settings\views\_general.form.php:74
+#: ..\..\..\inc\settings\views\_general.form.php:76
 msgid "Levels determine hierarchy of users in blogs."
 msgstr "Уровни определяют иерархию пользователей в блогах."
 
-#: ..\..\..\inc\settings\views\_general.form.php:80
+#: ..\..\..\inc\settings\views\_general.form.php:82
 msgid "Email validation"
 msgstr "Подтверждение Email адреса"
 
-#: ..\..\..\inc\settings\views\_general.form.php:82
+#: ..\..\..\inc\settings\views\_general.form.php:84
 msgid "Check to require users to validate their email by clicking a link sent to them."
 msgstr "Отметьте чтобы требовать от пользователей подтверждения их email адреса нажатием по отправленной им ссылке."
 
-#: ..\..\..\inc\settings\views\_general.form.php:82
+#: ..\..\..\inc\settings\views\_general.form.php:84
 msgid "New users must validate email"
 msgstr "Новые пользователи должны подтверждать email"
 
-#: ..\..\..\inc\settings\views\_general.form.php:84
+#: ..\..\..\inc\settings\views\_general.form.php:86
 msgid "Check to require users to re-validate when they change their email address."
 msgstr "Отметьте чтобы требовать от пользователей подтверждения измененного адреса."
 
-#: ..\..\..\inc\settings\views\_general.form.php:84
+#: ..\..\..\inc\settings\views\_general.form.php:86
 msgid "Validate email changes"
 msgstr "Подтверждение изменений email адреса"
 
-#: ..\..\..\inc\settings\views\_general.form.php:90
+#: ..\..\..\inc\settings\views\_general.form.php:92
 msgid "Security options"
 msgstr "Настройки безопасности"
 
-#: ..\..\..\inc\settings\views\_general.form.php:92
+#: ..\..\..\inc\settings\views\_general.form.php:94
 msgid "Minimum password length"
 msgstr "Минимальная длина пароля"
 
-#: ..\..\..\inc\settings\views\_general.form.php:92
+#: ..\..\..\inc\settings\views\_general.form.php:94
 msgid "characters."
 msgstr "символов."
 
-#: ..\..\..\inc\settings\views\_general.form.php:94
+#: ..\..\..\inc\settings\views\_general.form.php:96
 msgid "Check to enable the login form to hash the password with Javascript before transmitting it. This provides extra security on non-SSL connections."
 msgstr "Отметьте чтобы включить хеширование пароля формы входа при помощи Javascript, прежде чем передать его. Это обеспечит дополнительную безопасность для не SSL соединений."
 
-#: ..\..\..\inc\settings\views\_general.form.php:94
+#: ..\..\..\inc\settings\views\_general.form.php:96
 msgid "Login password hashing"
 msgstr "Хеширование пароля при входе"
 
-#: ..\..\..\inc\settings\views\_general.form.php:100
+#: ..\..\..\inc\settings\views\_general.form.php:102
 msgid "Timeouts"
 msgstr "Таймауты"
 
-#: ..\..\..\inc\settings\views\_general.form.php:103
+#: ..\..\..\inc\settings\views\_general.form.php:105
 msgid "Session timeout"
 msgstr "Таймаут сессии"
 
-#: ..\..\..\inc\settings\views\_general.form.php:103
+#: ..\..\..\inc\settings\views\_general.form.php:105
 msgid "seconds. How long can a user stay inactive before automatic logout?"
 msgstr "секунд. Как долго пользователь может оставаться неактивным перед его автоматическим выводом из системы?"
 
-#: ..\..\..\inc\settings\views\_general.form.php:109
+#: ..\..\..\inc\settings\views\_general.form.php:111
 msgid "Reload-page timeout"
 msgstr "Таймаут перезагрузки страницы"
 
-#: ..\..\..\inc\settings\views\_general.form.php:109
+#: ..\..\..\inc\settings\views\_general.form.php:111
 msgid "Time (in seconds) that must pass before a request to the same URI from the same IP and useragent is considered as a new hit."
 msgstr "Время (в секундах), через которое запрос по данному URI с того же IP и агента пользователя будет рассмотрен как новый хит."
 
-#: ..\..\..\inc\settings\views\_general.form.php:117
+#: ..\..\..\inc\settings\views\_general.form.php:119
 msgid "Cache rendered pages that are not controlled by a skin. See Blog Settings for skin output caching."
 msgstr "Кэшировать обработанные страницы, не котролируемые темой. См. вкладку Настройки блога для кэширования страниц, обработанных темой."
 
-#: ..\..\..\inc\settings\views\_general.form.php:117
+#: ..\..\..\inc\settings\views\_general.form.php:119
 msgid "Enable general cache"
 msgstr "Включить глобальное кэширование"
 
@@ -10402,19 +10415,19 @@ msgstr "Медиа папка не доступна для записи."
 msgid "Ok"
 msgstr "Ok"
 
-#: ..\..\..\inc\tools\mtimport.ctrl.php:337
+#: ..\..\..\inc\tools\mtimport.ctrl.php:338
 #: ..\..\..\inc\users\views\_user.form.php:100
 #: ..\..\..\inc\users\views\_user.form.php:105
 msgid "User group"
 msgstr "Группа пользователей"
 
-#: ..\..\..\inc\tools\mtimport.ctrl.php:338
+#: ..\..\..\inc\tools\mtimport.ctrl.php:339
 #: ..\..\..\inc\users\views\_user.form.php:108
 #, php-format
 msgid "See <a %s>online manual</a> for details."
 msgstr "Смотри <a %s>руководство в Сети</a> для подробностей."
 
-#: ..\..\..\inc\tools\mtimport.ctrl.php:339
+#: ..\..\..\inc\tools\mtimport.ctrl.php:340
 #: ..\..\..\inc\users\views\_user_list.view.php:237
 #: ..\..\..\inc\users\views\_user_list.view.php:272
 #: ..\..\..\skins\_profile.disp.php:99
@@ -10422,11 +10435,11 @@ msgstr "Смотри <a %s>руководство в Сети</a> для под�
 msgid "Level"
 msgstr "Уровень"
 
-#: ..\..\..\inc\tools\mtimport.ctrl.php:1262
+#: ..\..\..\inc\tools\mtimport.ctrl.php:1263
 msgid "Select main category in target blog and optionally check additional categories"
 msgstr "Выберите главную рубрику в целевом блоге и отметьте дополнительные рубрики"
 
-#: ..\..\..\inc\tools\mtimport.ctrl.php:1290
+#: ..\..\..\inc\tools\mtimport.ctrl.php:1291
 msgid "Select as an additionnal category"
 msgstr "Выбрать как дополнительную рубрику"
 
@@ -11790,6 +11803,7 @@ msgstr "Список рубрик; при нажатии фильтрует бл
 
 #: ..\..\..\inc\widgets\widgets\_coll_category_list.widget.php:94
 #: ..\..\..\inc\widgets\widgets\_coll_item_list.widget.php:71
+#: ..\..\..\inc\widgets\widgets\_coll_media_index.widget.php:62
 #: ..\..\..\inc\widgets\widgets\_coll_tag_cloud.widget.php:102
 msgid "Block title"
 msgstr "Заголовок блока"
@@ -11865,7 +11879,9 @@ msgid "Random selection"
 msgstr "Случайный выбор"
 
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:73
+#: ..\..\..\inc\widgets\widgets\_coll_item_list.widget.php:123
 #: ..\..\..\inc\widgets\widgets\_coll_media_index.widget.php:88
+#: ..\..\..\plugins\_archives.plugin.php:313
 msgid "Max items"
 msgstr "Количество"
 
@@ -12012,12 +12028,6 @@ msgstr "По рубрике"
 msgid "How to sort the items"
 msgstr "Способ сортировки записей"
 
-#: ..\..\..\inc\widgets\widgets\_coll_item_list.widget.php:123
-#: ..\..\..\plugins\_archives.plugin.php:313
-#, fuzzy
-msgid "Limit"
-msgstr "Список"
-
 #: ..\..\..\inc\widgets\widgets\_coll_item_list.widget.php:129
 msgid "Link titles"
 msgstr "Ссылки заголовков"
@@ -12113,6 +12123,7 @@ msgid "Long description from the blog's <a %s>general settings</a>."
 msgstr "Подробное описание из <a %s>настроек блога</a>."
 
 #: ..\..\..\inc\widgets\widgets\_coll_media_index.widget.php:65
+#: ..\..\..\install\_functions_install.php:587
 msgid "Recent photos"
 msgstr "Последние фото"
 
@@ -12137,6 +12148,7 @@ msgid "Number of columns in grid mode."
 msgstr "Количество колонок в режиме сетки."
 
 #: ..\..\..\inc\widgets\widgets\_coll_media_index.widget.php:123
+#: ..\..\..\install\_functions_install.php:587
 #, fuzzy
 msgid "Photo index"
 msgstr "Список изображений"
@@ -12306,6 +12318,7 @@ msgid "All blogs"
 msgstr "Все блоги"
 
 #: ..\..\..\inc\widgets\widgets\_free_html.widget.php:54
+#: ..\..\..\install\_functions_install.php:591
 msgid "Free HTML"
 msgstr "Свободный HTML"
 
@@ -12889,19 +12902,19 @@ msgstr "Похоже на то, что следующие названия за�
 msgid "I can't upgrade until you make them unique. DB field: [%s]"
 msgstr "Невозможно обновить пока вы не сделаете их уникальными. Поле БД: [%s]"
 
-#: ..\..\..\install\_functions_evoupgrade.php:2468
+#: ..\..\..\install\_functions_evoupgrade.php:2475
 msgid "The database schema is up to date."
 msgstr "Структура базы данных в актуальном состоянии."
 
-#: ..\..\..\install\_functions_evoupgrade.php:2499
+#: ..\..\..\install\_functions_evoupgrade.php:2506
 msgid "Upgrade database"
 msgstr "Обновить базу данных"
 
-#: ..\..\..\install\_functions_evoupgrade.php:2506
+#: ..\..\..\install\_functions_evoupgrade.php:2513
 msgid "The version number is correct, but we have detected changes in the database schema. This can happen with CVS versions..."
 msgstr "Номер версии корректный, но мы обнаружили изменения в структуре базы данных. Это может происходить в CVS версиях..."
 
-#: ..\..\..\install\_functions_evoupgrade.php:2517
+#: ..\..\..\install\_functions_evoupgrade.php:2524
 msgid "Upgrade database!"
 msgstr "Обновить базу данных!"
 
@@ -12958,6 +12971,15 @@ msgstr "Базовый URL"
 msgid "Admin email"
 msgstr "Email администратора"
 
+#: ..\..\..\install\_functions_install.php:134
+msgid "OOPS! It seems b2evolution is already installed!"
+msgstr "Похоже, что b2evolution уже установлен!"
+
+#: ..\..\..\install\_functions_install.php:138
+#, php-format
+msgid "Would you like to <a %s>upgrade your existing installation now</a>?"
+msgstr "Хотите ли вы <a %s>выполнить обновление системы</a> прямо сейчас?"
+
 #: ..\..\..\install\_functions_install.php:155
 msgid "Creating b2evolution tables..."
 msgstr "Создание таблиц b2evolution..."
@@ -12982,6 +13004,14 @@ msgstr "Теперь вы можете <a %s>войти</a> используя �
 #: ..\..\..\install\_functions_install.php:200
 msgid "Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew."
 msgstr "Запомните этот пароль! Это <em>случайный</em> пароль, сгенерированный b2evolution. Если вы потеряете его, вам придется удалить таблицы b2evolution и переустановить систему заново."
+
+#: ..\..\..\install\_functions_install.php:564
+msgid "Random photo"
+msgstr "Случайное фото"
+
+#: ..\..\..\install\_functions_install.php:591
+msgid "This is the \"Sidebar 2\" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select \"Customize\", then \"Blog Widgets\"."
+msgstr ""
 
 #: ..\..\..\install\index.php:83
 msgid "Upgrade from a previous version"
@@ -13836,11 +13866,20 @@ msgstr "Иконки контактов"
 msgid "Display contact icons allowing to send private messages to logged in users."
 msgstr "Показать иконки контактов для отправки личных сообщений вошедшим пользователям."
 
-#: ..\..\..\plugins\_whosonline.plugin.php:106
+#: ..\..\..\plugins\_whosonline.plugin.php:84
+#, fuzzy
+msgid "Online session timeout"
+msgstr "Таймаут сессии"
+
+#: ..\..\..\plugins\_whosonline.plugin.php:85
+msgid "seconds. After how much time of inactivity an user is considered to be offline? 300 seconds are 5 minutes."
+msgstr "секунд. Время, по истечении которого (при отсутствии активности), статус пользователя будет заменен на \"не в сети\". 300 сек. = 5  мин."
+
+#: ..\..\..\plugins\_whosonline.plugin.php:115
 msgid "Who's Online?"
 msgstr "Кто онлайн?"
 
-#: ..\..\..\plugins\_whosonline.plugin.php:297
+#: ..\..\..\plugins\_whosonline.plugin.php:324
 msgid "Guest Users:"
 msgstr "Гости:"
 
@@ -14045,20 +14084,21 @@ msgid "Context menu"
 msgstr "Контекстное меню"
 
 #: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:83
+#: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:190
 msgid "Enable this to use an extra context menu in the editor"
 msgstr "Отметьте, для добавления нового контекстного меню в редактор"
 
 #: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:86
 #: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:193
-#, fuzzy
 msgid "Advanced paste support"
-msgstr "Дополнительные свойства"
+msgstr "Расширенная встака"
 
 #: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:89
 msgid "Enable this to add support for pasting easily word and plain text files"
 msgstr "Отметьте, чтобы включить поддержку простой вставки из Ворда и простых текстовых файлов"
 
 #: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:92
+#: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:199
 msgid "Show XHTML extras"
 msgstr "Расширенный XHTML"
 
@@ -14069,7 +14109,6 @@ msgstr "Отметьте, чтобы включить поддержку XHTML �
 
 #: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:98
 #: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:205
-#, fuzzy
 msgid "Directionality support"
 msgstr "Направление письма"
 
@@ -14094,38 +14133,29 @@ msgstr "Использовать TinyMCE"
 msgid "Check this to enable the extended Javascript editor (TinyMCE)."
 msgstr "Отметьте, чтобы использовать расширенный Javascript редактор (TinyMCE)."
 
-#: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:190
-msgid "Enable this to use an extra content menu in the editor"
-msgstr ""
-
 #: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:196
-msgid "Enable this to add support for pasting of word and plain text files"
-msgstr ""
-
-#: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:199
-#, fuzzy
-msgid "Show XHTML Extras"
-msgstr "Разрешенные XHTML теги"
+msgid "Enable this to add support for easily pasting word and plain text files"
+msgstr "Отметьте, чтобы включить поддержку простой вставки из Ворда и простых текстовых файлов"
 
 #: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:208
 msgid "Enable to add directionality icons to TinyMCE that enables TinyMCE to better handle languages that is written from right to left."
 msgstr "Отметьте, чтобы включить значки выбора направления письма (слева-направо и справа-налево)."
 
-#: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:282
+#: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:288
 msgid "Toggle between WYSIWYG and plain HTML editor"
 msgstr "Переключение с WYSIWYG редактора на простой HTML редактор и наоборот"
 
-#: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:352
+#: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:358
 #, php-format
 msgid "Compressed TinyMCE javascript could not be loaded. Check the \"%s\" plugin setting."
 msgstr "Сжатый javascript TinyMCE не может быть загружен. Проверьте настройки \"%s\" плагина."
 
-#: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:353
-#: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:388
+#: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:359
+#: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:394
 msgid "URL to TinyMCE"
 msgstr "Путь к TinyMCE"
 
-#: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:387
+#: ..\..\..\plugins\tinymce_plugin\_tinymce.plugin.php:393
 #, php-format
 msgid "TinyMCE javascript could not be loaded. Check the \"%s\" plugin setting."
 msgstr "Javascript TinyMCE не может быть загружен. Проверьте настройки \"%s\" плагина."
@@ -14856,6 +14886,13 @@ msgstr "Этот демонстрационный шаблон показыва�
 msgid "More posts..."
 msgstr "Больше записей..."
 
+#, fuzzy
+#~ msgid "Limit"
+#~ msgstr "Список"
+
+#, fuzzy
+#~ msgid "Show XHTML Extras"
+#~ msgstr "Разрешенные XHTML теги"
 #~ msgid "English (GB)"
 #~ msgstr "Английский (GB)"
 #~ msgid "Go"
