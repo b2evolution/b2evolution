@@ -303,7 +303,7 @@ function stats_search_keywords( $keyphrase, $length = 30 )
 	// See http://forums.b2evolution.net/viewtopic.php?t=17431
 	$keyphrase = htmlentities( $keyphrase, ENT_COMPAT, $evo_charset );
 	
-	return '<span title="'.$keyphrase_orig.'">'.$keyphrase.'</span>';
+	return '<span title="'.format_to_output( $keyphrase_orig, 'htmlattr' ).'">'.$keyphrase.'</span>';
 }
 
 
@@ -344,6 +344,10 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.12  2009/07/08 01:45:48  sam2kb
+ * Added param $length to stats_search_keywords()
+ * Changed keywords length for better accessibility on low resolution screens
+ *
  * Revision 1.11  2009/07/08 00:52:27  sam2kb
  * stats_search_keywords() returns original (not cropped) string on hover
  *

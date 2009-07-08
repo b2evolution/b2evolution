@@ -76,7 +76,7 @@ else
 $Results->cols[] = array(
 		'th' => T_('Search keywords'),
 		'order' => 'keyp_phrase',
-		'td' => '%stats_search_keywords( #keyp_phrase# )%',
+		'td' => '%stats_search_keywords( #keyp_phrase#, 20 )%',
 	);
 
 // Serp Rank:
@@ -118,6 +118,10 @@ echo '<p class="notes">'.T_('These are hits from people who came to this blog sy
 
 /*
  * $Log$
+ * Revision 1.10  2009/07/08 01:45:48  sam2kb
+ * Added param $length to stats_search_keywords()
+ * Changed keywords length for better accessibility on low resolution screens
+ *
  * Revision 1.9  2009/07/06 06:51:03  sam2kb
  * Added target="_blank" on referer URLs
  *

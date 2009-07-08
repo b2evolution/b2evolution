@@ -133,7 +133,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Search keywords'),
 		'order' => 'keyp_phrase',
-		'td' => '%stats_search_keywords( #keyp_phrase# )%',
+		'td' => '%stats_search_keywords( #keyp_phrase#, 20 )%',
 	);
 
 // Serp Rank:
@@ -177,6 +177,10 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.5  2009/07/08 01:45:48  sam2kb
+ * Added param $length to stats_search_keywords()
+ * Changed keywords length for better accessibility on low resolution screens
+ *
  * Revision 1.4  2009/05/10 00:28:51  fplanque
  * serp rank logging
  *
