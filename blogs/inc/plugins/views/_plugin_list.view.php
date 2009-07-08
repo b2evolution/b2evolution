@@ -233,17 +233,19 @@ $Results->cols[] = array(
  */
 function plugin_results_td_actions($Plugin)
 {
+	global $dispatcher;
+	
 	$r = '';
 	if( $Plugin->status == 'enabled' )
 	{
-		$r .= action_icon( T_('Disable the plugin!'), 'deactivate', 'admin.php?ctrl=plugins&amp;action=disable_plugin&amp;plugin_ID='.$Plugin->ID );
+		$r .= action_icon( T_('Disable the plugin!'), 'deactivate', $dispatcher.'?ctrl=plugins&amp;action=disable_plugin&amp;plugin_ID='.$Plugin->ID );
 	}
 	elseif( $Plugin->status != 'broken' )
 	{
-		$r .= action_icon( T_('Enable the plugin!'), 'activate', 'admin.php?ctrl=plugins&amp;action=enable_plugin&amp;plugin_ID='.$Plugin->ID );
+		$r .= action_icon( T_('Enable the plugin!'), 'activate', $dispatcher.'?ctrl=plugins&amp;action=enable_plugin&amp;plugin_ID='.$Plugin->ID );
 	}
 	$r .= $Plugin->get_edit_settings_link();
-	$r .= action_icon( T_('Un-install this plugin!'), 'delete', 'admin.php?ctrl=plugins&amp;action=uninstall&amp;plugin_ID='.$Plugin->ID );
+	$r .= action_icon( T_('Un-install this plugin!'), 'delete', $dispatcher.'?ctrl=plugins&amp;action=uninstall&amp;plugin_ID='.$Plugin->ID );
 	return $r;
 }
 if( $current_User->check_perm( 'options', 'edit', false ) )
@@ -276,6 +278,9 @@ unset($Results); // free memory
 
 /*
  * $Log$
+ * Revision 1.4  2009/07/08 05:24:42  sam2kb
+ * Hardcoded "admin.php" replaced with $dispatcher
+ *
  * Revision 1.3  2009/03/08 23:57:45  fplanque
  * 2009
  *
