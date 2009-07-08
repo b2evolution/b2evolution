@@ -266,7 +266,7 @@ function stats_basedomain( $disp = true )
 /**
  * Displays keywords used for search leading to this page
  */
-function stats_search_keywords( $keyphrase )
+function stats_search_keywords( $keyphrase, $length = 30 )
 {
 	global $evo_charset;
 	
@@ -274,8 +274,11 @@ function stats_search_keywords( $keyphrase )
 	{
 		return '<span class="note">['.T_('n.a.').']</span>';
 	}
+	
+	// Save original string
+	$keyphrase_orig = $keyphrase;
 
-	if( strlen( $keyphrase ) > 30 )
+	if( strlen( $keyphrase ) > $length )
 	{
 		// TODO: dh> there are other places, where mb_substr should get used, when available!
 		//           Either create a generic wrapper (evo_substr()), or just use
@@ -287,18 +290,20 @@ function stats_search_keywords( $keyphrase )
 		if( function_exists('mb_substr') )
 		{	// 2-byte unicode strings are cropped to 15 characters
 			// When cropped with 'substr' usually end with junk character
-			$keyphrase = mb_substr( $keyphrase, 0, 30, $evo_charset ).'...';
+			$keyphrase = mb_substr( $keyphrase, 0, $length, $evo_charset ).'...';
 		}
 		else
 		{
-			$keyphrase = substr( $keyphrase, 0, 30 ).'...';	// word too long, crop it
+			$keyphrase = substr( $keyphrase, 0, $length ).'...';	// word too long, crop it
 		}
 	}
 
 	// Convert keyword encoding, some charsets are supported only in PHP 4.3.2 and later.
 	// This fixes encoding problem for Cyrillic keywords
 	// See http://forums.b2evolution.net/viewtopic.php?t=17431
-	return htmlentities( $keyphrase, ENT_COMPAT, $evo_charset );
+	$keyphrase = htmlentities( $keyphrase, ENT_COMPAT, $evo_charset );
+	
+	return '<span title="'.$keyphrase_orig.'">'.$keyphrase.'</span>';
 }
 
 
@@ -339,6 +344,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.11  2009/07/08 00:52:27  sam2kb
+ * stats_search_keywords() returns original (not cropped) string on hover
+ *
  * Revision 1.10  2009/03/08 23:57:45  fplanque
  * 2009
  *
