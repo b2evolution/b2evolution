@@ -493,7 +493,15 @@ function skin_include( $template_name, $params = array() )
 	I think in your use case, you need specific skins anyways (otherwise the plugin would just display "out of context" pages.
 	So selecting a PHP file should actually be a method of the Skin class and then,
 	your shopping cart enabled skins should just override the Skin class.
-	
+
+	yabs> Would you prefer to discus this here, on the dev list, some alternative ?
+				Currently the plugin can work with any skin ( shedloads of work to do still ).
+				It's custom disps that allow it to do that.
+				I'm 100% happy with a system that involves the user upload disps to their skin
+				( or use a customised skin ) If you think that would be a better answer?
+				My goal isn't to bloat the core, I'd like to think that other plugins will make use of these hooks,
+				once they realise they exist ... if they exist .... do they exist? O_o
+
 	2. The disp should only be handled by ONE SINGLE plugin. Correct?
 	So going through a loop here again is a bit of a waste.
 	It would make more sense, I think, for the event handler plugin ID
@@ -889,6 +897,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.67  2009/07/08 14:19:59  yabs
+ * doc
+ *
  * Revision 1.66  2009/07/06 22:55:11  fplanque
  * minor
  *
