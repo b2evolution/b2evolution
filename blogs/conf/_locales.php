@@ -41,10 +41,8 @@ $evo_charset = '';
  * Set this to a specific charset, to force this as {@link $io_charset I/O charset},
  * if the browser accepts it.
  *
- * Setting this to "utf-8" allows you to deliver all pages in this encoding.
- *
- * NOTE: make sure, that your PHP/MySQL setup supports this. You most probably need
- *       the mbstring PHP extension and MySQL 4.1 for this to work.
+ * Setting this to "utf-8" allows you to deliver all pages in this encoding even if the selected locale was not
+ * translated to iutf-8. Typically requires MBSTRING. Make sure, that your PHP/MySQL setup supports this.
  *
  * @global string
  */
@@ -52,19 +50,19 @@ $force_io_charset_if_accepted = '';
 
 
 /**
- * Request a specific charset for the client connection.
+ * This variable is include dhere for documentation only.
  *
- * This will issue a MySQL SET NAMES command. This must be a MySQL charset. Example: 'latin1' or 'utf8'
+ * If not empty, this will issue a MySQL SET NAMES command.
+ * This must be a MySQL charset. Example: 'latin1' or 'utf8'
+ * fp> Actually, DB::set_connection_charset(x,true) can convert from 'iso-8859-1' to 'latin1' for example.
  *
- * If left empty, the default charset will be used. The default here is
- * the default set your MySQL Server.
+ * If left empty, the default charset will be used. The default here is the default set your MySQL Server.
+ *
+ * NOTE: in any case, this will be OVERRIDEN by init_charsets() when initializing a locale.
  *
  * This should match the charset you are using internally in b2evolution.
  * This allows b2evo to work internally in a different charset from the database charset.
  * Example: b2evo will use latin1 whereas the database uses utf8.
- *
- * TODO: This gets overridden anyway with "SET NAMES $evo_charset" in init_charsets() and gets only used until that!
- *       So, does it make sense to configure it here? Or shouldn't it get overridden, if set explicitly here?
  */
 $db_config['connection_charset'] = '';
 

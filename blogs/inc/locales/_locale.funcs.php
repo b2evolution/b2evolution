@@ -964,12 +964,10 @@ function init_charsets( $req_io_charset )
 		}
 	}
 
-	if( isset($DB) // not available in /install/index.php
-			&& empty($db_config['connection_charset']) // do not override explicitly set one
-		)
-	{
-		// Set encoding for MySQL connection:
-		$DB->set_connection_charset( $evo_charset, true );
+	// Make sure the DB send us text in the same charset as $evo_charset (override whatever may have been set before)
+	if( isset($DB) ) // not available in /install/index.php
+	{	// Set encoding for MySQL connection:
+		$DB->set_connection_charset( $evo_charset );
 	}
 
 	$Debuglog->add( 'evo_charset: '.$evo_charset, 'locale' );
@@ -1045,6 +1043,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.28  2009/07/09 22:57:32  fplanque
+ * Fixed init of connection_charset, especially during install.
+ *
  * Revision 1.27  2009/06/23 07:52:02  tblue246
  * Add missing $param to TS_()
  *

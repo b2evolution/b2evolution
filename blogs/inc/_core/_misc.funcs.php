@@ -593,12 +593,12 @@ function convert_chars( $content, $flag = 'html' )
 function evo_strlen( $string )
 {
 	global $current_charset;
-	
+
 	if( $current_charset != 'iso-8859-1' && $current_charset != '' && function_exists('mb_strlen') )
 	{
 		return mb_strlen( $string, $current_charset );
 	}
-	
+
 	return strlen($string);
 }
 
@@ -614,17 +614,17 @@ function evo_strlen( $string )
 function evo_substr( $string, $start = 0, $length = '#' )
 {
 	global $current_charset;
-	
+
 	if( $length == '#' )
 	{
 		$length = evo_strlen($string);
 	}
-	
+
 	if( $current_charset != 'iso-8859-1' && $current_charset != '' && function_exists('mb_substr') )
 	{
 		return mb_substr( $string, $start, $length, $current_charset );
 	}
-	
+
 	return substr( $string, $start, $length );
 }
 
@@ -3481,6 +3481,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.116  2009/07/09 22:57:32  fplanque
+ * Fixed init of connection_charset, especially during install.
+ *
  * Revision 1.115  2009/07/08 02:38:54  sam2kb
  * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
  *

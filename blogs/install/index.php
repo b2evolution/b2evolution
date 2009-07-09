@@ -73,12 +73,13 @@ else
 // Activate default locale:
 locale_activate( $default_locale );
 
-init_charsets($current_charset);
+init_charsets( $current_charset );
 
 $timestamp = time() - 120; // We start dates 2 minutes ago because their dates increase 1 second at a time and we want everything to be visible when the user watches the blogs right after install :P
 
 
-switch( $action ) {
+switch( $action )
+{
 	case 'evoupgrade':
 		$title = T_('Upgrade from a previous version');
 		break;
@@ -101,7 +102,6 @@ switch( $action ) {
 
 	default:
 		$title = '';
-
 }
 
 header('Content-Type: text/html; charset='.$io_charset);
@@ -145,10 +145,17 @@ block_open();
 
 if( $config_is_done || (($action != 'start') && ($action != 'default') && ($action != 'conf')) )
 { // Connect to DB:
+
 	$tmp_evoconf_db = $db_config;
+
 	// We want a friendly message if we can't connect:
 	$tmp_evoconf_db['halt_on_error'] = false;
 	$tmp_evoconf_db['show_errors'] = false;
+
+	// Make sure we use the proper charset:
+	$tmp_evoconf_db['connection_charset'] = $evo_charset;
+
+	// CONNECT TO DB:
 	$DB = new DB( $tmp_evoconf_db );
 	unset($tmp_evoconf_db);
 
@@ -360,6 +367,7 @@ to
 			// Guess baseurl:
 			// TODO: dh> IMHO HTTP_HOST would be a better default, because it's what the user accesses for install.
 			//       fp, please change it, if it's ok. SERVER_NAME might get used if HTTP_HOST is not given, but that shouldn't be the case normally.
+			// fp> ok for change and test after first 3.x-stable release
 			$baseurl = 'http://'.( isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'yourserver.com' );
 			if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
 				$baseurl .= ':'.$_SERVER['SERVER_PORT'];
@@ -569,31 +577,32 @@ to
 		}
 
 		// Uninstall Plugins
-// TODO: fp>> I don't trust the plugins to uninstall themselves correctly. There will be tons of lousy poorly written plugins. All I trust them to do is to crash the uninstall procedure. We want a hardcore brute force uninsall! and most users "may NOT want" to even think about "ma-nu-al-ly" removing something from their DB.
-/*
-		$DB->show_errors = $DB->halt_on_error = false;
-		$Plugins = new Plugins();
-		$DB->show_errors = $DB->halt_on_error = true;
-		$at_least_one_failed = false;
-		foreach( $Plugins->get_list_by_event( 'Uninstall' ) as $l_Plugin )
-		{
-			$success = $Plugins->call_method( $l_Plugin->ID, 'Uninstall', $params = array( 'unattended' => true ) );
-			if( $success === false )
-			{
-				echo "Failed un-installing plugin $l_Plugin->classname (ID $l_Plugin->ID)...<br />\n";
+		// TODO: fp>> I don't trust the plugins to uninstall themselves correctly. There will be tons of lousy poorly written plugins. All I trust them to do is to crash the uninstall procedure. We want a hardcore brute force uninsall! and most users "may NOT want" to even think about "ma-nu-al-ly" removing something from their DB.
+		/*
+				$DB->show_errors = $DB->halt_on_error = false;
+				$Plugins = new Plugins();
+				$DB->show_errors = $DB->halt_on_error = true;
 				$at_least_one_failed = false;
-			}
-			else
-			{
-				echo "Uninstalled plugin $l_Plugin->classname (ID $l_Plugin->ID)...<br />\n";
-			}
-		}
-		if( $at_least_one_failed )
-		{
-			echo "You may want to manually remove left files or DB tables from the failed plugin(s).<br />\n";
-		}
-		$DB->show_errors = $DB->halt_on_error = true;
-*/
+				foreach( $Plugins->get_list_by_event( 'Uninstall' ) as $l_Plugin )
+				{
+					$success = $Plugins->call_method( $l_Plugin->ID, 'Uninstall', $params = array( 'unattended' => true ) );
+					if( $success === false )
+					{
+						echo "Failed un-installing plugin $l_Plugin->classname (ID $l_Plugin->ID)...<br />\n";
+						$at_least_one_failed = false;
+					}
+					else
+					{
+						echo "Uninstalled plugin $l_Plugin->classname (ID $l_Plugin->ID)...<br />\n";
+					}
+				}
+				if( $at_least_one_failed )
+				{
+					echo "You may want to manually remove left files or DB tables from the failed plugin(s).<br />\n";
+				}
+				$DB->show_errors = $DB->halt_on_error = true;
+		*/
+
 		db_delete();
 		?>
 		<p><?php echo T_('Reset done!')?></p>
@@ -623,7 +632,7 @@ block_close();
 	<!-- InstanceBeginEditable name="BodyFoot" -->
 	<?php
 		// We need to manually call debug_info since there is no shutdown function registered during the install process.
-		debug_info(); // output debug info if requested
+		// debug_info( true ); // force output of debug info
 		// the following comment gets checked in the automatic install script of demo.b2evolution.net:
 ?>
 <!-- b2evo-install-end -->
@@ -635,6 +644,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.167  2009/07/09 22:57:32  fplanque
+ * Fixed init of connection_charset, especially during install.
+ *
  * Revision 1.166  2009/07/06 23:52:25  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *

@@ -384,10 +384,9 @@ class DB
 			$this->select($this->dbname);
 		}
 
-
 		if( !empty($params['connection_charset']) )
 		{	// Specify which charset we are using on the client:
-			$this->set_connection_charset($params['connection_charset']);
+			$this->set_connection_charset( $params['connection_charset'] );
 		}
 
 		/*
@@ -1480,9 +1479,11 @@ class DB
 	 * @param boolean Use the "regular charset => mysql charset map"?
 	 * @return boolean true on success, false on failure
 	 */
-	function set_connection_charset( $charset, $use_map = false )
+	function set_connection_charset( $charset, $use_map = true )
 	{
 		global $Debuglog;
+
+		// pre_dump( 'set_connection_charset', $charset );
 
 		/**
 		 * This is taken from phpMyAdmin (libraries/select_lang.lib.php).
@@ -1515,13 +1516,8 @@ class DB
 
 		$charset = strtolower($charset);
 
-		if( $use_map )
-		{
-			if( ! isset($mysql_charset_map[$charset]) )
-			{
-				return false;
-			}
-
+		if( $use_map && isset($mysql_charset_map[$charset]) )
+		{	// We want to use the map and we have a translation available:
 			$charset = $mysql_charset_map[$charset];
 		}
 
@@ -1564,6 +1560,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.25  2009/07/09 22:57:32  fplanque
+ * Fixed init of connection_charset, especially during install.
+ *
  * Revision 1.24  2009/04/22 19:43:02  blueyed
  * debug_get_rows_table: use get_row (and properly for HEAD, where it does not default to NULL/next row (fixing r1.23)
  *
