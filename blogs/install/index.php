@@ -513,6 +513,7 @@ to
 		{
 			echo '<div class="error"><p class="error">'.sprintf( T_('In order to install b2evolution with the %s locale, your MySQL needs to support the %s connection charset.').' (SET NAMES %s)',
 				$current_locale, $evo_charset, $expected_connection_charset ).'</p></div>';
+			// sam2kb> TODO: If something is not supported we can display a message saying "do this and that, enable extension X etc. etc... or switch to a better hosting".
 			break;
 		}
 
@@ -655,6 +656,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.169  2009/07/09 23:45:43  fplanque
+ * doc
+ *
  * Revision 1.168  2009/07/09 23:23:41  fplanque
  * Check that DB supports proper charset before installing.
  *
