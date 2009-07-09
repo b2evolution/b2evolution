@@ -377,7 +377,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				// Check that slug is not empty. Mind you, in WP it CAN happen!
 				if( empty( $post['slug'] ) )
 				{
-					$post['slug'] = preg_replace( '[^A-Za-z0-9]', '-', $post['post_id'].'-'.$post['title'] );
+					$post['slug'] = preg_replace( '/[^a-z0-9]/i', '-', $post['post_id'].'-'.$post['title'] );
 					echo '<br /> ** WARNING: generated automatic slug: '.$post['slug'];
 				}
 
@@ -577,6 +577,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <?php
 /*
  * $Log$
+ * Revision 1.9  2009/07/09 12:12:49  tblue246
+ * a) RegExp delimiter *is* needed. b) Removed uppercase A-Z range and made RegExp case-insensitive.
+ *
  * Revision 1.8  2009/07/09 05:07:08  sam2kb
  * minor
  *
