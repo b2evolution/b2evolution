@@ -219,7 +219,7 @@ if( $split_engines )
 $Results->cols[] = array(
 		'th' => T_('Search keywords'),
 		'order' => 'keyp_phrase',
-		'td' => '%stats_search_keywords( #keyp_phrase#, 40 )%',
+		'td' => '%stats_search_keywords( #keyp_phrase#, 45 )%',
 		'total' => $sql_count.' '.T_('keyphrases'),
 	);
 
@@ -271,6 +271,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.4  2009/07/09 00:11:18  fplanque
+ * minor
+ *
  * Revision 1.3  2009/07/08 01:45:48  sam2kb
  * Added param $length to stats_search_keywords()
  * Changed keywords length for better accessibility on low resolution screens

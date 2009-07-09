@@ -67,8 +67,6 @@ if( !empty($Goal->goal_redir_url) )
 	header( 'Location: '.$redir_url, true, 302 ); // explictly setting the status is required for (fast)cgi
 	// TODO: dh> str_repeat won't be enough (when gzipped), see http://core.trac.wordpress.org/ticket/8942
 	//           should be probably a more general function and get used in e.g. bad_request_die(), too (if necessary)
-	// fp> I don't think the ref'd url is relevant to the current case.
-	// dh> Why? It's exactly about that problem AFAICS. gzipping 1024 spaces will lead to a page smaller than 512(?) bytes again..
 	echo str_repeat( ' ', 1024 );
 	flush();
 	// At this point Firefox 2 will redirect without waiting for the end of the page, but IE7 will not :/
@@ -108,6 +106,9 @@ $DB->query( $sql );
 
 /*
  * $Log$
+ * Revision 1.7  2009/07/09 00:11:18  fplanque
+ * minor
+ *
  * Revision 1.6  2009/07/07 23:09:26  blueyed
  * doc
  *

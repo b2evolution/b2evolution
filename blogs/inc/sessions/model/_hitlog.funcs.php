@@ -266,7 +266,7 @@ function stats_basedomain( $disp = true )
 /**
  * Displays keywords used for search leading to this page
  */
-function stats_search_keywords( $keyphrase, $length = 30 )
+function stats_search_keywords( $keyphrase, $length = 45 )
 {
 	global $evo_charset;
 	
@@ -336,6 +336,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.14  2009/07/09 00:11:18  fplanque
+ * minor
+ *
  * Revision 1.13  2009/07/08 02:38:55  sam2kb
  * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
  *

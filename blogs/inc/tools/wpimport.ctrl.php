@@ -377,7 +377,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				// Check that slug is not empty. Mind you, in WP it CAN happen!
 				if( empty( $post['slug'] ) )
 				{
-					$post['slug'] = preg_replace( '[^A-Za-z0-9]', '-', $post['post_id'].'-'.$post['title'] );
+					$post['slug'] = preg_replace( '¤[^A-Za-z0-9]¤', '-', $post['post_id'].'-'.$post['title'] );
 					echo '<br /> ** WARNING: generated automatic slug: '.$post['slug'];
 				}
 
@@ -574,3 +574,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 </body>
 </html>
 
+/*
+ * $Log$
+ * Revision 1.7  2009/07/09 00:11:19  fplanque
+ * minor
+ *
+ */
