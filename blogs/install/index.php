@@ -506,6 +506,17 @@ to
 
 
 	case 'newdb':
+
+		// fp> TODO: this test should probably be made more generic and applied to upgrade too.
+		$expected_connection_charset = $DB->php_to_mysql_charmap($evo_charset);
+		if( $DB->connection_charset != $expected_connection_charset )
+		{
+			echo '<div class="error"><p class="error">'.sprintf( T_('In order to install b2evolution with the %s locale, your MySQL needs to support the %s connection charset.').' (SET NAMES %s)',
+				$current_locale, $evo_charset, $expected_connection_charset ).'</p></div>';
+			break;
+		}
+
+
 		install_newdb();
 		break;
 
@@ -644,6 +655,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.168  2009/07/09 23:23:41  fplanque
+ * Check that DB supports proper charset before installing.
+ *
  * Revision 1.167  2009/07/09 22:57:32  fplanque
  * Fixed init of connection_charset, especially during install.
  *

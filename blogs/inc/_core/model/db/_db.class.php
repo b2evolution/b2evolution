@@ -1470,20 +1470,12 @@ class DB
 
 
 	/**
-	 * Set the charset of the connection.
-	 *
-	 * WARNING: this will fail on MySQL 3.23
-	 *
-	 * @staticvar array "regular charset => mysql charset map"
-	 * @param string Charset
-	 * @param boolean Use the "regular charset => mysql charset map"?
-	 * @return boolean true on success, false on failure
+	 * @param string PHP charset
+	 * @return string MYSQL charset or unchanged
 	 */
-	function set_connection_charset( $charset, $use_map = true )
+	function php_to_mysql_charmap( $php_charset )
 	{
-		global $Debuglog;
-
-		// pre_dump( 'set_connection_charset', $charset );
+		$php_charset = strtolower($php_charset);
 
 		/**
 		 * This is taken from phpMyAdmin (libraries/select_lang.lib.php).
@@ -1514,11 +1506,36 @@ class DB
 				'windows-1257' => 'cp1257',
 			);
 
+		if( isset($mysql_charset_map[$php_charset]) )
+		{
+			return $mysql_charset_map[$php_charset];
+		}
+
+		// for lack of a better answer:
+		return $php_charset;
+	}
+
+	/**
+	 * Set the charset of the connection.
+	 *
+	 * WARNING: this will fail on MySQL 3.23
+	 *
+	 * @staticvar array "regular charset => mysql charset map"
+	 * @param string Charset
+	 * @param boolean Use the "regular charset => mysql charset map"?
+	 * @return boolean true on success, false on failure
+	 */
+	function set_connection_charset( $charset, $use_map = true )
+	{
+		global $Debuglog;
+
+		// pre_dump( 'set_connection_charset', $charset );
+
 		$charset = strtolower($charset);
 
-		if( $use_map && isset($mysql_charset_map[$charset]) )
-		{	// We want to use the map and we have a translation available:
-			$charset = $mysql_charset_map[$charset];
+		if( $use_map )
+		{	// We want to use the map
+			$charset = $this->php_to_mysql_charmap( $charset );
 		}
 
 		$r = true;
@@ -1560,6 +1577,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.26  2009/07/09 23:23:40  fplanque
+ * Check that DB supports proper charset before installing.
+ *
  * Revision 1.25  2009/07/09 22:57:32  fplanque
  * Fixed init of connection_charset, especially during install.
  *
