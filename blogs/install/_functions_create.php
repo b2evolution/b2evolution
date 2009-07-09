@@ -225,7 +225,7 @@ function create_default_data()
 	// added in Phoenix-Beta
 	echo 'Creating default file types... ';
 	// Contribs: feel free to add more types here...
-	// TODO: dh> shouldn't they get localized to the app's default locale?
+	// TODO: dh> shouldn't they get localized to the app's default locale? fp> ftyp_name, yes
 	$DB->query( "INSERT INTO T_filetypes
 			(ftyp_ID, ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed)
 		VALUES
@@ -852,6 +852,9 @@ If needed, a skin can format info pages differently from regular posts.");
 
 /*
  * $Log$
+ * Revision 1.266  2009/07/09 22:56:02  fplanque
+ * doc
+ *
  * Revision 1.265  2009/07/02 17:32:59  fplanque
  * only activate ONE locale at install time.
  *

@@ -310,7 +310,7 @@ $cookie_session = 'cookie'.$instance_name.'session';
  *
  * Value in seconds, set this to 0 if you wish to use non permanent cookies (erased when browser is closed).
  * Default: time() + 31536000 (one year from now)
- * 
+ *
  * @global int $cookie_expires
  */
 $cookie_expires = time() + 31536000;
@@ -321,7 +321,7 @@ $cookie_expires = time() + 31536000;
  * Note: user sessions use different settings (config in admin)
  *
  * Default: time() - 86400 (24 hours ago)
- * 
+ *
  * @global int $cookie_expired
  */
 $cookie_expired = time() - 86400;
@@ -421,7 +421,7 @@ $skins_url = $baseurl.$skins_subdir;     // You should not need to change this
 /**
  * Location of the admin interface dispatcher
  */
-$dispatcher = 'admin.php';
+$dispatcher = 'admin.php'; // DEPRECATED
 $admin_url = $baseurl.$dispatcher;
 
 
@@ -535,7 +535,7 @@ $force_regexp_dirname = '';
  * XMLRPC logging. Set this to 1 to log XMLRPC calls received by this server (into /xmlsrv/xmlrpc.log).
  *
  * Default: 0
- * 
+ *
  * @global int $debug_xmlrpc_logging
  */
 $debug_xmlrpc_logging = 0;
@@ -549,7 +549,7 @@ $cron_timeout_delay = 1800; // 30 minutes
 /**
  * Enable a workaround to allow accessing posts with URL titles ending with
  * a dash (workaround for old bug).
- * 
+ *
  * In b2evolution v2.4.5 new tag URLs were introduced: You could choose
  * to have tag URLs ending with a dash. This lead to problems with post
  * URL titles accidentially ending with a dash (today, URL titles cannot
