@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 3\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2009-07-07 13:46+0200\n"
-"PO-Revision-Date: 2009-07-07 21:38-0500\n"
+"PO-Revision-Date: 2009-07-10 01:16-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -10626,13 +10626,13 @@ msgstr "Лимит памяти memory_limit маленький. Некотор�
 #: ..\..\..\inc\tools\system.ctrl.php:373
 #: ..\..\..\inc\tools\system.ctrl.php:388
 msgid "Loaded"
-msgstr "Загружен"
+msgstr "Загружено"
 
 #: ..\..\..\inc\tools\system.ctrl.php:361
 #: ..\..\..\inc\tools\system.ctrl.php:373
 #: ..\..\..\inc\tools\system.ctrl.php:388
 msgid "Not loaded"
-msgstr "Не загружен"
+msgstr "Не загружено"
 
 #: ..\..\..\inc\tools\system.ctrl.php:361
 msgid "PHP mbstring extension"
@@ -10656,7 +10656,7 @@ msgstr "PHP IMAP расширение"
 
 #: ..\..\..\inc\tools\system.ctrl.php:391
 msgid "You will not be able to use the Blog  by email feature of b2evolution. Enable the IMAP extension in your php.ini file or ask your hosting provider about it."
-msgstr "Вы не сможете автоматически генерировать миниатюры для изображений. Активируйте расширение gd2 в вашем php.ini файле или попросите провайдера вашего хостинга сделать это."
+msgstr "Вы не сможете использовать опцию \"Блог по email\". Активируйте расширение IMAP в вашем php.ini файле или попросите провайдера вашего хостинга сделать это."
 
 #: ..\..\..\inc\tools\system.ctrl.php:410
 msgid "GD Library (image handling)"
@@ -13353,7 +13353,7 @@ msgstr "Смотреть архивы по неделям"
 
 #: ..\..\..\plugins\_auto_p.plugin.php:54
 msgid "Automatic &lt;P&gt; and &lt;BR&gt; tags"
-msgstr "Автоматические теги &lt;P&gt; и &lt;BR&gt;"
+msgstr "Автоматически добавляет теги &lt;P&gt; и &lt;BR&gt;"
 
 #: ..\..\..\plugins\_auto_p.plugin.php:55
 msgid ""
@@ -13630,11 +13630,11 @@ msgstr "**жирный** \\наклонный\\ //наклонный// __под�
 
 #: ..\..\..\plugins\_ping_b2evonet.plugin.php:67
 msgid "Ping b2evolution.net"
-msgstr "Пинговать b2evolution.net"
+msgstr "Пинг b2evolution.net"
 
 #: ..\..\..\plugins\_ping_b2evonet.plugin.php:68
 msgid "Ping the b2evolution.net site"
-msgstr "Пинговать сайт b2evolution.net"
+msgstr "Пингует сайт b2evolution.net"
 
 #: ..\..\..\plugins\_ping_b2evonet.plugin.php:69
 msgid "Pings the b2evolution.net site to include your post in the list of recently updated blogs."
