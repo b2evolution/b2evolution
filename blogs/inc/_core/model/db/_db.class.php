@@ -1470,6 +1470,8 @@ class DB
 
 
 	/**
+	 * Convert a PHP charset to its MySQL equivalent.
+	 *
 	 * @param string PHP charset
 	 * @return string MYSQL charset or unchanged
 	 */
@@ -1577,6 +1579,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.27  2009/07/10 10:54:06  tblue246
+ * Doc
+ *
  * Revision 1.26  2009/07/09 23:23:40  fplanque
  * Check that DB supports proper charset before installing.
  *

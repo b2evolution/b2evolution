@@ -58,7 +58,7 @@ $force_io_charset_if_accepted = '';
  *
  * If left empty, the default charset will be used. The default here is the default set your MySQL Server.
  *
- * NOTE: in any case, this will be OVERRIDEN by init_charsets() when initializing a locale.
+ * NOTE: in any case, this will be OVERRIDDEN by init_charsets() when initializing a locale.
  *
  * This should match the charset you are using internally in b2evolution.
  * This allows b2evo to work internally in a different charset from the database charset.
