@@ -798,9 +798,17 @@ function load_db_schema()
 	global $schema_queries;
 	global $modules, $inc_path;
 
+	global $db_storage_charset, $DB;
+	if( empty($db_storage_charset) )
+	{	// If no specific charset has been requested for datstorage, use the one of the current connection (optimize for speed - no conversions)
+		$db_storage_charset = $DB->connection_charset;
+	}
+	//pre_dump( 'db_storage_charset', $db_storage_charset );
+
 	// Load modules:
 	foreach( $modules as $module )
 	{
+		echo 'Loading: '.$module.'/model/_'.$module.'.install.php<br />';
 		require_once $inc_path.$module.'/model/_'.$module.'.install.php';
 	}
 
@@ -809,6 +817,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.67  2009/07/10 19:48:02  fplanque
+ * clean up a little bit
+ *
  * Revision 1.66  2009/07/10 18:41:34  fplanque
  * do NOT hide password warning from developers.
  * They need to know what teh rest of the world sees.

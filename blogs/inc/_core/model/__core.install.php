@@ -29,9 +29,10 @@
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 
-global $expected_connection_charset, $db_storage_charset;
+global $db_storage_charset;
+// fp> TODO: upgrade procedure should check for proper charset. (and for ENGINE too)
+// fp> TODO: we should actually use a DEFAULT COLLATE, maybe have a DD::php_to_mysql_collate( $php_charset ) -> returning a Mysql collation
 
-$db_storage_charset = $expected_connection_charset;
 
 /**
  * The b2evo database scheme.
@@ -579,6 +580,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.23  2009/07/10 19:48:01  fplanque
+ * clean up a little bit
+ *
  * Revision 1.22  2009/07/10 17:18:27  sam2kb
  * minor
  *
