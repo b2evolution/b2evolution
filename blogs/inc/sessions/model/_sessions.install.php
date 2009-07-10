@@ -51,7 +51,7 @@ $schema_queries['T_sessions'] = array(
 			sess_data      MEDIUMBLOB DEFAULT NULL,
 			PRIMARY KEY      ( sess_ID ),
 		  KEY sess_user_ID (sess_user_ID)
-		) DEFAULT CHARSET=$db_storage_charset" );
+		) DEFAULT CHARSET = $db_storage_charset" );
 		// NOTE: sess_lastseen is only relevant/used by Sessions class (+ stats) and results in a quite large index (file size wise)
 		// NOTE: sess_data is (MEDIUM)BLOB because e.g. serialize() does not completely convert binary data to text
 
@@ -65,7 +65,7 @@ $schema_queries['T_basedomains'] = array(
 			PRIMARY KEY     (dom_ID),
 			UNIQUE dom_name (dom_name),
 			INDEX dom_type  (dom_type)
-		) DEFAULT CHARSET=$db_storage_charset" );
+		) DEFAULT CHARSET = $db_storage_charset" );
 
 // fp> TODO: this table is crap. It has to go.
 $schema_queries['T_useragents'] = array(
@@ -76,7 +76,7 @@ $schema_queries['T_useragents'] = array(
 			agnt_type      ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL ,
 			PRIMARY KEY (agnt_ID),
 			INDEX agnt_type ( agnt_type )
-		) DEFAULT CHARSET=$db_storage_charset" );
+		) DEFAULT CHARSET = $db_storage_charset" );
 
 $schema_queries['T_track__keyphrase'] = array(
 		'Creating table for Hit-Logs',
@@ -85,7 +85,7 @@ $schema_queries['T_track__keyphrase'] = array(
 			keyp_phrase  VARCHAR( 255 ) NOT NULL,
 			PRIMARY KEY        ( keyp_ID ),
 			UNIQUE keyp_phrase ( keyp_phrase )
-		) DEFAULT CHARSET=$db_storage_charset" );
+		) DEFAULT CHARSET = $db_storage_charset" );
 
 
 $schema_queries['T_hitlog'] = array(
@@ -110,7 +110,7 @@ $schema_queries['T_hitlog'] = array(
 			INDEX hit_referer_dom_ID ( hit_referer_dom_ID ),
 			INDEX hit_remote_addr    ( hit_remote_addr ),
 			INDEX hit_sess_ID        ( hit_sess_ID )
-		) DEFAULT CHARSET=$db_storage_charset" );
+		) DEFAULT CHARSET = $db_storage_charset" );
 		// Note: hit_remote_addr is used for goal matching stats
 		// fp> needed? 			INDEX hit_keyphrase_keyp_ID( hit_keyphrase_keyp_ID ),
 		// dh> There appear too many indexes here, which makes inserting hits rather
@@ -136,7 +136,7 @@ $schema_queries['T_track__goal'] = array(
 		  goal_default_value double default NULL,
 		  PRIMARY KEY (goal_ID),
 		  UNIQUE KEY goal_key (goal_key)
-		) DEFAULT CHARSET=$db_storage_charset" );
+		) DEFAULT CHARSET = $db_storage_charset" );
 
 $schema_queries['T_track__goalhit'] = array(
 		'Creating goal hits table',
@@ -148,11 +148,14 @@ $schema_queries['T_track__goalhit'] = array(
 		  PRIMARY KEY  (ghit_ID),
 		  KEY ghit_goal_ID (ghit_goal_ID),
 		  KEY ghit_hit_ID (ghit_hit_ID)
-   ) DEFAULT CHARSET=$db_storage_charset" );
+   ) DEFAULT CHARSET = $db_storage_charset" );
 
 
 /*
  * $Log$
+ * Revision 1.10  2009/07/10 17:18:28  sam2kb
+ * minor
+ *
  * Revision 1.9  2009/07/10 16:30:16  sam2kb
  * b2evo tables created with DEFAULT CHARSET based on selected locale
  *
