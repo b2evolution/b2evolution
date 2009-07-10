@@ -192,7 +192,7 @@ if( ($version_main * 100 + $version_minor) < 401 )
 if( $req_errors = install_validate_requirements() )
 {
 	echo '<div class="error">';
-	echo '<p class="error"><strong>'.'b2evolution cannot be installed, because of the following errors:'.'</strong></p>';
+	echo '<p class="error"><strong>'.T_('b2evolution cannot be installed, because of the following errors:').'</strong></p>';
 	echo '<ul class="error"><li>'.implode( '</li><li>', $req_errors ).'</li></ul>';
 	echo '</div>';
 	die;
@@ -245,7 +245,7 @@ switch( $action )
 
 			if( empty( $file_loaded ) )
 			{ // This should actually never happen, just in case...
-				printf( '<div class="error"><p class="error">Could not load original conf file [%s]. Is it missing?</p></div>', $conf_filepath );
+				echo '<div class="error"><p class="error">'.sprintf( T_('Could not load original conf file [%s]. Is it missing?'), $conf_filepath ).'</p></div>';
 				break;
 			}
 
@@ -346,12 +346,9 @@ switch( $action )
 
 			if( $config_is_done && $allow_evodb_reset != 1 )
 			{
-				echo '<p><strong>Resetting the base configuration is currently disabled for security reasons.</strong></p>';
-				echo '<p>To enable it, please go to the /conf/_basic_config.php file and change:</p>
-<pre>$allow_evodb_reset = 0;</pre>
-to
-<pre>$allow_evodb_reset = 1;</pre>
-<p>Then reload this page and a reset option will appear.</p>';
+				echo '<p><strong>'.T_('Resetting the base configuration is currently disabled for security reasons.').'</strong></p>';
+				echo '<p>'.sprintf( T_('To enable it, please go to the %s file and change: %s to %s'), '/conf/_basic_config.php', '<pre>$allow_evodb_reset = 0;</pre>', '<pre>$allow_evodb_reset = 1;</pre>' ).'</p>';
+				echo '<p>'.T_('Then reload this page and a reset option will appear.').'</p>';
 				block_close();
 				break;
 			}
@@ -387,8 +384,7 @@ to
 
 				<fieldset>
 					<legend><?php echo T_('Database you want to install into') ?></legend>
-					<p class="note">b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installating b2evolution and
-					provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.</p>
+					<p class="note"><?php echo T_('b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installating b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.') ?></p>
 					<?php
 						form_text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ), 120 );
 						form_text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ), 100);
@@ -556,11 +552,8 @@ to
 		if( $allow_evodb_reset != 1 )
 		{
 			echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.');
-			echo( '<p>To enable it, please go to the /conf/_basic_config.php file and change:</p>
-<pre>$allow_evodb_reset = 0;</pre>
-to
-<pre>$allow_evodb_reset = 1;</pre>
-<p>Then reload this page and a reset option will appear.</p>');
+			echo '<p>'.sprintf( T_('To enable it, please go to the %s file and change: %s to %s'), '/conf/_basic_config.php', '<pre>$allow_evodb_reset = 0;</pre>', '<pre>$allow_evodb_reset = 1;</pre>' ).'</p>';
+			echo '<p>'.T_('Then reload this page and a reset option will appear.').'</p>';
 			break;
 		}
 		if( ! param('confirmed', 'integer', 1) )
@@ -656,6 +649,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.170  2009/07/10 06:49:10  sam2kb
+ * Made some strings translatable
+ *
  * Revision 1.169  2009/07/09 23:45:43  fplanque
  * doc
  *
