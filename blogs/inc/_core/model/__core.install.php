@@ -64,7 +64,7 @@ $schema_queries = array(
 			grp_perm_templates TINYINT NOT NULL DEFAULT 0,
 			grp_perm_files enum('none','view','add','edit','all') NOT NULL default 'none',
 			PRIMARY KEY grp_ID (grp_ID)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_settings' => array(
 		'Creating table for Settings',
@@ -72,7 +72,7 @@ $schema_queries = array(
 			set_name VARCHAR( 30 ) NOT NULL ,
 			set_value VARCHAR( 255 ) NULL ,
 			PRIMARY KEY ( set_name )
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_global__cache' => array(
 		'Creating table for Caches',
@@ -80,7 +80,7 @@ $schema_queries = array(
 			cach_name VARCHAR( 30 ) NOT NULL ,
 			cach_cache MEDIUMBLOB NULL ,
 			PRIMARY KEY ( cach_name )
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_users' => array(
 		'Creating table for Users',
@@ -113,7 +113,7 @@ $schema_queries = array(
 			PRIMARY KEY user_ID (user_ID),
 			UNIQUE user_login (user_login),
 			KEY user_grp_ID (user_grp_ID)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_users__fielddefs' => array(
 		'Creating table for User field definitions',
@@ -122,7 +122,7 @@ $schema_queries = array(
 			ufdf_type char(8) NOT NULL,
 			ufdf_name varchar(255) NOT NULL,
 			PRIMARY KEY (ufdf_ID)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_users_fields' => array(
 		'Creating table for User fields',
@@ -132,7 +132,7 @@ $schema_queries = array(
 		  uf_ufdf_ID int(10) unsigned NOT NULL,
 		  uf_varchar varchar(255) NOT NULL,
 		  PRIMARY KEY (uf_ID)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_skins__skin' => array(
 		'Creating table for installed skins',
@@ -144,7 +144,7 @@ $schema_queries = array(
 				PRIMARY KEY skin_ID (skin_ID),
 				UNIQUE skin_folder( skin_folder ),
 				KEY skin_name( skin_name )
-			) DEFAULT CHARSET = $db_storage_charset" ),
+			) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_skins__container' => array(
 		'Creating table for skin containers',
@@ -152,7 +152,7 @@ $schema_queries = array(
 				sco_skin_ID   int(10) unsigned      NOT NULL,
 				sco_name      varchar(40)           NOT NULL,
 				PRIMARY KEY (sco_skin_ID, sco_name)
-			) DEFAULT CHARSET = $db_storage_charset" ),
+			) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_blogs' => array(
 		'Creating table for Blogs',
@@ -185,7 +185,7 @@ $schema_queries = array(
 			blog_UID             VARCHAR(20),
 			PRIMARY KEY blog_ID (blog_ID),
 			UNIQUE KEY blog_urlname (blog_urlname)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_coll_settings' => array(
 		'Creating collection settings table',
@@ -194,7 +194,7 @@ $schema_queries = array(
 			cset_name    VARCHAR( 30 ) NOT NULL,
 			cset_value   VARCHAR( 255 ) NULL,
 			PRIMARY KEY ( cset_coll_ID, cset_name )
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_widget' => array(
 		'Creating components table',
@@ -209,7 +209,7 @@ $schema_queries = array(
 			wi_params     TEXT NULL,
 			PRIMARY KEY ( wi_ID ),
 			UNIQUE wi_order( wi_coll_ID, wi_sco_name, wi_order )
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_categories' => array(
 		'Creating table for Categories',
@@ -226,7 +226,7 @@ $schema_queries = array(
 			KEY cat_blog_ID (cat_blog_ID),
 			KEY cat_parent_ID (cat_parent_ID),
 			KEY cat_order (cat_order)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__item' => array(
 		'Creating table for Posts',
@@ -292,7 +292,7 @@ $schema_queries = array(
 			postcat_cat_ID int(11) unsigned NOT NULL,
 			PRIMARY KEY postcat_pk (postcat_post_ID,postcat_cat_ID),
 			UNIQUE catpost ( postcat_cat_ID, postcat_post_ID )
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_comments' => array(	// Note: pingbacks no longer supported, but previous pingbacks are to be preserved in the DB
 		'Creating table for Comments',
@@ -318,7 +318,7 @@ $schema_queries = array(
 			KEY comment_post_ID (comment_post_ID),
 			KEY comment_date (comment_date),
 			KEY comment_type (comment_type)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_locales' => array(
 		'Creating table for Locales',
@@ -333,7 +333,7 @@ $schema_queries = array(
 			loc_priority tinyint(4) UNSIGNED NOT NULL default '0',
 			loc_enabled tinyint(4) NOT NULL default '1',
 			PRIMARY KEY loc_locale( loc_locale )
-		) DEFAULT CHARSET = $db_storage_charset COMMENT='saves available locales'
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset COMMENT='saves available locales'
 		" ),
 
 	'T_antispam' => array(
@@ -344,7 +344,7 @@ $schema_queries = array(
 			aspm_source enum( 'local','reported','central' ) NOT NULL default 'reported',
 			PRIMARY KEY aspm_ID (aspm_ID),
 			UNIQUE aspm_string (aspm_string)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_usersettings' => array(
 		'Creating user settings table',
@@ -353,7 +353,7 @@ $schema_queries = array(
 			uset_name    VARCHAR( 30 ) NOT NULL,
 			uset_value   VARCHAR( 255 ) NULL,
 			PRIMARY KEY ( uset_user_ID, uset_name )
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__prerendering' => array(
 		'Creating item prerendering cache table',
@@ -364,7 +364,7 @@ $schema_queries = array(
 			itpr_content_prerendered      MEDIUMTEXT NULL,
 			itpr_datemodified             TIMESTAMP NOT NULL,
 			PRIMARY KEY (itpr_itm_ID, itpr_format)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__version' => array(	// fp> made iver_edit_user_ID NULL because of INSERT INTO SELECT statement that can try to write NULL
 		'Creating item versions table',
@@ -376,7 +376,7 @@ $schema_queries = array(
 			iver_title         TEXT NULL ,
 			iver_content       MEDIUMTEXT NULL ,
 			INDEX iver_itm_ID ( iver_itm_ID )
-			) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__status' => array(
 		'Creating table for Post Statuses',
@@ -384,7 +384,7 @@ $schema_queries = array(
 			pst_ID   int(11) unsigned not null AUTO_INCREMENT,
 			pst_name varchar(30)      not null,
 			primary key ( pst_ID )
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__type' => array(
 		'Creating table for Post Types',
@@ -392,7 +392,7 @@ $schema_queries = array(
 			ptyp_ID   int(11) unsigned not null AUTO_INCREMENT,
 			ptyp_name varchar(30)      not null,
 			primary key (ptyp_ID)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__tag' => array(
 		'Creating table for Tags',
@@ -401,7 +401,7 @@ $schema_queries = array(
 			tag_name varchar(50)      not null,
 			primary key (tag_ID),
 			UNIQUE tag_name( tag_name )
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__itemtag' => array(
 		'Creating table for Post-to-Tag relationships',
@@ -410,7 +410,7 @@ $schema_queries = array(
 			itag_tag_ID int(11) unsigned NOT NULL,
 			PRIMARY KEY (itag_itm_ID, itag_tag_ID),
 			UNIQUE tagitem ( itag_tag_ID, itag_itm_ID )
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_files' => array(
 		'Creating table for File Meta Data',
@@ -424,7 +424,7 @@ $schema_queries = array(
 			file_desc      text,
 			primary key (file_ID),
 			unique file (file_root_type, file_root_ID, file_path)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_subscriptions' => array(
 		'Creating table for subscriptions',
@@ -434,7 +434,7 @@ $schema_queries = array(
 			sub_items       tinyint(1)          not null,
 			sub_comments    tinyint(1)          not null,
 			primary key (sub_coll_ID, sub_user_ID)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_coll_user_perms' => array(
 		'Creating table for Blog-User permissions',
@@ -453,7 +453,7 @@ $schema_queries = array(
 			bloguser_perm_media_browse tinyint NOT NULL default 0,
 			bloguser_perm_media_change tinyint NOT NULL default 0,
 			PRIMARY KEY bloguser_pk (bloguser_blog_ID,bloguser_user_ID)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_coll_group_perms' => array(
 		'Creating table for blog-group permissions',
@@ -472,7 +472,7 @@ $schema_queries = array(
 			bloggroup_perm_media_browse tinyint NOT NULL default 0,
 			bloggroup_perm_media_change tinyint NOT NULL default 0,
 			PRIMARY KEY bloggroup_pk (bloggroup_blog_ID,bloggroup_group_ID)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_links' => array(
 		'Creating table for Post Links',
@@ -492,7 +492,7 @@ $schema_queries = array(
 			INDEX link_itm_ID( link_itm_ID ),
 			INDEX link_dest_itm_ID (link_dest_itm_ID),
 			INDEX link_file_ID (link_file_ID)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_filetypes' => array(
 		'Creating table for file types',
@@ -505,7 +505,7 @@ $schema_queries = array(
 			ftyp_viewtype varchar(10) NOT NULL,
 			ftyp_allowed tinyint(1) NOT NULL default 0,
 			PRIMARY KEY (ftyp_ID)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_plugins' => array(
 		'Creating plugins table',
@@ -523,7 +523,7 @@ $schema_queries = array(
 			PRIMARY KEY ( plug_ID ),
 			UNIQUE plug_code( plug_code ),
 			INDEX plug_status( plug_status )
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_pluginsettings' => array(
 		'Creating plugin settings table',
@@ -532,7 +532,7 @@ $schema_queries = array(
 			pset_name VARCHAR( 30 ) NOT NULL,
 			pset_value TEXT NULL,
 			PRIMARY KEY ( pset_plug_ID, pset_name )
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_pluginusersettings' => array(
 		'Creating plugin user settings table',
@@ -542,7 +542,7 @@ $schema_queries = array(
 			puset_name VARCHAR( 30 ) NOT NULL,
 			puset_value TEXT NULL,
 			PRIMARY KEY ( puset_plug_ID, puset_user_ID, puset_name )
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_pluginevents' => array(
 		'Creating plugin events table',
@@ -551,7 +551,7 @@ $schema_queries = array(
 			pevt_event VARCHAR(40) NOT NULL,
 			pevt_enabled TINYINT NOT NULL DEFAULT 1,
 			PRIMARY KEY( pevt_plug_ID, pevt_event )
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_cron__task' => array(
 		'Creating cron tasks table',
@@ -563,7 +563,7 @@ $schema_queries = array(
 			ctsk_controller      varchar(50)           not null,
 			ctsk_params          text,
 			PRIMARY KEY (ctsk_ID)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_cron__log' => array(
 		'Creating cron tasks table',
@@ -574,12 +574,16 @@ $schema_queries = array(
 			clog_status               enum('started','finished','error','timeout') not null default 'started',
 			clog_messages             text,
 			PRIMARY KEY (clog_ctsk_ID)
-		) DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 );
 
 
 /*
  * $Log$
+ * Revision 1.24  2009/07/10 20:02:08  fplanque
+ * using innodb by default for most tables now.
+ * enabled transactions by default.
+ *
  * Revision 1.23  2009/07/10 19:48:01  fplanque
  * clean up a little bit
  *

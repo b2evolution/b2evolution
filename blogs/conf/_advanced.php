@@ -210,24 +210,18 @@ $db_config['halt_on_error'] = true;
 /**
  * CREATE TABLE options.
  *
- * Edit those if you have control over you MySQL server and want a more professional
- * database than what is commonly offered by popular hosting providers.
+ * DO NOT USE unless you know what you're doing -- For most options, we want to work on a table by table basis.
  */
 $db_config['table_options'] = ''; 	// Low ranking MySQL hosting compatibility Default
-// Recommended settings:
-# $db_config['table_options'] = ' ENGINE=InnoDB ';
-// Development settings:
-# $db_config['table_options'] = ' ENGINE=InnoDB DEFAULT CHARSET=utf8 ';
 
 
 /**
  * Use transactions in DB?
  *
- * You need to use InnoDB in order to enable this. See the {@link $db_config "table_options" key}.
+ * You need to use InnoDB in order to enable this.
+ * @todo fp> Have upgrade procedure upgrade necessary tables to INNODB.
  */
-$db_config['use_transactions'] = false;
-// Recommended settings:
-# $db_config['use_transactions'] = true;
+$db_config['use_transactions'] = true;  // fp> guess this should not cause trouble even if used on myisam tables.
 
 
 /**

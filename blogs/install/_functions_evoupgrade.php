@@ -2331,7 +2331,7 @@ function upgrade_b2evo_tables()
 		task_end();
 
 		task_begin( 'Updating items table...' );
-		$DB->query( "ALTER TABLE T_items__item ENGINE=innodb" );
+		$DB->query( "ALTER TABLE T_items__item ENGINE=innodb" );	// fp> hum... this originally was a test :)
 		task_end();
 
 		task_begin( 'Creating versions table...' );
@@ -2537,6 +2537,10 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.295  2009/07/10 20:02:10  fplanque
+ * using innodb by default for most tables now.
+ * enabled transactions by default.
+ *
  * Revision 1.294  2009/07/07 00:34:42  fplanque
  * Remember whether or not the TinyMCE editor was last used on a per post and per blog basis.
  *
