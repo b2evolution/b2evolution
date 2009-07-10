@@ -120,7 +120,7 @@ function display_base_config_recap()
  */
 function install_newdb()
 {
-	global $new_db_version, $admin_url, $random_password, $install_password;
+	global $new_db_version, $admin_url, $random_password;
 
 	/*
 	 * -----------------------------------------------------------------------------------
@@ -196,11 +196,8 @@ function install_newdb()
 	echo '<tr><td>Login: &nbsp;</td><td><strong><evo:password>admin</evo:password></strong></td></tr>';
 	printf( '<tr><td>Password: &nbsp;</td><td><strong><evo:password>%s</evo:password></strong></td></tr>', $random_password );
 	echo '</table>';
-	
-	if( !isset($install_password) )
-	{
-		echo '<p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>';
-	}
+
+	echo '<p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>';
 }
 
 
@@ -812,6 +809,10 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.66  2009/07/10 18:41:34  fplanque
+ * do NOT hide password warning from developers.
+ * They need to know what teh rest of the world sees.
+ *
  * Revision 1.65  2009/07/10 06:48:46  sam2kb
  * Don't show the message about random password if $install_password is set.
  *
