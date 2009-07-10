@@ -42,7 +42,7 @@ $evo_charset = '';
  * if the browser accepts it.
  *
  * Setting this to "utf-8" allows you to deliver all pages in this encoding even if the selected locale was not
- * translated to iutf-8. Typically requires MBSTRING. Make sure, that your PHP/MySQL setup supports this.
+ * translated to utf-8. Typically requires MBSTRING. Make sure, that your PHP/MySQL setup supports this.
  *
  * @global string
  */
@@ -50,7 +50,7 @@ $force_io_charset_if_accepted = '';
 
 
 /**
- * This variable is include dhere for documentation only.
+ * This variable is included here for documentation only.
  *
  * If not empty, this will issue a MySQL SET NAMES command.
  * This must be a MySQL charset. Example: 'latin1' or 'utf8'
