@@ -259,7 +259,13 @@ else
 	echo '<p class="center">';
 	if( $loc_transinfo )
 	{
-		echo '<a href="'.$pagenow.'?ctrl=locales">' . T_('Hide translation info'), '</a>';
+		echo '<a href="'.$pagenow.'?ctrl=locales">' . T_('Hide translation info'), '</a><br />';
+		if( $current_User->check_perm( 'options', 'edit' ) && !$allow_po_extraction )
+		{
+			echo '<span class="notes">';
+			echo T_('To allow the extraction of language files, please change $allow_po_extraction to 1 on conf/_locales.php');
+			echo '</span>';
+		}
 	}
 	else
 	{
@@ -508,6 +514,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.7  2009/07/11 17:33:02  waltercruz
+ * Adding more instructions about language extraction
+ *
  * Revision 1.6  2009/03/08 23:57:45  fplanque
  * 2009
  *
