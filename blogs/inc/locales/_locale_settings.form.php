@@ -263,7 +263,7 @@ else
 		if( $current_User->check_perm( 'options', 'edit' ) && !$allow_po_extraction )
 		{
 			echo '<span class="notes">';
-			echo T_('To allow the extraction of language files, please change $allow_po_extraction to 1 on conf/_locales.php');
+			echo T_('To allow the extraction of language files, please set $allow_po_extraction = 1; in conf/_locales.php.');
 			echo '</span>';
 		}
 	}
@@ -514,6 +514,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.8  2009/07/11 18:30:10  tblue246
+ * minor
+ *
  * Revision 1.7  2009/07/11 17:33:02  waltercruz
  * Adding more instructions about language extraction
  *
