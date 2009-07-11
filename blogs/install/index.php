@@ -384,7 +384,7 @@ switch( $action )
 
 				<fieldset>
 					<legend><?php echo T_('Database you want to install into') ?></legend>
-					<p class="note"><?php echo T_('b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installating b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.') ?></p>
+					<p class="note"><?php echo T_('b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installing b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.') ?></p>
 					<?php
 						form_text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ), 120 );
 						form_text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ), 100);
@@ -649,6 +649,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.171  2009/07/11 19:43:35  tblue246
+ * Translation fix
+ *
  * Revision 1.170  2009/07/10 06:49:10  sam2kb
  * Made some strings translatable
  *
