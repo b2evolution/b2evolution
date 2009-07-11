@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 3\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2009-07-07 13:46+0200\n"
-"PO-Revision-Date: 2009-07-10 01:16-0500\n"
+"PO-Revision-Date: 2009-07-10 20:40-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -12928,12 +12928,12 @@ msgstr "Выбрать как язык/локаль по умолчанию"
 
 #: ..\..\..\install\_functions_install.php:95
 msgid "Base config recap..."
-msgstr "Вернуть основную конфигурацию..."
+msgstr "Просмотр основных настроек..."
 
 #: ..\..\..\install\_functions_install.php:97
 #, php-format
 msgid "If you don't see correct settings here, STOP before going any further, and <a %s>update your base configuration</a>."
-msgstr "Если вы видите здесь неправильные настройки, не двигайтесь дальше, а <a %s>измените вашу основную конфигурацию</a>."
+msgstr "Если вы видите здесь не правильные значения, не двигайтесь дальше, а <a %s>измените ваши основные настройки</a>."
 
 #: ..\..\..\install\_functions_install.php:106
 #: ..\..\..\install\index.php:387
@@ -13033,7 +13033,7 @@ msgstr "Удалить таблицы b2evolution"
 #: ..\..\..\install\index.php:99
 #: ..\..\..\install\index.php:338
 msgid "Base configuration"
-msgstr "Основная конфигурация"
+msgstr "Основные настройки"
 
 #: ..\..\..\install\index.php:114
 msgid "b2evo installer"
@@ -13148,11 +13148,11 @@ msgstr "Ваш файл основной конфигурации (<code>/conf/_
 
 #: ..\..\..\install\index.php:374
 msgid "This is the minimum info we need to set up b2evolution on this server:"
-msgstr "Это минимальное количество информации, необходимой для установки b2evolution на этот сервер:"
+msgstr "Следующая информация необходима для установки b2evolution на ваш сервер:"
 
 #: ..\..\..\install\index.php:381
 msgid "Database you want to install into"
-msgstr "База данных, в которую вы хотите установить"
+msgstr "База данных для установки"
 
 #: ..\..\..\install\index.php:385
 msgid "Typically looks like \"localhost\" or \"sql-6\" or \"sql-8.yourhost.net\"..."
@@ -13217,7 +13217,7 @@ msgstr "Если у вас уже есть ранее установленные
 
 #: ..\..\..\install\index.php:474
 msgid "<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location..."
-msgstr "<strong>Измените ваши начальные настройки</strong>: Вам необходимо будет это делать лишь в том случае, когда вы хотите переместить файлы b2evolution или базу данных в другое место..."
+msgstr "<strong>Изменить основные настройки</strong>: Это необходимо в том случае, когда вы хотите переместить файлы или базу данных b2evolution в другое место..."
 
 #: ..\..\..\install\index.php:481
 msgid "Need to start anew?"
@@ -13239,7 +13239,7 @@ msgstr ""
 
 #: ..\..\..\install\index.php:513
 msgid "Upgrading data in existing b2evolution database..."
-msgstr "Обновление записей существующей базы данных b2evolution..."
+msgstr "Обновление существующей базы данных b2evolution..."
 
 #: ..\..\..\install\index.php:518
 msgid "Upgrade completed successfully!"
