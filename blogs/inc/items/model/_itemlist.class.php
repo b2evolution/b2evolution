@@ -188,7 +188,8 @@ class ItemList2 extends ItemListLight
 			".$DB->quote($item_typ_ID)." AS post_ptyp_ID,
 			".$DB->quote($item_st_ID)." AS post_pst_ID,
 			".$DB->quote($item_deadline)." AS post_datedeadline,
-			".$DB->quote($item_priority)." AS post_priority,";
+			".$DB->quote($item_priority)." AS post_priority,
+			NULL AS post_editor_code,";
 
 		// CUSTOM FIELDS double
 		for( $i = 1 ; $i <= 5; $i++ )
@@ -716,6 +717,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.22  2009/07/11 18:45:31  tblue246
+ * Fix PHP notice
+ *
  * Revision 1.21  2009/07/02 23:29:40  fplanque
  * even nastier!
  *
