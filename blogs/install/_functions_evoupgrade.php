@@ -2376,7 +2376,7 @@ function upgrade_b2evo_tables()
 		task_begin( 'Altering Items table... ' );
 		$DB->query( "ALTER TABLE T_items__item
 			ADD COLUMN post_metadesc VARCHAR(255) NULL DEFAULT NULL AFTER post_titletag,
-			ADD COLUMN post_metakeywords VARCHAR(255) NULL DEFAULT NULL AFTER post_metadesc
+			ADD COLUMN post_metakeywords VARCHAR(255) NULL DEFAULT NULL AFTER post_metadesc,
 			ADD COLUMN post_editor_code VARCHAR(32) NULL COMMENT 'Plugin code of the editor used to edit this post' AFTER post_varchar3" );
 		task_end();
 
@@ -2537,6 +2537,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.296  2009/07/11 17:18:03  waltercruz
+ * Fixing missing comma
+ *
  * Revision 1.295  2009/07/10 20:02:10  fplanque
  * using innodb by default for most tables now.
  * enabled transactions by default.
