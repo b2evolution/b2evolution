@@ -124,7 +124,7 @@ $schema_queries = array(
 			PRIMARY KEY (ufdf_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
-	'T_users_fields' => array(
+	'T_users__fields' => array(
 		'Creating table for User fields',
 		"CREATE TABLE T_users__fields (
 		  uf_ID      int(10) unsigned NOT NULL auto_increment,
@@ -478,8 +478,8 @@ $schema_queries = array(
 		'Creating table for Post Links',
 		"CREATE TABLE T_links (
 			link_ID               int(11) unsigned  not null AUTO_INCREMENT,
-			link_datecreated      datetime          not null,
-			link_datemodified     datetime          not null,
+			link_datecreated      datetime          not null DEFAULT '2000-01-01 00:00:00',
+			link_datemodified     datetime          not null DEFAULT '2000-01-01 00:00:00',
 			link_creator_user_ID  int(11) unsigned  not null,
 			link_lastedit_user_ID int(11) unsigned  not null,
 			link_itm_ID           int(11) unsigned  NOT NULL,
@@ -580,6 +580,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.25  2009/07/12 23:18:22  fplanque
+ * upgrading tables to innodb
+ *
  * Revision 1.24  2009/07/10 20:02:08  fplanque
  * using innodb by default for most tables now.
  * enabled transactions by default.

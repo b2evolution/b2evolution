@@ -2368,12 +2368,18 @@ function upgrade_b2evo_tables()
 	}
 
 	if( $old_db_version < 9950 )
-	{	// 3.2
+	{	// 3.3
 		task_begin( 'Altering Blogs table... ' );
 		$DB->query( "ALTER TABLE T_blogs CHANGE COLUMN blog_shortname blog_shortname varchar(255) default ''" );
 		task_end();
 
-		task_begin( 'Altering Items table... ' );
+		task_begin( 'Altering Links table... ' );
+		$DB->query( "ALTER TABLE evo_links
+      ALTER COLUMN link_datecreated SET DEFAULT '2000-01-01 00:00:00',
+      ALTER COLUMN link_datemodified SET DEFAULT '2000-01-01 00:00:00'" );
+		task_end();
+
+ 		task_begin( 'Altering Items table... ' );
 		$DB->query( "ALTER TABLE T_items__item
 			ADD COLUMN post_metadesc VARCHAR(255) NULL DEFAULT NULL AFTER post_titletag,
 			ADD COLUMN post_metakeywords VARCHAR(255) NULL DEFAULT NULL AFTER post_metadesc,
@@ -2381,10 +2387,28 @@ function upgrade_b2evo_tables()
 		task_end();
 
 		task_begin( 'Forcing AutoP posts to html editor...' );
-			$DB->query( 'UPDATE T_items__item
+		$DB->query( 'UPDATE T_items__item
 											SET post_editor_code = "html"
 										WHERE post_renderers = "default"
 											 OR post_renderers LIKE "%b2WPAutP%"' );
+		task_end();
+
+		set_upgrade_checkpoint( '9950' );
+	}
+
+
+	if( $old_db_version < 9960 )
+	{	// 3.3
+		// fp> The following is more tricky to do with CHARACTER SET. During upgrade, we don't know what the admin actually wants.
+		task_begin( 'Making sure all tables use desired storage ENGINE...' );
+		foreach( $schema_queries as $table_name=>$table_def )
+		{
+			if( preg_match( '/ ENGINE = ([a-z]+) /is', $table_def[1], $matches ) )
+			{
+				echo $table_name.':'.$matches[1].'<br />';
+				$DB->query( "ALTER TABLE $table_name ENGINE = ".$matches[1] );
+			}
+		}
 		task_end();
 	}
 
@@ -2537,6 +2561,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.297  2009/07/12 23:18:22  fplanque
+ * upgrading tables to innodb
+ *
  * Revision 1.296  2009/07/11 17:18:03  waltercruz
  * Fixing missing comma
  *

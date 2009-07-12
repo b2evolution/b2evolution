@@ -219,9 +219,8 @@ $db_config['table_options'] = ''; 	// Low ranking MySQL hosting compatibility De
  * Use transactions in DB?
  *
  * You need to use InnoDB in order to enable this.
- * @todo fp> Have upgrade procedure upgrade necessary tables to INNODB.
  */
-$db_config['use_transactions'] = true;  // fp> guess this should not cause trouble even if used on myisam tables.
+$db_config['use_transactions'] = true; 
 
 
 /**

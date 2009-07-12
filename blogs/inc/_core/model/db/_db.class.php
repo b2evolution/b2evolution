@@ -155,8 +155,6 @@ class DB
 	 * Edit those if you have control over you MySQL server and want a more professional
 	 * database than what is commonly offered by popular hosting providers.
 	 *
-	 * Recommended settings: ' ENGINE=InnoDB '
-	 * Development settings: ' ENGINE=InnoDB DEFAULT CHARSET=utf8 '
 	 * @todo dh> If the query itself uses already e.g. "CHARACTER SET latin1" it should not get overridden..
 	 * @var string
 	 */
@@ -1578,6 +1576,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.29  2009/07/12 23:18:22  fplanque
+ * upgrading tables to innodb
+ *
  * Revision 1.28  2009/07/10 15:59:04  sam2kb
  * Change DB connection charset only if SET NAMES worked
  *
