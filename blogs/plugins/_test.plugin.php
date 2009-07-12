@@ -784,7 +784,7 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Return list of custom disp types handled by this plugin
+	 * 3.3? Return list of custom disp types handled by this plugin
 	 *
 	 * @return array $disp_modes : list of disp modes supplied by this plugin
 	 */
@@ -799,7 +799,7 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Display our custom disp mode(s)
+	 * 3.3? Display our custom disp mode(s)
 	 *
 	 * Only called if disp file doesn't exist in :
 	 * 	/skins/skin/
@@ -836,6 +836,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.83  2009/07/12 19:12:51  fplanque
+ * doc
+ *
  * Revision 1.82  2009/07/06 12:44:41  yabs
  * Modifying BeforeSessionsDelete behaviour
  *
