@@ -445,7 +445,9 @@ switch( $action )
 			<p><?php echo T_('The installation can be done in different ways. Choose one:')?></p>
 
 			<p><input type="radio" name="action" id="newdb" value="newdb"
-				<?php if( is_null($old_db_version) )
+				<?php
+					// fp> change the above to 'newdbsettings' for an additional settings screen.
+					if( is_null($old_db_version) )
 					{
 						echo 'checked="checked"';
 					}
@@ -482,7 +484,7 @@ switch( $action )
 
 			if( $allow_evodb_reset != 1 )
 			{
-				echo '<div class="floatright"><a href="index.php?action=deletedb&amp;locale='.$default_locale.'">'.T_('Need to start anew?').'</a></div>';
+				echo '<div class="floatright"><a href="index.php?action=deletedb&amp;locale='.$default_locale.'">'.T_('Need to start anew?').' &raquo;</a></div>';
 			}
 			?>
 
@@ -500,8 +502,49 @@ switch( $action )
 		display_base_config_recap();
 		break;
 
+	case 'localeinfo':
+		// Info about getting additional locales.
+		display_locale_selector();
+
+		block_open();
+
+		// Note: Do NOT make these strings translatable. We are not in the desired language anyways!
+		?>
+		<h2>What if your language is not in the list above?</h2>
+		<ol>
+			<li>Go to the <a href="http://b2evolution.net/downloads/language-packs.html" target="_blank">language packs section on b2evolution.net</a>.</li>
+			<li>Select the version of b2evolution you're trying to install. If it's not available select the closest match (in most cases this should work).</li>
+			<li>Find your language and click the "Download" link.</li>
+			<li>Unzip the contents of the downloaded ZIP file.</li>
+			<li>Upload the new folder (for example es_ES) into the /locales folder on your server. (The /locales folder already contains a few locales such as de_DE, ru_RU, etc.)</li>
+			<li>Reload this page. The new locale should now appear in the list at the top of this screen. If it doesn't, it means the language pack you installed is not compatible with this verison of b2evolution.</li>
+		</ol>
+
+		<h3>What if there is no language pack to download?</h3>
+		<p>Nobody has contrbuted a language pack in your language yet. You could help by providing a translation for your language.</p>
+		<p>For now, you will have to install b2evolution with a supported language.</p>
+		<p>Once you get familair with b2evolution you will be able to <a href="http://manual.b2evolution.net/Localization" target="_blank">create your own language pack</a> fairly easily.</p>
+		<p><a href="index.php?locale=<?php echo $default_locale ?>">&laquo; <?php echo T_('Back to install menu') ?></a></p>
+		<?php
+		break;
+
+	case 'newdbsettings':
+		/*
+		 * fp> TODO: Add a screen for additionnal settings:
+		 * - create_sample_contents : to be moved away from main screen
+		 * - admin_email: to be moved out of conf file
+		 * - storage_charset: offer option to FORCE storing data in UTF-8 even if current locale doesn't require it (must be supported by MySQL) -- recommended for multilingual blogs
+		 * - evo_charset: offer option to FORCE handling data internally in UTF-8 even if current locale doesn't require it (requires mbstring) -- not recommended in most situations
+		 */
+
 
 	case 'newdb':
+		/*
+		 * -----------------------------------------------------------------------------------
+		 * NEW DB: install a new b2evolution database.
+		 * -----------------------------------------------------------------------------------
+		 * Note: auto installers should kick in directly at this step and provide all required params.
+		 */
 
 		// fp> TODO: this test should probably be made more generic and applied to upgrade too.
 		$expected_connection_charset = $DB->php_to_mysql_charmap($evo_charset);
@@ -554,8 +597,11 @@ switch( $action )
 			echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.');
 			echo '<p>'.sprintf( T_('To enable it, please go to the %s file and change: %s to %s'), '/conf/_basic_config.php', '<pre>$allow_evodb_reset = 0;</pre>', '<pre>$allow_evodb_reset = 1;</pre>' ).'</p>';
 			echo '<p>'.T_('Then reload this page and a reset option will appear.').'</p>';
+			echo '<p><a href="index.php?locale='.$default_locale.'">&laquo; '.T_('Back to install menu').'</a></p>';
+
 			break;
 		}
+
 		if( ! param('confirmed', 'integer', 1) )
 		{
 			?>
@@ -611,7 +657,7 @@ switch( $action )
 		db_delete();
 		?>
 		<p><?php echo T_('Reset done!')?></p>
-		<p><a href="index.php?locale=<?php echo $default_locale ?>"><?php echo T_('Back to menu')?></a>.</p>
+		<p><a href="index.php?locale=<?php echo $default_locale ?>">&laquo; <?php echo T_('Back to install menu') ?></a></p>
 		<?php
 		break;
 }
@@ -649,6 +695,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.172  2009/07/12 18:41:58  fplanque
+ * doc / help
+ *
  * Revision 1.171  2009/07/11 19:43:35  tblue246
  * Translation fix
  *

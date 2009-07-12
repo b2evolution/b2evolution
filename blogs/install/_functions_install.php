@@ -57,6 +57,8 @@ function display_locale_selector()
 	<h2><?php echo T_('Language / Locale')?></h2>
 	<form action="index.php" method="get">
 	<?php
+	echo '<div class="floatright"><a href="index.php?action=localeinfo&amp;locale='.$default_locale.'">'.T_('More languages').' &raquo;</a></div>';
+
 	locale_flag( $default_locale, 'w16px', 'flag', '', true, /* Do not rely on $baseurl/$rsc_url here: */ '../rsc/flags' );
 	echo '<select name="locale" onchange="this.form.submit()">';
 	foreach( $locales as $lkey => $lvalue )
@@ -69,7 +71,9 @@ function display_locale_selector()
 	}
 	?>
 	</select>
-	<input type="submit" value="<?php echo T_('Select as default language/locale'); ?>" />
+	<noscript>
+		<input type="submit" value="<?php echo T_('Select as default language/locale'); ?>" />
+	</noscript>
 	</form>
 	<?php
 	block_close();
@@ -817,6 +821,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.68  2009/07/12 18:41:58  fplanque
+ * doc / help
+ *
  * Revision 1.67  2009/07/10 19:48:02  fplanque
  * clean up a little bit
  *
