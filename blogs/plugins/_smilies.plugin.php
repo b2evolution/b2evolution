@@ -29,8 +29,8 @@ class smilies_plugin extends Plugin
 	 * fp> There is... I can't remember the exact problem thouh. Probably some interaction with the code highlight or the video plugins.
 	 */
 	var $priority = 15;
-	var $version = '3.0';
-	var $apply_rendering = 'opt-out';
+	var $version = '3.3';
+	var $apply_rendering = 'opt-in';
 	var $group = 'rendering';
 	var $number_of_installs = 3; // QUESTION: dh> why 3?
 
@@ -400,6 +400,9 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.50  2009/07/12 19:35:31  fplanque
+ * make rendering opt-in
+ *
  * Revision 1.49  2009/03/08 23:57:47  fplanque
  * 2009
  *

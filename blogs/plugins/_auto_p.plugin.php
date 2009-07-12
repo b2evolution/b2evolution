@@ -22,8 +22,8 @@ class auto_p_plugin extends Plugin
 	var $code = 'b2WPAutP';
 	var $name = 'Auto P';
 	var $priority = 70;
-	var $version = '1.9';
-	var $apply_rendering = 'opt-out';
+	var $version = '3.3';
+	var $apply_rendering = 'opt-in';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -635,6 +635,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.43  2009/07/12 19:35:31  fplanque
+ * make rendering opt-in
+ *
  * Revision 1.42  2008/01/14 18:08:48  blueyed
  * Add OBJECT to list of block tags (i.e. no P/BR therein)
  *
