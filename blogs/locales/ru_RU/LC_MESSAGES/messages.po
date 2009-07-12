@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 3\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2009-07-07 13:46+0200\n"
-"PO-Revision-Date: 2009-07-10 20:40-0500\n"
+"POT-Creation-Date: 2009-07-11 21:44+0200\n"
+"PO-Revision-Date: 2009-07-12 12:51-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -136,7 +136,7 @@ msgstr "Домашняя папка"
 #: ..\..\..\conf\_icons.php:79
 #: ..\..\..\conf\_icons.php:281
 #: ..\..\..\inc\files\views\_file_links.view.php:62
-#: ..\..\..\inc\locales\_locale_settings.form.php:284
+#: ..\..\..\inc\locales\_locale_settings.form.php:290
 msgid "Edit"
 msgstr "Изменить"
 
@@ -448,7 +448,7 @@ msgstr "Бан"
 msgid "XML Feed"
 msgstr "XML лента"
 
-#: ..\..\..\conf\_locales.php:111
+#: ..\..\..\conf\_locales.php:109
 msgid "English (US)"
 msgstr "Английский (US)"
 
@@ -1526,7 +1526,7 @@ msgid "DB connection charset"
 msgstr "Кодировка подключения к БД"
 
 #: ..\..\..\inc\_core\_misc.funcs.php:2985
-#: ..\..\..\install\index.php:614
+#: ..\..\..\install\index.php:628
 msgid "Manual"
 msgstr "Руководство"
 
@@ -1559,8 +1559,8 @@ msgstr "URL (имя файла)"
 #: ..\..\..\inc\items\views\_item_expert.form.php:277
 #: ..\..\..\inc\items\views\_item_list_full.view.php:181
 #: ..\..\..\inc\locales\_locale_settings.form.php:95
-#: ..\..\..\inc\locales\_locale_settings.form.php:281
-#: ..\..\..\inc\locales\_locale_settings.form.php:315
+#: ..\..\..\inc\locales\_locale_settings.form.php:287
+#: ..\..\..\inc\locales\_locale_settings.form.php:321
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:166
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:115
 msgid "Priority"
@@ -1720,7 +1720,7 @@ msgid "User"
 msgstr "Пользователь"
 
 #: ..\..\..\inc\_core\_template.funcs.php:585
-#: ..\..\..\inc\widgets\widgets.ctrl.php:385
+#: ..\..\..\inc\widgets\widgets.ctrl.php:389
 msgid "Update cancelled"
 msgstr "Обновление отменено"
 
@@ -1729,12 +1729,12 @@ msgid "Update paused"
 msgstr "Обновление приостановлено"
 
 #: ..\..\..\inc\_core\_template.funcs.php:587
-#: ..\..\..\inc\widgets\widgets.ctrl.php:382
+#: ..\..\..\inc\widgets\widgets.ctrl.php:386
 msgid "Changes pending"
 msgstr "Вносим изменения"
 
 #: ..\..\..\inc\_core\_template.funcs.php:588
-#: ..\..\..\inc\widgets\widgets.ctrl.php:383
+#: ..\..\..\inc\widgets\widgets.ctrl.php:387
 msgid "Saving changes"
 msgstr "Сохраняем изменения"
 
@@ -1838,14 +1838,14 @@ msgstr "НЕ МОЖЕТ БЫТЬ ОТМЕНЕНО!"
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:555
 #: ..\..\..\inc\collections\collections.ctrl.php:421
 #: ..\..\..\inc\plugins\plugins.ctrl.php:942
-#: ..\..\..\install\index.php:559
+#: ..\..\..\install\index.php:572
 msgid "I am sure!"
 msgstr "Я уверен!"
 
 #: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:447
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:563
 #: ..\..\..\inc\collections\collections.ctrl.php:429
-#: ..\..\..\install\index.php:564
+#: ..\..\..\install\index.php:577
 msgid "CANCEL"
 msgstr "ОТМЕНА"
 
@@ -2750,7 +2750,7 @@ msgstr "Перепроверить"
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:164
 #: ..\..\..\inc\items\views\_item_links.view.php:164
 #: ..\..\..\inc\items\views\inc\_item_links.inc.php:171
-#: ..\..\..\inc\plugins\views\_plugin_list.view.php:252
+#: ..\..\..\inc\plugins\views\_plugin_list.view.php:254
 #: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:59
 #: ..\..\..\inc\sessions\views\_stats_goals.view.php:99
 #: ..\..\..\inc\skins\views\_skin_list.view.php:67
@@ -2872,7 +2872,7 @@ msgstr "Обновить"
 #: ..\..\..\inc\generic\views\_generic_category.form.php:67
 #: ..\..\..\inc\generic\views\_generic_category.form.php:73
 #: ..\..\..\inc\locales\_locale_settings.form.php:113
-#: ..\..\..\inc\locales\_locale_settings.form.php:505
+#: ..\..\..\inc\locales\_locale_settings.form.php:511
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:181
 #: ..\..\..\inc\sessions\views\_goal.form.php:57
 #: ..\..\..\inc\sessions\views\_goal.form.php:62
@@ -2884,7 +2884,7 @@ msgstr "Обновить"
 #: ..\..\..\inc\users\views\_user.form.php:476
 #: ..\..\..\inc\widgets\views\_widget.form.php:71
 #: ..\..\..\inc\widgets\views\_widget.form.php:76
-#: ..\..\..\install\index.php:406
+#: ..\..\..\install\index.php:410
 #: ..\..\..\skins\_profile.disp.php:110
 #: ..\..\..\skins\_subs.disp.php:112
 msgid "Reset"
@@ -2892,7 +2892,7 @@ msgstr "Сброс"
 
 #: ..\..\..\inc\antispam\views\_antispam_settings.form.php:93
 #: ..\..\..\inc\files\views\_file_settings.form.php:238
-#: ..\..\..\inc\locales\_locale_settings.form.php:496
+#: ..\..\..\inc\locales\_locale_settings.form.php:502
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:182
 #: ..\..\..\inc\settings\views\_features.form.php:202
 #: ..\..\..\inc\users\views\_user.form.php:478
@@ -2921,7 +2921,7 @@ msgstr "Невозможно удалить рубрику"
 #: ..\..\..\inc\chapters\chapters.ctrl.php:61
 #: ..\..\..\inc\collections\coll_settings.ctrl.php:246
 #: ..\..\..\inc\collections\collections.ctrl.php:340
-#: ..\..\..\inc\widgets\widgets.ctrl.php:372
+#: ..\..\..\inc\widgets\widgets.ctrl.php:376
 #: ..\..\..\inc\widgets\widgets\_coll_media_index.widget.php:78
 msgid "List"
 msgstr "Список"
@@ -3047,7 +3047,7 @@ msgstr "Родительская рубрика"
 #: ..\..\..\inc\generic\views\_generic_ordered_list.inc.php:87
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:160
 #: ..\..\..\inc\locales\_locale_settings.form.php:87
-#: ..\..\..\inc\locales\_locale_settings.form.php:276
+#: ..\..\..\inc\locales\_locale_settings.form.php:282
 #: ..\..\..\inc\plugins\plugins.ctrl.php:974
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:72
 #: ..\..\..\inc\sessions\views\_goal.form.php:44
@@ -3732,7 +3732,7 @@ msgstr "Количество ссылок в футере"
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:375
 #: ..\..\..\inc\collections\views\_coll_urls.form.php:316
 #: ..\..\..\inc\comments\views\_comment.form.php:128
-#: ..\..\..\inc\locales\_locale_settings.form.php:504
+#: ..\..\..\inc\locales\_locale_settings.form.php:510
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:179
 #: ..\..\..\inc\settings\views\_general.form.php:127
 #: ..\..\..\inc\users\views\_group.form.php:188
@@ -4461,7 +4461,7 @@ msgstr "Статичный файл"
 #: ..\..\..\inc\collections\views\_coll_list.view.php:170
 #: ..\..\..\inc\items\model\_itemlistlight.class.php:1035
 #: ..\..\..\inc\locales\_locale_settings.form.php:85
-#: ..\..\..\inc\locales\_locale_settings.form.php:274
+#: ..\..\..\inc\locales\_locale_settings.form.php:280
 #: ..\..\..\skins\_user.disp.php:89
 #: ..\..\..\skins_adm\login\_reg_form.main.php:68
 msgid "Locale"
@@ -5578,7 +5578,7 @@ msgstr "Вы можете увидеть содержимое вашего бл�
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:294
 msgid "You can come back here at any time by clicking \"Manage\" in that same evobar."
-msgstr "Вы можете вернуться сюда в любое время нажав \"Панель управления\" на той же панели."
+msgstr "Вы можете вернуться сюда в любое время нажав \"Панель управления\" на той же панели эвобар."
 
 #: ..\..\..\inc\dashboard\dashboard.ctrl.php:313
 msgid "Manage your blog"
@@ -7674,7 +7674,7 @@ msgstr "Обзор рубрики"
 msgid "Permanent link to full entry"
 msgstr "Постоянная ссылка на полную запись"
 
-#: ..\..\..\inc\items\model\_itemlist.class.php:219
+#: ..\..\..\inc\items\model\_itemlist.class.php:220
 msgid "Invalid post, please correct these errors:"
 msgstr "Недопустимая запись, пожалуйста, исправьте следующие ошибки:"
 
@@ -8204,13 +8204,13 @@ msgid "Link files"
 msgstr "Ссылки на файлы"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:52
-#: ..\..\..\inc\locales\_locale_settings.form.php:492
+#: ..\..\..\inc\locales\_locale_settings.form.php:498
 msgid "Create new locale"
 msgstr "Создать новую локаль"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:52
-#: ..\..\..\inc\locales\_locale_settings.form.php:323
-#: ..\..\..\inc\locales\_locale_settings.form.php:384
+#: ..\..\..\inc\locales\_locale_settings.form.php:329
+#: ..\..\..\inc\locales\_locale_settings.form.php:390
 msgid "Edit locale"
 msgstr "Редактировать локаль"
 
@@ -8225,7 +8225,7 @@ msgid "The first two letters should be a <a %s>ISO 639 language code</a>. The la
 msgstr "Первые два символа должны соответствовать <a %s>коду языка из ISO 639</a>.  Последние два символа должны соответствовать <a %s>коду страны из ISO 3166</a>."
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:86
-#: ..\..\..\inc\locales\_locale_settings.form.php:275
+#: ..\..\..\inc\locales\_locale_settings.form.php:281
 msgid "Enabled"
 msgstr "Разрешено"
 
@@ -8238,7 +8238,7 @@ msgid "name of the locale"
 msgstr "название локали"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:89
-#: ..\..\..\inc\locales\_locale_settings.form.php:315
+#: ..\..\..\inc\locales\_locale_settings.form.php:321
 msgid "Charset"
 msgstr "Кодировка"
 
@@ -8264,12 +8264,12 @@ msgid "Day at the start of the week."
 msgstr "День, с которого начинается неделя."
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:92
-#: ..\..\..\inc\locales\_locale_settings.form.php:280
+#: ..\..\..\inc\locales\_locale_settings.form.php:286
 msgid "Start of week"
 msgstr "Начало недели"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:93
-#: ..\..\..\inc\locales\_locale_settings.form.php:315
+#: ..\..\..\inc\locales\_locale_settings.form.php:321
 msgid "Lang file"
 msgstr "Файл языка"
 
@@ -8489,65 +8489,69 @@ msgid "Hide translation info"
 msgstr "Скрыть информацию о переводе"
 
 #: ..\..\..\inc\locales\_locale_settings.form.php:266
+msgid "To allow the extraction of language files, please set $allow_po_extraction = 1; in conf/_locales.php."
+msgstr "Чтобы разрешить извлечение языковых файлов, пожалуйста, выставьте $allow_po_extraction = 1; в файле conf/_locales.php."
+
+#: ..\..\..\inc\locales\_locale_settings.form.php:272
 msgid "Show translation info"
 msgstr "Показать информацию о переводе"
 
-#: ..\..\..\inc\locales\_locale_settings.form.php:277
+#: ..\..\..\inc\locales\_locale_settings.form.php:283
 msgid "Date fmt"
 msgstr "Формат даты"
 
-#: ..\..\..\inc\locales\_locale_settings.form.php:278
+#: ..\..\..\inc\locales\_locale_settings.form.php:284
 msgid "Time fmt"
 msgstr "Формат времени"
 
-#: ..\..\..\inc\locales\_locale_settings.form.php:279
+#: ..\..\..\inc\locales\_locale_settings.form.php:285
 msgid "Day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc"
 msgstr "День начала недели: 0 для Воскресенья, 1 для Понедельника, 2 для Вторника, и т.д."
 
-#: ..\..\..\inc\locales\_locale_settings.form.php:290
+#: ..\..\..\inc\locales\_locale_settings.form.php:296
 msgid "Strings"
 msgstr "Строк"
 
-#: ..\..\..\inc\locales\_locale_settings.form.php:291
+#: ..\..\..\inc\locales\_locale_settings.form.php:297
 msgid "Translated"
 msgstr "Переведено"
 
-#: ..\..\..\inc\locales\_locale_settings.form.php:295
-#: ..\..\..\inc\locales\_locale_settings.form.php:480
+#: ..\..\..\inc\locales\_locale_settings.form.php:301
+#: ..\..\..\inc\locales\_locale_settings.form.php:486
 msgid "Extract"
 msgstr "Извлечь"
 
-#: ..\..\..\inc\locales\_locale_settings.form.php:340
-#: ..\..\..\inc\locales\_locale_settings.form.php:343
+#: ..\..\..\inc\locales\_locale_settings.form.php:346
+#: ..\..\..\inc\locales\_locale_settings.form.php:349
 #, php-format
 msgid "Preview: %s"
 msgstr "Предпросмотр: %s"
 
-#: ..\..\..\inc\locales\_locale_settings.form.php:366
+#: ..\..\..\inc\locales\_locale_settings.form.php:372
 msgid "Move priority up"
 msgstr "Повысить приоритет"
 
-#: ..\..\..\inc\locales\_locale_settings.form.php:375
+#: ..\..\..\inc\locales\_locale_settings.form.php:381
 msgid "Move priority down"
 msgstr "Понизить приоритет"
 
-#: ..\..\..\inc\locales\_locale_settings.form.php:382
+#: ..\..\..\inc\locales\_locale_settings.form.php:388
 msgid "Copy locale"
 msgstr "Копировать локаль"
 
-#: ..\..\..\inc\locales\_locale_settings.form.php:389
+#: ..\..\..\inc\locales\_locale_settings.form.php:395
 msgid "Restore default locale settings"
 msgstr "Восстановить исходные значения"
 
-#: ..\..\..\inc\locales\_locale_settings.form.php:400
+#: ..\..\..\inc\locales\_locale_settings.form.php:406
 msgid "No language file..."
 msgstr "Нет языкового файла..."
 
-#: ..\..\..\inc\locales\_locale_settings.form.php:480
+#: ..\..\..\inc\locales\_locale_settings.form.php:486
 msgid "Extract .po file into b2evo-format"
 msgstr "Извлечь .po файл в b2evo-формат"
 
-#: ..\..\..\inc\locales\_locale_settings.form.php:496
+#: ..\..\..\inc\locales\_locale_settings.form.php:502
 msgid ""
 "Are you sure you want to restore to default locales?\\n"
 "All custom locale definitions will be lost!"
@@ -9059,33 +9063,33 @@ msgstr "Код для вызова плагина из темы (SkinTag) или
 msgid "Display info"
 msgstr "Показать информацию"
 
-#: ..\..\..\inc\plugins\views\_plugin_list.view.php:239
+#: ..\..\..\inc\plugins\views\_plugin_list.view.php:241
 msgid "Disable the plugin!"
 msgstr "Отключить плагин!"
 
-#: ..\..\..\inc\plugins\views\_plugin_list.view.php:243
+#: ..\..\..\inc\plugins\views\_plugin_list.view.php:245
 msgid "Enable the plugin!"
 msgstr "Включить плагин!"
 
-#: ..\..\..\inc\plugins\views\_plugin_list.view.php:246
+#: ..\..\..\inc\plugins\views\_plugin_list.view.php:248
 msgid "Un-install this plugin!"
 msgstr "Удалить этот плагин!"
 
-#: ..\..\..\inc\plugins\views\_plugin_list.view.php:262
+#: ..\..\..\inc\plugins\views\_plugin_list.view.php:264
 msgid "Reload events and codes for installed plugins."
 msgstr "Перезагрузить события и коды установленных плагинов."
 
-#: ..\..\..\inc\plugins\views\_plugin_list.view.php:262
+#: ..\..\..\inc\plugins\views\_plugin_list.view.php:264
 msgid "Reload plugins"
 msgstr "Перезагрузить плагины"
 
-#: ..\..\..\inc\plugins\views\_plugin_list.view.php:265
+#: ..\..\..\inc\plugins\views\_plugin_list.view.php:267
 #: ..\..\..\inc\skins\views\_coll_skin.view.php:32
 #: ..\..\..\inc\skins\views\_skin_list.view.php:80
 msgid "Install new"
 msgstr "Установить новый"
 
-#: ..\..\..\inc\plugins\views\_plugin_list.view.php:265
+#: ..\..\..\inc\plugins\views\_plugin_list.view.php:267
 msgid "Install new plugin..."
 msgstr "Установить новый плагин..."
 
@@ -11133,18 +11137,21 @@ msgid "Edit/delete all"
 msgstr "Редактировать / удалить все"
 
 #: ..\..\..\inc\users\views\_group.form.php:84
-msgid "Hidden"
-msgstr "Скрыто"
+msgid "Hidden (type in admin.php directly)"
+msgstr "Скрыт (admin.php вводится вручную)"
 
 #: ..\..\..\inc\users\views\_group.form.php:85
-#: ..\..\..\inc\users\views\_group.form.php:90
-msgid "Visible link"
-msgstr "Видимая ссылка"
+msgid "Visible links to admin in evobar"
+msgstr "Видимая ссылка в Панель управления на эвобаре"
 
 #: ..\..\..\inc\users\views\_group.form.php:86
 #: ..\..\..\inc\users\views\_group.form.php:90
 msgid "Access to Admin area"
 msgstr "Доступ к панели управления"
+
+#: ..\..\..\inc\users\views\_group.form.php:90
+msgid "Visible link"
+msgstr "Видимая ссылка"
 
 #: ..\..\..\inc\users\views\_group.form.php:95
 msgid "Blogging permissions"
@@ -11686,22 +11693,22 @@ msgid "There is no widget in this container yet."
 msgstr "В этом контейнере еще нет виджетов."
 
 #: ..\..\..\inc\widgets\views\_widget_list.view.php:122
-#: ..\..\..\inc\widgets\widgets.ctrl.php:393
+#: ..\..\..\inc\widgets\widgets.ctrl.php:397
 msgid "The widget is enabled."
 msgstr "Виджет включен."
 
 #: ..\..\..\inc\widgets\views\_widget_list.view.php:127
-#: ..\..\..\inc\widgets\widgets.ctrl.php:394
+#: ..\..\..\inc\widgets\widgets.ctrl.php:398
 msgid "The widget is disabled."
 msgstr "Виджет отключен."
 
 #: ..\..\..\inc\widgets\views\_widget_list.view.php:167
-#: ..\..\..\inc\widgets\widgets.ctrl.php:396
+#: ..\..\..\inc\widgets\widgets.ctrl.php:400
 msgid "Disable this widget!"
 msgstr "Отключить этот виджет!"
 
 #: ..\..\..\inc\widgets\views\_widget_list.view.php:171
-#: ..\..\..\inc\widgets\widgets.ctrl.php:395
+#: ..\..\..\inc\widgets\widgets.ctrl.php:399
 msgid "Enable this widget!"
 msgstr "Включить этот виджет!"
 
@@ -11764,32 +11771,32 @@ msgstr "Виджет &laquo;%s&raquo; был добавлен в контейн�
 msgid "Widget settings have been updated"
 msgstr "Настройки виджета были обновлены"
 
-#: ..\..\..\inc\widgets\widgets.ctrl.php:283
+#: ..\..\..\inc\widgets\widgets.ctrl.php:287
 msgid "Widget has been disabled."
 msgstr "Виджет был отключен."
 
-#: ..\..\..\inc\widgets\widgets.ctrl.php:287
+#: ..\..\..\inc\widgets\widgets.ctrl.php:291
 msgid "Widget has been enabled."
 msgstr "Виджет был включен."
 
-#: ..\..\..\inc\widgets\widgets.ctrl.php:300
+#: ..\..\..\inc\widgets\widgets.ctrl.php:304
 #, php-format
 msgid "Widget &laquo;%s&raquo; removed."
 msgstr "Виджет &laquo;%s&raquo; удален."
 
-#: ..\..\..\inc\widgets\widgets.ctrl.php:357
+#: ..\..\..\inc\widgets\widgets.ctrl.php:361
 msgid "Widgets updated"
 msgstr "Виджеты обновлены"
 
-#: ..\..\..\inc\widgets\widgets.ctrl.php:384
+#: ..\..\..\inc\widgets\widgets.ctrl.php:388
 msgid "Widget order unchanged"
 msgstr "Порядок виджетов не изменен"
 
-#: ..\..\..\inc\widgets\widgets.ctrl.php:386
+#: ..\..\..\inc\widgets\widgets.ctrl.php:390
 msgid "Update Paused"
 msgstr "Обновление приостановлено"
 
-#: ..\..\..\inc\widgets\widgets.ctrl.php:470
+#: ..\..\..\inc\widgets\widgets.ctrl.php:474
 msgid "Select widget to add:"
 msgstr "Выберите виджет:"
 
@@ -12123,7 +12130,6 @@ msgid "Long description from the blog's <a %s>general settings</a>."
 msgstr "Подробное описание из <a %s>настроек блога</a>."
 
 #: ..\..\..\inc\widgets\widgets\_coll_media_index.widget.php:65
-#: ..\..\..\install\_functions_install.php:587
 msgid "Recent photos"
 msgstr "Последние фото"
 
@@ -12148,7 +12154,6 @@ msgid "Number of columns in grid mode."
 msgstr "Количество колонок в режиме сетки."
 
 #: ..\..\..\inc\widgets\widgets\_coll_media_index.widget.php:123
-#: ..\..\..\install\_functions_install.php:587
 #, fuzzy
 msgid "Photo index"
 msgstr "Список изображений"
@@ -12318,7 +12323,6 @@ msgid "All blogs"
 msgstr "Все блоги"
 
 #: ..\..\..\inc\widgets\widgets\_free_html.widget.php:54
-#: ..\..\..\install\_functions_install.php:591
 msgid "Free HTML"
 msgstr "Свободный HTML"
 
@@ -12936,7 +12940,7 @@ msgid "If you don't see correct settings here, STOP before going any further, an
 msgstr "Если вы видите здесь не правильные значения, не двигайтесь дальше, а <a %s>измените ваши основные настройки</a>."
 
 #: ..\..\..\install\_functions_install.php:106
-#: ..\..\..\install\index.php:387
+#: ..\..\..\install\index.php:391
 msgid "MySQL Username"
 msgstr "Пользователь MySQL"
 
@@ -12945,7 +12949,7 @@ msgid "(Set, but not shown for security reasons)"
 msgstr "(Установлен, но не показывается из соображений безопасности)"
 
 #: ..\..\..\install\_functions_install.php:107
-#: ..\..\..\install\index.php:388
+#: ..\..\..\install\index.php:392
 msgid "MySQL Password"
 msgstr "Пароль MySQL"
 
@@ -12954,7 +12958,7 @@ msgid "MySQL Database name"
 msgstr "Имя базы данных MySQL"
 
 #: ..\..\..\install\_functions_install.php:109
-#: ..\..\..\install\index.php:385
+#: ..\..\..\install\index.php:389
 msgid "MySQL Host/Server"
 msgstr "MySQL хост/сервер"
 
@@ -12963,7 +12967,7 @@ msgid "MySQL tables prefix"
 msgstr "Префикс таблиц MySQL"
 
 #: ..\..\..\install\_functions_install.php:111
-#: ..\..\..\install\index.php:396
+#: ..\..\..\install\index.php:400
 msgid "Base URL"
 msgstr "Базовый URL"
 
@@ -13005,33 +13009,25 @@ msgstr "Теперь вы можете <a %s>войти</a> используя �
 msgid "Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew."
 msgstr "Запомните этот пароль! Это <em>случайный</em> пароль, сгенерированный b2evolution. Если вы потеряете его, вам придется удалить таблицы b2evolution и переустановить систему заново."
 
-#: ..\..\..\install\_functions_install.php:564
-msgid "Random photo"
-msgstr "Случайное фото"
-
-#: ..\..\..\install\_functions_install.php:591
-msgid "This is the \"Sidebar 2\" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select \"Customize\", then \"Blog Widgets\"."
-msgstr ""
-
-#: ..\..\..\install\index.php:83
+#: ..\..\..\install\index.php:84
 msgid "Upgrade from a previous version"
 msgstr "Обновление с предыдущей версии"
 
-#: ..\..\..\install\index.php:87
+#: ..\..\..\install\index.php:88
 msgid "New Install"
 msgstr "Новая установка"
 
-#: ..\..\..\install\index.php:91
+#: ..\..\..\install\index.php:92
 msgid "Upgrade from Cafelog/b2"
 msgstr "Обновление с Cafelog/b2"
 
-#: ..\..\..\install\index.php:95
-#: ..\..\..\install\index.php:470
+#: ..\..\..\install\index.php:96
+#: ..\..\..\install\index.php:474
 msgid "Delete b2evolution tables"
 msgstr "Удалить таблицы b2evolution"
 
-#: ..\..\..\install\index.php:99
-#: ..\..\..\install\index.php:338
+#: ..\..\..\install\index.php:100
+#: ..\..\..\install\index.php:345
 msgid "Base configuration"
 msgstr "Основные настройки"
 
@@ -13059,176 +13055,204 @@ msgstr "Меню установки"
 msgid "PHP info"
 msgstr "Информация PHP"
 
-#: ..\..\..\install\index.php:157
+#: ..\..\..\install\index.php:164
 msgid "Check your database config settings below and update them if necessary..."
 msgstr "Проверьте настройки вашей базы данных ниже, и измените, если необходимо..."
 
-#: ..\..\..\install\index.php:171
-#: ..\..\..\install\index.php:180
+#: ..\..\..\install\index.php:178
+#: ..\..\..\install\index.php:187
 #, php-format
 msgid "The minimum requirement for this version of b2evolution is %s version %s but you are trying to use version %s!"
 msgstr "Минимальные требования для этой версии b2evolution - это %s версии %s, а вы пытаетесь использовать версию %s!"
 
-#: ..\..\..\install\index.php:228
+#: ..\..\..\install\index.php:195
+msgid "b2evolution cannot be installed, because of the following errors:"
+msgstr "Плагин не может быть установлен из-за следующих ошибок:"
+
+#: ..\..\..\install\index.php:235
 msgid "It seems that the database config settings you entered don't work. Please check them carefully and try again..."
 msgstr "Введенные вами настройки базы данных неправильны. Пожалуйста, внимательно проверьте их и попытайтесь снова..."
 
-#: ..\..\..\install\index.php:277
+#: ..\..\..\install\index.php:248
+#, php-format
+msgid "Could not load original conf file [%s]. Is it missing?"
+msgstr "Не удалось прочитать исходный файл конфигурации [%s]. Возможно, он утерян!"
+
+#: ..\..\..\install\index.php:284
 msgid "Config file update"
 msgstr "Обновление файла конфигурации"
 
-#: ..\..\..\install\index.php:278
+#: ..\..\..\install\index.php:285
 #, php-format
 msgid "We cannot automatically create or update your config file [%s]!"
 msgstr "Мы не можем автоматически создать или обновить ваш файл конфигурации [%s]!"
 
-#: ..\..\..\install\index.php:279
+#: ..\..\..\install\index.php:286
 msgid "There are two ways to deal with this:"
 msgstr "Есть два пути решения этой проблемы:"
 
-#: ..\..\..\install\index.php:281
+#: ..\..\..\install\index.php:288
 msgid "You can allow the installer to create the config file by changing permissions for the /conf directory:"
 msgstr "Вы можете разрешить установщику автоматически создать конфигурационный файл, изменив разрешения для директории /conf :"
 
-#: ..\..\..\install\index.php:283
+#: ..\..\..\install\index.php:290
 #, php-format
 msgid "Make sure there is no existing and potentially locked configuration file named <code>%s</code>. If so, please delete it."
 msgstr "Убедитесь в том, что конфигурационный файл с именем <code>%s</code> <u>не существует</ul>. Если такой файл уже существует, удалите его."
 
-#: ..\..\..\install\index.php:284
+#: ..\..\..\install\index.php:291
 #, php-format
 msgid "<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about permissions</a>."
 msgstr "<code>chmod 666 %s</code>. Если необходимо, смотрите <a %s>онлайн руководство</a>."
 
-#: ..\..\..\install\index.php:285
+#: ..\..\..\install\index.php:292
 msgid "Come back to this page and refresh/reload."
 msgstr "Вернитесь на эту страницу и обновите / перезагрузите ее."
 
-#: ..\..\..\install\index.php:289
+#: ..\..\..\install\index.php:296
 msgid "Alternatively, you can update the config file manually:"
 msgstr "Также, вы можете обновить файл конфигурации вручную:"
 
-#: ..\..\..\install\index.php:291
+#: ..\..\..\install\index.php:298
 msgid "Create a new text file with a text editor."
 msgstr "Создайте новый файл в текстовом редакторе."
 
-#: ..\..\..\install\index.php:292
+#: ..\..\..\install\index.php:299
 msgid "Copy the contents from the box below."
 msgstr "Скопируйте содержимое из блока ниже."
 
-#: ..\..\..\install\index.php:293
+#: ..\..\..\install\index.php:300
 msgid "Paste them into your local text editor. <strong>ATTENTION: make sure there is ABSOLUTELY NO WHITESPACE after the final <code>?&gt;</code> in the file.</strong> Any space, tab, newline or blank line at the end of the conf file may prevent cookies from being set when you try to log in later."
 msgstr "Вставьте содержимое блока в текстовый редактор. <strong>ВНИМАНИЕ: убедитесь, что после этих символов <code>?&gt;</code> нет пробелов или переводов строк.</strong> Любой пробел, табуляция, перевод строки или пустая строка в файле конфигурации, может повлиять на установку cookies, когда вы попытаетесь войти в систему позже."
 
-#: ..\..\..\install\index.php:294
+#: ..\..\..\install\index.php:301
 msgid "Save the file locally under the name <code>_basic_config.php</code>"
 msgstr "Сохраните файл на локальном компьютере под именем <code>_basic_config.php</code>"
 
-#: ..\..\..\install\index.php:295
+#: ..\..\..\install\index.php:302
 msgid "Upload the file to your server, into the <code>/_conf</code> folder."
 msgstr "Загрузите этот файл на ваш сервер в папку <code>/_conf</code>."
 
-#: ..\..\..\install\index.php:296
+#: ..\..\..\install\index.php:303
 #, php-format
 msgid "<a %s>Call the installer from scratch</a>."
 msgstr "<a %s>Запустите установщик заново</a>."
 
-#: ..\..\..\install\index.php:300
+#: ..\..\..\install\index.php:307
 msgid "This is how your _basic_config.php should look like:"
 msgstr "Ваш _basic_config.php должен выглядеть так:"
 
-#: ..\..\..\install\index.php:314
+#: ..\..\..\install\index.php:321
 #, php-format
 msgid "Your configuration file [%s] has been successfully created."
 msgstr "Ваш файл конфигурации [%s] был успешно создан."
 
-#: ..\..\..\install\index.php:372
+#: ..\..\..\install\index.php:349
+msgid "Resetting the base configuration is currently disabled for security reasons."
+msgstr "Сброс основных настроек в настоящее время запрещен из соображений безопасности."
+
+#: ..\..\..\install\index.php:350
+#: ..\..\..\install\index.php:555
+#, php-format
+msgid "To enable it, please go to the %s file and change: %s to %s"
+msgstr "Чтобы разрешить сброс, пожалуйста измените в файле %s строку: %s на %s"
+
+#: ..\..\..\install\index.php:351
+#: ..\..\..\install\index.php:556
+msgid "Then reload this page and a reset option will appear."
+msgstr "Затем обновите эту страницу, и опция сброса настроек появится."
+
+#: ..\..\..\install\index.php:377
 msgid "The basic configuration file (<code>/conf/_basic_config.php</code>) has not been created yet. You can do automatically generate it by filling out the form below."
 msgstr "Ваш файл основной конфигурации (<code>/conf/_basic_config.php</code>) еще не был создан. Мы можем создать его автоматически если вы заполните форму, расположенную ниже."
 
-#: ..\..\..\install\index.php:374
+#: ..\..\..\install\index.php:379
 msgid "This is the minimum info we need to set up b2evolution on this server:"
 msgstr "Следующая информация необходима для установки b2evolution на ваш сервер:"
 
-#: ..\..\..\install\index.php:381
+#: ..\..\..\install\index.php:386
 msgid "Database you want to install into"
 msgstr "База данных для установки"
 
-#: ..\..\..\install\index.php:385
+#: ..\..\..\install\index.php:387
+msgid "b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installing b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you."
+msgstr "b2evolution хранит все записи, комментарии, профили пользователей и т.д. в базе данных MySQL. Вы должны создать эту базу данных до установки b2evolution и предоставить данные для подключения к ней. Если вы с этим еще не сталкивались, попросите провайдера вашего хостинга создать базу данных для вас."
+
+#: ..\..\..\install\index.php:389
 msgid "Typically looks like \"localhost\" or \"sql-6\" or \"sql-8.yourhost.net\"..."
 msgstr "В большинстве случаев - это \"localhost\" или \"sql-6\" или \"sql-8.yourhost.net\"..."
 
-#: ..\..\..\install\index.php:386
+#: ..\..\..\install\index.php:390
 msgid "MySQL Database"
 msgstr "База MySQL"
 
-#: ..\..\..\install\index.php:386
+#: ..\..\..\install\index.php:390
 msgid "Name of the MySQL database you have created on the server"
 msgstr "Имя базы данных MySQL, которую вы создали на сервере"
 
-#: ..\..\..\install\index.php:387
-#: ..\..\..\install\index.php:388
+#: ..\..\..\install\index.php:391
+#: ..\..\..\install\index.php:392
 msgid "Used by b2evolution to access the MySQL database"
 msgstr "Используется b2evolution для доступа к базе данных MySQL"
 
-#: ..\..\..\install\index.php:394
+#: ..\..\..\install\index.php:398
 msgid "Additional settings"
 msgstr "Дополнительные настройки"
 
-#: ..\..\..\install\index.php:396
+#: ..\..\..\install\index.php:400
 msgid "This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine's name!"
 msgstr "Это поле показывает, где находятся b2evo и ваши блоги по умолчанию. ПРОВЕРЬТЕ ЭТО ВНИМАТЕЛЬНО или ничего не будет работать. Если вы хотите протестировать b2evolution на вашем локальном компьютере, вы ДОЛЖНЫ использовать http://<strong>localhost</strong>/ для того, чтобы cookie, отправляемые при входе, работали корректно... Не используйте имя вашего компьютера!"
 
-#: ..\..\..\install\index.php:398
+#: ..\..\..\install\index.php:402
 msgid "This is used to create your admin account. You will receive notifications for comments on your blog, etc."
 msgstr "Используется для создания учетной записи администратора. Вы также будете получать уведомления и комментарии на этот адрес."
 
-#: ..\..\..\install\index.php:398
+#: ..\..\..\install\index.php:402
 msgid "Your email"
 msgstr "Ваш email"
 
-#: ..\..\..\install\index.php:405
+#: ..\..\..\install\index.php:409
 msgid "Update config file"
 msgstr "Обновить файл конфигурации"
 
-#: ..\..\..\install\index.php:430
+#: ..\..\..\install\index.php:434
 msgid "How would you like your b2evolution installed?"
 msgstr "Способ установки b2evolution"
 
-#: ..\..\..\install\index.php:441
+#: ..\..\..\install\index.php:445
 msgid "The installation can be done in different ways. Choose one:"
 msgstr "Установка может быть произведена различными способами. Выберите один:"
 
-#: ..\..\..\install\index.php:450
+#: ..\..\..\install\index.php:454
 msgid "<strong>New Install</strong>: Install b2evolution database tables."
 msgstr "<strong>Новая установка</strong>: Установка таблиц базы данных b2evolution."
 
-#: ..\..\..\install\index.php:453
+#: ..\..\..\install\index.php:457
 msgid "Also install sample blogs &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users."
 msgstr "Также установить демонстрационные блоги и заполнить их записями. Эти записи объясняют ряд особенностей b2evolution. Крайне рекомендуется новым пользователям."
 
-#: ..\..\..\install\index.php:463
+#: ..\..\..\install\index.php:467
 msgid "<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version. <strong>WARNING:</strong> If you have modified your database, this operation may fail. Make sure you have a backup."
 msgstr "<strong>Обновление с предыдущей версии b2evolution</strong>: Обновляет вашу базу данных для совместимости с новой версией. <strong>ВНИМАНИЕ:</strong> Если у вас измененная база данных, эта операция может завершится неудачно. Убедитесь в том что вы сохранили базу данных."
 
-#: ..\..\..\install\index.php:471
+#: ..\..\..\install\index.php:475
 msgid "If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Any non-b2evolution tables will remain untouched though."
 msgstr "Если у вас уже есть ранее установленные таблицы b2evolution и вы решили начать заново, вам нужно удалить старые таблицы до начала новой установки. <strong>ВНИМАНИЕ: все ваши таблицы и данные b2evolution будут потеряны!!!</strong> Любые таблицы, не относящиеся к b2evolution не будут затронуты."
 
-#: ..\..\..\install\index.php:474
+#: ..\..\..\install\index.php:478
 msgid "<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location..."
 msgstr "<strong>Изменить основные настройки</strong>: Это необходимо в том случае, когда вы хотите переместить файлы или базу данных b2evolution в другое место..."
 
-#: ..\..\..\install\index.php:481
+#: ..\..\..\install\index.php:485
 msgid "Need to start anew?"
 msgstr "Хотите начать заново?"
 
-#: ..\..\..\install\index.php:486
+#: ..\..\..\install\index.php:490
 msgid "GO!"
 msgstr "ВПЕРЕД!"
 
 #. TRANS: %s gets replaced by app name, usually "b2evolution"
-#: ..\..\..\install\index.php:488
+#: ..\..\..\install\index.php:492
 #, php-format
 msgid ""
 "Are you sure you want to delete your existing %s tables?\\n"
@@ -13237,29 +13261,34 @@ msgstr ""
 "Вы уверены, что хотите удалить существующие таблицы %s?\\n"
 "Вы сохранили базу данных?"
 
-#: ..\..\..\install\index.php:513
+#: ..\..\..\install\index.php:510
+#, php-format
+msgid "In order to install b2evolution with the %s locale, your MySQL needs to support the %s connection charset."
+msgstr "Для того чтобы установить b2evolution с локалью %s, MySQL на вашем сервере должна поддерживать следующую кодировку подключения %s"
+
+#: ..\..\..\install\index.php:529
 msgid "Upgrading data in existing b2evolution database..."
 msgstr "Обновление существующей базы данных b2evolution..."
 
-#: ..\..\..\install\index.php:518
+#: ..\..\..\install\index.php:534
 msgid "Upgrade completed successfully!"
 msgstr "Обновление успешно завершено!"
 
-#: ..\..\..\install\index.php:519
+#: ..\..\..\install\index.php:535
 #, php-format
 msgid "Now you can <a %s>log in</a> with your usual %s username and password."
 msgstr "Теперь вы можете <a %s>войти</a> с вашим обычным %s именем пользователя и паролем."
 
-#: ..\..\..\install\index.php:533
+#: ..\..\..\install\index.php:549
 msgid "Deleting b2evolution tables from the datatase..."
 msgstr "Удаление таблиц из базы данных b2evolution..."
 
-#: ..\..\..\install\index.php:538
+#: ..\..\..\install\index.php:554
 msgid "If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default."
 msgstr "Если вы устанавливали таблицы b2evolution ранее и решили начать заново, вы должны удалить старые таблицы до начала новой установки. b2evolution может удалить ваши таблицы, но, по умолчанию, эта возможность отключена из соображений безопасности."
 
 #. TRANS: %s gets replaced by app name, usually "b2evolution"
-#: ..\..\..\install\index.php:551
+#: ..\..\..\install\index.php:564
 #, php-format
 msgid ""
 "Are you sure you want to delete your existing %s tables?\n"
@@ -13268,27 +13297,27 @@ msgstr ""
 "Вы уверены, что хотите удалить существующие таблицы %s?\\n"
 "Вы сохранили базу данных?"
 
-#: ..\..\..\install\index.php:599
+#: ..\..\..\install\index.php:613
 msgid "Reset done!"
 msgstr "Сброс выполнен!"
 
-#: ..\..\..\install\index.php:600
+#: ..\..\..\install\index.php:614
 msgid "Back to menu"
 msgstr "Назад к меню"
 
-#: ..\..\..\install\index.php:614
+#: ..\..\..\install\index.php:628
 msgid "Find a host"
 msgstr "Найти хостинг"
 
-#: ..\..\..\install\index.php:614
+#: ..\..\..\install\index.php:628
 msgid "Forums"
 msgstr "Форумы"
 
-#: ..\..\..\install\index.php:614
+#: ..\..\..\install\index.php:628
 msgid "Official website"
 msgstr "Официальный сайт"
 
-#: ..\..\..\install\index.php:614
+#: ..\..\..\install\index.php:628
 msgid "Online resources"
 msgstr "Онлайн ресурсы"
 
@@ -14885,6 +14914,11 @@ msgstr "Этот демонстрационный шаблон показыва�
 #: ..\..\..\summary.php:161
 msgid "More posts..."
 msgstr "Больше записей..."
+
+#~ msgid "Hidden"
+#~ msgstr "Скрыто"
+#~ msgid "Random photo"
+#~ msgstr "Случайное фото"
 
 #, fuzzy
 #~ msgid "Limit"
