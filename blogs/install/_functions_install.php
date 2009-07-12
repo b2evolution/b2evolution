@@ -197,8 +197,8 @@ function install_newdb()
 	echo '</strong></p>';
 
 	echo '<table>';
-	echo '<tr><td>Login: &nbsp;</td><td><strong><evo:password>admin</evo:password></strong></td></tr>';
-	printf( '<tr><td>Password: &nbsp;</td><td><strong><evo:password>%s</evo:password></strong></td></tr>', $random_password );
+	echo '<tr><td>', T_( 'Login' ), ': &nbsp;</td><td><strong><evo:password>admin</evo:password></strong></td></tr>';
+	printf( '<tr><td>%s: &nbsp;</td><td><strong><evo:password>%s</evo:password></strong></td></tr>', T_( 'Password' ), $random_password );
 	echo '</table>';
 
 	echo '<p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>';
@@ -821,6 +821,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.69  2009/07/12 22:22:26  tblue246
+ * Translation bugfix
+ *
  * Revision 1.68  2009/07/12 18:41:58  fplanque
  * doc / help
  *
