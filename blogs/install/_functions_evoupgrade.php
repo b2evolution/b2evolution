@@ -2396,9 +2396,17 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9950' );
 	}
 
-
 	if( $old_db_version < 9960 )
 	{	// 3.3
+
+		echo "Renaming tables...";
+		$DB->save_error_state();
+		$DB->halt_on_error = false;
+		$DB->show_errors = false;
+		$DB->query( "ALTER TABLE {$tableprefix}users_fields RENAME TO T_users__fields" );
+		$DB->restore_error_state();
+		echo "OK.<br />\n";
+
 		// fp> The following is more tricky to do with CHARACTER SET. During upgrade, we don't know what the admin actually wants.
 		task_begin( 'Making sure all tables use desired storage ENGINE...' );
 		foreach( $schema_queries as $table_name=>$table_def )
@@ -2561,6 +2569,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.298  2009/07/12 23:54:10  fplanque
+ * rename table
+ *
  * Revision 1.297  2009/07/12 23:18:22  fplanque
  * upgrading tables to innodb
  *
