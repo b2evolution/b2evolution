@@ -2373,10 +2373,14 @@ function upgrade_b2evo_tables()
 		$DB->query( "ALTER TABLE T_blogs CHANGE COLUMN blog_shortname blog_shortname varchar(255) default ''" );
 		task_end();
 
-		task_begin( 'Altering Links table... ' );
-		$DB->query( "ALTER TABLE evo_links
+		task_begin( 'Altering default dates... ' );
+		$DB->query( "ALTER TABLE T_links
       ALTER COLUMN link_datecreated SET DEFAULT '2000-01-01 00:00:00',
       ALTER COLUMN link_datemodified SET DEFAULT '2000-01-01 00:00:00'" );
+		$DB->query( "ALTER TABLE T_cron__task
+      ALTER COLUMN ctsk_start_datetime SET DEFAULT '2000-01-01 00:00:00'" );
+		$DB->query( "ALTER TABLE T_cron__log
+      ALTER COLUMN clog_realstart_datetime SET DEFAULT '2000-01-01 00:00:00'" );
 		task_end();
 
  		task_begin( 'Altering Items table... ' );
@@ -2569,6 +2573,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.299  2009/07/13 00:14:07  fplanque
+ * fixing default dates
+ *
  * Revision 1.298  2009/07/12 23:54:10  fplanque
  * rename table
  *

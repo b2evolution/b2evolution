@@ -557,7 +557,7 @@ $schema_queries = array(
 		'Creating cron tasks table',
 		"CREATE TABLE T_cron__task(
 			ctsk_ID              int(10) unsigned      not null AUTO_INCREMENT,
-			ctsk_start_datetime  datetime              not null,
+			ctsk_start_datetime  datetime              not null DEFAULT '2000-01-01 00:00:00',
 			ctsk_repeat_after    int(10) unsigned,
 			ctsk_name            varchar(50)           not null,
 			ctsk_controller      varchar(50)           not null,
@@ -569,7 +569,7 @@ $schema_queries = array(
 		'Creating cron tasks table',
 		"CREATE TABLE T_cron__log(
 			clog_ctsk_ID              int(10) unsigned   not null,
-			clog_realstart_datetime   datetime           not null,
+			clog_realstart_datetime   datetime           not null DEFAULT '2000-01-01 00:00:00',
 			clog_realstop_datetime    datetime,
 			clog_status               enum('started','finished','error','timeout') not null default 'started',
 			clog_messages             text,
@@ -580,6 +580,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.26  2009/07/13 00:14:07  fplanque
+ * fixing default dates
+ *
  * Revision 1.25  2009/07/12 23:18:22  fplanque
  * upgrading tables to innodb
  *
