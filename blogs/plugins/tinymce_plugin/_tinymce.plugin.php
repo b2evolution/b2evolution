@@ -29,7 +29,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @todo Make sure settings get transformed from 0.6 to 0.7 and obsolete ones get dropped from the DB!
  * @todo dh> use require_js() and add_js_headline() for the JavaScript includes
  * @todo fp> see bbcode plugin for an example about how to convert [tag] to <tag> on the fly for editing purposes. May be used for [img:] tags in b2evo. May also be used for b2evo smilies display. ed.onBeforeSetContent ed.onPostProcess
- * @todo fp> lang.js files should be moved to the standard language packs. Mayve served by .php files outputting javascript.
+ * @todo fp> lang.js files should be moved to the standard language packs. Maybe served by .php files outputting javascript.
  */
 class tinymce_plugin extends Plugin
 {
@@ -773,11 +773,17 @@ class tinymce_plugin extends Plugin
 
 		$tmce_plugins = implode( ',' , $tmce_plugins_array );
 
-		global $current_locale;
+		global $current_locale, $plugins_path;
 		$tmce_language = substr($current_locale, 0, 2);
+		// waltercruz> Fallback to english if there's no tinymce equivalent to the user locale
+		// to avoid some strange screens like http://www.flickr.com/photos/waltercruz/3390729964/
+		$lang_path = $plugins_path . $this->classname . '/tiny_mce/langs/' . $tmce_language . '.js';
+		if ( !file_exists( $lang_path ) )
+		{
+			$tmce_language = 'en';
+		}
 
-
-		// Configration: -- http://wiki.moxiecode.com/index.php/TinyMCE:Configuration
+		// Configuration: -- http://wiki.moxiecode.com/index.php/TinyMCE:Configuration
 		$init_options = array();
 		// Convert one specifc textarea to use TinyMCE:
 		$init_options[] = 'mode : "exact"';
