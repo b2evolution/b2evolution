@@ -517,13 +517,13 @@ switch( $action )
 			<li>Find your language and click the "Download" link.</li>
 			<li>Unzip the contents of the downloaded ZIP file.</li>
 			<li>Upload the new folder (for example es_ES) into the /locales folder on your server. (The /locales folder already contains a few locales such as de_DE, ru_RU, etc.)</li>
-			<li>Reload this page. The new locale should now appear in the list at the top of this screen. If it doesn't, it means the language pack you installed is not compatible with this verison of b2evolution.</li>
+			<li>Reload this page. The new locale should now appear in the list at the top of this screen. If it doesn't, it means the language pack you installed is not compatible with this version of b2evolution.</li>
 		</ol>
 
 		<h3>What if there is no language pack to download?</h3>
-		<p>Nobody has contrbuted a language pack in your language yet. You could help by providing a translation for your language.</p>
+		<p>Nobody has contributed a language pack in your language yet. You could help by providing a translation for your language.</p>
 		<p>For now, you will have to install b2evolution with a supported language.</p>
-		<p>Once you get familair with b2evolution you will be able to <a href="http://manual.b2evolution.net/Localization" target="_blank">create your own language pack</a> fairly easily.</p>
+		<p>Once you get familiar with b2evolution you will be able to <a href="http://manual.b2evolution.net/Localization" target="_blank">create your own language pack</a> fairly easily.</p>
 		<p><a href="index.php?locale=<?php echo $default_locale ?>">&laquo; <?php echo T_('Back to install menu') ?></a></p>
 		<?php
 		break;
@@ -695,6 +695,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.173  2009/07/13 19:17:09  tblue246
+ * Fixed typos
+ *
  * Revision 1.172  2009/07/12 18:41:58  fplanque
  * doc / help
  *
