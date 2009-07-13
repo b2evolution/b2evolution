@@ -777,8 +777,8 @@ class tinymce_plugin extends Plugin
 		$tmce_language = substr($current_locale, 0, 2);
 		// waltercruz> Fallback to english if there's no tinymce equivalent to the user locale
 		// to avoid some strange screens like http://www.flickr.com/photos/waltercruz/3390729964/
-		$lang_path = $plugins_path . $this->classname . '/tiny_mce/langs/' . $tmce_language . '.js';
-		if ( !file_exists( $lang_path ) )
+		$lang_path = $plugins_path.$this->classname.'/tiny_mce/langs/'.$tmce_language.'.js';
+		if( !file_exists( $lang_path ) )
 		{
 			$tmce_language = 'en';
 		}
