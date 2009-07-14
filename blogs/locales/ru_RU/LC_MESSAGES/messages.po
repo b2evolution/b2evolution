@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 3\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2009-07-11 21:44+0200\n"
-"PO-Revision-Date: 2009-07-12 12:51-0500\n"
+"PO-Revision-Date: 2009-07-14 19:17-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -7212,7 +7212,7 @@ msgstr "Редактирование записи #%d: %s"
 #: ..\..\..\inc\items\items.ctrl.php:343
 #, php-format
 msgid "The post has been created but not published because it seems like you wanted to set its status to \"%s\" instead.  If you really want to make it public, manually change its status to \"Published\" and click the \"Save\" button."
-msgstr ""
+msgstr "Запись была сохранена, но не опубликована, вероятно, вы выбрали статус записи \"%s\". Если вы действительно хотите опубликовать эту запись, измените ее статус на \"Опубликовано\" и сохраните."
 
 #: ..\..\..\inc\items\items.ctrl.php:386
 #: ..\..\..\inc\items\items.ctrl.php:485
@@ -7226,7 +7226,7 @@ msgstr "Запись создана."
 #: ..\..\..\inc\items\items.ctrl.php:442
 #, php-format
 msgid "The post has been updated but not published because it seems like you wanted to set its status to \"%s\" instead. If you really want to make it public, manually change its status to \"Published\" and click the \"Save\" button."
-msgstr ""
+msgstr "Запись была обновлена, но не опубликована, вероятно, вы выбрали статус записи \"%s\". Если вы действительно хотите опубликовать эту запись, измените ее статус на \"Опубликовано\" и сохраните."
 
 #: ..\..\..\inc\items\items.ctrl.php:497
 msgid "Post has been updated."
@@ -7559,9 +7559,8 @@ msgid "Warning: the URL slug has been changed to &laquo;%s&raquo;."
 msgstr "Внимание: URL имя файла записи было изменено на &laquo;%s&raquo;."
 
 #: ..\..\..\inc\items\model\_item.funcs.php:445
-#, fuzzy
 msgid "Images &amp; Attachments"
-msgstr "Вложения и фото"
+msgstr "Вложения и Фото"
 
 #. TRANS: This is the value of an input submit button
 #: ..\..\..\inc\items\model\_item.funcs.php:452
@@ -7798,14 +7797,12 @@ msgid "&lt;title&gt; tag"
 msgstr "&lt;title&gt; тег"
 
 #: ..\..\..\inc\items\views\_item_expert.form.php:233
-#, fuzzy
 msgid "&lt;meta&gt; desc"
-msgstr "&lt;meta&gt; desc"
+msgstr ""
 
 #: ..\..\..\inc\items\views\_item_expert.form.php:238
-#, fuzzy
 msgid "&lt;meta&gt; keywds"
-msgstr "&lt;meta&gt; keywds"
+msgstr ""
 
 #: ..\..\..\inc\items\views\_item_expert.form.php:243
 #: ..\..\..\inc\items\views\_item_simple.form.php:213
@@ -11747,7 +11744,7 @@ msgstr "Мета информация блога"
 
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:48
 msgid "Other"
-msgstr "Другое"
+msgstr "Дополнительно"
 
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:72
 #: ..\..\..\inc\widgets\views\_widget_list_available.view.php:107
@@ -13811,7 +13808,7 @@ msgstr ""
 
 #: ..\..\..\plugins\_test.plugin.php:133
 msgid "Multiple select"
-msgstr ""
+msgstr "Выпадающий список"
 
 #: ..\..\..\plugins\_test.plugin.php:137
 msgid "Paper"
@@ -13827,7 +13824,7 @@ msgstr "Камень"
 
 #: ..\..\..\plugins\_test.plugin.php:139
 msgid "This is a free style Multiple Select. You can choose zero or one or more items"
-msgstr ""
+msgstr "Здесь вы видите Выпадающий список. Вы можете выбрать один или несколько вариантов"
 
 #: ..\..\..\plugins\_texturize.plugin.php:33
 msgid "Smart quotes + additional typographic replacements."
@@ -14203,7 +14200,7 @@ msgstr "Дублирует на ваш аккаунт в Twitter.com запис�
 
 #: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:67
 msgid "Update your twitter account with details about the new post."
-msgstr ""
+msgstr "Отправляет на ваш twitter информацию о новой записи в блоге."
 
 #: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:94
 msgid "The twitter plugin needs a non-empty code."
