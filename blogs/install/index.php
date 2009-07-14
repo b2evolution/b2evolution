@@ -173,7 +173,7 @@ if( $config_is_done || (($action != 'start') && ($action != 'default') && ($acti
 		// Check MySQL version
 		$mysql_version = $DB->get_var( 'SELECT VERSION()' );
 		list( $mysl_version_main, $mysl_version_minor ) = explode( '.', $mysql_version );
-		if( ($mysl_version_main * 100 + $mysl_version_minor) < 410 )
+		if( ($mysl_version_main * 100 + $mysl_version_minor) < 401 )
 		{
 			die( '<div class="error"><p class="error"><strong>'.sprintf(T_('The minimum requirement for this version of b2evolution is %s version %s but you are trying to use version %s!'), 'MySQL', '4.1', $mysql_version ).'</strong></p></div>');
 		}
@@ -695,6 +695,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.174  2009/07/14 15:48:00  fplanque
+ * Thx to @slalaurette for finding this
+ *
  * Revision 1.173  2009/07/13 19:17:09  tblue246
  * Fixed typos
  *
