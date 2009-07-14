@@ -252,7 +252,7 @@ function skin_init( $disp )
 					if( ($Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
 							|| $Blog->get_setting( 'relcanonical_archive_urls' ) )
 					{ // Check if the URL was canonical:
-						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w );
+						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w, '&amp;', $MainList->get_active_filter('page') );
 						if( ! is_same_url($ReqHost.$ReqURI, $canonical_url) )
 						{
 							if( $Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
@@ -897,6 +897,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.69  2009/07/14 10:55:03  tblue246
+ * Bugfix: Remember requested page number when redirecting to a canonical chapter URL
+ *
  * Revision 1.68  2009/07/12 19:12:51  fplanque
  * doc
  *

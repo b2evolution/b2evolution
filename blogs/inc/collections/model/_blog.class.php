@@ -1071,7 +1071,7 @@ class Blog extends DataObject
 	 * @param string day
 	 * @param string week
 	 */
-	function gen_archive_url( $year, $month = NULL, $day = NULL, $week = NULL, $glue = '&amp;' )
+	function gen_archive_url( $year, $month = NULL, $day = NULL, $week = NULL, $glue = '&amp;', $paged = 1 )
 	{
 		$blogurl = $this->gen_blogurl();
 
@@ -1123,6 +1123,11 @@ class Blog extends DataObject
 			$link = url_add_tail( $blogurl, $datestring ); // there may already be a slash from a siteurl like 'http://example.com/'
 		}
 
+		if( $paged > 1 )
+		{	// We want a specific page:
+			$link = url_add_param( $link, 'paged='.$paged, $glue );
+		}
+
 		return $link;
 	}
 
@@ -1132,7 +1137,7 @@ class Blog extends DataObject
 	 * @uses Blog::gen_archive_url()
 	 * @return string HTML A tag
 	 */
-	function gen_archive_link( $text, $title, $year, $month = NULL, $day = NULL, $week = NULL, $glue = '&amp;' )
+	function gen_archive_link( $text, $title, $year, $month = NULL, $day = NULL, $week = NULL, $glue = '&amp;', $paged = 1 )
 	{
 		$link = '<a';
 
@@ -1146,7 +1151,7 @@ class Blog extends DataObject
 			$link .= ' title="'.format_to_output( $title, 'htmlattr' ).'"';
 		}
 
-		$link .= ' href="'.$this->gen_archive_url( $year, $month, $day, $week, $glue ).'" >';
+		$link .= ' href="'.$this->gen_archive_url( $year, $month, $day, $week, $glue, $paged ).'" >';
 		$link .= format_to_output( $text );
 		$link .= '</a>';
 
@@ -2127,6 +2132,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.72  2009/07/14 10:55:03  tblue246
+ * Bugfix: Remember requested page number when redirecting to a canonical chapter URL
+ *
  * Revision 1.71  2009/07/06 23:52:24  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *
