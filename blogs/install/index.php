@@ -392,7 +392,7 @@ switch( $action )
 						form_text( 'conf_db_password', $conf_db_password, 16, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 ); // no need to hyde this. nobody installs b2evolution from a public place
 						// sam2kb> This must be hidden! everybody install it from public place. Here's a situation: I edited _basic_config.template.php in order to not enter everything manually, anybody can see my pass if I don't delete the install forder. What if I forgot to delete it or decided to install b2evo tomorrow or somebody called me etc...
 						
-						// form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
+						form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
 					?>
 				</fieldset>
 
@@ -697,6 +697,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.176  2009/07/14 23:24:04  sam2kb
+ * activated table prefix fieldset
+ *
  * Revision 1.175  2009/07/14 16:23:32  sam2kb
  * doc
  *
