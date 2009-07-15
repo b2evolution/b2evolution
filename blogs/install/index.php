@@ -71,7 +71,11 @@ else
 	// echo 'detected locale: ' . $default_locale. '<br />';
 }
 // Activate default locale:
-locale_activate( $default_locale );
+if( ! locale_activate( $default_locale ) )
+{	// Could not activate locale (non-existent?), fallback to en-US:
+	$default_locale = 'en-US';
+	locale_activate( 'en-US' );
+}
 
 init_charsets( $current_charset );
 
@@ -214,7 +218,7 @@ switch( $action )
 		param( 'conf_db_password', 'string', true );
 		param( 'conf_db_name', 'string', true );
 		param( 'conf_db_host', 'string', true );
-		param( 'conf_db_tableprefix', 'string', 'evo_' );
+		param( 'conf_db_tableprefix', 'string', $tableprefix );
 		param( 'conf_baseurl', 'string', true );
 		$conf_baseurl = preg_replace( '#(/)?$#', '', $conf_baseurl ).'/'; // force trailing slash
 		param( 'conf_admin_email', 'string', true );
@@ -392,7 +396,7 @@ switch( $action )
 						form_text( 'conf_db_password', $conf_db_password, 16, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 ); // no need to hyde this. nobody installs b2evolution from a public place
 						// sam2kb> This must be hidden! everybody install it from public place. Here's a situation: I edited _basic_config.template.php in order to not enter everything manually, anybody can see my pass if I don't delete the install forder. What if I forgot to delete it or decided to install b2evo tomorrow or somebody called me etc...
 						
-						form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
+						// Too confusing for (most) newbies.	form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
 					?>
 				</fieldset>
 
@@ -697,6 +701,12 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.177  2009/07/15 11:58:16  tblue246
+ * - Installer:
+ * 	- Check if the selected locale could be activated and fallback to en-US if not.
+ * 	- Commented out table prefix option, see mailing list/fplanque ("too complex for most newbies").
+ * - Added _basic_config.php to conf/.cvsignore (will replace _config_TEST.php in the future).
+ *
  * Revision 1.176  2009/07/14 23:24:04  sam2kb
  * activated table prefix fieldset
  *
