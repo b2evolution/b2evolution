@@ -222,6 +222,7 @@ class File extends DataObject
 
 		$this->delete_restrictions = array(
 				array( 'table'=>'T_links', 'fk'=>'link_file_ID', 'msg'=>T_('%d linked items') ),
+				array( 'table'=>'T_users', 'fk'=>'user_avatar_file_ID', 'msg'=>T_('%d linked users') ),
 			);
 
 		// Memorize filepath:
@@ -1927,6 +1928,10 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.37  2009/07/16 13:55:35  tblue246
+ * - Do not allow modification of "Post" post type (ID 1).
+ * - When deleting files, check for linked users.
+ *
  * Revision 1.36  2009/07/06 23:52:24  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *

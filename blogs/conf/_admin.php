@@ -45,7 +45,7 @@ $allow_cross_posting = 1;
  *
  * @global array $posttypes_locked_IDs
  */
-$posttypes_locked_IDs = array( 1000, 1500, 1520, 1530, 1570, 1600, 2000, 3000 );
+$posttypes_locked_IDs = array( 1, 1000, 1500, 1520, 1530, 1570, 1600, 2000, 3000 );
 
 /**
  * Reserved post type IDs.
