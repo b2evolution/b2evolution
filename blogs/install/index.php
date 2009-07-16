@@ -118,6 +118,7 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 	<title><?php echo T_('b2evo installer').( $title ? ': '.$title : '' ) ?></title>
 	<!-- InstanceEndEditable -->
 	<meta name="viewport" content="width = 750" />
+	<meta name="robots" content="noindex, follow" />
 	<link href="../rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
 	<!-- InstanceParam name="lang" type="text" value="&lt;?php locale_lang() ?&gt;" -->
@@ -701,6 +702,10 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.178  2009/07/16 17:09:54  fplanque
+ * noindex doc
+ * added info for noobs
+ *
  * Revision 1.177  2009/07/15 11:58:16  tblue246
  * - Installer:
  * 	- Check if the selected locale could be activated and fallback to en-US if not.

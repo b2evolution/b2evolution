@@ -5,6 +5,7 @@
 	<title>b2evolution</title>
 	<!-- TemplateEndEditable -->
 	<meta name="viewport" content="width = 750" />
+	<meta name="robots" content="noindex, follow" />
 	<link href="../blogs/rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	<!-- TemplateBeginEditable name="head" --><!-- TemplateEndEditable -->
 	<!-- TemplateParam name="lang" type="text" value="en-US" passthrough="true" --> 

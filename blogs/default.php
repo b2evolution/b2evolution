@@ -47,6 +47,7 @@ header_content_type( 'text/html' );
 	<title>b2evolution - Default Page</title>
 	<!-- InstanceEndEditable -->
 	<meta name="viewport" content="width = 750" />
+	<meta name="robots" content="noindex, follow" />
 	<link href="rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	<!-- InstanceBeginEditable name="head" -->
 	<base href="<?php echo $baseurl ?>" />

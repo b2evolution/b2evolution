@@ -5,6 +5,7 @@
 	<title>b2evolution</title>
 	<!-- InstanceEndEditable -->
 	<meta name="viewport" content="width = 750" />
+	<meta name="robots" content="noindex, follow" />
 	<link href="../blogs/rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	<!-- InstanceBeginEditable name="head" --><!-- TemplateBeginEditable name="head" --><!-- TemplateEndEditable --><!-- InstanceEndEditable -->
 	<!-- InstanceParam name="lang" type="text" value="en-US" passthrough="true" --> 
