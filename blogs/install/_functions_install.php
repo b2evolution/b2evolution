@@ -812,7 +812,7 @@ function load_db_schema()
 	// Load modules:
 	foreach( $modules as $module )
 	{
-		echo 'Loading: '.$module.'/model/_'.$module.'.install.php<br />';
+		// echo 'Loading: '.$module.'/model/_'.$module.'.install.php<br />';
 		require_once $inc_path.$module.'/model/_'.$module.'.install.php';
 	}
 
@@ -821,6 +821,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.70  2009/07/16 21:36:26  blueyed
+ * Comment debug code(?!)
+ *
  * Revision 1.69  2009/07/12 22:22:26  tblue246
  * Translation bugfix
  *
