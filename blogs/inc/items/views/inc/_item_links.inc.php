@@ -128,7 +128,11 @@ function display_link( & $row )
 			}
 		}
 
-		$r .= '<span class="filemeta"> - '.$current_File->dget('title').'</span>';
+		$title = $current_File->dget('title');
+		if( $title !== '' )
+		{
+			$r .= '<span class="filemeta"> - '.$title.'</span>';
+		}
 
 		return $r;
 	}
@@ -185,6 +189,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2009/07/16 14:14:59  tblue246
+ * Linked file lists: Only display file title if not empty.
+ *
  * Revision 1.5  2009/03/08 23:57:44  fplanque
  * 2009
  *
