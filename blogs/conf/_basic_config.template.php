@@ -4,7 +4,7 @@
  *
  * You do NOT need to edit this file. In most situations, the installer will do it for you.
  * If however you are doing a MANUAL install, make sure you do NOT edit _basic_config.template.php !
- * You should edit _basic_config.php instead. If _basic_config.template.php doesn't exist yet, then
+ * You should edit _basic_config.php instead. If _basic_config.php doesn't exist yet, then
  * open _basic_config.template.php and SAVE it AS _basic_config.php.
  *
  * Reminder: every line starting with # or // is a comment, multiline comments are
