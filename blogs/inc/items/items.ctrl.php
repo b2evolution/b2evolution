@@ -338,8 +338,7 @@ switch( $action )
 			}
 			else
 			{
-				// Tblue> - Perhaps this should be an error (?).
-				//        - Message contents could be confusing.
+				// Tblue> Message contents could be confusing.
 				$Messages->add( sprintf( T_( 'The post has been created but not published because it seems like you wanted to set its status to "%s" instead.  If you really want to make it public, manually change its status to "Published" and click the "Save" button.' ),
 					$post_status == 'protected' ? T_( 'Protected' ) : T_( 'Private' ) ), 'error' );
 			}
@@ -437,8 +436,7 @@ switch( $action )
 			}
 			else
 			{
-				// Tblue> - Perhaps this should be an error (?).
-				//        - Message contents could be confusing.
+				// Tblue> Message contents could be confusing.
 				$Messages->add( sprintf( T_( 'The post has been updated but not published because it seems like you wanted to set its status to "%s" instead. If you really want to make it public, manually change its status to "Published" and click the "Save" button.' ),
 									$post_status == 'protected' ? T_( 'Protected' ) : T_( 'Private' ) ), 'error' );
 			}
@@ -1029,6 +1027,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.53  2009/07/17 22:33:26  tblue246
+ * minor/doc
+ *
  * Revision 1.52  2009/07/06 23:52:24  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *
