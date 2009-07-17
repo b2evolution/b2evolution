@@ -127,15 +127,21 @@ function skin_init( $disp )
 
 				$canonical_url = $Item->get_permanent_url( '', '', '&' );
 
-				// fp> why gave we been cropping params?
-				// $requested_crop = preg_replace( '¤\?.*$¤', '', $ReqHost.$ReqURI );
-				// $canonical_crop = preg_replace( '¤\?.*$¤', '', $canonical_url );
+				// fp> why have we been cropping params?
+				/* Tblue> If we don't crop them, e.g. post pages don't
+				 *        work anymore (canonical URL without params !=
+				 *        requested URL with "page" param => redirect to
+				 *        canonical URL without page param). Alternatively,
+				 *        we could extract the page param only and discard
+				 *        all other params.
+				 */
+				$requested_crop = preg_replace( '¤\?.*$¤', '', $ReqHost.$ReqURI );
+				$canonical_crop = preg_replace( '¤\?.*$¤', '', $canonical_url );
 				// pre_dump( '', $requested_crop, $canonical_crop );
 
-				// if( ! is_same_url($requested_crop, $canonical_crop) )
-				if( ! is_same_url( $ReqHost.$ReqURI, $canonical_url) )
+				//if( ! is_same_url( $ReqHost.$ReqURI, $canonical_url) )
+				if( ! is_same_url( $requested_crop, $canonical_crop ) )
 				{	// The requested URL does not look like the canonical URL for this post...
-					// fp> TODO: we might be losing additional params, it would be better to keep them... (but we have redir=no for that)
 					if( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
 					{	// REDIRECT TO THE CANONICAL URL:
 						$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].' );
@@ -897,6 +903,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.70  2009/07/17 11:44:27  tblue246
+ * Crop params before comparing requested post URL and canonical post URL. Fixes http://forums.b2evolution.net//viewtopic.php?t=19200
+ *
  * Revision 1.69  2009/07/14 10:55:03  tblue246
  * Bugfix: Remember requested page number when redirecting to a canonical chapter URL
  *
