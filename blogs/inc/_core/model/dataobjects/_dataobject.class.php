@@ -74,6 +74,17 @@ class DataObject
 	/**#@-*/
 
 	/**
+	 * DB field change that prevents an update of the datemodified field.
+	 *
+	 * If the number of DB changes matches the number of elements in this
+	 * array and all of the listed fields are changed, the datemodified
+	 * field does not get updated.
+	 *
+	 * @var array
+	 */
+	var $ignore_datemodified = array();
+
+	/**
 	 * Relations that may restrict deletion.
 	 */
 	var $delete_restrictions = array();
@@ -130,19 +141,28 @@ class DataObject
 	 */
 	function dbupdate()
 	{
-		global $DB, $localtimenow, $current_User;
+		global $DB, $localtimenow, $current_User, $Debuglog;
 
 		if( $this->ID == 0 ) { debug_die( 'New object cannot be updated!' ); }
 
-		if( count( $this->dbchanges ) == 0 )
+		$nb_dbchanges   = count( $this->dbchanges );
+		$nb_ign_datemod = count( $this->ignore_datemodified );
+		if( $nb_dbchanges == 0 )
 		{
 			return NULL;	// No changes!
 		}
-
-		if( !empty($this->datemodified_field) )
+		else if( ! empty( $this->datemodified_field ) &&
+					( $nb_dbchanges != $nb_ign_datemod ||
+					  array_diff( $this->ignore_datemodified, array_keys( $this->dbchanges ) ) != array() ) )
 		{	// We want to track modification date:
+			//$Debuglog->add( $this->dbtablename.' object, updating datemodified field', 'dataobjects' );
 			$this->set_param( $this->datemodified_field, 'date', date('Y-m-d H:i:s',$localtimenow) );
 		}
+		/*else
+		{
+			$Debuglog->add( $this->dbtablename.' object, NOT updating datemodified field', 'dataobjects' );
+		}*/
+
 		if( !empty($this->lasteditor_field) && is_object($current_User) )
 		{	// We want to track last editor:
 			// TODO: the current_User is not necessarily the last editor. Item::dbupdate() gets called after incrementing the view for example!
@@ -655,6 +675,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2009/07/17 17:50:10  tblue246
+ * Item class: Prevent update of datemodified field if only the post excerpt gets updated.
+ *
  * Revision 1.4  2009/03/08 23:57:40  fplanque
  * 2009
  *

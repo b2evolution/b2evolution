@@ -209,8 +209,17 @@ class Item extends ItemLight
 	 */
 	var $Links = NULL;
 
+	/*
+	 * Prevent update of datemodified field if only the excerpt gets
+	 * updated.
+	 * 
+	 * @var array
+	 * @see DataObject::$ignore_datemodified
+	 */
+	var $ignore_datemodified = array( 'post_excerpt' );
 
 	var $priorities;
+
 
 	/**
 	 * Constructor
@@ -3934,6 +3943,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.118  2009/07/17 17:50:11  tblue246
+ * Item class: Prevent update of datemodified field if only the post excerpt gets updated.
+ *
  * Revision 1.117  2009/07/08 02:38:55  sam2kb
  * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
  *
