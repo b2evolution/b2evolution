@@ -549,6 +549,35 @@ class DataObject
 		// i-e: transform 0 to ''
 		$new_value = ($make_null && ($parvalue === '')) ? NULL : $parvalue;
 
+		/* Tblue> Problem: All class member variables originating from the
+		 *                 DB are strings (unless they were NULL in the DB,
+		 *                 then they are set to NULL by the PHP MySQL
+		 *                 extension).
+		 *                 If we pass an integer or a double to this function,
+		 *                 the corresponding member variable gets changed
+		 *                 on every call, because its type is 'string' and
+		 *                 we compare using the === operator. Using the
+		 *                 == operator would be a bad idea, though, because
+		 *                 somebody could pass a NULL value to this function.
+		 *                 If the member variable then is set to 0, then
+		 *                 0 equals NULL and the member variable does not
+		 *                 get updated at all!
+		 *                 Thus, using the === operator is correct.
+		 *       Solution: If $fieldtype is 'number' and the type of the
+		 *                 passed value is either integer or double, we
+		 *                 convert it to a string (no data loss). The
+		 *                 member variable and the passed value can then
+		 *                 be correctly compared using the === operator.
+		 *
+		 * THIS IS EXPERIMENTAL! Feel free to revert if something does not
+		 * work as expected.
+		 */
+		if( $fieldtype == 'number' && in_array( gettype( $new_value ), array( 'integer', 'double' ) ) )
+		{
+			settype( $new_value, 'string' );
+		}
+
+		//$Debuglog->add( $this->dbtablename.' object; $fieldtype = '.$fieldtype.'; type of $this->'.$parname.' = '.gettype( @$this->$parname ).'; type of $new_value = '.gettype( $new_value ), 'dataobjects' );
 /* >old
 		if( !isset($this->$parname) )
 		{	// This property has never been set before, set it to NULL now in order for tests to work:
@@ -579,7 +608,7 @@ class DataObject
 		else
 		{
 			// Set the value in the object:
-			// echo '<br/>'.$this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$new_value.(is_null($new_value)?' NULL':'').' (was:'.$this->$parname.(is_null($this->$parname)?' NULL':'').')';
+			//$Debuglog->add( $this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$new_value.(is_null($new_value)?' NULL':'').' (was:'.@$this->$parname.(is_null(@$this->$parname)?' NULL':'').')', 'dataobjects' );
 			$this->$parname = $new_value;
 			$Debuglog->add( $this->dbtablename.' object, setting param '.$parname.'/'.$dbfield.' to '.$this->$parname, 'dataobjects' );
 
@@ -675,6 +704,11 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2009/07/17 23:11:11  tblue246
+ * - DataObject::set_param(): Correctly decide whether to update values with $fieldtype == 'number' (see code for detailed explanation).
+ * - Item class: Doc about updating excerpt without updating the datemodified field.
+ * - ItemLight class: Add missing member variable.
+ *
  * Revision 1.5  2009/07/17 17:50:10  tblue246
  * Item class: Prevent update of datemodified field if only the post excerpt gets updated.
  *

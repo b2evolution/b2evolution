@@ -146,7 +146,10 @@ class ItemLight extends DataObject
 		{
 			$this->ID = $db_row->$dbIDname;
 			$this->datemodified = $db_row->post_datemodified; // Needed for history display
+			/* Tblue> Both of the next two member variables are used in
+			 *        various places, maybe we should decide on one?! */
 			$this->issue_date = $db_row->post_datestart;
+			$this->datestart = $db_row->post_datestart;
 			$this->mod_date = $db_row->post_datemodified;
 			$this->main_cat_ID = $db_row->post_main_cat_ID;
 			$this->urltitle = $db_row->post_urltitle;
@@ -952,6 +955,11 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2009/07/17 23:11:11  tblue246
+ * - DataObject::set_param(): Correctly decide whether to update values with $fieldtype == 'number' (see code for detailed explanation).
+ * - Item class: Doc about updating excerpt without updating the datemodified field.
+ * - ItemLight class: Add missing member variable.
+ *
  * Revision 1.20  2009/07/05 00:50:29  fplanque
  * no message
  *
