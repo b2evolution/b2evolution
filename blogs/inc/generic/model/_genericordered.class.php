@@ -87,7 +87,7 @@ class GenericOrdered extends GenericElement
 		switch( $parname )
 		{
  			case 'order':
-				$this->set_param( $parname, 'integer', $parvalue );
+				$this->set_param( $parname, 'number', $parvalue );
 				break;
 
 			case 'name':
@@ -129,6 +129,9 @@ class GenericOrdered extends GenericElement
 
 /*
  * $Log$
+ * Revision 1.4  2009/07/18 18:43:50  tblue246
+ * DataObject::set_param() does not accept "integer" as the 2nd param (has to be "number").
+ *
  * Revision 1.3  2009/03/08 23:57:43  fplanque
  * 2009
  *

@@ -1348,7 +1348,7 @@ class File extends DataObject
 
 		// Let's make sure the bare minimum gets saved to DB:
 		$this->set_param( 'root_type', 'string', $this->_FileRoot->type );
-		$this->set_param( 'root_ID', 'integer', $this->_FileRoot->in_type_ID );
+		$this->set_param( 'root_ID', 'number', $this->_FileRoot->in_type_ID );
 		$this->set_param( 'path', 'string', $this->_rdfp_rel_path );
 
 		// Let parent do the insert:
@@ -1928,6 +1928,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2009/07/18 18:43:50  tblue246
+ * DataObject::set_param() does not accept "integer" as the 2nd param (has to be "number").
+ *
  * Revision 1.37  2009/07/16 13:55:35  tblue246
  * - Do not allow modification of "Post" post type (ID 1).
  * - When deleting files, check for linked users.
