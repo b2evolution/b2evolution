@@ -572,7 +572,7 @@ class DataObject
 		 * THIS IS EXPERIMENTAL! Feel free to revert if something does not
 		 * work as expected.
 		 */
-		if( $fieldtype == 'number' && in_array( gettype( $new_value ), array( 'integer', 'double' ) ) )
+		if( $fieldtype == 'number' && ( is_int( $new_value ) || is_float( $new_value ) ) )
 		{
 			settype( $new_value, 'string' );
 		}
@@ -704,6 +704,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2009/07/18 11:09:26  tblue246
+ * Use is_int() and is_float() instead of gettype() -- better performance.
+ *
  * Revision 1.6  2009/07/17 23:11:11  tblue246
  * - DataObject::set_param(): Correctly decide whether to update values with $fieldtype == 'number' (see code for detailed explanation).
  * - Item class: Doc about updating excerpt without updating the datemodified field.
