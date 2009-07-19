@@ -222,7 +222,7 @@ class File extends DataObject
 
 		$this->delete_restrictions = array(
 				array( 'table'=>'T_links', 'fk'=>'link_file_ID', 'msg'=>T_('%d linked items') ),
-				array( 'table'=>'T_users', 'fk'=>'user_avatar_file_ID', 'msg'=>T_('%d linked users') ),
+				array( 'table'=>'T_users', 'fk'=>'user_avatar_file_ID', 'msg'=>T_('%d linked users (avatars)') ),
 			);
 
 		// Memorize filepath:
@@ -1928,6 +1928,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.39  2009/07/19 21:00:19  fplanque
+ * minor
+ *
  * Revision 1.38  2009/07/18 18:43:50  tblue246
  * DataObject::set_param() does not accept "integer" as the 2nd param (has to be "number").
  *
