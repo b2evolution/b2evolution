@@ -394,12 +394,11 @@ $allowed_attributes += array
 
 );
 
-
 if( $allow_javascript )
 {
 	$allowed_attributes += array
 	(
-		'script' => 'type',
+		'script' => 'type charset src',
 		'noscript' => '',
 	);
 }
@@ -568,6 +567,9 @@ $comments_allowed_attributes = array
 
 /*
  * $Log$
+ * Revision 1.9  2009/07/19 22:36:15  fplanque
+ * more attribs
+ *
  * Revision 1.8  2009/03/22 16:15:07  fplanque
  * Reverted fugky hack where all possible combiantions pose as a "level"
  * Use one checkbox per attributes class/style/id
