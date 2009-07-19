@@ -38,8 +38,17 @@ $evo_charset = '';
 
 
 /**
- * Set this to a specific charset, to force this as {@link $io_charset I/O charset},
- * if the browser accepts it.
+ * Set this to a specific charset, to force this as {@link $io_charset I/O charset}, if the browser accepts it.
+ *
+ * DO NOT CHANGE THIS if your language requires UTF8 (East Asian, Arabic, etc, etc, etc) !!!
+ * This is NOT the correct way to do it. If you change this setting it may look like it works but YOU WILL HAVE ISSUES!
+ * The correct way to use UTF8 for some languages/locales is to install the appropriate language pack into the locales folder.
+ * Language packs can be downloaded here: http://b2evolution.net/downloads/language-packs.html
+ *
+ * If your language is not available, you can create your own (you may use /locales/ru-RU as a model)
+ * OR... WORST CASE SCENARIO: you can always use the en-US-utf8 locale: "English (US) utf8"
+ *
+ * Please share new language packs with the community.
  *
  * Setting this to "utf-8" allows you to deliver all pages in this encoding even if the selected locale was not
  * translated to utf-8. Typically requires MBSTRING. Make sure, that your PHP/MySQL setup supports this.
@@ -106,13 +115,12 @@ require_once $inc_path.'locales/_locale.funcs.php';
  * @todo fp>Actually, the default locale setting should move to install and we should always use the database after that. What were we smoking when we did that? :P
  */
 $locales['en-US'] = array(
-		'name' => NT_('English (US)'),
+		'name' => NT_('English (US) latin1'),
 		'charset' => 'iso-8859-1',
 		'datefmt' => 'm/d/y',
 		'timefmt' => 'h:i:s a',
 		'startofweek' => 0,
 		'messages' => 'en_US',
-		'enabled' => 0,
 	);
 
 /**

@@ -10,7 +10,7 @@
  *  - 'charset':  Character set of the locale's messages files.
  */
 $locale_defs['en-SG'] = array(
-		'name' => NT_('English (SG)'),
+		'name' => NT_('English (SG) latin1'),
 		'charset' => 'iso-8859-1',
 		'datefmt' => 'd/m/y',
 		'timefmt' => 'H:i:s a',
