@@ -134,6 +134,7 @@ function skin_init( $disp )
 				 *        canonical URL without page param). Alternatively,
 				 *        we could extract the page param only and discard
 				 *        all other params.
+				 * fp> I think it may make more sense to extract the page param.
 				 */
 				$requested_crop = preg_replace( '¤\?.*$¤', '', $ReqHost.$ReqURI );
 				$canonical_crop = preg_replace( '¤\?.*$¤', '', $canonical_url );
@@ -903,6 +904,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.71  2009/07/19 14:34:43  fplanque
+ * doc
+ *
  * Revision 1.70  2009/07/17 11:44:27  tblue246
  * Crop params before comparing requested post URL and canonical post URL. Fixes http://forums.b2evolution.net//viewtopic.php?t=19200
  *
