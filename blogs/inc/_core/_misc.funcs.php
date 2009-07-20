@@ -725,8 +725,8 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 					}
 					// end of tag:
 					$inside_tag = false;
-					$r .= substr($text, $from_pos, $i-$from_pos);
-					$from_pos = $i;
+					$r .= substr($text, $from_pos, $i-$from_pos+1);
+					$from_pos = $i+1;
 					// $r .= '}';
 					break;
 
@@ -3523,6 +3523,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.118  2009/07/20 23:12:56  fplanque
+ * more power to autolinks plugin
+ *
  * Revision 1.117  2009/07/20 02:15:10  fplanque
  * fun with tags, regexps & the autolink plugin
  *

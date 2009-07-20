@@ -28,16 +28,22 @@ class autolinks_plugin extends Plugin
 	var $code = 'b2evALnk';
 	var $name = 'Auto Links';
 	var $priority = 60;
-	var $version = '1.9-dev';
+	var $version = '3.3.1';
 	var $apply_rendering = 'opt-out';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
 	var $number_of_installs = null;	// Let admins install several instances with potentially different word lists
 
-	var $link_array;
+	/**
+	 * Lazy loaded from txt files
+	 *
+	 * @var array
+	 */
+	var $link_array = null;
 	var $current_link_array;
 
+	var $previous_word = null;
 
 	/**
 	 * Init
@@ -46,15 +52,50 @@ class autolinks_plugin extends Plugin
 	{
 		$this->short_desc = T_('Make URLs clickable');
 		$this->long_desc = T_('This renderer will detect URLs in the text and automatically transform them into clickable links.');
+	}
 
-		// fp> TODO: Make editable. Textarea/DB and/or .txt files(s)
-		// Dummy test data waiting for admin interface: (these words should work like crazy on the default contents)
-		$this->link_array = array(
-				'blog' => 'b2evolution.net',
-				'post' => 'b2evo.net',
-				'settings' => 'evocore.net',
-				'@b2evolution' => 'twitter.com/b2evolution', // maybe we should integrate that one into the generic make_clickable?
-			);
+	/**
+	 * Lazy load
+	 *
+	 */
+	function load_link_array()
+	{
+		global $plugins_path;
+
+		if( !is_null($this->link_array) )
+		{
+			return;
+		}
+
+		$this->link_array = array();
+
+		// Load defaults:
+		$this->read_csv_file( $plugins_path.'autolinks_plugin/definitions.default.txt' );
+		// Load local user defintions:
+		$this->read_csv_file( $plugins_path.'autolinks_plugin/definitions.local.txt' );
+	}
+
+	/**
+ 	 *
+	 *
+	 * @param string $filename
+	 */
+	function read_csv_file( $filename )
+	{
+		if( ! $handle = @fopen( $filename, 'r') )
+		{	// File could not be opened:
+			return;
+		}
+
+		while( ($data = fgetcsv($handle, 1000, ';', '"')) !== false )
+		{
+			if( empty($data[0]) || empty($data[2]) )
+			{	// Skip empty and comment lines
+				continue;
+			}
+			$this->link_array[$data[0]] = array( $data[1], $data[2] );
+		}
+		fclose($handle);
 	}
 
 
@@ -69,8 +110,9 @@ class autolinks_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
+		$this->load_link_array();
+
 		// Start with a fresh link array:
-		// fp> TODO: setting to edit list
 		$this->current_link_array = $this->link_array;
 
 		// First, make the URLs clickable:
@@ -92,8 +134,15 @@ class autolinks_plugin extends Plugin
 	 */
 	function make_clickable_callback( $text, $moredelim = '&amp;' )
 	{
+		$this->previous_lword = null;
+
 		// Find word with 3 characters at least:
-		$text = preg_replace_callback( '/(^|[^&])(@?[a-z0-9_\-]{3,})/i', array( $this, 'replace_callback' ), $text );
+		$text = preg_replace_callback( '/(^|\s)([@a-z0-9_\-]{3,})/i', array( $this, 'replace_callback' ), $text );
+
+		// pre_dump($text);
+
+		// Cleanup words to be deleted:
+		$text = preg_replace( '/[@a-z0-9_\-]+\s*==!#DEL#!==/i', '', $text );
 
 		return $text;
 	}
@@ -103,23 +152,45 @@ class autolinks_plugin extends Plugin
 	 */
 	function replace_callback( $matches )
 	{
+		$sign = $matches[1];
 		$word = $matches[2];
 		$lword = strtolower($word);
+		$r = $sign.$word;
 
 		if( isset( $this->current_link_array[$lword] ) )
 		{
-			$word = '<a href="http://'.$this->current_link_array[$lword].'" target="_blank">'.$word.'</a>';
+			$previous = $this->current_link_array[$lword][0];
+			$url = 'http://'.$this->current_link_array[$lword][1];
+
+			if( !empty($previous) )
+			{
+				if( $this->previous_lword != $previous )
+				{	// We do not have the required previous word
+					return $r;
+				}
+				$r = '==!#DEL#!==<a href="'.$url.'">'.$this->previous_word.' '.$word.'</a>';
+			}
+			else
+			{
+				$r = $sign.'<a href="'.$url.'">'.$word.'</a>';
+			}
 			// Make sure we don't make the same word clickable twice in the same text/post:
 			unset( $this->current_link_array[$lword] );
 		}
 
-		return $matches[1].$word;
+		$this->previous_word = $word;
+		$this->previous_lword = $lword;
+
+		return $r;
 	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.22  2009/07/20 23:12:56  fplanque
+ * more power to autolinks plugin
+ *
  * Revision 1.21  2009/07/20 02:15:10  fplanque
  * fun with tags, regexps & the autolink plugin
  *

@@ -1,0 +1,33 @@
+; This is the definitions file for the autolinks plugin.
+;
+; Do NOT MODIFY this file. You may lose your edits when upgrading.
+;
+; To create your own definitions, duplicate this file by SAVING it AS defintions.local.csv .
+;
+; Values are separated by ;
+; Field 1 = word to autolink
+; Field 2 = optional previous required word (allows to create groups of 2 words)
+; Field 3 = url
+
+; Simple word autolinks:
+b2evo;;b2evolution.net
+b2evolution;;b2evolution.net
+engine;blog;b2evolution.net
+platform;blog;b2evolution.net
+soft;blog;b2evolution.net
+software;blog;b2evolution.net
+tool;blog;b2evolution.net
+
+; DUMMY DEFINITIONS FOR TESTING:
+blog;;b2evolution.net
+blogs;new;evoblog.com
+post;;b2evo.net
+settings;;evocore.net
+
+; Twitter handles:
+@b2evolution;;twitter.com/b2evolution
+@tblue;;twitter.com/tblue
+@leeturner;;twitter.com/leeturner
+@waltercruz;;twitter.com/waltercruz
+@francoisplanque;;twitter.com/francoisplanque
+@sam2kb;;twitter.com/sam2kb
