@@ -33,7 +33,10 @@ class autolinks_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $number_of_installs = 1;
+	var $number_of_installs = null;	// Let admins install several instances with potentially different word lists
+
+	var $link_array;
+	var $current_link_array;
 
 
 	/**
@@ -43,6 +46,15 @@ class autolinks_plugin extends Plugin
 	{
 		$this->short_desc = T_('Make URLs clickable');
 		$this->long_desc = T_('This renderer will detect URLs in the text and automatically transform them into clickable links.');
+
+		// fp> TODO: Make editable. Textarea/DB and/or .txt files(s)
+		// Dummy test data waiting for admin interface: (these words should work like crazy on the default contents)
+		$this->link_array = array(
+				'blog' => 'b2evolution.net',
+				'post' => 'b2evo.net',
+				'settings' => 'evocore.net',
+				'@b2evolution' => 'twitter.com/b2evolution', // maybe we should integrate that one into the generic make_clickable?
+			);
 	}
 
 
@@ -57,15 +69,60 @@ class autolinks_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
+		// Start with a fresh link array:
+		// fp> TODO: setting to edit list
+		$this->current_link_array = $this->link_array;
+
+		// First, make the URLs clickable:
+		// fp> TODO: setting to enable/disable this
 		$content = make_clickable( $content );
 
+		// Now, make the desired remaining terms clickable:
+		// fp> TODO: setting to enable/disable this
+		$content = make_clickable( $content, '&amp;', array( $this, 'make_clickable_callback' ) );
+
 		return true;
+	}
+
+
+	/**
+	 * Callback function for {@link make_clickable()}.
+	 *
+	 * @return string The clickable text.
+	 */
+	function make_clickable_callback( $text, $moredelim = '&amp;' )
+	{
+		// Find word with 3 characters at least:
+		$text = preg_replace_callback( '/(^|[^&])(@?[a-z0-9_\-]{3,})/i', array( $this, 'replace_callback' ), $text );
+
+		return $text;
+	}
+
+	/**
+	 * This is the 2nd level of callback!!
+	 */
+	function replace_callback( $matches )
+	{
+		$word = $matches[2];
+		$lword = strtolower($word);
+
+		if( isset( $this->current_link_array[$lword] ) )
+		{
+			$word = '<a href="http://'.$this->current_link_array[$lword].'" target="_blank">'.$word.'</a>';
+			// Make sure we don't make the same word clickable twice in the same text/post:
+			unset( $this->current_link_array[$lword] );
+		}
+
+		return $matches[1].$word;
 	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.21  2009/07/20 02:15:10  fplanque
+ * fun with tags, regexps & the autolink plugin
+ *
  * Revision 1.20  2009/03/08 23:57:47  fplanque
  * 2009
  *

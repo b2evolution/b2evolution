@@ -692,16 +692,19 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
  *
  * @todo dh> this should not replace links in tags! currently fails for something
  *           like '<img src=" http://example.com/" />' (not usual though!)
+ * fp> I am trying to address this by not replacing anything inside tags
+ * fp> This should be replaced by a clean state machine (one single variable for current state)
  *
  * {@internal This function gets tested in misc.funcs.simpletest.php.}}
  *
  * @return string
  */
-function make_clickable( $text, $moredelim = '&amp;' )
+function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickable_callback' )
 {
 	$r = '';
+	$inside_tag = false;
 	$in_a_tag = false;
-	$in_a_tag_quote = false;
+	$in_tag_quote = false;
 	$from_pos = 0;
 	$i = 0;
 	$n = strlen($text);
@@ -710,67 +713,103 @@ function make_clickable( $text, $moredelim = '&amp;' )
 	// wellformed HTML and the implementation below should be
 	// faster and less memory intensive (tested for some example content)
 	while( $i < $n )
-	{
-		if( $in_a_tag )
-		{
+	{	// Go through each char in string... (we will fast forward from tag to tag)
+		if( $inside_tag )
+		{	// State: We're currently inside some tag:
 			switch( $text[$i] )
 			{
-			case '<':
-				if( $in_a_tag_quote )
-				{
+				case '>':
+					if( $in_tag_quote )
+					{ // This is in a quoted string so it doesn't really matter...
+						break;
+					}
+					// end of tag:
+					$inside_tag = false;
+					$r .= substr($text, $from_pos, $i-$from_pos);
+					$from_pos = $i;
+					// $r .= '}';
 					break;
-				}
-				if( strtolower(substr($text, $i+1, 3)) == '/a>' )
-				{
-					$r .= substr($text, $from_pos, $i-$from_pos+4);
-					$from_pos = $i+4;
-					$i += 3;
-					$in_a_tag = false;
-					$in_a_tag_quote = false;
-				}
-				break;
 
-			case '"':
-			case '\'':
-				if( ! $in_a_tag_quote )
-				{
-					$in_a_tag_quote = $text[$i];
-				}
-				elseif( $in_a_tag_quote == $text[$i] )
-				{
-					$in_a_tag_quote = false;
-				}
-				break;
+				case '"':
+				case '\'':
+					// This is the beginning or the end of a quoted string:
+					if( ! $in_tag_quote )
+					{
+						$in_tag_quote = $text[$i];
+					}
+					elseif( $in_tag_quote == $text[$i] )
+					{
+						$in_tag_quote = false;
+					}
+					break;
+			}
+		}
+		elseif( $in_a_tag )
+		{	// In a link but no longer inside <a>...</a> tag or any othe rembedded tag like <strong> or whatever
+			switch( $text[$i] )
+			{
+				case '<':
+					if( strtolower(substr($text, $i+1, 3)) == '/a>' )
+					{	// Ok, this is the end tag of the link:
+						// $r .= substr($text, $from_pos, $i-$from_pos+4);
+						// $from_pos = $i+4;
+						$i += 3;
+						$in_a_tag = false;
+						$in_tag_quote = false;
+					}
+					break;
 			}
 		}
 		else
-		{ // ! $in_a_tag:
+		{ // State: we're not currently in any tag:
+			// Find next tag opening:
 			$i = strpos($text, '<', $i);
 			if( $i === false )
 			{ // No more opening tags:
 				break;
 			}
+
+			$inside_tag = true;
+			$in_tag_quote = false;
+			// s$r .= '{'.$text[$i+1];
+
 			if( ($text[$i+1] == 'a' || $text[$i+1] == 'A') && ctype_space($text[$i+2]) )
 			{ // opening "A" tag
 				$in_a_tag = true;
-				$in_a_tag_quote = false;
-				// Make the text before the opening A clickable:
-				$r .= make_clickable_callback( substr($text, $from_pos, $i-$from_pos), $moredelim );
-				$from_pos = $i;
-				$i += 2;
 			}
+
+			// Make the text before the opening < clickable:
+			if( is_array($callback) )
+			{
+				$r .= $callback[0]->$callback[1]( substr($text, $from_pos, $i-$from_pos), $moredelim );
+			}
+			else
+			{
+				$r .= $callback( substr($text, $from_pos, $i-$from_pos), $moredelim );
+			}
+			$from_pos = $i;
+
+			// $i += 2;
 		}
 
 		$i++;
 	}
+
 	// the remaining part:
 	if( $in_a_tag )
 	{ // may happen for invalid html:
 		$r .= substr($text, $from_pos);
 	}
 	else
-	{
-		$r .= make_clickable_callback( substr($text, $from_pos), $moredelim );
+	{	// Make remplacements in the remaining part:
+		if( is_array($callback) )
+		{
+			$r .= $callback[0]->$callback[1]( substr($text, $from_pos), $moredelim );
+		}
+		else
+		{
+			$r .= $callback( substr($text, $from_pos), $moredelim );
+		}
 	}
 
 	return $r;
@@ -783,6 +822,9 @@ function make_clickable( $text, $moredelim = '&amp;' )
  * original function: phpBB, extended here for AIM & ICQ
  * fplanque restricted :// to http:// and mailto://
  * Fixed to not include trailing dot and comma.
+ *
+ * fp> I'm thinking of moving this into the autolinks plugin (only place where it's used)
+ *     and break it up into something more systematic.
  *
  * @return string The clickable text.
  */
@@ -3481,6 +3523,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.117  2009/07/20 02:15:10  fplanque
+ * fun with tags, regexps & the autolink plugin
+ *
  * Revision 1.116  2009/07/09 22:57:32  fplanque
  * Fixed init of connection_charset, especially during install.
  *
