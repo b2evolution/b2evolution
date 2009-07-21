@@ -249,8 +249,8 @@ function create_default_data()
 		" );
 	echo "OK.<br />\n";
 
-	if( ! empty( $current_locale ) && ! $locales[$current_locale]['enabled'] )
-	{	// Make sure the user sees his new system localized. (b2evo is no longer supposed to have specific locales enabled by default)
+	if( ! empty( $current_locale ) )
+	{	// Make sure the user sees his new system localized.
 		echo 'Activating selected default locale... ';
 		$DB->query( 'INSERT INTO T_locales '
 				   .'( loc_locale, loc_charset, loc_datefmt, loc_timefmt, '
@@ -580,13 +580,13 @@ function create_demo_contents()
 
 
 
- 	$info_page = T_("This blog is powered by b2evolution.
+ 	$info_page = T_("<p>This blog is powered by b2evolution.</p>
 
-You are currently looking at an info page about %s.
+<p>You are currently looking at an info page about %s.</p>
 
-Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.
+<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.</p>
 
-If needed, a skin can format info pages differently from regular posts.");
+<p>If needed, an evoskin can format info pages differently from regular posts.</p>");
 
 	// Insert a PAGE:
 	$now = date('Y-m-d H:i:s',$timestamp++);
@@ -609,7 +609,7 @@ If needed, a skin can format info pages differently from regular posts.");
 
 <p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.</p>
 
-<p>If needed, a skin can format info pages differently from regular posts.</p>"), $now, $cat_ann_a,
+<p>If needed, an evoskin can format info pages differently from regular posts.</p>"), $now, $cat_ann_a,
 		array( $cat_ann_a, $cat_ann_b, $cat_linkblog_b2evo ), 'published', '#', '', '', 'open', array('default'), 1000 );
 	$edit_File = & new File( 'shared', 0, 'logos/b2evolution8.png' );
 	$edit_File->link_to_Item( $edited_Item );
@@ -668,7 +668,7 @@ If needed, a skin can format info pages differently from regular posts.");
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("Skins, Stubs, Templates &amp; website integration..."), T_("<p>By default, blogs are displayed using a skin. (More on skins in another post.)</p>
+	$edited_Item->insert( 1, T_("Skins, Stubs, Templates &amp; website integration..."), T_("<p>By default, blogs are displayed using an evoskin. (More on skins in another post.)</p>
 
 <p>This means, blogs are accessed through '<code>index.php</code>', which loads default parameters from the database and then passes on the display job to a skin.</p>
 
@@ -692,7 +692,7 @@ If needed, a skin can format info pages differently from regular posts.");
 
 <p>You can add, remove and reorder widgets from the Blog Settings tab in the admin interface.</p>
 
-<p>Note: to be displayed widgets are placed in containers. Each container appears in a specific place on a skin. If you change the skin of your blog, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.</p>'), $now, $cat_b2evo );
+<p>Note: to be displayed widgets are placed in containers. Each container appears in a specific place in an evoskin. If you change your blog skin, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.</p>'), $now, $cat_b2evo );
 	$edited_Item->set_tags_from_string( 'widgets' );
 	//$edited_Item->dbsave();
 	$edited_Item->insert_update_tags( 'update' );
@@ -700,7 +700,7 @@ If needed, a skin can format info pages differently from regular posts.");
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("About skins..."), T_('<p>By default, b2evolution blogs are displayed using a skin.</p>
+	$edited_Item->insert( 1, T_("About skins..."), T_('<p>By default, b2evolution blogs are displayed using an evoskin.</p>
 
 <p>You can change the skin used by any blog by editing the blog settings in the admin interface.</p>
 
@@ -720,7 +720,7 @@ If needed, a skin can format info pages differently from regular posts.");
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_('Image post'), T_('<p>This post has an image attached to it. The image is automatically resized to fit the current skin. You can zoom in by clicking on the thumbnail.</p>
+	$edited_Item->insert( 1, T_('Image post'), T_('<p>This post has an image attached to it. The image is automatically resized to fit the current blog skin. You can zoom in by clicking on the thumbnail.</p>
 
 <p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>'), $now, $cat_bg );
 	$edit_File = & new File( 'shared', 0, 'monument-valley/monuments.jpg' );
@@ -781,7 +781,7 @@ If needed, a skin can format info pages differently from regular posts.");
 	<li><strong>Photoblog</strong>: This blog is an example of how you can use b2evolution to showcase photos, with one photo per page as well as a thumbnail index.</li>
 </ul>
 
-<p>You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, skin, widgets, etc.) from the Blog Settings tab in the admin interface.</p>"), $now, $cat_ann_a );
+<p>You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, blog skin, widgets, etc.) from the Blog Settings tab in the admin interface.</p>"), $now, $cat_ann_a );
 	$edit_File = & new File( 'shared', 0, 'logos/b2evolution8.png' );
 	$edit_File->link_to_Item( $edited_Item );
 
@@ -852,6 +852,9 @@ If needed, a skin can format info pages differently from regular posts.");
 
 /*
  * $Log$
+ * Revision 1.267  2009/07/21 00:59:59  fplanque
+ * fixed locale
+ *
  * Revision 1.266  2009/07/09 22:56:02  fplanque
  * doc
  *
