@@ -41,7 +41,8 @@ class autolinks_plugin extends Plugin
 	 * @var array
 	 */
 	var $link_array = null;
-	var $current_link_array;
+
+	var $already_linked_array;
 
 	var $previous_word = null;
 
@@ -112,8 +113,8 @@ class autolinks_plugin extends Plugin
 
 		$this->load_link_array();
 
-		// Start with a fresh link array:
-		$this->current_link_array = $this->link_array;
+		// reset already linked:
+		$this->already_linked_array = array();
 
 		// First, make the URLs clickable:
 		// fp> TODO: setting to enable/disable this
@@ -147,6 +148,7 @@ class autolinks_plugin extends Plugin
 		return $text;
 	}
 
+
 	/**
 	 * This is the 2nd level of callback!!
 	 */
@@ -157,10 +159,15 @@ class autolinks_plugin extends Plugin
 		$lword = strtolower($word);
 		$r = $sign.$word;
 
-		if( isset( $this->current_link_array[$lword] ) )
+		if( isset( $this->link_array[$lword] ) )
 		{
-			$previous = $this->current_link_array[$lword][0];
-			$url = 'http://'.$this->current_link_array[$lword][1];
+			$previous = $this->link_array[$lword][0];
+			$url = 'http://'.$this->link_array[$lword][1];
+
+			if( in_array( $url, $this->already_linked_array ) )
+			{	// Do not repeat link to same destination:
+				return $r;
+			}
 
 			if( !empty($previous) )
 			{
@@ -174,8 +181,9 @@ class autolinks_plugin extends Plugin
 			{
 				$r = $sign.'<a href="'.$url.'">'.$word.'</a>';
 			}
-			// Make sure we don't make the same word clickable twice in the same text/post:
-			unset( $this->current_link_array[$lword] );
+
+			// Make sure we don't link to same destination twice in the same text/post:
+			$this->already_linked_array[] = $url;
 		}
 
 		$this->previous_word = $word;
@@ -188,6 +196,9 @@ class autolinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.23  2009/07/21 01:33:47  fplanque
+ * better de-dupe algo
+ *
  * Revision 1.22  2009/07/20 23:12:56  fplanque
  * more power to autolinks plugin
  *

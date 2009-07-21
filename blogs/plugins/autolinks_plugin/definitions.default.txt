@@ -9,20 +9,35 @@
 ; Field 2 = optional previous required word (allows to create groups of 2 words)
 ; Field 3 = url
 
-; Simple word autolinks:
+; A couple of English definitions
+csv;;www.tellmewhatis.com/csv-comma-separated-values
+dns;;www.tellmewhatis.com/dns-domain-name-system
+ethernet;;www.tellmewhatis.com/ethernet
+ftp;;www.tellmewhatis.com/ftp-file-transfer-protocol
+rss;;webreference.fr/defintions/rss-atom-xml
+xml;;www.tellmewhatis.com/xml
+
+; b2evo stuff
+b2;;b2evolution.net
 b2evo;;b2evolution.net
 b2evolution;;b2evolution.net
+blog;free;b2evolution.net
+blogs;multiple;b2evolution.net
 engine;blog;b2evolution.net
+evoskin;;skins.b2evolution.net
 platform;blog;b2evolution.net
+skin;blog;skins.b2evolution.net
+servers;dedicated;b2evolution.net/about/linux-dedicated-servers-web-hosting.php
 soft;blog;b2evolution.net
 software;blog;b2evolution.net
 tool;blog;b2evolution.net
+vps;;b2evolution.net/web-hosting/vps-hosting-virtual-private-servers.php
+webhosting;;b2evolution.net/web-hosting/top-quality-best-webhosting.php
+webhosts;;b2evolution.net/web-hosting/top-quality-best-webhosting.php
 
-; DUMMY DEFINITIONS FOR TESTING:
-blog;;b2evolution.net
-blogs;new;evoblog.com
-post;;b2evo.net
-settings;;evocore.net
+; A couple of French definitions (we should prolly have different files by language/locale)
+hypertexte;;webreference.fr/defintions/www/hypertexte
+godfrain;loi;webreference.fr/defintions/securite/godfrain-loi
 
 ; Twitter handles:
 @b2evolution;;twitter.com/b2evolution
