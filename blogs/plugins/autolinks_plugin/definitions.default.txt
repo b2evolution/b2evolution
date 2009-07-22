@@ -27,22 +27,18 @@ rss;;webreference.fr/defintions/rss-atom-xml
 xml;;www.tellmewhatis.com/xml
 
 ; b2evo stuff
-b2;;b2evolution.net
-b2evo;;b2evolution.net
-b2evolution;;b2evolution.net
-blog;free;b2evolution.net
-blogs;multiple;b2evolution.net
-engine;blog;b2evolution.net
-evoskin;;skins.b2evolution.net
-platform;blog;b2evolution.net
-skin;blog;skins.b2evolution.net
-soft;blog;b2evolution.net
-software;blog;b2evolution.net
-tool;blog;b2evolution.net
+b2;;b2evolution.net/
+b2evo;;b2evolution.net/
+b2evolution;;b2evolution.net/
+engine;multiblog;b2evolution.net/
+evoskin;;skins.b2evolution.net/
+evoskins;;skins.b2evolution.net/
+platform;multiblog;b2evolution.net/
+skin;evo;skins.b2evolution.net/
+skins;evo;skins.b2evolution.net/
 
-; A couple of French definitions (we should prolly have different files by language/locale)
+; A couple of French definitions (TODO: different files by language/locale)
 hypertexte;;webreference.fr/defintions/www/hypertexte
-godfrain;loi;webreference.fr/defintions/securite/godfrain-loi
 
 ; Twitter handles:
 @b2evolution;;twitter.com/b2evolution

@@ -115,6 +115,10 @@ class autolinks_plugin extends Plugin
 
 		// reset already linked:
 		$this->already_linked_array = array();
+		if( preg_match_all( '|[\'"](http://[^\'"]+)|i', $content, $matches ) )
+		{	// There are existing links:
+			$this->already_linked_array = $matches[1];
+		}
 
 		// First, make the URLs clickable:
 		// fp> TODO: setting to enable/disable this
@@ -196,6 +200,10 @@ class autolinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.24  2009/07/22 22:53:02  fplanque
+ * Dedupe existing links
+ * Added missing slashes
+ *
  * Revision 1.23  2009/07/21 01:33:47  fplanque
  * better de-dupe algo
  *
