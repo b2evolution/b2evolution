@@ -263,26 +263,27 @@ skin_include( '_html_header.inc.php' );
 			// Display a link to contact the owner of this blog (if owner accepts messages):
 			$Blog->contact_link( array(
 					'before'      => '',
-					'after'       => ' &bull; ',
+					'after'       => '',
 					'text'   => T_('Contact'),
 					'title'  => T_('Send a message to the owner of this blog...'),
 				) );
 		?>
-
-		Original b2evo skin <a href="http://blog.thedarksighed.com/projectblog/" title="Custom b2evolution template designs">design by Andrew Hreschak</a> / <?php display_param_link( $skinfaktory_links ) ?>
 
 		<?php
 			// Display additional credits:
  			// If you can add your own credits without removing the defaults, you'll be very cool :))
 		 	// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 			credits( array(
-					'list_start'  => '<br />'.T_('Credits').': ',
+					'list_start'  => '&bull;',
 					'list_end'    => ' ',
-					'separator'   => '|',
+					'separator'   => '&bull;',
 					'item_start'  => ' ',
 					'item_end'    => ' ',
 				) );
 		?>
+
+		<br/><?php display_param_link( $skin_links ) ?> <a href="http://blog.thedarksighed.com/projectblog/" title="Custom b2evolution template designs">design by Andrew Hreschak</a>
+
 	</p>
 
 </div><!-- END pagefoot -->

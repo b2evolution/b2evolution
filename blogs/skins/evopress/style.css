@@ -107,8 +107,8 @@ h2, h2 a, h2 a:hover, h2 a:visited, h3, h3 a, h3 a:hover, h3 a:visited, #sidebar
 text-decoration: none;
 }
 
-.bText p a:visited {
-color: #b85b5a;
+.bText a {
+color: #003399;
 }
 
 .commentlist li, #commentform input, #commentform textarea {

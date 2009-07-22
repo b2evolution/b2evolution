@@ -99,7 +99,7 @@ padding: 0;
 border-top:1px solid #fff;
 font-family:tahoma,geneva,verdana,sans-serif;
 font-size: 8pt;
-color:#DAD6C4;
+color:#996600;
 width:960px;
 background:#220000;
 font-size: 8pt;
@@ -185,7 +185,7 @@ text-decoration: none;
 font-size: bold;
 }
 
-a:hover, a:active {
+a:hover {
 text-decoration:underline;
 color:#000;
 }
@@ -198,8 +198,12 @@ text-decoration: underline;
 color:#330000;
 }
 
-#footer a:hover, #footer a:active {
+#footer a:hover {
 text-decoration:underline;
+color:#996600;
+}
+
+#footer a.contact_link:hover {
 color:#fff;
 }
 
@@ -369,6 +373,12 @@ background: url(img/zekebullet.gif) 0 4px no-repeat;
 padding: 0 0 2px 14px;
 }
 
+.bText a {
+color:#630;
+}
+.bText a:visited {
+color:#410;
+}
 
 table.prevnext_post {
 margin: 10px auto;

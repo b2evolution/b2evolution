@@ -68,7 +68,12 @@ p.baseline {
 	text-align: center;
 	margin:1ex;
 }
-
+p.baseline a {
+	color: #666;
+}
+p.baseline a.contact_link:hover {
+	color: #c0c;
+}
 /*
  * General styles:
  */

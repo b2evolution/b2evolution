@@ -42,9 +42,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  			// If you can add your own credits without removing the defaults, you'll be very cool :))
 			// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 			credits( array(
-					'list_start'  => ' &bull; '.T_('Credits').': ',
+					'list_start'  => '&bull;',
 					'list_end'    => ' ',
-					'separator'   => '|',
+					'separator'   => '&bull;',
 					'item_start'  => ' ',
 					'item_end'    => ' ',
 				) );

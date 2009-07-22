@@ -258,18 +258,15 @@ skin_include( '_html_header.inc.php' );
 							) );
 					?>
 					</span>
-					<br />
-					Design: <a href="http://www.nodethirtythree.com">Node33</a>
-					&bull;
-					Skin: <a href="http://wpthemepark.com/themes/terrafirma/">Sadish Bala</a> |
-					<?php display_param_link( $skinfaktory_links ) ?>
-					<br />
+
+					<br />Design: <a href="http://www.nodethirtythree.com">Node33</a> | <a href="http://wpthemepark.com/themes/terrafirma/">Sadish Bala</a> | <?php display_param_link( $skinfaktory_links ) ?>
+
 					<?php
 						// Display additional credits:
 						// If you can add your own credits without removing the defaults, you'll be very cool :))
 						// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 						credits( array(
-								'list_start'  => ' ',
+								'list_start'  => '|',
 								'list_end'    => ' ',
 								'separator'   => '|',
 								'item_start'  => ' ',

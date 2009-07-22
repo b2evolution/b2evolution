@@ -144,12 +144,12 @@ p.baseline {
 	padding: 1ex;
 	margin: 0;
 }
-p.baseline a,
 p.baseline a {
 	color: #888;
 	text-decoration: none;
 }
 p.baseline a:hover {
+	color: #888;
 	text-decoration: underline;
 }
 hr {
@@ -194,6 +194,15 @@ div.action_messages {
 .bText {
 	margin-top: 0px;
 	margin-bottom: 0px;
+}
+.bText a {
+	color: #4ac;
+}
+.bText a:visited {
+	color: #68a;
+}
+.bText a:hover {
+	color: #26AAE8;
 }
 .bSmallPrint
 {

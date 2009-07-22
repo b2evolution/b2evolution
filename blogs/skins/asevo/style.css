@@ -54,9 +54,14 @@ div.inner_wrapper
 	overflow: hidden;
 }
 
-p.baseline {
+p.baseline,
+p.baseline2 {
 	font-size: 76%;
 	margin: 3px;
+}
+p.baseline2,
+p.baseline2 a {
+	color: #666;
 }
 
 /*
@@ -67,7 +72,7 @@ div.clear {
 }
 
 a {
-	color: #000;
+	color: #666;
 	text-decoration:none;
 }
 a:hover {

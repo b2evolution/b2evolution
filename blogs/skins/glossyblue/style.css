@@ -285,6 +285,13 @@ div.featured_post {
 	background: url(img/mini-nav-right.gif) no-repeat right center;
 }
 
+.bText a {
+	color: #888;
+}
+.bText a:visited {
+	color: #666;
+}
+
 /* comments area */
 #comments, #respond {
 	border-bottom: 1px dotted #CCCCCC;
@@ -556,6 +563,10 @@ div.footer_widget ul {
 	line-height: 120%;
 }
 #credits a, #credit a:visited {
+	color: #7a9299;
+}
+#credits a.contact_link,
+#credits div.alignright a {
 	color: #048db4;
 }
 .rss {

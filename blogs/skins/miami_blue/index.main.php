@@ -252,16 +252,16 @@ skin_include( '_html_header.inc.php' );
 				) );
 		?>
 
-		<a href="http://www.sunnyislesmiamirealestate.com/b2evolution-skins/" target="_blank">Miami blue skin</a>
+		<a href="http://www.sunnyislesmiamirealestate.com/b2evolution-skins/" target="_blank">skin</a>
 
 		<?php
 			// Display additional credits:
  			// If you can add your own credits without removing the defaults, you'll be very cool :))
 			// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 			credits( array(
-					'list_start'  => ' &bull; '.T_('Credits').': ',
+					'list_start'  => ' &bull; ',
 					'list_end'    => ' ',
-					'separator'   => '|',
+					'separator'   => '&bull;',
 					'item_start'  => ' ',
 					'item_end'    => ' ',
 				) );

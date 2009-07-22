@@ -24,7 +24,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			) );
 	?>
 
-	<p class="baseline">
+	<p class="baseline2">
 		<?php
 			// Display a link to contact the owner of this blog (if owner accepts messages):
 			$Blog->contact_link( array(
@@ -42,7 +42,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			// If you can add your own credits without removing the defaults, you'll be very cool :))
 			// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 			credits( array(
-					'list_start'  => ' | '.T_('Credits').': ',
+					'list_start'  => '|',
 					'list_end'    => ' ',
 					'separator'   => '|',
 					'item_start'  => ' ',

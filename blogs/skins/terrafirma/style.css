@@ -70,12 +70,11 @@ a
 {
 	color: #FF6E00;
 	text-decoration: none;
-	border-bottom:#FF6E00 1px dashed;
 }
 
 a:hover
 {
-	border-bottom:#FF6E00 1px solid;
+	text-decoration: underline;
 }
 p
 {
@@ -375,7 +374,15 @@ margin-bottom: 0;
 	float:right;
 	font-weight:normal;
 }
-
+.bText a {
+	color: #e72;
+}
+.bText a:visited {
+	color: #888;
+}
+.bText a:hover {
+	color: #FF6E00;
+}
 
 .bSideBar
 {
@@ -475,6 +482,7 @@ textarea{
 	color: #999;
 	padding:10px;
 	margin:0;
+	font-size: 92%;
 }
 #pageFooter p {
 	margin: 0;
@@ -497,11 +505,11 @@ textarea{
 }
 #pageFooter a.contact_link:hover
 {
-	color: #333;
+	color: #222;
 }
 #pageFooter a:hover
 {
-	color: #666;
+	color: #999;
 	text-decoration:underline;
 }
 /* Begin Calendar */

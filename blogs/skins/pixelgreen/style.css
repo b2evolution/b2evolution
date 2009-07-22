@@ -353,9 +353,11 @@ div.top_menu ul {
 #footer-content a.contact_link {
 	text-decoration: underline;
 }
+#footer-content a.contact_link:hover {
+	color: #444;
+}
 #footer-content a:hover {
 	text-decoration: underline;
-	color: #333;
 }
 #footer-content ul {
 	list-style: none;

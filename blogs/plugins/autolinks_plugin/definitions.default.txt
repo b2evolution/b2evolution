@@ -9,6 +9,16 @@
 ; Field 2 = optional previous required word (allows to create groups of 2 words)
 ; Field 3 = url
 
+; Team members and their b2evo blogs
+tblue;;www.ax86.net/
+leeturner;;www.leeturner.org/
+waltercruz;;b2evolution.waltercruz.com/
+sam2kb;;ru.b2evo.net/
+personman;;personman.com/
+fplanque;;fplanque.com/
+yabba;;innervisions.org.uk/
+blueyed;;daniel.hahler.de/
+
 ; A couple of English definitions
 csv;;www.tellmewhatis.com/csv-comma-separated-values
 dns;;www.tellmewhatis.com/dns-domain-name-system
@@ -46,3 +56,9 @@ godfrain;loi;webreference.fr/defintions/securite/godfrain-loi
 @waltercruz;;twitter.com/waltercruz
 @francoisplanque;;twitter.com/francoisplanque
 @sam2kb;;twitter.com/sam2kb
+@blueyed;;twitter.com/blueyed
+@sir_yabs;;twitter.com/sir_yabs
+; Aliases
+@b2evo;;twitter.com/b2evolution
+@fplanque;;twitter.com/francoisplanque
+@yabba;;twitter.com/sir_yabs

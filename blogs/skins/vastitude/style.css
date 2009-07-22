@@ -31,7 +31,10 @@ h1, .subtitle h1, .subtitle h1 a, .submenu, .leftside h1, div.bSmallHead, #quote
 blockquote {color:#523a2c;}
 .rightside h2 {color:#964122;}
 .subtext {color:#BBB;}
-a, ul#mainnav li a:hover, div.rightside, .rightside a, .audio, .righttext form.search input.SearchField, .bCommentText, .leftside .bComment, .leftside .bComment2, .leftside h4, .bCommentform, input#d, input#f, input#g, input#i, input#o, input#u, td#bCalendarToday {color:#d8c19a;}
+a, ul#mainnav li a:hover, div.rightside, .rightside a, .audio, .righttext form.search input.SearchField, .bCommentText, .leftside .bComment, .leftside .bComment2, .leftside h4, .bCommentform, input#d, input#f, input#g, input#i, input#o, input#u, td#bCalendarToday {
+	color:#d8c19a;
+	text-decoration: none;
+}
 a:hover, .text p a:hover, .rightside a:hover, .music_outer, table.bCalendarCaption, .highlight {color:#fff;}
 ul#mainnav a {color:#997340; text-decoration: none;}
 ul#mainnav li, ul#mainnav a.selected, .leftside h3, .bCommentTitle {color:#c09261;}
@@ -46,7 +49,9 @@ ul#mainnav li, ul#mainnav a.selected, .leftside h3, .bCommentTitle {color:#c0926
 /* LINK STYLEE */
 
 .topicons a, .subtitle h1 a, .submenu h1 a, .text h2 a, div.bSmallPrint a, div.bSmallHead a, div.moderation_msg a, div.bCommentSmallPrint a, div.bCommentTitle a, ul#mainnav a:hover {text-decoration:none;}
-.topicons a:hover, a, a:hover, acronym, ul#mainnav a, .rightside a, .rightside a:hover {text-decoration:underline;}
+a:hover {
+	text-decoration: underline;
+}
 .topicons a img {border:none;}
 
 .searchcloud {font-size:0.9em;clear:both;margin:auto 40px 40px;text-align:center;border:1px solid #9e7d55;background-color: #6b4634;padding:10px;}
@@ -146,6 +151,13 @@ p.center {text-align:center;}
 html>body p.center {padding-bottom:20px;}
 p.bMore {clear:both;margin-top:20px;}
 .righttext p.center {text-align:center;}
+
+.bText a {
+	color:#c3aa85;
+}
+.bText a:visited {
+	color:#a85;
+}
 
 ul#mainnav {font-size:0.9em; font-weight:bold; margin:0px 0 20px 25px; padding-left:0px;}
 ul#mainnav li {margin-right:12px; display:inline; float:left;}
@@ -248,7 +260,8 @@ td.bCalendarLinkPost {background-color:#6b4634; font-weight:bold;}
 
 div.rss {background:url(img/vast_rss.gif) top left no-repeat; padding-top:40px; margin-top:25px;}
 
-.pagefoot {background:url(img/vast_foot.gif) bottom no-repeat; font-size:0.8em; height:90px; clear:both; text-align:center;}
+.pagefoot {
+	background:url(img/vast_foot.gif) bottom no-repeat; font-size:0.75em; height:90px; clear:both; text-align:center;}
 .pagefoot a {
 	color:#3C2D21;
 	text-decoration: none;
@@ -257,8 +270,11 @@ div.rss {background:url(img/vast_rss.gif) top left no-repeat; padding-top:40px; 
 	color:#3C2D21;
 	text-decoration: underline;
 }
-.pagefoot a:hover {
+
+.pagefoot a.contact_link:hover {
 	color:#D8C19A;
+}
+.pagefoot a:hover {
 	text-decoration: underline;
 }
 

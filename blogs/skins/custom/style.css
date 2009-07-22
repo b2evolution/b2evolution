@@ -14,12 +14,14 @@ body {
 
 a {
 	color: #569;
+	text-decoration: none;
 }
-a:visited {
-	color: #000;
+.bText a:visited {
+	color: #236;
 }
 a:hover {
 	color: #9ae;
+	text-decoration: underline;
 }
 
 div.pageHeader h1 a,

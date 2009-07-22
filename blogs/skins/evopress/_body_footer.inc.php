@@ -36,13 +36,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			) );
 		?>
 
-		<a href="http://www.evopress.org/" target="_blank">Design</a> by <a href="http://binarybonsai.com/" target="_blank">Michael</a>
+		<a href="http://www.evopress.org/" target="_blank">Design</a> by <a href="http://binarybonsai.com/" target="_blank">Michael Heilemann</a>
 		<?php
 		// Display additional credits:
 		// If you can add your own credits without removing the defaults, you'll be very cool :))
 		// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
 		credits( array(
-				'list_start'  => ' | '.T_('Credits').': ',
+				'list_start'  => ' | ',
 				'list_end'    => ' ',
 				'separator'   => '|',
 				'item_start'  => ' ',
