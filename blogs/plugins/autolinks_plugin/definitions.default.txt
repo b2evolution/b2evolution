@@ -16,7 +16,6 @@ waltercruz;;b2evolution.waltercruz.com/
 sam2kb;;ru.b2evo.net/
 personman;;personman.com/
 fplanque;;fplanque.com/
-yabba;;innervisions.org.uk/
 blueyed;;daniel.hahler.de/
 
 ; A couple of English definitions
@@ -37,13 +36,9 @@ engine;blog;b2evolution.net
 evoskin;;skins.b2evolution.net
 platform;blog;b2evolution.net
 skin;blog;skins.b2evolution.net
-servers;dedicated;b2evolution.net/about/linux-dedicated-servers-web-hosting.php
 soft;blog;b2evolution.net
 software;blog;b2evolution.net
 tool;blog;b2evolution.net
-vps;;b2evolution.net/web-hosting/vps-hosting-virtual-private-servers.php
-webhosting;;b2evolution.net/web-hosting/top-quality-best-webhosting.php
-webhosts;;b2evolution.net/web-hosting/top-quality-best-webhosting.php
 
 ; A couple of French definitions (we should prolly have different files by language/locale)
 hypertexte;;webreference.fr/defintions/www/hypertexte
@@ -57,8 +52,6 @@ godfrain;loi;webreference.fr/defintions/securite/godfrain-loi
 @francoisplanque;;twitter.com/francoisplanque
 @sam2kb;;twitter.com/sam2kb
 @blueyed;;twitter.com/blueyed
-@sir_yabs;;twitter.com/sir_yabs
 ; Aliases
 @b2evo;;twitter.com/b2evolution
 @fplanque;;twitter.com/francoisplanque
-@yabba;;twitter.com/sir_yabs
