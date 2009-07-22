@@ -551,11 +551,6 @@ function create_demo_contents()
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, 'Yabba', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-UK', '', 'http://www.innervisions.org.uk/babbles/', 'disabled', array() );
-
-	// Insert a post into linkblog:
-	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
 	$edited_Item->insert( 1, 'Francois', '', $now, $cat_linkblog_contrib, array(), 'published',	 'fr-FR', '', 'http://fplanque.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
@@ -852,6 +847,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.268  2009/07/22 20:08:29  yabs
+ * retiring
+ *
  * Revision 1.267  2009/07/21 00:59:59  fplanque
  * fixed locale
  *
