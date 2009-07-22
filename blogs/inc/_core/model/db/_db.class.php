@@ -369,8 +369,8 @@ class DB
 
 		if( ! $this->dbhandle )
 		{
-			$this->print_error( 'Error establishing a database connection!', '
-				<p>('.$mysql_error.')</p>
+			$this->print_error( 'Error establishing a database connection!',
+				( $mysql_error ? '<p>('.$mysql_error.')</p>' : '' ).'
 				<ol>
 					<li>Are you sure you have typed the correct user/password?</li>
 					<li>Are you sure that you have typed the correct hostname?</li>
@@ -1576,6 +1576,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.30  2009/07/22 20:51:18  blueyed
+ * Only display P and brackets if there is a DB error, which is not the case with wrong user/pass (oddly)
+ *
  * Revision 1.29  2009/07/12 23:18:22  fplanque
  * upgrading tables to innodb
  *
