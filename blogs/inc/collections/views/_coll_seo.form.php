@@ -180,7 +180,7 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 		), 'canonical_item_urls_options', T_('Make canonical') );
 
 	$Form->checkbox( 'excerpts_meta_description', $edited_Blog->get_setting( 'excerpts_meta_description' ),
-			T_('Meta description'), T_('Use excerpt as meta description for posts and pages') );
+			T_('Meta description'), T_('Fallback to excerpt as meta description for posts and pages if meta description for item is empty') );
 
 $Form->end_fieldset();
 
@@ -379,6 +379,9 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.26  2009/07/23 15:39:22  waltercruz
+ * Improving message
+ *
  * Revision 1.25  2009/05/27 14:46:33  waltercruz
  * Using categories description as meta-description for categories pages
  *
