@@ -821,12 +821,17 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.72  2009/07/23 22:38:24  blueyed
+ * doc
+ *
  * Revision 1.71  2009/07/19 21:00:19  fplanque
  * minor
  *
  * Revision 1.70  2009/07/16 21:36:26  blueyed
  * Comment debug code(?!)
  * fp> No, it makes sense to show what modules are being installed.
+ * dh> I've seen it being displayed in tests and thought that it should not get displayed there.
+ *     Other types of useful info aren't displayed in tests either (like e.g. the Doing Foo.. OK. stuff)
  *
  * Revision 1.69  2009/07/12 22:22:26  tblue246
  * Translation bugfix
