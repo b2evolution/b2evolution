@@ -395,6 +395,7 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( strmaxlen('foo', 2, '.'), 'f.' );
 		$this->assertEqual( strmaxlen('foobar', 6, '...'), 'foobar' );
 		$this->assertEqual( strmaxlen('foobar', 5, '...'), 'fo...' );
+		$this->assertEqual( strmaxlen('foobar', 5, '&amp;&hellip;'), 'foo&amp;&hellip;' );
 	}
 
 
