@@ -416,13 +416,20 @@ function zeroise( $number, $threshold )
  *
  * @param string
  * @param int Maximum length
+ * @param string Tail to use, when string gets cropped. Its length gets
+ *               substracted from the total length (with HTML entities
+ *               being decoded)
  * @return string
  */
-function strmaxlen( $str, $maxlen = 50 )
+function strmaxlen( $str, $maxlen = 50, $tail = '&hellip;' )
 {
 	if( evo_strlen( $str ) > $maxlen )
 	{
-		$str = evo_substr( $str, 0, $maxlen-1 ).'&hellip;';
+		// Replace all HTML entities by a single char. html_entity_decode for example
+		// would not handle &hellip;.
+		$tail_for_length = preg_replace('~&\w+?;~', '.', $tail);
+		$tail_length = evo_strlen( html_entity_decode($tail_for_length) );
+		$str = evo_substr( $str, 0, $maxlen-$tail_length ).$tail;
 	}
 
 	return $str;
@@ -3523,6 +3530,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.119  2009/07/23 21:28:03  blueyed
+ * Add $tail param to strmaxlen, use it in stats_search_keywords and add some tests for it.
+ *
  * Revision 1.118  2009/07/20 23:12:56  fplanque
  * more power to autolinks plugin
  *

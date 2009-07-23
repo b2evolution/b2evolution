@@ -278,17 +278,7 @@ function stats_search_keywords( $keyphrase, $length = 45 )
 	// Save original string
 	$keyphrase_orig = $keyphrase;
 
-	if( evo_strlen( $keyphrase ) > $length )
-	{
-		// TODO: dh> there are other places, where mb_substr should get used, when available!
-		//           Either create a generic wrapper (evo_substr()), or just use
-		//           mbstring_func_overlay=7 (php.ini). I'd say the latter is the way to go,
-		//           but at least the first option ("evo_substr") should get used otherwise
-		//           (which is kind of crappy though). Note: there are more internal PHP funcs
-		//           that would need wrapping, so overloading appears to be the way to go.
-		// fp> we should just init somewhere that if( ! function_exists('mb_substr') ) function mbsubstr() { return substr() }
-		$keyphrase = evo_substr( $keyphrase, 0, $length ).'...';	// word too long, crop it
-	}
+	$keyphrase = strmaxlen($keyphrase, $length, '...');
 
 	// Convert keyword encoding, some charsets are supported only in PHP 4.3.2 and later.
 	// This fixes encoding problem for Cyrillic keywords
@@ -336,6 +326,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.15  2009/07/23 21:28:03  blueyed
+ * Add $tail param to strmaxlen, use it in stats_search_keywords and add some tests for it.
+ *
  * Revision 1.14  2009/07/09 00:11:18  fplanque
  * minor
  *
