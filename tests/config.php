@@ -37,6 +37,11 @@ if( !defined( 'TMPDIR' ) )
 	define( 'TMPDIR', dirname(__FILE__).'/temp/' );
 }
 
+/**
+ * @global string Prefix for test tables.
+ */
+$evo_tests_tableprefix = 'evo_tests_';
+
 
 // Load b2evo config:
 /**
@@ -71,23 +76,17 @@ if( !isset($testDB_conf) || !is_array($testDB_conf) )
 	$testDB_conf = array();
 }
 
-$testDB_conf = array_merge( array(
-		'user' => 'demouser',          // your MySQL username
-		'password' => 'demopass',      // ...and password
-		#'name' => 'b2evolution_tests', // the name of the database
-		'host' => 'localhost',         // MySQL Server (typically 'localhost')
 
-		'table_options' => '',
-		// Recommended settings:
-		# 'table_options' => ' ENGINE=InnoDB ',
-		// Development settings:
-		# 'table_options' => ' ENGINE=InnoDB DEFAULT CHARSET=utf8 ',
-		'new_link' => true,            // Create a new link to the DB! This is required to not interfere with the normal connection (used DB).
-	),
-	$testDB_conf );
+// Use $db_config, with overrides from $testDB_conf
+$testDB_conf = array_merge( $db_config, $testDB_conf );
 
-// Use default aliases, if not set
-$testDB_conf['aliases'] = array_merge( $db_config['aliases'], isset($testDB_conf['aliases']) ? $testDB_conf['aliases'] : array() );
 
-// pre_dump( $testDB_conf );
+// Replace DB table aliases.
+foreach($testDB_conf['aliases'] as $k => $v)
+{
+	$testDB_conf['aliases'][$k] = preg_replace('~^'.preg_quote($tableprefix).'~', $evo_tests_tableprefix, $v);
+}
+// $tableprefix global follows the $evo_tests_tableprefix override.
+$GLOBALS['tableprefix'] = $evo_tests_tableprefix;
+
 ?>

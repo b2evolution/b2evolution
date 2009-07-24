@@ -7,6 +7,14 @@
 
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
+if( empty($action) && isset($argv[0]) )
+{ // CLI
+	if( isset($argv[1]) )
+		$action = $argv[1];
+	else
+		$action = 'all';
+}
+
 require dirname(__FILE__).'/config.php';
 
 if( empty($action) )

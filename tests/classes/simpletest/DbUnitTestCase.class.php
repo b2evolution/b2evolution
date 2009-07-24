@@ -49,8 +49,11 @@ class DbUnitTestCase extends EvoUnitTestCase
 		$this->old_DB = & $GLOBALS['DB'];
 		$GLOBALS['DB'] = & $this->test_DB;
 
-		// reset any error (and catch it in tearDown())
-		$this->test_DB->error = false;
+		// Init DB::connection_charset, required for $db_storage_charset
+		// init_charsets('utf-8');
+		// load_db_schema();
+		global $db_storage_charset;
+		$db_storage_charset = 'utf8';
 
 		$this->test_DB->begin();
 	}
@@ -100,23 +103,24 @@ class DbUnitTestCase extends EvoUnitTestCase
 	{
 		global $db_config;
 
-		$testDbTables = array_keys($db_config['aliases']);
+		$test_tables = $this->test_DB->get_col( 'SHOW TABLES LIKE "'.$GLOBALS['tableprefix'].'%"' );
 
-		if( $test_tables = $this->test_DB->get_col( 'SHOW TABLES LIKE "test%"' ) )
-		{
-			$testDbTables = array_merge( $testDbTables, $test_tables );
-		}
-		if( $test_tables = $this->test_DB->get_col( 'SHOW TABLES LIKE "b2%"' ) )
-		{
-			$testDbTables = array_merge( $testDbTables, $test_tables );
+		if( ! $test_tables )
+		{ // nothing to drop
+			return;
 		}
 
 		$old_fk_check = $this->test_DB->get_var( 'SELECT @@FOREIGN_KEY_CHECKS' );
 		$this->test_DB->query( 'SET FOREIGN_KEY_CHECKS = 0;' );
 
-		$drop_query = 'DROP TABLE IF EXISTS '.implode( ', ', $testDbTables );
+		$drop_query = 'DROP TABLE IF EXISTS '.implode( ', ', $test_tables );
 		$this->test_DB->query( $drop_query );
 
+		/*
+		// dh> deactivated due to easy-tests-setup, using another tableprefix.
+		// Does not seem to be required anymore. After running all tests, the
+		// (separate) DB is empty.
+		//
 		// Now drop all "evo_%" tables, which may not have been handled from
 		// the alias definitions above (e.g. "evo_posts" for the 0.8 upgrade
 		// test)
@@ -125,6 +129,7 @@ class DbUnitTestCase extends EvoUnitTestCase
 			$drop_query = 'DROP TABLE IF EXISTS '.implode( ', ', $test_tables );
 			$this->test_DB->query( $drop_query );
 		}
+		*/
 
 		if( ! empty($old_fk_check) )
 		{
