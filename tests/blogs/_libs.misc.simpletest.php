@@ -45,44 +45,42 @@ class ExtLibsTestCase extends EvoUnitTestCase
 			$this->fail( 'utf8_encode() not available, cannot test.' );
 			return;
 		}
+		$context = 'posting';
+		$allow_css_tweaks = false;
+		$allow_iframes = false;
+		$allow_javascript = false;
+		$allow_objects = false;
 
-		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme
-			/* default encoding */ );
+		// default encoding
+		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects );
 		$SHC->check( 'foo bar' );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme
-			/* default encoding */ );
+		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects );
 		$SHC->check( 'foo дц bar' );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme
-			/* default encoding */ );
+		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects );
 		$SHC->check( utf8_encode('foo дц bar') );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
-			'UTF-8' );
+		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'utf-8' );
 		$SHC->check( 'foo bar' );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
-			'UTF-8' );
+		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'utf-8' );
 		$SHC->check( utf8_encode('foo дц bar' ) );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
-			'UTF-8' );
+		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'utf-8' );
 		$SHC->check( 'foo дц bar' );
 		$this->assertFalse( $SHC->isOK() );
 
-		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
-			'ISO-8859-1' );
+		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'iso-8859-1' );
 		$SHC->check( 'foo дц bar' );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
-			'ISO-8859-15' );
+		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'iso-8859-15' );
 		$SHC->check( utf8_encode('foo д bar') );
 		$this->assertTrue( $SHC->isOK() );
 
@@ -95,8 +93,7 @@ class ExtLibsTestCase extends EvoUnitTestCase
 			$this->assertEqual( $SHC->encoding, 'ISO-8859-15' );
 		}
 
-		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme,
-			'ISO-8859-1' );
+		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'iso-8859-1' );
 		$SHC->check( utf8_encode('foo д bar') );
 		$this->assertTrue( $SHC->isOK() );
 		$this->assertEqual( $SHC->encoding, 'ISO-8859-1' );
@@ -110,18 +107,21 @@ class ExtLibsTestCase extends EvoUnitTestCase
 	 */
 	function test_htmlchecker_check()
 	{
-		global $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme;
 		global $Messages;
 
-		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme
-			/* default encoding */ );
+		$context = 'posting';
+		$allow_css_tweaks = false;
+		$allow_iframes = false;
+		$allow_javascript = false;
+		$allow_objects = false;
+
+		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects );
 		$SHC->check( '<moo>foo</moo>' );
 		$this->assertEqual( $GLOBALS['Messages']->messages['error'][0],
 			T_('Illegal tag').': <code>moo</code>' );
 		$Messages->clear();
 
-		$SHC = & new SafeHtmlChecker( $allowed_tags, $allowed_attributes, $uri_attrs, $allowed_uri_scheme
-			/* default encoding */ );
+		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects );
 		$SHC->check( '<img>foo</img>' );
 		$this->assertEqual( $GLOBALS['Messages']->messages['error'][0],
 			sprintf( T_('Tag &lt;%s&gt; may not contain raw character data'), '<code>img</code>' ) );
