@@ -211,6 +211,7 @@ class DB
 	/**
 	 * Current connection charset
 	 * @var string
+	 * @access protected
 	 * @see DB::set_connection_charset()
 	 */
 	var $connection_charset;
@@ -1576,6 +1577,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.31  2009/07/24 23:36:47  blueyed
+ * doc
+ *
  * Revision 1.30  2009/07/22 20:51:18  blueyed
  * Only display P and brackets if there is a DB error, which is not the case with wrong user/pass (oddly)
  *
