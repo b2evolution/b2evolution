@@ -1643,7 +1643,7 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
  * @param string The content to format
  * @param string
  * @param integer Create automated <br /> tags?
- * @param string Encoding (used for SafeHtmlChecker() only!); defaults to $io_charset
+ * @param string Encoding (used for XHTML_Validator only!); defaults to $io_charset
  * @return boolean|string
  */
 function check_html_sanity( $content, $context = 'posting', $autobr = false, $encoding = NULL )
@@ -1928,6 +1928,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.34  2009/07/24 20:22:44  blueyed
+ * Fix doc
+ *
  * Revision 1.33  2009/06/29 02:14:04  fplanque
  * no message
  *
