@@ -1087,7 +1087,7 @@ class DB
 
 		// ======================================================
 		// print main results
-		if( $this->last_result )
+		if( is_resource($this->last_result) ) // may be true for 'SET sql_mode = "TRADITIONAL"'
 		{
 			for( $i = 0, $n = min(count($this->last_result), $max_lines); $i < $n; $i++ )
 			{
@@ -1577,6 +1577,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.32  2009/07/25 00:39:00  blueyed
+ * DB::debug_get_rows_table: only print result rows, if there is a result.
+ *
  * Revision 1.31  2009/07/24 23:36:47  blueyed
  * doc
  *
