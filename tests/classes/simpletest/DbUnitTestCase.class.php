@@ -56,6 +56,8 @@ class DbUnitTestCase extends EvoUnitTestCase
 		$db_storage_charset = 'utf8';
 
 		$this->test_DB->begin();
+
+		$this->dropTestDbTables();
 	}
 
 
@@ -70,6 +72,8 @@ class DbUnitTestCase extends EvoUnitTestCase
 		{
 			$this->fail( 'There has been a DB error.' );
 		}
+
+		$this->dropTestDbTables();
 
 		$GLOBALS['DB'] = & $this->old_DB;
 

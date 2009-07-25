@@ -73,7 +73,9 @@ require_once $inc_path.'_core/_misc.funcs.php';
 
 if( !isset($testDB_conf) || !is_array($testDB_conf) )
 {
-	$testDB_conf = array();
+	$testDB_conf = array(
+		'log_queries' => false,
+		);
 }
 
 

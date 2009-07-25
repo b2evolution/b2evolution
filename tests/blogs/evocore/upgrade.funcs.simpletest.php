@@ -24,14 +24,6 @@ class UpgradeFuncsTestCase extends DbUnitTestCase
 	}
 
 
-	function setUp()
-	{
-		parent::setup();
-
-		$this->dropTestDbTables();
-	}
-
-
 	/**
 	 * A wrapper to always execute the generated queries (check for SQL errors) and
 	 * do not exclude any query types.
