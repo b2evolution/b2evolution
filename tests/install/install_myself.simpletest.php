@@ -27,9 +27,9 @@ class InstallSelfTestCase extends InstallUnitTestCase
 	{
 		global $new_db_version;
 
-		parent::tearDown();
-
 		$this->assertEqual( $new_db_version, $this->test_DB->get_var('SELECT set_value FROM T_settings WHERE set_name = "db_version"') );
+
+		parent::tearDown();
 	}
 
 
