@@ -119,7 +119,6 @@ switch( $action )
 		break;
 }
 
-$test->run( new HtmlReporter(), new TextReporter() );
-#$test->run( new HtmlReporterShowPasses(), new TextReporter() );
+$test->run( new EvoHtmlReporter(), new EvoTextReporter() );
 
 ?>

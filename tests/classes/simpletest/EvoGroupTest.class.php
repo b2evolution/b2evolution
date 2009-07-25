@@ -8,7 +8,7 @@
 /**
  * We use a derived reporter, which shows passes
  */
-require_once( dirname(__FILE__).'/HtmlReporterShowPasses.class.php' );
+//require_once( dirname(__FILE__).'/HtmlReporterShowPasses.class.php' );
 
 
 /**
@@ -57,7 +57,7 @@ class EvoGroupTest extends TestSuite
 	 */
 	function run( &$htmlReporter, &$cliReporter )
 	{
-		if( TextReporter::inCli() )
+		if( EvoTextReporter::inCli() )
 		{
 			exit( parent::run( $cliReporter ) ? 0 : 1 );
 		}

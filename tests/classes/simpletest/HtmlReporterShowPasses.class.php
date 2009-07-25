@@ -14,11 +14,6 @@ require_once( SIMPLETEST_DIR.'reporter.php' );
  */
 class HtmlReporterShowPasses extends HtmlReporter
 {
-	function HtmlReporterShowPasses()
-	{
-		$this->HtmlReporter();
-	}
-
 	function paintPass($message)
 	{
 		parent::paintPass($message);

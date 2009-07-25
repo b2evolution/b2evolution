@@ -9,7 +9,7 @@
 /**
  * We use a derived reporter, which shows passes
  */
-require_once( dirname(__FILE__).'/HtmlReporterShowPasses.class.php' );
+//require_once( dirname(__FILE__).'/HtmlReporterShowPasses.class.php' );
 
 load_class( '_core/model/_log.class.php' );
 load_class( 'files/model/_filerootcache.class.php' );
@@ -68,11 +68,58 @@ class EvoUnitTestCase extends UnitTestCase
 	 */
 	function run_html_or_cli()
 	{
-		if( TextReporter::inCli() )
+		if( EvoTextReporter::inCli() )
 		{
-			exit( parent::run( new TextReporter() ) ? 0 : 1 );
+			exit( parent::run( new EvoTextReporter() ) ? 0 : 1 );
 		}
-		parent::run( new HtmlReporter() );
+		parent::run( new EvoHtmlReporter() );
+	}
+}
+
+
+#
+# WORK IN PROGRESS: dh> an attempt to silence the noise from test, especially install tests.
+#
+
+/**
+ * A reporter that is meant to suppress any output from the test methods.
+ * Unfortunately, this silences simpletests error reporting, too.. :/
+ * @todo dh> find another way.
+ */
+class EvoTextReporter extends TextReporter
+{
+	function paintMethodStart($test_name)
+	{
+		parent::paintMethodStart($test_name);
+		//ob_start();
+	}
+
+	function paintMethodEnd($test_name)
+	{
+		//while(ob_get_status())
+		//	ob_end_clean();
+		parent::paintMethodEnd($test_name);
+	}
+}
+
+/**
+ * A reporter that is meant to suppress any output from the test methods.
+ * Unfortunately, this silences simpletests error reporting, too.. :/
+ * @todo dh> find another way.
+ */
+class EvoHtmlReporter extends HtmlReporter
+{
+	function paintMethodStart($test_name)
+	{
+		parent::paintMethodStart($test_name);
+		//ob_start();
+	}
+
+	function paintMethodEnd($test_name)
+	{
+		//while(ob_get_status())
+		//	ob_end_clean();
+		parent::paintMethodEnd($test_name);
 	}
 }
 

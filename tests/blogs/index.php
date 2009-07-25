@@ -17,6 +17,5 @@ $test = new EvoGroupTest( 'evo-Core Tests Suite');
 
 $test->loadAllTests( dirname(__FILE__) );
 
-$test->run( new HtmlReporter(), new TextReporter() );
-#$test->run( new HtmlReporterShowPasses(), new TextReporter() );
+$test->run( new EvoHtmlReporter(), new EvoTextReporter() );
 ?>
