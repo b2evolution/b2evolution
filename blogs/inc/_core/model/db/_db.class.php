@@ -298,6 +298,7 @@ class DB
 	 *       the same params before. (requires PHP 4.2)
 	 *    - 'client_flags': optional settings like compression or SSL encryption. See {@link http://www.php.net/manual/en/ref.mysql.php#mysql.client-flags}.
 	 *       (requires PHP 4.3)
+	 *    - 'log_queries': should queries get logged internally? (follows $debug by default)
 	 */
 	function DB( $params )
 	{
@@ -324,8 +325,11 @@ class DB
 		if( isset($params['debug_dump_rows']) ) $this->debug_dump_rows = $params['debug_dump_rows']; // Nb of rows to dump
 		if( isset($params['debug_explain_joins']) ) $this->debug_explain_joins = $params['debug_explain_joins'];
 		if( isset($params['debug_dump_function_trace_for_queries']) ) $this->debug_dump_function_trace_for_queries = $params['debug_dump_function_trace_for_queries'];
-
-		if( isset($debug) && ! isset($this->log_queries) )
+		if( isset($params['log_queries']) )
+		{
+			$this->log_queries = $params['log_queries'];
+		}
+		elseif( isset($debug) && ! isset($this->log_queries) )
 		{ // $log_queries follows $debug and respects subclasses, which may define it:
 			$this->log_queries = $debug;
 		}
@@ -1577,6 +1581,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.33  2009/07/25 00:47:21  blueyed
+ * Add log_queries param to DB constructor. Used from tests for performance reason.
+ *
  * Revision 1.32  2009/07/25 00:39:00  blueyed
  * DB::debug_get_rows_table: only print result rows, if there is a result.
  *
