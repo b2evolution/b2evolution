@@ -55,6 +55,15 @@ require_once $inc_path.'_core/_class'.floor(PHP_VERSION).'.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
 
 
+// Load vars, e.g. $is_cli
+// TODO: this should get done in EvoUnitTestCase::setup (clean state), but needs global massaging.
+$Debuglog = new Log_noop; // used in _vars.inc
+require_once($inc_path.'_vars.inc.php');
+
+// Bootstrap charset handling (e.g. setting $io_charset)
+init_charsets('utf-8');
+
+
 /**
  * MySQL settings for the tests.
  *
