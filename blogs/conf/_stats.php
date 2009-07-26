@@ -187,6 +187,7 @@ $user_agents = array(
 	array('robot', 'Yandex/', 'Yandex' ),
 	array('robot', 'Mail.Ru/', 'Mail.Ru' ),
 	array('robot', 'Baiduspider', 'Baidu spider' ),
+	array('robot', 'infometrics-bot', 'Infometrics Bot' ),
 	// Unknown robots:
 	array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:
