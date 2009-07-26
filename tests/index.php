@@ -90,6 +90,8 @@ if( empty($action) )
 		?>
 		</ul>
 
+	<p><strong>NOTE: Some tests will create temporary test tables in your database (<?php echo htmlspecialchars($db_config['name'])?>); using the prefix: "<?php echo htmlspecialchars($evo_tests_tableprefix) ?>".</p>
+
 	</body>
 
 	</html>

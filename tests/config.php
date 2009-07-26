@@ -67,10 +67,6 @@ init_charsets('utf-8');
 /**
  * MySQL settings for the tests.
  *
- * WARNING: Tables in this DB that are used for the tests will be
- *          dropped during the tests.
- *          BE SURE to use a test DB here.
- *
  * These settings override the defaults from {@link $db_config}
  *
  * This is used to create {@link DbUnitTestCase::test_DB the test DB object}
@@ -83,7 +79,7 @@ init_charsets('utf-8');
 if( !isset($testDB_conf) || !is_array($testDB_conf) )
 {
 	$testDB_conf = array(
-		'log_queries' => false,
+		'log_queries' => false, // performance
 		);
 }
 
