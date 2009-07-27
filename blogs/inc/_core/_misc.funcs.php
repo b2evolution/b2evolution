@@ -860,14 +860,22 @@ function make_clickable_callback( $text, $moredelim = '&amp;' )
 
 /***** // Formatting functions *****/
 
-
+/**
+ * Convert timestamp to MySQL/ISO format.
+ *
+ * @param integer UNIX timestamp
+ * @return string Date formatted as "Y-m-d H:i:s"
+ */
 function date2mysql( $ts )
 {
 	return date( 'Y-m-d H:i:s', $ts );
 }
 
 /**
- * Convert a MYSQL date to a UNIX timestamp
+ * Convert a MYSQL date to a UNIX timestamp.
+ *
+ * @param string Date formatted as "Y-m-d H:i:s"
+ * @return integer UNIX timestamp
  */
 function mysql2timestamp( $m )
 {
@@ -931,7 +939,7 @@ function mysql2localedatetime_spans( $mysqlstring, $datefmt = NULL, $timefmt = N
 function mysql2date( $dateformatstring, $mysqlstring, $useGM = false )
 {
 	$m = $mysqlstring;
-	if( empty($m) || ($m == '0000-00-00 00:00:00' ))
+	if( empty($m) || ($m == '0000-00-00 00:00:00' ) )
 		return false;
 
 	// Get a timestamp:
@@ -942,8 +950,9 @@ function mysql2date( $dateformatstring, $mysqlstring, $useGM = false )
 
 
 /**
- * Date internationalization: same as date() formatting but with i18n support
+ * Date internationalization: same as date() formatting but with i18n support.
  *
+ * @todo dh> support for MySQL date format instead of $unixtimestamp? This would simplify callees, where currently mktime() is used.
  * @param string enhanced format string
  * @param integer UNIX timestamp
  * @param boolean true to use GM time
@@ -960,6 +969,8 @@ function date_i18n( $dateformatstring, $unixtimestamp, $useGM = false )
 
 	if( $useGM )
 	{ // We want a Greenwich Meridian time:
+		// TODO: dh> what's the point of the substraction? UNIX timestamp should contain no time_difference in the first place?! Otherwise it should be substracted for !$useGM, too.
+		// TODO: dh> Why does $useGM do not get the special symbols handling?
 		$r = gmdate($dateformatstring, ($unixtimestamp - $time_difference));
 	}
 	else
@@ -1467,6 +1478,8 @@ function pre_dump( $var__var__var__var__ )
  * Get a function trace from {@link debug_backtrace()} as html table.
  *
  * Adopted from {@link http://us2.php.net/manual/de/function.debug-backtrace.php#47644}.
+ *
+ * @todo dh> Add support for $is_cli = true (e.g. in case of MySQL error)
  *
  * @param integer|NULL Get the last x entries from the stack (after $ignore_from is applied). Anything non-numeric means "all".
  * @param array After a key/value pair matches a stack entry, this and the rest is ignored.
@@ -3530,6 +3543,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.120  2009/07/27 19:40:13  blueyed
+ * doc
+ *
  * Revision 1.119  2009/07/23 21:28:03  blueyed
  * Add $tail param to strmaxlen, use it in stats_search_keywords and add some tests for it.
  *
