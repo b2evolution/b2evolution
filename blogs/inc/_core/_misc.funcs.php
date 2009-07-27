@@ -301,7 +301,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 		case 'entityencoded':
 			// Special mode for RSS 0.92: apply renders and allow full HTML but escape it
 			$content = convert_chars($content, 'html');
-			$content = htmlspecialchars( $content );
+			$content = htmlspecialchars( $content, ENT_QUOTES );
 			break;
 
 		case 'htmlhead':
@@ -314,8 +314,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 			// use as an attribute: strips tags and escapes quotes
 			$content = strip_tags($content);
 			$content = convert_chars($content, 'html');
-			$content = str_replace('"', '&quot;', $content );
-			$content = str_replace("'", '&#039;', $content );
+			$content = str_replace(array('"', "'"), array('&quot;', '&#039;'), $content );
 			break;
 
 		case 'formvalue':
@@ -333,8 +332,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 			// use as an attribute: strips tags and escapes quotes
 			$content = strip_tags($content);
 			$content = convert_chars($content, 'xml');
-			$content = str_replace('"', '&quot;', $content );
-			$content = str_replace("'", '&#039;', $content );
+			$content = str_replace(array('"', "'"), array('&quot;', '&#039;'), $content );
 			break;
 
 		case 'text':
@@ -3543,6 +3541,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.121  2009/07/27 19:45:43  blueyed
+ * Minor performance improvements to format_to_output
+ *
  * Revision 1.120  2009/07/27 19:40:13  blueyed
  * doc
  *
