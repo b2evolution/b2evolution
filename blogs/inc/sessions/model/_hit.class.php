@@ -734,6 +734,7 @@ class Hit
 
 			if( $this->user_agent != strip_tags($this->user_agent) )
 			{ // then they have tried something funky, putting HTML or PHP into the user agent
+				global $Debuglog;
 				$Debuglog->add( 'detect_useragent(): '.T_('bad char in User Agent'), 'hit');
 				$this->user_agent = '';
 			}
@@ -1102,6 +1103,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.27  2009/07/27 18:58:31  blueyed
+ * Fix E_FATAL in Hit::get_user_agent
+ *
  * Revision 1.26  2009/07/08 02:38:55  sam2kb
  * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
  *
