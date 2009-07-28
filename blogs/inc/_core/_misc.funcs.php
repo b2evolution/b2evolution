@@ -2269,7 +2269,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 {
 	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $notify_from;
 
-	$NL = "\n";
+	$NL = "\r\n";
 
 	if( !is_array( $headers ) )
 	{ // Make sure $headers is an array
@@ -3541,6 +3541,10 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.122  2009/07/28 23:04:50  sam2kb
+ * Use CRLF line breaks in emails
+ * See http://forums.b2evolution.net/viewtopic.php?t=19275
+ *
  * Revision 1.121  2009/07/27 19:45:43  blueyed
  * Minor performance improvements to format_to_output
  *
