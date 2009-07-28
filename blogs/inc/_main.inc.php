@@ -199,6 +199,7 @@ load_class('users/model/_usersettings.class.php');
  * @global GeneralSettings $Settings
  */
 $Settings = & new GeneralSettings();
+
 /**
  * Interface to user settings
  *
@@ -229,6 +230,51 @@ load_class('sessions/model/_hit.class.php');
 // fp> The following constructor requires these right now:
 load_funcs('_core/_param.funcs.php');
 load_funcs('_core/_url.funcs.php');
+
+
+/**
+ * Locale selection:
+ * We need to do this as early as possible in order to set DB connection charset below
+ */
+$Debuglog->add( 'default_locale from conf: '.$default_locale, 'locale' );
+
+locale_overwritefromDB();
+$Debuglog->add( 'default_locale from DB: '.$default_locale, 'locale' );
+
+$default_locale = locale_from_httpaccept(); // set default locale by autodetect
+$Debuglog->add( 'default_locale from HTTP_ACCEPT: '.$default_locale, 'locale' );
+
+if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
+{
+	if( $locale_from_get != $default_locale )
+	{
+		if( isset( $locales[$locale_from_get] ) )
+		{
+			$default_locale = $locale_from_get;
+			$Debuglog->add('Overriding locale from REQUEST: '.$default_locale, 'locale');
+		}
+		else
+		{
+			$Debuglog->add('$locale_from_get ('.$locale_from_get.') is not set. Available locales: '.implode(', ', array_keys($locales)), 'locale');
+		}
+	}
+	else
+	{
+		$Debuglog->add('$locale_from_get == $default_locale ('.$locale_from_get.').', 'locale');
+	}
+
+}
+
+
+/**
+ * Activate default locale:
+ */
+locale_activate( $default_locale );
+
+// Set encoding for MySQL connection:
+$DB->set_connection_charset( $current_charset );
+
+
 /**
  * @global Hit The Hit object
  */
@@ -326,45 +372,6 @@ load_funcs('_core/ui/forms/_form.funcs.php');
 load_class('_core/ui/forms/_form.class.php');
 load_class('items/model/_itemquery.class.php');
 $Timer->pause( '_main.inc:requires' );
-
-
-/**
- * Locale selection:
- */
-$Debuglog->add( 'default_locale from conf: '.$default_locale, 'locale' );
-
-locale_overwritefromDB();
-$Debuglog->add( 'default_locale from DB: '.$default_locale, 'locale' );
-
-$default_locale = locale_from_httpaccept(); // set default locale by autodetect
-$Debuglog->add( 'default_locale from HTTP_ACCEPT: '.$default_locale, 'locale' );
-
-if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
-{
-	if( $locale_from_get != $default_locale )
-	{
-		if( isset( $locales[$locale_from_get] ) )
-		{
-			$default_locale = $locale_from_get;
-			$Debuglog->add('Overriding locale from REQUEST: '.$default_locale, 'locale');
-		}
-		else
-		{
-			$Debuglog->add('$locale_from_get ('.$locale_from_get.') is not set. Available locales: '.implode(', ', array_keys($locales)), 'locale');
-		}
-	}
-	else
-	{
-		$Debuglog->add('$locale_from_get == $default_locale ('.$locale_from_get.').', 'locale');
-	}
-
-}
-
-
-/**
- * Activate default locale:
- */
-locale_activate( $default_locale );
 
 
 /*
@@ -627,7 +634,6 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale
 
 
 // Init charset handling:
-// TODO: dh> anything translated before this call might have encoding issues (e.g. the login form!)
 init_charsets( $current_charset );
 
 
@@ -655,6 +661,10 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.111  2009/07/28 23:51:08  sam2kb
+ * Do locale selection and set DB connection charset as early as possible
+ * in order to get results in the right encoding
+ *
  * Revision 1.110  2009/05/28 23:01:03  blueyed
  * Add Debuglog when charsets are not setup yet when translating: encoding issues in e.g. login form.. :/
  *
