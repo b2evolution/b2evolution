@@ -955,6 +955,10 @@ class Hit
 		{
 			return NULL;
 		}
+		
+		// This is needed for google image search to extract q param from encoded URL
+		// Otherwise "=" is encoded to "%3D"
+		$ref = urldecode($ref);
 
 		$known_search_params =  array(
 					'q',
@@ -974,8 +978,12 @@ class Hit
 					'Gw',           // scroogle.org
 					'text',         // yandex.ru
 				);
+		
+		// This is needed for google image search to extract q param
+		// prev=/images?q=
+		$ref = str_replace( '?', '&', evo_substr( $ref, $pos_question+1 ) );
 
-		$ref_params = explode( '&', evo_substr( $ref, $pos_question+1 ) );
+		$ref_params = explode( '&', $ref );
 		foreach( $ref_params as $ref_param )
 		{
 			$param_parts = explode( '=', $ref_param );
@@ -1103,6 +1111,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.28  2009/07/29 23:49:15  sam2kb
+ * Better keywords extraction for google image search
+ *
  * Revision 1.27  2009/07/27 18:58:31  blueyed
  * Fix E_FATAL in Hit::get_user_agent
  *
