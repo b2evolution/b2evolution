@@ -2401,6 +2401,11 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 {
 	global $UserSettings;
 
+	if( strlen($icon) === '' )
+	{	// Called with empty icon, e.g. through "File management popup"
+		return '';
+	}
+
 	$link_attribs['href'] = $url;
 	$link_attribs['title'] = $title;
 
@@ -3541,6 +3546,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.123  2009/07/29 18:52:02  blueyed
+ * action_icon: return early for empty icon name.
+ *
  * Revision 1.122  2009/07/28 23:04:50  sam2kb
  * Use CRLF line breaks in emails
  * See http://forums.b2evolution.net/viewtopic.php?t=19275
