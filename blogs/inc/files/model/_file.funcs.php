@@ -218,34 +218,42 @@ function get_dirsize_recursive( $path )
 /**
  * Deletes a dir recursively, wiping out all subdirectories!!
  *
- * @param string the dir
+ * @param string The dir
+ * @return boolean False on failure
  */
 function rmdir_r( $path )
 {
 	$path = trailing_slash( $path );
 
-	cleardir_r( $path );
+	$r = true;
 
-	@rmdir( $path );
+	if( ! cleardir_r( $path ) )
+		$r = false;
+
+	if( ! @rmdir( $path ) )
+		$r = false;
+
+	return $r;
 }
 
 
 /**
  * Clear contents of dorectory, but do not delete directory itself
+ * @return boolean False on failure (may be only partial), true on success.
  */
 function cleardir_r( $path )
 {
 	$path = trailing_slash( $path );
 	// echo "<br>rmdir_r($path)";
 
+	$r = true; // assume success
+
 	if( $dir = @opendir($path) )
 	{
 		while( ( $file = readdir($dir) ) !== false )
 		{
 			if( $file == '.' || $file == '..' )
-			{
 				continue;
-			}
 
 			$adfp_filepath = $path.$file;
 
@@ -254,16 +262,21 @@ function cleardir_r( $path )
 			if( is_dir( $adfp_filepath ) && ! is_link($adfp_filepath) )
 			{ // Note: we do NOT follow symlinks
 				// echo 'D';
-				rmdir_r( $adfp_filepath );
+				if( ! rmdir_r( $adfp_filepath ) )
+					$r = false;
 			}
 			else
 			{ // File or symbolic link
 				//echo 'F/S';
-				@unlink( $adfp_filepath );
+				if( ! @unlink( $adfp_filepath ) )
+					$r = false;
 			}
 		}
 		closedir($dir);
 	}
+	else $r = false;
+
+	return $r;
 }
 
 /**
@@ -771,6 +784,9 @@ function is_absolute_pathname($path)
 
 /*
  * $Log$
+ * Revision 1.18  2009/07/30 23:40:08  blueyed
+ * Add boolean return value to rmdir_r and cleardir_r
+ *
  * Revision 1.17  2009/05/17 19:51:10  fplanque
  * minor/doc
  *
