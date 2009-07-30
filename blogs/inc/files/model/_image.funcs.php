@@ -54,11 +54,13 @@ function get_available_thumb_sizes()
  * @param integer source height
  * @param integer constrained width
  * @param integer constrained height
+ * @return array ( x, y, width, height )
  */
 function crop_to_constraint( $src_width, $src_height, $max_width, $max_height )
 {
 	$src_ratio = $src_width / $src_height;
-	if( $max_width / $max_height <= $src_ratio )
+	$max_ratio = $max_width / $max_height;
+	if( $max_ratio <= $src_ratio )
 	{
 		$x = ($src_width - $src_height) / 2;
 		$y = 0;
@@ -80,11 +82,17 @@ function crop_to_constraint( $src_width, $src_height, $max_width, $max_height )
  *
  * @param integer source width
  * @param integer source height
- * @param integer constrained width
- * @param integer constrained height
+ * @param integer constrained width (might be NULL/0 to use source width)
+ * @param integer constrained height (might be NULL/0 to use source height)
+ * @return array (width, height)
  */
 function scale_to_constraint( $src_width, $src_height, $max_width, $max_height )
 {
+	if( $max_width == 0 )
+		$max_width = $src_width;
+	if( $max_height == 0 )
+		$max_height = $src_height;
+
 	$src_ratio = $src_width / $src_height;
 	if( $max_width / $max_height <= $src_ratio )
 	{
@@ -247,6 +255,10 @@ function output_image( $imh, $mimetype )
 /**
  * Generate a thumbnail
  *
+ * @param
+ * @param
+ * @param int Thumbnail width
+ * @param int Thumbnail height
  * @return array short error code + dest image handler
  */
 function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
@@ -288,8 +300,12 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 	return array( NULL, $dest_imh );
 }
 
+
 /*
  * $Log$
+ * Revision 1.7  2009/07/30 21:34:55  blueyed
+ * scale_to_constraint: support NULL/0 for max_width/max_height, allowing formats like '640x'. doc.
+ *
  * Revision 1.6  2009/03/08 23:57:43  fplanque
  * 2009
  *
