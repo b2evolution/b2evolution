@@ -501,6 +501,7 @@ $Plugins->trigger_event( 'BeforeBlogDisplay', array('skin'=>$skin) );
 
 if( !empty( $skin ) )
 { // We want to display with a skin now:
+	$Debuglog->add('Selected skin: '.$skin, 'skin');
 
 	// Instanciate PageCache:
 	load_class( '_core/model/_pagecache.class.php' );
@@ -591,6 +592,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.140  2009/07/30 20:22:04  blueyed
+ * Debuglog: log selected skin
+ *
  * Revision 1.139  2009/06/29 02:14:04  fplanque
  * no message
  *
