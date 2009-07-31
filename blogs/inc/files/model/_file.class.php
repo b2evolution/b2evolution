@@ -1816,93 +1816,6 @@ class File extends DataObject
 
 
 	/**
-	 * This will spit out a content-type header followed by a thumbnail for this file.
-	 *
-	 * @todo a million things (fp) but you get the idea...
-	 * The generated thumb will be saved to a cached file here (fp)
-	 * The cache will be accessed through the File object (fp)
-	 * @todo cleanup memory resources
-	 *
-	 * @param string requested size: 'thumbnail'
-	 * @return boolean True on success, false on failure.
-	 */
-	function thumbnail( $req_size )
-	{
-		global $thumbnail_sizes;
-
-		load_funcs( '/files/model/_image.funcs.php' );
-
-		$size_name = $req_size;
-		if( isset($thumbnail_sizes[$req_size] ) )
-		{
-			$size_name = $req_size;
-		}
-		else
-		{
-			$size_name = 'fit-80x80';
-		}
-
-		// Set all params for requested size:
-		list( $thumb_type, $thumb_width, $thumb_height, $thumb_quality ) = $thumbnail_sizes[$size_name];
-
-		$Filetype = & $this->get_Filetype();
-		// TODO: dh> Filetype may be NULL here! see also r1.18 (IIRC)
-		$mimetype = $Filetype->mimetype;
-
-		// Try to output the cached thumbnail:
-		$err = $this->output_cached_thumb( $size_name, $mimetype );
-
-		if( $err == '!Thumbnail not found in .evocache' )
-		{	// The thumbnail wasn't already in the cache, try to generate and cache it now:
-			$err = NULL;		// Short error code
-
-			list( $err, $src_imh ) = load_image( $this->get_full_path(), $mimetype );
-			if( empty( $err ) )
-			{
-				list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height );
-				if( empty( $err ) )
-				{
-					$err = $this->save_thumb_to_cache( $dest_imh, $size_name, $mimetype, $thumb_quality );
-					if( empty( $err ) )
-					{	// File was saved. Ouput that same file immediately:
-						// This is probably better than recompressing the memory image..
-						$err = $this->output_cached_thumb( $size_name, $mimetype );
-					}
-					else
-					{	// File could not be saved.
-						// fp> We might want to output dynamically...
-						// $err = output_image( $dest_imh, $mimetype );
-					}
-				}
-			}
-		}
-
-		// ERROR IMAGE
-		if( !empty( $err ) )
-		{	// Generate an error image and try to squeeze an error message inside:
-			// Note: we write small and close to the upper left in order to have as much text as possible on small thumbs
-			$err = substr( $err, 1 ); // crop 1st car
-			$car_width = ceil( ($thumb_width-4)/6 );
-			// $err = 'w='.$car_width.' '.$err;
-			$err = wordwrap( $err, $car_width, "\n" );
-			$err = split( "\n", $err );	// split into lines
-			$im_handle = imagecreatetruecolor( $thumb_width, $thumb_height ); // Create a black image
-			$text_color = imagecolorallocate( $im_handle, 255, 0, 0 );
-			$y = 0;
-			foreach( $err as $err_string )
-			{
-				imagestring( $im_handle, 2, 2, $y, $err_string, $text_color);
-				$y += 11;
-			}
-			header('Content-type: image/png' );
-			imagepng( $im_handle );
-			return false;
-		}
-		return true;
-	}
-
-
-	/**
 	 * @param Item
 	 */
 	function link_to_Item( & $edited_Item )
@@ -1927,6 +1840,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.41  2009/07/31 00:17:20  blueyed
+ * Move File::thumbnail to getfile.php, where it gets used exclusively. ACKed by FP.
+ *
  * Revision 1.40  2009/07/31 00:14:00  blueyed
  * File class: indent, minor
  *

@@ -77,12 +77,77 @@ $File = & new File( $FileRoot->type, $FileRoot->in_type_ID, $path );
 
 if( !empty($size) && $File->is_image() )
 {	// We want a thumbnail:
-	// This will do all the magic:
-	$File->thumbnail( $size );
-	// fp> TODO: for more efficient caching, this should probably redirect to the static file right after creating it (when $public_access_to_media=true OF COURSE)
-	// TODO: dh> it would be nice, if the above would not do all the magic, but return
-	//       image data and error code instead, allowing us to send "Expires" for given
-	//       "mtime" like below. We do not want to send it for error images after all.
+	global $thumbnail_sizes;
+
+	load_funcs( '/files/model/_image.funcs.php' );
+
+	$size_name = $size;
+	if( ! isset($thumbnail_sizes[$size] ) )
+	{ // this file size alias is not defined, use default:
+		$size_name = 'fit-80x80';
+	}
+
+	// Set all params for requested size:
+	list( $thumb_type, $thumb_width, $thumb_height, $thumb_quality ) = $thumbnail_sizes[$size_name];
+
+	$Filetype = & $File->get_Filetype();
+	// TODO: dh> Filetype may be NULL here! see also r1.18 (IIRC)
+	$mimetype = $Filetype->mimetype;
+
+	// Try to output the cached thumbnail:
+	$err = $File->output_cached_thumb( $size_name, $mimetype );
+
+	if( $err == '!Thumbnail not found in .evocache' )
+	{	// The thumbnail wasn't already in the cache, try to generate and cache it now:
+		$err = NULL;		// Short error code
+
+		list( $err, $src_imh ) = load_image( $File->get_full_path(), $mimetype );
+		if( empty( $err ) )
+		{
+			list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height );
+			if( empty( $err ) )
+			{
+				$err = $File->save_thumb_to_cache( $dest_imh, $size_name, $mimetype, $thumb_quality );
+				if( empty( $err ) )
+				{	// File was saved. Ouput that same file immediately:
+					// This is probably better than recompressing the memory image..
+					$err = $File->output_cached_thumb( $size_name, $mimetype );
+				}
+				else
+				{	// File could not be saved.
+					// fp> We might want to output dynamically...
+					// $err = output_image( $dest_imh, $mimetype );
+				}
+			}
+		}
+	}
+
+	// ERROR IMAGE
+	if( !empty( $err ) )
+	{	// Generate an error image and try to squeeze an error message inside:
+		// Note: we write small and close to the upper left in order to have as much text as possible on small thumbs
+		$err = substr( $err, 1 ); // crop 1st car
+		$car_width = ceil( ($thumb_width-4)/6 );
+		// $err = 'w='.$car_width.' '.$err;
+		$err = wordwrap( $err, $car_width, "\n" );
+		$err = split( "\n", $err );	// split into lines
+		$im_handle = imagecreatetruecolor( $thumb_width, $thumb_height ); // Create a black image
+		$text_color = imagecolorallocate( $im_handle, 255, 0, 0 );
+		$y = 0;
+		foreach( $err as $err_string )
+		{
+			imagestring( $im_handle, 2, 2, $y, $err_string, $text_color);
+			$y += 11;
+		}
+		header('Content-type: image/png' );
+		// The URL refers to this specific file, therefore we can tell the browser that
+		// it does not expire anytime soon.
+		if( $mtime && $mtime == $File->get_lastmod_ts() ) // TODO: dh> use salt here?!
+		{
+			header('Expires: '.date('r', time()+315360000)); // 86400*365*10 (10 years)
+		}
+		imagepng( $im_handle );
+	}
 }
 else
 {	// We want the regular file:
@@ -118,6 +183,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.29  2009/07/31 00:17:20  blueyed
+ * Move File::thumbnail to getfile.php, where it gets used exclusively. ACKed by FP.
+ *
  * Revision 1.28  2009/03/08 23:57:36  fplanque
  * 2009
  *
