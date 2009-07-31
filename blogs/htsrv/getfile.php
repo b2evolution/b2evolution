@@ -95,6 +95,7 @@ if( !empty($size) && $File->is_image() )
 	$mimetype = $Filetype->mimetype;
 
 	// Try to output the cached thumbnail:
+	// TODO: dh> this should also then "Expires" header. Please refactor.
 	$err = $File->output_cached_thumb( $size_name, $mimetype );
 
 	if( $err == '!Thumbnail not found in .evocache' )
@@ -183,6 +184,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.30  2009/07/31 01:27:52  blueyed
+ * TODO
+ *
  * Revision 1.29  2009/07/31 00:17:20  blueyed
  * Move File::thumbnail to getfile.php, where it gets used exclusively. ACKed by FP.
  *
