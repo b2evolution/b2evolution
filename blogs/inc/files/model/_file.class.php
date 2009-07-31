@@ -997,16 +997,16 @@ class File extends DataObject
 			$r = $before_image;
 			if( $size_name == 'original' )
 			{
-					$img = '<img src="'.$this->get_url().'" '
-								.'alt="'.$this->dget('alt', 'htmlattr').'" '
-								.'title="'.$this->dget('title', 'htmlattr').'" '
-								.$this->get_image_size( 'string' ).' />';
+				$img = '<img src="'.$this->get_url().'" '
+					.'alt="'.$this->dget('alt', 'htmlattr').'" '
+					.'title="'.$this->dget('title', 'htmlattr').'" '
+					.$this->get_image_size( 'string' ).' />';
 			}
 			else
 			{
-					$img = '<img src="'.$this->get_thumb_url( $size_name ).'" '
-								.'alt="'.$this->dget('alt', 'htmlattr').'" '
-								.'title="'.$this->dget('title', 'htmlattr').'" />';
+				$img = '<img src="'.$this->get_thumb_url( $size_name ).'" '
+					.'alt="'.$this->dget('alt', 'htmlattr').'" '
+					.'title="'.$this->dget('title', 'htmlattr').'" />';
 					// TODO: size
 			}
 
@@ -1019,15 +1019,14 @@ class File extends DataObject
 			{
 				$img = '<a href="'.$image_link_to.'">'.$img.'</a>';
 			}
-
 			$r .= $img;
 
 			$desc = $this->dget('desc');
-			if( !empty($desc) and !is_null($before_image_legend) )
+			if( !empty($desc) && !is_null($before_image_legend) )
 			{
 				$r .= $before_image_legend
-								.$this->dget('desc')
-							.$after_image_legend;
+					.$desc
+					.$after_image_legend;
 			}
 			$r .= $after_image;
 		}
@@ -1488,12 +1487,12 @@ class File extends DataObject
 											$actionurl = '#', $target = '' )
 	{
 		global $dispatcher;
-		
+
 		if( $actionurl == '#' )
 		{
 			$actionurl = $dispatcher.'?ctrl=files';
 		}
-		
+
 		if( is_null( $text ) )
 		{	// Use file root+relpath+name by default
 			$text = $this->get_root_and_rel_path();
@@ -1528,12 +1527,12 @@ class File extends DataObject
 	function get_linkedit_url( $link_itm_ID = NULL, $actionurl = '#' )
 	{
 		global $dispatcher;
-		
+
 		if( $actionurl == '#' )
 		{
 			$actionurl = $dispatcher.'?ctrl=files';
 		}
-		
+
 		if( $this->is_dir() )
 		{
 			$rdfp_path = $this->_rdfp_rel_path;
@@ -1928,6 +1927,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.40  2009/07/31 00:14:00  blueyed
+ * File class: indent, minor
+ *
  * Revision 1.39  2009/07/19 21:00:19  fplanque
  * minor
  *
