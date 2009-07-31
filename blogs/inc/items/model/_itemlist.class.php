@@ -158,9 +158,10 @@ class ItemList2 extends ItemListLight
 		$post_title = format_to_post( $post_title );
 		$content = format_to_post( $content );
 
+		$post_ID = param('post_ID', 'integer', 0);
 
 		$this->sql = "SELECT
-			0 AS post_ID,
+			$post_ID AS post_ID,
 			$preview_userid AS post_creator_user_ID,
 			$preview_userid AS post_lastedit_user_ID,
 			'$item_issue_date' AS post_datestart,
@@ -717,6 +718,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.23  2009/07/31 21:30:29  blueyed
+ * Use existing post_ID in item preview. This makes attachments appear when previewing a new and existing post.
+ *
  * Revision 1.22  2009/07/11 18:45:31  tblue246
  * Fix PHP notice
  *
