@@ -336,6 +336,10 @@ class AutoPPluginTestCase extends PluginUnitTestCase
 		$this->assertEqual(
 			'<p><span foo="bar"></span><foo></p>',
 			$this->render('<span foo="bar"></span><foo>') );
+
+		// BR not allowed in DL, but DT and DD; P allowed in DD
+		$this->assertEqual("<dl>\n\n<dt>foo<br />\nbar\n</dt>\n\n<dd>\n\n<p>foo<br />\nbar</p></dd>\n\n</dl>",
+			$this->render("<dl>\n\n<dt>foo\nbar\n</dt>\n\n<dd>\n\nfoo\nbar</dd>\n\n</dl>") );
 	}
 
 }

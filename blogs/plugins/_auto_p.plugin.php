@@ -41,7 +41,7 @@ class auto_p_plugin extends Plugin
 
 	var $br_allowed_in = array(
 		// Block level:
-		'address', 'center', 'dl', 'dir', 'div', 'fieldset', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'isindex', 'menu', 'noframes', 'noscript', 'p', 'pre',
+		'address', 'center', 'dd', 'dir', 'div', 'dt', 'fieldset', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'isindex', 'menu', 'noframes', 'noscript', 'p', 'pre',
 		// Inline:
 		'a', 'abbr', 'acronym', 'applet', 'b', 'basefont', 'bdo', 'big', 'button', 'cite', 'code', 'dfn', 'em', 'font', 'i', 'img', 'input', 'iframe', 'kbd', 'label', 'li', 'map', 'object', 'q', 'samp', 'select', 'small', 'span', 'strong', 'sub', 'sup', 'textarea', 'td', 'th', 'tt', 'var' );
 
@@ -635,6 +635,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.44  2009/08/01 19:09:47  blueyed
+ * auto_p_plugin: BR not allowed in DL, but DD AND DT. Add test.
+ *
  * Revision 1.43  2009/07/12 19:35:31  fplanque
  * make rendering opt-in
  *
