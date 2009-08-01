@@ -2401,11 +2401,6 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 {
 	global $UserSettings;
 
-	if( strlen($icon) === '' )
-	{	// Called with empty icon, e.g. through "File management popup"
-		return '';
-	}
-
 	$link_attribs['href'] = $url;
 	$link_attribs['title'] = $title;
 
@@ -2480,7 +2475,14 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 	{	// We MUST display an action icon in order to make the user happy:
 		// OR we default to icon because the user doesn't want the word either!!
 
-		$r .= get_icon( $icon, 'imgtag', array( 'title'=>$title ), true );
+		if( $icon_s = get_icon( $icon, 'imgtag', array( 'title'=>$title ), true ) )
+		{
+			$r .= $icon_s;
+		}
+		else
+		{ // fallback to word
+			$display_word = true;
+		}
 	}
 
 	if( $display_word )
@@ -2522,6 +2524,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
  *              'size' => param for 'size',
  *              'title' => title attribute for 'imgtag')
  * @param boolean true to include this icon into the legend at the bottom of the page (works for 'imgtag' only)
+ * @return mixed False on failure, string on success.
  */
 function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legend = false )
 {
@@ -2537,7 +2540,8 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 	$icon = get_icon_info($iconKey);
 	if( ! $icon || ! isset( $icon['file'] ) )
 	{
-		return '[no image defined for '.var_export( $iconKey, true ).'!]';
+		$Debuglog->add('No image defined for '.var_export( $iconKey, true ).'!', 'icons');
+		return false;
 	}
 
 	switch( $what )
@@ -3546,6 +3550,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.124  2009/08/01 18:39:24  blueyed
+ * Properly handle empty action icon name: get_icon returns false and action_icon uses the word instead.
+ *
  * Revision 1.123  2009/07/29 18:52:02  blueyed
  * action_icon: return early for empty icon name.
  *
