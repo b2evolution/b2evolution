@@ -2,12 +2,14 @@
 ;
 ; Do NOT MODIFY this file. You may lose your edits when upgrading.
 ;
-; To create your own definitions, duplicate this file by SAVING it AS defintions.local.csv .
+; To create your own definitions, duplicate this file by SAVING it AS defintions.local.txt .
 ;
 ; Values are separated by ;
 ; Field 1 = word to autolink
 ; Field 2 = optional previous required word (allows to create groups of 2 words)
 ; Field 3 = url
+;
+; All lines not matching this pattern are ignored.
 
 ; Team members and their b2evo blogs
 tblue;;www.ax86.net/
