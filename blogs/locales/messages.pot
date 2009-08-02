@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 3.4.0-dev\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2009-07-23 23:47+0200\n"
+"POT-Creation-Date: 2009-08-02 16:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -89,31 +89,6 @@ msgstr ""
 #: ..\..\..\skins_adm\_adminUI_general.class.php:895
 #: ..\..\..\skins_adm\chicago\_adminUI.class.php:267
 msgid "Next"
-msgstr ""
-
-#: ..\..\..\admin.php:86
-msgid "You are trying to post data, but it looks like this is no valid request."
-msgstr ""
-
-#: ..\..\..\admin.php:88
-msgid "If you are sure that this is a valid request (initiated and intended by you), you may resend it."
-msgstr ""
-
-#: ..\..\..\admin.php:100
-#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:439
-#: ..\..\..\inc\_core\ui\results\_resultsel.class.php:555
-#: ..\..\..\inc\collections\collections.ctrl.php:421
-#: ..\..\..\inc\plugins\plugins.ctrl.php:954
-#: ..\..\..\install\index.php:623
-msgid "I am sure!"
-msgstr ""
-
-#: ..\..\..\admin.php:107
-#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:450
-#: ..\..\..\inc\_core\ui\results\_resultsel.class.php:563
-#: ..\..\..\inc\collections\collections.ctrl.php:429
-#: ..\..\..\install\index.php:628
-msgid "CANCEL"
 msgstr ""
 
 #: ..\..\..\conf\_application.php:41
@@ -286,7 +261,7 @@ msgid "Website"
 msgstr ""
 
 #: ..\..\..\conf\_icons.php:271
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1921
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1888
 #: ..\..\..\inc\collections\collections.ctrl.php:75
 #: ..\..\..\inc\files\views\_file_browse.view.php:327
 msgid "New"
@@ -372,7 +347,7 @@ msgstr ""
 
 #: ..\..\..\conf\_icons.php:397
 #: ..\..\..\conf\_icons.php:403
-#: ..\..\..\inc\plugins\plugins.ctrl.php:1012
+#: ..\..\..\inc\plugins\plugins.ctrl.php:1000
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:226
 #: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:57
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:78
@@ -1008,11 +983,11 @@ msgid "File"
 msgstr ""
 
 #: ..\..\..\htsrv\viewfile.php:133
-#: ..\..\..\inc\_core\_misc.funcs.php:3466
+#: ..\..\..\inc\_core\_misc.funcs.php:3486
 #: ..\..\..\inc\collections\views\_coll_general.form.php:52
 #: ..\..\..\inc\files\views\_file_links.view.php:112
-#: ..\..\..\inc\items\model\_item.class.php:3643
-#: ..\..\..\inc\items\model\_item.class.php:3653
+#: ..\..\..\inc\items\model\_item.class.php:3640
+#: ..\..\..\inc\items\model\_item.class.php:3650
 #: ..\..\..\inc\items\views\_item_expert.form.php:101
 #: ..\..\..\inc\items\views\_item_list_table.view.php:141
 #: ..\..\..\inc\items\views\_item_simple.form.php:132
@@ -1291,8 +1266,8 @@ msgstr ""
 #: ..\..\..\inc\chapters\views\_chapter.form.php:62
 #: ..\..\..\inc\collections\model\_blog.class.php:225
 #: ..\..\..\inc\comments\model\_comment.class.php:1241
-#: ..\..\..\inc\items\model\_item.class.php:3643
-#: ..\..\..\inc\items\model\_item.class.php:3648
+#: ..\..\..\inc\items\model\_item.class.php:3640
+#: ..\..\..\inc\items\model\_item.class.php:3645
 #: ..\..\..\inc\items\views\_item_list_table.view.php:80
 #: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:155
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:92
@@ -1468,109 +1443,109 @@ msgstr ""
 msgid "Misc"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:851
+#: ..\..\..\inc\_core\_misc.funcs.php:849
 msgid "Hello"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1272
-#: ..\..\..\inc\_core\_misc.funcs.php:1319
+#: ..\..\..\inc\_core\_misc.funcs.php:1281
+#: ..\..\..\inc\_core\_misc.funcs.php:1328
 msgid "No response!"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1278
-#: ..\..\..\inc\_core\_misc.funcs.php:1325
+#: ..\..\..\inc\_core\_misc.funcs.php:1287
+#: ..\..\..\inc\_core\_misc.funcs.php:1334
 msgid "Remote error"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1302
-#: ..\..\..\inc\_core\_misc.funcs.php:1348
+#: ..\..\..\inc\_core\_misc.funcs.php:1311
+#: ..\..\..\inc\_core\_misc.funcs.php:1357
 msgid "Response"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1688
-#: ..\..\..\inc\_core\_misc.funcs.php:1706
+#: ..\..\..\inc\_core\_misc.funcs.php:1699
+#: ..\..\..\inc\_core\_misc.funcs.php:1717
 msgid "An unexpected error has occurred!"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1689
-#: ..\..\..\inc\_core\_misc.funcs.php:1707
+#: ..\..\..\inc\_core\_misc.funcs.php:1700
+#: ..\..\..\inc\_core\_misc.funcs.php:1718
 msgid "If this error persists, please report it to the administrator."
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1690
-#: ..\..\..\inc\_core\_misc.funcs.php:1714
-#: ..\..\..\inc\_core\_misc.funcs.php:1821
+#: ..\..\..\inc\_core\_misc.funcs.php:1701
+#: ..\..\..\inc\_core\_misc.funcs.php:1725
+#: ..\..\..\inc\_core\_misc.funcs.php:1832
 msgid "Additional information about this error:"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1708
-#: ..\..\..\inc\_core\_misc.funcs.php:1815
+#: ..\..\..\inc\_core\_misc.funcs.php:1719
+#: ..\..\..\inc\_core\_misc.funcs.php:1826
 msgid "Go back to home page"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1812
+#: ..\..\..\inc\_core\_misc.funcs.php:1823
 msgid "Bad Request!"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1813
+#: ..\..\..\inc\_core\_misc.funcs.php:1824
 msgid "The parameters of your request are invalid."
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1814
+#: ..\..\..\inc\_core\_misc.funcs.php:1825
 msgid "If you have obtained this error by clicking on a link INSIDE of this site, please report the bad link to the administrator."
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2154
+#: ..\..\..\inc\_core\_misc.funcs.php:2165
 msgid "DB Username"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2155
+#: ..\..\..\inc\_core\_misc.funcs.php:2166
 msgid "DB Database"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2156
+#: ..\..\..\inc\_core\_misc.funcs.php:2167
 msgid "DB Host"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2157
+#: ..\..\..\inc\_core\_misc.funcs.php:2168
 msgid "DB tables prefix"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2158
+#: ..\..\..\inc\_core\_misc.funcs.php:2169
 msgid "DB connection charset"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3034
+#: ..\..\..\inc\_core\_misc.funcs.php:3054
 #: ..\..\..\install\index.php:679
 msgid "Manual"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3034
+#: ..\..\..\inc\_core\_misc.funcs.php:3054
 msgid "Open relevant page in online manual"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3463
+#: ..\..\..\inc\_core\_misc.funcs.php:3483
 msgid "Date issued (Default)"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3464
+#: ..\..\..\inc\_core\_misc.funcs.php:3484
 msgid "Order (as explicitely specified)"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3467
+#: ..\..\..\inc\_core\_misc.funcs.php:3487
 msgid "Date created"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3468
+#: ..\..\..\inc\_core\_misc.funcs.php:3488
 msgid "Date last modified"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3469
+#: ..\..\..\inc\_core\_misc.funcs.php:3489
 #: ..\..\..\inc\collections\views\_coll_general.form.php:64
 msgid "URL \"filename\""
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3470
+#: ..\..\..\inc\_core\_misc.funcs.php:3490
 #: ..\..\..\inc\items\views\_item_expert.form.php:277
 #: ..\..\..\inc\items\views\_item_list_full.view.php:181
 #: ..\..\..\inc\locales\_locale_settings.form.php:95
@@ -1581,11 +1556,11 @@ msgstr ""
 msgid "Priority"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3471
+#: ..\..\..\inc\_core\_misc.funcs.php:3491
 msgid "Views"
 msgstr ""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3472
+#: ..\..\..\inc\_core\_misc.funcs.php:3492
 msgid "Random order!"
 msgstr ""
 
@@ -1845,8 +1820,23 @@ msgstr ""
 #: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:431
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:541
 #: ..\..\..\inc\collections\collections.ctrl.php:397
-#: ..\..\..\inc\plugins\plugins.ctrl.php:952
+#: ..\..\..\inc\plugins\plugins.ctrl.php:940
 msgid "THIS CANNOT BE UNDONE!"
+msgstr ""
+
+#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:439
+#: ..\..\..\inc\_core\ui\results\_resultsel.class.php:555
+#: ..\..\..\inc\collections\collections.ctrl.php:421
+#: ..\..\..\inc\plugins\plugins.ctrl.php:942
+#: ..\..\..\install\index.php:623
+msgid "I am sure!"
+msgstr ""
+
+#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:450
+#: ..\..\..\inc\_core\ui\results\_resultsel.class.php:563
+#: ..\..\..\inc\collections\collections.ctrl.php:429
+#: ..\..\..\install\index.php:628
+msgid "CANCEL"
 msgstr ""
 
 #: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:649
@@ -1967,27 +1957,27 @@ msgstr ""
 msgid "Descending order"
 msgstr ""
 
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1093
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1060
 #: ..\..\..\inc\collections\views\_coll_general.form.php:91
 #: ..\..\..\inc\cron\views\_cronjob.view.php:44
 msgid "days"
 msgstr ""
 
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1102
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1069
 #: ..\..\..\inc\cron\views\_cronjob.view.php:48
 msgid "hours"
 msgstr ""
 
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1112
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1079
 #: ..\..\..\inc\cron\views\_cronjob.view.php:52
 msgid "minutes"
 msgstr ""
 
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1389
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1356
 msgid "You have modified this form but you haven't submitted it yet.\\nYou are about to lose your edits.\\nAre you sure?"
 msgstr ""
 
-#: ..\..\..\inc\_core\ui\forms\_form.class.php:1393
+#: ..\..\..\inc\_core\ui\forms\_form.class.php:1360
 #, php-format
 msgid "You have modified the form \\\"%s\\\"\\nbut you haven't submitted it yet.\\nYou are about to lose your edits.\\nAre you sure?"
 msgstr ""
@@ -2087,24 +2077,24 @@ msgstr ""
 msgid "Selection deleted."
 msgstr ""
 
-#: ..\..\..\inc\_main.inc.php:479
-#: ..\..\..\inc\_main.inc.php:490
+#: ..\..\..\inc\_main.inc.php:486
+#: ..\..\..\inc\_main.inc.php:497
 msgid "The login window has expired. Please try again."
 msgstr ""
 
-#: ..\..\..\inc\_main.inc.php:484
+#: ..\..\..\inc\_main.inc.php:491
 msgid "Either you have not enabled cookies or this login window has expired."
 msgstr ""
 
-#: ..\..\..\inc\_main.inc.php:520
+#: ..\..\..\inc\_main.inc.php:527
 msgid "Wrong login/password."
 msgstr ""
 
-#: ..\..\..\inc\_main.inc.php:553
+#: ..\..\..\inc\_main.inc.php:560
 msgid "You must log in!"
 msgstr ""
 
-#: ..\..\..\inc\_main.inc.php:571
+#: ..\..\..\inc\_main.inc.php:578
 msgid "You must validate your email address before you can log in."
 msgstr ""
 
@@ -2407,7 +2397,7 @@ msgstr ""
 
 #: ..\..\..\inc\antispam\antispam_settings.ctrl.php:61
 #: ..\..\..\inc\files\file_settings.ctrl.php:75
-#: ..\..\..\inc\plugins\plugins.ctrl.php:748
+#: ..\..\..\inc\plugins\plugins.ctrl.php:736
 #: ..\..\..\inc\settings\features.ctrl.php:98
 msgid "Restored default values."
 msgstr ""
@@ -2416,7 +2406,7 @@ msgstr ""
 #: ..\..\..\inc\antispam\antispam_settings.ctrl.php:118
 #: ..\..\..\inc\files\file_settings.ctrl.php:79
 #: ..\..\..\inc\files\file_settings.ctrl.php:155
-#: ..\..\..\inc\plugins\plugins.ctrl.php:752
+#: ..\..\..\inc\plugins\plugins.ctrl.php:740
 #: ..\..\..\inc\settings\features.ctrl.php:102
 #: ..\..\..\inc\settings\features.ctrl.php:193
 msgid "Settings have not changed."
@@ -2489,7 +2479,7 @@ msgstr ""
 
 #: ..\..\..\inc\antispam\model\_antispam.funcs.php:281
 #: ..\..\..\inc\cron\jobs\_post_notifications.job.php:64
-#: ..\..\..\inc\items\model\_item.class.php:3684
+#: ..\..\..\inc\items\model\_item.class.php:3681
 msgid "Done."
 msgstr ""
 
@@ -2566,8 +2556,8 @@ msgstr ""
 #: ..\..\..\inc\comments\model\_comment.class.php:1263
 #: ..\..\..\inc\comments\views\_comment.form.php:70
 #: ..\..\..\inc\comments\views\_comment.form.php:89
-#: ..\..\..\inc\items\model\_item.class.php:3643
-#: ..\..\..\inc\items\model\_item.class.php:3651
+#: ..\..\..\inc\items\model\_item.class.php:3640
+#: ..\..\..\inc\items\model\_item.class.php:3648
 #: ..\..\..\inc\items\views\_item_list_table.view.php:100
 msgid "Author"
 msgstr ""
@@ -3034,7 +3024,7 @@ msgstr ""
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:160
 #: ..\..\..\inc\locales\_locale_settings.form.php:87
 #: ..\..\..\inc\locales\_locale_settings.form.php:282
-#: ..\..\..\inc\plugins\plugins.ctrl.php:986
+#: ..\..\..\inc\plugins\plugins.ctrl.php:974
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:72
 #: ..\..\..\inc\sessions\views\_goal.form.php:44
 #: ..\..\..\inc\sessions\views\_stats_goals.view.php:69
@@ -3112,7 +3102,7 @@ msgstr ""
 #: ..\..\..\inc\generic\views\_generic_ordered_list.inc.php:63
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:159
 #: ..\..\..\inc\items\views\_item_list_track.view.php:159
-#: ..\..\..\inc\plugins\plugins.ctrl.php:994
+#: ..\..\..\inc\plugins\plugins.ctrl.php:982
 #: ..\..\..\inc\sessions\views\_stats_goals.view.php:62
 #: ..\..\..\inc\sessions\views\_stats_sessions_list.view.php:71
 #: ..\..\..\inc\users\views\_group.form.php:63
@@ -3691,7 +3681,7 @@ msgid "This will be appended to each post in your RSS/Atom feeds."
 msgstr ""
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:169
-#: ..\..\..\inc\items\items.ctrl.php:1004
+#: ..\..\..\inc\items\items.ctrl.php:1000
 msgid "Notes"
 msgstr ""
 
@@ -5131,8 +5121,8 @@ msgstr ""
 
 #: ..\..\..\inc\comments\model\_comment.class.php:1252
 #: ..\..\..\inc\comments\model\_comment.class.php:1265
-#: ..\..\..\inc\items\model\_item.class.php:3643
-#: ..\..\..\inc\items\model\_item.class.php:3656
+#: ..\..\..\inc\items\model\_item.class.php:3640
+#: ..\..\..\inc\items\model\_item.class.php:3653
 msgid "Url"
 msgstr ""
 
@@ -5148,12 +5138,12 @@ msgid "Rating"
 msgstr ""
 
 #: ..\..\..\inc\comments\model\_comment.class.php:1281
-#: ..\..\..\inc\items\model\_item.class.php:3667
+#: ..\..\..\inc\items\model\_item.class.php:3664
 msgid "Edit/Delete"
 msgstr ""
 
 #: ..\..\..\inc\comments\model\_comment.class.php:1282
-#: ..\..\..\inc\items\model\_item.class.php:3669
+#: ..\..\..\inc\items\model\_item.class.php:3666
 msgid "Edit your subscriptions/notifications"
 msgstr ""
 
@@ -6042,7 +6032,7 @@ msgstr ""
 msgid "&lt;dir&gt;"
 msgstr ""
 
-#: ..\..\..\inc\files\model\_file.class.php:1503
+#: ..\..\..\inc\files\model\_file.class.php:1469
 #: ..\..\..\inc\files\views\_file_list.inc.php:260
 msgid "Open in a new window"
 msgstr ""
@@ -6097,34 +6087,34 @@ msgstr ""
 msgid "Terabytes"
 msgstr ""
 
-#: ..\..\..\inc\files\model\_file.funcs.php:433
-#: ..\..\..\inc\files\model\_file.funcs.php:440
+#: ..\..\..\inc\files\model\_file.funcs.php:446
+#: ..\..\..\inc\files\model\_file.funcs.php:453
 #, php-format
 msgid "&laquo;%s&raquo; is not a valid filename."
 msgstr ""
 
-#: ..\..\..\inc\files\model\_file.funcs.php:456
+#: ..\..\..\inc\files\model\_file.funcs.php:469
 #, php-format
 msgid "&laquo;%s&raquo; is a locked extension."
 msgstr ""
 
-#: ..\..\..\inc\files\model\_file.funcs.php:461
+#: ..\..\..\inc\files\model\_file.funcs.php:474
 #, php-format
 msgid "&laquo;%s&raquo; has an unrecognized extension."
 msgstr ""
 
-#: ..\..\..\inc\files\model\_file.funcs.php:466
+#: ..\..\..\inc\files\model\_file.funcs.php:479
 #, php-format
 msgid "&laquo;%s&raquo; has not a valid extension."
 msgstr ""
 
-#: ..\..\..\inc\files\model\_file.funcs.php:500
+#: ..\..\..\inc\files\model\_file.funcs.php:513
 #, php-format
 msgid "&laquo;%s&raquo; is not a valid directory name."
 msgstr ""
 
-#: ..\..\..\inc\files\model\_file.funcs.php:620
-#: ..\..\..\inc\files\model\_file.funcs.php:622
+#: ..\..\..\inc\files\model\_file.funcs.php:633
+#: ..\..\..\inc\files\model\_file.funcs.php:635
 msgid "Open this directory in the file manager"
 msgstr ""
 
@@ -6884,10 +6874,10 @@ msgstr ""
 msgid "Check to allow uploading files in general."
 msgstr ""
 
-#. TRANS: first %s is setting/var name, second is file name, third is limit value
+#. TRANS: first %s is first is php.ini limit, second is setting/var name, third is file name, 4th is limit in b2evo conf
 #: ..\..\..\inc\files\views\_file_settings.form.php:191
 #, php-format
-msgid "KB. This cannot be higher than your PHP/Webserver setting and the limit of %s (in %s), which is currently %s!"
+msgid "KB. This cannot be higher than your PHP/Webserver setting (PHP: %s) and the limit of %s (in %s), which is currently %s!"
 msgstr ""
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:191
@@ -7481,58 +7471,58 @@ msgstr ""
 msgid "%d views"
 msgstr ""
 
-#: ..\..\..\inc\items\model\_item.class.php:3496
+#: ..\..\..\inc\items\model\_item.class.php:3493
 msgid "Post had already pinged: skipping notifications..."
 msgstr ""
 
-#: ..\..\..\inc\items\model\_item.class.php:3507
+#: ..\..\..\inc\items\model\_item.class.php:3504
 msgid "Post processing already pending..."
 msgstr ""
 
-#: ..\..\..\inc\items\model\_item.class.php:3517
+#: ..\..\..\inc\items\model\_item.class.php:3514
 msgid "Post not publicly published: skipping notifications..."
 msgstr ""
 
-#: ..\..\..\inc\items\model\_item.class.php:3527
+#: ..\..\..\inc\items\model\_item.class.php:3524
 msgid "This post type doesn't need notifications..."
 msgstr ""
 
-#: ..\..\..\inc\items\model\_item.class.php:3545
+#: ..\..\..\inc\items\model\_item.class.php:3542
 msgid "Scheduling asynchronous notifications..."
 msgstr ""
 
-#: ..\..\..\inc\items\model\_item.class.php:3557
+#: ..\..\..\inc\items\model\_item.class.php:3554
 #, php-format
 msgid "Send notifications for &laquo;%s&raquo;"
 msgstr ""
 
-#: ..\..\..\inc\items\model\_item.class.php:3601
+#: ..\..\..\inc\items\model\_item.class.php:3598
 msgid "Notifying subscribed users..."
 msgstr ""
 
-#: ..\..\..\inc\items\model\_item.class.php:3624
+#: ..\..\..\inc\items\model\_item.class.php:3621
 msgid "No-one to notify."
 msgstr ""
 
-#: ..\..\..\inc\items\model\_item.class.php:3643
-#: ..\..\..\inc\items\model\_item.class.php:3658
+#: ..\..\..\inc\items\model\_item.class.php:3640
+#: ..\..\..\inc\items\model\_item.class.php:3655
 msgid "Content"
 msgstr ""
 
-#: ..\..\..\inc\items\model\_item.class.php:3645
+#: ..\..\..\inc\items\model\_item.class.php:3642
 #, php-format
 msgid "[%s] New post: \"%s\""
 msgstr ""
 
-#: ..\..\..\inc\items\model\_item.class.php:3674
+#: ..\..\..\inc\items\model\_item.class.php:3671
 msgid "Notifying:"
 msgstr ""
 
-#: ..\..\..\inc\items\model\_item.class.php:3709
+#: ..\..\..\inc\items\model\_item.class.php:3706
 msgid "Skipping pings (Running on localhost)."
 msgstr ""
 
-#: ..\..\..\inc\items\model\_item.class.php:3718
+#: ..\..\..\inc\items\model\_item.class.php:3715
 #, php-format
 msgid "Pinging %s..."
 msgstr ""
@@ -7657,7 +7647,7 @@ msgstr ""
 msgid "Permanent link to full entry"
 msgstr ""
 
-#: ..\..\..\inc\items\model\_itemlist.class.php:220
+#: ..\..\..\inc\items\model\_itemlist.class.php:221
 msgid "Invalid post, please correct these errors:"
 msgstr ""
 
@@ -8578,54 +8568,6 @@ msgstr ""
 msgid "Switched priorities."
 msgstr ""
 
-#: ..\..\..\inc\plugins\_captcha_base_plugin.class.php:66
-msgid "Timeout for keys"
-msgstr ""
-
-#: ..\..\..\inc\plugins\_captcha_base_plugin.class.php:68
-msgid "in minutes. When does the generated captcha expire?"
-msgstr ""
-
-#: ..\..\..\inc\plugins\_captcha_base_plugin.class.php:74
-msgid "Use for"
-msgstr ""
-
-#: ..\..\..\inc\plugins\_captcha_base_plugin.class.php:78
-msgid "Use for anonymous"
-msgstr ""
-
-#: ..\..\..\inc\plugins\_captcha_base_plugin.class.php:80
-msgid "Should this plugin be used for anonymous users?"
-msgstr ""
-
-#: ..\..\..\inc\plugins\_captcha_base_plugin.class.php:84
-msgid "Use for members"
-msgstr ""
-
-#: ..\..\..\inc\plugins\_captcha_base_plugin.class.php:86
-msgid "Use this plugin for members of the target blog, if their level is below this."
-msgstr ""
-
-#: ..\..\..\inc\plugins\_captcha_base_plugin.class.php:92
-msgid "Use for registered"
-msgstr ""
-
-#: ..\..\..\inc\plugins\_captcha_base_plugin.class.php:94
-msgid "Use this plugin for registered users, if their level is below this."
-msgstr ""
-
-#: ..\..\..\inc\plugins\_captcha_base_plugin.class.php:209
-msgid "Validate me"
-msgstr ""
-
-#: ..\..\..\inc\plugins\_captcha_base_plugin.class.php:248
-msgid "The entered captcha code was invalid."
-msgstr ""
-
-#: ..\..\..\inc\plugins\_captcha_base_plugin.class.php:332
-msgid "Create test image... (please save any changes before)"
-msgstr ""
-
 #: ..\..\..\inc\plugins\_plugin.class.php:336
 msgid "No desc available"
 msgstr ""
@@ -8647,7 +8589,7 @@ msgid "Local documentation of the plugin"
 msgstr ""
 
 #: ..\..\..\inc\plugins\_plugin.class.php:2796
-#: ..\..\..\inc\plugins\plugins.ctrl.php:977
+#: ..\..\..\inc\plugins\plugins.ctrl.php:965
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:126
 msgid "Edit plugin settings!"
 msgstr ""
@@ -8907,134 +8849,130 @@ msgstr ""
 msgid "Plugin description updated."
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:556
-#: ..\..\..\inc\plugins\plugins.ctrl.php:759
-msgid "Plugin events have been updated."
-msgstr ""
-
-#: ..\..\..\inc\plugins\plugins.ctrl.php:565
-msgid "This ping plugin needs a non-empty code."
-msgstr ""
-
-#: ..\..\..\inc\plugins\plugins.ctrl.php:577
-#: ..\..\..\inc\plugins\plugins.ctrl.php:720
+#: ..\..\..\inc\plugins\plugins.ctrl.php:542
+#: ..\..\..\inc\plugins\plugins.ctrl.php:708
 msgid "Plugin code updated."
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:583
-#: ..\..\..\inc\plugins\plugins.ctrl.php:726
+#: ..\..\..\inc\plugins\plugins.ctrl.php:546
+#: ..\..\..\inc\plugins\plugins.ctrl.php:714
 msgid "Plugin priority must be numeric (0-100)."
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:588
-#: ..\..\..\inc\plugins\plugins.ctrl.php:733
+#: ..\..\..\inc\plugins\plugins.ctrl.php:551
+#: ..\..\..\inc\plugins\plugins.ctrl.php:721
 msgid "Plugin priority updated."
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:599
-#: ..\..\..\inc\plugins\plugins.ctrl.php:740
+#: ..\..\..\inc\plugins\plugins.ctrl.php:562
+#: ..\..\..\inc\plugins\plugins.ctrl.php:728
 msgid "Plugin rendering updated."
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:623
+#: ..\..\..\inc\plugins\plugins.ctrl.php:586
 msgid "Plugin settings have been updated."
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:634
-#: ..\..\..\inc\plugins\plugins.ctrl.php:769
+#: ..\..\..\inc\plugins\plugins.ctrl.php:612
+#: ..\..\..\inc\plugins\plugins.ctrl.php:747
+msgid "Plugin events have been updated."
+msgstr ""
+
+#: ..\..\..\inc\plugins\plugins.ctrl.php:622
+#: ..\..\..\inc\plugins\plugins.ctrl.php:757
 msgid "The plugin has been disabled."
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:817
+#: ..\..\..\inc\plugins\plugins.ctrl.php:805
 #, php-format
 msgid "Edit plugin &laquo;%s&raquo; (ID %d)"
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:834
+#: ..\..\..\inc\plugins\plugins.ctrl.php:822
 #, php-format
 msgid "Help for plugin &laquo;%s&raquo;"
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:837
+#: ..\..\..\inc\plugins\plugins.ctrl.php:825
 msgid "External help page"
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:890
+#: ..\..\..\inc\plugins\plugins.ctrl.php:878
 msgid "Cancel installation!"
 msgstr ""
 
 #. TRANS: %d is ID, %d name
-#: ..\..\..\inc\plugins\plugins.ctrl.php:892
+#: ..\..\..\inc\plugins\plugins.ctrl.php:880
 #, php-format
 msgid "Finish setup for plugin #%d (%s)"
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:894
+#: ..\..\..\inc\plugins\plugins.ctrl.php:882
 msgid "The plugin needs the following database changes."
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:898
+#: ..\..\..\inc\plugins\plugins.ctrl.php:886
 #: ..\..\..\install\_functions_evoupgrade.php:2551
 msgid "The following database changes will be carried out. If you are not sure what this means, it will probably be alright."
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:911
+#: ..\..\..\inc\plugins\plugins.ctrl.php:899
 msgid "Install!"
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:933
+#: ..\..\..\inc\plugins\plugins.ctrl.php:921
 msgid "Cancel uninstall!"
 msgstr ""
 
 #. TRANS: %d is ID, %d name
-#: ..\..\..\inc\plugins\plugins.ctrl.php:935
+#: ..\..\..\inc\plugins\plugins.ctrl.php:923
 #, php-format
 msgid "Uninstall plugin #%d (%s)"
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:939
+#: ..\..\..\inc\plugins\plugins.ctrl.php:927
 msgid "Uninstalling this plugin will also delete its database tables:"
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:981
+#: ..\..\..\inc\plugins\plugins.ctrl.php:969
 msgid "Close info!"
 msgstr ""
 
 #. TRANS: Code of a plugin
-#: ..\..\..\inc\plugins\plugins.ctrl.php:987
+#: ..\..\..\inc\plugins\plugins.ctrl.php:975
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:194
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:114
 #: ..\..\..\plugins\code_highlight_plugin\_code_highlight.plugin.php:212
 msgid "Code"
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:989
+#: ..\..\..\inc\plugins\plugins.ctrl.php:977
 msgid "This 32 character code uniquely identifies the functionality of this plugin. It is only necessary to call the plugin by code (SkinTag) or when using it as a Renderer."
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:990
+#: ..\..\..\inc\plugins\plugins.ctrl.php:978
 #: ..\..\..\inc\plugins\views\_plugin_settings.form.php:74
 msgid "Short desc"
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:991
+#: ..\..\..\inc\plugins\plugins.ctrl.php:979
 msgid "Long desc"
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:996
+#: ..\..\..\inc\plugins\plugins.ctrl.php:984
 #: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:56
 msgid "Version"
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:997
+#: ..\..\..\inc\plugins\plugins.ctrl.php:985
 msgid "Classname"
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:998
+#: ..\..\..\inc\plugins\plugins.ctrl.php:986
 msgid "Class file"
 msgstr ""
 
-#: ..\..\..\inc\plugins\plugins.ctrl.php:1028
+#: ..\..\..\inc\plugins\plugins.ctrl.php:1016
 #: ..\..\..\inc\skins\model\_skin.class.php:406
 #: ..\..\..\inc\skins\model\_skin.class.php:448
 #: ..\..\..\inc\skins\model\_skin.class.php:449
@@ -9333,7 +9271,7 @@ msgstr ""
 msgid "Default value must be a number."
 msgstr ""
 
-#: ..\..\..\inc\sessions\model\_hit.class.php:737
+#: ..\..\..\inc\sessions\model\_hit.class.php:738
 msgid "bad char in User Agent"
 msgstr ""
 
@@ -14128,48 +14066,44 @@ msgstr ""
 msgid "Update your twitter account with details about the new post."
 msgstr ""
 
-#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:97
-msgid "The twitter plugin needs the PHP CURL extension to be enabled."
-msgstr ""
-
-#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:116
+#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:94
 msgid "The twitter plugin needs a non-empty code."
 msgstr ""
 
-#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:146
+#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:123
 msgid "You must configure a twitter username/password before you can post to twitter."
 msgstr ""
 
-#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:202
+#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:179
 msgid "No ping method available, please contact your host about using CURL or fsockopen"
 msgstr ""
 
-#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:216
+#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:193
 msgid "Posted to account: @"
 msgstr ""
 
-#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:230
-#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:260
+#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:206
+#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:236
 msgid "Twitter username"
 msgstr ""
 
-#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:234
-#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:264
+#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:210
+#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:240
 msgid "Twitter password"
 msgstr ""
 
-#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:238
-#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:268
+#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:214
+#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:244
 msgid "Message format"
 msgstr ""
 
-#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:242
-#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:272
+#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:218
+#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:248
 msgid "Just posted $title$ $url$ #b2p"
 msgstr ""
 
-#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:243
-#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:273
+#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:219
+#: ..\..\..\plugins\twitter_plugin\_twitter.plugin.php:249
 msgid "$title$, $excerpt$ and $url$ will be replaced appropriately."
 msgstr ""
 

@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 3.1.0-beta\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2009-07-11 21:44+0200\n"
-"PO-Revision-Date: 2009-07-11 21:45+0100\n"
+"POT-Creation-Date: 2009-08-02 16:55+0200\n"
+"PO-Revision-Date: 2009-08-02 17:15+0100\n"
 "Last-Translator: Tilman Blumenbach <tilman (at) ax86 (dot) net>\n"
 "Language-Team: Tilman Blumenbach <tilman (at) ax86 (dot) net>\n"
 "MIME-Version: 1.0\n"
@@ -375,8 +375,8 @@ msgstr "Onlinehilfe"
 #: ..\..\..\conf\_icons.php:409
 #: ..\..\..\inc\comments\model\_comment.class.php:891
 #: ..\..\..\inc\comments\model\_comment.class.php:899
-#: ..\..\..\inc\items\model\_itemlight.class.php:681
-#: ..\..\..\inc\items\model\_itemlight.class.php:689
+#: ..\..\..\inc\items\model\_itemlight.class.php:684
+#: ..\..\..\inc\items\model\_itemlight.class.php:692
 #: ..\..\..\skins\photoblog\_item_block.inc.php:79
 msgid "Permalink"
 msgstr "Permalink"
@@ -458,9 +458,9 @@ msgstr "Blocken"
 msgid "XML Feed"
 msgstr "XML-Feed"
 
-#: ..\..\..\conf\_locales.php:109
-msgid "English (US)"
-msgstr "Englisch (US)"
+#: ..\..\..\conf\_locales.php:118
+msgid "English (US) latin1"
+msgstr "Englisch (US) latin1"
 
 #: ..\..\..\contact.php:49
 #: ..\..\..\contact.php:98
@@ -564,84 +564,84 @@ msgstr "Kann nicht auf das Medienverzeichnis zugreifen. Keine Anhänge wurden ver
 msgid "Cannot post, please correct these errors:"
 msgstr "Kann nicht absenden, bitte korrigieren Sie die folgenden Fehler:"
 
-#: ..\..\..\default.php:80
+#: ..\..\..\default.php:81
 msgid "Default page"
 msgstr "Standardseite"
 
-#: ..\..\..\default.php:104
+#: ..\..\..\default.php:105
 msgid "Welcome to b2evolution"
 msgstr "Willkommen zu b2evolution"
 
-#: ..\..\..\default.php:114
+#: ..\..\..\default.php:115
 msgid "b2evolution is installed and ready but you haven't created any blog on this system yet."
 msgstr "b2evolution ist installiert und betriebsbereit, aber Sie haben noch keine Blogs auf diesem System erstellt."
 
-#: ..\..\..\default.php:116
+#: ..\..\..\default.php:117
 msgid "Create a first blog"
 msgstr "Ein erstes Blog erstellen"
 
-#: ..\..\..\default.php:120
+#: ..\..\..\default.php:121
 msgid "You have successfully installed b2evolution."
 msgstr "Sie haben b2evolution erfolgreich installiert."
 
-#: ..\..\..\default.php:122
+#: ..\..\..\default.php:123
 msgid "You haven't set a default blog yet. Thus, you see this default page."
 msgstr "Sie haben noch kein Standardblog festgelegt, deswegen sehen Sie diese Standardseite."
 
-#: ..\..\..\default.php:124
+#: ..\..\..\default.php:125
 msgid "Set a default blog"
 msgstr "Ein Standardblog festlegen"
 
-#: ..\..\..\default.php:142
+#: ..\..\..\default.php:143
 msgid "Blogs on this system"
 msgstr "Blogs auf diesem System"
 
-#: ..\..\..\default.php:152
+#: ..\..\..\default.php:153
 #, php-format
 msgid "Blog #%d"
 msgstr "Blog #%d"
 
-#: ..\..\..\default.php:163
+#: ..\..\..\default.php:164
 msgid "Add a new blog"
 msgstr "Ein neues Blog hinzufügen"
 
-#: ..\..\..\default.php:173
+#: ..\..\..\default.php:174
 msgid "Bonus templates &amp; features"
 msgstr "Bonustemplates &amp; -features"
 
-#: ..\..\..\default.php:174
+#: ..\..\..\default.php:175
 msgid "These templates demonstrate more advanced uses of b2evolution. These do not make use of skins. The only way to change their look and feel is to edit their PHP template."
 msgstr "Diese Templates demonstrieren fortgeschrittene Anwendungen von b2evolution. Sie benutzen keine Skins. Der einzige Weg ihr Aussehen zu ändern, ist ihr PHP-Template zu bearbeiten."
 
-#: ..\..\..\default.php:181
+#: ..\..\..\default.php:182
 msgid "Blog #1 called through a custom template (not a skin)"
 msgstr "Blog #1 mit einem benutzerdefinierten Template aufgerufen (kein Skin)"
 
-#: ..\..\..\default.php:182
+#: ..\..\..\default.php:183
 msgid "Multiple blogs displayed on the same page"
 msgstr "Mehrere Blogs auf der selben Seite dargestellt"
 
-#: ..\..\..\default.php:183
+#: ..\..\..\default.php:184
 msgid "Blog #1 XML sitemap (called through a stub)"
 msgstr "XML-Sitemap für Blog #1 (durch ein Stub aufgerufen)"
 
-#: ..\..\..\default.php:184
+#: ..\..\..\default.php:185
 msgid "Blog #1 aggregated XML sitemap (called through a stub)"
 msgstr "Aggregierte XML-Sitemap für Blog #1 (durch ein Stub aufgerufen)"
 
-#: ..\..\..\default.php:188
+#: ..\..\..\default.php:189
 msgid "Summary of latest posts in all blogs"
 msgstr "Zusammenfassung der letzten Einträge in allen Blogs"
 
-#: ..\..\..\default.php:189
+#: ..\..\..\default.php:190
 msgid "The page you're looking at"
 msgstr "Die Seite, die Sie gerade anschauen"
 
-#: ..\..\..\default.php:190
+#: ..\..\..\default.php:191
 msgid "A standalone admin-contact page for your site"
 msgstr "Eine eigenständige Administrator-Kontaktseite für Ihre Webseite"
 
-#: ..\..\..\default.php:209
+#: ..\..\..\default.php:210
 msgid "Contact the admin"
 msgstr "Den Administrator kontaktieren"
 
@@ -1004,11 +1004,11 @@ msgid "File"
 msgstr "Datei"
 
 #: ..\..\..\htsrv\viewfile.php:133
-#: ..\..\..\inc\_core\_misc.funcs.php:3417
+#: ..\..\..\inc\_core\_misc.funcs.php:3486
 #: ..\..\..\inc\collections\views\_coll_general.form.php:52
 #: ..\..\..\inc\files\views\_file_links.view.php:112
-#: ..\..\..\inc\items\model\_item.class.php:3638
-#: ..\..\..\inc\items\model\_item.class.php:3648
+#: ..\..\..\inc\items\model\_item.class.php:3640
+#: ..\..\..\inc\items\model\_item.class.php:3650
 #: ..\..\..\inc\items\views\_item_expert.form.php:101
 #: ..\..\..\inc\items\views\_item_list_table.view.php:141
 #: ..\..\..\inc\items\views\_item_simple.form.php:132
@@ -1184,7 +1184,7 @@ msgstr "Dateien"
 
 #: ..\..\..\inc\_core\__core.init.php:286
 #: ..\..\..\inc\tools\system.ctrl.php:84
-#: ..\..\..\install\_functions_create.php:606
+#: ..\..\..\install\_functions_create.php:601
 msgid "About this system"
 msgstr "Über dieses System"
 
@@ -1287,8 +1287,8 @@ msgstr "Abmelden"
 #: ..\..\..\inc\chapters\views\_chapter.form.php:62
 #: ..\..\..\inc\collections\model\_blog.class.php:225
 #: ..\..\..\inc\comments\model\_comment.class.php:1241
-#: ..\..\..\inc\items\model\_item.class.php:3638
-#: ..\..\..\inc\items\model\_item.class.php:3643
+#: ..\..\..\inc\items\model\_item.class.php:3640
+#: ..\..\..\inc\items\model\_item.class.php:3645
 #: ..\..\..\inc\items\views\_item_list_table.view.php:80
 #: ..\..\..\inc\sessions\views\_stats_hit_list.view.php:155
 #: ..\..\..\inc\widgets\widgets\_coll_comment_list.widget.php:92
@@ -1315,7 +1315,7 @@ msgstr "Start"
 #: ..\..\..\inc\sessions\views\_stats_browserhits.view.php:166
 #: ..\..\..\inc\users\model\_user.funcs.php:332
 #: ..\..\..\inc\widgets\widgets\_user_tools.widget.php:97
-#: ..\..\..\install\index.php:133
+#: ..\..\..\install\index.php:138
 msgid "Admin"
 msgstr "Admin"
 
@@ -1464,109 +1464,109 @@ msgstr "System"
 msgid "Misc"
 msgstr "Verschiedenes"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:802
+#: ..\..\..\inc\_core\_misc.funcs.php:849
 msgid "Hello"
 msgstr "Hallo"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1223
-#: ..\..\..\inc\_core\_misc.funcs.php:1270
+#: ..\..\..\inc\_core\_misc.funcs.php:1281
+#: ..\..\..\inc\_core\_misc.funcs.php:1328
 msgid "No response!"
 msgstr "Keine Antwort!"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1229
-#: ..\..\..\inc\_core\_misc.funcs.php:1276
+#: ..\..\..\inc\_core\_misc.funcs.php:1287
+#: ..\..\..\inc\_core\_misc.funcs.php:1334
 msgid "Remote error"
 msgstr "Entfernter Fehler"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1253
-#: ..\..\..\inc\_core\_misc.funcs.php:1299
+#: ..\..\..\inc\_core\_misc.funcs.php:1311
+#: ..\..\..\inc\_core\_misc.funcs.php:1357
 msgid "Response"
 msgstr "Antwort"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1639
-#: ..\..\..\inc\_core\_misc.funcs.php:1657
+#: ..\..\..\inc\_core\_misc.funcs.php:1699
+#: ..\..\..\inc\_core\_misc.funcs.php:1717
 msgid "An unexpected error has occurred!"
 msgstr "Ein unerwarteter Fehler ist aufgetreten!"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1640
-#: ..\..\..\inc\_core\_misc.funcs.php:1658
+#: ..\..\..\inc\_core\_misc.funcs.php:1700
+#: ..\..\..\inc\_core\_misc.funcs.php:1718
 msgid "If this error persists, please report it to the administrator."
 msgstr "Falls dieser Fehler bestehen bleibt, melden Sie ihn bitte dem Administrator."
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1641
-#: ..\..\..\inc\_core\_misc.funcs.php:1665
-#: ..\..\..\inc\_core\_misc.funcs.php:1772
+#: ..\..\..\inc\_core\_misc.funcs.php:1701
+#: ..\..\..\inc\_core\_misc.funcs.php:1725
+#: ..\..\..\inc\_core\_misc.funcs.php:1832
 msgid "Additional information about this error:"
 msgstr "Zusätzliche Informationen zu diesem Fehler:"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1659
-#: ..\..\..\inc\_core\_misc.funcs.php:1766
+#: ..\..\..\inc\_core\_misc.funcs.php:1719
+#: ..\..\..\inc\_core\_misc.funcs.php:1826
 msgid "Go back to home page"
 msgstr "Zurück zur Startseite gehen"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1763
+#: ..\..\..\inc\_core\_misc.funcs.php:1823
 msgid "Bad Request!"
 msgstr "Ungültige Anforderung!"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1764
+#: ..\..\..\inc\_core\_misc.funcs.php:1824
 msgid "The parameters of your request are invalid."
 msgstr "Die Parameter Ihrer Anforderung sind ungültig."
 
-#: ..\..\..\inc\_core\_misc.funcs.php:1765
+#: ..\..\..\inc\_core\_misc.funcs.php:1825
 msgid "If you have obtained this error by clicking on a link INSIDE of this site, please report the bad link to the administrator."
 msgstr "Wenn Sie den Fehler erhalten haben, indem Sie auf einen Link INNERHALB dieser Seite geklickt haben, teilen Sie den fehlerhaften Link bitte dem Administrator mit."
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2105
+#: ..\..\..\inc\_core\_misc.funcs.php:2165
 msgid "DB Username"
 msgstr "DB-Benutzername"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2106
+#: ..\..\..\inc\_core\_misc.funcs.php:2166
 msgid "DB Database"
 msgstr "DB-Datenbank"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2107
+#: ..\..\..\inc\_core\_misc.funcs.php:2167
 msgid "DB Host"
 msgstr "DB-Host"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2108
+#: ..\..\..\inc\_core\_misc.funcs.php:2168
 msgid "DB tables prefix"
 msgstr "DB-Tabellenpräfix"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2109
+#: ..\..\..\inc\_core\_misc.funcs.php:2169
 msgid "DB connection charset"
 msgstr "DB-Verbindungszeichensatz"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2985
-#: ..\..\..\install\index.php:628
+#: ..\..\..\inc\_core\_misc.funcs.php:3054
+#: ..\..\..\install\index.php:679
 msgid "Manual"
 msgstr "Anleitung"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:2985
+#: ..\..\..\inc\_core\_misc.funcs.php:3054
 msgid "Open relevant page in online manual"
 msgstr "Entsprechende Seite in der Onlinehilfe öffnen"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3414
+#: ..\..\..\inc\_core\_misc.funcs.php:3483
 msgid "Date issued (Default)"
 msgstr "Veröffentlichungsdatum (Standard)"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3415
+#: ..\..\..\inc\_core\_misc.funcs.php:3484
 msgid "Order (as explicitely specified)"
 msgstr "Anordnung (wie angegeben)"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3418
+#: ..\..\..\inc\_core\_misc.funcs.php:3487
 msgid "Date created"
 msgstr "Erstellungsdatum"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3419
+#: ..\..\..\inc\_core\_misc.funcs.php:3488
 msgid "Date last modified"
 msgstr "Datum der letzten Veränderung"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3420
+#: ..\..\..\inc\_core\_misc.funcs.php:3489
 #: ..\..\..\inc\collections\views\_coll_general.form.php:64
 msgid "URL \"filename\""
 msgstr "URL-\"Dateiname\""
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3421
+#: ..\..\..\inc\_core\_misc.funcs.php:3490
 #: ..\..\..\inc\items\views\_item_expert.form.php:277
 #: ..\..\..\inc\items\views\_item_list_full.view.php:181
 #: ..\..\..\inc\locales\_locale_settings.form.php:95
@@ -1577,11 +1577,11 @@ msgstr "URL-\"Dateiname\""
 msgid "Priority"
 msgstr "Priorität"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3422
+#: ..\..\..\inc\_core\_misc.funcs.php:3491
 msgid "Views"
 msgstr "Ansichten"
 
-#: ..\..\..\inc\_core\_misc.funcs.php:3423
+#: ..\..\..\inc\_core\_misc.funcs.php:3492
 msgid "Random order!"
 msgstr "Zufällige Anordnung!"
 
@@ -1828,66 +1828,66 @@ msgstr "URL \"%s\" nicht erlaubt: Gebanntes Wort \"%s\"."
 msgid "URL not allowed"
 msgstr "URL nicht erlaubt"
 
-#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:392
+#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:395
 msgid "The following relations prevent deletion:"
 msgstr "Die folgenden Zugehörigkeiten verhindern die Löschung:"
 
-#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:394
+#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:397
 msgid "Please delete related objects before you proceed."
 msgstr "Bitte löschen Sie die zugehörigen Objekte, bevor Sie fortfahren."
 
-#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:423
+#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:426
 msgid "WARNING: Deleting this object will also delete:"
 msgstr "WARNUNG: Das Löschen dieses Objektes wird auch folgendes löschen:"
 
-#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:428
+#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:431
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:541
 #: ..\..\..\inc\collections\collections.ctrl.php:397
 #: ..\..\..\inc\plugins\plugins.ctrl.php:940
 msgid "THIS CANNOT BE UNDONE!"
 msgstr "DIES KANN NICHT RÜCKGÄNGIG GEMACHT WERDEN!"
 
-#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:436
+#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:439
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:555
 #: ..\..\..\inc\collections\collections.ctrl.php:421
 #: ..\..\..\inc\plugins\plugins.ctrl.php:942
-#: ..\..\..\install\index.php:572
+#: ..\..\..\install\index.php:623
 msgid "I am sure!"
 msgstr "Ich bin mir sicher!"
 
-#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:447
+#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:450
 #: ..\..\..\inc\_core\ui\results\_resultsel.class.php:563
 #: ..\..\..\inc\collections\collections.ctrl.php:429
-#: ..\..\..\install\index.php:577
+#: ..\..\..\install\index.php:628
 msgid "CANCEL"
 msgstr "ABBRECHEN"
 
-#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:617
+#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:649
 #, php-format
 msgid "Created on %s by %s"
 msgstr "Erstellt am %s von %s"
 
-#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:622
+#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:654
 #, php-format
 msgid "Created by %s"
 msgstr "Erstellt von %s"
 
-#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:627
+#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:659
 #, php-format
 msgid "Created on %s"
 msgstr "Erstellt am %s"
 
-#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:637
+#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:669
 #, php-format
 msgid "Last mod on %s by %s"
 msgstr "Letzte Änderung am %s von %s"
 
-#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:642
+#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:674
 #, php-format
 msgid "Last mod by %s"
 msgstr "Letzte Änderung von %s"
 
-#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:647
+#: ..\..\..\inc\_core\model\dataobjects\_dataobject.class.php:679
 #, php-format
 msgid "Last mod on %s"
 msgstr "Letzte Änderung am %s"
@@ -2115,24 +2115,24 @@ msgstr "Auswahlanhänge gelöscht."
 msgid "Selection deleted."
 msgstr "Auswahl gelöscht."
 
-#: ..\..\..\inc\_main.inc.php:479
-#: ..\..\..\inc\_main.inc.php:490
+#: ..\..\..\inc\_main.inc.php:486
+#: ..\..\..\inc\_main.inc.php:497
 msgid "The login window has expired. Please try again."
 msgstr "Das Anmeldefenster ist nicht mehr gültig. Bitte versuchen Sie es erneut."
 
-#: ..\..\..\inc\_main.inc.php:484
+#: ..\..\..\inc\_main.inc.php:491
 msgid "Either you have not enabled cookies or this login window has expired."
 msgstr "Entweder haben Sie Cookies nicht aktiviert oder das Anmeldefenster ist nicht mehr gültig."
 
-#: ..\..\..\inc\_main.inc.php:520
+#: ..\..\..\inc\_main.inc.php:527
 msgid "Wrong login/password."
 msgstr "Falscher Benutzername/falsches Passwort."
 
-#: ..\..\..\inc\_main.inc.php:553
+#: ..\..\..\inc\_main.inc.php:560
 msgid "You must log in!"
 msgstr "Sie müssen sich anmelden!"
 
-#: ..\..\..\inc\_main.inc.php:571
+#: ..\..\..\inc\_main.inc.php:578
 msgid "You must validate your email address before you can log in."
 msgstr "Sie müssen Ihre E-Mail-Adresse bestätigen, bevor Sie sich anmelden können."
 
@@ -2413,16 +2413,16 @@ msgid "Redirected"
 msgstr "Umgeleitet"
 
 #: ..\..\..\inc\_vars.inc.php:279
-#: ..\..\..\inc\items\items.ctrl.php:344
-#: ..\..\..\inc\items\items.ctrl.php:443
+#: ..\..\..\inc\items\items.ctrl.php:343
+#: ..\..\..\inc\items\items.ctrl.php:441
 #: ..\..\..\inc\items\model\_item.funcs.php:760
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:98
 msgid "Protected"
 msgstr "Geschützt"
 
 #: ..\..\..\inc\_vars.inc.php:280
-#: ..\..\..\inc\items\items.ctrl.php:344
-#: ..\..\..\inc\items\items.ctrl.php:443
+#: ..\..\..\inc\items\items.ctrl.php:343
+#: ..\..\..\inc\items\items.ctrl.php:441
 #: ..\..\..\inc\items\model\_item.funcs.php:763
 #: ..\..\..\inc\items\views\_item_list_sidebar.view.php:101
 msgid "Private"
@@ -2544,7 +2544,7 @@ msgstr "Neuer Zeitstempel der letzten Aktualisierung"
 
 #: ..\..\..\inc\antispam\model\_antispam.funcs.php:281
 #: ..\..\..\inc\cron\jobs\_post_notifications.job.php:64
-#: ..\..\..\inc\items\model\_item.class.php:3679
+#: ..\..\..\inc\items\model\_item.class.php:3681
 msgid "Done."
 msgstr "Erledigt."
 
@@ -2621,8 +2621,8 @@ msgstr "Lösche die folgenden %s Kommentare:"
 #: ..\..\..\inc\comments\model\_comment.class.php:1263
 #: ..\..\..\inc\comments\views\_comment.form.php:70
 #: ..\..\..\inc\comments\views\_comment.form.php:89
-#: ..\..\..\inc\items\model\_item.class.php:3638
-#: ..\..\..\inc\items\model\_item.class.php:3646
+#: ..\..\..\inc\items\model\_item.class.php:3640
+#: ..\..\..\inc\items\model\_item.class.php:3648
 #: ..\..\..\inc\items\views\_item_list_table.view.php:100
 msgid "Author"
 msgstr "Autor"
@@ -2790,8 +2790,8 @@ msgstr "Erneut prüfen"
 #: ..\..\..\inc\generic\views\_generic_list.inc.php:115
 #: ..\..\..\inc\generic\views\_generic_ordered_list.inc.php:122
 #: ..\..\..\inc\generic\views\_generic_recursive_list.inc.php:164
-#: ..\..\..\inc\items\views\_item_links.view.php:164
-#: ..\..\..\inc\items\views\inc\_item_links.inc.php:171
+#: ..\..\..\inc\items\views\_item_links.view.php:168
+#: ..\..\..\inc\items\views\inc\_item_links.inc.php:175
 #: ..\..\..\inc\plugins\views\_plugin_list.view.php:254
 #: ..\..\..\inc\plugins\views\_plugin_list_available.view.php:59
 #: ..\..\..\inc\sessions\views\_stats_goals.view.php:99
@@ -2926,7 +2926,7 @@ msgstr "Aktualisieren"
 #: ..\..\..\inc\users\views\_user.form.php:476
 #: ..\..\..\inc\widgets\views\_widget.form.php:71
 #: ..\..\..\inc\widgets\views\_widget.form.php:76
-#: ..\..\..\install\index.php:410
+#: ..\..\..\install\index.php:415
 #: ..\..\..\skins\_profile.disp.php:110
 #: ..\..\..\skins\_subs.disp.php:112
 msgid "Reset"
@@ -3046,7 +3046,7 @@ msgstr "Element &laquo;%s&raquo; löschen?"
 #: ..\..\..\inc\files\views\_filetype.form.php:52
 #: ..\..\..\inc\generic\model\_genericelement.class.php:113
 #: ..\..\..\inc\generic\views\_generic_category.form.php:45
-#: ..\..\..\inc\items\items.ctrl.php:819
+#: ..\..\..\inc\items\items.ctrl.php:817
 #: ..\..\..\inc\sessions\views\_goal.form.php:35
 #: ..\..\..\inc\skins\views\_skin.form.php:39
 #: ..\..\..\inc\users\views\_group.form.php:52
@@ -3514,48 +3514,48 @@ msgstr "Sie müssen das Medien-Unterverzeichnis angeben."
 msgid "Invalid subdirectory &laquo;%s&raquo;."
 msgstr "Ungültiges Unterverzeichnis &laquo;%s&raquo;."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1406
+#: ..\..\..\inc\collections\model\_blog.class.php:1411
 #, php-format
 msgid "The blog's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."
 msgstr "Das Blog-Medienverzeichnis &laquo;%s&raquo; konnte nicht erstellt werden, da das übergeordnete Verzeichnis nicht beschreibbar ist oder nicht existiert."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1415
+#: ..\..\..\inc\collections\model\_blog.class.php:1420
 #, php-format
 msgid "The blog's media directory &laquo;%s&raquo; could not be created."
 msgstr "Das Blog-Medienverzeichnis &laquo;%s&raquo; konnte nicht erstellt werden."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1429
+#: ..\..\..\inc\collections\model\_blog.class.php:1434
 #, php-format
 msgid "The blog's media directory &laquo;%s&raquo; has been created with permissions %s."
 msgstr "Das Blog-Medienverzeichnis &laquo;%s&raquo; wurde mit den Rechten %s erstellt."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1839
+#: ..\..\..\inc\collections\model\_blog.class.php:1844
 msgid "Deleted post-categories"
 msgstr "Eintragskategorien gelöscht"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1846
+#: ..\..\..\inc\collections\model\_blog.class.php:1851
 msgid "Deleted comments on blog's posts"
 msgstr "Kommentare zu den Blogeinträgen gelöscht"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1854
+#: ..\..\..\inc\collections\model\_blog.class.php:1859
 msgid "Deleted blog's posts"
 msgstr "Blogeinträge gelöscht"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1863
+#: ..\..\..\inc\collections\model\_blog.class.php:1868
 msgid "Deleted blog's categories"
 msgstr "Blogkategorien gelöscht"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1876
+#: ..\..\..\inc\collections\model\_blog.class.php:1881
 #, php-format
 msgid "ERROR! Could not delete! You will have to delete the file [%s] by hand."
 msgstr "FEHLER! Konnte nicht löschen! Sie werden die Datei [%s] von Hand löschen müssen."
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1880
+#: ..\..\..\inc\collections\model\_blog.class.php:1885
 #, php-format
 msgid "Could not delete static file [%s]"
 msgstr "Konnte statische Datei [%s] nicht löschen"
 
-#: ..\..\..\inc\collections\model\_blog.class.php:1885
+#: ..\..\..\inc\collections\model\_blog.class.php:1890
 msgid "Deleted blog's static file"
 msgstr "Statische Datei des Blogs gelöscht"
 
@@ -3750,7 +3750,7 @@ msgid "This will be appended to each post in your RSS/Atom feeds."
 msgstr "Dies wird nach jedem Eintrag in Ihren RSS-/Atom-Feeds angezeigt."
 
 #: ..\..\..\inc\collections\views\_coll_advanced.form.php:169
-#: ..\..\..\inc\items\items.ctrl.php:1002
+#: ..\..\..\inc\items\items.ctrl.php:1000
 msgid "Notes"
 msgstr "Notizen"
 
@@ -4179,7 +4179,7 @@ msgstr "Layout"
 #: ..\..\..\inc\collections\views\_coll_group_perm.form.php:99
 #: ..\..\..\inc\collections\views\_coll_user_perm.form.php:98
 #: ..\..\..\inc\files\views\_file_browse_set.form.php:85
-#: ..\..\..\inc\items\items.ctrl.php:786
+#: ..\..\..\inc\items\items.ctrl.php:784
 msgid "Simple"
 msgstr "Einfach"
 
@@ -4412,6 +4412,7 @@ msgstr "Alle aus-/abwählen"
 #: ..\..\..\inc\users\views\_user.form.php:183
 #: ..\..\..\inc\users\views\_user_list.view.php:186
 #: ..\..\..\inc\widgets\widgets\_user_tools.widget.php:69
+#: ..\..\..\install\_functions_install.php:200
 #: ..\..\..\skins\_profile.disp.php:73
 #: ..\..\..\skins\_subs.disp.php:56
 #: ..\..\..\skins\_user.disp.php:50
@@ -4756,13 +4757,13 @@ msgid "Permalink scheme"
 msgstr "Permalink-Schema"
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:183
+msgid "Fallback to excerpt as meta description for posts and pages if meta description for item is empty"
+msgstr "Auszug als Meta-Beschreibung für Einträge und Seiten verwenden, wenn Meta-Beschreibung leer ist"
+
+#: ..\..\..\inc\collections\views\_coll_seo.form.php:183
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:266
 msgid "Meta description"
 msgstr "Meta-Beschreibung"
-
-#: ..\..\..\inc\collections\views\_coll_seo.form.php:183
-msgid "Use excerpt as meta description for posts and pages"
-msgstr "Auszug als Meta-Beschreibung für Einträge und Seiten verwenden"
 
 #: ..\..\..\inc\collections\views\_coll_seo.form.php:187
 msgid "\"By date\" archives"
@@ -5200,8 +5201,8 @@ msgstr "Eintrag"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:1252
 #: ..\..\..\inc\comments\model\_comment.class.php:1265
-#: ..\..\..\inc\items\model\_item.class.php:3638
-#: ..\..\..\inc\items\model\_item.class.php:3651
+#: ..\..\..\inc\items\model\_item.class.php:3640
+#: ..\..\..\inc\items\model\_item.class.php:3653
 msgid "Url"
 msgstr "URL"
 
@@ -5217,12 +5218,12 @@ msgid "Rating"
 msgstr "Bewertung"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:1281
-#: ..\..\..\inc\items\model\_item.class.php:3662
+#: ..\..\..\inc\items\model\_item.class.php:3664
 msgid "Edit/Delete"
 msgstr "Bearbeiten/Löschen"
 
 #: ..\..\..\inc\comments\model\_comment.class.php:1282
-#: ..\..\..\inc\items\model\_item.class.php:3664
+#: ..\..\..\inc\items\model\_item.class.php:3666
 msgid "Edit your subscriptions/notifications"
 msgstr "Bearbeiten Sie Ihre Abonnements/Benachrichtigungen"
 
@@ -5260,7 +5261,7 @@ msgid "Feedback (Comments, Trackbacks...)"
 msgstr "Feedback (Kommentare, Trackbacks...)"
 
 #: ..\..\..\inc\comments\views\_comment.form.php:38
-#: ..\..\..\inc\items\items.ctrl.php:819
+#: ..\..\..\inc\items\items.ctrl.php:817
 msgid "cancel"
 msgstr "Abbrechen"
 
@@ -6073,22 +6074,27 @@ msgstr "Konnte &laquo;%s&raquo; nicht nach &laquo;%s&raquo; verschieben."
 msgid "%d linked items"
 msgstr "%d verknüpfte Elemente"
 
-#: ..\..\..\inc\files\model\_file.class.php:527
+#: ..\..\..\inc\files\model\_file.class.php:225
+#, php-format
+msgid "%d linked users (avatars)"
+msgstr "%d verknüpfte Benutzer (Avatare)"
+
+#: ..\..\..\inc\files\model\_file.class.php:528
 #, php-format
 msgid "Directory &laquo;%s&raquo;"
 msgstr "Verzeichnis &laquo;%s&raquo;"
 
-#: ..\..\..\inc\files\model\_file.class.php:531
+#: ..\..\..\inc\files\model\_file.class.php:532
 #, php-format
 msgid "File &laquo;%s&raquo;"
 msgstr "Datei &laquo;%s&raquo;"
 
-#: ..\..\..\inc\files\model\_file.class.php:668
+#: ..\..\..\inc\files\model\_file.class.php:669
 #: ..\..\..\inc\files\views\_file_list.inc.php:205
 msgid "Directory"
 msgstr "Verzeichnis"
 
-#: ..\..\..\inc\files\model\_file.class.php:679
+#: ..\..\..\inc\files\model\_file.class.php:680
 #: ..\..\..\inc\sessions\views\_stats_refdomains.view.php:104
 #: ..\..\..\inc\sessions\views\_stats_refdomains.view.php:113
 #: ..\..\..\inc\sessions\views\_stats_summary.view.php:135
@@ -6103,7 +6109,7 @@ msgstr "Unbekannt"
 
 # TRANS: short for '<directory>'
 #. TRANS: short for '<directory>'
-#: ..\..\..\inc\files\model\_file.class.php:962
+#: ..\..\..\inc\files\model\_file.class.php:963
 #: ..\..\..\inc\files\model\_filelist.class.php:458
 msgid "&lt;dir&gt;"
 msgstr "&lt;Verzeichnis&gt;"
@@ -6168,34 +6174,34 @@ msgstr "TB"
 msgid "Terabytes"
 msgstr "Terabytes"
 
-#: ..\..\..\inc\files\model\_file.funcs.php:433
-#: ..\..\..\inc\files\model\_file.funcs.php:440
+#: ..\..\..\inc\files\model\_file.funcs.php:446
+#: ..\..\..\inc\files\model\_file.funcs.php:453
 #, php-format
 msgid "&laquo;%s&raquo; is not a valid filename."
 msgstr "&laquo;%s&raquo; ist kein gültiger Dateiname."
 
-#: ..\..\..\inc\files\model\_file.funcs.php:456
+#: ..\..\..\inc\files\model\_file.funcs.php:469
 #, php-format
 msgid "&laquo;%s&raquo; is a locked extension."
 msgstr "&laquo;%s&raquo; ist eine gesperrte Dateiendung."
 
-#: ..\..\..\inc\files\model\_file.funcs.php:461
+#: ..\..\..\inc\files\model\_file.funcs.php:474
 #, php-format
 msgid "&laquo;%s&raquo; has an unrecognized extension."
 msgstr "&laquo;%s&raquo; hat eine nicht erkannte Erweiterung."
 
-#: ..\..\..\inc\files\model\_file.funcs.php:466
+#: ..\..\..\inc\files\model\_file.funcs.php:479
 #, php-format
 msgid "&laquo;%s&raquo; has not a valid extension."
 msgstr "&laquo;%s&raquo; hat keine gültige Erweiterung."
 
-#: ..\..\..\inc\files\model\_file.funcs.php:500
+#: ..\..\..\inc\files\model\_file.funcs.php:513
 #, php-format
 msgid "&laquo;%s&raquo; is not a valid directory name."
 msgstr "&laquo;%s&raquo; ist kein gültiger Verzeichnisname."
 
-#: ..\..\..\inc\files\model\_file.funcs.php:620
-#: ..\..\..\inc\files\model\_file.funcs.php:622
+#: ..\..\..\inc\files\model\_file.funcs.php:633
+#: ..\..\..\inc\files\model\_file.funcs.php:635
 msgid "Open this directory in the file manager"
 msgstr "Öffne dieses Verzeichnis im Dateimanager"
 
@@ -6711,14 +6717,14 @@ msgid "Path"
 msgstr "Pfad"
 
 #: ..\..\..\inc\files\views\_file_links.view.php:124
-#: ..\..\..\inc\items\views\_item_links.view.php:148
-#: ..\..\..\inc\items\views\inc\_item_links.inc.php:158
+#: ..\..\..\inc\items\views\_item_links.view.php:152
+#: ..\..\..\inc\items\views\inc\_item_links.inc.php:162
 msgid "Locate this file!"
 msgstr "Lokalisiere diese Datei!"
 
 #: ..\..\..\inc\files\views\_file_links.view.php:131
-#: ..\..\..\inc\items\views\_item_links.view.php:157
-#: ..\..\..\inc\items\views\inc\_item_links.inc.php:164
+#: ..\..\..\inc\items\views\_item_links.view.php:161
+#: ..\..\..\inc\items\views\inc\_item_links.inc.php:168
 msgid "Delete this link!"
 msgstr "Lösche diese Verknüpfung!"
 
@@ -6960,11 +6966,11 @@ msgstr "Hochladen von Dateien aktivieren"
 msgid "Check to allow uploading files in general."
 msgstr "Auswählen, um allgemein das Hochladen zu erlauben."
 
-#. TRANS: first %s is setting/var name, second is file name, third is limit value
+#. TRANS: first %s is first is php.ini limit, second is setting/var name, third is file name, 4th is limit in b2evo conf
 #: ..\..\..\inc\files\views\_file_settings.form.php:191
 #, php-format
-msgid "KB. This cannot be higher than your PHP/Webserver setting and the limit of %s (in %s), which is currently %s!"
-msgstr "KB. Das kann nicht größer sein, als Ihre PHP-/Webserver-Einstellung und das durch %s gesetzte Limit (in %s), das zur Zeit %s beträgt!"
+msgid "KB. This cannot be higher than your PHP/Webserver setting (PHP: %s) and the limit of %s (in %s), which is currently %s!"
+msgstr "KB. Das kann nicht größer als Ihre PHP-/Webserver-Einstellung (PHP: %s) und das durch %s gesetzte Limit (in %s), das zur Zeit %s beträgt, sein!"
 
 #: ..\..\..\inc\files\views\_file_settings.form.php:191
 msgid "Maximum upload filesize"
@@ -7275,65 +7281,65 @@ msgstr "Eintrag bearbeiten"
 msgid "Editing post #%d: %s"
 msgstr "Bearbeite Eintrag #%d: %s"
 
-#: ..\..\..\inc\items\items.ctrl.php:343
+#: ..\..\..\inc\items\items.ctrl.php:342
 #, php-format
 msgid "The post has been created but not published because it seems like you wanted to set its status to \"%s\" instead.  If you really want to make it public, manually change its status to \"Published\" and click the \"Save\" button."
 msgstr "Der Eintrag wurde erstellt, aber nicht veröffentlicht, da es so scheint, als wenn Sie seinen Status stattdessen auf \"%s\" setzen wollten. Falls Sie den Eintrag wirklich öffentlich machen möchten, ändern Sie seinen Status manuell auf \"Veröffentlicht\" und klicken auf die \"Speichern\"-Schaltfläche."
 
-#: ..\..\..\inc\items\items.ctrl.php:386
-#: ..\..\..\inc\items\items.ctrl.php:485
+#: ..\..\..\inc\items\items.ctrl.php:385
+#: ..\..\..\inc\items\items.ctrl.php:483
 msgid "Post not publicly published: skipping trackback..."
 msgstr "Eintrag nicht öffentlich publiziert: Überspringe Trackbacks..."
 
-#: ..\..\..\inc\items\items.ctrl.php:398
+#: ..\..\..\inc\items\items.ctrl.php:397
 msgid "Post has been created."
 msgstr "Eintrag wurde erstellt."
 
-#: ..\..\..\inc\items\items.ctrl.php:442
+#: ..\..\..\inc\items\items.ctrl.php:440
 #, php-format
 msgid "The post has been updated but not published because it seems like you wanted to set its status to \"%s\" instead. If you really want to make it public, manually change its status to \"Published\" and click the \"Save\" button."
 msgstr "Der Eintrag wurde aktualisiert, aber nicht veröffentlicht, da es so scheint, als wenn Sie seinen Status stattdessen auf \"%s\" setzen wollten. Falls Sie den Eintrag wirklich öffentlich machen möchten, ändern Sie seinen Status manuell auf \"Veröffentlicht\" und klicken auf die \"Speichern\"-Schaltfläche."
 
-#: ..\..\..\inc\items\items.ctrl.php:497
+#: ..\..\..\inc\items\items.ctrl.php:495
 msgid "Post has been updated."
 msgstr "Eintrag wurde aktualisiert."
 
-#: ..\..\..\inc\items\items.ctrl.php:544
+#: ..\..\..\inc\items\items.ctrl.php:542
 msgid "Post has been published."
 msgstr "Eintrag wurde veröffentlicht."
 
-#: ..\..\..\inc\items\items.ctrl.php:572
+#: ..\..\..\inc\items\items.ctrl.php:570
 msgid "Post has been deprecated."
 msgstr "Eintrag wurde missbilligt."
 
-#: ..\..\..\inc\items\items.ctrl.php:598
+#: ..\..\..\inc\items\items.ctrl.php:596
 msgid "Post has been deleted."
 msgstr "Eintrag wurde gelöscht."
 
-#: ..\..\..\inc\items\items.ctrl.php:634
+#: ..\..\..\inc\items\items.ctrl.php:632
 #, php-format
 msgid "Link has been deleted from &laquo;%s&raquo;."
 msgstr "Verknüpfung wurde von &laquo;%s&raquo; gelöscht."
 
-#: ..\..\..\inc\items\items.ctrl.php:767
+#: ..\..\..\inc\items\items.ctrl.php:765
 #, php-format
 msgid "Since this blog has no categories, you cannot post into it. You must <a %s>create categories</a> first."
 msgstr "Da dieses Blog keine Kategorien hat, können Sie auch keine Einträge darin verfassen. Sie müssen zuerst <a %s>Kategorien erstellen</a>."
 
-#: ..\..\..\inc\items\items.ctrl.php:792
+#: ..\..\..\inc\items\items.ctrl.php:790
 msgid "Expert"
 msgstr "Experte"
 
-#: ..\..\..\inc\items\items.ctrl.php:811
+#: ..\..\..\inc\items\items.ctrl.php:809
 #: ..\..\..\inc\items\model\_item.class.php:2295
 msgid "Delete this post"
 msgstr "Lösche diesen Eintrag"
 
-#: ..\..\..\inc\items\items.ctrl.php:812
+#: ..\..\..\inc\items\items.ctrl.php:810
 msgid "delete"
 msgstr "Löschen"
 
-#: ..\..\..\inc\items\items.ctrl.php:813
+#: ..\..\..\inc\items\items.ctrl.php:811
 #: ..\..\..\inc\items\model\_item.class.php:2308
 #: ..\..\..\inc\items\model\_item.class.php:2316
 msgid ""
@@ -7343,11 +7349,11 @@ msgstr ""
 "Sie sind dabei, diesen Eintrag zu löschen!\\n"
 "Das kann nicht rückgängig gemacht werden!"
 
-#: ..\..\..\inc\items\items.ctrl.php:825
+#: ..\..\..\inc\items\items.ctrl.php:823
 msgid "View post & comments"
 msgstr "Einträge & Kommentare ansehen"
 
-#: ..\..\..\inc\items\items.ctrl.php:831
+#: ..\..\..\inc\items\items.ctrl.php:829
 msgid "Browse blog"
 msgstr "Blog durchsuchen"
 
@@ -7571,58 +7577,58 @@ msgstr "1 Ansicht"
 msgid "%d views"
 msgstr "%d Ansichten"
 
-#: ..\..\..\inc\items\model\_item.class.php:3491
+#: ..\..\..\inc\items\model\_item.class.php:3493
 msgid "Post had already pinged: skipping notifications..."
 msgstr "Eintrag wurde bereits gepingt: Überspringe Benachrichtigungen..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3502
+#: ..\..\..\inc\items\model\_item.class.php:3504
 msgid "Post processing already pending..."
 msgstr "Nachverarbeitung bereits in Vorbereitung..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3512
+#: ..\..\..\inc\items\model\_item.class.php:3514
 msgid "Post not publicly published: skipping notifications..."
 msgstr "Eintrag nicht öffentlich publiziert: Überspringe Benachrichtigungen..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3522
+#: ..\..\..\inc\items\model\_item.class.php:3524
 msgid "This post type doesn't need notifications..."
 msgstr "Diese Eintragstyp benötigt keine Benachrichtigungen..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3540
+#: ..\..\..\inc\items\model\_item.class.php:3542
 msgid "Scheduling asynchronous notifications..."
 msgstr "Plane asynchrone Benachrichtigungen..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3552
+#: ..\..\..\inc\items\model\_item.class.php:3554
 #, php-format
 msgid "Send notifications for &laquo;%s&raquo;"
 msgstr "Sende Benachrichtigungen für &laquo;%s&raquo;"
 
-#: ..\..\..\inc\items\model\_item.class.php:3596
+#: ..\..\..\inc\items\model\_item.class.php:3598
 msgid "Notifying subscribed users..."
 msgstr "Benachrichtige Abonnenten..."
 
-#: ..\..\..\inc\items\model\_item.class.php:3619
+#: ..\..\..\inc\items\model\_item.class.php:3621
 msgid "No-one to notify."
 msgstr "Niemand zum Benachrichtigen."
 
-#: ..\..\..\inc\items\model\_item.class.php:3638
-#: ..\..\..\inc\items\model\_item.class.php:3653
+#: ..\..\..\inc\items\model\_item.class.php:3640
+#: ..\..\..\inc\items\model\_item.class.php:3655
 msgid "Content"
 msgstr "Inhalt"
 
-#: ..\..\..\inc\items\model\_item.class.php:3640
+#: ..\..\..\inc\items\model\_item.class.php:3642
 #, php-format
 msgid "[%s] New post: \"%s\""
 msgstr "[%s] Neuer Eintrag: \"%s\""
 
-#: ..\..\..\inc\items\model\_item.class.php:3669
+#: ..\..\..\inc\items\model\_item.class.php:3671
 msgid "Notifying:"
 msgstr "Benachrichtige:"
 
-#: ..\..\..\inc\items\model\_item.class.php:3704
+#: ..\..\..\inc\items\model\_item.class.php:3706
 msgid "Skipping pings (Running on localhost)."
 msgstr "Überspringe Pings (laufe auf localhost)."
 
-#: ..\..\..\inc\items\model\_item.class.php:3713
+#: ..\..\..\inc\items\model\_item.class.php:3715
 #, php-format
 msgid "Pinging %s..."
 msgstr "Pinge %s..."
@@ -7740,16 +7746,16 @@ msgstr "%d Versionen"
 # TRANS: When the categories for a specific post are displayed, the user can click
 #. TRANS: When the categories for a specific post are displayed, the user can click
 #. on these cats to browse them, this is the default href title displayed there
-#: ..\..\..\inc\items\model\_itemlight.class.php:377
+#: ..\..\..\inc\items\model\_itemlight.class.php:380
 msgid "Browse category"
 msgstr "Kategorie durchsuchen"
 
-#: ..\..\..\inc\items\model\_itemlight.class.php:697
+#: ..\..\..\inc\items\model\_itemlight.class.php:700
 #: ..\..\..\skins\basic\index.main.php:145
 msgid "Permanent link to full entry"
 msgstr "Permanenter Link zum vollen Eintrag"
 
-#: ..\..\..\inc\items\model\_itemlist.class.php:220
+#: ..\..\..\inc\items\model\_itemlist.class.php:221
 msgid "Invalid post, please correct these errors:"
 msgstr "Ungültiger Eintrag, bitte korrigieren Sie diese Fehler:"
 
@@ -7919,7 +7925,7 @@ msgid "(Separate by space)"
 msgstr "(durch Leerzeichen trennen)"
 
 #: ..\..\..\inc\items\views\_item_expert.form.php:338
-#: ..\..\..\install\_functions_create.php:651
+#: ..\..\..\install\_functions_create.php:646
 msgid "Featured post"
 msgstr "Sondereintrag"
 
@@ -7981,8 +7987,8 @@ msgstr "Notiz"
 msgid "Attachments"
 msgstr "Anhänge"
 
-#: ..\..\..\inc\items\views\_item_links.view.php:128
-#: ..\..\..\inc\items\views\inc\_item_links.inc.php:139
+#: ..\..\..\inc\items\views\_item_links.view.php:132
+#: ..\..\..\inc\items\views\inc\_item_links.inc.php:143
 msgid "Destination"
 msgstr "Ziel"
 
@@ -8270,11 +8276,11 @@ msgstr "Neue Aufgabe"
 msgid "Meta info"
 msgstr "Meta-Info"
 
-#: ..\..\..\inc\items\views\inc\_item_links.inc.php:180
+#: ..\..\..\inc\items\views\inc\_item_links.inc.php:184
 msgid "Link a file..."
 msgstr "Eine Datei verknüpfen..."
 
-#: ..\..\..\inc\items\views\inc\_item_links.inc.php:181
+#: ..\..\..\inc\items\views\inc\_item_links.inc.php:185
 msgid "Link files"
 msgstr "Dateien verknüpfen"
 
@@ -8776,91 +8782,91 @@ msgstr "Der Wert ist ungültig. Er muss kleiner oder gleich %s sein."
 msgid "The value is invalid. It must be greater than or equal to %s."
 msgstr "Der Wert ist ungültig. Er muss größer oder gleich %s sein."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:489
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:488
 msgid "The plugin cannot be installed again."
 msgstr "Das Plugin kann nicht erneut installiert werden."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:497
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:496
 msgid "The installation of the plugin failed."
 msgstr "Die Installation des Plugins ist fehlgeschlagen."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:517
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:516
 msgid "Some plugin dependencies are not fulfilled:"
 msgstr "Einige Pluginabhängigkeiten sind nicht erfüllt:"
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:858
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:857
 msgid "The maximum length of a plugin code is 32 characters."
 msgstr "Die maximale Länge eines Plugin-Codes ist 32 Zeichen."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:864
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:863
 msgid "The plugin code cannot include a dot!"
 msgstr "Der Plugin-Code kann keinen Punkt enthalten!"
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:875
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:874
 msgid "The plugin code is already in use by another plugin."
 msgstr "Der Plugincode wird schon von einem anderen Plugin genutzt."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1162
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1161
 #, php-format
 msgid "The events %s are required by %s (ID %d)."
 msgstr "Die Ereignisse %s werden von %s (ID %d) benötigt."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1176
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1175
 #, php-format
 msgid "The event %s is required by %s (ID %d)."
 msgstr "Das Ereignis %s wird von %s (ID %d) benötigt."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1191
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1190
 #, php-format
 msgid "The plugin is required by the following plugins: %s."
 msgstr "Das Plugin wird von den folgenden Plugins benötigt: %s."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1231
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1230
 #, php-format
 msgid "The plugin recommends a plugin which provides all of the following events: %s."
 msgstr "Das Plugin empfiehlt ein Plugin, welches alle der folgenden Ereignisse bereitstellt: %s."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1235
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1234
 #, php-format
 msgid "The plugin requires a plugin which provides all of the following events: %s."
 msgstr "Das Plugin erfordert ein Plugin, welches alle der folgenden Ereignisse bereitstellt: %s."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1246
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1245
 #, php-format
 msgid "The plugin recommends plugins which provide the events: %s."
 msgstr "Das Plugin empfiehlt Plugins, welches die folgenden Ereignisse bereitstellen: %s."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1250
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1249
 #, php-format
 msgid "The plugin requires plugins which provide the events: %s."
 msgstr "Das Plugin erfordert Plugins, welche die folgenden Ereignisse bereitstellen: %s."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1287
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1286
 #, php-format
 msgid "The plugin requires at least version %s of the plugin %s, but you have %s."
 msgstr "Das Plugin erfordert mindestens Version %s des Plugins %s, aber Sie haben %s."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1305
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1304
 #, php-format
 msgid "The plugin requires the plugins: %s."
 msgstr "Das Plugin erfordert die folgenden Plugins: %s."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1310
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1309
 #, php-format
 msgid "The plugin recommends to install the plugins: %s."
 msgstr "Das Plugin empfiehlt, die folgenden Plugins zu installieren: %s."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1322
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1321
 #, php-format
 msgid "The plugin recommends version %s of %s (%s is installed). Think about upgrading."
 msgstr "Das Plugin empfiehlt Version %s von %s (%s ist installiert). Denken Sie über ein Upgrade nach."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1327
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1326
 #, php-format
 msgid "The plugin requires version %s of %s, but %s is installed."
 msgstr "Das Plugin benötigt Version %s von %s, aber %s ist installiert."
 
-#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1340
+#: ..\..\..\inc\plugins\model\_plugins_admin.class.php:1339
 #, php-format
 msgid "Unknown dependency type (%s). This probably means that the plugin is not compatible and you have to upgrade your %s installation."
 msgstr "Unbekannter Abhängigkeitstyp (%s). Das bedeutet möglichweise, dass das Plugin nicht kompatibel ist und Sie Ihre %s-Installation upgraden müssen."
@@ -8870,7 +8876,7 @@ msgid "The database has been updated."
 msgstr "Die Datenbank wurde aktualisiert."
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:116
-#: ..\..\..\install\_functions_evoupgrade.php:2491
+#: ..\..\..\install\_functions_evoupgrade.php:2527
 msgid "The DB schema has been changed since confirmation."
 msgstr "Das Datenbank-Schema wurde verändert, seitdem es bestätigt wurde."
 
@@ -9025,7 +9031,7 @@ msgid "The plugin needs the following database changes."
 msgstr "Das Plugin benötigt die folgenden Datenbankänderungen."
 
 #: ..\..\..\inc\plugins\plugins.ctrl.php:886
-#: ..\..\..\install\_functions_evoupgrade.php:2515
+#: ..\..\..\install\_functions_evoupgrade.php:2551
 msgid "The following database changes will be carried out. If you are not sure what this means, it will probably be alright."
 msgstr "Die folgenden Datenbankänderungen werden ausgeführt. Wenn Sie nicht wissen, was das bedeutet, wird es wahrscheinlich in Ordnung sein."
 
@@ -9387,7 +9393,7 @@ msgstr "%d verwandte Zieltreffer"
 msgid "Default value must be a number."
 msgstr "Standardwert muss eine Zahl sein."
 
-#: ..\..\..\inc\sessions\model\_hit.class.php:737
+#: ..\..\..\inc\sessions\model\_hit.class.php:738
 msgid "bad char in User Agent"
 msgstr "böses Zeichen in User Agent"
 
@@ -10046,6 +10052,7 @@ msgstr "Benutzername zur Authentifikation am Mailserver."
 
 #: ..\..\..\inc\settings\views\_features.form.php:102
 #: ..\..\..\inc\users\views\_user.form.php:200
+#: ..\..\..\install\_functions_install.php:201
 #: ..\..\..\skins\_profile.disp.php:82
 #: ..\..\..\skins_adm\login\_login_form.main.php:128
 #: ..\..\..\skins_adm\login\_reg_form.main.php:57
@@ -10469,7 +10476,7 @@ msgstr "Skin-Eigenschaften bearbeiten..."
 #: ..\..\..\inc\skins\views\_skin_list.view.php:51
 #: ..\..\..\inc\users\views\_group.form.php:101
 #: ..\..\..\inc\users\views\_user_list.view.php:227
-#: ..\..\..\install\index.php:132
+#: ..\..\..\install\index.php:137
 msgid "Blogs"
 msgstr "Blogs"
 
@@ -12651,42 +12658,42 @@ msgstr "Monument Valley"
 msgid "This is a short photo album demo. Use the arrows to navigate between photos. Click on \"Index\" to see a thumbnail index."
 msgstr "Das ist eine kurze Fotoalbumsdemo. Benutzen Sie die Pfeile, um durch die Fotos zu navigieren. Klicken Sie auf \"Index\", um einen Index mit Vorschaubildern zu sehen."
 
-#: ..\..\..\install\_functions_create.php:583
+#: ..\..\..\install\_functions_create.php:578
 #, php-format
 msgid ""
-"This blog is powered by b2evolution.\n"
+"<p>This blog is powered by b2evolution.</p>\n"
 "\n"
-"You are currently looking at an info page about %s.\n"
+"<p>You are currently looking at an info page about %s.</p>\n"
 "\n"
-"Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.\n"
+"<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.</p>\n"
 "\n"
-"If needed, a skin can format info pages differently from regular posts."
+"<p>If needed, an evoskin can format info pages differently from regular posts.</p>"
 msgstr ""
-"Dieses Blogsystem wird mit b2evolution betrieben.\n"
+"<p>Dieses Blogsystem wird mit b2evolution betrieben.</p>\n"
 "\n"
-"Sie sehen sich gerade eine Infoseite über %s an.\n"
+"<p>Sie sehen sich gerade eine Infoseite über %s an.</p>\n"
 "\n"
-"Infoseiten ähneln normalen Einträgen stark, erscheinen aber nicht in der normalen Eintragsabfolge. Sie erscheinen stattdessen als Infoseiten in der Seitenleiste.\n"
+"<p>Infoseiten ähneln normalen Einträgen stark, erscheinen aber nicht in der normalen Eintragsabfolge. Sie erscheinen stattdessen als Infoseiten in der Seitenleiste.</p>\n"
 "\n"
-"Falls nötig, kann ein Skin Infoseiten anders als normale Einträge formatieren."
+"<p>Falls nötig, kann ein evoskin Infoseiten anders als normale Einträge formatieren.</p>"
 
-#: ..\..\..\install\_functions_create.php:594
+#: ..\..\..\install\_functions_create.php:589
 msgid "About Blog B"
 msgstr "Über Blog B"
 
-#: ..\..\..\install\_functions_create.php:594
+#: ..\..\..\install\_functions_create.php:589
 msgid "Blog B"
 msgstr "Blog B"
 
-#: ..\..\..\install\_functions_create.php:600
+#: ..\..\..\install\_functions_create.php:595
 msgid "About Blog A"
 msgstr "Über Blog A"
 
-#: ..\..\..\install\_functions_create.php:600
+#: ..\..\..\install\_functions_create.php:595
 msgid "Blog A"
 msgstr "Blog A"
 
-#: ..\..\..\install\_functions_create.php:606
+#: ..\..\..\install\_functions_create.php:601
 msgid ""
 "<p>This blog platform is powered by b2evolution.</p>\n"
 "\n"
@@ -12694,7 +12701,7 @@ msgid ""
 "\n"
 "<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the sidebar instead.</p>\n"
 "\n"
-"<p>If needed, a skin can format info pages differently from regular posts.</p>"
+"<p>If needed, an evoskin can format info pages differently from regular posts.</p>"
 msgstr ""
 "<p>Dieses Blogsystem wird mit b2evolution betrieben.</p>\n"
 "\n"
@@ -12702,33 +12709,33 @@ msgstr ""
 "\n"
 "<p>Infoseiten ähneln normalen Einträgen stark, erscheinen aber nicht in der normalen Eintragsabfolge. Sie erscheinen stattdessen als Infoseiten in der Seitenleiste.</p>\n"
 "\n"
-"<p>Falls nötig, kann ein Skin Infoseiten anders als normale Einträge formatieren.</p>"
+"<p>Falls nötig, kann ein evoskin Infoseiten anders als normale Einträge formatieren.</p>"
 
-#: ..\..\..\install\_functions_create.php:629
+#: ..\..\..\install\_functions_create.php:624
 msgid "Main Intro post"
 msgstr "Haupt-Intro-Eintrag"
 
-#: ..\..\..\install\_functions_create.php:629
+#: ..\..\..\install\_functions_create.php:624
 msgid "This is the main intro post. It appears on the homepage only."
 msgstr "Das ist der Haupt-Intro-Eintrag. Er erscheint nur auf der Hauptseite."
 
-#: ..\..\..\install\_functions_create.php:635
+#: ..\..\..\install\_functions_create.php:630
 msgid "This uses post type \"Intro-Cat\" and is attached to the desired Category(ies)."
 msgstr "Dies benutzt den Eintragstyp \"Intro-Cat\" und ist in die gewünschten Kategorien eingeordnet."
 
-#: ..\..\..\install\_functions_create.php:635
+#: ..\..\..\install\_functions_create.php:630
 msgid "b2evolution tips category &ndash; Sub Intro post"
 msgstr "b2evolution-Tipps-Kategorie &ndash; untergeordneter Intro-Eintrag"
 
-#: ..\..\..\install\_functions_create.php:641
+#: ..\..\..\install\_functions_create.php:636
 msgid "This uses post type \"Intro-Tag\" and is tagged with the desired Tag(s)."
 msgstr "Dies benutzt den Eintragstyp \"Intro-Tag\" und ist mit den gewünschten Schlagworten versehen."
 
-#: ..\..\..\install\_functions_create.php:641
+#: ..\..\..\install\_functions_create.php:636
 msgid "Widgets tag &ndash; Sub Intro post"
 msgstr "Widgets-Schlagwort &ndash; untergeordneter Intro-Eintrag"
 
-#: ..\..\..\install\_functions_create.php:651
+#: ..\..\..\install\_functions_create.php:646
 msgid ""
 "<p>This is a demo of a featured post.</p>\n"
 "\n"
@@ -12742,7 +12749,7 @@ msgstr ""
 "\n"
 "<p>Beachten Sie auch, dass Sondereinträge nicht in der normalen Artikelabfolge erscheinen.</p>"
 
-#: ..\..\..\install\_functions_create.php:663
+#: ..\..\..\install\_functions_create.php:658
 msgid ""
 "<p>In the <code>/blogs</code> folder there is a file called [<code>sample.htaccess</code>]. You should try renaming it to [<code>.htaccess</code>].</p>\n"
 "\n"
@@ -12752,13 +12759,13 @@ msgstr ""
 "\n"
 "<p>Das wird die Art, wie b2evolution vom Webserver behandelt wird, optimieren (wenn Sie Apache benutzen). Diese Datei ist standardmäßig nicht aktiv, da einige Hosts einfach einen Fehler anzeigen, wenn Sie versuchen, sie zu benutzen. Sollte das passieren, wenn Sie die Datei umbenennen, entfernen Sie sie einfach und alles wird in Ordnung sein.</p>"
 
-#: ..\..\..\install\_functions_create.php:663
+#: ..\..\..\install\_functions_create.php:658
 msgid "Apache optimization..."
 msgstr "Apache-Optimierung..."
 
-#: ..\..\..\install\_functions_create.php:671
+#: ..\..\..\install\_functions_create.php:666
 msgid ""
-"<p>By default, blogs are displayed using a skin. (More on skins in another post.)</p>\n"
+"<p>By default, blogs are displayed using an evoskin. (More on skins in another post.)</p>\n"
 "\n"
 "<p>This means, blogs are accessed through '<code>index.php</code>', which loads default parameters from the database and then passes on the display job to a skin.</p>\n"
 "\n"
@@ -12772,13 +12779,13 @@ msgid ""
 "\n"
 "<p>Either way, make sure you go to the blogs admin and set the correct access method/URL for your blog. Otherwise, the permalinks will not function properly.</p>"
 msgstr ""
-"<p>Standardmäßig werden Blogs mit Hilfe eines Skins angezeigt. (Mehr Informationen zu Skins gibt es in einem anderen Eintrag.)</p>\n"
+"<p>Standardmäßig werden Blogs mit Hilfe eines evoskins angezeigt. (Mehr Informationen zu Skins gibt es in einem anderen Eintrag.)</p>\n"
 "\n"
 "<p>Das bedeutet, dass Blogs über die '<code>index.php</code>'-Datei aufgerufen werden, welche Standardparameter aus der Datenbank lädt und dann die Aufgabe des Anzeigens an einen Skin übergibt.</p>\n"
 "\n"
 "<p>Alternativ, wenn Sie nicht die Standard-DB-Parameter nutzen möchten und, sagen wir, einen Skin, eine Kategorie oder ein bestimmtes Linkblog erzwingen wollen, können Sie eine Stub-Datei wie die bereitgestellte '<code>a_stub.php</code>'-Datei erzeugen und Ihr Blog über ein Stub anstatt über index.php aufrufen.</p>\n"
 "\n"
-"<p>Letztendlich, wenn Sie einige sehr spezielle Änderungen an Ihrem Blog vornehmen möchten, können Sie reine Templates anstatt Skins benutzen. Rufen Sie Ihr Blog in diesem Fall über ein vollständiges Template wie die bereitgestellte '<code>a_noskin.php</code>'-Datei auf.</p>\n"
+"<p>Wenn Sie nun letztendlich einige sehr spezielle Änderungen an Ihrem Blog vornehmen möchten, können Sie reine Templates anstatt Skins benutzen. Rufen Sie Ihr Blog in diesem Fall über ein vollständiges Template wie die bereitgestellte '<code>a_noskin.php</code>'-Datei auf.</p>\n"
 "\n"
 "<p>Wenn Sie ein b2evolution-Blog in eine komplexe Webseite integrieren wollen, möchten Sie das möglicherweise tun, indem Sie Code aus <code>a_noskin.php</code> kopieren und in eine Seite Ihrer Webseite einfügen.</p>\n"
 "\n"
@@ -12786,31 +12793,31 @@ msgstr ""
 "\n"
 "<p>Wie auch immer, stellen Sie sicher, dass Sie im Blog-Administrationsbereich die richtige Zugriffsmethode/den richtigen URL für Ihr Blog einstellen - sonst werden Permalinks nicht ordnungsgemäß funktionieren.</p>"
 
-#: ..\..\..\install\_functions_create.php:671
+#: ..\..\..\install\_functions_create.php:666
 msgid "Skins, Stubs, Templates &amp; website integration..."
 msgstr "Skins, Stubs, Templates &amp; Webseiten-Integration..."
 
-#: ..\..\..\install\_functions_create.php:691
+#: ..\..\..\install\_functions_create.php:686
 msgid ""
 "<p>b2evolution blogs are installed with a default selection of Widgets. For example, the sidebar of this blog includes widgets like a calendar, a search field, a list of categories, a list of XML feeds, etc.</p>\n"
 "\n"
 "<p>You can add, remove and reorder widgets from the Blog Settings tab in the admin interface.</p>\n"
 "\n"
-"<p>Note: to be displayed widgets are placed in containers. Each container appears in a specific place on a skin. If you change the skin of your blog, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.</p>"
+"<p>Note: to be displayed widgets are placed in containers. Each container appears in a specific place in an evoskin. If you change your blog skin, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.</p>"
 msgstr ""
 "<p>b2evolution-Blogs werden mit einer Standardauswahl an Widgets installiert. Die Seitenleiste dieses Blogs enthält zum Beispiel Widgets wie einen Kalender, ein Suchfeld, eine Liste der Kategorien, eine Liste der XML-Feeds, etc.</p>\n"
 "\n"
-"<p>Über den Blogeinstellungen-Tab im Administrationsbereich können Sie Widgets hinzufügen, entfernen und neu sortieren.</p>\n"
+"<p>Über den Blogeinstellungen-Tab im Administrationsbereich können Sie Widgets hinzufügen, entfernen und neu anordnen.</p>\n"
 "\n"
-"<p>Hinweis: Anzuzeigende Widgets werden in Containern platziert. Jeder Container erscheint an einer bestimmten Stelle im Skin. Wenn Sie den Skin Ihres Blogs ändern, könnte der neue Skin nicht die gleichen Container wie der alte benutzen. Stellen Sie sicher, dass Sie Ihre Widgets in Container einsortieren, die im von Ihnen benutzten Skin existieren.</p>"
+"<p>Hinweis: Anzuzeigende Widgets werden in Containern platziert. Jeder Container erscheint in einem evoskin an einer bestimmten Stelle. Wenn Sie den Skin Ihres Blogs ändern, könnte der neue Skin nicht die gleichen Container wie der alte benutzen. Stellen Sie sicher, dass Sie Ihre Widgets in Container einsortieren, die im von Ihnen benutzten Skin existieren.</p>"
 
-#: ..\..\..\install\_functions_create.php:691
+#: ..\..\..\install\_functions_create.php:686
 msgid "About widgets..."
 msgstr "Über Widgets..."
 
-#: ..\..\..\install\_functions_create.php:703
+#: ..\..\..\install\_functions_create.php:698
 msgid ""
-"<p>By default, b2evolution blogs are displayed using a skin.</p>\n"
+"<p>By default, b2evolution blogs are displayed using an evoskin.</p>\n"
 "\n"
 "<p>You can change the skin used by any blog by editing the blog settings in the admin interface.</p>\n"
 "\n"
@@ -12822,24 +12829,25 @@ msgid ""
 "\n"
 "<p>And, of course, read the <a href=\"http://manual.b2evolution.net/Skins_2.0\" target=\"_blank\">manual on skins</a>!</p>"
 msgstr ""
-"<p>Standardmäßig werden b2evolution-Blogs mit Hilfe eines Skins angezeigt.</p>\n"
+"<p>Standardmäßig werden b2evolution-Blogs mit Hilfe eines evoskins angezeigt.</p>\n"
 "\n"
 "<p>Sie können den benutzten Skin jedes Blogs ändern, indem Sie die Blogeinstellungen im Administrationsbereich ändern.</p>\n"
 "\n"
-"<p>Sie können weitere Skins von der <a href=\"http://skins.b2evolution.net/\" target=\"_blank\">Skin-Seite</a> herunterladen. Um sie zu installieren, entpacken Sie sie in das /blogs/skins-Verzeichnis, gehen im Administrationsbereich zu Allgemeine Einstellungen &gt; Skins und klicken auf \"neuen Skin installieren\".</p>\n"
+"<p>Sie können weitere Skins von der <a href=\"http://skins.b2evolution.net/\" target=\"_blank\">Skin-Seite</a> herunterladen. Um sie zu installieren, entpacken Sie sie in das /blogs/skins-Verzeichnis, gehen im Administrationsbereich zu Globale Einstellungen &gt; Skins und klicken auf \"Neues installieren\".</p>\n"
 "\n"
 "<p>Sie können auch Ihre eigenen Skins erstellen, indem Sie bestehende Skin-Verzeichnisse aus dem /blogs/skins-Verzeichnis duplizieren, umbenennen und verändern.</p>\n"
+"\n"
 "<p>Um damit zu beginnen, einen Skin zu verändern, öffnen Sie seine \"<code>index.main.php</code>\"-Datei in einem Editor und lesen Sie die enthaltenen Kommentare. Hinweis: Sie können Skins auch im \"Dateien\"-Tab im Administrationsbereich bearbeiten.</p>\n"
 "\n"
 "<p>Lesen Sie auch die <a href=\"http://manual.b2evolution.net/Skins_2.0\" target=\"_blank\">Skin-Anleitung</a>!</p>"
 
-#: ..\..\..\install\_functions_create.php:703
+#: ..\..\..\install\_functions_create.php:698
 msgid "About skins..."
 msgstr "Über Skins..."
 
-#: ..\..\..\install\_functions_create.php:723
+#: ..\..\..\install\_functions_create.php:718
 msgid ""
-"<p>This post has an image attached to it. The image is automatically resized to fit the current skin. You can zoom in by clicking on the thumbnail.</p>\n"
+"<p>This post has an image attached to it. The image is automatically resized to fit the current blog skin. You can zoom in by clicking on the thumbnail.</p>\n"
 "\n"
 "<p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>"
 msgstr ""
@@ -12847,11 +12855,11 @@ msgstr ""
 "\n"
 "<p>Schauen Sie sich das Fotoblog (erreichbar über die Links oben auf der Seite) an, um einen komplett anderen, mehr auf die Fotos als den Blog-Text konzentrierten Skin zu sehen.</p>"
 
-#: ..\..\..\install\_functions_create.php:723
+#: ..\..\..\install\_functions_create.php:718
 msgid "Image post"
 msgstr "Bildeintrag"
 
-#: ..\..\..\install\_functions_create.php:733
+#: ..\..\..\install\_functions_create.php:728
 msgid ""
 "<p>This is page 1 of a multipage post.</p>\n"
 "\n"
@@ -12889,11 +12897,11 @@ msgstr ""
 "\n"
 "<p>Dies ist die letzte Seite.</p>"
 
-#: ..\..\..\install\_functions_create.php:733
+#: ..\..\..\install\_functions_create.php:728
 msgid "This is a multipage post"
 msgstr "Dies ist ein mehrseitiger Eintrag"
 
-#: ..\..\..\install\_functions_create.php:755
+#: ..\..\..\install\_functions_create.php:750
 msgid ""
 "<p>This is an extended post with no teaser. This means that you won't see this teaser any more when you click the \"more\" link.</p>\n"
 "\n"
@@ -12907,11 +12915,11 @@ msgstr ""
 "\n"
 "<p>Dies ist der erweiterte Text. Sie sehen ihn nur, wenn Sie auf den \"mehr\"-Link geklickt haben.</p>"
 
-#: ..\..\..\install\_functions_create.php:755
+#: ..\..\..\install\_functions_create.php:750
 msgid "Extended post with no teaser"
 msgstr "Erweiterter Eintrag ohne Teaser"
 
-#: ..\..\..\install\_functions_create.php:765
+#: ..\..\..\install\_functions_create.php:760
 msgid ""
 "<p>This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.</p>\n"
 "\n"
@@ -12925,11 +12933,11 @@ msgstr ""
 "\n"
 "<p>Dies ist der erweiterte Text. Sie sehen ihn nur, wenn Sie auf den \"mehr\"-Link geklickt haben.</p>"
 
-#: ..\..\..\install\_functions_create.php:765
+#: ..\..\..\install\_functions_create.php:760
 msgid "Extended post"
 msgstr "Erweiterter Eintrag"
 
-#: ..\..\..\install\_functions_create.php:775
+#: ..\..\..\install\_functions_create.php:770
 msgid ""
 "<p>Four blogs have been created with sample contents:</p>\n"
 "\n"
@@ -12940,7 +12948,7 @@ msgid ""
 "\t<li><strong>Photoblog</strong>: This blog is an example of how you can use b2evolution to showcase photos, with one photo per page as well as a thumbnail index.</li>\n"
 "</ul>\n"
 "\n"
-"<p>You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, skin, widgets, etc.) from the Blog Settings tab in the admin interface.</p>"
+"<p>You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, blog skin, widgets, etc.) from the Blog Settings tab in the admin interface.</p>"
 msgstr ""
 "<p>Vier Blogs wurden mit Beispielinhalten erstellt:</p>\n"
 "\n"
@@ -12951,13 +12959,13 @@ msgstr ""
 "\t<li><strong>Fotoblog</strong>: Dieses Blog ist ein Beispiel dafür, wie Sie b2evolution zum Zurschaustellen von Fotos benutzen können. Es wird ein Foto pro Seite angezeigt und es gibt einen Bilderindex mit Vorschaubildern.</li>\n"
 "</ul>\n"
 "\n"
-"<p>Über den Blogeinstellungen-Tab im Administrationsbereich können Sie neue Blogs hinzufügen, unerwünschte Blogs löschen und bestehende Blogs anpassen (Titel, Seitenleiste, Skin, Widgets, etc.).</p>"
+"<p>Über den Blogeinstellungen-Tab im Administrationsbereich können Sie neue Blogs hinzufügen, unerwünschte Blogs löschen und bestehende Blogs anpassen (Titel, Seitenleiste, Blog-Skin, Widgets, etc.).</p>"
 
-#: ..\..\..\install\_functions_create.php:775
+#: ..\..\..\install\_functions_create.php:770
 msgid "Welcome to b2evolution!"
 msgstr "Willkommen zu b2evolution!"
 
-#: ..\..\..\install\_functions_create.php:803
+#: ..\..\..\install\_functions_create.php:798
 msgid "Hi, this is a comment.<br />To delete a comment, just log in, and view the posts' comments, there you will have the option to edit or delete them."
 msgstr "Hi, dies ist ein Kommentar.<br />Um einen Kommentar zu löschen, melden Sie sich einfach an und betrachten die Kommentare des Eintrags, von dort aus können Sie sie bearbeiten oder löschen."
 
@@ -12983,19 +12991,19 @@ msgstr "Es scheint, als würden die folgenden Blog-Stub-Namen mehr als einmal ben
 msgid "I can't upgrade until you make them unique. DB field: [%s]"
 msgstr "Ich kann nicht upgraden, bevor Sie sie einzigartig machen. DB-Feld: [%s]"
 
-#: ..\..\..\install\_functions_evoupgrade.php:2475
+#: ..\..\..\install\_functions_evoupgrade.php:2511
 msgid "The database schema is up to date."
 msgstr "Das Datenbankschema befindet sich auf dem aktuellsten Stand."
 
-#: ..\..\..\install\_functions_evoupgrade.php:2506
+#: ..\..\..\install\_functions_evoupgrade.php:2542
 msgid "Upgrade database"
 msgstr "Datenbank aktualisieren"
 
-#: ..\..\..\install\_functions_evoupgrade.php:2513
+#: ..\..\..\install\_functions_evoupgrade.php:2549
 msgid "The version number is correct, but we have detected changes in the database schema. This can happen with CVS versions..."
 msgstr "Die Versionsnummer ist korrekt, aber wir haben Änderungen im Datenbankschema festgestellt. Dies kann bei CVS-Versionen vorkommen..."
 
-#: ..\..\..\install\_functions_evoupgrade.php:2524
+#: ..\..\..\install\_functions_evoupgrade.php:2560
 msgid "Upgrade database!"
 msgstr "Datenbank aktualisieren!"
 
@@ -13003,334 +13011,338 @@ msgstr "Datenbank aktualisieren!"
 msgid "Language / Locale"
 msgstr "Sprache / Gebietsschema"
 
-#: ..\..\..\install\_functions_install.php:72
+#: ..\..\..\install\_functions_install.php:60
+msgid "More languages"
+msgstr "Mehr Sprachen"
+
+#: ..\..\..\install\_functions_install.php:75
 msgid "Select as default language/locale"
 msgstr "Als Standardsprache/-Gebietsschema wählen"
 
-#: ..\..\..\install\_functions_install.php:95
+#: ..\..\..\install\_functions_install.php:99
 msgid "Base config recap..."
 msgstr "Zusammenfassung der Basis-Konfiguration"
 
-#: ..\..\..\install\_functions_install.php:97
+#: ..\..\..\install\_functions_install.php:101
 #, php-format
 msgid "If you don't see correct settings here, STOP before going any further, and <a %s>update your base configuration</a>."
 msgstr "Falls Sie hier keine korrekten Werte sehen, HÖREN SIE AUF weiterzumachen und <a %s>passen Sie Ihre Basis-Konfiguration an</a>."
 
-#: ..\..\..\install\_functions_install.php:106
-#: ..\..\..\install\index.php:391
+#: ..\..\..\install\_functions_install.php:110
+#: ..\..\..\install\index.php:396
 msgid "MySQL Username"
 msgstr "MySQL-Benutzername"
 
-#: ..\..\..\install\_functions_install.php:107
+#: ..\..\..\install\_functions_install.php:111
 msgid "(Set, but not shown for security reasons)"
 msgstr "(Gesetzt, aber aus Sicherheitsgründen nicht angezeigt)"
 
-#: ..\..\..\install\_functions_install.php:107
-#: ..\..\..\install\index.php:392
+#: ..\..\..\install\_functions_install.php:111
+#: ..\..\..\install\index.php:397
 msgid "MySQL Password"
 msgstr "MySQL-Passwort"
 
-#: ..\..\..\install\_functions_install.php:108
+#: ..\..\..\install\_functions_install.php:112
 msgid "MySQL Database name"
 msgstr "MySQL-Datenbankname"
 
-#: ..\..\..\install\_functions_install.php:109
-#: ..\..\..\install\index.php:389
+#: ..\..\..\install\_functions_install.php:113
+#: ..\..\..\install\index.php:394
 msgid "MySQL Host/Server"
 msgstr "MySQL-Host/-Server"
 
-#: ..\..\..\install\_functions_install.php:110
+#: ..\..\..\install\_functions_install.php:114
 msgid "MySQL tables prefix"
 msgstr "MySQL-Tabellenpräfix"
 
-#: ..\..\..\install\_functions_install.php:111
-#: ..\..\..\install\index.php:400
+#: ..\..\..\install\_functions_install.php:115
+#: ..\..\..\install\index.php:405
 msgid "Base URL"
 msgstr "Basis-URL"
 
-#: ..\..\..\install\_functions_install.php:112
+#: ..\..\..\install\_functions_install.php:116
 msgid "Admin email"
 msgstr "Admin-E-Mail-Adresse"
 
-#: ..\..\..\install\_functions_install.php:134
+#: ..\..\..\install\_functions_install.php:138
 msgid "OOPS! It seems b2evolution is already installed!"
 msgstr "HUCH! Es scheint, als wenn b2evolution bereits existiert ist!"
 
-#: ..\..\..\install\_functions_install.php:138
+#: ..\..\..\install\_functions_install.php:142
 #, php-format
 msgid "Would you like to <a %s>upgrade your existing installation now</a>?"
 msgstr "Möchten Sie <a %s>Ihre existierende Installation jetzt upgraden</a>?"
 
-#: ..\..\..\install\_functions_install.php:155
+#: ..\..\..\install\_functions_install.php:159
 msgid "Creating b2evolution tables..."
 msgstr "Erstelle b2evolution-Tabellen..."
 
-#: ..\..\..\install\_functions_install.php:159
+#: ..\..\..\install\_functions_install.php:163
 msgid "Creating minimum default data..."
 msgstr "Erstelle minimale Standarddaten..."
 
-#: ..\..\..\install\_functions_install.php:167
+#: ..\..\..\install\_functions_install.php:171
 msgid "Installing sample contents..."
 msgstr "Installiere Beispielinhalte..."
 
-#: ..\..\..\install\_functions_install.php:189
+#: ..\..\..\install\_functions_install.php:193
 msgid "Installation successful!"
 msgstr "Installation erfolgreich!"
 
-#: ..\..\..\install\_functions_install.php:192
+#: ..\..\..\install\_functions_install.php:196
 #, php-format
 msgid "Now you can <a %s>log in</a> with the following credentials:"
 msgstr "Nun können Sie sich mit den folgenden Zugangsdaten <a %s>anmelden</a>:"
 
-#: ..\..\..\install\_functions_install.php:200
+#: ..\..\..\install\_functions_install.php:204
 msgid "Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew."
 msgstr "Notieren Sie dieses Passwort sorgfältig! Es ist ein <em>zufälliges</em> Passwort, das Ihnen mitgeteilt wird, wenn Sie b2evolution installieren. Wenn Sie es verlieren, werden Sie alle Datenbanktabellen löschen und neu installieren müssen."
 
-#: ..\..\..\install\index.php:84
+#: ..\..\..\install\index.php:88
 msgid "Upgrade from a previous version"
 msgstr "Von einer vorherigen Version upgraden"
 
-#: ..\..\..\install\index.php:88
+#: ..\..\..\install\index.php:92
 msgid "New Install"
 msgstr "Neue Installation"
 
-#: ..\..\..\install\index.php:92
+#: ..\..\..\install\index.php:96
 msgid "Upgrade from Cafelog/b2"
 msgstr "Upgrade von Cafelog/b2"
 
-#: ..\..\..\install\index.php:96
-#: ..\..\..\install\index.php:474
+#: ..\..\..\install\index.php:100
+#: ..\..\..\install\index.php:481
 msgid "Delete b2evolution tables"
 msgstr "Lösche b2evolution-Tabellen"
 
-#: ..\..\..\install\index.php:100
-#: ..\..\..\install\index.php:345
+#: ..\..\..\install\index.php:104
+#: ..\..\..\install\index.php:350
 msgid "Base configuration"
 msgstr "Basis-Konfiguration"
 
-#: ..\..\..\install\index.php:114
+#: ..\..\..\install\index.php:118
 msgid "b2evo installer"
 msgstr "b2evo-Installer"
 
-#: ..\..\..\install\index.php:127
+#: ..\..\..\install\index.php:132
 msgid "Installer for version "
 msgstr "Installer für Version "
 
-#: ..\..\..\install\index.php:132
+#: ..\..\..\install\index.php:137
 msgid "After install"
 msgstr "Nach der Installation"
 
-#: ..\..\..\install\index.php:135
+#: ..\..\..\install\index.php:140
 msgid "Current installation"
 msgstr "Aktuelle Installation"
 
-#: ..\..\..\install\index.php:136
+#: ..\..\..\install\index.php:141
 msgid "Install menu"
 msgstr "Installationsmenü"
 
-#: ..\..\..\install\index.php:137
+#: ..\..\..\install\index.php:142
 msgid "PHP info"
 msgstr "PHP-Info"
 
-#: ..\..\..\install\index.php:164
+#: ..\..\..\install\index.php:169
 msgid "Check your database config settings below and update them if necessary..."
 msgstr "Überprüfen Sie Ihre Datenbank-Konfiguration unten und aktualisieren Sie sie, falls nötig..."
 
-#: ..\..\..\install\index.php:178
-#: ..\..\..\install\index.php:187
+#: ..\..\..\install\index.php:183
+#: ..\..\..\install\index.php:192
 #, php-format
 msgid "The minimum requirement for this version of b2evolution is %s version %s but you are trying to use version %s!"
 msgstr "Die Mindestvoraussetzung für diese Version von b2evolution ist %s-Version %s, aber Sie versuchen, Version %s zu benutzen!"
 
-#: ..\..\..\install\index.php:195
+#: ..\..\..\install\index.php:200
 msgid "b2evolution cannot be installed, because of the following errors:"
 msgstr "b2evolution kann auf Grund folgender Fehler nicht installiert werden:"
 
-#: ..\..\..\install\index.php:235
+#: ..\..\..\install\index.php:240
 msgid "It seems that the database config settings you entered don't work. Please check them carefully and try again..."
 msgstr "Es scheint, als würden die Datenbank-Einstellungen, die Sie angegeben haben, nicht funktionieren. Bitte überprüfen Sie sie sorgfältig und versuchen es erneut..."
 
-#: ..\..\..\install\index.php:248
+#: ..\..\..\install\index.php:253
 #, php-format
 msgid "Could not load original conf file [%s]. Is it missing?"
 msgstr "Konnte originale Konfigurationsdatei [%s] nicht laden. Fehlt sie?"
 
-#: ..\..\..\install\index.php:284
+#: ..\..\..\install\index.php:289
 msgid "Config file update"
 msgstr "Update der Konfigurationsdatei"
 
-#: ..\..\..\install\index.php:285
+#: ..\..\..\install\index.php:290
 #, php-format
 msgid "We cannot automatically create or update your config file [%s]!"
 msgstr "Wir können Ihre Konfigurationsdatei [%s] nicht automatisch erstellen oder aktualisieren!"
 
-#: ..\..\..\install\index.php:286
+#: ..\..\..\install\index.php:291
 msgid "There are two ways to deal with this:"
 msgstr "Es gibt zwei Wege, damit umzugehen:"
 
-#: ..\..\..\install\index.php:288
+#: ..\..\..\install\index.php:293
 msgid "You can allow the installer to create the config file by changing permissions for the /conf directory:"
 msgstr "Sie können dem Installer ermöglichen, die Konfigurationsdatei zu erstellen, indem Sie die Rechte für das /conf-Verzeichnis ändern:"
 
-#: ..\..\..\install\index.php:290
+#: ..\..\..\install\index.php:295
 #, php-format
 msgid "Make sure there is no existing and potentially locked configuration file named <code>%s</code>. If so, please delete it."
 msgstr "Stellen Sie sicher, dass es keine bestehende und möglicherweise gesperrte Datei namens <code>%s</code> gibt. Falls doch, löschen Sie sie bitte."
 
-#: ..\..\..\install\index.php:291
+#: ..\..\..\install\index.php:296
 #, php-format
 msgid "<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about permissions</a>."
 msgstr "<code>chmod 666 %s</code>. Falls nötig, schauen Sie sich die <a %s>Onlineanleitung über Dateirechte</a> an."
 
-#: ..\..\..\install\index.php:292
+#: ..\..\..\install\index.php:297
 msgid "Come back to this page and refresh/reload."
 msgstr "Kehren Sie zu dieser Seite zurück und laden Sie sie neu."
 
-#: ..\..\..\install\index.php:296
+#: ..\..\..\install\index.php:301
 msgid "Alternatively, you can update the config file manually:"
 msgstr "Alternativ können Sie die Konfigurationsdatei auch manuell aktualisieren:"
 
-#: ..\..\..\install\index.php:298
+#: ..\..\..\install\index.php:303
 msgid "Create a new text file with a text editor."
 msgstr "Erstellen Sie eine neue Textdatei mit einem Text-Editor."
 
-#: ..\..\..\install\index.php:299
+#: ..\..\..\install\index.php:304
 msgid "Copy the contents from the box below."
 msgstr "Kopieren Sie den Inhalt aus der unteren Box."
 
-#: ..\..\..\install\index.php:300
+#: ..\..\..\install\index.php:305
 msgid "Paste them into your local text editor. <strong>ATTENTION: make sure there is ABSOLUTELY NO WHITESPACE after the final <code>?&gt;</code> in the file.</strong> Any space, tab, newline or blank line at the end of the conf file may prevent cookies from being set when you try to log in later."
 msgstr "Fügen Sie ihn in Ihren lokalen Texteditor ein. <strong>ACHTUNG: Stellen Sie sicher, dass es ABSOLUT KEINEN WHITESPACE nach dem letzten <code>?&gt;</code> in der Datei gibt.</strong> Jedes Leerzeichen, Tab oder neue Zeile am Ende der Konfigurationsdatei könnte verhindern, dass Cookies gesetzt werden, wenn Sie später versuchen, sich anzumelden."
 
-#: ..\..\..\install\index.php:301
+#: ..\..\..\install\index.php:306
 msgid "Save the file locally under the name <code>_basic_config.php</code>"
 msgstr "Speichern Sie die Datei lokal unter dem Namen <code>_basic_config.php</code>"
 
-#: ..\..\..\install\index.php:302
+#: ..\..\..\install\index.php:307
 msgid "Upload the file to your server, into the <code>/_conf</code> folder."
 msgstr "Laden Sie die Datei auf Ihren Server in das <code>/_conf</code>-Verzeichnis hoch."
 
-#: ..\..\..\install\index.php:303
+#: ..\..\..\install\index.php:308
 #, php-format
 msgid "<a %s>Call the installer from scratch</a>."
 msgstr "<a %s>Den Installer erneut aufrufen</a>."
 
-#: ..\..\..\install\index.php:307
+#: ..\..\..\install\index.php:312
 msgid "This is how your _basic_config.php should look like:"
 msgstr "So sollte Ihre _basic_config.php aussehen:"
 
-#: ..\..\..\install\index.php:321
+#: ..\..\..\install\index.php:326
 #, php-format
 msgid "Your configuration file [%s] has been successfully created."
 msgstr "Ihre Konfigurationsdatei [%s] wurde erfolgreich erstellt."
 
-#: ..\..\..\install\index.php:349
+#: ..\..\..\install\index.php:354
 msgid "Resetting the base configuration is currently disabled for security reasons."
 msgstr "Das Zurücksetzen der Basiskonfiguration ist zur Zeit aus Sicherheitsgründen deaktiviert."
 
-#: ..\..\..\install\index.php:350
-#: ..\..\..\install\index.php:555
+#: ..\..\..\install\index.php:355
+#: ..\..\..\install\index.php:603
 #, php-format
 msgid "To enable it, please go to the %s file and change: %s to %s"
 msgstr "Um es zu aktivieren, bearbeiten Sie bitte die %s-Datei und ändern Sie: %s zu %s"
 
-#: ..\..\..\install\index.php:351
-#: ..\..\..\install\index.php:556
+#: ..\..\..\install\index.php:356
+#: ..\..\..\install\index.php:604
 msgid "Then reload this page and a reset option will appear."
 msgstr "Laden Sie diese Seite dann neu und eine Option für das Zurücksetzen wird erscheinen."
 
-#: ..\..\..\install\index.php:377
+#: ..\..\..\install\index.php:382
 msgid "The basic configuration file (<code>/conf/_basic_config.php</code>) has not been created yet. You can do automatically generate it by filling out the form below."
 msgstr "Ihre Basis-Konfigurationsdatei (<code>/conf/_basic_config.php</code>) wurde noch nicht erstellt. Sie können sie automatisch generieren, indem Sie das untere Formular ausfüllen."
 
-#: ..\..\..\install\index.php:379
+#: ..\..\..\install\index.php:384
 msgid "This is the minimum info we need to set up b2evolution on this server:"
 msgstr "Das sind die Mindestinformationen, die wir brauchen um b2evolution auf diesem Server zu installieren:"
 
-#: ..\..\..\install\index.php:386
+#: ..\..\..\install\index.php:391
 msgid "Database you want to install into"
 msgstr "Datenbank, in die Sie installieren möchten"
 
-#: ..\..\..\install\index.php:387
+#: ..\..\..\install\index.php:392
 msgid "b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installing b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you."
 msgstr "b2evolution speichert Blog-Einträge, Kommentare, Benutzerrechte etc. in einer MySQL-Datenbank. Sie müssen diese Datenbank erstellen, bevor Sie b2evolution installieren und anschließend die Datenbank-Zugangsdaten unten angeben. Falls Sie mit dieser Vorgehensweise nicht vertraut sind, können Sie Ihren Hosting-Provider bitten, die Datenbank für Sie zu erstellen."
 
-#: ..\..\..\install\index.php:389
+#: ..\..\..\install\index.php:394
 msgid "Typically looks like \"localhost\" or \"sql-6\" or \"sql-8.yourhost.net\"..."
 msgstr "Ist typischerweise etwas wie \"localhost\", \"sql-6\" oder \"sql-8.ihrhost.net\"..."
 
-#: ..\..\..\install\index.php:390
+#: ..\..\..\install\index.php:395
 msgid "MySQL Database"
 msgstr "MySQL-Datenbank"
 
-#: ..\..\..\install\index.php:390
+#: ..\..\..\install\index.php:395
 msgid "Name of the MySQL database you have created on the server"
 msgstr "Name der MySQL-Datenbank, die Sie auf dem Server erstellt haben"
 
-#: ..\..\..\install\index.php:391
-#: ..\..\..\install\index.php:392
+#: ..\..\..\install\index.php:396
+#: ..\..\..\install\index.php:397
 msgid "Used by b2evolution to access the MySQL database"
 msgstr "Wird von b2evolution benutzt, um auf die MySQL-Datenbank zuzugreifen"
 
-#: ..\..\..\install\index.php:398
+#: ..\..\..\install\index.php:403
 msgid "Additional settings"
 msgstr "Weitere Einstellungen"
 
-#: ..\..\..\install\index.php:400
+#: ..\..\..\install\index.php:405
 msgid "This is where b2evo and your blogs reside by default. CHECK THIS CAREFULLY or not much will work. If you want to test b2evolution on your local machine, in order for login cookies to work, you MUST use http://<strong>localhost</strong>/path... Do NOT use your machine's name!"
 msgstr "Hier werden b2evo und Ihre Blogs standardmäßig liegen. ÜBERPRÜFEN SIE DIES SORGFÄLTIG oder vieles wird nicht funktionieren. Falls Sie b2evolution auf Ihrer lokalen Maschine testen möchten, MÜSSEN Sie http://<strong>localhost</strong>/pfad benutzen, damit Cookies funktionieren... Benutzen Sie NICHT Ihren Computernamen!"
 
-#: ..\..\..\install\index.php:402
+#: ..\..\..\install\index.php:407
 msgid "This is used to create your admin account. You will receive notifications for comments on your blog, etc."
 msgstr "Das wird benutzt, um den Admin-Account zu erstellen. Sie werden Benachrichtigungen über Kommentare in Ihrem Blog erhalten etc."
 
-#: ..\..\..\install\index.php:402
+#: ..\..\..\install\index.php:407
 msgid "Your email"
 msgstr "Ihre E-Mail-Adresse"
 
-#: ..\..\..\install\index.php:409
+#: ..\..\..\install\index.php:414
 msgid "Update config file"
 msgstr "Konfigurationsdatei aktualisieren"
 
-#: ..\..\..\install\index.php:434
+#: ..\..\..\install\index.php:439
 msgid "How would you like your b2evolution installed?"
 msgstr "Wie möchten Sie Ihr b2evolution installiert haben?"
 
-#: ..\..\..\install\index.php:445
+#: ..\..\..\install\index.php:450
 msgid "The installation can be done in different ways. Choose one:"
 msgstr "Die Installation kann auf verschiedene Weise erfolgen. Wählen Sie eine:"
 
-#: ..\..\..\install\index.php:454
+#: ..\..\..\install\index.php:461
 msgid "<strong>New Install</strong>: Install b2evolution database tables."
 msgstr "<strong>Neue Installation</strong>: Installiere b2evolution-Datenbank-Tabellen."
 
-#: ..\..\..\install\index.php:457
+#: ..\..\..\install\index.php:464
 msgid "Also install sample blogs &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users."
 msgstr "Auch Beispielblogs &amp; -inhalte installieren. Die Beispieleinträge erklären verschiedene Features von b2evolution. Dies wird neuen Benutzern wärmstens empfohlen."
 
-#: ..\..\..\install\index.php:467
+#: ..\..\..\install\index.php:474
 msgid "<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version. <strong>WARNING:</strong> If you have modified your database, this operation may fail. Make sure you have a backup."
 msgstr "<strong>Upgrade von einer früheren b2evolution-Version</strong>: Aktualisieren Sie Ihre Datenbank-Tabellen, um sie mit der jetzigen Version kompatibel zu machen. <strong>WARNUNG:</strong> Wenn Sie Ihre Datenbank verändert haben, kann diese Operation fehlschlagen. Stellen Sie sicher, dass Sie ein Backup haben."
 
-#: ..\..\..\install\index.php:475
+#: ..\..\..\install\index.php:482
 msgid "If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. <strong>WARNING: All your b2evolution tables and data will be lost!!!</strong> Any non-b2evolution tables will remain untouched though."
 msgstr "Falls Sie schon b2evolution-Tabellen installiert haben und neu anfangen möchten, müssen Sie die b2evolution-Tabellen löschen, bevor Sie eine neue Installation starten können. <strong>WARNUNG: Alle Ihre b2evolution-Datenbank-Tabellen und Daten werden verloren sein!!!</strong> Andere, nicht zu b2evolution gehörende Datenbank-Tabellen werden allerdings auf keinen Fall verändert."
 
-#: ..\..\..\install\index.php:478
+#: ..\..\..\install\index.php:485
 msgid "<strong>Change your base configuration</strong> (see recap below): You only want to do this in rare occasions where you may have moved your b2evolution files or database to a different location..."
 msgstr "<strong>Ändern Sie Ihre Basis-Konfiguration</strong> (siehe Zusammenfassung unten): Sie werden das nur in seltenen Fällen tun wollen, z. B. wenn Sie Ihre b2evolution-Dateien oder -Datenbank verschoben haben..."
 
-#: ..\..\..\install\index.php:485
+#: ..\..\..\install\index.php:492
 msgid "Need to start anew?"
 msgstr "Möchten Sie neu anfangen?"
 
-#: ..\..\..\install\index.php:490
+#: ..\..\..\install\index.php:497
 msgid "GO!"
 msgstr "LOS!"
 
 # TRANS: %s gets replaced by app name, usually "b2evolution"
 #. TRANS: %s gets replaced by app name, usually "b2evolution"
-#: ..\..\..\install\index.php:492
+#: ..\..\..\install\index.php:499
 #, php-format
 msgid ""
 "Are you sure you want to delete your existing %s tables?\\n"
@@ -13339,34 +13351,40 @@ msgstr ""
 "Sind Sie sicher, dass Sie Ihre bestehenden %s-Tabellen löschen möchten?\\n"
 "Haben Sie ein Backup?"
 
-#: ..\..\..\install\index.php:510
+#: ..\..\..\install\index.php:532
+#: ..\..\..\install\index.php:605
+#: ..\..\..\install\index.php:665
+msgid "Back to install menu"
+msgstr "Zurück zum Installationsmenü"
+
+#: ..\..\..\install\index.php:558
 #, php-format
 msgid "In order to install b2evolution with the %s locale, your MySQL needs to support the %s connection charset."
 msgstr "Um b2evolution mit dem %s-Gebietsschema zu installieren, muss Ihr MySQL den %s-Verbindungszeichensatz unterstützen."
 
-#: ..\..\..\install\index.php:529
+#: ..\..\..\install\index.php:577
 msgid "Upgrading data in existing b2evolution database..."
 msgstr "Aktualisiere Daten in vorhandener b2evolution-Datenbank..."
 
-#: ..\..\..\install\index.php:534
+#: ..\..\..\install\index.php:582
 msgid "Upgrade completed successfully!"
 msgstr "Upgrade erfolgreich beendet!"
 
-#: ..\..\..\install\index.php:535
+#: ..\..\..\install\index.php:583
 #, php-format
 msgid "Now you can <a %s>log in</a> with your usual %s username and password."
 msgstr "Jetzt können Sie sich mit Ihrem üblichen %2$s-Benutzernamen und -Passwort <a %1$s>anmelden</a>."
 
-#: ..\..\..\install\index.php:549
+#: ..\..\..\install\index.php:597
 msgid "Deleting b2evolution tables from the datatase..."
 msgstr "Lösche b2evolution-Tabellen aus der Datenbank..."
 
-#: ..\..\..\install\index.php:554
+#: ..\..\..\install\index.php:602
 msgid "If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default."
 msgstr "Wenn Sie schon vorher b2evolution-Tabellen installiert haben und neu anfangen möchten, müssen Sie die b2evolution-Tabellen löschen, bevor Sie eine neue Installation starten können. b2evolution kann seine eigenen DB-Tabellen für Sie löschen, aber aus offensichtlichen Sicherheitsgründen ist diese Funktion standardmäßig abgeschaltet."
 
 #. TRANS: %s gets replaced by app name, usually "b2evolution"
-#: ..\..\..\install\index.php:564
+#: ..\..\..\install\index.php:615
 #, php-format
 msgid ""
 "Are you sure you want to delete your existing %s tables?\n"
@@ -13375,45 +13393,73 @@ msgstr ""
 "Sind Sie sicher, dass Sie Ihre bestehenden %s-Tabellen löschen möchten?\n"
 "Haben Sie ein Backup?"
 
-#: ..\..\..\install\index.php:613
+#: ..\..\..\install\index.php:664
 msgid "Reset done!"
 msgstr "Reset beendet!"
 
-#: ..\..\..\install\index.php:614
-msgid "Back to menu"
-msgstr "Zurück zum Menu"
-
-#: ..\..\..\install\index.php:628
+#: ..\..\..\install\index.php:679
 msgid "Find a host"
 msgstr "Finde einen Host"
 
-#: ..\..\..\install\index.php:628
+#: ..\..\..\install\index.php:679
 msgid "Forums"
 msgstr "Forum"
 
-#: ..\..\..\install\index.php:628
+#: ..\..\..\install\index.php:679
 msgid "Official website"
 msgstr "Offizielle Website"
 
-#: ..\..\..\install\index.php:628
+#: ..\..\..\install\index.php:679
 msgid "Online resources"
 msgstr "Online-Ressourcen"
 
 #: ..\..\..\locales\de_DE\de-DE.locale.php:13
-msgid "German (DE)"
-msgstr "Deutsch (DE)"
+msgid "German (DE) latin1"
+msgstr "Deutsch (DE) latin1"
+
+#: ..\..\..\locales\en_US\en-AU.locale.php:13
+msgid "English (AU) latin1"
+msgstr "Englisch (AU) latin1"
+
+#: ..\..\..\locales\en_US\en-CA.locale.php:13
+msgid "English (CA) latin1"
+msgstr "Englisch (CA) latin1"
+
+#: ..\..\..\locales\en_US\en-GB.locale.php:13
+msgid "English (GB) latin1"
+msgstr "Englisch (GB) latin1"
+
+#: ..\..\..\locales\en_US\en-IL.locale.php:13
+msgid "English (IL) latin1"
+msgstr "Englisch (IL) latin1"
+
+#: ..\..\..\locales\en_US\en-NZ.locale.php:13
+msgid "English (NZ) latin1"
+msgstr "Englisch (NZ) latin1"
+
+#: ..\..\..\locales\en_US\en-SG.locale.php:13
+msgid "English (SG) latin1"
+msgstr "Englisch (SG) latin1"
+
+#: ..\..\..\locales\en_US\en-US.utf8.locale.php:13
+msgid "English (US) utf8"
+msgstr "Englisch (US) latin1"
 
 #: ..\..\..\locales\fr_FR\fr-BE.locale.php:13
-msgid "French (BE)"
-msgstr "Französisch (BE)"
+msgid "French (BE) latin1"
+msgstr "Französisch (BE) latin1"
 
 #: ..\..\..\locales\fr_FR\fr-CA.locale.php:13
-msgid "French (CA)"
-msgstr "Französisch (CA)"
+msgid "French (CA) latin1"
+msgstr "Französisch (CA) latin1"
 
 #: ..\..\..\locales\fr_FR\fr-FR.locale.php:13
-msgid "French (FR)"
-msgstr "Französisch (FR)"
+msgid "French (FR) latin1"
+msgstr "Französisch (FR) latin1"
+
+#: ..\..\..\locales\ru_RU\ru-RU.locale.php:13
+msgid "Russian (RU) utf8"
+msgstr "Russisch (RU) utf8"
 
 #: ..\..\..\multiblogs.php:136
 msgid "Multiblog demo"
@@ -13490,11 +13536,11 @@ msgstr "Ignoriere Tags"
 msgid "A list of tags, in which no P or BR tags should get added."
 msgstr "Eine Liste von Tags, in denen keine P- oder BR-Tags hinzugefügt werden sollen."
 
-#: ..\..\..\plugins\_autolinks.plugin.php:44
+#: ..\..\..\plugins\_autolinks.plugin.php:54
 msgid "Make URLs clickable"
 msgstr "Macht URLs klickbar"
 
-#: ..\..\..\plugins\_autolinks.plugin.php:45
+#: ..\..\..\plugins\_autolinks.plugin.php:55
 msgid "This renderer will detect URLs in the text and automatically transform them into clickable links."
 msgstr "Dieser Renderer erkennt URLs im Text und transformiert sie automatisch in klickbare Links."
 
@@ -14595,18 +14641,6 @@ msgstr "Dieser Benutzer möchte nicht direkt kontaktiert werden."
 msgid "Miscellaneous"
 msgstr "Verschiedenes"
 
-#: ..\..\..\skins\asevo\_body_footer.inc.php:45
-#: ..\..\..\skins\custom\index.main.php:293
-#: ..\..\..\skins\evopress\_body_footer.inc.php:45
-#: ..\..\..\skins\miami_blue\index.main.php:262
-#: ..\..\..\skins\natural_pink\_body_footer.inc.php:45
-#: ..\..\..\skins\nifty_corners\_body_footer.inc.php:45
-#: ..\..\..\skins\pixelgreen\index.main.php:235
-#: ..\..\..\skins\vastitude\index.main.php:279
-#: ..\..\..\skins_adm\login\_html_footer.inc.php:40
-msgid "Credits"
-msgstr "Dank an"
-
 #: ..\..\..\skins\asevo\index.main.php:39
 #: ..\..\..\skins\basic\index.main.php:51
 #: ..\..\..\skins\custom\index.main.php:45
@@ -14858,6 +14892,10 @@ msgstr "Alle abwählen"
 msgid "Color:"
 msgstr "Farbe:"
 
+#: ..\..\..\skins_adm\login\_html_footer.inc.php:40
+msgid "Credits"
+msgstr "Dank an"
+
 #: ..\..\..\skins_adm\login\_login_form.main.php:42
 #, php-format
 msgid "Note: You are already logged in as %s!"
@@ -15011,8 +15049,6 @@ msgstr "Mehr Einträge..."
 #~ msgstr "Aktivieren, um ein extra Inhaltsmenü im Editor zu benutzen"
 #~ msgid "Show XHTML Extras"
 #~ msgstr "XHTML-Extras anzeigen"
-#~ msgid "English (GB)"
-#~ msgstr "Englisch (GB)"
 #~ msgid "Go"
 #~ msgstr "Los"
 #~ msgid "Display type"
