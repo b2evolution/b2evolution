@@ -91,7 +91,7 @@ class free_html_Widget extends ComponentWidget
 				),
 				'internal_name' => array(
 					'label' => T_('Internal name'),
-					'note' => T_('Gets displayed on the widget list'),
+					'note' => T_('Gets displayed on the widget list.'),
 					'size' => 60,
 				),
 				'content' => array(
@@ -133,6 +133,9 @@ class free_html_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.14  2009/08/03 14:05:04  tblue246
+ * minor
+ *
  * Revision 1.13  2009/08/03 12:33:57  tblue246
  * Add "internal name" field to HTML widget and make another field title translatable
  *
