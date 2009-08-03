@@ -176,8 +176,18 @@ switch( $action )
 		{
 			case 'js' :	// this is a js call, lets return the settings page -- fp> what do you mean "settings page" ?
 				// fp> wthis will visually live insert the new widget into the container; it probably SHOULD open the edit properties right away
-				send_javascript_message( array( 'addNewWidgetCallback' => array( $edited_ComponentWidget->ID, $container, $edited_ComponentWidget->get( 'order' ), $edited_ComponentWidget->get_name() ) ) ); // will be sent with settings form
-				$action = 'edit'; // pulls up the settings form
+				send_javascript_message( array(
+					'addNewWidgetCallback' => array(
+						$edited_ComponentWidget->ID,
+						$container,
+						$edited_ComponentWidget->get( 'order' ),
+						$edited_ComponentWidget->get_name(),
+					),
+					// Open widget settings:
+					'editWidget' => array(
+						'wi_ID_'.$edited_ComponentWidget->ID,
+					),
+				) );
 				break;
 
 			case 'normal' :
@@ -497,6 +507,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.28  2009/08/03 12:35:09  tblue246
+ * JS widget screen: Open settings page after adding a new widget
+ *
  * Revision 1.27  2009/07/07 15:21:10  yabs
  * Bug fix : error messages are now shown
  *
