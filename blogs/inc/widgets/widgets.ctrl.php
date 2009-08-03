@@ -155,7 +155,7 @@ switch( $action )
 				{
 					debug_die( 'Requested plugin does not support SkinTag' );
 				}
-				$edited_ComponentWidget = & new ComponentWidget( NULL, 'plugin', $code, array() );
+				$edited_ComponentWidget = & new ComponentWidget( NULL, 'plugin', $code );
 				break;
 
 			default:
@@ -507,6 +507,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.29  2009/08/03 13:19:11  tblue246
+ * Fixed http://forums.b2evolution.net//viewtopic.php?p=94778
+ *
  * Revision 1.28  2009/08/03 12:35:09  tblue246
  * JS widget screen: Open settings page after adding a new widget
  *

@@ -87,8 +87,8 @@ class ComponentWidget extends DataObject
 
 		if( is_null($db_row) )
 		{	// We are creating an object here:
-			$this->set( 'type', $type );
-			$this->set( 'code', $code );
+			parent::set( 'type', $type );
+			parent::set( 'code', $code );
 		}
 		else
 		{	// We are loading an object:
@@ -611,6 +611,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.61  2009/08/03 13:19:11  tblue246
+ * Fixed http://forums.b2evolution.net//viewtopic.php?p=94778
+ *
  * Revision 1.60  2009/07/02 21:50:13  fplanque
  * commented out unfinished code
  *
