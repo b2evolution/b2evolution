@@ -61,7 +61,8 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function get_short_desc()
 	{
-		return format_to_output($this->disp_params['title']);
+		return format_to_output( ! empty( $this->disp_params['internal_name'] ) ?
+									$this->disp_params['internal_name'] : $this->disp_params['title'] );
 	}
 
 
@@ -85,7 +86,12 @@ class free_html_Widget extends ComponentWidget
 		// Demo data:
 		$r = array_merge( array(
 				'title' => array(
-					'label' => 'Block title',
+					'label' => T_('Block title'),
+					'size' => 60,
+				),
+				'internal_name' => array(
+					'label' => T_('Internal name'),
+					'note' => T_('Gets displayed on the widget list'),
 					'size' => 60,
 				),
 				'content' => array(
@@ -127,6 +133,9 @@ class free_html_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.13  2009/08/03 12:33:57  tblue246
+ * Add "internal name" field to HTML widget and make another field title translatable
+ *
  * Revision 1.12  2009/03/13 02:32:07  fplanque
  * Cleaned up widgets.
  * Removed stupid widget_name param.
