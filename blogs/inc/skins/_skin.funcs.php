@@ -126,22 +126,12 @@ function skin_init( $disp )
 			{	// We want to redirect to the Item's canonical URL:
 
 				$canonical_url = $Item->get_permanent_url( '', '', '&' );
+				if( preg_match( '|[&?](page=\d+)|', $ReqURI, $page_param ) )
+				{	// A certain post page has been requested, keep only this param and discard all others:
+					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
+				}
 
-				// fp> why have we been cropping params?
-				/* Tblue> If we don't crop them, e.g. post pages don't
-				 *        work anymore (canonical URL without params !=
-				 *        requested URL with "page" param => redirect to
-				 *        canonical URL without page param). Alternatively,
-				 *        we could extract the page param only and discard
-				 *        all other params.
-				 * fp> I think it may make more sense to extract the page param.
-				 */
-				$requested_crop = preg_replace( '¤\?.*$¤', '', $ReqHost.$ReqURI );
-				$canonical_crop = preg_replace( '¤\?.*$¤', '', $canonical_url );
-				// pre_dump( '', $requested_crop, $canonical_crop );
-
-				//if( ! is_same_url( $ReqHost.$ReqURI, $canonical_url) )
-				if( ! is_same_url( $requested_crop, $canonical_crop ) )
+				if( ! is_same_url( $ReqHost.$ReqURI, $canonical_url) )
 				{	// The requested URL does not look like the canonical URL for this post...
 					if( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
 					{	// REDIRECT TO THE CANONICAL URL:
@@ -904,6 +894,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.72  2009/08/03 12:02:40  tblue246
+ * Keep only page param when redirecting to canonical post URL
+ *
  * Revision 1.71  2009/07/19 14:34:43  fplanque
  * doc
  *
