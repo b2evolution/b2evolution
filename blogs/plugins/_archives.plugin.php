@@ -125,7 +125,6 @@ class archives_plugin extends Plugin
 		// Title:
 		if(!isset($params['block_title_start'])) $params['block_title_start'] = '<h3>';
 		if(!isset($params['block_title_end'])) $params['block_title_end'] = '</h3>';
-		if(!isset($params['title'])) $params['title'] = T_('Archives');
 
 		// Archive mode:
 		if(!isset($params['mode']))
@@ -309,6 +308,12 @@ class archives_plugin extends Plugin
 	function get_widget_param_definitions( $params )
 	{
 		$r = array(
+			'title' => array(
+					'label' => T_('Block title'),
+					'note' => T_('Title to display in your skin.'),
+					'size' => 60,
+					'defaultvalue' => T_('Archives'),
+			),
 			'limit' => array(
 				'label' => T_( 'Max items' ),
 				'note' => T_( 'Maximum number of items to display.' ),
@@ -607,6 +612,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.54  2009/08/03 13:30:15  tblue246
+ * Make title of Archives widget editable. Fixes http://forums.b2evolution.net//viewtopic.php?p=94788
+ *
  * Revision 1.53  2009/07/05 16:39:10  sam2kb
  * "Limit" to "Max items"
  *
