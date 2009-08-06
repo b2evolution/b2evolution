@@ -58,10 +58,18 @@ class free_html_Widget extends ComponentWidget
 
 	/**
 	 * Get a very short desc. Used in the widget list.
+	 *
+	 * @return string The block title, the first 60 characters of the block
+	 *                content or an empty string.
 	 */
 	function get_short_desc()
 	{
-		return format_to_output($this->disp_params['title']);
+		if( empty( $this->disp_params['title'] ) )
+		{
+			return strmaxlen( htmlspecialchars( $this->disp_params['content'] ), 60 );
+		}
+
+		return format_to_output( $this->disp_params['title'] );
 	}
 
 
@@ -85,7 +93,7 @@ class free_html_Widget extends ComponentWidget
 		// Demo data:
 		$r = array_merge( array(
 				'title' => array(
-					'label' => 'Block title',
+					'label' => T_('Block title'),
 					'size' => 60,
 				),
 				'content' => array(
@@ -127,6 +135,10 @@ class free_html_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.16  2009/08/06 16:12:57  tblue246
+ * - Make block title field name translatable - again...
+ * - Show first 60 chars of block content if block title is empty
+ *
  * Revision 1.15  2009/08/06 15:04:25  fplanque
  * internal name is overkill. (too many confusing params not good)
  * (maybe the first chars of content if title is empty ?)
