@@ -317,7 +317,7 @@ function bufferedServerCall()
 	else
 	{	// widget order either hasn't changed or has been changed back to original order
 		jQuery( '#server_messages' ).html( '<div class="log_container"><div class="log_message">'
-						+T_( 'WOW, you managed to shufffle the widgets back into their original order ..... well done .... update cancelled' )+'</div></a>' ); // inform user
+						+T_( 'Widget order unchanged' )+'</div></a>' ); // inform user
 		jQuery( '.pending_update' ).removeClass( 'pending_update' ); // remove "needs updating"
 		colourWidgets(); // redo widget colours
 	}
