@@ -121,6 +121,7 @@ $locales['en-US'] = array(
 		'timefmt' => 'h:i:s a',
 		'startofweek' => 0,
 		'messages' => 'en_US',
+		'enabled' => false,	// We need this line to prevent notices iin locales conf screen and user profile screen.
 	);
 
 /**
