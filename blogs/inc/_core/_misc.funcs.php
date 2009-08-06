@@ -314,7 +314,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 			// use as an attribute: strips tags and escapes quotes
 			$content = strip_tags($content);
 			$content = convert_chars($content, 'html');
-			$content = str_replace(array('"', "'"), array('&quot;', '&#039;'), $content );
+			$content = str_replace( array('"', "'"), array('&quot;', '&#039;'), $content );
 			break;
 
 		case 'formvalue':
@@ -332,7 +332,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 			// use as an attribute: strips tags and escapes quotes
 			$content = strip_tags($content);
 			$content = convert_chars($content, 'xml');
-			$content = str_replace(array('"', "'"), array('&quot;', '&#039;'), $content );
+			$content = str_replace( array('"', "'"), array('&quot;', '&#039;'), $content );
 			break;
 
 		case 'text':
@@ -3550,6 +3550,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.125  2009/08/06 16:35:57  fplanque
+ * no message
+ *
  * Revision 1.124  2009/08/01 18:39:24  blueyed
  * Properly handle empty action icon name: get_icon returns false and action_icon uses the word instead.
  *

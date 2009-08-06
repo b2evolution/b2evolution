@@ -228,10 +228,14 @@ function rmdir_r( $path )
 	$r = true;
 
 	if( ! cleardir_r( $path ) )
+	{
 		$r = false;
+	}
 
 	if( ! @rmdir( $path ) )
+	{
 		$r = false;
+	}
 
 	return $r;
 }
@@ -263,18 +267,25 @@ function cleardir_r( $path )
 			{ // Note: we do NOT follow symlinks
 				// echo 'D';
 				if( ! rmdir_r( $adfp_filepath ) )
+				{
 					$r = false;
+				}
 			}
 			else
 			{ // File or symbolic link
 				//echo 'F/S';
 				if( ! @unlink( $adfp_filepath ) )
+				{
 					$r = false;
+				}
 			}
 		}
 		closedir($dir);
 	}
-	else $r = false;
+	else
+	{
+		$r = false;
+	}
 
 	return $r;
 }
@@ -784,6 +795,9 @@ function is_absolute_pathname($path)
 
 /*
  * $Log$
+ * Revision 1.19  2009/08/06 16:35:57  fplanque
+ * no message
+ *
  * Revision 1.18  2009/07/30 23:40:08  blueyed
  * Add boolean return value to rmdir_r and cleardir_r
  *
