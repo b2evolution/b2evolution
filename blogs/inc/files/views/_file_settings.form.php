@@ -188,7 +188,7 @@ $Form->begin_fieldset( T_('File creation options'), array( 'id' => 'ffset_filecr
 	$Form->checkbox( 'fm_enable_create_file', $Settings->get('fm_enable_create_file'), T_('Enable creation of files'), T_('Check to enable creation of files.' ) );
 	$Form->checkbox_input( 'upload_enabled', $Settings->get('upload_enabled'), T_('Enable upload of files'), array(
 		'note' => T_('Check to allow uploading files in general.' ), 'onclick' => JS_showhide_ffield_on_this('upload_maxkb') ) );
-	$Form->text_input( 'upload_maxkb', $Settings->get('upload_maxkb'), 6, T_('Maximum upload filesize'), sprintf( /* TRANS: first %s is first is php.ini limit, second is setting/var name, third is file name, 4th is limit in b2evo conf */ T_('KB. This cannot be higher than your PHP/Webserver setting (PHP: %s) and the limit of %s (in %s), which is currently %s!'), ini_get('upload_max_filesize').'/'.ini_get('post_max_size').' (upload_max_filesize/post_max_size)', '$upload_maxmaxkb', '/conf/_advanced.php', $upload_maxmaxkb.' '.T_('KB') ), array( 'maxlength'=>7, 'required'=>true ) );
+	$Form->text_input( 'upload_maxkb', $Settings->get('upload_maxkb'), 6, T_('Maximum upload filesize'), sprintf( /* TRANS: first %s is php.ini limit, second is setting/var name, third is file name, 4th is limit in b2evo conf */ T_('KB. This cannot be higher than your PHP/Webserver setting (PHP: %s) and the limit of %s (in %s), which is currently %s!'), ini_get('upload_max_filesize').'/'.ini_get('post_max_size').' (upload_max_filesize/post_max_size)', '$upload_maxmaxkb', '/conf/_advanced.php', $upload_maxmaxkb.' '.T_('KB') ), array( 'maxlength'=>7, 'required'=>true ) );
 	// Javascript to init hidden/shown state:
 	echo JS_showhide_ffield_on_checkbox( 'upload_maxkb', 'upload_enabled' );
 $Form->end_fieldset();
@@ -245,6 +245,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.7  2009/08/06 15:02:48  fplanque
+ * minor
+ *
  * Revision 1.6  2009/07/29 21:06:17  blueyed
  * Make upload_maxkb settings note more verbose about the involved PHP settings
  *
