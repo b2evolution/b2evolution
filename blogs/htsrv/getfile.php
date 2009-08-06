@@ -77,6 +77,8 @@ $File = & new File( $FileRoot->type, $FileRoot->in_type_ID, $path );
 
 if( !empty($size) && $File->is_image() )
 {	// We want a thumbnail:
+	// fp> TODO: for more efficient caching, this should probably redirect to the static file right after creating it (when $public_access_to_media=true OF COURSE)
+
 	global $thumbnail_sizes;
 
 	load_funcs( '/files/model/_image.funcs.php' );
@@ -184,6 +186,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.31  2009/08/06 14:55:45  fplanque
+ * doc
+ *
  * Revision 1.30  2009/07/31 01:27:52  blueyed
  * TODO
  *

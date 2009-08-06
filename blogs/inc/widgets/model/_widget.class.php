@@ -87,6 +87,7 @@ class ComponentWidget extends DataObject
 
 		if( is_null($db_row) )
 		{	// We are creating an object here:
+			// Using parent:: instead of $this-> in order to fix http://forums.b2evolution.net//viewtopic.php?p=94778
 			parent::set( 'type', $type );
 			parent::set( 'code', $code );
 		}
@@ -611,6 +612,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.62  2009/08/06 14:55:45  fplanque
+ * doc
+ *
  * Revision 1.61  2009/08/03 13:19:11  tblue246
  * Fixed http://forums.b2evolution.net//viewtopic.php?p=94778
  *

@@ -1025,8 +1025,8 @@ class File extends DataObject
 			if( !empty($desc) && !is_null($before_image_legend) )
 			{
 				$r .= $before_image_legend
-					.$desc
-					.$after_image_legend;
+							.$this->dget('desc')		// If this needs to be changed, please document.
+							.$after_image_legend;
 			}
 			$r .= $after_image;
 		}
@@ -1840,6 +1840,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.42  2009/08/06 14:55:45  fplanque
+ * doc
+ *
  * Revision 1.41  2009/07/31 00:17:20  blueyed
  * Move File::thumbnail to getfile.php, where it gets used exclusively. ACKed by FP.
  *
