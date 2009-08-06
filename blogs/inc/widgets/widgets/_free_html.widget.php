@@ -61,8 +61,7 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function get_short_desc()
 	{
-		return format_to_output( ! empty( $this->disp_params['internal_name'] ) ?
-									$this->disp_params['internal_name'] : $this->disp_params['title'] );
+		return format_to_output($this->disp_params['title']);
 	}
 
 
@@ -86,12 +85,7 @@ class free_html_Widget extends ComponentWidget
 		// Demo data:
 		$r = array_merge( array(
 				'title' => array(
-					'label' => T_('Block title'),
-					'size' => 60,
-				),
-				'internal_name' => array(
-					'label' => T_('Internal name'),
-					'note' => T_('Gets displayed on the widget list.'),
+					'label' => 'Block title',
 					'size' => 60,
 				),
 				'content' => array(
@@ -133,6 +127,10 @@ class free_html_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.15  2009/08/06 15:04:25  fplanque
+ * internal name is overkill. (too many confusing params not good)
+ * (maybe the first chars of content if title is empty ?)
+ *
  * Revision 1.14  2009/08/03 14:05:04  tblue246
  * minor
  *
