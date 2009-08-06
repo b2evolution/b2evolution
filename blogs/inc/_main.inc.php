@@ -235,6 +235,7 @@ load_funcs('_core/_url.funcs.php');
 /**
  * Locale selection:
  * We need to do this as early as possible in order to set DB connection charset below
+ * fp> that does not explain why it needs to be here!! Why do we need to set the Db charset HERE? BEFORE WHAT? 
  */
 $Debuglog->add( 'default_locale from conf: '.$default_locale, 'locale' );
 
@@ -661,6 +662,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.112  2009/08/06 15:11:15  fplanque
+ * doc
+ *
  * Revision 1.111  2009/07/28 23:51:08  sam2kb
  * Do locale selection and set DB connection charset as early as possible
  * in order to get results in the right encoding
