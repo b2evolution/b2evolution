@@ -41,6 +41,11 @@ $timestamp_max = 'now';
 # Additionnaly, you can set other values (see URL params in the manual)...
 # $order = 'ASC'; // This for example would display the blog in chronological order...
 
+# Tell b2evolution not to redirect. This is necessary only if "301" for homepage is checked and the blog URL is set
+# to something else than this page -- which is the case on demo installs.
+# For production systems, properly set the blog URL , then remove the line below:
+$redir = 'no';
+
 /**
  * Let b2evolution handle the query string and load the blog data:
  */
@@ -84,7 +89,7 @@ header_content_type( 'text/html' );
 		) );
 		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?></title>
-<!-- InstanceEndEditable --> 
+<!-- InstanceEndEditable -->
 <link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 <!-- InstanceBeginEditable name="head" -->
 	<?php skin_content_meta(); /* Charset for static pages */ ?>
@@ -96,7 +101,7 @@ header_content_type( 'text/html' );
 	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="<?php $Blog->disp( 'rss2_url', 'raw' ) ?>" />
 	<link rel="alternate" type="application/atom+xml" title="Atom" href="<?php $Blog->disp( 'atom_url', 'raw' ) ?>" />
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
-	<!-- InstanceEndEditable --> 
+	<!-- InstanceEndEditable -->
 </head>
 <body>
 <!-- InstanceBeginEditable name="ToolBar" -->
