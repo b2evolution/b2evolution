@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Automatic links plugin.
  *
- * @todo dh> Provide a setting for:
+ * @todo dh> Provide a setting for: fp> This should be a DIFFERENT plugin that kicks in last in the rendering and actually prcesses ALL links, auto links as well as explicit/manual links
  *   - marking external and internal (relative URL or on the blog's URL) links with a HTML/CSS class
  *   - add e.g. 'target="_blank"' to external links
  * @todo Add "max. displayed length setting" and add full title + dots in the middle to shorten it.
@@ -51,12 +51,42 @@ class autolinks_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->short_desc = T_('Make URLs clickable');
-		$this->long_desc = T_('This renderer will detect URLs in the text and automatically transform them into clickable links.');
+		$this->short_desc = T_('Make URLs and specific terms/defintions clickable');
+		$this->long_desc = T_('This renderer automatically creates links for you. URLs can be made clickable automatically. Specific and frequently used terms can be configured to be automatically linked to a definition URL.');
 	}
 
+
 	/**
-	 * Lazy load
+	 * @return array
+	 */
+	function GetDefaultSettings()
+	{
+		global $rsc_subdir;
+		return array(
+				'autolink_urls' => array(
+						'label' => T_( 'Autolink URLs' ),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+						'note' => T_('Autolink URLs starting with http: https: mailto: aim: icq: as well as adresses of the form www.*.* or *@*.*'),
+					),
+				'autolink_defs_default' => array(
+						'label' => T_( 'Autolink definitions' ),
+						'defaultvalue' => 0,
+						'type' => 'checkbox',
+						'note' => T_('As defined in definitions.default.txt'),
+					),
+				'autolink_defs_local' => array(
+						'label' => '',
+						'defaultvalue' => 0,
+						'type' => 'checkbox',
+						'note' => T_('As defined in definitions.local.txt'),
+					),
+			);
+	}
+
+
+	/**
+	 * Lazy load definitions array
 	 *
 	 */
 	function load_link_array()
@@ -70,14 +100,19 @@ class autolinks_plugin extends Plugin
 
 		$this->link_array = array();
 
-		// Load defaults:
-		$this->read_csv_file( $plugins_path.'autolinks_plugin/definitions.default.txt' );
-		// Load local user defintions:
-		$this->read_csv_file( $plugins_path.'autolinks_plugin/definitions.local.txt' );
+		if( $this->Settings->get( 'autolink_defs_default' ) )
+		{	// Load defaults:
+			$this->read_csv_file( $plugins_path.'autolinks_plugin/definitions.default.txt' );
+		}
+		if( $this->Settings->get( 'autolink_defs_local' ) )
+		{	// Load local user defintions:
+			$this->read_csv_file( $plugins_path.'autolinks_plugin/definitions.local.txt' );
+		}
 	}
 
+
 	/**
- 	 *
+ 	 * Load contents of one specific CSV file
 	 *
 	 * @param string $filename
 	 */
@@ -120,13 +155,15 @@ class autolinks_plugin extends Plugin
 			$this->already_linked_array = $matches[1];
 		}
 
-		// First, make the URLs clickable:
-		// fp> TODO: setting to enable/disable this
-		$content = make_clickable( $content );
+		if( $this->Settings->get( 'autolink_urls' ) )
+		{ // First, make the URLs clickable:
+			$content = make_clickable( $content );
+		}
 
-		// Now, make the desired remaining terms clickable:
-		// fp> TODO: setting to enable/disable this
-		$content = make_clickable( $content, '&amp;', array( $this, 'make_clickable_callback' ) );
+		if( ! empty($this->link_array) )
+		{ // Make the desired remaining terms/definitions clickable:
+			$content = make_clickable( $content, '&amp;', array( $this, 'make_clickable_callback' ) );
+		}
 
 		return true;
 	}
@@ -200,6 +237,9 @@ class autolinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.25  2009/08/07 17:00:07  fplanque
+ * added conf options
+ *
  * Revision 1.24  2009/07/22 22:53:02  fplanque
  * Dedupe existing links
  * Added missing slashes
