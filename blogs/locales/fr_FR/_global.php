@@ -7,7 +7,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $trans['fr_FR'] = array(
 '__meta__' => array('format_version'=>1, 'charset'=>'iso-8859-1'),
-'' => "Project-Id-Version: b2evolution 2.5\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2009-08-07 01:42+0200\nPO-Revision-Date: 2009-08-07 01:48+0100\nLast-Translator: Francois Planque <http://fplanque.com>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\nX-Poedit-Language: French\nX-Poedit-Country: FRANCE\nX-Poedit-SourceCharset: iso-8859-1\n",
+'' => "Project-Id-Version: b2evolution 2.5\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2009-08-07 19:24+0200\nPO-Revision-Date: 2009-08-07 19:27+0100\nLast-Translator: Francois Planque <http://fplanque.com>\nLanguage-Team: François PLANQUE <http://fplanque.net/>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=iso-8859-1\nContent-Transfer-Encoding: 8bit\nX-Poedit-Language: French\nX-Poedit-Country: FRANCE\nX-Poedit-SourceCharset: iso-8859-1\n",
 'Categories' => 'Catégories',
 'Tags' => 'Tags',
 'Previous' => 'Précédente',
@@ -2545,8 +2545,8 @@ $trans['fr_FR'] = array(
 'Add P tags in blocks (e.g. DIV)' => 'Ajoute des P dans les DIV',
 'Ignore tags' => 'Ignorer les tags',
 'A list of tags, in which no P or BR tags should get added.' => 'Une liste de tags à l\'intérieur desquels il ne faut jamais ajouter de P ou de BR.',
-'Make URLs clickable' => 'Rend les URLs clickables',
-'This renderer will detect URLs in the text and automatically transform them into clickable links.' => 'Ce formatteur ca détecter les URLs dans le texte et les transformera automatiquement en liens cliquables.',
+'Autolink URLs' => 'Autolinker les URLs',
+'Autolink definitions' => 'Autolinker les définitions',
 'BB formatting e-g [b]bold[/b]' => 'Formatage BB e-g [b]bold[/b]',
 'Available tags are: [b] [i] [u] [s] [color=...] [size=...] [font=...] [code] [quote] [list=1] [list=a] [list] [*]' => 'Les tags disponibles sont: [b] [i] [u] [s] [color=...] [size=...] [font=...] [code] [quote] [list=1] [list=a] [list] [*]',
 'Settings for posts' => 'Réglages pour les articles',
@@ -2775,6 +2775,7 @@ $trans['fr_FR'] = array(
 'Select blog:' => 'Sélection d\'un blog:',
 'words' => 'mots',
 'Header Background Color' => 'Couleur de fond de l\'entête',
+'E-g: #ff0000 for red' => 'Ex: #ff0000 pour rouge',
 'Invalid color code.' => 'Code couleur invalide.',
 'Menu Background Color' => 'Couleur de dond du menu',
 'Footer' => 'Pied de page',

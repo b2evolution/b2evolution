@@ -13,7 +13,7 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 #: ../../index.src.html:6
 #: ../../doc/install_new.src.html:6
@@ -74,7 +74,7 @@ msgid "Before install"
 msgstr ""
 
 #: ../../index.src.html:25
-#: ../../index.src.html:31
+#: ../../index.src.html:32
 #: ../../doc/install_new.src.html:25
 #: ../../doc/upgradefrom_b2.src.html:25
 #: ../../doc/upgradefrom_b2evo.src.html:25
@@ -101,16 +101,16 @@ msgstr ""
 msgid "Installer"
 msgstr ""
 
-#: ../../index.src.html:32
-msgid "You are about to install the b2evolution  multilingual multiuser multiblog engine. You can learn more about b2evolution by visiting <a %s>b2evolution.net</a> ."
+#: ../../index.src.html:31
+msgid "trans_current"
 msgstr ""
 
 #: ../../index.src.html:33
-msgid "Below are some quick instructions designed to help you. Please pick your prefered language and read on..."
+msgid "You are about to install the b2evolution  multilingual multiuser multiblog engine. You can learn more about b2evolution by visiting <a %s>b2evolution.net</a> ."
 msgstr ""
 
 #: ../../index.src.html:34
-msgid "trans_current"
+msgid "Below are some quick instructions designed to help you. Please pick your prefered language and read on..."
 msgstr ""
 
 #: ../../index.src.html:42
@@ -327,7 +327,7 @@ msgid "If you are upgrading from a version prior to 2.0, we highly recommend you
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:38
-msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you cannot reuse your  /conf files, default skin templates or default plugins as they are.<br /> <br /> Since your custom skins and custom plugins should be using different names, they will not be overwritten. Same for your media files.<br /> <br /> The one file you must absolutely restore from your backup (see step 1) though is <code>/blogs/conf/_basic_config.php</code>. You will need to either restore or recreate that file in order to proceed with upgrade."
+msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you cannot reuse your default /conf files, default skin templates or default plugins if you have modified them without renaming them.<br /> <br /> Since your custom configurations, custom skins and custom plugins should be using different names, they should typically not be overwritten. Same for your media files.<br /> <br /> The single one file you must absolutely pay attention to is <code>/blogs/conf/_basic_config.php</code>. You will need to either keep, recreate or restore that file from backup (see step 1) before you can proceed with the upgrade."
 msgstr ""
 
 #: ../../doc/upgradefrom_b2evo.src.html:43

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution VERSION\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2009-08-07 01:42+0200\n"
+"POT-Creation-Date: 2009-08-07 19:24+0200\n"
 "PO-Revision-Date: 2009-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -13230,11 +13230,31 @@ msgid "A list of tags, in which no P or BR tags should get added."
 msgstr ""
 
 #: ../../../plugins/_autolinks.plugin.php:54
-msgid "Make URLs clickable"
+msgid "Make URLs and specific terms/defintions clickable"
 msgstr ""
 
 #: ../../../plugins/_autolinks.plugin.php:55
-msgid "This renderer will detect URLs in the text and automatically transform them into clickable links."
+msgid "This renderer automatically creates links for you. URLs can be made clickable automatically. Specific and frequently used terms can be configured to be automatically linked to a definition URL."
+msgstr ""
+
+#: ../../../plugins/_autolinks.plugin.php:67
+msgid "Autolink URLs"
+msgstr ""
+
+#: ../../../plugins/_autolinks.plugin.php:70
+msgid "Autolink URLs starting with http: https: mailto: aim: icq: as well as adresses of the form www.*.* or *@*.*"
+msgstr ""
+
+#: ../../../plugins/_autolinks.plugin.php:73
+msgid "Autolink definitions"
+msgstr ""
+
+#: ../../../plugins/_autolinks.plugin.php:76
+msgid "As defined in definitions.default.txt"
+msgstr ""
+
+#: ../../../plugins/_autolinks.plugin.php:82
+msgid "As defined in definitions.local.txt"
 msgstr ""
 
 #: ../../../plugins/_bbcode.plugin.php:44
