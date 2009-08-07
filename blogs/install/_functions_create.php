@@ -847,10 +847,13 @@ function create_demo_contents()
 
 /*
  * $Log$
- * Revision 1.268  2009/07/22 20:08:29  yabs
+ * Revision 1.269  2009/08/07 00:00:47  fplanque
+ * i18n update
+ *
+ * Revision 1.266.2.2  2009/07/22 20:09:31  yabs
  * retiring
  *
- * Revision 1.267  2009/07/21 00:59:59  fplanque
+ * Revision 1.266.2.1  2009/07/21 00:59:50  fplanque
  * fixed locale
  *
  * Revision 1.266  2009/07/09 22:56:02  fplanque
