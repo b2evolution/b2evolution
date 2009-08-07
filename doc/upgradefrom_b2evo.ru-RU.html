@@ -7,6 +7,7 @@
 <title>b2evo package: Обновление с предыдущей версии b2evolution</title>
 
 	<meta name="viewport" content="width = 750" />
+	<meta name="robots" content="noindex, follow" />
 	<link href="../blogs/rsc/css/evo_distrib_2.css" rel="stylesheet" type="text/css" />
 	
 	 
@@ -23,7 +24,7 @@
 		
 		<div class="menu_top"> 
 			<span class="floatright"> После установки: <a href="../blogs/index.php">Блоги</a> &bull; <a href="../blogs/admin.php">Панель управления</a> </span> 
-			Перед установкой: <a href="../index.ru-RU.html">Здравствуйте!</a> &bull; <a href="changes.html">Changelog</a> &bull; <a href="../blogs/install/index.php?locale=ru-RU">Установщик</a> 		</div>
+			До установки: <a href="../index.ru-RU.html">Здравствуйте!</a> &bull; <a href="changes.html">Изменения</a> &bull; <a href="../blogs/install/index.php?locale=ru-RU">Установщик</a> 		</div>
 		
 		
 		<div class="block1">
@@ -31,12 +32,12 @@
 		<div class="block3">
 		
 		<h1>Обновление с предыдущей версии b2evolution</h1>
-		<p class="note">Перед началом, пожалуйста обратите внимание на то, что некоторые сетевые особенности b2evolution требуют от вас согласия с <a href="http://b2evolution.net/about/terms.html" target="_blank">Условиями обслуживания</a>.</p>
+		<p class="note">Перед началом, пожалуйста обратите внимание на то, что некоторые функции b2evolution требуют от вас согласия с <a href="http://b2evolution.net/about/terms.html" target="_blank">Условиями обслуживания</a>.</p>
 		<ol class="expanded">
 			<li>Сохраните все ваши файлы b2evolution. Позаботьтесь о файлах, которые вы изменяли, особенно в папках <strong>/conf</strong>, <strong>/skins</strong>, <strong>/plugins</strong>, <strong>/media</strong>, а также о заглушках, плагинах и т.д.</li>
 			<li>Вам также следует сохранить базу данных. Это можно сделать средствами вашего хостинга.</li>
 			<li>Если вы обновляетесь с версии ниже 2.0, мы настоятельно рекоммендуем вам удалить все старые файлы. Для этого удалите все папки b2evolution <strong>кроме /media</strong>. Папки для удаления:  /admin, /conf, /cron, /htsrv, /inc, /install, /plugins, /skins, /skins_adm, /xmlsrv. В зависимости от установленной у вас версии, вы можете не найти некоторых из этих папок. Еще раз, пожалуйста, убедитесь что вы сделали резервную копию перед удалением!</li>
-			<li>Загрузите <strong>все новые файлы b2evolution из папки /blogs</strong> на ваш сайт. Еще раз <strong>ВСЕ ФАЙЛЫ</strong>! Это означает что вы НЕ сможете использовать измененные старые файлы из /conf, темы, шаблоны и т.д. как есть!<br /> <br /> Если у ваших личных тем или плагинов другие названия (отличные от тех, которые входят в состав системы), то они не будут утеряны. То же касается и media файлов.<br /> <br /> Единственный файл, который вы должны скопировать из установленной системы в новую (шаг 1) - это <code>/blogs/_basic_config.php</code>. Вы должны либо скопировать этот файл либо перенести его содержимое для того чтобы начать процесс обновления.</li>
+			<li>Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you cannot reuse your default /conf files, default skin templates or default plugins if you have modified them without renaming them.<br /> <br /> Since your custom configurations, custom skins and custom plugins should be using different names, they should typically not be overwritten. Same for your media files.<br /> <br /> The single one file you must absolutely pay attention to is <code>/blogs/conf/_basic_config.php</code>. You will need to either keep, recreate or restore that file from backup (see step 1) before you can proceed with the upgrade.</li>
 			<li>Запустите установочный скрипт на вашем сервере. Он находится в <code>http://yoursite.com/yourblogsfolder/install</code>. Затем, просто следуйте инструкциям установщика.<br /> <br /> Установщик предложит вам обновление с <strong>любой</strong> установленной версии b2evolution до текущей.</li>
 			<li>Проверьте работоспособность новой системы.</li>
 			<li>Прочтите онлайн руководство для <a href="http://manual.b2evolution.net/Upgrade_from_an_older_version" target="_blank">дополнительных возможностей обновления</a> до вашей новой версии b2evolution.</li>
