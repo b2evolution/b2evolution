@@ -7,47 +7,48 @@
 ; Values are separated by ;
 ; Field 1 = word to autolink
 ; Field 2 = optional previous required word (allows to create groups of 2 words)
-; Field 3 = url
+; Field 3 = reserved
+; Field 4 = url
 
 ; Team members and their b2evo blogs
-tblue;;www.ax86.net/
-leeturner;;www.leeturner.org/
-waltercruz;;b2evolution.waltercruz.com/
-sam2kb;;ru.b2evo.net/
-personman;;personman.com/
-fplanque;;fplanque.com/
-blueyed;;daniel.hahler.de/
+tblue;;;www.ax86.net/
+leeturner;;;www.leeturner.org/
+waltercruz;;;b2evolution.waltercruz.com/
+sam2kb;;;ru.b2evo.net/
+personman;;;personman.com/
+fplanque;;;fplanque.com/
+blueyed;;;daniel.hahler.de/
 
 ; A couple of English definitions
-csv;;www.tellmewhatis.com/csv-comma-separated-values
-dns;;www.tellmewhatis.com/dns-domain-name-system
-ethernet;;www.tellmewhatis.com/ethernet
-ftp;;www.tellmewhatis.com/ftp-file-transfer-protocol
-rss;;webreference.fr/defintions/rss-atom-xml
-xml;;www.tellmewhatis.com/xml
+csv;;;www.tellmewhatis.com/csv-comma-separated-values
+dns;;;www.tellmewhatis.com/dns-domain-name-system
+ethernet;;;www.tellmewhatis.com/ethernet
+ftp;;;www.tellmewhatis.com/ftp-file-transfer-protocol
+rss;;;webreference.fr/defintions/rss-atom-xml
+xml;;;www.tellmewhatis.com/xml
 
 ; b2evo stuff
-b2;;b2evolution.net/
-b2evo;;b2evolution.net/
-b2evolution;;b2evolution.net/
-engine;multiblog;b2evolution.net/
-evoskin;;skins.b2evolution.net/
-evoskins;;skins.b2evolution.net/
-platform;multiblog;b2evolution.net/
-skin;evo;skins.b2evolution.net/
-skins;evo;skins.b2evolution.net/
+b2;;;b2evolution.net/
+b2evo;;;b2evolution.net/
+b2evolution;;;b2evolution.net/
+engine;multiblog;;b2evolution.net/
+evoskin;;;skins.b2evolution.net/
+evoskins;;;skins.b2evolution.net/
+platform;multiblog;;b2evolution.net/
+skin;evo;;skins.b2evolution.net/
+skins;evo;;skins.b2evolution.net/
 
 ; A couple of French definitions (TODO: different files by language/locale)
-hypertexte;;webreference.fr/defintions/www/hypertexte
+hypertexte;;;webreference.fr/defintions/www/hypertexte
 
 ; Twitter handles:
-@b2evolution;;twitter.com/b2evolution
-@tblue;;twitter.com/tblue
-@leeturner;;twitter.com/leeturner
-@waltercruz;;twitter.com/waltercruz
-@francoisplanque;;twitter.com/francoisplanque
-@sam2kb;;twitter.com/sam2kb
-@blueyed;;twitter.com/blueyed
+@b2evolution;;;twitter.com/b2evolution
+@tblue;;;twitter.com/tblue
+@leeturner;;;twitter.com/leeturner
+@waltercruz;;;twitter.com/waltercruz
+@francoisplanque;;;twitter.com/francoisplanque
+@sam2kb;;;twitter.com/sam2kb
+@blueyed;;;twitter.com/blueyed
 ; Aliases
-@b2evo;;twitter.com/b2evolution
-@fplanque;;twitter.com/francoisplanque
+@b2evo;;;twitter.com/b2evolution
+@fplanque;;;twitter.com/francoisplanque

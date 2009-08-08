@@ -108,6 +108,8 @@ class autolinks_plugin extends Plugin
 		{	// Load local user defintions:
 			$this->read_csv_file( $plugins_path.'autolinks_plugin/definitions.local.txt' );
 		}
+
+		// pre_dump( $this->link_array );
 	}
 
 
@@ -125,11 +127,11 @@ class autolinks_plugin extends Plugin
 
 		while( ($data = fgetcsv($handle, 1000, ';', '"')) !== false )
 		{
-			if( empty($data[0]) || empty($data[2]) )
+			if( empty($data[0]) || empty($data[3]) )
 			{	// Skip empty and comment lines
 				continue;
 			}
-			$this->link_array[$data[0]] = array( $data[1], $data[2] );
+			$this->link_array[$data[0]] = array( $data[1], $data[3] );
 		}
 		fclose($handle);
 	}
@@ -207,6 +209,7 @@ class autolinks_plugin extends Plugin
 
 			if( in_array( $url, $this->already_linked_array ) )
 			{	// Do not repeat link to same destination:
+				// pre_dump( 'already linked:'. $url );
 				return $r;
 			}
 
@@ -214,6 +217,7 @@ class autolinks_plugin extends Plugin
 			{
 				if( $this->previous_lword != $previous )
 				{	// We do not have the required previous word
+					// pre_dump( 'previous word does not match', $this->previous_lword, $previous );
 					return $r;
 				}
 				$r = '==!#DEL#!==<a href="'.$url.'">'.$this->previous_word.' '.$word.'</a>';
@@ -237,6 +241,9 @@ class autolinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.26  2009/08/08 16:01:14  fplanque
+ * minor
+ *
  * Revision 1.25  2009/08/07 17:00:07  fplanque
  * added conf options
  *
