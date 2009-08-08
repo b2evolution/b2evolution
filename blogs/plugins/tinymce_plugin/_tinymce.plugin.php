@@ -681,7 +681,7 @@ class tinymce_plugin extends Plugin
 
 		$tmce_plugins_array = array( 'more', 'pagebreak', 'searchreplace', 'inlinepopups', 'table', 'media', 'visualchars', 'nonbreaking', 'safari', 'fullscreen' );
 		
-		// Requires cURL extension since fsockopen + ssl produse fatal error
+		// Requires cURL extension since fsockopen + ssl produce fatal error
 		// if PHP configured without openSSL
 		if( extension_loaded('curl') )
 		{
@@ -735,7 +735,7 @@ class tinymce_plugin extends Plugin
 			$tmce_theme_advanced_buttons3_array = array(
 				'visualchars,visualaid',
 				'table,row_props,cell_props,delete_col,delete_row,col_after,col_before,row_after,row_before,row_after,row_before,split_cells,merge_cells',
-				'sub,sup',
+				'sub,sup'
 			);
 
 			if( $this->UserSettings->get('tmce_options_directionality') == 1 )
@@ -750,7 +750,7 @@ class tinymce_plugin extends Plugin
 				$tmce_theme_advanced_buttons3_array[] = 'pastetext,pasteword';
 			}
 			
-			// Requires cURL extension since fsockopen + ssl produse fatal error
+			// Requires cURL extension since fsockopen + ssl produce fatal error
 			// if PHP configured without openSSL
 			if( extension_loaded('curl') )
 			{
