@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2009-08-07 19:19+0100\n"
+"PO-Revision-Date: 2009-08-08 17:25+0100\n"
 "Last-Translator: Francois Planque <http://fplanque.com>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -271,13 +271,9 @@ msgstr "Téléchargez les fichiers de b2evolution sur votre serveur web."
 msgid "Only the contents of the <code>/blogs</code> directory need to be uploaded to your site. If you want b2evolution to handle the homepage of your site, upload the contents of the <code>/blogs</code> folder to your website root. Otherwise, it's best to upload the files to a subdirectory of your webserver. You can keep the <code>/blogs</code> subdirectory name, but you can also choose another."
 msgstr "Seuls les contenus du répertoire <code>/blogs</code> ont besoin d'être téléchargés sur votre serveur. Si vous voulez que b2evolution prenne en charge la page d'accueil de votre site, téléchargez les contenus du dossier <code>/blogs</code> à la racine de votre site web. Autrement, le mieux est de télécharger les fichiers dans un sous-répertoire de votre site web. Vous pouvez conserver le nom de répertoire <code>/blogs</code>, mais vous pouvez également en choisir un autre."
 
-#: ../../doc/install_new.src.html:46
-msgid "Let's assume you install the contents of the blogs folder to <code>http://yoursite.com/yourfolder</code> ..."
-msgstr "Supposons que vous installiez les contenus du répertoire blogs à l'emplacement <code>http://votresite.com/votredossier</code> ..."
-
-#: ../../doc/install_new.src.html:47
-msgid "Run the installation script on your server. It is located in <code>http://yoursite.com/yourfolder/install</code> . Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you a few questions, create required database tables and configure b2evolution for you."
-msgstr "Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/votredossier/install</code>. Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation vos posera quelques questions, créera les tables requises dans la base de donnés et configurera b2evolution pour vous."
+#: ../../doc/install_new.src.html:45
+msgid "Run the installation script on your server. Go to the following address in your web borwser <code>http://yoursite.com/yourfolder/install/index.php</code> (replace yoursite.com and yourfolder depending on where you installed). Then, simply follow the on screen instructions.<br /> <br /> The installer will ask you a few questions, create required database tables and configure b2evolution for you."
+msgstr "Executez le script d'installation sur votre serveur. Il est situé à l'emplacement <code>http://votresite.com/votredossier/install/index.php</code> (remplacez votresite.com et votredossier en fonction de l'emplacement où vous avez installé) . Ensuite, suivez simplement les instructions à l'écran.<br /> <br /> Le script d'installation vos posera quelques questions, créera les tables requises dans la base de donnés et configurera b2evolution pour vous."
 
 #: ../../doc/install_new.src.html:50
 #: ../../doc/upgradefrom_b2evo.src.html:46
