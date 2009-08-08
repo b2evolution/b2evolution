@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru-RU" lang="ru-RU">
 <head>
 	
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>b2evo package: Обновление с предыдущей версии b2evolution</title>
 
 	<meta name="viewport" content="width = 750" />
@@ -37,7 +37,7 @@
 			<li>Сохраните все ваши файлы b2evolution. Позаботьтесь о файлах, которые вы изменяли, особенно в папках <strong>/conf</strong>, <strong>/skins</strong>, <strong>/plugins</strong>, <strong>/media</strong>, а также о заглушках, плагинах и т.д.</li>
 			<li>Вам также следует сохранить базу данных. Это можно сделать средствами вашего хостинга.</li>
 			<li>Если вы обновляетесь с версии ниже 2.0, мы настоятельно рекоммендуем вам удалить все старые файлы. Для этого удалите все папки b2evolution <strong>кроме /media</strong>. Папки для удаления:  /admin, /conf, /cron, /htsrv, /inc, /install, /plugins, /skins, /skins_adm, /xmlsrv. В зависимости от установленной у вас версии, вы можете не найти некоторых из этих папок. Еще раз, пожалуйста, убедитесь что вы сделали резервную копию перед удалением!</li>
-			<li>Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you cannot reuse your default /conf files, default skin templates or default plugins if you have modified them without renaming them.<br /> <br /> Since your custom configurations, custom skins and custom plugins should be using different names, they should typically not be overwritten. Same for your media files.<br /> <br /> The single one file you must absolutely pay attention to is <code>/blogs/conf/_basic_config.php</code>. You will need to either keep, recreate or restore that file from backup (see step 1) before you can proceed with the upgrade.</li>
+			<li>Загрузите <strong>все новые файлы b2evolution из папки /blogs</strong> на ваш сайт. Еще раз <strong>ВСЕ ФАЙЛЫ</strong>! Это означает что вы НЕ сможете использовать измененные старые конфигурационные файлы из /conf, темы и плагины по умолчанию (если вы не изменяли их названия)!<br /> <br /> Если у ваших личных тем или плагинов другие названия (отличные от тех, которые входят в состав системы), то они не будут утеряны. То же касается и media файлов.<br /> <br /> Единственный файл, который вас должен интересовать - это <code>/blogs/_basic_config.php</code>. Вы должны либо скопировать этот файл либо перенести его содержимое (см. шаг 1) для того, чтобы начать процесс обновления.</li>
 			<li>Запустите установочный скрипт на вашем сервере. Он находится в <code>http://yoursite.com/yourblogsfolder/install</code>. Затем, просто следуйте инструкциям установщика.<br /> <br /> Установщик предложит вам обновление с <strong>любой</strong> установленной версии b2evolution до текущей.</li>
 			<li>Проверьте работоспособность новой системы.</li>
 			<li>Прочтите онлайн руководство для <a href="http://manual.b2evolution.net/Upgrade_from_an_older_version" target="_blank">дополнительных возможностей обновления</a> до вашей новой версии b2evolution.</li>
