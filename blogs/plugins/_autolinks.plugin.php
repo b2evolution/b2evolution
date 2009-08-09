@@ -28,7 +28,7 @@ class autolinks_plugin extends Plugin
 	var $code = 'b2evALnk';
 	var $name = 'Auto Links';
 	var $priority = 60;
-	var $version = '3.3.1';
+	var $version = '3.3.2';
 	var $apply_rendering = 'opt-out';
 	var $group = 'rendering';
 	var $short_desc;
@@ -131,7 +131,18 @@ class autolinks_plugin extends Plugin
 			{	// Skip empty and comment lines
 				continue;
 			}
-			$this->link_array[$data[0]] = array( $data[1], $data[3] );
+			
+			$word = $data[0];
+			$url = $data[3];
+			if( $url =='-' )
+			{	// Remove URL (useful to remove some defs on a specific site):
+				unset( $this->link_array[$word] );
+			}
+			else
+			{
+				$this->link_array[$word] = array( $data[1], $url );
+			}
+
 		}
 		fclose($handle);
 	}
@@ -181,7 +192,7 @@ class autolinks_plugin extends Plugin
 		$this->previous_lword = null;
 
 		// Find word with 3 characters at least:
-		$text = preg_replace_callback( '/(^|\s)([@a-z0-9_\-]{3,})/i', array( $this, 'replace_callback' ), $text );
+		$text = preg_replace_callback( '/(^|\s)([@a-z0-9_\-]{3,})/i', array( & $this, 'replace_callback' ), $text );
 
 		// pre_dump($text);
 
@@ -207,6 +218,8 @@ class autolinks_plugin extends Plugin
 			$previous = $this->link_array[$lword][0];
 			$url = 'http://'.$this->link_array[$lword][1];
 
+			// pre_dump( $this->already_linked_array );
+
 			if( in_array( $url, $this->already_linked_array ) )
 			{	// Do not repeat link to same destination:
 				// pre_dump( 'already linked:'. $url );
@@ -229,6 +242,7 @@ class autolinks_plugin extends Plugin
 
 			// Make sure we don't link to same destination twice in the same text/post:
 			$this->already_linked_array[] = $url;
+			// pre_dump( $this->already_linked_array );
 		}
 
 		$this->previous_word = $word;
@@ -241,6 +255,9 @@ class autolinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.27  2009/08/09 18:22:03  fplanque
+ * MFB
+ *
  * Revision 1.26  2009/08/08 16:01:14  fplanque
  * minor
  *
