@@ -47,15 +47,15 @@ $have_plugins = false;
 $Plugins->restart();
 while( $loop_Plugin = & $Plugins->get_next() )
 {
-	// We use output buffers here to display the fieldset only if there's content in there
-	ob_start();
-
 	$Form->begin_form( 'fform' );
 
 		$Form->hidden_ctrl();
 		$Form->hidden( 'tab', 'plugin_settings' );
 		$Form->hidden( 'action', 'update' );
 		$Form->hidden( 'blog', $Blog->ID );
+
+	// We use output buffers here to display the fieldset only if there's content in there
+	ob_start();
 
 	$Form->begin_fieldset( $loop_Plugin->name );
 
@@ -80,8 +80,6 @@ while( $loop_Plugin = & $Plugins->get_next() )
 		ob_end_flush();
 		ob_end_flush();
 
-		$Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
-															array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 		$have_plugins = true;
 	}
 	else
@@ -91,13 +89,22 @@ while( $loop_Plugin = & $Plugins->get_next() )
 	}
 }
 
-if( ! $have_plugins )
+if( $have_plugins )
+{	// End form:
+	$Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
+															array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+}
+else
 {	// Display a message:
 	echo '<p>', T_( 'There are no plugins providing blog-specific settings.' ), '</p>';
+	$Form->end_form();
 }
 
 /*
  * $Log$
+ * Revision 1.4  2009/08/09 19:15:12  fplanque
+ * fix for when there are multiple plugins with blog specific settings
+ *
  * Revision 1.3  2009/05/28 10:08:56  tblue246
  * Display a message if there are no plugin settings
  *
