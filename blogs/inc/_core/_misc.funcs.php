@@ -750,7 +750,7 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 			}
 		}
 		elseif( $in_a_tag )
-		{	// In a link but no longer inside <a>...</a> tag or any othe rembedded tag like <strong> or whatever
+		{	// In a link but no longer inside <a>...</a> tag or any other embedded tag like <strong> or whatever
 			switch( $text[$i] )
 			{
 				case '<':
@@ -758,7 +758,10 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 					{	// Ok, this is the end tag of the link:
 						// $r .= substr($text, $from_pos, $i-$from_pos+4);
 						// $from_pos = $i+4;
-						$i += 3;
+						$i += 4;
+						// pre_dump( 'END A TAG: '.substr($text, $from_pos, $i-$from_pos) );
+						$r .= substr($text, $from_pos, $i-$from_pos);
+						$from_pos = $i;
 						$in_a_tag = false;
 						$in_tag_quote = false;
 					}
@@ -3550,6 +3553,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.126  2009/08/10 03:45:42  fplanque
+ * fixes
+ *
  * Revision 1.125  2009/08/06 16:35:57  fplanque
  * no message
  *

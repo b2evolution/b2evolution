@@ -38,9 +38,9 @@ class autolinks_plugin extends Plugin
 	/**
 	 * Lazy loaded from txt files
 	 *
-	 * @var array
+	 * @var array of array for each blog. Index 0 is for shared content
 	 */
-	var $link_array = null;
+	var $link_array = array();
 
 	var $already_linked_array;
 
@@ -81,35 +81,80 @@ class autolinks_plugin extends Plugin
 						'type' => 'checkbox',
 						'note' => T_('As defined in definitions.local.txt'),
 					),
+				'autolink_defs_db' => array(
+						'label' => '',
+						'type' => 'html_textarea',
+						'rows' => 15,
+						'note' => $this->T_( 'Enter custom definitions above.' ),
+						'defaultvalue' => '',
+					),
 			);
 	}
 
 
 	/**
-	 * Lazy load definitions array
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
-	function load_link_array()
+	function get_coll_setting_definitions( & $params )
+	{
+		return array(
+				'autolink_defs_coll_db' => array(
+						'label' => T_( 'Custom autolink definitions' ),
+						'type' => 'html_textarea',
+						'rows' => 15,
+						'note' => $this->T_( 'Enter custom definitions above.' ),
+						'defaultvalue' => '',
+					),
+			);
+	}
+
+
+	/**
+	 * Lazy load global definitions array
+	 *
+	 * @param Blog
+	 */
+	function load_link_array( $Blog )
 	{
 		global $plugins_path;
 
-		if( !is_null($this->link_array) )
-		{
-			return;
+		if( !isset($this->link_array[0]) )
+		{	// global defs NOT already loaded
+			$this->link_array[0] = array();
+
+			if( $this->Settings->get( 'autolink_defs_default' ) )
+			{	// Load defaults:
+				$this->read_csv_file( $plugins_path.'autolinks_plugin/definitions.default.txt', 0 );
+			}
+			if( $this->Settings->get( 'autolink_defs_local' ) )
+			{	// Load local user defintions:
+				$this->read_csv_file( $plugins_path.'autolinks_plugin/definitions.local.txt', 0 );
+			}
+			$text = $this->Settings->get( 'autolink_defs_db', 0 );
+			if( !empty($text) )
+			{	// Load local user defintions:
+				$this->read_textfield( $text, 0 );
+			}
 		}
 
-		$this->link_array = array();
-
-		if( $this->Settings->get( 'autolink_defs_default' ) )
-		{	// Load defaults:
-			$this->read_csv_file( $plugins_path.'autolinks_plugin/definitions.default.txt' );
+		// load defs for current blog:
+		$coll_ID = $Blog->ID;
+		if( !isset($this->link_array[$coll_ID]) )
+		{	// This blog is not loaded yet:
+			$this->link_array[$coll_ID] = array();
+			$text = $this->get_coll_setting( 'autolink_defs_coll_db', $Blog );
+			if( !empty($text) )
+			{	// Load local user defintions:
+				$this->read_textfield( $text, $coll_ID );
+			}
 		}
-		if( $this->Settings->get( 'autolink_defs_local' ) )
-		{	// Load local user defintions:
-			$this->read_csv_file( $plugins_path.'autolinks_plugin/definitions.local.txt' );
-		}
 
-		// pre_dump( $this->link_array );
+		// Prepare working link array:
+		$this->replacement_link_array = array_merge( $this->link_array[0], $this->link_array[$coll_ID] );
+
+		// pre_dump( $this->replacement_link_array );
 	}
 
 
@@ -118,7 +163,7 @@ class autolinks_plugin extends Plugin
 	 *
 	 * @param string $filename
 	 */
-	function read_csv_file( $filename )
+	function read_csv_file( $filename, $coll_ID )
 	{
 		if( ! $handle = @fopen( $filename, 'r') )
 		{	// File could not be opened:
@@ -127,24 +172,57 @@ class autolinks_plugin extends Plugin
 
 		while( ($data = fgetcsv($handle, 1000, ';', '"')) !== false )
 		{
-			if( empty($data[0]) || empty($data[3]) )
-			{	// Skip empty and comment lines
-				continue;
-			}
-			
-			$word = $data[0];
-			$url = $data[3];
-			if( $url =='-' )
-			{	// Remove URL (useful to remove some defs on a specific site):
-				unset( $this->link_array[$word] );
-			}
-			else
-			{
-				$this->link_array[$word] = array( $data[1], $url );
-			}
-
+			$this->read_line( $data, $coll_ID );
 		}
+
 		fclose($handle);
+	}
+
+
+	/**
+ 	 * Load contents of one large textfield to be treated as CSV
+ 	 *
+ 	 * Note: This method is probably not well suited for very large lists.
+	 *
+	 * @param string $filename
+	 */
+	function read_textfield( $text, $coll_ID )
+	{
+		// split into lines:
+		$lines = preg_split( '#\r|\n#', $text );
+
+		foreach( $lines as $line )
+		{
+			// CSV style decoding in memory:
+			// $keywords = preg_split( "/[\s,]*\\\"([^\\\"]+)\\\"[\s,]*|[\s,]+/", "textline with, commas and \"quoted text\" inserted", 0, PREG_SPLIT_DELIM_CAPTURE );
+			$data = explode( ';', $line );
+			$this->read_line( $data, $coll_ID );
+		}
+	}
+
+
+	/**
+	 * read line
+	 *
+	 * @param exploded $data array
+	 */
+	function read_line( $data, $coll_ID )
+	{
+		if( empty($data[0]) || empty($data[3]) )
+		{	// Skip empty and comment lines
+			return;
+		}
+
+		$word = $data[0];
+		$url = $data[3];
+		if( $url =='-' )
+		{	// Remove URL (useful to remove some defs on a specific site):
+			unset( $this->link_array[$coll_ID][$word] );
+		}
+		else
+		{
+			$this->link_array[$coll_ID][$word] = array( $data[1], $url );
+		}
 	}
 
 
@@ -158,8 +236,14 @@ class autolinks_plugin extends Plugin
 	function RenderItemAsHtml( & $params )
 	{
 		$content = & $params['data'];
+		$Item = & $params['Item'];
+    /**
+		 * @var Blog
+		 */
+		$item_Blog = $params['Item']->get_Blog();
 
-		$this->load_link_array();
+		// load global defs
+		$this->load_link_array( $item_Blog );
 
 		// reset already linked:
 		$this->already_linked_array = array();
@@ -173,7 +257,7 @@ class autolinks_plugin extends Plugin
 			$content = make_clickable( $content );
 		}
 
-		if( ! empty($this->link_array) )
+		if( ! empty($this->replacement_link_array) )
 		{ // Make the desired remaining terms/definitions clickable:
 			$content = make_clickable( $content, '&amp;', array( $this, 'make_clickable_callback' ) );
 		}
@@ -192,7 +276,7 @@ class autolinks_plugin extends Plugin
 		$this->previous_lword = null;
 
 		// Find word with 3 characters at least:
-		$text = preg_replace_callback( '/(^|\s)([@a-z0-9_\-]{3,})/i', array( & $this, 'replace_callback' ), $text );
+		$text = preg_replace_callback( '/(^|\s|[(),;])([@a-z0-9_\-]{3,})/i', array( & $this, 'replace_callback' ), $text );
 
 		// pre_dump($text);
 
@@ -213,10 +297,10 @@ class autolinks_plugin extends Plugin
 		$lword = strtolower($word);
 		$r = $sign.$word;
 
-		if( isset( $this->link_array[$lword] ) )
+		if( isset( $this->replacement_link_array[$lword] ) )
 		{
-			$previous = $this->link_array[$lword][0];
-			$url = 'http://'.$this->link_array[$lword][1];
+			$previous = $this->replacement_link_array[$lword][0];
+			$url = 'http://'.$this->replacement_link_array[$lword][1];
 
 			// pre_dump( $this->already_linked_array );
 
@@ -255,6 +339,9 @@ class autolinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.28  2009/08/10 03:45:42  fplanque
+ * fixes
+ *
  * Revision 1.27  2009/08/09 18:22:03  fplanque
  * MFB
  *
