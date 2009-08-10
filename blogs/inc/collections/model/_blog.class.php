@@ -375,12 +375,17 @@ class Blog extends DataObject
 			$this->set_setting( 'what_to_show', get_param( 'what_to_show' ) );
 
 			param_integer_range( 'posts_per_page', 1, 9999, T_('Items/days per page must be between %d and %d.') );
-			$this->set_setting( 'posts_per_page', get_param( 'posts_per_page' ) );
-
 			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
+			$this->set_setting( 'posts_per_page', get_param( 'posts_per_page' ) );
 
  			$this->set_setting( 'orderby', param( 'orderby', 'string', true ) );
  			$this->set_setting( 'orderdir', param( 'orderdir', 'string', true ) );
+		}
+
+
+		if( param( 'archives_sort_order',   'string', NULL ) !== NULL )
+		{
+			$this->set_setting( 'archives_sort_order', param( 'archives_sort_order', 'string', false ) );
 		}
 
 		if( param( 'feed_content',   'string', NULL ) !== NULL )
@@ -2132,6 +2137,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.73  2009/08/10 17:15:24  waltercruz
+ * Adding permalinks on postbypost archive mode and adding a button to set the sort order on postbypost mode
+ *
  * Revision 1.72  2009/07/14 10:55:03  tblue246
  * Bugfix: Remember requested page number when redirecting to a canonical chapter URL
  *

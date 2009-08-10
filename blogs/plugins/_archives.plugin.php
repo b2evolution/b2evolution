@@ -131,11 +131,20 @@ class archives_plugin extends Plugin
 			$params['mode'] = $Blog->get_setting('archive_mode');
 
 		//Sort order (used only in postbypost mode):
-		if($params['mode'] !='postbypost'){
+		if($params['mode'] !='postbypost')
+		{
 			$params['sort_order'] = 'date';
 		}
-		elseif(!isset($params['sort_order']) || $params['sort_order'] == '') {
-			$params['sort_order'] = 'date';
+		if(!isset($params['sort_order']))
+		{
+			if ( !is_null ($Blog->get_setting('archives_sort_order') ) )
+			{
+				$params['sort_order'] = $Blog->get_setting('archives_sort_order');
+			}
+			else
+			{
+				$params['sort_order'] = 'date';
+			}
 		}
 
 		// Link type:
@@ -180,7 +189,7 @@ class archives_plugin extends Plugin
 		}
 
 		echo $params['list_start'];
-		while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title) )
+		while( $ArchiveList->get_item( $arc_year, $arc_month, $arc_dayofmonth, $arc_w, $arc_count, $post_ID, $post_title, $permalink) )
 		{
 			echo $params['line_start'];
 			switch( $params['mode'] )
@@ -269,12 +278,13 @@ class archives_plugin extends Plugin
 						echo '<a rel="nofollow" href="'.regenerate_url( $params['context_isolation'], 'p='.$post_ID ).'">'.$text.'</a>';
 					}
 					else
-					{	// We want to link to the absolute (canonical) URL for this archive:
-						// fp> TODO: This is NOT canonical. To go to the canonical, we'd need a 'light' itemlist (which does not load too much data)
-						// fp> Note: there may be a "redirect to canonical" anyway. Not optimal, but at least this is less broken than it was before.
+					{
 						// fp> THIS IS ALL OBSOLETE. There is a better way to have a post list with a specific widget.
 						// TO BE DELETED (waiting for photoblog cleanup)
-						echo '<a href="'.url_add_param( $Blog->get('url'), 'p='.$post_ID.'&amp;more=1&amp;c=1&amp;tb=1&amp;pb=1' ).'">'.$text.'</a>';
+
+						// until the cleanup, a fix. I hope.
+
+						echo '<a href="'. $permalink .'">'.$text.'</a>';
 					}
 			}
 
@@ -364,6 +374,7 @@ class ArchiveList extends Results
 	{
 		global $DB;
 		global $blog, $cat, $catsel;
+		global $Blog;
 		global $show_statuses;
 		global $author, $assgn, $status, $types;
 		global $timestamp_min, $timestamp_max;
@@ -465,17 +476,30 @@ class ArchiveList extends Results
 			case 'postbypost':
 			default:
 				// ----------------------------- POSY BY POST ARCHIVES --------------------------------
-				$sql = 'SELECT DISTINCT '.$this->dbIDname.', '.$this->dbprefix.'datestart, '.$this->dbprefix.'title '
-													.$this->from
-													.$this->where
-													.$this->group_by.'
-													ORDER BY ';
-				if($sort_order == 'title'){
-					$sql .= $this->dbprefix.'title ASC';
+
+				$archives_list = new ItemListLight( $Blog );
+				$archives_list->set_filters( array(
+				'visibility_array' => array( 'published' ),  // We only want to advertised published items
+				'types' => '-1000,1500,1520,1530,1570,1600,3000',	// Include all types except pages, intros and sidebar links:
+	) );
+
+				if($sort_order == 'title')
+				{
+					$archives_list->set_filters( array(
+					'orderby' => 'title',
+					'order' => 'ASC') );
 				}
-				else if($sort_order == 'date'){
-					$sql .= $this->dbprefix.'datestart DESC';
+			
+				$archives_list->query();
+				$this->rows = array();
+				while ($Item = $archives_list->get_item())
+				{
+					$this->rows[] = $Item;
 				}
+				$this->result_num_rows = $archives_list->result_num_rows;
+				$this->current_idx = 0;
+				$this->arc_w_last = '';
+				return;
 		}
 
 
@@ -489,7 +513,6 @@ class ArchiveList extends Results
 				$sql = 'SELECT SQL_CALC_FOUND_ROWS '.substr( $sql, 7 ); // "SQL_CALC_FOUND_ROWS" available since MySQL 4
 			}
 		}
-
 
 		parent::Results( $sql, 'archivelist_', '', $limit );
 
@@ -566,7 +589,7 @@ class ArchiveList extends Results
 	 *
 	 * WARNING: these are *NOT* Item objects!
 	 */
-	function get_item( & $arc_year, & $arc_month, & $arc_dayofmonth, & $arc_w, & $arc_count, & $post_ID, & $post_title )
+	function get_item( & $arc_year, & $arc_month, & $arc_dayofmonth, & $arc_w, & $arc_count, & $post_ID, & $post_title, & $permalink )
 	{
 		// echo 'getting next item<br />';
 
@@ -600,8 +623,9 @@ class ArchiveList extends Results
 
 			case 'postbypost':
 			default:
-				$post_ID = $arc_row->post_ID;
-				$post_title = $arc_row->{$this->dbprefix.'title'};
+				$post_ID = $arc_row->ID;
+				$post_title = $arc_row->title;
+				$permalink = $arc_row->get_permanent_url();
 				return true;
 		}
 	}
@@ -612,6 +636,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.55  2009/08/10 17:15:25  waltercruz
+ * Adding permalinks on postbypost archive mode and adding a button to set the sort order on postbypost mode
+ *
  * Revision 1.54  2009/08/03 13:30:15  tblue246
  * Make title of Archives widget editable. Fixes http://forums.b2evolution.net//viewtopic.php?p=94788
  *

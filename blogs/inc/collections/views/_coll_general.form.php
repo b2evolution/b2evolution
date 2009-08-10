@@ -98,6 +98,10 @@ $Form->begin_fieldset( T_('Content / Posts') );
 											array( 'daily', T_('daily') ),
 											array( 'postbypost', T_('post by post') )
 										), T_('Archive grouping'), false,  T_('How do you want to browse the post archives? May also apply to permalinks.') );
+	$Form->radio( 'archives_sort_order',  $edited_Blog->get_setting('archives_sort_order'),
+							array(  array( 'date', T_('date') ),
+											array( 'title', T_('title') ),
+										), T_('Archive sort order'), false,  T_('How to sort your archives? (only in post by post mode)') );
 $Form->end_fieldset();
 
 
@@ -114,6 +118,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.12  2009/08/10 17:15:25  waltercruz
+ * Adding permalinks on postbypost archive mode and adding a button to set the sort order on postbypost mode
+ *
  * Revision 1.11  2009/07/06 12:50:51  sam2kb
  * Typo fo => do
  *
