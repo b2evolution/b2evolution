@@ -235,7 +235,11 @@ load_funcs('_core/_url.funcs.php');
 /**
  * Locale selection:
  * We need to do this as early as possible in order to set DB connection charset below
- * fp> that does not explain why it needs to be here!! Why do we need to set the Db charset HERE? BEFORE WHAT? 
+ * fp> that does not explain why it needs to be here!! Why do we need to set the Db charset HERE? BEFORE WHAT?
+ *
+ * sam2kb> ideally we should set the right DB charset at the time when we connect to the database. The reason is until we do it all data pulled out from DB is in wrong encoding. I put the code here because it depends on _param.funcs, so if move the _param.funcs higher we can also move this code right under _connect_db
+ * See also http://forums.b2evolution.net//viewtopic.php?p=95100
+ * 
  */
 $Debuglog->add( 'default_locale from conf: '.$default_locale, 'locale' );
 
@@ -662,6 +666,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.113  2009/08/12 12:01:49  sam2kb
+ * doc
+ *
  * Revision 1.112  2009/08/06 15:11:15  fplanque
  * doc
  *
