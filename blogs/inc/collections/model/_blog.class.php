@@ -606,6 +606,9 @@ class Blog extends DataObject
 			if( param( 'aggregate_coll_IDs', 'string', NULL ) !== NULL )
 			{ // Aggregate list: (can be '*')
 				$aggregate_coll_IDs = get_param( 'aggregate_coll_IDs' );
+				// Sanitize the string
+				$aggregate_coll_IDs = implode( ',', array_filter( array_map( 'trim', explode( ',', $aggregate_coll_IDs ) ) ) );
+				
 				// fp> TODO: check perms on each aggregated blog (if changed)
 				// fp> TODO: better interface
 				if( $aggregate_coll_IDs != '*' && !preg_match( '#^([0-9]+(,[0-9]+)*)?$#', $aggregate_coll_IDs ) )
@@ -2137,6 +2140,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.74  2009/08/13 00:41:47  sam2kb
+ * Sanitize aggregate_coll_IDs list
+ *
  * Revision 1.73  2009/08/10 17:15:24  waltercruz
  * Adding permalinks on postbypost archive mode and adding a button to set the sort order on postbypost mode
  *
