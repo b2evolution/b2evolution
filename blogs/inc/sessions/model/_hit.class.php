@@ -977,6 +977,7 @@ class Hit
 					'su',           // suche.web.de
 					'Gw',           // scroogle.org
 					'text',         // yandex.ru
+					'search_query',	// search.ukr.net
 				);
 		
 		// This is needed for google image search to extract q param
@@ -990,6 +991,12 @@ class Hit
 			if( !empty($param_parts[1]) && in_array( $param_parts[0], $known_search_params )	)
 			{ // found "q" query parameter
 				$q = trim(urldecode($param_parts[1]));
+				
+				if( preg_match( '~^[0-9]+$~', $q ) && $param_parts[0] == 'p' )
+				{	// ?p=5&text=keyword
+					continue;
+				}
+				
 				$q = convert_charset($q, $evo_charset);
 				return $q;
 			}
@@ -1010,9 +1017,35 @@ class Hit
 	 */
 	function extract_serprank_from_referer( $ref )
 	{
-		if( preg_match( '/[?&](start|cd)=([0-9]+)/i', $ref, $matches ) )
+		if( ($pos_question = strpos( $ref, '?' )) == false )
 		{
-			return $matches[2];
+			return NULL;
+		}
+		
+		$serprank_params = array(
+				'start',	// google
+				'cd',		// google
+				'b',		// yahoo
+				'page',		// aol
+				'page2',	// lycos
+				'first',	// bing
+				'sf',		// mail.ru
+				'p',		// yandex.ru
+			);
+		
+		$ref_params = explode( '&', evo_substr( $ref, $pos_question+1 ) );
+		foreach( $ref_params as $ref_param )
+		{
+			$param_parts = explode( '=', $ref_param );
+			if( !empty($param_parts[1]) && in_array( $param_parts[0], $serprank_params )	)
+			{
+				$q = trim($param_parts[1]);
+				
+				if( preg_match( '~^[0-9]+$~', $q ) )
+				{
+					return $q;
+				}
+			}
 		}
 
 		return NULL;
@@ -1111,6 +1144,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.29  2009/08/15 06:16:05  sam2kb
+ * Better serp rank extraction
+ *
  * Revision 1.28  2009/07/29 23:49:15  sam2kb
  * Better keywords extraction for google image search
  *
