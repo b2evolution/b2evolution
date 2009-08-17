@@ -669,7 +669,7 @@ function init_list_mode()
 	}
 	else
 	{	// Store/retrieve preferred tab from UserSettings:
-		$UserSettings->param_Request( 'tab', 'pref_browse_tab', 'string', NULL, true /* memorize */ );
+		$UserSettings->param_Request( 'tab', 'pref_browse_tab', 'string', NULL, true /* memorize */, true /* force */ );
 	}
 
 	/*
@@ -775,7 +775,7 @@ switch( $action )
 	case 'update': // on error
 	case 'update_publish': // on error
 		// Get tab ("simple" or "expert") from Request or UserSettings:
-		$tab = $UserSettings->param_Request( 'tab', 'pref_edit_tab', 'string', NULL, true /* memorize */ );
+		$tab = $UserSettings->param_Request( 'tab', 'pref_edit_tab', 'string', NULL, true /* memorize */, true /* force */ );
 
 		$AdminUI->add_menu_entries(
 				'items',
@@ -1027,6 +1027,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.54  2009/08/17 00:48:41  sam2kb
+ * Fixed "Unknown filterset []" bug (save default params to UserSettings)
+ * See http://forums.b2evolution.net/viewtopic.php?t=19440
+ *
  * Revision 1.53  2009/07/17 22:33:26  tblue246
  * minor/doc
  *
