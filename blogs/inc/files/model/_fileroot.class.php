@@ -84,10 +84,10 @@ class FileRoot
 	 */
 	function FileRoot( $root_type, $root_in_type_ID, $create = true )
 	{
-    /**
-     * @var User
-     */
-    global $current_User;
+		/**
+		 * @var User
+		 */
+		global $current_User;
 		global $Messages;
  		global $Settings, $Debuglog;
 
@@ -119,18 +119,28 @@ class FileRoot
 				$this->ads_url = $Blog->get_media_url();
 				return;
 
-    	case 'shared':
-    		// fp> TODO: handle multiple shared directories
+    		case 'shared':
+    			// fp> TODO: handle multiple shared directories
 				global $media_path, $media_url;
 				$rds_shared_subdir = 'shared/global/';
-    		$ads_shared_dir = $media_path.$rds_shared_subdir;
-     		if( ! $Settings->get( 'fm_enable_roots_shared' ) )
+				$ads_shared_dir = $media_path.$rds_shared_subdir;
+				
+				// Create shared directory if not exists yet
+				if( ! mkdir_r( $ads_shared_dir ) || ! is_writable($ads_shared_dir) )
+				{	// add error
+					if( is_admin_page() )
+					{
+						$Messages->add( sprintf( T_("The shared directory &laquo;%s&raquo; could not be created or is not writable.\nYou may not be able to upload files."), rel_path_to_base($ads_shared_dir) ).get_manual_link('directory_creation_error'), 'note' );
+					}
+				}
+				
+				if( ! $Settings->get( 'fm_enable_roots_shared' ) )
 				{ // Skins root is disabled:
 					$Debuglog->add( 'Attempt to access shared dir, but this feature is globally disabled', 'files' );
 				}
 				elseif( ! is_dir( $ads_shared_dir ) )
 				{
-     			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $rds_shared_subdir ), 'error' );
+					$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $rds_shared_subdir ), 'error' );
 				}
 				else
 				{
@@ -201,6 +211,10 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.6  2009/08/17 05:50:33  sam2kb
+ * Create shared/global/  directories if not exist yet
+ * See http://forums.b2evolution.net/viewtopic.php?t=19411
+ *
  * Revision 1.5  2009/03/08 23:57:43  fplanque
  * 2009
  *
