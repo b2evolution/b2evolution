@@ -3218,8 +3218,8 @@ class Item extends ItemLight
 			$DB->query( $sql, 'Save a version of the Item' );
 		}
 
-		if( $result = parent::dbupdate( $auto_track_modification ) )
-		{ // We could update the item object..
+		if( ( $result = parent::dbupdate( $auto_track_modification ) ) !== false )
+		{ // We could update the item object:
 
 			// Let's handle the extracats:
 			$this->insert_update_extracats( 'update' );
@@ -3936,6 +3936,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.124  2009/08/22 21:19:20  tblue246
+ * Item::dbupdate(): Allow ItemLight::dbupdate() to return NULL. Fixes https://bugs.launchpad.net/b2evolution/+bug/415436
+ *
  * Revision 1.123  2009/07/19 22:14:22  fplanque
  * Clean resolution of the excerpt mod date bullcrap.
  * It took 4 lines of code...
