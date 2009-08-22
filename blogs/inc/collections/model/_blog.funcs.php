@@ -114,7 +114,11 @@ function blog_update_perms( $blog, $context = 'user' )
 				'bloguser_perm_media_change' => 0,
 				'bloguser_perm_admin' => 0,
 				'bloguser_perm_properties' => 0,
-				'bloguser_perm_cats' => 0
+				'bloguser_perm_cats' => 0,
+				'bloguser_perm_page' => 0,
+				'bloguser_perm_intro' => 0,
+				'bloguser_perm_podcast' => 0,
+				'bloguser_perm_sidebar' => 0,
 			);
 
 			if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $blog )
@@ -168,12 +172,16 @@ function blog_update_perms( $blog, $context = 'user' )
 					$easy_perms['bloguser_perm_poststatuses'][] = 'deprecated';
 					$easy_perms['bloguser_perm_poststatuses'][] = 'protected';
 					$easy_perms['bloguser_perm_poststatuses'][] = 'published';
+					$easy_perms['bloguser_perm_intro'] = 1;
+					$easy_perms['bloguser_perm_podcast'] = 1;
+					$easy_perms['bloguser_perm_sidebar'] = 1;
 
 				case 'contrib':
 					$easy_perms['bloguser_perm_poststatuses'][] = 'draft';
 					$easy_perms['bloguser_perm_poststatuses'][] = 'private';
 					$easy_perms['bloguser_perm_media_upload'] = 1;
 					$easy_perms['bloguser_perm_media_browse'] = 1;
+					$easy_perms['bloguser_perm_page'] = 1;
 
 				case 'member':
 					$easy_perms['bloguser_ismember'] = 1;
@@ -192,7 +200,9 @@ function blog_update_perms( $blog, $context = 'user' )
 														.', '.$easy_perms['bloguser_perm_cats'].', '.$easy_perms['bloguser_perm_properties']
 														.', '.$easy_perms['bloguser_perm_admin']
 														.', '.$easy_perms['bloguser_perm_media_upload'].', '.$easy_perms['bloguser_perm_media_browse']
-														.', '.$easy_perms['bloguser_perm_media_change'].' ) ';
+														.', '.$easy_perms['bloguser_perm_media_change'].', '.$easy_perms['bloguser_perm_page']
+														.', '.$easy_perms['bloguser_perm_intro'].', '.$easy_perms['bloguser_perm_podcast']
+														.', '.$easy_perms['bloguser_perm_sidebar'].' ) ';
 		}
 		else
 		{	// Use checkboxes
@@ -217,6 +227,11 @@ function blog_update_perms( $blog, $context = 'user' )
 
 			$perm_redirected = param( 'blog_perm_redirected_'.$loop_ID, 'string', '' );
 			if( !empty($perm_redirected) ) $perm_post[] = 'redirected';
+
+			$perm_page    = param( 'blog_perm_page_'.$loop_ID, 'integer', 0 );
+			$perm_intro   = param( 'blog_perm_intro_'.$loop_ID, 'integer', 0 );
+			$perm_podcast = param( 'blog_perm_podcast_'.$loop_ID, 'integer', 0 );
+			$perm_sidebar = param( 'blog_perm_sidebar_'.$loop_ID, 'integer', 0 );
 
 			$perm_edit = param( 'blog_perm_edit_'.$loop_ID, 'string', 'no' );
 
@@ -249,7 +264,8 @@ function blog_update_perms( $blog, $context = 'user' )
 				$inserted_values[] = " ( $blog, $loop_ID, $ismember, ".$DB->quote(implode(',',$perm_post)).",
 																	".$DB->quote($perm_edit).",
 																	$perm_delpost, $perm_comments, $perm_cats, $perm_properties, $perm_admin,
-																	$perm_media_upload, $perm_media_browse, $perm_media_change )";
+																	$perm_media_upload, $perm_media_browse, $perm_media_change, $perm_page,
+																	$perm_intro, $perm_podcast, $perm_sidebar )";
 			}
 		}
 	}
@@ -260,7 +276,8 @@ function blog_update_perms( $blog, $context = 'user' )
 		$DB->query( "INSERT INTO $table( {$prefix}blog_ID, {$ID_field}, {$prefix}ismember,
 											{$prefix}perm_poststatuses, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_comments,
 											{$prefix}perm_cats, {$prefix}perm_properties, {$prefix}perm_admin,
-											{$prefix}perm_media_upload, {$prefix}perm_media_browse, {$prefix}perm_media_change)
+											{$prefix}perm_media_upload, {$prefix}perm_media_browse, {$prefix}perm_media_change,
+											{$prefix}perm_page, {$prefix}perm_intro, {$prefix}perm_podcast, {$prefix}perm_sidebar )
 									VALUES ".implode( ',', $inserted_values ) );
 	}
 }
@@ -455,6 +472,9 @@ function set_working_blog( $new_blog_ID )
 
 /*
  * $Log$
+ * Revision 1.5  2009/08/22 20:31:01  tblue246
+ * New feature: Post type permissions
+ *
  * Revision 1.4  2009/03/08 23:57:42  fplanque
  * 2009
  *

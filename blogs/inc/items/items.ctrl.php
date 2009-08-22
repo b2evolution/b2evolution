@@ -350,7 +350,8 @@ switch( $action )
 		$post_extracats = array_unique( $post_extracats );
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
-
+		// Check permission on post type:
+		check_perm_posttype();
 
 		// CREATE NEW POST:
 		load_class('items/model/_item.class.php');
@@ -448,6 +449,8 @@ switch( $action )
 		$post_extracats = array_unique( $post_extracats );
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
+		// Check permission on post type:
+		check_perm_posttype();
 
 		// Is this post already published?
 		$was_published = $edited_Item->status == 'published';
@@ -525,7 +528,7 @@ switch( $action )
 		// Check permissions:
 		/* TODO: Check extra categories!!! */
 		$current_User->check_perm( 'item_post!'.$post_status, 'edit', true, $edited_Item );
-		$current_User->check_perm( 'edit_timestamp', 'any', true ) ;
+		$current_User->check_perm( 'edit_timestamp', 'any', true );
 
 		$edited_Item->set( 'status', $post_status );
 
@@ -1027,6 +1030,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.55  2009/08/22 20:31:01  tblue246
+ * New feature: Post type permissions
+ *
  * Revision 1.54  2009/08/17 00:48:41  sam2kb
  * Fixed "Unknown filterset []" bug (save default params to UserSettings)
  * See http://forums.b2evolution.net/viewtopic.php?t=19440

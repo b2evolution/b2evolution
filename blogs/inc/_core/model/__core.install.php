@@ -452,11 +452,12 @@ $schema_queries = array(
 			bloguser_perm_media_upload tinyint NOT NULL default 0,
 			bloguser_perm_media_browse tinyint NOT NULL default 0,
 			bloguser_perm_media_change tinyint NOT NULL default 0,
+			bloguser_perm_page         tinyint NOT NULL default 0,
+			bloguser_perm_intro        tinyint NOT NULL default 0,
+			bloguser_perm_podcast      tinyint NOT NULL default 0,
+			bloguser_perm_sidebar      tinyint NOT NULL default 0,
 			PRIMARY KEY bloguser_pk (bloguser_blog_ID,bloguser_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
-		// bloguser_perm_page       tinyint NOT NULL default 0,   // for post type 1000
-		// bloguser_perm_intro      tinyint NOT NULL default 0,   // for post types 15xx
-		// bloguser_perm_sidebar    tinyint NOT NULL default 0,   // for post type 3000
 
 	'T_coll_group_perms' => array(
 		'Creating table for blog-group permissions',
@@ -474,11 +475,12 @@ $schema_queries = array(
 			bloggroup_perm_media_upload tinyint NOT NULL default 0,
 			bloggroup_perm_media_browse tinyint NOT NULL default 0,
 			bloggroup_perm_media_change tinyint NOT NULL default 0,
+			bloggroup_perm_page         tinyint NOT NULL default 0,
+			bloggroup_perm_intro        tinyint NOT NULL default 0,
+			bloggroup_perm_podcast      tinyint NOT NULL default 0,
+			bloggroup_perm_sidebar      tinyint NOT NULL default 0,
 			PRIMARY KEY bloggroup_pk (bloggroup_blog_ID,bloggroup_group_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
-		// bloggroup_perm_page       tinyint NOT NULL default 0,   // for post type 1000
-		// bloggroup_perm_intro      tinyint NOT NULL default 0,   // for post types 15xx
-		// bloggroup_perm_sidebar    tinyint NOT NULL default 0,   // for post type 3000
 
 	'T_links' => array(
 		'Creating table for Post Links',
@@ -586,6 +588,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.28  2009/08/22 20:31:01  tblue246
+ * New feature: Post type permissions
+ *
  * Revision 1.27  2009/08/06 14:14:17  fplanque
  * doc
  *

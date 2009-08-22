@@ -883,8 +883,50 @@ function echo_publishnowbutton_js( $action )
 	<?php
 }
 
+/**
+ * Assert that the supplied post type can be used by the current user in
+ * the current blog's context.
+ */
+function check_perm_posttype()
+{
+	global $item_typ_ID, $posttypes_perms, $current_User, $Blog;
+
+	static $posttype2perm = NULL;
+	if( $posttype2perm === NULL )
+	{	// "Reverse" the $posttypes_perms array:
+		// Tblue> Possibly bloat; this function usually is invoked only
+		//        once, thus it *may* be better to simply iterate through
+		//        the $posttypes_perms array every time and look for the
+		//        post type ID.
+		foreach( $posttypes_perms as $l_permname => $l_posttypes )
+		{
+			foreach( $l_posttypes as $ll_posttype )
+			{
+				$posttype2perm[$ll_posttype] = $l_permname;
+			}
+		}
+	}
+
+	// Tblue> Usually, when this function is invoked, item_typ_ID is not
+	//        loaded yet... If it is, it doesn't get loaded again anyway.
+	//        Item::load_from_Request() uses param() again, in case this
+	//        function wasn't called yet when load_from_Request() gets
+	//        called (does this happen?).
+	param( 'item_typ_ID', 'integer', true /* require input */ );
+	if( ! isset( $posttype2perm[$item_typ_ID] ) )
+	{	// Allow usage:
+		return;
+	}
+
+	// Check permission:
+	$current_User->check_perm( 'blog_'.$posttype2perm[$item_typ_ID], 'edit', true /* assert */, $Blog->ID );
+}
+
 /*
  * $Log$
+ * Revision 1.58  2009/08/22 20:31:01  tblue246
+ * New feature: Post type permissions
+ *
  * Revision 1.57  2009/08/22 17:07:08  tblue246
  * Minor/coding style
  *

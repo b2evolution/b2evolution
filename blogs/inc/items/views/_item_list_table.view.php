@@ -239,33 +239,42 @@ if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) 
 			$label = T_('New page');
 			$title = T_('Create a new page...');
 			$new_ptyp_ID = 1000;
+			$perm = 'page';
 			break;
 
 		case 'intros':
 			$label = T_('New intro');
 			$title = T_('Write a new intro text...');
 			$new_ptyp_ID = 1600;
+			$perm = 'intro';
 			break;
 
 		case 'podcasts':
 			$label = T_('New episode');
 			$title = T_('Package a new podcast episode...');
 			$new_ptyp_ID = 2000;
+			$perm = 'podcast';
 			break;
 
 		case 'links':
 			$label = T_('New link');
 			$title = T_('Add a sidebar link...');
 			$new_ptyp_ID = 3000;
+			$perm = 'sidebar';
 			break;
 
 		default:
 			$label = T_('New post');
 			$title = T_('Write a new post...');
 			$new_ptyp_ID = 1;
+			$perm = ''; // No need to check
 			break;
 	}
-	$ItemList->global_icon( $title, 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$new_ptyp_ID, $label.' &raquo;', 3, 4 );
+
+	if( empty( $perm ) || $current_User->check_perm( 'blog_'.$perm, 'edit', false, $Blog->ID ) )
+	{	// We have the permission to create posts with this post type:
+		$ItemList->global_icon( $title, 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$new_ptyp_ID, $label.' &raquo;', 3, 4 );
+	}
 }
 
 
@@ -283,6 +292,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.18  2009/08/22 20:31:01  tblue246
+ * New feature: Post type permissions
+ *
  * Revision 1.17  2009/03/22 17:19:37  fplanque
  * better intro posts handling
  *

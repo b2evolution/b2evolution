@@ -605,6 +605,10 @@ class User extends DataObject
 			case 'blog_properties':
 			case 'blog_cats':
 			case 'blog_genstatic':
+			case 'blog_page':
+			case 'blog_intro';
+			case 'blog_podcast':
+			case 'blog_sidebar':
 				// Blog permission to edit its properties...
 				if( $this->check_perm_blogowner( $perm_target_ID ) )
 				{	// Owner can do *almost* anything:
@@ -869,6 +873,10 @@ class User extends DataObject
 						'blog_cats' => '0',
 						'blog_properties' => '0',
 						'blog_admin' => '0',
+						'blog_page' => '0',
+						'blog_intro' => '0',
+						'blog_podcast' => '0',
+						'blog_sidebar' => '0',
 					);
 			}
 			else
@@ -889,6 +897,10 @@ class User extends DataObject
 				$this->blog_post_statuses[$perm_target_blog]['blog_cats'] = $row['bloguser_perm_cats'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_properties'] = $row['bloguser_perm_properties'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_admin'] = $row['bloguser_perm_admin'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_page'] = $row['bloguser_perm_page'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_intro'] = $row['bloguser_perm_intro'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_podcast'] = $row['bloguser_perm_podcast'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_sidebar'] = $row['bloguser_perm_sidebar'];
 			}
 		}
 
@@ -1467,6 +1479,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2009/08/22 20:31:01  tblue246
+ * New feature: Post type permissions
+ *
  * Revision 1.17  2009/03/08 23:57:46  fplanque
  * 2009
  *

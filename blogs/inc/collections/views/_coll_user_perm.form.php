@@ -81,7 +81,8 @@ if( !empty( $keywords ) )
 $sql = 'SELECT user_ID, user_login, user_level, bloguser_perm_poststatuses, bloguser_perm_edit, bloguser_ismember,
 													bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
 													bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,
-													bloguser_perm_media_browse, bloguser_perm_media_change
+													bloguser_perm_media_browse, bloguser_perm_media_change, bloguser_perm_page,
+													bloguser_perm_intro, bloguser_perm_podcast, bloguser_perm_sidebar
 					FROM T_users LEFT JOIN T_coll_user_perms ON (
 				 						user_ID = bloguser_user_ID
 										AND bloguser_blog_ID = '.$edited_Blog->ID.' )
@@ -283,12 +284,40 @@ $Results->cols[] = array(
 						'td' => '%coll_perm_status_checkbox( {row}, \'deprecated\', \''.TS_('Permission to post into this blog with deprecated status').'\' )%',
 						'td_class' => 'center',
 					);
-
 $Results->cols[] = array(
 						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can post/edit with following statuses:'),
 						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Redr'),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_status_checkbox( {row}, \'redirected\', \''.TS_('Permission to post into this blog with redirected status').'\' )%',
+						'td_class' => 'center',
+					);
+
+$Results->cols[] = array(
+						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can use following post types:'),
+						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Page'),
+						'th_class' => 'checkright',
+						'td' => '%coll_perm_checkbox( {row}, \'perm_page\', \''.TS_('Permission to create pages').'\' )%',
+						'td_class' => 'center',
+					);
+$Results->cols[] = array(
+						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can use following post types:'),
+						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Intro'),
+						'th_class' => 'checkright',
+						'td' => '%coll_perm_checkbox( {row}, \'perm_intro\', \''.TS_('Permission to create intro posts (Intro-* post types)').'\' )%',
+						'td_class' => 'center',
+					);
+$Results->cols[] = array(
+						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can use following post types:'),
+						'th' => /* TRANS: SHORT table header on TWO lines; short for "Podcast" */ T_('Podc'),
+						'th_class' => 'checkright',
+						'td' => '%coll_perm_checkbox( {row}, \'perm_podcast\', \''.TS_('Permission to create podcast episodes').'\' )%',
+						'td_class' => 'center',
+					);
+$Results->cols[] = array(
+						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can use following post types:'),
+						'th' => /* TRANS: SHORT table header on TWO lines; short for "Sidebar", meaning Sidebar links */ T_('Sideb'),
+						'th_class' => 'checkright',
+						'td' => '%coll_perm_checkbox( {row}, \'perm_sidebar\', \''.TS_('Permission to create sidebar links').'\' )%',
 						'td_class' => 'center',
 					);
 
@@ -520,6 +549,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.4  2009/08/22 20:31:01  tblue246
+ * New feature: Post type permissions
+ *
  * Revision 1.3  2009/03/08 23:57:42  fplanque
  * 2009
  *

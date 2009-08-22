@@ -138,7 +138,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	echo '<td width="1%" class="select">';
 	$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
 	$Form->select_object( 'item_typ_ID', $edited_Item->ptyp_ID, $ItemTypeCache,
-								'', '', false, '', 'get_option_list_unreserved_only' );
+								'', '', false, '', 'get_option_list_usable_only' );
 	echo '</td>';
 
 	echo '</tr></table>';
@@ -162,7 +162,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 		<!--
 		// This is for toolbar plugins
 		var b2evoCanvas = document.getElementById('itemform_post_content');
-		//-->
+		// -->
 	</script>
 
 	<?php // ------------------------------- ACTIONS ----------------------------------
@@ -425,6 +425,9 @@ if( $publishnow_displayed )
 
 /*
  * $Log$
+ * Revision 1.49  2009/08/22 20:31:01  tblue246
+ * New feature: Post type permissions
+ *
  * Revision 1.48  2009/07/06 22:49:11  fplanque
  * made some small changes on "publish now" handling.
  * Basically only display it for drafts everywhere.

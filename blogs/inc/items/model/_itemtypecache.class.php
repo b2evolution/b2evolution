@@ -151,20 +151,36 @@ class ItemTypeCache extends DataObjectCache
 	}
 
 	/**
-	 * Returns a form option list which only contains unreserved post types.
+	 * Returns a form option list which only contains post types that can
+	 * be used by the current user (and in the current blog's context).
 	 *
-	 * @see $posttypes_reserved_IDs
-	 *
+	 * The user cannot use any post type IDs listed in the {@see $posttypes_reserved_IDs}
+	 * array; to use the "Page", "Intro-*", "Podcast" and "Sidebar link"
+	 * post types, the current blog must grant the blog_page, blog_intro,
+	 * blog_podcast and blog_sidebar permission, respectively (see blog
+	 * user/group permissions).
+	 * 
 	 * @param integer The selected ID.
 	 * @param boolean Provide a choice for "none" with ID ''
 	 * @param string  Callback method name.
 	 * @return string
 	 */
-	function get_option_list_unreserved_only( $default = 0, $allow_none = false, $method = 'get_name' )
+	function get_option_list_usable_only( $default = 0, $allow_none = false, $method = 'get_name' )
 	{
-		global $posttypes_reserved_IDs;
+		global $posttypes_reserved_IDs, $posttypes_perms, $current_User, $Blog;
 
-		return $this->get_option_list( $default, $allow_none, $method, $posttypes_reserved_IDs );
+		// Compile an array of post type IDs to exclude:
+		$exclude_posttype_IDs = $posttypes_reserved_IDs;
+
+		foreach( $posttypes_perms as $l_permname => $l_posttype_IDs )
+		{
+			if( ! $current_User->check_perm( 'blog_'.$l_permname, 'edit', false, $Blog->ID ) )
+			{	// No permission to use this post type(s):
+				$exclude_posttype_IDs = array_merge( $exclude_posttype_IDs, $l_posttype_IDs );
+			}
+		}
+
+		return $this->get_option_list( $default, $allow_none, $method, $exclude_posttype_IDs );
 	}
 
 	/**
@@ -180,6 +196,9 @@ class ItemTypeCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.6  2009/08/22 20:31:01  tblue246
+ * New feature: Post type permissions
+ *
  * Revision 1.5  2009/03/15 20:35:18  fplanque
  * Universal Item List proof of concept
  *

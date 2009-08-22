@@ -135,11 +135,15 @@ function merge_from_easy( source, userid )
 			source.form.elements['blog_perm_published_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_protected_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_deprecated_'+String(userid)].checked = 1;
+			source.form.elements['blog_perm_intro_'+String(userid)].checked = 1;
+			source.form.elements['blog_perm_podcast_'+String(userid)].checked = 1;
+			source.form.elements['blog_perm_sidebar_'+String(userid)].checked = 1;
 		case 'contrib':
 			source.form.elements['blog_perm_private_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_draft_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_media_browse_'+String(userid)].checked = 1;
 			source.form.elements['blog_perm_media_upload_'+String(userid)].checked = 1;
+			source.form.elements['blog_perm_page_'+String(userid)].checked = 1;
 		case 'member':
 			source.form.elements['blog_ismember_'+String(userid)].click();
 	}

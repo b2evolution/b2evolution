@@ -442,6 +442,10 @@ class Group extends DataObject
 						'blog_cats' => '0',
 						'blog_properties' => '0',
 						'blog_admin' => '0',
+						'blog_page' => '0',
+						'blog_intro' => '0',
+						'blog_podcast' => '0',
+						'blog_sidebar' => '0',
 					);
 			}
 			else
@@ -462,6 +466,10 @@ class Group extends DataObject
 				$this->blog_post_statuses[$perm_target_blog]['blog_cats'] = $row['bloggroup_perm_cats'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_properties'] = $row['bloggroup_perm_properties'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_admin'] = $row['bloggroup_perm_admin'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_page'] = $row['bloggroup_perm_page'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_intro'] = $row['bloggroup_perm_intro'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_podcast'] = $row['bloggroup_perm_podcast'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_sidebar'] = $row['bloggroup_perm_sidebar'];
 			}
 		}
 
@@ -554,6 +562,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2009/08/22 20:31:01  tblue246
+ * New feature: Post type permissions
+ *
  * Revision 1.7  2009/03/08 23:57:46  fplanque
  * 2009
  *
