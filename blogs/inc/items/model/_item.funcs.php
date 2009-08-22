@@ -754,22 +754,34 @@ function visibility_select( & $Form, $post_status )
 	$sharing_options = array();
 
 	if( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) )
+	{
 		$sharing_options[] = array( 'published', T_('Published').' <span class="notes">'.T_('(Public)').'</span>' );
+	}
 
 	if( $current_User->check_perm( 'blog_post!protected', 'edit', false, $Blog->ID ) )
+	{
 		$sharing_options[] = array( 'protected', T_('Protected').' <span class="notes">'.T_('(Members only)').'</span>' );
+	}
 
 	if( $current_User->check_perm( 'blog_post!private', 'edit', false, $Blog->ID ) )
+	{
 		$sharing_options[] = array( 'private', T_('Private').' <span class="notes">'.T_('(You only)').'</span>' );
+	}
 
 	if( $current_User->check_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
+	{
 		$sharing_options[] = array( 'draft', T_('Draft').' <span class="notes">'.T_('(Not published!)').'</span>' );
+	}
 
 	if( $current_User->check_perm( 'blog_post!deprecated', 'edit', false, $Blog->ID ) )
+	{
 		$sharing_options[] = array( 'deprecated', T_('Deprecated').' <span class="notes">'.T_('(Not published!)').'</span>' );
+	}
 
 	if( $current_User->check_perm( 'blog_post!redirected', 'edit', false, $Blog->ID ) )
+	{
 		$sharing_options[] = array( 'redirected', T_('Redirected').' <span class="notes">'.T_('(301)').'</span>' );
+	}
 
 	$Form->radio( 'post_status', $post_status, $sharing_options, '', true );
 }
@@ -873,6 +885,9 @@ function echo_publishnowbutton_js( $action )
 
 /*
  * $Log$
+ * Revision 1.57  2009/08/22 17:07:08  tblue246
+ * Minor/coding style
+ *
  * Revision 1.56  2009/07/06 23:52:24  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *
