@@ -951,7 +951,7 @@ class Hit
 		global $evo_charset;
 
 		$kwout = '';
-		if( ($pos_question = strpos( $ref, '?' )) == false )
+		if( ($pos_question = strpos( $ref, '?' )) === false )
 		{
 			return NULL;
 		}
@@ -988,11 +988,11 @@ class Hit
 		foreach( $ref_params as $ref_param )
 		{
 			$param_parts = explode( '=', $ref_param );
-			if( !empty($param_parts[1]) && in_array( $param_parts[0], $known_search_params )	)
-			{ // found "q" query parameter
+			if( !empty($param_parts[1]) && in_array( $param_parts[0], $known_search_params ) )
+			{ // found the keyphrase query parameter
 				$q = trim(urldecode($param_parts[1]));
 				
-				if( preg_match( '~^[0-9]+$~', $q ) && $param_parts[0] == 'p' )
+				if( ctype_digit( $q ) && $param_parts[0] == 'p' )
 				{	// ?p=5&text=keyword
 					continue;
 				}
@@ -1017,12 +1017,9 @@ class Hit
 	 */
 	function extract_serprank_from_referer( $ref )
 	{
-		if( ($pos_question = strpos( $ref, '?' )) == false )
-		{
-			return NULL;
-		}
-		
-		$serprank_params = array(
+		// Note: The param names cannot contain special RegExp (PCRE)
+		// characters (they must be escaped).
+		static $serprank_params = array(
 				'start',	// google
 				'cd',		// google
 				'b',		// yahoo
@@ -1032,23 +1029,19 @@ class Hit
 				'sf',		// mail.ru
 				'p',		// yandex.ru
 			);
-		
-		$ref_params = explode( '&', evo_substr( $ref, $pos_question+1 ) );
-		foreach( $ref_params as $ref_param )
-		{
-			$param_parts = explode( '=', $ref_param );
-			if( !empty($param_parts[1]) && in_array( $param_parts[0], $serprank_params )	)
-			{
-				$q = trim($param_parts[1]);
-				
-				if( preg_match( '~^[0-9]+$~', $q ) )
-				{
-					return $q;
-				}
-			}
+		static $regexp = '';
+
+		if( $regexp === '' )
+		{	// Generate RegExp:
+			$regexp = '~[&?](?:'.implode( '|', $serprank_params ).')=([0-9]+)~i';
 		}
 
-		return NULL;
+		if( ! preg_match( $regexp, $ref, $serprank ) )
+		{	// Could not extract serp rank:
+			return NULL;
+		}
+
+		return $serprank[1];
 	}
 
 
@@ -1144,6 +1137,12 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.30  2009/08/22 15:27:38  tblue246
+ * - FileRoot::FileRoot():
+ * 	- Only try to create shared dir if enabled.
+ * - Hit::extract_serprank_from_referer():
+ * 	- Do not explode() $ref string, but use a (dynamically generated) RegExp instead. Tested and should work.
+ *
  * Revision 1.29  2009/08/15 06:16:05  sam2kb
  * Better serp rank extraction
  *
