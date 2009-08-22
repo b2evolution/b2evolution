@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 3.1.0-beta\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2009-08-07 19:24+0200\n"
-"PO-Revision-Date: 2009-08-07 20:14+0100\n"
+"PO-Revision-Date: 2009-08-22 22:33+0100\n"
 "Last-Translator: Tilman Blumenbach <tilman (at) ax86 (dot) net>\n"
 "Language-Team: Tilman Blumenbach <tilman (at) ax86 (dot) net>\n"
 "MIME-Version: 1.0\n"
@@ -10913,7 +10913,7 @@ msgstr "Das Benutzerverzeichnis &laquo;%s&raquo; wurde mit den Rechten %s erstel
 #: ../../../inc/users/model/_user.class.php:721
 #, php-format
 msgid "Group/user permission denied by %s!"
-msgstr "Gruppen/Benutzer-Berechtigung verweigert durch %s!"
+msgstr "Gruppen-/Benutzer-Berechtigung durch %s verweigert!"
 
 #: ../../../inc/users/model/_user.class.php:1132
 #: ../../../inc/users/views/_user.form.php:171
