@@ -730,7 +730,7 @@ class User extends DataObject
 		if( ! $perm && $assert )
 		{ // We can't let this go on!
 			global $app_name;
-			debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name )." ($permname:$permlevel:$perm_target)" );
+			debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name )." ($permname:$permlevel:".( is_object( $perm_target ) ? get_class( $perm_target ).'('.$perm_target_ID.')' : $perm_target ).")" );
 		}
 
 		if( isset($perm_target_ID) )
@@ -1490,6 +1490,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2009/08/23 15:37:50  tblue246
+ * Fix catchable fatal error
+ *
  * Revision 1.20  2009/08/23 13:42:49  tblue246
  * Doc. Please read.
  *
