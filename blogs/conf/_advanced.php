@@ -34,9 +34,14 @@ $debug = 0;
 
 // Most of the time you'll want to see all errors, including notices:
 // b2evo should run notice free! (plugins too!)
-// temporarily fix for PHP 5.3 (Assigning the return value of new by reference is deprecated)
-if( !defined('E_DEPRECATED') ) define( 'E_DEPRECATED', true );
-error_reporting( E_ALL & ~E_DEPRECATED );
+if( ! defined( 'E_DEPRECATED' ) )
+{
+	error_reporting( E_ALL );
+}
+else
+{	// Hopefully temporary fix for PHP >= v5.3 (Assigning the return value of new by reference is deprecated)
+	error_reporting( E_ALL & ~E_DEPRECATED );
+}
 
 // To help debugging severe errors, you'll probably want PHP to display the errors on screen.
 // In this case, uncomment the following line:
