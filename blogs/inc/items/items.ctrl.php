@@ -351,7 +351,7 @@ switch( $action )
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
 		// Check permission on post type:
-		check_perm_posttype();
+		check_perm_posttype( $post_extracats );
 
 		// CREATE NEW POST:
 		load_class('items/model/_item.class.php');
@@ -450,7 +450,7 @@ switch( $action )
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
 		// Check permission on post type:
-		check_perm_posttype();
+		check_perm_posttype( $post_extracats );
 
 		// Is this post already published?
 		$was_published = $edited_Item->status == 'published';
@@ -1030,6 +1030,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.56  2009/08/23 20:08:26  tblue246
+ * - Check extra categories when validating post type permissions.
+ * - Removed User::check_perm_catusers() + Group::check_perm_catgroups() and modified User::check_perm() to perform the task previously covered by these two methods, fixing a redundant check of blog group permissions and a malfunction introduced by the usage of Group::check_perm_catgroups().
+ *
  * Revision 1.55  2009/08/22 20:31:01  tblue246
  * New feature: Post type permissions
  *

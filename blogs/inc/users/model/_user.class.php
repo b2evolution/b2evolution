@@ -570,7 +570,8 @@ class User extends DataObject
 			return $this->cache_perms[$permname][$permlevel][$perm_target_ID];
 		}
 
-		// $Debuglog->add( "Querying perm [$permname][$permlevel][$perm_target_ID]", 'perms' );
+		//$Debuglog->add( "Querying perm [$permname][$permlevel]".( isset( $perm_target_ID ) ? '['.$perm_target_ID.']' : '' ).']', 'perms' );
+		//pre_dump( 'Perm target: '.var_export( $perm_target, true ) );
 
 		$perm = false;
 
@@ -583,20 +584,38 @@ class User extends DataObject
 			case 'cats_post!draft':
 			case 'cats_post!deprecated':
 			case 'cats_post!redirected':
+			case 'cats_page':
+			case 'cats_intro':
+			case 'cats_podcast':
+			case 'cats_sidebar':
 				// Category permissions...
-				$perm = $this->check_perm_catsusers( $permname, $permlevel, $perm_target );
-				if( ! $perm  )
-				{ // Check groups category permissions...
-					/* Tblue> This will always fail! See @internal phpdoc
-					          comment on Group::check_perm_catsgroups().
-					          Anyway, if User::check_perm_catsusers() and
-					          Group::check_perm_catsgroups() don't get
-					          changed, it doesn't make sense to call
-					          Group::check_perm_catsgroups() here if $perm
-					          is false.
-					*/
-					$this->get_Group();
-					$perm = $this->Group->check_perm_catsgroups( $permname, $permlevel, $perm_target );
+				if( ! is_array( $perm_target ) )
+				{	// We need an array here:
+					$perm_target = array( $perm_target );
+				}
+
+				// First we need to create an array of blogs, not cats
+				$perm_target_blogs = array();
+				foreach( $perm_target as $loop_cat_ID )
+				{
+					$loop_cat_blog_ID = get_catblog( $loop_cat_ID );
+					// echo "cat $loop_cat_ID -> blog $loop_cat_blog_ID <br />";
+					if( ! in_array( $loop_cat_blog_ID, $perm_target_blogs ) )
+					{ // not already in list: add it:
+						$perm_target_blogs[] = $loop_cat_blog_ID;
+					}
+				}
+
+				$perm = true; // Permission granted if no blog denies it below
+				$blogperm = 'blog_'.substr( $permname, 5 );
+				// Now we'll check permissions for each blog:
+				foreach( $perm_target_blogs as $loop_blog_ID )
+				{
+					if( ! $this->check_perm( $blogperm, $permlevel, false, $loop_blog_ID ) )
+					{ // If at least one blog denies the permission:
+						$perm = false;
+						break;
+					}
 				}
 				break;
 
@@ -637,7 +656,7 @@ class User extends DataObject
 				if( $perm_target > 0 )
 				{ // Check user perm for this blog:
 					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target_ID );
-					if( $perm == false )
+					if( ! $perm )
 					{ // Check groups for permissions to this specific blog:
 						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target_ID );
 					}
@@ -645,7 +664,7 @@ class User extends DataObject
 				break;
 
 			case 'item_post!CURSTATUS':
-        /**
+				/**
 				 * @var Item
 				 */
 				$Item = & $perm_target;
@@ -658,7 +677,7 @@ class User extends DataObject
 			case 'item_post!deprecated':
 			case 'item_post!redirected':
 				// Get the Blog ID
-        /**
+				/**
 				 * @var Item
 				 */
 				$Item = & $perm_target;
@@ -681,7 +700,7 @@ class User extends DataObject
 				// Check permissions at the blog level:
 				$blog_permname = 'blog_'.substr( $permname, 5 );
 				$perm = $this->check_perm_blogusers( $blog_permname, $permlevel, $blog_ID, $Item );
-				if( $perm == false )
+				if( ! $perm )
 				{ // Check groups for permissions to this specific blog:
 					$perm = $this->Group->check_perm_bloggroups( $blog_permname, $permlevel, $blog_ID, $Item, $this );
 				}
@@ -701,7 +720,7 @@ class User extends DataObject
 				if( $perm_target > 0 )
 				{ // Check user perm for this blog:
 					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
-					if ( $perm == false )
+					if ( ! $perm )
 					{ // Check groups for permissions to this specific blog:
 						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
 					}
@@ -767,63 +786,6 @@ class User extends DataObject
 
 
 	/**
-	 * Check permission for this user on a set of specified categories
-	 *
-	 * This is not for direct use, please call {@link User::check_perm()} instead
-	 *
-	 * @internal Tblue> Shouldn't this call User::check_perm_blogusers()
-	 *                  since it is supposed to check blog *user* perms?
-	 * 
-	 * @see User::check_perm()
-	 * @param string Permission name, can be one of the following:
-	 *                  - cat_post_statuses
-	 *                  - more to come later...
-	 * @param string Permission level
-	 * @param array Array of target cat IDs
-	 * @return boolean 0 if permission denied
-	 */
-	function check_perm_catsusers( $permname, $permlevel, & $perm_target_cats )
-	{
-		// Check if permission is granted:
-		switch( $permname )
-		{
-			case 'cats_post_statuses':
-			case 'cats_post!published':
-			case 'cats_post!protected':
-			case 'cats_post!private':
-			case 'cats_post!draft':
-			case 'cats_post!deprecated':
-			case 'cats_post!redirected':
-				// We'll actually pass this on to blog permissions
-
-				// First we need to create an array of blogs, not cats
-				$perm_target_blogs = array();
-				foreach( $perm_target_cats as $loop_cat_ID )
-				{
-					$loop_cat_blog_ID = get_catblog( $loop_cat_ID );
-					// echo "cat $loop_cat_ID -> blog $loop_cat_blog_ID <br />";
-					if( ! in_array( $loop_cat_blog_ID, $perm_target_blogs ) )
-					{ // not already in list: add it:
-						$perm_target_blogs[] = $loop_cat_blog_ID;
-					}
-				}
-
-				// Now we'll check permissions for each blog:
-				foreach( $perm_target_blogs as $loop_blog_ID )
-				{
-					if( ! $this->check_perm( 'blog_'.substr($permname,5), $permlevel, false, $loop_blog_ID ) )
-					{ // If at least one blog is denied:
-						return false;	// permission denied
-					}
-				}
-				return true;	// Permission granted
-		}
-
-		return false; 	// permission denied
-	}
-
-
-	/**
 	 * Check permission for this user on a specified blog
 	 *
 	 * This is not for direct use, please call {@link User::check_perm()} instead
@@ -848,7 +810,7 @@ class User extends DataObject
 		// echo "checkin for $permname >= $permlevel on blog $perm_target_blog<br />";
 
 		$BlogCache = & get_Cache('BlogCache');
-    /**
+		/**
 		 * @var Blog
 		 */
 		$Blog = & $BlogCache->get_by_ID( $perm_target_blog );
@@ -1490,6 +1452,10 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2009/08/23 20:08:27  tblue246
+ * - Check extra categories when validating post type permissions.
+ * - Removed User::check_perm_catusers() + Group::check_perm_catgroups() and modified User::check_perm() to perform the task previously covered by these two methods, fixing a redundant check of blog group permissions and a malfunction introduced by the usage of Group::check_perm_catgroups().
+ *
  * Revision 1.21  2009/08/23 15:37:50  tblue246
  * Fix catchable fatal error
  *

@@ -328,62 +328,6 @@ class Group extends DataObject
 
 
 	/**
-	 * Check permission for this group on a set of specified categories
-	 *
-	 * This is not for direct use, please call {@link User::check_perm()} instead
-	 *
-	 * @internal Tblue> Shouldn't this call Group::check_perm_bloggroups()
-	 *                  since it is supposed to check blog *group* perms?
-	 * 
-	 * @see User::check_perm()
-	 * @param string Permission name, can be one of the following:
-	 *                  - cat_post_statuses
-	 *                  - more to come later...
-	 * @param string Permission level
-	 * @param array Array of target cat IDs
-	 * @return boolean 0 if permission denied
-	 */
-	function check_perm_catsgroups( $permname, $permlevel, & $perm_target_cats )
-	{
-		// Check if permission is granted:
-		switch( $permname )
-		{
-			case 'cats_post_statuses':
-			case 'cats_post!published':
-			case 'cats_post!protected':
-			case 'cats_post!private':
-			case 'cats_post!draft':
-			case 'cats_post!deprecated':
-			case 'cats_post!redirected':
-				// We'll actually pass this on to blog permissions
-				// First we need to create an array of blogs, not cats
-				$perm_target_blogs = array();
-				foreach( $perm_target_cats as $loop_cat_ID )
-				{
-					$loop_cat_blog_ID = get_catblog( $loop_cat_ID );
-					// echo "cat $loop_cat_ID -> blog $loop_cat_blog_ID <br />";
-					if( ! in_array( $loop_cat_blog_ID, $perm_target_blogs ) )
-					{ // not already in list: add it:
-						$perm_target_blogs[] = $loop_cat_blog_ID;
-					}
-				}
-
-				// Now we'll check permissions for each blog:
-				foreach( $perm_target_blogs as $loop_blog_ID )
-				{
-					if( ! $this->check_perm( 'blog_'.substr($permname,5), $permlevel, $loop_blog_ID ) )
-					{ // If at least one blog is denied:
-						return false;	// permission denied
-					}
-				}
-				return true;	// Permission granted
-		}
-
-		return false; 	// permission denied
-	}
-
-
-	/**
 	 * Check permission for this group on a specified blog
 	 *
 	 * This is not for direct use, please call {@link User::check_perm()} instead
@@ -565,6 +509,10 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2009/08/23 20:08:27  tblue246
+ * - Check extra categories when validating post type permissions.
+ * - Removed User::check_perm_catusers() + Group::check_perm_catgroups() and modified User::check_perm() to perform the task previously covered by these two methods, fixing a redundant check of blog group permissions and a malfunction introduced by the usage of Group::check_perm_catgroups().
+ *
  * Revision 1.9  2009/08/23 13:42:49  tblue246
  * Doc. Please read.
  *

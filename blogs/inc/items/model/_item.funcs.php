@@ -510,12 +510,12 @@ function cat_select( $Form, $form_fields = true )
 
 	if( $allow_cross_posting >= 2 )
 	{ // If BLOG cross posting enabled, go through all blogs with cats:
-    /**
+		/**
 		 * @var BlogCache
 		 */
 		$BlogCache = & get_Cache('BlogCache');
 
-    /**
+		/**
 		 * @var Blog
 		 */
 		for( $l_Blog = & $BlogCache->get_first(); !is_null($l_Blog); $l_Blog = & $BlogCache->get_next() )
@@ -885,13 +885,13 @@ function echo_publishnowbutton_js( $action )
 
 /**
  * Assert that the supplied post type can be used by the current user in
- * the current blog's context.
+ * the post's extra categories' context.
  *
- * @todo Tblue> IMPORTANT: Check perms using post extracats.
+ * @param array The extra cats of the post.
  */
-function check_perm_posttype()
+function check_perm_posttype( $post_extracats )
 {
-	global $item_typ_ID, $posttypes_perms, $current_User, $Blog;
+	global $posttypes_perms, $item_typ_ID, $current_User;
 
 	static $posttype2perm = NULL;
 	if( $posttype2perm === NULL )
@@ -921,11 +921,15 @@ function check_perm_posttype()
 	}
 
 	// Check permission:
-	$current_User->check_perm( 'blog_'.$posttype2perm[$item_typ_ID], 'edit', true /* assert */, $Blog->ID );
+	$current_User->check_perm( 'cats_'.$posttype2perm[$item_typ_ID], 'edit', true /* assert */, $post_extracats );
 }
 
 /*
  * $Log$
+ * Revision 1.60  2009/08/23 20:08:27  tblue246
+ * - Check extra categories when validating post type permissions.
+ * - Removed User::check_perm_catusers() + Group::check_perm_catgroups() and modified User::check_perm() to perform the task previously covered by these two methods, fixing a redundant check of blog group permissions and a malfunction introduced by the usage of Group::check_perm_catgroups().
+ *
  * Revision 1.59  2009/08/23 13:42:48  tblue246
  * Doc. Please read.
  *
