@@ -556,6 +556,11 @@ function create_demo_contents()
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
+	$edited_Item->insert( 1, 'Tilman', '', $now, $cat_linkblog_contrib, array(), 'published',	 'de-DE', '', 'http://ax86.net/', 'disabled', array() );
+
+	// Insert a post into linkblog:
+	$now = date('Y-m-d H:i:s',$timestamp++);
+	$edited_Item = & new Item();
 	$edited_Item->insert( 1, 'Blog news', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://b2evolution.net/news.php', 'disabled', array() );
 
 	// Insert a post into linkblog:
@@ -847,6 +852,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.270  2009/08/23 21:56:18  tblue246
+ * Added myself to contributor linkblog
+ *
  * Revision 1.269  2009/08/07 00:00:47  fplanque
  * i18n update
  *
