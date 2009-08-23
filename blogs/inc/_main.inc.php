@@ -201,6 +201,31 @@ load_class('users/model/_usersettings.class.php');
 $Settings = & new GeneralSettings();
 
 /**
+ * Locale selection:
+ * We need to do this as early as possible in order to set DB connection charset below.
+ * Never use locale from HTTP_ACCEPT nor locale from REQUEST here, only locale from DB because we don't want to pull utf-8 data using latin1 charset even if user requests it.
+ *
+ * fp> that does not explain why it needs to be here!! Why do we need to set the Db charset HERE? BEFORE WHAT?
+ *
+ * sam2kb> ideally we should set the right DB charset at the time when we connect to the database. The reason is until we do it all data pulled out from DB is in wrong encoding.
+ * See also http://forums.b2evolution.net//viewtopic.php?p=95100
+ * 
+ */
+$Debuglog->add( 'default_locale from conf: '.$default_locale, 'locale' );
+
+locale_overwritefromDB();
+$Debuglog->add( 'default_locale from DB: '.$default_locale, 'locale' );
+
+/**
+ * Activate default locale:
+ */
+locale_activate( $default_locale );
+
+// Set encoding for MySQL connection:
+$DB->set_connection_charset( $current_charset );
+
+
+/**
  * Interface to user settings
  *
  * @global UserSettings $UserSettings
@@ -230,54 +255,6 @@ load_class('sessions/model/_hit.class.php');
 // fp> The following constructor requires these right now:
 load_funcs('_core/_param.funcs.php');
 load_funcs('_core/_url.funcs.php');
-
-
-/**
- * Locale selection:
- * We need to do this as early as possible in order to set DB connection charset below
- * fp> that does not explain why it needs to be here!! Why do we need to set the Db charset HERE? BEFORE WHAT?
- *
- * sam2kb> ideally we should set the right DB charset at the time when we connect to the database. The reason is until we do it all data pulled out from DB is in wrong encoding. I put the code here because it depends on _param.funcs, so if move the _param.funcs higher we can also move this code right under _connect_db
- * See also http://forums.b2evolution.net//viewtopic.php?p=95100
- * 
- */
-$Debuglog->add( 'default_locale from conf: '.$default_locale, 'locale' );
-
-locale_overwritefromDB();
-$Debuglog->add( 'default_locale from DB: '.$default_locale, 'locale' );
-
-$default_locale = locale_from_httpaccept(); // set default locale by autodetect
-$Debuglog->add( 'default_locale from HTTP_ACCEPT: '.$default_locale, 'locale' );
-
-if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
-{
-	if( $locale_from_get != $default_locale )
-	{
-		if( isset( $locales[$locale_from_get] ) )
-		{
-			$default_locale = $locale_from_get;
-			$Debuglog->add('Overriding locale from REQUEST: '.$default_locale, 'locale');
-		}
-		else
-		{
-			$Debuglog->add('$locale_from_get ('.$locale_from_get.') is not set. Available locales: '.implode(', ', array_keys($locales)), 'locale');
-		}
-	}
-	else
-	{
-		$Debuglog->add('$locale_from_get == $default_locale ('.$locale_from_get.').', 'locale');
-	}
-
-}
-
-
-/**
- * Activate default locale:
- */
-locale_activate( $default_locale );
-
-// Set encoding for MySQL connection:
-$DB->set_connection_charset( $current_charset );
 
 
 /**
@@ -666,6 +643,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.114  2009/08/23 00:25:27  sam2kb
+ * Never use locale from HTTP_ACCEPT nor locale from REQUEST when we set DB connection charset
+ *
  * Revision 1.113  2009/08/12 12:01:49  sam2kb
  * doc
  *
