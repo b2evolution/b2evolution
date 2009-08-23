@@ -114,7 +114,7 @@ function & get_Cache( $objectName )
 			$Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
 			return $FiletypeCache;
 
-		case 'GoalCache';
+		case 'GoalCache':
 			$GoalCache = new DataObjectCache( 'Goal', false, 'T_track__goal', 'goal_', 'goal_ID', 'goal_name', 'goal_name' ); // COPY (FUNC)
 			return $GoalCache;
 
@@ -122,11 +122,11 @@ function & get_Cache( $objectName )
 			$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'\', T_(\'No group\') )' );
 			return $GroupCache;
 
-		case 'ItemCacheLight';
+		case 'ItemCacheLight':
 			$ItemCacheLight = new DataObjectCache( 'ItemLight', false, 'T_items__item', 'post_', 'post_ID' ); // COPY (FUNC)
 			return $ItemCacheLight;
 
-		case 'ItemCache';
+		case 'ItemCache':
 			load_class( 'items/model/_itemcache.class.php' );
 			$ItemCache = new ItemCache(); // COPY (FUNC)
 			return $ItemCache;
@@ -3553,6 +3553,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.127  2009/08/23 12:58:49  tblue246
+ * minor
+ *
  * Revision 1.126  2009/08/10 03:45:42  fplanque
  * fixes
  *

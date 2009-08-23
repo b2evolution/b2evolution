@@ -606,7 +606,7 @@ class User extends DataObject
 			case 'blog_cats':
 			case 'blog_genstatic':
 			case 'blog_page':
-			case 'blog_intro';
+			case 'blog_intro':
 			case 'blog_podcast':
 			case 'blog_sidebar':
 				// Blog permission to edit its properties...
@@ -1479,6 +1479,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2009/08/23 12:58:49  tblue246
+ * minor
+ *
  * Revision 1.18  2009/08/22 20:31:01  tblue246
  * New feature: Post type permissions
  *
