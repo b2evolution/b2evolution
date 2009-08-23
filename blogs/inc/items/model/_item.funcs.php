@@ -886,6 +886,8 @@ function echo_publishnowbutton_js( $action )
 /**
  * Assert that the supplied post type can be used by the current user in
  * the current blog's context.
+ *
+ * @todo Tblue> IMPORTANT: Check perms using post extracats.
  */
 function check_perm_posttype()
 {
@@ -924,6 +926,9 @@ function check_perm_posttype()
 
 /*
  * $Log$
+ * Revision 1.59  2009/08/23 13:42:48  tblue246
+ * Doc. Please read.
+ *
  * Revision 1.58  2009/08/22 20:31:01  tblue246
  * New feature: Post type permissions
  *

@@ -332,6 +332,9 @@ class Group extends DataObject
 	 *
 	 * This is not for direct use, please call {@link User::check_perm()} instead
 	 *
+	 * @internal Tblue> Shouldn't this call Group::check_perm_bloggroups()
+	 *                  since it is supposed to check blog *group* perms?
+	 * 
 	 * @see User::check_perm()
 	 * @param string Permission name, can be one of the following:
 	 *                  - cat_post_statuses
@@ -562,6 +565,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2009/08/23 13:42:49  tblue246
+ * Doc. Please read.
+ *
  * Revision 1.8  2009/08/22 20:31:01  tblue246
  * New feature: Post type permissions
  *

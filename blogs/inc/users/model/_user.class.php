@@ -587,6 +587,14 @@ class User extends DataObject
 				$perm = $this->check_perm_catsusers( $permname, $permlevel, $perm_target );
 				if( ! $perm  )
 				{ // Check groups category permissions...
+					/* Tblue> This will always fail! See @internal phpdoc
+					          comment on Group::check_perm_catsgroups().
+					          Anyway, if User::check_perm_catsusers() and
+					          Group::check_perm_catsgroups() don't get
+					          changed, it doesn't make sense to call
+					          Group::check_perm_catsgroups() here if $perm
+					          is false.
+					*/
 					$this->get_Group();
 					$perm = $this->Group->check_perm_catsgroups( $permname, $permlevel, $perm_target );
 				}
@@ -763,6 +771,9 @@ class User extends DataObject
 	 *
 	 * This is not for direct use, please call {@link User::check_perm()} instead
 	 *
+	 * @internal Tblue> Shouldn't this call User::check_perm_blogusers()
+	 *                  since it is supposed to check blog *user* perms?
+	 * 
 	 * @see User::check_perm()
 	 * @param string Permission name, can be one of the following:
 	 *                  - cat_post_statuses
@@ -1479,6 +1490,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2009/08/23 13:42:49  tblue246
+ * Doc. Please read.
+ *
  * Revision 1.19  2009/08/23 12:58:49  tblue246
  * minor
  *
