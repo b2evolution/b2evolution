@@ -386,8 +386,9 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 		{
 			if( isset( $http_response_header )
 			    && ( $code = _http_wrapper_last_status( $http_response_header ) ) !== false )
-			{	// fopen() returned false because it got a "bad" HTTP code:
-				$info['code'] = $code;
+			{	// fopen() returned false because it got a bad HTTP code:
+				$info['error'] = 'Invalid response';
+				$info['status'] = $code;
 				return '';
 			}
 
@@ -403,7 +404,7 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 		}
 		else
 		{
-			$info['code'] = $code;
+			$info['status'] = $code;
 			$r = '';
 			while( ! feof( $fp ) )
 			{
@@ -732,6 +733,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.37  2009/08/24 13:07:10  tblue246
+ * Fixed bugs in fetch_remote_page()
+ *
  * Revision 1.36  2009/06/04 21:20:23  blueyed
  * Fix url_add_param if last char is question mark. Add and move tests.
  *
