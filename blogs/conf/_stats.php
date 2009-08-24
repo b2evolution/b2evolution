@@ -149,7 +149,8 @@ $search_engines = array(
 	'cuil.com/',
 	'yandex.ru/yandsearch',
 	'go.mail.ru/search',
-	'//www.bing.com' //q=
+	'//www.bing.com', //q=
+	'.qip.ru/', // query=
 );
 
 
