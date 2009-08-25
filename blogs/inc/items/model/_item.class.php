@@ -1477,20 +1477,33 @@ class Item extends ItemLight
 		if( ! isset( $this->tags ) )
 		{
 			$ItemTagsCache = & get_Cache('ItemTagsCache');
-
-			if( empty($ItemTagsCache) )
+			if( ! isset($ItemTagsCache[$this->ID]) )
 			{
+				/* Only try to fetch tags for items that are not yet in
+				 * the cache. This will always give at least the ID of
+				 * this Item.
+				 */
+				$prefetch_item_IDs = array_diff( $this->get_prefetch_itemlist_IDs(), array_keys( $ItemTagsCache ) );
+				// Assume these items don't have any tags:
+				foreach( $prefetch_item_IDs as $item_ID )
+				{
+					$ItemTagsCache[$item_ID] = array();
+				}
+
+				// Now fetch the tags:
 				foreach( $DB->get_results('
 					SELECT itag_itm_ID, tag_name
 						FROM T_items__itemtag INNER JOIN T_items__tag ON itag_tag_ID = tag_ID
-					 WHERE itag_itm_ID IN ('.$DB->quote($this->get_prefetch_itemlist_IDs()).')
+					 WHERE itag_itm_ID IN ('.$DB->quote($prefetch_item_IDs).')
 					 ORDER BY tag_name', OBJECT, 'Get tags for items' ) as $row )
 				{
 					$ItemTagsCache[$row->itag_itm_ID][] = $row->tag_name;
 				}
+
+				//pre_dump( $ItemTagsCache );
 			}
 
-			$this->tags = isset($ItemTagsCache[$this->ID]) ? $ItemTagsCache[$this->ID] : array();
+			$this->tags = $ItemTagsCache[$this->ID];
 		}
 
 		return $this->tags;
@@ -3929,13 +3942,17 @@ class Item extends ItemLight
 		{
 			$r = array_merge($r, $ItemList->get_page_ID_array());
 		}
-		return $r;
+
+		return array_unique( $r );
 	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.125  2009/08/25 15:47:26  tblue246
+ * Item::get_tags(): Bugfix and optimization: Remember items without tags and do not try to fetch tags for them on the next call. Bug discovered by and fixed with help from yabs.
+ *
  * Revision 1.124  2009/08/22 21:19:20  tblue246
  * Item::dbupdate(): Allow ItemLight::dbupdate() to return NULL. Fixes https://bugs.launchpad.net/b2evolution/+bug/415436
  *
