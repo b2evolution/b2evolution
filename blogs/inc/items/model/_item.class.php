@@ -3244,7 +3244,10 @@ class Item extends ItemLight
 
 			$DB->commit();
 
-			$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
+			if( $result === true )
+			{	// Item has changed:
+				$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
+			}
 		}
 		else
 		{
@@ -3950,6 +3953,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.126  2009/08/25 15:58:43  tblue246
+ * Bugfix: Only trigger AfterItemUpdate if Item has changed. Bug discovered by Yabs.
+ *
  * Revision 1.125  2009/08/25 15:47:26  tblue246
  * Item::get_tags(): Bugfix and optimization: Remember items without tags and do not try to fetch tags for them on the next call. Bug discovered by and fixed with help from yabs.
  *
