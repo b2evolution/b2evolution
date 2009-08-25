@@ -254,9 +254,9 @@ function TS_( $string, $req_locale = '', $params = array() )
  */
 function locale_temp_switch( $locale )
 {
-	global $saved_locales, $current_locale, $Timer;
+	global $saved_locales, $current_locale;
 
-	// $Timer->resume( 'locale_temp_switch' );
+	// $GLOBALS['Timer']->resume( 'locale_temp_switch' );
 
 	if( !isset( $saved_locales ) || ! is_array( $saved_locales ) )
 	{
@@ -270,7 +270,7 @@ function locale_temp_switch( $locale )
 		return true;
 	}
 
-	// $Timer->stop( 'locale_temp_switch' );
+	// $GLOBALS['Timer']->stop( 'locale_temp_switch' );
 	return false;
 }
 
@@ -828,8 +828,10 @@ function locale_updateDB()
  */
 function convert_charset( $string, $dest_charset, $src_charset = NULL )
 {
+	$GLOBALS['Timer']->resume('convert_charset');
 	if( $dest_charset == $src_charset || $dest_charset == '' /* may happen if $evo_charset is not defined yet */ )
 	{ // no conversation required
+		$GLOBALS['Timer']->pause('convert_charset');
 		return $string;
 	}
 
@@ -848,6 +850,7 @@ function convert_charset( $string, $dest_charset, $src_charset = NULL )
 	}
 	// pre_dump( $dest_charset, $src_charset, $string );
 
+	$GLOBALS['Timer']->pause('convert_charset');
 	return $string;
 }
 
@@ -1043,6 +1046,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.29  2009/08/25 19:56:02  blueyed
+ * Add convert_charset timer.
+ *
  * Revision 1.28  2009/07/09 22:57:32  fplanque
  * Fixed init of connection_charset, especially during install.
  *
