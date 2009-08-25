@@ -298,7 +298,7 @@ class code_highlight_plugin extends Plugin
 
 		// 1 - attribs : lang &| line
 		// 2 - codeblock
-		$content = preg_replace_callback( '#<\!--\s*codeblock([^-]*?)\s*--><pre><code>(.+?)</code></pre><\!--\s+/codeblock\s*-->#i', array( $this, 'format_to_edit' ), $content );
+		$content = preg_replace_callback( '#<\!--\s*codeblock([^-]*?)\s*--><pre><code>(.+?)</code></pre><\!--\s+/codeblock\s*-->#is', array( $this, 'format_to_edit' ), $content );
 
 		return true;
 	}
@@ -631,6 +631,9 @@ class code_highlight_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.25  2009/08/25 16:43:14  tblue246
+ * Code highlight plugin: Correctly unfilter item contents. Bug found by Yabs.
+ *
  * Revision 1.24  2009/03/25 00:59:44  fplanque
  * fix
  *
