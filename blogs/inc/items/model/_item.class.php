@@ -3244,7 +3244,7 @@ class Item extends ItemLight
 
 			$DB->commit();
 
-			if( $result === true )
+			if( $result )
 			{	// Item has changed:
 				$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
 			}
@@ -3953,6 +3953,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.127  2009/08/25 16:19:18  tblue246
+ * minor
+ *
  * Revision 1.126  2009/08/25 15:58:43  tblue246
  * Bugfix: Only trigger AfterItemUpdate if Item has changed. Bug discovered by Yabs.
  *
