@@ -1149,7 +1149,7 @@ class Plugin
 
 	/**
 	 * Event handler: called at the end of {@link Item::dbupdate() updating
-	 * an item/post in the database}, which means that it has been changed.
+	 * an item/post in the database}.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Item': the related Item (by reference)
@@ -1487,7 +1487,7 @@ class Plugin
 
 	/**
 	 * Event handler: called at the end of {@link Comment::dbupdate() updating
-	 * a comment in the database}, which means that it has changed.
+	 * a comment in the database}.
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'Comment': the related Comment (by reference)
@@ -2897,6 +2897,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.28  2009/08/25 16:54:24  tblue246
+ * Doc
+ *
  * Revision 1.27  2009/07/06 23:00:33  fplanque
  * minor
  *
