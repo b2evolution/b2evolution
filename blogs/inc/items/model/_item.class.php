@@ -3244,10 +3244,7 @@ class Item extends ItemLight
 
 			$DB->commit();
 
-			if( $result )
-			{	// Item has changed:
-				$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
-			}
+			$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
 		}
 		else
 		{
@@ -3953,11 +3950,8 @@ class Item extends ItemLight
 
 /*
  * $Log$
- * Revision 1.127  2009/08/25 16:19:18  tblue246
- * minor
- *
- * Revision 1.126  2009/08/25 15:58:43  tblue246
- * Bugfix: Only trigger AfterItemUpdate if Item has changed. Bug discovered by Yabs.
+ * Revision 1.128  2009/08/25 16:49:48  tblue246
+ * Always trigger AfterCommentUpdate/AfterItemUpdate, not only if Comment/Item has changed. Don't kill me, it makes more sense and, as Yabs said: 'yabs nagged the arse off me to reverse this'
  *
  * Revision 1.125  2009/08/25 15:47:26  tblue246
  * Item::get_tags(): Bugfix and optimization: Remember items without tags and do not try to fetch tags for them on the next call. Bug discovered by and fixed with help from yabs.

@@ -1310,11 +1310,7 @@ class Comment extends DataObject
 		global $Plugins;
 
 		$dbchanges = $this->dbchanges;
-
-		if( $r = parent::dbupdate() )
-		{
-			$Plugins->trigger_event( 'AfterCommentUpdate', $params = array( 'Comment' => & $this, 'dbchanges' => $dbchanges ) );
-		}
+		$Plugins->trigger_event( 'AfterCommentUpdate', $params = array( 'Comment' => & $this, 'dbchanges' => $dbchanges ) );
 
 		return $r;
 	}
@@ -1392,6 +1388,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2009/08/25 16:49:48  tblue246
+ * Always trigger AfterCommentUpdate/AfterItemUpdate, not only if Comment/Item has changed. Don't kill me, it makes more sense and, as Yabs said: 'yabs nagged the arse off me to reverse this'
+ *
  * Revision 1.27  2009/03/08 23:57:42  fplanque
  * 2009
  *
