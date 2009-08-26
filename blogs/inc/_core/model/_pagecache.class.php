@@ -271,6 +271,10 @@ class PageCache
 
 		/*
 		// fstat() is interesting because it gives the last access time... use that for purging...
+		* Tblue> Note: Many server admins mount partitions with the "noatime"
+		*              option, which disables atime updates and thus speeds
+		*              up disk access - that means the atime is not reliable,
+		*              better use the mtime (modification time).
 		if( $fh = @fopen( $af_cache_file, 'r', false ) )
 		{
 			$fstat = fstat( $fh );
@@ -443,6 +447,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.8  2009/08/26 19:03:59  tblue246
+ * doc
+ *
  * Revision 1.7  2009/03/08 23:57:40  fplanque
  * 2009
  *
