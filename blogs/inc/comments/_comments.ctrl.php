@@ -100,12 +100,15 @@ switch( $action )
 			param( 'newcomment_author', 'string', true );
 			param( 'newcomment_author_email', 'string' );
 			param( 'newcomment_author_url', 'string' );
+			param( 'comment_allow_msgform', 'integer', 0 /* checkbox */ );
+
 			param_check_not_empty( 'newcomment_author', T_('Please enter and author name.'), '' );
 			$edited_Comment->set( 'author', $newcomment_author );
 			param_check_email( 'newcomment_author_email', false );
 			$edited_Comment->set( 'author_email', $newcomment_author_email );
 			param_check_url( 'newcomment_author_url', 'posting', '' ); // Give posting permissions here
 			$edited_Comment->set( 'author_url', $newcomment_author_url );
+			$edited_Comment->set( 'allow_msgform', $comment_allow_msgform );
 		}
 
 		// Content:
@@ -272,6 +275,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2009/08/26 23:37:00  tblue246
+ * Backoffice comment editing: Allow changing of "Allow message form" setting for guest comments
+ *
  * Revision 1.13  2009/03/08 23:57:42  fplanque
  * 2009
  *

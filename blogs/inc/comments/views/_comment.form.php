@@ -161,11 +161,32 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	// fp> TODO: this should be Auto-P and handled by the Auto-P plugin
 	?>
 	<input type="checkbox" class="checkbox" name="post_autobr" value="1"
-	<?php	if( $comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out' ) echo ' checked="checked"' ?>
+	<?php
+	if( $comments_use_autobr == 'always' || $comments_use_autobr == 'opt-out' )
+	{
+		echo ' checked="checked"';
+	}
+	?>
 		id="autobr" tabindex="6" />
-	<label for="autobr"><strong><?php echo T_('Auto-BR') ?></strong></label>
+	<label for="autobr"><strong><?php echo T_('Auto-BR'); ?></strong></label>
+	<br />
 
 	<?php
+	// --------------------------- ALLOW MESSAGE FORM ---------------------------
+	if( ! $edited_Comment->get_author_User() )
+	{	// Not a member comment
+		?>
+		<input type="checkbox" class="checkbox" name="comment_allow_msgform" value="1"
+		<?php
+		if( $edited_Comment->allow_msgform )
+		{
+			echo ' checked="checked"';
+		}
+		?>
+			id="comment_allow_msgform" tabindex="7" />
+		<label for="comment_allow_msgform"><strong><?php echo T_('Allow message form'); ?></strong></label>
+		<?php
+	}
 
 	$Form->switch_layout( NULL );
 
@@ -246,6 +267,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.7  2009/08/26 23:37:00  tblue246
+ * Backoffice comment editing: Allow changing of "Allow message form" setting for guest comments
+ *
  * Revision 1.6  2009/03/08 23:57:42  fplanque
  * 2009
  *
