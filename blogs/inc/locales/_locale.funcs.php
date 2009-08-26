@@ -819,7 +819,8 @@ function locale_updateDB()
  * Convert a string from one charset to another.
  *
  * @todo Implement iconv and PHP mapping tables
- *
+ * @todo Remove unreliable mb_detect_encoding().
+ * 
  * @see can_convert_charsets()
  * @param string String to convert
  * @param string Target charset (TO)
@@ -1046,6 +1047,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.30  2009/08/26 22:36:25  tblue246
+ * Todo about mb_detect_encoding()
+ *
  * Revision 1.29  2009/08/25 19:56:02  blueyed
  * Add convert_charset timer.
  *
