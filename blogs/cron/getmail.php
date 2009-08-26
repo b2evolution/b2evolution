@@ -106,8 +106,6 @@ if( $test > 0 )
 {
 	//error_reporting (0);
 
-	// TODO: I don't find a header to include for this popup window.
-	//	There should exist one in b2evo. So right now no valid HTML
 	$page_title = T_( 'Blog by email' );
 	echo '<html><head><title>' . $page_title . '</title></head><body>';
 }
@@ -708,13 +706,15 @@ imap_close( $mbox );
 
 if( $test > 0 )
 {
-	// TODO: I don't find a footer to include in this popup. b2evo should include one...
 	echo '</body>';
 }
 
 
 /*
  * $Log$
+ * Revision 1.38  2009/08/26 16:52:15  tblue246
+ * Minor
+ *
  * Revision 1.37  2009/03/15 15:04:22  tblue246
  * minor
  *
