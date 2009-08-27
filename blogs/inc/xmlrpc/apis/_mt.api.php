@@ -18,6 +18,20 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 
+$mt_supportedMethods_sig = array( array( $xmlrpcArray ) );
+$mt_supportedMethods_doc = 'Returns methods supported by the server.';
+function mt_supportedMethods()
+{
+	return new xmlrpcresp( new xmlrpcval( array(
+					new xmlrpcval( 'mt.supportedMethods', 'string' ),
+					new xmlrpcval( 'mt.setPostCategories', 'string' ),
+					new xmlrpcval( 'mt.getPostCategories', 'string' ),
+					new xmlrpcval( 'mt.getCategoryList', 'string' ),
+				), 'array' ) );
+}
+
+
+
 $mt_setPostCategories_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcArray));
 $mt_setPostCategories_doc = 'Sets the categories for a post.';
 /**
@@ -199,7 +213,7 @@ function mt_getCategoryList($m)
 
 
 /*
- *  mt.supportedMethods
+ * *mt.supportedMethods
  *  mt.supportedTextFilters
  *  mt.publishPost
  * *mt.getCategoryList
@@ -208,6 +222,11 @@ function mt_getCategoryList($m)
  *  mt.getRecentPostTitles
  *  mt.getTrackbackPings
  */
+
+$xmlrpc_procs['mt.supportedMethods'] = array(
+				'function' => 'mt_supportedMethods',
+				'signature' => $mt_supportedMethods_sig,
+				'docstring' => $mt_supportedMethods_doc );
 
 $xmlrpc_procs['mt.getCategoryList'] = array(
 				'function' => 'mt_getCategoryList',
@@ -229,10 +248,9 @@ $xmlrpc_procs['mt.getPostCategories'] = array(
 	Missing:
 
 	- mt.supportedTextFilters
-	- mt.supportedMethods
-  - mt.publishPost
-  - mt.getTrackbackPings
-  - mt.getRecentPostTitles
+	- mt.publishPost
+	- mt.getTrackbackPings
+	- mt.getRecentPostTitles
 
 	http://www.sixapart.com/developers/xmlrpc/movable_type_api/
 */
@@ -240,6 +258,9 @@ $xmlrpc_procs['mt.getPostCategories'] = array(
 
 /*
  * $Log$
+ * Revision 1.6  2009/08/27 16:51:16  tblue246
+ * MT API: Implemented mt.supportedMethods
+ *
  * Revision 1.5  2009/08/27 16:01:34  tblue246
  * Replaced unnecessary double quotes with single quotes
  *
