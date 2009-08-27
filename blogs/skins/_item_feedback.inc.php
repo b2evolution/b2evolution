@@ -153,7 +153,7 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 	echo implode( ', ', $disp_title);
 	echo $params['after_section_title'];
 
-	$CommentList = & new CommentList( NULL, implode(',', $type_list), array('published'), $Item->ID, '', 'ASC' );
+	$CommentList = & new CommentList( NULL, implode(',', $type_list), array('published'), $Item->ID, '', $Blog->get_setting( 'comments_orderdir' ) );
 
 	echo $params['comment_list_start'];
 	/**
@@ -207,6 +207,9 @@ skin_include( '_item_comment_form.inc.php', $params );
 
 /*
  * $Log$
+ * Revision 1.20  2009/08/27 12:24:27  tblue246
+ * Added blog setting to display comments in ascending/descending order
+ *
  * Revision 1.19  2009/07/02 18:08:53  fplanque
  * minor
  *

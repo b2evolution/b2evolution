@@ -94,6 +94,11 @@ $Form->begin_fieldset( T_('Feedback options') );
 	$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
 				T_('New feedback status'), T_('This status will be assigned to new comments/trackbacks from non moderators (unless overriden by plugins).') );
 
+	$Form->select_input_array( 'comments_orderdir', $edited_Blog->get_setting('comments_orderdir'), array(
+														'ASC'  => T_('Ascending'),
+														'DESC' => T_('Descending'),
+													), T_('Direction') );
+
 	echo '</div>';
 
 	if( $edited_Blog->get( 'allowcomments' ) == 'never' )
@@ -185,6 +190,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.14  2009/08/27 12:24:27  tblue246
+ * Added blog setting to display comments in ascending/descending order
+ *
  * Revision 1.13  2009/03/08 23:57:42  fplanque
  * 2009
  *

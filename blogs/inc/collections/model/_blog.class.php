@@ -475,6 +475,7 @@ class Blog extends DataObject
 			$this->set_setting( 'new_feedback_status', param( 'new_feedback_status', 'string', 'draft' ) );
 			$this->set_setting( 'allow_rating', param( 'allow_rating', 'string', 'never' ) );
 			$this->set( 'allowtrackbacks', param( 'blog_allowtrackbacks', 'integer', 0 ) );
+			$this->set_setting( 'comments_orderdir', param( 'comments_orderdir', '/^(?:ASC|DESC)$/', 'ASC' ) );
 
 			// Public blog list
 			$this->set( 'in_bloglist',   param( 'blog_in_bloglist',   'integer', 0 ) );
@@ -2140,6 +2141,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.75  2009/08/27 12:24:27  tblue246
+ * Added blog setting to display comments in ascending/descending order
+ *
  * Revision 1.74  2009/08/13 00:41:47  sam2kb
  * Sanitize aggregate_coll_IDs list
  *

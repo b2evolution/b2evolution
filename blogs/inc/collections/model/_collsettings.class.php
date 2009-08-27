@@ -71,6 +71,7 @@ class CollectionSettings extends AbstractSettings
 		// Comment settings:
 			'new_feedback_status' => 'draft',  	// 'draft', 'published' or 'deprecated'
 			'allow_rating'   => 'never',
+			'comments_orderdir' => 'ASC',
 
 		// Archive settings:
 			'arcdir_noindex' => '1',						// META NOINDEX on Archive directory
@@ -167,6 +168,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.36  2009/08/27 12:24:27  tblue246
+ * Added blog setting to display comments in ascending/descending order
+ *
  * Revision 1.35  2009/08/27 11:54:39  tblue246
  * General blog settings: Added default value for archives_sort_order
  *

@@ -114,7 +114,7 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 <h4><?php echo implode( ", ", $disp_title) ?>:</h4>
 
 <?php
-$CommentList = & new CommentList( NULL, implode(',', $type_list), array('published'), $Item->ID, '', 'ASC' );
+$CommentList = & new CommentList( NULL, implode(',', $type_list), array('published'), $Item->ID, '', $Blog->get_setting( 'comments_orderdir' ) );
 
 $CommentList->display_if_empty( array(
 		'msg_empty' => sprintf( /* TRANS: NO comments/trackbacks/pingbacks/ FOR THIS POST... */
