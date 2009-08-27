@@ -51,6 +51,17 @@
 						<li>MovableType API: Implemented mt.supportedMethods. (@tblue)</li>
 					</ul>
 				</li>
+				<li><strong>Bug fixes (technical mumbo-jumbo):</strong>
+					<ul>
+						<li>Fixed a bug in fetch_remote_page() (wrong $info array keys). (@tblue)</li>
+						<li>Item::get_tags(): Bugfix and optimization:
+							Remember items without tags and do not try to
+							fetch tags for them on the next call. (@sir_yabs/@tblue)</li>
+						<li>Code highlight plugin: Correctly unfilter item contents. (@sir_yabs/@tblue)</li>
+						<li>Plugin hooks: Always trigger AfterCommentUpdate/AfterItemUpdate,
+							not only if Comment/Item has changed. (@sir_yabs/@tblue)</li>
+					</ul>
+				</li>
 			</ul>
 			<h2>3.3.2-stable</h2>
 			<ul>
