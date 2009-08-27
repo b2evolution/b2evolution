@@ -76,8 +76,8 @@ function mt_setPostCategories($m)
 		logIO( 'Category ID: '.$catstruct['categoryId'] ) ;
 		if( !empty($catstruct['isPrimary']) )
 		{
-			logIO('got primary category and there should only be one...'.$tempcat);
 			$category = $catstruct['categoryId'];
+			logIO('got primary category and there should only be one... '.$category);
 		}
 		$categories[] = $catstruct['categoryId'];
 	}
@@ -258,6 +258,9 @@ $xmlrpc_procs['mt.getPostCategories'] = array(
 
 /*
  * $Log$
+ * Revision 1.7  2009/08/27 19:15:31  tblue246
+ * Bugfix
+ *
  * Revision 1.6  2009/08/27 16:51:16  tblue246
  * MT API: Implemented mt.supportedMethods
  *
