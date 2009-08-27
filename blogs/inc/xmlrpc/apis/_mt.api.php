@@ -27,6 +27,7 @@ function mt_supportedMethods()
 					new xmlrpcval( 'mt.setPostCategories', 'string' ),
 					new xmlrpcval( 'mt.getPostCategories', 'string' ),
 					new xmlrpcval( 'mt.getCategoryList', 'string' ),
+					new xmlrpcval( 'mt.publishPost', 'string' ),
 				), 'array' ) );
 }
 
@@ -211,11 +212,57 @@ function mt_getCategoryList($m)
 	return _b2_or_mt_get_categories('mt', $m);
 }
 
+$mt_publishPost_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcString,$xmlrpcString));
+$mt_publishPost_doc = 'Sets a post publish status to published';
+/**
+ * mt.publishPost
+ *
+ * @see http://www.sixapart.com/developers/xmlrpc/movable_type_api/mtpublishpost.html
+ *
+ * @param xmlrpcmsg XML-RPC Message
+ *					0 blogid (string): Unique identifier of the blog to query
+ *					1 username (string): Login for a Blogger user who is member of the blog.
+ *					2 password (string): Password for said username.
+ */
+function mt_publishPost($m)
+{
+	logIO('mt_publishPost start');
+	global $xmlrpcerruser;
+	global $Settings;
+	// CHECK LOGIN:
+	/**
+	 * @var User
+	 */
+	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
+	{	// Login failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	// GET POST:
+	/**
+	 * @var Item
+	 */
+	if( ! $edited_Item = & xmlrpcs_get_Item( $m, 0 ) )
+	{	// Failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	$post_title = $edited_Item->title;
+	$content = $edited_Item->content;
+	$post_date = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
+	$main_cat = $edited_Item->main_cat_ID;
+	$cat_IDs = array( $edited_Item->main_cat_ID );
+	$tags = '';
+	$status = 'published';
+	// COMPLETE VALIDATION & UPDATE:
+	//waltercruz> This method should just change a post status to published. Maybe this is overkill? But it works, for a while.
+	return xmlrpcs_edit_item( $edited_Item, $post_title, $content, $post_date, $main_cat, $cat_IDs, $status, $tags );
+
+}
 
 /*
  * *mt.supportedMethods
  *  mt.supportedTextFilters
- *  mt.publishPost
  * *mt.getCategoryList
  * *mt.getPostCategories
  * *mt.setPostCategories
@@ -243,6 +290,11 @@ $xmlrpc_procs['mt.getPostCategories'] = array(
 				'signature' => $mt_getPostCategories_sig,
 				'docstring' => $mt_getPostCategories_doc );
 
+$xmlrpc_procs['mt.publishPost'] = array(
+				'function' => 'mt_publishPost',
+				'signature' => $mt_publishPost_sig,
+				'docstring' => $mt_publishPost_doc );
+
 
 /*
 	Missing:
@@ -258,6 +310,9 @@ $xmlrpc_procs['mt.getPostCategories'] = array(
 
 /*
  * $Log$
+ * Revision 1.8  2009/08/27 20:24:48  waltercruz
+ * Addind publishPost to MovableType API
+ *
  * Revision 1.7  2009/08/27 19:15:31  tblue246
  * Bugfix
  *
