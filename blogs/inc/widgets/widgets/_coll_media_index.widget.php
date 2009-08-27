@@ -189,6 +189,7 @@ class coll_media_index_Widget extends ComponentWidget
 											'post_', 'post_ID '.$this->disp_params['order_dir'].', link_ID' ) );
 
 		$FileList->sql = $SQL->get();
+		pre_dump( $FileList->sql );
 
 		$FileList->query( false, false, false );
 
@@ -213,6 +214,9 @@ class coll_media_index_Widget extends ComponentWidget
 			if( ! $File->is_image() )
 			{	// Skip anything that is not an image
 				// fp> TODO: maybe this property should be stored in link_ltype_ID
+				// Tblue> TODO: If LIMIT is 1 and we order by RAND(), we
+				//        sometimes get no images (only normal files) and
+				//        nothing is displayed "inside" the widget.
 				continue;
 			}
 
@@ -282,6 +286,10 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.9  2009/08/27 13:13:54  tblue246
+ * - Doc/todo
+ * - Minor bugfix
+ *
  * Revision 1.8  2009/07/07 04:52:54  sam2kb
  * Made some strings translatable
  *

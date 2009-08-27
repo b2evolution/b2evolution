@@ -3513,7 +3513,7 @@ function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname_disambigu
 	$order_by = implode( ', ', $orderby_array );
 
 	// Special case for RAND:
-	$order_by = str_replace( $dbprefix.'RAND ', 'RAND()', $order_by );
+	$order_by = str_replace( $dbprefix.'RAND ', 'RAND() ', $order_by );
 
 	// Add an ID parameter to make sure there is no ambiguity in ordering on similar items:
 	$order_by = $order_by.', '.$dbIDname_disambiguation.' '.$order_dir;
@@ -3553,6 +3553,10 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.128  2009/08/27 13:13:54  tblue246
+ * - Doc/todo
+ * - Minor bugfix
+ *
  * Revision 1.127  2009/08/23 12:58:49  tblue246
  * minor
  *
