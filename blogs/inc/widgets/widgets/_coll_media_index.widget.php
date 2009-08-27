@@ -189,7 +189,6 @@ class coll_media_index_Widget extends ComponentWidget
 											'post_', 'post_ID '.$this->disp_params['order_dir'].', link_ID' ) );
 
 		$FileList->sql = $SQL->get();
-		pre_dump( $FileList->sql );
 
 		$FileList->query( false, false, false );
 
@@ -286,6 +285,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.10  2009/08/27 13:15:28  tblue246
+ * Removed left over pre_dump()...
+ *
  * Revision 1.9  2009/08/27 13:13:54  tblue246
  * - Doc/todo
  * - Minor bugfix
