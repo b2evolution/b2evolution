@@ -91,12 +91,12 @@ function _mw_get_cat_IDs( $contentstruct, $blog_ID, $empty_struct_ok = false )
 			$sql = substr($sql, 0, -2); // remove ', '
 		}
 		$sql .= ' )';
-		logIO("sql for finding IDs ...".$sql);
+		logIO('sql for finding IDs ...'.$sql);
 
 		$cat_IDs = $DB->get_col( $sql );
 		if( $DB->error )
 		{	// DB error
-			logIO("user error finding categories info ...");
+			logIO('user error finding categories info ...');
 		}
 	}
 	else
@@ -111,14 +111,14 @@ function _mw_get_cat_IDs( $contentstruct, $blog_ID, $empty_struct_ok = false )
 		$ChapterCache = & get_Cache('ChapterCache');
 		if( $ChapterCache->get_by_ID( $cat_IDs[0], false ) === false )
 		{ // Main cat does not exist:
-			logIO("usererror 5 ...");
+			logIO('usererror 5 ...');
 			return new xmlrpcresp(0, $xmlrpcerruser+5, 'Requested category does not exist.'); // user error 5
 		}
-		logIO("finished checking if main category exists ...".$cat_IDs[0]);
+		logIO('finished checking if main category exists ...'.$cat_IDs[0]);
 	}
 	else
 	{ // No category given/valid - use the first for the blog:
-		logIO("No category for post given ...");
+		logIO('No category for post given ...');
 
 		$first_cat = $DB->get_var( '
 			SELECT cat_ID
@@ -446,7 +446,7 @@ function mw_editpost( $m )
 
 	$xcontent = $m->getParam(3);
 	$contentstruct = xmlrpc_decode_recurse($xcontent);
-	logIO("Decoded xcontent");
+	logIO('Decoded xcontent');
 
 	// Categories:
 	$cat_IDs = _mw_get_cat_IDs( $contentstruct, $edited_Item->get_blog_ID(), true /* empty is ok */ );
@@ -605,7 +605,7 @@ function mw_getcategories( $m )
 				'htmlUrl' => new xmlrpcval( $Chapter->get_permanent_url() ),
 				'rssUrl' => new xmlrpcval( url_add_param($Chapter->get_permanent_url(), 'tempskin=_rss2') )
 			//	mb_convert_encoding( $row->cat_name, "utf-8", "iso-8859-1")  )
-			),"struct");
+			),'struct');
 	}
 
 	logIO( 'OK.' );
@@ -661,7 +661,7 @@ function mw_getrecentposts( $m )
 
 	$numposts = $m->getParam(3);
 	$numposts = $numposts->scalarval();
-	logIO("In mw_getrecentposts, current numposts is ...". $numposts);
+	logIO('In mw_getrecentposts, current numposts is ...'. $numposts);
 
 	// Get the posts to display:
 	load_class( 'items/model/_itemlist.class.php' );
@@ -687,8 +687,8 @@ function mw_getrecentposts( $m )
 		xmlrpc_debugmsg( 'Item:'.$Item->title.
 											' - Issued: '.$Item->issue_date.
 											' - Modified: '.$Item->mod_date );
-		$post_date = mysql2date("U", $Item->issue_date);
-		$post_date = gmdate("Ymd", $post_date)."T".gmdate("H:i:s", $post_date);
+		$post_date = mysql2date('U', $Item->issue_date);
+		$post_date = gmdate('Ymd', $post_date).'T'.gmdate('H:i:s', $post_date);
 		$content = $Item->content;
 		$content = str_replace("\n",'',$content); // Tor - kludge to fix bug in xmlrpc libraries
 		// Load Item's creator User:
@@ -701,13 +701,13 @@ function mw_getrecentposts( $m )
 		xmlrpc_debugmsg( 'postcats:'.$hope_Chapter->name );
 		xmlrpc_debugmsg( 'test:'.$test);
 		$data[] = new xmlrpcval(array(
-				"dateCreated" => new xmlrpcval($post_date,"dateTime.iso8601"),
-				"userid" => new xmlrpcval($Item->creator_user_ID),
-				"postid" => new xmlrpcval($Item->ID),
-				"categories" => new xmlrpcval(array(new xmlrpcval($hope_Chapter->name)),'array'),
-				"title" => new xmlrpcval($Item->title),
-				"description" => new xmlrpcval($content),
-				"link" => new xmlrpcval($Item->url),
+				'dateCreated' => new xmlrpcval($post_date,'dateTime.iso8601'),
+				'userid' => new xmlrpcval($Item->creator_user_ID),
+				'postid' => new xmlrpcval($Item->ID),
+				'categories' => new xmlrpcval(array(new xmlrpcval($hope_Chapter->name)),'array'),
+				'title' => new xmlrpcval($Item->title),
+				'description' => new xmlrpcval($content),
+				'link' => new xmlrpcval($Item->url),
 				'publish' => new xmlrpcval(($Item->status == 'published'),'boolean'),
 				/*
 				"permalink" => new xmlrpcval($Item->urltitle),
@@ -716,9 +716,9 @@ function mw_getrecentposts( $m )
 				"mt_allow_pings" => new xmlrpcval('1'),
 				"mt_text_more" => new xmlrpcval('')
 				*/
-			),"struct");
+			),'struct');
 	}
-	$resp = new xmlrpcval($data, "array");
+	$resp = new xmlrpcval($data, 'array');
 
 	logIO( 'OK.' );
 	return new xmlrpcresp($resp);
@@ -770,14 +770,14 @@ function mw_getpost($m)
 	logIO( 'Permission granted.' );
 
 
-	$post_date = mysql2date( "U", $edited_Item->issue_date );
-	$post_date = gmdate("Ymd", $post_date)."T".gmdate("H:i:s", $post_date);
+	$post_date = mysql2date( 'U', $edited_Item->issue_date );
+	$post_date = gmdate('Ymd', $post_date).'T'.gmdate('H:i:s', $post_date);
 
 	$struct = new xmlrpcval(array(
 			'link'              => new xmlrpcval( $edited_Item->get_permanent_url()),
 			'title'             => new xmlrpcval( $edited_Item->title),
 			'description'       => new xmlrpcval( $edited_Item->content),
-			'dateCreated'       => new xmlrpcval( $post_date,"dateTime.iso8601"),
+			'dateCreated'       => new xmlrpcval( $post_date,'dateTime.iso8601'),
 			'userid'            => new xmlrpcval( $edited_Item->creator_user_ID),
 			'postid'            => new xmlrpcval( $edited_Item->ID),
 			'content'           => new xmlrpcval( $edited_Item->content),
@@ -789,7 +789,7 @@ function mw_getpost($m)
 			'mt_allow_pings'    => new xmlrpcval( $edited_Item->notifications_status,'int'), // TODO: convert
 			'mt_text_more'      => new xmlrpcval( "")	// Doc?
 			*/
-		),"struct");
+		),'struct');
 	$resp = $struct;
 
 	logIO( 'OK.' );
@@ -799,39 +799,42 @@ function mw_getpost($m)
 
 
 
-$xmlrpc_procs["metaWeblog.newMediaObject"] = array(
-				"function" => "mw_newmediaobject",
-				"signature" => $mwnewMediaObject_sig,
-				"docstring" => $mwnewMediaObject_doc);
+$xmlrpc_procs['metaWeblog.newMediaObject'] = array(
+				'function' => 'mw_newmediaobject',
+				'signature' => $mwnewMediaObject_sig,
+				'docstring' => $mwnewMediaObject_doc);
 
-$xmlrpc_procs["metaWeblog.newPost"] = array(
-				"function" => "mw_newpost",
-				"signature" => $mwnewpost_sig,
-				"docstring" => $mwnewpost_doc );
+$xmlrpc_procs['metaWeblog.newPost'] = array(
+				'function' => 'mw_newpost',
+				'signature' => $mwnewpost_sig,
+				'docstring' => $mwnewpost_doc );
 
-$xmlrpc_procs["metaWeblog.editPost"] = array(
-				"function" => "mw_editpost",
-				"signature" => $mweditpost_sig,
-				"docstring" => $mweditpost_doc );
+$xmlrpc_procs['metaWeblog.editPost'] = array(
+				'function' => 'mw_editpost',
+				'signature' => $mweditpost_sig,
+				'docstring' => $mweditpost_doc );
 
-$xmlrpc_procs["metaWeblog.getPost"] = array(
-				"function" => "mw_getpost",
-				"signature" => $mwgetpost_sig,
-				"docstring" => $mwgetpost_doc );
+$xmlrpc_procs['metaWeblog.getPost'] = array(
+				'function' => 'mw_getpost',
+				'signature' => $mwgetpost_sig,
+				'docstring' => $mwgetpost_doc );
 
-$xmlrpc_procs["metaWeblog.getCategories"] = array(
-				"function" => "mw_getcategories",
-				"signature" => $mwgetcats_sig,
-				"docstring" => $mwgetcats_doc );
+$xmlrpc_procs['metaWeblog.getCategories'] = array(
+				'function' => 'mw_getcategories',
+				'signature' => $mwgetcats_sig,
+				'docstring' => $mwgetcats_doc );
 
-$xmlrpc_procs["metaWeblog.getRecentPosts"] = array(
-				"function" => "mw_getrecentposts",
-				"signature" => $metawebloggetrecentposts_sig,
-				"docstring" => $metawebloggetrecentposts_doc );
+$xmlrpc_procs['metaWeblog.getRecentPosts'] = array(
+				'function' => 'mw_getrecentposts',
+				'signature' => $metawebloggetrecentposts_sig,
+				'docstring' => $metawebloggetrecentposts_doc );
 
 
 /*
  * $Log$
+ * Revision 1.11  2009/08/27 16:01:34  tblue246
+ * Replaced unnecessary double quotes with single quotes
+ *
  * Revision 1.10  2009/03/08 23:57:47  fplanque
  * 2009
  *

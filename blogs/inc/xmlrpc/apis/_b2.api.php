@@ -168,23 +168,26 @@ function b2_getposturl($m)
 }
 
 
-$xmlrpc_procs["b2.newPost"] = array(
-				"function" => "b2_newpost",
-				"signature" => $b2newpost_sig,
-				"docstring" => $b2newpost_doc );
+$xmlrpc_procs['b2.newPost'] = array(
+				'function' => 'b2_newpost',
+				'signature' => $b2newpost_sig,
+				'docstring' => $b2newpost_doc );
 
-$xmlrpc_procs["b2.getCategories"] = array(
-				"function" => "b2_getcategories",
-				"signature" => $b2getcategories_sig,
-				"docstring" => $b2getcategories_doc );
+$xmlrpc_procs['b2.getCategories'] = array(
+				'function' => 'b2_getcategories',
+				'signature' => $b2getcategories_sig,
+				'docstring' => $b2getcategories_doc );
 
-$xmlrpc_procs["b2.getPostURL"] = array(
-				"function" => "b2_getposturl",
-				"signature" => $b2_getPostURL_sig,
-				"docstring" => $b2_getPostURL_doc );
+$xmlrpc_procs['b2.getPostURL'] = array(
+				'function' => 'b2_getposturl',
+				'signature' => $b2_getPostURL_sig,
+				'docstring' => $b2_getPostURL_doc );
 
 /*
  * $Log$
+ * Revision 1.7  2009/08/27 16:01:34  tblue246
+ * Replaced unnecessary double quotes with single quotes
+ *
  * Revision 1.6  2009/03/08 23:57:46  fplanque
  * 2009
  *

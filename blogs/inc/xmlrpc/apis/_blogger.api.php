@@ -334,13 +334,13 @@ function blogger_getusersblogs($m)
 		 */
 		$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
 
-		logIO("Current user IS a member of this blog.".$l_blog_ID);
+		logIO('Current user IS a member of this blog.'.$l_blog_ID);
 
 		$resp_array[] = new xmlrpcval( array(
-					"blogid" => new xmlrpcval( $l_blog_ID ),
-					"blogName" => new xmlrpcval( $l_Blog->get('shortname') ),
-					"url" => new xmlrpcval( $l_Blog->gen_blogurl() ),
-					"isAdmin" => new xmlrpcval( $current_User->check_perm( 'templates', 'any' ), 'boolean')
+					'blogid' => new xmlrpcval( $l_blog_ID ),
+					'blogName' => new xmlrpcval( $l_Blog->get('shortname') ),
+					'url' => new xmlrpcval( $l_Blog->gen_blogurl() ),
+					'isAdmin' => new xmlrpcval( $current_User->check_perm( 'templates', 'any' ), 'boolean')
 												), 'struct');
 	}
 
@@ -453,8 +453,8 @@ function blogger_getpost($m)
 	logIO( 'Permission granted.' );
 
 
-	$post_date = mysql2date( "U", $edited_Item->issue_date );
-	$post_date = gmdate("Ymd", $post_date)."T".gmdate("H:i:s", $post_date);
+	$post_date = mysql2date( 'U', $edited_Item->issue_date );
+	$post_date = gmdate('Ymd', $post_date).'T'.gmdate('H:i:s', $post_date);
 
 	$content	= '<title>'.$edited_Item->title.'</title>';
 	$content .= '<category>'.$edited_Item->main_cat_ID.'</category>';
@@ -465,7 +465,7 @@ function blogger_getpost($m)
 									'dateCreated' => new xmlrpcval( $post_date, 'dateTime.iso8601' ),
 									'content'     => new xmlrpcval( $content ),
 									'postid'      => new xmlrpcval( $edited_Item->ID )
-								), "struct" );
+								), 'struct' );
 
 	logIO( 'OK.' );
 	return new xmlrpcresp($struct);
@@ -552,8 +552,8 @@ function blogger_getrecentposts( $m )
 											' - Issued: '.$Item->issue_date.
 											' - Modified: '.$Item->mod_date );
 
-		$post_date = mysql2date("U", $Item->issue_date);
-		$post_date = gmdate("Ymd", $post_date)."T".gmdate("H:i:s", $post_date);
+		$post_date = mysql2date('U', $Item->issue_date);
+		$post_date = gmdate('Ymd', $post_date).'T'.gmdate('H:i:s', $post_date);
 
 		$content	= '<title>'.$Item->title.'</title>';
 		$content .= '<category>'.$Item->main_cat_ID.'</category>';
@@ -564,58 +564,61 @@ function blogger_getrecentposts( $m )
 		$authorname = $Item->creator_User->get('preferredname');
 
 		$data[] = new xmlrpcval(array(
-									"authorName" => new xmlrpcval($authorname),
-									"userid" => new xmlrpcval($Item->creator_user_ID),
-									"dateCreated" => new xmlrpcval($post_date,"dateTime.iso8601"),
-									"content" => new xmlrpcval($content),
-									"postid" => new xmlrpcval($Item->ID)
-									),"struct");
+									'authorName' => new xmlrpcval($authorname),
+									'userid' => new xmlrpcval($Item->creator_user_ID),
+									'dateCreated' => new xmlrpcval($post_date,'dateTime.iso8601'),
+									'content' => new xmlrpcval($content),
+									'postid' => new xmlrpcval($Item->ID)
+									),'struct');
 	}
 
-	$resp = new xmlrpcval($data, "array");
+	$resp = new xmlrpcval($data, 'array');
 
 	logIO( 'OK.' );
 	return new xmlrpcresp($resp);
 }
 
 
-$xmlrpc_procs["blogger.newPost"] = array(
-				"function" => "blogger_newpost",
-				"signature" => $bloggernewpost_sig,
-				"docstring" => $bloggernewpost_doc );
+$xmlrpc_procs['blogger.newPost'] = array(
+				'function' => 'blogger_newpost',
+				'signature' => $bloggernewpost_sig,
+				'docstring' => $bloggernewpost_doc );
 
-$xmlrpc_procs["blogger.editPost"] = array(
-				"function" => "blogger_editpost",
-				"signature" => $bloggereditpost_sig,
-				"docstring" => $bloggereditpost_doc );
+$xmlrpc_procs['blogger.editPost'] = array(
+				'function' => 'blogger_editpost',
+				'signature' => $bloggereditpost_sig,
+				'docstring' => $bloggereditpost_doc );
 
-$xmlrpc_procs["blogger.deletePost"] = array(
-				"function" => "blogger_deletepost",
-				"signature" => $bloggerdeletepost_sig,
-				"docstring" => $bloggerdeletepost_doc );
+$xmlrpc_procs['blogger.deletePost'] = array(
+				'function' => 'blogger_deletepost',
+				'signature' => $bloggerdeletepost_sig,
+				'docstring' => $bloggerdeletepost_doc );
 
-$xmlrpc_procs["blogger.getUsersBlogs"] = array(
-				"function" => "blogger_getusersblogs",
-				"signature" => $bloggergetusersblogs_sig,
-				"docstring" => $bloggergetusersblogs_doc );
+$xmlrpc_procs['blogger.getUsersBlogs'] = array(
+				'function' => 'blogger_getusersblogs',
+				'signature' => $bloggergetusersblogs_sig,
+				'docstring' => $bloggergetusersblogs_doc );
 
-$xmlrpc_procs["blogger.getUserInfo"] = array(
-				"function" => "blogger_getuserinfo",
-				"signature" => $bloggergetuserinfo_sig,
-				"docstring" => $bloggergetuserinfo_doc );
+$xmlrpc_procs['blogger.getUserInfo'] = array(
+				'function' => 'blogger_getuserinfo',
+				'signature' => $bloggergetuserinfo_sig,
+				'docstring' => $bloggergetuserinfo_doc );
 
-$xmlrpc_procs["blogger.getPost"] = array(
-				"function" => "blogger_getpost",
-				"signature" => $bloggergetpost_sig,
-				"docstring" => $bloggergetpost_doc );
+$xmlrpc_procs['blogger.getPost'] = array(
+				'function' => 'blogger_getpost',
+				'signature' => $bloggergetpost_sig,
+				'docstring' => $bloggergetpost_doc );
 
-$xmlrpc_procs["blogger.getRecentPosts"] = array(
-				"function" => "blogger_getrecentposts",
-				"signature" => $bloggergetrecentposts_sig,
-				"docstring" => $bloggergetrecentposts_doc );
+$xmlrpc_procs['blogger.getRecentPosts'] = array(
+				'function' => 'blogger_getrecentposts',
+				'signature' => $bloggergetrecentposts_sig,
+				'docstring' => $bloggergetrecentposts_doc );
 
 /*
  * $Log$
+ * Revision 1.7  2009/08/27 16:01:34  tblue246
+ * Replaced unnecessary double quotes with single quotes
+ *
  * Revision 1.6  2009/03/08 23:57:46  fplanque
  * 2009
  *
