@@ -137,14 +137,7 @@ class archives_plugin extends Plugin
 		}
 		if(!isset($params['sort_order']))
 		{
-			if ( !is_null ($Blog->get_setting('archives_sort_order') ) )
-			{
-				$params['sort_order'] = $Blog->get_setting('archives_sort_order');
-			}
-			else
-			{
-				$params['sort_order'] = 'date';
-			}
+			$params['sort_order'] = $Blog->get_setting('archives_sort_order');
 		}
 
 		// Link type:
@@ -636,6 +629,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.56  2009/08/27 11:54:40  tblue246
+ * General blog settings: Added default value for archives_sort_order
+ *
  * Revision 1.55  2009/08/10 17:15:25  waltercruz
  * Adding permalinks on postbypost archive mode and adding a button to set the sort order on postbypost mode
  *

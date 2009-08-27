@@ -82,6 +82,7 @@ class CollectionSettings extends AbstractSettings
 			'archive_posts_per_page' => '100',
 			'archive_noindex' => '1',						// META NOINDEX on Archive pages
 			'archive_nofollowto' => '0',        // NOFOLLOW on links to archive pages
+			'archives_sort_order' => 'date',
 
 		// Chapter/Category settings:
 			'catdir_noindex' => '1',						// META NOINDEX on Category directory
@@ -166,6 +167,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.35  2009/08/27 11:54:39  tblue246
+ * General blog settings: Added default value for archives_sort_order
+ *
  * Revision 1.34  2009/05/26 17:36:41  fplanque
  * Have twitter plugin enabled by default. (it still won't tweet until user enters credentials)
  *
