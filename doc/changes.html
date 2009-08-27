@@ -39,7 +39,18 @@
 						<li>plugin disp types (yabs)</li>
 					</ul>
 				</li>
-				<li>Post type permissions (blog user/group perms) (@tblue)</li>
+				<li>Added post type permissions (configurable through blog user/group perms) (@tblue)</li>
+				<li>Backoffice comment editing: Allow changing of "Allow message form" setting for guest comments (@tblue)</li>
+				<li>Blog options: Added option to sort comments by ascending or descending order (@tblue)</li>
+				<li><strong>XML-RPC:</strong>
+					<ul>
+						<li>MetaWeblog API: Use mt_keyword field to get/set
+							post tags. Affected methods: metaWeblog.newPost,
+							metaWeblog.editPost, metaWeblog.getRecentPosts,
+							metaweblog.getPost. (@tblue)</li>
+						<li>MovableType API: Implemented mt.supportedMethods. (@tblue)</li>
+					</ul>
+				</li>
 			</ul>
 			<h2>3.3.2-stable</h2>
 			<ul>
