@@ -212,23 +212,22 @@ function mt_getCategoryList($m)
 	return _b2_or_mt_get_categories('mt', $m);
 }
 
-$mt_publishPost_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcString,$xmlrpcString));
-$mt_publishPost_doc = 'Sets a post publish status to published';
+$mt_publishPost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcString));
+$mt_publishPost_doc = 'Published a post';
 /**
  * mt.publishPost
  *
  * @see http://www.sixapart.com/developers/xmlrpc/movable_type_api/mtpublishpost.html
  *
  * @param xmlrpcmsg XML-RPC Message
- *					0 blogid (string): Unique identifier of the blog to query
- *					1 username (string): Login for a Blogger user who is member of the blog.
+ *					0 postid (string): Unique identifier of the post to publish
+ *					1 username (string): Login for a user who is member of the blog.
  *					2 password (string): Password for said username.
  */
 function mt_publishPost($m)
 {
-	logIO('mt_publishPost start');
-	global $xmlrpcerruser;
-	global $Settings;
+	global $localtimenow, $DB;
+
 	// CHECK LOGIN:
 	/**
 	 * @var User
@@ -237,6 +236,7 @@ function mt_publishPost($m)
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
+	logIO( 'mt_publishPost: Login OK' );
 
 	// GET POST:
 	/**
@@ -247,28 +247,31 @@ function mt_publishPost($m)
 		return xmlrpcs_resperror();
 	}
 
-	$post_title = $edited_Item->title;
-	$content = $edited_Item->content;
-	$post_date = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
-	$main_cat = $edited_Item->main_cat_ID;
-	$cat_IDs = array( $edited_Item->main_cat_ID );
-	$tags = '';
-	$status = 'published';
-	// COMPLETE VALIDATION & UPDATE:
-	//waltercruz> This method should just change a post status to published. Maybe this is overkill? But it works, for a while.
-	return xmlrpcs_edit_item( $edited_Item, $post_title, $content, $post_date, $main_cat, $cat_IDs, $status, $tags );
+	if( ! $current_User->check_perm( 'item_post!published', 'edit', false, $edited_Item )
+		|| ! $current_User->check_perm( 'edit_timestamp' ) )
+	{
+		return xmlrpcs_resperror( 3 ); // Permission denied
+	}
+	logIO('mt_publishPost: Permission granted');
 
+	logIO( 'mt_publishPost: Old post status: '.$edited_Item->status );
+	$edited_Item->set( 'status', 'published' );
+	$edited_Item->set( 'datestart', date('Y-m-d H:i:s', $localtimenow) );
+
+	if( $edited_Item->dbupdate() === false )
+	{	// Could not update item...
+		return xmlrpcs_resperror( 99, 'Database error: '.$DB->last_error ); // DB error
+	}
+	logIO('mt_publishPost: Item published.');
+
+	// Execute or schedule notifications & pings:
+	logIO( 'mt_publishPost: Handling notifications...' );
+	$edited_Item->handle_post_processing( false );
+
+	logIO( 'mt_publishPost: OK.' );
+	return new xmlrpcresp( new xmlrpcval( 1, 'boolean' ) );
 }
 
-/*
- * *mt.supportedMethods
- *  mt.supportedTextFilters
- * *mt.getCategoryList
- * *mt.getPostCategories
- * *mt.setPostCategories
- *  mt.getRecentPostTitles
- *  mt.getTrackbackPings
- */
 
 $xmlrpc_procs['mt.supportedMethods'] = array(
 				'function' => 'mt_supportedMethods',
@@ -300,7 +303,6 @@ $xmlrpc_procs['mt.publishPost'] = array(
 	Missing:
 
 	- mt.supportedTextFilters
-	- mt.publishPost
 	- mt.getTrackbackPings
 	- mt.getRecentPostTitles
 
@@ -310,6 +312,9 @@ $xmlrpc_procs['mt.publishPost'] = array(
 
 /*
  * $Log$
+ * Revision 1.9  2009/08/27 21:53:55  tblue246
+ * MovableType API/mt.publishPost(): Check permission!!
+ *
  * Revision 1.8  2009/08/27 20:24:48  waltercruz
  * Addind publishPost to MovableType API
  *
