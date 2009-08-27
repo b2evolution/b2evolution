@@ -386,9 +386,10 @@ function mw_newpost($m)
 	$post_date = _mw_decode_postdate( $contentstruct, true );
 	$post_title = $contentstruct['title'];
 	$content = $contentstruct['description'];
+	$tags = isset( $contentstruct['mt_keywords'] ) ? $contentstruct['mt_keywords'] : ''; // non-standard MT extension
 
 	// COMPLETE VALIDATION & INSERT:
-	return xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status );
+	return xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status, $tags );
 }
 
 
@@ -480,10 +481,10 @@ function mw_editpost( $m )
 	$post_date = _mw_decode_postdate( $contentstruct, false );
 	$post_title = $contentstruct['title'];
 	$content = $contentstruct['description'];
-
+	$tags = isset( $contentstruct['mt_keywords'] ) ? $contentstruct['mt_keywords'] : NULL /* don't change tags */; // non-standard MT extension
 
 	// COMPLETE VALIDATION & UPDATE:
-	return xmlrpcs_edit_item( $edited_Item, $post_title, $content, $post_date, $main_cat, $cat_IDs, $status );
+	return xmlrpcs_edit_item( $edited_Item, $post_title, $content, $post_date, $main_cat, $cat_IDs, $status, $tags );
 
 
 	/*
@@ -709,6 +710,7 @@ function mw_getrecentposts( $m )
 				'description' => new xmlrpcval($content),
 				'link' => new xmlrpcval($Item->url),
 				'publish' => new xmlrpcval(($Item->status == 'published'),'boolean'),
+				'mt_keywords' => new xmlrpcval( implode( ',', $Item->get_tags() ), 'string' ),
 				/*
 				"permalink" => new xmlrpcval($Item->urltitle),
 				"mt_excerpt" => new xmlrpcval($content),
@@ -783,6 +785,7 @@ function mw_getpost($m)
 			'content'           => new xmlrpcval( $edited_Item->content),
 			'permalink'         => new xmlrpcval( $edited_Item->get_permanent_url()),
 			'categories'        => new xmlrpcval( $edited_Item->main_cat_ID),	// TODO: CATEGORY NAMES!
+			'mt_keywords'       => new xmlrpcval( implode( ',', $edited_Item->get_tags() ), 'string' ),
 			/*
 			'mt_excerpt'        => new xmlrpcval( $edited_Item->excerpt),
 			'mt_allow_comments' => new xmlrpcval( $edited_Item->comment_status,'int'), // TODO: convert, looking for doc!!?
@@ -832,6 +835,9 @@ $xmlrpc_procs['metaWeblog.getRecentPosts'] = array(
 
 /*
  * $Log$
+ * Revision 1.12  2009/08/27 17:46:12  tblue246
+ * Metaweblog API: Use mt_keywords for item tags (set/get)
+ *
  * Revision 1.11  2009/08/27 16:01:34  tblue246
  * Replaced unnecessary double quotes with single quotes
  *

@@ -325,9 +325,10 @@ function xmlrpcs_resperror( $errcode = NULL, $errmsg = NULL )
  * @param integer main category
  * @param array of integers : extra categories
  * @param string status
+ * @param string Tags
  * @return xmlrpcmsg
  */
-function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status )
+function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status, $tags = '' )
 {
   /**
 	 * @var User
@@ -355,7 +356,8 @@ function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_ID
 	$edited_Item->set( 'datestart', $post_date );
 	$edited_Item->set( 'main_cat_ID', $main_cat );
 	$edited_Item->set( 'extra_cat_IDs', $cat_IDs );
-	$edited_Item->set( 'status', $status);
+	$edited_Item->set( 'status', $status );
+	$edited_Item->set_tags_from_string( $tags );
 	$edited_Item->set( 'locale', $current_User->locale );
 	$edited_Item->set_creator_User( $current_User );
 	$edited_Item->dbinsert();
@@ -384,9 +386,10 @@ function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_ID
  * @param integer main category
  * @param array of integers : extra categories
  * @param string status
+ * @param NULL|string Tags (NULL to leave tags unchanged)
  * @return xmlrpcmsg
  */
-function xmlrpcs_edit_item( & $edited_Item, $post_title, $content, $post_date, $main_cat, $cat_IDs, $status )
+function xmlrpcs_edit_item( & $edited_Item, $post_title, $content, $post_date, $main_cat, $cat_IDs, $status, $tags = NULL )
 {
   /**
 	 * @var User
@@ -422,6 +425,10 @@ function xmlrpcs_edit_item( & $edited_Item, $post_title, $content, $post_date, $
 	{ // Extra-Cats:
 		$edited_Item->set('extra_cat_IDs', $cat_IDs);
 	}
+	if( $tags !== NULL )
+	{
+		$edited_Item->set_tags_from_string( $tags );
+	}
 	$edited_Item->dbupdate();
 	if( $DB->error )
 	{ // DB error
@@ -439,6 +446,9 @@ function xmlrpcs_edit_item( & $edited_Item, $post_title, $content, $post_date, $
 
 /*
  * $Log$
+ * Revision 1.7  2009/08/27 17:46:13  tblue246
+ * Metaweblog API: Use mt_keywords for item tags (set/get)
+ *
  * Revision 1.6  2009/01/28 21:23:23  fplanque
  * Manual ordering of categories
  *
