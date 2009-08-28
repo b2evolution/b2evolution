@@ -634,7 +634,7 @@
 				// http compression of output: only
 				// if we can do it, and we want to do it, and client asked us to,
 				// and php ini settings do not force it already
-				$php_no_self_compress = ini_get('zlib.output_compression') == '' && (ini_get('output_handler') != 'ob_gzhandler');
+				$php_no_self_compress = !ini_get('zlib.output_compression') && (ini_get('output_handler') != 'ob_gzhandler');
 				if($this->compress_response && function_exists('gzencode') && $resp_encoding != ''
 					&& $php_no_self_compress)
 				{
@@ -676,9 +676,10 @@
 		* @param string $function the php function that will get invoked
 		* @param array $sig the array of valid method signatures
 		* @param string $doc method documentation
+		* @param array $sigdoc the array of valid method signatures docs (one string per param, one for return type)
 		* @access public
 		*/
-		function add_to_map($methodname,$function,$sig=null,$doc='')
+		function add_to_map($methodname,$function,$sig=null,$doc=false,$sigdoc=false)
 		{
 			$this->dmap[$methodname] = array(
 				'function'	=> $function,
@@ -687,6 +688,10 @@
 			if ($sig)
 			{
 				$this->dmap[$methodname]['signature'] = $sig;
+			}
+			if ($sigdoc)
+			{
+			    $this->dmap[$methodname]['signature_docs'] = $sigdoc;
 			}
 		}
 
@@ -1199,6 +1204,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2009/08/28 18:22:05  waltercruz
+ * Updating xmlrpc to 2.2.2
+ *
  * Revision 1.2  2009/01/28 22:32:29  afwas
  * - Bumped to version 2.2.1 - March 6, 2008
  * - Added check for installed zlib in _xmlrpc.inc.php from line 1073. See http://forums.b2evolution.net/viewtopic.php?t=17029

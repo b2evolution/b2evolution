@@ -6,9 +6,11 @@
  * @version $Id$
  * @copyright G. Giunta (C) 2006
  * @author Gaetano Giunta
+ * @copyright (C) 2006-2008 G. Giunta
+ * @license code licensed under the BSD License: http://phpxmlrpc.sourceforge.net/license.txt
  *
  * @todo separate introspection from code generation for func-2-method wrapping
- * @todo use some better templating system from code generation?
+ * @todo use some better templating system for code generation?
  * @todo implement method wrapping with preservation of php objs in calls
  * @todo when wrapping methods without obj rebuilding, use return_type = 'phpvals' (faster)
  * @todo implement self-parsing of php code for PHP <= 4
@@ -121,7 +123,7 @@
 	* php functions (ie. functions not expecting a single xmlrpcmsg obj as parameter)
 	* is by making use of the functions_parameters_type class member.
 	*
-	* @param string $funcname the name of the PHP user function to be exposed as xmlrpc method; array($obj, 'methodname') might be ok too, in the future...
+	* @param string $funcname the name of the PHP user function to be exposed as xmlrpc method; array($obj, 'methodname') and array('class', 'methodname') are ok too
 	* @param string $newfuncname (optional) name for function to be created
 	* @param array $extra_options (optional) array of options for conversion. valid values include:
 	*        bool  return_source when true, php code w. function definition will be returned, not evaluated
@@ -135,8 +137,10 @@
 	* @todo finish using javadoc info to build method sig if all params are named but out of order
 	* @todo add a check for params of 'resource' type
 	* @todo add some trigger_errors / error_log when returning false?
-	* @todo what to do when the PHP function returns NULL? we are currently an empty string value...
+	* @todo what to do when the PHP function returns NULL? we are currently returning an empty string value...
 	* @todo add an option to suppress php warnings in invocation of user function, similar to server debug level 3?
+	* @todo if $newfuncname is empty, we could use create_user_func instead of eval, as it is possibly faster
+	* @todo add a verbatim_object_copy parameter to allow avoiding the same obj instance?
 	*/
 	function wrap_php_function($funcname, $newfuncname='', $extra_options=array())
 	{
@@ -152,9 +156,34 @@
 			error_log('XML-RPC: cannot not wrap php functions unless running php version bigger than 5.0.3');
 			return false;
 		}
-		if((is_array($funcname) && !method_exists($funcname[0], $funcname[1])) || !function_exists($funcname))
+
+        $exists = false;
+        if(is_array($funcname))
 		{
-			error_log('XML-RPC: function to be wrapped is not defined: '.$funcname);
+            if(count($funcname) < 2 || (!is_string($funcname[0]) && !is_object($funcname[0])))
+            {
+    			error_log('XML-RPC: syntax for function to be wrapped is wrong');
+    			return false;
+            }
+            if(is_string($funcname[0]))
+            {
+                $plainfuncname = implode('::', $funcname);
+            }
+            elseif(is_object($funcname[0]))
+            {
+                $plainfuncname = get_class($funcname[0]) . '->' . $funcname[1];
+            }
+            $exists = method_exists($funcname[0], $funcname[1]);
+        }
+        else
+        {
+            $plainfuncname = $funcname;
+            $exists = function_exists($funcname);
+        }
+
+		if(!$exists)
+		{
+			error_log('XML-RPC: function to be wrapped is not defined: '.$plainfuncname);
 			return false;
 		}
 		else
@@ -164,7 +193,10 @@
 			{
 				if(is_array($funcname))
 				{
+    				if(is_string($funcname[0]))
 					$xmlrpcfuncname = "{$prefix}_".implode('_', $funcname);
+    				else
+    					$xmlrpcfuncname = "{$prefix}_".get_class($funcname[0]) . '_' . $funcname[1];
 				}
 				else
 				{
@@ -181,12 +213,45 @@
 			}
 
 			// start to introspect PHP code
+			if(is_array($funcname))
+			{
+    			$func =& new ReflectionMethod($funcname[0], $funcname[1]);
+    			if($func->isPrivate())
+    			{
+    				error_log('XML-RPC: method to be wrapped is private: '.$plainfuncname);
+    				return false;
+    			}
+    			if($func->isProtected())
+    			{
+    				error_log('XML-RPC: method to be wrapped is protected: '.$plainfuncname);
+    				return false;
+    			}
+     			if($func->isConstructor())
+    			{
+    				error_log('XML-RPC: method to be wrapped is the constructor: '.$plainfuncname);
+    				return false;
+    			}
+    			if($func->isDestructor())
+    			{
+    				error_log('XML-RPC: method to be wrapped is the destructor: '.$plainfuncname);
+    				return false;
+    			}
+    			if($func->isAbstract())
+    			{
+    				error_log('XML-RPC: method to be wrapped is abstract: '.$plainfuncname);
+    				return false;
+    			}
+                /// @todo add more checks for static vs. nonstatic?
+            }
+			else
+			{
 			$func =& new ReflectionFunction($funcname);
+            }
 			if($func->isInternal())
 			{
 				// Note: from PHP 5.1.0 onward, we will possibly be able to use invokeargs
 				// instead of getparameters to fully reflect internal php functions ?
-				error_log('XML-RPC: function to be wrapped is internal: '.$funcname);
+				error_log('XML-RPC: function to be wrapped is internal: '.$plainfuncname);
 				return false;
 			}
 
@@ -333,9 +398,21 @@
 			}
 
 			$innercode .= "\$np = false;\n";
+			// since there are no closures in php, if we are given an object instance,
+            // we store a pointer to it in a global var...
+			if ( is_array($funcname) && is_object($funcname[0]) )
+			{
+			    $GLOBALS['xmlrpcWPFObjHolder'][$xmlrpcfuncname] =& $funcname[0];
+			    $innercode .= "\$obj =& \$GLOBALS['xmlrpcWPFObjHolder']['$xmlrpcfuncname'];\n";
+			    $realfuncname = '$obj->'.$funcname[1];
+			}
+			else
+			{
+    			$realfuncname = $plainfuncname;
+            }
 			foreach($parsvariations as $pars)
 			{
-				$innercode .= "if (\$paramcount == " . count($pars) . ") \$retval = {$catch_warnings}$funcname(" . implode(',', $pars) . "); else\n";
+				$innercode .= "if (\$paramcount == " . count($pars) . ") \$retval = {$catch_warnings}$realfuncname(" . implode(',', $pars) . "); else\n";
 				// build a 'generic' signature (only use an appropriate return type)
 				$sig = array($returns);
 				$psig = array($returnsDocs);
@@ -383,7 +460,7 @@
 
 				if(!$allOK)
 				{
-					error_log('XML-RPC: could not create function '.$xmlrpcfuncname.' to wrap php function '.$funcname);
+					error_log('XML-RPC: could not create function '.$xmlrpcfuncname.' to wrap php function '.$plainfuncname);
 					return false;
 				}
 			}
@@ -394,6 +471,56 @@
 			$ret = array('function' => $xmlrpcfuncname, 'signature' => $sigs, 'docstring' => $desc, 'signature_docs' => $psigs, 'source' => $code);
 			return $ret;
 		}
+	}
+
+    /**
+    * Given a user-defined PHP class or php object, map its methods onto a list of
+	* PHP 'wrapper' functions that can be exposed as xmlrpc methods from an xmlrpc_server
+	* object and called from remote clients (as well as their corresponding signature info).
+	*
+    * @param mixed $classname the name of the class whose methods are to be exposed as xmlrpc methods, or an object instance of that class
+    * @param array $extra_options see the docs for wrap_php_method for more options
+    *        string method_type 'static', 'nonstatic', 'all' and 'auto' (default); the latter will switch between static and non-static depending on wheter $classname is a class name or object instance
+    * @return array or false on failure
+    *
+    * @todo get_class_methods will return both static and non-static methods.
+    *       we have to differentiate the action, depending on wheter we recived a class name or object
+    */
+    function wrap_php_class($classname, $extra_options=array())
+    {
+		$methodfilter = isset($extra_options['method_filter']) ? $extra_options['method_filter'] : '';
+		$methodtype = isset($extra_options['method_type']) ? $extra_options['method_type'] : 'auto';
+
+        if(version_compare(phpversion(), '5.0.3') == -1)
+		{
+			// up to php 5.0.3 some useful reflection methods were missing
+			error_log('XML-RPC: cannot not wrap php functions unless running php version bigger than 5.0.3');
+			return false;
+		}
+
+        $result = array();
+		$mlist = get_class_methods($classname);
+		foreach($mlist as $mname)
+		{
+    		if ($methodfilter == '' || preg_match($methodfilter, $mname))
+			{
+    			// echo $mlist."\n";
+    			$func =& new ReflectionMethod($classname, $mname);
+    			if(!$func->isPrivate() && !$func->isProtected() && !$func->isConstructor() && !$func->isDestructor() && !$func->isAbstract())
+    			{
+        			if(($func->isStatic && ($methodtype == 'all' || $methodtype == 'static' || ($methodtype == 'auto' && is_string($classname)))) ||
+            			(!$func->isStatic && ($methodtype == 'all' || $methodtype == 'nonstatic' || ($methodtype == 'auto' && is_object($classname)))))
+            		{
+                        $methodwrap = wrap_php_function(array($classname, $mname), '', $extra_options);
+                        if ( $methodwrap )
+                        {
+                            $result[$methodwrap['function']] = $methodwrap['function'];
+                        }
+                    }
+    			}
+			}
+		}
+        return $result;
 	}
 
 	/**
@@ -436,7 +563,7 @@
 	function wrap_xmlrpc_method($client, $methodname, $extra_options=0, $timeout=0, $protocol='', $newfuncname='')
 	{
 		// mind numbing: let caller use sane calling convention (as per javadoc, 3 params),
-		// OR the 2.0 calling convention (no ptions) - we really love backward compat, don't we?
+		// OR the 2.0 calling convention (no options) - we really love backward compat, don't we?
 		if (!is_array($extra_options))
 		{
 			$signum = $extra_options;
@@ -575,7 +702,7 @@
 	function wrap_xmlrpc_server($client, $extra_options=array())
 	{
 		$methodfilter = isset($extra_options['method_filter']) ? $extra_options['method_filter'] : '';
-		$signum = isset($extra_options['signum']) ? (int)$extra_options['signum'] : 0;
+		//$signum = isset($extra_options['signum']) ? (int)$extra_options['signum'] : 0;
 		$timeout = isset($extra_options['timeout']) ? (int)$extra_options['timeout'] : 0;
 		$protocol = isset($extra_options['protocol']) ? $extra_options['protocol'] : '';
 		$newclassname = isset($extra_options['new_class_name']) ? $extra_options['new_class_name'] : '';
