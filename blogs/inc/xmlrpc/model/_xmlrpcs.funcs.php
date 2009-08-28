@@ -196,12 +196,13 @@ function & xmlrpcs_get_Blog( $m, $blog_param )
 
 	$blog = $m->getParam( $blog_param );
 	$blog = $blog->scalarval();
-
-  /**
+	// qtm: http://qtm.blogistan.co.uk/ inserts some spacing before/after blogID.
+	$blog = (int) trim($blog);
+	/**
 	 * @var BlogCache
 	 */
 	$BlogCache = & get_Cache( 'BlogCache' );
-  /**
+	/**
 	 * @var Blog
 	 */
 	$Blog = & $BlogCache->get_by_ID( $blog, false, false );
@@ -446,6 +447,9 @@ function xmlrpcs_edit_item( & $edited_Item, $post_title, $content, $post_date, $
 
 /*
  * $Log$
+ * Revision 1.8  2009/08/28 19:15:06  waltercruz
+ * Fixing post creation in qtm
+ *
  * Revision 1.7  2009/08/27 17:46:13  tblue246
  * Metaweblog API: Use mt_keywords for item tags (set/get)
  *
