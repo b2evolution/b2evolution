@@ -202,9 +202,10 @@ function mw_newmediaobject($m)
 
 	$xcontent = $m->getParam(3);
 	// Get the main data - and decode it properly for the image - sorry, binary object
+	logIO( 'Decoding content...' );
 	$contentstruct = xmlrpc_decode_recurse($xcontent);
 	$data = $contentstruct['bits'];
-	logIO( 'Received MIME type: '.$contentstruct['type'] );
+	logIO( 'Received MIME type: '.( isset( $contentstruct['type'] ) ? $contentstruct['type'] : '(none)' ) );
 
 	load_funcs('files/model/_file.funcs.php');
 
@@ -262,7 +263,6 @@ function mw_newmediaobject($m)
 	$afs_filepath = $afs_filedir.$filename;
 	if( file_exists( $afs_filepath ) )
 	{
-		logIO( 'File exists' );
 		return xmlrpcs_resperror( 8, 'File exists.' );
 	}
 
@@ -279,7 +279,6 @@ function mw_newmediaobject($m)
 	$fh = @fopen( $afs_filepath, 'wb' );
 	if( !$fh )
 	{
-		logIO( 'Error opening file' );
 		return xmlrpcs_resperror( 10, 'Error opening file for writing.' );
 	}
 
@@ -288,7 +287,6 @@ function mw_newmediaobject($m)
 
 	if ( $ok === false )
 	{
-		logIO( 'Error writing to file' );
 		return xmlrpcs_resperror( 13, 'Error while writing to file.' );
 	}
 
@@ -810,6 +808,9 @@ $xmlrpc_procs['metaWeblog.getRecentPosts'] = array(
 
 /*
  * $Log$
+ * Revision 1.14  2009/08/29 13:53:27  tblue246
+ * Minor/fixed PHP warning
+ *
  * Revision 1.13  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
