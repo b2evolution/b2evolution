@@ -75,10 +75,14 @@ function starify( $string )
  */
 function _b2_or_mt_get_categories( $type, $m )
 {
-	global $xmlrpcerruser, $DB, $Settings;
+	global $DB, $Settings;
 
 	// CHECK LOGIN:
-  /**
+	// Tblue> Note on perms: I think an user doesn't need any special perms
+	//                       to get a list of blog categories; the only
+	//                       requirement for the user is to have an account
+	//                       in the system.
+	/**
 	 * @var User
 	 */
 	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
@@ -87,21 +91,13 @@ function _b2_or_mt_get_categories( $type, $m )
 	}
 
 	// GET BLOG:
-  /**
+	/**
 	 * @var Blog
 	 */
 	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
-
-	// CHECK PERMISSION: (we need at least one post/edit status)
-	if( ! $current_User->check_perm( 'blog_post_statuses', 1, false, $Blog->ID ) )
-	{	// Permission denied
-		return xmlrpcs_resperror( 3 );	// User error 3
-	}
-	logIO( 'Permission granted.' );
-
 
 	$sql = 'SELECT *
 					  FROM T_categories ';
@@ -121,24 +117,24 @@ function _b2_or_mt_get_categories( $type, $m )
 	$rows = $DB->get_results( $sql );
 	if( $DB->error )
 	{ // DB error
-		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+		return xmlrpcs_resperror( 99, 'DB error: '.$DB->last_error ); // user error 99
 	}
 
-	xmlrpc_debugmsg( 'Categories:'.count($rows) );
+	xmlrpc_debugmsg( 'Categories: '.$DB->num_rows );
 
 	$categoryIdName = ( $type == 'b2' ? 'categoryID' : 'categoryId' );
 	$data = array();
 	foreach( $rows as $row )
 	{
 		$data[] = new xmlrpcval( array(
-				$categoryIdName => new xmlrpcval($row->cat_ID),
+				$categoryIdName => new xmlrpcval( $row->cat_ID ),
 				'categoryName' => new xmlrpcval( $row->cat_name )
 			//	mb_convert_encoding( $row->cat_name, "utf-8", "iso-8859-1")  )
 			), 'struct' );
 	}
 
 	logIO( 'OK.' );
-	return new xmlrpcresp( new xmlrpcval($data, "array") );
+	return new xmlrpcresp( new xmlrpcval($data, 'array') );
 }
 
 
@@ -196,7 +192,7 @@ function & xmlrpcs_get_Blog( $m, $blog_param )
 
 	$blog = $m->getParam( $blog_param );
 	$blog = $blog->scalarval();
-	// qtm: http://qtm.blogistan.co.uk/ inserts some spacing before/after blogID.
+	// waltercruz> qtm: http://qtm.blogistan.co.uk/ inserts some spacing before/after blogID.
 	$blog = (int) trim($blog);
 	/**
 	 * @var BlogCache
@@ -445,8 +441,105 @@ function xmlrpcs_edit_item( & $edited_Item, $post_title, $content, $post_date, $
 }
 
 
+/**
+ * Check that an User can view a specific Item.
+ *
+ * @param object The Item (by reference).
+ * @param object The User (by reference).
+ * @return boolean True if permission granted, false otherwise.
+ */
+function xmlrpcs_can_view_item( & $Item, & $current_User )
+{
+	$can_view_post = false;
+	switch( $Item->status )
+	{
+		case 'published':
+		case 'redirected':
+			$can_view_post = true;
+			break;
+		case 'protected':
+		case 'draft':
+		case 'deprecated':
+			$can_view_post = $current_User->check_perm( 'blog_ismember', 'view', false, $Item->get_blog_ID() );
+			break;
+		case 'private':
+			$can_view_post = ( $Item->creator_user_ID == $current_User->ID );
+			break;
+	}
+
+	logIO( 'xmlrpcs_can_view_item(): Post status: '.$Item->status );
+	logIO( 'xmlrpcs_can_view_item( Item(#'.$Item->ID.'), User(#'.$current_User->ID.') ): Permission '.( $can_view_post ? 'granted' : 'DENIED' ) );
+	return $can_view_post;
+}
+
+
+/**
+ * Get a main category that exists and is allowed by the current crossposting
+ * settings.
+ *
+ * If the category doesn't exist, the blog's default category is returned.
+ * If the value of $allow_cross_posting doesn't allow changing of the post's
+ * main category across blogs and the category doesn't belong to the supplied
+ * blog, an XML-RPC error is returned.
+ * If no errors occurred, this function returns its $maincat argument.
+ * 
+ * @param integer The main category to check.
+ * @param object The Blog to which the category is supposed to belong to (by reference).
+ * @param array Extra categories for the post (by reference).
+ *
+ * @return object|integer An usable category or a XML-RPC error (object).
+ */
+function xmlrpcs_get_maincat( $maincat, & $Blog, & $extracats )
+{
+	global $allow_cross_posting;
+
+	$ChapterCache = & get_Cache( 'ChapterCache' );
+	if( $ChapterCache->get_by_ID( $maincat, false ) === false )
+	{	// Category does not exist, use default:
+		$new_maincat = $Blog->get_default_cat_ID();
+
+		// Remove old category from extra cats:
+		if( ( $key = array_search( $maincat, $extracats ) ) !== false )
+		{
+			unset( $extracats[$key] );
+		}
+		// Add new category to extracats:
+		if( ! in_array( $new_maincat, $extracats ) )
+		{
+			$extracats[] = $new_maincat;
+		}
+
+		return (int)$new_maincat;
+	}
+	else if( $allow_cross_posting < 3 && get_catblog( $maincat ) != $Blog->ID )
+	{	// We cannot use a maincat of another blog than the current one:
+		return xmlrpcs_resperror( 11 );
+	}
+
+	// Main category is OK:
+	return (int)$maincat;
+}
+
+
 /*
  * $Log$
+ * Revision 1.9  2009/08/29 12:23:56  tblue246
+ * - SECURITY:
+ * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
+ * 	- files.ctrl.php: Removed redundant calls to User::check_perm().
+ * 	- XML-RPC APIs: Added missing permission checks.
+ * 	- items.ctrl.php: Check permission to edit item with current status (also checks user levels) for update actions.
+ * - XML-RPC client: Re-added check for zlib support (removed by update).
+ * - XML-RPC APIs: Corrected method signatures (return type).
+ * - Localization:
+ * 	- Fixed wrong permission description in blog user/group permissions screen.
+ * 	- Removed wrong TRANS comment
+ * 	- de-DE: Fixed bad translation strings (double quotes + HTML attribute = mess).
+ * - File upload:
+ * 	- Suppress warnings generated by move_uploaded_file().
+ * 	- File browser: Hide link to upload screen if no upload permission.
+ * - Further code optimizations.
+ *
  * Revision 1.8  2009/08/28 19:15:06  waltercruz
  * Fixing post creation in qtm
  *

@@ -46,12 +46,8 @@ $bloggernewpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $
  */
 function blogger_newpost( $m )
 {
-	global $xmlrpcerruser; // import user errcode value
-	global $DB;
-	global $Settings, $Messages;
-
 	// CHECK LOGIN:
-  /**
+	/**
 	 * @var User
 	 */
 	if( ! $current_User = & xmlrpcs_login( $m, 2, 3 ) )
@@ -60,7 +56,7 @@ function blogger_newpost( $m )
 	}
 
 	// GET BLOG:
-  /**
+	/**
 	 * @var Blog
 	 */
 	if( ! $Blog = & xmlrpcs_get_Blog( $m, 1 ) )
@@ -68,7 +64,7 @@ function blogger_newpost( $m )
 		return xmlrpcs_resperror();
 	}
 
-	$content  = $m->getParam(4);
+	$content = $m->getParam(4);
 	$content = $content->scalarval();
 
 	$publish  = $m->getParam(5);
@@ -97,22 +93,14 @@ function blogger_newpost( $m )
 	}
 	logIO( 'Permission granted.' );
 
-
 	logIO( 'Main cat: '.$main_cat);
 
-	// Check if category exists
-	$ChapterCache = & get_Cache('ChapterCache');
-	if( $ChapterCache->get_by_ID( $main_cat, false ) === false )
-	{ // Cat does not exist:
-		// fp> TODO use $Blog->get_default_cat_ID();
-		return xmlrpcs_resperror( 11 ); // User error 11
+	// Check if category exists and can be used
+	$main_cat = xmlrpcs_get_maincat( $main_cat, $Blog, $cat_IDs );
+	if( ! is_int( $main_cat ) )
+	{	// Error
+		return $main_cat;
 	}
-
-	if( get_catblog($main_cat) != $Blog->ID )
-	{	// The category does not match the blog!
-		return xmlrpcs_resperror( 11 ); // User error 11
-	}
-
 
 	$post_date = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
 	// Extract <title> from content
@@ -127,7 +115,7 @@ function blogger_newpost( $m )
 
 
 $bloggereditpost_doc='Edits a post, blogger-api like';
-$bloggereditpost_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcBoolean));
+$bloggereditpost_sig=array(array($xmlrpcBoolean, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcBoolean));
 /**
  * blogger.editPost changes the contents of a given post.
  *
@@ -156,12 +144,8 @@ $bloggereditpost_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $x
  */
 function blogger_editpost($m)
 {
-	global $xmlrpcerruser; // import user errcode value
-	global $DB;
-	global $Messages;
-
 	// CHECK LOGIN:
-  /**
+	/**
 	 * @var User
 	 */
 	if( ! $current_User = & xmlrpcs_login( $m, 2, 3 ) )
@@ -170,12 +154,18 @@ function blogger_editpost($m)
 	}
 
 	// GET POST:
-  /**
+	/**
 	 * @var Item
 	 */
 	if( ! $edited_Item = & xmlrpcs_get_Item( $m, 1 ) )
 	{	// Failed, return (last) error:
 		return xmlrpcs_resperror();
+	}
+
+	// We need to be able to edit this post:
+	if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+	{
+		return xmlrpcs_resperror( 3 ); // Permission denied
 	}
 
 	$content = $m->getParam(4);
@@ -206,12 +196,12 @@ function blogger_editpost($m)
 
 	logIO( 'Main cat: '.$main_cat);
 
-	// Check if category exists
-	$ChapterCache = & get_Cache('ChapterCache');
-	if( $ChapterCache->get_by_ID( $main_cat, false ) === false )
-	{ // Cat does not exist:
-		// fp> TODO use $Blog->get_default_cat_ID();
-		return xmlrpcs_resperror( 11 ); // User error 11
+	// Check if category exists and can be used
+	$Blog = & $edited_Item->get_Blog();
+	$main_cat = xmlrpcs_get_maincat( $main_cat, $Blog, $cat_IDs );
+	if( ! is_int( $main_cat ) )
+	{	// Error
+		return $main_cat;
 	}
 
 	$post_date = NULL;
@@ -227,7 +217,7 @@ function blogger_editpost($m)
 
 
 $bloggerdeletepost_doc = 'Deletes a post, blogger-api like';
-$bloggerdeletepost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcBoolean));
+$bloggerdeletepost_sig = array(array($xmlrpcBoolean, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcBoolean));
 /**
  * blogger.deletePost deletes a given post.
  *
@@ -246,7 +236,6 @@ $bloggerdeletepost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString
  */
 function blogger_deletepost($m)
 {
-	global $xmlrpcerruser; // import user errcode value
 	global $DB;
 
 	// CHECK LOGIN:
@@ -256,7 +245,7 @@ function blogger_deletepost($m)
 	}
 
 	// GET POST:
-  /**
+	/**
 	 * @var Item
 	 */
 	if( ! $edited_Item = & xmlrpcs_get_Item( $m, 1 ) )
@@ -265,7 +254,7 @@ function blogger_deletepost($m)
 	}
 
 	// CHECK PERMISSION:
-	if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $edited_Item->get_blog_ID() ) )
+	if( ! $current_User->check_perm( 'blog_del_post', 'edit', false, $edited_Item->get_blog_ID() ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
@@ -275,21 +264,21 @@ function blogger_deletepost($m)
 	$edited_Item->dbdelete();
 	if( $DB->error )
 	{ // DB error
-		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+		return xmlrpcs_resperror( 99, 'DB error: '.$DB->last_error ); // user error 9
 	}
 
 	logIO( 'OK.' );
-	return new xmlrpcresp(new xmlrpcval(1));
+	return new xmlrpcresp(new xmlrpcval(1, 'boolean'));
 }
 
 
 
 $bloggergetusersblogs_doc='returns the user\'s blogs - this is a dummy function, just so that BlogBuddy and other blogs-retrieving apps work';
-$bloggergetusersblogs_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
+$bloggergetusersblogs_sig=array(array($xmlrpcArray, $xmlrpcString, $xmlrpcString, $xmlrpcString));
 /**
  * blogger.getUsersBlogs returns information about all the blogs a given user is a member of.
  *
- * Data is returned as an array of <struct>'s containing the ID (blogid), name (blogName),
+ * Data is returned as an array of <struct>s containing the ID (blogid), name (blogName),
  * and URL (url) of each blog.
  *
  * Non official: Also return a boolean stating wether or not the user can edit th eblog templates
@@ -304,7 +293,7 @@ $bloggergetusersblogs_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcStrin
  *					1 username (string): Login for the Blogger user who's blogs will be retrieved.
  *					2 password (string): Password for said username.
  *						(currently not required by b2evo)
- * @return xmlrpcresp XML-RPC Response, an array of <struct>'s containing for each blog:
+ * @return xmlrpcresp XML-RPC Response, an array of <struct>s containing for each blog:
  *					- ID (blogid),
  *					- name (blogName),
  *					- URL (url),
@@ -312,9 +301,6 @@ $bloggergetusersblogs_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcStrin
  */
 function blogger_getusersblogs($m)
 {
-	global $xmlrpcerruser;
-	global $baseurl;
-
 	// CHECK LOGIN:
 	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
 	{	// Login failed, return (last) error:
@@ -334,7 +320,7 @@ function blogger_getusersblogs($m)
 		 */
 		$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
 
-		logIO('Current user IS a member of this blog.'.$l_blog_ID);
+		logIO('Current user IS a member of this blog: '.$l_blog_ID);
 
 		$resp_array[] = new xmlrpcval( array(
 					'blogid' => new xmlrpcval( $l_blog_ID ),
@@ -344,17 +330,15 @@ function blogger_getusersblogs($m)
 												), 'struct');
 	}
 
-	$resp = new xmlrpcval($resp_array, 'array');
-
 	logIO( 'OK.' );
-	return new xmlrpcresp($resp);
+	return new xmlrpcresp( new xmlrpcval( $resp_array, 'array' ) );
 }
 
 
 
 
 $bloggergetuserinfo_doc='gives the info about a user';
-$bloggergetuserinfo_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
+$bloggergetuserinfo_sig=array(array($xmlrpcStruct, $xmlrpcString, $xmlrpcString, $xmlrpcString));
 /**
  * blogger.getUserInfo returns returns a struct containing user info.
  *
@@ -379,15 +363,13 @@ $bloggergetuserinfo_sig=array(array($xmlrpcString, $xmlrpcString, $xmlrpcString,
  */
 function blogger_getuserinfo($m)
 {
-	global $xmlrpcerruser;
-
 	// CHECK LOGIN:
 	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
 
-	// INFO about looged in user
+	// INFO about logged in user
 	$struct = new xmlrpcval( array(
 			'nickname'  => new xmlrpcval( $current_User->get('nickname') ),
 			'userid'    => new xmlrpcval( $current_User->ID ),
@@ -405,7 +387,7 @@ function blogger_getuserinfo($m)
 
 
 $bloggergetpost_doc = 'fetches a post, blogger-api like';
-$bloggergetpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
+$bloggergetpost_sig = array(array($xmlrpcStruct, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
 /**
  * blogger.getPost retieves a given post.
  *
@@ -424,10 +406,8 @@ $bloggergetpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $
  */
 function blogger_getpost($m)
 {
-	global $xmlrpcerruser;
-
 	// CHECK LOGIN:
-  /**
+	/**
 	 * @var User
 	 */
 	if( ! $current_User = & xmlrpcs_login( $m, 2, 3 ) )
@@ -436,7 +416,7 @@ function blogger_getpost($m)
 	}
 
 	// GET POST:
-  /**
+	/**
 	 * @var Item
 	 */
 	if( ! $edited_Item = & xmlrpcs_get_Item( $m, 1 ) )
@@ -444,14 +424,12 @@ function blogger_getpost($m)
 		return xmlrpcs_resperror();
 	}
 
-	// CHECK PERMISSION: (we need at least one post/edit status)
-	// (we should be able to see even if we cannot edit the particular status of that post)
-	if( ! $current_User->check_perm( 'blog_post_statuses', 1, false, $edited_Item->get_blog_ID() ) )
-	{	// Permission denied
-		return xmlrpcs_resperror( 3 );	// User error 3
+	// CHECK PERMISSION:
+	if( ! xmlrpcs_can_view_item( $edited_Item, $current_User ) )
+	{
+		return xmlrpcs_resperror( 3 );
 	}
 	logIO( 'Permission granted.' );
-
 
 	$post_date = mysql2date( 'U', $edited_Item->issue_date );
 	$post_date = gmdate('Ymd', $post_date).'T'.gmdate('H:i:s', $post_date);
@@ -475,7 +453,7 @@ function blogger_getpost($m)
 
 
 $bloggergetrecentposts_doc = 'fetches X most recent posts, blogger-api like';
-$bloggergetrecentposts_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcInt));
+$bloggergetrecentposts_sig = array(array($xmlrpcArray, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcInt));
 /**
  * blogger.getRecentPosts retieves X most recent posts.
  *
@@ -499,7 +477,7 @@ function blogger_getrecentposts( $m )
 	global $xmlrpcerruser, $DB;
 
 	// CHECK LOGIN:
-  /**
+	/**
 	 * @var User
 	 */
 	if( ! $current_User = & xmlrpcs_login( $m, 2, 3 ) )
@@ -508,22 +486,13 @@ function blogger_getrecentposts( $m )
 	}
 
 	// GET BLOG:
-  /**
+	/**
 	 * @var Blog
 	 */
 	if( ! $Blog = & xmlrpcs_get_Blog( $m, 1 ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
-
-	// CHECK PERMISSION: (we need at least one post/edit status)
-	// (we should be able to see all even if we cannot edit the particular status of a post)
-	if( ! $current_User->check_perm( 'blog_post_statuses', 1, false, $Blog->ID ) )
-	{	// Permission denied
-		return xmlrpcs_resperror( 3 );	// User error 3
-	}
-	logIO( 'Permission granted.' );
-
 
 	$numposts = $m->getParam(4);
 	$numposts = $numposts->scalarval();
@@ -533,8 +502,16 @@ function blogger_getrecentposts( $m )
 	load_class( 'items/model/_itemlist.class.php' );
 	$MainList = & new ItemList2( $Blog, NULL, NULL, $numposts );
 
+	// Protected and private get checked by statuses_where_clause().
+	$statuses = array( 'published', 'redirected', 'protected', 'private' );
+	if( $current_User->check_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
+	{	// These statuses require member status:
+		$statuses = array_merge( $statuses, array( 'draft', 'deprecated' ) );
+	}
+	logIO( 'Statuses: '.implode( ', ', $statuses ) );
+
 	$MainList->set_filters( array(
-			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated', 'redirected' ),
+			'visibility_array' => $statuses,
 			'order' => 'DESC',
 			'unit' => 'posts',
 		) );
@@ -543,14 +520,14 @@ function blogger_getrecentposts( $m )
 	$MainList->query();
 
 
-	xmlrpc_debugmsg( 'Items:'.$MainList->result_num_rows );
+	logIO( 'Items:'.$MainList->result_num_rows );
 
 	$data = array();
 	while( $Item = & $MainList->get_item() )
 	{
-		xmlrpc_debugmsg( 'Item:'.$Item->title.
-											' - Issued: '.$Item->issue_date.
-											' - Modified: '.$Item->mod_date );
+		logIO( 'Item:'.$Item->title.
+					' - Issued: '.$Item->issue_date.
+					' - Modified: '.$Item->mod_date );
 
 		$post_date = mysql2date('U', $Item->issue_date);
 		$post_date = gmdate('Ymd', $post_date).'T'.gmdate('H:i:s', $post_date);
@@ -616,6 +593,23 @@ $xmlrpc_procs['blogger.getRecentPosts'] = array(
 
 /*
  * $Log$
+ * Revision 1.8  2009/08/29 12:23:56  tblue246
+ * - SECURITY:
+ * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
+ * 	- files.ctrl.php: Removed redundant calls to User::check_perm().
+ * 	- XML-RPC APIs: Added missing permission checks.
+ * 	- items.ctrl.php: Check permission to edit item with current status (also checks user levels) for update actions.
+ * - XML-RPC client: Re-added check for zlib support (removed by update).
+ * - XML-RPC APIs: Corrected method signatures (return type).
+ * - Localization:
+ * 	- Fixed wrong permission description in blog user/group permissions screen.
+ * 	- Removed wrong TRANS comment
+ * 	- de-DE: Fixed bad translation strings (double quotes + HTML attribute = mess).
+ * - File upload:
+ * 	- Suppress warnings generated by move_uploaded_file().
+ * 	- File browser: Hide link to upload screen if no upload permission.
+ * - Further code optimizations.
+ *
  * Revision 1.7  2009/08/27 16:01:34  tblue246
  * Replaced unnecessary double quotes with single quotes
  *

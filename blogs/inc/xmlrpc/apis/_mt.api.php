@@ -7,6 +7,8 @@
  * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @author tor
+ * @author tblue246 (Tilman BLUMENBACH)
+ * @author waltercruz
  *
  * @see http://manual.b2evolution.net/MovableType_API
  *
@@ -33,7 +35,7 @@ function mt_supportedMethods()
 
 
 
-$mt_setPostCategories_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcArray));
+$mt_setPostCategories_sig = array(array($xmlrpcBoolean, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcArray));
 $mt_setPostCategories_doc = 'Sets the categories for a post.';
 /**
  * mt.setPostCategories : set cats for a post
@@ -45,11 +47,8 @@ $mt_setPostCategories_doc = 'Sets the categories for a post.';
  */
 function mt_setPostCategories($m)
 {
-	global $xmlrpcerruser,$Settings;
-	global $DB, $Messages;
-
 	// CHECK LOGIN:
-  /**
+	/**
 	 * @var User
 	 */
 	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
@@ -58,7 +57,7 @@ function mt_setPostCategories($m)
 	}
 
 	// GET POST:
-  /**
+	/**
 	 * @var Item
 	 */
 	if( ! $edited_Item = & xmlrpcs_get_Item( $m, 0 ) )
@@ -66,7 +65,12 @@ function mt_setPostCategories($m)
 		return xmlrpcs_resperror();
 	}
 
- 	$xcontent = $m->getParam(3); // This is now an array of structs
+	if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );
+	}
+
+	$xcontent = $m->getParam(3); // This is now an array of structs
 	$contentstruct = xmlrpc_decode_recurse($xcontent);
 	logIO('Decoded xcontent');
 
@@ -85,8 +89,16 @@ function mt_setPostCategories($m)
 
 	if( empty( $categories ) )
 	{
-		return new xmlrpcresp(0, $xmlrpcerruser+4, // user error 4
-					 'No categories specified.');
+		return xmlrpcs_resperror( 4, 'No categories specified.' );
+	}
+	else if( $category )
+	{	// Check if category exists and can be used:
+		$Blog = & $edited_Item->get_Blog();
+		$category = xmlrpcs_get_maincat( $category, $Blog, $categories );
+		if( ! is_int( $category ) )
+		{	// Error:
+			return $category;
+		}
 	}
 
 	// CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
@@ -111,17 +123,16 @@ function mt_setPostCategories($m)
 	if( $edited_Item->dbupdate() === false )
 	{
 		logIO( 'Update failed.' );
-		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
-					 'Update failed.');
+		return xmlrpcs_resperror( 99, 'Update failed.' );
 	}
 
 	logIO( 'OK.' );
-	return new xmlrpcresp(new xmlrpcval(1));
+	return new xmlrpcresp( new xmlrpcval( 1, 'boolean' ) );
 }
 
 
 
-$mt_getPostCategories_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
+$mt_getPostCategories_sig = array(array($xmlrpcArray, $xmlrpcString, $xmlrpcString, $xmlrpcString));
 $mt_getPostCategories_doc = 'Returns a list of all categories to which the post is assigned.';
 /**
  * mt.getPostCategories : Get the categories for a given post.
@@ -133,11 +144,10 @@ $mt_getPostCategories_doc = 'Returns a list of all categories to which the post 
  */
 function mt_getPostCategories($m)
 {
-	global $xmlrpcerruser;
 	global $DB;
 
 	// CHECK LOGIN:
-  /**
+	/**
 	 * @var User
 	 */
 	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
@@ -146,7 +156,7 @@ function mt_getPostCategories($m)
 	}
 
 	// GET POST:
-  /**
+	/**
 	 * @var Item
 	 */
 	if( ! $edited_Item = & xmlrpcs_get_Item( $m, 0 ) )
@@ -154,24 +164,24 @@ function mt_getPostCategories($m)
 		return xmlrpcs_resperror();
 	}
 
-	// CHECK PERMISSION: (we need at least one post/edit status)
-	if( ! $current_User->check_perm( 'blog_post_statuses', 1, false, $edited_Item->get_blog_ID() ) )
+	// CHECK PERMISSION (user needs to be able to view the post):
+	if( ! xmlrpcs_can_view_item( $edited_Item, $current_User ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
-	logIO( 'Permission granted.' );
 
-
+	// Tblue> TODO: We could save one DB query by using our own custom query
+	//              instead of postcats_get_byID().
 	$categories = postcats_get_byID( $edited_Item->ID ); // Secondary categories
 	$iSize = count($categories); // The number of objects ie categories
-	logIO('mt_getgategorylist  no. of categories...'.$iSize);// works
+	logIO('mt_getPostCategories  no. of categories... '.$iSize);// works
 	$struct = array();
 	for( $i=0; $i<$iSize; $i++)
 	{
 		logIO('mt_getPostCategories categories  ...'.$categories[$i]);
 		// In database cat_ID and cat_name from tablecategories
 		$sql = 'SELECT * FROM T_categories WHERE  cat_ID = '.$categories[$i];
-		logIO('mt_getgategorylist  sql...'.$sql);
+		logIO('mt_getPostCategories  sql...'.$sql);
 		$rows = $DB->get_results( $sql );
 		foreach( $rows as $row )
 		{
@@ -184,7 +194,7 @@ function mt_getPostCategories($m)
 
 		$struct[$i] = new xmlrpcval(array('categoryId' => new xmlrpcval($categories[$i]),    // Look up name from ID separately
 										'categoryName' => new xmlrpcval($Categoryname),
-										'isPrimary' => new xmlrpcval($isPrimary)
+										'isPrimary' => new xmlrpcval($isPrimary, 'boolean'),
 										),'struct');
 	}
 
@@ -212,7 +222,7 @@ function mt_getCategoryList($m)
 	return _b2_or_mt_get_categories('mt', $m);
 }
 
-$mt_publishPost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcString));
+$mt_publishPost_sig =  array(array($xmlrpcBoolean,$xmlrpcString,$xmlrpcString,$xmlrpcString));
 $mt_publishPost_doc = 'Published a post';
 /**
  * mt.publishPost
@@ -248,7 +258,7 @@ function mt_publishPost($m)
 	}
 
 	if( ! $current_User->check_perm( 'item_post!published', 'edit', false, $edited_Item )
-		|| ! $current_User->check_perm( 'edit_timestamp' ) )
+		/*|| ! $current_User->check_perm( 'edit_timestamp' )*/ )
 	{
 		return xmlrpcs_resperror( 3 ); // Permission denied
 	}
@@ -256,7 +266,7 @@ function mt_publishPost($m)
 
 	logIO( 'mt_publishPost: Old post status: '.$edited_Item->status );
 	$edited_Item->set( 'status', 'published' );
-	$edited_Item->set( 'datestart', date('Y-m-d H:i:s', $localtimenow) );
+	//$edited_Item->set( 'datestart', date('Y-m-d H:i:s', $localtimenow) );
 
 	if( $edited_Item->dbupdate() === false )
 	{	// Could not update item...
@@ -269,6 +279,7 @@ function mt_publishPost($m)
 	$edited_Item->handle_post_processing( false );
 
 	logIO( 'mt_publishPost: OK.' );
+
 	return new xmlrpcresp( new xmlrpcval( 1, 'boolean' ) );
 }
 
@@ -312,6 +323,23 @@ $xmlrpc_procs['mt.publishPost'] = array(
 
 /*
  * $Log$
+ * Revision 1.10  2009/08/29 12:23:56  tblue246
+ * - SECURITY:
+ * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
+ * 	- files.ctrl.php: Removed redundant calls to User::check_perm().
+ * 	- XML-RPC APIs: Added missing permission checks.
+ * 	- items.ctrl.php: Check permission to edit item with current status (also checks user levels) for update actions.
+ * - XML-RPC client: Re-added check for zlib support (removed by update).
+ * - XML-RPC APIs: Corrected method signatures (return type).
+ * - Localization:
+ * 	- Fixed wrong permission description in blog user/group permissions screen.
+ * 	- Removed wrong TRANS comment
+ * 	- de-DE: Fixed bad translation strings (double quotes + HTML attribute = mess).
+ * - File upload:
+ * 	- Suppress warnings generated by move_uploaded_file().
+ * 	- File browser: Hide link to upload screen if no upload permission.
+ * - Further code optimizations.
+ *
  * Revision 1.9  2009/08/27 21:53:55  tblue246
  * MovableType API/mt.publishPost(): Check permission!!
  *

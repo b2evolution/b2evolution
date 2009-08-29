@@ -59,6 +59,8 @@ global $current_User;
 
 global $dispatcher;
 
+global $blog;
+
 // Check global access permissions:
 if( ! $Settings->get( 'fm_enabled' ) )
 {
@@ -66,7 +68,7 @@ if( ! $Settings->get( 'fm_enabled' ) )
 }
 
 // Check permission:
-$current_User->check_perm( 'files', 'view', true );
+$current_User->check_perm( 'files', 'view', true, $blog ? $blog : NULL );
 
 $AdminUI->set_path( 'files', 'browse' );
 
@@ -179,7 +181,7 @@ elseif( !empty($edited_User) )
 {	// We have a user, check if it already has a linked file in a particular root, in which case we want to use that root!
 	// This is useful so users can find their existing avatar
 	// Get list of attached files:
-  /**
+	/**
 	 * @var File
 	 */
 	if( $avatar_File = & $edited_User->get_avatar_File() )
@@ -195,7 +197,7 @@ elseif( !empty($edited_Item) )
 	// Get list of attached files:
 	$FileList = $edited_Item->get_attachment_FileList( 1 );
 	// Get first file:
-  /**
+	/**
 	 * @var File
 	 */
 	$File = & $FileList->get_next();
@@ -342,7 +344,7 @@ if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 if( $action == 'createnew' )
 {
 	// Check permission:
-	$current_User->check_perm( 'files', 'add', true );
+	$current_User->check_perm( 'files', 'add', true, $blog ? $blog : NULL );
 
 	// create new file/dir
 	param( 'create_type', 'string', true ); // 'file', 'dir'
@@ -365,7 +367,7 @@ switch( $action )
 	case 'createnew_dir':
 		// We are probably comming from 'createnew' but there is no guarantee!
 		// Check permission:
-		$current_User->check_perm( 'files', 'add', true );
+		$current_User->check_perm( 'files', 'add', true, $blog ? $blog : NULL );
 
 		if( ! $Settings->get( 'fm_enable_create_dir' ) )
 		{ // Directory creation is gloablly disabled:
@@ -415,7 +417,7 @@ switch( $action )
 	case 'createnew_file':
 		// We are probably comming from 'createnew' but there is no guarantee!
 		// Check permission:
-		$current_User->check_perm( 'files', 'add', true );
+		$current_User->check_perm( 'files', 'add', true, $blog ? $blog : NULL );
 
 		if( ! $Settings->get( 'fm_enable_create_file' ) )
 		{ // File creation is gloablly disabled:
@@ -492,7 +494,7 @@ switch( $action )
 		}
 
 		// Check permission!
- 		$current_User->check_perm( 'files', 'edit', true );
+ 		$current_User->check_perm( 'files', 'edit', true, $blog ? $blog : NULL );
 
  		// Get the file we want to update:
 		$edited_File = & $selected_Filelist->get_by_idx(0);
@@ -642,7 +644,7 @@ switch( $action )
 		// Rename a file:
 
 		// This will not allow to overwrite existing files, the same way Windows and MacOS do not allow it. Adding an option will only clutter the interface and satisfy geeks only.
-		if( ! $current_User->check_perm( 'files', 'edit' ) )
+		if( ! $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
 			$action = 'list';
@@ -736,7 +738,7 @@ switch( $action )
 		// TODO: We don't need the Filelist, move UP!
 		// Delete a file or directory:
 
-		if( ! $current_User->check_perm( 'files', 'edit' ) )
+		if( ! $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
 			$action = 'list';
@@ -963,7 +965,7 @@ switch( $action )
 		// Edit Text File
 
 		// Check permission!
- 		$current_User->check_perm( 'files', 'edit', true );
+ 		$current_User->check_perm( 'files', 'edit', true, $blog ? $blog : NULL );
 
  		// Get the file we want to edit:
 		$edited_File = & $selected_Filelist->get_by_idx(0);
@@ -996,7 +998,7 @@ switch( $action )
 		// Edit File properties (Meta Data)
 
 		// Check permission!
- 		$current_User->check_perm( 'files', 'edit', true );
+ 		$current_User->check_perm( 'files', 'edit', true, $blog ? $blog : NULL );
 
 		$edited_File = & $selected_Filelist->get_by_idx(0);
 		$edited_File->load_meta();
@@ -1008,7 +1010,7 @@ switch( $action )
 		// Update File properties (Meta Data); on success this ends the file_properties mode:
 
 		// Check permission!
- 		$current_User->check_perm( 'files', 'edit', true );
+ 		$current_User->check_perm( 'files', 'edit', true, $blog ? $blog : NULL );
 
 		$edited_File = & $selected_Filelist->get_by_idx(0);
 		// Load meta data:
@@ -1156,7 +1158,7 @@ switch( $action )
 		// TODO: We don't need the Filelist, move UP!
 		// Edit file or directory permissions:
 
-		if( ! $current_User->check_perm( 'files', 'edit' ) )
+		if( ! $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
 			$action = 'list';
@@ -1277,7 +1279,7 @@ switch( $fm_mode )
 			// fp>> Okay. It should *definitely* be a method of the File object and we should ask for ONE file at a time. Any question about 'where is the file?' (what/where/when/who, etc) should be asked to the File object itself.
 		*/
 
-		if( ! $current_User->check_perm( 'files', 'edit' ) )
+		if( ! $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
 		{ // We do not have permission to edit files
 			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
 			$fm_mode = NULL;
@@ -1512,7 +1514,7 @@ switch( $fm_mode )
 
 
 // Update sub-menu:
-if( $current_User->check_perm( 'files', 'add' ) )
+if( $current_User->check_perm( 'files', 'add', false, $blog ? $blog : NULL ) )
 { // Permission to upload: (no subtabs needed otherwise)
 	$AdminUI->add_menu_entries(
 			'files',
@@ -1660,6 +1662,23 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.30  2009/08/29 12:23:56  tblue246
+ * - SECURITY:
+ * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
+ * 	- files.ctrl.php: Removed redundant calls to User::check_perm().
+ * 	- XML-RPC APIs: Added missing permission checks.
+ * 	- items.ctrl.php: Check permission to edit item with current status (also checks user levels) for update actions.
+ * - XML-RPC client: Re-added check for zlib support (removed by update).
+ * - XML-RPC APIs: Corrected method signatures (return type).
+ * - Localization:
+ * 	- Fixed wrong permission description in blog user/group permissions screen.
+ * 	- Removed wrong TRANS comment
+ * 	- de-DE: Fixed bad translation strings (double quotes + HTML attribute = mess).
+ * - File upload:
+ * 	- Suppress warnings generated by move_uploaded_file().
+ * 	- File browser: Hide link to upload screen if no upload permission.
+ * - Further code optimizations.
+ *
  * Revision 1.29  2009/07/06 23:52:24  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *

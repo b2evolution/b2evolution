@@ -55,7 +55,7 @@ function _mw_decode_postdate( $contentstruct, $now_if_empty = true )
  */
 function _mw_get_cat_IDs( $contentstruct, $blog_ID, $empty_struct_ok = false )
 {
-	global $DB, $xmlrpcerruser;
+	global $DB;
 
 	$categories = array();
 	if( isset($contentstruct['categories']) )
@@ -73,7 +73,7 @@ function _mw_get_cat_IDs( $contentstruct, $blog_ID, $empty_struct_ok = false )
 		return $categories;
 	}
 
-	xmlrpc_debugmsg( 'Categories: '.implode( ', ', $categories ) );
+	logIO( 'Categories: '.implode( ', ', $categories ) );
 
 	// for cross-blog-entries, the cat_blog_ID WHERE clause should be removed (but cats are given by name!)
 	if( ! empty($categories) )
@@ -108,11 +108,12 @@ function _mw_get_cat_IDs( $contentstruct, $blog_ID, $empty_struct_ok = false )
 	{ // categories requested to be set:
 
 		// Check if category exists
+		// Tblue> Why is this needed?
 		$ChapterCache = & get_Cache('ChapterCache');
 		if( $ChapterCache->get_by_ID( $cat_IDs[0], false ) === false )
 		{ // Main cat does not exist:
 			logIO('usererror 5 ...');
-			return new xmlrpcresp(0, $xmlrpcerruser+5, 'Requested category does not exist.'); // user error 5
+			return xmlrpcs_resperror( 5, 'Requested category does not exist.' ); // user error 5
 		}
 		logIO('finished checking if main category exists ...'.$cat_IDs[0]);
 	}
@@ -128,7 +129,7 @@ function _mw_get_cat_IDs( $contentstruct, $blog_ID, $empty_struct_ok = false )
 		if( empty($first_cat) )
 		{
 			logIO( 'No categories for this blog...');
-			return new xmlrpcresp(0, $xmlrpcerruser+5, 'No categories for this blog.'); // user error 5
+			return xmlrpcs_resperror( 5, 'No categories for this blog.' ); // user error 5
 		}
 		else
 		{
@@ -167,11 +168,10 @@ $mwnewMediaObject_sig = array(array( $xmlrpcStruct, $xmlrpcString, $xmlrpcString
  */
 function mw_newmediaobject($m)
 {
-	global $xmlrpcerruser; // import user errcode value
-	global $Settings, $baseurl,$fileupload_allowedtypes;
+	global $Settings;
 
 	// CHECK LOGIN:
-  /**
+	/**
 	 * @var User
 	 */
 	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
@@ -180,7 +180,7 @@ function mw_newmediaobject($m)
 	}
 
 	// GET BLOG:
-  /**
+	/**
 	 * @var Blog
 	 */
 	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
@@ -189,41 +189,38 @@ function mw_newmediaobject($m)
 	}
 
 	// CHECK PERMISSION:
-	// For lack of more subtle perm: require any edit perm on blog + global file add perm.
-	if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID )
-		|| ! $current_User->check_perm( 'files', 'add', false ) )
+	if( ! $current_User->check_perm( 'files', 'add', false, $Blog->ID ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 	logIO( 'Permission granted.' );
 
-
 	if( ! $Settings->get('upload_enabled') )
 	{
-		return new xmlrpcresp(0, $xmlrpcerruser+2, // user error 2
-				 'Object upload not allowed ');
+		return xmlrpcs_resperror( 2, 'Object upload not allowed' );
 	}
 
-
 	$xcontent = $m->getParam(3);
-
-
 	// Get the main data - and decode it properly for the image - sorry, binary object
 	$contentstruct = xmlrpc_decode_recurse($xcontent);
-
 	$data = $contentstruct['bits'];
+	logIO( 'Received MIME type: '.$contentstruct['type'] );
 
-	$type = $contentstruct['type'];
-	logIO( 'Received MIME type: '.$type );
+	load_funcs('files/model/_file.funcs.php');
+
+	$filesize = strlen( $data );
+	if( ( $maxfilesize = $Settings->get( 'upload_maxkb' ) * 1024 ) && $filesize > $maxfilesize )
+	{
+		return xmlrpcs_resperror( 4, 'File too big ('.bytesreadable( $filesize, false )
+									.'); max. allowed size is '.bytesreadable( $maxfilesize, false ) );
+	}
 
 	$rf_filepath = $contentstruct['name'];
 	logIO( 'Received filepath: '.$rf_filepath );
 	// Avoid problems:
 	$rf_filepath = strtolower($rf_filepath);
-	$rf_filepath = preg_replace( '¤[^a-z0-9\-_./]¤', '-', $rf_filepath);
+	$rf_filepath = preg_replace( '¤[^a-z0-9\-_./]+¤i', '-', $rf_filepath );
 	logIO( 'Sanitized filepath: '.$rf_filepath );
-
- 	load_funcs('files/model/_file.funcs.php');
 
 	// Split into path + name:
 	$filepath_parts = explode( '/', $rf_filepath );
@@ -233,8 +230,7 @@ function mw_newmediaobject($m)
 	logIO( 'File name: '.$filename );
 	if( $error_filename = validate_filename( $filename, false ) )
 	{
-		return new xmlrpcresp(0, $xmlrpcerruser+4, // user error 4
-			'Invalid objecttype for upload ('.$filename.'): '.$error_filename);
+		return xmlrpcs_resperror( 5, $error_filename );
 	}
 
 	// Check valid path parts:
@@ -249,8 +245,7 @@ function mw_newmediaobject($m)
 		if( $error = validate_dirname($filepath_part) )
 		{ // invalid relative path:
 			logIO( $error );
-			return new xmlrpcresp(0, $xmlrpcerruser+3, // user error 3
-				$error );
+			return xmlrpcs_resperror( 6, $error );
 		}
 
 		$rds_subpath .= $filepath_part.'/';
@@ -260,39 +255,41 @@ function mw_newmediaobject($m)
 	$fileupload_path = $Blog->get_media_dir();
 	if( ! $fileupload_path )
 	{
-		return new xmlrpcresp(0, $xmlrpcerruser+5, // user error 5
-			'Error accessing Blog media directory.');
+		return xmlrpcs_resperror( 7, 'Error accessing Blog media directory.' );
+	}
+
+	$afs_filedir = $fileupload_path.$rds_subpath;
+	$afs_filepath = $afs_filedir.$filename;
+	if( file_exists( $afs_filepath ) )
+	{
+		logIO( 'File exists' );
+		return xmlrpcs_resperror( 8, 'File exists.' );
 	}
 
 	// Create subdirs, if necessary:
 	if( !empty($rds_subpath) )
 	{
-		$fileupload_path = $fileupload_path.$rds_subpath;
-		if( ! mkdir_r( $fileupload_path ) )
+		if( ! mkdir_r( $afs_filedir ) )
 		{	// Dir didn't already exist and could not be created
-			return new xmlrpcresp(0, $xmlrpcerruser+6, // user error 6
-				'Error creating sub directories: '.rel_path_to_base($fileupload_path));
+			return xmlrpcs_resperror( 9, 'Error creating sub directories: '.rel_path_to_base($afs_filedir));
 		}
 	}
 
-	$afs_filepath = $fileupload_path.$filename;
 	logIO( 'Saving to: '.$afs_filepath );
 	$fh = @fopen( $afs_filepath, 'wb' );
 	if( !$fh )
 	{
 		logIO( 'Error opening file' );
-		return new xmlrpcresp(0, $xmlrpcerruser+7, // user error 7
-			'Error opening file for writing.');
+		return xmlrpcs_resperror( 10, 'Error opening file for writing.' );
 	}
 
 	$ok = @fwrite($fh, $data);
 	@fclose($fh);
 
-	if (!$ok)
+	if ( $ok === false )
 	{
 		logIO( 'Error writing to file' );
-		return new xmlrpcresp(0, $xmlrpcerruser+8, // user error 8
-			'Error while writing to file.');
+		return xmlrpcs_resperror( 13, 'Error while writing to file.' );
 	}
 
 	// chmod uploaded file:
@@ -302,7 +299,6 @@ function mw_newmediaobject($m)
 
 	$url = $Blog->get_media_url().$rds_subpath.$filename;
 	logIO( 'URL of new file: '.$url );
-
 
 	// - return URL as XML
 	$urlstruct = new xmlrpcval(array(
@@ -321,9 +317,6 @@ $mwnewpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcS
 /**
  * metaWeblog.newPost
  *
- * mw API
- * Tor 2004
- *
  * NB! (Tor Feb 2005) status in metaweblog API speak dictates whether static html files are generated or not, so fairly misleading
  *
  * @param xmlrpcmsg XML-RPC Message
@@ -336,12 +329,8 @@ $mwnewpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcS
  */
 function mw_newpost($m)
 {
-	global $xmlrpcerruser; // import user errcode value
-	global $DB;
-	global $Settings, $Messages;
-
 	// CHECK LOGIN:
-  /**
+	/**
 	 * @var User
 	 */
 	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
@@ -350,7 +339,7 @@ function mw_newpost($m)
 	}
 
 	// GET BLOG:
-  /**
+	/**
 	 * @var Blog
 	 */
 	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
@@ -383,6 +372,12 @@ function mw_newpost($m)
 	}
 	logIO( 'Permission granted.' );
 
+	$main_cat = xmlrpcs_get_maincat( $main_cat, $Blog, $cat_IDs );
+	if( ! is_int( $main_cat ) )
+	{	// Error:
+		return $main_cat;
+	}
+
 	$post_date = _mw_decode_postdate( $contentstruct, true );
 	$post_title = $contentstruct['title'];
 	$content = $contentstruct['description'];
@@ -396,7 +391,7 @@ function mw_newpost($m)
 
 
 $mweditpost_doc='Edits a post, blogger-api like, +title +category +postdate';
-$mweditpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcStruct,$xmlrpcBoolean));
+$mweditpost_sig =  array(array($xmlrpcBoolean,$xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcStruct,$xmlrpcBoolean));
 /**
  * metaWeblog.editPost (metaWeblog.editPost)
  *
@@ -409,7 +404,6 @@ $mweditpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpc
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 postid (string): Unique identifier of the post to edit
- *						Currently ignored in b2evo, in favor of the category.
  *					1 username (string): Login for a Blogger user who has permission to edit the given
  *						post (either the user who originally created it or an admin of the blog).
  *					2 password (string): Password for said username.
@@ -417,13 +411,8 @@ $mweditpost_sig =  array(array($xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpc
  */
 function mw_editpost( $m )
 {
-	global $xmlrpcerruser; // import user errcode value
-	global $DB;
-	global $Settings;
-	global $Messages;
-
 	// CHECK LOGIN:
-  /**
+	/**
 	 * @var User
 	 */
 	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
@@ -432,12 +421,18 @@ function mw_editpost( $m )
 	}
 
 	// GET POST:
-  /**
+	/**
 	 * @var Item
 	 */
 	if( ! $edited_Item = & xmlrpcs_get_Item( $m, 0 ) )
 	{	// Failed, return (last) error:
 		return xmlrpcs_resperror();
+	}
+
+	// We need to be able to edit this post:
+	if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+	{
+		return xmlrpcs_resperror( 3 ); // Permission denied
 	}
 
 	$xstatus = $m->getParam(4);
@@ -456,27 +451,25 @@ function mw_editpost( $m )
 		return $cat_IDs;
 	}
 
-	if( empty($cat_IDs) )
-	{	// TODO: make this finer
-		// CHECK PERMISSION: (we need perm on current status)
-		if( ! $current_User->check_perm( 'blog_post!'.$status, 'edit', false, $edited_Item->get_blog_ID() ) )
-		{	// Permission denied
-			return xmlrpcs_resperror( 3 );	// User error 3
-		}
-		$main_cat = NULL;
-	}
-	else
+	if( empty( $cat_IDs ) )
 	{
-		// CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
-		if( ! $current_User->check_perm( 'cats_post!'.$status, 'edit', false, $cat_IDs ) )
-		{	// Permission denied
-			return xmlrpcs_resperror( 3 );	// User error 3
-		}
-		$main_cat = $cat_IDs[0];
+		$cat_IDs = postcats_get_byID( $edited_Item->ID );
+	}
+	$main_cat = $cat_IDs[0];
+
+	// CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
+	if( ! $current_User->check_perm( 'cats_post!'.$status, 'edit', false, $cat_IDs ) )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 	logIO( 'Permission granted.' );
 
-
+	$Blog = & $edited_Item->get_Blog();
+	$main_cat = xmlrpcs_get_maincat( $main_cat, $Blog, $cat_IDs );
+	if( ! is_int( $main_cat ) )
+	{	// Error:
+		return $main_cat;
+	}
 
 	$post_date = _mw_decode_postdate( $contentstruct, false );
 	$post_title = $contentstruct['title'];
@@ -527,7 +520,7 @@ function mw_editpost( $m )
 
 
 
-$mwgetcats_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcString,$xmlrpcString));
+$mwgetcats_sig =  array(array($xmlrpcStruct,$xmlrpcString,$xmlrpcString,$xmlrpcString));
 $mwgetcats_doc = 'Get categories of a post, MetaWeblog API-style';
 /**
  * metaWeblog.getCategories
@@ -543,10 +536,10 @@ $mwgetcats_doc = 'Get categories of a post, MetaWeblog API-style';
  */
 function mw_getcategories( $m )
 {
-	global $xmlrpcerruser, $DB, $Settings;
+	global $DB, $Settings;
 
 	// CHECK LOGIN:
-  /**
+	/**
 	 * @var User
 	 */
 	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
@@ -555,21 +548,13 @@ function mw_getcategories( $m )
 	}
 
 	// GET BLOG:
-  /**
+	/**
 	 * @var Blog
 	 */
 	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
-
-	// CHECK PERMISSION: (we need at least one post/edit status)
-	if( ! $current_User->check_perm( 'blog_post_statuses', 1, false, $Blog->ID ) )
-	{	// Permission denied
-		return xmlrpcs_resperror( 3 );	// User error 3
-	}
-	logIO( 'Permission granted.' );
-
 
 	$sql = "SELECT cat_ID, cat_name
 					FROM T_categories ";
@@ -586,9 +571,9 @@ function mw_getcategories( $m )
 	$rows = $DB->get_results( $sql );
 	if( $DB->error )
 	{	// DB error
-		return new xmlrpcresp(0, $xmlrpcerruser+9, 'DB error: '.$DB->last_error ); // user error 9
+		return xmlrpcs_resperror( 99, 'DB error: '.$DB->last_error ); // user error 9
 	}
-	xmlrpc_debugmsg( 'Categories:'.count($rows) );
+	logIO( 'Categories: '.count($rows) );
 
 	$ChapterCache = & get_Cache('ChapterCache');
 	$data = array();
@@ -610,7 +595,7 @@ function mw_getcategories( $m )
 	}
 
 	logIO( 'OK.' );
-	return new xmlrpcresp( new xmlrpcval($data, "array") );
+	return new xmlrpcresp( new xmlrpcval($data, 'struct') );
 }
 
 
@@ -632,10 +617,8 @@ $metawebloggetrecentposts_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcS
  */
 function mw_getrecentposts( $m )
 {
-	global $xmlrpcerruser, $DB;
-
 	// CHECK LOGIN:
-  /**
+	/**
 	 * @var User
 	 */
 	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
@@ -644,21 +627,13 @@ function mw_getrecentposts( $m )
 	}
 
 	// GET BLOG:
-  /**
+	/**
 	 * @var Blog
 	 */
 	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
-
-	// CHECK PERMISSION: (we need at least one post/edit status)
-	if( ! $current_User->check_perm( 'blog_post_statuses', 1, false, $Blog->ID ) )
-	{	// Permission denied
-		return xmlrpcs_resperror( 3 );	// User error 3
-	}
-	logIO( 'Permission granted.' );
-
 
 	$numposts = $m->getParam(3);
 	$numposts = $numposts->scalarval();
@@ -668,39 +643,43 @@ function mw_getrecentposts( $m )
 	load_class( 'items/model/_itemlist.class.php' );
 	$MainList = & new ItemList2( $Blog, NULL, NULL, $numposts );
 
+	// Protected and private get checked by statuses_where_clause().
+	$statuses = array( 'published', 'redirected', 'protected', 'private' );
+	if( $current_User->check_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
+	{	// These statuses require member status:
+		$statuses = array_merge( $statuses, array( 'draft', 'deprecated' ) );
+	}
+	logIO( 'Statuses: '.implode( ', ', $statuses ) );
+
 	$MainList->set_filters( array(
-			'visibility_array' => array( 'published', 'protected', 'private', 'draft', 'deprecated', 'redirected' ),
+			'visibility_array' => $statuses,
 			'order' => 'DESC',
 			'unit' => 'posts',
 		) );
-
 	// Run the query:
 	$MainList->query();
 
-	xmlrpc_debugmsg( 'Items:'.$MainList->result_num_rows );
+	logIO( 'Items:'.$MainList->result_num_rows );
 
 	$data = array();
-  /**
+	/**
 	 * @var Item
 	 */
 	while( $Item = & $MainList->get_item() )
 	{
-		xmlrpc_debugmsg( 'Item:'.$Item->title.
-											' - Issued: '.$Item->issue_date.
-											' - Modified: '.$Item->mod_date );
+		logIO( 'Item:'.$Item->title.
+					' - Issued: '.$Item->issue_date.
+					' - Modified: '.$Item->mod_date );
 		$post_date = mysql2date('U', $Item->issue_date);
 		$post_date = gmdate('Ymd', $post_date).'T'.gmdate('H:i:s', $post_date);
 		$content = $Item->content;
-		$content = str_replace("\n",'',$content); // Tor - kludge to fix bug in xmlrpc libraries
 		// Load Item's creator User:
 		$Item->get_creator_User();
 		$authorname = $Item->creator_User->get('preferredname');
 		// need a loop here to extract all categoy names
 		// $extra_cat_IDs is the variable for the rest of the IDs
 		$hope_Chapter = & $Item->get_main_Chapter();
-		$test = $Item->extra_cat_IDs[0];
-		xmlrpc_debugmsg( 'postcats:'.$hope_Chapter->name );
-		xmlrpc_debugmsg( 'test:'.$test);
+		logIO( 'postcats: '.$hope_Chapter->name );
 		$data[] = new xmlrpcval(array(
 				'dateCreated' => new xmlrpcval($post_date,'dateTime.iso8601'),
 				'userid' => new xmlrpcval($Item->creator_user_ID),
@@ -720,16 +699,15 @@ function mw_getrecentposts( $m )
 				*/
 			),'struct');
 	}
-	$resp = new xmlrpcval($data, 'array');
 
 	logIO( 'OK.' );
-	return new xmlrpcresp($resp);
+	return new xmlrpcresp( new xmlrpcval( $data, 'array' ) );
 }
 
 
 
 $mwgetpost_doc = 'Fetches a post, blogger-api like';
-$mwgetpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString));
+$mwgetpost_sig = array(array($xmlrpcStruct, $xmlrpcString, $xmlrpcString, $xmlrpcString));
 /**
  * metaweblog.getPost retieves a given post.
  *
@@ -744,10 +722,8 @@ $mwgetpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrp
  */
 function mw_getpost($m)
 {
-	global $xmlrpcerruser;
-
 	// CHECK LOGIN:
-  /**
+	/**
 	 * @var User
 	 */
 	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
@@ -756,7 +732,7 @@ function mw_getpost($m)
 	}
 
 	// GET POST:
-  /**
+	/**
 	 * @var Item
 	 */
 	if( ! $edited_Item = & xmlrpcs_get_Item( $m, 0 ) )
@@ -764,8 +740,8 @@ function mw_getpost($m)
 		return xmlrpcs_resperror();
 	}
 
-	// CHECK PERMISSION: (we need at least one post/edit status)
-	if( ! $current_User->check_perm( 'blog_post_statuses', 1, false, $edited_Item->get_blog_ID() ) )
+	// CHECK PERMISSION:
+	if( ! xmlrpcs_can_view_item( $edited_Item, $current_User ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
@@ -793,10 +769,9 @@ function mw_getpost($m)
 			'mt_text_more'      => new xmlrpcval( "")	// Doc?
 			*/
 		),'struct');
-	$resp = $struct;
 
 	logIO( 'OK.' );
-	return new xmlrpcresp($resp);
+	return new xmlrpcresp($struct);
 }
 
 
@@ -835,6 +810,23 @@ $xmlrpc_procs['metaWeblog.getRecentPosts'] = array(
 
 /*
  * $Log$
+ * Revision 1.13  2009/08/29 12:23:56  tblue246
+ * - SECURITY:
+ * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
+ * 	- files.ctrl.php: Removed redundant calls to User::check_perm().
+ * 	- XML-RPC APIs: Added missing permission checks.
+ * 	- items.ctrl.php: Check permission to edit item with current status (also checks user levels) for update actions.
+ * - XML-RPC client: Re-added check for zlib support (removed by update).
+ * - XML-RPC APIs: Corrected method signatures (return type).
+ * - Localization:
+ * 	- Fixed wrong permission description in blog user/group permissions screen.
+ * 	- Removed wrong TRANS comment
+ * 	- de-DE: Fixed bad translation strings (double quotes + HTML attribute = mess).
+ * - File upload:
+ * 	- Suppress warnings generated by move_uploaded_file().
+ * 	- File browser: Hide link to upload screen if no upload permission.
+ * - Further code optimizations.
+ *
  * Revision 1.12  2009/08/27 17:46:12  tblue246
  * Metaweblog API: Use mt_keywords for item tags (set/get)
  *
