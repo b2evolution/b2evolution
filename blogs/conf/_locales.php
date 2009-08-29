@@ -17,7 +17,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  *
  * Set to 0 to disable localization.
  * Set to 1 to enable localization.
-
+ *
  * @global integer
  */
 $use_l10n = 1;
