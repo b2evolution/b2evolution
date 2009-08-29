@@ -26,7 +26,7 @@ if( ! isset($HTTP_RAW_POST_DATA) )
 {
 	$HTTP_RAW_POST_DATA = implode("\r\n", file('php://input'));
 }
-// Trim requests (used by XML-RPC library); fix for mozBlog and other cases where '<?xml' isn't on the very first line
+// Trim requests (used by XML-RPC library); fix for mozBlog and other cases where '< ?xml' isn't on the very first line
 $HTTP_RAW_POST_DATA = trim( $HTTP_RAW_POST_DATA );
 
 
@@ -68,12 +68,19 @@ include_once $inc_path.'xmlrpc/apis/_mt.api.php';
 
 load_funcs('xmlrpc/model/_xmlrpcs.funcs.php'); // This will add generic remote calls
 
+// Set up the XML-RPC server:
+$s = & new xmlrpc_server( $xmlrpc_procs, false );
+// Use the request encoding for the response:
+$s->response_charset_encoding = 'auto';
 // DO THE SERVING:
-$s = new xmlrpc_server( $xmlrpc_procs );
+$s->service();
 
 
 /*
  * $Log$
+ * Revision 1.150  2009/08/29 19:46:41  tblue246
+ * XML-RPC: Revert previous commit and auto-detect response encoding. Props to: waltercruz
+ *
  * Revision 1.149  2009/03/08 23:58:16  fplanque
  * 2009
  *
