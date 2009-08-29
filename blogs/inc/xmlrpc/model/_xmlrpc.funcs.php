@@ -71,9 +71,12 @@ if( true !== CANUSEXMLRPC )
 
 load_funcs('_ext/xmlrpc/_xmlrpc.inc.php');
 
-// b2evolution: Set internal encoding for the XML-RPC library.
-global $xmlrpc_internalencoding, $evo_charset;
+// b2evolution: Set default and internal encodings for the XML-RPC library.
+global $xmlrpc_internalencoding, $xmlrpc_defencoding, $evo_charset, $io_charset;
+
 $xmlrpc_internalencoding = strtoupper( $evo_charset );
+$xmlrpc_defencoding      = strtoupper( $io_charset );
+
 
 // --------------------------------------- SUPPORT FUNCTIONS ----------------------------------------
 
