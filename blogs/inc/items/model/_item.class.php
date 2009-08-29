@@ -1560,7 +1560,8 @@ class Item extends ItemLight
 
 		if( function_exists( 'mb_strtolower' ) )
 		{	// fp> TODO: instead of those "when used" ifs, it would make more sense to redefine mb_strtolower beforehand if it doesn"t exist (it would then just be a fallback to the strtolower + a Debuglog->add() )
-			array_walk( $this->tags, create_function( '& $tag', '$tag = mb_strtolower( $tag, $GLOBALS[\'io_charset\'] );' ) );
+			// Tblue> Note on charset: param() should have converted the tag string from $io_charset to $evo_charset.
+			array_walk( $this->tags, create_function( '& $tag', '$tag = mb_strtolower( $tag, $GLOBALS[\'evo_charset\'] );' ) );
 		}
 		else
 		{
@@ -3950,6 +3951,10 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.129  2009/08/29 19:10:55  tblue246
+ * - Item::set_tags_from_string(): Use $evo_charset instead of $io_charset for mb_strtolower.
+ * - XML-RPC library: Set internal encoding to $evo_charset.
+ *
  * Revision 1.128  2009/08/25 16:49:48  tblue246
  * Always trigger AfterCommentUpdate/AfterItemUpdate, not only if Comment/Item has changed. Don't kill me, it makes more sense and, as Yabs said: 'yabs nagged the arse off me to reverse this'
  *

@@ -71,8 +71,11 @@ if( true !== CANUSEXMLRPC )
 
 load_funcs('_ext/xmlrpc/_xmlrpc.inc.php');
 
-// --------------------------------------- SUPPORT FUNCTIONS ----------------------------------------
+// b2evolution: Set internal encoding for the XML-RPC library.
+global $xmlrpc_internalencoding, $evo_charset;
+$xmlrpc_internalencoding = strtoupper( $evo_charset );
 
+// --------------------------------------- SUPPORT FUNCTIONS ----------------------------------------
 
 /*
  * evocore: We add xmlrpc_decode_recurse because the default PHP implementation
