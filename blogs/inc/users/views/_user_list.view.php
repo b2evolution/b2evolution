@@ -42,6 +42,7 @@ global $Settings;
  */
 global $DB;
 
+global $collections_Module;
 
 // query which groups have users (in order to prevent deletion of groups which have users)
 global $usedgroups;	// We need this in a callback below
@@ -65,19 +66,29 @@ if( !empty( $keywords ) )
 	}
 }
 
-$sql = "SELECT T_users.*, grp_ID, grp_name, COUNT(blog_ID) AS nb_blogs
-					FROM T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID
-								LEFT JOIN T_blogs on user_ID = blog_owner_user_ID
-				 WHERE $where_clause 1
-				 GROUP BY user_ID
-				 ORDER BY grp_name, *";
+$SQL = new SQL();
+$SQL->SELECT( 'T_users.*, grp_ID, grp_name' );
+$SQL->FROM( 'T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID' );
+$SQL->WHERE( $where_clause.' 1' );
+$SQL->GROUP_BY( 'user_ID' );
+$SQL->ORDER_BY( 'grp_name, *' );
+
+if( isset($collections_Module) )
+{	// We are handling blogs:
+	$SQL->SELECT_add( ', COUNT(blog_ID) AS nb_blogs' );
+	$SQL->FROM_add( ' LEFT JOIN T_blogs on user_ID = blog_owner_user_ID' );
+}
+else
+{
+	$SQL->SELECT_add( ', 0 AS nb_blogs' );
+}
 
 $count_sql = 'SELECT COUNT(*)
 							 	FROM T_users
 							 WHERE '.$where_clause.' 1';
 
 
-$Results = & new Results( $sql, 'user_', '--A', NULL, $count_sql );
+$Results = new Results( $SQL->get(), 'user_', '--A', NULL, $count_sql );
 
 $Results->title = T_('Groups & Users');
 
@@ -223,13 +234,16 @@ $Results->cols[] = array(
 								.get_icon( 'www', 'imgtag', array( 'class' => 'middle', 'title' => 'Website: $user_url$' ) ).'</a>\', \'&nbsp;\' )¤',
 					);
 
-$Results->cols[] = array(
-						'th' => T_('Blogs'),
-						'order' => 'nb_blogs',
-						'th_class' => 'shrinkwrap',
-						'td_class' => 'center',
-						'td' => '¤conditional( (#nb_blogs# > 0), #nb_blogs#, \'&nbsp;\' )¤',
-					);
+if( isset($collections_Module) )
+{	// We are handling blogs:
+	$Results->cols[] = array(
+							'th' => T_('Blogs'),
+							'order' => 'nb_blogs',
+							'th_class' => 'shrinkwrap',
+							'td_class' => 'center',
+							'td' => '¤conditional( (#nb_blogs# > 0), #nb_blogs#, \'&nbsp;\' )¤',
+						);
+}
 
 if( ! $current_User->check_perm( 'users', 'edit', false ) )
 {
@@ -296,6 +310,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2009/08/30 00:43:52  fplanque
+ * increased modularity
+ *
  * Revision 1.7  2009/03/08 23:57:46  fplanque
  * 2009
  *
