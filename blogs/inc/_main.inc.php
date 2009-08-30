@@ -595,8 +595,7 @@ else
 /**
  * User locale selection:
  */
-if( is_logged_in() && $current_User->get('locale') != $current_locale
-		&& !$locale_from_get )
+if( is_logged_in() && $current_User->get('locale') != $current_locale )
 { // change locale to users preference
 	/*
 	 * User locale selection:
@@ -643,6 +642,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.115  2009/08/30 18:52:11  tblue246
+ * Removed checking of unused variable
+ *
  * Revision 1.114  2009/08/23 00:25:27  sam2kb
  * Never use locale from HTTP_ACCEPT nor locale from REQUEST when we set DB connection charset
  *
