@@ -1177,6 +1177,9 @@ class AdminUI_general extends Menu
 		// Part 2:
 		modules_call_method( 'build_menu_2' );
 
+		// Part 3:
+		modules_call_method( 'build_menu_3' );
+
 		// Call AdminAfterMenuInit to notify Plugins that the menu is initialized
 		// E.g. the livehits_plugin and weather_plugin use it for adding a menu entry.
 		$Plugins->trigger_event( 'AdminAfterMenuInit' );
@@ -1282,6 +1285,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.96  2009/08/30 00:30:52  fplanque
+ * increased modularity
+ *
  * Revision 1.95  2009/04/21 19:19:49  blueyed
  * doc/normalization
  *

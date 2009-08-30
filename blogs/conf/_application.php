@@ -21,7 +21,7 @@ $app_version = '3.4.0-dev';
  * Release date (ISO)
  * @global string
  */
-$app_date = '2009-07-20';
+$app_date = '2009-08-30';
 
 /**
  * This is used to check if the database is up to date.
@@ -55,9 +55,12 @@ $copyright_text ='<span class="nobr">&copy;2001-2002 by Michel V &amp; others</s
  *
  * Note: a long term goal is to be able to disable some b2evolution feature sets that would not be needed. This should
  * however only be used for large enough feature sets to make it worth the trouble. NO MICROMANAGING here.
+ * Try commenting out the 'collections' module to revert to pretty much just evocore.
  */
 $modules = array(
 		'_core',
+		'collections',
+		'files',
 		'sessions',
 	);
 ?>

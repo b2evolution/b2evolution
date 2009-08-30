@@ -71,22 +71,24 @@ require_once $inc_path.'_async.inc.php';
  * Get the blog from param, defaulting to the last selected one for this user:
  * we need it for quite a few of the menu urls
  */
-$user_selected_blog = (int)$UserSettings->get('selected_blog');
-$BlogCache = & get_Cache( 'BlogCache' );
-if( param( 'blog', 'integer', NULL, true ) === NULL      // We got no explicit blog choice (not even '0' for 'no blog'):
-	|| ($blog > 0 && ! ($Blog = & $BlogCache->get_by_ID( $blog, false, false )) )) // or we requested a nonexistent blog
-{ // Try the memorized blog from the previous action:
-	$blog = $user_selected_blog;
-	if( ! ($Blog = & $BlogCache->get_by_ID( $blog, false, false ) ) )
-	{	// That one doesn't exist either...
-		$blog = 0;
+if( isset($collections_Module) )
+{
+	$user_selected_blog = (int)$UserSettings->get('selected_blog');
+	$BlogCache = & get_Cache( 'BlogCache' );
+	if( param( 'blog', 'integer', NULL, true ) === NULL      // We got no explicit blog choice (not even '0' for 'no blog'):
+		|| ($blog > 0 && ! ($Blog = & $BlogCache->get_by_ID( $blog, false, false )) )) // or we requested a nonexistent blog
+	{ // Try the memorized blog from the previous action:
+		$blog = $user_selected_blog;
+		if( ! ($Blog = & $BlogCache->get_by_ID( $blog, false, false ) ) )
+		{	// That one doesn't exist either...
+			$blog = 0;
+		}
+	}
+	elseif( $blog != $user_selected_blog )
+	{ // We have selected a new & valid blog. Update UserSettings for selected blog:
+		set_working_blog( $blog );
 	}
 }
-elseif( $blog != $user_selected_blog )
-{ // We have selected a new & valid blog. Update UserSettings for selected blog:
-	set_working_blog( $blog );
-}
-
 
 // bookmarklet, upload (upload actually means sth like: select img for post):
 param( 'mode', 'string', '', true );
@@ -174,7 +176,7 @@ $AdminUI = & new AdminUI();
  */
 
 // Get requested controller and memorize it:
-param( 'ctrl', '/^[a-z0-9_]+$/', 'dashboard', true );
+param( 'ctrl', '/^[a-z0-9_]+$/', $default_ctrl, true );
 
 
 // Redirect old-style URLs (e.g. /admin/plugins.php), if they come here because the webserver maps "/admin/" to "/admin.php"
@@ -222,6 +224,9 @@ require $inc_path.$ctrl_mappings[$ctrl];
 
 /*
  * $Log$
+ * Revision 1.32  2009/08/30 00:30:52  fplanque
+ * increased modularity
+ *
  * Revision 1.31  2009/03/08 23:57:34  fplanque
  * 2009
  *

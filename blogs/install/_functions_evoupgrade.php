@@ -2275,7 +2275,7 @@ function upgrade_b2evo_tables()
 							(160000, 'url',      'Digg'),
 							(160100, 'url',      'StumbleUpon'),
 							(200000, 'text',     'Role'),
-							(200100, 'text',     'Organization'),
+							(200100, 'text',     'Company/Org.'),
 							(200200, 'text',     'Division'),
 							(211000, 'text',     'VAT ID'),
 							(300000, 'text',     'Main address'),
@@ -2573,6 +2573,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.300  2009/08/30 00:30:52  fplanque
+ * increased modularity
+ *
  * Revision 1.299  2009/07/13 00:14:07  fplanque
  * fixing default dates
  *

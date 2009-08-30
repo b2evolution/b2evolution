@@ -80,11 +80,9 @@ class Goal extends DataObject
 		param_string_not_empty( 'goal_key', T_('Please enter a name.') );
 		$this->set_from_Request( 'key' );
 
-		// View type
 		param( 'goal_redir_url', 'string' );
 		$this->set_from_Request( 'redir_url', 'goal_redir_url', true  );
 
-		// View type
 		param( 'goal_default_value', 'string' );
 		param_check_decimal( 'goal_default_value', T_('Default value must be a number.') );
 		$this->set_from_Request( 'default_value', 'goal_default_value', true  );
@@ -130,6 +128,9 @@ class Goal extends DataObject
 
 /*
  * $Log$
+ * Revision 1.3  2009/08/30 00:30:52  fplanque
+ * increased modularity
+ *
  * Revision 1.2  2008/05/26 19:26:32  fplanque
  * minor
  *

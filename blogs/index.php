@@ -26,6 +26,12 @@ require_once dirname(__FILE__).'/conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
+if( ! isset($collections_Module) )
+{	// The evocore framework is not used as a blog app here / we don't know how to display a public interface...
+	header_redirect( 'admin.php', 302 );
+	exit(0);
+}
+
 // Check if a specific blog has been requested in the URL:
 param( 'blog', 'integer', '', true );
 

@@ -158,7 +158,7 @@ class DataObjectList2 extends FilteredResults
 		parent::Results( NULL, $param_prefix, $default_order, $limit, NULL, false );
 
 		// The list objects will also be cached in this cache.
-		// Tje Cache object may also be useful to get table information for the Items.
+		// The Cache object may also be useful to get table information for the Items.
 		$this->Cache = & $Cache;
 
 		// Colum used for IDs
@@ -338,6 +338,9 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
+ * Revision 1.9  2009/08/30 00:30:52  fplanque
+ * increased modularity
+ *
  * Revision 1.8  2009/03/08 23:57:40  fplanque
  * 2009
  *

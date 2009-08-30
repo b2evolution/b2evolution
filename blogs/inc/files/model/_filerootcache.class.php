@@ -61,6 +61,7 @@ class FileRootCache
 	function get_available_FileRoots()
 	{
 		global $current_User;
+		global $collections_Module;
 
 		$r = array();
 
@@ -71,14 +72,16 @@ class FileRootCache
 			$r[ $user_FileRoot->ID ] = & $user_FileRoot;
 		}
 
-		// Blog/collection media dirs:
-		$BlogCache = & get_Cache( 'BlogCache' );
-		$bloglist = $BlogCache->load_user_blogs( 'blog_media_browse', $current_User->ID );
-		foreach( $bloglist as $blog_ID )
-		{
-			if( $Root = & $this->get_by_type_and_ID( 'collection', $blog_ID, true ) )
+		if( isset($collections_Module) )
+		{	// Blog/collection media dirs:
+			$BlogCache = & get_Cache( 'BlogCache' );
+			$bloglist = $BlogCache->load_user_blogs( 'blog_media_browse', $current_User->ID );
+			foreach( $bloglist as $blog_ID )
 			{
-				$r[ $Root->ID ] = & $Root;
+				if( $Root = & $this->get_by_type_and_ID( 'collection', $blog_ID, true ) )
+				{
+					$r[ $Root->ID ] = & $Root;
+				}
 			}
 		}
 
@@ -89,13 +92,15 @@ class FileRootCache
 			$r[ $shared_FileRoot->ID ] = & $shared_FileRoot;
 		}
 
-		// Skins root:
-		$skins_FileRoot = & $this->get_by_type_and_ID( 'skins', 0, false );
-		if( $skins_FileRoot )
-		{ // We got a skins dir:
-			$r[ $skins_FileRoot->ID ] = & $skins_FileRoot;
+		if( isset($collections_Module) )
+		{ // Skins root:
+			$skins_FileRoot = & $this->get_by_type_and_ID( 'skins', 0, false );
+			if( $skins_FileRoot )
+			{ // We got a skins dir:
+				$r[ $skins_FileRoot->ID ] = & $skins_FileRoot;
+			}
 		}
-
+		
 		return $r;
 	}
 
@@ -161,6 +166,9 @@ class FileRootCache
 
 /*
  * $Log$
+ * Revision 1.5  2009/08/30 00:30:52  fplanque
+ * increased modularity
+ *
  * Revision 1.4  2009/03/08 23:57:43  fplanque
  * 2009
  *

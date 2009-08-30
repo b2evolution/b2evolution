@@ -175,6 +175,12 @@ class sessions_Module
 											'href' => $dispatcher.'?ctrl=stats&amp;tab=summary&amp;tab3=feed&amp;blog='.$blog ),
 										),
 									),
+								),
+							),
+						)
+					);
+
+			$AdminUI->add_menu_entries( 'stats', array(
 								'refsearches' => array(
 									'text' => T_('Search B-hits'),
 									'href' => $dispatcher.'?ctrl=stats&amp;tab=refsearches&amp;tab3=hits&amp;blog='.$blog,
@@ -203,9 +209,7 @@ class sessions_Module
 									'text' => T_('Referring domains'),
 									'href' => $dispatcher.'?ctrl=stats&amp;tab=domains&amp;blog='.$blog ),
 							)
-						),
-					)
-				);
+						);
 		}
 
 		if( $blog == 0 && $current_User->check_perm( 'stats', 'view' ) )
@@ -263,6 +267,16 @@ class sessions_Module
 	function build_menu_2()
 	{
 	}
+
+
+	/**
+	 * Builds the 3rd half of the menu. This is the one with the configuration features
+	 *
+	 * At some point this might be displayed differently than the 1st half.
+	 */
+	function build_menu_3()
+	{
+	}
 }
 
 $sessions_Module = & new sessions_Module();
@@ -270,6 +284,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.14  2009/08/30 00:30:52  fplanque
+ * increased modularity
+ *
  * Revision 1.13  2009/07/06 23:52:25  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *

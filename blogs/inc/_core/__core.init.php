@@ -28,6 +28,11 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * This is supposed to be overriden by sth more useful when a more useful module is loaded
+ * Typically should be 'dashboard'
+ */
+$default_ctrl = 'settings';
 
 /**
  * Aliases for table names:
@@ -38,41 +43,20 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 $db_config['aliases'] = array(
 		'T_antispam'            => $tableprefix.'antispam',
-		'T_blogs'               => $tableprefix.'blogs',
-		'T_categories'          => $tableprefix.'categories',
-		'T_coll_group_perms'    => $tableprefix.'bloggroups',
-		'T_coll_user_perms'     => $tableprefix.'blogusers',
-		'T_coll_settings'       => $tableprefix.'coll_settings',
-		'T_comments'            => $tableprefix.'comments',
 		'T_cron__log'           => $tableprefix.'cron__log',
 		'T_cron__task'          => $tableprefix.'cron__task',
-		'T_files'               => $tableprefix.'files',
-		'T_filetypes'           => $tableprefix.'filetypes',
 		'T_groups'              => $tableprefix.'groups',
 		'T_global__cache'       => $tableprefix.'global__cache',
-		'T_items__item'         => $tableprefix.'items__item',
-		'T_items__itemtag'      => $tableprefix.'items__itemtag',
-		'T_items__prerendering' => $tableprefix.'items__prerendering',
-		'T_items__status'       => $tableprefix.'items__status',
-		'T_items__tag'          => $tableprefix.'items__tag',
-		'T_items__type'         => $tableprefix.'items__type',
-		'T_items__version'      => $tableprefix.'items__version',
-		'T_links'               => $tableprefix.'links',
 		'T_locales'             => $tableprefix.'locales',
 		'T_plugins'             => $tableprefix.'plugins',
 		'T_pluginevents'        => $tableprefix.'pluginevents',
 		'T_pluginsettings'      => $tableprefix.'pluginsettings',
 		'T_pluginusersettings'  => $tableprefix.'pluginusersettings',
-		'T_postcats'            => $tableprefix.'postcats',
 		'T_settings'            => $tableprefix.'settings',
-		'T_skins__container'    => $tableprefix.'skins__container',
-		'T_skins__skin'         => $tableprefix.'skins__skin',
-		'T_subscriptions'       => $tableprefix.'subscriptions',
 		'T_users'               => $tableprefix.'users',
 		'T_users__fielddefs'    => $tableprefix.'users__fielddefs',
 		'T_users__fields'       => $tableprefix.'users__fields',
 		'T_usersettings'        => $tableprefix.'usersettings',
-		'T_widget'              => $tableprefix.'widget',
 	);
 
 
@@ -92,32 +76,16 @@ $db_config['aliases'] = array(
  */
 $ctrl_mappings = array(
 		'antispam'     => 'antispam/antispam_list.ctrl.php',
-		'chapters'     => 'chapters/chapters.ctrl.php',
-		'collections'  => 'collections/collections.ctrl.php',
-		'coll_settings'=> 'collections/coll_settings.ctrl.php',
-		'comments'     => 'comments/_comments.ctrl.php',
 		'crontab'      => 'cron/cronjobs.ctrl.php',
-		'dashboard'    => 'dashboard/dashboard.ctrl.php',
 		'features'     => 'settings/features.ctrl.php',
-		'files'        => 'files/files.ctrl.php',
-		'fileset'      => 'files/file_settings.ctrl.php',
-		'filetypes'    => 'files/file_types.ctrl.php',
-		'items'        => 'items/items.ctrl.php',
-		'itemstatuses' => 'items/item_statuses.ctrl.php',
-		'itemtypes'    => 'items/item_types.ctrl.php',
 		'locales'      => 'locales/locales.ctrl.php',
-		'mtimport'     => 'tools/mtimport.ctrl.php',
 		'plugins'      => 'plugins/plugins.ctrl.php',
 		'settings'     => 'settings/settings.ctrl.php',
 		'set_antispam' => 'antispam/antispam_settings.ctrl.php',
-		'skins'        => 'skins/skins.ctrl.php',
 		'stats'        => 'sessions/stats.ctrl.php',
 		'system'       => 'tools/system.ctrl.php',
-		'tools'        => 'tools/tools.ctrl.php',
 		'users'        => 'users/users.ctrl.php',
 		'upload'       => 'files/upload.ctrl.php',
-		'widgets'      => 'widgets/widgets.ctrl.php',
-		'wpimport'     => 'tools/wpimport.ctrl.php',
 	);
 
 
@@ -292,52 +260,6 @@ class _core_Module
 				);
 		}
 
-		if( $current_User->check_perm( 'blogs', 'create' ) )
-		{
-			$entries['b2evo']['entries']['newblog'] = array(
-					'text' => T_('Create new blog').'&hellip;',
-					'href' => $admin_url.'?ctrl=collections&amp;action=new',
-				);
-			$entries['b2evo']['entries'][] = array(
-					'separator' => true,
-				);
-		}
-
-		$entries['b2evo']['entries']['info'] = array(
-				'text' => T_('More info'),
-				'entries' => array(
-						'b2evonet' => array(
-								'text' => T_('Open b2evolution.net'),
-								'href' => 'http://b2evolution.net/',
-								'target' => '_blank',
-							),
-						'forums' => array(
-								'text' => T_('Open Support forums'),
-								'href' => 'http://forums.b2evolution.net/',
-								'target' => '_blank',
-							),
-						'manual' => array(
-								'text' => T_('Open Online manual'),
-								'href' => 'http://manual.b2evolution.net/',
-								'target' => '_blank',
-							),
-						'info_sep' => array(
-								'separator' => true,
-							),
-						'twitter' => array(
-								'text' => T_('b2evolution on twitter'),
-								'href' => 'http://twitter.com/b2evolution',
-								'target' => '_blank',
-							),
-						'facebook' => array(
-								'text' => T_('b2evolution on facebook'),
-								'href' => 'http://www.facebook.com/b2evolution',
-								'target' => '_blank',
-							),
-						),
-				);
-
-
 		// CUSTOMIZE:
 		if( !empty($Blog) && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 		{	// We have permission to edit blog properties:
@@ -421,6 +343,10 @@ class _core_Module
 
 		$topleft_Menu->add_menu_entries( NULL, $entries );
 
+
+
+
+		// ---------------------------------------------------------------------------
 
 		/*
 		 * RIGHT MENU
@@ -510,14 +436,16 @@ class _core_Module
 				);
 		}
 
-		$entries['logout'] = array(
+
+		$topright_Menu->add_menu_entries( NULL, $entries );
+
+		$topright_Menu->add_menu_entries( NULL, array(
+			'logout' => array(
 				'text' => T_('Logout').' '.get_icon('close'),
 				'class' => 'rollover',
 				'href' => get_user_logout_url(),
-			);
-
-
-		$topright_Menu->add_menu_entries( NULL, $entries );
+				)
+		 ) );
 
 	}
 
@@ -527,56 +455,23 @@ class _core_Module
 	 */
 	function build_menu_1()
 	{
-		global $blog, $dispatcher;
-		/**
-		 * @var User
-		 */
-		global $current_User;
-		global $Blog;
-		global $Settings;
-		/**
-		 * @var AdminUI_general
-		 */
-		global $AdminUI;
-
-		$AdminUI->add_menu_entries(
-				NULL, // root
-				array(
-					'dashboard' => array(
-						'text' => T_('Dashboard'),
-						'href' => $dispatcher.'?ctrl=dashboard&amp;blog='.$blog,
-						'style' => 'font-weight: bold;'
-						),
-
-					'items' => array(
-						'text' => T_('Posts / Comments'),
-						'href' => $dispatcher.'?ctrl=items&amp;blog='.$blog.'&amp;filter=restore',
-						// Controller may add subtabs
-						),
-					) );
-
-
-		if( $Settings->get( 'fm_enabled' ) && $current_User->check_perm( 'files', 'view', false, $blog ? $blog : NULL ) )
-		{	// FM enabled and permission to view files:
-			$AdminUI->add_menu_entries( NULL, array(
-						'files' => array(
-							'text' => T_('Files'),
-							'title' => T_('File management'),
-							'href' => $dispatcher.'?ctrl=files',
-							// Controller may add subtabs
-						),
-					) );
-
-		}
 	}
 
 
 	/**
-	 * Builds the 2nd half of the menu. This is the one with the configuration features
+	 * Builds the 2nd half of the menu. This is the one with the most important features
+	 */
+	function build_menu_2()
+	{
+	}
+
+
+	/**
+	 * Builds the 3rd half of the menu. This is the one with the configuration features
 	 *
 	 * At some point this might be displayed differently than the 1st half.
 	 */
-	function build_menu_2()
+	function build_menu_3()
 	{
 		global $blog, $loc_transinfo, $ctrl, $dispatcher;
 		/**
@@ -588,111 +483,6 @@ class _core_Module
 		 * @var AdminUI_general
 		 */
 		global $AdminUI;
-
-		// BLOG SETTINGS:
-		if( $ctrl == 'collections' )
-		{ // We are viewing the blog list, nothing fancy involved:
-			$AdminUI->add_menu_entries(
-					NULL, // root
-					array(
-						'blogs' => array(
-							'text' => T_('Blog settings'),
-							'href' => $dispatcher.'?ctrl=collections',
-						),
-					) );
-		}
-		else
-		{	// We're on any other page, we may have a direct destination
-		  // + we have subtabs (fp > maybe the subtabs should go into the controller as for _items ?)
-
-			// What perms do we have?
-			$coll_settings_perm = $current_User->check_perm( 'blog_properties', 'any', false, $blog );
-			$coll_chapters_perm = $current_User->check_perm( 'blog_cats', '', false, $blog );
-
-			// Determine default page based on permissions:
-			if( $coll_settings_perm )
-			{	// Default: show General Blog Settings
-				$default_page = $dispatcher.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog;
-			}
-			elseif( $coll_chapters_perm )
-			{	// Default: show categories
-				$default_page = $dispatcher.'?ctrl=chapters&amp;blog='.$blog;
-			}
-			else
-			{	// Default: Show list of blogs
-				$default_page = $dispatcher.'?ctrl=collections';
-			}
-
-			$AdminUI->add_menu_entries(
-					NULL, // root
-					array(
-						'blogs' => array(
-							'text' => T_('Blog settings'),
-							'href' => $default_page,
-							),
-						) );
-
-			if( $coll_settings_perm )
-			{
-				$AdminUI->add_menu_entries( 'blogs',	array(
-							'general' => array(
-								'text' => T_('General'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog, ),
-							'features' => array(
-								'text' => T_('Features'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$blog, ),
-							'skin' => array(
-								'text' => T_('Skin'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog, ),
-							'skin_settings' => array(
-								'text' => T_('Skin settings'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=skin_settings&amp;blog='.$blog, ),
-							'plugin_settings' => array(
-								'text' => T_('Plugin settings'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$blog, ),
-							'widgets' => array(
-								'text' => T_('Widgets'),
-								'href' => $dispatcher.'?ctrl=widgets&amp;blog='.$blog, ),
-						) );
-			}
-
-			if( $coll_chapters_perm )
-			{
-				$AdminUI->add_menu_entries( 'blogs',	array(
-							'chapters' => array(
-								'text' => T_('Categories'),
-								'href' => $dispatcher.'?ctrl=chapters&amp;blog='.$blog ),
-						) );
-			}
-
-			if( $coll_settings_perm )
-			{
-				$AdminUI->add_menu_entries( 'blogs',	array(
-							'urls' => array(
-								'text' => T_('URLs'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=urls&amp;blog='.$blog, ),
-							'seo' => array(
-								'text' => T_('SEO'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=seo&amp;blog='.$blog, ),
-							'advanced' => array(
-								'text' => T_('Advanced'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$blog, ),
-						) );
-
-				if( $Blog && $Blog->advanced_perms )
-				{
-					$AdminUI->add_menu_entries( 'blogs',	array(
-								'perm' => array(
-									'text' => T_('User perms'), // keep label short
-									'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=perm&amp;blog='.$blog, ),
-								'permgroup' => array(
-									'text' => T_('Group perms'), // keep label short
-									'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$blog, ),
-							) );
-				}
-			}
-		}
-
 
 		if( $current_User->check_perm( 'options', 'view' ) )
 		{	// Permission to view settings:
@@ -707,32 +497,15 @@ class _core_Module
 								'features' => array(
 									'text' => T_('Features'),
 									'href' => $dispatcher.'?ctrl=features' ),
-								'skins' => array(
-									'text' => T_('Skins'),
-									'href' => $dispatcher.'?ctrl=skins'),
-								'plugins' => array(
-									'text' => T_('Plugins'),
-									'href' => $dispatcher.'?ctrl=plugins'),
 								'antispam' => array(
 									'text' => T_('Antispam'),
 									'href' => $dispatcher.'?ctrl=set_antispam'),
 								'regional' => array(
 									'text' => T_('Regional'),
 									'href' => $dispatcher.'?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
-								'files' => array(
-									'text' => T_('Files'),
-									'href' => $dispatcher.'?ctrl=fileset' ),
-								'filetypes' => array(
-									'text' => T_('File types'),
-									'href' => $dispatcher.'?ctrl=filetypes' ),
-								'types' => array(
-									'text' => T_('Post types'),
-									'title' => T_('Post types management'),
-									'href' => $dispatcher.'?ctrl=itemtypes'),
-								'statuses' => array(
-									'text' => T_('Post statuses'),
-									'title' => T_('Post statuses management'),
-									'href' => $dispatcher.'?ctrl=itemstatuses'),
+								'plugins' => array(
+									'text' => T_('Plugins'),
+									'href' => $dispatcher.'?ctrl=plugins'),
 							)
 						),
 					) );
@@ -787,12 +560,6 @@ class _core_Module
 										'href' => $dispatcher.'?ctrl=antispam'	),
 									) );
 				}
-
-				$AdminUI->add_menu_entries( 'tools', array(
-							'' => array(	// fp> '' is dirty
-								'text' => T_('Misc'),
-								'href' => $dispatcher.'?ctrl=tools' ),
-						) );
 		}
 		elseif( $current_User->check_perm( 'spamblacklist', 'view' ) )
 		{	// Permission to view antispam but NOT tools:
@@ -817,6 +584,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.19  2009/08/30 00:30:52  fplanque
+ * increased modularity
+ *
  * Revision 1.18  2009/08/29 12:23:55  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

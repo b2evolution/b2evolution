@@ -40,6 +40,8 @@ global $Settings;
 
 global $dispatcher;
 
+global $collections_Module;
+
 $Form = & new Form( NULL, 'settings_checkchanges' );
 $Form->begin_form( 'fform', T_('General Settings'),
 	// enable all form elements on submit (so values get sent):
@@ -51,18 +53,21 @@ $Form->hidden( 'tab', 'general' );
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Display options') );
+if( isset($collections_Module) )
+{
+	$Form->begin_fieldset( T_('Display options') );
 
-$BlogCache = & get_Cache( 'BlogCache' );
+	$BlogCache = & get_Cache( 'BlogCache' );
 
-	$Form->select_input_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default blog to display'), array(
-			'note' => T_('This blog will be displayed on index.php.').' <a href="'.$dispatcher.'?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
-			'allow_none' => true,
-			'class' => '',
-			'loop_object_method' => 'get_maxlen_name',
-			'onchange' => '' )  );
+		$Form->select_input_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default blog to display'), array(
+				'note' => T_('This blog will be displayed on index.php.').' <a href="'.$dispatcher.'?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
+				'allow_none' => true,
+				'class' => '',
+				'loop_object_method' => 'get_maxlen_name',
+				'onchange' => '' )  );
 
-$Form->end_fieldset();
+	$Form->end_fieldset();
+}
 
 // --------------------------------------------
 
@@ -130,6 +135,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.8  2009/08/30 00:30:52  fplanque
+ * increased modularity
+ *
  * Revision 1.7  2009/07/06 23:52:25  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *

@@ -36,6 +36,8 @@ global $current_User;
 
 global $dispatcher;
 
+global $collections_Module;
+
 // Do we have permission to view all stats (aggregated stats) ?
 $perm_view_all = $current_User->check_perm( 'stats', 'view' );
 
@@ -53,20 +55,20 @@ $AdminUI->title = T_('Stats');
 
 param( 'action', 'string' );
 
-if( $blog == 0 && $perm_view_all )
-{	// We want to view aggregate stats
-}
-elseif( $blog == 0 )
-{	// Find a blog we can view stats for:
-	if( ! $selected = autoselect_blog( 'stats', 'view' ) )
-	{ // No blog could be selected
-		$Messages->add( T_('Sorry, there is no blog you have permission to view stats for.'), 'error' );
-		$action = 'nil';
-	}
-	elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
-	{	// Selected a new blog:
-		$BlogCache = & get_Cache( 'BlogCache' );
-		$Blog = & $BlogCache->get_by_ID( $blog );
+if( $blog == 0 )
+{
+	if( (!$perm_view_all) && isset($collections_Module) )
+	{	// Find a blog we can view stats for:
+		if( ! $selected = autoselect_blog( 'stats', 'view' ) )
+		{ // No blog could be selected
+			$Messages->add( T_('Sorry, there is no blog you have permission to view stats for.'), 'error' );
+			$action = 'nil';
+		}
+		elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
+		{	// Selected a new blog:
+			$BlogCache = & get_Cache( 'BlogCache' );
+			$Blog = & $BlogCache->get_by_ID( $blog );
+		}
 	}
 }
 
@@ -117,14 +119,17 @@ switch( $action )
 		break;
 }
 
-if( $perm_view_all )
-{
-	$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ), T_('All'),
-					$dispatcher.'?ctrl=stats&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0' );
-}
-else
-{	// No permission to view aggregated stats:
-	$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ) );
+if( isset($collections_Module) )
+{ // Display list of blogs:
+	if( $perm_view_all )
+	{
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ), T_('All'),
+						$dispatcher.'?ctrl=stats&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0' );
+	}
+	else
+	{	// No permission to view aggregated stats:
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ) );
+	}
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -238,6 +243,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2009/08/30 00:30:52  fplanque
+ * increased modularity
+ *
  * Revision 1.13  2009/07/06 23:52:25  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *

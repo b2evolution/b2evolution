@@ -29,8 +29,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 /**
  * Load class file
+ *
+ * @param string
+ * @param string used by PHP5
  */
-function load_class( $class_path )
+function load_class( $class_path, $ignore = NULL )
 {
 	global $inc_path;
 	require_once $inc_path.$class_path;
@@ -40,6 +43,9 @@ function load_class( $class_path )
 
 /*
  * $Log$
+ * Revision 1.19  2009/08/30 00:30:52  fplanque
+ * increased modularity
+ *
  * Revision 1.18  2009/03/08 23:57:39  fplanque
  * 2009
  *
