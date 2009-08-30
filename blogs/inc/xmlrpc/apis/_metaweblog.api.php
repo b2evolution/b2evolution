@@ -389,6 +389,7 @@ function mw_newpost($m)
 		$allow_comments = 'disabled'; // Tblue> I think disabled makes sense here since it is a new post.
 	}
 
+	$excerpt = '';
 	if( isset($contentstruct['mt_excerpt']) )
 	{
 		$excerpt = $contentstruct['mt_excerpt'];
@@ -821,6 +822,9 @@ $xmlrpc_procs['metaWeblog.getRecentPosts'] = array(
 
 /*
  * $Log$
+ * Revision 1.19  2009/08/30 17:21:24  waltercruz
+ * Fixing possible PHP warning. Thanks Tblue
+ *
  * Revision 1.18  2009/08/30 17:15:41  waltercruz
  * Adding support to mt_excerpt
  *
