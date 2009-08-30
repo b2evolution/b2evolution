@@ -992,7 +992,18 @@ class Hit
 			{ // found the keyphrase query parameter
 				$q = trim(urldecode($param_parts[1]));
 
-			/* fp> what's that? when do we need that? 				
+			/* fp> what's that? when do we need that?
+			 * Tblue> I think the problem is this: yandex.ru uses the text
+			 *        parameter for the keyphrase and the p parameter for
+			 *        the serprank, but some other search engine uses p
+			 *        for the keyphrase. If yandex.ru puts the p param
+			 *        before the text param in the URL, we would get the
+			 *        serprank instead of the keyphrase, so if p appears
+			 *        to be the serprank, we skip it. This may work for
+			 *        yandex.ru, but if somebody searches for a numeric
+			 *        value using the search engine which uses the p param
+			 *        for the keyphrase, we won't get the correct result!
+			 *        Conclusion: We need a better fix for yandex.ru.
 				if( ctype_digit( $q ) && $param_parts[0] == 'p' )
 				{	// ?p=5&text=keyword
 					continue;
@@ -1139,6 +1150,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.32  2009/08/30 15:35:51  tblue246
+ * doc
+ *
  * Revision 1.31  2009/08/30 14:00:13  fplanque
  * minor
  *
