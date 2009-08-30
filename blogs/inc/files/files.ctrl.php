@@ -102,8 +102,7 @@ if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 	$ItemCache = & get_Cache( 'ItemCache' );
 	if( ($edited_Item = & $ItemCache->get_by_ID( $item_ID, false )) === false )
 	{	// We could not find the contact to link:
-		$Messages->add( T_('Requested item does not exist any longer.'), 'error' );
-		unset( $edited_Item );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Item') ), 'error' );
 		forget_param( 'item_ID' );
 		unset( $item_ID );
 	}
@@ -114,7 +113,7 @@ if( param( 'user_ID', 'integer', NULL, true, false, false ) )
 	$UserCache = & get_Cache( 'UserCache' );
 	if( ($edited_User = & $UserCache->get_by_ID( $user_ID, false )) === false )
 	{	// We could not find the contact to link:
-		$Messages->add( T_('Requested user does not exist any longer.'), 'error' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('User') ), 'error' );
 		unset( $edited_User );
 		forget_param( 'user_ID' );
 		unset( $user_ID );
@@ -331,7 +330,7 @@ if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 	$LinkCache = & get_Cache( 'LinkCache' );
 	if( ($edited_Link = & $LinkCache->get_by_ID( $link_ID, false )) === false )
 	{	// We could not find the link to edit:
-		$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Link') ), 'error' );
 		unset( $edited_Link );
 		forget_param( 'link_ID' );
 		unset( $link_ID );
@@ -1662,6 +1661,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.31  2009/08/30 19:54:24  fplanque
+ * less translation messgaes for infrequent errors
+ *
  * Revision 1.30  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

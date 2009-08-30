@@ -244,8 +244,7 @@ class DataObjectList2 extends FilteredResults
 
 		if( ($obj = & $this->Cache->get_by_ID( $id )) === false )
 		{
-			$Messages->head = T_('Cannot edit entry!');
-			$Messages->add( T_('Requested entry does not exist any longer.'), 'error' );
+			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Entry') ), 'error' );
 			$DB->commit();
 			return false;
 		}
@@ -297,8 +296,7 @@ class DataObjectList2 extends FilteredResults
 
 		if( ($obj = & $this->Cache->get_by_ID( $id )) === false )
 		{
-			$Messages->head = T_('Cannot edit entry!');
-			$Messages->add( T_('Requested entry does not exist any longer.'), 'error' );
+			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Entry') ), 'error' );
 			$DB->commit();
 			return false;
 		}
@@ -338,6 +336,9 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
+ * Revision 1.10  2009/08/30 19:54:25  fplanque
+ * less translation messgaes for infrequent errors
+ *
  * Revision 1.9  2009/08/30 00:30:52  fplanque
  * increased modularity
  *

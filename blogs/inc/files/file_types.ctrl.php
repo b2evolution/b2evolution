@@ -50,8 +50,7 @@ if( param( 'ftyp_ID', 'integer', '', true) )
 	{	// We could not find the file type to edit:
 		unset( $edited_Filetype );
 		forget_param( 'ftyp_ID' );
-		$Messages->head = T_('Cannot edit file type!');
-		$Messages->add( T_('Requested file type does not exist any longer.'), 'error' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('File type') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -108,7 +107,7 @@ switch( $action )
 			// Insert in DB:
 			$edited_Filetype->dbinsert();
 			$Messages->add( T_('New file type created.'), 'success' );
-			
+
 			// What next?
 			param( 'submit', 'string', true );
 			if( $submit == T_('Record, then Create Similar') ) // TODO: do not use submit value for this!
@@ -226,6 +225,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2009/08/30 19:54:24  fplanque
+ * less translation messgaes for infrequent errors
+ *
  * Revision 1.3  2009/03/08 23:57:42  fplanque
  * 2009
  *

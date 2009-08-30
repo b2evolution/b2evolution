@@ -76,7 +76,7 @@ switch( $action )
 		}
 		else
 		{	// We could not find the link to edit:
-			$Messages->add( T_('Requested link does not exist any longer.'), 'error' );
+			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Link') ), 'error' );
 			unset( $edited_Link );
 			unset( $link_ID );
 			if( $mode == 'iframe' )
@@ -507,7 +507,7 @@ switch( $action )
 
 		/* fp> I noticed that after publishing a new post, I always want
 		 *     to see how the blog looks like. If anyone doesn't want that,
-		 *     we can make this optional... 
+		 *     we can make this optional...
 		 */
 		if( ! $was_published && $edited_Item->status == 'published' )
 		{	/* The post's last status wasn't "published", but we're going
@@ -1033,6 +1033,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.58  2009/08/30 19:54:25  fplanque
+ * less translation messgaes for infrequent errors
+ *
  * Revision 1.57  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

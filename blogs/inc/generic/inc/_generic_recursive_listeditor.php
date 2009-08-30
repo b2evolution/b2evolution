@@ -43,8 +43,7 @@ if( param( $GenericCategoryCache->dbIDname, 'integer', NULL, true, false, false 
 	if( ($edited_GenericCategory = & $GenericCategoryCache->get_by_ID( ${$GenericCategoryCache->dbIDname}, false, true, $subset_ID )) === false )
 	{	// We could not find the element to edit:
 		unset( $edited_GenericCategory );
-		$Messages->head = T_('Cannot edit element!');
-		$Messages->add( T_('Requested element does not exist any longer.'), 'error' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Element') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -54,8 +53,7 @@ if ( !is_null( param( $GenericCategoryCache->dbprefix.'parent_ID', 'integer', NU
 	if( ( $edited_parent_GenericElement = & $GenericCategoryCache->get_by_ID( ${$GenericCategoryCache->dbprefix.'parent_ID'}, false, true, $subset_ID ) ) === false )
 	{ // Parent generic category doesn't exist any longer.
 		unset( $GenericCategoryCache->dbIDname );
-		$Messages->head = T_('Cannot edit element!');
-		$Messages->add( T_('Requested element does not exist any longer.'), 'error' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Element') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -301,6 +299,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2009/08/30 19:54:24  fplanque
+ * less translation messgaes for infrequent errors
+ *
  * Revision 1.3  2009/03/08 23:57:43  fplanque
  * 2009
  *

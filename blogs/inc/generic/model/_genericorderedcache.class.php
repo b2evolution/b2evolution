@@ -64,8 +64,7 @@ class GenericOrderedCache extends GenericCache
 
 		if( ($obj_sup = & $this->get_by_ID( $id )) === false )
 		{
-			$Messages->head = T_('Cannot edit entry!');
-			$Messages->add( T_('Requested entry does not exist any longer.'), 'error' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Entry') ), 'error' );
 			$DB->commit();
 			return false;
 		}
@@ -117,8 +116,7 @@ class GenericOrderedCache extends GenericCache
 
 		if( ($obj_inf = & $this->get_by_ID( $id )) === false )
 		{
-			$Messages->head = T_('Cannot edit entry!');
-			$Messages->add( T_('Requested entry does not exist any longer.'), 'error' );
+			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Entry') ), 'error' );
 			$DB->commit();
 			return false;
 		}
@@ -159,6 +157,9 @@ class GenericOrderedCache extends GenericCache
 
 /*
  * $Log$
+ * Revision 1.4  2009/08/30 19:54:25  fplanque
+ * less translation messgaes for infrequent errors
+ *
  * Revision 1.3  2009/03/08 23:57:43  fplanque
  * 2009
  *

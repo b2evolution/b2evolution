@@ -89,8 +89,7 @@ if( ! is_null($user_ID) )
 	{	// We could not find the User to edit:
 		unset( $edited_User );
 		forget_param( 'user_ID' );
-		$Messages->head = T_('Cannot edit user!');
-		$Messages->add( T_('Requested user does not exist any longer.'), 'error' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('User') ), 'error' );
 		$action = 'list';
 	}
 	elseif( $action == 'list' )
@@ -141,8 +140,7 @@ elseif( $grp_ID !== NULL )
 	{ // We could not find the Group to edit:
 		unset( $edited_Group );
 		forget_param( 'grp_ID' );
-		$Messages->head = T_('Cannot edit group!');
-		$Messages->add( T_('Requested group does not exist any longer.'), 'error' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Group') ), 'error' );
 		$action = 'list';
 	}
 	elseif( $action == 'list' )
@@ -908,6 +906,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2009/08/30 19:54:22  fplanque
+ * less translation messgaes for infrequent errors
+ *
  * Revision 1.21  2009/05/31 12:36:04  tblue246
  * minor
  *

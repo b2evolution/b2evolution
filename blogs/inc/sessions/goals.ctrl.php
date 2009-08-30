@@ -43,8 +43,7 @@ if( param( 'goal_ID', 'integer', '', true) )
 	{	// We could not find the goal to edit:
 		unset( $edited_Goal );
 		forget_param( 'goal_ID' );
-		$Messages->head = T_('Cannot edit goal!');
-		$Messages->add( T_('Requested goal does not exist any longer.'), 'error' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Goal') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -100,20 +99,17 @@ switch( $action )
 			// What next?
 			param( 'submit', 'string', true );
 			if( $submit == T_('Record, then Create Similar') ) // TODO: do not use submit value for this!
-			{
-				// Redirect so that a reload doesn't write to the DB twice:
+			{	// Redirect so that a reload doesn't write to the DB twice:
 				header_redirect( '?ctrl=goals&action=new&goal_ID='.$edited_Goal->ID, 303 ); // Will EXIT
 				// We have EXITed already at this point!!
 			}
 			elseif( $submit == T_('Record, then Create New') ) // TODO: do not use submit value for this!
-			{
-				// Redirect so that a reload doesn't write to the DB twice:
+			{	// Redirect so that a reload doesn't write to the DB twice:
 				header_redirect( '?ctrl=goals&action=new', 303 ); // Will EXIT
 				// We have EXITed already at this point!!
 			}
 			else
-			{
-				// Redirect so that a reload doesn't write to the DB twice:
+			{	// Redirect so that a reload doesn't write to the DB twice:
 				header_redirect( '?ctrl=goals', 303 ); // Will EXIT
 				// We have EXITed already at this point!!
 			}
@@ -234,6 +230,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2009/08/30 19:54:24  fplanque
+ * less translation messgaes for infrequent errors
+ *
  * Revision 1.7  2009/08/30 14:13:49  fplanque
  * clean redirects after DB actions
  *
