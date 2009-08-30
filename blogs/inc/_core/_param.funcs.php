@@ -430,7 +430,7 @@ function param_check_decimal( $var, $err_msg, $required = false )
 		return true;
 	}
 
-	if( ! preg_match( '#^[0-9]*(\.[0-9]+)$#', $GLOBALS[$var] ) )
+	if( ! preg_match( '#^[0-9]*(\.[0-9]+)?$#', $GLOBALS[$var] ) )
 	{
 		param_error( $var, $err_msg );
 		return false;
@@ -1928,6 +1928,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.35  2009/08/30 00:34:40  fplanque
+ * fix
+ *
  * Revision 1.34  2009/07/24 20:22:44  blueyed
  * Fix doc
  *
