@@ -324,9 +324,10 @@ function xmlrpcs_resperror( $errcode = NULL, $errmsg = NULL )
  * @param string status
  * @param string Tags
  * @param string Comment status. See {@link Item::$comment_status}.
+ * @param string Excerpt
  * @return xmlrpcmsg
  */
-function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status, $tags = '', $allow_comments = 'open' )
+function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status, $tags = '', $allow_comments = 'open', $excerpt = '' )
 {
   /**
 	 * @var User
@@ -364,6 +365,12 @@ function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_ID
 	if( $edited_Item->Blog->allowcomments == 'post_by_post' )
 	{
 		$edited_Item->set( 'comment_status', $allow_comments );
+	}
+
+	//Excerpt:
+	if ( ! empty( $excerpt ) )
+	{
+		$edited_Item->set( 'excerpt', $excerpt );
 	}
 
 	$edited_Item->dbinsert();
@@ -532,6 +539,9 @@ function xmlrpcs_get_maincat( $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.13  2009/08/30 17:15:41  waltercruz
+ * Adding support to mt_excerpt
+ *
  * Revision 1.12  2009/08/30 17:06:25  tblue246
  * Let xmlrpcs_new_item() handle Blog::allowcomments.
  *

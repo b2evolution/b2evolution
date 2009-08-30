@@ -382,14 +382,20 @@ function mw_newpost($m)
 
 	// non-standard MT extensions
 	$tags = isset( $contentstruct['mt_keywords'] ) ? $contentstruct['mt_keywords'] : '';
+
 	$allow_comments = 'open';
 	if( isset($contentstruct['mt_allow_comments']) && ! $contentstruct['mt_allow_comments'] )
 	{
 		$allow_comments = 'disabled'; // Tblue> I think disabled makes sense here since it is a new post.
 	}
 
+	if( isset($contentstruct['mt_excerpt']) )
+	{
+		$excerpt = $contentstruct['mt_excerpt'];
+	}
+
 	// COMPLETE VALIDATION & INSERT:
-	return xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status, $tags, $allow_comments );
+	return xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status, $tags, $allow_comments, $excerpt );
 }
 
 
@@ -815,6 +821,9 @@ $xmlrpc_procs['metaWeblog.getRecentPosts'] = array(
 
 /*
  * $Log$
+ * Revision 1.18  2009/08/30 17:15:41  waltercruz
+ * Adding support to mt_excerpt
+ *
  * Revision 1.17  2009/08/30 17:06:25  tblue246
  * Let xmlrpcs_new_item() handle Blog::allowcomments.
  *
