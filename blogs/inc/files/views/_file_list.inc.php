@@ -511,6 +511,8 @@ $Form->begin_form();
 			$field_options['file_perms'] = T_('Change permissions for the selected files...');
 			*/
 
+			// TODO: dh> Add "Link items" action, if opened from a post, which would attach the selected files to the post.
+
 			$Form->switch_layout( 'none' );
 			$Form->select_input_array( 'group_action', $action, $field_options, ' &mdash; <strong>'.T_('With selected files').'</strong>' );
 			$Form->submit_input( array( 'name'=>'actionArray[group_action]', 'value'=>T_('Go!'), 'onclick'=>'return js_act_on_selected();' ) );
@@ -630,6 +632,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.22  2009/08/30 22:18:25  blueyed
+ * todo
+ *
  * Revision 1.21  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
