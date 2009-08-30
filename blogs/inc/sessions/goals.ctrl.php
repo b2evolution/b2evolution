@@ -56,7 +56,10 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'stats', 'edit', true );
 
-		$edited_Goal = & new Goal();
+		if( ! isset($edited_Goal) )
+		{	// We don't have a model to use, start with blank object:
+			$edited_Goal = & new Goal();
+		}
 		break;
 
 	case 'copy':
@@ -98,16 +101,21 @@ switch( $action )
 			param( 'submit', 'string', true );
 			if( $submit == T_('Record, then Create Similar') ) // TODO: do not use submit value for this!
 			{
-				$action = 'new';
+				// Redirect so that a reload doesn't write to the DB twice:
+				header_redirect( '?ctrl=goals&action=new&goal_ID='.$edited_Goal->ID, 303 ); // Will EXIT
+				// We have EXITed already at this point!!
 			}
 			elseif( $submit == T_('Record, then Create New') ) // TODO: do not use submit value for this!
 			{
-				$action = 'new';
-				$edited_Goal = & new Goal();
+				// Redirect so that a reload doesn't write to the DB twice:
+				header_redirect( '?ctrl=goals&action=new', 303 ); // Will EXIT
+				// We have EXITed already at this point!!
 			}
 			else
 			{
-				$action = 'list';
+				// Redirect so that a reload doesn't write to the DB twice:
+				header_redirect( '?ctrl=goals', 303 ); // Will EXIT
+				// We have EXITed already at this point!!
 			}
 		}
 		break;
@@ -129,6 +137,10 @@ switch( $action )
 			$Messages->add( T_('Goal updated.'), 'success' );
 			$action = 'list';
 		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=goals', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 
 	case 'delete':
@@ -147,7 +159,9 @@ switch( $action )
 			unset( $edited_Goal );
 			forget_param( 'goal_ID' );
 			$Messages->add( $msg, 'success' );
-			$action = 'list';
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=goals', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 		else
 		{	// not confirmed, Check for restrictions:
@@ -220,6 +234,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2009/08/30 14:13:49  fplanque
+ * clean redirects after DB actions
+ *
  * Revision 1.6  2009/08/30 00:42:57  fplanque
  * minor
  *
