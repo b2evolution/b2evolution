@@ -29,12 +29,6 @@ img.flagtop {
 	vertical-align:top;
 	border:1px solid #000;
 }
-/*
-TODO: dh> please verify if this makes sense and enable it.
-.bSmallPrint img {
-	vertical-align:middle;
-}
-*/
 
 div.single_image_zone {
 	overflow: hidden;
