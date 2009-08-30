@@ -144,6 +144,7 @@ $action = param_action();
 if( $action == 'group_action' )
 { // Get the real action from the select:
 	$action = param( 'group_action', 'string', '' );
+	// NOTE/TODO: dh> action "img_tag" appears to be unimplemented for non-JS
 }
 
 if( !empty($action) && substr( $fm_mode, 0, 5 ) != 'link_' )
@@ -1661,6 +1662,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.32  2009/08/30 22:25:08  blueyed
+ * note/todo
+ *
  * Revision 1.31  2009/08/30 19:54:24  fplanque
  * less translation messgaes for infrequent errors
  *
