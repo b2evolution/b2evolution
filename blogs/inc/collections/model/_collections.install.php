@@ -1,12 +1,12 @@
 <?php
 /**
- * This is the init file for the billing module
+ * This is the install file for the collections module
  *
  * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * @package personas
+ * @package evocore
  *
- * @version $Id$
+ * @version _collections.install.php,v 1.1 2009/08/30 00:34:15 fplanque Exp
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -344,7 +344,7 @@ $schema_queries = array_merge( $schema_queries, array(
 ) );
 
 /*
- * $Log$
+ * _collections.install.php,v
  * Revision 1.1  2009/08/30 00:34:15  fplanque
  * increased modularity
  *

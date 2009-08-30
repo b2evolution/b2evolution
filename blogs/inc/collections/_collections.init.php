@@ -1,12 +1,12 @@
 <?php
 /**
- * This is the init file for the billing module
+ * This is the init file for the collections module
  *
  * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
  *
- * @version $Id$
+ * @version _collections.init.php,v 1.1 2009/08/30 00:30:52 fplanque Exp
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -354,7 +354,7 @@ $collections_Module = & new collections_Module();
 
 
 /*
- * $Log$
+ * _collections.init.php,v
  * Revision 1.1  2009/08/30 00:30:52  fplanque
  * increased modularity
  *

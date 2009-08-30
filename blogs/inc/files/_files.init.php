@@ -1,12 +1,12 @@
 <?php
 /**
- * This is the init file for the billing module
+ * This is the init file for the files module
  *
  * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package admin
  *
- * @version $Id$
+ * @version _files.init.php,v 1.1 2009/08/30 00:30:52 fplanque Exp
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -136,7 +136,7 @@ $files_Module = & new files_Module();
 
 
 /*
- * $Log$
+ * _files.init.php,v
  * Revision 1.1  2009/08/30 00:30:52  fplanque
  * increased modularity
  *
