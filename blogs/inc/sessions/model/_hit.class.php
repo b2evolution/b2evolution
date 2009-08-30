@@ -991,11 +991,13 @@ class Hit
 			if( !empty($param_parts[1]) && in_array( $param_parts[0], $known_search_params ) )
 			{ // found the keyphrase query parameter
 				$q = trim(urldecode($param_parts[1]));
-				
+
+			/* fp> what's that? when do we need that? 				
 				if( ctype_digit( $q ) && $param_parts[0] == 'p' )
 				{	// ?p=5&text=keyword
 					continue;
 				}
+			*/	
 				
 				$q = convert_charset($q, $evo_charset);
 				return $q;
@@ -1137,6 +1139,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.31  2009/08/30 14:00:13  fplanque
+ * minor
+ *
  * Revision 1.30  2009/08/22 15:27:38  tblue246
  * - FileRoot::FileRoot():
  * 	- Only try to create shared dir if enabled.
