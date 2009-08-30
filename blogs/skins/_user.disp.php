@@ -69,16 +69,13 @@ $ProfileForm->end_fieldset();
 
 $ProfileForm->begin_fieldset( T_('Additional info') );
 
-	// This totally needs to move into User object
-	global $DB;
-	$userfields = $DB->get_results( '
-		SELECT ufdf_ID, ufdf_type, ufdf_name, uf_varchar
-			FROM T_users__fields LEFT JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
-		 WHERE uf_user_ID = '.$User->ID );
+	// Load the user fields:
+	$User->userfields_load();
 
-	foreach( $userfields as $userfield )
+	// fp> TODO: have some clean iteration support
+	foreach( $User->userfields as $uf_ID=>$uf_array )
 	{
-		$ProfileForm->info( $userfield->ufdf_name, $userfield->uf_varchar );
+		$ProfileForm->info( $User->userfield_defs[$uf_array[0]][1], $uf_array[1] );
 	}
 
 $ProfileForm->end_fieldset();
@@ -97,6 +94,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.6  2009/08/30 00:54:46  fplanque
+ * Cleaner userfield handling
+ *
  * Revision 1.5  2009/03/08 23:57:56  fplanque
  * 2009
  *

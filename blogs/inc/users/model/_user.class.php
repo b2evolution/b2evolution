@@ -114,8 +114,14 @@ class User extends DataObject
 	 * User fields
 	 */
 	var $userfields = array();
+	var $userfields_by_type = array();
+	var $updated_fields = array();
 	var $new_fields = array();
 
+	/**
+	 * Userfield defs
+	 */
+	var $userfield_defs;
 
 	/**
 	 * Constructor
@@ -1031,18 +1037,21 @@ class User extends DataObject
 		parent::dbupdate();
 
 		// Update existing fields:
-		foreach( $this->userfields as $uf_ID=>$uf_val )
+		if( !empty($this->updated_fields) )
 		{
-			if( empty( $uf_val ) )
-			{	// Delete field:
-				$DB->query( 'DELETE FROM T_users__fields
-													 WHERE uf_ID = '.$uf_ID );
-			}
-			else
-			{	// Update field:
-				$DB->query( 'UPDATE T_users__fields
-												SET uf_varchar = '.$DB->quote($uf_val).'
-											WHERE uf_ID = '.$uf_ID );
+			foreach( $this->updated_fields as $uf_ID=>$uf_val )
+			{
+				if( empty( $uf_val ) )
+				{	// Delete field:
+					$DB->query( 'DELETE FROM T_users__fields
+														 WHERE uf_ID = '.$uf_ID );
+				}
+				else
+				{	// Update field:
+					$DB->query( 'UPDATE T_users__fields
+													SET uf_varchar = '.$DB->quote($uf_val).'
+												WHERE uf_ID = '.$uf_ID );
+				}
 			}
 		}
 
@@ -1050,7 +1059,7 @@ class User extends DataObject
 		if( !empty($this->new_fields) )
 		{
 			$sql = 'INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
-							VALUES '.implode( ',', $this->new_fields );
+							VALUES ('.$this->ID.', '.implode( '), ('.$this->ID.', ', $this->new_fields ).' )';
 			$DB->query( $sql, 'Insert new fields' );
 		}
 
@@ -1480,22 +1489,89 @@ class User extends DataObject
 	function userfield_add( $type, $val )
 	{
 		global $DB;
-		$this->new_fields[] = '('.$this->ID.', '.$type.', '.$DB->quote($val).')';
+		$this->new_fields[] = $type.', '.$DB->quote($val);
 	}
 
 
 	/**
-	 * Update an user field. Enmpty fields will be deleted on dbupdate.
+	 * Update an user field. Empty fields will be deleted on dbupdate.
 	 */
 	function userfield_update( $uf_ID, $val )
 	{
 		global $DB;
-		$this->userfields[$uf_ID] = $val;
+		$this->updated_fields[$uf_ID] = $val;
+		// pre_dump( $uf_ID, $val);
+	}
+
+
+	/**
+	 * Load userfields
+	 */
+	function userfields_load()
+	{
+		global $DB;
+
+		$userfields = $DB->get_results( '
+			SELECT uf_ID, uf_ufdf_ID, uf_varchar
+				FROM T_users__fields
+			 WHERE uf_user_ID = '.$this->ID );
+
+		foreach( $userfields as $userfield )
+		{
+			// Save all data for this field:
+			$this->userfields[$userfield->uf_ID] = array( $userfield->uf_ufdf_ID, $userfield->uf_varchar);
+			// Save index
+			$this->userfields_by_type[$userfield->uf_ufdf_ID][] = $userfield->uf_ID;
+		}
+
+		// Also make sure the definitions are loaded
+		$this->userfield_defs_load();
+	}
+
+
+	/**
+	 * Load userfields defs
+	 */
+	function userfield_defs_load()
+	{
+		global $DB;
+
+		if( !isset($this->userfield_defs) )
+		{
+			$userfield_defs = $DB->get_results( '
+				SELECT ufdf_ID, ufdf_type, ufdf_name
+					FROM T_users__fielddefs' );
+
+			foreach( $userfield_defs as $userfield_def )
+			{
+				$this->userfield_defs[$userfield_def->ufdf_ID] = array( $userfield_def->ufdf_type, $userfield_def->ufdf_name );
+			}
+		}
+	}
+
+	/**
+	* Get first field for a specific type
+	*
+	* @return string or NULL
+	*/
+	function userfieldget_first_for_type( $type_ID )
+	{
+		if( !isset($this->userfields_by_type[$type_ID]) )
+		{
+			return NULL;
+		}
+
+		$idx = $this->userfields_by_type[$type_ID][0];
+
+		return $this->userfields[$idx][1];
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.24  2009/08/30 00:54:46  fplanque
+ * Cleaner userfield handling
+ *
  * Revision 1.23  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
