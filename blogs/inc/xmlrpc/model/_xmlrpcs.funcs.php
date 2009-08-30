@@ -325,7 +325,7 @@ function xmlrpcs_resperror( $errcode = NULL, $errmsg = NULL )
  * @param string Tags
  * @return xmlrpcmsg
  */
-function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status, $tags = '' )
+function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status, $tags = '', $allow_comments = 'open')
 {
   /**
 	 * @var User
@@ -355,6 +355,7 @@ function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_ID
 	$edited_Item->set( 'extra_cat_IDs', $cat_IDs );
 	$edited_Item->set( 'status', $status );
 	$edited_Item->set_tags_from_string( $tags );
+	$edited_Item->set( 'comment_status', $allow_comments );
 	$edited_Item->set( 'locale', $current_User->locale );
 	$edited_Item->set_creator_User( $current_User );
 	$edited_Item->dbinsert();
@@ -523,6 +524,9 @@ function xmlrpcs_get_maincat( $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.10  2009/08/30 15:50:52  waltercruz
+ * Adding support for mt_allow_comments
+ *
  * Revision 1.9  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

@@ -379,10 +379,26 @@ function mw_newpost($m)
 	$post_date = _mw_decode_postdate( $contentstruct, true );
 	$post_title = $contentstruct['title'];
 	$content = $contentstruct['description'];
-	$tags = isset( $contentstruct['mt_keywords'] ) ? $contentstruct['mt_keywords'] : ''; // non-standard MT extension
+
+	// non-standard MT extensions
+	$tags = isset( $contentstruct['mt_keywords'] ) ? $contentstruct['mt_keywords'] : '';
+
+	$allow_comments = 'open';
+
+	if ( $Blog->allowcomments == 'post_by_post' )
+	{
+		if ( isset($contentstruct['mt_allow_comments'] ) )
+		{
+			if ( ! $contentstruct['mt_allow_comments'] )
+			{
+				$allow_comments = 'closed';
+			}
+		}
+
+	}
 
 	// COMPLETE VALIDATION & INSERT:
-	return xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status, $tags );
+	return xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status, $tags, $allow_comments );
 }
 
 
@@ -808,6 +824,9 @@ $xmlrpc_procs['metaWeblog.getRecentPosts'] = array(
 
 /*
  * $Log$
+ * Revision 1.15  2009/08/30 15:50:52  waltercruz
+ * Adding support for mt_allow_comments
+ *
  * Revision 1.14  2009/08/29 13:53:27  tblue246
  * Minor/fixed PHP warning
  *
