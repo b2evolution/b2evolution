@@ -160,10 +160,6 @@ switch( $action )
 
 }
 
-// blog list (for visual consistency, could be removed)
-$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => 'summary' ), T_('All'),
-				$dispatcher.'?ctrl=goals&amp;blog=0' );
-
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -224,6 +220,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2009/08/30 00:42:57  fplanque
+ * minor
+ *
  * Revision 1.5  2009/07/06 23:52:25  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *
