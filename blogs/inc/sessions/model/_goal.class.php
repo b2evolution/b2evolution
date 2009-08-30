@@ -73,16 +73,15 @@ class Goal extends DataObject
 	function load_from_Request()
 	{
 		// Name
-		param_string_not_empty( 'goal_name', T_('Please enter a name.') );
-		$this->set_from_Request( 'name' );
+		$this->set_string_from_param( 'name', true );
 
 		// Key
-		param_string_not_empty( 'goal_key', T_('Please enter a name.') );
-		$this->set_from_Request( 'key' );
+		$this->set_string_from_param( 'key', true );
 
-		param( 'goal_redir_url', 'string' );
-		$this->set_from_Request( 'redir_url', 'goal_redir_url', true  );
+		// Redir URL:
+		$this->set_string_from_param( 'redir_url' );
 
+		// Default value:
 		param( 'goal_default_value', 'string' );
 		param_check_decimal( 'goal_default_value', T_('Default value must be a number.') );
 		$this->set_from_Request( 'default_value', 'goal_default_value', true  );
@@ -128,6 +127,9 @@ class Goal extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2009/08/30 14:00:53  fplanque
+ * simpler form processing
+ *
  * Revision 1.3  2009/08/30 00:30:52  fplanque
  * increased modularity
  *
