@@ -102,7 +102,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'td' => action_icon( T_('Edit this goal...'), 'edit',
 	                        '%regenerate_url( \'action\', \'goal_ID=$goal_ID$&amp;action=edit\')%' )
 	                    .action_icon( T_('Duplicate this goal...'), 'copy',
-	                        '%regenerate_url( \'action\', \'goal_ID=$goal_ID$&amp;action=copy\')%' )
+	                        '%regenerate_url( \'action\', \'goal_ID=$goal_ID$&amp;action=new\')%' )
 	                    .action_icon( T_('Delete this file goal!'), 'delete',
 	                        '%regenerate_url( \'action\', \'goal_ID=$goal_ID$&amp;action=delete\')%' ),
 						);
@@ -116,6 +116,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.5  2009/08/30 20:58:10  tblue246
+ * Goals ctrl: 1. Do not use localized messages to determine action. 2. Removed redundant "copy" action (always use "new" action with goal_ID).
+ *
  * Revision 1.4  2009/05/16 00:28:31  fplanque
  * edit link
  *

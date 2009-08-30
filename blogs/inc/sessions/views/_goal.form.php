@@ -36,10 +36,12 @@ $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) )
 
 $Form->begin_form( 'fform', $creating ?  T_('New goal') : T_('Goal') );
 
-	$Form->hidden( 'action', $creating ? 'create' : 'update' );
 	$Form->hiddens_by_key( get_memorized( 'action' ) ); // (this allows to come back to the right list order & page)
 
-	if( ! $creating ) $Form->hidden( 'goal_ID', $edited_Goal->ID );
+	if( ! $creating )
+	{
+		$Form->hidden( 'goal_ID', $edited_Goal->ID );
+	}
 
 	$Form->text_input( 'goal_name', $edited_Goal->name, 40, T_('Name'), '', array( 'maxlength'=> 50, 'required'=>true ) );
 
@@ -51,20 +53,23 @@ $Form->begin_form( 'fform', $creating ?  T_('New goal') : T_('Goal') );
 
 if( $creating )
 {
-	$Form->end_form( array( array( 'submit', 'submit', T_('Record'), 'SaveButton' ),
-													array( 'submit', 'submit', T_('Record, then Create New'), 'SaveButton' ),
-													array( 'submit', 'submit', T_('Record, then Create Similar'), 'SaveButton' ),
+	$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
+													array( 'submit', 'actionArray[create_new]', T_('Record, then Create New'), 'SaveButton' ),
+													array( 'submit', 'actionArray[create_copy]', T_('Record, then Create Similar'), 'SaveButton' ),
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
 else
 {
-	$Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
+	$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'SaveButton' ),
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
 
 
 /*
  * $Log$
+ * Revision 1.4  2009/08/30 20:58:10  tblue246
+ * Goals ctrl: 1. Do not use localized messages to determine action. 2. Removed redundant "copy" action (always use "new" action with goal_ID).
+ *
  * Revision 1.3  2009/05/16 00:28:04  fplanque
  * Return to the right list page & order after editing.
  *

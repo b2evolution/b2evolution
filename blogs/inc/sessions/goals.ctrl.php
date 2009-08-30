@@ -34,7 +34,7 @@ $current_User->check_perm( 'stats', 'view', true );
 $tab3 = param( 'tab3', 'string', 'goals', true );
 $AdminUI->set_path( 'stats', 'goals', $tab3 );
 
-param( 'action', 'string' );
+param_action();
 
 if( param( 'goal_ID', 'integer', '', true) )
 {// Load file type:
@@ -61,17 +61,6 @@ switch( $action )
 		}
 		break;
 
-	case 'copy':
-		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
-
-		// Duplicate a file type by prefilling create form:
-		param( 'goal_ID', 'integer', true );
-		$new_Goal = $edited_Goal;	// COPY
-		$new_Goal->ID = 0;
-		$edited_Goal = & $new_Goal;
-		break;
-
 	case 'edit':
 		// Edit file type form...:
 
@@ -82,7 +71,9 @@ switch( $action )
 		param( 'goal_ID', 'integer', true );
  		break;
 
-	case 'create':
+	case 'create': // Record new goal
+	case 'create_new': // Record goal and create new
+	case 'create_copy': // Record goal and create similar
 		// Insert new file type...:
 		$edited_Goal = & new Goal();
 
@@ -97,21 +88,23 @@ switch( $action )
 			$Messages->add( T_('New goal created.'), 'success' );
 
 			// What next?
-			param( 'submit', 'string', true );
-			if( $submit == T_('Record, then Create Similar') ) // TODO: do not use submit value for this!
-			{	// Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=goals&action=new&goal_ID='.$edited_Goal->ID, 303 ); // Will EXIT
-				// We have EXITed already at this point!!
-			}
-			elseif( $submit == T_('Record, then Create New') ) // TODO: do not use submit value for this!
-			{	// Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=goals&action=new', 303 ); // Will EXIT
-				// We have EXITed already at this point!!
-			}
-			else
-			{	// Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=goals', 303 ); // Will EXIT
-				// We have EXITed already at this point!!
+			switch( $action )
+			{
+				case 'create_copy':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals&action=new&goal_ID='.$edited_Goal->ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create_new':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals&action=new', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=goals', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
 			}
 		}
 		break;
@@ -197,8 +190,9 @@ switch( $action )
 				$action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':
-	case 'copy':
 	case 'create':	// we return in this state after a validation error
+	case 'create_new':	// we return in this state after a validation error
+	case 'create_copy':	// we return in this state after a validation error
 	case 'edit':
 	case 'update':	// we return in this state after a validation error
 		$AdminUI->disp_view( 'sessions/views/_goal.form.php' );
@@ -230,6 +224,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2009/08/30 20:58:10  tblue246
+ * Goals ctrl: 1. Do not use localized messages to determine action. 2. Removed redundant "copy" action (always use "new" action with goal_ID).
+ *
  * Revision 1.8  2009/08/30 19:54:24  fplanque
  * less translation messgaes for infrequent errors
  *
