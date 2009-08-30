@@ -2739,18 +2739,27 @@ class Form extends Widget
 
 		if( strlen($label) )
 		{
-			$r .= $this->labelstart
-				.'<label'
-				.( !empty($this->_common_params['id'])
-					? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
-					: '' )
-				.'>'
-				.format_to_output($label, 'htmlbody');
+			$r .= $this->labelstart;
 
-			$r .= $this->label_suffix;
+			if( $this->_common_params['clickable_label'] == false )
+			{
+				$r .= format_to_output($label, 'htmlbody').$this->label_suffix;
+			}
+			else
+			{
+				$r .= '<label'
+					.( !empty($this->_common_params['id'])
+						? ' for="'.format_to_output( $this->_common_params['id'], 'htmlattr' ).'"'
+						: '' )
+					.'>'
+					.format_to_output($label, 'htmlbody');
 
-			$r .= '</label>'
-				.$this->labelend;
+				$r .= $this->label_suffix;
+
+				$r .= '</label>';
+			}
+
+			$r .= $this->labelend;
 		}
 		else
 		{ // Empty label:
@@ -2819,6 +2828,16 @@ class Form extends Widget
 		else
 		{
 			$this->_common_params['label'] = '';
+		}
+
+		if( isset($field_params['clickable_label']) )
+		{
+			$this->_common_params['clickable_label'] = $field_params['clickable_label'];
+			unset($field_params['clickable_label']); // no HTML attribute
+		}
+		else
+		{
+			$this->_common_params['clickable_label'] = true;
 		}
 
 		if( isset($field_params['field_prefix']) )
@@ -2921,6 +2940,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.57  2009/08/30 00:42:11  fplanque
+ * fixed user form
+ *
  * Revision 1.56  2009/07/01 23:34:21  fplanque
  * made $id$ more predictable
  *

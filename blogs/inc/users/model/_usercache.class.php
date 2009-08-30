@@ -214,9 +214,10 @@ class UserCache extends DataObjectCache
 	 *
 	 * Optionally, also adds default choice to the cache.
 	 *
-	 * @param integer blog ID
+	 * @param integer blog ID or 0 for ALL
 	 * @param integer selected ID
 	 * @param boolean provide a choice for "none" with ID 0
+	 * @param boolean make sur the current default user is part of the choices
 	 */
 	function get_blog_member_option_list( $blog_ID, $default = 0, $allow_none = false, $always_load_default = false )
 	{
@@ -267,6 +268,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.4  2009/08/30 00:42:11  fplanque
+ * fixed user form
+ *
  * Revision 1.3  2009/03/08 23:57:46  fplanque
  * 2009
  *

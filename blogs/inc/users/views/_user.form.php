@@ -422,10 +422,11 @@ $Form->begin_fieldset( T_('Experimental') );
 		}
 
 		// Display existing field:
-		$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 50, $userfield->ufdf_name, $field_note, array() );
+		$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, 50, $userfield->ufdf_name, $field_note, array( 'maxlength' => 255 ) );
 	}
 
 	// Get list of possible field types:
+	// TODO: use userfield manipulation functions
 	$userfielddefs = $DB->get_results( '
 		SELECT ufdf_ID, ufdf_type, ufdf_name
 			FROM T_users__fielddefs
@@ -462,7 +463,7 @@ $Form->begin_fieldset( T_('Experimental') );
 		}
 		$label .= '</optgroup></select>';
 
-		$Form->text_input( 'new_uf_val_'.$i, param( 'new_uf_val_'.$i, 'string', '' ), 50, $label, '', array() );
+		$Form->text_input( 'new_uf_val_'.$i, param( 'new_uf_val_'.$i, 'string', '' ), 50, $label, '', array('maxlength' => 255, 'clickable_label'=>false) );
 	}
 
 $Form->end_fieldset();
@@ -489,6 +490,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.13  2009/08/30 00:42:11  fplanque
+ * fixed user form
+ *
  * Revision 1.12  2009/05/26 19:32:00  fplanque
  * Plugins can now have Settings that are specific to each blog.
  *
