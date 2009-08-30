@@ -623,6 +623,33 @@ class DataObject
 
 
 	/**
+	 * Set a string parameter from a Request form value.
+	 *
+	 * @param string Dataobject parameter name
+	 * @param boolean true to set to NULL if empty string value
+	 * @return boolean true, if value is required
+	 */
+	function set_string_from_param( $parname, $required = false, $cleanup_function = NULL )
+	{
+		$var = $this->dbprefix.$parname;
+
+		$value = param( $var, 'string' );
+
+		if( !empty($cleanup_function) )
+		{	// We want to applu a cleanup function:
+			$GLOBALS[$var] = $value = $cleanup_function( $value );
+		}
+
+		if( $required )
+		{
+			param_check_not_empty( $var );
+		}
+
+		return $this->set( $parname, $value, ! $required );
+	}
+
+
+	/**
 	 * Template function: Displays object ID.
 	 */
 	function ID()
@@ -687,6 +714,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2009/08/30 02:37:14  fplanque
+ * support for simple form processing
+ *
  * Revision 1.9  2009/07/19 22:14:22  fplanque
  * Clean resolution of the excerpt mod date bullcrap.
  * It took 4 lines of code...
