@@ -592,7 +592,7 @@ $Form->begin_form();
 			}
 
 			/**
-			 * Insert IMG tags into parent window for selected files:
+			 * Insert IMG tags into parent window for selected files.
 			 */
 			function insert_tag_for_selected_files()
 			{
@@ -604,7 +604,7 @@ $Form->begin_form();
 					{
 						id = elems[i].id.substring( elems[i].id.lastIndexOf('_')+1, elems[i].id.length );
 						img_tag_info_field = document.getElementById( 'img_tag_'+id );
-						snippet += img_tag_info_field.value + ' ';
+						snippet += img_tag_info_field.value + '\n';
 					}
 				}
 				if( ! snippet.length )
@@ -614,6 +614,8 @@ $Form->begin_form();
 				}
 				else
 				{
+					// Remove last newline from snippet:
+					snippet = snippet.substring(0, snippet.length-1)
 					if (! (window.focus && window.opener))
 					{
 						return true;
@@ -632,6 +634,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.23  2009/08/30 23:22:26  blueyed
+ * When inserting tags for selected files to an item, implode multiple file tags using newlines, not just space. Makes it a lot easier to handle the tag soup.
+ *
  * Revision 1.22  2009/08/30 22:18:25  blueyed
  * todo
  *
