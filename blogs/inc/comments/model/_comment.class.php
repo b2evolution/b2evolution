@@ -218,17 +218,18 @@ class Comment extends DataObject
 	 *
 	 * @param string parameter name
 	 * @param mixed parameter value
+	 * @param boolean true to set to NULL if empty value
 	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
-	function set( $parname, $parvalue )
+	function set( $parname, $parvalue, $make_null = false )
 	{
 		switch( $parname )
 		{
 			case 'rating':
-				return parent::set_param( $parname, 'string', $parvalue, true );
+				return $this->set_param( $parname, 'string', $parvalue, true );
 
 			default:
-				return parent::set_param( $parname, 'string', $parvalue );
+				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
 
@@ -262,7 +263,7 @@ class Comment extends DataObject
 	 */
 	function set_spam_karma( $spam_karma )
 	{
-		return parent::set_param( 'spam_karma', 'number', $spam_karma );
+		return $this->set_param( 'spam_karma', 'number', $spam_karma );
 	}
 
 
@@ -1392,6 +1393,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.31  2009/08/30 17:27:03  fplanque
+ * better NULL param handling all over the app
+ *
  * Revision 1.30  2009/08/25 17:01:50  tblue246
  * Bugfix #2, not my day today...
  *

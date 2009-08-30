@@ -131,17 +131,18 @@ class Group extends DataObject
 	 *
 	 * @param string Parameter name
 	 * @param mixed Parameter value
+	 * @param boolean true to set to NULL if empty value
 	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
-	function set( $parname, $parvalue )
+	function set( $parname, $parvalue, $make_null = false )
 	{
 		switch( $parname )
 		{
 			case 'perm_templates':
-				return parent::set_param( $parname, 'number', $parvalue );
+				return $this->set_param( $parname, 'number', $parvalue, $make_null );
 
 			default:
-				return parent::set_param( $parname, 'string', $parvalue );
+				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
 
@@ -529,6 +530,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2009/08/30 17:27:03  fplanque
+ * better NULL param handling all over the app
+ *
  * Revision 1.11  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

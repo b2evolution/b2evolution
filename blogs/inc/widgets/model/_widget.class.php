@@ -299,9 +299,10 @@ class ComponentWidget extends DataObject
 	 *
 	 * @param string parameter name
 	 * @param mixed parameter value
+	 * @param boolean true to set to NULL if empty value
 	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
-	function set( $parname, $parvalue )
+	function set( $parname, $parvalue, $make_null = false )
 	{
 		$params = $this->get_param_definitions( NULL );
 
@@ -309,14 +310,13 @@ class ComponentWidget extends DataObject
 		{	// This is a widget specific param:
 			$this->param_array[$parname] = $parvalue;
 			// This is what'll be saved to the DB:
-			$this->set_param( 'params', 'string', serialize($this->param_array) );
-			return;
+			return $this->set_param( 'params', 'string', serialize($this->param_array), $make_null );
 		}
 
 		switch( $parname )
 		{
 			default:
-				return parent::set_param( $parname, 'string', $parvalue );
+				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
 
@@ -612,6 +612,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.63  2009/08/30 17:27:03  fplanque
+ * better NULL param handling all over the app
+ *
  * Revision 1.62  2009/08/06 14:55:45  fplanque
  * doc
  *

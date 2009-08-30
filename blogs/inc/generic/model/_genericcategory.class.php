@@ -104,18 +104,18 @@ class GenericCategory extends GenericElement
 	 *
 	 * @param string parameter name
 	 * @param mixed parameter value
+	 * @param boolean true to set to NULL if empty value
+	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
-	function set( $parname, $parvalue )
+	function set( $parname, $parvalue, $make_null = false )
 	{
 		switch( $parname )
 		{
  			case 'parent_ID':
-				$this->set_param( $parname, 'string', $parvalue, true );
-				break;
+				return $this->set_param( $parname, 'string', $parvalue, true );
 
 			case 'name':
-			default:
-				$this->set_param( $parname, 'string', $parvalue );
+				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
 
@@ -135,6 +135,9 @@ class GenericCategory extends GenericElement
 
 /*
  * $Log$
+ * Revision 1.4  2009/08/30 17:27:03  fplanque
+ * better NULL param handling all over the app
+ *
  * Revision 1.3  2009/03/08 23:57:43  fplanque
  * 2009
  *

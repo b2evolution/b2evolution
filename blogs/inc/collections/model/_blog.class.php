@@ -728,9 +728,10 @@ class Blog extends DataObject
 	 * Set param value
 	 *
 	 * @param string Parameter name
+	 * @param boolean true to set to NULL if empty value
 	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
-	function set( $parname, $parvalue )
+	function set( $parname, $parvalue, $make_null = false )
 	{
 		global $Settings;
 
@@ -739,16 +740,16 @@ class Blog extends DataObject
 			case 'ID':
 			case 'allowtrackbacks':
 			case 'blog_in_bloglist':
-				return parent::set_param( $parname, 'number', $parvalue );
+				return $this->set_param( $parname, 'number', $parvalue, $make_null );
 				break;
 
 			case 'shortdesc':
 				$this->shortdesc = $parvalue;
-				return parent::set_param( 'description', 'string', $parvalue );
+				return $this->set_param( 'description', 'string', $parvalue, $make_null );
 				break;
 
 			default:
-				return parent::set_param( $parname, 'string', $parvalue );
+				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
 
@@ -1492,7 +1493,7 @@ class Blog extends DataObject
 	function get_filemanager_link()
 	{
 		global $dispatcher;
-		
+
 		load_class('/files/model/_fileroot.class.php');
 		return $dispatcher.'?ctrl=files&amp;root='.FileRoot::gen_ID( 'collection', $this->ID );
 	}
@@ -2141,6 +2142,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.76  2009/08/30 17:27:03  fplanque
+ * better NULL param handling all over the app
+ *
  * Revision 1.75  2009/08/27 12:24:27  tblue246
  * Added blog setting to display comments in ascending/descending order
  *

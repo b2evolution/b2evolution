@@ -81,18 +81,19 @@ class GenericOrdered extends GenericElement
 	 *
 	 * @param string parameter name
 	 * @param mixed parameter value
+	 * @param boolean true to set to NULL if empty value
+	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
-	function set( $parname, $parvalue )
+	function set( $parname, $parvalue, $make_null = false )
 	{
 		switch( $parname )
 		{
  			case 'order':
-				$this->set_param( $parname, 'number', $parvalue );
-				break;
+				return $this->set_param( $parname, 'number', $parvalue, $make_null );
 
 			case 'name':
 			default:
-				$this->set_param( $parname, 'string', $parvalue );
+				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
 
@@ -129,6 +130,9 @@ class GenericOrdered extends GenericElement
 
 /*
  * $Log$
+ * Revision 1.5  2009/08/30 17:27:03  fplanque
+ * better NULL param handling all over the app
+ *
  * Revision 1.4  2009/07/18 18:43:50  tblue246
  * DataObject::set_param() does not accept "integer" as the 2nd param (has to be "number").
  *

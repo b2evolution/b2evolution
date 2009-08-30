@@ -257,7 +257,7 @@ class Menu extends Widget
 					$anchor .= ' class="'.trim($class).'"';
 				}
 
-				$anchor .= '>'.format_to_output( $loop_details['text'], 'htmlbody' )."</a>";
+				$anchor .= '>'.(isset($loop_details['text']) ? format_to_output( $loop_details['text'], 'htmlbody' ) : '?')."</a>";
 
 				if( $loop_key == $selected )
 				{ // Highlight selected entry
@@ -349,6 +349,9 @@ class Menu extends Widget
 
 /*
  * $Log$
+ * Revision 1.7  2009/08/30 17:27:03  fplanque
+ * better NULL param handling all over the app
+ *
  * Revision 1.6  2009/03/23 22:19:45  fplanque
  * evobar right menu is now also customizable by plugins
  *

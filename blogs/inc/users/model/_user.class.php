@@ -411,25 +411,26 @@ class User extends DataObject
 	 *
 	 * @param string parameter name
 	 * @param mixed parameter value
+	 * @param boolean true to set to NULL if empty value
 	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
-	function set( $parname, $parvalue )
+	function set( $parname, $parvalue, $make_null = false )
 	{
 		switch( $parname )
 		{
 			case 'icq':
-				return parent::set_param( $parname, 'number', $parvalue, true );
+				return $this->set_param( $parname, 'number', $parvalue, true );
 
 			case 'level':
 			case 'notify':
 			case 'showonline':
-				return parent::set_param( $parname, 'number', $parvalue );
+				return $this->set_param( $parname, 'number', $parvalue, $make_null );
 
 			case 'validated':
-				return parent::set_param( $parname, 'number', $parvalue ? 1 : 0 );	// convert boolean
+				return $this->set_param( $parname, 'number', $parvalue ? 1 : 0, $make_null );	// convert boolean
 
 			default:
-				return parent::set_param( $parname, 'string', $parvalue );
+				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
 
@@ -1569,6 +1570,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2009/08/30 17:27:03  fplanque
+ * better NULL param handling all over the app
+ *
  * Revision 1.24  2009/08/30 00:54:46  fplanque
  * Cleaner userfield handling
  *

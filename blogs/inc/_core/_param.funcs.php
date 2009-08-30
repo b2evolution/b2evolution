@@ -382,10 +382,16 @@ function param_string_not_empty( $var, $err_msg, $field_err_msg = NULL )
  * @param string|NULL error message for form field ($err_msg gets used if === NULL).
  * @return boolean true if OK
  */
-function param_check_not_empty( $var, $err_msg, $field_err_msg = NULL )
+function param_check_not_empty( $var, $err_msg = NULL, $field_err_msg = NULL )
 {
 	if( empty( $GLOBALS[$var] ) )
 	{
+		if( empty($err_msg) )
+		{
+			$err_msg = sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), substr( $var, strpos( $var, '_' )+1 ) );
+			$field_err_msg = T_('This field cannot be empty.');
+		}
+
 		param_error( $var, $err_msg, $field_err_msg );
 		return false;
 	}
@@ -554,7 +560,27 @@ function param_check_isregexp( $var, $err_msg, $field_err_msg = NULL )
 {
 	if( ! is_regexp( $GLOBALS[$var] ) )
 	{
-		param_error( $var, $field_err_msg );
+		param_error( $var, $err_msg, $field_err_msg );
+		return false;
+	}
+	return true;
+}
+
+
+/**
+ * Check if the value of a param MATCHES a regular expression (syntax).
+ *
+ * @param string param name
+ * @param string regexp
+ * @param string error message
+ * @param string|NULL error message for form field ($err_msg gets used if === NULL).
+ * @return boolean true if OK
+ */
+function param_check_regexp( $var, $regexp, $err_msg, $field_err_msg = NULL )
+{
+	if( ! preg_match( $regexp, $GLOBALS[$var] ) )
+	{
+		param_error( $var, $err_msg, $field_err_msg );
 		return false;
 	}
 	return true;
@@ -1928,6 +1954,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.36  2009/08/30 17:27:02  fplanque
+ * better NULL param handling all over the app
+ *
  * Revision 1.35  2009/08/30 00:34:40  fplanque
  * fix
  *
