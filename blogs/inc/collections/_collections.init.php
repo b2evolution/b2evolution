@@ -6,7 +6,7 @@
  *
  * @package admin
  *
- * @version _collections.init.php,v 1.1 2009/08/30 00:30:52 fplanque Exp
+ * @version $Id$
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -354,7 +354,10 @@ $collections_Module = & new collections_Module();
 
 
 /*
- * _collections.init.php,v
+ * $Log$
+ * Revision 1.3  2009/08/30 12:31:44  tblue246
+ * Fixed CVS keywords
+ *
  * Revision 1.1  2009/08/30 00:30:52  fplanque
  * increased modularity
  *
