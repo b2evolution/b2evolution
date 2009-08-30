@@ -100,16 +100,16 @@ class collections_Module
 
 		if( $current_User->check_perm( 'blogs', 'create' ) )
 		{
-			$entries['entries']['newblog'] = array(
+			$entries['newblog'] = array(
 					'text' => T_('Create new blog').'&hellip;',
 					'href' => $admin_url.'?ctrl=collections&amp;action=new',
 				);
-			$entries['entries'][] = array(
+			$entries['minfo_sep'] = array(
 					'separator' => true,
 				);
 		}
 
-		$entries['entries']['info'] = array(
+		$entries['info'] = array(
 				'text' => T_('More info'),
 				'entries' => array(
 						'b2evonet' => array(
@@ -355,6 +355,9 @@ $collections_Module = & new collections_Module();
 
 /*
  * $Log$
+ * Revision 1.4  2009/08/30 14:18:07  tblue246
+ * evoBar: Fixed b2evolution menu
+ *
  * Revision 1.3  2009/08/30 12:31:44  tblue246
  * Fixed CVS keywords
  *
