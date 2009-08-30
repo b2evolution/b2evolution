@@ -356,9 +356,16 @@ function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_ID
 	$edited_Item->set( 'extra_cat_IDs', $cat_IDs );
 	$edited_Item->set( 'status', $status );
 	$edited_Item->set_tags_from_string( $tags );
-	$edited_Item->set( 'comment_status', $allow_comments );
 	$edited_Item->set( 'locale', $current_User->locale );
 	$edited_Item->set_creator_User( $current_User );
+
+	// Comment status:
+	$edited_Item->load_Blog();
+	if( $edited_Item->Blog->allowcomments == 'post_by_post' )
+	{
+		$edited_Item->set( 'comment_status', $allow_comments );
+	}
+
 	$edited_Item->dbinsert();
 	if( empty($edited_Item->ID) )
 	{ // DB error
@@ -525,6 +532,9 @@ function xmlrpcs_get_maincat( $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.12  2009/08/30 17:06:25  tblue246
+ * Let xmlrpcs_new_item() handle Blog::allowcomments.
+ *
  * Revision 1.11  2009/08/30 16:50:19  tblue246
  * Minor
  *

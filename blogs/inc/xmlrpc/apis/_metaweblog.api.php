@@ -383,8 +383,7 @@ function mw_newpost($m)
 	// non-standard MT extensions
 	$tags = isset( $contentstruct['mt_keywords'] ) ? $contentstruct['mt_keywords'] : '';
 	$allow_comments = 'open';
-	if ( $Blog->allowcomments == 'post_by_post' && isset($contentstruct['mt_allow_comments'])
-		 && ! $contentstruct['mt_allow_comments'] )
+	if( isset($contentstruct['mt_allow_comments']) && ! $contentstruct['mt_allow_comments'] )
 	{
 		$allow_comments = 'disabled'; // Tblue> I think disabled makes sense here since it is a new post.
 	}
@@ -816,6 +815,9 @@ $xmlrpc_procs['metaWeblog.getRecentPosts'] = array(
 
 /*
  * $Log$
+ * Revision 1.17  2009/08/30 17:06:25  tblue246
+ * Let xmlrpcs_new_item() handle Blog::allowcomments.
+ *
  * Revision 1.16  2009/08/30 16:50:19  tblue246
  * Minor
  *
