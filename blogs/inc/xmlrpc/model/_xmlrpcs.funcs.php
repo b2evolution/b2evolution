@@ -323,9 +323,10 @@ function xmlrpcs_resperror( $errcode = NULL, $errmsg = NULL )
  * @param array of integers : extra categories
  * @param string status
  * @param string Tags
+ * @param string Comment status. See {@link Item::$comment_status}.
  * @return xmlrpcmsg
  */
-function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status, $tags = '', $allow_comments = 'open')
+function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_IDs, $status, $tags = '', $allow_comments = 'open' )
 {
   /**
 	 * @var User
@@ -524,6 +525,9 @@ function xmlrpcs_get_maincat( $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.11  2009/08/30 16:50:19  tblue246
+ * Minor
+ *
  * Revision 1.10  2009/08/30 15:50:52  waltercruz
  * Adding support for mt_allow_comments
  *
