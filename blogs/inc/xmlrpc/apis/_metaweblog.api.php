@@ -774,8 +774,8 @@ function mw_getpost($m)
 			'permalink'         => new xmlrpcval( $edited_Item->get_permanent_url()),
 			'categories'        => new xmlrpcval( $edited_Item->main_cat_ID),	// TODO: CATEGORY NAMES!
 			'mt_keywords'       => new xmlrpcval( implode( ',', $edited_Item->get_tags() ), 'string' ),
-			/*
 			'mt_excerpt'        => new xmlrpcval( $edited_Item->excerpt),
+			/*
 			'mt_allow_comments' => new xmlrpcval( $edited_Item->comment_status,'int'), // TODO: convert, looking for doc!!?
 			'mt_allow_pings'    => new xmlrpcval( $edited_Item->notifications_status,'int'), // TODO: convert
 			'mt_text_more'      => new xmlrpcval( "")	// Doc?
@@ -822,6 +822,9 @@ $xmlrpc_procs['metaWeblog.getRecentPosts'] = array(
 
 /*
  * $Log$
+ * Revision 1.20  2009/08/30 17:32:53  waltercruz
+ * returning excerpt in metaweblog.getPost
+ *
  * Revision 1.19  2009/08/30 17:21:24  waltercruz
  * Fixing possible PHP warning. Thanks Tblue
  *
