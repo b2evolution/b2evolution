@@ -1010,15 +1010,27 @@ class User extends DataObject
 	 */
 	function dbinsert()
 	{
-		global $Plugins;
+		global $Plugins, $DB;
+
+		$DB->begin();
 
 		if( $result = parent::dbinsert() )
 		{ // We could insert the user object..
+
+			// Add new fields:
+			if( !empty($this->new_fields) )
+			{
+				$sql = 'INSERT INTO T_users__fields( uf_user_ID, uf_ufdf_ID, uf_varchar )
+								VALUES ('.$this->ID.', '.implode( '), ('.$this->ID.', ', $this->new_fields ).' )';
+				$DB->query( $sql, 'Insert new fields' );
+			}
 
 			// Notify plugins:
 			// A user could be created also in another DB (to synchronize it with b2evo)
 			$Plugins->trigger_event( 'AfterUserInsert', $params = array( 'User' => & $this ) );
 		}
+
+		$DB->commit();
 
 		return $result;
 	}
@@ -1570,6 +1582,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2009/08/31 20:13:49  fplanque
+ * fix
+ *
  * Revision 1.25  2009/08/30 17:27:03  fplanque
  * better NULL param handling all over the app
  *
