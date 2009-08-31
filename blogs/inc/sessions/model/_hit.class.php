@@ -948,7 +948,7 @@ class Hit
 	 */
 	function extract_keyphrase_from_referer( $ref )
 	{
-		global $evo_charset;
+		global $evo_charset, $known_search_params;
 
 		$kwout = '';
 		if( ($pos_question = strpos( $ref, '?' )) === false )
@@ -959,26 +959,6 @@ class Hit
 		// This is needed for google image search to extract q param from encoded URL
 		// Otherwise "=" is encoded to "%3D"
 		$ref = urldecode($ref);
-
-		$known_search_params =  array(
-					'q',
-					'as_q',         // Google Advanced Search Query
-					'as_epq',       // Google Advanced Search Query
-					'query',
-					'search',
-					's',            // google.co.uk
-					'p',
-					'kw',
-					'qs',
-					'searchfor',    // mysearch.myway.com
-					'r',
-					'rdata',        // search.ke.voila.fr
-					'string',       // att.net
-					'su',           // suche.web.de
-					'Gw',           // scroogle.org
-					'text',         // yandex.ru
-					'search_query',	// search.ukr.net
-				);
 		
 		// This is needed for google image search to extract q param
 		// prev=/images?q=
@@ -1150,6 +1130,10 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.33  2009/08/31 01:45:28  sam2kb
+ * $known_search_params definitions moved to conf/_stats.php
+ * added "wd" param for baidu.com
+ *
  * Revision 1.32  2009/08/30 15:35:51  tblue246
  * doc
  *

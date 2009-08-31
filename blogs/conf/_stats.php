@@ -155,6 +155,35 @@ $search_engines = array(
 
 
 /**
+ * Search params needed to extract keywords from a search engine referer url
+ *
+ * Typically http://google.com?s=keyphraz returns keyphraz
+ *
+ * @global array $known_search_params
+ */
+$known_search_params =  array(
+	'q',
+	'as_q',         // Google Advanced Search Query
+	'as_epq',       // Google Advanced Search Query
+	'query',
+	'search',
+	's',            // google.co.uk
+	'p',
+	'kw',
+	'qs',
+	'searchfor',    // mysearch.myway.com
+	'r',
+	'rdata',        // search.ke.voila.fr
+	'string',       // att.net
+	'su',           // suche.web.de
+	'Gw',           // scroogle.org
+	'text',         // yandex.ru
+	'search_query',	// search.ukr.net
+	'wd',			// baidu.com
+);
+
+
+/**
  * UserAgent identifiers for logging/statistics
  *
  * The following substrings will be looked up in the user_agent http header
