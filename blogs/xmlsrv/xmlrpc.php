@@ -62,6 +62,7 @@ include_once $inc_path.'xmlrpc/apis/_blogger.api.php';
 include_once $inc_path.'xmlrpc/apis/_b2.api.php';
 include_once $inc_path.'xmlrpc/apis/_metaweblog.api.php';
 include_once $inc_path.'xmlrpc/apis/_mt.api.php';
+include_once $inc_path.'xmlrpc/apis/_wordpress.api.php';
 
 
 // fp> xmlrpc.php should actually only load the function/api/plugin to execute once it has been identified
@@ -80,6 +81,9 @@ $s->service();
 
 /*
  * $Log$
+ * Revision 1.154  2009/08/31 18:07:06  waltercruz
+ * Support to wordpress aliases to metaweblog APIS
+ *
  * Revision 1.153  2009/08/31 16:47:55  tblue246
  * Use error 17 (Internal server error) for error response if XML-RPC cannot be used (error/disabled by admin)
  *
