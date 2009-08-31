@@ -19,9 +19,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $wordpressgetpagelist_doc = 'Get an array of all the pages on a blog. Just the minimum details, lighter than wp.getPages. ';
 $wordpressgetpagelist_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcString,$xmlrpcString));
 /**
- * metaWeblog.getRecentPosts
+ * wp.getPageList
  *
- * @see http://www.xmlrpc.com/metaWeblogApi#metawebloggetrecentposts
+ * @see http://codex.wordpress.org/XML-RPC_wp
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 blogid (string): Unique identifier of the blog the post will be added to.
@@ -97,6 +97,75 @@ function wp_getpagelist( $m )
 }
 
 
+$wordpressgetpagestatuslist_doc = 'Retrieve all of the WordPress supported page statuses.';
+$wordpressgetpoststatuslist_doc = 'Retrieve post statuses.';
+$wordpressgetpagestatuslist_sig =  array(array($xmlrpcStruct,$xmlrpcString,$xmlrpcString,$xmlrpcString));
+/**
+ * wp.getPageStatusList
+ *
+ * @see http://codex.wordpress.org/XML-RPC_wp
+ *
+ * @param xmlrpcmsg XML-RPC Message
+ *					0 blogid (string): Unique identifier of the blog the post will be added to.
+ *						Currently ignored in b2evo, in favor of the category.
+ *					1 username (string): Login for a Blogger user who has permission to edit the given
+ *						post (either the user who originally created it or an admin of the blog).
+ *					2 password (string): Password for said username.
+ */
+function wp_getpagestatuslist( $m )
+{
+	// CHECK LOGIN:
+	/**
+	 * @var User
+	 */
+	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
+	{	// Login failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	// GET BLOG:
+	/**
+	 * @var Blog
+	 */
+	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	{	// Login failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	$status_list = array();
+
+	if( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) )
+	{
+		$status_list['published'] = new xmlrpcval(T_('Published')) ;
+	}
+
+	if( $current_User->check_perm( 'blog_post!protected', 'edit', false, $Blog->ID ) )
+	{
+		$status_list['protected'] = new xmlrpcval(T_('Protected')) ;
+	}
+
+	if( $current_User->check_perm( 'blog_post!private', 'edit', false, $Blog->ID ) )
+	{
+		$status_list['private'] = new xmlrpcval(T_('Private')) ;
+	}
+
+	if( $current_User->check_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
+	{
+		$status_list['draft'] = new xmlrpcval(T_('Draft')) ;
+	}
+
+	if( $current_User->check_perm( 'blog_post!deprecated', 'edit', false, $Blog->ID ) )
+	{
+		$status_list['deprecated'] = new xmlrpcval(T_('Deprecated')) ;
+	}
+
+	if( $current_User->check_perm( 'blog_post!redirected', 'edit', false, $Blog->ID ) )
+	{
+		$status_list['redirected'] = new xmlrpcval(T_('Redirected')) ;
+	}
+	return new xmlrpcresp(  new xmlrpcval($status_list,'struct') );
+}
+
 
 // Wordpress has some aliases to metaweblog APIS.
 
@@ -110,9 +179,21 @@ $xmlrpc_procs['wp.uploadFile '] = array(
 				'signature' => $mwnewMediaObject_sig,
 				'docstring' => $mwnewMediaObject_doc);
 
+// and these we are implementing here.
+
 $xmlrpc_procs['wp.getPageList'] = array(
 				'function' => 'wp_getpagelist',
 				'signature' => $wordpressgetpagelist_sig,
 				'docstring' => $wordpressgetpagelist_doc);
+
+$xmlrpc_procs['wp.getPageStatusList'] = array(
+				'function' => 'wp_getpagestatuslist',
+				'signature' => $wordpressgetpagestatuslist_sig,
+				'docstring' => $wordpressgetpagestatuslist_doc);
+
+$xmlrpc_procs['wp.getPostStatusList'] = array(
+				'function' => 'wp_getpagestatuslist',
+				'signature' => $wordpressgetpagestatuslist_sig,
+				'docstring' => $wordpressgetpoststatuslist_doc);
 
 ?>
