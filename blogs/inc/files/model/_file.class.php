@@ -995,26 +995,30 @@ class File extends DataObject
 		if( $this->is_image() )
 		{ // Make an IMG link:
 			$r = $before_image;
+			$img_attribs = array(
+				'title' => $this->get('title'),
+				'alt' => $this->get('alt'),
+			);
+			if( ! strlen($img_attribs['alt']) )
+			{ // use title for alt, too
+				$img_attribs['alt'] = $img_attribs['title'];
+			}
 			if( $size_name == 'original' )
 			{
-				$img = '<img src="'.$this->get_url().'" '
-					.'alt="'.$this->dget('alt', 'htmlattr').'" '
-					.'title="'.$this->dget('title', 'htmlattr').'" '
-					.$this->get_image_size( 'string' ).' />';
+				$img_attribs['src'] = $this->get_url();
+				$img_attribs += $this->get_image_size('widthheight');
 			}
 			else
 			{
-				$img = '<img src="'.$this->get_thumb_url( $size_name ).'" '
-					.'alt="'.$this->dget('alt', 'htmlattr').'" '
-					.'title="'.$this->dget('title', 'htmlattr').'" />';
-					// TODO: size
+				$img_attribs['src'] = $this->get_thumb_url( $size_name );
+				// TODO: size
 			}
+			$img = '<img '.get_field_attribs_as_string($img_attribs).' />';
 
 			if( $image_link_to == 'original' )
 			{	// special case
 				$image_link_to = $this->get_url();
 			}
-
 			if( !empty( $image_link_to ) )
 			{
 				$img = '<a href="'.$image_link_to.'">'.$img.'</a>';
@@ -1840,6 +1844,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.43  2009/08/31 19:19:24  blueyed
+ * File::get_tag: use title for alt tag, if the latter info is not provided. Refactor it using get_field_attribs_as_string.
+ *
  * Revision 1.42  2009/08/06 14:55:45  fplanque
  * doc
  *
