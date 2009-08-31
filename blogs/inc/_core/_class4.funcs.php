@@ -40,9 +40,20 @@ function load_class( $class_path, $ignore = NULL )
 	return true;
 }
 
+/**
+ * Create a copy of an object (abstraction from PHP4 vs PHP5)
+ */
+function duplicate( $Obj )
+{
+	$Copy = $Obj;
+	return $Copy;
+}
 
 /*
  * $Log$
+ * Revision 1.20  2009/08/31 20:35:31  fplanque
+ * cleanup
+ *
  * Revision 1.19  2009/08/30 00:30:52  fplanque
  * increased modularity
  *

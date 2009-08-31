@@ -57,7 +57,12 @@ switch( $action )
 
 		if( ! isset($edited_Goal) )
 		{	// We don't have a model to use, start with blank object:
-			$edited_Goal = & new Goal();
+			$edited_Goal = new Goal();
+		}
+		else
+		{	// Duplicate object in order no to mess with the cache:
+			$edited_Goal = duplicate( $edited_Goal ); // PHP4/5 abstraction
+			$edited_Goal->ID = 0;
 		}
 		break;
 
@@ -224,6 +229,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2009/08/31 20:35:31  fplanque
+ * cleanup
+ *
  * Revision 1.11  2009/08/31 14:22:10  tblue246
  * Better fix
  *
