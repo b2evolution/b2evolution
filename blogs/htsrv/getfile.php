@@ -45,6 +45,8 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'/_main.inc.php';
 
+// We need this param early to check blog perms, if possible
+param( 'root', 'string', true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
 
 // Check permission:
 if( ! $public_access_to_media )
@@ -53,23 +55,22 @@ if( ! $public_access_to_media )
 	{
 		debug_die( 'No permission to get file (not logged in)!', array('status'=>'403 Forbidden') );
 	}
-}
 
-// We need this param early to check blog perms, if possible
-param( 'root', 'string', true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
-if( preg_match( '/^collection_(\d+)$/', $root, $perm_blog ) )
-{	// OK, we got a blog ID:
-	$perm_blog = $perm_blog[1];
-}
-else
-{	// No blog ID, we will check the global group perm
-	$perm_blog = NULL;
-}
-//pre_dump( $perm_blog );
 
-// Check permission (#2):
-$current_User->check_perm( 'files', 'view', true, $perm_blog );
+	fp> I don't think we need the following if public_access_to_media
+	if( preg_match( '/^collection_(\d+)$/', $root, $perm_blog ) )
+	{	// OK, we got a blog ID:
+		$perm_blog = $perm_blog[1];
+	}
+	else
+	{	// No blog ID, we will check the global group perm
+		$perm_blog = NULL;
+	}
+	//pre_dump( $perm_blog );
 
+	// Check permission (#2):
+	$current_User->check_perm( 'files', 'view', true, $perm_blog );
+}
 
 // Load the other params:
 param( 'path', 'string', true );
@@ -199,6 +200,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.33  2009/08/31 21:55:52  fplanque
+ * no message
+ *
  * Revision 1.32  2009/08/29 12:23:55  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
