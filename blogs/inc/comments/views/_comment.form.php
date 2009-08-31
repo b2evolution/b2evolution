@@ -186,7 +186,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		?>
 			id="comment_allow_msgform" tabindex="7" />
 		<label for="comment_allow_msgform"><strong><?php echo T_('Allow message form'); ?></strong></label>
-		<span class="note">Commenter can be contacted directly via email</span>
+		<span class="note">Comment author can be contacted directly via email</span>
 		<?php
 	}
 
@@ -269,6 +269,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.9  2009/08/31 17:27:31  tblue246
+ * Minor
+ *
  * Revision 1.8  2009/08/31 17:21:31  fplanque
  * minor
  *
