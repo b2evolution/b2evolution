@@ -35,9 +35,15 @@ require_once $inc_path.'_main.inc.php';
 load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 
 if( CANUSEXMLRPC !== TRUE )
-{ // We cannot use XML-RPC: send a error response ( "1 Unknown method" ).
-    //this should be structured as an xml response
-	$errResponse = new xmlrpcresp( 0, 1, 'Cannot use XML-RPC. Probably the server is missing the XML extension. Error: '.CANUSEXMLRPC );
+{	// We cannot use XML-RPC: send a error response ( "1 Unknown method" ).
+	//this should be structured as an xml response
+	$errResponse = & new xmlrpcresp( 0, 1, 'Cannot use XML-RPC. Probably the server is missing the XML extension. Error: '.CANUSEXMLRPC );
+	die( $errResponse->serialize() );
+}
+else if( ! $Settings->get('general_xmlrpc') )
+{	// XML-RPC server is disabled:
+	global $xmlrpcerruser;
+	$errResponse = & new xmlrpcresp( 0, $xmlrpcerruser + 42, 'XML-RPC services are disabled on this system.' );
 	die( $errResponse->serialize() );
 }
 
@@ -78,6 +84,9 @@ $s->service();
 
 /*
  * $Log$
+ * Revision 1.152  2009/08/31 16:32:26  tblue246
+ * Check whether XML-RPC is enabled in xmlsrv/xmlrpc.php
+ *
  * Revision 1.151  2009/08/30 15:13:28  tblue246
  * minor/doc
  *
