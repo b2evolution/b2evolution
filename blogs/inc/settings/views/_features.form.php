@@ -146,6 +146,8 @@ $Form->begin_fieldset( T_('Blog by email').get_manual_link('blog_by_email') );
 	echo '</div>';
 $Form->end_fieldset();
 
+// fp> TODO: it would be awesome to be able to enable the different APIs individually
+// that way you minimalize security/spam risks by enable just what you need.
 $Form->begin_fieldset( T_('Remote publishing').get_manual_link('remote_publishing') );
 	$Form->checkbox_input( 'general_xmlrpc', $Settings->get('general_xmlrpc'), T_('Enable XML-RPC'), array( 'note' => T_('Enable the Movable Type, MetaWeblog, Blogger and B2 XML-RPC publishing protocols.') ) );
 $Form->end_fieldset();
@@ -210,6 +212,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.20  2009/08/31 18:07:12  fplanque
+ * minor/doc
+ *
  * Revision 1.19  2009/08/31 16:32:26  tblue246
  * Check whether XML-RPC is enabled in xmlsrv/xmlrpc.php
  *

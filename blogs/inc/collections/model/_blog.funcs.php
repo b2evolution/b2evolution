@@ -160,6 +160,8 @@ function blog_update_perms( $blog, $context = 'user' )
 					$easy_perms['bloguser_perm_properties'] = 1;
 					$easy_perms['bloguser_perm_cats'] = 1;
 					$easy_perms['bloguser_perm_delpost'] = 1;
+					$easy_perms['bloguser_perm_intro'] = 1;
+					$easy_perms['bloguser_perm_sidebar'] = 1;
 
 				case 'moderator':
 					$easy_perms['bloguser_perm_poststatuses'][] = 'redirected';
@@ -172,16 +174,14 @@ function blog_update_perms( $blog, $context = 'user' )
 					$easy_perms['bloguser_perm_poststatuses'][] = 'deprecated';
 					$easy_perms['bloguser_perm_poststatuses'][] = 'protected';
 					$easy_perms['bloguser_perm_poststatuses'][] = 'published';
-					$easy_perms['bloguser_perm_intro'] = 1;
 					$easy_perms['bloguser_perm_podcast'] = 1;
-					$easy_perms['bloguser_perm_sidebar'] = 1;
+					$easy_perms['bloguser_perm_page'] = 1;
 
 				case 'contrib':
 					$easy_perms['bloguser_perm_poststatuses'][] = 'draft';
 					$easy_perms['bloguser_perm_poststatuses'][] = 'private';
 					$easy_perms['bloguser_perm_media_upload'] = 1;
 					$easy_perms['bloguser_perm_media_browse'] = 1;
-					$easy_perms['bloguser_perm_page'] = 1;
 
 				case 'member':
 					$easy_perms['bloguser_ismember'] = 1;
@@ -472,6 +472,9 @@ function set_working_blog( $new_blog_ID )
 
 /*
  * $Log$
+ * Revision 1.6  2009/08/31 18:07:12  fplanque
+ * minor/doc
+ *
  * Revision 1.5  2009/08/22 20:31:01  tblue246
  * New feature: Post type permissions
  *
