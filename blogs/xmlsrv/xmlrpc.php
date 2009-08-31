@@ -34,16 +34,12 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 
-if( CANUSEXMLRPC !== TRUE )
-{	// We cannot use XML-RPC: send a error response ( "1 Unknown method" ).
-	//this should be structured as an xml response
-	$errResponse = & new xmlrpcresp( 0, 1, 'Cannot use XML-RPC. Probably the server is missing the XML extension. Error: '.CANUSEXMLRPC );
-	die( $errResponse->serialize() );
-}
-else if( ! $Settings->get('general_xmlrpc') )
-{	// XML-RPC server is disabled:
-	global $xmlrpcerruser;
-	$errResponse = & new xmlrpcresp( 0, $xmlrpcerruser + 42, 'XML-RPC services are disabled on this system.' );
+if( CANUSEXMLRPC !== TRUE || ! $Settings->get('general_xmlrpc') )
+{	// We cannot use XML-RPC: send an error response ( "17 Internal server error" ).
+	$errMessage = CANUSEXMLRPC !== TRUE
+					? ( 'Cannot use XML-RPC. Probably the server is missing the XML extension. Error: '.CANUSEXMLRPC )
+					: 'XML-RPC services are disabled on this system.';
+	$errResponse = & new xmlrpcresp( 0, 17, $errMessage );
 	die( $errResponse->serialize() );
 }
 
@@ -84,6 +80,9 @@ $s->service();
 
 /*
  * $Log$
+ * Revision 1.153  2009/08/31 16:47:55  tblue246
+ * Use error 17 (Internal server error) for error response if XML-RPC cannot be used (error/disabled by admin)
+ *
  * Revision 1.152  2009/08/31 16:32:26  tblue246
  * Check whether XML-RPC is enabled in xmlsrv/xmlrpc.php
  *
