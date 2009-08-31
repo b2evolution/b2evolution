@@ -749,11 +749,19 @@ class User extends DataObject
 				 *    - NULL or 0: check global group permission only
 				 *    - positive: check global group permission and
 				 *      (if granted) if a specific blog denies it.
+* fp> This is BAD BAD BAD because it's inconsistent with the other permissions
+* in b2evolution. There should NEVER be a denying. ony additional allowing.
+* It's also inconsistent with most other permission systems.
+* The lwoer file permission for groups is now called "No Access" 
+* This should be renamed to "Depending on each blog's permissions" 
+* Whetver general permissions you have on files, blog can give you additional permissions
+* but they can never take a global perm away.
 				 *  - Only a $permlevel of 'add', 'view' or 'edit' can be
 				 *    denied by blog permissions.
 				 *  - If the group grants the 'all' permission, blogs cannot
 				 *    deny it.
 				 */
+/*
 				if( $perm && $perm_target && in_array( $permlevel, array( 'add', 'view', 'edit' ) )
 					&& $this->Group->get( 'perm_files' ) != 'all' )
 				{	// Check specific blog perms:
@@ -763,6 +771,7 @@ class User extends DataObject
 						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
 					}
 				}
+*/
 				break;
 
 			default:
@@ -1582,6 +1591,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.27  2009/08/31 21:47:03  fplanque
+ * no message
+ *
  * Revision 1.26  2009/08/31 20:13:49  fplanque
  * fix
  *

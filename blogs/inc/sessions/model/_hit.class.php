@@ -984,6 +984,8 @@ class Hit
 			 *        value using the search engine which uses the p param
 			 *        for the keyphrase, we won't get the correct result!
 			 *        Conclusion: We need a better fix for yandex.ru.
+			 * fp> What we need is to merge definitions for search engine sig + keyword param + position param into a single array or a single database table
+			 
 				if( ctype_digit( $q ) && $param_parts[0] == 'p' )
 				{	// ?p=5&text=keyword
 					continue;
@@ -1130,6 +1132,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.34  2009/08/31 21:47:02  fplanque
+ * no message
+ *
  * Revision 1.33  2009/08/31 01:45:28  sam2kb
  * $known_search_params definitions moved to conf/_stats.php
  * added "wd" param for baidu.com
