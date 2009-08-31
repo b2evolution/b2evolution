@@ -36,12 +36,13 @@ $AdminUI->set_path( 'stats', 'goals', $tab3 );
 
 param_action();
 
-if( param( 'goal_ID', 'integer' ) )
-{	// Load file type:
+if( param( 'goal_ID', 'integer', '', true) )
+{// Load file type:
 	$GoalCache = & get_Cache( 'GoalCache' );
 	if( ($edited_Goal = & $GoalCache->get_by_ID( $goal_ID, false )) === false )
 	{	// We could not find the goal to edit:
 		unset( $edited_Goal );
+		forget_param( 'goal_ID' );
 		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Goal') ), 'error' );
 		$action = 'nil';
 	}
@@ -145,6 +146,7 @@ switch( $action )
 			$msg = sprintf( T_('Goal &laquo;%s&raquo; deleted.'), $edited_Goal->dget('name') );
 			$edited_Goal->dbdelete( true );
 			unset( $edited_Goal );
+			forget_param( 'goal_ID' );
 			$Messages->add( $msg, 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=goals', 303 ); // Will EXIT
@@ -202,6 +204,8 @@ switch( $action )
 		switch( $tab3 )
 		{
 			case 'goals':
+				// Cleanup context:
+				forget_param( 'goal_ID' );
 				// Display goals list:
 				$AdminUI->disp_view( 'sessions/views/_stats_goals.view.php' );
 				break;
@@ -220,8 +224,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.10  2009/08/31 14:10:37  tblue246
- * Goals: Do not memorize goal_ID param
+ * Revision 1.11  2009/08/31 14:22:10  tblue246
+ * Better fix
  *
  * Revision 1.9  2009/08/30 20:58:10  tblue246
  * Goals ctrl: 1. Do not use localized messages to determine action. 2. Removed redundant "copy" action (always use "new" action with goal_ID).

@@ -36,12 +36,7 @@ $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) )
 
 $Form->begin_form( 'fform', $creating ?  T_('New goal') : T_('Goal') );
 
-	$Form->hiddens_by_key( get_memorized() ); // (this allows to come back to the right list order & page)
-
-	if( ! $creating )
-	{
-		$Form->hidden( 'goal_ID', $edited_Goal->ID );
-	}
+	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',goal_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
 	$Form->text_input( 'goal_name', $edited_Goal->name, 40, T_('Name'), '', array( 'maxlength'=> 50, 'required'=>true ) );
 
@@ -67,8 +62,8 @@ else
 
 /*
  * $Log$
- * Revision 1.5  2009/08/31 14:10:38  tblue246
- * Goals: Do not memorize goal_ID param
+ * Revision 1.6  2009/08/31 14:22:10  tblue246
+ * Better fix
  *
  * Revision 1.4  2009/08/30 20:58:10  tblue246
  * Goals ctrl: 1. Do not use localized messages to determine action. 2. Removed redundant "copy" action (always use "new" action with goal_ID).
