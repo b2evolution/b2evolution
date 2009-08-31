@@ -819,9 +819,24 @@ $xmlrpc_procs['metaWeblog.getRecentPosts'] = array(
 				'signature' => $metawebloggetrecentposts_sig,
 				'docstring' => $metawebloggetrecentposts_doc );
 
+// Blogger aliases, as in http://www.xmlrpc.com/stories/storyReader$2460
+
+$xmlrpc_procs['metaWeblog.deletePost'] = array(
+				'function' => 'blogger_deletepost',
+				'signature' => $bloggerdeletepost_sig,
+				'docstring' => $bloggerdeletepost_doc );
+
+$xmlrpc_procs['metaWeblog.getUsersBlogs'] = array(
+				'function' => 'blogger_getusersblogs',
+				'signature' => $bloggergetusersblogs_sig,
+				'docstring' => $bloggergetusersblogs_doc );
+
 
 /*
  * $Log$
+ * Revision 1.21  2009/08/31 19:24:10  waltercruz
+ * Adding blogger aliases to metaWeblog API
+ *
  * Revision 1.20  2009/08/30 17:32:53  waltercruz
  * returning excerpt in metaweblog.getPost
  *
