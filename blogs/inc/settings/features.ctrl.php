@@ -181,6 +181,8 @@ switch( $action )
 			$Settings->set( 'allow_moving_chapters', param( 'allow_moving_chapters', 'integer', 0 ) );
 			$Settings->set( 'chapter_ordering', param( 'chapter_ordering', 'string', 'alpha' ) );
 
+			//XML-RPC
+			$Settings->set( 'general_xmlrpc', param( 'general_xmlrpc', 'integer', 0 ) );
 
 			if( ! $Messages->count('error') )
 			{
@@ -218,6 +220,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2009/08/31 15:56:39  waltercruz
+ * Adding setting to enable/disable xmlrc
+ *
  * Revision 1.10  2009/03/08 23:57:45  fplanque
  * 2009
  *

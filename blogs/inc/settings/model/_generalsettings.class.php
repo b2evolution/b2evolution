@@ -116,6 +116,7 @@ class GeneralSettings extends AbstractSettings
 		'eblog_add_imgtag' => 1,					// blog by email
 		'eblog_body_terminator' => '___',			// blog by email
 		'eblog_subject_prefix' => 'blog:',			// blog by email
+		'general_xmlrpc' => 1,
 	);
 
 
@@ -188,6 +189,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.18  2009/08/31 15:56:39  waltercruz
+ * Adding setting to enable/disable xmlrc
+ *
  * Revision 1.17  2009/03/08 23:57:45  fplanque
  * 2009
  *

@@ -149,6 +149,15 @@ function _b2_or_mt_get_categories( $type, $m )
 function & xmlrpcs_login( $m, $login_param, $pass_param )
 {
 	global $xmlrpcs_errcode, $xmlrpcs_errmsg, $xmlrpcerruser;
+	global $Settings;
+	if( ! $Settings->get('general_xmlrpc') )
+	{
+		logIO( 'XML-RPC disabled' );
+		$xmlrpcs_errcode = 405;
+		$xmlrpcs_errmsg = 'XML-RPC services are disabled on this blog';
+		$r = NULL;
+		return $r;
+	}
 
 	$username = $m->getParam( $login_param );
 	$username = $username->scalarval();
@@ -156,7 +165,7 @@ function & xmlrpcs_login( $m, $login_param, $pass_param )
 	$password = $m->getParam( $pass_param );
 	$password = $password->scalarval();
 
-  /**
+	 /**
 	 * @var UserCache
 	 */
 	$UserCache = & get_Cache( 'UserCache' );
@@ -269,7 +278,6 @@ function xmlrpcs_resperror( $errcode = NULL, $errmsg = NULL )
 	{ // Transform into user error code
 		$xmlrpcs_errcode = $xmlrpcerruser + $errcode;
 	}
-
 	if( !empty($errmsg) )
 	{	// Custom message
 		$xmlrpcs_errmsg = $errmsg;
@@ -539,6 +547,9 @@ function xmlrpcs_get_maincat( $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.14  2009/08/31 15:56:39  waltercruz
+ * Adding setting to enable/disable xmlrc
+ *
  * Revision 1.13  2009/08/30 17:15:41  waltercruz
  * Adding support to mt_excerpt
  *

@@ -146,6 +146,10 @@ $Form->begin_fieldset( T_('Blog by email').get_manual_link('blog_by_email') );
 	echo '</div>';
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Remote Publishing').get_manual_link('remote_publishing') );
+	$Form->checkbox_input( 'general_xmlrpc', $Settings->get('general_xmlrpc'), T_('Enable XML-RPC'), array( 'note' => T_('Enable the Movable Type, MetaWeblog , Blogger and B2 XML-RPC publishing protocols.' ) ) );
+$Form->end_fieldset();
+
 
 $Form->begin_fieldset( T_('Hit & session logging').get_manual_link('hit_logging') );
 
@@ -206,6 +210,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.18  2009/08/31 15:56:39  waltercruz
+ * Adding setting to enable/disable xmlrc
+ *
  * Revision 1.17  2009/07/04 15:43:44  sam2kb
  * "Manual " with space, like in _chapter_list.view.php
  *
