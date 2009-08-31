@@ -159,6 +159,9 @@ $search_engines = array(
  *
  * Typically http://google.com?s=keyphraz returns keyphraz
  *
+ * fp> TODO: merge with above table
+ * fp> TODO: put into configurable database table
+ *
  * @global array $known_search_params
  */
 $known_search_params =  array(
