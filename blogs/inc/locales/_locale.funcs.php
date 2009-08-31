@@ -254,9 +254,9 @@ function TS_( $string, $req_locale = '', $params = array() )
  */
 function locale_temp_switch( $locale )
 {
-	global $saved_locales, $current_locale;
+	global $saved_locales, $current_locale, $Timer;
 
-	// $GLOBALS['Timer']->resume( 'locale_temp_switch' );
+	// $Timer->resume( 'locale_temp_switch' );
 
 	if( !isset( $saved_locales ) || ! is_array( $saved_locales ) )
 	{
@@ -270,7 +270,7 @@ function locale_temp_switch( $locale )
 		return true;
 	}
 
-	// $GLOBALS['Timer']->stop( 'locale_temp_switch' );
+	// $Timer->stop( 'locale_temp_switch' );
 	return false;
 }
 
@@ -1047,6 +1047,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.31  2009/08/31 17:21:32  fplanque
+ * minor
+ *
  * Revision 1.30  2009/08/26 22:36:25  tblue246
  * Todo about mb_detect_encoding()
  *

@@ -162,7 +162,7 @@ class AdminUI extends AdminUI_general
 				<h1>'.$this->get_bloglist_buttons( '<strong>'.$this->get_title_for_titlearea().'</strong> ' ).'</h1>
 			</div>
 
-			<div class="panelbody">'
+			<div id="panelbody" class="panelbody">'
 			."\n\n";
 
 		// Display info & error messages
@@ -200,6 +200,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.31  2009/08/31 17:21:32  fplanque
+ * minor
+ *
  * Revision 1.30  2009/05/18 02:59:16  fplanque
  * Skins can now have an item.css file to specify content formats. Used in TinyMCE.
  * Note there are temporarily too many CSS files.

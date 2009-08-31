@@ -71,7 +71,7 @@ class AdminUI extends AdminUI_general
 			// Display MAIN menu:
 			$r .= $this->get_html_menu().'
 
-			<div class="panelbody">
+			<div id="panelbody" class="panelbody">
 			';
 		}
 
@@ -190,6 +190,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.34  2009/08/31 17:21:32  fplanque
+ * minor
+ *
  * Revision 1.33  2009/05/18 02:59:16  fplanque
  * Skins can now have an item.css file to specify content formats. Used in TinyMCE.
  * Note there are temporarily too many CSS files.

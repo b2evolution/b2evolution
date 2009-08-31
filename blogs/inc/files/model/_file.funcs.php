@@ -755,8 +755,7 @@ function mkdir_r( $dirName, $chmod = NULL )
 		{ // found existing dir:
 			foreach($create_dirs as $loop_dir )
 			{
-				// Tblue> Note: The chmod value for mkdir() is affected
-				//              by the user's umask.
+				// Tblue> Note: The chmod value for mkdir() is affected by the user's umask.
 				if( ! @mkdir($loop_dir, octdec($chmod)) )
 				{
 					return false;
@@ -797,6 +796,9 @@ function is_absolute_pathname($path)
 
 /*
  * $Log$
+ * Revision 1.21  2009/08/31 17:21:32  fplanque
+ * minor
+ *
  * Revision 1.20  2009/08/29 15:14:33  tblue246
  * doc
  *

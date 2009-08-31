@@ -98,7 +98,10 @@ $Form->begin_fieldset( T_('Content / Posts') );
 											array( 'daily', T_('daily') ),
 											array( 'postbypost', T_('post by post') )
 										), T_('Archive grouping'), false,  T_('How do you want to browse the post archives? May also apply to permalinks.') );
+
 	// TODO: Hide if archive_mode != 'postbypost' (JS)
+	// fp> there should probably be no post by post mode since we do have other ways to list posts now
+	// fp> TODO: this is display param and should go to plugin/widget
 	$Form->radio( 'archives_sort_order',  $edited_Blog->get_setting('archives_sort_order'),
 							array(  array( 'date', T_('date') ),
 											array( 'title', T_('title') ),
@@ -119,6 +122,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.14  2009/08/31 17:21:32  fplanque
+ * minor
+ *
  * Revision 1.13  2009/08/27 11:54:40  tblue246
  * General blog settings: Added default value for archives_sort_order
  *

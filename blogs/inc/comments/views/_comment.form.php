@@ -175,6 +175,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	// --------------------------- ALLOW MESSAGE FORM ---------------------------
 	if( ! $edited_Comment->get_author_User() )
 	{	// Not a member comment
+		// TODO: move next to email address
 		?>
 		<input type="checkbox" class="checkbox" name="comment_allow_msgform" value="1"
 		<?php
@@ -185,6 +186,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		?>
 			id="comment_allow_msgform" tabindex="7" />
 		<label for="comment_allow_msgform"><strong><?php echo T_('Allow message form'); ?></strong></label>
+		<span class="note">Commenter can be contacted directly via email</span>
 		<?php
 	}
 
@@ -267,6 +269,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.8  2009/08/31 17:21:31  fplanque
+ * minor
+ *
  * Revision 1.7  2009/08/26 23:37:00  tblue246
  * Backoffice comment editing: Allow changing of "Allow message form" setting for guest comments
  *

@@ -293,28 +293,28 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can use following post types:'),
+						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can use special post types:'),
 						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Page'),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_checkbox( {row}, \'perm_page\', \''.TS_('Permission to create pages').'\' )%',
 						'td_class' => 'center',
 					);
 $Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can use following post types:'),
+						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can use special post types:'),
 						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Intro'),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_checkbox( {row}, \'perm_intro\', \''.TS_('Permission to create intro posts (Intro-* post types)').'\' )%',
 						'td_class' => 'center',
 					);
 $Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can use following post types:'),
+						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can use special post types:'),
 						'th' => /* TRANS: SHORT table header on TWO lines; short for "Podcast" */ T_('Podc'),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_checkbox( {row}, \'perm_podcast\', \''.TS_('Permission to create podcast episodes').'\' )%',
 						'td_class' => 'center',
 					);
 $Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can use following post types:'),
+						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can use special post types:'),
 						'th' => /* TRANS: SHORT table header on TWO lines; short for "Sidebar", meaning Sidebar links */ T_('Sideb'),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_checkbox( {row}, \'perm_sidebar\', \''.TS_('Permission to create sidebar links').'\' )%',
@@ -549,6 +549,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.6  2009/08/31 17:21:32  fplanque
+ * minor
+ *
  * Revision 1.5  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

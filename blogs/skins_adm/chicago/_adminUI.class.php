@@ -87,7 +87,7 @@ class AdminUI extends AdminUI_general
 
 		$r .= $this->get_bloglist_buttons();
 
-		$r .= '<div class="panelbody">'
+		$r .= '<div id="panelbody" class="panelbody">'
 			."\n\n";
 
 		// Display info & error messages
@@ -382,6 +382,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.23  2009/08/31 17:21:31  fplanque
+ * minor
+ *
  * Revision 1.22  2009/07/02 00:18:06  fplanque
  * no message
  *
