@@ -57,7 +57,7 @@ if( ! $public_access_to_media )
 	}
 
 
-	fp> I don't think we need the following if public_access_to_media
+	// fp> I don't think we need the following if public_access_to_media
 	if( preg_match( '/^collection_(\d+)$/', $root, $perm_blog ) )
 	{	// OK, we got a blog ID:
 		$perm_blog = $perm_blog[1];
@@ -200,6 +200,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.34  2009/09/01 16:10:29  tblue246
+ * minor
+ *
  * Revision 1.33  2009/08/31 21:55:52  fplanque
  * no message
  *
