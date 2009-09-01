@@ -469,8 +469,10 @@ class ArchiveList extends Results
 			case 'postbypost':
 			default:
 				// ----------------------------- POSY BY POST ARCHIVES --------------------------------
-
-				$archives_list = new ItemListLight( $Blog );
+				global $timestamp_min, $timestamp_max;
+				//waltercruz> note that NULL will not issue a unlimited query, as ItemListLight inherits from
+				// Results class, and it will set the limit to $UserSettings->get('results_per_page') if limit is null
+				$archives_list = new ItemListLight( $Blog , $timestamp_min, $timestamp_max, NULL);
 				$archives_list->set_filters( array(
 				'visibility_array' => array( 'published' ),  // We only want to advertised published items
 				'types' => '-1000,1500,1520,1530,1570,1600,3000',	// Include all types except pages, intros and sidebar links:
@@ -629,6 +631,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.57  2009/09/01 01:25:43  waltercruz
+ * Trying to fix the limit bug, but I think that there's still something stra nge
+ *
  * Revision 1.56  2009/08/27 11:54:40  tblue246
  * General blog settings: Added default value for archives_sort_order
  *
