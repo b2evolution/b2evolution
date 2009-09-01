@@ -756,6 +756,16 @@ class User extends DataObject
 * This should be renamed to "Depending on each blog's permissions" 
 * Whetver general permissions you have on files, blog can give you additional permissions
 * but they can never take a global perm away.
+* Tblue> On the permissions page it says that the blog perms will be restricted
+* by any global perms, which means to me that a blog cannot grant e. g.
+* the files upload perm if this perm isn't granted globally... But apparently
+* it shouldn't be like that?! I understand it should be like that then:
+* if( ! $perm && $perm_target && in_array( $permlevel, array( 'add', 'view', 'edit' ) )
+* {
+* 		// check if blog grants permission.
+* }
+* If this is correct, we should remove the note on the blog permissions
+* pages and the group properties form.
 				 *  - Only a $permlevel of 'add', 'view' or 'edit' can be
 				 *    denied by blog permissions.
 				 *  - If the group grants the 'all' permission, blogs cannot
@@ -1591,6 +1601,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2009/09/01 16:48:31  tblue246
+ * doc
+ *
  * Revision 1.27  2009/08/31 21:47:03  fplanque
  * no message
  *
