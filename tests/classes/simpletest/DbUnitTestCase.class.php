@@ -42,9 +42,7 @@ class DbUnitTestCase extends EvoUnitTestCase
 		$this->test_DB = new DbUnitTestCase_DB( $testDB_conf );
 		$this->test_DB->halt_on_error = false;
 
-
 		parent::setUp();
-
 
 		$this->old_DB = & $GLOBALS['DB'];
 		$GLOBALS['DB'] = & $this->test_DB;
@@ -86,7 +84,10 @@ class DbUnitTestCase extends EvoUnitTestCase
 	 */
 	function executeQueriesFromFile( $filename )
 	{
+		global $tableprefix;
+
 		$buffer = file_get_contents( $filename );
+		$buffer = str_replace('{{{EVO_TABLE_PREFIX}}}', $tableprefix, $buffer);
 
 		foreach( preg_split( '#;(\r?\n|\r)#', $buffer, -1 ) as $lQuery )
 		{

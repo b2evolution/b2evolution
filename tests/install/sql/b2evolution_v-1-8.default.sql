@@ -13,10 +13,10 @@
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_antispam`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}antispam`
 --
 
-CREATE TABLE `evo_antispam` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}antispam` (
   `aspm_ID` bigint(11) NOT NULL auto_increment,
   `aspm_string` varchar(80) NOT NULL,
   `aspm_source` enum('local','reported','central') NOT NULL default 'reported',
@@ -25,10 +25,10 @@ CREATE TABLE `evo_antispam` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=19 ;
 
 --
--- Dumping data for table `evo_antispam`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}antispam`
 --
 
-INSERT INTO `evo_antispam` (`aspm_ID`, `aspm_string`, `aspm_source`) VALUES (1, 'penis-enlargement', 'reported'),
+INSERT INTO `{{{EVO_TABLE_PREFIX}}}antispam` (`aspm_ID`, `aspm_string`, `aspm_source`) VALUES (1, 'penis-enlargement', 'reported'),
 (2, 'online-casino', 'reported'),
 (3, 'order-viagra', 'reported'),
 (4, 'order-phentermine', 'reported'),
@@ -50,10 +50,10 @@ INSERT INTO `evo_antispam` (`aspm_ID`, `aspm_string`, `aspm_source`) VALUES (1, 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_basedomains`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}basedomains`
 --
 
-CREATE TABLE `evo_basedomains` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}basedomains` (
   `dom_ID` int(11) unsigned NOT NULL auto_increment,
   `dom_name` varchar(250) NOT NULL default '',
   `dom_status` enum('unknown','whitelist','blacklist') NOT NULL default 'unknown',
@@ -63,17 +63,17 @@ CREATE TABLE `evo_basedomains` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
--- Dumping data for table `evo_basedomains`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}basedomains`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_bloggroups`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}bloggroups`
 --
 
-CREATE TABLE `evo_bloggroups` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}bloggroups` (
   `bloggroup_blog_ID` int(11) unsigned NOT NULL default '0',
   `bloggroup_group_ID` int(11) unsigned NOT NULL default '0',
   `bloggroup_ismember` tinyint(4) NOT NULL default '0',
@@ -89,10 +89,10 @@ CREATE TABLE `evo_bloggroups` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `evo_bloggroups`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}bloggroups`
 --
 
-INSERT INTO `evo_bloggroups` (`bloggroup_blog_ID`, `bloggroup_group_ID`, `bloggroup_ismember`, `bloggroup_perm_poststatuses`, `bloggroup_perm_delpost`, `bloggroup_perm_comments`, `bloggroup_perm_cats`, `bloggroup_perm_properties`, `bloggroup_perm_media_upload`, `bloggroup_perm_media_browse`, `bloggroup_perm_media_change`) VALUES (2, 1, 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1),
+INSERT INTO `{{{EVO_TABLE_PREFIX}}}bloggroups` (`bloggroup_blog_ID`, `bloggroup_group_ID`, `bloggroup_ismember`, `bloggroup_perm_poststatuses`, `bloggroup_perm_delpost`, `bloggroup_perm_comments`, `bloggroup_perm_cats`, `bloggroup_perm_properties`, `bloggroup_perm_media_upload`, `bloggroup_perm_media_browse`, `bloggroup_perm_media_change`) VALUES (2, 1, 1, 'published,deprecated,protected,private,draft', 1, 1, 1, 1, 1, 1, 1),
 (2, 2, 1, 'published,deprecated,protected,private,draft', 1, 1, 0, 0, 1, 1, 1),
 (2, 3, 1, 'published,deprecated,protected,private,draft', 0, 0, 0, 0, 1, 1, 0),
 (2, 4, 1, '', 0, 0, 0, 0, 0, 0, 0),
@@ -108,10 +108,10 @@ INSERT INTO `evo_bloggroups` (`bloggroup_blog_ID`, `bloggroup_group_ID`, `bloggr
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_blogs`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}blogs`
 --
 
-CREATE TABLE `evo_blogs` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}blogs` (
   `blog_ID` int(11) unsigned NOT NULL auto_increment,
   `blog_shortname` varchar(12) default '',
   `blog_name` varchar(50) NOT NULL default '',
@@ -151,10 +151,10 @@ CREATE TABLE `evo_blogs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
--- Dumping data for table `evo_blogs`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}blogs`
 --
 
-INSERT INTO `evo_blogs` (`blog_ID`, `blog_shortname`, `blog_name`, `blog_tagline`, `blog_description`, `blog_longdesc`, `blog_locale`, `blog_access_type`, `blog_siteurl`, `blog_staticfilename`, `blog_stub`, `blog_urlname`, `blog_notes`, `blog_keywords`, `blog_allowcomments`, `blog_allowtrackbacks`, `blog_allowpingbacks`, `blog_allowblogcss`, `blog_allowusercss`, `blog_pingb2evonet`, `blog_pingtechnorati`, `blog_pingweblogs`, `blog_pingblodotgs`, `blog_default_skin`, `blog_force_skin`, `blog_disp_bloglist`, `blog_in_bloglist`, `blog_links_blog_ID`, `blog_commentsexpire`, `blog_media_location`, `blog_media_subdir`, `blog_media_fullpath`, `blog_media_url`, `blog_UID`) VALUES (1, 'Blog All', 'Blog All Title', 'Tagline for Blog All', 'Short description for Blog All', 'This is the long description for the blog named ''Blog All''. <br />\r\n<br />\r\n<strong>This blog (blog #1) is actually a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by unchecking ''Include in public blog list'' in the blogs admin.</strong>', 'en-EU', 'index.php', '', 'all.html', 'all', 'all', 'Notes for Blog All', 'Keywords for Blog All', 'post_by_post', 1, 0, 1, 1, 0, 0, 1, 0, 'custom', 0, 1, 1, 4, 0, 'default', NULL, NULL, NULL, ''),
+INSERT INTO `{{{EVO_TABLE_PREFIX}}}blogs` (`blog_ID`, `blog_shortname`, `blog_name`, `blog_tagline`, `blog_description`, `blog_longdesc`, `blog_locale`, `blog_access_type`, `blog_siteurl`, `blog_staticfilename`, `blog_stub`, `blog_urlname`, `blog_notes`, `blog_keywords`, `blog_allowcomments`, `blog_allowtrackbacks`, `blog_allowpingbacks`, `blog_allowblogcss`, `blog_allowusercss`, `blog_pingb2evonet`, `blog_pingtechnorati`, `blog_pingweblogs`, `blog_pingblodotgs`, `blog_default_skin`, `blog_force_skin`, `blog_disp_bloglist`, `blog_in_bloglist`, `blog_links_blog_ID`, `blog_commentsexpire`, `blog_media_location`, `blog_media_subdir`, `blog_media_fullpath`, `blog_media_url`, `blog_UID`) VALUES (1, 'Blog All', 'Blog All Title', 'Tagline for Blog All', 'Short description for Blog All', 'This is the long description for the blog named ''Blog All''. <br />\r\n<br />\r\n<strong>This blog (blog #1) is actually a very special blog! It automatically aggregates all posts from all other blogs. This allows you to easily track everything that is posted on this system. You can hide this blog from the public by unchecking ''Include in public blog list'' in the blogs admin.</strong>', 'en-EU', 'index.php', '', 'all.html', 'all', 'all', 'Notes for Blog All', 'Keywords for Blog All', 'post_by_post', 1, 0, 1, 1, 0, 0, 1, 0, 'custom', 0, 1, 1, 4, 0, 'default', NULL, NULL, NULL, ''),
 (2, 'Blog A', 'Blog A Title', 'Tagline for Blog A', 'Short description for Blog A', 'This is the long description for the blog named ''Blog A''. ', 'en-EU', 'index.php', '', 'a.html', 'a', 'a', 'Notes for Blog A', 'Keywords for Blog A', 'post_by_post', 1, 0, 1, 1, 0, 0, 1, 0, 'custom', 0, 1, 1, 4, 0, 'default', NULL, NULL, NULL, ''),
 (3, 'Blog B', 'Blog B Title', 'Tagline for Blog B', 'Short description for Blog B', 'This is the long description for the blog named ''Blog B''. ', 'en-EU', 'index.php', '', 'b.html', 'b', 'b', 'Notes for Blog B', 'Keywords for Blog B', 'post_by_post', 1, 0, 1, 1, 0, 0, 1, 0, 'custom', 0, 1, 1, 4, 0, 'default', NULL, NULL, NULL, ''),
 (4, 'Linkblog', 'Linkblog Title', 'Tagline for Linkblog', 'Short description for Linkblog', 'This is the long description for the blog named ''Linkblog''. <br />\r\n<br />\r\n<strong>The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.</strong>', 'en-EU', 'index.php', '', 'links.html', 'links', 'links', 'Notes for Linkblog', 'Keywords for Linkblog', 'post_by_post', 1, 0, 1, 1, 0, 0, 1, 0, 'custom', 0, 1, 1, 0, 0, 'default', NULL, NULL, NULL, '');
@@ -162,10 +162,10 @@ INSERT INTO `evo_blogs` (`blog_ID`, `blog_shortname`, `blog_name`, `blog_tagline
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_blogusers`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}blogusers`
 --
 
-CREATE TABLE `evo_blogusers` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}blogusers` (
   `bloguser_blog_ID` int(11) unsigned NOT NULL default '0',
   `bloguser_user_ID` int(11) unsigned NOT NULL default '0',
   `bloguser_ismember` tinyint(4) NOT NULL default '0',
@@ -182,17 +182,17 @@ CREATE TABLE `evo_blogusers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `evo_blogusers`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}blogusers`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_categories`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}categories`
 --
 
-CREATE TABLE `evo_categories` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}categories` (
   `cat_ID` int(11) unsigned NOT NULL auto_increment,
   `cat_parent_ID` int(11) unsigned default NULL,
   `cat_name` tinytext NOT NULL,
@@ -206,10 +206,10 @@ CREATE TABLE `evo_categories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
 
 --
--- Dumping data for table `evo_categories`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}categories`
 --
 
-INSERT INTO `evo_categories` (`cat_ID`, `cat_parent_ID`, `cat_name`, `cat_blog_ID`, `cat_description`, `cat_longdesc`, `cat_icon`) VALUES (1, NULL, 'Announcements [A]', 2, NULL, NULL, NULL),
+INSERT INTO `{{{EVO_TABLE_PREFIX}}}categories` (`cat_ID`, `cat_parent_ID`, `cat_name`, `cat_blog_ID`, `cat_description`, `cat_longdesc`, `cat_icon`) VALUES (1, NULL, 'Announcements [A]', 2, NULL, NULL, NULL),
 (2, NULL, 'News', 2, NULL, NULL, NULL),
 (3, NULL, 'Background', 2, NULL, NULL, NULL),
 (4, NULL, 'Announcements [B]', 3, NULL, NULL, NULL),
@@ -226,10 +226,10 @@ INSERT INTO `evo_categories` (`cat_ID`, `cat_parent_ID`, `cat_name`, `cat_blog_I
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_coll_settings`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}coll_settings`
 --
 
-CREATE TABLE `evo_coll_settings` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}coll_settings` (
   `cset_coll_ID` int(11) unsigned NOT NULL,
   `cset_name` varchar(30) NOT NULL,
   `cset_value` varchar(255) default NULL,
@@ -237,17 +237,17 @@ CREATE TABLE `evo_coll_settings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `evo_coll_settings`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}coll_settings`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_comments`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}comments`
 --
 
-CREATE TABLE `evo_comments` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}comments` (
   `comment_ID` int(11) unsigned NOT NULL auto_increment,
   `comment_post_ID` int(11) unsigned NOT NULL default '0',
   `comment_type` enum('comment','linkback','trackback','pingback') NOT NULL default 'comment',
@@ -269,18 +269,18 @@ CREATE TABLE `evo_comments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 --
--- Dumping data for table `evo_comments`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}comments`
 --
 
-INSERT INTO `evo_comments` (`comment_ID`, `comment_post_ID`, `comment_type`, `comment_status`, `comment_author_ID`, `comment_author`, `comment_author_email`, `comment_author_url`, `comment_author_IP`, `comment_date`, `comment_content`, `comment_karma`, `comment_spam_karma`, `comment_allow_msgform`) VALUES (1, 1, 'comment', 'published', NULL, 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1', '2006-08-03 01:15:40', 'Hi, this is a comment.<br />To delete a comment, just log in, and view the posts'' comments, there you will have the option to edit or delete them.', 0, NULL, 0);
+INSERT INTO `{{{EVO_TABLE_PREFIX}}}comments` (`comment_ID`, `comment_post_ID`, `comment_type`, `comment_status`, `comment_author_ID`, `comment_author`, `comment_author_email`, `comment_author_url`, `comment_author_IP`, `comment_date`, `comment_content`, `comment_karma`, `comment_spam_karma`, `comment_allow_msgform`) VALUES (1, 1, 'comment', 'published', NULL, 'miss b2', 'missb2@example.com', 'http://example.com', '127.0.0.1', '2006-08-03 01:15:40', 'Hi, this is a comment.<br />To delete a comment, just log in, and view the posts'' comments, there you will have the option to edit or delete them.', 0, NULL, 0);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_cron__log`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}cron__log`
 --
 
-CREATE TABLE `evo_cron__log` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}cron__log` (
   `clog_ctsk_ID` int(10) unsigned NOT NULL,
   `clog_realstart_datetime` datetime NOT NULL,
   `clog_realstop_datetime` datetime default NULL,
@@ -290,17 +290,17 @@ CREATE TABLE `evo_cron__log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `evo_cron__log`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}cron__log`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_cron__task`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}cron__task`
 --
 
-CREATE TABLE `evo_cron__task` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}cron__task` (
   `ctsk_ID` int(10) unsigned NOT NULL auto_increment,
   `ctsk_start_datetime` datetime NOT NULL,
   `ctsk_repeat_after` int(10) unsigned default NULL,
@@ -311,17 +311,17 @@ CREATE TABLE `evo_cron__task` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
--- Dumping data for table `evo_cron__task`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}cron__task`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_files`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}files`
 --
 
-CREATE TABLE `evo_files` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}files` (
   `file_ID` int(11) unsigned NOT NULL auto_increment,
   `file_root_type` enum('absolute','user','group','collection') NOT NULL default 'absolute',
   `file_root_ID` int(11) unsigned NOT NULL default '0',
@@ -334,17 +334,17 @@ CREATE TABLE `evo_files` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
--- Dumping data for table `evo_files`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}files`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_filetypes`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}filetypes`
 --
 
-CREATE TABLE `evo_filetypes` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}filetypes` (
   `ftyp_ID` int(11) unsigned NOT NULL auto_increment,
   `ftyp_extensions` varchar(30) NOT NULL,
   `ftyp_name` varchar(30) NOT NULL,
@@ -356,10 +356,10 @@ CREATE TABLE `evo_filetypes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=13 ;
 
 --
--- Dumping data for table `evo_filetypes`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}filetypes`
 --
 
-INSERT INTO `evo_filetypes` (`ftyp_ID`, `ftyp_extensions`, `ftyp_name`, `ftyp_mimetype`, `ftyp_icon`, `ftyp_viewtype`, `ftyp_allowed`) VALUES (1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 1),
+INSERT INTO `{{{EVO_TABLE_PREFIX}}}filetypes` (`ftyp_ID`, `ftyp_extensions`, `ftyp_name`, `ftyp_mimetype`, `ftyp_icon`, `ftyp_viewtype`, `ftyp_allowed`) VALUES (1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 1),
 (2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 1),
 (3, 'jpg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
 (4, 'txt', 'Text file', 'text/plain', 'document.png', 'text', 1),
@@ -375,10 +375,10 @@ INSERT INTO `evo_filetypes` (`ftyp_ID`, `ftyp_extensions`, `ftyp_name`, `ftyp_mi
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_groups`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}groups`
 --
 
-CREATE TABLE `evo_groups` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}groups` (
   `grp_ID` int(11) NOT NULL auto_increment,
   `grp_name` varchar(50) NOT NULL default '',
   `grp_perm_admin` enum('none','hidden','visible') NOT NULL default 'visible',
@@ -393,10 +393,10 @@ CREATE TABLE `evo_groups` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
--- Dumping data for table `evo_groups`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}groups`
 --
 
-INSERT INTO `evo_groups` (`grp_ID`, `grp_name`, `grp_perm_admin`, `grp_perm_blogs`, `grp_perm_stats`, `grp_perm_spamblacklist`, `grp_perm_options`, `grp_perm_users`, `grp_perm_templates`, `grp_perm_files`) VALUES (1, 'Administrators', 'visible', 'editall', 'edit', 'edit', 'edit', 'edit', 1, 'edit'),
+INSERT INTO `{{{EVO_TABLE_PREFIX}}}groups` (`grp_ID`, `grp_name`, `grp_perm_admin`, `grp_perm_blogs`, `grp_perm_stats`, `grp_perm_spamblacklist`, `grp_perm_options`, `grp_perm_users`, `grp_perm_templates`, `grp_perm_files`) VALUES (1, 'Administrators', 'visible', 'editall', 'edit', 'edit', 'edit', 'edit', 1, 'edit'),
 (2, 'Privileged Bloggers', 'visible', 'viewall', 'view', 'edit', 'view', 'view', 0, 'add'),
 (3, 'Bloggers', 'visible', 'user', 'none', 'view', 'none', 'none', 0, 'view'),
 (4, 'Basic Users', 'none', 'user', 'none', 'none', 'none', 'none', 0, 'none');
@@ -404,10 +404,10 @@ INSERT INTO `evo_groups` (`grp_ID`, `grp_name`, `grp_perm_admin`, `grp_perm_blog
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_hitlog`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}hitlog`
 --
 
-CREATE TABLE `evo_hitlog` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}hitlog` (
   `hit_ID` int(11) NOT NULL auto_increment,
   `hit_sess_ID` int(10) unsigned default NULL,
   `hit_datetime` datetime NOT NULL,
@@ -424,17 +424,17 @@ CREATE TABLE `evo_hitlog` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
--- Dumping data for table `evo_hitlog`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}hitlog`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_links`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}links`
 --
 
-CREATE TABLE `evo_links` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}links` (
   `link_ID` int(11) unsigned NOT NULL auto_increment,
   `link_datecreated` datetime NOT NULL,
   `link_datemodified` datetime NOT NULL,
@@ -455,17 +455,17 @@ CREATE TABLE `evo_links` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
--- Dumping data for table `evo_links`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}links`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_locales`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}locales`
 --
 
-CREATE TABLE `evo_locales` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}locales` (
   `loc_locale` varchar(20) NOT NULL default '',
   `loc_charset` varchar(15) NOT NULL default 'iso-8859-1',
   `loc_datefmt` varchar(10) NOT NULL default 'y-m-d',
@@ -479,17 +479,17 @@ CREATE TABLE `evo_locales` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='saves available locales';
 
 --
--- Dumping data for table `evo_locales`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}locales`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_pluginevents`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}pluginevents`
 --
 
-CREATE TABLE `evo_pluginevents` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}pluginevents` (
   `pevt_plug_ID` int(11) unsigned NOT NULL,
   `pevt_event` varchar(40) NOT NULL,
   `pevt_enabled` tinyint(4) NOT NULL default '1',
@@ -497,10 +497,10 @@ CREATE TABLE `evo_pluginevents` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `evo_pluginevents`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}pluginevents`
 --
 
-INSERT INTO `evo_pluginevents` (`pevt_plug_ID`, `pevt_event`, `pevt_enabled`) VALUES (1, 'AdminDisplayToolbar', 1),
+INSERT INTO `{{{EVO_TABLE_PREFIX}}}pluginevents` (`pevt_plug_ID`, `pevt_event`, `pevt_enabled`) VALUES (1, 'AdminDisplayToolbar', 1),
 (2, 'RenderItemAsHtml', 1),
 (3, 'RenderItemAsHtml', 1),
 (4, 'RenderItemAsHtml', 1),
@@ -512,10 +512,10 @@ INSERT INTO `evo_pluginevents` (`pevt_plug_ID`, `pevt_event`, `pevt_enabled`) VA
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_plugins`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}plugins`
 --
 
-CREATE TABLE `evo_plugins` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}plugins` (
   `plug_ID` int(11) unsigned NOT NULL auto_increment,
   `plug_priority` tinyint(4) NOT NULL default '50',
   `plug_classname` varchar(40) NOT NULL default '',
@@ -530,24 +530,24 @@ CREATE TABLE `evo_plugins` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=8 ;
 
 --
--- Dumping data for table `evo_plugins`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}plugins`
 --
 
-INSERT INTO `evo_plugins` (`plug_ID`, `plug_priority`, `plug_classname`, `plug_code`, `plug_apply_rendering`, `plug_version`, `plug_status`, `plug_spam_weight`) VALUES (1, 30, 'quicktags_plugin', 'b2evQTag', 'never', '1.8', 'enabled', 1),
+INSERT INTO `{{{EVO_TABLE_PREFIX}}}plugins` (`plug_ID`, `plug_priority`, `plug_classname`, `plug_code`, `plug_apply_rendering`, `plug_version`, `plug_status`, `plug_spam_weight`) VALUES (1, 30, 'quicktags_plugin', 'b2evQTag', 'never', '1.8', 'enabled', 1),
 (2, 70, 'auto_p_plugin', 'b2WPAutP', 'opt-out', '1.8', 'enabled', 1),
 (3, 60, 'autolinks_plugin', 'b2evALnk', 'opt-out', '1.8', 'enabled', 1),
 (4, 90, 'texturize_plugin', 'b2WPTxrz', 'opt-in', '1.8', 'enabled', 1),
-(5, 20, 'calendar_plugin', 'evo_Calr', 'never', '1.8', 'enabled', 1),
-(6, 50, 'archives_plugin', 'evo_Arch', 'never', '1.8', 'enabled', 1),
-(7, 60, 'categories_plugin', 'evo_Cats', 'never', '1.8', 'enabled', 1);
+(5, 20, 'calendar_plugin', '{{{EVO_TABLE_PREFIX}}}Calr', 'never', '1.8', 'enabled', 1),
+(6, 50, 'archives_plugin', '{{{EVO_TABLE_PREFIX}}}Arch', 'never', '1.8', 'enabled', 1),
+(7, 60, 'categories_plugin', '{{{EVO_TABLE_PREFIX}}}Cats', 'never', '1.8', 'enabled', 1);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_pluginsettings`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}pluginsettings`
 --
 
-CREATE TABLE `evo_pluginsettings` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}pluginsettings` (
   `pset_plug_ID` int(11) unsigned NOT NULL,
   `pset_name` varchar(30) NOT NULL,
   `pset_value` text,
@@ -555,17 +555,17 @@ CREATE TABLE `evo_pluginsettings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `evo_pluginsettings`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}pluginsettings`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_pluginusersettings`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}pluginusersettings`
 --
 
-CREATE TABLE `evo_pluginusersettings` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}pluginusersettings` (
   `puset_plug_ID` int(11) unsigned NOT NULL,
   `puset_user_ID` int(11) unsigned NOT NULL,
   `puset_name` varchar(30) NOT NULL,
@@ -574,17 +574,17 @@ CREATE TABLE `evo_pluginusersettings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `evo_pluginusersettings`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}pluginusersettings`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_postcats`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}postcats`
 --
 
-CREATE TABLE `evo_postcats` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}postcats` (
   `postcat_post_ID` int(11) unsigned NOT NULL,
   `postcat_cat_ID` int(11) unsigned NOT NULL,
   PRIMARY KEY  (`postcat_post_ID`,`postcat_cat_ID`),
@@ -592,10 +592,10 @@ CREATE TABLE `evo_postcats` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `evo_postcats`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}postcats`
 --
 
-INSERT INTO `evo_postcats` (`postcat_post_ID`, `postcat_cat_ID`) VALUES (1, 1),
+INSERT INTO `{{{EVO_TABLE_PREFIX}}}postcats` (`postcat_post_ID`, `postcat_cat_ID`) VALUES (1, 1),
 (1, 4),
 (2, 1),
 (2, 2),
@@ -630,10 +630,10 @@ INSERT INTO `evo_postcats` (`postcat_post_ID`, `postcat_cat_ID`) VALUES (1, 1),
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_posts`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}posts`
 --
 
-CREATE TABLE `evo_posts` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}posts` (
   `post_ID` int(11) unsigned NOT NULL auto_increment,
   `post_parent_ID` int(11) unsigned default NULL,
   `post_creator_user_ID` int(11) unsigned NOT NULL,
@@ -673,10 +673,10 @@ CREATE TABLE `evo_posts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=24 ;
 
 --
--- Dumping data for table `evo_posts`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}posts`
 --
 
-INSERT INTO `evo_posts` (`post_ID`, `post_parent_ID`, `post_creator_user_ID`, `post_lastedit_user_ID`, `post_assigned_user_ID`, `post_datestart`, `post_datedeadline`, `post_datecreated`, `post_datemodified`, `post_status`, `post_pst_ID`, `post_ptyp_ID`, `post_locale`, `post_content`, `post_title`, `post_urltitle`, `post_url`, `post_main_cat_ID`, `post_flags`, `post_views`, `post_wordcount`, `post_comment_status`, `post_commentsexpire`, `post_renderers`, `post_priority`) VALUES (1, NULL, 1, 1, NULL, '2006-08-03 01:13:34', NULL, '1970-01-01 01:00:00', '1970-01-01 01:00:00', 'published', NULL, 1, 'en-EU', '<p>This is the first post.</p>\r\n\r\n<p>It appears on both blog A and blog B.</p>', 'First Post', 'first_post', '', 1, 'pingsdone', 0, 14, 'open', NULL, 'default', 3),
+INSERT INTO `{{{EVO_TABLE_PREFIX}}}posts` (`post_ID`, `post_parent_ID`, `post_creator_user_ID`, `post_lastedit_user_ID`, `post_assigned_user_ID`, `post_datestart`, `post_datedeadline`, `post_datecreated`, `post_datemodified`, `post_status`, `post_pst_ID`, `post_ptyp_ID`, `post_locale`, `post_content`, `post_title`, `post_urltitle`, `post_url`, `post_main_cat_ID`, `post_flags`, `post_views`, `post_wordcount`, `post_comment_status`, `post_commentsexpire`, `post_renderers`, `post_priority`) VALUES (1, NULL, 1, 1, NULL, '2006-08-03 01:13:34', NULL, '1970-01-01 01:00:00', '1970-01-01 01:00:00', 'published', NULL, 1, 'en-EU', '<p>This is the first post.</p>\r\n\r\n<p>It appears on both blog A and blog B.</p>', 'First Post', 'first_post', '', 1, 'pingsdone', 0, 14, 'open', NULL, 'default', 3),
 (2, NULL, 1, 1, NULL, '2006-08-03 01:13:35', NULL, '1970-01-01 01:00:00', '1970-01-01 01:00:00', 'published', NULL, 1, 'en-EU', '<p>This is the second post.</p>\r\n\r\n<p>It appears on blog A only but in multiple categories.</p>', 'Second post', 'second_post', '', 2, 'pingsdone', 0, 15, 'open', NULL, 'default', 3),
 (3, NULL, 1, 1, NULL, '2006-08-03 01:13:36', NULL, '1970-01-01 01:00:00', '1970-01-01 01:00:00', 'published', NULL, 1, 'en-EU', '<p>This is the third post.</p>\r\n\r\n<p>It appears on blog B only and in a single category.</p>', 'Third post', 'third_post', '', 5, 'pingsdone', 0, 16, 'open', NULL, 'default', 3),
 (4, NULL, 1, 1, NULL, '2006-08-03 01:13:37', NULL, '1970-01-01 01:00:00', '1970-01-01 01:00:00', 'published', NULL, 1, 'en-US', '', 'Travis', 'travis', 'http://www.travisswicegood.com/', 13, 'pingsdone', 0, NULL, 'disabled', NULL, '', 3),
@@ -703,46 +703,46 @@ INSERT INTO `evo_posts` (`post_ID`, `post_parent_ID`, `post_creator_user_ID`, `p
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_poststatuses`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}poststatuses`
 --
 
-CREATE TABLE `evo_poststatuses` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}poststatuses` (
   `pst_ID` int(11) unsigned NOT NULL auto_increment,
   `pst_name` varchar(30) NOT NULL,
   PRIMARY KEY  (`pst_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
--- Dumping data for table `evo_poststatuses`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}poststatuses`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_posttypes`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}posttypes`
 --
 
-CREATE TABLE `evo_posttypes` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}posttypes` (
   `ptyp_ID` int(11) unsigned NOT NULL auto_increment,
   `ptyp_name` varchar(30) NOT NULL,
   PRIMARY KEY  (`ptyp_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
--- Dumping data for table `evo_posttypes`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}posttypes`
 --
 
-INSERT INTO `evo_posttypes` (`ptyp_ID`, `ptyp_name`) VALUES (1, 'Post'),
+INSERT INTO `{{{EVO_TABLE_PREFIX}}}posttypes` (`ptyp_ID`, `ptyp_name`) VALUES (1, 'Post'),
 (2, 'Link');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_sessions`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}sessions`
 --
 
-CREATE TABLE `evo_sessions` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}sessions` (
   `sess_ID` int(11) unsigned NOT NULL auto_increment,
   `sess_key` char(32) default NULL,
   `sess_lastseen` datetime NOT NULL,
@@ -753,37 +753,37 @@ CREATE TABLE `evo_sessions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
--- Dumping data for table `evo_sessions`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}sessions`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_settings`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}settings`
 --
 
-CREATE TABLE `evo_settings` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}settings` (
   `set_name` varchar(30) NOT NULL,
   `set_value` varchar(255) default NULL,
   PRIMARY KEY  (`set_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `evo_settings`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}settings`
 --
 
-INSERT INTO `evo_settings` (`set_name`, `set_value`) VALUES ('db_version', '9200'),
+INSERT INTO `{{{EVO_TABLE_PREFIX}}}settings` (`set_name`, `set_value`) VALUES ('db_version', '9200'),
 ('default_locale', 'en-EU'),
 ('newusers_grp_ID', '4');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_subscriptions`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}subscriptions`
 --
 
-CREATE TABLE `evo_subscriptions` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}subscriptions` (
   `sub_coll_ID` int(11) unsigned NOT NULL,
   `sub_user_ID` int(11) unsigned NOT NULL,
   `sub_items` tinyint(1) NOT NULL,
@@ -793,17 +793,17 @@ CREATE TABLE `evo_subscriptions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `evo_subscriptions`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}subscriptions`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_useragents`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}useragents`
 --
 
-CREATE TABLE `evo_useragents` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}useragents` (
   `agnt_ID` int(10) unsigned NOT NULL auto_increment,
   `agnt_signature` varchar(250) NOT NULL,
   `agnt_type` enum('rss','robot','browser','unknown') NOT NULL default 'unknown',
@@ -811,17 +811,17 @@ CREATE TABLE `evo_useragents` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
--- Dumping data for table `evo_useragents`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}useragents`
 --
 
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_users`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}users`
 --
 
-CREATE TABLE `evo_users` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}users` (
   `user_ID` int(11) unsigned NOT NULL auto_increment,
   `user_login` varchar(20) NOT NULL,
   `user_pass` char(32) NOT NULL,
@@ -852,19 +852,19 @@ CREATE TABLE `evo_users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
--- Dumping data for table `evo_users`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}users`
 --
 
-INSERT INTO `evo_users` (`user_ID`, `user_login`, `user_pass`, `user_firstname`, `user_lastname`, `user_nickname`, `user_icq`, `user_email`, `user_url`, `user_ip`, `user_domain`, `user_browser`, `dateYMDhour`, `user_level`, `user_aim`, `user_msn`, `user_yim`, `user_locale`, `user_idmode`, `user_allow_msgform`, `user_notify`, `user_showonline`, `user_grp_ID`, `user_validated`) VALUES (1, 'admin', '4c7a34d25eff9121c49658dbceadf694', NULL, NULL, 'admin', NULL, 'b2demo_stable@codeprobe.de', NULL, '127.0.0.1', 'localhost', NULL, '2006-08-03 01:13:32', 10, NULL, NULL, NULL, 'en-EU', 'login', 1, 1, 1, 1, 1),
+INSERT INTO `{{{EVO_TABLE_PREFIX}}}users` (`user_ID`, `user_login`, `user_pass`, `user_firstname`, `user_lastname`, `user_nickname`, `user_icq`, `user_email`, `user_url`, `user_ip`, `user_domain`, `user_browser`, `dateYMDhour`, `user_level`, `user_aim`, `user_msn`, `user_yim`, `user_locale`, `user_idmode`, `user_allow_msgform`, `user_notify`, `user_showonline`, `user_grp_ID`, `user_validated`) VALUES (1, 'admin', '4c7a34d25eff9121c49658dbceadf694', NULL, NULL, 'admin', NULL, 'b2demo_stable@codeprobe.de', NULL, '127.0.0.1', 'localhost', NULL, '2006-08-03 01:13:32', 10, NULL, NULL, NULL, 'en-EU', 'login', 1, 1, 1, 1, 1),
 (2, 'demouser', '4c7a34d25eff9121c49658dbceadf694', NULL, NULL, 'Mr. Demo', NULL, 'b2demo_stable@codeprobe.de', NULL, '127.0.0.1', 'localhost', NULL, '2006-08-03 01:13:33', 0, NULL, NULL, NULL, 'en-EU', 'login', 1, 1, 1, 4, 1);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evo_usersettings`
+-- Table structure for table `{{{EVO_TABLE_PREFIX}}}usersettings`
 --
 
-CREATE TABLE `evo_usersettings` (
+CREATE TABLE `{{{EVO_TABLE_PREFIX}}}usersettings` (
   `uset_user_ID` int(11) unsigned NOT NULL,
   `uset_name` varchar(30) NOT NULL,
   `uset_value` varchar(255) default NULL,
@@ -872,7 +872,7 @@ CREATE TABLE `evo_usersettings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `evo_usersettings`
+-- Dumping data for table `{{{EVO_TABLE_PREFIX}}}usersettings`
 --
 
 
@@ -881,87 +881,87 @@ CREATE TABLE `evo_usersettings` (
 --
 
 --
--- Constraints for table `evo_blogusers`
+-- Constraints for table `{{{EVO_TABLE_PREFIX}}}blogusers`
 --
-ALTER TABLE `evo_blogusers`
-  ADD CONSTRAINT `FK_bloguser_user_ID` FOREIGN KEY (`bloguser_user_ID`) REFERENCES `evo_users` (`user_ID`),
-  ADD CONSTRAINT `FK_bloguser_blog_ID` FOREIGN KEY (`bloguser_blog_ID`) REFERENCES `evo_blogs` (`blog_ID`);
+ALTER TABLE `{{{EVO_TABLE_PREFIX}}}blogusers`
+  ADD CONSTRAINT `FK_bloguser_user_ID` FOREIGN KEY (`bloguser_user_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}users` (`user_ID`),
+  ADD CONSTRAINT `FK_bloguser_blog_ID` FOREIGN KEY (`bloguser_blog_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}blogs` (`blog_ID`);
 
 --
--- Constraints for table `evo_categories`
+-- Constraints for table `{{{EVO_TABLE_PREFIX}}}categories`
 --
-ALTER TABLE `evo_categories`
-  ADD CONSTRAINT `FK_cat_blog_ID` FOREIGN KEY (`cat_blog_ID`) REFERENCES `evo_blogs` (`blog_ID`),
-  ADD CONSTRAINT `FK_cat_parent_ID` FOREIGN KEY (`cat_parent_ID`) REFERENCES `evo_categories` (`cat_ID`);
+ALTER TABLE `{{{EVO_TABLE_PREFIX}}}categories`
+  ADD CONSTRAINT `FK_cat_blog_ID` FOREIGN KEY (`cat_blog_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}blogs` (`blog_ID`),
+  ADD CONSTRAINT `FK_cat_parent_ID` FOREIGN KEY (`cat_parent_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}categories` (`cat_ID`);
 
 --
--- Constraints for table `evo_comments`
+-- Constraints for table `{{{EVO_TABLE_PREFIX}}}comments`
 --
-ALTER TABLE `evo_comments`
-  ADD CONSTRAINT `FK_comment_post_ID` FOREIGN KEY (`comment_post_ID`) REFERENCES `evo_posts` (`post_ID`);
+ALTER TABLE `{{{EVO_TABLE_PREFIX}}}comments`
+  ADD CONSTRAINT `FK_comment_post_ID` FOREIGN KEY (`comment_post_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}posts` (`post_ID`);
 
 --
--- Constraints for table `evo_links`
+-- Constraints for table `{{{EVO_TABLE_PREFIX}}}links`
 --
-ALTER TABLE `evo_links`
-  ADD CONSTRAINT `FK_link_itm_ID` FOREIGN KEY (`link_itm_ID`) REFERENCES `evo_posts` (`post_ID`),
-  ADD CONSTRAINT `FK_link_creator_user_ID` FOREIGN KEY (`link_creator_user_ID`) REFERENCES `evo_users` (`user_ID`),
-  ADD CONSTRAINT `FK_link_dest_itm_ID` FOREIGN KEY (`link_dest_itm_ID`) REFERENCES `evo_posts` (`post_ID`),
-  ADD CONSTRAINT `FK_link_file_ID` FOREIGN KEY (`link_file_ID`) REFERENCES `evo_files` (`file_ID`),
-  ADD CONSTRAINT `FK_link_lastedit_user_ID` FOREIGN KEY (`link_lastedit_user_ID`) REFERENCES `evo_users` (`user_ID`);
+ALTER TABLE `{{{EVO_TABLE_PREFIX}}}links`
+  ADD CONSTRAINT `FK_link_itm_ID` FOREIGN KEY (`link_itm_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}posts` (`post_ID`),
+  ADD CONSTRAINT `FK_link_creator_user_ID` FOREIGN KEY (`link_creator_user_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}users` (`user_ID`),
+  ADD CONSTRAINT `FK_link_dest_itm_ID` FOREIGN KEY (`link_dest_itm_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}posts` (`post_ID`),
+  ADD CONSTRAINT `FK_link_file_ID` FOREIGN KEY (`link_file_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}files` (`file_ID`),
+  ADD CONSTRAINT `FK_link_lastedit_user_ID` FOREIGN KEY (`link_lastedit_user_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}users` (`user_ID`);
 
 --
--- Constraints for table `evo_pluginevents`
+-- Constraints for table `{{{EVO_TABLE_PREFIX}}}pluginevents`
 --
-ALTER TABLE `evo_pluginevents`
-  ADD CONSTRAINT `FK_pevt_plug_ID` FOREIGN KEY (`pevt_plug_ID`) REFERENCES `evo_plugins` (`plug_ID`);
+ALTER TABLE `{{{EVO_TABLE_PREFIX}}}pluginevents`
+  ADD CONSTRAINT `FK_pevt_plug_ID` FOREIGN KEY (`pevt_plug_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}plugins` (`plug_ID`);
 
 --
--- Constraints for table `evo_pluginsettings`
+-- Constraints for table `{{{EVO_TABLE_PREFIX}}}pluginsettings`
 --
-ALTER TABLE `evo_pluginsettings`
-  ADD CONSTRAINT `FK_pset_plug_ID` FOREIGN KEY (`pset_plug_ID`) REFERENCES `evo_plugins` (`plug_ID`);
+ALTER TABLE `{{{EVO_TABLE_PREFIX}}}pluginsettings`
+  ADD CONSTRAINT `FK_pset_plug_ID` FOREIGN KEY (`pset_plug_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}plugins` (`plug_ID`);
 
 --
--- Constraints for table `evo_pluginusersettings`
+-- Constraints for table `{{{EVO_TABLE_PREFIX}}}pluginusersettings`
 --
-ALTER TABLE `evo_pluginusersettings`
-  ADD CONSTRAINT `FK_puset_plug_ID` FOREIGN KEY (`puset_plug_ID`) REFERENCES `evo_plugins` (`plug_ID`);
+ALTER TABLE `{{{EVO_TABLE_PREFIX}}}pluginusersettings`
+  ADD CONSTRAINT `FK_puset_plug_ID` FOREIGN KEY (`puset_plug_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}plugins` (`plug_ID`);
 
 --
--- Constraints for table `evo_postcats`
+-- Constraints for table `{{{EVO_TABLE_PREFIX}}}postcats`
 --
-ALTER TABLE `evo_postcats`
-  ADD CONSTRAINT `FK_postcat_cat_ID` FOREIGN KEY (`postcat_cat_ID`) REFERENCES `evo_categories` (`cat_ID`),
-  ADD CONSTRAINT `FK_postcat_post_ID` FOREIGN KEY (`postcat_post_ID`) REFERENCES `evo_posts` (`post_ID`);
+ALTER TABLE `{{{EVO_TABLE_PREFIX}}}postcats`
+  ADD CONSTRAINT `FK_postcat_cat_ID` FOREIGN KEY (`postcat_cat_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}categories` (`cat_ID`),
+  ADD CONSTRAINT `FK_postcat_post_ID` FOREIGN KEY (`postcat_post_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}posts` (`post_ID`);
 
 --
--- Constraints for table `evo_posts`
+-- Constraints for table `{{{EVO_TABLE_PREFIX}}}posts`
 --
-ALTER TABLE `evo_posts`
-  ADD CONSTRAINT `FK_post_assigned_user_ID` FOREIGN KEY (`post_assigned_user_ID`) REFERENCES `evo_users` (`user_ID`),
-  ADD CONSTRAINT `FK_post_lastedit_user_ID` FOREIGN KEY (`post_lastedit_user_ID`) REFERENCES `evo_users` (`user_ID`),
-  ADD CONSTRAINT `FK_post_creator_user_ID` FOREIGN KEY (`post_creator_user_ID`) REFERENCES `evo_users` (`user_ID`),
-  ADD CONSTRAINT `FK_post_main_cat_ID` FOREIGN KEY (`post_main_cat_ID`) REFERENCES `evo_categories` (`cat_ID`),
-  ADD CONSTRAINT `FK_post_parent_ID` FOREIGN KEY (`post_parent_ID`) REFERENCES `evo_posts` (`post_ID`),
-  ADD CONSTRAINT `FK_post_pst_ID` FOREIGN KEY (`post_pst_ID`) REFERENCES `evo_poststatuses` (`pst_ID`),
-  ADD CONSTRAINT `FK_post_ptyp_ID` FOREIGN KEY (`post_ptyp_ID`) REFERENCES `evo_posttypes` (`ptyp_ID`);
+ALTER TABLE `{{{EVO_TABLE_PREFIX}}}posts`
+  ADD CONSTRAINT `FK_post_assigned_user_ID` FOREIGN KEY (`post_assigned_user_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}users` (`user_ID`),
+  ADD CONSTRAINT `FK_post_lastedit_user_ID` FOREIGN KEY (`post_lastedit_user_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}users` (`user_ID`),
+  ADD CONSTRAINT `FK_post_creator_user_ID` FOREIGN KEY (`post_creator_user_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}users` (`user_ID`),
+  ADD CONSTRAINT `FK_post_main_cat_ID` FOREIGN KEY (`post_main_cat_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}categories` (`cat_ID`),
+  ADD CONSTRAINT `FK_post_parent_ID` FOREIGN KEY (`post_parent_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}posts` (`post_ID`),
+  ADD CONSTRAINT `FK_post_pst_ID` FOREIGN KEY (`post_pst_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}poststatuses` (`pst_ID`),
+  ADD CONSTRAINT `FK_post_ptyp_ID` FOREIGN KEY (`post_ptyp_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}posttypes` (`ptyp_ID`);
 
 --
--- Constraints for table `evo_subscriptions`
+-- Constraints for table `{{{EVO_TABLE_PREFIX}}}subscriptions`
 --
-ALTER TABLE `evo_subscriptions`
-  ADD CONSTRAINT `FK_sub_user_ID` FOREIGN KEY (`sub_user_ID`) REFERENCES `evo_users` (`user_ID`),
-  ADD CONSTRAINT `FK_sub_coll_ID` FOREIGN KEY (`sub_coll_ID`) REFERENCES `evo_blogs` (`blog_ID`);
+ALTER TABLE `{{{EVO_TABLE_PREFIX}}}subscriptions`
+  ADD CONSTRAINT `FK_sub_user_ID` FOREIGN KEY (`sub_user_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}users` (`user_ID`),
+  ADD CONSTRAINT `FK_sub_coll_ID` FOREIGN KEY (`sub_coll_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}blogs` (`blog_ID`);
 
 --
--- Constraints for table `evo_users`
+-- Constraints for table `{{{EVO_TABLE_PREFIX}}}users`
 --
-ALTER TABLE `evo_users`
-  ADD CONSTRAINT `FK_user_grp_ID` FOREIGN KEY (`user_grp_ID`) REFERENCES `evo_groups` (`grp_ID`);
+ALTER TABLE `{{{EVO_TABLE_PREFIX}}}users`
+  ADD CONSTRAINT `FK_user_grp_ID` FOREIGN KEY (`user_grp_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}groups` (`grp_ID`);
 
 --
--- Constraints for table `evo_usersettings`
+-- Constraints for table `{{{EVO_TABLE_PREFIX}}}usersettings`
 --
-ALTER TABLE `evo_usersettings`
-  ADD CONSTRAINT `FK_uset_user_ID` FOREIGN KEY (`uset_user_ID`) REFERENCES `evo_users` (`user_ID`);
+ALTER TABLE `{{{EVO_TABLE_PREFIX}}}usersettings`
+  ADD CONSTRAINT `FK_uset_user_ID` FOREIGN KEY (`uset_user_ID`) REFERENCES `{{{EVO_TABLE_PREFIX}}}users` (`user_ID`);
