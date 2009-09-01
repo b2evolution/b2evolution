@@ -151,8 +151,6 @@ $mwnewMediaObject_sig = array(array( $xmlrpcStruct, $xmlrpcString, $xmlrpcString
  *
  * @see http://www.xmlrpc.com/metaWeblogApi#metaweblognewmediaobject
  *
- * @todo do not overwrite existing pics with same name
- * @todo extensive permissions
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 blogid (string): Unique identifier of the blog the post will be added to.
@@ -168,143 +166,7 @@ $mwnewMediaObject_sig = array(array( $xmlrpcStruct, $xmlrpcString, $xmlrpcString
  */
 function mw_newmediaobject($m)
 {
-	global $Settings;
-
-	// CHECK LOGIN:
-	/**
-	 * @var User
-	 */
-	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
-	{	// Login failed, return (last) error:
-		return xmlrpcs_resperror();
-	}
-
-	// GET BLOG:
-	/**
-	 * @var Blog
-	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
-	{	// Login failed, return (last) error:
-		return xmlrpcs_resperror();
-	}
-
-	// CHECK PERMISSION:
-	if( ! $current_User->check_perm( 'files', 'add', false, $Blog->ID ) )
-	{	// Permission denied
-		return xmlrpcs_resperror( 3 );	// User error 3
-	}
-	logIO( 'Permission granted.' );
-
-	if( ! $Settings->get('upload_enabled') )
-	{
-		return xmlrpcs_resperror( 2, 'Object upload not allowed' );
-	}
-
-	$xcontent = $m->getParam(3);
-	// Get the main data - and decode it properly for the image - sorry, binary object
-	logIO( 'Decoding content...' );
-	$contentstruct = xmlrpc_decode_recurse($xcontent);
-	$data = $contentstruct['bits'];
-	logIO( 'Received MIME type: '.( isset( $contentstruct['type'] ) ? $contentstruct['type'] : '(none)' ) );
-
-	load_funcs('files/model/_file.funcs.php');
-
-	$filesize = strlen( $data );
-	if( ( $maxfilesize = $Settings->get( 'upload_maxkb' ) * 1024 ) && $filesize > $maxfilesize )
-	{
-		return xmlrpcs_resperror( 4, 'File too big ('.bytesreadable( $filesize, false )
-									.'); max. allowed size is '.bytesreadable( $maxfilesize, false ) );
-	}
-
-	$rf_filepath = $contentstruct['name'];
-	logIO( 'Received filepath: '.$rf_filepath );
-	// Avoid problems:
-	$rf_filepath = strtolower($rf_filepath);
-	$rf_filepath = preg_replace( '¤[^a-z0-9\-_./]+¤i', '-', $rf_filepath );
-	logIO( 'Sanitized filepath: '.$rf_filepath );
-
-	// Split into path + name:
-	$filepath_parts = explode( '/', $rf_filepath );
-	$filename = array_pop( $filepath_parts );
-
-	// Check valid filename/extension: (includes check for locked filenames)
-	logIO( 'File name: '.$filename );
-	if( $error_filename = validate_filename( $filename, false ) )
-	{
-		return xmlrpcs_resperror( 5, $error_filename );
-	}
-
-	// Check valid path parts:
-	$rds_subpath = '';
-	foreach( $filepath_parts as $filepath_part )
-	{
-		if( empty($filepath_part) || $filepath_part == '.' )
-		{	// self ref not useful
-			continue;
-		}
-
-		if( $error = validate_dirname($filepath_part) )
-		{ // invalid relative path:
-			logIO( $error );
-			return xmlrpcs_resperror( 6, $error );
-		}
-
-		$rds_subpath .= $filepath_part.'/';
-	}
-	logIO( 'Subpath: '.$rds_subpath );
-
-	$fileupload_path = $Blog->get_media_dir();
-	if( ! $fileupload_path )
-	{
-		return xmlrpcs_resperror( 7, 'Error accessing Blog media directory.' );
-	}
-
-	$afs_filedir = $fileupload_path.$rds_subpath;
-	$afs_filepath = $afs_filedir.$filename;
-	if( file_exists( $afs_filepath ) )
-	{
-		return xmlrpcs_resperror( 8, 'File exists.' );
-	}
-
-	// Create subdirs, if necessary:
-	if( !empty($rds_subpath) )
-	{
-		if( ! mkdir_r( $afs_filedir ) )
-		{	// Dir didn't already exist and could not be created
-			return xmlrpcs_resperror( 9, 'Error creating sub directories: '.rel_path_to_base($afs_filedir));
-		}
-	}
-
-	logIO( 'Saving to: '.$afs_filepath );
-	$fh = @fopen( $afs_filepath, 'wb' );
-	if( !$fh )
-	{
-		return xmlrpcs_resperror( 10, 'Error opening file for writing.' );
-	}
-
-	$ok = @fwrite($fh, $data);
-	@fclose($fh);
-
-	if ( $ok === false )
-	{
-		return xmlrpcs_resperror( 13, 'Error while writing to file.' );
-	}
-
-	// chmod uploaded file:
-	$chmod = $Settings->get('fm_default_chmod_file');
-	logIO( 'chmod to: '.$chmod );
-	@chmod( $afs_filepath, octdec( $chmod ) );
-
-	$url = $Blog->get_media_url().$rds_subpath.$filename;
-	logIO( 'URL of new file: '.$url );
-
-	// - return URL as XML
-	$urlstruct = new xmlrpcval(array(
-			'url' => new xmlrpcval($url, 'string')
-		), 'struct');
-
-	logIO( 'OK.' );
-	return new xmlrpcresp($urlstruct);
+	return _wp_mw_newmediaobject( $m );
 }
 
 
@@ -548,66 +410,7 @@ $mwgetcats_doc = 'Get categories of a post, MetaWeblog API-style';
  */
 function mw_getcategories( $m )
 {
-	global $DB, $Settings;
-
-	// CHECK LOGIN:
-	/**
-	 * @var User
-	 */
-	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
-	{	// Login failed, return (last) error:
-		return xmlrpcs_resperror();
-	}
-
-	// GET BLOG:
-	/**
-	 * @var Blog
-	 */
-	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
-	{	// Login failed, return (last) error:
-		return xmlrpcs_resperror();
-	}
-
-	$sql = "SELECT cat_ID, cat_name
-					FROM T_categories ";
-	$sql .= 'WHERE '.$Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID');
-	if( $Settings->get('chapter_ordering') == 'manual' )
-	{	// Manual order
-		$sql .= ' ORDER BY cat_order';
-	}
-	else
-	{	// Alphabetic order
-		$sql .= ' ORDER BY cat_name';
-	}
-
-	$rows = $DB->get_results( $sql );
-	if( $DB->error )
-	{	// DB error
-		return xmlrpcs_resperror( 99, 'DB error: '.$DB->last_error ); // user error 9
-	}
-	logIO( 'Categories: '.count($rows) );
-
-	$ChapterCache = & get_Cache('ChapterCache');
-	$data = array();
-	foreach( $rows as $row )
-	{
-		$Chapter = & $ChapterCache->get_by_ID($row->cat_ID);
-		if( ! $Chapter )
-		{
-			continue;
-		}
-		$data[] = new xmlrpcval( array(
-				'categoryId' => new xmlrpcval( $row->cat_ID ), // not in RFC (http://www.xmlrpc.com/metaWeblogApi)
-				'description' => new xmlrpcval( $row->cat_name ),
-				'categoryName' => new xmlrpcval( $row->cat_name ), // not in RFC (http://www.xmlrpc.com/metaWeblogApi)
-				'htmlUrl' => new xmlrpcval( $Chapter->get_permanent_url() ),
-				'rssUrl' => new xmlrpcval( url_add_param($Chapter->get_permanent_url(), 'tempskin=_rss2') )
-			//	mb_convert_encoding( $row->cat_name, "utf-8", "iso-8859-1")  )
-			),'struct');
-	}
-
-	logIO( 'OK.' );
-	return new xmlrpcresp( new xmlrpcval($data, 'struct') );
+	return _wp_mw_getcategories ( $m ) ;
 }
 
 
@@ -717,6 +520,37 @@ function mw_getrecentposts( $m )
 }
 
 
+$mwgetusersblogs_doc='returns the user\'s blogs - this is a dummy function, just so that BlogBuddy and other blogs-retrieving apps work';
+$mwgetusersblogs_sig=array(array($xmlrpcArray, $xmlrpcString, $xmlrpcString, $xmlrpcString));
+/**
+ * metaweblog.getUsersBlogs returns information about all the blogs a given user is a member of.
+ *
+ * Data is returned as an array of <struct>s containing the ID (blogid), name (blogName),
+ * and URL (url) of each blog.
+ *
+ * Non official: Also return a boolean stating wether or not the user can edit th eblog templates
+ * (isAdmin).
+ *
+ * see {@link http://www.xmlrpc.com/stories/storyReader$2460
+ *
+ * @param xmlrpcmsg XML-RPC Message
+ *					0 appkey (string): Unique identifier/passcode of the application sending the post.
+ *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .)
+ *					1 username (string): Login for the Blogger user who's blogs will be retrieved.
+ *					2 password (string): Password for said username.
+ *						(currently not required by b2evo)
+ * @return xmlrpcresp XML-RPC Response, an array of <struct>s containing for each blog:
+ *					- ID (blogid),
+ *					- name (blogName),
+ *					- URL (url),
+ *					- bool: can user edit template? (isAdmin).
+ */
+function mw_getusersblogs($m)
+{
+	logIO('mw_getusersblogs start');
+	return _wp_or_blogger_getusersblogs( 'blogger', $m );
+}
+
 
 $mwgetpost_doc = 'Fetches a post, blogger-api like';
 $mwgetpost_sig = array(array($xmlrpcStruct, $xmlrpcString, $xmlrpcString, $xmlrpcString));
@@ -787,6 +621,29 @@ function mw_getpost($m)
 }
 
 
+$mwdeletepost_doc = 'Deletes a post, blogger-api like';
+$mwdeletepost_sig = array(array($xmlrpcBoolean, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcBoolean));
+/**
+ * metaWeblog.deletePost deletes a given post.
+ *
+ * This API call is not documented on
+ * {@link http://www.blogger.com/developers/api/1_docs/}
+ * @see http://www.xmlrpc.com/stories/storyReader$2460
+ *
+ * @param xmlrpcmsg XML-RPC Message
+ *					0 appkey (string): Unique identifier/passcode of the application sending the post.
+ *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .)
+ *					1 postid (string): Unique identifier of the post to be deleted.
+ *					2 username (string): Login for a Blogger user who has permission to edit the given
+ *						post (either the user who originally created it or an admin of the blog).
+ *					3 password (string): Password for said username.
+ * @return xmlrpcresp XML-RPC Response
+ */
+function mw_deletepost($m)
+{
+	logIO('mw_deletepost start');
+	return _mw_blogger_deletepost( $m );
+}
 
 
 $xmlrpc_procs['metaWeblog.newMediaObject'] = array(
@@ -822,18 +679,21 @@ $xmlrpc_procs['metaWeblog.getRecentPosts'] = array(
 // Blogger aliases, as in http://www.xmlrpc.com/stories/storyReader$2460
 
 $xmlrpc_procs['metaWeblog.deletePost'] = array(
-				'function' => 'blogger_deletepost',
-				'signature' => $bloggerdeletepost_sig,
-				'docstring' => $bloggerdeletepost_doc );
+				'function' => 'mw_deletepost',
+				'signature' => $mwdeletepost_sig,
+				'docstring' => $mwdeletepost_doc );
 
 $xmlrpc_procs['metaWeblog.getUsersBlogs'] = array(
-				'function' => 'blogger_getusersblogs',
-				'signature' => $bloggergetusersblogs_sig,
-				'docstring' => $bloggergetusersblogs_doc );
+				'function' => 'mw_getusersblogs',
+				'signature' => $mwgetusersblogs_sig,
+				'docstring' => $mwgetusersblogs_doc );
 
 
 /*
  * $Log$
+ * Revision 1.22  2009/09/01 16:44:57  waltercruz
+ * Generic functions to avoid alias and allow enable/disabling of specific APIs on future
+ *
  * Revision 1.21  2009/08/31 19:24:10  waltercruz
  * Adding blogger aliases to metaWeblog API
  *

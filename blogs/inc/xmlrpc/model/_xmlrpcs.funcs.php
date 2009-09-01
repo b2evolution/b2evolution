@@ -61,6 +61,352 @@ function starify( $string )
 	return str_repeat( '*', strlen( $string ) );
 }
 
+/**
+ * blogger.deletePost deletes a given post.
+ *
+ * This API call is not documented on
+ * {@link http://www.blogger.com/developers/api/1_docs/}
+ * @see http://www.sixapart.com/developers/xmlrpc/blogger_api/bloggerdeletepost.html
+ *
+ * @param xmlrpcmsg XML-RPC Message
+ *					0 appkey (string): Unique identifier/passcode of the application sending the post.
+ *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .)
+ *					1 postid (string): Unique identifier of the post to be deleted.
+ *					2 username (string): Login for a Blogger user who has permission to edit the given
+ *						post (either the user who originally created it or an admin of the blog).
+ *					3 password (string): Password for said username.
+ * @return xmlrpcresp XML-RPC Response
+ */
+function _mw_blogger_deletepost($m)
+{
+	global $DB;
+
+	// CHECK LOGIN:
+	if( ! $current_User = & xmlrpcs_login( $m, 2, 3 ) )
+	{	// Login failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	// GET POST:
+	/**
+	 * @var Item
+	 */
+	if( ! $edited_Item = & xmlrpcs_get_Item( $m, 1 ) )
+	{	// Failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	// CHECK PERMISSION:
+	if( ! $current_User->check_perm( 'blog_del_post', 'edit', false, $edited_Item->get_blog_ID() ) )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
+	}
+	logIO( 'Permission granted.' );
+
+	// DELETE POST FROM DB:
+	$edited_Item->dbdelete();
+	if( $DB->error )
+	{ // DB error
+		return xmlrpcs_resperror( 99, 'DB error: '.$DB->last_error ); // user error 9
+	}
+
+	logIO( 'OK.' );
+	return new xmlrpcresp(new xmlrpcval(1, 'boolean'));
+}
+
+/**
+ * metaWeblog.getCategories
+ *
+ * @see http://www.xmlrpc.com/metaWeblogApi#metawebloggetcategories
+ *
+ * @param xmlrpcmsg XML-RPC Message
+ *					0 blogid (string): Unique identifier of the blog the post will be added to.
+ *						Currently ignored in b2evo, in favor of the category.
+ *					1 username (string): Login for a Blogger user who has permission to edit the given
+ *						post (either the user who originally created it or an admin of the blog).
+ *					2 password (string): Password for said username.
+ */
+function _wp_mw_getcategories( $m )
+{
+	global $DB, $Settings;
+
+	// CHECK LOGIN:
+	/**
+	 * @var User
+	 */
+	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
+	{	// Login failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	// GET BLOG:
+	/**
+	 * @var Blog
+	 */
+	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	{	// Login failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	$sql = "SELECT cat_ID, cat_name
+					FROM T_categories ";
+	$sql .= 'WHERE '.$Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID');
+	if( $Settings->get('chapter_ordering') == 'manual' )
+	{	// Manual order
+		$sql .= ' ORDER BY cat_order';
+	}
+	else
+	{	// Alphabetic order
+		$sql .= ' ORDER BY cat_name';
+	}
+
+	$rows = $DB->get_results( $sql );
+	if( $DB->error )
+	{	// DB error
+		return xmlrpcs_resperror( 99, 'DB error: '.$DB->last_error ); // user error 9
+	}
+	logIO( 'Categories: '.count($rows) );
+
+	$ChapterCache = & get_Cache('ChapterCache');
+	$data = array();
+	foreach( $rows as $row )
+	{
+		$Chapter = & $ChapterCache->get_by_ID($row->cat_ID);
+		if( ! $Chapter )
+		{
+			continue;
+		}
+		$data[] = new xmlrpcval( array(
+				'categoryId' => new xmlrpcval( $row->cat_ID ), // not in RFC (http://www.xmlrpc.com/metaWeblogApi)
+				'description' => new xmlrpcval( $row->cat_name ),
+				'categoryName' => new xmlrpcval( $row->cat_name ), // not in RFC (http://www.xmlrpc.com/metaWeblogApi)
+				'htmlUrl' => new xmlrpcval( $Chapter->get_permanent_url() ),
+				'rssUrl' => new xmlrpcval( url_add_param($Chapter->get_permanent_url(), 'tempskin=_rss2') )
+			//	mb_convert_encoding( $row->cat_name, "utf-8", "iso-8859-1")  )
+			),'struct');
+	}
+
+	logIO( 'OK.' );
+	return new xmlrpcresp( new xmlrpcval($data, 'struct') );
+}
+
+
+/**
+ * metaWeblog.newMediaObject  image upload
+ * wp.uploadFile
+ *
+ * image is supplied coded in the info struct as bits
+ *
+ * @see http://www.xmlrpc.com/metaWeblogApi#metaweblognewmediaobject
+ * @see http://codex.wordpress.org/XML-RPC_wp#wp.uploadFile
+ *
+ * @todo do not overwrite existing pics with same name
+ * @todo extensive permissions
+ *
+ * @param xmlrpcmsg XML-RPC Message
+ *					0 blogid (string): Unique identifier of the blog the post will be added to.
+ *						Currently ignored in b2evo, in favor of the category.
+ *					1 username (string): Login for a Blogger user who has permission to edit the given
+ *						post (either the user who originally created it or an admin of the blog).
+ *					2 password (string): Password for said username.
+ *					3 struct (struct)
+ * 							- name : filename
+ * 							- type : mimetype
+ * 							- bits : base64 encoded file
+ * @return xmlrpcresp XML-RPC Response
+ */
+function _wp_mw_newmediaobject($m)
+{
+	global $Settings;
+
+	// CHECK LOGIN:
+	/**
+	 * @var User
+	 */
+	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
+	{	// Login failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	// GET BLOG:
+	/**
+	 * @var Blog
+	 */
+	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	{	// Login failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	// CHECK PERMISSION:
+	if( ! $current_User->check_perm( 'files', 'add', false, $Blog->ID ) )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
+	}
+	logIO( 'Permission granted.' );
+
+	if( ! $Settings->get('upload_enabled') )
+	{
+		return xmlrpcs_resperror( 2, 'Object upload not allowed' );
+	}
+
+	$xcontent = $m->getParam(3);
+	// Get the main data - and decode it properly for the image - sorry, binary object
+	logIO( 'Decoding content...' );
+	$contentstruct = xmlrpc_decode_recurse($xcontent);
+	$data = $contentstruct['bits'];
+	logIO( 'Received MIME type: '.( isset( $contentstruct['type'] ) ? $contentstruct['type'] : '(none)' ) );
+
+	load_funcs('files/model/_file.funcs.php');
+
+	$filesize = strlen( $data );
+	if( ( $maxfilesize = $Settings->get( 'upload_maxkb' ) * 1024 ) && $filesize > $maxfilesize )
+	{
+		return xmlrpcs_resperror( 4, 'File too big ('.bytesreadable( $filesize, false )
+									.'); max. allowed size is '.bytesreadable( $maxfilesize, false ) );
+	}
+
+	$rf_filepath = $contentstruct['name'];
+	logIO( 'Received filepath: '.$rf_filepath );
+	// Avoid problems:
+	$rf_filepath = strtolower($rf_filepath);
+	$rf_filepath = preg_replace( '€[^a-z0-9\-_./]+€i', '-', $rf_filepath );
+	logIO( 'Sanitized filepath: '.$rf_filepath );
+
+	// Split into path + name:
+	$filepath_parts = explode( '/', $rf_filepath );
+	$filename = array_pop( $filepath_parts );
+
+	// Check valid filename/extension: (includes check for locked filenames)
+	logIO( 'File name: '.$filename );
+	if( $error_filename = validate_filename( $filename, false ) )
+	{
+		return xmlrpcs_resperror( 5, $error_filename );
+	}
+
+	// Check valid path parts:
+	$rds_subpath = '';
+	foreach( $filepath_parts as $filepath_part )
+	{
+		if( empty($filepath_part) || $filepath_part == '.' )
+		{	// self ref not useful
+			continue;
+		}
+
+		if( $error = validate_dirname($filepath_part) )
+		{ // invalid relative path:
+			logIO( $error );
+			return xmlrpcs_resperror( 6, $error );
+		}
+
+		$rds_subpath .= $filepath_part.'/';
+	}
+	logIO( 'Subpath: '.$rds_subpath );
+
+	$fileupload_path = $Blog->get_media_dir();
+	if( ! $fileupload_path )
+	{
+		return xmlrpcs_resperror( 7, 'Error accessing Blog media directory.' );
+	}
+
+	$afs_filedir = $fileupload_path.$rds_subpath;
+	$afs_filepath = $afs_filedir.$filename;
+	if( file_exists( $afs_filepath ) )
+	{
+		return xmlrpcs_resperror( 8, 'File exists.' );
+	}
+
+	// Create subdirs, if necessary:
+	if( !empty($rds_subpath) )
+	{
+		if( ! mkdir_r( $afs_filedir ) )
+		{	// Dir didn't already exist and could not be created
+			return xmlrpcs_resperror( 9, 'Error creating sub directories: '.rel_path_to_base($afs_filedir));
+		}
+	}
+
+	logIO( 'Saving to: '.$afs_filepath );
+	$fh = @fopen( $afs_filepath, 'wb' );
+	if( !$fh )
+	{
+		return xmlrpcs_resperror( 10, 'Error opening file for writing.' );
+	}
+
+	$ok = @fwrite($fh, $data);
+	@fclose($fh);
+
+	if ( $ok === false )
+	{
+		return xmlrpcs_resperror( 13, 'Error while writing to file.' );
+	}
+
+	// chmod uploaded file:
+	$chmod = $Settings->get('fm_default_chmod_file');
+	logIO( 'chmod to: '.$chmod );
+	@chmod( $afs_filepath, octdec( $chmod ) );
+
+	$url = $Blog->get_media_url().$rds_subpath.$filename;
+	logIO( 'URL of new file: '.$url );
+
+	// - return URL as XML
+	$urlstruct = new xmlrpcval(array(
+			'url' => new xmlrpcval($url, 'string')
+		), 'struct');
+
+	logIO( 'OK.' );
+	return new xmlrpcresp($urlstruct);
+}
+
+function _wp_or_blogger_getusersblogs( $type, $m )
+{
+	global $xmlsrv_url;
+
+	if ( $type == 'wp')
+	{
+		$username_index = 0;
+		$password_index = 1;
+	}
+	else
+	{
+		$username_index = 1;
+		$password_index = 2;
+	}
+	// CHECK LOGIN:
+	if( ! $current_User = & xmlrpcs_login( $m, $username_index, $password_index ) )
+	{	// Login failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	// LOAD BLOGS tehuser is a member of:
+	$BlogCache = & get_Cache( 'BlogCache' );
+	$blog_array = $BlogCache->load_user_blogs( 'blog_ismember', 'view', $current_User->ID, 'ID' );
+
+	$resp_array = array();
+	foreach( $blog_array as $l_blog_ID )
+	{	// Loop through all blogs that match the requested permission:
+
+		/**
+		 * @var Blog
+		 */
+		$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
+
+		logIO('Current user IS a member of this blog: '.$l_blog_ID);
+		$item = array(
+					'blogid' => new xmlrpcval( $l_blog_ID ),
+					'blogName' => new xmlrpcval( $l_Blog->get('shortname') ),
+					'url' => new xmlrpcval( $l_Blog->gen_blogurl() ),
+					'isAdmin' => new xmlrpcval( $current_User->check_perm( 'templates', 'any' ), 'boolean') );
+		if ( $type == 'wp')
+		{
+			$item['xmlrpc'] = new xmlrpcval ( $xmlsrv_url );
+		}
+
+		$resp_array[] = new xmlrpcval( $item, 'struct');
+	}
+
+	logIO( 'OK.' );
+	return new xmlrpcresp( new xmlrpcval( $resp_array, 'array' ) );
+}
+
 
 /**
  * Helper for {@link b2_getcategories()} and {@link mt_getPostCategories()}, because they differ
@@ -539,6 +885,9 @@ function xmlrpcs_get_maincat( $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/01 16:44:58  waltercruz
+ * Generic functions to avoid alias and allow enable/disabling of specific APIs on future
+ *
  * Revision 1.15  2009/08/31 16:32:26  tblue246
  * Check whether XML-RPC is enabled in xmlsrv/xmlrpc.php
  *

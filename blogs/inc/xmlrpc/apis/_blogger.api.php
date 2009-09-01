@@ -236,39 +236,7 @@ $bloggerdeletepost_sig = array(array($xmlrpcBoolean, $xmlrpcString, $xmlrpcStrin
  */
 function blogger_deletepost($m)
 {
-	global $DB;
-
-	// CHECK LOGIN:
-	if( ! $current_User = & xmlrpcs_login( $m, 2, 3 ) )
-	{	// Login failed, return (last) error:
-		return xmlrpcs_resperror();
-	}
-
-	// GET POST:
-	/**
-	 * @var Item
-	 */
-	if( ! $edited_Item = & xmlrpcs_get_Item( $m, 1 ) )
-	{	// Failed, return (last) error:
-		return xmlrpcs_resperror();
-	}
-
-	// CHECK PERMISSION:
-	if( ! $current_User->check_perm( 'blog_del_post', 'edit', false, $edited_Item->get_blog_ID() ) )
-	{	// Permission denied
-		return xmlrpcs_resperror( 3 );	// User error 3
-	}
-	logIO( 'Permission granted.' );
-
-	// DELETE POST FROM DB:
-	$edited_Item->dbdelete();
-	if( $DB->error )
-	{ // DB error
-		return xmlrpcs_resperror( 99, 'DB error: '.$DB->last_error ); // user error 9
-	}
-
-	logIO( 'OK.' );
-	return new xmlrpcresp(new xmlrpcval(1, 'boolean'));
+	return _mw_blogger_deletepost( $m );
 }
 
 
@@ -301,37 +269,8 @@ $bloggergetusersblogs_sig=array(array($xmlrpcArray, $xmlrpcString, $xmlrpcString
  */
 function blogger_getusersblogs($m)
 {
-	// CHECK LOGIN:
-	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
-	{	// Login failed, return (last) error:
-		return xmlrpcs_resperror();
-	}
-
-	// LOAD BLOGS tehuser is a member of:
-	$BlogCache = & get_Cache( 'BlogCache' );
-	$blog_array = $BlogCache->load_user_blogs( 'blog_ismember', 'view', $current_User->ID, 'ID' );
-
-	$resp_array = array();
-	foreach( $blog_array as $l_blog_ID )
-	{	// Loop through all blogs that match the requested permission:
-
-		/**
-		 * @var Blog
-		 */
-		$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
-
-		logIO('Current user IS a member of this blog: '.$l_blog_ID);
-
-		$resp_array[] = new xmlrpcval( array(
-					'blogid' => new xmlrpcval( $l_blog_ID ),
-					'blogName' => new xmlrpcval( $l_Blog->get('shortname') ),
-					'url' => new xmlrpcval( $l_Blog->gen_blogurl() ),
-					'isAdmin' => new xmlrpcval( $current_User->check_perm( 'templates', 'any' ), 'boolean')
-												), 'struct');
-	}
-
-	logIO( 'OK.' );
-	return new xmlrpcresp( new xmlrpcval( $resp_array, 'array' ) );
+	logIO('blogger_getusersblogs start');
+	return _wp_or_blogger_getusersblogs( 'blogger', $m );
 }
 
 
@@ -593,6 +532,9 @@ $xmlrpc_procs['blogger.getRecentPosts'] = array(
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/01 16:44:57  waltercruz
+ * Generic functions to avoid alias and allow enable/disabling of specific APIs on future
+ *
  * Revision 1.8  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

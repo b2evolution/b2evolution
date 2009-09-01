@@ -52,7 +52,7 @@ function wp_getpagelist( $m )
 
 	// Get the pages to display:
 	load_class( 'items/model/_itemlistlight.class.php' );
-	$MainList = & new ItemListLight( $Blog, NULL, NULL,  NULL );
+	$MainList = & new ItemListLight( $Blog, NULL, NULL,  50000 );
 
 	// Protected and private get checked by statuses_where_clause().
 	$statuses = array( 'published', 'redirected', 'protected', 'private' );
@@ -96,12 +96,45 @@ function wp_getpagelist( $m )
 	return new xmlrpcresp( new xmlrpcval( $data, 'array' ) );
 }
 
+$wordpressgetusersblogs_doc='Retrieve the blogs of the users.';
+$wordpressgetusersblogs_sig=array(array($xmlrpcArray, $xmlrpcString, $xmlrpcString));
+/**
+ * wp.getUsersBlogs returns information about all the blogs a given user is a member of.
+ *
+ * Data is returned as an array of <struct>s containing the ID (blogid), name (blogName),
+ * and URL (url) of each blog.
+ *
+ * Non official: Also return a boolean stating wether or not the user can edit th eblog templates
+ * (isAdmin). Also return a value for xmlrpc url (xmlrpc.
+ *
+ * see {@link http://codex.wordpress.org/XML-RPC_wp#wp.getUsersBlogs}
+ * @see http://comox.textdrive.com/pipermail/wp-xmlrpc/2008-June/000206.html
+ *
+ * @param xmlrpcmsg XML-RPC Message
+ *					0 appkey (string): Unique identifier/passcode of the application sending the post.
+ *						(See access info {@link http://www.blogger.com/developers/api/1_docs/#access} .)
+ *					1 username (string): Login for the Blogger user who's blogs will be retrieved.
+ *					2 password (string): Password for said username.
+ *						(currently not required by b2evo)
+ * @return xmlrpcresp XML-RPC Response, an array of <struct>s containing for each blog:
+ *					- ID (blogid),
+ *					- name (blogName),
+ *					- URL (url),
+ *					- bool: can user edit template? (isAdmin).
+ */
+function wp_getusersblogs($m)
+{
+	logIO('wp_getusersblogs start');
+	return _wp_or_blogger_getusersblogs( 'wp', $m );
+}
+
 
 $wordpressgetpagestatuslist_doc = 'Retrieve all of the WordPress supported page statuses.';
 $wordpressgetpoststatuslist_doc = 'Retrieve post statuses.';
 $wordpressgetpagestatuslist_sig =  array(array($xmlrpcStruct,$xmlrpcString,$xmlrpcString,$xmlrpcString));
 /**
  * wp.getPageStatusList
+ * wp.getPostStatusList
  *
  * @see http://codex.wordpress.org/XML-RPC_wp
  *
@@ -166,18 +199,71 @@ function wp_getpagestatuslist( $m )
 	return new xmlrpcresp(  new xmlrpcval($status_list,'struct') );
 }
 
+$wordpressUploadFile_doc = 'Uploads a file to the media library of the blog';
+$wordpressUploadFile_sig = array(array( $xmlrpcStruct, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcStruct ));
+/**
+ * metaWeblog.newMediaObject  image upload
+ *
+ * image is supplied coded in the info struct as bits
+ *
+ * @see http://www.xmlrpc.com/metaWeblogApi#metaweblognewmediaobject
+ *
+ *
+ * @param xmlrpcmsg XML-RPC Message
+ *					0 blogid (string): Unique identifier of the blog the post will be added to.
+ *						Currently ignored in b2evo, in favor of the category.
+ *					1 username (string): Login for a Blogger user who has permission to edit the given
+ *						post (either the user who originally created it or an admin of the blog).
+ *					2 password (string): Password for said username.
+ *					3 struct (struct)
+ * 							- name : filename
+ * 							- type : mimetype
+ * 							- bits : base64 encoded file
+ * @return xmlrpcresp XML-RPC Response
+ */
+function wp_uploadfile($m)
+{
+	return _wp_mw_newmediaobject( $m );
+}
+
+
+$wordpressgetcats_sig =  array(array($xmlrpcStruct,$xmlrpcString,$xmlrpcString,$xmlrpcString));
+$wordpressgetcats_doc = 'Get categories of a post, MetaWeblog API-style';
+/**
+ * wp.getCategories
+ *
+ * @see http://codex.wordpress.org/XML-RPC_wp#wp.getCategories
+ *
+ * @param xmlrpcmsg XML-RPC Message
+ *					0 blogid (string): Unique identifier of the blog the post will be added to.
+ *						Currently ignored in b2evo, in favor of the category.
+ *					1 username (string): Login for a Blogger user who has permission to edit the given
+ *						post (either the user who originally created it or an admin of the blog).
+ *					2 password (string): Password for said username.
+ */
+function wp_getcategories( $m )
+{
+	return _wp_mw_getcategories ( $m ) ;
+}
+
 
 // Wordpress has some aliases to metaweblog APIS.
 
 $xmlrpc_procs['wp.getCategories'] = array(
-				'function' => 'mw_getcategories',
-				'signature' => $mwgetcats_sig,
-				'docstring' => $mwgetcats_doc );
+				'function' => 'wp_getcategories',
+				'signature' => $wordpressgetcats_sig,
+				'docstring' => $wordpressgetcats_doc );
 
-$xmlrpc_procs['wp.uploadFile '] = array(
-				'function' => 'mw_newmediaobject',
-				'signature' => $mwnewMediaObject_sig,
-				'docstring' => $mwnewMediaObject_doc);
+$xmlrpc_procs['wp.uploadFile'] = array(
+				'function' => 'wp_uploadfile',
+				'signature' => $wordpressUploadFile_sig,
+				'docstring' => $wordpressUploadFile_doc);
+
+//very similar to blogger api
+$xmlrpc_procs['wp.getUsersBlogs'] = array(
+				'function' => 'wp_getusersblogs',
+				'signature' => $wordpressgetusersblogs_sig ,
+				'docstring' => $wordpressgetusersblogs_doc );
 
 // and these we are implementing here.
 
