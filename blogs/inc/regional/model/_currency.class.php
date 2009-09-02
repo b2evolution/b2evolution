@@ -109,6 +109,16 @@ class Currency extends DataObject
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
+	
+	/**
+	 * Check existing of specified currency code in curr_code unique field.
+	 *
+	 * @return ID if currency code exists otherwise NULL/false
+	 */
+	function dbexists()
+	{
+		return parent::dbexists('curr_code', $this->code);		
+	}
 }
 
 /*

@@ -98,9 +98,22 @@ switch( $action )
 		// Load data from request
 		if( $edited_Currency->load_from_Request() )
 		{	// We could load data from form without errors:
-			// Insert in DB:
-			$edited_Currency->dbinsert();
-			$Messages->add( T_('New currency created.'), 'success' );
+			
+			// Insert in DB:		
+			$DB->begin();			
+			$q = $edited_Currency->dbexists();
+			if($q)
+			{
+				param_error( 'edited_currency',
+					sprintf( T_('This currency already exists. Do you want to <a %s>edit the existing currency</a>?'),
+						'href="?ctrl=currencies&amp;action=edit&amp;curr_ID='.$q.'"' ) );
+			}
+			else
+			{
+				$edited_Currency->dbinsert();
+				$Messages->add( T_('New currency created.'), 'success' );				
+			}		
+			$DB->commit();
 
 			// What next?
 			switch( $action )
@@ -136,9 +149,23 @@ switch( $action )
 		// load data from request
 		if( $edited_Currency->load_from_Request() )
 		{	// We could load data from form without errors:
-			// Update in DB:
-			$edited_Currency->dbupdate();
-			$Messages->add( T_('Currency updated.'), 'success' );
+			
+			// Update in DB:			
+			$DB->begin();			
+			$q = $edited_Currency->dbexists();
+			if($q)
+			{
+				param_error( 'edited_currency',
+					sprintf( T_('This currency already exists. Do you want to <a %s>edit the existing currency</a>?'),
+						'href="?ctrl=currencies&amp;action=edit&amp;curr_ID='.$q.'"' ) );
+			}
+			else
+			{
+				$edited_Currency->dbupdate();
+				$Messages->add( T_('Currency updated.'), 'success' );
+			}		
+			$DB->commit();		
+			
 			$action = 'list';
 		}
 

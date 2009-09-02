@@ -88,9 +88,22 @@ switch( $action )
 		// load data from request
 		if( $edited_Goal->load_from_Request() )
 		{	// We could load data from form without errors:
-			// Insert in DB:
-			$edited_Goal->dbinsert();
-			$Messages->add( T_('New goal created.'), 'success' );
+			
+			// Insert in DB:			
+			$DB->begin();			
+			$q = $edited_Goal->dbexists();
+			if($q)
+			{
+				param_error( 'edited_goal',
+					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
+						'href="?ctrl=goals&amp;action=edit&amp;goal_ID='.$q.'"' ) );
+			}
+			else
+			{
+				$edited_Goal->dbinsert();
+				$Messages->add( T_('New goal created.'), 'success' );
+			}		
+			$DB->commit();			
 
 			// What next?
 			switch( $action )
@@ -126,9 +139,23 @@ switch( $action )
 		// load data from request
 		if( $edited_Goal->load_from_Request() )
 		{	// We could load data from form without errors:
-			// Update in DB:
-			$edited_Goal->dbupdate();
-			$Messages->add( T_('Goal updated.'), 'success' );
+			
+			// Update in DB:			
+			$DB->begin();			
+			$q = $edited_Goal->dbexists();
+			if($q)
+			{
+				param_error( 'edited_goal',
+					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
+						'href="?ctrl=goals&amp;action=edit&amp;goal_ID='.$q.'"' ) );
+			}
+			else
+			{
+				$edited_Goal->dbupdate();			
+				$Messages->add( T_('Goal updated.'), 'success' );
+			}		
+			$DB->commit();			
+			
 			$action = 'list';
 		}
 
@@ -229,6 +256,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/02 22:50:49  efy-maxim
+ * Clean error message for currency/goal already exists
+ *
  * Revision 1.12  2009/08/31 20:35:31  fplanque
  * cleanup
  *

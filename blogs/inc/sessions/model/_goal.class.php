@@ -122,11 +122,23 @@ class Goal extends DataObject
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
-
+	
+	/**
+	 * Check existing of specified goal in goal_key unique field.
+	 *
+	 * @return ID if goal exists otherwise NULL/false
+	 */
+	function dbexists()
+	{
+		return parent::dbexists('goal_key', $this->key);		
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/02 22:50:50  efy-maxim
+ * Clean error message for currency/goal already exists
+ *
  * Revision 1.5  2009/08/30 17:27:03  fplanque
  * better NULL param handling all over the app
  *

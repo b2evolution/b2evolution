@@ -347,7 +347,28 @@ class DataObject
 
 		return true;
 	}
-
+	
+	/**
+	 * Check existing of specified value in unique field.
+	 * 
+	 * @param $unique_field name of unique field
+	 * @param $value specified value
+	 * @param $quote quote if unique field represents string value 
+	 * @return ID if value exists otherwise NULL/false
+	 */
+	function dbexists($unique_field, $value, $quote = true)
+	{
+		global $DB;
+		
+		if($quote)
+		{
+			$value = $DB->quote($value);			
+		}
+		
+		$query = "SELECT $this->dbIDname FROM $this->dbtablename 
+					WHERE $unique_field = $value AND $this->dbIDname != $this->ID";
+		return $DB->get_var( $query );			
+	}
 
 	/**
 	 * Check relations for restrictions or cascades
@@ -734,6 +755,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/02 22:50:48  efy-maxim
+ * Clean error message for currency/goal already exists
+ *
  * Revision 1.11  2009/09/02 17:47:23  fplanque
  * doc/minor
  *
