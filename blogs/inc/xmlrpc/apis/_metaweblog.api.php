@@ -166,6 +166,7 @@ $mwnewMediaObject_sig = array(array( $xmlrpcStruct, $xmlrpcString, $xmlrpcString
  */
 function mw_newmediaobject($m)
 {
+	logIO('mw_newmediaobject');
 	return _wp_mw_newmediaobject( $m );
 }
 
@@ -410,6 +411,7 @@ $mwgetcats_doc = 'Get categories of a post, MetaWeblog API-style';
  */
 function mw_getcategories( $m )
 {
+	logIO('mw_getcategories');
 	return _wp_mw_getcategories ( $m ) ;
 }
 
@@ -691,6 +693,9 @@ $xmlrpc_procs['metaWeblog.getUsersBlogs'] = array(
 
 /*
  * $Log$
+ * Revision 1.23  2009/09/02 01:11:34  waltercruz
+ * More logging
+ *
  * Revision 1.22  2009/09/01 16:44:57  waltercruz
  * Generic functions to avoid alias and allow enable/disabling of specific APIs on future
  *

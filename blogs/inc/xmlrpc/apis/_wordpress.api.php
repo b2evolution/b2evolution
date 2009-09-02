@@ -223,6 +223,7 @@ $wordpressUploadFile_sig = array(array( $xmlrpcStruct, $xmlrpcString, $xmlrpcStr
  */
 function wp_uploadfile($m)
 {
+	logIO('wp_uploadfile start');
 	return _wp_mw_newmediaobject( $m );
 }
 
