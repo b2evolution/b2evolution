@@ -150,6 +150,7 @@ $search_engines = array(
 	'yandex.ru/yandsearch',
 	'go.mail.ru/search',
 	'//www.bing.com', //q=
+	'//cc.bingj.com'// q= 
 	'.qip.ru/', // query=
 );
 
