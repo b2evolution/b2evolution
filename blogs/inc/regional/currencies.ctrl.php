@@ -98,9 +98,9 @@ switch( $action )
 		// Load data from request
 		if( $edited_Currency->load_from_Request() )
 		{	// We could load data from form without errors:
-			
-			// Insert in DB:		
-			$DB->begin();			
+
+			// Insert in DB:
+			$DB->begin();
 			$q = $edited_Currency->dbexists();
 			if($q)
 			{
@@ -111,8 +111,8 @@ switch( $action )
 			else
 			{
 				$edited_Currency->dbinsert();
-				$Messages->add( T_('New currency created.'), 'success' );				
-			}		
+				$Messages->add( T_('New currency created.'), 'success' );
+			}
 			$DB->commit();
 
 			// What next?
@@ -149,12 +149,12 @@ switch( $action )
 		// load data from request
 		if( $edited_Currency->load_from_Request() )
 		{	// We could load data from form without errors:
-			
-			// Update in DB:			
-			$DB->begin();			
+
+			// Update in DB:
+			$DB->begin();
 			$q = $edited_Currency->dbexists();
 			if($q)
-			{
+			{ // We have a duplicate entry:
 				param_error( 'edited_currency',
 					sprintf( T_('This currency already exists. Do you want to <a %s>edit the existing currency</a>?'),
 						'href="?ctrl=currencies&amp;action=edit&amp;curr_ID='.$q.'"' ) );
@@ -163,15 +163,15 @@ switch( $action )
 			{
 				$edited_Currency->dbupdate();
 				$Messages->add( T_('Currency updated.'), 'success' );
-			}		
-			$DB->commit();		
-			
-			$action = 'list';
-		}
+			}
+			$DB->commit();
 
-		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( '?ctrl=currencies', 303 ); // Will EXIT
-		// We have EXITed already at this point!!
+			if( empty($q) )
+			{	// If no error, Redirect so that a reload doesn't write to the DB twice:
+				header_redirect( '?ctrl=currencies', 303 ); // Will EXIT
+				// We have EXITed already at this point!!
+			}
+		}
 		break;
 
 	case 'delete':
@@ -252,6 +252,9 @@ $AdminUI->disp_payload_end();
 $AdminUI->disp_global_footer();
 
 /*
- * $Log:
+ * $Log$
+ * Revision 1.4  2009/09/02 23:21:17  fplanque
+ * only redirect if there was no error
+ *
  */
 ?>
