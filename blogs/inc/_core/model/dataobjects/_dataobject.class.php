@@ -348,6 +348,7 @@ class DataObject
 		return true;
 	}
 	
+	
 	/**
 	 * Check existing of specified value in unique field.
 	 * 
@@ -365,9 +366,12 @@ class DataObject
 			$value = $DB->quote($value);			
 		}
 		
-		$query = "SELECT $this->dbIDname FROM $this->dbtablename 
-					WHERE $unique_field = $value AND $this->dbIDname != $this->ID";
-		return $DB->get_var( $query );			
+		$sql = "SELECT $this->dbIDname 
+						  FROM $this->dbtablename 
+					   WHERE $unique_field = $value 
+						   AND $this->dbIDname != $this->ID";
+								
+		return $DB->get_var( $sql );			
 	}
 
 	/**
@@ -755,6 +759,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/02 23:29:34  fplanque
+ * doc
+ *
  * Revision 1.12  2009/09/02 22:50:48  efy-maxim
  * Clean error message for currency/goal already exists
  *

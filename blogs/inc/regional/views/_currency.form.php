@@ -69,6 +69,9 @@ else
 }
 
 /*
- * $Log:
+ * $Log$
+ * Revision 1.3  2009/09/02 23:29:34  fplanque
+ * doc
+ *
  */
 ?>

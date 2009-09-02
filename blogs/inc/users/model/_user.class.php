@@ -780,9 +780,11 @@ class User extends DataObject
 * what do you think?
 * Tblue> That sounds OK. So we would add another option to the global
 * 'files' group perm setting ("Depending on each blog's permissions"), right?
-* Regarding separation: It could make sense. The blog-specific permissions would only
+* fp> yes.
+* tb> Regarding separation: It could make sense. The blog-specific permissions would only
 * affect blog roots (and if "Depending on each blog's permissions" is selected;
 * for the other roots we would add separate (global) settings...
+* fp> yes.
 				 *  - Only a $permlevel of 'add', 'view' or 'edit' can be
 				 *    denied by blog permissions.
 				 *  - If the group grants the 'all' permission, blogs cannot
@@ -1618,6 +1620,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.31  2009/09/02 23:29:34  fplanque
+ * doc
+ *
  * Revision 1.30  2009/09/02 18:41:51  tblue246
  * doc
  *

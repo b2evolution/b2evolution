@@ -122,6 +122,9 @@ class Currency extends DataObject
 }
 
 /*
- * $Log:
+ * $Log$
+ * Revision 1.4  2009/09/02 23:29:34  fplanque
+ * doc
+ *
  */
 ?>
