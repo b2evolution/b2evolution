@@ -117,6 +117,7 @@ class GeneralSettings extends AbstractSettings
 		'eblog_body_terminator' => '___',			// blog by email
 		'eblog_subject_prefix' => 'blog:',			// blog by email
 		'general_xmlrpc' => 1,
+		'xmlrpc_default_title' => '',		//default title for posts created throgh blogger api
 	);
 
 
@@ -189,6 +190,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.19  2009/09/02 13:47:32  waltercruz
+ * Setting the default title fot posts created through blogger API
+ *
  * Revision 1.18  2009/08/31 15:56:39  waltercruz
  * Adding setting to enable/disable xmlrc
  *

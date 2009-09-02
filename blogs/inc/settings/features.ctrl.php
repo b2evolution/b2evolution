@@ -184,6 +184,9 @@ switch( $action )
 			//XML-RPC
 			$Settings->set( 'general_xmlrpc', param( 'general_xmlrpc', 'integer', 0 ) );
 
+			param( 'xmlrpc_default_title', 'string', true );
+			$Settings->set( 'xmlrpc_default_title', trim($xmlrpc_default_title) );
+
 			if( ! $Messages->count('error') )
 			{
 				if( $Settings->dbupdate() )
@@ -220,6 +223,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/02 13:47:31  waltercruz
+ * Setting the default title fot posts created through blogger API
+ *
  * Revision 1.11  2009/08/31 15:56:39  waltercruz
  * Adding setting to enable/disable xmlrc
  *
