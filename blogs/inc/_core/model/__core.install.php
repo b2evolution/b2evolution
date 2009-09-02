@@ -237,11 +237,25 @@ $schema_queries = array(
 			clog_messages             text,
 			PRIMARY KEY (clog_ctsk_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+		
+	'T_currency' => array(
+		'Creating Currencies table',
+		"CREATE TABLE T_currency (
+			curr_ID int(11) unsigned NOT NULL auto_increment,
+			curr_code char(3) NOT NULL,
+			curr_shortcut varchar(8) NOT NULL,
+			curr_name varchar(40) NOT NULL,			
+			PRIMARY KEY curr_ID (curr_ID),
+			UNIQUE curr_code (curr_code)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" )
 );
 
 
 /*
  * $Log$
+ * Revision 1.30  2009/09/02 06:23:59  efy-maxim
+ * Currencies Tab in Global Settings
+ *
  * Revision 1.29  2009/08/30 00:30:52  fplanque
  * increased modularity
  *

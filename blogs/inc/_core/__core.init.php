@@ -45,6 +45,7 @@ $db_config['aliases'] = array(
 		'T_antispam'            => $tableprefix.'antispam',
 		'T_cron__log'           => $tableprefix.'cron__log',
 		'T_cron__task'          => $tableprefix.'cron__task',
+		'T_currency'            => $tableprefix.'currency',
 		'T_groups'              => $tableprefix.'groups',
 		'T_global__cache'       => $tableprefix.'global__cache',
 		'T_locales'             => $tableprefix.'locales',
@@ -77,6 +78,7 @@ $db_config['aliases'] = array(
 $ctrl_mappings = array(
 		'antispam'     => 'antispam/antispam_list.ctrl.php',
 		'crontab'      => 'cron/cronjobs.ctrl.php',
+		'currencies'   => 'regional/currencies.ctrl.php',
 		'features'     => 'settings/features.ctrl.php',
 		'locales'      => 'locales/locales.ctrl.php',
 		'plugins'      => 'plugins/plugins.ctrl.php',
@@ -503,9 +505,12 @@ class _core_Module
 								'regional' => array(
 									'text' => T_('Regional'),
 									'href' => $dispatcher.'?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
+								'currencies' => array(
+									'text' => T_('Currencies'),
+									'href' => $dispatcher.'?ctrl=currencies'),
 								'plugins' => array(
 									'text' => T_('Plugins'),
-									'href' => $dispatcher.'?ctrl=plugins'),
+									'href' => $dispatcher.'?ctrl=plugins'),								
 							)
 						),
 					) );
@@ -584,6 +589,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.20  2009/09/02 06:23:58  efy-maxim
+ * Currencies Tab in Global Settings
+ *
  * Revision 1.19  2009/08/30 00:30:52  fplanque
  * increased modularity
  *

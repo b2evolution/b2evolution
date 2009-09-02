@@ -81,6 +81,7 @@ $map_class_path = array(
 		'coll_search_form_widget' => $inc_path.'widgets/widgets/_coll_search_form.widget.php',
 		'colls_list_public_widget' => $inc_path.'widgets/widgets/_colls_list_public.widget.php',
 		'coll_logo_widget' => $inc_path.'widgets/widgets/_coll_logo.widget.php',
+		'currency' => $inc_path.'regional/model/_currency.class.php',
 		'links_widget' => $inc_path.'widgets/widgets/_links.widget.php',
 		'coll_tagline_widget' => $inc_path.'widgets/widgets/_coll_tagline.widget.php',
 		'free_html_widget' => $inc_path.'widgets/widgets/_free_html.widget.php',
@@ -206,6 +207,9 @@ function duplicate( $Obj )
 
 /*
  * $Log$
+ * Revision 1.18  2009/09/02 06:23:59  efy-maxim
+ * Currencies Tab in Global Settings
+ *
  * Revision 1.17  2009/08/31 20:35:31  fplanque
  * cleanup
  *

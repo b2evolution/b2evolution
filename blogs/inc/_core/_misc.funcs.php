@@ -98,6 +98,10 @@ function & get_Cache( $objectName )
 			load_class( 'chapters/model/_chaptercache.class.php' );
 			$ChapterCache = new ChapterCache(); // COPY (FUNC)
 			return $ChapterCache;
+			
+		case 'CurrencyCache':
+			$CurrencyCache = new DataObjectCache( 'Currency', false, 'T_currency', 'curr_', 'curr_ID', 'curr_code');
+			return $CurrencyCache;
 
 		case 'FileCache':
 			load_class( 'files/model/_filecache.class.php' );
@@ -3558,6 +3562,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.130  2009/09/02 06:23:59  efy-maxim
+ * Currencies Tab in Global Settings
+ *
  * Revision 1.129  2009/08/31 16:14:48  fplanque
  * minor
  *
