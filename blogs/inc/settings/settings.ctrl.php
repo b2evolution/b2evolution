@@ -69,7 +69,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	param_integer_range( 'newusers_level', 0, 9, T_('User level must be between %d and %d.') );
 	$Settings->set( 'newusers_level', $newusers_level );
 
-	if( param( 'default_blog_ID', 'integer', NULL ) !== NULL )
+	if( param( 'default_blog_ID', 'integer', NULL ) != NULL )
 	{
 		$Settings->set( 'default_blog_ID', $default_blog_ID );
 	}
@@ -153,6 +153,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/02 23:27:20  fplanque
+ * != works, doesn't it?
+ *
  * Revision 1.6  2009/09/02 18:01:51  tblue246
  * minor
  *
