@@ -530,17 +530,54 @@ switch( $action )
 			}
 		}
 
+
+		// Plugin Events:
+		$registered_events = $admin_Plugins->get_registered_events( $edit_Plugin );
+
+		$enable_events = array();
+		$disable_events = array();
+		foreach( $edited_plugin_displayed_events as $l_event )
+		{
+			if( ! in_array( $l_event, $registered_events ) )
+			{ // unsupported event
+				continue;
+			}
+			if( isset($edited_plugin_events[$l_event]) && $edited_plugin_events[$l_event] )
+			{
+				$enable_events[] = $l_event; // may be already there
+			}
+			else
+			{ // unset:
+				$disable_events[] = $l_event;
+			}
+		}
+		if( $admin_Plugins->save_events( $edit_Plugin, $enable_events, $disable_events ) )
+		{
+			$Messages->add( T_('Plugin events have been updated.'), 'success' );
+		}
+
+
 		// Plugin code
-		$updated = $admin_Plugins->set_code( $edit_Plugin->ID, $edited_plugin_code );
-		if( is_string( $updated ) )
+		// Check if a ping plugin has a code (which is required) (this has to go after event handling!):
+		if( $admin_Plugins->has_event($edit_Plugin->ID, 'ItemSendPing')
+			&& empty($edited_plugin_code) )
 		{
-			param_error( 'edited_plugin_code', $updated );
-			$action = 'edit_settings';
+			param_error( 'edited_plugin_code', sprintf( T_('This ping plugin needs a non-empty code.'), $edit_Plugin->name ) );
 		}
-		elseif( $updated === 1 )
+		else
 		{
-			$Messages->add( T_('Plugin code updated.'), 'success' );
+			$updated = $admin_Plugins->set_code( $edit_Plugin->ID, $edited_plugin_code );
+			if( is_string( $updated ) )
+			{
+				param_error( 'edited_plugin_code', $updated );
+				$action = 'edit_settings';
+			}
+			elseif( $updated === 1 )
+			{
+				$Messages->add( T_('Plugin code updated.'), 'success' );
+			}
 		}
+
 
 		// Plugin priority
 		if( param_check_range( 'edited_plugin_priority', 0, 100, T_('Plugin priority must be numeric (0-100).'), true ) )
@@ -574,42 +611,17 @@ switch( $action )
 			}
 
 			// Let the plugin handle custom fields:
-			// fp> why can't we call the method directly with $edit_Plugin->PluginSettingsUpdateAction() ??
+			// We use call_method to keep track of this call, although calling the plugins PluginSettingsUpdateAction method directly _might_ work, too.
 			$ok_to_update = $admin_Plugins->call_method( $edit_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params = array() );
 
 			if( $ok_to_update === false )
-			{	// fp> why do we reset here??
+			{	// Rollback settings: the plugin has said they should not get updated.
 				$edit_Plugin->Settings->reset();
 			}
 			elseif( $edit_Plugin->Settings->dbupdate() )
 			{
 				$Messages->add( T_('Plugin settings have been updated.'), 'success' );
 			}
-		}
-
-		// Plugin Events:
-		$registered_events = $admin_Plugins->get_registered_events( $edit_Plugin );
-
-		$enable_events = array();
-		$disable_events = array();
-		foreach( $edited_plugin_displayed_events as $l_event )
-		{
-			if( ! in_array( $l_event, $registered_events ) )
-			{ // unsupported event
-				continue;
-			}
-			if( isset($edited_plugin_events[$l_event]) && $edited_plugin_events[$l_event] )
-			{
-				$enable_events[] = $l_event; // may be already there
-			}
-			else
-			{ // unset:
-				$disable_events[] = $l_event;
-			}
-		}
-		if( $admin_Plugins->save_events( $edit_Plugin, $enable_events, $disable_events ) )
-		{
-			$Messages->add( T_('Plugin events have been updated.'), 'success' );
 		}
 
 		// Check if it can stay enabled, if it is
@@ -970,7 +982,7 @@ switch( $action )
 
 		$Form->begin_form('fform');
 		$Form->hidden( 'ctrl', 'plugins' );
-		$Form->begin_fieldset('Plugin info', array('class' => 'fieldset clear')); // "clear" to fix Konqueror (http://bugs.kde.org/show_bug.cgi?id=117509)
+		$Form->begin_fieldset('Plugin info', array('class' => 'fieldset'));
 		$Form->info_field( T_('Name'), $edit_Plugin->name );
 		$Form->info_field( T_('Code'),
 				( empty($edit_Plugin->code) ? ' - ' : $edit_Plugin->code ),
@@ -1046,6 +1058,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/02 20:19:14  blueyed
+ * plugins controller: Drop li.clear workaround for Konqueror, where it has been fixed.
+ *
  * Revision 1.11  2009/07/06 23:52:24  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *
