@@ -1,5 +1,34 @@
 <?php
-
+/**
+ * This file is part of the evoCore framework - {@link http://evocore.net/}
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
+ *
+ * {@internal License choice
+ * - If you have received this file as part of a package, please find the license.txt file in
+ *   the same folder or the closest folder above for complete license terms.
+ * - If you have received this file individually (e-g: from http://evocms.cvs.sourceforge.net/)
+ *   then you must choose one of the following licenses before using the file:
+ *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
+ *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
+ * }}
+ *
+ * {@internal Open Source relicensing agreement:
+ * The Evo Factory grants Francois PLANQUE the right to license
+ * The Evo Factory's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
+ * @package evocore
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author efy-maxim: Evo Factory / Maxim.
+ * @author fplanque: Francois Planque.
+ *
+ * @version $Id$
+ */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $dispatcher;
@@ -17,7 +46,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'order' => 'curr_code',
 							'td' => '<strong><a href="'.$dispatcher.'?ctrl=currencies&amp;curr_ID=$curr_ID$&amp;action=edit" title="'.
 											T_('Edit this currency...').'">$curr_code$</a></strong>',
-						);	
+						);
 }
 else
 {	// View only:
@@ -40,7 +69,7 @@ $Results->cols[] = array(
 						'order' => 'curr_name',
 						'td' => '$curr_name$',
 					);
-					
+
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
@@ -60,4 +89,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 $Results->display();
 
+/*
+ * $Log:
+ */
 ?>
