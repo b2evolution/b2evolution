@@ -1646,6 +1646,7 @@ class Form extends Widget
 		if( isset($field_params['loop_object_method']) )
 		{
 			$field_options = $field_object->$field_object_callback( $field_value, $allow_none, $field_params['loop_object_method'] );
+			unset( $field_params['loop_object_method'] );
 		}
 		else
 		{
@@ -2940,6 +2941,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.58  2009/09/02 18:08:03  tblue246
+ * Bugfix
+ *
  * Revision 1.57  2009/08/30 00:42:11  fplanque
  * fixed user form
  *
