@@ -46,6 +46,7 @@ $bloggernewpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $
  */
 function blogger_newpost( $m )
 {
+	global $Settings;
 	// CHECK LOGIN:
 	/**
 	 * @var User
@@ -532,6 +533,9 @@ $xmlrpc_procs['blogger.getRecentPosts'] = array(
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/02 13:45:39  waltercruz
+ * Fixing Undefined variable
+ *
  * Revision 1.9  2009/09/01 16:44:57  waltercruz
  * Generic functions to avoid alias and allow enable/disabling of specific APIs on future
  *
