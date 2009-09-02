@@ -150,7 +150,7 @@ $Form->end_fieldset();
 // that way you minimalize security/spam risks by enable just what you need.
 $Form->begin_fieldset( T_('Remote publishing').get_manual_link('remote_publishing') );
 	$Form->checkbox_input( 'general_xmlrpc', $Settings->get('general_xmlrpc'), T_('Enable XML-RPC'), array( 'note' => T_('Enable the Movable Type, MetaWeblog, Blogger and B2 XML-RPC publishing protocols.') ) );
-	$Form->text_input( 'xmlrpc_default_title', $Settings->get('xmlrpc_default_title'), 50, T_('Default Title'), T_("Default title for items created with a XML-RPC API that don't send a title (like blogger API)"), array( 'maxlength' => 255 ) );
+	$Form->text_input( 'xmlrpc_default_title', $Settings->get('xmlrpc_default_title'), 50, T_('Default title'), T_('Default title for items created with a XML-RPC API that doesn\'t send a post title (e. g. the Blogger API).'), array( 'maxlength' => 255 ) );
 $Form->end_fieldset();
 
 
@@ -213,6 +213,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.22  2009/09/02 14:05:32  tblue246
+ * minor
+ *
  * Revision 1.21  2009/09/02 13:47:34  waltercruz
  * Setting the default title fot posts created through blogger API
  *
