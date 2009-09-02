@@ -388,8 +388,7 @@ class Log
 			if( $style == 'ul' )
 			{
 				$disp .= "\t<ul".( $lcssclass['class'] ? " class=\"{$lcssclass['class']}\"" : '' ).'>'
-					.'<li class="clear">' // "clear" to fix Konqueror (http://bugs.kde.org/show_bug.cgi?id=117509)
-					.implode( "</li>\n<li>", $lmessages )."</li></ul>\n";
+					.'<li>'.implode( "</li>\n<li>", $lmessages )."</li></ul>\n";
 			}
 			elseif( $style == 'p' )
 			{
@@ -641,6 +640,9 @@ class Log_noop {
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/02 20:17:50  blueyed
+ * Log: Drop li.clear workaround for Konqueror, where it has been fixed.
+ *
  * Revision 1.8  2009/03/08 23:57:40  fplanque
  * 2009
  *
