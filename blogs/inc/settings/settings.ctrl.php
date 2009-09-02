@@ -69,9 +69,11 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	param_integer_range( 'newusers_level', 0, 9, T_('User level must be between %d and %d.') );
 	$Settings->set( 'newusers_level', $newusers_level );
 
-	param( 'default_blog_ID', 'integer', true );
-	$Settings->set( 'default_blog_ID', $default_blog_ID );
-
+	if( param( 'default_blog_ID', 'integer', NULL ) != NULL )
+	{
+		$Settings->set( 'default_blog_ID', $default_blog_ID );
+	}
+	
 	param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimun password length must be between %d and %d.') );
 	$Settings->set( 'user_minpwdlen', $user_minpwdlen );
 
@@ -151,6 +153,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/02 17:47:25  fplanque
+ * doc/minor
+ *
  * Revision 1.4  2009/03/08 23:57:45  fplanque
  * 2009
  *

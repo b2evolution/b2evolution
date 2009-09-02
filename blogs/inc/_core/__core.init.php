@@ -510,7 +510,7 @@ class _core_Module
 									'href' => $dispatcher.'?ctrl=currencies'),
 								'plugins' => array(
 									'text' => T_('Plugins'),
-									'href' => $dispatcher.'?ctrl=plugins'),								
+									'href' => $dispatcher.'?ctrl=plugins'),
 							)
 						),
 					) );
@@ -589,6 +589,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.21  2009/09/02 17:47:26  fplanque
+ * doc/minor
+ *
  * Revision 1.20  2009/09/02 06:23:58  efy-maxim
  * Currencies Tab in Global Settings
  *

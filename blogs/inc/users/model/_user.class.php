@@ -272,12 +272,16 @@ class User extends DataObject
 	function get_num_posts()
 	{
 		global $DB;
+		global $collections_Module;
 
-		if( is_null( $this->_num_posts ) )
+		if( isset($collections_Module) )
 		{
-			$this->_num_posts = $DB->get_var( 'SELECT count(*)
-																				FROM T_items__item
-																				WHERE post_creator_user_ID = '.$this->ID );
+			if( is_null( $this->_num_posts ) )
+			{
+				$this->_num_posts = $DB->get_var( 'SELECT count(*)
+																					FROM T_items__item
+																					WHERE post_creator_user_ID = '.$this->ID );
+			}
 		}
 
 		return $this->_num_posts;
@@ -752,9 +756,9 @@ class User extends DataObject
 * fp> This is BAD BAD BAD because it's inconsistent with the other permissions
 * in b2evolution. There should NEVER be a denying. ony additional allowing.
 * It's also inconsistent with most other permission systems.
-* The lwoer file permission for groups is now called "No Access" 
-* This should be renamed to "Depending on each blog's permissions" 
-* Whetver general permissions you have on files, blog can give you additional permissions
+* The lower file permission level for groups is now called "No Access"
+* This should be renamed to "Depending on each blog's permissions"
+* Whatever general permissions you have on files, blog can give you additional permissions
 * but they can never take a global perm away.
 * Tblue> On the permissions page it says that the blog perms will be restricted
 * by any global perms, which means to me that a blog cannot grant e. g.
@@ -766,6 +770,14 @@ class User extends DataObject
 * }
 * If this is correct, we should remove the note on the blog permissions
 * pages and the group properties form.
+* fp> ok, I had forgotten we had that old message, but still it doesn't say it will, it says it *may* !
+* To be exact the message should be "
+* Note: General group permissions may further restrict or extend any permissions defined here."
+* Restriction should only happen when "NO ACCESS" is selected
+* But when "Depending on each blog's permissions" is selected, THEN (and I guess ONLY then) the blog permissions should be used
+* Note: This is quite messy actually. maybe it would make more sense to separate group permissions by "root type":
+* i-e nto use the same permission for blog roots vs user root vs shared root vs skins root
+* what do you think?
 				 *  - Only a $permlevel of 'add', 'view' or 'edit' can be
 				 *    denied by blog permissions.
 				 *  - If the group grants the 'all' permission, blogs cannot
@@ -1601,6 +1613,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.29  2009/09/02 17:47:24  fplanque
+ * doc/minor
+ *
  * Revision 1.28  2009/09/01 16:48:31  tblue246
  * doc
  *

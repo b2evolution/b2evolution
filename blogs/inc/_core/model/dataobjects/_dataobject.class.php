@@ -658,6 +658,26 @@ class DataObject
 	}
 
 	/**
+	* EXPERIMENTAL:
+	*/
+	function action_icon( $action, $help_texts = array() )
+	{
+		$help_texts = array_merge( array(
+				'edit' => NT_('Edit this object...'),
+				'delete' => NT_('Delete this object!'),
+			), $help_texts );
+
+		if( ! $this->check_perm($action, false) )
+		{	// permission denied:
+			return '';
+		}
+
+		return action_icon( T_($help_texts[$action]), $action,
+	              				regenerate_url( 'action', $this->dbIDname.'='.$this->ID.'&amp;action='.$action ) );
+	}
+
+
+	/**
 	 * Create icon with dataobject history
 	 */
 	function history_info_icon()
@@ -714,6 +734,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/02 17:47:23  fplanque
+ * doc/minor
+ *
  * Revision 1.10  2009/08/30 02:37:14  fplanque
  * support for simple form processing
  *
