@@ -33,7 +33,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Load Country class (PHP4):
-load_class( 'regional/model/_country.class.php' );
+load_class( 'regional/model/_country.class.php', 'Country' );
 
 /**
  * @var User
@@ -104,7 +104,7 @@ switch( $action )
 			$q = $edited_Country->dbexists();
 			if($q)
 			{	// We have a duplicate entry:
-				
+
 				param_error( 'ctry_code',
 					sprintf( T_('This country already exists. Do you want to <a %s>edit the existing country</a>?'),
 						'href="?ctrl=countries&amp;action=edit&amp;ctry_ID='.$q.'"' ) );
@@ -118,7 +118,7 @@ switch( $action )
 
 			if( empty($q) )
 			{	// What next?
-				
+
 				switch( $action )
 				{
 					case 'create_copy':

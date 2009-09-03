@@ -33,7 +33,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Load Currency class (PHP4):
-load_class( 'regional/model/_currency.class.php' );
+load_class( 'regional/model/_currency.class.php', 'Currency' );
 
 /**
  * @var User
@@ -104,7 +104,7 @@ switch( $action )
 			$q = $edited_Currency->dbexists();
 			if($q)
 			{	// We have a duplicate entry:
-				
+
 				param_error( 'curr_code',
 					sprintf( T_('This currency already exists. Do you want to <a %s>edit the existing currency</a>?'),
 						'href="?ctrl=currencies&amp;action=edit&amp;curr_ID='.$q.'"' ) );
@@ -118,7 +118,7 @@ switch( $action )
 
 			if( empty($q) )
 			{	// What next?
-				
+
 				switch( $action )
 				{
 					case 'create_copy':
@@ -257,6 +257,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/03 14:08:04  fplanque
+ * automated load_class()
+ *
  * Revision 1.5  2009/09/03 07:24:58  efy-maxim
  * 1. Show edit screen again if current currency/goal exists in database.
  * 2. Convert currency code to uppercase
