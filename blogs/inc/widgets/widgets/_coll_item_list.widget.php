@@ -58,13 +58,13 @@ class coll_item_list_Widget extends ComponentWidget
 		 * @var ItemTypeCache
 		 */
 		$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
-
-		$item_type_options = array_merge(
+		// waltercruz> a array merge will generate a array with wrong keys
+		// and the right post type will never be selected
+		$item_type_options = 
 			array(
 				'#' => T_('Default'),
 				''  => T_('All'),
-			),
-			$ItemTypeCache->get_option_array() );
+			) + $ItemTypeCache->get_option_array() ;
 
 		$r = array_merge( array(
 				'title' => array(
@@ -284,8 +284,6 @@ class coll_item_list_Widget extends ComponentWidget
 			$filters['orderby'] = 'main_cat_ID '.$filters['orderby'];
 		}
 
-		// pre_dump( $filters );
-
 		$ItemList->set_filters( $filters, false ); // we don't want to memorize these params
 
 		// Run the query:
@@ -394,6 +392,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/03 15:04:23  waltercruz
+ * Fixing universal item list. array_merge won't work here
+ *
  * Revision 1.8  2009/07/05 16:39:10  sam2kb
  * "Limit" to "Max items"
  *
