@@ -45,6 +45,7 @@ $db_config['aliases'] = array(
 		'T_antispam'            => $tableprefix.'antispam',
 		'T_cron__log'           => $tableprefix.'cron__log',
 		'T_cron__task'          => $tableprefix.'cron__task',
+		'T_country'            => $tableprefix.'country',
 		'T_currency'            => $tableprefix.'currency',
 		'T_groups'              => $tableprefix.'groups',
 		'T_global__cache'       => $tableprefix.'global__cache',
@@ -78,6 +79,7 @@ $db_config['aliases'] = array(
 $ctrl_mappings = array(
 		'antispam'     => 'antispam/antispam_list.ctrl.php',
 		'crontab'      => 'cron/cronjobs.ctrl.php',
+		'countries'   =>  'regional/countries.ctrl.php',
 		'currencies'   => 'regional/currencies.ctrl.php',
 		'features'     => 'settings/features.ctrl.php',
 		'locales'      => 'locales/locales.ctrl.php',
@@ -504,10 +506,13 @@ class _core_Module
 									'href' => $dispatcher.'?ctrl=set_antispam'),
 								'regional' => array(
 									'text' => T_('Regional'),
-									'href' => $dispatcher.'?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
+									'href' => $dispatcher.'?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),								
 								'currencies' => array(
 									'text' => T_('Currencies'),
 									'href' => $dispatcher.'?ctrl=currencies'),
+								'countries' => array(
+									'text' => T_('Countries'),
+									'href' => $dispatcher.'?ctrl=countries'),
 								'plugins' => array(
 									'text' => T_('Plugins'),
 									'href' => $dispatcher.'?ctrl=plugins'),
@@ -589,6 +594,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.22  2009/09/03 10:43:37  efy-maxim
+ * Countries tab in Global Settings section
+ *
  * Revision 1.21  2009/09/02 17:47:26  fplanque
  * doc/minor
  *

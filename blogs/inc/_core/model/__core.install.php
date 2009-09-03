@@ -238,6 +238,16 @@ $schema_queries = array(
 			PRIMARY KEY (clog_ctsk_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 		
+	'T_country' => array(
+		'Creating Countries table',
+		"CREATE TABLE T_country (
+			ctry_ID int(11) unsigned NOT NULL auto_increment,
+			ctry_code char(2) NOT NULL,			
+			ctry_name varchar(40) NOT NULL,			
+			PRIMARY KEY ctry_ID (ctry_ID),
+			UNIQUE ctry_code (ctry_code)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+		
 	'T_currency' => array(
 		'Creating Currencies table',
 		"CREATE TABLE T_currency (
@@ -250,9 +260,11 @@ $schema_queries = array(
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" )
 );
 
-
 /*
  * $Log$
+ * Revision 1.31  2009/09/03 10:43:37  efy-maxim
+ * Countries tab in Global Settings section
+ *
  * Revision 1.30  2009/09/02 06:23:59  efy-maxim
  * Currencies Tab in Global Settings
  *

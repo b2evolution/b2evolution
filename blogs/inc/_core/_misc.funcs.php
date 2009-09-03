@@ -99,6 +99,10 @@ function & get_Cache( $objectName )
 			$ChapterCache = new ChapterCache(); // COPY (FUNC)
 			return $ChapterCache;
 			
+		case 'CountryCache':
+			$CountryCache = new DataObjectCache( 'Country', false, 'T_country', 'ctry_', 'ctry_ID', 'ctry_code');
+			return $CountryCache;	
+			
 		case 'CurrencyCache':
 			$CurrencyCache = new DataObjectCache( 'Currency', false, 'T_currency', 'curr_', 'curr_ID', 'curr_code');
 			return $CurrencyCache;
@@ -3562,6 +3566,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.131  2009/09/03 10:43:37  efy-maxim
+ * Countries tab in Global Settings section
+ *
  * Revision 1.130  2009/09/02 06:23:59  efy-maxim
  * Currencies Tab in Global Settings
  *
