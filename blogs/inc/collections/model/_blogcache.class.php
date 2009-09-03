@@ -60,7 +60,7 @@ class BlogCache extends DataObjectCache
 	function BlogCache()
 	{
 		parent::DataObjectCache( 'Blog', false, 'T_blogs', 'blog_', 'blog_ID', NULL, '',
-			/* TRANS: "None" select option */ T_('No blog') );
+			/* TRANS: "None" select option */ T_('No blog'), 0 );
 	}
 
 
@@ -357,6 +357,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/03 15:51:52  tblue246
+ * Doc, "refix", use "0" instead of an empty string for the "No blog" option.
+ *
  * Revision 1.5  2009/03/08 23:57:42  fplanque
  * 2009
  *

@@ -69,7 +69,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	param_integer_range( 'newusers_level', 0, 9, T_('User level must be between %d and %d.') );
 	$Settings->set( 'newusers_level', $newusers_level );
 
-	if( param( 'default_blog_ID', 'integer', NULL ) != NULL )
+	if( param( 'default_blog_ID', 'integer', NULL ) !== NULL )
 	{
 		$Settings->set( 'default_blog_ID', $default_blog_ID );
 	}
@@ -153,8 +153,14 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/03 15:51:52  tblue246
+ * Doc, "refix", use "0" instead of an empty string for the "No blog" option.
+ *
  * Revision 1.7  2009/09/02 23:27:20  fplanque
  * != works, doesn't it?
+ * Tblue> No, it does _not_. If you select "No blog", the setting does
+ * not get set to 0 because comparing 0 and NULL using the != operator
+ * gives false.
  *
  * Revision 1.6  2009/09/02 18:01:51  tblue246
  * minor
