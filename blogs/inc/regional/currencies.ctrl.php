@@ -103,8 +103,9 @@ switch( $action )
 			$DB->begin();
 			$q = $edited_Currency->dbexists();
 			if($q)
-			{
-				param_error( 'edited_currency',
+			{	// We have a duplicate entry:
+				
+				param_error( 'curr_code',
 					sprintf( T_('This currency already exists. Do you want to <a %s>edit the existing currency</a>?'),
 						'href="?ctrl=currencies&amp;action=edit&amp;curr_ID='.$q.'"' ) );
 			}
@@ -115,24 +116,27 @@ switch( $action )
 			}
 			$DB->commit();
 
-			// What next?
-			switch( $action )
-			{
-				case 'create_copy':
-					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=currencies&action=new&curr_ID='.$edited_Currency->ID, 303 ); // Will EXIT
-					// We have EXITed already at this point!!
-					break;
-				case 'create_new':
-					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=currencies&action=new', 303 ); // Will EXIT
-					// We have EXITed already at this point!!
-					break;
-				case 'create':
-					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=currencies', 303 ); // Will EXIT
-					// We have EXITed already at this point!!
-					break;
+			if( empty($q) )
+			{	// What next?
+				
+				switch( $action )
+				{
+					case 'create_copy':
+						// Redirect so that a reload doesn't write to the DB twice:
+						header_redirect( '?ctrl=currencies&action=new&curr_ID='.$edited_Currency->ID, 303 ); // Will EXIT
+						// We have EXITed already at this point!!
+						break;
+					case 'create_new':
+						// Redirect so that a reload doesn't write to the DB twice:
+						header_redirect( '?ctrl=currencies&action=new', 303 ); // Will EXIT
+						// We have EXITed already at this point!!
+						break;
+					case 'create':
+						// Redirect so that a reload doesn't write to the DB twice:
+						header_redirect( '?ctrl=currencies', 303 ); // Will EXIT
+						// We have EXITed already at this point!!
+						break;
+				}
 			}
 		}
 		break;
@@ -154,8 +158,8 @@ switch( $action )
 			$DB->begin();
 			$q = $edited_Currency->dbexists();
 			if($q)
-			{ // We have a duplicate entry:
-				param_error( 'edited_currency',
+			{ 	// We have a duplicate entry:
+				param_error( 'curr_code',
 					sprintf( T_('This currency already exists. Do you want to <a %s>edit the existing currency</a>?'),
 						'href="?ctrl=currencies&amp;action=edit&amp;curr_ID='.$q.'"' ) );
 			}
@@ -253,6 +257,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/03 07:24:58  efy-maxim
+ * 1. Show edit screen again if current currency/goal exists in database.
+ * 2. Convert currency code to uppercase
+ *
  * Revision 1.4  2009/09/02 23:21:17  fplanque
  * only redirect if there was no error
  *

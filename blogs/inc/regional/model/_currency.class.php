@@ -103,6 +103,7 @@ class Currency extends DataObject
 		switch( $parname )
 		{
 			case 'code':
+				$parvalue = strtoupper($parvalue);
 			case 'shortcut':
 			case 'name':
 			default:
@@ -123,6 +124,10 @@ class Currency extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/03 07:24:58  efy-maxim
+ * 1. Show edit screen again if current currency/goal exists in database.
+ * 2. Convert currency code to uppercase
+ *
  * Revision 1.4  2009/09/02 23:29:34  fplanque
  * doc
  *

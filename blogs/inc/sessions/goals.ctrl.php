@@ -93,8 +93,9 @@ switch( $action )
 			$DB->begin();			
 			$q = $edited_Goal->dbexists();
 			if($q)
-			{
-				param_error( 'edited_goal',
+			{	// We have a duplicate entry:
+				
+				param_error( 'goal_key',
 					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
 						'href="?ctrl=goals&amp;action=edit&amp;goal_ID='.$q.'"' ) );
 			}
@@ -105,24 +106,26 @@ switch( $action )
 			}		
 			$DB->commit();			
 
-			// What next?
-			switch( $action )
-			{
-				case 'create_copy':
-					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=goals&action=new&goal_ID='.$edited_Goal->ID, 303 ); // Will EXIT
-					// We have EXITed already at this point!!
-					break;
-				case 'create_new':
-					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=goals&action=new', 303 ); // Will EXIT
-					// We have EXITed already at this point!!
-					break;
-				case 'create':
-					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=goals', 303 ); // Will EXIT
-					// We have EXITed already at this point!!
-					break;
+			if( empty($q) )
+			{	// What next?
+				switch( $action )
+				{
+					case 'create_copy':
+						// Redirect so that a reload doesn't write to the DB twice:
+						header_redirect( '?ctrl=goals&action=new&goal_ID='.$edited_Goal->ID, 303 ); // Will EXIT
+						// We have EXITed already at this point!!
+						break;
+					case 'create_new':
+						// Redirect so that a reload doesn't write to the DB twice:
+						header_redirect( '?ctrl=goals&action=new', 303 ); // Will EXIT
+						// We have EXITed already at this point!!
+						break;
+					case 'create':
+						// Redirect so that a reload doesn't write to the DB twice:
+						header_redirect( '?ctrl=goals', 303 ); // Will EXIT
+						// We have EXITed already at this point!!
+						break;
+				}
 			}
 		}
 		break;
@@ -144,8 +147,9 @@ switch( $action )
 			$DB->begin();			
 			$q = $edited_Goal->dbexists();
 			if($q)
-			{
-				param_error( 'edited_goal',
+			{	// We have a duplicate entry:
+				
+				param_error( 'goal_key',
 					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
 						'href="?ctrl=goals&amp;action=edit&amp;goal_ID='.$q.'"' ) );
 			}
@@ -154,14 +158,18 @@ switch( $action )
 				$edited_Goal->dbupdate();			
 				$Messages->add( T_('Goal updated.'), 'success' );
 			}		
-			$DB->commit();			
+			$DB->commit();		
 			
-			$action = 'list';
+			if( empty($q) )
+			{
+				$action = 'list';
+				// Redirect so that a reload doesn't write to the DB twice:
+				header_redirect( '?ctrl=goals', 303 ); // Will EXIT
+				// We have EXITed already at this point!!
+			}
 		}
-
-		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( '?ctrl=goals', 303 ); // Will EXIT
-		// We have EXITed already at this point!!
+		
+		
 		break;
 
 	case 'delete':
@@ -256,6 +264,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/03 07:24:58  efy-maxim
+ * 1. Show edit screen again if current currency/goal exists in database.
+ * 2. Convert currency code to uppercase
+ *
  * Revision 1.13  2009/09/02 22:50:49  efy-maxim
  * Clean error message for currency/goal already exists
  *
