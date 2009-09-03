@@ -60,6 +60,7 @@ class coll_item_list_Widget extends ComponentWidget
 		$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
 		// waltercruz> a array merge will generate a array with wrong keys
 		// and the right post type will never be selected
+		// fp> Does adding arrays work in PHP 4 ?
 		$item_type_options = 
 			array(
 				'#' => T_('Default'),
@@ -392,6 +393,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/03 23:52:35  fplanque
+ * minor
+ *
  * Revision 1.9  2009/09/03 15:04:23  waltercruz
  * Fixing universal item list. array_merge won't work here
  *

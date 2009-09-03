@@ -378,12 +378,14 @@ function param_string_not_empty( $var, $err_msg, $field_err_msg = NULL )
 /**
  * Checks if parameter is ISO code (for instance, currency code or country code)
  *
+ * @todo merge into param_check_regexp()
+ *
  * @param string param name
  * @param integer value length
  * @param string error message
  * @return boolean true if OK
  */
-function param_check_iso_code( $var, $length, $err_msg = NULL, $required = false )
+function param_check_iso_code( $var, $length, $err_msg = NULL, $required = true )
 {
 	if( empty( $GLOBALS[$var] ) && ! $required )
 	{
@@ -1977,6 +1979,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.38  2009/09/03 23:52:34  fplanque
+ * minor
+ *
  * Revision 1.37  2009/09/03 18:29:28  efy-maxim
  * currency/country code validators
  *
