@@ -76,14 +76,16 @@ class Currency extends DataObject
 	 */
 	function load_from_Request()
 	{
-		// Code
-		$this->set_string_from_param( 'code', true );
+		// Name
+		$this->set_string_from_param( 'name', true );
 
 		// Shortcut
 		$this->set_string_from_param( 'shortcut', true );
 
-		// Name
-		$this->set_string_from_param( 'name', true );
+		// Code
+		param( 'curr_code', 'string' );
+		param_check_iso_code( 'curr_code', 3, T_('Currency code must be 3 letters parameter.') );
+		$this->set_from_Request( 'code', 'curr_code', true  );
 
 		return ! param_errors_detected();
 	}
@@ -110,7 +112,7 @@ class Currency extends DataObject
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
-	
+
 	/**
 	 * Check existing of specified currency code in curr_code unique field.
 	 *
@@ -118,12 +120,15 @@ class Currency extends DataObject
 	 */
 	function dbexists()
 	{
-		return parent::dbexists('curr_code', $this->code);		
+		return parent::dbexists('curr_code', $this->code);
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/03 18:29:29  efy-maxim
+ * currency/country code validators
+ *
  * Revision 1.5  2009/09/03 07:24:58  efy-maxim
  * 1. Show edit screen again if current currency/goal exists in database.
  * 2. Convert currency code to uppercase

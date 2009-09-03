@@ -49,7 +49,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New currency') : T_('Currency') );
 
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',curr_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
-	$Form->text_input( 'curr_code', $edited_Currency->code, 3, T_('Code'), '', array( 'maxlength'=> 3, 'required'=>true ) );
+	$Form->text_input( 'curr_code', $edited_Currency->code, 3, T_('Code'), '', array( 'maxlength'=> 3 ) );
 
 	$Form->text_input( 'curr_shortcut', $edited_Currency->shortcut, 8, T_('Shortcut'), '', array( 'maxlength'=> 8, 'required'=>true ) );
 
@@ -70,6 +70,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.4  2009/09/03 18:29:29  efy-maxim
+ * currency/country code validators
+ *
  * Revision 1.3  2009/09/02 23:29:34  fplanque
  * doc
  *

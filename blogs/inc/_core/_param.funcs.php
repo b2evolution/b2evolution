@@ -375,6 +375,29 @@ function param_string_not_empty( $var, $err_msg, $field_err_msg = NULL )
 	return param_check_not_empty( $var, $err_msg, $field_err_msg );
 }
 
+/**
+ * Checks if parameter is ISO code (for instance, currency code or country code)
+ *
+ * @param string param name
+ * @param integer value length
+ * @param string error message
+ * @return boolean true if OK
+ */
+function param_check_iso_code( $var, $length, $err_msg = NULL, $required = false )
+{
+	if( empty( $GLOBALS[$var] ) && ! $required )
+	{
+		// ISO code is OK
+		return true;
+	}
+
+	if( ! preg_match( '#^[A-Za-z]{'.$length.'}$#', $GLOBALS[$var] ) )
+	{
+		param_error( $var, $err_msg );
+		return false;
+	}
+	return true;
+}
 
 /**
  * @param string param name
@@ -1954,6 +1977,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.37  2009/09/03 18:29:28  efy-maxim
+ * currency/country code validators
+ *
  * Revision 1.36  2009/08/30 17:27:02  fplanque
  * better NULL param handling all over the app
  *

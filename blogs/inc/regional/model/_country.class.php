@@ -40,7 +40,7 @@ load_class('_core/model/dataobjects/_dataobject.class.php');
  */
 class Country extends DataObject
 {
-	var $code = '';	
+	var $code = '';
 	var $name = '';
 
 	/**
@@ -61,7 +61,7 @@ class Country extends DataObject
  		if( $db_row != NULL )
 		{
 			$this->ID            = $db_row->ctry_ID;
-			$this->code          = $db_row->ctry_code;			
+			$this->code          = $db_row->ctry_code;
 			$this->name          = $db_row->ctry_name;
 		}
 	}
@@ -73,11 +73,13 @@ class Country extends DataObject
 	 */
 	function load_from_Request()
 	{
-		// Code
-		$this->set_string_from_param( 'code', true );		
-
 		// Name
 		$this->set_string_from_param( 'name', true );
+
+		// Code
+		param( 'ctry_code', 'string' );
+		param_check_iso_code( 'ctry_code', 2, T_('Country code must be 2 letters parameter.') );
+		$this->set_from_Request( 'code', 'ctry_code', true  );
 
 		return ! param_errors_detected();
 	}
@@ -97,13 +99,13 @@ class Country extends DataObject
 		switch( $parname )
 		{
 			case 'code':
-				$parvalue = strtoupper($parvalue);			
+				$parvalue = strtolower($parvalue);
 			case 'name':
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
-	
+
 	/**
 	 * Check existing of specified country code in ctry_code unique field.
 	 *
@@ -111,7 +113,7 @@ class Country extends DataObject
 	 */
 	function dbexists()
 	{
-		return parent::dbexists('ctry_code', $this->code);		
+		return parent::dbexists('ctry_code', $this->code);
 	}
 }
 ?>
