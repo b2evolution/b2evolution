@@ -84,7 +84,7 @@ class Currency extends DataObject
 
 		// Code
 		param( 'curr_code', 'string' );
-		param_check_iso_code( 'curr_code', 3, T_('Currency code must be 3 letters parameter.') );
+		param_check_regexp( 'curr_code', '#^[A-Za-z]{3}$#', T_('Currency code must be 3 letters parameter.') );
 		$this->set_from_Request( 'code', 'curr_code', true  );
 
 		return ! param_errors_detected();
@@ -126,6 +126,9 @@ class Currency extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/04 19:00:05  efy-maxim
+ * currency/country codes validators have been improved using param_check_regexp() function
+ *
  * Revision 1.6  2009/09/03 18:29:29  efy-maxim
  * currency/country code validators
  *

@@ -78,7 +78,7 @@ class Country extends DataObject
 
 		// Code
 		param( 'ctry_code', 'string' );
-		param_check_iso_code( 'ctry_code', 2, T_('Country code must be 2 letters parameter.') );
+		param_check_regexp( 'ctry_code', '#^[A-Za-z]{2}$#', T_('Country code must be 2 letters parameter.') );
 		$this->set_from_Request( 'code', 'ctry_code', true  );
 
 		return ! param_errors_detected();
