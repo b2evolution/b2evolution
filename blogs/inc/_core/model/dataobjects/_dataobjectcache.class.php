@@ -96,13 +96,6 @@ class DataObjectCache
 	 */
 	var $none_option_text;
 
-	/**
-	 * The value that gets used for the "None" option in the objects options list.
-	 *
-	 * @var mixed
-	 */
-	var $none_option_value;
-
 
 	/**
 	 * Constructor
@@ -115,9 +108,8 @@ class DataObjectCache
 	 * @param string Name of the name field (including prefix)
 	 * @param string field names or NULL to use name field
 	 * @param string The text that gets used for the "None" option in the objects options list (Default: T_('None')).
-	 * @param mixed  The value that gets used for the "None" option in the objects options list.
 	 */
-	function DataObjectCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname, $name_field = NULL, $order_by = '', $allow_none_text = NULL, $allow_none_value = '' )
+	function DataObjectCache( $objtype, $load_all, $tablename, $prefix = '', $dbIDname, $name_field = NULL, $order_by = '', $allow_none_text = NULL )
 	{
 		$this->objtype = $objtype;
 		$this->load_all = $load_all;
@@ -125,7 +117,6 @@ class DataObjectCache
 		$this->dbprefix = $prefix;
 		$this->dbIDname = $dbIDname;
 		$this->name_field = $name_field;
-		$this->none_option_value = $allow_none_value;
 
 		if( empty( $order_by ) )
 		{
@@ -562,7 +553,7 @@ class DataObjectCache
 	 * Load the cache if necessary
 	 *
 	 * @param integer selected ID
-	 * @param boolean provide a choice for "none" with ID ''
+	 * @param boolean provide a choice for "none" with ID 0
 	 * @param string Callback method name
 	 * @param array IDs to ignore.
 	 * @return string
@@ -585,7 +576,7 @@ class DataObjectCache
 
 		if( $allow_none )
 		{
-			$r .= '<option value="'.$this->none_option_value.'"';
+			$r .= '<option value="0"';
 			if( empty($default) ) $r .= ' selected="selected"';
 			$r .= '>'.format_to_output($this->none_option_text).'</option>'."\n";
 		}
@@ -651,8 +642,8 @@ class DataObjectCache
 
 /*
  * $Log$
- * Revision 1.10  2009/09/03 15:51:51  tblue246
- * Doc, "refix", use "0" instead of an empty string for the "No blog" option.
+ * Revision 1.11  2009/09/04 14:11:06  tblue246
+ * DataObjectCache::get_option_list(): Use 0 instead of empty string for value of "None" option (2nd and better fix)
  *
  * Revision 1.9  2009/03/15 20:35:18  fplanque
  * Universal Item List proof of concept
