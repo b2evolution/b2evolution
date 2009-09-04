@@ -2899,7 +2899,6 @@ class Item extends ItemLight
 	 */
 	function url_link( $params = array() )
 	{
-		global $rsc_url;
 
 		if( empty( $this->url ) )
 		{
@@ -3966,6 +3965,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.131  2009/09/04 17:21:34  waltercruz
+ * minor
+ *
  * Revision 1.130  2009/09/04 17:07:15  waltercruz
  * Showing a player when the attachment is a mp3
  *
