@@ -61,6 +61,7 @@ class coll_item_list_Widget extends ComponentWidget
 		// waltercruz> a array merge will generate a array with wrong keys
 		// and the right post type will never be selected
 		// fp> Does adding arrays work in PHP 4 ?
+		// Tblue> Yes.
 		$item_type_options = 
 			array(
 				'#' => T_('Default'),
@@ -393,6 +394,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/04 13:30:26  tblue246
+ * Doc
+ *
  * Revision 1.10  2009/09/03 23:52:35  fplanque
  * minor
  *
