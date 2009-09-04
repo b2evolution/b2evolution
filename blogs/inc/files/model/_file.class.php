@@ -192,6 +192,14 @@ class File extends DataObject
 	var $_is_image;
 
 	/**
+	 * Is the File an audio file? NULL if unknown
+	 * @var boolean
+	 * @see is_image()
+	 * @access protected
+	 */
+	var $_is_audio;
+
+	/**
 	 * Extension, Mime type, icon, viewtype and 'allowed extension' of the file
 	 * @access protected
 	 * @see File::get_Filetype
@@ -359,6 +367,7 @@ class File extends DataObject
 	{
 		// Unset values that will be determined (and cached) upon request
 		$this->_is_image = NULL;
+		$this->_is_audio = NULL;
 		$this->_lastmod_ts = NULL;
 		$this->_exists = NULL;
 		$this->_perms = NULL;
@@ -417,6 +426,22 @@ class File extends DataObject
 		}
 
 		return $this->_is_image;
+	}
+
+	/**
+	 * Is the File an image?
+	 *
+	 * Tries to determine if it is and caches the info.
+	 *
+	 * @return boolean true if the object is an image, false if not
+	 */
+	function is_audio()
+	{
+		if ( is_null( $this->_is_audio ) )
+		{
+			$this->_is_audio = ( $this->get_ext() == 'mp3');
+		}
+		return $this->_is_audio;
 	}
 
 
@@ -1844,6 +1869,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.44  2009/09/04 17:07:18  waltercruz
+ * Showing a player when the attachment is a mp3
+ *
  * Revision 1.43  2009/08/31 19:19:24  blueyed
  * File::get_tag: use title for alt tag, if the latter info is not provided. Refactor it using get_field_attribs_as_string.
  *
