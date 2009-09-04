@@ -2742,8 +2742,8 @@ class Form extends Widget
 		{
 			$r .= $this->labelstart;
 
-			if( $this->_common_params['clickable_label'] == false )
-			{
+			if( isset( $this->_common_params['clickable_label'] ) && ! $this->_common_params['clickable_label'] )
+			{	// Not set if this method is invoked by ::begin_field()
 				$r .= format_to_output($label, 'htmlbody').$this->label_suffix;
 			}
 			else
@@ -2941,6 +2941,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.59  2009/09/04 16:10:31  tblue246
+ * Fix PHP notice (discovered by waltercruz)
+ *
  * Revision 1.58  2009/09/02 18:08:03  tblue246
  * Bugfix
  *
