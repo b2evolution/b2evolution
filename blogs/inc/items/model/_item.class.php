@@ -1848,25 +1848,22 @@ class Item extends ItemLight
 			// fp> note: it actually makes sense to show directories if the admin chose to link a directory
 			// it may be a convenient way to link 1000 files at once... or even a whole source code tree of folders & files... and let apache do the navigation
 
-/*
 			if ( $File->is_audio() )
 			{
-// fp> TODO: ok with the concept but this function is get_* --> NOT supposed to echo
-				echo '<div class="podplayer">';
-				echo $this->show_player( $File->get_url() );
-				echo '</div>';
+				$r_file[$i]  = '<div class="podplayer">';
+				$r_file[$i] .= $this->get_player( $File->get_url() );
+				$r_file[$i] .= '</div>';
 			}
 			else
-*/
 			{
 				$r_file[$i] = $params['before_file'];
 				$r_file[$i] .= action_icon( T_('Download file'), 'download', $File->get_url(), '', 5 ).' ';
 				$r_file[$i] .= $File->get_view_link( $File->get_name() );
 				$r_file[$i] .= $params['before_file_size'].'('.bytesreadable( $File->get_size() ).')'.$params['after_file_size'];
 				$r_file[$i] .= $params['after_file'];
-
-				$i++;
 			}
+
+			$i++;
 		}
 
 		if( !empty($r_file) )
@@ -2888,12 +2885,20 @@ class Item extends ItemLight
 	}
 
 
-// fp> please add doc
-	function show_player($url)
+	/**
+	 * Get HTML code to display a flash audio player for playback of a
+	 * given URL.
+	 *
+	 * @param string The URL of a MP3 audio file.
+	 * @return string The HTML code.
+	 */
+	function get_player( $url )
 	{
 		global $rsc_url;
+
 		return '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" width="200" height="20" id="dewplayer" align="middle"><param name="wmode" value="transparent"><param name="allowScriptAccess" value="sameDomain" /><param name="movie" value="'.$rsc_url.'swf/dewplayer.swf?mp3='.$url.'&amp;showtime=1" /><param name="quality" value="high" /><param name="bgcolor" value="" /><embed src="'.$rsc_url.'swf/dewplayer.swf?mp3='.$url.'&amp;showtime=1" quality="high" bgcolor="" width="200" height="20" name="dewplayer" wmode="transparent" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></embed></object>';
 	}
+
 
 	/**
 	 * Template function: Display link to item related url.
@@ -2932,7 +2937,7 @@ class Item extends ItemLight
 
 			echo $params['before_podplayer'];
 
-			echo $this->show_player($this->url);
+			echo $this->get_player( $this->url );
 
 			echo $params['after_podplayer'];
 
@@ -3969,6 +3974,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.133  2009/09/05 19:04:23  tblue246
+ * Item::get_files(): Do not output HTML code
+ *
  * Revision 1.132  2009/09/05 18:34:48  fplanque
  * minor
  *
