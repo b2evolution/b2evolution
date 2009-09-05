@@ -60,7 +60,7 @@ class BlogCache extends DataObjectCache
 	function BlogCache()
 	{
 		parent::DataObjectCache( 'Blog', false, 'T_blogs', 'blog_', 'blog_ID', NULL, '',
-			/* TRANS: "None" select option */ T_('No blog') );
+			/* TRANS: "None" select option */ T_('No blog'), 0 );
 	}
 
 
@@ -357,8 +357,11 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
- * Revision 1.7  2009/09/04 14:11:07  tblue246
- * DataObjectCache::get_option_list(): Use 0 instead of empty string for value of "None" option (2nd and better fix)
+ * Revision 1.8  2009/09/05 18:17:40  tblue246
+ * DataObjectCache/BlogCache::get_option_list(): Back again... Allow custom value for "None" option and use 0 for BlogCache.
+ *
+ * Revision 1.6  2009/09/03 15:51:52  tblue246
+ * Doc, "refix", use "0" instead of an empty string for the "No blog" option.
  *
  * Revision 1.5  2009/03/08 23:57:42  fplanque
  * 2009

@@ -161,7 +161,7 @@ class ItemTypeCache extends DataObjectCache
 	 * user/group permissions).
 	 * 
 	 * @param integer The selected ID.
-	 * @param boolean Provide a choice for "none" with ID 0
+	 * @param boolean Provide a choice for "none" with ID ''
 	 * @param string  Callback method name.
 	 * @return string
 	 */
@@ -196,8 +196,8 @@ class ItemTypeCache extends DataObjectCache
 
 /*
  * $Log$
- * Revision 1.7  2009/09/04 14:11:07  tblue246
- * DataObjectCache::get_option_list(): Use 0 instead of empty string for value of "None" option (2nd and better fix)
+ * Revision 1.8  2009/09/05 18:17:40  tblue246
+ * DataObjectCache/BlogCache::get_option_list(): Back again... Allow custom value for "None" option and use 0 for BlogCache.
  *
  * Revision 1.6  2009/08/22 20:31:01  tblue246
  * New feature: Post type permissions
