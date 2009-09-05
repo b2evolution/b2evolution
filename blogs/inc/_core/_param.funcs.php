@@ -59,6 +59,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * - integer
  * - float, double
  * - string (strips (HTML-)Tags, trims whitespace)
+ * - text like string but allows multiple lines
  * - array	(TODO:  array/integer  , array/array/string )
  * - html (does nothing)
  * - '' (does nothing)
@@ -148,30 +149,38 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		switch( $type )
 		{
 			case 'html':
+				if( ! is_scalar($GLOBALS[$var]) )
+				{ // This happens if someone uses "foo[]=x" where "foo" is expected as string
+					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
+				}
+
 				// do nothing
 				if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.$var.'</strong> as RAW Unsecure HTML', 'params' );
 				break;
 
-			case 'string':
-				// strip out any html:
-				// echo $var, '=', $GLOBALS[$var], '<br />';
+			case 'text':
 				if( ! is_scalar($GLOBALS[$var]) )
 				{ // This happens if someone uses "foo[]=x" where "foo" is expected as string
-					// TODO: dh> debug_die() instead?
-					$GLOBALS[$var] = '';
-					$Debuglog->add( 'param(-): <strong>'.$var.'</strong> is not scalar!', 'params' );
+					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
 				}
-				else
-				{
-					$GLOBALS[$var] = trim( strip_tags($GLOBALS[$var]) );
-					// Make sure the string is a single line
-					// TODO: dh> this breaks e.g. multi-line widget params (e.g. "Custom TinyMCE init")
-					//           While this example works without newlines, there are probably places
-					//           where it's more important.
-					//       fp> Someone was hiding text. Can't remember exactly where.
-					//           Make a "multiline-string" where appropriate.
-					$GLOBALS[$var] = preg_replace( '¤\r|\n¤', '', $GLOBALS[$var] );
+
+				// strip out any html:
+				$GLOBALS[$var] = trim( strip_tags($GLOBALS[$var]) );
+				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as text', 'params' );
+				break;
+
+			case 'string':
+				if( ! is_scalar($GLOBALS[$var]) )
+				{ // This happens if someone uses "foo[]=x" where "foo" is expected as string
+					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
 				}
+
+				// strip out any html:
+				// echo $var, '=', $GLOBALS[$var], '<br />';
+				$GLOBALS[$var] = trim( strip_tags($GLOBALS[$var]) );
+				// Make sure the string is a single line
+				$GLOBALS[$var] = preg_replace( '¤\r|\n¤', '', $GLOBALS[$var] );
+
 				$Debuglog->add( 'param(-): <strong>'.$var.'</strong> as string', 'params' );
 				break;
 
@@ -374,6 +383,7 @@ function param_string_not_empty( $var, $err_msg, $field_err_msg = NULL )
 	param( $var, 'string', true );
 	return param_check_not_empty( $var, $err_msg, $field_err_msg );
 }
+
 
 /**
  * @param string param name
@@ -578,8 +588,7 @@ function param_check_isregexp( $var, $err_msg, $field_err_msg = NULL )
 function param_check_regexp( $var, $regexp, $err_msg, $field_err_msg = NULL, $required = true )
 {
 	if( empty( $GLOBALS[$var] ) && ! $required )
-	{
-		// variable is OK
+	{ // empty variable is OK
 		return true;
 	}
 
@@ -1959,6 +1968,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.40  2009/09/05 17:57:55  fplanque
+ * support for multiline/text fields
+ *
  * Revision 1.39  2009/09/04 19:00:04  efy-maxim
  * currency/country codes validators have been improved using param_check_regexp() function
  *
