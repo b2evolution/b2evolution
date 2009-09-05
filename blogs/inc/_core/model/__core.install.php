@@ -237,24 +237,25 @@ $schema_queries = array(
 			clog_messages             text,
 			PRIMARY KEY (clog_ctsk_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
-		
+
 	'T_country' => array(
 		'Creating Countries table',
 		"CREATE TABLE T_country (
 			ctry_ID int(11) unsigned NOT NULL auto_increment,
-			ctry_code char(2) NOT NULL,			
-			ctry_name varchar(40) NOT NULL,			
+			ctry_code char(2) NOT NULL,
+			ctry_name varchar(40) NOT NULL,
+			ctry_curr_ID int(11) unsigned,
 			PRIMARY KEY ctry_ID (ctry_ID),
 			UNIQUE ctry_code (ctry_code)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
-		
+
 	'T_currency' => array(
 		'Creating Currencies table',
 		"CREATE TABLE T_currency (
 			curr_ID int(11) unsigned NOT NULL auto_increment,
 			curr_code char(3) NOT NULL,
-			curr_shortcut varchar(8) NOT NULL,
-			curr_name varchar(40) NOT NULL,			
+			curr_shortcut varchar(30) NOT NULL,
+			curr_name varchar(40) NOT NULL,
 			PRIMARY KEY curr_ID (curr_ID),
 			UNIQUE curr_code (curr_code)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" )
@@ -262,6 +263,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.32  2009/09/05 11:29:28  efy-maxim
+ * Create default currencies and countries. Upgrade currencies and countries.
+ *
  * Revision 1.31  2009/09/03 10:43:37  efy-maxim
  * Countries tab in Global Settings section
  *
