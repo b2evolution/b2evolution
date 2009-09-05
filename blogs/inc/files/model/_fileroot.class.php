@@ -129,12 +129,15 @@ class FileRoot
 				{ // Shared dir is disabled:
 					$Debuglog->add( 'Attempt to access shared dir, but this feature is globally disabled', 'files' );
 				}
-				elseif( ! is_dir( $ads_shared_dir ) )
+				/* Try to create shared directory if it doesn't exist.
+				 * Note: mkdir_r() already checks if the dir to create exists.
+				 */
+				elseif( ! mkdir_r( $ads_shared_dir ) )
 				{
-					// Create shared directory if it doesn't exist yet:
-					if( (!is_admin_page()) || (!mkdir_r( $ads_shared_dir )) )
+					// Only display error on an admin page:
+					if( is_admin_page() )
 					{
-     				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $rds_shared_subdir ).get_manual_link('directory_creation_error'), 'error' );
+						$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be created.'), $rds_shared_subdir ).get_manual_link('directory_creation_error'), 'error' );
 					}
 				}
 				else
@@ -206,6 +209,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/05 19:16:05  tblue246
+ * Correct (?) if condition.
+ *
  * Revision 1.8  2009/08/31 16:56:10  fplanque
  * if-conditions did not seem right
  *
