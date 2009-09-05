@@ -142,6 +142,7 @@ switch( $action )
 		}
 
 		$edited_GenericCategory = & $GenericCategoryCache->new_obj( NULL, $subset_ID );
+		$edited_GenericCategory->blog_ID = $edited_Blog->ID;
 
 		if( isset( $edited_parent_GenericElement ) )
 		{
@@ -424,6 +425,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/05 13:51:11  efy-maxim
+ * pass correct Blog_ID in categories
+ *
  * Revision 1.12  2009/08/30 19:54:25  fplanque
  * less translation messgaes for infrequent errors
  *
