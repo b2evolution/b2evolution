@@ -55,7 +55,9 @@ class Currency extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_currency', 'curr_', 'curr_ID' );
 
-		$this->delete_restrictions = array();
+		$this->delete_restrictions = array(
+				array( 'table'=>'T_country', 'fk'=>'ctry_curr_ID', 'msg'=>T_('%d related countries') ),
+			);
 
   		$this->delete_cascades = array();
 
@@ -126,6 +128,9 @@ class Currency extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/05 14:39:48  efy-maxim
+ * Delete Restrictions for currency
+ *
  * Revision 1.7  2009/09/04 19:00:05  efy-maxim
  * currency/country codes validators have been improved using param_check_regexp() function
  *
