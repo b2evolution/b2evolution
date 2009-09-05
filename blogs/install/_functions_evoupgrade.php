@@ -2440,6 +2440,7 @@ function upgrade_b2evo_tables()
 			) ENGINE = innodb" );
 		task_end();
 
+// todo: call function instead
 		task_begin( 'Creating default currencies... ' );
 		$DB->query( "INSERT INTO T_currency (curr_ID, curr_code, curr_shortcut, curr_name)
 			 VALUES
@@ -2611,6 +2612,8 @@ function upgrade_b2evo_tables()
 			) ENGINE = innodb" );
 		task_end();
 
+
+// todo: call function instead
 		task_begin( 'Creating default countries... ' );
 		$DB->query( "INSERT INTO T_country ( ctry_ID, ctry_code, ctry_name, ctry_curr_ID)
 			VALUES
@@ -3030,6 +3033,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.304  2009/09/05 18:35:07  fplanque
+ * todo
+ *
  * Revision 1.303  2009/09/05 12:59:51  tblue246
  * 1. Partly reverted my last commit, was a bad idea. 2. Added missing (explicit) DB updates.
  *
