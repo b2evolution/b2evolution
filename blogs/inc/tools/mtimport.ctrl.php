@@ -1418,6 +1418,7 @@ function import_data_extract_authors_cats()
 	global $categories_countprim;
 	global $importdata;
 	global $import_mode;
+	global $dispatcher;
 
 	$fp = fopen( $exportedfile, 'rb');
 //slamp_080609_begin: to avoid warning when importing file with 0 bytes of data
@@ -1614,7 +1615,8 @@ function debug_dump( $var, $title = '' )
 
 function chooseexportfile()
 {
-	global $exportedfile, $import_mode;
+	global $exportedfile, $import_mode, $dispatcher;
+
 	// Go through directory:
 	$this_dir = dir( IMPORT_SRC_DIR );
 	$r = '';
@@ -1672,6 +1674,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/05 21:28:07  tblue246
+ * Fixed PHP notice
+ *
  * Revision 1.11  2009/07/06 23:52:25  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *
