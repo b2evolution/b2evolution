@@ -272,7 +272,7 @@ function create_default_data()
 
 	// don't change order of the following two functions as countries has relations to currencies
 	create_default_currencies();
-	create_default_counties();
+	create_default_countries();
 
 	install_basic_skins();
 
@@ -455,7 +455,7 @@ function create_default_currencies()
  * Create default countries with relations to currencies
  *
  */
-function create_default_counties()
+function create_default_countries()
 {
 	global $DB;
 
@@ -1286,6 +1286,10 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.272  2009/09/05 12:27:20  tblue246
+ * - Fix upgrade
+ * - Use create_default_currencies() and create_default_countries() instead of duplicated queries.
+ *
  * Revision 1.271  2009/09/05 11:29:28  efy-maxim
  * Create default currencies and countries. Upgrade currencies and countries.
  *
