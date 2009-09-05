@@ -2323,7 +2323,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 
 	// ADDITIONAL HEADERS:
-	$headers['X-Mailer'] = 'b2evolution '.$app_version.' - PHP/'.phpversion();
+	$headers['X-Mailer'] = $app_name.' '.$app_version.' - PHP/'.phpversion();
 	$headers['X-Remote-Addr'] = implode( ',', get_ip_list() );
 
 
@@ -3566,6 +3566,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.132  2009/09/05 13:43:07  waltercruz
+ * minor
+ *
  * Revision 1.131  2009/09/03 10:43:37  efy-maxim
  * Countries tab in Global Settings section
  *
