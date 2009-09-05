@@ -483,7 +483,7 @@ function require_js( $js_file, $relative_to_base = false )
 	}
 
 	// Be sure to get a fresh copy of this JS file after application upgrades:
-	$js_url = url_add_param( $js_url, 'b2e_ver='.$app_version );
+	$js_url = url_add_param( $js_url, 'v='.$app_version );
 
 	// Add to headlines, if not done already:
 	if( empty( $required_js ) || ! in_array( strtolower($js_url), $required_js ) )
@@ -531,7 +531,7 @@ function require_css( $css_file, $relative_to_base = false, $title = NULL, $medi
 	}
 
 	// Be sure to get a fresh copy of this CSS file after application upgrades:
-	$css_url = url_add_param( $css_url, 'b2e_ver='.$app_version );
+	$css_url = url_add_param( $css_url, 'v='.$app_version );
 
 	// Add to headlines, if not done already:
 	if( empty( $required_css ) || ! in_array( strtolower($css_url), $required_css ) )
@@ -997,6 +997,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.59  2009/09/05 22:12:34  fplanque
+ * made dummy shorter :)
+ *
  * Revision 1.58  2009/09/05 21:04:27  tblue246
  * require_js/require_css(): Add a dummy parameter to JS/CSS URLs to force a cache refresh after application upgrades.
  *
