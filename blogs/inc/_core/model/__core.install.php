@@ -244,7 +244,7 @@ $schema_queries = array(
 			ctry_ID int(11) unsigned NOT NULL auto_increment,
 			ctry_code char(2) NOT NULL,
 			ctry_name varchar(40) NOT NULL,
-			ctry_curr_ID int(11) unsigned,
+			ctry_curr_ID int(11) unsigned NULL,
 			PRIMARY KEY ctry_ID (ctry_ID),
 			UNIQUE ctry_code (ctry_code)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -263,6 +263,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.33  2009/09/05 18:34:47  fplanque
+ * minor
+ *
  * Revision 1.32  2009/09/05 11:29:28  efy-maxim
  * Create default currencies and countries. Upgrade currencies and countries.
  *

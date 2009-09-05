@@ -1848,13 +1848,16 @@ class Item extends ItemLight
 			// fp> note: it actually makes sense to show directories if the admin chose to link a directory
 			// it may be a convenient way to link 1000 files at once... or even a whole source code tree of folders & files... and let apache do the navigation
 
+/*
 			if ( $File->is_audio() )
 			{
+// fp> TODO: ok with the concept but this function is get_* --> NOT supposed to echo
 				echo '<div class="podplayer">';
 				echo $this->show_player( $File->get_url() );
 				echo '</div>';
 			}
 			else
+*/
 			{
 				$r_file[$i] = $params['before_file'];
 				$r_file[$i] .= action_icon( T_('Download file'), 'download', $File->get_url(), '', 5 ).' ';
@@ -2885,6 +2888,7 @@ class Item extends ItemLight
 	}
 
 
+// fp> please add doc
 	function show_player($url)
 	{
 		global $rsc_url;
@@ -3965,6 +3969,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.132  2009/09/05 18:34:48  fplanque
+ * minor
+ *
  * Revision 1.131  2009/09/04 17:21:34  waltercruz
  * minor
  *

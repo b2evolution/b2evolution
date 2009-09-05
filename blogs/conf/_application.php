@@ -59,7 +59,7 @@ $copyright_text ='<span class="nobr">&copy;2001-2002 by Michel V &amp; others</s
  */
 $modules = array(
 		'_core',
-		'collections',
+		'collections',  // TODO: installer won't work without this module
 		'files',
 		'sessions',
 	);
