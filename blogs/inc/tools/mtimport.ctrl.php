@@ -94,7 +94,7 @@ $head .= <<<EOB
 <div id="header">
 	<div id="headinfo">
 		<span style="font-size:150%; font-weight:bold">Movable Type to b2evolution importer</span>
-		[<a href="<?php echo $dispatcher ?>?ctrl=tools">Back to b2evolution</a>]
+		[<a href="{$dispatcher}?ctrl=tools">Back to b2evolution</a>]
 	</div>
 EOB;
 
@@ -1674,6 +1674,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/05 21:37:31  tblue246
+ * More $dispatcher fixes
+ *
  * Revision 1.12  2009/09/05 21:28:07  tblue246
  * Fixed PHP notice
  *
