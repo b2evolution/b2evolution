@@ -172,7 +172,7 @@ class PageCache
 	/**
 	 * @return boolean true if cache has been successfully created
 	 */
-	function cache_create()
+	function cache_create( $clear = true )
 	{
 		// Create by using the filemanager's default chmod. TODO> we may not want to make these publicly readable
 		if( ! mkdir_r( $this->ads_collcache_path, NULL ) )
@@ -180,8 +180,10 @@ class PageCache
 			return false;
 		}
 
-		// Clear contents of folder, if any:
-		cleardir_r( $this->ads_collcache_path );
+		if( $clear )
+		{	// Clear contents of folder, if any:
+			cleardir_r( $this->ads_collcache_path );
+		}
 
 		return true;
 	}
@@ -235,6 +237,13 @@ class PageCache
 			return false;
 		}
 
+		if( ! $this->cache_create( false ) )
+		{	// Make sure that blog cache directory exists
+			$Debuglog->add( 'Could not create cache directory: '.$this->ads_collcache_path, 'cache' );
+			return false;
+		}
+		
+		
 		// TODO: fp> If the user has submitted a comment, we might actually want to invalidate the cache...
 
 
@@ -447,6 +456,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/06 05:40:44  sam2kb
+ * Make sure that blog cache directory exists
+ *
  * Revision 1.8  2009/08/26 19:03:59  tblue246
  * doc
  *
