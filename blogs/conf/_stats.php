@@ -184,6 +184,7 @@ $known_search_params =  array(
 	'text',         // yandex.ru
 	'search_query',	// search.ukr.net
 	'wd',			// baidu.com
+	'keywords',		// gde.ru
 );
 
 
