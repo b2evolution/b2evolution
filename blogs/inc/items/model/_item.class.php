@@ -3103,7 +3103,7 @@ class Item extends ItemLight
 	 *
 	 * This function has to handle all needed DB dependencies!
 	 *
-	 * @deprecated since EVO_NEXT_VERSION. Use set() + dbinsert() instead
+	 * @deprecated Use set() + dbinsert() instead
 	 */
 	function insert(
 		$author_user_ID,              // Author
@@ -3974,6 +3974,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.134  2009/09/06 21:50:24  tblue246
+ * Remove EVO_NEXT_VERSION, which at a point was not replaced and is useless now (since nobody knows by what version it should be replaced now).
+ *
  * Revision 1.133  2009/09/05 19:04:23  tblue246
  * Item::get_files(): Do not output HTML code
  *

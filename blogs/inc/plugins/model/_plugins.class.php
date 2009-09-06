@@ -1865,7 +1865,7 @@ class Plugins
 	// Deprecated stubs: {{{
 
 	/**
-	 * @deprecated since EVO_NEXT_VERSION by Plugins_admin::count_regs()
+	 * @deprecated by Plugins_admin::count_regs()
 	 */
 	function count_regs( $classname )
 	{
@@ -1881,7 +1881,7 @@ class Plugins
 	 *
 	 * It makes sure that the index is handled and writes it to DB.
 	 *
-	 * @deprecated since EVO_NEXT_VERSION by Plugins_admin::set_apply_rendering()
+	 * @deprecated by Plugins_admin::set_apply_rendering()
 	 * @return boolean true if set to new value, false in case of error or if already set to same value
 	 */
 	function set_apply_rendering( $plugin_ID, $apply_rendering )
@@ -1894,7 +1894,7 @@ class Plugins
 	/**
 	 * Validate renderer list.
 	 *
-	 * @deprecated since EVO_NEXT_VERSION by Plugins_admin::validate_renderer_list()
+	 * @deprecated by Plugins_admin::validate_renderer_list()
 	 * @param array renderer codes ('default' will include all "opt-out"-ones)
 	 * @return array validated array of renderer codes
 	 */
@@ -1913,6 +1913,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/06 21:50:25  tblue246
+ * Remove EVO_NEXT_VERSION, which at a point was not replaced and is useless now (since nobody knows by what version it should be replaced now).
+ *
  * Revision 1.13  2009/07/02 21:57:11  blueyed
  * doc fix: move files and classes to the plugins package
  *

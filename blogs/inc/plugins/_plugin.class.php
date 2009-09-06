@@ -1730,7 +1730,7 @@ class Plugin
 	 *   - 'name': name of the setting
 	 *   - 'value': value of the setting (by reference)
 	 *   - 'meta': meta data of the setting (as given in {@link GetDefaultSettings()})
-	 *   - 'action': 'display' or 'set' (since b2evo EVO_NEXT_VERSION)
+	 *   - 'action': 'display' or 'set'
 	 * @return string|NULL Return a string with an error to prevent the setting from being set
 	 *                     and/or a message added to the settings field.
 	 */
@@ -1798,7 +1798,7 @@ class Plugin
 	 *   - 'value': value of the setting (by reference)
 	 *   - 'meta': meta data of the setting (as given in {@link GetDefaultUserSettings()})
 	 *   - 'User': the {@link User} for which the setting is
-	 *   - 'action': 'display' or 'set' (since b2evo EVO_NEXT_VERSION)
+	 *   - 'action': 'display' or 'set'
 	 * @return string|NULL Return a string with an error to prevent the setting from being set
 	 *                     and/or a message added to the settings field.
 	 */
@@ -1818,7 +1818,7 @@ class Plugin
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'User': the {@link User} for which the settings get updated
-	 *   - 'action': "save", "reset" (since b2evo EVO_NEXT_VERSION - before there was only "save")
+	 *   - 'action': "save", "reset"
 	 *
 	 * @return false|NULL Return false to prevent the settings from being updated to DB.
 	 */
@@ -1997,8 +1997,8 @@ class Plugin
 	 *   - 'login': user's login (by reference since 1.10.0)
 	 *   - 'pass': user's password (by reference since 1.10.0)
 	 *   - 'pass_md5': user's md5 password (by reference since 1.10.0)
-	 *   - 'pass_salt': the salt used in "pass_hashed" (by reference) (since EVO_NEXT_VERSION)
-	 *   - 'pass_hashed': if non-empty this is the users passwords hashed. See note above. (by reference) (since EVO_NEXT_VERSION)
+	 *   - 'pass_salt': the salt used in "pass_hashed" (by reference)
+	 *   - 'pass_hashed': if non-empty this is the users passwords hashed. See note above. (by reference)
 	 *   - 'pass_ok': is the password ok for 'login'? (by reference) (since 1.10.0)
 	 */
 	function LoginAttempt( & $params )
@@ -2897,6 +2897,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.29  2009/09/06 21:50:25  tblue246
+ * Remove EVO_NEXT_VERSION, which at a point was not replaced and is useless now (since nobody knows by what version it should be replaced now).
+ *
  * Revision 1.28  2009/08/25 16:54:24  tblue246
  * Doc
  *
