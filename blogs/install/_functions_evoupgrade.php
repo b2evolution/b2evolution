@@ -2474,6 +2474,11 @@ function upgrade_b2evo_tables()
 			ADD COLUMN bloggroup_perm_sidebar	tinyint NOT NULL default 0 AFTER bloggroup_perm_podcast" );
 		task_end();
 
+		task_begin( 'Updating users table... ' );
+		$DB->query( "ALTER TABLE T_users
+			ADD COLUMN user_ctry_ID int(11) unsigned NULL AFTER user_avatar_file_ID" );
+		task_end();
+
 		//set_upgrade_checkpoint( '9970' );
 	}
 
@@ -2626,6 +2631,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.306  2009/09/07 14:42:35  efy-maxim
+ * Create user_ctry_ID column in T_users table in evoupgrade module
+ *
  * Revision 1.305  2009/09/05 18:49:29  tblue246
  * Bad idea was a good idea: Use function call instead of duplicate INSERT statements. Meh.
  *
