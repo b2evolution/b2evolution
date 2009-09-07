@@ -32,6 +32,8 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'regional/model/_currency.class.php', 'Currency' );
+
 /**
  * @var Country
  */
@@ -53,6 +55,10 @@ $Form->begin_form( 'fform', $creating ?  T_('New country') : T_('Country') );
 	$Form->text_input( 'ctry_code', $edited_Country->code, 2, T_('Code'), '', array( 'maxlength'=> 2, 'required'=>true ) );
 
 	$Form->text_input( 'ctry_name', $edited_Country->name, 40, T_('Name'), '', array( 'maxlength'=> 40, 'required'=>true ) );
+
+	$CurrencyCache = & get_Cache( 'CurrencyCache' );
+
+	$Form->select_input_object( 'ctry_curr_ID', $edited_Country->curr_ID, $CurrencyCache, 'Default Currency', $field_params = array('allow_none'=>true) );
 
 if( $creating )
 {

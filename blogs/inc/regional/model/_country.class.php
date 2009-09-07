@@ -42,6 +42,7 @@ class Country extends DataObject
 {
 	var $code = '';
 	var $name = '';
+	var $curr_ID = '';
 
 	/**
 	 * Constructor
@@ -63,6 +64,7 @@ class Country extends DataObject
 			$this->ID            = $db_row->ctry_ID;
 			$this->code          = $db_row->ctry_code;
 			$this->name          = $db_row->ctry_name;
+			$this->curr_ID       = $db_row->ctry_curr_ID;
 		}
 	}
 
@@ -80,6 +82,9 @@ class Country extends DataObject
 		param( 'ctry_code', 'string' );
 		param_check_regexp( 'ctry_code', '#^[A-Za-z]{2}$#', T_('Country code must be 2 letters parameter.') );
 		$this->set_from_Request( 'code', 'ctry_code', true  );
+
+		// Currency Id
+		$this->set_string_from_param('curr_ID', false);
 
 		return ! param_errors_detected();
 	}
@@ -101,6 +106,7 @@ class Country extends DataObject
 			case 'code':
 				$parvalue = strtolower($parvalue);
 			case 'name':
+			case 'curr_ID':
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}

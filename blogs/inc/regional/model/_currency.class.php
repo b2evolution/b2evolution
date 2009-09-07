@@ -124,10 +124,23 @@ class Currency extends DataObject
 	{
 		return parent::dbexists('curr_code', $this->code);
 	}
+
+	/**
+	 * Get currency unique name (code).
+	 *
+	 * @return currency code
+	 */
+	function get_name()
+	{
+		return $this->code;
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/07 12:40:57  efy-maxim
+ * Ability to select the default currency when editing a country
+ *
  * Revision 1.8  2009/09/05 14:39:48  efy-maxim
  * Delete Restrictions for currency
  *

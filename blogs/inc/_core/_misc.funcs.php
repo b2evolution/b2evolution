@@ -98,13 +98,13 @@ function & get_Cache( $objectName )
 			load_class( 'chapters/model/_chaptercache.class.php' );
 			$ChapterCache = new ChapterCache(); // COPY (FUNC)
 			return $ChapterCache;
-			
+
 		case 'CountryCache':
 			$CountryCache = new DataObjectCache( 'Country', false, 'T_country', 'ctry_', 'ctry_ID', 'ctry_code');
-			return $CountryCache;	
-			
+			return $CountryCache;
+
 		case 'CurrencyCache':
-			$CurrencyCache = new DataObjectCache( 'Currency', false, 'T_currency', 'curr_', 'curr_ID', 'curr_code');
+			$CurrencyCache = new DataObjectCache( 'Currency', true, 'T_currency', 'curr_', 'curr_ID', 'curr_code');
 			return $CurrencyCache;
 
 		case 'FileCache':
@@ -3566,6 +3566,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.133  2009/09/07 12:40:56  efy-maxim
+ * Ability to select the default currency when editing a country
+ *
  * Revision 1.132  2009/09/05 13:43:07  waltercruz
  * minor
  *
