@@ -61,6 +61,7 @@ class User extends DataObject
 	var $datecreated;
 	var $level;
 	var $avatar_file_ID;
+	var $ctry_ID;
 
 	/**
 	 * Does the user accept emails through a message form?
@@ -211,6 +212,7 @@ class User extends DataObject
 			$this->notify = $db_row->user_notify;
 			$this->showonline = $db_row->user_showonline;
 			$this->avatar_file_ID = $db_row->user_avatar_file_ID;
+			$this->ctry_ID = $db_row->user_ctry_ID;
 
 			// Group for this user:
 			$this->group_ID = $db_row->user_grp_ID;
@@ -433,6 +435,7 @@ class User extends DataObject
 			case 'validated':
 				return $this->set_param( $parname, 'number', $parvalue ? 1 : 0, $make_null );	// convert boolean
 
+			case 'ctry_ID':
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
@@ -1620,6 +1623,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2009/09/07 14:26:48  efy-maxim
+ * Country field has been added to User form (but without updater)
+ *
  * Revision 1.31  2009/09/02 23:29:34  fplanque
  * doc
  *

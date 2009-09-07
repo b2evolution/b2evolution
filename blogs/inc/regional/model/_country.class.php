@@ -55,7 +55,9 @@ class Country extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_country', 'ctry_', 'ctry_ID' );
 
-		$this->delete_restrictions = array();
+		$this->delete_restrictions = array(
+				array( 'table'=>'T_users', 'fk'=>'user_ctry_ID', 'msg'=>T_('%d related users') ),
+			);
 
   		$this->delete_cascades = array();
 
@@ -110,6 +112,16 @@ class Country extends DataObject
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
+	}
+
+	/**
+	 * Get country name.
+	 *
+	 * @return currency code
+	 */
+	function get_name()
+	{
+		return $this->name;
 	}
 
 	/**

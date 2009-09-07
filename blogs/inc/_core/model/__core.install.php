@@ -110,6 +110,7 @@ $schema_queries = array(
 			user_grp_ID int(4) NOT NULL default 1,
 			user_validated tinyint(1) NOT NULL DEFAULT 0,
 			user_avatar_file_ID int(10) unsigned default NULL,
+			user_ctry_ID int(11) unsigned NULL,
 			PRIMARY KEY user_ID (user_ID),
 			UNIQUE user_login (user_login),
 			KEY user_grp_ID (user_grp_ID)
@@ -263,6 +264,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.34  2009/09/07 14:26:46  efy-maxim
+ * Country field has been added to User form (but without updater)
+ *
  * Revision 1.33  2009/09/05 18:34:47  fplanque
  * minor
  *

@@ -100,7 +100,7 @@ function & get_Cache( $objectName )
 			return $ChapterCache;
 
 		case 'CountryCache':
-			$CountryCache = new DataObjectCache( 'Country', false, 'T_country', 'ctry_', 'ctry_ID', 'ctry_code');
+			$CountryCache = new DataObjectCache( 'Country', true, 'T_country', 'ctry_', 'ctry_ID', 'ctry_code', '', 'Unknown');
 			return $CountryCache;
 
 		case 'CurrencyCache':
@@ -3566,6 +3566,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.134  2009/09/07 14:26:45  efy-maxim
+ * Country field has been added to User form (but without updater)
+ *
  * Revision 1.133  2009/09/07 12:40:56  efy-maxim
  * Ability to select the default currency when editing a country
  *

@@ -276,6 +276,10 @@ if( !$Messages->count('error') )
 			param( 'edited_user_nickname', 'string', true );
 			param_check_not_empty( 'edited_user_nickname', T_('Please enter a nickname (can be the same as your login).') );
 
+			param( 'edited_user_ctry_ID', 'integer', true );
+
+			param_check_number( 'edited_user_ctry_ID', 'Please select a country', true );
+
 			param( 'edited_user_idmode', 'string', true );
 			param( 'edited_user_locale', 'string', true );
 
@@ -313,6 +317,7 @@ if( !$Messages->count('error') )
 			$edited_User->set( 'lastname', $edited_user_lastname );
 			$edited_User->set( 'nickname', $edited_user_nickname );
 			$edited_User->set( 'idmode', $edited_user_idmode );
+			$edited_User->set('ctry_ID', $edited_user_ctry_ID);
 			if( $edited_User->set( 'locale', $edited_user_locale ) && $edited_User->ID == $current_User->ID )
 			{ // locale value has changed for the current user
 				$reload_page = true;
@@ -906,6 +911,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2009/09/07 14:26:49  efy-maxim
+ * Country field has been added to User form (but without updater)
+ *
  * Revision 1.22  2009/08/30 19:54:22  fplanque
  * less translation messgaes for infrequent errors
  *

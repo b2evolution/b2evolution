@@ -35,6 +35,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'regional/model/_country.class.php', 'Country' );
+
 /**
  * @var User
  */
@@ -170,6 +172,11 @@ $Form->begin_fieldset( T_('Identity') );
 		$Form->text_input( 'edited_user_lastname', $edited_User->lastname, 20, T_('Last name'), '', array( 'maxlength' => 50 ) );
 		$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => true ) );
 		$Form->select( 'edited_user_idmode', $edited_User->get( 'idmode' ), array( &$edited_User, 'callback_optionsForIdMode' ), T_('Identity shown') );
+
+		$CountryCache = & get_Cache( 'CountryCache' );
+
+		$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, 'Country', $field_params = array('allow_none'=>true, 'required'=>true) );
+
 		$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
 		$Form->checkbox( 'edited_user_set_login_multiple_sessions', $UserSettings->get('login_multiple_sessions', $edited_User->ID), T_('Multiple sessions'),
 			T_('Check this if you want to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will disconnect you on the previous one.') );
@@ -490,6 +497,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/07 14:26:49  efy-maxim
+ * Country field has been added to User form (but without updater)
+ *
  * Revision 1.13  2009/08/30 00:42:11  fplanque
  * fixed user form
  *
