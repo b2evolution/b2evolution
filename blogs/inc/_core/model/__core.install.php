@@ -110,7 +110,7 @@ $schema_queries = array(
 			user_grp_ID int(4) NOT NULL default 1,
 			user_validated tinyint(1) NOT NULL DEFAULT 0,
 			user_avatar_file_ID int(10) unsigned default NULL,
-			user_ctry_ID int(11) unsigned NULL,
+			user_ctry_ID int(10) unsigned NULL,
 			PRIMARY KEY user_ID (user_ID),
 			UNIQUE user_login (user_login),
 			KEY user_grp_ID (user_grp_ID)
@@ -245,7 +245,7 @@ $schema_queries = array(
 			ctry_ID int(11) unsigned NOT NULL auto_increment,
 			ctry_code char(2) NOT NULL,
 			ctry_name varchar(40) NOT NULL,
-			ctry_curr_ID int(11) unsigned NULL,
+			ctry_curr_ID int(10) unsigned NULL,
 			PRIMARY KEY ctry_ID (ctry_ID),
 			UNIQUE ctry_code (ctry_code)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -264,6 +264,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.35  2009/09/07 23:35:47  fplanque
+ * cleanup
+ *
  * Revision 1.34  2009/09/07 14:26:46  efy-maxim
  * Country field has been added to User form (but without updater)
  *

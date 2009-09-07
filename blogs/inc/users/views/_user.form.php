@@ -174,7 +174,6 @@ $Form->begin_fieldset( T_('Identity') );
 		$Form->select( 'edited_user_idmode', $edited_User->get( 'idmode' ), array( &$edited_User, 'callback_optionsForIdMode' ), T_('Identity shown') );
 
 		$CountryCache = & get_Cache( 'CountryCache' );
-
 		$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, 'Country', $field_params = array('allow_none'=>true, 'required'=>true) );
 
 		$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
@@ -192,6 +191,7 @@ $Form->begin_fieldset( T_('Identity') );
 		$Form->info( T_('Last name'), $edited_User->get('lastname') );
 		$Form->info( T_('Nickname'), $edited_User->get('nickname') );
 		$Form->info( T_('Identity shown'), $edited_User->get('preferredname') );
+		$Form->info( T_('Country'), $edited_User->get_country_name() );
 		$Form->info( T_('Show online'), ($edited_User->get('showonline')) ? T_('yes') : T_('no') );
 		$Form->info( T_('Multiple sessions'), ($UserSettings->get('login_multiple_sessions', $edited_User->ID) ? T_('Allowed') : T_('Forbidden')) );
   }
@@ -497,6 +497,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/07 23:35:49  fplanque
+ * cleanup
+ *
  * Revision 1.14  2009/09/07 14:26:49  efy-maxim
  * Country field has been added to User form (but without updater)
  *

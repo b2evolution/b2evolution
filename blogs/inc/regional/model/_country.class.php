@@ -86,6 +86,7 @@ class Country extends DataObject
 		$this->set_from_Request( 'code', 'ctry_code', true  );
 
 		// Currency Id
+// fp> TODO: curr_ID must NOT accept a string.
 		$this->set_string_from_param('curr_ID', false);
 
 		return ! param_errors_detected();

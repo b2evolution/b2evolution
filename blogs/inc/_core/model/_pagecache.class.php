@@ -237,12 +237,13 @@ class PageCache
 			return false;
 		}
 
+	/* fp> It feels like a waste of time to do this for every page hit 
 		if( ! $this->cache_create( false ) )
 		{	// Make sure that blog cache directory exists
 			$Debuglog->add( 'Could not create cache directory: '.$this->ads_collcache_path, 'cache' );
 			return false;
 		}
-		
+	*/
 		
 		// TODO: fp> If the user has submitted a comment, we might actually want to invalidate the cache...
 
@@ -456,6 +457,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/07 23:35:49  fplanque
+ * cleanup
+ *
  * Revision 1.9  2009/09/06 05:40:44  sam2kb
  * Make sure that blog cache directory exists
  *

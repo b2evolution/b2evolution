@@ -99,6 +99,13 @@ class User extends DataObject
 	var $Group;
 
 	/**
+	 * Country lazy filled
+	 *
+	 * @var country
+	 */
+	var $Country;
+
+	/**
 	 * Blog posts statuses permissions
 	 */
 	var $blog_post_statuses = array();
@@ -263,6 +270,35 @@ class User extends DataObject
 			default:
 				return parent::get($this->idmode);
 		}
+	}
+
+
+	/**
+	 * Get Country object
+	 */
+	function & get_Country()
+	{
+		if( is_null($this->Country) && !empty($this->ctry_ID ) )
+		{
+			$CountryCache = & get_Cache( 'CountryCache' );
+			$this->Country = $CountryCache->get_by_ID( $this->ctry_ID );
+		}
+
+		return $this->Country;
+	}
+
+
+	/**
+	 * Get country name
+	 */
+	function get_country_name()
+	{
+		if( $this->get_Country() )
+		{	// We have a country:
+			return $this->Country->name;
+		}
+
+		return 'UNKNOWN';
 	}
 
 
@@ -1623,6 +1659,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.33  2009/09/07 23:35:49  fplanque
+ * cleanup
+ *
  * Revision 1.32  2009/09/07 14:26:48  efy-maxim
  * Country field has been added to User form (but without updater)
  *

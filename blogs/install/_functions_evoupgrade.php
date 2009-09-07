@@ -2476,7 +2476,7 @@ function upgrade_b2evo_tables()
 
 		task_begin( 'Updating users table... ' );
 		$DB->query( "ALTER TABLE T_users
-			ADD COLUMN user_ctry_ID int(11) unsigned NULL AFTER user_avatar_file_ID" );
+			ADD COLUMN user_ctry_ID int(10) unsigned NULL AFTER user_avatar_file_ID" );
 		task_end();
 
 		//set_upgrade_checkpoint( '9970' );
@@ -2631,6 +2631,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.307  2009/09/07 23:35:51  fplanque
+ * cleanup
+ *
  * Revision 1.306  2009/09/07 14:42:35  efy-maxim
  * Create user_ctry_ID column in T_users table in evoupgrade module
  *
