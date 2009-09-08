@@ -238,8 +238,19 @@ class PageCache
 		}
 
 	/* fp> It feels like a waste of time to do this for every page hit 
-	   sam2kb> I spent 20 minutes trying to figure out why caching doesn't work after upgrade, checked directory perms etc... Do you think that everybody will save cache dir content when they backup/upgrade b2evo? If blog cache directoty is missing users will have to disable and reenable caching for each blog (what if they have 100 blogs), but they won't because they will never know that caching is disabled ;)
-	    
+	   sam2kb> I spent 20 minutes trying to figure out why caching doesn't work after upgrade, 
+		 checked directory perms etc... Do you think that everybody will save cache 
+		 dir content when they backup/upgrade b2evo? 
+		 If blog cache directoty is missing users will have to disable and reenable 
+		 caching for each blog (what if they have 100 blogs), 
+		 but they won't because they will never know that caching is disabled ;)
+		 fp> Yeah, I'm actually still under the illusion that some people will just follow the upgrade instructions.
+		 Anyways, we can try to recreate the cache directory:
+		 	- everytime we upgrade
+			- everytime we try to write to it
+		 We canNOT try to recreate:
+		 	- everytime we try to read from it
+		 		    
 		if( ! $this->cache_create( false ) )
 		{	// Make sure that blog cache directory exists
 			$Debuglog->add( 'Could not create cache directory: '.$this->ads_collcache_path, 'cache' );
@@ -459,6 +470,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/08 21:32:41  fplanque
+ * doc
+ *
  * Revision 1.11  2009/09/08 02:59:33  sam2kb
  * doc
  *
