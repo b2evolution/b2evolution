@@ -220,6 +220,7 @@ if( $action == 'extract' )
 	// Replace various things (see comments)
 	echo 'Automagically search&replace in messages.pot.. ';
 	$data = file_get_contents( $file_pot );
+
 	$data = str_replace( "\r", '', $data );
 	// Make paths relative:
 	$data = preg_replace( '~^#: .*$~me', 'str_replace( \' '.$dir_root.'\', \' ../../../\', \'$0\' )', $data );
