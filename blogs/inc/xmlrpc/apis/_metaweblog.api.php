@@ -533,7 +533,7 @@ $mwgetusersblogs_sig=array(array($xmlrpcArray, $xmlrpcString, $xmlrpcString, $xm
  * Non official: Also return a boolean stating wether or not the user can edit th eblog templates
  * (isAdmin).
  *
- * see {@link http://www.xmlrpc.com/stories/storyReader$2460
+ * @see http://www.xmlrpc.com/stories/storyReader$2460
  *
  * @param xmlrpcmsg XML-RPC Message
  *					0 appkey (string): Unique identifier/passcode of the application sending the post.
@@ -693,6 +693,9 @@ $xmlrpc_procs['metaWeblog.getUsersBlogs'] = array(
 
 /*
  * $Log$
+ * Revision 1.24  2009/09/08 13:51:01  tblue246
+ * phpdoc fixes
+ *
  * Revision 1.23  2009/09/02 01:11:34  waltercruz
  * More logging
  *

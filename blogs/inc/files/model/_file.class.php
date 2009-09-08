@@ -742,7 +742,7 @@ class File extends DataObject
 	/**
 	 * Get date/time of last modification, formatted.
 	 *
-	 $ @param string date format or 'date' or 'time' for default locales.
+	 * @param string date format or 'date' or 'time' for default locales.
 	 * @return string locale formatted date/time
 	 */
 	function get_lastmod_formatted( $format = '#' )
@@ -1869,6 +1869,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.45  2009/09/08 13:51:01  tblue246
+ * phpdoc fixes
+ *
  * Revision 1.44  2009/09/04 17:07:18  waltercruz
  * Showing a player when the attachment is a mp3
  *

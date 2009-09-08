@@ -96,7 +96,7 @@ function form_text( $field_name, $field_value, $field_size, $field_label, $field
 /**
  * Display a select field and populate it with a callback function.
  *
- * @deprecated Deprecated by (@link Form::select_input())
+ * @deprecated Deprecated by {@link Form::select_input()}
  *
  * @param string field name
  * @param string default field value
@@ -277,6 +277,9 @@ function form_formstart( $action, $class = '', $name = '', $method = 'get', $id 
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/08 13:51:00  tblue246
+ * phpdoc fixes
+ *
  * Revision 1.5  2009/03/08 23:57:41  fplanque
  * 2009
  *
