@@ -219,21 +219,10 @@ if( $action == 'extract' )
 
 	// Replace various things (see comments)
 	echo 'Automagically search&replace in messages.pot.. ';
-	$search = array('~\r~'); // TODO: may need to be '\\r' (or even more escaped)
-	$replace = array('');
-
 	$data = file_get_contents( $file_pot );
-	$data = preg_replace( $search, $replace, $data );
-
-	// Build callback:
-	$function = '';
-	// make paths relative to the .po files (this was used for CORE previously only, but matches also plugins)
-	$function .= '$m[0] = str_replace( " '.$dir_root.'", " ../../../", $m[0] );';
-	// Convert forward slashes (unix) in paths to backward slashes (windows),
-	// because unix tools are more likely to handle windows slashes.
-	$function .= 'return str_replace( "/", "\\\\", $m[0] );';
-
-	$data = preg_replace_callback( '~^#: (.*)$~m', create_function( '$m', $function ), $data );
+	$data = str_replace( "\r", '', $data );
+	// Make paths relative:
+	$data = preg_replace( '~^#: .*$~me', 'str_replace( \' '.$dir_root.'\', \' ../../../\', \'$0\' )', $data );
 
 	file_put_contents( $file_pot, $data );
 
