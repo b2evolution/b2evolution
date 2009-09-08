@@ -83,11 +83,12 @@ class Country extends DataObject
 		// Code
 		param( 'ctry_code', 'string' );
 		param_check_regexp( 'ctry_code', '#^[A-Za-z]{2}$#', T_('Country code must be 2 letters parameter.') );
-		$this->set_from_Request( 'code', 'ctry_code', true  );
+		$this->set_from_Request( 'code', 'ctry_code' );
 
 		// Currency Id
-// fp> TODO: curr_ID must NOT accept a string.
-		$this->set_string_from_param('curr_ID', false);
+		param( 'ctry_curr_ID', 'integer' );
+		param_check_number( 'ctry_curr_ID', 'Please select a currency' );
+		$this->set_from_Request( 'curr_ID', 'ctry_curr_ID', true );
 
 		return ! param_errors_detected();
 	}

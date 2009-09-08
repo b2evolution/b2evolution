@@ -100,11 +100,11 @@ function & get_Cache( $objectName )
 			return $ChapterCache;
 
 		case 'CountryCache':
-			$CountryCache = new DataObjectCache( 'Country', true, 'T_country', 'ctry_', 'ctry_ID', 'ctry_code', '', 'Unknown');
+			$CountryCache = new DataObjectCache( 'Country', true, 'T_country', 'ctry_', 'ctry_ID', 'ctry_code', 'ctry_name', 'Unknown');
 			return $CountryCache;
 
 		case 'CurrencyCache':
-			$CurrencyCache = new DataObjectCache( 'Currency', true, 'T_currency', 'curr_', 'curr_ID', 'curr_code');
+			$CurrencyCache = new DataObjectCache( 'Currency', true, 'T_currency', 'curr_', 'curr_ID', 'curr_code', 'curr_code');
 			return $CurrencyCache;
 
 		case 'FileCache':
@@ -3566,6 +3566,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.135  2009/09/08 08:03:20  efy-maxim
+ * 1. Countries order has been fixed in Edit User form; 2. Currency ID validator has been added to Country class, but it can be empty.
+ *
  * Revision 1.134  2009/09/07 14:26:45  efy-maxim
  * Country field has been added to User form (but without updater)
  *
