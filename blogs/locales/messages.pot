@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 3.4.0-dev\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2009-09-08 16:48+0200\n"
+"POT-Creation-Date: 2009-09-09 22:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2000,24 +2000,24 @@ msgstr ""
 msgid "Selection deleted."
 msgstr ""
 
-#: ../../../inc/_main.inc.php:468
-#: ../../../inc/_main.inc.php:479
+#: ../../../inc/_main.inc.php:491
+#: ../../../inc/_main.inc.php:502
 msgid "The login window has expired. Please try again."
 msgstr ""
 
-#: ../../../inc/_main.inc.php:473
+#: ../../../inc/_main.inc.php:496
 msgid "Either you have not enabled cookies or this login window has expired."
 msgstr ""
 
-#: ../../../inc/_main.inc.php:509
+#: ../../../inc/_main.inc.php:532
 msgid "Wrong login/password."
 msgstr ""
 
-#: ../../../inc/_main.inc.php:542
+#: ../../../inc/_main.inc.php:565
 msgid "You must log in!"
 msgstr ""
 
-#: ../../../inc/_main.inc.php:560
+#: ../../../inc/_main.inc.php:583
 msgid "You must validate your email address before you can log in."
 msgstr ""
 
@@ -4143,7 +4143,7 @@ msgid "title"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_general.form.php:108
-msgid "Archive sort order"
+msgid "Archive sorting"
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_general.form.php:108

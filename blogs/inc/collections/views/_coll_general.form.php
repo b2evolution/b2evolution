@@ -105,7 +105,7 @@ $Form->begin_fieldset( T_('Content / Posts') );
 	$Form->radio( 'archives_sort_order',  $edited_Blog->get_setting('archives_sort_order'),
 							array(  array( 'date', T_('date') ),
 											array( 'title', T_('title') ),
-										), T_('Archive sort order'), false,  T_('How to sort your archives? (only in post by post mode)') );
+										), T_('Archive sorting'), false,  T_('How to sort your archives? (only in post by post mode)') );
 $Form->end_fieldset();
 
 
@@ -122,6 +122,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/09 20:34:28  tblue246
+ * Translation update
+ *
  * Revision 1.14  2009/08/31 17:21:32  fplanque
  * minor
  *
