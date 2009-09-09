@@ -194,7 +194,7 @@ class File extends DataObject
 	/**
 	 * Is the File an audio file? NULL if unknown
 	 * @var boolean
-	 * @see is_image()
+	 * @see is_audio()
 	 * @access protected
 	 */
 	var $_is_audio;
@@ -429,17 +429,17 @@ class File extends DataObject
 	}
 
 	/**
-	 * Is the File an image?
+	 * Is the File an audio file?
 	 *
 	 * Tries to determine if it is and caches the info.
 	 *
-	 * @return boolean true if the object is an image, false if not
+	 * @return boolean true if the object is an audio file, false if not
 	 */
 	function is_audio()
 	{
 		if ( is_null( $this->_is_audio ) )
 		{
-			$this->_is_audio = ( $this->get_ext() == 'mp3');
+			$this->_is_audio = in_array($this->get_ext(), array('mp3', 'oga'));
 		}
 		return $this->_is_audio;
 	}
@@ -1869,6 +1869,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.46  2009/09/09 19:05:39  blueyed
+ * is_audio: fix doc, add oga to audio file extensions.
+ *
  * Revision 1.45  2009/09/08 13:51:01  tblue246
  * phpdoc fixes
  *
