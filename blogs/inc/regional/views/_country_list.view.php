@@ -36,14 +36,13 @@ load_class( 'regional/model/_currency.class.php', 'Currency' );
 
 global $dispatcher;
 
-$sql='
-SELECT ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_name 
-FROM T_country LEFT JOIN T_currency ON ctry_curr_ID=curr_ID
-';
-$count_sql='SELECT count(*) FROM T_country';
+$sql = 'SELECT ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_name 
+			FROM T_country
+			LEFT JOIN T_currency ON ctry_curr_ID=curr_ID';
+$count_sql = 'SELECT count(*) FROM T_country';
 
 // Create result set:
-$Results = & new Results( $sql, 'ctry_', 'D', NULL, $count_sql);
+$Results = & new Results( $sql, 'ctry_', 'D', NULL, $count_sql );
 
 //$Results->Cache = & get_Cache( 'CountryCache' );
 $Results->title = T_('Countries list');
@@ -60,8 +59,9 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	$Results->cols[] = array(
 							'th' => T_('Name'),
 							'order' => 'ctry_name',
-							'td' => '<strong><a href="'.$dispatcher.'?ctrl=countries&amp;ctry_ID=$ctry_ID$&amp;action=edit" title="'.
-											T_('Edit this country...').'">$ctry_name$</a></strong>',
+							'td' => '<strong><a href="'.$dispatcher
+								   .'?ctrl=countries&amp;ctry_ID=$ctry_ID$&amp;action=edit" title="'
+								   .T_('Edit this country...').'">$ctry_name$</a></strong>',
 						);
 }
 else
@@ -88,16 +88,23 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
 							'td' => action_icon( T_('Edit this country...'), 'edit',
-	                        '%regenerate_url( \'action\', \'ctry_ID=$ctry_ID$&amp;action=edit\')%' )
-	                    .action_icon( T_('Duplicate this country...'), 'copy',
-	                        '%regenerate_url( \'action\', \'ctry_ID=$ctry_ID$&amp;action=new\')%' )
-	                    .action_icon( T_('Delete this country!'), 'delete',
-	                        '%regenerate_url( \'action\', \'ctry_ID=$ctry_ID$&amp;action=delete\')%' ),
+										'%regenerate_url( \'action\', \'ctry_ID=$ctry_ID$&amp;action=edit\')%' )
+									.action_icon( T_('Duplicate this country...'), 'copy',
+										'%regenerate_url( \'action\', \'ctry_ID=$ctry_ID$&amp;action=new\')%' )
+									.action_icon( T_('Delete this country!'), 'delete',
+										'%regenerate_url( \'action\', \'ctry_ID=$ctry_ID$&amp;action=delete\')%' ),
 						);
 
-  $Results->global_icon( T_('Create a new country ...'), 'new', regenerate_url( 'action', 'action=new'), T_('New country').' &raquo;', 3, 4  );
+	$Results->global_icon( T_('Create a new country ...'), 'new',
+				regenerate_url( 'action', 'action=new'), T_('New country').' &raquo;', 3, 4  );
 }
 
 $Results->display();
 
+/*
+ * $Log$
+ * Revision 1.5  2009/09/10 19:14:08  tblue246
+ * Re-added CVS log block; coding style.
+ *
+ */
 ?>
