@@ -12,10 +12,12 @@ class Message extends DataObject
 {
 	/**
 	 * Available message statuses constants
+	 *
+	 * @internal Tblue> Class constants are PHP5-only!
 	 */
-	const AUTHOR = 0;
-	const READ = 1;
-	const UNREAD = 2;
+	var $AUTHOR = 0;
+	var $READ = 1;
+	var $UNREAD = 2;
 
 	var $thread_ID;
 	var $author_user_ID;
@@ -151,9 +153,9 @@ class Message extends DataObject
 
 			foreach ($this->Thread->recipients_list as $recipient_ID)
 			{
-				$sql .= ' ('.$this->thread_ID.', '.$this->ID.', '.$recipient_ID.', '.Message::UNREAD.'),';
+				$sql .= ' ('.$this->thread_ID.', '.$this->ID.', '.$recipient_ID.', '.$this->UNREAD.'),';
 			}
-			$sql .= ' ('.$this->thread_ID.', '.$this->ID.', '.$this->author_user_ID.', '.Message::AUTHOR.')';
+			$sql .= ' ('.$this->thread_ID.', '.$this->ID.', '.$this->author_user_ID.', '.$this->AUTHOR.')';
 
 			$DB->query( $sql, 'Insert message statuses' );
 		}
