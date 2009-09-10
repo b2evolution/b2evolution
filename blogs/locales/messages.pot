@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 3.4.0-dev\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2009-09-09 22:28+0200\n"
+"POT-Creation-Date: 2009-09-10 15:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2995,6 +2995,7 @@ msgstr ""
 #: ../../../inc/chapters/views/_chapter_list.view.php:197
 #: ../../../inc/items/views/_item_expert.form.php:349
 #: ../../../inc/items/views/_item_list_full.view.php:144
+#: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:66
 msgid "Order"
 msgstr ""
 
@@ -12067,10 +12068,15 @@ msgid "List of all categories; click filters blog on selected category."
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_coll_category_list.widget.php:94
+#: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:60
+#: ../../../inc/widgets/widgets/_coll_common_links.widget.php:90
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:69
+#: ../../../inc/widgets/widgets/_coll_longdesc.widget.php:88
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:62
+#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:86
 #: ../../../inc/widgets/widgets/_coll_tag_cloud.widget.php:102
 #: ../../../inc/widgets/widgets/_free_html.widget.php:96
+#: ../../../inc/widgets/widgets/_user_tools.widget.php:59
 #: ../../../plugins/_archives.plugin.php:315
 msgid "Block title"
 msgstr ""
@@ -13052,7 +13058,7 @@ msgid "This version is too old!"
 msgstr ""
 
 #: ../../../install/_functions_evoupgrade.php:255
-msgid "This version is too recent! We cannot downgrade to it!"
+msgid "This version is too recent! We cannot downgrade to the version you are trying to install..."
 msgstr ""
 
 #: ../../../install/_functions_evoupgrade.php:621

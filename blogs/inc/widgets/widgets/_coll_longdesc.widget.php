@@ -85,7 +85,7 @@ class coll_longdesc_Widget extends ComponentWidget
 	{
 		$r = array_merge( array(
 				'title' => array(
-					'label' => t_('Block title'),
+					'label' => T_('Block title'),
 					'note' => T_( 'Title to display in your skin.' ),
 					'size' => 40,
 					'defaultvalue' => '',
@@ -125,6 +125,9 @@ class coll_longdesc_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/10 13:44:57  tblue246
+ * Translation fixes/update
+ *
  * Revision 1.8  2009/03/14 15:27:01  blueyed
  * coll_longdesc_Widget: do not add hardcoded P tags around the long desc, which can be html itself
  *

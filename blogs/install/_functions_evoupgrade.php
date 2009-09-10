@@ -252,7 +252,7 @@ function upgrade_b2evo_tables()
 	echo $old_db_version, ' : ';
 
 	if( $old_db_version < 8000 ) debug_die( T_('This version is too old!') );
-	if( $old_db_version > $new_db_version ) debug_die( T_('This version is too recent! We cannot downgrade to it!') );
+	if( $old_db_version > $new_db_version ) debug_die( T_('This version is too recent! We cannot downgrade to the version you are trying to install...') );
 	echo "OK.<br />\n";
 
 
@@ -2662,6 +2662,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.310  2009/09/10 13:44:57  tblue246
+ * Translation fixes/update
+ *
  * Revision 1.309  2009/09/10 13:10:37  efy-maxim
  * int(11) has been changed to int(10) for PKs of T_country, T_currency tables
  *

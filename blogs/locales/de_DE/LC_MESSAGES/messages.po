@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 3.1.0-beta\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
-"POT-Creation-Date: 2009-09-09 22:28+0200\n"
-"PO-Revision-Date: 2009-09-09 22:30+0100\n"
+"POT-Creation-Date: 2009-09-10 15:34+0200\n"
+"PO-Revision-Date: 2009-09-10 15:36+0100\n"
 "Last-Translator: Tilman Blumenbach <tilman (at) ax86 (dot) net>\n"
 "Language-Team: Tilman Blumenbach <tilman (at) ax86 (dot) net>\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +26,7 @@ msgstr ""
 "X-Poedit-Language: German\n"
 "X-Poedit-SourceCharset: iso-8859-1\n"
 "X-Poedit-Basepath: /home/tilman/public_html/b2evo/cvs/HEAD/blogs/locales/de_DE/LC_MESSAGES\n"
-"X-Poedit-Bookmarks: 786,787,-1,2100,-1,-1,-1,-1,-1,-1\n"
+"X-Poedit-Bookmarks: 2506,787,-1,2100,-1,-1,-1,-1,-1,-1\n"
 
 #: ../../../a_noskin.php:236
 #: ../../../inc/_core/__core.init.php:248
@@ -423,7 +423,7 @@ msgstr "Runter"
 #: ../../../inc/_core/ui/results/_results.class.php:1464
 #: ../../../inc/_core/ui/results/_results.class.php:1474
 msgid "Sort by order"
-msgstr "Nach Folge sortieren"
+msgstr "Nach Reihenfolge sortieren"
 
 #: ../../../conf/_icons.php:469
 #: ../../../inc/items/model/_itemlistlight.class.php:1027
@@ -1171,7 +1171,7 @@ msgstr "Tracker"
 
 #: ../../../inc/_core/__core.init.php:207
 msgid "All Items"
-msgstr "Alle Einträge"
+msgstr "Alle Elemente"
 
 #: ../../../inc/_core/__core.init.php:240
 #: ../../../inc/files/_files.init.php:81
@@ -1439,7 +1439,7 @@ msgstr "Veröffentlichungsdatum (Standard)"
 
 #: ../../../inc/_core/_misc.funcs.php:3500
 msgid "Order (as explicitely specified)"
-msgstr "Anordnung (wie angegeben)"
+msgstr "Reihenfolge (wie angegeben)"
 
 #: ../../../inc/_core/_misc.funcs.php:3503
 msgid "Date created"
@@ -1471,7 +1471,7 @@ msgstr "Ansichten"
 
 #: ../../../inc/_core/_misc.funcs.php:3508
 msgid "Random order!"
-msgstr "Zufällige Anordnung!"
+msgstr "Zufällige Reihenfolge!"
 
 #: ../../../inc/_core/_param.funcs.php:111
 #, php-format
@@ -1891,7 +1891,7 @@ msgstr "Sortierung ändern"
 #: ../../../skins_adm/chicago/_adminUI.class.php:218
 #: ../../../skins_adm/chicago/_adminUI.class.php:220
 msgid "Ascending order"
-msgstr "Aufsteigende Sortierung"
+msgstr "Aufsteigende Reihenfolge"
 
 #: ../../../inc/_core/ui/_uiwidget.class.php:814
 #: ../../../skins_adm/_adminUI_general.class.php:765
@@ -1901,7 +1901,7 @@ msgstr "Aufsteigende Sortierung"
 #: ../../../skins_adm/chicago/_adminUI.class.php:222
 #: ../../../skins_adm/chicago/_adminUI.class.php:224
 msgid "Descending order"
-msgstr "Absteigende Sortierung"
+msgstr "Absteigende Reihenfolge"
 
 #: ../../../inc/_core/ui/forms/_form.class.php:1060
 #: ../../../inc/collections/views/_coll_general.form.php:91
@@ -2701,7 +2701,7 @@ msgstr "Melden"
 
 #: ../../../inc/antispam/views/_antispam_list.view.php:170
 msgid "Check hit-logs and comments for this keyword!"
-msgstr "Prüfe Zugriffsaufzeichnungen und Kommentare auf dieses Stichwort!"
+msgstr "Zugriffsaufzeichnungen und Kommentare auf dieses Stichwort prüfen!"
 
 #: ../../../inc/antispam/views/_antispam_list.view.php:171
 msgid "Re-check"
@@ -3062,6 +3062,7 @@ msgstr "Für manuelles Sortieren der Kategorien."
 #: ../../../inc/chapters/views/_chapter_list.view.php:197
 #: ../../../inc/items/views/_item_expert.form.php:349
 #: ../../../inc/items/views/_item_list_full.view.php:144
+#: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:66
 msgid "Order"
 msgstr "Reihenfolge"
 
@@ -3464,12 +3465,12 @@ msgstr "Ungültiges Schlagwortpräfix"
 #: ../../../inc/collections/model/_blog.class.php:377
 #, php-format
 msgid "Items/days per page must be between %d and %d."
-msgstr "Die Anzahl der Einträge/Tage pro Seite muss zwischen %d und %d liegen."
+msgstr "Anzahl der Elemente/Tage pro Seite muss zwischen %d und %d liegen."
 
 #: ../../../inc/collections/model/_blog.class.php:395
 #, php-format
 msgid "Items per feed must be between %d and %d."
-msgstr "Die Anzahl der Einträge pro Feed muss zwischen %d und %d liegen."
+msgstr "Anzahl der Elemente pro Feed muss zwischen %d und %d liegen."
 
 #: ../../../inc/collections/model/_blog.class.php:416
 msgid "Invalid tagline"
@@ -5711,7 +5712,7 @@ msgstr "Wiederholen"
 
 #: ../../../inc/cron/views/_cronjob_list.view.php:147
 msgid "Delete this job!"
-msgstr "Lösche diesen Job!"
+msgstr "Diesen Job löschen!"
 
 #: ../../../inc/cron/views/_cronjob_list.view.php:166
 msgid "Execute pending jobs in a popup window now!"
@@ -6470,7 +6471,7 @@ msgstr "Hier ist der Code, um sie anzuzeigen:"
 
 #: ../../../inc/files/upload.ctrl.php:374
 msgid "Add the code to your post !"
-msgstr "Fügen Sie diesen Code zu Ihrem Eintrag hinzu!"
+msgstr "Diesen Code zu Ihrem Eintrag hinzufügen!"
 
 #: ../../../inc/files/views/_file_browse.view.php:74
 #, php-format
@@ -6747,7 +6748,7 @@ msgstr "Aktualisieren!"
 
 #: ../../../inc/files/views/_file_copy_move.form.php:62
 msgid "Quit copy/move mode!"
-msgstr "Beende Kopieren/Verschieben-Modus!"
+msgstr "Kopieren/Verschieben-Modus beenden!"
 
 #: ../../../inc/files/views/_file_copy_move.form.php:77
 msgid "Check to overwrite the existing file"
@@ -6839,7 +6840,7 @@ msgstr "Diesen Eintrag bearbeiten..."
 
 #: ../../../inc/files/views/_file_links.view.php:66
 msgid "Quit link mode!"
-msgstr "Verlasse Verknüpfungs-Modus!"
+msgstr "Verknüpfungs-Modus verlassen!"
 
 # TRANS: file/directory path
 #. TRANS: file/directory path
@@ -6852,13 +6853,13 @@ msgstr "Pfad"
 #: ../../../inc/items/views/_item_links.view.php:152
 #: ../../../inc/items/views/inc/_item_links.inc.php:164
 msgid "Locate this file!"
-msgstr "Lokalisiere diese Datei!"
+msgstr "Diese Datei lokalisieren!"
 
 #: ../../../inc/files/views/_file_links.view.php:131
 #: ../../../inc/items/views/_item_links.view.php:161
 #: ../../../inc/items/views/inc/_item_links.inc.php:170
 msgid "Delete this link!"
-msgstr "Lösche diese Verknüpfung!"
+msgstr "Diese Verknüpfung löschen!"
 
 #: ../../../inc/files/views/_file_links.view.php:151
 #, php-format
@@ -6973,7 +6974,7 @@ msgstr "Setze neue Rechte"
 
 #: ../../../inc/files/views/_file_properties.form.php:40
 msgid "Close properties!"
-msgstr "Schließe Eigenschaften!"
+msgstr "Eigenschaften schließen!"
 
 #: ../../../inc/files/views/_file_properties.form.php:42
 msgid "File properties"
@@ -7209,7 +7210,7 @@ msgstr "Maximal erlaubte Dateigröße"
 
 #: ../../../inc/files/views/_filetype.form.php:51
 msgid "Delete this filetype!"
-msgstr "Lösche diesen Dateityp!"
+msgstr "Diesen Dateityp löschen!"
 
 #: ../../../inc/files/views/_filetype.form.php:54
 #: ../../../inc/files/views/_filetype_list.view.php:128
@@ -7315,7 +7316,7 @@ msgstr "Dupliziere diesen Dateityp..."
 
 #: ../../../inc/files/views/_filetype_list.view.php:124
 msgid "Delete this file type!"
-msgstr "Lösche diesen Dateityp!"
+msgstr "Diesen Dateityp löschen!"
 
 #: ../../../inc/files/views/_filetype_list.view.php:128
 msgid "Create a new file type..."
@@ -7684,7 +7685,7 @@ msgstr "Veröffentliche jetzt mit aktuellem Datum und Zeit."
 
 #: ../../../inc/items/model/_item.class.php:2513
 msgid "Deprecate this post!"
-msgstr "Missbillige diesen Eintrag!"
+msgstr "Diesen Eintrag missbilligen!"
 
 #. TRANS: "None" select option
 #: ../../../inc/items/model/_item.class.php:2569
@@ -8850,7 +8851,7 @@ msgstr "Plugin-Einstellungen bearbeiten!"
 
 #: ../../../inc/plugins/_plugin.funcs.php:309
 msgid "Delete set!"
-msgstr "Lösche Datensatz!"
+msgstr "Datensatz löschen!"
 
 #: ../../../inc/plugins/_plugin.funcs.php:369
 #, php-format
@@ -9195,7 +9196,7 @@ msgstr "Das Deinstallieren des Pluigins wird auch seine Datenbanktabellen lösche
 
 #: ../../../inc/plugins/plugins.ctrl.php:981
 msgid "Close info!"
-msgstr "Schließe Info!"
+msgstr "Info schließen!"
 
 # TRANS: Code of a plugin
 #. TRANS: Code of a plugin
@@ -9299,11 +9300,11 @@ msgstr "Das Plugin deaktivieren!"
 
 #: ../../../inc/plugins/views/_plugin_list.view.php:245
 msgid "Enable the plugin!"
-msgstr "Aktiviere das Plugin!"
+msgstr "Das Plugin aktivieren!"
 
 #: ../../../inc/plugins/views/_plugin_list.view.php:248
 msgid "Un-install this plugin!"
-msgstr "Deinstalliere dieses Plugin!"
+msgstr "Dieses Plugin deinstallieren!"
 
 #: ../../../inc/plugins/views/_plugin_list.view.php:264
 msgid "Reload events and codes for installed plugins."
@@ -9372,7 +9373,7 @@ msgstr "Plugin-Variablen"
 
 #: ../../../inc/plugins/views/_plugin_settings.form.php:114
 msgid "The code to call the plugin by code. This is also used to link renderer plugins to items."
-msgstr "Der Code, um das Plugin durch einen Code aufzurufen. Das wird auch dazu benutzt, um Renderer-Plugins mit Einträgen zu verknüpfen."
+msgstr "Der Code, um das Plugin durch einen Code aufzurufen. Das wird auch dazu benutzt, um Renderer-Plugins mit Elementen zu verknüpfen."
 
 #: ../../../inc/plugins/views/_plugin_settings.form.php:119
 msgid "Note: The plugin code is empty, so this plugin will not work as an \"opt-out\", \"opt-in\" or \"lazy\" renderer."
@@ -9825,7 +9826,7 @@ msgstr "Referrer-Spam"
 #: ../../../inc/sessions/views/_stats_summary.view.php:150
 #: ../../../inc/sessions/views/_stats_summary.view.php:182
 msgid "Prune hits for this date!"
-msgstr "Entferne Zugriffsaufzeichnungen für dieses Datum!"
+msgstr "Zugriffsaufzeichnungen für dieses Datum entfernen!"
 
 #: ../../../inc/sessions/views/_stats_direct.view.php:37
 #: ../../../inc/sessions/views/_stats_direct.view.php:49
@@ -9848,7 +9849,7 @@ msgstr "Datum Zeit"
 #: ../../../inc/sessions/views/_stats_referers.view.php:69
 #: ../../../inc/sessions/views/_stats_refsearches.view.php:67
 msgid "Delete this hit!"
-msgstr "Lösche diese Zugriffsaufzeichnung!"
+msgstr "Diese Zugriffsaufzeichnung löschen!"
 
 #: ../../../inc/sessions/views/_stats_direct.view.php:82
 #: ../../../inc/sessions/views/_stats_hit_list.view.php:162
@@ -10007,7 +10008,7 @@ msgstr "-&gt;S"
 #: ../../../inc/sessions/views/_stats_referers.view.php:95
 #: ../../../inc/sessions/views/_stats_referers.view.php:186
 msgid "Ban this domain!"
-msgstr "Banne diese Domain!"
+msgstr "Diese Domain bannen!"
 
 # TRANS: Abbrev. for Spam
 #. TRANS: Abbrev. for Spam
@@ -12006,7 +12007,7 @@ msgstr "Diese Gruppe duplizieren..."
 
 #: ../../../inc/users/views/_user_list.view.php:150
 msgid "Delete this group!"
-msgstr "Lösche diese Gruppe!"
+msgstr "Diese Gruppe löschen!"
 
 #: ../../../inc/users/views/_user_list.view.php:266
 msgid "Decrease user level"
@@ -12197,10 +12198,15 @@ msgid "List of all categories; click filters blog on selected category."
 msgstr "Liste alle Kategorien; Klick zeigt nur die gewählte Kategorie an."
 
 #: ../../../inc/widgets/widgets/_coll_category_list.widget.php:94
+#: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:60
+#: ../../../inc/widgets/widgets/_coll_common_links.widget.php:90
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:69
+#: ../../../inc/widgets/widgets/_coll_longdesc.widget.php:88
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:62
+#: ../../../inc/widgets/widgets/_coll_search_form.widget.php:86
 #: ../../../inc/widgets/widgets/_coll_tag_cloud.widget.php:102
 #: ../../../inc/widgets/widgets/_free_html.widget.php:96
+#: ../../../inc/widgets/widgets/_user_tools.widget.php:59
 #: ../../../plugins/_archives.plugin.php:315
 msgid "Block title"
 msgstr "Blocktitel"
@@ -12262,15 +12268,15 @@ msgstr "Neueste Kommentare"
 
 #: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:67
 msgid "Order to display items"
-msgstr "Anordnung der Einträge"
+msgstr "Reihenfolge der Elemente"
 
 #: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:69
 msgid "Newest to oldest"
-msgstr "Neueste zu ältesten"
+msgstr "Absteigend nach Datum"
 
 #: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:69
 msgid "Oldest to newest"
-msgstr "Älteste zu neuesten"
+msgstr "Aufsteigend nach Datum"
 
 #: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:69
 msgid "Random selection"
@@ -12281,14 +12287,14 @@ msgstr "Zufällige Auswahl"
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:88
 #: ../../../plugins/_archives.plugin.php:321
 msgid "Max items"
-msgstr "Max. Einträge"
+msgstr "Max. Elementanzahl"
 
 #: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:74
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:122
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:89
 #: ../../../plugins/_archives.plugin.php:322
 msgid "Maximum number of items to display."
-msgstr "Maximale Anzahl der anzuzeigenden Einträge."
+msgstr "Maximale Anzahl der anzuzeigenden Elemente."
 
 #: ../../../inc/widgets/widgets/_coll_comment_list.widget.php:79
 msgid "Link to author"
@@ -12377,7 +12383,7 @@ msgstr "kürzlich"
 
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:72
 msgid "Items"
-msgstr "Einträge"
+msgstr "Elemente"
 
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:75
 msgid "Link to blog"
@@ -12393,7 +12399,7 @@ msgstr "Element-Typ"
 
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:82
 msgid "What kind of items do you want to list?"
-msgstr "Welche Art von Einträgen möchten Sie auflisten?"
+msgstr "Welche Art von Elementen möchten Sie auflisten?"
 
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:88
 msgid "Follow Main List"
@@ -12413,7 +12419,7 @@ msgstr "Zusammenfassen nach"
 
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:101
 msgid "Do you want to group the Items?"
-msgstr "Möchten Sie die Einträge zusammenfassen?"
+msgstr "Möchten Sie die Elemente gruppieren?"
 
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:103
 msgid "By category/chapter"
@@ -12424,7 +12430,7 @@ msgstr "Nach Kategorie"
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:95
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:102
 msgid "How to sort the items"
-msgstr "Wie die Einträge sortiert werden sollen"
+msgstr "Wie die Elemente sortiert werden sollen"
 
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:127
 msgid "Link titles"
@@ -12476,7 +12482,7 @@ msgstr "Universelle Elementliste"
 
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:187
 msgid "Can list Items (Posts/Pages/Links...) in a variety of ways."
-msgstr "Kann Einträge (normale Einträge/Seiten/Links) auf verschiedene Arten anzeigen"
+msgstr "Kann Elemente (Einträge/Seiten/Links) auf verschiedene Arten anzeigen"
 
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:212
 msgid "The requested Blog doesn't exist any more!"
@@ -12893,7 +12899,7 @@ msgstr "Slogan für %s"
 
 #: ../../../install/_functions_create.php:851
 msgid "The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links."
-msgstr "Der Hauptzweck dieses Blogs ist es, in der seitlichen Leiste der anderen Blogs eingefügt zu werden und dort Ihre favorisierten/verwandten Links anzuzeigen."
+msgstr "Der Hauptzweck dieses Blogs ist es, als ein Seitenleistenelement in anderen Blogs eingefügt zu werden und dort Ihre favorisierten/verwandten Links anzuzeigen."
 
 #: ../../../install/_functions_create.php:856
 msgid "Some interesting links..."
@@ -13279,8 +13285,8 @@ msgid "This version is too old!"
 msgstr "Diese Version ist zu alt!"
 
 #: ../../../install/_functions_evoupgrade.php:255
-msgid "This version is too recent! We cannot downgrade to it!"
-msgstr "Diese Version ist zu neu! Wir können nicht dorthin downgraden!"
+msgid "This version is too recent! We cannot downgrade to the version you are trying to install..."
+msgstr "Diese Version ist zu neu! Wir können nicht auf die Version, die Sie zu installieren versuchen, downgraden..."
 
 #: ../../../install/_functions_evoupgrade.php:621
 #, php-format
@@ -13367,7 +13373,7 @@ msgstr "Admin-E-Mail-Adresse"
 
 #: ../../../install/_functions_install.php:138
 msgid "OOPS! It seems b2evolution is already installed!"
-msgstr "HUCH! Es scheint, als wenn b2evolution bereits existiert ist!"
+msgstr "HUCH! Es scheint, dass b2evolution bereits installiert ist!"
 
 #: ../../../install/_functions_install.php:142
 #, php-format
@@ -14280,7 +14286,7 @@ msgstr "Stein"
 
 #: ../../../plugins/_test.plugin.php:139
 msgid "This is a free style Multiple Select. You can choose zero or one or more items"
-msgstr "Das ist ein frei konfigurierbares Mehrfachauswahlfeld. Sie können keinen, einen oder mehrere Einträge auswählen."
+msgstr "Das ist ein frei konfigurierbares Mehrfachauswahlfeld. Sie können keine, ein oder mehrere Elemente auswählen."
 
 #: ../../../plugins/_texturize.plugin.php:33
 msgid "Smart quotes + additional typographic replacements."
@@ -14416,7 +14422,7 @@ msgstr "Erlaube anonyme Kommentare"
 
 #: ../../../plugins/basic_antispam_plugin/_basic_antispam.plugin.php:75
 msgid "Allow non-registered visitors to leave comments."
-msgstr "Erlaube nicht-registrierten Benutzern, Kommentare zu hinterlassen."
+msgstr "Erlaube nichtregistrierten Benutzern, Kommentare zu hinterlassen."
 
 #: ../../../plugins/basic_antispam_plugin/_basic_antispam.plugin.php:80
 msgid "Detect feedback duplicates"
@@ -15247,7 +15253,7 @@ msgstr "Einloggen!"
 
 #: ../../../skins_adm/login/_login_form.main.php:141
 msgid "Log into backoffice!"
-msgstr "Gehe zum Administrationsbereich!"
+msgstr "In Administrationsbereich einloggen!"
 
 #: ../../../skins_adm/login/_login_form.main.php:172
 msgid "Please wait..."
@@ -15274,19 +15280,19 @@ msgstr "Sobald Sie die E-Mail erhalten, klicken Sie auf den darin enthaltenen Li
 #: ../../../skins_adm/login/_lostpass_form.main.php:55
 #: ../../../skins_adm/login/_validate_form.main.php:61
 msgid "Send me an email now!"
-msgstr "Schicke mir eine E-Mail!"
+msgstr "Mir jetzt eine E-Mail schicken!"
 
 #: ../../../skins_adm/login/_reg_complete.main.php:33
 msgid "Registration complete"
-msgstr "Anmeldung abgeschlossen"
+msgstr "Registrierung abgeschlossen"
 
 #: ../../../skins_adm/login/_reg_disabled.main.php:33
 msgid "Registration Currently Disabled"
-msgstr "Anmeldung zur Zeit deaktiviert"
+msgstr "Registrierung zur Zeit deaktiviert"
 
 #: ../../../skins_adm/login/_reg_disabled.main.php:36
 msgid "User registration is currently not allowed."
-msgstr "Benutzeranmeldung ist zur Zeit nicht erlaubt."
+msgstr "Benutzerregistrierung ist zur Zeit nicht erlaubt."
 
 #: ../../../skins_adm/login/_reg_form.main.php:37
 msgid "Register form"
@@ -15307,7 +15313,7 @@ msgstr "Bevorzugte Sprache"
 
 #: ../../../skins_adm/login/_reg_form.main.php:72
 msgid "Register!"
-msgstr "Anmelden!"
+msgstr "Registrieren!"
 
 #: ../../../skins_adm/login/_reg_form.main.php:79
 msgid "Log into existing account..."

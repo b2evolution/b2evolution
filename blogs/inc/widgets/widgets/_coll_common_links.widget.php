@@ -87,7 +87,7 @@ class coll_common_links_Widget extends ComponentWidget
 	{
 		$r = array_merge( array(
 				'title' => array(
-					'label' => t_('Block title'),
+					'label' => T_('Block title'),
 					'note' => T_( 'Title to display in your skin.' ),
 					'size' => 40,
 					'defaultvalue' => '',
@@ -182,6 +182,9 @@ class coll_common_links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/10 13:44:57  tblue246
+ * Translation fixes/update
+ *
  * Revision 1.10  2009/05/18 03:59:39  fplanque
  * minor/doc
  *
