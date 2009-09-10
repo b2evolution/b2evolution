@@ -64,7 +64,7 @@ class Thread extends DataObject
 		$unavailable_recipients_list = $this->find_recipients( $thrd_recipients );
 		if( $unavailable_recipients_list )
 		{
-			param_error( 'recipients', 'The following users not found: '.implode( ', ', $unavailable_recipients_list ) );
+			param_error( 'recipients', 'The following users were not found: '.implode( ', ', $unavailable_recipients_list ) );
 		}
 
 		return ! param_errors_detected();
@@ -96,6 +96,11 @@ class Thread extends DataObject
 	/**
 	 * Select available recipients from database
 	 *
+	 * @todo Tblue> This currently leads to a "user not found" message if
+	 *              the current user is specified as a recipient; this is
+	 *              confusing -- it should display a message like "You cannot
+	 *              send threads to yourself.".
+	 * 
 	 * @param string $recipients
 	 */
 	function find_recipients ( $recipients )
