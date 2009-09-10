@@ -32,38 +32,54 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'regional/model/_currency.class.php', 'Currency' );
+
 global $dispatcher;
 
+$sql='
+SELECT ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_name 
+FROM T_country LEFT JOIN T_currency ON ctry_curr_ID=curr_ID
+';
+$count_sql='SELECT count(*) FROM T_country';
+
 // Create result set:
-$Results = & new Results(
-							'SELECT * FROM T_country', 'ctry_' );
-$Results->Cache = & get_Cache( 'CountryCache' );
+$Results = & new Results( $sql, 'ctry_', 'D', NULL, $count_sql);
+
+//$Results->Cache = & get_Cache( 'CountryCache' );
 $Results->title = T_('Countries list');
 
+$Results->cols[] = array(
+						'th' => T_('Code'),
+						'td_class' => 'center',
+						'order' => 'ctry_code',
+						'td' => '<strong>$ctry_code$</strong>',
+					);
+						
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
-							'th' => T_('Code'),
-							'order' => 'ctry_code',
+							'th' => T_('Name'),
+							'order' => 'ctry_name',
 							'td' => '<strong><a href="'.$dispatcher.'?ctrl=countries&amp;ctry_ID=$ctry_ID$&amp;action=edit" title="'.
-											T_('Edit this country...').'">$ctry_code$</a></strong>',
+											T_('Edit this country...').'">$ctry_name$</a></strong>',
 						);
 }
 else
 {	// View only:
 	$Results->cols[] = array(
-							'th' => T_('Code'),
-							'order' => 'ctry_code',
-							'td' => '<strong>$ctry_code$</strong>',
+							'th' => T_('Name'),
+							'order' => 'ctry_name',
+							'td' => '$ctry_name$',
 						);
 
 }
-
 $Results->cols[] = array(
-						'th' => T_('Name'),
-						'order' => 'ctry_name',
-						'td' => '$ctry_name$',
+						'th' => T_('Default Currency'),
+						'td_class' => 'center',
+						'order' => 'curr_name',
+						'td' => '$curr_shortcut$ $curr_name$',
 					);
+	
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
@@ -84,10 +100,4 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 $Results->display();
 
-/*
- * $Log$
- * Revision 1.3  2009/09/10 18:24:07  fplanque
- * doc
- *
- */
 ?>
