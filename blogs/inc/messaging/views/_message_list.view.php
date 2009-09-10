@@ -67,7 +67,7 @@ $Form->begin_form( 'fform', '' );
 
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
-$Form->textarea_input( 'msg_text', '', 10, T_('New Message'), array( 'cols'=>80, 'required'=>true ) );
+$Form->textarea_input( 'msg_text', '', 10, T_('Reply'), array( 'cols'=>80, 'required'=>true ) );
 
 $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
