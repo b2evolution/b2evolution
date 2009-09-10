@@ -108,7 +108,7 @@ $Form->begin_fieldset( T_('User permissions'), array( 'class'=>'fieldset clear' 
 	}
 
 	$field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://manual.b2evolution.net/User_levels"' );
-	if( $current_User->check_perm( 'users', 'edit' ) )
+	if( $action != 'view_user' && $current_User->check_perm( 'users', 'edit' ) )
 	{
 		$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), $field_note, array( 'required' => true ) );
 	}
@@ -497,6 +497,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/10 13:51:38  tblue246
+ * Do not show form field for user level if action == view_user.
+ *
  * Revision 1.15  2009/09/07 23:35:49  fplanque
  * cleanup
  *
