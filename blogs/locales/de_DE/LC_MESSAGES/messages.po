@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 3.1.0-beta\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2009-09-10 15:34+0200\n"
-"PO-Revision-Date: 2009-09-10 15:36+0100\n"
+"PO-Revision-Date: 2009-09-10 17:57+0100\n"
 "Last-Translator: Tilman Blumenbach <tilman (at) ax86 (dot) net>\n"
 "Language-Team: Tilman Blumenbach <tilman (at) ax86 (dot) net>\n"
 "MIME-Version: 1.0\n"
@@ -2452,7 +2452,7 @@ msgstr "Es sind keine neuen geblockten Zeichenketten verfügbar."
 
 #: ../../../inc/antispam/model/_antispam.funcs.php:259
 msgid "Adding strings to local blacklist:"
-msgstr "Füge Zeichenkette zur lokalen Bannliste hinzu:"
+msgstr "Füge Zeichenketten zur lokalen Bannliste hinzu:"
 
 #: ../../../inc/antispam/model/_antispam.funcs.php:264
 #: ../../../inc/antispam/model/_antispam.funcs.php:269
