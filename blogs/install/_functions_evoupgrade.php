@@ -2479,9 +2479,9 @@ function upgrade_b2evo_tables()
 			ADD COLUMN user_ctry_ID int(10) unsigned NULL AFTER user_avatar_file_ID" );
 		task_end();
 
-		// Creating tables for messagin module
+		// Creating tables for messaging module
 
-		task_begin( 'Creating table for messaging thread... ' );
+		task_begin( 'Creating table for message threads... ' );
 		$DB->query( "CREATE TABLE T_messaging__thread (
 			thrd_ID int(10) unsigned NOT NULL auto_increment,
 			thrd_title varchar(255) NOT NULL,
@@ -2490,18 +2490,18 @@ function upgrade_b2evo_tables()
 		) ENGINE = innodb" );
 		task_end();
 
-		task_begin( 'Creating table for messaging message... ' );
+		task_begin( 'Creating table for messagee... ' );
 		$DB->query( "CREATE TABLE T_messaging__message (
 			msg_ID int(10) unsigned NOT NULL auto_increment,
 			msg_author_user_ID int(10) unsigned NOT NULL,
 			msg_datetime datetime NOT NULL,
 			msg_thread_ID int(10) unsigned NOT NULL,
-			msg_text text,
+			msg_text text NULL,
 			PRIMARY KEY msg_ID (msg_ID)
 		) ENGINE = innodb" );
 		task_end();
 
-		task_begin( 'Creating table for messaging status... ' );
+		task_begin( 'Creating table for message statuses... ' );
 		$DB->query( "CREATE TABLE T_messaging__msgstatus (
 			msta_thread_ID int(10) unsigned NOT NULL,
 			msta_msg_ID int(10) unsigned NOT NULL,
@@ -2662,6 +2662,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.311  2009/09/10 18:24:07  fplanque
+ * doc
+ *
  * Revision 1.310  2009/09/10 13:44:57  tblue246
  * Translation fixes/update
  *

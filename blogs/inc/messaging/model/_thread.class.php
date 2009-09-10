@@ -1,5 +1,27 @@
 <?php
-
+/**
+ * This file is part of b2evolution - {@link http://b2evolution.net/}
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
+ *
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
+ *
+ * {@internal Open Source relicensing agreement:
+ * The Evo Factory grants Francois PLANQUE the right to license
+ * The Evo Factory's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ * }}
+ *
+ * @package messaging
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author efy-maxim: Evo Factory / Maxim.
+ * @author fplanque: Francois Planque.
+ *
+ * @version $Id$
+ */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class('_core/model/dataobjects/_dataobject.class.php');
@@ -100,7 +122,7 @@ class Thread extends DataObject
 	 *              the current user is specified as a recipient; this is
 	 *              confusing -- it should display a message like "You cannot
 	 *              send threads to yourself.".
-	 * 
+	 *
 	 * @param string $recipients
 	 */
 	function find_recipients ( $recipients )
@@ -186,4 +208,10 @@ class Thread extends DataObject
 	}
 }
 
+/*
+ * $Log$
+ * Revision 1.3  2009/09/10 18:24:07  fplanque
+ * doc
+ *
+ */
 ?>

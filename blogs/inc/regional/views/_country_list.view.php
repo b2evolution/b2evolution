@@ -84,4 +84,10 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 $Results->display();
 
+/*
+ * $Log$
+ * Revision 1.3  2009/09/10 18:24:07  fplanque
+ * doc
+ *
+ */
 ?>

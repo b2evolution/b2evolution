@@ -136,4 +136,11 @@ class Country extends DataObject
 		return parent::dbexists('ctry_code', $this->code);
 	}
 }
+
+/*
+ * $Log$
+ * Revision 1.9  2009/09/10 18:24:07  fplanque
+ * doc
+ *
+ */
 ?>

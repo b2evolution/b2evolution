@@ -73,4 +73,10 @@ else
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
 
+/*
+ * $Log$
+ * Revision 1.8  2009/09/10 18:24:07  fplanque
+ * doc
+ *
+ */
 ?>

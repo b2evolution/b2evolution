@@ -253,6 +253,17 @@ class User extends DataObject
 
 
 	/**
+	 * Get the name of the account with complete details for admin select lists
+	 *
+	 * @return string
+	 */
+	function get_account_name()
+	{
+		return $this->login.' - '.$this->firstname.' '.$this->lastname.' ('.$this->nickname.')';
+	}
+
+	
+	/**
 	 * Get preferred name of the user, according to {@link User::$idmode}.
 	 *
 	 * @return string
@@ -1659,6 +1670,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.34  2009/09/10 18:24:07  fplanque
+ * doc
+ *
  * Revision 1.33  2009/09/07 23:35:49  fplanque
  * cleanup
  *
