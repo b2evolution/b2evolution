@@ -20,9 +20,11 @@ $select_sql = 'SELECT mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified, ms.numb_m
 				GROUP BY ts.msta_thread_ID ORDER BY ms.numb_msgs DESC, mt.thrd_datemodified DESC';
 
 $count_sql = 'SELECT COUNT(*)
-				FROM T_messaging__msgstatus
+				FROM (
+					SELECT msta_thread_ID
+					FROM T_messaging__msgstatus
 					WHERE msta_user_ID = '.$current_User->ID.'
-					GROUP BY msta_thread_ID';
+					GROUP BY msta_thread_ID) AS threads';
 
 $Results = & new Results( $select_sql, 'thrd_', '', NULL, $count_sql);
 
