@@ -2479,6 +2479,37 @@ function upgrade_b2evo_tables()
 			ADD COLUMN user_ctry_ID int(10) unsigned NULL AFTER user_avatar_file_ID" );
 		task_end();
 
+		// Creating tables for messagin module
+
+		task_begin( 'Creating table for messaging thread... ' );
+		$DB->query( "CREATE TABLE T_messaging__thread (
+			thrd_ID int(10) unsigned NOT NULL auto_increment,
+			thrd_title varchar(255) NOT NULL,
+			thrd_datemodified datetime NOT NULL,
+			PRIMARY KEY thrd_ID (thrd_ID)
+		) ENGINE = innodb" );
+		task_end();
+
+		task_begin( 'Creating table for messaging message... ' );
+		$DB->query( "CREATE TABLE T_messaging__message (
+			msg_ID int(10) unsigned NOT NULL auto_increment,
+			msg_author_user_ID int(10) unsigned NOT NULL,
+			msg_datetime datetime NOT NULL,
+			msg_thread_ID int(10) unsigned NOT NULL,
+			msg_text text,
+			PRIMARY KEY msg_ID (msg_ID)
+		) ENGINE = innodb" );
+		task_end();
+
+		task_begin( 'Creating table for messaging status... ' );
+		$DB->query( "CREATE TABLE T_messaging__msgstatus (
+			msta_thread_ID int(10) unsigned NOT NULL,
+			msta_msg_ID int(10) unsigned NOT NULL,
+			msta_user_ID int(10) unsigned NOT NULL,
+			msta_status tinyint(1) unsigned NOT NULL
+		) ENGINE = innodb" );
+		task_end();
+
 		//set_upgrade_checkpoint( '9970' );
 	}
 
@@ -2631,6 +2662,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.308  2009/09/10 12:13:33  efy-maxim
+ * Messaging Module
+ *
  * Revision 1.307  2009/09/07 23:35:51  fplanque
  * cleanup
  *

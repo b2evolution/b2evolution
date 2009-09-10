@@ -50,6 +50,9 @@ $db_config['aliases'] = array(
 		'T_groups'              => $tableprefix.'groups',
 		'T_global__cache'       => $tableprefix.'global__cache',
 		'T_locales'             => $tableprefix.'locales',
+		'T_messaging__thread'   => $tableprefix.'messaging__thread',
+		'T_messaging__message'  => $tableprefix.'messaging__message',
+		'T_messaging__msgstatus'=> $tableprefix.'messaging__msgstatus',
 		'T_plugins'             => $tableprefix.'plugins',
 		'T_pluginevents'        => $tableprefix.'pluginevents',
 		'T_pluginsettings'      => $tableprefix.'pluginsettings',
@@ -83,11 +86,13 @@ $ctrl_mappings = array(
 		'currencies'   => 'regional/currencies.ctrl.php',
 		'features'     => 'settings/features.ctrl.php',
 		'locales'      => 'locales/locales.ctrl.php',
+		'messages'     => 'messaging/messages.ctrl.php',
 		'plugins'      => 'plugins/plugins.ctrl.php',
 		'settings'     => 'settings/settings.ctrl.php',
 		'set_antispam' => 'antispam/antispam_settings.ctrl.php',
 		'stats'        => 'sessions/stats.ctrl.php',
 		'system'       => 'tools/system.ctrl.php',
+		'threads'      => 'messaging/threads.ctrl.php',
 		'users'        => 'users/users.ctrl.php',
 		'upload'       => 'files/upload.ctrl.php',
 	);
@@ -586,6 +591,17 @@ class _core_Module
 						),
 					) );
 		}
+
+		if( $current_User->check_perm( 'options', 'view' ) )
+		{	// Permission to view messaging:
+			$AdminUI->add_menu_entries( NULL, array(
+						'messaging' => array(
+						'text' => T_('Messaging'),
+						'title' => T_('Messaging'),
+						'href' => $dispatcher.'?ctrl=threads',
+					),
+				) );
+		}
 	}
 }
 
@@ -594,6 +610,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.24  2009/09/10 12:13:33  efy-maxim
+ * Messaging Module
+ *
  * Revision 1.23  2009/09/03 14:08:24  fplanque
  * minor
  *

@@ -161,6 +161,10 @@ function & get_Cache( $objectName )
 			$LinkCache = new LinkCache(); // COPY (FUNC)
 			return $LinkCache;
 
+		case 'MessageCache':
+			$MessageCache = new DataObjectCache( 'Message', false, 'T_messaging__message', 'msg_', 'msg_ID' );
+			return $MessageCache;
+
 		case 'Plugins_admin':
 			load_class('plugins/model/_plugins_admin.class.php');
 			$Plugins_admin = new Plugins_admin(); // COPY (FUNC)
@@ -170,6 +174,10 @@ function & get_Cache( $objectName )
 			load_class( 'skins/model/_skincache.class.php' );
 			$SkinCache = new SkinCache(); // COPY (FUNC)
 			return $SkinCache;
+
+		case 'ThreadCache':
+			$ThreadCache = new DataObjectCache( 'Thread', false, 'T_messaging__thread', 'thrd_', 'thrd_ID', 'thrd_title' );
+			return $ThreadCache;
 
 		case 'UserCache':
 			load_class( 'users/model/_usercache.class.php' );
@@ -3566,6 +3574,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.136  2009/09/10 12:13:33  efy-maxim
+ * Messaging Module
+ *
  * Revision 1.135  2009/09/08 08:03:20  efy-maxim
  * 1. Countries order has been fixed in Edit User form; 2. Currency ID validator has been added to Country class, but it can be empty.
  *
