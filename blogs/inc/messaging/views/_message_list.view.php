@@ -49,13 +49,16 @@ $Results->cols[] = array(
 					);
 
 if( $current_User->ID == 1 )
-{ // We have permission to modify:
+{	// We have permission to modify:
+	// Tblue> Shouldn't this check options:edit (see controller)?
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
-							'td' => action_icon( T_('Delete this message!'), 'delete',
-	                        '%regenerate_url( \'action\', \'msg_ID=$msg_ID$&amp;action=delete\')%' ),
+							// Do not display the icon if the message cannot be deleted
+							'td' => $Results->total_rows == 1 ? '' :
+										action_icon( T_('Delete this message!'), 'delete',
+											'%regenerate_url( \'action\', \'msg_ID=$msg_ID$&amp;action=delete\')%' ),
 						);
 }
 

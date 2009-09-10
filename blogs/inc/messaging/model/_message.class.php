@@ -214,12 +214,7 @@ class Message extends DataObject
 
 		if( $var == 1 )
 		{
-			$Messages->add( '', 'restrict' );
-			$Messages->head = array(
-					'container' => $message,
-					'restrict' => T_('Last message of the thread can\'t be deleted.')
-				);
-
+			$Messages->add( T_('The last message of the thread can\'t be deleted. Delete the related thread instead.'), 'error' );
 			return false;
 		}
 

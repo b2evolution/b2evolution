@@ -47,7 +47,8 @@ $Results->cols[] = array(
 					);
 
 if( $current_User->ID == 1 )
-{ // We have permission to modify:
+{	// We have permission to modify:
+	// Tblue> Shouldn't this check options:edit (see controller)?
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
 							'th_class' => 'shrinkwrap',
