@@ -58,7 +58,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New country') : T_('Country') );
 
 	$CurrencyCache = & get_Cache( 'CurrencyCache' );
 
-	$Form->select_input_object( 'ctry_curr_ID', $edited_Country->curr_ID, $CurrencyCache, 'Default Currency', array( 'allow_none' => true ) );
+	$Form->select_input_object( 'ctry_curr_ID', $edited_Country->curr_ID, $CurrencyCache, T_( 'Default Currency' ), array( 'allow_none' => true ) );
 
 if( $creating )
 {
