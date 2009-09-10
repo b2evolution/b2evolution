@@ -242,7 +242,7 @@ $schema_queries = array(
 	'T_country' => array(
 		'Creating Countries table',
 		"CREATE TABLE T_country (
-			ctry_ID int(11) unsigned NOT NULL auto_increment,
+			ctry_ID int(10) unsigned NOT NULL auto_increment,
 			ctry_code char(2) NOT NULL,
 			ctry_name varchar(40) NOT NULL,
 			ctry_curr_ID int(10) unsigned NULL,
@@ -253,7 +253,7 @@ $schema_queries = array(
 	'T_currency' => array(
 		'Creating Currencies table',
 		"CREATE TABLE T_currency (
-			curr_ID int(11) unsigned NOT NULL auto_increment,
+			curr_ID int(10) unsigned NOT NULL auto_increment,
 			curr_code char(3) NOT NULL,
 			curr_shortcut varchar(30) NOT NULL,
 			curr_name varchar(40) NOT NULL,
@@ -264,6 +264,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.36  2009/09/10 13:10:37  efy-maxim
+ * int(11) has been changed to int(10) for PKs of T_country, T_currency tables
+ *
  * Revision 1.35  2009/09/07 23:35:47  fplanque
  * cleanup
  *

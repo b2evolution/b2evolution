@@ -2434,7 +2434,7 @@ function upgrade_b2evo_tables()
 
 		task_begin( 'Creating table for default currencies... ' );
 		$DB->query( "CREATE TABLE T_currency (
-				curr_ID int(11) unsigned NOT NULL auto_increment,
+				curr_ID int(10) unsigned NOT NULL auto_increment,
 				curr_code char(3) NOT NULL,
 				curr_shortcut varchar(30) NOT NULL,
 				curr_name varchar(40) NOT NULL,
@@ -2447,10 +2447,10 @@ function upgrade_b2evo_tables()
 
 		task_begin( 'Creating table for default countries... ' );
 		$DB->query( "CREATE TABLE T_country (
-				ctry_ID int(11) unsigned NOT NULL auto_increment,
+				ctry_ID int(10) unsigned NOT NULL auto_increment,
 				ctry_code char(2) NOT NULL,
 				ctry_name varchar(40) NOT NULL,
-				ctry_curr_ID int(11) unsigned,
+				ctry_curr_ID int(10) unsigned,
 				PRIMARY KEY ctry_ID (ctry_ID),
 				UNIQUE ctry_code (ctry_code)
 			) ENGINE = innodb" );
@@ -2662,6 +2662,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.309  2009/09/10 13:10:37  efy-maxim
+ * int(11) has been changed to int(10) for PKs of T_country, T_currency tables
+ *
  * Revision 1.308  2009/09/10 12:13:33  efy-maxim
  * Messaging Module
  *
