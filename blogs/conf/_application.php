@@ -63,7 +63,5 @@ $modules = array(
 		'files',
 		'sessions',
     'messaging',		// Experimental
-		'domains',
-		'adsense',
 	);
 ?>
