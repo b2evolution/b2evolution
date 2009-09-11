@@ -37,6 +37,13 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+/**
+ *  Load required funcs
+ */
+load_funcs('_core/_url.funcs.php');
+
+
 /**
  * XHTML_Validator
  *
@@ -62,8 +69,13 @@ class XHTML_Validator
 	 *
 	 * {@internal This gets tested in _libs.misc.simpletest.php}}
 	 *
-	 * @param string
+	 * @param string Context
+	 * @param boolean Allow CSS tweaks?
+	 * @param boolean Allow IFrames?
+	 * @param boolean Allow Javascript?
+	 * @param boolean Allow Objects?
 	 * @param string Input encoding to use ('ISO-8859-1', 'UTF-8', 'US-ASCII' or '' for auto-detect)
+	 * @param string Message type for errors
 	 */
 	function XHTML_Validator( $context = 'posting', $allow_css_tweaks = false, $allow_iframes = false, $allow_javascript = false, $allow_objects = false, $encoding = NULL, $msg_type = 'error' )
 	{
@@ -328,6 +340,9 @@ class XHTML_Validator
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/11 20:16:33  blueyed
+ * Load required funcs (when used from tests). Doc.
+ *
  * Revision 1.11  2009/07/08 02:38:55  sam2kb
  * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
  *
