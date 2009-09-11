@@ -36,7 +36,7 @@ load_class( 'regional/model/_currency.class.php', 'Currency' );
 
 global $dispatcher;
 
-$sql = 'SELECT ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_name 
+$sql = 'SELECT ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_code 
 			FROM T_country
 			LEFT JOIN T_currency ON ctry_curr_ID=curr_ID';
 $count_sql = 'SELECT count(*) FROM T_country';
@@ -76,8 +76,8 @@ else
 $Results->cols[] = array(
 						'th' => T_('Default Currency'),
 						'td_class' => 'center',
-						'order' => 'curr_name',
-						'td' => '$curr_shortcut$ $curr_name$',
+						'order' => 'curr_code',
+						'td' => '$curr_shortcut$ $curr_code$',
 					);
 	
 
@@ -103,6 +103,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/11 11:19:03  efy-sergey
+ * Displaying currency code
+ *
  * Revision 1.5  2009/09/10 19:14:08  tblue246
  * Re-added CVS log block; coding style.
  *
