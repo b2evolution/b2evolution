@@ -609,7 +609,7 @@ class Blog extends DataObject
 				$aggregate_coll_IDs = get_param( 'aggregate_coll_IDs' );
 				// Sanitize the string
 				$aggregate_coll_IDs = implode( ',', array_filter( array_map( 'trim', explode( ',', $aggregate_coll_IDs ) ) ) );
-				
+
 				// fp> TODO: check perms on each aggregated blog (if changed)
 				// fp> TODO: better interface
 				if( $aggregate_coll_IDs != '*' && !preg_match( '#^([0-9]+(,[0-9]+)*)?$#', $aggregate_coll_IDs ) )
@@ -864,7 +864,7 @@ class Blog extends DataObject
 				$this->set_setting( 'chapter_posts_per_page', NULL );
 				$this->set_setting( 'tag_posts_per_page', NULL );
 				$this->set_setting( 'tag_links', 'colon' );
-				$this->set_setting( 'single_links', 'ymd' );
+				$this->set_setting( 'single_links', 'short' );
 
 				$this->set_setting( 'canonical_homepage', 1 );
 				$this->set_setting( 'relcanonical_homepage', 1 );
@@ -2142,6 +2142,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.77  2009/09/11 19:57:01  fplanque
+ * updates awall style
+ *
  * Revision 1.76  2009/08/30 17:27:03  fplanque
  * better NULL param handling all over the app
  *
