@@ -295,7 +295,8 @@ function cleardir_r( $path )
  *
  * @param string absolute file path
  * @param string what property/format to get: 'width', 'height', 'widthxheight',
- *               'type', 'string' (as for img tags), else 'widthheight' (array)
+ *               'type', 'string' (as for img tags), 'widthheight_assoc' (array
+ *               with keys "width" and "height", else 'widthheight' (numeric array)
  * @return mixed false if no image, otherwise what was requested through $param
  */
 function imgsize( $path, $param = 'widthheight' )
@@ -344,6 +345,10 @@ function imgsize( $path, $param = 'widthheight' )
 	elseif( $param == 'string' )
 	{
 		return $size[3];
+	}
+	elseif( $param == 'widthheight_assoc' )
+	{
+		return array( 'width' => $size[0], 'height' => $size[1] );
 	}
 	else
 	{ // default: 'widthheight'
@@ -796,6 +801,9 @@ function is_absolute_pathname($path)
 
 /*
  * $Log$
+ * Revision 1.22  2009/09/11 19:35:24  blueyed
+ * imgsize: add "widthheight_assoc" format param, which returns an associative array
+ *
  * Revision 1.21  2009/08/31 17:21:32  fplanque
  * minor
  *
