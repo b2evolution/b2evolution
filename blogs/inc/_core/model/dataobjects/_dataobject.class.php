@@ -60,6 +60,8 @@ class DataObject
 	 */
 	var $ID = 0;  // This will be the ID in the DB
 
+	var $allow_ID_insert = false;
+
 	/**#@+
 	 * @access private
 	 */
@@ -205,7 +207,10 @@ class DataObject
 	{
 		global $DB, $localtimenow, $current_User;
 
-		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
+		if( $this->ID != 0 && !$this->allow_ID_insert )
+		{
+			die( 'Existing object/object with an ID cannot be inserted!' );
+		}
 
 		if( !empty($this->datecreated_field) )
 		{	// We want to track creation date:
@@ -347,31 +352,31 @@ class DataObject
 
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Check existing of specified value in unique field.
-	 * 
+	 *
 	 * @param $unique_field name of unique field
 	 * @param $value specified value
-	 * @param $quote quote if unique field represents string value 
+	 * @param $quote quote if unique field represents string value
 	 * @return ID if value exists otherwise NULL/false
 	 */
 	function dbexists($unique_field, $value, $quote = true)
 	{
 		global $DB;
-		
+
 		if($quote)
 		{
-			$value = $DB->quote($value);			
+			$value = $DB->quote($value);
 		}
-		
-		$sql = "SELECT $this->dbIDname 
-						  FROM $this->dbtablename 
-					   WHERE $unique_field = $value 
+
+		$sql = "SELECT $this->dbIDname
+						  FROM $this->dbtablename
+					   WHERE $unique_field = $value
 						   AND $this->dbIDname != $this->ID";
-								
-		return $DB->get_var( $sql );			
+
+		return $DB->get_var( $sql );
 	}
 
 	/**
@@ -759,6 +764,10 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/11 18:34:05  fplanque
+ * userfields editing module.
+ * needs further cleanup but I think it works.
+ *
  * Revision 1.13  2009/09/02 23:29:34  fplanque
  * doc
  *

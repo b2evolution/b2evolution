@@ -41,7 +41,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $AdminUI;
 
 
-$AdminUI->set_path( 'users' );
+$AdminUI->set_path( 'users', 'users' );
 
 param_action( 'list' );
 
@@ -910,6 +910,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2009/09/11 18:34:06  fplanque
+ * userfields editing module.
+ * needs further cleanup but I think it works.
+ *
  * Revision 1.24  2009/09/07 23:35:50  fplanque
  * cleanup
  *

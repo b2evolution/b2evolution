@@ -198,7 +198,11 @@ function & get_Cache( $objectName )
 			load_class( 'widgets/model/_widgetcache.class.php' );
 			$EnabledWidgetCache = new WidgetCache( true );
 			return $EnabledWidgetCache;
-
+			
+		case 'UserFieldCache';
+			$UserFieldCache = new DataObjectCache( 'Userfield', false, 'T_users__fielddefs', 'ufdf_', 'ufdf_ID', 'ufdf_name', 'ufdf_name' ); // COPY (FUNC)
+			return $UserFieldCache;
+						
 		default:
 			debug_die( 'getCache(): Unknown Cache type:'.$objectName );
 	}
@@ -3574,6 +3578,10 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.137  2009/09/11 18:34:05  fplanque
+ * userfields editing module.
+ * needs further cleanup but I think it works.
+ *
  * Revision 1.136  2009/09/10 12:13:33  efy-maxim
  * Messaging Module
  *

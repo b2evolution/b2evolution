@@ -89,6 +89,7 @@ $ctrl_mappings = array(
 		'stats'        => 'sessions/stats.ctrl.php',
 		'system'       => 'tools/system.ctrl.php',
 		'users'        => 'users/users.ctrl.php',
+		'userfields'   => 'users/userfields.ctrl.php',
 		'upload'       => 'files/upload.ctrl.php',
 	);
 
@@ -497,25 +498,25 @@ class _core_Module
 							'entries' => array(
 								'general' => array(
 									'text' => T_('General'),
-									'href' => $dispatcher.'?ctrl=settings' ),
+									'href' => '?ctrl=settings' ),
 								'features' => array(
 									'text' => T_('Features'),
-									'href' => $dispatcher.'?ctrl=features' ),
+									'href' => '?ctrl=features' ),
 								'antispam' => array(
 									'text' => T_('Antispam'),
-									'href' => $dispatcher.'?ctrl=set_antispam'),
+									'href' => '?ctrl=set_antispam'),
 								'regional' => array(
 									'text' => T_('Regional'),
-									'href' => $dispatcher.'?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
+									'href' => '?ctrl=locales'.( (isset($loc_transinfo) && $loc_transinfo) ? '&amp;loc_transinfo=1' : '' ) ),
 								'countries' => array(
 									'text' => T_('Countries'),
-									'href' => $dispatcher.'?ctrl=countries'),
+									'href' => '?ctrl=countries'),
 								'currencies' => array(
 									'text' => T_('Currencies'),
-									'href' => $dispatcher.'?ctrl=currencies'),
+									'href' => '?ctrl=currencies'),
 								'plugins' => array(
 									'text' => T_('Plugins'),
-									'href' => $dispatcher.'?ctrl=plugins'),
+									'href' => '?ctrl=plugins'),
 							)
 						),
 					) );
@@ -528,7 +529,20 @@ class _core_Module
 						'users' => array(
 						'text' => T_('Users'),
 						'title' => T_('User management'),
-						'href' => $dispatcher.'?ctrl=users',
+						'href' => '?ctrl=users',
+						'entries' =>  array(
+
+			// fp> the following submenu needs even further breakdown.
+
+							'users' => array(
+								'text' => T_('Users & Groups'),
+								'href' => '?ctrl=users'	),
+							// 'groups' =>
+							// 'defaultprofiles' =>
+							'userfields' => array(
+								'text' => T_('User fields'),
+								'href' => '?ctrl=userfields'	),
+							),
 					),
 				) );
 		}
@@ -538,7 +552,7 @@ class _core_Module
 						'users' => array(
 						'text' => T_('My profile'),
 						'title' => T_('User profile'),
-						'href' => $dispatcher.'?ctrl=users',
+						'href' => '?ctrl=users',
 					),
 				) );
 		}
@@ -550,14 +564,14 @@ class _core_Module
 				$AdminUI->add_menu_entries( NULL, array(
 						'tools' => array(
 							'text' => T_('Tools'),
-							'href' => $dispatcher.'?ctrl=crontab',
+							'href' => '?ctrl=crontab',
 							'entries' =>  array(
 								'cron' => array(
 									'text' => T_('Scheduler'),
-									'href' => $dispatcher.'?ctrl=crontab' ),
+									'href' => '?ctrl=crontab' ),
 								'system' => array(
 									'text' => T_('System'),
-									'href' => $dispatcher.'?ctrl=system' ),
+									'href' => '?ctrl=system' ),
 									),
 								),
 							) );
@@ -567,7 +581,7 @@ class _core_Module
 					$AdminUI->add_menu_entries( 'tools', array(
 									'antispam' => array(
 										'text' => T_('Antispam'),
-										'href' => $dispatcher.'?ctrl=antispam'	),
+										'href' => '?ctrl=antispam'	),
 									) );
 				}
 		}
@@ -577,11 +591,11 @@ class _core_Module
 			$AdminUI->add_menu_entries( NULL, array(
 						'tools' => array(
 							'text' => T_('Tools'),
-							'href' => $dispatcher.'?ctrl=antispam',
+							'href' => '?ctrl=antispam',
 							'entries' =>  array(
 								'antispam' => array(
 									'text' => T_('Antispam'),
-									'href' => $dispatcher.'?ctrl=antispam'	),
+									'href' => '?ctrl=antispam'	),
 								),
 						),
 					) );
@@ -594,6 +608,10 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.26  2009/09/11 18:34:05  fplanque
+ * userfields editing module.
+ * needs further cleanup but I think it works.
+ *
  * Revision 1.25  2009/09/10 13:01:30  efy-maxim
  * Messaging module - added initializer
  *
