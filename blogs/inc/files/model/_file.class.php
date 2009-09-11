@@ -1031,12 +1031,16 @@ class File extends DataObject
 			if( $size_name == 'original' )
 			{
 				$img_attribs['src'] = $this->get_url();
-				$img_attribs += $this->get_image_size('widthheight');
+				$img_attribs += $this->get_image_size('widthheight_assoc');
 			}
 			else
 			{
 				$img_attribs['src'] = $this->get_thumb_url( $size_name );
-				// TODO: size
+				$thumb_path = $this->get_af_thumb_path($size_name, NULL, true);
+				if( substr($thumb_path, 0, 1) != '!' )
+				{ // no error, add width and height attribs
+					$img_attribs += imgsize($thumb_path, 'widthheight_assoc');
+				}
 			}
 			$img = '<img '.get_field_attribs_as_string($img_attribs).' />';
 
@@ -1761,8 +1765,8 @@ class File extends DataObject
 	 *
 	 * af = Absolute File
 	 *
-	 * @param string size name
-	 * @param string mimetype of thumbnail (NULL if we're ready to take wathever is available)
+	 * @param string size name (e.g. "fit-80x80")
+	 * @param string mimetype of thumbnail (NULL if we're ready to take whatever is available)
 	 * @param boolean shall we create the dir if it doesn't exist?
 	 * @return string absolute filename or !error
 	 */
@@ -1869,6 +1873,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.47  2009/09/11 19:36:58  blueyed
+ * File::get_tag: fix width/height attribs for "original" size and add the attribs for thumbs, using "widthheight_assoc"
+ *
  * Revision 1.46  2009/09/09 19:05:39  blueyed
  * is_audio: fix doc, add oga to audio file extensions.
  *
