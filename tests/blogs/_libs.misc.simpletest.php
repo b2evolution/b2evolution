@@ -56,8 +56,9 @@ class ExtLibsTestCase extends EvoUnitTestCase
 		$SHC->check( 'foo bar' );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects );
+		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'ISO-8859-1' );
 		$SHC->check( 'foo дц bar' );
+
 		$this->assertTrue( $SHC->isOK() );
 
 		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects );
