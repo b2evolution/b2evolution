@@ -110,7 +110,7 @@ switch( $content_mode )
 					'after_image_legend' =>  $params['after_image_legend'],
 					'after_image' =>         $params['after_image_legend'],
 					'after' =>               $params['after_images'],
-					'image_size' =>					 $params['excerpt_image_size'],
+					'image_size' =>          $params['excerpt_image_size'],
 					'image_link_to' =>       'single',
 				) );
 		}
@@ -216,6 +216,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.18  2009/09/11 18:29:26  blueyed
+ * Fix indent
+ *
  * Revision 1.17  2009/05/22 06:35:58  sam2kb
  * minor
  *
