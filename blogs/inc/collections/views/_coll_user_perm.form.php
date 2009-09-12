@@ -74,7 +74,8 @@ if( !empty( $keywords ) )
 	$kw_array = split( ' ', $keywords );
 	foreach( $kw_array as $kw )
 	{
-		$where_clause .= 'CONCAT( user_login, \' \', user_firstname, \' \', user_lastname, \' \', user_nickname, \' \', user_email) LIKE "%'.$DB->escape($kw).'%" AND ';
+		// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
+		$where_clause .= 'CONCAT_WS( " ", user_login, user_firstname, user_lastname, user_nickname, user_email) LIKE "%'.$DB->escape($kw).'%" AND ';
 	}
 }
 
@@ -549,6 +550,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/12 00:21:03  fplanque
+ * search cleanup
+ *
  * Revision 1.6  2009/08/31 17:21:32  fplanque
  * minor
  *

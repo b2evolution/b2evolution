@@ -21,22 +21,27 @@ global $Session;
  */
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
-
 $final = param( 'final', 'integer', 0, true );
+$s = param( 's', 'string', '', true );
 
-// Create result set:
-$sql = 'SELECT *
-					FROM T_track__goal';
-$count_sql = 'SELECT COUNT(goal_ID)
-								FROM T_track__goal';
+// Create query:
+$SQL = & new SQL();
+$SQL->SELECT( '*' );
+$SQL->FROM( 'T_track__goal' );
 
 if( !empty($final) )
 {	// We want to filter on final goals only:
-	$sql .= ' WHERE goal_redir_url IS NULL';
-	$count_sql .= ' WHERE goal_redir_url IS NULL';
+	$SQL->WHERE_and( 'goal_redir_url IS NULL' );
 }
 
-$Results = & new Results( $sql, 'goals_', '-A', 20, $count_sql );
+if( !empty($s) )
+{	// We want to filter on search keyword:
+	// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
+	$SQL->WHERE_and( 'CONCAT_WS( " ", goal_name, goal_key, goal_redir_url ) LIKE "%'.$DB->escape($s).'%"' );
+}
+
+// Create result set:
+$Results = & new Results( $SQL->get(), 'goals_', '-A' );
 
 $Results->title = T_('Goals');
 
@@ -47,7 +52,8 @@ $Results->title = T_('Goals');
  */
 function filter_goals( & $Form )
 {
-	$Form->checkbox_basic_input( 'final', get_param('final'), T_('Final') );
+	$Form->checkbox_basic_input( 'final', get_param('final'), T_('Final only').' &bull;' );
+	$Form->text( 's', get_param('s'), 30, T_('Search'), '', 255 );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_goals',
@@ -116,6 +122,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/12 00:20:59  fplanque
+ * search cleanup
+ *
  * Revision 1.5  2009/08/30 20:58:10  tblue246
  * Goals ctrl: 1. Do not use localized messages to determine action. 2. Removed redundant "copy" action (always use "new" action with goal_ID).
  *

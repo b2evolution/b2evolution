@@ -36,13 +36,12 @@ load_class( 'regional/model/_currency.class.php', 'Currency' );
 
 global $dispatcher;
 
-$sql = 'SELECT ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_code 
+$sql = 'SELECT ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_code
 			FROM T_country
 			LEFT JOIN T_currency ON ctry_curr_ID=curr_ID';
-$count_sql = 'SELECT count(*) FROM T_country';
 
 // Create result set:
-$Results = & new Results( $sql, 'ctry_', 'D', NULL, $count_sql );
+$Results = & new Results( $sql, 'ctry_' );
 
 //$Results->Cache = & get_Cache( 'CountryCache' );
 $Results->title = T_('Countries list');
@@ -53,7 +52,7 @@ $Results->cols[] = array(
 						'order' => 'ctry_code',
 						'td' => '<strong>$ctry_code$</strong>',
 					);
-						
+
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
@@ -79,7 +78,7 @@ $Results->cols[] = array(
 						'order' => 'curr_code',
 						'td' => '$curr_shortcut$ $curr_code$',
 					);
-	
+
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
@@ -103,6 +102,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/12 00:21:02  fplanque
+ * search cleanup
+ *
  * Revision 1.6  2009/09/11 11:19:03  efy-sergey
  * Displaying currency code
  *
