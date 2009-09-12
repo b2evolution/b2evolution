@@ -36,14 +36,14 @@ load_class( 'regional/model/_currency.class.php', 'Currency' );
 
 global $dispatcher;
 
-$sql = 'SELECT ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_code
-			FROM T_country
-			LEFT JOIN T_currency ON ctry_curr_ID=curr_ID';
+// Create query
+$SQL = & new SQL();
+$SQL->SELECT( 'ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_code' );
+$SQL->FROM( 'T_country	LEFT JOIN T_currency ON ctry_curr_ID=curr_ID' );
 
 // Create result set:
-$Results = & new Results( $sql, 'ctry_' );
+$Results = & new Results( $SQL->get(), 'ctry_' );
 
-//$Results->Cache = & get_Cache( 'CountryCache' );
 $Results->title = T_('Countries list');
 
 $Results->cols[] = array(
@@ -102,6 +102,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/12 18:18:02  efy-sergey
+ * Changed query creation to using an SQL object
+ *
  * Revision 1.7  2009/09/12 00:21:02  fplanque
  * search cleanup
  *
