@@ -33,10 +33,19 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $dispatcher;
 
+// Get params from request
+$s = param( 's', 'string', '', true );
+
 //Create query
 $SQL = & new SQL();
 $SQL->SELECT( '*' );
 $SQL->FROM( 'T_currency' );
+
+if( !empty($s) )
+{	// We want to filter on search keyword:
+	// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
+	$SQL->WHERE( 'CONCAT_WS( " ", curr_code, curr_name ) LIKE "%'.$DB->escape($s).'%"' );
+}
 
 // Create result set:
 $Results = & new Results( $SQL->get(), 'curr_' );
@@ -44,6 +53,23 @@ $Results = & new Results( $SQL->get(), 'curr_' );
 $Results->Cache = & get_Cache( 'CurrencyCache' );
 
 $Results->title = T_('Currencies list');
+
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_currencies( & $Form )
+{
+	$Form->text( 's', get_param('s'), 30, T_('Search'), '', 255 );
+}
+
+$Results->filter_area = array(
+	'callback' => 'filter_currencies',
+	'presets' => array(
+		'all' => array( T_('All'), '?ctrl=currencies' ),
+		)
+	);
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
@@ -97,6 +123,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/12 18:57:27  efy-sergey
+ * Added a search field to the currency tables
+ *
  * Revision 1.4  2009/09/12 18:52:05  efy-sergey
  * Changed query creation to using an SQL object
  *
