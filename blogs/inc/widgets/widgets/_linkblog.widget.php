@@ -25,7 +25,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'widgets/widgets/_coll_item_list.widget.php' );
+load_class( 'widgets/widgets/_coll_item_list.widget.php','coll_item_list_Widget' );
 
 /**
  * linkblog_widget class
@@ -134,6 +134,9 @@ class linkblog_Widget extends coll_item_list_Widget
 
 /*
  * $Log$
+ * Revision 1.23  2009/09/12 11:11:21  efy-arrin
+ * Included the ClassName in the loadclass() with proper UpperCase
+ *
  * Revision 1.22  2009/03/20 23:20:16  fplanque
  * Related posts widget
  *
