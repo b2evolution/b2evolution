@@ -32,7 +32,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/dataobjects/_dataobject.class.php');
+load_class('_core/model/dataobjects/_dataobject.class.php', 'DataObject');
 
 /**
  * Country Class
@@ -139,6 +139,9 @@ class Country extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/12 12:53:44  tblue246
+ * Country class: Call load_class() with $classname parameter
+ *
  * Revision 1.11  2009/09/12 10:40:40  tblue246
  * Fixed wrong pathname
  *
