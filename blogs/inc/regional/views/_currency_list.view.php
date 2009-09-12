@@ -33,10 +33,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $dispatcher;
 
+//Create query
+$SQL = & new SQL();
+$SQL->SELECT( '*' );
+$SQL->FROM( 'T_currency' );
+
 // Create result set:
-$Results = & new Results(
-							'SELECT * FROM T_currency', 'curr_' );
+$Results = & new Results( $SQL->get(), 'curr_' );
+
 $Results->Cache = & get_Cache( 'CurrencyCache' );
+
 $Results->title = T_('Currencies list');
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
@@ -91,6 +97,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.4  2009/09/12 18:52:05  efy-sergey
+ * Changed query creation to using an SQL object
+ *
  * Revision 1.3  2009/09/02 23:29:34  fplanque
  * doc
  *
