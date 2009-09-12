@@ -36,16 +36,42 @@ load_class( 'regional/model/_currency.class.php', 'Currency' );
 
 global $dispatcher;
 
+// Get params from request
+$s = param( 's', 'string', '', true );
+
 // Create query
 $SQL = & new SQL();
 $SQL->SELECT( 'ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_code' );
 $SQL->FROM( 'T_country	LEFT JOIN T_currency ON ctry_curr_ID=curr_ID' );
+
+if( !empty($s) )
+{	// We want to filter on search keyword:
+	// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
+	$SQL->WHERE( 'CONCAT_WS( " ", ctry_code, ctry_name, curr_code ) LIKE "%'.$DB->escape($s).'%"' );
+}
 
 // Create result set:
 $Results = & new Results( $SQL->get(), 'ctry_' );
 
 $Results->title = T_('Countries list');
 
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_countries( & $Form )
+{
+	$Form->text( 's', get_param('s'), 30, T_('Search'), '', 255 );
+}
+
+$Results->filter_area = array(
+	'callback' => 'filter_countries',
+	'presets' => array(
+		'all' => array( T_('All'), '?ctrl=countries' ),
+		)
+	);
+	
 $Results->cols[] = array(
 						'th' => T_('Code'),
 						'td_class' => 'center',
@@ -102,6 +128,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/12 18:44:03  efy-sergey
+ * Added a search field to the countries tables
+ *
  * Revision 1.8  2009/09/12 18:18:02  efy-sergey
  * Changed query creation to using an SQL object
  *
