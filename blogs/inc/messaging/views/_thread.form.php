@@ -30,7 +30,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $edited_Message;
 global $edited_Thread;
 
-global $action;
+global $DB, $action;
+
 $creating = is_create_action( $action );
 
 $Form = & new Form( NULL, 'thread_checkchanges', 'post', 'compact' );
@@ -41,17 +42,30 @@ $Form->begin_form( 'fform', T_('New thread') );
 
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
-$Form->text_input( 'thrd_recipients', $edited_Thread->recipients, 100, T_('Recipients'), T_('Enter comma separated logins'), array( 'maxlength'=> 255, 'required'=>true ) );
+$recent_recipients = $DB->get_var('SELECT GROUP_CONCAT(DISTINCT user_login SEPARATOR \', \')
+									FROM (SELECT u.user_login
+											FROM T_messaging__threadstatus t
+											LEFT OUTER JOIN T_messaging__threadstatus tu
+											ON t.tsta_thread_ID = tu.tsta_thread_ID AND tu.tsta_user_ID <> '.$current_User->ID.'
+											LEFT OUTER JOIn T_users u ON tu.tsta_user_ID = u.user_ID
+											WHERE t.tsta_user_ID = '.$current_User->ID.' LIMIT 20) AS users');
 
-$Form->text_input( 'thrd_title', $edited_Thread->title, 100, T_('Title'), '', array( 'maxlength'=> 255, 'required'=>true ) );
+$user_login = param( 'user_login', 'string', '');
 
-$Form->textarea_input( 'msg_text', $edited_Message->text, 10, T_('Message'), array( 'cols'=>80, 'required'=>true ) );
+$Form->text_input( 'thrd_recipients', empty( $user_login ) ? $edited_Thread->recipients : $user_login, 70, T_('Recipients'), T_('Enter comma separated logins<br/>'.$recent_recipients), array( 'maxlength'=> 255, 'required'=>true ) );
+
+$Form->text_input( 'thrd_title', $edited_Thread->title, 70, T_('Title'), '', array( 'maxlength'=> 255, 'required'=>true ) );
+
+$Form->textarea_input( 'msg_text', $edited_Message->text, 10, T_('Message'), array( 'cols'=>80 ) );
 
 $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
 												/*
  * $Log$
+ * Revision 1.3  2009/09/12 18:44:11  efy-maxim
+ * Messaging module improvements
+ *
  * Revision 1.2  2009/09/10 18:24:07  fplanque
  * doc
  *

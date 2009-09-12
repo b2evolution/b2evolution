@@ -84,37 +84,24 @@ class Message extends DataObject
 	 */
 	function load_from_Request()
 	{
+		$new_thread = empty($this->thread_ID);
+
 		// Text
-		$this->set_string_from_param( 'text', true );
+
+		param( 'msg_text', 'text');
+		if( ! $new_thread )
+		{
+			param_check_not_empty( 'msg_text' );
+		}
+		$this->set( 'text', get_param( 'msg_text' ) );
 
 		// Thread
-		if( empty($this->thread_ID) )
+		if( $new_thread )
 		{
 			$this->Thread->load_from_Request();
 		}
 
 		return ! param_errors_detected();
-	}
-
-	/**
-	 * Set param value
-	 *
-	 * By default, all values will be considered strings
-	 *
-	 * @param string parameter name
-	 * @param mixed parameter value
-	 * @param boolean true to set to NULL if empty value
-	 * @return boolean true, if a value has been set; false if it has not changed
-	 */
-	function set( $parname, $parvalue, $make_null = false )
-	{
-		switch( $parname )
-		{
-			case 'text':
-				return $this->set_param( $parname, 'string', $parvalue, $make_null);
-			default:
-				return parent::set( $parname, $parvalue, $make_null );
-		}
 	}
 
 	/**
@@ -144,46 +131,62 @@ class Message extends DataObject
 
 		$DB->begin();
 
+		$new_thread = $this->get_Thread()->ID == 0;
+
 		// Create thread for new message
 
-		$this->get_Thread();
-
-		if( $this->Thread->ID == 0 && !$this->Thread->dbinsert() )
+		if( $new_thread )
 		{
-			$DB->rollback();
-
-			$Log->add( 'Thread has not been creted.', 'error' );
-			return false;
+			$success = $this->Thread->dbinsert();
 		}
 		else
 		{
 			$this->Thread->set_param( 'datemodified', 'string', date('Y-m-d H:i:s', $localtimenow) );
-			$this->Thread->dbupdate();
-
-			// Load recipients - Lazy filled
-			$this->Thread->load_recipients();
+			$success = $this->Thread->dbupdate();
 		}
 
-		$this->set_param( 'thread_ID', 'integer', $this->Thread->ID);
+		if( $success )
+		{
+			$this->set_param( 'thread_ID', 'integer', $this->Thread->ID);
+			$success = parent::dbinsert();
+		}
 
 
-		if( $result = parent::dbinsert() )
-		{ // We can insert message status for each recipient
+		if( $success )
+		{ // We can insert or update thread status for each recipient
 
-			$sql = 'INSERT INTO T_messaging__msgstatus (msta_thread_ID, msta_msg_ID, msta_user_ID, msta_status)
-								VALUES';
-
-			foreach ($this->Thread->recipients_list as $recipient_ID)
+			if( $new_thread )
 			{
-				$sql .= ' ('.$this->thread_ID.', '.$this->ID.', '.$recipient_ID.', '.$this->UNREAD.'),';
-			}
-			$sql .= ' ('.$this->thread_ID.', '.$this->ID.', '.$this->author_user_ID.', '.$this->AUTHOR.')';
+				$sql = 'INSERT INTO T_messaging__threadstatus (tsta_thread_ID, tsta_user_ID, tsta_first_unread_msg_ID)
+							VALUES';
 
-			$DB->query( $sql, 'Insert message statuses' );
+				foreach ( $this->Thread->recipients_list as $recipient_ID )
+				{
+					$sql .= ' ('.$this->Thread->ID.', '.$recipient_ID.', '.$this->ID.'),';
+				}
+				$sql .= ' ('.$this->Thread->ID.', '.$this->author_user_ID.', NULL)';
+
+				$success = $DB->query( $sql, 'Insert thread statuses' );
+			}
+			else
+			{
+				$sql = 'UPDATE T_messaging__threadstatus
+							SET tsta_first_unread_msg_ID = '.$this->ID.'
+							WHERE tsta_thread_ID = '.$this->Thread->ID.'
+							AND tsta_user_ID <> '.$this->author_user_ID.'
+							AND tsta_first_unread_msg_ID IS NULL';
+
+				$DB->query( $sql, 'Insert thread statuses' );
+			}
+		}
+
+		if( !$success )
+		{
+			$DB->rollback();
+			return false;
 		}
 
 		$DB->commit();
-
 		return true;
 	}
 
@@ -200,9 +203,10 @@ class Message extends DataObject
 
 		$DB->begin();
 
-		// Delete Statuses
-		$DB->query( 'DELETE FROM T_messaging__msgstatus
-												WHERE msta_msg_ID='.$this->ID );
+		// UPDATE Statuses
+		$DB->query( 'UPDATE T_messaging__threadstatus
+						SET tsta_first_unread_msg_ID = NULL
+						WHERE tsta_first_unread_msg_ID='.$this->ID );
 
 		// Delete Message
 		if( ! parent::dbdelete() )
@@ -216,37 +220,13 @@ class Message extends DataObject
 
 		return true;
 	}
-
-	/**
-	 * Check relations
-	 *
-	 * @param string $message
-	 * @return boolean result
-	 */
-	function check_delete( $message )
-	{
-		global $DB, $Messages;
-
-		if( ! parent::check_delete( $message ) )
-		{
-			return false;
-		}
-
-		$var = $DB->get_var('SELECT COUNT(*) FROM T_messaging__msgstatus WHERE msta_thread_ID = '.$this->thread_ID);
-
-		if( $var == 1 )
-		{
-			$Messages->add( T_('The last message of the thread can\'t be deleted. Delete the related thread instead.'), 'error' );
-			return false;
-		}
-
-		return true;
-	}
-
 }
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/12 18:44:11  efy-maxim
+ * Messaging module improvements
+ *
  * Revision 1.4  2009/09/10 18:24:07  fplanque
  * doc
  *

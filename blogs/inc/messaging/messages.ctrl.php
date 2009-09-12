@@ -44,7 +44,16 @@ $AdminUI->set_path( 'messaging' );
 // Get action parameter from request:
 param_action();
 
-param( 'thrd_ID', 'integer', '', true);
+if( param( 'thrd_ID', 'integer', '', true) )
+{// Load thread from cache:
+	$ThreadCache = & get_Cache( 'ThreadCache' );
+	if( ($edited_Thread = & $ThreadCache->get_by_ID( $thrd_ID, false )) === false )
+	{	unset( $edited_Thread );
+		forget_param( 'thrd_ID' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Thread') ), 'error' );
+		$action = 'nil';
+	}
+}
 
 if( param( 'msg_ID', 'integer', '', true) )
 {// Load message from cache:
@@ -151,6 +160,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2009/09/12 18:44:11  efy-maxim
+ * Messaging module improvements
+ *
  * Revision 1.3  2009/09/10 18:24:07  fplanque
  * doc
  *

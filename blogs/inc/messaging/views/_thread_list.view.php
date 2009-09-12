@@ -30,23 +30,17 @@ global $current_User;
 
 // Create result set:
 
-$select_sql = 'SELECT mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified, ms.numb_msgs AS thrd_messages
-				FROM T_messaging__msgstatus AS ts
-				LEFT OUTER JOIN T_messaging__thread mt ON mt.thrd_ID = ts.msta_thread_ID
-				LEFT OUTER JOIN
-					(SELECT msta_thread_ID, COUNT(*) AS numb_msgs
-					 FROM T_messaging__msgstatus
-					 WHERE msta_user_ID = '.$current_User->ID.'
-					 AND msta_status = 2 GROUP BY msta_thread_ID) AS ms ON ts.msta_thread_ID = ms.msta_thread_ID
-				WHERE ts.msta_user_ID = '.$current_User->ID.'
-				GROUP BY ts.msta_thread_ID ORDER BY ms.numb_msgs DESC, mt.thrd_datemodified DESC';
+$select_sql = 'SELECT mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified, mts.tsta_first_unread_msg_ID AS thrd_msg_ID,
+					(SELECT GROUP_CONCAT(ru.user_login ORDER BY ru.user_login SEPARATOR \', \')
+					FROM T_messaging__threadstatus AS rts
+					LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID
+					WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients
+				FROM T_messaging__threadstatus mts
+				LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
+					WHERE mts.tsta_user_ID = '.$current_User->ID.'
+					ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC';
 
-$count_sql = 'SELECT COUNT(*)
-				FROM (
-					SELECT msta_thread_ID
-					FROM T_messaging__msgstatus
-					WHERE msta_user_ID = '.$current_User->ID.'
-					GROUP BY msta_thread_ID) AS threads';
+$count_sql = 'SELECT COUNT(*) FROM T_messaging__threadstatus WHERE tsta_user_ID = '.$current_User->ID;
 
 $Results = & new Results( $select_sql, 'thrd_', '', NULL, $count_sql);
 
@@ -55,17 +49,17 @@ $Results->title = T_('Threads list');
 
 $Results->cols[] = array(
 					'th' => T_('Title'),
-					'td' => '¤conditional( #thrd_messages#>0, \'<strong><a href="'.$dispatcher
+					'td' => '¤conditional( #thrd_msg_ID#>0, \'<strong><a href="'.$dispatcher
 							.'?ctrl=messages&amp;thrd_ID=$thrd_ID$" title="'.
 							T_('Show messages...').'">$thrd_title$</a></strong>\', \'<a href="'
 							.$dispatcher.'?ctrl=messages&amp;thrd_ID=$thrd_ID$" title="'.T_('Show messages...').'">$thrd_title$</a>\' )¤',
 					);
 
 $Results->cols[] = array(
-					'th' => T_('New Messages'),
+					'th' => T_('Recipients'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
-					'td' => '¤conditional( #thrd_messages#>0, \'<strong>$thrd_messages$</strong>\', \'0\' )¤',
+					'td' => '%strmaxlen(#thrd_recipients#, 20)%',
 					);
 
 if( $current_User->ID == 1 )
@@ -86,6 +80,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/12 18:44:11  efy-maxim
+ * Messaging module improvements
+ *
  * Revision 1.4  2009/09/10 18:24:07  fplanque
  * doc
  *

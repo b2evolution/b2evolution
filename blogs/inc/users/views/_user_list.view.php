@@ -228,6 +228,23 @@ $Results->cols[] = array(
 						'td' => '%user_mailto( #user_email# )%',
 					);
 
+function user_pm ( $user_ID, $user_login )
+{
+	global $current_User;
+
+	if( $user_ID == $current_User->ID )
+	{
+		return '&nbsp;';
+	}
+	return action_icon( T_('Private Message').': '.$user_login, 'email', '?ctrl=threads&action=new&user_login='.$user_login );
+}
+$Results->cols[] = array(
+						'th' => T_('PM'),
+						'td_class' => 'shrinkwrap',
+						'td' => '%user_pm( #user_ID#, #user_login# )%',
+					);
+
+
 $Results->cols[] = array(
 						'th' => T_('URL'),
 						'td_class' => 'shrinkwrap',
@@ -311,6 +328,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/12 18:44:11  efy-maxim
+ * Messaging module improvements
+ *
  * Revision 1.9  2009/09/12 00:21:02  fplanque
  * search cleanup
  *

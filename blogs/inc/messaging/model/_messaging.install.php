@@ -56,19 +56,21 @@ $schema_queries['T_messaging__message'] = array(
 			PRIMARY KEY msg_ID (msg_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
 
-// msta_status can be one of the following: 0=author 1=read and 2=unread
-// fp> TODO: we probably neede indexes on this table
-$schema_queries['T_messaging__msgstatus'] = array(
-		'Creating table for message statuses',
-		"CREATE TABLE T_messaging__msgstatus (
-			msta_thread_ID int(10) unsigned NOT NULL,
-			msta_msg_ID int(10) unsigned NOT NULL,
-			msta_user_ID int(10) unsigned NOT NULL,
-			msta_status tinyint(1) unsigned NOT NULL
+// index on tsta_user_ID field
+$schema_queries['T_messaging__threadstatus'] = array(
+		'Creating table for message threads statuses',
+		"CREATE TABLE T_messaging__threadstatus (
+			tsta_thread_ID int(10) unsigned NOT NULL,
+			tsta_user_ID int(10) unsigned NOT NULL,
+			tsta_first_unread_msg_ID int(10) unsigned NULL,
+			INDEX(tsta_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
 
 /*
  * $Log$
+ * Revision 1.3  2009/09/12 18:44:11  efy-maxim
+ * Messaging module improvements
+ *
  * Revision 1.2  2009/09/10 18:24:07  fplanque
  * doc
  *

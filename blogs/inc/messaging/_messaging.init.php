@@ -33,7 +33,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 $db_config['aliases']['T_messaging__thread'] = $tableprefix.'messaging__thread';
 $db_config['aliases']['T_messaging__message'] = $tableprefix.'messaging__message';
-$db_config['aliases']['T_messaging__msgstatus'] = $tableprefix.'messaging__msgstatus';
+$db_config['aliases']['T_messaging__threadstatus'] = $tableprefix.'messaging__threadstatus';
 
 /**
  * Controller mappings.
@@ -118,6 +118,9 @@ $messaging_Module = & new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.3  2009/09/12 18:44:11  efy-maxim
+ * Messaging module improvements
+ *
  * Revision 1.2  2009/09/10 18:24:07  fplanque
  * doc
  *

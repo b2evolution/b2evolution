@@ -1997,13 +1997,15 @@ class Form extends Widget
 	 * @param string
 	 * @param integer
 	 * @param string
+	 * @param boolean
 	 */
-	function textarea( $field_name, $field_value, $field_rows, $field_label, $field_note = '', $field_cols = 50 , $field_class = '' )
+	function textarea( $field_name, $field_value, $field_rows, $field_label, $field_note = '', $field_cols = 50 , $field_class = '', $required = false )
 	{
 		$field_params = array(
 			'note' => $field_note,
 			'cols' => $field_cols,
-			'class' => $field_class );
+			'class' => $field_class,
+			'required' => $required );
 
 		return $this->textarea_input( $field_name, $field_value, $field_rows, $field_label, $field_params );
 	}
@@ -2941,6 +2943,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.60  2009/09/12 18:44:11  efy-maxim
+ * Messaging module improvements
+ *
  * Revision 1.59  2009/09/04 16:10:31  tblue246
  * Fix PHP notice (discovered by waltercruz)
  *

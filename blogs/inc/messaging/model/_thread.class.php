@@ -83,11 +83,7 @@ class Thread extends DataObject
 		// Resipients
 		$this->set_string_from_param( 'recipients', true );
 
-		$unavailable_recipients_list = $this->find_recipients( $thrd_recipients );
-		if( $unavailable_recipients_list )
-		{
-			param_error( 'recipients', 'The following users were not found: '.implode( ', ', $unavailable_recipients_list ) );
-		}
+		$this->param_check__recipients( 'thrd_recipients', $thrd_recipients );
 
 		return ! param_errors_detected();
 	}
@@ -116,40 +112,45 @@ class Thread extends DataObject
 	}
 
 	/**
-	 * Select available recipients from database
+	 * Check are recipients available in database
 	 *
-	 * @todo Tblue> This currently leads to a "user not found" message if
-	 *              the current user is specified as a recipient; this is
-	 *              confusing -- it should display a message like "You cannot
-	 *              send threads to yourself.".
-	 *
-	 * @param string $recipients
+	 * @param string recipients
 	 */
-	function find_recipients ( $recipients )
+	function param_check__recipients ( $var, $recipients )
 	{
 		global $DB, $current_User;
 
+		// split recipients into array using comma separator
 		$recipients_list = array();
 		foreach ( explode(',', $recipients) as $recipient )
 		{
 			$recipients_list[] = strtolower(trim($recipient));
 		}
 
+		$error_msg = '';
+
+		// check has recipients list login of current user
+		if( in_array( $current_User->login, $recipients_list ) )
+		{
+			$error_msg = 'You cannot send threads to yourself: '.$current_User->login;
+		}
+
+		// select all users from database
 		$db_users_list = array();
 		foreach( $DB->get_results( 'SELECT user_ID, user_login
-									FROM T_users
-										WHERE user_ID != '.$current_User->ID) as $row )
+									FROM T_users') as $row )
 		{
 			$db_users_list[$row->user_login] = $row->user_ID;
 		}
 
+		// check are recipients available in database
 		$this->recipients_list = array();
 		$unavailable_recipients_list = array();
 		foreach( $recipients_list as $recipient )
 		{
-			if( array_key_exists( $recipient, $db_users_list ) )
+			if ( array_key_exists( $recipient, $db_users_list ) )
 			{
-				$this->recipients_list[$db_users_list[$recipient]] = $row->user_ID;
+				$this->recipients_list[] = $db_users_list[$recipient];
 			}
 			else
 			{
@@ -157,24 +158,24 @@ class Thread extends DataObject
 			}
 		}
 
-		return count( $unavailable_recipients_list ) > 0 ? $unavailable_recipients_list : false;
-	}
-
-	/**
-	 * Load recipients from database
-	 */
-	function load_recipients()
-	{
-		global $DB, $current_User;
-
-		foreach( $DB->get_results( 'SELECT msta_user_ID
-									FROM T_messaging__msgstatus
-										WHERE msta_thread_ID = '.$this->ID.'
-										AND msta_user_ID != '.$current_User->ID.'
-										GROUP BY msta_user_ID') as $row )
+		if ( count( $unavailable_recipients_list ) > 0 )
 		{
-			$this->recipients_list[] = $row->msta_user_ID;
+			if ( ! empty( $error_msg ) )
+			{
+				$error_msg .= '<br/>';
+			}
+
+			$error_msg .= 'The following users were not found: '.implode( ', ', $unavailable_recipients_list );
 		}
+
+		if( ! empty( $error_msg ) )
+		{	// show error
+
+			param_error( $var, $error_msg );
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -192,8 +193,8 @@ class Thread extends DataObject
 		$ret = $DB->query( 'DELETE FROM T_messaging__message
 												WHERE msg_thread_ID='.$this->ID );
 		// Delete Statuses
-		$ret = $DB->query( 'DELETE FROM T_messaging__msgstatus
-												WHERE msta_thread_ID='.$this->ID );
+		$ret = $DB->query( 'DELETE FROM T_messaging__threadstatus
+												WHERE tsta_thread_ID='.$this->ID );
 		// Delete Thread
 		if( ! parent::dbdelete() )
 		{
@@ -210,6 +211,9 @@ class Thread extends DataObject
 
 /*
  * $Log$
+ * Revision 1.4  2009/09/12 18:44:11  efy-maxim
+ * Messaging module improvements
+ *
  * Revision 1.3  2009/09/10 18:24:07  fplanque
  * doc
  *

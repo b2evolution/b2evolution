@@ -2501,12 +2501,12 @@ function upgrade_b2evo_tables()
 		) ENGINE = innodb" );
 		task_end();
 
-		task_begin( 'Creating table for message statuses... ' );
-		$DB->query( "CREATE TABLE T_messaging__msgstatus (
-			msta_thread_ID int(10) unsigned NOT NULL,
-			msta_msg_ID int(10) unsigned NOT NULL,
-			msta_user_ID int(10) unsigned NOT NULL,
-			msta_status tinyint(1) unsigned NOT NULL
+		task_begin( 'Creating table for message threads statuses... ' );
+		$DB->query( "CREATE TABLE T_messaging__threadstatus (
+			tsta_thread_ID int(10) unsigned NOT NULL,
+			tsta_user_ID int(10) unsigned NOT NULL,
+			tsta_first_unread_msg_ID int(10) unsigned NULL,
+			INDEX(tsta_user_ID)
 		) ENGINE = innodb" );
 		task_end();
 
@@ -2662,6 +2662,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.312  2009/09/12 18:44:11  efy-maxim
+ * Messaging module improvements
+ *
  * Revision 1.311  2009/09/10 18:24:07  fplanque
  * doc
  *
