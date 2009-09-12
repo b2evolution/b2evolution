@@ -255,8 +255,8 @@ function output_image( $imh, $mimetype )
 /**
  * Generate a thumbnail
  *
- * @param
- * @param
+ * @param resource Image resource
+ * @param string Thumbnail type ('crop'|'fit')
  * @param int Thumbnail width
  * @param int Thumbnail height
  * @return array short error code + dest image handler
@@ -303,6 +303,9 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/12 20:51:58  tblue246
+ * phpdoc fixes
+ *
  * Revision 1.7  2009/07/30 21:34:55  blueyed
  * scale_to_constraint: support NULL/0 for max_width/max_height, allowing formats like '640x'. doc.
  *

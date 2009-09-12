@@ -779,7 +779,7 @@ function skin_container( $sco_name, $params = array() )
  *
  * @todo do not install if skin doesn't exist. Important for upgrade. Need to NOT fail if ZERO skins installed though :/
  *
- * @param string
+ * @param string Skin folder
  * @return Skin
  */
 function & skin_install( $skin_folder )
@@ -894,6 +894,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.73  2009/09/12 20:51:58  tblue246
+ * phpdoc fixes
+ *
  * Revision 1.72  2009/08/03 12:02:40  tblue246
  * Keep only page param when redirecting to canonical post URL
  *
