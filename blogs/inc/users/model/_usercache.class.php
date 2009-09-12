@@ -33,7 +33,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/dataobjects/_dataobjectcache.class.php');
+load_class('_core/model/dataobjects/_dataobjectcache.class.php','DataObjectCache');
 
 /**
  * Blog Cache Class
@@ -268,6 +268,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/12 11:15:43  efy-arrin
+ * Included the ClassName in loadclass with proper UpperCase
+ *
  * Revision 1.4  2009/08/30 00:42:11  fplanque
  * fixed user form
  *
