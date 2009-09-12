@@ -32,7 +32,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/dataobjects/_dataobject.class.php');
+load_class('_core/model/dataobjects/_DataObject.class.php');
 
 /**
  * Country Class
@@ -139,6 +139,9 @@ class Country extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/12 09:45:58  efy-arrin
+ * by efy-arrin
+ *
  * Revision 1.9  2009/09/10 18:24:07  fplanque
  * doc
  *
