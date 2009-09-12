@@ -25,7 +25,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'widgets/model/_widget.class.php' );
+load_class( 'widgets/model/_widget.class.php','ComponentWidget');
 
 /**
  * ComponentWidget Class
@@ -105,6 +105,9 @@ class coll_title_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/12 11:03:13  efy-arrin
+ * Included the ClassName in the loadclass() with proper UpperCase
+ *
  * Revision 1.10  2009/03/13 02:32:07  fplanque
  * Cleaned up widgets.
  * Removed stupid widget_name param.

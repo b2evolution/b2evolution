@@ -90,12 +90,12 @@ function & get_Cache( $objectName )
 	switch( $objectName )
 	{
 		case 'BlogCache':
-			load_class( 'collections/model/_blogcache.class.php' );
+			load_class( 'collections/model/_blogcache.class.php','BlogCache' );
 			$BlogCache = new BlogCache(); // COPY (FUNC)
 			return $BlogCache;
 
 		case 'ChapterCache':
-			load_class( 'chapters/model/_chaptercache.class.php' );
+			load_class( 'chapters/model/_chaptercache.class.php','chaptercache');
 			$ChapterCache = new ChapterCache(); // COPY (FUNC)
 			return $ChapterCache;
 
@@ -108,7 +108,7 @@ function & get_Cache( $objectName )
 			return $CurrencyCache;
 
 		case 'FileCache':
-			load_class( 'files/model/_filecache.class.php' );
+			load_class( 'files/model/_filecache.class.php','FileCache' );
 			$FileCache = new FileCache(); // COPY (FUNC)
 			return $FileCache;
 
@@ -118,7 +118,7 @@ function & get_Cache( $objectName )
 			return $FileRootCache;
 
 		case 'FiletypeCache':
-			load_class( 'files/model/_filetypecache.class.php' );
+			load_class( 'files/model/_filetypecache.class.php','FiletypeCache' );
 			$Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
 			return $FiletypeCache;
 
@@ -135,7 +135,7 @@ function & get_Cache( $objectName )
 			return $ItemCacheLight;
 
 		case 'ItemCache':
-			load_class( 'items/model/_itemcache.class.php' );
+			load_class( 'items/model/_itemcache.class.php','ItemCache' );
 			$ItemCache = new ItemCache(); // COPY (FUNC)
 			return $ItemCache;
 
@@ -152,12 +152,12 @@ function & get_Cache( $objectName )
 			return $ItemStatusCache;
 
 		case 'ItemTypeCache':
-			load_class( 'items/model/_itemtypecache.class.php' );
+			load_class( 'items/model/_itemtypecache.class.php','ItemTypeCache' );
 			$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', 'new ItemTypeCache( \'ptyp_\', \'ptyp_ID\' )' );
 			return $ItemTypeCache;
 
 		case 'LinkCache':
-			load_class( 'items/model/_linkcache.class.php' );
+			load_class( 'items/model/_linkcache.class.php','LinkCache' );
 			$LinkCache = new LinkCache(); // COPY (FUNC)
 			return $LinkCache;
 
@@ -166,12 +166,12 @@ function & get_Cache( $objectName )
 			return $MessageCache;
 
 		case 'Plugins_admin':
-			load_class('plugins/model/_plugins_admin.class.php');
+			load_class('plugins/model/_plugins_admin.class.php','Plugins_admin');
 			$Plugins_admin = new Plugins_admin(); // COPY (FUNC)
 			return $Plugins_admin;
 
 		case 'SkinCache':
-			load_class( 'skins/model/_skincache.class.php' );
+			load_class( 'skins/model/_skincache.class.php','SkinCache' );
 			$SkinCache = new SkinCache(); // COPY (FUNC)
 			return $SkinCache;
 
@@ -180,12 +180,13 @@ function & get_Cache( $objectName )
 			return $ThreadCache;
 
 		case 'UserCache':
-			load_class( 'users/model/_usercache.class.php' );
+			load_class( 'users/model/_usercache.class.php','UserCache' );
 			$UserCache = new UserCache(); // COPY (FUNC)
 			return $UserCache;
 
 		case 'WidgetCache':
-			load_class( 'widgets/model/_widgetcache.class.php' );
+			load_class( 'widgets/model/_widgetcache.class.php','WidgetCache' );
+			
 			$WidgetCache = new WidgetCache(); // COPY (FUNC)
 			return $WidgetCache;
 
@@ -195,7 +196,7 @@ function & get_Cache( $objectName )
 			// instead of per-method parameters to load only the enabled
 			// widgets should be cleaner when there will be more methods
 			// in the WidgetCache class in the future.
-			load_class( 'widgets/model/_widgetcache.class.php' );
+			load_class( 'widgets/model/_widgetcache.class.php','WidgetCache' );
 			$EnabledWidgetCache = new WidgetCache( true );
 			return $EnabledWidgetCache;
 			
@@ -3578,6 +3579,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.138  2009/09/12 10:58:46  efy-arrin
+ * Included the ClassName in the loadclass() with proper UpperCase
+ *
  * Revision 1.137  2009/09/11 18:34:05  fplanque
  * userfields editing module.
  * needs further cleanup but I think it works.

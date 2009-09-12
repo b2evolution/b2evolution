@@ -25,7 +25,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'widgets/model/_widget.class.php' );
+load_class( 'widgets/model/_widget.class.php','ComponentWidget');
 
 /**
  * ComponentWidget: Common navigation links.
@@ -182,6 +182,9 @@ class coll_common_links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/12 11:03:13  efy-arrin
+ * Included the ClassName in the loadclass() with proper UpperCase
+ *
  * Revision 1.11  2009/09/10 13:44:57  tblue246
  * Translation fixes/update
  *
