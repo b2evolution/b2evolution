@@ -2501,7 +2501,7 @@ function upgrade_b2evo_tables()
 		) ENGINE = innodb" );
 		task_end();
 
-		task_begin( 'Creating table for message threads statuses... ' );
+		task_begin( 'Creating table for message thread statuses... ' );
 		$DB->query( "CREATE TABLE T_messaging__threadstatus (
 			tsta_thread_ID int(10) unsigned NOT NULL,
 			tsta_user_ID int(10) unsigned NOT NULL,
@@ -2510,7 +2510,7 @@ function upgrade_b2evo_tables()
 		) ENGINE = innodb" );
 		task_end();
 
-		// Add messaging permission collumn to T_groups table for messaging module
+		// Add messaging permission column to T_groups table for messaging module
 
 		task_begin( 'Add messaging permissions for groups... ' );
 		$DB->query( "ALTER TABLE T_groups
@@ -2690,6 +2690,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.314  2009/09/13 15:56:11  fplanque
+ * minor
+ *
  * Revision 1.313  2009/09/13 12:25:34  efy-maxim
  * Messaging permissions have been added to:
  * 1. Upgrader

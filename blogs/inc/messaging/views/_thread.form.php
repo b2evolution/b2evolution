@@ -45,9 +45,9 @@ $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) 
 $recent_recipients = $DB->get_var('SELECT GROUP_CONCAT(DISTINCT user_login SEPARATOR \', \')
 									FROM (SELECT u.user_login
 											FROM T_messaging__threadstatus t
-											LEFT OUTER JOIN T_messaging__threadstatus tu
-											ON t.tsta_thread_ID = tu.tsta_thread_ID AND tu.tsta_user_ID <> '.$current_User->ID.'
-											LEFT OUTER JOIn T_users u ON tu.tsta_user_ID = u.user_ID
+													LEFT OUTER JOIN T_messaging__threadstatus tu
+																ON t.tsta_thread_ID = tu.tsta_thread_ID AND tu.tsta_user_ID <> '.$current_User->ID.'
+													LEFT OUTER JOIn T_users u ON tu.tsta_user_ID = u.user_ID
 											WHERE t.tsta_user_ID = '.$current_User->ID.' LIMIT 20) AS users');
 
 $user_login = param( 'user_login', 'string', '');
@@ -63,6 +63,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 
 												/*
  * $Log$
+ * Revision 1.4  2009/09/13 15:56:12  fplanque
+ * minor
+ *
  * Revision 1.3  2009/09/12 18:44:11  efy-maxim
  * Messaging module improvements
  *

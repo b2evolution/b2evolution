@@ -184,7 +184,7 @@ function & get_Cache( $objectName )
 
 		case 'WidgetCache':
 			load_class( 'widgets/model/_widgetcache.class.php','WidgetCache' );
-			
+
 			$WidgetCache = new WidgetCache(); // COPY (FUNC)
 			return $WidgetCache;
 
@@ -3577,6 +3577,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.141  2009/09/13 15:56:13  fplanque
+ * minor
+ *
  * Revision 1.140  2009/09/13 02:25:03  fplanque
  * prototype for splitting up get_Cache()
  *

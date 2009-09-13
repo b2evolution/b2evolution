@@ -94,9 +94,10 @@ $Form->begin_form( 'fform', '' );
 
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
-$recipients = $DB->get_var('SELECT GROUP_CONCAT(u.user_login ORDER BY u.user_login SEPARATOR \', \') FROM T_messaging__threadstatus mts
-LEFT OUTER JOIN T_users u ON mts.tsta_user_ID = u.user_ID
-WHERE mts.tsta_thread_ID = '.$edited_Thread->ID.' AND mts.tsta_user_ID <> '.$current_User->ID);
+$recipients = $DB->get_var('SELECT GROUP_CONCAT(u.user_login ORDER BY u.user_login SEPARATOR \', \') 
+	 FROM T_messaging__threadstatus mts
+				LEFT OUTER JOIN T_users u ON mts.tsta_user_ID = u.user_ID
+	WHERE mts.tsta_thread_ID = '.$edited_Thread->ID.' AND mts.tsta_user_ID <> '.$current_User->ID);
 
 $Form->textarea('msg_text', '', 10, T_('Reply'), '<b>Reply to: </b>'.$recipients, 80, '', true);
 
@@ -104,6 +105,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.6  2009/09/13 15:56:12  fplanque
+ * minor
+ *
  * Revision 1.5  2009/09/12 18:44:11  efy-maxim
  * Messaging module improvements
  *

@@ -327,7 +327,8 @@ class Group extends DataObject
 				switch ( $permvalue )
 				{
 					case 'write': // you create threads, view any thread you're involved in & reply
-					case 'delete': // same ad write but you can also delete threads you're involved in
+					case 'delete': // same as write but you can also delete threads you're involved in
+						// fp> TODO: implement $permlevel
 						$perm = true;
 					break;
 				}
@@ -542,6 +543,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/13 15:56:13  fplanque
+ * minor
+ *
  * Revision 1.13  2009/09/13 12:25:34  efy-maxim
  * Messaging permissions have been added to:
  * 1. Upgrader
