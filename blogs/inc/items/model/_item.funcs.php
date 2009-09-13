@@ -347,7 +347,7 @@ function bpost_count_words( $str )
 	$str = trim( strip_tags( $str ) );
 
 	// Note: The \p escape sequence is available since PHP 4.4.0 and 5.1.0.
-	if( @preg_match( '|\pL|', 'foo' ) === false )
+	if( @preg_match( '|\pL|u', 'foo' ) === false )
 	{
 		return str_word_count( $str );
 	}
@@ -357,7 +357,7 @@ function bpost_count_words( $str )
 	foreach( preg_split( '#\s+#', convert_charset( $str, 'UTF-8' ), -1,
 							PREG_SPLIT_NO_EMPTY ) as $word )
 	{
-		if( preg_match( '#\pL#', $word ) )
+		if( preg_match( '#\pL#u', $word ) )
 		{
 			++$count;
 		}
@@ -654,7 +654,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 				.' style="padding-left:'.($level-1).'em;">'
 				.htmlspecialchars($thisChapter->name).'</label>'
 				.' <a href="'.htmlspecialchars($thisChapter->get_permanent_url()).'" title="'.htmlspecialchars(T_('View category in blog.')).'">'
-				.'&nbsp;&raquo;&nbsp; ' // TODO: dh> provide an icon instead? // fp> maybe the A(dmin)/B(log) icon from the toolbar? And also use it for permalinks to posts? 
+				.'&nbsp;&raquo;&nbsp; ' // TODO: dh> provide an icon instead? // fp> maybe the A(dmin)/B(log) icon from the toolbar? And also use it for permalinks to posts?
 				.'</a>'
 				."</td></tr>\n";
 
@@ -860,7 +860,7 @@ function item_link_by_urltitle( $params = array() )
  * button depending on the selected post status.
  *
  * This function is used by the simple and expert write screens.
- * 
+ *
  * @param string Are we updating or creating? ('create' or 'update').
  */
 function echo_publishnowbutton_js( $action )
@@ -870,7 +870,7 @@ function echo_publishnowbutton_js( $action )
 		jQuery( '#itemform_visibility input[type=radio]' ).click( function()
 		{
 			var publishnow_btn = jQuery( '.edit_actions input[name=actionArray[<?php echo $action; ?>_publish]]' );
-			
+
 			if( this.value != 'draft' )
 			{	// Hide the "Publish NOW !" button:
 				publishnow_btn.css( 'display', 'none' );
@@ -927,6 +927,9 @@ function check_perm_posttype( $post_extracats )
 
 /*
  * $Log$
+ * Revision 1.63  2009/09/13 21:51:01  blueyed
+ * Fix bpost_count_words to use unicode. Fixes the russian test.
+ *
  * Revision 1.62  2009/09/13 21:29:21  blueyed
  * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
  *
