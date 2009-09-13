@@ -6,7 +6,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version _collections.init.php,v 1.4 2009/08/30 14:18:07 tblue246 Exp
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -74,6 +74,19 @@ $ctrl_mappings = array_merge( $ctrl_mappings, array(
 		'widgets'      => 'widgets/widgets.ctrl.php',
 		'wpimport'     => 'tools/wpimport.ctrl.php',
 	) );
+
+
+/**
+ * Get the BlogCache
+ *
+ * @return BlogCache
+ */
+function & get_BlogCache()
+{
+	load_class( 'collections/model/_blogcache.class.php','BlogCache' );
+	$BlogCache = new BlogCache(); // COPY (FUNC)
+	return $BlogCache;
+}
 
 
 /**
@@ -354,7 +367,7 @@ $collections_Module = & new collections_Module();
 
 
 /*
- * $Log$
+ * _collections.init.php,v
  * Revision 1.4  2009/08/30 14:18:07  tblue246
  * evoBar: Fixed b2evolution menu
  *

@@ -73,7 +73,7 @@ function modules_call_method( $method_name )
 }
 
 /**
- * @todo fp> split into 1 function per case. (typed @return values)
+ * @todo fp> split into 1 function per case. (typed @return values) @see get_BlogCache()
  *
  * @return DataObjectCache
  */
@@ -90,9 +90,7 @@ function & get_Cache( $objectName )
 	switch( $objectName )
 	{
 		case 'BlogCache':
-			load_class( 'collections/model/_blogcache.class.php','BlogCache' );
-			$BlogCache = new BlogCache(); // COPY (FUNC)
-			return $BlogCache;
+			return get_BlogCache();
 
 		case 'ChapterCache':
 			load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
@@ -199,11 +197,11 @@ function & get_Cache( $objectName )
 			load_class( 'widgets/model/_widgetcache.class.php','WidgetCache' );
 			$EnabledWidgetCache = new WidgetCache( true );
 			return $EnabledWidgetCache;
-			
+
 		case 'UserFieldCache';
 			$UserFieldCache = new DataObjectCache( 'Userfield', false, 'T_users__fielddefs', 'ufdf_', 'ufdf_ID', 'ufdf_name', 'ufdf_name' ); // COPY (FUNC)
 			return $UserFieldCache;
-						
+
 		default:
 			debug_die( 'getCache(): Unknown Cache type:'.$objectName );
 	}
@@ -3579,6 +3577,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.140  2009/09/13 02:25:03  fplanque
+ * prototype for splitting up get_Cache()
+ *
  * Revision 1.139  2009/09/13 02:13:51  fplanque
  * minor
  *
