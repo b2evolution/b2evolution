@@ -67,10 +67,14 @@ $ProfileForm->end_fieldset();
 $ProfileForm->begin_fieldset( T_('Identity') );
 
 	global $admin_url;
-	$ProfileForm->info( T_('Avatar'), $current_User->get_avatar_imgtag()
-		.' <a href="'.$admin_url.'?ctrl=files&amp;user_ID='.$current_User->ID.'">'.T_('change').' &raquo;</a>' );
+	$avatar_tag = $current_User->get_avatar_imgtag();
+	if( $current_User->check_perm( 'admin', 'any' ) && $current_User->check_perm( 'files', 'view' ) )
+	{
+		$avatar_tag .= ' <a href="'.$admin_url.'?ctrl=files&amp;user_ID='.$current_User->ID.'">'.T_('change').' &raquo;</a>';
+	}
+	$ProfileForm->info( T_('Avatar'), $avatar_tag );
 
-  $ProfileForm->info( T_('Login'), $current_User->get('login') );
+	$ProfileForm->info( T_('Login'), $current_User->get('login') );
 	$ProfileForm->text_input( 'newuser_firstname', $current_User->get( 'firstname' ), 40, T_('First name'), '', array( 'maxlength' => 50, 'class' => 'bComment' ) );
 	$ProfileForm->text_input( 'newuser_lastname', $current_User->get( 'lastname' ), 40, T_('Last name'), '', array( 'maxlength' => 50, 'class' => 'bComment' ) );
 	$ProfileForm->text_input( 'newuser_nickname', $current_User->get( 'nickname' ), 40, T_('Nickname'), '', array( 'maxlength' => 50, 'class' => 'bComment' ) );
@@ -114,6 +118,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/13 12:27:28  tblue246
+ * Only display link to change to the avatar if user has appropriate permissions
+ *
  * Revision 1.9  2009/03/20 03:38:04  fplanque
  * rollback -- http://forums.b2evolution.net/viewtopic.php?t=18269
  *

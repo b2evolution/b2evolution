@@ -162,8 +162,12 @@ $Form->begin_fieldset( T_('Identity') );
 	{ // We can edit the values:
 
 		global $admin_url;
-		$Form->info( T_('Avatar'), $edited_User->get_avatar_imgtag()
-			.' <a href="'.$admin_url.'?ctrl=files&amp;user_ID='.$edited_User->ID.'">'.T_('change').' &raquo;</a>' );
+		$avatar_tag = $edited_User->get_avatar_imgtag();
+		if( $current_User->check_perm( 'files', 'view' ) )
+		{
+			$avatar_tag .= ' <a href="'.$admin_url.'?ctrl=files&amp;user_ID='.$edited_User->ID.'">'.T_('change').' &raquo;</a>';
+		}
+		$Form->info( T_('Avatar'), $avatar_tag );
 
 		// fp> TODO: a javascript REFRAME feature would ne neat here: selecting a square area of the img and saving it as a new avatar image
 
@@ -497,6 +501,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.17  2009/09/13 12:27:28  tblue246
+ * Only display link to change to the avatar if user has appropriate permissions
+ *
  * Revision 1.16  2009/09/10 13:51:38  tblue246
  * Do not show form field for user level if action == view_user.
  *
