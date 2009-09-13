@@ -95,7 +95,7 @@ function & get_Cache( $objectName )
 			return $BlogCache;
 
 		case 'ChapterCache':
-			load_class( 'chapters/model/_chaptercache.class.php','chaptercache');
+			load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
 			$ChapterCache = new ChapterCache(); // COPY (FUNC)
 			return $ChapterCache;
 
@@ -3579,6 +3579,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.139  2009/09/13 02:13:51  fplanque
+ * minor
+ *
  * Revision 1.138  2009/09/12 10:58:46  efy-arrin
  * Included the ClassName in the loadclass() with proper UpperCase
  *
