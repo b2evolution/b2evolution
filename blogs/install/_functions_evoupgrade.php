@@ -2582,6 +2582,11 @@ function upgrade_b2evo_tables()
 	 */
 
 
+	task_begin( 'Updating posts...' );
+	$DB->query( 'UPDATE T_items__item SET post_datestart = FROM_UNIXTIME( FLOOR(UNIX_TIMESTAMP(post_datestart)/60)*60 )' );
+		task_end();
+
+
 	// Just in case, make sure the db schema version is upto date at the end.
 	if( $old_db_version != $new_db_version )
 	{ // Update DB schema version to $new_db_version
@@ -2690,6 +2695,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.316  2009/09/13 21:29:22  blueyed
+ * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
+ *
  * Revision 1.315  2009/09/13 21:26:50  blueyed
  * SQL_NO_CACHE for SELECT queries using T_hitlog
  *

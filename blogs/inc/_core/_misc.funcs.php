@@ -1135,6 +1135,18 @@ function get_weekstartend( $date, $startOfWeek )
 
 
 /**
+ * Get datetime lowered to minutes. This is meant to remove seconds and
+ * support MySQL's query cache.
+ * @param integer UNIX timestamp
+ * @param string Format (defaults to "Y-m-d H:i"). Use "U" for UNIX timestamp.
+ */
+function remove_seconds($timestamp, $format = 'Y-m-d H:i')
+{
+	return date($format, floor($timestamp/60)*60);
+}
+
+
+/**
  * Check that email address looks valid.
  *
  * @param string email address to check
@@ -3577,6 +3589,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.142  2009/09/13 21:29:21  blueyed
+ * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
+ *
  * Revision 1.141  2009/09/13 15:56:13  fplanque
  * minor
  *

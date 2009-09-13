@@ -151,24 +151,22 @@ class coll_tag_cloud_Widget extends ComponentWidget
 			return;
 		}
 
-		global $DB;
+		global $DB, $localtimenow;
 
 // fp> verrry dirty and params; TODO: clean up
 		// get list of relevant blogs
-		$sql = 'SELECT LOWER(tag_name) AS tag_name, COUNT(DISTINCT itag_itm_ID) AS tag_count
+		$sql = "SELECT LOWER(tag_name) AS tag_name, post_datestart, COUNT(DISTINCT itag_itm_ID) AS tag_count
 						  FROM T_items__tag INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID
 					  				INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID
 					  				INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 					  				INNER JOIN T_items__item ON itag_itm_ID = post_ID
-						 WHERE '.$Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID').'
-						  AND post_status = "published" AND post_datestart < NOW()
+						 WHERE ".$Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID')."
+						  AND post_status = 'published' AND post_datestart < '".remove_seconds($localtimenow)."'
 						 GROUP BY tag_name
 						 ORDER BY tag_count DESC
-						 LIMIT '.$this->disp_params['max_tags'];
+						 LIMIT ".$this->disp_params['max_tags'];
 
 		$results = $DB->get_results( $sql, OBJECT, 'Get tags' );
-
-		// pre_dump( $results );
 
 		if( empty($results) )
 		{	// No tags!
@@ -224,6 +222,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.21  2009/09/13 21:29:22  blueyed
+ * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
+ *
  * Revision 1.20  2009/09/12 11:03:13  efy-arrin
  * Included the ClassName in the loadclass() with proper UpperCase
  *

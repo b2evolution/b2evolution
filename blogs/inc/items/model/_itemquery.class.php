@@ -470,7 +470,10 @@ class ItemQuery extends SQL
 
 
 	/**
-	 * Restricts to a specific date range. (despite thje 'start' in the name
+	 * Restricts to a specific date range. (despite the 'start' in the name).
+	 *
+	 * Start date gets restricted to minutes only (to make the query more
+	 * cachable).
 	 *
 	 * Priorities:
 	 *  -dstart and/or dstop
@@ -508,8 +511,9 @@ class ItemQuery extends SQL
 			// Add trailing 0s: YYYYMMDDHHMMSS
 			$dstart0 = $dstart.'00000000000000';  // TODO: this is NOT correct, should be 0101 for month
 
+			// Start date in MySQL format: seconds get omitted (lowered to minutes)
 			$dstart_mysql = substr($dstart0,0,4).'-'.substr($dstart0,4,2).'-'.substr($dstart0,6,2).' '
-											.substr($dstart0,8,2).':'.substr($dstart0,10,2).':'.substr($dstart0,12,2);
+											.substr($dstart0,8,2).':'.substr($dstart0,10,2);
 
 			$this->WHERE_and( $this->dbprefix.'datestart >= \''.$dstart_mysql.'\'
 													OR ( '.$this->dbprefix.'datedeadline IS NULL AND '.$this->dbprefix.'datestart >= \''.$dstart_mysql.'\' )' );
@@ -551,7 +555,7 @@ class ItemQuery extends SQL
 				default:
 					// add one to second
 					$dstop_mysql = substr($dstop,0,4).'-'.substr($dstop,4,2).'-'.substr($dstop,6,2).' '
-											.substr($dstop,8,2).':'.substr($dstop,10,2).':'.( substr( $dstop,12,2) + 1 );
+											.substr($dstop,8,2).':'.substr($dstop,10,2);
 			}
 
 			$this->WHERE_and( $this->dbprefix.'datestart < \''.$dstop_mysql.'\'' ); // NOT <= comparator because we compare to the superior stop date
@@ -613,7 +617,7 @@ class ItemQuery extends SQL
 		if( !empty($timestamp_min) )
 		{ // Hide posts before
 			// echo 'hide before '.$timestamp_min;
-			$date_min = date('Y-m-d H:i:s', $timestamp_min + $time_difference );
+			$date_min = remove_seconds( $timestamp_min + $time_difference );
 			$this->WHERE_and( $this->dbprefix.'datestart >= \''. $date_min.'\'' );
 		}
 
@@ -625,7 +629,7 @@ class ItemQuery extends SQL
 		if( !empty($timestamp_max) )
 		{ // Hide posts after
 			// echo 'after';
-			$date_max = date('Y-m-d H:i:s', $timestamp_max + $time_difference );
+			$date_max = remove_seconds( $timestamp_max + $time_difference );
 			$this->WHERE_and( $this->dbprefix.'datestart <= \''. $date_max.'\'' );
 		}
 
@@ -719,6 +723,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/13 21:29:22  blueyed
+ * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
+ *
  * Revision 1.10  2009/03/08 23:57:44  fplanque
  * 2009
  *

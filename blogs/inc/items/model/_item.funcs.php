@@ -790,6 +790,7 @@ function visibility_select( & $Form, $post_status )
 /**
  * Selection of the issue date
  *
+ * @todo dh> should display erroneous values (e.g. when giving invalid date) as current (form) value, too.
  * @param Form
  */
 function issue_date_control( $Form, $break = false )
@@ -812,7 +813,7 @@ function issue_date_control( $Form, $break = false )
 				.'/><strong>'.T_('Set to').':</strong></label>';
 	$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), '' );
 	echo ' '; // allow wrapping!
-	$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '', 'hh:mm:ss', '' );
+	$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '', 'hh:mm', '' );
 	echo ' '; // allow wrapping!
 
 }
@@ -926,6 +927,9 @@ function check_perm_posttype( $post_extracats )
 
 /*
  * $Log$
+ * Revision 1.62  2009/09/13 21:29:21  blueyed
+ * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
+ *
  * Revision 1.61  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

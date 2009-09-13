@@ -42,6 +42,12 @@
 				<li>Added post type permissions (@tblue)</li>
 				<li>Backoffice comment editing: Allow changing of "Allow message form" setting for guest comments (@tblue)</li>
 				<li>Blog options: Added option to sort comments by ascending or descending order (@tblue)</li>
+				<li>SQL optimizations (@blueyed)
+					<ul>
+						<li>SQL_NO_CACHE for queries selecting from T_sessions/T_hitlog</li>
+						<li>Remove information about seconds from item issue and start date,
+						so that those queries can get cached for up to one minute now.</li>
+					</ul>
 				<li><strong>XML-RPC:</strong>
 					<ul>
 						<li>MetaWeblog API: Use mt_keyword field to get/set

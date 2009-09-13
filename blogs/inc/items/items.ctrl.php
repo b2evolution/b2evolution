@@ -9,6 +9,12 @@
  * {@internal Open Source relicensing agreement:
  * }}
  *
+ * @todo dh> AFAICS there are three params used for "item ID": "p", "post_ID"
+ *       and "item_ID". This should get cleaned up.
+ *       Side effect: "post_ID required" error if you switch tabs (expert/simple),
+ *       after an error is display (e.g. entering an invalid issue time).
+ *       (related to $tab_switch_params)
+ *
  * @package admin
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
@@ -535,9 +541,8 @@ switch( $action )
 
 		$edited_Item->set( 'status', $post_status );
 
-		$post_date = date('Y-m-d H:i:s', $localtimenow);
-		$edited_Item->set( 'datestart', $post_date );
-		$edited_Item->set( 'datemodified', $post_date );
+		$edited_Item->set( 'datestart', remove_seconds($localtimenow) );
+		$edited_Item->set( 'datemodified', date('Y-m-d H:i:s', $localtimenow) );
 
 		// UPDATE POST IN DB:
 		$edited_Item->dbupdate();
@@ -1033,6 +1038,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.59  2009/09/13 21:29:21  blueyed
+ * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
+ *
  * Revision 1.58  2009/08/30 19:54:25  fplanque
  * less translation messgaes for infrequent errors
  *

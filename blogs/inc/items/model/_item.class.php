@@ -444,10 +444,9 @@ class Item extends ItemLight
 
 			if( $editing || $set_issue_date == 'set' )
 			{ // We can use user date:
-				param_date( 'item_issue_date', T_('Please enter a valid issue date.'), true );
-				if( strlen(get_param('item_issue_date')) )
-				{ // only set it, if a date was given:
-					param_time( 'item_issue_time' );
+				if( param_date( 'item_issue_date', T_('Please enter a valid issue date.'), true )
+					&& param_time( 'item_issue_time' ) )
+				{ // only set it, if a (valid) date and time was given:
 					$this->set( 'issue_date', form_date( get_param( 'item_issue_date' ), get_param( 'item_issue_time' ) ) ); // TODO: cleanup...
 				}
 			}
@@ -3066,6 +3065,11 @@ class Item extends ItemLight
 			case 'renderers': // deprecated
 				return $this->set_renderers( $parvalue );
 
+			case 'datestart':
+			case 'issue_date':
+				// Remove seconds from issue date and start date
+				return parent::set( $parname, remove_seconds(strtotime($parvalue)) );
+
 			default:
 				return parent::set( $parname, $parvalue, $make_null );
 		}
@@ -3974,6 +3978,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.135  2009/09/13 21:29:21  blueyed
+ * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
+ *
  * Revision 1.134  2009/09/06 21:50:24  tblue246
  * Remove EVO_NEXT_VERSION, which at a point was not replaced and is useless now (since nobody knows by what version it should be replaced now).
  *
