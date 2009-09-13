@@ -33,11 +33,11 @@ global $blog, $admin_url, $rsc_url;
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 // Create result set:
-$sql = 'SELECT user_login, COUNT( sess_ID ) AS nb_sessions, MAX( sess_lastseen ) AS sess_lastseen
+$sql = 'SELECT SQL_NO_CACHE user_login, COUNT( sess_ID ) AS nb_sessions, MAX( sess_lastseen ) AS sess_lastseen
 					FROM T_sessions LEFT JOIN T_users ON sess_user_ID = user_ID
 					GROUP BY sess_user_ID';
 
-$count_sql = 'SELECT COUNT( DISTINCT(sess_user_ID) )
+$count_sql = 'SELECT SQL_NO_CACHE COUNT( DISTINCT(sess_user_ID) )
 								FROM T_sessions';
 
 $Results = & new Results( $sql, 'usess_', '-D', 20, $count_sql );
@@ -71,6 +71,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/13 21:27:20  blueyed
+ * SQL_NO_CACHE for SELECT queries using T_sessions
+ *
  * Revision 1.7  2009/03/08 23:57:45  fplanque
  * 2009
  *

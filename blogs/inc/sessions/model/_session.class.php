@@ -129,7 +129,7 @@ class Session
 				$Debuglog->add( 'Session ID received from cookie: '.$session_id_by_cookie, 'session' );
 
 				$row = $DB->get_row( '
-					SELECT sess_ID, sess_key, sess_data, sess_user_ID
+					SELECT SQL_NO_CACHE sess_ID, sess_key, sess_data, sess_user_ID
 					  FROM T_sessions
 					 WHERE sess_ID  = '.$DB->quote($session_id_by_cookie).'
 					   AND sess_key = '.$DB->quote($session_key_by_cookie).'
@@ -464,7 +464,7 @@ class Session
 		}
 
 		$sess_data = $DB->get_var( '
-			SELECT sess_data FROM T_sessions
+			SELECT SQL_NO_CACHE sess_data FROM T_sessions
 			 WHERE sess_ID = '.$this->ID );
 
 		$sess_data = @unserialize( $sess_data );
@@ -546,6 +546,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/13 21:27:20  blueyed
+ * SQL_NO_CACHE for SELECT queries using T_sessions
+ *
  * Revision 1.11  2009/05/28 22:46:14  blueyed
  * doc
  *

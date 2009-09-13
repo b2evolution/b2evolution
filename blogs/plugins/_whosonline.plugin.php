@@ -200,7 +200,7 @@ class OnlineSessions
 		// We get all sessions that have been seen in $timeout_YMD and that have a session key.
 		// NOTE: we do not use DISTINCT here, because guest users are all "NULL".
 		foreach( $DB->get_results( "
-			SELECT sess_user_ID
+			SELECT SQL_NO_CACHE sess_user_ID
 			  FROM T_sessions
 			 WHERE sess_lastseen > '".$timeout_YMD."'
 			   AND sess_key IS NOT NULL", OBJECT, 'Sessions: get list of relevant users.' ) as $row )
@@ -333,6 +333,9 @@ class OnlineSessions
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/13 21:27:20  blueyed
+ * SQL_NO_CACHE for SELECT queries using T_sessions
+ *
  * Revision 1.6  2009/07/04 17:43:13  tblue246
  * Made $timeout_online_user a widget setting
  *

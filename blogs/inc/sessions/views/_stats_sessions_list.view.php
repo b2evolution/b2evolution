@@ -35,9 +35,9 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 $user = param( 'user', 'string', '', true );
 
 // Create result set:
-$sql = 'SELECT sess_ID, user_login, sess_hitcount, sess_lastseen, sess_ipaddress
+$sql = 'SELECT SQL_NO_CACHE sess_ID, user_login, sess_hitcount, sess_lastseen, sess_ipaddress
 					FROM T_sessions LEFT JOIN T_users ON sess_user_ID = user_ID';
-$count_sql = 'SELECT COUNT(sess_ID)
+$count_sql = 'SELECT SQL_NO_CACHE COUNT(sess_ID)
 					      FROM T_sessions';
 if( !empty( $user ) )
 {
@@ -108,6 +108,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/13 21:27:20  blueyed
+ * SQL_NO_CACHE for SELECT queries using T_sessions
+ *
  * Revision 1.5  2009/03/08 23:57:45  fplanque
  * 2009
  *
