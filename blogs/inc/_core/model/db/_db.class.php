@@ -838,7 +838,7 @@ class DB
 				$this->queries[ $this->num_queries - 1 ]['function_trace'] = debug_get_backtrace( $this->debug_dump_function_trace_for_queries, array( array( 'class' => 'DB' ) ), 1 ); // including first stack entry from class DB
 			}
 
-			if( $this->debug_dump_rows )
+			if( $this->debug_dump_rows && $this->num_rows )
 			{
 				$this->queries[ $this->num_queries - 1 ]['results'] = $this->debug_get_rows_table( $this->debug_dump_rows );
 			}
@@ -1064,7 +1064,7 @@ class DB
 	{
 		$r = '';
 
-		if( ! is_resource($this->result) )
+		if( ! $this->last_result )
 		{
 			return '<p>No Results.</p>';
 		}
@@ -1091,47 +1091,39 @@ class DB
 
 		// ======================================================
 		// print main results
-		if( is_resource($this->last_result) ) // may be true for 'SET sql_mode = "TRADITIONAL"'
+		for( $i = 0, $n = min(count($this->last_result), $max_lines); $i < $n; $i++ )
 		{
-			for( $i = 0, $n = min(count($this->last_result), $max_lines); $i < $n; $i++ )
+			$one_row = $this->get_row(NULL, ARRAY_N, $i);
+			$r .= '<tr>';
+			foreach( $one_row as $item )
 			{
-				$one_row = $this->get_row(NULL, ARRAY_N, $i);
-				$r .= '<tr>';
-				foreach( $one_row as $item )
+				if( $i % 2 )
 				{
-					if( $i % 2 )
-					{
-						$r .= '<td class="odd">';
-					}
-					else
-					{
-						$r .= '<td>';
-					}
-
-					if( $break_at_comma )
-					{
-						$item = str_replace( ',', '<br />', $item );
-						$item = str_replace( ';', '<br />', $item );
-						$r .= $item;
-					}
-					else
-					{
-						if( strlen( $item ) > 50 )
-						{
-							$item = substr( $item, 0, 50 ).'...';
-						}
-						$r .= htmlspecialchars($item);
-					}
-					$r .= '</td>';
+					$r .= '<td class="odd">';
+				}
+				else
+				{
+					$r .= '<td>';
 				}
 
-				$r .= '</tr>';
+				if( $break_at_comma )
+				{
+					$item = str_replace( ',', '<br />', $item );
+					$item = str_replace( ';', '<br />', $item );
+					$r .= $item;
+				}
+				else
+				{
+					if( strlen( $item ) > 50 )
+					{
+						$item = substr( $item, 0, 50 ).'...';
+					}
+					$r .= htmlspecialchars($item);
+				}
+				$r .= '</td>';
 			}
 
-		} // if last result
-		else
-		{
-			$r .= '<tr><td colspan="'.(count($col_info)+1).'">No Results</td></tr>';
+			$r .= '</tr>';
 		}
 		if( $i >= $max_lines )
 		{
@@ -1581,6 +1573,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.34  2009/09/13 21:29:59  blueyed
+ * DB: fix debug_get_rows_table, which returned 'No results' since 1.32. Only display result related info if there are any rows now.
+ *
  * Revision 1.33  2009/07/25 00:47:21  blueyed
  * Add log_queries param to DB constructor. Used from tests for performance reason.
  *
