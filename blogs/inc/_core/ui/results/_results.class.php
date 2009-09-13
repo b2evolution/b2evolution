@@ -614,6 +614,8 @@ class Results extends Table
 	 *
 	 * This is done by dynamically modifying the SQL query and forging a COUNT() into it.
 	 *
+	 * @todo dh> This might get done using SQL_CALC_FOUND_ROWS (I noted this somewhere else already)
+	 *
 	 * @todo allow overriding?
 	 * @todo handle problem of empty groups!
 	 */
@@ -1819,6 +1821,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.26  2009/09/13 21:28:25  blueyed
+ * doc/todo
+ *
  * Revision 1.25  2009/07/02 23:59:33  fplanque
  * Don't display ... when not needed.
  * Clicking on ... now brings you to the middle of the interval.
