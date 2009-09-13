@@ -70,7 +70,7 @@ class Group extends DataObject
 	var $perm_files;
 	var $perm_options;
 	var $perm_users;
-
+	var $perm_messaging;
 
 	/**
 	 * Constructor
@@ -101,6 +101,7 @@ class Group extends DataObject
 			$this->set( 'perm_files', 'none' );
 			$this->set( 'perm_options', 'none' );
 			$this->set( 'perm_users', 'none' );
+			$this->set( 'perm_messaging', 'none' );
 		}
 		else
 		{
@@ -122,6 +123,7 @@ class Group extends DataObject
 			$this->perm_files                   = $db_row->grp_perm_files;
 			$this->perm_options                 = $db_row->grp_perm_options;
 			$this->perm_users                   = $db_row->grp_perm_users;
+			$this->perm_messaging               = $db_row->grp_perm_messaging;
 		}
 	}
 
@@ -318,6 +320,16 @@ class Group extends DataObject
 							$perm = true;
 							break;
 						}
+				}
+				break;
+
+			case 'messaging':
+				switch ( $permvalue )
+				{
+					case 'write': // you create threads, view any thread you're involved in & reply
+					case 'delete': // same ad write but you can also delete threads you're involved in
+						$perm = true;
+					break;
 				}
 				break;
 		}
@@ -530,6 +542,12 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/13 12:25:34  efy-maxim
+ * Messaging permissions have been added to:
+ * 1. Upgrader
+ * 2. Group class
+ * 3. Edit Group form
+ *
  * Revision 1.12  2009/08/30 17:27:03  fplanque
  * better NULL param handling all over the app
  *

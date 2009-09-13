@@ -2510,6 +2510,34 @@ function upgrade_b2evo_tables()
 		) ENGINE = innodb" );
 		task_end();
 
+		// Add messaging permission collumn to T_groups table for messaging module
+
+		task_begin( 'Add messaging permissions for groups... ' );
+		$DB->query( "ALTER TABLE T_groups
+										ADD COLUMN grp_perm_messaging enum('none','write','delete') NOT NULL default 'none' AFTER grp_perm_files" );
+		task_end();
+
+		// Add default messaging permissions for the following groups:
+		// Administrator Group, Privileged Bloggers Group, Bloggers Group
+
+		task_begin( 'Giving Administrator Group delete perms on messaging threads... ' );
+		$DB->query( 'UPDATE T_groups
+		             SET grp_perm_messaging = "delete"
+		             WHERE grp_ID = 1' );
+		task_end();
+
+		task_begin( 'Giving Privileged Bloggers Group write perms on messaging threads and messages... ' );
+		$DB->query( 'UPDATE T_groups
+		             SET grp_perm_messaging = "write"
+		             WHERE grp_ID = 2' );
+		task_end();
+
+		task_begin( 'Giving Bloggers Group write perms on messaging threads and messages... ' );
+		$DB->query( 'UPDATE T_groups
+		             SET grp_perm_messaging = "write"
+		             WHERE grp_ID = 3' );
+		task_end();
+
 		//set_upgrade_checkpoint( '9970' );
 	}
 
@@ -2662,6 +2690,12 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.313  2009/09/13 12:25:34  efy-maxim
+ * Messaging permissions have been added to:
+ * 1. Upgrader
+ * 2. Group class
+ * 3. Edit Group form
+ *
  * Revision 1.312  2009/09/12 18:44:11  efy-maxim
  * Messaging module improvements
  *

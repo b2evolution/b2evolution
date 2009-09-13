@@ -150,6 +150,13 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 							array( 'all', sprintf( T_('Edit all files, including %slocked ones'), $filetypes_linkstart.get_icon('file_not_allowed').$filetypes_linkend ), T_('Needed for editing PHP files in skins.') ),
 						), T_('Files'), true, T_('This setting will further restrict any media file permissions on specific blogs.') );
 
+
+	$Form->radio( 'edited_grp_perm_messaging', $edited_Group->get('perm_messaging'),
+			array(  $perm_none_option,
+							array( 'write', T_( 'Create threads, view any thread you\'re involved in & reply' ) ),
+							array( 'delete', T_( 'Create threads, view and delete any thread you\'re involved in & reply' ) )
+						), T_('Messaging'), true );
+
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_properties_system_permissions') );
@@ -196,6 +203,12 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/13 12:25:34  efy-maxim
+ * Messaging permissions have been added to:
+ * 1. Upgrader
+ * 2. Group class
+ * 3. Edit Group form
+ *
  * Revision 1.10  2009/07/08 22:42:15  fplanque
  * wording for newbies
  *

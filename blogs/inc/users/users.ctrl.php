@@ -765,6 +765,7 @@ if( !$Messages->count('error') )
 			$edited_Group->set( 'perm_stats', param( 'edited_grp_perm_stats', 'string', true ) );
 			$edited_Group->set( 'perm_options', param( 'edited_grp_perm_options', 'string', true ) );
 			$edited_Group->set( 'perm_files', param( 'edited_grp_perm_files', 'string', true ) );
+			$edited_Group->set( 'perm_messaging', param( 'edited_grp_perm_messaging', 'string', true ) );
 
 			if( $edited_Group->ID != 1 )
 			{ // Groups others than #1 can be prevented from logging in or editing users
@@ -910,6 +911,12 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.26  2009/09/13 12:25:34  efy-maxim
+ * Messaging permissions have been added to:
+ * 1. Upgrader
+ * 2. Group class
+ * 3. Edit Group form
+ *
  * Revision 1.25  2009/09/11 18:34:06  fplanque
  * userfields editing module.
  * needs further cleanup but I think it works.
