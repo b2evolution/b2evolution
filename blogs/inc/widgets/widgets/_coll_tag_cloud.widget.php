@@ -154,17 +154,28 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		global $DB, $localtimenow;
 
 // fp> verrry dirty and params; TODO: clean up
+// dh> oddly, this appears to not get cached by the query cache. Have experimented a bit, but not found the reason.
+//     It worked locally somehow, but not live.
+//     This takes up to ~50% (but more likely 15%) off the total SQL time. With the query being cached, it would be far better.
 		// get list of relevant blogs
+		$where_cats = trim($Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID'));
+
+		// build query, only joining categories, if not using all.
 		$sql = "SELECT LOWER(tag_name) AS tag_name, post_datestart, COUNT(DISTINCT itag_itm_ID) AS tag_count
-						  FROM T_items__tag INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID
-					  				INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID
-					  				INNER JOIN T_categories ON postcat_cat_ID = cat_ID
-					  				INNER JOIN T_items__item ON itag_itm_ID = post_ID
-						 WHERE ".$Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID')."
-						  AND post_status = 'published' AND post_datestart < '".remove_seconds($localtimenow)."'
-						 GROUP BY tag_name
-						 ORDER BY tag_count DESC
-						 LIMIT ".$this->disp_params['max_tags'];
+			  FROM T_items__tag INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID";
+		if( $where_cats != '1' )
+		{ // we have to join the cats
+			$sql .= "
+			 INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID
+			 INNER JOIN T_categories ON postcat_cat_ID = cat_ID";
+		}
+		$sql .= "
+			 INNER JOIN T_items__item ON itag_itm_ID = post_ID
+			 WHERE $where_cats
+			   AND post_status = 'published' AND post_datestart < '".remove_seconds($localtimenow)."'
+			 GROUP BY tag_name
+			 ORDER BY tag_count DESC
+			 LIMIT ".$this->disp_params['max_tags'];
 
 		$results = $DB->get_results( $sql, OBJECT, 'Get tags' );
 
@@ -222,6 +233,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.22  2009/09/13 21:33:44  blueyed
+ * coll_tag_cloud_Widget: optimizing tag query a bit. doc.
+ *
  * Revision 1.21  2009/09/13 21:29:22  blueyed
  * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
  *
