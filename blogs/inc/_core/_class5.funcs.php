@@ -183,6 +183,7 @@ else
 
 /**
  * Load class file. No-op for PHP5, uses __autoload().
+ * @todo dh> This is meant to be a NO-OP. Why the magic and not adding it just to the map?!
  */
 function load_class( $class_path, $classname = NULL )
 {
@@ -206,6 +207,9 @@ function duplicate( $Obj )
 
 /*
  * $Log$
+ * Revision 1.21  2009/09/13 22:26:54  blueyed
+ * todo/question
+ *
  * Revision 1.20  2009/09/03 14:08:04  fplanque
  * automated load_class()
  *
