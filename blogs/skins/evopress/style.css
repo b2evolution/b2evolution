@@ -425,7 +425,8 @@ padding: 2px;
 /* Begin Various Tags & Classes */
 
 hr {
-display: none;
+height:0;
+border:none;
 }
 
 
