@@ -109,6 +109,16 @@ class EvoTextReporter extends TextReporter
  */
 class EvoHtmlReporter extends HtmlReporter
 {
+	function __construct($charset = NULL)
+	{
+		if( is_null($charset) )
+		{
+			global $io_charset;
+			$charset = $io_charset;
+		}
+		parent::__construct($charset);
+	}
+
 	function paintMethodStart($test_name)
 	{
 		parent::paintMethodStart($test_name);

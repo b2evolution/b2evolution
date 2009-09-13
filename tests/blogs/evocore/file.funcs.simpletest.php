@@ -17,9 +17,9 @@ load_funcs('files/model/_file.funcs.php');
  */
 class FileFuncsTestCase extends EvoUnitTestCase
 {
-	function FileFuncsTestCase()
+	function __construct()
 	{
-		$this->EvoUnitTestCase( 'File functions test' );
+		parent::__construct( 'File functions test' );
 	}
 
 
@@ -75,6 +75,12 @@ class FileFuncsTestCase extends EvoUnitTestCase
 	 */
 	function test_mkdir_r()
 	{
+		if( ! is_writable(TMPDIR) )
+		{
+			// HACK to display skip message. skipIf is meant to be called in skip only, but we do not want to skip all tests.
+			$this->skipIf( true, 'TMPDIR is not writable.' );
+			return;
+		}
 		$this->assertTrue( mkdir_r( TMPDIR.'test/foo' ) );
 		$this->assertTrue( is_dir( TMPDIR.'test/foo' ) );
 

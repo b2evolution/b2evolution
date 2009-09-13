@@ -15,9 +15,9 @@ require_once( dirname(__FILE__).'/../../config.simpletest.php' );
  */
 class FileTestCase extends FilemanUnitTestCase
 {
-	function FileTestCase()
+	function __construct()
 	{
-		$this->FilemanUnitTestCase( 'File class test' );
+		parent::__construct( 'File class test' );
 	}
 
 

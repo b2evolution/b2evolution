@@ -20,9 +20,9 @@ load_funcs('_core/_url.funcs.php');
  */
 class MiscFuncsTestCase extends EvoUnitTestCase
 {
-	function MiscFuncsTestCase()
+	function __construct()
 	{
-		$this->EvoUnitTestCase( 'Miscellaneous functions test' );
+		parent::__construct( 'Miscellaneous functions test' );
 	}
 
 

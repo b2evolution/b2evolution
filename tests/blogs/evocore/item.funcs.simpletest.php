@@ -18,9 +18,9 @@ load_funcs('items/model/_item.funcs.php');
  */
 class ItemFuncsTestCase extends EvoUnitTestCase
 {
-	function ItemFuncsTestCase()
+	function __construct()
 	{
-		$this->EvoUnitTestCase( 'Item functions test' );
+		parent::__construct( 'Item functions test' );
 	}
 
 

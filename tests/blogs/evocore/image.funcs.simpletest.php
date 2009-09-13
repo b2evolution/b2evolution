@@ -18,9 +18,9 @@ load_funcs('files/model/_image.funcs.php');
  */
 class ImageFuncsTestCase extends EvoUnitTestCase
 {
-	function ImageFuncsTestCase()
+	function __construct()
 	{
-		$this->EvoUnitTestCase( 'Image functions test' );
+		parent::__construct( 'Image functions test' );
 	}
 
 
