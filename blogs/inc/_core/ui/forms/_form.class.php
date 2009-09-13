@@ -862,24 +862,24 @@ class Form extends Widget
 	{
 		if( isset($field_params['time_format']) )
 		{
-			$field_format = '('.$field_params['time_format'].')';
+			$field_format = $field_params['time_format'];
 			unset( $field_params['time_format'] ); // not an attribute
 		}
 		else
 		{
-			$field_format = '(hh:mm:ss)';
+			$field_format = 'hh:mm:ss';
 		}
 
-		// Prepend format to note
+		// Use format as field note
 		if( ! isset($field_params['note']) )
 		{
-			$field_params['note'] = $field_format;
+			$field_params['note'] = '('.$field_format.')';
 		}
 
 		$field_size = strlen($field_format);
 
 		// Get time part of datetime:
-		$field_value = substr( $field_value, 11, 8 );
+		$field_value = substr( $field_value, 11, $field_size );
 
 		return $this->text_input( $field_name, $field_value, $field_size, $field_label, '', $field_params ); // TEMP: Note already in params
 	}
@@ -2943,6 +2943,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.61  2009/09/13 21:27:57  blueyed
+ * Form::time_input: fix field_size and crop value according to format.
+ *
  * Revision 1.60  2009/09/12 18:44:11  efy-maxim
  * Messaging module improvements
  *
