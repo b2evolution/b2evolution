@@ -888,7 +888,7 @@ class Hit
 			if( ! empty($current_User->ID) )
 			{ // select by user ID: one user counts really just once. May be even faster than the anonymous query below..!?
 				$sql = "
-					SELECT hit_ID FROM T_hitlog INNER JOIN T_sessions ON hit_sess_ID = sess_ID
+					SELECT SQL_NO_CACHE hit_ID FROM T_hitlog INNER JOIN T_sessions ON hit_sess_ID = sess_ID
 					 WHERE sess_user_ID = ".$current_User->ID."
 						 AND hit_uri = '".$DB->escape( substr($ReqURI, 0, 250) )."'
 					 LIMIT 1";
@@ -896,7 +896,7 @@ class Hit
 			else
 			{ // select by remote_addr/agnt_signature:
 				$sql = "
-					SELECT hit_ID
+					SELECT SQL_NO_CACHE hit_ID
 					  FROM T_hitlog INNER JOIN T_useragents
 					    ON hit_agnt_ID = agnt_ID
 					 WHERE hit_datetime > '".date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') )."'
@@ -1132,6 +1132,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.35  2009/09/13 21:26:50  blueyed
+ * SQL_NO_CACHE for SELECT queries using T_hitlog
+ *
  * Revision 1.34  2009/08/31 21:47:02  fplanque
  * no message
  *

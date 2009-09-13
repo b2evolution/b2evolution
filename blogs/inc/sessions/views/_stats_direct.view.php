@@ -39,7 +39,7 @@ global $blog, $admin_url, $rsc_url;
 <?php
 // Create result set:
 $Results = & new Results( "
-	SELECT hit_ID, hit_datetime, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname
+	SELECT SQL_NO_CACHE hit_ID, hit_datetime, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname
 		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
 				 LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
 	 WHERE hit_referer_type = 'direct'
@@ -96,6 +96,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/13 21:26:50  blueyed
+ * SQL_NO_CACHE for SELECT queries using T_hitlog
+ *
  * Revision 1.5  2009/03/08 23:57:45  fplanque
  * 2009
  *

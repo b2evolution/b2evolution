@@ -31,7 +31,7 @@ echo '<h2>'.T_('XML hits summary').'</h2>';
 echo '<p class="notes">'.sprintf( T_('These are hits from <a %s>XML readers</a>. This includes RSS and Atom readers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_rss=1&amp;blog='.$blog.'"' ).'</p>';
 echo '<p class="notes">'.T_('Any user agent accessing the XML feeds will be flagged as an XML reader.').'</p>';
 $sql = "
-	SELECT COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS year,
+	SELECT SQL_NO_CACHE COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS year,
 			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
 		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
 	 WHERE agnt_type = 'rss'";
@@ -87,6 +87,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/13 21:26:50  blueyed
+ * SQL_NO_CACHE for SELECT queries using T_hitlog
+ *
  * Revision 1.7  2009/03/08 23:57:45  fplanque
  * 2009
  *

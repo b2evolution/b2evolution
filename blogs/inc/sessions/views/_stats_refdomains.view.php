@@ -69,20 +69,20 @@ if( !empty($blog) )
 }
 
 $total_hit_count = $DB->get_var( "
-		SELECT COUNT(*) AS hit_count
+		SELECT SQL_NO_CACHE COUNT(*) AS hit_count
 			FROM T_basedomains INNER JOIN T_hitlog ON dom_ID = hit_referer_dom_ID "
 			.$where_clause, 0, 0, 'Get total hit count - referred hits only' );
 
 
 // Create result set:
 $results_sql = "
-		SELECT dom_name, dom_status, dom_type, COUNT( * ) AS hit_count
+		SELECT SQL_NO_CACHE dom_name, dom_status, dom_type, COUNT( * ) AS hit_count
 		  FROM T_basedomains LEFT JOIN T_hitlog ON dom_ID = hit_referer_dom_ID "
 		.$where_clause.'
 		 GROUP BY dom_ID ';
 
 $results_count_sql = "
-		SELECT COUNT( DISTINCT dom_ID )
+		SELECT SQL_NO_CACHE COUNT( DISTINCT dom_ID )
 		  FROM T_basedomains INNER JOIN T_hitlog ON dom_ID = hit_referer_dom_ID "
 			.$where_clause;
 
@@ -162,6 +162,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.4  2009/09/13 21:26:50  blueyed
+ * SQL_NO_CACHE for SELECT queries using T_hitlog
+ *
  * Revision 1.3  2009/03/08 23:57:45  fplanque
  * 2009
  *

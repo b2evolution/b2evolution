@@ -39,7 +39,7 @@ $sess_ID = param( 'sess_ID', 'integer', NULL, true );
 $remote_IP = param( 'remote_IP', 'string', NULL, true );
 
 // Create result set:
-$sql = 'SELECT hit_ID, sess_ID, hit_datetime, hit_referer_type, hit_uri, hit_blog_ID, hit_referer, hit_remote_addr,
+$sql = 'SELECT SQL_NO_CACHE hit_ID, sess_ID, hit_datetime, hit_referer_type, hit_uri, hit_blog_ID, hit_referer, hit_remote_addr,
 								user_login, agnt_type, blog_shortname, dom_name, goal_name, keyp_phrase, hit_serprank
 					FROM T_hitlog LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
 							  LEFT JOIN T_track__keyphrase ON hit_keyphrase_keyp_ID = keyp_ID
@@ -49,7 +49,7 @@ $sql = 'SELECT hit_ID, sess_ID, hit_datetime, hit_referer_type, hit_uri, hit_blo
 								LEFT JOIN T_users ON sess_user_ID = user_ID
 								LEFT JOIN T_track__goalhit ON hit_ID = ghit_hit_ID
 								LEFT JOIN T_track__goal ON ghit_goal_ID = goal_ID';
-$count_sql = 'SELECT COUNT(hit_ID)
+$count_sql = 'SELECT SQL_NO_CACHE COUNT(hit_ID)
 								FROM T_hitlog';
 
 $operator = ($exclude ? ' <> ' : ' = ' );
@@ -177,6 +177,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/13 21:26:50  blueyed
+ * SQL_NO_CACHE for SELECT queries using T_hitlog
+ *
  * Revision 1.6  2009/07/09 00:11:18  fplanque
  * minor
  *

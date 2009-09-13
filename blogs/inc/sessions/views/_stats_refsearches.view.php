@@ -35,7 +35,7 @@ global $blog, $admin_url, $rsc_url;
 
 // Create result set:
 $Results = & new Results( "
-	 	 SELECT hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname,
+	 	 SELECT SQL_NO_CACHE hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname,
 	 	 				keyp_phrase, hit_serprank
 		 	 FROM T_hitlog INNER JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
 					  INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
@@ -118,6 +118,9 @@ echo '<p class="notes">'.T_('These are hits from people who came to this blog sy
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/13 21:26:50  blueyed
+ * SQL_NO_CACHE for SELECT queries using T_hitlog
+ *
  * Revision 1.11  2009/07/09 00:11:18  fplanque
  * minor
  *

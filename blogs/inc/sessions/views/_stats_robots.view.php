@@ -38,7 +38,7 @@ echo '<p class="notes">'.sprintf( T_('This page only includes hits identified as
 echo '<p class="notes">'.T_('In order to be detected, robots must be listed in /conf/_stats.php.').'</p>';
 
 $sql = "
-	SELECT COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS year,
+	SELECT SQL_NO_CACHE COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS year,
 			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
 		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
 	 WHERE agnt_type = 'robot'";
@@ -98,13 +98,13 @@ if( count($res_hits) )
 // TOP INDEXING ROBOTS
 
 // Create result set:
-$sql = "SELECT COUNT(*) AS hit_count, agnt_signature
+$sql = "SELECT SQL_NO_CACHE COUNT(*) AS hit_count, agnt_signature
 					FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
 				 WHERE agnt_type = 'robot' "
 				 			.( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog ).'
 				 GROUP BY agnt_signature';
 
-$count_sql = "SELECT COUNT( DISTINCT agnt_signature )
+$count_sql = "SELECT SQL_NO_CACHE COUNT( DISTINCT agnt_signature )
 								FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
 							 WHERE agnt_type = 'robot' "
 							 .( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog );
@@ -112,7 +112,7 @@ $count_sql = "SELECT COUNT( DISTINCT agnt_signature )
 $Results = & new Results( $sql, 'topidx', '-D', 20, $count_sql );
 
 $total_hit_count = $DB->get_var( "
-		SELECT COUNT(*)
+		SELECT SQL_NO_CACHE COUNT(*)
 			FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
 		 WHERE agnt_type = 'robot' "
 		.( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog ) );
@@ -167,6 +167,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/13 21:26:50  blueyed
+ * SQL_NO_CACHE for SELECT queries using T_hitlog
+ *
  * Revision 1.7  2009/03/08 23:57:45  fplanque
  * 2009
  *

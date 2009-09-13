@@ -162,7 +162,7 @@ class Hitlist
 		else
 		{ // two queries for MySQL < 4
 			$ids = $DB->get_row( "
-				SELECT dom_ID
+				SELECT SQL_NO_CACHE dom_ID
 				  FROM T_basedomains LEFT JOIN T_hitlog ON hit_referer_dom_ID = dom_ID
 				 WHERE hit_referer_dom_ID IS NULL
 				 AND dom_type = 'unknown'
@@ -187,6 +187,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/13 21:26:50  blueyed
+ * SQL_NO_CACHE for SELECT queries using T_hitlog
+ *
  * Revision 1.13  2009/07/06 22:55:11  fplanque
  * minor
  *

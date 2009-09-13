@@ -39,7 +39,7 @@ echo '<p class="notes">'.sprintf( T_('This page includes all recorded hits, spli
 // TODO: I've also limited this to agnt_type "browser" here, according to the change for "referers" (Rev 1.6)
 //       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
 $sql = '
-	SELECT COUNT(*) AS hits, agnt_type, EXTRACT(YEAR FROM hit_datetime) AS year,
+	SELECT SQL_NO_CACHE COUNT(*) AS hits, agnt_type, EXTRACT(YEAR FROM hit_datetime) AS year,
 			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
 		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID';
 if( $blog > 0 )
@@ -213,6 +213,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/13 21:26:50  blueyed
+ * SQL_NO_CACHE for SELECT queries using T_hitlog
+ *
  * Revision 1.10  2009/03/08 23:57:45  fplanque
  * 2009
  *

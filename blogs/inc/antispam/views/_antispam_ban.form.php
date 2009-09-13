@@ -40,7 +40,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	// Check for junk:
 
 	// Check for potentially affected logged hits:
-	$sql = 'SELECT hit_ID, UNIX_TIMESTAMP(hit_datetime) as hit_datetime, hit_uri, hit_referer, dom_name,
+	$sql = 'SELECT SQL_NO_CACHE hit_ID, UNIX_TIMESTAMP(hit_datetime) as hit_datetime, hit_uri, hit_referer, dom_name,
 									hit_blog_ID, hit_remote_addr, blog_shortname
 					 FROM T_hitlog INNER JOIN T_basedomains ON hit_referer_dom_ID = dom_ID
 						 		LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
@@ -211,6 +211,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/13 21:26:50  blueyed
+ * SQL_NO_CACHE for SELECT queries using T_hitlog
+ *
  * Revision 1.10  2009/07/08 02:38:55  sam2kb
  * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
  *

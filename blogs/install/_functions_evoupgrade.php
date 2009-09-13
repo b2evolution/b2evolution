@@ -2169,7 +2169,7 @@ function upgrade_b2evo_tables()
 		task_begin( 'Updating keyphrases in hitlog table... ' );
 		flush();
 		load_class( 'sessions/model/_hit.class.php' );
-	  $sql = 'SELECT hit_ID, hit_referer
+	  $sql = 'SELECT SQL_NO_CACHE hit_ID, hit_referer
   						FROM T_hitlog
    					 WHERE hit_referer_type = "search"
    				 		 AND hit_keyphrase_keyp_ID IS NULL'; // this line just in case we crashed in the middle, so we restart where we stopped
@@ -2690,6 +2690,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.315  2009/09/13 21:26:50  blueyed
+ * SQL_NO_CACHE for SELECT queries using T_hitlog
+ *
  * Revision 1.314  2009/09/13 15:56:11  fplanque
  * minor
  *

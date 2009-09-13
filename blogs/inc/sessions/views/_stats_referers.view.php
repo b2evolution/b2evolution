@@ -39,7 +39,7 @@ global $blog, $admin_url, $rsc_url, $AdminUI;
 <?php
 // Create result set:
 $Results = & new Results( "
-		 SELECT hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname
+		 SELECT SQL_NO_CACHE hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname
 			 FROM T_hitlog INNER JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
 					  INNER JOIN T_sessions ON hit_sess_ID = sess_ID
 					  INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
@@ -210,6 +210,9 @@ if( count( $res_stats ) )
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/13 21:26:50  blueyed
+ * SQL_NO_CACHE for SELECT queries using T_hitlog
+ *
  * Revision 1.10  2009/07/06 06:51:03  sam2kb
  * Added target="_blank" on referer URLs
  *
