@@ -1277,14 +1277,13 @@ class DB
 
 					var a = document.createElement("a");
 					a.href= "#";
-					a.style.display = "block";
 					var a_onclick = function() {
 						if( div.style.display == \'\' ) {
 							div.style.display = \'none\';
-							a.innerHTML = text_show;
+							a.innerHTML = " [" + text_show + "] ";
 						} else {
 							div.style.display = \'\';
-							a.innerHTML = text_hide;
+							a.innerHTML = " [" + text_hide + "] ";
 						}
 						return false;
 					};
@@ -1659,6 +1658,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.36  2009/09/13 21:32:42  blueyed
+ * DB: display toggle links below dumped queries inline, saving some screen space.
+ *
  * Revision 1.35  2009/09/13 21:32:16  blueyed
  * DB: add "debug_profile_queries" option, which uses MySQL profiling. Info is displayed when dumping queries and total time is compared to measured time.
  *
