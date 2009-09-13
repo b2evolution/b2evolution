@@ -114,7 +114,10 @@ class GenericCategory extends GenericElement
  			case 'parent_ID':
 				return $this->set_param( $parname, 'string', $parvalue, true );
 
-			case 'name':
+			// dh> I cannot see why default has been removed here (1.4).
+			//     It failed on "urlname" and "description" here. (LP: #428201)
+			//     Please review and remove this explanation
+			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
@@ -135,6 +138,9 @@ class GenericCategory extends GenericElement
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/13 22:12:55  blueyed
+ * Fix saving of urlname/description for tags (LP: #428201)
+ *
  * Revision 1.4  2009/08/30 17:27:03  fplanque
  * better NULL param handling all over the app
  *
