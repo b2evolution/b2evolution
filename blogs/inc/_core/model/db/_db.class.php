@@ -244,6 +244,17 @@ class DB
 	var $debug_explain_joins = false;
 
 	/**
+	 * Do we want to profile queries?
+	 * This requires {@link DB::$log_queries} to be true.
+	 *
+	 * This sets "profiling=1" for the session and queries "SHOW PROFILE" after
+	 * each query.
+	 *
+	 * @var boolean
+	 */
+	var $debug_profile_queries = false;
+
+	/**
 	 * Do we want to output a function backtrace for every query?
 	 * Number of stack entries to show (from last to first) (Default: 0); true means 'all'.
 	 *
@@ -299,6 +310,11 @@ class DB
 	 *    - 'client_flags': optional settings like compression or SSL encryption. See {@link http://www.php.net/manual/en/ref.mysql.php#mysql.client-flags}.
 	 *       (requires PHP 4.3)
 	 *    - 'log_queries': should queries get logged internally? (follows $debug by default)
+	 *      This is a requirement for the following options:
+	 *    - 'debug_dump_rows': Number of rows to dump
+	 *    - 'debug_explain_joins': Explain JOINS? (calls "EXPLAIN $query")
+	 *    - 'debug_profile_queries': Profile queries? (calls "SHOW PROFILE" after each query)
+	 *    - 'debug_dump_function_trace_for_queries': Collect call stack for queries? (showing where queries have been called)
 	 */
 	function DB( $params )
 	{
@@ -324,6 +340,7 @@ class DB
 		if( isset($params['use_transactions']) ) $this->use_transactions = $params['use_transactions'];
 		if( isset($params['debug_dump_rows']) ) $this->debug_dump_rows = $params['debug_dump_rows']; // Nb of rows to dump
 		if( isset($params['debug_explain_joins']) ) $this->debug_explain_joins = $params['debug_explain_joins'];
+		if( isset($params['debug_profile_queries']) ) $this->debug_profile_queries = $params['debug_profile_queries'];
 		if( isset($params['debug_dump_function_trace_for_queries']) ) $this->debug_dump_function_trace_for_queries = $params['debug_dump_function_trace_for_queries'];
 		if( isset($params['log_queries']) )
 		{
@@ -420,6 +437,12 @@ class DB
 			{
 				$this->query( 'SET sql_mode = "TRADITIONAL"', 'we do this in DEBUG mode only' );
 			}
+		}
+
+		if( $this->debug_profile_queries )
+		{
+			// dh> this will fail, if it is not supported, but has to be enabled manually anyway.
+			$this->query('SET profiling = 1'); // Requires 5.0.37.
 		}
 	}
 
@@ -847,6 +870,44 @@ class DB
 		// Free original query's result:
 		@mysql_free_result($this->result);
 
+		// Profile queries
+		if( $this->log_queries && $this->debug_profile_queries )
+		{
+			// save values:
+			$saved_last_result = $this->last_result;
+			$saved_num_rows = $this->num_rows;
+
+			$this->last_result = NULL;
+			$this->num_rows = 0;
+
+			$this->result = @mysql_query( 'SHOW PROFILE', $this->dbhandle );
+			// Store Query Results
+			$this->num_rows = 0;
+			while( $row = @mysql_fetch_object($this->result) )
+			{
+				// Store results as an objects within main array
+				$this->last_result[$this->num_rows] = $row;
+				$this->num_rows++;
+			}
+
+			if( $this->num_rows )
+			{
+				$this->queries[$this->num_queries-1]['profile'] = $this->debug_get_rows_table( 100, true );
+
+				// Get time information from PROFILING table (which corresponds to "SHOW PROFILE")
+				$this->result = mysql_query( 'SELECT FORMAT(SUM(DURATION), 6) AS DURATION FROM INFORMATION_SCHEMA.PROFILING GROUP BY QUERY_ID ORDER BY QUERY_ID DESC LIMIT 1', $this->dbhandle );
+				$this->queries[$this->num_queries-1]['time_profile'] = array_shift(mysql_fetch_row($this->result));
+			}
+
+			// Free "PROFILE" result resource:
+			mysql_free_result($this->result);
+
+
+			// Restore:
+			$this->last_result = $saved_last_result;
+			$this->num_rows = $saved_num_rows;
+		}
+
 		// EXPLAIN JOINS ??
 		if( $this->log_queries && $this->debug_explain_joins && preg_match( '#^ [\s(]* SELECT \s #ix', $query) )
 		{ // Query was a select, let's try to explain joins...
@@ -1179,19 +1240,6 @@ class DB
 	 */
 	function dump_queries( $html = true )
 	{
-		global $Timer;
-		if( is_object( $Timer ) )
-		{
-			$time_queries = $Timer->get_duration( 'sql_queries' );
-		}
-		else
-		{
-			$time_queries = 0;
-		}
-
-		$count_queries = 0;
-		$count_rows = 0;
-
 		if ( $html )
 		{
 			echo '<strong>DB queries:</strong> '.$this->num_queries."<br />\n";
@@ -1205,6 +1253,20 @@ class DB
 		{ // nothing more to do here..
 			return;
 		}
+
+		global $Timer;
+		if( is_object( $Timer ) )
+		{
+			$time_queries = $Timer->get_duration( 'sql_queries', 4 );
+		}
+		else
+		{
+			$time_queries = 0;
+		}
+
+		$count_queries = 0;
+		$count_rows = 0;
+		$time_queries_profiled = 0;
 
 		// Javascript function to toggle DIVs (EXPLAIN, results, backtraces).
 		if( $html )
@@ -1294,6 +1356,12 @@ class DB
 				echo ' ('.number_format( 100/$time_queries * $query['time'], 2 ).'%)';
 			}
 
+			if( isset($query['time_profile']) )
+			{
+				echo ' (real: '.number_format($query['time_profile'], 4).'s)';
+				$time_queries_profiled += $query['time_profile'];
+			}
+
 			if( $style_time_text || $plain_time_text )
 			{
 				echo $html ? '</span>' : $plain_time_text;
@@ -1324,6 +1392,23 @@ class DB
 					echo $query['explain'];
 					echo '</div>';
 					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show EXPLAIN", "Hide EXPLAIN");</script>';
+				}
+				else
+				{ // TODO: dh> contains html.
+					echo $query['explain'];
+				}
+			}
+
+			// Profile:
+			if( isset($query['profile']) )
+			{
+				if( $html )
+				{
+					$div_id = 'db_query_profile_'.$i.'_'.md5(serialize($query));
+					echo '<div id="'.$div_id.'">';
+					echo $query['profile'];
+					echo '</div>';
+					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show PROFILE", "Hide PROFILE");</script>';
 				}
 				else
 				{ // TODO: dh> contains html.
@@ -1365,25 +1450,26 @@ class DB
 				}
 			}
 
-			if( $html )
-			{
-				echo '<hr />';
-			}
-			else
-			{
-				echo "=============================================\n";
-			}
+			echo $html ? '<hr />' : "=============================================\n";
 
 			$count_rows += $query['rows'];
 		}
 
+		$time_queries_profiled = number_format($time_queries_profiled, 4);
+		$time_diff_percentage = round($time_queries / $time_queries_profiled * 100);
 		if ( $html )
 		{
-			echo "\n<strong>Total rows:</strong> $count_rows<br />\n";
+			echo "\nTotal rows: $count_rows<br />\n";
+			echo "\nMeasured time: {$time_queries}s<br />\n";
+			echo "\nProfiled time: {$time_queries_profiled}<br />\n";
+			echo "\nTime difference: {$time_diff_percentage}%<br />\n";
 		}
 		else
 		{
 			echo 'Total rows: '.$count_rows."\n";
+			echo "Measured time: {$time_queries}s\n";
+			echo "Profiled time: {$time_queries_profiled}\n";
+			echo "Time difference: {$time_diff_percentage}%\n";
 		}
 	}
 
@@ -1573,6 +1659,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.35  2009/09/13 21:32:16  blueyed
+ * DB: add "debug_profile_queries" option, which uses MySQL profiling. Info is displayed when dumping queries and total time is compared to measured time.
+ *
  * Revision 1.34  2009/09/13 21:29:59  blueyed
  * DB: fix debug_get_rows_table, which returned 'No results' since 1.32. Only display result related info if there are any rows now.
  *
