@@ -2097,11 +2097,11 @@ class Blog extends DataObject
 	 *
 	 * This resolves as follows:
 	 *  - empty: current blog only
-	 *  - "*": all blogs (returns "1" as in "WHERE 1")
+	 *  - "*": all blogs (returns " 1 " as in "WHERE 1")
 	 *  - other: as present in DB
 	 *
 	 * @param string SQL field name
-	 * @return string e.g. "$field IN (1,5)"
+	 * @return string e.g. "$field IN (1,5)". It will return " 1 ", when all blogs/cats are aggregated.
 	 */
 	function get_sql_where_aggregate_coll_IDs( $field )
 	{
@@ -2142,6 +2142,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.78  2009/09/13 21:33:14  blueyed
+ * doc fix
+ *
  * Revision 1.77  2009/09/11 19:57:01  fplanque
  * updates awall style
  *
