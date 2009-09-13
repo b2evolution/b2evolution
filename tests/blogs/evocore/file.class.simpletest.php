@@ -27,6 +27,8 @@ class FileTestCase extends FilemanUnitTestCase
 	function testExist()
 	{
 		$filePath = $this->createUserFile( '1234' );
+		if( ! $filePath )
+			return;
 
 		$File = new File( 'user', 1, basename( $filePath ) );
 
@@ -43,6 +45,9 @@ class FileTestCase extends FilemanUnitTestCase
 	{
 		// create a temporary file and just delete it again:
 		$temp_path = $this->createUserFile();
+		if( ! $temp_path )
+			return;
+
 		unlink( $temp_path );
 		$temp_name = basename($temp_path);
 
@@ -73,6 +78,9 @@ class FileTestCase extends FilemanUnitTestCase
 		$this->assertTrue( $Dir->is_dir(), 'Dir is dir.' );
 
 		$temp_path = $this->createUserFile();
+		if( ! $temp_path )
+			return;
+
 		$File = new File( 'user', 1, $temp_path );
 		$this->assertFalse( $File->is_dir(), 'File is no dir.' );
 	}

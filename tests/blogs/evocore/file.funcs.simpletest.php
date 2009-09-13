@@ -77,8 +77,7 @@ class FileFuncsTestCase extends EvoUnitTestCase
 	{
 		if( ! is_writable(TMPDIR) )
 		{
-			// HACK to display skip message. skipIf is meant to be called in skip only, but we do not want to skip all tests.
-			$this->skipIf( true, 'TMPDIR is not writable.' );
+			$this->my_skip_message( 'TMPDIR is not writable.' );
 			return;
 		}
 		$this->assertTrue( mkdir_r( TMPDIR.'test/foo' ) );

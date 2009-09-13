@@ -74,6 +74,15 @@ class EvoUnitTestCase extends UnitTestCase
 		}
 		parent::run( new EvoHtmlReporter() );
 	}
+
+
+	/**
+	 * Custom method to print a skip message.
+	 */
+	function my_skip_message($message)
+	{
+		$this->reporter->paintSkip($message . $this->getAssertionLine());
+	}
 }
 
 

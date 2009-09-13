@@ -57,7 +57,7 @@ class FilemanUnitTestCase extends EvoUnitTestCase
 
 		if( ! $FileRoot )
 		{
-			trigger_error( 'Cannot get FileRoot for user #'.$user_ID );
+			$this->my_skip_message( 'Cannot get FileRoot for user #'.$user_ID );
 			return false;
 		}
 
@@ -103,7 +103,7 @@ class FilemanUnitTestCase extends EvoUnitTestCase
 	{
 		if( !($fh = @fopen( $path, 'w' )) )
 		{
-			trigger_error( "Cannot create file '$path'!" );
+			$this->my_skip_message( "Cannot create file '$path'!" );
 			return false;
 		}
 
