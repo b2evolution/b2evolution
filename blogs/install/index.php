@@ -43,8 +43,8 @@ $Messages = & new Log('error');
 require_once $conf_path.'_upgrade.php';
 require_once $inc_path.'_vars.inc.php';
 load_class( '/_core/model/db/_db.class.php', 'DB' );
-load_funcs('collections/model/_blog.funcs.php',);
-load_funcs('collections/model/_category.funcs.php',);
+load_funcs('collections/model/_blog.funcs.php');
+load_funcs('collections/model/_category.funcs.php');
 load_class( 'items/model/_item.class.php', 'Item' );
 load_funcs('items/model/_item.funcs.php');
 load_funcs('users/model/_user.funcs.php');
@@ -700,6 +700,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.181  2009/09/14 14:31:16  waltercruz
+ * minor fix
+ *
  * Revision 1.180  2009/09/14 14:10:15  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
