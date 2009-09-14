@@ -17,9 +17,9 @@ require_once dirname(__FILE__).'/../config.simpletest.php';
  */
 class InstallSelfTestCase extends InstallUnitTestCase
 {
-	function InstallSelfTestCase()
+	function __construct()
 	{
-		$this->InstallUnitTestCase( 'Installing myself' );
+		parent::__construct( 'Installing myself' );
 	}
 
 
