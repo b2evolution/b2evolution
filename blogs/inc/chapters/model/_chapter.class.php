@@ -26,7 +26,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('generic/model/_genericcategory.class.php');
+load_class( 'generic/model/_genericcategory.class.php', 'GenericCategory' );
 
 
 /**
@@ -307,6 +307,9 @@ class Chapter extends GenericCategory
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/14 12:26:25  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.11  2009/03/08 23:57:41  fplanque
  * 2009
  *

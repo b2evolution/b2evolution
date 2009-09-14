@@ -24,8 +24,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'generic/model/_genericcategorycache.class.php' );
-load_class( 'chapters/model/_chapter.class.php' );
+load_class( 'generic/model/_genericcategorycache.class.php', 'GenericCategoryCache' );
+load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
 
 /**
  * ChapterCache Class
@@ -318,6 +318,9 @@ class ChapterCache extends GenericCategoryCache
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/14 12:29:35  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.7  2009/03/08 23:57:41  fplanque
  * 2009
  *

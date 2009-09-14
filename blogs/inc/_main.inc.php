@@ -124,7 +124,7 @@ require_once $inc_path.'/_core/_misc.funcs.php';
 /**
  * Load logging class
  */
-load_class('_core/model/_log.class.php');
+load_class( '_core/model/_log.class.php', 'Log' );
 /**
  * Debug message log for debugging only (initialized here).
  *
@@ -150,7 +150,7 @@ $Messages = & new Log( 'error' );
 /**
  * Start timer:
  */
-load_class('_core/model/_timer.class.php');
+load_class( '_core/model/_timer.class.php', 'Timer' );
 $Timer = & new Timer('total');
 
 $Timer->resume( '_main.inc' );
@@ -187,8 +187,8 @@ require_once dirname(__FILE__).'/_connect_db.inc.php';
 /**
  * Load settings class
  */
-load_class('settings/model/_generalsettings.class.php');
-load_class('users/model/_usersettings.class.php');
+load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
 /**
  * Interface to general settings
  *
@@ -226,7 +226,7 @@ $localtimenow = $servertimenow + $time_difference;
 /**
  * The Hit class
  */
-load_class('sessions/model/_hit.class.php');
+load_class( 'sessions/model/_hit.class.php', 'Hit' );
 // fp> The following constructor requires these right now:
 load_funcs('_core/_param.funcs.php');
 load_funcs('_core/_url.funcs.php');
@@ -289,7 +289,7 @@ $Hit = & new Hit(); // This may INSERT a basedomain and a useragent but NOT the 
 /**
  * The Session class.
  */
-load_class('sessions/model/_session.class.php');
+load_class( 'sessions/model/_session.class.php', 'Session' );
 /**
  * The Session object.
  * It has to be instantiated before the "SessionLoaded" hook.
@@ -317,7 +317,7 @@ $global_Cache = & new AbstractSettings( 'T_global__cache', array( 'cach_name' ),
  * This is done quite early here to give an early hook ("SessionLoaded") to plugins (though it might also be moved just after $DB init when there is reason for a hook there).
  * The {@link dnsbl_antispam_plugin} is an example that uses this to check the user's IP against a list of DNS blacklists.
  */
-load_class('plugins/model/_plugins.class.php');
+load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
 /**
  * @global Plugins The Plugin management object
  */
@@ -356,26 +356,26 @@ if( empty($generating_static) )
  * Includes:
  */
 $Timer->resume('_main.inc:requires');
-load_class('_core/model/dataobjects/_dataobjectcache.class.php');
-load_class('generic/model/_genericelement.class.php');
-load_class('generic/model/_genericcache.class.php');
-load_class('collections/model/_blog.class.php');
+load_class( '_core/model/dataobjects/_dataobjectcache.class.php', 'DataObjectCache' );
+load_class( 'generic/model/_genericelement.class.php', 'GenericElement' );
+load_class( 'generic/model/_genericcache.class.php', 'GenericCache' );
+load_class( 'collections/model/_blog.class.php', 'Blog' );
 load_funcs('collections/model/_blog.funcs.php');
 load_funcs('collections/model/_category.funcs.php');
 load_funcs('items/model/_item.funcs.php');
 load_funcs('users/model/_user.funcs.php');
 load_funcs('_core/_template.funcs.php');
-load_class('files/model/_file.class.php');
-load_class('files/model/_filetype.class.php');
-load_class('files/model/_filetypecache.class.php');
-load_class('items/model/_itemtype.class.php');
-load_class('items/model/_link.class.php');
+load_class( 'files/model/_file.class.php', 'File' );
+load_class( 'files/model/_filetype.class.php', 'FileType' );
+load_class( 'files/model/_filetypecache.class.php', 'FileTypeCache' );
+load_class( 'items/model/_itemtype.class.php', 'ItemType' );
+load_class( 'items/model/_link.class.php', 'Link' );
 load_funcs('comments/model/_comment.funcs.php');
 load_funcs('items/model/_item.funcs.php');
-load_class('comments/model/_commentlist.class.php');
+load_class( 'comments/model/_commentlist.class.php', 'CommentList' );
 load_funcs('_core/ui/forms/_form.funcs.php');
-load_class('_core/ui/forms/_form.class.php');
-load_class('items/model/_itemquery.class.php');
+load_class( '_core/ui/forms/_form.class.php', 'Form' );
+load_class( 'items/model/_itemquery.class.php', 'ItemQuery' );
 $Timer->pause( '_main.inc:requires' );
 
 
@@ -665,6 +665,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.117  2009/09/14 12:26:53  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.116  2009/09/08 19:17:59  fplanque
  * reverted change that broke user registration
  *

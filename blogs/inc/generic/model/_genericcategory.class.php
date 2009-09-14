@@ -33,7 +33,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-load_class('generic/model/_genericelement.class.php');
+load_class('generic/model/_genericelement.class.php', 'GenericElement');
 
 
 /**
@@ -138,6 +138,9 @@ class GenericCategory extends GenericElement
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/14 12:25:47  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.5  2009/09/13 22:12:55  blueyed
  * Fix saving of urlname/description for tags (LP: #428201)
  *
