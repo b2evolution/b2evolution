@@ -33,7 +33,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('generic/model/_genericcache.class.php');
+load_class( 'generic/model/_genericcache.class.php', 'GenericCache' );
 
 /**
  * GenericOrderedCache Class
@@ -157,6 +157,9 @@ class GenericOrderedCache extends GenericCache
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/14 13:11:37  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.4  2009/08/30 19:54:25  fplanque
  * less translation messgaes for infrequent errors
  *
