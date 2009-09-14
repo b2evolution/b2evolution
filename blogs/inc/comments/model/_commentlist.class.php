@@ -26,7 +26,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/dataobjects/_dataobjectlist.class.php');
+load_class( '_core/model/dataobjects/_dataobjectlist.class.php', 'DataObjectList' );
 
 /**
  * CommentList Class
@@ -167,6 +167,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/14 12:46:36  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.11  2009/03/08 23:57:42  fplanque
  * 2009
  *

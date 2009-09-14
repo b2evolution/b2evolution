@@ -152,7 +152,7 @@ switch( $action )
 							'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1 )" );
 
 			// Create default category:
-			load_class( 'chapters/model/_chapter.class.php' );
+			load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
 			$edited_Chapter = & new Chapter( NULL, $edited_Blog->ID );
 			$edited_Chapter->set( 'name', T_('Uncategorized') );
 			$edited_Chapter->set( 'urlname', 'main' );
@@ -454,6 +454,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/14 12:42:25  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.13  2009/07/06 23:52:24  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *

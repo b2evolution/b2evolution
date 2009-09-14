@@ -30,7 +30,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('settings/model/_abstractsettings.class.php');
+load_class( 'settings/model/_abstractsettings.class.php', 'AbstractSettings' );
 
 /**
  * Class to handle the settings for collections/blogs
@@ -168,6 +168,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.37  2009/09/14 12:43:05  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.36  2009/08/27 12:24:27  tblue246
  * Added blog setting to display comments in ascending/descending order
  *

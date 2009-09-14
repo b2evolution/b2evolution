@@ -29,7 +29,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('comments/model/_comment.class.php');
+load_class( 'comments/model/_comment.class.php', 'Comment' );
 
 /**
  * Generic comments/trackbacks/pingbacks counting
@@ -220,6 +220,9 @@ function comments_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/14 12:46:36  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.5  2009/03/27 02:08:29  sam2kb
  * Minor. Believe it or not, but this little thing produced MYSQL error on php4 because the $postIDlist was always empty.
  *

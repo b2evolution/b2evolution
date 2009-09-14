@@ -26,7 +26,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/dataobjects/_dataobject.class.php');
+load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 
 /**
  * Comment Class
@@ -1393,6 +1393,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2009/09/14 12:46:36  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.31  2009/08/30 17:27:03  fplanque
  * better NULL param handling all over the app
  *

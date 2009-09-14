@@ -41,7 +41,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/dataobjects/_dataobject.class.php');
+load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 
 /**
  * Blog
@@ -1494,7 +1494,7 @@ class Blog extends DataObject
 	{
 		global $dispatcher;
 
-		load_class('/files/model/_fileroot.class.php');
+		load_class( '/files/model/_fileroot.class.php', 'FileRoot' );
 		return $dispatcher.'?ctrl=files&amp;root='.FileRoot::gen_ID( 'collection', $this->ID );
 	}
 
@@ -1748,7 +1748,7 @@ class Blog extends DataObject
 	{
 		if( ! isset( $this->CollectionSettings ) )
 		{
-			load_class('collections/model/_collsettings.class.php');
+			load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
 			$this->CollectionSettings = new CollectionSettings(); // COPY (function)
 		}
 	}
@@ -2142,6 +2142,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.79  2009/09/14 12:43:04  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.78  2009/09/13 21:33:14  blueyed
  * doc fix
  *

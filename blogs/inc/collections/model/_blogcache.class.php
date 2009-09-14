@@ -33,7 +33,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/dataobjects/_dataobjectcache.class.php');
+load_class( '_core/model/dataobjects/_dataobjectcache.class.php', 'DataObjectCache' );
 
 /**
  * Blog Cache Class
@@ -357,6 +357,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/14 12:43:05  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.8  2009/09/05 18:17:40  tblue246
  * DataObjectCache/BlogCache::get_option_list(): Back again... Allow custom value for "None" option and use 0 for BlogCache.
  *

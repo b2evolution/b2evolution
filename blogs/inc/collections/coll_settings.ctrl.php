@@ -194,7 +194,7 @@ switch( $action )
 				{ // Commit update to the DB:
 					$new_cache_status =  $edited_Blog->get_setting('cache_enabled');
 
-					load_class( '_core/model/_pagecache.class.php' );
+					load_class( '_core/model/_pagecache.class.php', 'PageCache' );
 					$PageCache = & new PageCache( $edited_Blog );
 
 					if( $old_cache_status == false && $new_cache_status == true )
@@ -311,6 +311,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2009/09/14 12:42:25  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.19  2009/05/26 19:31:56  fplanque
  * Plugins can now have Settings that are specific to each blog.
  *
