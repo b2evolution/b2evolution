@@ -78,7 +78,9 @@ class Thread extends DataObject
 		global $thrd_recipients;
 
 		// Title
-		$this->set_string_from_param( 'title', true );
+		param( 'thrd_title', 'string' );
+		param_check_not_empty( 'thrd_title', T_('The field «subject» cannot be empty.'), T_('This field cannot be empty.') );
+		$this->set_from_Request( 'title', 'thrd_title' );
 
 		// Resipients
 		$this->set_string_from_param( 'recipients', true );
@@ -211,6 +213,9 @@ class Thread extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/14 10:33:20  efy-maxim
+ * messagin module improvements
+ *
  * Revision 1.4  2009/09/12 18:44:11  efy-maxim
  * Messaging module improvements
  *

@@ -236,7 +236,7 @@ function user_pm ( $user_ID, $user_login )
 	{
 		return '&nbsp;';
 	}
-	return action_icon( T_('Private Message').': '.$user_login, 'email', '?ctrl=threads&action=new&user_login='.$user_login );
+	return action_icon( T_('Private Message').': '.$user_login, 'comments', '?ctrl=threads&action=new&user_login='.$user_login );
 }
 $Results->cols[] = array(
 						'th' => T_('PM'),
@@ -328,6 +328,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/14 10:33:20  efy-maxim
+ * messagin module improvements
+ *
  * Revision 1.10  2009/09/12 18:44:11  efy-maxim
  * Messaging module improvements
  *

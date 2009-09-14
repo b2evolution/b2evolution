@@ -53,7 +53,8 @@ $Results->title = $edited_Thread->title;
 $Results->cols[] = array(
 					'th' => T_('Message'),
 					'td_class' => 'lastcol',
-					'td' => '%nl2br(#msg_text#)%',
+					//'td' => '%nl2br(#msg_text#)%',
+					'td' => '¤conditional( empty(#msg_text#), \''.$edited_Thread->title.'\', \'%nl2br(#msg_text#)%\')¤',
 					);
 
 $Results->cols[] = array(
@@ -106,6 +107,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.8  2009/09/14 10:33:20  efy-maxim
+ * messagin module improvements
+ *
  * Revision 1.7  2009/09/14 07:31:43  efy-maxim
  * 1. Messaging permissions have been fully implemented
  * 2. Messaging has been added to evo bar menu
