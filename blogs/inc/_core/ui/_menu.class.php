@@ -29,7 +29,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( '_core/ui/_uiwidget.class.php' );
+load_class( '_core/ui/_uiwidget.class.php', 'Widget' );
 
 /**
  * Menu class
@@ -349,6 +349,9 @@ class Menu extends Widget
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/14 10:56:06  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.7  2009/08/30 17:27:03  fplanque
  * better NULL param handling all over the app
  *

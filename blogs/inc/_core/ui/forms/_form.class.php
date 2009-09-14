@@ -47,7 +47,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( '_core/ui/_uiwidget.class.php' );
+load_class( '_core/ui/_uiwidget.class.php', 'Widget' );
 
 /**
  * Form class
@@ -2943,6 +2943,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.62  2009/09/14 10:56:36  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.61  2009/09/13 21:27:57  blueyed
  * Form::time_input: fix field_size and crop value according to format.
  *
