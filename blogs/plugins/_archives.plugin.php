@@ -36,7 +36,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-load_class('_core/ui/results/_results.class.php');
+load_class('_core/ui/results/_results.class.php', 'Results' );
 
 
 
@@ -631,6 +631,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.59  2009/09/14 10:45:39  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.58  2009/09/01 02:58:02  waltercruz
  * A better fix
  *
