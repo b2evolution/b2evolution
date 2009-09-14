@@ -34,20 +34,31 @@ $DB->query( 'UPDATE T_messaging__threadstatus
 				WHERE tsta_thread_ID = '.$edited_Thread->ID.'
 				AND tsta_user_ID = '.$current_User->ID );
 
+// Create SELECT query:
+
+$select_SQL = & new SQL();
+
+$select_SQL->SELECT( 'mm.msg_ID, mm.msg_datetime, u.user_login AS msg_author,
+					u.user_firstname AS msg_firstname, u.user_lastname AS msg_lastname, mm.msg_text' );
+
+$select_SQL->FROM( 'T_messaging__message mm
+					LEFT OUTER JOIN T_users u ON u.user_ID = mm.msg_author_user_ID' );
+
+$select_SQL->WHERE( 'mm.msg_thread_ID = '.$edited_Thread->ID );
+
+$select_SQL->ORDER_BY( 'mm.msg_datetime' );
+
+// Create COUNT query
+
+$count_SQL = & new SQL();
+
+$count_SQL->SELECT( 'COUNT(*)' );
+$count_SQL->FROM( 'T_messaging__message' );
+$count_SQL->WHERE( 'msg_thread_ID = '.$edited_Thread->ID );
+
 // Create result set:
 
-$select_sql = 'SELECT mm.msg_ID, mm.msg_datetime, u.user_login AS msg_author,
-					u.user_firstname AS msg_firstname, u.user_lastname AS msg_lastname, mm.msg_text
-				FROM T_messaging__message mm
-				LEFT OUTER JOIN T_users u ON u.user_ID = mm.msg_author_user_ID
-					WHERE mm.msg_thread_ID = '.$edited_Thread->ID.'
-					ORDER BY mm.msg_datetime';
-
-$count_sql = 'SELECT COUNT(*)
-				FROM T_messaging__message
-					WHERE msg_thread_ID = '.$edited_Thread->ID;
-
-$Results = & new Results( $select_sql, 'msg_', '', 0, $count_sql);
+$Results = & new Results( $select_SQL->get(), 'msg_', '', 0, $count_SQL->get() );
 
 $Results->title = $edited_Thread->title;
 
@@ -88,18 +99,31 @@ $Form->begin_form( 'fform', '' );
 
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
-$recipients = $DB->get_var('SELECT GROUP_CONCAT(u.user_login ORDER BY u.user_login SEPARATOR \', \')
-	 						FROM T_messaging__threadstatus mts
-							LEFT OUTER JOIN T_users u ON mts.tsta_user_ID = u.user_ID
-							WHERE mts.tsta_thread_ID = '.$edited_Thread->ID.'
-							AND mts.tsta_user_ID <> '.$current_User->ID);
+// Create SQL query and select recipients
 
-$Form->textarea('msg_text', '', 10, T_('Reply'), '<b>Reply to: </b>'.$recipients, 80, '', true);
+$recipients_select_SQL = & new SQL();
+
+$recipients_select_SQL->SELECT( 'GROUP_CONCAT(u.user_login ORDER BY u.user_login SEPARATOR \', \')' );
+
+$recipients_select_SQL->FROM( 'T_messaging__threadstatus mts
+								LEFT OUTER JOIN T_users u ON mts.tsta_user_ID = u.user_ID' );
+
+$recipients_select_SQL->WHERE( 'mts.tsta_thread_ID = '.$edited_Thread->ID.'
+								AND mts.tsta_user_ID <> '.$current_User->ID );
+
+$recipients = $DB->get_var( $recipients_select_SQL->get() );
+
+$Form->info_field(T_('Reply to'), $recipients, array('required'=>true));
+
+$Form->textarea('msg_text', '', 10, '', '', 80, '', true);
 
 $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.11  2009/09/14 19:33:02  efy-maxim
+ * Some queries has been wrapped by SQL object
+ *
  * Revision 1.10  2009/09/14 15:18:00  efy-maxim
  * 1. Recipients can be separated by commas or spaces.
  * 2. Message list: author, full name date in the first column.

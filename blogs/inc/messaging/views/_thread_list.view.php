@@ -25,25 +25,37 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $dispatcher;
-
 global $current_User;
+
+// Create SELECT query
+
+$select_SQL = & new SQL();
+$select_SQL->SELECT( 'mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified, mts.tsta_first_unread_msg_ID
+			  			AS thrd_msg_ID, mm.msg_datetime AS thrd_unread_since,' );
+
+$select_SQL->SELECT_add( '(SELECT GROUP_CONCAT(ru.user_login ORDER BY ru.user_login SEPARATOR \', \')
+							FROM T_messaging__threadstatus AS rts
+							LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID
+							WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients' );
+
+$select_SQL->FROM( 'T_messaging__threadstatus mts
+					LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
+					LEFT OUTER JOIN T_messaging__message mm ON mts.tsta_first_unread_msg_ID = mm.msg_ID' );
+
+$select_SQL->WHERE( 'mts.tsta_user_ID = '.$current_User->ID );
+$select_SQL->ORDER_BY( 'mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC' );
+
+// Create COUNT quiery
+
+$count_SQL = & new SQL();
+
+$count_SQL->SELECT( 'COUNT(*)' );
+$count_SQL->FROM( 'T_messaging__threadstatus' );
+$count_SQL->WHERE( 'tsta_user_ID = '.$current_User->ID );
 
 // Create result set:
 
-$select_sql = 'SELECT mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified, mts.tsta_first_unread_msg_ID AS thrd_msg_ID, mm.msg_datetime AS thrd_unread_since,
-					(SELECT GROUP_CONCAT(ru.user_login ORDER BY ru.user_login SEPARATOR \', \')
-					FROM T_messaging__threadstatus AS rts
-					LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID
-					WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients
-				FROM T_messaging__threadstatus mts
-				LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
-				LEFT OUTER JOIN T_messaging__message mm ON mts.tsta_first_unread_msg_ID = mm.msg_ID
-					WHERE mts.tsta_user_ID = '.$current_User->ID.'
-					ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC';
-
-$count_sql = 'SELECT COUNT(*) FROM T_messaging__threadstatus WHERE tsta_user_ID = '.$current_User->ID;
-
-$Results = & new Results( $select_sql, 'thrd_', '', NULL, $count_sql);
+$Results = & new Results( $select_SQL->get(), 'thrd_', '', NULL, $count_SQL->get() );
 
 $Results->Cache = & get_Cache( 'ThreadCache' );
 $Results->title = T_('Threads list');
@@ -86,6 +98,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/14 19:33:02  efy-maxim
+ * Some queries has been wrapped by SQL object
+ *
  * Revision 1.8  2009/09/14 13:52:07  tblue246
  * Translation fixes; removed now pointless doc comment.
  *
