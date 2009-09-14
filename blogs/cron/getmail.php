@@ -40,10 +40,10 @@
 require_once dirname( __FILE__ ) . '/../conf/_config.php';
 require_once $inc_path . '_main.inc.php';
 
-load_class('items/model/_itemlist.class.php');
+load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 load_funcs('files/model/_file.funcs.php');
-load_class( '_ext/mime_parser/rfc822_addresses.php' );
-load_class( '_ext/mime_parser/mime_parser.php' );
+load_class( '_ext/mime_parser/rfc822_addresses.php', 'rfc822_addresses_class' );
+load_class( '_ext/mime_parser/mime_parser.php', 'mime_parser_class' );
 
 if( !$Settings->get( 'eblog_enabled' ) )
 {
@@ -712,6 +712,9 @@ if( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.40  2009/09/14 14:02:20  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.39  2009/08/29 12:23:54  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

@@ -33,7 +33,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 require_once dirname(__FILE__).'/_main.inc.php';
 
 load_funcs('skins/_skin.funcs.php');
-load_class('items/model/_itemlist.class.php');
+load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 
 $Timer->start( '_blog_main.inc' );
 
@@ -504,7 +504,7 @@ if( !empty( $skin ) )
 	$Debuglog->add('Selected skin: '.$skin, 'skin');
 
 	// Instanciate PageCache:
-	load_class( '_core/model/_pagecache.class.php' );
+	load_class( '_core/model/_pagecache.class.php', 'PageCache' );
 	$PageCache = & new PageCache( $Blog );
 	// Check for cached content & Start caching if needed
 	// Note: there are some redirects inside the skins themselves for canonical URLs,
@@ -592,6 +592,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.141  2009/09/14 14:00:35  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.140  2009/07/30 20:22:04  blueyed
  * Debuglog: log selected skin
  *

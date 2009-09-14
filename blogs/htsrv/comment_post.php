@@ -387,7 +387,7 @@ if( $Comment->ID )
 		// before the cache has expired. Invalidate cache for that page:
 		// Note: this is approximative and may not cover all URLs where the user expects to see the comment...
 		// TODO: fp> solution: touch dates?
-		load_class( '_core/model/_pagecache.class.php' );
+		load_class( '_core/model/_pagecache.class.php', 'PageCache' );
 		$PageCache = & new PageCache( $Comment->Item->Blog );
 		$PageCache->invalidate( $Comment->Item->get_single_url() );
 	}
@@ -400,6 +400,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.133  2009/09/14 14:03:02  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.132  2009/05/20 13:53:34  fplanque
  * Return to a clean url after posting a comment
  *
