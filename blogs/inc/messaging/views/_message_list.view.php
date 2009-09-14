@@ -36,7 +36,8 @@ $DB->query( 'UPDATE T_messaging__threadstatus
 
 // Create result set:
 
-$select_sql = 'SELECT mm.msg_ID, mm.msg_datetime, u.user_login AS msg_author, mm.msg_text
+$select_sql = 'SELECT mm.msg_ID, mm.msg_datetime, u.user_login AS msg_author,
+					u.user_firstname AS msg_firstname, u.user_lastname AS msg_lastname, mm.msg_text
 				FROM T_messaging__message mm
 				LEFT OUTER JOIN T_users u ON u.user_ID = mm.msg_author_user_ID
 					WHERE mm.msg_thread_ID = '.$edited_Thread->ID.'
@@ -51,24 +52,17 @@ $Results = & new Results( $select_sql, 'msg_', '', 0, $count_sql);
 $Results->title = $edited_Thread->title;
 
 $Results->cols[] = array(
-					'th' => T_('Message'),
-					'td_class' => 'lastcol',
-					//'td' => '%nl2br(#msg_text#)%',
-					'td' => '¤conditional( empty(#msg_text#), \''.$edited_Thread->title.'\', \'%nl2br(#msg_text#)%\')¤',
-					);
-
-$Results->cols[] = array(
-					'th' => T_('Date / Time'),
-					'th_class' => 'shrinkwrap',
-					'td_class' => 'shrinkwrap',
-					'td' => '%mysql2localedatetime(#msg_datetime#)%',
-					);
-
-$Results->cols[] = array(
 					'th' => T_('Author'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
-					'td' => '$msg_author$',
+					'td' => '<b>$msg_author$</b><br/>$msg_firstname$ $msg_lastname$<br/>
+							<span class="note">%mysql2localedatetime(#msg_datetime#)%</span>',
+					);
+
+$Results->cols[] = array(
+					'th' => T_('Message'),
+					'td_class' => 'lastcol',
+					'td' => '¤conditional( empty(#msg_text#), \''.$edited_Thread->title.'\', \'%nl2br(#msg_text#)%\')¤',
 					);
 
 if( $current_User->check_perm( 'messaging', 'delete' ) )
@@ -106,6 +100,11 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.10  2009/09/14 15:18:00  efy-maxim
+ * 1. Recipients can be separated by commas or spaces.
+ * 2. Message list: author, full name date in the first column.
+ * 3. Message list: message in the second column
+ *
  * Revision 1.9  2009/09/14 13:52:07  tblue246
  * Translation fixes; removed now pointless doc comment.
  *

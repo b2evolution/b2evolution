@@ -53,7 +53,7 @@ $recent_recipients = $DB->get_var('SELECT GROUP_CONCAT(DISTINCT user_login SEPAR
 
 $user_login = param( 'user_login', 'string', '');
 
-$Form->text_input( 'thrd_recipients', empty( $user_login ) ? $edited_Thread->recipients : $user_login, 70, T_('Recipients'), T_('Enter comma separated logins<br/>'.$recent_recipients), array( 'maxlength'=> 255, 'required'=>true ) );
+$Form->text_input( 'thrd_recipients', empty( $user_login ) ? $edited_Thread->recipients : $user_login, 70, T_('Recipients'), T_('Enter comma or space separated logins<br/>'.$recent_recipients), array( 'maxlength'=> 255, 'required'=>true ) );
 
 $Form->text_input( 'thrd_title', $edited_Thread->title, 70, T_('Subject'), '', array( 'maxlength'=> 255, 'required'=>true ) );
 
@@ -64,6 +64,11 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 
 												/*
  * $Log$
+ * Revision 1.6  2009/09/14 15:18:00  efy-maxim
+ * 1. Recipients can be separated by commas or spaces.
+ * 2. Message list: author, full name date in the first column.
+ * 3. Message list: message in the second column
+ *
  * Revision 1.5  2009/09/14 10:33:20  efy-maxim
  * messagin module improvements
  *

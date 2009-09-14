@@ -124,9 +124,14 @@ class Thread extends DataObject
 
 		// split recipients into array using comma separator
 		$recipients_list = array();
-		foreach ( explode(',', $recipients) as $recipient )
+		$recipients = trim( str_replace( ',', ' ', $recipients ) );
+		foreach ( explode(' ', $recipients) as $recipient )
 		{
-			$recipients_list[] = strtolower(trim($recipient));
+			$login = trim($recipient);
+			if( ! empty( $login ) )
+			{
+				$recipients_list[] = strtolower( $login );
+			}
 		}
 
 		$error_msg = '';
@@ -213,6 +218,11 @@ class Thread extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/14 15:18:00  efy-maxim
+ * 1. Recipients can be separated by commas or spaces.
+ * 2. Message list: author, full name date in the first column.
+ * 3. Message list: message in the second column
+ *
  * Revision 1.7  2009/09/14 13:52:07  tblue246
  * Translation fixes; removed now pointless doc comment.
  *
