@@ -127,7 +127,7 @@ switch( $action )
 		$current_User->check_perm( 'options', 'edit', true, NULL );
 
 		// CREATE OBJECT:
-		load_class( '/cron/model/_cronjob.class.php' );
+		load_class( '/cron/model/_cronjob.class.php', 'CronJob' );
 		$edited_Cronjob = & new Cronjob();
 
 		$cjob_type = param( 'cjob_type', 'string', true );
@@ -276,6 +276,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2009/09/14 12:52:23  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.3  2009/03/08 23:57:42  fplanque
  * 2009
  *

@@ -59,7 +59,7 @@ if( $blog )
 
 	echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr><td>';
 
-	load_class('items/model/_itemlist.class.php');
+	load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 
 	$block_item_Widget = & new Widget( 'block_item' );
 
@@ -482,6 +482,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.32  2009/09/14 12:54:17  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.31  2009/07/06 23:52:24  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *

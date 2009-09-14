@@ -16,7 +16,7 @@ if( $Settings->get( 'auto_prune_stats_mode' ) != 'cron' )
 	return 2;
 }
 
-load_class('sessions/model/_hitlist.class.php', 'Hitlist' );
+load_class( 'sessions/model/_hitlist.class.php', 'Hitlist' );
 
 $result_message = Hitlist::dbprune(); // will prune once per day, according to Settings
 
@@ -29,6 +29,9 @@ return 100;
 
 /*
  * $Log$
+ * Revision 1.3  2009/09/14 12:53:16  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.2  2009/09/14 11:27:40  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
