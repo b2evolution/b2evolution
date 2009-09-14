@@ -54,20 +54,11 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 
 	// UPDATE general settings:
 
-	param( 'newusers_canregister', 'integer', 0 );
-	$Settings->set( 'newusers_canregister', $newusers_canregister );
-
 	param( 'newusers_mustvalidate', 'integer', 0 );
 	$Settings->set( 'newusers_mustvalidate', $newusers_mustvalidate );
 
 	param( 'newusers_revalidate_emailchg', 'integer', 0 );
 	$Settings->set( 'newusers_revalidate_emailchg', $newusers_revalidate_emailchg );
-
-	param( 'newusers_grp_ID', 'integer', true );
-	$Settings->set( 'newusers_grp_ID', $newusers_grp_ID );
-
-	param_integer_range( 'newusers_level', 0, 9, T_('User level must be between %d and %d.') );
-	$Settings->set( 'newusers_level', $newusers_level );
 
 	if( param( 'default_blog_ID', 'integer', NULL ) !== NULL )
 	{
@@ -153,6 +144,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/14 11:54:21  efy-bogdan
+ * Moved Default user permissions under a new tab
+ *
  * Revision 1.8  2009/09/03 15:51:52  tblue246
  * Doc, "refix", use "0" instead of an empty string for the "No blog" option.
  *

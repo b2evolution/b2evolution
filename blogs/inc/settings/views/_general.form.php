@@ -71,19 +71,6 @@ if( isset($collections_Module) )
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Default user permissions') );
-
-	$Form->checkbox( 'newusers_canregister', $Settings->get('newusers_canregister'), T_('New users can register'), T_('Check to allow new users to register themselves.' ) );
-
-	$GroupCache = & get_Cache( 'GroupCache' );
-	$Form->select_object( 'newusers_grp_ID', $Settings->get('newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
-
-	$Form->text_input( 'newusers_level', $Settings->get('newusers_level'), 1, T_('Level for new users'), T_('Levels determine hierarchy of users in blogs.' ), array( 'maxlength'=>1, 'required'=>true ) );
-
-$Form->end_fieldset();
-
-// --------------------------------------------
-
 $Form->begin_fieldset( T_('Email validation') );
 
 	$Form->checkbox( 'newusers_mustvalidate', $Settings->get('newusers_mustvalidate'), T_('New users must validate email'), T_('Check to require users to validate their email by clicking a link sent to them.' ) );
@@ -135,6 +122,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/14 11:54:21  efy-bogdan
+ * Moved Default user permissions under a new tab
+ *
  * Revision 1.8  2009/08/30 00:30:52  fplanque
  * increased modularity
  *

@@ -90,6 +90,7 @@ $ctrl_mappings = array(
 		'system'       => 'tools/system.ctrl.php',
 		'users'        => 'users/users.ctrl.php',
 		'userfields'   => 'users/userfields.ctrl.php',
+		'registration' => 'users/registration.ctrl.php',
 		'upload'       => 'files/upload.ctrl.php',
 	);
 
@@ -542,6 +543,9 @@ class _core_Module
 							'userfields' => array(
 								'text' => T_('User fields'),
 								'href' => '?ctrl=userfields'	),
+							'registration' => array(
+								'text' => T_('Registration'),
+ 								'href' => '?ctrl=registration'  ),
 							),
 					),
 				) );
@@ -608,6 +612,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.27  2009/09/14 11:54:21  efy-bogdan
+ * Moved Default user permissions under a new tab
+ *
  * Revision 1.26  2009/09/11 18:34:05  fplanque
  * userfields editing module.
  * needs further cleanup but I think it works.
