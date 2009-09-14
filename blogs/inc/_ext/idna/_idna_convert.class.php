@@ -52,7 +52,7 @@
  * @version 0.6.2
  * @changelog since 0.5.1 class updated to PHP5/6 style should be compatible to PHP 4.3+
  */
-class idna_convert
+class Idna_Convert
 {
     // NP See below
 
