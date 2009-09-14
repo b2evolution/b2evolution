@@ -74,7 +74,6 @@ $Results->cols[] = array(
 if( $current_User->check_perm( 'messaging', 'delete' ) )
 {
 	// We have permission to modify:
-	// Tblue> Shouldn't this check options:edit (see controller)?
 
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
@@ -107,6 +106,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.9  2009/09/14 13:52:07  tblue246
+ * Translation fixes; removed now pointless doc comment.
+ *
  * Revision 1.8  2009/09/14 10:33:20  efy-maxim
  * messagin module improvements
  *

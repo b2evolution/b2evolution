@@ -79,7 +79,7 @@ class Thread extends DataObject
 
 		// Title
 		param( 'thrd_title', 'string' );
-		param_check_not_empty( 'thrd_title', T_('The field «subject» cannot be empty.'), T_('This field cannot be empty.') );
+		param_check_not_empty( 'thrd_title', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Subject') ) );
 		$this->set_from_Request( 'title', 'thrd_title' );
 
 		// Resipients
@@ -134,7 +134,7 @@ class Thread extends DataObject
 		// check has recipients list login of current user
 		if( in_array( $current_User->login, $recipients_list ) )
 		{
-			$error_msg = 'You cannot send threads to yourself: '.$current_User->login;
+			$error_msg = sprintf( T_( 'You cannot send threads to yourself: %s' ), $current_User->login );
 		}
 
 		// select all users from database
@@ -164,10 +164,10 @@ class Thread extends DataObject
 		{
 			if ( ! empty( $error_msg ) )
 			{
-				$error_msg .= '<br/>';
+				$error_msg .= '<br />';
 			}
 
-			$error_msg .= 'The following users were not found: '.implode( ', ', $unavailable_recipients_list );
+			$error_msg .= sprintf( 'The following users were not found: %s', implode( ', ', $unavailable_recipients_list ) );
 		}
 
 		if( ! empty( $error_msg ) )
@@ -213,6 +213,9 @@ class Thread extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/14 13:52:07  tblue246
+ * Translation fixes; removed now pointless doc comment.
+ *
  * Revision 1.6  2009/09/14 13:20:56  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
