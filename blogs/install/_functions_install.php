@@ -172,8 +172,8 @@ function install_newdb()
 		flush();
 
 		// We're gonna need some environment in order to create the demo contents...
-		load_class( 'settings/model/_generalsettings.class.php' );
-		load_class( 'users/model/_usersettings.class.php' );
+		load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+		load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
 		/**
 		 * @var GeneralSettings
 		 */
@@ -821,6 +821,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.74  2009/09/14 14:10:14  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.73  2009/09/13 22:34:59  blueyed
  * doc
  *

@@ -42,7 +42,7 @@ global $Hit;
 
 global $Plugins;
 
-load_class( '_core/ui/_menu.class.php' );
+load_class( '_core/ui/_menu.class.php', 'Menu' );
 
 /**
  * @global Menu Evobar menu on the top left (should be useed for content & system management features)

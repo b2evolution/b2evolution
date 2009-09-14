@@ -2168,7 +2168,7 @@ function upgrade_b2evo_tables()
 	{	// 3.0 part 1
 		task_begin( 'Updating keyphrases in hitlog table... ' );
 		flush();
-		load_class( 'sessions/model/_hit.class.php' );
+		load_class( 'sessions/model/_hit.class.php', 'Hit' );
 	  $sql = 'SELECT SQL_NO_CACHE hit_ID, hit_referer
   						FROM T_hitlog
    					 WHERE hit_referer_type = "search"
@@ -2659,7 +2659,7 @@ function upgrade_b2evo_tables()
 		if( ! $confirmed_db_upgrade )
 		{
 			global $action, $locale;
-			load_class( '_core/ui/forms/_form.class.php' );
+			load_class( '_core/ui/forms/_form.class.php', 'Form' );
 			$Form = & new Form( NULL, '', 'post' );
 			$Form->begin_form( 'fform', T_('Upgrade database') );
 			$Form->begin_fieldset();
@@ -2695,6 +2695,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.317  2009/09/14 14:10:14  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.316  2009/09/13 21:29:22  blueyed
  * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
  *

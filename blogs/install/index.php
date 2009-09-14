@@ -37,20 +37,20 @@ if( ! $config_is_done )
 require_once $inc_path.'_core/_class'.floor(PHP_VERSION).'.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
 
-load_class('_core/model/_log.class.php');
+load_class( '_core/model/_log.class.php', 'Log');
 $Debuglog = & new Log( 'note' );
 $Messages = & new Log('error');
 require_once $conf_path.'_upgrade.php';
 require_once $inc_path.'_vars.inc.php';
-load_class('/_core/model/db/_db.class.php');
-load_funcs('collections/model/_blog.funcs.php');
-load_funcs('collections/model/_category.funcs.php');
-load_class('items/model/_item.class.php');
+load_class( '/_core/model/db/_db.class.php', 'DB' );
+load_funcs('collections/model/_blog.funcs.php',);
+load_funcs('collections/model/_category.funcs.php',);
+load_class( 'items/model/_item.class.php', 'Item' );
 load_funcs('items/model/_item.funcs.php');
 load_funcs('users/model/_user.funcs.php');
 load_funcs( '_core/ui/forms/_form.funcs.php' );
-load_class('_core/model/_timer.class.php');
-load_class('plugins/model/_plugins.class.php');
+load_class( '_core/model/_timer.class.php', 'Timer' );
+load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
 require_once dirname(__FILE__).'/_functions_install.php';
 
 $Timer = & new Timer('main');
@@ -700,6 +700,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.180  2009/09/14 14:10:15  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.179  2009/07/16 17:14:22  fplanque
  * doc
  *

@@ -31,7 +31,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-load_class( '_core/ui/_menu.class.php' );
+load_class( '_core/ui/_menu.class.php', 'Menu' );
 
 
 /**
@@ -1285,6 +1285,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.97  2009/09/14 14:12:21  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.96  2009/08/30 00:30:52  fplanque
  * increased modularity
  *

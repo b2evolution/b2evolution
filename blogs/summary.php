@@ -27,7 +27,7 @@ load_funcs( 'skins/_skin.funcs.php' );
 // --------------------- PAGE LEVEL CACHING SUPPORT ---------------------
 // Note: This is totally optional. General caching must be enabled in Global settings, otherwise this will do nothing.
 // Delete this block if you don't care about page level caching. Don't forget to delete the matching section at the end of the page.
-load_class( '_core/model/_pagecache.class.php' );
+load_class( '_core/model/_pagecache.class.php', 'PageCache' );
 $PageCache = & new PageCache( NULL );
 // Check for cached content & Start caching if needed:
 if( ! $PageCache->check() )
@@ -107,7 +107,7 @@ header_content_type( 'text/html' );
 
 <?php // --------------------------- BLOG LIST -----------------------------
 
-	load_class('items/model/_itemlist.class.php');
+	load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 
 	$BlogCache = & get_Cache( 'BlogCache' );
 

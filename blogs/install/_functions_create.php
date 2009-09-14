@@ -41,7 +41,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'users/model/_group.class.php' );
+load_class( 'users/model/_group.class.php', 'Group' );
 load_funcs( 'collections/model/_category.funcs.php' );
 
 /**
@@ -70,7 +70,7 @@ function create_default_data()
 	global $DB, $locales, $current_locale;
 
 	// Inserting sample data triggers events: instead of checking if $Plugins is an object there, just use a fake one..
-	load_class('plugins/model/_plugins_admin_no_db.class.php');
+	load_class('plugins/model/_plugins_admin_no_db.class.php', 'Plugins_admin_no_DB' );
 	global $Plugins;
 	$Plugins = new Plugins_admin_no_DB(); // COPY
 
@@ -772,10 +772,10 @@ function create_demo_contents()
    */
 	global $FileRootCache;
 
-	load_class( 'collections/model/_blog.class.php' );
-	load_class( 'files/model/_file.class.php' );
-	load_class( 'files/model/_filetype.class.php' );
-	load_class( 'items/model/_link.class.php' );
+	load_class( 'collections/model/_blog.class.php', 'Blog' );
+	load_class( 'files/model/_file.class.php', 'File' );
+	load_class( 'files/model/_filetype.class.php', 'FileType' );
+	load_class( 'items/model/_link.class.php', 'Link' );
 
 	task_begin('Assigning avatar to Admin... ');
 	$edit_File = & new File( 'user', 1, 'faceyourmanga_admin_boy.png' );
@@ -1289,6 +1289,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.274  2009/09/14 14:10:14  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.273  2009/09/14 05:57:36  efy-maxim
  * Add default messaging permissions
  *
