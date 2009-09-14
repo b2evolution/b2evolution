@@ -182,7 +182,7 @@ else
 
 
 /**
- * In PHP4, this really load th class. In PHP5, it's smarter than that:
+ * In PHP4, this really load the class. In PHP5, it's smarter than that:
  * It only registers the class & file name so that __autoload() can later
  * load the class IF and ONLY IF the class is actually needed during execution.
  */
@@ -208,6 +208,9 @@ function duplicate( $Obj )
 
 /*
  * $Log$
+ * Revision 1.23  2009/09/14 18:46:41  blueyed
+ * fix typo
+ *
  * Revision 1.22  2009/09/14 18:37:07  fplanque
  * doc/cleanup/minor
  *
