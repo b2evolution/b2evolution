@@ -34,59 +34,34 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'regional/model/_currency.class.php', 'Currency' );
 
-global $dispatcher;
+global $dispatcher, $rsc_url, $rsc_path;
 
-// Get params from request
-$s = param( 's', 'string', '', true );
-
-// Create query
-$SQL = & new SQL();
-$SQL->SELECT( 'ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_code' );
-$SQL->FROM( 'T_country	LEFT JOIN T_currency ON ctry_curr_ID=curr_ID' );
-
-if( !empty($s) )
-{	// We want to filter on search keyword:
-	// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
-	$SQL->WHERE( 'CONCAT_WS( " ", ctry_code, ctry_name, curr_code ) LIKE "%'.$DB->escape($s).'%"' );
-}
+$sql = 'SELECT ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_code 
+			FROM T_country
+			LEFT JOIN T_currency ON ctry_curr_ID=curr_ID';
+$count_sql = 'SELECT count(*) FROM T_country';
 
 // Create result set:
-$Results = & new Results( $SQL->get(), 'ctry_' );
+$Results = & new Results( $sql, 'ctry_', 'D', NULL, $count_sql );
 
+//$Results->Cache = & get_Cache( 'CountryCache' );
 $Results->title = T_('Countries list');
 
-/**
- * Callback to add filters on top of the result set
- *
- * @param Form
- */
-function filter_countries( & $Form )
-{
-	$Form->text( 's', get_param('s'), 30, T_('Search'), '', 255 );
-}
-
-$Results->filter_area = array(
-	'callback' => 'filter_countries',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=countries' ),
-		)
-	);
-	
 $Results->cols[] = array(
 						'th' => T_('Code'),
 						'td_class' => 'center',
 						'order' => 'ctry_code',
 						'td' => '<strong>$ctry_code$</strong>',
 					);
-
+						
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Name'),
 							'order' => 'ctry_name',
-							'td' => '<strong><a href="'.$dispatcher
+							'td' => '<img src="'.$rsc_url.'flags/w16px/$ctry_code$.gif" alt="$ctry_name$" class="flag" />'.'<strong><a href="'.$dispatcher
 								   .'?ctrl=countries&amp;ctry_ID=$ctry_ID$&amp;action=edit" title="'
-								   .T_('Edit this country...').'">$ctry_name$</a></strong>',
+								   .T_('Edit this country...').'"> $ctry_name$</a></strong>',
 						);
 }
 else
@@ -94,7 +69,7 @@ else
 	$Results->cols[] = array(
 							'th' => T_('Name'),
 							'order' => 'ctry_name',
-							'td' => '$ctry_name$',
+							'td' => '<img src="'.$rsc_url.'flags/w16px/$ctry_code$.gif" alt="$ctry_name$" class="flag" /> $ctry_name$',
 						);
 
 }
@@ -104,7 +79,7 @@ $Results->cols[] = array(
 						'order' => 'curr_code',
 						'td' => '$curr_shortcut$ $curr_code$',
 					);
-
+	
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
@@ -128,14 +103,8 @@ $Results->display();
 
 /*
  * $Log$
- * Revision 1.9  2009/09/12 18:44:03  efy-sergey
- * Added a search field to the countries tables
- *
- * Revision 1.8  2009/09/12 18:18:02  efy-sergey
- * Changed query creation to using an SQL object
- *
- * Revision 1.7  2009/09/12 00:21:02  fplanque
- * search cleanup
+ * Revision 1.10  2009/09/14 18:32:51  efy-sasha
+ * *** empty log message ***
  *
  * Revision 1.6  2009/09/11 11:19:03  efy-sergey
  * Displaying currency code
