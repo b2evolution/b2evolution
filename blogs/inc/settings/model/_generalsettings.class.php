@@ -33,7 +33,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('settings/model/_abstractsettings.class.php');
+load_class( 'settings/model/_abstractsettings.class.php', 'AbstractSettings' );
 
 /**
  * Class to handle the global settings.
@@ -190,6 +190,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.20  2009/09/14 13:42:12  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.19  2009/09/02 13:47:32  waltercruz
  * Setting the default title fot posts created through blogger API
  *

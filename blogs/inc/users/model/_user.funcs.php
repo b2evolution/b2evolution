@@ -36,8 +36,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('users/model/_group.class.php');
-load_class('users/model/_user.class.php');
+load_class( 'users/model/_group.class.php', 'Group' );
+load_class( 'users/model/_user.class.php', 'User' );
 
 
 /**
@@ -584,6 +584,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/14 13:46:11  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.10  2009/03/23 22:19:46  fplanque
  * evobar right menu is now also customizable by plugins
  *

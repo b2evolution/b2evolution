@@ -27,9 +27,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/dataobjects/_dataobjectcache.class.php');
+load_class( '_core/model/dataobjects/_dataobjectcache.class.php', 'DataObjectCache' );
 
-load_class( 'skins/model/_skin.class.php' );
+load_class( 'skins/model/_skin.class.php', 'Skin' );
 
 load_funcs( 'skins/_skin.funcs.php' );
 
@@ -187,6 +187,9 @@ class SkinCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/14 13:42:44  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.4  2009/05/23 20:20:18  fplanque
  * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
  *

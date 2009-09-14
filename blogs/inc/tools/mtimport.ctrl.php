@@ -68,7 +68,7 @@ $output_debug_dump = 0;
 // TODO: Make this AdminUI compliant, or better: make an MT import plugin..
 
 load_funcs('files/model/_file.funcs.php');
-load_class('items/model/_item.class.php');
+load_class( 'items/model/_item.class.php', 'Item' );
 
 set_magic_quotes_runtime( 0 );  // be clear on this
 
@@ -1674,6 +1674,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/14 13:43:38  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.13  2009/09/05 21:37:31  tblue246
  * More $dispatcher fixes
  *

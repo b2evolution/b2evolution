@@ -27,11 +27,11 @@
  * @author evofactory-test
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version _userfield.class.php,v 1.1 2009/09/11 18:34:06 fplanque Exp
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/dataobjects/_dataobject.class.php');
+load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 
 /**
  * Userfield Class
@@ -127,7 +127,7 @@ class Userfield extends DataObject
 }
 
 /*
- * $Log$
+ * _userfield.class.php,v
  * Revision 1.1  2009/09/11 18:34:06  fplanque
  * userfields editing module.
  * needs further cleanup but I think it works.

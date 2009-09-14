@@ -28,7 +28,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/dataobjects/_dataobject.class.php');
+load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 
 /**
  * User Group
@@ -553,6 +553,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/14 13:46:11  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.15  2009/09/14 07:31:43  efy-maxim
  * 1. Messaging permissions have been fully implemented
  * 2. Messaging has been added to evo bar menu

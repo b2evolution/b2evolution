@@ -16,7 +16,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'sessions/model/_goal.class.php' );
+load_class( 'sessions/model/_goal.class.php', 'Goal' );
 load_funcs('sessions/model/_hitlog.funcs.php');
 
 /**
@@ -264,6 +264,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/14 13:39:00  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.14  2009/09/03 07:24:58  efy-maxim
  * 1. Show edit screen again if current currency/goal exists in database.
  * 2. Convert currency code to uppercase

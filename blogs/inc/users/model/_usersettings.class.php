@@ -37,7 +37,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Includes
  */
-load_class('settings/model/_abstractsettings.class.php');
+load_class( 'settings/model/_abstractsettings.class.php', 'AbstractSettings' );
 
 /**
  * Class to handle the settings for users
@@ -210,6 +210,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/14 13:46:11  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.6  2009/03/20 03:38:04  fplanque
  * rollback -- http://forums.b2evolution.net/viewtopic.php?t=18269
  *

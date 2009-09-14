@@ -30,7 +30,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
-load_class( '/sessions/model/_goal.class.php' );
+load_class( '/sessions/model/_goal.class.php', 'Goal' );
 
 global $blog, $admin_url, $rsc_url, $goal_ID, $localtimenow;
 global $datestartinput, $datestart, $datestopinput, $datestop;
@@ -271,6 +271,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/14 13:38:33  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.4  2009/07/09 00:11:18  fplanque
  * minor
  *

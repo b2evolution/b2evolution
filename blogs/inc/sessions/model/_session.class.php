@@ -498,27 +498,27 @@ function session_unserialize_callback( $classname )
 	switch( strtolower($classname) )
 	{
 		case 'blog':
-			load_class('collections/model/_blog.class.php');
+			load_class( 'collections/model/_blog.class.php', 'Blog' );
 			return true;
 
 		case 'collectionsettings':
-			load_class('collections/model/_collsettings.class.php');
+			load_class( 'collections/model/_collsettings.class.php', 'CollSettings' );
 			return true;
 
 		case 'comment':
-			load_class('comments/model/_comment.class.php');
+			load_class( 'comments/model/_comment.class.php', 'Comment' );
 			return true;
 
 		case 'item':
-			load_class('items/model/_item.class.php');
+			load_class( 'items/model/_item.class.php', 'Item' );
 			return true;
 
 		case 'group':
-			load_class('users/model/_group.class.php');
+			load_class( 'users/model/_group.class.php', 'Group' );
 			return true;
 
 		case 'user':
-			load_class('users/model/_user.class.php');
+			load_class( 'users/model/_user.class.php', 'User' );
 			return true;
 	}
 
@@ -535,17 +535,20 @@ function session_unserialize_callback( $classname )
  */
 function session_unserialize_load_all_classes()
 {
-	load_class('collections/model/_blog.class.php');
-	load_class('collections/model/_collsettings.class.php');
-	load_class('comments/model/_comment.class.php');
-	load_class('items/model/_item.class.php');
-	load_class('users/model/_group.class.php');
-	load_class('users/model/_user.class.php');
+	load_class( 'collections/model/_blog.class.php', 'Blog' );
+	load_class( 'collections/model/_collsettings.class.php', 'CollSettings' );
+	load_class( 'comments/model/_comment.class.php', 'Comment' );
+	load_class( 'items/model/_item.class.php', 'Item' );
+	load_class( 'users/model/_group.class.php', 'Group' );
+	load_class( 'users/model/_user.class.php', 'User' );
 }
 
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/14 13:38:10  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.12  2009/09/13 21:27:20  blueyed
  * SQL_NO_CACHE for SELECT queries using T_sessions
  *

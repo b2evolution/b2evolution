@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/dataobjects/_dataobject.class.php');
+load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 
 /**
  * Filetype Class
@@ -136,6 +136,9 @@ class Goal extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/14 13:38:10  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.6  2009/09/02 22:50:50  efy-maxim
  * Clean error message for currency/goal already exists
  *

@@ -90,7 +90,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	$new_cache_status = param( 'general_cache_enabled', 'integer', 0 );
 	$old_cache_status = $Settings->get('general_cache_enabled');
 
-	load_class( '_core/model/_pagecache.class.php' );
+	load_class( '_core/model/_pagecache.class.php', 'PageCache' );
 	$PageCache = & new PageCache(  );
 
 	if( $old_cache_status == false && $new_cache_status == true )
@@ -144,6 +144,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/14 13:41:44  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.9  2009/09/14 11:54:21  efy-bogdan
  * Moved Default user permissions under a new tab
  *
