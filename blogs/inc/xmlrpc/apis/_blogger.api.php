@@ -439,7 +439,7 @@ function blogger_getrecentposts( $m )
 
 
 	// Get the posts to display:
-	load_class( 'items/model/_itemlist.class.php' );
+	load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 	$MainList = & new ItemList2( $Blog, NULL, NULL, $numposts );
 
 	// Protected and private get checked by statuses_where_clause().
@@ -533,6 +533,9 @@ $xmlrpc_procs['blogger.getRecentPosts'] = array(
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/14 13:56:13  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.10  2009/09/02 13:45:39  waltercruz
  * Fixing Undefined variable
  *

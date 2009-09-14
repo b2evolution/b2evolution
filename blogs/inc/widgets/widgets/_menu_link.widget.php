@@ -25,7 +25,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'widgets/model/_widget.class.php','ComponentWidget');
+load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
 
 global $menu_link_widget_link_types;
 $menu_link_widget_link_types = array(
@@ -188,6 +188,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/14 13:54:13  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.15  2009/09/12 11:03:13  efy-arrin
  * Included the ClassName in the loadclass() with proper UpperCase
  *

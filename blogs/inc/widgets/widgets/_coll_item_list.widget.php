@@ -25,7 +25,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'widgets/model/_widget.class.php','ComponentWidget' );
+load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
 
 /**
  * ComponentWidget Class
@@ -390,6 +390,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/14 13:54:13  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.13  2009/09/12 11:03:13  efy-arrin
  * Included the ClassName in the loadclass() with proper UpperCase
  *

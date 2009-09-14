@@ -27,7 +27,7 @@ global $AdminUI;
  */
 global $Plugins;
 
-load_class( 'widgets/model/_widget.class.php','ComponentWidget');
+load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
 
 param( 'action', 'string', 'list' );
 param( 'display_mode', 'string', 'normal' );
@@ -507,6 +507,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.31  2009/09/14 13:52:55  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.30  2009/09/12 11:01:28  efy-arrin
  * Included the ClassName in the loadclass() with proper UpperCase
  *

@@ -51,7 +51,7 @@ function wp_getpagelist( $m )
 	}
 
 	// Get the pages to display:
-	load_class( 'items/model/_itemlistlight.class.php' );
+	load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
 	$MainList = & new ItemListLight( $Blog, NULL, NULL,  50000 );
 
 	// Protected and private get checked by statuses_where_clause().

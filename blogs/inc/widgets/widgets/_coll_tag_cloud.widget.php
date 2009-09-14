@@ -25,7 +25,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'widgets/model/_widget.class.php','ComponentWidget');
+load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
 
 /**
  * ComponentWidget Class
@@ -233,6 +233,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.23  2009/09/14 13:54:13  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.22  2009/09/13 21:33:44  blueyed
  * coll_tag_cloud_Widget: optimizing tag query a bit. doc.
  *

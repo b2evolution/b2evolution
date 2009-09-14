@@ -694,7 +694,7 @@ function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_ID
 	}
 
 	// INSERT NEW POST INTO DB:
-	load_class( 'items/model/_item.class.php' );
+	load_class( 'items/model/_item.class.php', 'Item' );
 	$edited_Item = & new Item();
 	$edited_Item->set( 'title', $post_title );
 	$edited_Item->set( 'content', $content );
@@ -885,6 +885,9 @@ function xmlrpcs_get_maincat( $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.17  2009/09/14 13:57:07  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.16  2009/09/01 16:44:58  waltercruz
  * Generic functions to avoid alias and allow enable/disabling of specific APIs on future
  *

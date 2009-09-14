@@ -457,7 +457,7 @@ function mw_getrecentposts( $m )
 	logIO('In mw_getrecentposts, current numposts is ...'. $numposts);
 
 	// Get the posts to display:
-	load_class( 'items/model/_itemlist.class.php' );
+	load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 	$MainList = & new ItemList2( $Blog, NULL, NULL, $numposts );
 
 	// Protected and private get checked by statuses_where_clause().
@@ -693,6 +693,9 @@ $xmlrpc_procs['metaWeblog.getUsersBlogs'] = array(
 
 /*
  * $Log$
+ * Revision 1.25  2009/09/14 13:56:13  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.24  2009/09/08 13:51:01  tblue246
  * phpdoc fixes
  *

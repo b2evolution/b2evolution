@@ -27,9 +27,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/dataobjects/_dataobjectcache.class.php','DataObjectCache');
+load_class( '_core/model/dataobjects/_dataobjectcache.class.php', 'DataObjectCache' );
 
-load_class( 'widgets/model/_widget.class.php','ComponentWidget');
+load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
 
 /**
  * Widget Cache Class
@@ -154,6 +154,9 @@ class WidgetCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/14 13:53:32  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.7  2009/09/12 11:02:23  efy-arrin
  * Included the ClassName in the loadclass() with proper UpperCase
  *
