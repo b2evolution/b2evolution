@@ -72,7 +72,7 @@ $Table->display_body_start();
 
 if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_admin_no_DB' ) )
 { // (may have been instantiated for action 'info')
-	load_class('plugins/model/_plugins_admin_no_db.class.php');
+	load_class( 'plugins/model/_plugins_admin_no_db.class.php', 'Plugins_admin_no_DB' );
 	$AvailablePlugins = & new Plugins_admin_no_DB(); // do not load registered plugins/events from DB
 	$AvailablePlugins->discover();
 }
@@ -214,6 +214,9 @@ echo '</p>';
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/14 13:30:09  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.7  2009/07/06 23:52:24  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *
