@@ -36,7 +36,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * fp>> TODO: When the user is viewing details for a file he should (by default) not be presented with the filelist in addition to the file properties
  * In cases like that, we should try to avoid instanciating a Filelist.
  */
-load_class('files/model/_filelist.class.php');
+load_class( 'files/model/_filelist.class.php', 'FileList' );
 
 /**
  * @var User
@@ -429,6 +429,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/14 13:01:31  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.13  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

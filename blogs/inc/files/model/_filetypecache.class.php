@@ -33,7 +33,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/dataobjects/_dataobjectcache.class.php');
+load_class( '_core/model/dataobjects/_dataobjectcache.class.php', 'DataObjectCache' );
 
 /**
  * FiletypeCache Class
@@ -129,6 +129,9 @@ class FiletypeCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.4  2009/09/14 13:04:53  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.3  2009/03/08 23:57:43  fplanque
  * 2009
  *

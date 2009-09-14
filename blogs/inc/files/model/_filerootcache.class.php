@@ -29,7 +29,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-load_class('/files/model/_fileroot.class.php');
+load_class( '/files/model/_fileroot.class.php', 'FileRoot' );
 
 
 /**
@@ -166,6 +166,9 @@ class FileRootCache
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/14 13:04:53  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.5  2009/08/30 00:30:52  fplanque
  * increased modularity
  *
