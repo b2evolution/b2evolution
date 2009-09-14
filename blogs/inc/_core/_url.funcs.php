@@ -688,12 +688,12 @@ function idna_encode( $url )
 
 	if( version_compare(PHP_VERSION, '5', '>=') )
 	{
-		load_class('_ext/idna/_idna_convert.class.php');
+		load_class('_ext/idna/_idna_convert.class.php', 'Idna_Convert' );
 		$IDNA = new idna_convert();
 	}
 	else
 	{
-		load_class('_ext/idna/_idna_convert.class.php4');
+		load_class('_ext/idna/_idna_convert.class.php4', 'Idna_Convert' );
 		$IDNA = new Net_IDNA_php4();
 	}
 
@@ -719,12 +719,12 @@ function idna_decode( $url )
 {
 	if( version_compare(PHP_VERSION, '5', '>=') )
 	{
-		load_class('_ext/idna/_idna_convert.class.php');
+		load_class('_ext/idna/_idna_convert.class.php', 'Idna_Convert' );
 		$IDNA = new idna_convert();
 	}
 	else
 	{
-		load_class('_ext/idna/_idna_convert.class.php4');
+		load_class('_ext/idna/_idna_convert.class.php4', 'Idna_Convert' );
 		$IDNA = new Net_IDNA_php4();
 	}
 	return $IDNA->decode($url);
@@ -733,6 +733,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.38  2009/09/14 11:41:23  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.37  2009/08/24 13:07:10  tblue246
  * Fixed bugs in fetch_remote_page()
  *

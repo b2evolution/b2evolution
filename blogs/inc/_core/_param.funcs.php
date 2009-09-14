@@ -1774,7 +1774,7 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 
 	if( $xhtmlvalidation )
 	{ // We want to validate XHTML:
-		load_class( 'xhtml_validator/_xhtml_validator.class.php' );
+		load_class( 'xhtml_validator/_xhtml_validator.class.php', 'XHTML_Validator' );
 
 		$XHTML_Validator = & new XHTML_Validator( $context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, $encoding );
 
@@ -1968,6 +1968,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.41  2009/09/14 11:41:23  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.40  2009/09/05 17:57:55  fplanque
  * support for multiline/text fields
  *
