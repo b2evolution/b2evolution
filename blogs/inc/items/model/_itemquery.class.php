@@ -28,7 +28,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/db/_sql.class.php');
+load_class( '_core/model/db/_sql.class.php', 'SQL');
 
 /**
  * ItemQuery: help constructing queries on Items
@@ -723,6 +723,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/14 13:17:28  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.11  2009/09/13 21:29:22  blueyed
  * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
  *

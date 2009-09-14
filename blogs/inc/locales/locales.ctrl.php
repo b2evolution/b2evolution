@@ -228,7 +228,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 			}
 
 
-			load_class( 'locales/_pofile.class.php' );
+			load_class( 'locales/_pofile.class.php', 'POFile' );
 			$POFile = new POFile($po_file);
 			$POFile->read(true); // adds info about sources to $Messages
 			$POFile->write_evo_trans($outfile, $locales[$edit_locale]['messages']);
@@ -324,6 +324,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/14 13:18:14  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.5  2009/03/08 23:57:45  fplanque
  * 2009
  *

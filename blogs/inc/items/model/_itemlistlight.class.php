@@ -31,9 +31,9 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/dataobjects/_dataobjectcache.class.php');
-load_class('_core/model/dataobjects/_dataobjectlist2.class.php');
-load_class('items/model/_item.class.php');
+load_class( '_core/model/dataobjects/_dataobjectcache.class.php', 'DataObjectCache' );
+load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectList2' );
+load_class( 'items/model/_item.class.php', 'Item' );
 load_funcs('items/model/_item.funcs.php');
 
 /**
@@ -1510,6 +1510,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.32  2009/09/14 13:17:28  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.31  2009/03/15 21:02:33  tblue246
  * Check m and w parameters (fixes a PHP notice when specifying an invalid month).
  *

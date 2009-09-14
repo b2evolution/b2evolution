@@ -35,7 +35,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('plugins/_plugin.class.php');
+load_class( 'plugins/_plugin.class.php', 'Plugin' );
 
 
 /**
@@ -709,7 +709,7 @@ class Plugins
 
 		if( $set_type == 'UserSettings' )
 		{	// User specific settings:
-			load_class('plugins/model/_pluginusersettings.class.php');
+			load_class( 'plugins/model/_pluginusersettings.class.php', 'PluginUserSettings' );
 
 			$Plugin->UserSettings = new PluginUserSettings( $Plugin->ID );
 
@@ -717,7 +717,7 @@ class Plugins
 		}
 		else
 		{	// Global settings:
-			load_class('plugins/model/_pluginsettings.class.php');
+			load_class( 'plugins/model/_pluginsettings.class.php', 'PluginSettings' );
 
 			$Plugin->Settings = new PluginSettings( $Plugin->ID );
 
@@ -1913,6 +1913,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/14 13:24:14  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.14  2009/09/06 21:50:25  tblue246
  * Remove EVO_NEXT_VERSION, which at a point was not replaced and is useless now (since nobody knows by what version it should be replaced now).
  *

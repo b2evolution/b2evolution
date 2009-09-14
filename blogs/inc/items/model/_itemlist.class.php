@@ -30,7 +30,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('/items/model/_itemlistlight.class.php');
+load_class( '/items/model/_itemlistlight.class.php', 'ItemListLight' );
 
 
 /**
@@ -718,6 +718,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.24  2009/09/14 13:17:28  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.23  2009/07/31 21:30:29  blueyed
  * Use existing post_ID in item preview. This makes attachments appear when previewing a new and existing post.
  *

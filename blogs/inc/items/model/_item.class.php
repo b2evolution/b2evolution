@@ -38,8 +38,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Includes:
  */
-load_class('items/model/_itemlight.class.php');
-load_funcs('items/model/_item.funcs.php');
+load_class( 'items/model/_itemlight.class.php', 'ItemLight' );
+load_funcs( 'items/model/_item.funcs.php');
 
 
 /**
@@ -1890,7 +1890,7 @@ class Item extends ItemLight
 	 */
 	function get_attachment_FileList( $limit = 1000 )
 	{
-		load_class('_core/model/dataobjects/_dataobjectlist2.class.php');
+		load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectList2' );
 
 		$FileCache = & get_Cache( 'FileCache' );
 
@@ -3583,7 +3583,7 @@ class Item extends ItemLight
 			$Messages->add( T_('Scheduling asynchronous notifications...'), 'note' );
 
 			// CREATE OBJECT:
-			load_class( '/cron/model/_cronjob.class.php' );
+			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
 			$edited_Cronjob = & new Cronjob();
 
 			// start datetime. We do not want to ping before the post is effectively published:
@@ -3978,6 +3978,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.136  2009/09/14 13:17:28  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.135  2009/09/13 21:29:21  blueyed
  * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
  *

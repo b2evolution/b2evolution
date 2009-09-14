@@ -26,7 +26,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-load_class('plugins/model/_plugins.class.php');
+load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
 
 
 /**
@@ -1470,6 +1470,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.22  2009/09/14 13:24:14  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.21  2009/07/12 19:12:51  fplanque
  * doc
  *

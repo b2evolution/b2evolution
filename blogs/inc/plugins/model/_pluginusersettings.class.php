@@ -33,7 +33,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('settings/model/_abstractsettings.class.php');
+load_class( 'settings/model/_abstractsettings.class.php', 'AbstractSettings' );
 
 /**
  * Class to handle settings for plugins
@@ -132,6 +132,9 @@ class PluginUserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/14 13:24:14  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.4  2009/07/02 21:57:11  blueyed
  * doc fix: move files and classes to the plugins package
  *

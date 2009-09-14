@@ -24,7 +24,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/dataobjects/_dataobject.class.php');
+load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 
 /**
  * Thread Class
@@ -213,6 +213,9 @@ class Thread extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/14 13:20:56  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.5  2009/09/14 10:33:20  efy-maxim
  * messagin module improvements
  *

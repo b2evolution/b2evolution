@@ -200,7 +200,7 @@ switch( $action )
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 		// New post form  (can be a bookmarklet form if mode == bookmarklet )
 
-		load_class('items/model/_item.class.php');
+		load_class( 'items/model/_item.class.php', 'Item' );
 		$edited_Item = & new Item();
 
 		$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
@@ -360,7 +360,7 @@ switch( $action )
 		check_perm_posttype( $post_extracats );
 
 		// CREATE NEW POST:
-		load_class('items/model/_item.class.php');
+		load_class( 'items/model/_item.class.php', 'Item' );
 		$edited_Item = & new Item();
 
 		// Set the params we already got:
@@ -686,7 +686,7 @@ function init_list_mode()
 	/*
 	 * Init list of posts to display:
 	 */
-	load_class('items/model/_itemlist.class.php');
+	load_class( 'items/model/_itemlist.class.php', 'ItemList2' );
 
 	// Create empty List:
 	$ItemList = new ItemList2( $Blog, NULL, NULL, $UserSettings->get('results_per_page'), 'ItemCache', '', $tab /* filterset name */ ); // COPY (func)
@@ -1038,6 +1038,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.60  2009/09/14 13:16:42  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.59  2009/09/13 21:29:21  blueyed
  * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
  *

@@ -32,7 +32,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/model/dataobjects/_dataobject.class.php');
+load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 
 
 /**
@@ -955,6 +955,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2009/09/14 13:17:28  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.21  2009/07/17 23:11:11  tblue246
  * - DataObject::set_param(): Correctly decide whether to update values with $fieldtype == 'number' (see code for detailed explanation).
  * - Item class: Doc about updating excerpt without updating the datemodified field.
