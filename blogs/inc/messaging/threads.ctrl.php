@@ -12,7 +12,7 @@ load_class( 'messaging/model/_message.class.php', 'Message' );
 global $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'edit', true );
+$current_User->check_perm( 'messaging', 'write', true );
 
 // Set options path:
 $AdminUI->set_path( 'messaging' );
@@ -46,7 +46,7 @@ switch( $action )
 {
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		$current_User->check_perm( 'messaging', 'write', true );
 
 		if( ! isset($edited_Message) )
 		{	// We don't have a model to use, start with blank object:
@@ -71,7 +71,7 @@ switch( $action )
 		$edited_Message->Thread = & $edited_Thread;
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		$current_User->check_perm( 'messaging', 'write', true );
 
 		param( 'thrd_recipients', 'string' );
 
@@ -99,7 +99,7 @@ switch( $action )
 		// Delete thread:
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		$current_User->check_perm( 'messaging', 'delete', true );
 
 		// Make sure we got an thrd_ID:
 		param( 'thrd_ID', 'integer', true );

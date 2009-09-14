@@ -62,7 +62,7 @@ $Results->cols[] = array(
 					'td' => '%strmaxlen(#thrd_recipients#, 20)%',
 					);
 
-if( $current_User->ID == 1 )
+if( $current_User->check_perm( 'messaging', 'delete' ) )
 {	// We have permission to modify:
 	// Tblue> Shouldn't this check options:edit (see controller)?
 	$Results->cols[] = array(
@@ -80,6 +80,10 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/14 07:31:43  efy-maxim
+ * 1. Messaging permissions have been fully implemented
+ * 2. Messaging has been added to evo bar menu
+ *
  * Revision 1.5  2009/09/12 18:44:11  efy-maxim
  * Messaging module improvements
  *

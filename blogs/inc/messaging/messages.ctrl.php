@@ -36,7 +36,7 @@ load_class( 'messaging/model/_message.class.php', 'Message' );
 global $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'edit', true );
+$current_User->check_perm( 'messaging', 'write', true );
 
 // Set options path:
 $AdminUI->set_path( 'messaging' );
@@ -75,7 +75,7 @@ switch( $action )
 		$edited_Message->thread_ID = $thrd_ID;
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		$current_User->check_perm( 'messaging', 'write', true );
 
 		// Load data from request
 		if( $edited_Message->load_from_Request() )
@@ -95,7 +95,7 @@ switch( $action )
 		// Delete message:
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		$current_User->check_perm( 'messaging', 'delete', true );
 
 		// Make sure we got an msg_ID:
 		param( 'msg_ID', 'integer', true );
@@ -160,6 +160,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/14 07:31:43  efy-maxim
+ * 1. Messaging permissions have been fully implemented
+ * 2. Messaging has been added to evo bar menu
+ *
  * Revision 1.4  2009/09/12 18:44:11  efy-maxim
  * Messaging module improvements
  *

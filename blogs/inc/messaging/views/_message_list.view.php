@@ -70,7 +70,7 @@ $Results->cols[] = array(
 					'td' => '$msg_author$',
 					);
 
-if( $current_User->ID == 1 )
+if( $current_User->check_perm( 'messaging', 'delete' ) )
 {
 	// We have permission to modify:
 	// Tblue> Shouldn't this check options:edit (see controller)?
@@ -94,10 +94,11 @@ $Form->begin_form( 'fform', '' );
 
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
-$recipients = $DB->get_var('SELECT GROUP_CONCAT(u.user_login ORDER BY u.user_login SEPARATOR \', \') 
-	 FROM T_messaging__threadstatus mts
-				LEFT OUTER JOIN T_users u ON mts.tsta_user_ID = u.user_ID
-	WHERE mts.tsta_thread_ID = '.$edited_Thread->ID.' AND mts.tsta_user_ID <> '.$current_User->ID);
+$recipients = $DB->get_var('SELECT GROUP_CONCAT(u.user_login ORDER BY u.user_login SEPARATOR \', \')
+	 						FROM T_messaging__threadstatus mts
+							LEFT OUTER JOIN T_users u ON mts.tsta_user_ID = u.user_ID
+							WHERE mts.tsta_thread_ID = '.$edited_Thread->ID.'
+							AND mts.tsta_user_ID <> '.$current_User->ID);
 
 $Form->textarea('msg_text', '', 10, T_('Reply'), '<b>Reply to: </b>'.$recipients, 80, '', true);
 
@@ -105,6 +106,10 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.7  2009/09/14 07:31:43  efy-maxim
+ * 1. Messaging permissions have been fully implemented
+ * 2. Messaging has been added to evo bar menu
+ *
  * Revision 1.6  2009/09/13 15:56:12  fplanque
  * minor
  *

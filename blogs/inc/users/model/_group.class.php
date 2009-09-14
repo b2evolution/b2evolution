@@ -160,6 +160,7 @@ class Group extends DataObject
 	 *                - users
 	 *                - blogs
 	 *                - admin (levels "visible", "hidden")
+	 *                - messaging
 	 * @param string Requested permission level
 	 * @param mixed Permission target (blog ID, array of cat IDs...)
 	 * @return boolean True on success (permission is granted), false if permission is not granted
@@ -326,11 +327,20 @@ class Group extends DataObject
 			case 'messaging':
 				switch ( $permvalue )
 				{
-					case 'write': // you create threads, view any thread you're involved in & reply
-					case 'delete': // same as write but you can also delete threads you're involved in
-						// fp> TODO: implement $permlevel
-						$perm = true;
-					break;
+					case 'delete':
+						// same as write but you can also delete threads you're involved in
+						if( $permlevel == 'delete' )
+						{
+							$perm = true;
+							break;
+						}
+					case 'write':
+						//  you create threads, view any thread you're involved in & reply
+						if( $permlevel == 'write' )
+						{
+							$perm = true;
+							break;
+						}
 				}
 				break;
 		}
@@ -543,6 +553,10 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/14 07:31:43  efy-maxim
+ * 1. Messaging permissions have been fully implemented
+ * 2. Messaging has been added to evo bar menu
+ *
  * Revision 1.14  2009/09/13 15:56:13  fplanque
  * minor
  *

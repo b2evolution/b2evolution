@@ -63,6 +63,24 @@ class messaging_Module
 	 */
 	function build_evobar_menu()
 	{
+		global $topleft_Menu;
+		global $admin_url;
+		global $current_User;
+
+		$entries = array(
+			'messaging' => array(
+					'text' => T_('Messaging'),
+					'disabled' => true,
+				),
+		);
+
+		if( $current_User->check_perm( 'messaging', 'write' ) )
+		{
+			$entries['messaging']['disabled'] = false;
+			$entries['messaging']['href'] = $admin_url.'?ctrl=threads';
+		}
+
+		$topleft_Menu->add_menu_entries( NULL, $entries );
 	}
 
 	/**
@@ -101,7 +119,7 @@ class messaging_Module
 		 */
 		global $AdminUI;
 
-		if( $current_User->check_perm( 'options', 'view' ) )
+		if( $current_User->check_perm( 'messaging', 'write' ) )
 		{	// Permission to view messaging:
 			$AdminUI->add_menu_entries( NULL, array(
 						'messaging' => array(
@@ -118,6 +136,10 @@ $messaging_Module = & new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.4  2009/09/14 07:31:43  efy-maxim
+ * 1. Messaging permissions have been fully implemented
+ * 2. Messaging has been added to evo bar menu
+ *
  * Revision 1.3  2009/09/12 18:44:11  efy-maxim
  * Messaging module improvements
  *
