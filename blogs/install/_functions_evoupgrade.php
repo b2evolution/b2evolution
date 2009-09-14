@@ -2415,8 +2415,9 @@ function upgrade_b2evo_tables()
 		task_begin( 'Making sure all tables use desired storage ENGINE...' );
 		foreach( $schema_queries as $table_name=>$table_def )
 		{
-			if( preg_match( '/ ENGINE = ([a-z]+) /is', $table_def[1], $matches ) )
-			{
+			if( $DB->query( 'SHOW TABLES LIKE \''.$table_name.'\'' )
+				&& preg_match( '/ ENGINE = ([a-z]+) /is', $table_def[1], $matches ) )
+			{	// If the table exists and has an ENGINE definition:
 				echo $table_name.':'.$matches[1].'<br />';
 				$DB->query( "ALTER TABLE $table_name ENGINE = ".$matches[1] );
 			}
@@ -2695,6 +2696,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.318  2009/09/14 14:55:19  tblue246
+ * Fix upgrade process
+ *
  * Revision 1.317  2009/09/14 14:10:14  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
