@@ -50,7 +50,7 @@ $restrict_title = T_('Cannot delete category');	 //&laquo;%s&raquo;
 // This must be initialized to false before checking the delete restrictions
 $checked_delete = false;
 
-load_class( 'chapters/model/_chaptercache.class.php' );
+load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
 $GenericCategoryCache = & new ChapterCache();
 
 
@@ -425,6 +425,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/14 11:26:19  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.13  2009/09/05 13:51:11  efy-maxim
  * pass correct Blog_ID in categories
  *

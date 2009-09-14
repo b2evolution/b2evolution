@@ -26,7 +26,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-load_class('plugins/model/_plugins_admin.class.php');
+load_class( 'plugins/model/_plugins_admin.class.php', 'Plugins_admin' );
 
 
 /**
@@ -59,6 +59,9 @@ class Plugins_admin_no_DB extends Plugins_admin
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/14 11:27:09  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.4  2009/07/02 21:57:11  blueyed
  * doc fix: move files and classes to the plugins package
  *

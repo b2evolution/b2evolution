@@ -106,17 +106,17 @@ function & get_Cache( $objectName )
 			return $CurrencyCache;
 
 		case 'FileCache':
-			load_class( 'files/model/_filecache.class.php','FileCache' );
+			load_class( 'files/model/_filecache.class.php', 'FileCache' );
 			$FileCache = new FileCache(); // COPY (FUNC)
 			return $FileCache;
 
 		case 'FileRootCache':
-			load_class( 'files/model/_filerootcache.class.php' );
+			load_class( 'files/model/_filerootcache.class.php', 'FileRootCache' );
 			$Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
 			return $FileRootCache;
 
 		case 'FiletypeCache':
-			load_class( 'files/model/_filetypecache.class.php','FiletypeCache' );
+			load_class( 'files/model/_filetypecache.class.php', 'FiletypeCache' );
 			$Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
 			return $FiletypeCache;
 
@@ -133,7 +133,7 @@ function & get_Cache( $objectName )
 			return $ItemCacheLight;
 
 		case 'ItemCache':
-			load_class( 'items/model/_itemcache.class.php','ItemCache' );
+			load_class( 'items/model/_itemcache.class.php', 'ItemCache' );
 			$ItemCache = new ItemCache(); // COPY (FUNC)
 			return $ItemCache;
 
@@ -150,12 +150,12 @@ function & get_Cache( $objectName )
 			return $ItemStatusCache;
 
 		case 'ItemTypeCache':
-			load_class( 'items/model/_itemtypecache.class.php','ItemTypeCache' );
+			load_class( 'items/model/_itemtypecache.class.php', 'ItemTypeCache' );
 			$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', 'new ItemTypeCache( \'ptyp_\', \'ptyp_ID\' )' );
 			return $ItemTypeCache;
 
 		case 'LinkCache':
-			load_class( 'items/model/_linkcache.class.php','LinkCache' );
+			load_class( 'items/model/_linkcache.class.php', 'LinkCache' );
 			$LinkCache = new LinkCache(); // COPY (FUNC)
 			return $LinkCache;
 
@@ -164,12 +164,12 @@ function & get_Cache( $objectName )
 			return $MessageCache;
 
 		case 'Plugins_admin':
-			load_class('plugins/model/_plugins_admin.class.php','Plugins_admin');
+			load_class( 'plugins/model/_plugins_admin.class.php', 'Plugins_admin' );
 			$Plugins_admin = new Plugins_admin(); // COPY (FUNC)
 			return $Plugins_admin;
 
 		case 'SkinCache':
-			load_class( 'skins/model/_skincache.class.php','SkinCache' );
+			load_class( 'skins/model/_skincache.class.php', 'SkinCache' );
 			$SkinCache = new SkinCache(); // COPY (FUNC)
 			return $SkinCache;
 
@@ -178,12 +178,12 @@ function & get_Cache( $objectName )
 			return $ThreadCache;
 
 		case 'UserCache':
-			load_class( 'users/model/_usercache.class.php','UserCache' );
+			load_class( 'users/model/_usercache.class.php', 'UserCache' );
 			$UserCache = new UserCache(); // COPY (FUNC)
 			return $UserCache;
 
 		case 'WidgetCache':
-			load_class( 'widgets/model/_widgetcache.class.php','WidgetCache' );
+			load_class( 'widgets/model/_widgetcache.class.php', 'WidgetCache' );
 
 			$WidgetCache = new WidgetCache(); // COPY (FUNC)
 			return $WidgetCache;
@@ -194,7 +194,7 @@ function & get_Cache( $objectName )
 			// instead of per-method parameters to load only the enabled
 			// widgets should be cleaner when there will be more methods
 			// in the WidgetCache class in the future.
-			load_class( 'widgets/model/_widgetcache.class.php','WidgetCache' );
+			load_class( 'widgets/model/_widgetcache.class.php', 'WidgetCache' );
 			$EnabledWidgetCache = new WidgetCache( true );
 			return $EnabledWidgetCache;
 
@@ -263,7 +263,7 @@ function shutdown()
 	// Auto pruning of old HITS, old SESSIONS and potentially MORE analytics data:
 	if( $Settings->get( 'auto_prune_stats_mode' ) == 'page' )
 	{ // Autopruning is requested
-		load_class('sessions/model/_hitlist.class.php');
+		load_class('sessions/model/_hitlist.class.php', 'Hitlist' );
 		Hitlist::dbprune(); // will prune once per day, according to Settings
 	}
 
@@ -3575,7 +3575,7 @@ function & get_IconLegend()
 			/**
 			 * Icon Legend
 			 */
-			load_class( '_core/ui/_iconlegend.class.php' );
+			load_class( '_core/ui/_iconlegend.class.php', 'IconLegend' );
 			$IconLegend = new IconLegend();
 		}
 		else
@@ -3589,6 +3589,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.143  2009/09/14 11:22:18  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.142  2009/09/13 21:29:21  blueyed
  * MySQL query cache optimization: remove information about seconds from post_datestart and item_issue_date.
  *

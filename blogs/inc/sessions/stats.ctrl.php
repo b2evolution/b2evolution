@@ -26,7 +26,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('sessions/model/_hitlist.class.php');
+load_class('sessions/model/_hitlist.class.php', 'Hitlist' );
 load_funcs('sessions/model/_hitlog.funcs.php');
 
 /**
@@ -243,6 +243,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/14 11:24:02  efy-arrin
+ * Included the ClassName in load_class() call with proper UpperCase
+ *
  * Revision 1.14  2009/08/30 00:30:52  fplanque
  * increased modularity
  *
