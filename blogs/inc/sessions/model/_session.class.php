@@ -502,7 +502,7 @@ function session_unserialize_callback( $classname )
 			return true;
 
 		case 'collectionsettings':
-			load_class( 'collections/model/_collsettings.class.php', 'CollSettings' );
+			load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
 			return true;
 
 		case 'comment':
@@ -536,7 +536,7 @@ function session_unserialize_callback( $classname )
 function session_unserialize_load_all_classes()
 {
 	load_class( 'collections/model/_blog.class.php', 'Blog' );
-	load_class( 'collections/model/_collsettings.class.php', 'CollSettings' );
+	load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
 	load_class( 'comments/model/_comment.class.php', 'Comment' );
 	load_class( 'items/model/_item.class.php', 'Item' );
 	load_class( 'users/model/_group.class.php', 'Group' );
@@ -546,6 +546,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/14 14:36:16  tblue246
+ * Fixing broken commits by efy-arrin
+ *
  * Revision 1.13  2009/09/14 13:38:10  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
