@@ -3068,6 +3068,7 @@ class Item extends ItemLight
 			case 'datestart':
 			case 'issue_date':
 				// Remove seconds from issue date and start date
+// fp> TODO: this should only be done if the date is in the future. If it's in the past there are no sideeffects to having seconds.
 				return parent::set( $parname, remove_seconds(strtotime($parvalue)) );
 
 			default:
@@ -3978,6 +3979,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.137  2009/09/14 18:37:07  fplanque
+ * doc/cleanup/minor
+ *
  * Revision 1.136  2009/09/14 13:17:28  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

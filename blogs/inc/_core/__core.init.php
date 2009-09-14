@@ -542,10 +542,10 @@ class _core_Module
 							// 'defaultprofiles' =>
 							'userfields' => array(
 								'text' => T_('User fields'),
-								'href' => '?ctrl=userfields'	),
+								'href' => '?ctrl=userfields' ),
 							'registration' => array(
 								'text' => T_('Registration'),
- 								'href' => '?ctrl=registration'  ),
+ 								'href' => '?ctrl=registration' ),
 							),
 					),
 				) );
@@ -612,6 +612,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.28  2009/09/14 18:37:07  fplanque
+ * doc/cleanup/minor
+ *
  * Revision 1.27  2009/09/14 11:54:21  efy-bogdan
  * Moved Default user permissions under a new tab
  *

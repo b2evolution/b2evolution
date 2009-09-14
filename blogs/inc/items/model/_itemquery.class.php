@@ -470,7 +470,7 @@ class ItemQuery extends SQL
 
 
 	/**
-	 * Restricts to a specific date range. (despite the 'start' in the name).
+	 * Restricts the datestart param to a specific date range. 
 	 *
 	 * Start date gets restricted to minutes only (to make the query more
 	 * cachable).
@@ -511,7 +511,7 @@ class ItemQuery extends SQL
 			// Add trailing 0s: YYYYMMDDHHMMSS
 			$dstart0 = $dstart.'00000000000000';  // TODO: this is NOT correct, should be 0101 for month
 
-			// Start date in MySQL format: seconds get omitted (lowered to minutes)
+			// Start date in MySQL format: seconds get omitted (rounded to lower to minute for caching purposes)
 			$dstart_mysql = substr($dstart0,0,4).'-'.substr($dstart0,4,2).'-'.substr($dstart0,6,2).' '
 											.substr($dstart0,8,2).':'.substr($dstart0,10,2);
 
@@ -554,6 +554,7 @@ class ItemQuery extends SQL
 
 				default:
 					// add one to second
+					// Stop date in MySQL format: seconds get omitted (rounded to lower to minute for caching purposes)
 					$dstop_mysql = substr($dstop,0,4).'-'.substr($dstop,4,2).'-'.substr($dstop,6,2).' '
 											.substr($dstop,8,2).':'.substr($dstop,10,2);
 			}
@@ -723,6 +724,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/14 18:37:07  fplanque
+ * doc/cleanup/minor
+ *
  * Revision 1.12  2009/09/14 13:17:28  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

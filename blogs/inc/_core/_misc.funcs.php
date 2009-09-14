@@ -1135,8 +1135,9 @@ function get_weekstartend( $date, $startOfWeek )
 
 
 /**
- * Get datetime lowered to minutes. This is meant to remove seconds and
- * support MySQL's query cache.
+ * Get datetime rounded to lower minute. This is meant to remove seconds and
+ * leverage MySQL's query cache by having SELECT queries remain identical for 60 seconds instead of just 1.
+ *
  * @param integer UNIX timestamp
  * @param string Format (defaults to "Y-m-d H:i"). Use "U" for UNIX timestamp.
  */
@@ -3589,6 +3590,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.144  2009/09/14 18:37:07  fplanque
+ * doc/cleanup/minor
+ *
  * Revision 1.143  2009/09/14 11:22:18  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

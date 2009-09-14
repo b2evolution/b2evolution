@@ -62,7 +62,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-class Idna_Convert
+class idna_convert
 {
     /**
      * Holds all relevant mapping tables, loaded from a seperate file on construct

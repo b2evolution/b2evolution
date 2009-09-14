@@ -813,7 +813,7 @@ function issue_date_control( $Form, $break = false )
 				.'/><strong>'.T_('Set to').':</strong></label>';
 	$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), '' );
 	echo ' '; // allow wrapping!
-	$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '', 'hh:mm', '' );
+	$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '', 'hh:mm:ss', '' );
 	echo ' '; // allow wrapping!
 
 }
@@ -927,6 +927,9 @@ function check_perm_posttype( $post_extracats )
 
 /*
  * $Log$
+ * Revision 1.64  2009/09/14 18:37:07  fplanque
+ * doc/cleanup/minor
+ *
  * Revision 1.63  2009/09/13 21:51:01  blueyed
  * Fix bpost_count_words to use unicode. Fixes the russian test.
  *

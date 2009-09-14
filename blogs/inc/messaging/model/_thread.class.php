@@ -79,7 +79,7 @@ class Thread extends DataObject
 
 		// Title
 		param( 'thrd_title', 'string' );
-		param_check_not_empty( 'thrd_title', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Subject') ) );
+		param_check_not_empty( 'thrd_title', T_('Please enter a subject') );
 		$this->set_from_Request( 'title', 'thrd_title' );
 
 		// Resipients
@@ -125,7 +125,7 @@ class Thread extends DataObject
 		// split recipients into array using comma separator
 		$recipients_list = array();
 		$recipients = trim( str_replace( ',', ' ', $recipients ) );
-		foreach ( explode(' ', $recipients) as $recipient )
+		foreach( explode(' ', $recipients) as $recipient )
 		{
 			$login = trim($recipient);
 			if( ! empty( $login ) )
@@ -218,6 +218,9 @@ class Thread extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/14 18:37:07  fplanque
+ * doc/cleanup/minor
+ *
  * Revision 1.8  2009/09/14 15:18:00  efy-maxim
  * 1. Recipients can be separated by commas or spaces.
  * 2. Message list: author, full name date in the first column.

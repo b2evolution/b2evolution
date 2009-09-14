@@ -330,10 +330,11 @@ class Group extends DataObject
 					case 'delete':
 						// same as write but you can also delete threads you're involved in
 						if( $permlevel == 'delete' )
-						{
+						{ // User can ask for delete perm...
 							$perm = true;
 							break;
 						}
+						// ... or for any lower priority perm... (no break)
 					case 'write':
 						//  you create threads, view any thread you're involved in & reply
 						if( $permlevel == 'write' )
@@ -553,6 +554,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2009/09/14 18:37:07  fplanque
+ * doc/cleanup/minor
+ *
  * Revision 1.16  2009/09/14 13:46:11  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

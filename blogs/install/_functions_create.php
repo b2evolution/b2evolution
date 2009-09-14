@@ -141,6 +141,7 @@ function create_default_data()
 	$Group_Users->set( 'perm_options', 'none' );
 	$Group_Users->set( 'perm_templates', 0 );
 	$Group_Users->set( 'perm_users', 'none' );
+	$Group_Bloggers->set( 'perm_messaging', 'none' );
 	$Group_Users->dbinsert();
 	echo "OK.<br />\n";
 
@@ -1289,6 +1290,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.275  2009/09/14 18:37:07  fplanque
+ * doc/cleanup/minor
+ *
  * Revision 1.274  2009/09/14 14:10:14  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

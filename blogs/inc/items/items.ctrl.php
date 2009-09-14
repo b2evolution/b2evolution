@@ -14,6 +14,10 @@
  *       Side effect: "post_ID required" error if you switch tabs (expert/simple),
  *       after an error is display (e.g. entering an invalid issue time).
  *       (related to $tab_switch_params)
+ * fp> Yes, it's a mess...
+ *     Ironically the correct name would be itm_ID (which is what the DB uses, 
+ *     except for the Items table which should actually also use itm_ prefixes instead of post_
+ *     ... a lot of history lead to this :p
  *
  * @package admin
  *
@@ -541,6 +545,7 @@ switch( $action )
 
 		$edited_Item->set( 'status', $post_status );
 
+// fp> TODO: remove seconds ONLY if date is in the future
 		$edited_Item->set( 'datestart', remove_seconds($localtimenow) );
 		$edited_Item->set( 'datemodified', date('Y-m-d H:i:s', $localtimenow) );
 
@@ -1038,6 +1043,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.61  2009/09/14 18:37:07  fplanque
+ * doc/cleanup/minor
+ *
  * Revision 1.60  2009/09/14 13:16:42  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

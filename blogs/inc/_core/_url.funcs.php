@@ -688,12 +688,12 @@ function idna_encode( $url )
 
 	if( version_compare(PHP_VERSION, '5', '>=') )
 	{
-		load_class('_ext/idna/_idna_convert.class.php', 'Idna_Convert' );
+		load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
 		$IDNA = new idna_convert();
 	}
 	else
 	{
-		load_class('_ext/idna/_idna_convert.class.php4', 'Idna_Convert' );
+		load_class('_ext/idna/_idna_convert.class.php4', 'idna_convert' );
 		$IDNA = new Net_IDNA_php4();
 	}
 
@@ -719,12 +719,12 @@ function idna_decode( $url )
 {
 	if( version_compare(PHP_VERSION, '5', '>=') )
 	{
-		load_class('_ext/idna/_idna_convert.class.php', 'Idna_Convert' );
+		load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
 		$IDNA = new idna_convert();
 	}
 	else
 	{
-		load_class('_ext/idna/_idna_convert.class.php4', 'Idna_Convert' );
+		load_class('_ext/idna/_idna_convert.class.php4', 'idna_convert' );
 		$IDNA = new Net_IDNA_php4();
 	}
 	return $IDNA->decode($url);
@@ -733,6 +733,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.39  2009/09/14 18:37:07  fplanque
+ * doc/cleanup/minor
+ *
  * Revision 1.38  2009/09/14 11:41:23  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

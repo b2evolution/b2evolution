@@ -2583,10 +2583,11 @@ function upgrade_b2evo_tables()
 	 */
 
 
+/* fp> do thhis only for dates in the future:
 	task_begin( 'Updating posts...' );
 	$DB->query( 'UPDATE T_items__item SET post_datestart = FROM_UNIXTIME( FLOOR(UNIX_TIMESTAMP(post_datestart)/60)*60 )' );
 		task_end();
-
+*/
 
 	// Just in case, make sure the db schema version is upto date at the end.
 	if( $old_db_version != $new_db_version )
@@ -2696,6 +2697,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.319  2009/09/14 18:37:07  fplanque
+ * doc/cleanup/minor
+ *
  * Revision 1.318  2009/09/14 14:55:19  tblue246
  * Fix upgrade process
  *

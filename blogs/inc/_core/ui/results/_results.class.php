@@ -615,6 +615,7 @@ class Results extends Table
 	 * This is done by dynamically modifying the SQL query and forging a COUNT() into it.
 	 *
 	 * @todo dh> This might get done using SQL_CALC_FOUND_ROWS (I noted this somewhere else already)
+	 * fp> I have a vague memory about issues with SQL_CALC_FOUND_ROWS. Maybe it was not returned accurate counts. Or maybe it didn't work with GROUP BY. Sth like that.
 	 *
 	 * @todo allow overriding?
 	 * @todo handle problem of empty groups!
@@ -1821,6 +1822,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.27  2009/09/14 18:37:07  fplanque
+ * doc/cleanup/minor
+ *
  * Revision 1.26  2009/09/13 21:28:25  blueyed
  * doc/todo
  *

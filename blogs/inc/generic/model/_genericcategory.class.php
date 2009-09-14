@@ -114,9 +114,9 @@ class GenericCategory extends GenericElement
  			case 'parent_ID':
 				return $this->set_param( $parname, 'string', $parvalue, true );
 
-			// dh> I cannot see why default has been removed here (1.4).
-			//     It failed on "urlname" and "description" here. (LP: #428201)
-			//     Please review and remove this explanation
+			case 'name':
+			case 'urlname':
+			case 'description':
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
@@ -138,6 +138,9 @@ class GenericCategory extends GenericElement
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/14 18:37:07  fplanque
+ * doc/cleanup/minor
+ *
  * Revision 1.6  2009/09/14 12:25:47  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
