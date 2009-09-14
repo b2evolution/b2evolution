@@ -100,6 +100,7 @@ function create_default_data()
 	$Group_Admins->set( 'perm_templates', 1 );
 	$Group_Admins->set( 'perm_users', 'edit' );
 	$Group_Admins->set( 'perm_xhtml_css_tweaks', 1 );
+	$Group_Admins->set( 'perm_messaging', 'delete' );
 	$Group_Admins->dbinsert();
 
 	$Group_Privileged = new Group(); // COPY !
@@ -113,6 +114,7 @@ function create_default_data()
 	$Group_Privileged->set( 'perm_templates', 0 );
 	$Group_Privileged->set( 'perm_users', 'view' );
 	$Group_Privileged->set( 'perm_xhtml_css_tweaks', 1 );
+	$Group_Privileged->set( 'perm_messaging', 'write' );
 	$Group_Privileged->dbinsert();
 
 	$Group_Bloggers = new Group(); // COPY !
@@ -126,6 +128,7 @@ function create_default_data()
 	$Group_Bloggers->set( 'perm_templates', 0 );
 	$Group_Bloggers->set( 'perm_users', 'none' );
 	$Group_Bloggers->set( 'perm_xhtml_css_tweaks', 1 );
+	$Group_Bloggers->set( 'perm_messaging', 'write' );
 	$Group_Bloggers->dbinsert();
 
 	$Group_Users = new Group(); // COPY !
@@ -1286,6 +1289,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.273  2009/09/14 05:57:36  efy-maxim
+ * Add default messaging permissions
+ *
  * Revision 1.272  2009/09/05 12:27:20  tblue246
  * - Fix upgrade
  * - Use create_default_currencies() and create_default_countries() instead of duplicated queries.
