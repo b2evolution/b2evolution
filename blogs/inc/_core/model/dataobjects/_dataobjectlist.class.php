@@ -28,7 +28,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/ui/results/_results.class.php');
+load_class('_core/ui/results/_results.class.php', 'Results' );
 
 /**
  * Data Object List Base Class
@@ -114,6 +114,9 @@ class DataObjectList extends Results
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/14 10:38:23  efy-arrin
+ * Include the ClassName in the load_class() with proper UpperCase
+ *
  * Revision 1.4  2009/03/08 23:57:40  fplanque
  * 2009
  *

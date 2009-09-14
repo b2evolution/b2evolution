@@ -28,7 +28,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/ui/results/_results.class.php');
+load_class('_core/ui/results/_results.class.php', 'Results' );
 
 
 /**
@@ -336,6 +336,9 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/14 10:38:23  efy-arrin
+ * Include the ClassName in the load_class() with proper UpperCase
+ *
  * Revision 1.10  2009/08/30 19:54:25  fplanque
  * less translation messgaes for infrequent errors
  *

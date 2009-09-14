@@ -34,7 +34,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class('_core/ui/results/_results.class.php');
+load_class('_core/ui/results/_results.class.php', 'Results' );
 
 
 /**
@@ -595,6 +595,9 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/14 10:40:07  efy-arrin
+ * Include the ClassName in the load_class() with proper UpperCase
+ *
  * Revision 1.5  2009/04/14 22:25:26  blueyed
  * Use '&' as glue for all regenerate_url calls used in Form constructor.
  *
