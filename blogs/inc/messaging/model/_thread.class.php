@@ -138,7 +138,11 @@ class Thread extends DataObject
 			$login = trim($recipient);
 			if( ! empty( $login ) )
 			{
-				$recipients_list[] = strtolower( $login );
+				$login = strtolower( $login );
+				if( ! in_array( $login , $recipients_list ) )
+				{
+					$recipients_list[] = $login;
+				}
 			}
 		}
 
@@ -226,6 +230,10 @@ class Thread extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/15 16:46:21  efy-maxim
+ * 1. Avatar in Messages List has been added
+ * 2. Duplicated recipients issue has been fixed
+ *
  * Revision 1.10  2009/09/15 11:20:03  efy-maxim
  * Group discussion vs Individual messages
  *

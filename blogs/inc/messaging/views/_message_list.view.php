@@ -99,12 +99,61 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 	$read_by_list[$row->msg_ID] = $read_by ;
 }
 
+// Get user avatar
+
+function user_avatar( $user_ID, $user_avatar_file_ID )
+{
+	$FileCache = & get_Cache( 'FileCache' );
+
+	if( ! $File = & $FileCache->get_by_ID( $user_avatar_file_ID, false, false ) )
+	{
+		return '';
+	}
+
+	return '<a href="?ctrl=users&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-48x48' ).'</a>';
+}
+
+// Create author cell for message list table
+
+function author( $user_ID, $user_login, $user_first_name,
+					$user_last_name, $user_avatar_ID, $datetime)
+{
+	$author = '<b>'.$user_login.'</b>';
+
+	$avatar = user_avatar( $user_ID, $user_avatar_ID );
+
+	if( !empty( $avatar ) )
+	{
+		$author .= '<br/>'.$avatar;
+	}
+
+	$full_name = '';
+
+	if( !empty( $user_first_name ) )
+	{
+		$full_name .= $user_first_name;
+	}
+
+	if( !empty( $user_last_name ) )
+	{
+		$full_name .= ' '.$user_last_name;
+	}
+
+	if( !empty( $full_name ) )
+	{
+		$author .= '<br/>'.$full_name;
+	}
+
+	return $author.'<br/>'.mysql2localedatetime( $datetime );
+}
+
 // Create SELECT query:
 
 $select_SQL = & new SQL();
 
 $select_SQL->SELECT( 'mm.msg_ID, mm.msg_datetime, u.user_login AS msg_author,
-						u.user_firstname AS msg_firstname, u.user_lastname AS msg_lastname, mm.msg_text' );
+						u.user_firstname AS msg_firstname, u.user_lastname AS msg_lastname,
+						u.user_avatar_file_ID AS msg_user_avatar_ID, mm.msg_text' );
 
 $select_SQL->FROM( 'T_messaging__message mm
 						LEFT OUTER JOIN T_users u ON u.user_ID = mm.msg_author_user_ID' );
@@ -131,8 +180,7 @@ $Results->cols[] = array(
 					'th' => T_('Author'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
-					'td' => '<b>$msg_author$</b><br/>$msg_firstname$ $msg_lastname$<br/>
-							<span class="note">%mysql2localedatetime(#msg_datetime#)%</span>',
+					'td' => '%author( #msg_ID#,  #msg_author#, #msg_firstname#, #msg_lastname#, #msg_user_avatar_ID#, #msg_datetime#)%'
 					);
 
 $Results->cols[] = array(
@@ -186,6 +234,10 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.13  2009/09/15 16:46:21  efy-maxim
+ * 1. Avatar in Messages List has been added
+ * 2. Duplicated recipients issue has been fixed
+ *
  * Revision 1.12  2009/09/15 15:49:32  efy-maxim
  * "read by" column
  *
