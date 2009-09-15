@@ -64,7 +64,8 @@ $Results->cols[] = array(
 					'th' => T_('With'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
-					'td' => '%strmaxlen(#thrd_recipients#, 20)%',
+					'td' => '$thrd_recipients$',
+					//'td' => '%strmaxlen(#thrd_recipients#, 20)%',
 					);
 
 $Results->cols[] = array(
@@ -98,6 +99,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/15 15:49:32  efy-maxim
+ * "read by" column
+ *
  * Revision 1.9  2009/09/14 19:33:02  efy-maxim
  * Some queries has been wrapped by SQL object
  *

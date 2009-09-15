@@ -25,6 +25,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $dispatcher, $action, $current_User, $edited_Thread;
+
+global $read_by_list;
+
 $creating = is_create_action( $action );
 
 // Update message statuses
@@ -34,15 +37,77 @@ $DB->query( 'UPDATE T_messaging__threadstatus
 				WHERE tsta_thread_ID = '.$edited_Thread->ID.'
 				AND tsta_user_ID = '.$current_User->ID );
 
+// Select all recipients
+
+$recipients_SQL = & new SQL();
+
+$recipients_SQL->SELECT( 'GROUP_CONCAT(u.user_login ORDER BY u.user_login SEPARATOR \',\')' );
+
+$recipients_SQL->FROM( 'T_messaging__threadstatus mts
+								LEFT OUTER JOIN T_users u ON mts.tsta_user_ID = u.user_ID' );
+
+$recipients_SQL->WHERE( 'mts.tsta_thread_ID = '.$edited_Thread->ID.'
+								AND mts.tsta_user_ID <> '.$current_User->ID );
+
+$recipients = explode( ',', $DB->get_var( $recipients_SQL->get() ) );
+
+// Select unread recipients
+
+$unread_recipients_SQL = & new SQL();
+
+$unread_recipients_SQL->SELECT( 'mm.msg_ID, GROUP_CONCAT(uu.user_login ORDER BY uu.user_login SEPARATOR \',\') AS msg_unread' );
+
+$unread_recipients_SQL->FROM( 'T_messaging__message mm
+										LEFT OUTER JOIN T_messaging__threadstatus tsu ON mm.msg_ID = tsu.tsta_first_unread_msg_ID
+										LEFT OUTER JOIN T_users uu ON tsu.tsta_user_ID = uu.user_ID' );
+
+$unread_recipients_SQL->WHERE( 'mm.msg_thread_ID = '.$edited_Thread->ID );
+
+$unread_recipients_SQL->GROUP_BY( 'mm.msg_ID' );
+
+$unread_recipients_SQL->ORDER_BY( 'mm.msg_datetime' );
+
+$unread_recipients = array();
+
+// Create array for read by
+
+foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
+{
+	if( !empty( $row->msg_unread ) )
+	{
+		$unread_recipients = array_merge( $unread_recipients, explode( ',', $row->msg_unread ) );
+	}
+
+	$read_recipiens = array_diff( $recipients, $unread_recipients );
+
+	$read_by = '';
+	if( !empty( $read_recipiens ) )
+	{
+		$read_by .= '<span style="color:green">'.implode( ', ', $read_recipiens );
+		if( !empty ( $unread_recipients ) )
+		{
+			$read_by .= ', ';
+		}
+		$read_by .= '</span>';
+	}
+
+	if( !empty ( $unread_recipients ) )
+	{
+		$read_by .= '<span style="color:red">'.implode( ', ', $unread_recipients ).'</span>';
+	}
+
+	$read_by_list[$row->msg_ID] = $read_by ;
+}
+
 // Create SELECT query:
 
 $select_SQL = & new SQL();
 
 $select_SQL->SELECT( 'mm.msg_ID, mm.msg_datetime, u.user_login AS msg_author,
-					u.user_firstname AS msg_firstname, u.user_lastname AS msg_lastname, mm.msg_text' );
+						u.user_firstname AS msg_firstname, u.user_lastname AS msg_lastname, mm.msg_text' );
 
 $select_SQL->FROM( 'T_messaging__message mm
-					LEFT OUTER JOIN T_users u ON u.user_ID = mm.msg_author_user_ID' );
+						LEFT OUTER JOIN T_users u ON u.user_ID = mm.msg_author_user_ID' );
 
 $select_SQL->WHERE( 'mm.msg_thread_ID = '.$edited_Thread->ID );
 
@@ -76,6 +141,20 @@ $Results->cols[] = array(
 					'td' => '¤conditional( empty(#msg_text#), \''.$edited_Thread->title.'\', \'%nl2br(#msg_text#)%\')¤',
 					);
 
+function get_read_by( $message_ID )
+{
+	global $read_by_list;
+
+	return $read_by_list[$message_ID];
+}
+
+$Results->cols[] = array(
+					'th' => T_('Read by'),
+					'th_class' => 'shrinkwrap',
+					'td_class' => 'shrinkwrap',
+					'td' => '%get_read_by( #msg_ID# )%',
+					);
+
 if( $current_User->check_perm( 'messaging', 'delete' ) )
 {
 	// We have permission to modify:
@@ -99,21 +178,7 @@ $Form->begin_form( 'fform', '' );
 
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
-// Create SQL query and select recipients
-
-$recipients_select_SQL = & new SQL();
-
-$recipients_select_SQL->SELECT( 'GROUP_CONCAT(u.user_login ORDER BY u.user_login SEPARATOR \', \')' );
-
-$recipients_select_SQL->FROM( 'T_messaging__threadstatus mts
-								LEFT OUTER JOIN T_users u ON mts.tsta_user_ID = u.user_ID' );
-
-$recipients_select_SQL->WHERE( 'mts.tsta_thread_ID = '.$edited_Thread->ID.'
-								AND mts.tsta_user_ID <> '.$current_User->ID );
-
-$recipients = $DB->get_var( $recipients_select_SQL->get() );
-
-$Form->info_field(T_('Reply to'), $recipients, array('required'=>true));
+$Form->info_field(T_('Reply to'), implode( ', ', $recipients ), array('required'=>true));
 
 $Form->textarea('msg_text', '', 10, '', '', 80, '', true);
 
@@ -121,6 +186,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.12  2009/09/15 15:49:32  efy-maxim
+ * "read by" column
+ *
  * Revision 1.11  2009/09/14 19:33:02  efy-maxim
  * Some queries has been wrapped by SQL object
  *
