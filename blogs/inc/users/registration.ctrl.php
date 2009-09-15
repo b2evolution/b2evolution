@@ -1,12 +1,10 @@
 <?php
 /**
- * This file implements the UI controller for settings management.
- *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
- * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * Parts of this file are copyright (c)2009 by The Evo Factory - {@link http://www.evofactory.com/}.
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -18,15 +16,15 @@
  * }}
  *
  * {@internal Open Source relicensing agreement:
- * Daniel HAHLER grants Francois PLANQUE the right to license
- * Daniel HAHLER's contributions to this file and the b2evolution project
+ * The Evo Factory grants Francois PLANQUE the right to license
+ * The Evo Factory's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
- * @package admin
+ * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author blueyed: Daniel HAHLER
+ * @author efy-bogdan: Evo Factory / Bogdan.
  * @author fplanque: Francois PLANQUE
  *
  * @version $Id$
@@ -94,6 +92,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2009/09/15 02:43:35  fplanque
+ * doc
+ *
  * Revision 1.1  2009/09/14 12:01:00  efy-bogdan
  * User Registration tab
  *
