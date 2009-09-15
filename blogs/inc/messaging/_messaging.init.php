@@ -76,13 +76,14 @@ class messaging_Module
 	 */
 	function build_evobar_menu()
 	{
-		global $topleft_Menu;
+		global $DB;
+		global $topright_Menu;
 		global $admin_url;
 		global $current_User;
 
 		$entries = array(
 			'messaging' => array(
-					'text' => T_('Messaging'),
+					'text' => T_('Messages'),
 					'disabled' => true,
 				),
 		);
@@ -91,9 +92,30 @@ class messaging_Module
 		{
 			$entries['messaging']['disabled'] = false;
 			$entries['messaging']['href'] = $admin_url.'?ctrl=threads';
+
+			// Count unread messages for current user
+			$SQL = & new SQL();
+
+			$SQL->SELECT( 'COUNT(*)' );
+
+			$SQL->FROM( 'T_messaging__threadstatus ts
+							LEFT OUTER JOIN T_messaging__message mu
+								ON ts.tsta_first_unread_msg_ID = mu.msg_ID
+							INNER JOIN T_messaging__message mm
+								ON ts.tsta_thread_ID = mm.msg_thread_ID
+								AND mm.msg_datetime >= mu.msg_datetime' );
+
+			$SQL->WHERE( 'ts.tsta_first_unread_msg_ID IS NOT NULL AND ts.tsta_user_ID = '.$current_User->ID );
+
+			$count = $DB->get_var( $SQL->get() );
+			if( $count > 0 )
+			{
+				$entries['messaging']['text'] = '<b>'.T_('Messages').' <span style="background-color:red;
+													color:white">'.$count.'</span></b>';
+			}
 		}
 
-		$topleft_Menu->add_menu_entries( NULL, $entries );
+		$topright_Menu->insert_menu_entries( 'userprefs', $entries );
 	}
 
 	/**
@@ -149,6 +171,10 @@ $messaging_Module = & new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/15 20:05:06  efy-maxim
+ * 1. Red badge for messages in the right menu
+ * 2. Insert menu entries method in menu class
+ *
  * Revision 1.5  2009/09/15 19:31:55  fplanque
  * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
  * PHP 4 compatible. Even better on PHP 5.

@@ -81,6 +81,27 @@ class Menu extends Widget
 		}
 	}
 
+	/**
+	 * Insert new menu entried right after the menu entry found by name parameter
+	 * @param name must not be null
+	 * @param new entries
+	 */
+	function insert_menu_entries( $name, $new_entries )
+	{
+		$entries = & $this->_menus['entries'];
+		$keys = array_keys( $entries );
+
+		if( !empty( $keys ) )
+		{
+			$index = array_search( $name, $keys);
+
+			if( $index >= 0 )
+			{
+				array_splice( $entries, $index + 1, count( $entries ),
+					array_merge( $new_entries, array_slice( $entries, $index + 1 ) ) );
+			}
+		}
+	}
 
 	/**
 	 * Get the reference of a node from the menu entries using a path.
@@ -350,6 +371,10 @@ class Menu extends Widget
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/15 20:05:05  efy-maxim
+ * 1. Red badge for messages in the right menu
+ * 2. Insert menu entries method in menu class
+ *
  * Revision 1.9  2009/09/15 19:31:56  fplanque
  * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
  * PHP 4 compatible. Even better on PHP 5.
