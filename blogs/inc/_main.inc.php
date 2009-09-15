@@ -122,20 +122,18 @@ require_once $inc_path.'/_core/_misc.funcs.php';
 
 
 /**
- * Load logging class
- */
-load_class( '_core/model/_log.class.php', 'Log' );
-/**
  * Debug message log for debugging only (initialized here).
  *
  * @global Log|Log_noop $Debuglog
  */
 if( $debug )
 {
+	load_class( '_core/model/_log.class.php', 'Log' );
 	$Debuglog = & new Log( 'note' );
 }
 else
 {
+	load_class( '_core/model/_log.class.php', 'Log_noop' );
 	$Debuglog = & new Log_noop( 'note' );
 }
 
@@ -175,6 +173,17 @@ elseif( !isset( $locales[$default_locale] ) )
 if( isset( $error_message ) )
 { // error & exit
 	require dirname(__FILE__).'/../skins_adm/conf_error.main.php';
+}
+
+
+/**
+ * Load modules.
+ *
+ * This initializes table name aliases and is required before trying to connect to the DB.
+ */
+foreach( $modules as $module )
+{
+	require_once $inc_path.$module.'/_'.$module.'.init.php';
 }
 
 
@@ -239,7 +248,7 @@ load_funcs('_core/_url.funcs.php');
  *
  * sam2kb> ideally we should set the right DB charset at the time when we connect to the database. The reason is until we do it all data pulled out from DB is in wrong encoding. I put the code here because it depends on _param.funcs, so if move the _param.funcs higher we can also move this code right under _connect_db
  * See also http://forums.b2evolution.net//viewtopic.php?p=95100
- * 
+ *
  */
 $Debuglog->add( 'default_locale from conf: '.$default_locale, 'locale' );
 
@@ -356,26 +365,8 @@ if( empty($generating_static) )
  * Includes:
  */
 $Timer->resume('_main.inc:requires');
-load_class( '_core/model/dataobjects/_dataobjectcache.class.php', 'DataObjectCache' );
-load_class( 'generic/model/_genericelement.class.php', 'GenericElement' );
-load_class( 'generic/model/_genericcache.class.php', 'GenericCache' );
-load_class( 'collections/model/_blog.class.php', 'Blog' );
-load_funcs('collections/model/_blog.funcs.php');
-load_funcs('collections/model/_category.funcs.php');
-load_funcs('items/model/_item.funcs.php');
-load_funcs('users/model/_user.funcs.php');
-load_funcs('_core/_template.funcs.php');
-load_class( 'files/model/_file.class.php', 'File' );
-load_class( 'files/model/_filetype.class.php', 'FileType' );
-load_class( 'files/model/_filetypecache.class.php', 'FileTypeCache' );
-load_class( 'items/model/_itemtype.class.php', 'ItemType' );
-load_class( 'items/model/_link.class.php', 'Link' );
-load_funcs('comments/model/_comment.funcs.php');
-load_funcs('items/model/_item.funcs.php');
-load_class( 'comments/model/_commentlist.class.php', 'CommentList' );
-load_funcs('_core/ui/forms/_form.funcs.php');
-load_class( '_core/ui/forms/_form.class.php', 'Form' );
-load_class( 'items/model/_itemquery.class.php', 'ItemQuery' );
+// Let the modules load/register what they need:
+modules_call_method( 'init' );
 $Timer->pause( '_main.inc:requires' );
 
 
@@ -665,6 +656,12 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.118  2009/09/15 19:31:54  fplanque
+ * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
+ * PHP 4 compatible. Even better on PHP 5.
+ * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
+ * Thanks for fixing or reporting if you spot issues.
+ *
  * Revision 1.117  2009/09/14 12:26:53  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

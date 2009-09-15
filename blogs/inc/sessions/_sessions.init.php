@@ -69,6 +69,19 @@ $ctrl_mappings['goals'] = 'sessions/goals.ctrl.php';
 class sessions_Module
 {
 	/**
+	 * Do the initializations. Called from in _main.inc.php.
+	 * This is typically where classes matching DB tables for this module are registered/loaded.
+	 *
+	 * Note: this should only load/register things that are going to be needed application wide,
+	 * for example: for constructing menus.
+	 * Anything that is needed only in a specific controller should be loaded only there.
+	 * Anything that is needed only in a specific view should be loaded only there.
+	 */
+	function init()
+	{
+	}
+
+	/**
 	 * Build the evobar menu
 	 */
 	function build_evobar_menu()
@@ -284,6 +297,12 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/15 19:31:54  fplanque
+ * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
+ * PHP 4 compatible. Even better on PHP 5.
+ * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
+ * Thanks for fixing or reporting if you spot issues.
+ *
  * Revision 1.14  2009/08/30 00:30:52  fplanque
  * increased modularity
  *

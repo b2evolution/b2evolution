@@ -28,7 +28,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( '_core/model/db/_sql.class.php', 'SQL');
+load_class( '_core/model/db/_sql.class.php', 'SQL' );
 
 /**
  * ItemQuery: help constructing queries on Items
@@ -470,7 +470,7 @@ class ItemQuery extends SQL
 
 
 	/**
-	 * Restricts the datestart param to a specific date range. 
+	 * Restricts the datestart param to a specific date range.
 	 *
 	 * Start date gets restricted to minutes only (to make the query more
 	 * cachable).
@@ -724,6 +724,12 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/15 19:31:54  fplanque
+ * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
+ * PHP 4 compatible. Even better on PHP 5.
+ * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
+ * Thanks for fixing or reporting if you spot issues.
+ *
  * Revision 1.13  2009/09/14 18:37:07  fplanque
  * doc/cleanup/minor
  *

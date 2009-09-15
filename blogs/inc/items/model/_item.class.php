@@ -38,7 +38,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Includes:
  */
-load_class( 'items/model/_itemlight.class.php', 'ItemLight' );
 load_funcs( 'items/model/_item.funcs.php');
 
 
@@ -3979,6 +3978,12 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.138  2009/09/15 19:31:54  fplanque
+ * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
+ * PHP 4 compatible. Even better on PHP 5.
+ * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
+ * Thanks for fixing or reporting if you spot issues.
+ *
  * Revision 1.137  2009/09/14 18:37:07  fplanque
  * doc/cleanup/minor
  *

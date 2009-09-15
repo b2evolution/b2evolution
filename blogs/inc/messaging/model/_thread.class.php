@@ -90,6 +90,7 @@ class Thread extends DataObject
 		$this->param_check__recipients( 'thrd_recipients', $thrd_recipients );
 
 		// Type of the thread creation. It can be either 'group discussion' or 'Individual messages'
+// fp> TODO: this should not be a thread property. This should be a param used by the messaging controller onyl when deciding to creating one or multiple new threads
 		$this->set_string_from_param( 'type', true );
 
 		return ! param_errors_detected();
@@ -230,6 +231,12 @@ class Thread extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/15 19:31:55  fplanque
+ * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
+ * PHP 4 compatible. Even better on PHP 5.
+ * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
+ * Thanks for fixing or reporting if you spot issues.
+ *
  * Revision 1.11  2009/09/15 16:46:21  efy-maxim
  * 1. Avatar in Messages List has been added
  * 2. Duplicated recipients issue has been fixed

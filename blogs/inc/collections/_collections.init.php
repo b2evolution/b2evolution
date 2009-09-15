@@ -95,6 +95,30 @@ function & get_BlogCache()
 class collections_Module
 {
 	/**
+	 * Do the initializations. Called from in _main.inc.php.
+	 * This is typically where classes matching DB tables for this module are registered/loaded.
+	 *
+	 * Note: this should only load/register things that are going to be needed application wide,
+	 * for example: for constructing menus.
+	 * Anything that is needed only in a specific controller should be loaded only there.
+	 * Anything that is needed only in a specific view should be loaded only there.
+	 */
+	function init()
+	{
+		load_class( 'collections/model/_blog.class.php', 'Blog' );
+		load_funcs( 'collections/model/_blog.funcs.php' );
+		load_funcs( 'collections/model/_category.funcs.php' );
+		load_funcs( 'items/model/_item.funcs.php' );
+		load_class( 'items/model/_itemtype.class.php', 'ItemType' );
+		load_class( 'items/model/_link.class.php', 'Link' );
+		load_funcs( 'comments/model/_comment.funcs.php');
+		load_funcs( 'items/model/_item.funcs.php');
+		load_class( 'comments/model/_commentlist.class.php', 'CommentList' );
+		load_class( 'items/model/_itemquery.class.php', 'ItemQuery' );
+	}
+
+
+	/**
 	 * Build teh evobar menu
 	 */
 	function build_evobar_menu()

@@ -36,6 +36,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'items/model/_itemlight.class.php', 'ItemLight' );
+load_class( 'items/model/_itemlist.class.php', 'ItemList2' );
 
 /**
  * Prepare the MainList object for displaying skins.
@@ -927,6 +929,12 @@ function check_perm_posttype( $post_extracats )
 
 /*
  * $Log$
+ * Revision 1.65  2009/09/15 19:31:54  fplanque
+ * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
+ * PHP 4 compatible. Even better on PHP 5.
+ * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
+ * Thanks for fixing or reporting if you spot issues.
+ *
  * Revision 1.64  2009/09/14 18:37:07  fplanque
  * doc/cleanup/minor
  *

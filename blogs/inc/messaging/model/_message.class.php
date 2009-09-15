@@ -131,6 +131,7 @@ class Message extends DataObject
 
 		$DB->begin();
 
+// fp> TODO: the following does not work on PHP4:
 		$new_thread = $this->get_Thread()->ID == 0;
 
 		if( $new_thread )
@@ -307,6 +308,12 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/15 19:31:55  fplanque
+ * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
+ * PHP 4 compatible. Even better on PHP 5.
+ * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
+ * Thanks for fixing or reporting if you spot issues.
+ *
  * Revision 1.7  2009/09/15 11:20:03  efy-maxim
  * Group discussion vs Individual messages
  *

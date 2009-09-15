@@ -59,6 +59,19 @@ $ctrl_mappings['threads'] = 'messaging/threads.ctrl.php';
 class messaging_Module
 {
 	/**
+	 * Do the initializations. Called from in _main.inc.php.
+	 * This is typically where classes matching DB tables for this module are registered/loaded.
+	 *
+	 * Note: this should only load/register things that are going to be needed application wide,
+	 * for example: for constructing menus.
+	 * Anything that is needed only in a specific controller should be loaded only there.
+	 * Anything that is needed only in a specific view should be loaded only there.
+	 */
+	function init()
+	{
+	}
+
+	/**
 	 * Build the evobar menu
 	 */
 	function build_evobar_menu()
@@ -136,6 +149,12 @@ $messaging_Module = & new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/15 19:31:55  fplanque
+ * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
+ * PHP 4 compatible. Even better on PHP 5.
+ * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
+ * Thanks for fixing or reporting if you spot issues.
+ *
  * Revision 1.4  2009/09/14 07:31:43  efy-maxim
  * 1. Messaging permissions have been fully implemented
  * 2. Messaging has been added to evo bar menu

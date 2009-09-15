@@ -48,14 +48,14 @@ if( file_exists(dirname(__FILE__).'/_overrides_TEST.php') )
 	include_once dirname(__FILE__).'/_overrides_TEST.php';	// FOR TESTING / DEVELOPMENT OVERRIDES
 }
 
-// Load modules:
-foreach( $modules as $module )
-{
-	require_once $inc_path.$module.'/_'.$module.'.init.php';
-}
-
 /*
  * $Log$
+ * Revision 1.55  2009/09/15 19:31:55  fplanque
+ * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
+ * PHP 4 compatible. Even better on PHP 5.
+ * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
+ * Thanks for fixing or reporting if you spot issues.
+ *
  * Revision 1.54  2009/07/02 15:43:55  fplanque
  * B2evolution no longer ships with _basic_config.php .
  * It ships with _basic_config.template.php instead.

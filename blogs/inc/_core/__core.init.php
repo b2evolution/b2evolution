@@ -101,6 +101,28 @@ $ctrl_mappings = array(
 class _core_Module
 {
 	/**
+	 * Do the initializations. Called from in _main.inc.php.
+	 * This is typically where classes matching DB tables for this module are registered/loaded.
+	 *
+	 * Note: this should only load/register things that are going to be needed application wide,
+	 * for example: for constructing menus.
+	 * Anything that is needed only in a specific controller should be loaded only there.
+	 * Anything that is needed only in a specific view should be loaded only there.
+	 */
+	function init()
+	{
+		load_class( '_core/model/dataobjects/_dataobjectcache.class.php', 'DataObjectCache' );
+		load_class( 'generic/model/_genericelement.class.php', 'GenericElement' );
+		load_class( 'generic/model/_genericcache.class.php', 'GenericCache' );
+		load_funcs( 'users/model/_user.funcs.php' );
+		load_funcs( '_core/_template.funcs.php' );
+		load_funcs( '_core/ui/forms/_form.funcs.php');
+		load_class( '_core/ui/forms/_form.class.php', 'Form' );
+		load_class( '_core/model/db/_sql.class.php', 'SQL' );
+		load_class( '_core/ui/results/_results.class.php', 'Results' );
+	}
+
+	/**
 	 * Build teh evobar menu
 	 */
 	function build_evobar_menu()
@@ -612,6 +634,12 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.29  2009/09/15 19:31:55  fplanque
+ * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
+ * PHP 4 compatible. Even better on PHP 5.
+ * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
+ * Thanks for fixing or reporting if you spot issues.
+ *
  * Revision 1.28  2009/09/14 18:37:07  fplanque
  * doc/cleanup/minor
  *

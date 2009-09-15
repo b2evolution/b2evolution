@@ -610,7 +610,7 @@ switch( $action )
 		}
 
 		// Downloading
-		load_class( '_ext/_zip_archives.php', 'ZipArchives' );
+		load_class( '_ext/_zip_archives.php', 'zip_file' );
 
 		$arraylist = $selected_Filelist->get_array( 'get_rdfs_rel_path' );
 
@@ -1662,6 +1662,12 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.34  2009/09/15 19:31:55  fplanque
+ * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
+ * PHP 4 compatible. Even better on PHP 5.
+ * I may have broken a few things. Sorry. This is pretty hard to do in one swoop without any glitch.
+ * Thanks for fixing or reporting if you spot issues.
+ *
  * Revision 1.33  2009/09/14 13:01:31  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

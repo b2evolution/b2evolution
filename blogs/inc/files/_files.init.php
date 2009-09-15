@@ -6,7 +6,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version _files.init.php,v 1.3 2009/08/30 12:31:44 tblue246 Exp
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -48,6 +48,23 @@ $ctrl_mappings = array_merge( $ctrl_mappings, array(
  */
 class files_Module
 {
+	/**
+	 * Do the initializations. Called from in _main.inc.php.
+	 * This is typically where classes matching DB tables for this module are registered/loaded.
+	 *
+	 * Note: this should only load/register things that are going to be needed application wide,
+	 * for example: for constructing menus.
+	 * Anything that is needed only in a specific controller should be loaded only there.
+	 * Anything that is needed only in a specific view should be loaded only there.
+	 */
+	function init()
+	{
+		load_class( 'files/model/_file.class.php', 'File' );
+		load_class( 'files/model/_filetype.class.php', 'FileType' );
+		load_class( 'files/model/_filetypecache.class.php', 'FileTypeCache' );
+	}
+
+
 	/**
 	 * Build teh evobar menu
 	 */
@@ -136,7 +153,7 @@ $files_Module = & new files_Module();
 
 
 /*
- * $Log$
+ * _files.init.php,v
  * Revision 1.3  2009/08/30 12:31:44  tblue246
  * Fixed CVS keywords
  *
