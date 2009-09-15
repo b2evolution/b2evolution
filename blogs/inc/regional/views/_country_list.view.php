@@ -35,7 +35,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'regional/model/_currency.class.php', 'Currency' );
 
 global $dispatcher;
-global $rsc_url;
 
 // Get params from request
 $s = param( 's', 'string', '', true );
@@ -80,14 +79,58 @@ $Results->cols[] = array(
 						'td' => '<strong>$ctry_code$</strong>',
 					);
 
+/**
+ * Template function: Display country flag
+ *
+ * @param string country code to use
+ * @param string country name to use
+ * @param string collection name (subdir of img/flags)
+ * @param string name of class for IMG tag
+ * @param string deprecated HTML align attribute
+ * @param boolean to echo or not
+ * @param mixed use absolute url (===true) or path to flags directory
+ */
+function country_flag( $country_code, $country_name, $collection = 'w16px', $class = 'flag', $align = '', $disp = true, $absoluteurl = true )
+{
+	global $rsc_path, $rsc_url;
+
+	if( ! is_file( $rsc_path.'flags/'.$collection.'/'.$country_code.'.gif') )
+	{ // File does not exist
+		$country_code = 'default';
+	}
+
+	if( $absoluteurl !== true )
+	{
+		$iurl = $absoluteurl;
+	}
+	else
+	{
+		$iurl = $rsc_url.'flags';
+	}
+
+	$r = '<img src="'.$iurl.'/'.$collection.'/'.$country_code.'.gif" alt="' .
+				$country_name .
+				'"';
+	if( !empty( $class ) ) $r .= ' class="'.$class.'"';
+	if( !empty( $align ) ) $r .= ' align="'.$align.'"';
+	$r .= ' /> ';
+
+	if( $disp )
+		echo $r;   // echo it
+	else
+		return $r; // return it
+
+}
+
+
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Name'),
 							'order' => 'ctry_name',
-							'td' => '<a href="?ctrl=countries&amp;ctry_ID=$ctry_ID$&amp;action=edit" title="'.T_('Edit this country...')
-											.'"><img src="'.$rsc_url.'flags/w16px/$ctry_code$.gif" alt="$ctry_name$" class="flag" />
-											<strong>$ctry_name$</strong></a>',
+										'td' => '<a href="?ctrl=countries&amp;ctry_ID=$ctry_ID$&amp;action=edit" title="'.T_('Edit this country...')
+											.'">%country_flag( #ctry_code#, #ctry_name# )%
+								<strong>$ctry_name$</strong></a>',
 						);
 }
 else
@@ -95,7 +138,7 @@ else
 	$Results->cols[] = array(
 							'th' => T_('Name'),
 							'order' => 'ctry_name',
-							'td' => '<img src="'.$rsc_url.'flags/w16px/$ctry_code$.gif" alt="$ctry_name$" class="flag" /> $ctry_name$',
+							'td' => '%country_flag( #ctry_code#, #ctry_name# )%  $ctry_name$',
 						);
 
 }
@@ -129,6 +172,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/15 16:25:24  efy-sasha
+ * *** empty log message ***
+ *
  * Revision 1.11  2009/09/14 22:18:27  fplanque
  * tssss.... cleaned up ith proper merge.
  *
