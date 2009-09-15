@@ -43,7 +43,7 @@ global $dispatcher;
 global $collections_Module;
 
 $Form = & new Form( NULL, 'settings_checkchanges' );
-$Form->begin_form( 'fform', T_('User Settings'),
+$Form->begin_form( 'fform', '',
 	// enable all form elements on submit (so values get sent):
 	array( 'onsubmit'=>'var es=this.elements; for( var i=0; i < es.length; i++ ) { es[i].disabled=false; };' ) );
 
@@ -74,6 +74,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.2  2009/09/15 01:39:16  fplanque
+ * minor
+ *
  * Revision 1.1  2009/09/14 12:01:00  efy-bogdan
  * User Registration tab
  *
