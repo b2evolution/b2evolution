@@ -693,7 +693,7 @@ function idna_encode( $url )
 	}
 	else
 	{
-		load_class('_ext/idna/_idna_convert.class.php4', 'idna_convert' );
+		load_class('_ext/idna/_idna_convert.class.php4', 'Net_IDNA_php4' );
 		$IDNA = new Net_IDNA_php4();
 	}
 
@@ -724,7 +724,7 @@ function idna_decode( $url )
 	}
 	else
 	{
-		load_class('_ext/idna/_idna_convert.class.php4', 'idna_convert' );
+		load_class('_ext/idna/_idna_convert.class.php4', 'Net_IDNA_php4' );
 		$IDNA = new Net_IDNA_php4();
 	}
 	return $IDNA->decode($url);
@@ -733,6 +733,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.40  2009/09/15 12:09:52  tblue246
+ * More load_class() fixes
+ *
  * Revision 1.39  2009/09/14 18:37:07  fplanque
  * doc/cleanup/minor
  *
