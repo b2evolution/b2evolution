@@ -152,6 +152,7 @@ class User extends DataObject
 				array( 'table'=>'T_items__item', 'fk'=>'post_assigned_user_ID', 'msg'=>T_('%d posts assigned to this user') ),
 				array( 'table'=>'T_links', 'fk'=>'link_creator_user_ID', 'msg'=>T_('%d links created by this user') ),
 				array( 'table'=>'T_links', 'fk'=>'link_lastedit_user_ID', 'msg'=>T_('%d links last edited by this user') ),
+				array( 'table'=>'T_messaging__threadstatus', 'fk'=>'tsta_user_ID', 'msg'=>T_('The user is part of %d messaging thread(s)') ),
 			);
 
 		$this->delete_cascades = array(
@@ -262,7 +263,7 @@ class User extends DataObject
 		return $this->login.' - '.$this->firstname.' '.$this->lastname.' ('.$this->nickname.')';
 	}
 
-	
+
 	/**
 	 * Get preferred name of the user, according to {@link User::$idmode}.
 	 *
@@ -1670,6 +1671,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2009/09/15 15:57:05  efy-maxim
+ * The admin cannot delete a user if he is part of a thread
+ *
  * Revision 1.35  2009/09/14 13:46:11  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
