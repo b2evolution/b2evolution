@@ -100,6 +100,9 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 
 	$Settings->set( 'general_cache_enabled', $new_cache_status );
 
+	param( 'login_require_country', 'integer', 0 );
+	$Settings->set( 'login_require_country', $login_require_country );
+	
 	if( ! $Messages->count('error') )
 	{
 		if( $Settings->dbupdate() )
@@ -131,6 +134,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/15 22:33:20  efy-bogdan
+ * Require country checkbox added
+ *
  * Revision 1.11  2009/09/15 09:20:47  efy-bogdan
  * Moved the "email validation" and the "security options" blocks to the Users -> Registration tab
  *

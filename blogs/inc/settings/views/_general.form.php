@@ -94,6 +94,14 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
+$Form->begin_fieldset( T_('Login options') );
+
+	$Form->checkbox_input( 'login_require_country', $Settings->get('login_require_country'), T_('Require country'), array( 'note'=>T_('Enable country required at login.') ) );
+
+$Form->end_fieldset();
+
+// --------------------------------------------
+
 if( $current_User->check_perm( 'options', 'edit' ) )
 {
 	$Form->end_form( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
@@ -102,6 +110,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/15 22:33:20  efy-bogdan
+ * Require country checkbox added
+ *
  * Revision 1.10  2009/09/15 09:20:49  efy-bogdan
  * Moved the "email validation" and the "security options" blocks to the Users -> Registration tab
  *
