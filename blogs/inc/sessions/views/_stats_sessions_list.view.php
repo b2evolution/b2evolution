@@ -35,18 +35,21 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 $user = param( 'user', 'string', '', true );
 
 // Create result set:
-$sql = 'SELECT SQL_NO_CACHE sess_ID, user_login, sess_hitcount, sess_lastseen, sess_ipaddress
-					FROM T_sessions LEFT JOIN T_users ON sess_user_ID = user_ID';
-$count_sql = 'SELECT SQL_NO_CACHE COUNT(sess_ID)
-					      FROM T_sessions';
+$SQL = & new SQL();
+$SQL->SELECT( 'SQL_NO_CACHE sess_ID, user_login, sess_hitcount, sess_lastseen, sess_ipaddress' );
+$SQL->FROM( 'T_sessions LEFT JOIN T_users ON sess_user_ID = user_ID' );
+
+$Count_SQL = & new SQL();
+$Count_SQL->SELECT( 'SQL_NO_CACHE COUNT(sess_ID)' );
+$Count_SQL->FROM( 'T_sessions LEFT JOIN T_users ON sess_user_ID = user_ID' );
+
 if( !empty( $user ) )
 {
-	$sql .= ' WHERE user_login LIKE "%'.$DB->escape($user).'%"';
-	$count_sql .= ' LEFT JOIN T_users ON sess_user_ID = user_ID
-		WHERE user_login LIKE "%'.$DB->escape($user).'%"';
+	$SQL->WHERE( 'user_login LIKE "%'.$DB->escape($user).'%"' );
+	$Count_SQL->WHERE( 'user_login LIKE "%'.$DB->escape($user).'%"' );
 }
 
-$Results = & new Results( $sql, 'sess_', 'D', 20, $count_sql );
+$Results = & new Results( $SQL->get(), 'sess_', 'D', 20, $Count_SQL->get() );
 
 $Results->title = T_('Recent sessions');
 
@@ -108,6 +111,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/15 18:39:25  efy-sasha
+ * Converted old style SQL request using SQL class.
+ *
  * Revision 1.6  2009/09/13 21:27:20  blueyed
  * SQL_NO_CACHE for SELECT queries using T_sessions
  *
