@@ -68,6 +68,26 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
+$Form->begin_fieldset( T_('Email validation') );
+
+	$Form->checkbox( 'newusers_mustvalidate', $Settings->get('newusers_mustvalidate'), T_('New users must validate email'), T_('Check to require users to validate their email by clicking a link sent to them.' ) );
+
+	$Form->checkbox( 'newusers_revalidate_emailchg', $Settings->get('newusers_revalidate_emailchg'), T_('Validate email changes'), T_('Check to require users to re-validate when they change their email address.' ) );
+
+$Form->end_fieldset();
+
+// --------------------------------------------
+
+$Form->begin_fieldset( T_('Security options') );
+
+	$Form->text_input( 'user_minpwdlen', (int)$Settings->get('user_minpwdlen'), 2, T_('Minimum password length'), T_('characters.'), array( 'maxlength'=>2, 'required'=>true ) );
+
+	$Form->checkbox_input( 'js_passwd_hashing', (bool)$Settings->get('js_passwd_hashing'), T_('Login password hashing'), array( 'note'=>T_('Check to enable the login form to hash the password with Javascript before transmitting it. This provides extra security on non-SSL connections.')) );
+
+$Form->end_fieldset();
+
+// --------------------------------------------
+
 if( $current_User->check_perm( 'options', 'edit' ) )
 {
 	$Form->end_form( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
@@ -76,6 +96,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.4  2009/09/15 09:20:50  efy-bogdan
+ * Moved the "email validation" and the "security options" blocks to the Users -> Registration tab
+ *
  * Revision 1.3  2009/09/15 02:43:35  fplanque
  * doc
  *

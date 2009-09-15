@@ -61,6 +61,18 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	param_integer_range( 'newusers_level', 0, 9, T_('User level must be between %d and %d.') );
 	$Settings->set( 'newusers_level', $newusers_level );
 
+	param( 'newusers_mustvalidate', 'integer', 0 );
+	$Settings->set( 'newusers_mustvalidate', $newusers_mustvalidate );
+
+	param( 'newusers_revalidate_emailchg', 'integer', 0 );
+	$Settings->set( 'newusers_revalidate_emailchg', $newusers_revalidate_emailchg );
+	
+	param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimum password length must be between %d and %d.') );
+	$Settings->set( 'user_minpwdlen', $user_minpwdlen );
+
+	param( 'js_passwd_hashing', 'integer', 0 );
+	$Settings->set( 'js_passwd_hashing', $js_passwd_hashing );
+	
 	if( ! $Messages->count('error') )
 	{
 		if( $Settings->dbupdate() )
@@ -92,6 +104,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2009/09/15 09:20:49  efy-bogdan
+ * Moved the "email validation" and the "security options" blocks to the Users -> Registration tab
+ *
  * Revision 1.2  2009/09/15 02:43:35  fplanque
  * doc
  *

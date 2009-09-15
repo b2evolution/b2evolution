@@ -54,23 +54,10 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 
 	// UPDATE general settings:
 
-	param( 'newusers_mustvalidate', 'integer', 0 );
-	$Settings->set( 'newusers_mustvalidate', $newusers_mustvalidate );
-
-	param( 'newusers_revalidate_emailchg', 'integer', 0 );
-	$Settings->set( 'newusers_revalidate_emailchg', $newusers_revalidate_emailchg );
-
 	if( param( 'default_blog_ID', 'integer', NULL ) !== NULL )
 	{
 		$Settings->set( 'default_blog_ID', $default_blog_ID );
 	}
-
-	param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimum password length must be between %d and %d.') );
-	$Settings->set( 'user_minpwdlen', $user_minpwdlen );
-
-	param( 'js_passwd_hashing', 'integer', 0 );
-	$Settings->set( 'js_passwd_hashing', $js_passwd_hashing );
-
 
 	// Session timeout
 	$timeout_sessions = param( 'timeout_sessions', 'integer', $Settings->get_default('timeout_sessions') );
@@ -144,6 +131,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/15 09:20:47  efy-bogdan
+ * Moved the "email validation" and the "security options" blocks to the Users -> Registration tab
+ *
  * Revision 1.10  2009/09/14 13:41:44  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
