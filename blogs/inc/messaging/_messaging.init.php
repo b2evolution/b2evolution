@@ -81,17 +81,15 @@ class messaging_Module
 		global $admin_url;
 		global $current_User;
 
-		$entries = array(
-			'messaging' => array(
-					'text' => T_('Messages'),
-					'disabled' => true,
-				),
-		);
+		$entries = array();
 
 		if( $current_User->check_perm( 'messaging', 'write' ) )
 		{
-			$entries['messaging']['disabled'] = false;
-			$entries['messaging']['href'] = $admin_url.'?ctrl=threads';
+			$entries['messaging'] = array(
+				'text' => T_('Messages'),
+				'href' => $admin_url.'?ctrl=threads',
+				'style' => 'padding: 3px 1ex;',
+			);
 
 			// Count unread messages for current user
 			$SQL = & new SQL();
@@ -171,6 +169,9 @@ $messaging_Module = & new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/15 20:39:00  tblue246
+ * Hide "Message" button on evoBar if no sufficient permissions; style
+ *
  * Revision 1.6  2009/09/15 20:05:06  efy-maxim
  * 1. Red badge for messages in the right menu
  * 2. Insert menu entries method in menu class
