@@ -31,58 +31,59 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
 
-
 $AdminUI->set_path( 'users', 'registration' );
 
-param( 'action', 'string' );
-param( 'edit_locale', 'string' );
-param( 'loc_transinfo', 'integer', 0 );
+param_action();
 
-if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale', 'deletelocale', 'extract', 'prioup', 'priodown' )) )
-{ // We have an action to do..
-	// Check permission:
-	$current_User->check_perm( 'options', 'edit', true );
-
-	// clear settings cache
-	$cache_settings = '';
-
-	// UPDATE general settings:
-
-	param( 'newusers_canregister', 'integer', 0 );
-	$Settings->set( 'newusers_canregister', $newusers_canregister );
-
-	param( 'newusers_grp_ID', 'integer', true );
-	$Settings->set( 'newusers_grp_ID', $newusers_grp_ID );
-
-	param_integer_range( 'newusers_level', 0, 9, T_('User level must be between %d and %d.') );
-	$Settings->set( 'newusers_level', $newusers_level );
-
-	param( 'newusers_mustvalidate', 'integer', 0 );
-	$Settings->set( 'newusers_mustvalidate', $newusers_mustvalidate );
-
-	param( 'newusers_revalidate_emailchg', 'integer', 0 );
-	$Settings->set( 'newusers_revalidate_emailchg', $newusers_revalidate_emailchg );
-	
-	param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimum password length must be between %d and %d.') );
-	$Settings->set( 'user_minpwdlen', $user_minpwdlen );
-
-	param( 'js_passwd_hashing', 'integer', 0 );
-	$Settings->set( 'js_passwd_hashing', $js_passwd_hashing );
-	
-	if( ! $Messages->count('error') )
-	{
-		if( $Settings->dbupdate() )
+switch ( $action )
+{
+	case 'update':
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+		
+		// UPDATE general settings:
+		param( 'newusers_canregister', 'integer', 0 );
+		
+		param( 'newusers_grp_ID', 'integer', true );
+		
+		param_integer_range( 'newusers_level', 0, 9, T_('User level must be between %d and %d.') );
+		
+		param( 'newusers_mustvalidate', 'integer', 0 );
+		
+		param( 'newusers_revalidate_emailchg', 'integer', 0 );
+		
+		param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimum password length must be between %d and %d.') );
+		
+		param( 'js_passwd_hashing', 'integer', 0 );
+		
+		$Settings->set_array( array(
+									 array( 'newusers_canregister', $newusers_canregister),
+									 
+									 array( 'newusers_grp_ID', $newusers_grp_ID),
+									 
+									 array( 'newusers_level', $newusers_level),
+									 
+									 array( 'newusers_mustvalidate', $newusers_mustvalidate),
+									 
+		                             array( 'newusers_revalidate_emailchg', $newusers_revalidate_emailchg),
+		                             
+									 array( 'user_minpwdlen', $user_minpwdlen),
+									 
+									 array( 'js_passwd_hashing', $js_passwd_hashing) ) );
+		
+		if( ! $Messages->count('error') )
 		{
-			$Messages->add( T_('General settings updated.'), 'success' );
+			if( $Settings->dbupdate() )
+			{
+				$Messages->add( T_('General settings updated.'), 'success' );
+			}
 		}
-	}
-
+	
+		break;
 }
-
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -104,6 +105,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2009/09/15 12:11:23  efy-bogdan
+ * Clean structure
+ *
  * Revision 1.3  2009/09/15 09:20:49  efy-bogdan
  * Moved the "email validation" and the "security options" blocks to the Users -> Registration tab
  *
