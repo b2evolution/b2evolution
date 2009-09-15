@@ -59,11 +59,19 @@ $Form->text_input( 'thrd_title', $edited_Thread->title, 70, T_('Subject'), '', a
 
 $Form->textarea_input( 'msg_text', $edited_Message->text, 10, T_('Message'), array( 'cols'=>80 ) );
 
+$Form->radio( 'thrd_type', $edited_Thread->type, array(
+							array( 'discussion', T_( 'Group discussion' ) ),
+							array( 'individual', T_( 'Individual messages' ) )
+						), T_('Multiple recipients'), true );
+
 $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
 												/*
  * $Log$
+ * Revision 1.7  2009/09/15 11:20:03  efy-maxim
+ * Group discussion vs Individual messages
+ *
  * Revision 1.6  2009/09/14 15:18:00  efy-maxim
  * 1. Recipients can be separated by commas or spaces.
  * 2. Message list: author, full name date in the first column.

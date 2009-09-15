@@ -133,51 +133,21 @@ class Message extends DataObject
 
 		$new_thread = $this->get_Thread()->ID == 0;
 
-		// Create thread for new message
-
 		if( $new_thread )
-		{
-			$success = $this->Thread->dbinsert();
-		}
-		else
-		{
-			$this->Thread->set_param( 'datemodified', 'string', date('Y-m-d H:i:s', $localtimenow) );
-			$success = $this->Thread->dbupdate();
-		}
+		{	// We can create new thread or new threads
 
-		if( $success )
-		{
-			$this->set_param( 'thread_ID', 'integer', $this->Thread->ID);
-			$success = parent::dbinsert();
-		}
-
-
-		if( $success )
-		{ // We can insert or update thread status for each recipient
-
-			if( $new_thread )
-			{
-				$sql = 'INSERT INTO T_messaging__threadstatus (tsta_thread_ID, tsta_user_ID, tsta_first_unread_msg_ID)
-							VALUES';
-
-				foreach ( $this->Thread->recipients_list as $recipient_ID )
-				{
-					$sql .= ' ('.$this->Thread->ID.', '.$recipient_ID.', '.$this->ID.'),';
-				}
-				$sql .= ' ('.$this->Thread->ID.', '.$this->author_user_ID.', NULL)';
-
-				$success = $DB->query( $sql, 'Insert thread statuses' );
+			if ( $this->Thread->type == 'discussion' )
+			{	// Create one thread for all recipients
+				$success = $this->dbinsert_discussion();
 			}
 			else
-			{
-				$sql = 'UPDATE T_messaging__threadstatus
-							SET tsta_first_unread_msg_ID = '.$this->ID.'
-							WHERE tsta_thread_ID = '.$this->Thread->ID.'
-							AND tsta_user_ID <> '.$this->author_user_ID.'
-							AND tsta_first_unread_msg_ID IS NULL';
-
-				$DB->query( $sql, 'Insert thread statuses' );
+			{	// Create thread for each recipient
+				$success = $this->dbinsert_individual();
 			}
+		}
+		else
+		{	// We can update thread and create new message
+			$success = $this->dbinsert_message();
 		}
 
 		if( !$success )
@@ -188,6 +158,119 @@ class Message extends DataObject
 
 		$DB->commit();
 		return true;
+	}
+
+	/**
+	 * Insert discussion (one thread for all recipients)
+	 * @return true if success, instead false
+	 */
+	function dbinsert_discussion()
+	{
+		global $DB;
+
+		if ( $this->Thread->dbinsert() )
+		{
+			$this->set_param( 'thread_ID', 'integer', $this->Thread->ID);
+
+			if( parent::dbinsert() )
+			{
+				return $this->dbinsert_threadstatus( $this->Thread->recipients_list );
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Insert new thread for each recipient
+	 * @return true if success, instead false
+	 */
+	function dbinsert_individual()
+	{
+		foreach( $this->Thread->recipients_list as $recipient_ID )
+		{
+			$message = $this->clone_message( $this );
+
+			$message->Thread->recipients_list = array( $recipient_ID );
+
+			if ( !$message->dbinsert_discussion() )
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Insert message in existing thread
+	 * @return true if success, instead false
+	 */
+	function dbinsert_message()
+	{
+		global $DB, $localtimenow;
+
+		$this->Thread->set_param( 'datemodified', 'string', date('Y-m-d H:i:s', $localtimenow) );
+
+		if( $this->Thread->dbupdate() )
+		{
+			$this->set_param( 'thread_ID', 'integer', $this->Thread->ID);
+
+			if( parent::dbinsert() )
+			{
+				$sql = 'UPDATE T_messaging__threadstatus
+						SET tsta_first_unread_msg_ID = '.$this->ID.'
+						WHERE tsta_thread_ID = '.$this->Thread->ID.'
+						AND tsta_user_ID <> '.$this->author_user_ID.'
+						AND tsta_first_unread_msg_ID IS NULL';
+
+				$DB->query( $sql, 'Insert thread statuses' );
+
+				return true;
+			}
+		}
+
+		return false;;
+	}
+
+	/**
+	 * Insert recipients into database
+	 * @param recipients
+	 * @return true if success, instead false
+	 */
+	function dbinsert_threadstatus( $recipients_list )
+	{
+		global $DB;
+
+		$sql = 'INSERT INTO T_messaging__threadstatus (tsta_thread_ID, tsta_user_ID, tsta_first_unread_msg_ID)
+							VALUES';
+
+		foreach ( $recipients_list as $recipient_ID )
+		{
+			$sql .= ' ('.$this->Thread->ID.', '.$recipient_ID.', '.$this->ID.'),';
+		}
+		$sql .= ' ('.$this->Thread->ID.', '.$this->author_user_ID.', NULL)';
+
+		return $DB->query( $sql, 'Insert thread statuses' );
+	}
+
+	/**
+	 * Clone current message and convert cloned message from 'individual' to 'discussion'.
+	 * @param instance of Message class
+	 * @return cloned message
+	 */
+	function clone_message( $message )
+	{
+		$new_Message = new Message();
+		$new_Message->set( 'text', $message->text );
+
+		$new_Thread = new Thread();
+		$new_Thread->set( 'title', $message->Thread->title );
+		$new_Thread->set( 'type', 'discussion' );
+
+		$new_Message->Thread = & $new_Thread;
+
+		return $new_Message;
 	}
 
 	/**
@@ -224,6 +307,9 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/15 11:20:03  efy-maxim
+ * Group discussion vs Individual messages
+ *
  * Revision 1.6  2009/09/14 13:20:56  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

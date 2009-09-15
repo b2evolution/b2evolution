@@ -36,6 +36,8 @@ class Thread extends DataObject
 	var $datemodified;
 	var $recipients = '';
 
+	var $type = 'discussion';
+
 	/**
 	 * Number unread messages
 	 * @var integer
@@ -87,6 +89,9 @@ class Thread extends DataObject
 
 		$this->param_check__recipients( 'thrd_recipients', $thrd_recipients );
 
+		// Type of the thread creation. It can be either 'group discussion' or 'Individual messages'
+		$this->set_string_from_param( 'type', true );
+
 		return ! param_errors_detected();
 	}
 
@@ -106,6 +111,9 @@ class Thread extends DataObject
 		{
 			case 'recipients':
 				$this->recipients = $parvalue;
+				break;
+			case 'type':
+				$this->type = $parvalue;
 				break;
 			case 'title':
 			default:
@@ -218,6 +226,9 @@ class Thread extends DataObject
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/15 11:20:03  efy-maxim
+ * Group discussion vs Individual messages
+ *
  * Revision 1.9  2009/09/14 18:37:07  fplanque
  * doc/cleanup/minor
  *
