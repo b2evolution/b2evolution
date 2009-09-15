@@ -58,14 +58,24 @@ $count_SQL->WHERE( 'tsta_user_ID = '.$current_User->ID );
 $Results = & new Results( $select_SQL->get(), 'thrd_', '', NULL, $count_SQL->get() );
 
 $Results->Cache = & get_Cache( 'ThreadCache' );
-$Results->title = T_('Threads list');
+$Results->title = T_('Conversations list');
 
 $Results->cols[] = array(
 					'th' => T_('With'),
-					'th_class' => 'shrinkwrap',
-					'td_class' => 'shrinkwrap',
+					'th_class' => 'thread_with',
+					'td_class' => 'thread_with',
 					'td' => '$thrd_recipients$',
 					//'td' => '%strmaxlen(#thrd_recipients#, 20)%',
+					);
+
+$Results->cols[] = array(
+					'th' => T_('Subject'),
+					'th_class' => 'thread_subject',
+					'td_class' => 'thread_subject',
+					'td' => '¤conditional( #thrd_msg_ID#>0, \'<strong><a href="'.$dispatcher
+							.'?ctrl=messages&amp;thrd_ID=$thrd_ID$" title="'.
+							T_('Show messages...').'">$thrd_title$</a></strong>\', \'<a href="'
+							.$dispatcher.'?ctrl=messages&amp;thrd_ID=$thrd_ID$" title="'.T_('Show messages...').'">$thrd_title$</a>\' )¤',
 					);
 
 $Results->cols[] = array(
@@ -73,14 +83,6 @@ $Results->cols[] = array(
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
 					'td' => '¤conditional( #thrd_msg_ID#>0, \'%mysql2localedatetime(#thrd_unread_since#)%\', \'&nbsp;\')¤' );
-
-$Results->cols[] = array(
-					'th' => T_('Subject'),
-					'td' => '¤conditional( #thrd_msg_ID#>0, \'<strong><a href="'.$dispatcher
-							.'?ctrl=messages&amp;thrd_ID=$thrd_ID$" title="'.
-							T_('Show messages...').'">$thrd_title$</a></strong>\', \'<a href="'
-							.$dispatcher.'?ctrl=messages&amp;thrd_ID=$thrd_ID$" title="'.T_('Show messages...').'">$thrd_title$</a>\' )¤',
-					);
 
 if( $current_User->check_perm( 'messaging', 'delete' ) )
 {	// We have permission to modify:
@@ -93,12 +95,15 @@ if( $current_User->check_perm( 'messaging', 'delete' ) )
 						);
 }
 
-$Results->global_icon( T_('Create a new thread...'), 'new', regenerate_url( 'action', 'action=new'), T_('New thread').' &raquo;', 3, 4  );
+$Results->global_icon( T_('Create a new conversation...'), 'new', regenerate_url( 'action', 'action=new'), T_('Compose new').' &raquo;', 3, 4  );
 
 $Results->display();
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/15 23:17:12  fplanque
+ * minor
+ *
  * Revision 1.10  2009/09/15 15:49:32  efy-maxim
  * "read by" column
  *

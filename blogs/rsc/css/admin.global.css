@@ -402,3 +402,7 @@ ul.widget_list {
 ul.widget_list li {
 	margin-bottom: 3px;
 }
+
+.thread_subject {
+	width: 60%;
+}

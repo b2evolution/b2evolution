@@ -99,59 +99,12 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 	$read_by_list[$row->msg_ID] = $read_by ;
 }
 
-// Get user avatar
-
-function user_avatar( $user_ID, $user_avatar_file_ID )
-{
-	$FileCache = & get_Cache( 'FileCache' );
-
-	if( ! $File = & $FileCache->get_by_ID( $user_avatar_file_ID, false, false ) )
-	{
-		return '';
-	}
-
-	return '<a href="?ctrl=users&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-48x48' ).'</a>';
-}
-
-// Create author cell for message list table
-
-function author( $user_ID, $user_login, $user_first_name,
-					$user_last_name, $user_avatar_ID, $datetime)
-{
-	$author = '<b>'.$user_login.'</b>';
-
-	$avatar = user_avatar( $user_ID, $user_avatar_ID );
-
-	if( !empty( $avatar ) )
-	{
-		$author .= '<br/>'.$avatar;
-	}
-
-	$full_name = '';
-
-	if( !empty( $user_first_name ) )
-	{
-		$full_name .= $user_first_name;
-	}
-
-	if( !empty( $user_last_name ) )
-	{
-		$full_name .= ' '.$user_last_name;
-	}
-
-	if( !empty( $full_name ) )
-	{
-		$author .= '<br/>'.$full_name;
-	}
-
-	return $author.'<br/>'.mysql2localedatetime( $datetime );
-}
 
 // Create SELECT query:
 
 $select_SQL = & new SQL();
 
-$select_SQL->SELECT( 'mm.msg_ID, mm.msg_datetime, u.user_login AS msg_author,
+$select_SQL->SELECT( 'mm.msg_ID, mm.msg_datetime, u.user_ID AS msg_user_ID, u.user_login AS msg_author,
 						u.user_firstname AS msg_firstname, u.user_lastname AS msg_lastname,
 						u.user_avatar_file_ID AS msg_user_avatar_ID, mm.msg_text' );
 
@@ -176,18 +129,84 @@ $Results = & new Results( $select_SQL->get(), 'msg_', '', 0, $count_SQL->get() )
 
 $Results->title = $edited_Thread->title;
 
-$Results->cols[] = array(
-					'th' => T_('Author'),
-					'th_class' => 'shrinkwrap',
-					'td_class' => 'shrinkwrap',
-					'td' => '%author( #msg_ID#,  #msg_author#, #msg_firstname#, #msg_lastname#, #msg_user_avatar_ID#, #msg_datetime#)%'
-					);
 
+/*
+ * Author col:
+ */
+
+/**
+ * Get user avatar
+ *
+ * @param integer $user_ID
+ * @param integer $user_avatar_file_ID
+ * @return string
+ */
+function user_avatar( $user_ID, $user_avatar_file_ID )
+{
+	$FileCache = & get_Cache( 'FileCache' );
+
+	if( ! $File = & $FileCache->get_by_ID( $user_avatar_file_ID, false, false ) )
+	{
+		return '';
+	}
+
+	return '<a href="?ctrl=users&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-80x80' ).'</a>';
+}
+/**
+ * Create author cell for message list table
+ *
+ * @param integer $user_ID
+ * @param string $user_login
+ * @param string $user_first_name
+ * @param string $user_last_name
+ * @param integer $user_avatar_ID
+ * @param string $datetime
+ */
+function author( $user_ID, $user_login, $user_first_name, $user_last_name, $user_avatar_ID, $datetime)
+{
+	$author = '<b>'.$user_login.'</b>';
+
+	$avatar = user_avatar( $user_ID, $user_avatar_ID );
+
+	if( !empty( $avatar ) )
+	{
+		$author = $avatar.'<br/>'.$author;
+	}
+
+	$full_name = '';
+
+	if( !empty( $user_first_name ) )
+	{
+		$full_name .= $user_first_name;
+	}
+
+	if( !empty( $user_last_name ) )
+	{
+		$full_name .= ' '.$user_last_name;
+	}
+
+	if( !empty( $full_name ) )
+	{
+		$author .= '<br/>'.$full_name;
+	}
+
+	return $author.'<br/><span class="note">'.mysql2localedatetime( $datetime ).'</span>';
+}
 $Results->cols[] = array(
-					'th' => T_('Message'),
-					'td_class' => 'lastcol',
-					'td' => '¤conditional( empty(#msg_text#), \''.$edited_Thread->title.'\', \'%nl2br(#msg_text#)%\')¤',
-					);
+		'th' => T_('Author'),
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'left top',
+		'td' => '%author( #msg_user_ID#,  #msg_author#, #msg_firstname#, #msg_lastname#, #msg_user_avatar_ID#, #msg_datetime#)%'
+	);
+
+/*
+ * Message col
+ */
+$Results->cols[] = array(
+		'th' => T_('Message'),
+		'td_class' => 'left top',
+		'td' => '¤conditional( empty(#msg_text#), \''.$edited_Thread->title.'\', \'%nl2br(#msg_text#)%\')¤',
+	);
 
 function get_read_by( $message_ID )
 {
@@ -199,7 +218,7 @@ function get_read_by( $message_ID )
 $Results->cols[] = array(
 					'th' => T_('Read by'),
 					'th_class' => 'shrinkwrap',
-					'td_class' => 'shrinkwrap',
+					'td_class' => 'top',
 					'td' => '%get_read_by( #msg_ID# )%',
 					);
 
@@ -234,6 +253,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.14  2009/09/15 23:17:12  fplanque
+ * minor
+ *
  * Revision 1.13  2009/09/15 16:46:21  efy-maxim
  * 1. Avatar in Messages List has been added
  * 2. Duplicated recipients issue has been fixed

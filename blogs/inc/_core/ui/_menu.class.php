@@ -83,6 +83,9 @@ class Menu extends Widget
 
 	/**
 	 * Insert new menu entried right after the menu entry found by name parameter
+	 *
+	 * @todo fp> rename to insert_menu_entries_after()
+	 *
 	 * @param name must not be null
 	 * @param new entries
 	 */
@@ -371,6 +374,9 @@ class Menu extends Widget
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/15 23:17:12  fplanque
+ * minor
+ *
  * Revision 1.10  2009/09/15 20:05:05  efy-maxim
  * 1. Red badge for messages in the right menu
  * 2. Insert menu entries method in menu class
