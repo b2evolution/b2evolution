@@ -63,33 +63,8 @@ class twitter_plugin extends Plugin
 		$this->short_desc = $this->T_('Post to your Twitter account when you post to your blog');
 		$this->long_desc = $this->T_('Posts to your Twitter account to update Twitter.com with details of your blog post.');
 
-		$this->ping_service_name = 'twitter / identi.ca';
+		$this->ping_service_name = 'twitter.com';
 		$this->ping_service_note = $this->T_('Update your twitter account with details about the new post.');
-		$this->options_array = 	 array(
-				'twitter_username' => array(
-					'label' => T_( 'Twitter username' ),
-					'type' => 'text',
-				),
-				'twitter_password' => array(
-					'label' => T_( 'Twitter password' ),
-					'type' => 'password',
-				),
-				'twitter_msg_format' => array(
-					'label' => T_( 'Message format' ),
-					'type' => 'text',
-					'size' => 30,
-					'maxlength' => 140,
-					'defaultvalue' => T_( 'Just posted $title$ $url$ #b2p' ),
-					'note' => T_('$title$, $excerpt$ and $url$ will be replaced appropriately.'),
-				),
-				'microblog_service' => array(
-					'label' => T_( 'Microblog Service' ),
-					'type' => 'select',
-					'defaultvalue' => 'twitter',
-					'options' => array( 'twitter' => 'Twitter', 'identica' => 'Identica' ),
-					'note' => T_('You can use twitter or identica'),
-				),
-			);
 	}
 
 
@@ -151,13 +126,11 @@ class twitter_plugin extends Plugin
 			else
 				{	// Get additional params from User Setttings:
 				$msg = $this->UserSettings->get( 'twitter_msg_format' );
-				$service = $this->UserSettings->get( 'microblog_service' );
 			}
 		}
 		else
 		{	// Get additional params from Blog Setttings:
 			$msg = $this->get_coll_setting( 'twitter_msg_format', $item_Blog );
-			$service = $this->get_coll_setting( 'microblog_service', $item_Blog );
 		}
 
 		$title =  $params['Item']->dget('title', 'xml');
@@ -168,24 +141,10 @@ class twitter_plugin extends Plugin
 		$msg = str_replace( '$excerpt$', $excerpt, $msg );
 		$msg = str_replace( '$url$', $url, $msg );
 
-		$service_url = 'http://twitter.com/statuses/update.xml';
-		$host = 'twitter.com';
-
-		if ( $service  == 'twitter' )
-		{
-			$service_url = 'http://twitter.com/statuses/update.xml';
-			$host = 'twitter.com';
-		}
-		elseif ( $service == 'identica' )
-		{
-			$service_url = 'http://identi.ca/api/statuses/update.xml';
-			$host = 'identi.ca';
-		}
-
 		if( extension_loaded( 'curl' ) )
 		{ // CURL available
 			$session = curl_init();
-			curl_setopt( $session, CURLOPT_URL, $service_url );
+			curl_setopt( $session, CURLOPT_URL, 'http://twitter.com/statuses/update.xml' );
 			curl_setopt( $session, CURLOPT_POSTFIELDS, 'status='.urlencode($msg));
 			curl_setopt( $session, CURLOPT_HTTPAUTH, CURLAUTH_BASIC );
 			curl_setopt( $session, CURLOPT_HEADER, false );
@@ -198,6 +157,7 @@ class twitter_plugin extends Plugin
 		}
 		else
 		{ // fallback to fsockopen
+			$host = 'twitter.com';
 			$url = '/statuses/update.xml?status='.urlencode( $msg );
 			// Build the header
 			$header  = 'POST '.$url.' HTTP/1.0'."\r\n";
@@ -241,7 +201,24 @@ class twitter_plugin extends Plugin
 	 */
 	function GetDefaultUserSettings( & $params )
 	{
-		return $this->options_array;
+		return array(
+				'twitter_username' => array(
+					'label' => T_( 'Twitter username' ),
+					'type' => 'text',
+				),
+				'twitter_password' => array(
+					'label' => T_( 'Twitter password' ),
+					'type' => 'password',
+				),
+				'twitter_msg_format' => array(
+					'label' => T_( 'Message format' ),
+					'type' => 'text',
+					'size' => 30,
+					'maxlength' => 140,
+					'defaultvalue' => T_( 'Just posted $title$ $url$ #b2p' ),
+					'note' => T_('$title$, $excerpt$ and $url$ will be replaced appropriately.'),
+				),
+			);
 	}
 
 
@@ -254,15 +231,32 @@ class twitter_plugin extends Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
-		return $this->options_array;
+		return array(
+				'twitter_username' => array(
+					'label' => T_( 'Twitter username' ),
+					'type' => 'text',
+				),
+				'twitter_password' => array(
+					'label' => T_( 'Twitter password' ),
+					'type' => 'password',
+				),
+				'twitter_msg_format' => array(
+					'label' => T_( 'Message format' ),
+					'type' => 'text',
+					'size' => 30,
+					'maxlength' => 140,
+					'defaultvalue' => T_( 'Just posted $title$ $url$ #b2p' ),
+					'note' => T_('$title$, $excerpt$ and $url$ will be replaced appropriately.'),
+				),
+			);
 	}
 
 }
 
 /*
  * $Log$
- * Revision 1.16  2009/09/15 14:36:02  waltercruz
- * adding identi.ca support on twitter plugin
+ * Revision 1.17  2009/09/15 18:02:05  fplanque
+ * please make a separate plugin for identi.ca
  *
  * Revision 1.15  2009/06/29 02:14:04  fplanque
  * no message
