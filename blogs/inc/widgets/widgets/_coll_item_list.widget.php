@@ -224,6 +224,7 @@ class coll_item_list_Widget extends ComponentWidget
 		}
 		else
 		{ // no excerpts, use ItemListLight
+			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
 			$ItemList = & new ItemListLight( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCacheLight', $this->code.'_' );
 		}
 
@@ -390,6 +391,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/16 20:27:26  tblue246
+ * Fix fatal error
+ *
  * Revision 1.14  2009/09/14 13:54:13  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
