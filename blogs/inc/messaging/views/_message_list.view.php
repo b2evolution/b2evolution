@@ -133,6 +133,7 @@ $Results = & new Results( $select_SQL->get(), 'msg_', '', 0, $count_SQL->get() )
 
 $Results->title = $edited_Thread->title;
 
+$Results->global_icon( T_('Cancel!'), 'close', '?ctrl=threads' );
 
 /*
  * Author col:
@@ -141,8 +142,8 @@ $Results->title = $edited_Thread->title;
 /**
  * Get user avatar
  *
- * @param integer $user_ID
- * @param integer $user_avatar_file_ID
+ * @param integer user ID
+ * @param integer avatar ID
  * @return string
  */
 function user_avatar( $user_ID, $user_avatar_file_ID )
@@ -159,12 +160,12 @@ function user_avatar( $user_ID, $user_avatar_file_ID )
 /**
  * Create author cell for message list table
  *
- * @param integer $user_ID
- * @param string $user_login
- * @param string $user_first_name
- * @param string $user_last_name
- * @param integer $user_avatar_ID
- * @param string $datetime
+ * @param integer user ID
+ * @param string login
+ * @param string first name
+ * @param string last name
+ * @param integer avatar ID
+ * @param string datetime
  */
 function author( $user_ID, $user_login, $user_first_name, $user_last_name, $user_avatar_ID, $datetime)
 {
@@ -257,6 +258,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.16  2009/09/16 13:30:35  efy-maxim
+ * A red close "X" on the right of the title bar of messages list
+ *
  * Revision 1.15  2009/09/16 09:15:32  efy-maxim
  * Messaging module improvements
  *
