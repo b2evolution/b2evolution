@@ -1455,19 +1455,19 @@ class DB
 		}
 
 		$time_queries_profiled = number_format($time_queries_profiled, 4);
-		$time_diff_percentage = round($time_queries / $time_queries_profiled * 100);
+		$time_diff_percentage = $time_queries_profiled != 0 ? round($time_queries / $time_queries_profiled * 100) : 0;
 		if ( $html )
 		{
 			echo "\nTotal rows: $count_rows<br />\n";
 			echo "\nMeasured time: {$time_queries}s<br />\n";
-			echo "\nProfiled time: {$time_queries_profiled}<br />\n";
+			echo "\nProfiled time: {$time_queries_profiled}s<br />\n";
 			echo "\nTime difference: {$time_diff_percentage}%<br />\n";
 		}
 		else
 		{
 			echo 'Total rows: '.$count_rows."\n";
 			echo "Measured time: {$time_queries}s\n";
-			echo "Profiled time: {$time_queries_profiled}\n";
+			echo "Profiled time: {$time_queries_profiled}s\n";
 			echo "Time difference: {$time_diff_percentage}%\n";
 		}
 	}
@@ -1658,6 +1658,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.37  2009/09/16 20:50:52  tblue246
+ * Do not divide by zero; style fix
+ *
  * Revision 1.36  2009/09/13 21:32:42  blueyed
  * DB: display toggle links below dumped queries inline, saving some screen space.
  *
