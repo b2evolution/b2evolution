@@ -27,7 +27,7 @@
  * @author evofactory-test
  * @author fplanque: Francois Planque.
  *
- * @version userfields.ctrl.php,v 1.1 2009/09/11 18:34:06 fplanque Exp
+ * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -257,7 +257,11 @@ $AdminUI->disp_payload_end();
 $AdminUI->disp_global_footer();
 
 /*
- * userfields.ctrl.php,v
+ * $Log$
+ * Revision 1.4  2009/09/16 18:27:19  fplanque
+ * Readded with -kkv option
+ */*
+ *
  * Revision 1.1  2009/09/11 18:34:06  fplanque
  * userfields editing module.
  * needs further cleanup but I think it works.

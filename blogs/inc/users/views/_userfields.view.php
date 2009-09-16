@@ -27,7 +27,7 @@
  * @author evofactory-test
  * @author fplanque: Francois Planque.
  *
- * @version _userfields.view.php,v 1.1 2009/09/11 18:34:05 fplanque Exp
+ * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -91,7 +91,10 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 $Results->display();
 
 /*
- * _userfields.view.php,v
+ * $Log$
+ * Revision 1.6  2009/09/16 18:22:57  fplanque
+ * Readded with -kkv option
+ *
  * Revision 1.1  2009/09/11 18:34:05  fplanque
  * userfields editing module.
  * needs further cleanup but I think it works.
