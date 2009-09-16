@@ -42,11 +42,12 @@ class Userfield extends DataObject
 {
 	var $type = '';
 	var $name = '';
-
+	
+	
 	/**
 	 * Constructor
 	 *
-	 * @param table Database row
+	 * @param db_row Database row
 	 */
 	function Userfield( $db_row = NULL )
 	{
@@ -69,11 +70,25 @@ class Userfield extends DataObject
 			$this->type          = $db_row->ufdf_type;
 			$this->name          = $db_row->ufdf_name;
 		}
-		else
-		{	// Create a new user field:
-		}
+		
 	}
+	
+	/**
+	 * Returns array of possible user field types
+	 * 
+	 * @return array
+	 */
 
+	function get_types() {
+		return array(
+			'email' => T_('Email address'),
+			'word' => T_('Single word'),
+			'number' => T_('Number'),
+			'phone' => T_('Phone number'),
+			'url' => T_('URL'),
+			'text' => T_('Text'),
+		 );
+	}
 
 	/**
 	 * Load data from Request form fields.
@@ -82,14 +97,14 @@ class Userfield extends DataObject
 	 */
 	function load_from_Request()
 	{
-		// Name
+		// get new ID
 		if( param( 'new_ufdf_ID', 'string', NULL ) !== NULL )
 		{
 			param_check_number( 'new_ufdf_ID', T_('ID must be a number'), true );
 			$this->set_from_Request( 'ID', 'new_ufdf_ID' );
 		}
 
-		// Name
+		// Type
 		param_string_not_empty( 'ufdf_type', T_('Please enter a type.') );
 		$this->set_from_Request( 'type' );
 
@@ -98,11 +113,6 @@ class Userfield extends DataObject
 		$this->set_from_Request( 'name' );
 
 		return ! param_errors_detected();
-	}
-
-	function get_name()
-	{
-		return $this->name;
 	}
 
 	/**
@@ -122,6 +132,34 @@ class Userfield extends DataObject
 			default:
 				$this->set_param( $parname, 'string', $parvalue );
 		}
+	}
+	
+	/**
+	 * Get user field name.
+	 *
+	 * @return user field name
+	 */
+	function get_name()
+	{
+		return $this->name;
+	}
+	
+	/**
+	 * Check existing of specified user field ID in ufdf_ID unique field.
+	 *
+	 * @return ID if user field exists otherwise NULL/false
+	 */
+	function dbexists()
+	{
+		global $DB;
+		
+		$sql = "SELECT $this->dbIDname
+						  FROM $this->dbtablename
+					   WHERE $this->dbIDname = $this->ID";
+
+		return $DB->get_var( $sql );
+		
+		return parent::dbexists('ufdf_ID', $this->ID);
 	}
 
 }
