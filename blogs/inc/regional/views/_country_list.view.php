@@ -82,6 +82,8 @@ $Results->cols[] = array(
 /**
  * Template function: Display country flag
  *
+ * @todo factor with locale_flag()
+ *
  * @param string country code to use
  * @param string country name to use
  * @param string collection name (subdir of img/flags)
@@ -172,6 +174,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/16 00:26:03  fplanque
+ * no message
+ *
  * Revision 1.12  2009/09/15 16:25:24  efy-sasha
  * *** empty log message ***
  *
