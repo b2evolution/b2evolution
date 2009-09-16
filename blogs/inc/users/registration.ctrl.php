@@ -59,6 +59,8 @@ switch ( $action )
 		
 		param( 'js_passwd_hashing', 'integer', 0 );
 		
+		param( 'registration_require_country', 'integer', 0 );
+		
 		$Settings->set_array( array(
 									 array( 'newusers_canregister', $newusers_canregister),
 									 
@@ -72,7 +74,9 @@ switch ( $action )
 		                             
 									 array( 'user_minpwdlen', $user_minpwdlen),
 									 
-									 array( 'js_passwd_hashing', $js_passwd_hashing) ) );
+									 array( 'js_passwd_hashing', $js_passwd_hashing),
+
+									 array( 'registration_require_country', $registration_require_country)) );
 		
 		if( ! $Messages->count('error') )
 		{
@@ -105,6 +109,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/16 05:35:49  efy-bogdan
+ * Require country checkbox added
+ *
  * Revision 1.4  2009/09/15 12:11:23  efy-bogdan
  * Clean structure
  *
