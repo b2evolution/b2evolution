@@ -35,6 +35,8 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
+
 /**
  * Represents a file or folder on disk. Optionnaly stores meta data from DB.
  *
@@ -1874,6 +1876,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.49  2009/09/16 21:23:09  blueyed
+ * File class derives from DataObject. Load this.
+ *
  * Revision 1.48  2009/09/16 20:33:40  tblue246
  * Fix fatal error ("unsupported operand types").
  *
