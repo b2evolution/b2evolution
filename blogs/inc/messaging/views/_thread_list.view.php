@@ -26,6 +26,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $dispatcher;
 global $current_User;
+global $unread_messages_count;
 
 // Create SELECT query
 
@@ -58,7 +59,13 @@ $count_SQL->WHERE( 'tsta_user_ID = '.$current_User->ID );
 $Results = & new Results( $select_SQL->get(), 'thrd_', '', NULL, $count_SQL->get() );
 
 $Results->Cache = & get_Cache( 'ThreadCache' );
+
 $Results->title = T_('Conversations list');
+
+if( $unread_messages_count > 0 )
+{
+	$Results->title = $Results->title.' <span class="badge">'.$unread_messages_count.'</span></b>';
+}
 
 $Results->cols[] = array(
 					'th' => T_('With'),
@@ -101,6 +108,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/16 15:14:48  efy-maxim
+ * badge for unread message number
+ *
  * Revision 1.11  2009/09/15 23:17:12  fplanque
  * minor
  *

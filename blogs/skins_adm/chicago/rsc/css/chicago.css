@@ -916,7 +916,19 @@ div.system_check {
 	border-top: 1px solid #e1ddce;
 }
 
+/*
+ * Messaging
+ */
 
+ .badge {
+ 	-moz-border-radius:20px;
+ 	-webkit-border-radius:5px;
+ 	background-color:red;
+ 	border:2px solid #fff;
+ 	color:#fff;
+ 	font-size:10px;
+ 	padding:0 6px
+ }
 
 /*
  * Footer (60 pixels)

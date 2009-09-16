@@ -80,6 +80,7 @@ class messaging_Module extends Module
 		global $topright_Menu;
 		global $admin_url;
 		global $current_User;
+		global $unread_messages_count;
 
 		$entries = array();
 
@@ -105,11 +106,10 @@ class messaging_Module extends Module
 
 			$SQL->WHERE( 'ts.tsta_first_unread_msg_ID IS NOT NULL AND ts.tsta_user_ID = '.$current_User->ID );
 
-			$count = $DB->get_var( $SQL->get() );
-			if( $count > 0 )
+			$unread_messages_count = $DB->get_var( $SQL->get() );
+			if( $unread_messages_count > 0 )
 			{
-				$entries['messaging']['text'] = '<b>'.T_('Messages').' <span style="background-color:red;
-													color:white">'.$count.'</span></b>';
+				$entries['messaging']['text'] = '<b>'.T_('Messages').' <span class="badge">'.$unread_messages_count.'</span></b>';
 			}
 		}
 
@@ -151,6 +151,9 @@ $messaging_Module = & new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/16 15:14:47  efy-maxim
+ * badge for unread message number
+ *
  * Revision 1.9  2009/09/16 09:15:32  efy-maxim
  * Messaging module improvements
  *
