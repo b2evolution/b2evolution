@@ -620,7 +620,7 @@ function xmlrpcs_resperror( $errcode = NULL, $errmsg = NULL )
 	{	// Custom message
 		$xmlrpcs_errmsg = $errmsg;
 	}
-	else if( empty( $xmlrpcs_errmsg ) )
+	elseif( empty( $xmlrpcs_errmsg ) )
 	{	// Use a standard messsage
 		switch( $errcode )
 		{
@@ -885,6 +885,9 @@ function xmlrpcs_get_maincat( $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.19  2009/09/16 22:03:40  fplanque
+ * doc
+ *
  * Revision 1.18  2009/09/16 20:18:19  tblue246
  * bugfix
  *

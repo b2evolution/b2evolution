@@ -403,17 +403,19 @@ ul.widget_list li {
 	margin-bottom: 3px;
 }
 
-.thread_subject {
-	width: 60%;
-}
 
 /*
  * Messaging
  */
 
+.thread_subject {
+	width: 60%;
+}
  .badge {
- 	-moz-border-radius:20px;
- 	-webkit-border-radius:5px;
+ 	position: relative;
+ 	top: -1px;	
+ 	-moz-border-radius:12px;
+ 	-webkit-border-radius:12px;
  	background-color:red;
  	border:2px solid #fff;
  	color:#fff;

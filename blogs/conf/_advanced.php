@@ -501,6 +501,9 @@ $media_url = $baseurl.$media_subdir;     // You should not need to change this
 
 
 // Define default avatar image URL
+// fp> TODO: do not use a setting for this.
+// fp> put the file into the shared files directory with the other sample "admin" avatars. That way it is very easy to replace with another default.
+// fp> PS: I like the ? image ;)
 $default_avatar = $rsc_url.'img/default_avatar.jpg';
 
 

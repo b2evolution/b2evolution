@@ -121,6 +121,7 @@ class Message extends DataObject
 	/**
 	 * Insert object into DB based on previously recorded changes
 	 *
+	 * fp> what is $type for???
 	 * @return boolean true on success
 	 */
 	function dbinsert( $type = NULL )
@@ -377,6 +378,9 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/16 22:03:40  fplanque
+ * doc
+ *
  * Revision 1.11  2009/09/16 13:21:44  tblue246
  * Check if user wants to receive notifications; message improvements
  *

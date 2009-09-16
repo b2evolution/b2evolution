@@ -39,29 +39,40 @@
 				<li> plugin disp types			(yabs)</li>
 				</ul>
 				</li>
-				<li>Added post type permissions (@tblue)</li>
-				<li>Backoffice comment editing: Allow changing of "Allow message form" setting for guest comments (@tblue)</li>
-				<li>Blog options: Added option to sort comments by ascending or descending order (@tblue)</li>
-				<li>SQL optimizations (@blueyed)
-					<ul>
-						<li>SQL_NO_CACHE for queries selecting from T_sessions/T_hitlog</li>
-						<li>Remove information about seconds from item issue and start date,
-						so that those queries can get cached for up to one minute now.</li>
-					</ul>
-				<li><strong>XML-RPC:</strong>
-					<ul>
-						<li>MetaWeblog API: Use mt_keyword field to get/set
-							post tags. Affected methods: metaWeblog.newPost,
-							metaWeblog.editPost, metaWeblog.getRecentPosts,
-							metaweblog.getPost. (@tblue)</li>
-						<li>MovableType API: Implemented mt.supportedMethods. (@tblue)</li>
-						<li>MovableType API: Implemented mt.publishPost (@tblue,@waltercruz)</li>
-						<li>MetaWeblog API: Implemented mt_allow_comments and mt_excerpt (@tblue,@waltercruz)</li>
-						<li>XML-RPC can be disabled (@tblue,@waltercruz)</li>
-					</ul>
+				<li><strong>Backoffice:</strong>
+				  <ul>
+				    <li>Messaging module (@evofactory)</li>
+			        <li>Added post type permissions (@tblue)</li>
+			        <li>Blog options: Added option to sort comments by ascending or descending order (@tblue)			    </li>
+				  </ul>
 				</li>
-				<li><strong>Bug fixes (technical mumbo-jumbo):</strong>
+				<li><strong>Comments</strong>
+				  <ul>
+				    <li>Display avatars for comments (@alex)</li>
+			        <li>Backoffice comment editing: Allow changing of &quot;Allow message form&quot; setting for guest comments (@tblue)</li>
+				  </ul>
+				</li>
+			  <li><strong>XML-RPC:</strong>
+			    <ul>
+			      <li>MetaWeblog API: Use mt_keyword field to get/set
+				      post tags. Affected methods: metaWeblog.newPost,
+				      metaWeblog.editPost, metaWeblog.getRecentPosts,
+			        metaweblog.getPost. (@tblue)</li>
+			        <li>MovableType API: Implemented mt.supportedMethods. (@tblue)</li>
+			        <li>MovableType API: Implemented mt.publishPost (@tblue,@waltercruz)</li>
+			        <li>MetaWeblog API: Implemented mt_allow_comments and mt_excerpt (@tblue,@waltercruz)</li>
+			        <li>XML-RPC can be disabled (@tblue,@waltercruz)</li>
+	            </ul>
+			  </li>
+				<li><strong>Technical mumbo-jumbo:</strong>
 					<ul>
+						<li>SQL optimizations (@blueyed)
+                          <ul>
+                            <li>SQL_NO_CACHE for queries selecting from T_sessions/T_hitlog</li>
+                            <li>Remove information about seconds from item issue and start date,
+                              so that those queries can get cached for up to one minute now.</li>
+                          </ul>
+                        </li>
 						<li>Fixed a bug in fetch_remote_page() (wrong $info array keys). (@tblue)</li>
 						<li>Item::get_tags(): Bugfix and optimization:
 							Remember items without tags and do not try to
@@ -69,12 +80,12 @@
 						<li>Code highlight plugin: Correctly unfilter item contents. (@sir_yabs/@tblue)</li>
 						<li>Plugin hooks: Always trigger AfterCommentUpdate/AfterItemUpdate,
 							not only if Comment/Item has changed. (@sir_yabs/@tblue)</li>
-					</ul>
+					    <li>Increased core modularity</li>
+				    </ul>
 				</li>
-				<li>Increased core modularity</li>
-			</ul>
-			<h2>3.3.2-stable</h2>
-			<ul>
+		    </ul>
+		  <h2>3.3.2-stable</h2>
+	    <ul>
               <li>Improved Auto Links plugin (@francoisplanque)</li>
 			  <li>Fixed bug allowing multiple plugins to have per-blog specific settings (@francoisplanque)</li>
 		      <li>Additional bug fixes (@francoisplanque)</li>
@@ -134,7 +145,7 @@
 						</ul>
 						<ul>
 							<li>Bug fixes! (blueyed, tblue246, sam2kb, yabs, leeturner2701, fplanque)</li>
-						</ul
+						</ul>
 					</li>
 		  </ul>
 			<h2>3.2.0-beta</h2>
