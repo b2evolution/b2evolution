@@ -1037,9 +1037,10 @@ class File extends DataObject
 			{
 				$img_attribs['src'] = $this->get_thumb_url( $size_name );
 				$thumb_path = $this->get_af_thumb_path($size_name, NULL, true);
-				if( substr($thumb_path, 0, 1) != '!' )
+				if( substr($thumb_path, 0, 1) != '!'
+					&& ( $size_arr = imgsize($thumb_path, 'widthheight_assoc') ) !== false )
 				{ // no error, add width and height attribs
-					$img_attribs += imgsize($thumb_path, 'widthheight_assoc');
+					$img_attribs += $size_arr;
 				}
 			}
 			$img = '<img '.get_field_attribs_as_string($img_attribs).' />';
@@ -1873,6 +1874,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.48  2009/09/16 20:33:40  tblue246
+ * Fix fatal error ("unsupported operand types").
+ *
  * Revision 1.47  2009/09/11 19:36:58  blueyed
  * File::get_tag: fix width/height attribs for "original" size and add the attribs for thumbs, using "widthheight_assoc"
  *
