@@ -29,7 +29,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Do not cache this page, because the JS password random salt has to match the one stored in the current session:
 header_nocache(); // do not cache this page, because the JS password salt has to match the session cookie
 
-load_class( 'regional/model/_country.class.php', 'Country' );
 
 // TODO: dh> the message below should also get displayed in _reg_form.
 // E.g., the user might have clicked accidently on an old password change link.
@@ -76,9 +75,6 @@ if( $transmit_hashed_password )
 	require_js( 'sha1.js' );
 }
 
-// Check if login form needs Country field too
-$login_form_country = (bool)$Settings->get('login_require_country');
-
 /**
  * Login header
  */
@@ -121,13 +117,6 @@ $Form->begin_form( 'fform' );
 
 	$Form->text_input( 'login', $login, 16, T_('Login'), '', array( 'maxlength' => 20, 'class' => 'input_text' ) );
 
-	if($login_form_country)
-	{
-		$CountryCache = & get_Cache( 'CountryCache' );
-		
-		$Form->select_input_object( 'country', $country, $CountryCache, 'Country', $field_params = array('allow_none'=>true, 'required'=>true) );
-	}
-	
 	$pwd_note = '<a href="'.$htsrv_url_sensitive.'login.php?action=lostpassword&amp;redirect_to='
 		.rawurlencode( url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 	if( !empty($login) )
@@ -235,8 +224,8 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
- * Revision 1.13  2009/09/15 22:33:20  efy-bogdan
- * Require country checkbox added
+ * Revision 1.14  2009/09/16 00:25:41  fplanque
+ * rollback of stuff that doesn't make any sense at all!!!
  *
  * Revision 1.12  2009/06/12 18:45:08  blueyed
  * Make login form more beautiful, by not using an inner border.

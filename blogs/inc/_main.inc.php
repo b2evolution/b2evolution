@@ -388,31 +388,17 @@ $login = NULL;
 $pass = NULL;
 $pass_md5 = NULL;
 
-// Check if login form needs Country field too
-if($login_form_country = (bool)$Settings->get('login_require_country'))
-{
-	$country = NULL;
-}
-
 if( isset($_POST['login'] ) && isset($_POST['pwd'] ) )
 { // Trying to log in with a POST
 	$login = $_POST['login'];
 	$pass = $_POST['pwd'];
 	unset($_POST['pwd']); // password will be hashed below
-	if( $login_form_country )
-	{
-		$country = $_POST['country'];
-	}
 }
 elseif( isset($_GET['login'] ) )
 { // Trying to log in with a GET; we might only provide a user here.
 	$login = $_GET['login'];
 	$pass = isset($_GET['pwd']) ? $_GET['pwd'] : '';
 	unset($_GET['pwd']); // password will be hashed below
-	if( $login_form_country )
-	{
-		$country = $_GET['country'];
-	}
 }
 
 $Debuglog->add( 'login: '.var_export($login, true), 'login' );
@@ -433,10 +419,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	$login = strtolower(strip_tags(remove_magic_quotes($login)));
 	$pass = strip_tags(remove_magic_quotes($pass));
 	$pass_md5 = md5( $pass );
-	if( $login_form_country )
-	{
-		$country = (int) $country;
-	}
+
 
 	/*
 	 * Handle javascript-hashed password:
@@ -673,8 +656,8 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
- * Revision 1.119  2009/09/15 22:27:37  efy-bogdan
- * Require country checkbox added
+ * Revision 1.120  2009/09/16 00:25:41  fplanque
+ * rollback of stuff that doesn't make any sense at all!!!
  *
  * Revision 1.118  2009/09/15 19:31:54  fplanque
  * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
