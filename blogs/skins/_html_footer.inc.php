@@ -12,8 +12,10 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-// Trigger plugin event, which could be used e.g. by a google_analytics plugin to add the javascript snippet here:
+// SkinEndHtmlBody hook -- could be used e.g. by a google_analytics plugin to add the javascript snippet here:
+modules_call_method( 'SkinEndHtmlBody' );
 $Plugins->trigger_event('SkinEndHtmlBody');
+
 ?>
 
 <!-- End of skin_wrapper -->

@@ -66,7 +66,7 @@ $ctrl_mappings['goals'] = 'sessions/goals.ctrl.php';
 /**
  * sessions_Module definition
  */
-class sessions_Module
+class sessions_Module extends Module
 {
 	/**
 	 * Do the initializations. Called from in _main.inc.php.
@@ -270,26 +270,6 @@ class sessions_Module
 				);
 		}
 	}
-
-
-	/**
-	 * Builds the 2nd half of the menu. This is the one with the configuration features
-	 *
-	 * At some point this might be displayed differently than the 1st half.
-	 */
-	function build_menu_2()
-	{
-	}
-
-
-	/**
-	 * Builds the 3rd half of the menu. This is the one with the configuration features
-	 *
-	 * At some point this might be displayed differently than the 1st half.
-	 */
-	function build_menu_3()
-	{
-	}
 }
 
 $sessions_Module = & new sessions_Module();
@@ -297,6 +277,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/16 00:48:50  fplanque
+ * getting a bit more serious with modules
+ *
  * Revision 1.15  2009/09/15 19:31:54  fplanque
  * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
  * PHP 4 compatible. Even better on PHP 5.

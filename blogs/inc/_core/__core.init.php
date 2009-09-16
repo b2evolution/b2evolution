@@ -98,7 +98,7 @@ $ctrl_mappings = array(
 /**
  * _core_Module definition
  */
-class _core_Module
+class _core_Module extends Module
 {
 	/**
 	 * Do the initializations. Called from in _main.inc.php.
@@ -479,22 +479,6 @@ class _core_Module
 
 
 	/**
-	 * Builds the 1st half of the menu. This is the one with the most important features
-	 */
-	function build_menu_1()
-	{
-	}
-
-
-	/**
-	 * Builds the 2nd half of the menu. This is the one with the most important features
-	 */
-	function build_menu_2()
-	{
-	}
-
-
-	/**
 	 * Builds the 3rd half of the menu. This is the one with the configuration features
 	 *
 	 * At some point this might be displayed differently than the 1st half.
@@ -634,6 +618,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.30  2009/09/16 00:48:50  fplanque
+ * getting a bit more serious with modules
+ *
  * Revision 1.29  2009/09/15 19:31:55  fplanque
  * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
  * PHP 4 compatible. Even better on PHP 5.

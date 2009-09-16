@@ -92,7 +92,7 @@ function & get_BlogCache()
 /**
  * adsense_Module definition
  */
-class collections_Module
+class collections_Module extends Module
 {
 	/**
 	 * Do the initializations. Called from in _main.inc.php.

@@ -181,6 +181,7 @@ if( isset( $error_message ) )
  *
  * This initializes table name aliases and is required before trying to connect to the DB.
  */
+load_class( '_core/model/_module.class.php', 'Module' );
 foreach( $modules as $module )
 {
 	require_once $inc_path.$module.'/_'.$module.'.init.php';
@@ -656,6 +657,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.121  2009/09/16 00:48:50  fplanque
+ * getting a bit more serious with modules
+ *
  * Revision 1.120  2009/09/16 00:25:41  fplanque
  * rollback of stuff that doesn't make any sense at all!!!
  *

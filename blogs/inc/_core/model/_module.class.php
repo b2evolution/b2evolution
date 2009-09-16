@@ -1,0 +1,88 @@
+<?php
+/**
+ * This file is part of the evoCore framework - {@link http://evocore.net/}
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * {@internal License choice
+ * - If you have received this file as part of a package, please find the license.txt file in
+ *   the same folder or the closest folder above for complete license terms.
+ * - If you have received this file individually (e-g: from http://evocms.cvs.sourceforge.net/)
+ *   then you must choose one of the following licenses before using the file:
+ *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
+ *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
+ * }}
+ *
+ * @package evocore
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author fplanque: Francois PLANQUE.
+ *
+ * @version $Id$
+ */
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+/**
+ * Module class (only useful if derived)
+ */
+class Module
+{
+	/**
+	 * Do the initializations. Called from in _main.inc.php.
+	 * This is typically where classes matching DB tables for this module are registered/loaded.
+	 *
+	 * Note: this should only load/register things that are going to be needed application wide,
+	 * for example: for constructing menus.
+	 * Anything that is needed only in a specific controller should be loaded only there.
+	 * Anything that is needed only in a specific view should be loaded only there.
+	 */
+	function init()
+	{
+	}
+
+	/**
+	 * Build teh evobar menu
+	 */
+	function build_evobar_menu()
+	{
+	}
+
+
+	/**
+	 * Builds the 1st half of the menu. This is the one with the most important features
+	 */
+	function build_menu_1()
+	{
+	}
+
+  /**
+	 * Builds the 2nd half of the menu. This is the one with the configuration features
+	 *
+	 * At some point this might be displayed differently than the 1st half.
+	 */
+	function build_menu_2()
+	{
+	}
+
+
+	/**
+	 * Builds the 3rd half of the menu. This is the one with the configuration features
+	 *
+	 * At some point this might be displayed differently than the 1st half.
+	 */
+	function build_menu_3()
+	{
+	}
+
+	/**
+	 * could be used e.g. by a google_analytics plugin to add the javascript snippet
+	 */
+	function SkinEndHtmlBody()
+	{
+	}
+}
+
+/*
+ */
+?>

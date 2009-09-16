@@ -56,7 +56,7 @@ $ctrl_mappings['threads'] = 'messaging/threads.ctrl.php';
 /**
  * messaging_Module definition
  */
-class messaging_Module
+class messaging_Module extends Module
 {
 	/**
 	 * Do the initializations. Called from in _main.inc.php.
@@ -117,24 +117,6 @@ class messaging_Module
 	}
 
 	/**
-	 * Builds the 1st half of the menu. This is the one with the most important features
-	 */
-	function build_menu_1()
-	{
-	}
-
-
-	/**
-	 * Builds the 2nd half of the menu. This is the one with the configuration features
-	 *
-	 * At some point this might be displayed differently than the 1st half.
-	 */
-	function build_menu_2()
-	{
-	}
-
-
-	/**
 	 * Builds the 3rd half of the menu. This is the one with the configuration features
 	 *
 	 * At some point this might be displayed differently than the 1st half.
@@ -169,6 +151,9 @@ $messaging_Module = & new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/16 00:48:50  fplanque
+ * getting a bit more serious with modules
+ *
  * Revision 1.7  2009/09/15 20:39:00  tblue246
  * Hide "Message" button on evoBar if no sufficient permissions; style
  *

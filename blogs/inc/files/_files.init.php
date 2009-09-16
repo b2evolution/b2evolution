@@ -46,7 +46,7 @@ $ctrl_mappings = array_merge( $ctrl_mappings, array(
 /**
  * adsense_Module definition
  */
-class files_Module
+class files_Module extends Module
 {
 	/**
 	 * Do the initializations. Called from in _main.inc.php.
@@ -105,16 +105,6 @@ class files_Module
 		}
 
 	}
-
-  /**
-	 * Builds the 2nd half of the menu. This is the one with the configuration features
-	 *
-	 * At some point this might be displayed differently than the 1st half.
-	 */
-	function build_menu_2()
-	{
-	}
-
 
 	/**
 	 * Builds the 3rd half of the menu. This is the one with the configuration features
