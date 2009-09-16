@@ -79,6 +79,10 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 	}
 
 	$read_recipiens = array_diff( $recipients, $unread_recipients );
+	$read_recipiens[] = $current_User->login;
+
+	asort( $read_recipiens );
+	asort( $unread_recipients );
 
 	$read_by = '';
 	if( !empty( $read_recipiens ) )
@@ -253,6 +257,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.15  2009/09/16 09:15:32  efy-maxim
+ * Messaging module improvements
+ *
  * Revision 1.14  2009/09/15 23:17:12  fplanque
  * minor
  *

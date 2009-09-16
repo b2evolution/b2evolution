@@ -152,8 +152,8 @@ class User extends DataObject
 				array( 'table'=>'T_items__item', 'fk'=>'post_assigned_user_ID', 'msg'=>T_('%d posts assigned to this user') ),
 				array( 'table'=>'T_links', 'fk'=>'link_creator_user_ID', 'msg'=>T_('%d links created by this user') ),
 				array( 'table'=>'T_links', 'fk'=>'link_lastedit_user_ID', 'msg'=>T_('%d links last edited by this user') ),
+				array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('The user has %d authored message(s)') ),
 				array( 'table'=>'T_messaging__threadstatus', 'fk'=>'tsta_user_ID', 'msg'=>T_('The user is part of %d messaging thread(s)') ),
-// fp> TODO: add FK to check if he's th eauthor of some messages (it should never happen that he's not in a thread but still author of messages, but still, you never know how user hacks/plugins will mess up the DB)
 			);
 
 		$this->delete_cascades = array(
@@ -1672,6 +1672,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2009/09/16 09:15:32  efy-maxim
+ * Messaging module improvements
+ *
  * Revision 1.37  2009/09/15 19:31:55  fplanque
  * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
  * PHP 4 compatible. Even better on PHP 5.

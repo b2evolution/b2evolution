@@ -123,7 +123,7 @@ class Message extends DataObject
 	 *
 	 * @return boolean true on success
 	 */
-	function dbinsert()
+	function dbinsert( $type = NULL )
 	{
 		global $DB, $localtimenow;
 
@@ -131,13 +131,12 @@ class Message extends DataObject
 
 		$DB->begin();
 
-// fp> TODO: the following does not work on PHP4:
-		$new_thread = $this->get_Thread()->ID == 0;
+		$this->get_Thread();
 
-		if( $new_thread )
+		if( $this->Thread->ID == 0 )
 		{	// We can create new thread or new threads
 
-			if ( $this->Thread->type == 'discussion' )
+			if ( $type == 'discussion' )
 			{	// Create one thread for all recipients
 				$success = $this->dbinsert_discussion();
 			}
@@ -267,7 +266,6 @@ class Message extends DataObject
 
 		$new_Thread = new Thread();
 		$new_Thread->set( 'title', $message->Thread->title );
-		$new_Thread->set( 'type', 'discussion' );
 
 		$new_Message->Thread = & $new_Thread;
 
@@ -308,6 +306,9 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/16 09:15:32  efy-maxim
+ * Messaging module improvements
+ *
  * Revision 1.8  2009/09/15 19:31:55  fplanque
  * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
  * PHP 4 compatible. Even better on PHP 5.

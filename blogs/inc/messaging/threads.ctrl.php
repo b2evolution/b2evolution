@@ -80,7 +80,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Insert in DB:
-			$edited_Message->dbinsert();
+			$edited_Message->dbinsert( param( 'thrdtype', 'string', 'discussion' ) );
 			$Messages->add( T_('New thread created.'), 'success' );
 
 			// What next?
@@ -155,7 +155,6 @@ switch( $action )
 
 	case 'new':
 	case 'create':
-
 		$AdminUI->disp_view( 'messaging/views/_thread.form.php' );
 		break;
 

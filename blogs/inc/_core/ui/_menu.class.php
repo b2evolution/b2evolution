@@ -84,12 +84,10 @@ class Menu extends Widget
 	/**
 	 * Insert new menu entried right after the menu entry found by name parameter
 	 *
-	 * @todo fp> rename to insert_menu_entries_after()
-	 *
 	 * @param name must not be null
 	 * @param new entries
 	 */
-	function insert_menu_entries( $name, $new_entries )
+	function insert_menu_entries_after( $name, $new_entries )
 	{
 		$entries = & $this->_menus['entries'];
 		$keys = array_keys( $entries );
@@ -374,6 +372,9 @@ class Menu extends Widget
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/16 09:15:31  efy-maxim
+ * Messaging module improvements
+ *
  * Revision 1.11  2009/09/15 23:17:12  fplanque
  * minor
  *

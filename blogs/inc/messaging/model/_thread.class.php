@@ -36,8 +36,6 @@ class Thread extends DataObject
 	var $datemodified;
 	var $recipients = '';
 
-	var $type = 'discussion';
-
 	/**
 	 * Number unread messages
 	 * @var integer
@@ -89,10 +87,6 @@ class Thread extends DataObject
 
 		$this->param_check__recipients( 'thrd_recipients', $thrd_recipients );
 
-		// Type of the thread creation. It can be either 'group discussion' or 'Individual messages'
-// fp> TODO: this should not be a thread property. This should be a param used by the messaging controller onyl when deciding to creating one or multiple new threads
-		$this->set_string_from_param( 'type', true );
-
 		return ! param_errors_detected();
 	}
 
@@ -112,9 +106,6 @@ class Thread extends DataObject
 		{
 			case 'recipients':
 				$this->recipients = $parvalue;
-				break;
-			case 'type':
-				$this->type = $parvalue;
 				break;
 			case 'title':
 			default:
@@ -139,13 +130,11 @@ class Thread extends DataObject
 			$login = trim($recipient);
 			if( ! empty( $login ) )
 			{
-				$login = strtolower( $login );
-				if( ! in_array( $login , $recipients_list ) )
-				{
-					$recipients_list[] = $login;
-				}
+				$recipients_list[] = strtolower( $login );
 			}
 		}
+
+		$recipients_list = array_unique( $recipients_list );
 
 		$error_msg = '';
 
@@ -231,6 +220,9 @@ class Thread extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/16 09:15:32  efy-maxim
+ * Messaging module improvements
+ *
  * Revision 1.12  2009/09/15 19:31:55  fplanque
  * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
  * PHP 4 compatible. Even better on PHP 5.

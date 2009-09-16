@@ -113,7 +113,7 @@ class messaging_Module extends Module
 			}
 		}
 
-		$topright_Menu->insert_menu_entries( 'userprefs', $entries );
+		$topright_Menu->insert_menu_entries_after( 'userprefs', $entries );
 	}
 
 	/**
@@ -151,6 +151,9 @@ $messaging_Module = & new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/16 09:15:32  efy-maxim
+ * Messaging module improvements
+ *
  * Revision 1.8  2009/09/16 00:48:50  fplanque
  * getting a bit more serious with modules
  *
