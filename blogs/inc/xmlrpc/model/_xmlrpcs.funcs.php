@@ -620,7 +620,7 @@ function xmlrpcs_resperror( $errcode = NULL, $errmsg = NULL )
 	{	// Custom message
 		$xmlrpcs_errmsg = $errmsg;
 	}
-	else
+	else if( empty( $xmlrpcs_errmsg ) )
 	{	// Use a standard messsage
 		switch( $errcode )
 		{
@@ -885,6 +885,9 @@ function xmlrpcs_get_maincat( $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.18  2009/09/16 20:18:19  tblue246
+ * bugfix
+ *
  * Revision 1.17  2009/09/14 13:57:07  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
