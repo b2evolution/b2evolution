@@ -120,6 +120,12 @@ div.bCommentSmallPrint {
 	font-size: 78%;
 	margin: 1ex 0;
 }
+.bCommentAvatar {
+	margin: 5px 10px 10px 0;
+	padding: 2px;
+	float:left;
+	border:1px solid #ccc;
+}
 
 div.moderation_msg
 {

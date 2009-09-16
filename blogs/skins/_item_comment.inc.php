@@ -78,7 +78,10 @@ $Comment = & $params['Comment'];
 	</div>
 	<?php $Comment->rating(); ?>
 	<div class="bCommentText">
-		<?php $Comment->content() ?>
+		<?php
+			$Comment->avatar();
+			$Comment->content();
+		?>
 	</div>
 	<div class="bCommentSmallPrint">
 		<?php
@@ -96,6 +99,9 @@ $Comment = & $params['Comment'];
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/16 21:29:31  sam2kb
+ * Display user/visitor avatar in comments
+ *
  * Revision 1.5  2009/03/08 23:57:56  fplanque
  * 2009
  *

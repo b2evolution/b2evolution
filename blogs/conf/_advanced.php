@@ -500,6 +500,10 @@ $media_path = $basepath.$media_subdir;   // You should not need to change this
 $media_url = $baseurl.$media_subdir;     // You should not need to change this
 
 
+// Define default avatar image URL
+$default_avatar = $rsc_url.'img/default_avatar.jpg';
+
+
 /**
  * Do you want to allow public access to the media dir?
  *

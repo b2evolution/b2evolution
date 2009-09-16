@@ -39,7 +39,10 @@ while( $Comment = & $CommentList->get_next() )
 			<?php $Comment->author_url( '', ' &middot; ', '' ) ?>
 		</div>
 		<div class="bCommentText">
-			<?php $Comment->content() ?>
+			<?php
+				$Comment->avatar();
+            	$Comment->content();
+			?>
 		</div>
 		<div class="bCommentSmallPrint">
 			<?php
@@ -60,6 +63,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/16 21:29:31  sam2kb
+ * Display user/visitor avatar in comments
+ *
  * Revision 1.4  2009/03/08 23:57:53  fplanque
  * 2009
  *

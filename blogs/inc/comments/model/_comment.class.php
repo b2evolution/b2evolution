@@ -339,6 +339,75 @@ class Comment extends DataObject
 			return $this->author_url;
 		}
 	}
+	
+	
+	/**
+	 * Template function: display the avatar of the comment's author.
+	 *
+	 */
+	function avatar( $size = 'crop-80x80', $class = 'bCommentAvatar', $params = array() )
+	{
+		if( $r = $this->get_avatar( $size, $class, $params ) )
+		{
+			echo $r;
+		}
+	}
+	
+	
+	/**
+	 * Get the avatar of the comment's author.
+	 *
+	 * @return string
+	 */
+	function get_avatar( $size = 'crop-80x80', $class = 'bCommentAvatar', $params = array() )
+	{
+		global $Plugins, $default_avatar;
+
+		if( $comment_author_User = & $this->get_author_User() )
+		{	// Author is a user
+			if( $r = $comment_author_User->get_avatar_imgtag( $size, $class ) )
+			{	// Got an image
+				return $r;
+			}
+		}
+
+		// TODO> add new event
+		// See if plugin supplies an image
+		// $img_url = $Plugins->trigger_event( 'GetCommentAvatar', array( 'Comment' => & $this, 'size' => $size ) );
+
+		if( empty($img_url) )
+		{	// Use gravatar
+			$params = array_merge( array(
+					'default'	=> $default_avatar,
+					'size'		=> '80',
+				), $params );
+
+			$img_url = 'http://www.gravatar.com/avatar.php?gravatar_id='.md5( $this->get_author_email() );
+
+			if( !empty($params['rating']) )
+				$img_url .= '&amp;rating='.$params['rating'];
+
+			if( !empty($params['size']) )
+				$img_url .='&amp;size='.$params['size'];
+
+			if( !empty($params['default']) )
+				$img_url .= '&amp;default='.urlencode($params['default']);				
+		}
+
+		$imgtag = '<img src="'.$img_url.'" '
+					.'alt="'.format_to_output( $this->get_author_name(), 'htmlattr').'" '
+					.'title="'.format_to_output( $this->get_author_name(), 'htmlattr').'"';
+
+		if( $class )
+		{ // add class
+			$imgtag .= ' class="'.$class.'"';
+		}
+		
+		$imgtag .=' />';
+		
+		return $imgtag;
+	}
+
 
 
 	/**
@@ -1393,6 +1462,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.33  2009/09/16 21:29:31  sam2kb
+ * Display user/visitor avatar in comments
+ *
  * Revision 1.32  2009/09/14 12:46:36  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
