@@ -40,22 +40,41 @@ require_once $inc_path.'_core/_misc.funcs.php';
 load_class( '_core/model/_log.class.php', 'Log');
 $Debuglog = & new Log( 'note' );
 $Messages = & new Log('error');
+
+/**
+ * Load modules.
+ *
+ * This initializes table name aliases and is required before trying to connect to the DB.
+ */
+load_class( '_core/model/_module.class.php', 'Module' );
+foreach( $modules as $module )
+{
+	require_once $inc_path.$module.'/_'.$module.'.init.php';
+}
+
 require_once $conf_path.'_upgrade.php';
 require_once $inc_path.'_vars.inc.php';
 load_class( '/_core/model/db/_db.class.php', 'DB' );
-load_funcs('collections/model/_blog.funcs.php');
-load_funcs('collections/model/_category.funcs.php');
-load_class( 'items/model/_item.class.php', 'Item' );
-load_funcs('items/model/_item.funcs.php');
-load_funcs('users/model/_user.funcs.php');
-load_funcs( '_core/ui/forms/_form.funcs.php' );
+//load_funcs('collections/model/_blog.funcs.php');
+//load_funcs('collections/model/_category.funcs.php');
+//load_class( 'items/model/_item.class.php', 'Item' );
+//load_funcs('items/model/_item.funcs.php');
+//load_funcs('users/model/_user.funcs.php');
+//load_funcs( '_core/ui/forms/_form.funcs.php' );
 load_class( '_core/model/_timer.class.php', 'Timer' );
-load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+//load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+
+
 require_once dirname(__FILE__).'/_functions_install.php';
 
 $Timer = & new Timer('main');
 
 load_funcs('_core/_param.funcs.php');
+
+// Let the modules load/register what they need:
+modules_call_method( 'init' );
+
+
 param( 'action', 'string', 'default' );
 
 // Load all available locale defintions:
@@ -700,6 +719,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.182  2009/09/16 01:33:36  fplanque
+ * so noone complained about HEAD not (really) being installable?
+ *
  * Revision 1.181  2009/09/14 14:31:16  waltercruz
  * minor fix
  *
