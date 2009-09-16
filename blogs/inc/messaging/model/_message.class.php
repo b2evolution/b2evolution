@@ -310,35 +310,26 @@ class Message extends DataObject
 	}
 
 	/**
-	 * Send email notification to recipients on new thread or new message event
-	 * @param true if new thread, false if new message in the current thread
+	 * Send email notification to recipients on new thread or new message event.
+	 *
+	 * @todo Tblue> Show direct links to the new conversation/message.
+	 * 
+	 * @param boolean true if new thread, false if new message in the current thread
+	 * @return boolean True if all messages could be sent, false if at least one error occurred.
 	 */
 	function send_email_notifications( $new_thread = true )
 	{
 		global $DB, $current_User, $htsrv_url_sensitive;
 
-		// Select recipients of the current thread
-
+		// Select recipients of the current thread:
 		$SQL = & new SQL();
-
 		$SQL->SELECT( 'u.user_login, u.user_email' );
-
 		$SQL->FROM( 'T_messaging__threadstatus ts
 						LEFT OUTER JOIN T_users u ON ts.tsta_user_ID = u.user_ID' );
-
 		$SQL->WHERE( 'ts.tsta_thread_ID = '.$this->Thread->ID.' AND ts.tsta_user_ID <> '.$this->author_user_ID );
 
-		$notifications = array();
-		foreach( $DB->get_results( $SQL->get() ) as $row )
-		{
-			$notifications[] = array(	'login'  => $row->user_login,
-										'email'  => $row->user_email	);
-		}
-
-		// Construct message subject and body
-
-		$body = T_( 'Dear user');
-		$body .= ',';
+		// Construct message subject and body:
+		$body = /* TRANS: Email salutation */ T_( 'Dear user,' );
 		$body .= "\n\n";
 
 		$body .= $current_User->login;
@@ -346,38 +337,49 @@ class Message extends DataObject
 
 		if( $new_thread )
 		{
-			$subject = T_( 'New conversation has been created.' ); ;
+			$subject = sprintf( T_( 'New conversation created: "%s"' ), $this->Thread->title );
 
-			$body .= sprintf( T_( 'has created "%s" conversation. ' ), $this->Thread->title );
-			$body .= sprintf( T_( 'To access it, log in at "%s" and click Messages button.' ), $htsrv_url_sensitive.'login.php' );
+			$body .= sprintf( /* TRANS: Space at the end! */ T_( 'has created the "%s" conversation. ' ), $this->Thread->title );
+			$body .= sprintf( T_( 'To access it, log in at "%s" and click the Messages button.' ), $htsrv_url_sensitive.'login.php' );
 		}
 		else
 		{
-			$subject = T_( 'New message has been created.' ); ;
+			$subject = sprintf( T_( 'New message in conversation "%s" created' ), $this->Thread->title );
 
-			$body .= sprintf( T_( 'has created new message in "%s" conversation. ' ), $this->Thread->title );
-			$body .= sprintf( T_( 'To access it, log in at "%s". Click Messages button and then open above mentioned conversation.' ), $htsrv_url_sensitive.'login.php' );
+			$body .= sprintf( /* TRANS: Space at the end! */ T_( 'has created a new message in the "%s" conversation. ' ), $this->Thread->title );
+			$body .= sprintf( T_( 'To access it, log in at "%s". Click the Messages button and then open the conversation mentioned above.' ), $htsrv_url_sensitive.'login.php' );
 		}
 
 		$body .= "\n\n";
 		$body .= T_( 'Best regards' );
 		$body .= ',';
 		$body .= "\n";
-		$body .= T_( 'b2evolution team' );
+		$body .= T_( 'b2evolution mailer' );
 		$body .= "\n\n\n";
-		$body .= T_( 'Please do not reply to this email.' );
+		$body .= T_( 'This is an automatically generated message; please do not reply to this email.' );
 
-		// Send email notifications
-
-		foreach( $notifications as $notification )
+		// Send email notifications:
+		$ret = true;
+		$UserCache = & get_Cache( 'UserCache' );
+		foreach( $DB->get_results( $SQL->get() ) as $row )
 		{
-			send_mail( $notification['email'], $notification['login'], $subject, $body );
+			$User = & $UserCache->get_by_login( $row->user_login );
+			if( $User && $User->notify )
+			{
+				$ret = send_mail( $row->user_email, $row->user_login, $subject, $body );
+			}
+			//unset( $User );
 		}
+
+		return $ret;
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/16 13:21:44  tblue246
+ * Check if user wants to receive notifications; message improvements
+ *
  * Revision 1.10  2009/09/16 12:30:03  efy-maxim
  * Send notification on new thread or new message event
  *
