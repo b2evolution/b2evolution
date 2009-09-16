@@ -174,7 +174,11 @@ class Message extends DataObject
 
 			if( parent::dbinsert() )
 			{
-				return $this->dbinsert_threadstatus( $this->Thread->recipients_list );
+				if( $this->dbinsert_threadstatus( $this->Thread->recipients_list ) )
+				{
+					$this->send_email_notifications();
+					return true;
+				}
 			}
 		}
 
@@ -225,6 +229,8 @@ class Message extends DataObject
 						AND tsta_first_unread_msg_ID IS NULL';
 
 				$DB->query( $sql, 'Insert thread statuses' );
+
+				$this->send_email_notifications( false );
 
 				return true;
 			}
@@ -302,10 +308,79 @@ class Message extends DataObject
 
 		return true;
 	}
+
+	/**
+	 * Send email notification to recipients on new thread or new message event
+	 * @param true if new thread, false if new message in the current thread
+	 */
+	function send_email_notifications( $new_thread = true )
+	{
+		global $DB, $current_User, $htsrv_url_sensitive;
+
+		// Select recipients of the current thread
+
+		$SQL = & new SQL();
+
+		$SQL->SELECT( 'u.user_login, u.user_email' );
+
+		$SQL->FROM( 'T_messaging__threadstatus ts
+						LEFT OUTER JOIN T_users u ON ts.tsta_user_ID = u.user_ID' );
+
+		$SQL->WHERE( 'ts.tsta_thread_ID = '.$this->Thread->ID.' AND ts.tsta_user_ID <> '.$this->author_user_ID );
+
+		$notifications = array();
+		foreach( $DB->get_results( $SQL->get() ) as $row )
+		{
+			$notifications[] = array(	'login'  => $row->user_login,
+										'email'  => $row->user_email	);
+		}
+
+		// Construct message subject and body
+
+		$body = T_( 'Dear user');
+		$body .= ',';
+		$body .= "\n\n";
+
+		$body .= $current_User->login;
+		$body .= ' ';
+
+		if( $new_thread )
+		{
+			$subject = T_( 'New conversation has been created.' ); ;
+
+			$body .= sprintf( T_( 'has created "%s" conversation. ' ), $this->Thread->title );
+			$body .= sprintf( T_( 'To access it, log in at "%s" and click Messages button.' ), $htsrv_url_sensitive.'login.php' );
+		}
+		else
+		{
+			$subject = T_( 'New message has been created.' ); ;
+
+			$body .= sprintf( T_( 'has created new message in "%s" conversation. ' ), $this->Thread->title );
+			$body .= sprintf( T_( 'To access it, log in at "%s". Click Messages button and then open above mentioned conversation.' ), $htsrv_url_sensitive.'login.php' );
+		}
+
+		$body .= "\n\n";
+		$body .= T_( 'Best regards' );
+		$body .= ',';
+		$body .= "\n";
+		$body .= T_( 'b2evolution team' );
+		$body .= "\n\n\n";
+		$body .= T_( 'Please do not reply to this email.' );
+
+		// Send email notifications
+
+		foreach( $notifications as $notification )
+		{
+			send_mail( $notification['email'], $notification['login'], $subject, $body );
+		}
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/16 12:30:03  efy-maxim
+ * Send notification on new thread or new message event
+ *
  * Revision 1.9  2009/09/16 09:15:32  efy-maxim
  * Messaging module improvements
  *
