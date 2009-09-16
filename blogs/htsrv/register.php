@@ -43,9 +43,10 @@ require_once $inc_path.'_main.inc.php';
 $login_required = false;
 
 
-param( 'action', 'string', '' );
-param( 'login', 'string', '' );
-param( 'email', 'string', '' );
+param( 'action',  'string', '' );
+param( 'login',   'string', '' );
+param( 'email',   'string', '' );
+param( 'country', 'integer', '' );
 param( 'redirect_to', 'string', '' ); // do not default to $admin_url; "empty" gets handled better in the end (uses $blogurl, if no admin perms).
 
 
@@ -65,11 +66,12 @@ switch( $action )
 
 		// Call plugin event to allow catching input in general and validating own things from DisplayRegisterFormFieldset event
 		$Plugins->trigger_event( 'RegisterFormSent', array(
-				'login' => & $login,
-				'email' => & $email,
-				'locale' => & $locale,
-				'pass1' => & $pass1,
-				'pass2' => & $pass2,
+				'login'   => & $login,
+				'email'   => & $email,
+				'country' => & $country,
+				'locale'  => & $locale,
+				'pass1'   => & $pass1,
+				'pass2'   => & $pass2,
 			) );
 
 		if( $Messages->count( 'error' ) )
@@ -79,10 +81,11 @@ switch( $action )
 
 		// Check profile params:
 		profile_check_params( array(
-			'login' => $login,
-			'pass1' => $pass1,
-			'pass2' => $pass2,
-			'email' => $email,
+			'login'   => $login,
+			'pass1'   => $pass1,
+			'pass2'   => $pass2,
+			'email'   => $email,
+			'country' => $country,
 			'pass_required' => true ) );
 
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
@@ -105,6 +108,7 @@ switch( $action )
 		$new_User->set( 'login', $login );
 		$new_User->set( 'pass', md5($pass1) ); // encrypted
 		$new_User->set( 'nickname', $login );
+		$new_User->set( 'ctry_ID', $country );
 		$new_User->set_email( $email );
 		$new_User->set( 'ip', $Hit->IP );
 		$new_User->set( 'domain', $Hit->get_remote_host( true ) );
@@ -212,6 +216,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.97  2009/09/16 06:55:13  efy-bogdan
+ * Require country checkbox added
+ *
  * Revision 1.96  2009/05/28 20:57:23  blueyed
  * Rolling back additional activation of locale in htsrv (register, login). http://forums.b2evolution.net/viewtopic.php?p=92006#92006
  *

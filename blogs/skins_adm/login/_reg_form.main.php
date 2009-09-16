@@ -30,6 +30,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'regional/model/_country.class.php', 'Country' );
 
 /**
  * Include page header:
@@ -65,6 +66,14 @@ $Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20
 	<?php
 	$Form->text_input( 'email', $email, 16, T_('Email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
 
+	$registration_require_country = (bool)$Settings->get('registration_require_country');
+	
+	if( $registration_require_country )
+	{
+		$CountryCache = & get_Cache( 'CountryCache' );
+		$Form->select_input_object( 'country', $country, $CountryCache, 'Country', $field_params = array('allow_none'=>true, 'required'=>true) );
+	}
+		
 	$Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Preferred language') );
 
 	$Plugins->trigger_event( 'DisplayRegisterFormFieldset', array( 'Form' => & $Form ) );
@@ -84,6 +93,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/16 06:55:13  efy-bogdan
+ * Require country checkbox added
+ *
  * Revision 1.7  2009/03/08 23:58:09  fplanque
  * 2009
  *
