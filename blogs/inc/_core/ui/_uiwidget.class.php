@@ -195,14 +195,14 @@ class Widget
 
 			case 'title':
 				// Results title:
-				return $this->title;
+				return $this->replace_vars( $this->title );
 
 			case 'no_results':
 				// No Results text:
 				return $this->no_results_text;
 
 			default:
-				return $matches[1];
+				return '[Unknown:'.$matches[1].']';
 		}
 	}
 
@@ -1003,6 +1003,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/16 01:33:55  fplanque
+ * no message
+ *
  * Revision 1.11  2009/04/14 01:17:28  fplanque
  * better handling of colselect
  *
