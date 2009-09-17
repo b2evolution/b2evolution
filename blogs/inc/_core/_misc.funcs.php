@@ -125,6 +125,7 @@ function & get_FileCache()
  */
 function & get_FileRootCache()
 {
+	global $Plugins, $FileRootCache;
 	load_class( 'files/model/_filerootcache.class.php', 'FileRootCache' );
 	$Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
 	return $FileRootCache;
@@ -137,6 +138,7 @@ function & get_FileRootCache()
  */
 function & get_FiletypeCache()
 {
+	global $Plugins, $FiletypeCache;
 	load_class( 'files/model/_filetypecache.class.php', 'FiletypeCache' );
 	$Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
 	return $FiletypeCache;
@@ -160,6 +162,7 @@ function & get_GoalCache()
  */
 function & get_GroupCache()
 {
+	global $Plugins, $GroupCache;
 	$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'\', T_(\'No group\') )' );
 	return $GroupCache;
 }
@@ -216,6 +219,7 @@ function & get_ItemTagsCache()
  */
 function & get_ItemStatusCache()
 {
+	global $Plugins, $ItemStatusCache;
 	$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_items__status\', \'pst_\', \'pst_ID\', NULL, \'\', T_(\'No status\') )' );
 	return $ItemStatusCache;
 }
@@ -227,6 +231,7 @@ function & get_ItemStatusCache()
  */
 function & get_ItemTypeCache()
 {
+	global $Plugins, $ItemTypeCache;
 	load_class( 'items/model/_itemtypecache.class.php', 'ItemTypeCache' );
 	$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', 'new ItemTypeCache( \'ptyp_\', \'ptyp_ID\' )' );
 	return $ItemTypeCache;
@@ -2493,7 +2498,7 @@ function mail_encode_header_string( $header_str, $mode = 'Q' )
 	{	// If the string actually needs some encoding
 		if( $mode == 'Q' )
 		{	// Quoted printable is best for reading with old/text terminal mail reading/debugging stuff:
-			$header_str = preg_replace( '?[^a-z0-9!*+\-/ ])¤ie', 'sprintf("=%02x", ord(StripSlashes("\\1")))', $header_str );
+			$header_str = preg_replace( '#[^a-z0-9!*+\-/ ])#ie', 'sprintf("=%02x", ord(StripSlashes("\\1")))', $header_str );
 			$header_str = str_replace( ' ', '_', $header_str );
 
 			$header_str = '=?'.$evo_charset.'?Q?'.$header_str.'?=';
@@ -3820,6 +3825,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.146  2009/09/17 14:09:45  fplanque
+ * tssss
+ *
  * Revision 1.145  2009/09/17 03:59:48  efy-cantor
  * copy the get_*cache into each functions
  *
