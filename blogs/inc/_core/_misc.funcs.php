@@ -267,6 +267,8 @@ function & get_MessageCache()
  */
 function & get_Plugins_admin()
 {
+	global $Plugins_admin;
+
 	load_class( 'plugins/model/_plugins_admin.class.php', 'Plugins_admin' );
 	$Plugins_admin = new Plugins_admin(); // COPY (FUNC)
 	return $Plugins_admin;
@@ -3825,6 +3827,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.147  2009/09/17 14:23:32  fplanque
+ * fix
+ *
  * Revision 1.146  2009/09/17 14:09:45  fplanque
  * tssss
  *
