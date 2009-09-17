@@ -202,11 +202,10 @@ function wp_getpagestatuslist( $m )
 $wordpressUploadFile_doc = 'Uploads a file to the media library of the blog';
 $wordpressUploadFile_sig = array(array( $xmlrpcStruct, $xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrpcStruct ));
 /**
- * metaWeblog.newMediaObject  image upload
+ * wp.uploadFile
  *
  * image is supplied coded in the info struct as bits
  *
- * @see http://www.xmlrpc.com/metaWeblogApi#metaweblognewmediaobject
  *
  *
  * @param xmlrpcmsg XML-RPC Message
