@@ -20,14 +20,13 @@
  * The Evo Factory's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
- * 
+ *
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  *
  * @version $Id$
- */
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -81,6 +80,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/17 00:55:24  fplanque
+ * fix
+ *
  * Revision 1.4  2009/09/16 18:19:05  fplanque
  * Readded with -kkv option
  *
