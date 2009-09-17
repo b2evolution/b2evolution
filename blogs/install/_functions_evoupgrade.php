@@ -2515,7 +2515,7 @@ function upgrade_b2evo_tables()
 
 		task_begin( 'Add messaging permissions for groups... ' );
 		$DB->query( "ALTER TABLE T_groups
-										ADD COLUMN grp_perm_messaging enum('none','write','delete') NOT NULL default 'none' AFTER grp_perm_files" );
+										ADD COLUMN grp_perm_messaging enum('none','reply','write','delete') NOT NULL default 'none' AFTER grp_perm_files" );
 		task_end();
 
 		// Add default messaging permissions for the following groups:
@@ -2535,7 +2535,7 @@ function upgrade_b2evo_tables()
 
 		task_begin( 'Giving Bloggers Group write perms on messaging threads and messages... ' );
 		$DB->query( 'UPDATE T_groups
-		             SET grp_perm_messaging = "write"
+		             SET grp_perm_messaging = "reply"
 		             WHERE grp_ID = 3' );
 		task_end();
 
@@ -2697,6 +2697,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.320  2009/09/17 11:34:33  efy-maxim
+ * reply permission in create and upgrade functionality
+ *
  * Revision 1.319  2009/09/14 18:37:07  fplanque
  * doc/cleanup/minor
  *

@@ -128,7 +128,7 @@ function create_default_data()
 	$Group_Bloggers->set( 'perm_templates', 0 );
 	$Group_Bloggers->set( 'perm_users', 'none' );
 	$Group_Bloggers->set( 'perm_xhtml_css_tweaks', 1 );
-	$Group_Bloggers->set( 'perm_messaging', 'write' );
+	$Group_Bloggers->set( 'perm_messaging', 'reply' );
 	$Group_Bloggers->dbinsert();
 
 	$Group_Users = new Group(); // COPY !
@@ -1290,6 +1290,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.276  2009/09/17 11:34:31  efy-maxim
+ * reply permission in create and upgrade functionality
+ *
  * Revision 1.275  2009/09/14 18:37:07  fplanque
  * doc/cleanup/minor
  *
