@@ -2635,7 +2635,7 @@ function mail_encode_header_string( $header_str, $mode = 'Q' )
 	{	// If the string actually needs some encoding
 		if( $mode == 'Q' )
 		{	// Quoted printable is best for reading with old/text terminal mail reading/debugging stuff:
-			$header_str = preg_replace( '#[^a-z0-9!*+\-/ ])#ie', 'sprintf("=%02x", ord(StripSlashes("\\1")))', $header_str );
+			$header_str = preg_replace( '#[^a-z0-9!*+\-/ ]#ie', 'sprintf(\'=%02x\', ord(stripslashes(\'$0\')))', $header_str );
 			$header_str = str_replace( ' ', '_', $header_str );
 
 			$header_str = '=?'.$evo_charset.'?Q?'.$header_str.'?=';
@@ -3962,6 +3962,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.149  2009/09/17 16:18:04  tblue246
+ * Fixed PCRE error; minor
+ *
  * Revision 1.148  2009/09/17 14:42:13  fplanque
  * optimization
  *

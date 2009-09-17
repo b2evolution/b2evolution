@@ -338,17 +338,18 @@ class Message extends DataObject
 		{
 			$subject = sprintf( T_( 'New conversation created: "%s"' ), $this->Thread->title );
 
-			$body .= sprintf( T_( 'has created the "%s" conversation. ' ), $this->Thread->title );
+			$body .= sprintf( /* TRANS: Space at the end */ T_( 'has created the "%s" conversation. ' ), $this->Thread->title );
 			$body .= "\n";
-			$body .= sprintf( T_( 'To read, click on this link: %s' ), $admin_url.'?ctrl=messages&thrd_ID='.$this->Thread->ID );
+			$body .= sprintf( T_( 'To read it, click on this link: %s' ), $admin_url.'?ctrl=messages&thrd_ID='.$this->Thread->ID );
 		}
 		else
 		{
 			$subject = sprintf( T_( 'New message in conversation "%s" created' ), $this->Thread->title );
 
-			$body .= sprintf( T_( 'has created a new message in the "%s" conversation. ' ), $this->Thread->title );
+			$body .= sprintf( /* TRANS: Space at the end */ T_( 'has created a new message in the "%s" conversation. ' ), $this->Thread->title );
 			$body .= "\n";
-			$body .= sprintf( T_( 'To read, click on this link: %s' ), $admin_url.'?ctrl=messages&thrd_ID='.$this->Thread->ID );
+			$body .= sprintf( T_( 'To read it, click on this link: %s' ),
+								$admin_url.'?ctrl=messages&thrd_ID='.$this->Thread->ID );
 		}
 
 		$body .= "\n\n";
@@ -378,6 +379,9 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/17 16:18:06  tblue246
+ * Fixed PCRE error; minor
+ *
  * Revision 1.14  2009/09/17 11:16:52  efy-maxim
  * debug info removed
  *
