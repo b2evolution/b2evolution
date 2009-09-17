@@ -367,9 +367,6 @@ class Message extends DataObject
 			$User = & $UserCache->get_by_login( $row->user_login );
 			if( $User && $User->notify )
 			{
-				echo '<br>##########################<br>';
-				echo $body;
-
 				$ret = send_mail( $row->user_email, $row->user_login, $subject, $body );
 			}
 			//unset( $User );
@@ -381,6 +378,9 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/17 11:16:52  efy-maxim
+ * debug info removed
+ *
  * Revision 1.13  2009/09/17 11:13:45  efy-maxim
  * direct link to the thread
  *
