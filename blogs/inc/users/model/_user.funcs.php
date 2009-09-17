@@ -485,6 +485,7 @@ function user_preferredname( $user_ID )
  *     - 'nickname': check for non-empty
  *     - 'icq': must be a number
  *     - 'email': mandatory, must be well formed
+ *     - 'country': check for non-empty
  *     - 'url': must be well formed, in allowed scheme, not blacklisted
  *     - 'pass1' / 'pass2': passwords (twice), must be the same and not == login (if given)
  *     - 'pass_required': false/true (default is true)
@@ -536,6 +537,12 @@ function profile_check_params( $params, $User = NULL )
 			param_error( $params['email'][1], T_('The email address is invalid.') );
 		}
 	}
+	
+	// Checking country
+	if( isset($params['country']) && empty($params['country'][0]) )
+	{
+		param_error( 'country', T_('Please select country.') );
+	}
 
 	// Checking URL:
 	if( isset($params['url']) )
@@ -584,6 +591,9 @@ function profile_check_params( $params, $User = NULL )
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/17 07:32:56  efy-bogdan
+ * Require country
+ *
  * Revision 1.11  2009/09/14 13:46:11  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
