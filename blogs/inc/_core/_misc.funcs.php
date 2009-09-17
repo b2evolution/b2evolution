@@ -79,8 +79,14 @@ function modules_call_method( $method_name )
  */
 function & get_ChapterCache()
 {
-	load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
-	$ChapterCache = new ChapterCache(); // COPY (FUNC)
+	global $ChapterCache;
+
+	if( ! isset( $ChapterCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
+		$ChapterCache = new ChapterCache(); // COPY (FUNC)
+	}
+
 	return $ChapterCache;
 }
 
@@ -91,8 +97,14 @@ function & get_ChapterCache()
  */
 function & get_CountryCache()
 {
-	$CountryCache = new DataObjectCache( 'Country', true, 'T_country', 'ctry_', 'ctry_ID', 'ctry_code', 'ctry_name', 'Unknown');
-  return $CountryCache;
+	global $CountryCache;
+
+	if( ! isset( $CountryCache ) )
+	{	// Cache doesn't exist yet:
+		$CountryCache = new DataObjectCache( 'Country', true, 'T_country', 'ctry_', 'ctry_ID', 'ctry_code', 'ctry_name', 'Unknown');
+	}
+
+	return $CountryCache;
 }
 
 /**
@@ -102,7 +114,13 @@ function & get_CountryCache()
  */
 function & get_CurrencyCache()
 {
-	$CurrencyCache = new DataObjectCache( 'Currency', true, 'T_currency', 'curr_', 'curr_ID', 'curr_code', 'curr_code');
+	global $CurrencyCache;
+
+	if( ! isset( $CurrencyCache ) )
+	{	// Cache doesn't exist yet:
+		$CurrencyCache = new DataObjectCache( 'Currency', true, 'T_currency', 'curr_', 'curr_ID', 'curr_code', 'curr_code');
+	}
+
 	return $CurrencyCache;
 }
 
@@ -113,8 +131,14 @@ function & get_CurrencyCache()
  */
 function & get_FileCache()
 {
-	load_class( 'files/model/_filecache.class.php', 'FileCache' );
-	$FileCache = new FileCache(); // COPY (FUNC)
+	global $FileCache;
+
+	if( ! isset( $FileCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'files/model/_filecache.class.php', 'FileCache' );
+		$FileCache = new FileCache(); // COPY (FUNC)
+	}
+
 	return $FileCache;
 }
 
@@ -126,8 +150,13 @@ function & get_FileCache()
 function & get_FileRootCache()
 {
 	global $Plugins, $FileRootCache;
-	load_class( 'files/model/_filerootcache.class.php', 'FileRootCache' );
-	$Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
+
+	if( ! isset( $FileRootCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'files/model/_filerootcache.class.php', 'FileRootCache' );
+		$Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
+	}
+
 	return $FileRootCache;
 }
 
@@ -138,9 +167,15 @@ function & get_FileRootCache()
  */
 function & get_FiletypeCache()
 {
-	global $Plugins, $FiletypeCache;
-	load_class( 'files/model/_filetypecache.class.php', 'FiletypeCache' );
-	$Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
+	global $Plugins;
+	global $FiletypeCache;
+
+	if( ! isset( $FiletypeCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'files/model/_filetypecache.class.php', 'FiletypeCache' );
+		$Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
+	}
+
 	return $FiletypeCache;
 }
 
@@ -151,7 +186,13 @@ function & get_FiletypeCache()
  */
 function & get_GoalCache()
 {
-	$GoalCache = new DataObjectCache( 'Goal', false, 'T_track__goal', 'goal_', 'goal_ID', 'goal_name', 'goal_name' ); // COPY (FUNC)
+	global $GoalCache;
+
+	if( ! isset( $GoalCache ) )
+	{	// Cache doesn't exist yet:
+		$GoalCache = new DataObjectCache( 'Goal', false, 'T_track__goal', 'goal_', 'goal_ID', 'goal_name', 'goal_name' ); // COPY (FUNC)
+	}
+
 	return $GoalCache;
 }
 
@@ -162,8 +203,14 @@ function & get_GoalCache()
  */
 function & get_GroupCache()
 {
-	global $Plugins, $GroupCache;
-	$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'\', T_(\'No group\') )' );
+	global $Plugins;
+	global $GroupCache;
+
+	if( ! isset( $GroupCache ) )
+	{	// Cache doesn't exist yet:
+		$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'\', T_(\'No group\') )' );
+	}
+
 	return $GroupCache;
 }
 
@@ -174,7 +221,13 @@ function & get_GroupCache()
  */
 function & get_ItemCacheLight()
 {
-	$ItemCacheLight = new DataObjectCache( 'ItemLight', false, 'T_items__item', 'post_', 'post_ID' ); // COPY (FUNC)
+	global $ItemCacheLight;
+
+	if( ! isset( $ItemCacheLight ) )
+	{	// Cache doesn't exist yet:
+		$ItemCacheLight = new DataObjectCache( 'ItemLight', false, 'T_items__item', 'post_', 'post_ID' ); // COPY (FUNC)
+	}
+
 	return $ItemCacheLight;
 }
 
@@ -185,8 +238,14 @@ function & get_ItemCacheLight()
  */
 function & get_ItemCache()
 {
-	load_class( 'items/model/_itemcache.class.php', 'ItemCache' );
-	$ItemCache = new ItemCache(); // COPY (FUNC)
+	global $ItemCache;
+
+	if( ! isset( $ItemCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'items/model/_itemcache.class.php', 'ItemCache' );
+		$ItemCache = new ItemCache(); // COPY (FUNC)
+	}
+
 	return $ItemCache;
 }
 
@@ -197,7 +256,13 @@ function & get_ItemCache()
  */
 function & get_ItemPrerenderingCache()
 {
-	$ItemPrerenderingCache = array();
+	global $ItemPrerenderingCache;
+
+	if( ! isset( $ItemPrerenderingCache ) )
+	{	// Cache doesn't exist yet:
+		$ItemPrerenderingCache = array();
+	}
+
 	return $ItemPrerenderingCache;
 }
 
@@ -208,7 +273,13 @@ function & get_ItemPrerenderingCache()
  */
 function & get_ItemTagsCache()
 {
-	$ItemTagsCache = array();
+	global $ItemTagsCache;
+
+	if( ! isset( $ItemTagsCache ) )
+	{	// Cache doesn't exist yet:
+		$ItemTagsCache = array();
+	}
+
 	return $ItemTagsCache;
 }
 
@@ -219,8 +290,14 @@ function & get_ItemTagsCache()
  */
 function & get_ItemStatusCache()
 {
-	global $Plugins, $ItemStatusCache;
-	$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_items__status\', \'pst_\', \'pst_ID\', NULL, \'\', T_(\'No status\') )' );
+	global $Plugins;
+	global $ItemStatusCache;
+
+	if( ! isset( $ItemStatusCache ) )
+	{	// Cache doesn't exist yet:
+		$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_items__status\', \'pst_\', \'pst_ID\', NULL, \'\', T_(\'No status\') )' );
+	}
+
 	return $ItemStatusCache;
 }
 
@@ -231,9 +308,15 @@ function & get_ItemStatusCache()
  */
 function & get_ItemTypeCache()
 {
-	global $Plugins, $ItemTypeCache;
-	load_class( 'items/model/_itemtypecache.class.php', 'ItemTypeCache' );
-	$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', 'new ItemTypeCache( \'ptyp_\', \'ptyp_ID\' )' );
+	global $Plugins;
+	global $ItemTypeCache;
+
+	if( ! isset( $ItemTypeCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'items/model/_itemtypecache.class.php', 'ItemTypeCache' );
+		$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', 'new ItemTypeCache( \'ptyp_\', \'ptyp_ID\' )' );
+	}
+
 	return $ItemTypeCache;
 }
 
@@ -244,8 +327,14 @@ function & get_ItemTypeCache()
  */
 function & get_LinkCache()
 {
-	load_class( 'items/model/_linkcache.class.php', 'LinkCache' );
-	$LinkCache = new LinkCache(); // COPY (FUNC)
+	global $LinkCache;
+
+	if( ! isset( $LinkCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'items/model/_linkcache.class.php', 'LinkCache' );
+		$LinkCache = new LinkCache(); // COPY (FUNC)
+	}
+
 	return $LinkCache;
 }
 
@@ -256,7 +345,13 @@ function & get_LinkCache()
  */
 function & get_MessageCache()
 {
-	$MessageCache = new DataObjectCache( 'Message', false, 'T_messaging__message', 'msg_', 'msg_ID' );
+	global $MessageCache;
+
+	if( ! isset( $MessageCache ) )
+	{	// Cache doesn't exist yet:
+		$MessageCache = new DataObjectCache( 'Message', false, 'T_messaging__message', 'msg_', 'msg_ID' );
+	}
+
 	return $MessageCache;
 }
 
@@ -269,8 +364,12 @@ function & get_Plugins_admin()
 {
 	global $Plugins_admin;
 
-	load_class( 'plugins/model/_plugins_admin.class.php', 'Plugins_admin' );
-	$Plugins_admin = new Plugins_admin(); // COPY (FUNC)
+	if( ! isset( $Plugins_admin ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'plugins/model/_plugins_admin.class.php', 'Plugins_admin' );
+		$Plugins_admin = new Plugins_admin(); // COPY (FUNC)
+	}
+
 	return $Plugins_admin;
 }
 
@@ -281,8 +380,14 @@ function & get_Plugins_admin()
  */
 function & get_SkinCache()
 {
-	load_class( 'skins/model/_skincache.class.php', 'SkinCache' );
-	$SkinCache = new SkinCache(); // COPY (FUNC)
+	global $SkinCache;
+
+	if( ! isset( $SkinCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'skins/model/_skincache.class.php', 'SkinCache' );
+		$SkinCache = new SkinCache(); // COPY (FUNC)
+	}
+
 	return $SkinCache;
 }
 
@@ -293,7 +398,13 @@ function & get_SkinCache()
  */
 function & get_ThreadCache()
 {
-	$ThreadCache = new DataObjectCache( 'Thread', false, 'T_messaging__thread', 'thrd_', 'thrd_ID', 'thrd_title' );
+	global $ThreadCache;
+
+	if( ! isset( $ThreadCache ) )
+	{	// Cache doesn't exist yet:
+		$ThreadCache = new DataObjectCache( 'Thread', false, 'T_messaging__thread', 'thrd_', 'thrd_ID', 'thrd_title' );
+	}
+
 	return $ThreadCache;
 }
 
@@ -304,8 +415,14 @@ function & get_ThreadCache()
  */
 function & get_UserCache()
 {
-	load_class( 'users/model/_usercache.class.php', 'UserCache' );
-	$UserCache = new UserCache(); // COPY (FUNC)
+	global $UserCache;
+
+	if( ! isset( $UserCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'users/model/_usercache.class.php', 'UserCache' );
+		$UserCache = new UserCache(); // COPY (FUNC)
+	}
+
 	return $UserCache;
 }
 
@@ -316,8 +433,14 @@ function & get_UserCache()
  */
 function & get_WidgetCache()
 {
-	load_class( 'widgets/model/_widgetcache.class.php', 'WidgetCache' );
-	$WidgetCache = new WidgetCache(); // COPY (FUNC)
+	global $WidgetCache;
+
+	if( ! isset( $WidgetCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'widgets/model/_widgetcache.class.php', 'WidgetCache' );
+		$WidgetCache = new WidgetCache(); // COPY (FUNC)
+	}
+
 	return $WidgetCache;
 }
 
@@ -328,13 +451,19 @@ function & get_WidgetCache()
  */
 function & get_EnabledWidgetCache()
 {
-	// This simply instantiates a WidgetCache object, setting the
-	// $enabled_only parameter to true. Using a member variable
-	// instead of per-method parameters to load only the enabled
-	// widgets should be cleaner when there will be more methods
-	// in the WidgetCache class in the future.
-	load_class( 'widgets/model/_widgetcache.class.php', 'WidgetCache' );
-	$EnabledWidgetCache = new WidgetCache( true );
+	global $EnabledWidgetCache;
+
+	if( ! isset( $EnabledWidgetCache ) )
+	{	// Cache doesn't exist yet:
+		// This simply instantiates a WidgetCache object, setting the
+		// $enabled_only parameter to true. Using a member variable
+		// instead of per-method parameters to load only the enabled
+		// widgets should be cleaner when there will be more methods
+		// in the WidgetCache class in the future.
+		load_class( 'widgets/model/_widgetcache.class.php', 'WidgetCache' );
+		$EnabledWidgetCache = new WidgetCache( true );
+	}
+
 	return $EnabledWidgetCache;
 }
 
@@ -345,7 +474,13 @@ function & get_EnabledWidgetCache()
  */
 function & get_UserFieldCache()
 {
-	$UserFieldCache = new DataObjectCache( 'Userfield', false, 'T_users__fielddefs', 'ufdf_', 'ufdf_ID', 'ufdf_name', 'ufdf_name' ); // COPY (FUNC)
+	global $UserFieldCache;
+
+	if( ! isset( $UserFieldCache ) )
+	{	// Cache doesn't exist yet:
+		$UserFieldCache = new DataObjectCache( 'Userfield', false, 'T_users__fielddefs', 'ufdf_', 'ufdf_ID', 'ufdf_name', 'ufdf_name' ); // COPY (FUNC)
+	}
+
 	return $UserFieldCache;
 }
 
@@ -3827,6 +3962,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.148  2009/09/17 14:42:13  fplanque
+ * optimization
+ *
  * Revision 1.147  2009/09/17 14:23:32  fplanque
  * fix
  *
