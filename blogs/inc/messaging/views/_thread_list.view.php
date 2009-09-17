@@ -27,6 +27,52 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $dispatcher;
 global $current_User;
 global $unread_messages_count;
+global $read_unread_recipients;
+
+// Select read/unread users for each thread
+
+$recipients_SQL = & new SQL();
+
+$recipients_SQL->SELECT( 'ts.tsta_thread_ID AS thr_ID,
+							GROUP_CONCAT(DISTINCT ur.user_login ORDER BY ur.user_login SEPARATOR \', \') AS thr_read,
+    						GROUP_CONCAT(DISTINCT uu.user_login ORDER BY uu.user_login SEPARATOR \', \') AS thr_unread' );
+
+$recipients_SQL->FROM( 'T_messaging__threadstatus ts
+							LEFT OUTER JOIN T_messaging__threadstatus tsr
+								ON ts.tsta_thread_ID = tsr.tsta_thread_ID AND tsr.tsta_first_unread_msg_ID IS NULL
+							LEFT OUTER JOIN T_users ur
+								ON tsr.tsta_user_ID = ur.user_ID
+							LEFT OUTER JOIN T_messaging__threadstatus tsu
+								ON ts.tsta_thread_ID = tsu.tsta_thread_ID AND tsu.tsta_first_unread_msg_ID IS NOT NULL
+							LEFT OUTER JOIN T_users uu
+								ON tsu.tsta_user_ID = uu.user_ID' );
+
+$recipients_SQL->WHERE( 'ts.tsta_user_ID ='.$current_User->ID );
+
+$recipients_SQL->GROUP_BY( 'ts.tsta_thread_ID' );
+
+foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
+{
+	$read_by = '';
+
+	if( !empty( $row->thr_read ) )
+	{
+		$read_by .= '<span style="color:green">';
+		$read_by .= $row->thr_read;
+		if( !empty( $row->thr_unread ) )
+		{
+			$read_by .= ', ';
+		}
+		$read_by .= '</span>';
+	}
+
+	if( !empty( $row->thr_unread ) )
+	{
+		$read_by .= '<span style="color:red">'.$row->thr_unread.'</span>';
+	}
+
+	$read_unread_recipients[$row->thr_ID] = $read_by;
+}
 
 // Create SELECT query
 
@@ -91,6 +137,21 @@ $Results->cols[] = array(
 					'td_class' => 'shrinkwrap',
 					'td' => '¤conditional( #thrd_msg_ID#>0, \'%mysql2localedatetime(#thrd_unread_since#)%\', \'&nbsp;\')¤' );
 
+function get_read_by( $thread_ID )
+{
+	global $read_unread_recipients;
+
+	return $read_unread_recipients[$thread_ID];
+}
+
+$Results->cols[] = array(
+					'th' => T_('Read by'),
+					'th_class' => 'shrinkwrap',
+					'td_class' => 'top',
+					'td' => '%get_read_by( #thrd_ID# )%',
+					);
+
+
 if( $current_User->check_perm( 'messaging', 'delete' ) )
 {	// We have permission to modify:
 	$Results->cols[] = array(
@@ -108,6 +169,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/17 10:54:21  efy-maxim
+ * Read/Unread (green/red) users columns in thread list
+ *
  * Revision 1.12  2009/09/16 15:14:48  efy-maxim
  * badge for unread message number
  *
