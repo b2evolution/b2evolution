@@ -313,14 +313,12 @@ class Message extends DataObject
 	/**
 	 * Send email notification to recipients on new thread or new message event.
 	 *
-	 * @todo Tblue> Show direct links to the new conversation/message.
-	 * 
 	 * @param boolean true if new thread, false if new message in the current thread
 	 * @return boolean True if all messages could be sent, false if at least one error occurred.
 	 */
 	function send_email_notifications( $new_thread = true )
 	{
-		global $DB, $current_User, $htsrv_url_sensitive;
+		global $DB, $current_User, $admin_url;
 
 		// Select recipients of the current thread:
 		$SQL = & new SQL();
@@ -340,15 +338,17 @@ class Message extends DataObject
 		{
 			$subject = sprintf( T_( 'New conversation created: "%s"' ), $this->Thread->title );
 
-			$body .= sprintf( /* TRANS: Space at the end! */ T_( 'has created the "%s" conversation. ' ), $this->Thread->title );
-			$body .= sprintf( T_( 'To access it, log in at "%s" and click the Messages button.' ), $htsrv_url_sensitive.'login.php' );
+			$body .= sprintf( T_( 'has created the "%s" conversation. ' ), $this->Thread->title );
+			$body .= "\n";
+			$body .= sprintf( T_( 'To read, click on this link: %s' ), $admin_url.'?ctrl=messages&thrd_ID='.$this->Thread->ID );
 		}
 		else
 		{
 			$subject = sprintf( T_( 'New message in conversation "%s" created' ), $this->Thread->title );
 
-			$body .= sprintf( /* TRANS: Space at the end! */ T_( 'has created a new message in the "%s" conversation. ' ), $this->Thread->title );
-			$body .= sprintf( T_( 'To access it, log in at "%s". Click the Messages button and then open the conversation mentioned above.' ), $htsrv_url_sensitive.'login.php' );
+			$body .= sprintf( T_( 'has created a new message in the "%s" conversation. ' ), $this->Thread->title );
+			$body .= "\n";
+			$body .= sprintf( T_( 'To read, click on this link: %s' ), $admin_url.'?ctrl=messages&thrd_ID='.$this->Thread->ID );
 		}
 
 		$body .= "\n\n";
@@ -367,6 +367,9 @@ class Message extends DataObject
 			$User = & $UserCache->get_by_login( $row->user_login );
 			if( $User && $User->notify )
 			{
+				echo '<br>##########################<br>';
+				echo $body;
+
 				$ret = send_mail( $row->user_email, $row->user_login, $subject, $body );
 			}
 			//unset( $User );
@@ -378,6 +381,9 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/17 11:13:45  efy-maxim
+ * direct link to the thread
+ *
  * Revision 1.12  2009/09/16 22:03:40  fplanque
  * doc
  *
