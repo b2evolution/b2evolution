@@ -73,6 +73,277 @@ function modules_call_method( $method_name )
 }
 
 /**
+ * Get the ChapterCache
+ *
+ * @return ChapterCache
+ */
+function & get_ChapterCache()
+{
+	load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
+	$ChapterCache = new ChapterCache(); // COPY (FUNC)
+	return $ChapterCache;
+}
+
+/**
+ * Get the CountryCache
+ *
+ * @return CountryCache
+ */
+function & get_CountryCache()
+{
+	$CountryCache = new DataObjectCache( 'Country', true, 'T_country', 'ctry_', 'ctry_ID', 'ctry_code', 'ctry_name', 'Unknown');
+  return $CountryCache;
+}
+
+/**
+ * Get the CurrencyCache
+ *
+ * @return CurrencyCache
+ */
+function & get_CurrencyCache()
+{
+	$CurrencyCache = new DataObjectCache( 'Currency', true, 'T_currency', 'curr_', 'curr_ID', 'curr_code', 'curr_code');
+	return $CurrencyCache;
+}
+
+/**
+ * Get the FileCache
+ *
+ * @return FileCache
+ */
+function & get_FileCache()
+{
+	load_class( 'files/model/_filecache.class.php', 'FileCache' );
+	$FileCache = new FileCache(); // COPY (FUNC)
+	return $FileCache;
+}
+
+/**
+ * Get the FileRootCache
+ *
+ * @return FileRootCache
+ */
+function & get_FileRootCache()
+{
+	load_class( 'files/model/_filerootcache.class.php', 'FileRootCache' );
+	$Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
+	return $FileRootCache;
+}
+
+/**
+ * Get the FiletypeCache
+ *
+ * @return FiletypeCache
+ */
+function & get_FiletypeCache()
+{
+	load_class( 'files/model/_filetypecache.class.php', 'FiletypeCache' );
+	$Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
+	return $FiletypeCache;
+}
+
+/**
+ * Get the GoalCache
+ *
+ * @return GoalCache
+ */
+function & get_GoalCache()
+{
+	$GoalCache = new DataObjectCache( 'Goal', false, 'T_track__goal', 'goal_', 'goal_ID', 'goal_name', 'goal_name' ); // COPY (FUNC)
+	return $GoalCache;
+}
+
+/**
+ * Get the GroupCache
+ *
+ * @return GroupCache
+ */
+function & get_GroupCache()
+{
+	$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'\', T_(\'No group\') )' );
+	return $GroupCache;
+}
+
+/**
+ * Get the ItemCacheLight
+ *
+ * @return ItemCacheLight
+ */
+function & get_ItemCacheLight()
+{
+	$ItemCacheLight = new DataObjectCache( 'ItemLight', false, 'T_items__item', 'post_', 'post_ID' ); // COPY (FUNC)
+	return $ItemCacheLight;
+}
+
+/**
+ * Get the ItemCache
+ *
+ * @return ItemCache
+ */
+function & get_ItemCache()
+{
+	load_class( 'items/model/_itemcache.class.php', 'ItemCache' );
+	$ItemCache = new ItemCache(); // COPY (FUNC)
+	return $ItemCache;
+}
+
+/**
+ * Get the ItemPrerenderingCache
+ *
+ * @return ItemPrerenderingCache
+ */
+function & get_ItemPrerenderingCache()
+{
+	$ItemPrerenderingCache = array();
+	return $ItemPrerenderingCache;
+}
+
+/**
+ * Get the ItemTagsCache
+ *
+ * @return ItemTagsCache
+ */
+function & get_ItemTagsCache()
+{
+	$ItemTagsCache = array();
+	return $ItemTagsCache;
+}
+
+/**
+ * Get the ItemStatusCache
+ *
+ * @return ItemStatusCache
+ */
+function & get_ItemStatusCache()
+{
+	$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_items__status\', \'pst_\', \'pst_ID\', NULL, \'\', T_(\'No status\') )' );
+	return $ItemStatusCache;
+}
+
+/**
+ * Get the ItemTypeCache
+ *
+ * @return ItemTypeCache
+ */
+function & get_ItemTypeCache()
+{
+	load_class( 'items/model/_itemtypecache.class.php', 'ItemTypeCache' );
+	$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', 'new ItemTypeCache( \'ptyp_\', \'ptyp_ID\' )' );
+	return $ItemTypeCache;
+}
+
+/**
+ * Get the LinkCache
+ *
+ * @return LinkCache
+ */
+function & get_LinkCache()
+{
+	load_class( 'items/model/_linkcache.class.php', 'LinkCache' );
+	$LinkCache = new LinkCache(); // COPY (FUNC)
+	return $LinkCache;
+}
+
+/**
+ * Get the MessageCache
+ *
+ * @return MessageCache
+ */
+function & get_MessageCache()
+{
+	$MessageCache = new DataObjectCache( 'Message', false, 'T_messaging__message', 'msg_', 'msg_ID' );
+	return $MessageCache;
+}
+
+/**
+ * Get the Plugins_admin
+ *
+ * @return Plugins_admin
+ */
+function & get_Plugins_admin()
+{
+	load_class( 'plugins/model/_plugins_admin.class.php', 'Plugins_admin' );
+	$Plugins_admin = new Plugins_admin(); // COPY (FUNC)
+	return $Plugins_admin;
+}
+
+/**
+ * Get the SkinCache
+ *
+ * @return SkinCache
+ */
+function & get_SkinCache()
+{
+	load_class( 'skins/model/_skincache.class.php', 'SkinCache' );
+	$SkinCache = new SkinCache(); // COPY (FUNC)
+	return $SkinCache;
+}
+
+/**
+ * Get the ThreadCache
+ *
+ * @return ThreadCache
+ */
+function & get_ThreadCache()
+{
+	$ThreadCache = new DataObjectCache( 'Thread', false, 'T_messaging__thread', 'thrd_', 'thrd_ID', 'thrd_title' );
+	return $ThreadCache;
+}
+
+/**
+ * Get the UserCache
+ *
+ * @return UserCache
+ */
+function & get_UserCache()
+{
+	load_class( 'users/model/_usercache.class.php', 'UserCache' );
+	$UserCache = new UserCache(); // COPY (FUNC)
+	return $UserCache;
+}
+
+/**
+ * Get the WidgetCache
+ *
+ * @return WidgetCache
+ */
+function & get_WidgetCache()
+{
+	load_class( 'widgets/model/_widgetcache.class.php', 'WidgetCache' );
+	$WidgetCache = new WidgetCache(); // COPY (FUNC)
+	return $WidgetCache;
+}
+
+/**
+ * Get the EnabledWidgetCache
+ *
+ * @return EnabledWidgetCache
+ */
+function & get_EnabledWidgetCache()
+{
+	// This simply instantiates a WidgetCache object, setting the
+	// $enabled_only parameter to true. Using a member variable
+	// instead of per-method parameters to load only the enabled
+	// widgets should be cleaner when there will be more methods
+	// in the WidgetCache class in the future.
+	load_class( 'widgets/model/_widgetcache.class.php', 'WidgetCache' );
+	$EnabledWidgetCache = new WidgetCache( true );
+	return $EnabledWidgetCache;
+}
+
+/**
+ * Get the UserFieldCache
+ *
+ * @return UserFieldCache
+ */
+function & get_UserFieldCache()
+{
+	$UserFieldCache = new DataObjectCache( 'Userfield', false, 'T_users__fielddefs', 'ufdf_', 'ufdf_ID', 'ufdf_name', 'ufdf_name' ); // COPY (FUNC)
+	return $UserFieldCache;
+}
+
+
+/**
  * @todo fp> split into 1 function per case. (typed @return values) @see get_BlogCache()
  *
  * @return DataObjectCache
@@ -93,114 +364,73 @@ function & get_Cache( $objectName )
 			return get_BlogCache();
 
 		case 'ChapterCache':
-			load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
-			$ChapterCache = new ChapterCache(); // COPY (FUNC)
-			return $ChapterCache;
+			return get_ChapterCache();
 
 		case 'CountryCache':
-			$CountryCache = new DataObjectCache( 'Country', true, 'T_country', 'ctry_', 'ctry_ID', 'ctry_code', 'ctry_name', 'Unknown');
-			return $CountryCache;
+			return get_CountryCache();
 
 		case 'CurrencyCache':
-			$CurrencyCache = new DataObjectCache( 'Currency', true, 'T_currency', 'curr_', 'curr_ID', 'curr_code', 'curr_code');
-			return $CurrencyCache;
+			return get_CurrencyCache();
 
 		case 'FileCache':
-			load_class( 'files/model/_filecache.class.php', 'FileCache' );
-			$FileCache = new FileCache(); // COPY (FUNC)
-			return $FileCache;
+			return get_FileCache();
 
 		case 'FileRootCache':
-			load_class( 'files/model/_filerootcache.class.php', 'FileRootCache' );
-			$Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
-			return $FileRootCache;
+			return get_FileRootCache();
 
 		case 'FiletypeCache':
-			load_class( 'files/model/_filetypecache.class.php', 'FiletypeCache' );
-			$Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
-			return $FiletypeCache;
+			return get_FiletypeCache();
 
 		case 'GoalCache':
-			$GoalCache = new DataObjectCache( 'Goal', false, 'T_track__goal', 'goal_', 'goal_ID', 'goal_name', 'goal_name' ); // COPY (FUNC)
-			return $GoalCache;
+			return get_GoalCache();
 
 		case 'GroupCache':
-			$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'\', T_(\'No group\') )' );
-			return $GroupCache;
+			return get_GroupCache();
 
 		case 'ItemCacheLight':
-			$ItemCacheLight = new DataObjectCache( 'ItemLight', false, 'T_items__item', 'post_', 'post_ID' ); // COPY (FUNC)
-			return $ItemCacheLight;
+			return get_ItemCacheLight();
 
 		case 'ItemCache':
-			load_class( 'items/model/_itemcache.class.php', 'ItemCache' );
-			$ItemCache = new ItemCache(); // COPY (FUNC)
-			return $ItemCache;
+			return get_ItemCache();
 
 		case 'ItemPrerenderingCache':
-			$ItemPrerenderingCache = array();
-			return $ItemPrerenderingCache;
+			return get_ItemPrerenderingCache();
 
 		case 'ItemTagsCache':
-			$ItemTagsCache = array();
-			return $ItemTagsCache;
+			return get_ItemTagsCache();
 
 		case 'ItemStatusCache':
-			$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_items__status\', \'pst_\', \'pst_ID\', NULL, \'\', T_(\'No status\') )' );
-			return $ItemStatusCache;
+			return get_ItemStatusCache();
 
 		case 'ItemTypeCache':
-			load_class( 'items/model/_itemtypecache.class.php', 'ItemTypeCache' );
-			$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', 'new ItemTypeCache( \'ptyp_\', \'ptyp_ID\' )' );
-			return $ItemTypeCache;
+			return get_ItemTypeCache();
 
 		case 'LinkCache':
-			load_class( 'items/model/_linkcache.class.php', 'LinkCache' );
-			$LinkCache = new LinkCache(); // COPY (FUNC)
-			return $LinkCache;
+			return get_LinkCache();
 
 		case 'MessageCache':
-			$MessageCache = new DataObjectCache( 'Message', false, 'T_messaging__message', 'msg_', 'msg_ID' );
-			return $MessageCache;
+			return get_MessageCache();
 
 		case 'Plugins_admin':
-			load_class( 'plugins/model/_plugins_admin.class.php', 'Plugins_admin' );
-			$Plugins_admin = new Plugins_admin(); // COPY (FUNC)
-			return $Plugins_admin;
+			return get_Plugins_admin();
 
 		case 'SkinCache':
-			load_class( 'skins/model/_skincache.class.php', 'SkinCache' );
-			$SkinCache = new SkinCache(); // COPY (FUNC)
-			return $SkinCache;
+			return get_SkinCache();
 
 		case 'ThreadCache':
-			$ThreadCache = new DataObjectCache( 'Thread', false, 'T_messaging__thread', 'thrd_', 'thrd_ID', 'thrd_title' );
-			return $ThreadCache;
+			return get_ThreadCache();
 
 		case 'UserCache':
-			load_class( 'users/model/_usercache.class.php', 'UserCache' );
-			$UserCache = new UserCache(); // COPY (FUNC)
-			return $UserCache;
+			return get_UserCache();
 
 		case 'WidgetCache':
-			load_class( 'widgets/model/_widgetcache.class.php', 'WidgetCache' );
-
-			$WidgetCache = new WidgetCache(); // COPY (FUNC)
-			return $WidgetCache;
+			return get_WidgetCache();
 
 		case 'EnabledWidgetCache':
-			// This simply instantiates a WidgetCache object, setting the
-			// $enabled_only parameter to true. Using a member variable
-			// instead of per-method parameters to load only the enabled
-			// widgets should be cleaner when there will be more methods
-			// in the WidgetCache class in the future.
-			load_class( 'widgets/model/_widgetcache.class.php', 'WidgetCache' );
-			$EnabledWidgetCache = new WidgetCache( true );
-			return $EnabledWidgetCache;
+			return get_EnabledWidgetCache();
 
 		case 'UserFieldCache';
-			$UserFieldCache = new DataObjectCache( 'Userfield', false, 'T_users__fielddefs', 'ufdf_', 'ufdf_ID', 'ufdf_name', 'ufdf_name' ); // COPY (FUNC)
-			return $UserFieldCache;
+			return get_UserFieldCache();
 
 		default:
 			debug_die( 'getCache(): Unknown Cache type:'.$objectName );
@@ -2263,7 +2493,7 @@ function mail_encode_header_string( $header_str, $mode = 'Q' )
 	{	// If the string actually needs some encoding
 		if( $mode == 'Q' )
 		{	// Quoted printable is best for reading with old/text terminal mail reading/debugging stuff:
-			$header_str = preg_replace( '¤([^a-z0-9!*+\-/ ])¤ie', 'sprintf("=%02x", ord(StripSlashes("\\1")))', $header_str );
+			$header_str = preg_replace( '?[^a-z0-9!*+\-/ ])¤ie', 'sprintf("=%02x", ord(StripSlashes("\\1")))', $header_str );
 			$header_str = str_replace( ' ', '_', $header_str );
 
 			$header_str = '=?'.$evo_charset.'?Q?'.$header_str.'?=';
@@ -3590,6 +3820,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.145  2009/09/17 03:59:48  efy-cantor
+ * copy the get_*cache into each functions
+ *
  * Revision 1.144  2009/09/14 18:37:07  fplanque
  * doc/cleanup/minor
  *
