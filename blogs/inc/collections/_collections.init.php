@@ -83,8 +83,14 @@ $ctrl_mappings = array_merge( $ctrl_mappings, array(
  */
 function & get_BlogCache()
 {
-	load_class( 'collections/model/_blogcache.class.php', 'BlogCache' );
-	$BlogCache = new BlogCache(); // COPY (FUNC)
+	global $BlogCache;
+
+	if( ! isset( $BlogCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'collections/model/_blogcache.class.php', 'BlogCache' );
+		$BlogCache = new BlogCache(); // COPY (FUNC)
+	}
+
 	return $BlogCache;
 }
 
