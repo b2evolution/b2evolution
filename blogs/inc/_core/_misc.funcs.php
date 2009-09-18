@@ -3894,68 +3894,11 @@ function & get_IconLegend()
 }
 
 
-/**
- * Get avatar <img> tag by user login
- *
- * @param user login
- * @param avatar size
- * @param style class
- * @param image align
- * @param if true show user login before an avatar
- * @return login <img> tag
- */
-function get_avatar_imgtag( $user_login, $size = 'crop-15x15', $class = '', $align = '', $show_login = true)
-{
-	$UserCache = & get_Cache( 'UserCache' );
-	$User = & $UserCache->get_by_login( $user_login );
-
-	$img_tag = '';
-	if( $User !== false )
-	{
-		$img_tag = $User->get_avatar_imgtag( $size, $class, $align );
-
-		if( $show_login )
-		{
-			if( !empty( $img_tag ) )
-			{
-				$img_tag = ' '.$img_tag;
-			}
-			$img_tag = $user_login.$img_tag;
-		}
-	}
-
-	return $img_tag;
-}
-
-
-/**
- * Get avatar <img> tags for list of user logins
- *
- * @param list of user logins
- * @param avatar size
- * @param style class
- * @param image align
- * @param if true show user login before an avatar
- * @return coma separated login <img> tag
- */
-function get_avatar_imgtags( $user_logins_list, $size = 'crop-15x15', $class = '', $align = '', $show_login = true )
-{
-	if( !is_array( $user_logins_list ) )
-	{
-		$user_logins_list = explode( ', ', $user_logins_list );
-	}
-
-	$user_imgtags_list = array();
-	foreach( $user_logins_list as $user_login )
-	{
-		$user_imgtags_list[] = get_avatar_imgtag( $user_login, $size, $class, $align, $show_login );
-	}
-	return implode( ', ', $user_imgtags_list );
-}
-
-
 /*
  * $Log$
+ * Revision 1.153  2009/09/18 16:01:50  fplanque
+ * cleanup
+ *
  * Revision 1.152  2009/09/18 15:47:11  fplanque
  * doc/cleanup
  *

@@ -2517,7 +2517,7 @@ function upgrade_b2evo_tables()
 			mct_to_user_ID int(10) unsigned NOT NULL,
 			mct_blocked tinyint(1) default 0,
 			mct_last_contact_datetime datetime NOT NULL,
-			UNIQUE(mct_from_user_ID, mct_to_user_ID)
+			PRIMARY KEY mct_PK (mct_from_user_ID, mct_to_user_ID)
 		) ENGINE = innodb" );
 		task_end();
 
@@ -2707,6 +2707,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.322  2009/09/18 16:01:50  fplanque
+ * cleanup
+ *
  * Revision 1.321  2009/09/18 14:22:11  efy-maxim
  * 1. 'reply' permission in group form
  * 2. functionality to store and update contacts

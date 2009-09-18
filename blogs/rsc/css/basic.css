@@ -82,7 +82,10 @@ a.selected {
 	font-weight: bold;
 }
 
-
+img.avatar_before_login {
+	margin-right: 2px;
+	vertical-align: top;
+}
 
 /*
  * Evo Toolbar
