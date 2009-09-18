@@ -64,8 +64,9 @@ foreach( $core_componentwidget_defs as $code )
 	}
 	else
 	{
-		load_class( 'widgets/widgets/_'.$code.'.widget.php' );
 		$classname = $code.'_Widget';
+		load_class( 'widgets/widgets/_'.$code.'.widget.php' , $classname);
+		
 		$ComponentWidget = & new $classname( NULL, 'core', $code );
 
 		echo '<li>';
@@ -115,6 +116,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.23  2009/09/18 15:02:38  waltercruz
+ * Fixing widget list
+ *
  * Revision 1.22  2009/03/20 23:28:31  fplanque
  * renamed coll_link_list widget
  *
