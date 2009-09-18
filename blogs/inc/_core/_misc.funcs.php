@@ -486,7 +486,8 @@ function & get_UserFieldCache()
 
 
 /**
- * @todo fp> split into 1 function per case. (typed @return values) @see get_BlogCache()
+ * @deprecated kept only for plugin backward compatibility (core is being modified to call getters directly)
+ * To be removed, maybe in b2evo v5.
  *
  * @return DataObjectCache
  */
@@ -500,82 +501,15 @@ function & get_Cache( $objectName )
 		return $$objectName;
 	}
 
-	switch( $objectName )
+	$func_name = 'get_'.$objectName;
+
+	if( function_exists($func_name) )
 	{
-		case 'BlogCache':
-			return get_BlogCache();
-
-		case 'ChapterCache':
-			return get_ChapterCache();
-
-		case 'CountryCache':
-			return get_CountryCache();
-
-		case 'CurrencyCache':
-			return get_CurrencyCache();
-
-		case 'FileCache':
-			return get_FileCache();
-
-		case 'FileRootCache':
-			return get_FileRootCache();
-
-		case 'FiletypeCache':
-			return get_FiletypeCache();
-
-		case 'GoalCache':
-			return get_GoalCache();
-
-		case 'GroupCache':
-			return get_GroupCache();
-
-		case 'ItemCacheLight':
-			return get_ItemCacheLight();
-
-		case 'ItemCache':
-			return get_ItemCache();
-
-		case 'ItemPrerenderingCache':
-			return get_ItemPrerenderingCache();
-
-		case 'ItemTagsCache':
-			return get_ItemTagsCache();
-
-		case 'ItemStatusCache':
-			return get_ItemStatusCache();
-
-		case 'ItemTypeCache':
-			return get_ItemTypeCache();
-
-		case 'LinkCache':
-			return get_LinkCache();
-
-		case 'MessageCache':
-			return get_MessageCache();
-
-		case 'Plugins_admin':
-			return get_Plugins_admin();
-
-		case 'SkinCache':
-			return get_SkinCache();
-
-		case 'ThreadCache':
-			return get_ThreadCache();
-
-		case 'UserCache':
-			return get_UserCache();
-
-		case 'WidgetCache':
-			return get_WidgetCache();
-
-		case 'EnabledWidgetCache':
-			return get_EnabledWidgetCache();
-
-		case 'UserFieldCache';
-			return get_UserFieldCache();
-
-		default:
-			debug_die( 'getCache(): Unknown Cache type:'.$objectName );
+		return $func_name();
+	}
+	else
+	{
+		debug_die( 'getCache(): Unknown Cache type get function:'.$func_name.'()' );
 	}
 }
 
@@ -3959,6 +3893,7 @@ function & get_IconLegend()
 	return $IconLegend;
 }
 
+
 /**
  * Get avatar <img> tag by user login
  *
@@ -3992,6 +3927,7 @@ function get_avatar_imgtag( $user_login, $size = 'crop-15x15', $class = '', $ali
 	return $img_tag;
 }
 
+
 /**
  * Get avatar <img> tags for list of user logins
  *
@@ -4020,6 +3956,9 @@ function get_avatar_imgtags( $user_logins_list, $size = 'crop-15x15', $class = '
 
 /*
  * $Log$
+ * Revision 1.152  2009/09/18 15:47:11  fplanque
+ * doc/cleanup
+ *
  * Revision 1.151  2009/09/18 14:22:11  efy-maxim
  * 1. 'reply' permission in group form
  * 2. functionality to store and update contacts

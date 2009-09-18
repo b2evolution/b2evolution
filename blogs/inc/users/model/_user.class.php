@@ -805,6 +805,7 @@ class User extends DataObject
 					$SQL->SELECT( 'COUNT(*)' );
 					$SQL->FROM( 'T_messaging__threadstatus' );
 					$SQL->WHERE( 'tsta_thread_ID = '.$perm_target.' AND tsta_user_ID = '.$this->ID );
+// fp> TODO: cache the result of this query so perm can be queried multiple times without firing up the query again
 					if( $DB->get_var( $SQL->get() ) == 0 )
 					{
 						// Access denied
@@ -1688,6 +1689,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.40  2009/09/18 15:47:11  fplanque
+ * doc/cleanup
+ *
  * Revision 1.39  2009/09/18 06:14:35  efy-maxim
  * fix for very very bad security issue
  *

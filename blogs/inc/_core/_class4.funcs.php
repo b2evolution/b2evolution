@@ -33,7 +33,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param string
  * @param string used by PHP5
  */
-function load_class( $class_path, $ignore = NULL )
+function load_class( $class_path, $ignore )
 {
 	global $inc_path;
 	require_once $inc_path.$class_path;
@@ -51,6 +51,9 @@ function duplicate( $Obj )
 
 /*
  * $Log$
+ * Revision 1.21  2009/09/18 15:47:10  fplanque
+ * doc/cleanup
+ *
  * Revision 1.20  2009/08/31 20:35:31  fplanque
  * cleanup
  *

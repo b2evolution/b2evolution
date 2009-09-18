@@ -83,7 +83,7 @@ else
  * It only registers the class & file name so that __autoload() can later
  * load the class IF and ONLY IF the class is actually needed during execution.
  */
-function load_class( $class_path, $classname = NULL )
+function load_class( $class_path, $classname )
 {
 	global $map_class_path, $inc_path;
 	if( !is_null($classname) )
@@ -106,6 +106,9 @@ function duplicate( $Obj )
 
 /*
  * $Log$
+ * Revision 1.25  2009/09/18 15:47:11  fplanque
+ * doc/cleanup
+ *
  * Revision 1.24  2009/09/15 19:31:55  fplanque
  * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
  * PHP 4 compatible. Even better on PHP 5.

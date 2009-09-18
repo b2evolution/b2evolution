@@ -65,7 +65,7 @@ foreach( $core_componentwidget_defs as $code )
 	else
 	{
 		$classname = $code.'_Widget';
-		load_class( 'widgets/widgets/_'.$code.'.widget.php' , $classname);
+		load_class( 'widgets/widgets/_'.$code.'.widget.php', $classname);
 		
 		$ComponentWidget = & new $classname( NULL, 'core', $code );
 
@@ -116,6 +116,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.24  2009/09/18 15:47:10  fplanque
+ * doc/cleanup
+ *
  * Revision 1.23  2009/09/18 15:02:38  waltercruz
  * Fixing widget list
  *

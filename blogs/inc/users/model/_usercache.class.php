@@ -138,6 +138,7 @@ class UserCache extends DataObjectCache
 		return $User;
 	}
 
+
 	/**
 	 * Overload parent's function to also maintain the login cache.
 	 *
@@ -206,9 +207,12 @@ class UserCache extends DataObjectCache
 
 		return true;
 	}
+	
 
 	/**
-	 * Load all of the contacts of current user
+	 * Extract list of contacts of current user from his message threads
+	 *
+	 * @todo fp> Although this deals with user IDs, this function should go to the Messaging module (see todo in next func below)
 	 *
 	 * @param current user ID
 	 */
@@ -237,8 +241,11 @@ class UserCache extends DataObjectCache
 		}
 	}
 
+
 	/**
 	 * Load all of the recipients of current thread
+	 *
+	 * @todo fp> I think this should dbe a method of Thread (Ideally the app can handle Users without the Messaging module enabled - reverse can never be true)
 	 *
 	 * @param current thread ID
 	 */
@@ -324,6 +331,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/18 15:47:11  fplanque
+ * doc/cleanup
+ *
  * Revision 1.7  2009/09/18 10:38:31  efy-maxim
  * 15x15 icons next to login in messagin module
  *

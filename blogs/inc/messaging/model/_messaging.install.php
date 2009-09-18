@@ -75,9 +75,14 @@ $schema_queries['T_messaging__contact'] = array(
 			mct_last_contact_datetime datetime NOT NULL,
 			UNIQUE(mct_from_user_ID, mct_to_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
+// fp> TODO: why use UNIQUE instead of PRIMARY KEY?
+
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/18 15:47:11  fplanque
+ * doc/cleanup
+ *
  * Revision 1.4  2009/09/18 14:22:11  efy-maxim
  * 1. 'reply' permission in group form
  * 2. functionality to store and update contacts
