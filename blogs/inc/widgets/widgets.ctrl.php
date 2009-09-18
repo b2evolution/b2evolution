@@ -141,8 +141,8 @@ switch( $action )
 		{
 			case 'core':
 				// Check the requested core widget is valid:
-				load_class( 'widgets/widgets/_'.$code.'.widget.php' );
 				$objtype = $code.'_Widget';
+				load_class( 'widgets/widgets/_'.$code.'.widget.php', $objtype );
 				$edited_ComponentWidget = & new $objtype();
 				break;
 
@@ -507,6 +507,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.32  2009/09/18 15:30:24  waltercruz
+ * Fixing load_class for PHP5
+ *
  * Revision 1.31  2009/09/14 13:52:55  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
