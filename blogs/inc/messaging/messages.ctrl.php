@@ -35,9 +35,6 @@ load_class( 'messaging/model/_message.class.php', 'Message' );
  */
 global $current_User;
 
-// Check minimum permission:
-$current_User->check_perm( 'messaging', 'write', true );
-
 // Set options path:
 $AdminUI->set_path( 'messaging' );
 
@@ -54,6 +51,9 @@ if( param( 'thrd_ID', 'integer', '', true) )
 		$action = 'nil';
 	}
 }
+
+// Check minimum permission:
+$current_User->check_perm( 'messaging', 'write', true, $thrd_ID );
 
 if( param( 'msg_ID', 'integer', '', true) )
 {// Load message from cache:
@@ -160,6 +160,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/18 06:14:33  efy-maxim
+ * fix for very very bad security issue
+ *
  * Revision 1.5  2009/09/14 07:31:43  efy-maxim
  * 1. Messaging permissions have been fully implemented
  * 2. Messaging has been added to evo bar menu

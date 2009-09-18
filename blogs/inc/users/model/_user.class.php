@@ -615,7 +615,7 @@ class User extends DataObject
 	 */
 	function check_perm( $permname, $permlevel = 'any', $assert = false, $perm_target = NULL )
 	{
-		global $Debuglog;
+		global $Debuglog, $DB;
 
 		if( is_object($perm_target) && isset($perm_target->ID) )
 		{
@@ -795,6 +795,22 @@ class User extends DataObject
 				// fp> TODO: merge below
 				$perm = ($this->level >= 5);
 				break;
+
+			case 'messaging':
+				if( $perm_target > 0 )
+				{   // Check user permission for current thread
+
+					// efy-maxim> TODO: now, messaging thread has no author, therefore SQL query is used
+					$SQL = & new SQL();
+					$SQL->SELECT( 'COUNT(*)' );
+					$SQL->FROM( 'T_messaging__threadstatus' );
+					$SQL->WHERE( 'tsta_thread_ID = '.$perm_target.' AND tsta_user_ID = '.$this->ID );
+					if( $DB->get_var( $SQL->get() ) == 0 )
+					{
+						// Access denied
+						break;
+					}
+				}
 
 			case 'files':
 				$this->get_Group();
@@ -1672,6 +1688,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.39  2009/09/18 06:14:35  efy-maxim
+ * fix for very very bad security issue
+ *
  * Revision 1.38  2009/09/16 09:15:32  efy-maxim
  * Messaging module improvements
  *
