@@ -13,7 +13,8 @@
  * @version $Id$
  */
 
-// use xmlrpc_debugmsg() to add debug messages to responses;
+// use xmlrpc_debugmsg() to add debug messages to responses or logIO() to
+// log them to a local file (preferred).
 
 /**
  * Initialize everything:
@@ -81,6 +82,9 @@ $s->service();
 
 /*
  * $Log$
+ * Revision 1.155  2009/09/18 19:27:08  tblue246
+ * Minor/doc
+ *
  * Revision 1.154  2009/08/31 18:07:06  waltercruz
  * Support to wordpress aliases to metaweblog APIS
  *
