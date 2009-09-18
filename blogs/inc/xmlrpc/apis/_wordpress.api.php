@@ -11,7 +11,7 @@
  * @see http://codex.wordpress.org/XML-RPC_wp
  *
  * @package xmlsrv
- *
+ * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -282,4 +282,10 @@ $xmlrpc_procs['wp.getPostStatusList'] = array(
 				'signature' => $wordpressgetpagestatuslist_sig,
 				'docstring' => $wordpressgetpoststatuslist_doc);
 
+/*
+ * $Log$
+ * Revision 1.8  2009/09/18 17:23:02  tblue246
+ * Added CVS tags
+ *
+ */
 ?>
