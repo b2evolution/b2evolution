@@ -226,18 +226,17 @@ function mw_newpost($m)
 	}
 	$main_cat = $cat_IDs[0];
 
+	if( ! xmlrpcs_check_cats( $main_cat, $Blog, $cat_IDs ) )
+	{	// Error:
+		return xmlrpcs_resperror();
+	}
+
 	// CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
 	if( ! $current_User->check_perm( 'cats_post!'.$status, 'edit', false, $cat_IDs ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 	logIO( 'Permission granted.' );
-
-	$main_cat = xmlrpcs_get_maincat( $main_cat, $Blog, $cat_IDs );
-	if( ! is_int( $main_cat ) )
-	{	// Error:
-		return $main_cat;
-	}
 
 	$post_date = _mw_decode_postdate( $contentstruct, true );
 	$post_title = $contentstruct['title'];
@@ -332,19 +331,18 @@ function mw_editpost( $m )
 	}
 	$main_cat = $cat_IDs[0];
 
+	$Blog = & $edited_Item->get_Blog();
+	if( ! xmlrpcs_check_cats( $main_cat, $Blog, $cat_IDs ) )
+	{	// Error:
+		return xmlrpcs_resperror();
+	}
+
 	// CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
 	if( ! $current_User->check_perm( 'cats_post!'.$status, 'edit', false, $cat_IDs ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 	logIO( 'Permission granted.' );
-
-	$Blog = & $edited_Item->get_Blog();
-	$main_cat = xmlrpcs_get_maincat( $main_cat, $Blog, $cat_IDs );
-	if( ! is_int( $main_cat ) )
-	{	// Error:
-		return $main_cat;
-	}
 
 	$post_date = _mw_decode_postdate( $contentstruct, false );
 	$post_title = $contentstruct['title'];
@@ -693,6 +691,9 @@ $xmlrpc_procs['metaWeblog.getUsersBlogs'] = array(
 
 /*
  * $Log$
+ * Revision 1.26  2009/09/18 19:09:05  tblue246
+ * XML-RPC: Check extracats in addition to maincat before calling check_perm(). Fixes debug_die()ing and sends an XML-RPC error instead.
+ *
  * Revision 1.25  2009/09/14 13:56:13  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

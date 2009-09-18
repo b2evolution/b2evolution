@@ -91,14 +91,16 @@ function mt_setPostCategories($m)
 	{
 		return xmlrpcs_resperror( 4, 'No categories specified.' );
 	}
-	else if( $category )
-	{	// Check if category exists and can be used:
-		$Blog = & $edited_Item->get_Blog();
-		$category = xmlrpcs_get_maincat( $category, $Blog, $categories );
-		if( ! is_int( $category ) )
-		{	// Error:
-			return $category;
-		}
+	else if( empty( $category ) )
+	{	// Use first one as default:
+		$category = $categories[0];
+	}
+
+	// Check if category exists and can be used:
+	$Blog = & $edited_Item->get_Blog();
+	if( ! xmlrpcs_check_cats( $category, $Blog, $categories ) )
+	{	// Error:
+		return xmlrpcs_resperror();
 	}
 
 	// CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
@@ -107,12 +109,6 @@ function mt_setPostCategories($m)
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 	logIO( 'Permission granted.' );
-
-
-	if( empty( $category ) )
-	{	// Use first one as default:
-		$category = $categories[0];
-	}
 
 	logIO( 'Main Cat: '.$category.' - Other: '.implode(',',$categories) );
 
@@ -323,6 +319,9 @@ $xmlrpc_procs['mt.publishPost'] = array(
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/18 19:09:05  tblue246
+ * XML-RPC: Check extracats in addition to maincat before calling check_perm(). Fixes debug_die()ing and sends an XML-RPC error instead.
+ *
  * Revision 1.10  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

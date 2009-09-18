@@ -466,7 +466,7 @@ function _b2_or_mt_get_categories( $type, $m )
 		return xmlrpcs_resperror( 99, 'DB error: '.$DB->last_error ); // user error 99
 	}
 
-	xmlrpc_debugmsg( 'Categories: '.$DB->num_rows );
+	logIO( 'Categories: '.$DB->num_rows );
 
 	$categoryIdName = ( $type == 'b2' ? 'categoryID' : 'categoryId' );
 	$data = array();
@@ -836,55 +836,79 @@ function xmlrpcs_can_view_item( & $Item, & $current_User )
 
 
 /**
- * Get a main category that exists and is allowed by the current crossposting
- * settings.
+ * Check whether the main category and the extra categories are valid
+ * in a Blog's context and try to fix errors.
  *
- * If the category doesn't exist, the blog's default category is returned.
- * If the value of $allow_cross_posting doesn't allow changing of the post's
- * main category across blogs and the category doesn't belong to the supplied
- * blog, an XML-RPC error is returned.
- * If no errors occurred, this function returns its $maincat argument.
+ * @author Tilman BLUMENBACH / Tblue
  * 
- * @param integer The main category to check.
+ * @param integer The main category to check (by reference).
  * @param object The Blog to which the category is supposed to belong to (by reference).
  * @param array Extra categories for the post (by reference).
  *
- * @return object|integer An usable category or a XML-RPC error (object).
+ * @return boolean False on error (use xmlrpcs_resperror() to return it), true on success.
  */
-function xmlrpcs_get_maincat( $maincat, & $Blog, & $extracats )
+function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
 {
-	global $allow_cross_posting;
+	global $allow_cross_posting, $xmlrpcs_errcode, $xmlrpcs_errmsg, $xmlrpcerruser;
+
+	// Trim $maincat and $extracats (qtm sends whitespace before the cat IDs):
+	$maincat   = trim( $maincat );
+	$extracats = array_map( 'trim', $extracats );
 
 	$ChapterCache = & get_Cache( 'ChapterCache' );
-	if( $ChapterCache->get_by_ID( $maincat, false ) === false )
-	{	// Category does not exist, use default:
-		$new_maincat = $Blog->get_default_cat_ID();
 
+	// ---- CHECK MAIN CATEGORY ----
+	if( $ChapterCache->get_by_ID( $maincat, false ) === false )
+	{	// Category does not exist!
 		// Remove old category from extra cats:
 		if( ( $key = array_search( $maincat, $extracats ) ) !== false )
 		{
 			unset( $extracats[$key] );
 		}
-		// Add new category to extracats:
-		if( ! in_array( $new_maincat, $extracats ) )
-		{
-			$extracats[] = $new_maincat;
-		}
 
-		return (int)$new_maincat;
+		// Set new category (blog default):
+		$maincat = $Blog->get_default_cat_ID();
+		logIO( 'Invalid main cat ID - new ID: '.$maincat );
 	}
 	else if( $allow_cross_posting < 3 && get_catblog( $maincat ) != $Blog->ID )
 	{	// We cannot use a maincat of another blog than the current one:
-		return xmlrpcs_resperror( 11 );
+		$xmlrpcs_errcode = $xmlrpcerruser + 11;
+		$xmlrpcs_errmsg = 'Current crossposting setting does not allow moving posts to a different blog.';
+		return false;
 	}
 
-	// Main category is OK:
-	return (int)$maincat;
+	// ---- CHECK EXTRA CATEGORIES ----
+	foreach( $extracats as $ecat )
+	{
+		if( $ecat == $maincat )
+		{	// We already checked the maincat above (or reset it):
+			continue;
+		}
+
+		logIO( 'Checking cat: '.$ecat );
+		if( $ChapterCache->get_by_ID( $ecat, false ) === false )
+		{	// Extra cat does not exist:
+			$xmlrpcs_errcode = $xmlrpcerruser + 11;
+			$xmlrpcs_errmsg  = 'Extra category '.(int)$ecat.' not found in requested blog.';
+			return false;
+		}
+	}
+
+	if( ! in_array( $maincat, $extracats ) )
+	{
+		logIO( '$maincat was not found in $extracats array - adding.' );
+		$extracats[] = $maincat;
+	}
+
+	return true;
 }
 
 
 /*
  * $Log$
+ * Revision 1.20  2009/09/18 19:09:05  tblue246
+ * XML-RPC: Check extracats in addition to maincat before calling check_perm(). Fixes debug_die()ing and sends an XML-RPC error instead.
+ *
  * Revision 1.19  2009/09/16 22:03:40  fplanque
  * doc
  *

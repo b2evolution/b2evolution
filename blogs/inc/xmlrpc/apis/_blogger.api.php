@@ -87,21 +87,22 @@ function blogger_newpost( $m )
 		$main_cat = $cat_IDs[0];
 	}
 
+	logIO( 'Current main cat: '.$main_cat );
+
+	// Check if category exists and can be used
+	if( ! xmlrpcs_check_cats( $main_cat, $Blog, $cat_IDs ) )
+	{	// Error
+		return xmlrpcs_resperror();
+	}
+
+	logIO( 'New main cat: '.$main_cat );
+
 	// CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
 	if( ! $current_User->check_perm( 'cats_post!'.$status, 'edit', false, $cat_IDs ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 	logIO( 'Permission granted.' );
-
-	logIO( 'Main cat: '.$main_cat);
-
-	// Check if category exists and can be used
-	$main_cat = xmlrpcs_get_maincat( $main_cat, $Blog, $cat_IDs );
-	if( ! is_int( $main_cat ) )
-	{	// Error
-		return $main_cat;
-	}
 
 	$post_date = date('Y-m-d H:i:s', (time() + $Settings->get('time_difference')));
 	// Extract <title> from content
@@ -188,22 +189,21 @@ function blogger_editpost($m)
 		$main_cat = $cat_IDs[0];
 	}
 
+	// Check if category exists and can be used
+	$Blog = & $edited_Item->get_Blog();
+	if( ! xmlrpcs_check_cats( $main_cat, $Blog, $cat_IDs ) )
+	{	// Error
+		return xmlrpcs_resperror();
+	}
+
+	logIO( 'Main cat: '.$main_cat );
+
 	// CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
 	if( ! $current_User->check_perm( 'cats_post!'.$status, 'edit', false, $cat_IDs ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 	logIO( 'Permission granted.' );
-
-	logIO( 'Main cat: '.$main_cat);
-
-	// Check if category exists and can be used
-	$Blog = & $edited_Item->get_Blog();
-	$main_cat = xmlrpcs_get_maincat( $main_cat, $Blog, $cat_IDs );
-	if( ! is_int( $main_cat ) )
-	{	// Error
-		return $main_cat;
-	}
 
 	$post_date = NULL;
 	$post_title = xmlrpc_getposttitle($content);
@@ -533,6 +533,9 @@ $xmlrpc_procs['blogger.getRecentPosts'] = array(
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/18 19:09:04  tblue246
+ * XML-RPC: Check extracats in addition to maincat before calling check_perm(). Fixes debug_die()ing and sends an XML-RPC error instead.
+ *
  * Revision 1.11  2009/09/14 13:56:13  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

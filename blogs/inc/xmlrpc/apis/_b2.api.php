@@ -54,14 +54,6 @@ function b2_newpost($m)
 	$main_cat = $m->getParam(7);
 	$main_cat = $main_cat->scalarval();
 
-
-	// CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
-	if( ! $current_User->check_perm( 'cats_post!'.$status, 'edit', false, array($main_cat) ) )
-	{	// Permission denied
-		return xmlrpcs_resperror( 3 );	// User error 3
-	}
-	logIO( 'Permission granted.' );
-
 	// Check if category exists and can be used
 	$ChapterCache = & get_Cache('ChapterCache');
 	if( $ChapterCache->get_by_ID( $main_cat, false ) === false )
@@ -69,6 +61,13 @@ function b2_newpost($m)
 		return xmlrpcs_resperror( 11 );	// User error 11
 	}
 	$cat_IDs = array( $main_cat );
+
+	// CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
+	if( ! $current_User->check_perm( 'cats_post!'.$status, 'edit', false, $cat_IDs ) )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
+	}
+	logIO( 'Permission granted.' );
 
 	$postdate = $m->getParam(8);
 	$postdate = $postdate->scalarval();
@@ -177,6 +176,9 @@ $xmlrpc_procs['b2.getPostURL'] = array(
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/18 19:09:04  tblue246
+ * XML-RPC: Check extracats in addition to maincat before calling check_perm(). Fixes debug_die()ing and sends an XML-RPC error instead.
+ *
  * Revision 1.8  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
