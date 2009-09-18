@@ -34,6 +34,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 $db_config['aliases']['T_messaging__thread'] = $tableprefix.'messaging__thread';
 $db_config['aliases']['T_messaging__message'] = $tableprefix.'messaging__message';
 $db_config['aliases']['T_messaging__threadstatus'] = $tableprefix.'messaging__threadstatus';
+$db_config['aliases']['T_messaging__contact'] = $tableprefix.'messaging__contact';
 
 /**
  * Controller mappings.
@@ -151,6 +152,11 @@ $messaging_Module = & new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/18 14:22:11  efy-maxim
+ * 1. 'reply' permission in group form
+ * 2. functionality to store and update contacts
+ * 3. fix in misc functions
+ *
  * Revision 1.10  2009/09/16 15:14:47  efy-maxim
  * badge for unread message number
  *

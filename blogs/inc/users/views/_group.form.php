@@ -153,6 +153,7 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 
 	$Form->radio( 'edited_grp_perm_messaging', $edited_Group->get('perm_messaging'),
 			array(  $perm_none_option,
+							array( 'reply', T_( 'Reply to people you have messaged with in the past' ) ),
 							array( 'write', T_( 'Create threads, view any thread you\'re involved in & reply' ) ),
 							array( 'delete', T_( 'Create threads, view and delete any thread you\'re involved in & reply' ) )
 						), T_('Messaging'), true );
@@ -203,6 +204,11 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/18 14:22:11  efy-maxim
+ * 1. 'reply' permission in group form
+ * 2. functionality to store and update contacts
+ * 3. fix in misc functions
+ *
  * Revision 1.11  2009/09/13 12:25:34  efy-maxim
  * Messaging permissions have been added to:
  * 1. Upgrader

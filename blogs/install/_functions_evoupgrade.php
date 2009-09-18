@@ -2511,6 +2511,16 @@ function upgrade_b2evo_tables()
 		) ENGINE = innodb" );
 		task_end();
 
+		task_begin( 'Creating table for messaging contacts... ' );
+		$DB->query( "CREATE TABLE T_messaging__contact (
+			mct_from_user_ID int(10) unsigned NOT NULL,
+			mct_to_user_ID int(10) unsigned NOT NULL,
+			mct_blocked tinyint(1) default 0,
+			mct_last_contact_datetime datetime NOT NULL,
+			UNIQUE(mct_from_user_ID, mct_to_user_ID)
+		) ENGINE = innodb" );
+		task_end();
+
 		// Add messaging permission column to T_groups table for messaging module
 
 		task_begin( 'Add messaging permissions for groups... ' );
@@ -2697,6 +2707,11 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.321  2009/09/18 14:22:11  efy-maxim
+ * 1. 'reply' permission in group form
+ * 2. functionality to store and update contacts
+ * 3. fix in misc functions
+ *
  * Revision 1.320  2009/09/17 11:34:33  efy-maxim
  * reply permission in create and upgrade functionality
  *

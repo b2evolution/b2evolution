@@ -151,6 +151,11 @@ class Message extends DataObject
 			$success = $this->dbinsert_message();
 		}
 
+		if( $success )
+		{
+			$success = $this->dbupdate_last_contact_datetime();
+		}
+
 		if( !$success )
 		{
 			$DB->rollback();
@@ -177,8 +182,11 @@ class Message extends DataObject
 			{
 				if( $this->dbinsert_threadstatus( $this->Thread->recipients_list ) )
 				{
-					$this->send_email_notifications();
-					return true;
+					if( $this->dbinsert_contacts( $this->Thread->recipients_list ) )
+					{
+						$this->send_email_notifications();
+						return true;
+					}
 				}
 			}
 		}
@@ -215,7 +223,7 @@ class Message extends DataObject
 	{
 		global $DB, $localtimenow;
 
-		$this->Thread->set_param( 'datemodified', 'string', date('Y-m-d H:i:s', $localtimenow) );
+		$this->Thread->set_param( 'datemodified', 'string', date( 'Y-m-d H:i:s', $localtimenow ) );
 
 		if( $this->Thread->dbupdate() )
 		{
@@ -226,8 +234,8 @@ class Message extends DataObject
 				$sql = 'UPDATE T_messaging__threadstatus
 						SET tsta_first_unread_msg_ID = '.$this->ID.'
 						WHERE tsta_thread_ID = '.$this->Thread->ID.'
-						AND tsta_user_ID <> '.$this->author_user_ID.'
-						AND tsta_first_unread_msg_ID IS NULL';
+							AND tsta_user_ID <> '.$this->author_user_ID.'
+							AND tsta_first_unread_msg_ID IS NULL';
 
 				$DB->query( $sql, 'Insert thread statuses' );
 
@@ -259,6 +267,82 @@ class Message extends DataObject
 		$sql .= ' ('.$this->Thread->ID.', '.$this->author_user_ID.', NULL)';
 
 		return $DB->query( $sql, 'Insert thread statuses' );
+	}
+
+	/**
+	 * Insert contacts into database
+	 * @param recipients
+	 * @return true if success, instead false
+	 */
+	function dbinsert_contacts( $recipients )
+	{
+		global $DB, $localtimenow;
+
+		// select contacts of the current user
+
+		$SQL = & new SQL();
+
+		$SQL->SELECT( 'mct_to_user_ID' );
+		$SQL->FROM( 'T_messaging__contact' );
+		$SQL->WHERE( 'mct_from_user_ID = '.$this->author_user_ID );
+
+		$contact_list = array();
+		foreach( $DB->get_results( $SQL->get() ) as $row )
+		{
+			$contact_list[] = $row->mct_to_user_ID;
+		}
+
+		// get users/recipients which are not in contact list
+		$contact_list = array_diff( $recipients, $contact_list );
+
+		if( !empty( $contact_list ) )
+		{	// insert users/recipients which are not in contact list
+
+			$sql = 'INSERT INTO T_messaging__contact (mct_from_user_ID, mct_to_user_ID, mct_last_contact_datetime)
+								VALUES';
+
+			$datetime = date( 'Y-m-d H:i:s', $localtimenow );
+
+			$statements = array();
+			foreach ( $contact_list as $contact_ID )
+			{
+				$statements[] = ' ('.$this->author_user_ID.', '.$contact_ID.', \''.$datetime.'\')';
+				$statements[] = ' ('.$contact_ID.', '.$this->author_user_ID.', \''.$datetime.'\')';
+			}
+			$sql .= implode( ', ', $statements );
+
+			return $DB->query( $sql, 'Insert contacts' );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Update last contact datetimes
+	 * @return true if success
+	 */
+	function dbupdate_last_contact_datetime()
+	{
+		global $DB, $localtimenow;
+
+		// efy-maxim> TODO: two SQL queries are used instead one update with subselect, because T_messaging__threadstatus alias is not converted to real table name (evo_messaging__threadstatus)
+		$select_SQL = & new SQL();
+		$select_SQL->SELECT( 'GROUP_CONCAT(tsta_user_ID SEPARATOR \',\')' );
+		$select_SQL->FROM( 'T_messaging__threadstatus' );
+		$select_SQL->WHERE( 'tsta_thread_ID = '.$this->Thread->ID );
+
+		$recipients = $DB->get_var( $select_SQL->get() );
+
+		$datetime = date( 'Y-m-d H:i:s', $localtimenow );
+
+		$update_sql = 'UPDATE T_messaging__contact
+					SET mct_last_contact_datetime = \''.$datetime.'\'
+					WHERE mct_from_user_ID = '.$this->author_user_ID.'
+						AND mct_to_user_ID IN ('.$recipients.')';
+
+		$DB->query( $update_sql, 'Update last contact datetimes' );
+
+		return true;
 	}
 
 	/**
@@ -379,6 +463,11 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/18 14:22:11  efy-maxim
+ * 1. 'reply' permission in group form
+ * 2. functionality to store and update contacts
+ * 3. fix in misc functions
+ *
  * Revision 1.15  2009/09/17 16:18:06  tblue246
  * Fixed PCRE error; minor
  *

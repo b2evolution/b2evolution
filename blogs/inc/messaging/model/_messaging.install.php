@@ -66,8 +66,23 @@ $schema_queries['T_messaging__threadstatus'] = array(
 			INDEX(tsta_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
 
+$schema_queries['T_messaging__contact'] = array(
+		'Creating table for messaging contacts',
+		"CREATE TABLE T_messaging__contact (
+			mct_from_user_ID int(10) unsigned NOT NULL,
+			mct_to_user_ID int(10) unsigned NOT NULL,
+			mct_blocked tinyint(1) default 0,
+			mct_last_contact_datetime datetime NOT NULL,
+			UNIQUE(mct_from_user_ID, mct_to_user_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
+
 /*
  * $Log$
+ * Revision 1.4  2009/09/18 14:22:11  efy-maxim
+ * 1. 'reply' permission in group form
+ * 2. functionality to store and update contacts
+ * 3. fix in misc functions
+ *
  * Revision 1.3  2009/09/12 18:44:11  efy-maxim
  * Messaging module improvements
  *

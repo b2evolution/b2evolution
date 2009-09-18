@@ -3972,17 +3972,21 @@ function & get_IconLegend()
 function get_avatar_imgtag( $user_login, $size = 'crop-15x15', $class = '', $align = '', $show_login = true)
 {
 	$UserCache = & get_Cache( 'UserCache' );
-	$User = $UserCache->get_by_login( $user_login );
+	$User = & $UserCache->get_by_login( $user_login );
 
-	$img_tag = $User->get_avatar_imgtag( $size, $class, $align );
-
-	if( $show_login )
+	$img_tag = '';
+	if( $User !== false )
 	{
-		if( !empty( $img_tag ) )
+		$img_tag = $User->get_avatar_imgtag( $size, $class, $align );
+
+		if( $show_login )
 		{
-			$img_tag = ' '.$img_tag;
+			if( !empty( $img_tag ) )
+			{
+				$img_tag = ' '.$img_tag;
+			}
+			$img_tag = $user_login.$img_tag;
 		}
-		$img_tag = $user_login.$img_tag;
 	}
 
 	return $img_tag;
@@ -4016,6 +4020,11 @@ function get_avatar_imgtags( $user_logins_list, $size = 'crop-15x15', $class = '
 
 /*
  * $Log$
+ * Revision 1.151  2009/09/18 14:22:11  efy-maxim
+ * 1. 'reply' permission in group form
+ * 2. functionality to store and update contacts
+ * 3. fix in misc functions
+ *
  * Revision 1.150  2009/09/18 10:38:31  efy-maxim
  * 15x15 icons next to login in messagin module
  *
