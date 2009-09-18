@@ -342,6 +342,13 @@ class Group extends DataObject
 							$perm = true;
 							break;
 						}
+					case 'reply':
+						//  reply to people you have messaged with in the past
+						if( $permlevel == 'reply' )
+						{
+							$perm = true;
+							break;
+						}
 				}
 				break;
 		}
@@ -554,6 +561,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2009/09/18 16:16:50  efy-maxim
+ * comments tab in messaging module
+ *
  * Revision 1.17  2009/09/14 18:37:07  fplanque
  * doc/cleanup/minor
  *

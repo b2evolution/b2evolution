@@ -36,7 +36,7 @@ load_class( 'messaging/model/_message.class.php', 'Message' );
 global $current_User;
 
 // Set options path:
-$AdminUI->set_path( 'messaging' );
+$AdminUI->set_path( 'messaging', 'messages' );
 
 // Get action parameter from request:
 param_action();
@@ -165,6 +165,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/18 16:16:50  efy-maxim
+ * comments tab in messaging module
+ *
  * Revision 1.7  2009/09/18 10:38:31  efy-maxim
  * 15x15 icons next to login in messagin module
  *

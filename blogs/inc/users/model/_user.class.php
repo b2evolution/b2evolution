@@ -615,7 +615,7 @@ class User extends DataObject
 	 */
 	function check_perm( $permname, $permlevel = 'any', $assert = false, $perm_target = NULL )
 	{
-		global $Debuglog, $DB;
+		global $Debuglog;
 
 		if( is_object($perm_target) && isset($perm_target->ID) )
 		{
@@ -796,17 +796,10 @@ class User extends DataObject
 				$perm = ($this->level >= 5);
 				break;
 
-			case 'messaging':
+		case 'messaging':
 				if( $perm_target > 0 )
 				{   // Check user permission for current thread
-
-					// efy-maxim> TODO: now, messaging thread has no author, therefore SQL query is used
-					$SQL = & new SQL();
-					$SQL->SELECT( 'COUNT(*)' );
-					$SQL->FROM( 'T_messaging__threadstatus' );
-					$SQL->WHERE( 'tsta_thread_ID = '.$perm_target.' AND tsta_user_ID = '.$this->ID );
-// fp> TODO: cache the result of this query so perm can be queried multiple times without firing up the query again
-					if( $DB->get_var( $SQL->get() ) == 0 )
+					if( !$this->check_thread_recipient( $perm_target ) )
 					{
 						// Access denied
 						break;
@@ -920,6 +913,29 @@ class User extends DataObject
 		$Blog = & $BlogCache->get_by_ID( $blog_ID );
 
 		return ( $Blog->owner_user_ID == $this->ID );
+	}
+
+
+	/**
+	 * Check if current user is recipient of the thread
+	 *
+	 * @param thread ID
+	 * @return true is user is recipient, instead false
+	 */
+	function check_thread_recipient( $thrd_ID )
+	{
+		global $DB;
+
+		$SQL = & new SQL();
+		$SQL->SELECT( 'COUNT(*)' );
+		$SQL->FROM( 'T_messaging__threadstatus' );
+		$SQL->WHERE( 'tsta_thread_ID = '.$thrd_ID.' AND tsta_user_ID = '.$this->ID );
+		if( $DB->get_var( $SQL->get() ) > 0 )
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 
@@ -1689,6 +1705,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.41  2009/09/18 16:16:50  efy-maxim
+ * comments tab in messaging module
+ *
  * Revision 1.40  2009/09/18 15:47:11  fplanque
  * doc/cleanup
  *

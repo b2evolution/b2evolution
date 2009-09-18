@@ -52,6 +52,7 @@ $db_config['aliases']['T_messaging__contact'] = $tableprefix.'messaging__contact
  */
 $ctrl_mappings['messages'] = 'messaging/messages.ctrl.php';
 $ctrl_mappings['threads'] = 'messaging/threads.ctrl.php';
+$ctrl_mappings['contacts'] = 'messaging/contacts.ctrl.php';
 
 
 /**
@@ -142,6 +143,14 @@ class messaging_Module extends Module
 						'text' => T_('Messaging'),
 						'title' => T_('Messaging'),
 						'href' => $dispatcher.'?ctrl=threads',
+						'entries' => array(
+								'messages' => array(
+									'text' => T_('Messages'),
+									'href' => '?ctrl=threads' ),
+								'contacts' => array(
+									'text' => T_('Contacts'),
+									'href' => '?ctrl=contacts' ),
+							)
 					),
 				) );
 		}
@@ -152,6 +161,9 @@ $messaging_Module = & new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/18 16:16:50  efy-maxim
+ * comments tab in messaging module
+ *
  * Revision 1.11  2009/09/18 14:22:11  efy-maxim
  * 1. 'reply' permission in group form
  * 2. functionality to store and update contacts
