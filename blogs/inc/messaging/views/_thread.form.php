@@ -53,7 +53,7 @@ $recent_recipients = $DB->get_var('SELECT GROUP_CONCAT(DISTINCT user_login SEPAR
 
 $user_login = param( 'user_login', 'string', '');
 
-$Form->text_input( 'thrd_recipients', empty( $user_login ) ? $edited_Thread->recipients : $user_login, 70, T_('Recipients'), T_('Enter comma or space separated logins<br/>'.$recent_recipients), array( 'maxlength'=> 255, 'required'=>true ) );
+$Form->text_input( 'thrd_recipients', empty( $user_login ) ? $edited_Thread->recipients : $user_login, 70, T_('Recipients'), T_('Enter comma or space separated logins<br/>'.get_avatar_imgtags( $recent_recipients ) ), array( 'maxlength'=> 255, 'required'=>true ) );
 
 $Form->text_input( 'thrd_title', $edited_Thread->title, 70, T_('Subject'), '', array( 'maxlength'=> 255, 'required'=>true ) );
 
@@ -69,6 +69,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 
 												/*
  * $Log$
+ * Revision 1.9  2009/09/18 10:38:31  efy-maxim
+ * 15x15 icons next to login in messagin module
+ *
  * Revision 1.8  2009/09/16 09:15:32  efy-maxim
  * Messaging module improvements
  *

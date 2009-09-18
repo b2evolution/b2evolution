@@ -66,6 +66,11 @@ if( param( 'msg_ID', 'integer', '', true) )
 	}
 }
 
+// Preload users to show theirs avatars
+
+$UserCache = & get_Cache( 'UserCache' );
+$UserCache->load_messaging_thread_recipients( $thrd_ID );
+
 switch( $action )
 {
 	case 'create': // Record new message
@@ -160,6 +165,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/18 10:38:31  efy-maxim
+ * 15x15 icons next to login in messagin module
+ *
  * Revision 1.6  2009/09/18 06:14:33  efy-maxim
  * fix for very very bad security issue
  *

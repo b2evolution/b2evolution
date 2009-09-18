@@ -58,7 +58,7 @@ foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
 	if( !empty( $row->thr_read ) )
 	{
 		$read_by .= '<span style="color:green">';
-		$read_by .= $row->thr_read;
+		$read_by .= get_avatar_imgtags( $row->thr_read );
 		if( !empty( $row->thr_unread ) )
 		{
 			$read_by .= ', ';
@@ -68,7 +68,7 @@ foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
 
 	if( !empty( $row->thr_unread ) )
 	{
-		$read_by .= '<span style="color:red">'.$row->thr_unread.'</span>';
+		$read_by .= '<span style="color:red">'.get_avatar_imgtags( $row->thr_unread ).'</span>';
 	}
 
 	$read_unread_recipients[$row->thr_ID] = $read_by;
@@ -117,8 +117,7 @@ $Results->cols[] = array(
 					'th' => T_('With'),
 					'th_class' => 'thread_with',
 					'td_class' => 'thread_with',
-					'td' => '$thrd_recipients$',
-					//'td' => '%strmaxlen(#thrd_recipients#, 20)%',
+					'td' => '%get_avatar_imgtags( #thrd_recipients# )%',
 					);
 
 $Results->cols[] = array(
@@ -169,6 +168,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/18 10:38:31  efy-maxim
+ * 15x15 icons next to login in messagin module
+ *
  * Revision 1.13  2009/09/17 10:54:21  efy-maxim
  * Read/Unread (green/red) users columns in thread list
  *

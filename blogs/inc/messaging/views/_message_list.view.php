@@ -87,7 +87,7 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 	$read_by = '';
 	if( !empty( $read_recipiens ) )
 	{
-		$read_by .= '<span style="color:green">'.implode( ', ', $read_recipiens );
+		$read_by .= '<span style="color:green">'.get_avatar_imgtags( $read_recipiens );
 		if( !empty ( $unread_recipients ) )
 		{
 			$read_by .= ', ';
@@ -97,7 +97,7 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 
 	if( !empty ( $unread_recipients ) )
 	{
-		$read_by .= '<span style="color:red">'.implode( ', ', $unread_recipients ).'</span>';
+		$read_by .= '<span style="color:red">'.get_avatar_imgtags( $unread_recipients ).'</span>';
 	}
 
 	$read_by_list[$row->msg_ID] = $read_by ;
@@ -250,7 +250,7 @@ $Form->begin_form( 'fform', '' );
 
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
-$Form->info_field(T_('Reply to'), implode( ', ', $recipients ), array('required'=>true));
+$Form->info_field(T_('Reply to'), get_avatar_imgtags( $recipients ), array('required'=>true));
 
 $Form->textarea('msg_text', '', 10, '', '', 80, '', true);
 
@@ -258,6 +258,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.17  2009/09/18 10:38:31  efy-maxim
+ * 15x15 icons next to login in messagin module
+ *
  * Revision 1.16  2009/09/16 13:30:35  efy-maxim
  * A red close "X" on the right of the title bar of messages list
  *

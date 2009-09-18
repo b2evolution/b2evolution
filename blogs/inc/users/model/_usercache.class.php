@@ -138,7 +138,6 @@ class UserCache extends DataObjectCache
 		return $User;
 	}
 
-
 	/**
 	 * Overload parent's function to also maintain the login cache.
 	 *
@@ -208,6 +207,63 @@ class UserCache extends DataObjectCache
 		return true;
 	}
 
+	/**
+	 * Load all of the contacts of current user
+	 *
+	 * @param current user ID
+	 */
+	function load_messaging_threads_recipients( $user_ID )
+	{
+		global $DB;
+
+		$SQL = & new SQL();
+
+		$SQL->SELECT( 'DISTINCT u.*' );
+
+		$SQL->FROM( 'T_messaging__threadstatus ts
+						LEFT OUTER JOIN T_messaging__threadstatus tsr
+							ON ts.tsta_thread_ID = tsr.tsta_thread_ID
+						LEFT OUTER JOIN T_users u
+							ON tsr.tsta_user_ID = u.user_ID' );
+
+		$SQL->WHERE( 'ts.tsta_user_ID = '.$user_ID );
+
+		foreach( $DB->get_results( $SQL->get() ) as $row )
+		{
+			if( !isset($this->cache[$row->user_ID]) )
+			{
+				$this->add( new User( $row ) );
+			}
+		}
+	}
+
+	/**
+	 * Load all of the recipients of current thread
+	 *
+	 * @param current thread ID
+	 */
+	function load_messaging_thread_recipients( $thrd_ID )
+	{
+		global $DB;
+
+		$SQL = & new SQL();
+
+		$SQL->SELECT( 'u.*' );
+
+		$SQL->FROM( 'T_messaging__threadstatus ts
+						LEFT OUTER JOIN T_users u
+							ON ts.tsta_user_ID = u.user_ID' );
+
+		$SQL->WHERE( 'ts.tsta_thread_ID = '.$thrd_ID );
+
+		foreach( $DB->get_results( $SQL->get() ) as $row )
+		{
+			if( !isset($this->cache[$row->user_ID]) )
+			{
+				$this->add( new User( $row ) );
+			}
+		}
+	}
 
 	/**
 	 * Loads cache with blog memeber, then display form option list with cache contents
@@ -268,6 +324,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/18 10:38:31  efy-maxim
+ * 15x15 icons next to login in messagin module
+ *
  * Revision 1.6  2009/09/14 13:46:11  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
