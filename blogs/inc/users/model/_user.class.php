@@ -919,6 +919,9 @@ class User extends DataObject
 	/**
 	 * Check if current user is recipient of the thread
 	 *
+	 * @todo fp> Cache result so multiple perm checks don't trigger multiple queries
+	 * @todo fp> move to Thread class because User class can exist without Messaging module and opposite is not true, so it makes more sense messaging be a layer above user instead of an interlocked architecture
+	 *
 	 * @param thread ID
 	 * @return true is user is recipient, instead false
 	 */
@@ -1603,7 +1606,7 @@ class User extends DataObject
 	/**
 	 * Get avatar <img> tag
 	 */
-	function get_avatar_imgtag( $size = 'crop-80x80', $class = '', $align = '' )
+	function get_avatar_imgtag( $size = 'crop-80x80', $class = 'avatar', $align = '' )
 	{
     /**
 		 * @var File
@@ -1705,6 +1708,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.42  2009/09/19 01:04:06  fplanque
+ * button to remove an avatar from an user profile
+ *
  * Revision 1.41  2009/09/18 16:16:50  efy-maxim
  * comments tab in messaging module
  *

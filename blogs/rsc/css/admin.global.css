@@ -64,6 +64,11 @@ h3.dashboard_post_title {
 }
 
 
+.avatar {
+	vertical-align: top;
+}
+
+
 /*
  * Compose screen:
  */
@@ -413,7 +418,7 @@ ul.widget_list li {
 }
  .badge {
  	position: relative;
- 	top: -1px;	
+ 	top: -1px;
  	-moz-border-radius:12px;
  	-webkit-border-radius:12px;
  	background-color:red;

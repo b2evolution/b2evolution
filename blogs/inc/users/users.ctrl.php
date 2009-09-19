@@ -217,6 +217,31 @@ if( !$Messages->count('error') )
 			break;
 
 
+		case 'remove_avatar':
+			if( empty($edited_User) || !is_object($edited_User) )
+			{
+				$Messages->add( 'No user set!' ); // Needs no translation, should be prevented by UI.
+				$action = 'list';
+				break;
+			}
+
+			if( !$current_User->check_perm( 'users', 'edit' ) && $edited_User->ID != $current_User->ID )
+			{ // user is only allowed to update him/herself
+				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
+				$action = 'view_user';
+				break;
+			}
+
+			$edited_User->set( 'avatar_file_ID', NULL, true );
+
+			$edited_User->dbupdate();
+
+			$Messages->add( T_('Avatar has been removed.'), 'success' );
+
+			header_redirect( '?ctrl=users&user_ID='.$edited_User->ID, 303 ); // will save $Messages into Session
+			/* EXITED */
+			break;
+
 		case 'userupdate':
 			// Update existing user OR create new user:
 			if( empty($edited_User) || !is_object($edited_User) )
@@ -911,6 +936,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.27  2009/09/19 01:04:06  fplanque
+ * button to remove an avatar from an user profile
+ *
  * Revision 1.26  2009/09/13 12:25:34  efy-maxim
  * Messaging permissions have been added to:
  * 1. Upgrader

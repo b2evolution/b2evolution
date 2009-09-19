@@ -163,10 +163,21 @@ $Form->begin_fieldset( T_('Identity') );
 
 		global $admin_url;
 		$avatar_tag = $edited_User->get_avatar_imgtag();
-		if( $current_User->check_perm( 'files', 'view' ) )
+		if( !empty($avatar_tag) )
 		{
-			$avatar_tag .= ' <a href="'.$admin_url.'?ctrl=files&amp;user_ID='.$edited_User->ID.'">'.T_('change').' &raquo;</a>';
+			$avatar_tag .= ' '.action_icon( T_('Remove'), 'delete', '?ctrl=users&amp;user_ID='.$edited_User->ID.'&amp;action=remove_avatar', T_('Remove') );
+			if( $current_User->check_perm( 'files', 'view' ) )
+			{
+				$avatar_tag .= ' '.action_icon( T_('Change'), 'link', '?ctrl=files&amp;user_ID='.$edited_User->ID, T_('Change' ).' &raquo;', 5, 5 );
+			}
 		}
+		elseif( $current_User->check_perm( 'files', 'view' ) )
+		{
+			$avatar_tag .= ' '.action_icon( T_('Upload or choose an avatar'), 'link', '?ctrl=files&amp;user_ID='.$edited_User->ID, T_('Upload/Select' ).' &raquo;', 5, 5 );
+		}
+
+
+
 		$Form->info( T_('Avatar'), $avatar_tag );
 
 		// fp> TODO: a javascript REFRAME feature would ne neat here: selecting a square area of the img and saving it as a new avatar image
@@ -501,6 +512,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.18  2009/09/19 01:04:06  fplanque
+ * button to remove an avatar from an user profile
+ *
  * Revision 1.17  2009/09/13 12:27:28  tblue246
  * Only display link to change to the avatar if user has appropriate permissions
  *
