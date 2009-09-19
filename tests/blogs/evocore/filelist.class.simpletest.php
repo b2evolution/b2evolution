@@ -9,7 +9,7 @@
  */
 require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 
-load_class( 'files/model/_filelist.class.php' );
+load_class( 'files/model/_filelist.class.php', 'FileList' );
 
 /**
  * @package tests

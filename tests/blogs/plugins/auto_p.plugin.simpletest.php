@@ -9,8 +9,6 @@
  */
 require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 
-require_once $GLOBALS['plugins_path'].'_auto_p.plugin.php';
-
 
 /**
  * @package tests
@@ -27,7 +25,7 @@ class AutoPPluginTestCase extends PluginUnitTestCase
 	{
 		parent::setup();
 
-		$this->Plugin = & $this->get_fake_Plugin('auto_p_plugin');
+		$this->Plugin = $this->get_fake_Plugin('auto_p_plugin');
 	}
 
 

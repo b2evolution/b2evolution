@@ -34,11 +34,26 @@ class PluginUnitTestCase extends EvoUnitTestCase
 	/**
 	 * @return Plugin
 	 */
+	function get_Plugin( $classname )
+	{
+		if( ! class_exists($classname) )
+		{
+			global $Plugins;
+			require_once $Plugins->get_classfile_path($classname);
+		}
+		$real_Plugin = new $classname();
+		return $real_Plugin;
+	}
+
+
+	/**
+	 * @return Plugin
+	 */
 	function & get_fake_Plugin( $classname )
 	{
 		$GLOBALS['Plugins'] = new Plugins_admin_no_DB();
 
-		$real_Plugin = new $classname();
+		$real_Plugin = $this->get_Plugin($classname);
 
 		// Fake DB entry:
 		$GLOBALS['Plugins']->index_ID_rows[1] = array(

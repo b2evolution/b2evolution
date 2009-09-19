@@ -10,7 +10,7 @@
 require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 
 
-load_class( 'users/model/_usercache.class.php' );
+load_class( 'users/model/_usercache.class.php', 'UserCache' );
 
 
 /**

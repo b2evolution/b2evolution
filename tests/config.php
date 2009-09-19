@@ -57,11 +57,19 @@ require_once $inc_path.'_core/_misc.funcs.php';
 
 // Load vars, e.g. $is_cli
 // TODO: this should get done in EvoUnitTestCase::setup (clean state), but needs global massaging.
+load_class('_core/model/_log.class.php', 'Log_noop');
 $Debuglog = new Log_noop; // used in _vars.inc
 require_once($inc_path.'_vars.inc.php');
 
 // Bootstrap charset handling (e.g. setting $io_charset)
 init_charsets('utf-8');
+
+
+load_class( '_core/model/_module.class.php', 'Module' );
+foreach( $modules as $module )
+{
+        require_once $inc_path.$module.'/_'.$module.'.init.php';
+}
 
 
 /**

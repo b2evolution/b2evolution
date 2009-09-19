@@ -11,19 +11,20 @@
  */
 //require_once( dirname(__FILE__).'/HtmlReporterShowPasses.class.php' );
 
-load_class( '_core/model/_log.class.php' );
-load_class( 'files/model/_filerootcache.class.php' );
-load_class( 'files/model/_filecache.class.php' );
-load_class( 'files/model/_filetypecache.class.php' );
-load_class( '_core/model/_timer.class.php' );
-load_class( 'plugins/model/_plugins_admin.class.php' );
-load_class( 'plugins/model/_plugins_admin_no_db.class.php' );
-load_class( 'settings/model/_generalsettings.class.php' );
-load_class( 'users/model/_usersettings.class.php' );
-load_class( 'users/model/_user.class.php' );
-load_class( 'users/model/_usercache.class.php' );
-load_class( 'files/model/_file.class.php' );
-load_class( 'files/model/_filetype.class.php' );
+load_class( '_core/model/_log.class.php', 'Log' );
+load_class( 'files/model/_filerootcache.class.php', 'FileRootCache' );
+load_class( 'files/model/_filecache.class.php', 'FileCache' );
+load_class( 'files/model/_filetypecache.class.php', 'FileTypeCache' );
+load_class( '_core/model/_timer.class.php', 'Timer' );
+load_class( 'plugins/model/_plugins_admin.class.php', 'Plugins_admin' );
+load_class( 'plugins/model/_plugins_admin_no_db.class.php', 'Plugins_admin_no_DB' );
+load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+load_class( 'users/model/_user.class.php', 'User' );
+load_class( 'users/model/_usercache.class.php', 'UserCache' );
+load_class( 'files/model/_file.class.php', 'File' );
+load_class( 'files/model/_filetype.class.php', 'FileType' );
+
 
 /**
  * Class EvoUnitTestCase

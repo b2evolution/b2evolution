@@ -9,13 +9,11 @@
  */
 require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 
-require_once( EVODIR.'blogs/plugins/_wikilinks.plugin.php' );
-
 
 /**
  * @package tests
  */
-class WikilinksPluginTestCase extends EvoUnitTestCase
+class WikilinksPluginTestCase extends PluginUnitTestCase
 {
 	function __construct()
 	{
@@ -26,7 +24,7 @@ class WikilinksPluginTestCase extends EvoUnitTestCase
 	function setUp()
 	{
 		parent::setup();
-		$this->Plugin = new wikilinks_plugin();
+		$this->Plugin = $this->get_Plugin('wikilinks_plugin');
 	}
 
 
