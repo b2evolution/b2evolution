@@ -157,6 +157,13 @@ class Hitlist
 			 AND dom_status = 'unknown'" );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_basedomains.', 'hit' );
 
+		// Prune entries from T_useragents which are not referenced in T_hitlog anymore.
+		$rows_affected = $DB->query('
+			DELETE T_useragents
+			  FROM T_useragents LEFT JOIN T_hitlog ON agnt_ID = hit_agnt_ID
+			 WHERE hit_agnt_ID IS NULL');
+		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_useragents.', 'hit' );
+
 		$Settings->set( 'auto_prune_stats_done', date('Y-m-d H:i:s', $localtimenow) ); // save exact datetime
 		$Settings->dbupdate();
 
@@ -166,6 +173,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/19 12:52:54  blueyed
+ * Remove obsolete entries from T_useragents when pruning hitlog info.
+ *
  * Revision 1.15  2009/09/14 18:37:07  fplanque
  * doc/cleanup/minor
  *
