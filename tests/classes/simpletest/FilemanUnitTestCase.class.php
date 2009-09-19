@@ -7,7 +7,7 @@
 /**
  * The class for Filemanager unit tests.
  */
-class FilemanUnitTestCase extends EvoUnitTestCase
+class EvoFilemanUnitTestCase extends EvoUnitTestCase
 {
 	/**
 	 * Remember created files.
@@ -24,7 +24,7 @@ class FilemanUnitTestCase extends EvoUnitTestCase
 
 		Mock::generate('GeneralSettings');
 
-		$this->old_Settings_FilemanUnitTestCase = & $GLOBALS['Settings'];
+		$this->old_Settings_EvoFilemanUnitTestCase = & $GLOBALS['Settings'];
 		$GLOBALS['Settings'] = new MockGeneralSettings();
 		$GLOBALS['Settings']->setReturnValue( 'get', 1, array( 'fm_enable_roots_user' ) );
 		$GLOBALS['Settings']->setReturnValue( 'get', '775', array( 'fm_default_chmod_dir' ) );
@@ -37,7 +37,7 @@ class FilemanUnitTestCase extends EvoUnitTestCase
 	 */
 	function tearDown()
 	{
-		$GLOBALS['Settings'] = & $this->old_Settings_FilemanUnitTestCase;
+		$GLOBALS['Settings'] = & $this->old_Settings_EvoFilemanUnitTestCase;
 		$this->unlinkCreatedFiles();
 
 		parent::tearDown();

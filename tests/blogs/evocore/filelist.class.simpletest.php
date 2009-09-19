@@ -14,7 +14,7 @@ load_class( 'files/model/_filelist.class.php', 'FileList' );
 /**
  * @package tests
  */
-class FilelistTestCase extends FilemanUnitTestCase
+class FilelistTestCase extends EvoFilemanUnitTestCase
 {
 	function __construct()
 	{
