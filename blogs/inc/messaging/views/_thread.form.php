@@ -67,8 +67,11 @@ $Form->radio( 'thrdtype', param( 'thrdtype', 'string', 'discussion' ), array(
 $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
-												/*
+/*
  * $Log$
+ * Revision 1.10  2009/09/19 01:15:49  fplanque
+ * minor
+ *
  * Revision 1.9  2009/09/18 10:38:31  efy-maxim
  * 15x15 icons next to login in messagin module
  *

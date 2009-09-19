@@ -611,11 +611,7 @@ function get_avatar_imgtag( $user_login, $size = 'crop-15x15', $class = 'avatar_
 
 		if( $show_login )
 		{
-			if( !empty( $img_tag ) )
-			{
-				$img_tag = $img_tag;
-			}
-			$img_tag = $img_tag.$user_login;
+			$img_tag = '<span class="nowrap">'.$img_tag.$user_login.'</span>';
 		}
 	}
 
@@ -651,6 +647,9 @@ function get_avatar_imgtags( $user_logins_list, $size = 'crop-15x15', $class = '
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/19 01:15:49  fplanque
+ * minor
+ *
  * Revision 1.13  2009/09/18 16:01:50  fplanque
  * cleanup
  *
