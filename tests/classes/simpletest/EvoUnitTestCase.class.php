@@ -57,6 +57,10 @@ class EvoUnitTestCase extends UnitTestCase
 
 		$Settings = new GeneralSettings();
 		$UserSettings = new UserSettings();
+
+		// Reload conf and vars.
+		require EVODIR.'blogs/conf/_config.php';
+		require EVODIR.'blogs/inc/_vars.inc.php';
 	}
 
 
