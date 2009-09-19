@@ -125,7 +125,7 @@ class Message extends DataObject
 	/**
 	 * Insert discussion (one thread for all recipients)
 	 *
-	 * @return true if success, instead false
+	 * @return true if success, false otherwise
 	 */
 	function dbinsert_discussion()
 	{
@@ -461,6 +461,9 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2009/09/19 20:47:08  fplanque
+ * doc
+ *
  * Revision 1.17  2009/09/19 11:29:05  efy-maxim
  * Refactoring
  *
