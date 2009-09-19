@@ -27,27 +27,71 @@
  * @author evofactory-test
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version _userfields.view.php,v 1.1 2009/09/11 18:34:05 fplanque Exp
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $rsc_url;
-global $Session;
+load_class( 'users/model/_userfield.class.php', 'Userfield' );
 
-/**
- * View funcs
- */
-// require_once dirname(__FILE__).'/_user_fields_view.funcs.php';
+global $dispatcher;
 
-$final = param( 'final', 'integer', 0, true );
+// Get params from request
+$s = param( 's', 'string', '', true );
+$s_type = param( 's_type', 'string', '', true );
+
+// Create query
+$SQL = & new SQL();
+$SQL->SELECT( '*' );
+$SQL->FROM( 'T_users__fielddefs' );
+
+if( !empty($s) )
+{	// We want to filter on search keyword:
+	// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
+	$SQL->WHERE_and( 'CONCAT_WS( " ", ufdf_name ) LIKE "%'.$DB->escape($s).'%"' );
+}
+
+if( !empty( $s_type ) )
+{	// We want to filter on user field type:
+	$SQL->WHERE_and( 'ufdf_type LIKE "%'.$DB->escape($s_type).'%"' );
+}
 
 // Create result set:
-$sql = 'SELECT *
-					FROM T_users__fielddefs';
-
-$Results = & new Results( $sql, 'ufdfs_', 'A' );
+$Results = & new Results( $SQL->get(), 'ufdf_', 'A' );
 
 $Results->title = T_('User fields');
+
+/**
+ * Callback to enumerate possible user field types
+ * 
+ */
+function enumerate_types( $selected = '' ) {
+	$options = '<option value="">All</option>';
+	foreach( Userfield::get_types() as $type_code => $type_name ) {
+		$options .= '<option value="'.$type_code.'" ';
+		if( $type_code == $selected ) $options .= '"selected" ';
+		$options .= '>'.$type_name.'</option>';
+	}
+	return $options;
+}
+
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_userfields( & $Form )
+{
+	$Form->text( 's', get_param('s'), 30, T_('Search'), '', 255 );
+	$Form->select( 's_type', get_param( 's_type' ), 'enumerate_types', T_('Type'), '', ''  );
+}
+
+$Results->filter_area = array(
+	'callback' => 'filter_userfields',
+	'presets' => array(
+		'all' => array( T_('All'), '?ctrl=userfields' ),
+		)
+	);
+
 
 $Results->cols[] = array(
 		'th' => T_('ID'),
@@ -70,20 +114,20 @@ $Results->cols[] = array(
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
-
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
 							'td' => action_icon( T_('Edit this user field...'), 'edit',
-	                        '%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=edit\')%' )
-	                    .action_icon( T_('Duplicate this user field...'), 'copy',
-	                        '%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=copy\')%' )
-	                    .action_icon( T_('Delete this file user field!'), 'delete',
-	                        '%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=delete\')%' ),
+										'%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=edit\')%' )
+									.action_icon( T_('Duplicate this user field...'), 'copy',
+										'%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=new\')%' )
+									.action_icon( T_('Delete this user field!'), 'delete',
+										'%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=delete\')%' ),
 						);
 
-  $Results->global_icon( T_('Create a new user field...'), 'new', regenerate_url( 'action', 'action=new' ), T_('New user field').' &raquo;', 3, 4  );
+  $Results->global_icon( T_('Create a new user field...'), 'new',
+				regenerate_url( 'action', 'action=new' ), T_('New user field').' &raquo;', 3, 4  );
 }
 
 
@@ -91,10 +135,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 $Results->display();
 
 /*
- * $Log$
- * Revision 1.6  2009/09/16 18:22:57  fplanque
- * Readded with -kkv option
- *
+ * _userfields.view.php,v
  * Revision 1.1  2009/09/11 18:34:05  fplanque
  * userfields editing module.
  * needs further cleanup but I think it works.
