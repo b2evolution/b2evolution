@@ -68,8 +68,7 @@ if( param( 'msg_ID', 'integer', '', true) )
 
 // Preload users to show theirs avatars
 
-$UserCache = & get_Cache( 'UserCache' );
-$UserCache->load_messaging_thread_recipients( $thrd_ID );
+load_messaging_thread_recipients( $thrd_ID );
 
 switch( $action )
 {
@@ -87,7 +86,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Insert in DB:
-			$edited_Message->dbinsert();
+			$edited_Message->dbinsert_message();
 			$Messages->add( T_('New message created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
@@ -165,6 +164,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/19 11:29:05  efy-maxim
+ * Refactoring
+ *
  * Revision 1.8  2009/09/18 16:16:50  efy-maxim
  * comments tab in messaging module
  *

@@ -71,6 +71,7 @@ class messaging_Module extends Module
 	 */
 	function init()
 	{
+		load_funcs( 'messaging/model/_messaging.funcs.php' );
 	}
 
 	/**
@@ -161,6 +162,9 @@ $messaging_Module = & new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/19 11:29:05  efy-maxim
+ * Refactoring
+ *
  * Revision 1.12  2009/09/18 16:16:50  efy-maxim
  * comments tab in messaging module
  *

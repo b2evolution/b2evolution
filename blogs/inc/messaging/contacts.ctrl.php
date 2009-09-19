@@ -40,8 +40,7 @@ param_action();
 
 // Preload users to show theirs avatars
 
-$UserCache = & get_Cache( 'UserCache' );
-$UserCache->load_messaging_threads_recipients( $current_User->ID );
+load_messaging_threads_recipients( $current_User->ID );
 
 switch( $action )
 {
@@ -92,6 +91,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2009/09/19 11:29:05  efy-maxim
+ * Refactoring
+ *
  * Revision 1.2  2009/09/19 01:15:49  fplanque
  * minor
  *

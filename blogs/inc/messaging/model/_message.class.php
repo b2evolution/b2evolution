@@ -54,6 +54,7 @@ class Message extends DataObject
 	 */
 	var $Thread;
 
+
 	/**
 	 * Constructor
 	 *
@@ -76,6 +77,7 @@ class Message extends DataObject
 			$this->text              = $db_row->msg_text;
 		}
 	}
+
 
 	/**
 	 * Load data from Request form fields.
@@ -104,6 +106,7 @@ class Message extends DataObject
 		return ! param_errors_detected();
 	}
 
+
 	/**
 	 * Get Thread object
 	 */
@@ -118,61 +121,21 @@ class Message extends DataObject
 		return $this->Thread;
 	}
 
+
 	/**
-	 * Insert object into DB based on previously recorded changes
+	 * Insert discussion (one thread for all recipients)
 	 *
-	 * fp> what is $type for???
-	 * @return boolean true on success
+	 * @return true if success, instead false
 	 */
-	function dbinsert( $type = NULL )
+	function dbinsert_discussion()
 	{
-		global $DB, $localtimenow;
+		global $DB;
 
 		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
 
 		$DB->begin();
 
 		$this->get_Thread();
-
-		if( $this->Thread->ID == 0 )
-		{	// We can create new thread or new threads
-
-			if ( $type == 'discussion' )
-			{	// Create one thread for all recipients
-				$success = $this->dbinsert_discussion();
-			}
-			else
-			{	// Create thread for each recipient
-				$success = $this->dbinsert_individual();
-			}
-		}
-		else
-		{	// We can update thread and create new message
-			$success = $this->dbinsert_message();
-		}
-
-		if( $success )
-		{
-			$success = $this->dbupdate_last_contact_datetime();
-		}
-
-		if( !$success )
-		{
-			$DB->rollback();
-			return false;
-		}
-
-		$DB->commit();
-		return true;
-	}
-
-	/**
-	 * Insert discussion (one thread for all recipients)
-	 * @return true if success, instead false
-	 */
-	function dbinsert_discussion()
-	{
-		global $DB;
 
 		if ( $this->Thread->dbinsert() )
 		{
@@ -184,18 +147,26 @@ class Message extends DataObject
 				{
 					if( $this->dbinsert_contacts( $this->Thread->recipients_list ) )
 					{
-						$this->send_email_notifications();
-						return true;
+						if( $this->dbupdate_last_contact_datetime() )
+						{
+							$DB->commit();
+
+							$this->send_email_notifications();
+							return true;
+						}
 					}
 				}
 			}
 		}
 
+		$DB->rollback();
 		return false;
 	}
 
+
 	/**
 	 * Insert new thread for each recipient
+	 *
 	 * @return true if success, instead false
 	 */
 	function dbinsert_individual()
@@ -215,13 +186,21 @@ class Message extends DataObject
 		return true;
 	}
 
+
 	/**
 	 * Insert message in existing thread
+	 *
 	 * @return true if success, instead false
 	 */
 	function dbinsert_message()
 	{
 		global $DB, $localtimenow;
+
+		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
+
+		$DB->begin();
+
+		$this->get_Thread();
 
 		$this->Thread->set_param( 'datemodified', 'string', date( 'Y-m-d H:i:s', $localtimenow ) );
 
@@ -239,17 +218,24 @@ class Message extends DataObject
 
 				$DB->query( $sql, 'Insert thread statuses' );
 
-				$this->send_email_notifications( false );
+				if( $this->dbupdate_last_contact_datetime() )
+				{
+					$DB->commit();
 
-				return true;
+					$this->send_email_notifications( false );
+					return true;
+				}
 			}
 		}
 
-		return false;;
+		$DB->rollback();
+		return false;
 	}
+
 
 	/**
 	 * Insert recipients into database
+	 *
 	 * @param recipients
 	 * @return true if success, instead false
 	 */
@@ -269,8 +255,10 @@ class Message extends DataObject
 		return $DB->query( $sql, 'Insert thread statuses' );
 	}
 
+
 	/**
 	 * Insert contacts into database
+	 *
 	 * @param recipients
 	 * @return true if success, instead false
 	 */
@@ -317,15 +305,21 @@ class Message extends DataObject
 		return true;
 	}
 
+
 	/**
 	 * Update last contact datetimes
+	 *
 	 * @return true if success
 	 */
 	function dbupdate_last_contact_datetime()
 	{
 		global $DB, $localtimenow;
 
-		// efy-maxim> TODO: two SQL queries are used instead one update with subselect, because T_messaging__threadstatus alias is not converted to real table name (evo_messaging__threadstatus)
+		// efy-maxim> TODO: two SQL queries are used instead one update with subselect,
+		// because T_messaging__threadstatus alias is not converted to real table name.
+		// Also, it can't be improved right now because it depends of
+		// (pls. see blueyed's comment for $DB->query() function)
+
 		$select_SQL = & new SQL();
 		$select_SQL->SELECT( 'GROUP_CONCAT(tsta_user_ID SEPARATOR \',\')' );
 		$select_SQL->FROM( 'T_messaging__threadstatus' );
@@ -345,8 +339,10 @@ class Message extends DataObject
 		return true;
 	}
 
+
 	/**
 	 * Clone current message and convert cloned message from 'individual' to 'discussion'.
+	 *
 	 * @param instance of Message class
 	 * @return cloned message
 	 */
@@ -362,6 +358,7 @@ class Message extends DataObject
 
 		return $new_Message;
 	}
+
 
 	/**
 	 * Delete message and dependencies from database
@@ -393,6 +390,7 @@ class Message extends DataObject
 
 		return true;
 	}
+
 
 	/**
 	 * Send email notification to recipients on new thread or new message event.
@@ -463,6 +461,9 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2009/09/19 11:29:05  efy-maxim
+ * Refactoring
+ *
  * Revision 1.16  2009/09/18 14:22:11  efy-maxim
  * 1. 'reply' permission in group form
  * 2. functionality to store and update contacts

@@ -49,6 +49,7 @@ class Thread extends DataObject
 	 */
 	var $recipients_list;
 
+
 	/**
 	 * Constructor
 	 * @param db_row database row
@@ -68,6 +69,7 @@ class Thread extends DataObject
 			$this->datemodified = $db_row->thrd_datemodified;
 		}
 	}
+
 
 	/**
 	 * Load data from Request form fields.
@@ -89,6 +91,7 @@ class Thread extends DataObject
 
 		return ! param_errors_detected();
 	}
+
 
 	/**
 	 * Set param value
@@ -112,6 +115,7 @@ class Thread extends DataObject
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
+
 
 	/**
 	 * Check are recipients available in database
@@ -187,6 +191,7 @@ class Thread extends DataObject
 		return true;
 	}
 
+
 	/**
 	 * Delete thread and dependencies from database
 	 */
@@ -220,6 +225,9 @@ class Thread extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/19 11:29:05  efy-maxim
+ * Refactoring
+ *
  * Revision 1.13  2009/09/16 09:15:32  efy-maxim
  * Messaging module improvements
  *

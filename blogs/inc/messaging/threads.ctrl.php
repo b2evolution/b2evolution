@@ -44,8 +44,7 @@ if( param( 'msg_ID', 'integer', '', true) )
 
 // Preload users to show theirs avatars
 
-$UserCache = & get_Cache( 'UserCache' );
-$UserCache->load_messaging_threads_recipients( $current_User->ID );
+load_messaging_threads_recipients( $current_User->ID );
 
 switch( $action )
 {
@@ -85,7 +84,15 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Insert in DB:
-			$edited_Message->dbinsert( param( 'thrdtype', 'string', 'discussion' ) );
+			if( param( 'thrdtype', 'string', 'discussion' ) == 'discussion' )
+			{
+				$edited_Message->dbinsert_discussion();
+			}
+			else
+			{
+				$edited_Message->dbinsert_individual();
+			}
+
 			$Messages->add( T_('New thread created.'), 'success' );
 
 			// What next?
@@ -180,6 +187,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/19 11:29:05  efy-maxim
+ * Refactoring
+ *
  * Revision 1.7  2009/09/18 16:16:50  efy-maxim
  * comments tab in messaging module
  *

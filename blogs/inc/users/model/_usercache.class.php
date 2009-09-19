@@ -207,70 +207,7 @@ class UserCache extends DataObjectCache
 
 		return true;
 	}
-	
 
-	/**
-	 * Extract list of contacts of current user from his message threads
-	 *
-	 * @todo fp> Although this deals with user IDs, this function should go to the Messaging module (see todo in next func below)
-	 *
-	 * @param current user ID
-	 */
-	function load_messaging_threads_recipients( $user_ID )
-	{
-		global $DB;
-
-		$SQL = & new SQL();
-
-		$SQL->SELECT( 'DISTINCT u.*' );
-
-		$SQL->FROM( 'T_messaging__threadstatus ts
-						LEFT OUTER JOIN T_messaging__threadstatus tsr
-							ON ts.tsta_thread_ID = tsr.tsta_thread_ID
-						LEFT OUTER JOIN T_users u
-							ON tsr.tsta_user_ID = u.user_ID' );
-
-		$SQL->WHERE( 'ts.tsta_user_ID = '.$user_ID );
-
-		foreach( $DB->get_results( $SQL->get() ) as $row )
-		{
-			if( !isset($this->cache[$row->user_ID]) )
-			{
-				$this->add( new User( $row ) );
-			}
-		}
-	}
-
-
-	/**
-	 * Load all of the recipients of current thread
-	 *
-	 * @todo fp> I think this should dbe a method of Thread (Ideally the app can handle Users without the Messaging module enabled - reverse can never be true)
-	 *
-	 * @param current thread ID
-	 */
-	function load_messaging_thread_recipients( $thrd_ID )
-	{
-		global $DB;
-
-		$SQL = & new SQL();
-
-		$SQL->SELECT( 'u.*' );
-
-		$SQL->FROM( 'T_messaging__threadstatus ts
-						LEFT OUTER JOIN T_users u
-							ON ts.tsta_user_ID = u.user_ID' );
-
-		$SQL->WHERE( 'ts.tsta_thread_ID = '.$thrd_ID );
-
-		foreach( $DB->get_results( $SQL->get() ) as $row )
-		{
-			if( !isset($this->cache[$row->user_ID]) )
-			{
-				$this->add( new User( $row ) );
-			}
-		}
-	}
 
 	/**
 	 * Loads cache with blog memeber, then display form option list with cache contents
@@ -331,6 +268,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/19 11:29:05  efy-maxim
+ * Refactoring
+ *
  * Revision 1.8  2009/09/18 15:47:11  fplanque
  * doc/cleanup
  *
