@@ -29,7 +29,8 @@ global $dispatcher;
 $blog = 0;
 
 // Do we have permission to view all stats (aggregated stats) ?
-$current_User->check_perm( 'stats', 'view', true );
+$sessions_Module->check_perm( 'view' );
+
 
 $tab3 = param( 'tab3', 'string', 'goals', true );
 $AdminUI->set_path( 'stats', 'goals', $tab3 );
@@ -52,8 +53,9 @@ switch( $action )
 {
 
 	case 'new':
+	case 'copy':
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		$sessions_Module->check_perm( 'edit' );
 
 		if( ! isset($edited_Goal) )
 		{	// We don't have a model to use, start with blank object:
@@ -70,7 +72,7 @@ switch( $action )
 		// Edit file type form...:
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		$sessions_Module->check_perm( 'edit' );
 
 		// Make sure we got an ftyp_ID:
 		param( 'goal_ID', 'integer', true );
@@ -83,18 +85,18 @@ switch( $action )
 		$edited_Goal = & new Goal();
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		$sessions_Module->check_perm( 'edit' );
 
 		// load data from request
 		if( $edited_Goal->load_from_Request() )
 		{	// We could load data from form without errors:
-			
-			// Insert in DB:			
-			$DB->begin();			
+
+			// Insert in DB:
+			$DB->begin();
 			$q = $edited_Goal->dbexists();
 			if($q)
 			{	// We have a duplicate entry:
-				
+
 				param_error( 'goal_key',
 					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
 						'href="?ctrl=goals&amp;action=edit&amp;goal_ID='.$q.'"' ) );
@@ -103,8 +105,8 @@ switch( $action )
 			{
 				$edited_Goal->dbinsert();
 				$Messages->add( T_('New goal created.'), 'success' );
-			}		
-			$DB->commit();			
+			}
+			$DB->commit();
 
 			if( empty($q) )
 			{	// What next?
@@ -134,7 +136,7 @@ switch( $action )
 		// Edit file type form...:
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		$sessions_Module->check_perm( 'edit' );
 
 		// Make sure we got an ftyp_ID:
 		param( 'goal_ID', 'integer', true );
@@ -142,24 +144,24 @@ switch( $action )
 		// load data from request
 		if( $edited_Goal->load_from_Request() )
 		{	// We could load data from form without errors:
-			
-			// Update in DB:			
-			$DB->begin();			
+
+			// Update in DB:
+			$DB->begin();
 			$q = $edited_Goal->dbexists();
 			if($q)
 			{	// We have a duplicate entry:
-				
+
 				param_error( 'goal_key',
 					sprintf( T_('This goal already exists. Do you want to <a %s>edit the existing goal</a>?'),
 						'href="?ctrl=goals&amp;action=edit&amp;goal_ID='.$q.'"' ) );
 			}
 			else
 			{
-				$edited_Goal->dbupdate();			
+				$edited_Goal->dbupdate();
 				$Messages->add( T_('Goal updated.'), 'success' );
-			}		
-			$DB->commit();		
-			
+			}
+			$DB->commit();
+
 			if( empty($q) )
 			{
 				$action = 'list';
@@ -168,15 +170,15 @@ switch( $action )
 				// We have EXITed already at this point!!
 			}
 		}
-		
-		
+
+
 		break;
 
 	case 'delete':
 		// Delete file type:
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		$sessions_Module->check_perm( 'edit' );
 
 		// Make sure we got an ftyp_ID:
 		param( 'goal_ID', 'integer', true );
@@ -230,6 +232,7 @@ switch( $action )
 				$action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':
+	case 'copy':
 	case 'create':	// we return in this state after a validation error
 	case 'create_new':	// we return in this state after a validation error
 	case 'create_copy':	// we return in this state after a validation error
@@ -264,6 +267,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/19 20:49:51  fplanque
+ * Cleaner way of implementing permissions.
+ *
  * Revision 1.15  2009/09/14 13:39:00  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

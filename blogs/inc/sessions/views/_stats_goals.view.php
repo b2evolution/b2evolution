@@ -43,6 +43,8 @@ if( !empty($s) )
 // Create result set:
 $Results = & new Results( $SQL->get(), 'goals_', '-A' );
 
+$Results->Cache = & get_GoalCache();
+
 $Results->title = T_('Goals');
 
 /**
@@ -80,7 +82,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Key'),
 		'order' => 'goal_key',
-		'td' => '<a href="%regenerate_url( \'action\', \'goal_ID=$goal_ID$&amp;action=edit\')%">$goal_key$</a>',
+		'td' => '@action_link( "edit", #goal_key# )@',
  	);
 
 
@@ -105,12 +107,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'th' => T_('Actions'),
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
-							'td' => action_icon( T_('Edit this goal...'), 'edit',
-	                        '%regenerate_url( \'action\', \'goal_ID=$goal_ID$&amp;action=edit\')%' )
-	                    .action_icon( T_('Duplicate this goal...'), 'copy',
-	                        '%regenerate_url( \'action\', \'goal_ID=$goal_ID$&amp;action=new\')%' )
-	                    .action_icon( T_('Delete this file goal!'), 'delete',
-	                        '%regenerate_url( \'action\', \'goal_ID=$goal_ID$&amp;action=delete\')%' ),
+							'td' => '@action_icon("edit")@@action_icon("copy")@@action_icon("delete")@',
 						);
 
   $Results->global_icon( T_('Create a new goal...'), 'new', regenerate_url( 'action', 'action=new' ), T_('New goal').' &raquo;', 3, 4  );
@@ -122,6 +119,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/19 20:49:51  fplanque
+ * Cleaner way of implementing permissions.
+ *
  * Revision 1.6  2009/09/12 00:20:59  fplanque
  * search cleanup
  *

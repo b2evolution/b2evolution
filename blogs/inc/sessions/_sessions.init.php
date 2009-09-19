@@ -270,6 +270,23 @@ class sessions_Module extends Module
 				);
 		}
 	}
+
+	/**
+	 * Check global permissions for this module (not for specific object - those should be handled in the appropriate DataObject class)
+	 *
+	 * @todo fp> break up central User::check_perm() so that add-on modules do not need to add code into User class.
+	 *
+	 * @param mixed $action
+	 * @param mixed $assert
+	 */
+	function check_perm( $action = 'view', $assert = true )
+	{
+		global $current_User;
+
+		return $current_User->check_perm( 'stats', $action, $assert );
+	}
+
+
 }
 
 $sessions_Module = & new sessions_Module();
@@ -277,6 +294,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.17  2009/09/19 20:49:51  fplanque
+ * Cleaner way of implementing permissions.
+ *
  * Revision 1.16  2009/09/16 00:48:50  fplanque
  * getting a bit more serious with modules
  *

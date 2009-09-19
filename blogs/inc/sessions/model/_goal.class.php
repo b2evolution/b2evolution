@@ -66,6 +66,43 @@ class Goal extends DataObject
 
 
 	/**
+	 * Generate help title text for action
+	 *
+	 * @param string action code: edit, delete, etc.
+	 * @return string translated help string
+	 */
+	function get_action_title( $action )
+	{
+		switch( $action )
+		{
+			case 'edit': return T_('Edit this goal...');
+			case 'copy': return T_('Duplicate this goal...');
+			case 'delete': return T_('Delete this goal!');
+			default:
+				return '';
+		}
+	}
+
+
+	/**
+	 * Check permission on a persona
+	 *
+	 * @todo fp> break up central User::check_perm() so that add-on modules do not need to add code into User class.
+	 *
+	 * @return boolean true if granted
+	 */
+	function check_perm( $action= 'view', $assert = true )
+	{
+		/**
+		* @var User
+		*/
+		global $current_User;
+
+		return $current_User->check_perm( 'stats', $action, $assert );
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.
@@ -122,7 +159,8 @@ class Goal extends DataObject
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
 	}
-	
+
+
 	/**
 	 * Check existing of specified goal in goal_key unique field.
 	 *
@@ -130,12 +168,15 @@ class Goal extends DataObject
 	 */
 	function dbexists()
 	{
-		return parent::dbexists('goal_key', $this->key);		
+		return parent::dbexists('goal_key', $this->key);
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/19 20:49:51  fplanque
+ * Cleaner way of implementing permissions.
+ *
  * Revision 1.7  2009/09/14 13:38:10  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

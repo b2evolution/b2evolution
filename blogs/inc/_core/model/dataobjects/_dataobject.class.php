@@ -687,23 +687,53 @@ class DataObject
 		echo $this->ID;
 	}
 
+
 	/**
-	* EXPERIMENTAL:
-	*/
+	 * Generate help title text for action
+	 *
+	 * @param string action code: edit, delete, etc.
+	 * @return string translated help string
+	 */
+	function get_action_title( $action )
+	{
+		switch( $action )
+		{
+			case 'edit': return T_('Edit this object...');
+			case 'copy': return T_('Duplicate this object...');
+			case 'delete': return T_('Delete this object!');
+			default:
+				return '';
+		}
+	}
+
+
+	/**
+	 * Generate requested action icon depending on perm
+	 */
 	function action_icon( $action, $help_texts = array() )
 	{
-		$help_texts = array_merge( array(
-				'edit' => NT_('Edit this object...'),
-				'delete' => NT_('Delete this object!'),
-			), $help_texts );
-
 		if( ! $this->check_perm($action, false) )
 		{	// permission denied:
 			return '';
 		}
 
-		return action_icon( T_($help_texts[$action]), $action,
+		return action_icon( $this->get_action_title($action), $action,
 	              				regenerate_url( 'action', $this->dbIDname.'='.$this->ID.'&amp;action='.$action ) );
+	}
+
+
+	/**
+	 * Generate requested action link depending on perm
+	 */
+	function action_link( $action, $link_text, $help_texts = array() )
+	{
+		if( ! $this->check_perm($action, false) )
+		{	// permission denied:
+			return '';
+		}
+
+		return '<a href="'.regenerate_url( 'action', $this->dbIDname.'='.$this->ID.'&amp;action='.$action )
+						.'" title="'.$this->get_action_title($action).'">'.$link_text.'</a>';
 	}
 
 
@@ -764,6 +794,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/19 20:49:51  fplanque
+ * Cleaner way of implementing permissions.
+ *
  * Revision 1.14  2009/09/11 18:34:05  fplanque
  * userfields editing module.
  * needs further cleanup but I think it works.

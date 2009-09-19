@@ -31,7 +31,10 @@ param( 'results_goals_order', 'string', '', true );
 
 $Form = & new Form( NULL, 'goal_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Delete this goal!'), 'delete', regenerate_url( 'action', 'action=delete' ) );
+if( ! $creating )
+{
+	$Form->global_icon( T_('Delete this goal!'), 'delete', regenerate_url( 'action', 'action=delete' ) );
+}
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', $creating ?  T_('New goal') : T_('Goal') );
@@ -62,6 +65,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/19 20:49:51  fplanque
+ * Cleaner way of implementing permissions.
+ *
  * Revision 1.6  2009/08/31 14:22:10  tblue246
  * Better fix
  *
