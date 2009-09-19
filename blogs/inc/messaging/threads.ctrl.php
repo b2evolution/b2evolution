@@ -83,26 +83,38 @@ switch( $action )
 		if( $edited_Message->load_from_Request() )
 		{	// We could load data from form without errors:
 
-			// Insert in DB:
-			if( param( 'thrdtype', 'string', 'discussion' ) == 'discussion' )
+			if( $current_User->check_perm( 'messaging', 'reply' ) )
 			{
-				$edited_Message->dbinsert_discussion();
-			}
-			else
-			{
-				$edited_Message->dbinsert_individual();
+				$blocked_contacts = check_blocked_contacts( $edited_Thread->recipients_list );
+				if( !empty( $blocked_contacts ) )
+				{
+					param_error( 'thrd_recipients', T_( 'You don\'t have permission to initiate conversations with the following users: ' ). implode( ', ', $blocked_contacts ) );
+				}
 			}
 
-			$Messages->add( T_('New thread created.'), 'success' );
-
-			// What next?
-			switch( $action )
+			if( ! param_errors_detected() )
 			{
-				case 'create':
-					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=threads', 303 ); // Will EXIT
-					// We have EXITed already at this point!!
-					break;
+				// Insert in DB:
+				if( param( 'thrdtype', 'string', 'discussion' ) == 'discussion' )
+				{
+					$edited_Message->dbinsert_discussion();
+				}
+				else
+				{
+					$edited_Message->dbinsert_individual();
+				}
+
+				$Messages->add( T_('New thread created.'), 'success' );
+
+				// What next?
+				switch( $action )
+				{
+					case 'create':
+						// Redirect so that a reload doesn't write to the DB twice:
+						header_redirect( '?ctrl=threads', 303 ); // Will EXIT
+						// We have EXITed already at this point!!
+						break;
+				}
 			}
 		}
 		break;
@@ -187,6 +199,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/19 20:31:38  efy-maxim
+ * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
+ *
  * Revision 1.8  2009/09/19 11:29:05  efy-maxim
  * Refactoring
  *

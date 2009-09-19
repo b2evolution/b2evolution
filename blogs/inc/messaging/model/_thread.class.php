@@ -51,6 +51,14 @@ class Thread extends DataObject
 
 
 	/**
+	 * Unblocked contacts IDs lazy filled
+	 *
+	 * @var array
+	 */
+	var $contacts_list;
+
+
+	/**
 	 * Constructor
 	 * @param db_row database row
 	 */
@@ -221,10 +229,87 @@ class Thread extends DataObject
 
 		return true;
 	}
+
+
+	/**
+	 * Load recipients of the current thread
+	 *
+	 * @return recipients list
+	 */
+	function load_recipients()
+	{
+		global $DB;
+
+		$SQL = & new SQL();
+		$SQL->SELECT( 'tsta_user_ID' );
+		$SQL->FROM( 'T_messaging__threadstatus' );
+		$SQL->WHERE( 'tsta_thread_ID = '.$this->ID );
+
+		$this->recipients_list = array();
+		foreach( $DB->get_results( $SQL->get() ) as $row )
+		{
+			$this->recipients_list[] = $row->tsta_user_ID;
+		}
+
+		return $this->recipients_list;
+	}
+
+
+	/**
+	 * Load all of the non blocked contacts of current thread
+
+	 * @return contacts
+	 */
+	function load_contacts()
+	{
+		global $DB, $current_User;
+
+		if( empty( $this->contacts_list ) )
+		{
+			$SQL = & new SQL();
+			$SQL->SELECT( 'u.user_ID' );
+			$SQL->FROM( 'T_messaging__threadstatus ts
+							INNER JOIN T_messaging__contact mc
+								ON ts.tsta_user_ID = mc.mct_from_user_ID
+								AND mc.mct_to_user_ID = '.$current_User->ID.'
+								AND mc.mct_blocked = 0
+							LEFT OUTER JOIN T_users u
+								ON ts.tsta_user_ID = u.user_ID' );
+			$SQL->WHERE( 'ts.tsta_user_ID <> '.$current_User->ID );
+			$SQL->WHERE_and( 'ts.tsta_thread_ID ='.$this->ID );
+
+			foreach( $DB->get_results( $SQL->get() ) as $row )
+			{
+				$this->contacts_list[] = $row->user_ID;
+			}
+		}
+
+		return $this->contacts_list;
+	}
+
+
+	/**
+	 * Check if user is recipient of the current thread
+	 *
+	 * @param user ID
+	 * @return true is user is recipient, instead false
+	 */
+	function check_thread_recipient( $user_ID )
+	{
+		if( empty( $this->recipients_list ) )
+		{
+			$this->load_recipients();
+		}
+
+		return in_array( $user_ID, $this->recipients_list );
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/19 20:31:38  efy-maxim
+ * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
+ *
  * Revision 1.14  2009/09/19 11:29:05  efy-maxim
  * Refactoring
  *

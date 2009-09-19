@@ -32,7 +32,7 @@ global $read_unread_recipients;
 // Create SELECT query
 
 $select_SQL = & new SQL();
-$select_SQL->SELECT( 'mc.mct_to_user_ID, mc.mct_last_contact_datetime, u.user_login AS mct_to_user_ID' );
+$select_SQL->SELECT( 'mc.mct_to_user_ID, mc.mct_blocked, mc.mct_last_contact_datetime, u.user_login AS mct_to_user_login' );
 
 $select_SQL->FROM( 'T_messaging__contact mc
 						LEFT OUTER JOIN T_users u
@@ -58,7 +58,7 @@ $Results->title = T_('Contacts list');
 
 $Results->cols[] = array(
 					'th' => T_('Contact'),
-					'td' => '%get_avatar_imgtag( #mct_to_user_ID# )%',
+					'td' => '%get_avatar_imgtag( #mct_to_user_login# )%',
 					);
 
 $Results->cols[] = array(
@@ -67,16 +67,40 @@ $Results->cols[] = array(
 					'td_class' => 'shrinkwrap',
 					'td' => '%mysql2localedatetime(#mct_last_contact_datetime#)%' );
 
+/**
+ * Get block/unblock icon
+ *
+ * @param block value
+ * @param user ID
+ * @return icon
+ */
+function contact_block( $block, $user_ID )
+{
+	global $admin_url;
+
+	if( $block == 0 )
+	{
+		return action_icon( T_('Block contact'), 'file_allowed', $admin_url.'?ctrl=contacts&action=block&user_ID='.$user_ID );
+	}
+	else
+	{
+		return action_icon( T_('Unblock contact'), 'file_not_allowed', $admin_url.'?ctrl=contacts&action=unblock&user_ID='.$user_ID );
+	}
+}
+
 $Results->cols[] = array(
 					'th' => T_('Block / Unblock'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
-					'td' => '&nbsp;' );
+					'td' => '%contact_block( #mct_blocked#, #mct_to_user_ID# )%' );
 
 $Results->display();
 
 /*
  * $Log$
+ * Revision 1.3  2009/09/19 20:31:39  efy-maxim
+ * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
+ *
  * Revision 1.2  2009/09/19 01:15:49  fplanque
  * minor
  *

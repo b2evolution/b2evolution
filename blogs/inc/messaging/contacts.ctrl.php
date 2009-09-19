@@ -27,7 +27,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var User
  */
-global $current_User;
+global $DB, $current_User;
 
 // Check minimum permission:
 $current_User->check_perm( 'messaging', 'write', true );
@@ -45,18 +45,30 @@ load_messaging_threads_recipients( $current_User->ID );
 switch( $action )
 {
 	case 'block': // Block selected contact
-
-		// Check permission:
-		$current_User->check_perm( 'messaging', 'write', true );
-
+		$mct_blocked = 1;
 		break;
 
 	case 'unblock': // Unblock selected contact
-
-		// Check permission:
-		$current_User->check_perm( 'messaging', 'write', true );
-
+		$mct_blocked = 0;
 		break;
+}
+
+if( isset( $mct_blocked ) )
+{
+	// Check permission:
+	$current_User->check_perm( 'messaging', 'write', true );
+
+	$sql = 'UPDATE T_messaging__contact
+				SET mct_blocked = '.$mct_blocked.'
+					WHERE mct_from_user_ID = '.$current_User->ID.'
+					AND mct_to_user_ID = '.param( 'user_ID', 'integer' );
+
+	$DB->query( $sql );
+
+	// Redirect so that a reload doesn't write to the DB twice:
+	header_redirect( '?ctrl=contacts', 303 ); // Will EXIT
+	// We have EXITed already at this point!!
+	break;
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -91,6 +103,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2009/09/19 20:31:38  efy-maxim
+ * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
+ *
  * Revision 1.3  2009/09/19 11:29:05  efy-maxim
  * Refactoring
  *

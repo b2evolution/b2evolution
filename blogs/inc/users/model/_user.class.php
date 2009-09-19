@@ -797,9 +797,16 @@ class User extends DataObject
 				break;
 
 		case 'messaging':
+
 				if( $perm_target > 0 )
 				{   // Check user permission for current thread
-					if( !$this->check_thread_recipient( $perm_target ) )
+
+					// efy-maxim> Currently, below code can't be moved to messaging code
+					// efy-maxim> because messaging permissions can only be checked in core module
+					$ThreadCache = & get_Cache( 'ThreadCache' );
+					$Thread = & $ThreadCache->get_by_ID( $perm_target, false );
+
+					if( $Thread === false || ! $Thread->check_thread_recipient( $this->ID ) )
 					{
 						// Access denied
 						break;
@@ -913,32 +920,6 @@ class User extends DataObject
 		$Blog = & $BlogCache->get_by_ID( $blog_ID );
 
 		return ( $Blog->owner_user_ID == $this->ID );
-	}
-
-
-	/**
-	 * Check if current user is recipient of the thread
-	 *
-	 * @todo fp> Cache result so multiple perm checks don't trigger multiple queries
-	 * @todo fp> move to Thread class because User class can exist without Messaging module and opposite is not true, so it makes more sense messaging be a layer above user instead of an interlocked architecture
-	 *
-	 * @param thread ID
-	 * @return true is user is recipient, instead false
-	 */
-	function check_thread_recipient( $thrd_ID )
-	{
-		global $DB;
-
-		$SQL = & new SQL();
-		$SQL->SELECT( 'COUNT(*)' );
-		$SQL->FROM( 'T_messaging__threadstatus' );
-		$SQL->WHERE( 'tsta_thread_ID = '.$thrd_ID.' AND tsta_user_ID = '.$this->ID );
-		if( $DB->get_var( $SQL->get() ) > 0 )
-		{
-			return true;
-		}
-
-		return false;
 	}
 
 
@@ -1708,6 +1689,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.43  2009/09/19 20:31:39  efy-maxim
+ * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
+ *
  * Revision 1.42  2009/09/19 01:04:06  fplanque
  * button to remove an avatar from an user profile
  *

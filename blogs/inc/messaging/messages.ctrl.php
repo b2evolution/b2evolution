@@ -85,13 +85,25 @@ switch( $action )
 		if( $edited_Message->load_from_Request() )
 		{	// We could load data from form without errors:
 
-			// Insert in DB:
-			$edited_Message->dbinsert_message();
-			$Messages->add( T_('New message created.'), 'success' );
+			if( $current_User->check_perm( 'messaging', 'reply' ) )
+			{
+				$non_blocked_contacts = $edited_Thread->load_contacts();
+				if( empty( $non_blocked_contacts ) )
+				{
+					param_error( '', T_( 'You don\'t have permission to reply here.' ) );
+				}
+			}
 
-			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=messages&thrd_ID='.$thrd_ID, 303 ); // Will EXIT
-			// We have EXITed already at this point!!
+			if( ! param_errors_detected() )
+			{
+				// Insert in DB:
+				$edited_Message->dbinsert_message();
+				$Messages->add( T_('New message created.'), 'success' );
+
+				// Redirect so that a reload doesn't write to the DB twice:
+				header_redirect( '?ctrl=messages&thrd_ID='.$thrd_ID, 303 ); // Will EXIT
+				// We have EXITed already at this point!!
+			}
 		}
 		break;
 
@@ -164,6 +176,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/19 20:31:38  efy-maxim
+ * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
+ *
  * Revision 1.9  2009/09/19 11:29:05  efy-maxim
  * Refactoring
  *

@@ -66,4 +66,40 @@ function load_messaging_thread_recipients( $thrd_ID )
 	}
 }
 
+
+/**
+ * Check blocked contacts in recipients list
+ *
+ * @param recipients list
+ * @return blocked contacts array
+ */
+function check_blocked_contacts( $recipients_list )
+{
+	global $DB, $current_User;
+
+	$SQL = & new SQL();
+
+	$SQL->SELECT( 'u.user_login' );
+
+	$SQL->FROM( 'T_users u
+					LEFT OUTER JOIN T_messaging__contact mcu
+						ON u.user_ID = mcu.mct_from_user_ID
+    					AND mcu.mct_to_user_ID = '.$current_User->ID.'
+    					AND mcu.mct_blocked = 0' );
+
+	$SQL->WHERE( 'u.user_ID <> '.$current_User->ID );
+	$SQL->WHERE_and( 'mcu.mct_from_user_ID IS NULL' );
+	$SQL->WHERE_and( 'u.user_ID IN ('.implode( ',', $recipients_list ).')' );
+
+	$SQL->ORDER_BY( 'u.user_login' );
+
+	$blocked_contacts = array();
+	foreach( $DB->get_results( $SQL->get() ) as $row )
+	{
+		$blocked_contacts[] = $row->user_login;
+	}
+
+	return $blocked_contacts;
+}
+
 ?>

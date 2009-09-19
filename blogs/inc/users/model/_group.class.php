@@ -325,6 +325,7 @@ class Group extends DataObject
 				break;
 
 			case 'messaging':
+
 				switch ( $permvalue )
 				{
 					case 'delete':
@@ -334,17 +335,18 @@ class Group extends DataObject
 							$perm = true;
 							break;
 						}
-						// ... or for any lower priority perm... (no break)
-					case 'write':
-						//  you create threads, view any thread you're involved in & reply
-						if( $permlevel == 'write' )
+
+					case 'reply':
+						//  reply to people you have messaged with in the past
+						if( $permlevel == 'reply' && $permvalue != 'delete')
 						{
 							$perm = true;
 							break;
 						}
-					case 'reply':
-						//  reply to people you have messaged with in the past
-						if( $permlevel == 'reply' )
+					// ... or for any lower priority perm... (no break)
+					case 'write':
+						//  you create threads, view any thread you're involved in & reply
+						if( $permlevel == 'write' )
 						{
 							$perm = true;
 							break;
@@ -561,6 +563,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2009/09/19 20:31:39  efy-maxim
+ * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
+ *
  * Revision 1.18  2009/09/18 16:16:50  efy-maxim
  * comments tab in messaging module
  *
