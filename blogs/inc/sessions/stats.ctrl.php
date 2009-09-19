@@ -50,8 +50,16 @@ if( $tab == 'sessions' && (!$perm_view_all || $blog != 0) )
 	$tab = 'summary';
 }
 $tab3 = param( 'tab3', 'string', '', true );
-$AdminUI->set_path( 'stats', $tab, $tab3 );
-$AdminUI->title = T_('Stats');
+if( $tab == 'sessions' )
+{ // Show this sub-tab in Users tab
+	$AdminUI->set_path( 'users', $tab, $tab3 );
+	$AdminUI->title = T_('Stats');
+}
+else
+{
+	$AdminUI->set_path( 'stats', $tab, $tab3 );
+	$AdminUI->title = T_('Stats');
+}
 
 param( 'action', 'string' );
 
@@ -119,16 +127,19 @@ switch( $action )
 		break;
 }
 
-if( isset($collections_Module) )
-{ // Display list of blogs:
-	if( $perm_view_all )
-	{
-		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ), T_('All'),
-						$dispatcher.'?ctrl=stats&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0' );
-	}
-	else
-	{	// No permission to view aggregated stats:
-		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ) );
+if( $tab != 'sessions' )
+{ // no need to show blogs list while displaying sessions
+	if( isset($collections_Module) )
+	{ // Display list of blogs:
+		if( $perm_view_all )
+		{
+			$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ), T_('All'),
+							$dispatcher.'?ctrl=stats&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0' );
+		}
+		else
+		{	// No permission to view aggregated stats:
+			$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ) );
+		}
 	}
 }
 
@@ -141,7 +152,14 @@ $AdminUI->disp_body_top();
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
-echo $AdminUI->get_html_menu( array( 'stats', $tab ), 'menu3' );
+if( $tab == 'sessions' )
+{	// show sub-sub menu in Users tab
+	echo $AdminUI->get_html_menu( array( 'users', $tab ), 'menu3' );
+}
+else
+{
+	echo $AdminUI->get_html_menu( array( 'stats', $tab ), 'menu3' );
+}
 flush();
 
 switch( $AdminUI->get_path(1) )
@@ -243,6 +261,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/19 21:49:03  efy-sergey
+ * Moved Stats>User Sessions tab to Users>Sessions
+ *
  * Revision 1.15  2009/09/14 11:24:02  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

@@ -230,24 +230,6 @@ class sessions_Module extends Module
 			$AdminUI->add_menu_entries(
 					'stats',
 					array(
-						'sessions' => array(
-							'text' => T_('User sessions'),
-							'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0',
-							'entries' => array(
-								'login' => array(
-									'text' => T_('Users'),
-									'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0'
-									),
-								'sessid' => array(
-									'text' => T_('Sessions'),
-									'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;blog=0'
-									),
-								'hits' => array(
-									'text' => T_('Hits'),
-									'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0'
-									),
-								),
-						 	),
 						'goals' => array(
 							'text' => T_('Goals'),
 							'href' => $dispatcher.'?ctrl=goals',
@@ -266,6 +248,47 @@ class sessions_Module extends Module
 									),
 								),
 							),
+						)
+				);
+		}
+	}
+	
+	function build_menu_3() {
+		
+		global $blog, $dispatcher;
+		/**
+		 * @var User
+		 */
+		global $current_User;
+		global $Blog;
+		/**
+		 * @var AdminUI_general
+		 */
+		global $AdminUI;
+		
+		if( $blog == 0 && $current_User->check_perm( 'stats', 'view' ) )
+		{	// Viewing aggregate + Permission to view stats for ALL blogs:
+			$AdminUI->add_menu_entries(
+					'users',
+					array(
+						'sessions' => array(
+							'text' => T_('User sessions'),
+							'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0',
+							'entries' => array(
+								'login' => array(
+									'text' => T_('Users'),
+									'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0'
+									),
+								'sessid' => array(
+									'text' => T_('Sessions'),
+									'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;blog=0'
+									),
+								'hits' => array(
+									'text' => T_('Hits'),
+									'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0'
+									),
+								),
+						 	),
 						)
 				);
 		}
@@ -294,6 +317,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.18  2009/09/19 21:49:03  efy-sergey
+ * Moved Stats>User Sessions tab to Users>Sessions
+ *
  * Revision 1.17  2009/09/19 20:49:51  fplanque
  * Cleaner way of implementing permissions.
  *
