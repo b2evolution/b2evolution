@@ -2169,10 +2169,10 @@ function upgrade_b2evo_tables()
 		task_begin( 'Updating keyphrases in hitlog table... ' );
 		flush();
 		load_class( 'sessions/model/_hit.class.php', 'Hit' );
-	  $sql = 'SELECT SQL_NO_CACHE hit_ID, hit_referer
-  						FROM T_hitlog
-   					 WHERE hit_referer_type = "search"
-   				 		 AND hit_keyphrase_keyp_ID IS NULL'; // this line just in case we crashed in the middle, so we restart where we stopped
+		$sql = 'SELECT SQL_NO_CACHE hit_ID, hit_referer
+  		          FROM T_hitlog
+   		         WHERE hit_referer_type = "search"
+		           AND hit_keyphrase_keyp_ID IS NULL'; // this line just in case we crashed in the middle, so we restart where we stopped
 		$rows = $DB->get_results( $sql, OBJECT, 'get all search hits' );
 		foreach( $rows as $row )
 		{
@@ -2707,6 +2707,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.323  2009/09/19 13:27:15  blueyed
+ * Fix indent
+ *
  * Revision 1.322  2009/09/18 16:01:50  fplanque
  * cleanup
  *
