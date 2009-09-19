@@ -75,7 +75,7 @@ function call_job( $job_name, $job_params = array() )
 	{ // Cron job provided by a plugin:
 		if( ! is_object($Plugins) )
 		{
-      load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+			load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
 			$Plugins = & new Plugins();
 		}
 
@@ -128,6 +128,9 @@ function call_job( $job_name, $job_params = array() )
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/19 13:14:55  blueyed
+ * Fix indent
+ *
  * Revision 1.8  2009/09/14 12:52:23  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
