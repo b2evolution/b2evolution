@@ -149,6 +149,8 @@ class coll_media_index_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
+		global $localtimenow;
+
 		$this->init_display( $params );
 
 		global $Blog;
@@ -183,6 +185,7 @@ class coll_media_index_Widget extends ComponentWidget
 									INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( 'cat_blog_ID = '.$list_Blog->ID ); // fp> TODO: want to restrict on images :]
 		$SQL->WHERE_and( 'post_status = "published"' );	// TODO: this is a dirty temporary hack. More should be shown.
+		$SQL->WHERE_and( 'post_datestart <= \''.remove_seconds( $localtimenow ).'\'' );
 		$SQL->GROUP_BY( 'link_ID' );
 		$SQL->LIMIT( $this->disp_params[ 'limit' ] );
 		$SQL->ORDER_BY(	gen_order_clause( $this->disp_params['order_by'], $this->disp_params['order_dir'],
@@ -285,6 +288,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/19 13:02:51  tblue246
+ * Media index: Do not show images from posts in the future, fixes: http://forums.b2evolution.net/viewtopic.php?t=19659
+ *
  * Revision 1.12  2009/09/14 13:54:13  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
