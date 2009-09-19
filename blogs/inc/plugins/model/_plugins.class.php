@@ -287,6 +287,25 @@ class Plugins
 
 
 	/**
+	 * Get path of a given Plugin classname.
+	 * @param string Classname
+	 * @return string Path
+	 */
+	function get_classfile_path($classname)
+	{
+		$plugin_filename = '_'.str_replace( '_plugin', '.plugin', $classname ).'.php';
+		// Try <plug_classname>/<plug_classname>.php (subfolder) first
+		$classfile_path = $this->plugins_path.$classname.'/'.$plugin_filename;
+
+		if( ! is_readable( $classfile_path ) )
+		{ // Look directly in $plugins_path
+			$classfile_path = $this->plugins_path.$plugin_filename;
+		}
+		return $classfile_path;
+	}
+
+
+	/**
 	 * Register a plugin.
 	 *
 	 * This handles the indexes, dynamically unregisters a Plugin that does not exist (anymore)
@@ -315,14 +334,7 @@ class Plugins
 
 		if( empty($classfile_path) )
 		{
-			$plugin_filename = '_'.str_replace( '_plugin', '.plugin', $classname ).'.php';
-			// Try <plug_classname>/<plug_classname>.php (subfolder) first
-			$classfile_path = $this->plugins_path.$classname.'/'.$plugin_filename;
-
-			if( ! is_readable( $classfile_path ) )
-			{ // Look directly in $plugins_path
-				$classfile_path = $this->plugins_path.$plugin_filename;
-			}
+			$classfile_path = $this->get_classfile_path($classname);
 		}
 
 		$Debuglog->add( 'register(): '.$classname.', ID: '.$ID.', priority: '.$priority.', classfile_path: ['.$classfile_path.']', 'plugins' );
@@ -1913,6 +1925,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/19 20:49:46  blueyed
+ * Factor get_classfile_path out, used in tests.
+ *
  * Revision 1.15  2009/09/14 13:24:14  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
