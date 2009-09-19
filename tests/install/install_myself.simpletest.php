@@ -15,7 +15,7 @@ require_once dirname(__FILE__).'/../config.simpletest.php';
  *
  * @package tests
  */
-class InstallSelfTestCase extends InstallUnitTestCase
+class InstallSelfTestCase extends EvoInstallUnitTestCase
 {
 	function __construct()
 	{

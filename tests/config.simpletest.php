@@ -61,7 +61,7 @@ require_once( SIMPLETEST_DIR.'mock_objects.php');
 require_once( dirname(__FILE__).'/classes/simpletest/EvoUnitTestCase.class.php' );
 require_once( dirname(__FILE__).'/classes/simpletest/FilemanUnitTestCase.class.php' );
 require_once( dirname(__FILE__).'/classes/simpletest/EvoGroupTest.class.php' );
-require_once( dirname(__FILE__).'/classes/simpletest/InstallUnitTestCase.class.php' );
+require_once( dirname(__FILE__).'/classes/simpletest/EvoInstallUnitTestCase.class.php' );
 require_once( dirname(__FILE__).'/classes/simpletest/EvoPluginUnitTestCase.class.php' );
 require_once( dirname(__FILE__).'/classes/simpletest/MockDbUnitTestCase.class.php' );
 /**#@-*/

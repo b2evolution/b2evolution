@@ -25,7 +25,7 @@ require_once $conf_path.'_upgrade.php';
  * Test upgrading to current scheme
  * @package tests
  */
-class UpgradeToCurrentTestCase extends InstallUnitTestCase
+class UpgradeToCurrentTestCase extends EvoInstallUnitTestCase
 {
 	function __construct()
 	{

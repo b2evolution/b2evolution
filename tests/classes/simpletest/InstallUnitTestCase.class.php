@@ -19,7 +19,7 @@ load_funcs('_core/model/db/_upgrade.funcs.php');
 /**
  * The base class for all /install tests.
  */
-class InstallUnitTestCase extends DbUnitTestCase
+class EvoInstallUnitTestCase extends DbUnitTestCase
 {
 	/**
 	 * Number of basic plugins to test for being installed.
