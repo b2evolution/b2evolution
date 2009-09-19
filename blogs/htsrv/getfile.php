@@ -78,9 +78,10 @@ param( 'size', 'string', NULL );	// Can be used for images.
 param( 'mtime', 'integer', 0 );     // used for unique URLs (that never expire).
 
 // TODO: dh> this failed with filenames containing multiple dots!
-// if ( false !== strpos( urldecode( $path ), '..' ) )
+if ( false !== strpos( urldecode( $path ), '..' ) )
 // TODO: dh> fix this better. by adding is_relative_path()?
-if( preg_match( '~\.\.[/\\\]~', urldecode( $path ) ) )
+// fp> the following doesn't look secure. I can't take the risk. What if the path ends with or is just '..' ? I don't want to allow this to go through.
+// if( preg_match( '~\.\.[/\\\]~', urldecode( $path ) ) )
 {
 	debug_die( 'Relative pathnames not allowed!' );
 }
@@ -203,6 +204,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.36  2009/09/19 23:34:58  fplanque
+ * security risk
+ *
  * Revision 1.35  2009/09/19 21:54:08  blueyed
  * Fix getfile.php for files containing multiple dots.
  *
