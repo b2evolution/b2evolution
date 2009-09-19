@@ -618,7 +618,8 @@ function get_avatar_imgtag( $user_login, $size = 'crop-15x15', $class = 'avatar_
 
 		if( $current_User->check_perm( 'users', 'view', false ) )
 		{	// Permission to view user details
-			$img_tag = '<a href="?ctrl=users&amp;user_ID='.$User->ID.'">'.$img_tag.'</a>';
+			global $admin_url;
+			$img_tag = '<a href="'.url_add_param($admin_url, 'ctrl=users&amp;user_ID='.$User->ID).'">'.$img_tag.'</a>';
 		}
 
 	}
@@ -655,6 +656,9 @@ function get_avatar_imgtags( $user_logins_list, $size = 'crop-15x15', $class = '
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/19 22:34:17  blueyed
+ * get_avatar_imgtag: use admin_url (useful when called in the frontend)
+ *
  * Revision 1.15  2009/09/19 20:50:57  fplanque
  * added action icons/links
  *
