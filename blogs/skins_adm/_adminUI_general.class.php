@@ -248,19 +248,15 @@ class AdminUI_general extends Menu
 	{
 		global $app_shortname;
 
-		$r = $app_shortname.$this->pathSeparator;
-
 		if( $htmltitle = $this->get_prop_for_node( $this->path, array( 'htmltitle' ) ) )
 		{ // Explicit htmltitle set:
-			$r .= $htmltitle;
+			$r = $htmltitle;
 		}
 		else
 		{	// No explicit title set, construct Title from path
-			$r .= #preg_replace( '/:$/', '',
-						$this->get_title()
-						#)
-						;
+			$r = $this->get_title();
 		}
+		$r .= ' &ndash; '.$app_shortname;
 
 		return $r;
 	}
@@ -1285,6 +1281,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.98  2009/09/19 23:09:02  blueyed
+ * Improve usability by adding the short app_name at the end of html title.
+ *
  * Revision 1.97  2009/09/14 14:12:21  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
