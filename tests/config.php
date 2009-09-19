@@ -77,8 +77,8 @@ foreach( $modules as $module )
  *
  * These settings override the defaults from {@link $db_config}
  *
- * This is used to create {@link DbUnitTestCase::test_DB the test DB object}
- * in the class {@link DbUnitTestCase}, which gets used for tests that
+ * This is used to create {@link EvoDbUnitTestCase::test_DB the test DB object}
+ * in the class {@link EvoDbUnitTestCase}, which gets used for tests that
  * need a real database connection.
  *
  * @global array $testDB_conf

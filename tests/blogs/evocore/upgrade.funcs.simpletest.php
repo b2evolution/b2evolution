@@ -13,7 +13,7 @@ require_once dirname(__FILE__).'/../../config.simpletest.php';
 /**
  * @package tests
  */
-class UpgradeFuncsTestCase extends DbUnitTestCase
+class UpgradeFuncsTestCase extends EvoDbUnitTestCase
 {
 	function __construct()
 	{

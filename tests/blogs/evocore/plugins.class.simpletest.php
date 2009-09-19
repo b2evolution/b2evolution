@@ -17,7 +17,7 @@ load_class('plugins/_plugin.class.php', 'Plugin');
 /**
  * @package tests
  */
-class PluginsTestCase extends DbUnitTestCase
+class PluginsTestCase extends EvoDbUnitTestCase
 {
 	function __construct()
 	{

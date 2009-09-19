@@ -6,7 +6,7 @@
 /**
  * The DB class for the internal DB object.
  */
-require_once( dirname(__FILE__).'/DbUnitTestCase.class.php' );
+require_once( dirname(__FILE__).'/EvoDbUnitTestCase.class.php' );
 
 
 global $install_subdir, $basepath;
@@ -19,7 +19,7 @@ load_funcs('_core/model/db/_upgrade.funcs.php');
 /**
  * The base class for all /install tests.
  */
-class EvoInstallUnitTestCase extends DbUnitTestCase
+class EvoInstallUnitTestCase extends EvoDbUnitTestCase
 {
 	/**
 	 * Number of basic plugins to test for being installed.

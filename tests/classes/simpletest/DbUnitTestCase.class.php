@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the DbUnitTestCase class, which
+ * This file implements the EvoDbUnitTestCase class, which
  * provides DB handling functions for the test DB.
  */
 
@@ -17,7 +17,7 @@ require_once $inc_path.'/_core/model/db/_db.class.php';
  *
  * It sets the global $DB to the test-DB object and creates a fresh installation in {@link setUp()}.
  */
-class DbUnitTestCase extends EvoUnitTestCase
+class EvoDbUnitTestCase extends EvoUnitTestCase
 {
 	/**
 	 * A database object connected to the test DB.
@@ -39,7 +39,7 @@ class DbUnitTestCase extends EvoUnitTestCase
 			die( 'Please set the DB name to use for tests in /tests/config.php or /tests/config.OVERRIDE.php. See $testDB_conf there..' );
 		}
 
-		$this->test_DB = new DbUnitTestCase_DB( $testDB_conf );
+		$this->test_DB = new EvoDbUnitTestCase_DB( $testDB_conf );
 		$this->test_DB->halt_on_error = false;
 
 		parent::setUp();
@@ -185,7 +185,7 @@ class DbUnitTestCase extends EvoUnitTestCase
 /**
  * Extends {@link DB} class to output backtraces in case of error
  */
-class DbUnitTestCase_DB extends DB
+class EvoDbUnitTestCase_DB extends DB
 {
 	/**
 	 * Append a backtrace to any query errors, if errors get
