@@ -63,7 +63,7 @@ require_once( dirname(__FILE__).'/classes/simpletest/EvoFilemanUnitTestCase.clas
 require_once( dirname(__FILE__).'/classes/simpletest/EvoGroupTest.class.php' );
 require_once( dirname(__FILE__).'/classes/simpletest/EvoInstallUnitTestCase.class.php' );
 require_once( dirname(__FILE__).'/classes/simpletest/EvoPluginUnitTestCase.class.php' );
-require_once( dirname(__FILE__).'/classes/simpletest/MockDbUnitTestCase.class.php' );
+require_once( dirname(__FILE__).'/classes/simpletest/EvoMockDbUnitTestCase.class.php' );
 /**#@-*/
 
 

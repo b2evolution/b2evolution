@@ -16,7 +16,7 @@ load_class( 'users/model/_usercache.class.php', 'UserCache' );
 /**
  * @package tests
  */
-class UserCacheTestCase extends MockDbUnitTestCase
+class UserCacheTestCase extends EvoMockDbUnitTestCase
 {
 	var $mocked_DB_methods = array( 'get_row' );
 

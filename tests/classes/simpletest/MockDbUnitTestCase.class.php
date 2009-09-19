@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the MockDbUnitTestCase class, which
+ * This file implements the EvoMockDbUnitTestCase class, which
  * setups the global $DB as a mocked DB object.
  */
 
@@ -10,7 +10,7 @@
  *
  * It sets the global $DB to a mocked one.
  */
-class MockDbUnitTestCase extends EvoUnitTestCase
+class EvoMockDbUnitTestCase extends EvoUnitTestCase
 {
 	/**
 	 * mocked DB object
@@ -35,7 +35,7 @@ class MockDbUnitTestCase extends EvoUnitTestCase
 		{
 			die( 'Please set the DB name to use for tests in /tests/config.php or /tests/config.OVERRIDE.php. See $testDB_conf there..' );
 		}
-		Mock::generatePartial('DB', 'MockDbUnitTestCase_DB_'.get_class($this), $this->mocked_DB_methods);
+		Mock::generatePartial('DB', 'EvoMockDbUnitTestCase_DB_'.get_class($this), $this->mocked_DB_methods);
 		parent::__construct($label);
 	}
 
@@ -48,11 +48,11 @@ class MockDbUnitTestCase extends EvoUnitTestCase
 		global $testDB_conf;
 		parent::setup();
 
-		$classname = 'MockDbUnitTestCase_DB_'.get_class($this);
+		$classname = 'EvoMockDbUnitTestCase_DB_'.get_class($this);
 		$this->MockDB = new $classname($this);
 		$this->MockDB->DB( $testDB_conf );
 
-		$this->old_DB_MockDbUnitTestCache = & $GLOBALS['DB'];
+		$this->old_DB_EvoMockDbUnitTestCache = & $GLOBALS['DB'];
 		$GLOBALS['DB'] = & $this->MockDB;
 	}
 
@@ -62,7 +62,7 @@ class MockDbUnitTestCase extends EvoUnitTestCase
 	 */
 	function tearDown()
 	{
-		$GLOBALS['DB'] = $this->old_DB_MockDbUnitTestCache;
+		$GLOBALS['DB'] = $this->old_DB_EvoMockDbUnitTestCache;
 
 		parent::tearDown();
 	}

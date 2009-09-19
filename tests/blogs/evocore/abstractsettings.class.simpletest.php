@@ -13,7 +13,7 @@ require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 /**
  * @package tests
  */
-class AbstractSettingsTestCase extends MockDbUnitTestCase
+class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 {
 	var $mocked_DB_methods = array('get_results');
 

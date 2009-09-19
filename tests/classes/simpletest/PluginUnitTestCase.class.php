@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the PluginUnitTestCase class, which
+ * This file implements the EvoPluginUnitTestCase class, which
  * provides common methods for plugin tests.
  */
 
