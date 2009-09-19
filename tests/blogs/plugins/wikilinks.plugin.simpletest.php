@@ -13,7 +13,7 @@ require_once( dirname(__FILE__).'/../../config.simpletest.php' );
 /**
  * @package tests
  */
-class WikilinksPluginTestCase extends PluginUnitTestCase
+class WikilinksPluginTestCase extends EvoPluginUnitTestCase
 {
 	function __construct()
 	{

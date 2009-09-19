@@ -7,7 +7,7 @@
 
 /**
  */
-class PluginUnitTestCase extends EvoUnitTestCase
+class EvoPluginUnitTestCase extends EvoUnitTestCase
 {
 	/**
 	 * Replace global $DB by MockDB instance
@@ -16,7 +16,7 @@ class PluginUnitTestCase extends EvoUnitTestCase
 	{
 		parent::setUp();
 
-		$this->old_PluginUnitTestCase_DB = $GLOBALS['DB'];
+		$this->old_EvoPluginUnitTestCase_DB = $GLOBALS['DB'];
 		$GLOBALS['DB'] = new MockDB( $this );
 	}
 
@@ -25,7 +25,7 @@ class PluginUnitTestCase extends EvoUnitTestCase
 	 */
 	function tearDown()
 	{
-		$GLOBALS['DB'] = $this->old_PluginUnitTestCase_DB;
+		$GLOBALS['DB'] = $this->old_EvoPluginUnitTestCase_DB;
 
 		parent::tearDown();
 	}
