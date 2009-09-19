@@ -164,6 +164,12 @@ class Hitlist
 			 WHERE hit_agnt_ID IS NULL');
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_useragents.', 'hit' );
 
+		// Optimizing tables
+		$DB->query('OPTIMIZE TABLE T_hitlog');
+		$DB->query('OPTIMIZE TABLE T_sessions');
+		$DB->query('OPTIMIZE TABLE T_basedomains');
+		$DB->query('OPTIMIZE TABLE T_useragents');
+
 		$Settings->set( 'auto_prune_stats_done', date('Y-m-d H:i:s', $localtimenow) ); // save exact datetime
 		$Settings->dbupdate();
 
@@ -173,6 +179,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.17  2009/09/19 12:57:20  blueyed
+ * Hitlist: Optimize tables after pruning entries.
+ *
  * Revision 1.16  2009/09/19 12:52:54  blueyed
  * Remove obsolete entries from T_useragents when pruning hitlog info.
  *
