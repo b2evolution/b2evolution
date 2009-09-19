@@ -202,6 +202,7 @@ while( $Item = & $ItemList->get_item() )
 		</div>
 
 		<div class="bContent">
+			<!-- TODO: Tblue> Do not display link if item does not get displayed in the frontend (e. g. not published). -->
 			<h3 class="bTitle"><?php $Item->title() ?></h3>
 
 			<?php
@@ -391,6 +392,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.22  2009/09/19 13:59:45  tblue246
+ * Doc
+ *
  * Revision 1.21  2009/05/28 20:21:27  blueyed
  * Streamline code to display form buttons.
  *
