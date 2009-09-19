@@ -601,6 +601,8 @@ function profile_check_params( $params, $User = NULL )
  */
 function get_avatar_imgtag( $user_login, $size = 'crop-15x15', $class = 'avatar_before_login', $align = '', $show_login = true)
 {
+	global $current_User;
+
 	$UserCache = & get_UserCache();
 	$User = & $UserCache->get_by_login( $user_login );
 
@@ -613,6 +615,12 @@ function get_avatar_imgtag( $user_login, $size = 'crop-15x15', $class = 'avatar_
 		{
 			$img_tag = '<span class="nowrap">'.$img_tag.$user_login.'</span>';
 		}
+
+		if( $current_User->check_perm( 'users', 'view', false ) )
+		{	// Permission to view user details
+			$img_tag = '<a href="?ctrl=users&amp;user_ID='.$User->ID.'">'.$img_tag.'</a>';
+		}
+
 	}
 
 	return $img_tag;
@@ -647,6 +655,9 @@ function get_avatar_imgtags( $user_logins_list, $size = 'crop-15x15', $class = '
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/19 20:50:57  fplanque
+ * added action icons/links
+ *
  * Revision 1.14  2009/09/19 01:15:49  fplanque
  * minor
  *

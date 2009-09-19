@@ -72,6 +72,8 @@ $Form = & new Form( NULL, 'user_checkchanges' );
 
 if( !$user_profile_only )
 {
+	$Form->global_icon( T_('Compose message'), 'comments', '?ctrl=threads&action=new&user_login='.$edited_User->login );
+
 	$Form->global_icon( ( $action != 'view_user' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', regenerate_url( 'user_ID,action' ) );
 }
 
@@ -512,6 +514,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.19  2009/09/19 20:50:57  fplanque
+ * added action icons/links
+ *
  * Revision 1.18  2009/09/19 01:04:06  fplanque
  * button to remove an avatar from an user profile
  *
