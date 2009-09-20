@@ -82,26 +82,55 @@ class Menu extends Widget
 	}
 
 	/**
-	 * Insert new menu entries right after the menu entry found by name parameter
+	 * Insert new menu entries right after the menu entry passed as path
 	 *
-	 * @param name must not be null
+	 * @param NULL|string|array The path. See {@link get_node_by_path()}.
 	 * @param new entries
+	 * @param position after which to insert new entries. If not given, new entries is inserted after Path
+	 * @returns boolean Whether inserting was successfull.
 	 */
-	function insert_menu_entries_after( $name, $new_entries )
+	function insert_menu_entries_after( $path, $new_entries, $index = false )
 	{
-		$entries = & $this->_menus['entries'];
-		$keys = array_keys( $entries );
-
-		if( !empty( $keys ) )
-		{
-			$index = array_search( $name, $keys);
-
-			if( $index >= 0 )
+		$menu_item = '';
+		if( $index === false )
+		{ // get menu item after which to insert new entries
+			
+			if( is_array( $path ) )
 			{
-				array_splice( $entries, $index + 1, count( $entries ),
-					array_merge( $new_entries, array_slice( $entries, $index + 1 ) ) );
+				$menu_item = array_pop( $path );
+			}
+			elseif( is_string( $path ) )
+			{
+				$menu_item = $path;
+				$path = NULL;
 			}
 		}
+		$menu = & $this->get_node_by_path( $path );
+		if( $menu === false )
+		{ // no such path
+			return false;
+		}
+		$entries = & $menu['entries'];
+		if( $menu_item )
+		{ // find index of menu itemafter which to insert new entries
+			$keys = array_keys( $entries );
+
+			if( !empty( $keys ) ) $index = array_search( $menu_item, $keys );
+		}
+		
+		if( ( $index === false ) || ($index === NULL) )
+		{
+			return false;
+		}
+		
+		// make new menu entries
+		$menu['entries'] = array_merge(
+			array_slice( $entries, 0, $index + 1 ),
+			$new_entries,
+			array_slice( $entries, $index )
+		);
+		
+		return true;
 	}
 
 	/**
@@ -372,6 +401,9 @@ class Menu extends Widget
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/20 11:59:46  efy-sergey
+ * fixed insert_menu_entries_after to support path
+ *
  * Revision 1.13  2009/09/16 12:30:03  efy-maxim
  * Send notification on new thread or new message event
  *
