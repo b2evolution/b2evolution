@@ -717,12 +717,12 @@ function attach_browse_tabs()
 		);
 
 /* fp> Custom types should be variations of normal posts by default
-  I am ok with giving extra tabs to SOME of them but then the 
+  I am ok with giving extra tabs to SOME of them but then the
 	posttype list has to be transformed into a normal CREATE/UPDATE/DELETE (CRUD)
 	(see the stats>goals CRUD for an example of a clean CRUD)
 	and each post type must have a checkbox like "use separate tab"
 	Note: you can also make a select list "group with: posts|pages|etc...|other|own tab"
-	
+
 	$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
 	$default_post_types = array(1,1000,1500,1520,1530,1570,1600,2000,3000);
 	$items_types = array_values( array_keys( $ItemTypeCache->get_option_array() ) );
@@ -953,6 +953,9 @@ function check_perm_posttype( $post_extracats )
 
 /*
  * $Log$
+ * Revision 1.68  2009/09/20 21:44:01  blueyed
+ * whitespace
+ *
  * Revision 1.67  2009/09/20 18:13:20  fplanque
  * doc
  *
