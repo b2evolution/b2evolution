@@ -1022,28 +1022,13 @@ class File extends DataObject
 		if( $this->is_image() )
 		{ // Make an IMG link:
 			$r = $before_image;
-			$img_attribs = array(
-				'title' => $this->get('title'),
-				'alt' => $this->get('alt'),
-			);
+
+			$img_attribs = $this->get_img_attribs($size_name);
+			$img_attribs['title'] = $this->get('title');
+			$img_attribs['alt'] = $this->get('alt');
 			if( ! strlen($img_attribs['alt']) )
 			{ // use title for alt, too
 				$img_attribs['alt'] = $img_attribs['title'];
-			}
-			if( $size_name == 'original' )
-			{
-				$img_attribs['src'] = $this->get_url();
-				$img_attribs += $this->get_image_size('widthheight_assoc');
-			}
-			else
-			{
-				$img_attribs['src'] = $this->get_thumb_url( $size_name );
-				$thumb_path = $this->get_af_thumb_path($size_name, NULL, true);
-				if( substr($thumb_path, 0, 1) != '!'
-					&& ( $size_arr = imgsize($thumb_path, 'widthheight_assoc') ) !== false )
-				{ // no error, add width and height attribs
-					$img_attribs += $size_arr;
-				}
 			}
 			$img = '<img '.get_field_attribs_as_string($img_attribs).' />';
 
@@ -1643,7 +1628,8 @@ class File extends DataObject
 
 
 	/**
-	 *  Generate the IMG THUMBNAIL tag with all the alt & title if available
+	 * Generate the IMG THUMBNAIL tag with all the alt & title if available.
+	 * @return string
 	 */
 	function get_thumb_imgtag( $size_name = 'fit-80x80', $class = '', $align = '' )
 	{
@@ -1654,23 +1640,51 @@ class File extends DataObject
 			return '';
 		}
 
-		$imgtag = '<img src="'.$this->get_thumb_url($size_name).'" '
-					.'alt="'.$this->dget('alt', 'htmlattr').'" '
-					.'title="'.$this->dget('title', 'htmlattr').'"';
+		$img_attribs = $this->get_img_attribs($size_name);
 
 		if( $class )
 		{ // add class
-			$imgtag .= ' class="'.$class.'"';
+			$img_attribs['class'] = $class;
 		}
 
 		if( !$use_strict && $align )
 		{ // add align
-			$imgtag .= ' align="'.$align.'"';
+			$img_attribs['align'] = $align;
 		}
 
-		$imgtag .=' />';
+		return '<img '.get_field_attribs_as_string($img_attribs).' />';
+	}
 
-		return $imgtag;
+
+	/**
+	 * @return array List of HTML attributes for the image.
+	 */
+	function get_img_attribs($size_name = '80x80')
+	{
+		$img_attribs = array(
+			'title' => $this->get('title'),
+			'alt' => $this->get('alt'),
+		);
+		if( ! strlen($img_attribs['alt']) )
+		{ // use title for alt, too
+			$img_attribs['alt'] = $img_attribs['title'];
+		}
+		if( $size_name == 'original' )
+		{
+			$img_attribs['src'] = $this->get_url();
+			$img_attribs += $this->get_image_size('widthheight_assoc');
+		}
+		else
+		{
+			$img_attribs['src'] = $this->get_thumb_url( $size_name );
+			$thumb_path = $this->get_af_thumb_path($size_name, NULL, true);
+			if( substr($thumb_path, 0, 1) != '!'
+				&& ( $size_arr = imgsize($thumb_path, 'widthheight_assoc') ) !== false )
+			{ // no error, add width and height attribs
+				$img_attribs += $size_arr;
+			}
+		}
+		return $img_attribs;
 	}
 
 
@@ -1876,8 +1890,12 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.52  2009/09/20 13:45:19  blueyed
+ * Re-add get_img_attribs, fix class issue and use it where it has been factored out, too.
+ *
  * Revision 1.51  2009/09/20 01:28:35  fplanque
  * reverted broken stuff (first bug: the class is no longer added to img, I tried to fixed that and entered a rathole with no end)
+ * dh> the problem has been just that get_img_attribs was called again, and not just once. Fixed.
  *
  * Revision 1.50  2009/09/20 00:19:31  blueyed
  * Add width/height attribs to get_thumb_imgtag generated images. Refactor used method into get_img_attribs.
