@@ -271,6 +271,7 @@ if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
 		else
 		{
 			$Debuglog->add('$locale_from_get ('.$locale_from_get.') is not set. Available locales: '.implode(', ', array_keys($locales)), 'locale');
+			$locale_from_get = false;
 		}
 	}
 	else
@@ -607,10 +608,10 @@ else
 /* Login procedure }}} */
 
 
-/**
- * User locale selection:
+/*
+ * User locale selection. Only override it if not set from REQUEST.
  */
-if( is_logged_in() && $current_User->get('locale') != $current_locale )
+if( is_logged_in() && $current_User->get('locale') != $current_locale && ! $locale_from_get )
 { // change locale to users preference
 	/*
 	 * User locale selection:
@@ -657,6 +658,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.122  2009/09/20 16:21:17  blueyed
+ * If locale gets set from REQUEST (locale_from_get), do not override it from user settings.
+ *
  * Revision 1.121  2009/09/16 00:48:50  fplanque
  * getting a bit more serious with modules
  *
