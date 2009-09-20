@@ -399,8 +399,9 @@ class Comment extends DataObject
 			'title' => $this->get_author_name(),
 		);
 		if( $class )
+		{ // add class
 			$img_params['class'] = $class;
-
+		}
 		$imgtag = '<img '.get_field_attribs_as_string($img_params).' />';
 		
 		return $imgtag;
@@ -1460,6 +1461,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.35  2009/09/20 18:13:20  fplanque
+ * doc
+ *
  * Revision 1.34  2009/09/20 13:48:46  blueyed
  * Cleanup get_avatar some.
  *

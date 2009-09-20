@@ -294,9 +294,8 @@ class sessions_Module extends Module
 						),
 					),
 			 	);
-			if( // insert at 2nd position
-				!$AdminUI->insert_menu_entries_after( 'users', $sessions_menu, 0 )
-			)
+			// insert at 2nd position:
+			if( ! $AdminUI->insert_menu_entries_after( 'users', $sessions_menu, 0 )	)
 			{
 				$AdminUI->add_menu_entries( 'user', $sessions_menu );
 			}
@@ -326,6 +325,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.21  2009/09/20 18:13:20  fplanque
+ * doc
+ *
  * Revision 1.20  2009/09/20 12:00:31  efy-sergey
  * Moved Stats>User Sessions tab 2nd position
  *

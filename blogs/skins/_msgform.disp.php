@@ -17,7 +17,7 @@
  * @todo dh> A user/blog might want to accept only mails from logged in users (fp>yes!)
  * @todo dh> For logged in users the From name and address should be not editable/displayed
  *           (the same as when commenting). (fp>yes!!!)
- * @todo dh> Display recipient's avatar?!
+ * @todo dh> Display recipient's avatar?! fp> of course! :p
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -206,6 +206,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/20 18:13:20  fplanque
+ * doc
+ *
  * Revision 1.5  2009/09/20 14:00:35  blueyed
  * todo
  *

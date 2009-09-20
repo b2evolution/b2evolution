@@ -1622,6 +1622,7 @@ class User extends DataObject
 
 	/**
 	 * Get {@link File} object of the user's avatar.
+	 *
 	 * @return File This may be NULL.
 	 */
 	function & get_avatar_File()
@@ -1647,6 +1648,7 @@ class User extends DataObject
 
 	/**
 	 * Get avatar IMG tag.
+	 *
 	 * @return string
 	 */
 	function get_avatar_imgtag( $size = 'crop-80x80', $class = 'avatar', $align = '' )
@@ -1750,6 +1752,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.46  2009/09/20 18:13:20  fplanque
+ * doc
+ *
  * Revision 1.45  2009/09/20 13:46:47  blueyed
  * doc
  *

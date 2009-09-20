@@ -716,6 +716,13 @@ function attach_browse_tabs()
 				)
 		);
 
+/* fp> Custom types should be variations of normal posts by default
+  I am ok with giving extra tabs to SOME of them but then the 
+	posttype list has to be transformed into a normal CREATE/UPDATE/DELETE (CRUD)
+	(see the stats>goals CRUD for an example of a clean CRUD)
+	and each post type must have a checkbox like "use separate tab"
+	Note: you can also make a select list "group with: posts|pages|etc...|other|own tab"
+	
 	$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
 	$default_post_types = array(1,1000,1500,1520,1530,1570,1600,2000,3000);
 	$items_types = array_values( array_keys( $ItemTypeCache->get_option_array() ) );
@@ -732,6 +739,7 @@ function attach_browse_tabs()
 				)
 		);
 	}
+*/
 
 	if( $Blog->get_setting( 'use_workflow' ) )
 	{	// We want to use workflow properties for this blog:
@@ -945,6 +953,9 @@ function check_perm_posttype( $post_extracats )
 
 /*
  * $Log$
+ * Revision 1.67  2009/09/20 18:13:20  fplanque
+ * doc
+ *
  * Revision 1.66  2009/09/20 13:59:13  waltercruz
  * Adding a tab to show custom types (will be displayed only if you have custom types)
  *
