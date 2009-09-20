@@ -855,9 +855,6 @@ class DB
 			$return_val = $this->num_rows;
 		}
 
-		// Free original query's result:
-		@mysql_free_result($this->result);
-
 		if( $this->log_queries )
 		{	// We want to log queries:
 			if( $this->debug_dump_function_trace_for_queries )
@@ -939,6 +936,11 @@ class DB
 				$this->last_result = $saved_last_result;
 				$this->num_rows = $saved_num_rows;
 			}
+		}
+
+		if( is_resource($this->result) )
+		{
+			mysql_free_result($this->result);
 		}
 
 		return $return_val;
@@ -1659,6 +1661,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.39  2009/09/20 22:35:56  blueyed
+ * whoops.
+ *
  * Revision 1.38  2009/09/20 22:05:34  blueyed
  * DB:
  *  - log_queries requires $debug to be enabled, otherwise you won't see
