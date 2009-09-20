@@ -685,8 +685,7 @@ function cat_select_after_last( $parent_cat_ID, $level )
  */
 function attach_browse_tabs()
 {
-	global $AdminUI, $Blog, $current_User, $dispatcher;
-
+	global $AdminUI, $Blog, $current_User, $dispatcher, $ItemTypeCache;
 	$AdminUI->add_menu_entries(
 			'items',
 			array(
@@ -716,6 +715,23 @@ function attach_browse_tabs()
 						),
 				)
 		);
+
+	$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
+	$default_post_types = array(1,1000,1500,1520,1530,1570,1600,2000,3000);
+	$items_types = array_values( array_keys( $ItemTypeCache->get_option_array() ) );
+	// a tab for custom types
+	if ( array_diff($items_types,$default_post_types) )
+	{
+		$AdminUI->add_menu_entries(
+				'items',
+				array(
+					'custom' => array(
+						'text' => T_('Custom Types'),
+						'href' => $dispatcher.'?ctrl=items&amp;tab=custom&amp;filter=restore&amp;blog='.$Blog->ID,
+					),
+				)
+		);
+	}
 
 	if( $Blog->get_setting( 'use_workflow' ) )
 	{	// We want to use workflow properties for this blog:
@@ -929,6 +945,9 @@ function check_perm_posttype( $post_extracats )
 
 /*
  * $Log$
+ * Revision 1.66  2009/09/20 13:59:13  waltercruz
+ * Adding a tab to show custom types (will be displayed only if you have custom types)
+ *
  * Revision 1.65  2009/09/15 19:31:54  fplanque
  * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
  * PHP 4 compatible. Even better on PHP 5.

@@ -736,6 +736,12 @@ function init_list_mode()
 				) );
 			break;
 
+		case 'custom':
+			$ItemList->set_default_filters( array(
+					'types' => '-1,1000,1500,1520,1530,1570,1600,2000,3000,4000,5000', // Links
+				) );
+			break;
+
 		case 'tracker':
 			// In tracker mode, we want a different default sort:
 			$ItemList->set_default_filters( array(
@@ -1043,6 +1049,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.62  2009/09/20 13:59:13  waltercruz
+ * Adding a tab to show custom types (will be displayed only if you have custom types)
+ *
  * Revision 1.61  2009/09/14 18:37:07  fplanque
  * doc/cleanup/minor
  *
