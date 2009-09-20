@@ -396,7 +396,7 @@ class DataObjectCache
 	 * @param integer ID of object to load
 	 * @param boolean true if function should die on error
 	 * @param boolean true if function should die on empty/null
-	 * @return DataObject reference on cached object
+	 * @return DataObject reference on cached object or NULL if not found
 	 */
 	function & get_by_ID( $req_ID, $halt_on_error = true, $halt_on_empty = true )
 	{
@@ -651,6 +651,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/20 13:46:47  blueyed
+ * doc
+ *
  * Revision 1.12  2009/09/05 18:17:40  tblue246
  * DataObjectCache/BlogCache::get_option_list(): Back again... Allow custom value for "None" option and use 0 for BlogCache.
  *

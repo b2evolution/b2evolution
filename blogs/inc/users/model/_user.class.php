@@ -1621,7 +1621,8 @@ class User extends DataObject
 
 
 	/**
-	 *
+	 * Get {@link File} object of the user's avatar.
+	 * @return File This may be NULL.
 	 */
 	function & get_avatar_File()
 	{
@@ -1634,7 +1635,7 @@ class User extends DataObject
 			$FileCache = & get_Cache( 'FileCache' );
 
 			// Do not halt on error. A file can disappear without the profile being updated.
-	    /**
+			/**
 			 * @var File
 			 */
 			$File = & $FileCache->get_by_ID( $this->avatar_file_ID, false, false );
@@ -1645,18 +1646,18 @@ class User extends DataObject
 
 
 	/**
-	 * Get avatar <img> tag
+	 * Get avatar IMG tag.
+	 * @return string
 	 */
 	function get_avatar_imgtag( $size = 'crop-80x80', $class = 'avatar', $align = '' )
 	{
-    /**
+		/**
 		 * @var File
 		 */
 		if( ! $File = & $this->get_avatar_File() )
 		{
 			return '';
 		}
-
 		$r = $File->get_thumb_imgtag( $size, $class, $align );
 
 		return $r;
@@ -1749,6 +1750,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.45  2009/09/20 13:46:47  blueyed
+ * doc
+ *
  * Revision 1.44  2009/09/20 01:35:52  fplanque
  * Factorized User::get_link()
  *
