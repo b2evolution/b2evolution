@@ -129,8 +129,7 @@ if( $Messages->count('error') )
 
 $title = strip_tags($title);
 $title = (strlen($title) > 255) ? substr($title, 0, 252).'...' : $title;
-$excerpt = strip_tags($excerpt);
-$excerpt = (strlen($excerpt) > 255) ? substr($excerpt, 0, 252).'...' : $excerpt;
+$excerpt = strmaxlen( strip_tags($excerpt), 255, '...' );
 $blog_name = htmlspecialchars($blog_name);
 $blog_name = (strlen($blog_name) > 255) ? substr($blog_name, 0, 252).'...' : $blog_name;
 
@@ -213,6 +212,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.68  2009/09/20 18:54:58  blueyed
+ * Use strmaxlen
+ *
  * Revision 1.67  2009/03/08 23:57:37  fplanque
  * 2009
  *
