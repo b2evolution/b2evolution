@@ -266,6 +266,60 @@ class User extends DataObject
 
 
 	/**
+	 * Get link to User
+	 *
+	 * @return string
+	 */
+	function get_link( $params = array() )
+	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'format'       => 'htmlbody',
+				'link_to'		   => 'userpage',
+				'link_text'    => 'preferredname',
+				'link_rel'     => '',
+				'link_class'   => '',
+				'thumb_size'   => 'crop-32x32',
+				'thumb_class'  => '',
+			), $params );
+
+		if( $params['link_text'] == 'avatar' )
+		{
+			$r = $this->get_avatar_imgtag( $params['thumb_size'], $params['thumb_class'] );
+		}
+		else
+		{
+			$r = $this->dget( 'preferredname', $params['format'] );
+		}
+
+		if( $params['link_to'] == 'userpage' )
+		{
+			$url = $this->get_userpage_url( NULL );
+		}
+		elseif( $params['link_to'] == 'userurl' )
+		{
+			$url = $this->url;
+		}
+
+		if( !empty($url) )
+		{
+			$link = '<a href="'.$url.'"';
+			if( !empty($params['link_rel']) )
+			{
+				$link .= ' rel="'.$params['link_rel'].'"';
+			}
+			if( !empty($params['link_class']) )
+			{
+				$link .= ' class="'.$params['link_class'].'"';
+			}
+			$r = $link.'>'.$r.'</a>';
+		}
+
+		return $r;
+	}
+
+
+	/**
 	 * Get preferred name of the user, according to {@link User::$idmode}.
 	 *
 	 * @return string
@@ -1560,6 +1614,12 @@ class User extends DataObject
 	// }}}
 
 
+	function has_avatar()
+	{
+		return ! empty( $this->avatar_file_ID );
+	}
+
+
 	/**
 	 *
 	 */
@@ -1689,6 +1749,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.44  2009/09/20 01:35:52  fplanque
+ * Factorized User::get_link()
+ *
  * Revision 1.43  2009/09/19 20:31:39  efy-maxim
  * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
  *

@@ -337,9 +337,6 @@ class Item extends ItemLight
 	/**
 	 * Template function: display author/creator of item
 	 *
-	 * @param string String to display before author name
-	 * @param string String to display after author name
-	 * @param string Output format, see {@link format_to_output()}
 	 */
 	function author( $params = array() )
 	{
@@ -359,38 +356,7 @@ class Item extends ItemLight
 		// Load User
 		$this->get_creator_User();
 
-		if( $params['link_text'] == 'avatar' )
-		{
-			$r = $this->creator_User->get_avatar_imgtag( $params['thumb_size'], $params['thumb_class'] );
-
-		}
-		else
-		{
-			$r = $this->creator_User->dget( 'preferredname', $params['format'] );
-		}
-
-		if( $params['link_to'] == 'userpage' )
-		{
-			$url = $this->creator_User->get_userpage_url( NULL );
-		}
-		elseif( $params['link_to'] == 'userurl' )
-		{
-			$url = $this->creator_User->url;
-		}
-
-		if( !empty($url) )
-		{
-			$link = '<a href="'.$url.'"';
-			if( !empty($params['link_rel']) )
-			{
-				$link .= ' rel="'.$params['link_rel'].'"';
-			}
-			if( !empty($params['link_class']) )
-			{
-				$link .= ' class="'.$params['link_class'].'"';
-			}
-			$r = $link.'>'.$r.'</a>';
-		}
+		$r = $this->creator_User->get_link( $params );
 
 		echo $params['before'].$r.$params['after'];
 	}
@@ -3978,6 +3944,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.139  2009/09/20 01:35:52  fplanque
+ * Factorized User::get_link()
+ *
  * Revision 1.138  2009/09/15 19:31:54  fplanque
  * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
  * PHP 4 compatible. Even better on PHP 5.

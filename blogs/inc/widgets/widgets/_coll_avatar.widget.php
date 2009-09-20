@@ -79,7 +79,7 @@ class coll_avatar_Widget extends ComponentWidget
 
 		$options = array_combine( array_keys($thumbnail_sizes), array_keys($thumbnail_sizes) );
 		$r = array_merge( array(
-			'size' => array(
+			'thumb_size' => array(
 					'type' => 'select',
 					'label' => T_('Image size'),
 					'options' => $options,
@@ -104,12 +104,11 @@ class coll_avatar_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		$owner_User = $Blog->get_owner_User();
-		$img_tag = $owner_User->get_avatar_imgtag($this->disp_params['size']);
+		$owner_User = & $Blog->get_owner_User();
 
-		if( ! $img_tag )
+		if( ! $owner_User->has_avatar() )
 		{
-			return;
+			return false;
 		}
 
 		// START DISPLAY:
@@ -118,7 +117,11 @@ class coll_avatar_Widget extends ComponentWidget
 		// Display title if requested
 		$this->disp_title();
 
-		echo $img_tag;
+		echo $owner_User->get_link( array(
+				'link_to'		   => 'userpage',  // TODO: make configurable $this->disp_params['link_to']
+				'link_text'    => 'avatar',
+				'thumb_size'	 => $this->disp_params['thumb_size'],
+			) );
 
 		echo $this->disp_params['block_end'];
 
@@ -130,6 +133,9 @@ class coll_avatar_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.3  2009/09/20 01:35:52  fplanque
+ * Factorized User::get_link()
+ *
  * Revision 1.2  2009/09/20 00:51:43  fplanque
  * OMG!!
  *
