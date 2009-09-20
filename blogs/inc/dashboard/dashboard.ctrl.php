@@ -75,7 +75,8 @@ if( $blog )
 
 		$nb_blocks_displayed++;
 
-		$block_item_Widget->title = T_('Comments awaiting moderation');
+		// TODO: fix badge with real numebr (wich may be greater than 5!)
+		$block_item_Widget->title = T_('Comments awaiting moderation').' <span class="badge">'.$CommentList->result_num_rows.'</span>';
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
     /**
@@ -482,6 +483,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.33  2009/09/20 02:08:52  fplanque
+ * badge demo
+ *
  * Revision 1.32  2009/09/14 12:54:17  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
