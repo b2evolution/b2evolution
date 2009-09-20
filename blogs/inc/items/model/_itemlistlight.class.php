@@ -814,10 +814,10 @@ class ItemListLight extends DataObjectList2
 	 * Get datetime of the last post/item
 	 * @todo dh> Optimize this, if this can be said after having done {@link query()} already.
 	 * @todo dh> Cache result
-	 * @todo dh> Add $dateformat param
+	 * @param string Date format (see {@link date()})
 	 * @return string 'Y-m-d H:i:s' formatted; If there are no items this will be {@link $localtimenow}.
 	 */
-	function get_lastpostdate()
+	function get_lastpostdate($dateformat = 'Y-m-d H:i:s')
 	{
 		global $localtimenow, $DB;
 
@@ -869,7 +869,11 @@ class ItemListLight extends DataObjectList2
 		if( empty( $lastpostdate ) )
 		{
 			// echo 'we have no last item';
-			$lastpostdate = date('Y-m-d H:i:s', $localtimenow);
+			$lastpostdate = date($dateformat, $localtimenow);
+		}
+		elseif( $dateformat != 'Y-m-d H:i:s' )
+		{
+			$lastpostdate = date($dateformat, strtotime($lastpostdate));
 		}
 
 		// echo $lastpostdate;
@@ -1510,6 +1514,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.33  2009/09/20 23:52:34  blueyed
+ * Add dateformat param to get_lastpostdate
+ *
  * Revision 1.32  2009/09/14 13:17:28  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
