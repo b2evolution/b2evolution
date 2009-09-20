@@ -35,6 +35,11 @@ else
 	header_content_type( 'application/atom+xml' );	// Sets charset!
 }
 
+// Add caching headers
+// TODO: Last-Modified
+header('Expires: '.date('r', time() + 300)); // TODO: dh> should be a centralized setting. Maybe through the Skin class, if type is "feed"?
+
+
 echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 ?>
 <feed xml:lang="<?php $Blog->disp( 'locale', 'xml' ) ?>" xmlns="http://www.w3.org/2005/Atom">

@@ -41,8 +41,13 @@ if( $feed_content == 'none' )
 
 header_content_type( 'application/xml' );	// Sets charset!
 
-echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 
+// Add caching headers
+header('Last-Modified: '.$MainList->get_lastpostdate('r'));
+header('Expires: '.date('r', time() + 300)); // TODO: dh> should be a centralized setting. Maybe through the Skin class, if type is "feed"?
+
+
+echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 ?>
 <!-- generator="<?php echo $app_name ?>/<?php echo $app_version ?>" -->
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:admin="http://webns.net/mvcb/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:wfw="http://wellformedweb.org/CommentAPI/" xmlns:atom="http://www.w3.org/2005/Atom">

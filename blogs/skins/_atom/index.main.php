@@ -10,6 +10,8 @@
  * @package evoskins
  * @subpackage atom
  *
+ * @todo dh> isn't this missing a call to skin_init()!? - if so, other feeds are missing it, too.
+ *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -44,6 +46,11 @@ else
 {
 	header_content_type( 'application/atom+xml' );	// Sets charset!
 }
+
+// Add caching headers
+header('Last-Modified: '.$MainList->get_lastpostdate('r'));
+header('Expires: '.date('r', time() + 300)); // TODO: dh> should be a centralized setting. Maybe through the Skin class, if type is "feed"?
+
 
 echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 ?>
