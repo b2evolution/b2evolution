@@ -25,6 +25,7 @@ $core_componentwidget_defs = array(
 		'*'.T_('General purpose widgets'),
 			'free_html',
 			'coll_logo',
+			'coll_avatar',
 		'*'.T_('Different ways of listing the blog contents'),
 			'coll_item_list',			// Universal Item List
 			'coll_post_list',			// Simple List
@@ -66,7 +67,7 @@ foreach( $core_componentwidget_defs as $code )
 	{
 		$classname = $code.'_Widget';
 		load_class( 'widgets/widgets/_'.$code.'.widget.php', $classname);
-		
+
 		$ComponentWidget = & new $classname( NULL, 'core', $code );
 
 		echo '<li>';
@@ -116,6 +117,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.25  2009/09/20 00:33:59  blueyed
+ * Add widget to display avatar of collection/blog owner. Install it for all new blogs by default.
+ *
  * Revision 1.24  2009/09/18 15:47:10  fplanque
  * doc/cleanup
  *

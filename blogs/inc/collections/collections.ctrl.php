@@ -192,27 +192,30 @@ switch( $action )
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
 									 VALUES( '.$edited_Blog->ID.', "Menu", 4, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'login'))).'" )' );
 
+			// Add Avatar widget to all blog Sidebars:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+									 VALUES( '.$edited_Blog->ID.', "Sidebar", 10, "core", "coll_avatar" )' );
 			// Add Calendar plugin to all blog Sidebars:
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Sidebar", 1, "plugin", "evo_Calr" )' );
+									 VALUES( '.$edited_Blog->ID.', "Sidebar", 20, "plugin", "evo_Calr" )' );
 			// Add title to all blog Sidebars:
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Sidebar", 2, "core", "coll_title" )' );
+									 VALUES( '.$edited_Blog->ID.', "Sidebar", 30, "core", "coll_title" )' );
 			// Add longdesc to all blogs Sidebars:
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Sidebar", 3, "core", "coll_longdesc" )' );
+									 VALUES( '.$edited_Blog->ID.', "Sidebar", 40, "core", "coll_longdesc" )' );
 			// Add common links to all blogs Sidebars:
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Sidebar", 4, "core", "coll_common_links" )' );
+									 VALUES( '.$edited_Blog->ID.', "Sidebar", 50, "core", "coll_common_links" )' );
 			// Add search form to all blogs Sidebars:
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Sidebar", 5, "core", "coll_search_form" )' );
+									 VALUES( '.$edited_Blog->ID.', "Sidebar", 60, "core", "coll_search_form" )' );
 			// Add category links to all blog Sidebars:
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Sidebar", 6, "core", "coll_category_list" )' );
+									 VALUES( '.$edited_Blog->ID.', "Sidebar", 70, "core", "coll_category_list" )' );
 			// Add XML feeds to all blogs Sidebars:
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Sidebar", 7, "core", "coll_xml_feeds" )' );
+									 VALUES( '.$edited_Blog->ID.', "Sidebar", 80, "core", "coll_xml_feeds" )' );
 
 			$Messages->add( T_('Default widgets have been set-up for this blog.'), 'success' );
 
@@ -454,6 +457,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/20 00:33:59  blueyed
+ * Add widget to display avatar of collection/blog owner. Install it for all new blogs by default.
+ *
  * Revision 1.14  2009/09/14 12:42:25  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

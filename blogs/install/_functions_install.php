@@ -538,44 +538,48 @@ function install_basic_widgets()
 							 SELECT blog_ID, "Menu", 4, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'login'))).'"
 							   FROM T_blogs' );
 
+	// Add Avatar widget to all blog Sidebars:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Sidebar", 10, "core", "coll_avatar"
+							   FROM T_blogs' );
 	// Add Calendar plugin to all blog Sidebars except blog A:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 1, "plugin", "evo_Calr"
+							 SELECT blog_ID, "Sidebar", 20, "plugin", "evo_Calr"
 							   FROM T_blogs
 							  WHERE blog_ID > 1' );
 	// Add title to all blog Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 2, "core", "coll_title"
+							 SELECT blog_ID, "Sidebar", 30, "core", "coll_title"
 							   FROM T_blogs' );
 	// Add longdesc to all blogs Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 3, "core", "coll_longdesc"
+							 SELECT blog_ID, "Sidebar", 40, "core", "coll_longdesc"
 							   FROM T_blogs' );
 	// Add common links to all blogs Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 4, "core", "coll_common_links"
+							 SELECT blog_ID, "Sidebar", 50, "core", "coll_common_links"
 							   FROM T_blogs' );
 	// Add search form to all blogs Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 5, "core", "coll_search_form"
+							 SELECT blog_ID, "Sidebar", 60, "core", "coll_search_form"
 							   FROM T_blogs' );
 	// Add categories list to all blog Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 6, "core", "coll_category_list"
+							 SELECT blog_ID, "Sidebar", 70, "core", "coll_category_list"
 							   FROM T_blogs' );
 	// Add Random photo to blog Sidebars except blog B:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-							 SELECT blog_ID, "Sidebar", 7, "core", "coll_media_index", \'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";s:7:"blog_ID";s:1:"4";s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\'
+							 SELECT blog_ID, "Sidebar", 80, "core", "coll_media_index", \'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";s:7:"blog_ID";s:1:"4";s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\'
 							   FROM T_blogs
 							  WHERE blog_ID <> 2' );
 	// Add linkblog to blog Sidebars for blog A & B:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-							 SELECT blog_ID, "Sidebar", 8, "core", "linkblog", "'.$DB->escape(serialize(array('blog_ID'=>3))).'"
+							 SELECT blog_ID, "Sidebar", 90, "core", "linkblog", "'.$DB->escape(serialize(array('blog_ID'=>3))).'"
 							   FROM T_blogs
 							  WHERE blog_ID <= 2' );
 	// Add XML feeds to all blogs Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 9, "core", "coll_xml_feeds"
+							 SELECT blog_ID, "Sidebar", 100, "core", "coll_xml_feeds"
 							   FROM T_blogs' );
 
 	// All blog Sidebar 2:
@@ -821,6 +825,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.75  2009/09/20 00:33:59  blueyed
+ * Add widget to display avatar of collection/blog owner. Install it for all new blogs by default.
+ *
  * Revision 1.74  2009/09/14 14:10:14  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

@@ -68,7 +68,9 @@ $log_app_errors = 1;
 
 
 /**
- * Thumbnail size definitions
+ * Thumbnail size definitions.
+ *
+ * NOTE: this gets used for general resizing, too. E.g. in the coll_avatar_Widget.
  *
  * type, width, height, quality
  */
@@ -227,7 +229,7 @@ $db_config['table_options'] = ''; 	// Low ranking MySQL hosting compatibility De
  *
  * You need to use InnoDB in order to enable this.
  */
-$db_config['use_transactions'] = true; 
+$db_config['use_transactions'] = true;
 
 
 /**
