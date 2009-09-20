@@ -36,7 +36,6 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 
 /**
  * Country Class
- *
  */
 class Country extends DataObject
 {
@@ -47,11 +46,10 @@ class Country extends DataObject
 	/**
 	 * Constructor
 	 *
-	 * @param db_row database row
+	 * @param object database row
 	 */
 	function Country( $db_row = NULL )
 	{
-
 		// Call parent constructor:
 		parent::DataObject( 'T_country', 'ctry_', 'ctry_ID' );
 
@@ -61,7 +59,7 @@ class Country extends DataObject
 
   		$this->delete_cascades = array();
 
- 		if( $db_row != NULL )
+ 		if( $db_row )
 		{
 			$this->ID            = $db_row->ctry_ID;
 			$this->code          = $db_row->ctry_code;
@@ -69,6 +67,7 @@ class Country extends DataObject
 			$this->curr_ID       = $db_row->ctry_curr_ID;
 		}
 	}
+
 
 	/**
 	 * Load data from Request form fields.
@@ -93,6 +92,7 @@ class Country extends DataObject
 		return ! param_errors_detected();
 	}
 
+
 	/**
 	 * Set param value
 	 *
@@ -116,20 +116,22 @@ class Country extends DataObject
 		}
 	}
 
+
 	/**
 	 * Get country name.
 	 *
-	 * @return currency code
+	 * @return string currency code
 	 */
 	function get_name()
 	{
 		return $this->name;
 	}
 
+
 	/**
-	 * Check existing of specified country code in ctry_code unique field.
+	 * Check existence of specified country code in ctry_code unique field.
 	 *
-	 * @return ID if country code exists otherwise NULL/false
+	 * @return int ID if country code exists otherwise NULL/false
 	 */
 	function dbexists()
 	{
@@ -137,8 +139,14 @@ class Country extends DataObject
 	}
 }
 
+
 /*
  * $Log$
+ * Revision 1.14  2009/09/20 20:07:18  blueyed
+ *  - DataObject::dbexists quotes always
+ *  - phpdoc fixes
+ *  - style fixes
+ *
  * Revision 1.13  2009/09/14 13:31:35  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

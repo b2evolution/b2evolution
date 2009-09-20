@@ -27,7 +27,7 @@
  * @author evofactory-test
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version _userfield.class.php,v 1.5 2009/09/16 18:11:51 fplanque Exp
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -42,11 +42,11 @@ class Userfield extends DataObject
 {
 	var $type = '';
 	var $name = '';
-	
+
 	/**
 	 * Constructor
 	 *
-	 * @param db_row Database row
+	 * @param object Database row
 	 */
 	function Userfield( $db_row = NULL )
 	{
@@ -56,12 +56,9 @@ class Userfield extends DataObject
 		// Allow inseting specific IDs
 		$this->allow_ID_insert = true;
 
+		$this->delete_restrictions = array();
 
-		$this->delete_restrictions = array(
-			);
-
-  	$this->delete_cascades = array(
-			);
+  	$this->delete_cascades = array();
 
  		if( $db_row != NULL )
 		{
@@ -72,15 +69,15 @@ class Userfield extends DataObject
 		else
 		{	// Create a new user field:
 		}
-		
 	}
-	
+
+
 	/**
 	 * Returns array of possible user field types
-	 * 
+	 *
 	 * @return array
 	 */
-	function get_types() 
+	function get_types()
 	{
 		return array(
 			'email'  => T_('Email address'),
@@ -118,6 +115,7 @@ class Userfield extends DataObject
 		return ! param_errors_detected();
 	}
 
+
 	/**
 	 * Set param value
 	 *
@@ -136,39 +134,42 @@ class Userfield extends DataObject
 				$this->set_param( $parname, 'string', $parvalue );
 		}
 	}
-	
+
+
 	/**
 	 * Get user field name.
 	 *
-	 * @return user field name
+	 * @return string user field name
 	 */
 	function get_name()
 	{
 		return $this->name;
 	}
-	
+
+
 	/**
-	 * Check existing of specified user field ID in ufdf_ID unique field.
+	 * Check existence of specified user field ID in ufdf_ID unique field.
 	 *
-	 * @return ID if user field exists otherwise NULL/false
+	 * @todo dh> Two returns here!!
+	 * @return int ID if user field exists otherwise NULL/false
 	 */
 	function dbexists()
 	{
 		global $DB;
-		
+
 		$sql = "SELECT $this->dbIDname
 						  FROM $this->dbtablename
 					   WHERE $this->dbIDname = $this->ID";
 
 		return $DB->get_var( $sql );
-		
+
 		return parent::dbexists('ufdf_ID', $this->ID);
 	}
-
 }
 
+
 /*
- * $Log$
+ * _userfield.class.php,v
  * Revision 1.5  2009/09/16 18:11:51  fplanque
  * Readded with -kkv option
  *

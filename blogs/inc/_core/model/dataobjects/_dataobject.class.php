@@ -271,10 +271,10 @@ class DataObject
 			return false;
 		}
 
-		
+
 		if( !( $this->allow_ID_insert && $this->ID ) )
 		{// store ID for newly created db record. Do not if allow_ID_insert is true and $this->ID is not 0
-			
+
 			$this->ID = $DB->insert_id;
 		}
 		// Reset changes in object:
@@ -358,29 +358,24 @@ class DataObject
 
 
 	/**
-	 * Check existing of specified value in unique field.
+	 * Check existence of specified value in unique field.
 	 *
-	 * @param $unique_field name of unique field
-	 * @param $value specified value
-	 * @param $quote quote if unique field represents string value
-	 * @return ID if value exists otherwise NULL/false
+	 * @param string Name of unique field
+	 * @param mixed specified value
+	 * @return int ID if value exists otherwise NULL/false
 	 */
-	function dbexists($unique_field, $value, $quote = true)
+	function dbexists($unique_field, $value)
 	{
 		global $DB;
 
-		if($quote)
-		{
-			$value = $DB->quote($value);
-		}
-
 		$sql = "SELECT $this->dbIDname
 						  FROM $this->dbtablename
-					   WHERE $unique_field = $value
+					   WHERE $unique_field = ".$DB->quote($value)."
 						   AND $this->dbIDname != $this->ID";
 
 		return $DB->get_var( $sql );
 	}
+
 
 	/**
 	 * Check relations for restrictions or cascades
@@ -797,6 +792,11 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2009/09/20 20:07:18  blueyed
+ *  - DataObject::dbexists quotes always
+ *  - phpdoc fixes
+ *  - style fixes
+ *
  * Revision 1.18  2009/09/20 18:09:41  tblue246
  * revert
  *

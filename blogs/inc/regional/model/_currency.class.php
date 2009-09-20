@@ -36,7 +36,6 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 
 /**
  * Currency Class
- *
  */
 class Currency extends DataObject
 {
@@ -47,11 +46,10 @@ class Currency extends DataObject
 	/**
 	 * Constructor
 	 *
-	 * @param db_row database row
+	 * @param object database row
 	 */
 	function Currency( $db_row = NULL )
 	{
-
 		// Call parent constructor:
 		parent::DataObject( 'T_currency', 'curr_', 'curr_ID' );
 
@@ -59,9 +57,9 @@ class Currency extends DataObject
 				array( 'table'=>'T_country', 'fk'=>'ctry_curr_ID', 'msg'=>T_('%d related countries') ),
 			);
 
-  		$this->delete_cascades = array();
+		$this->delete_cascades = array();
 
- 		if( $db_row != NULL )
+ 		if( $db_row )
 		{
 			$this->ID            = $db_row->curr_ID;
 			$this->code          = $db_row->curr_code;
@@ -92,6 +90,7 @@ class Currency extends DataObject
 		return ! param_errors_detected();
 	}
 
+
 	/**
 	 * Set param value
 	 *
@@ -115,20 +114,22 @@ class Currency extends DataObject
 		}
 	}
 
+
 	/**
-	 * Check existing of specified currency code in curr_code unique field.
+	 * Check existence of specified currency code in curr_code unique field.
 	 *
-	 * @return ID if currency code exists otherwise NULL/false
+	 * @return int ID if currency code exists otherwise NULL/false
 	 */
 	function dbexists()
 	{
 		return parent::dbexists('curr_code', $this->code);
 	}
 
+
 	/**
 	 * Get currency unique name (code).
 	 *
-	 * @return currency code
+	 * @return string currency code
 	 */
 	function get_name()
 	{
@@ -136,8 +137,14 @@ class Currency extends DataObject
 	}
 }
 
+
 /*
  * $Log$
+ * Revision 1.11  2009/09/20 20:07:18  blueyed
+ *  - DataObject::dbexists quotes always
+ *  - phpdoc fixes
+ *  - style fixes
+ *
  * Revision 1.10  2009/09/14 13:31:36  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 
 /**
- * Filetype Class
+ * Goal Class
  *
  * @package evocore
  */
@@ -36,11 +36,10 @@ class Goal extends DataObject
 	/**
 	 * Constructor
 	 *
-	 * @param table Database row
+	 * @param object Database row
 	 */
 	function Goal( $db_row = NULL )
 	{
-
 		// Call parent constructor:
 		parent::DataObject( 'T_track__goal', 'goal_', 'goal_ID' );
 
@@ -51,7 +50,7 @@ class Goal extends DataObject
   	$this->delete_cascades = array(
 			);
 
- 		if( $db_row != NULL )
+ 		if( $db_row )
 		{
 			$this->ID            = $db_row->goal_ID;
 			$this->name          = $db_row->goal_name;
@@ -162,9 +161,9 @@ class Goal extends DataObject
 
 
 	/**
-	 * Check existing of specified goal in goal_key unique field.
+	 * Check existence of specified goal in goal_key unique field.
 	 *
-	 * @return ID if goal exists otherwise NULL/false
+	 * @return int ID if goal exists otherwise NULL/false
 	 */
 	function dbexists()
 	{
@@ -172,8 +171,14 @@ class Goal extends DataObject
 	}
 }
 
+
 /*
  * $Log$
+ * Revision 1.9  2009/09/20 20:07:19  blueyed
+ *  - DataObject::dbexists quotes always
+ *  - phpdoc fixes
+ *  - style fixes
+ *
  * Revision 1.8  2009/09/19 20:49:51  fplanque
  * Cleaner way of implementing permissions.
  *
