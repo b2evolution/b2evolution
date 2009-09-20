@@ -253,7 +253,11 @@ class sessions_Module extends Module
 		}
 	}
 
-	
+	/**
+	 * Builds the 3rd half of the menu. This is the one with the configuration features
+	 *
+	 * At some point this might be displayed differently than the 1st half.
+	 */
 	function build_menu_3()
 	{
 		
@@ -270,29 +274,32 @@ class sessions_Module extends Module
 		
 		if( $blog == 0 && $current_User->check_perm( 'stats', 'view' ) )
 		{	// Viewing aggregate + Permission to view stats for ALL blogs:
-			$AdminUI->add_menu_entries(
-					'users',
-					array(
-						'sessions' => array(
-							'text' => T_('User sessions'),
-							'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0',
-							'entries' => array(
-								'login' => array(
-									'text' => T_('Users'),
-									'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0'
-									),
-								'sessid' => array(
-									'text' => T_('Sessions'),
-									'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;blog=0'
-									),
-								'hits' => array(
-									'text' => T_('Hits'),
-									'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0'
-									),
-								),
-						 	),
-						)
-				);
+			$sessions_menu = array(
+				'sessions' => array(
+					'text' => T_('User sessions'),
+					'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0',
+					'entries' => array(
+						'login' => array(
+							'text' => T_('Users'),
+							'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=login&amp;blog=0'
+							),
+						'sessid' => array(
+							'text' => T_('Sessions'),
+							'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;blog=0'
+							),
+						'hits' => array(
+							'text' => T_('Hits'),
+							'href' => $dispatcher.'?ctrl=stats&amp;tab=sessions&amp;tab3=hits&amp;blog=0'
+							),
+						),
+					),
+			 	);
+			if( // insert at 2nd position
+				!$AdminUI->insert_menu_entries_after( 'users', $sessions_menu, 0 )
+			)
+			{
+				$AdminUI->add_menu_entries( 'user', $sessions_menu );
+			}
 		}
 	}
 
@@ -319,6 +326,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.20  2009/09/20 12:00:31  efy-sergey
+ * Moved Stats>User Sessions tab 2nd position
+ *
  * Revision 1.19  2009/09/20 00:27:08  fplanque
  * cleanup/doc/simplified
  *
