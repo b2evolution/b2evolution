@@ -58,7 +58,7 @@ foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
 	if( !empty( $row->thr_read ) )
 	{
 		$read_by .= '<span style="color:green">';
-		$read_by .= get_avatar_imgtags( $row->thr_read );
+		$read_by .= get_avatar_imgtags( $row->thr_read, true, false );
 		if( !empty( $row->thr_unread ) )
 		{
 			$read_by .= ', ';
@@ -68,7 +68,7 @@ foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
 
 	if( !empty( $row->thr_unread ) )
 	{
-		$read_by .= '<span style="color:red">'.get_avatar_imgtags( $row->thr_unread ).'</span>';
+		$read_by .= '<span style="color:red">'.get_avatar_imgtags( $row->thr_unread, true, false ).'</span>';
 	}
 
 	$read_unread_recipients[$row->thr_ID] = $read_by;
@@ -168,6 +168,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/20 02:02:45  fplanque
+ * fixed read/unread colors
+ *
  * Revision 1.14  2009/09/18 10:38:31  efy-maxim
  * 15x15 icons next to login in messagin module
  *

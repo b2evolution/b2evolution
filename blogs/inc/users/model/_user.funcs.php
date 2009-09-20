@@ -594,12 +594,13 @@ function profile_check_params( $params, $User = NULL )
  *
  * @param user login
  * @param if true show user login after avatar
+ * @param if true link to user profile
  * @param avatar size
  * @param style class
  * @param image align
  * @return login <img> tag
  */
-function get_avatar_imgtag( $user_login, $show_login = true, $size = 'crop-15x15', $class = 'avatar_before_login', $align = '' )
+function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size = 'crop-15x15', $class = 'avatar_before_login', $align = '' )
 {
 	global $current_User;
 
@@ -616,11 +617,11 @@ function get_avatar_imgtag( $user_login, $show_login = true, $size = 'crop-15x15
 			$img_tag = '<span class="nowrap">'.$img_tag.$user_login.'</span>';
 		}
 
-		if( $current_User->check_perm( 'users', 'view', false ) )
+		if( $link && $current_User->check_perm( 'users', 'view', false ) )
 		{	// Permission to view user details
 			global $admin_url;
-	// fp> why did you add $admin_url here? If this is gonna be used outside of admin, it should not point to the profile in the admin but rather to the profile disp in the public blog skin
-			$img_tag = '<a href="'.url_add_param($admin_url, 'ctrl=users&amp;user_ID='.$User->ID).'">'.$img_tag.'</a>';
+	// fp>dh why did you add $admin_url here? If this is gonna be used outside of admin, it should not point to the profile in the admin but rather to the profile disp in the public blog skin
+			$img_tag = '<a href="?ctrl=users&amp;user_ID='.$User->ID.'">'.$img_tag.'</a>';
 		}
 
 	}
@@ -639,7 +640,7 @@ function get_avatar_imgtag( $user_login, $show_login = true, $size = 'crop-15x15
  * @param image align
  * @return coma separated login <img> tag
  */
-function get_avatar_imgtags( $user_logins_list, $show_login = true, $size = 'crop-15x15', $class = 'avatar_before_login', $align = '' )
+function get_avatar_imgtags( $user_logins_list, $show_login = true, $link = true, $size = 'crop-15x15', $class = 'avatar_before_login', $align = '' )
 {
 	if( !is_array( $user_logins_list ) )
 	{
@@ -649,7 +650,7 @@ function get_avatar_imgtags( $user_logins_list, $show_login = true, $size = 'cro
 	$user_imgtags_list = array();
 	foreach( $user_logins_list as $user_login )
 	{
-		$user_imgtags_list[] = get_avatar_imgtag( $user_login, $show_login, $size, $class, $align );
+		$user_imgtags_list[] = get_avatar_imgtag( $user_login, $show_login, $link, $size, $class, $align );
 	}
 	return implode( ', ', $user_imgtags_list );
 }
@@ -657,6 +658,9 @@ function get_avatar_imgtags( $user_logins_list, $show_login = true, $size = 'cro
 
 /*
  * $Log$
+ * Revision 1.18  2009/09/20 02:02:45  fplanque
+ * fixed read/unread colors
+ *
  * Revision 1.17  2009/09/20 00:27:08  fplanque
  * cleanup/doc/simplified
  *
