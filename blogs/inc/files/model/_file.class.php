@@ -1654,52 +1654,23 @@ class File extends DataObject
 			return '';
 		}
 
-		$img_attribs = $this->get_img_attribs($size_name);
+		$imgtag = '<img src="'.$this->get_thumb_url($size_name).'" '
+					.'alt="'.$this->dget('alt', 'htmlattr').'" '
+					.'title="'.$this->dget('title', 'htmlattr').'"';
 
 		if( $class )
 		{ // add class
-			$img_attribs['class'] = $class;
+			$imgtag .= ' class="'.$class.'"';
 		}
 
 		if( !$use_strict && $align )
 		{ // add align
-			$img_attribs['align'] = $align;
+			$imgtag .= ' align="'.$align.'"';
 		}
 
-		$imgtag = '<img '.get_field_attribs_as_string($this->get_img_attribs($size_name)).' />';
+		$imgtag .=' />';
+
 		return $imgtag;
-	}
-
-
-	/**
-	 * @return array List of HTML attributes for the image.
-	 */
-	function get_img_attribs($size_name = '80x80')
-	{
-		$img_attribs = array(
-			'title' => $this->get('title'),
-			'alt' => $this->get('alt'),
-		);
-		if( ! strlen($img_attribs['alt']) )
-		{ // use title for alt, too
-			$img_attribs['alt'] = $img_attribs['title'];
-		}
-		if( $size_name == 'original' )
-		{
-			$img_attribs['src'] = $this->get_url();
-			$img_attribs += $this->get_image_size('widthheight_assoc');
-		}
-		else
-		{
-			$img_attribs['src'] = $this->get_thumb_url( $size_name );
-			$thumb_path = $this->get_af_thumb_path($size_name, NULL, true);
-			if( substr($thumb_path, 0, 1) != '!'
-				&& ( $size_arr = imgsize($thumb_path, 'widthheight_assoc') ) !== false )
-			{ // no error, add width and height attribs
-				$img_attribs += $size_arr;
-			}
-		}
-		return $img_attribs;
 	}
 
 
@@ -1905,6 +1876,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.51  2009/09/20 01:28:35  fplanque
+ * reverted broken stuff (first bug: the class is no longer added to img, I tried to fixed that and entered a rathole with no end)
+ *
  * Revision 1.50  2009/09/20 00:19:31  blueyed
  * Add width/height attribs to get_thumb_imgtag generated images. Refactor used method into get_img_attribs.
  *
