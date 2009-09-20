@@ -145,13 +145,21 @@ else
 $Messages = & new Log( 'error' );
 
 
-/**
+/*
  * Start timer:
  */
-load_class( '_core/model/_timer.class.php', 'Timer' );
-$Timer = & new Timer('total');
+if( $debug )
+{
+	load_class( '_core/model/_timer.class.php', 'Timer' );
+	$Timer = & new Timer('total');
 
-$Timer->resume( '_main.inc' );
+	$Timer->resume( '_main.inc' );
+}
+else
+{
+	load_class( '_core/model/_timer.class.php', 'Timer_noop' );
+	$Timer = new Timer_noop();
+}
 
 
 /**
@@ -658,6 +666,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.123  2009/09/20 16:55:14  blueyed
+ * Performance boost: add Timer_noop class and use it when not in debug mode.
+ *
  * Revision 1.122  2009/09/20 16:21:17  blueyed
  * If locale gets set from REQUEST (locale_from_get), do not override it from user settings.
  *

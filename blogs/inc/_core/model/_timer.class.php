@@ -240,8 +240,36 @@ class Timer
 	}
 }
 
+
+/**
+ * This is an implementation of {@link Timer}, which does nothing
+ * (no-operation).
+ * {@link $Timer} will get derived from this, if not running in
+ * {@link $debug debug mode}.
+ */
+class Timer_noop
+{
+	function Timer( $category = NULL ) {}
+	function reset( $category ) {}
+	function start( $category, $log = true ) {}
+	function stop( $category ) {}
+	function pause( $category ) {}
+	function resume( $category ) {}
+	function get_duration( $category, $decimals = 3 ) {}
+	function get_count( $category ) {}
+	function get_microtime( $category ) {}
+	function get_state( $category ) {}
+	function get_categories() {}
+	function get_current_microtime() {}
+}
+
+
+
 /*
  * $Log$
+ * Revision 1.4  2009/09/20 16:55:14  blueyed
+ * Performance boost: add Timer_noop class and use it when not in debug mode.
+ *
  * Revision 1.3  2009/03/08 23:57:40  fplanque
  * 2009
  *
