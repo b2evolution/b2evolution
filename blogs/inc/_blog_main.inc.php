@@ -462,7 +462,7 @@ if( isset( $skin ) )
 	}
 	else if( ! empty( $tempskin ) )
 	{ // By definition, we want to see the temporary skin (if we don't use feedburner... )
-		$redir = 'no';	
+		$redir = 'no';
 	}
 }
 
@@ -592,6 +592,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.142  2009/09/20 23:51:24  blueyed
+ * whitespace
+ *
  * Revision 1.141  2009/09/14 14:00:35  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
