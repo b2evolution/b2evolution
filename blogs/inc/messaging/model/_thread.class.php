@@ -234,6 +234,8 @@ class Thread extends DataObject
 	/**
 	 * Load recipients of the current thread
 	 *
+	 * @todo fp> should probably not reissue sql if called twice
+	 *
 	 * @return recipients list
 	 */
 	function load_recipients()
@@ -307,6 +309,9 @@ class Thread extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/20 00:27:08  fplanque
+ * cleanup/doc/simplified
+ *
  * Revision 1.15  2009/09/19 20:31:38  efy-maxim
  * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
  *

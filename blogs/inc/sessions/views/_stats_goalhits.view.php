@@ -135,7 +135,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('User'),
 		'order' => 'user_login',
-		'td' => '%stat_session_login( #user_login#, true )%',
+		'td' => '%stat_session_login( #user_login# )%',
 	);
 
 $Results->cols[] = array(
@@ -191,6 +191,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/20 00:27:08  fplanque
+ * cleanup/doc/simplified
+ *
  * Revision 1.5  2009/03/08 23:57:45  fplanque
  * 2009
  *

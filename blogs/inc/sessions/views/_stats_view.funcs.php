@@ -53,26 +53,28 @@ function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40 )
 }
 
 
-
-function stat_session_login( $login, $link = false )
+/**
+ * display avatar and login linking to sessions list for user
+ *
+ * @param mixed $login
+ */
+function stat_session_login( $login )
 {
 	if( empty($login) )
 	{
 		return '<span class="note">'.T_('Anon.').'</span>';
 	}
-	elseif( $link )
-	{
-		return '<strong><a href="?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;user='.$login.'">'.$login.'</a></strong>';
-	}
-	else
-	{
-		return '<strong>'.$login.'</strong>';
-	}
+
+	return '<span class="nowrap">'.get_avatar_imgtag( $login, false )
+			.' <strong><a href="?ctrl=stats&amp;tab=sessions&amp;tab3=sessid&amp;user='.$login.'">'.$login.'</a></strong></span>';
 }
 
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/20 00:27:08  fplanque
+ * cleanup/doc/simplified
+ *
  * Revision 1.6  2009/03/08 23:57:45  fplanque
  * 2009
  *

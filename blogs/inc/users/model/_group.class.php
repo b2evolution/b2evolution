@@ -326,16 +326,17 @@ class Group extends DataObject
 
 			case 'messaging':
 
-				switch ( $permvalue )
+				switch( $permvalue ) // permvalue is what the group allows
 				{
 					case 'delete':
 						// same as write but you can also delete threads you're involved in
-						if( $permlevel == 'delete' )
+						if( $permlevel == 'delete' )  // permlevel is what is requested
 						{ // User can ask for delete perm...
 							$perm = true;
 							break;
 						}
-
+						// ... or for any lower priority perm... (no break)
+// fp> this does not seem right. write is a higher perm than reply so they should probably appear in that order
 					case 'reply':
 						//  reply to people you have messaged with in the past
 						if( $permlevel == 'reply' && $permvalue != 'delete')
@@ -563,6 +564,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2009/09/20 00:27:08  fplanque
+ * cleanup/doc/simplified
+ *
  * Revision 1.19  2009/09/19 20:31:39  efy-maxim
  * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
  *

@@ -252,8 +252,10 @@ class sessions_Module extends Module
 				);
 		}
 	}
+
 	
-	function build_menu_3() {
+	function build_menu_3()
+	{
 		
 		global $blog, $dispatcher;
 		/**
@@ -317,6 +319,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.19  2009/09/20 00:27:08  fplanque
+ * cleanup/doc/simplified
+ *
  * Revision 1.18  2009/09/19 21:49:03  efy-sergey
  * Moved Stats>User Sessions tab to Users>Sessions
  *

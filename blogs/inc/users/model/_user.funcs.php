@@ -593,13 +593,13 @@ function profile_check_params( $params, $User = NULL )
  * Get avatar <img> tag by user login
  *
  * @param user login
+ * @param if true show user login after avatar
  * @param avatar size
  * @param style class
  * @param image align
- * @param if true show user login before an avatar
  * @return login <img> tag
  */
-function get_avatar_imgtag( $user_login, $size = 'crop-15x15', $class = 'avatar_before_login', $align = '', $show_login = true)
+function get_avatar_imgtag( $user_login, $show_login = true, $size = 'crop-15x15', $class = 'avatar_before_login', $align = '' )
 {
 	global $current_User;
 
@@ -619,6 +619,7 @@ function get_avatar_imgtag( $user_login, $size = 'crop-15x15', $class = 'avatar_
 		if( $current_User->check_perm( 'users', 'view', false ) )
 		{	// Permission to view user details
 			global $admin_url;
+	// fp> why did you add $admin_url here? If this is gonna be used outside of admin, it should not point to the profile in the admin but rather to the profile disp in the public blog skin
 			$img_tag = '<a href="'.url_add_param($admin_url, 'ctrl=users&amp;user_ID='.$User->ID).'">'.$img_tag.'</a>';
 		}
 
@@ -632,13 +633,13 @@ function get_avatar_imgtag( $user_login, $size = 'crop-15x15', $class = 'avatar_
  * Get avatar <img> tags for list of user logins
  *
  * @param list of user logins
+ * @param if true show user login after each avatar
  * @param avatar size
  * @param style class
  * @param image align
- * @param if true show user login before an avatar
  * @return coma separated login <img> tag
  */
-function get_avatar_imgtags( $user_logins_list, $size = 'crop-15x15', $class = 'avatar_before_login', $align = '', $show_login = true )
+function get_avatar_imgtags( $user_logins_list, $show_login = true, $size = 'crop-15x15', $class = 'avatar_before_login', $align = '' )
 {
 	if( !is_array( $user_logins_list ) )
 	{
@@ -648,7 +649,7 @@ function get_avatar_imgtags( $user_logins_list, $size = 'crop-15x15', $class = '
 	$user_imgtags_list = array();
 	foreach( $user_logins_list as $user_login )
 	{
-		$user_imgtags_list[] = get_avatar_imgtag( $user_login, $size, $class, $align, $show_login );
+		$user_imgtags_list[] = get_avatar_imgtag( $user_login, $show_login, $size, $class, $align );
 	}
 	return implode( ', ', $user_imgtags_list );
 }
@@ -656,6 +657,9 @@ function get_avatar_imgtags( $user_logins_list, $size = 'crop-15x15', $class = '
 
 /*
  * $Log$
+ * Revision 1.17  2009/09/20 00:27:08  fplanque
+ * cleanup/doc/simplified
+ *
  * Revision 1.16  2009/09/19 22:34:17  blueyed
  * get_avatar_imgtag: use admin_url (useful when called in the frontend)
  *

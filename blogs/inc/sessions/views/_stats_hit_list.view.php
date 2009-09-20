@@ -99,7 +99,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('User'),
 		'order' => 'user_login',
-		'td' => '%stat_session_login( #user_login#, true )%',
+		'td' => '%stat_session_login( #user_login# )%',
 	);
 
 $Results->cols[] = array(
@@ -177,6 +177,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/20 00:27:08  fplanque
+ * cleanup/doc/simplified
+ *
  * Revision 1.7  2009/09/13 21:26:50  blueyed
  * SQL_NO_CACHE for SELECT queries using T_hitlog
  *

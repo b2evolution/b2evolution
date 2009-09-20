@@ -129,6 +129,7 @@ switch( $action )
 
 if( $tab != 'sessions' )
 { // no need to show blogs list while displaying sessions
+
 	if( isset($collections_Module) )
 	{ // Display list of blogs:
 		if( $perm_view_all )
@@ -261,6 +262,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2009/09/20 00:27:08  fplanque
+ * cleanup/doc/simplified
+ *
  * Revision 1.16  2009/09/19 21:49:03  efy-sergey
  * Moved Stats>User Sessions tab to Users>Sessions
  *

@@ -288,6 +288,7 @@ class Plugins
 
 	/**
 	 * Get path of a given Plugin classname.
+	 *
 	 * @param string Classname
 	 * @return string Path
 	 */
@@ -1925,6 +1926,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.17  2009/09/20 00:27:08  fplanque
+ * cleanup/doc/simplified
+ *
  * Revision 1.16  2009/09/19 20:49:46  blueyed
  * Factor get_classfile_path out, used in tests.
  *
