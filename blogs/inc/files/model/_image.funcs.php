@@ -177,6 +177,8 @@ function load_image( $path, $mimetype )
 /**
  * Output an image from memory to web client
  *
+ * @todo dh> image* functions might fail here, e.g. no fs permission.
+ *
  * @param resource image handle
  * @param string pathname of image file
  * @param string
@@ -309,6 +311,9 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/20 01:10:36  blueyed
+ * todo
+ *
  * Revision 1.9  2009/09/20 00:46:28  blueyed
  * load_image: handle error case a bit better.
  *
