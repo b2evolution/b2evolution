@@ -164,6 +164,12 @@ function load_image( $path, $mimetype )
 			break;
 	}
 
+	if( $imh === false )
+	{
+		// e.g. "imagecreatefromjpeg(): $FILE is not a valid JPEG file"
+		$err = '!load_image failed (no valid image?)';
+	}
+
 	return array( $err, $imh );
 }
 
@@ -303,6 +309,9 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/20 00:46:28  blueyed
+ * load_image: handle error case a bit better.
+ *
  * Revision 1.8  2009/09/12 20:51:58  tblue246
  * phpdoc fixes
  *
