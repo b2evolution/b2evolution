@@ -115,8 +115,7 @@ if( !empty($size) && $File->is_image() )
 	$mimetype = $Filetype->mimetype;
 
 	// Try to output the cached thumbnail:
-	// TODO: dh> this should also then "Expires" header. Please refactor.
-	$err = $File->output_cached_thumb( $size_name, $mimetype );
+	$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime );
 
 	if( $err == '!Thumbnail not found in .evocache' )
 	{	// The thumbnail wasn't already in the cache, try to generate and cache it now:
@@ -132,7 +131,7 @@ if( !empty($size) && $File->is_image() )
 				if( empty( $err ) )
 				{	// File was saved. Ouput that same file immediately:
 					// This is probably better than recompressing the memory image..
-					$err = $File->output_cached_thumb( $size_name, $mimetype );
+					$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime );
 				}
 				else
 				{	// File could not be saved.
@@ -204,6 +203,12 @@ else
 
 /*
  * $Log$
+ * Revision 1.37  2009/09/20 23:54:24  blueyed
+ * File::output_cached_thumb handles mtime param, and uses it to send a
+ * far in the future Expires header.
+ * mtime param gets forwarded from getfile.php.
+ * This makes browsers finally cache files served through getfile.php.
+ *
  * Revision 1.36  2009/09/19 23:34:58  fplanque
  * security risk
  *

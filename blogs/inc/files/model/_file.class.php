@@ -1840,9 +1840,10 @@ class File extends DataObject
 	 *
 	 * @param string size name
 	 * @param string mimetype of thumbnail
-	 * @param string short error code
+	 * @param int Modified time of the file (should have been provided as GET param)
+	 * @return mixed NULL on success, otherwise string ("!Error code")
 	 */
-	function output_cached_thumb( $size_name, $thumb_mimetype )
+	function output_cached_thumb( $size_name, $thumb_mimetype, $mtime = NULL )
 	{
 		$af_thumb_path = $this->get_af_thumb_path( $size_name, $thumb_mimetype, false );
 		if( $af_thumb_path[0] != '!' )
@@ -1857,7 +1858,11 @@ class File extends DataObject
 				return '!Thumbnail read error! Check filesystem permissions.';
 			}
 
-			header('Content-type: '.$thumb_mimetype );
+			if( $mtime && $mtime == $this->get_lastmod_ts() )
+			{
+				header('Expires: '.date('r', time()+315360000)); // 86400*365*10 (10 years)
+			}
+			header('Content-Type: '.$thumb_mimetype );
 			header('Content-Length: '.filesize( $af_thumb_path ) );
 			// Output the content of the file
 			readfile( $af_thumb_path );
@@ -1893,6 +1898,12 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.54  2009/09/20 23:54:24  blueyed
+ * File::output_cached_thumb handles mtime param, and uses it to send a
+ * far in the future Expires header.
+ * mtime param gets forwarded from getfile.php.
+ * This makes browsers finally cache files served through getfile.php.
+ *
  * Revision 1.53  2009/09/20 16:55:57  tblue246
  * Prevent PHP error
  *
