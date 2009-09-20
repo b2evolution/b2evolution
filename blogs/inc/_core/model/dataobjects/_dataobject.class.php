@@ -271,10 +271,8 @@ class DataObject
 			return false;
 		}
 
-		
-		if( !( $this->allow_ID_insert && $this->ID ) )
-		{// store ID for newly created db record. Do not if allow_ID_insert is true and $this->ID is not 0
-			
+		if( ! $this->allow_ID_insert && ! $this->ID )
+		{	// store ID for newly created db record. Do not if allow_ID_insert is true and $this->ID is not 0
 			$this->ID = $DB->insert_id;
 		}
 		// Reset changes in object:
@@ -797,6 +795,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.17  2009/09/20 17:17:56  tblue246
+ * minor
+ *
  * Revision 1.16  2009/09/20 12:17:15  efy-sergey
  * fixed wrong ID asigning for tables without auto_increment fields
  *
