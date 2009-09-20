@@ -223,6 +223,7 @@ class DB
 	 * Do we want to log queries?
 	 * If null, it gets set according to {@link $debug}.
 	 * A subclass may set it by default (e.g. DbUnitTestCase_DB).
+	 * This requires {@link $debug} to be true.
 	 * @var boolean
 	 */
 	var $log_queries;
@@ -309,7 +310,7 @@ class DB
 	 *       the same params before. (requires PHP 4.2)
 	 *    - 'client_flags': optional settings like compression or SSL encryption. See {@link http://www.php.net/manual/en/ref.mysql.php#mysql.client-flags}.
 	 *       (requires PHP 4.3)
-	 *    - 'log_queries': should queries get logged internally? (follows $debug by default)
+	 *    - 'log_queries': should queries get logged internally? (follows $debug by default, and requires it to be enabled otherwise)
 	 *      This is a requirement for the following options:
 	 *    - 'debug_dump_rows': Number of rows to dump
 	 *    - 'debug_explain_joins': Explain JOINS? (calls "EXPLAIN $query")
@@ -344,11 +345,11 @@ class DB
 		if( isset($params['debug_dump_function_trace_for_queries']) ) $this->debug_dump_function_trace_for_queries = $params['debug_dump_function_trace_for_queries'];
 		if( isset($params['log_queries']) )
 		{
-			$this->log_queries = $params['log_queries'];
+			$this->log_queries = $debug && $params['log_queries'];
 		}
 		elseif( isset($debug) && ! isset($this->log_queries) )
 		{ // $log_queries follows $debug and respects subclasses, which may define it:
-			$this->log_queries = $debug;
+			$this->log_queries = (bool)$debug;
 		}
 
 		if( ! extension_loaded('mysql') )
@@ -854,6 +855,9 @@ class DB
 			$return_val = $this->num_rows;
 		}
 
+		// Free original query's result:
+		@mysql_free_result($this->result);
+
 		if( $this->log_queries )
 		{	// We want to log queries:
 			if( $this->debug_dump_function_trace_for_queries )
@@ -865,79 +869,76 @@ class DB
 			{
 				$this->queries[ $this->num_queries - 1 ]['results'] = $this->debug_get_rows_table( $this->debug_dump_rows );
 			}
-		}
 
-		// Free original query's result:
-		@mysql_free_result($this->result);
-
-		// Profile queries
-		if( $this->log_queries && $this->debug_profile_queries )
-		{
-			// save values:
-			$saved_last_result = $this->last_result;
-			$saved_num_rows = $this->num_rows;
-
-			$this->last_result = NULL;
-			$this->num_rows = 0;
-
-			$this->result = @mysql_query( 'SHOW PROFILE', $this->dbhandle );
-			// Store Query Results
-			$this->num_rows = 0;
-			while( $row = @mysql_fetch_object($this->result) )
+			// Profile queries
+			if( $this->debug_profile_queries )
 			{
-				// Store results as an objects within main array
-				$this->last_result[$this->num_rows] = $row;
-				$this->num_rows++;
+				// save values:
+				$saved_last_result = $this->last_result;
+				$saved_num_rows = $this->num_rows;
+
+				$this->last_result = NULL;
+				$this->num_rows = 0;
+
+				$this->result = @mysql_query( 'SHOW PROFILE', $this->dbhandle );
+				// Store Query Results
+				$this->num_rows = 0;
+				while( $row = @mysql_fetch_object($this->result) )
+				{
+					// Store results as an objects within main array
+					$this->last_result[$this->num_rows] = $row;
+					$this->num_rows++;
+				}
+
+				if( $this->num_rows )
+				{
+					$this->queries[$this->num_queries-1]['profile'] = $this->debug_get_rows_table( 100, true );
+
+					// Get time information from PROFILING table (which corresponds to "SHOW PROFILE")
+					$this->result = mysql_query( 'SELECT FORMAT(SUM(DURATION), 6) AS DURATION FROM INFORMATION_SCHEMA.PROFILING GROUP BY QUERY_ID ORDER BY QUERY_ID DESC LIMIT 1', $this->dbhandle );
+					$this->queries[$this->num_queries-1]['time_profile'] = array_shift(mysql_fetch_row($this->result));
+				}
+
+				// Free "PROFILE" result resource:
+				mysql_free_result($this->result);
+
+
+				// Restore:
+				$this->last_result = $saved_last_result;
+				$this->num_rows = $saved_num_rows;
 			}
 
-			if( $this->num_rows )
-			{
-				$this->queries[$this->num_queries-1]['profile'] = $this->debug_get_rows_table( 100, true );
+			// EXPLAIN JOINS ??
+			if( $this->debug_explain_joins && preg_match( '#^ [\s(]* SELECT \s #ix', $query) )
+			{ // Query was a select, let's try to explain joins...
 
-				// Get time information from PROFILING table (which corresponds to "SHOW PROFILE")
-				$this->result = mysql_query( 'SELECT FORMAT(SUM(DURATION), 6) AS DURATION FROM INFORMATION_SCHEMA.PROFILING GROUP BY QUERY_ID ORDER BY QUERY_ID DESC LIMIT 1', $this->dbhandle );
-				$this->queries[$this->num_queries-1]['time_profile'] = array_shift(mysql_fetch_row($this->result));
+				// save values:
+				$saved_last_result = $this->last_result;
+				$saved_num_rows = $this->num_rows;
+
+				$this->last_result = NULL;
+				$this->num_rows = 0;
+
+				$this->result = @mysql_query( 'EXPLAIN '.$query, $this->dbhandle );
+
+				// Store Query Results
+				$this->num_rows = 0;
+				while( $row = @mysql_fetch_object($this->result) )
+				{
+					// Store results as an objects within main array
+					$this->last_result[$this->num_rows] = $row;
+					$this->num_rows++;
+				}
+
+				$this->queries[ $this->num_queries - 1 ]['explain'] = $this->debug_get_rows_table( 100, true );
+
+				// Free "EXPLAIN" result resource:
+				@mysql_free_result($this->result);
+
+				// Restore:
+				$this->last_result = $saved_last_result;
+				$this->num_rows = $saved_num_rows;
 			}
-
-			// Free "PROFILE" result resource:
-			mysql_free_result($this->result);
-
-
-			// Restore:
-			$this->last_result = $saved_last_result;
-			$this->num_rows = $saved_num_rows;
-		}
-
-		// EXPLAIN JOINS ??
-		if( $this->log_queries && $this->debug_explain_joins && preg_match( '#^ [\s(]* SELECT \s #ix', $query) )
-		{ // Query was a select, let's try to explain joins...
-
-			// save values:
-			$saved_last_result = $this->last_result;
-			$saved_num_rows = $this->num_rows;
-
-			$this->last_result = NULL;
-			$this->num_rows = 0;
-
-			$this->result = @mysql_query( 'EXPLAIN '.$query, $this->dbhandle );
-
-			// Store Query Results
-			$this->num_rows = 0;
-			while( $row = @mysql_fetch_object($this->result) )
-			{
-				// Store results as an objects within main array
-				$this->last_result[$this->num_rows] = $row;
-				$this->num_rows++;
-			}
-
-			$this->queries[ $this->num_queries - 1 ]['explain'] = $this->debug_get_rows_table( 100, true );
-
-			// Free "EXPLAIN" result resource:
-			@mysql_free_result($this->result);
-
-			// Restore:
-			$this->last_result = $saved_last_result;
-			$this->num_rows = $saved_num_rows;
 		}
 
 		return $return_val;
@@ -1658,6 +1659,12 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.38  2009/09/20 22:05:34  blueyed
+ * DB:
+ *  - log_queries requires $debug to be enabled, otherwise you won't see
+ *    any results, but the performance drawback.
+ *  - Save two IFs
+ *
  * Revision 1.37  2009/09/16 20:50:52  tblue246
  * Do not divide by zero; style fix
  *
