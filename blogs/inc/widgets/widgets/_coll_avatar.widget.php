@@ -84,7 +84,7 @@ class coll_avatar_Widget extends ComponentWidget
 					'label' => T_('Image size'),
 					'options' => $options,
 					'note' => T_('List of available image sizes is defined in $thumbnail_sizes.'),
-					'default' => '160x160',
+					'defaultvalue' => 'fit-160x160',
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -130,6 +130,9 @@ class coll_avatar_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.2  2009/09/20 00:51:43  fplanque
+ * OMG!!
+ *
  * Revision 1.1  2009/09/20 00:33:59  blueyed
  * Add widget to display avatar of collection/blog owner. Install it for all new blogs by default.
  *
