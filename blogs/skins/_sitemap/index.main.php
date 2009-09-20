@@ -14,6 +14,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $Timer->resume( 'prepare list' );
 
+load_class( '/items/model/_itemlistlight.class.php', 'ItemListLight' );
+
 // Use a LIGHT Item List:  (Sitemap = 50000 entries max)
 $MainList = & new ItemListLight( $Blog, $timestamp_min, $timestamp_max, 50000 );
 
