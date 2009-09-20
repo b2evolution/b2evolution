@@ -1672,14 +1672,17 @@ class File extends DataObject
 		if( $size_name == 'original' )
 		{
 			$img_attribs['src'] = $this->get_url();
-			$img_attribs += $this->get_image_size('widthheight_assoc');
+			if( ( $size_arr = $this->get_image_size('widthheight_assoc') ) )
+			{
+				$img_attribs += $size_arr;
+			}
 		}
 		else
 		{
 			$img_attribs['src'] = $this->get_thumb_url( $size_name );
 			$thumb_path = $this->get_af_thumb_path($size_name, NULL, true);
 			if( substr($thumb_path, 0, 1) != '!'
-				&& ( $size_arr = imgsize($thumb_path, 'widthheight_assoc') ) !== false )
+				&& ( $size_arr = imgsize($thumb_path, 'widthheight_assoc') ) )
 			{ // no error, add width and height attribs
 				$img_attribs += $size_arr;
 			}
@@ -1890,6 +1893,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.53  2009/09/20 16:55:57  tblue246
+ * Prevent PHP error
+ *
  * Revision 1.52  2009/09/20 13:45:19  blueyed
  * Re-add get_img_attribs, fix class issue and use it where it has been factored out, too.
  *
