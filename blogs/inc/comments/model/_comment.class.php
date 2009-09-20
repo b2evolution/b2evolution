@@ -393,17 +393,15 @@ class Comment extends DataObject
 			if( !empty($params['default']) )
 				$img_url .= '&amp;default='.urlencode($params['default']);				
 		}
-
-		$imgtag = '<img src="'.$img_url.'" '
-					.'alt="'.format_to_output( $this->get_author_name(), 'htmlattr').'" '
-					.'title="'.format_to_output( $this->get_author_name(), 'htmlattr').'"';
-
+		$img_params = array(
+			'src' => $img_url,
+			'alt' => $this->get_author_name(),
+			'title' => $this->get_author_name(),
+		);
 		if( $class )
-		{ // add class
-			$imgtag .= ' class="'.$class.'"';
-		}
-		
-		$imgtag .=' />';
+			$img_params['class'] = $class;
+
+		$imgtag = '<img '.get_field_attribs_as_string($img_params).' />';
 		
 		return $imgtag;
 	}
@@ -1462,6 +1460,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.34  2009/09/20 13:48:46  blueyed
+ * Cleanup get_avatar some.
+ *
  * Revision 1.33  2009/09/16 21:29:31  sam2kb
  * Display user/visitor avatar in comments
  *
