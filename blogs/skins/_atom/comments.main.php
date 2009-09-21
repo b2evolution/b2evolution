@@ -37,7 +37,7 @@ else
 
 // Add caching headers
 // TODO: Last-Modified
-header('Expires: '.date('r', time() + 300)); // TODO: dh> should be a centralized setting. Maybe through the Skin class, if type is "feed"?
+header('Expires: '.date('r', time() + 300)); // TODO: dh> should be a centralized setting. Maybe through the Skin class, if type is "feed"? fp> I'm not sure, maybe a blog param would be make sense (in the feeds section) -> depending on post frequency for a particular blog, you want different cache times
 
 
 echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';

@@ -10,7 +10,7 @@
  * @package evoskins
  * @subpackage atom
  *
- * @todo dh> isn't this missing a call to skin_init()!? - if so, other feeds are missing it, too.
+ * @todo dh> isn't this missing a call to skin_init()!? - if so, other feeds are missing it, too. fp> no this is very much on purpose. there is a comment somewhere (don't know exactly)
  *
  * @version $Id$
  */
