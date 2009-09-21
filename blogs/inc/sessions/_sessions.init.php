@@ -64,6 +64,24 @@ $ctrl_mappings['goals'] = 'sessions/goals.ctrl.php';
 
 
 /**
+ * Get the GoalCache
+ *
+ * @return GoalCache
+ */
+function & get_GoalCache()
+{
+	global $GoalCache;
+
+	if( ! isset( $GoalCache ) )
+	{	// Cache doesn't exist yet:
+		$GoalCache = new DataObjectCache( 'Goal', false, 'T_track__goal', 'goal_', 'goal_ID', 'goal_name', 'goal_name' ); // COPY (FUNC)
+	}
+
+	return $GoalCache;
+}
+
+
+/**
  * sessions_Module definition
  */
 class sessions_Module extends Module
@@ -260,7 +278,7 @@ class sessions_Module extends Module
 	 */
 	function build_menu_3()
 	{
-		
+
 		global $blog, $dispatcher;
 		/**
 		 * @var User
@@ -271,7 +289,7 @@ class sessions_Module extends Module
 		 * @var AdminUI_general
 		 */
 		global $AdminUI;
-		
+
 		if( $blog == 0 && $current_User->check_perm( 'stats', 'view' ) )
 		{	// Viewing aggregate + Permission to view stats for ALL blogs:
 			$sessions_menu = array(
@@ -325,6 +343,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.22  2009/09/21 03:14:35  fplanque
+ * modularized a little more
+ *
  * Revision 1.21  2009/09/20 18:13:20  fplanque
  * doc
  *

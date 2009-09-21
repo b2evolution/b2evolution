@@ -96,6 +96,116 @@ $ctrl_mappings = array(
 
 
 /**
+ * Get the CountryCache
+ *
+ * @return CountryCache
+ */
+function & get_CountryCache()
+{
+	global $CountryCache;
+
+	if( ! isset( $CountryCache ) )
+	{	// Cache doesn't exist yet:
+		$CountryCache = new DataObjectCache( 'Country', true, 'T_country', 'ctry_', 'ctry_ID', 'ctry_code', 'ctry_name', 'Unknown');
+	}
+
+	return $CountryCache;
+}
+
+/**
+ * Get the CurrencyCache
+ *
+ * @return CurrencyCache
+ */
+function & get_CurrencyCache()
+{
+	global $CurrencyCache;
+
+	if( ! isset( $CurrencyCache ) )
+	{	// Cache doesn't exist yet:
+		$CurrencyCache = new DataObjectCache( 'Currency', true, 'T_currency', 'curr_', 'curr_ID', 'curr_code', 'curr_code');
+	}
+
+	return $CurrencyCache;
+}
+
+
+/**
+ * Get the GroupCache
+ *
+ * @return GroupCache
+ */
+function & get_GroupCache()
+{
+	global $Plugins;
+	global $GroupCache;
+
+	if( ! isset( $GroupCache ) )
+	{	// Cache doesn't exist yet:
+		$Plugins->get_object_from_cacheplugin_or_create( 'GroupCache', 'new DataObjectCache( \'Group\', true, \'T_groups\', \'grp_\', \'grp_ID\', \'grp_name\', \'\', T_(\'No group\') )' );
+	}
+
+	return $GroupCache;
+}
+
+
+/**
+ * Get the Plugins_admin
+ *
+ * @return Plugins_admin
+ */
+function & get_Plugins_admin()
+{
+	global $Plugins_admin;
+
+	if( ! isset( $Plugins_admin ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'plugins/model/_plugins_admin.class.php', 'Plugins_admin' );
+		$Plugins_admin = new Plugins_admin(); // COPY (FUNC)
+	}
+
+	return $Plugins_admin;
+}
+
+
+/**
+ * Get the UserCache
+ *
+ * @return UserCache
+ */
+function & get_UserCache()
+{
+	global $UserCache;
+
+	if( ! isset( $UserCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'users/model/_usercache.class.php', 'UserCache' );
+		$UserCache = new UserCache(); // COPY (FUNC)
+	}
+
+	return $UserCache;
+}
+
+
+/**
+ * Get the UserFieldCache
+ *
+ * @return UserFieldCache
+ */
+function & get_UserFieldCache()
+{
+	global $UserFieldCache;
+
+	if( ! isset( $UserFieldCache ) )
+	{	// Cache doesn't exist yet:
+		$UserFieldCache = new DataObjectCache( 'Userfield', false, 'T_users__fielddefs', 'ufdf_', 'ufdf_ID', 'ufdf_name', 'ufdf_name' ); // COPY (FUNC)
+	}
+
+	return $UserFieldCache;
+}
+
+
+/**
  * _core_Module definition
  */
 class _core_Module extends Module
@@ -618,6 +728,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.31  2009/09/21 03:14:35  fplanque
+ * modularized a little more
+ *
  * Revision 1.30  2009/09/16 00:48:50  fplanque
  * getting a bit more serious with modules
  *

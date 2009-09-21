@@ -55,6 +55,43 @@ $ctrl_mappings['threads'] = 'messaging/threads.ctrl.php';
 $ctrl_mappings['contacts'] = 'messaging/contacts.ctrl.php';
 
 
+
+/**
+ * Get the MessageCache
+ *
+ * @return MessageCache
+ */
+function & get_MessageCache()
+{
+	global $MessageCache;
+
+	if( ! isset( $MessageCache ) )
+	{	// Cache doesn't exist yet:
+		$MessageCache = new DataObjectCache( 'Message', false, 'T_messaging__message', 'msg_', 'msg_ID' );
+	}
+
+	return $MessageCache;
+}
+
+
+/**
+ * Get the ThreadCache
+ *
+ * @return ThreadCache
+ */
+function & get_ThreadCache()
+{
+	global $ThreadCache;
+
+	if( ! isset( $ThreadCache ) )
+	{	// Cache doesn't exist yet:
+		$ThreadCache = new DataObjectCache( 'Thread', false, 'T_messaging__thread', 'thrd_', 'thrd_ID', 'thrd_title' );
+	}
+
+	return $ThreadCache;
+}
+
+
 /**
  * messaging_Module definition
  */
@@ -162,6 +199,9 @@ $messaging_Module = & new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/21 03:14:35  fplanque
+ * modularized a little more
+ *
  * Revision 1.13  2009/09/19 11:29:05  efy-maxim
  * Refactoring
  *

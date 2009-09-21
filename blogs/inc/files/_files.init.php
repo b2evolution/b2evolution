@@ -43,6 +43,62 @@ $ctrl_mappings = array_merge( $ctrl_mappings, array(
 	) );
 
 
+
+/**
+ * Get the FileCache
+ *
+ * @return FileCache
+ */
+function & get_FileCache()
+{
+	global $FileCache;
+
+	if( ! isset( $FileCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'files/model/_filecache.class.php', 'FileCache' );
+		$FileCache = new FileCache(); // COPY (FUNC)
+	}
+
+	return $FileCache;
+}
+
+/**
+ * Get the FileRootCache
+ *
+ * @return FileRootCache
+ */
+function & get_FileRootCache()
+{
+	global $Plugins, $FileRootCache;
+
+	if( ! isset( $FileRootCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'files/model/_filerootcache.class.php', 'FileRootCache' );
+		$Plugins->get_object_from_cacheplugin_or_create( 'FileRootCache' );
+	}
+
+	return $FileRootCache;
+}
+
+/**
+ * Get the FiletypeCache
+ *
+ * @return FiletypeCache
+ */
+function & get_FiletypeCache()
+{
+	global $Plugins;
+	global $FiletypeCache;
+
+	if( ! isset( $FiletypeCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'files/model/_filetypecache.class.php', 'FiletypeCache' );
+		$Plugins->get_object_from_cacheplugin_or_create( 'FiletypeCache' );
+	}
+
+	return $FiletypeCache;
+}
+
 /**
  * adsense_Module definition
  */

@@ -96,6 +96,210 @@ function & get_BlogCache()
 
 
 /**
+ * Get the ChapterCache
+ *
+ * @return ChapterCache
+ */
+function & get_ChapterCache()
+{
+	global $ChapterCache;
+
+	if( ! isset( $ChapterCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
+		$ChapterCache = new ChapterCache(); // COPY (FUNC)
+	}
+
+	return $ChapterCache;
+}
+
+
+/**
+ * Get the ItemCacheLight
+ *
+ * @return ItemCacheLight
+ */
+function & get_ItemCacheLight()
+{
+	global $ItemCacheLight;
+
+	if( ! isset( $ItemCacheLight ) )
+	{	// Cache doesn't exist yet:
+		$ItemCacheLight = new DataObjectCache( 'ItemLight', false, 'T_items__item', 'post_', 'post_ID' ); // COPY (FUNC)
+	}
+
+	return $ItemCacheLight;
+}
+
+/**
+ * Get the ItemCache
+ *
+ * @return ItemCache
+ */
+function & get_ItemCache()
+{
+	global $ItemCache;
+
+	if( ! isset( $ItemCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'items/model/_itemcache.class.php', 'ItemCache' );
+		$ItemCache = new ItemCache(); // COPY (FUNC)
+	}
+
+	return $ItemCache;
+}
+
+/**
+ * Get the ItemPrerenderingCache
+ *
+ * @return ItemPrerenderingCache
+ */
+function & get_ItemPrerenderingCache()
+{
+	global $ItemPrerenderingCache;
+
+	if( ! isset( $ItemPrerenderingCache ) )
+	{	// Cache doesn't exist yet:
+		$ItemPrerenderingCache = array();
+	}
+
+	return $ItemPrerenderingCache;
+}
+
+/**
+ * Get the ItemTagsCache
+ *
+ * @return ItemTagsCache
+ */
+function & get_ItemTagsCache()
+{
+	global $ItemTagsCache;
+
+	if( ! isset( $ItemTagsCache ) )
+	{	// Cache doesn't exist yet:
+		$ItemTagsCache = array();
+	}
+
+	return $ItemTagsCache;
+}
+
+/**
+ * Get the ItemStatusCache
+ *
+ * @return ItemStatusCache
+ */
+function & get_ItemStatusCache()
+{
+	global $Plugins;
+	global $ItemStatusCache;
+
+	if( ! isset( $ItemStatusCache ) )
+	{	// Cache doesn't exist yet:
+		$Plugins->get_object_from_cacheplugin_or_create( 'ItemStatusCache', 'new GenericCache( \'GenericElement\', true, \'T_items__status\', \'pst_\', \'pst_ID\', NULL, \'\', T_(\'No status\') )' );
+	}
+
+	return $ItemStatusCache;
+}
+
+/**
+ * Get the ItemTypeCache
+ *
+ * @return ItemTypeCache
+ */
+function & get_ItemTypeCache()
+{
+	global $Plugins;
+	global $ItemTypeCache;
+
+	if( ! isset( $ItemTypeCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'items/model/_itemtypecache.class.php', 'ItemTypeCache' );
+		$Plugins->get_object_from_cacheplugin_or_create( 'ItemTypeCache', 'new ItemTypeCache( \'ptyp_\', \'ptyp_ID\' )' );
+	}
+
+	return $ItemTypeCache;
+}
+
+/**
+ * Get the LinkCache
+ *
+ * @return LinkCache
+ */
+function & get_LinkCache()
+{
+	global $LinkCache;
+
+	if( ! isset( $LinkCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'items/model/_linkcache.class.php', 'LinkCache' );
+		$LinkCache = new LinkCache(); // COPY (FUNC)
+	}
+
+	return $LinkCache;
+}
+
+/**
+ * Get the SkinCache
+ *
+ * @return SkinCache
+ */
+function & get_SkinCache()
+{
+	global $SkinCache;
+
+	if( ! isset( $SkinCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'skins/model/_skincache.class.php', 'SkinCache' );
+		$SkinCache = new SkinCache(); // COPY (FUNC)
+	}
+
+	return $SkinCache;
+}
+
+
+/**
+ * Get the WidgetCache
+ *
+ * @return WidgetCache
+ */
+function & get_WidgetCache()
+{
+	global $WidgetCache;
+
+	if( ! isset( $WidgetCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'widgets/model/_widgetcache.class.php', 'WidgetCache' );
+		$WidgetCache = new WidgetCache(); // COPY (FUNC)
+	}
+
+	return $WidgetCache;
+}
+
+/**
+ * Get the EnabledWidgetCache
+ *
+ * @return EnabledWidgetCache
+ */
+function & get_EnabledWidgetCache()
+{
+	global $EnabledWidgetCache;
+
+	if( ! isset( $EnabledWidgetCache ) )
+	{	// Cache doesn't exist yet:
+		// This simply instantiates a WidgetCache object, setting the
+		// $enabled_only parameter to true. Using a member variable
+		// instead of per-method parameters to load only the enabled
+		// widgets should be cleaner when there will be more methods
+		// in the WidgetCache class in the future.
+		load_class( 'widgets/model/_widgetcache.class.php', 'WidgetCache' );
+		$EnabledWidgetCache = new WidgetCache( true );
+	}
+
+	return $EnabledWidgetCache;
+}
+
+
+/**
  * adsense_Module definition
  */
 class collections_Module extends Module
