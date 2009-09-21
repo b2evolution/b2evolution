@@ -1155,7 +1155,7 @@ function db_delta_remove_backticks($fieldname)
 /**
  * Alter the DB schema to match the current expected one ({@link $schema_queries}).
  *
- * @todo if used by install only, then put it into the install folde!!!
+ * @todo if used by install only, then put it into the install folder!!!
  *
  * @param boolean Display what we've done?
  */
@@ -1163,9 +1163,11 @@ function install_make_db_schema_current( $display = true )
 {
 	global $schema_queries, $DB, $debug;
 
+	// Go through all tables:
 	foreach( $schema_queries as $table => $query_info )
 	{
-		$items_need_update = db_delta( $query_info[1], array('drop_column', 'drop_index') );
+		// Look for differences between terrain & map:
+		$items_need_update = db_delta( $query_info[1], array('drop_column', 'drop_index'), false );
 
 		if( empty($items_need_update) )
 		{
@@ -1186,7 +1188,7 @@ function install_make_db_schema_current( $display = true )
 			}
 		}
 		else
-		{ // the same, but with output
+		{ // execute & output
 			foreach( $items_need_update as $table => $itemlist )
 			{
 				if( count($itemlist) == 1 && $itemlist[0]['type'] == 'create_table' )
@@ -1228,6 +1230,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.10  2009/09/21 03:31:23  fplanque
+ * made autoupgrade more verbose in debug mode
+ *
  * Revision 1.9  2009/04/11 23:24:49  fplanque
  * blep
  *

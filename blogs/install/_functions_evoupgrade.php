@@ -2593,7 +2593,7 @@ function upgrade_b2evo_tables()
 	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 100).
 	 */
 
-	task_begin( 'Updating items table... ' );
+	task_begin( 'Updating future posts... ' );
 	$DB->query( '
 		UPDATE T_items__item
 		   SET post_datestart = FROM_UNIXTIME( FLOOR(UNIX_TIMESTAMP(post_datestart)/60)*60 )
@@ -2625,31 +2625,47 @@ function upgrade_b2evo_tables()
 
 
 	/*
+	 * -----------------------------------------------
 	 * Check to make sure the DB schema is up to date:
+	 * -----------------------------------------------
 	 */
 	$upgrade_db_deltas = array(); // This holds changes to make, if any (just all queries)
 
+	global $debug;
+
 	foreach( $schema_queries as $table => $query_info )
 	{	// For each table in the schema, check diffs...
-		foreach( db_delta( $query_info[1], array('drop_column', 'drop_index') ) as $table => $queries )
+		if( $debug )
 		{
-			foreach( $queries as $qinfo )
+			echo '<br />Checking table: '.$table.': ';
+		}
+		$updates = db_delta( $query_info[1], array('drop_column', 'drop_index'), false, true );
+		if( empty($updates) )
+		{
+			if( $debug ) echo 'ok';
+		}
+		else
+		{
+			if( $debug ) echo 'NEEDS UPDATE!';
+			foreach( $updates as $table => $queries )
 			{
-				foreach( $qinfo['queries'] as $query )
-				{ // subqueries for this query (usually one, but may include required other queries)
-					$upgrade_db_deltas[] = $query;
+				foreach( $queries as $qinfo )
+				{
+					foreach( $qinfo['queries'] as $query )
+					{ // subqueries for this query (usually one, but may include required other queries)
+						$upgrade_db_deltas[] = $query;
+					}
 				}
 			}
 		}
 	}
 
 	if( empty($upgrade_db_deltas) )
-	{
+	{	// no upgrades needed:
 		echo '<p>'.T_('The database schema is up to date.').'</p>';
 	}
 	else
-	{
-		// delta queries have to be confirmed or executed now..
+	{	// Upgrades are needed:
 
 		$confirmed_db_upgrade = param('confirmed', 'integer', 0); // force confirmation
 		$upgrade_db_deltas_confirm_md5 = param( 'upgrade_db_deltas_confirm_md5', 'string', '' );
@@ -2710,6 +2726,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.326  2009/09/21 03:31:23  fplanque
+ * made autoupgrade more verbose in debug mode
+ *
  * Revision 1.325  2009/09/20 19:52:21  blueyed
  * Make ENGINE match more lax.
  *
