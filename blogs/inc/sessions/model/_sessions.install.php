@@ -47,7 +47,7 @@ $schema_queries['T_sessions'] = array(
 			sess_key       CHAR(32) NULL,
 			sess_hitcount  INT(10) UNSIGNED NOT NULL DEFAULT 1,
 			sess_lastseen  DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
-			sess_ipaddress VARCHAR(15) NOT NULL DEFAULT '',
+			sess_ipaddress VARCHAR(39) NOT NULL DEFAULT '',
 			sess_user_ID   INT(10) DEFAULT NULL,
 			sess_data      MEDIUMBLOB DEFAULT NULL,
 			PRIMARY KEY      ( sess_ID ),
@@ -154,6 +154,9 @@ $schema_queries['T_track__goalhit'] = array(
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/21 03:16:48  fplanque
+ * IPv6
+ *
  * Revision 1.12  2009/07/12 23:18:22  fplanque
  * upgrading tables to innodb
  *
