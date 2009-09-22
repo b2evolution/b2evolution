@@ -42,6 +42,8 @@ require_once $inc_path.'_main.inc.php';
 // Login is not required on the register page:
 $login_required = false;
 
+// Check if country is required
+$registration_require_country = (bool)$Settings->get('registration_require_country');
 
 param( 'action',  'string', '' );
 param( 'login',   'string', '' );
@@ -79,14 +81,21 @@ switch( $action )
 			break;
 		}
 
-		// Check profile params:
-		profile_check_params( array(
+		// Set params:
+		$paramsList = array(
 			'login'   => $login,
 			'pass1'   => $pass1,
 			'pass2'   => $pass2,
 			'email'   => $email,
-			'country' => $country,
-			'pass_required' => true ) );
+			'pass_required' => true );
+		
+		if( $registration_require_country )
+		{
+			$paramsList['country'] = $country;
+		}
+		
+		// Check profile params:
+		profile_check_params( $paramsList );
 
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
 		$login = strtolower( $login );
@@ -216,6 +225,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.98  2009/09/22 16:37:59  efy-bogdan
+ * Require country checkbox added
+ *
  * Revision 1.97  2009/09/16 06:55:13  efy-bogdan
  * Require country checkbox added
  *
