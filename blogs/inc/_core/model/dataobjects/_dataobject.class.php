@@ -639,14 +639,22 @@ class DataObject
 	 * @param boolean true to set to NULL if empty string value
 	 * @return boolean true, if value has been set/changed, false if not.
 	 */
-	function set_from_Request( $parname, $var = NULL, $make_null = false )
+	function set_from_Request( $parname, $var = NULL, $make_null = false, $cleanup_function = NULL )
 	{
 		if( empty($var) )
 		{
 			$var = $this->dbprefix.$parname;
 		}
+		
+		$value = get_param($var);
+		
+		if( !empty($cleanup_function) )
+		{	//We want to apply a cleanup function
+			$value = $cleanup_function($value);
+			set_param($var, $value);
+		}
 
-		return $this->set( $parname, get_param($var), $make_null );
+		return $this->set( $parname, $value, $make_null );
 	}
 
 
@@ -664,7 +672,7 @@ class DataObject
 		$value = param( $var, 'string' );
 
 		if( !empty($cleanup_function) )
-		{	// We want to applu a cleanup function:
+		{	// We want to apply a cleanup function:
 			$GLOBALS[$var] = $value = $cleanup_function( $value );
 		}
 
@@ -792,6 +800,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2009/09/22 07:07:24  efy-bogdan
+ * user.ctrl.php cleanup
+ *
  * Revision 1.19  2009/09/20 20:07:18  blueyed
  *  - DataObject::dbexists quotes always
  *  - phpdoc fixes

@@ -260,11 +260,6 @@ if( !$Messages->count('error') )
 				break;
 			}
 
-			param( 'edited_user_login', 'string' );
-			param_check_not_empty( 'edited_user_login', T_('You must provide a login!') );
-			// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
-			$edited_user_login = strtolower( $edited_user_login );
-
 			if( $current_User->check_perm( 'users', 'edit' ) )
 			{ // changing level/group is allowed (not in profile mode)
 				param_integer_range( 'edited_user_level', 0, 10, T_('User level must be between %d and %d.') );
@@ -281,132 +276,73 @@ if( !$Messages->count('error') )
 				// echo 'new group = ';
 				// $edited_User->Group->disp('name');
 			}
+			
+			// load data from request
+			if( $edited_User->load_from_Request() )
+			{	// We could load data from form without errors:
 
-			// check if new login already exists for another user_ID
-			$query = '
-				SELECT user_ID
-				  FROM T_users
-				 WHERE user_login = '.$DB->quote($edited_user_login).'
-				   AND user_ID != '.$edited_User->ID;
-			if( $q = $DB->get_var( $query ) )
-			{
-				param_error( 'edited_user_login',
-					sprintf( T_('This login already exists. Do you want to <a %s>edit the existing user</a>?'),
-						'href="?ctrl=users&amp;user_ID='.$q.'"' ) );
-			}
-
-			param( 'edited_user_firstname', 'string', true );
-			param( 'edited_user_lastname', 'string', true );
-
-			param( 'edited_user_nickname', 'string', true );
-			param_check_not_empty( 'edited_user_nickname', T_('Please enter a nickname (can be the same as your login).') );
-
-			param( 'edited_user_ctry_ID', 'integer', true );
-			param_check_number( 'edited_user_ctry_ID', 'Please select a country', true );
-
-			param( 'edited_user_idmode', 'string', true );
-			param( 'edited_user_locale', 'string', true );
-
-			param( 'edited_user_email', 'string', true );
-			param_check_not_empty( 'edited_user_email', T_('Please enter an e-mail address.') );
-			param_check_email( 'edited_user_email', true );
-
-			param( 'edited_user_url', 'string', true );
-			param_check_url( 'edited_user_url', 'commenting' );
-
-			param( 'edited_user_icq', 'string', true );
-			param_check_number( 'edited_user_icq', T_('The ICQ UIN can only be a number, no letters allowed.') );
-
-			param( 'edited_user_aim', 'string', true );
-
-			param( 'edited_user_msn', 'string', true );
-			param_check_email( 'edited_user_msn', false );
-
-			param( 'edited_user_yim', 'string', true );
-			param( 'edited_user_allow_msgform', 'integer', 0 );
-			param( 'edited_user_notify', 'integer', 0 );
-			param( 'edited_user_showonline', 'integer', 0 );
-			param( 'edited_user_set_login_multiple_sessions', 'integer', 0 );
-
-			param( 'edited_user_pass1', 'string', true );
-			param( 'edited_user_pass2', 'string', true );
-			if( ! param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', ($edited_User->ID == 0) ) ) // required for new users
-			{ // passwords not the same or empty: empty them for the form
-				$edited_user_pass1 = '';
-				$edited_user_pass2 = '';
-			}
-
-			$edited_User->set( 'login', $edited_user_login );
-			$edited_User->set( 'firstname', $edited_user_firstname );
-			$edited_User->set( 'lastname', $edited_user_lastname );
-			$edited_User->set( 'nickname', $edited_user_nickname );
-			$edited_User->set( 'idmode', $edited_user_idmode );
-			$edited_User->set( 'ctry_ID', $edited_user_ctry_ID);
-			if( $edited_User->set( 'locale', $edited_user_locale ) && $edited_User->ID == $current_User->ID )
-			{ // locale value has changed for the current user
-				$reload_page = true;
-			}
-			$edited_User->set( 'email', $edited_user_email );
-			$edited_User->set( 'url', $edited_user_url );
-			$edited_User->set( 'icq', $edited_user_icq );
-			$edited_User->set( 'aim', $edited_user_aim );
-			$edited_User->set( 'msn', $edited_user_msn );
-			$edited_User->set( 'yim', $edited_user_yim );
-			$edited_User->set( 'allow_msgform', $edited_user_allow_msgform );
-			$edited_User->set( 'notify', $edited_user_notify );
-			$edited_User->set( 'showonline', $edited_user_showonline );
-
-			// Features
-			param( 'edited_user_admin_skin', 'string', true );
-			param_integer_range( 'edited_user_action_icon_threshold', 1, 5, T_('The threshold must be between 1 and 5.') );
-			param_integer_range( 'edited_user_action_word_threshold', 1, 5, T_('The threshold must be between 1 and 5.') );
-			param( 'edited_user_legend', 'integer', 0 );
-			param( 'edited_user_bozo', 'integer', 0 );
-			param( 'edited_user_focusonfirst', 'integer', 0 );
-			param( 'edited_user_results_per_page', 'integer', null );
-
-
-			// EXPERIMENTAL user fields:
-
-			// EXISTING fields:
-			// Get indices of existing userfields:
-			$userfield_IDs = $DB->get_col( '
-						SELECT uf_ID
-							FROM T_users__fields
-						 WHERE uf_user_ID = '.$edited_User->ID );
-			foreach( $userfield_IDs as $userfield_ID )
-			{
-				$uf_val = param( 'uf_'.$userfield_ID, 'string', '' );
-
-				// TODO: type checking
-
-				$edited_User->userfield_update( $userfield_ID, $uf_val );
-			}
-
-			// NEW fields:
-			for( $i=1; $i<=3; $i++ )
-			{	// new fields:
-				$new_uf_type = param( 'new_uf_type_'.$i, 'integer', '' );
-				$new_uf_val = param( 'new_uf_val_'.$i, 'string', '' );
-				if( empty($new_uf_type) && empty($new_uf_val) )
+				// check if new login already exists for another user_ID
+				$query = '
+					SELECT user_ID
+					  FROM T_users
+					 WHERE user_login = '.$DB->quote($edited_user_login).'
+					   AND user_ID != '.$edited_User->ID;
+				if( $q = $DB->get_var( $query ) )
 				{
-					continue;
+					param_error( 'edited_user_login',
+						sprintf( T_('This login already exists. Do you want to <a %s>edit the existing user</a>?'),
+							'href="?ctrl=users&amp;user_ID='.$q.'"' ) );
 				}
-
-				if( empty($new_uf_type) )
+	
+	
+				if( ! param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', ($edited_User->ID == 0) ) ) // required for new users
+				{ // passwords not the same or empty: empty them for the form
+					$edited_user_pass1 = '';
+					$edited_user_pass2 = '';
+				}
+	
+				// EXPERIMENTAL user fields:
+	
+				// EXISTING fields:
+				// Get indices of existing userfields:
+				$userfield_IDs = $DB->get_col( '
+							SELECT uf_ID
+								FROM T_users__fields
+							 WHERE uf_user_ID = '.$edited_User->ID );
+				foreach( $userfield_IDs as $userfield_ID )
 				{
-					param_error( 'new_uf_val_'.$i, T_('Please select a field type.') );
+					$uf_val = param( 'uf_'.$userfield_ID, 'string', '' );
+	
+					// TODO: type checking
+	
+					$edited_User->userfield_update( $userfield_ID, $uf_val );
 				}
-				if( empty($new_uf_val) )
-				{
-					param_error( 'new_uf_val_'.$i, T_('Please enter a value.') );
+	
+				// NEW fields:
+				for( $i=1; $i<=3; $i++ )
+				{	// new fields:
+					$new_uf_type = param( 'new_uf_type_'.$i, 'integer', '' );
+					$new_uf_val = param( 'new_uf_val_'.$i, 'string', '' );
+					if( empty($new_uf_type) && empty($new_uf_val) )
+					{
+						continue;
+					}
+	
+					if( empty($new_uf_type) )
+					{
+						param_error( 'new_uf_val_'.$i, T_('Please select a field type.') );
+					}
+					if( empty($new_uf_val) )
+					{
+						param_error( 'new_uf_val_'.$i, T_('Please enter a value.') );
+					}
+	
+					// echo $new_uf_type.':'.$new_uf_val;
+	
+					// TODO: type checking
+	
+					$edited_User->userfield_add( $new_uf_type, $new_uf_val );
 				}
-
-				// echo $new_uf_type.':'.$new_uf_val;
-
-				// TODO: type checking
-
-				$edited_User->userfield_add( $new_uf_type, $new_uf_val );
 			}
 
 			if( $Messages->count( 'error' ) )
@@ -936,6 +872,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.28  2009/09/22 07:07:24  efy-bogdan
+ * user.ctrl.php cleanup
+ *
  * Revision 1.27  2009/09/19 01:04:06  fplanque
  * button to remove an avatar from an user profile
  *
