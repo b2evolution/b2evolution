@@ -49,7 +49,7 @@ $this->disp_payload_begin();
 
 $Form = & new Form( NULL, 'group_checkchanges' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'grp_ID,action' ) );
+$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'ctrl,grp_ID,action', 'ctrl=users' ) );
 
 if( $edited_Group->ID == 0 )
 {
@@ -57,7 +57,7 @@ if( $edited_Group->ID == 0 )
 }
 else
 {
-	$title = ( $action == 'edit_user' ? T_('Editing group:') : T_('Viewing group:') )
+	$title = ( $action == 'edit' ? T_('Editing group:') : T_('Viewing group:') )
 						.' '.
 						( isset($edited_grp_oldname) ? $edited_grp_oldname : $edited_Group->dget('name') )
 						.' ('.T_('ID').' '.$edited_Group->ID.')';
@@ -65,7 +65,7 @@ else
 }
 
 $Form->hidden_ctrl();
-$Form->hidden( 'action', 'groupupdate' );
+$Form->hidden( 'action', 'update' );
 $Form->hidden( 'grp_ID', $edited_Group->ID );
 
 $perm_none_option = array( 'none', T_('No Access') );
@@ -204,6 +204,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/23 13:32:21  efy-bogdan
+ * Separate controller added for groups
+ *
  * Revision 1.12  2009/09/18 14:22:11  efy-maxim
  * 1. 'reply' permission in group form
  * 2. functionality to store and update contacts

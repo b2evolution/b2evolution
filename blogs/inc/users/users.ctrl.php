@@ -46,7 +46,6 @@ $AdminUI->set_path( 'users', 'users' );
 param_action( 'list' );
 
 param( 'user_ID', 'integer', NULL );	// Note: should NOT be memorized (would kill navigation/sorting) use memorize_param() if needed
-param( 'grp_ID', 'integer', NULL );		// Note: should NOT be memorized:    -- " --
 
 /**
  * @global boolean true, if user is only allowed to edit his profile
@@ -56,15 +55,13 @@ $user_profile_only = ! $current_User->check_perm( 'users', 'view' );
 if( $user_profile_only )
 { // User has no permissions to view: he can only edit his profile
 
-	if( (isset($user_ID) && $user_ID != $current_User->ID)
-	 || isset($grp_ID) )
+	if( isset($user_ID) && $user_ID != $current_User->ID )
 	{ // User is trying to edit something he should not: add error message (Should be prevented by UI)
 		$Messages->add( T_('You have no permission to view other users or groups!'), 'error' );
 	}
 
 	// Make sure the user only edits himself:
 	$user_ID = $current_User->ID;
-	$grp_ID = NULL;
 	if( ! in_array( $action, array( 'userupdate', 'edit_user', 'default_settings' ) ) )
 	{
 		$action = 'edit_user';
@@ -76,7 +73,6 @@ if( $user_profile_only )
  */
 
 $UserCache = & get_Cache( 'UserCache' );
-$GroupCache = & get_Cache( 'GroupCache' );
 
 if( ! is_null($user_ID) )
 { // User selected
@@ -126,51 +122,6 @@ if( ! is_null($user_ID) )
 				{
 					$action = 'view_user';
 				}
-			}
-		}
-	}
-}
-elseif( $grp_ID !== NULL )
-{ // Group selected
-	if( $action == 'groupupdate' && $grp_ID == 0 )
-	{ // New Group:
-		$edited_Group = new Group();
-	}
-	elseif( ($edited_Group = & $GroupCache->get_by_ID( $grp_ID, false )) === false )
-	{ // We could not find the Group to edit:
-		unset( $edited_Group );
-		forget_param( 'grp_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Group') ), 'error' );
-		$action = 'list';
-	}
-	elseif( $action == 'list' )
-	{ // 'list' is default, $grp_ID given
-		if( $current_User->check_perm( 'users', 'edit' ) )
-		{
-			$action = 'edit_group';
-		}
-		else
-		{
-			$action = 'view_group';
-		}
-	}
-
-	if( $action != 'view_group' && $action != 'list' )
-	{ // check edit permissions
-		if( !$current_User->check_perm( 'users', 'edit' ) )
-		{
-			$Messages->add( T_('You have no permission to edit groups!'), 'error' );
-			$action = 'view_group';
-		}
-		elseif( $demo_mode  )
-		{ // Additional checks for demo mode: no changes to admin's and demouser's group allowed
-			$admin_User = & $UserCache->get_by_ID(1);
-			$demo_User = & $UserCache->get_by_login('demouser');
-			if( $edited_Group->ID == $admin_User->Group->ID
-					|| $edited_Group->ID == $demo_User->group_ID )
-			{
-				$Messages->add( T_('You cannot edit the groups of user &laquo;admin&raquo; or &laquo;demouser&raquo; in demo mode!'), 'error' );
-				$action = 'view_group';
 			}
 		}
 	}
@@ -670,113 +621,6 @@ if( !$Messages->count('error') )
 			$action = 'edit_user';
 
 			break;
-
-
-		// ---- GROUPS --------------------------------------------------------------------------------------
-
-		case 'new_group':
-			// We want to create a new group:
-			if( isset( $edited_Group ) )
-			{ // We want to use a template
-				$new_Group = $edited_Group; // Copy !
-				$new_Group->set( 'ID', 0 );
-				$edited_Group = & $new_Group;
-			}
-			else
-			{ // We use an empty group:
-				$edited_Group = & new Group();
-			}
-			break;
-
-
-		case 'groupupdate':
-			if( empty($edited_Group) || !is_object($edited_Group) )
-			{
-				$Messages->add( 'No group set!' ); // Needs no translation, should be prevented by UI.
-				$action = 'list';
-				break;
-			}
-			
-			if( $edited_Group->load_from_Request() )
-			{
-
-				// check if the group name already exists for another group
-				$query = 'SELECT grp_ID FROM T_groups
-				           WHERE grp_name = '.$DB->quote($edited_grp_name).'
-				             AND grp_ID != '.$edited_Group->ID;
-				if( $q = $DB->get_var( $query ) )
-				{
-					param_error( 'edited_grp_name',
-						sprintf( T_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'),
-							'href="?ctrl=users&amp;grp_ID='.$q.'"' ) );
-				}
-	
-				if( $edited_Group->ID != 1 )
-				{ // Groups others than #1 can be prevented from logging in or editing users
-					$edited_Group->set( 'perm_admin', param( 'edited_grp_perm_admin', 'string', true ) );
-					$edited_Group->set( 'perm_users', param( 'edited_grp_perm_users', 'string', true ) );
-				}
-			}
-			
-			if( $Messages->count( 'error' ) )
-			{	// We have found validation errors:
-				$action = 'edit_group';
-				break;
-			}
-
-			if( $edited_Group->ID == 0 )
-			{ // Insert into the DB:
-				$edited_Group->dbinsert();
-				$Messages->add( T_('New group created.'), 'success' );
-			}
-			else
-			{ // Commit update to the DB:
-				$edited_Group->dbupdate();
-				$Messages->add( T_('Group updated.'), 'success' );
-			}
-			// Commit changes in cache:
-			$GroupCache->add( $edited_Group );
-			break;
-
-
-		case 'delete_group':
-			/*
-			 * Delete group
-			 */
-			if( !isset($edited_Group) )
-				debug_die( 'no Group set' );
-
-			if( $edited_Group->ID == 1 )
-			{
-				$Messages->add( T_('You can\'t delete Group #1!'), 'error' );
-				$action = 'view_group';
-				break;
-			}
-			if( $edited_Group->ID == $Settings->get('newusers_grp_ID' ) )
-			{
-				$Messages->add( T_('You can\'t delete the default group for new users!'), 'error' );
-				$action = 'view_group';
-				break;
-			}
-
-			if( param( 'confirm', 'integer', 0 ) )
-			{ // confirmed, Delete from DB:
-				$msg = sprintf( T_('Group &laquo;%s&raquo; deleted.'), $edited_Group->dget( 'name' ) );
-				$edited_Group->dbdelete( $Messages );
-				unset($edited_Group);
-				forget_param('grp_ID');
-				$Messages->add( $msg, 'success' );
-				$action = 'list';
-			}
-			else
-			{	// not confirmed, Check for restrictions:
-				memorize_param( 'grp_ID', 'integer', true );
-				if( ! $edited_Group->check_delete( sprintf( T_('Cannot delete Group &laquo;%s&raquo;'), $edited_Group->dget( 'name' ) ) ) )
-				{	// There are restrictions:
-					$action = 'view_group';
-				}
-			}
-			break;
 	}
 }
 
@@ -828,19 +672,6 @@ switch( $action )
 			break;
 
 
-		case 'delete_group':
-			// We need to ask for confirmation:
-			$edited_Group->confirm_delete(
-					sprintf( T_('Delete group &laquo;%s&raquo;?'), $edited_Group->dget( 'name' ) ),
-					$action, get_memorized( 'action' ) );
-		case 'new_group':
-		case 'edit_group':
-		case 'view_group':
-			// Display group form:
-			$AdminUI->disp_view( 'users/views/_group.form.php' );
-			break;
-
-
 	case 'promote':
 	default:
 		// Display user list:
@@ -856,6 +687,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.30  2009/09/23 13:32:20  efy-bogdan
+ * Separate controller added for groups
+ *
  * Revision 1.29  2009/09/23 07:17:14  efy-bogdan
  *  load_from_Request added to Group class
  *
