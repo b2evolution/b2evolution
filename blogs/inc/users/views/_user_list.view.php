@@ -47,8 +47,8 @@ global $collections_Module;
 // query which groups have users (in order to prevent deletion of groups which have users)
 global $usedgroups;	// We need this in a callback below
 $usedgroups = $DB->get_col( 'SELECT grp_ID
-															 FROM T_groups INNER JOIN T_users ON user_grp_ID = grp_ID
-															GROUP BY grp_ID');
+                             FROM T_groups INNER JOIN T_users ON user_grp_ID = grp_ID
+							 GROUP BY grp_ID');
 
 /*
  * Query user list:
@@ -71,7 +71,7 @@ $SQL = new SQL();
 $SQL->SELECT( 'T_users.*, grp_ID, grp_name' );
 $SQL->FROM( 'T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID' );
 $SQL->WHERE( $where_clause.' 1' );
-$SQL->GROUP_BY( 'user_ID' );
+$SQL->GROUP_BY( 'user_ID, grp_ID' );
 $SQL->ORDER_BY( 'grp_name, *' );
 
 if( isset($collections_Module) )
@@ -328,6 +328,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/23 14:19:57  efy-bogdan
+ * Listing null groups error fixed
+ *
  * Revision 1.12  2009/09/23 13:32:21  efy-bogdan
  * Separate controller added for groups
  *
