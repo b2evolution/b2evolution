@@ -91,6 +91,7 @@ $ctrl_mappings = array(
 		'users'        => 'users/users.ctrl.php',
 		'userfields'   => 'users/userfields.ctrl.php',
 		'registration' => 'users/registration.ctrl.php',
+		'group'        => 'users/group.ctrl.php',
 		'upload'       => 'files/upload.ctrl.php',
 	);
 
@@ -728,6 +729,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.32  2009/09/23 09:38:52  efy-bogdan
+ * Added group controller to controllers array
+ *
  * Revision 1.31  2009/09/21 03:14:35  fplanque
  * modularized a little more
  *
