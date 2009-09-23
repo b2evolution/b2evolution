@@ -74,7 +74,7 @@ if( !$user_profile_only )
 {
 	$Form->global_icon( T_('Compose message'), 'comments', '?ctrl=threads&action=new&user_login='.$edited_User->login );
 
-	$Form->global_icon( ( $action != 'view_user' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', regenerate_url( 'user_ID,action' ) );
+	$Form->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', regenerate_url( 'user_ID,action' ) );
 }
 
 if( $edited_User->ID == 0 )
@@ -110,7 +110,7 @@ $Form->begin_fieldset( T_('User permissions'), array( 'class'=>'fieldset clear' 
 	}
 
 	$field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://manual.b2evolution.net/User_levels"' );
-	if( $action != 'view_user' && $current_User->check_perm( 'users', 'edit' ) )
+	if( $action != 'view' && $current_User->check_perm( 'users', 'edit' ) )
 	{
 		$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), $field_note, array( 'required' => true ) );
 	}
@@ -127,7 +127,7 @@ $Form->begin_fieldset( T_('Email communications') );
 
 	$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
 
-  if( $action != 'view_user' )
+  if( $action != 'view' )
 	{ // We can edit the values:
 
 		$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), $email_fieldnote, array( 'maxlength' => 100, 'required' => true ) );
@@ -160,7 +160,7 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Identity') );
 
 
-  if( $action != 'view_user' )
+  if( $action != 'view' )
 	{ // We can edit the values:
 
 		global $admin_url;
@@ -218,7 +218,7 @@ $Form->end_fieldset();
 // _____________________________________________________________________
 
 
-if( $action != 'view_user' )
+if( $action != 'view' )
 { // We can edit the values:
 
 	$Form->begin_fieldset( T_('Password') );
@@ -244,7 +244,7 @@ $Form->begin_fieldset( T_('Preferences') );
 		$value_admin_skin = $Settings->get('admin_skin');
 	}
 
-	if( $action != 'view_user' )
+	if( $action != 'view' )
 	{ // We can edit the values:
 
 		$Form->select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options_return', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
@@ -285,7 +285,7 @@ $Form->end_fieldset();
 
 // _____________________________________________________________________
 
-if( $action != 'view_user' )
+if( $action != 'view' )
 { // We can edit the values:
 	// PluginUserSettings
 	load_funcs('plugins/_plugin.funcs.php');
@@ -375,7 +375,7 @@ $Form->begin_fieldset( T_('Additional info') );
 		$aim_fieldnote = '';
 
 
-  if( $action != 'view_user' )
+  if( $action != 'view' )
 	{ // We can edit the values:
 
 		$Form->text_input( 'edited_user_url', $edited_User->url, 30, T_('URL'), $url_fieldnote, array( 'maxlength' => 100 ) );
@@ -494,10 +494,10 @@ $Form->end_fieldset();
 
 // _____________________________________________________________________
 
-if( $action != 'view_user' )
+if( $action != 'view' )
 { // Edit buttons
 	$Form->buttons( array(
-		array( '', 'actionArray[userupdate]', T_('Save !'), 'SaveButton' ),
+		array( '', 'actionArray[update]', T_('Save !'), 'SaveButton' ),
 		array( 'reset', '', T_('Reset'), 'ResetButton' ),
 		// dh> TODO: Non-Javascript-confirm before trashing all settings with a misplaced click.
 		array( 'type' => 'submit', 'name' => 'actionArray[default_settings]', 'value' => T_('Restore defaults'), 'class' => 'ResetButton',
@@ -514,6 +514,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.20  2009/09/23 19:23:10  efy-bogdan
+ * Cleanup users.ctrl.php
+ *
  * Revision 1.19  2009/09/19 20:50:57  fplanque
  * added action icons/links
  *
@@ -524,7 +527,7 @@ $this->disp_payload_end();
  * Only display link to change to the avatar if user has appropriate permissions
  *
  * Revision 1.16  2009/09/10 13:51:38  tblue246
- * Do not show form field for user level if action == view_user.
+ * Do not show form field for user level if action == view.
  *
  * Revision 1.15  2009/09/07 23:35:49  fplanque
  * cleanup

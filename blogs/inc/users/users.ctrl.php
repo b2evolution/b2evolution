@@ -57,14 +57,14 @@ if( $user_profile_only )
 
 	if( isset($user_ID) && $user_ID != $current_User->ID )
 	{ // User is trying to edit something he should not: add error message (Should be prevented by UI)
-		$Messages->add( T_('You have no permission to view other users or groups!'), 'error' );
+		$Messages->add( T_('You have no permission to view other users!'), 'error' );
 	}
 
 	// Make sure the user only edits himself:
 	$user_ID = $current_User->ID;
-	if( ! in_array( $action, array( 'userupdate', 'edit_user', 'default_settings' ) ) )
+	if( ! in_array( $action, array( 'update', 'edit', 'default_settings' ) ) )
 	{
-		$action = 'edit_user';
+		$action = 'edit';
 	}
 }
 
@@ -76,7 +76,7 @@ $UserCache = & get_Cache( 'UserCache' );
 
 if( ! is_null($user_ID) )
 { // User selected
-	if( $action == 'userupdate' && $user_ID == 0 )
+	if( $action == 'update' && $user_ID == 0 )
 	{ // we create a new user
 		$edited_User = new User();
 		$edited_User->set_datecreated( $localtimenow );
@@ -92,21 +92,21 @@ if( ! is_null($user_ID) )
 	{ // 'list' is default, $user_ID given
 		if( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'edit' ) )
 		{
-			$action = 'edit_user';
+			$action = 'edit';
 		}
 		else
 		{
-			$action = 'view_user';
+			$action = 'view';
 		}
 	}
 
-	if( $action != 'view_user' && $action != 'list' )
+	if( $action != 'view' && $action != 'list' )
 	{ // check edit permissions
 		if( ! $current_User->check_perm( 'users', 'edit' )
 		    && $edited_User->ID != $current_User->ID )
 		{ // user is only allowed to _view_ other user's profiles
 			$Messages->add( T_('You have no permission to edit other users!'), 'error' );
-			$action = 'view_user';
+			$action = 'view';
 		}
 		elseif( $demo_mode )
 		{ // Demo mode restrictions: admin/demouser cannot be edited
@@ -120,7 +120,7 @@ if( ! is_null($user_ID) )
 				}
 				else
 				{
-					$action = 'view_user';
+					$action = 'view';
 				}
 			}
 		}
@@ -135,7 +135,7 @@ if( !$Messages->count('error') )
 { // no errors
 	switch( $action )
 	{
-		case 'new_user':
+		case 'new':
 			// We want to create a new user:
 			if( isset( $edited_User ) )
 			{ // We want to use a template
@@ -156,13 +156,13 @@ if( !$Messages->count('error') )
 		case 'change_admin_skin':
 			// Skin switch from menu
 			param( 'new_admin_skin', 'string', true );
-	    param( 'redirect_to', 'string', '' );
+	    	param( 'redirect_to', 'string', '' );
 
-	    $UserSettings->set( 'admin_skin', $new_admin_skin );
+	    	$UserSettings->set( 'admin_skin', $new_admin_skin );
 			$UserSettings->dbupdate();
 			$Messages->add( sprintf( T_('Admin skin changed to &laquo;%s&raquo;'), $new_admin_skin ), 'success' );
 
-      header_nocache();
+      		header_nocache();
 			header_redirect();
 			/* EXITED */
 			break;
@@ -179,7 +179,7 @@ if( !$Messages->count('error') )
 			if( !$current_User->check_perm( 'users', 'edit' ) && $edited_User->ID != $current_User->ID )
 			{ // user is only allowed to update him/herself
 				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
-				$action = 'view_user';
+				$action = 'view';
 				break;
 			}
 
@@ -193,7 +193,7 @@ if( !$Messages->count('error') )
 			/* EXITED */
 			break;
 
-		case 'userupdate':
+		case 'update':
 			// Update existing user OR create new user:
 			if( empty($edited_User) || !is_object($edited_User) )
 			{
@@ -207,7 +207,7 @@ if( !$Messages->count('error') )
 			if( !$current_User->check_perm( 'users', 'edit' ) && $edited_User->ID != $current_User->ID )
 			{ // user is only allowed to update him/herself
 				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
-				$action = 'view_user';
+				$action = 'view';
 				break;
 			}
 
@@ -298,7 +298,7 @@ if( !$Messages->count('error') )
 
 			if( $Messages->count( 'error' ) )
 			{	// We have found validation errors:
-				$action = 'edit_user';
+				$action = 'edit';
 				break;
 			}
 
@@ -410,12 +410,12 @@ if( !$Messages->count('error') )
 
 			if( $user_profile_only )
 			{
-				$action = 'edit_user';
+				$action = 'edit';
 			}
 
 			if( $reload_page )
 			{ // reload the current page through header redirection:
-				if( $action != 'edit_user' )
+				if( $action != 'edit' )
 				{
 					$action = 'list';
 				}
@@ -488,7 +488,7 @@ if( !$Messages->count('error') )
 			}
 
 			// Always display the profile again:
-			$action = 'edit_user';
+			$action = 'edit';
 
 			if( $reload_page )
 			{ // reload the current page through header redirection:
@@ -527,7 +527,7 @@ if( !$Messages->count('error') )
 			break;
 
 
-		case 'delete_user':
+		case 'delete':
 			/*
 			 * Delete user
 			 */
@@ -537,13 +537,13 @@ if( !$Messages->count('error') )
 			if( $edited_User->ID == $current_User->ID )
 			{
 				$Messages->add( T_('You can\'t delete yourself!'), 'error' );
-				$action = 'view_user';
+				$action = 'view';
 				break;
 			}
 			if( $edited_User->ID == 1 )
 			{
 				$Messages->add( T_('You can\'t delete User #1!'), 'error' );
-				$action = 'view_user';
+				$action = 'view';
 				break;
 			}
 
@@ -579,7 +579,7 @@ if( !$Messages->count('error') )
 
 				if( ! $edited_User->check_delete( $msg ) )
 				{	// There are restrictions:
-					$action = 'view_user';
+					$action = 'view';
 				}
 			}
 			break;
@@ -599,7 +599,7 @@ if( !$Messages->count('error') )
 
 			$edit_Plugin->Settings->dbupdate();
 
-			$action = 'edit_user';
+			$action = 'edit';
 
 			break;
 
@@ -618,7 +618,7 @@ if( !$Messages->count('error') )
 
 			$edit_Plugin->Settings->dbupdate();
 
-			$action = 'edit_user';
+			$action = 'edit';
 
 			break;
 	}
@@ -626,7 +626,7 @@ if( !$Messages->count('error') )
 
 
 // We might delegate to this action from above:
-if( $action == 'edit_user' )
+if( $action == 'edit' )
 {
 	$Plugins->trigger_event( 'PluginUserSettingsEditAction', $tmp_params = array( 'User' => & $edited_User ) );
 
@@ -651,7 +651,7 @@ switch( $action )
 		break;
 
 
-		case 'delete_user':
+		case 'delete':
 			// We need to ask for confirmation:
 			$fullname = $edited_User->dget( 'fullname' );
 			if ( ! empty( $fullname ) )
@@ -664,9 +664,9 @@ switch( $action )
 			}
 
 			$edited_User->confirm_delete( $msg, $action, get_memorized( 'action' ) );
-		case 'new_user':
-		case 'view_user':
-		case 'edit_user':
+		case 'new':
+		case 'view':
+		case 'edit':
 			// Display user form:
 			$AdminUI->disp_view( 'users/views/_user.form.php' );
 			break;
@@ -687,6 +687,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.31  2009/09/23 19:23:02  efy-bogdan
+ * Cleanup users.ctrl.php
+ *
  * Revision 1.30  2009/09/23 13:32:20  efy-bogdan
  * Separate controller added for groups
  *
