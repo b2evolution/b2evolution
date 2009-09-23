@@ -663,9 +663,11 @@ class DataObject
 	 *
 	 * @param string Dataobject parameter name
 	 * @param boolean true to set to NULL if empty string value
+	 * @param string name of function used to clean up input
+	 * @param string name of fucntion used to validate input (TODO)
 	 * @return boolean true, if value is required
 	 */
-	function set_string_from_param( $parname, $required = false, $cleanup_function = NULL )
+	function set_string_from_param( $parname, $required = false, $cleanup_function = NULL, $validation_function = NULL )
 	{
 		$var = $this->dbprefix.$parname;
 
@@ -679,6 +681,11 @@ class DataObject
 		if( $required )
 		{
 			param_check_not_empty( $var );
+		}
+
+		if( !empty($validation_function) )
+		{	// We want to apply a cleanup function:
+			// TODO
 		}
 
 		return $this->set( $parname, $value, ! $required );
@@ -800,6 +807,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2009/09/23 02:46:40  fplanque
+ * doc
+ *
  * Revision 1.20  2009/09/22 07:07:24  efy-bogdan
  * user.ctrl.php cleanup
  *
