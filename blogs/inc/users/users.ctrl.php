@@ -696,44 +696,28 @@ if( !$Messages->count('error') )
 				$action = 'list';
 				break;
 			}
-			param( 'edited_grp_name', 'string' );
-
-			param_check_not_empty( 'edited_grp_name', T_('You must provide a group name!') );
-
-			// check if the group name already exists for another group
-			$query = 'SELECT grp_ID FROM T_groups
-			           WHERE grp_name = '.$DB->quote($edited_grp_name).'
-			             AND grp_ID != '.$edited_Group->ID;
-			if( $q = $DB->get_var( $query ) )
+			
+			if( $edited_Group->load_from_Request() )
 			{
-				param_error( 'edited_grp_name',
-					sprintf( T_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'),
-						'href="?ctrl=users&amp;grp_ID='.$q.'"' ) );
+
+				// check if the group name already exists for another group
+				$query = 'SELECT grp_ID FROM T_groups
+				           WHERE grp_name = '.$DB->quote($edited_grp_name).'
+				             AND grp_ID != '.$edited_Group->ID;
+				if( $q = $DB->get_var( $query ) )
+				{
+					param_error( 'edited_grp_name',
+						sprintf( T_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'),
+							'href="?ctrl=users&amp;grp_ID='.$q.'"' ) );
+				}
+	
+				if( $edited_Group->ID != 1 )
+				{ // Groups others than #1 can be prevented from logging in or editing users
+					$edited_Group->set( 'perm_admin', param( 'edited_grp_perm_admin', 'string', true ) );
+					$edited_Group->set( 'perm_users', param( 'edited_grp_perm_users', 'string', true ) );
+				}
 			}
-
-			$edited_Group->set( 'name', $edited_grp_name );
-
-			$edited_Group->set( 'perm_blogs', param( 'edited_grp_perm_blogs', 'string', true ) );
-			$edited_Group->set( 'perm_bypass_antispam', param( 'apply_antispam', 'integer', 0 ) ? 0 : 1 );
-			$edited_Group->set( 'perm_xhtmlvalidation', param( 'perm_xhtmlvalidation', 'string', true ) );
-			$edited_Group->set( 'perm_xhtmlvalidation_xmlrpc', param( 'perm_xhtmlvalidation_xmlrpc', 'string', true ) );
-			$edited_Group->set( 'perm_xhtml_css_tweaks', param( 'prevent_css_tweaks', 'integer', 0 ) ? 0 : 1 );
-			$edited_Group->set( 'perm_xhtml_iframes', param( 'prevent_iframes', 'integer', 0 ) ? 0 : 1 );
-			$edited_Group->set( 'perm_xhtml_javascript', param( 'prevent_javascript', 'integer', 0 ) ? 0 : 1 );
-			$edited_Group->set( 'perm_xhtml_objects', param( 'prevent_objects', 'integer', 0 ) ? 0 : 1 );
-			$edited_Group->set( 'perm_spamblacklist', param( 'edited_grp_perm_spamblacklist', 'string', true ) );
-			$edited_Group->set( 'perm_templates', param( 'edited_grp_perm_templates', 'integer', 0 ) );
-			$edited_Group->set( 'perm_stats', param( 'edited_grp_perm_stats', 'string', true ) );
-			$edited_Group->set( 'perm_options', param( 'edited_grp_perm_options', 'string', true ) );
-			$edited_Group->set( 'perm_files', param( 'edited_grp_perm_files', 'string', true ) );
-			$edited_Group->set( 'perm_messaging', param( 'edited_grp_perm_messaging', 'string', true ) );
-
-			if( $edited_Group->ID != 1 )
-			{ // Groups others than #1 can be prevented from logging in or editing users
-				$edited_Group->set( 'perm_admin', param( 'edited_grp_perm_admin', 'string', true ) );
-				$edited_Group->set( 'perm_users', param( 'edited_grp_perm_users', 'string', true ) );
-			}
-
+			
 			if( $Messages->count( 'error' ) )
 			{	// We have found validation errors:
 				$action = 'edit_group';
@@ -872,6 +856,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.29  2009/09/23 07:17:14  efy-bogdan
+ *  load_from_Request added to Group class
+ *
  * Revision 1.28  2009/09/22 07:07:24  efy-bogdan
  * user.ctrl.php cleanup
  *

@@ -235,7 +235,7 @@ class User extends DataObject
 	 * @return boolean true if loaded data seems valid.
 	 */
 	function load_from_Request()
-	{		
+	{	
 		param( 'edited_user_login', 'string' );
 		param_check_not_empty( 'edited_user_login', T_('You must provide a login!') );
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
@@ -1845,6 +1845,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.50  2009/09/23 07:17:13  efy-bogdan
+ *  load_from_Request added to Group class
+ *
  * Revision 1.49  2009/09/23 02:56:33  fplanque
  * revert broken permissions
  *

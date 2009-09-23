@@ -127,6 +127,64 @@ class Group extends DataObject
 		}
 	}
 
+	/**
+	 * Load data from Request form fields.
+	 *
+	 * @return boolean true if loaded data seems valid.
+	 */
+	function load_from_Request()
+	{
+		// Edited Group Name
+		param( 'edited_grp_name', 'string' );
+		param_check_not_empty( 'edited_grp_name', T_('You must provide a group name!') );
+		$this->set_from_Request('name', 'edited_grp_name', true);
+		
+		// Edited Group Permission Blogs
+		param( 'edited_grp_perm_blogs', 'string', true );
+		$this->set_from_Request( 'perm_blogs', 'edited_grp_perm_blogs', true );
+		
+		// Apply Antispam
+		$this->set( 'perm_bypass_antispam', param( 'apply_antispam', 'integer', 0 ) ? 0 : 1 );
+
+		// XHTML Validation
+		$this->set( 'perm_xhtmlvalidation', param( 'perm_xhtmlvalidation', 'string', true ) );
+		
+		// XHTML Validation XMLRPC
+		$this->set( 'perm_xhtmlvalidation_xmlrpc', param( 'perm_xhtmlvalidation_xmlrpc', 'string', true ) );
+		
+		// CSS Tweaks
+		$this->set( 'perm_xhtml_css_tweaks', param( 'prevent_css_tweaks', 'integer', 0 ) ? 0 : 1 );
+		
+		// Iframes
+		$this->set( 'perm_xhtml_iframes', param( 'prevent_iframes', 'integer', 0 ) ? 0 : 1 );
+		
+		// Javascript
+		$this->set( 'perm_xhtml_javascript', param( 'prevent_javascript', 'integer', 0 ) ? 0 : 1 );
+		
+		// Objects
+		$this->set( 'perm_xhtml_objects', param( 'prevent_objects', 'integer', 0 ) ? 0 : 1 );
+		
+		// Spam blacklist
+		$this->set( 'perm_spamblacklist', param( 'edited_grp_perm_spamblacklist', 'string', true ) );
+		
+		// Templates
+		$this->set( 'perm_templates', param( 'edited_grp_perm_templates', 'integer', 0 ) );
+		
+		// Stats
+		$this->set( 'perm_stats', param( 'edited_grp_perm_stats', 'string', true ) );
+		
+		// Options
+		$this->set( 'perm_options', param( 'edited_grp_perm_options', 'string', true ) );
+		
+		// Files
+		$this->set( 'perm_files', param( 'edited_grp_perm_files', 'string', true ) );
+		
+		// Messaging
+		$this->set( 'perm_messaging', param( 'edited_grp_perm_messaging', 'string', true ) );
+		
+		return !param_errors_detected();
+	}
+	
 
 	/**
 	 * Set param value
@@ -562,6 +620,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2009/09/23 07:17:13  efy-bogdan
+ *  load_from_Request added to Group class
+ *
  * Revision 1.21  2009/09/23 02:57:06  fplanque
  * tentative fix
  *
