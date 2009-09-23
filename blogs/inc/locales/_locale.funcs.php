@@ -128,11 +128,15 @@ if( $use_l10n )
 			{	// Load our global translation file.
 				$path = $locales_path.$messages.'/_global.php';
 			}
-			$Debuglog->add( 'Loading file: '.$path, 'locale' );
 
-			if( file_exists( $path ) )
+			if( file_exists($path) && is_readable($path) )
 			{
+				$Debuglog->add( 'T_: Loading file: '.$path, 'locale' );
 				include_once $path;
+			}
+			else
+			{
+				$Debuglog->add( 'T_: Messages file does not exist or is not readable: '.$path, 'locale' );
 			}
 			if( ! isset($trans[ $messages ] ) )
 			{ // Still not loaded... file doesn't exist, memorize that no translations are available
@@ -1047,6 +1051,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.32  2009/09/23 21:37:03  blueyed
+ * Unify Debuglogging of T_ methods.
+ *
  * Revision 1.31  2009/08/31 17:21:32  fplanque
  * minor
  *

@@ -2299,7 +2299,7 @@ class Plugin
 			}
 			else
 			{
-				$this->debug_log( 'Global messages file '.$globalfile_path.' does not exist or is not readable!', 'locale' );
+				$this->debug_log( 'T_: Plugin global messages file does not exist or is not readable: '.$globalfile_path, 'locale' );
 			}
 		}
 
@@ -2897,6 +2897,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.30  2009/09/23 21:37:03  blueyed
+ * Unify Debuglogging of T_ methods.
+ *
  * Revision 1.29  2009/09/06 21:50:25  tblue246
  * Remove EVO_NEXT_VERSION, which at a point was not replaced and is useless now (since nobody knows by what version it should be replaced now).
  *
