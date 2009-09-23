@@ -325,7 +325,6 @@ class Group extends DataObject
 				break;
 
 			case 'messaging':
-
 				switch( $permvalue ) // permvalue is what the group allows
 				{
 					case 'delete':
@@ -336,18 +335,17 @@ class Group extends DataObject
 							break;
 						}
 						// ... or for any lower priority perm... (no break)
-// fp> this does not seem right. write is a higher perm than reply so they should probably appear in that order
-					case 'reply':
-						//  reply to people you have messaged with in the past
-						if( $permlevel == 'reply' && $permvalue != 'delete')
+					case 'write':
+						//  you create threads, view any thread you're involved in & reply
+						if( $permlevel == 'write' )
 						{
 							$perm = true;
 							break;
 						}
-					// ... or for any lower priority perm... (no break)
-					case 'write':
-						//  you create threads, view any thread you're involved in & reply
-						if( $permlevel == 'write' )
+						// ... or for any lower priority perm... (no break)
+					case 'reply':
+						//  reply to people you have messaged with in the past
+						if( $permlevel == 'reply')
 						{
 							$perm = true;
 							break;
@@ -564,6 +562,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2009/09/23 02:57:06  fplanque
+ * tentative fix
+ *
  * Revision 1.20  2009/09/20 00:27:08  fplanque
  * cleanup/doc/simplified
  *
