@@ -936,23 +936,21 @@ class User extends DataObject
 				break;
 
 			case 'messaging':
-				// Check user permission for current thread
-				if( ! $perm_target )
-				{	// We need a target for this permission...
-					// Access denied!
-					break;
+
+				if( $perm_target > 0 )
+				{   // Check user permission for current thread
+
+					// efy-maxim> Currently, below code can't be moved to messaging code
+					// efy-maxim> because messaging permissions can only be checked in core module
+					$ThreadCache = & get_Cache( 'ThreadCache' );
+					$Thread = & $ThreadCache->get_by_ID( $perm_target, false );
+
+					if( $Thread === false || ! $Thread->check_thread_recipient( $this->ID ) )
+					{
+						// Access denied
+						break;
+					}
 				}
-
-				// efy-maxim> Currently, below code can't be moved to messaging code
-				// efy-maxim> because messaging permissions can only be checked in core module
-				$ThreadCache = & get_Cache( 'ThreadCache' );
-				$Thread = & $ThreadCache->get_by_ID( $perm_target, false );
-
-				if( $Thread === false || ! $Thread->check_thread_recipient( $this->ID ) )
-				{	// No such thread or user not in recipient list: Access denied!
-					break;
-				}
-
 				// Forward to group:
 				/* Tblue> Note: DO NOT let this fall-through to the "files"
 				 * perm checking below since it could lead to side effects
@@ -1847,6 +1845,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.49  2009/09/23 02:56:33  fplanque
+ * revert broken permissions
+ *
  * Revision 1.48  2009/09/22 16:02:26  tblue246
  * User::check_perm(): Cleaner "message" perm code.
  *
