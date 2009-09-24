@@ -263,7 +263,7 @@ class ItemLight extends DataObject
 	}
 
 
-  /**
+	/**
 	 * Generate a link to the post in the archives
 	 *
  	 * @param string base url to use
@@ -284,7 +284,7 @@ class ItemLight extends DataObject
 	}
 
 
-  /**
+	/**
 	 * Generate a link to the post in the category
 	 *
  	 * @param string base url to use
@@ -961,6 +961,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2009/09/24 00:01:02  blueyed
+ * indent
+ *
  * Revision 1.24  2009/09/21 03:44:32  fplanque
  * doc
  *
