@@ -99,7 +99,7 @@ $Results->title = T_('Groups & Users');
 if( $current_User->check_perm( 'users', 'edit', false ) )
 { // create new user link
 	$Results->global_icon( T_('Create a new user...'), 'new', '?ctrl=users&amp;action=new', T_('Add user').' &raquo;', 3, 4  );
-	$Results->global_icon( T_('Create a new group...'), 'new', '?ctrl=group&amp;action=new', T_('Add group').' &raquo;', 3, 4  );
+	$Results->global_icon( T_('Create a new group...'), 'new', '?ctrl=groups&amp;action=new', T_('Add group').' &raquo;', 3, 4  );
 }
 
 
@@ -134,7 +134,7 @@ $Results->ID_col = 'user_ID';
 $Results->grp_cols[] = array(
 						'td_class' => 'firstcol'.($current_User->check_perm( 'users', 'edit', false ) ? '' : ' lastcol' ),
 						'td_colspan' => -1,  // nb_colds - 1
-						'td' => '<a href="?ctrl=group&amp;grp_ID=$grp_ID$">$grp_name$</a>'
+						'td' => '<a href="?ctrl=groups&amp;grp_ID=$grp_ID$">$grp_name$</a>'
 										.'¤conditional( (#grp_ID# == '.$Settings->get('newusers_grp_ID').'), \' <span class="notes">('.T_('default group for new users').')</span>\' )¤',
 					);
 
@@ -142,13 +142,13 @@ function grp_actions( & $row )
 {
 	global $usedgroups, $Settings;
 
-	$r = action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=group&amp;grp_ID='.$row->grp_ID ) );
+	$r = action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;grp_ID='.$row->grp_ID ) );
 
-	$r .= action_icon( T_('Duplicate this group...'), 'copy', regenerate_url( 'ctrl,action', 'ctrl=group&amp;action=new&amp;grp_ID='.$row->grp_ID ) );
+	$r .= action_icon( T_('Duplicate this group...'), 'copy', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=new&amp;grp_ID='.$row->grp_ID ) );
 
 	if( ($row->grp_ID != 1) && ($row->grp_ID != $Settings->get('newusers_grp_ID')) && !in_array( $row->grp_ID, $usedgroups ) )
 	{ // delete
-		$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'ctrl,action', 'ctrl=group&amp;action=delete&amp;grp_ID='.$row->grp_ID ) );
+		$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=delete&amp;grp_ID='.$row->grp_ID ) );
 	}
 	else
 	{
@@ -328,6 +328,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/24 10:14:14  efy-bogdan
+ * Separate controller added for groups
+ *
  * Revision 1.14  2009/09/24 06:56:02  efy-bogdan
  * Cleanup users.ctrl.php
  *
