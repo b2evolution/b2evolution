@@ -1048,6 +1048,108 @@ function remove_seconds($timestamp, $format = 'Y-m-d H:i')
 
 
 /**
+ * Validate variable
+ *
+ * @param string param name
+ * @param string validator function name
+ * @param boolean true if variable value can't be empty
+ * @param custom error message
+ * @return boolean true if OK
+ */
+function validate( $variable, $validator, $required = false, $custom_msg = NULL )
+{
+	if( !function_exists( $validator ) || ( empty( $GLOBALS[$variable] ) && !$required ) )
+	{
+		return true;
+	}
+
+	$msg = $validator( $GLOBALS[$variable] );
+
+	if( !empty( $msg ) )
+	{
+		if( !empty( $custom_msg ) )
+		{
+			$msg = $custom_msg;
+		}
+
+		param_error( $variable, $msg );
+		return false;
+	}
+
+	return true;
+}
+
+
+/**
+ * Checks if the param is a decimal number
+ *
+ * @param string decimal to check
+ * @return string error message if decimal is not valid
+ */
+function check_is_decimal( $decimal )
+{
+	if( !is_decimal( $decimal ) )
+	{
+		return T_('The decimal value is invalid.');
+	}
+}
+
+
+/**
+ * Checks if the param is a decimal number
+ *
+ * @param string decimal to check
+ * @return boolean true if OK
+ */
+function is_decimal( $decimal )
+{
+	return preg_match( '#^[0-9]*(\.[0-9]+)?$#', $decimal );
+}
+
+
+/**
+ * Checks if the param is an integer (no float, e.g. 3.14).
+ *
+ * @param string number to check
+ * @return string error message if number is not valid
+ */
+function check_is_number( $number )
+{
+	if( !is_number( $number ) )
+	{
+		return T_('The number value is invalid.');
+	}
+}
+
+
+/**
+ * Checks if the param is an integer (no float, e.g. 3.14).
+ *
+ * @param string number to check
+ * @return boolean true if OK
+ */
+function is_number( $number )
+{
+	return preg_match( '#^[0-9]+$#', $number );
+}
+
+
+/**
+ * Check that email address looks valid.
+ *
+ * @param string email address to check
+ * @return string error message if address is not valid
+ */
+function check_is_email( $email )
+{
+	if( !is_email( $email ) )
+	{
+		return T_('The email address is invalid.');
+	}
+}
+
+
+/**
  * Check that email address looks valid.
  *
  * @param string email address to check
@@ -1122,6 +1224,33 @@ function is_email( $email, $format = 'simple', $return_match = false )
 	{
 		return $return_match ? array() : false;
 	}
+}
+
+
+/**
+ * Checks if the phone number is valid
+ *
+ * @param string phone number to check
+ * @return string error message if phone number is not valid
+ */
+function check_is_phone( $phone )
+{
+	if( !is_phone( $phone ) )
+	{
+		return T_('The phone number is invalid.');
+	}
+}
+
+
+/**
+ * Checks if the phone number is valid
+ *
+ * @param string phone number to check
+ * @return boolean true if OK
+ */
+function is_phone( $phone )
+{
+	return preg_match( '|^\+?[\-*#/(). 0-9]+$|', $phone );
 }
 
 
@@ -3490,6 +3619,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.156  2009/09/24 19:48:30  efy-maxim
+ * validators
+ *
  * Revision 1.155  2009/09/24 00:32:28  blueyed
  * Add some timers. skin_display is taking too long - obviously.
  *

@@ -667,7 +667,7 @@ class DataObject
 	 * @param string name of fucntion used to validate input (TODO)
 	 * @return boolean true, if value is required
 	 */
-	function set_string_from_param( $parname, $required = false, $cleanup_function = NULL, $validation_function = NULL )
+	function set_string_from_param( $parname, $required = false, $cleanup_function = NULL, $validation_function = NULL, $error_message = NULL )
 	{
 		$var = $this->dbprefix.$parname;
 
@@ -683,13 +683,7 @@ class DataObject
 			param_check_not_empty( $var );
 		}
 
-		if( function_exists( $validation_function ) && ( !empty( $value ) || $required ))
-		{
-			if( !$validation_function( $value ) )
-			{
-				param_error( $var, T_( 'Field is not ' ).$validation_function );
-			}
-		}
+		validate( $var, $validation_function, $required, $error_message );
 
 		return $this->set( $parname, $value, ! $required );
 	}
@@ -810,6 +804,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.23  2009/09/24 19:48:30  efy-maxim
+ * validators
+ *
  * Revision 1.22  2009/09/24 09:36:04  efy-maxim
  * validation_function
  *
