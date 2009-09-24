@@ -645,9 +645,9 @@ class DataObject
 		{
 			$var = $this->dbprefix.$parname;
 		}
-		
+
 		$value = get_param($var);
-		
+
 		if( !empty($cleanup_function) )
 		{	//We want to apply a cleanup function
 			$value = $cleanup_function($value);
@@ -683,9 +683,12 @@ class DataObject
 			param_check_not_empty( $var );
 		}
 
-		if( !empty($validation_function) )
-		{	// We want to apply a cleanup function:
-			// TODO
+		if( function_exists( $validation_function ) && ( !empty( $value ) || $required ))
+		{
+			if( !$validation_function( $value ) )
+			{
+				param_error( $var, T_( 'Field is not ' ).$validation_function );
+			}
 		}
 
 		return $this->set( $parname, $value, ! $required );
@@ -807,6 +810,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2009/09/24 09:36:04  efy-maxim
+ * validation_function
+ *
  * Revision 1.21  2009/09/23 02:46:40  fplanque
  * doc
  *
