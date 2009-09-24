@@ -397,6 +397,8 @@ class Comment extends DataObject
 			'src' => $img_url,
 			'alt' => $this->get_author_name(),
 			'title' => $this->get_author_name(),
+			'width' => $params['size'], //  dh> NOTE: works with gravatar, check if extending
+			'height' => $params['size'], // dh> NOTE: works with gravatar, check if extending
 		);
 		if( $class )
 		{ // add class
@@ -1461,6 +1463,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2009/09/24 01:20:16  blueyed
+ * width and height for gravatar images
+ *
  * Revision 1.35  2009/09/20 18:13:20  fplanque
  * doc
  *
