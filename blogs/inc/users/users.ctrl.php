@@ -156,13 +156,13 @@ if( !$Messages->count('error') )
 		case 'change_admin_skin':
 			// Skin switch from menu
 			param( 'new_admin_skin', 'string', true );
-	    	param( 'redirect_to', 'string', '' );
+			param( 'redirect_to', 'string', '' );
 
-	    	$UserSettings->set( 'admin_skin', $new_admin_skin );
+			$UserSettings->set( 'admin_skin', $new_admin_skin );
 			$UserSettings->dbupdate();
 			$Messages->add( sprintf( T_('Admin skin changed to &laquo;%s&raquo;'), $new_admin_skin ), 'success' );
 
-      		header_nocache();
+			header_nocache();
 			header_redirect();
 			/* EXITED */
 			break;
@@ -687,6 +687,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.32  2009/09/24 20:45:47  fplanque
+ * no message
+ *
  * Revision 1.31  2009/09/23 19:23:02  efy-bogdan
  * Cleanup users.ctrl.php
  *
