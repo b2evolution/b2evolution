@@ -98,7 +98,7 @@ $Results->title = T_('Groups & Users');
  */
 if( $current_User->check_perm( 'users', 'edit', false ) )
 { // create new user link
-	$Results->global_icon( T_('Create a new user...'), 'new', '?ctrl=users&amp;action=new_user', T_('Add user').' &raquo;', 3, 4  );
+	$Results->global_icon( T_('Create a new user...'), 'new', '?ctrl=users&amp;action=new', T_('Add user').' &raquo;', 3, 4  );
 	$Results->global_icon( T_('Create a new group...'), 'new', '?ctrl=group&amp;action=new', T_('Add group').' &raquo;', 3, 4  );
 }
 
@@ -313,7 +313,7 @@ else
 						'th' => T_('Actions'),
 						'td_class' => 'shrinkwrap',
 						'td' => action_icon( T_('Edit this user...'), 'edit', '%regenerate_url( \'action\', \'user_ID=$user_ID$\' )%' )
-										.action_icon( T_('Duplicate this user...'), 'copy', '%regenerate_url( \'action\', \'action=new_user&amp;user_ID=$user_ID$\' )%' )
+										.action_icon( T_('Duplicate this user...'), 'copy', '%regenerate_url( \'action\', \'action=new&amp;user_ID=$user_ID$\' )%' )
 										.'¤conditional( (#user_ID# != 1) && (#nb_blogs# < 1) && (#user_ID# != '.$current_User->ID.'), \''
 											.action_icon( T_('Delete this user!'), 'delete',
 												'%regenerate_url( \'action\', \'action=delete_user&amp;user_ID=$user_ID$\' )%' ).'\', \''
@@ -328,6 +328,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/24 06:56:02  efy-bogdan
+ * Cleanup users.ctrl.php
+ *
  * Revision 1.13  2009/09/23 14:19:57  efy-bogdan
  * Listing null groups error fixed
  *
