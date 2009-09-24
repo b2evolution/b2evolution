@@ -263,4 +263,11 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
+/*
+ * $Log$
+ * Revision 1.2  2009/09/24 21:05:38  fplanque
+ * no message
+ *
+ *
+ */
 ?>

@@ -91,7 +91,7 @@ $ctrl_mappings = array(
 		'users'        => 'users/users.ctrl.php',
 		'userfields'   => 'users/userfields.ctrl.php',
 		'registration' => 'users/registration.ctrl.php',
-		'groups'        => 'users/groups.ctrl.php',
+		'groups'       => 'users/groups.ctrl.php',
 		'upload'       => 'files/upload.ctrl.php',
 	);
 
@@ -729,6 +729,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.34  2009/09/24 21:05:39  fplanque
+ * no message
+ *
  * Revision 1.33  2009/09/24 10:15:21  efy-bogdan
  * Separate controller added for groups
  *

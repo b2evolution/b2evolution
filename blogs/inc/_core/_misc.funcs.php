@@ -1050,6 +1050,9 @@ function remove_seconds($timestamp, $format = 'Y-m-d H:i')
 /**
  * Validate variable
  *
+ * @todo if funtion does not exist DEBUG_DIE() !!!! NEVER be silent about a potential security risk. (inserting non validated data into the DB) + ALWAYS die when something unexpected occurs.
+ * @todo rename to param_validate()
+ *
  * @param string param name
  * @param string validator function name
  * @param boolean true if variable value can't be empty
@@ -1083,6 +1086,8 @@ function validate( $variable, $validator, $required = false, $custom_msg = NULL 
 /**
  * Checks if the param is a decimal number
  *
+ * @ todo move to params.funcs
+ *
  * @param string decimal to check
  * @return string error message if decimal is not valid
  */
@@ -1110,6 +1115,8 @@ function is_decimal( $decimal )
 /**
  * Checks if the param is an integer (no float, e.g. 3.14).
  *
+ * @ todo move to params.funcs
+ *
  * @param string number to check
  * @return string error message if number is not valid
  */
@@ -1136,6 +1143,8 @@ function is_number( $number )
 
 /**
  * Check that email address looks valid.
+ *
+ * @ todo move to params.funcs
  *
  * @param string email address to check
  * @return string error message if address is not valid
@@ -1230,6 +1239,8 @@ function is_email( $email, $format = 'simple', $return_match = false )
 /**
  * Checks if the phone number is valid
  *
+ * @ todo move to params.funcs
+ *
  * @param string phone number to check
  * @return string error message if phone number is not valid
  */
@@ -1237,7 +1248,7 @@ function check_is_phone( $phone )
 {
 	if( !is_phone( $phone ) )
 	{
-		return T_('The phone number is invalid.');
+		return T_('The phone number is invalid. Example: +1 401-555-1234');
 	}
 }
 
@@ -3619,6 +3630,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.157  2009/09/24 21:05:39  fplanque
+ * no message
+ *
  * Revision 1.156  2009/09/24 19:48:30  efy-maxim
  * validators
  *
