@@ -576,16 +576,7 @@ class collections_Module extends Module
 					'skins' => array(
 						'text' => T_('Skins'),
 						'href' => $dispatcher.'?ctrl=skins'),
-					'types' => array(
-						'text' => T_('Post types'),
-						'title' => T_('Post types management'),
-						'href' => $dispatcher.'?ctrl=itemtypes'),
-					'statuses' => array(
-						'text' => T_('Post statuses'),
-						'title' => T_('Post statuses management'),
-						'href' => $dispatcher.'?ctrl=itemstatuses'),
-				) );
-
+					) );
 			$AdminUI->add_menu_entries( 'tools', array(
 						'' => array(	// fp> '' is dirty
 							'text' => T_('Misc'),

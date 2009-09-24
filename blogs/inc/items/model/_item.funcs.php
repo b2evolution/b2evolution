@@ -766,6 +766,29 @@ function attach_browse_tabs()
 					)
 			);
 	}
+	
+	// Add post types and statuses sub menu
+	$AdminUI->add_menu_entries(
+			'items',
+			array(
+				'settings' => array(
+					'text' => T_('Settings'),
+					'href' => $dispatcher.'?ctrl=itemtypes&amp;tab=settings&amp;tab3=types',
+					'entries' => array(
+						'types' => array(
+							'text' => T_('Post types'),
+							'title' => T_('Post types management'),
+							'href' => $dispatcher.'?ctrl=itemtypes&amp;tab=settings&amp;tab3=types'
+							),
+						'statuses' => array(
+							'text' => T_('Post statuses'),
+							'title' => T_('Post statuses management'),
+							'href' => $dispatcher.'?ctrl=itemstatuses&amp;tab=settings&amp;tab3=statuses'
+							),
+						)
+					)
+				)
+		);
 }
 
 
@@ -953,6 +976,9 @@ function check_perm_posttype( $post_extracats )
 
 /*
  * $Log$
+ * Revision 1.69  2009/09/24 13:50:31  efy-sergey
+ * Moved the Global Settings>Post types & Post statuses tabs to "Posts / Comments > Settings > Post types & Post statuses"
+ *
  * Revision 1.68  2009/09/20 21:44:01  blueyed
  * whitespace
  *

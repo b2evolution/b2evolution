@@ -33,10 +33,35 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * @var AdminUI
+ */
+global $AdminUI;
+
+/**
+ * @var User
+ */
+global $current_User;
+
+global $dispatcher;
+
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
 
-$AdminUI->set_path( 'options', 'statuses' );
+$tab = param( 'tab', 'string', 'settings', true );
+
+/**
+ * We need make this call to build menu for all modules
+ */
+$AdminUI->set_path( 'items' );
+
+/*
+ * Add sub menu entries:
+ * We do this here instead of _header because we need to include all filter params into regenerate_url()
+ */
+attach_browse_tabs();
+
+$AdminUI->set_path( 'items', 'settings', 'statuses' );
 
 $list_title = T_('Post statuses');
 $default_col_order = 'A';
@@ -64,6 +89,9 @@ require $inc_path.'generic/inc/_generic_listeditor.php';
 
 /*
  * $Log$
+ * Revision 1.4  2009/09/24 13:50:32  efy-sergey
+ * Moved the Global Settings>Post types & Post statuses tabs to "Posts / Comments > Settings > Post types & Post statuses"
+ *
  * Revision 1.3  2009/03/08 23:57:43  fplanque
  * 2009
  *
