@@ -501,9 +501,11 @@ $Plugins->trigger_event( 'BeforeBlogDisplay', array('skin'=>$skin) );
 
 if( !empty( $skin ) )
 { // We want to display with a skin now:
+	$Timer->resume( 'skin_display' );
+
 	$Debuglog->add('Selected skin: '.$skin, 'skin');
 
-	// Instanciate PageCache:
+	// Instantiate PageCache:
 	load_class( '_core/model/_pagecache.class.php', 'PageCache' );
 	$PageCache = & new PageCache( $Blog );
 	// Check for cached content & Start caching if needed
@@ -577,6 +579,8 @@ if( !empty( $skin ) )
 		$PageCache->end_collect();
 	}
 
+	$Timer->pause( 'skin_display' );
+
 	// We probably don't want to return to the caller if we have displayed a skin...
 	// That is useful if the caller implements a custom display but we still use skins for RSS/ Atom etc..
 	exit(0);
@@ -592,6 +596,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.143  2009/09/24 00:32:28  blueyed
+ * Add some timers. skin_display is taking too long - obviously.
+ *
  * Revision 1.142  2009/09/20 23:51:24  blueyed
  * whitespace
  *

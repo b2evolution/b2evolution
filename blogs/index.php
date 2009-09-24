@@ -26,6 +26,8 @@ require_once dirname(__FILE__).'/conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
+$Timer->resume('index.php');
+
 if( ! isset($collections_Module) )
 {	// The evocore framework is not used as a blog app here / we don't know how to display a public interface...
 	header_redirect( 'admin.php', 302 );
@@ -109,6 +111,8 @@ $timestamp_max = 'now';
 
 # Additionnaly, you can set other values (see URL params in the manual)...
 # $order = 'ASC'; // This for example would display the blog in chronological order...
+
+$Timer->pause('index.php');
 
 // That's it, now let b2evolution do the rest! :)
 require $inc_path.'_blog_main.inc.php';

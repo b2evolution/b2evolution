@@ -135,6 +135,10 @@ function shutdown()
 	global $Settings;
 	global $Debuglog;
 
+	global $Timer;
+
+	$Timer->resume('shutdown');
+
 	// echo '*** SHUTDOWN FUNC KICKING IN ***';
 
 	// fp> do we need special processing if we are in CLI mode?  probably earlier actually
@@ -168,6 +172,8 @@ function shutdown()
 	// Update the SESSION again, at the very end:
 	// (e.g. "Debugslogs" may have been removed in debug_info())
 	$Session->dbsave();
+
+	$Timer->pause('shutdown');
 }
 
 
@@ -3484,6 +3490,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.155  2009/09/24 00:32:28  blueyed
+ * Add some timers. skin_display is taking too long - obviously.
+ *
  * Revision 1.154  2009/09/21 03:14:35  fplanque
  * modularized a little more
  *
