@@ -268,6 +268,7 @@ div.skin_wrapper_loggedin {
 				dateFormat: \'' . $datefmt . '\',
 				monthNames: monthNames,
 				dayNamesMin: dayNamesMin,
+				firstDay: '.locale_startofweek().',
 				onClose: function(){ // Dynamically removing stylesheet, prevents duplicates
 					jQuery(docHead).find("link[href=\'' . $rsc_url . 'css/ui.datepicker.css\']").remove();
 				}
@@ -285,6 +286,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.28  2009/09/25 22:50:31  tblue246
+ * More outstanding bugfixes
+ *
  * Revision 1.27  2009/04/11 23:50:34  fplanque
  * diiiiiirtyyyyy
  *
