@@ -144,12 +144,11 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 	$filetypes_linkend = '</a>';
 	$Form->radio( 'edited_grp_perm_files', $edited_Group->get('perm_files'),
 			array(	$perm_none_option,
-							array( 'user', T_('Depending on each blog\'s permissions'), T_( 'This will restrict access to special file roots.' ) ),
 							array( 'view', T_('View files for all allowed roots') ),
 							array( 'add', T_('Add/Upload files to allowed roots') ),
 							array( 'edit', sprintf( T_('Edit %sunlocked files'), $filetypes_linkstart.get_icon('file_allowed').$filetypes_linkend ) ),
 							array( 'all', sprintf( T_('Edit all files, including %slocked ones'), $filetypes_linkstart.get_icon('file_not_allowed').$filetypes_linkend ), T_('Needed for editing PHP files in skins.') ),
-						), T_('Files'), true, T_('This setting will further restrict or extend any media file permissions on specific blogs.') );
+						), T_('Files'), true, T_('This setting will further restrict any media file permissions on specific blogs.') );
 
 
 	$Form->radio( 'edited_grp_perm_messaging', $edited_Group->get('perm_messaging'),
@@ -205,8 +204,8 @@ $this->disp_payload_end();
 
 /*
  * $Log$
- * Revision 1.14  2009/09/25 13:43:35  tblue246
- * validate(): debug_die() if validator function does not exist.
+ * Revision 1.15  2009/09/25 14:18:22  tblue246
+ * Reverting accidental commits
  *
  * Revision 1.13  2009/09/23 13:32:21  efy-bogdan
  * Separate controller added for groups

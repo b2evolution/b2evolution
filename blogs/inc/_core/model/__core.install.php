@@ -62,7 +62,7 @@ $schema_queries = array(
 			grp_perm_options enum('none','view','edit') NOT NULL default 'none',
 			grp_perm_users enum('none','view','edit') NOT NULL default 'none',
 			grp_perm_templates TINYINT NOT NULL DEFAULT 0,
-			grp_perm_files enum('user','none','view','add','edit','all') NOT NULL default 'none',
+			grp_perm_files enum('none','view','add','edit','all') NOT NULL default 'none',
 			grp_perm_messaging enum('none','reply','write','delete') NOT NULL default 'none',
 			PRIMARY KEY grp_ID (grp_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -265,8 +265,8 @@ $schema_queries = array(
 
 /*
  * $Log$
- * Revision 1.39  2009/09/25 13:43:35  tblue246
- * validate(): debug_die() if validator function does not exist.
+ * Revision 1.40  2009/09/25 14:18:22  tblue246
+ * Reverting accidental commits
  *
  * Revision 1.38  2009/09/17 11:34:29  efy-maxim
  * reply permission in create and upgrade functionality

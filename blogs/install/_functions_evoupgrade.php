@@ -2459,7 +2459,7 @@ function upgrade_b2evo_tables()
 
 		create_default_countries();
 
-		task_begin( 'Upgrading user permissions table... ' );
+		task_begin( 'Updating user permissions table... ' );
 		$DB->query( "ALTER TABLE T_coll_user_perms
 			ADD COLUMN bloguser_perm_page		tinyint NOT NULL default 0 AFTER bloguser_perm_media_change,
 			ADD COLUMN bloguser_perm_intro		tinyint NOT NULL default 0 AFTER bloguser_perm_page,
@@ -2467,7 +2467,7 @@ function upgrade_b2evo_tables()
 			ADD COLUMN bloguser_perm_sidebar	tinyint NOT NULL default 0 AFTER bloguser_perm_podcast" );
 		task_end();
 
-		task_begin( 'Upgrading group permissions table... ' );
+		task_begin( 'Updating group permissions table... ' );
 		$DB->query( "ALTER TABLE T_coll_group_perms
 			ADD COLUMN bloggroup_perm_page		tinyint NOT NULL default 0 AFTER bloggroup_perm_media_change,
 			ADD COLUMN bloggroup_perm_intro		tinyint NOT NULL default 0 AFTER bloggroup_perm_page,
@@ -2475,7 +2475,7 @@ function upgrade_b2evo_tables()
 			ADD COLUMN bloggroup_perm_sidebar	tinyint NOT NULL default 0 AFTER bloggroup_perm_podcast" );
 		task_end();
 
-		task_begin( 'Upgrading users table... ' );
+		task_begin( 'Updating users table... ' );
 		$DB->query( "ALTER TABLE T_users
 			ADD COLUMN user_ctry_ID int(10) unsigned NULL AFTER user_avatar_file_ID" );
 		task_end();
@@ -2523,7 +2523,7 @@ function upgrade_b2evo_tables()
 
 		// Add messaging permission column to T_groups table for messaging module
 
-		task_begin( 'Adding messaging permissions for groups... ' );
+		task_begin( 'Add messaging permissions for groups... ' );
 		$DB->query( "ALTER TABLE T_groups
 										ADD COLUMN grp_perm_messaging enum('none','reply','write','delete') NOT NULL default 'none' AFTER grp_perm_files" );
 		task_end();
@@ -2547,11 +2547,6 @@ function upgrade_b2evo_tables()
 		$DB->query( 'UPDATE T_groups
 		             SET grp_perm_messaging = "reply"
 		             WHERE grp_ID = 3' );
-		task_end();
-
-		task_begin( 'Upgrading groups table... ' );
-		$DB->query( "ALTER TABLE T_groups
-						MODIFY COLUMN grp_perm_files enum('user','none','view','add','edit','all') NOT NULL default 'none'" );
 		task_end();
 
 		//set_upgrade_checkpoint( '9970' );
@@ -2731,8 +2726,8 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
- * Revision 1.327  2009/09/25 13:43:35  tblue246
- * validate(): debug_die() if validator function does not exist.
+ * Revision 1.328  2009/09/25 14:18:22  tblue246
+ * Reverting accidental commits
  *
  * Revision 1.326  2009/09/21 03:31:23  fplanque
  * made autoupgrade more verbose in debug mode
