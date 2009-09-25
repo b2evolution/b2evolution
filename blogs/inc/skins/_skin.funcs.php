@@ -249,7 +249,7 @@ function skin_init( $disp )
 					if( ($Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
 							|| $Blog->get_setting( 'relcanonical_archive_urls' ) )
 					{ // Check if the URL was canonical:
-						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w, '&amp;', $MainList->get_active_filter('page') );
+						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w, '&', $MainList->get_active_filter('page') );
 						if( ! is_same_url($ReqHost.$ReqURI, $canonical_url) )
 						{
 							if( $Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
@@ -894,6 +894,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.75  2009/09/25 22:04:39  tblue246
+ * Bugfix
+ *
  * Revision 1.74  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *
