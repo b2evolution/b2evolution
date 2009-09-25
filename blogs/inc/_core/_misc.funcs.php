@@ -1065,7 +1065,17 @@ function validate( $variable, $validator, $required = false, $custom_msg = NULL 
 	{
 		debug_die( 'Function '.$validator.'() does not exist!' );
 	}
-	elseif( empty( $GLOBALS[$variable] ) && ! $required )
+	elseif( ! isset( $GLOBALS[$variable] ) )
+	{	// Variable not set, we cannot handle this using the validator function...
+		if( $required )
+		{	// Add error:
+			param_check_not_empty( $variable );
+			return false;
+		}
+
+		return true;
+	}
+	elseif( $GLOBALS[$variable] === '' && ! $required )
 	{	// Variable is empty or not set. That's fine since it isn't required:
 		return true;
 	}
@@ -3634,6 +3644,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.159  2009/09/25 14:45:54  tblue246
+ * Improved validate()
+ *
  * Revision 1.158  2009/09/25 13:43:35  tblue246
  * validate(): debug_die() if validator function does not exist.
  *
