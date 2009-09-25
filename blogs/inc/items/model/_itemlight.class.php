@@ -446,7 +446,7 @@ class ItemLight extends DataObject
 	{
 		global $cache_postcats;
 
-		$ChapterCache = & get_Cache( 'ChapterCache' );
+		$ChapterCache = & get_ChapterCache( );
 
 		// Load cache for category associations with current posts
 		// TODO: dh> This fails, if $postIDlist is not set! (e.g. in admin)
@@ -477,7 +477,7 @@ class ItemLight extends DataObject
 	{
 		if( is_null($this->main_Chapter) )
 		{
-			$ChapterCache = & get_Cache( 'ChapterCache' );
+			$ChapterCache = & get_ChapterCache( );
 			/**
 			 * @var Chapter
 			 */
@@ -834,7 +834,7 @@ class ItemLight extends DataObject
 	 */
 	function type( $before = '', $after = '', $format = 'htmlbody' )
 	{
-		$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
+		$ItemTypeCache = & get_ItemTypeCache();
 		$Element = & $ItemTypeCache->get_by_ID( $this->ptyp_ID, true, false );
 		if( !$Element )
 		{ // No status:
@@ -951,7 +951,7 @@ class ItemLight extends DataObject
 	{
 		if( is_null($this->Blog) )
 		{
-			$BlogCache = & get_Cache( 'BlogCache' );
+			$BlogCache = & get_BlogCache( );
 			$this->Blog = & $BlogCache->get_by_ID( $this->get_blog_ID() );
 		}
 	}
@@ -961,6 +961,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.25  2009/09/24 00:01:02  blueyed
  * indent
  *

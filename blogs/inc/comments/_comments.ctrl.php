@@ -45,7 +45,7 @@ switch( $action )
 
 		$edited_Comment_Item = & $edited_Comment->get_Item();
 		set_working_blog( $edited_Comment_Item->get_blog_ID() );
-		$BlogCache = & get_Cache( 'BlogCache' );
+		$BlogCache = & get_BlogCache( );
 		$Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission:
@@ -65,7 +65,7 @@ switch( $action )
 		}
 		elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
 		{	// Selected a new blog:
-			$BlogCache = & get_Cache( 'BlogCache' );
+			$BlogCache = & get_BlogCache( );
 			$Blog = & $BlogCache->get_by_ID( $blog );
 		}
 		break;
@@ -275,6 +275,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.14  2009/08/26 23:37:00  tblue246
  * Backoffice comment editing: Allow changing of "Allow message form" setting for guest comments
  *

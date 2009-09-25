@@ -115,7 +115,7 @@ function get_the_category_by_ID( $cat_ID, $die = true )
  */
 function get_catblog( $cat_ID )
 {
-	$ChapterCache = & get_Cache('ChapterCache');
+	$ChapterCache = & get_ChapterCache();
 	$Chapter = $ChapterCache->get_by_ID($cat_ID);
 
 	return $Chapter->blog_ID;
@@ -474,6 +474,9 @@ function cat_req_dummy()
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.9  2009/08/29 12:23:55  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

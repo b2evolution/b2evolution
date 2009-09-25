@@ -417,7 +417,7 @@ $Debuglog->add( 'pass: '.( empty($pass) ? '' : 'not' ).' empty', 'login' );
 // either 'login' (normal) or 'redirect_to_backoffice' may be set here. This also helps to display the login form again, if either login or pass were empty.
 $login_action = param_arrayindex( 'login_action' );
 
-$UserCache = & get_Cache( 'UserCache' );
+$UserCache = & get_UserCache( );
 
 if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 { // User is trying to login right now
@@ -666,6 +666,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.124  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.123  2009/09/20 16:55:14  blueyed
  * Performance boost: add Timer_noop class and use it when not in debug mode.
  *

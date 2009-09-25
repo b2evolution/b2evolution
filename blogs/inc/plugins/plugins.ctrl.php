@@ -47,7 +47,7 @@ $current_User->check_perm( 'options', 'view', true );
 /**
  * @var Plugins_admin
  */
-$admin_Plugins = & get_Cache( 'Plugins_admin' );
+$admin_Plugins = & get_Plugins_admin();
 $admin_Plugins->restart();
 
 // Pre-walk list of plugins
@@ -1058,6 +1058,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/25 07:32:53  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.12  2009/09/02 20:19:14  blueyed
  * plugins controller: Drop li.clear workaround for Konqueror, where it has been fixed.
  *

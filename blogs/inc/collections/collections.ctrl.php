@@ -222,7 +222,7 @@ switch( $action )
 			$DB->commit();
 
 			// Commit changes in cache:
-			$BlogCache = & get_Cache( 'BlogCache' );
+			$BlogCache = & get_BlogCache( );
 			$BlogCache->add( $edited_Blog );
 
 			// We want to highlight the edited object on next list display:
@@ -457,6 +457,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.15  2009/09/20 00:33:59  blueyed
  * Add widget to display avatar of collection/blog owner. Install it for all new blogs by default.
  *

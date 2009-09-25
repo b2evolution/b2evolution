@@ -112,7 +112,7 @@ $Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']'.get_manual_link('blog
 		if( $default_blog_ID = $Settings->get('default_blog_ID') )
 		{
 			$Debuglog->add('Default blog is set to: '.$default_blog_ID);
-			$BlogCache = & get_Cache( 'BlogCache' );
+			$BlogCache = & get_BlogCache( );
 			if( $default_Blog = & $BlogCache->get_by_ID($default_blog_ID, false) )
 			{ // Default blog exists
 				$defblog = $default_Blog->dget('shortname');
@@ -320,6 +320,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.23  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.22  2009/04/22 22:46:34  blueyed
  * Add support for rel=tag in tag URLs. This adds a new tag_links mode 'prefix-only', which requires a prefix (default: tag) and uses no suffix (dash/colon/semicolon). Also adds more JS juice and cleans up/normalized previously existing JS. Not much tested, but implemented as discussed on ML.
  *

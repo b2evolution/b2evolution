@@ -104,7 +104,7 @@ $count_SQL->WHERE( 'tsta_user_ID = '.$current_User->ID );
 
 $Results = & new Results( $select_SQL->get(), 'thrd_', '', NULL, $count_SQL->get() );
 
-$Results->Cache = & get_Cache( 'ThreadCache' );
+$Results->Cache = & get_ThreadCache( );
 
 $Results->title = T_('Conversations list');
 
@@ -168,6 +168,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/25 07:32:53  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.15  2009/09/20 02:02:45  fplanque
  * fixed read/unread colors
  *

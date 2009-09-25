@@ -182,7 +182,7 @@ function install_newdb()
 		/**
 		 * @var UserCache
 		 */
-		$UserCache = & get_Cache( 'UserCache' );
+		$UserCache = & get_UserCache( );
 		// Create $current_User object.
 		// (Assigning by reference does not work with "global" keyword (PHP 5.2.8))
 		$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
@@ -422,7 +422,7 @@ function install_basic_plugins( $old_db_version = 0 )
 	 */
 	global $Plugins_admin;
 
-	$Plugins_admin = & get_Cache('Plugins_admin');
+	$Plugins_admin = & get_Plugins_admin();
 
 	// Create global $Plugins instance, which is required during installation of basic plugins,
 	// not only for the ones getting installed, but also during e.g. count_regs(), which instantiates
@@ -825,6 +825,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.76  2009/09/25 07:33:31  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.75  2009/09/20 00:33:59  blueyed
  * Add widget to display avatar of collection/blog owner. Install it for all new blogs by default.
  *

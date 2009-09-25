@@ -835,7 +835,7 @@ class tinymce_plugin extends Plugin
 			// Load the appropriate ITEM/POST styles depending on the blog's skin:
 			if( ! empty( $Blog->skin_ID) )
 			{
-				$SkinCache = & get_Cache( 'SkinCache' );
+				$SkinCache = & get_SkinCache( );
 				/**
 				 * @var Skin
 				 */

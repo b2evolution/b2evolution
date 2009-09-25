@@ -23,7 +23,7 @@ global $container_list;
 
 
 // Load widgets for current collection:
-$WidgetCache = & get_Cache( 'WidgetCache' );
+$WidgetCache = & get_WidgetCache();
 $container_Widget_array = & $WidgetCache->get_by_coll_ID( $Blog->ID );
 
 /**
@@ -84,7 +84,7 @@ function display_container( $container, $legend_suffix = '' )
 	/**
 	 * @var WidgetCache
 	 */
-	$WidgetCache = & get_Cache( 'WidgetCache' );
+	$WidgetCache = & get_WidgetCache();
 	$Widget_array = & $WidgetCache->get_by_coll_container( $Blog->ID, $container );
 
 	if( empty($Widget_array) )
@@ -212,6 +212,9 @@ echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear">';
 
 /*
  * $Log$
+ * Revision 1.17  2009/09/25 07:33:30  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.16  2009/03/14 21:50:46  fplanque
  * still cleaning up...
  *

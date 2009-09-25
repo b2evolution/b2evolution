@@ -100,7 +100,7 @@ $Form->begin_fieldset( T_('User permissions'), array( 'class'=>'fieldset clear' 
 	if( $edited_User->ID != 1 && $current_User->check_perm( 'users', 'edit' ) )
 	{	// This is not Admin and we're not restricted: we're allowed to change the user group:
 		$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get('newusers_grp_ID') : $edited_User->Group->ID;
-		$GroupCache = & get_Cache( 'GroupCache' );
+		$GroupCache = & get_GroupCache();
 		$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group') );
 	}
 	else
@@ -190,7 +190,7 @@ $Form->begin_fieldset( T_('Identity') );
 		$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => true ) );
 		$Form->select( 'edited_user_idmode', $edited_User->get( 'idmode' ), array( &$edited_User, 'callback_optionsForIdMode' ), T_('Identity shown') );
 
-		$CountryCache = & get_Cache( 'CountryCache' );
+		$CountryCache = & get_CountryCache( );
 		$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, 'Country', $field_params = array('allow_none'=>true, 'required'=>true) );
 
 		$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
@@ -514,6 +514,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.21  2009/09/25 07:33:15  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.20  2009/09/23 19:23:10  efy-bogdan
  * Cleanup users.ctrl.php
  *

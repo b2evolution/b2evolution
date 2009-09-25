@@ -493,7 +493,7 @@ class Filelist
 	 */
 	function add_by_subpath( $rel_path, $mustExist = false )
 	{
-		$FileCache = & get_Cache( 'FileCache' );
+		$FileCache = & get_FileCache( );
 		$NewFile = & $FileCache->get_by_root_and_path( $this->_FileRoot->type, $this->_FileRoot->in_type_ID, $rel_path );
 
 		return $this->add( $NewFile, $mustExist );
@@ -1171,7 +1171,7 @@ class Filelist
 			/**
 			 * @var FileCache
 			 */
-			$FileCache = & get_Cache( 'FileCache' );
+			$FileCache = & get_FileCache( );
 
 			$rows = $DB->get_results( "
 				SELECT *
@@ -1258,6 +1258,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.5  2009/09/14 13:04:53  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

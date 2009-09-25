@@ -150,7 +150,7 @@ class ItemQuery extends SQL
 		$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
 											INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
 
-		$BlogCache = & get_Cache('BlogCache');
+		$BlogCache = & get_BlogCache();
 		$current_Blog = $BlogCache->get_by_ID( $blog );
 
 		$this->WHERE_and( $current_Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID') );
@@ -724,6 +724,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.14  2009/09/15 19:31:54  fplanque
  * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
  * PHP 4 compatible. Even better on PHP 5.

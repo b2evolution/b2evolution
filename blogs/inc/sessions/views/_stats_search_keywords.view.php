@@ -184,7 +184,7 @@ function filter_keyphrases( & $Form )
 	if( $current_User->check_perm( 'stats', 'view' ) )
 	{	// Permission to view stats for ALL blogs:
 		global $goal_ID;
-		$GoalCache = & get_Cache( 'GoalCache' );
+		$GoalCache = & get_GoalCache();
 		$GoalCache->load_all();
 		$Form->select_object( 'goal_ID', $goal_ID, $GoalCache, T_('Goal'), '', true );
 	}
@@ -271,6 +271,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.5  2009/09/14 13:38:33  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

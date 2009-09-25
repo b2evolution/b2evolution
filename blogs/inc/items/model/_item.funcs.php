@@ -515,7 +515,7 @@ function cat_select( $Form, $form_fields = true )
 		/**
 		 * @var BlogCache
 		 */
-		$BlogCache = & get_Cache('BlogCache');
+		$BlogCache = & get_BlogCache();
 
 		/**
 		 * @var Blog
@@ -600,7 +600,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 
 	$cat_sel_total_count++;
 
-	$ChapterCache = & get_Cache('ChapterCache');
+	$ChapterCache = & get_ChapterCache();
 	$thisChapter = $ChapterCache->get_by_ID($cat_ID);
 	$r = "\n".'<tr class="'.( $total_count%2 ? 'odd' : 'even' ).'">';
 
@@ -723,7 +723,7 @@ function attach_browse_tabs()
 	and each post type must have a checkbox like "use separate tab"
 	Note: you can also make a select list "group with: posts|pages|etc...|other|own tab"
 
-	$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
+	$ItemTypeCache = & get_ItemTypeCache();
 	$default_post_types = array(1,1000,1500,1520,1530,1570,1600,2000,3000);
 	$items_types = array_values( array_keys( $ItemTypeCache->get_option_array() ) );
 	// a tab for custom types
@@ -888,7 +888,7 @@ function item_link_by_urltitle( $params = array() )
   /**
 	 * @var ItemCache
 	 */
-	$ItemCache = & get_Cache( 'ItemCache' );
+	$ItemCache = & get_ItemCache( );
 
   /**
 	 * @var Item
@@ -976,6 +976,9 @@ function check_perm_posttype( $post_extracats )
 
 /*
  * $Log$
+ * Revision 1.70  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.69  2009/09/24 13:50:31  efy-sergey
  * Moved the Global Settings>Post types & Post statuses tabs to "Posts / Comments > Settings > Post types & Post statuses"
  *

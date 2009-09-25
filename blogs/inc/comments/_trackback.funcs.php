@@ -74,7 +74,7 @@ function trackback(
 	$title = rawurlencode($title);
 	$excerpt = rawurlencode($excerpt);
 	$blog_name = rawurlencode($Blog->get( 'name' ));
-	$ItemCache = & get_Cache( 'ItemCache' );
+	$ItemCache = & get_ItemCache( );
 	$Item = & $ItemCache->get_by_ID( $ID );
 	$url = rawurlencode( $Item->get_permanent_url('', '', '&') );
 	// dis is the trackback stuff to be sent:
@@ -224,6 +224,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.7  2009/07/08 02:38:55  sam2kb
  * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
  *

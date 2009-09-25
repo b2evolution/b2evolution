@@ -227,7 +227,7 @@ function stats_blog_name()
 {
 	global $row_stats;
 
-	$BlogCache = & get_Cache('BlogCache');
+	$BlogCache = & get_BlogCache();
 	$Blog = & $BlogCache->get_by_ID($row_stats['hit_blog_ID']);
 
 	$Blog->disp('name');
@@ -326,6 +326,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.15  2009/07/23 21:28:03  blueyed
  * Add $tail param to strmaxlen, use it in stats_search_keywords and add some tests for it.
  *

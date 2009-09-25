@@ -59,10 +59,10 @@ class Link extends DataObject
 			$this->ltype_ID = $db_row->link_ltype_ID;
 
 			// source of link:
-			$ItemCache = & get_Cache( 'ItemCache' );
+			$ItemCache = & get_ItemCache( );
 			$this->Item = & $ItemCache->get_by_ID( $db_row->link_itm_ID );
 
-			$FileCache = & get_Cache( 'FileCache' );
+			$FileCache = & get_FileCache( );
 			// fp> do not halt on error. For some reason (ahem bug) a file can disappear and if we fail here then we won't be
 			// able to delete the link
 			$this->File = & $FileCache->get_by_ID( $db_row->link_file_ID, false, false );
@@ -94,6 +94,9 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.5  2009/09/14 13:17:28  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

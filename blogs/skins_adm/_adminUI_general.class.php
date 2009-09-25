@@ -544,7 +544,7 @@ class AdminUI_general extends Menu
 
 		$template = $this->get_template( 'CollectionList' );
 
-		$BlogCache = & get_Cache( 'BlogCache' );
+		$BlogCache = & get_BlogCache( );
 
 		$blog_array = $BlogCache->load_user_blogs( $this->coll_list_permname, $this->coll_list_permlevel );
 
@@ -1281,6 +1281,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.99  2009/09/25 07:33:31  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.98  2009/09/19 23:09:02  blueyed
  * Improve usability by adding the short app_name at the end of html title.
  *

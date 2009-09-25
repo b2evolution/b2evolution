@@ -43,7 +43,7 @@ if( $DB->rows_affected != 1 )
 }
 
 // Get the Item:
-$ItemCache = & get_Cache( 'ItemCache' );
+$ItemCache = & get_ItemCache( );
 /**
  * @var Item
  */
@@ -67,6 +67,9 @@ return 1; /* ok */
 
 /*
  * $Log$
+ * Revision 1.3  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.2  2008/05/10 23:53:46  fplanque
  * fix
  *

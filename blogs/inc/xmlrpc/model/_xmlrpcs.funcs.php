@@ -167,7 +167,7 @@ function _wp_mw_getcategories( $m )
 	}
 	logIO( 'Categories: '.count($rows) );
 
-	$ChapterCache = & get_Cache('ChapterCache');
+	$ChapterCache = & get_ChapterCache();
 	$data = array();
 	foreach( $rows as $row )
 	{
@@ -377,7 +377,7 @@ function _wp_or_blogger_getusersblogs( $type, $m )
 	}
 
 	// LOAD BLOGS tehuser is a member of:
-	$BlogCache = & get_Cache( 'BlogCache' );
+	$BlogCache = & get_BlogCache( );
 	$blog_array = $BlogCache->load_user_blogs( 'blog_ismember', 'view', $current_User->ID, 'ID' );
 
 	$resp_array = array();
@@ -448,7 +448,7 @@ function _b2_or_mt_get_categories( $type, $m )
 	$sql = 'SELECT *
 					  FROM T_categories ';
 
-	$BlogCache = & get_Cache('BlogCache');
+	$BlogCache = & get_BlogCache();
 	$current_Blog = $BlogCache->get_by_ID( $Blog->ID );
 	$sql .= 'WHERE '.$Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID');
 	if( $Settings->get('chapter_ordering') == 'manual' )
@@ -505,7 +505,7 @@ function & xmlrpcs_login( $m, $login_param, $pass_param )
   /**
 	 * @var UserCache
 	 */
-	$UserCache = & get_Cache( 'UserCache' );
+	$UserCache = & get_UserCache( );
 	$current_User = & $UserCache->get_by_login( $username );
 
 	if( empty( $current_User ) || ! $current_User->check_password( $password, false ) )
@@ -543,7 +543,7 @@ function & xmlrpcs_get_Blog( $m, $blog_param )
 	/**
 	 * @var BlogCache
 	 */
-	$BlogCache = & get_Cache( 'BlogCache' );
+	$BlogCache = & get_BlogCache( );
 	/**
 	 * @var Blog
 	 */
@@ -580,7 +580,7 @@ function & xmlrpcs_get_Item( $m, $postid_param )
   /**
 	 * @var ItemCache
 	 */
-	$ItemCache = & get_Cache( 'ItemCache' );
+	$ItemCache = & get_ItemCache( );
   /**
 	 * @var Item
 	 */
@@ -855,7 +855,7 @@ function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
 	$maincat   = trim( $maincat );
 	$extracats = array_map( 'trim', $extracats );
 
-	$ChapterCache = & get_Cache( 'ChapterCache' );
+	$ChapterCache = & get_ChapterCache( );
 
 	// ---- CHECK MAIN CATEGORY ----
 	if( $ChapterCache->get_by_ID( $maincat, false ) === false )
@@ -906,6 +906,9 @@ function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.21  2009/09/25 07:33:31  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.20  2009/09/18 19:09:05  tblue246
  * XML-RPC: Check extracats in addition to maincat before calling check_perm(). Fixes debug_die()ing and sends an XML-RPC error instead.
  *

@@ -313,7 +313,7 @@ class Item extends ItemLight
 			{
 				$this->assigned_user_ID = $user_ID;
 			}
-			$UserCache = & get_Cache( 'UserCache' );
+			$UserCache = & get_UserCache( );
 			$this->assigned_User = & $UserCache->get_by_ID( $user_ID );
 		}
 		else
@@ -516,7 +516,7 @@ class Item extends ItemLight
 			// Typically stuff that will help the content to validate
 			// Useful for code display.
 			// Will probably be used for validation also.
-			$Plugins_admin = & get_Cache('Plugins_admin');
+			$Plugins_admin = & get_Plugins_admin();
 			$Plugins_admin->filter_contents( $GLOBALS['post_title'] /* by ref */, $GLOBALS['content'] /* by ref */, $renderers );
 
 
@@ -599,7 +599,7 @@ class Item extends ItemLight
 	 */
 	function get_assigned_user_options()
 	{
-		$UserCache = & get_Cache( 'UserCache' );
+		$UserCache = & get_UserCache( );
 		return $UserCache->get_blog_member_option_list( $this->get_blog_ID(), $this->assigned_user_ID,
 							true,	($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */ );
 	}
@@ -771,7 +771,7 @@ class Item extends ItemLight
 
 		if( $use_cache )
 		{ // the format/item can be cached:
-			$ItemPrerenderingCache = & get_Cache('ItemPrerenderingCache');
+			$ItemPrerenderingCache = & get_ItemPrerenderingCache();
 
 			if( isset($ItemPrerenderingCache[$format][$this->ID][$cache_key]) )
 			{ // already in PHP cache.
@@ -883,7 +883,7 @@ class Item extends ItemLight
 		$DB->query( 'DELETE FROM T_items__prerendering WHERE itpr_itm_ID = '.$this->ID );
 
 		// Delete cache.
-		$ItemPrerenderingCache = & get_Cache('ItemPrerenderingCache');
+		$ItemPrerenderingCache = & get_ItemPrerenderingCache();
 		foreach( array_keys($ItemPrerenderingCache) as $format )
 		{
 			unset($ItemPrerenderingCache[$format][$this->ID]);
@@ -1436,7 +1436,7 @@ class Item extends ItemLight
 	{
 		if( is_null( $this->Links ) )
 		{ // Links have not been loaded yet:
-			$LinkCache = & get_Cache( 'LinkCache' );
+			$LinkCache = & get_LinkCache( );
 			$this->Links = & $LinkCache->get_by_item_ID( $this->ID );
 		}
 	}
@@ -1455,7 +1455,7 @@ class Item extends ItemLight
 
 		if( ! isset( $this->tags ) )
 		{
-			$ItemTagsCache = & get_Cache('ItemTagsCache');
+			$ItemTagsCache = & get_ItemTagsCache();
 			if( ! isset($ItemTagsCache[$this->ID]) )
 			{
 				/* Only try to fetch tags for items that are not yet in
@@ -1872,7 +1872,7 @@ class Item extends ItemLight
 	{
 		load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectList2' );
 
-		$FileCache = & get_Cache( 'FileCache' );
+		$FileCache = & get_FileCache( );
 
 		$FileList = new DataObjectList2( $FileCache ); // IN FUNC
 
@@ -3472,7 +3472,7 @@ class Item extends ItemLight
 	{
 		if( ! isset($this->assigned_User) && isset($this->assigned_user_ID) )
 		{
-			$UserCache = & get_Cache( 'UserCache' );
+			$UserCache = & get_UserCache( );
 			$this->assigned_User = & $UserCache->get_by_ID( $this->assigned_user_ID );
 		}
 
@@ -3489,7 +3489,7 @@ class Item extends ItemLight
 	{
 		if( is_null($this->creator_User) )
 		{
-			$UserCache = & get_Cache( 'UserCache' );
+			$UserCache = & get_UserCache( );
 			$this->creator_User = & $UserCache->get_by_ID( $this->creator_user_ID );
 			$this->Author = & $this->creator_User;  // deprecated
 		}
@@ -3815,7 +3815,7 @@ class Item extends ItemLight
 				return T_( $post_statuses[$this->status] );
 
 			case 't_extra_status':
-				$ItemStatusCache = & get_Cache( 'ItemStatusCache' );
+				$ItemStatusCache = & get_ItemStatusCache();
 				if( ! ($Element = & $ItemStatusCache->get_by_ID( $this->pst_ID, true, false ) ) )
 				{ // No status:
 					return '';
@@ -3829,7 +3829,7 @@ class Item extends ItemLight
 					return '';
 				}
 
-				$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
+				$ItemTypeCache = & get_ItemTypeCache();
 				$type_Element = & $ItemTypeCache->get_by_ID( $this->ptyp_ID );
 				return $type_Element->get_name();
 
@@ -3967,6 +3967,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.143  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.142  2009/09/21 03:44:32  fplanque
  * doc
  *

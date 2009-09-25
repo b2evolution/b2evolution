@@ -153,7 +153,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 		echo '<fieldset>';
 		echo '<legend>'.T_('Assignees').'</legend>';
 		// Load current blog members into cache:
-		$UserCache = & get_Cache( 'UserCache' );
+		$UserCache = & get_UserCache( );
 		$UserCache->load_blogmembers( $Blog->ID );
 		if( count($UserCache->cache) )
 		{
@@ -204,7 +204,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 		 * Statuses
  		 * TODO: allow multiple selection
 		 */
-		$ItemStatusCache = & get_Cache( 'ItemStatusCache' );
+		$ItemStatusCache = & get_ItemStatusCache();
 		$ItemStatusCache->load_all(); // TODO: load for current blog only
 		if( count($ItemStatusCache->cache) )
 		{	// We have satuses:
@@ -270,6 +270,9 @@ echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.14  2009/03/10 13:53:18  tblue246
  * Fixing the "Category list" widget again, now hopefully without making the backoffice sidebar look ugly...
  *

@@ -432,7 +432,7 @@ class User extends DataObject
 	{
 		if( is_null($this->Country) && !empty($this->ctry_ID ) )
 		{
-			$CountryCache = & get_Cache( 'CountryCache' );
+			$CountryCache = & get_CountryCache( );
 			$this->Country = $CountryCache->get_by_ID( $this->ctry_ID );
 		}
 
@@ -713,7 +713,7 @@ class User extends DataObject
 	{
 		if( ! isset($this->Group) )
 		{
-			$GroupCache = & get_Cache( 'GroupCache' );
+			$GroupCache = & get_GroupCache();
 			$this->Group = & $GroupCache->get_by_ID($this->group_ID);
 		}
 		return $this->Group;
@@ -942,7 +942,7 @@ class User extends DataObject
 
 					// efy-maxim> Currently, below code can't be moved to messaging code
 					// efy-maxim> because messaging permissions can only be checked in core module
-					$ThreadCache = & get_Cache( 'ThreadCache' );
+					$ThreadCache = & get_ThreadCache( );
 					$Thread = & $ThreadCache->get_by_ID( $perm_target, false );
 
 					if( $Thread === false || ! $Thread->check_thread_recipient( $this->ID ) )
@@ -1060,7 +1060,7 @@ class User extends DataObject
 			return false;
 		}
 
-		$BlogCache = & get_Cache('BlogCache');
+		$BlogCache = & get_BlogCache();
     /**
 		 * @var Blog
 		 */
@@ -1094,7 +1094,7 @@ class User extends DataObject
 		global $DB;
 		// echo "checkin for $permname >= $permlevel on blog $perm_target_blog<br />";
 
-		$BlogCache = & get_Cache('BlogCache');
+		$BlogCache = & get_BlogCache();
 		/**
 		 * @var Blog
 		 */
@@ -1726,7 +1726,7 @@ class User extends DataObject
 		}
 		else
 		{
-			$FileCache = & get_Cache( 'FileCache' );
+			$FileCache = & get_FileCache( );
 
 			// Do not halt on error. A file can disappear without the profile being updated.
 			/**
@@ -1845,6 +1845,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.51  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.50  2009/09/23 07:17:13  efy-bogdan
  *  load_from_Request added to Group class
  *

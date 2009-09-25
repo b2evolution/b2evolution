@@ -87,7 +87,7 @@ if ( false !== strpos( urldecode( $path ), '..' ) )
 }
 
 // Load fileroot info:
-$FileRootCache = & get_Cache( 'FileRootCache' );
+$FileRootCache = & get_FileRootCache();
 $FileRoot = & $FileRootCache->get_by_ID( $root );
 
 // Load file object (not the file content):
@@ -203,6 +203,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.38  2009/09/25 07:32:51  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.37  2009/09/20 23:54:24  blueyed
  * File::output_cached_thumb handles mtime param, and uses it to send a
  * far in the future Expires header.

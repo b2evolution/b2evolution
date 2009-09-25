@@ -236,7 +236,7 @@ class File extends DataObject
 			);
 
 		// Memorize filepath:
-		$FileRootCache = & get_Cache( 'FileRootCache' );
+		$FileRootCache = & get_FileRootCache();
 		$this->_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID );
 
 		// If there's a valid file root, handle extra stuff. This should not get done when the FileRoot is invalid.
@@ -295,7 +295,7 @@ class File extends DataObject
 				$this->desc  = $row->file_desc;
 
 				// Store this in the FileCache:
-				$FileCache = & get_Cache( 'FileCache' );
+				$FileCache = & get_FileCache( );
 				$FileCache->add( $this );
 			}
 			else
@@ -486,7 +486,7 @@ class File extends DataObject
 			// Create the filetype with the extension of the file if the extension exist in database
 			if( $ext = $this->get_ext() )
 			{ // The file has an extension, load filetype object
-				$FiletypeCache = & get_Cache( 'FiletypeCache' );
+				$FiletypeCache = & get_FiletypeCache();
 				$this->Filetype = & $FiletypeCache->get_by_extension( strtolower( $ext ), false );
 			}
 
@@ -1168,7 +1168,7 @@ class File extends DataObject
 		// echo "relpath= $rel_path ";
 
 		$rdfp_rel_path = str_replace( '\\', '/', $rdfp_rel_path );
-		$FileRootCache = & get_Cache( 'FileRootCache' );
+		$FileRootCache = & get_FileRootCache();
 
 		$new_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID, true );
 		$adfp_posix_path = $new_FileRoot->ads_path.$rdfp_rel_path;
@@ -1898,6 +1898,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.55  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.54  2009/09/20 23:54:24  blueyed
  * File::output_cached_thumb handles mtime param, and uses it to send a
  * far in the future Expires header.

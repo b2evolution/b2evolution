@@ -28,7 +28,7 @@ if( empty($user_ID) )
 	return;
 }
 
-$UserCache = & get_Cache( 'UserCache' );
+$UserCache = & get_UserCache( );
 /**
  * @var User
  */
@@ -94,6 +94,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/25 07:33:31  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.6  2009/08/30 00:54:46  fplanque
  * Cleaner userfield handling
  *

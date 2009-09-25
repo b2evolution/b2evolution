@@ -100,7 +100,7 @@ switch( $action )
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
 		$login = strtolower( $login );
 
-		$UserCache = & get_Cache( 'UserCache' );
+		$UserCache = & get_UserCache( );
 		if( $UserCache->get_by_login( $login ) )
 		{ // The login is already registered
 			param_error( 'login', sprintf( T_('The login &laquo;%s&raquo; is already registered, please choose another one.'), $login ) );
@@ -126,7 +126,7 @@ switch( $action )
 		$new_User->set( 'locale', $locale );
 		$newusers_grp_ID = $Settings->get('newusers_grp_ID');
 		// echo $newusers_grp_ID;
-		$GroupCache = & get_Cache( 'GroupCache' );
+		$GroupCache = & get_GroupCache();
 		$new_user_Group = & $GroupCache->get_by_ID( $newusers_grp_ID );
 		// echo $new_user_Group->disp('name');
 		$new_User->set_Group( $new_user_Group );
@@ -225,6 +225,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.99  2009/09/25 07:32:51  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.98  2009/09/22 16:37:59  efy-bogdan
  * Require country checkbox added
  *

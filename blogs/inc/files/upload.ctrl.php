@@ -106,7 +106,7 @@ $ads_list_path = false; // false by default, gets set if we have a valid root
  */
 $fm_FileRoot = NULL;
 
-$FileRootCache = & get_Cache( 'FileRootCache' );
+$FileRootCache = & get_FileRootCache();
 
 $available_Roots = $FileRootCache->get_available_FileRoots();
 
@@ -321,7 +321,7 @@ if( isset($_FILES) && count( $_FILES ) )
 		}
 
 		// Get File object for requested target location:
-		$FileCache = & get_Cache( 'FileCache' );
+		$FileCache = & get_FileCache( );
 		$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
 
 		if( $newFile->exists() )
@@ -429,6 +429,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.14  2009/09/14 13:01:31  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

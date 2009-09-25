@@ -155,7 +155,7 @@ class coll_media_index_Widget extends ComponentWidget
 
 		global $Blog;
 
-		$blogCache = get_Cache( 'BlogCache' );
+		$blogCache = & get_BlogCache( );
 		// fp> TODO: damn references!
 		$list_Blog = ( $this->disp_params[ 'blog_ID' ] ? $blogCache->get_by_ID( $this->disp_params[ 'blog_ID' ] ) : $Blog );
 
@@ -171,7 +171,7 @@ class coll_media_index_Widget extends ComponentWidget
 		//          overriding ItemListLigth::query() for starters ;)
 
 
-		$FileCache = & get_Cache( 'FileCache' );
+		$FileCache = & get_FileCache( );
 
 		$FileList = & new DataObjectList2( $FileCache );
 
@@ -288,6 +288,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/25 07:33:31  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.13  2009/09/19 13:02:51  tblue246
  * Media index: Do not show images from posts in the future, fixes: http://forums.b2evolution.net/viewtopic.php?t=19659
  *

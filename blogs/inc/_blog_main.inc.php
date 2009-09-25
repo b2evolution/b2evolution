@@ -52,7 +52,7 @@ $Timer->start( '_blog_main.inc' );
 param( 'blog', 'integer', '', false );
 
 // Getting current blog info:
-$BlogCache = & get_Cache( 'BlogCache' );
+$BlogCache = & get_BlogCache( );
 /**
  * @var Blog
  */
@@ -263,7 +263,7 @@ if( $resolve_extra_path )
 					}
 					elseif( preg_match( '|^[A-Za-z0-9\-_]+$|', $last_part ) )	// UNDERSCORES for catching OLD URLS!!!
 					{	// We are pointing to a chapter/category:
-						$ChapterCache = & get_Cache( 'ChapterCache' );
+						$ChapterCache = & get_ChapterCache( );
 						/**
 						 * @var Chapter
 						 */
@@ -321,7 +321,7 @@ if( !isset($timestamp_max) ) $timestamp_max = '';
 if( !empty($p) || !empty($title) )
 { // We are going to display a single post
 	// Make sure the single post we're requesting (still) exists:
-	$ItemCache = & get_Cache( 'ItemCache' );
+	$ItemCache = & get_ItemCache( );
 	if( !empty($p) )
 	{	// Get from post ID:
 		$Item = & $ItemCache->get_by_ID( $p, false );
@@ -342,7 +342,7 @@ if( !empty($p) || !empty($title) )
 
 		if( ! $tag_fallback && !empty($title) && empty($already_looked_into_chapters) )
 		{	// Let's try to fall back to a category/chapter...
-			$ChapterCache = & get_Cache( 'ChapterCache' );
+			$ChapterCache = & get_ChapterCache( );
 			/**
 			 * @var Chapter
 			 */
@@ -442,7 +442,7 @@ if( isset( $skin ) )
 		debug_die( 'The requested skin name is invalid.' );
 	}
 
-	$SkinCache = & get_cache( 'SkinCache' );
+	$SkinCache = & get_SkinCache( );
 	$Skin = & $SkinCache->new_obj( NULL, $skin );
 
 	if( $Skin->type == 'feed' )
@@ -468,7 +468,7 @@ if( isset( $skin ) )
 
 if( !isset( $skin ) && !empty($Blog->skin_ID) )	// Note: if $skin is set to '', then we want to do a "no skin" display
 { // Use default skin from the database
-	$SkinCache = & get_cache( 'SkinCache' );
+	$SkinCache = & get_SkinCache( );
 	$Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
 	$skin = $Skin->folder;
 }
@@ -596,6 +596,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.144  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.143  2009/09/24 00:32:28  blueyed
  * Add some timers. skin_display is taking too long - obviously.
  *

@@ -76,12 +76,12 @@ switch( $action )
 	case 'move_down':
 	case 'toggle':
 		param( 'wi_ID', 'integer', true );
-		$WidgetCache = & get_Cache( 'WidgetCache' );
+		$WidgetCache = & get_WidgetCache();
 		$edited_ComponentWidget = & $WidgetCache->get_by_ID( $wi_ID );
 		// Take blog from here!
 		// echo $edited_ComponentWidget->coll_ID;
  		set_working_blog( $edited_ComponentWidget->coll_ID );
-		$BlogCache = & get_Cache( 'BlogCache' );
+		$BlogCache = & get_BlogCache( );
 		$Blog = & $BlogCache->get_by_ID( $blog );
 
 		break;
@@ -113,7 +113,7 @@ switch( $display_mode )
 }
 
 // Get Skin used by current Blog:
-$SkinCache = & get_Cache( 'SkinCache' );
+$SkinCache = & get_SkinCache( );
 $Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
 // Make sure containers are loaded for that skin:
 $container_list = $Skin->get_containers();
@@ -507,6 +507,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.33  2009/09/25 07:33:30  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.32  2009/09/18 15:30:24  waltercruz
  * Fixing load_class for PHP5
  *

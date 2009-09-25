@@ -754,7 +754,7 @@ class DataObject
 	{
 		$history = array();
 
-		$UserCache = & get_Cache( 'UserCache' );
+		$UserCache = & get_UserCache( );
 
 		// HANDLE CREATOR STUFF
 		if( !empty($this->creator_field) && !empty($this->{$this->creator_field}) )
@@ -804,6 +804,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.24  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.23  2009/09/24 19:48:30  efy-maxim
  * validators
  *

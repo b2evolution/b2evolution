@@ -2621,7 +2621,7 @@ class Plugin
 	 */
 	function disable_event( $event )
 	{
-		$Plugins_admin = & get_Cache('Plugins_admin');
+		$Plugins_admin = & get_Plugins_admin();
 		return $Plugins_admin->set_event_status( $this->ID, $event, 0 );
 	}
 
@@ -2635,7 +2635,7 @@ class Plugin
 	 */
 	function enable_event( $event )
 	{
-		$Plugins_admin = & get_Cache('Plugins_admin');
+		$Plugins_admin = & get_Plugins_admin();
 		return $Plugins_admin->set_event_status( $this->ID, $event, 1 );
 	}
 
@@ -2897,6 +2897,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.31  2009/09/25 07:32:53  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.30  2009/09/23 21:37:03  blueyed
  * Unify Debuglogging of T_ methods.
  *

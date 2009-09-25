@@ -109,7 +109,7 @@ function _mw_get_cat_IDs( $contentstruct, $blog_ID, $empty_struct_ok = false )
 
 		// Check if category exists
 		// Tblue> Why is this needed?
-		$ChapterCache = & get_Cache('ChapterCache');
+		$ChapterCache = & get_ChapterCache();
 		if( $ChapterCache->get_by_ID( $cat_IDs[0], false ) === false )
 		{ // Main cat does not exist:
 			logIO('usererror 5 ...');
@@ -691,6 +691,9 @@ $xmlrpc_procs['metaWeblog.getUsersBlogs'] = array(
 
 /*
  * $Log$
+ * Revision 1.27  2009/09/25 07:33:31  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.26  2009/09/18 19:09:05  tblue246
  * XML-RPC: Check extracats in addition to maincat before calling check_perm(). Fixes debug_die()ing and sends an XML-RPC error instead.
  *

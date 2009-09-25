@@ -263,7 +263,7 @@ class BlogCache extends DataObjectCache
 		}
 		else
 		{
-			$UserCache = & get_Cache( 'UserCache' );
+			$UserCache = & get_UserCache( );
 			$for_User = & $UserCache->get_by_ID( $user_ID );
 		}
 		$for_User->get_Group();// ensure Group is set
@@ -357,6 +357,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.9  2009/09/14 12:43:05  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

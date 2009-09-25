@@ -99,7 +99,7 @@ else
  */
 if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 { // Load Requested iem:
-	$ItemCache = & get_Cache( 'ItemCache' );
+	$ItemCache = & get_ItemCache( );
 	if( ($edited_Item = & $ItemCache->get_by_ID( $item_ID, false )) === false )
 	{	// We could not find the contact to link:
 		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Item') ), 'error' );
@@ -110,7 +110,7 @@ if( param( 'item_ID', 'integer', NULL, true, false, false ) )
 
 if( param( 'user_ID', 'integer', NULL, true, false, false ) )
 { // Load Requested user:
-	$UserCache = & get_Cache( 'UserCache' );
+	$UserCache = & get_UserCache( );
 	if( ($edited_User = & $UserCache->get_by_ID( $user_ID, false )) === false )
 	{	// We could not find the contact to link:
 		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('User') ), 'error' );
@@ -163,7 +163,7 @@ $ads_list_path = false; // false by default, gets set if we have a valid root
  */
 $fm_FileRoot = NULL;
 
-$FileRootCache = & get_Cache( 'FileRootCache' );
+$FileRootCache = & get_FileRootCache();
 
 $available_Roots = $FileRootCache->get_available_FileRoots();
 
@@ -328,7 +328,7 @@ foreach( $fm_selected as $l_source_path )
  */
 if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 {
-	$LinkCache = & get_Cache( 'LinkCache' );
+	$LinkCache = & get_LinkCache( );
 	if( ($edited_Link = & $LinkCache->get_by_ID( $link_ID, false )) === false )
 	{	// We could not find the link to edit:
 		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Link') ), 'error' );
@@ -390,7 +390,7 @@ switch( $action )
 		/**
 		 * @var FileCache
 		 */
-		$FileCache = & get_Cache( 'FileCache' );
+		$FileCache = & get_FileCache( );
 		/**
 		 * @var File
 		 */
@@ -437,7 +437,7 @@ switch( $action )
 		}
 
 		// Try to get File object:
-		$FileCache = & get_Cache( 'FileCache' );
+		$FileCache = & get_FileCache( );
 		$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, $path.$create_name );
 
 		if( $newFile->exists() )
@@ -1370,7 +1370,7 @@ switch( $fm_mode )
 			}
 
 			// Check if destination file exists:
-			$FileCache = & get_Cache( 'FileCache' );
+			$FileCache = & get_FileCache( );
 			if( ($dest_File = & $FileCache->get_by_root_and_path( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID(), $fm_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] ))
 							&& $dest_File->exists() )
 			{ // Target exists
@@ -1418,7 +1418,7 @@ switch( $fm_mode )
 			while( $loop_src_File = & $fm_source_Filelist->get_next() )
 			{
 				// Get a pointer on dest file
-				$FileCache = & get_Cache( 'FileCache' );
+				$FileCache = & get_FileCache( );
 				$dest_File = & $FileCache->get_by_root_and_path( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID(), $fm_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()] );
 
 				if( $fm_mode == 'file_copy' )
@@ -1662,6 +1662,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.35  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.34  2009/09/15 19:31:55  fplanque
  * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
  * PHP 4 compatible. Even better on PHP 5.

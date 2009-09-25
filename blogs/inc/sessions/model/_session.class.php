@@ -316,7 +316,7 @@ class Session
 	{
 		if( !empty($this->user_ID) )
 		{
-			$UserCache = & get_Cache( 'UserCache' );
+			$UserCache = & get_UserCache( );
 			return $UserCache->get_by_ID( $this->user_ID );
 		}
 
@@ -546,6 +546,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.14  2009/09/14 14:36:16  tblue246
  * Fixing broken commits by efy-arrin
  *

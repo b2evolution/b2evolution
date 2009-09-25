@@ -27,7 +27,7 @@
  * @author evofactory-test
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version userfields.ctrl.php,v 1.5 2009/09/16 18:29:35 fplanque Exp
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -50,7 +50,7 @@ param_action();
 
 if( param( 'ufdf_ID', 'integer', '', true) )
 {// Load userfield from cache:
-	$UserfieldCache = & get_Cache( 'UserFieldCache' );
+	$UserfieldCache = & get_UserFieldCache( );
 	if( ($edited_Userfield = & $UserfieldCache->get_by_ID( $ufdf_ID, false )) === false )
 	{	// We could not find the user field to edit:
 		unset( $edited_Userfield );
@@ -257,7 +257,7 @@ $AdminUI->disp_payload_end();
 $AdminUI->disp_global_footer();
 
 /*
- * $Log$
+ * userfields.ctrl.php,v
  * Revision 1.5  2009/09/16 18:29:35  fplanque
  * doc
  *

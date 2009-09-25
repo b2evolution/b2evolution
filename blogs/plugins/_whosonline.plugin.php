@@ -195,7 +195,7 @@ class OnlineSessions
 
 		$timeout_YMD = date( 'Y-m-d H:i:s', ($localtimenow - $this->_timeout_online_user) );
 
-		$UserCache = & get_Cache( 'UserCache' );
+		$UserCache = & get_UserCache( );
 
 		// We get all sessions that have been seen in $timeout_YMD and that have a session key.
 		// NOTE: we do not use DISTINCT here, because guest users are all "NULL".
@@ -333,6 +333,9 @@ class OnlineSessions
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/25 07:33:31  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.7  2009/09/13 21:27:20  blueyed
  * SQL_NO_CACHE for SELECT queries using T_sessions
  *

@@ -39,7 +39,7 @@ global $rsc_url, $dispatcher;
 // Create result set:
 $Results = & new Results(
 							'SELECT * FROM T_filetypes', 'ftyp_' );
-$Results->Cache = & get_Cache( 'FiletypeCache' );
+$Results->Cache = & get_FiletypeCache();
 $Results->title = T_('File types list');
 
 $Results->cols[] = array(
@@ -133,6 +133,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.5  2009/07/06 23:52:24  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *

@@ -92,7 +92,7 @@ header_content_type( 'text/html' );
 		/**
 		 * @var BlogCache
 		 */
-		$BlogCache = & get_Cache('BlogCache');
+		$BlogCache = & get_BlogCache();
 		$BlogCache->load_all();
 
 		if( $pagenow == 'index.php' || count( $BlogCache->cache ) == 0 )

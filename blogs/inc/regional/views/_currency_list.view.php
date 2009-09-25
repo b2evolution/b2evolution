@@ -50,7 +50,7 @@ if( !empty($s) )
 // Create result set:
 $Results = & new Results( $SQL->get(), 'curr_' );
 
-$Results->Cache = & get_Cache( 'CurrencyCache' );
+$Results->Cache = & get_CurrencyCache( );
 
 $Results->title = T_('Currencies list');
 
@@ -123,6 +123,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.5  2009/09/12 18:57:27  efy-sergey
  * Added a search field to the currency tables
  *

@@ -34,7 +34,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
-	$SkinCache = & get_Cache( 'SkinCache' );
+	$SkinCache = & get_SkinCache( );
 	$SkinCache->load_all();
 
 	// TODO: this is like touching private parts :>
@@ -59,6 +59,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.6  2009/07/06 23:52:25  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *

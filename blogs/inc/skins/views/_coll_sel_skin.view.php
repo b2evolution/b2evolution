@@ -21,7 +21,7 @@ echo '<h2>'.sprintf( T_('New %s'), Blog::kind_name($kind) ).':</h2>';
 
 echo '<h3>'.T_('Pick a skin:').'</h3>';
 
-$SkinCache = & get_Cache( 'SkinCache' );
+$SkinCache = & get_SkinCache( );
 $SkinCache->load_all();
 
 // TODO: this is like touching private parts :>
@@ -40,6 +40,9 @@ echo '<div class="clear"></div>';
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.4  2009/05/23 20:20:18  fplanque
  * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
  *

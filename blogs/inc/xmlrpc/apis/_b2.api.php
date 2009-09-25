@@ -55,7 +55,7 @@ function b2_newpost($m)
 	$main_cat = $main_cat->scalarval();
 
 	// Check if category exists and can be used
-	$ChapterCache = & get_Cache('ChapterCache');
+	$ChapterCache = & get_ChapterCache();
 	if( $ChapterCache->get_by_ID( $main_cat, false ) === false )
 	{ // Cat does not exist:
 		return xmlrpcs_resperror( 11 );	// User error 11
@@ -176,6 +176,9 @@ $xmlrpc_procs['b2.getPostURL'] = array(
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/25 07:33:31  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.9  2009/09/18 19:09:04  tblue246
  * XML-RPC: Check extracats in addition to maincat before calling check_perm(). Fixes debug_die()ing and sends an XML-RPC error instead.
  *

@@ -124,7 +124,7 @@ class Chapter extends GenericCategory
 			}
 			else
 			{
-				$ChapterCache = & get_Cache( 'ChapterCache' );
+				$ChapterCache = & get_ChapterCache( );
 				$this->parent_Chapter = & $ChapterCache->get_by_ID( $this->parent_ID );
 			}
 		}
@@ -250,7 +250,7 @@ class Chapter extends GenericCategory
 	{
 		if( is_null($this->Blog) )
 		{
-			$BlogCache = & get_Cache( 'BlogCache' );
+			$BlogCache = & get_BlogCache( );
 			$this->Blog = & $BlogCache->get_by_ID( $this->blog_ID );
 		}
 	}
@@ -307,6 +307,9 @@ class Chapter extends GenericCategory
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.12  2009/09/14 12:26:25  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

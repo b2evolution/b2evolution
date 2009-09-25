@@ -39,7 +39,7 @@ param_action();
 
 if( param( 'goal_ID', 'integer', '', true) )
 {// Load file type:
-	$GoalCache = & get_Cache( 'GoalCache' );
+	$GoalCache = & get_GoalCache();
 	if( ($edited_Goal = & $GoalCache->get_by_ID( $goal_ID, false )) === false )
 	{	// We could not find the goal to edit:
 		unset( $edited_Goal );
@@ -267,6 +267,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.16  2009/09/19 20:49:51  fplanque
  * Cleaner way of implementing permissions.
  *

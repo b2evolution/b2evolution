@@ -297,7 +297,7 @@ header_content_type( 'text/html' );
 
 	<div class="bSideItem">
 		<?php
-		$BlogCache = & get_Cache( 'BlogCache' );
+		$BlogCache = & get_BlogCache( );
 		$Blog_B = & $BlogCache->get_by_ID( 2, false );
 		if( empty($Blog_B) )
 		{

@@ -72,7 +72,7 @@ if( $user_profile_only )
  * Load editable objects and set $action (while checking permissions)
  */
 
-$UserCache = & get_Cache( 'UserCache' );
+$UserCache = & get_UserCache( );
 
 if( ! is_null($user_ID) )
 { // User selected
@@ -590,7 +590,7 @@ if( !$Messages->count('error') )
 			param( 'plugin_ID', 'integer', true );
 			param( 'set_path' );
 
-			$admin_Plugins = & get_Cache('Plugins_admin');
+			$admin_Plugins = & get_Plugins_admin();
 			$admin_Plugins->restart();
 			$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 
@@ -609,7 +609,7 @@ if( !$Messages->count('error') )
 			param( 'plugin_ID', 'integer', true );
 			param( 'set_path', 'string', '' );
 
-			$admin_Plugins = & get_Cache('Plugins_admin');
+			$admin_Plugins = & get_Plugins_admin();
 			$admin_Plugins->restart();
 			$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 
@@ -687,6 +687,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.33  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.32  2009/09/24 20:45:47  fplanque
  * no message
  *

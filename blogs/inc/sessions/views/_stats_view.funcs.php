@@ -35,7 +35,7 @@ function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40 )
 {
 	if( !empty( $hit_blog_ID ) )
 	{
-		$BlogCache = & get_Cache( 'BlogCache' );
+		$BlogCache = & get_BlogCache( );
 		$tmp_Blog = & $BlogCache->get_by_ID( $hit_blog_ID );
 		$full_url = $tmp_Blog->get('baseurlroot').$hit_uri;
 	}
@@ -72,6 +72,9 @@ function stat_session_login( $login )
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.7  2009/09/20 00:27:08  fplanque
  * cleanup/doc/simplified
  *

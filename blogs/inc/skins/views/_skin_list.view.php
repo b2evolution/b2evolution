@@ -20,7 +20,7 @@ $Results = & new Results( 'SELECT T_skins__skin.*, COUNT(blog_ID) AS nb_blogs
 													 	 FROM T_skins__skin LEFT JOIN T_blogs ON skin_ID = blog_skin_ID
 													 	GROUP BY skin_ID',
 							'', '', NULL, 'SELECT COUNT( * ) FROM T_skins__skin' );
-$Results->Cache = & get_Cache( 'SkinCache' );
+$Results->Cache = & get_SkinCache( );
 $Results->title = T_('Installed skins');
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
@@ -89,6 +89,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.4  2009/03/08 23:57:46  fplanque
  * 2009
  *

@@ -443,7 +443,7 @@ class Group extends DataObject
 		global $DB;
 		// echo "checkin for $permname >= $permlevel on blog $perm_target_blog<br />";
 
-		$BlogCache = & get_Cache('BlogCache');
+		$BlogCache = & get_BlogCache();
     /**
 		 * @var Blog
 		 */
@@ -620,6 +620,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.23  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.22  2009/09/23 07:17:13  efy-bogdan
  *  load_from_Request added to Group class
  *

@@ -289,7 +289,7 @@ param( 'import_mode', 'string', 'normal' );
 				<div class="input">
 					<select name="default_blog">
 					<?php
-					$BlogCache = & get_Cache( 'BlogCache' );
+					$BlogCache = & get_BlogCache( );
 					echo $BlogCache->get_option_list( 2 );  // use first non-all blog as default
 					?>
 					</select>
@@ -334,7 +334,7 @@ param( 'import_mode', 'string', 'normal' );
 			<?php
 			form_text( 'default_password', $default_password, 20, 'Password for new users', 'this will be the password for users created during migration (default is "changeme")', 30 , '', 'password' );
 			form_text( 'default_password2', $default_password, 20, 'Confirm password', 'please confirm the password', 30 , '', 'password' );
-			$GroupCache = & get_Cache( 'GroupCache' );
+			$GroupCache = & get_GroupCache();
 			form_select_object( 'default_usergroup', $Settings->get('newusers_grp_ID'), $GroupCache, T_('User group') );
 			$field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://manual.b2evolution.net/User_levels"' );
 			form_text( 'default_userlevel', $Settings->get('newusers_level'), 2, T_('Level'), $field_note, 2 );
@@ -880,7 +880,7 @@ param( 'import_mode', 'string', 'normal' );
 
 					case 'createnew':
 						// check if the user already exists
-						$UserCache = & get_Cache( 'UserCache' );
+						$UserCache = & get_UserCache( );
 						$item_Author = & $UserCache->get_by_login( $usersmapped[ $post_author ][1] );
 
 						if( ! $item_Author )
@@ -891,7 +891,7 @@ param( 'import_mode', 'string', 'normal' );
 							$item_Author->set('pass', md5( $default_password ));
 							$item_Author->set('level', $default_userlevel);
 							$item_Author->set('email', '');
-							$GroupCache = & get_Cache( 'GroupCache' );
+							$GroupCache = & get_GroupCache();
 							$item_Author_Group = & $GroupCache->get_by_ID( $default_usergroup );
 							$item_Author->set_Group( $item_Author_Group );
 
@@ -1219,7 +1219,7 @@ function blog_load_cache()
 	global $DB, $cache_blogs;
 	if( empty($cache_blogs) )
 	{
-		$BlogCache = & get_Cache('BlogCache');
+		$BlogCache = & get_BlogCache();
 		$cache_blogs = array();
 
 		foreach( $DB->get_results( "SELECT * FROM T_blogs ORDER BY blog_ID", OBJECT, 'blog_load_cache()' ) as $this_blog )
@@ -1243,7 +1243,7 @@ function blog_load_cache()
  */
 function get_catname($cat_ID)
 {
-	$ChapterCache = & get_Cache('ChapterCache');
+	$ChapterCache = & get_ChapterCache();
 	$Chapter = & $ChapterCache->get_by_ID($cat_ID);
 	return $Chapter->name;
 }
@@ -1502,7 +1502,7 @@ function renderer_list()
 {
 	global $renderers;
 
-	$admin_Plugins = & get_Cache('Plugins_admin'); // use Plugins_admin, because a plugin might be disabled
+	$admin_Plugins = & get_Plugins_admin(); // use Plugins_admin, because a plugin might be disabled
 	$admin_Plugins->discover();
 
 	$renderers = array('default');
@@ -1674,6 +1674,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.14  2009/09/14 13:43:38  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

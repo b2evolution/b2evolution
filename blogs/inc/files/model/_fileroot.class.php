@@ -101,7 +101,7 @@ class FileRoot
 		switch( $root_type )
 		{
 			case 'user':
-				$UserCache = & get_Cache( 'UserCache' );
+				$UserCache = & get_UserCache( );
 				$User = & $UserCache->get_by_ID( $root_in_type_ID );
 				$this->name = $User->get( 'preferredname' ); //.' ('. /* TRANS: short for "user" */ T_('u').')';
 				$this->ads_path = $User->get_media_dir( $create );
@@ -109,7 +109,7 @@ class FileRoot
 				return;
 
 			case 'collection':
-				$BlogCache = & get_Cache( 'BlogCache' );
+				$BlogCache = & get_BlogCache( );
 				/**
 				 * @var Blog
 				 */
@@ -209,6 +209,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.9  2009/09/05 19:16:05  tblue246
  * Correct (?) if condition.
  *

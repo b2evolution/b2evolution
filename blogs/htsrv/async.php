@@ -65,7 +65,7 @@ switch( $action )
 
 		param( 'plugin_ID', 'integer', true );
 
-		$admin_Plugins = & get_Cache('Plugins_admin'); // use Plugins_admin, because a plugin might be disabled
+		$admin_Plugins = & get_Plugins_admin(); // use Plugins_admin, because a plugin might be disabled
 		$Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 		if( ! $Plugin )
 		{
@@ -115,6 +115,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.30  2009/09/25 07:32:51  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.29  2009/03/08 23:57:35  fplanque
  * 2009
  *

@@ -45,7 +45,7 @@ param( 'action', 'string' );
 
 if( param( 'ftyp_ID', 'integer', '', true) )
 {// Load file type:
-	$FiletypeCache = & get_Cache( 'FiletypeCache' );
+	$FiletypeCache = & get_FiletypeCache();
 	if( ($edited_Filetype = & $FiletypeCache->get_by_ID( $ftyp_ID, false )) === false )
 	{	// We could not find the file type to edit:
 		unset( $edited_Filetype );
@@ -225,6 +225,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.4  2009/08/30 19:54:24  fplanque
  * less translation messgaes for infrequent errors
  *

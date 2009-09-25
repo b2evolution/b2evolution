@@ -40,7 +40,7 @@ param( 'redirect_to', 'string', '' );
 $action = param_arrayindex( 'submit_comment_post_'.$comment_post_ID, 'save' );
 
 
-$ItemCache = & get_Cache( 'ItemCache' );
+$ItemCache = & get_ItemCache( );
 $commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
 
 if( ! $commented_Item->can_comment( NULL ) )
@@ -400,6 +400,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.134  2009/09/25 07:32:51  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.133  2009/09/14 14:03:02  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

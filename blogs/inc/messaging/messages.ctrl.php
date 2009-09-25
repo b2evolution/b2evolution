@@ -43,7 +43,7 @@ param_action();
 
 if( param( 'thrd_ID', 'integer', '', true) )
 {// Load thread from cache:
-	$ThreadCache = & get_Cache( 'ThreadCache' );
+	$ThreadCache = & get_ThreadCache( );
 	if( ($edited_Thread = & $ThreadCache->get_by_ID( $thrd_ID, false )) === false )
 	{	unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
@@ -57,7 +57,7 @@ $current_User->check_perm( 'messaging', 'write', true, $thrd_ID );
 
 if( param( 'msg_ID', 'integer', '', true) )
 {// Load message from cache:
-	$MessageCache = & get_Cache( 'MessageCache' );
+	$MessageCache = & get_MessageCache();
 	if( ($edited_Message = & $MessageCache->get_by_ID( $msg_ID, false )) === false )
 	{	unset( $edited_Message );
 		forget_param( 'msg_ID' );
@@ -176,6 +176,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.10  2009/09/19 20:31:38  efy-maxim
  * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
  *

@@ -51,7 +51,7 @@ param_action();
 
 if( param( 'curr_ID', 'integer', '', true) )
 {// Load currency from cache:
-	$CurrencyCache = & get_Cache( 'CurrencyCache' );
+	$CurrencyCache = & get_CurrencyCache( );
 	if( ($edited_Currency = & $CurrencyCache->get_by_ID( $curr_ID, false )) === false )
 	{	unset( $edited_Currency );
 		forget_param( 'curr_ID' );
@@ -257,6 +257,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.6  2009/09/03 14:08:04  fplanque
  * automated load_class()
  *

@@ -782,7 +782,7 @@ function create_demo_contents()
 	$edit_File = & new File( 'user', 1, 'faceyourmanga_admin_boy.png' );
 	// Load meta data AND MAKE SURE IT IS CREATED IN DB:
 	$edit_File->load_meta( true );
-	$UserCache = & get_Cache( 'UserCache' );
+	$UserCache = & get_UserCache( );
 	$User_Admin = & $UserCache->get_by_ID( 1 );
 	$User_Admin->set( 'avatar_file_ID', $edit_File->ID );
 	$User_Admin->dbupdate();
@@ -927,7 +927,7 @@ function create_demo_contents()
   /**
    * @var FileRootCache
    */
-	// $FileRootCache = & get_Cache( 'FileRootCache' );
+	// $FileRootCache = & get_FileRootCache();
 	// $FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $blog_photoblog_ID, true );
 
 	// Insert a post into photoblog:
@@ -1290,6 +1290,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.277  2009/09/25 07:33:31  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.276  2009/09/17 11:34:31  efy-maxim
  * reply permission in create and upgrade functionality
  *

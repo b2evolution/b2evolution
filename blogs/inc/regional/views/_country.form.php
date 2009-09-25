@@ -56,7 +56,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New country') : T_('Country') );
 
 	$Form->text_input( 'ctry_name', $edited_Country->name, 40, T_('Name'), '', array( 'maxlength'=> 40, 'required'=>true ) );
 
-	$CurrencyCache = & get_Cache( 'CurrencyCache' );
+	$CurrencyCache = & get_CurrencyCache( );
 
 	$Form->select_input_object( 'ctry_curr_ID', $edited_Country->curr_ID, $CurrencyCache, T_( 'Default Currency' ), array( 'allow_none' => true ) );
 
@@ -75,6 +75,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.8  2009/09/10 18:24:07  fplanque
  * doc
  *

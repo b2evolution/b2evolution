@@ -136,7 +136,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	echo '</td>';
 	echo '<td width="1%">&nbsp;&nbsp;<strong>'.T_('Type').':</strong></td>';
 	echo '<td width="1%" class="select">';
-	$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
+	$ItemTypeCache = & get_ItemTypeCache();
 	$Form->select_object( 'item_typ_ID', $edited_Item->ptyp_ID, $ItemTypeCache,
 								'', '', false, '', 'get_option_list_usable_only' );
 	echo '</td>';
@@ -283,7 +283,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 			echo ' '; // allow wrapping!
 
-			$ItemStatusCache = & get_Cache( 'ItemStatusCache' );
+			$ItemStatusCache = & get_ItemStatusCache();
 			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true ), T_('Task status') );
 
 			echo ' '; // allow wrapping!
@@ -425,6 +425,9 @@ if( $publishnow_displayed )
 
 /*
  * $Log$
+ * Revision 1.50  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.49  2009/08/22 20:31:01  tblue246
  * New feature: Post type permissions
  *

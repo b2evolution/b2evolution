@@ -59,7 +59,7 @@ else
 
 // Create result set:
 $Results = & new Results( $sql, 'blog_' );
-$Results->Cache = & get_Cache( 'BlogCache' );
+$Results->Cache = & get_BlogCache( );
 $Results->title = T_('Blog list');
 $Results->no_results_text = $no_results;
 
@@ -215,6 +215,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.7  2009/03/08 23:57:42  fplanque
  * 2009
  *

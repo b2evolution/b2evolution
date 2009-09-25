@@ -473,7 +473,7 @@ function validate_filename( $filename, $allow_locked_filetypes = false )
 	// Check extension filename
 	if( preg_match( '#\.([a-zA-Z0-9\-_]+)$#', $filename, $match ) )
 	{ // Filename has a valid extension
-		$FiletypeCache = & get_Cache( 'FiletypeCache' );
+		$FiletypeCache = & get_FiletypeCache();
 		if( $Filetype = & $FiletypeCache->get_by_extension( strtolower( $match[1] ) , false ) )
 		{
 			if( $Filetype->allowed || $allow_locked_filetypes )
@@ -594,7 +594,7 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 	// ________________________ Handle Roots ______________________
 	if( $Root === NULL )
 	{ // We want to list all roots:
-		$FileRootCache = & get_Cache( 'FileRootCache' );
+		$FileRootCache = & get_FileRootCache();
 		$_roots = $FileRootCache->get_available_FileRoots();
 
 		foreach( $_roots as $l_Root )
@@ -801,6 +801,9 @@ function is_absolute_pathname($path)
 
 /*
  * $Log$
+ * Revision 1.23  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.22  2009/09/11 19:35:24  blueyed
  * imgsize: add "widthheight_assoc" format param, which returns an associative array
  *

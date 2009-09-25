@@ -109,7 +109,7 @@ header_content_type( 'text/html' );
 
 	load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 
-	$BlogCache = & get_Cache( 'BlogCache' );
+	$BlogCache = & get_BlogCache( );
 
 	$blog_array = $BlogCache->load_public( 'ID' );
 

@@ -69,7 +69,7 @@ switch( $action )
 	case 'retrievepassword': // Send passwort change request by mail
 		$login_required = true; // Do not display "Without login.." link on the form
 
-		$UserCache = & get_Cache( 'UserCache' );
+		$UserCache = & get_UserCache( );
 		$ForgetfulUser = & $UserCache->get_by_login( $login );
 
 		if( ! $ForgetfulUser )
@@ -143,7 +143,7 @@ switch( $action )
 		param( 'reqID', 'string', '' );
 		param( 'sessID', 'integer', '' );
 
-		$UserCache = & get_Cache( 'UserCache' );
+		$UserCache = & get_UserCache( );
 		$ForgetfulUser = & $UserCache->get_by_login($login);
 
 		if( ! $ForgetfulUser || empty($reqID) )
@@ -417,6 +417,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.107  2009/09/25 07:32:51  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.106  2009/05/28 20:57:22  blueyed
  * Rolling back additional activation of locale in htsrv (register, login). http://forums.b2evolution.net/viewtopic.php?p=92006#92006
  *

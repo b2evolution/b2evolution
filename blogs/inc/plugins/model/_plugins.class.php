@@ -502,7 +502,7 @@ class Plugins
 					if( empty($db_deltas) )
 					{ // No DB changes needed, update (bump or decrease) the version
 						global $DB;
-						$Plugins_admin = & get_Cache('Plugins_admin');
+						$Plugins_admin = & get_Plugins_admin();
 
 						// Update version in DB:
 						$DB->query( '
@@ -1884,7 +1884,7 @@ class Plugins
 	{
 		global $Debuglog;
 		$Debuglog->add('Call to deprecated method Plugins::count_regs()', 'deprecated');
-		$Plugins_admin = & get_Cache('Plugins_admin');
+		$Plugins_admin = & get_Plugins_admin();
 		return $Plugins_admin->count_regs($classname);
 	}
 
@@ -1899,7 +1899,7 @@ class Plugins
 	 */
 	function set_apply_rendering( $plugin_ID, $apply_rendering )
 	{
-		$Plugins_admin = & get_Cache('Plugins_admin');
+		$Plugins_admin = & get_Plugins_admin();
 		return $Plugins_admin->set_apply_rendering($plugin_ID, $apply_rendering);
 	}
 
@@ -1926,6 +1926,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.18  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.17  2009/09/20 00:27:08  fplanque
  * cleanup/doc/simplified
  *

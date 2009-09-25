@@ -152,7 +152,7 @@ class ItemList2 extends ItemListLight
 		// Typically stuff that will help the content to validate
 		// Useful for code display.
 		// Will probably be used for validation also.
-		$Plugins_admin = & get_Cache('Plugins_admin');
+		$Plugins_admin = & get_Plugins_admin();
 		$Plugins_admin->filter_contents( $post_title /* by ref */, $content /* by ref */, $renderers );
 
 		$post_title = format_to_post( $post_title );
@@ -718,6 +718,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.25  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.24  2009/09/14 13:17:28  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

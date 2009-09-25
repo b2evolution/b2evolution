@@ -74,7 +74,7 @@ class FileRootCache
 
 		if( isset($collections_Module) )
 		{	// Blog/collection media dirs:
-			$BlogCache = & get_Cache( 'BlogCache' );
+			$BlogCache = & get_BlogCache( );
 			$bloglist = $BlogCache->load_user_blogs( 'blog_media_browse', $current_User->ID );
 			foreach( $bloglist as $blog_ID )
 			{
@@ -166,6 +166,9 @@ class FileRootCache
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.6  2009/09/14 13:04:53  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

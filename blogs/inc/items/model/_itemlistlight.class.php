@@ -930,7 +930,7 @@ class ItemListLight extends DataObjectList2
 		if( !empty($this->filters['cat_array']) )
 		{ // We have requested specific categories...
 			$cat_names = array();
-			$ChapterCache = & get_Cache('ChapterCache');
+			$ChapterCache = & get_ChapterCache();
 			foreach( $this->filters['cat_array'] as $cat_ID )
 			{
 				if( ($my_Chapter = & $ChapterCache->get_by_ID($cat_ID, false) ) !== false )
@@ -1514,6 +1514,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.34  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.33  2009/09/20 23:52:34  blueyed
  * Add dateformat param to get_lastpostdate
  *

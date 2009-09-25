@@ -57,7 +57,7 @@ class coll_item_list_Widget extends ComponentWidget
 		/**
 		 * @var ItemTypeCache
 		 */
-		$ItemTypeCache = & get_Cache( 'ItemTypeCache' );
+		$ItemTypeCache = & get_ItemTypeCache();
 		$item_type_options = 
 			array(
 				'#' => T_('Default'),
@@ -391,6 +391,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/25 07:33:31  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.15  2009/09/16 20:27:26  tblue246
  * Fix fatal error
  *

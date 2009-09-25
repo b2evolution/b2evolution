@@ -142,7 +142,7 @@ class coll_category_list_Widget extends ComponentWidget
 		/**
 		 * @var ChapterCache
 		 */
-		$ChapterCache = & get_Cache( 'ChapterCache' );
+		$ChapterCache = & get_ChapterCache( );
 
 		$callbacks = array(
 			'line'         => array( $this, 'cat_line' ),
@@ -194,7 +194,7 @@ class coll_category_list_Widget extends ComponentWidget
 		else
 		{ // ____________________ We want to display cats for SEVERAL blogs ____________________
 
-			$BlogCache = & get_Cache( 'BlogCache' );
+			$BlogCache = & get_BlogCache( );
 
 			// Make sure everything is loaded at once (vs multiple queries)
 			// fp> TODO: scaling
@@ -397,6 +397,9 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.23  2009/09/25 07:33:31  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.22  2009/09/14 13:54:13  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

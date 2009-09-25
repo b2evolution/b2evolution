@@ -59,7 +59,7 @@ $Form->begin_fieldset( T_('Default user permissions') );
 
 	$Form->checkbox( 'newusers_canregister', $Settings->get('newusers_canregister'), T_('New users can register'), T_('Check to allow new users to register themselves.' ) );
 
-	$GroupCache = & get_Cache( 'GroupCache' );
+	$GroupCache = & get_GroupCache();
 	$Form->select_object( 'newusers_grp_ID', $Settings->get('newusers_grp_ID'), $GroupCache, T_('Group for new users'), T_('Groups determine user roles and permissions.') );
 
 	$Form->text_input( 'newusers_level', $Settings->get('newusers_level'), 1, T_('Level for new users'), T_('Levels determine hierarchy of users in blogs.' ), array( 'maxlength'=>1, 'required'=>true ) );
@@ -104,6 +104,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/25 07:33:15  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.5  2009/09/16 05:35:49  efy-bogdan
  * Require country checkbox added
  *

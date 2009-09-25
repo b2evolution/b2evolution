@@ -20,7 +20,7 @@ require_once dirname(__FILE__).'/conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
-$BlogCache = & get_Cache( 'BlogCache' );
+$BlogCache = & get_BlogCache( );
 
 if( preg_match( '#^(.+?)index.php/([^/]+)#', $ReqHost.$ReqPath, $matches ) )
 { // We have an URL blog name:

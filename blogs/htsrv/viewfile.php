@@ -73,7 +73,7 @@ if ( false !== strpos( urldecode( $path ), '..' ) )
 }
 
 // Load fileroot infos
-$FileRootCache = & get_Cache( 'FileRootCache' );
+$FileRootCache = & get_FileRootCache();
 $FileRoot = & $FileRootCache->get_by_ID( $root );
 
 // Create file object
@@ -256,6 +256,9 @@ switch( $viewtype )
 <?php
 /*
  * $Log$
+ * Revision 1.25  2009/09/25 07:32:52  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.24  2009/08/29 12:23:55  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

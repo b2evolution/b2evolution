@@ -51,7 +51,7 @@ param_action();
 
 if( param( 'ctry_ID', 'integer', '', true) )
 {// Load country from cache:
-	$CountryCache = & get_Cache( 'CountryCache' );
+	$CountryCache = & get_CountryCache( );
 	if( ($edited_Country = & $CountryCache->get_by_ID( $ctry_ID, false )) === false )
 	{	unset( $edited_Country );
 		forget_param( 'ctry_ID' );
@@ -257,6 +257,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/25 07:33:14  efy-cantor
+ * replace get_cache to get_*cache
+ *
  * Revision 1.4  2009/09/10 18:24:07  fplanque
  * doc
  *
