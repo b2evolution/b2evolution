@@ -40,6 +40,8 @@ if( ! defined( 'E_DEPRECATED' ) )
 }
 else
 {	// Hopefully temporary fix for PHP >= v5.3 (Assigning the return value of new by reference is deprecated)
+	// Tblue> This doesn't work properly on PHP 5.3... For some reason, you have to set error_reporting to
+	// the desired value in php.ini -- error_reporting() and even ini_set() fail.
 	error_reporting( E_ALL & ~E_DEPRECATED );
 }
 
