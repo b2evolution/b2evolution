@@ -290,7 +290,7 @@ class sessions_Module extends Module
 		 */
 		global $AdminUI;
 
-		if( $blog == 0 && $current_User->check_perm( 'stats', 'view' ) )
+		if( $current_User->check_perm( 'stats', 'view' ) )
 		{	// Viewing aggregate + Permission to view stats for ALL blogs:
 			$sessions_menu = array(
 				'sessions' => array(
@@ -343,6 +343,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.23  2009/09/25 20:45:41  fplanque
+ * fix
+ *
  * Revision 1.22  2009/09/21 03:14:35  fplanque
  * modularized a little more
  *
