@@ -129,7 +129,7 @@ class Session
 				$Debuglog->add( 'Session ID received from cookie: '.$session_id_by_cookie, 'session' );
 
 				$row = $DB->get_row( '
-					SELECT SQL_NO_CACHE sess_ID, sess_key, sess_data, sess_user_ID
+					SELECT sess_ID, sess_key, sess_data, sess_user_ID
 					  FROM T_sessions
 					 WHERE sess_ID  = '.$DB->quote($session_id_by_cookie).'
 					   AND sess_key = '.$DB->quote($session_key_by_cookie).'
@@ -546,6 +546,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/25 19:12:39  blueyed
+ * Allow caching for the load-session-data query. After all, a user might click somewhere before the next one arrives (re query cache).
+ *
  * Revision 1.15  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *
