@@ -244,7 +244,7 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_items__type' => array(
 		'Creating table for Post Types',
 		"CREATE TABLE T_items__type (
-			ptyp_ID   int(11) unsigned not null AUTO_INCREMENT,
+			ptyp_ID   int(11) unsigned not null auto_increment,
 			ptyp_name varchar(30)      not null,
 			primary key (ptyp_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

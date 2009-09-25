@@ -56,6 +56,9 @@ class ItemType extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_items__type', 'ptyp_', 'ptyp_ID' );
 
+		// Allow inseting specific IDs
+		$this->allow_ID_insert = true;
+		
 		$this->delete_restrictions = array(
 				array( 'table'=>'T_ityp_col', 'fk'=>'itco_ityp_ID', 'msg'=>T_('%d related collections') ), // "Lignes de missions"
 				array( 'table'=>'T_items__item', 'fk'=>'post_ptyp_ID', 'msg'=>T_('%d related items') ), // "Lignes de visit reports"
@@ -67,6 +70,27 @@ class ItemType extends DataObject
 			$this->name  			 = $db_row->ptyp_name 	;
 		}
 	}
+	
+	/**
+	 * Load data from Request form fields.
+	 *
+	 * @return boolean true if loaded data seems valid.
+	 */
+	function load_from_Request()
+	{
+		// get new ID
+		if( param( 'new_ptyp_ID', 'string', NULL ) !== NULL )
+		{
+			param_check_number( 'new_ptyp_ID', T_('ID must be a number'), true );
+			$this->set_from_Request( 'ID', 'new_ptyp_ID' );
+		}
+
+		// Name
+		param_string_not_empty( 'ptyp_name', T_('Please enter a name.') );
+		$this->set_from_Request( 'name' );
+
+		return ! param_errors_detected();
+	}
 
 	/**
 	 * Get the name of the ItemType
@@ -76,10 +100,38 @@ class ItemType extends DataObject
 	{
 		return $this->name;
 	}
+	
+	/**
+	 * Check existence of specified item type ID in ptyp_ID unique field.
+	 *
+	 * @return int ID if item type exists otherwise NULL/false
+	 */
+	function dbexists()
+	{
+		global $DB;
+
+		$sql = "SELECT $this->dbIDname
+						  FROM $this->dbtablename
+					   WHERE $this->dbIDname = $this->ID";
+
+		return $DB->get_var( $sql );
+	}
+	
+	/**
+	 *  Returns array, which determinate the lower and upper limit of protected ID's
+	 *  @return array
+	 */
+	function get_reserved_ids()
+	{
+		return array( 1000, 5000 );
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/25 11:36:44  efy-sergey
+ * Replaced "simple list" manager for Post types. Also allow to edit ID for Item types
+ *
  * Revision 1.4  2009/09/14 13:17:28  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
