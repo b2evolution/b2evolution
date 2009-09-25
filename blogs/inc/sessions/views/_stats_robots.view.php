@@ -37,18 +37,18 @@ echo '<h2>'.T_('Robot hits').'</h2>';
 echo '<p class="notes">'.sprintf( T_('This page only includes hits identified as made by <a %s>indexing robots</a> a.k.a. web crawlers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_robot=1&amp;blog='.$blog.'"' ).'</p>';
 echo '<p class="notes">'.T_('In order to be detected, robots must be listed in /conf/_stats.php.').'</p>';
 
-$sql = "
-	SELECT SQL_NO_CACHE COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS year,
-			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
-		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-	 WHERE agnt_type = 'robot'";
+$SQL = & new SQL();
+$SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS year,'
+	. 'EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day' );
+$SQL->FROM( 'T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID' );
+$SQL->WHERE( 'agnt_type = "robot"' );
 if( $blog > 0 )
 {
-	$sql .= ' AND hit_blog_ID = '.$blog;
+	$SQL->WHERE_and( 'hit_blog_ID = ' . $blog );
 }
-$sql .= ' GROUP BY year, month, day
-					ORDER BY year DESC, month DESC, day DESC';
-$res_hits = $DB->get_results( $sql, ARRAY_A, 'Get robot summary' );
+$SQL->GROUP_BY( 'year, month, day' );
+$SQL->ORDER_BY( 'year DESC, month DESC, day DESC' );
+$res_hits = $DB->get_results( $SQL->get(), ARRAY_A, 'Get robot summary' );
 
 
 /*
@@ -98,24 +98,23 @@ if( count($res_hits) )
 // TOP INDEXING ROBOTS
 
 // Create result set:
-$sql = "SELECT SQL_NO_CACHE COUNT(*) AS hit_count, agnt_signature
-					FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-				 WHERE agnt_type = 'robot' "
-				 			.( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog ).'
-				 GROUP BY agnt_signature';
+$SQL = & new SQL();
+$SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS hit_count, agnt_signature' );
+$SQL->FROM( 'T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID' );
+$SQL->WHERE( 'agnt_type = "robot"' );
+if( ! empty( $blog ) )
+	$SQL->WHERE_and( 'hit_blog_ID = ' . $blog );
+$SQL->GROUP_BY( 'agnt_signature' );
 
-$count_sql = "SELECT SQL_NO_CACHE COUNT( DISTINCT agnt_signature )
-								FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-							 WHERE agnt_type = 'robot' "
-							 .( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog );
+$CountSQL = & new SQL();
+$CountSQL->SELECT( 'SQL_NO_CACHE COUNT( DISTINCT agnt_signature )' );
+$CountSQL->FROM( $SQL->get_from( '' ) );
+$CountSQL->WHERE( $SQL->get_where( '' ) );
 
-$Results = & new Results( $sql, 'topidx', '-D', 20, $count_sql );
+$Results = & new Results( $SQL->get(), 'topidx', '-D', 20, $CountSQL->get() );
 
-$total_hit_count = $DB->get_var( "
-		SELECT SQL_NO_CACHE COUNT(*)
-			FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-		 WHERE agnt_type = 'robot' "
-		.( empty($blog) ? '' : 'AND hit_blog_ID = '.$blog ) );
+$CountSQL->SELECT( 'SQL_NO_CACHE COUNT(*)' );
+$total_hit_count = $DB->get_var( $CountSQL->get() );
 
 $Results->title = T_('Top Indexing Robots');
 
@@ -167,6 +166,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/25 13:09:36  efy-vyacheslav
+ * Using the SQL class to prepare queries
+ *
  * Revision 1.8  2009/09/13 21:26:50  blueyed
  * SQL_NO_CACHE for SELECT queries using T_hitlog
  *

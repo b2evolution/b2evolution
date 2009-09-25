@@ -38,13 +38,16 @@ global $blog, $admin_url, $rsc_url;
 <p class="notes"><?php echo T_('These are browser hits from people who came to this blog system by direct access (either by typing the URL directly, or using a bookmark. Invalid (too short) referers are also listed here.)') ?></p>
 <?php
 // Create result set:
-$Results = & new Results( "
-	SELECT SQL_NO_CACHE hit_ID, hit_datetime, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname
-		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-				 LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
-	 WHERE hit_referer_type = 'direct'
-		 AND agnt_type = 'browser'"
-		.( empty($blog) ? '' : "AND hit_blog_ID = $blog "), 'lstref_', 'D' );
+
+$SQL = & new SQL();
+$SQL->SELECT( 'SQL_NO_CACHE hit_ID, hit_datetime, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname' );
+$SQL->FROM( 'T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID'
+	. ' LEFT JOIN T_blogs ON hit_blog_ID = blog_ID' );
+$SQL->WHERE( 'hit_referer_type = "direct" AND agnt_type = "browser"' );
+if( ! empty( $blog ) )
+	$SQL->WHERE_and( 'hit_blog_ID = ' . $blog );
+	
+$Results = & new Results( $SQL->get(), 'lstref_', 'D' );
 
 $Results->title = T_('Direct browser hits');
 
@@ -96,6 +99,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/25 13:09:36  efy-vyacheslav
+ * Using the SQL class to prepare queries
+ *
  * Revision 1.6  2009/09/13 21:26:50  blueyed
  * SQL_NO_CACHE for SELECT queries using T_hitlog
  *

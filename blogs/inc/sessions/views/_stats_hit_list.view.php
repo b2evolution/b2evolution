@@ -39,33 +39,39 @@ $sess_ID = param( 'sess_ID', 'integer', NULL, true );
 $remote_IP = param( 'remote_IP', 'string', NULL, true );
 
 // Create result set:
-$sql = 'SELECT SQL_NO_CACHE hit_ID, sess_ID, hit_datetime, hit_referer_type, hit_uri, hit_blog_ID, hit_referer, hit_remote_addr,
-								user_login, agnt_type, blog_shortname, dom_name, goal_name, keyp_phrase, hit_serprank
-					FROM T_hitlog LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
-							  LEFT JOIN T_track__keyphrase ON hit_keyphrase_keyp_ID = keyp_ID
-								LEFT JOIN T_sessions ON hit_sess_ID = sess_ID
-								LEFT JOIN T_useragents ON hit_agnt_ID = agnt_ID
-								LEFT JOIN T_blogs ON hit_blog_ID = blog_ID
-								LEFT JOIN T_users ON sess_user_ID = user_ID
-								LEFT JOIN T_track__goalhit ON hit_ID = ghit_hit_ID
-								LEFT JOIN T_track__goal ON ghit_goal_ID = goal_ID';
-$count_sql = 'SELECT SQL_NO_CACHE COUNT(hit_ID)
-								FROM T_hitlog';
+
+$SQL = & new SQL();
+$SQL->SELECT( 'SQL_NO_CACHE hit_ID, sess_ID, hit_datetime, hit_referer_type, hit_uri, hit_blog_ID, hit_referer, hit_remote_addr,'
+	. 'user_login, agnt_type, blog_shortname, dom_name, goal_name, keyp_phrase, hit_serprank' );
+$SQL->FROM( 'T_hitlog LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID'
+	. ' LEFT JOIN T_track__keyphrase ON hit_keyphrase_keyp_ID = keyp_ID'
+	. ' LEFT JOIN T_sessions ON hit_sess_ID = sess_ID'
+	. ' LEFT JOIN T_useragents ON hit_agnt_ID = agnt_ID'
+	. ' LEFT JOIN T_blogs ON hit_blog_ID = blog_ID'
+	. ' LEFT JOIN T_users ON sess_user_ID = user_ID'
+	. ' LEFT JOIN T_track__goalhit ON hit_ID = ghit_hit_ID'
+	. ' LEFT JOIN T_track__goal ON ghit_goal_ID = goal_ID' );
+
+$CountSQL = & new SQL();
+$CountSQL->SELECT( 'SQL_NO_CACHE COUNT(hit_ID)' );
+$CountSQL->FROM( 'T_hitlog' );
 
 $operator = ($exclude ? ' <> ' : ' = ' );
 
-if( !empty($sess_ID) )
+if( ! empty( $sess_ID ) )
 {	// We want to filter on the session ID:
-	$sql .= ' WHERE hit_sess_ID'.$operator.$sess_ID;
-	$count_sql .= ' WHERE hit_sess_ID'.$operator.$sess_ID;
+	$filter = 'hit_sess_ID' . $operator . $sess_ID;
+	$SQL->WHERE( $filter );
+	$CountSQL->WHERE( $filter );
 }
 elseif( !empty($remote_IP) ) // TODO: allow combine
 { // We want to filter on the goal name:
-	$sql .= ' WHERE hit_remote_addr'.$operator.$DB->quote($remote_IP);
-	$count_sql .= ' WHERE hit_remote_addr'.$operator.$DB->quote($remote_IP);
+	$filter = 'hit_remote_addr' . $operator . $DB->quote( $remote_IP );
+	$SQL->WHERE( $filter );
+	$CountSQL->WHERE( $filter );
 }
 
-$Results = & new Results( $sql, 'hits_', '--D', 20, $count_sql );
+$Results = & new Results( $SQL->get(), 'hits_', '--D', 20, $CountSQL->get() );
 
 $Results->title = T_('Recent hits');
 
@@ -177,6 +183,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/25 13:09:36  efy-vyacheslav
+ * Using the SQL class to prepare queries
+ *
  * Revision 1.8  2009/09/20 00:27:08  fplanque
  * cleanup/doc/simplified
  *

@@ -50,10 +50,11 @@ global $admin_Plugins;
 global $edit_Plugin;
 load_funcs('plugins/_plugin.funcs.php');
 
+$SQL = & new SQL();
+$SQL->SELECT( 'plug_status, plug_ID, plug_priority, plug_code, plug_apply_rendering' );
+$SQL->FROM( 'T_plugins' );
 
-$Results = new Results( '
-	SELECT plug_status, plug_ID, plug_priority, plug_code, plug_apply_rendering FROM T_plugins',
-	'plug_', '-A-' /* by name */, 0 /* no limit */ );
+$Results = new Results( $SQL->get(), 'plug_', '-A-' /* by name */, 0 /* no limit */ );
 
 $Results->Cache = & $admin_Plugins;
 
@@ -278,6 +279,9 @@ unset($Results); // free memory
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/25 13:09:36  efy-vyacheslav
+ * Using the SQL class to prepare queries
+ *
  * Revision 1.4  2009/07/08 05:24:42  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *

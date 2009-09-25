@@ -67,29 +67,25 @@ else
 	set_param( 'keywords2', $keywords );
 }
 
-$where_clause = '';
+$SQL = & new SQL();
+$SQL->SELECT( 'user_ID, user_login, user_level, bloguser_perm_poststatuses, bloguser_perm_edit, bloguser_ismember,'
+	. 'bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,'
+	. 'bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,'
+	. 'bloguser_perm_media_browse, bloguser_perm_media_change, bloguser_perm_page,'
+	. 'bloguser_perm_intro, bloguser_perm_podcast, bloguser_perm_sidebar' );
+$SQL->FROM( 'T_users LEFT JOIN T_coll_user_perms ON user_ID = bloguser_user_ID' );
+$SQL->WHERE( 'bloguser_blog_ID = ' . $edited_Blog->ID );
+$SQL->ORDER_BY( 'bloguser_ismember DESC, *, user_login, user_ID' );
 
 if( !empty( $keywords ) )
 {
-	$kw_array = split( ' ', $keywords );
-	foreach( $kw_array as $kw )
-	{
-		// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
-		$where_clause .= 'CONCAT_WS( " ", user_login, user_firstname, user_lastname, user_nickname, user_email) LIKE "%'.$DB->escape($kw).'%" AND ';
-	}
+	$SQL->add_search_field( 'user_login' );
+	$SQL->add_search_field( 'user_firstname' );
+	$SQL->add_search_field( 'user_lastname' );
+	$SQL->add_search_field( 'user_nickname' );
+	$SQL->add_search_field( 'user_email' );
+	$SQL->WHERE_keyword( split( ' ', $keywords ), 'AND' );
 }
-
-$sql = 'SELECT user_ID, user_login, user_level, bloguser_perm_poststatuses, bloguser_perm_edit, bloguser_ismember,
-													bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,
-													bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,
-													bloguser_perm_media_browse, bloguser_perm_media_change, bloguser_perm_page,
-													bloguser_perm_intro, bloguser_perm_podcast, bloguser_perm_sidebar
-					FROM T_users LEFT JOIN T_coll_user_perms ON (
-				 						user_ID = bloguser_user_ID
-										AND bloguser_blog_ID = '.$edited_Blog->ID.' )
-				 WHERE '.$where_clause.' 1
-				 ORDER BY bloguser_ismember DESC, *, user_login, user_ID';
-
 
 
 // Display layout selector:
@@ -117,7 +113,7 @@ echo '</div>';
 <?php
 
 
-$Results = & new Results( $sql, 'colluser_' );
+$Results = & new Results( $SQL->get(), 'colluser_' );
 
 // Tell the Results class that we already have a form for this page:
 $Results->Form = & $Form;
@@ -550,6 +546,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/25 13:07:49  efy-vyacheslav
+ * Using the SQL class to prepare queries
+ *
  * Revision 1.7  2009/09/12 00:21:03  fplanque
  * search cleanup
  *

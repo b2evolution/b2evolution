@@ -28,22 +28,22 @@ global $Blog;
  */
 global $edited_Item;
 
-
-$sql = 'SELECT "'.$edited_Item->mod_date.'" AS iver_edit_datetime, "'.$edited_Item->lastedit_user_ID.'" AS user_login, "Current version" AS action
-UNION
-	SELECT iver_edit_datetime, user_login,  "Archived version" AS action
-		FROM T_items__version LEFT JOIN T_users ON iver_edit_user_ID = user_ID
-		WHERE iver_itm_ID = '.$edited_Item->ID;
+$sql1 = 'SELECT "'.$edited_Item->mod_date.'" AS iver_edit_datetime, "'.$edited_Item->lastedit_user_ID.'" AS user_login, "Current version" AS action';
+$SQL = & new SQL();
+$SQL->SELECT( 'iver_edit_datetime, user_login,  "Archived version" AS action' );
+$SQL->FROM( 'T_items__version LEFT JOIN T_users ON iver_edit_user_ID = user_ID' );
+$SQL->WHERE( 'iver_itm_ID = ' . $edited_Item->ID );
 // fp> not actually necessary:
 // UNION
 // SELECT "'.$edited_Item->datecreated.'" AS iver_edit_datetime, "'.$edited_Item->creator_user_ID.'" AS user_login, "First version" AS action';
 
-$count_sql = 'SELECT COUNT(*)+1
-FROM T_items__version
-WHERE iver_itm_ID = '.$edited_Item->ID;
+$CountSQL = & new SQL();
+$CountSQL->SELECT( 'COUNT(*)+1' );
+$CountSQL->FROM( 'T_items__version' );
+$CountSQL->WHERE( $SQL->get_where( '' ) );
 
 // Create result set:
-$Results = & new Results( $sql, 'iver_', 'D', NULL, $count_sql );
+$Results = & new Results( $sql1 . ' UNION ' . $SQL->get(), 'iver_', 'D', NULL, $CountSQL->get() );
 
 $Results->title = T_('Item history (experimental) for:').' '.$edited_Item->get_title();
 
@@ -76,6 +76,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.3  2009/09/25 13:09:36  efy-vyacheslav
+ * Using the SQL class to prepare queries
+ *
  * Revision 1.2  2009/03/08 23:57:44  fplanque
  * 2009
  *

@@ -16,11 +16,19 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Create result set:
-$Results = & new Results( 'SELECT T_skins__skin.*, COUNT(blog_ID) AS nb_blogs
-													 	 FROM T_skins__skin LEFT JOIN T_blogs ON skin_ID = blog_skin_ID
-													 	GROUP BY skin_ID',
-							'', '', NULL, 'SELECT COUNT( * ) FROM T_skins__skin' );
+$SQL = & new SQL();
+$SQL->SELECT( 'T_skins__skin.*, COUNT(blog_ID) AS nb_blogs' );
+$SQL->FROM( 'T_skins__skin LEFT JOIN T_blogs ON skin_ID = blog_skin_ID' );
+$SQL->GROUP_BY( 'skin_ID' );
+
+$CountSQL = & new SQL();
+$CountSQL->SELECT( 'COUNT( * )' );
+$CountSQL->FROM( 'T_skins__skin' );
+
+$Results = & new Results( $SQL->get(), '', '', NULL, $CountSQL->get() );
+
 $Results->Cache = & get_SkinCache( );
+
 $Results->title = T_('Installed skins');
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
@@ -89,6 +97,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/25 13:09:36  efy-vyacheslav
+ * Using the SQL class to prepare queries
+ *
  * Revision 1.5  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *

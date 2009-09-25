@@ -33,22 +33,22 @@ global $Settings;
 global $dispatcher;
 
 
-$sql = 'SELECT T_blogs.*, user_login
-					FROM T_blogs INNER JOIN T_users ON blog_owner_user_ID = user_ID';
-
+$SQL = & new SQL();
+$SQL->SELECT( 'T_blogs.*, user_login' );
+$SQL->FROM( 'T_blogs INNER JOIN T_users ON blog_owner_user_ID = user_ID' );
 
 if( ! $current_User->check_perm( 'blogs', 'view' ) )
 {	// We do not have perm to view all blogs... we need to restrict to those we're a member of:
 
-	$sql .= " LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0
-		       																		AND blog_ID = bloguser_blog_ID
-		       																		AND bloguser_user_ID = {$current_User->ID} )
-		       LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0
-		          																AND blog_ID = bloggroup_blog_ID
-		          																AND bloggroup_group_ID = {$current_User->group_ID} )
-		       WHERE blog_owner_user_ID = {$current_User->ID}
-		       				OR bloguser_ismember <> 0
-								 	OR bloggroup_ismember <> 0";
+	$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0'
+		. ' AND blog_ID = bloguser_blog_ID'
+		. ' AND bloguser_user_ID = ' . $current_User->ID . ' )'
+		. ' LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0'
+		. ' AND blog_ID = bloggroup_blog_ID'
+		. ' AND bloggroup_group_ID = ' . $current_User->group_ID . ' )' );
+	$SQL->WHERE( 'blog_owner_user_ID = ' . $current_User->ID
+		. ' OR bloguser_ismember <> 0'
+		. ' OR bloggroup_ismember <> 0' );
 
 	$no_results = T_('Sorry, you have no permission to edit/view any blog\'s properties.');
 }
@@ -58,7 +58,7 @@ else
 }
 
 // Create result set:
-$Results = & new Results( $sql, 'blog_' );
+$Results = & new Results( $SQL->get(), 'blog_' );
 $Results->Cache = & get_BlogCache( );
 $Results->title = T_('Blog list');
 $Results->no_results_text = $no_results;
@@ -215,6 +215,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/25 13:07:49  efy-vyacheslav
+ * Using the SQL class to prepare queries
+ *
  * Revision 1.8  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

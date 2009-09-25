@@ -68,23 +68,19 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
  */
 $keywords = param( 'keywords', 'string', '', true );
 
-$where_clause = '';
+$SQL = & new SQL();
 
 if( !empty( $keywords ) )
 {
-	$kw_array = split( ' ', $keywords );
-	foreach( $kw_array as $kw )
-	{
-		$where_clause .= 'aspm_string LIKE "%'.$DB->escape($kw).'%" AND ';
-	}
+	$SQL->add_search_field( 'aspm_string' );
+	$SQL->WHERE_keyword( split( ' ', $keywords ), 'AND' );
 }
 
-$sql = 'SELECT aspm_ID, aspm_string, aspm_source
-					FROM T_antispam
-				 WHERE '.$where_clause.' 1';
+$SQL->SELECT( 'aspm_ID, aspm_string, aspm_source' );
+$SQL->FROM( 'T_antispam' );
 
 // Create result set:
-$Results = & new Results( $sql, 'antispam_' );
+$Results = & new Results( $SQL->get(), 'antispam_' );
 
 $Results->title = T_('Banned keywords blacklist');
 
@@ -182,6 +178,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/25 13:06:09  efy-vyacheslav
+ * Using the SQL class to prepare queries
+ *
  * Revision 1.4  2009/03/08 23:57:41  fplanque
  * 2009
  *

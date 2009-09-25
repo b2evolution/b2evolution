@@ -67,30 +67,22 @@ else
 	set_param( 'keywords2', $keywords );
 }
 
-$where_clause = '';
+
+$SQL = & new SQL();
+$SQL->SELECT( 'grp_ID, grp_name, bloggroup_perm_poststatuses, bloggroup_perm_edit, bloggroup_ismember,'
+	. 'bloggroup_perm_comments, bloggroup_perm_delpost, bloggroup_perm_cats,'
+	. 'bloggroup_perm_properties, bloggroup_perm_admin, bloggroup_perm_media_upload,'
+	. 'bloggroup_perm_media_browse, bloggroup_perm_media_change, bloggroup_perm_page,'
+	. 'bloggroup_perm_intro, bloggroup_perm_podcast, bloggroup_perm_sidebar' );
+$SQL->FROM( 'T_groups LEFT JOIN T_coll_group_perms ON grp_ID = bloggroup_group_ID' );
+$SQL->WHERE( 'bloggroup_blog_ID = ' . $edited_Blog->ID );
+$SQL->ORDER_BY( 'bloggroup_ismember DESC, *, grp_name, grp_ID' );
 
 if( !empty( $keywords ) )
 {
-	$kw_array = split( ' ', $keywords );
-	foreach( $kw_array as $kw )
-	{
-		$where_clause .= 'grp_name LIKE "%'.$DB->escape($kw).'%" AND ';
-	}
+	$SQL->add_search_field( 'grp_name' );
+	$SQL->WHERE_keyword( split( ' ', $keywords ), 'AND' );
 }
-
-
-$sql = 'SELECT grp_ID, grp_name, bloggroup_perm_poststatuses, bloggroup_perm_edit, bloggroup_ismember,
-													bloggroup_perm_comments, bloggroup_perm_delpost, bloggroup_perm_cats,
-													bloggroup_perm_properties, bloggroup_perm_admin, bloggroup_perm_media_upload,
-													bloggroup_perm_media_browse, bloggroup_perm_media_change, bloggroup_perm_page,
-													bloggroup_perm_intro, bloggroup_perm_podcast, bloggroup_perm_sidebar
-					FROM T_groups LEFT JOIN T_coll_group_perms ON (
-				 						grp_ID = bloggroup_group_ID
-										AND bloggroup_blog_ID = '.$edited_Blog->ID.' )
-				 WHERE '.$where_clause.' 1
-				 ORDER BY bloggroup_ismember DESC, *, grp_name, grp_ID';
-
-
 
 // Display layout selector:
 // TODO: cancel event in switch layout (or it will trigger bozo validator)
@@ -117,7 +109,7 @@ echo '</div>';
 <?php
 
 
-$Results = & new Results( $sql, 'collgroup_' );
+$Results = & new Results( $SQL->get(), 'collgroup_' );
 
 // Tell the Results class that we already have a form for this page:
 $Results->Form = & $Form;
@@ -542,6 +534,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/25 13:07:49  efy-vyacheslav
+ * Using the SQL class to prepare queries
+ *
  * Revision 1.7  2009/08/31 17:21:32  fplanque
  * minor
  *

@@ -52,12 +52,14 @@ if( !$dtyp_normal && !$dtyp_searcheng && !$dtyp_aggregator && !$dtyp_unknown )
 
 echo '<h2>'.T_('Referring domains').'</h2>';
 
+$SQL = & new SQL();
+
 $selected_agnt_types = array();
 if( $dtyp_normal ) $selected_agnt_types[] = "'normal'";
 if( $dtyp_searcheng ) $selected_agnt_types[] = "'searcheng'";
 if( $dtyp_aggregator ) $selected_agnt_types[] = "'aggregator'";
 if( $dtyp_unknown ) $selected_agnt_types[] = "'unknown'";
-$where_clause =  ' WHERE dom_type IN ('.implode(',',$selected_agnt_types).')';
+$SQL->WHERE( 'dom_type IN ( ' . implode( ', ', $selected_agnt_types ) . ' )' );
 
 // Exclude hits of type "self" and "admin":
 // TODO: fp>implement filter checkboxes, not a hardwired filter
@@ -65,29 +67,25 @@ $where_clause =  ' WHERE dom_type IN ('.implode(',',$selected_agnt_types).')';
 
 if( !empty($blog) )
 {
-	$where_clause .= ' AND hit_blog_ID = '.$blog;
+	$SQL->WHERE_and( 'hit_blog_ID = ' . $blog );
 }
 
-$total_hit_count = $DB->get_var( "
-		SELECT SQL_NO_CACHE COUNT(*) AS hit_count
-			FROM T_basedomains INNER JOIN T_hitlog ON dom_ID = hit_referer_dom_ID "
-			.$where_clause, 0, 0, 'Get total hit count - referred hits only' );
+$SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS hit_count' );
+$SQL->FROM( 'T_basedomains INNER JOIN T_hitlog ON dom_ID = hit_referer_dom_ID' );
+
+$total_hit_count = $DB->get_var( $SQL->get(), 0, 0, 'Get total hit count - referred hits only' );
 
 
 // Create result set:
-$results_sql = "
-		SELECT SQL_NO_CACHE dom_name, dom_status, dom_type, COUNT( * ) AS hit_count
-		  FROM T_basedomains LEFT JOIN T_hitlog ON dom_ID = hit_referer_dom_ID "
-		.$where_clause.'
-		 GROUP BY dom_ID ';
+$SQL->SELECT( 'SQL_NO_CACHE dom_name, dom_status, dom_type, COUNT( * ) AS hit_count' );
+$SQL->GROUP_BY( 'dom_ID' );
 
-$results_count_sql = "
-		SELECT SQL_NO_CACHE COUNT( DISTINCT dom_ID )
-		  FROM T_basedomains INNER JOIN T_hitlog ON dom_ID = hit_referer_dom_ID "
-			.$where_clause;
+$CountSQL = & new SQL();
+$CountSQL->SELECT( 'SQL_NO_CACHE COUNT( DISTINCT dom_ID )' );
+$CountSQL->FROM( $SQL->get_from( '' ) );
+$CountSQL->WHERE( $SQL->get_where( '' ) );
 
-$Results = & new Results( $results_sql, 'refdom_', '---D', 20, $results_count_sql );
-
+$Results = & new Results( $SQL->get(), 'refdom_', '---D', 20, $CountSQL->get() );
 
 /**
  * Callback to add filters on top of the result set
@@ -162,6 +160,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/25 13:09:36  efy-vyacheslav
+ * Using the SQL class to prepare queries
+ *
  * Revision 1.4  2009/09/13 21:26:50  blueyed
  * SQL_NO_CACHE for SELECT queries using T_hitlog
  *

@@ -37,8 +37,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $rsc_url, $dispatcher;
 
 // Create result set:
-$Results = & new Results(
-							'SELECT * FROM T_filetypes', 'ftyp_' );
+$SQL = & new SQL();
+$SQL->SELECT( '*' );
+$SQL->FROM( 'T_filetypes' );
+
+$Results = & new Results( $SQL->get(), 'ftyp_' );
 $Results->Cache = & get_FiletypeCache();
 $Results->title = T_('File types list');
 
@@ -133,6 +136,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/25 13:09:36  efy-vyacheslav
+ * Using the SQL class to prepare queries
+ *
  * Revision 1.6  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

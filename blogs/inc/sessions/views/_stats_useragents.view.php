@@ -57,34 +57,33 @@ if( $agnt_browser ) $selected_agnt_types[] = "'browser'";
 if( $agnt_robot ) $selected_agnt_types[] = "'robot'";
 if( $agnt_rss ) $selected_agnt_types[] = "'rss'";
 if( $agnt_unknown ) $selected_agnt_types[] = "'unknown'";
-$from = 'T_useragents LEFT JOIN T_hitlog ON agnt_ID = hit_agnt_ID';
+
+$SQL = & new SQL();
+$SQL->FROM( 'T_useragents LEFT JOIN T_hitlog ON agnt_ID = hit_agnt_ID' );
 
 // Note: fp> oddly enough the query is faster with the where condition even if all apply
-$where_clause = ' WHERE agnt_type IN ('.implode(',',$selected_agnt_types).')';
+$SQL->WHERE( 'agnt_type IN ( ' . implode( ', ', $selected_agnt_types ) . ' )' );
 
-if( !empty($blog) )
+if( ! empty( $blog ) )
 {
-	$from .= ' INNER JOIN T_blogs ON hit_blog_ID = blog_ID';
-	$where_clause .= ' AND hit_blog_ID = '.$blog;
+	$SQL->FROM_add( 'INNER JOIN T_blogs ON hit_blog_ID = blog_ID' );
+	$SQL->WHERE_and( 'hit_blog_ID = ' . $blog );
 }
 
-$total_hit_count = $DB->get_var( "
-		SELECT COUNT(*) AS hit_count
-			FROM $from "
-			.$where_clause, 0, 0, 'Get total hit count - hits with an UA' );
+$SQL->SELECT( 'COUNT(*) AS hit_count' );
+$total_hit_count = $DB->get_var( $SQL->get(), 0, 0, 'Get total hit count - hits with an UA' );
 
 
 // Create result set:
-$sql = "SELECT agnt_signature, agnt_type, COUNT( hit_ID ) AS hit_count
-					FROM $from"
-			.$where_clause.'
-				 GROUP BY agnt_ID ';
+$SQL->SELECT( 'agnt_signature, agnt_type, COUNT( hit_ID ) AS hit_count' );
+$SQL->GROUP_BY( 'agnt_ID' );
 
-$count_sql = "SELECT COUNT( DISTINCT agnt_ID )
-					FROM $from"
-			.$where_clause;
+$SQL_count = & new SQL();
+$SQL_count->SELECT( 'COUNT( DISTINCT agnt_ID )' );
+$SQL_count->FROM( $SQL->get_from( '' ) );
+$SQL_count->WHERE( $SQL->get_where( '' ) );
 
-$Results = & new Results( $sql, 'uagnt_', '--D', 20, $count_sql );
+$Results = & new Results( $SQL->get(), 'uagnt_', '--D', 20, $SQL_count->get() );
 
 
 /**
@@ -153,6 +152,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/25 13:09:36  efy-vyacheslav
+ * Using the SQL class to prepare queries
+ *
  * Revision 1.4  2009/03/08 23:57:45  fplanque
  * 2009
  *

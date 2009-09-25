@@ -33,14 +33,17 @@ global $blog, $admin_url, $rsc_url;
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 // Create result set:
-$sql = 'SELECT SQL_NO_CACHE user_login, COUNT( sess_ID ) AS nb_sessions, MAX( sess_lastseen ) AS sess_lastseen
-					FROM T_sessions LEFT JOIN T_users ON sess_user_ID = user_ID
-					GROUP BY sess_user_ID';
+$SQL = & new SQL();
+$CountSQL = & new SQL();
 
-$count_sql = 'SELECT SQL_NO_CACHE COUNT( DISTINCT(sess_user_ID) )
-								FROM T_sessions';
+$SQL->SELECT( 'SQL_NO_CACHE user_login, COUNT( sess_ID ) AS nb_sessions, MAX( sess_lastseen ) AS sess_lastseen' );
+$SQL->FROM( 'T_sessions LEFT JOIN T_users ON sess_user_ID = user_ID' );
+$SQL->GROUP_BY( 'sess_user_ID' );
 
-$Results = & new Results( $sql, 'usess_', '-D', 20, $count_sql );
+$CountSQL->SELECT( 'SQL_NO_CACHE COUNT( DISTINCT(sess_user_ID) )' );
+$CountSQL->FROM( 'T_sessions' );
+
+$Results = & new Results( $SQL->get(), 'usess_', '-D', 20, $CountSQL->get() );
 
 $Results->title = T_('Recent sessions');
 
@@ -71,6 +74,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/25 13:09:36  efy-vyacheslav
+ * Using the SQL class to prepare queries
+ *
  * Revision 1.9  2009/09/20 00:27:08  fplanque
  * cleanup/doc/simplified
  *

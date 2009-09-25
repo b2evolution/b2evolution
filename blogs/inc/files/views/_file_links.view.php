@@ -46,12 +46,12 @@ if( $mode != 'upload' )
 
 	$Form->hidden_ctrl();
 
+	$SQL = & new SQL();
+	$SQL->SELECT( 'link_ID, link_ltype_ID, T_files.*' );
+	$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
+	$SQL->WHERE( 'link_itm_ID = ' . $edited_Item->ID );
 
-	$Results = & new Results(
-						'SELECT link_ID, link_ltype_ID, T_files.*
-							 FROM T_links INNER JOIN T_files ON link_file_ID = file_ID
-							WHERE link_itm_ID = '.$edited_Item->ID,
-						'link_' );
+	$Results = & new Results( $SQL->get(), 'link_' );
 
 	$Results->title = sprintf( T_('Files linked to &laquo;%s&raquo;'),
 					'<a href="?ctrl=items&amp;blog='.$edited_Item->get_blog_ID().'&amp;p='.$edited_Item->ID.'" title="'
@@ -157,6 +157,9 @@ if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Ite
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/25 13:09:36  efy-vyacheslav
+ * Using the SQL class to prepare queries
+ *
  * Revision 1.10  2009/07/04 15:58:26  tblue246
  * Translation fixes and update of German translation
  *

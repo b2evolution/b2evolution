@@ -49,10 +49,13 @@ if ( !isset( $default_col_order ) )
 }
 
 // Create result set:
-$sql = "SELECT $GenericElementCache->dbIDname, {$GenericElementCache->dbprefix}name
-  			 	FROM $GenericElementCache->dbtablename";
 
-$Results = & new Results(	$sql, $GenericElementCache->dbprefix, $default_col_order );
+$SQL = & new SQL();
+$SQL->SELECT( $GenericElementCache->dbIDname . ', '
+	. $GenericElementCache->dbprefix . 'name' );
+$SQL->FROM( $GenericElementCache->dbtablename );
+
+$Results = & new Results( $SQL->get(), $GenericElementCache->dbprefix, $default_col_order );
 
 if( isset( $list_title ) )
 {
@@ -134,6 +137,9 @@ $Results->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/25 13:09:36  efy-vyacheslav
+ * Using the SQL class to prepare queries
+ *
  * Revision 1.4  2009/03/08 23:57:43  fplanque
  * 2009
  *
