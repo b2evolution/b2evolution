@@ -1050,7 +1050,7 @@ function remove_seconds($timestamp, $format = 'Y-m-d H:i')
 /**
  * Validate variable
  *
- * @todo if funtion does not exist DEBUG_DIE() !!!! NEVER be silent about a potential security risk. (inserting non validated data into the DB) + ALWAYS die when something unexpected occurs.
+ * @todo ALWAYS die when something unexpected occurs. Tblue> What exactly would be "unexpected"?
  * @todo rename to param_validate()
  *
  * @param string param name
@@ -1061,8 +1061,12 @@ function remove_seconds($timestamp, $format = 'Y-m-d H:i')
  */
 function validate( $variable, $validator, $required = false, $custom_msg = NULL )
 {
-	if( !function_exists( $validator ) || ( empty( $GLOBALS[$variable] ) && !$required ) )
+	if( ! function_exists( $validator ) )
 	{
+		debug_die( 'Function '.$validator.'() does not exist!' );
+	}
+	elseif( empty( $GLOBALS[$variable] ) && ! $required )
+	{	// Variable is empty or not set. That's fine since it isn't required:
 		return true;
 	}
 
@@ -3630,6 +3634,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.158  2009/09/25 13:43:35  tblue246
+ * validate(): debug_die() if validator function does not exist.
+ *
  * Revision 1.157  2009/09/24 21:05:39  fplanque
  * no message
  *

@@ -527,7 +527,7 @@ echo '</div>';
 
 // Permission note:
 // fp> TODO: link
-echo '<p class="note center">'.T_('Note: General group permissions may further restrict any media folder permissions defined here.').'</p>';
+echo '<p class="note center">'.T_('Note: General group permissions may further restrict or extend any media folder permissions defined here.').'</p>';
 
 $Form->end_fieldset();
 
@@ -546,6 +546,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/25 13:43:35  tblue246
+ * validate(): debug_die() if validator function does not exist.
+ *
  * Revision 1.8  2009/09/25 13:07:49  efy-vyacheslav
  * Using the SQL class to prepare queries
  *

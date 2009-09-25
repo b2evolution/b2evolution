@@ -961,62 +961,31 @@ class User extends DataObject
 				break;
 
 			case 'files':
-				$this->get_Group();
-				$perm = $this->Group->check_perm( $permname, $permlevel );
-
-				/* Notes:
-				 *  - $perm_target can be:
-				 *    - NULL or 0: check global group permission only
-				 *    - positive: check global group permission and
-				 *      (if granted) if a specific blog denies it.
-* fp> This is BAD BAD BAD because it's inconsistent with the other permissions
-* in b2evolution. There should NEVER be a denying. ony additional allowing.
-* It's also inconsistent with most other permission systems.
-* The lower file permission level for groups is now called "No Access"
-* This should be renamed to "Depending on each blog's permissions"
-* Whatever general permissions you have on files, blog can give you additional permissions
-* but they can never take a global perm away.
-* Tblue> On the permissions page it says that the blog perms will be restricted
-* by any global perms, which means to me that a blog cannot grant e. g.
-* the files upload perm if this perm isn't granted globally... But apparently
-* it shouldn't be like that?! I understand it should be like that then:
-* if( ! $perm && $perm_target && in_array( $permlevel, array( 'add', 'view', 'edit' ) )
-* {
-* 		// check if blog grants permission.
-* }
-* If this is correct, we should remove the note on the blog permissions
-* pages and the group properties form.
-* fp> ok, I had forgotten we had that old message, but still it doesn't say it will, it says it *may* !
-* To be exact the message should be "
-* Note: General group permissions may further restrict or extend any permissions defined here."
-* Restriction should only happen when "NO ACCESS" is selected
-* But when "Depending on each blog's permissions" is selected, THEN (and I guess ONLY then) the blog permissions should be used
-* Note: This is quite messy actually. maybe it would make more sense to separate group permissions by "root type":
-* i-e nto use the same permission for blog roots vs user root vs shared root vs skins root
-* what do you think?
-* Tblue> That sounds OK. So we would add another option to the global
-* 'files' group perm setting ("Depending on each blog's permissions"), right?
-* fp> yes.
-* tb> Regarding separation: It could make sense. The blog-specific permissions would only
-* affect blog roots (and if "Depending on each blog's permissions" is selected;
-* for the other roots we would add separate (global) settings...
-* fp> yes.
-				 *  - Only a $permlevel of 'add', 'view' or 'edit' can be
-				 *    denied by blog permissions.
-				 *  - If the group grants the 'all' permission, blogs cannot
-				 *    deny it.
+				// Permission to view/edit/upload files:
+				/* Tblue> TODO: Implement permissions for specific file
+				 * roots (blog/user/shared/skins).
 				 */
-/*
-				if( $perm && $perm_target && in_array( $permlevel, array( 'add', 'view', 'edit' ) )
-					&& $this->Group->get( 'perm_files' ) != 'all' )
+
+				$this->get_Group();
+				/* We have a specific blog, the permission value is set to
+				 * "Depending on each blog's permissions" and the requested
+				 * permission level can be handled by specific blog permissions:
+				 */
+				if( $perm_target && $this->Group->get( 'perm_files' ) == 'user'
+					&& in_array( $permlevel, array( 'add', 'view', 'edit' ) ) )
 				{	// Check specific blog perms:
 					$perm = $this->check_perm_blogusers( $permname, $permlevel, $perm_target );
 					if ( ! $perm )
 					{ // Check groups for permissions for this specific blog:
 						$perm = $this->Group->check_perm_bloggroups( $permname, $permlevel, $perm_target );
 					}
+
+					// We are done here:
+					break;
 				}
-*/
+
+				// Let the group handle this:
+				$perm = $this->Group->check_perm( $permname, $permlevel );
 				break;
 
 			default:
@@ -1845,6 +1814,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.52  2009/09/25 13:43:35  tblue246
+ * validate(): debug_die() if validator function does not exist.
+ *
  * Revision 1.51  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *

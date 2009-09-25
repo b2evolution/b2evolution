@@ -336,7 +336,12 @@ class Group extends DataObject
 
 			case 'files':
 				switch( $permvalue )
-				{ // Depending on current group permission:
+				{	// Depending on current group permission:
+					/* Note: If the perm value is "user", User::check_perm()
+					 * checks the specific blog permissions if appropriate.
+					 * We deny the perm here.
+					 */
+
 					case 'all':
 						global $demo_mode;
 						if( ! $demo_mode )
@@ -620,6 +625,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.24  2009/09/25 13:43:35  tblue246
+ * validate(): debug_die() if validator function does not exist.
+ *
  * Revision 1.23  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *
