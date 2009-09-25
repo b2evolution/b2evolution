@@ -293,7 +293,8 @@ switch( $action )
 		$AdminUI->disp_payload_begin();
 
 		// Show 3rd level menu for settings tab
-		if( isset( $tab ) && ($tab == 'settings') ) {
+		if( isset( $tab ) && ($tab == 'settings') ) 
+		{
 			echo $AdminUI->get_html_menu( array( 'items', $tab ), 'menu3' );
 			flush();
 		}
@@ -326,6 +327,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/25 20:26:26  fplanque
+ * fixes/doc
+ *
  * Revision 1.5  2009/09/24 13:50:31  efy-sergey
  * Moved the Global Settings>Post types & Post statuses tabs to "Posts / Comments > Settings > Post types & Post statuses"
  *

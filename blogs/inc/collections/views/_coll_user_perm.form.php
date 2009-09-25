@@ -73,8 +73,9 @@ $SQL->SELECT( 'user_ID, user_login, user_level, bloguser_perm_poststatuses, blog
 	. 'bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,'
 	. 'bloguser_perm_media_browse, bloguser_perm_media_change, bloguser_perm_page,'
 	. 'bloguser_perm_intro, bloguser_perm_podcast, bloguser_perm_sidebar' );
-$SQL->FROM( 'T_users LEFT JOIN T_coll_user_perms ON user_ID = bloguser_user_ID' );
-$SQL->WHERE( 'bloguser_blog_ID = ' . $edited_Blog->ID );
+$SQL->FROM( 'T_users LEFT JOIN T_coll_user_perms ON (
+				 						user_ID = bloguser_user_ID
+										AND bloguser_blog_ID = '.$edited_Blog->ID.' )' );
 $SQL->ORDER_BY( 'bloguser_ismember DESC, *, user_login, user_ID' );
 
 if( !empty( $keywords ) )
@@ -84,7 +85,7 @@ if( !empty( $keywords ) )
 	$SQL->add_search_field( 'user_lastname' );
 	$SQL->add_search_field( 'user_nickname' );
 	$SQL->add_search_field( 'user_email' );
-	$SQL->WHERE_keyword( split( ' ', $keywords ), 'AND' );
+	$SQL->WHERE_keywords( $keywords, 'AND' );
 }
 
 
@@ -527,7 +528,7 @@ echo '</div>';
 
 // Permission note:
 // fp> TODO: link
-echo '<p class="note center">'.T_('Note: General group permissions may further restrict any media folder permissions defined here.').'</p>';
+echo '<p class="note center">'.T_('Note: General group permissions may further restrict or extend any media folder permissions defined here.').'</p>';
 
 $Form->end_fieldset();
 
@@ -546,6 +547,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/25 20:26:26  fplanque
+ * fixes/doc
+ *
  * Revision 1.10  2009/09/25 14:18:22  tblue246
  * Reverting accidental commits
  *

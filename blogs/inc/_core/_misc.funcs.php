@@ -1050,7 +1050,6 @@ function remove_seconds($timestamp, $format = 'Y-m-d H:i')
 /**
  * Validate variable
  *
- * @todo ALWAYS die when something unexpected occurs. Tblue> What exactly would be "unexpected"?
  * @todo rename to param_validate()
  *
  * @param string param name
@@ -1065,7 +1064,8 @@ function validate( $variable, $validator, $required = false, $custom_msg = NULL 
 	{
 		debug_die( 'Function '.$validator.'() does not exist!' );
 	}
-	elseif( ! isset( $GLOBALS[$variable] ) )
+
+	( ! isset( $GLOBALS[$variable] ) )
 	{	// Variable not set, we cannot handle this using the validator function...
 		if( $required )
 		{	// Add error:
@@ -1075,7 +1075,8 @@ function validate( $variable, $validator, $required = false, $custom_msg = NULL 
 
 		return true;
 	}
-	elseif( $GLOBALS[$variable] === '' && ! $required )
+	
+	if( $GLOBALS[$variable] === '' && ! $required )
 	{	// Variable is empty or not set. That's fine since it isn't required:
 		return true;
 	}
@@ -1262,7 +1263,7 @@ function check_is_phone( $phone )
 {
 	if( !is_phone( $phone ) )
 	{
-		return T_('The phone number is invalid. Example: +1 401-555-1234');
+		return T_('Please enter a valid phone number like for example: +1 401-555-1234');
 	}
 }
 
@@ -1289,7 +1290,7 @@ function check_is_url( $url )
 {
 	if( !is_url( $url ) )
 	{
-		return T_('The url is invalid.');
+		return T_('Please enter a valid URL, like for example: http://www.b2evolution.net/');
 	}
 }
 
@@ -3676,6 +3677,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.161  2009/09/25 20:26:26  fplanque
+ * fixes/doc
+ *
  * Revision 1.160  2009/09/25 14:50:35  efy-maxim
  * validation function is_url
  *

@@ -81,7 +81,7 @@ $SQL->ORDER_BY( 'bloggroup_ismember DESC, *, grp_name, grp_ID' );
 if( !empty( $keywords ) )
 {
 	$SQL->add_search_field( 'grp_name' );
-	$SQL->WHERE_keyword( split( ' ', $keywords ), 'AND' );
+	$SQL->WHERE_keywords( $keywords, 'AND' );
 }
 
 // Display layout selector:
@@ -516,7 +516,7 @@ echo '</div>';
 
 // Permission note:
 // fp> TODO: link
-echo '<p class="note center">'.T_('Note: General group permissions may further restrict any media folder permissions defined here.').'</p>';
+echo '<p class="note center">'.T_('Note: General group permissions may further restrict or extend any media folder permissions defined here.').'</p>';
 
 $Form->end_fieldset();
 
@@ -534,6 +534,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/25 20:26:26  fplanque
+ * fixes/doc
+ *
  * Revision 1.10  2009/09/25 14:18:22  tblue246
  * Reverting accidental commits
  *

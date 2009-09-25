@@ -300,7 +300,7 @@ class SQL
 	 * @param string field to search on
 	 * @param string regular expression we want to use on the search for the field param
 	 */
-	function add_search_field( $field,  $reg_exp = '' )
+	function add_search_field( $field, $reg_exp = '' )
 	{
 		$this->search_field[] = $field;
 
@@ -312,17 +312,18 @@ class SQL
 
 	/**
 	 * create the filter whith the search field array
-	 * @param string search
+	 *
+	 * @param string keywords separated by space
 	 * @param string operator( AND , OR , PHRASE ) for the filter
 	 */
-	function WHERE_keyword( $search, $search_kw_combine )
+	function WHERE_keywords( $search, $search_kw_combine )
 	{
 		global $DB;
-	
+
 		// Concat the list of search fields ( concat(' ',field1,field2,field3...) )
 		if (count( $this->search_field ) > 1)
 		{
-			$search_field = 'CONCAT_WS(\' \',' . implode( ',', $this->search_field).')';
+			$search_field = 'CONCAT_WS(\' \','.implode( ',', $this->search_field).')';
 		}
 		else
 		{
@@ -335,7 +336,7 @@ class SQL
 			case 'OR':
 				// Create array of key words of the search string
 				$keyword_array = explode( ' ', $search );
-				$keyword_array = array_filter( $keyword_array, 'filter_empty' );
+				$keyword_array = array_filter( $keyword_array, create_function( '$val', 'return !empty($val);' ) );
 
 				$twhere = array();
 				// Loop on all keywords
@@ -404,6 +405,9 @@ class SQL
 
 /*
  * $Log$
+ * Revision 1.4  2009/09/25 20:26:27  fplanque
+ * fixes/doc
+ *
  * Revision 1.3  2009/03/08 23:57:40  fplanque
  * 2009
  *

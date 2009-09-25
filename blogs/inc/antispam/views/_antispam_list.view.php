@@ -70,14 +70,14 @@ $keywords = param( 'keywords', 'string', '', true );
 
 $SQL = & new SQL();
 
+$SQL->SELECT( 'aspm_ID, aspm_string, aspm_source' );
+$SQL->FROM( 'T_antispam' );
+
 if( !empty( $keywords ) )
 {
 	$SQL->add_search_field( 'aspm_string' );
-	$SQL->WHERE_keyword( split( ' ', $keywords ), 'AND' );
+	$SQL->WHERE_keywords( $keywords, 'AND' );
 }
-
-$SQL->SELECT( 'aspm_ID, aspm_string, aspm_source' );
-$SQL->FROM( 'T_antispam' );
 
 // Create result set:
 $Results = & new Results( $SQL->get(), 'antispam_' );
@@ -178,6 +178,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/25 20:26:27  fplanque
+ * fixes/doc
+ *
  * Revision 1.5  2009/09/25 13:06:09  efy-vyacheslav
  * Using the SQL class to prepare queries
  *

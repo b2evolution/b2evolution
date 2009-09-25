@@ -148,6 +148,7 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 							array( 'add', T_('Add/Upload files to allowed roots') ),
 							array( 'edit', sprintf( T_('Edit %sunlocked files'), $filetypes_linkstart.get_icon('file_allowed').$filetypes_linkend ) ),
 							array( 'all', sprintf( T_('Edit all files, including %slocked ones'), $filetypes_linkstart.get_icon('file_not_allowed').$filetypes_linkend ), T_('Needed for editing PHP files in skins.') ),
+
 						), T_('Files'), true, T_('This setting will further restrict any media file permissions on specific blogs.') );
 
 
@@ -204,6 +205,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/25 20:26:26  fplanque
+ * fixes/doc
+ *
  * Revision 1.15  2009/09/25 14:18:22  tblue246
  * Reverting accidental commits
  *

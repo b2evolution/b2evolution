@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the UI view for the Hit list.
+ * This file implements the UI view for Users > User sessions > Hits
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -183,6 +183,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/25 20:26:26  fplanque
+ * fixes/doc
+ *
  * Revision 1.9  2009/09/25 13:09:36  efy-vyacheslav
  * Using the SQL class to prepare queries
  *
