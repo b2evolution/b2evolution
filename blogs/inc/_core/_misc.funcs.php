@@ -1280,6 +1280,38 @@ function is_phone( $phone )
 
 
 /**
+ * Checks if the url is valid
+ *
+ * @param string url to check
+ * @return string error message if url is not valid
+ */
+function check_is_url( $url )
+{
+	if( !is_url( $url ) )
+	{
+		return T_('The url is invalid.');
+	}
+}
+
+
+/**
+ * Checks if the url is valid
+ *
+ * @param string url to check
+ * @return boolean true if OK
+ */
+function is_url( $url )
+{
+	if( validate_url( $url, 'posting', false ) )
+	{
+		return false;
+	}
+
+	return true;
+}
+
+
+/**
  * Are we running on a Windows server?
  */
 function is_windows()
@@ -3644,6 +3676,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.160  2009/09/25 14:50:35  efy-maxim
+ * validation function is_url
+ *
  * Revision 1.159  2009/09/25 14:45:54  tblue246
  * Improved validate()
  *
