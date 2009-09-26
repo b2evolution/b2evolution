@@ -843,8 +843,7 @@ class Blog extends DataObject
 		}
 
 		// For case relative and absolute:
-		return preg_replace( '¤^(.+)/[^/]$¤', '$1/', $url );
-
+		return preg_replace( '~^(.+)/[^/]$~', '$1/', $url );
 	}
 
 
@@ -2059,7 +2058,7 @@ class Blog extends DataObject
 			), $params );
 
 		$text = $this->get_setting( 'blog_footer_text' );
-		$text = preg_replace_callback( '¤\$([a-z]+)\$¤', array( $this, 'replace_callback' ), $text );
+		$text = preg_replace_callback( '~\$([a-z]+)\$~', array( $this, 'replace_callback' ), $text );
 
 		if( empty($text) )
 		{
@@ -2142,6 +2141,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.82  2009/09/26 20:37:48  blueyed
+ * Minor: fix pattern delimiters, to not cause charset issues.
+ *
  * Revision 1.81  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *
