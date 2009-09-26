@@ -34,7 +34,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
-	$SkinCache = & get_SkinCache( );
+	$SkinCache = & get_SkinCache();
 	$SkinCache->load_all();
 
 	// TODO: this is like touching private parts :>
@@ -59,6 +59,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.7  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *

@@ -27,7 +27,7 @@ $CountSQL->FROM( 'T_skins__skin' );
 
 $Results = & new Results( $SQL->get(), '', '', NULL, $CountSQL->get() );
 
-$Results->Cache = & get_SkinCache( );
+$Results->Cache = & get_SkinCache();
 
 $Results->title = T_('Installed skins');
 
@@ -97,6 +97,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.6  2009/09/25 13:09:36  efy-vyacheslav
  * Using the SQL class to prepare queries
  *

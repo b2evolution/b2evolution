@@ -91,7 +91,7 @@ if( empty($url) )
 
 @header('Content-Type: text/xml');
 
-$ItemCache = & get_ItemCache( );
+$ItemCache = & get_ItemCache();
 if( !( $commented_Item = & $ItemCache->get_by_ID( $tb_id, false ) ) )
 {
 	trackback_response( 1, 'Sorry, the requested post doesn\'t exist.' ); // exits
@@ -212,6 +212,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.70  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.69  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

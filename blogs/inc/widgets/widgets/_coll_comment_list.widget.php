@@ -137,7 +137,7 @@ class coll_comment_list_Widget extends ComponentWidget
 
 		global $Blog;
 
-		$blogCache = & get_BlogCache( );
+		$blogCache = & get_BlogCache();
 		$listBlog = ( $this->disp_params[ 'blog_ID' ] ? $blogCache->get_by_ID( $this->disp_params[ 'blog_ID' ] ) : $Blog );
 
 		// Create ItemList
@@ -180,6 +180,9 @@ class coll_comment_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/26 12:00:44  tblue246
+ * Minor/coding style
+ *
  * Revision 1.15  2009/09/25 07:33:31  efy-cantor
  * replace get_cache to get_*cache
  *

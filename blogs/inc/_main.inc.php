@@ -423,7 +423,7 @@ $Debuglog->add( 'pass: '.( empty($pass) ? '' : 'not' ).' empty', 'login' );
 // either 'login' (normal) or 'redirect_to_backoffice' may be set here. This also helps to display the login form again, if either login or pass were empty.
 $login_action = param_arrayindex( 'login_action' );
 
-$UserCache = & get_UserCache( );
+$UserCache = & get_UserCache();
 
 if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 { // User is trying to login right now
@@ -672,6 +672,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.126  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.125  2009/09/25 21:52:03  tblue246
  * - Suppress PHP warning ("It is not safe to rely on the system's timezone settings. [...]").
  * - Doc about odd PHP behaviour regarding error reporting settings.

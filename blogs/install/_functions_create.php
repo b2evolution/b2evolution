@@ -782,7 +782,7 @@ function create_demo_contents()
 	$edit_File = & new File( 'user', 1, 'faceyourmanga_admin_boy.png' );
 	// Load meta data AND MAKE SURE IT IS CREATED IN DB:
 	$edit_File->load_meta( true );
-	$UserCache = & get_UserCache( );
+	$UserCache = & get_UserCache();
 	$User_Admin = & $UserCache->get_by_ID( 1 );
 	$User_Admin->set( 'avatar_file_ID', $edit_File->ID );
 	$User_Admin->dbupdate();
@@ -1290,6 +1290,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.278  2009/09/26 12:00:44  tblue246
+ * Minor/coding style
+ *
  * Revision 1.277  2009/09/25 07:33:31  efy-cantor
  * replace get_cache to get_*cache
  *

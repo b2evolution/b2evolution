@@ -22,7 +22,7 @@ global $redirect_to;
 /**
  * @var SkinCache
  */
-$SkinCache = & get_SkinCache( );
+$SkinCache = & get_SkinCache();
 $SkinCache->load_all();
 
 $block_item_Widget = & new Widget( 'block_item' );
@@ -60,6 +60,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.9  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.8  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *

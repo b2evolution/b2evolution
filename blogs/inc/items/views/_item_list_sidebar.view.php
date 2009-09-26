@@ -153,7 +153,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 		echo '<fieldset>';
 		echo '<legend>'.T_('Assignees').'</legend>';
 		// Load current blog members into cache:
-		$UserCache = & get_UserCache( );
+		$UserCache = & get_UserCache();
 		$UserCache->load_blogmembers( $Blog->ID );
 		if( count($UserCache->cache) )
 		{
@@ -270,6 +270,9 @@ echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.15  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

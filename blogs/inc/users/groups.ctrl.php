@@ -68,7 +68,7 @@ if( $user_view_group_only )
  * Load editable objects and set $action (while checking permissions)
  */
 
-$UserCache  = & get_UserCache( );
+$UserCache  = & get_UserCache();
 $GroupCache = & get_GroupCache();
 
 if( $grp_ID !== NULL )
@@ -265,6 +265,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.3  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *

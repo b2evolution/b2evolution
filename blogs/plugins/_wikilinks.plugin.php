@@ -113,7 +113,7 @@ class wikilinks_plugin extends Plugin
 			}
 
 			// Lookup all urltitles at once in DB and preload cache:
-			$ItemCache = & get_ItemCache( );
+			$ItemCache = & get_ItemCache();
 			$ItemCache->load_urltitle_array( $wikiwords );
 
 			// Construct arrays for replacing wikiwords by links:
@@ -171,7 +171,7 @@ class wikilinks_plugin extends Plugin
 		}
 
 		// Lookup all urltitles at once in DB and preload cache:
-		$ItemCache = & get_ItemCache( );
+		$ItemCache = & get_ItemCache();
 		$ItemCache->load_urltitle_array( $wikiwords );
 
 		// Construct arrays for replacing wikiwords by links:
@@ -261,6 +261,9 @@ class wikilinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.29  2009/09/26 12:00:44  tblue246
+ * Minor/coding style
+ *
  * Revision 1.28  2009/09/25 07:33:31  efy-cantor
  * replace get_cache to get_*cache
  *

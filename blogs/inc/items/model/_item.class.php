@@ -313,7 +313,7 @@ class Item extends ItemLight
 			{
 				$this->assigned_user_ID = $user_ID;
 			}
-			$UserCache = & get_UserCache( );
+			$UserCache = & get_UserCache();
 			$this->assigned_User = & $UserCache->get_by_ID( $user_ID );
 		}
 		else
@@ -599,7 +599,7 @@ class Item extends ItemLight
 	 */
 	function get_assigned_user_options()
 	{
-		$UserCache = & get_UserCache( );
+		$UserCache = & get_UserCache();
 		return $UserCache->get_blog_member_option_list( $this->get_blog_ID(), $this->assigned_user_ID,
 							true,	($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */ );
 	}
@@ -1436,7 +1436,7 @@ class Item extends ItemLight
 	{
 		if( is_null( $this->Links ) )
 		{ // Links have not been loaded yet:
-			$LinkCache = & get_LinkCache( );
+			$LinkCache = & get_LinkCache();
 			$this->Links = & $LinkCache->get_by_item_ID( $this->ID );
 		}
 	}
@@ -1872,7 +1872,7 @@ class Item extends ItemLight
 	{
 		load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectList2' );
 
-		$FileCache = & get_FileCache( );
+		$FileCache = & get_FileCache();
 
 		$FileList = new DataObjectList2( $FileCache ); // IN FUNC
 
@@ -3472,7 +3472,7 @@ class Item extends ItemLight
 	{
 		if( ! isset($this->assigned_User) && isset($this->assigned_user_ID) )
 		{
-			$UserCache = & get_UserCache( );
+			$UserCache = & get_UserCache();
 			$this->assigned_User = & $UserCache->get_by_ID( $this->assigned_user_ID );
 		}
 
@@ -3489,7 +3489,7 @@ class Item extends ItemLight
 	{
 		if( is_null($this->creator_User) )
 		{
-			$UserCache = & get_UserCache( );
+			$UserCache = & get_UserCache();
 			$this->creator_User = & $UserCache->get_by_ID( $this->creator_user_ID );
 			$this->Author = & $this->creator_User;  // deprecated
 		}
@@ -3967,6 +3967,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.144  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.143  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

@@ -100,7 +100,7 @@ switch( $action )
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
 		$login = strtolower( $login );
 
-		$UserCache = & get_UserCache( );
+		$UserCache = & get_UserCache();
 		if( $UserCache->get_by_login( $login ) )
 		{ // The login is already registered
 			param_error( 'login', sprintf( T_('The login &laquo;%s&raquo; is already registered, please choose another one.'), $login ) );
@@ -225,6 +225,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.100  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.99  2009/09/25 07:32:51  efy-cantor
  * replace get_cache to get_*cache
  *

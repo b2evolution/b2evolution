@@ -78,7 +78,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	$old_cache_status = $Settings->get('general_cache_enabled');
 
 	load_class( '_core/model/_pagecache.class.php', 'PageCache' );
-	$PageCache = & new PageCache(  );
+	$PageCache = & new PageCache();
 
 	if( $old_cache_status == false && $new_cache_status == true )
 	{ // Caching has been turned ON:
@@ -131,6 +131,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.13  2009/09/16 05:35:47  efy-bogdan
  * Require country checkbox added
  *

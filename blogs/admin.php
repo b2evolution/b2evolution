@@ -74,7 +74,7 @@ require_once $inc_path.'_async.inc.php';
 if( isset($collections_Module) )
 {
 	$user_selected_blog = (int)$UserSettings->get('selected_blog');
-	$BlogCache = & get_BlogCache( );
+	$BlogCache = & get_BlogCache();
 	if( param( 'blog', 'integer', NULL, true ) === NULL      // We got no explicit blog choice (not even '0' for 'no blog'):
 		|| ($blog > 0 && ! ($Blog = & $BlogCache->get_by_ID( $blog, false, false )) )) // or we requested a nonexistent blog
 	{ // Try the memorized blog from the previous action:
@@ -224,6 +224,9 @@ require $inc_path.$ctrl_mappings[$ctrl];
 
 /*
  * $Log$
+ * Revision 1.34  2009/09/26 12:00:41  tblue246
+ * Minor/coding style
+ *
  * Revision 1.33  2009/09/25 07:32:51  efy-cantor
  * replace get_cache to get_*cache
  *

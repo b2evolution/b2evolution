@@ -263,7 +263,7 @@ class BlogCache extends DataObjectCache
 		}
 		else
 		{
-			$UserCache = & get_UserCache( );
+			$UserCache = & get_UserCache();
 			$for_User = & $UserCache->get_by_ID( $user_ID );
 		}
 		$for_User->get_Group();// ensure Group is set
@@ -357,6 +357,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.10  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

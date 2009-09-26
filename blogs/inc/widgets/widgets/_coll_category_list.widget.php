@@ -142,7 +142,7 @@ class coll_category_list_Widget extends ComponentWidget
 		/**
 		 * @var ChapterCache
 		 */
-		$ChapterCache = & get_ChapterCache( );
+		$ChapterCache = & get_ChapterCache();
 
 		$callbacks = array(
 			'line'         => array( $this, 'cat_line' ),
@@ -194,7 +194,7 @@ class coll_category_list_Widget extends ComponentWidget
 		else
 		{ // ____________________ We want to display cats for SEVERAL blogs ____________________
 
-			$BlogCache = & get_BlogCache( );
+			$BlogCache = & get_BlogCache();
 
 			// Make sure everything is loaded at once (vs multiple queries)
 			// fp> TODO: scaling
@@ -397,6 +397,9 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.24  2009/09/26 12:00:44  tblue246
+ * Minor/coding style
+ *
  * Revision 1.23  2009/09/25 07:33:31  efy-cantor
  * replace get_cache to get_*cache
  *

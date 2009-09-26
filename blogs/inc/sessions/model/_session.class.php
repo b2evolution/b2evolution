@@ -316,7 +316,7 @@ class Session
 	{
 		if( !empty($this->user_ID) )
 		{
-			$UserCache = & get_UserCache( );
+			$UserCache = & get_UserCache();
 			return $UserCache->get_by_ID( $this->user_ID );
 		}
 
@@ -546,6 +546,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.17  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.16  2009/09/25 19:12:39  blueyed
  * Allow caching for the load-session-data query. After all, a user might click somewhere before the next one arrives (re query cache).
  *

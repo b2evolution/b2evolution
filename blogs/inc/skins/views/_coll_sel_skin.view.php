@@ -21,7 +21,7 @@ echo '<h2>'.sprintf( T_('New %s'), Blog::kind_name($kind) ).':</h2>';
 
 echo '<h3>'.T_('Pick a skin:').'</h3>';
 
-$SkinCache = & get_SkinCache( );
+$SkinCache = & get_SkinCache();
 $SkinCache->load_all();
 
 // TODO: this is like touching private parts :>
@@ -40,6 +40,9 @@ echo '<div class="clear"></div>';
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.5  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *

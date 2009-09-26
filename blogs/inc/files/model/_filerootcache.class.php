@@ -74,7 +74,7 @@ class FileRootCache
 
 		if( isset($collections_Module) )
 		{	// Blog/collection media dirs:
-			$BlogCache = & get_BlogCache( );
+			$BlogCache = & get_BlogCache();
 			$bloglist = $BlogCache->load_user_blogs( 'blog_media_browse', $current_User->ID );
 			foreach( $bloglist as $blog_ID )
 			{
@@ -166,6 +166,9 @@ class FileRootCache
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.7  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

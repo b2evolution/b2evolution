@@ -409,7 +409,7 @@ function autoselect_blog( $permname, $permlevel = 'any' )
     /**
 		 * @var BlogCache
 		 */
-		$BlogCache = & get_BlogCache( );
+		$BlogCache = & get_BlogCache();
 
 		// Get first suitable blog
 		$blog_array = $BlogCache->load_user_blogs( $permname, $permlevel, $current_User->ID, 'ID', 1 );
@@ -472,6 +472,9 @@ function set_working_blog( $new_blog_ID )
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.7  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

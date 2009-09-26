@@ -295,7 +295,7 @@ class File extends DataObject
 				$this->desc  = $row->file_desc;
 
 				// Store this in the FileCache:
-				$FileCache = & get_FileCache( );
+				$FileCache = & get_FileCache();
 				$FileCache->add( $this );
 			}
 			else
@@ -1898,6 +1898,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.56  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.55  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

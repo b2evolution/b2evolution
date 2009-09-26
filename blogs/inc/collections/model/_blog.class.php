@@ -536,7 +536,7 @@ class Blog extends DataObject
 
 			if( param( 'owner_login', 'string', NULL ) !== NULL )
 			{ // Permissions:
-				$UserCache = & get_UserCache( );
+				$UserCache = & get_UserCache();
 				$owner_User = & $UserCache->get_by_login( get_param('owner_login'), false, false );
 				if( empty( $owner_User ) )
 				{
@@ -1513,7 +1513,7 @@ class Blog extends DataObject
 		/**
 		 * @var SkinCache
 		 */
-	 	$SkinCache = & get_SkinCache( );
+	 	$SkinCache = & get_SkinCache();
 		if( ! $Skin = & $SkinCache->get_by_folder( $skin_folder_name, $halt_on_error ) )
 		{
 			return NULL;
@@ -2005,7 +2005,7 @@ class Blog extends DataObject
 	{
 		if( !isset($this->owner_User) )
 		{
-			$UserCache = & get_UserCache( );
+			$UserCache = & get_UserCache();
 			$this->owner_User = & $UserCache->get_by_ID($this->owner_user_ID);
 		}
 
@@ -2142,6 +2142,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.81  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.80  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

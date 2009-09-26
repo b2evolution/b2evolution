@@ -59,7 +59,7 @@ else
 
 // Create result set:
 $Results = & new Results( $SQL->get(), 'blog_' );
-$Results->Cache = & get_BlogCache( );
+$Results->Cache = & get_BlogCache();
 $Results->title = T_('Blog list');
 $Results->no_results_text = $no_results;
 
@@ -215,6 +215,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.9  2009/09/25 13:07:49  efy-vyacheslav
  * Using the SQL class to prepare queries
  *

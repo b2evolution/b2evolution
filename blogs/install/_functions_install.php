@@ -182,7 +182,7 @@ function install_newdb()
 		/**
 		 * @var UserCache
 		 */
-		$UserCache = & get_UserCache( );
+		$UserCache = & get_UserCache();
 		// Create $current_User object.
 		// (Assigning by reference does not work with "global" keyword (PHP 5.2.8))
 		$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
@@ -825,6 +825,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.77  2009/09/26 12:00:44  tblue246
+ * Minor/coding style
+ *
  * Revision 1.76  2009/09/25 07:33:31  efy-cantor
  * replace get_cache to get_*cache
  *

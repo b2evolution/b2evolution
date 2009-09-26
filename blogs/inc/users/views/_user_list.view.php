@@ -174,7 +174,7 @@ $Results->cols[] = array(
 
 function user_avatar( $user_ID, $user_avatar_file_ID )
 {
-	$FileCache = & get_FileCache( );
+	$FileCache = & get_FileCache();
 
 	// Do not halt on error. A file can disappear without the profile being updated.
 	/**
@@ -328,6 +328,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.17  2009/09/26 12:00:44  tblue246
+ * Minor/coding style
+ *
  * Revision 1.16  2009/09/25 07:33:15  efy-cantor
  * replace get_cache to get_*cache
  *

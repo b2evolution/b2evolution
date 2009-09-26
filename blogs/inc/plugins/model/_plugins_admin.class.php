@@ -616,7 +616,7 @@ class Plugins_admin extends Plugins
 			if( strpos($event, 'RenderItemAs') === 0 )
 			{ // Clear pre-rendered content cache, if RenderItemAs* events get removed:
 				$DB->query( 'DELETE FROM T_items__prerendering WHERE 1=1' );
-				$ItemCache = & get_ItemCache( );
+				$ItemCache = & get_ItemCache();
 				$ItemCache->clear();
 				break;
 			}
@@ -777,7 +777,7 @@ class Plugins_admin extends Plugins
 				if( strpos($event, 'RenderItemAs') === 0 )
 				{ // Clear pre-rendered content cache, if RenderItemAs* events have been added or removed:
 					$DB->query( 'DELETE FROM T_items__prerendering WHERE 1=1' );
-					$ItemCache = & get_ItemCache( );
+					$ItemCache = & get_ItemCache();
 					$ItemCache->clear();
 					break;
 				}
@@ -927,7 +927,7 @@ class Plugins_admin extends Plugins
 			if( strpos($plugin_event, 'RenderItemAs') === 0 )
 			{ // Clear pre-rendered content cache, if RenderItemAs* events have been added or removed:
 				$DB->query( 'DELETE FROM T_items__prerendering WHERE 1=1' );
-				$ItemCache = & get_ItemCache( );
+				$ItemCache = & get_ItemCache();
 				$ItemCache->clear();
 				break;
 			}
@@ -1470,6 +1470,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.24  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.23  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *

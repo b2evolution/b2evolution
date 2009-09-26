@@ -45,7 +45,7 @@ if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm 
 
 	if( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
 	{	// Selected a new blog:
-		$BlogCache = & get_BlogCache( );
+		$BlogCache = & get_BlogCache();
 		/**
 		 * @var Blog
 		 */
@@ -72,7 +72,7 @@ memorize_param( 'blog', 'integer', -1 );	// Needed when generating static page f
 
 if( $tab == 'skin_settings' )
 {
-	$SkinCache = & get_SkinCache( );
+	$SkinCache = & get_SkinCache();
 	/**
 	 * @var Skin
 	 */
@@ -311,6 +311,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.21  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

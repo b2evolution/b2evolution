@@ -50,7 +50,7 @@ param_action();
 
 if( param( 'ufdf_ID', 'integer', '', true) )
 {// Load userfield from cache:
-	$UserfieldCache = & get_UserFieldCache( );
+	$UserfieldCache = & get_UserFieldCache();
 	if( ($edited_Userfield = & $UserfieldCache->get_by_ID( $ufdf_ID, false )) === false )
 	{	// We could not find the user field to edit:
 		unset( $edited_Userfield );

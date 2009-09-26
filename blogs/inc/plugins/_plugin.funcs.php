@@ -249,7 +249,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			break;
 
 		case 'select_blog':
-			$BlogCache = & get_BlogCache( );
+			$BlogCache = & get_BlogCache();
 			$Form->select_input_object( $input_name, $set_value, $BlogCache, $set_label, $params );
 			break;
 
@@ -259,7 +259,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			break;
 
 		case 'select_user':
-			$UserCache = & get_UserCache( );
+			$UserCache = & get_UserCache();
 			$UserCache->load_all();
 			if( ! isset($params['loop_object_method']) )
 			{
@@ -861,7 +861,7 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 					switch( $meta['type'] )
 					{
 						case 'select_blog':
-							$Cache = & get_BlogCache( );
+							$Cache = & get_BlogCache();
 							break;
 
 						case 'select_group':
@@ -869,7 +869,7 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 							break;
 
 						case 'select_user':
-							$Cache = & get_UserCache( );
+							$Cache = & get_UserCache();
 							break;
 					}
 
@@ -1023,6 +1023,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.13  2009/09/25 07:32:53  efy-cantor
  * replace get_cache to get_*cache
  *

@@ -41,7 +41,7 @@ if( empty($blog) )
 { // No blog requested by URL param, let's try to match something in the URL
 	$Debuglog->add( 'No blog param received, checking extra path...', 'detectblog' );
 
-	$BlogCache = & get_BlogCache( );
+	$BlogCache = & get_BlogCache();
 
 	if( preg_match( '#^(.+?)index.php/([^/]+)#', $ReqHost.$ReqPath, $matches ) )
 	{ // We have an URL blog name:

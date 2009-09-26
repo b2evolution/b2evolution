@@ -189,7 +189,7 @@ class Skin extends DataObject
 		/**
 		 * @var EnabledWidgetCache
 		 */
-		$EnabledWidgetCache = & get_EnabledWidgetCache( );
+		$EnabledWidgetCache = & get_EnabledWidgetCache();
 		$Widget_array = & $EnabledWidgetCache->get_by_coll_container( $Blog->ID, $sco_name );
 
 		if( !empty($Widget_array) )
@@ -610,6 +610,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.18  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *

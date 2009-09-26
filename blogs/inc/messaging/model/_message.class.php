@@ -114,7 +114,7 @@ class Message extends DataObject
 	{
 		if( is_null($this->Thread) && !empty($this->thread_ID) )
 		{
-			$ThreadCache = & get_ThreadCache( );
+			$ThreadCache = & get_ThreadCache();
 			$this->Thread = $ThreadCache->get_by_ID( $this->thread_ID );
 		}
 
@@ -444,7 +444,7 @@ class Message extends DataObject
 
 		// Send email notifications:
 		$ret = true;
-		$UserCache = & get_UserCache( );
+		$UserCache = & get_UserCache();
 		foreach( $DB->get_results( $SQL->get() ) as $row )
 		{
 			$User = & $UserCache->get_by_login( $row->user_login );
@@ -461,6 +461,9 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.19  2009/09/25 07:32:53  efy-cantor
  * replace get_cache to get_*cache
  *

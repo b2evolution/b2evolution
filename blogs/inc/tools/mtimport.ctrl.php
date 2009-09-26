@@ -289,7 +289,7 @@ param( 'import_mode', 'string', 'normal' );
 				<div class="input">
 					<select name="default_blog">
 					<?php
-					$BlogCache = & get_BlogCache( );
+					$BlogCache = & get_BlogCache();
 					echo $BlogCache->get_option_list( 2 );  // use first non-all blog as default
 					?>
 					</select>
@@ -880,7 +880,7 @@ param( 'import_mode', 'string', 'normal' );
 
 					case 'createnew':
 						// check if the user already exists
-						$UserCache = & get_UserCache( );
+						$UserCache = & get_UserCache();
 						$item_Author = & $UserCache->get_by_login( $usersmapped[ $post_author ][1] );
 
 						if( ! $item_Author )
@@ -1674,6 +1674,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.15  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *

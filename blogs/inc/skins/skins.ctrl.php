@@ -32,7 +32,7 @@ param( 'redirect_to', 'string', '?ctrl=skins' );
 
 if( param( 'skin_ID', 'integer', '', true) )
 {// Load file type:
-	$SkinCache = & get_SkinCache( );
+	$SkinCache = & get_SkinCache();
 	if( ($edited_Skin = & $SkinCache->get_by_ID( $skin_ID, false )) === false )
 	{	// We could not find the skin to edit:
 		unset( $edited_Skin );
@@ -197,6 +197,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.6  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *

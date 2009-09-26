@@ -136,7 +136,7 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 		echo $this->disp_params['list_start'];
 
-		$SkinCache = & get_SkinCache( );
+		$SkinCache = & get_SkinCache();
 		$SkinCache->load_by_type( 'feed' );
 
 		// TODO: this is like touching private parts :>
@@ -195,6 +195,9 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.21  2009/09/26 12:00:44  tblue246
+ * Minor/coding style
+ *
  * Revision 1.20  2009/09/25 07:33:31  efy-cantor
  * replace get_cache to get_*cache
  *

@@ -148,7 +148,7 @@ $Results->global_icon( T_('Cancel!'), 'close', '?ctrl=threads' );
  */
 function user_avatar( $user_ID, $user_avatar_file_ID )
 {
-	$FileCache = & get_FileCache( );
+	$FileCache = & get_FileCache();
 
 	if( ! $File = & $FileCache->get_by_ID( $user_avatar_file_ID, false, false ) )
 	{
@@ -258,6 +258,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.20  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.19  2009/09/25 07:32:53  efy-cantor
  * replace get_cache to get_*cache
  *

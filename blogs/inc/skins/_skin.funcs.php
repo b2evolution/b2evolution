@@ -189,7 +189,7 @@ function skin_init( $disp )
 						{ // Check if the URL was canonical:
 							if( !isset( $Chapter ) )
 							{
-								$ChapterCache = & get_ChapterCache( );
+								$ChapterCache = & get_ChapterCache();
 								/**
 								 * @var Chapter
 								 */
@@ -784,7 +784,7 @@ function skin_container( $sco_name, $params = array() )
  */
 function & skin_install( $skin_folder )
 {
-	$SkinCache = & get_SkinCache( );
+	$SkinCache = & get_SkinCache();
 	$Skin = & $SkinCache->new_obj( NULL, $skin_folder );
 
 	$Skin->install();
@@ -881,7 +881,7 @@ function skin_file_exists( $name, $filename = 'index.main.php' )
  */
 function skin_installed( $name )
 {
-	$SkinCache = & get_SkinCache( );
+	$SkinCache = & get_SkinCache();
 
 	if( skin_provided_by_plugin( $name ) || $SkinCache->get_by_folder( $name, false ) )
 	{
@@ -894,6 +894,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.76  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.75  2009/09/25 22:04:39  tblue246
  * Bugfix
  *

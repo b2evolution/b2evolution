@@ -888,7 +888,7 @@ function item_link_by_urltitle( $params = array() )
   /**
 	 * @var ItemCache
 	 */
-	$ItemCache = & get_ItemCache( );
+	$ItemCache = & get_ItemCache();
 
   /**
 	 * @var Item
@@ -976,6 +976,9 @@ function check_perm_posttype( $post_extracats )
 
 /*
  * $Log$
+ * Revision 1.71  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.70  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

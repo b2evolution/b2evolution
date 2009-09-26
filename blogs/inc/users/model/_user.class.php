@@ -432,7 +432,7 @@ class User extends DataObject
 	{
 		if( is_null($this->Country) && !empty($this->ctry_ID ) )
 		{
-			$CountryCache = & get_CountryCache( );
+			$CountryCache = & get_CountryCache();
 			$this->Country = $CountryCache->get_by_ID( $this->ctry_ID );
 		}
 
@@ -942,7 +942,7 @@ class User extends DataObject
 
 					// efy-maxim> Currently, below code can't be moved to messaging code
 					// efy-maxim> because messaging permissions can only be checked in core module
-					$ThreadCache = & get_ThreadCache( );
+					$ThreadCache = & get_ThreadCache();
 					$Thread = & $ThreadCache->get_by_ID( $perm_target, false );
 
 					if( $Thread === false || ! $Thread->check_thread_recipient( $this->ID ) )
@@ -1726,7 +1726,7 @@ class User extends DataObject
 		}
 		else
 		{
-			$FileCache = & get_FileCache( );
+			$FileCache = & get_FileCache();
 
 			// Do not halt on error. A file can disappear without the profile being updated.
 			/**
@@ -1845,6 +1845,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.54  2009/09/26 12:00:44  tblue246
+ * Minor/coding style
+ *
  * Revision 1.53  2009/09/25 14:18:22  tblue246
  * Reverting accidental commits
  *

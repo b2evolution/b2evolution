@@ -70,7 +70,7 @@ $Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20
 	
 	if( $registration_require_country )
 	{
-		$CountryCache = & get_CountryCache( );
+		$CountryCache = & get_CountryCache();
 		$Form->select_input_object( 'country', $country, $CountryCache, 'Country', $field_params = array('allow_none'=>true, 'required'=>true) );
 	}
 		
@@ -93,6 +93,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.10  2009/09/26 12:00:44  tblue246
+ * Minor/coding style
+ *
  * Revision 1.9  2009/09/25 07:33:31  efy-cantor
  * replace get_cache to get_*cache
  *

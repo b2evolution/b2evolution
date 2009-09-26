@@ -377,7 +377,7 @@ function _wp_or_blogger_getusersblogs( $type, $m )
 	}
 
 	// LOAD BLOGS tehuser is a member of:
-	$BlogCache = & get_BlogCache( );
+	$BlogCache = & get_BlogCache();
 	$blog_array = $BlogCache->load_user_blogs( 'blog_ismember', 'view', $current_User->ID, 'ID' );
 
 	$resp_array = array();
@@ -505,7 +505,7 @@ function & xmlrpcs_login( $m, $login_param, $pass_param )
   /**
 	 * @var UserCache
 	 */
-	$UserCache = & get_UserCache( );
+	$UserCache = & get_UserCache();
 	$current_User = & $UserCache->get_by_login( $username );
 
 	if( empty( $current_User ) || ! $current_User->check_password( $password, false ) )
@@ -543,7 +543,7 @@ function & xmlrpcs_get_Blog( $m, $blog_param )
 	/**
 	 * @var BlogCache
 	 */
-	$BlogCache = & get_BlogCache( );
+	$BlogCache = & get_BlogCache();
 	/**
 	 * @var Blog
 	 */
@@ -580,7 +580,7 @@ function & xmlrpcs_get_Item( $m, $postid_param )
   /**
 	 * @var ItemCache
 	 */
-	$ItemCache = & get_ItemCache( );
+	$ItemCache = & get_ItemCache();
   /**
 	 * @var Item
 	 */
@@ -855,7 +855,7 @@ function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
 	$maincat   = trim( $maincat );
 	$extracats = array_map( 'trim', $extracats );
 
-	$ChapterCache = & get_ChapterCache( );
+	$ChapterCache = & get_ChapterCache();
 
 	// ---- CHECK MAIN CATEGORY ----
 	if( $ChapterCache->get_by_ID( $maincat, false ) === false )
@@ -906,6 +906,9 @@ function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.22  2009/09/26 12:00:44  tblue246
+ * Minor/coding style
+ *
  * Revision 1.21  2009/09/25 07:33:31  efy-cantor
  * replace get_cache to get_*cache
  *

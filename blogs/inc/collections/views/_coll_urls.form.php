@@ -112,7 +112,7 @@ $Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']'.get_manual_link('blog
 		if( $default_blog_ID = $Settings->get('default_blog_ID') )
 		{
 			$Debuglog->add('Default blog is set to: '.$default_blog_ID);
-			$BlogCache = & get_BlogCache( );
+			$BlogCache = & get_BlogCache();
 			if( $default_Blog = & $BlogCache->get_by_ID($default_blog_ID, false) )
 			{ // Default blog exists
 				$defblog = $default_Blog->dget('shortname');
@@ -320,6 +320,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.24  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.23  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

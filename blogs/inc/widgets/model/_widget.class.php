@@ -491,7 +491,7 @@ class ComponentWidget extends DataObject
 		/**
 		 * @var BlogCache
 		 */
-		$BlogCache = & get_BlogCache( );
+		$BlogCache = & get_BlogCache();
 
 		if( $filter == 'owner' )
 		{	// Load blogs of same owner
@@ -612,6 +612,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.65  2009/09/26 12:00:44  tblue246
+ * Minor/coding style
+ *
  * Revision 1.64  2009/09/25 07:33:15  efy-cantor
  * replace get_cache to get_*cache
  *

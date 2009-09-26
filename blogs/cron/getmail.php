@@ -607,7 +607,7 @@ for ( $index = 1; $index <= $imap_obj->Nmsgs; $index++ )
 	}
 
 	// check_html_sanity needs local user set.
-	$UserCache = & get_UserCache( );
+	$UserCache = & get_UserCache();
 	$current_User = & $UserCache->get_by_login( $user_login );
 
 	$post_title = get_post_title( $content, $subject );
@@ -622,7 +622,7 @@ for ( $index = 1; $index <= $imap_obj->Nmsgs; $index++ )
 	$blog_ID = get_catblog( $post_category ); // TODO: should not die, if cat does not exist!
 	echo_message( 'Blog ID: ' . $blog_ID, INFO, 3 );
 
-	$BlogCache = & get_BlogCache( );
+	$BlogCache = & get_BlogCache();
 	$Blog = $BlogCache->get_by_ID( $blog_ID, false, false );
 
 	if( empty( $Blog ) )
@@ -712,6 +712,9 @@ if( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.42  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.41  2009/09/25 07:32:51  efy-cantor
  * replace get_cache to get_*cache
  *

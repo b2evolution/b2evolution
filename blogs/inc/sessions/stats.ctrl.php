@@ -74,7 +74,7 @@ if( $blog == 0 )
 		}
 		elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
 		{	// Selected a new blog:
-			$BlogCache = & get_BlogCache( );
+			$BlogCache = & get_BlogCache();
 			$Blog = & $BlogCache->get_by_ID( $blog );
 		}
 	}
@@ -262,6 +262,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.18  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *

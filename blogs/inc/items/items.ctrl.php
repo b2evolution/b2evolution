@@ -64,7 +64,7 @@ switch( $action )
 {
 	case 'edit_links':
 		param( 'item_ID', 'integer', true, true );
-		$ItemCache = & get_ItemCache( );
+		$ItemCache = & get_ItemCache();
 		$edited_Item = & $ItemCache->get_by_ID( $item_ID );
 		// Load the blog we're in:
 		$Blog = & $edited_Item->get_Blog();
@@ -75,7 +75,7 @@ switch( $action )
 		param( 'iframe_name', 'string', '', true );
 
 		param( 'link_ID', 'integer', true );
-		$LinkCache = & get_LinkCache( );
+		$LinkCache = & get_LinkCache();
 		if( ($edited_Link = & $LinkCache->get_by_ID( $link_ID, false )) !== false )
 		{	// We have a link, get the Item it is attached to:
 			$edited_Item = & $edited_Link->Item;
@@ -93,7 +93,7 @@ switch( $action )
 			{
 				$action = 'edit_links';
 				param( 'item_ID', 'integer', true, true );
-				$ItemCache = & get_ItemCache( );
+				$ItemCache = & get_ItemCache();
 				$edited_Item = & $ItemCache->get_by_ID( $item_ID );
 				// Load the blog we're in:
 				$Blog = & $edited_Item->get_Blog();
@@ -109,7 +109,7 @@ switch( $action )
 	case 'history':
  		// Load post to edit:
 		param( 'p', 'integer', true, true );
-		$ItemCache = & get_ItemCache( );
+		$ItemCache = & get_ItemCache();
 		$edited_Item = & $ItemCache->get_by_ID( $p );
 
 		// Load the blog we're in:
@@ -130,7 +130,7 @@ switch( $action )
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
  		// Load post to edit:
 		param( 'post_ID', 'integer', true, true );
-		$ItemCache = & get_ItemCache( );
+		$ItemCache = & get_ItemCache();
 		$edited_Item = & $ItemCache->get_by_ID( $post_ID );
 
 		// Load the blog we're in:
@@ -169,7 +169,7 @@ switch( $action )
 		{
 			if( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
 			{	// Selected a new blog:
-				$BlogCache = & get_BlogCache( );
+				$BlogCache = & get_BlogCache();
 				$Blog = & $BlogCache->get_by_ID( $blog );
 			}
 
@@ -882,7 +882,7 @@ require_css( $rsc_url.'css/blog_base.css' );
 // Load the appropriate ITEM/POST styles depending on the blog's skin:
 if( ! empty( $Blog->skin_ID) )
 {
-	$SkinCache = & get_SkinCache( );
+	$SkinCache = & get_SkinCache();
 	/**
 	 * @var Skin
 	 */
@@ -1051,6 +1051,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.65  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.64  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

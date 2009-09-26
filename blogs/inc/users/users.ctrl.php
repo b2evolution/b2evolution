@@ -72,7 +72,7 @@ if( $user_profile_only )
  * Load editable objects and set $action (while checking permissions)
  */
 
-$UserCache = & get_UserCache( );
+$UserCache = & get_UserCache();
 
 if( ! is_null($user_ID) )
 { // User selected
@@ -687,6 +687,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.34  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.33  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *

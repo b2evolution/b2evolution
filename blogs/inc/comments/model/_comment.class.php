@@ -167,7 +167,7 @@ class Comment extends DataObject
 	{
 		if( isset($this->author_user_ID) && ! isset($this->author_User) )
 		{
-			$UserCache = & get_UserCache( );
+			$UserCache = & get_UserCache();
 			$this->author_User = & $UserCache->get_by_ID( $this->author_user_ID );
 		}
 
@@ -184,7 +184,7 @@ class Comment extends DataObject
 	{
 		if( ! isset($this->Item) )
 		{
-			$ItemCache = & get_ItemCache( );
+			$ItemCache = & get_ItemCache();
 			$this->Item = & $ItemCache->get_by_ID( $this->item_ID );
 		}
 
@@ -1463,6 +1463,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.37  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

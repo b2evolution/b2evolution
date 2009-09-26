@@ -190,7 +190,7 @@ $Form->begin_fieldset( T_('Identity') );
 		$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => true ) );
 		$Form->select( 'edited_user_idmode', $edited_User->get( 'idmode' ), array( &$edited_User, 'callback_optionsForIdMode' ), T_('Identity shown') );
 
-		$CountryCache = & get_CountryCache( );
+		$CountryCache = & get_CountryCache();
 		$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, 'Country', $field_params = array('allow_none'=>true, 'required'=>true) );
 
 		$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
@@ -514,6 +514,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.22  2009/09/26 12:00:44  tblue246
+ * Minor/coding style
+ *
  * Revision 1.21  2009/09/25 07:33:15  efy-cantor
  * replace get_cache to get_*cache
  *

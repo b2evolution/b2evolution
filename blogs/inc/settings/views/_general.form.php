@@ -57,7 +57,7 @@ if( isset($collections_Module) )
 {
 	$Form->begin_fieldset( T_('Display options') );
 
-	$BlogCache = & get_BlogCache( );
+	$BlogCache = & get_BlogCache();
 
 		$Form->select_input_object( 'default_blog_ID', $Settings->get('default_blog_ID'), $BlogCache, T_('Default blog to display'), array(
 				'note' => T_('This blog will be displayed on index.php.').' <a href="'.$dispatcher.'?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
@@ -102,6 +102,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.13  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *

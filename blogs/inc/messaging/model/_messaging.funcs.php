@@ -46,7 +46,7 @@ function load_messaging_threads_recipients( $user_ID )
 
 	$SQL->WHERE( 'ts.tsta_user_ID = '.$user_ID );
 
-	$UserCache = & get_UserCache( );
+	$UserCache = & get_UserCache();
 
 	foreach( $DB->get_results( $SQL->get() ) as $row )
 	{
@@ -77,7 +77,7 @@ function load_messaging_thread_recipients( $thrd_ID )
 
 	$SQL->WHERE( 'ts.tsta_thread_ID = '.$thrd_ID );
 
-	$UserCache = & get_UserCache( );
+	$UserCache = & get_UserCache();
 
 	foreach( $DB->get_results( $SQL->get() ) as $row )
 	{
@@ -126,6 +126,9 @@ function check_blocked_contacts( $recipients_list )
 
 /*
  * $Log$
+ * Revision 1.5  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.4  2009/09/25 07:32:53  efy-cantor
  * replace get_cache to get_*cache
  *

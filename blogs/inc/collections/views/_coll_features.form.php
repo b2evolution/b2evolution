@@ -174,7 +174,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 
 	$Form->begin_fieldset( T_('Skin and style').' ['.T_('Admin').']' );
 
-		$SkinCache = & get_SkinCache( );
+		$SkinCache = & get_SkinCache();
 		$SkinCache->load_all();
 		$Form->select_input_object( 'blog_skin_ID', $edited_Blog->skin_ID, $SkinCache, T_('Skin') );
 		$Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('You will be able to customize the blog\'s skin stylesheet with a file named style.css in the blog\'s media file folder.') );
@@ -191,6 +191,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.17  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.16  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

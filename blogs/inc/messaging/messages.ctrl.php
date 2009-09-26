@@ -43,7 +43,7 @@ param_action();
 
 if( param( 'thrd_ID', 'integer', '', true) )
 {// Load thread from cache:
-	$ThreadCache = & get_ThreadCache( );
+	$ThreadCache = & get_ThreadCache();
 	if( ($edited_Thread = & $ThreadCache->get_by_ID( $thrd_ID, false )) === false )
 	{	unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
@@ -176,6 +176,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2009/09/26 12:00:43  tblue246
+ * Minor/coding style
+ *
  * Revision 1.11  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

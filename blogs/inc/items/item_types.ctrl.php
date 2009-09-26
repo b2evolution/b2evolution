@@ -72,7 +72,7 @@ param_action();
 
 if( param( 'ptyp_ID', 'integer', '', true) )
 {// Load itemtype from cache:
-	$ItemtypeCache = & get_ItemTypeCache( );
+	$ItemtypeCache = & get_ItemTypeCache();
 	if( ($edited_Itemtype = & $ItemtypeCache->get_by_ID( $ptyp_ID, false )) === false )
 	{	// We could not find the item type to edit:
 		unset( $edited_Itemtype );
@@ -306,6 +306,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.7  2009/09/25 11:36:44  efy-sergey
  * Replaced "simple list" manager for Post types. Also allow to edit ID for Item types
  *

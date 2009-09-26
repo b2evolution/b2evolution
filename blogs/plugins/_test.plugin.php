@@ -749,7 +749,7 @@ class test_plugin extends Plugin
 		{
 			global $Session, $Messages;
 
-			$UserCache = & get_UserCache( );
+			$UserCache = & get_UserCache();
 			if( $demo_User = & $UserCache->get_by_login('demouser') )
 			{ // demouser exists:
 				$Session->set_User( $demo_User );
@@ -836,6 +836,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.85  2009/09/26 12:00:44  tblue246
+ * Minor/coding style
+ *
  * Revision 1.84  2009/09/25 07:33:31  efy-cantor
  * replace get_cache to get_*cache
  *

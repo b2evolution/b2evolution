@@ -148,7 +148,7 @@ elseif( $antispam_on_message_form && antispam_check( $message ) )
 
 
 // Build message footer:
-$BlogCache = & get_BlogCache( );
+$BlogCache = & get_BlogCache();
 $message_footer = '';
 if( !empty( $comment_id ) )
 {
@@ -175,7 +175,7 @@ else
 
 if( ! empty( $recipient_id ) )
 { // Get the email address for the recipient if a member:
-	$UserCache = & get_UserCache( );
+	$UserCache = & get_UserCache();
 	$recipient_User = & $UserCache->get_by_ID( $recipient_id );
 
 	if( empty($recipient_User->allow_msgform) )
@@ -310,6 +310,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.62  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.61  2009/09/25 07:32:51  efy-cantor
  * replace get_cache to get_*cache
  *

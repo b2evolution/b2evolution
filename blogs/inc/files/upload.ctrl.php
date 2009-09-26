@@ -321,7 +321,7 @@ if( isset($_FILES) && count( $_FILES ) )
 		}
 
 		// Get File object for requested target location:
-		$FileCache = & get_FileCache( );
+		$FileCache = & get_FileCache();
 		$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
 
 		if( $newFile->exists() )
@@ -429,6 +429,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/26 12:00:42  tblue246
+ * Minor/coding style
+ *
  * Revision 1.15  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

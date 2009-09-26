@@ -83,7 +83,7 @@ function is_logged_in()
  */
 function user_pass_ok( $login, $pass, $pass_is_md5 = false )
 {
-	$UserCache = & get_UserCache( );
+	$UserCache = & get_UserCache();
 	$User = & $UserCache->get_by_login( $login );
 	if( !$User )
 	{
@@ -466,7 +466,7 @@ function get_user_subs_url()
  */
 function user_preferredname( $user_ID )
 {
-	$UserCache = & get_UserCache( );
+	$UserCache = & get_UserCache();
 	if( !empty( $user_ID )
 		&& ($User = & $UserCache->get_by_ID( $user_ID )) )
 	{
@@ -658,6 +658,9 @@ function get_avatar_imgtags( $user_logins_list, $show_login = true, $link = true
 
 /*
  * $Log$
+ * Revision 1.20  2009/09/26 12:00:44  tblue246
+ * Minor/coding style
+ *
  * Revision 1.19  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *
