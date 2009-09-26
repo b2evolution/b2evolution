@@ -913,10 +913,12 @@ class Table extends Widget
 	}
 
 
-  /**
+	/**
+	 * Start a column (data).
 	 *
+	 * @param array Additional attributes for the <td> tag (attr_name => attr_value).
 	 */
-	function display_col_start()
+	function display_col_start( $extra_attr = array() )
 	{
 		// Get colum definitions for current column:
 		$col = $this->cols[$this->displayed_cols_count];
@@ -957,6 +959,13 @@ class Table extends Widget
 			$output = $this->params['col_start'];
 			// Replace the "class_attrib" in the total col start param by the td column class
 			$output = str_replace( '$class_attrib$', 'class="'.$class.'"', $output );
+		}
+
+		// Custom attributes:
+		// Tblue> TODO: Make this more elegant...
+		if( $extra_attr )
+		{
+			$output = substr( $output, 0, -1 ).' '.get_field_attribs_as_string( $extra_attr ).'>';
 		}
 
 		echo $output;
@@ -1003,6 +1012,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.13  2009/09/26 21:23:02  tblue246
+ * Non-JS widgets screen: Use proper colspan for "No widgets" message.
+ *
  * Revision 1.12  2009/09/16 01:33:55  fplanque
  * no message
  *

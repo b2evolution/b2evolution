@@ -90,7 +90,7 @@ function display_container( $container, $legend_suffix = '' )
 	if( empty($Widget_array) )
 	{	// TODO: cleanup
 		$Table->display_line_start( true );
-		$Table->display_col_start();
+		$Table->display_col_start( array( 'colspan' => 5 ) );
 		echo '<span class="new_widget">'.T_('There is no widget in this container yet.').'</span>';
 		$Table->display_col_end();
 		$Table->display_line_end();
@@ -212,6 +212,9 @@ echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear">';
 
 /*
  * $Log$
+ * Revision 1.18  2009/09/26 21:23:02  tblue246
+ * Non-JS widgets screen: Use proper colspan for "No widgets" message.
+ *
  * Revision 1.17  2009/09/25 07:33:30  efy-cantor
  * replace get_cache to get_*cache
  *
