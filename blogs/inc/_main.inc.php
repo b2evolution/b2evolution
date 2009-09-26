@@ -298,12 +298,6 @@ locale_activate( $default_locale );
 // Set encoding for MySQL connection:
 $DB->set_connection_charset( $current_charset );
 
-// PHP >= 5.3 (?): Prevent "It is not safe to rely on the system's timezone settings. [...]" warning.
-if( function_exists( 'date_default_timezone_set' ) && function_exists( 'date_default_timezone_get' ) )
-{
-	date_default_timezone_set( @date_default_timezone_get() );
-}
-
 
 /**
  * @global Hit The Hit object
@@ -672,6 +666,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.127  2009/09/26 13:50:28  tblue246
+ * MFH: Reverting fix for timezone warnings, let users fix their errors themselves.
+ *
  * Revision 1.126  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *
