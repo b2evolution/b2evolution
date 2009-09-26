@@ -688,6 +688,10 @@ class Plugins
 	 * The plugin must provide setting definitions (through {@link Plugin::GetDefaultSettings()}
 	 * OR {@link Plugin::GetDefaultUserSettings()}).
 	 *
+	 * @todo dh> there should be only one instance of Plugin(User)Settings, which would allow to
+	 *           query the DB at once.
+	 *           Defaults would need to be handled by Plugin(User)Settings::get_default() then.
+	 *
 	 * @param Plugin
 	 * @param string settings type: "Settings" or "UserSettings"
 	 * @return boolean NULL, if no Settings
@@ -1926,6 +1930,9 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.19  2009/09/26 20:41:52  blueyed
+ * todo
+ *
  * Revision 1.18  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *
