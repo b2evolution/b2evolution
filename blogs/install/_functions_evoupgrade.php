@@ -2427,6 +2427,23 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9960' );
 	}
 
+	if( $old_db_version < 9965 )
+	{	// 3.3.2
+
+		task_begin( 'Upgrading skins table... ' );
+		$DB->query( "ALTER TABLE T_skins__skin
+						MODIFY skin_type enum('normal','feed','sitemap') NOT NULL default 'normal'" );
+		task_end();
+
+		task_begin( 'Setting skin type of sitemap skin to "sitemap"... ' );
+		$DB->query( "UPDATE T_skins__skin
+						SET skin_type = 'sitemap'
+						WHERE skin_folder = '_sitemap'" );
+		task_end();
+
+		set_upgrade_checkpoint( '9965' );
+	}
+
 	if( $old_db_version < 9970 )
 	{	// 3.4
 
@@ -2726,6 +2743,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.330  2009/09/26 13:41:54  tblue246
+ * If XML feeds are disabled for a blog, still allow accessing "sitemap" skins.
+ *
  * Revision 1.329  2009/09/25 20:26:26  fplanque
  * fixes/doc
  *

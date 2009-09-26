@@ -26,10 +26,10 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_skins__skin' => array(
 		'Creating table for installed skins',
 		"CREATE TABLE T_skins__skin (
-				skin_ID      int(10) unsigned      NOT NULL auto_increment,
-				skin_name    varchar(32)           NOT NULL,
-				skin_type    enum('normal','feed') NOT NULL default 'normal',
-				skin_folder  varchar(32)           NOT NULL,
+				skin_ID      int(10) unsigned                NOT NULL auto_increment,
+				skin_name    varchar(32)                     NOT NULL,
+				skin_type    enum('normal','feed','sitemap') NOT NULL default 'normal',
+				skin_folder  varchar(32)                     NOT NULL,
 				PRIMARY KEY skin_ID (skin_ID),
 				UNIQUE skin_folder( skin_folder ),
 				KEY skin_name( skin_name )

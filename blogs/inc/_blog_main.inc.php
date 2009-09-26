@@ -456,11 +456,15 @@ if( isset( $skin ) )
 			$disp_detail = '404-feeds-disabled';
 		}
 	}
+	elseif( $Skin->type == 'sitemap' )
+	{	// "sitemap" skins are always accessible and cannot be disabled.
+		// Do not do anything in this block...
+	}
 	elseif( skin_exists( $skin ) && ! skin_installed( $skin ) )
 	{	// The requested skin is not a feed skin and exists in the file system, but isn't installed:
 		debug_die( sprintf( T_( 'The skin [%s] is not installed on this system.' ), htmlspecialchars( $skin ) ) );
 	}
-	else if( ! empty( $tempskin ) )
+	elseif( ! empty( $tempskin ) )
 	{ // By definition, we want to see the temporary skin (if we don't use feedburner... )
 		$redir = 'no';
 	}
@@ -596,6 +600,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.146  2009/09/26 13:41:54  tblue246
+ * If XML feeds are disabled for a blog, still allow accessing "sitemap" skins.
+ *
  * Revision 1.145  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *

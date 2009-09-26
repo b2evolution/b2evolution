@@ -55,6 +55,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 									 array(
 													array( 'normal', T_( 'Normal' ), T_( 'Normal skin for general browsing' ) ),
 													array( 'feed', T_( 'XML Feed' ), T_( 'Special system skin for XML feeds like RSS and Atom' ) ),
+													array( 'sitemap', T_( 'XML Sitemap' ), T_( 'Special system skin for XML sitemaps' ) ),
 												),
 										T_( 'Skin type' ),
 										true // separate lines
@@ -78,6 +79,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/26 13:41:54  tblue246
+ * If XML feeds are disabled for a blog, still allow accessing "sitemap" skins.
+ *
  * Revision 1.5  2009/05/23 20:20:18  fplanque
  * Skins can now have a _skin.class.php file to override default Skin behaviour. Currently only the default name but can/will be extended.
  *
