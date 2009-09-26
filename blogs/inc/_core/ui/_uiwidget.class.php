@@ -965,7 +965,7 @@ class Table extends Widget
 		// Tblue> TODO: Make this more elegant...
 		if( $extra_attr )
 		{
-			$output = substr( $output, 0, -1 ).' '.get_field_attribs_as_string( $extra_attr ).'>';
+			$output = substr( $output, 0, -1 ).get_field_attribs_as_string( $extra_attr ).'>';
 		}
 
 		echo $output;
@@ -1012,6 +1012,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/26 21:26:19  tblue246
+ * minor
+ *
  * Revision 1.13  2009/09/26 21:23:02  tblue246
  * Non-JS widgets screen: Use proper colspan for "No widgets" message.
  *
