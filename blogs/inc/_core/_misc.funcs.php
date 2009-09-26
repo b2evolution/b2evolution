@@ -1313,6 +1313,33 @@ function is_url( $url )
 
 
 /**
+ * Checks if the word is valid
+ *
+ * @param string word to check
+ * @return string error message if word is not valid
+ */
+function check_is_word( $word )
+{
+	if( !is_word( $word ) )
+	{
+		return T_('The word is invalid.');
+	}
+}
+
+
+/**
+ * Checks if the word is valid
+ *
+ * @param string word to check
+ * @return boolean true if OK
+ */
+function is_word( $word )
+{
+	return preg_match( '#^[A-Za-z]+$#', $word );
+}
+
+
+/**
  * Are we running on a Windows server?
  */
 function is_windows()
@@ -3677,6 +3704,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.163  2009/09/26 15:18:12  efy-maxim
+ * temporary solution for file/image types
+ *
  * Revision 1.162  2009/09/25 20:34:44  tblue246
  * Fixed parse error
  *

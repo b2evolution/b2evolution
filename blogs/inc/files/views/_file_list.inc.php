@@ -291,6 +291,20 @@ $Form->begin_form();
 								NULL, NULL, NULL, array() );
 					echo ' ';
 				}
+
+				// efy-maxim TODO: temporary solution for file/image types in dbase mod
+				$db_ID = param( 'db_ID', 'string' );
+				if( $db_ID != NULL )
+				{
+					$db_action = param( 'db_action', 'string' );
+					$field_name = param( 'field_name', 'string' );
+
+					echo action_icon( T_('Link this file!'), 'link',
+								regenerate_url( 'fm_selected', 'action=link_db&amp;db_ID='.$db_ID.'&amp;db_action='.$db_action.'&amp;field_name='.$field_name.'&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ),
+								NULL, NULL, NULL, array() );
+
+					echo ' ';
+				}
 			}
 
 			/********************  Filename  ********************/
@@ -634,6 +648,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.24  2009/09/26 15:18:12  efy-maxim
+ * temporary solution for file/image types
+ *
  * Revision 1.23  2009/08/30 23:22:26  blueyed
  * When inserting tags for selected files to an item, implode multiple file tags using newlines, not just space. Makes it a lot easier to handle the tag soup.
  *

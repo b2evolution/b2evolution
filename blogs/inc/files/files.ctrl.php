@@ -1065,6 +1065,25 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=users&user_ID='.$edited_User->ID );
 		break;
 
+	case 'link_db':
+
+		// efy-maxim TODO: temporary solution for file/image types in dbase mod
+
+		// Get the file we want to link:
+		if( !$selected_Filelist->count() )
+		{
+			$Messages->add( T_('Nothing selected.'), 'error' );
+			break;
+		}
+		$edited_File = & $selected_Filelist->get_by_idx(0);
+
+		// Load meta data AND MAKE SURE IT IS CREATED IN DB:
+		$edited_File->load_meta( true );
+
+		// REDIRECT / EXIT
+		header_redirect( $admin_url.'?ctrl=dbdata&action='.param( 'db_action', 'string' ).'&db_ID='.param( 'db_ID', 'string' ).'&field_name='.param( 'field_name', 'string' ).'&file_ID='.$edited_File->ID.'&file_root='.$edited_File->_FileRoot->ads_url.'&file_path='.$edited_File->_rdfp_rel_path );
+
+		break;
 
 	case 'link':
 	case 'link_inpost':	// In the context of a post
@@ -1662,6 +1681,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.37  2009/09/26 15:18:12  efy-maxim
+ * temporary solution for file/image types
+ *
  * Revision 1.36  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *
