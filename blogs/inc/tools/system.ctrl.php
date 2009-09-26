@@ -423,8 +423,9 @@ else
 	$gd_info = gd_info();
 
 	// JPG:
-	init_system_check( T_( 'GD JPG Support' ), !empty($gd_info['JPG Support']) ? T_('Read/Write') : T_('No') );
-	if( empty($gd_info['JPG Support']) )
+	// Tblue> Note: "JPG Support" was renamed to "JPEG Support" in PHP 5.3.
+	init_system_check( T_( 'GD JPG Support' ), ( ! empty($gd_info['JPG Support']) || ! empty($gd_info['JPEG Support']) ) ? T_('Read/Write') : T_('No') );
+	if( empty($gd_info['JPG Support']) && empty($gd_info['JPEG Support']) )
 	{
 		disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for JPG images.') );
 	}
@@ -499,6 +500,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2009/09/26 18:58:18  tblue246
+ * GD info fix for PHP 5.3
+ *
  * Revision 1.20  2009/04/13 14:50:22  tblue246
  * Typo, bugfix
  *
