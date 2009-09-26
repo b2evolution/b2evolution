@@ -1741,14 +1741,20 @@ class Blog extends DataObject
 
 
 	/**
-	 * Make sure collection settings are loaded
+	 * Make sure collection settings are loaded.
+	 * This keeps a single instance across all blogs.
 	 */
 	function load_CollectionSettings()
 	{
-		if( ! isset( $this->CollectionSettings ) )
+		static $instance;
+		if( ! isset( $instance ) )
 		{
 			load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
-			$this->CollectionSettings = new CollectionSettings(); // COPY (function)
+			$instance = new CollectionSettings(); // COPY (function)
+		}
+		if( ! isset($this->CollectionSettings) )
+		{
+			$this->CollectionSettings = $instance;
 		}
 	}
 
@@ -2141,6 +2147,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.83  2009/09/26 20:40:05  blueyed
+ * Keep a single instance of CollectionSettings across all blogs.
+ *
  * Revision 1.82  2009/09/26 20:37:48  blueyed
  * Minor: fix pattern delimiters, to not cause charset issues.
  *
