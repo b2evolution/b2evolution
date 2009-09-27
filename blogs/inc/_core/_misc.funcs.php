@@ -343,7 +343,9 @@ function zeroise( $number, $threshold )
 function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw' )
 {
 	if( is_null($tail) )
+	{
 		$tail = '&hellip;';
+	}
 
 	if( evo_strlen( $str ) > $maxlen )
 	{
@@ -3719,6 +3721,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.165  2009/09/27 13:52:22  tblue246
+ * minor
+ *
  * Revision 1.164  2009/09/27 12:57:29  blueyed
  * strmaxlen: add format param, which is used on the (possibly) cropped string.
  *

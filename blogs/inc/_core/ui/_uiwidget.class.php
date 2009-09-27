@@ -962,7 +962,7 @@ class Table extends Widget
 		}
 
 		// Custom attributes:
-		// Tblue> TODO: Make this more elegant...
+		// Tblue> TODO: Make this more elegant (e. g.: replace "$extra_attr$" with the attributes string).
 		if( $extra_attr )
 		{
 			$output = substr( $output, 0, -1 ).get_field_attribs_as_string( $extra_attr ).'>';
@@ -1012,6 +1012,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/27 13:52:22  tblue246
+ * minor
+ *
  * Revision 1.14  2009/09/26 21:26:19  tblue246
  * minor
  *
