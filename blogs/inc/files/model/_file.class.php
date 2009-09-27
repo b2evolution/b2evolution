@@ -1659,11 +1659,11 @@ class File extends DataObject
 	/**
 	 * @return array List of HTML attributes for the image.
 	 */
-	function get_img_attribs($size_name = '80x80')
+	function get_img_attribs($size_name = 'fit-80x80', $title = NULL, $alt = NULL)
 	{
 		$img_attribs = array(
-			'title' => $this->get('title'),
-			'alt' => $this->get('alt'),
+			'title' => isset($title) ? $title : $this->get('title'),
+			'alt'   => isset($alt) ? $alt : $this->get('alt'),
 		);
 		if( ! strlen($img_attribs['alt']) )
 		{ // use title for alt, too
@@ -1701,7 +1701,9 @@ class File extends DataObject
 	{
 		if( $this->is_image() )
 		{	// Ok, it's an image:
-			$img = '<img src="'.$this->get_thumb_url().'" alt="'.$this->get_type().'" title="'.$this->get_type().'" />';
+			$type = $this->get_type();
+			$img_attribs = $this->get_img_attribs('fit-80x80', $type, $type);
+			$img = '<img '.get_field_attribs_as_string($img_attribs).' />';
 
 			// Get link to view the file (fallback to no view link - just the img):
 			$link = $this->get_view_link( $img );
@@ -1898,6 +1900,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.57  2009/09/27 21:00:54  blueyed
+ * get_img_attribs: fix default for size_name, allow passing of title and alt. get_preview_thumb uses it now, too, which adds width/height params to the icons in the file manager.
+ *
  * Revision 1.56  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *
