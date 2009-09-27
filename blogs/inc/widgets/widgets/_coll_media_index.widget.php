@@ -105,8 +105,8 @@ class coll_media_index_Widget extends ComponentWidget
 				'defaultvalue' => 'DESC',
 			),
 			'blog_ID' => array(
-				'label' => T_( 'Blog' ),
-				'note' => T_( 'ID of the blog to use, leave empty for the current blog.' ),
+				'label' => T_( 'Blogs' ),
+				'note' => T_( 'IDs of the blogs to use, leave empty for the current blog. Separate multiple blogs by commas.' ),
 				'size' => 4,
 			),
 		), parent::get_param_definitions( $params )	);
@@ -154,11 +154,8 @@ class coll_media_index_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		global $Blog;
-
-		$blogCache = & get_BlogCache();
-		// fp> TODO: damn references!
-		$list_Blog = ( $this->disp_params[ 'blog_ID' ] ? $blogCache->get_by_ID( $this->disp_params[ 'blog_ID' ] ) : $Blog );
-
+		$list_blogs = ( $this->disp_params[ 'blog_ID' ] ? $this->disp_params[ 'blog_ID' ] : $Blog->ID );
+		//pre_dump( $list_blogs );
 
 		echo $this->disp_params[ 'block_start'];
 
@@ -166,7 +163,7 @@ class coll_media_index_Widget extends ComponentWidget
 		$this->disp_title();
 
 		// Display photos:
-		// TODO: permissions, complete statuses, aggregations...
+		// TODO: permissions, complete statuses...
 		// TODO: A FileList object based on ItemListLight but adding File data into the query?
 		//          overriding ItemListLigth::query() for starters ;)
 
@@ -183,7 +180,7 @@ class coll_media_index_Widget extends ComponentWidget
 									INNER JOIN T_items__item ON postcat_post_ID = post_ID
 									INNER JOIN T_links ON post_ID = link_itm_ID
 									INNER JOIN T_files ON link_file_ID = file_ID' );
-		$SQL->WHERE( 'cat_blog_ID = '.$list_Blog->ID ); // fp> TODO: want to restrict on images :]
+		$SQL->WHERE( 'cat_blog_ID IN ('.$list_blogs.')' ); // fp> TODO: want to restrict on images :]
 		$SQL->WHERE_and( 'post_status = "published"' );	// TODO: this is a dirty temporary hack. More should be shown.
 		$SQL->WHERE_and( 'post_datestart <= \''.remove_seconds( $localtimenow ).'\'' );
 		$SQL->GROUP_BY( 'link_ID' );
@@ -288,6 +285,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/27 15:59:13  tblue246
+ * Photo index widget: Allow specifying multiple blogs
+ *
  * Revision 1.15  2009/09/26 12:00:44  tblue246
  * Minor/coding style
  *
