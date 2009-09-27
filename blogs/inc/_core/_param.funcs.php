@@ -1633,7 +1633,7 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
 		return $content;
 	}
 
-	// return aletered content
+	// return altered content
 	return $ret;
 }
 
@@ -1940,6 +1940,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.44  2009/09/27 12:55:46  blueyed
+ * typo
+ *
  * Revision 1.43  2009/09/24 19:48:30  efy-maxim
  * validators
  *
