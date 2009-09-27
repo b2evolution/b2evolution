@@ -3220,7 +3220,7 @@ function get_manual_link( $topic )
 
 	if( $Settings->get('webhelp_enabled') )
 	{
-		$manual_url = 'http://manual.b2evolution.net/redirect/'.str_replace(" ","_",strtolower($topic)).'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version;
+		$manual_url = 'http://manual.b2evolution.net/redirect/'.str_replace(' ','_',strtolower($topic)).'?lang='.$current_locale.'&amp;app='.$app_shortname.'&amp;version='.$app_version;
 
 		$webhelp_link = action_icon( T_('Open relevant page in online manual'), 'manual', $manual_url, T_('Manual'), 5, 1, array( 'target' => '_blank' ) );
 
@@ -3721,6 +3721,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.166  2009/09/27 14:13:25  tblue246
+ * minor
+ *
  * Revision 1.165  2009/09/27 13:52:22  tblue246
  * minor
  *
