@@ -90,12 +90,18 @@ class UrlFuncsTestCase extends EvoUnitTestCase
 	{
 		$this->assertEqual( url_add_param('foo', 'bar', '&'), 'foo?bar' );
 		$this->assertEqual( url_add_param('foo#anchor', 'bar', '&'), 'foo?bar#anchor' );
-		
+
 		$this->assertEqual( url_add_param('foo?', 'bar', '&'), 'foo?bar' );
 		$this->assertEqual( url_add_param('foo?#anchor', 'bar', '&'), 'foo?bar#anchor' );
 		$this->assertEqual( url_add_param('?', 'bar', '&'), '?bar' );
 		$this->assertEqual( url_add_param('?#anchor', 'bar', '&'), '?bar#anchor' );
 		$this->assertEqual( url_add_param('#anchor', 'bar', '&'), '?bar#anchor' );
+
+		$this->assertEqual( url_add_param('?', array('foo'=>1)), '?foo=1' );
+		$this->assertEqual( url_add_param('?', array('foo'=>array(1=>2))), '?foo%5B1%5D=2' );
+		$this->assertEqual( url_add_param('?', array('foo'=>array(1, 2))), '?foo%5B%5D=1&amp;foo%5B%5D=2' );
+		$this->assertEqual( url_add_param('?', array('foo'=>'100%')), '?foo=100%25' );
+		$this->assertEqual( url_add_param('?', array('foo'=>'1&2')), '?foo=1%262' );
 	}
 }
 

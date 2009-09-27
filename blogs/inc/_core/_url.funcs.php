@@ -462,7 +462,7 @@ function url_same_protocol( $url, $other_url = NULL )
  * Add param(s) at the end of an URL, using either "?" or "&amp;" depending on existing url
  *
  * @param string existing url
- * @param string params to add
+ * @param string|array Params to add (string as-is) or array, which gets urlencoded.
  * @param string delimiter to use for more params
  */
 function url_add_param( $url, $param, $glue = '&amp;' )
@@ -480,6 +480,17 @@ function url_add_param( $url, $param, $glue = '&amp;' )
 	else
 	{ // URL without "#anchor"
 		$anchor = '';
+	}
+
+	// Handle array use case
+	if( is_array($param) )
+	{ // list of key => value pairs
+		$param_list = array();
+		foreach( $param as $k => $v )
+		{
+			$param_list[] = get_param_urlencoded($k, $v, $glue);
+		}
+		$param = implode($glue, $param_list);
 	}
 
 	if( strpos($url, '?') !== false )
@@ -733,6 +744,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.41  2009/09/27 13:12:53  blueyed
+ * Add get_param_urlencoded: use it in regenerate_url and add functionality to pass array of params to url_add_param
+ *
  * Revision 1.40  2009/09/15 12:09:52  tblue246
  * More load_class() fixes
  *

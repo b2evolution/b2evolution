@@ -1384,18 +1384,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $glue = '&a
 			// $Debuglog->add( "regenerate_url(): Using var=$var, type=$type, defval=[$defval], val=[$value]", 'params' );
 			// echo "regenerate_url(): Using var=$var, type=$type, defval=[$defval], val=[$value]";
 
-			if( $type === 'array' )
-			{ // there is a special formatting in case of arrays
-				$url_array = array();
-				foreach( $value as $value )
-				{
-					$params[] = $var.'%5B%5D='.rawurlencode($value);
-				}
-			}
-			else
-			{	// not an array : normal formatting
-				$params[] = $var.'='.rawurlencode($value);
-			}
+			$params[] = get_param_urlencoded($var, $value, $glue);
 		}
 		else // if( $var == 's' )
 		{
@@ -1440,6 +1429,30 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $glue = '&a
 	}
 	// if( isset($Debuglog) ) $Debuglog->add( 'regenerate_url(): ['.$url.']', 'params' );
 	return $url;
+}
+
+
+/**
+ * Get URL param, urlencoded.
+ * This handles arrays, recursively.
+ * @return string
+ */
+function get_param_urlencoded($var, $value, $glue = '&amp;', $force_type = NULL)
+{
+	if( is_array($value) || $force_type == 'array' )
+	{ // there is a special formatting in case of arrays
+		$r = array();
+		$keep_keys = array_keys($value) != array_keys(array_values($value));
+		foreach( $value as $key => $value )
+		{
+			$r[] = get_param_urlencoded($var.'['.($keep_keys ? $key : '').']', $value, $glue);
+		}
+		return implode($glue, $r);
+	}
+	else
+	{ // not an array : normal formatting
+		return rawurlencode($var).'='.rawurlencode($value);
+	}
 }
 
 
@@ -1940,6 +1953,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.45  2009/09/27 13:12:53  blueyed
+ * Add get_param_urlencoded: use it in regenerate_url and add functionality to pass array of params to url_add_param
+ *
  * Revision 1.44  2009/09/27 12:55:46  blueyed
  * typo
  *
