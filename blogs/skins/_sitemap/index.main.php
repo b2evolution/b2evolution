@@ -38,12 +38,18 @@ $MainList->set_filters( array(
 $MainList->query();
 
 // Old style globals for category.funcs:
+// TODO: dh> check if still required.
 $postIDlist = $MainList->get_page_ID_list();
 $postIDarray = $MainList->get_page_ID_array();
 
 $Timer->stop( 'prepare list' );
 
 $Timer->resume( 'display list' );
+
+// TODO: dh> add entry for homepage (lastmod of latest item)
+// TODO: dh> take comments into consideration for prio
+// TODO: dh> use main Blog URL only, since google requires them to be on the same domain/path
+// (see sitemap_plugin)
 
 // Note: since URLs are likely to be clean ASCII, $io_charset can probably be faked to UTF-8 here
 
@@ -56,8 +62,10 @@ echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 <?php
 while( $Item = & mainlist_get_item() )
 {	// For each blog post, do everything below up to the closing curly brace "}"
-	// age in days of teh post
+
+	// Age in days of the post
 	$age = ($localtimenow - mysql2timestamp($Item->datemodified)) / 86400;
+
 	// Prio: Recent posts will get higher priority compared to older posts, in case the SE doesn't want to index all posts!
 	// Change frequency: recent posts are more likely to change often than older posts, especially regarding comments.
 	// We hint SEs to check back more often (and not to waste indexing credits on old stuff).
