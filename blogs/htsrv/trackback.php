@@ -126,12 +126,10 @@ if( $Messages->count('error') )
 	trackback_response( 1, $Messages->get_string( '', '', 'all', "\n" ) ); // exits
 }
 
-
-$title = strip_tags($title);
-$title = (strlen($title) > 255) ? substr($title, 0, 252).'...' : $title;
-$excerpt = strmaxlen( strip_tags($excerpt), 255, '...' );
-$blog_name = htmlspecialchars($blog_name);
-$blog_name = (strlen($blog_name) > 255) ? substr($blog_name, 0, 252).'...' : $blog_name;
+// TODO: dh> title and excerpt should be htmlbody, too, no?
+$title = strmaxlen(strip_tags($title), 255, '...', 'raw');
+$excerpt = strmaxlen(strip_tags($excerpt), 255, '...', 'raw');
+$blog_name = strmaxlen($blog_name, 255, '...', 'htmlbody');
 
 $comment = '';
 if( ! empty($title) )
@@ -212,6 +210,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.71  2009/09/27 12:57:29  blueyed
+ * strmaxlen: add format param, which is used on the (possibly) cropped string.
+ *
  * Revision 1.70  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *

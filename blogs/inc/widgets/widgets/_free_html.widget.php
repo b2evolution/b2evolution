@@ -66,7 +66,7 @@ class free_html_Widget extends ComponentWidget
 	{
 		if( empty( $this->disp_params['title'] ) )
 		{
-			return strmaxlen( htmlspecialchars( $this->disp_params['content'] ), 60 );
+			return strmaxlen( $this->disp_params['content'], 60, NULL, 'htmlbody' );
 		}
 
 		return format_to_output( $this->disp_params['title'] );
@@ -135,6 +135,9 @@ class free_html_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.19  2009/09/27 12:57:29  blueyed
+ * strmaxlen: add format param, which is used on the (possibly) cropped string.
+ *
  * Revision 1.18  2009/09/14 13:54:13  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

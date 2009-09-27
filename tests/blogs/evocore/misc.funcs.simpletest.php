@@ -396,6 +396,15 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( strmaxlen('foobar', 6, '...'), 'foobar' );
 		$this->assertEqual( strmaxlen('foobar', 5, '...'), 'fo...' );
 		$this->assertEqual( strmaxlen('foobar', 5, '&amp;&hellip;'), 'foo&amp;&hellip;' );
+
+		$this->assertEqual( strmaxlen('1', 1, '&hellip;'), '1' );
+		$this->assertEqual( strmaxlen('1', 1, '...'), '1' );
+		$this->assertEqual( strmaxlen('123', 1, '...'), '1...' );
+		$this->assertEqual( strmaxlen('12345', 1, '...'), '1...' );
+
+		$this->assertEqual( strmaxlen('1&2', 3, NULL, 'htmlbody'), '1&amp;2' );
+		$this->assertEqual( strmaxlen('1&2', 3, NULL, 'raw'), '1&2' );
+		$this->assertEqual( strmaxlen('1&2', 3), '1&2' );
 	}
 
 
@@ -411,7 +420,6 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( strmaxwords('  <img />foo  bar  ', 2), '  <img />foo  bar  ' );
 		$this->assertEqual( strmaxwords('  <img />foo  bar  ', 1), '  <img />foo  &hellip;' );
 	}
-
 }
 
 

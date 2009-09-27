@@ -269,22 +269,22 @@ function stats_basedomain( $disp = true )
 function stats_search_keywords( $keyphrase, $length = 45 )
 {
 	global $evo_charset;
-	
+
 	if( empty( $keyphrase ) )
 	{
 		return '<span class="note">['.T_('n.a.').']</span>';
 	}
-	
+
 	// Save original string
 	$keyphrase_orig = $keyphrase;
 
-	$keyphrase = strmaxlen($keyphrase, $length, '...');
+	$keyphrase = strmaxlen($keyphrase, $length, '...', 'raw');
 
 	// Convert keyword encoding, some charsets are supported only in PHP 4.3.2 and later.
 	// This fixes encoding problem for Cyrillic keywords
 	// See http://forums.b2evolution.net/viewtopic.php?t=17431
 	$keyphrase = htmlentities( $keyphrase, ENT_COMPAT, $evo_charset );
-	
+
 	return '<span title="'.format_to_output( $keyphrase_orig, 'htmlattr' ).'">'.$keyphrase.'</span>';
 }
 
@@ -326,6 +326,9 @@ function stats_user_agent( $translate = false )
 
 /*
  * $Log$
+ * Revision 1.17  2009/09/27 12:57:29  blueyed
+ * strmaxlen: add format param, which is used on the (possibly) cropped string.
+ *
  * Revision 1.16  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *

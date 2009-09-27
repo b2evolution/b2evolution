@@ -328,28 +328,43 @@ function zeroise( $number, $threshold )
 	return str_pad( $number, $threshold, '0', STR_PAD_LEFT );
 }
 
+
 /**
- * Crop string to maxlen with &hellip; at the end if needed.
+ * Crop string to maxlen with &hellip; (default tail) at the end if needed.
  *
  * @param string
  * @param int Maximum length
  * @param string Tail to use, when string gets cropped. Its length gets
  *               substracted from the total length (with HTML entities
  *               being decoded)
+ * @param string Format, see {@link format_to_output()}
  * @return string
  */
-function strmaxlen( $str, $maxlen = 50, $tail = '&hellip;' )
+function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw' )
 {
+	if( is_null($tail) )
+		$tail = '&hellip;';
+
 	if( evo_strlen( $str ) > $maxlen )
 	{
 		// Replace all HTML entities by a single char. html_entity_decode for example
 		// would not handle &hellip;.
 		$tail_for_length = preg_replace('~&\w+?;~', '.', $tail);
 		$tail_length = evo_strlen( html_entity_decode($tail_for_length) );
-		$str = evo_substr( $str, 0, $maxlen-$tail_length ).$tail;
-	}
+		$len = $maxlen-$tail_length;
+		if( $len < 1 )
+		{ // special case; $tail length is >= $maxlen
+			$len = 1;
+		}
+		$str = format_to_output(evo_substr( $str, 0, $len ), $format);
+		$str .= $tail;
 
-	return $str;
+		return $str;
+	}
+	else
+	{
+		return format_to_output($str, $format);
+	}
 }
 
 
@@ -3704,6 +3719,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.164  2009/09/27 12:57:29  blueyed
+ * strmaxlen: add format param, which is used on the (possibly) cropped string.
+ *
  * Revision 1.163  2009/09/26 15:18:12  efy-maxim
  * temporary solution for file/image types
  *

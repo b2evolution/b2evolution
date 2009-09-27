@@ -1999,7 +1999,7 @@ class Blog extends DataObject
 
 	function get_maxlen_name( $maxlen = 50 )
 	{
-		return strmaxlen( $this->get_name(), $maxlen );
+		return strmaxlen( $this->get_name(), $maxlen, NULL, 'raw' );
 	}
 
 	/**
@@ -2148,6 +2148,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.85  2009/09/27 12:57:29  blueyed
+ * strmaxlen: add format param, which is used on the (possibly) cropped string.
+ *
  * Revision 1.84  2009/09/27 12:27:45  blueyed
  * Small optimization
  *

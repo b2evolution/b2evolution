@@ -108,7 +108,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Full Name'),
 						'order' => 'blog_name',
-						'td' => '%strmaxlen( #blog_name#, 40 )%',
+						'td' => '%strmaxlen( #blog_name#, 40, NULL, "raw" )%',
 					);
 
 $Results->cols[] = array(
@@ -215,6 +215,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/27 12:57:29  blueyed
+ * strmaxlen: add format param, which is used on the (possibly) cropped string.
+ *
  * Revision 1.10  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *
