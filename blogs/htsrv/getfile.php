@@ -104,6 +104,8 @@ if( !empty($size) && $File->is_image() )
 	$size_name = $size;
 	if( ! isset($thumbnail_sizes[$size] ) )
 	{ // this file size alias is not defined, use default:
+		// TODO: dh> this causes links for e.g. "fit-50x50" to work also, but with the drawback of images not getting served from the
+		//           .evocache directory directly. I think invalid $size params should bark out here.
 		$size_name = 'fit-80x80';
 	}
 
@@ -116,7 +118,6 @@ if( !empty($size) && $File->is_image() )
 
 	// Try to output the cached thumbnail:
 	$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime );
-
 	if( $err == '!Thumbnail not found in .evocache' )
 	{	// The thumbnail wasn't already in the cache, try to generate and cache it now:
 		$err = NULL;		// Short error code
@@ -203,6 +204,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.39  2009/09/27 19:09:20  blueyed
+ * todo
+ *
  * Revision 1.38  2009/09/25 07:32:51  efy-cantor
  * replace get_cache to get_*cache
  *
