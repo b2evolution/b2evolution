@@ -860,37 +860,26 @@ class Filelist
 	 */
 	function & get_next( $type = '' )
 	{
-		/*
-		 * DEBUG: return the same file 10 times, useful for profiling
-			static $debugMakeLonger = 0;
-			if( $debugMakeLonger-- == 0 )
-			{
-				$this->_current_idx++;
-				$debugMakeLonger = 9;
-			}
-		*/
-
-		if( !isset($this->_order_index[$this->_current_idx + 1]) )
-		{	// End of list:
-			$r = false;
-			return $r;
-		}
-		$this->_current_idx++;
-
-		$index = $this->_order_index[$this->_current_idx];
-
-		if( $type != '' )
+		for(;;)
 		{
-			if( $type == 'dir' && !$this->_entries[ $index ]->is_dir() )
-			{ // we want a dir
-				$r = & $this->get_next( 'dir' );
+			if( !isset($this->_order_index[$this->_current_idx + 1]) )
+			{	// End of list:
+				$r = false;
 				return $r;
 			}
-			elseif( $type == 'file' && $this->_entries[ $index ]->is_dir() )
-			{ // we want a file
-				$r = & $this->get_next( 'file' );
-				return $r;
+			$this->_current_idx++;
+
+			$index = $this->_order_index[$this->_current_idx];
+			if( $type != '' )
+			{
+				$is_dir = $this->_entries[$index]->is_dir();
+				if( ($type == 'dir' && ! $is_dir )
+					|| ($type == 'file' && $is_dir) )
+				{ // we want another type
+					continue;
+				}
 			}
+			break;
 		}
 
 		return $this->_entries[ $index ];
@@ -1258,6 +1247,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/27 20:56:40  blueyed
+ * Implement Filelist:get_next non-recursively, which prevents a 'max recursion reached' error and is way smarter anyway.
+ *
  * Revision 1.7  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *
