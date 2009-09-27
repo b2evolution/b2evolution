@@ -1747,13 +1747,14 @@ class Blog extends DataObject
 	function load_CollectionSettings()
 	{
 		static $instance;
-		if( ! isset( $instance ) )
-		{
-			load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
-			$instance = new CollectionSettings(); // COPY (function)
-		}
+
 		if( ! isset($this->CollectionSettings) )
 		{
+			if( ! isset( $instance ) )
+			{
+				load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
+				$instance = new CollectionSettings(); // COPY (function)
+			}
 			$this->CollectionSettings = $instance;
 		}
 	}
@@ -2147,6 +2148,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.84  2009/09/27 12:27:45  blueyed
+ * Small optimization
+ *
  * Revision 1.83  2009/09/26 20:40:05  blueyed
  * Keep a single instance of CollectionSettings across all blogs.
  *
