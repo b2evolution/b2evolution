@@ -235,7 +235,7 @@ switch( $action )
 		block_open();
 
 		param( 'conf_db_user', 'string', true );
-		param( 'conf_db_password', 'string', true );
+		param( 'conf_db_password', '', true );
 		param( 'conf_db_name', 'string', true );
 		param( 'conf_db_host', 'string', true );
 		param( 'conf_db_tableprefix', 'string', $tableprefix );
@@ -381,7 +381,7 @@ switch( $action )
 
 			// Set default params if not provided otherwise:
 			param( 'conf_db_user', 'string', $db_config['user'] );
-			param( 'conf_db_password', 'string', $db_config['password'] );
+			param( 'conf_db_password', '', $db_config['password'] );
 			param( 'conf_db_name', 'string', $db_config['name'] );
 			param( 'conf_db_host', 'string', $db_config['host'] );
 			param( 'conf_db_tableprefix', 'string', $tableprefix );
@@ -719,6 +719,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.183  2009/09/28 17:48:09  tblue246
+ * Bugfix: Allow <> chars in DB password
+ *
  * Revision 1.182  2009/09/16 01:33:36  fplanque
  * so noone complained about HEAD not (really) being installable?
  *
