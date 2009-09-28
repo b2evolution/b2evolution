@@ -504,7 +504,11 @@ class ItemLight extends DataObject
 
 	/**
 	 * returns issue date (datetime) of Item
-	 *
+	 * @param array
+	 *   - 'before'
+	 *   - 'after'
+	 *   - 'date_format': Date format
+	 *   - 'use_GMT': Use GMT/UTC date
 	 */
 	function get_issue_date( $params = array() )
 	{
@@ -527,7 +531,7 @@ class ItemLight extends DataObject
 
 	/**
 	 * Template function: display issue date (datetime) of Item
-	 *
+	 * @see get_issue_date()
 	 */
 	function issue_date( $params = array() )
 	{
@@ -537,7 +541,10 @@ class ItemLight extends DataObject
 
 	/**
 	 * Template function: display issue time (datetime) of Item
-	 *
+	 * @param array
+	 *   - 'time_format': Time format
+	 *   - ... see {@link get_issue_date()}
+	 * @see get_issue_date()
 	 */
 	function issue_time( $params = array() )
 	{
@@ -961,6 +968,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2009/09/28 23:56:22  blueyed
+ * doc
+ *
  * Revision 1.27  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *

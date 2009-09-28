@@ -2685,10 +2685,10 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
  * @uses get_icon_info()
  * @param string icon for what? (key)
  * @param string what to return for that icon ('imgtag', 'alt', 'legend', 'file', 'url', 'size' {@link imgsize()})
- * @param array additional params (
- *              'class' => class name when getting 'imgtag',
- *              'size' => param for 'size',
- *              'title' => title attribute for 'imgtag')
+ * @param array additional params
+ *   - 'class' => class name when getting 'imgtag',
+ *   - 'size' => param for 'size',
+ *   - 'title' => title attribute for 'imgtag'
  * @param boolean true to include this icon into the legend at the bottom of the page (works for 'imgtag' only)
  * @return mixed False on failure, string on success.
  */
@@ -2898,7 +2898,6 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 
 			return $r;
 			/* BREAK */
-
 	}
 }
 
@@ -3721,6 +3720,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.167  2009/09/28 23:56:22  blueyed
+ * doc
+ *
  * Revision 1.166  2009/09/27 14:13:25  tblue246
  * minor
  *
