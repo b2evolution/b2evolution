@@ -1439,12 +1439,12 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $glue = '&a
  * This handles arrays, recursively.
  * @return string
  */
-function get_param_urlencoded($var, $value, $glue = '&amp;', $force_type = NULL)
+function get_param_urlencoded($var, $value, $glue = '&amp;')
 {
-	if( is_array($value) || $force_type == 'array' )
+	if( is_array($value) )
 	{ // there is a special formatting in case of arrays
 		$r = array();
-		$keep_keys = array_keys($value) != array_keys(array_values($value));
+		$keep_keys = array_diff( array_keys($value), array_keys(array_values($value)) );
 		foreach( $value as $key => $value )
 		{
 			$r[] = get_param_urlencoded($var.'['.($keep_keys ? $key : '').']', $value, $glue);
@@ -1955,6 +1955,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.47  2009/09/28 22:56:36  blueyed
+ * get_param_urlencoded: drop force_type param, which is not required AFAICS
+ *
  * Revision 1.46  2009/09/28 20:02:41  tblue246
  * param()/$type parameter: Deprecate "" value in favor of (newly added) "raw".
  *
