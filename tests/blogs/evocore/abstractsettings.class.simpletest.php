@@ -69,7 +69,6 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 		$this->MockDB->expectOnce( 'get_results', array( new PatternExpectation('/SELECT test_name, test_value\s+FROM testtable/i') ), 'DB select ok.' );
 		$this->TestSettings->set( 'lala', 1 );
 
-		$this->MockDB->expectNever( 'get_results', false, 'Did not reload settings from DB.' );
 		$this->TestSettings->load_all();
 
 		$this->assertEqual( $this->TestSettings->get( 'lala' ), 1, 'Prefer setting which was set before explicit load().' );
@@ -82,9 +81,9 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 	 */
 	function test_delete_of_nonexistent()
 	{
-		$this->MockDB->expectAt( 0, 'query', array(
+		$this->MockDB->expectCallCount('query', $this->__base_db_calls_count+1);
+		$this->MockDB->expectAt( $this->__base_db_calls_count, 'query', array(
 			new IdenticalExpectation("REPLACE INTO testtable (test_name, test_value) VALUES ( 'foobar', '1' )") ), 'DB REPLACE-INTO ok.' );
-		$this->MockDB->expectCallCount('query', 1);
 
 		// Should not do any query:
 		$this->assertFalse( $this->TestSettings->delete('does-not-exist') );
@@ -92,6 +91,7 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 
 		// Should do a query:
 		$this->assertTrue( $this->TestSettings->set('foobar', 1) );
+		$this->assertFalse( $this->TestSettings->delete('does-not-exist') );
 		$this->TestSettings->dbupdate(); // TODO: should return true, but is mocked.
 
 		// Should not do any query:
@@ -166,7 +166,8 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 
 	function test_get_undefined_then_set_updates_db()
 	{
-		$this->MockDB->expectOnce( 'query', array(
+		$this->MockDB->expectCallCount('query', $this->__base_db_calls_count+1);
+		$this->MockDB->expectAt( $this->__base_db_calls_count, 'query', array(
 			new IdenticalExpectation("REPLACE INTO T_test (key1, key2, val) VALUES ( '1', 'foo', '1' )") ), 'DB REPLACE-INTO ok.' );
 
 		$s = new AbstractSettings( 'T_test', array( 'key1', 'key2' ), 'val', 0 );
@@ -196,6 +197,59 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 		load_class('plugins/model/_pluginusersettings.class.php', 'PluginUserSettings');
 		$s = new PluginUserSettings('plugin_ID');
 		$this->assertTrue( $s->set('set_setting', 'set_value', 'user_ID') );
+	}
+
+
+	function test_applySettingsCorrectlyForCachebycolkeys0()
+	{
+		$s = new AbstractSettings( 'T_test', array( 'key1', 'key2', 'key3' ), 'val', 0 );
+
+		$s->_defaults = array('3' => 'bar');
+
+		$this->MockDB->expectAt( 0, 'get_results', array(
+			new PatternExpectation("/SELECT key1, key2, key3, val\s+FROM T_test$/"), ARRAY_A ), 'DB SELECT ok.' );
+		$this->MockDB->expectOnce('get_results');
+
+		// Mock the return value of get_results, to simulate saved settings.
+		$r = array(
+			array(
+					'key1' => 1,
+					'key2' => 2,
+					'key3' => 3,
+					'val' => 4,
+				),
+			array(
+					'key1' => 1,
+					'key2' => 22,
+					'key3' => 3,
+					'val' => 44,
+				),
+			array(
+					'key1' => 2,
+					'key2' => 2,
+					'key3' => 2,
+					'val' => 2,
+				)
+			);
+		$this->MockDB->setReturnValueAt(0, 'get_results', $r);
+
+		// Should return the saved value, not default:
+		$this->assertEqual( $s->get(1, 2, 3), '4' );
+		$this->assertEqual( $s->get(1, 22, 3), '44' );
+
+		$this->assertEqual($s->get(2, 2, 2), 2 );
+	}
+
+
+	function test_cache_only_once()
+	{
+		$this->MockDB->expectAt( 0, 'get_results', array(
+			new PatternExpectation("/SELECT cset_coll_ID, cset_name, cset_value\s+FROM T_coll_settings$/"), ARRAY_A ), 'DB SELECT ok.' );
+		$this->MockDB->expectOnce('get_results');
+
+		$s = new AbstractSettings( 'T_coll_settings', array( 'cset_coll_ID', 'cset_name' ), 'cset_value', 0 );
+		$s->get( "1", "cache_enabled" );
+		$s->get( "17", "title_link_type" );
 	}
 }
 
