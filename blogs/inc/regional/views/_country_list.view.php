@@ -41,7 +41,7 @@ $s = param( 's', 'string', '', true );
 
 // Create query
 $SQL = & new SQL();
-$SQL->SELECT( 'ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_code' );
+$SQL->SELECT( 'ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_code, ctry_enabled' );
 $SQL->FROM( 'T_country	LEFT JOIN T_currency ON ctry_curr_ID=curr_ID' );
 
 if( !empty($s) )
@@ -51,9 +51,31 @@ if( !empty($s) )
 }
 
 // Create result set:
-$Results = & new Results( $SQL->get(), 'ctry_' );
+$Results = & new Results( $SQL->get(), 'ctry_', '--A-', 0 );
 
 $Results->title = T_('Countries list');
+
+/*
+ * STATUS TD:
+ */
+function ctry_td_enabled( $ctry_enabled, $ctry_ID )
+{	
+
+	if( $ctry_enabled == true )
+	{
+		return get_icon('enabled', 'imgtag', array('title'=>T_('The country is enabled.')) );
+	}
+	else
+	{
+		return get_icon('disabled', 'imgtag', array('title'=>T_('The country is disabled.')) );
+	}
+}
+$Results->cols[] = array(
+		'th' => /* TRANS: shortcut for enabled */ T_('En'),
+		'order' => 'ctry_enabled',
+		'td' => '%ctry_td_enabled( #ctry_enabled#, #ctry_ID# )%',
+		'td_class' => 'center'
+	);
 
 /**
  * Callback to add filters on top of the result set
@@ -151,21 +173,39 @@ $Results->cols[] = array(
 						'td' => '$curr_shortcut$ $curr_code$',
 					);
 
+/*
+ * ACTIONS TD:
+ */
+function ctry_td_actions($ctry_enabled, $ctry_ID )
+{
+	global $dispatcher;
+	
+	$r = '';
+	if( $ctry_enabled == true )
+	{
+		$r .= action_icon( T_('Disable the country!'), 'deactivate', $dispatcher.'?ctrl=countries&amp;action=disable_country&amp;ctry_ID='.$ctry_ID );
+	}
+	else
+	{
+		$r .= action_icon( T_('Enable the country!'), 'activate', $dispatcher.'?ctrl=countries&amp;action=enable_country&amp;ctry_ID='.$ctry_ID );
+	}
+	$r .= action_icon( T_('Edit this country...'), 'edit',
+										'%regenerate_url( \'action\', \'ctry_ID=' . $ctry_ID . '$&amp;action=edit\')%' );
+	$r .= action_icon( T_('Duplicate this country...'), 'copy',
+										'%regenerate_url( \'action\', \'ctry_ID=' . $ctry_ID . '$&amp;action=new\')%' );
+	$r .= action_icon( T_('Delete this country!'), 'delete',
+										'%regenerate_url( \'action\', \'ctry_ID=' . $ctry_ID . '$&amp;action=delete\')%' );
 
+	return $r;
+}
 if( $current_User->check_perm( 'options', 'edit', false ) )
-{ // We have permission to modify:
+{
 	$Results->cols[] = array(
-							'th' => T_('Actions'),
-							'th_class' => 'shrinkwrap',
-							'td_class' => 'shrinkwrap',
-							'td' => action_icon( T_('Edit this country...'), 'edit',
-										'%regenerate_url( \'action\', \'ctry_ID=$ctry_ID$&amp;action=edit\')%' )
-									.action_icon( T_('Duplicate this country...'), 'copy',
-										'%regenerate_url( \'action\', \'ctry_ID=$ctry_ID$&amp;action=new\')%' )
-									.action_icon( T_('Delete this country!'), 'delete',
-										'%regenerate_url( \'action\', \'ctry_ID=$ctry_ID$&amp;action=delete\')%' ),
-						);
-
+			'th' => T_('Actions'),
+			'td' => '%ctry_td_actions( #ctry_enabled#, #ctry_ID# )%',
+			'td_class' => 'shrinkwrap',
+		);
+		
 	$Results->global_icon( T_('Create a new country ...'), 'new',
 				regenerate_url( 'action', 'action=new'), T_('New country').' &raquo;', 3, 4  );
 }
@@ -174,6 +214,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.14  2009/09/28 20:55:00  efy-khurram
+ * Implemented support for enabling disabling countries.
+ *
  * Revision 1.13  2009/09/16 00:26:03  fplanque
  * no message
  *

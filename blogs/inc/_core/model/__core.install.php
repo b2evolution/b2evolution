@@ -247,6 +247,7 @@ $schema_queries = array(
 			ctry_code char(2) NOT NULL,
 			ctry_name varchar(40) NOT NULL,
 			ctry_curr_ID int(10) unsigned NULL,
+			ctry_enabled tinyint(1) NOT NULL DEFAULT 1,
 			PRIMARY KEY ctry_ID (ctry_ID),
 			UNIQUE ctry_code (ctry_code)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -265,6 +266,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.41  2009/09/28 20:54:58  efy-khurram
+ * Implemented support for enabling disabling countries.
+ *
  * Revision 1.40  2009/09/25 14:18:22  tblue246
  * Reverting accidental commits
  *

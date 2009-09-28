@@ -42,6 +42,7 @@ class Country extends DataObject
 	var $code = '';
 	var $name = '';
 	var $curr_ID = '';
+	var $enabled = '';
 
 	/**
 	 * Constructor
@@ -65,6 +66,7 @@ class Country extends DataObject
 			$this->code          = $db_row->ctry_code;
 			$this->name          = $db_row->ctry_name;
 			$this->curr_ID       = $db_row->ctry_curr_ID;
+			$this->enabled       = $db_row->ctry_enabled;
 		}
 	}
 
@@ -111,6 +113,7 @@ class Country extends DataObject
 				$parvalue = strtolower($parvalue);
 			case 'name':
 			case 'curr_ID':
+			case 'enabled':
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
@@ -142,6 +145,9 @@ class Country extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/28 20:55:00  efy-khurram
+ * Implemented support for enabling disabling countries.
+ *
  * Revision 1.14  2009/09/20 20:07:18  blueyed
  *  - DataObject::dbexists quotes always
  *  - phpdoc fixes

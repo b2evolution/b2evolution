@@ -62,7 +62,39 @@ if( param( 'ctry_ID', 'integer', '', true) )
 
 switch( $action )
 {
+	case 'disable_country':
+	case 'enable_country':
+		
+		// Disable a country only if it is enabled, and user has edit access.
+		$current_User->check_perm( 'options', 'edit', true );
 
+		// Make sure the country information was loaded. If not, just exit with
+		// error.
+		if( empty($edited_Country) )
+		{
+			$Messages->add( sprintf( T_( 'The country with ID %d could not be instantiated.' ), $ctry_ID ), 'error' );
+			break;
+		}	
+		if ( $action == 'disable_country' )
+		{	// Disable this country by setting flag to false.
+			$edited_Country->set( 'enabled', false );			
+			$Messages->add( sprintf( T_('Disabled country (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
+		} 
+		else if ( $action == 'enable_country' )
+		{	// Enable country by setting flag to true.
+			$edited_Country->set( 'enabled', true );			
+			$Messages->add( sprintf( T_('Enabled country (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
+		}
+		
+		// Update db with new flag value.
+		$DB->begin();
+		$edited_Country->dbupdate();
+		$DB->commit();
+		
+		// Reload list.
+		$action = 'list';
+		break;
+		
 	case 'new':
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -257,6 +289,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/28 20:54:59  efy-khurram
+ * Implemented support for enabling disabling countries.
+ *
  * Revision 1.6  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *
