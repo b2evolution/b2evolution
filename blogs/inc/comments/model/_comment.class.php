@@ -345,7 +345,7 @@ class Comment extends DataObject
 	 * Template function: display the avatar of the comment's author.
 	 *
 	 */
-	function avatar( $size = 'crop-80x80', $class = 'bCommentAvatar', $params = array() )
+	function avatar( $size = 'crop-64x64', $class = 'bCommentAvatar', $params = array() )
 	{
 		if( $r = $this->get_avatar( $size, $class, $params ) )
 		{
@@ -359,7 +359,7 @@ class Comment extends DataObject
 	 *
 	 * @return string
 	 */
-	function get_avatar( $size = 'crop-80x80', $class = 'bCommentAvatar', $params = array() )
+	function get_avatar( $size = 'crop-64x64', $class = 'bCommentAvatar', $params = array() )
 	{
 		global $Plugins, $default_avatar;
 
@@ -379,7 +379,7 @@ class Comment extends DataObject
 		{	// Use gravatar
 			$params = array_merge( array(
 					'default'	=> $default_avatar,
-					'size'		=> '80',
+					'size'		=> '64',
 				), $params );
 
 			$img_url = 'http://www.gravatar.com/avatar.php?gravatar_id='.md5( $this->get_author_email() );
@@ -1463,6 +1463,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.39  2009/09/28 02:26:36  sam2kb
+ * 80x80px image looks weird, changed to 64x64
+ *
  * Revision 1.38  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *
