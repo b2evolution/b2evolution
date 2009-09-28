@@ -59,14 +59,24 @@ class UrlFuncsTestCase extends EvoUnitTestCase
 			url_rel_to_same_host('foobar', 'http://example.com/barfoo'),
 			'foobar' );
 
-		// Tests for URLs without protocol. Currently failing.
+		// Tests for URLs without protocol
+		// URL has protocol info, keep it.
 		$this->assertEqual(
-			url_rel_to_same_host('http://foo/bar', '//foo/baz'),
-			'//foo/bar' );
+			url_rel_to_same_host('http://host/bar', '//host/baz'),
+			'http://host/bar' );
+
+		// Target URL has protocol info, URL is protocol ambivalent.
+		$this->assertEqual(
+			url_rel_to_same_host('//host/bar', 'https://host/baz'),
+			'/bar' );
 
 		$this->assertEqual(
-			url_rel_to_same_host('//foo/bar', 'https://foo/baz'),
-			'//foo/bar' );
+			url_rel_to_same_host('//host/bar', '//host/baz'),
+			'/bar' );
+
+		$this->assertEqual(
+			url_rel_to_same_host('//hostA/bar', '//hostB/baz'),
+			'//hostA/bar' );
 	}
 
 
@@ -102,6 +112,9 @@ class UrlFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( url_add_param('?', array('foo'=>array(1, 2))), '?foo%5B%5D=1&amp;foo%5B%5D=2' );
 		$this->assertEqual( url_add_param('?', array('foo'=>'100%')), '?foo=100%25' );
 		$this->assertEqual( url_add_param('?', array('foo'=>'1&2')), '?foo=1%262' );
+
+		$this->assertEqual( url_add_param('?',
+						array('foo' => array('bar' => 1))), '?foo%5Bbar%5D=1' );
 	}
 }
 

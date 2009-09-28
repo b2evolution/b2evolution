@@ -536,15 +536,21 @@ function url_add_tail( $url, $tail )
  * This is useful for redirect_to params, to keep them short and avoid mod_security
  * rejecting the request as "Not Acceptable" (whole URL as param).
  *
- * NOTE: parse_url cannot handle URLs without scheme (e.g. "//example.com/foo").
- *
  * @param string URL to handle
  * @param string URL where we want to make $url relative to
  * @return string
  */
 function url_rel_to_same_host( $url, $target_url )
 {
-	$parsed_url = @parse_url( $url );
+	// Prepend fake scheme to URLs starting with "//" (relative to current protocol), since
+	// parse_url fails to handle them correctly otherwise (recognizes them as path-only)
+	$mangled_url = substr($url, 0, 2) == '//' ? 'noprotocolscheme:'.$url : $url;
+
+	if( substr($target_url, 0, 2) == '//' )
+		$target_url = 'noprotocolscheme:'.$target_url;
+
+
+	$parsed_url = @parse_url( $mangled_url );
 	if( ! $parsed_url )
 	{ // invalid url
 		return $url;
@@ -559,7 +565,8 @@ function url_rel_to_same_host( $url, $target_url )
 	{ // invalid url
 		return $url;
 	}
-	if( ! empty($target_url['scheme']) && $target_url['scheme'] != $parsed_url['scheme'] )
+	if( ! empty($target_url['scheme']) && $target_url['scheme'] != $parsed_url['scheme']
+		&& $parsed_url['scheme'] != 'noprotocolscheme' )
 	{ // scheme/protocol is different
 		return $url;
 	}
@@ -744,6 +751,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.42  2009/09/28 22:57:51  blueyed
+ * Fix url_rel_to_same_host for protocol relative URLs (//example.org/)
+ *
  * Revision 1.41  2009/09/27 13:12:53  blueyed
  * Add get_param_urlencoded: use it in regenerate_url and add functionality to pass array of params to url_add_param
  *
