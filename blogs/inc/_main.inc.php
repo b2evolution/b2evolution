@@ -286,7 +286,10 @@ if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
 	{
 		$Debuglog->add('$locale_from_get == $default_locale ('.$locale_from_get.').', 'locale');
 	}
-
+	if( $locale_from_get )
+	{ // locale from GET being used. It should not get overridden below.
+		$redir = 'no'; // do not redirect to canonical URL
+	}
 }
 
 
@@ -666,6 +669,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.128  2009/09/28 23:57:31  blueyed
+ * if locale_from_get is used, set redir=no
+ *
  * Revision 1.127  2009/09/26 13:50:28  tblue246
  * MFH: Reverting fix for timezone warnings, let users fix their errors themselves.
  *
