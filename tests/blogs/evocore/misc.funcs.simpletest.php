@@ -352,6 +352,8 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( format_to_output('<b>éêèë</b>', 'htmlbody'), '<b>éêèë</b>' );
 		$this->assertEqual( format_to_output('<b>éêèë</b>', 'xml'), 'éêèë' );
 
+		$this->assertEqual( format_to_output('2 > &1', 'htmlbody'), '2 > &amp;1' );
+
 		$evo_charset = 'latin1';
 	}
 
