@@ -1744,7 +1744,7 @@ class User extends DataObject
 	 *
 	 * @return string
 	 */
-	function get_avatar_imgtag( $size = 'crop-80x80', $class = 'avatar', $align = '' )
+	function get_avatar_imgtag( $size = 'crop-64x64', $class = 'avatar', $align = '' )
 	{
 		/**
 		 * @var File
@@ -1845,6 +1845,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.55  2009/09/28 20:19:06  blueyed
+ * Use crop-64x64 as default for User::get_avatar_imgtag, too.
+ *
  * Revision 1.54  2009/09/26 12:00:44  tblue246
  * Minor/coding style
  *
