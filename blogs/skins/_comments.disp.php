@@ -28,6 +28,9 @@ while( $Comment = & $CommentList->get_next() )
 	<!-- ========== START of a COMMENT ========== -->
 	<?php $Comment->anchor() ?>
 	<div class="bComment">
+		<?php
+		$Comment->avatar();
+		?>
 		<h3 class="bTitle">
 			<?php echo T_('In response to:') ?>
 			<?php $Comment->Item->title( array(
@@ -40,8 +43,7 @@ while( $Comment = & $CommentList->get_next() )
 		</div>
 		<div class="bCommentText">
 			<?php
-				$Comment->avatar();
-       	$Comment->content();
+			$Comment->content();
 			?>
 		</div>
 		<div class="bCommentSmallPrint">
@@ -63,6 +65,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/28 21:19:39  blueyed
+ * Comments list: display avatar 'on top', which is especially useful when letting it float to the right.
+ *
  * Revision 1.6  2009/09/16 22:03:41  fplanque
  * doc
  *
