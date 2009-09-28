@@ -61,8 +61,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * - string (strips (HTML-)Tags, trims whitespace)
  * - text like string but allows multiple lines
  * - array	(TODO:  array/integer  , array/array/string )
- * - html (does nothing)
- * - '' (does nothing)
+ * - html (does nothing, for now)
+ * - raw (does nothing)
+ * - '' (does nothing) -- DEPRECATED, use "raw" instead
  * - '/^...$/' check regexp pattern match (string)
  * - boolean (will force type to boolean, but you can't use 'true' as a default since it has special meaning. There is no real reason to pass booleans on a URL though. Passing 0 and 1 as integers seems to be best practice).
  * Value type will be forced only if resulting value (probably from default then) is !== NULL
@@ -75,7 +76,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *              'allow_empty' will refuse illegal values but will always accept empty values (This helps blocking dirty spambots or borked index bots. Saves a lot of processor time by killing invalid requests)
  * @return mixed Final value of Variable, or false if we don't force setting and did not set
  */
-function param( $var, $type = '', $default = '', $memorize = false,
+function param( $var, $type = 'raw', $default = '', $memorize = false,
 								$override = false, $use_default = true, $strict_typing = 'allow_empty' )
 {
 	global $Debuglog, $debug, $evo_charset, $io_charset;
@@ -148,7 +149,8 @@ function param( $var, $type = '', $default = '', $memorize = false,
 		// echo "forcing type!";
 		switch( $type )
 		{
-			case 'html':
+			case 'html': // Technically does the same as "raw", but may do more in the future.
+			case 'raw':
 				if( ! is_scalar($GLOBALS[$var]) )
 				{ // This happens if someone uses "foo[]=x" where "foo" is expected as string
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not scalar!' );
@@ -1953,6 +1955,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.46  2009/09/28 20:02:41  tblue246
+ * param()/$type parameter: Deprecate "" value in favor of (newly added) "raw".
+ *
  * Revision 1.45  2009/09/27 13:12:53  blueyed
  * Add get_param_urlencoded: use it in regenerate_url and add functionality to pass array of params to url_add_param
  *
