@@ -196,8 +196,8 @@ switch( $content_mode )
 			?>
 		</div>
 		<?php
-		
-		
+
+
 		if( !empty($params['limit_files']) )
 		{	// Display attachments/files that are linked to this post:
 			$Item->files( array(
@@ -216,6 +216,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.19  2009/09/28 23:58:16  blueyed
+ * whitespace
+ *
  * Revision 1.18  2009/09/11 18:29:26  blueyed
  * Fix indent
  *

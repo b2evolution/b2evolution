@@ -185,7 +185,7 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 
 	// _______________________________________________________________
 
-	if( $Blog->get_setting( 'feed_content' ) != 'none' ) 
+	if( $Blog->get_setting( 'feed_content' ) != 'none' )
 	{ // fp: TODO; move this tesqt into feedback_feed_link()
 		// Display link for comments feed:
 		$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
@@ -207,6 +207,9 @@ skin_include( '_item_comment_form.inc.php', $params );
 
 /*
  * $Log$
+ * Revision 1.21  2009/09/28 23:58:16  blueyed
+ * whitespace
+ *
  * Revision 1.20  2009/08/27 12:24:27  tblue246
  * Added blog setting to display comments in ascending/descending order
  *
