@@ -201,6 +201,10 @@ class DataObject
 	/**
 	 * Insert object into DB based on previously recorded changes.
 	 *
+	 * @todo dh> this should handle caches, e.g. if a Chapter gets inserted
+	 *           (via Chapter::dbinsert()), it should add it to $ChapterCache.
+	 *           Have I missed something?
+	 *
 	 * @return boolean true on success
 	 */
 	function dbinsert()
@@ -804,6 +808,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2009/09/29 21:07:24  blueyed
+ * todo/question
+ *
  * Revision 1.25  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *
