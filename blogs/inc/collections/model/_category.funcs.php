@@ -44,6 +44,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
 /**
  * Create a new category
  *
@@ -53,28 +54,35 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param string Category ID ('NULL' as string(!) for root)
  * @param integer|NULL Blog ID (will be taken from parent cat, if empty)
  */
-function cat_create(
-	$cat_name,
-	$cat_parent_ID,
-	$cat_blog_ID = NULL)
+function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL)
 {
 	global $DB;
 
-	if( $cat_blog_ID == NULL )
+	load_class('chapters/model/_chapter.class.php', 'Chapter');
+
+	if( ! $cat_blog_ID )
 	{
-		if( empty($cat_parent_ID) ) debug_die ( 'cat_create(-) missing parameters!' );
-		$cat_blog_ID = get_catblog($cat_parent_ID);
+		if( empty($cat_parent_ID) ) debug_die ( 'cat_create(-) missing parameters (cat_parent_ID)!' );
+
+		$ChapterCache = & get_ChapterCache();
+		$Chapter = $ChapterCache->get_by_ID($cat_parent_ID);
+		$cat_blog_ID = $Chapter->blog_ID;
 	}
 
-	// Dirty temporary fix:
-	$cat_urlname = preg_replace( '/[^a-z0-9]/', '-', strtolower($cat_name) );
+	if( $cat_parent_ID === 'NULL' )
+		// fix old use case
+		$cat_parent_ID = NULL;
 
-	$sql = "INSERT INTO T_categories( cat_parent_ID, cat_name, cat_blog_ID, cat_urlname )
-					VALUES ( $cat_parent_ID, ".$DB->quote($cat_name).", $cat_blog_ID, ".$DB->quote($cat_urlname)." )";
-	if( ! $DB->query( $sql ) )
+	$new_Chapter = new Chapter(NULL, $cat_blog_ID);
+	$new_Chapter->set('name', $cat_name);
+	$new_Chapter->set('urlname', strtolower($cat_name)); // TODO: should get handled by set("name")
+	$new_Chapter->set('parent_ID', $cat_parent_ID);
+
+
+	if( ! $new_Chapter->dbinsert() )
 		return 0;
 
-	return $DB->insert_id;
+	return $new_Chapter->ID;
 }
 
 
@@ -474,6 +482,9 @@ function cat_req_dummy()
 
 /*
  * $Log$
+ * Revision 1.11  2009/09/29 22:28:04  blueyed
+ * cat_create: use Chapter class
+ *
  * Revision 1.10  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *
