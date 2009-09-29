@@ -291,14 +291,13 @@ switch( $action )
 				),
 				array(
 					"\$db_config = array(\n"
-						."\t'user'     => '$conf_db_user',\$1"
-						// Tblue> Actually, we should escape all other values, too...
+						."\t'user'     => '".str_replace( "'", "\'", $conf_db_user )."',\$1"
 						."\t'password' => '".str_replace( "'", "\'", $conf_db_password )."',\$2"
-						."\t'name'     => '$conf_db_name',\$3"
-						."\t'host'     => '$conf_db_host',\$4",
-					"tableprefix = '$conf_db_tableprefix';",
-					"baseurl = '$conf_baseurl';",
-					"admin_email = '$conf_admin_email';",
+						."\t'name'     => '".str_replace( "'", "\'", $conf_db_name )."',\$3"
+						."\t'host'     => '".str_replace( "'", "\'", $conf_db_host )."',\$4",
+					"tableprefix = '".str_replace( "'", "\'", $conf_db_tableprefix )."';",
+					"baseurl = '".str_replace( "'", "\'", $conf_baseurl )."';",
+					"admin_email = '".str_replace( "'", "\'", $conf_admin_email )."';",
 					'config_is_done = 1;',
 				), $conf );
 
@@ -720,6 +719,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.187  2009/09/29 15:47:59  tblue246
+ * Installer: Escape single quotes when writing config file
+ *
  * Revision 1.186  2009/09/29 13:29:58  tblue246
  * Proper security fixes
  *
