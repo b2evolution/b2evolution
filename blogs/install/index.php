@@ -312,7 +312,7 @@ switch( $action )
 					<li><strong><?php echo T_('You can allow the installer to create the config file by changing permissions for the /conf directory:') ?></strong>
 						<ol>
 							<li><?php printf( T_('Make sure there is no existing and potentially locked configuration file named <code>%s</code>. If so, please delete it.'), $conf_filepath ); ?></li>
-							<li><?php printf( T_('<code>chmod 666 %s</code>. If needed, see the <a %s>online manual about permissions</a>.'), $conf_path, 'href="http://manual.b2evolution.net/Directory_and_file_permissions" target="_blank"' ); ?></li>
+							<li><?php printf( T_('<code>chmod 777 %s</code>. If needed, see the <a %s>online manual about permissions</a>.'), $conf_path, 'href="http://manual.b2evolution.net/Directory_and_file_permissions" target="_blank"' ); ?></li>
 							<li><?php echo T_('Come back to this page and refresh/reload.') ?></li>
 						</ol>
 						<br />
@@ -719,6 +719,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.188  2009/09/29 17:56:19  tblue246
+ * minor
+ *
  * Revision 1.187  2009/09/29 15:47:59  tblue246
  * Installer: Escape single quotes when writing config file
  *
