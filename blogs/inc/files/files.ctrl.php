@@ -153,6 +153,10 @@ if( !empty($action) && substr( $fm_mode, 0, 5 ) != 'link_' )
 	$fm_mode = '';
 }
 
+// Abstract data we want to come back:
+param( 'linkctrl', 'string', '', true );
+param( 'linkdata', 'string', '', true );
+
 // Name of the iframe we want some actions to come back to:
 param( 'iframe_name', 'string', '', true );
 
@@ -1065,8 +1069,7 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=users&user_ID='.$edited_User->ID );
 		break;
 
-	case 'link_db':
-		// efy-maxim> TODO: temporary hook for DB module (EXPERIMENTAL)
+	case 'link_data':
 
 		// Get the file we want to link:
 		if( !$selected_Filelist->count() )
@@ -1080,7 +1083,7 @@ switch( $action )
 		$edited_File->load_meta( true );
 
 		// REDIRECT / EXIT
-		header_redirect( $admin_url.'?ctrl=dbdata&action='.param( 'db_action', 'string' ).'&db_ID='.param( 'db_ID', 'string' ).'&field_name='.param( 'field_name', 'string' ).'&file_ID='.$edited_File->ID.'&file_root='.$edited_File->_FileRoot->ads_url.'&file_path='.$edited_File->_rdfp_rel_path );
+		header_redirect( $admin_url.'?ctrl='.$linkctrl.'&linkdata='.$linkdata.'&file_ID='.$edited_File->ID );
 
 		break;
 
@@ -1680,6 +1683,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.39  2009/09/29 20:17:05  efy-maxim
+ * linkctrl & linkdata parameters
+ *
  * Revision 1.38  2009/09/29 03:14:22  fplanque
  * doc
  *

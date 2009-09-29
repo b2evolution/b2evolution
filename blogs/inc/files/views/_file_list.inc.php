@@ -73,6 +73,9 @@ global $Blog, $blog;
 
 global $fm_hide_dirtree, $create_name, $ads_list_path;
 
+// Abstract data we want to come back:
+global $linkctrl, $linkdata;
+
 // Name of the iframe we want some atiosn to come back to:
 global $iframe_name;
 
@@ -291,16 +294,10 @@ $Form->begin_form();
 								NULL, NULL, NULL, array() );
 					echo ' ';
 				}
-
-				// efy-maxim> TODO: temporary hook for DB module (EXPERIMENTAL)
-				$db_ID = param( 'db_ID', 'string' );
-				if( $db_ID != NULL )
+				elseif( !$lFile->is_dir() && isset( $linkctrl ) && isset( $linkdata ) )
 				{
-					$db_action = param( 'db_action', 'string' );
-					$field_name = param( 'field_name', 'string' );
-
 					echo action_icon( T_('Link this file!'), 'link',
-								regenerate_url( 'fm_selected', 'action=link_db&amp;db_ID='.$db_ID.'&amp;db_action='.$db_action.'&amp;field_name='.$field_name.'&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ),
+								regenerate_url( 'fm_selected', 'action=link_data&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ),
 								NULL, NULL, NULL, array() );
 
 					echo ' ';
@@ -648,6 +645,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.26  2009/09/29 20:17:06  efy-maxim
+ * linkctrl & linkdata parameters
+ *
  * Revision 1.25  2009/09/29 03:14:22  fplanque
  * doc
  *
