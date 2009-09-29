@@ -2427,25 +2427,6 @@ function upgrade_b2evo_tables()
 		set_upgrade_checkpoint( '9960' );
 	}
 
-	if( $old_db_version < 9965 )
-	{	// 3.3.2
-
-// fp> NO, 3.3.x CANNOT CHANGE DB MODEL !! move down with 4.0
-
-		task_begin( 'Upgrading skins table... ' );
-		$DB->query( "ALTER TABLE T_skins__skin
-						MODIFY skin_type enum('normal','feed','sitemap') NOT NULL default 'normal'" );
-		task_end();
-
-		task_begin( 'Setting skin type of sitemap skin to "sitemap"... ' );
-		$DB->query( "UPDATE T_skins__skin
-						SET skin_type = 'sitemap'
-						WHERE skin_folder = '_sitemap'" );
-		task_end();
-
-		set_upgrade_checkpoint( '9965' );
-	}
-
 	if( $old_db_version < 9970 )
 	{	// 4.0
 
@@ -2566,6 +2547,17 @@ function upgrade_b2evo_tables()
 		$DB->query( 'UPDATE T_groups
 		             SET grp_perm_messaging = "reply"
 		             WHERE grp_ID = 3' );
+		task_end();
+
+		task_begin( 'Upgrading skins table... ' );
+		$DB->query( "ALTER TABLE T_skins__skin
+						MODIFY skin_type enum('normal','feed','sitemap') NOT NULL default 'normal'" );
+		task_end();
+
+		task_begin( 'Setting skin type of sitemap skin to "sitemap"... ' );
+		$DB->query( "UPDATE T_skins__skin
+						SET skin_type = 'sitemap'
+						WHERE skin_folder = '_sitemap'" );
 		task_end();
 
 		//set_upgrade_checkpoint( '9970' );
@@ -2745,6 +2737,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.332  2009/09/29 13:32:30  tblue246
+ * OK, no DB changes for 3.3.2, moved to 4.0
+ *
  * Revision 1.331  2009/09/29 03:47:07  fplanque
  * doc
  *
