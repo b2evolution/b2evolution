@@ -51,7 +51,7 @@ if( !empty($s) )
 }
 
 // Create result set:
-$Results = & new Results( $SQL->get(), 'ctry_', '--A-', 0 );
+$Results = & new Results( $SQL->get(), 'ctry_', '-A' );
 
 $Results->title = T_('Countries list');
 
@@ -181,6 +181,7 @@ function ctry_td_actions($ctry_enabled, $ctry_ID )
 	global $dispatcher;
 	
 	$r = '';
+// fp> TODO: regenerate URL so that page is not lost
 	if( $ctry_enabled == true )
 	{
 		$r .= action_icon( T_('Disable the country!'), 'deactivate', $dispatcher.'?ctrl=countries&amp;action=disable_country&amp;ctry_ID='.$ctry_ID );
@@ -214,6 +215,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/29 03:14:22  fplanque
+ * doc
+ *
  * Revision 1.14  2009/09/28 20:55:00  efy-khurram
  * Implemented support for enabling disabling countries.
  *

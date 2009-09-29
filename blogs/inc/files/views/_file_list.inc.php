@@ -292,7 +292,7 @@ $Form->begin_form();
 					echo ' ';
 				}
 
-				// efy-maxim TODO: temporary solution for file/image types in dbase mod
+				// efy-maxim> TODO: temporary hook for DB module (EXPERIMENTAL)
 				$db_ID = param( 'db_ID', 'string' );
 				if( $db_ID != NULL )
 				{
@@ -648,6 +648,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.25  2009/09/29 03:14:22  fplanque
+ * doc
+ *
  * Revision 1.24  2009/09/26 15:18:12  efy-maxim
  * temporary solution for file/image types
  *

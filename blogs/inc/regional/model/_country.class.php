@@ -42,7 +42,7 @@ class Country extends DataObject
 	var $code = '';
 	var $name = '';
 	var $curr_ID = '';
-	var $enabled = '';
+	var $enabled = 1;
 
 	/**
 	 * Constructor
@@ -145,6 +145,9 @@ class Country extends DataObject
 
 /*
  * $Log$
+ * Revision 1.16  2009/09/29 03:14:22  fplanque
+ * doc
+ *
  * Revision 1.15  2009/09/28 20:55:00  efy-khurram
  * Implemented support for enabling disabling countries.
  *

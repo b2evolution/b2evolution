@@ -1066,8 +1066,7 @@ switch( $action )
 		break;
 
 	case 'link_db':
-
-		// efy-maxim TODO: temporary solution for file/image types in dbase mod
+		// efy-maxim> TODO: temporary hook for DB module (EXPERIMENTAL)
 
 		// Get the file we want to link:
 		if( !$selected_Filelist->count() )
@@ -1681,6 +1680,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.38  2009/09/29 03:14:22  fplanque
+ * doc
+ *
  * Revision 1.37  2009/09/26 15:18:12  efy-maxim
  * temporary solution for file/image types
  *
