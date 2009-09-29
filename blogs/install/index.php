@@ -235,7 +235,7 @@ switch( $action )
 		block_open();
 
 		param( 'conf_db_user', 'string', true );
-		param( 'conf_db_password', 'raw', true );
+		param( 'conf_db_password', 'string', true );
 		param( 'conf_db_name', 'string', true );
 		param( 'conf_db_host', 'string', true );
 		param( 'conf_db_tableprefix', 'string', $tableprefix );
@@ -381,7 +381,7 @@ switch( $action )
 
 			// Set default params if not provided otherwise:
 			param( 'conf_db_user', 'string', $db_config['user'] );
-			param( 'conf_db_password', 'raw', $db_config['password'] );
+			param( 'conf_db_password', 'string', $db_config['password'] );
 			param( 'conf_db_name', 'string', $db_config['name'] );
 			param( 'conf_db_host', 'string', $db_config['host'] );
 			param( 'conf_db_tableprefix', 'string', $tableprefix );
@@ -719,6 +719,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.185  2009/09/29 03:38:34  fplanque
+ * security rollback. NEVER EVER ALLOW UNFILTERED INPUTS. problem here: close password with single quote, then inject PHP, no less!!!
+ *
  * Revision 1.184  2009/09/28 20:02:43  tblue246
  * param()/$type parameter: Deprecate "" value in favor of (newly added) "raw".
  *
