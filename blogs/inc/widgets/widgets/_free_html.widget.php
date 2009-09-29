@@ -66,7 +66,9 @@ class free_html_Widget extends ComponentWidget
 	{
 		if( empty( $this->disp_params['title'] ) )
 		{
-			return strmaxlen( $this->disp_params['content'], 60, NULL, 'htmlbody' );
+			// fp> This MUST NOT allow HTML code to be "executed"
+			// TODO: fix usage of strmaxlen go it doesn't how &hellip;
+			return htmlspecialchars(strmaxlen( $this->disp_params['content'], 60, NULL, 'htmlbody' ));
 		}
 
 		return format_to_output( $this->disp_params['title'] );
@@ -135,6 +137,9 @@ class free_html_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.20  2009/09/29 03:29:58  fplanque
+ * security fix
+ *
  * Revision 1.19  2009/09/27 12:57:29  blueyed
  * strmaxlen: add format param, which is used on the (possibly) cropped string.
  *
