@@ -198,7 +198,7 @@ switch( $action )
 
 	case 'new':
 		$set_issue_date = 'now';
-		$item_issue_date = date( locale_datefmt(), $localtimenow );
+		$item_issue_date = date_i18n( locale_datefmt(), $localtimenow );
 		$item_issue_time = date( 'H:i:s', $localtimenow );
 		// pre_dump( $item_issue_date, $item_issue_time );
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
@@ -1051,6 +1051,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.66  2009/09/29 02:03:41  sam2kb
+ * Use date_i18n() for $item_issue_date, otherwise regional dates don't validate
+ * See http://forums.b2evolution.net/viewtopic.php?t=19743
+ *
  * Revision 1.65  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *
