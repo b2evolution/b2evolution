@@ -1295,14 +1295,15 @@ class Results extends Table
 			{	// For each position in order string:
 				if( isset( $this->cols[$i]['order'] ) )
 				{	// if column is sortable:
+					# Add ASC/DESC to any order cols (except if there is ASC/DESC given already, which is used to order NULL values always at the end)
 					switch( substr( $this->order, $i, 1 ) )
 					{
 						case 'A':
-							$orders[] = str_replace( ',', ' ASC,', $this->cols[$i]['order']).' ASC';
+							$orders[] = preg_replace('~(?<!asc|desc)\s*,~i', ' ASC,', $this->cols[$i]['order']).' ASC';
 							break;
 
 						case 'D':
-							$orders[] = str_replace( ',', ' DESC,', $this->cols[$i]['order']).' DESC';
+							$orders[] = str_replace( '~(?<asc|desc)\s*,~i', ' DESC,', $this->cols[$i]['order']).' DESC';
 							break;
 					}
 				}
@@ -1823,6 +1824,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.29  2009/09/29 00:00:16  blueyed
+ * Finish r8131: sort NULL hit_serprank values _always_ to the end.
+ *
  * Revision 1.28  2009/09/15 19:31:55  fplanque
  * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
  * PHP 4 compatible. Even better on PHP 5.

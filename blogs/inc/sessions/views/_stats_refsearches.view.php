@@ -83,7 +83,7 @@ $Results->cols[] = array(
 // Serp Rank:
 $Results->cols[] = array(
 		'th' => T_('SR'),
-		'order' => 'is_null_hit_serprank, hit_serprank',
+		'order' => 'is_null_hit_serprank ASC, hit_serprank',
 		'td_class' => 'center',
 		'td' => '$hit_serprank$',
 	);
@@ -119,6 +119,9 @@ echo '<p class="notes">'.T_('These are hits from people who came to this blog sy
 
 /*
  * $Log$
+ * Revision 1.15  2009/09/29 00:00:16  blueyed
+ * Finish r8131: sort NULL hit_serprank values _always_ to the end.
+ *
  * Revision 1.14  2009/09/25 13:09:36  efy-vyacheslav
  * Using the SQL class to prepare queries
  *
