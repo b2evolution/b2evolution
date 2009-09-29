@@ -106,6 +106,7 @@ if( !empty($size) && $File->is_image() )
 	{ // this file size alias is not defined, use default:
 		// TODO: dh> this causes links for e.g. "fit-50x50" to work also, but with the drawback of images not getting served from the
 		//           .evocache directory directly. I think invalid $size params should bark out here.
+		// fp> ok.
 		$size_name = 'fit-80x80';
 	}
 
@@ -204,6 +205,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.40  2009/09/29 02:52:20  fplanque
+ * doc
+ *
  * Revision 1.39  2009/09/27 19:09:20  blueyed
  * todo
  *

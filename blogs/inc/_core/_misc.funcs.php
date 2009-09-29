@@ -1339,7 +1339,7 @@ function check_is_word( $word )
 {
 	if( !is_word( $word ) )
 	{
-		return T_('The word is invalid.');
+		return T_('This field should be a single word; A-Z only.');
 	}
 }
 
@@ -3720,6 +3720,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.168  2009/09/29 02:52:20  fplanque
+ * doc
+ *
  * Revision 1.167  2009/09/28 23:56:22  blueyed
  * doc
  *

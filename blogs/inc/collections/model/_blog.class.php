@@ -1743,10 +1743,11 @@ class Blog extends DataObject
 	/**
 	 * Make sure collection settings are loaded.
 	 * This keeps a single instance across all blogs.
+	 * fp> why?
 	 */
 	function load_CollectionSettings()
 	{
-		static $instance;
+		static $instance; // fp> why do we need static? (it actually feels totally wrong: sharing settings between blogs!)
 
 		if( ! isset($this->CollectionSettings) )
 		{
@@ -2148,6 +2149,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.86  2009/09/29 02:52:20  fplanque
+ * doc
+ *
  * Revision 1.85  2009/09/27 12:57:29  blueyed
  * strmaxlen: add format param, which is used on the (possibly) cropped string.
  *
