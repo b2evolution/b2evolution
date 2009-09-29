@@ -24,7 +24,7 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author evofactory-test
+ * @author efy-sergey: Evo Factory / Sergey.
  * @author fplanque: Francois Planque.
  *
  * @version $Id$
@@ -42,7 +42,7 @@ $SQL->SELECT( '*' );
 $SQL->FROM( 'T_items__type' );
 
 // Create result set:
-$Results = & new Results( $SQL->get(), 'ptyp_', '-A' );
+$Results = & new Results( $SQL->get(), 'ptyp_' );
 
 $Results->title = T_('Item/Post/Page types');
 
@@ -52,7 +52,7 @@ $reserved_ids = ItemType::get_reserved_ids();
 
 /**
  * Callback to build possible actions depending on item type id
- * 
+ *
  */
 function get_actions_for_itemtype( $id )
 {
@@ -72,19 +72,19 @@ function get_actions_for_itemtype( $id )
 
 /**
  * Callback to make item type name depending on item type id
- * 
+ *
  */
 function get_name_for_itemtype( $id, $name )
 {
 	global $reserved_ids;
-	
+
 	if( ($id < $reserved_ids[0]) || ($id > $reserved_ids[1]) )
 	{	// not reserved id
 		$ret_name = '<strong><a href="'.regenerate_url( 'action,ID', 'ptyp_ID='.$id.'&amp;action=edit' ).'">'.$name.'</a></strong>';
 	}
 	else
 	{
-		$ret_name = '<strong>'.$name.'</strong>'; 
+		$ret_name = '<strong>'.$name.'</strong>';
 	}
 	return $ret_name;
 }
@@ -97,13 +97,13 @@ $Results->cols[] = array(
 		'td_class' => 'shrinkwrap',
 		'td' => '$ptyp_ID$',
 	);
-	
+
 $Results->cols[] = array(
 		'th' => T_('Name'),
 		'order' => 'ptyp_name',
 		'td' => '%get_name_for_itemtype(#ptyp_ID#, #ptyp_name#)%',
 	);
-	
+
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
@@ -112,7 +112,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'td_class' => 'shrinkwrap',
 							'td' => '%get_actions_for_itemtype( #ptyp_ID# )%',
 						);
-						
+
 	$Results->global_icon( T_('Create a new element...'), 'new',
 				regenerate_url( 'action', 'action=new' ), T_('New item type').' &raquo;', 3, 4  );
 }
@@ -122,9 +122,12 @@ $Results->display();
 
 /**
  * $Log$
+ * Revision 1.2  2009/09/29 18:44:00  fplanque
+ * doc
+ *
  * Revision 1.1  2009/09/25 11:36:43  efy-sergey
  * Replaced "simple list" manager for Post types. Also allow to edit ID for Item types
  *
- * 
+ *
  */
 ?>

@@ -37,23 +37,14 @@ $allow_cross_posting = 1;
 
 
 /**
- * Locked post type IDs.
- *
- * These post types can't be edited or deleted in the post type editor.
- * They're needed by certain b2evolution features, so
- * don't remove any IDs from this array.
- *
- * @global array $posttypes_locked_IDs
- */
-$posttypes_locked_IDs = array( 1000, 1500, 1520, 1530, 1570, 1600, 2000, 3000 );
-
-/**
  * Reserved post type IDs.
  *
  * These post types are reserved for future use and can't be edited or
  * deleted in the post type editor. It also is not possible to select
  * them when creating a new post.
  * Do not remove any IDs from this array.
+ *
+ * @todo fp>get rid of this and just delete 4000 &  500 from the database during upgrade
  *
  * @global array $posttypes_reserved_IDs
  */

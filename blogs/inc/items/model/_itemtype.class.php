@@ -21,6 +21,10 @@
  * PROGIDISTRI S.A.S. grants Francois PLANQUE the right to license
  * PROGIDISTRI S.A.S.'s contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ *
+ * The Evo Factory grants Francois PLANQUE the right to license
+ * The Evo Factory's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package evocore
@@ -28,6 +32,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author fplanque: Francois PLANQUE.
  * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
+ * @author efy-sergey: Evo Factory / Sergey.
  *
  * @version $Id$
  */
@@ -58,7 +63,7 @@ class ItemType extends DataObject
 
 		// Allow inseting specific IDs
 		$this->allow_ID_insert = true;
-		
+
 		$this->delete_restrictions = array(
 				array( 'table'=>'T_ityp_col', 'fk'=>'itco_ityp_ID', 'msg'=>T_('%d related collections') ), // "Lignes de missions"
 				array( 'table'=>'T_items__item', 'fk'=>'post_ptyp_ID', 'msg'=>T_('%d related items') ), // "Lignes de visit reports"
@@ -70,7 +75,7 @@ class ItemType extends DataObject
 			$this->name  			 = $db_row->ptyp_name 	;
 		}
 	}
-	
+
 	/**
 	 * Load data from Request form fields.
 	 *
@@ -100,7 +105,7 @@ class ItemType extends DataObject
 	{
 		return $this->name;
 	}
-	
+
 	/**
 	 * Check existence of specified item type ID in ptyp_ID unique field.
 	 *
@@ -116,9 +121,10 @@ class ItemType extends DataObject
 
 		return $DB->get_var( $sql );
 	}
-	
+
 	/**
 	 *  Returns array, which determinate the lower and upper limit of protected ID's
+	 *
 	 *  @return array
 	 */
 	function get_reserved_ids()
@@ -129,6 +135,9 @@ class ItemType extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2009/09/29 18:43:58  fplanque
+ * doc
+ *
  * Revision 1.5  2009/09/25 11:36:44  efy-sergey
  * Replaced "simple list" manager for Post types. Also allow to edit ID for Item types
  *

@@ -24,6 +24,7 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author efy-sergey: Evo Factory / Sergey.
  * @author fplanque: Francois PLANQUE.
  *
  * @version $Id$
@@ -78,9 +79,12 @@ else
 
 /**
  * $Log$
+ * Revision 1.2  2009/09/29 18:44:00  fplanque
+ * doc
+ *
  * Revision 1.1  2009/09/25 11:36:43  efy-sergey
  * Replaced "simple list" manager for Post types. Also allow to edit ID for Item types
  *
- * 
+ *
  */
 ?>
