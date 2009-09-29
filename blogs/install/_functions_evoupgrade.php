@@ -2430,6 +2430,8 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 9965 )
 	{	// 3.3.2
 
+// fp> NO, 3.3.x CANNOT CHANGE DB MODEL !! move down with 4.0
+
 		task_begin( 'Upgrading skins table... ' );
 		$DB->query( "ALTER TABLE T_skins__skin
 						MODIFY skin_type enum('normal','feed','sitemap') NOT NULL default 'normal'" );
@@ -2445,7 +2447,7 @@ function upgrade_b2evo_tables()
 	}
 
 	if( $old_db_version < 9970 )
-	{	// 3.4
+	{	// 4.0
 
 		// For create_default_currencies() and create_default_countries():
 		require_once dirname(__FILE__).'/_functions_create.php';
@@ -2743,6 +2745,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.331  2009/09/29 03:47:07  fplanque
+ * doc
+ *
  * Revision 1.330  2009/09/26 13:41:54  tblue246
  * If XML feeds are disabled for a blog, still allow accessing "sitemap" skins.
  *

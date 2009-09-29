@@ -174,7 +174,8 @@ switch( $action )
 
 		switch( $display_mode )
 		{
-			case 'js' :
+			case 'js' :	// this is a js call, lets return the settings page -- fp> what do you mean "settings page" ?
+				// fp> wthis will visually live insert the new widget into the container; it probably SHOULD open the edit properties right away
 				send_javascript_message( array(
 					'addNewWidgetCallback' => array(
 						$edited_ComponentWidget->ID,
@@ -506,6 +507,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.36  2009/09/29 03:47:07  fplanque
+ * doc
+ *
  * Revision 1.35  2009/09/26 20:51:37  tblue246
  * minor
  *
