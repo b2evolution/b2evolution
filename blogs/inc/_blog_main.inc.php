@@ -435,6 +435,7 @@ if( !empty( $tempskin ) )
 
 if( isset( $skin ) )
 {	// A skin has been requested by folder_name (url or stub):
+	// Note: "sitemap" type skins get handled here just like "normal" skins.
 
 	// Check validity of requested skin name:
 	if( preg_match( '~([^-A-Za-z0-9._]|\.\.)~', $skin ) )
@@ -456,12 +457,6 @@ if( isset( $skin ) )
 			$disp_detail = '404-feeds-disabled';
 		}
 	}
-/* fp> make a setting to disable sitemaps. It is important to be able to do so
-	elseif( $Skin->type == 'sitemap' )
-	{	// "sitemap" skins are always accessible and cannot be disabled.
-		// Do not do anything in this block...
-	}
-*/
 	elseif( skin_exists( $skin ) && ! skin_installed( $skin ) )
 	{	// The requested skin is not a feed skin and exists in the file system, but isn't installed:
 		debug_die( sprintf( T_( 'The skin [%s] is not installed on this system.' ), htmlspecialchars( $skin ) ) );
@@ -602,6 +597,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.148  2009/09/29 15:39:16  tblue246
+ * doc
+ *
  * Revision 1.147  2009/09/29 03:47:07  fplanque
  * doc
  *
