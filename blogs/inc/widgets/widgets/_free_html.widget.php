@@ -66,9 +66,7 @@ class free_html_Widget extends ComponentWidget
 	{
 		if( empty( $this->disp_params['title'] ) )
 		{
-			// fp> This MUST NOT allow HTML code to be "executed"
-			// TODO: fix usage of strmaxlen go it doesn't how &hellip;
-			return htmlspecialchars(strmaxlen( $this->disp_params['content'], 60, NULL, 'htmlbody' ));
+			return strmaxlen( $this->disp_params['content'], 60, NULL, /* use htmlspecialchars() */ 'formvalue' );
 		}
 
 		return format_to_output( $this->disp_params['title'] );
@@ -137,6 +135,9 @@ class free_html_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.21  2009/09/29 13:29:58  tblue246
+ * Proper security fixes
+ *
  * Revision 1.20  2009/09/29 03:29:58  fplanque
  * security fix
  *

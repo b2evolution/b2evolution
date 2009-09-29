@@ -235,7 +235,7 @@ switch( $action )
 		block_open();
 
 		param( 'conf_db_user', 'string', true );
-		param( 'conf_db_password', 'string', true );
+		param( 'conf_db_password', 'raw', true );
 		param( 'conf_db_name', 'string', true );
 		param( 'conf_db_host', 'string', true );
 		param( 'conf_db_tableprefix', 'string', $tableprefix );
@@ -292,7 +292,8 @@ switch( $action )
 				array(
 					"\$db_config = array(\n"
 						."\t'user'     => '$conf_db_user',\$1"
-						."\t'password' => '$conf_db_password',\$2"
+						// Tblue> Actually, we should escape all other values, too...
+						."\t'password' => '".str_replace( "'", "\'", $conf_db_password )."',\$2"
 						."\t'name'     => '$conf_db_name',\$3"
 						."\t'host'     => '$conf_db_host',\$4",
 					"tableprefix = '$conf_db_tableprefix';",
@@ -381,7 +382,7 @@ switch( $action )
 
 			// Set default params if not provided otherwise:
 			param( 'conf_db_user', 'string', $db_config['user'] );
-			param( 'conf_db_password', 'string', $db_config['password'] );
+			param( 'conf_db_password', 'raw', $db_config['password'] );
 			param( 'conf_db_name', 'string', $db_config['name'] );
 			param( 'conf_db_host', 'string', $db_config['host'] );
 			param( 'conf_db_tableprefix', 'string', $tableprefix );
@@ -719,6 +720,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.186  2009/09/29 13:29:58  tblue246
+ * Proper security fixes
+ *
  * Revision 1.185  2009/09/29 03:38:34  fplanque
  * security rollback. NEVER EVER ALLOW UNFILTERED INPUTS. problem here: close password with single quote, then inject PHP, no less!!!
  *
