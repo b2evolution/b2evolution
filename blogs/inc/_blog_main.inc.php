@@ -435,7 +435,6 @@ if( !empty( $tempskin ) )
 
 if( isset( $skin ) )
 {	// A skin has been requested by folder_name (url or stub):
-	// Note: "sitemap" type skins get handled here just like "normal" skins.
 
 	// Check validity of requested skin name:
 	if( preg_match( '~([^-A-Za-z0-9._]|\.\.)~', $skin ) )
@@ -455,6 +454,17 @@ if( isset( $skin ) )
 			unset( $Skin );
 			$disp = '404';
 			$disp_detail = '404-feeds-disabled';
+		}
+	}
+	elseif( $Skin->type == 'sitemap' )
+	{	// Check if we actually allow the display of sitemaps.
+		// Note: Skins with the type "sitemap" can always be accessed, even when they're not installed.
+		if( ! $Blog->get_setting('enable_sitemaps') )
+		{ // We don't want to show this sitemap, revert to error 404:
+			unset( $skin );
+			unset( $Skin );
+			$disp = '404';
+			$disp_detail = '404-sitemaps-disabled';
 		}
 	}
 	elseif( skin_exists( $skin ) && ! skin_installed( $skin ) )
@@ -597,6 +607,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.149  2009/09/29 16:56:07  tblue246
+ * Added setting to disable sitemaps skins
+ *
  * Revision 1.148  2009/09/29 15:39:16  tblue246
  * doc
  *

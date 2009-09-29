@@ -467,6 +467,8 @@ class Blog extends DataObject
 
 			$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
 			$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
+
+			$this->set_setting( 'enable_sitemaps', param( 'enable_sitemaps', 'integer', 0 ) );
 		}
 
 		if( param( 'blog_allowcomments',   'string', NULL ) !== NULL )
@@ -2149,6 +2151,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.87  2009/09/29 16:56:11  tblue246
+ * Added setting to disable sitemaps skins
+ *
  * Revision 1.86  2009/09/29 02:52:20  fplanque
  * doc
  *

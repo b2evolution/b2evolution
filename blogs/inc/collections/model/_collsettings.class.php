@@ -122,6 +122,9 @@ class CollectionSettings extends AbstractSettings
 			'posts_per_feed' => '8',
 			'xml_item_footer_text' => '<p><small><a href="$item_perm_url$">Original post</a> blogged on <a href="http://b2evolution.net/">b2evolution</a>.</small></p>',
 
+		// Sitemaps settings:
+			'enable_sitemaps' => 1,
+
 		// General settings:
 			'cache_enabled' => 0,
 			'default_cat_ID' => NULL,						// Default Cat for new posts
@@ -168,6 +171,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.38  2009/09/29 16:56:12  tblue246
+ * Added setting to disable sitemaps skins
+ *
  * Revision 1.37  2009/09/14 12:43:05  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
