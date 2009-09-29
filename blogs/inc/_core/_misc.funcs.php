@@ -3248,6 +3248,7 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 	{
 		if( $l_value === '' || $l_value === NULL )
 		{ // don't generate empty attributes (it may be NULL if we pass 'value' => NULL as field_param for example, because isset() does not match it!)
+		// sam2kb> what about alt="" how do we handle this?
 			continue;
 		}
 
@@ -3720,6 +3721,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.169  2009/09/29 23:38:26  sam2kb
+ * doc
+ *
  * Revision 1.168  2009/09/29 02:52:20  fplanque
  * doc
  *
