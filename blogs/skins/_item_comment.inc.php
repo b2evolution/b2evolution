@@ -49,9 +49,15 @@ $Comment = & $params['Comment'];
 							'nofollow'	=> true,
 						) );
 				}
-				$Comment->author();
+				$Comment->author(
+					/* before: */ '',
+					/* after:  */ '#',
+					/* before_user: */ '',
+					/* after_user:  */ '#',
+					/* format: */ 'htmlbody',
+					/* makelink: */ true );
 				$Comment->msgform_link( $Blog->get('msgformurl') );
-				$Comment->author_url( '', ' &middot; ', '' );
+				// $Comment->author_url( '', ' &middot; ', '' );
 				break;
 
 			case 'trackback': // Display a trackback:
@@ -99,6 +105,9 @@ $Comment = & $params['Comment'];
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/29 00:19:12  blueyed
+ * Link author of comments by default, instead of displaying the URL separately. Document template function call. Leave old call to author_url commented.
+ *
  * Revision 1.6  2009/09/16 21:29:31  sam2kb
  * Display user/visitor avatar in comments
  *

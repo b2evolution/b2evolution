@@ -38,8 +38,14 @@ while( $Comment = & $CommentList->get_next() )
 				) ); ?>
 		</h3>
 		<div class="bCommentTitle">
-			<?php $Comment->author() ?>
-			<?php $Comment->author_url( '', ' &middot; ', '' ) ?>
+			<?php $Comment->author(
+				/* before: */ '',
+				/* after:  */ '#',
+				/* before_user: */ '',
+				/* after_user:  */ '#',
+				/* format: */ 'htmlbody',
+				/* makelink: */ true ) ?>
+			<?php /* $Comment->author_url( '', ' &middot; ', '' ) */ ?>
 		</div>
 		<div class="bCommentText">
 			<?php
@@ -65,6 +71,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/29 00:19:12  blueyed
+ * Link author of comments by default, instead of displaying the URL separately. Document template function call. Leave old call to author_url commented.
+ *
  * Revision 1.7  2009/09/28 21:19:39  blueyed
  * Comments list: display avatar 'on top', which is especially useful when letting it float to the right.
  *
