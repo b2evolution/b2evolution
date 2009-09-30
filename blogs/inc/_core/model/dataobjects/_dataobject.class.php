@@ -687,7 +687,10 @@ class DataObject
 			param_check_not_empty( $var );
 		}
 
-		validate( $var, $validation_function, $required, $error_message );
+		if( $validation_function != NULL )
+		{
+			validate( $var, $validation_function, $required, $error_message );
+		}
 
 		return $this->set( $parname, $value, ! $required );
 	}
@@ -808,6 +811,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.27  2009/09/30 15:15:59  efy-maxim
+ * NULL check for validation function
+ *
  * Revision 1.26  2009/09/29 21:07:24  blueyed
  * todo/question
  *
