@@ -501,7 +501,7 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 		'alt' => isset($locales[$locale]['name']) ? $locales[$locale]['name'] : $locale,
 	);
 
-	if( $absoluteurl )
+	if( $absoluteurl !== true )
 	{
 		$absoluteurl = trailing_slash($absoluteurl);
 		$img_attribs['src'] = $absoluteurl.$collection.'/'.$country.'.gif';
@@ -516,7 +516,6 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 			$country = 'default';
 			$subpath = 'flags/'.$collection.'/'.$country.'.gif';
 		}
-
 		$img_attribs['src'] = $rsc_url.$subpath;
 
 		// Add size, if available.
@@ -1063,6 +1062,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.34  2009/09/30 21:14:20  blueyed
+ * omg, fix locale_flag
+ *
  * Revision 1.33  2009/09/30 17:41:19  blueyed
  * locale_flag: add image width/height
  *
