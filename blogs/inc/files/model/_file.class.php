@@ -619,7 +619,7 @@ class File extends DataObject
 		{ // Directory
 			if( $public_access_to_media )
 			{ // Public access: full path
-				$url = $this->_FileRoot->ads_url.$this->get_rdfs_rel_path();
+				$url = $this->_FileRoot->ads_url.$this->get_rdfs_rel_path().'?mtime='.$this->get_lastmod_ts();
 			}
 			else
 			{ // No Access
@@ -630,7 +630,7 @@ class File extends DataObject
 		{ // File
 			if( $public_access_to_media )
 			{ // Public Access : full path
-				$url = $this->_FileRoot->ads_url.$this->_rdfp_rel_path;
+				$url = $this->_FileRoot->ads_url.$this->_rdfp_rel_path.'?mtime='.$this->get_lastmod_ts();
 			}
 			else
 			{ // Private Access: doesn't show the full path
@@ -1900,6 +1900,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.60  2009/09/30 20:04:43  blueyed
+ * Add mtime param to results from get_url, too.
+ *
  * Revision 1.59  2009/09/30 17:39:51  blueyed
  * Add mtime param to .evocache files. This allows to cache them to the max on the client.
  *
