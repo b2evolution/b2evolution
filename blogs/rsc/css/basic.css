@@ -23,7 +23,8 @@ img.icon {
 
 img.flag {
 	vertical-align:middle;
-	border:1px solid #000;
+	border-right:1px solid #ddd;
+	border-bottom:1px solid #ddd;
 }
 img.flagtop {
 	vertical-align:top;
