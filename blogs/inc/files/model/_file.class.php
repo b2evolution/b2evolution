@@ -1598,7 +1598,7 @@ class File extends DataObject
 				if( @is_file( $af_thumb_path ) )
 				{	// The thumb IS already in cache! :)
 					// Let's point directly into the cache:
-					$url = $this->_FileRoot->ads_url.dirname($this->_rdfp_rel_path).'/.evocache/'.$this->_name.'/'.$size_name.'.'.$this->get_ext();
+					$url = $this->_FileRoot->ads_url.dirname($this->_rdfp_rel_path).'/.evocache/'.$this->_name.'/'.$size_name.'.'.$this->get_ext().'?mtime='.$this->get_lastmod_ts();
 					return $url;
 				}
 			}
@@ -1739,7 +1739,7 @@ class File extends DataObject
 	function get_ads_evocache( $create_if_needed = false )
 	{
 		if( strpos( $this->_dir, '/.evocache/' ) !== false )
-		{	// We are already in an evocahce folder: refuse to go further!
+		{	// We are already in an evocache folder: refuse to go further!
 			return '!Recursive caching not allowed';
 		}
 
@@ -1900,6 +1900,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.59  2009/09/30 17:39:51  blueyed
+ * Add mtime param to .evocache files. This allows to cache them to the max on the client.
+ *
  * Revision 1.58  2009/09/30 00:38:15  sam2kb
  * Space is not needed before get_field_attribs_as_string()
  *
