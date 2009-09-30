@@ -72,15 +72,19 @@ if( empty($tab) )
 			$current_User->check_perm('options', 'edit', true);
 
 			global $tableprefix;
+			$tblprefix_len = strlen( $tableprefix );
 
 			$db_optimized = false;
 			// This fails if DB name is numeric!
 			$tables = $DB->get_results( 'SHOW TABLE STATUS FROM '.$DB->dbname );
-			
+
 			foreach( $tables as $table )
 			{
 				// Skip non b2evo tables
-				if( !preg_match( "~^$tableprefix~", $table->Name ) ) continue;
+				if( substr( $table->Name, 0, $tblprefix_len ) != $tableprefix )
+				{
+					continue;
+				}
 
 				if( $table->Engine == 'MyISAM' && $table->Data_free )
 				{	// Optimization needed
@@ -91,8 +95,7 @@ if( empty($tab) )
 					else
 					{
 						$db_optimized = true;
-						$Messages->add( sprintf( T_('Database table %s optimized.'), '<b>'.$table->Name.'</b>' )
-, 'success' );
+						$Messages->add( sprintf( T_('Database table %s optimized.'), '<b>'.$table->Name.'</b>' ), 'success' );
 					}
 				}
 			}
@@ -192,6 +195,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2009/09/30 19:48:38  tblue246
+ * Tools -> Optimize tables: Do not use preg_match() to check table prefix but a simple substr().
+ *
  * Revision 1.7  2009/09/30 18:00:19  sam2kb
  * Optimize b2evo tables from Tools > Misc
  *
