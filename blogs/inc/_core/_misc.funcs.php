@@ -1077,9 +1077,9 @@ function remove_seconds($timestamp, $format = 'Y-m-d H:i')
  */
 function validate( $variable, $validator, $required = false, $custom_msg = NULL )
 {
-	if( ! function_exists( $validator ) )
+	if( ! is_callable( $validator ) )
 	{
-		debug_die( 'Function '.$validator.'() does not exist!' );
+		debug_die( 'Function '.$validator.'() is not callable!' );
 	}
 
 	if( ! isset( $GLOBALS[$variable] ) )
@@ -3721,6 +3721,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.171  2009/09/30 21:30:35  blueyed
+ * validate: check if function is callable (not only if it exists). minor, but still.
+ *
  * Revision 1.170  2009/09/30 00:38:12  sam2kb
  * Space is not needed before get_field_attribs_as_string()
  *
