@@ -486,7 +486,7 @@ function locale_dialing_code( $locale = '' )
  * @param string name of class for IMG tag
  * @param string deprecated HTML align attribute
  * @param boolean to echo or not
- * @param mixed use absolute url (===true) or path to flags directory
+ * @param mixed use absolute url (===true) or path to flags directory (used in installer)
  */
 function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $align = '', $disp = true, $absoluteurl = true )
 {
@@ -497,32 +497,44 @@ function locale_flag( $locale = '', $collection = 'w16px', $class = 'flag', $ali
 	// extract flag name:
 	$country = strtolower(substr( $locale, 3, 2 ));
 
-	if( ! is_file( $rsc_path.'flags/'.$collection.'/'.$country.'.gif') )
-	{ // File does not exist
-		$country = 'default';
-	}
+	$img_attribs = array(
+		'alt' => isset($locales[$locale]['name']) ? $locales[$locale]['name'] : $locale,
+	);
 
-	if( $absoluteurl !== true )
+	if( $absoluteurl )
 	{
-		$iurl = $absoluteurl;
+		$absoluteurl = trailing_slash($absoluteurl);
+		$img_attribs['src'] = $absoluteurl.$collection.'/'.$country.'.gif';
 	}
 	else
 	{
-		$iurl = $rsc_url.'flags';
+		// subpath below $rsc_path
+		$subpath = 'flags/'.$collection.'/'.$country.'.gif';
+
+		if( ! is_file( $rsc_path.$subpath ) )
+		{ // File does not exist
+			$country = 'default';
+			$subpath = 'flags/'.$collection.'/'.$country.'.gif';
+		}
+
+		$img_attribs['src'] = $rsc_url.$subpath;
+
+		// Add size, if available.
+		if( $img_wh = imgsize($rsc_path.$subpath, 'widthheight_assoc') )
+		{
+			$img_attribs += $img_wh;
+		}
 	}
 
-	$r = '<img src="'.$iurl.'/'.$collection.'/'.$country.'.gif" alt="' .
-				(isset($locales[$locale]['name']) ? $locales[$locale]['name'] : $locale) .
-				'"';
-	if( !empty( $class ) ) $r .= ' class="'.$class.'"';
-	if( !empty( $align ) ) $r .= ' align="'.$align.'"';
-	$r .= ' /> ';
+	if( ! empty( $class ) ) $img_attribs['class'] = $class;
+	if( ! empty( $align ) ) $img_attribs['align'] = $align;
+
+	$r = '<img'.get_field_attribs_as_string($img_attribs).' />';
 
 	if( $disp )
 		echo $r;   // echo it
 	else
 		return $r; // return it
-
 }
 
 
@@ -824,7 +836,7 @@ function locale_updateDB()
  *
  * @todo Implement iconv and PHP mapping tables
  * @todo Remove unreliable mb_detect_encoding().
- * 
+ *
  * @see can_convert_charsets()
  * @param string String to convert
  * @param string Target charset (TO)
@@ -1051,6 +1063,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.33  2009/09/30 17:41:19  blueyed
+ * locale_flag: add image width/height
+ *
  * Revision 1.32  2009/09/23 21:37:03  blueyed
  * Unify Debuglogging of T_ methods.
  *
