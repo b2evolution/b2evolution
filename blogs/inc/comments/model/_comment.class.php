@@ -404,7 +404,7 @@ class Comment extends DataObject
 		{ // add class
 			$img_params['class'] = $class;
 		}
-		$imgtag = '<img '.get_field_attribs_as_string($img_params).' />';
+		$imgtag = '<img'.get_field_attribs_as_string($img_params).' />';
 		
 		return $imgtag;
 	}
@@ -1463,6 +1463,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.40  2009/09/30 00:38:14  sam2kb
+ * Space is not needed before get_field_attribs_as_string()
+ *
  * Revision 1.39  2009/09/28 02:26:36  sam2kb
  * 80x80px image looks weird, changed to 64x64
  *

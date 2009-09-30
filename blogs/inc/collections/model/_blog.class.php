@@ -1282,7 +1282,7 @@ class Blog extends DataObject
 			$text = $tag;
 		}
 
-		return '<a '.get_field_attribs_as_string($attribs).'>'.$text.'</a>';
+		return '<a'.get_field_attribs_as_string($attribs).'>'.$text.'</a>';
 	}
 
 
@@ -2151,6 +2151,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.88  2009/09/30 00:38:13  sam2kb
+ * Space is not needed before get_field_attribs_as_string()
+ *
  * Revision 1.87  2009/09/29 16:56:11  tblue246
  * Added setting to disable sitemaps skins
  *

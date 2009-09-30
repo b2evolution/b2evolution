@@ -1030,7 +1030,7 @@ class File extends DataObject
 			{ // use title for alt, too
 				$img_attribs['alt'] = $img_attribs['title'];
 			}
-			$img = '<img '.get_field_attribs_as_string($img_attribs).' />';
+			$img = '<img'.get_field_attribs_as_string($img_attribs).' />';
 
 			if( $image_link_to == 'original' )
 			{	// special case
@@ -1652,7 +1652,7 @@ class File extends DataObject
 			$img_attribs['align'] = $align;
 		}
 
-		return '<img '.get_field_attribs_as_string($img_attribs).' />';
+		return '<img'.get_field_attribs_as_string($img_attribs).' />';
 	}
 
 
@@ -1703,7 +1703,7 @@ class File extends DataObject
 		{	// Ok, it's an image:
 			$type = $this->get_type();
 			$img_attribs = $this->get_img_attribs('fit-80x80', $type, $type);
-			$img = '<img '.get_field_attribs_as_string($img_attribs).' />';
+			$img = '<img'.get_field_attribs_as_string($img_attribs).' />';
 
 			// Get link to view the file (fallback to no view link - just the img):
 			$link = $this->get_view_link( $img );
@@ -1900,6 +1900,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.58  2009/09/30 00:38:15  sam2kb
+ * Space is not needed before get_field_attribs_as_string()
+ *
  * Revision 1.57  2009/09/27 21:00:54  blueyed
  * get_img_attribs: fix default for size_name, allow passing of title and alt. get_preview_thumb uses it now, too, which adds width/height params to the icons in the file manager.
  *

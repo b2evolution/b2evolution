@@ -2632,7 +2632,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 	}
 
 	// NOTE: We do not use format_to_output with get_field_attribs_as_string() here, because it interferes with the Results class (eval() fails on entitied quotes..) (blueyed)
-	$r = '<a '.get_field_attribs_as_string( $link_attribs, false ).'>';
+	$r = '<a'.get_field_attribs_as_string( $link_attribs, false ).'>';
 
 	$display_icon = ($icon_weight >= $UserSettings->get('action_icon_threshold'));
 	$display_word = ($word_weight >= $UserSettings->get('action_word_threshold'));
@@ -3721,6 +3721,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.170  2009/09/30 00:38:12  sam2kb
+ * Space is not needed before get_field_attribs_as_string()
+ *
  * Revision 1.169  2009/09/29 23:38:26  sam2kb
  * doc
  *
