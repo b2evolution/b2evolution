@@ -62,7 +62,7 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-					'th' => T_('Last_Contact'),
+					'th' => /* TRANS: time related */ T_('Last contact'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
 					'td' => '%mysql2localedatetime(#mct_last_contact_datetime#)%' );
@@ -98,6 +98,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.4  2009/09/30 19:00:23  blueyed
+ * trans fix, doc
+ *
  * Revision 1.3  2009/09/19 20:31:39  efy-maxim
  * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
  *
