@@ -55,7 +55,7 @@ if( param( 'ufdf_ID', 'integer', '', true) )
 	{	// We could not find the user field to edit:
 		unset( $edited_Userfield );
 		forget_param( 'ufdf_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Userfield') ), 'error' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('User field') ), 'error' );
 		$action = 'nil';
 	}
 }
