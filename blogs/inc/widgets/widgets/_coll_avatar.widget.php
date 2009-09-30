@@ -83,7 +83,7 @@ class coll_avatar_Widget extends ComponentWidget
 					'type' => 'select',
 					'label' => T_('Image size'),
 					'options' => $options,
-					'note' => T_('List of available image sizes is defined in $thumbnail_sizes.'),
+					'note' => sprintf( /* TRANS: %s is a config variable name */ T_('List of available image sizes is defined in %s.'), '$thumbnail_sizes' ),
 					'defaultvalue' => 'fit-160x160',
 				),
 			), parent::get_param_definitions( $params ) );
@@ -133,6 +133,9 @@ class coll_avatar_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.4  2009/09/30 19:09:39  blueyed
+ * trans fix
+ *
  * Revision 1.3  2009/09/20 01:35:52  fplanque
  * Factorized User::get_link()
  *
