@@ -66,6 +66,42 @@ if( empty($tab) )
 			$Messages->add( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
 
 			break;
+
+		case 'optimize_tables':
+			// TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
+			$current_User->check_perm('options', 'edit', true);
+
+			global $tableprefix;
+
+			$db_optimized = false;
+			// This fails if DB name is numeric!
+			$tables = $DB->get_results( 'SHOW TABLE STATUS FROM '.$DB->dbname );
+			
+			foreach( $tables as $table )
+			{
+				// Skip non b2evo tables
+				if( !preg_match( "~^$tableprefix~", $table->Name ) ) continue;
+
+				if( $table->Engine == 'MyISAM' && $table->Data_free )
+				{	// Optimization needed
+					if( !$DB->query( 'OPTIMIZE TABLE '.$table->Name ) )
+					{
+						$Messages->add( sprintf( T_('Database table %s could not be optimized.'), '<b>'.$table->Name.'</b>' ), 'note' );
+					}
+					else
+					{
+						$db_optimized = true;
+						$Messages->add( sprintf( T_('Database table %s optimized.'), '<b>'.$table->Name.'</b>' )
+, 'success' );
+					}
+				}
+			}
+
+			if( !$db_optimized )
+			{
+				$Messages->add( T_('Database tables are already optimized.'), 'success' );
+			}
+			break;
 	}
 }
 
@@ -100,9 +136,11 @@ if( empty($tab) )
 	// TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
 	if( $current_User->check_perm('options', 'edit') )
 	{ // default admin actions:
-		$block_item_Widget->title = T_('Contents cached in the database');
+		$block_item_Widget->title = T_('Advanced database operations');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 		echo '&raquo; <a href="'.regenerate_url('action', 'action=del_itemprecache').'">'.T_('Delete pre-renderered item cache.').'</a>';
+		
+		echo '<br /><br />&raquo; <a href="'.regenerate_url('action', 'action=optimize_tables').'">'.T_('Optimize database tables.').'</a>';
 		$block_item_Widget->disp_template_raw( 'block_end' );
 	}
 
@@ -154,6 +192,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2009/09/30 18:00:19  sam2kb
+ * Optimize b2evo tables from Tools > Misc
+ *
  * Revision 1.6  2009/03/08 23:57:46  fplanque
  * 2009
  *
