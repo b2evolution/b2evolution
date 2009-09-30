@@ -29,7 +29,7 @@ class smilies_plugin extends Plugin
 	 * fp> There is... I can't remember the exact problem thouh. Probably some interaction with the code highlight or the video plugins.
 	 */
 	var $priority = 15;
-	var $version = '3.3';
+	var $version = '4.0.0-dev';
 	var $apply_rendering = 'opt-in';
 	var $group = 'rendering';
 	var $number_of_installs = 3; // QUESTION: dh> why 3?
@@ -212,12 +212,14 @@ XX(      graydead.gif
 		$smiled = array();
 		foreach( $this->smilies as $smiley )
 		{
-			if (!in_array($smiley[ 'image' ], $smiled))
-			{
-				$smiled[] = $smiley[ 'image'];
-				$smiley[ 'code' ] = str_replace(' ', '', $smiley[ 'code' ]);
-				$grins .= '<img src="'.$smiley[ 'image' ].'" title="'.$smiley[ 'code' ].'" alt="'.$smiley[ 'code' ]
-									.'" class="top" onclick="textarea_wrap_selection( b2evoCanvas, \''. str_replace("'","\'",$smiley[ 'code' ]). '\', \'\', 1 );" /> ';
+			if( ! in_array($smiley['image'], $smiled) )
+			{ // include any smiley only once
+				$smiled[] = $smiley['image'];
+
+				$grins .= $this->get_smiley_img_tag( $smiley, array(
+					'class' => 'top',
+					'onclick' => 'textarea_wrap_selection( b2evoCanvas, \''. str_replace("'", "\'", $smiley['code']). '\', \'\', 1 );' ) )
+					.' ';
 			}
 		}
 
@@ -262,16 +264,7 @@ XX(      graydead.gif
 			foreach( $tmpsmilies as $smiley )
 			{
 				$this->search[] = $smiley[ 'code' ];
-				$smiley_masked = '';
-				for ($i = 0; $i < strlen($smiley[ 'code' ] ); $i++ )
-				{
-					$smiley_masked .=  '&#'.ord(substr($smiley[ 'code' ], $i, 1)).';';
-				}
-
-				// We don't use getimagesize() here until we have a mean
-				// to preprocess smilies. It takes up to much time when
-				// processing them at display time.
-				$this->replace[] = '<img src="'.$smiley[ 'image' ].'" alt="'.$smiley_masked.'" class="middle" />';
+				$this->replace[] = $this->get_smiley_img_tag($smiley);
 			}
 		}
 
@@ -293,6 +286,29 @@ XX(      graydead.gif
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * @param array Smiley
+	 * @param array Override params, e.g. "class"
+	 */
+	function get_smiley_img_tag($smiley, $override_fields = array())
+	{
+		$attribs = array(
+			'src' => $smiley['image'],
+			'title' => htmlspecialchars($smiley['code']),
+			'alt' => htmlspecialchars($smiley['code']),
+			'class' => 'middle',
+			);
+
+		if( $smiley_wh = imgsize($smiley['path'], 'widthheight_assoc') )
+			$attribs += $smiley_wh;
+
+		if( $override_fields )
+			$attribs = $override_fields + $attribs;
+
+		return '<img'.get_field_attribs_as_string($attribs).' />';
 	}
 
 
@@ -374,10 +390,12 @@ XX(      graydead.gif
 				if( $skin_has_smilies && is_file( $currentskin_path.$temp_img ) )
 				{
 					$temp_url = $currentskin_url.$temp_img;	// skin has it's own smiley, use it
+					$temp_path = $currentskin_path.$temp_img;
 				}
 				elseif ( is_file( $default_path.$temp_img ) )
 				{
 					$temp_url = $default_url.$temp_img; // no skin image, but default smiley found so use it
+					$temp_path = $default_path.$temp_img;
 				}
 				else
 				{
@@ -385,7 +403,7 @@ XX(      graydead.gif
 				}
 
 				if( $temp_url )
-					$this->smilies[] = array( 'code' => trim( $a_smiley[0] ),'image' => $temp_url );
+					$this->smilies[] = array( 'code' => trim( $a_smiley[0] ), 'image' => $temp_url, 'path' => $temp_path );
 			}
 		}
 	}
@@ -400,6 +418,9 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.51  2009/09/30 21:23:33  blueyed
+ * smilies_plugin: version 4.0.0-dev, cleaned up image processing. Outputs width/height now.
+ *
  * Revision 1.50  2009/07/12 19:35:31  fplanque
  * make rendering opt-in
  *
