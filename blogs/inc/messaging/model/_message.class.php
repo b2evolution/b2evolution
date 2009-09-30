@@ -401,6 +401,7 @@ class Message extends DataObject
 	function send_email_notifications( $new_thread = true )
 	{
 		global $DB, $current_User, $admin_url;
+		global $app_name;
 
 		// Select recipients of the current thread:
 		$SQL = & new SQL();
@@ -438,7 +439,7 @@ class Message extends DataObject
 		$body .= T_( 'Best regards' );
 		$body .= ',';
 		$body .= "\n";
-		$body .= T_( 'b2evolution mailer' );
+		$body .= sprintf( /* TRANS: %s gets replaced by app_name, usually "b2evolution" */ T_( '%s mailer' ), $app_name );
 		$body .= "\n\n\n";
 		$body .= T_( 'This is an automatically generated message; please do not reply to this email.' );
 
@@ -461,6 +462,9 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2009/09/30 18:58:29  blueyed
+ * use $app_name in message
+ *
  * Revision 1.20  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *
