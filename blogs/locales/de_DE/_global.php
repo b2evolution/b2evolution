@@ -7,7 +7,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $trans['de_DE'] = array(
 '__meta__' => array('format_version'=>1, 'charset'=>'iso-8859-1'),
-'' => "Project-Id-Version: b2evolution 3.1.0-beta\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2009-09-30 14:35+0200\nPO-Revision-Date: 2009-09-10 17:57+0100\nLast-Translator: Tilman Blumenbach <tilman (at) ax86 (dot) net>\nLanguage-Team: Tilman Blumenbach <tilman (at) ax86 (dot) net>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=ISO-8859-1\nContent-Transfer-Encoding: 8bit\nX-Launchpad-Export-Date: 2009-05-21 13:08+0000\nX-Generator: Launchpad (build Unknown)\nX-Poedit-Country: GERMANY\nX-Poedit-Language: German\nX-Poedit-SourceCharset: iso-8859-1\nX-Poedit-Basepath: /home/tilman/public_html/b2evo/cvs/HEAD/blogs/locales/de_DE/LC_MESSAGES\nX-Poedit-Bookmarks: 2506,787,-1,2100,-1,-1,-1,-1,-1,-1\n",
+'' => "Project-Id-Version: b2evolution 3.1.0-beta\nReport-Msgid-Bugs-To: http://fplanque.net/\nPOT-Creation-Date: 2009-09-30 14:35+0200\nPO-Revision-Date: 2009-10-01 21:58+0100\nLast-Translator: Tilman Blumenbach <tilman (at) ax86 (dot) net>\nLanguage-Team: Tilman Blumenbach <tilman (at) ax86 (dot) net>\nMIME-Version: 1.0\nContent-Type: text/plain; charset=ISO-8859-1\nContent-Transfer-Encoding: 8bit\nX-Launchpad-Export-Date: 2009-05-21 13:08+0000\nX-Generator: Launchpad (build Unknown)\nX-Poedit-Country: GERMANY\nX-Poedit-Language: German\nX-Poedit-SourceCharset: iso-8859-1\nX-Poedit-Basepath: /home/tilman/public_html/b2evo/cvs/HEAD/blogs/locales/de_DE/LC_MESSAGES\nX-Poedit-Bookmarks: 2506,787,-1,2100,-1,-1,-1,-1,-1,-1\n",
 'Categories' => 'Kategorien',
 'Tags' => 'Schlagworte',
 'Previous' => 'Vorherige',
@@ -449,7 +449,7 @@ $trans['de_DE'] = array(
 'Spam weight has to be in the range of 0-100.' => 'Spamgewichtung muss im Bereich 0-100 liegen.',
 'Settings updated.' => 'Einstellungen aktualisiert.',
 'Reporting abuse to b2evolution aborted (Running on localhost).' => 'Missbrauchsmeldung an b2evolution abgebrochen (laufe auf localhost).',
-'Reported abuse to %s.' => 'Melde Missbrauch an %s.',
+'Reported abuse to %s.' => 'Missbrauch an %s gemeldet.',
 'Failed to report abuse to b2evolution.net.' => 'Konnte Missbrauch nicht an b2evolution.net melden.',
 'Latest update timestamp' => 'Zeitstempel der letzten Aktualisierung',
 'Requesting abuse list from %s...' => 'Fordere Missbrauchsliste von %s an...',
@@ -2280,7 +2280,7 @@ $trans['de_DE'] = array(
 'You must provide a login!' => 'Sie müssen einen Benutzernamen angeben!',
 'Please enter a nickname (can be the same as your login).' => 'Bitte geben Sie einen Nicknamen an (kann gleich Ihrem Benutzernamen sein).',
 'Please enter an e-mail address.' => 'Bitte geben Sie eine E-Mail-Adresse an.',
-'The ICQ UIN can only be a number, no letters allowed.' => 'Deine ICQ-UIN muss eine Nummer sein, Buchstaben sind nicht erlaubt.',
+'The ICQ UIN can only be a number, no letters allowed.' => 'Die ICQ-UIN kann nur eine Nummer sein, Buchstaben sind nicht erlaubt.',
 'The threshold must be between 1 and 5.' => 'Der Grenzbereich muss muss zwischen 1 und 5 liegen.',
 'The user\'s media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist.' => 'Das Benutzer-Medienverzeichnis &laquo;%s&raquo; kann nicht erstellt werden, weil das übergeordnete Verzeichnis nicht beschreibbar ist oder nicht existiert.',
 'The user\'s media directory &laquo;%s&raquo; could not be created.' => 'Das Benutzer-Medienverzeichnis &laquo;%s&raquo; konnte nicht erstellt werden.',
