@@ -79,7 +79,10 @@ if( empty($tab) )
 
 			foreach( $tables as $table )
 			{
-				if( $table->Engine == 'MyISAM' && $table->Data_free )
+				// Before MySQL 4.1.2, the "Engine" field was labeled as "Type".
+				if( ( ( isset( $table->Engine ) && $table->Engine == 'MyISAM' )
+					  || ( isset( $table->Type ) && $table->Type == 'MyISAM' ) )
+					&& $table->Data_free )
 				{	// Optimization needed
 					if( !$DB->query( 'OPTIMIZE TABLE '.$table->Name ) )
 					{
@@ -188,6 +191,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2009/10/01 13:06:03  tblue246
+ * Fix for backward compatibility with MySQL versions lower than 4.1.2.
+ *
  * Revision 1.9  2009/10/01 12:57:18  tblue246
  * Tools -> Optimize DB: Drop substr() check for table prefix and modify the SQL query to only return appropriate tables instead.
  *
