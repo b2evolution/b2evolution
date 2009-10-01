@@ -199,10 +199,12 @@ if( empty($tab) )
 	{ // default admin actions:
 		$block_item_Widget->title = T_('Advanced operations');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
-		echo '&raquo; <a href="'.regenerate_url('action', 'action=del_itemprecache').'">'.T_('Delete pre-renderered item cache.').'</a>';
-		echo '<br /><br />&raquo; <a href="'.regenerate_url('action', 'action=del_pagecache').'">'.T_('Delete rendered pages from cache directory.').'</a>';
-		echo '<br /><br />&raquo; <a href="'.regenerate_url('action', 'action=del_filecache').'">'.T_('Delete cached thumbnails (.evocache directories).').'</a>';
-		echo '<br /><br />&raquo; <a href="'.regenerate_url('action', 'action=optimize_tables').'">'.T_('Optimize database tables.').'</a>';
+		echo '<ul>';
+		echo '<li><a href="'.regenerate_url('action', 'action=del_itemprecache').'">'.T_('Delete pre-renderered item cache').'</a></li>';
+		echo '<li><a href="'.regenerate_url('action', 'action=del_pagecache').'">'.T_('Delete rendered pages from cache directory').'</a></li>';
+		echo '<li><a href="'.regenerate_url('action', 'action=del_filecache').'">'.T_('Delete cached thumbnails (.evocache directories)').'</a></li>';
+		echo '<li><a href="'.regenerate_url('action', 'action=optimize_tables').'">'.T_('Optimize database tables').'</a></li>';
+		echo '</ul>';
 		$block_item_Widget->disp_template_raw( 'block_end' );
 	}
 
@@ -254,6 +256,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2009/10/01 16:19:14  sam2kb
+ * minor
+ *
  * Revision 1.11  2009/10/01 14:58:44  sam2kb
  * Delete page and thumbnails cache
  *
