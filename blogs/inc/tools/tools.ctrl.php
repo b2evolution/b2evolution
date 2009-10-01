@@ -64,11 +64,73 @@ if( empty($tab) )
 			$DB->query('DELETE FROM T_items__prerendering WHERE 1=1');
 
 			$Messages->add( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
+			break;
 
+		case 'del_pagecache':
+			$current_User->check_perm('options', 'edit', true);
+
+			global $cache_path;
+
+			// Clear general cache directory
+			if( cleardir_r( $cache_path.'general' ) )
+			{
+				$Messages->add( sprintf( T_('General cache deleted: %s'), $cache_path.'general' ), 'note' );
+			}
+			else
+			{
+				$Messages->add( sprintf( T_('Could not delete general cache: %s'), $cache_path.'general' ), 'error' );
+			}
+
+			$SQL = 'SELECT blog_ID FROM T_blogs
+					INNER JOIN T_coll_settings ON ( blog_ID = cset_coll_ID
+								AND cset_name = "cache_enabled"
+								AND cset_value = "1" )
+					WHERE 1=1';
+
+			if( $blog_array = $DB->get_col( $SQL ) )
+			{
+				foreach( $blog_array as $l_blog )
+				{	// Clear blog cache
+					if( cleardir_r( $cache_path.'c'.$l_blog ) )
+					{
+						$Messages->add( sprintf( T_('Blog %d cache deleted: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'note' );
+					}
+					else
+					{
+						$Messages->add( sprintf( T_('Could not delete blog %d cache: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'error' );
+					}
+				}
+			}
+
+			$Messages->add( T_('Page cache deleted.'), 'success' );
+			break;
+
+		case 'del_filecache':
+			$current_User->check_perm('options', 'edit', true);
+
+			global $media_path;
+
+			// TODO> handle custom media directories
+			$dirs = get_filenames( $media_path, false );
+			foreach( $dirs as $dir )
+			{
+				if( basename($dir) == '.evocache' )
+				{	// Delete .evocache directory recursively
+					if( rmdir_r( $dir ) )
+					{
+						$Messages->add( sprintf( T_('Directory deleted: %s'), $dir ), 'note' );
+					}
+					else
+					{
+						$Messages->add( sprintf( T_('Could not delete directory: %s'), $dir ), 'error' );
+					}
+				}
+			}
+
+			$Messages->add( T_('Files cache deleted.'), 'success' );
 			break;
 
 		case 'optimize_tables':
-			// TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
 			$current_User->check_perm('options', 'edit', true);
 
 			global $tableprefix;
@@ -135,10 +197,11 @@ if( empty($tab) )
 	// TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
 	if( $current_User->check_perm('options', 'edit') )
 	{ // default admin actions:
-		$block_item_Widget->title = T_('Advanced database operations');
+		$block_item_Widget->title = T_('Advanced operations');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 		echo '&raquo; <a href="'.regenerate_url('action', 'action=del_itemprecache').'">'.T_('Delete pre-renderered item cache.').'</a>';
-		
+		echo '<br /><br />&raquo; <a href="'.regenerate_url('action', 'action=del_pagecache').'">'.T_('Delete rendered pages from cache directory.').'</a>';
+		echo '<br /><br />&raquo; <a href="'.regenerate_url('action', 'action=del_filecache').'">'.T_('Delete cached thumbnails (.evocache directories).').'</a>';
 		echo '<br /><br />&raquo; <a href="'.regenerate_url('action', 'action=optimize_tables').'">'.T_('Optimize database tables.').'</a>';
 		$block_item_Widget->disp_template_raw( 'block_end' );
 	}
@@ -191,6 +254,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2009/10/01 14:58:44  sam2kb
+ * Delete page and thumbnails cache
+ *
  * Revision 1.10  2009/10/01 13:06:03  tblue246
  * Fix for backward compatibility with MySQL versions lower than 4.1.2.
  *
