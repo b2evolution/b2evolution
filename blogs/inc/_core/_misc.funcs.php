@@ -1077,6 +1077,9 @@ function remove_seconds($timestamp, $format = 'Y-m-d H:i')
  */
 function validate( $variable, $validator, $required = false, $custom_msg = NULL )
 {
+	/* Tblue> Note: is_callable() does not check whether a function is
+	 *        disabled (http://www.php.net/manual/en/function.is-callable.php#79151).
+	 */
 	if( ! is_callable( $validator ) )
 	{
 		debug_die( 'Function '.$validator.'() is not callable!' );
@@ -3721,6 +3724,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.172  2009/10/01 12:17:12  tblue246
+ * doc
+ *
  * Revision 1.171  2009/09/30 21:30:35  blueyed
  * validate: check if function is callable (not only if it exists). minor, but still.
  *
