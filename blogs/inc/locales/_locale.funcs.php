@@ -839,25 +839,16 @@ function locale_updateDB()
  * @see can_convert_charsets()
  * @param string String to convert
  * @param string Target charset (TO)
- * @param string Source charset (FROM) - leave empty to detect it automatically (UTF8, latin1 or latin15)
+ * @param string Source charset (FROM)
  * @return string Encoded string (if it cannot be converted it's the original one)
  */
-function convert_charset( $string, $dest_charset, $src_charset = NULL )
+function convert_charset( $string, $dest_charset, $src_charset )
 {
 	$GLOBALS['Timer']->resume('convert_charset');
 	if( $dest_charset == $src_charset || $dest_charset == '' /* may happen if $evo_charset is not defined yet */ )
 	{ // no conversation required
 		$GLOBALS['Timer']->pause('convert_charset');
 		return $string;
-	}
-
-	if( empty($src_charset) )
-	{
-		if( function_exists('mb_detect_encoding') )
-		{
-			$detect_string = $string.'a'; // work around a bug in mb_detect_encoding, where an ISO string gets detected as UTF-8, if the last char is e.g. "ae" (german umlaut)
-			$src_charset = mb_detect_encoding($detect_string, 'UTF-8, ISO-8859-1, ISO-8859-15', true);
-		}
 	}
 
 	if( function_exists('mb_convert_variables') )
@@ -1062,6 +1053,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.35  2009/10/01 18:50:15  tblue246
+ * convert_charset(): Trying to remove unreliable charset detection and modify all calls accordingly -- needs testing to ensure all charset conversions work as expected.
+ *
  * Revision 1.34  2009/09/30 21:14:20  blueyed
  * omg, fix locale_flag
  *

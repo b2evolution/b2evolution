@@ -992,7 +992,7 @@ class Hit
 				}
 			*/	
 				
-				$q = convert_charset($q, $evo_charset);
+				$q = convert_charset($q, $evo_charset, 'UTF-8');
 				return $q;
 			}
 		}
@@ -1132,6 +1132,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.36  2009/10/01 18:50:16  tblue246
+ * convert_charset(): Trying to remove unreliable charset detection and modify all calls accordingly -- needs testing to ensure all charset conversions work as expected.
+ *
  * Revision 1.35  2009/09/13 21:26:50  blueyed
  * SQL_NO_CACHE for SELECT queries using T_hitlog
  *

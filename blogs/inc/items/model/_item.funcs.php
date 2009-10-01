@@ -346,6 +346,8 @@ function get_postdata($postid)
  */
 function bpost_count_words( $str )
 {
+	global $evo_charset;
+
 	$str = trim( strip_tags( $str ) );
 
 	// Note: The \p escape sequence is available since PHP 4.4.0 and 5.1.0.
@@ -356,7 +358,7 @@ function bpost_count_words( $str )
 
 	$count = 0;
 
-	foreach( preg_split( '#\s+#', convert_charset( $str, 'UTF-8' ), -1,
+	foreach( preg_split( '#\s+#', convert_charset( $str, 'UTF-8', $evo_charset ), -1,
 							PREG_SPLIT_NO_EMPTY ) as $word )
 	{
 		if( preg_match( '#\pL#u', $word ) )
@@ -976,6 +978,9 @@ function check_perm_posttype( $post_extracats )
 
 /*
  * $Log$
+ * Revision 1.72  2009/10/01 18:50:12  tblue246
+ * convert_charset(): Trying to remove unreliable charset detection and modify all calls accordingly -- needs testing to ensure all charset conversions work as expected.
+ *
  * Revision 1.71  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *
