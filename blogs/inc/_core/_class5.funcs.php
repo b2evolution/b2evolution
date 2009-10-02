@@ -83,7 +83,7 @@ else
  * It only registers the class & file name so that __autoload() can later
  * load the class IF and ONLY IF the class is actually needed during execution.
  */
-function load_class( $class_path, $classname = NULL )
+function load_class( $class_path, $classname )
 {
 	global $map_class_path, $inc_path;
 	if( !is_null($classname) )
@@ -106,8 +106,8 @@ function duplicate( $Obj )
 
 /*
  * $Log$
- * Revision 1.26  2009/10/02 01:37:43  sam2kb
- * minor
+ * Revision 1.27  2009/10/02 13:39:46  tblue246
+ * Fixed wrong load_class() calls
  *
  * Revision 1.25  2009/09/18 15:47:11  fplanque
  * doc/cleanup

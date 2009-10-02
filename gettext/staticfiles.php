@@ -29,10 +29,9 @@ define( 'EVO_MAIN_INIT', true );
  */
 require_once $inc_path.'_core/_class'.floor(PHP_VERSION).'.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
-load_class('_core/model/_log.class.php');
+load_class('_core/model/_log.class.php', 'Log');
 load_funcs('_core/_param.funcs.php');
 load_funcs('_core/ui/forms/_form.funcs.php');
-load_class('locales/_pofile.class.php');
 /**#@-*/
 
 $Debuglog = new Log();
@@ -231,7 +230,7 @@ foreach( array( '.', 'doc' ) as $dir )
 switch( $action )
 {
 	case 'extract':
-
+		load_class('locales/_pofile.class.php', 'POTFile');
 		$POTFile = new POTFile( STATIC_POT );
 
 		foreach( $srcfiles as $srcfile )
@@ -265,6 +264,8 @@ switch( $action )
 	break;
 
 	case 'merge':
+		load_class('locales/_pofile.class.php', 'POFile');
+
 		foreach( $targets as $target => $targetmessagefile )
 		{ // loop targets/locales
 			log_('<h2 style="margin-bottom:0">TARGET: '.$target.'</h2>');
