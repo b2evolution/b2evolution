@@ -165,36 +165,54 @@ if( empty($tab) )
 			break;
 		
 		case 'backup_db':
+			/* Tblue> There are a few problems with using the mysqldump program:
+			 *          - Windows hosts (?)
+			 *          - Shared hosting (perhaps no access to MySQL helper programs)
+			 *          - Hosting with PHP's safe_mode enabled (because
+			 *            only files from the safe_mode_exec_dir can be
+			 *            executed).
+			 *          - The DB password passed to mysqldump can show up
+			 *            in the process list.
+			 *         Perhaps it would be better to directly query the
+			 *         database (and halt the script if we run out of time;
+			 *         the user would then need to click on a link to resume
+			 *         the backup process. For this to work, we would need
+			 *         to "remember" the progress at the time the script
+			 *         had halt.).
+			 */
 			$current_User->check_perm('options', 'edit', true);
 
 			if( $current_User->Group->ID != 1 )
 			{
-				$Messages->add( T_('You don\'t have permissions to backup the database.'), 'error' );
-				return;
+				$Messages->add( T_('You don\'t have permission to backup the database.'), 'error' );
+				break;
 			}
 
 			$dump_filename = dirname(__FILE__).'/'.$DB->dbname.'.sql';
 
-			// Get the MYSQL basedir path			
-			$rows = $DB->get_results( 'SHOW VARIABLES' );
-			foreach( $rows as $row )
-			{
-				if( $row->Variable_name == 'basedir' )
-				{	
-					$mysql_basedir = $row->Value;
-					break;
-				}
+			// Get the MySQL basedir path
+			$mysql_basedir = $DB->get_var( 'SHOW VARIABLES LIKE \'basedir\'', 1 );
+			if( empty( $mysql_basedir ) )
+			{	// Tblue> Is this even possible?
+				$Messages->add( T_( 'Could not get MySQL base directory!' ), 'error' );
+				break;
 			}
 
-			if( !empty($mysql_basedir) )
-			{	// Dump the database
-				$db_auth = ' --host='.$DB->dbhost.' --user='.$DB->dbuser.' --password='.$DB->dbpassword;
-				
-				exec( $mysql_basedir.'/bin/mysqldump '.$db_auth.' --opt '.$DB->dbname.' 2>&1 >'.$dump_filename, $output, $res);
-				if( $res > 0 )
-				{
-					$Messages->add( T_('Backup failed').':<br />'.implode( '<br />', $output), 'error' );
-				}
+			// Dump the database
+			$backup_cmd = trailing_slash( $mysql_basedir ).'bin/mysqldump'
+						 .' --host='.escapeshellarg( $DB->dbhost )
+						 .' --user='.escapeshellarg( $DB->dbuser )
+						 // Tblue> Note: Could be a security risk (shows up in process list)!
+						 .' --password='.escapeshellarg( $DB->dbpassword )
+						 .' --opt '.escapeshellarg( $DB->dbname )
+						 .' 2>&1 > '.$dump_filename;
+			
+			@exec( $backup_cmd, $output, $res );
+			if( $res > 0 )
+			{
+				//$Messages->add( sprintf( T_('Backup failed (command: %s): %s'), $backup_cmd, '<br />'.implode( '<br />', $output) ), 'error' );
+				$Messages->add( sprintf( T_('Backup failed: %s'), '<br />'.implode( '<br />', $output) ), 'error' );
+				break;
 			}
 
 			// Compress and download the file
@@ -218,7 +236,7 @@ if( empty($tab) )
 				{
 					$Messages->add( $v, 'error' );
 				}
-				return false;
+				break;
 			}
 			
 			// Delete dump file
@@ -321,6 +339,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2009/10/02 14:16:55  tblue246
+ * Tools -> Backup database: Fixes, doc
+ *
  * Revision 1.13  2009/10/02 13:28:03  sam2kb
  * Backup b2evo database from Tools > Misc
  *
