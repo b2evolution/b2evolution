@@ -407,7 +407,10 @@ class Message extends DataObject
 		$SQL = & new SQL();
 		$SQL->SELECT( 'u.user_login, u.user_email' );
 		$SQL->FROM( 'T_messaging__threadstatus ts
-						LEFT OUTER JOIN T_users u ON ts.tsta_user_ID = u.user_ID' );
+						INNER JOIN T_messaging__contact c
+							ON ts.tsta_user_ID = c.mct_to_user_ID AND c.mct_from_user_ID = '.$this->author_user_ID.' AND c.mct_blocked = 0
+						LEFT OUTER JOIN T_users u
+							ON ts.tsta_user_ID = u.user_ID' );
 		$SQL->WHERE( 'ts.tsta_thread_ID = '.$this->Thread->ID.' AND ts.tsta_user_ID <> '.$this->author_user_ID );
 
 		// Construct message subject and body:
@@ -462,6 +465,9 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2009/10/02 15:23:44  efy-maxim
+ * messaging module improvements
+ *
  * Revision 1.21  2009/09/30 18:58:29  blueyed
  * use $app_name in message
  *
