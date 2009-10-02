@@ -178,7 +178,7 @@ if( empty($tab) )
 			 *         the user would then need to click on a link to resume
 			 *         the backup process. For this to work, we would need
 			 *         to "remember" the progress at the time the script
-			 *         had halt.).
+			 *         had to halt.).
 			 */
 			$current_User->check_perm('options', 'edit', true);
 
@@ -339,8 +339,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.14  2009/10/02 14:16:55  tblue246
- * Tools -> Backup database: Fixes, doc
+ * Revision 1.15  2009/10/02 14:17:34  tblue246
+ * minor/doc
  *
  * Revision 1.13  2009/10/02 13:28:03  sam2kb
  * Backup b2evo database from Tools > Misc
