@@ -163,6 +163,70 @@ if( empty($tab) )
 				$Messages->add( T_('Database tables are already optimized.'), 'success' );
 			}
 			break;
+		
+		case 'backup_db':
+			$current_User->check_perm('options', 'edit', true);
+
+			if( $current_User->Group->ID != 1 )
+			{
+				$Messages->add( T_('You don\'t have permissions to backup the database.'), 'error' );
+				return;
+			}
+
+			$dump_filename = dirname(__FILE__).'/'.$DB->dbname.'.sql';
+
+			// Get the MYSQL basedir path			
+			$rows = $DB->get_results( 'SHOW VARIABLES' );
+			foreach( $rows as $row )
+			{
+				if( $row->Variable_name == 'basedir' )
+				{	
+					$mysql_basedir = $row->Value;
+					break;
+				}
+			}
+
+			if( !empty($mysql_basedir) )
+			{	// Dump the database
+				$db_auth = ' --host='.$DB->dbhost.' --user='.$DB->dbuser.' --password='.$DB->dbpassword;
+				
+				exec( $mysql_basedir.'/bin/mysqldump '.$db_auth.' --opt '.$DB->dbname.' 2>&1 >'.$dump_filename, $output, $res);
+				if( $res > 0 )
+				{
+					$Messages->add( T_('Backup failed').':<br />'.implode( '<br />', $output), 'error' );
+				}
+			}
+
+			// Compress and download the file
+			load_class( '_ext/_zip_archives.php', 'zip_file' );
+
+			$options = array(
+				'basedir'	=> dirname(__FILE__),
+				'inmemory'	=> 1,
+				'overwrite'	=> 1,
+				'type'		=> 'zip',
+			);
+
+			$zipfile = & new zip_file( $DB->dbname.'.zip' );
+			$zipfile->set_options( $options );
+			$zipfile->add_files( $DB->dbname.'.sql' );
+			$zipfile->create_archive();
+
+			if( $zipfile->error )
+			{
+				foreach($zipfile->error as $v)
+				{
+					$Messages->add( $v, 'error' );
+				}
+				return false;
+			}
+			
+			// Delete dump file
+			@unlink($dump_filename);
+			
+			// Download compressed file
+			$zipfile->download_file();
+			break;
 	}
 }
 
@@ -204,6 +268,7 @@ if( empty($tab) )
 		echo '<li><a href="'.regenerate_url('action', 'action=del_pagecache').'">'.T_('Delete rendered pages from cache directory').'</a></li>';
 		echo '<li><a href="'.regenerate_url('action', 'action=del_filecache').'">'.T_('Delete cached thumbnails (.evocache directories)').'</a></li>';
 		echo '<li><a href="'.regenerate_url('action', 'action=optimize_tables').'">'.T_('Optimize database tables').'</a></li>';
+		echo '<li><a href="'.regenerate_url('action', 'action=backup_db').'">'.T_('Backup database').'</a></li>';
 		echo '</ul>';
 		$block_item_Widget->disp_template_raw( 'block_end' );
 	}
@@ -256,6 +321,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2009/10/02 13:28:03  sam2kb
+ * Backup b2evo database from Tools > Misc
+ *
  * Revision 1.12  2009/10/01 16:19:14  sam2kb
  * minor
  *
