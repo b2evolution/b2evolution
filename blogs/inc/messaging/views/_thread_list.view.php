@@ -41,11 +41,11 @@ $recipients_SQL->FROM( 'T_messaging__threadstatus ts
 							LEFT OUTER JOIN T_messaging__threadstatus tsr
 								ON ts.tsta_thread_ID = tsr.tsta_thread_ID AND tsr.tsta_first_unread_msg_ID IS NULL
 							LEFT OUTER JOIN T_users ur
-								ON tsr.tsta_user_ID = ur.user_ID
+								ON tsr.tsta_user_ID = ur.user_ID AND ur.user_ID <> '.$current_User->ID.'
 							LEFT OUTER JOIN T_messaging__threadstatus tsu
 								ON ts.tsta_thread_ID = tsu.tsta_thread_ID AND tsu.tsta_first_unread_msg_ID IS NOT NULL
 							LEFT OUTER JOIN T_users uu
-								ON tsu.tsta_user_ID = uu.user_ID' );
+								ON tsu.tsta_user_ID = uu.user_ID AND uu.user_ID <> '.$current_User->ID );
 
 $recipients_SQL->WHERE( 'ts.tsta_user_ID ='.$current_User->ID );
 
@@ -74,35 +74,47 @@ foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
 	$read_unread_recipients[$row->thr_ID] = $read_by;
 }
 
+// Get params from request
+$s = param( 's', 'string', '', true );
+
 // Create SELECT query
+$select_SQL = 'SELECT * FROM (SELECT mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified, mts.tsta_first_unread_msg_ID AS thrd_msg_ID, mm.msg_datetime AS thrd_unread_since,
+					(SELECT GROUP_CONCAT(ru.user_login ORDER BY ru.user_login SEPARATOR \', \')
+						FROM T_messaging__threadstatus AS rts
+							LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
+								WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients
+					FROM T_messaging__threadstatus mts
+						LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
+						LEFT OUTER JOIN T_messaging__message mm ON mts.tsta_first_unread_msg_ID = mm.msg_ID
+							WHERE mts.tsta_user_ID = '.$current_User->ID.'
+							ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC) AS threads';
 
-$select_SQL = & new SQL();
-$select_SQL->SELECT( 'mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified, mts.tsta_first_unread_msg_ID
-			  			AS thrd_msg_ID, mm.msg_datetime AS thrd_unread_since,' );
+if( !empty($s) )
+{	// We want to filter on search keyword:
+	$select_SQL .= ' WHERE threads.thrd_recipients LIKE "%'.$DB->escape($s).'%"';
 
-$select_SQL->SELECT_add( '(SELECT GROUP_CONCAT(ru.user_login ORDER BY ru.user_login SEPARATOR \', \')
-							FROM T_messaging__threadstatus AS rts
-							LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID
-							WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients' );
-
-$select_SQL->FROM( 'T_messaging__threadstatus mts
-					LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
-					LEFT OUTER JOIN T_messaging__message mm ON mts.tsta_first_unread_msg_ID = mm.msg_ID' );
-
-$select_SQL->WHERE( 'mts.tsta_user_ID = '.$current_User->ID );
-$select_SQL->ORDER_BY( 'mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC' );
-
-// Create COUNT quiery
-
-$count_SQL = & new SQL();
-
-$count_SQL->SELECT( 'COUNT(*)' );
-$count_SQL->FROM( 'T_messaging__threadstatus' );
-$count_SQL->WHERE( 'tsta_user_ID = '.$current_User->ID );
+	// Create COUNT quiery
+	$count_SQL = 'SELECT COUNT(*)
+					FROM (SELECT (SELECT GROUP_CONCAT(ru.user_login SEPARATOR \', \')
+	      				FROM T_messaging__threadstatus AS rts
+	          				LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
+	              				WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients
+		  					FROM T_messaging__threadstatus mts
+		  						LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
+		          				WHERE mts.tsta_user_ID = '.$current_User->ID.') AS r
+		          					WHERE r.thrd_recipients LIKE "%'.$DB->escape($s).'%"';
+}
+else
+{
+	// Create COUNT quiery
+	$count_SQL = 'SELECT COUNT(*)
+					FROM T_messaging__threadstatus
+						WHERE tsta_user_ID = '.$current_User->ID;
+}
 
 // Create result set:
 
-$Results = & new Results( $select_SQL->get(), 'thrd_', '', NULL, $count_SQL->get() );
+$Results = & new Results( $select_SQL, 'thrd_', '', NULL, $count_SQL );
 
 $Results->Cache = & get_ThreadCache();
 
@@ -112,6 +124,23 @@ if( $unread_messages_count > 0 )
 {
 	$Results->title = $Results->title.' <span class="badge">'.$unread_messages_count.'</span></b>';
 }
+
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_recipients( & $Form )
+{
+	$Form->text( 's', get_param('s'), 30, T_('Search'), '', 255 );
+}
+
+$Results->filter_area = array(
+	'callback' => 'filter_recipients',
+	'presets' => array(
+		'all' => array( T_('All'), '?ctrl=threads' ),
+		)
+	);
 
 $Results->cols[] = array(
 					'th' => T_('With'),
@@ -131,10 +160,10 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-					'th' => T_('Unread since'),
+					'th' => T_('Date'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
-					'td' => '¤conditional( #thrd_msg_ID#>0, \'%mysql2localedatetime(#thrd_unread_since#)%\', \'&nbsp;\')¤' );
+					'td' => '¤conditional( #thrd_msg_ID#>0, \'<span style="color:red">%mysql2localedatetime(#thrd_unread_since#)%</span>\', \'&nbsp;\')¤' );
 
 function get_read_by( $thread_ID )
 {
@@ -168,6 +197,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.18  2009/10/02 15:07:27  efy-maxim
+ * messaging module improvements
+ *
  * Revision 1.17  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *

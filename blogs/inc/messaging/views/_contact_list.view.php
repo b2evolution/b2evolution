@@ -32,15 +32,16 @@ global $read_unread_recipients;
 // Create SELECT query
 
 $select_SQL = & new SQL();
-$select_SQL->SELECT( 'mc.mct_to_user_ID, mc.mct_blocked, mc.mct_last_contact_datetime, u.user_login AS mct_to_user_login' );
+$select_SQL->SELECT( 	'mc.mct_to_user_ID, mc.mct_blocked, mc.mct_last_contact_datetime,
+						u.user_login AS mct_to_user_login, u.user_nickname AS mct_to_user_nickname,
+						CONCAT_WS( " ", u.user_firstname, u.user_lastname ) AS mct_to_user_name,
+						u.user_email AS mct_to_user_email' );
 
 $select_SQL->FROM( 'T_messaging__contact mc
 						LEFT OUTER JOIN T_users u
 						ON mc.mct_to_user_ID = u.user_ID' );
 
 $select_SQL->WHERE( 'mc.mct_from_user_ID = '.$current_User->ID );
-
-$select_SQL->ORDER_BY( 'u.user_login' );
 
 // Create COUNT quiery
 
@@ -56,9 +57,96 @@ $Results = & new Results( $select_SQL->get(), 'mct_', '', NULL, $count_SQL->get(
 
 $Results->title = T_('Contacts list');
 
+/**
+ * Get user avatar
+ *
+ * @param integer user ID
+ * @return string
+ */
+function user_avatar( $user_ID )
+{
+	$UserCache = & get_UserCache();
+	$User = & $UserCache->get_by_ID( $user_ID, false, false );
+	if( $User )
+	{
+		return $User->get_avatar_imgtag();
+	}
+	return '';
+}
+
 $Results->cols[] = array(
-					'th' => T_('Contact'),
-					'td' => '%get_avatar_imgtag( #mct_to_user_login# )%',
+					'th' => T_('Avatar'),
+					'th_class' => 'shrinkwrap',
+					'td_class' => 'shrinkwrap',
+					'td' => '%user_avatar( #mct_to_user_ID# )%',
+					);
+
+$Results->cols[] = array(
+					'th' => T_('Login'),
+					'order' => 'mct_to_user_login',
+					'th_class' => 'shrinkwrap',
+					'td_class' => 'shrinkwrap',
+					'td' => '<strong>$mct_to_user_login$</strong>',
+					);
+
+$Results->cols[] = array(
+					'th' => T_('Nickname'),
+					'order' => 'mct_to_user_nickname',
+					'th_class' => 'shrinkwrap',
+					'td_class' => 'shrinkwrap',
+					'td' => '$mct_to_user_nickname$',
+					);
+
+$Results->cols[] = array(
+					'th' => T_('Name'),
+					'order' => 'mct_to_user_name',
+					'td' => '$mct_to_user_name$',
+					);
+
+
+/**
+ * Get user email
+ *
+ * @param email
+ * @return string
+ */
+function user_mailto( $email )
+{
+	if( !empty( $email ) )
+	{
+		return action_icon( T_('Email').': '.$email, 'email', 'mailto:'.$email, T_('Email') );
+	}
+	return '';
+}
+
+$Results->cols[] = array(
+					'th' => T_('Email'),
+					'th_class' => 'shrinkwrap',
+					'td_class' => 'shrinkwrap',
+					'td' => '%user_mailto( #mct_to_user_email# )%',
+					);
+
+/**
+ * Get user private message
+ *
+ * @param block
+ * @param user login
+ * @return string
+ */
+function user_pm ( $block, $user_login )
+{
+	if( $block == 0 )
+	{
+		return action_icon( T_('Private Message').': '.$user_login, 'comments', '?ctrl=threads&action=new&user_login='.$user_login );
+	}
+	return '';
+}
+
+$Results->cols[] = array(
+					'th' => T_('PM'),
+					'th_class' => 'shrinkwrap',
+					'td_class' => 'shrinkwrap',
+					'td' => '%user_pm( #mct_blocked#, #mct_to_user_login# )%',
 					);
 
 $Results->cols[] = array(
@@ -88,8 +176,10 @@ function contact_block( $block, $user_ID )
 	}
 }
 
+
 $Results->cols[] = array(
 					'th' => T_('Block / Unblock'),
+					'order' => 'mct_blocked',
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
 					'td' => '%contact_block( #mct_blocked#, #mct_to_user_ID# )%' );
@@ -98,6 +188,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.5  2009/10/02 15:07:27  efy-maxim
+ * messaging module improvements
+ *
  * Revision 1.4  2009/09/30 19:00:23  blueyed
  * trans fix, doc
  *
