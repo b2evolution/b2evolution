@@ -144,7 +144,19 @@ function load_image( $path, $mimetype )
 	$err = NULL;
 	$imh = NULL;
 
-	switch( $mimetype )
+	$image_info = getimagesize($path);
+	if( ! $image_info || $image_info['mime'] != $mimetype )
+	{
+		$FiletypeCache = get_Cache('FiletypeCache');
+		$correct_Filetype = $FiletypeCache->get_by_mimetype($image_info['mime']);
+		$correct_extension = array_shift($correct_Filetype->get_extensions());
+
+		$path_info = pathinfo($path);
+		$wrong_extension = $path_info['extension'];
+
+		$err = '!'.$correct_extension.' extension mismatch: use .'.$correct_extension.' instead of .'.$wrong_extension;
+	}
+	else switch( $mimetype )
 	{
 		case 'image/jpeg':
 			$imh = imagecreatefromjpeg( $path ); // dh> TODO: this can fail, if $path is not a valid jpeg! Handle this.
@@ -311,6 +323,11 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.11  2009/10/02 20:34:32  blueyed
+ * Improve handling of wrong file extensions for image.
+ *  - load_image: if the wrong mimetype gets passed, return error, instead of letting imagecreatefrom* fail
+ *  - upload: detect wrong extensions, rename accordingly and add a warning
+ *
  * Revision 1.10  2009/09/20 01:10:36  blueyed
  * todo
  *

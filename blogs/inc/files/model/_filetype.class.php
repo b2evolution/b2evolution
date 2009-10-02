@@ -60,21 +60,18 @@ class Filetype extends DataObject
 		// Call parent constructor:
 		parent::DataObject( 'T_filetypes', 'ftyp_', 'ftyp_ID' );
 
-		$this->delete_restrictions = array(
-					);
-
-  	$this->delete_cascades = array(
-			);
+		$this->delete_restrictions = array();
+		$this->delete_cascades = array();
 
  		if( $db_row != NULL )
 		{
-			$this->ID      			= 	$db_row->ftyp_ID      		;
-			$this->extensions  	= 	$db_row->ftyp_extensions 	;
-			$this->name   			= 	$db_row->ftyp_name    		;
-			$this->mimetype  	 	= 	$db_row->ftyp_mimetype  	;
-			$this->icon    			= 	$db_row->ftyp_icon    		;
-			$this->viewtype    	= 	$db_row->ftyp_viewtype   	;
-			$this->allowed 			=		$db_row->ftyp_allowed		  ;
+			$this->ID         = $db_row->ftyp_ID;
+			$this->extensions = $db_row->ftyp_extensions;
+			$this->name       = $db_row->ftyp_name;
+			$this->mimetype   = $db_row->ftyp_mimetype;
+			$this->icon       = $db_row->ftyp_icon;
+			$this->viewtype   = $db_row->ftyp_viewtype;
+			$this->allowed    = $db_row->ftyp_allowed;
 		}
 		else
 		{	// Create a new filetype:
@@ -191,10 +188,25 @@ class Filetype extends DataObject
 		return '<img src="'.$rsc_url.'icons/fileicons/'.$icon.'" alt="" title="'.$this->dget('name', 'htmlattr').'" class="middle" />';
 	}
 
+
+	/**
+	 * Get list of extensions for this filetype.
+	 * The first is being considered the default / most appropriate one.
+	 * @return array
+	 */
+	function get_extensions()
+	{
+		return explode(' ', $this->extensions);
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.6  2009/10/02 20:34:32  blueyed
+ * Improve handling of wrong file extensions for image.
+ *  - load_image: if the wrong mimetype gets passed, return error, instead of letting imagecreatefrom* fail
+ *  - upload: detect wrong extensions, rename accordingly and add a warning
+ *
  * Revision 1.5  2009/09/14 13:04:53  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

@@ -84,6 +84,8 @@ class FiletypeCache extends DataObjectCache
 			$this->extension_cache[$extension] = $Obj; // not & $Obj
 		}
 
+		$this->mimetype_cache[$Obj->mimetype] = $Obj; // not & $Obj
+
 		return true;
 	}
 
@@ -125,10 +127,53 @@ class FiletypeCache extends DataObjectCache
 		return $this->extension_cache[ $req_ID ];
 	}
 
+
+ 	/**
+	 * Get an object from cache by mimetype.
+	 *
+	 * Load the cache if necessary (all at once if allowed).
+	 *
+	 * @todo dh> this copies nearly the whole code of get_by_extension! Have not checked DataObjectCache, but this needs refactoring.
+	 *
+	 * @param string Mimetype string of object to load
+	 * @param boolean true if function should die on error
+	 * @param boolean true if function should die on empty/null
+	 * @return reference on cached object
+	 */
+	function & get_by_mimetype( $mimetype, $halt_on_error = true, $halt_on_empty = true )
+	{
+		global $DB, $Debuglog;
+
+		if( empty($mimetype) )
+		{
+			if($halt_on_empty) { debug_die( "Requested $this->objtype from $this->dbtablename without mimetype!" ); }
+			$r = NULL;
+			return $r;
+		}
+
+		$this->load_all();
+
+		if( empty( $this->mimetype_cache[ $mimetype ] ) )
+		{ // Requested object does not exist
+			if( $halt_on_error )
+			{
+				debug_die( "Requested $this->objtype does not exist!" );
+			}
+			$r = false;
+			return $r;
+		}
+
+		return $this->mimetype_cache[ $mimetype ];
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.5  2009/10/02 20:34:32  blueyed
+ * Improve handling of wrong file extensions for image.
+ *  - load_image: if the wrong mimetype gets passed, return error, instead of letting imagecreatefrom* fail
+ *  - upload: detect wrong extensions, rename accordingly and add a warning
+ *
  * Revision 1.4  2009/09/14 13:04:53  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

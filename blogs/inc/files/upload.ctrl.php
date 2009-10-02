@@ -320,6 +320,25 @@ if( isset($_FILES) && count( $_FILES ) )
 			continue;
 		}
 
+		$uploadfile_path = $_FILES['uploadfile']['tmp_name'][$lKey];
+		$image_info = getimagesize($uploadfile_path);
+		if( $image_info )
+		{ // This is an image, validate mimetype vs. extension
+			$FiletypeCache = get_Cache('FiletypeCache');
+			$correct_Filetype = $FiletypeCache->get_by_mimetype($image_info['mime']);
+			$correct_extension = array_shift($correct_Filetype->get_extensions());
+
+			$path_info = pathinfo($newName);
+			$current_extension = $path_info['extension'];
+
+			if( $current_extension != $correct_extension )
+			{
+				$old_name = $newName;
+				$newName = $path_info['filename'].'.'.$correct_extension;
+				$Messages->add( sprintf(T_('The extension of the file &laquo;%s&raquo; has been corrected. The new filename is &laquo;%s.&raquo;'), $old_name, $newName), 'warning' );
+			}
+		}
+
 		// Get File object for requested target location:
 		$FileCache = & get_FileCache();
 		$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
@@ -429,6 +448,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2009/10/02 20:34:31  blueyed
+ * Improve handling of wrong file extensions for image.
+ *  - load_image: if the wrong mimetype gets passed, return error, instead of letting imagecreatefrom* fail
+ *  - upload: detect wrong extensions, rename accordingly and add a warning
+ *
  * Revision 1.16  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *
