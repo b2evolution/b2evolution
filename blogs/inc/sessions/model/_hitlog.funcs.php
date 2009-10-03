@@ -289,43 +289,26 @@ function stats_search_keywords( $keyphrase, $length = 45 )
 }
 
 
-/*
- * stats_req_URI(-)
- */
-function stats_req_URI()
-{
-	global $row_stats;
-	echo htmlentities($row_stats['hit_uri']);
-}
-
-
-/**
- * stats_user_agent(-)
- *
- * @param boolean
- */
-function stats_user_agent( $translate = false )
-{
-	global $row_stats, $user_agents;
-	$UserAgent = $row_stats[ 'agnt_signature' ];
-	if( $translate )
-	{
-		foreach ($user_agents as $curr_user_agent)
-		{
-			if (stristr($UserAgent, $curr_user_agent[1]))
-			{
-				$UserAgent = $curr_user_agent[2];
-				break;
-			}
-		}
-	}
-	echo htmlentities( $UserAgent );
-}
-
-
 
 /*
  * $Log$
+ * Revision 1.18  2009/10/03 20:07:51  tblue246
+ * - Hit::detect_user_agent():
+ * 	- Try to use get_browser() to get platform information or detect robots if "normal" detection failed.
+ * 	- Use Skin::type to detect RSS readers.
+ * - Removed unneeded functions.
+ * - translate_user_agent(): Use get_browser() if translation failed.
+ * CVS: ----------------------------------------------------------------------
+ * CVS: Enter Log.  Lines beginning with `CVS:' are removed automatically
+ * CVS:
+ * CVS: Committing in .
+ * CVS:
+ * CVS: Modified Files:
+ * CVS: 	blogs/conf/_stats.php blogs/inc/sessions/model/_hit.class.php
+ * CVS: 	blogs/inc/sessions/model/_hitlog.funcs.php
+ * CVS: 	blogs/inc/sessions/views/_stats_robots.view.php
+ * CVS: ----------------------------------------------------------------------
+ *
  * Revision 1.17  2009/09/27 12:57:29  blueyed
  * strmaxlen: add format param, which is used on the (possibly) cropped string.
  *

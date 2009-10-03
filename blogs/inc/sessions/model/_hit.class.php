@@ -395,7 +395,7 @@ class Hit
 
 		global $DB, $Debuglog;
 		global $user_agents;
-		global $skin; // to detect agent_type (gets set in /xmlsrv/atom.php for example)
+		global $Skin; // to detect agent_type (gets set in /xmlsrv/atom.php for example)
 
 
 		// Init is_* members.
@@ -413,9 +413,29 @@ class Hit
 		$this->agent_platform = '';
 
 		$user_agent = $this->get_user_agent();
+		$browscap   = @get_browser( $user_agent );
 
 		if( ! empty($user_agent) )
 		{ // detect browser
+			if( strpos($user_agent, 'Win') !== false)
+			{
+				$this->agent_platform = 'win';
+			}
+			elseif( strpos($user_agent, 'Mac') !== false)
+			{
+				$this->agent_platform = 'mac';
+			}
+			elseif( $browscap )
+			{
+				$Debuglog->add( 'detect_useragent(): Trying to detect platform using browscap', 'hit' );
+
+				$platform = strtolower( substr( $browscap->platform, 0, 3 ) );
+				if( in_array( $platform, array( 'win', 'mac' ) ) )
+				{
+					$this->agent_platform = $platform;
+				}
+			}
+
 			if(strpos($user_agent, 'Lynx') !== false)
 			{
 				$this->is_lynx = 1;
@@ -429,19 +449,21 @@ class Hit
 				$this->agent_type = 'browser';
 			}
 			elseif(strpos($user_agent, 'Gecko/') !== false)	// We don't want to see Safari as Gecko
-			{
+			{	// Tblue> Note: Gecko is only a rendering engine, not a real browser!
 				$this->is_gecko = 1;
 				$this->agent_name = 'gecko';
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($user_agent, 'MSIE') !== false && strpos($user_agent, 'Win') !== false)
+			elseif(strpos($user_agent, 'MSIE') !== false && $this->agent_platform == 'win' )
 			{
+				$this->is_IE = true;
 				$this->is_winIE = 1;
 				$this->agent_name = 'msie';
 				$this->agent_type = 'browser';
 			}
-			elseif(strpos($user_agent, 'MSIE') !== false && strpos($user_agent, 'Mac') !== false)
+			elseif(strpos($user_agent, 'MSIE') !== false && $this->agent_platform == 'mac' )
 			{
+				$this->is_IE = true;
 				$this->is_macIE = 1;
 				$this->agent_name = 'msie';
 				$this->agent_type = 'browser';
@@ -464,43 +486,39 @@ class Hit
 				$this->agent_name = 'nav4';
 				$this->agent_type = 'browser';
 			}
-
-			if( strpos($user_agent, 'Win') !== false)
-			{
-				$this->agent_platform = 'win';
-			}
-			elseif( strpos($user_agent, 'Mac') !== false)
-			{
-				$this->agent_platform = 'mac';
-			}
 		}
-		$this->is_IE = (($this->is_macIE) || ($this->is_winIE));
 
 		$Debuglog->add( 'Agent name: '.$this->agent_name, 'hit' );
 		$Debuglog->add( 'Agent platform: '.$this->agent_platform, 'hit' );
-
 
 		/*
 		 * Detect requests for XML feeds by $skin / $tempskin param.
 		 * fp> TODO: this is WEAK! Do we really need to know before going into the skin?
 		 * dh> not necessary, but only where ->agent_type gets used (logging).
-		 * Use $skin, if not empty (may be set in /xmlsrv/atom.php for example), otherwise $tempskin.
 		 */
-		$used_skin = empty( $skin ) ? param( 'tempskin', 'string', '', true ) : $skin;
-		if( in_array( $used_skin, array( '_atom', '_rdf', '_rss', '_rss2' ) ) )
+		if( isset( $Skin ) && $Skin->type == 'feed' )
 		{
 			$Debuglog->add( 'detect_useragent(): RSS', 'hit' );
 			$this->agent_type = 'rss';
 		}
 		else
 		{ // Lookup robots
+			$match = false;
 			foreach( $user_agents as $lUserAgent )
 			{
-				if( ($lUserAgent[0] == 'robot') && (strstr($this->user_agent, $lUserAgent[1])) )
+				if( $lUserAgent[0] == 'robot' && strpos( $this->user_agent, $lUserAgent[1] ) !== false )
 				{
 					$Debuglog->add( 'detect_useragent(): robot', 'hit' );
 					$this->agent_type = 'robot';
+					$match = true;
+					break;
 				}
+			}
+
+			if( ! $match && $browscap && $browscap->crawler )
+			{
+				$Debuglog->add( 'detect_useragent(): robot (through browscap)', 'hit' );
+				$this->agent_type = 'robot';
 			}
 		}
 	}
@@ -1132,6 +1150,23 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.37  2009/10/03 20:07:51  tblue246
+ * - Hit::detect_user_agent():
+ * 	- Try to use get_browser() to get platform information or detect robots if "normal" detection failed.
+ * 	- Use Skin::type to detect RSS readers.
+ * - Removed unneeded functions.
+ * - translate_user_agent(): Use get_browser() if translation failed.
+ * CVS: ----------------------------------------------------------------------
+ * CVS: Enter Log.  Lines beginning with `CVS:' are removed automatically
+ * CVS:
+ * CVS: Committing in .
+ * CVS:
+ * CVS: Modified Files:
+ * CVS: 	blogs/conf/_stats.php blogs/inc/sessions/model/_hit.class.php
+ * CVS: 	blogs/inc/sessions/model/_hitlog.funcs.php
+ * CVS: 	blogs/inc/sessions/views/_stats_robots.view.php
+ * CVS: ----------------------------------------------------------------------
+ *
  * Revision 1.36  2009/10/01 18:50:16  tblue246
  * convert_charset(): Trying to remove unreliable charset detection and modify all calls accordingly -- needs testing to ensure all charset conversions work as expected.
  *
