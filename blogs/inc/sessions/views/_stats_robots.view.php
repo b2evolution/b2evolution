@@ -174,22 +174,15 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.11  2009/10/03 20:43:40  tblue246
+ * Commit message cleanup...
+ *
  * Revision 1.10  2009/10/03 20:07:51  tblue246
  * - Hit::detect_user_agent():
  * 	- Try to use get_browser() to get platform information or detect robots if "normal" detection failed.
  * 	- Use Skin::type to detect RSS readers.
  * - Removed unneeded functions.
  * - translate_user_agent(): Use get_browser() if translation failed.
- * CVS: ----------------------------------------------------------------------
- * CVS: Enter Log.  Lines beginning with `CVS:' are removed automatically
- * CVS:
- * CVS: Committing in .
- * CVS:
- * CVS: Modified Files:
- * CVS: 	blogs/conf/_stats.php blogs/inc/sessions/model/_hit.class.php
- * CVS: 	blogs/inc/sessions/model/_hitlog.funcs.php
- * CVS: 	blogs/inc/sessions/views/_stats_robots.view.php
- * CVS: ----------------------------------------------------------------------
  *
  * Revision 1.9  2009/09/25 13:09:36  efy-vyacheslav
  * Using the SQL class to prepare queries
