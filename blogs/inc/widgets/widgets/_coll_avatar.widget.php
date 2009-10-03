@@ -77,7 +77,13 @@ class coll_avatar_Widget extends ComponentWidget
 	{
 		global $thumbnail_sizes;
 
-		$options = array_combine( array_keys($thumbnail_sizes), array_keys($thumbnail_sizes) );
+		$options = array();
+		// PHP 4 replacement for array_combine():
+		foreach( array_keys( $thumbnail_sizes ) as $thumb_size )
+		{
+			$options[$thumb_size] = $thumb_size;
+		}
+
 		$r = array_merge( array(
 			'thumb_size' => array(
 					'type' => 'select',
@@ -133,6 +139,9 @@ class coll_avatar_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.5  2009/10/03 21:00:50  tblue246
+ * Bugfixes
+ *
  * Revision 1.4  2009/09/30 19:09:39  blueyed
  * trans fix
  *

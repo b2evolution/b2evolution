@@ -25,6 +25,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
+
 /**
  * ComponentWidget Class
  *
@@ -612,6 +614,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.66  2009/10/03 21:00:50  tblue246
+ * Bugfixes
+ *
  * Revision 1.65  2009/09/26 12:00:44  tblue246
  * Minor/coding style
  *
