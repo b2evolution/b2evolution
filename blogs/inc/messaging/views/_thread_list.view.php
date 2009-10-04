@@ -163,7 +163,7 @@ $Results->cols[] = array(
 					'th' => T_('Date'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
-					'td' => '¤conditional( #thrd_msg_ID#>0, \'<span style="color:red">%mysql2localedatetime(#thrd_unread_since#)%</span>\', \'&nbsp;\')¤' );
+					'td' => '¤conditional( #thrd_msg_ID#>0, \'<span style="color:red">%mysql2localedatetime(#thrd_unread_since#)%</span>\', \'<span style="color:green">%mysql2localedatetime(#thrd_datemodified#)%</span>\')¤' );
 
 function get_read_by( $thread_ID )
 {
@@ -197,6 +197,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.19  2009/10/04 08:26:57  efy-maxim
+ * messaging module improvements
+ *
  * Revision 1.18  2009/10/02 15:07:27  efy-maxim
  * messaging module improvements
  *
