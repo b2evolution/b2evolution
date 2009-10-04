@@ -265,6 +265,8 @@ class Chapter extends GenericCategory
 	{
 		global $DB;
 
+		load_funcs( 'items/model/_item.funcs.php' );
+
 		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
 
 		$DB->begin();
@@ -307,6 +309,9 @@ class Chapter extends GenericCategory
 
 /*
  * $Log$
+ * Revision 1.15  2009/10/04 20:36:04  blueyed
+ * Add missing load_funcs
+ *
  * Revision 1.14  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *
