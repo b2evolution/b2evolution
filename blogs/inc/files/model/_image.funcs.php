@@ -143,6 +143,7 @@ function load_image( $path, $mimetype )
 	// @ini_set('memory_limit', '256M'); // artificially inflate memory if we can
 	$err = NULL;
 	$imh = NULL;
+	$function = NULL;
 
 	$image_info = getimagesize($path);
 	if( ! $image_info || $image_info['mime'] != $mimetype )
@@ -156,30 +157,37 @@ function load_image( $path, $mimetype )
 
 		$err = '!'.$correct_extension.' extension mismatch: use .'.$correct_extension.' instead of .'.$wrong_extension;
 	}
-	else switch( $mimetype )
+	else
 	{
-		case 'image/jpeg':
-			$imh = imagecreatefromjpeg( $path ); // dh> TODO: this can fail, if $path is not a valid jpeg! Handle this.
-			break;
-
-		case 'image/gif':
-			$imh = imagecreatefromgif( $path );  // dh> TODO: this can fail, if $path is not a valid gif! Handle this.
-			break;
-
-		case 'image/png':
-			$imh = imagecreatefrompng( $path );  // dh> TODO: this can fail, if $path is not a valid png! Handle this.
-			break;
-
- 		default:
-			// Unrecognized mime type
+		$mime_function = array(
+			'image/jpeg' => 'imagecreatefromjpeg',
+			'image/gif'  => 'imagecreatefromgif',
+			'image/png'  => 'imagecreatefrompng',
+		);
+		if( isset($mime_function[$mimetype]) )
+		{
+			$function = $mime_function[$mimetype];
+		}
+		else
+		{ // Unrecognized mime type
 			$err = '!Unsupported format '.$mimetype.' (load_image)';
-			break;
+		}
 	}
 
+	if( $function )
+	{
+		$imh = $function( $path );
+	}
 	if( $imh === false )
 	{
 		// e.g. "imagecreatefromjpeg(): $FILE is not a valid JPEG file"
 		$err = '!load_image failed (no valid image?)';
+	}
+	if( $err )
+	{ // Trigger PHP error, but do not display it (otherwise the image containing the error would be broken)
+		$old_de = ini_set('display_errors', 0);
+		trigger_error( 'load_image failed: '.substr($err, 1).' ('.$path.' / '.$mimetype.')', E_USER_WARNING );
+		ini_set('display_errors', $old_de);
 	}
 
 	return array( $err, $imh );
@@ -323,6 +331,9 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.12  2009/10/04 01:24:56  blueyed
+ * load_image: refactored, add call to trigger_error.
+ *
  * Revision 1.11  2009/10/02 20:34:32  blueyed
  * Improve handling of wrong file extensions for image.
  *  - load_image: if the wrong mimetype gets passed, return error, instead of letting imagecreatefrom* fail
