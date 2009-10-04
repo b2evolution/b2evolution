@@ -421,7 +421,7 @@ function param_check_not_empty( $var, $err_msg = NULL, $field_err_msg = NULL )
  */
 function param_check_number( $var, $err_msg, $required = false )
 {
-	return validate( $var, 'check_is_number', $required, $err_msg );
+	return param_validate( $var, 'check_is_number', $required, $err_msg );
 }
 
 
@@ -434,7 +434,7 @@ function param_check_number( $var, $err_msg, $required = false )
  */
 function param_check_decimal( $var, $err_msg, $required = false )
 {
-	return validate( $var, 'check_is_decimal', $required, $err_msg );
+	return param_validate( $var, 'check_is_decimal', $required, $err_msg );
 }
 
 
@@ -486,7 +486,7 @@ function param_check_range( $var, $min, $max, $err_msg, $required = true )
  */
 function param_check_email( $var, $required = false )
 {
-	return validate( $var, 'check_is_email', $required, NULL );
+	return param_validate( $var, 'check_is_email', $required, NULL );
 }
 
 
@@ -1955,6 +1955,10 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.48  2009/10/04 12:20:21  efy-maxim
+ * 1. validate has been renamed to param_validate
+ * 2. check recipients list in load_recipients function in Thread class
+ *
  * Revision 1.47  2009/09/28 22:56:36  blueyed
  * get_param_urlencoded: drop force_type param, which is not required AFAICS
  *

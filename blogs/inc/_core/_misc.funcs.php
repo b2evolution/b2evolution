@@ -1067,15 +1067,13 @@ function remove_seconds($timestamp, $format = 'Y-m-d H:i')
 /**
  * Validate variable
  *
- * @todo rename to param_validate()
- *
  * @param string param name
  * @param string validator function name
  * @param boolean true if variable value can't be empty
  * @param custom error message
  * @return boolean true if OK
  */
-function validate( $variable, $validator, $required = false, $custom_msg = NULL )
+function param_validate( $variable, $validator, $required = false, $custom_msg = NULL )
 {
 	/* Tblue> Note: is_callable() does not check whether a function is
 	 *        disabled (http://www.php.net/manual/en/function.is-callable.php#79151).
@@ -3724,6 +3722,10 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.173  2009/10/04 12:20:21  efy-maxim
+ * 1. validate has been renamed to param_validate
+ * 2. check recipients list in load_recipients function in Thread class
+ *
  * Revision 1.172  2009/10/01 12:17:12  tblue246
  * doc
  *

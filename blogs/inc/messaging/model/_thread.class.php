@@ -234,23 +234,24 @@ class Thread extends DataObject
 	/**
 	 * Load recipients of the current thread
 	 *
-	 * @todo fp> should probably not reissue sql if called twice
-	 *
 	 * @return recipients list
 	 */
 	function load_recipients()
 	{
 		global $DB;
 
-		$SQL = & new SQL();
-		$SQL->SELECT( 'tsta_user_ID' );
-		$SQL->FROM( 'T_messaging__threadstatus' );
-		$SQL->WHERE( 'tsta_thread_ID = '.$this->ID );
-
-		$this->recipients_list = array();
-		foreach( $DB->get_results( $SQL->get() ) as $row )
+		if( empty( $this->recipients_list ) )
 		{
-			$this->recipients_list[] = $row->tsta_user_ID;
+			$SQL = & new SQL();
+			$SQL->SELECT( 'tsta_user_ID' );
+			$SQL->FROM( 'T_messaging__threadstatus' );
+			$SQL->WHERE( 'tsta_thread_ID = '.$this->ID );
+
+			$this->recipients_list = array();
+			foreach( $DB->get_results( $SQL->get() ) as $row )
+			{
+				$this->recipients_list[] = $row->tsta_user_ID;
+			}
 		}
 
 		return $this->recipients_list;
@@ -298,17 +299,17 @@ class Thread extends DataObject
 	 */
 	function check_thread_recipient( $user_ID )
 	{
-		if( empty( $this->recipients_list ) )
-		{
-			$this->load_recipients();
-		}
-
+		$this->load_recipients();
 		return in_array( $user_ID, $this->recipients_list );
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.17  2009/10/04 12:20:22  efy-maxim
+ * 1. validate has been renamed to param_validate
+ * 2. check recipients list in load_recipients function in Thread class
+ *
  * Revision 1.16  2009/09/20 00:27:08  fplanque
  * cleanup/doc/simplified
  *
