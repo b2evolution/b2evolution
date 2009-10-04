@@ -689,7 +689,7 @@ class DataObject
 
 		if( $validation_function != NULL )
 		{
-			validate( $var, $validation_function, $required, $error_message );
+			param_validate( $var, $validation_function, $required, $error_message );
 		}
 
 		return $this->set( $parname, $value, ! $required );
@@ -811,6 +811,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2009/10/04 12:23:40  efy-maxim
+ * validate has been renamed to param_validate function
+ *
  * Revision 1.27  2009/09/30 15:15:59  efy-maxim
  * NULL check for validation function
  *
