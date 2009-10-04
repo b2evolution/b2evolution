@@ -62,16 +62,6 @@ class UpgradeToCurrentTestCase extends EvoInstallUnitTestCase
 
 
 	/**
-	 * Test upgrade from 0.8.2
-	 */
-	function testUpgradeFrom0_8_2()
-	{
-		$this->executeQueriesFromFile( TESTSDIR.'install/sql/b2evolution_0_8_2.default.sql' );
-		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 0.8.2 successful!' );
-	}
-
-
-	/**
 	 * Test upgrade from 0.9.0.11
 	 */
 	function testUpgradeFrom0_9_0_11()
