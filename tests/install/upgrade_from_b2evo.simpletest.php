@@ -113,6 +113,17 @@ class UpgradeToCurrentTestCase extends EvoInstallUnitTestCase
 		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 1.8 in strict mode successful!' );
 	}
 
+
+	/**
+	 * Test upgrade from 2.4 ("strict" MySQL mode)
+	 */
+	function testUpgradeFrom2_4_strict()
+	{
+		$this->executeQueriesFromFile( TESTSDIR.'install/sql/b2evolution_v-2-4.welcome-slugs.sql' );
+		$this->test_DB->query( 'SET sql_mode = "TRADITIONAL"' );
+		$this->assertTrue( upgrade_b2evo_tables(), 'Upgrade from 2.4 in strict mode successful!' );
+	}
+
 }
 
 
