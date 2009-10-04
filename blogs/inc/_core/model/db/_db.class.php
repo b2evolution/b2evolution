@@ -123,13 +123,7 @@ class DB
 	var $result;
 
 	/**
-	 * Last result's rows
-	 * @var array
-	 */
-	var $last_result;
-
-	/**
-	 * Number of rows in result set (after a select)
+	 * Number of rows in result set
 	 */
 	var $num_rows = 0;
 
@@ -634,9 +628,13 @@ class DB
 	 */
 	function flush()
 	{
-		// Get rid of these
-		$this->last_result = NULL;
+		$this->result = NULL;
 		$this->last_query = NULL;
+		$this->num_rows = 0;
+		if( isset($this->result) && is_resource($this->result) )
+		{ // Free last result resource
+			mysql_free_result($this->result);
+		}
 	}
 
 
@@ -806,7 +804,10 @@ class DB
 		// If there is an error then take note of it..
 		if( is_resource($this->dbhandle) && mysql_error($this->dbhandle) )
 		{
-			@mysql_free_result($this->result);
+			if( is_resource($this->result) )
+			{
+				mysql_free_result($this->result);
+			}
 			$this->print_error( '', '', $title );
 			return false;
 		}
@@ -832,18 +833,9 @@ class DB
 		}
 		else
 		{ // Query was a select, alter, etc...:
-			$this->num_rows = 0;
-
 			if( is_resource($this->result) )
 			{ // It's not a resource for CREATE or DROP for example and can even trigger a fatal error (see http://forums.b2evolution.net//viewtopic.php?t=9529)
-
-				// Store Query Results
-				while( $row = mysql_fetch_object($this->result) )
-				{
-					// Store relults as an objects within main array
-					$this->last_result[$this->num_rows] = $row;
-					$this->num_rows++;
-				}
+				$this->num_rows = mysql_num_rows($this->result);
 			}
 
 			if( $this->log_queries )
@@ -854,7 +846,6 @@ class DB
 			// Return number of rows selected
 			$return_val = $this->num_rows;
 		}
-
 		if( $this->log_queries )
 		{	// We want to log queries:
 			if( $this->debug_dump_function_trace_for_queries )
@@ -871,21 +862,13 @@ class DB
 			if( $this->debug_profile_queries )
 			{
 				// save values:
-				$saved_last_result = $this->last_result;
+				$saved_last_result = $this->result;
 				$saved_num_rows = $this->num_rows;
 
-				$this->last_result = NULL;
 				$this->num_rows = 0;
 
 				$this->result = @mysql_query( 'SHOW PROFILE', $this->dbhandle );
-				// Store Query Results
-				$this->num_rows = 0;
-				while( $row = @mysql_fetch_object($this->result) )
-				{
-					// Store results as an objects within main array
-					$this->last_result[$this->num_rows] = $row;
-					$this->num_rows++;
-				}
+				$this->num_rows = mysql_num_rows($this->result);
 
 				if( $this->num_rows )
 				{
@@ -901,48 +884,10 @@ class DB
 
 
 				// Restore:
-				$this->last_result = $saved_last_result;
-				$this->num_rows = $saved_num_rows;
-			}
-
-			// EXPLAIN JOINS ??
-			if( $this->debug_explain_joins && preg_match( '#^ [\s(]* SELECT \s #ix', $query) )
-			{ // Query was a select, let's try to explain joins...
-
-				// save values:
-				$saved_last_result = $this->last_result;
-				$saved_num_rows = $this->num_rows;
-
-				$this->last_result = NULL;
-				$this->num_rows = 0;
-
-				$this->result = @mysql_query( 'EXPLAIN '.$query, $this->dbhandle );
-
-				// Store Query Results
-				$this->num_rows = 0;
-				while( $row = @mysql_fetch_object($this->result) )
-				{
-					// Store results as an objects within main array
-					$this->last_result[$this->num_rows] = $row;
-					$this->num_rows++;
-				}
-
-				$this->queries[ $this->num_queries - 1 ]['explain'] = $this->debug_get_rows_table( 100, true );
-
-				// Free "EXPLAIN" result resource:
-				@mysql_free_result($this->result);
-
-				// Restore:
-				$this->last_result = $saved_last_result;
+				$this->result = $saved_last_result;
 				$this->num_rows = $saved_num_rows;
 			}
 		}
-
-		if( is_resource($this->result) )
-		{
-			mysql_free_result($this->result);
-		}
-
 		return $return_val;
 	}
 
@@ -963,15 +908,14 @@ class DB
 			$this->query($query, $title);
 		}
 
-		// Extract var out of cached results based x,y vals
-		if( $this->last_result[$y] )
+		if( $this->num_rows && mysql_data_seek($this->result, $y) )
 		{
-			$values = array_values(get_object_vars($this->last_result[$y]));
-		}
+			$row = mysql_fetch_row($this->result);
 
-		if( isset($values[$x]) )
-		{
-			return $values[$x];
+			if( isset($row[$x]) )
+			{
+				return $row[$x];
+			}
 		}
 
 		return NULL;
@@ -979,11 +923,15 @@ class DB
 
 
 	/**
-	 * Get one row from the DB - see docs for more detail
+	 * Get one row from the DB.
 	 *
+	 * @param string Query (or NULL for previous query)
+	 * @param string Output type ("OBJECT", "ARRAY_A", "ARRAY_N")
+	 * @param int Row to fetch (or NULL for next - useful with $query=NULL)
+	 * @param string Optional title for $query (if any)
 	 * @return mixed
 	 */
-	function get_row( $query = NULL, $output = OBJECT, $y = 0, $title = '' )
+	function get_row( $query = NULL, $output = OBJECT, $y = NULL, $title = '' )
 	{
 		// If there is a query then perform it if not then use cached results..
 		if( $query )
@@ -991,31 +939,30 @@ class DB
 			$this->query($query, $title);
 		}
 
+		if( ! $this->num_rows
+			|| ( isset($y) && ! mysql_data_seek($this->result, $y) ) )
+		{
+			if( $output == OBJECT )
+				return NULL;
+			else
+				return array();
+		}
+
 		// If the output is an object then return object using the row offset..
-		if( $output == OBJECT )
+		switch( $output )
 		{
-			return $this->last_result[$y]
-				? $this->last_result[$y]
-				: NULL;
-		}
-		// If the output is an associative array then return row as such..
-		elseif( $output == ARRAY_A )
-		{
-			return $this->last_result[$y]
-				? get_object_vars( $this->last_result[$y] )
-				: array();
-		}
-		// If the output is an numerical array then return row as such..
-		elseif( $output == ARRAY_N )
-		{
-			return $this->last_result[$y]
-				? array_values( get_object_vars($this->last_result[$y]) )
-				: array();
-		}
-		// If invalid output type was specified..
-		else
-		{
+		case OBJECT:
+			return mysql_fetch_object($this->result);
+
+		case ARRAY_A:
+			return mysql_fetch_array($this->result, MYSQL_ASSOC);
+
+		case ARRAY_N:
+			return mysql_fetch_array($this->result, MYSQL_NUM);
+
+		default:
 			$this->print_error('DB::get_row(string query, output type, int offset) -- Output type must be one of: OBJECT, ARRAY_A, ARRAY_N', '', false);
+			break;
 		}
 	}
 
@@ -1036,7 +983,7 @@ class DB
 
 		// Extract the column values
 		$new_array = array();
-		for( $i = 0, $count = count($this->last_result); $i < $count; $i++ )
+		for( $i = 0; $i < $this->num_rows; $i++ )
 		{
 			$new_array[$i] = $this->get_var( NULL, $x, $i );
 		}
@@ -1060,7 +1007,7 @@ class DB
 
 		// Extract the column values
 		$new_array = array();
-		for( $i = 0, $count = count($this->last_result); $i < $count; $i++ )
+		for( $i = 0; $i < $this->num_rows; $i++ )
 		{
 			$key = $this->get_var( NULL, 0, $i );
 
@@ -1084,38 +1031,36 @@ class DB
 			$this->query($query, $title);
 		}
 
-		// Send back array of objects. Each row is an object
-		if( $output == OBJECT )
-		{
-			return $this->last_result ? $this->last_result : array();
-		}
-		elseif( $output == ARRAY_A || $output == ARRAY_N )
-		{
-			$new_array = array();
+		$r = array();
 
-			if( $this->last_result )
+		if( $this->num_rows )
+		{
+			mysql_data_seek($this->result, 0);
+			switch( $output )
 			{
-				$i = 0;
-
-				foreach( $this->last_result as $row )
+			case OBJECT:
+				while( $row = mysql_fetch_object($this->result) )
 				{
-					$new_array[$i] = get_object_vars($row);
-
-					if( $output == ARRAY_N )
-					{
-						$new_array[$i] = array_values($new_array[$i]);
-					}
-
-					$i++;
+					$r[] = $row;
 				}
+				break;
 
-				return $new_array;
-			}
-			else
-			{
-				return array();
+			case ARRAY_A:
+				while( $row = mysql_fetch_array($this->result, MYSQL_ASSOC) )
+				{
+					$r[] = $row;
+				}
+				break;
+
+			case ARRAY_N:
+				while( $row = mysql_fetch_array($this->result, MYSQL_NUM) )
+				{
+					$r[] = $row;
+				}
+				break;
 			}
 		}
+		return $r;
 	}
 
 
@@ -1128,7 +1073,7 @@ class DB
 	{
 		$r = '';
 
-		if( ! $this->last_result )
+		if( ! $this->result || ! $this->num_rows )
 		{
 			return '<p>No Results.</p>';
 		}
@@ -1153,11 +1098,19 @@ class DB
 		}
 		$r .= '</tr>';
 
+
 		// ======================================================
 		// print main results
-		for( $i = 0, $n = min(count($this->last_result), $max_lines); $i < $n; $i++ )
+		$i=0;
+		// Rewind to first row (should be there already).
+		mysql_data_seek($this->result, 0);
+		while( $one_row = $this->get_row(NULL, ARRAY_N) )
 		{
-			$one_row = $this->get_row(NULL, ARRAY_N, $i);
+			$i++;
+			if( $i >= $max_lines )
+			{
+				break;
+			}
 			$r .= '<tr>';
 			foreach( $one_row as $item )
 			{
@@ -1189,6 +1142,8 @@ class DB
 
 			$r .= '</tr>';
 		}
+		// Rewind to first row again.
+		mysql_data_seek($this->result, 0);
 		if( $i >= $max_lines )
 		{
 			$r .= '<tr><td colspan="'.(count($col_info)+1).'">Max number of dumped rows has been reached.</td></tr>';
@@ -1384,16 +1339,27 @@ class DB
 			}
 			echo $html ? '</div>' : "\n\n";
 
-			// Explain:
-			if( isset($query['explain']) )
+			if( $this->debug_explain_joins || $query['results'] != 'unknown' || isset($query_['function_trace']) )
 			{
-				if( $html )
+				$md5_query = md5(serialize($query));
+			}
+
+			// EXPLAIN JOINS ??
+			if( $this->debug_explain_joins && preg_match( '#^ [\s(]* SELECT \s #ix', $query['sql']) )
+			{ // Query was a select, let's try to explain joins...
+
+				$this->result = mysql_query( 'EXPLAIN '.$query['sql'], $this->dbhandle );
+				if( is_resource($this->result) )
 				{
-					$div_id = 'db_query_explain_'.$i.'_'.md5(serialize($query));
-					echo '<div id="'.$div_id.'">';
-					echo $query['explain'];
-					echo '</div>';
-					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show EXPLAIN", "Hide EXPLAIN");</script>';
+					$this->num_rows = mysql_num_rows($this->result);
+
+					if( $html )
+					{
+						$div_id = 'db_query_explain_'.$i.'_'.$md5_query;
+						echo '<div id="'.$div_id.'">';
+						echo $this->debug_get_rows_table( 100, true );
+						echo '</div>';
+						echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show EXPLAIN", "Hide EXPLAIN");</script>';
 				}
 				else
 				{ // TODO: dh> contains html.
@@ -1411,10 +1377,13 @@ class DB
 					echo $query['profile'];
 					echo '</div>';
 					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show PROFILE", "Hide PROFILE");</script>';
-				}
-				else
-				{ // TODO: dh> contains html.
-					echo $query['explain'];
+					}
+					else
+					{ // TODO: dh> contains html.
+						echo $this->debug_get_rows_table( 100, true );
+					}
+
+					mysql_free_result($this->result);
 				}
 			}
 
@@ -1661,6 +1630,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.40  2009/10/04 21:10:16  blueyed
+ * Merge db-noresultcache via whissip.
+ *
  * Revision 1.39  2009/09/20 22:35:56  blueyed
  * whoops.
  *
