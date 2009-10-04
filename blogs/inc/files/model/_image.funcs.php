@@ -185,7 +185,7 @@ function load_image( $path, $mimetype )
 	}
 	if( $err )
 	{
-		error_log( 'load_image failed: '.substr($err, 1).' ('.$path.' / '.$mimetype.')', E_USER_WARNING );
+		error_log( 'load_image failed: '.substr($err, 1).' ('.$path.' / '.$mimetype.')' );
 	}
 
 	return array( $err, $imh );
@@ -329,6 +329,9 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.15  2009/10/04 14:02:18  tblue246
+ * fix
+ *
  * Revision 1.14  2009/10/04 12:32:53  blueyed
  * Use error_log instead of trigger_error.
  *
