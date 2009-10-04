@@ -224,6 +224,9 @@ $user_agents = array(
 	array('robot', 'Baiduspider', 'Baidu spider' ),
 	array('robot', 'infometrics-bot', 'Infometrics Bot' ),
 	array('robot', 'DotBot/', 'DotBot' ),
+	array('robot', 'Twiceler-', 'Cuil (Twiceler)' ),
+	array('robot', 'discobot/', 'Discovery Engine' ),
+	array('robot', 'Speedy Spider', 'Entireweb (Speedy Spider)' ),
 	// Unknown robots:
 	array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:
