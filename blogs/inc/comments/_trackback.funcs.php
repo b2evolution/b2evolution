@@ -36,7 +36,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * Do multiple trackbacks
  *
- * @todo dh> Use Item->get_excerpt()?!
+ * @todo dh> Use Item->get_excerpt()?!  fp> good idea
  *
  * fplanque: added
  */
@@ -226,6 +226,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.11  2009/10/04 23:06:30  fplanque
+ * doc
+ *
  * Revision 1.10  2009/10/04 16:47:47  blueyed
  * todo
  *

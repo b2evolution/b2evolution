@@ -130,7 +130,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Sitemaps') );
 	$Form->checkbox( 'enable_sitemaps', $edited_Blog->get_setting( 'enable_sitemaps' ),
-						T_( 'Enable sitemaps' ), T_( 'Whether to allow the usage of skins with the "sitemap" type.' ) );
+						T_( 'Enable sitemaps' ), T_( 'Check to allow usage of skins with the "sitemap" type.' ) );
 $Form->end_fieldset();
 
 
@@ -197,6 +197,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.19  2009/10/04 23:06:30  fplanque
+ * doc
+ *
  * Revision 1.18  2009/09/29 16:56:12  tblue246
  * Added setting to disable sitemaps skins
  *

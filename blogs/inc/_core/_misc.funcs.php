@@ -1080,7 +1080,7 @@ function param_validate( $variable, $validator, $required = false, $custom_msg =
 	 */
 	if( ! is_callable( $validator ) )
 	{
-		debug_die( 'Function '.$validator.'() is not callable!' );
+		debug_die( 'Validator function '.$validator.'() is not callable!' );
 	}
 
 	if( ! isset( $GLOBALS[$variable] ) )
@@ -3722,6 +3722,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.174  2009/10/04 23:06:30  fplanque
+ * doc
+ *
  * Revision 1.173  2009/10/04 12:20:21  efy-maxim
  * 1. validate has been renamed to param_validate
  * 2. check recipients list in load_recipients function in Thread class

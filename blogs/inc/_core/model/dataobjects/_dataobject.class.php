@@ -201,9 +201,10 @@ class DataObject
 	/**
 	 * Insert object into DB based on previously recorded changes.
 	 *
-	 * @todo dh> this should handle caches, e.g. if a Chapter gets inserted
-	 *           (via Chapter::dbinsert()), it should add it to $ChapterCache.
-	 *           Have I missed something?
+	 * Note: DataObject does not require a matching *Cache object. 
+	 * Therefore it will not try to update the Cache.
+	 * If something like that was needed, sth like *Cache->add() should be called.
+	 * ATTENTION: Any dbinsert should typically be followed by a 303 redirect. Updating the Cache before redirect is generally not needed.
 	 *
 	 * @return boolean true on success
 	 */
@@ -811,6 +812,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.29  2009/10/04 23:06:30  fplanque
+ * doc
+ *
  * Revision 1.28  2009/10/04 12:23:40  efy-maxim
  * validate has been renamed to param_validate function
  *
