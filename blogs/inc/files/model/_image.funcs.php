@@ -184,11 +184,8 @@ function load_image( $path, $mimetype )
 		$err = '!load_image failed (no valid image?)';
 	}
 	if( $err )
-	{ // Trigger PHP error, but do not display it (otherwise the image containing the error would be broken)
-		// Tblue> Perhaps it would be better to use error_log() here?
-		$old_de = ini_set('display_errors', 0);
-		trigger_error( 'load_image failed: '.substr($err, 1).' ('.$path.' / '.$mimetype.')', E_USER_WARNING );
-		ini_set('display_errors', $old_de);
+	{
+		error_log( 'load_image failed: '.substr($err, 1).' ('.$path.' / '.$mimetype.')', E_USER_WARNING );
 	}
 
 	return array( $err, $imh );
@@ -332,6 +329,9 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.14  2009/10/04 12:32:53  blueyed
+ * Use error_log instead of trigger_error.
+ *
  * Revision 1.13  2009/10/04 11:23:21  tblue246
  * doc
  *
