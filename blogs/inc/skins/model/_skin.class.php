@@ -26,6 +26,10 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
+
+
 /**
  * Skin Class
  *
@@ -610,6 +614,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2009/10/04 18:25:13  blueyed
+ * Add missing load_class call
+ *
  * Revision 1.19  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *
