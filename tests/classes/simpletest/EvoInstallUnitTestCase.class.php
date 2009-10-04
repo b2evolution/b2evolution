@@ -22,11 +22,24 @@ load_funcs('_core/model/db/_upgrade.funcs.php');
 class EvoInstallUnitTestCase extends EvoDbUnitTestCase
 {
 	/**
-	 * Number of basic plugins to test for being installed.
+	 * List of basic plugins to test for being installed, sorted.
 	 *
 	 * @see install_basic_plugins()
 	 */
-	var $nb_of_basic_plugins = 12;
+	var $basic_plugins = array(
+		'archives_plugin',
+		'auto_p_plugin',
+		'autolinks_plugin',
+		'calendar_plugin',
+		'ping_b2evonet_plugin',
+		'ping_pingomatic_plugin',
+		'quicktags_plugin',
+		'smilies_plugin',
+		'texturize_plugin',
+		'tinymce_plugin',
+		'twitter_plugin',
+		'videoplug_plugin',
+	);
 
 
 	/**
@@ -54,6 +67,13 @@ class EvoInstallUnitTestCase extends EvoDbUnitTestCase
 			$this->test_DB->get_var( 'SELECT ptyp_name
 																	FROM T_items__type
 																 ORDER BY ptyp_ID' ), 'Post' );
+
+		// Check if all basic plugins are being installed.
+		$installed_plugins = $this->test_DB->get_col( 'SELECT plug_classname FROM T_plugins ORDER BY plug_classname ASC' );
+		if( ! $this->assertEqual( $installed_plugins, $this->basic_plugins ) )
+		{
+			echo 'Missing plugins: '.implode( ', ', array_diff($installed_plugins, $this->basic_plugins) );
+		}
 
 		parent::tearDown();
 	}

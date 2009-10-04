@@ -48,7 +48,6 @@ class UpgradeToCurrentTestCase extends EvoInstallUnitTestCase
 		global $new_db_version;
 
 		$this->assertEqual( $new_db_version, $this->test_DB->get_var('SELECT set_value FROM T_settings WHERE set_name = "db_version"') );
-		$this->assertEqual( $this->test_DB->get_var( 'SELECT COUNT(*) FROM T_plugins' ), $this->nb_of_basic_plugins );
 
 		// Test that columns are not present anymore:
 		$this->assertEqual(

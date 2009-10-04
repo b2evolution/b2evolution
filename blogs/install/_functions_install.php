@@ -410,7 +410,7 @@ function install_basic_skins()
  * NOTE: this won't call the "AfterInstall" method on the plugin nor install its DB schema.
  *       This get done in the plugins controller, on manually installing a plugin.
  *
- * If you change the number of plugins here, please also adjust {@link InstallUnitTestCase::nb_of_basic_plugins}.
+ * If you change the plugins here, please also adjust {@link InstallUnitTestCase::basic_plugins}.
  * }}
  *
  * @param integer Old DB version, so that only new plugins gets installed
@@ -825,6 +825,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.79  2009/10/04 18:27:34  blueyed
+ * Changed nb_of_basic_plugins to list of plugins (basic_plugins), and tell about differences on failure.
+ *
  * Revision 1.78  2009/10/04 18:05:24  blueyed
  * rename nr_ to nb_
  *
