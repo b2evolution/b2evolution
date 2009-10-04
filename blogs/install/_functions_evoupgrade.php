@@ -2613,6 +2613,10 @@ function upgrade_b2evo_tables()
 	task_end();
 
 
+	db_add_col( 'T_country', 'ctry_enabled', 'tinyint(1) NOT NULL DEFAULT 1 AFTER ctry_curr_ID' );
+	$DB->query( "ALTER TABLE evo_tests_sessions CHANGE COLUMN sess_ipaddress sess_ipaddress VARCHAR(39) NOT NULL DEFAULT ''" );
+
+
 	// Just in case, make sure the db schema version is upto date at the end.
 	if( $old_db_version != $new_db_version )
 	{ // Update DB schema version to $new_db_version
@@ -2737,6 +2741,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.333  2009/10/04 18:26:48  blueyed
+ * Add missing DB transformations, need to get added to blocks.
+ *
  * Revision 1.332  2009/09/29 13:32:30  tblue246
  * OK, no DB changes for 3.3.2, moved to 4.0
  *
