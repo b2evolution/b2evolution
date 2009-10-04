@@ -68,11 +68,17 @@ class EvoInstallUnitTestCase extends EvoDbUnitTestCase
 																	FROM T_items__type
 																 ORDER BY ptyp_ID' ), 'Post' );
 
-		// Check if all basic plugins are being installed.
+		// Check if all basic plugins have been installed.
 		$installed_plugins = $this->test_DB->get_col( 'SELECT plug_classname FROM T_plugins ORDER BY plug_classname ASC' );
-		if( ! $this->assertEqual( $installed_plugins, $this->basic_plugins ) )
+
+		// Make sure it's sorted in the same way.
+		sort($installed_plugins);
+		sort($this->basic_plugins);
+
+		if( ! $this->assertFalse( array_diff($this->basic_plugins, $installed_plugins) ) )
 		{
-			echo 'Missing plugins: '.implode( ', ', array_diff($installed_plugins, $this->basic_plugins) );
+			echo 'Missing plugins: '.implode( ', ', array_diff($this->basic_plugins, $installed_plugins) )."<br />\n";
+			echo 'Installed, but unexpected plugins: '.implode( ', ', array_diff($installed_plugins, $this->basic_plugins) )."<br />\n";
 		}
 
 		parent::tearDown();
