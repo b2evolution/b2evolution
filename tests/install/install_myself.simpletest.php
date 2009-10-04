@@ -41,7 +41,7 @@ class InstallSelfTestCase extends EvoInstallUnitTestCase
 		// NOTE: this is the same as with install action "newdb":
 		install_newdb();
 
-		$this->assertEqual( $this->test_DB->get_var( 'SELECT COUNT(*) FROM T_plugins' ), $this->nr_of_basic_plugins );
+		$this->assertEqual( $this->test_DB->get_var( 'SELECT COUNT(*) FROM T_plugins' ), $this->nb_of_basic_plugins );
 	}
 }
 

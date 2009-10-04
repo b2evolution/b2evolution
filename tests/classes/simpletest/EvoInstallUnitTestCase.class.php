@@ -26,7 +26,7 @@ class EvoInstallUnitTestCase extends EvoDbUnitTestCase
 	 *
 	 * @see install_basic_plugins()
 	 */
-	var $nr_of_basic_plugins = 12;
+	var $nb_of_basic_plugins = 12;
 
 
 	/**
