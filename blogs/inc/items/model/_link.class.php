@@ -39,6 +39,9 @@ class Link extends DataObject
 {
 	var $ltype_ID = 0;
 	var $Item;
+	/**
+	 * @access protected Use {@link get_File()}
+	 */
 	var $File;
 
 
@@ -62,15 +65,33 @@ class Link extends DataObject
 			$ItemCache = & get_ItemCache();
 			$this->Item = & $ItemCache->get_by_ID( $db_row->link_itm_ID );
 
-			$FileCache = & get_FileCache();
-			// fp> do not halt on error. For some reason (ahem bug) a file can disappear and if we fail here then we won't be
-			// able to delete the link
-			$this->File = & $FileCache->get_by_ID( $db_row->link_file_ID, false, false );
+			$this->file_ID = $db_row->link_file_ID;
+
+			// TODO: dh> deprecated, check where it's used, and fix it.
+			$this->File = & $this->get_File();
 		}
 		else
 		{	// New object:
 
 		}
+	}
+
+
+	/**
+	 * Get {@link File} of the link.
+	 *
+	 * @return File
+	 */
+	function & get_File()
+	{
+		if( ! isset($this->File) )
+		{
+			$FileCache = & get_FileCache();
+			// fp> do not halt on error. For some reason (ahem bug) a file can disappear and if we fail here then we won't be
+			// able to delete the link
+			$this->File = & $FileCache->get_by_ID( $this->file_ID, false, false );
+		}
+		return $this->File;
 	}
 
 
@@ -94,6 +115,9 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.8  2009/10/05 23:25:06  blueyed
+ * Add Item:get_File, to lazy-instantiate the link's File object; todo
+ *
  * Revision 1.7  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *
