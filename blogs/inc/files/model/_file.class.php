@@ -623,6 +623,8 @@ class File extends DataObject
 			}
 			else
 			{ // No Access
+				// TODO: dh> why can't this go through the FM, preferably opening in a popup, if the user has access?!
+				//           (see get_view_url)
 				debug_die( 'Private directory! ');
 			}
 		}
@@ -1900,6 +1902,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.61  2009/10/05 23:21:32  blueyed
+ * todo/question
+ *
  * Revision 1.60  2009/09/30 20:04:43  blueyed
  * Add mtime param to results from get_url, too.
  *
