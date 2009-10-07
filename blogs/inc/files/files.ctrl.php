@@ -153,7 +153,7 @@ if( !empty($action) && substr( $fm_mode, 0, 5 ) != 'link_' )
 	$fm_mode = '';
 }
 
-// Abstract data we want to come back:
+// Abstract data we want to pass through:
 param( 'linkctrl', 'string', '', true );
 param( 'linkdata', 'string', '', true );
 
@@ -1070,6 +1070,7 @@ switch( $action )
 		break;
 
 	case 'link_data':
+		// fp> do we need to go through this block + redirect or could the link icons link directly to $linkctrl ?
 
 		// Get the file we want to link:
 		if( !$selected_Filelist->count() )
@@ -1683,6 +1684,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.40  2009/10/07 23:43:25  fplanque
+ * doc
+ *
  * Revision 1.39  2009/09/29 20:17:05  efy-maxim
  * linkctrl & linkdata parameters
  *

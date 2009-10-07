@@ -625,6 +625,7 @@ class File extends DataObject
 			{ // No Access
 				// TODO: dh> why can't this go through the FM, preferably opening in a popup, if the user has access?!
 				//           (see get_view_url)
+				// fp> the FM can do anything as long as this function does not send back an URL to something that is actually private.
 				debug_die( 'Private directory! ');
 			}
 		}
@@ -1902,6 +1903,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.62  2009/10/07 23:43:25  fplanque
+ * doc
+ *
  * Revision 1.61  2009/10/05 23:21:32  blueyed
  * todo/question
  *

@@ -73,7 +73,7 @@ global $Blog, $blog;
 
 global $fm_hide_dirtree, $create_name, $ads_list_path;
 
-// Abstract data we want to come back:
+// Abstract data we want to pass through:
 global $linkctrl, $linkdata;
 
 // Name of the iframe we want some atiosn to come back to:
@@ -645,6 +645,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.27  2009/10/07 23:43:25  fplanque
+ * doc
+ *
  * Revision 1.26  2009/09/29 20:17:06  efy-maxim
  * linkctrl & linkdata parameters
  *

@@ -2614,6 +2614,7 @@ function upgrade_b2evo_tables()
 
 
 	db_add_col( 'T_country', 'ctry_enabled', 'tinyint(1) NOT NULL DEFAULT 1 AFTER ctry_curr_ID' );
+
 	$DB->query( "ALTER TABLE evo_tests_sessions CHANGE COLUMN sess_ipaddress sess_ipaddress VARCHAR(39) NOT NULL DEFAULT ''" );
 
 
@@ -2741,6 +2742,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.334  2009/10/07 23:43:25  fplanque
+ * doc
+ *
  * Revision 1.333  2009/10/04 18:26:48  blueyed
  * Add missing DB transformations, need to get added to blocks.
  *
