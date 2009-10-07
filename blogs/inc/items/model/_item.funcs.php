@@ -574,10 +574,10 @@ function cat_select_header()
 {
 	global $current_blog_ID, $blog, $allow_cross_posting;
 
-	$r = '<thead><tr><th class="selector catsel_main">'.T_('Main').'</th>';
+	$r = '<thead><tr><th class="selector catsel_main" title="'.T_('Main category').'">'.T_('Main').'</th>';
 	if( $allow_cross_posting >= 1 )
 	{ // This is current blog or we allow moving posts accross blogs
-		$r .= '<th class="selector catsel_extra">'.T_('Extra').'</th>';
+		$r .= '<th class="selector catsel_extra" title="'.T_('Additional category').'">'.T_('Extra').'</th>';
 	}
 	$r .= '<th class="catsel_name">'.T_('Category').'</th></tr></thead>';
 	return $r;
@@ -978,6 +978,9 @@ function check_perm_posttype( $post_extracats )
 
 /*
  * $Log$
+ * Revision 1.73  2009/10/07 00:52:00  sam2kb
+ * Titles in cat_select_header()
+ *
  * Revision 1.72  2009/10/01 18:50:12  tblue246
  * convert_charset(): Trying to remove unreliable charset detection and modify all calls accordingly -- needs testing to ensure all charset conversions work as expected.
  *
