@@ -111,6 +111,143 @@ class messaging_Module extends Module
 		load_funcs( 'messaging/model/_messaging.funcs.php' );
 	}
 
+
+	/**
+	 * Get default module permissions
+	 *
+	 * #param integer Group ID
+	 * @return array
+	 */
+	function get_default_group_permissions( $grp_ID )
+	{
+		switch( $grp_ID )
+		{
+			case 1: // Administrators group ID equals 1
+				$permname = 'delete';
+				break;
+			case 2: // Privileged Bloggers group equals 2
+				$permname = 'write';
+				break;
+			case 3: // Bloggers group ID equals 3
+				$permname = 'reply';
+				break;
+			default: // Other groups
+				$permname = 'none';
+				break;
+		}
+
+		// We can return as many default permissions as we want:
+		// e.g. array ( permission_name => permission_value, ... , ... )
+		return $permissions = array( 'perm_messaging' => $permname );
+	}
+
+
+	/**
+	 * Get available group permissions
+	 *
+	 * @return array
+	 */
+	function get_available_group_permissions()
+	{
+		// Create permission options which will be used also to create radio buttons of the group form
+		// e.g. array ( radio_button_value, radio_button_label, radio_button_note )
+		$none_option 	= array( 'none', T_( 'No Access' ), '' );
+		$reply_option 	= array( 'reply', T_( 'Reply to people you have messaged with in the past' ), '' );
+		$write_option 	= array( 'write', T_( 'Create threads, view any thread you\'re involved in & reply' ), '' );
+		$delete_option 	= array( 'delete', T_( 'Create threads, view and delete any thread you\'re involved in & reply' ) );
+
+		// Create permission and set permission options to it.
+		// 'label' is used in the group form as label for radio buttons group
+		// 'user_func' is used to check user permission. This function should be defined in module initializer.
+		// 'group_func' is used to check group permission. This function should be defined in module initializer.
+		// 'available' is permission options
+		$permissions = array( 'perm_messaging' => array(	'label'      => T_('Messaging'),
+															'user_func'  => 'check_messaging_user_perm',
+															'group_func' => 'check_messaging_group_perm',
+															'available'  => array(	$none_option,
+																					$reply_option,
+																					$write_option,
+																					$delete_option  ) ) );
+		// We can return as many default permissions as we want.
+		// In other words, one module can return many pluggable permissions.
+		return $permissions;
+	}
+
+
+	/**
+	 * Check a permission for the user. ( see 'user_func' in get_available_group_permissions() function  )
+	 *
+	 * @param string Requested permission level
+	 * @param string Permission value
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
+	function check_messaging_user_perm( $permlevel, $permvalue, $permtarget )
+	{
+		global $current_User;
+
+		if( $permtarget > 0 )
+		{   // Check user permission for current thread
+			$ThreadCache = & get_ThreadCache();
+			$Thread = & $ThreadCache->get_by_ID( $permtarget, false );
+
+			if( $Thread === false || ! $Thread->check_thread_recipient( $current_User->ID ) )
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Check a permission for the group. ( see 'group_func' in get_available_group_permissions() function )
+	 *
+	 * @param string Requested permission level
+	 * @param string Permission value
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
+	function check_messaging_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		$perm = false;
+		switch ( $permvalue )
+		{
+			case 'delete':
+				// same as write but you can also delete threads you're involved in
+				if( $permlevel == 'delete' )
+				{ // User can ask for delete perm...
+					$perm = true;
+					break;
+				}
+
+			// efy-maxim> This is right location for 'reply' permission, because
+			// efy-maxim> user with 'reply' permission has 'write' permission, but he has not 'delete' permission.
+			// efy-maxim> But user with 'delete' or 'write' permission has no reply repmission.
+			// efy-maxim> Note: 'reply' permission means only restriction of 'write' permission.
+
+			case 'reply':
+				//  reply to people you have messaged with in the past
+				if( $permlevel == 'reply' && $permvalue != 'delete')
+				{
+					$perm = true;
+					break;
+				}
+			// ... or for any lower priority perm... (no break)
+			case 'write':
+				//  you create threads, view any thread you're involved in & reply
+				if( $permlevel == 'write' )
+				{
+					$perm = true;
+					break;
+				}
+		}
+
+		return $perm;
+	}
+
+
 	/**
 	 * Build the evobar menu
 	 */
@@ -124,7 +261,7 @@ class messaging_Module extends Module
 
 		$entries = array();
 
-		if( $current_User->check_perm( 'messaging', 'write' ) )
+		if( $current_User->check_perm( 'perm_messaging', 'write' ) )
 		{
 			$entries['messaging'] = array(
 				'text' => T_('Messages'),
@@ -174,7 +311,7 @@ class messaging_Module extends Module
 		 */
 		global $AdminUI;
 
-		if( $current_User->check_perm( 'messaging', 'write' ) )
+		if( $current_User->check_perm( 'perm_messaging', 'write' ) )
 		{	// Permission to view messaging:
 			$AdminUI->add_menu_entries( NULL, array(
 						'messaging' => array(
@@ -199,6 +336,9 @@ $messaging_Module = & new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.15  2009/10/08 20:05:52  efy-maxim
+ * Modular/Pluggable Permissions
+ *
  * Revision 1.14  2009/09/21 03:14:35  fplanque
  * modularized a little more
  *

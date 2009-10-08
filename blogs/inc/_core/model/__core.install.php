@@ -63,8 +63,16 @@ $schema_queries = array(
 			grp_perm_users enum('none','view','edit') NOT NULL default 'none',
 			grp_perm_templates TINYINT NOT NULL DEFAULT 0,
 			grp_perm_files enum('none','view','add','edit','all') NOT NULL default 'none',
-			grp_perm_messaging enum('none','reply','write','delete') NOT NULL default 'none',
 			PRIMARY KEY grp_ID (grp_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_groupsettings' => array(
+		'Creating table for Group Settings',
+		"CREATE TABLE T_groupsettings (
+			gset_grp_ID INT(11) UNSIGNED NOT NULL,
+			gset_name VARCHAR(30) NOT NULL,
+			gset_value VARCHAR(255) NULL,
+			PRIMARY KEY (gset_grp_ID, gset_name)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_settings' => array(
@@ -266,6 +274,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.42  2009/10/08 20:05:51  efy-maxim
+ * Modular/Pluggable Permissions
+ *
  * Revision 1.41  2009/09/28 20:54:58  efy-khurram
  * Implemented support for enabling disabling countries.
  *

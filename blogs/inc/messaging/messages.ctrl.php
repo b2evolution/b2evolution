@@ -53,7 +53,7 @@ if( param( 'thrd_ID', 'integer', '', true) )
 }
 
 // Check minimum permission:
-$current_User->check_perm( 'messaging', 'write', true, $thrd_ID );
+$current_User->check_perm( 'perm_messaging', 'write', true, $thrd_ID );
 
 if( param( 'msg_ID', 'integer', '', true) )
 {// Load message from cache:
@@ -79,13 +79,13 @@ switch( $action )
 		$edited_Message->thread_ID = $thrd_ID;
 
 		// Check permission:
-		$current_User->check_perm( 'messaging', 'write', true );
+		$current_User->check_perm( 'perm_messaging', 'write', true );
 
 		// Load data from request
 		if( $edited_Message->load_from_Request() )
 		{	// We could load data from form without errors:
 
-			if( $current_User->check_perm( 'messaging', 'reply' ) )
+			if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
 			{
 				$non_blocked_contacts = $edited_Thread->load_contacts();
 				if( empty( $non_blocked_contacts ) )
@@ -111,7 +111,7 @@ switch( $action )
 		// Delete message:
 
 		// Check permission:
-		$current_User->check_perm( 'messaging', 'delete', true );
+		$current_User->check_perm( 'perm_messaging', 'delete', true );
 
 		// Make sure we got an msg_ID:
 		param( 'msg_ID', 'integer', true );
@@ -176,6 +176,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2009/10/08 20:05:52  efy-maxim
+ * Modular/Pluggable Permissions
+ *
  * Revision 1.12  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *

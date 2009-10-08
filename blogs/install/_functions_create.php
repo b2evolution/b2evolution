@@ -100,7 +100,6 @@ function create_default_data()
 	$Group_Admins->set( 'perm_templates', 1 );
 	$Group_Admins->set( 'perm_users', 'edit' );
 	$Group_Admins->set( 'perm_xhtml_css_tweaks', 1 );
-	$Group_Admins->set( 'perm_messaging', 'delete' );
 	$Group_Admins->dbinsert();
 
 	$Group_Privileged = new Group(); // COPY !
@@ -114,7 +113,6 @@ function create_default_data()
 	$Group_Privileged->set( 'perm_templates', 0 );
 	$Group_Privileged->set( 'perm_users', 'view' );
 	$Group_Privileged->set( 'perm_xhtml_css_tweaks', 1 );
-	$Group_Privileged->set( 'perm_messaging', 'write' );
 	$Group_Privileged->dbinsert();
 
 	$Group_Bloggers = new Group(); // COPY !
@@ -128,7 +126,6 @@ function create_default_data()
 	$Group_Bloggers->set( 'perm_templates', 0 );
 	$Group_Bloggers->set( 'perm_users', 'none' );
 	$Group_Bloggers->set( 'perm_xhtml_css_tweaks', 1 );
-	$Group_Bloggers->set( 'perm_messaging', 'reply' );
 	$Group_Bloggers->dbinsert();
 
 	$Group_Users = new Group(); // COPY !
@@ -141,7 +138,6 @@ function create_default_data()
 	$Group_Users->set( 'perm_options', 'none' );
 	$Group_Users->set( 'perm_templates', 0 );
 	$Group_Users->set( 'perm_users', 'none' );
-	$Group_Bloggers->set( 'perm_messaging', 'none' );
 	$Group_Users->dbinsert();
 	echo "OK.<br />\n";
 
@@ -1290,6 +1286,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.279  2009/10/08 20:05:52  efy-maxim
+ * Modular/Pluggable Permissions
+ *
  * Revision 1.278  2009/09/26 12:00:44  tblue246
  * Minor/coding style
  *

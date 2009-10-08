@@ -30,7 +30,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $DB, $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'messaging', 'write', true );
+$current_User->check_perm( 'perm_messaging', 'write', true );
 
 // Set options path:
 $AdminUI->set_path( 'messaging', 'contacts' );
@@ -56,7 +56,7 @@ switch( $action )
 if( isset( $mct_blocked ) )
 {
 	// Check permission:
-	$current_User->check_perm( 'messaging', 'write', true );
+	$current_User->check_perm( 'perm_messaging', 'write', true );
 
 	$sql = 'UPDATE T_messaging__contact
 				SET mct_blocked = '.$mct_blocked.'
@@ -103,6 +103,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2009/10/08 20:05:52  efy-maxim
+ * Modular/Pluggable Permissions
+ *
  * Revision 1.4  2009/09/19 20:31:38  efy-maxim
  * 'Reply' permission : SQL queries to check permission ; Block/Unblock functionality; Error messages on insert thread/message
  *

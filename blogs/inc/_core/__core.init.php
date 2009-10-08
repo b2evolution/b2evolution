@@ -48,6 +48,7 @@ $db_config['aliases'] = array(
 		'T_country'             => $tableprefix.'country',
 		'T_currency'            => $tableprefix.'currency',
 		'T_groups'              => $tableprefix.'groups',
+		'T_groupsettings'       => $tableprefix.'groupsettings',
 		'T_global__cache'       => $tableprefix.'global__cache',
 		'T_locales'             => $tableprefix.'locales',
 		'T_plugins'             => $tableprefix.'plugins',
@@ -729,6 +730,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.35  2009/10/08 20:05:51  efy-maxim
+ * Modular/Pluggable Permissions
+ *
  * Revision 1.34  2009/09/24 21:05:39  fplanque
  * no message
  *

@@ -12,7 +12,7 @@ load_class( 'messaging/model/_message.class.php', 'Message' );
 global $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'messaging', 'write', true );
+$current_User->check_perm( 'perm_messaging', 'write', true );
 
 // Set options path:
 $AdminUI->set_path( 'messaging', 'messages' );
@@ -50,7 +50,7 @@ switch( $action )
 {
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'messaging', 'write', true );
+		$current_User->check_perm( 'perm_messaging', 'write', true );
 
 		if( ! isset($edited_Message) )
 		{	// We don't have a model to use, start with blank object:
@@ -75,7 +75,7 @@ switch( $action )
 		$edited_Message->Thread = & $edited_Thread;
 
 		// Check permission:
-		$current_User->check_perm( 'messaging', 'write', true );
+		$current_User->check_perm( 'perm_messaging', 'write', true );
 
 		param( 'thrd_recipients', 'string' );
 
@@ -83,7 +83,7 @@ switch( $action )
 		if( $edited_Message->load_from_Request() )
 		{	// We could load data from form without errors:
 
-			if( $current_User->check_perm( 'messaging', 'reply' ) )
+			if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
 			{
 				$blocked_contacts = check_blocked_contacts( $edited_Thread->recipients_list );
 				if( !empty( $blocked_contacts ) )
@@ -123,7 +123,7 @@ switch( $action )
 		// Delete thread:
 
 		// Check permission:
-		$current_User->check_perm( 'messaging', 'delete', true );
+		$current_User->check_perm( 'perm_messaging', 'delete', true );
 
 		// Make sure we got an thrd_ID:
 		param( 'thrd_ID', 'integer', true );
@@ -199,6 +199,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2009/10/08 20:05:52  efy-maxim
+ * Modular/Pluggable Permissions
+ *
  * Revision 1.11  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *

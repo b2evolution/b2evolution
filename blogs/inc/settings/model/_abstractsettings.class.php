@@ -703,11 +703,61 @@ class AbstractSettings
 		$this->all_loaded = false;
 	}
 
+
+	/**
+	 * Get a param from Request and save it to Settings, or default to previously saved user setting.
+	 *
+	 * If the setting was not set before (and there's no default given that gets returned), $default gets used.
+	 *
+	 * @param string Request param name
+	 * @param string setting name. Make sure this is unique!
+	 * @param string Force value type to one of:
+	 * - integer
+	 * - float
+	 * - string (strips (HTML-)Tags, trims whitespace)
+	 * - array
+	 * - object
+	 * - null
+	 * - html (does nothing)
+	 * - '' (does nothing)
+	 * - '/^...$/' check regexp pattern match (string)
+	 * - boolean (will force type to boolean, but you can't use 'true' as a default since it has special meaning. There is no real reason to pass booleans on a URL though. Passing 0 and 1 as integers seems to be best practice).
+	 * Value type will be forced only if resulting value (probably from default then) is !== NULL
+	 * @param mixed Default value or TRUE
+	 * @param boolean Do we need to memorize this to regenerate the URL for this page?
+	 * @param boolean Override if variable already set
+	 * @return NULL|mixed NULL, if neither a param was given nor knows about it.
+	 */
+	function param_Request( $param_name, $set_name, $type = '', $default = '', $memorize = false, $override = false ) // we do not force setting it..
+	{
+		$value = param( $param_name, $type, NULL, $memorize, $override, false ); // we pass NULL here, to see if it got set at all
+
+		if( $value !== false )
+		{ // we got a value
+			$this->set( $set_name, $value );
+			$this->dbupdate();
+		}
+		else
+		{ // get the value from user settings
+			$value = $this->get($set_name);
+
+			if( is_null($value) )
+			{ // it's not saved yet and there's not default defined ($_defaults)
+				$value = $default;
+			}
+		}
+
+		set_param( $param_name, $value );
+		return get_param($param_name);
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.6  2009/10/08 20:05:52  efy-maxim
+ * Modular/Pluggable Permissions
+ *
  * Revision 1.5  2009/03/08 23:57:45  fplanque
  * 2009
  *

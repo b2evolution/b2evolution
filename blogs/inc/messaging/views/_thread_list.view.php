@@ -180,7 +180,7 @@ $Results->cols[] = array(
 					);
 
 
-if( $current_User->check_perm( 'messaging', 'delete' ) )
+if( $current_User->check_perm( 'perm_messaging', 'delete' ) )
 {	// We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
@@ -197,6 +197,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.20  2009/10/08 20:05:52  efy-maxim
+ * Modular/Pluggable Permissions
+ *
  * Revision 1.19  2009/10/04 08:26:57  efy-maxim
  * messaging module improvements
  *

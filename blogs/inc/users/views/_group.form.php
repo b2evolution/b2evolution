@@ -151,13 +151,25 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 
 						), T_('Files'), true, T_('This setting will further restrict any media file permissions on specific blogs.') );
 
+// ----------------------------------------
+// Display all of the pluggable permissions
 
-	$Form->radio( 'edited_grp_perm_messaging', $edited_Group->get('perm_messaging'),
-			array(  $perm_none_option,
-							array( 'reply', T_( 'Reply to people you have messaged with in the past' ) ),
-							array( 'write', T_( 'Create threads, view any thread you\'re involved in & reply' ) ),
-							array( 'delete', T_( 'Create threads, view and delete any thread you\'re involved in & reply' ) )
-						), T_('Messaging'), true );
+$GroupSettings = & $edited_Group->get_GroupSettings();
+foreach( $GroupSettings->permission_modules as $perm_name => $module_name )
+{
+	$Module = & $GLOBALS[$module_name.'_Module'];
+	if( method_exists( $Module, 'get_available_group_permissions' ) )
+	{
+		$permissions = $Module->get_available_group_permissions();
+		if( array_key_exists( $perm_name, $permissions ) )
+		{
+			$perm = $permissions[$perm_name];
+			$Form->radio( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], $perm['available'], $perm['label'], true );
+		}
+	}
+}
+// ----------------------------------------
+
 
 $Form->end_fieldset();
 
@@ -205,6 +217,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.17  2009/10/08 20:05:52  efy-maxim
+ * Modular/Pluggable Permissions
+ *
  * Revision 1.16  2009/09/25 20:26:26  fplanque
  * fixes/doc
  *

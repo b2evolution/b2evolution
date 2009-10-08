@@ -2521,34 +2521,6 @@ function upgrade_b2evo_tables()
 		) ENGINE = innodb" );
 		task_end();
 
-		// Add messaging permission column to T_groups table for messaging module
-
-		task_begin( 'Adding messaging permissions for groups... ' );
-		$DB->query( "ALTER TABLE T_groups
-										ADD COLUMN grp_perm_messaging enum('none','reply','write','delete') NOT NULL default 'none' AFTER grp_perm_files" );
-		task_end();
-
-		// Add default messaging permissions for the following groups:
-		// Administrator Group, Privileged Bloggers Group, Bloggers Group
-
-		task_begin( 'Giving Administrator Group delete perms on messaging threads... ' );
-		$DB->query( 'UPDATE T_groups
-		             SET grp_perm_messaging = "delete"
-		             WHERE grp_ID = 1' );
-		task_end();
-
-		task_begin( 'Giving Privileged Bloggers Group write perms on messaging threads and messages... ' );
-		$DB->query( 'UPDATE T_groups
-		             SET grp_perm_messaging = "write"
-		             WHERE grp_ID = 2' );
-		task_end();
-
-		task_begin( 'Giving Bloggers Group write perms on messaging threads and messages... ' );
-		$DB->query( 'UPDATE T_groups
-		             SET grp_perm_messaging = "reply"
-		             WHERE grp_ID = 3' );
-		task_end();
-
 		task_begin( 'Upgrading skins table... ' );
 		$DB->query( "ALTER TABLE T_skins__skin
 						MODIFY skin_type enum('normal','feed','sitemap') NOT NULL default 'normal'" );
@@ -2558,6 +2530,17 @@ function upgrade_b2evo_tables()
 		$DB->query( "UPDATE T_skins__skin
 						SET skin_type = 'sitemap'
 						WHERE skin_folder = '_sitemap'" );
+		task_end();
+
+		// Creating table for pluggable permissions
+
+		task_begin( 'Creating table for Group Settings... ' );
+		$DB->query( "CREATE TABLE T_groupsettings (
+			gset_grp_ID INT(11) UNSIGNED NOT NULL,
+			gset_name VARCHAR(30) NOT NULL,
+			gset_value VARCHAR(255) NULL,
+			PRIMARY KEY (gset_grp_ID, gset_name)
+		) ENGINE = innodb" );
 		task_end();
 
 		//set_upgrade_checkpoint( '9970' );
@@ -2742,6 +2725,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.335  2009/10/08 20:05:52  efy-maxim
+ * Modular/Pluggable Permissions
+ *
  * Revision 1.334  2009/10/07 23:43:25  fplanque
  * doc
  *

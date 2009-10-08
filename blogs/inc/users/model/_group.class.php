@@ -29,6 +29,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
+load_class( 'users/model/_groupsettings.class.php', 'GroupSettings' );
 
 /**
  * User Group
@@ -70,7 +71,14 @@ class Group extends DataObject
 	var $perm_files;
 	var $perm_options;
 	var $perm_users;
-	var $perm_messaging;
+
+	/**
+	 * Pluggable group permissions
+	 *
+	 * @var Instance of GroupSettings class
+	 */
+	var $GroupSettings;
+
 
 	/**
 	 * Constructor
@@ -101,7 +109,6 @@ class Group extends DataObject
 			$this->set( 'perm_files', 'none' );
 			$this->set( 'perm_options', 'none' );
 			$this->set( 'perm_users', 'none' );
-			$this->set( 'perm_messaging', 'none' );
 		}
 		else
 		{
@@ -123,7 +130,6 @@ class Group extends DataObject
 			$this->perm_files                   = $db_row->grp_perm_files;
 			$this->perm_options                 = $db_row->grp_perm_options;
 			$this->perm_users                   = $db_row->grp_perm_users;
-			$this->perm_messaging               = $db_row->grp_perm_messaging;
 		}
 	}
 
@@ -138,53 +144,58 @@ class Group extends DataObject
 		param( 'edited_grp_name', 'string' );
 		param_check_not_empty( 'edited_grp_name', T_('You must provide a group name!') );
 		$this->set_from_Request('name', 'edited_grp_name', true);
-		
+
 		// Edited Group Permission Blogs
 		param( 'edited_grp_perm_blogs', 'string', true );
 		$this->set_from_Request( 'perm_blogs', 'edited_grp_perm_blogs', true );
-		
+
 		// Apply Antispam
 		$this->set( 'perm_bypass_antispam', param( 'apply_antispam', 'integer', 0 ) ? 0 : 1 );
 
 		// XHTML Validation
 		$this->set( 'perm_xhtmlvalidation', param( 'perm_xhtmlvalidation', 'string', true ) );
-		
+
 		// XHTML Validation XMLRPC
 		$this->set( 'perm_xhtmlvalidation_xmlrpc', param( 'perm_xhtmlvalidation_xmlrpc', 'string', true ) );
-		
+
 		// CSS Tweaks
 		$this->set( 'perm_xhtml_css_tweaks', param( 'prevent_css_tweaks', 'integer', 0 ) ? 0 : 1 );
-		
+
 		// Iframes
 		$this->set( 'perm_xhtml_iframes', param( 'prevent_iframes', 'integer', 0 ) ? 0 : 1 );
-		
+
 		// Javascript
 		$this->set( 'perm_xhtml_javascript', param( 'prevent_javascript', 'integer', 0 ) ? 0 : 1 );
-		
+
 		// Objects
 		$this->set( 'perm_xhtml_objects', param( 'prevent_objects', 'integer', 0 ) ? 0 : 1 );
-		
+
 		// Spam blacklist
 		$this->set( 'perm_spamblacklist', param( 'edited_grp_perm_spamblacklist', 'string', true ) );
-		
+
 		// Templates
 		$this->set( 'perm_templates', param( 'edited_grp_perm_templates', 'integer', 0 ) );
-		
+
 		// Stats
 		$this->set( 'perm_stats', param( 'edited_grp_perm_stats', 'string', true ) );
-		
+
 		// Options
 		$this->set( 'perm_options', param( 'edited_grp_perm_options', 'string', true ) );
-		
+
 		// Files
 		$this->set( 'perm_files', param( 'edited_grp_perm_files', 'string', true ) );
-		
-		// Messaging
-		$this->set( 'perm_messaging', param( 'edited_grp_perm_messaging', 'string', true ) );
-		
+
+		// Load pluggable group permissions from request
+		$GroupSettings = & $this->get_GroupSettings();
+		foreach( $GroupSettings->permission_values as $name => $value )
+		{
+			$value = param( 'edited_grp_'.$name, 'string', true );
+			$GroupSettings->set( $name, $value, $this->ID );
+		}
+
 		return !param_errors_detected();
 	}
-	
+
 
 	/**
 	 * Set param value
@@ -204,6 +215,22 @@ class Group extends DataObject
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
+	}
+
+
+	/**
+	 * Get the {@link GroupSettings} of the group.
+	 *
+	 * @return GroupSettings (by reference)
+	 */
+	function & get_GroupSettings()
+	{
+		if( ! isset( $this->GroupSettings ) )
+		{
+			$this->GroupSettings = & new GroupSettings();
+			$this->GroupSettings->load( $this->ID );
+		}
+		return $this->GroupSettings;
 	}
 
 
@@ -382,33 +409,15 @@ class Group extends DataObject
 				}
 				break;
 
-			case 'messaging':
-				switch( $permvalue ) // permvalue is what the group allows
-				{
-					case 'delete':
-						// same as write but you can also delete threads you're involved in
-						if( $permlevel == 'delete' )  // permlevel is what is requested
-						{ // User can ask for delete perm...
-							$perm = true;
-							break;
-						}
-						// ... or for any lower priority perm... (no break)
-					case 'write':
-						//  you create threads, view any thread you're involved in & reply
-						if( $permlevel == 'write' )
-						{
-							$perm = true;
-							break;
-						}
-						// ... or for any lower priority perm... (no break)
-					case 'reply':
-						//  reply to people you have messaged with in the past
-						if( $permlevel == 'reply')
-						{
-							$perm = true;
-							break;
-						}
+			default:
+
+				// Check pluggable permissions using group permission check function
+				$perm = module_check_perm( $permname, $permlevel, $perm_target, 'group_func' );
+				if( $perm === NULL )
+				{	// Even if group permisson check function doesn't exist we should return false value
+					$perm = false;
 				}
+
 				break;
 		}
 
@@ -616,10 +625,70 @@ class Group extends DataObject
 		return $this->name;
 	}
 
+
+	/**
+	 * Insert object into DB based on previously recorded changes.
+	 */
+	function dbinsert()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		parent::dbinsert();
+
+		// Create group permissions/settings for the current group
+		$GroupSettings = & $this->get_GroupSettings();
+		$GroupSettings->dbupdate( $this->ID );
+
+		$DB->commit();
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 */
+	function dbupdate()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		parent::dbupdate();
+
+		// Update group permissions/settings of the current group
+		$GroupSettings = & $this->get_GroupSettings();
+		$GroupSettings->dbupdate( $this->ID );
+
+		$DB->commit();
+	}
+
+
+	/**
+	 * Delete object from DB.
+	 */
+	function dbdelete( $Messages = NULL )
+	{
+		global $DB;
+
+		$DB->begin();
+
+		// Delete group permissions of the current group
+		$GroupSettings = & $this->get_GroupSettings();
+		$GroupSettings->delete( $this->ID );
+		$GroupSettings->dbupdate( $this->ID );
+
+		parent::dbdelete( $Messages );
+
+		$DB->commit();
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.26  2009/10/08 20:05:52  efy-maxim
+ * Modular/Pluggable Permissions
+ *
  * Revision 1.25  2009/09/25 14:18:22  tblue246
  * Reverting accidental commits
  *

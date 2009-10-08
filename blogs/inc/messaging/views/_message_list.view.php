@@ -227,7 +227,7 @@ $Results->cols[] = array(
 					'td' => '%get_read_by( #msg_ID# )%',
 					);
 
-if( $current_User->check_perm( 'messaging', 'delete' ) )
+if( $current_User->check_perm( 'perm_messaging', 'delete' ) )
 {
 	// We have permission to modify:
 
@@ -258,6 +258,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.21  2009/10/08 20:05:52  efy-maxim
+ * Modular/Pluggable Permissions
+ *
  * Revision 1.20  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *
