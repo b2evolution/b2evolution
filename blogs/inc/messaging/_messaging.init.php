@@ -168,7 +168,7 @@ class messaging_Module extends Module
 																					$reply_option,
 																					$write_option,
 																					$delete_option  ) ) );
-		// We can return as many default permissions as we want.
+		// We can return as many permissions as we want.
 		// In other words, one module can return many pluggable permissions.
 		return $permissions;
 	}
@@ -221,12 +221,10 @@ class messaging_Module extends Module
 					$perm = true;
 					break;
 				}
-
 			// efy-maxim> This is right location for 'reply' permission, because
 			// efy-maxim> user with 'reply' permission has 'write' permission, but he has not 'delete' permission.
 			// efy-maxim> But user with 'delete' or 'write' permission has no reply repmission.
 			// efy-maxim> Note: 'reply' permission means only restriction of 'write' permission.
-
 			case 'reply':
 				//  reply to people you have messaged with in the past
 				if( $permlevel == 'reply' && $permvalue != 'delete')
@@ -336,6 +334,9 @@ $messaging_Module = & new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.16  2009/10/09 05:27:55  efy-maxim
+ * pluggable permission - fix comment
+ *
  * Revision 1.15  2009/10/08 20:05:52  efy-maxim
  * Modular/Pluggable Permissions
  *
