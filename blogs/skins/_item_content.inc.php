@@ -54,6 +54,7 @@ $params = array_merge( array(
 		'after_file_size'     => '</span>',
 	), $params );
 
+global $more;
 
 // Determine content mode to use..
 if( $Item->is_intro() )
@@ -139,7 +140,7 @@ switch( $content_mode )
 				'allow_multiple_counts_per_page' => false,
 			) );
 
-		if( !empty($params['image_size']) )
+		if( ! empty($params['image_size']) && ! $Item->has_content_parts($params) )
 		{
 			// Display images that are linked to this post:
 			$Item->images( array(
@@ -178,6 +179,19 @@ switch( $content_mode )
 						'after'       => $params['after_more_link'],
 						'link_text'   => $params['more_link_text'],
 					) );
+				if( ! empty($params['image_size']) && $more && $Item->has_content_parts($params) )
+				{
+					// Display images that are linked to this post:
+					$Item->images( array(
+							'before' =>              $params['before_images'],
+							'before_image' =>        $params['before_image'],
+							'before_image_legend' => $params['before_image_legend'],
+							'after_image_legend' =>  $params['after_image_legend'],
+							'after_image' =>         $params['after_image_legend'],
+							'after' =>               $params['after_images'],
+							'image_size' =>          $params['image_size'],
+						) );
+				}
 				$Item->content_extension( array(
 						'before'      => '',
 						'after'       => '',
@@ -198,7 +212,8 @@ switch( $content_mode )
 		<?php
 
 
-		if( !empty($params['limit_files']) )
+		if( ! empty($params['limit_files'])
+			&& ( $more || ! $Item->has_content_parts($params) ) )
 		{	// Display attachments/files that are linked to this post:
 			$Item->files( array(
 					'before' =>              $params['file_list_start'],
@@ -216,6 +231,16 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.20  2009/10/10 20:10:34  blueyed
+ * Some refactoring in Item class.
+ * Add get_content_parts, has_content_parts and hidden_teaser.
+ * Apart from making the code more readable, this allows for more
+ * abstraction in the future, e.g. not storing this in the posts itself.
+ *
+ * This takes us to the "do not display linked files with teaser" feature:
+ * Attached images and files are not displayed with teasers anymore, but
+ * only with the full post.
+ *
  * Revision 1.19  2009/09/28 23:58:16  blueyed
  * whitespace
  *

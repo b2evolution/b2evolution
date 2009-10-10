@@ -993,11 +993,17 @@ class Item extends ItemLight
 	/**
 	 * Get a specific page to display (from the prerendered cache)
 	 *
-	 * @param integer Page number
+	 * @param integer Page number, NULL/"#" for current
 	 * @param string Format, used to retrieve the matching cache; see {@link format_to_output()}
 	 */
-	function get_content_page( $page, $format = 'htmlbody' )
+	function get_content_page( $page = NULL, $format = 'htmlbody' )
 	{
+		// Get requested content page:
+		if( ! isset($page) || $page === '#' )
+		{ // We want to display the page requested by the user:
+			$page = $GLOBALS['page'];
+		}
+
 		// Make sure, the pages are split up:
 		$this->split_pages( $format );
 
@@ -1078,25 +1084,14 @@ class Item extends ItemLight
 		global $Plugins, $preview, $Debuglog;
 		global $more;
 
-		// Get requested content page:
-		if( $disppage === '#' )
-		{ // We want to display the page requested by the user:
-			global $page;
-			$disppage = $page;
-		}
+		$params = array('disppage' => $disppage, 'format' => $format);
 
-		$content_page = $this->get_content_page( $disppage, $format ); // cannot include format_to_output() because of the magic below.. eg '<!--more-->' will get stripped in "xml"
-		// pre_dump($content_page);
-
-		$content_parts = explode( '<!--more-->', $content_page );
-		// echo ' Parts:'.count($content_parts);
-
-		if( count($content_parts) > 1 )
+		if( $this->has_content_parts($params) )
 		{ // This is an extended post (has a more section):
 			if( $stripteaser === '#' )
 			{
 				// If we're in "more" mode and we want to strip the teaser, we'll strip:
-				$stripteaser = ( $more && preg_match('/<!--noteaser-->/', $content_page ) );
+				$stripteaser = ( $more && $this->hidden_teaser($params) );
 			}
 
 			if( $stripteaser )
@@ -1105,7 +1100,7 @@ class Item extends ItemLight
 			}
 		}
 
-		$output = $content_parts[0];
+		$output = array_shift( $this->get_content_parts($params) );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -1118,6 +1113,29 @@ class Item extends ItemLight
 		$output = format_to_output( $output, $format );
 
 		return $output;
+	}
+
+
+	/**
+	 * Get content parts (split by "<!--more-->").
+	 * @param array 'disppage', 'format'
+	 * @return array Array of content parts
+	 */
+	function get_content_parts($params)
+	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'disppage'    => '#',
+				'format'      => 'htmlbody',
+			), $params );
+
+		$content_page = $this->get_content_page( $params['disppage'], $params['format'] ); // cannot include format_to_output() because of the magic below.. eg '<!--more-->' will get stripped in "xml"
+		// pre_dump($content_page);
+
+		$content_parts = explode( '<!--more-->', $content_page );
+		// echo ' Parts:'.count($content_parts);
+
+		return $content_parts;
 	}
 
 
@@ -1178,23 +1196,13 @@ class Item extends ItemLight
 			return NULL;
 		}
 
-		// Get requested content page:
-		if( $disppage === '#' )
-		{ // We want to display the page requested by the user:
-			global $page;
-			$disppage = $page;
-		}
-
-		$content_page = $this->get_content_page( $disppage, $format ); // cannot include format_to_output() because of the magic below.. eg '<!--more-->' will get stripped in "xml"
-		// pre_dump($content_page);
-
-		$content_parts = explode( '<!--more-->', $content_page );
-		// echo ' Parts:'.count($content_parts);
-
-		if( count($content_parts) < 2 )
+		$params = array('disppage' => $disppage, 'format' => $format);
+		if( ! $this->has_content_parts($params) )
 		{ // This is NOT an extended post
 			return NULL;
 		}
+
+		$content_parts = $this->get_content_parts($params);
 
 		// Output everything after <!-- more -->
 		array_shift($content_parts);
@@ -1332,23 +1340,12 @@ class Item extends ItemLight
 
 		global $more;
 
-		// Get requested content page:
-		if( $params['disppage'] === '#' )
-		{ // We want to display the page requested by the user:
-			global $page;
-			$params['disppage'] = $page;
-		}
-
-		$content_page = $this->get_content_page( $params['disppage'], $params['format'] ); // cannot include format_to_output() because of the magic below.. eg '<!--more-->' will get stripped in "xml"
-		// pre_dump($content_page);
-
-		$content_parts = explode( '<!--more-->', $content_page );
-		// echo ' Parts:'.count($content_parts);
-
-		if( count($content_parts) < 2 )
+		if( ! $this->has_content_parts($params) )
 		{ // This is NOT an extended post:
 			return '';
 		}
+
+		$content_parts = $this->get_content_parts($params);
 
 		if( ! $more && ! $params['force_more'] )
 		{	// We're NOT in "more" mode:
@@ -1362,7 +1359,7 @@ class Item extends ItemLight
 						.$params['link_text'].'</a>'
 						.$params['after'], $params['format'] );
 		}
-		elseif( ! preg_match('/<!--noteaser-->/', $content_page ) )
+		elseif( ! $this->hidden_teaser($params) )
 		{	// We are in mode mode and we're not hiding the teaser:
 			// (if we're higin the teaser we display this as a normal page ie: no anchor)
 			if( $params['anchor_text'] == '#' )
@@ -1373,6 +1370,38 @@ class Item extends ItemLight
 			return format_to_output( '<a id="more'.$this->ID.'" name="more'.$this->ID.'"></a>'
 							.$params['anchor_text'], $params['format'] );
 		}
+	}
+
+
+	/**
+	 * Does the post have different content parts (teaser/extension, devided by "<!--more-->")?
+	 * @access public
+	 * @return boolean
+	 */
+	function has_content_parts($params)
+	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'disppage'    => '#',
+				'format'      => 'htmlbody',
+			), $params );
+
+		$content_page = $this->get_content_page($params);
+
+		return strpos($content_page, '<!--more-->') !== false;
+	}
+
+
+	/**
+	 * Should the teaser get hidden when displaying full post ($more).
+	 * @access protected
+	 * @return boolean
+	 */
+	function hidden_teaser($params)
+	{
+		$content_page = $this->get_content_page($params);
+
+		return strpos($content_page, '<!--noteaser-->') !== false;
 	}
 
 
@@ -3970,6 +3999,16 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.147  2009/10/10 20:10:34  blueyed
+ * Some refactoring in Item class.
+ * Add get_content_parts, has_content_parts and hidden_teaser.
+ * Apart from making the code more readable, this allows for more
+ * abstraction in the future, e.g. not storing this in the posts itself.
+ *
+ * This takes us to the "do not display linked files with teaser" feature:
+ * Attached images and files are not displayed with teasers anymore, but
+ * only with the full post.
+ *
  * Revision 1.146  2009/10/07 23:43:25  fplanque
  * doc
  *
