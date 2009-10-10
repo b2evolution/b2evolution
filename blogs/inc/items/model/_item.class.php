@@ -1001,7 +1001,7 @@ class Item extends ItemLight
 		// Get requested content page:
 		if( ! isset($page) || $page === '#' )
 		{ // We want to display the page requested by the user:
-			$page = $GLOBALS['page'];
+			$page = isset($GLOBALS['page']) ? $GLOBALS['page'] : 1;
 		}
 
 		// Make sure, the pages are split up:
@@ -3999,6 +3999,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.149  2009/10/10 21:22:46  blueyed
+ * Default to page=1. Must have been the case before, too. Notice triggered in admin item list.
+ *
  * Revision 1.148  2009/10/10 20:27:09  blueyed
  * Item: fix params to get_content_page
  *
