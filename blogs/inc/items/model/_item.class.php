@@ -1386,7 +1386,7 @@ class Item extends ItemLight
 				'format'      => 'htmlbody',
 			), $params );
 
-		$content_page = $this->get_content_page($params);
+		$content_page = $this->get_content_page($params['disppage'], $params['format']);
 
 		return strpos($content_page, '<!--more-->') !== false;
 	}
@@ -1399,7 +1399,7 @@ class Item extends ItemLight
 	 */
 	function hidden_teaser($params)
 	{
-		$content_page = $this->get_content_page($params);
+		$content_page = $this->get_content_page($params['disppage'], $params['format']);
 
 		return strpos($content_page, '<!--noteaser-->') !== false;
 	}
@@ -3999,6 +3999,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.148  2009/10/10 20:27:09  blueyed
+ * Item: fix params to get_content_page
+ *
  * Revision 1.147  2009/10/10 20:10:34  blueyed
  * Some refactoring in Item class.
  * Add get_content_parts, has_content_parts and hidden_teaser.
