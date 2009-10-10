@@ -141,6 +141,14 @@ if( $resolve_extra_path )
 		$path_elements = preg_split( '~/~', $path_string, 20, PREG_SPLIT_NO_EMPTY );
 		// pre_dump( '',$path_elements );
 
+		/* Tblue> This breaks proper error handling for non-existent php
+		 *        files (returns HTTP 301 instead of 404) because the last
+		 *        part of the URI is being removed and b2evo then redirects
+		 *        to the canonical blog homepage URL.
+		 *        Why is this done here? Blog base URLs ending with *.php
+		 *        will be removed above and blog stub names will be removed
+		 *        below anyway?!
+		 */
 		if( isset( $path_elements[0] ) && preg_match( '#.*\.php[0-9]?$#', $path_elements[0] ) )
 		{ // Ignore element ending with .php (fp: note: may be just '.php')
 			array_shift( $path_elements );
@@ -607,6 +615,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.150  2009/10/10 21:12:12  tblue246
+ * Doc
+ *
  * Revision 1.149  2009/09/29 16:56:07  tblue246
  * Added setting to disable sitemaps skins
  *
