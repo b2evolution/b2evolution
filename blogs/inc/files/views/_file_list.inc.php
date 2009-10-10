@@ -287,6 +287,9 @@ $Form->begin_form();
 					echo ' ';
 				}
 
+
+				// TODO: dh> there might be two "Link this file!" icons.. very confusing! Improve titles at least..
+				//       (one from below and the one above ^^)
 				if( isset($edited_User) ) // fp> Perm already checked in controller
 				{	// Offer option to link the file to an Item (or anything else):
 					echo action_icon( T_('Link this file!'), 'link',
@@ -294,7 +297,7 @@ $Form->begin_form();
 								NULL, NULL, NULL, array() );
 					echo ' ';
 				}
-				elseif( !$lFile->is_dir() && isset( $linkctrl ) && isset( $linkdata ) )
+				elseif( !$lFile->is_dir() && ! empty( $linkctrl ) && ! empty( $linkdata ) )
 				{
 					echo action_icon( T_('Link this file!'), 'link',
 								regenerate_url( 'fm_selected', 'action=link_data&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ),
@@ -645,6 +648,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.28  2009/10/10 21:08:18  blueyed
+ * linkctrl might be set, but empty.
+ *
  * Revision 1.27  2009/10/07 23:43:25  fplanque
  * doc
  *
