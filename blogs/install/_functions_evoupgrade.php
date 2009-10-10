@@ -2658,6 +2658,10 @@ function upgrade_b2evo_tables()
 			}
 		}
 	}
+	if( $debug )
+	{
+		echo '<br />';
+	}
 
 	if( empty($upgrade_db_deltas) )
 	{	// no upgrades needed:
@@ -2725,6 +2729,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.337  2009/10/10 20:17:33  tblue246
+ * Minor debug output layout fix
+ *
  * Revision 1.336  2009/10/10 16:34:44  blueyed
  * Fix table alias
  *
