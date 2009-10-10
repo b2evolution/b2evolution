@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 3\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2009-09-30 20:51+0200\n"
-"PO-Revision-Date: 2009-10-04 16:47-0500\n"
+"PO-Revision-Date: 2009-10-09 20:00-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -12524,9 +12524,8 @@ msgid "Private Message"
 msgstr "Личное сообщение"
 
 #: ../../../inc/users/views/_user_list.view.php:242
-#, fuzzy
 msgid "PM"
-msgstr "pm"
+msgstr "ЛС"
 
 #: ../../../inc/users/views/_user_list.view.php:284
 msgid "Decrease user level"
