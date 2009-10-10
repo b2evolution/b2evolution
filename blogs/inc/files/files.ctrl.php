@@ -196,7 +196,7 @@ elseif( !empty($edited_User) )
 }
 elseif( !empty($edited_Item) )
 {	// We have a post, check if it already has a linked file in a particular root, in which case we want to use that root!
-	// This is useful when whlicking "attach files" from teh post edit screen: it takes you to the root where you have
+	// This is useful when clicking "attach files" from the post edit screen: it takes you to the root where you have
 	// already attached files from. Otherwise the next block below will default to the Blog's fileroot.
 	// Get list of attached files:
 	$FileList = $edited_Item->get_attachment_FileList( 1 );
@@ -1684,6 +1684,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.41  2009/10/10 23:33:17  blueyed
+ * typos
+ *
  * Revision 1.40  2009/10/07 23:43:25  fplanque
  * doc
  *
