@@ -191,7 +191,7 @@ $Form->begin_fieldset( T_('Identity') );
 		$Form->select( 'edited_user_idmode', $edited_User->get( 'idmode' ), array( &$edited_User, 'callback_optionsForIdMode' ), T_('Identity shown') );
 
 		$CountryCache = & get_CountryCache();
-		$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, 'Country', $field_params = array('required'=>true) );
+		$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, 'Country', array('required'=>true) );
 
 		$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
 		$Form->checkbox( 'edited_user_set_login_multiple_sessions', $UserSettings->get('login_multiple_sessions', $edited_User->ID), T_('Multiple sessions'),
@@ -514,6 +514,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.24  2009/10/10 21:43:09  tblue246
+ * cleanup
+ *
  * Revision 1.23  2009/10/10 21:34:44  tblue246
  * Bugfix: Do not "allow_none" for country selection on user form.
  *

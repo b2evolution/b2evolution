@@ -71,7 +71,7 @@ $Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20
 	if( $registration_require_country )
 	{
 		$CountryCache = & get_CountryCache();
-		$Form->select_input_object( 'country', $country, $CountryCache, 'Country', $field_params = array('allow_none'=>true, 'required'=>true) );
+		$Form->select_input_object( 'country', $country, $CountryCache, 'Country', array('allow_none'=>true, 'required'=>true) );
 	}
 		
 	$Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Preferred language') );
@@ -93,6 +93,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.11  2009/10/10 21:43:09  tblue246
+ * cleanup
+ *
  * Revision 1.10  2009/09/26 12:00:44  tblue246
  * Minor/coding style
  *
