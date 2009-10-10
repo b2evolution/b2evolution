@@ -2598,7 +2598,7 @@ function upgrade_b2evo_tables()
 
 	db_add_col( 'T_country', 'ctry_enabled', 'tinyint(1) NOT NULL DEFAULT 1 AFTER ctry_curr_ID' );
 
-	$DB->query( "ALTER TABLE evo_tests_sessions CHANGE COLUMN sess_ipaddress sess_ipaddress VARCHAR(39) NOT NULL DEFAULT ''" );
+	$DB->query( "ALTER TABLE T_sessions CHANGE COLUMN sess_ipaddress sess_ipaddress VARCHAR(39) NOT NULL DEFAULT ''" );
 
 
 	// Just in case, make sure the db schema version is upto date at the end.
@@ -2725,6 +2725,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.336  2009/10/10 16:34:44  blueyed
+ * Fix table alias
+ *
  * Revision 1.335  2009/10/08 20:05:52  efy-maxim
  * Modular/Pluggable Permissions
  *
