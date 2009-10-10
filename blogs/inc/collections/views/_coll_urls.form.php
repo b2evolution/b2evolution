@@ -133,6 +133,15 @@ $Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']'.get_manual_link('blog
 
 
 		$Form->radio( 'blog_access_type', $edited_Blog->get( 'access_type' ), array(
+			/* TODO: Tblue> This option only should be available if the
+			 *              current blog is set as the default blog, otherwise
+			 *              this setting is confusing. Another possible
+			 *              solution would be to change the default blog
+			 *              setting if this blog-specific setting is changed,
+			 *              but then we would be have the same setting in
+			 *              two places... I would be in favor of the first
+			 *              solution.
+			 */
 			array( 'default', T_('Default blog in index.php'),
 											$baseurl.'index.php ('.( !isset($defblog)
 												?	/* TRANS: NO current default blog */ T_('No default blog is currently set')
@@ -320,6 +329,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.25  2009/10/10 21:53:12  tblue246
+ * TODO
+ *
  * Revision 1.24  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *
