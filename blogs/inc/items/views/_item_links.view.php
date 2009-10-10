@@ -45,7 +45,7 @@ global $AdminUI;
 global $debug;
 $debug = 0;
 
-// Name of teh iframe we want some atiosn to come back to:
+// Name of the iframe we want some actions to come back to:
 param( 'iframe_name', 'string', '', true );
 
 $SQL = & new SQL();
@@ -173,8 +173,12 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 
 $Results->display( $AdminUI->get_template( 'compact_results' ) );
 
+
 /*
  * $Log$
+ * Revision 1.9  2009/10/10 16:21:05  blueyed
+ * typos
+ *
  * Revision 1.8  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.
