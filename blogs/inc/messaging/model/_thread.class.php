@@ -292,6 +292,19 @@ class Thread extends DataObject
 
 
 	/**
+	 * Check permission on a persona
+	 *
+	 * @return boolean true if granted
+	 */
+	function check_perm( $action, $assert = true )
+	{
+		global $current_User;
+
+		return $current_User->check_perm( 'perm_messaging', $action, $assert );
+	}
+
+
+	/**
 	 * Check if user is recipient of the current thread
 	 *
 	 * @param user ID
@@ -306,6 +319,9 @@ class Thread extends DataObject
 
 /*
  * $Log$
+ * Revision 1.18  2009/10/10 10:45:43  efy-maxim
+ * messaging module - @action_icon()@
+ *
  * Revision 1.17  2009/10/04 12:20:22  efy-maxim
  * 1. validate has been renamed to param_validate
  * 2. check recipients list in load_recipients function in Thread class

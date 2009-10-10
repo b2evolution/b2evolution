@@ -108,7 +108,8 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 
 $select_SQL = & new SQL();
 
-$select_SQL->SELECT( 'mm.msg_ID, mm.msg_datetime, u.user_ID AS msg_user_ID, u.user_login AS msg_author,
+$select_SQL->SELECT( 'mm.msg_ID, mm.msg_author_user_ID, mm.msg_thread_ID, mm.msg_datetime,
+						u.user_ID AS msg_user_ID, u.user_login AS msg_author,
 						u.user_firstname AS msg_firstname, u.user_lastname AS msg_lastname,
 						u.user_avatar_file_ID AS msg_user_avatar_ID, mm.msg_text' );
 
@@ -130,6 +131,8 @@ $count_SQL->WHERE( 'msg_thread_ID = '.$edited_Thread->ID );
 // Create result set:
 
 $Results = & new Results( $select_SQL->get(), 'msg_', '', 0, $count_SQL->get() );
+
+$Results->Cache = & get_MessageCache();
 
 $Results->title = $edited_Thread->title;
 
@@ -236,9 +239,7 @@ if( $current_User->check_perm( 'perm_messaging', 'delete' ) )
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
 							// Do not display the icon if the message cannot be deleted
-							'td' => $Results->total_rows == 1 ? '' :
-										action_icon( T_('Delete this message!'), 'delete',
-											'%regenerate_url( \'action\', \'msg_ID=$msg_ID$&amp;action=delete\')%' ),
+							'td' => $Results->total_rows == 1 ? '' : '@action_icon("delete")@',
 						);
 }
 
@@ -258,6 +259,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.22  2009/10/10 10:45:44  efy-maxim
+ * messaging module - @action_icon()@
+ *
  * Revision 1.21  2009/10/08 20:05:52  efy-maxim
  * Modular/Pluggable Permissions
  *

@@ -186,8 +186,7 @@ if( $current_User->check_perm( 'perm_messaging', 'delete' ) )
 							'th' => T_('Actions'),
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
-							'td' => action_icon( T_('Delete this thread!'), 'delete',
-	                        '%regenerate_url( \'action\', \'thrd_ID=$thrd_ID$&amp;action=delete\')%' ),
+							'td' => '@action_icon("delete")@',
 						);
 }
 
@@ -197,6 +196,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.21  2009/10/10 10:45:44  efy-maxim
+ * messaging module - @action_icon()@
+ *
  * Revision 1.20  2009/10/08 20:05:52  efy-maxim
  * Modular/Pluggable Permissions
  *

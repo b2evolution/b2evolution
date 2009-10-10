@@ -393,6 +393,19 @@ class Message extends DataObject
 
 
 	/**
+	 * Check permission on a persona
+	 *
+	 * @return boolean true if granted
+	 */
+	function check_perm( $action, $assert = true )
+	{
+		global $current_User;
+
+		return $current_User->check_perm( 'perm_messaging', $action, $assert );
+	}
+
+
+	/**
 	 * Send email notification to recipients on new thread or new message event.
 	 *
 	 * @param boolean true if new thread, false if new message in the current thread
@@ -465,6 +478,9 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.23  2009/10/10 10:45:43  efy-maxim
+ * messaging module - @action_icon()@
+ *
  * Revision 1.22  2009/10/02 15:23:44  efy-maxim
  * messaging module improvements
  *
