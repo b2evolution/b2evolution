@@ -48,14 +48,46 @@ $select_SQL->WHERE( 'mc.mct_from_user_ID = '.$current_User->ID );
 $count_SQL = & new SQL();
 
 $count_SQL->SELECT( 'COUNT(*)' );
-$count_SQL->FROM( 'T_messaging__contact' );
-$count_SQL->WHERE( 'mct_from_user_ID = '.$current_User->ID );
+
+// Get params from request
+$s = param( 's', 'string', '', true );
+
+if( !empty( $s ) )
+{
+	$select_SQL->WHERE_and( 'CONCAT_WS( " ", u.user_login, u.user_firstname, u.user_lastname, u.user_nickname ) LIKE "%'.$DB->escape($s).'%"' );
+
+	$count_SQL->FROM( 'T_messaging__contact mc LEFT OUTER JOIN T_users u ON mc.mct_to_user_ID = u.user_ID' );
+	$count_SQL->WHERE( 'mct_from_user_ID = '.$current_User->ID );
+	$count_SQL->WHERE_and( 'CONCAT_WS( " ", u.user_login, u.user_firstname, u.user_lastname, u.user_nickname ) LIKE "%'.$DB->escape($s).'%"' );
+}
+else
+{
+	$count_SQL->FROM( 'T_messaging__contact' );
+	$count_SQL->WHERE( 'mct_from_user_ID = '.$current_User->ID );
+}
 
 // Create result set:
 
 $Results = & new Results( $select_SQL->get(), 'mct_', '', NULL, $count_SQL->get() );
 
 $Results->title = T_('Contacts list');
+
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_contacts( & $Form )
+{
+	$Form->text( 's', get_param('s'), 30, T_('Search'), '', 255 );
+}
+
+$Results->filter_area = array(
+	'callback' => 'filter_contacts',
+	'presets' => array(
+		'all' => array( T_('All'), '?ctrl=contacts' ),
+		)
+	);
 
 /**
  * Get user avatar
@@ -188,6 +220,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2009/10/11 12:26:07  efy-maxim
+ * filter by user login, full name, nick name in contacts list
+ *
  * Revision 1.5  2009/10/02 15:07:27  efy-maxim
  * messaging module improvements
  *
