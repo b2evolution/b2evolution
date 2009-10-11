@@ -860,7 +860,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 			}
 			else
 			{ // implicit default, see http://dev.mysql.com/doc/refman/4.1/en/data-type-defaults.html
-				if( preg_match( '~^(TINYINT|SMALLINT|MEDIUMINT|INTEGER|INT|BIGINT|REAL|DOUBLE|FLOAT|DECIMAL|DEC|NUMERIC)$~', $fieldtype ) )
+				if( preg_match( '~^(TINYINT|SMALLINT|MEDIUMINT|INTEGER|INT|BIGINT|REAL|DOUBLE|FLOAT|DECIMAL|DEC|NUMERIC)~', $fieldtype ) )
 				{ // numeric
 					$update_default = '0';
 					$update_default_set = '0';
@@ -1230,6 +1230,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.11  2009/10/11 02:34:52  blueyed
+ * db_delta: fix implicit default, if length is used for numeric fields, e.g. 'int(11)'
+ *
  * Revision 1.10  2009/09/21 03:31:23  fplanque
  * made autoupgrade more verbose in debug mode
  *
