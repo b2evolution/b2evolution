@@ -1816,7 +1816,7 @@ class Form extends Widget
 	/**
 	 * Get the OPTION list as string for use in a SELECT.
 	 * @static
-	 * @param array Options
+	 * @param array Options (key => value)
 	 * @param string Selected value (if any)
 	 * @param boolean Force keys from $options as values? (Default: false, only array keys,
 	 *                which are strings will be used).
@@ -2944,6 +2944,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.64  2009/10/11 02:32:48  blueyed
+ * doc
+ *
  * Revision 1.63  2009/09/15 19:31:55  fplanque
  * Attempt to load classes & functions as late as possible, only when needed. Also not loading module specific stuff if a module is disabled (module granularity still needs to be improved)
  * PHP 4 compatible. Even better on PHP 5.
