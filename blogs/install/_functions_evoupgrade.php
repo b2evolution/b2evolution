@@ -138,14 +138,14 @@ function db_add_col( $table, $col_name, $col_desc )
  * Add an INDEX. If another index with the same name already exists, it will
  * get dropped before.
  */
-function db_add_index( $table, $name, $def )
+function db_add_index( $table, $name, $def, $type = 'INDEX' )
 {
 	global $DB;
 	if( db_index_exists($table, $name) )
 	{
 		$DB->query( 'ALTER TABLE '.$table.' DROP INDEX '.$name );
 	}
-	$DB->query( 'ALTER TABLE '.$table.' ADD INDEX '.$name.' ('.$def.')' );
+	$DB->query( 'ALTER TABLE '.$table.' ADD '.$type.' '.$name.' ('.$def.')' );
 }
 
 
@@ -2601,16 +2601,19 @@ function upgrade_b2evo_tables()
 	$DB->query( "ALTER TABLE T_sessions CHANGE COLUMN sess_ipaddress sess_ipaddress VARCHAR(39) NOT NULL DEFAULT ''" );
 
 
-	// Add link_position. Temporary allow NULL, set compatibility defaule, then do not allow NULL.
+	// Add link_position. Temporary allow NULL, set compatibility default, then do not allow NULL.
+	// TODO: dh> actually, using "teaser" for the first link and "aftermore" for the rest would make more sense (and "aftermore" should get displayed with "no-more" posts anyway).
+	//           Opinions? Could be heavy to transform this though..
 	db_add_col( 'T_links', 'link_position', "ENUM('teaser', 'aftermore') NULL AFTER link_title" );
 	$DB->query( "UPDATE T_links SET link_position = 'teaser' WHERE link_position IS NULL" );
 	db_add_col( 'T_links', 'link_position', "ENUM('teaser', 'aftermore') NOT NULL AFTER link_title" );
 
 
-	// Add link_order. Temporary allow NULL, use order from ID, then do not allow NULL.
+	// Add link_order. Temporary allow NULL, use order from ID, then do not allow NULL and add UNIQUE index.
 	db_add_col( 'T_links', 'link_order', 'int(11) unsigned NULL AFTER link_position' );
 	$DB->query( "UPDATE T_links SET link_order = link_ID WHERE link_order IS NULL" );
 	db_add_col( 'T_links', 'link_order', 'int(11) unsigned NOT NULL AFTER link_position' );
+	db_add_index( 'T_links', 'link_itm_ID_order', 'link_itm_ID, link_order', 'UNIQUE' );
 
 
 	// Just in case, make sure the db schema version is upto date at the end.
@@ -2741,6 +2744,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.339  2009/10/11 03:31:55  blueyed
+ * Upgrade fixes
+ *
  * Revision 1.338  2009/10/11 03:00:11  blueyed
  * Add "position" and "order" properties to attachments.
  * Position can be "teaser" or "aftermore" for now.
