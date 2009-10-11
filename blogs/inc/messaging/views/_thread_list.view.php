@@ -77,35 +77,60 @@ foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
 // Get params from request
 $s = param( 's', 'string', '', true );
 
-// Create SELECT query
-$select_SQL = 'SELECT * FROM (SELECT mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified, mts.tsta_first_unread_msg_ID AS thrd_msg_ID, mm.msg_datetime AS thrd_unread_since,
-					(SELECT GROUP_CONCAT(ru.user_login ORDER BY ru.user_login SEPARATOR \', \')
-						FROM T_messaging__threadstatus AS rts
-							LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
-								WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients
-					FROM T_messaging__threadstatus mts
-						LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
-						LEFT OUTER JOIN T_messaging__message mm ON mts.tsta_first_unread_msg_ID = mm.msg_ID
-							WHERE mts.tsta_user_ID = '.$current_User->ID.'
-							ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC) AS threads';
-
 if( !empty($s) )
 {	// We want to filter on search keyword:
-	$select_SQL .= ' WHERE threads.thrd_recipients LIKE "%'.$DB->escape($s).'%"';
+
+	// Create SELECT query
+	$select_SQL = 'SELECT * FROM
+						(SELECT mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified,
+								mts.tsta_first_unread_msg_ID AS thrd_msg_ID, mm.msg_datetime AS thrd_unread_since,
+								(SELECT GROUP_CONCAT(ru.user_login ORDER BY ru.user_login SEPARATOR \', \')
+									FROM T_messaging__threadstatus AS rts
+										LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
+										WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients,
+								(SELECT CONCAT_WS(" ", GROUP_CONCAT(ru.user_firstname), GROUP_CONCAT(ru.user_lastname), GROUP_CONCAT(ru.user_nickname))
+									FROM T_messaging__threadstatus AS rts
+										LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
+										WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_usernames
+						FROM T_messaging__threadstatus mts
+								LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
+								LEFT OUTER JOIN T_messaging__message mm ON mts.tsta_first_unread_msg_ID = mm.msg_ID
+								WHERE mts.tsta_user_ID = '.$current_User->ID.'
+								ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC) AS threads
+					WHERE CONCAT_WS( " ", threads.thrd_title, threads.thrd_recipients, threads.thrd_usernames) LIKE "%'.$DB->escape($s).'%"';
 
 	// Create COUNT quiery
-	$count_SQL = 'SELECT COUNT(*)
-					FROM (SELECT (SELECT GROUP_CONCAT(ru.user_login SEPARATOR \', \')
-	      				FROM T_messaging__threadstatus AS rts
-	          				LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
-	              				WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients
-		  					FROM T_messaging__threadstatus mts
-		  						LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
-		          				WHERE mts.tsta_user_ID = '.$current_User->ID.') AS r
-		          					WHERE r.thrd_recipients LIKE "%'.$DB->escape($s).'%"';
+	$count_SQL = 'SELECT COUNT(*) FROM
+					(SELECT mt.thrd_title,
+						(SELECT GROUP_CONCAT(ru.user_login SEPARATOR \', \')
+		      			FROM T_messaging__threadstatus AS rts
+		          			LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
+		              		WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients,
+		              	(SELECT CONCAT_WS(" ", GROUP_CONCAT(ru.user_firstname), GROUP_CONCAT(ru.user_lastname), GROUP_CONCAT(ru.user_nickname))
+						FROM T_messaging__threadstatus AS rts
+							LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
+							WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_usernames
+		  			FROM T_messaging__threadstatus mts
+		  				LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
+		          		WHERE mts.tsta_user_ID = '.$current_User->ID.') AS r
+		          WHERE CONCAT_WS( " ", r.thrd_title, r.thrd_recipients, r.thrd_usernames) LIKE "%'.$DB->escape($s).'%"';
 }
 else
 {
+	// Create SELECT query
+	$select_SQL = 'SELECT * FROM
+					(SELECT mt.thrd_ID, mt.thrd_title, mt.thrd_datemodified,
+							mts.tsta_first_unread_msg_ID AS thrd_msg_ID, mm.msg_datetime AS thrd_unread_since,
+						(SELECT GROUP_CONCAT(ru.user_login ORDER BY ru.user_login SEPARATOR \', \')
+						FROM T_messaging__threadstatus AS rts
+							LEFT OUTER JOIN T_users AS ru ON rts.tsta_user_ID = ru.user_ID AND ru.user_ID <> '.$current_User->ID.'
+							WHERE rts.tsta_thread_ID = mt.thrd_ID) AS thrd_recipients
+					FROM T_messaging__threadstatus mts
+						LEFT OUTER JOIN T_messaging__thread mt ON mts.tsta_thread_ID = mt.thrd_ID
+						LEFT OUTER JOIN T_messaging__message mm ON mts.tsta_first_unread_msg_ID = mm.msg_ID
+						WHERE mts.tsta_user_ID = '.$current_User->ID.'
+						ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC) AS threads';
+
 	// Create COUNT quiery
 	$count_SQL = 'SELECT COUNT(*)
 					FROM T_messaging__threadstatus
@@ -196,6 +221,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.22  2009/10/11 11:31:32  efy-maxim
+ * Extend filter of thread list. Search by user login, user full name, user nuckname and thread title/subject.
+ *
  * Revision 1.21  2009/10/10 10:45:44  efy-maxim
  * messaging module - @action_icon()@
  *
