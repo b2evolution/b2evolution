@@ -1890,7 +1890,6 @@ class File extends DataObject
 		$LinkCache = & get_LinkCache();
 		$existing_Links = $LinkCache->get_by_item_ID($edited_Item->ID);
 
-		// TODO: find highest order being used..
 		$order = 1;
 
 		if( $existing_Links )
@@ -1907,12 +1906,22 @@ class File extends DataObject
 			{ // default: use position of previous link/attachment
 				$position = $last_Link->get('position');
 			}
+
+			// Re-add popped link.
+			$existing_Links[] = $last_Link;
 		}
 		else
 		{ // no attachment yet
 			$position = $this->is_image() ? 'teaser' : 'aftermore';
 		}
 
+		// Find highest order
+		foreach( $existing_Links as $loop_Link )
+		{
+			$existing_order = $loop_Link->get('order');
+			if( $existing_order > $order )
+				$order = $existing_order+1;
+		}
 
 		$DB->begin();
 
@@ -1934,6 +1943,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.65  2009/10/11 03:12:53  blueyed
+ * Properly init order of new links.
+ *
  * Revision 1.64  2009/10/11 03:06:26  blueyed
  * Fix install
  *
