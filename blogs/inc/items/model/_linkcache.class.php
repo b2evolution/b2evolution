@@ -45,6 +45,12 @@ class LinkCache extends DataObjectCache
 	var $cache_item = array();
 
 	/**
+	 * @access private
+	 * @var array Remember full loads
+	 */
+	var $loaded_cache_item = array();
+
+	/**
 	 * Constructor
 	 */
 	function LinkCache()
@@ -101,12 +107,11 @@ class LinkCache extends DataObjectCache
 	{
 		global $DB, $Debuglog, $MainList, $ItemList;
 
-		if( isset( $this->cache_item[$item_ID] ) )
+		if( isset( $this->loaded_cache_item[$item_ID] ) )
 		{
 			$Debuglog->add( "Already loaded <strong>$this->objtype(Item #$item_ID)</strong> into cache", 'dataobjects' );
 			return false;
 		}
-
 		// Check if this Item is part of the MainList
 		if( $MainList || $ItemList )
 		{
@@ -127,6 +132,7 @@ class LinkCache extends DataObjectCache
 
 			// Remember this special load:
 			$this->cache_item[$item_ID] = array();
+			$this->loaded_cache_item[$item_ID] = true;
 
 			$Debuglog->add( "Loading <strong>$this->objtype(Item #$item_ID)</strong> into cache", 'dataobjects' );
 
@@ -163,6 +169,7 @@ class LinkCache extends DataObjectCache
 		foreach( $itemIDarray as $item_ID )
 		{ // Remember this special load:
 			$this->cache_item[$item_ID] = array();
+			$this->loaded_cache_item[$item_ID] = true;
 		}
 
 		foreach( $DB->get_results( 'SELECT *
@@ -179,6 +186,9 @@ class LinkCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.8  2009/10/11 02:37:03  blueyed
+ * Nasty bugfix for LinkCache: if an item got added, the list for the corresponding item would not get loaded anymore. Please verify and backport.
+ *
  * Revision 1.7  2009/09/14 13:17:28  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
