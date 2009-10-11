@@ -77,7 +77,7 @@ foreach( $DB->get_results( $recipients_SQL->get() ) as $row )
 // Get params from request
 $s = param( 's', 'string', '', true );
 
-if( !empty($s) )
+if( !empty( $s ) )
 {	// We want to filter on search keyword:
 
 	// Create SELECT query
@@ -221,6 +221,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.23  2009/10/11 12:15:51  efy-maxim
+ * filter by author of the message and message text
+ *
  * Revision 1.22  2009/10/11 11:31:32  efy-maxim
  * Extend filter of thread list. Search by user login, user full name, user nuckname and thread title/subject.
  *

@@ -108,7 +108,7 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 
 $select_SQL = & new SQL();
 
-$select_SQL->SELECT( 'mm.msg_ID, mm.msg_author_user_ID, mm.msg_thread_ID, mm.msg_datetime,
+$select_SQL->SELECT( 	'mm.msg_ID, mm.msg_author_user_ID, mm.msg_thread_ID, mm.msg_datetime,
 						u.user_ID AS msg_user_ID, u.user_login AS msg_author,
 						u.user_firstname AS msg_firstname, u.user_lastname AS msg_lastname,
 						u.user_avatar_file_ID AS msg_user_avatar_ID, mm.msg_text' );
@@ -123,10 +123,24 @@ $select_SQL->ORDER_BY( 'mm.msg_datetime' );
 // Create COUNT query
 
 $count_SQL = & new SQL();
-
 $count_SQL->SELECT( 'COUNT(*)' );
-$count_SQL->FROM( 'T_messaging__message' );
-$count_SQL->WHERE( 'msg_thread_ID = '.$edited_Thread->ID );
+
+// Get params from request
+$s = param( 's', 'string', '', true );
+
+if( !empty( $s ) )
+{
+	$select_SQL->WHERE_and( 'CONCAT_WS( " ", u.user_login, u.user_firstname, u.user_lastname, u.user_nickname, msg_text ) LIKE "%'.$DB->escape($s).'%"' );
+
+	$count_SQL->FROM( 'T_messaging__message mm LEFT OUTER JOIN T_users u ON u.user_ID = mm.msg_author_user_ID' );
+	$count_SQL->WHERE( 'mm.msg_thread_ID = '.$edited_Thread->ID );
+	$count_SQL->WHERE_and( 'CONCAT_WS( " ", u.user_login, u.user_firstname, u.user_lastname, u.user_nickname, msg_text ) LIKE "%'.$DB->escape($s).'%"' );
+}
+else
+{
+	$count_SQL->FROM( 'T_messaging__message' );
+	$count_SQL->WHERE( 'msg_thread_ID = '.$edited_Thread->ID );
+}
 
 // Create result set:
 
@@ -137,6 +151,23 @@ $Results->Cache = & get_MessageCache();
 $Results->title = $edited_Thread->title;
 
 $Results->global_icon( T_('Cancel!'), 'close', '?ctrl=threads' );
+
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_messages( & $Form )
+{
+	$Form->text( 's', get_param('s'), 30, T_('Search'), '', 255 );
+}
+
+$Results->filter_area = array(
+	'callback' => 'filter_messages',
+	'presets' => array(
+		'all' => array( T_('All'), '?ctrl=messages&thrd_ID='.$edited_Thread->ID ),
+		)
+	);
 
 /*
  * Author col:
@@ -259,6 +290,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.23  2009/10/11 12:15:51  efy-maxim
+ * filter by author of the message and message text
+ *
  * Revision 1.22  2009/10/10 10:45:44  efy-maxim
  * messaging module - @action_icon()@
  *
