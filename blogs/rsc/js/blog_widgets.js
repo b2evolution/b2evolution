@@ -244,14 +244,7 @@ function makeDroppable( selector )
  */
 function doFade( selector )
 {
-	jQuery( selector ).animate({
-			backgroundColor: "#ffff00"
-		},"fast" ).animate({
-			backgroundColor: "#ffffff"
-		},"fast" ).animate({
-			backgroundColor: "#eeee88"
-		},"fast", "", function(){jQuery( this ).removeAttr( "style" );
-		});
+	evoFadeSuccess( selector );
 }
 
 

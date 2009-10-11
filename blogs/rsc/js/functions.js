@@ -34,6 +34,7 @@
 
 /**
  * Cross browser event handling for IE5+, NS6+ an Mozilla/Gecko
+ * @obsolete Use jQuery instead
  * @author Scott Andrew
  */
 function addEvent( elm, evType, fn, useCapture )
@@ -338,6 +339,7 @@ function toggle_filter_area( filter_name )
  * What this really is actually, is just a function to perform an asynchronous Request to the server.
  * There is no need to have any XML involved.
  *
+ * @obsolete Use jQuery instead
  * @param string url urlencoded
  */
 function asyncRequest( url )
@@ -475,8 +477,45 @@ b2evo_Callbacks.prototype = {
 var b2evo_Callbacks = new b2evo_Callbacks();
 
 
+/**
+ * Fades the relevant object to provide feedback, in case of success.
+ * @param jQuery selector
+ */
+function evoFadeSuccess( selector )
+{
+	jQuery( selector ).animate({
+			backgroundColor: "#ffff00"
+		},"fast" ).animate({
+			backgroundColor: "#ffffff"
+		},"fast" ).animate({
+			backgroundColor: "#eeee88"
+		},"fast", "", function(){jQuery( this ).removeAttr( "style" );
+		});
+}
+
+
+/**
+ * Fades the relevant object to provide feedback, in case of failure.
+ * @param jQuery selector
+ */
+function evoFadeFailure( selector )
+{
+	jQuery( selector ).animate({
+			backgroundColor: "#ff0000"
+		},"fast" ).animate({
+			backgroundColor: "#ff00ff"
+		},"fast" ).animate({
+			backgroundColor: "#ff00ff"
+		},"fast", "", function(){jQuery(this).removeAttr("style");
+		});
+}
+
+
 /*
  * $Log$
+ * Revision 1.34  2009/10/11 02:51:19  blueyed
+ * Add JS functions evoFadeSuccess/evoFadeFailure, derived from doFade. IMHO this is the approach to take throughout the app (at least regarding the stubs), also for Results (uses FAT currently).
+ *
  * Revision 1.33  2009/03/22 23:39:33  fplanque
  * new evobar Menu structure
  * Superfish jQuery menu library
