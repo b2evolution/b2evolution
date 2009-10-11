@@ -32,6 +32,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * SQL class: help constructing queries
  *
+ * @todo dh> should provide quoting, e.g. via $DB->quote()..
+ *           Maybe using printf-style, where all args get quoted.
+ *
  * @todo (fplanque)
  */
 class SQL
@@ -405,6 +408,9 @@ class SQL
 
 /*
  * $Log$
+ * Revision 1.5  2009/10/11 02:32:18  blueyed
+ * todo
+ *
  * Revision 1.4  2009/09/25 20:26:27  fplanque
  * fixes/doc
  *
