@@ -562,7 +562,8 @@ div.success {
 }
 div.log_container div.log_error,
 div.action_messages div.log_error,
-div.error {
+div.error,
+td.error {
 	border:1px solid #d99;
 	background:#fbf2ee;
 	color:#e00;
