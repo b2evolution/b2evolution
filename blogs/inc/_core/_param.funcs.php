@@ -426,6 +426,21 @@ function param_check_number( $var, $err_msg, $required = false )
 
 
 /**
+ * Checks if the param is an integer (no float, e.g. 3.14).
+ *
+ * @param string number to check
+ * @return string error message if number is not valid
+ */
+function check_is_number( $number )
+{
+	if( !is_number( $number ) )
+	{
+		return T_('The number value is invalid.');
+	}
+}
+
+
+/**
  * Checks if the param is a decimal number
  *
  * @param string param name
@@ -435,6 +450,21 @@ function param_check_number( $var, $err_msg, $required = false )
 function param_check_decimal( $var, $err_msg, $required = false )
 {
 	return param_validate( $var, 'check_is_decimal', $required, $err_msg );
+}
+
+
+/**
+ * Checks if the param is a decimal number
+ *
+ * @param string decimal to check
+ * @return string error message if decimal is not valid
+ */
+function check_is_decimal( $decimal )
+{
+	if( !is_decimal( $decimal ) )
+	{
+		return T_('The decimal value is invalid.');
+	}
 }
 
 
@@ -491,6 +521,21 @@ function param_check_email( $var, $required = false )
 
 
 /**
+ * Check that email address looks valid.
+ *
+ * @param string email address to check
+ * @return string error message if address is not valid
+ */
+function check_is_email( $email )
+{
+	if( !is_email( $email ) )
+	{
+		return T_('The email address is invalid.');
+	}
+}
+
+
+/**
  * @param string param name
  * @param string
  * @return boolean true if OK
@@ -510,6 +555,21 @@ function param_check_url( $var, $context, $field_err_msg = NULL )
 		return false;
 	}
 	return true;
+}
+
+
+/**
+ * Checks if the url is valid
+ *
+ * @param string url to check
+ * @return string error message if url is not valid
+ */
+function check_is_url( $url )
+{
+	if( !is_url( $url ) )
+	{
+		return T_('Please enter a valid URL, like for example: http://www.b2evolution.net/');
+	}
 }
 
 
@@ -1004,6 +1064,21 @@ function param_check_phone( $var, $required = false )
 
 
 /**
+ * Checks if the phone number is valid
+ *
+ * @param string phone number to check
+ * @return string error message if phone number is not valid
+ */
+function check_is_phone( $phone )
+{
+	if( !is_phone( $phone ) )
+	{
+		return T_('Please enter a valid phone number like for example: +1 401-555-1234');
+	}
+}
+
+
+/**
  * @param string param name
  * @param string param name
  * @param boolean Is a password required? (non-empty)
@@ -1046,6 +1121,21 @@ function param_check_passwords( $var1, $var2, $required = false )
 	}
 
 	return true;
+}
+
+
+/**
+ * Checks if the word is valid
+ *
+ * @param string word to check
+ * @return string error message if word is not valid
+ */
+function check_is_word( $word )
+{
+	if( !is_word( $word ) )
+	{
+		return T_('This field should be a single word; A-Z only.');
+	}
 }
 
 
@@ -1955,6 +2045,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.49  2009/10/11 09:09:04  efy-maxim
+ * Check_is functions have been moved to to params.funcs
+ *
  * Revision 1.48  2009/10/04 12:20:21  efy-maxim
  * 1. validate has been renamed to param_validate
  * 2. check recipients list in load_recipients function in Thread class

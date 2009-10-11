@@ -1161,23 +1161,6 @@ function param_validate( $variable, $validator, $required = false, $custom_msg =
 /**
  * Checks if the param is a decimal number
  *
- * @ todo move to params.funcs
- *
- * @param string decimal to check
- * @return string error message if decimal is not valid
- */
-function check_is_decimal( $decimal )
-{
-	if( !is_decimal( $decimal ) )
-	{
-		return T_('The decimal value is invalid.');
-	}
-}
-
-
-/**
- * Checks if the param is a decimal number
- *
  * @param string decimal to check
  * @return boolean true if OK
  */
@@ -1190,46 +1173,12 @@ function is_decimal( $decimal )
 /**
  * Checks if the param is an integer (no float, e.g. 3.14).
  *
- * @ todo move to params.funcs
- *
- * @param string number to check
- * @return string error message if number is not valid
- */
-function check_is_number( $number )
-{
-	if( !is_number( $number ) )
-	{
-		return T_('The number value is invalid.');
-	}
-}
-
-
-/**
- * Checks if the param is an integer (no float, e.g. 3.14).
- *
  * @param string number to check
  * @return boolean true if OK
  */
 function is_number( $number )
 {
 	return preg_match( '#^[0-9]+$#', $number );
-}
-
-
-/**
- * Check that email address looks valid.
- *
- * @ todo move to params.funcs
- *
- * @param string email address to check
- * @return string error message if address is not valid
- */
-function check_is_email( $email )
-{
-	if( !is_email( $email ) )
-	{
-		return T_('The email address is invalid.');
-	}
 }
 
 
@@ -1314,44 +1263,12 @@ function is_email( $email, $format = 'simple', $return_match = false )
 /**
  * Checks if the phone number is valid
  *
- * @ todo move to params.funcs
- *
- * @param string phone number to check
- * @return string error message if phone number is not valid
- */
-function check_is_phone( $phone )
-{
-	if( !is_phone( $phone ) )
-	{
-		return T_('Please enter a valid phone number like for example: +1 401-555-1234');
-	}
-}
-
-
-/**
- * Checks if the phone number is valid
- *
  * @param string phone number to check
  * @return boolean true if OK
  */
 function is_phone( $phone )
 {
 	return preg_match( '|^\+?[\-*#/(). 0-9]+$|', $phone );
-}
-
-
-/**
- * Checks if the url is valid
- *
- * @param string url to check
- * @return string error message if url is not valid
- */
-function check_is_url( $url )
-{
-	if( !is_url( $url ) )
-	{
-		return T_('Please enter a valid URL, like for example: http://www.b2evolution.net/');
-	}
 }
 
 
@@ -1369,21 +1286,6 @@ function is_url( $url )
 	}
 
 	return true;
-}
-
-
-/**
- * Checks if the word is valid
- *
- * @param string word to check
- * @return string error message if word is not valid
- */
-function check_is_word( $word )
-{
-	if( !is_word( $word ) )
-	{
-		return T_('This field should be a single word; A-Z only.');
-	}
 }
 
 
@@ -3764,6 +3666,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.176  2009/10/11 09:09:03  efy-maxim
+ * Check_is functions have been moved to to params.funcs
+ *
  * Revision 1.175  2009/10/08 20:05:51  efy-maxim
  * Modular/Pluggable Permissions
  *
