@@ -1890,6 +1890,9 @@ class File extends DataObject
 		$LinkCache = & get_LinkCache();
 		$existing_Links = $LinkCache->get_by_item_ID($edited_Item->ID);
 
+		// TODO: find highest order being used..
+		$order = 1;
+
 		if( $existing_Links )
 		{
 			$position = NULL;
@@ -1921,6 +1924,7 @@ class File extends DataObject
 		$edited_Link->set( 'itm_ID', $edited_Item->ID );
 		$edited_Link->set( 'file_ID', $this->ID );
 		$edited_Link->set( 'position', $position );
+		$edited_Link->set( 'order', $order );
 		$edited_Link->dbinsert();
 
 		$DB->commit();
@@ -1930,6 +1934,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.64  2009/10/11 03:06:26  blueyed
+ * Fix install
+ *
  * Revision 1.63  2009/10/11 03:00:10  blueyed
  * Add "position" and "order" properties to attachments.
  * Position can be "teaser" or "aftermore" for now.

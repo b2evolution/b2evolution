@@ -3,6 +3,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class( 'settings/model/_abstractsettings.class.php', 'AbstractSettings' );
+load_class( '_core/model/db/_sql.class.php', 'SQL' );
 
 
 /**
