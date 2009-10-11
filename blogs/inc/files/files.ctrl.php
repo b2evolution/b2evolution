@@ -1113,18 +1113,8 @@ switch( $action )
 		}
 		$edited_File = & $selected_Filelist->get_by_idx(0);
 
-		$DB->begin();
-
-		// Load meta data AND MAKE SURE IT IS CREATED IN DB:
-		$edited_File->load_meta( true );
-
 		// Let's make the link!
-		$edited_Link = & new Link();
-		$edited_Link->set( 'itm_ID', $edited_Item->ID );
-		$edited_Link->set( 'file_ID', $edited_File->ID );
-		$edited_Link->dbinsert();
-
-		$DB->commit();
+		$edited_File->link_to_Item($edited_Item);
 
 		$Messages->add( T_('Selected file has been linked to item.'), 'success' );
 
@@ -1684,6 +1674,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.42  2009/10/11 02:29:01  blueyed
+ * Use API
+ *
  * Revision 1.41  2009/10/10 23:33:17  blueyed
  * typos
  *
