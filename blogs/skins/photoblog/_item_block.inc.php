@@ -52,6 +52,7 @@ $params = array_merge( array(
 				 * crop-15x15
 				 * See also the $thumbnail_sizes array in conf/_advanced.php.
 				 */
+				'files_position' =>      '',
 			) );
 	?>
 
@@ -171,6 +172,12 @@ $params = array_merge( array(
 <?php
 /*
  * $Log$
+ * Revision 1.3  2009/10/11 03:00:11  blueyed
+ * Add "position" and "order" properties to attachments.
+ * Position can be "teaser" or "aftermore" for now.
+ * Order defines the sorting of attachments.
+ * Needs testing and refinement. Upgrade might work already, be careful!
+ *
  * Revision 1.2  2009/06/28 17:37:54  tblue246
  * Adding list of possible values for the image_size param to Photoblog skin to make life easier for new/unexperienced users.
  *

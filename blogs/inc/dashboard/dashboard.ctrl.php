@@ -265,7 +265,8 @@ if( $blog )
 					'after_image_legend' =>  NULL,
 					'after_image' =>         '',
 					'after' =>               '</div>',
-					'image_size' =>          'fit-80x80'
+					'image_size' =>          'fit-80x80',
+					'files_position' =>      '',
 				) );
 
 			echo '<div class="small">'.$Item->get_content_excerpt( 150 ).'</div>';
@@ -483,6 +484,12 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.34  2009/10/11 03:00:10  blueyed
+ * Add "position" and "order" properties to attachments.
+ * Position can be "teaser" or "aftermore" for now.
+ * Order defines the sorting of attachments.
+ * Needs testing and refinement. Upgrade might work already, be careful!
+ *
  * Revision 1.33  2009/09/20 02:08:52  fplanque
  * badge demo
  *

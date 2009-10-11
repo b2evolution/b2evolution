@@ -15,7 +15,7 @@
  *       after an error is display (e.g. entering an invalid issue time).
  *       (related to $tab_switch_params)
  * fp> Yes, it's a mess...
- *     Ironically the correct name would be itm_ID (which is what the DB uses, 
+ *     Ironically the correct name would be itm_ID (which is what the DB uses,
  *     except for the Items table which should actually also use itm_ prefixes instead of post_
  *     ... a lot of history lead to this :p
  *
@@ -71,6 +71,8 @@ switch( $action )
 		break;
 
 	case 'unlink':
+	case 'move_up':
+	case 'move_down':
 		// Name of the iframe we want some action to come back to:
 		param( 'iframe_name', 'string', '', true );
 
@@ -655,7 +657,82 @@ switch( $action )
 		//init_list_mode();
 		//$action = 'view';
 		// REDIRECT / EXIT
-		if( $mode == 'iframe' )
+		if( $mode == 'iframe' ) // TODO: Messages get not displayed in this case
+		{
+	 		header_redirect( regenerate_url( '', 'action=edit_links&mode=iframe&item_ID='.$edited_Item->ID, '', '&' ) );
+		}
+		else
+		{
+	 		header_redirect( regenerate_url( '', 'p='.$edited_Item->ID, '', '&' ) );
+		}
+		break;
+
+
+	case 'move_up':
+	case 'move_down':
+		// Check permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		$itemLinks = $edited_Item->get_Links();
+
+		// Switch order with the next/prev one, from the same position group.
+		if( $action == 'move_up' )
+		{
+			$switchcond = 'return ($loop_Link->get("order") > $i
+				&& $loop_Link->get("order") < '.$edited_Link->get("order").'
+				&& $loop_Link->get("position") == "'.$edited_Link->get('position').'");';
+			$i = -1;
+		}
+		else
+		{
+			$switchcond = 'return ($loop_Link->get("order") < $i
+				&& $loop_Link->get("order") > '.$edited_Link->get("order").'
+				&& $loop_Link->get("position") == "'.$edited_Link->get('position').'");';
+			$i = PHP_INT_MAX;
+		}
+		foreach( $itemLinks as $loop_Link )
+		{ // find nearest order
+			if( $loop_Link == $edited_Link )
+				continue;
+
+			if( eval($switchcond) )
+			{
+				$i = $loop_Link->get('order');
+				$switch_Link = $loop_Link;
+			}
+		}
+		if( $i > -1 && $i < PHP_INT_MAX )
+		{ // switch
+			$switch_Link->set('order', $edited_Link->get('order'));
+
+			// HACK: go through order=0 to avoid duplicate key conflict
+			$edited_Link->set('order', 0);
+			$edited_Link->dbupdate( true );
+			$switch_Link->dbupdate( true );
+
+			$edited_Link->set('order', $i);
+			$edited_Link->dbupdate( true );
+
+
+			if( $action == 'move_up' )
+				$msg = T_('Link has been moved up.');
+			else
+				$msg = T_('Link has been moved down.');
+
+			$Messages->add( $msg, 'success' );
+		}
+		else
+		{
+			$Messages->add( T_('Link order has not been changed.'), 'note' );
+		}
+
+
+		// go on to view:
+		//$p = $edited_Item->ID;
+		//init_list_mode();
+		//$action = 'view';
+		// REDIRECT / EXIT
+		if( $mode == 'iframe' ) // TODO: Messages get not displayed in this case
 		{
 	 		header_redirect( regenerate_url( '', 'action=edit_links&mode=iframe&item_ID='.$edited_Item->ID, '', '&' ) );
 		}
@@ -667,7 +744,7 @@ switch( $action )
 
 
 	default:
-		debug_die( 'unhandled action 2' );
+		debug_die( 'unhandled action 2: '.htmlspecialchars($action) );
 }
 
 /**
@@ -1051,6 +1128,12 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.67  2009/10/11 03:00:10  blueyed
+ * Add "position" and "order" properties to attachments.
+ * Position can be "teaser" or "aftermore" for now.
+ * Order defines the sorting of attachments.
+ * Needs testing and refinement. Upgrade might work already, be careful!
+ *
  * Revision 1.66  2009/09/29 02:03:41  sam2kb
  * Use date_i18n() for $item_issue_date, otherwise regional dates don't validate
  * See http://forums.b2evolution.net/viewtopic.php?t=19743

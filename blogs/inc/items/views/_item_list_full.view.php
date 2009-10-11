@@ -214,7 +214,8 @@ while( $Item = & $ItemList->get_item() )
 						'after_image_legend' =>  '</div>',
 						'after_image' =>         '</div>',
 						'after' =>               '</div>',
-						'image_size' =>          'fit-320x320'
+						'image_size' =>          'fit-320x320',
+						'files_position' =>      '',
 					) );
 			?>
 
@@ -392,6 +393,12 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.23  2009/10/11 03:00:11  blueyed
+ * Add "position" and "order" properties to attachments.
+ * Position can be "teaser" or "aftermore" for now.
+ * Order defines the sorting of attachments.
+ * Needs testing and refinement. Upgrade might work already, be careful!
+ *
  * Revision 1.22  2009/09/19 13:59:45  tblue246
  * Doc
  *

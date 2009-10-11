@@ -50,10 +50,10 @@ param( 'iframe_name', 'string', '', true );
 
 $SQL = & new SQL();
 
-$SQL->SELECT( 'link_ID, link_ltype_ID, file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
+$SQL->SELECT( 'link_ID, link_ltype_ID, link_position, file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
 $SQL->FROM( 'T_links LEFT JOIN T_files ON link_file_ID = file_ID' );
 $SQL->WHERE( 'link_itm_ID = '.$edited_Item->ID );
-$SQL->ORDER_BY( 'link_ID' );
+$SQL->ORDER_BY( 'link_position+0, link_order, link_ID' ); // the same order is required
 
 $Results = & new Results( $SQL->get(), 'link_' );
 
@@ -136,7 +136,7 @@ $Results->cols[] = array(
 
 if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 {
-	function file_actions( $link_ID )
+	function file_actions( $link_ID, $cur_idx, $total_rows )
 	{
 		/**
 		 * @var File
@@ -156,10 +156,35 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 						.get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ).'</a> ';
 		}
 
+		// Delete link.
 		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	  {	// Check that we have permission to edit item:
 			$r .= action_icon( T_('Delete this link!'), 'unlink',
 			                  regenerate_url( 'p,itm_ID,action', "link_ID=$link_ID&amp;action=unlink" ) );
+		}
+
+		// Change order.
+		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+		{	// Check that we have permission to edit item:
+			if( $cur_idx > 0 )
+			{
+				echo action_icon( T_('Move upwards'), 'move_up',
+					regenerate_url( 'p,itm_ID,action', "link_ID=$link_ID&amp;action=move_up" ) );
+			}
+			else
+			{
+				echo get_icon( 'nomove' ).' ';
+			}
+
+			if( $cur_idx < $total_rows-1 )
+			{
+				echo action_icon( T_('Move down'), 'move_down',
+					regenerate_url( 'p,itm_ID,action', "link_ID=$link_ID&amp;action=move_down" ) );
+			}
+			else
+			{
+				echo get_icon( 'nomove' ).' ';
+			}
 		}
 
 		return $r;
@@ -167,15 +192,61 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
 							'td_class' => 'shrinkwrap',
-							'td' => '%file_actions( #link_ID# )%',
+							'td' => '%file_actions( #link_ID#, {CUR_IDX}, {TOTAL_ROWS} )%',
 						);
 }
+
+
+/*
+ * POSITION column
+ */
+function display_position( & $row )
+{
+	global $htsrv_url;
+
+	$positions = array(
+		'teaser' => T_('Teaser'),
+		'aftermore' => T_('After "more"'),
+		);
+
+	// TODO: dh> only handle images
+
+	$onchange = 'var oThis = this;
+	jQuery.get(\''.$htsrv_url.'async.php\', {
+		action: "set_item_link_position",
+		link_ID: "'.$row->link_ID.'",
+		link_position: this.value
+	}, function(r, status) {
+		if( r == "OK" ) {
+			evoFadeSuccess( jQuery(oThis.form).closest(\'tr\') );
+			jQuery(oThis.form).closest(\'td\').removeClass(\'error\');
+		} else {
+			jQuery(oThis).val(r);
+			evoFadeFailure( jQuery(oThis.form).closest(\'tr\') );
+			jQuery(oThis.form).closest(\'td\').addClass(\'error\');
+		}
+	} ); return false;';
+
+	return '<form><select onchange="'.htmlspecialchars($onchange).'">'
+		.Form::get_select_options_string($positions, $row->link_position, true).'</select></form>';
+}
+$Results->cols[] = array(
+						'th' => T_('Position'),
+						'td_class' => 'shrinkwrap',
+						'td' => '%display_position( {row} )%',
+					);
 
 $Results->display( $AdminUI->get_template( 'compact_results' ) );
 
 
 /*
  * $Log$
+ * Revision 1.10  2009/10/11 03:00:11  blueyed
+ * Add "position" and "order" properties to attachments.
+ * Position can be "teaser" or "aftermore" for now.
+ * Order defines the sorting of attachments.
+ * Needs testing and refinement. Upgrade might work already, be careful!
+ *
  * Revision 1.9  2009/10/10 16:21:05  blueyed
  * typos
  *

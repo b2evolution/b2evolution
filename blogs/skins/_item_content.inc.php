@@ -113,6 +113,7 @@ switch( $content_mode )
 					'after' =>               $params['after_images'],
 					'image_size' =>          $params['excerpt_image_size'],
 					'image_link_to' =>       'single',
+					'files_position' =>      '',
 				) );
 		}
 
@@ -140,7 +141,7 @@ switch( $content_mode )
 				'allow_multiple_counts_per_page' => false,
 			) );
 
-		if( ! empty($params['image_size']) && ! $Item->has_content_parts($params) )
+		if( ! empty($params['image_size']) )
 		{
 			// Display images that are linked to this post:
 			$Item->images( array(
@@ -151,6 +152,7 @@ switch( $content_mode )
 					'after_image' =>         $params['after_image_legend'],
 					'after' =>               $params['after_images'],
 					'image_size' =>          $params['image_size'],
+					'files_position' =>      $Item->has_content_parts($params) ? 'teaser' : '',
 				) );
 		}
 
@@ -179,7 +181,7 @@ switch( $content_mode )
 						'after'       => $params['after_more_link'],
 						'link_text'   => $params['more_link_text'],
 					) );
-				if( ! empty($params['image_size']) && $more && $Item->has_content_parts($params) )
+				if( ! empty($params['image_size']) && $more )
 				{
 					// Display images that are linked to this post:
 					$Item->images( array(
@@ -190,6 +192,7 @@ switch( $content_mode )
 							'after_image' =>         $params['after_image_legend'],
 							'after' =>               $params['after_images'],
 							'image_size' =>          $params['image_size'],
+							'files_position' =>      'aftermore',
 						) );
 				}
 				$Item->content_extension( array(
@@ -231,6 +234,12 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.21  2009/10/11 03:00:11  blueyed
+ * Add "position" and "order" properties to attachments.
+ * Position can be "teaser" or "aftermore" for now.
+ * Order defines the sorting of attachments.
+ * Needs testing and refinement. Upgrade might work already, be careful!
+ *
  * Revision 1.20  2009/10/10 20:10:34  blueyed
  * Some refactoring in Item class.
  * Add get_content_parts, has_content_parts and hidden_teaser.

@@ -1756,10 +1756,11 @@ class Item extends ItemLight
 				'image_size' =>          'fit-720x500',
 				'image_link_to' =>       'original',  // Can be 'orginal' (image) or 'single' (this post)
 				'limit' =>               1000,	// Max # of images displayed
+				'files_position' =>      '',
 			), $params );
 
 		// Get list of attached files
-		$FileList = $this->get_attachment_FileList( $params['limit'] );
+		$FileList = $this->get_attachment_FileList( $params['limit'], $params['files_position'] );
 
 		$r = '';
 		/**
@@ -1833,10 +1834,11 @@ class Item extends ItemLight
 			// sam2kb> It's needed only for flexibility, in the meantime if user attaches 200 files he expects to see all of them in skin, I think.
 				'limit_files' =>         1000, // Max # of files displayed
 				'limit' =>               1000,
+				'files_position' =>      'aftermore',
 			), $params );
 
 		// Get list of attached files
-		$FileList = $this->get_attachment_FileList( $params['limit'] );
+		$FileList = $this->get_attachment_FileList( $params['limit'], $params['files_position'] );
 
 		load_funcs('files/model/_file.funcs.php');
 
@@ -1897,9 +1899,10 @@ class Item extends ItemLight
 	 *           The $limit param and DataObjectList2 makes this quite difficult
 	 *           though. Would save (N-1) queries on a blog list page for N items.
 	 *
+	 * @access protected
 	 * @return DataObjectList2
 	 */
-	function get_attachment_FileList( $limit = 1000 )
+	function get_attachment_FileList( $limit = 1000, $position = NULL, $order = 'link_ID' )
 	{
 		load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectList2' );
 
@@ -1911,7 +1914,13 @@ class Item extends ItemLight
 		$SQL->SELECT( 'file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
 		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( 'link_itm_ID = '.$this->ID );
-		$SQL->ORDER_BY( 'link_ID' );
+		if( $position )
+		{
+			global $DB;
+			$SQL->WHERE_and( 'link_position = '.$DB->quote($position) );
+		}
+		//$SQL->ORDER_BY( $order );
+		$SQL->ORDER_BY( 'link_order' );
 		$SQL->LIMIT( $limit );
 
 		$FileList->sql = $SQL->get();
@@ -3999,6 +4008,12 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.150  2009/10/11 03:00:11  blueyed
+ * Add "position" and "order" properties to attachments.
+ * Position can be "teaser" or "aftermore" for now.
+ * Order defines the sorting of attachments.
+ * Needs testing and refinement. Upgrade might work already, be careful!
+ *
  * Revision 1.149  2009/10/10 21:22:46  blueyed
  * Default to page=1. Must have been the case before, too. Notice triggered in admin item list.
  *

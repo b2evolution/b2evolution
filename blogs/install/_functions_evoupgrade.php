@@ -2601,6 +2601,18 @@ function upgrade_b2evo_tables()
 	$DB->query( "ALTER TABLE T_sessions CHANGE COLUMN sess_ipaddress sess_ipaddress VARCHAR(39) NOT NULL DEFAULT ''" );
 
 
+	// Add link_position. Temporary allow NULL, set compatibility defaule, then do not allow NULL.
+	db_add_col( 'T_links', 'link_position', "ENUM('teaser', 'aftermore') NULL AFTER link_title" );
+	$DB->query( "UPDATE T_links SET link_position = 'teaser' WHERE link_position IS NULL" );
+	db_add_col( 'T_links', 'link_position', "ENUM('teaser', 'aftermore') NOT NULL AFTER link_title" );
+
+
+	// Add link_order. Temporary allow NULL, use order from ID, then do not allow NULL.
+	db_add_col( 'T_links', 'link_order', 'int(11) unsigned NULL AFTER link_position' );
+	$DB->query( "UPDATE T_links SET link_order = link_ID WHERE link_order IS NULL" );
+	db_add_col( 'T_links', 'link_order', 'int(11) unsigned NOT NULL AFTER link_position' );
+
+
 	// Just in case, make sure the db schema version is upto date at the end.
 	if( $old_db_version != $new_db_version )
 	{ // Update DB schema version to $new_db_version
@@ -2729,6 +2741,12 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.338  2009/10/11 03:00:11  blueyed
+ * Add "position" and "order" properties to attachments.
+ * Position can be "teaser" or "aftermore" for now.
+ * Order defines the sorting of attachments.
+ * Needs testing and refinement. Upgrade might work already, be careful!
+ *
  * Revision 1.337  2009/10/10 20:17:33  tblue246
  * Minor debug output layout fix
  *

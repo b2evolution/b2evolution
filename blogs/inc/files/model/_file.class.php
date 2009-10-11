@@ -1885,6 +1885,32 @@ class File extends DataObject
 	{
 		global $DB;
 
+		// Automatically determine default position.
+		// First image becomes "teaser", otherwise "aftermore".
+		$LinkCache = & get_LinkCache();
+		$existing_Links = $LinkCache->get_by_item_ID($edited_Item->ID);
+
+		if( $existing_Links )
+		{
+			$position = NULL;
+			$last_Link = array_pop($existing_Links);
+			$last_File = & $last_Link->get_File();
+
+			if( $last_File && $this->is_image() && $last_File->is_image() && ! count($existing_Links) )
+			{ // there's only one image attached yet, the second becomes "aftermore"
+				$position = 'aftermore';
+			}
+			else
+			{ // default: use position of previous link/attachment
+				$position = $last_Link->get('position');
+			}
+		}
+		else
+		{ // no attachment yet
+			$position = $this->is_image() ? 'teaser' : 'aftermore';
+		}
+
+
 		$DB->begin();
 
 		// Load meta data AND MAKE SURE IT IS CREATED IN DB:
@@ -1894,6 +1920,7 @@ class File extends DataObject
 		$edited_Link = & new Link();
 		$edited_Link->set( 'itm_ID', $edited_Item->ID );
 		$edited_Link->set( 'file_ID', $this->ID );
+		$edited_Link->set( 'position', $position );
 		$edited_Link->dbinsert();
 
 		$DB->commit();
@@ -1903,6 +1930,12 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.63  2009/10/11 03:00:10  blueyed
+ * Add "position" and "order" properties to attachments.
+ * Position can be "teaser" or "aftermore" for now.
+ * Order defines the sorting of attachments.
+ * Needs testing and refinement. Upgrade might work already, be careful!
+ *
  * Revision 1.62  2009/10/07 23:43:25  fplanque
  * doc
  *

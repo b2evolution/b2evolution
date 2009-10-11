@@ -49,6 +49,8 @@ if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 }
 
 
+// Do not append Debuglog to response!
+$debug = false;
 
 
 // fp> Does the following have an HTTP fallback when Javascript/AJ is not available?
@@ -99,6 +101,24 @@ switch( $action )
 		$UserSettings->param_Request( 'layout', 'blogperms_layout', 'string', $debug ? 'all' : 'default' );  // table layout mode
 		exit(0);
 
+	case 'set_item_link_position':
+		param('link_ID', 'integer', true);
+		param('link_position', 'string', true);
+
+		$LinkCache = & get_LinkCache();
+		$Link = & $LinkCache->get_by_ID($link_ID);
+
+		if( $Link->set('position', $link_position)
+			&& $Link->dbupdate() )
+		{
+			echo 'OK';
+		}
+		else
+		{ // return the current value on failure
+			echo $Link->get('position');
+		}
+		exit(0);
+
 }
 
 
@@ -115,6 +135,12 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.31  2009/10/11 03:00:10  blueyed
+ * Add "position" and "order" properties to attachments.
+ * Position can be "teaser" or "aftermore" for now.
+ * Order defines the sorting of attachments.
+ * Needs testing and refinement. Upgrade might work already, be careful!
+ *
  * Revision 1.30  2009/09/25 07:32:51  efy-cantor
  * replace get_cache to get_*cache
  *

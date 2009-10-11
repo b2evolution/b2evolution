@@ -69,6 +69,9 @@ class Link extends DataObject
 
 			// TODO: dh> deprecated, check where it's used, and fix it.
 			$this->File = & $this->get_File();
+
+			$this->position = $db_row->link_position;
+			$this->order = $db_row->link_order;
 		}
 		else
 		{	// New object:
@@ -115,6 +118,12 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.9  2009/10/11 03:00:11  blueyed
+ * Add "position" and "order" properties to attachments.
+ * Position can be "teaser" or "aftermore" for now.
+ * Order defines the sorting of attachments.
+ * Needs testing and refinement. Upgrade might work already, be careful!
+ *
  * Revision 1.8  2009/10/05 23:25:06  blueyed
  * Add Item:get_File, to lazy-instantiate the link's File object; todo
  *

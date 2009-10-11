@@ -997,6 +997,7 @@ class Results extends Table
 				// Contents to output:
 				$output = $this->parse_col_content( $col['td'] );
 				#pre_dump( '{'.$output.'}' );
+
 				$out = eval( "return '$output';" );
 				// fp> <input> is needed for checkboxes in the Blog User/Group permissions table > advanced
 				echo ( trim(strip_tags($out,'<img><input>')) === '' ? '&nbsp;' : $out );
@@ -1391,6 +1392,9 @@ class Results extends Table
 
 		// Make callback function move_icons for oderable lists // dh> what does it do?
 		$content = str_replace( '{move}', "'.\$this->move_icons().'", $content );
+
+		$content = str_replace( '{CUR_IDX}', $this->current_idx, $content );
+		$content = str_replace( '{TOTAL_ROWS}', $this->total_rows, $content );
 
 		return $content;
 	}
@@ -1824,6 +1828,12 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.30  2009/10/11 03:00:10  blueyed
+ * Add "position" and "order" properties to attachments.
+ * Position can be "teaser" or "aftermore" for now.
+ * Order defines the sorting of attachments.
+ * Needs testing and refinement. Upgrade might work already, be careful!
+ *
  * Revision 1.29  2009/09/29 00:00:16  blueyed
  * Finish r8131: sort NULL hit_serprank values _always_ to the end.
  *

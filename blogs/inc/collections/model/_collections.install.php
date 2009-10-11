@@ -337,10 +337,13 @@ $schema_queries = array_merge( $schema_queries, array(
 			link_ltype_ID         int(11) unsigned  NOT NULL default 1,
 			link_external_url     VARCHAR(255)      NULL,
 			link_title            TEXT              NULL,
+			link_position         ENUM('teaser', 'aftermore') NOT NULL,
+			link_order            int(11) unsigned  NOT NULL,
 			PRIMARY KEY (link_ID),
 			INDEX link_itm_ID( link_itm_ID ),
 			INDEX link_dest_itm_ID (link_dest_itm_ID),
-			INDEX link_file_ID (link_file_ID)
+			INDEX link_file_ID (link_file_ID),
+			UNIQUE link_itm_ID_order (link_itm_ID, link_order)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 ) );
 
