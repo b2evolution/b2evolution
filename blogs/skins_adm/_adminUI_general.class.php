@@ -370,10 +370,15 @@ class AdminUI_general extends Menu
 		// #body_win and .body_firefox (for example) can be used to customize CSS per plaform/browser
 		echo '<body id="body_'.$Hit->get_agent_platform().'" class="body_'.$Hit->get_agent_name().'">'."\n";
 
-		if( !empty( $mode ) )
+		if( ! empty( $mode ) )
 		{
+			global $Messages;
+
 			$mode = preg_replace( '¤[^a-z]¤', '', $mode );	// sanitize
 			echo '<div id="'.$mode.'_wrapper">';
+
+			// Display info & error messages
+			$Messages->display( NULL, NULL, true, 'all', NULL, NULL, 'action_messages' );
 			return;
 		}
 
@@ -1185,6 +1190,8 @@ class AdminUI_general extends Menu
 	/**
 	 * Get the top of the HTML <body>.
 	 *
+	 * This is not called if {@link $mode} is set.
+	 *
 	 * @return string
 	 */
 	function get_body_top()
@@ -1195,6 +1202,8 @@ class AdminUI_general extends Menu
 
 	/**
 	 * Get the end of the HTML <body>. Close open divs, etc...
+	 *
+	 * This is not called if {@link $mode} is set.
 	 *
 	 * @return string
 	 */
@@ -1281,6 +1290,10 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.101  2009/10/12 23:03:32  blueyed
+ * Fix displaying of Messages in $mode windows (e.g. file uploads) and enable
+ * them in the attachment iframe.
+ *
  * Revision 1.100  2009/09/26 12:00:44  tblue246
  * Minor/coding style
  *

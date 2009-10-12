@@ -25,7 +25,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( $mode != 'iframe' )
+if( empty($mode) )
 {
 	/**
 	 * Icon Legend
@@ -36,13 +36,14 @@ if( $mode != 'iframe' )
 	}
 
 	echo $this->get_footer_contents();
+}
 
-	// CALL PLUGINS NOW:
-	global $Plugins;
-	$Plugins->trigger_event( 'AdminAfterPageFooter', array() );
+// CALL PLUGINS NOW:
+global $Plugins;
+$Plugins->trigger_event( 'AdminAfterPageFooter', array() );
 
-
-	// Close open divs, etc...
+if( empty($mode) )
+{ // Close open divs, etc...
 	echo $this->get_body_bottom();
 }
 
@@ -77,6 +78,10 @@ include_footerlines(); // enables translation strings for js
 <?php
 /*
  * $Log$
+ * Revision 1.13  2009/10/12 23:03:32  blueyed
+ * Fix displaying of Messages in $mode windows (e.g. file uploads) and enable
+ * them in the attachment iframe.
+ *
  * Revision 1.12  2009/03/23 23:29:01  fplanque
  * version bump
  *

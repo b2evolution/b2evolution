@@ -152,10 +152,7 @@ class AdminUI extends AdminUI_general
 
 		$r = '';
 
-		if( empty($this->mode) )
-		{ // We're not running in an special mode (bookmarklet...)
-			$r .= $this->get_page_head();
-		}
+		$r .= $this->get_page_head();
 
 		$blog_buttons = $this->get_bloglist_buttons( '<strong>'.$this->get_title_for_titlearea().'</strong> ' );
 		if( ! empty($blog_buttons) )
@@ -204,6 +201,10 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.33  2009/10/12 23:03:33  blueyed
+ * Fix displaying of Messages in $mode windows (e.g. file uploads) and enable
+ * them in the attachment iframe.
+ *
  * Revision 1.32  2009/10/12 20:49:14  blueyed
  * legacy admin skin: display TitleArea only if there are bloglist buttons.
  *

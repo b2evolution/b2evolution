@@ -76,14 +76,11 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_body_top()
 	{
-		global $Messages, $mode;
+		global $Messages;
 
 		$r = '<div class="wrapper">';
 
-		if( empty($mode) )
-		{
-			$r .= $this->get_page_head();
-		}
+		$r .= $this->get_page_head();
 
 		$r .= $this->get_bloglist_buttons();
 
@@ -382,6 +379,10 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.24  2009/10/12 23:03:32  blueyed
+ * Fix displaying of Messages in $mode windows (e.g. file uploads) and enable
+ * them in the attachment iframe.
+ *
  * Revision 1.23  2009/08/31 17:21:31  fplanque
  * minor
  *
