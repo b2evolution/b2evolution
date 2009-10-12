@@ -249,12 +249,15 @@ if( count($res_hits) )
 
 	</table>
 
-	<img src="<?php global $rsc_url; echo $rsc_url ?>img/blank.gif" width="1" height="1" /><!-- for IE -->
+	<!--[if IE]><img src="<?php global $rsc_url; echo $rsc_url ?>img/blank.gif" width="1" height="1" alt="" /><![endif]-->
 	<?php
 }
 
 /*
  * $Log$
+ * Revision 1.12  2009/10/12 22:11:28  blueyed
+ * Fix blank.gif some: use conditional comments, where marked as being required for IE. Add ALT tags and close tags.
+ *
  * Revision 1.11  2009/09/13 21:26:50  blueyed
  * SQL_NO_CACHE for SELECT queries using T_hitlog
  *

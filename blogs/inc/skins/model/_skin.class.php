@@ -207,7 +207,7 @@ class Skin extends DataObject
 
 		if( false )
 		{	// DEBUG:
-			echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear">';
+			echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear" />';
 			echo '</div>';
 		}
 	}
@@ -614,6 +614,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.21  2009/10/12 22:11:28  blueyed
+ * Fix blank.gif some: use conditional comments, where marked as being required for IE. Add ALT tags and close tags.
+ *
  * Revision 1.20  2009/10/04 18:25:13  blueyed
  * Add missing load_class call
  *

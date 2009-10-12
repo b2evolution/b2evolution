@@ -107,7 +107,7 @@ class AdminUI extends AdminUI_general
 
 		$r .= "</div>\n";	// Close right col.
 
-		$r .= '<img src="'.$rsc_url.'/img/blank.gif" width="1" height="1" />';
+		$r .= '<img src="'.$rsc_url.'/img/blank.gif" width="1" height="1" alt="" />';
 
 		return $r;
 	}
@@ -190,6 +190,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.35  2009/10/12 22:11:28  blueyed
+ * Fix blank.gif some: use conditional comments, where marked as being required for IE. Add ALT tags and close tags.
+ *
  * Revision 1.34  2009/08/31 17:21:32  fplanque
  * minor
  *

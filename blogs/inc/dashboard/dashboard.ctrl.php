@@ -186,7 +186,7 @@ if( $blog )
 					'class'     => 'ActionButton'
 				) );
 			$Item->publish_link( '', '', '#', '#', 'PublishButton' );
-			echo '<img src="'.$rsc_url.'/img/blank.gif">';
+			echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" />';
 			echo '</div>';
 
 			echo '<h3 class="dashboard_post_title">';
@@ -484,6 +484,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.35  2009/10/12 22:11:28  blueyed
+ * Fix blank.gif some: use conditional comments, where marked as being required for IE. Add ALT tags and close tags.
+ *
  * Revision 1.34  2009/10/11 03:00:10  blueyed
  * Add "position" and "order" properties to attachments.
  * Position can be "teaser" or "aftermore" for now.

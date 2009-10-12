@@ -204,14 +204,17 @@ foreach( $container_Widget_array as $container=>$dummy )
 
 global $rsc_url;
 
-echo '<img src="'.$rsc_url.'img/blank.gif" width="1" height="1" /><!-- for IE -->';
+echo '<!--[if IE]><img src="'.$rsc_url.'img/blank.gif" width="1" height="1" alt="" /><![endif]-->';
 
 echo '</fieldset>'."\n";
-echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear">';
+echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear" />';
 
 
 /*
  * $Log$
+ * Revision 1.19  2009/10/12 22:11:28  blueyed
+ * Fix blank.gif some: use conditional comments, where marked as being required for IE. Add ALT tags and close tags.
+ *
  * Revision 1.18  2009/09/26 21:23:02  tblue246
  * Non-JS widgets screen: Use proper colspan for "No widgets" message.
  *
