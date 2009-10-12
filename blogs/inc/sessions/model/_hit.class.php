@@ -116,7 +116,7 @@ class Hit
 	var $agent_name;
 
 	/**
-	 * The user agent platform, eg "mac"
+	 * The user agent platform. Either "win", "mac" or "linux".
 	 * @see Hit::get_agent_platform()
 	 * @access protected
 	 * @var string
@@ -413,7 +413,6 @@ class Hit
 		$this->agent_platform = '';
 
 		$user_agent = $this->get_user_agent();
-		$browscap   = @get_browser( $user_agent );
 
 		if( ! empty($user_agent) )
 		{ // detect browser
@@ -425,12 +424,16 @@ class Hit
 			{
 				$this->agent_platform = 'mac';
 			}
-			elseif( $browscap )
+			elseif( strpos($user_agent, 'Linux') !== false)
+			{
+				$this->agent_platform = 'linux';
+			}
+			elseif( $browscap = $this->get_browser_caps() )
 			{
 				$Debuglog->add( 'detect_useragent(): Trying to detect platform using browscap', 'hit' );
 
 				$platform = strtolower( substr( $browscap->platform, 0, 3 ) );
-				if( in_array( $platform, array( 'win', 'mac' ) ) )
+				if( in_array( $platform, array( 'win', 'mac', 'linux' ) ) )
 				{
 					$this->agent_platform = $platform;
 				}
@@ -515,12 +518,23 @@ class Hit
 				}
 			}
 
-			if( ! $match && $browscap && $browscap->crawler )
+			if( ! $match && ($browscap = $this->get_browser_caps()) && $browscap->crawler )
 			{
 				$Debuglog->add( 'detect_useragent(): robot (through browscap)', 'hit' );
 				$this->agent_type = 'robot';
 			}
 		}
+	}
+
+
+	/**
+	 * Get browser capabilities through {@link get_browser()}.
+	 *
+	 * @return false|object
+	 */
+	function get_browser_caps()
+	{
+		return @get_browser( $this->get_user_agent() );
 	}
 
 
@@ -973,11 +987,11 @@ class Hit
 		{
 			return NULL;
 		}
-		
+
 		// This is needed for google image search to extract q param from encoded URL
 		// Otherwise "=" is encoded to "%3D"
 		$ref = urldecode($ref);
-		
+
 		// This is needed for google image search to extract q param
 		// prev=/images?q=
 		$ref = str_replace( '?', '&', evo_substr( $ref, $pos_question+1 ) );
@@ -1003,13 +1017,13 @@ class Hit
 			 *        for the keyphrase, we won't get the correct result!
 			 *        Conclusion: We need a better fix for yandex.ru.
 			 * fp> What we need is to merge definitions for search engine sig + keyword param + position param into a single array or a single database table
-			 
+
 				if( ctype_digit( $q ) && $param_parts[0] == 'p' )
 				{	// ?p=5&text=keyword
 					continue;
 				}
-			*/	
-				
+			*/
+
 				$q = convert_charset($q, $evo_charset, 'UTF-8');
 				return $q;
 			}
@@ -1150,6 +1164,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.39  2009/10/12 22:51:58  blueyed
+ * Hit: detect 'linux' as platform, too. Make the call to get_browser() more lazy.
+ *
  * Revision 1.38  2009/10/03 20:43:40  tblue246
  * Commit message cleanup...
  *
