@@ -1919,7 +1919,7 @@ class File extends DataObject
 		foreach( $existing_Links as $loop_Link )
 		{
 			$existing_order = $loop_Link->get('order');
-			if( $existing_order > $order )
+			if( $existing_order >= $order )
 				$order = $existing_order+1;
 		}
 
@@ -1943,6 +1943,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.66  2009/10/12 18:54:18  blueyed
+ * link_to_Item: Fix off-by-one error with order generation
+ *
  * Revision 1.65  2009/10/11 03:12:53  blueyed
  * Properly init order of new links.
  *
