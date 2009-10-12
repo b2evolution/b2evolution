@@ -232,11 +232,11 @@ ul.sf-menu li li li.sfHover ul {
 	height: 10px;
 	overflow: hidden;
 }
-.sf-menu li.separator a {
+.sf-menu li.separator div {
 	padding: 4px 2px;
 	margin: 0;
 }
-.sf-menu li.separator a:hover {
+.sf-menu li.separator div:hover {
 	background-color: ThreeDFace;
 }
 .sf-menu hr {

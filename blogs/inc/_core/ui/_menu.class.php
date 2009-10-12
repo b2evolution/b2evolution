@@ -94,7 +94,7 @@ class Menu extends Widget
 		$menu_item = '';
 		if( $index === false )
 		{ // get menu item after which to insert new entries
-			
+
 			if( is_array( $path ) )
 			{
 				$menu_item = array_pop( $path );
@@ -117,19 +117,19 @@ class Menu extends Widget
 
 			if( !empty( $keys ) ) $index = array_search( $menu_item, $keys );
 		}
-		
+
 		if( ( $index === false ) || ($index === NULL) )
 		{
 			return false;
 		}
-		
+
 		// make new menu entries
 		$menu['entries'] = array_merge(
 			array_slice( $entries, 0, $index + 1 ),
 			$new_entries,
 			array_slice( $entries, $index )
 		);
-		
+
 		return true;
 	}
 
@@ -385,7 +385,7 @@ class Menu extends Widget
 					'afterEach' => '</li>',
 					'beforeEachSel' => '<li class="current">',
 					'afterEachSel' => '</li>',
-					'separator' => '<li class="separator"><a><hr /></a></li>',
+					'separator' => '<li class="separator"><div><hr /></div></li>',
 					'disabled_class' => 'disabled',
 					'_props' => array(
 						'recurse' => 'always',  // options are: 'no' 'always' or 'intoselected'
@@ -401,6 +401,9 @@ class Menu extends Widget
 
 /*
  * $Log$
+ * Revision 1.15  2009/10/12 21:58:43  blueyed
+ * toolbar/menu: wrap HR in DIV instead of A, to make HTML valid
+ *
  * Revision 1.14  2009/09/20 11:59:46  efy-sergey
  * fixed insert_menu_entries_after to support path
  *
