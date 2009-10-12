@@ -85,7 +85,5 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
 			}
 		}
  		?>
-	</ul>
-</div>
-
+	</div>
 </div>
