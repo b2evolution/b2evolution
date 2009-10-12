@@ -201,7 +201,7 @@ class DataObject
 	/**
 	 * Insert object into DB based on previously recorded changes.
 	 *
-	 * Note: DataObject does not require a matching *Cache object. 
+	 * Note: DataObject does not require a matching *Cache object.
 	 * Therefore it will not try to update the Cache.
 	 * If something like that was needed, sth like *Cache->add() should be called.
 	 * ATTENTION: Any dbinsert should typically be followed by a 303 redirect. Updating the Cache before redirect is generally not needed.
@@ -383,7 +383,8 @@ class DataObject
 
 
 	/**
-	 * Check relations for restrictions or cascades
+	 * Check relations for restrictions or cascades.
+	 * @todo dh> Add link to affected items, e.g. items when trying to delete an attachment, where it gets used.
 	 */
 	function check_relations( $what, $ignore = array() )
 	{
@@ -812,6 +813,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.30  2009/10/12 23:52:46  blueyed
+ * todo
+ *
  * Revision 1.29  2009/10/04 23:06:30  fplanque
  * doc
  *
