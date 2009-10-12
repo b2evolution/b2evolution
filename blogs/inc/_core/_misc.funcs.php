@@ -81,6 +81,7 @@ function modules_call_method( $method_name )
  * @param mixed Permission target (blog ID, array of cat IDs...)
  * @param string function name
  * @return boolean True on success (permission is granted), false if permission is not granted
+ *                 NULL if permission not implemented.
  */
 function module_check_perm( $permname, $permlevel, $permtarget, $function )
 {
@@ -3667,6 +3668,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.178  2009/10/12 22:55:51  blueyed
+ * doc
+ *
  * Revision 1.177  2009/10/12 21:29:42  blueyed
  * get_field_attribs_as_string: skip empty fields only if NULL, allow empty strings for ALT handling.
  *
