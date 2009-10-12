@@ -73,12 +73,12 @@ if( !empty($Goal->goal_redir_url) )
 }
 else
 {	// No redirection specified, we send a blank pixel instead:
-	// TODO: dh> Looks like caching should get prevented here?! (so additional requests arrive here, too)?!
-	// fp> yes.
+	load_funcs( '_core/_template.funcs.php' );
 	$blank_gif = $rsc_path.'img/blank.gif';
 
  	header('Content-type: image/gif' );
 	header('Content-Length: '.filesize( $blank_gif ) );
+	header_nocache();
 	readfile( $blank_gif );
 	flush();
 }
@@ -106,6 +106,9 @@ $DB->query( $sql );
 
 /*
  * $Log$
+ * Revision 1.8  2009/10/12 22:08:15  blueyed
+ * Track: send nocache headers as per todo.
+ *
  * Revision 1.7  2009/07/09 00:11:18  fplanque
  * minor
  *
