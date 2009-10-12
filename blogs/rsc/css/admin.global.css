@@ -416,14 +416,15 @@ ul.widget_list li {
 .thread_subject {
 	width: 60%;
 }
- .badge {
- 	position: relative;
- 	top: -1px;
- 	-moz-border-radius:12px;
- 	-webkit-border-radius:12px;
- 	background-color:red;
- 	border:2px solid #fff;
- 	color:#fff;
- 	font-size:10px;
- 	padding:0 6px
- }
+
+.badge {
+	position: relative;
+	top: -1px;
+	-moz-border-radius:12px;
+	-webkit-border-radius:12px;
+	background-color:red;
+	border:2px solid #fff;
+	color:#fff;
+	font-size:10px;
+	padding:0 6px
+}
