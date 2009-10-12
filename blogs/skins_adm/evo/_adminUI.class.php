@@ -63,17 +63,13 @@ class AdminUI extends AdminUI_general
 
 		$r = '';
 
-		if( empty($this->mode) )
-		{ // We're not running in an special mode (bookmarklet...)
+		$r .= $this->get_page_head();
 
-			$r .= $this->get_page_head();
+		// Display MAIN menu:
+		$r .= $this->get_html_menu().'
 
-			// Display MAIN menu:
-			$r .= $this->get_html_menu().'
-
-			<div id="panelbody" class="panelbody">
-			';
-		}
+		<div id="panelbody" class="panelbody">
+		';
 
 		$r .= '
 
@@ -100,10 +96,7 @@ class AdminUI extends AdminUI_general
 
 		$r = '';
 
-		if( empty($this->mode) )
-		{ // We're not running in an special mode (bookmarklet...)
-			$r .= "\n\t</div>";
-		}
+		$r .= "\n\t</div>";
 
 		$r .= "</div>\n";	// Close right col.
 
@@ -190,6 +183,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.36  2009/10/12 23:56:27  blueyed
+ * Cleanup of messages handling, forgot to commit this.
+ *
  * Revision 1.35  2009/10/12 22:11:28  blueyed
  * Fix blank.gif some: use conditional comments, where marked as being required for IE. Add ALT tags and close tags.
  *
