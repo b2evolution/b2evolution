@@ -768,7 +768,7 @@ function attach_browse_tabs()
 					)
 			);
 	}
-	
+
 	// Add post types and statuses sub menu
 	$AdminUI->add_menu_entries(
 			'items',
@@ -976,8 +976,69 @@ function check_perm_posttype( $post_extracats )
 	$current_User->check_perm( 'cats_'.$posttype2perm[$item_typ_ID], 'edit', true /* assert */, $post_extracats );
 }
 
+
+/**
+ * Mass create. Create multiple posts from one post
+ * @param instance of Item class
+ * @return array
+ */
+function create_multiple_posts( & $Item )
+{
+	// Parse text into titles and paragraphs
+	$titles = array();
+	$paragraphs = array();
+	$current_title = '';
+	foreach( explode( "\n", trim( $Item->content ) ) as $line )
+	{
+		$line = trim( strip_tags( $line ) );
+		if( count( $paragraphs ) == 0 && !empty( $line ) )
+		{
+			$current_title = $line;
+			$paragraphs[] = '';
+			$titles[$line] = $paragraphs;
+
+		}
+		elseif( count( $paragraphs ) > 0 && !empty( $line ) )
+		{
+			$titles[$current_title][] = $line;
+		}
+		else
+		{
+			$paragraphs = array();
+		}
+	}
+
+	// Create instances of Item class from parsed titles/paragraphs
+	$Items = array();
+	foreach( $titles as $title => $paragraphs )
+	{
+		// duplicate item to create new post
+		$new_Item = duplicate( $Item );
+		$new_Item->set_param( 'title', 'string', $title );
+
+		$content = '';
+
+		foreach( $paragraphs as $paragraph )
+		{
+			if( strlen( $paragraph ) > 0 )
+			{
+				$content .= '<p>'.$paragraph.'</p>';
+			}
+		}
+
+		$new_Item->set_param( 'content', 'string', $content );
+
+		$Items[] = $new_Item;
+	}
+
+	return $Items;
+}
+
 /*
  * $Log$
+ * Revision 1.74  2009/10/12 11:59:44  efy-maxim
+ * Mass create
+ *
  * Revision 1.73  2009/10/07 00:52:00  sam2kb
  * Titles in cat_select_header()
  *

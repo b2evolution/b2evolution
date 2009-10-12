@@ -60,6 +60,13 @@ $AdminUI->set_path( 'items' );	// Sublevel may be attached below
  * Autoselect a blog where we have PERMISSION to browse (preferably the last used blog):
  * Note: for some actions, we'll get the blog from the post ID
  */
+
+$mass_create = param( 'mass_create', 'integer' );
+if( $action == 'new_switchtab' && !empty( $mass_create ) )
+{	// Replace action with mass create action
+	$action = 'new_mass';
+}
+
 switch( $action )
 {
 	case 'edit_links':
@@ -149,6 +156,7 @@ switch( $action )
 
 	case 'new':
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
+	case 'new_mass':
 	case 'create_edit':
 	case 'create':
 	case 'create_publish':
@@ -199,6 +207,7 @@ switch( $action )
 		break;
 
 	case 'new':
+	case 'new_mass':
 		$set_issue_date = 'now';
 		$item_issue_date = date_i18n( locale_datefmt(), $localtimenow );
 		$item_issue_time = date( 'H:i:s', $localtimenow );
@@ -379,15 +388,38 @@ switch( $action )
 
 		$Plugins->trigger_event( 'AdminBeforeItemEditCreate', array( 'Item' => & $edited_Item ) );
 
+		if( !empty( $mass_create ) )
+		{
+			$Items = & create_multiple_posts( $edited_Item );
+			if( empty( $Items ) )
+			{
+				param_error( 'content', T_( 'Content must not be empty.' ) );
+			}
+		}
+
 		if( $Messages->count('error') )
-		{	// There have been some validation errors:
+		{
+			if( !empty( $mass_create ) )
+			{
+				$action = 'new_mass';
+			}
+			// There have been some validation errors:
 			// Params we need for tab switching:
 			$tab_switch_params = 'blog='.$blog;
 			break;
 		}
 
-		// INSERT NEW POST INTO DB:
-		$edited_Item->dbinsert();
+		if( isset( $Items ) && !empty( $Items ) )
+		{	// We can create multiple posts from single post
+			foreach( $Items as $edited_Item )
+			{	// INSERT NEW POST INTO DB:
+				$edited_Item->dbinsert();
+			}
+		}
+		else
+		{	// INSERT NEW POST INTO DB:
+			$edited_Item->dbinsert();
+		}
 
 		// post post-publishing operations:
 		param( 'trackback_url', 'string' );
@@ -747,6 +779,7 @@ switch( $action )
 		debug_die( 'unhandled action 2: '.htmlspecialchars($action) );
 }
 
+
 /**
  * Initialize list mode; Several actions need this.
  */
@@ -919,6 +952,22 @@ switch( $action )
 
 		break;
 
+	case 'new_mass':
+
+		$AdminUI->set_coll_list_params( 'blog_post_statuses', 'edit',
+						array( 'ctrl' => 'items', 'action' => 'new' ), NULL, '',
+						'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$dispatcher.'\', %s )' );
+
+		// We don't check the following earlier, because we want the blog switching buttons to be available:
+		if( ! blog_has_cats( $blog ) )
+		{
+			$Messages->add( sprintf( T_('Since this blog has no categories, you cannot post into it. You must <a %s>create categories</a> first.'), 'href="'.$dispatcher.'?ctrl=chapters&amp;blog='.$blog.'"') , 'error' );
+			$action = 'nil';
+			break;
+		}
+
+	break;
+
 	case 'view':
 		// We're displaying a SINGLE specific post:
 		$AdminUI->title = $AdminUI->title_titlearea = T_('View post & comments');
@@ -952,7 +1001,6 @@ if( !empty($tab) )
 	$AdminUI->append_path_level( $tab );
 }
 
-
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
 require_css( $rsc_url.'css/blog_base.css' );
 
@@ -980,13 +1028,14 @@ $AdminUI->disp_body_top();
 /**
  * Display payload:
  */
+
 switch( $action )
 {
 	case 'nil':
 		// Do nothing
 		break;
 
-  case 'new_switchtab': // this gets set as action by JS, when we switch tabs
+  	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
 		$bozo_start_modified = true;	// We want to start with a form being already modified
 	case 'new':
@@ -1022,6 +1071,21 @@ switch( $action )
 
 		// End payload block:
 		$AdminUI->disp_payload_end();
+		break;
+
+	case 'new_mass':
+
+		// Begin payload block:
+		$AdminUI->disp_payload_begin();
+
+		$item_title = $edited_Item->title;
+		$item_content = $edited_Item->content;
+
+		$AdminUI->disp_view( 'items/views/_item_mass.form.php' );
+
+		// End payload block:
+		$AdminUI->disp_payload_end();
+
 		break;
 
 	case 'view':
@@ -1128,6 +1192,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.68  2009/10/12 11:59:43  efy-maxim
+ * Mass create
+ *
  * Revision 1.67  2009/10/11 03:00:10  blueyed
  * Add "position" and "order" properties to attachments.
  * Position can be "teaser" or "aftermore" for now.

@@ -268,6 +268,9 @@ if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) 
 			$title = T_('Write a new post...');
 			$new_ptyp_ID = 1;
 			$perm = ''; // No need to check
+
+			$ItemList->global_icon( T_( 'Mass create...' ), 'new', '?ctrl=items&amp;action=new_mass&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$new_ptyp_ID, T_( 'Mass create' ).' &raquo;', 3, 4 );
+
 			break;
 	}
 
@@ -292,6 +295,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.19  2009/10/12 11:59:44  efy-maxim
+ * Mass create
+ *
  * Revision 1.18  2009/08/22 20:31:01  tblue246
  * New feature: Post type permissions
  *
