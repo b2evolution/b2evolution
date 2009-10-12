@@ -1026,14 +1026,7 @@ class File extends DataObject
 		{ // Make an IMG link:
 			$r = $before_image;
 
-			$img_attribs = $this->get_img_attribs($size_name);
-			$img_attribs['title'] = $this->get('title');
-			$img_attribs['alt'] = $this->get('alt');
-			if( ! strlen($img_attribs['alt']) )
-			{ // use title for alt, too
-				$img_attribs['alt'] = $img_attribs['title'];
-			}
-			$img = '<img'.get_field_attribs_as_string($img_attribs).' />';
+			$img = '<img'.get_field_attribs_as_string($this->get_img_attribs($size_name)).' />';
 
 			if( $image_link_to == 'original' )
 			{	// special case
@@ -1668,9 +1661,13 @@ class File extends DataObject
 			'title' => isset($title) ? $title : $this->get('title'),
 			'alt'   => isset($alt) ? $alt : $this->get('alt'),
 		);
-		if( ! strlen($img_attribs['alt']) )
+		if( ! isset($img_attribs['alt']) )
 		{ // use title for alt, too
 			$img_attribs['alt'] = $img_attribs['title'];
+		}
+		if( ! isset($img_attribs['alt']) )
+		{ // always use empty alt
+			$img_attribs['alt'] = '';
 		}
 		if( $size_name == 'original' )
 		{
@@ -1690,6 +1687,7 @@ class File extends DataObject
 				$img_attribs += $size_arr;
 			}
 		}
+
 		return $img_attribs;
 	}
 
@@ -1943,6 +1941,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.67  2009/10/12 21:32:13  blueyed
+ * File: get_tag: use get_img_attribs; get_img_attribs: always use empty alt, if nothing else is provided.
+ *
  * Revision 1.66  2009/10/12 18:54:18  blueyed
  * link_to_Item: Fix off-by-one error with order generation
  *
