@@ -157,12 +157,16 @@ class AdminUI extends AdminUI_general
 			$r .= $this->get_page_head();
 		}
 
-		$r .= '
-			<div id="TitleArea">
-				<h1>'.$this->get_bloglist_buttons( '<strong>'.$this->get_title_for_titlearea().'</strong> ' ).'</h1>
-			</div>
+		$blog_buttons = $this->get_bloglist_buttons( '<strong>'.$this->get_title_for_titlearea().'</strong> ' );
+		if( ! empty($blog_buttons) )
+		{
+			$r .= '
+				<div id="TitleArea">
+					<h1>'.$blog_buttons.'</h1>
+				</div>';
+		}
 
-			<div id="panelbody" class="panelbody">'
+		$r .= '<div id="panelbody" class="panelbody">'
 			."\n\n";
 
 		// Display info & error messages
@@ -200,6 +204,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.32  2009/10/12 20:49:14  blueyed
+ * legacy admin skin: display TitleArea only if there are bloglist buttons.
+ *
  * Revision 1.31  2009/08/31 17:21:32  fplanque
  * minor
  *
