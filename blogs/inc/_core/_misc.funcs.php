@@ -3191,9 +3191,10 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 
 	foreach( $field_attribs as $l_attr => $l_value )
 	{
-		if( $l_value === '' || $l_value === NULL )
+		if( $l_value === NULL )
 		{ // don't generate empty attributes (it may be NULL if we pass 'value' => NULL as field_param for example, because isset() does not match it!)
-		// sam2kb> what about alt="" how do we handle this?
+			// sam2kb> what about alt="" how do we handle this?
+			// I've removed the "=== ''" check now. Should not do any harm. IIRC NULL is what we want to avoid here.
 			continue;
 		}
 
@@ -3666,6 +3667,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.177  2009/10/12 21:29:42  blueyed
+ * get_field_attribs_as_string: skip empty fields only if NULL, allow empty strings for ALT handling.
+ *
  * Revision 1.176  2009/10/11 09:09:03  efy-maxim
  * Check_is functions have been moved to to params.funcs
  *
