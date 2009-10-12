@@ -532,11 +532,13 @@ class _core_Module extends Module
 				$entries['userprefs']['entries']['admskins'] = array(
 						'text' => T_('Admin skin'),
 					);
+				$redirect_to = rawurlencode(regenerate_url('', '', '', '&'));
 				foreach( $admin_skins as $admin_skin )
 				{
 					$entries['userprefs']['entries']['admskins']['entries'][$admin_skin] = array(
 							'text' => $admin_skin,
-							'href' => $dispatcher.'?ctrl=users&amp;action=change_admin_skin&amp;new_admin_skin='.rawurlencode($admin_skin),
+							'href' => $dispatcher.'?ctrl=users&amp;action=change_admin_skin&amp;new_admin_skin='.rawurlencode($admin_skin)
+								.'&amp;redirect_to='.$redirect_to
 						);
 				}
 			}
@@ -730,6 +732,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.36  2009/10/12 23:54:56  blueyed
+ * Return to current page when changing admin skin (via regenerate_url)
+ *
  * Revision 1.35  2009/10/08 20:05:51  efy-maxim
  * Modular/Pluggable Permissions
  *
