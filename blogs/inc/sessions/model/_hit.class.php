@@ -431,10 +431,10 @@ class Hit
 			elseif( $browscap = $this->get_browser_caps() )
 			{
 				$Debuglog->add( 'detect_useragent(): Trying to detect platform using browscap', 'hit' );
-				$Debuglog->add( 'Raw platform string: '.$browscap->platform, 'hit' );
+				$Debuglog->add( 'detect_useragent(): Raw platform string: '.$browscap->platform, 'hit' );
 
 				$platform = strtolower( $browscap->platform );
-				if( $platform == 'linux' || in_array( $platform, array( 'win', 'mac' ) ) )
+				if( $platform == 'linux' || in_array( substr( $platform, 0, 3 ), array( 'win', 'mac' ) ) )
 				{
 					$this->agent_platform = $platform;
 				}
@@ -531,7 +531,7 @@ class Hit
 	/**
 	 * Get browser capabilities through {@link get_browser()}.
 	 *
-	 * @return false|object
+	 * @return false|object The return value of get_browser().
 	 */
 	function get_browser_caps()
 	{
@@ -1165,6 +1165,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.41  2009/10/13 09:39:03  tblue246
+ * Bugfix
+ *
  * Revision 1.40  2009/10/13 09:35:01  tblue246
  * Correctly detect Linux using browscap
  *
