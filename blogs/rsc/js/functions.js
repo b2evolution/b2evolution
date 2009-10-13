@@ -483,7 +483,7 @@ var b2evo_Callbacks = new b2evo_Callbacks();
  */
 function evoFadeSuccess( selector )
 {
-	evoFadeBg(selector, new Array("#ffff00", "#ffffff", "#eeee88"), {speed:"fast"});
+	evoFadeBg(selector, new Array("#ddff00", "#bbff00"));
 }
 
 
@@ -493,7 +493,7 @@ function evoFadeSuccess( selector )
  */
 function evoFadeFailure( selector )
 {
-	evoFadeBg(selector, new Array("#9300ff", "#ff000a", "#ff0000"), {speed:"fast"});
+	evoFadeBg(selector, new Array("#9300ff", "#ff000a", "#ff0000"));
 }
 
 
@@ -504,7 +504,7 @@ function evoFadeFailure( selector )
  */
 function evoFadeHighlight( selector )
 {
-	evoFadeBg(selector, new Array("#ddff00", "#bbff00"));
+	evoFadeBg(selector, new Array("#ffbf00", "#ffe79f"));
 }
 
 
@@ -532,6 +532,9 @@ function evoFadeBg( selector, bgs, options )
 
 /*
  * $Log$
+ * Revision 1.36  2009/10/13 22:33:19  blueyed
+ * move colors from Highlight to Success (greenish). Use something orangish/yellowish for highlight. Use 'normal' speed in all cases.
+ *
  * Revision 1.35  2009/10/13 22:27:06  blueyed
  * Add general EvoFadeBg function, and use it from the other faders. Add EvoFadeHighlight, meant for highlighting. Color scheme cries for improvement.
  *
