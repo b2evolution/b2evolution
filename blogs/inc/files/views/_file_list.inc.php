@@ -160,7 +160,8 @@ $Form->begin_form();
 
 	<tbody>
 	<?php
-	param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
+	$checkall = param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
+	$fm_highlight = param( 'fm_highlight', 'string', NULL );
 
 	/***********************************************************/
 	/*                    MAIN FILE LIST:                      */
@@ -168,7 +169,13 @@ $Form->begin_form();
 	$countFiles = 0;
 	while( $lFile = & $fm_Filelist->get_next() )
 	{ // Loop through all Files:
-		echo '<tr class="'.( $countFiles%2 ? 'odd' : 'even' ).'">';
+		echo '<tr class="'.($countFiles%2 ? 'odd' : 'even').'"';
+
+		if( isset($fm_highlight) && $lFile->get_name() == $fm_highlight )
+		{
+			echo ' id="fm_highlighted"'; // could be a class, too..
+		}
+		echo '>';
 
 
 		/********************    Checkbox:    *******************/
@@ -177,7 +184,6 @@ $Form->begin_form();
 		echo '<span name="surround_check" class="checkbox_surround_init">';
 		echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
 					name="fm_selected[]" value="'.rawurlencode($lFile->get_rdfp_rel_path()).'" id="cb_filename_'.$countFiles.'"';
-		global $checkall;
 		if( $checkall || $selected_Filelist->contains( $lFile ) )
 		{
 			echo ' checked="checked"';
@@ -642,12 +648,34 @@ $Form->begin_form();
 			// -->
 		</script>
 		<?php
+
+		if( $fm_highlight )
+		{ // if a file is being highlighted (e.g. via "Locate this file!"), scroll there and do the success fade
+			?>
+
+			<script type="text/javascript">
+			jQuery( function() {
+				var fm_hl = jQuery("#fm_highlighted");
+				if( fm_hl.length ) {
+					jQuery.getScript('<?php echo $rsc_url ?>js/jquery/jquery.scrollto.js', function () {
+						jQuery.scrollTo(fm_hl, { onAfter: function() { evoFadeHighlight( fm_hl ) } });
+					});
+				}
+			} );
+			</script>
+
+			<?php
+		}
+
 	}}}
 ?>
 <!-- End of detailed file list -->
 <?php
 /*
  * $Log$
+ * Revision 1.29  2009/10/13 22:36:01  blueyed
+ * Highlight files and directories in the filemanager when opened via 'Locate this' link. Adds scrollTo jQuery plugin.
+ *
  * Revision 1.28  2009/10/10 21:08:18  blueyed
  * linkctrl might be set, but empty.
  *

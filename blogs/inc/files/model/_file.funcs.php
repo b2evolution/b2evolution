@@ -578,6 +578,14 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 {
 	static $js_closeClickIDs; // clickopen IDs that should get closed
 	static $instance_ID = 0;
+	static $fm_highlight;
+
+	// A folder might be highlighted (via "Locate this directory!")
+	if( ! isset($fm_highlight) )
+	{
+		$fm_highlight = param('fm_highlight', 'string', '');
+	}
+
 
 	if( ! $is_recursing )
 	{	// This is not a recursive call (yet):
@@ -616,18 +624,24 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 
 		$id_path = 'id_path_'.$instance_ID.md5( $ads_full_path );
 
-		$r['string'] = '<span class="folder_in_tree">';
+		$r['string'] = '<span class="folder_in_tree"';
 
-		// echo '<br />'. $rds_rel_path . ' - '.$ads_full_path;
 		if( $ads_full_path == $ads_selected_full_path )
 		{	// This is the current open path
 	 		$r['opened'] = true;
+
+	 		if( $fm_highlight && $fm_highlight == substr($rds_rel_path, 0, -1) )
+	 		{
+	 			$r['string'] .= ' id="fm_highlighted"';
+	 			unset($fm_highlight);
+	 		}
 		}
 		else
 		{
 	 		$r['opened'] = NULL;
 		}
 
+		$r['string'] .= '>';
 
 		if( $radios )
 		{ // Optional radio input to select this path:
@@ -801,6 +815,9 @@ function is_absolute_pathname($path)
 
 /*
  * $Log$
+ * Revision 1.24  2009/10/13 22:36:01  blueyed
+ * Highlight files and directories in the filemanager when opened via 'Locate this' link. Adds scrollTo jQuery plugin.
+ *
  * Revision 1.23  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

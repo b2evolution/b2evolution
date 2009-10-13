@@ -1566,6 +1566,9 @@ class File extends DataObject
 			$url_params .= '&amp;fm_mode=link_item&amp;item_ID='.$link_itm_ID;
 		}
 
+		// Add param to make the file list highlight this (via JS).
+		$url_params .= '&amp;fm_highlight='.rawurlencode($this->_name);
+
 		$url = url_add_param( $actionurl, $url_params );
 
 		return $url;
@@ -1941,6 +1944,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.68  2009/10/13 22:36:01  blueyed
+ * Highlight files and directories in the filemanager when opened via 'Locate this' link. Adds scrollTo jQuery plugin.
+ *
  * Revision 1.67  2009/10/12 21:32:13  blueyed
  * File: get_tag: use get_img_attribs; get_img_attribs: always use empty alt, if nothing else is provided.
  *
