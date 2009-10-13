@@ -42,12 +42,12 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
  */
 class Filetype extends DataObject
 {
-	var $extensions = '' ;
-	var $name = ''			 ;
-	var $mimetype = ''	 ;
-	var $icon = ''			 ;
-	var $viewtype = ''	 ;
-	var $allowed =''		 ;
+	var $extensions = '';
+	var $name = '';
+	var $mimetype = '';
+	var $icon = '';
+	var $viewtype = '';
+	var $allowed ='';
 
 	/**
 	 * Constructor
@@ -202,6 +202,9 @@ class Filetype extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2009/10/13 23:06:01  blueyed
+ * minor
+ *
  * Revision 1.6  2009/10/02 20:34:32  blueyed
  * Improve handling of wrong file extensions for image.
  *  - load_image: if the wrong mimetype gets passed, return error, instead of letting imagecreatefrom* fail
