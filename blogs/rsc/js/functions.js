@@ -483,14 +483,7 @@ var b2evo_Callbacks = new b2evo_Callbacks();
  */
 function evoFadeSuccess( selector )
 {
-	jQuery( selector ).animate({
-			backgroundColor: "#ffff00"
-		},"fast" ).animate({
-			backgroundColor: "#ffffff"
-		},"fast" ).animate({
-			backgroundColor: "#eeee88"
-		},"fast", "", function(){jQuery( this ).removeAttr( "style" );
-		});
+	evoFadeBg(selector, new Array("#ffff00", "#ffffff", "#eeee88"), {speed:"fast"});
 }
 
 
@@ -500,19 +493,48 @@ function evoFadeSuccess( selector )
  */
 function evoFadeFailure( selector )
 {
-	jQuery( selector ).animate({
-			backgroundColor: "#ff0000"
-		},"fast" ).animate({
-			backgroundColor: "#ff00ff"
-		},"fast" ).animate({
-			backgroundColor: "#ff00ff"
-		},"fast", "", function(){jQuery(this).removeAttr("style");
-		});
+	evoFadeBg(selector, new Array("#9300ff", "#ff000a", "#ff0000"), {speed:"fast"});
+}
+
+
+/**
+ * Fades the relevant object to provide feedback, in case of highlighting
+ * e.g. for items the file manager get called for ("#fm_highlighted").
+ * @param jQuery selector
+ */
+function evoFadeHighlight( selector )
+{
+	evoFadeBg(selector, new Array("#ddff00", "#bbff00"));
+}
+
+
+/**
+ * Fade jQuery selector via backgrounds colors (bgs), back to original background
+ * color and then remove any styles (from animations and others)
+ *
+ * @param string|jQuery
+ * @param Array
+ * @param object Options ("speed")
+ */
+function evoFadeBg( selector, bgs, options )
+{
+	var origBg = jQuery(selector).css("backgroundColor");
+	var speed = options && options.speed || "normal";
+
+	var toEval = 'jQuery(selector).animate({ backgroundColor: ';
+	for( e in bgs )
+		toEval += '"'+bgs[e]+'"'+'}, "'+speed+'" ).animate({ backgroundColor: ';
+	toEval += 'origBg },"'+speed+'", "", function(){jQuery( this ).removeAttr( "style" );});';
+
+	eval(toEval);
 }
 
 
 /*
  * $Log$
+ * Revision 1.35  2009/10/13 22:27:06  blueyed
+ * Add general EvoFadeBg function, and use it from the other faders. Add EvoFadeHighlight, meant for highlighting. Color scheme cries for improvement.
+ *
  * Revision 1.34  2009/10/11 02:51:19  blueyed
  * Add JS functions evoFadeSuccess/evoFadeFailure, derived from doFade. IMHO this is the approach to take throughout the app (at least regarding the stubs), also for Results (uses FAT currently).
  *
