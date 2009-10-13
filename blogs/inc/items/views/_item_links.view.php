@@ -53,7 +53,7 @@ $SQL = & new SQL();
 $SQL->SELECT( 'link_ID, link_ltype_ID, link_position, file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
 $SQL->FROM( 'T_links LEFT JOIN T_files ON link_file_ID = file_ID' );
 $SQL->WHERE( 'link_itm_ID = '.$edited_Item->ID );
-$SQL->ORDER_BY( 'link_position+0, link_order, link_ID' ); // the same order is required
+$SQL->ORDER_BY( 'link_position+0, link_order, link_ID' );
 
 $Results = & new Results( $SQL->get(), 'link_' );
 
@@ -169,7 +169,7 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 			if( $cur_idx > 0 )
 			{
 				echo action_icon( T_('Move upwards'), 'move_up',
-					regenerate_url( 'p,itm_ID,action', "link_ID=$link_ID&amp;action=move_up" ) );
+					regenerate_url( 'p,itm_ID,action', "link_ID=$link_ID&amp;action=link_move_up" ) );
 			}
 			else
 			{
@@ -179,7 +179,7 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 			if( $cur_idx < $total_rows-1 )
 			{
 				echo action_icon( T_('Move down'), 'move_down',
-					regenerate_url( 'p,itm_ID,action', "link_ID=$link_ID&amp;action=move_down" ) );
+					regenerate_url( 'p,itm_ID,action', "link_ID=$link_ID&amp;action=link_move_down" ) );
 			}
 			else
 			{
@@ -202,8 +202,8 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
  */
 function display_position( & $row )
 {
-	global $htsrv_url;
-
+	// TODO: dh> centralize somewhere.. might get parsed out of ENUM info?!
+	// Should be ordered like the ENUM.
 	$positions = array(
 		'teaser' => T_('Teaser'),
 		'aftermore' => T_('After "more"'),
@@ -211,24 +211,28 @@ function display_position( & $row )
 
 	// TODO: dh> only handle images
 
-	$onchange = 'var oThis = this;
-	jQuery.get(\''.$htsrv_url.'async.php\', {
-		action: "set_item_link_position",
-		link_ID: "'.$row->link_ID.'",
-		link_position: this.value
-	}, function(r, status) {
-		if( r == "OK" ) {
-			evoFadeSuccess( jQuery(oThis.form).closest(\'tr\') );
-			jQuery(oThis.form).closest(\'td\').removeClass(\'error\');
-		} else {
-			jQuery(oThis).val(r);
-			evoFadeFailure( jQuery(oThis.form).closest(\'tr\') );
-			jQuery(oThis.form).closest(\'td\').addClass(\'error\');
-		}
-	} ); return false;';
+	$id = 'display_position_'.$row->link_ID;
 
-	return '<form><select onchange="'.htmlspecialchars($onchange).'">'
-		.Form::get_select_options_string($positions, $row->link_position, true).'</select></form>';
+	// NOTE: dh> using method=get so that we can use regenerate_url (for non-JS).
+	$r = '<form action="" method="post"><select id="'.$id.'" name="link_position">'
+		.Form::get_select_options_string($positions, $row->link_position, true).'</select>'
+		.'<script type="text/javascript">jQuery("#'.$id.'").change( evo_display_position_onchange );</script>';
+
+	$r .= '<noscript>';
+	// Add hidden fields for non-JS
+	$url = regenerate_url( 'p,itm_ID,action', 'link_ID='.$row->link_ID.'&action=set_item_link_position', '', '&' );
+	$params = explode('&', substr($url, strpos($url, '?')+1));
+
+	foreach($params as $param)
+	{
+		list($k, $v) = explode('=', $param);
+		$r .= '<input type="hidden" name="'.htmlspecialchars($k).'" value="'.htmlspecialchars($v).'" />';
+	}
+	$r .= '<input class="SaveButton" type="submit" value="&raquo;" />';
+	$r .= '</noscript>';
+	$r .= '</form>';
+
+	return $r;
 }
 $Results->cols[] = array(
 						'th' => T_('Position'),
@@ -241,6 +245,9 @@ $Results->display( $AdminUI->get_template( 'compact_results' ) );
 
 /*
  * $Log$
+ * Revision 1.11  2009/10/13 00:24:28  blueyed
+ * Cleanup attachment position handling. Make it work for non-JS.
+ *
  * Revision 1.10  2009/10/11 03:00:11  blueyed
  * Add "position" and "order" properties to attachments.
  * Position can be "teaser" or "aftermore" for now.

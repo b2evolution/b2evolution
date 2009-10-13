@@ -54,6 +54,7 @@ $action = param_action( 'list' );
 
 $AdminUI->set_path( 'items' );	// Sublevel may be attached below
 
+
 /*
  * Init the objects we want to work on.
  *
@@ -77,9 +78,11 @@ switch( $action )
 		$Blog = & $edited_Item->get_Blog();
 		break;
 
+	case 'set_item_link_position':
+		param('link_position', 'string', true);
 	case 'unlink':
-	case 'move_up':
-	case 'move_down':
+	case 'link_move_up':
+	case 'link_move_down':
 		// Name of the iframe we want some action to come back to:
 		param( 'iframe_name', 'string', '', true );
 
@@ -669,6 +672,29 @@ switch( $action )
 
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		// Add JavaScript.
+		// TODO: dh> move this into a .js file specific to the items page(s)?!
+		global $htsrv_url;
+		add_js_headline('
+		function evo_display_position_onchange() {
+			var oThis = this;
+			jQuery.get(\''.$htsrv_url.'async.php\', {
+				action: "set_item_link_position",
+				link_ID: this.id.substr(17),
+				link_position: this.value
+			}, function(r, status) {
+				if( r == "OK" ) {
+					evoFadeSuccess( jQuery(oThis.form).closest(\'tr\') );
+					jQuery(oThis.form).closest(\'td\').removeClass(\'error\');
+				} else {
+					jQuery(oThis).val(r);
+					evoFadeFailure( jQuery(oThis.form).closest(\'tr\') );
+					jQuery(oThis.form).closest(\'td\').addClass(\'error\');
+				}
+			} );
+			return false;
+		}');
 		break;
 
 
@@ -689,7 +715,7 @@ switch( $action )
 		//init_list_mode();
 		//$action = 'view';
 		// REDIRECT / EXIT
-		if( $mode == 'iframe' ) // TODO: Messages get not displayed in this case
+		if( $mode == 'iframe' )
 		{
 	 		header_redirect( regenerate_url( '', 'action=edit_links&mode=iframe&item_ID='.$edited_Item->ID, '', '&' ) );
 		}
@@ -700,15 +726,15 @@ switch( $action )
 		break;
 
 
-	case 'move_up':
-	case 'move_down':
+	case 'link_move_up':
+	case 'link_move_down':
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		$itemLinks = $edited_Item->get_Links();
 
 		// Switch order with the next/prev one, from the same position group.
-		if( $action == 'move_up' )
+		if( $action == 'link_move_up' )
 		{
 			$switchcond = 'return ($loop_Link->get("order") > $i
 				&& $loop_Link->get("order") < '.$edited_Link->get("order").'
@@ -746,7 +772,7 @@ switch( $action )
 			$edited_Link->dbupdate( true );
 
 
-			if( $action == 'move_up' )
+			if( $action == 'link_move_up' )
 				$msg = T_('Link has been moved up.');
 			else
 				$msg = T_('Link has been moved down.');
@@ -758,13 +784,8 @@ switch( $action )
 			$Messages->add( T_('Link order has not been changed.'), 'note' );
 		}
 
-
-		// go on to view:
-		//$p = $edited_Item->ID;
-		//init_list_mode();
-		//$action = 'view';
 		// REDIRECT / EXIT
-		if( $mode == 'iframe' ) // TODO: Messages get not displayed in this case
+		if( $mode == 'iframe' )
 		{
 	 		header_redirect( regenerate_url( '', 'action=edit_links&mode=iframe&item_ID='.$edited_Item->ID, '', '&' ) );
 		}
@@ -774,6 +795,33 @@ switch( $action )
 		}
 		break;
 
+
+	case 'set_item_link_position':
+		// Check permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		$LinkCache = & get_LinkCache();
+		$Link = & $LinkCache->get_by_ID($link_ID);
+
+		if( $Link->set('position', $link_position) && $Link->dbupdate() )
+		{
+			$Messages->add( T_('Link position has been changed.'), 'success' );
+		}
+		else
+		{
+			$Messages->add( T_('Link position has not been changed.'), 'note' );
+		}
+
+		// REDIRECT / EXIT
+		if( $mode == 'iframe' )
+		{
+	 		header_redirect( regenerate_url( '', 'action=edit_links&mode=iframe&item_ID='.$edited_Item->ID, '', '&' ) );
+		}
+		else
+		{
+	 		header_redirect( regenerate_url( '', 'p='.$edited_Item->ID, '', '&' ) );
+		}
+		break;
 
 	default:
 		debug_die( 'unhandled action 2: '.htmlspecialchars($action) );
@@ -1192,6 +1240,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.69  2009/10/13 00:24:28  blueyed
+ * Cleanup attachment position handling. Make it work for non-JS.
+ *
  * Revision 1.68  2009/10/12 11:59:43  efy-maxim
  * Mass create
  *
