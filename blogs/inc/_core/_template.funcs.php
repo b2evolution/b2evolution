@@ -446,8 +446,8 @@ function require_js( $js_file, $relative_to_base = false )
 	$js_aliases = array(
 		'#jquery#' => 'jquery.min.js',
 		'#jquery_debug#' => 'jquery.js',
-		'#jqueryUI#' => 'jquery.ui.all.min.js',
-		'#jqueryUI_debug#' => 'jquery.ui.all.js',
+		'#jqueryUI#' => 'jquery/jquery.ui.all.min.js',
+		'#jqueryUI_debug#' => 'jquery/jquery.ui.all.js',
 	);
 
 	// TODO: dh> I think dependencies should get handled where the files are included!
@@ -997,6 +997,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.60  2009/10/13 20:59:49  blueyed
+ * Create subdir for jquery plugins. Move jQuery UI in there.
+ *
  * Revision 1.59  2009/09/05 22:12:34  fplanque
  * made dummy shorter :)
  *
