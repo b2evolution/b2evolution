@@ -121,7 +121,11 @@ if( $mode != 'upload' )
 	{
 		global $current_File, $edited_Item, $current_User;
 
-		$title = T_('Locate this file!');
+		if( $current_File->is_dir() )
+			$title = T_('Locate this directory!');
+		else
+			$title = T_('Locate this file!');
+
 
 		$r = $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID,
 						get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title );
@@ -157,6 +161,9 @@ if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Ite
 
 /*
  * $Log$
+ * Revision 1.12  2009/10/13 22:28:06  blueyed
+ * "Locate this directory" for dirs. Cries for refactoring.
+ *
  * Revision 1.11  2009/09/25 13:09:36  efy-vyacheslav
  * Using the SQL class to prepare queries
  *

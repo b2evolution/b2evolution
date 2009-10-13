@@ -161,7 +161,10 @@ if( $current_User->check_perm( 'files', 'view', false, $blog ) )
 
 		if( isset($current_File) )
 		{
-			$title = T_('Locate this file!');
+			if( $current_File->is_dir() )
+				$title = T_('Locate this directory!');
+			else
+				$title = T_('Locate this file!');
 			$r = $current_File->get_linkedit_link( $edited_Item->ID, get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title ).' ';
 		}
 
@@ -191,6 +194,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2009/10/13 22:28:06  blueyed
+ * "Locate this directory" for dirs. Cries for refactoring.
+ *
  * Revision 1.7  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

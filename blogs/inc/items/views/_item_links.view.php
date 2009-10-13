@@ -149,7 +149,10 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 
 		if( isset($current_File) )
 		{
-			$title = T_('Locate this file!');
+			if( $current_File->is_dir() )
+				$title = T_('Locate this directory!');
+			else
+				$title = T_('Locate this file!');
 			$url = $current_File->get_linkedit_url( $edited_Item->ID );
 			$r = '<a href="'.$url.'" onclick="return pop_up_window( \''
 						.url_add_param( $url, 'mode=upload&amp;iframe_name='.$iframe_name.'' ).'\', \'fileman_upload\', 1000 )" target="_parent" title="'.$title.'">'
@@ -245,6 +248,9 @@ $Results->display( $AdminUI->get_template( 'compact_results' ) );
 
 /*
  * $Log$
+ * Revision 1.12  2009/10/13 22:28:06  blueyed
+ * "Locate this directory" for dirs. Cries for refactoring.
+ *
  * Revision 1.11  2009/10/13 00:24:28  blueyed
  * Cleanup attachment position handling. Make it work for non-JS.
  *
