@@ -535,7 +535,14 @@ class Hit
 	 */
 	function get_browser_caps()
 	{
-		return @get_browser( $this->get_user_agent() );
+		static $caps = NULL;
+
+		if( $caps === NULL )
+		{
+			$caps = @get_browser( $this->get_user_agent() );
+		}
+
+		return $caps;
 	}
 
 
@@ -1165,6 +1172,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.42  2009/10/13 10:02:01  tblue246
+ * Hit::get_browser_caps(): Cache result.
+ *
  * Revision 1.41  2009/10/13 09:39:03  tblue246
  * Bugfix
  *
