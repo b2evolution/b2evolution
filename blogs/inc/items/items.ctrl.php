@@ -733,19 +733,17 @@ switch( $action )
 
 		$itemLinks = $edited_Item->get_Links();
 
-		// Switch order with the next/prev one, from the same position group.
+		// Switch order with the next/prev one
 		if( $action == 'link_move_up' )
 		{
 			$switchcond = 'return ($loop_Link->get("order") > $i
-				&& $loop_Link->get("order") < '.$edited_Link->get("order").'
-				&& $loop_Link->get("position") == "'.$edited_Link->get('position').'");';
+				&& $loop_Link->get("order") < '.$edited_Link->get("order").');';
 			$i = -1;
 		}
 		else
 		{
 			$switchcond = 'return ($loop_Link->get("order") < $i
-				&& $loop_Link->get("order") > '.$edited_Link->get("order").'
-				&& $loop_Link->get("position") == "'.$edited_Link->get('position').'");';
+				&& $loop_Link->get("order") > '.$edited_Link->get("order").');';
 			$i = PHP_INT_MAX;
 		}
 		foreach( $itemLinks as $loop_Link )
@@ -1240,6 +1238,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.70  2009/10/13 23:26:16  blueyed
+ * Drop special handling of link_position + link_order: it is confusing, and will not scale well with more link_positions probably.
+ *
  * Revision 1.69  2009/10/13 00:24:28  blueyed
  * Cleanup attachment position handling. Make it work for non-JS.
  *
