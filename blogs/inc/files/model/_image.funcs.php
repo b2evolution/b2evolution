@@ -316,8 +316,8 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 	// Create a transparent image:
 	$dest_imh = imagecreatetruecolor( $dest_width, $dest_height );
 	imagealphablending($dest_imh, true);
-        imagefill($dest_imh, 0, 0, imagecolortransparent($dest_imh, imagecolorallocatealpha($dest_imh, 0, 0, 0, 127)));
-        imagesavealpha($dest_imh, true);
+	imagefill($dest_imh, 0, 0, imagecolortransparent($dest_imh, imagecolorallocatealpha($dest_imh, 0, 0, 0, 127)));
+	imagesavealpha($dest_imh, true);
 
 	if( ! imagecopyresampled( $dest_imh, $src_imh, 0, 0, $src_x, $src_y, $dest_width, $dest_height, $src_width, $src_height ) )
 	{
@@ -333,6 +333,9 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.17  2009/10/14 23:56:05  blueyed
+ * indent
+ *
  * Revision 1.16  2009/10/14 23:55:22  blueyed
  * generate_thumb: use transparent background. Works for png and gif, as far as I can see. Please try to break it.
  *
