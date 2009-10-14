@@ -305,7 +305,7 @@ function bufferedServerCall()
 		current_widgets = new_widget_order; // store current order
 		jQuery( '.pending_update' ).removeClass( 'pending_update' ).addClass( 'server_updating' ); // change class to "updating"
 
-		SendAdminRequest( 'widgets', 're-order', new_widget_order ); // send current order to server
+		SendAdminRequest( 'widgets', 're-order', new_widget_order, false ); // send current order to server
 	}
 	else
 	{	// widget order either hasn't changed or has been changed back to original order
@@ -569,8 +569,7 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 function toggleWidget( wi_ID )
 {
 	//console.log( 'Toggling widget #' + wi_ID.substr( 6 ) );
-	var datetime = new Date();
-	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ) + '&nocache_dummy=' + datetime.getTime() );
+	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ) );
 	return false;
 }
 

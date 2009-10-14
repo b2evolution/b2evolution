@@ -44,8 +44,14 @@ jQuery(document).ready(function()
  * @param string action Action to take
  * @param string query_string Any extra data
  */
-function SendAdminRequest( ctrl, action, query_string )
+function SendAdminRequest( ctrl, action, query_string, nocache )
 {
+	if( nocache === undefined || nocache )
+	{
+		var datetime = new Date();
+		query_string += ( query_string !== '' ? '&' : '' ) + 'nocache_dummy=' + datetime.getTime();
+	}
+
 	SendServerRequest( b2evo_dispatcher_url + '?ctrl='+ctrl+'&action='+action+( query_string ? '&'+query_string : '' ) );
 }
 
