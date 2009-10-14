@@ -43,6 +43,7 @@ jQuery(document).ready(function()
  * @param string ctrl Admin control to send request to
  * @param string action Action to take
  * @param string query_string Any extra data
+ * @param boolean Whether to prevent caching of the result. Default: true.
  */
 function SendAdminRequest( ctrl, action, query_string, nocache )
 {
