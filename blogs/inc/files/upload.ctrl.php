@@ -331,7 +331,7 @@ if( isset($_FILES) && count( $_FILES ) )
 			$path_info = pathinfo($newName);
 			$current_extension = $path_info['extension'];
 
-			if( $current_extension != $correct_extension )
+			if( strtolower($current_extension) != strtolower($correct_extension) )
 			{
 				$old_name = $newName;
 				$newName = $path_info['filename'].'.'.$correct_extension;
@@ -448,6 +448,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2009/10/15 00:35:04  blueyed
+ * Upload: make correction of extensions case insensitive.
+ *
  * Revision 1.17  2009/10/02 20:34:31  blueyed
  * Improve handling of wrong file extensions for image.
  *  - load_image: if the wrong mimetype gets passed, return error, instead of letting imagecreatefrom* fail
