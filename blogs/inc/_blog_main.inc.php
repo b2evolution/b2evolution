@@ -148,6 +148,9 @@ if( $resolve_extra_path )
 		 *        Why is this done here? Blog base URLs ending with *.php
 		 *        will be removed above and blog stub names will be removed
 		 *        below anyway?!
+		 * dh> I've fallen into this myself, e.g. with some GET-var => $debug hacking.
+		 *     The workaround appears to be using redir=no.
+		 *     Apart from that, I'm not that much involved in this part of the code.
 		 */
 		if( isset( $path_elements[0] ) && preg_match( '#.*\.php[0-9]?$#', $path_elements[0] ) )
 		{ // Ignore element ending with .php (fp: note: may be just '.php')
@@ -615,6 +618,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.151  2009/10/15 00:45:00  blueyed
+ * doc/reply
+ *
  * Revision 1.150  2009/10/10 21:12:12  tblue246
  * Doc
  *
