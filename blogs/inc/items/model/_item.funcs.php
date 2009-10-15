@@ -978,57 +978,50 @@ function check_perm_posttype( $post_extracats )
 
 
 /**
- * Mass create. Create multiple posts from one post
- * @param instance of Item class
- * @return array
+ * Mass create.
+ *
+ * Create multiple posts from one post.
+ *
+ * @param object Instance of Item class (by reference).
+ * @return array The posts, by reference.
  */
-function create_multiple_posts( & $Item )
+function & create_multiple_posts( & $Item )
 {
-	// Parse text into titles and paragraphs
-	$titles = array();
-	$paragraphs = array();
+	$Items = array();
+
+	// Parse text into titles and contents:
 	$current_title = '';
-	foreach( explode( "\n", trim( $Item->content ) ) as $line )
+	$current_data  = '';
+
+	// Append a newline to the end of the original contents to make sure
+	// that the last item gets created - this saves a second loop.
+	foreach( explode( "\n", $Item->content."\n" ) as $line )
 	{
 		$line = trim( strip_tags( $line ) );
-		if( count( $paragraphs ) == 0 && !empty( $line ) )
-		{
+
+		if( $current_title === '' && $line !== '' )
+		{	// We got a new title:
 			$current_title = $line;
-			$paragraphs[] = '';
-			$titles[$line] = $paragraphs;
-
 		}
-		elseif( count( $paragraphs ) > 0 && !empty( $line ) )
+		elseif( $current_title !== '' )
 		{
-			$titles[$current_title][] = $line;
-		}
-		else
-		{
-			$paragraphs = array();
-		}
-	}
+			if( $line !== '' )
+			{	// We got a new paragraph for this post:
+				$current_data .= '<p>'.$line.'</p>';
+			}
+			else
+			{	// End of this post:
+				$new_Item = duplicate( $Item );
 
-	// Create instances of Item class from parsed titles/paragraphs
-	$Items = array();
-	foreach( $titles as $title => $paragraphs )
-	{
-		// duplicate item to create new post
-		$new_Item = duplicate( $Item );
-		$new_Item->set_param( 'title', 'string', $title );
+				$new_Item->set_param( 'title', 'string', $current_title );
+				$new_Item->set_param( 'content', 'string', $current_data );
 
-		$content = '';
+				$Items[] = $new_Item;
 
-		foreach( $paragraphs as $paragraph )
-		{
-			if( strlen( $paragraph ) > 0 )
-			{
-				$content .= '<p>'.$paragraph.'</p>';
+				$current_title = '';
+				$current_data  = '';
 			}
 		}
-
-		$new_Item->set_param( 'content', 'string', $content );
-
-		$Items[] = $new_Item;
 	}
 
 	return $Items;
@@ -1036,6 +1029,9 @@ function create_multiple_posts( & $Item )
 
 /*
  * $Log$
+ * Revision 1.75  2009/10/15 20:54:25  tblue246
+ * create_multiple_posts(): Code improvements, e. g. removed second loop.
+ *
  * Revision 1.74  2009/10/12 11:59:44  efy-maxim
  * Mass create
  *
