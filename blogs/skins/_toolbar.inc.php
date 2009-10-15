@@ -81,7 +81,7 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
 
 			if( $debug )
 			{
-				echo '<div style="position:relative;left:5px;top:-7px;color:#999">'.$disp_detail.'</div>';
+				echo '<div style="position:relative;left:5px;top:-7px;color:#999;z-index:-1;">'.$disp_detail.'</div>';
 			}
 		}
  		?>
