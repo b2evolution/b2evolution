@@ -569,6 +569,23 @@ function convert_chars( $content, $flag = 'html' )
 
 
 /**
+ * Get number of bytes in $string. This works around mbstring.func_overload, if
+ * activated for strlen/mb_strlen.
+ * @param string
+ * @return int
+ */
+function evo_bytes( $string )
+{
+	$fo = ini_get('mbstring.func_overload');
+	if( $fo && $fo & 2 && function_exists('mb_strlen') )
+	{ // overloading of strlen is enabled
+		return mb_strlen( $string, 'ASCII' );
+	}
+	return strlen($string);
+}
+
+
+/**
  * mbstring wrapper for strlen function
  *
  * @param string
@@ -3668,6 +3685,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.179  2009/10/16 19:57:46  blueyed
+ * Add evo_bytes function to count actual bytes in a string.
+ *
  * Revision 1.178  2009/10/12 22:55:51  blueyed
  * doc
  *
