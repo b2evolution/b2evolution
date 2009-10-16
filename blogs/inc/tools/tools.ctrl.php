@@ -179,6 +179,10 @@ if( empty($tab) )
 			 *         the backup process. For this to work, we would need
 			 *         to "remember" the progress at the time the script
 			 *         had to halt.).
+			 *
+			 * Tblue> 2009-10-16: DB backups are now handled by BackupSettings::backup_database(),
+			 *                    thus this code here is obsolete - we now have two different
+			 *                    methods to backup the DB! That's redundant.
 			 */
 			$current_User->check_perm('options', 'edit', true);
 
@@ -339,6 +343,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2009/10/16 18:41:47  tblue246
+ * Cleanup/doc
+ *
  * Revision 1.15  2009/10/02 14:17:34  tblue246
  * minor/doc
  *

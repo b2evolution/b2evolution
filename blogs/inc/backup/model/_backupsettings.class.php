@@ -91,6 +91,10 @@ class BackupSettings
 
 	/**
 	 * Start backup
+	 *
+	 * @todo Tblue> Halt script if max_execution_time is about to be reached
+	 *              (in case we cannot set a high time limit) and allow
+	 *              the user to continue the backup process.
 	 */
 	function backup()
 	{
@@ -147,6 +151,12 @@ class BackupSettings
 
 	/**
 	 * Enable/disable maintenance mode
+	 *
+	 * @internal Tblue> IMO modifying config files without user consent
+	 *                  and a backup is a bad idea. The admin should either
+	 *                  have to do the configuration changes manually or
+	 *                  at least confirm automated changes.
+	 * 
 	 * @param integer enabled
 	 */
 	function switch_maintenance_mode( $enabled )
@@ -280,6 +290,9 @@ class BackupSettings
 
 	/**
 	 * Backup database
+	 *
+	 * @todo Tblue> Respect time limits!
+	 * 
 	 * @param string backup directory path
 	 */
 	function backup_database( $backup_dirpath )

@@ -34,33 +34,27 @@ $backup_subdir = 'blogs/_backup/';
 /**
  * Backup folder/files default settings
  * - 'label' checkbox label
- * - 'note' checkbox note
  * - 'path' path to folder or file
  * - 'included' true if folder or file must be in backup
  * @var array
  */
 $backup_paths = array( 	'application_files'   => array ( 'label'    => T_( 'Application files' ),
-														 'note'     => T_( '' ),
 														 'path'     => '.',
 														 'included' => true ),
 
 						'configuration_files' => array ( 'label'    => T_( 'Configuration files' ),
-														 'note'     => T_( '' ),
 														 'path'     => $conf_subdir,
 														 'included' => true ),
 
 						'skins_files'         => array ( 'label'    => T_( 'Skins' ),
-														 'note'     => T_( '' ),
 														 'path'     => $skins_subdir,
 														 'included' => true ),
 
 						'plugins_files'       => array ( 'label'    => T_( 'Plugins' ),
-														 'note'     => T_( '' ),
 														 'path'     => $plugins_subdir,
 														 'included' => true ),
 
 						'media_files'         => array ( 'label'    => T_( 'Media folder' ),
-														 'note'     => T_( '' ),
 														 'path'     => $media_subdir,
 														 'included' => true ),
 
@@ -70,18 +64,15 @@ $backup_paths = array( 	'application_files'   => array ( 'label'    => T_( 'Appl
 /**
  * Backup database tables default settings
  * - 'label' checkbox label
- * - 'note' checkbox note
  * - 'tables' tables list
  * - 'included' true if database tables must be in backup
  * @var array
  */
 $backup_tables = array(	'content_tables'      => array ( 'label'    => T_( 'Content tables' ),
-														 'note'     => T_( '' ),
 														 'tables'   => '*',
 														 'included' => true ),
 
 						'logs_stats_tables'   => array ( 'label'    => T_( 'Logs & stats tables' ),
-														 'note'     => T_( '' ),
 														 'tables'   => array( 	$tableprefix.'cron__log',
 																				$tableprefix.'hitlog' ),
 														 'included' => true ) )
