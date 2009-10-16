@@ -263,6 +263,11 @@ function _http_wrapper_last_status( & $headers )
  * Attempt to retrieve a remote page using a HTTP GET request, first with
  * cURL, then fsockopen, then fopen.
  *
+ * cURL gets skipped, if $max_size_kb is requested, since there appears to be no
+ * method to control this.
+ * {@internal (CURLOPT_READFUNCTION maybe? But it has not been called for me.. seems
+ *            to affect sending, not fetching?!)}}
+ *
  * @todo dh> Should we try remaining methods, if the previous one(s) failed?
  * @todo Tblue> Also allow HTTP POST.
  *
@@ -272,18 +277,23 @@ function _http_wrapper_last_status( & $headers )
  *        'status': HTTP status (e.g. 200 or 404)
  *        'used_method': Used method ("curl", "fopen", "fsockopen" or null if no method
  *                       is available)
- * @param integer Timeout
+ * @param integer Timeout (default: 15 seconds)
+ * @param integer Maximum size in kB
  * @return string|false The remote page as a string; false in case of error
  */
-function fetch_remote_page( $url, & $info, $timeout = 15 )
+function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL )
 {
 	$info = array(
 		'error' => '',
 		'status' => NULL,
+		'mimetype' => NULL,
 		'used_method' => NULL,
 	);
 
-	if( extension_loaded( 'curl' ) )
+	if( ! isset($timeout) )
+		$timeout = 15;
+
+	if( extension_loaded('curl') && ! $max_size_kb ) // dh> I could not find an option to support "maximum size" for curl (to abort during download => memory limit).
 	{	// CURL:
 		$info['used_method'] = 'curl';
 
@@ -292,8 +302,11 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, $timeout );
 		curl_setopt( $ch, CURLOPT_TIMEOUT, $timeout );
+		curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true );
+		curl_setopt( $ch, CURLOPT_MAXREDIRS, 3 );
 		$r = curl_exec( $ch );
 
+		$info['mimetype'] = curl_getinfo( $ch, CURLINFO_CONTENT_TYPE );
 		$info['status'] = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
 		$info['error'] = curl_error( $ch );
 		if( ( $errno = curl_errno( $ch ) ) )
@@ -301,8 +314,6 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 			$info['error'] .= ' (#'.$errno.')';
 		}
 		curl_close( $ch );
-
-		return $r;
 	}
 	elseif( function_exists( 'fsockopen' ) ) // may have been disabled
 	{	// FSOCKOPEN:
@@ -343,13 +354,9 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 
 		// Set timeout for data:
 		if( function_exists( 'stream_set_timeout' ) )
-		{
 			stream_set_timeout( $fp, $timeout ); // PHP 4.3.0
-		}
 		else
-		{
 			socket_set_timeout( $fp, $timeout ); // PHP 4
-		}
 
 		// Read response:
 		$r = '';
@@ -361,11 +368,15 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 			fclose( $fp );
 			return false;
 		}
-		$info['status'] = $match[1];
 
 		while( ! feof( $fp ) )
 		{
 			$r .= fgets( $fp );
+			if( $max_size_kb && evo_bytes($r) >= $max_size_kb*1024 )
+			{
+				$info['error'] = sprintf('Maximum size of %d kB reached.', $max_size_kb);
+				return false;
+			}
 		}
 		fclose($fp);
 
@@ -375,7 +386,11 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 			return false;
 		}
 
-		return substr( $r, $pos + 4 );
+		// Remember headers to extract info at the end
+		$headers = explode("\r\n", substr($r, 0, $pos));
+
+		$info['status'] = $match[1];
+		$r = substr( $r, $pos + 4 );
 	}
 	elseif( ini_get( 'allow_url_fopen' ) )
 	{	// URL FOPEN:
@@ -400,19 +415,43 @@ function fetch_remote_page( $url, & $info, $timeout = 15 )
 		          || ( $code = _http_wrapper_last_status( $http_response_header ) ) === false )
 		{
 			$info['error'] = 'Invalid response';
-			$r = false;
+			return false;
 		}
 		else
 		{
-			$info['status'] = $code;
+			// Used to get info at the end
+			$headers = $http_response_header;
+
+			// Retrieve contents
 			$r = '';
 			while( ! feof( $fp ) )
 			{
 				$r .= fgets( $fp );
+				if( $max_size_kb && evo_bytes($r) >= $max_size_kb*1024 )
+				{
+					$info['error'] = sprintf('Maximum size of %d kB reached.', $max_size_kb);
+					return false;
+				}
+			}
+
+			$info['status'] = $code;
+		}
+		fclose( $fp );
+	}
+
+	// Extract mimetype info from the headers (for fsockopen/fopen)
+	if( isset($r) )
+	{
+		foreach($headers as $header)
+		{
+			$header = strtolower($header);
+			if( substr($header, 0, 13) == 'content-type:' )
+			{
+				$info['mimetype'] = trim(substr($header, 13));
+				break; // only looking for mimetype
 			}
 		}
 
-		fclose( $fp );
 		return $r;
 	}
 
@@ -751,6 +790,12 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.43  2009/10/16 19:58:46  blueyed
+ * fetch_remote_page:
+ *  - add max_size_kb param (TODO: implement this also for curl, currently it gets skipped).
+ *  - add some config for curl: CURLOPT_FOLLOWLOCATION=1, CURLOPT_MAXREDIRS=3
+ *  - add "mimetype" info to $info
+ *
  * Revision 1.42  2009/09/28 22:57:51  blueyed
  * Fix url_rel_to_same_host for protocol relative URLs (//example.org/)
  *
