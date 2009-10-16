@@ -79,6 +79,7 @@ $db_config['aliases'] = array(
  */
 $ctrl_mappings = array(
 		'antispam'     => 'antispam/antispam_list.ctrl.php',
+		'backup'       => 'backup/backup.ctrl.php',
 		'crontab'      => 'cron/cronjobs.ctrl.php',
 		'countries'    => 'regional/countries.ctrl.php',
 		'currencies'   => 'regional/currencies.ctrl.php',
@@ -453,6 +454,12 @@ class _core_Module extends Module
 						'text' => T_('Scheduler').'&hellip;',
 						'href' => $admin_url.'?ctrl=crontab',
 					);
+
+				// Display Backup option in Tools submenu in evobar menu
+				$entries['tools']['entries']['backup'] = array(
+						'text' => T_('Backup').'&hellip;',
+						'href' => $admin_url.'?ctrl=crontab',
+					);
 			}
 		}
 
@@ -708,6 +715,14 @@ class _core_Module extends Module
 										'href' => '?ctrl=antispam'	),
 									) );
 				}
+
+				// Display Backup tab in Tools menu
+				$AdminUI->add_menu_entries( 'tools', array(
+									'backup' => array(
+									  'text' => T_('Backup'),
+									  'href' => '?ctrl=backup'	),
+								) );
+
 		}
 		elseif( $current_User->check_perm( 'spamblacklist', 'view' ) )
 		{	// Permission to view antispam but NOT tools:
@@ -732,6 +747,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.37  2009/10/16 18:18:11  efy-maxim
+ * files and database backup
+ *
  * Revision 1.36  2009/10/12 23:54:56  blueyed
  * Return to current page when changing admin skin (via regenerate_url)
  *

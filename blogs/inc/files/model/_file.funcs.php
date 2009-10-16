@@ -110,7 +110,7 @@ function bytesreadable( $bytes, $htmlabbr = true )
  * @return false|array false if the first directory could not be accessed,
  *                     array of entries otherwise
  */
-function get_filenames( $path, $inc_files = true, $inc_dirs = true, $flat = true, $recurse = true, $basename = false )
+function get_filenames( $path, $inc_files = true, $inc_dirs = true, $flat = true, $recurse = true, $basename = false, $trailing_slash = false )
 {
 	$r = array();
 
@@ -130,11 +130,17 @@ function get_filenames( $path, $inc_files = true, $inc_dirs = true, $flat = true
 				{
 					if( $inc_dirs )
 					{
-						$r[] = $basename ? $file : $path.$file;
+						$directory_name = $basename ? $file : $path.$file;
+						if( $trailing_slash )
+						{
+							$directory_name = trailing_slash( $directory_name );
+						}
+
+						$r[] = $directory_name;
 					}
 					if( $recurse )
 					{
-						$rSub = get_filenames( $path.$file, $inc_files, $inc_dirs, $flat, $recurse, $basename );
+						$rSub = get_filenames( $path.$file, $inc_files, $inc_dirs, $flat, $recurse, $basename, $trailing_slash );
 						if( $rSub )
 						{
 							$r = array_merge( $r, $rSub );
@@ -143,7 +149,7 @@ function get_filenames( $path, $inc_files = true, $inc_dirs = true, $flat = true
 				}
 				else
 				{
-					$r[$file] = get_filenames( $path.$file, $inc_files, $inc_dirs, $flat, $recurse, $basename );
+					$r[$file] = get_filenames( $path.$file, $inc_files, $inc_dirs, $flat, $recurse, $basename, $trailing_slash );
 				}
 			}
 			elseif( $inc_files )
@@ -815,6 +821,9 @@ function is_absolute_pathname($path)
 
 /*
  * $Log$
+ * Revision 1.25  2009/10/16 18:18:17  efy-maxim
+ * files and database backup
+ *
  * Revision 1.24  2009/10/13 22:36:01  blueyed
  * Highlight files and directories in the filemanager when opened via 'Locate this' link. Adds scrollTo jQuery plugin.
  *
