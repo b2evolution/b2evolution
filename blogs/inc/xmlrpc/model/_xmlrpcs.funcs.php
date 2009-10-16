@@ -258,7 +258,7 @@ function _wp_mw_newmediaobject($m)
 
 	load_funcs('files/model/_file.funcs.php');
 
-	$filesize = strlen( $data );
+	$filesize = evo_bytes( $data );
 	if( ( $maxfilesize = $Settings->get( 'upload_maxkb' ) * 1024 ) && $filesize > $maxfilesize )
 	{
 		return xmlrpcs_resperror( 4, 'File too big ('.bytesreadable( $filesize, false )
@@ -906,6 +906,9 @@ function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.23  2009/10/16 20:33:42  tblue246
+ * Avoid problems caused by mbstring.func_overload
+ *
  * Revision 1.22  2009/09/26 12:00:44  tblue246
  * Minor/coding style
  *
