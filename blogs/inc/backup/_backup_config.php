@@ -34,6 +34,7 @@ $backup_subdir = 'blogs/_backup/';
 /**
  * Backup folder/files default settings
  * - 'label' checkbox label
+ * - 'note' checkbox note
  * - 'path' path to folder or file
  * - 'included' true if folder or file must be in backup
  * @var array
@@ -64,6 +65,7 @@ $backup_paths = array( 	'application_files'   => array ( 'label'    => T_( 'Appl
 /**
  * Backup database tables default settings
  * - 'label' checkbox label
+ * - 'note' checkbox note
  * - 'tables' tables list
  * - 'included' true if database tables must be in backup
  * @var array
