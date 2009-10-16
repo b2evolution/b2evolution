@@ -814,13 +814,35 @@ function is_absolute_pathname($path)
 	{ // unix
 		return ( $path[0] == '/' );
 	}
+}
 
+
+/**
+ * Define sys_get_temp_dir, if not available (PHP 5 >= 5.2.1)
+ * @link http://us2.php.net/manual/en/function.sys-get-temp-dir.php#93390
+ * @return string NULL on failure
+ */
+if ( !function_exists('sys_get_temp_dir')) {
+  function sys_get_temp_dir() {
+    if (!empty($_ENV['TMP'])) { return realpath($_ENV['TMP']); }
+    if (!empty($_ENV['TMPDIR'])) { return realpath( $_ENV['TMPDIR']); }
+    if (!empty($_ENV['TEMP'])) { return realpath( $_ENV['TEMP']); }
+    $tempfile=tempnam(__FILE__,'');
+    if (file_exists($tempfile)) {
+      unlink($tempfile);
+      return realpath(dirname($tempfile));
+    }
+    return null;
+  }
 }
 
 
 
 /*
  * $Log$
+ * Revision 1.26  2009/10/16 20:02:19  blueyed
+ * Add function sys_get_temp_dir if it does not exist.
+ *
  * Revision 1.25  2009/10/16 18:18:17  efy-maxim
  * files and database backup
  *
