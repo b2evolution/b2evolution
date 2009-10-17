@@ -154,8 +154,8 @@ if( $resolve_extra_path )
 		 * fp> Can you give an example URL of undesired behaviour on the demo blog?
 		 * Tblue> dh: Even when using redir=no, 200 OK is returned when
 		 *            404 Not found would be the right status code to return.
-		 *        fp: http://test.b2evo.net/HEAD/blogs/index.php/a/foo.php
-		 *            (compare to http://test.b2evo.net/HEAD/blogs/index.php/a/foo).
+		 *        fp: http://test.b2evo.net/HEAD/blogs/blog1.php/foo.php
+		 *            (compare to http://test.b2evo.net/HEAD/blogs/blog1.php/foo).
 		 */
 		if( isset( $path_elements[0] ) && preg_match( '#.*\.php[0-9]?$#', $path_elements[0] ) )
 		{ // Ignore element ending with .php (fp: note: may be just '.php')
@@ -623,6 +623,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.154  2009/10/17 15:23:04  tblue246
+ * doc/correction
+ *
  * Revision 1.153  2009/10/17 15:16:56  tblue246
  * doc
  *
