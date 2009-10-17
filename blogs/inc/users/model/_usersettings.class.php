@@ -80,7 +80,7 @@ class UserSettings extends AbstractSettings
 	 */
 	function UserSettings()
 	{ // constructor
-		parent::AbstractSettings( 'T_usersettings', array( 'uset_user_ID', 'uset_name' ), 'uset_value', 1 );
+		parent::AbstractSettings( 'T_users__usersettings', array( 'uset_user_ID', 'uset_name' ), 'uset_value', 1 );
 	}
 
 
@@ -210,6 +210,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.8  2009/10/17 16:31:33  efy-maxim
+ * Renamed: T_groupsettings to T_groups__groupsettings, T_usersettings to T_users__usersettings
+ *
  * Revision 1.7  2009/09/14 13:46:11  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

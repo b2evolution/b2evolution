@@ -66,9 +66,9 @@ $schema_queries = array(
 			PRIMARY KEY grp_ID (grp_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
-	'T_groupsettings' => array(
+	'T_groups__groupsettings' => array(
 		'Creating table for Group Settings',
-		"CREATE TABLE T_groupsettings (
+		"CREATE TABLE T_groups__groupsettings (
 			gset_grp_ID INT(11) UNSIGNED NOT NULL,
 			gset_name VARCHAR(30) NOT NULL,
 			gset_value VARCHAR(255) NULL,
@@ -170,9 +170,9 @@ $schema_queries = array(
 			UNIQUE aspm_string (aspm_string)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
-	'T_usersettings' => array(
+	'T_users__usersettings' => array(
 		'Creating user settings table',
-		"CREATE TABLE T_usersettings (
+		"CREATE TABLE T_users__usersettings (
 			uset_user_ID INT(11) UNSIGNED NOT NULL,
 			uset_name    VARCHAR( 30 ) NOT NULL,
 			uset_value   VARCHAR( 255 ) NULL,
@@ -274,6 +274,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.43  2009/10/17 16:31:32  efy-maxim
+ * Renamed: T_groupsettings to T_groups__groupsettings, T_usersettings to T_users__usersettings
+ *
  * Revision 1.42  2009/10/08 20:05:51  efy-maxim
  * Modular/Pluggable Permissions
  *

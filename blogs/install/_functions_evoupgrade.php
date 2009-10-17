@@ -2535,12 +2535,18 @@ function upgrade_b2evo_tables()
 		// Creating table for pluggable permissions
 
 		task_begin( 'Creating table for Group Settings... ' );
-		$DB->query( "CREATE TABLE T_groupsettings (
+		$DB->query( "CREATE TABLE T_groups__groupsettings (
 			gset_grp_ID INT(11) UNSIGNED NOT NULL,
 			gset_name VARCHAR(30) NOT NULL,
 			gset_value VARCHAR(255) NULL,
 			PRIMARY KEY (gset_grp_ID, gset_name)
 		) ENGINE = innodb" );
+		task_end();
+
+		// Rename T_usersettings table to T_users__usersettings
+
+		task_begin( 'Rename T_usersettings table to T_users__usersettings... ' );
+		$DB->query( 'RENAME TABLE '.$tableprefix.'usersettings TO T_users__usersettings' );
 		task_end();
 
 		//set_upgrade_checkpoint( '9970' );
@@ -2745,6 +2751,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.341  2009/10/17 16:31:33  efy-maxim
+ * Renamed: T_groupsettings to T_groups__groupsettings, T_usersettings to T_users__usersettings
+ *
  * Revision 1.340  2009/10/17 14:49:46  fplanque
  * doc
  *

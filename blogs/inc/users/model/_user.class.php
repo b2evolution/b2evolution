@@ -157,7 +157,7 @@ class User extends DataObject
 			);
 
 		$this->delete_cascades = array(
-				array( 'table'=>'T_usersettings', 'fk'=>'uset_user_ID', 'msg'=>T_('%d user settings on collections') ),
+				array( 'table'=>'T_users__usersettings', 'fk'=>'uset_user_ID', 'msg'=>T_('%d user settings on collections') ),
 				array( 'table'=>'T_sessions', 'fk'=>'sess_user_ID', 'msg'=>T_('%d sessions opened by this user') ),
 				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_user_ID', 'msg'=>T_('%d user permissions on blogs') ),
 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_user_ID', 'msg'=>T_('%d subscriptions') ),
@@ -1827,6 +1827,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.57  2009/10/17 16:31:33  efy-maxim
+ * Renamed: T_groupsettings to T_groups__groupsettings, T_usersettings to T_users__usersettings
+ *
  * Revision 1.56  2009/10/08 20:05:52  efy-maxim
  * Modular/Pluggable Permissions
  *

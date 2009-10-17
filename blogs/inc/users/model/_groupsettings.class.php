@@ -38,7 +38,7 @@ class GroupSettings extends AbstractSettings
 	 */
 	function GroupSettings()
 	{ 	// call parent constructor
-		parent::AbstractSettings( 'T_groupsettings', array( 'gset_grp_ID', 'gset_name' ), 'gset_value', 1 );
+		parent::AbstractSettings( 'T_groups__groupsettings', array( 'gset_grp_ID', 'gset_name' ), 'gset_value', 1 );
 	}
 
 
@@ -66,7 +66,7 @@ class GroupSettings extends AbstractSettings
 			// Select current group permission from database
 			$SQL = & new SQL();
 			$SQL->SELECT( '*' );
-			$SQL->FROM( 'T_groupsettings' );
+			$SQL->FROM( 'T_groups__groupsettings' );
 			$SQL->WHERE( 'gset_grp_ID = '.$grp_ID );
 
 			$DB->begin();

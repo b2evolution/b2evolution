@@ -768,7 +768,7 @@ function create_relations()
 											on delete restrict
 											on update restrict' );
 
-	$DB->query( 'alter table T_usersettings
+	$DB->query( 'alter table T_users__usersettings
 								add constraint FK_uset_user_ID
 											foreign key (uset_user_ID)
 											references T_users (user_ID)
@@ -825,6 +825,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.80  2009/10/17 16:31:33  efy-maxim
+ * Renamed: T_groupsettings to T_groups__groupsettings, T_usersettings to T_users__usersettings
+ *
  * Revision 1.79  2009/10/04 18:27:34  blueyed
  * Changed nb_of_basic_plugins to list of plugins (basic_plugins), and tell about differences on failure.
  *

@@ -42,24 +42,24 @@ $default_ctrl = 'settings';
  *  change {@link $tableprefix} in _basic_config.php)
  */
 $db_config['aliases'] = array(
-		'T_antispam'            => $tableprefix.'antispam',
-		'T_cron__log'           => $tableprefix.'cron__log',
-		'T_cron__task'          => $tableprefix.'cron__task',
-		'T_country'             => $tableprefix.'country',
-		'T_currency'            => $tableprefix.'currency',
-		'T_groups'              => $tableprefix.'groups',
-		'T_groupsettings'       => $tableprefix.'groupsettings',
-		'T_global__cache'       => $tableprefix.'global__cache',
-		'T_locales'             => $tableprefix.'locales',
-		'T_plugins'             => $tableprefix.'plugins',
-		'T_pluginevents'        => $tableprefix.'pluginevents',
-		'T_pluginsettings'      => $tableprefix.'pluginsettings',
-		'T_pluginusersettings'  => $tableprefix.'pluginusersettings',
-		'T_settings'            => $tableprefix.'settings',
-		'T_users'               => $tableprefix.'users',
-		'T_users__fielddefs'    => $tableprefix.'users__fielddefs',
-		'T_users__fields'       => $tableprefix.'users__fields',
-		'T_usersettings'        => $tableprefix.'usersettings',
+		'T_antispam'              => $tableprefix.'antispam',
+		'T_cron__log'             => $tableprefix.'cron__log',
+		'T_cron__task'            => $tableprefix.'cron__task',
+		'T_country'               => $tableprefix.'country',
+		'T_currency'              => $tableprefix.'currency',
+		'T_groups'                => $tableprefix.'groups',
+		'T_groups__groupsettings' => $tableprefix.'groups__groupsettings',
+		'T_global__cache'         => $tableprefix.'global__cache',
+		'T_locales'               => $tableprefix.'locales',
+		'T_plugins'               => $tableprefix.'plugins',
+		'T_pluginevents'          => $tableprefix.'pluginevents',
+		'T_pluginsettings'        => $tableprefix.'pluginsettings',
+		'T_pluginusersettings'    => $tableprefix.'pluginusersettings',
+		'T_settings'              => $tableprefix.'settings',
+		'T_users'                 => $tableprefix.'users',
+		'T_users__fielddefs'      => $tableprefix.'users__fielddefs',
+		'T_users__fields'         => $tableprefix.'users__fields',
+		'T_users__usersettings'   => $tableprefix.'users__usersettings',
 	);
 
 
@@ -760,6 +760,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.40  2009/10/17 16:31:32  efy-maxim
+ * Renamed: T_groupsettings to T_groups__groupsettings, T_usersettings to T_users__usersettings
+ *
  * Revision 1.39  2009/10/17 15:56:45  efy-maxim
  * updates has been moved from backup to updates folder
  *
