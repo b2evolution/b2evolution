@@ -59,8 +59,9 @@ $backup_paths = array( 	'application_files'   => array ( 'label'    => T_( 'Appl
 
 						'media_files'         => array ( 'label'    => T_( 'Media folder' ),
 														 'path'     => $media_subdir,
-														 'included' => true ),
+														 'included' => false ),
 
+	// fp> why is the following listed here?
 						'backup_files'        => array ( 'path'     => $blogs_subdir,
 														 'included' => false ) );
 
@@ -77,8 +78,21 @@ $backup_tables = array(	'content_tables'      => array ( 'label'    => T_( 'Cont
 														 'included' => true ),
 
 						'logs_stats_tables'   => array ( 'label'    => T_( 'Logs & stats tables' ),
-														 'table'   => array( 	$tableprefix.'cron__log',
-																				$tableprefix.'hitlog' ),
-														 'included' => true ) )
+														 'table'   => array(
+// TODO: please use T_hitlog syntax instead of $tableprefix.'hitlog'
+																$tableprefix.'sessions',
+																$tableprefix.'hitlog',
+																$tableprefix.'basedomains',
+																$tableprefix.'track__goalhit',
+																$tableprefix.'track__keyphrase',
+																$tableprefix.'useragents',
+															),
+														 'included' => false ) )
 
+/*
+ * $Log$
+ * Revision 1.5  2009/10/17 23:58:48  fplanque
+ * doc
+ *
+ */
 ?>

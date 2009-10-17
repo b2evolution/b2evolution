@@ -65,8 +65,8 @@ $Form->end_fieldset();
 // Enable/Disable maintenance mode
 $Form->begin_fieldset( T_( 'Maintenance' ), array( 'class'=>'fieldset clear' ) );
 
-$Form->checkbox( 'bk_maintenance_mode', $backup_Settings->maintenance_mode, T_( 'Maintenance mode' ), T_( 'Recommended' ) );
-$Form->checkbox( 'bk_pack_backup_files', $backup_Settings->pack_backup_files, T_( 'Make ZIP archive' ) );
+$Form->checkbox( 'bk_maintenance_mode', $backup_Settings->maintenance_mode, T_( 'Maintenance mode' ), T_( 'Put b2evolution into Maintenance Mode while backing up - Recommended' ) );
+$Form->checkbox( 'bk_pack_backup_files', $backup_Settings->pack_backup_files, T_( 'ZIP' ), T_('Compress backup into ZIP files') );
 
 $Form->end_fieldset();
 
