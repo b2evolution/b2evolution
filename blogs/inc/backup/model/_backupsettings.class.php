@@ -156,7 +156,7 @@ class BackupSettings
 	 *                  and a backup is a bad idea. The admin should either
 	 *                  have to do the configuration changes manually or
 	 *                  at least confirm automated changes.
-	 * 
+	 *
 	 * @param integer enabled
 	 */
 	function switch_maintenance_mode( $enabled )
@@ -213,45 +213,43 @@ class BackupSettings
 		if( $this->pack_backup_files )
 		{	// Create ZIPped backup
 
-			// Load ZIP class
-			load_class( '_ext/_zip_archives.php', 'zip_file' );
-
-			$zip_filepath = $backup_dirpath.'files.zip';
-			$zipfile = & new zip_file( $zip_filepath );
-			$zipfile->set_options( array ( 'basedir'  => $basepath ) );
-
 			// Find included and excluded files
 			$included_files = array();
 
-			if( $this->backup_paths['application_files'] )
+			if( $root_included = $this->backup_paths['application_files'] )
 			{
 				$included_files = get_filenames( $basepath, true, true, true, false, true, true );
-
-				foreach( $this->backup_paths as $name => $included )
-				{
-					if( !$included )
-					{
-						$excluded_files[] = $backup_paths[$name]['path'];
-					}
-				}
 			}
-			else
+
+			// Prepare included/excluded paths
+			foreach( $this->backup_paths as $name => $included )
 			{
-				foreach( $this->backup_paths as $name => $included )
+				foreach( $this->path_to_array( $backup_paths[$name]['path'] ) as $path )
 				{
-					if( $included )
+					if( $root_included && !$included )
 					{
-						$included_files[] = $backup_paths[$name]['path'];
+						$excluded_files[] = $path;
+					}
+					elseif( !$root_included && $included )
+					{
+						$included_files[] = $path;
 					}
 				}
 			}
 
-			$zipfile->add_files( $included_files );
-			$zipfile->exclude_files( $excluded_files );
+			$included_files = array_diff( $included_files, $excluded_files );
 
-			// Create archive
+			// Load ZIP class
+			load_class( '_ext/_zip_archives.php', 'zip_file' );
+
+			// Create ZIPped backup
+			$zip_filepath = $backup_dirpath.'files.zip';
+			$zipfile = & new zip_file( $zip_filepath );
+			$zipfile->set_options( array ( 'basedir'  => $basepath ) );
+			$zipfile->add_files( $included_files );
 			$zipfile->create_archive();
 
+			// Check if backup is created
 			if( !file_exists( $zip_filepath ) )
 			{
 				$Messages->add( sprintf( T_( 'Unable to create &laquo;%s&raquo;' ), $zip_filepath ), 'error' );
@@ -260,29 +258,34 @@ class BackupSettings
 		}
 		else
 		{	// Copy directories and files to backup directory
-			if( $this->backup_paths['application_files'] )
-			{	// Copy all of the directories and files except excluded ones
-				foreach( $this->backup_paths as $name => $included )
-				{
-					if( !$included )
-					{
-						$excluded_files[] = no_trailing_slash( $basepath.$backup_paths[$name]['path'] );
-					}
-				}
-				$this->recurse_copy( no_trailing_slash( $basepath ),
-							no_trailing_slash( $backup_dirpath ), $excluded_files );
+
+			$src_dest_paths = array();
+			if( $root_included = $this->backup_paths['application_files'] )
+			{
+				$src_dest_paths[] = array( $basepath, $backup_dirpath );
 			}
-			else
-			{	// Copy only included directories and files
-				foreach( $this->backup_paths as $name => $included )
+
+			// Prepare included/excluded paths
+			foreach( $this->backup_paths as $name => $included )
+			{
+				foreach( $this->path_to_array( $backup_paths[$name]['path'] ) as $path )
 				{
-					if( $included )
+					if( $root_included && !$included )
 					{
-						$path = $backup_paths[$name]['path'];
-						$this->recurse_copy( no_trailing_slash( $basepath.$path ),
-									no_trailing_slash( $backup_dirpath.$path ), $excluded_files );
+						$excluded_files[] = no_trailing_slash( $basepath.$path );
+					}
+					elseif( !$root_included && $included )
+					{
+						$src_dest_paths[] = array( $basepath.$path, $backup_dirpath.$path );
 					}
 				}
+			}
+
+			// Copy prepared paths
+			foreach( $src_dest_paths as $src_dest_path )
+			{
+				$this->recurse_copy( no_trailing_slash( $src_dest_path[0] ),
+									no_trailing_slash( $src_dest_path[1] ), $excluded_files );
 			}
 		}
 	}
@@ -292,7 +295,7 @@ class BackupSettings
 	 * Backup database
 	 *
 	 * @todo Tblue> Respect time limits!
-	 * 
+	 *
 	 * @param string backup directory path
 	 */
 	function backup_database( $backup_dirpath )
@@ -305,7 +308,7 @@ class BackupSettings
 		{
 			if( $included )
 			{
-				$tables = $backup_tables[$name]['tables'];
+				$tables = $backup_tables[$name]['table'];
 				if( is_array( $tables ) )
 				{
 					$ready_to_backup = array_merge( $ready_to_backup, $tables );
@@ -332,7 +335,7 @@ class BackupSettings
 		{
 			if( !$included )
 			{
-				$tables = $backup_tables[$name]['tables'];
+				$tables = $backup_tables[$name]['table'];
 				if( is_array( $tables ) )
 				{
 					$ready_to_backup = array_diff( $ready_to_backup, $tables );
@@ -348,12 +351,29 @@ class BackupSettings
 			}
 		}
 
-		// Create backup SQL script
-		$backup = '';
+		// Create and save created SQL backup script
+		$backup_sql_filename = 'backup.sql';
+		$backup_sql_filepath = $backup_dirpath.$backup_sql_filename;
+
+		// Check if backup file exists
+		if( file_exists( $backup_sql_filepath ) )
+		{	// Stop tables backup, because backup file exists
+			$Messages->add( sprintf( T_( 'Unable to write database dump. Database dump already exists: &laquo;%s&raquo;' ), $backup_sql_filepath ), 'error' );
+			return false;
+		}
+
+		$f = @fopen( $backup_sql_filepath , 'w+' );
+		if( $f == false )
+		{	// Stop backup, because it can't open backup file for writting
+			$Messages->add( sprintf( T_( 'Unable to write database dump. Could not open &laquo;%s&raquo; for writing.' ), $backup_sql_filepath ), 'error' );
+			return false;
+		}
+
+		// Create and save created SQL backup script
 		foreach( $ready_to_backup as $table )
 		{
 			$row_table_data = $DB->get_row( 'SHOW CREATE TABLE '.$table, ARRAY_N );
-			$backup .= $row_table_data[1].";\n\n";
+			fwrite( $f, $row_table_data[1].";\n\n" );
 
 			$values_list = array();
 			foreach( $DB->get_results( 'SELECT * FROM '.$table, ARRAY_N ) as $row )
@@ -383,34 +403,17 @@ class BackupSettings
 
 			if( !empty( $values_list ) )
 			{
-				$backup .= 'INSERT INTO '.$table.' VALUES '.implode( ',', $values_list ).";\n\n";
+				fwrite( $f, 'INSERT INTO '.$table.' VALUES '.implode( ',', $values_list ).";\n\n" );
 			}
 
 			unset( $values_list );
+
+			// Flush the output to a file
+			fflush( $f );
 		}
 
-		// Save created SQL backup script
-		$backup_sql_filename = 'backup.sql';
-		$backup_sql_filepath = $backup_dirpath.$backup_sql_filename;
-		if( !file_exists( $backup_sql_filepath ) )
-		{
-			$f = @fopen( $backup_sql_filepath , 'w+' );
-			if( $f == false )
-			{
-				$Messages->add( sprintf( T_( 'Unable to write database dump. Could not open &laquo;%s&raquo; for writing.' ), $backup_sql_filepath ), 'error' );
-				return false;
-			}
-			else
-			{
-				fwrite( $f, $backup );
-				fclose($f);
-			}
-		}
-		else
-		{
-			$Messages->add( sprintf( T_( 'Unable to write database dump. Database dump already exists: &laquo;%s&raquo;' ), $backup_sql_filepath ), 'error' );
-			return false;
-		}
+		// Close backup file input stream
+		fclose($f);
 
 		if( $this->pack_backup_files )
 		{	// Pack created backup SQL script
@@ -528,6 +531,21 @@ class BackupSettings
 			}
 		}
 		return false;
+	}
+
+
+	/**
+	 * Convert path to array
+	 * @param mixed path
+	 * @return array
+	 */
+	function path_to_array( $path )
+	{
+		if( is_array( $path ) )
+		{
+			return $path;
+		}
+		return array( $path );
 	}
 }
 
