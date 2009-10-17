@@ -152,6 +152,10 @@ if( $resolve_extra_path )
 		 *     The workaround appears to be using redir=no.
 		 *     Apart from that, I'm not that much involved in this part of the code.
 		 * fp> Can you give an example URL of undesired behaviour on the demo blog?
+		 * Tblue> dh: Even when using redir=no, 200 OK is returned when
+		 *            404 Not found would be the right status code to return.
+		 *        fp: http://test.b2evo.net/HEAD/blogs/index.php/a/foo.php
+		 *            (compare to http://test.b2evo.net/HEAD/blogs/index.php/a/foo).
 		 */
 		if( isset( $path_elements[0] ) && preg_match( '#.*\.php[0-9]?$#', $path_elements[0] ) )
 		{ // Ignore element ending with .php (fp: note: may be just '.php')
@@ -619,6 +623,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.153  2009/10/17 15:16:56  tblue246
+ * doc
+ *
  * Revision 1.152  2009/10/17 15:01:23  fplanque
  * doc
  *
