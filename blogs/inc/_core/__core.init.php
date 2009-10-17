@@ -95,6 +95,7 @@ $ctrl_mappings = array(
 		'registration' => 'users/registration.ctrl.php',
 		'groups'       => 'users/groups.ctrl.php',
 		'upload'       => 'files/upload.ctrl.php',
+		'updates'      => 'backup/updates.ctrl.php',
 	);
 
 
@@ -458,7 +459,13 @@ class _core_Module extends Module
 				// Display Backup option in Tools submenu in evobar menu
 				$entries['tools']['entries']['backup'] = array(
 						'text' => T_('Backup').'&hellip;',
-						'href' => $admin_url.'?ctrl=crontab',
+						'href' => $admin_url.'?ctrl=backup',
+					);
+
+				// Display Updates option in Tools submenu in evobar menu
+				$entries['tools']['entries']['updates'] = array(
+						'text' => T_('Check for updates').'&hellip;',
+						'href' => $admin_url.'?ctrl=updates',
 					);
 			}
 		}
@@ -723,6 +730,12 @@ class _core_Module extends Module
 									  'href' => '?ctrl=backup'	),
 								) );
 
+				// Display Updates tab in Tools menu
+				$AdminUI->add_menu_entries( 'tools', array(
+									'updates' => array(
+									  'text' => T_('Check for updates'),
+									  'href' => '?ctrl=updates'	),
+								) );
 		}
 		elseif( $current_User->check_perm( 'spamblacklist', 'view' ) )
 		{	// Permission to view antispam but NOT tools:
@@ -747,6 +760,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.38  2009/10/17 14:12:22  efy-maxim
+ * Upgrader prototype
+ *
  * Revision 1.37  2009/10/16 18:18:11  efy-maxim
  * files and database backup
  *
