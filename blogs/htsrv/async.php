@@ -5,6 +5,9 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
+ * fp> TODO: it would be better to have the code for the actions below part of the controllers they belong to.
+ * This would require some refectoring but would be better for maintenance and code clarity.
+ *
  * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
@@ -135,6 +138,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.32  2009/10/17 14:49:46  fplanque
+ * doc
+ *
  * Revision 1.31  2009/10/11 03:00:10  blueyed
  * Add "position" and "order" properties to attachments.
  * Position can be "teaser" or "aftermore" for now.

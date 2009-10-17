@@ -2673,6 +2673,7 @@ function upgrade_b2evo_tables()
 			}
 		}
 	}
+
 	if( $debug )
 	{
 		echo '<br />';
@@ -2744,6 +2745,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.340  2009/10/17 14:49:46  fplanque
+ * doc
+ *
  * Revision 1.339  2009/10/11 03:31:55  blueyed
  * Upgrade fixes
  *
