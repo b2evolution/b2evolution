@@ -3,10 +3,10 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Load Currency class (PHP4):
-load_class( 'updates/model/_updater.class.php', 'Updater' );
+load_class( 'upgrade/model/_updater.class.php', 'Updater' );
 
 // Set options path:
-$AdminUI->set_path( 'tools', 'updates' );
+$AdminUI->set_path( 'tools', 'upgrade' );
 
 // Get action parameter from request:
 param_action();
@@ -26,7 +26,7 @@ switch( $action )
 		if( $current_Updater->start_upgrade() )
 		{
 			// Redirect to avoid double post
-			header_redirect( '?ctrl=updates', 303 ); // Will EXIT
+			header_redirect( '?ctrl=upgrade', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 
@@ -58,7 +58,7 @@ switch( $action )
 	case 'new':
 	default:
 		// Display updates checker form
-		$AdminUI->disp_view( 'updates/views/_updater.form.php' );
+		$AdminUI->disp_view( 'upgrade/views/_updater.form.php' );
 		break;
 }
 

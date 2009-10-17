@@ -95,7 +95,7 @@ $ctrl_mappings = array(
 		'registration' => 'users/registration.ctrl.php',
 		'groups'       => 'users/groups.ctrl.php',
 		'upload'       => 'files/upload.ctrl.php',
-		'updates'      => 'updates/updates.ctrl.php',
+		'upgrade'      => 'upgrade/upgrade.ctrl.php',
 	);
 
 
@@ -462,10 +462,10 @@ class _core_Module extends Module
 						'href' => $admin_url.'?ctrl=backup',
 					);
 
-				// Display Updates option in Tools submenu in evobar menu
-				$entries['tools']['entries']['updates'] = array(
+				// Display Upgrade option in Tools submenu in evobar menu
+				$entries['tools']['entries']['upgrade'] = array(
 						'text' => T_('Check for updates').'&hellip;',
-						'href' => $admin_url.'?ctrl=updates',
+						'href' => $admin_url.'?ctrl=upgrade',
 					);
 			}
 		}
@@ -732,9 +732,9 @@ class _core_Module extends Module
 
 				// Display Updates tab in Tools menu
 				$AdminUI->add_menu_entries( 'tools', array(
-									'updates' => array(
+									'upgrade' => array(
 									  'text' => T_('Check for updates'),
-									  'href' => '?ctrl=updates'	),
+									  'href' => '?ctrl=upgrade'	),
 								) );
 		}
 		elseif( $current_User->check_perm( 'spamblacklist', 'view' ) )
@@ -760,6 +760,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.41  2009/10/17 16:49:10  efy-maxim
+ * upgrade
+ *
  * Revision 1.40  2009/10/17 16:31:32  efy-maxim
  * Renamed: T_groupsettings to T_groups__groupsettings, T_usersettings to T_users__usersettings
  *
