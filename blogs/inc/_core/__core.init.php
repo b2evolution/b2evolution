@@ -95,7 +95,7 @@ $ctrl_mappings = array(
 		'registration' => 'users/registration.ctrl.php',
 		'groups'       => 'users/groups.ctrl.php',
 		'upload'       => 'files/upload.ctrl.php',
-		'updates'      => 'backup/updates.ctrl.php',
+		'updates'      => 'updates/updates.ctrl.php',
 	);
 
 
@@ -760,6 +760,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.39  2009/10/17 15:56:45  efy-maxim
+ * updates has been moved from backup to updates folder
+ *
  * Revision 1.38  2009/10/17 14:12:22  efy-maxim
  * Upgrader prototype
  *

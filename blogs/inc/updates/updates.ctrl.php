@@ -3,7 +3,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Load Currency class (PHP4):
-load_class( 'backup/model/_updater.class.php', 'Updater' );
+load_class( 'updates/model/_updater.class.php', 'Updater' );
 
 // Set options path:
 $AdminUI->set_path( 'tools', 'updates' );
@@ -58,7 +58,7 @@ switch( $action )
 	case 'new':
 	default:
 		// Display updates checker form
-		$AdminUI->disp_view( 'backup/views/_updater.form.php' );
+		$AdminUI->disp_view( 'updates/views/_updater.form.php' );
 		break;
 }
 
