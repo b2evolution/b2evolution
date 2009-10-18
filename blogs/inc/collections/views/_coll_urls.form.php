@@ -141,6 +141,9 @@ $Form->begin_fieldset( T_('Blog URL').' ['.T_('Admin').']'.get_manual_link('blog
 			 *              but then we would be have the same setting in
 			 *              two places... I would be in favor of the first
 			 *              solution.
+			 * fp> I think it should actually change the default blog setting because
+			 * people have a hard time finding the settings. I personally couldn't care
+			 * less that there are 2 ways to do the same thing.
 			 */
 			array( 'default', T_('Default blog in index.php'),
 											$baseurl.'index.php ('.( !isset($defblog)
@@ -329,6 +332,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.26  2009/10/18 16:28:06  fplanque
+ * no message
+ *
  * Revision 1.25  2009/10/10 21:53:12  tblue246
  * TODO
  *
