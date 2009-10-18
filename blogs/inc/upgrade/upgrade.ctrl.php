@@ -96,4 +96,11 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
+/*
+ * $Log$
+ * Revision 1.3  2009/10/18 08:16:55  efy-maxim
+ * log
+ *
+ */
+
 ?>

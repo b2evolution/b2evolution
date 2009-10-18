@@ -38,4 +38,11 @@ else
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
 
+/*
+ * $Log$
+ * Revision 1.3  2009/10/18 08:16:55  efy-maxim
+ * log
+ *
+ */
+
 ?>

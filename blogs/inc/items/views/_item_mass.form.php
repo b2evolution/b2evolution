@@ -202,4 +202,11 @@ if( $publishnow_displayed )
 
 //require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
+/*
+ * $Log$
+ * Revision 1.2  2009/10/18 08:16:55  efy-maxim
+ * log
+ *
+ */
+
 ?>
