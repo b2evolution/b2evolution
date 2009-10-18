@@ -2,12 +2,90 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
 /**
- * BackupSettings class
+ * @var strings base application paths
+ */
+global $basepath, $conf_subdir, $skins_subdir, $adminskins_subdir;
+global $plugins_subdir, $media_subdir, $backup_subdir, $upgrade_subdir;
+
+/**
+ * @var array backup paths
+ */
+global $backup_paths;
+
+/**
+ * @var array backup tables
+ */
+global $backup_tables;
+
+
+/**
+ * Backup folder/files default settings
+ * - 'label' checkbox label
+ * - 'note' checkbox note
+ * - 'path' path to folder or file
+ * - 'included' true if folder or file must be in backup
+ * @var array
+ */
+$backup_paths = array( 	'application_files'   => array ( 'label'    => T_( 'Application files' ), /* It is files root. Please, don't remove it. */
+														 'path'     => '*',
+														 'included' => true ),
+
+						'configuration_files' => array ( 'label'    => T_( 'Configuration files' ),
+														 'path'     => $conf_subdir,
+														 'included' => true ),
+
+						'skins_files'         => array ( 'label'    => T_( 'Skins' ),
+														 'path'     => array( 	$skins_subdir,
+																				$adminskins_subdir ),
+														 'included' => true ),
+
+						'plugins_files'       => array ( 'label'    => T_( 'Plugins' ),
+														 'path'     => $plugins_subdir,
+														 'included' => true ),
+
+						'media_files'         => array ( 'label'    => T_( 'Media folder' ),
+														 'path'     => $media_subdir,
+														 'included' => false ),
+
+						'backup_files'        => array ( 'path'     => $backup_subdir,
+														 'included' => false ),
+
+						'upgrade_files'        => array ( 'path'     => $upgrade_subdir,
+														  'included' => false ) );
+
+/**
+ * Backup database tables default settings
+ * - 'label' checkbox label
+ * - 'note' checkbox note
+ * - 'tables' tables list
+ * - 'included' true if database tables must be in backup
+ * @var array
+ */
+$backup_tables = array(	'content_tables'      => array ( 'label'    => T_( 'Content tables' ), /* It means collection of all of the tables. Please, don't remove it. */
+														 'table'   => '*',
+														 'included' => true ),
+
+						'logs_stats_tables'   => array ( 'label'    => T_( 'Logs & stats tables' ),
+														 'table'   => array(
+																'T_sessions',
+																'T_hitlog',
+																'T_basedomains',
+																'T_track__goalhit',
+																'T_track__keyphrase',
+																'T_useragents',
+															),
+														 'included' => false ) );
+
+
+
+/**
+ * Backup class
  * This class is responsible to backup application files and data.
  *
  */
-class BackupSettings
+class Backup
 {
 	/**
 	 * All of the paths and their 'included' values defined in backup configuration file
@@ -37,7 +115,7 @@ class BackupSettings
 	/**
 	 * Constructor
 	 */
-	function BackupSettings()
+	function Backup()
 	{
 		global $backup_paths, $backup_tables;
 
@@ -100,9 +178,9 @@ class BackupSettings
 	 *
 	 * @todo fp> urgent: backup should display what it's doing while it's doing it. There shoulf be flush(); calls all along so the lines are displayed as backup progresses... (install & upgrade do sth like that already)
 	 */
-	function backup()
+	function start_backup()
 	{
-		global $basepath, $backup_subdir, $servertimenow, $Messages;
+		global $basepath, $backup_path, $servertimenow, $Messages;
 
 		// Check are there something to backup
 		$do_backup_files = $this->has_included( $this->backup_paths );
@@ -120,19 +198,17 @@ class BackupSettings
 		// Enable maintenance mode
 		$this->switch_maintenance_mode( 1 );
 
-		// Create backup paths
-		$backups_root_path = $basepath.$backup_subdir;
-		$backups_path = $backups_root_path.date( 'Y-m-d-H-i-s', $servertimenow );
-
-		if( $this->prepare_backupdir( $backups_root_path, true ) )
+		// Create current backup path
+		$cbackup_path = $backup_path.date( 'Y-m-d-H-i-s', $servertimenow ).'/';
+		if( $this->prepare_backupdir( $backup_path, true ) )
 		{	// We can backup files and database
-			$backup_files_path = $backups_path.'/files/';
+			$backup_files_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'files/';
 			if( $do_backup_files && $this->prepare_backupdir( $backup_files_path ) )
 			{	// We can backup files
 				$this->backup_files( $backup_files_path );
 			}
 
-			$backup_tables_path = $backups_path.'/db/';
+			$backup_tables_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'db/';
 			if( $Messages->count() == 0 && $do_backup_tables && $this->prepare_backupdir( $backup_tables_path ) )
 			{	// We can backup database
 				$this->backup_database( $backup_tables_path );
@@ -144,11 +220,11 @@ class BackupSettings
 
 		if( $Messages->count() > 0 )
 		{
-			rmdir_r( $backups_path );
+			@rmdir_r( $cbackup_path );
 			return false;
 		}
 
-		$Messages->add( sprintf( T_('Backup has been created in the following directory: &laquo;%s&raquo;'), $backups_path ), 'success' );
+		$Messages->add( sprintf( T_('Backup has been created in the following directory: &laquo;%s&raquo;'), $cbackup_path ), 'success' );
 		return true;
 	}
 
@@ -313,7 +389,7 @@ class BackupSettings
 		{
 			if( $included )
 			{
-				$tables = $backup_tables[$name]['table'];
+				$tables = $this->aliases_to_tables( $backup_tables[$name]['table'] );
 				if( is_array( $tables ) )
 				{
 					$ready_to_backup = array_merge( $ready_to_backup, $tables );
@@ -340,7 +416,7 @@ class BackupSettings
 		{
 			if( !$included )
 			{
-				$tables = $backup_tables[$name]['table'];
+				$tables = $this->aliases_to_tables( $backup_tables[$name]['table'] );
 				if( is_array( $tables ) )
 				{
 					$ready_to_backup = array_diff( $ready_to_backup, $tables );
@@ -357,7 +433,7 @@ class BackupSettings
 		}
 
 		// Create and save created SQL backup script
-		$backup_sql_filename = 'backup.sql';
+		$backup_sql_filename = 'db.sql';
 		$backup_sql_filepath = $backup_dirpath.$backup_sql_filename;
 
 		// Check if backup file exists
@@ -426,7 +502,7 @@ class BackupSettings
 			// Load ZIP class
 			load_class( '_ext/_zip_archives.php', 'zip_file' );
 
-			$zipfile = & new zip_file( 'backup.zip' );
+			$zipfile = & new zip_file( 'db.zip' );
 			$zipfile->set_options( array ( 'basedir'  => $backup_dirpath ) );
 			$zipfile->add_files( $backup_sql_filename );
 			$zipfile->create_archive();
@@ -552,15 +628,43 @@ class BackupSettings
 		}
 		return array( $path );
 	}
+
+
+	/**
+	 * Convert aliases to real table names as table backup works with real table names
+	 * @param mixed aliases
+	 * @return mixed
+	 */
+	function aliases_to_tables( $aliases )
+	{
+		global $DB;
+
+		if( is_array( $aliases ) )
+		{
+			$tables = array();
+			foreach( $aliases as $alias )
+			{
+				$tables[] = preg_replace( $DB->dbaliases, $DB->dbreplaces, $alias );
+			}
+			return $tables;
+		}
+		elseif( $aliases == '*' )
+		{
+			return $aliases;
+		}
+		else
+		{
+			return preg_replace( $DB->dbaliases, $DB->dbreplaces, $aliases );
+		}
+	}
 }
+
 
 /*
  * $Log$
- * Revision 1.5  2009/10/18 00:22:12  fplanque
- * doc/maintenance mode
- *
- * Revision 1.4  2009/10/18 00:10:27  fplanque
- * doc
+ * Revision 1.1  2009/10/18 10:24:28  efy-maxim
+ * backup
  *
  */
+
 ?>

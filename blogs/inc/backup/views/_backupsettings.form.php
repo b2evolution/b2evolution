@@ -3,9 +3,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @var instance of BackupSettings class
+ * @var instance of Backup class
  */
-global $backup_Settings;
+global $current_Backup;
 
 /**
  * @var back up configuration
@@ -23,7 +23,6 @@ $Form = & new Form( NULL, 'backup_settings', 'post' );
 
 $Form->begin_form( 'fform', T_('Backup application files and data') );
 
-
 $Form->hiddens_by_key( get_memorized( 'action' ) );
 
 // Backup settings for folders and files
@@ -31,7 +30,6 @@ $Form->begin_fieldset( T_( 'Folders & files' ), array( 'class'=>'fieldset clear'
 
 foreach( $backup_paths as $name => $settings )
 {
-
 	if( array_key_exists( 'label', $settings ) )
 	{
 		$note = '';
@@ -40,7 +38,7 @@ foreach( $backup_paths as $name => $settings )
 			$note = $settings['note'];
 		}
 
-		$Form->checkbox( 'bk_'.$name, $backup_Settings->backup_paths[$name], $settings['label'], $note );
+		$Form->checkbox( 'bk_'.$name, $current_Backup->backup_paths[$name], $settings['label'], $note );
 	}
 }
 
@@ -57,7 +55,7 @@ foreach( $backup_tables as $name => $settings )
 		$note = $settings['note'];
 	}
 
-	$Form->checkbox( 'bk_'.$name, $backup_Settings->backup_tables[$name], $settings['label'], $note );
+	$Form->checkbox( 'bk_'.$name, $current_Backup->backup_tables[$name], $settings['label'], $note );
 }
 
 $Form->end_fieldset();
@@ -65,8 +63,8 @@ $Form->end_fieldset();
 // Enable/Disable maintenance mode
 $Form->begin_fieldset( T_( 'Maintenance' ), array( 'class'=>'fieldset clear' ) );
 
-$Form->checkbox( 'bk_maintenance_mode', $backup_Settings->maintenance_mode, T_( 'Maintenance mode' ), T_( 'Put b2evolution into Maintenance Mode while backing up - Recommended' ) );
-$Form->checkbox( 'bk_pack_backup_files', $backup_Settings->pack_backup_files, T_( 'ZIP' ), T_('Compress backup into ZIP files') );
+$Form->checkbox( 'bk_maintenance_mode', $current_Backup->maintenance_mode, T_( 'Maintenance mode' ), T_( 'Put b2evolution into Maintenance Mode while backing up - Recommended' ) );
+$Form->checkbox( 'bk_pack_backup_files', $current_Backup->pack_backup_files, T_( 'ZIP' ), T_('Compress backup into ZIP files') );
 
 $Form->end_fieldset();
 
@@ -76,6 +74,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'S
 
 /*
  * $Log$
+ * Revision 1.4  2009/10/18 10:24:28  efy-maxim
+ * backup
+ *
  * Revision 1.3  2009/10/18 08:16:55  efy-maxim
  * log
  *

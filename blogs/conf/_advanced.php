@@ -504,6 +504,30 @@ $media_path = $basepath.$media_subdir;   // You should not need to change this
 $media_url = $baseurl.$media_subdir;     // You should not need to change this
 
 
+/**
+ * Location of the backup folder.
+ *
+ * Note: This folder does NOT NEED to be accessible through HTTP.
+ * This folder MUST be writable by PHP.
+ *
+ * @global string $backup_subdir
+ */
+$backup_subdir = '_backup/';				// Subdirectory relative to base
+$backup_path = $basepath.$backup_subdir;	// You should not need to change this
+
+
+/**
+ * Location of the upgrade folder.
+ *
+ * Note: This folder does NOT NEED to be accessible through HTTP.
+ * This folder MUST be writable by PHP.
+ *
+ * @global string $upgrade_subdir
+ */
+$upgrade_subdir = '_upgrade';				// Subdirectory relative to base
+$upgrade_path = $basepath.$upgrade_subdir;	// You should not need to change this
+
+
 // Define default avatar image URL
 // fp> TODO: do not use a setting for this.
 // fp> put the file into the shared files directory with the other sample "admin" avatars. That way it is very easy to replace with another default.
