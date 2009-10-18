@@ -156,12 +156,11 @@ class BackupSettings
 	/**
 	 * Enable/disable maintenance mode
 	 *
-	 * @internal Tblue> IMO modifying config files without user consent
-	 *                  and a backup is a bad idea. The admin should either
-	 *                  have to do the configuration changes manually or
-	 *                  at least confirm automated changes.
-	 * fp> we'll take care of paranoid users later. In the meantime they don't have to use the backup feature.
-	 * Solution: create a /conf/maintenance.txt file and have /conf/config check for it. If present: 503 + display contents of file as message. 
+	 * @todo fp> use new way of putting into maintenance mode:
+	 * - create a /conf/maintenance.txt file; abort backup if file cannot be created
+	 * - contents of file should be a message like "System backup is in progress. Please reload this page in a few minutes."
+	 * /conf/config.php will check for this file. If present is returns 503 + display contents of file as message.
+	 * - delete the file at the end of the backup
 	 *
 	 * @param integer enabled
 	 */
@@ -557,6 +556,9 @@ class BackupSettings
 
 /*
  * $Log$
+ * Revision 1.5  2009/10/18 00:22:12  fplanque
+ * doc/maintenance mode
+ *
  * Revision 1.4  2009/10/18 00:10:27  fplanque
  * doc
  *
