@@ -61,7 +61,6 @@ $Form->hidden( 'preview', 1 );
 $Form->hidden( 'more', 1 );
 $Form->hidden( 'preview_userid', $current_User->ID );
 
-
 // Fields used in "advanced" form, but not here:
 $Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
 $Form->hidden( 'item_typ_ID', $edited_Item->ptyp_ID );
@@ -80,8 +79,6 @@ if( $Blog->get_setting( 'use_workflow' ) )
 	$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
 }
 $Form->hidden( 'trackback_url', $trackback_url );
-$Form->hidden( 'renderers_displayed', 1 );
-$Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 $Form->hidden( 'item_featured', $edited_Item->featured );
 $Form->hidden( 'item_order', $edited_Item->order );
 // CUSTOM FIELDS double
@@ -104,7 +101,8 @@ for( $i = 1 ; $i <= 3; $i++ )
 	<?php
 	// ############################ POST CONTENTS #############################
 
-	$Form->begin_fieldset( T_('Mass post contents').get_manual_link('post_contents_fieldset') );
+	$Form->begin_fieldset( T_('Mass post contents') );
+	//$Form->begin_fieldset( T_('Mass post contents').get_manual_link('post_contents_fieldset') );
 
 	$Form->hidden( 'post_title', 'None' );
 	$Form->hidden( 'mass_create', '1' );
@@ -112,7 +110,7 @@ for( $i = 1 ; $i <= 3; $i++ )
 	// ---------------------------- TEXTAREA -------------------------------------
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
-	$Form->textarea_input( 'content', $item_content, 16, '', array( 'cols' => 40 , 'rows' => 25, 'id' => 'itemform_post_content' ) );
+	$Form->textarea_input( 'content', $item_content, 16, '', array( 'cols' => 40 , 'rows' => 33, 'id' => 'itemform_post_content' ) );
 	$Form->fieldstart = '<div class="tile">';
 	$Form->fieldend = '</div>';
 
@@ -121,20 +119,7 @@ for( $i = 1 ; $i <= 3; $i++ )
 	echo '<div class="edit_actions">';
 
 	$next_action = ($creating ? 'create' : 'update');
-	$Form->submit( array( 'actionArray['.$next_action.']', /* TRANS: This is the value of an input submit button */ T_('Save'), 'SaveButton' ) );
-
-	$publishnow_displayed = false;
-	if( $edited_Item->status == 'draft'
-			&& $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID )	// TODO: if we actually set the primary cat to another blog, we may still get an ugly perm die
-			&& $current_User->check_perm( 'edit_timestamp', 'edit', false ) )
-	{	// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
-		$Form->submit( array(
-			'actionArray['.$next_action.'_publish]',
-			/* TRANS: This is the value of an input submit button */ T_('Publish NOW !'),
-			'SaveButton',
-		) );
-		$publishnow_displayed = true;
-	}
+	$Form->submit( array( 'actionArray['.$next_action.']', /* TRANS: This is the value of an input submit button */ T_('Create posts'), 'SaveButton' ) );
 
 	echo '</div>';
 
@@ -157,8 +142,17 @@ for( $i = 1 ; $i <= 3; $i++ )
 	$Form->begin_fieldset( T_('Visibility / Sharing'), array( 'id' => 'itemform_visibility' ) );
 
 	$Form->switch_layout( 'linespan' );
-	visibility_select( $Form, $edited_Item->status );
+	visibility_select( $Form, $edited_Item->status, true );
 	$Form->switch_layout( NULL );
+
+	$Form->end_fieldset();
+
+	// ################### TEXT RENDERERS ###################
+
+	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
+
+	// fp> TODO: there should be no param call here (shld be in controller)
+	$edited_Item->renderer_checkboxes( param('renderers', 'array', NULL) );
 
 	$Form->end_fieldset();
 
@@ -190,20 +184,17 @@ for( $i = 1 ; $i <= 3; $i++ )
 <div class="clear"></div>
 
 <?php
+
 // ================================== END OF EDIT FORM ==================================
+
 $Form->end_form();
 
-if( $publishnow_displayed )
-{	// fp> TODO: ideally this shoudd not be hacked in *here*
-	echo_publishnowbutton_js( $next_action );
-}
-
-// ####################### JS BEHAVIORS #########################
-
-//require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.3  2009/10/18 11:29:43  efy-maxim
+ * 1. mass create in 'All' tab; 2. "Text Renderers" and "Comments"
+ *
  * Revision 1.2  2009/10/18 08:16:55  efy-maxim
  * log
  *

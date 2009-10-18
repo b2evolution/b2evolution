@@ -798,7 +798,7 @@ function attach_browse_tabs()
 /**
  * Allow to select status/visibility
  */
-function visibility_select( & $Form, $post_status )
+function visibility_select( & $Form, $post_status, $mass_create = false )
 {
 	global $current_User, $Blog;
 
@@ -829,7 +829,7 @@ function visibility_select( & $Form, $post_status )
 		$sharing_options[] = array( 'deprecated', T_('Deprecated').' <span class="notes">'.T_('(Not published!)').'</span>' );
 	}
 
-	if( $current_User->check_perm( 'blog_post!redirected', 'edit', false, $Blog->ID ) )
+	if( !$mass_create && $current_User->check_perm( 'blog_post!redirected', 'edit', false, $Blog->ID ) )
 	{
 		$sharing_options[] = array( 'redirected', T_('Redirected').' <span class="notes">'.T_('(301)').'</span>' );
 	}
@@ -1029,6 +1029,9 @@ function & create_multiple_posts( & $Item )
 
 /*
  * $Log$
+ * Revision 1.76  2009/10/18 11:29:42  efy-maxim
+ * 1. mass create in 'All' tab; 2. "Text Renderers" and "Comments"
+ *
  * Revision 1.75  2009/10/15 20:54:25  tblue246
  * create_multiple_posts(): Code improvements, e. g. removed second loop.
  *

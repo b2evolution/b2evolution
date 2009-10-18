@@ -71,6 +71,8 @@ else
 	{	// List is filtered, offer option to reset filters:
 		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3 );
 	}
+
+	$block_item_Widget->global_icon( T_('Mass create...'), 'new', '?ctrl=items&amp;action=new_mass&amp;blog='.$blog, T_('Mass create').' &raquo;', 3, 4 );
 	$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post').' &raquo;', 3, 4 );
 }
 
@@ -393,6 +395,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.24  2009/10/18 11:29:43  efy-maxim
+ * 1. mass create in 'All' tab; 2. "Text Renderers" and "Comments"
+ *
  * Revision 1.23  2009/10/11 03:00:11  blueyed
  * Add "position" and "order" properties to attachments.
  * Position can be "teaser" or "aftermore" for now.

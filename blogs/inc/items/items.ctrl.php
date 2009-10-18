@@ -1127,6 +1127,10 @@ switch( $action )
 		$item_title = $edited_Item->title;
 		$item_content = $edited_Item->content;
 
+		// Format content for editing, if we were not already in editing...
+		$Plugins_admin = & get_Plugins_admin();
+		$Plugins_admin->unfilter_contents( $item_title /* by ref */, $item_content /* by ref */, $edited_Item->get_renderers_validated() );
+
 		$AdminUI->disp_view( 'items/views/_item_mass.form.php' );
 
 		// End payload block:
@@ -1238,6 +1242,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.71  2009/10/18 11:29:42  efy-maxim
+ * 1. mass create in 'All' tab; 2. "Text Renderers" and "Comments"
+ *
  * Revision 1.70  2009/10/13 23:26:16  blueyed
  * Drop special handling of link_position + link_order: it is confusing, and will not scale well with more link_positions probably.
  *
