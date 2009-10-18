@@ -27,8 +27,16 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+ * @var instance of User class
+ */
+global $current_User;
+
+// Check minimum permission:
+$current_User->check_perm( 'perm_maintenance', 'backup', true );
+
 // Load Backup class (PHP4):
-load_class( 'backup/model/_backup.class.php', 'Backup' );
+load_class( 'maintenance/model/_backup.class.php', 'Backup' );
 
 // Set options path:
 $AdminUI->set_path( 'tools', 'backup' );
@@ -60,7 +68,7 @@ switch( $action )
 {
 	case 'start':
 		// Display backup settings form
-		$AdminUI->disp_view( 'backup/views/_backupsettings.form.php' );
+		$AdminUI->disp_view( 'maintenance/views/_backup.form.php' );
 		break;
 
 	case 'backup':
@@ -86,23 +94,12 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
+
 /*
  * $Log$
- * Revision 1.6  2009/10/18 17:26:26  fplanque
- * doc
- *
- * Revision 1.5  2009/10/18 17:20:58  fplanque
- * doc/messages/minor refact
- *
- * Revision 1.4  2009/10/18 15:32:53  efy-maxim
- * 1. new maintenance mode switcher. 2. flush
- *
- * Revision 1.3  2009/10/18 10:24:28  efy-maxim
- * backup
- *
- * Revision 1.2  2009/10/18 08:11:37  efy-maxim
- * log test
+ * Revision 1.1  2009/10/18 20:15:51  efy-maxim
+ * 1. backup, upgrade have been moved to maintenance module
+ * 2. maintenance module permissions
  *
  */
-
 ?>

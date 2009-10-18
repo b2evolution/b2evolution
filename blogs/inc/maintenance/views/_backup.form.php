@@ -22,7 +22,6 @@
  *
  * @version $Id$
  */
-
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
@@ -97,21 +96,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'S
 
 /*
  * $Log$
- * Revision 1.7  2009/10/18 17:26:26  fplanque
- * doc
- *
- * Revision 1.6  2009/10/18 17:20:58  fplanque
- * doc/messages/minor refact
- *
- * Revision 1.5  2009/10/18 15:32:54  efy-maxim
- * 1. new maintenance mode switcher. 2. flush
- *
- * Revision 1.4  2009/10/18 10:24:28  efy-maxim
- * backup
- *
- * Revision 1.3  2009/10/18 08:16:55  efy-maxim
- * log
+ * Revision 1.1  2009/10/18 20:15:51  efy-maxim
+ * 1. backup, upgrade have been moved to maintenance module
+ * 2. maintenance module permissions
  *
  */
-
 ?>

@@ -22,18 +22,12 @@
  *
  * @version $Id$
  */
-
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
-
-/**
- * @var instance of Updater class
- */
-global $current_Updater;
 
 /**
  * @var action
  */
-global $action;
+global $action, $updates;
 
 $Form = & new Form( NULL, 'backup_settings', 'post', 'compact' );
 
@@ -41,7 +35,7 @@ $Form->begin_form( 'fform', T_('Check for updates') );
 
 $Form->hiddens_by_key( get_memorized( 'action' ) );
 
-if( empty( $current_Updater->updates ) )
+if( empty( $updates ) )
 {
 	$Form->info( T_( 'Updates' ), T_( 'There are no any new updates.' ) );
 
@@ -49,7 +43,7 @@ if( empty( $current_Updater->updates ) )
 }
 else
 {
-	$update = $current_Updater->updates[0];
+	$update = $updates[0];
 
 	$Form->info( T_( 'Updates' ), T_( 'There is a new update!' ), '<br/><br/><b>Name:</b> '.$update['name'].
 																'<br/><b>Description:</b> '.$update['description'].
@@ -61,14 +55,12 @@ else
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
 
+
 /*
  * $Log$
- * Revision 1.4  2009/10/18 17:26:26  fplanque
- * doc
- *
- * Revision 1.3  2009/10/18 08:16:55  efy-maxim
- * log
+ * Revision 1.1  2009/10/18 20:15:51  efy-maxim
+ * 1. backup, upgrade have been moved to maintenance module
+ * 2. maintenance module permissions
  *
  */
-
 ?>

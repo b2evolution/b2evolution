@@ -79,7 +79,6 @@ $db_config['aliases'] = array(
  */
 $ctrl_mappings = array(
 		'antispam'     => 'antispam/antispam_list.ctrl.php',
-		'backup'       => 'backup/backup.ctrl.php',
 		'crontab'      => 'cron/cronjobs.ctrl.php',
 		'countries'    => 'regional/countries.ctrl.php',
 		'currencies'   => 'regional/currencies.ctrl.php',
@@ -95,7 +94,6 @@ $ctrl_mappings = array(
 		'registration' => 'users/registration.ctrl.php',
 		'groups'       => 'users/groups.ctrl.php',
 		'upload'       => 'files/upload.ctrl.php',
-		'upgrade'      => 'upgrade/upgrade.ctrl.php',
 	);
 
 
@@ -455,18 +453,6 @@ class _core_Module extends Module
 						'text' => T_('Scheduler').'&hellip;',
 						'href' => $admin_url.'?ctrl=crontab',
 					);
-
-				// Display Backup option in Tools submenu in evobar menu
-				$entries['tools']['entries']['backup'] = array(
-						'text' => T_('Backup').'&hellip;',
-						'href' => $admin_url.'?ctrl=backup',
-					);
-
-				// Display Upgrade option in Tools submenu in evobar menu
-				$entries['tools']['entries']['upgrade'] = array(
-						'text' => T_('Check for updates').'&hellip;',
-						'href' => $admin_url.'?ctrl=upgrade',
-					);
 			}
 		}
 
@@ -722,20 +708,6 @@ class _core_Module extends Module
 										'href' => '?ctrl=antispam'	),
 									) );
 				}
-
-				// Display Backup tab in Tools menu
-				$AdminUI->add_menu_entries( 'tools', array(
-									'backup' => array(
-									  'text' => T_('Backup'),
-									  'href' => '?ctrl=backup'	),
-								) );
-
-				// Display Updates tab in Tools menu
-				$AdminUI->add_menu_entries( 'tools', array(
-									'upgrade' => array(
-									  'text' => T_('Check for updates'),
-									  'href' => '?ctrl=upgrade'	),
-								) );
 		}
 		elseif( $current_User->check_perm( 'spamblacklist', 'view' ) )
 		{	// Permission to view antispam but NOT tools:
@@ -760,6 +732,10 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.42  2009/10/18 20:15:51  efy-maxim
+ * 1. backup, upgrade have been moved to maintenance module
+ * 2. maintenance module permissions
+ *
  * Revision 1.41  2009/10/17 16:49:10  efy-maxim
  * upgrade
  *

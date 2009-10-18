@@ -1,6 +1,6 @@
 <?php
 /**
- * Upgarde - This is a LINEAR controller
+ * Upgrade - This is a LINEAR controller
  *
  * This file is part of b2evolution - {@link http://b2evolution.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -24,30 +24,21 @@
  *
  * @version $Id$
  */
-
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-// Load Currency class (PHP4):
-load_class( 'upgrade/model/_updater.class.php', 'Updater' );
+/**
+ * @var instance of User class
+ */
+global $current_User;
+
+// Check minimum permission:
+$current_User->check_perm( 'perm_maintenance', 'upgrade', true );
 
 // Set options path:
 $AdminUI->set_path( 'tools', 'upgrade' );
 
 // Get action parameter from request:
 param_action();
-
-/**
- * @var instance of Updater class
- */
-global $current_Updater;
-
-// Create instance of Updater class
-$current_Updater = & new Updater();
-
-
-// We don't check if updates are available her ebecause API call could take a long time
-// and we don't want the user to be waiting on a blank screen.
-
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -99,12 +90,11 @@ switch( $action )
 
 		// Extract available updates:
 		$updates = $global_Cache->get( 'updates' );
-		$current_Updater->updates = $updates;
 
 		$block_item_Widget->disp_template_replaced( 'block_end' );
 
 		// Display updates checker form
-		$AdminUI->disp_view( 'upgrade/views/_updater.form.php' );
+		$AdminUI->disp_view( 'maintenance/views/_upgrade.form.php' );
 		break;
 
 	case 'download':
@@ -121,16 +111,12 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
+
 /*
  * $Log$
- * Revision 1.5  2009/10/18 17:26:26  fplanque
- * doc
- *
- * Revision 1.4  2009/10/18 17:20:58  fplanque
- * doc/messages/minor refact
- *
- * Revision 1.3  2009/10/18 08:16:55  efy-maxim
- * log
+ * Revision 1.1  2009/10/18 20:15:51  efy-maxim
+ * 1. backup, upgrade have been moved to maintenance module
+ * 2. maintenance module permissions
  *
  */
 ?>
