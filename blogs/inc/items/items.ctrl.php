@@ -1081,7 +1081,7 @@ switch( $action )
 		// Do nothing
 		break;
 
-  	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
+  case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
 		$bozo_start_modified = true;	// We want to start with a form being already modified
 	case 'new':
@@ -1242,6 +1242,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.72  2009/10/18 20:46:27  fplanque
+ * no message
+ *
  * Revision 1.71  2009/10/18 11:29:42  efy-maxim
  * 1. mass create in 'All' tab; 2. "Text Renderers" and "Comments"
  *
