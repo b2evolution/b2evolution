@@ -1,0 +1,5 @@
+b2evolution maintenance mode message.
+
+In order to put b2evolution into maintenance mode, rename this file to maintenance.txt (without a _ at the beginning).
+
+Edit the contents of this file to change the message that is displayed during maintenance.
