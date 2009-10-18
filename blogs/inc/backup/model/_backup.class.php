@@ -145,7 +145,7 @@ class Backup
 	 */
 	function load_from_Request()
 	{
-		global $backup_paths, $backup_tables;
+		global $backup_paths, $backup_tables, $Messages;
 
 		// Load folders/files settings from request
 		foreach( $backup_paths as $name => $settings )
@@ -164,6 +164,15 @@ class Backup
 
 		$this->maintenance_mode = param( 'bk_maintenance_mode', 'boolean' );
 		$this->pack_backup_files = param( 'bk_pack_backup_files', 'boolean' );
+
+		// Check are there something to backup
+		if( !$this->has_included( $this->backup_paths ) && !$this->has_included( $this->backup_tables ) )
+		{
+			$Messages->add( T_( 'There is nothing to backup. Please select at least one option' ), 'error' );
+			return false;
+		}
+
+		return true;
 	}
 
 
@@ -175,48 +184,37 @@ class Backup
 	 *              the user to continue the backup process.
 	 * fp> yes, this needs to be done but it's not critical.
 	 * However we should check that the set_time_limit() has worked and warn the user if not. "Max PHP execution time is only: xx seconds. Backup may be interrupted. fail before it's compelte.". flush();
-	 *
-	 * @todo fp> urgent: backup should display what it's doing while it's doing it. There shoulf be flush(); calls all along so the lines are displayed as backup progresses... (install & upgrade do sth like that already)
 	 */
 	function start_backup()
 	{
 		global $basepath, $backup_path, $servertimenow, $Messages;
 
-		// Check are there something to backup
-		$do_backup_files = $this->has_included( $this->backup_paths );
-		$do_backup_tables = $this->has_included( $this->backup_tables );
-
-		if( !$do_backup_files && !$do_backup_tables )
-		{
-			$Messages->add( T_( 'There is nothing to backup. Please select at least one option' ), 'error' );
-			return false;
-		}
-
 		// Set time limit as backup can take much time
 		set_time_limit( 1800 ); // 30 minutes
 
 		// Enable maintenance mode
-		$this->switch_maintenance_mode( 1 );
+		$this->switch_maintenance_mode( true );
 
 		// Create current backup path
 		$cbackup_path = $backup_path.date( 'Y-m-d-H-i-s', $servertimenow ).'/';
-		if( $this->prepare_backupdir( $backup_path, true ) )
+		if( $Messages->count() == 0 && $this->prepare_backupdir( $backup_path, true ) )
 		{	// We can backup files and database
+
 			$backup_files_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'files/';
-			if( $do_backup_files && $this->prepare_backupdir( $backup_files_path ) )
+			if( $this->has_included( $this->backup_paths ) && $this->prepare_backupdir( $backup_files_path ) )
 			{	// We can backup files
 				$this->backup_files( $backup_files_path );
 			}
 
 			$backup_tables_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'db/';
-			if( $Messages->count() == 0 && $do_backup_tables && $this->prepare_backupdir( $backup_tables_path ) )
+			if( $Messages->count() == 0 && $this->has_included( $this->backup_tables ) && $this->prepare_backupdir( $backup_tables_path ) )
 			{	// We can backup database
 				$this->backup_database( $backup_tables_path );
 			}
 		}
 
 		// Disable maintenance mode
-		$this->switch_maintenance_mode( 0 );
+		$this->switch_maintenance_mode( false );
 
 		if( $Messages->count() > 0 )
 		{
@@ -232,52 +230,40 @@ class Backup
 	/**
 	 * Enable/disable maintenance mode
 	 *
-	 * @todo fp> use new way of putting into maintenance mode:
-	 * - create a /conf/maintenance.txt file; abort backup if file cannot be created
-	 * - contents of file should be a message like "System backup is in progress. Please reload this page in a few minutes."
-	 * /conf/config.php will check for this file. If present is returns 503 + display contents of file as message.
-	 * - delete the file at the end of the backup
-	 *
-	 * @param integer enabled
+	 * @param boolean true if maintenance mode need to be enabled
 	 */
-	function switch_maintenance_mode( $enabled )
+	function switch_maintenance_mode( $enable )
 	{
 		global $conf_path, $Messages;
 
 		if( $this->maintenance_mode )
 		{
-			$conf_filepath = $conf_path.'_basic_config.php';
+			$maintenance_mode_file = 'maintenance.txt';
 
-			// Read current config file
-			$file_loaded = @file( $conf_filepath );
-
-			if( empty( $file_loaded ) )
-			{
-				$Messages->add( sprintf( T_( 'Unable to switch maintenance mode. Configuration file not found: &laquo;%s&raquo;' ), $conf_filepath ), 'error' );
-				return false;
-			}
-
-			// File loaded...
-			$conf = implode( '', $file_loaded );
-
-			// Update conf
-			$conf = preg_replace( 	array( 	'/\$maintenance_mode = 0;/',
-											'/\$maintenance_mode = 1;/'),
-									'$maintenance_mode = '.$enabled.';', $conf );
-			if( $conf )
-			{
-				$f = @fopen( $conf_filepath , 'w' );
+			if( $enable )
+			{	// Create maintenance file
+				$f = @fopen( $conf_path.$maintenance_mode_file , 'w+' );
 				if( $f == false )
-				{
-					$Messages->add( sprintf( T_( 'Unable to switch maintenance mode. Could not open &laquo;%s&raquo; for writing.' ), $conf_filepath ), 'error' );
+				{	// Maintenance file has not been created
+					$Messages->add( sprintf( T_( 'Unable to switch maintenance mode. Maintenance file can\'t be created: &laquo;%s&raquo;' ), $maintenance_mode_file ), 'error' );
 					return false;
 				}
 				else
-				{	// Write new content
-					fwrite( $f, $conf );
+				{	// Write content
+					fwrite( $f, T_( 'System backup is in progress. Please reload this page in a few minutes.' ) );
 					fclose($f);
 				}
 			}
+			else
+			{	// Delete maintenance file
+				if( !unlink( $conf_path.$maintenance_mode_file ) )
+				{
+					$Messages->add( sprintf( T_( 'Unable to switch maintenance mode. Maintenance file can\'t be deleted: &laquo;%s&raquo;' ), $maintenance_mode_file ), 'error' );
+					return false;
+				}
+			}
+
+			return true;
 		}
 	}
 
@@ -289,6 +275,9 @@ class Backup
 	function backup_files( $backup_dirpath )
 	{
 		global $basepath, $backup_paths, $Messages;
+
+		echo '<h4 style="color:green">'.T_( 'Creating folders/files backup...' ).'</h4>';
+		flush();
 
 		$excluded_files = array();
 		if( $this->pack_backup_files )
@@ -336,6 +325,14 @@ class Backup
 				$Messages->add( sprintf( T_( 'Unable to create &laquo;%s&raquo;' ), $zip_filepath ), 'error' );
 				return false;
 			}
+
+			// Display which folders/files backup created
+			foreach( $included_files as $file )
+			{
+				// progressive display of what backup is doing
+				echo sprintf( T_( 'Backupped folder/file &laquo;<strong>%s</strong>&raquo;' ), $basepath.$file ).'<br/>';
+				flush();
+			}
 		}
 		else
 		{	// Copy directories and files to backup directory
@@ -382,6 +379,9 @@ class Backup
 	function backup_database( $backup_dirpath )
 	{
 		global $DB, $db_config, $backup_tables, $Messages;
+
+		echo '<h4 style="color:green">'.T_( 'Creating database backup...' ).'</h4>';
+		flush();
 
 		// Collect all included tables
 		$ready_to_backup = array();
@@ -491,6 +491,10 @@ class Backup
 
 			// Flush the output to a file
 			fflush( $f );
+
+			// progressive display of what backup is doing
+			echo sprintf( T_( 'Backupped table &laquo;<strong>%s</strong>&raquo;' ), $table ).'<br/>';
+			flush();
 		}
 
 		// Close backup file input stream
@@ -571,7 +575,7 @@ class Backup
 	 * @param string destination directory
 	 * @param array excluded directories
 	 */
-	function recurse_copy( $src, $dest, &$excluded_files )
+	function recurse_copy( $src, $dest, &$excluded_files, $root = true )
 	{
     	$dir = opendir( $src );
     	@mkdir( $dest );
@@ -584,11 +588,18 @@ class Backup
             	{
             		if( !in_array( $srcfile, $excluded_files ) )
             		{	// We can copy the current directory as it isn't in excluded directories list
-                		$this->recurse_copy( $srcfile, $dest . '/' . $file, $excluded_files );
+            			if( $root )
+            			{
+	            			// progressive display of what backup is doing
+							echo sprintf( T_( 'Backupped folder &laquo;<strong>%s</strong>&raquo;' ), $srcfile ).'<br/>';
+							flush();
+            			}
+                		$this->recurse_copy( $srcfile, $dest . '/' . $file, $excluded_files, false );
             		}
             	}
             	else
-            	{	// Copy file
+            	{
+            		// Copy file
                 	copy( $srcfile, $dest.'/'. $file );
             	}
         	}
@@ -662,6 +673,9 @@ class Backup
 
 /*
  * $Log$
+ * Revision 1.2  2009/10/18 15:32:54  efy-maxim
+ * 1. new maintenance mode switcher. 2. flush
+ *
  * Revision 1.1  2009/10/18 10:24:28  efy-maxim
  * backup
  *

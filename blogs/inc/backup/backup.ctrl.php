@@ -11,30 +11,14 @@ $AdminUI->set_path( 'tools', 'backup' );
 // Get action parameter from request:
 param_action();
 
-/**
- * @var instance of Backup class
- */
-global $backup_Settings;
-
 // Create instance of Backup class
 $current_Backup = & new Backup();
 
-switch( $action )
+// Load backup settings from request
+if( $action == 'backup' && !$current_Backup->load_from_Request() )
 {
-	case 'backup':
-
-		// Load backup settings from request
-		$current_Backup->load_from_Request();
-		// Start backup
-		if( $current_Backup->start_backup() )
-		{	// Redirect to avoid double post
-			header_redirect( '?ctrl=backup', 303 ); // Will EXIT
-			// We have EXITed already at this point!!
-		}
-		break;
+	$action = 'new';
 }
-
-$action = 'new';
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -49,7 +33,6 @@ $AdminUI->disp_payload_begin();
  */
 switch( $action )
 {
-	case 'backup':
 	default:
 		// Display backup settings form
 		$AdminUI->disp_view( 'backup/views/_backupsettings.form.php' );
@@ -63,6 +46,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2009/10/18 15:32:53  efy-maxim
+ * 1. new maintenance mode switcher. 2. flush
+ *
  * Revision 1.3  2009/10/18 10:24:28  efy-maxim
  * backup
  *
