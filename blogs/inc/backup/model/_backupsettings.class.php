@@ -10,13 +10,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class BackupSettings
 {
 	/**
-	 * All of the paths and theirs 'included' values defined in backup configuration file
+	 * All of the paths and their 'included' values defined in backup configuration file
 	 * @var array
 	 */
 	var $backup_paths;
 
 	/**
-	 * All of the tables and theirs 'included' values defined in backup configuration file
+	 * All of the tables and their 'included' values defined in backup configuration file
 	 * @var array
 	 */
 	var $backup_tables;
@@ -95,6 +95,10 @@ class BackupSettings
 	 * @todo Tblue> Halt script if max_execution_time is about to be reached
 	 *              (in case we cannot set a high time limit) and allow
 	 *              the user to continue the backup process.
+	 * fp> yes, this needs to be done but it's not critical.
+	 * However we should check that the set_time_limit() has worked and warn the user if not. "Max PHP execution time is only: xx seconds. Backup may be interrupted. fail before it's compelte.". flush();
+	 *
+	 * @todo fp> urgent: backup should display what it's doing while it's doing it. There shoulf be flush(); calls all along so the lines are displayed as backup progresses... (install & upgrade do sth like that already)
 	 */
 	function backup()
 	{
@@ -156,6 +160,8 @@ class BackupSettings
 	 *                  and a backup is a bad idea. The admin should either
 	 *                  have to do the configuration changes manually or
 	 *                  at least confirm automated changes.
+	 * fp> we'll take care of paranoid users later. In the meantime they don't have to use the backup feature.
+	 * Solution: create a /conf/maintenance.txt file and have /conf/config check for it. If present: 503 + display contents of file as message. 
 	 *
 	 * @param integer enabled
 	 */
@@ -549,4 +555,10 @@ class BackupSettings
 	}
 }
 
+/*
+ * $Log$
+ * Revision 1.4  2009/10/18 00:10:27  fplanque
+ * doc
+ *
+ */
 ?>
