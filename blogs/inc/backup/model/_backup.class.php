@@ -28,32 +28,42 @@ global $backup_tables;
  * - 'included' true if folder or file must be in backup
  * @var array
  */
-$backup_paths = array( 	'application_files'   => array ( 'label'    => T_( 'Application files' ), /* It is files root. Please, don't remove it. */
-														 'path'     => '*',
-														 'included' => true ),
+$backup_paths = array(
+	'application_files'   => array (
+		'label'    => T_( 'Application files' ), /* It is files root. Please, don't remove it. */
+		'path'     => '*',
+		'included' => true ),
 
-						'configuration_files' => array ( 'label'    => T_( 'Configuration files' ),
-														 'path'     => $conf_subdir,
-														 'included' => true ),
+	'configuration_files' => array (
+		'label'    => T_( 'Configuration files' ),
+		'path'     => $conf_subdir,
+		'included' => true ),
 
-						'skins_files'         => array ( 'label'    => T_( 'Skins' ),
-														 'path'     => array( 	$skins_subdir,
-																				$adminskins_subdir ),
-														 'included' => true ),
+	'skins_files'         => array (
+		'label'    => T_( 'Skins' ),
+		'path'     => array( 	$skins_subdir,
+							$adminskins_subdir ),
+		'included' => true ),
 
-						'plugins_files'       => array ( 'label'    => T_( 'Plugins' ),
-														 'path'     => $plugins_subdir,
-														 'included' => true ),
+	'plugins_files'       => array (
+		'label'    => T_( 'Plugins' ),
+		'path'     => $plugins_subdir,
+		'included' => true ),
 
-						'media_files'         => array ( 'label'    => T_( 'Media folder' ),
-														 'path'     => $media_subdir,
-														 'included' => false ),
+	'media_files'         => array (
+		'label'    => T_( 'Media folder' ),
+		'path'     => $media_subdir,
+		'included' => false ),
 
-						'backup_files'        => array ( 'path'     => $backup_subdir,
-														 'included' => false ),
+	'backup_files'        => array (
+		'label'    => NULL,		// Don't display in form. Just exclude from backup.
+		'path'     => $backup_subdir,
+		'included' => false ),
 
-						'upgrade_files'        => array ( 'path'     => $upgrade_subdir,
-														  'included' => false ) );
+	'upgrade_files'        => array (
+		'label'    => NULL,		// Don't display in form. Just exclude from backup.
+		'path'     => $upgrade_subdir,
+		'included' => false ) );
 
 /**
  * Backup database tables default settings
@@ -63,21 +73,23 @@ $backup_paths = array( 	'application_files'   => array ( 'label'    => T_( 'Appl
  * - 'included' true if database tables must be in backup
  * @var array
  */
-$backup_tables = array(	'content_tables'      => array ( 'label'    => T_( 'Content tables' ), /* It means collection of all of the tables. Please, don't remove it. */
-														 'table'   => '*',
-														 'included' => true ),
+$backup_tables = array(
+	'content_tables'      => array (
+		'label'    => T_( 'Content tables' ), /* It means collection of all of the tables. Please, don't remove it. */
+		'table'   => '*',
+		'included' => true ),
 
-						'logs_stats_tables'   => array ( 'label'    => T_( 'Logs & stats tables' ),
-														 'table'   => array(
-																'T_sessions',
-																'T_hitlog',
-																'T_basedomains',
-																'T_track__goalhit',
-																'T_track__keyphrase',
-																'T_useragents',
-															),
-														 'included' => false ) );
-
+	'logs_stats_tables'   => array (
+		'label'    => T_( 'Logs & stats tables' ),
+		'table'   => array(
+			'T_sessions',
+			'T_hitlog',
+			'T_basedomains',
+			'T_track__goalhit',
+			'T_track__keyphrase',
+			'T_useragents',
+		),
+		'included' => false ) );
 
 
 /**
@@ -183,7 +195,8 @@ class Backup
 	 *              (in case we cannot set a high time limit) and allow
 	 *              the user to continue the backup process.
 	 * fp> yes, this needs to be done but it's not critical.
-	 * However we should check that the set_time_limit() has worked and warn the user if not. "Max PHP execution time is only: xx seconds. Backup may be interrupted. fail before it's compelte.". flush();
+	 * However we should check that the set_time_limit() has worked and warn the user if not.
+	 * "Max PHP execution time is only: xx seconds. Backup may be interrupted. fail before it's compelte.". flush();
 	 */
 	function start_backup()
 	{
@@ -197,6 +210,10 @@ class Backup
 
 		// Create current backup path
 		$cbackup_path = $backup_path.date( 'Y-m-d-H-i-s', $servertimenow ).'/';
+
+ 		printf( T_('Starting backup to: &laquo;%s&raquo; ...').'<br />', $cbackup_path );
+ 		flush();
+
 		if( $Messages->count() == 0 && $this->prepare_backupdir( $backup_path, true ) )
 		{	// We can backup files and database
 
@@ -222,7 +239,7 @@ class Backup
 			return false;
 		}
 
-		$Messages->add( sprintf( T_('Backup has been created in the following directory: &laquo;%s&raquo;'), $cbackup_path ), 'success' );
+		$Messages->add( sprintf( T_('Backup complete. Directory: &laquo;%s&raquo;'), $cbackup_path ), 'success' );
 		return true;
 	}
 
@@ -242,6 +259,8 @@ class Backup
 
 			if( $enable )
 			{	// Create maintenance file
+				echo '<p>'.T_('Switching to maintenance mode...').'</p>';
+
 				$f = @fopen( $conf_path.$maintenance_mode_file , 'w+' );
 				if( $f == false )
 				{	// Maintenance file has not been created
@@ -256,6 +275,8 @@ class Backup
 			}
 			else
 			{	// Delete maintenance file
+				echo '<p>'.T_('Switching out of maintenance mode...').'</p>';
+
 				if( !unlink( $conf_path.$maintenance_mode_file ) )
 				{
 					$Messages->add( sprintf( T_( 'Unable to switch maintenance mode. Maintenance file can\'t be deleted: &laquo;%s&raquo;' ), $maintenance_mode_file ), 'error' );
@@ -312,9 +333,12 @@ class Backup
 			// Load ZIP class
 			load_class( '_ext/_zip_archives.php', 'zip_file' );
 
+
 			// Create ZIPped backup
 			$zip_filepath = $backup_dirpath.'files.zip';
 			$zipfile = & new zip_file( $zip_filepath );
+			echo sprintf( T_( 'Archiving files to &laquo;<strong>%s</strong>&raquo;...' ), $zip_filepath ).'<br/>';
+			flush();
 			$zipfile->set_options( array ( 'basedir'  => $basepath ) );
 			$zipfile->add_files( $included_files );
 			$zipfile->create_archive();
@@ -330,8 +354,7 @@ class Backup
 			foreach( $included_files as $file )
 			{
 				// progressive display of what backup is doing
-				echo sprintf( T_( 'Backupped folder/file &laquo;<strong>%s</strong>&raquo;' ), $basepath.$file ).'<br/>';
-				flush();
+				echo sprintf( T_( '&laquo;<strong>%s</strong>&raquo; added to ZIP.' ), $file ).'<br/>';
 			}
 		}
 		else
@@ -453,6 +476,10 @@ class Backup
 		// Create and save created SQL backup script
 		foreach( $ready_to_backup as $table )
 		{
+			// progressive display of what backup is doing
+			echo sprintf( T_( 'Backing up table &laquo;<strong>%s</strong>&raquo; ...' ), $table ).'<br/>';
+			flush();
+
 			$row_table_data = $DB->get_row( 'SHOW CREATE TABLE '.$table, ARRAY_N );
 			fwrite( $f, $row_table_data[1].";\n\n" );
 
@@ -491,10 +518,6 @@ class Backup
 
 			// Flush the output to a file
 			fflush( $f );
-
-			// progressive display of what backup is doing
-			echo sprintf( T_( 'Backupped table &laquo;<strong>%s</strong>&raquo;' ), $table ).'<br/>';
-			flush();
 		}
 
 		// Close backup file input stream
@@ -577,34 +600,32 @@ class Backup
 	 */
 	function recurse_copy( $src, $dest, &$excluded_files, $root = true )
 	{
-    	$dir = opendir( $src );
-    	@mkdir( $dest );
-    	while( false !== ( $file = readdir( $dir ) ) )
-    	{
-        	if ( ( $file != '.' ) && ( $file != '..' ) )
-        	{
-            	$srcfile = $src.'/'.$file;
-        		if ( is_dir( $srcfile ) )
-            	{
-            		if( !in_array( $srcfile, $excluded_files ) )
-            		{	// We can copy the current directory as it isn't in excluded directories list
-            			if( $root )
-            			{
-	            			// progressive display of what backup is doing
-							echo sprintf( T_( 'Backupped folder &laquo;<strong>%s</strong>&raquo;' ), $srcfile ).'<br/>';
+		$dir = opendir( $src );
+		@mkdir( $dest );
+		while( false !== ( $file = readdir( $dir ) ) )
+		{
+			if ( ( $file != '.' ) && ( $file != '..' ) )
+			{
+				$srcfile = $src.'/'.$file;
+				if ( is_dir( $srcfile ) )
+				{
+					if( !in_array( $srcfile, $excluded_files ) )
+					{	// We can copy the current directory as it is NOT in excluded directories list
+						if( $root )
+						{ // progressive display of what backup is doing
+							echo sprintf( T_( 'Backing up &laquo;<strong>%s</strong>&raquo; ...' ), $srcfile ).'<br/>';
 							flush();
-            			}
-                		$this->recurse_copy( $srcfile, $dest . '/' . $file, $excluded_files, false );
-            		}
-            	}
-            	else
-            	{
-            		// Copy file
-                	copy( $srcfile, $dest.'/'. $file );
-            	}
-        	}
+						}
+						$this->recurse_copy( $srcfile, $dest . '/' . $file, $excluded_files, false );
+					}
+				}
+				else
+				{ // Copy file
+					copy( $srcfile, $dest.'/'. $file );
+				}
+			}
 		}
-    	closedir( $dir );
+		closedir( $dir );
 	}
 
 
@@ -673,6 +694,9 @@ class Backup
 
 /*
  * $Log$
+ * Revision 1.3  2009/10/18 17:20:58  fplanque
+ * doc/messages/minor refact
+ *
  * Revision 1.2  2009/10/18 15:32:54  efy-maxim
  * 1. new maintenance mode switcher. 2. flush
  *

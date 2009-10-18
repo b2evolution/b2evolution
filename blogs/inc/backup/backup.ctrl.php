@@ -1,4 +1,7 @@
 <?php
+/**
+ * Backup - This is a LINEAR controller
+ */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -9,7 +12,7 @@ load_class( 'backup/model/_backup.class.php', 'Backup' );
 $AdminUI->set_path( 'tools', 'backup' );
 
 // Get action parameter from request:
-param_action();
+param_action( 'start' );
 
 // Create instance of Backup class
 $current_Backup = & new Backup();
@@ -33,9 +36,26 @@ $AdminUI->disp_payload_begin();
  */
 switch( $action )
 {
-	default:
+	case 'start':
 		// Display backup settings form
 		$AdminUI->disp_view( 'backup/views/_backupsettings.form.php' );
+		break;
+
+	case 'backup':
+		$Form = & new Form( NULL, 'backup_progress', 'post' );
+
+		// Interactive / flush() backup should start here
+		$Form->begin_form( 'fform', T_('System backup is in progress...') );
+
+		flush();
+
+		// Start backup
+		$current_Backup->start_backup();
+
+		global $Messages;
+		$Messages->display( NULL, NULL, true, 'all', NULL, NULL, 'action_messages' );
+
+		$Form->end_form();
 		break;
 }
 
@@ -46,6 +66,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2009/10/18 17:20:58  fplanque
+ * doc/messages/minor refact
+ *
  * Revision 1.4  2009/10/18 15:32:53  efy-maxim
  * 1. new maintenance mode switcher. 2. flush
  *
