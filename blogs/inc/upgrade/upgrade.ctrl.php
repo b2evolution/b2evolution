@@ -19,28 +19,10 @@ global $current_Updater;
 // Create instance of Updater class
 $current_Updater = & new Updater();
 
-switch( $action )
-{
-	case 'upgrade':
 
-		if( $current_Updater->start_upgrade() )
-		{
-			// Redirect to avoid double post
-			header_redirect( '?ctrl=upgrade', 303 ); // Will EXIT
-			// We have EXITed already at this point!!
-		}
+// We don't check if updates are available her ebecause API call could take a long time
+// and we don't want the user to be waiting on a blank screen.
 
-		break;
-
-	default:
-
-		// Check if upfates are available
-		$current_Updater->check_for_updates();
-
-		break;
-}
-
-$action = 'new';
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -55,10 +37,57 @@ $AdminUI->disp_payload_begin();
  */
 switch( $action )
 {
-	case 'new':
+	case 'start':
 	default:
+		$block_item_Widget = & new Widget( 'block_item' );
+		$block_item_Widget->title = T_('Updates from b2evolution.net');
+		$block_item_Widget->disp_template_replaced( 'block_start' );
+
+
+		// Note: hopefully, the update swill have been downloaded in the shutdown function of a previous page (including the login screen)
+		// However if we have outdated info, we will load updates here.
+		load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+		// Let's clear any remaining messages that should already have been displayed before...
+		$Messages->clear( 'all' );
+		b2evonet_get_updates();
+
+		// Display info & error messages
+		echo $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
+
+
+		/**
+		 * @var AbstractSettings
+		 */
+		global $global_Cache;
+
+		// Display the current version info for now. We may remove this in the future.
+		$version_status_msg = $global_Cache->get( 'version_status_msg' );
+		if( !empty($version_status_msg) )
+		{	// We have managed to get updates (right now or in the past):
+			echo '<p>'.$version_status_msg.'</p>';
+			$extra_msg = $global_Cache->get( 'extra_msg' );
+			if( !empty($extra_msg) )
+			{
+				echo '<p>'.$extra_msg.'</p>';
+			}
+		}
+
+		// Extract available updates:
+		$updates = $global_Cache->get( 'updates' );
+		$current_Updater->updates = $updates;
+
+		$block_item_Widget->disp_template_replaced( 'block_end' );
+
 		// Display updates checker form
 		$AdminUI->disp_view( 'upgrade/views/_updater.form.php' );
+		break;
+
+	case 'download':
+		// proceed with download + ask confirmation on upgarde (last chance to quit)
+		break;
+
+	case 'upgrade':
+		// proceed with upgrade issuing flush() all the time to track progress...
 		break;
 }
 

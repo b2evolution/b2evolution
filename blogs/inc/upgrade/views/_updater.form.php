@@ -12,8 +12,6 @@ global $current_Updater;
  */
 global $action;
 
-$creating = is_create_action( $action );
-
 $Form = & new Form( NULL, 'backup_settings', 'post', 'compact' );
 
 $Form->begin_form( 'fform', T_('Check for updates') );
@@ -34,7 +32,7 @@ else
 																'<br/><b>Description:</b> '.$update['description'].
 																'<br><b>Version:</b> '.$update['version'] );
 
-	$Form->text_input( 'upd_url', '', 40, T_('URL'), '<br/><span style="color:red">This is a test implementation. Please enter the URL of the ZIP file to download and install !</span>', array( 'maxlength'=> 100, 'required'=>true ) );
+	$Form->text_input( 'upd_url', $update['url'], 80, T_('URL'), '<br/><span style="color:red">This is a test implementation. Please enter the URL of the ZIP file to download and install !</span>', array( 'maxlength'=> 100, 'required'=>true ) );
 
 	$Form->end_form( array( array( 'submit', 'actionArray[upgrade]', T_('Upgrade'), 'SaveButton' ),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );

@@ -5,6 +5,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 /**
  * Updater class
+ *
+ * @todo fp> I think we really don't need this class at all.
  */
 class Updater
 {
@@ -29,25 +31,6 @@ class Updater
 	}
 
 
-	/**
-	 * Check for available updates
-	 *
-	 * @return array or empty array
-	 */
-	function check_for_updates()
-	{
-		// The following array represents test result
-		$available_update = array();
-		$available_update['name'] = 'Update Name';
-		$available_update['description'] = 'Update Description';
-		$available_update['version'] = '1.0.0';
-		$available_update['url'] = 'http://b2evolution.net/downloads/b2evolution_1_0_0.zip';
-
-		$this->updates = array();
-		$this->updates[] = $available_update;
-
-		return $this->updates;
-	}
 
 
 	/**
