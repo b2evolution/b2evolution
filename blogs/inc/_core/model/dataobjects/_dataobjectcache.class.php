@@ -107,7 +107,7 @@ class DataObjectCache
 	/**
 	 * Constructor
 	 *
-	 * @param string Name of DataObject class we are cacheing
+	 * @param string Name of DataObject class we are caching
 	 * @param boolean true if it's OK to just load all items!
 	 * @param string Name of table in database
 	 * @param string Prefix of fields in the table
@@ -651,6 +651,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.14  2009/10/19 21:50:36  blueyed
+ * doc
+ *
  * Revision 1.13  2009/09/20 13:46:47  blueyed
  * doc
  *

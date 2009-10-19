@@ -39,7 +39,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Convert special chars (like german umlauts) to ASCII characters.
  *
- * @todo dh> IMHO this function should not be included in a file that gets used often/always.
  * @param string
  * @return string
  */
@@ -84,6 +83,9 @@ function replace_special_chars( $str )
 
 /*
  * $Log$
+ * Revision 1.4  2009/10/19 21:50:36  blueyed
+ * doc
+ *
  * Revision 1.3  2009/03/08 23:57:45  fplanque
  * 2009
  *
