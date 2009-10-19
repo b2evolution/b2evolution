@@ -1806,7 +1806,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
  *
  * This should be used instead of die() everywhere.
  * This should NOT be used instead of exit() anywhere.
- * Dying means the application has encontered and unexpected situation,
+ * Dying means the application has encontered an unexpected situation,
  * i-e: something that should never occur during normal operation.
  * Examples: database broken, user changed URL by hand...
  *
@@ -3685,6 +3685,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.180  2009/10/19 21:53:29  blueyed
+ * typo
+ *
  * Revision 1.179  2009/10/16 19:57:46  blueyed
  * Add evo_bytes function to count actual bytes in a string.
  *
