@@ -86,7 +86,11 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_( 'Maintenance' ), array( 'class'=>'fieldset clear' ) );
 
 $Form->checkbox( 'bk_maintenance_mode', $current_Backup->maintenance_mode, T_( 'Maintenance mode' ), T_( 'Put b2evolution into Maintenance Mode while backing up - Recommended' ) );
-$Form->checkbox( 'bk_pack_backup_files', $current_Backup->pack_backup_files, T_( 'ZIP' ), T_('Compress backup into ZIP files') );
+
+if( extension_loaded( 'zip' ) )
+{
+	$Form->checkbox( 'bk_pack_backup_files', $current_Backup->pack_backup_files, T_( 'ZIP' ), T_('Compress backup into ZIP files') );
+}
 
 $Form->end_fieldset();
 
@@ -96,6 +100,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'S
 
 /*
  * $Log$
+ * Revision 1.2  2009/10/19 12:21:05  efy-maxim
+ * system ZipArchive
+ *
  * Revision 1.1  2009/10/18 20:15:51  efy-maxim
  * 1. backup, upgrade have been moved to maintenance module
  * 2. maintenance module permissions

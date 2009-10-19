@@ -197,7 +197,7 @@ class Backup
 		}
 
 		$this->maintenance_mode = param( 'bk_maintenance_mode', 'boolean' );
-		$this->pack_backup_files = param( 'bk_pack_backup_files', 'boolean' );
+		$this->pack_backup_files = param( 'bk_pack_backup_files', 'boolean', 0 );
 
 		// Check are there something to backup
 		if( !$this->has_included( $this->backup_paths ) && !$this->has_included( $this->backup_tables ) )
@@ -322,93 +322,63 @@ class Backup
 		echo '<h4 style="color:green">'.T_( 'Creating folders/files backup...' ).'</h4>';
 		flush();
 
+		// Find included and excluded files
+
+		$included_files = array();
+
+		if( $root_included = $this->backup_paths['application_files'] )
+		{
+			$included_files = get_filenames( $basepath, true, true, true, false, true, true );
+		}
+
+		// Prepare included/excluded paths
 		$excluded_files = array();
-		if( $this->pack_backup_files )
-		{	// Create ZIPped backup
 
-			// Find included and excluded files
-			$included_files = array();
-
-			if( $root_included = $this->backup_paths['application_files'] )
+		foreach( $this->backup_paths as $name => $included )
+		{
+			foreach( $this->path_to_array( $backup_paths[$name]['path'] ) as $path )
 			{
-				$included_files = get_filenames( $basepath, true, true, true, false, true, true );
-			}
-
-			// Prepare included/excluded paths
-			foreach( $this->backup_paths as $name => $included )
-			{
-				foreach( $this->path_to_array( $backup_paths[$name]['path'] ) as $path )
+				if( $root_included && !$included )
 				{
-					if( $root_included && !$included )
-					{
-						$excluded_files[] = $path;
-					}
-					elseif( !$root_included && $included )
-					{
-						$included_files[] = $path;
-					}
+					$excluded_files[] = $path;
+				}
+				elseif( !$root_included && $included )
+				{
+					$included_files[] = $path;
 				}
 			}
+		}
 
-			$included_files = array_diff( $included_files, $excluded_files );
+		// Remove excluded list from included list
+		$included_files = array_diff( $included_files, $excluded_files );
 
-			// Load ZIP class
-			load_class( '_ext/_zip_archives.php', 'zip_file' );
-
-
-			// Create ZIPped backup
+		if( $this->pack_backup_files )
+		{	// Create ZIPped backup
+			$zip = new ZipArchive();
 			$zip_filepath = $backup_dirpath.'files.zip';
-			$zipfile = & new zip_file( $zip_filepath );
-			echo sprintf( T_( 'Archiving files to &laquo;<strong>%s</strong>&raquo;...' ), $zip_filepath ).'<br/>';
-			flush();
-			$zipfile->set_options( array ( 'basedir'  => $basepath ) );
-			$zipfile->add_files( $included_files );
-			$zipfile->create_archive();
 
-			// Check if backup is created
-			if( !file_exists( $zip_filepath ) )
+			echo sprintf( T_( 'Archiving files to &laquo;<strong>%s</strong>&raquo;...' ), $zip_filepath ).'<br/>';
+
+			if ( $zip->open($zip_filepath, ZIPARCHIVE::CREATE ) !== TRUE)
 			{
-				$Messages->add( sprintf( T_( 'Unable to create &laquo;%s&raquo;' ), $zip_filepath ), 'error' );
+	    		$Messages->add( sprintf( T_( 'Unable to create &laquo;%s&raquo;' ), $zip_filepath ), 'error' );
 				return false;
 			}
 
-			// Display which folders/files backup created
-			foreach( $included_files as $file )
+			// Add folders and files to ZIP archive.
+			foreach( $included_files as $included_file )
 			{
-				// progressive display of what backup is doing
-				echo sprintf( T_( '&laquo;<strong>%s</strong>&raquo; added to ZIP.' ), $file ).'<br/>';
+				$this->recurse_zip( no_trailing_slash( $included_file ), $zip, '', true );
 			}
+
+			$zip->close();
 		}
 		else
 		{	// Copy directories and files to backup directory
-
-			$src_dest_paths = array();
-			if( $root_included = $this->backup_paths['application_files'] )
+			foreach( $included_files as $included_file )
 			{
-				$src_dest_paths[] = array( $basepath, $backup_dirpath );
-			}
-
-			// Prepare included/excluded paths
-			foreach( $this->backup_paths as $name => $included )
-			{
-				foreach( $this->path_to_array( $backup_paths[$name]['path'] ) as $path )
-				{
-					if( $root_included && !$included )
-					{
-						$excluded_files[] = no_trailing_slash( $basepath.$path );
-					}
-					elseif( !$root_included && $included )
-					{
-						$src_dest_paths[] = array( $basepath.$path, $backup_dirpath.$path );
-					}
-				}
-			}
-
-			// Copy prepared paths
-			foreach( $src_dest_paths as $src_dest_path )
-			{
-				$this->recurse_copy( no_trailing_slash( $src_dest_path[0] ),
-									no_trailing_slash( $src_dest_path[1] ), $excluded_files );
+				$this->recurse_copy( no_trailing_slash( $basepath.$included_file ),
+										no_trailing_slash( $backup_dirpath.$included_file ) );
 			}
 		}
 	}
@@ -547,23 +517,17 @@ class Backup
 
 		if( $this->pack_backup_files )
 		{	// Pack created backup SQL script
-
-			// Load ZIP class
-			load_class( '_ext/_zip_archives.php', 'zip_file' );
-
-			$zipfile = & new zip_file( 'db.zip' );
-			$zipfile->set_options( array ( 'basedir'  => $backup_dirpath ) );
-			$zipfile->add_files( $backup_sql_filename );
-			$zipfile->create_archive();
-
-			if( $zipfile->error )
+			$zip = new ZipArchive();
+			$zip_filepath = $backup_dirpath.'db.zip';
+			if ( $zip->open($zip_filepath, ZIPARCHIVE::CREATE ) !== TRUE)
 			{
-				foreach( $zipfile->error as $error_msg )
-				{
-					$Messages->add( $error_msg, 'error' );
-				}
+	    		$Messages->add( sprintf( T_( 'Unable to create &laquo;%s&raquo;' ), $zip_filepath ), 'error' );
 				return false;
 			}
+
+			$zip->addFile( $backup_dirpath.$backup_sql_filename, $backup_sql_filename );
+			$zip->close();
+
 			unlink( $backup_sql_filepath );
 		}
 
@@ -620,34 +584,93 @@ class Backup
 	 * @param string destination directory
 	 * @param array excluded directories
 	 */
-	function recurse_copy( $src, $dest, &$excluded_files, $root = true )
+	function recurse_copy( $src, $dest, $root = true )
 	{
-		$dir = opendir( $src );
-		@mkdir( $dest );
-		while( false !== ( $file = readdir( $dir ) ) )
+		if( is_dir( $src ) )
 		{
-			if ( ( $file != '.' ) && ( $file != '..' ) )
+			$dir = opendir( $src );
+			@mkdir( $dest );
+			while( false !== ( $file = readdir( $dir ) ) )
 			{
-				$srcfile = $src.'/'.$file;
-				if ( is_dir( $srcfile ) )
+				if ( ( $file != '.' ) && ( $file != '..' ) )
 				{
-					if( !in_array( $srcfile, $excluded_files ) )
-					{	// We can copy the current directory as it is NOT in excluded directories list
+					$srcfile = $src.'/'.$file;
+					if ( is_dir( $srcfile ) )
+					{
 						if( $root )
 						{ // progressive display of what backup is doing
 							echo sprintf( T_( 'Backing up &laquo;<strong>%s</strong>&raquo; ...' ), $srcfile ).'<br/>';
 							flush();
 						}
-						$this->recurse_copy( $srcfile, $dest . '/' . $file, $excluded_files, false );
+						$this->recurse_copy( $srcfile, $dest . '/' . $file, false );
+					}
+					else
+					{ // Copy file
+						copy( $srcfile, $dest.'/'. $file );
 					}
 				}
-				else
-				{ // Copy file
-					copy( $srcfile, $dest.'/'. $file );
-				}
+			}
+			closedir( $dir );
+		}
+		else
+		{
+			copy( $src, $dest );
+		}
+	}
+
+
+	/**
+	 * Zip directory recursively
+	 * @param string source directory
+	 * @param object instance of ZipArchive class
+	 * @param string prefix
+	 */
+	function recurse_zip( $path, &$zip, $prefix = '', $root = false )
+	{
+		global $basepath;
+
+		if( is_dir( $basepath.$path ) )
+		{
+			if( $dir = opendir( $basepath.$path ) )
+			{
+				$path .= '/';
+
+				$file_list = array();
+				while ( ( $file = readdir( $dir ) ) !== false )
+	            {
+	            	if( ($file !== ".") && ($file !== ".."))
+                    {	// Skip parent and root directories
+	            		$file_list[] = $file;
+                    }
+	            }
+
+	            if( count( $file_list ) == 0 )
+	            {	// Create empty directory
+	            	$zip->addEmptyDir( '/'.$path );
+	            }
+
+	            foreach( $file_list as $file )
+	            {
+	            	if( is_dir( $basepath.$path.$file ) )
+	            	{
+	            		if( $root )
+						{ 	// progressive display of what backup is doing
+							echo sprintf( T_( 'Backing up &laquo;<strong>%s</strong>&raquo; ...' ), $basepath.$path.$file ).'<br/>';
+							flush();
+						}
+	            		$this->recurse_zip( $path.$file, $zip );
+	            	}
+	            	else
+	            	{
+	            		$this->recurse_zip( $path.$file, $zip, '/' );
+	            	}
+	            }
 			}
 		}
-		closedir( $dir );
+		else
+		{
+			$zip->addFile( $basepath.$path, $prefix.$path );
+		}
 	}
 
 
@@ -716,6 +739,9 @@ class Backup
 
 /*
  * $Log$
+ * Revision 1.2  2009/10/19 12:21:04  efy-maxim
+ * system ZipArchive
+ *
  * Revision 1.1  2009/10/18 20:15:51  efy-maxim
  * 1. backup, upgrade have been moved to maintenance module
  * 2. maintenance module permissions
