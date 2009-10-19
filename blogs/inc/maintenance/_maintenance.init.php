@@ -88,12 +88,12 @@ class maintenance_Module extends Module
 		// 'user_func' is used to check user permission. This function should be defined in module initializer.
 		// 'group_func' is used to check group permission. This function should be defined in module initializer.
 		// 'available' is permission options
-		$permissions = array( 'perm_maintenance' => array(	'label'      => T_('Maintenance'),
-															'user_func'  => 'check_maintenance_user_perm',
-															'group_func' => 'check_maintenance_group_perm',
-															'available'  => array(	$none_option,
-																					$backup_option,
-																					$upgrade_option  ) ) );
+		$permissions = array( 'perm_maintenance' => array( 'label' => T_('Maintenance'),
+										'user_func'  => 'check_maintenance_user_perm',
+										'group_func' => 'check_maintenance_group_perm',
+										'available'  => array($none_option,
+															$backup_option,
+															$upgrade_option  ) ) );
 		// We can return as many permissions as we want.
 		// In other words, one module can return many pluggable permissions.
 		return $permissions;
@@ -184,6 +184,9 @@ $maintenance_Module = & new maintenance_Module();
 
 /*
  * $Log$
+ * Revision 1.2  2009/10/19 07:04:20  efy-maxim
+ * code formatting
+ *
  * Revision 1.1  2009/10/18 20:15:51  efy-maxim
  * 1. backup, upgrade have been moved to maintenance module
  * 2. maintenance module permissions

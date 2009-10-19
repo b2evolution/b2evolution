@@ -161,13 +161,13 @@ class messaging_Module extends Module
 		// 'user_func' is used to check user permission. This function should be defined in module initializer.
 		// 'group_func' is used to check group permission. This function should be defined in module initializer.
 		// 'available' is permission options
-		$permissions = array( 'perm_messaging' => array(	'label'      => T_('Messaging'),
-															'user_func'  => 'check_messaging_user_perm',
-															'group_func' => 'check_messaging_group_perm',
-															'available'  => array(	$none_option,
-																					$reply_option,
-																					$write_option,
-																					$delete_option  ) ) );
+		$permissions = array( 'perm_messaging' => array( 'label' => T_('Messaging'),
+										'user_func'  => 'check_messaging_user_perm',
+										'group_func' => 'check_messaging_group_perm',
+										'available'  => array( $none_option,
+															$reply_option,
+															$write_option,
+															$delete_option  ) ) );
 		// We can return as many permissions as we want.
 		// In other words, one module can return many pluggable permissions.
 		return $permissions;
@@ -334,6 +334,9 @@ $messaging_Module = & new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.17  2009/10/19 07:04:20  efy-maxim
+ * code formatting
+ *
  * Revision 1.16  2009/10/09 05:27:55  efy-maxim
  * pluggable permission - fix comment
  *
