@@ -569,6 +569,21 @@ class DB
 			'error_str'  => $this->last_error
 		);
 
+
+		// Send error to PHP's system logger.
+		// TODO: dh> respect $log_app_errors? Create a wrapper, e.g. evo_error_log, which can be used later to write into e.g. a DB table?!
+		if( isset($_SERVER['REQUEST_URI']) )
+			$req_url = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ? 'https://' : 'http://' )
+				.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+		else
+			$req_url = '-';
+		$error_text = 'SQL ERROR: '. $this->last_error
+				. ', QUERY: "'.trim($this->last_query).'"'
+				. ', BACKTRACE: '.trim(strip_tags(debug_get_backtrace()))
+				. ', URL: '.$req_url;
+		error_log( preg_replace( '#\s+#', ' ', $error_text ) );
+
+
 		if( ! ( $this->halt_on_error || $this->show_errors ) )
 		{ // no reason to generate a nice message:
 			return;
@@ -1630,6 +1645,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.41  2009/10/19 21:56:01  blueyed
+ * error_log SQL errors
+ *
  * Revision 1.40  2009/10/04 21:10:16  blueyed
  * Merge db-noresultcache via whissip.
  *
