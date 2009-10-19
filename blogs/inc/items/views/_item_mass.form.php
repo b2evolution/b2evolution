@@ -138,6 +138,13 @@ for( $i = 1 ; $i <= 3; $i++ )
 	$Form->fieldstart = '<div class="tile">';
 	$Form->fieldend = '</div>';
 
+	$Form->end_fieldset();
+
+	// ------------------------------- SETTINGS ---------------------------------
+
+	$Form->begin_fieldset( T_('Separate posts with a blank line') );
+	$Form->checkbox( 'paragraphs_linebreak', false, '', T_( 'Create paragraphs at each line break' ) );
+
 	// ------------------------------- ACTIONS ----------------------------------
 
 	echo '<div class="edit_actions">';
@@ -148,6 +155,8 @@ for( $i = 1 ; $i <= 3; $i++ )
 	echo '</div>';
 
 	$Form->end_fieldset();
+
+
 
 	?>
 
@@ -216,6 +225,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.5  2009/10/19 13:28:16  efy-maxim
+ * paragraphs at each line break or separate posts with a blank line
+ *
  * Revision 1.4  2009/10/18 20:46:27  fplanque
  * no message
  *

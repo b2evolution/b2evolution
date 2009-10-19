@@ -983,9 +983,10 @@ function check_perm_posttype( $post_extracats )
  * Create multiple posts from one post.
  *
  * @param object Instance of Item class (by reference).
+ * @param boolean true if create paragraphs at each line break
  * @return array The posts, by reference.
  */
-function & create_multiple_posts( & $Item )
+function & create_multiple_posts( & $Item, $linebreak = false )
 {
 	$Items = array();
 
@@ -1007,13 +1008,25 @@ function & create_multiple_posts( & $Item )
 		{
 			if( $line !== '' )
 			{	// We got a new paragraph for this post:
-				$current_data .= '<p>'.$line.'</p>';
+				if( $linebreak )
+				{
+					$current_data .= '<p>'.$line.'</p>';
+				}
+				else
+				{
+					$current_data .= $line.' ';
+				}
 			}
 			else
 			{	// End of this post:
 				$new_Item = duplicate( $Item );
 
 				$new_Item->set_param( 'title', 'string', $current_title );
+
+				if( !$linebreak )
+				{
+					$current_data = '<p>'.trim( $current_data ).'</p>';
+				}
 				$new_Item->set_param( 'content', 'string', $current_data );
 
 				$Items[] = $new_Item;
@@ -1029,6 +1042,9 @@ function & create_multiple_posts( & $Item )
 
 /*
  * $Log$
+ * Revision 1.77  2009/10/19 13:28:15  efy-maxim
+ * paragraphs at each line break or separate posts with a blank line
+ *
  * Revision 1.76  2009/10/18 11:29:42  efy-maxim
  * 1. mass create in 'All' tab; 2. "Text Renderers" and "Comments"
  *

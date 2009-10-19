@@ -393,7 +393,7 @@ switch( $action )
 
 		if( !empty( $mass_create ) )
 		{
-			$Items = & create_multiple_posts( $edited_Item );
+			$Items = & create_multiple_posts( $edited_Item, param( 'paragraphs_linebreak', 'boolean', 0 ) );
 			if( empty( $Items ) )
 			{
 				param_error( 'content', T_( 'Content must not be empty.' ) );
@@ -1242,6 +1242,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.73  2009/10/19 13:28:13  efy-maxim
+ * paragraphs at each line break or separate posts with a blank line
+ *
  * Revision 1.72  2009/10/18 20:46:27  fplanque
  * no message
  *
