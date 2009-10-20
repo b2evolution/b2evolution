@@ -79,8 +79,20 @@ switch( $action )
 
 		flush();
 
+		if( $maintenance_mode = param( 'bk_maintenance_mode', 'boolean' ) )
+		{	// Enable maintenance mode
+			switch_maintenance_mode( true, T_( 'System backup is in progress. Please reload this page in a few minutes.' ) );
+		}
+
+		set_max_execution_time( 1800 ); // 30 minutes
+
 		// Start backup
 		$current_Backup->start_backup();
+
+		if( $maintenance_mode )
+		{	// Disable maintenance mode
+			switch_maintenance_mode( false );
+		}
 
 		global $Messages;
 		$Messages->display( NULL, NULL, true, 'all', NULL, NULL, 'action_messages' );
@@ -97,6 +109,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.2  2009/10/20 14:38:54  efy-maxim
+ * maintenance modulde: downloading - unpacking - verifying destination files - backing up - copying new files - upgrade database using regular script (Warning: it is very unstable version! Please, don't use maintenance modulde, because it can affect your data )
+ *
  * Revision 1.1  2009/10/18 20:15:51  efy-maxim
  * 1. backup, upgrade have been moved to maintenance module
  * 2. maintenance module permissions

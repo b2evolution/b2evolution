@@ -134,12 +134,6 @@ class Backup
 	var $backup_tables;
 
 	/**
-	 * True if enable maintenance mode before backup
-	 * @var boolean
-	 */
-	var $maintenance_mode;
-
-	/**
 	 * True if pack backup files
 	 * @var boolean
 	 */
@@ -169,7 +163,6 @@ class Backup
 			$this->backup_tables[$name] = $settings['included'];
 		}
 
-		$this->maintenance_mode = true;
 		$this->pack_backup_files = true;
 	}
 
@@ -184,7 +177,7 @@ class Backup
 		// Load folders/files settings from request
 		foreach( $backup_paths as $name => $settings )
 		{
-			if( array_key_exists( 'label', $settings ) )
+			if( array_key_exists( 'label', $settings ) && !is_null( $settings['label'] ) )
 			{	// We can set param
 				$this->backup_paths[$name] = param( 'bk_'.$name, 'boolean' );
 			}
@@ -196,7 +189,6 @@ class Backup
 			$this->backup_tables[$name] = param( 'bk_'.$name, 'boolean' );
 		}
 
-		$this->maintenance_mode = param( 'bk_maintenance_mode', 'boolean' );
 		$this->pack_backup_files = param( 'bk_pack_backup_files', 'boolean', 0 );
 
 		// Check are there something to backup
@@ -212,48 +204,32 @@ class Backup
 
 	/**
 	 * Start backup
-	 *
-	 * @todo Tblue> Halt script if max_execution_time is about to be reached
-	 *              (in case we cannot set a high time limit) and allow
-	 *              the user to continue the backup process.
-	 * fp> yes, this needs to be done but it's not critical.
-	 * However we should check that the set_time_limit() has worked and warn the user if not.
-	 * "Max PHP execution time is only: xx seconds. Backup may be interrupted. fail before it's compelte.". flush();
 	 */
 	function start_backup()
 	{
 		global $basepath, $backup_path, $servertimenow, $Messages;
 
-		// Set time limit as backup can take much time
-		set_time_limit( 1800 ); // 30 minutes
-
-		// Enable maintenance mode
-		$this->switch_maintenance_mode( true );
-
 		// Create current backup path
 		$cbackup_path = $backup_path.date( 'Y-m-d-H-i-s', $servertimenow ).'/';
 
- 		printf( T_('Starting backup to: &laquo;%s&raquo; ...').'<br />', $cbackup_path );
+ 		echo '<p>'.sprintf( T_('Starting backup to: &laquo;%s&raquo; ...'), $cbackup_path ).'</p>';
  		flush();
 
-		if( $Messages->count() == 0 && $this->prepare_backupdir( $backup_path, true ) )
+		if( $Messages->count() == 0 && prepare_maintenance_dir( $backup_path, true ) )
 		{	// We can backup files and database
 
 			$backup_files_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'files/';
-			if( $this->has_included( $this->backup_paths ) && $this->prepare_backupdir( $backup_files_path ) )
+			if( $this->has_included( $this->backup_paths ) && prepare_maintenance_dir( $backup_files_path ) )
 			{	// We can backup files
 				$this->backup_files( $backup_files_path );
 			}
 
 			$backup_tables_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'db/';
-			if( $Messages->count() == 0 && $this->has_included( $this->backup_tables ) && $this->prepare_backupdir( $backup_tables_path ) )
+			if( $Messages->count() == 0 && $this->has_included( $this->backup_tables ) && prepare_maintenance_dir( $backup_tables_path ) )
 			{	// We can backup database
 				$this->backup_database( $backup_tables_path );
 			}
 		}
-
-		// Disable maintenance mode
-		$this->switch_maintenance_mode( false );
 
 		if( $Messages->count() > 0 )
 		{
@@ -263,51 +239,6 @@ class Backup
 
 		$Messages->add( sprintf( T_('Backup complete. Directory: &laquo;%s&raquo;'), $cbackup_path ), 'success' );
 		return true;
-	}
-
-
-	/**
-	 * Enable/disable maintenance mode
-	 *
-	 * @param boolean true if maintenance mode need to be enabled
-	 */
-	function switch_maintenance_mode( $enable )
-	{
-		global $conf_path, $Messages;
-
-		if( $this->maintenance_mode )
-		{
-			$maintenance_mode_file = 'maintenance.txt';
-
-			if( $enable )
-			{	// Create maintenance file
-				echo '<p>'.T_('Switching to maintenance mode...').'</p>';
-
-				$f = @fopen( $conf_path.$maintenance_mode_file , 'w+' );
-				if( $f == false )
-				{	// Maintenance file has not been created
-					$Messages->add( sprintf( T_( 'Unable to switch maintenance mode. Maintenance file can\'t be created: &laquo;%s&raquo;' ), $maintenance_mode_file ), 'error' );
-					return false;
-				}
-				else
-				{	// Write content
-					fwrite( $f, T_( 'System backup is in progress. Please reload this page in a few minutes.' ) );
-					fclose($f);
-				}
-			}
-			else
-			{	// Delete maintenance file
-				echo '<p>'.T_('Switching out of maintenance mode...').'</p>';
-
-				if( !unlink( $conf_path.$maintenance_mode_file ) )
-				{
-					$Messages->add( sprintf( T_( 'Unable to switch maintenance mode. Maintenance file can\'t be deleted: &laquo;%s&raquo;' ), $maintenance_mode_file ), 'error' );
-					return false;
-				}
-			}
-
-			return true;
-		}
 	}
 
 
@@ -386,8 +317,6 @@ class Backup
 
 	/**
 	 * Backup database
-	 *
-	 * @todo Tblue> Respect time limits!
 	 *
 	 * @param string backup directory path
 	 */
@@ -536,49 +465,6 @@ class Backup
 
 
 	/**
-	 * Prepare backup directory
-	 * @param string directory path
-	 * @param boolean create .htaccess file with 'deny from all' text
-	 * @return boolean
-	 */
-	function prepare_backupdir( $dir_name, $deny_access = false )
-	{
-		global $Messages;
-
-		if( !file_exists( $dir_name ) )
-		{	// We can create directory
-			if ( ! mkdir_r( $dir_name ) )
-			{
-				$Messages->add( sprintf( T_( 'Unable to create &laquo;%s&raquo; backup directory.' ), $dir_name ), 'error' );
-				return false;
-			}
-		}
-
-		if( $deny_access )
-		{	// Create .htaccess file
-			$htaccess_name = $dir_name.'.htaccess';
-
-			if( !file_exists( $htaccess_name ) )
-			{	// We can create .htaccess file
-				$f = @fopen( $htaccess_name , 'w+' );
-				if( $f == false )
-				{
-					$Messages->add( sprintf( T_( 'Unable to create &laquo;%s&raquo; file in backup directory.' ), $htaccess_name ), 'error' );
-					return false;
-				}
-				else
-				{	// Write content
-					fwrite( $f, 'deny from all' );
-					fclose($f);
-				}
-			}
-		}
-
-		return true;
-	}
-
-
-	/**
 	 * Copy directory recursively
 	 * @param string source directory
 	 * @param string destination directory
@@ -675,6 +561,28 @@ class Backup
 
 
 	/**
+	 * Include all of the folders and tables to backup.
+	 */
+	function include_all()
+	{
+		global $backup_paths, $backup_tables;
+
+		foreach( $backup_paths as $name => $settings )
+		{
+			if( array_key_exists( 'label', $settings ) && !is_null( $settings['label'] ) )
+			{
+				$this->backup_paths[$name] = true;
+			}
+		}
+
+		foreach( $backup_tables as $name => $settings )
+		{
+			$this->backup_tables[$name] = true;
+		}
+	}
+
+
+	/**
 	 * Check has data list included directories/files or tables
 	 * @param array list
 	 * @return boolean
@@ -739,6 +647,9 @@ class Backup
 
 /*
  * $Log$
+ * Revision 1.3  2009/10/20 14:38:54  efy-maxim
+ * maintenance modulde: downloading - unpacking - verifying destination files - backing up - copying new files - upgrade database using regular script (Warning: it is very unstable version! Please, don't use maintenance modulde, because it can affect your data )
+ *
  * Revision 1.2  2009/10/19 12:21:04  efy-maxim
  * system ZipArchive
  *

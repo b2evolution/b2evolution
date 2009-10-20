@@ -85,7 +85,7 @@ $Form->end_fieldset();
 // Enable/Disable maintenance mode
 $Form->begin_fieldset( T_( 'Maintenance' ), array( 'class'=>'fieldset clear' ) );
 
-$Form->checkbox( 'bk_maintenance_mode', $current_Backup->maintenance_mode, T_( 'Maintenance mode' ), T_( 'Put b2evolution into Maintenance Mode while backing up - Recommended' ) );
+$Form->checkbox( 'bk_maintenance_mode', true, T_( 'Maintenance mode' ), T_( 'Put b2evolution into Maintenance Mode while backing up - Recommended' ) );
 
 if( extension_loaded( 'zip' ) )
 {
@@ -100,6 +100,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'S
 
 /*
  * $Log$
+ * Revision 1.3  2009/10/20 14:38:55  efy-maxim
+ * maintenance modulde: downloading - unpacking - verifying destination files - backing up - copying new files - upgrade database using regular script (Warning: it is very unstable version! Please, don't use maintenance modulde, because it can affect your data )
+ *
  * Revision 1.2  2009/10/19 12:21:05  efy-maxim
  * system ZipArchive
  *
