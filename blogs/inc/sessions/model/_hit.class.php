@@ -402,6 +402,7 @@ class Hit
 		$this->is_lynx = false;
 		$this->is_firefox = false;
 		$this->is_gecko = false;
+		$this->is_IE = false;
 		$this->is_winIE = false;
 		$this->is_macIE = false;
 		$this->is_safari = false;
@@ -1172,6 +1173,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.43  2009/10/20 20:07:47  blueyed
+ * Hit: init is_IE
+ *
  * Revision 1.42  2009/10/13 10:02:01  tblue246
  * Hit::get_browser_caps(): Cache result.
  *
