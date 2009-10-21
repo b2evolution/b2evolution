@@ -95,177 +95,167 @@ switch( $action )
 		// Extract available updates:
 		$updates = $global_Cache->get( 'updates' );
 
-		$block_item_Widget->disp_template_replaced( 'block_end' );
+		$updates[0]['url'] = 'http://ubidev.com/b2evolution-1.0.0.zip'; // TODO: temporary URL
 
-		// Display updates checker and download form
-		$AdminUI->disp_view( 'maintenance/views/_upgrade.form.php' );
+		$action = 'start';
+
 		break;
 
 	case 'download':
+
 		$block_item_Widget = & new Widget( 'block_item' );
-		$block_item_Widget->title = T_('Downloading and unpacking package...');
+		$block_item_Widget->title = T_('Downloading, unzipping & installing package...');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
-		// Clear all of the messages
-		$Messages->clear( 'all' );
+		$download_url = param( 'upd_url', 'string' );
 
-		// Prepare upgrade directory before upgrade downloading
-		if( prepare_maintenance_dir( $upgrade_path, true ) )
+		$upgrade_name = param( 'upd_name', 'string' );
+		$upgrade_file = $upgrade_path.$upgrade_name.'.zip';
+
+		if( $success = prepare_maintenance_dir( $upgrade_path, true ) )
 		{
 			// Set maximum execution time
 			set_max_execution_time( 1800 ); // 30 minutes
 
-			$download_url = param( 'upd_url', 'string' ); // http://ubidev.com/b2evolution-1.0.0.zip
-			$download_url = str_replace( '\\', '/', $download_url );
-			// TODO: check is url valid
+			echo '<p>'.sprintf( T_( 'Downloading package to &laquo;<strong>%s</strong>&raquo;...' ), $upgrade_file ).'</p>';
+			flush();
 
-			$slash_pos = strrpos( $download_url, '/' );
-			$point_pos = strrpos( $download_url, '.' );
-			if( $slash_pos < $point_pos )
-			{	// Construct upgrade file name
-				$download_name = substr( $download_url, $slash_pos + 1, $point_pos - $slash_pos - 1 );
-				if( !empty( $download_name ) )
+			if( !$success = copy( $download_url, $upgrade_file ) )
+			{
+				echo '<p style="color:red">'.sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $download_url ).'</p>';
+				flush();
+			}
+		}
+
+	case 'unzip':
+
+		if( !isset( $block_item_Widget ) )
+		{
+			$block_item_Widget = & new Widget( 'block_item' );
+			$block_item_Widget->title = T_('Unzipping & installing package...');
+			$block_item_Widget->disp_template_replaced( 'block_start' );
+
+			$upgrade_name = param( 'upd_name', 'string' );
+			$upgrade_file = $upgrade_path.$upgrade_name.'.zip';
+
+			$success = true;
+		}
+
+		if( $success )
+		{
+			// Set maximum execution time
+			set_max_execution_time( 1800 ); // 30 minutes
+
+			echo '<p>'.sprintf( T_( 'Unpacking package to &laquo;<strong>%s</strong>&raquo;...' ), $upgrade_path.$upgrade_name ).'</p>';
+			flush();
+
+			// Unpack package
+			if( $success = unpack_archive( $upgrade_file, $upgrade_path.$upgrade_name, true ) )
+			{
+				$new_version_status = check_version( $upgrade_name );
+				if( !empty( $new_version_status ) )
 				{
-					$upgrade_name = $download_name.'-'.date( 'Y-m-d', $servertimenow );
-					$upgrade_file = $upgrade_path.$upgrade_name.'.zip';
+					echo '<h5 style="color:red">'.$new_version_status.'</h5>';
+					break;
+				}
+			}
+		}
 
-					echo '<p>'.sprintf( T_( 'Downloading package to &laquo;<strong>%s</strong>&raquo;...' ), $upgrade_file ).'</p>';
+	case 'install':
+
+		if( !isset( $block_item_Widget ) )
+		{
+			$block_item_Widget = & new Widget( 'block_item' );
+			$block_item_Widget->title = T_('Installing package...');
+			$block_item_Widget->disp_template_replaced( 'block_start' );
+
+			$upgrade_name = param( 'upd_name', 'string' );
+
+			$success = true;
+		}
+
+		// Enable maintenance mode
+		if( $success && switch_maintenance_mode( true, T_( 'System upgrade is in progress. Please reload this page in a few minutes.' ) ) )
+		{
+			// Set maximum execution time
+			set_max_execution_time( 1800 ); // 30 minutes
+
+			// Verify that all destination files can be overwritten
+			echo '<h4 style="color:green">'.T_( 'Verifying that all destination files can be overwritten...' ).'</h4>';
+			flush();
+
+			$read_only_list = array();
+			verify_overwrite( $upgrade_path.$upgrade_name, no_trailing_slash( $basepath ), 'Verifying', false, $read_only_list );
+
+			if( empty( $read_only_files ) )
+			{	// We can do backup files and database
+
+				// Load Backup class (PHP4) and backup all of the folders and files
+				load_class( 'maintenance/model/_backup.class.php', 'Backup' );
+				$Backup = & new Backup();
+				$Backup->include_all();
+				$Backup->pack_backup_files = false; // temporary
+
+				// Start backup
+				if( $success = $Backup->start_backup() )
+				{	// We can upgrade files and database
+
+					// Copying new folders and files
+					echo '<h4 style="color:green">'.T_( 'Copying new folders and files...' ).'</h4>';
 					flush();
 
-					// Download upgrade to upgrade directory
-					if( copy( $download_url, $upgrade_file ) )
-					{	// Upgrade downloaded and we can unpack it
-						echo '<p>'.sprintf( T_( 'Unpacking package to &laquo;<strong>%s</strong>&raquo;...' ), $upgrade_path.$upgrade_name ).'</p>';
-						flush();
+					verify_overwrite( $upgrade_path.$upgrade_name, no_trailing_slash( $basepath ), 'Copying', true );
 
-						// Unpack downloaded upgrade
-						if( !unpack_archive( $upgrade_file, $upgrade_path.$upgrade_name, true ) )
-						{
-							$Messages->add( sprintf( T_( 'Unable to unpack &laquo;%s&raquo; ZIP archive.' ), $upgrade_path.$upgrade_name ), 'error' );
-						}
+					// Upgrade database using regular upgrader script
+					require_once( $install_path.'/_functions_install.php' );
+					require_once( $install_path.'/_functions_evoupgrade.php' );
+
+					echo '<h4 style="color:green">'.T_( 'Upgrading data in existing b2evolution database...' ).'</h4>';
+					flush();
+
+					global $DB;
+
+					$DB->begin();
+					if( $success = upgrade_b2evo_tables() )
+					{
+						$DB->commit();
 					}
 					else
 					{
-						$Messages->add( sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $download_url ), 'error' );
+						$DB->rollback();
 					}
 				}
-				else
-				{
-					$Messages->add( sprintf( T_( 'Invalid download URL: &laquo;%s&raquo;' ), $download_url ), 'error' );
-				}
 			}
-		}
-
-		// Display info & error messages
-		echo $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
-
-		$block_item_Widget->disp_template_replaced( 'block_end' );
-
-		if( $Messages->count() == 0 )
-		{	// There are no errors and we can show form with Upgrade button
-			$upgrade_dir = $upgrade_name;
-		}
-
-		// Display upgrade form
-		// ask confirmation on upgarde (last chance to quit)
-		$AdminUI->disp_view( 'maintenance/views/_upgrade.form.php' );
-		break;
-
-	case 'upgrade':
-		$block_item_Widget = & new Widget( 'block_item' );
-		$block_item_Widget->title = T_('Upgrading...');
-		$block_item_Widget->disp_template_replaced( 'block_start' );
-
-		// Clear all of the messages
-		$Messages->clear( 'all' );
-
-		// Enable maintenance mode
-		switch_maintenance_mode( true, T_( 'System upgrade is in progress. Please reload this page in a few minutes.' ) );
-		flush();
-
-		// Get upgrade directory from request
-		$upgrade_dir = param( 'upgrade_dir', 'string' );
-
-		// Set maximum execution time
-		set_max_execution_time( 1800 ); // 30 minutes
-
-		// Verify that all destination files can be overwritten
-		echo '<h4 style="color:green">'.T_( 'Verifying that all destination files can be overwritten...' ).'</h4>';
-		flush();
-
-		$read_only_list = array();
-		verify_overwrite( $upgrade_path.$upgrade_dir, no_trailing_slash( $basepath ), 'Verifying', false, $read_only_list );
-		if( empty( $read_only_files ) )
-		{	// We can do backup files and database
-
-			// Load Backup class (PHP4):
-			load_class( 'maintenance/model/_backup.class.php', 'Backup' );
-
-			// Create instance of Backup class
-			$Backup = & new Backup();
-
-			// Backup all of the folders and files
-			$Backup->include_all();
-			$Backup->pack_backup_files = false; // temporary
-
-			// Start backup
-			if( $Backup->start_backup() )
-			{	// We can upgrade files and database
-
-				echo '<h4 style="color:green">'.T_( 'Copying new folders and files...' ).'</h4>';
-				flush();
-
-				verify_overwrite( $upgrade_path.$upgrade_dir, no_trailing_slash( $basepath ), 'Copying', true );
-
-				// Upgrade database using regular upgrader script
-				require_once( $install_path.'/_functions_install.php' );
-				require_once( $install_path.'/_functions_evoupgrade.php' );
-
-				echo '<h4 style="color:green">'.T_( 'Upgrading data in existing b2evolution database...' ).'</h4>';
-				flush();
-
-				global $DB;
-
-				$DB->begin();
-				if( upgrade_b2evo_tables() )
-				{
-					$DB->commit();
-				}
-				else
-				{
-					$Messages->add( T_( 'Database upgrade failed.' ), 'error' );
-					$DB->rollback();
-				}
-			}
-		}
-		else
-		{
-			$Messages->add( T_( 'Some old files can\'t be overwritten.' ), 'error' );
-
-			echo '<p>'.T_( '<strong>The following folders and files can\'t be overwritten:</strong>' ).'</p>';
-			foreach( $read_only_files as $read_only_file )
+			else
 			{
-				echo $read_only_file.'<br/>';
+				echo '<p style="color:red">'.T_( '<strong>The following folders and files can\'t be overwritten:</strong>' ).'</p>';
+				foreach( $read_only_files as $read_only_file )
+				{
+					echo $read_only_file.'<br/>';
+				}
+				$success = false;
 			}
 		}
 
 		// Disable maintenance mode
 		switch_maintenance_mode( false );
 
-		if( $Messages->count() == 0 )
+		if( $success )
 		{
-			$Messages->add( T_( 'Upgrade completed successfully!' ), 'success' );
+			echo '<h5 style="color:green">'.T_( 'Upgrade completed successfully!' ).'</h5>';
+		}
+		else
+		{
+			echo '<h5 style="color:red">'.T_( 'Upgrade failed!' ).'</h5>';
 		}
 
-		// Display info & error messages
-		echo $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
-
-		$block_item_Widget->disp_template_replaced( 'block_end' );
-
-		// Display upgrade form
-		$AdminUI->disp_view( 'maintenance/views/_upgrade.form.php' );
-
 		break;
+}
+
+if( isset( $block_item_Widget ) )
+{
+	$block_item_Widget->disp_template_replaced( 'block_end' );
+	$AdminUI->disp_view( 'maintenance/views/_upgrade.form.php' );
 }
 
 $AdminUI->disp_payload_end();
@@ -276,6 +266,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2009/10/21 14:27:39  efy-maxim
+ * upgrade
+ *
  * Revision 1.2  2009/10/20 14:38:54  efy-maxim
  * maintenance modulde: downloading - unpacking - verifying destination files - backing up - copying new files - upgrade database using regular script (Warning: it is very unstable version! Please, don't use maintenance modulde, because it can affect your data )
  *

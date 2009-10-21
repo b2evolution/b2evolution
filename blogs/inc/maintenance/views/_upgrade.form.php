@@ -27,16 +27,17 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var action
  */
-global $action, $updates, $upgrade_dir;
-
-$Form = & new Form( NULL, 'upgrade_form', 'post', 'compact' );
-
-$Form->hiddens_by_key( get_memorized( 'action' ) );
+global $action;
 
 switch( $action )
 {
 	case 'start':
-	default:
+
+		global $updates;
+
+		$Form = & new Form( NULL, 'upgrade_form', 'post', 'compact' );
+
+		$Form->hiddens_by_key( get_memorized( 'action' ) );
 
 		$Form->begin_form( 'fform', T_('Check for updates') );
 		if( empty( $updates ) )
@@ -55,31 +56,35 @@ switch( $action )
 
 			$Form->text_input( 'upd_url', $update['url'], 80, T_('URL'), '<br/><span style="color:red">This is a test implementation. Please enter the URL of the ZIP file to download and install !</span>', array( 'maxlength'=> 300, 'required'=>true ) );
 
-			$Form->end_form( array( array( 'submit', 'actionArray[download]', T_('Download'), 'SaveButton' ),
-														array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+			$upgrade_action = get_upgrade_action( $update['url'] );
+			switch( $upgrade_action['action'] )
+			{
+				case 'download':
+					$button = T_( 'Download, unzip & install now' );
+					break;
+
+				case 'unzip':
+					$button = T_( 'Unzip & install now' );
+					break;
+
+				case 'install':
+					$button = T_( 'Install now' );
+					break;
+			}
+
+			if( $upgrade_action['action'] == 'none' )
+			{
+				$Form->info( T_( 'Status' ), '<span style="color:red">'.$upgrade_action['status'].'</span>' );
+			}
+			else
+			{
+				$Form->hidden( 'upd_name', $upgrade_action['name'] );
+
+				$Form->end_form( array( array( 'submit', 'actionArray['.$upgrade_action['action'].']', $button, 'SaveButton' ),
+										array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+
+			}
 		}
-
-		break;
-
-	case 'download':
-
-		if( !empty( $upgrade_dir ) )
-		{
-			$Form->begin_form( 'fform', T_('Backup and upgrade') );
-
-			$Form->info( '', '', 'The backup form with checkboxes can be displayed here!' );
-
-			$Form->hidden( 'upgrade_dir', $upgrade_dir );
-
-			$Form->end_form( array( array( 'submit', 'actionArray[upgrade]', T_('Upgrade'), 'SaveButton' ),
-														array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
-		}
-
-		break;
-
-	case 'upgrade':
-
-		// TODO: display something here
 
 		break;
 }
@@ -87,6 +92,9 @@ switch( $action )
 
 /*
  * $Log$
+ * Revision 1.3  2009/10/21 14:27:39  efy-maxim
+ * upgrade
+ *
  * Revision 1.2  2009/10/20 14:38:55  efy-maxim
  * maintenance modulde: downloading - unpacking - verifying destination files - backing up - copying new files - upgrade database using regular script (Warning: it is very unstable version! Please, don't use maintenance modulde, because it can affect your data )
  *

@@ -50,6 +50,36 @@ $Form->hiddens_by_key( get_memorized( 'action' ) );
 // Backup settings for folders and files
 $Form->begin_fieldset( T_( 'Folders & files' ), array( 'class'=>'fieldset clear' ) );
 
+/**
+ * Get affected paths
+ * @param mixed path
+ * @return string
+ */
+function get_affected_paths( $path )
+{
+	global $basepath;
+
+	$affected_paths = T_( 'Affected_paths: ');
+	if( is_array( $path ) )
+	{
+		$paths = array();
+		foreach( $path as $p )
+			$paths[] = no_trailing_slash( $p );
+
+		$affected_paths .= implode( ', ', $paths );
+	}
+	elseif( $path == '*' )
+	{
+		$affected_paths .= implode( ', ', get_filenames( $basepath, false, true, true, false, true ) );
+	}
+	else
+	{
+		$affected_paths .= no_trailing_slash( $path );
+	}
+	return $affected_paths;
+}
+
+// Display checkboxes
 foreach( $backup_paths as $name => $settings )
 {
 	if( !is_null( $settings['label'] ) )
@@ -58,6 +88,10 @@ foreach( $backup_paths as $name => $settings )
 		if( array_key_exists( 'note', $settings ) )
 		{
 			$note = $settings['note'];
+		}
+		else
+		{
+			$note = get_affected_paths( $settings['path'] );
 		}
 
 		$Form->checkbox( 'bk_'.$name, $current_Backup->backup_paths[$name], $settings['label'], $note );
@@ -69,12 +103,46 @@ $Form->end_fieldset();
 // Backup settings for database tables
 $Form->begin_fieldset( T_( 'Database tables' ), array( 'class'=>'fieldset clear' ) );
 
+/**
+ * Get affected tables
+ * @param mixed table
+ * @return string
+ */
+function get_affected_tables( $table )
+{
+	global $DB;
+
+	$affected_tables = T_( 'Affected tables: ' );
+	if( is_array( $table ) )
+	{
+		$affected_tables .= implode( ', ', aliases_to_tables( $table ) );
+	}
+	elseif( $table == '*' )
+	{
+		$tables = array();
+		foreach( $DB->get_results( 'SHOW TABLES', ARRAY_N ) as $row )
+				$tables[] = $row[0];
+
+		$affected_tables .= implode( ', ', $tables );
+	}
+	else
+	{
+		$affected_tables .= aliases_to_tables( $table );
+	}
+	return $affected_tables;
+}
+
+// Display checkboxes
 foreach( $backup_tables as $name => $settings )
 {
 	$note = '';
 	if( array_key_exists( 'note', $settings ) )
 	{
 		$note = $settings['note'];
+	}
+	else
+	{
+		$note = get_affected_tables( $settings['table'] );
 	}
 
 	$Form->checkbox( 'bk_'.$name, $current_Backup->backup_tables[$name], $settings['label'], $note );
@@ -100,6 +168,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'S
 
 /*
  * $Log$
+ * Revision 1.4  2009/10/21 14:27:39  efy-maxim
+ * upgrade
+ *
  * Revision 1.3  2009/10/20 14:38:55  efy-maxim
  * maintenance modulde: downloading - unpacking - verifying destination files - backing up - copying new files - upgrade database using regular script (Warning: it is very unstable version! Please, don't use maintenance modulde, because it can affect your data )
  *
