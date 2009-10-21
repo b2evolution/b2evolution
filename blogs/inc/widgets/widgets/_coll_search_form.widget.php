@@ -117,7 +117,7 @@ class coll_search_form_Widget extends ComponentWidget
 		$this->disp_title();
 
 		form_formstart( $Blog->gen_blogurl(), 'search', 'SearchForm' );
-		echo '<p>';
+		echo '<div>';
 		$s = get_param( 's' );
 		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars($s).'" class="SearchField" />';
 
@@ -131,6 +131,7 @@ class coll_search_form_Widget extends ComponentWidget
 			echo '</div>';
 		}
 		echo '<input type="submit" name="submit" class="submit" value="'.T_('Search').'" />';
+		echo '</div>';
 		echo '</form>';
 
 		echo $this->disp_params['block_end'];
@@ -142,6 +143,9 @@ class coll_search_form_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.16  2009/10/21 22:12:44  blueyed
+ * whoops. fix is to use DIVs instead.
+ *
  * Revision 1.15  2009/10/21 22:09:52  blueyed
  * Remove wrong closing P tag.
  *
