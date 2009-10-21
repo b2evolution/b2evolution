@@ -120,7 +120,6 @@ class coll_search_form_Widget extends ComponentWidget
 		echo '<p>';
 		$s = get_param( 's' );
 		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars($s).'" class="SearchField" />';
-		echo '</p>';
 
 		if( $this->disp_params[ 'disp_search_options' ] )
 		{
@@ -143,6 +142,9 @@ class coll_search_form_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.15  2009/10/21 22:09:52  blueyed
+ * Remove wrong closing P tag.
+ *
  * Revision 1.14  2009/09/14 13:54:13  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
