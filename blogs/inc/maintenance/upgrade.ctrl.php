@@ -124,6 +124,9 @@ switch( $action )
 			{
 				echo '<p style="color:red">'.sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $download_url ).'</p>';
 				flush();
+
+				// Additional check
+				@unlink( $upgrade_file );
 			}
 		}
 
@@ -158,6 +161,11 @@ switch( $action )
 					echo '<h5 style="color:red">'.$new_version_status.'</h5>';
 					break;
 				}
+			}
+			else
+			{
+				// Additional check
+				@rmdir_r( $upgrade_path.$upgrade_name );
 			}
 		}
 
@@ -194,7 +202,11 @@ switch( $action )
 				load_class( 'maintenance/model/_backup.class.php', 'Backup' );
 				$Backup = & new Backup();
 				$Backup->include_all();
-				$Backup->pack_backup_files = false; // temporary
+
+				if( !extension_loaded( 'zip' ) )
+				{
+					$Backup->pack_backup_files = false;
+				}
 
 				// Start backup
 				if( $success = $Backup->start_backup() )
@@ -266,6 +278,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2009/10/22 10:52:57  efy-maxim
+ * upgrade - messages
+ *
  * Revision 1.3  2009/10/21 14:27:39  efy-maxim
  * upgrade
  *

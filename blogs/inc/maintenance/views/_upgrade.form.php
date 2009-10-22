@@ -42,7 +42,9 @@ switch( $action )
 		$Form->begin_form( 'fform', T_('Check for updates') );
 		if( empty( $updates ) )
 		{
-			$Form->info( T_( 'Updates' ), T_( 'There are no any new updates.' ) );
+			?><div class="action_messages">
+				<div class="log_error" style="text-align:center;font-weight:bold"><?php echo T_( 'There are no any new updates.' ); ?></div>
+			</div><?php
 
 			$Form->end_form();
 		}
@@ -50,9 +52,9 @@ switch( $action )
 		{
 			$update = $updates[0];
 
-			$Form->info( T_( 'Updates' ), T_( 'There is a new update!' ), '<br/><br/><b>Name:</b> '.$update['name'].
-																		'<br/><b>Description:</b> '.$update['description'].
-																		'<br><b>Version:</b> '.$update['version'] );
+			$Form->info( T_( 'Update' ), $update['name'] );
+			$Form->info( T_( 'Description' ), $update['description'] );
+			$Form->info( T_( 'Version' ), $update['version'] );
 
 			$Form->text_input( 'upd_url', $update['url'], 80, T_('URL'), '<br/><span style="color:red">This is a test implementation. Please enter the URL of the ZIP file to download and install !</span>', array( 'maxlength'=> 300, 'required'=>true ) );
 
@@ -74,7 +76,9 @@ switch( $action )
 
 			if( $upgrade_action['action'] == 'none' )
 			{
-				$Form->info( T_( 'Status' ), '<span style="color:red">'.$upgrade_action['status'].'</span>' );
+				?><div class="action_messages">
+					<div class="log_error" style="text-align:center;font-weight:bold"><?php echo $upgrade_action['status']; ?></div>
+				</div><?php
 			}
 			else
 			{
@@ -92,6 +96,9 @@ switch( $action )
 
 /*
  * $Log$
+ * Revision 1.4  2009/10/22 10:52:57  efy-maxim
+ * upgrade - messages
+ *
  * Revision 1.3  2009/10/21 14:27:39  efy-maxim
  * upgrade
  *
