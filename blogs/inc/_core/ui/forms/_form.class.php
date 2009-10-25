@@ -461,7 +461,7 @@ class Form extends Widget
 
 
 	/**
-	 * Builds a fieldset tag. This is a fieldset element by default, but a th element
+	 * Builds a fieldset tag. This is a "fieldset" element by default, but a "th" element
 	 * for table layout.
 	 *
 	 * @param string the title of the fieldset
@@ -2944,6 +2944,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.65  2009/10/25 23:11:19  blueyed
+ * doc
+ *
  * Revision 1.64  2009/10/11 02:32:48  blueyed
  * doc
  *
