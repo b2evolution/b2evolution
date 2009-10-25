@@ -1491,7 +1491,11 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $glue = '&a
 		// Transform set param into an array:
 		if( !is_array($set) )
 		{
-			$set = array( $set );
+			if( $set[0] == '?' )
+			{ // Remove leading question mark, e.g. from QUERY_STRING
+				$set = substr($set, 1);
+			}
+			$set = preg_split( '~&(amp;)?~', $set, NULL, PREG_SPLIT_NO_EMPTY );
 		}
 		// Merge them in:
 		$params = array_merge( $params, $set );
@@ -2045,6 +2049,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.50  2009/10/25 23:08:00  blueyed
+ * regenerate_url: split set params by ampersand, and remove any trailing question mark: allows passing QUERY_STRING
+ *
  * Revision 1.49  2009/10/11 09:09:04  efy-maxim
  * Check_is functions have been moved to to params.funcs
  *
