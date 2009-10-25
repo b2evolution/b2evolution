@@ -241,74 +241,91 @@ class User extends DataObject
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
 		$this->set_from_Request('login', 'edited_user_login', true, 'strtolower');
 
-		param( 'edited_user_firstname', 'string', true );
-		$this->set_from_Request('firstname', 'edited_user_firstname', true);
+		// ******* Identity form ******* //
 
-		param( 'edited_user_lastname', 'string', true );
-		$this->set_from_Request('lastname', 'edited_user_lastname', true);
+		if( param( 'identity_form', 'boolean', false ) )
+		{
+			//echo '#identity_form#<br>';
+			param( 'edited_user_email', 'string', true );
+			param_check_not_empty( 'edited_user_email', T_('Please enter an e-mail address.') );
+			param_check_email( 'edited_user_email', true );
+			$this->set_from_Request('email', 'edited_user_email', true);
 
+			param( 'edited_user_allow_msgform', 'integer', 0 );
+			$this->set_from_Request('allow_msgform', 'edited_user_allow_msgform', true);
 
-		param( 'edited_user_nickname', 'string', true );
-		param_check_not_empty( 'edited_user_nickname', T_('Please enter a nickname (can be the same as your login).') );
-		$this->set_from_Request('nickname', 'edited_user_nickname', true);
+			param( 'edited_user_notify', 'integer', 0 );
+			$this->set_from_Request('notify', 'edited_user_notify', true);
 
-		param( 'edited_user_ctry_ID', 'integer', true );
-		param_check_number( 'edited_user_ctry_ID', 'Please select a country', true );
-		$this->set_from_Request('ctry_ID', 'edited_user_ctry_ID', true);
+			param( 'edited_user_firstname', 'string', true );
+			$this->set_from_Request('firstname', 'edited_user_firstname', true);
 
-		param( 'edited_user_idmode', 'string', true );
-		$this->set_from_Request('idmode', 'edited_user_idmode', true);
+			param( 'edited_user_lastname', 'string', true );
+			$this->set_from_Request('lastname', 'edited_user_lastname', true);
 
-		param( 'edited_user_locale', 'string', true );
-		$this->set_from_Request('locale', 'edited_user_locale', true);
+			param( 'edited_user_nickname', 'string', true );
+			param_check_not_empty( 'edited_user_nickname', T_('Please enter a nickname (can be the same as your login).') );
+			$this->set_from_Request('nickname', 'edited_user_nickname', true);
 
-		param( 'edited_user_email', 'string', true );
-		param_check_not_empty( 'edited_user_email', T_('Please enter an e-mail address.') );
-		param_check_email( 'edited_user_email', true );
-		$this->set_from_Request('email', 'edited_user_email', true);
+			param( 'edited_user_idmode', 'string', true );
+			$this->set_from_Request('idmode', 'edited_user_idmode', true);
 
-		param( 'edited_user_url', 'string', true );
-		param_check_url( 'edited_user_url', 'commenting' );
-		$this->set_from_Request('url', 'edited_user_url', true);
+			param( 'edited_user_ctry_ID', 'integer', true );
+			param_check_number( 'edited_user_ctry_ID', 'Please select a country', true );
+			$this->set_from_Request('ctry_ID', 'edited_user_ctry_ID', true);
 
-		param( 'edited_user_icq', 'string', true );
-		param_check_number( 'edited_user_icq', T_('The ICQ UIN can only be a number, no letters allowed.') );
-		$this->set_from_Request('icq', 'edited_user_icq', true);
+			param( 'edited_user_showonline', 'integer', 0 );
+			$this->set_from_Request('showonline', 'edited_user_showonline', true);
 
-		param( 'edited_user_aim', 'string', true );
-		$this->set_from_Request('aim', 'edited_user_aim', true);
+			param( 'edited_user_url', 'string', true );
+			param_check_url( 'edited_user_url', 'commenting' );
+			$this->set_from_Request('url', 'edited_user_url', true);
 
-		param( 'edited_user_msn', 'string', true );
-		param_check_email( 'edited_user_msn', false );
-		$this->set_from_Request('msn', 'edited_user_msn', true);
+			param( 'edited_user_icq', 'string', true );
+			param_check_number( 'edited_user_icq', T_('The ICQ UIN can only be a number, no letters allowed.') );
+			$this->set_from_Request('icq', 'edited_user_icq', true);
 
-		param( 'edited_user_yim', 'string', true );
-		$this->set_from_Request('yim', 'edited_user_yim', true);
+			param( 'edited_user_aim', 'string', true );
+			$this->set_from_Request('aim', 'edited_user_aim', true);
 
-		param( 'edited_user_allow_msgform', 'integer', 0 );
-		$this->set_from_Request('allow_msgform', 'edited_user_allow_msgform', true);
+			param( 'edited_user_msn', 'string', true );
+			param_check_email( 'edited_user_msn', false );
+			$this->set_from_Request('msn', 'edited_user_msn', true);
 
-		param( 'edited_user_notify', 'integer', 0 );
-		$this->set_from_Request('notify', 'edited_user_notify', true);
+			param( 'edited_user_yim', 'string', true );
+			$this->set_from_Request('yim', 'edited_user_yim', true);
 
-		param( 'edited_user_showonline', 'integer', 0 );
-		$this->set_from_Request('showonline', 'edited_user_showonline', true);
+			param( 'edited_user_set_login_multiple_sessions', 'integer', 0 );
+		}
 
-		param( 'edited_user_pass1', 'string', true );
-		param( 'edited_user_pass2', 'string', true );
+		// ******* Password form ******* //
 
-		// Features
-		param( 'edited_user_set_login_multiple_sessions', 'integer', 0 );
+		if( param( 'password_form', 'boolean', false ) )
+		{
+			//echo '#password_form#<br>';
+			param( 'edited_user_pass1', 'string', true );
+			param( 'edited_user_pass2', 'string', true );
+		}
 
-		param( 'edited_user_admin_skin', 'string', true );
+		// ******* Preferences form ******* //
 
-		param_integer_range( 'edited_user_action_icon_threshold', 1, 5, T_('The threshold must be between 1 and 5.') );
-		param_integer_range( 'edited_user_action_word_threshold', 1, 5, T_('The threshold must be between 1 and 5.') );
+		if( param( 'preferences_form', 'boolean', false ) )
+		{
+			//echo '#preferences_form#<br>';
+			param( 'edited_user_locale', 'string', true );
+			$this->set_from_Request('locale', 'edited_user_locale', true);
 
-		param( 'edited_user_legend', 'integer', 0 );
-		param( 'edited_user_bozo', 'integer', 0 );
-		param( 'edited_user_focusonfirst', 'integer', 0 );
-		param( 'edited_user_results_per_page', 'integer', null );
+			param( 'edited_user_admin_skin', 'string', true );
+
+			param_integer_range( 'edited_user_action_icon_threshold', 1, 5, T_('The threshold must be between 1 and 5.') );
+			param_integer_range( 'edited_user_action_word_threshold', 1, 5, T_('The threshold must be between 1 and 5.') );
+
+			param( 'edited_user_legend', 'integer', 0 );
+			param( 'edited_user_bozo', 'integer', 0 );
+
+			param( 'edited_user_focusonfirst', 'integer', 0 );
+			param( 'edited_user_results_per_page', 'integer', null );
+		}
 
 		return ! param_errors_detected();
 	}
@@ -1827,6 +1844,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.58  2009/10/25 15:22:45  efy-maxim
+ * user - identity, password, preferences tabs
+ *
  * Revision 1.57  2009/10/17 16:31:33  efy-maxim
  * Renamed: T_groupsettings to T_groups__groupsettings, T_usersettings to T_users__usersettings
  *

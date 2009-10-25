@@ -91,6 +91,7 @@ $ctrl_mappings = array(
 		'system'       => 'tools/system.ctrl.php',
 		'users'        => 'users/users.ctrl.php',
 		'userfields'   => 'users/userfields.ctrl.php',
+		'usersettings' => 'users/settings.ctrl.php',
 		'registration' => 'users/registration.ctrl.php',
 		'groups'       => 'users/groups.ctrl.php',
 		'upload'       => 'files/upload.ctrl.php',
@@ -643,18 +644,79 @@ class _core_Module extends Module
 					) );
 		}
 
-
 		if( $current_User->check_perm( 'users', 'view' ) )
 		{	// Permission to view users:
-			$AdminUI->add_menu_entries( NULL, array(
-						'users' => array(
+			$users_entries = array(
 						'text' => T_('Users'),
 						'title' => T_('User management'),
-						'href' => '?ctrl=users',
-						'entries' =>  array(
+						'href' => '?ctrl=users' );
 
+			$user_ID = param( 'user_ID', 'integer', NULL );
+		}
+		else
+		{	// Only perm to view his own profile:
+			$users_entries = array(
+						'text' => T_('My profile'),
+						'title' => T_('User profile'),
+						'href' => '?ctrl=users&amp;tab=identity' );
+
+			$user_ID = $current_User->ID;
+		}
+
+
+		$tab = param( 'tab', 'string', NULL );
+
+		if( ( $tab != NULL || $user_ID != NULL ) && $ctrl == 'users' )
+		{
+			if( $user_ID !== NULL )
+			{
+				$action = param_action( 'list' );
+
+				if( $action == 'list' )
+				{
+					if( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'edit' ) )
+					{
+						$action = 'edit';
+					}
+					else
+					{
+						$action = 'view';
+					}
+				}
+
+				$users_sub_entries = array();
+
+				$users_sub_entries['identity'] = array(
+								'text' => T_('Identity'),
+								'href' => '?ctrl=users&amp;tab=identity&amp;user_ID='.$user_ID	);
+
+				if( $action != 'view' )
+				{
+					$users_sub_entries['password'] = array(
+									'text' => T_('Password'),
+									'href' => '?ctrl=users&amp;tab=password&amp;user_ID='.$user_ID );
+				}
+
+				$users_sub_entries['preferences'] = array(
+								'text' => T_('Preferences'),
+ 								'href' => '?ctrl=users&amp;tab=preferences&amp;user_ID='.$user_ID );
+
+				$users_entries['entries'] = $users_sub_entries;
+			}
+			else
+			{
+				$users_entries['entries'] = array(
+							'identity' => array(
+								'text' => T_('Identity'),
+								'href' => '?ctrl=users&amp;tab=identity' ) );
+			}
+
+
+		}
+		elseif( $current_User->check_perm( 'users', 'view' ) )
+		{
 			// fp> the following submenu needs even further breakdown.
-
+			$users_entries['entries'] = array(
 							'users' => array(
 								'text' => T_('Users & Groups'),
 								'href' => '?ctrl=users'	),
@@ -666,21 +728,13 @@ class _core_Module extends Module
 							'registration' => array(
 								'text' => T_('Registration'),
  								'href' => '?ctrl=registration' ),
-							),
-					),
-				) );
-		}
-		else
-		{	// Only perm to view his own profile:
-			$AdminUI->add_menu_entries( NULL, array(
-						'users' => array(
-						'text' => T_('My profile'),
-						'title' => T_('User profile'),
-						'href' => '?ctrl=users',
-					),
-				) );
+							/*'usersettings' => array(
+								'text' => T_('Settings'),
+ 								'href' => '?ctrl=usersettings' ),*/
+							);
 		}
 
+		$AdminUI->add_menu_entries( NULL, array( 'users' => $users_entries ) );
 
 		if( $current_User->check_perm( 'options', 'view' ) )
 		{	// Permission to view settings:
@@ -732,6 +786,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.43  2009/10/25 15:22:42  efy-maxim
+ * user - identity, password, preferences tabs
+ *
  * Revision 1.42  2009/10/18 20:15:51  efy-maxim
  * 1. backup, upgrade have been moved to maintenance module
  * 2. maintenance module permissions

@@ -279,7 +279,7 @@ class sessions_Module extends Module
 	function build_menu_3()
 	{
 
-		global $blog, $dispatcher;
+		global $blog, $dispatcher, $ctrl;
 		/**
 		 * @var User
 		 */
@@ -290,7 +290,8 @@ class sessions_Module extends Module
 		 */
 		global $AdminUI;
 
-		if( $current_User->check_perm( 'stats', 'view' ) )
+		$tab = param( 'tab', 'string', '' );
+		if( ( empty( $tab ) || $ctrl != 'users' ) && $current_User->check_perm( 'stats', 'view' ) )
 		{	// Viewing aggregate + Permission to view stats for ALL blogs:
 			$sessions_menu = array(
 				'sessions' => array(
@@ -343,6 +344,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.24  2009/10/25 15:22:44  efy-maxim
+ * user - identity, password, preferences tabs
+ *
  * Revision 1.23  2009/09/25 20:45:41  fplanque
  * fix
  *

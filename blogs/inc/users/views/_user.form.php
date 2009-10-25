@@ -90,6 +90,9 @@ else
 
 $Form->hidden_ctrl();
 $Form->hidden( 'user_ID', $edited_User->ID );
+$Form->hidden( 'identity_form', '1' );
+$Form->hidden( 'password_form', '1' );
+$Form->hidden( 'preferences_form', '1' );
 
 // _____________________________________________________________________
 
@@ -226,7 +229,6 @@ if( $action != 'view' )
 		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'note'=>sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
 
 	$Form->end_fieldset();
-
 }
 
 // _____________________________________________________________________
@@ -514,6 +516,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.25  2009/10/25 15:22:47  efy-maxim
+ * user - identity, password, preferences tabs
+ *
  * Revision 1.24  2009/10/10 21:43:09  tblue246
  * cleanup
  *

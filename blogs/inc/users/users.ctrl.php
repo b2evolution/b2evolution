@@ -40,12 +40,18 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $AdminUI;
 
-
-$AdminUI->set_path( 'users', 'users' );
-
-param_action( 'list' );
+param( 'tab', 'string' );
 
 param( 'user_ID', 'integer', NULL );	// Note: should NOT be memorized (would kill navigation/sorting) use memorize_param() if needed
+
+if( $tab == NULL && $user_ID != NULL )
+{
+	$tab = 'identity';
+}
+
+$AdminUI->set_path( 'users', !empty( $tab ) ? $tab : 'users' );
+
+param_action( 'list' );
 
 /**
  * @global boolean true, if user is only allowed to edit his profile
@@ -211,7 +217,9 @@ if( !$Messages->count('error') )
 				break;
 			}
 
-			if( $current_User->check_perm( 'users', 'edit' ) )
+			$is_identity_form = param( 'identity_form', 'boolean', false );
+
+			if( $is_identity_form && $current_User->check_perm( 'users', 'edit' ) )
 			{ // changing level/group is allowed (not in profile mode)
 				param_integer_range( 'edited_user_level', 0, 10, T_('User level must be between %d and %d.') );
 				$edited_User->set( 'level', $edited_user_level );
@@ -227,7 +235,7 @@ if( !$Messages->count('error') )
 				// echo 'new group = ';
 				// $edited_User->Group->disp('name');
 			}
-			
+
 			// load data from request
 			if( $edited_User->load_from_Request() )
 			{	// We could load data from form without errors:
@@ -244,56 +252,63 @@ if( !$Messages->count('error') )
 						sprintf( T_('This login already exists. Do you want to <a %s>edit the existing user</a>?'),
 							'href="?ctrl=users&amp;user_ID='.$q.'"' ) );
 				}
-	
-	
-				if( ! param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', ($edited_User->ID == 0) ) ) // required for new users
+
+
+				if( param( 'password_form', 'boolean', false ) && !param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', ($edited_User->ID == 0) ) ) // required for new users
 				{ // passwords not the same or empty: empty them for the form
 					$edited_user_pass1 = '';
 					$edited_user_pass2 = '';
 				}
-	
-				// EXPERIMENTAL user fields:
-	
-				// EXISTING fields:
-				// Get indices of existing userfields:
-				$userfield_IDs = $DB->get_col( '
-							SELECT uf_ID
-								FROM T_users__fields
-							 WHERE uf_user_ID = '.$edited_User->ID );
-				foreach( $userfield_IDs as $userfield_ID )
+
+				if( $is_identity_form )
 				{
-					$uf_val = param( 'uf_'.$userfield_ID, 'string', '' );
-	
-					// TODO: type checking
-	
-					$edited_User->userfield_update( $userfield_ID, $uf_val );
+					// EXPERIMENTAL user fields:
+
+					// EXISTING fields:
+					// Get indices of existing userfields:
+					$userfield_IDs = $DB->get_col( '
+								SELECT uf_ID
+									FROM T_users__fields
+								 WHERE uf_user_ID = '.$edited_User->ID );
+					foreach( $userfield_IDs as $userfield_ID )
+					{
+						$uf_val = param( 'uf_'.$userfield_ID, 'string', '' );
+
+						// TODO: type checking
+
+						$edited_User->userfield_update( $userfield_ID, $uf_val );
+					}
+
+					// NEW fields:
+					for( $i=1; $i<=3; $i++ )
+					{	// new fields:
+						$new_uf_type = param( 'new_uf_type_'.$i, 'integer', '' );
+						$new_uf_val = param( 'new_uf_val_'.$i, 'string', '' );
+						if( empty($new_uf_type) && empty($new_uf_val) )
+						{
+							continue;
+						}
+
+						if( empty($new_uf_type) )
+						{
+							param_error( 'new_uf_val_'.$i, T_('Please select a field type.') );
+						}
+						if( empty($new_uf_val) )
+						{
+							param_error( 'new_uf_val_'.$i, T_('Please enter a value.') );
+						}
+
+						// echo $new_uf_type.':'.$new_uf_val;
+
+						// TODO: type checking
+
+						$edited_User->userfield_add( $new_uf_type, $new_uf_val );
+					}
+
+					$UserSettings->set( 'login_multiple_sessions', $edited_user_set_login_multiple_sessions, $edited_User->ID );
 				}
-	
-				// NEW fields:
-				for( $i=1; $i<=3; $i++ )
-				{	// new fields:
-					$new_uf_type = param( 'new_uf_type_'.$i, 'integer', '' );
-					$new_uf_val = param( 'new_uf_val_'.$i, 'string', '' );
-					if( empty($new_uf_type) && empty($new_uf_val) )
-					{
-						continue;
-					}
-	
-					if( empty($new_uf_type) )
-					{
-						param_error( 'new_uf_val_'.$i, T_('Please select a field type.') );
-					}
-					if( empty($new_uf_val) )
-					{
-						param_error( 'new_uf_val_'.$i, T_('Please enter a value.') );
-					}
-	
-					// echo $new_uf_type.':'.$new_uf_val;
-	
-					// TODO: type checking
-	
-					$edited_User->userfield_add( $new_uf_type, $new_uf_val );
-				}
+
+
 			}
 
 			if( $Messages->count( 'error' ) )
@@ -340,29 +355,30 @@ if( !$Messages->count('error') )
 
 			// Now that the User exists in the DB and has an ID, update the settings:
 
-			$UserSettings->set( 'login_multiple_sessions', $edited_user_set_login_multiple_sessions, $edited_User->ID );
-
-			if( $UserSettings->set( 'admin_skin', $edited_user_admin_skin, $edited_User->ID )
-					&& ($edited_User->ID == $current_User->ID) )
-			{ // admin_skin has changed or was set the first time for the current user
-				$reload_page = true;
-			}
-
-			// Action icon params:
-			$UserSettings->set( 'action_icon_threshold', $edited_user_action_icon_threshold, $edited_User->ID );
-			$UserSettings->set( 'action_word_threshold', $edited_user_action_word_threshold, $edited_User->ID );
-			$UserSettings->set( 'display_icon_legend', $edited_user_legend, $edited_User->ID );
-
-			// Set bozo validador activation
-			$UserSettings->set( 'control_form_abortions', $edited_user_bozo, $edited_User->ID );
-
-			// Focus on first
-			$UserSettings->set( 'focus_on_first_input', $edited_user_focusonfirst, $edited_User->ID );
-
-			// Results per page
-			if( isset($edited_user_results_per_page) )
+			if( param( 'preferences_form', 'boolean', false ) )
 			{
-				$UserSettings->set( 'results_per_page', $edited_user_results_per_page, $edited_User->ID );
+				if( $UserSettings->set( 'admin_skin', $edited_user_admin_skin, $edited_User->ID )
+						&& ($edited_User->ID == $current_User->ID) )
+				{ // admin_skin has changed or was set the first time for the current user
+					$reload_page = true;
+				}
+
+				// Action icon params:
+				$UserSettings->set( 'action_icon_threshold', $edited_user_action_icon_threshold, $edited_User->ID );
+				$UserSettings->set( 'action_word_threshold', $edited_user_action_word_threshold, $edited_User->ID );
+				$UserSettings->set( 'display_icon_legend', $edited_user_legend, $edited_User->ID );
+
+				// Set bozo validador activation
+				$UserSettings->set( 'control_form_abortions', $edited_user_bozo, $edited_User->ID );
+
+				// Focus on first
+				$UserSettings->set( 'focus_on_first_input', $edited_user_focusonfirst, $edited_User->ID );
+
+				// Results per page
+				if( isset($edited_user_results_per_page) )
+				{
+					$UserSettings->set( 'results_per_page', $edited_user_results_per_page, $edited_User->ID );
+				}
 			}
 
 			// Update user settings:
@@ -413,6 +429,10 @@ if( !$Messages->count('error') )
 				$action = 'edit';
 			}
 
+			if( !empty( $tab ) )
+			{
+				header_redirect( regenerate_url( '', 'user_ID='.$edited_User->ID.'&action=edit&tab='.$tab, '', '&' ) );
+			}
 			if( $reload_page )
 			{ // reload the current page through header redirection:
 				if( $action != 'edit' )
@@ -421,6 +441,7 @@ if( !$Messages->count('error') )
 				}
 				header_redirect( regenerate_url( '', 'user_ID='.$edited_User->ID.'&action='.$action, '', '&' ) ); // will save $Messages into Session
 			}
+
 			break;
 
 
@@ -667,10 +688,24 @@ switch( $action )
 		case 'new':
 		case 'view':
 		case 'edit':
-			// Display user form:
-			$AdminUI->disp_view( 'users/views/_user.form.php' );
-			break;
 
+			switch( $tab )
+			{
+				case 'identity':
+					// Display user identity form:
+					$AdminUI->disp_view( 'users/views/_user.identity.form.php' );
+					break;
+				case 'password':
+					// Display user password form:
+					$AdminUI->disp_view( 'users/views/_user.password.form.php' );
+					break;
+				case 'preferences':
+					// Display user preferences form:
+					$AdminUI->disp_view( 'users/views/_user.preferences.form.php' );
+					break;
+			}
+
+			break;
 
 	case 'promote':
 	default:
@@ -687,6 +722,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.35  2009/10/25 15:22:46  efy-maxim
+ * user - identity, password, preferences tabs
+ *
  * Revision 1.34  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *
