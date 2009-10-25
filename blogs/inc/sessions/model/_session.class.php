@@ -249,9 +249,11 @@ class Session
 	{
 		if( $user_ID != $this->user_ID )
 		{
-			global $UserSettings, $DB;
+			global $Settings, $UserSettings, $DB;
 
-			if( ! $UserSettings->get('login_multiple_sessions', $user_ID) )
+			$multiple_sessions = $Settings->get( 'multiple_sessions' );
+
+			if( $multiple_sessions != 'always' && ( $multiple_sessions == 'never' || !$UserSettings->get('login_multiple_sessions', $user_ID) ) )
 			{ // The user does not want to have multiple sessions open at the same time:
 				// Invalidate previous sessions:
 				global $Debuglog;
@@ -546,6 +548,10 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.18  2009/10/25 22:02:43  efy-maxim
+ * 1. multiple sessions check
+ * 2. user form deleted
+ *
  * Revision 1.17  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *
