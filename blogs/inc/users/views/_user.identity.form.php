@@ -152,9 +152,6 @@ if( $action != 'view' )
 	$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, 'Country', array('required'=>true) );
 
 	$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
-	$Form->checkbox( 'edited_user_set_login_multiple_sessions', $UserSettings->get('login_multiple_sessions', $edited_User->ID), T_('Multiple sessions'),
-		T_('Check this if you want to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will disconnect you on the previous one.') );
-
 }
 else
 { // display only
@@ -182,6 +179,13 @@ if( empty( $edited_User->ID ) && $action != 'view' )
 		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'maxlength' => 50, 'required' => true, 'autocomplete'=>'off' ) );
 		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'note'=>sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => true, 'autocomplete'=>'off' ) );
 	$Form->end_fieldset();
+}
+
+	/***************  Prefferences  **************/
+
+if( empty( $edited_User->ID ) )
+{	// New user will be created with default multiple_session setting
+	$Form->hidden( 'edited_user_set_login_multiple_sessions', $Settings->get( 'multiple_sessions' ) == 'default-yes' ? 1 : 0 );
 }
 
 	/***************  Additional info  **************/
@@ -363,6 +367,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.2  2009/10/25 20:39:10  efy-maxim
+ * multiple sessions
+ *
  * Revision 1.1  2009/10/25 15:22:48  efy-maxim
  * user - identity, password, preferences tabs
  *

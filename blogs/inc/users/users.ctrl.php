@@ -304,8 +304,6 @@ if( !$Messages->count('error') )
 
 						$edited_User->userfield_add( $new_uf_type, $new_uf_val );
 					}
-
-					$UserSettings->set( 'login_multiple_sessions', $edited_user_set_login_multiple_sessions, $edited_User->ID );
 				}
 
 
@@ -379,6 +377,11 @@ if( !$Messages->count('error') )
 				{
 					$UserSettings->set( 'results_per_page', $edited_user_results_per_page, $edited_User->ID );
 				}
+			}
+
+			if( isset( $edited_user_set_login_multiple_sessions ) )
+			{	// Multiple session
+				$UserSettings->set( 'login_multiple_sessions', $edited_user_set_login_multiple_sessions, $edited_User->ID );
 			}
 
 			// Update user settings:
@@ -722,6 +725,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.36  2009/10/25 20:39:09  efy-maxim
+ * multiple sessions
+ *
  * Revision 1.35  2009/10/25 15:22:46  efy-maxim
  * user - identity, password, preferences tabs
  *

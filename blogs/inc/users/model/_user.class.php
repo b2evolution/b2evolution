@@ -243,9 +243,10 @@ class User extends DataObject
 
 		// ******* Identity form ******* //
 
-		if( param( 'identity_form', 'boolean', false ) )
+		$is_identity_form = param( 'identity_form', 'boolean', false );
+
+		if( $is_identity_form )
 		{
-			//echo '#identity_form#<br>';
 			param( 'edited_user_email', 'string', true );
 			param_check_not_empty( 'edited_user_email', T_('Please enter an e-mail address.') );
 			param_check_email( 'edited_user_email', true );
@@ -294,24 +295,24 @@ class User extends DataObject
 
 			param( 'edited_user_yim', 'string', true );
 			$this->set_from_Request('yim', 'edited_user_yim', true);
-
-			param( 'edited_user_set_login_multiple_sessions', 'integer', 0 );
 		}
 
 		// ******* Password form ******* //
 
-		if( param( 'password_form', 'boolean', false ) )
+		$is_password_form = param( 'password_form', 'boolean', false );
+
+		if( $is_password_form || ( $is_identity_form && $this->ID == 0 ) )
 		{
-			//echo '#password_form#<br>';
 			param( 'edited_user_pass1', 'string', true );
 			param( 'edited_user_pass2', 'string', true );
 		}
 
 		// ******* Preferences form ******* //
 
-		if( param( 'preferences_form', 'boolean', false ) )
+		$is_preferences_form = param( 'preferences_form', 'boolean', false );
+
+		if( $is_preferences_form )
 		{
-			//echo '#preferences_form#<br>';
 			param( 'edited_user_locale', 'string', true );
 			$this->set_from_Request('locale', 'edited_user_locale', true);
 
@@ -325,6 +326,11 @@ class User extends DataObject
 
 			param( 'edited_user_focusonfirst', 'integer', 0 );
 			param( 'edited_user_results_per_page', 'integer', null );
+		}
+
+		if( $is_preferences_form || ( $is_identity_form && $this->ID == 0 ) )
+		{
+			param( 'edited_user_set_login_multiple_sessions', 'integer', 0 );
 		}
 
 		return ! param_errors_detected();
@@ -1844,6 +1850,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.59  2009/10/25 20:39:09  efy-maxim
+ * multiple sessions
+ *
  * Revision 1.58  2009/10/25 15:22:45  efy-maxim
  * user - identity, password, preferences tabs
  *

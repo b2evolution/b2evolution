@@ -86,6 +86,23 @@ if( $action != 'view' )
 	// Number of results per page
 	$Form->text( 'edited_user_results_per_page', $UserSettings->get( 'results_per_page', $edited_User->ID ), 3, T_('Results per page'), T_('Number of rows displayed in results tables.') );
 
+	// Enable/disable multiple sessions for the current user
+	$multiple_sessions_value = $UserSettings->get( 'login_multiple_sessions', $edited_User->ID );
+
+	switch( $Settings->get( 'multiple_sessions' ) )
+	{
+		case 'default-no':
+		case 'default-yes':
+
+			$Form->checkbox( 'edited_user_set_login_multiple_sessions', $multiple_sessions_value, T_('Multiple sessions'),
+				T_('Check this if you want to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will disconnect you on the previous one.') );
+			break;
+
+		default:
+
+			$Form->hidden( 'edited_user_set_login_multiple_sessions', $multiple_sessions_value );
+			break;
+	}
 }
 else
 { // display only
@@ -175,6 +192,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.2  2009/10/25 20:39:10  efy-maxim
+ * multiple sessions
+ *
  * Revision 1.1  2009/10/25 15:22:48  efy-maxim
  * user - identity, password, preferences tabs
  *
