@@ -27,7 +27,7 @@ $Form->radio( 'uset_nickname_editing', $Settings->get( 'nickname_editing' ), arr
 					array( 'hidden', T_('Hidden') )
 				), T_('Nickname'), true );
 
-$Form->radio( 'uset_login_multiple_sessions', $Settings->get( 'login_multiple_sessions' ), array(
+$Form->radio( 'uset_multiple_sessions', $Settings->get( 'multiple_sessions' ), array(
 					array( 'never', T_('Never allow') ),
 					array( 'default-no', T_('Let users decide, default to "no" for new users') ),
 					array( 'default-yes', T_('Let users decide, default to "yes" for new users') ),
@@ -46,6 +46,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.3  2009/10/25 19:24:51  efy-maxim
+ * multiple_sessions param
+ *
  * Revision 1.2  2009/10/25 19:20:30  efy-maxim
  * users settings
  *

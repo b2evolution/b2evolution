@@ -14,11 +14,11 @@ switch ( $action )
 
 		// UPDATE general settings:
 		param( 'uset_nickname_editing', 'string', 'edited-user' );
-		param( 'uset_login_multiple_sessions', 'string', 'default-no' );
+		param( 'uset_multiple_sessions', 'string', 'default-no' );
 
 		$Settings->set_array( array(
-									array( 'nickname_editing', $uset_nickname_editing),
-									array( 'login_multiple_sessions', $uset_login_multiple_sessions) ) );
+									array( 'nickname_editing', $uset_nickname_editing ),
+									array( 'multiple_sessions', $uset_multiple_sessions ) ) );
 
 		if( ! $Messages->count('error') )
 		{
@@ -51,6 +51,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2009/10/25 19:24:51  efy-maxim
+ * multiple_sessions param
+ *
  * Revision 1.2  2009/10/25 19:20:30  efy-maxim
  * users settings
  *
