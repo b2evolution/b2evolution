@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 3\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2009-09-30 20:51+0200\n"
-"PO-Revision-Date: 2009-10-09 20:00-0500\n"
+"PO-Revision-Date: 2009-10-25 17:44-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -1339,7 +1339,6 @@ msgid "User fields"
 msgstr ""
 
 #: ../../../inc/_core/__core.init.php:664
-#, fuzzy
 msgid "Registration"
 msgstr "Регистрация"
 
@@ -7840,7 +7839,7 @@ msgstr "Сохранить и добавить файлы"
 
 #: ../../../inc/items/model/_item.funcs.php:475
 msgid "Add/Link files"
-msgstr "Добавить/Прикрепить файлы"
+msgstr "Добавить файлы"
 
 #: ../../../inc/items/model/_item.funcs.php:551
 msgid "Add a new category"
@@ -7923,7 +7922,7 @@ msgstr "Установить текущую дату"
 
 #: ../../../inc/items/model/_item.funcs.php:862
 msgid "Set to"
-msgstr "Выбрать вручную"
+msgstr "Выбрать дату"
 
 #: ../../../inc/items/model/_itemlight.class.php:127
 #, php-format
@@ -8988,7 +8987,7 @@ msgstr ""
 #: ../../../inc/messaging/model/_message.class.php:433
 #, php-format
 msgid "To read it, click on this link: %s"
-msgstr ""
+msgstr "Нажмите, чтобы прочесть: %s"
 
 #: ../../../inc/messaging/model/_message.class.php:429
 #, php-format
@@ -9006,9 +9005,8 @@ msgid "Best regards"
 msgstr "С наилучшими пожеланиями"
 
 #: ../../../inc/messaging/model/_message.class.php:441
-#, fuzzy
 msgid "b2evolution mailer"
-msgstr "Время в b2evolution"
+msgstr ""
 
 #: ../../../inc/messaging/model/_message.class.php:443
 msgid "This is an automatically generated message; please do not reply to this email."
@@ -9024,33 +9022,31 @@ msgid "You cannot send threads to yourself: %s"
 msgstr "Вы не можете отправлять сообщения самому себе: %s"
 
 #: ../../../inc/messaging/threads.ctrl.php:91
-#, fuzzy
 msgid "You don't have permission to initiate conversations with the following users: "
-msgstr "У вас нет разрешений на создание записей в этом блоге."
+msgstr "У вас нет разрешений на переписку со следующими пользователями:"
 
 #: ../../../inc/messaging/threads.ctrl.php:107
 msgid "New thread created."
 msgstr "Создана новая тема."
 
 #: ../../../inc/messaging/threads.ctrl.php:133
-#, fuzzy, php-format
+#, php-format
 msgid "Thread &laquo;%s&raquo; deleted."
-msgstr "Гол &laquo;%s&raquo; успешно удален."
+msgstr "Ветка &laquo;%s&raquo; успешно удален."
 
 #: ../../../inc/messaging/threads.ctrl.php:146
-#, fuzzy, php-format
+#, php-format
 msgid "Cannot delete thread &laquo;%s&raquo;"
-msgstr "Невозможно удалить гол &laquo;%s&raquo;"
+msgstr "Невозможно удалить ветку &laquo;%s&raquo;"
 
 #: ../../../inc/messaging/threads.ctrl.php:175
-#, fuzzy, php-format
+#, php-format
 msgid "Delete thread &laquo;%s&raquo;?"
-msgstr "Вы действительно хотите удалить гол &laquo;%s&raquo;?"
+msgstr ""
 
 #: ../../../inc/messaging/views/_contact_list.view.php:57
-#, fuzzy
 msgid "Contacts list"
-msgstr "Иконки контактов"
+msgstr "Список контактов"
 
 #: ../../../inc/messaging/views/_contact_list.view.php:60
 #: ../../../inc/widgets/widgets/_menu_link.widget.php:159
@@ -9074,38 +9070,33 @@ msgid "Contact"
 msgstr "Контакты"
 
 #: ../../../inc/messaging/views/_contact_list.view.php:65
-#, fuzzy
 msgid "Last_Contact"
-msgstr "Контакты"
+msgstr ""
 
 #: ../../../inc/messaging/views/_contact_list.view.php:83
-#, fuzzy
 msgid "Block contact"
-msgstr "Содержимое блока"
+msgstr "Заблокировать контакт"
 
 #: ../../../inc/messaging/views/_contact_list.view.php:87
-#, fuzzy
 msgid "Unblock contact"
-msgstr "Содержимое блока"
+msgstr "Разблокировать контакт"
 
 #: ../../../inc/messaging/views/_contact_list.view.php:92
 msgid "Block / Unblock"
-msgstr ""
+msgstr "Блокировка"
 
 #: ../../../inc/messaging/views/_message_list.view.php:224
 #: ../../../inc/messaging/views/_thread_list.view.php:147
-#, fuzzy
 msgid "Read by"
-msgstr "Читать"
+msgstr "Прочитано"
 
 #: ../../../inc/messaging/views/_message_list.view.php:240
 msgid "Delete this message!"
 msgstr "Удалить это сообщение!"
 
 #: ../../../inc/messaging/views/_message_list.view.php:253
-#, fuzzy
 msgid "Reply to"
-msgstr "Список замен"
+msgstr "Ответить"
 
 #: ../../../inc/messaging/views/_thread.form.php:41
 msgid "New thread"
@@ -9126,54 +9117,45 @@ msgid "Subject"
 msgstr "Тема"
 
 #: ../../../inc/messaging/views/_thread.form.php:63
-#, fuzzy
 msgid "Group discussion"
-msgstr "Разрешения групп"
+msgstr "Групповые сообщения"
 
 #: ../../../inc/messaging/views/_thread.form.php:64
-#, fuzzy
 msgid "Individual messages"
-msgstr "Отправить сообщение"
+msgstr "Персональные сообщения"
 
 #: ../../../inc/messaging/views/_thread.form.php:65
-#, fuzzy
 msgid "Multiple recipients"
-msgstr "Несколько сессий"
+msgstr "Несколько адресатов"
 
 #: ../../../inc/messaging/views/_thread_list.view.php:109
-#, fuzzy
 msgid "Conversations list"
-msgstr "Список стран"
+msgstr ""
 
 #: ../../../inc/messaging/views/_thread_list.view.php:117
-#, fuzzy
 msgid "With"
-msgstr "Написать"
+msgstr "Адресаты"
 
 #: ../../../inc/messaging/views/_thread_list.view.php:129
 #: ../../../inc/messaging/views/_thread_list.view.php:130
-#, fuzzy
 msgid "Show messages..."
-msgstr "сообщений"
+msgstr ""
 
 #: ../../../inc/messaging/views/_thread_list.view.php:134
-#, fuzzy
 msgid "Unread since"
-msgstr "Срок"
+msgstr ""
 
 #: ../../../inc/messaging/views/_thread_list.view.php:160
-#, fuzzy
 msgid "Delete this thread!"
-msgstr "Удалить этот хит!"
+msgstr "Удалить эту ветку!"
 
 #: ../../../inc/messaging/views/_thread_list.view.php:165
 msgid "Compose new"
-msgstr ""
+msgstr "Создать"
 
 #: ../../../inc/messaging/views/_thread_list.view.php:165
-#, fuzzy
 msgid "Create a new conversation..."
-msgstr "Создать новую рубрику..."
+msgstr "Создать новый диалог..."
 
 #: ../../../inc/plugins/_plugin.class.php:336
 msgid "No desc available"
@@ -9759,14 +9741,14 @@ msgid "Country"
 msgstr "Страна"
 
 #: ../../../inc/regional/countries.ctrl.php:80
-#, fuzzy, php-format
+#, php-format
 msgid "Disabled country (%s, #%d)."
-msgstr "Отключен плагин \"%s\" (%s, #%d)."
+msgstr "Отключена страна \"%s\" (%s, #%d)."
 
 #: ../../../inc/regional/countries.ctrl.php:85
-#, fuzzy, php-format
+#, php-format
 msgid "Enabled country (%s, #%d)."
-msgstr "Включен плагин \"%s\" (%s, #%d)."
+msgstr "Включена страна \"%s\" (%s, #%d)."
 
 #: ../../../inc/regional/countries.ctrl.php:139
 #: ../../../inc/regional/countries.ctrl.php:193
@@ -9861,23 +9843,20 @@ msgstr "Новая страна"
 
 #: ../../../inc/regional/views/_country.form.php:61
 #: ../../../inc/regional/views/_country_list.view.php:170
-#, fuzzy
 msgid "Default Currency"
-msgstr "Значение по умолчанию"
+msgstr "Валюта по умолчанию"
 
 #: ../../../inc/regional/views/_country_list.view.php:56
 msgid "Countries list"
 msgstr "Список стран"
 
 #: ../../../inc/regional/views/_country_list.view.php:66
-#, fuzzy
 msgid "The country is enabled."
-msgstr "Плагин включен."
+msgstr "Страна включена."
 
 #: ../../../inc/regional/views/_country_list.view.php:70
-#, fuzzy
 msgid "The country is disabled."
-msgstr "Плагин отключен."
+msgstr "Страна отключена."
 
 #: ../../../inc/regional/views/_country_list.view.php:155
 #: ../../../inc/regional/views/_country_list.view.php:193
@@ -9885,14 +9864,12 @@ msgid "Edit this country..."
 msgstr "Редактировать эту страну..."
 
 #: ../../../inc/regional/views/_country_list.view.php:187
-#, fuzzy
 msgid "Disable the country!"
-msgstr "Отключить плагин!"
+msgstr "Отключить страну!"
 
 #: ../../../inc/regional/views/_country_list.view.php:191
-#, fuzzy
 msgid "Enable the country!"
-msgstr "Включить плагин!"
+msgstr "Включить страну!"
 
 #: ../../../inc/regional/views/_country_list.view.php:195
 msgid "Duplicate this country..."
@@ -9915,7 +9892,7 @@ msgstr "Новая валюта"
 #: ../../../inc/regional/views/_currency.form.php:54
 #: ../../../inc/regional/views/_currency_list.view.php:94
 msgid "Shortcut"
-msgstr ""
+msgstr "Ярлык"
 
 #: ../../../inc/regional/views/_currency_list.view.php:55
 msgid "Currencies list"
@@ -11080,14 +11057,12 @@ msgid "Special system skin for XML feeds like RSS and Atom"
 msgstr "Специальная системная тема для XML лент, таких как RSS и Atom"
 
 #: ../../../inc/skins/views/_skin.form.php:58
-#, fuzzy
 msgid "Special system skin for XML sitemaps"
-msgstr "Специальная системная тема для XML лент, таких как RSS и Atom"
+msgstr "Специальная системная тема для карт сайта ( XML sitemap )"
 
 #: ../../../inc/skins/views/_skin.form.php:58
-#, fuzzy
 msgid "XML Sitemap"
-msgstr "XML хиты"
+msgstr "XML карта сайта"
 
 #: ../../../inc/skins/views/_skin_list.view.php:32
 msgid "Installed skins"
@@ -11716,9 +11691,8 @@ msgid "Please enter a login."
 msgstr "Пожалуйста, введите логин."
 
 #: ../../../inc/users/model/_user.funcs.php:544
-#, fuzzy
 msgid "Please select country."
-msgstr "Пожалуйста, выберите тип данных."
+msgstr "Пожалуйста, выберите страну."
 
 #: ../../../inc/users/model/_user.funcs.php:581
 msgid "The password must be different from your login."
@@ -11738,28 +11712,24 @@ msgid "Email address"
 msgstr "Email адрес"
 
 #: ../../../inc/users/model/_userfield.class.php:84
-#, fuzzy
 msgid "Single word"
-msgstr "Футер одиночной записи"
+msgstr "Слово"
 
 #: ../../../inc/users/model/_userfield.class.php:85
-#, fuzzy
 msgid "Number"
-msgstr "N"
+msgstr "Число"
 
 #: ../../../inc/users/model/_userfield.class.php:86
-#, fuzzy
 msgid "Phone number"
-msgstr "Показать номера строк"
+msgstr "Телефонный номер"
 
 #: ../../../inc/users/model/_userfield.class.php:88
 msgid "Text"
 msgstr "Текст"
 
 #: ../../../inc/users/model/_userfield.class.php:108
-#, fuzzy
 msgid "Please enter a type."
-msgstr "Пожалуйста, введите mime тип."
+msgstr "Пожалуйста, введите тип."
 
 #: ../../../inc/users/registration.ctrl.php:52
 #: ../../../inc/users/users.ctrl.php:216
@@ -12189,14 +12159,12 @@ msgid "Other options"
 msgstr "Дополнительные настройки"
 
 #: ../../../inc/users/views/_registration.form.php:93
-#, fuzzy
 msgid "Enable country required."
-msgstr "Новая страна создана."
+msgstr "Запрашивать страну пользователя при регистрации"
 
 #: ../../../inc/users/views/_registration.form.php:93
-#, fuzzy
 msgid "Require country"
-msgstr "Новая страна"
+msgstr "Запрашивать страну"
 
 #: ../../../inc/users/views/_user.form.php:75
 msgid "Compose message"
@@ -12752,9 +12720,8 @@ msgid "Image size"
 msgstr "Размер изображения"
 
 #: ../../../inc/widgets/widgets/_coll_avatar.widget.php:86
-#, fuzzy
 msgid "List of available image sizes is defined in $thumbnail_sizes."
-msgstr "Список доступных размеров задается переменной %s."
+msgstr "Список доступных размеров изображений, заданных переменной $thumbnail_sizes."
 
 #: ../../../inc/widgets/widgets/_coll_category_list.widget.php:56
 msgid "Category list"
@@ -13112,9 +13079,8 @@ msgid "Number of columns in grid mode."
 msgstr "Количество колонок в режиме сетки."
 
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:109
-#, fuzzy
 msgid "IDs of the blogs to use, leave empty for the current blog. Separate multiple blogs by commas."
-msgstr "ID блога (оставьте пустым для использования текущего блога)."
+msgstr "Перечислите ID блогов, разделяя запятой. Оставьте пустым для использования текущего блога."
 
 #: ../../../inc/widgets/widgets/_coll_media_index.widget.php:123
 msgid "Photo index"
@@ -14041,9 +14007,9 @@ msgid "Make sure there is no existing and potentially locked configuration file 
 msgstr "Убедитесь в том, что конфигурационный файл с именем <code>%s</code> <u>не существует</ul>. Если такой файл уже существует, удалите его."
 
 #: ../../../install/index.php:315
-#, fuzzy, php-format
+#, php-format
 msgid "<code>chmod 777 %s</code>. If needed, see the <a %s>online manual about permissions</a>."
-msgstr "<code>chmod 666 %s</code>. Если необходимо, смотрите <a %s>онлайн руководство</a>."
+msgstr "<code>chmod 777 %s</code>. Если необходимо, смотрите <a %s>онлайн руководство</a> о разрешениях."
 
 #: ../../../install/index.php:316
 msgid "Come back to this page and refresh/reload."
