@@ -714,9 +714,9 @@ class _core_Module extends Module
 							'registration' => array(
 								'text' => T_('Registration'),
  								'href' => '?ctrl=registration' ),
-							/*'usersettings' => array(
+							'usersettings' => array(
 								'text' => T_('Settings'),
- 								'href' => '?ctrl=usersettings' ),*/
+ 								'href' => '?ctrl=usersettings' ),
 							);
 		}
 
@@ -772,6 +772,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.45  2009/10/25 19:20:30  efy-maxim
+ * users settings
+ *
  * Revision 1.44  2009/10/25 18:43:35  efy-maxim
  * -action
  *

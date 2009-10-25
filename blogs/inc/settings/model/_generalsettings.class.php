@@ -118,6 +118,9 @@ class GeneralSettings extends AbstractSettings
 		'eblog_subject_prefix' => 'blog:',			// blog by email
 		'general_xmlrpc' => 1,
 		'xmlrpc_default_title' => '',		//default title for posts created throgh blogger api
+
+		'nickname_editing' => 'edited-user',		// "never" - Never allow; "default-no" - Let users decide, default to "no" for new users; "default-yes" - Let users decide, default to "yes" for new users; "always" - Always allow
+		'login_multiple_sessions' => 'default-no',	// "edited-user" - Can be edited by user; "edited-admin" - Can be edited by admins only; "hidden" - Hidden
 	);
 
 
@@ -190,6 +193,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.21  2009/10/25 19:20:30  efy-maxim
+ * users settings
+ *
  * Revision 1.20  2009/09/14 13:42:12  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
