@@ -181,7 +181,7 @@ switch( $content_mode )
 						'after'       => $params['after_more_link'],
 						'link_text'   => $params['more_link_text'],
 					) );
-				if( ! empty($params['image_size']) && $more )
+				if( ! empty($params['image_size']) && $more && $Item->has_content_parts($params) /* only if not displayed all images already */ )
 				{
 					// Display images that are linked to this post:
 					$Item->images( array(
@@ -234,6 +234,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.22  2009/10/25 21:55:21  blueyed
+ * Display attached images only once, if they are positioned as 'aftermore' and there is no 'more'.
+ *
  * Revision 1.21  2009/10/11 03:00:11  blueyed
  * Add "position" and "order" properties to attachments.
  * Position can be "teaser" or "aftermore" for now.
