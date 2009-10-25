@@ -670,27 +670,13 @@ class _core_Module extends Module
 		{
 			if( $user_ID !== NULL )
 			{
-				$action = param_action( 'list' );
-
-				if( $action == 'list' )
-				{
-					if( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'edit' ) )
-					{
-						$action = 'edit';
-					}
-					else
-					{
-						$action = 'view';
-					}
-				}
-
 				$users_sub_entries = array();
 
 				$users_sub_entries['identity'] = array(
 								'text' => T_('Identity'),
 								'href' => '?ctrl=users&amp;tab=identity&amp;user_ID='.$user_ID	);
 
-				if( $action != 'view' )
+				if( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'edit' ) )
 				{
 					$users_sub_entries['password'] = array(
 									'text' => T_('Password'),
@@ -786,6 +772,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.44  2009/10/25 18:43:35  efy-maxim
+ * -action
+ *
  * Revision 1.43  2009/10/25 15:22:42  efy-maxim
  * user - identity, password, preferences tabs
  *
