@@ -393,7 +393,7 @@ class Message extends DataObject
 
 
 	/**
-	 * Check permission on a persona
+	 * Check permission on a message
 	 *
 	 * @return boolean true if granted
 	 */
@@ -478,6 +478,9 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.24  2009/10/25 23:39:27  fplanque
+ * doc
+ *
  * Revision 1.23  2009/10/10 10:45:43  efy-maxim
  * messaging module - @action_icon()@
  *
