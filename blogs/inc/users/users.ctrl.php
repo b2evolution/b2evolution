@@ -260,6 +260,11 @@ if( !$Messages->count('error') )
 					$edited_user_pass2 = '';
 				}
 
+				if( $Settings->get( 'nickname_editing' ) == 'hidden' )
+				{
+					$edited_User->set( 'nickname', $edited_User->login );
+				}
+
 				if( $is_identity_form )
 				{
 					// EXPERIMENTAL user fields:
@@ -725,6 +730,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.37  2009/10/25 21:33:06  efy-maxim
+ * nickname setting
+ *
  * Revision 1.36  2009/10/25 20:39:09  efy-maxim
  * multiple sessions
  *

@@ -17,6 +17,10 @@ global $UserSettings;
  */
 global $edited_User;
 /**
+ * @var instance of User class
+ */
+global $current_User;
+/**
  * @var current action
  */
 global $action;
@@ -145,7 +149,17 @@ if( $action != 'view' )
 	$Form->text_input( 'edited_user_login', $edited_User->login, 20, T_('Login'), '', array( 'required' => true ) );
 	$Form->text_input( 'edited_user_firstname', $edited_User->firstname, 20, T_('First name'), '', array( 'maxlength' => 50 ) );
 	$Form->text_input( 'edited_user_lastname', $edited_User->lastname, 20, T_('Last name'), '', array( 'maxlength' => 50 ) );
-	$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => true ) );
+
+	$nickname_editing = $Settings->get( 'nickname_editing' );
+	if( ( $nickname_editing == 'edited-user' && $edited_User->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $current_User->check_perm( 'users', 'edit' ) ) )
+	{
+		$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => true ) );
+	}
+	else
+	{
+		$Form->hidden( 'edited_user_nickname', $edited_User->nickname );
+	}
+
 	$Form->select( 'edited_user_idmode', $edited_User->get( 'idmode' ), array( &$edited_User, 'callback_optionsForIdMode' ), T_('Identity shown') );
 
 	$CountryCache = & get_CountryCache();
@@ -183,7 +197,7 @@ if( empty( $edited_User->ID ) && $action != 'view' )
 
 	/***************  Prefferences  **************/
 
-if( empty( $edited_User->ID ) )
+if( empty( $edited_User->ID ) && $action != 'view' )
 {	// New user will be created with default multiple_session setting
 	$Form->hidden( 'edited_user_set_login_multiple_sessions', $Settings->get( 'multiple_sessions' ) == 'default-yes' ? 1 : 0 );
 }
@@ -367,6 +381,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.3  2009/10/25 21:33:06  efy-maxim
+ * nickname setting
+ *
  * Revision 1.2  2009/10/25 20:39:10  efy-maxim
  * multiple sessions
  *
