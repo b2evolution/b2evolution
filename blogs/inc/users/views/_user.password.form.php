@@ -34,7 +34,7 @@ if( !$user_profile_only )
 $Form->begin_form( 'fform', sprintf( T_('Change %s password'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' ) );
 
 $Form->hidden_ctrl();
-$Form->hidden( 'tab', 'password' );
+$Form->hidden( 'user_tab', 'password' );
 $Form->hidden( 'password_form', '1' );
 
 $Form->hidden( 'user_ID', $edited_User->ID );
@@ -57,12 +57,8 @@ if( $action != 'view' )
 if( $action != 'view' )
 { // Edit buttons
 	$Form->buttons( array(
-		array( '', 'actionArray[update]', T_('Save !'), 'SaveButton' ),
-		array( 'reset', '', T_('Reset'), 'ResetButton' ),
-		// dh> TODO: Non-Javascript-confirm before trashing all settings with a misplaced click.
-		array( 'type' => 'submit', 'name' => 'actionArray[default_settings]', 'value' => T_('Restore defaults'), 'class' => 'ResetButton',
-			'onclick' => "return confirm('".TS_('This will reset all your user settings.').'\n'.TS_('This cannot be undone.').'\n'.TS_('Are you sure?')."');" ),
-	) );
+		array( '', 'actionArray[update]', T_('Change password!'), 'SaveButton' ),
+		array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
 
 
@@ -74,6 +70,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.2  2009/10/26 12:59:37  efy-maxim
+ * users management
+ *
  * Revision 1.1  2009/10/25 15:22:48  efy-maxim
  * user - identity, password, preferences tabs
  *

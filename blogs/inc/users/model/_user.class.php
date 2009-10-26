@@ -236,6 +236,8 @@ class User extends DataObject
 	 */
 	function load_from_Request()
 	{
+		global $Settings;
+
 		param( 'edited_user_login', 'string' );
 		param_check_not_empty( 'edited_user_login', T_('You must provide a login!') );
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
@@ -264,9 +266,16 @@ class User extends DataObject
 			param( 'edited_user_lastname', 'string', true );
 			$this->set_from_Request('lastname', 'edited_user_lastname', true);
 
-			param( 'edited_user_nickname', 'string', true );
-			param_check_not_empty( 'edited_user_nickname', T_('Please enter a nickname (can be the same as your login).') );
-			$this->set_from_Request('nickname', 'edited_user_nickname', true);
+			if( $Settings->get( 'nickname_editing' ) == 'hidden' )
+			{
+				$this->set_from_Request('nickname', 'edited_user_login', true);
+			}
+			else
+			{
+				param( 'edited_user_nickname', 'string', true );
+				param_check_not_empty( 'edited_user_nickname', T_('Please enter a nickname (can be the same as your login).') );
+				$this->set_from_Request('nickname', 'edited_user_nickname', true);
+			}
 
 			param( 'edited_user_idmode', 'string', true );
 			$this->set_from_Request('idmode', 'edited_user_idmode', true);
@@ -1850,6 +1859,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.60  2009/10/26 12:59:36  efy-maxim
+ * users management
+ *
  * Revision 1.59  2009/10/25 20:39:09  efy-maxim
  * multiple sessions
  *

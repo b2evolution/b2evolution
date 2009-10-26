@@ -663,29 +663,34 @@ class _core_Module extends Module
 			$user_ID = $current_User->ID;
 		}
 
+		$action = param( 'action', 'string', NULL );
+		$user_tab = param( 'user_tab', 'string', NULL );
 
-		$tab = param( 'tab', 'string', NULL );
-
-		if( ( $tab != NULL || $user_ID != NULL ) && $ctrl == 'users' )
+		if( $user_tab == NULL && $user_ID != NULL && $action != 'promote' && $action != 'delete' )
 		{
-			if( $user_ID !== NULL )
+			$user_tab = 'identity';
+		}
+
+		if( !empty( $user_tab ) && $ctrl == 'users' )
+		{
+			if( !empty( $user_ID ) )
 			{
 				$users_sub_entries = array();
 
 				$users_sub_entries['identity'] = array(
 								'text' => T_('Identity'),
-								'href' => '?ctrl=users&amp;tab=identity&amp;user_ID='.$user_ID	);
+								'href' => '?ctrl=users&amp;user_tab=identity&amp;user_ID='.$user_ID	);
 
 				if( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'edit' ) )
 				{
 					$users_sub_entries['password'] = array(
 									'text' => T_('Password'),
-									'href' => '?ctrl=users&amp;tab=password&amp;user_ID='.$user_ID );
+									'href' => '?ctrl=users&amp;user_tab=password&amp;user_ID='.$user_ID );
 				}
 
 				$users_sub_entries['preferences'] = array(
 								'text' => T_('Preferences'),
- 								'href' => '?ctrl=users&amp;tab=preferences&amp;user_ID='.$user_ID );
+ 								'href' => '?ctrl=users&amp;user_tab=preferences&amp;user_ID='.$user_ID );
 
 				$users_entries['entries'] = $users_sub_entries;
 			}
@@ -694,10 +699,8 @@ class _core_Module extends Module
 				$users_entries['entries'] = array(
 							'identity' => array(
 								'text' => T_('Identity'),
-								'href' => '?ctrl=users&amp;tab=identity' ) );
+								'href' => '?ctrl=users&amp;user_tab=identity' ) );
 			}
-
-
 		}
 		elseif( $current_User->check_perm( 'users', 'view' ) )
 		{
@@ -772,6 +775,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.46  2009/10/26 12:59:34  efy-maxim
+ * users management
+ *
  * Revision 1.45  2009/10/25 19:20:30  efy-maxim
  * users settings
  *

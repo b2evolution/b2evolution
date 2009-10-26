@@ -40,18 +40,18 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $AdminUI;
 
-param( 'tab', 'string' );
+param( 'user_tab', 'string' );
 
 param( 'user_ID', 'integer', NULL );	// Note: should NOT be memorized (would kill navigation/sorting) use memorize_param() if needed
 
-if( $tab == NULL && $user_ID != NULL )
+param_action( 'list' );
+
+if( $user_tab == NULL && $user_ID != NULL && $action != 'promote' && $action != 'delete' )
 {
-	$tab = 'identity';
+	$user_tab = 'identity';
 }
 
-$AdminUI->set_path( 'users', !empty( $tab ) ? $tab : 'users' );
-
-param_action( 'list' );
+$AdminUI->set_path( 'users', !empty( $user_tab ) ? $user_tab : 'users' );
 
 /**
  * @global boolean true, if user is only allowed to edit his profile
@@ -218,6 +218,8 @@ if( !$Messages->count('error') )
 			}
 
 			$is_identity_form = param( 'identity_form', 'boolean', false );
+			$is_password_form = param( 'password_form', 'boolean', false );
+			$is_preferences_form = param( 'preferences_form', 'boolean', false );
 
 			if( $is_identity_form && $current_User->check_perm( 'users', 'edit' ) )
 			{ // changing level/group is allowed (not in profile mode)
@@ -253,16 +255,13 @@ if( !$Messages->count('error') )
 							'href="?ctrl=users&amp;user_ID='.$q.'"' ) );
 				}
 
-
-				if( param( 'password_form', 'boolean', false ) && !param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', ($edited_User->ID == 0) ) ) // required for new users
-				{ // passwords not the same or empty: empty them for the form
-					$edited_user_pass1 = '';
-					$edited_user_pass2 = '';
-				}
-
-				if( $Settings->get( 'nickname_editing' ) == 'hidden' )
+				if( $is_password_form || $edited_User->ID == 0 )
 				{
-					$edited_User->set( 'nickname', $edited_User->login );
+					if( !param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', ($edited_User->ID == 0) ) ) // required for new users
+					{ // passwords not the same or empty: empty them for the form
+						$edited_user_pass1 = '';
+						$edited_user_pass2 = '';
+					}
 				}
 
 				if( $is_identity_form )
@@ -310,8 +309,6 @@ if( !$Messages->count('error') )
 						$edited_User->userfield_add( $new_uf_type, $new_uf_val );
 					}
 				}
-
-
 			}
 
 			if( $Messages->count( 'error' ) )
@@ -330,7 +327,12 @@ if( !$Messages->count('error') )
 				$edited_User->set( 'pass', $new_pass ); // set password
 			}
 
-			if( $edited_User->ID != 0 )
+			if( $is_password_form && empty( $new_pass ) )
+			{
+				$Messages->add( T_('Password has not been changed.'), 'note' );
+				$user_created = false;
+			}
+			elseif( $edited_User->ID )
 			{ // Commit update to the DB:
 				$update_r = $edited_User->dbupdate();
 
@@ -338,27 +340,32 @@ if( !$Messages->count('error') )
 				{ // User updates his profile:
 					if( $update_r )
 					{
-						$Messages->add( T_('Your profile has been updated.'), 'success' );
+						$msg = $is_password_form ? T_('Password has been changed.') : T_('Your profile has been updated.');
+						$Messages->add( $msg, 'success' );
 					}
 					else
 					{
-						$Messages->add( T_('Your profile has not been changed.'), 'note' );
+						$msg = $is_password_form ? T_('Password has not been changed.') : T_('Your profile has not been changed.');
+						$Messages->add( $msg, 'note' );
 					}
 				}
 				else
 				{
-					$Messages->add( T_('User updated.'), 'success' );
+					$msg = $is_password_form ? T_('Password has been changed') : T_('User has been updated.');
+					$Messages->add( $msg, 'success' );
 				}
+				$user_created = false;
 			}
 			else
 			{ // Insert user into DB
 				$edited_User->dbinsert();
-				$Messages->add( T_('New user created.'), 'success' );
+				$Messages->add( T_('New user has been created.'), 'success' );
+				$user_created = true;
 			}
 
 			// Now that the User exists in the DB and has an ID, update the settings:
 
-			if( param( 'preferences_form', 'boolean', false ) )
+			if( $is_preferences_form )
 			{
 				if( $UserSettings->set( 'admin_skin', $edited_user_admin_skin, $edited_User->ID )
 						&& ($edited_User->ID == $current_User->ID) )
@@ -386,68 +393,67 @@ if( !$Messages->count('error') )
 
 			if( isset( $edited_user_set_login_multiple_sessions ) )
 			{	// Multiple session
-				$UserSettings->set( 'login_multiple_sessions', $edited_user_set_login_multiple_sessions, $edited_User->ID );
+				$multiple_sessions = $Settings->get( 'multiple_sessions' );
+				if( ( $multiple_sessions != 'default-admin-no' && $multiple_sessions != 'default-admin-yes' ) || $current_User->check_perm( 'users', 'edit' ) )
+				{
+					$UserSettings->set( 'login_multiple_sessions', $edited_user_set_login_multiple_sessions, $edited_User->ID );
+				}
 			}
 
 			// Update user settings:
-			if( $UserSettings->dbupdate() )
+			if( !$is_password_form && $UserSettings->dbupdate() )
 			{
 				$Messages->add( T_('User feature settings have been changed.'), 'success');
 			}
 
-			// PluginUserSettings
-			load_funcs('plugins/_plugin.funcs.php');
-
-			$any_plugin_settings_updated = false;
-			$Plugins->restart();
-			while( $loop_Plugin = & $Plugins->get_next() )
+			if( $is_preferences_form )
 			{
-				$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
-				if( empty($pluginusersettings) )
+				// PluginUserSettings
+				load_funcs('plugins/_plugin.funcs.php');
+
+				$any_plugin_settings_updated = false;
+				$Plugins->restart();
+				while( $loop_Plugin = & $Plugins->get_next() )
 				{
-					continue;
+					$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
+					if( empty($pluginusersettings) )
+					{
+						continue;
+					}
+
+					// Loop through settings for this plugin:
+					foreach( $pluginusersettings as $set_name => $set_meta )
+					{
+						autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'UserSettings', $edited_User );
+					}
+
+					// Let the plugin handle custom fields:
+					$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array(
+						'User' => & $edited_User, 'action' => 'save' ) );
+
+					if( $ok_to_update === false )
+					{
+						$loop_Plugin->UserSettings->reset();
+					}
+					elseif( $loop_Plugin->UserSettings->dbupdate() )
+					{
+						$any_plugin_settings_updated = true;
+					}
 				}
 
-				// Loop through settings for this plugin:
-				foreach( $pluginusersettings as $set_name => $set_meta )
+				if( $any_plugin_settings_updated )
 				{
-					autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'UserSettings', $edited_User );
-				}
-
-				// Let the plugin handle custom fields:
-				$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array(
-					'User' => & $edited_User, 'action' => 'save' ) );
-
-				if( $ok_to_update === false )
-				{
-					$loop_Plugin->UserSettings->reset();
-				}
-				elseif( $loop_Plugin->UserSettings->dbupdate() )
-				{
-					$any_plugin_settings_updated = true;
+					$Messages->add( T_('Usersettings of Plugins have been updated.'), 'success' );
 				}
 			}
-			if( $any_plugin_settings_updated )
-			{
-				$Messages->add( T_('Usersettings of Plugins have been updated.'), 'success' );
-			}
 
-			if( $user_profile_only )
+			if( !$user_created )
 			{
-				$action = 'edit';
+				header_redirect( regenerate_url( '', 'user_ID='.$edited_User->ID.'&action=edit&user_tab='.$user_tab, '', '&' ) );
 			}
-
-			if( !empty( $tab ) )
+			else
 			{
-				header_redirect( regenerate_url( '', 'user_ID='.$edited_User->ID.'&action=edit&tab='.$tab, '', '&' ) );
-			}
-			if( $reload_page )
-			{ // reload the current page through header redirection:
-				if( $action != 'edit' )
-				{
-					$action = 'list';
-				}
-				header_redirect( regenerate_url( '', 'user_ID='.$edited_User->ID.'&action='.$action, '', '&' ) ); // will save $Messages into Session
+				header_redirect( regenerate_url( '', 'action=list', '', '&' ) );
 			}
 
 			break;
@@ -679,25 +685,11 @@ switch( $action )
 		// Display NO payload!
 		break;
 
-
-		case 'delete':
-			// We need to ask for confirmation:
-			$fullname = $edited_User->dget( 'fullname' );
-			if ( ! empty( $fullname ) )
-			{
-				$msg = sprintf( T_('Delete user &laquo;%s&raquo; [%s]?'), $fullname, $edited_User->dget( 'login' ) );
-			}
-			else
-			{
-				$msg = sprintf( T_('Delete user &laquo;%s&raquo;?'), $edited_User->dget( 'login' ) );
-			}
-
-			$edited_User->confirm_delete( $msg, $action, get_memorized( 'action' ) );
 		case 'new':
 		case 'view':
 		case 'edit':
 
-			switch( $tab )
+			switch( $user_tab )
 			{
 				case 'identity':
 					// Display user identity form:
@@ -715,6 +707,20 @@ switch( $action )
 
 			break;
 
+	case 'delete':
+			// We need to ask for confirmation:
+			$fullname = $edited_User->dget( 'fullname' );
+			if ( ! empty( $fullname ) )
+			{
+				$msg = sprintf( T_('Delete user &laquo;%s&raquo; [%s]?'), $fullname, $edited_User->dget( 'login' ) );
+			}
+			else
+			{
+				$msg = sprintf( T_('Delete user &laquo;%s&raquo;?'), $edited_User->dget( 'login' ) );
+			}
+
+			$edited_User->confirm_delete( $msg, $action, get_memorized( 'action' ) );
+
 	case 'promote':
 	default:
 		// Display user list:
@@ -730,6 +736,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.38  2009/10/26 12:59:36  efy-maxim
+ * users management
+ *
  * Revision 1.37  2009/10/25 21:33:06  efy-maxim
  * nickname setting
  *

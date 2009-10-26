@@ -29,8 +29,10 @@ $Form->radio( 'uset_nickname_editing', $Settings->get( 'nickname_editing' ), arr
 
 $Form->radio( 'uset_multiple_sessions', $Settings->get( 'multiple_sessions' ), array(
 					array( 'never', T_('Never allow') ),
-					array( 'default-no', T_('Let users decide, default to "no" for new users') ),
-					array( 'default-yes', T_('Let users decide, default to "yes" for new users') ),
+					array( 'default-admin-no', T_('Let admins decide for each user, default to "no" for new users') ),
+					array( 'default-user-no', T_('Let users decide, default to "no" for new users') ),
+					array( 'default-user-yes', T_('Let users decide, default to "yes" for new users') ),
+					array( 'default-admin-yes', T_('Let admins decide for each user, default to "yes" for new users') ),
 					array( 'always', T_('Always allow') )
 				), T_('Multiple sessions'), true );
 
@@ -46,6 +48,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.4  2009/10/26 12:59:37  efy-maxim
+ * users management
+ *
  * Revision 1.3  2009/10/25 19:24:51  efy-maxim
  * multiple_sessions param
  *

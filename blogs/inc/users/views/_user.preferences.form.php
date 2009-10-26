@@ -42,7 +42,7 @@ if( !$user_profile_only )
 $Form->begin_form( 'fform', sprintf( T_('Edit %s preferences'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' ) );
 
 $Form->hidden_ctrl();
-$Form->hidden( 'tab', 'preferences' );
+$Form->hidden( 'user_tab', 'preferences' );
 $Form->hidden( 'preferences_form', '1' );
 
 $Form->hidden( 'user_ID', $edited_User->ID );
@@ -87,21 +87,37 @@ if( $action != 'view' )
 	$Form->text( 'edited_user_results_per_page', $UserSettings->get( 'results_per_page', $edited_User->ID ), 3, T_('Results per page'), T_('Number of rows displayed in results tables.') );
 
 	// Enable/disable multiple sessions for the current user
+	$multiple_sessions = $Settings->get( 'multiple_sessions' );
+	switch( $multiple_sessions )
+	{
+		case 'never':
+		case 'always':
+			$multiple_sessions_field_hidden = true;
+			$multiple_sessions_field_disabled = true;
+			break;
+		default:
+			$multiple_sessions_field_hidden = false;
+			if( ( $multiple_sessions == 'default-admin-no' || $multiple_sessions == 'default-admin-yes' ) && !$current_User->check_perm( 'users', 'edit' ) )
+			{
+				$multiple_sessions_field_disabled = true;
+			}
+			else
+			{
+				$multiple_sessions_field_disabled = false;
+			}
+	}
+
 	$multiple_sessions_value = $UserSettings->get( 'login_multiple_sessions', $edited_User->ID );
 
-	switch( $Settings->get( 'multiple_sessions' ) )
+	if( $multiple_sessions_field_hidden )
 	{
-		case 'default-no':
-		case 'default-yes':
-
-			$Form->checkbox( 'edited_user_set_login_multiple_sessions', $multiple_sessions_value, T_('Multiple sessions'),
-				T_('Check this if you want to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will disconnect you on the previous one.') );
-			break;
-
-		default:
-
-			$Form->hidden( 'edited_user_set_login_multiple_sessions', $multiple_sessions_value );
-			break;
+		$Form->hidden( 'edited_user_set_login_multiple_sessions', $multiple_sessions_value );
+	}
+	else
+	{
+		$Form->checkbox( 'edited_user_set_login_multiple_sessions', $multiple_sessions_value, T_('Multiple sessions'),
+				T_('Check this if you want to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will disconnect you on the previous one.'),
+				'', 1, $multiple_sessions_field_disabled );
 	}
 }
 else
@@ -192,6 +208,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.3  2009/10/26 12:59:37  efy-maxim
+ * users management
+ *
  * Revision 1.2  2009/10/25 20:39:10  efy-maxim
  * multiple sessions
  *

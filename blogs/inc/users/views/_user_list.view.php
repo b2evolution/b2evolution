@@ -98,7 +98,7 @@ $Results->title = T_('Groups & Users');
  */
 if( $current_User->check_perm( 'users', 'edit', false ) )
 { // create new user link
-	$Results->global_icon( T_('Create a new user...'), 'new', '?ctrl=users&amp;action=new&amp;tab=identity', T_('Add user').' &raquo;', 3, 4  );
+	$Results->global_icon( T_('Create a new user...'), 'new', '?ctrl=users&amp;action=new&amp;user_tab=identity', T_('Add user').' &raquo;', 3, 4  );
 	$Results->global_icon( T_('Create a new group...'), 'new', '?ctrl=groups&amp;action=new', T_('Add group').' &raquo;', 3, 4  );
 }
 
@@ -312,11 +312,11 @@ else
 	$Results->cols[] = array(
 						'th' => T_('Actions'),
 						'td_class' => 'shrinkwrap',
-						'td' => action_icon( T_('Edit this user...'), 'edit', '%regenerate_url( \'action\', \'user_ID=$user_ID$&amp;tab=identity\' )%' )
+						'td' => action_icon( T_('Edit this user...'), 'edit', '%regenerate_url( \'action\', \'user_ID=$user_ID$&amp;user_tab=identity\' )%' )
 										.action_icon( T_('Duplicate this user...'), 'copy', '%regenerate_url( \'action\', \'action=new&amp;user_ID=$user_ID$\' )%' )
 										.'¤conditional( (#user_ID# != 1) && (#nb_blogs# < 1) && (#user_ID# != '.$current_User->ID.'), \''
 											.action_icon( T_('Delete this user!'), 'delete',
-												'%regenerate_url( \'action\', \'action=delete_user&amp;user_ID=$user_ID$\' )%' ).'\', \''
+												'%regenerate_url( \'action\', \'action=delete&amp;user_ID=$user_ID$\' )%' ).'\', \''
 	                    .get_icon( 'delete', 'noimg' ).'\' )¤'
 					);
 }
@@ -328,6 +328,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.19  2009/10/26 12:59:37  efy-maxim
+ * users management
+ *
  * Revision 1.18  2009/10/25 15:22:47  efy-maxim
  * user - identity, password, preferences tabs
  *

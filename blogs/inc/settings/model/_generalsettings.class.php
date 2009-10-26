@@ -120,7 +120,7 @@ class GeneralSettings extends AbstractSettings
 		'xmlrpc_default_title' => '',		//default title for posts created throgh blogger api
 
 		'nickname_editing' => 'edited-user',		// "never" - Never allow; "default-no" - Let users decide, default to "no" for new users; "default-yes" - Let users decide, default to "yes" for new users; "always" - Always allow
-		'multiple_sessions' => 'default-no',		// "edited-user" - Can be edited by user; "edited-admin" - Can be edited by admins only; "hidden" - Hidden
+		'multiple_sessions' => 'default-user-no',	// "edited-user" - Can be edited by user; "edited-admin" - Can be edited by admins only; "hidden" - Hidden
 	);
 
 
@@ -193,6 +193,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.23  2009/10/26 12:59:36  efy-maxim
+ * users management
+ *
  * Revision 1.22  2009/10/25 19:24:51  efy-maxim
  * multiple_sessions param
  *
