@@ -1025,7 +1025,7 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 
 				if( !$linebreak )
 				{
-					$current_data = '<p>'.trim( $current_data ).'</p>';
+					$current_data = trim( $current_data );
 				}
 				$new_Item->set_param( 'content', 'string', $current_data );
 
@@ -1042,6 +1042,9 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 
 /*
  * $Log$
+ * Revision 1.78  2009/10/26 17:58:57  efy-maxim
+ * mass create fix and design improvement
+ *
  * Revision 1.77  2009/10/19 13:28:15  efy-maxim
  * paragraphs at each line break or separate posts with a blank line
  *

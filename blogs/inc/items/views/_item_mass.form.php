@@ -132,18 +132,17 @@ for( $i = 1 ; $i <= 3; $i++ )
 	$Form->hidden( 'mass_create', '1' );
 
 	// ---------------------------- TEXTAREA -------------------------------------
-	$Form->fieldstart = '<div class="edit_area">';
+	$Form->fieldstart = '<div>';
 	$Form->fieldend = "</div>\n";
-	$Form->textarea_input( 'content', $item_content, 16, '', array( 'cols' => 40 , 'rows' => 33, 'id' => 'itemform_post_content' ) );
+	$Form->textarea_input( 'content', $item_content, 16, '', array( 'style' => 'width: 99%', 'note' => T_('Separate posts with a blank line'), 'cols' => 40 , 'rows' => 33, 'id' => 'itemform_post_content' ) );
 	$Form->fieldstart = '<div class="tile">';
 	$Form->fieldend = '</div>';
 
-	$Form->end_fieldset();
+	echo '<br/>';
 
 	// ------------------------------- SETTINGS ---------------------------------
 
-	$Form->begin_fieldset( T_('Separate posts with a blank line') );
-	$Form->checkbox( 'paragraphs_linebreak', false, '', T_( 'Create paragraphs at each line break' ) );
+	$Form->checkbox( 'paragraphs_linebreak', false, '', T_( 'Create paragraphs at each line break' ), 'compose_layout' );
 
 	// ------------------------------- ACTIONS ----------------------------------
 
@@ -155,8 +154,6 @@ for( $i = 1 ; $i <= 3; $i++ )
 	echo '</div>';
 
 	$Form->end_fieldset();
-
-
 
 	?>
 
@@ -225,6 +222,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.6  2009/10/26 17:58:58  efy-maxim
+ * mass create fix and design improvement
+ *
  * Revision 1.5  2009/10/19 13:28:16  efy-maxim
  * paragraphs at each line break or separate posts with a blank line
  *
