@@ -358,7 +358,7 @@ class AdminUI_general extends Menu
 	 *
 	 * Typically includes title, menu, messages, etc.
 	 */
-	function disp_body_top()
+	function disp_body_top( $display_messages = true )
 	{
 		global $skins_path, $mode;
 
@@ -377,8 +377,10 @@ class AdminUI_general extends Menu
 			$mode = preg_replace( '¤[^a-z]¤', '', $mode );	// sanitize
 			echo '<div id="'.$mode.'_wrapper">';
 
-			// Display info & error messages
-			$Messages->display( NULL, NULL, true, 'all', NULL, NULL, 'action_messages' );
+			if( $display_messages )
+			{ // Display info & error messages
+				$Messages->display( NULL, NULL, true, 'all', NULL, NULL, 'action_messages' );
+			}
 			return;
 		}
 
@@ -1290,6 +1292,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.102  2009/10/27 22:40:21  fplanque
+ * removed UGLY UGLY UGLY messages from iframe
+ *
  * Revision 1.101  2009/10/12 23:03:32  blueyed
  * Fix displaying of Messages in $mode windows (e.g. file uploads) and enable
  * them in the attachment iframe.

@@ -86,6 +86,9 @@ switch( $action )
 		// Name of the iframe we want some action to come back to:
 		param( 'iframe_name', 'string', '', true );
 
+		// TODO fp> when moving an "after_more" above a "teaser" img, it should change to "teaser" too.
+		// TODO fp> when moving a "teaser" below an "aftermore" img, it should change to "aftermore" too.
+
 		param( 'link_ID', 'integer', true );
 		$LinkCache = & get_LinkCache();
 		if( ($edited_Link = & $LinkCache->get_by_ID( $link_ID, false )) !== false )
@@ -733,6 +736,9 @@ switch( $action )
 
 		$itemLinks = $edited_Item->get_Links();
 
+		// TODO fp> when moving an "after_more" above a "teaser" img, it should change to "teaser" too.
+		// TODO fp> when moving a "teaser" below an "aftermore" img, it should change to "aftermore" too.
+
 		// Switch order with the next/prev one
 		if( $action == 'link_move_up' )
 		{
@@ -1068,7 +1074,7 @@ if( ! empty( $Blog->skin_ID) )
 $AdminUI->disp_html_head();
 
 // Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-$AdminUI->disp_body_top();
+$AdminUI->disp_body_top( $mode != 'iframe' );	// do NOT display stupid messages in iframe (UGLY UGLY UGLY!!!!)
 
 
 /**
@@ -1080,6 +1086,7 @@ switch( $action )
 	case 'nil':
 		// Do nothing
 		break;
+
 
   case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
@@ -1119,8 +1126,8 @@ switch( $action )
 		$AdminUI->disp_payload_end();
 		break;
 
-	case 'new_mass':
 
+	case 'new_mass':
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
@@ -1137,6 +1144,7 @@ switch( $action )
 		$AdminUI->disp_payload_end();
 
 		break;
+
 
 	case 'view':
 	case 'delete':
@@ -1156,10 +1164,12 @@ switch( $action )
 
 		break;
 
+
 	case 'edit_links':
 		// View attachments
 		$AdminUI->disp_view( 'items/views/_item_links.view.php' );
 		break;
+
 
 	case 'history':
 		memorize_param( 'action', 'string', NULL );
@@ -1173,6 +1183,7 @@ switch( $action )
 		// End payload block:
 		$AdminUI->disp_payload_end();
 		break;
+
 
 	case 'list':
 	default:
@@ -1242,6 +1253,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.74  2009/10/27 22:40:22  fplanque
+ * removed UGLY UGLY UGLY messages from iframe
+ *
  * Revision 1.73  2009/10/19 13:28:13  efy-maxim
  * paragraphs at each line break or separate posts with a blank line
  *
