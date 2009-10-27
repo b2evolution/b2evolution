@@ -822,13 +822,16 @@ function is_absolute_pathname($path)
  * @link http://us2.php.net/manual/en/function.sys-get-temp-dir.php#93390
  * @return string NULL on failure
  */
-if ( !function_exists('sys_get_temp_dir')) {
-  function sys_get_temp_dir() {
+if ( !function_exists('sys_get_temp_dir')) 
+{
+  function sys_get_temp_dir() 
+	{
     if (!empty($_ENV['TMP'])) { return realpath($_ENV['TMP']); }
     if (!empty($_ENV['TMPDIR'])) { return realpath( $_ENV['TMPDIR']); }
     if (!empty($_ENV['TEMP'])) { return realpath( $_ENV['TEMP']); }
     $tempfile=tempnam(__FILE__,'');
-    if (file_exists($tempfile)) {
+    if (file_exists($tempfile)) 
+		{
       unlink($tempfile);
       return realpath(dirname($tempfile));
     }
@@ -840,6 +843,9 @@ if ( !function_exists('sys_get_temp_dir')) {
 
 /*
  * $Log$
+ * Revision 1.27  2009/10/27 22:40:50  fplanque
+ * minor
+ *
  * Revision 1.26  2009/10/16 20:02:19  blueyed
  * Add function sys_get_temp_dir if it does not exist.
  *
