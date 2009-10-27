@@ -656,8 +656,68 @@ function get_avatar_imgtags( $user_logins_list, $show_login = true, $link = true
 }
 
 
+/**
+ * Convert seconds duration
+ * @param integer seconds
+ * @return string
+ */
+function seconds_to_fields( $duration )
+{
+	$fields = '';
+
+	$month_seconds = 2592000; // 1 month
+	$months = floor( $duration / $month_seconds );
+	$duration = $duration - $months * $month_seconds;
+	if( $months > 0 )
+	{
+		$fields .= $months.' months ';
+	}
+
+	$day_seconds = 86400; // 1 day
+	$days = floor( $duration / $day_seconds );
+	$duration = $duration - $days * $day_seconds;
+	if( $days > 0 )
+	{
+		$fields .= $days.' days ';
+	}
+
+	$hour_seconds = 3600; // 1 hour
+	$hours = floor( $duration / $hour_seconds );
+	$duration = $duration - $hours * $hour_seconds;
+	if( $hours > 0 )
+	{
+		$fields .= $hours.' hours ';
+	}
+
+	$minute_seconds = 60; // 1 minute
+	$minutes = floor( $duration / $minute_seconds );
+	$duration = $duration - $minutes * $minute_seconds;
+	if( $minutes > 0 )
+	{
+		$fields .= $minutes.' minutes ';
+	}
+
+	$seconds = $duration;
+	if( $seconds > 0 )
+	{
+		$fields .= $seconds.' seconds ';
+	}
+
+	$fields = trim( $fields );
+	if( empty( $fields ) )
+	{
+		$fields = '0';
+	}
+
+	return $fields;
+}
+
+
 /*
  * $Log$
+ * Revision 1.21  2009/10/27 16:43:34  efy-maxim
+ * custom session timeout
+ *
  * Revision 1.20  2009/09/26 12:00:44  tblue246
  * Minor/coding style
  *

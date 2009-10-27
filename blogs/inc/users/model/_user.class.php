@@ -335,6 +335,8 @@ class User extends DataObject
 
 			param( 'edited_user_focusonfirst', 'integer', 0 );
 			param( 'edited_user_results_per_page', 'integer', null );
+
+			param( 'edited_user_timeout_sessions', 'string', null );
 		}
 
 		if( $is_preferences_form || ( $is_identity_form && $this->ID == 0 ) )
@@ -1859,6 +1861,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.61  2009/10/27 16:43:34  efy-maxim
+ * custom session timeout
+ *
  * Revision 1.60  2009/10/26 12:59:36  efy-maxim
  * users management
  *

@@ -119,6 +119,34 @@ if( $action != 'view' )
 				T_('Check this if you want to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will disconnect you on the previous one.'),
 				'', 1, $multiple_sessions_field_disabled );
 	}
+
+	// Session time out for the current user
+	$timeout_sessions = $UserSettings->get( 'timeout_sessions', $edited_User->ID );
+
+	if( empty( $timeout_sessions ) )
+	{
+		$timeout_sessions_selected = 'default';
+		$timeout_sessions = $Settings->get( 'timeout_sessions', $edited_User->ID );
+	}
+	else
+	{
+		$timeout_sessions_selected = 'custom';
+	}
+
+	if( $current_User->check_perm( 'users', 'edit' ) )
+	{
+		$Form->radio( 'edited_user_timeout_sessions', $timeout_sessions_selected, array(
+					array( 'default', T_('use default duration') ),
+					array( 'custom', T_('use custom duration') ),
+				), T_('Session timeout'), true );
+
+		$Form->duration_input( 'timeout_sessions', $timeout_sessions, T_('Custom duration'), array( 'minutes_step' => 1 ), 'months', 'seconds' );
+	}
+	else
+	{
+		$Form->info( T_('Session timeout'), $timeout_sessions_selected );
+		$Form->info( T_('Custom duration'), seconds_to_fields( $timeout_sessions ) );
+	}
 }
 else
 { // display only
@@ -208,6 +236,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.4  2009/10/27 16:43:35  efy-maxim
+ * custom session timeout
+ *
  * Revision 1.3  2009/10/26 12:59:37  efy-maxim
  * users management
  *

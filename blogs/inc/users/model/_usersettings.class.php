@@ -70,6 +70,7 @@ class UserSettings extends AbstractSettings
 		'blogperms_layout' => 'default',	// selected view in blog (user/group) perms
 
 		'login_multiple_sessions' => 1, 	// allow multiple concurrent sessions? (PARAMOUNT ON DEMO SERVER)
+		'timeout_sessions' => NULL,			// user session timeout
 
 		'results_per_page' => 20,
 	);
@@ -210,6 +211,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.9  2009/10/27 16:43:34  efy-maxim
+ * custom session timeout
+ *
  * Revision 1.8  2009/10/17 16:31:33  efy-maxim
  * Renamed: T_groupsettings to T_groups__groupsettings, T_usersettings to T_users__usersettings
  *

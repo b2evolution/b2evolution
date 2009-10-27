@@ -103,7 +103,7 @@ class Session
 	 */
 	function Session()
 	{
-		global $DB, $Debuglog, $current_User, $localtimenow, $Messages, $Settings;
+		global $DB, $Debuglog, $current_User, $localtimenow, $Messages, $Settings, $UserSettings;
 		global $Hit;
 		global $cookie_session, $cookie_expires, $cookie_path, $cookie_domain;
 
@@ -128,12 +128,23 @@ class Session
 
 				$Debuglog->add( 'Session ID received from cookie: '.$session_id_by_cookie, 'session' );
 
+				$timeout_sessions = NULL;
+				if( $this->user_ID != NULL )
+				{	// User is not anonymous and we can get custom session timeout
+					$timeout_sessions = $UserSettings->get( 'timeout_sessions', $this->user_ID );
+				}
+
+				if( empty( $timeout_sessions ) )
+				{	// User is anonymous or he has not custom session timeout. So, we use default session timeout.
+					$timeout_sessions = $Settings->get('timeout_sessions');
+				}
+
 				$row = $DB->get_row( '
 					SELECT sess_ID, sess_key, sess_data, sess_user_ID
 					  FROM T_sessions
 					 WHERE sess_ID  = '.$DB->quote($session_id_by_cookie).'
 					   AND sess_key = '.$DB->quote($session_key_by_cookie).'
-					   AND UNIX_TIMESTAMP(sess_lastseen) > '.($localtimenow - $Settings->get('timeout_sessions')) );
+					   AND UNIX_TIMESTAMP(sess_lastseen) > '.( $localtimenow - $timeout_sessions ) );
 				if( empty( $row ) )
 				{
 					$Debuglog->add( 'Session ID/key combination is invalid!', 'session' );
@@ -548,6 +559,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.19  2009/10/27 16:43:33  efy-maxim
+ * custom session timeout
+ *
  * Revision 1.18  2009/10/25 22:02:43  efy-maxim
  * 1. multiple sessions check
  * 2. user form deleted

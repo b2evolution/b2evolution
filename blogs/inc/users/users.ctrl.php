@@ -389,6 +389,29 @@ if( !$Messages->count('error') )
 				{
 					$UserSettings->set( 'results_per_page', $edited_user_results_per_page, $edited_User->ID );
 				}
+
+				// Session timeout
+				if( isset( $edited_user_timeout_sessions ) && $current_User->check_perm( 'users', 'edit' ) )
+				{
+					switch( $edited_user_timeout_sessions )
+					{
+						case 'default':
+							$UserSettings->set( 'timeout_sessions', NULL, $edited_User->ID );
+							break;
+						case 'custom':
+							$timeout_sessions_months = param( 'timeout_sessions_months', 'integer', 0 );
+							$timeout_sessions_days = param( 'timeout_sessions_days', 'integer', 0 );
+							$timeout_sessions_hours = param( 'timeout_sessions_hours', 'integer', 0 );
+							$timeout_sessions_minutes = param( 'timeout_sessions_minutes', 'integer', 0 );
+							$timeout_sessions_seconds = param( 'timeout_sessions_seconds', 'integer', 0 );
+
+							$timeout_sessions = ( ( ( $timeout_sessions_months*30 + $timeout_sessions_days )*24
+										+ $timeout_sessions_hours )*60 + $timeout_sessions_minutes )*60 + $timeout_sessions_seconds;
+
+							$UserSettings->set( 'timeout_sessions', $timeout_sessions, $edited_User->ID );
+							break;
+					}
+				}
 			}
 
 			if( isset( $edited_user_set_login_multiple_sessions ) )
@@ -736,6 +759,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.39  2009/10/27 16:43:34  efy-maxim
+ * custom session timeout
+ *
  * Revision 1.38  2009/10/26 12:59:36  efy-maxim
  * users management
  *
