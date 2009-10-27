@@ -73,29 +73,27 @@ class maintenance_Module extends Module
 	/**
 	 * Get available group permissions
 	 *
-	 * @return array
+	 * @return array (may contain several permission blocks)
 	 */
 	function get_available_group_permissions()
 	{
-		// Create permission options which will be used also to create radio buttons of the group form
-		// e.g. array ( radio_button_value, radio_button_label, radio_button_note )
-		$none_option 	= array( 'none', T_( 'No maintenance permission' ), '' );
-		$backup_option 	= array( 'backup', T_( 'Users can create backups' ), '' );
-		$upgrade_option 	= array( 'upgrade', T_( 'Users can create backups & upgrade the app' ), '' );
-
-		// Create permission and set permission options to it.
 		// 'label' is used in the group form as label for radio buttons group
-		// 'user_func' is used to check user permission. This function should be defined in module initializer.
-		// 'group_func' is used to check group permission. This function should be defined in module initializer.
-		// 'available' is permission options
-		$permissions = array( 'perm_maintenance' => array( 'label' => T_('Maintenance'),
-										'user_func'  => 'check_maintenance_user_perm',
-										'group_func' => 'check_maintenance_group_perm',
-										'available'  => array($none_option,
-															$backup_option,
-															$upgrade_option  ) ) );
-		// We can return as many permissions as we want.
-		// In other words, one module can return many pluggable permissions.
+		// 'user_func' function used to check user permission. This function should be defined in Module.
+		// 'group_func' function used to check group permission. This function should be defined in Module.
+		// 'available' is permission options - TODO: rename to 'options'
+		$permissions = array( 
+			'perm_maintenance' => array( 
+				'label' => T_('Maintenance'),
+				'user_func'  => 'check_maintenance_user_perm',
+				'group_func' => 'check_maintenance_group_perm',
+				'available'  => array(
+						// format: array( radio_button_value, radio_button_label, radio_button_note )
+						array( 'none', T_( 'No Access' ), '' ),
+						array( 'backup', T_( 'Create backups' ), '' ),
+						array( 'upgrade', T_( 'Create backups & upgrade b2evolution' ), '' ), 
+					), 
+				),
+			);
 		return $permissions;
 	}
 
@@ -184,6 +182,9 @@ $maintenance_Module = & new maintenance_Module();
 
 /*
  * $Log$
+ * Revision 1.3  2009/10/27 18:21:52  fplanque
+ * no message
+ *
  * Revision 1.2  2009/10/19 07:04:20  efy-maxim
  * code formatting
  *
