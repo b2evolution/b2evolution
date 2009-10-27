@@ -99,7 +99,7 @@ if( !empty( $s ) )
 								ORDER BY mts.tsta_first_unread_msg_ID DESC, mt.thrd_datemodified DESC) AS threads
 					WHERE CONCAT_WS( " ", threads.thrd_title, threads.thrd_recipients, threads.thrd_usernames) LIKE "%'.$DB->escape($s).'%"';
 
-	// Create COUNT quiery
+	// Create COUNT query
 	$count_SQL = 'SELECT COUNT(*) FROM
 					(SELECT mt.thrd_title,
 						(SELECT GROUP_CONCAT(ru.user_login SEPARATOR \', \')
@@ -185,7 +185,7 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-					'th' => T_('Date'),
+					'th' => T_('Last message'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'shrinkwrap',
 					'td' => '¤conditional( #thrd_msg_ID#>0, \'<span style="color:red">%mysql2localedatetime(#thrd_unread_since#)%</span>\', \'<span style="color:green">%mysql2localedatetime(#thrd_datemodified#)%</span>\')¤' );
@@ -221,6 +221,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.24  2009/10/27 18:48:48  fplanque
+ * minor
+ *
  * Revision 1.23  2009/10/11 12:15:51  efy-maxim
  * filter by author of the message and message text
  *
