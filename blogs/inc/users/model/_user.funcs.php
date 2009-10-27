@@ -658,6 +658,7 @@ function get_avatar_imgtags( $user_logins_list, $show_login = true, $link = true
 
 /**
  * Convert seconds duration
+ *
  * @param integer seconds
  * @return string
  */
@@ -715,6 +716,9 @@ function seconds_to_fields( $duration )
 
 /*
  * $Log$
+ * Revision 1.22  2009/10/27 23:06:46  fplanque
+ * doc
+ *
  * Revision 1.21  2009/10/27 16:43:34  efy-maxim
  * custom session timeout
  *

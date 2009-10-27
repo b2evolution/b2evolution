@@ -2610,7 +2610,6 @@ function upgrade_b2evo_tables()
 	// Add link_position. Temporary allow NULL, set compatibility default, then do not allow NULL.
 	// TODO: dh> actually, using "teaser" for the first link and "aftermore" for the rest would make more sense (and "aftermore" should get displayed with "no-more" posts anyway).
 	//           Opinions? Could be heavy to transform this though..
-	// fp> what do 'teaser' & 'aftermore' mean?
 	db_add_col( 'T_links', 'link_position', "varchar(10) NULL AFTER link_title" );
 	$DB->query( "UPDATE T_links SET link_position = 'teaser' WHERE link_position IS NULL" );
 	db_add_col( 'T_links', 'link_position', "varchar(10) NOT NULL AFTER link_title" ); // change to NOT NULL
@@ -2752,6 +2751,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.343  2009/10/27 23:06:43  fplanque
+ * doc
+ *
  * Revision 1.342  2009/10/27 21:57:43  fplanque
  * minor/doc
  *

@@ -153,6 +153,7 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 
 // ----------------------------------------
 // Display all of the pluggable permissions
+// TODO fp>max: move some down to next block
 
 $GroupSettings = & $edited_Group->get_GroupSettings();
 foreach( $GroupSettings->permission_modules as $perm_name => $module_name )
@@ -217,6 +218,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.18  2009/10/27 23:06:46  fplanque
+ * doc
+ *
  * Revision 1.17  2009/10/08 20:05:52  efy-maxim
  * Modular/Pluggable Permissions
  *

@@ -60,6 +60,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	}
 
 	// Session timeout
+	// TODO: fp>max please create a param_duration('timeout_sessions') to factorize the following...
 	$timeout_sessions_months = param( 'timeout_sessions_months', 'integer', 0 );
 	$timeout_sessions_days = param( 'timeout_sessions_days', 'integer', 0 );
 	$timeout_sessions_hours = param( 'timeout_sessions_hours', 'integer', 0 );
@@ -87,7 +88,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 
 	if( $reloadpage_timeout > 99999 )
 	{
-		param_error( 'reloadpage_timeout', sprintf( T_( 'Reload-page timeout must be between %d and %d.' ), 0, 99999 ) );
+		param_error( 'reloadpage_timeout', sprintf( T_( 'Reload-page timeout must be between %d and %d seconds.' ), 0, 99999 ) );
 	}
 	$Settings->set( 'reloadpage_timeout', $reloadpage_timeout );
 
@@ -148,6 +149,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2009/10/27 23:06:46  fplanque
+ * doc
+ *
  * Revision 1.15  2009/10/27 13:27:49  efy-maxim
  * 1. months and seconds fields in duration field
  * 2. duration fields instead simple text fields
