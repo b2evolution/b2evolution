@@ -1043,41 +1043,90 @@ class Form extends Widget
 	 * @param string label displayed in front of the field
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - minutes_step ( default = 15 );
+	 * @param string display from field: months, days, hours, minutes, seconds
+	 * @param string display to field: months, days, hours, minutes, seconds
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function duration_input( $field_prefix, $duration, $field_label, $field_params = array() )
+	function duration_input( $field_prefix, $duration, $field_label, $field_params = array(), $from_subfield = 'days', $to_subfield = 'minutes' )
 	{
 		$this->handle_common_params( $field_params, $field_prefix, $field_label );
 
 		$r = $this->begin_field();
 
-		$days = floor( $duration / 86400 ); // 24 hours
-		$r .= "\n".'<select name="'.$field_prefix.'_days" id="'.$this->get_valid_id($field_prefix).'_days">';
-		$r .= '<option value="0"'.( 0 == $days ? ' selected="selected"' : '' ).">---</option>\n";
-		for( $i = 1; $i <= 30; $i++ )
+		switch( $from_subfield )
 		{
-			$r .= '<option value="'.$i.'"'.( $i == $days ? ' selected="selected"' : '' ).'>'.$i."</option>\n";
-		}
-		$r .= '</select>'.T_('days')."\n";
+			case 'months':
+				// Display months field
+				$month_seconds = 2592000; // 1 month
+				$months = floor( $duration / $month_seconds );
+				$duration = $duration - $months * $month_seconds;
+				$r .= "\n".'<select name="'.$field_prefix.'_months" id="'.$this->get_valid_id($field_prefix).'_months">';
+				$r .= '<option value="0"'.( 0 == $months ? ' selected="selected"' : '' ).">---</option>\n";
+				for( $i = 1; $i <= 30; $i++ )
+				{
+					$r .= '<option value="'.$i.'"'.( $i == $months ? ' selected="selected"' : '' ).'>'.$i."</option>\n";
+				}
+				$r .= '</select>'.T_('months')."\n";
 
-		$hours = floor( $duration / 3600 ) % 24;
-		$r .= "\n".'<select name="'.$field_prefix.'_hours" id="'.$this->get_valid_id($field_prefix).'_hours">';
-		$r .= '<option value="0"'.( 0 == $hours ? ' selected="selected"' : '' ).">---</option>\n";
-		for( $i = 1; $i <= 23; $i++ )
-		{
-			$r .= '<option value="'.$i.'"'.( $i == $hours ? ' selected="selected"' : '' ).'>'.$i."</option>\n";
-		}
-		$r .= '</select>'.T_('hours')."\n";
+				if( $to_subfield == 'months' ) break;
 
-		$minutes = floor( $duration / 60 ) % 60;
-		$minutes_step = ( empty($field_params['minutes_step']) ? 15 : $field_params['minutes_step'] );
-		$r .= "\n".'<select name="'.$field_prefix.'_minutes" id="'.$this->get_valid_id($field_prefix).'_minutes">';
-		for( $i = 0; $i <= 59 ; $i += $minutes_step )
-		{
-			$r .= '<option value="'.$i.'"'.( ($minutes>=$i && $minutes<($i+$minutes_step)) ? ' selected="selected"' : '' ).'>'
-						.($i == 0 ? '---' : substr('0'.$i,-2))."</option>\n";
+			case 'days':
+				// Display days field
+				$day_seconds = 86400; // 1 day
+				$days = floor( $duration / $day_seconds );
+				$duration = $duration - $days * $day_seconds;
+				$r .= "\n".'<select name="'.$field_prefix.'_days" id="'.$this->get_valid_id($field_prefix).'_days">';
+				$r .= '<option value="0"'.( 0 == $days ? ' selected="selected"' : '' ).">---</option>\n";
+				for( $i = 1; $i <= 30; $i++ )
+				{
+					$r .= '<option value="'.$i.'"'.( $i == $days ? ' selected="selected"' : '' ).'>'.$i."</option>\n";
+				}
+				$r .= '</select>'.T_('days')."\n";
+
+				if( $to_subfield == 'days' ) break;
+
+			case 'hours':
+				// Display hours field
+				$hour_seconds = 3600; // 1 hour
+				$hours = floor( $duration / $hour_seconds );
+				$duration = $duration - $hours * $hour_seconds;
+				$r .= "\n".'<select name="'.$field_prefix.'_hours" id="'.$this->get_valid_id($field_prefix).'_hours">';
+				$r .= '<option value="0"'.( 0 == $hours ? ' selected="selected"' : '' ).">---</option>\n";
+				for( $i = 1; $i <= 23; $i++ )
+				{
+					$r .= '<option value="'.$i.'"'.( $i == $hours ? ' selected="selected"' : '' ).'>'.$i."</option>\n";
+				}
+				$r .= '</select>'.T_('hours')."\n";
+
+				if( $to_subfield == 'hours' ) break;
+
+			case 'minutes':
+				// Display minutes field
+				$minute_seconds = 60; // 1 minute
+				$minutes = floor( $duration / $minute_seconds );
+				$duration = $duration - $minutes * $minute_seconds;
+				$minutes_step = ( empty($field_params['minutes_step']) ? 15 : $field_params['minutes_step'] );
+				$r .= "\n".'<select name="'.$field_prefix.'_minutes" id="'.$this->get_valid_id($field_prefix).'_minutes">';
+				for( $i = 0; $i <= 59 ; $i += $minutes_step )
+				{
+					$r .= '<option value="'.$i.'"'.( ($minutes>=$i && $minutes<($i+$minutes_step)) ? ' selected="selected"' : '' ).'>'
+								.($i == 0 ? '---' : substr('0'.$i,-2))."</option>\n";
+				}
+				$r .= '</select>'.T_('minutes')."\n";
+
+				if( $to_subfield == 'minutes' ) break;
+
+			case 'seconds':
+				// Display seconds field
+				$seconds = $duration;
+				$r .= "\n".'<select name="'.$field_prefix.'_seconds" id="'.$this->get_valid_id($field_prefix).'_seconds">';
+				$r .= '<option value="0"'.( 0 == $seconds ? ' selected="selected"' : '' ).">---</option>\n";
+				for( $i = 1; $i <= 59; $i++ )
+				{
+					$r .= '<option value="'.$i.'"'.( $i == $seconds ? ' selected="selected"' : '' ).'>'.$i."</option>\n";
+				}
+				$r .= '</select>'.T_('seconds')."\n";
 		}
-		$r .= '</select>'.T_('minutes')."\n";
 
 		$r .= $this->end_field();
 
@@ -2944,6 +2993,10 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.66  2009/10/27 13:27:45  efy-maxim
+ * 1. months and seconds fields in duration field
+ * 2. duration fields instead simple text fields
+ *
  * Revision 1.65  2009/10/25 23:11:19  blueyed
  * doc
  *

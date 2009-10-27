@@ -60,7 +60,15 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	}
 
 	// Session timeout
-	$timeout_sessions = param( 'timeout_sessions', 'integer', $Settings->get_default('timeout_sessions') );
+	$timeout_sessions_months = param( 'timeout_sessions_months', 'integer', 0 );
+	$timeout_sessions_days = param( 'timeout_sessions_days', 'integer', 0 );
+	$timeout_sessions_hours = param( 'timeout_sessions_hours', 'integer', 0 );
+	$timeout_sessions_minutes = param( 'timeout_sessions_minutes', 'integer', 0 );
+	$timeout_sessions_seconds = param( 'timeout_sessions_seconds', 'integer', 0 );
+
+	$timeout_sessions = ( ( ( $timeout_sessions_months*30 + $timeout_sessions_days )*24
+				+ $timeout_sessions_hours )*60 + $timeout_sessions_minutes )*60 + $timeout_sessions_seconds;
+
 	if( $timeout_sessions < 300 )
 	{ // lower than 5 minutes: not allowed
 		param_error( 'timeout_sessions', sprintf( T_( 'You cannot set a session timeout below %d seconds.' ), 300 ) );
@@ -71,7 +79,16 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	}
 	$Settings->set( 'timeout_sessions', $timeout_sessions );
 
-	param_integer_range( 'reloadpage_timeout', 0, 99999, T_('Reload-page timeout must be between %d and %d.') );
+	// Reload page timeout
+	$reloadpage_timeout_minutes = param( 'reloadpage_timeout_minutes', 'integer', 0 );
+	$reloadpage_timeout_seconds = param( 'reloadpage_timeout_seconds', 'integer', 0 );
+
+	$reloadpage_timeout = $reloadpage_timeout_minutes*60 + $reloadpage_timeout_seconds;
+
+	if( $reloadpage_timeout > 99999 )
+	{
+		param_error( 'reloadpage_timeout', sprintf( T_( 'Reload-page timeout must be between %d and %d.' ), 0, 99999 ) );
+	}
 	$Settings->set( 'reloadpage_timeout', $reloadpage_timeout );
 
 	$new_cache_status = param( 'general_cache_enabled', 'integer', 0 );
@@ -99,7 +116,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	}
 
 	$Settings->set( 'general_cache_enabled', $new_cache_status );
-	
+
 	if( ! $Messages->count('error') )
 	{
 		if( $Settings->dbupdate() )
@@ -131,6 +148,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2009/10/27 13:27:49  efy-maxim
+ * 1. months and seconds fields in duration field
+ * 2. duration fields instead simple text fields
+ *
  * Revision 1.14  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *

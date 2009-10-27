@@ -74,13 +74,16 @@ if( isset($collections_Module) )
 $Form->begin_fieldset( T_('Timeouts') );
 
 	// fp>TODO: enhance UI with a general Form method for Days:Hours:Minutes:Seconds
-	$Form->text_input( 'timeout_sessions', $Settings->get('timeout_sessions'), 9, T_('Session timeout'), T_('seconds. How long can a user stay inactive before automatic logout?'), array( 'required'=>true) );
+
+	$Form->duration_input( 'timeout_sessions', $Settings->get('timeout_sessions'), T_('Session timeout'), array( 'minutes_step' => 1, 'required'=>true ), 'months', 'seconds' );
+	// $Form->text_input( 'timeout_sessions', $Settings->get('timeout_sessions'), 9, T_('Session timeout'), T_('seconds. How long can a user stay inactive before automatic logout?'), array( 'required'=>true) );
 
 	// fp>TODO: It may make sense to have a different (smaller) timeout for sessions with no logged user.
 	// fp>This might reduce the size of the Sessions table. But this needs to be checked against the hit logging feature.
 
-	$Form->text_input( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), 5,
-								T_('Reload-page timeout'), T_('Time (in seconds) that must pass before a request to the same URI from the same IP and useragent is considered as a new hit.'), array( 'maxlength'=>5, 'required'=>true ) );
+	$Form->duration_input( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), T_('Reload-page timeout'), array( 'minutes_step' => 1, 'required' => true ), 'minutes', 'seconds' );
+	// $Form->text_input( 'reloadpage_timeout', (int)$Settings->get('reloadpage_timeout'), 5,
+	// T_('Reload-page timeout'), T_('Time (in seconds) that must pass before a request to the same URI from the same IP and useragent is considered as a new hit.'), array( 'maxlength'=>5, 'required'=>true ) );
 
 $Form->end_fieldset();
 
@@ -102,6 +105,10 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.15  2009/10/27 13:27:50  efy-maxim
+ * 1. months and seconds fields in duration field
+ * 2. duration fields instead simple text fields
+ *
  * Revision 1.14  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *
