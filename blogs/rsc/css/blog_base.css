@@ -145,7 +145,7 @@ div.feedback_feed_msg {
 form.bComment fieldset
 {	/* one form line */
 	border: none;
-	margin: 1ex 0 0 0;
+	margin: 2ex 0ex;
 	padding: 0ex;
 	/* border: 1px solid #00f; */
 }
@@ -157,6 +157,7 @@ form.bComment fieldset div.label
 	float: left;
 	width: 18%;
 	text-align: right;
+	padding-top: .5ex;
 	font-weight: bold;
 	/* border: 1px solid #f00; */
 }
