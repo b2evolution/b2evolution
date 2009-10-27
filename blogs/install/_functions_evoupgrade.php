@@ -2610,15 +2610,16 @@ function upgrade_b2evo_tables()
 	// Add link_position. Temporary allow NULL, set compatibility default, then do not allow NULL.
 	// TODO: dh> actually, using "teaser" for the first link and "aftermore" for the rest would make more sense (and "aftermore" should get displayed with "no-more" posts anyway).
 	//           Opinions? Could be heavy to transform this though..
-	db_add_col( 'T_links', 'link_position', "ENUM('teaser', 'aftermore') NULL AFTER link_title" );
+	// fp> what do 'teaser' & 'aftermore' mean?
+	db_add_col( 'T_links', 'link_position', "varchar(10) NULL AFTER link_title" );
 	$DB->query( "UPDATE T_links SET link_position = 'teaser' WHERE link_position IS NULL" );
-	db_add_col( 'T_links', 'link_position', "ENUM('teaser', 'aftermore') NOT NULL AFTER link_title" );
+	db_add_col( 'T_links', 'link_position', "varchar(10) NOT NULL AFTER link_title" ); // change to NOT NULL
 
 
 	// Add link_order. Temporary allow NULL, use order from ID, then do not allow NULL and add UNIQUE index.
 	db_add_col( 'T_links', 'link_order', 'int(11) unsigned NULL AFTER link_position' );
 	$DB->query( "UPDATE T_links SET link_order = link_ID WHERE link_order IS NULL" );
-	db_add_col( 'T_links', 'link_order', 'int(11) unsigned NOT NULL AFTER link_position' );
+	db_add_col( 'T_links', 'link_order', 'int(11) unsigned NOT NULL AFTER link_position' ); // change to NOT NULL
 	db_add_index( 'T_links', 'link_itm_ID_order', 'link_itm_ID, link_order', 'UNIQUE' );
 
 
@@ -2751,6 +2752,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.342  2009/10/27 21:57:43  fplanque
+ * minor/doc
+ *
  * Revision 1.341  2009/10/17 16:31:33  efy-maxim
  * Renamed: T_groupsettings to T_groups__groupsettings, T_usersettings to T_users__usersettings
  *

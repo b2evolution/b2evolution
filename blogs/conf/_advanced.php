@@ -477,8 +477,8 @@ $cron_url = $baseurl.$cron_subdir;    // You should not need to change this
  * Location of the install folder.
  * @global string $install_subdir
  */
-$install_subdir = 'install/';            	// Subdirectory relative to base
-$install_path = $basepath.$install_subdir;   // You should not need to change this
+$install_subdir = 'install/';            	  // Subdirectory relative to base
+$install_path = $basepath.$install_subdir;  // You should not need to change this
 
 /**
  * Location of the rendered page cache folder.
@@ -525,8 +525,8 @@ $backup_path = $basepath.$backup_subdir;	// You should not need to change this
  *
  * @global string $upgrade_subdir
  */
-$upgrade_subdir = '_upgrade/';				// Subdirectory relative to base
-$upgrade_path = $basepath.$upgrade_subdir;	// You should not need to change this
+$upgrade_subdir = '_upgrade/';              // Subdirectory relative to base
+$upgrade_path = $basepath.$upgrade_subdir;  // You should not need to change this
 
 
 // Define default avatar image URL

@@ -62,7 +62,7 @@ $modules = array(
 		'collections',  // TODO: installer won't work without this module
 		'files',
 		'sessions',
-    	'messaging',		// Experimental
-		'maintenance',		// Experimental
+    'messaging',		// Experimental
+		'maintenance',	// Experimental
 	);
 ?>

@@ -76,6 +76,8 @@ function modules_call_method( $method_name )
 /**
  * Check module permission
  *
+ * @todo fp>max refactor to Module::check_perm()
+ *
  * @param string Permission name
  * @param string Requested permission level
  * @param mixed Permission target (blog ID, array of cat IDs...)
@@ -3685,6 +3687,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.181  2009/10/27 21:57:44  fplanque
+ * minor/doc
+ *
  * Revision 1.180  2009/10/19 21:53:29  blueyed
  * typo
  *

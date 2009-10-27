@@ -1036,7 +1036,7 @@ class Form extends Widget
 	/**
 	 * Builds a duration input field.
 	 *
-	 * @todo @Francois: please check API and change as appropriate.
+	 * @todo fp> move params array to the end
 	 *
 	 * @param string the name of the input field
 	 * @param string initial value (seconds)
@@ -2993,6 +2993,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.67  2009/10/27 21:57:44  fplanque
+ * minor/doc
+ *
  * Revision 1.66  2009/10/27 13:27:45  efy-maxim
  * 1. months and seconds fields in duration field
  * 2. duration fields instead simple text fields

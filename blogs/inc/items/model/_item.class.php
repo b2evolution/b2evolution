@@ -1900,6 +1900,10 @@ class Item extends ItemLight
 	 *           though. Would save (N-1) queries on a blog list page for N items.
 	 *
 	 * @access protected
+	 *
+	 * @param integer
+	 * @param string 'teaser'|'aftermore' -> please doc??
+	 * @param string
 	 * @return DataObjectList2
 	 */
 	function get_attachment_FileList( $limit = 1000, $position = NULL, $order = 'link_ID' )
@@ -4008,6 +4012,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.151  2009/10/27 21:57:45  fplanque
+ * minor/doc
+ *
  * Revision 1.150  2009/10/11 03:00:11  blueyed
  * Add "position" and "order" properties to attachments.
  * Position can be "teaser" or "aftermore" for now.

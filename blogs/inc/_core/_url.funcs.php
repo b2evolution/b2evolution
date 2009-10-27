@@ -354,9 +354,13 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 
 		// Set timeout for data:
 		if( function_exists( 'stream_set_timeout' ) )
+		{
 			stream_set_timeout( $fp, $timeout ); // PHP 4.3.0
+		}
 		else
+		{
 			socket_set_timeout( $fp, $timeout ); // PHP 4
+		}
 
 		// Read response:
 		$r = '';
@@ -790,6 +794,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.44  2009/10/27 21:57:45  fplanque
+ * minor/doc
+ *
  * Revision 1.43  2009/10/16 19:58:46  blueyed
  * fetch_remote_page:
  *  - add max_size_kb param (TODO: implement this also for curl, currently it gets skipped).
