@@ -46,6 +46,32 @@ global $action;
 // Begin payload block:
 $this->disp_payload_begin();
 
+/**
+ * Display pluggable permissions
+ * @param string perm block name
+ */
+function display_pluggable_permissions( &$Form, $perm_block )
+{
+	global $edited_Group;
+
+	$GroupSettings = & $edited_Group->get_GroupSettings();
+	foreach( $GroupSettings->permission_modules as $perm_name => $module_name )
+	{
+		$Module = & $GLOBALS[$module_name.'_Module'];
+		if( method_exists( $Module, 'get_available_group_permissions' ) )
+		{
+			$permissions = $Module->get_available_group_permissions();
+			if( array_key_exists( $perm_name, $permissions ) )
+			{
+				$perm = $permissions[$perm_name];
+				if( $perm['perm_block'] == $perm_block )
+				{
+					$Form->radio( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], $perm['options'], $perm['label'], true );
+				}
+			}
+		}
+	}
+}
 
 $Form = & new Form( NULL, 'group_checkchanges' );
 
@@ -151,26 +177,9 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 
 						), T_('Files'), true, T_('This setting will further restrict any media file permissions on specific blogs.') );
 
-// ----------------------------------------
-// Display all of the pluggable permissions
-// TODO fp>max: move some down to next block
 
-$GroupSettings = & $edited_Group->get_GroupSettings();
-foreach( $GroupSettings->permission_modules as $perm_name => $module_name )
-{
-	$Module = & $GLOBALS[$module_name.'_Module'];
-	if( method_exists( $Module, 'get_available_group_permissions' ) )
-	{
-		$permissions = $Module->get_available_group_permissions();
-		if( array_key_exists( $perm_name, $permissions ) )
-		{
-			$perm = $permissions[$perm_name];
-			$Form->radio( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], $perm['available'], $perm['label'], true );
-		}
-	}
-}
-// ----------------------------------------
-
+// Display pluggable permissions
+display_pluggable_permissions( $Form, 'additional' );
 
 $Form->end_fieldset();
 
@@ -202,6 +211,9 @@ $Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_pro
 							$perm_edit_option
 						), T_('Settings') );
 
+// Display pluggable permissions
+display_pluggable_permissions( $Form, 'system' );
+
 $Form->end_fieldset();
 
 if( $action != 'view_group' )
@@ -218,6 +230,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.19  2009/10/28 14:55:12  efy-maxim
+ * pluggable permissions separated by blocks in group form
+ *
  * Revision 1.18  2009/10/27 23:06:46  fplanque
  * doc
  *

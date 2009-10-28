@@ -80,18 +80,20 @@ class maintenance_Module extends Module
 		// 'label' is used in the group form as label for radio buttons group
 		// 'user_func' function used to check user permission. This function should be defined in Module.
 		// 'group_func' function used to check group permission. This function should be defined in Module.
-		// 'available' is permission options - TODO: rename to 'options'
-		$permissions = array( 
-			'perm_maintenance' => array( 
+		// 'perm_block' group form block where this permissions will be displayed. Now available, the following blocks: additional, system
+		// 'options' is permission options
+		$permissions = array(
+			'perm_maintenance' => array(
 				'label' => T_('Maintenance'),
 				'user_func'  => 'check_maintenance_user_perm',
 				'group_func' => 'check_maintenance_group_perm',
-				'available'  => array(
+				'perm_block' => 'system',
+				'options'  => array(
 						// format: array( radio_button_value, radio_button_label, radio_button_note )
 						array( 'none', T_( 'No Access' ), '' ),
 						array( 'backup', T_( 'Create backups' ), '' ),
-						array( 'upgrade', T_( 'Create backups & upgrade b2evolution' ), '' ), 
-					), 
+						array( 'upgrade', T_( 'Create backups & upgrade b2evolution' ), '' ),
+					),
 				),
 			);
 		return $permissions;
@@ -182,6 +184,9 @@ $maintenance_Module = & new maintenance_Module();
 
 /*
  * $Log$
+ * Revision 1.4  2009/10/28 14:55:11  efy-maxim
+ * pluggable permissions separated by blocks in group form
+ *
  * Revision 1.3  2009/10/27 18:21:52  fplanque
  * no message
  *

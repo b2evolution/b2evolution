@@ -149,25 +149,23 @@ class messaging_Module extends Module
 	 */
 	function get_available_group_permissions()
 	{
-		// Create permission options which will be used also to create radio buttons of the group form
-		// e.g. array ( radio_button_value, radio_button_label, radio_button_note )
-		$none_option 	= array( 'none', T_( 'No Access' ), '' );
-		$reply_option 	= array( 'reply', T_( 'Reply to people you have messaged with in the past' ), '' );
-		$write_option 	= array( 'write', T_( 'Create threads, view any thread you\'re involved in & reply' ), '' );
-		$delete_option 	= array( 'delete', T_( 'Create threads, view and delete any thread you\'re involved in & reply' ) );
-
-		// Create permission and set permission options to it.
 		// 'label' is used in the group form as label for radio buttons group
 		// 'user_func' is used to check user permission. This function should be defined in module initializer.
 		// 'group_func' is used to check group permission. This function should be defined in module initializer.
-		// 'available' is permission options
-		$permissions = array( 'perm_messaging' => array( 'label' => T_('Messaging'),
-										'user_func'  => 'check_messaging_user_perm',
-										'group_func' => 'check_messaging_group_perm',
-										'available'  => array( $none_option,
-															$reply_option,
-															$write_option,
-															$delete_option  ) ) );
+		// 'perm_block' group form block where this permissions will be displayed. Now available, the following blocks: additional, system
+		// 'options' is permission options
+		$permissions = array(
+			'perm_messaging' => array(
+				'label' => T_('Messaging'),
+				'user_func'  => 'check_messaging_user_perm',
+				'group_func' => 'check_messaging_group_perm',
+				'perm_block' => 'additional',
+				'options'  => array(
+						// format: array( radio_button_value, radio_button_label, radio_button_note )
+						array( 'none', T_( 'No Access' ), '' ),
+						array( 'reply', T_( 'Reply to people you have messaged with in the past' ), '' ),
+						array( 'write', T_( 'Create threads, view any thread you\'re involved in & reply' ), '' ),
+						array( 'delete', T_( 'Create threads, view and delete any thread you\'re involved in & reply' ) )  ) ) );
 		// We can return as many permissions as we want.
 		// In other words, one module can return many pluggable permissions.
 		return $permissions;
@@ -334,6 +332,9 @@ $messaging_Module = & new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.18  2009/10/28 14:55:11  efy-maxim
+ * pluggable permissions separated by blocks in group form
+ *
  * Revision 1.17  2009/10/19 07:04:20  efy-maxim
  * code formatting
  *
