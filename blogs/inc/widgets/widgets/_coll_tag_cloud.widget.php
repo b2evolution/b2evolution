@@ -127,6 +127,13 @@ class coll_tag_cloud_Widget extends ComponentWidget
 					'size' => 3,
 					'defaultvalue' => 22,
 				),
+			'tag_ordering' => array(
+					'type' => 'select',
+					'label' => T_('Ordering'),
+					'options' => array( 'ASC'  => T_('Ascending'), 'RAND' => T_('Random') ),
+					'defaultvalue' => 'ASC',
+					'note' => T_( 'How to sort the tag cloud.' ),
+				),
 			), parent::get_param_definitions( $params )	);
 
 		// add limit default 100
@@ -190,8 +197,15 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		$max_size = $this->disp_params['tag_max_size'];
 		$min_size = $this->disp_params['tag_min_size'];
 		$size_span = $max_size - $min_size;
-
-		usort($results, array($this, 'tag_cloud_cmp'));
+		
+		if ($this->disp_params['tag_ordering'] == 'ASC')
+		{
+			usort($results, array($this, 'tag_cloud_cmp'));
+		}
+		else if ($this->disp_params['tag_ordering'] == 'RAND')
+		{
+			shuffle( $results );
+		}
 
 		echo $this->disp_params['block_start'];
 
@@ -233,6 +247,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.24  2009/10/28 13:39:07  waltercruz
+ * Random order to tag cloud widget
+ *
  * Revision 1.23  2009/09/14 13:54:13  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
