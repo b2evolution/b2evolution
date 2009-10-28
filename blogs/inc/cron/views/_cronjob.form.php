@@ -46,7 +46,7 @@ $Form->begin_form( 'fform', T_('New scheduled job') );
 		$Form->time_input( 'cjob_time', date2mysql( $localtimenow ), T_('Schedule time'), array(
 							 'required' => true ) );
 
-		$Form->duration_input( 'cjob_repeat_after', 0, T_('Repeat every'), array( 'minutes_step' => 1 ) );
+		$Form->duration_input( 'cjob_repeat_after', 0, T_('Repeat every'), 'days', 'minutes', array( 'minutes_step' => 1 ) );
 
 	$Form->end_fieldset();
 
@@ -58,6 +58,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.5  2009/10/28 09:39:52  efy-maxim
+ * position of arguments of duration_input function have been changed
+ *
  * Revision 1.4  2009/03/08 23:57:42  fplanque
  * 2009
  *

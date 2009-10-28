@@ -177,7 +177,7 @@ if( $action != 'view' )
 					array( 'custom', T_('use custom duration') ),
 				), T_('Session timeout'), true );
 
-		$Form->duration_input( 'timeout_sessions', $timeout_sessions, T_('Custom duration'), array( 'minutes_step' => 1 ), 'months', 'seconds' );
+		$Form->duration_input( 'timeout_sessions', $timeout_sessions, T_('Custom duration'), 'months', 'seconds', array( 'minutes_step' => 1 ) );
 	}
 	else
 	{
@@ -273,6 +273,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.6  2009/10/28 09:39:52  efy-maxim
+ * position of arguments of duration_input function have been changed
+ *
  * Revision 1.5  2009/10/27 21:57:43  fplanque
  * minor/doc
  *

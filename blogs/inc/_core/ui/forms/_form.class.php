@@ -1041,13 +1041,13 @@ class Form extends Widget
 	 * @param string the name of the input field
 	 * @param string initial value (seconds)
 	 * @param string label displayed in front of the field
-	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
-	 *              - minutes_step ( default = 15 );
 	 * @param string display from field: months, days, hours, minutes, seconds
 	 * @param string display to field: months, days, hours, minutes, seconds
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              - minutes_step ( default = 15 );
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function duration_input( $field_prefix, $duration, $field_label, $field_params = array(), $from_subfield = 'days', $to_subfield = 'minutes' )
+	function duration_input( $field_prefix, $duration, $field_label, $from_subfield = 'days', $to_subfield = 'minutes', $field_params = array() )
 	{
 		$this->handle_common_params( $field_params, $field_prefix, $field_label );
 
@@ -2993,6 +2993,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.68  2009/10/28 09:39:50  efy-maxim
+ * position of arguments of duration_input function have been changed
+ *
  * Revision 1.67  2009/10/27 21:57:44  fplanque
  * minor/doc
  *
