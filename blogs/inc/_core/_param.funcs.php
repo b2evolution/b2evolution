@@ -377,6 +377,27 @@ function param_cookie($var, $type = '', $default = '', $memorize = false,
 
 
 /**
+ * Get total seconds from the following fields: months, days, hours, minutes, seconds
+ *
+ * @param string param name
+ * @return integer seconds
+ */
+function param_duration( $var )
+{
+	$timeout_sessions_months = param( $var.'_months', 'integer', 0 );
+	$timeout_sessions_days = param( $var.'_days', 'integer', 0 );
+	$timeout_sessions_hours = param( $var.'_hours', 'integer', 0 );
+	$timeout_sessions_minutes = param( $var.'_minutes', 'integer', 0 );
+	$timeout_sessions_seconds = param( $var.'_seconds', 'integer', 0 );
+
+	$timeout_sessions = ( ( ( $timeout_sessions_months*30 + $timeout_sessions_days )*24
+				+ $timeout_sessions_hours )*60 + $timeout_sessions_minutes )*60 + $timeout_sessions_seconds;
+
+	return $timeout_sessions;
+}
+
+
+/**
  * @param string param name
  * @param string error message
  * @param string|NULL error message for form field ($err_msg gets used if === NULL).
@@ -2049,6 +2070,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.51  2009/10/28 10:56:32  efy-maxim
+ * param_duration
+ *
  * Revision 1.50  2009/10/25 23:08:00  blueyed
  * regenerate_url: split set params by ampersand, and remove any trailing question mark: allows passing QUERY_STRING
  *

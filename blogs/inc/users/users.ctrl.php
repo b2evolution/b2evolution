@@ -399,16 +399,7 @@ if( !$Messages->count('error') )
 							$UserSettings->set( 'timeout_sessions', NULL, $edited_User->ID );
 							break;
 						case 'custom':
-							$timeout_sessions_months = param( 'timeout_sessions_months', 'integer', 0 );
-							$timeout_sessions_days = param( 'timeout_sessions_days', 'integer', 0 );
-							$timeout_sessions_hours = param( 'timeout_sessions_hours', 'integer', 0 );
-							$timeout_sessions_minutes = param( 'timeout_sessions_minutes', 'integer', 0 );
-							$timeout_sessions_seconds = param( 'timeout_sessions_seconds', 'integer', 0 );
-
-							$timeout_sessions = ( ( ( $timeout_sessions_months*30 + $timeout_sessions_days )*24
-										+ $timeout_sessions_hours )*60 + $timeout_sessions_minutes )*60 + $timeout_sessions_seconds;
-
-							$UserSettings->set( 'timeout_sessions', $timeout_sessions, $edited_User->ID );
+							$UserSettings->set( 'timeout_sessions', param_duration( 'timeout_sessions' ), $edited_User->ID );
 							break;
 					}
 				}
@@ -759,6 +750,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.41  2009/10/28 10:56:34  efy-maxim
+ * param_duration
+ *
  * Revision 1.40  2009/10/28 10:02:42  efy-maxim
  * rename some php files
  *

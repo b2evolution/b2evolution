@@ -60,15 +60,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	}
 
 	// Session timeout
-	// TODO: fp>max please create a param_duration('timeout_sessions') to factorize the following...
-	$timeout_sessions_months = param( 'timeout_sessions_months', 'integer', 0 );
-	$timeout_sessions_days = param( 'timeout_sessions_days', 'integer', 0 );
-	$timeout_sessions_hours = param( 'timeout_sessions_hours', 'integer', 0 );
-	$timeout_sessions_minutes = param( 'timeout_sessions_minutes', 'integer', 0 );
-	$timeout_sessions_seconds = param( 'timeout_sessions_seconds', 'integer', 0 );
-
-	$timeout_sessions = ( ( ( $timeout_sessions_months*30 + $timeout_sessions_days )*24
-				+ $timeout_sessions_hours )*60 + $timeout_sessions_minutes )*60 + $timeout_sessions_seconds;
+	$timeout_sessions = param_duration( 'timeout_sessions' );
 
 	if( $timeout_sessions < 300 )
 	{ // lower than 5 minutes: not allowed
@@ -81,10 +73,7 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	$Settings->set( 'timeout_sessions', $timeout_sessions );
 
 	// Reload page timeout
-	$reloadpage_timeout_minutes = param( 'reloadpage_timeout_minutes', 'integer', 0 );
-	$reloadpage_timeout_seconds = param( 'reloadpage_timeout_seconds', 'integer', 0 );
-
-	$reloadpage_timeout = $reloadpage_timeout_minutes*60 + $reloadpage_timeout_seconds;
+	$reloadpage_timeout = param_duration( 'reloadpage_timeout' );
 
 	if( $reloadpage_timeout > 99999 )
 	{
@@ -149,6 +138,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2009/10/28 10:56:34  efy-maxim
+ * param_duration
+ *
  * Revision 1.16  2009/10/27 23:06:46  fplanque
  * doc
  *

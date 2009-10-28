@@ -142,10 +142,8 @@ switch( $action )
 		$edited_Cronjob->set( 'start_datetime', form_date( get_param( 'cjob_date' ), get_param( 'cjob_time' ) ) );
 
 		// repeat after:
-		$cjob_repeat_after_days = param( 'cjob_repeat_after_days', 'integer', 0 );
-		$cjob_repeat_after_hours = param( 'cjob_repeat_after_hours', 'integer', 0 );
-		$cjob_repeat_after_minutes = param( 'cjob_repeat_after_minutes', 'integer', 0 );
-		$cjob_repeat_after = ( ( ($cjob_repeat_after_days*24) + $cjob_repeat_after_hours )*60 + $cjob_repeat_after_minutes)*60; // seconds
+		$cjob_repeat_after = param_duration( 'cjob_repeat_after' );
+
 		if( $cjob_repeat_after == 0 )
 		{
 			$cjob_repeat_after = NULL;
@@ -276,6 +274,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2009/10/28 10:56:33  efy-maxim
+ * param_duration
+ *
  * Revision 1.5  2009/09/14 18:37:07  fplanque
  * doc/cleanup/minor
  *
