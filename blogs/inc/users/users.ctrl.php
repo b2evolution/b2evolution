@@ -408,7 +408,7 @@ if( !$Messages->count('error') )
 			if( isset( $edited_user_set_login_multiple_sessions ) )
 			{	// Multiple session
 				$multiple_sessions = $Settings->get( 'multiple_sessions' );
-				if( ( $multiple_sessions != 'default-admin-no' && $multiple_sessions != 'default-admin-yes' ) || $current_User->check_perm( 'users', 'edit' ) )
+				if( ( $multiple_sessions != 'adminset_default_no' && $multiple_sessions != 'adminset_default_yes' ) || $current_User->check_perm( 'users', 'edit' ) )
 				{
 					$UserSettings->set( 'login_multiple_sessions', $edited_user_set_login_multiple_sessions, $edited_User->ID );
 				}
@@ -750,6 +750,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.42  2009/10/28 13:41:57  efy-maxim
+ * default multiple sessions settings
+ *
  * Revision 1.41  2009/10/28 10:56:34  efy-maxim
  * param_duration
  *

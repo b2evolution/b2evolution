@@ -134,7 +134,7 @@ if( $action != 'view' )
 			break;
 		default:
 			$multiple_sessions_field_hidden = false;
-			if( ( $multiple_sessions == 'default-admin-no' || $multiple_sessions == 'default-admin-yes' ) && !$current_User->check_perm( 'users', 'edit' ) )
+			if( ( $multiple_sessions == 'adminset_default_no' || $multiple_sessions == 'adminset_default_yes' ) && !$current_User->check_perm( 'users', 'edit' ) )
 			{
 				$multiple_sessions_field_disabled = true;
 			}
@@ -273,6 +273,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.2  2009/10/28 13:41:58  efy-maxim
+ * default multiple sessions settings
+ *
  * Revision 1.1  2009/10/28 10:02:42  efy-maxim
  * rename some php files
  *

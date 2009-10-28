@@ -241,7 +241,7 @@ if( empty( $edited_User->ID ) && $action != 'view' )
 {	// New user will be created with default multiple_session setting
 
 	$multiple_sessions = $Settings->get( 'multiple_sessions' );
-	if( $multiple_sessions == 'default-user-yes' || ( $current_User->check_perm( 'users', 'edit' ) && $multiple_sessions == 'default-admin-yes' ) )
+	if( $multiple_sessions == 'userset_default_yes' || ( $current_User->check_perm( 'users', 'edit' ) && $multiple_sessions == 'adminset_default_yes' ) )
 	{
 		$Form->hidden( 'edited_user_set_login_multiple_sessions', 1 );
 	}
@@ -430,6 +430,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.2  2009/10/28 13:41:58  efy-maxim
+ * default multiple sessions settings
+ *
  * Revision 1.1  2009/10/28 10:02:42  efy-maxim
  * rename some php files
  *

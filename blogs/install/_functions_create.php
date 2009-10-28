@@ -268,6 +268,13 @@ function create_default_data()
 		echo 'OK.<br />', "\n";
 	}
 
+	// Activating multiple sessions for administrator
+	echo 'Activating multiple sessions for administrator... ';
+	$DB->query( "
+		INSERT INTO T_users__usersettings ( uset_user_ID, uset_name, uset_value )
+		VALUES ( 1, 'login_multiple_sessions', '1' )" );
+	echo "OK.<br />\n";
+
 	create_default_settings();
 
 	// don't change order of the following two functions as countries has relations to currencies
@@ -1286,6 +1293,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.280  2009/10/28 13:41:58  efy-maxim
+ * default multiple sessions settings
+ *
  * Revision 1.279  2009/10/08 20:05:52  efy-maxim
  * Modular/Pluggable Permissions
  *
