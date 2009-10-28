@@ -74,51 +74,6 @@ function modules_call_method( $method_name )
 
 
 /**
- * Check module permission
- *
- * @todo fp>max refactor to Module::check_perm()
- *
- * @param string Permission name
- * @param string Requested permission level
- * @param mixed Permission target (blog ID, array of cat IDs...)
- * @param string function name
- * @return boolean True on success (permission is granted), false if permission is not granted
- *                 NULL if permission not implemented.
- */
-function module_check_perm( $permname, $permlevel, $permtarget, $function )
-{
-	global $current_User;
-
-	$Group = & $current_User->get_Group();
-	$GroupSettings = & $Group->get_GroupSettings();
-
-	if( array_key_exists( $permname, $GroupSettings->permission_modules ) )
-	{	// Requested permission found in the group settings
-		$Module = & $GLOBALS[$GroupSettings->permission_modules[$permname].'_Module'];
-		if( method_exists( $Module, 'get_available_group_permissions' ) )
-		{	// Function to get available permission exists
-			$permissions = $Module->get_available_group_permissions();
-			if( array_key_exists( $permname, $permissions ) )
-			{	// Requested permission found in available permisssion list
-				$permission = $permissions[$permname];
-				if( array_key_exists( $function, $permission ) )
-				{	// Function to check permission exists
-					$function = $permission[$function];
-					if( method_exists( $Module, $function ) )
-					{	// We can call check permission function
-						return $Module->{$function}( $permlevel, $GroupSettings->get( $permname, $Group->ID ), $permtarget );
-					}
-				}
-			}
-		}
-	}
-
-	// Required parameters of check permission function not found
-	return NULL;
-}
-
-
-/**
  * @deprecated kept only for plugin backward compatibility (core is being modified to call getters directly)
  * To be removed, maybe in b2evo v5.
  *
@@ -3687,6 +3642,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.182  2009/10/28 09:50:02  efy-maxim
+ * Module::check_perm
+ *
  * Revision 1.181  2009/10/27 21:57:44  fplanque
  * minor/doc
  *

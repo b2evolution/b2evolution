@@ -412,7 +412,7 @@ class Group extends DataObject
 			default:
 
 				// Check pluggable permissions using group permission check function
-				$perm = module_check_perm( $permname, $permlevel, $perm_target, 'group_func' );
+				$perm = Module::check_perm( $permname, $permlevel, $perm_target, 'group_func' );
 				if( $perm === NULL )
 				{	// Even if group permisson check function doesn't exist we should return false value
 					$perm = false;
@@ -686,6 +686,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.27  2009/10/28 09:50:03  efy-maxim
+ * Module::check_perm
+ *
  * Revision 1.26  2009/10/08 20:05:52  efy-maxim
  * Modular/Pluggable Permissions
  *

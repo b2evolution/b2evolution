@@ -1031,7 +1031,7 @@ class User extends DataObject
 			default:
 
 				// Check pluggable permissions using user permission check function
-				$perm = module_check_perm( $permname, $permlevel, $perm_target, 'user_func' );
+				$perm = Module::check_perm( $permname, $permlevel, $perm_target, 'user_func' );
 				if( $perm === true || $perm === NULL )
 				{	// We can check group permissions
 
@@ -1861,6 +1861,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.62  2009/10/28 09:50:03  efy-maxim
+ * Module::check_perm
+ *
  * Revision 1.61  2009/10/27 16:43:34  efy-maxim
  * custom session timeout
  *
