@@ -134,11 +134,10 @@ for( $i = 1 ; $i <= 3; $i++ )
 	// ---------------------------- TEXTAREA -------------------------------------
 	$Form->fieldstart = '<div>';
 	$Form->fieldend = "</div>\n";
-	$Form->textarea_input( 'content', $item_content, 16, '', array( 'style' => 'width: 99%', 'note' => T_('Separate posts with a blank line'), 'cols' => 40 , 'rows' => 33, 'id' => 'itemform_post_content' ) );
+	$Form->textarea_input( 'content', $item_content, 16, '', array( 'style' => 'width:99%;', 'note' => T_('Separate posts with a blank line'), 'cols' => 40 , 'rows' => 33, 'id' => 'itemform_post_content' ) );
 	$Form->fieldstart = '<div class="tile">';
 	$Form->fieldend = '</div>';
-
-	echo '<br/>';
+	echo '<div style="height:6px"></div>';
 
 	// ------------------------------- SETTINGS ---------------------------------
 
@@ -222,6 +221,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.7  2009/10/28 10:30:32  efy-maxim
+ * 6px
+ *
  * Revision 1.6  2009/10/26 17:58:58  efy-maxim
  * mass create fix and design improvement
  *
