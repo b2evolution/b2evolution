@@ -236,7 +236,7 @@ class User extends DataObject
 	 */
 	function load_from_Request()
 	{
-		global $Settings;
+		global $Settings, $current_User;
 
 		param( 'edited_user_login', 'string' );
 		param_check_not_empty( 'edited_user_login', T_('You must provide a login!') );
@@ -281,7 +281,7 @@ class User extends DataObject
 			$this->set_from_Request('idmode', 'edited_user_idmode', true);
 
 			param( 'edited_user_ctry_ID', 'integer', true );
-			param_check_number( 'edited_user_ctry_ID', 'Please select a country', true );
+			param_check_number( 'edited_user_ctry_ID', 'Please select a country', !$current_User->check_perm( 'users', 'edit' ) );
 			$this->set_from_Request('ctry_ID', 'edited_user_ctry_ID', true);
 
 			param( 'edited_user_showonline', 'integer', 0 );
@@ -1861,6 +1861,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.63  2009/10/28 14:26:23  efy-maxim
+ * allow selection of None/NULL for country
+ *
  * Revision 1.62  2009/10/28 09:50:03  efy-maxim
  * Module::check_perm
  *

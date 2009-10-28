@@ -99,7 +99,9 @@ $Form->begin_fieldset( T_('User permissions'), array( 'class'=>'fieldset clear' 
 
 $edited_User->get_Group();
 
-if( $edited_User->ID != 1 && $current_User->check_perm( 'users', 'edit' ) )
+$has_full_access = $current_User->check_perm( 'users', 'edit' );
+
+if( $edited_User->ID != 1 && $has_full_access )
 {	// This is not Admin and we're not restricted: we're allowed to change the user group:
 	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get('newusers_grp_ID') : $edited_User->Group->ID;
 	$GroupCache = & get_GroupCache();
@@ -112,7 +114,7 @@ else
 }
 
 $field_note = '[0 - 10] '.sprintf( T_('See <a %s>online manual</a> for details.'), 'href="http://manual.b2evolution.net/User_levels"' );
-if( $action != 'view' && $current_User->check_perm( 'users', 'edit' ) )
+if( $action != 'view' && $has_full_access )
 {
 	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), $field_note, array( 'required' => true ) );
 }
@@ -133,7 +135,7 @@ if( $action != 'view' )
 { // We can edit the values:
 
 	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), $email_fieldnote, array( 'maxlength' => 100, 'required' => true ) );
-	if( $current_User->check_perm( 'users', 'edit' ) )
+	if( $has_full_access )
 	{ // user has "edit users" perms:
 		$Form->checkbox( 'edited_user_validated', $edited_User->get('validated'), T_('Validated email'), T_('Has this email address been validated (through confirmation email)?') );
 	}
@@ -191,7 +193,7 @@ if( $action != 'view' )
 	$Form->text_input( 'edited_user_lastname', $edited_User->lastname, 20, T_('Last name'), '', array( 'maxlength' => 50 ) );
 
 	$nickname_editing = $Settings->get( 'nickname_editing' );
-	if( ( $nickname_editing == 'edited-user' && $edited_User->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $current_User->check_perm( 'users', 'edit' ) ) )
+	if( ( $nickname_editing == 'edited-user' && $edited_User->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $has_full_access ) )
 	{
 		$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => true ) );
 	}
@@ -203,7 +205,7 @@ if( $action != 'view' )
 	$Form->select( 'edited_user_idmode', $edited_User->get( 'idmode' ), array( &$edited_User, 'callback_optionsForIdMode' ), T_('Identity shown') );
 
 	$CountryCache = & get_CountryCache();
-	$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, 'Country', array('required'=>true) );
+	$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, 'Country', array( 'required' => !$has_full_access, 'allow_none' => $has_full_access ) );
 
 	$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
 }
@@ -241,7 +243,7 @@ if( empty( $edited_User->ID ) && $action != 'view' )
 {	// New user will be created with default multiple_session setting
 
 	$multiple_sessions = $Settings->get( 'multiple_sessions' );
-	if( $multiple_sessions == 'userset_default_yes' || ( $current_User->check_perm( 'users', 'edit' ) && $multiple_sessions == 'adminset_default_yes' ) )
+	if( $multiple_sessions == 'userset_default_yes' || ( $has_full_access && $multiple_sessions == 'adminset_default_yes' ) )
 	{
 		$Form->hidden( 'edited_user_set_login_multiple_sessions', 1 );
 	}
@@ -430,6 +432,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.3  2009/10/28 14:26:24  efy-maxim
+ * allow selection of None/NULL for country
+ *
  * Revision 1.2  2009/10/28 13:41:58  efy-maxim
  * default multiple sessions settings
  *

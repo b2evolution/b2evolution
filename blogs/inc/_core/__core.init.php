@@ -109,7 +109,7 @@ function & get_CountryCache()
 
 	if( ! isset( $CountryCache ) )
 	{	// Cache doesn't exist yet:
-		$CountryCache = new DataObjectCache( 'Country', true, 'T_country', 'ctry_', 'ctry_ID', 'ctry_code', 'ctry_name', 'Unknown');
+		$CountryCache = new DataObjectCache( 'Country', true, 'T_country', 'ctry_', 'ctry_ID', 'ctry_code', 'ctry_name', 'None');
 	}
 
 	return $CountryCache;
@@ -775,6 +775,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.47  2009/10/28 14:26:23  efy-maxim
+ * allow selection of None/NULL for country
+ *
  * Revision 1.46  2009/10/26 12:59:34  efy-maxim
  * users management
  *
