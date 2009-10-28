@@ -716,15 +716,15 @@ switch( $action )
 			{
 				case 'identity':
 					// Display user identity form:
-					$AdminUI->disp_view( 'users/views/_user.identity.form.php' );
+					$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
 					break;
 				case 'password':
 					// Display user password form:
-					$AdminUI->disp_view( 'users/views/_user.password.form.php' );
+					$AdminUI->disp_view( 'users/views/_user_password.form.php' );
 					break;
 				case 'preferences':
 					// Display user preferences form:
-					$AdminUI->disp_view( 'users/views/_user.preferences.form.php' );
+					$AdminUI->disp_view( 'users/views/_user_preferences.form.php' );
 					break;
 			}
 
@@ -759,6 +759,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.40  2009/10/28 10:02:42  efy-maxim
+ * rename some php files
+ *
  * Revision 1.39  2009/10/27 16:43:34  efy-maxim
  * custom session timeout
  *

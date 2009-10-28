@@ -107,14 +107,8 @@ $this->disp_payload_end();
 
 /*
  * $Log$
- * Revision 1.3  2009/10/27 21:57:43  fplanque
- * minor/doc
- *
- * Revision 1.2  2009/10/26 12:59:37  efy-maxim
- * users management
- *
- * Revision 1.1  2009/10/25 15:22:48  efy-maxim
- * user - identity, password, preferences tabs
+ * Revision 1.1  2009/10/28 10:02:42  efy-maxim
+ * rename some php files
  *
  */
 ?>
