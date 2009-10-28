@@ -26,7 +26,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $current_User;
 
-global $dispatcher;
+global $dispatcher, $allow_evo_stats;
 
 if( $blog )
 {
@@ -398,53 +398,60 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	// Begin payload block:
 	$AdminUI->disp_payload_begin();
 
-	echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr><td>';
+	echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr>';
 
-	$block_item_Widget = & new Widget( 'block_item' );
-
-	$block_item_Widget->title = T_('Updates from b2evolution.net');
-	$block_item_Widget->disp_template_replaced( 'block_start' );
-
-
-	// Note: hopefully, the update swill have been downloaded in the shutdown function of a previous page (including the login screen)
+	/*
+	 * LEFT COL
+	 */
+	// Note: hopefully, the updates will have been downloaded in the shutdown function of a previous page (including the login screen)
 	// However if we have outdated info, we will load updates here.
 	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 	// Let's clear any remaining messages that should already have been displayed before...
 	$Messages->clear( 'all' );
-	b2evonet_get_updates();
 
-	// Display info & error messages
-	echo $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
+	if( b2evonet_get_updates() !== NULL )
+	{	// Updates are allowed, display them:
+		echo '<td>';
 
-
-	/**
-	 * @var AbstractSettings
-	 */
-	global $global_Cache;
-	$version_status_msg = $global_Cache->get( 'version_status_msg' );
-	if( !empty($version_status_msg) )
-	{	// We have managed to get updates (right now or in the past):
-		echo '<p>'.$version_status_msg.'</p>';
-		$extra_msg = $global_Cache->get( 'extra_msg' );
-		if( !empty($extra_msg) )
-		{
-			echo '<p>'.$extra_msg.'</p>';
+		$block_item_Widget = & new Widget( 'block_item' );
+	
+		$block_item_Widget->title = T_('Updates from b2evolution.net');
+		$block_item_Widget->disp_template_replaced( 'block_start' );
+	
+		// Display info & error messages
+		echo $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
+	
+		/**
+		 * @var AbstractSettings
+		 */
+		global $global_Cache;
+		$version_status_msg = $global_Cache->get( 'version_status_msg' );
+		if( !empty($version_status_msg) )
+		{	// We have managed to get updates (right now or in the past):
+			echo '<p>'.$version_status_msg.'</p>';
+			$extra_msg = $global_Cache->get( 'extra_msg' );
+			if( !empty($extra_msg) )
+			{
+				echo '<p>'.$extra_msg.'</p>';
+			}
 		}
+	
+	
+		$block_item_Widget->disp_template_replaced( 'block_end' );
+	
+		/*
+		 * DashboardAdminMain to be added here (anyone?)
+		 */
+	
+		echo '</td>';
 	}
-
-
-	$block_item_Widget->disp_template_replaced( 'block_end' );
-
-	/*
-	 * DashboardAdminMain to be added here (anyone?)
-	 */
-
-	echo '</td><td>';
 
 	/*
 	 * RIGHT COL
 	 */
-	$side_item_Widget = & new Widget( 'side_item' );
+	echo '<td>';
+
+	$side_item_Widget = & new Widget( $allow_evo_stats !== false ? 'side_item' : 'block_item' );
 
 	$side_item_Widget->title = T_('Administrative tasks');
 	$side_item_Widget->disp_template_replaced( 'block_start' );
@@ -484,6 +491,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.36  2009/10/28 13:45:47  tblue246
+ * Do not display evonet updates if disabled by admin
+ *
  * Revision 1.35  2009/10/12 22:11:28  blueyed
  * Fix blank.gif some: use conditional comments, where marked as being required for IE. Add ALT tags and close tags.
  *
