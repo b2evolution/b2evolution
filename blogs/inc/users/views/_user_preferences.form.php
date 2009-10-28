@@ -182,7 +182,6 @@ if( $action != 'view' )
 	else
 	{
 		$Form->info( T_('Session timeout'), $timeout_sessions_selected );
-		$Form->info( T_('Custom duration'), seconds_to_fields( $timeout_sessions ) );
 	}
 }
 else
@@ -273,6 +272,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.3  2009/10/28 15:11:55  efy-maxim
+ * custom duration has been hidden for normal users
+ *
  * Revision 1.2  2009/10/28 13:41:58  efy-maxim
  * default multiple sessions settings
  *
