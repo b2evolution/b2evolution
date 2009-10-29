@@ -843,12 +843,43 @@ class Hit
 		if( ! isset($this->agent_ID) )
 		{
 			global $DB;
-			if( $agnt_ID = $DB->get_var( "
-				SELECT agnt_ID FROM T_useragents
+			$sql_agent_types = array($this->get_agent_type());
+			if( $sql_agent_types[0] != 'unknown' )
+				$sql_agent_types[] = 'unknown';
+
+			if( $rows = $DB->get_results( "
+				SELECT agnt_ID, agnt_type FROM T_useragents
 				 WHERE agnt_signature = ".$DB->quote( $this->get_user_agent() )."
-					 AND agnt_type = ".$DB->quote($this->get_agent_type()) ) )
-			{ // this agent (with that type) hit us once before, re-use ID
-				$this->agent_ID = $agnt_ID;
+					 AND agnt_type IN (".$DB->quote($sql_agent_types).")" ) )
+			{ // this agent (with that type or "unknown") hit us once before, re-use ID
+				if( $DB->num_rows == 1 )
+				{ // just one result, that's it
+					$this->agent_ID = $rows[0]->agnt_ID;
+					if( $rows[0]->agnt_type == 'unknown' && $sql_agent_types[0] != 'unknown' )
+					{ // type is "unknown", but known now: update type
+						$DB->query( "
+						UPDATE T_useragents
+						   SET agnt_type = ".$DB->quote($sql_agent_types[0])."
+						   WHERE agnt_ID = ".$this->agent_ID );
+					}
+				}
+				else
+				{ // two rows selected: "unknown" and detected type. This might be rows from before the case above was handled.
+					if( count($rows) != 2 )
+						debug_die('get_agent_ID: assertion failed: "unknown"+this != 2');
+					foreach($rows as $row)
+						if( $row->agnt_type == 'unknown' )
+							$unknown_id = $row->agnt_ID;
+						else
+							$this->agent_ID = $row->agnt_ID;
+
+					// Convert entries
+					$DB->query( '
+						UPDATE T_hitlog
+						   SET hit_agnt_ID = '.$this->agent_ID.'
+						   WHERE hit_agnt_ID = '.$unknown_id );
+					$DB->query( 'DELETE FROM T_useragents WHERE agnt_ID = '.$unknown_id );
+				}
 			}
 			else
 			{ // create new user agent entry
@@ -1173,6 +1204,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.44  2009/10/29 20:42:34  blueyed
+ * Handle conversion of agnt_type from 'unknown' to a known type.
+ *
  * Revision 1.43  2009/10/20 20:07:47  blueyed
  * Hit: init is_IE
  *
