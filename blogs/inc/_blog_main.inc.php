@@ -336,6 +336,7 @@ if( !isset($timestamp_max) ) $timestamp_max = '';
  */
 if( !empty($p) || !empty($title) )
 { // We are going to display a single post
+	$title = rawurldecode($title);
 	// Make sure the single post we're requesting (still) exists:
 	$ItemCache = & get_ItemCache();
 	if( !empty($p) )
@@ -347,6 +348,11 @@ if( !empty($p) || !empty($title) )
 		$orig_title = $title;
 		$title = preg_replace( '/[^A-Za-z0-9_]/', '-', $title );
 		$Item = & $ItemCache->get_by_urltitle( $title, false );
+
+		if( empty($Item) && substr($title, -1) == '-' )
+		{ // Try lookup by removing last invalid char, which might have been e.g. ">"
+			$Item = $ItemCache->get_by_urltitle(substr($title, 0, -1), false);
+		}
 	}
 	if( empty( $Item ) )
 	{	// Post doesn't exist!
@@ -623,6 +629,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.155  2009/10/29 20:44:30  blueyed
+ * urldecode title and check if it can be found with the last invalid char removed.
+ *
  * Revision 1.154  2009/10/17 15:23:04  tblue246
  * doc/correction
  *
