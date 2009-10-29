@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: b2evolution 3\n"
+"Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2009-09-30 20:51+0200\n"
-"PO-Revision-Date: 2009-10-25 17:44-0500\n"
+"PO-Revision-Date: 2009-10-29 16:07-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -9844,7 +9844,7 @@ msgstr "Новая страна"
 #: ../../../inc/regional/views/_country.form.php:61
 #: ../../../inc/regional/views/_country_list.view.php:170
 msgid "Default Currency"
-msgstr "Валюта по умолчанию"
+msgstr "Основная валюта"
 
 #: ../../../inc/regional/views/_country_list.view.php:56
 msgid "Countries list"
@@ -9892,7 +9892,7 @@ msgstr "Новая валюта"
 #: ../../../inc/regional/views/_currency.form.php:54
 #: ../../../inc/regional/views/_currency_list.view.php:94
 msgid "Shortcut"
-msgstr "Ярлык"
+msgstr "Обозначение"
 
 #: ../../../inc/regional/views/_currency_list.view.php:55
 msgid "Currencies list"
