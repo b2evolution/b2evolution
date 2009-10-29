@@ -55,40 +55,23 @@ global $fm_FileRoot;
 	function appendLabelAndInputElements( appendTo, labelText, labelBr, inputOrTextarea, inputName,
 	                                      inputSizeOrCols, inputMaxLengthOrRows, inputType, inputClass )
 	{
+		var id = inputName.replace(/\[(\d+)\]/, '_$1');
 		// LABEL:
+		var fileLabel = jQuery(appendTo).append(jQuery('<label for="'+id+'">'+labelText+'</label>'));
 
-		// var fileDivLabel = document.createElement("div");
-		// fileDivLabel.className = "label";
-
-		var fileLabel = document.createElement('label');
-		var fileLabelText = document.createTextNode( labelText );
-		fileLabel.appendChild( fileLabelText );
-
-		// fileDivLabel.appendChild( fileLabel )
-
-		appendTo.appendChild( fileLabel );
-
+		// Dow we want a BR after the label:
 		if( labelBr )
-		{ // We want a BR after the label:
 			appendTo.appendChild( document.createElement('br') );
-		}
 		else
-		{
 			appendTo.appendChild( document.createTextNode( ' ' ) );
-		}
 
 		// INPUT:
-
-		// var fileDivInput = document.createElement("div");
-		// fileDivInput.className = "input";
-
 		var fileInput = document.createElement( inputOrTextarea );
 		fileInput.name = inputName;
+		fileInput.id = id;
 		if( inputOrTextarea == "input" )
 		{
-			fileInput.type = typeof( inputType ) !== 'undefined' ?
-												inputType :
-												"text";
+			fileInput.type = typeof( inputType ) !== 'undefined' ? inputType : "text";
 			fileInput.size = inputSizeOrCols;
 			if( typeof( inputMaxLengthOrRows ) != 'undefined' )
 			{
@@ -102,8 +85,6 @@ global $fm_FileRoot;
 		}
 
 		fileInput.className = inputClass;
-
-		// fileDivInput.appendChild( fileInput );
 
 		appendTo.appendChild( fileInput );
 		appendTo.appendChild( document.createElement('br') );
@@ -142,19 +123,36 @@ global $fm_FileRoot;
 		if( get_icon( 'close', 'rollover' ) )
 		{ // handle rollover images ('close' by default is one).
 			?>
-			closeLink.className = 'rollover';
+			closeLink.className = 'rollover'; // dh> use "+=" to append class?
 			if( typeof setupRollovers == 'function' )
 			{
 				setupRollovers();
 			}
 			<?php
 		}
+		// add handler to image to close the parent LI and add css to float right.
 		?>
-		closeImage.setAttribute( 'onclick', "document.getElementById('uploadfileinputs').removeChild(this.parentNode.parentNode);" ); // TODO: setting onclick this way DOES NOT work in IE. (try attachEvent then)
-		closeLink.style.cssFloat = 'right';		// standard (not working in IE)
-		closeLink.style.styleFloat = 'right'; // IE
+		jQuery(closeImage)
+			.click( function() {jQuery(this).closest("li").remove()} )
+			.css('float', 'right');
 
-		appendLabelAndInputElements( newLI, '<?php echo TS_('Choose a file'); ?>:', false, 'input', 'uploadfile[]', '70', '0', 'file', 'upload_file' );
+		evo_upload_fields_count++;
+		// first radio
+		var radioFile = document.createElement('input');
+		radioFile.type = "radio";
+		radioFile.name = "uploadfile_source["+ evo_upload_fields_count +"]";
+		radioFile.value = "file";
+
+		// second radio
+		var radioURL = radioFile.cloneNode(true);
+		radioURL.value = "upload";
+
+		radioFile.checked = true;
+
+		newLI.appendChild( radioFile );
+		appendLabelAndInputElements( newLI, '<?php echo TS_('Choose a file'); ?>:', false, 'input', 'uploadfile['+evo_upload_fields_count+']', '70', '0', 'file', 'upload_file' );
+		newLI.appendChild( radioURL );
+		appendLabelAndInputElements( newLI, '<?php echo TS_('Upload by URL'); ?>:', false, 'input', 'uploadfile_url['+evo_upload_fields_count+']', '70', '0', 'text', 'upload_file' );
 		<?php
 		if( $uploadwithproperties )
 		{	// We want file properties on the upload form:
@@ -238,7 +236,7 @@ global $fm_FileRoot;
 			<ul id="uploadfileinputs">
 				<?php
 					if( empty($failedFiles) )
-					{ // No failed failes, display 5 empty input blocks:
+					{ // No failed files, display 5 empty input blocks:
 						$displayFiles = array( NULL, NULL, NULL, NULL, NULL );
 					}
 					else
@@ -246,6 +244,8 @@ global $fm_FileRoot;
 						$displayFiles = & $failedFiles;
 					}
 
+					global $uploadfile_alt, $uploadfile_desc, $uploadfile_name, $uploadfile_title;
+					global $uploadfile_url, $uploadfile_source;
 					foreach( $displayFiles as $lKey => $lMessage )
 					{ // For each file upload block to display:
 
@@ -264,8 +264,17 @@ global $fm_FileRoot;
 						// dh> TODO: it may be useful to add the "accept" attrib to the INPUT elements to give the browser a hint about the accepted MIME types
 						?>
 
-						<label><?php echo T_('Choose a file'); ?>:</label>
-						<input name="uploadfile[]" size="70" type="file" class="upload_file" /><br />
+						<input type="radio" name="uploadfile_source[<?php echo $lKey ?>]" value="file"
+							<?php echo ! isset($uploadfile_source[$lKey]) || $uploadfile_source[$lKey] == 'file' ? ' checked="checked"' : '' ?> />
+						<label for="uploadfile_<?php echo $lKey ?>"><?php echo T_('Choose a file'); ?>:</label>
+						<input name="uploadfile[]" id="uploadfile_<?php echo $lKey ?>" size="70" type="file" class="upload_file" /><br />
+
+						<input type="radio" name="uploadfile_source[<?php echo $lKey ?>]" value="upload"
+							<?php echo isset($uploadfile_source[$lKey]) && $uploadfile_source[$lKey] == 'upload' ? ' checked="checked"' : '' ?> />
+						<label for="uploadfile_url_<?php echo $lKey ?>"><?php echo T_('Upload by URL'); ?>:</label>
+						<input name="uploadfile_url[]" id="uploadfile_url_<?php echo $lKey ?>" size="70" type="text" class="upload_file"
+								value="<?php echo ( isset( $uploadfile_url[$lKey] ) ? format_to_output( $uploadfile_url[$lKey], 'formvalue' ) : '' );
+								?>" /><br />
 
 						<?php
 						if( $uploadwithproperties )
@@ -298,6 +307,17 @@ global $fm_FileRoot;
 
 				?>
 			</ul>
+
+			<script type="text/javascript">
+				(function() {
+					var handler = function() {
+						jQuery(this).prevAll("[type=radio]").eq(0).attr("checked", "checked")
+					}
+					jQuery(".upload_file").live("keyup", handler);
+					jQuery(".upload_file").live("change", handler);
+				})();
+				var evo_upload_fields_count = jQuery("#uploadfileinputs li").length-1;
+			</script>
 
 			<p class="uploadfileinputs"><a href="#" onclick="addAnotherFileInput(); return false;" class="small"><?php echo T_('Add another file'); ?></a></p>
 
@@ -346,6 +366,9 @@ global $fm_FileRoot;
 
 /*
  * $Log$
+ * Revision 1.9  2009/10/29 22:17:22  blueyed
+ * Filemanager upload: add "Upload by URL" fields. Cleanup/rewrite some JS on the go.
+ *
  * Revision 1.8  2009/03/08 23:57:43  fplanque
  * 2009
  *

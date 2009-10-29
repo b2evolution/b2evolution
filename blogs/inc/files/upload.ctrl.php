@@ -227,6 +227,69 @@ param( 'upload_quickmode', 'integer', 0 );
  */
 $failedFiles = array();
 
+param( 'uploadfile_url', 'array', array() );
+param( 'uploadfile_source', 'array', array() );
+if( $uploadfile_url )
+{
+	foreach($uploadfile_url as $k => $url)
+	{
+		if( ! isset($uploadfile_source[$k]) || $uploadfile_source[$k] != 'upload' )
+		{ // upload by URL has not been selected
+			continue;
+		}
+		if( strlen($url) )
+		{
+			// Validate URL and parse it for the file name
+			if( ! is_absolute_url($url)
+				|| ! ($parsed_url = parse_url($url))
+				||! isset($parsed_url['scheme'], $parsed_url['host'], $parsed_url['path']) )
+			{
+				$failedFiles[$k] = T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!');
+				continue;
+			}
+
+			$file_contents = fetch_remote_page($url, $info, NULL, $Settings->get('upload_maxkb'));
+
+			if( $file_contents !== false )
+			{
+				// Create temporary file and insert contents into it.
+				$tmpfile_name = tempnam(sys_get_temp_dir(), 'fmupload');
+				if( ! $tmpfile_name )
+				{
+					$failedFiles[$k] = 'Failed to find temporary directory.'; // no trans: very unlikely
+					continue;
+				}
+				$tmpfile = fopen($tmpfile_name, 'w');
+				if( ! fwrite($tmpfile, $file_contents) )
+				{
+					unlink($tmpfile);
+					$failedFiles[$k] = sprintf( T_('Could not write to temporary file (%s).'), $tmpfile );
+					continue;
+				}
+				fclose($tmpfile);
+
+				// Fake/inject info into PHP's array of uploaded files.
+				// This allows us to treat it (nearly) the same way as regular uploads, apart from
+				// is_uploaded_file(), which we skip and move_uploaded_file() (where we use rename()).
+				$_FILES['uploadfile']['name'][$k] = basename($parsed_url['path']);
+				$_FILES['uploadfile']['size'][$k] = evo_bytes($file_contents);
+				$_FILES['uploadfile']['error'][$k] = 0;
+				$_FILES['uploadfile']['tmp_name'][$k] = $tmpfile_name;
+				$_FILES['uploadfile']['_evo_fetched_url'][$k] = $url; // skip is_uploaded_file and keep info
+				unset($file_contents);
+			}
+			else
+			{
+				$failedFiles[$k] = sprintf(
+					T_('Could not retrieve file. Error: %s (status %s). Used method: %s.'),
+					$info['error'],
+					isset($info['status']) ? $info['status'] : '-',
+					isset($info['used_method']) ? $info['used_method'] : '-');
+			}
+		}
+	}
+}
+
 // Process uploaded files:
 if( isset($_FILES) && count( $_FILES ) )
 { // Some files have been uploaded:
@@ -303,7 +366,8 @@ if( isset($_FILES) && count( $_FILES ) )
 			}
 		}
 
-		if( !is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey] ) )
+		if( ! isset($_FILES['uploadfile']['_evo_fetched_url'][$lKey]) // skip check for fetched URLs
+			&& ! is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey] ) )
 		{ // Ensure that a malicious user hasn't tried to trick the script into working on files upon which it should not be working.
 			$failedFiles[$lKey] = T_('The file does not seem to be a valid upload! It may exceed the upload_max_filesize directive in php.ini.');
 			// Abort upload for this file:
@@ -352,7 +416,16 @@ if( isset($_FILES) && count( $_FILES ) )
 		}
 
 		// Attempt to move the uploaded file to the requested target location:
-		if( ! @move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->get_full_path() ) )
+		if( isset($_FILES['uploadfile']['_evo_fetched_url'][$lKey]) )
+		{ // fetched remotely
+			if( ! rename( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->get_full_path() ) )
+			{
+				$failedFiles[$lKey] = T_('An unknown error occurred when moving the uploaded file on the server.');
+				// Abort upload for this file:
+				continue;
+			}
+		}
+		elseif( ! move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->get_full_path() ) )
 		{
 			$failedFiles[$lKey] = T_('An unknown error occurred when moving the uploaded file on the server.');
 			// Abort upload for this file:
@@ -381,6 +454,7 @@ if( isset($_FILES) && count( $_FILES ) )
 		{ // If a desc text has been passed... (does not happen in quick upload mode)
 			$newFile->set( 'desc', trim( strip_tags($uploadfile_desc[$lKey])) );
 		}
+		// TODO: dh> store _evo_fetched_url (source URL) somewhere (e.g. at the end of desc)?
 
 		$success_msg = sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->dget('name') );
 		if( $mode == 'upload' )
@@ -448,6 +522,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2009/10/29 22:17:20  blueyed
+ * Filemanager upload: add "Upload by URL" fields. Cleanup/rewrite some JS on the go.
+ *
  * Revision 1.18  2009/10/15 00:35:04  blueyed
  * Upload: make correction of extensions case insensitive.
  *
