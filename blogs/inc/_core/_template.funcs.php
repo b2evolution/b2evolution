@@ -969,6 +969,18 @@ function bloginfo( $what )
 }
 
 /**
+ * Display comment allowed tags
+ *
+ * @param string format
+ */
+function comment_allowed_tags( $format = 'htmlbody' )
+{
+	global $comment_allowed_tags;
+
+	echo format_to_output( $comment_allowed_tags, $format );
+}
+
+/**
  * DEPRECATED
  */
 function link_pages()
@@ -997,6 +1009,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.61  2009/11/04 13:48:04  efy-maxim
+ * new comment_allowed_tags function
+ *
  * Revision 1.60  2009/10/13 20:59:49  blueyed
  * Create subdir for jquery plugins. Move jQuery UI in there.
  *
