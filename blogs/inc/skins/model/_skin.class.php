@@ -516,6 +516,30 @@ class Skin extends DataObject
 
 
 	/**
+	 * Get current skin path
+	 * @return string
+	 */
+	function get_path()
+	{
+		global $skins_path;
+
+		return trailing_slash($skins_path.$this->folder);
+	}
+
+
+	/**
+	 * Get current skin URL
+	 * @return string
+	 */
+	function get_url()
+	{
+		global $skins_url;
+
+		return trailing_slash($skins_url.$this->folder);
+	}
+
+
+	/**
 	 * Set a skin specific param value for current Blog
 	 *
 	 * @param string parameter name
@@ -614,6 +638,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.22  2009/11/04 13:20:25  efy-maxim
+ * some new functions
+ *
  * Revision 1.21  2009/10/12 22:11:28  blueyed
  * Fix blank.gif some: use conditional comments, where marked as being required for IE. Add ALT tags and close tags.
  *

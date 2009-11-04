@@ -2051,7 +2051,7 @@ class Item extends ItemLight
 
 			case 'trackbacks':
 				$this->get_Blog();
-				if( ! $this->Blog->get( 'allowtrackbacks' ) )
+				if( ! $this->can_receive_pings() )
 				{ // Trackbacks not allowed on this blog:
 					return;
 				}
@@ -2064,7 +2064,7 @@ class Item extends ItemLight
 			case 'pingbacks':
 				// Obsolete, but left for skin compatibility
 				$this->get_Blog();
-				if( ! $this->Blog->get( 'allowtrackbacks' ) )
+				if( ! $this->can_receive_pings() )
 				{ // Trackbacks not allowed on this blog:
 					// We'll consider pingbacks to follow the same restriction
 					return;
@@ -2126,6 +2126,48 @@ class Item extends ItemLight
 		}
 
 		echo $params['link_after'];
+	}
+
+
+	/**
+	 * Return true if there is any feedback of given type.
+	 *
+	 * @param array
+	 * @return boolean
+	 */
+	function has_feedback( $params )
+	{
+		$params = array_merge( array(
+							'type' => 'feedbacks',
+							'status' => 'published'
+						), $params );
+
+		// Check is a given type is allowed
+		switch( $params['type'] )
+		{
+			case 'feedbacks':
+			case 'comments':
+			case 'trackbacks':
+			case 'pingbacks':
+				break;
+			default:
+				debug_die( "Unknown feedback type [{$params['type']}]" );
+		}
+
+		$number = generic_ctp_number( $this->ID, $params['type'], $params['status'] );
+
+		return $number > 0;
+	}
+
+
+	/**
+	 * Return true if trackbacks and pingbacks are allowed
+	 *
+	 * @return boolen
+	 */
+	function can_receive_pings()
+	{
+		return $this->Blog->get( 'allowtrackbacks' );
 	}
 
 
@@ -2856,7 +2898,7 @@ class Item extends ItemLight
 	function trackback_rdf()
 	{
 		$this->get_Blog();
-		if( ! $this->Blog->get( 'allowtrackbacks' ) )
+		if( ! $this->can_receive_pings() )
 		{ // Trackbacks not allowed on this blog:
 			return;
 		}
@@ -4012,6 +4054,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.152  2009/11/04 13:20:24  efy-maxim
+ * some new functions
+ *
  * Revision 1.151  2009/10/27 21:57:45  fplanque
  * minor/doc
  *
