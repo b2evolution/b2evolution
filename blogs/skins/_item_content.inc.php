@@ -32,7 +32,9 @@ $params = array_merge( array(
 		'after_image'         => '</div>',
 		'after_images'        => '</div>',
 		'image_size'          => 'fit-400x320',
+		'image_limit'         =>  1000,
 		'excerpt_image_size'  => 'fit-80x80',
+		'excerpt_image_limit' =>  1,
 		'before_url_link'     => '<p class="post_link">'.T_('Link:').' ',
 		'after_url_link'      => '</p>',
 		'url_link_text_template' => '$url$',
@@ -112,6 +114,7 @@ switch( $content_mode )
 					'after_image' =>         $params['after_image_legend'],
 					'after' =>               $params['after_images'],
 					'image_size' =>          $params['excerpt_image_size'],
+					'limit' =>               $params['excerpt_image_limit'],
 					'image_link_to' =>       'single',
 					'files_position' =>      '',
 				) );
@@ -152,6 +155,7 @@ switch( $content_mode )
 					'after_image' =>         $params['after_image_legend'],
 					'after' =>               $params['after_images'],
 					'image_size' =>          $params['image_size'],
+					'image' =>               $params['image_limit'],
 					'files_position' =>      $Item->has_content_parts($params) ? 'teaser' : '',
 				) );
 		}
@@ -234,6 +238,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.23  2009/11/04 04:34:16  sam2kb
+ * Llimit the number of linked images displayed in excerpt and full modes
+ *
  * Revision 1.22  2009/10/25 21:55:21  blueyed
  * Display attached images only once, if they are positioned as 'aftermore' and there is no 'more'.
  *
