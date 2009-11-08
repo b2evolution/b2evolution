@@ -161,6 +161,7 @@ $search_engines = array(
  * Typically http://google.com?s=keyphraz returns keyphraz
  *
  * fp> TODO: merge with above table
+ *           dh> Piwik might have good data to build upon.
  * fp> TODO: put into configurable database table
  *
  * @global array $known_search_params
