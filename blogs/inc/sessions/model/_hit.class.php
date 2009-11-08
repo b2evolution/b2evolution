@@ -298,6 +298,7 @@ class Hit
 
 		// Check if the referer is valid and does not match the antispam blacklist:
 		// NOTE: requests to admin pages should not arrive here, because they should be matched above through $self_referer_list!
+		load_funcs('_core/_url.funcs.php');
 		if( $error = validate_url( $this->referer, 'commenting' ) )
 		{ // This is most probably referer spam!!
 			$Debuglog->add( 'detect_referer(): '.$error.' (SPAM)', 'hit');
@@ -1022,27 +1023,32 @@ class Hit
 	{
 		global $evo_charset, $known_search_params;
 
-		$kwout = '';
-		if( ($pos_question = strpos( $ref, '?' )) === false )
+		// Parse URL.
+		$pu = @parse_url($ref);
+		if( ! isset($pu['query']) )
 		{
 			return NULL;
 		}
 
-		// This is needed for google image search to extract q param from encoded URL
-		// Otherwise "=" is encoded to "%3D"
-		$ref = urldecode($ref);
+		// Parse query string into associate array.
+		parse_str($pu['query'], $ref_params);
 
-		// This is needed for google image search to extract q param
-		// prev=/images?q=
-		$ref = str_replace( '?', '&', evo_substr( $ref, $pos_question+1 ) );
-
-		$ref_params = explode( '&', $ref );
-		foreach( $ref_params as $ref_param )
+		// Special handling for images.google.*:
+		if( substr($pu['host'], 0, 14) == 'images.google.' && isset($ref_params['prev']) )
 		{
-			$param_parts = explode( '=', $ref_param );
-			if( !empty($param_parts[1]) && in_array( $param_parts[0], $known_search_params ) )
+			$prev = parse_url($ref_params['prev']);
+			parse_str($prev['query'], $prev_params);
+
+			$ie = isset($ref_params['ie']) ? $ref_params['ie'] : 'utf-8';
+			$q = convert_charset($prev_params['q'], $evo_charset, $ie);
+			return $q;
+		}
+
+		foreach( $known_search_params as $search_param )
+		{
+			if( isset($ref_params[$search_param]) )
 			{ // found the keyphrase query parameter
-				$q = trim(urldecode($param_parts[1]));
+				$q = trim(urldecode($ref_params[$search_param]));
 
 			/* fp> what's that? when do we need that?
 			 * Tblue> I think the problem is this: yandex.ru uses the text
@@ -1064,7 +1070,10 @@ class Hit
 				}
 			*/
 
-				$q = convert_charset($q, $evo_charset, 'UTF-8');
+				// convert from "input encoding": Google might provide param "ie". Defaults to utf8.
+				$ie = isset($ref_params['ie']) ? $ref_params['ie'] : 'utf-8';
+				$q = convert_charset($q, $evo_charset, $ie);
+
 				return $q;
 			}
 		}
@@ -1204,6 +1213,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.45  2009/11/08 23:01:52  blueyed
+ * Fix encoding/decoding of keyphrases from referers. Also, make the images.google code only apply to images.google.*
+ *
  * Revision 1.44  2009/10/29 20:42:34  blueyed
  * Handle conversion of agnt_type from 'unknown' to a known type.
  *
