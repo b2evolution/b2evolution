@@ -23,7 +23,7 @@ $Item->images( array(
 		'after_image' =>         '</td></tr>',
 		'after' =>               '</table>',
 		'image_size' =>          'fit-400x320',
-		'files_position' =>      '', // could be limited to "teaser" or "aftermore"
+		'files_position' =>      '', // could be limited to "teaser" or "aftermore" fp> what does '' mean????
 	) );
 ?>
 

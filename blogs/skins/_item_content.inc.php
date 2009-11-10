@@ -116,7 +116,7 @@ switch( $content_mode )
 					'image_size' =>          $params['excerpt_image_size'],
 					'limit' =>               $params['excerpt_image_limit'],
 					'image_link_to' =>       'single',
-					'files_position' =>      '',
+					'files_position' =>      '',  // fp> what does '' mean?
 				) );
 		}
 
@@ -238,6 +238,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.24  2009/11/10 02:44:38  fplanque
+ * no message
+ *
  * Revision 1.23  2009/11/04 04:34:16  sam2kb
  * Llimit the number of linked images displayed in excerpt and full modes
  *
