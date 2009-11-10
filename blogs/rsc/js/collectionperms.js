@@ -1,11 +1,7 @@
 /**
  * Javascript for Blog permission forms (backoffice).
- *
- * b2evolution - {@link http://b2evolution.net/}
- * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
- *
- * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
+ * b2evolution - http://b2evolution.net/
+ * @version $Id$
  */
 
 

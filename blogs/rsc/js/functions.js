@@ -1,33 +1,6 @@
 /**
- * This file implements general Javascript functions.
- *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
- * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
- *
- * {@internal License choice
- * - If you have received this file as part of a package, please find the license.txt file in
- *   the same folder or the closest folder above for complete license terms.
- * - If you have received this file individually (e-g: from http://evocms.cvs.sourceforge.net/)
- *   then you must choose one of the following licenses before using the file:
- *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
- *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
- * }}
- *
- * {@internal Open Source relicensing agreement:
- * Daniel HAHLER grants Francois PLANQUE the right to license
- * Daniel HAHLER's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
- *
- * @package main
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author blueyed: Daniel HAHLER
- * @author fplanque: Francois PLANQUE
- *
  * @version $Id$
  */
 
@@ -528,56 +501,3 @@ function evoFadeBg( selector, bgs, options )
 
 	eval(toEval);
 }
-
-
-/*
- * $Log$
- * Revision 1.36  2009/10/13 22:33:19  blueyed
- * move colors from Highlight to Success (greenish). Use something orangish/yellowish for highlight. Use 'normal' speed in all cases.
- *
- * Revision 1.35  2009/10/13 22:27:06  blueyed
- * Add general EvoFadeBg function, and use it from the other faders. Add EvoFadeHighlight, meant for highlighting. Color scheme cries for improvement.
- *
- * Revision 1.34  2009/10/11 02:51:19  blueyed
- * Add JS functions evoFadeSuccess/evoFadeFailure, derived from doFade. IMHO this is the approach to take throughout the app (at least regarding the stubs), also for Results (uses FAT currently).
- *
- * Revision 1.33  2009/03/22 23:39:33  fplanque
- * new evobar Menu structure
- * Superfish jQuery menu library
- * + removed obsolete JS includes
- *
- * Revision 1.32  2008/06/26 23:36:07  blueyed
- * Move evo_menu_show() and evo_menu_hide() javascript functions to global functions.js, instead of inlining them on every page
- *
- * Revision 1.31  2008/02/20 02:08:49  blueyed
- * doc
- *
- * Revision 1.30  2007/09/16 22:06:37  fplanque
- * minor
- *
- * Revision 1.29  2007/06/30 21:05:17  fplanque
- * fixed for FF; I hope.
- *
- * Revision 1.28  2007/06/29 23:42:30  blueyed
- * - Fixed b2evoCallback in textarea_wrap_selection: uses "wrap_selection_for_" callback now instead of "insert_raw_into_"
- * - trigger_callback now returns null if no callback is registered
- *
- * Revision 1.27  2007/04/20 01:42:32  fplanque
- * removed excess javascript
- *
- * Revision 1.26  2007/03/07 19:26:20  blueyed
- * Fix; for IE IIRC
- *
- * Revision 1.25  2007/01/26 02:12:09  fplanque
- * cleaner popup windows
- *
- * Revision 1.24  2006/12/10 03:05:02  blueyed
- * cleanup
- *
- * Revision 1.23  2006/11/28 19:44:51  blueyed
- * b2evo_Callbacks.trigger_callback() now supports variable number of arguments; textarea_replace_selection(): default to document for target_document arg
- *
- * Revision 1.22  2006/11/26 01:42:10  fplanque
- * doc
- *
- */

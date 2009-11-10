@@ -1,38 +1,9 @@
 /**
  * "BOZO VALIDATOR 2" : Check if a form has been changed but not submitted when a bozo clicks
  * on a link which will result in potential data input loss
- *
- * Used for bozos, ask for confirmation to change the current page when he clicks on a link after having done changes on inputs forms
- *	without saving them
- *
  * Tested on Firefox (XP & Mac OSX) , IE6 (XP), Safari (Mac OSX)
- *
- * This file is part of the evoCore framework - {@link http://evocore.net/}
- * See also {@link http://sourceforge.net/projects/evocms/}.
- *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
- * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
- *
- * {@internal License choice
- * - If you have received this file as part of a package, please find the license.txt file in
- *   the same folder or the closest folder above for complete license terms.
- * - If you have received this file individually (e-g: from http://evocms.cvs.sourceforge.net/)
- *   then you must choose one of the following licenses before using the file:
- *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
- *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
- * }}
- *
- * {@internal Open Source relicensing agreement:
- * PROGIDISTRI S.A.S. grants Francois PLANQUE the right to license
- * PROGIDISTRI S.A.S.'s contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
- *
- * @package admin
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE.
- * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
+ * b2evolution - http://b2evolution.net/
+ * @version $Id$
  */
 var bozo_confirm_mess;
 

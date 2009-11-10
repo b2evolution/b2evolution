@@ -1,10 +1,6 @@
 /**
  * This file is public domain.
- *
  * Source: http://www.alistapart.com/articles/alternate/
- *
- * dh> TODO: could be optimized probably a bit
- *
  * Changes:
  *  2006-10-17, http://daniel.hahler.de/:
  *  - fix/optimization regarding disabling of chosen stylesheet(-set)

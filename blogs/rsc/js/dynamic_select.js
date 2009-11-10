@@ -1,43 +1,16 @@
 /**
  *	Dynamic select list options
- *
- * 	Exemple:
- * 
+ * 	Example:
  * 	LIST 1 Values 'a','b','c'
- *
- *	LIST 2 Values 'a-1','a-2','b-3','c-2','c-4' 
+ *	LIST 2 Values 'a-1','a-2','b-3','c-2','c-4'
  *	==> After Refresh LIST 2 values '1','2' if SL1 = 'a' -- OR -- '3' if SL1 = 'b'  ..........
- *
  * 	CloneOptions always Values 'a-1','a-2','b-3','c-2','c-4'
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
- *
- * @copyright (c)2003-2006 by Francois PLANQUE - {@link http://fplanque.net/}
- * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
- *
- * {@internal License choice
- * - If you have received this file as part of a package, please find the license.txt file in
- *   the same folder or the closest folder above for complete license terms.
- * - If you have received this file individually (e-g: from http://evocms.cvs.sourceforge.net/)
- *   then you must choose one of the following licenses before using the file:
- *   - GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
- *   - Mozilla Public License 1.1 (MPL) - http://www.opensource.org/licenses/mozilla1.1.php
- * }}
- *
- * {@internal Open Source relicensing agreement:
- * PROGIDISTRI S.A.S. grants Francois PLANQUE the right to license
- * PROGIDISTRI S.A.S.'s contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
- *
- * @package admin
- *
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author fplanque: Francois PLANQUE.
- * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
+ * @version $Id$
  */
- 
+
 /**
 * Called by window.onload event
 * Initialize all parent_child selects lists of the form
@@ -46,10 +19,10 @@ function init_dynamicSelect()
 {
 	for( var i = 0; i < nb_dynamicSelects ; i++)
 	{
-		dynamicSelect( tab_dynamicSelects[i]['parent'], tab_dynamicSelects[i]['child'] ); 
+		dynamicSelect( tab_dynamicSelects[i]['parent'], tab_dynamicSelects[i]['child'] );
 	}
 }
- 
+
 /**
  * Initialize select lists
  *
@@ -60,22 +33,22 @@ function init_dynamicSelect()
  * @param parent select list
  * @param child select list
  */
-function dynamicSelect( id1, id2 ) 
+function dynamicSelect( id1, id2 )
 {
 	// Feature test to see if there is enough W3C DOM support
-	if (document.getElementById && document.getElementsByTagName) 
+	if (document.getElementById && document.getElementsByTagName)
 	{
 		// Obtain references to both select boxes
 		var sel1 = document.getElementById(id1);
 		var sel2 = document.getElementById(id2);
 		// Clone the dynamic select box
 		var clone = sel2.cloneNode(true);
-		// Obtain references to all cloned options 
+		// Obtain references to all cloned options
 		var clonedOptions = clone.getElementsByTagName("option");
 		// Onload init: call a generic function to display the related options in the dynamic select box
 		refreshDynamicSelectOptions(sel1, sel2, clonedOptions);
 		// Onchange of the main select box: call a generic function to display the related options in the dynamic select box
-		sel1.onchange = function() 
+		sel1.onchange = function()
 		{
 			refreshDynamicSelectOptions(sel1, sel2, clonedOptions);
 		}
@@ -88,9 +61,9 @@ function dynamicSelect( id1, id2 )
  *
  * @param parent select list
  * @param child select list
- * @param clone of the child select list initialized  
+ * @param clone of the child select list initialized
  */
-function refreshDynamicSelectOptions( sel1, sel2, clonedOptions ) 
+function refreshDynamicSelectOptions( sel1, sel2, clonedOptions )
 {
 	// Delete all options of the dynamic select box
 	while( sel2.options.length )
@@ -98,20 +71,20 @@ function refreshDynamicSelectOptions( sel1, sel2, clonedOptions )
 		sel2.remove(0);
 	}
 	// Regular expression to test if the value of a cloned option begins with the value of the selected option of the main select box
-	var pattern1 = new RegExp( "^" + sel1.options[sel1.selectedIndex].value + "-.*$" ); 
+	var pattern1 = new RegExp( "^" + sel1.options[sel1.selectedIndex].value + "-.*$" );
 
 	// Regular expression to keep only the second part(X2) of the value "X1-X2"
-	//var pattern2 = new RegExp( "^.*-(.*)$" ); 
-	
+	//var pattern2 = new RegExp( "^.*-(.*)$" );
+
 	// Iterate through all cloned options
 	for( var i = 0, j = 0; i < clonedOptions.length; i++ )
 	{
 		// If the value of a cloned option begins with the value of the selected option of the main select box
-		if ( clonedOptions[i].value.match( pattern1 ) || clonedOptions[i].value == '' ) 
-		{ 
+		if ( clonedOptions[i].value.match( pattern1 ) || clonedOptions[i].value == '' )
+		{
 			// Clone the option from the hidden option pool and append it to the dynamic select box
 			sel2.appendChild( clonedOptions[i].cloneNode( true ) );
-			
+
 			// keep only the second part of value if exist (pattern 2)
 			//	val = sel2.options[j].value.match( pattern2 );
 			//if (val) sel2.options[j].value = val[1];
