@@ -245,9 +245,10 @@ if( $uploadfile_url )
 			// Validate URL and parse it for the file name
 			if( ! is_absolute_url($url)
 				|| ! ($parsed_url = parse_url($url))
-				|| ! isset($parsed_url['scheme'], $parsed_url['host'], $parsed_url['path']) )
-			{
-				$failedFiles[$k] = T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!');
+				|| empty($parsed_url['scheme']) || empty($parsed_url['host'])
+				|| empty($parsed_url['path']) || $parsed_url['path'] == '/' )
+			{	// Includes forbidding getting the root of a server
+				$failedFiles[$k] = T_('The URL must start with <code>http://</code> or <code>https://</code> and point to a valid file!');
 				continue;
 			}
 
@@ -546,6 +547,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2009/11/11 20:53:24  fplanque
+ * restricting get from url a little bit so it doesn't allow getting the root of a website (this case was aboring silently before)
+ *
  * Revision 1.23  2009/11/11 20:44:55  fplanque
  * minor/cleanup
  *
