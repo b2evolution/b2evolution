@@ -465,11 +465,21 @@ if( isset($_FILES) && count( $_FILES ) )
 		{	// The filemanager has been opened from an Item, offer to insert an img tag into original post.
 			// TODO: Add plugin hook to allow generating JS insert code(s)
 			$img_tag = format_to_output( $newFile->get_tag(), 'formvalue' );
+			if( $newFile->is_image() )
+			{
+				$link_msg = T_('Link this image to your post');
+				$link_note = T_('recommended - allows automatic resizing');
+			}
+			else
+			{
+				$link_msg = T_('Link this file to your post');
+				$link_note = T_('The file will be appended for download at the end of the post');
+			}
 			$success_msg .= '<ul>'
 					.'<li>'.action_icon( T_('Link this file!'), 'link',
 								regenerate_url( 'fm_selected,ctrl', 'ctrl=files&amp;action=link_inpost&amp;fm_selected[]='.rawurlencode($newFile->get_rdfp_rel_path()) ),
-								' '.T_('Link this file/image to your post'), 5, 5, array( 'target' => $iframe_name ) )
-					.' ('.T_('recommended - allows automatic resizing').')</li>'
+								' '.$link_msg, 5, 5, array( 'target' => $iframe_name ) )
+					.' ('.$link_note.')</li>'
 
 					.'<li>or <a href="#" onclick="if( window.focus && window.opener ){'
 					.'window.opener.focus(); textarea_wrap_selection( window.opener.document.getElementById(\'itemform_post_content\'), \''
@@ -533,6 +543,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2009/11/11 19:25:59  fplanque
+ * "after upload actions" are even better now :)
+ *
  * Revision 1.20  2009/11/11 19:12:55  fplanque
  * Inproved actions after uploaded
  *
