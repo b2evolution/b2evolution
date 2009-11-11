@@ -114,16 +114,20 @@ if( !empty($size) && $File->is_image() )
 	list( $thumb_type, $thumb_width, $thumb_height, $thumb_quality ) = $thumbnail_sizes[$size_name];
 
 	$Filetype = & $File->get_Filetype();
+	// pre_dump( $Filetype );
 	// TODO: dh> Filetype may be NULL here! see also r1.18 (IIRC)
 	$mimetype = $Filetype->mimetype;
+	// pre_dump( $mimetype );
 
 	// Try to output the cached thumbnail:
 	$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime );
+	//pre_dump( $err );
+
 	if( $err == '!Thumbnail not found in .evocache' )
 	{	// The thumbnail wasn't already in the cache, try to generate and cache it now:
 		$err = NULL;		// Short error code
-
 		list( $err, $src_imh ) = load_image( $File->get_full_path(), $mimetype );
+
 		if( empty( $err ) )
 		{
 			list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height );
@@ -143,7 +147,6 @@ if( !empty($size) && $File->is_image() )
 			}
 		}
 	}
-
 	// ERROR IMAGE
 	if( !empty( $err ) )
 	{	// Generate an error image and try to squeeze an error message inside:
@@ -205,6 +208,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.41  2009/11/11 20:16:15  fplanque
+ * doc
+ *
  * Revision 1.40  2009/09/29 02:52:20  fplanque
  * doc
  *

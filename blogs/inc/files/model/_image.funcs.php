@@ -146,6 +146,7 @@ function load_image( $path, $mimetype )
 	$function = NULL;
 
 	$image_info = getimagesize($path);
+
 	if( ! $image_info || $image_info['mime'] != $mimetype )
 	{
 		$FiletypeCache = get_Cache('FiletypeCache');
@@ -160,10 +161,11 @@ function load_image( $path, $mimetype )
 	else
 	{
 		$mime_function = array(
-			'image/jpeg' => 'imagecreatefromjpeg',
-			'image/gif'  => 'imagecreatefromgif',
-			'image/png'  => 'imagecreatefrompng',
-		);
+				'image/jpeg' => 'imagecreatefromjpeg',
+				'image/gif'  => 'imagecreatefromgif',
+				'image/png'  => 'imagecreatefrompng',
+			);
+
 		if( isset($mime_function[$mimetype]) )
 		{
 			$function = $mime_function[$mimetype];
@@ -173,11 +175,13 @@ function load_image( $path, $mimetype )
 			$err = '!Unsupported format '.$mimetype.' (load_image)';
 		}
 	}
-
+	//pre_dump( $function );
 	if( $function )
-	{
+	{	// Call GD built-in function to load image
+		// fp> Note: sometimes this GD call will die and there is no real way to recover :/
 		$imh = $function( $path );
 	}
+	pre_dump( $imh );
 	if( $imh === false )
 	{
 		// e.g. "imagecreatefromjpeg(): $FILE is not a valid JPEG file"
@@ -333,6 +337,9 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.18  2009/11/11 20:16:14  fplanque
+ * doc
+ *
  * Revision 1.17  2009/10/14 23:56:05  blueyed
  * indent
  *

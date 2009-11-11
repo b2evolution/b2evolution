@@ -1656,14 +1656,25 @@ class File extends DataObject
 
 
 	/**
+	 * Returns an array of things like:
+	 * - src
+	 * - title
+	 * - alt
+	 * - width
+	 * - height
+	 *
+	 * @param string what size do we want src to link to, can be "original" or a thumnbail size
+	 * @param string
+	 * @param string
 	 * @return array List of HTML attributes for the image.
 	 */
-	function get_img_attribs($size_name = 'fit-80x80', $title = NULL, $alt = NULL)
+	function get_img_attribs( $size_name = 'fit-80x80', $title = NULL, $alt = NULL )
 	{
 		$img_attribs = array(
-			'title' => isset($title) ? $title : $this->get('title'),
-			'alt'   => isset($alt) ? $alt : $this->get('alt'),
-		);
+				'title' => isset($title) ? $title : $this->get('title'),
+				'alt'   => isset($alt) ? $alt : $this->get('alt'),
+			);
+
 		if( ! isset($img_attribs['alt']) )
 		{ // use title for alt, too
 			$img_attribs['alt'] = $img_attribs['title'];
@@ -1672,8 +1683,9 @@ class File extends DataObject
 		{ // always use empty alt
 			$img_attribs['alt'] = '';
 		}
+
 		if( $size_name == 'original' )
-		{
+		{	// We want src to link to the original file
 			$img_attribs['src'] = $this->get_url();
 			if( ( $size_arr = $this->get_image_size('widthheight_assoc') ) )
 			{
@@ -1681,7 +1693,7 @@ class File extends DataObject
 			}
 		}
 		else
-		{
+		{ // We want src to link to a thumbnail
 			$img_attribs['src'] = $this->get_thumb_url( $size_name );
 			$thumb_path = $this->get_af_thumb_path($size_name, NULL, true);
 			if( substr($thumb_path, 0, 1) != '!'
@@ -1706,7 +1718,7 @@ class File extends DataObject
 		if( $this->is_image() )
 		{	// Ok, it's an image:
 			$type = $this->get_type();
-			$img_attribs = $this->get_img_attribs('fit-80x80', $type, $type);
+			$img_attribs = $this->get_img_attribs( 'fit-80x80', $type, $type );
 			$img = '<img'.get_field_attribs_as_string($img_attribs).' />';
 
 			// Get link to view the file (fallback to no view link - just the img):
@@ -1852,6 +1864,7 @@ class File extends DataObject
 	function output_cached_thumb( $size_name, $thumb_mimetype, $mtime = NULL )
 	{
 		$af_thumb_path = $this->get_af_thumb_path( $size_name, $thumb_mimetype, false );
+		//pre_dump($af_thumb_path);
 		if( $af_thumb_path[0] != '!' )
 		{	// We obtained a path for the thumbnail to be saved:
 			if( ! file_exists( $af_thumb_path ) )
@@ -1944,6 +1957,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.70  2009/11/11 20:16:14  fplanque
+ * doc
+ *
  * Revision 1.69  2009/11/11 19:12:56  fplanque
  * Inproved actions after uploaded
  *

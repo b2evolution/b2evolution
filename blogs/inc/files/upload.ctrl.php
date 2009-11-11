@@ -457,6 +457,7 @@ if( isset($_FILES) && count( $_FILES ) )
 			$newFile->set( 'desc', trim( strip_tags($uploadfile_desc[$lKey])) );
 		}
 		// TODO: dh> store _evo_fetched_url (source URL) somewhere (e.g. at the end of desc)?
+		// fp> no. why?
 
 		$success_msg = sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded to the server.'), $newFile->dget('name') );
 
@@ -543,6 +544,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2009/11/11 20:16:14  fplanque
+ * doc
+ *
  * Revision 1.21  2009/11/11 19:25:59  fplanque
  * "after upload actions" are even better now :)
  *
