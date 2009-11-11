@@ -400,6 +400,19 @@ function no_trailing_slash( $path )
 	}
 }
 
+function no_leading_slash( $path )
+{
+	if( $path[0] == '/' )
+	{
+		return substr( $path, 1 );
+	}
+	else
+	{
+		return $path;
+	}
+}
+
+
 
 /**
  * Returns canonicalized pathname of a directory + ending slash
@@ -822,15 +835,15 @@ function is_absolute_pathname($path)
  * @link http://us2.php.net/manual/en/function.sys-get-temp-dir.php#93390
  * @return string NULL on failure
  */
-if ( !function_exists('sys_get_temp_dir')) 
+if ( !function_exists('sys_get_temp_dir'))
 {
-  function sys_get_temp_dir() 
+  function sys_get_temp_dir()
 	{
     if (!empty($_ENV['TMP'])) { return realpath($_ENV['TMP']); }
     if (!empty($_ENV['TMPDIR'])) { return realpath( $_ENV['TMPDIR']); }
     if (!empty($_ENV['TEMP'])) { return realpath( $_ENV['TEMP']); }
     $tempfile=tempnam(__FILE__,'');
-    if (file_exists($tempfile)) 
+    if (file_exists($tempfile))
 		{
       unlink($tempfile);
       return realpath(dirname($tempfile));
@@ -843,6 +856,9 @@ if ( !function_exists('sys_get_temp_dir'))
 
 /*
  * $Log$
+ * Revision 1.28  2009/11/11 19:12:56  fplanque
+ * Inproved actions after uploaded
+ *
  * Revision 1.27  2009/10/27 22:40:50  fplanque
  * minor
  *

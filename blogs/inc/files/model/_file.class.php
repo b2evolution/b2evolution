@@ -633,7 +633,7 @@ class File extends DataObject
 		{ // File
 			if( $public_access_to_media )
 			{ // Public Access : full path
-				$url = $this->_FileRoot->ads_url.$this->_rdfp_rel_path.'?mtime='.$this->get_lastmod_ts();
+				$url = $this->_FileRoot->ads_url.no_leading_slash($this->_rdfp_rel_path).'?mtime='.$this->get_lastmod_ts();
 			}
 			else
 			{ // Private Access: doesn't show the full path
@@ -1944,6 +1944,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.69  2009/11/11 19:12:56  fplanque
+ * Inproved actions after uploaded
+ *
  * Revision 1.68  2009/10/13 22:36:01  blueyed
  * Highlight files and directories in the filemanager when opened via 'Locate this' link. Adds scrollTo jQuery plugin.
  *

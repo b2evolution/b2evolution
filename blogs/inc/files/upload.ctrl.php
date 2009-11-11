@@ -47,6 +47,8 @@ global $dispatcher;
 
 global $blog;
 
+global $item_ID, $iframe_name;
+
 // Check global access permissions:
 if( ! $Settings->get( 'fm_enabled' ) )
 {
@@ -456,15 +458,24 @@ if( isset($_FILES) && count( $_FILES ) )
 		}
 		// TODO: dh> store _evo_fetched_url (source URL) somewhere (e.g. at the end of desc)?
 
-		$success_msg = sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded.'), $newFile->dget('name') );
-		if( $mode == 'upload' )
-		{
+		$success_msg = sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded to the server.'), $newFile->dget('name') );
+
+		// Allow to insert/link new upload into currently edited post:
+		if( $mode =='upload' && !empty($item_ID) )
+		{	// The filemanager has been opened from an Item, offer to insert an img tag into original post.
 			// TODO: Add plugin hook to allow generating JS insert code(s)
 			$img_tag = format_to_output( $newFile->get_tag(), 'formvalue' );
-			$success_msg .=
-				'<ul>'
-					.'<li>'.T_("Here's the code to display it:").' <input type="text" value="'.$img_tag.'" size="60" /></li>'
-					.'<li><a href="#" onclick="if( window.focus && window.opener ){ window.opener.focus(); textarea_wrap_selection( window.opener.document.getElementById(\'itemform_post_content\'), \''.format_to_output( $newFile->get_tag(), 'formvalue' ).'\', \'\', 1, window.opener.document ); } return false;">'.T_('Add the code to your post !').'</a></li>'
+			$success_msg .= '<ul>'
+					.'<li>'.action_icon( T_('Link this file!'), 'link',
+								regenerate_url( 'fm_selected,ctrl', 'ctrl=files&amp;action=link_inpost&amp;fm_selected[]='.rawurlencode($newFile->get_rdfp_rel_path()) ),
+								' '.T_('Link this file/image to your post'), 5, 5, array( 'target' => $iframe_name ) )
+					.' ('.T_('recommended - allows automatic resizing').')</li>'
+
+					.'<li>or <a href="#" onclick="if( window.focus && window.opener ){'
+					.'window.opener.focus(); textarea_wrap_selection( window.opener.document.getElementById(\'itemform_post_content\'), \''
+					.format_to_output( $newFile->get_tag(), 'formvalue' ).'\', \'\', 1, window.opener.document ); } return false;">'
+					.T_('Insert the following code snippet into your post').'</a> : <input type="text" value="'.$img_tag.'" size="60" /></li>'
+					// fp> TODO: it would be supacool to have an ajaxy "tumbnail size selector" here that generates a thumnail of requested size on server and then changes the code in the input above
 				.'</ul>';
 		}
 
@@ -522,6 +533,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2009/11/11 19:12:55  fplanque
+ * Inproved actions after uploaded
+ *
  * Revision 1.19  2009/10/29 22:17:20  blueyed
  * Filemanager upload: add "Upload by URL" fields. Cleanup/rewrite some JS on the go.
  *
