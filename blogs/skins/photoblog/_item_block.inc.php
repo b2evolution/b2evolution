@@ -21,7 +21,7 @@ $params = array_merge( array(
 		'item_class'             => 'bPost',
 		'item_status_class'      => 'bPost',
 		'content_mode'           => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
-		'image_size'	           =>	'', // Image is handled separately
+		'image_size'	           =>	'', // Do not display images in content block - Image is handled separately
 		'url_link_text_template' => '', // link will be displayed (except player if podcast)
 	), $params );
 
@@ -52,7 +52,7 @@ $params = array_merge( array(
 				 * crop-15x15
 				 * See also the $thumbnail_sizes array in conf/_advanced.php.
 				 */
-				'files_position' =>      '',
+				'restrict_to_image_position' => 'teaser',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 			) );
 	?>
 
@@ -103,7 +103,23 @@ $params = array_merge( array(
 		</div>
 
 		<?php
+			// Display images that are linked as "after more" on this post:
+			// We are actually displaying them before more here, but this is a special photo skin.
+			$Item->images( array(
+					'before' =>              '<div class="bImages">',
+					'before_image' =>        '<div class="image_block">',
+					'before_image_legend' => '<div class="image_legend">',
+					'after_image_legend' =>  '</div>',
+					'after_image' =>         '</div>',
+					'after' =>               '</div>',
+					'image_size' =>          'fit-520x390',
+					'restrict_to_image_position' => 'aftermore',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
+				) );
+		?>
+
+		<?php
 			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+			// Note: at the top of this file, we set: 'image_size' =>	'', // Do not display images in content block - Image is handled separately
 			skin_include( '_item_content.inc.php', $params );
 			// Note: You can customize the default item feedback by copying the generic
 			// /skins/_item_feedback.inc.php file into the current skin folder.
@@ -172,6 +188,9 @@ $params = array_merge( array(
 <?php
 /*
  * $Log$
+ * Revision 1.4  2009/11/11 03:24:51  fplanque
+ * misc/cleanup
+ *
  * Revision 1.3  2009/10/11 03:00:11  blueyed
  * Add "position" and "order" properties to attachments.
  * Position can be "teaser" or "aftermore" for now.

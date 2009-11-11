@@ -492,11 +492,13 @@ function evoFadeHighlight( selector )
 function evoFadeBg( selector, bgs, options )
 {
 	var origBg = jQuery(selector).css("backgroundColor");
-	var speed = options && options.speed || "normal";
+	var speed = options && options.speed || "slow";
 
 	var toEval = 'jQuery(selector).animate({ backgroundColor: ';
 	for( e in bgs )
+	{
 		toEval += '"'+bgs[e]+'"'+'}, "'+speed+'" ).animate({ backgroundColor: ';
+	}
 	toEval += 'origBg },"'+speed+'", "", function(){jQuery( this ).removeAttr( "style" );});';
 
 	eval(toEval);

@@ -13,6 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $more;
 
 // Display images that are linked to this post:
 $Item->images( array(
@@ -23,7 +24,8 @@ $Item->images( array(
 		'after_image' =>         '</td></tr>',
 		'after' =>               '</table>',
 		'image_size' =>          'fit-400x320',
-		'files_position' =>      '', // could be limited to "teaser" or "aftermore" fp> what does '' mean????
+		// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
+		'restrict_to_image_position' => $Item->has_content_parts($params) ? 'teaser' : '',
 	) );
 ?>
 
@@ -40,6 +42,20 @@ $Item->images( array(
 				'after'       => '',
 			) );
 		$Item->more_link();
+
+		if( $more )
+		{	// Display images that are linked after "more" in this post:
+			$Item->images( array(
+					'before' =>              '<table cellspacing="5">',
+					'before_image' =>        '<tr><td align="center">',
+					'before_image_legend' => '<br><small>',
+					'after_image_legend' =>  '</small>',
+					'after_image' =>         '</td></tr>',
+					'after' =>               '</table>',
+					'image_size' =>          'fit-400x320',
+					'restrict_to_image_position' => 'aftermore',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
+				) );
+		}
 		$Item->content_extension( array(
 				'before'      => '',
 				'after'       => '',

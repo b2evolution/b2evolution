@@ -969,7 +969,8 @@ function bloginfo( $what )
 }
 
 /**
- * Display comment allowed tags
+ * Display allowed tags for comments
+ * (Mainly provided for WP compatibility. Not recommended for use)
  *
  * @param string format
  */
@@ -1009,6 +1010,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.62  2009/11/11 03:24:50  fplanque
+ * misc/cleanup
+ *
  * Revision 1.61  2009/11/04 13:48:04  efy-maxim
  * new comment_allowed_tags function
  *

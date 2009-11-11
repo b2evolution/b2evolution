@@ -1361,7 +1361,7 @@ class Item extends ItemLight
 		}
 		elseif( ! $this->hidden_teaser($params) )
 		{	// We are in mode mode and we're not hiding the teaser:
-			// (if we're higin the teaser we display this as a normal page ie: no anchor)
+			// (if we're hiding the teaser we display this as a normal page ie: no anchor)
 			if( $params['anchor_text'] == '#' )
 			{ // TRANS: this is the default text displayed once the more link has been activated
 				$params['anchor_text'] = '<p class="bMore">'.T_('Follow up:').'</p>';
@@ -1756,11 +1756,11 @@ class Item extends ItemLight
 				'image_size' =>          'fit-720x500',
 				'image_link_to' =>       'original',  // Can be 'orginal' (image) or 'single' (this post)
 				'limit' =>               1000,	// Max # of images displayed
-				'files_position' =>      '',
+				'restrict_to_image_position' => '',		// 'teaser' or 'aftermore'
 			), $params );
 
 		// Get list of attached files
-		$FileList = $this->get_attachment_FileList( $params['limit'], $params['files_position'] );
+		$FileList = $this->get_attachment_FileList( $params['limit'], $params['restrict_to_image_position'] );
 
 		$r = '';
 		/**
@@ -1834,11 +1834,11 @@ class Item extends ItemLight
 			// sam2kb> It's needed only for flexibility, in the meantime if user attaches 200 files he expects to see all of them in skin, I think.
 				'limit_files' =>         1000, // Max # of files displayed
 				'limit' =>               1000,
-				'files_position' =>      'aftermore',
+				'restrict_to_image_position' => '',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 			), $params );
 
 		// Get list of attached files
-		$FileList = $this->get_attachment_FileList( $params['limit'], $params['files_position'] );
+		$FileList = $this->get_attachment_FileList( $params['limit'], $params['restrict_to_image_position'] );
 
 		load_funcs('files/model/_file.funcs.php');
 
@@ -1902,7 +1902,7 @@ class Item extends ItemLight
 	 * @access protected
 	 *
 	 * @param integer
-	 * @param string 'teaser'|'aftermore' -> please doc??
+	 * @param string Restrict to files/images linked to a specific position. Position can be 'teaser'|'aftermore'
 	 * @param string
 	 * @return DataObjectList2
 	 */
@@ -1918,7 +1918,7 @@ class Item extends ItemLight
 		$SQL->SELECT( 'file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
 		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( 'link_itm_ID = '.$this->ID );
-		if( $position )
+		if( !empty($position) )
 		{
 			global $DB;
 			$SQL->WHERE_and( 'link_position = '.$DB->quote($position) );
@@ -4054,6 +4054,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.153  2009/11/11 03:24:51  fplanque
+ * misc/cleanup
+ *
  * Revision 1.152  2009/11/04 13:20:24  efy-maxim
  * some new functions
  *

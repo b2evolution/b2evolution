@@ -217,7 +217,7 @@ while( $Item = & $ItemList->get_item() )
 						'after_image' =>         '</div>',
 						'after' =>               '</div>',
 						'image_size' =>          'fit-320x320',
-						'files_position' =>      '',
+						'restrict_to_image_position' => 'teaser',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 					) );
 			?>
 
@@ -395,6 +395,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.25  2009/11/11 03:24:52  fplanque
+ * misc/cleanup
+ *
  * Revision 1.24  2009/10/18 11:29:43  efy-maxim
  * 1. mass create in 'All' tab; 2. "Text Renderers" and "Comments"
  *

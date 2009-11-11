@@ -266,7 +266,7 @@ if( $blog )
 					'after_image' =>         '',
 					'after' =>               '</div>',
 					'image_size' =>          'fit-80x80',
-					'files_position' =>      '',
+					'restrict_to_image_position' => 'teaser',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 				) );
 
 			echo '<div class="small">'.$Item->get_content_excerpt( 150 ).'</div>';
@@ -414,13 +414,13 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		echo '<td>';
 
 		$block_item_Widget = & new Widget( 'block_item' );
-	
+
 		$block_item_Widget->title = T_('Updates from b2evolution.net');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
-	
+
 		// Display info & error messages
 		echo $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
-	
+
 		/**
 		 * @var AbstractSettings
 		 */
@@ -435,14 +435,14 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 				echo '<p>'.$extra_msg.'</p>';
 			}
 		}
-	
-	
+
+
 		$block_item_Widget->disp_template_replaced( 'block_end' );
-	
+
 		/*
 		 * DashboardAdminMain to be added here (anyone?)
 		 */
-	
+
 		echo '</td>';
 	}
 
@@ -491,6 +491,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.37  2009/11/11 03:24:52  fplanque
+ * misc/cleanup
+ *
  * Revision 1.36  2009/10/28 13:45:47  tblue246
  * Do not display evonet updates if disabled by admin
  *

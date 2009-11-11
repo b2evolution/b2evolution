@@ -172,7 +172,7 @@ $Form->begin_form();
 		echo '<tr class="'.($countFiles%2 ? 'odd' : 'even').'"';
 
 		if( isset($fm_highlight) && $lFile->get_name() == $fm_highlight )
-		{
+		{ // We want a specific file to be highlighted (user clicked on "locate"/target icon
 			echo ' id="fm_highlighted"'; // could be a class, too..
 		}
 		echo '>';
@@ -293,12 +293,9 @@ $Form->begin_form();
 					echo ' ';
 				}
 
-
-				// TODO: dh> there might be two "Link this file!" icons.. very confusing! Improve titles at least..
-				//       (one from below and the one above ^^)
 				if( isset($edited_User) ) // fp> Perm already checked in controller
 				{	// Offer option to link the file to an Item (or anything else):
-					echo action_icon( T_('Link this file!'), 'link',
+					echo action_icon( T_('Use this as an avatar image!'), 'link',
 								regenerate_url( 'fm_selected', 'action=link_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ),
 								NULL, NULL, NULL, array() );
 					echo ' ';
@@ -650,7 +647,7 @@ $Form->begin_form();
 		<?php
 
 		if( $fm_highlight )
-		{ // if a file is being highlighted (e.g. via "Locate this file!"), scroll there and do the success fade
+		{ // we want to highlight a file (e.g. via "Locate this file!"), scroll there and do the success fade
 			?>
 
 			<script type="text/javascript">
@@ -658,7 +655,12 @@ $Form->begin_form();
 				var fm_hl = jQuery("#fm_highlighted");
 				if( fm_hl.length ) {
 					jQuery.getScript('<?php echo $rsc_url ?>js/jquery/jquery.scrollto.js', function () {
-						jQuery.scrollTo(fm_hl, { onAfter: function() { evoFadeHighlight( fm_hl ) } });
+						jQuery.scrollTo( fm_hl, 
+						{ onAfter: function() 
+							{ 
+								evoFadeHighlight( fm_hl ) 
+							}
+						} );
 					});
 				}
 			} );
@@ -673,6 +675,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.30  2009/11/11 03:24:51  fplanque
+ * misc/cleanup
+ *
  * Revision 1.29  2009/10/13 22:36:01  blueyed
  * Highlight files and directories in the filemanager when opened via 'Locate this' link. Adds scrollTo jQuery plugin.
  *

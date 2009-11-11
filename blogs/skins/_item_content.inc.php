@@ -15,6 +15,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $disp_detail;
+global $more;
 
 // Default params:
 $params = array_merge( array(
@@ -41,6 +42,7 @@ $params = array_merge( array(
 		'before_more_link'    => '<p class="bMore">',
 		'after_more_link'     => '</p>',
 		'more_link_text'      => '#',
+		'anchor_text'         => '#',		// text to display as the more anchor (once the more link has been clicked)
 		'excerpt_before_text' => '<div class="excerpt">',
 		'excerpt_after_text'  => '</div>',
 		'excerpt_before_more' => ' <span class="excerpt_more">',
@@ -55,8 +57,6 @@ $params = array_merge( array(
 		'before_file_size'    => ' <span class="file_size">',
 		'after_file_size'     => '</span>',
 	), $params );
-
-global $more;
 
 // Determine content mode to use..
 if( $Item->is_intro() )
@@ -116,7 +116,7 @@ switch( $content_mode )
 					'image_size' =>          $params['excerpt_image_size'],
 					'limit' =>               $params['excerpt_image_limit'],
 					'image_link_to' =>       'single',
-					'files_position' =>      '',  // fp> what does '' mean?
+					'restrict_to_image_position' => 'teaser',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 				) );
 		}
 
@@ -133,6 +133,7 @@ switch( $content_mode )
 
 	case 'full':
 		$params['force_more'] = true;
+		$params['anchor_text'] = '';
 		/* continue down */
 	case 'normal':
 	default:
@@ -156,7 +157,8 @@ switch( $content_mode )
 					'after' =>               $params['after_images'],
 					'image_size' =>          $params['image_size'],
 					'image' =>               $params['image_limit'],
-					'files_position' =>      $Item->has_content_parts($params) ? 'teaser' : '',
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
+					'restrict_to_image_position' => $Item->has_content_parts($params) ? 'teaser' : '',
 				) );
 		}
 
@@ -184,6 +186,7 @@ switch( $content_mode )
 						'before'      => $params['before_more_link'],
 						'after'       => $params['after_more_link'],
 						'link_text'   => $params['more_link_text'],
+						'anchor_text' => $params['anchor_text'],
 					) );
 				if( ! empty($params['image_size']) && $more && $Item->has_content_parts($params) /* only if not displayed all images already */ )
 				{
@@ -196,7 +199,7 @@ switch( $content_mode )
 							'after_image' =>         $params['after_image_legend'],
 							'after' =>               $params['after_images'],
 							'image_size' =>          $params['image_size'],
-							'files_position' =>      'aftermore',
+							'restrict_to_image_position' => 'aftermore',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 						) );
 				}
 				$Item->content_extension( array(
@@ -238,6 +241,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.25  2009/11/11 03:24:51  fplanque
+ * misc/cleanup
+ *
  * Revision 1.24  2009/11/10 02:44:38  fplanque
  * no message
  *
