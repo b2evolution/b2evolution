@@ -181,7 +181,7 @@ function load_image( $path, $mimetype )
 		// fp> Note: sometimes this GD call will die and there is no real way to recover :/
 		$imh = $function( $path );
 	}
-	pre_dump( $imh );
+
 	if( $imh === false )
 	{
 		// e.g. "imagecreatefromjpeg(): $FILE is not a valid JPEG file"
@@ -337,6 +337,9 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.19  2009/11/11 20:23:59  fplanque
+ * oops, sorry.
+ *
  * Revision 1.18  2009/11/11 20:16:14  fplanque
  * doc
  *
