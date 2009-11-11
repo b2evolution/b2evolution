@@ -61,9 +61,13 @@ global $fm_FileRoot;
 
 		// Dow we want a BR after the label:
 		if( labelBr )
+		{ // We want a BR after the label:
 			appendTo.appendChild( document.createElement('br') );
+		}
 		else
+		{
 			appendTo.appendChild( document.createTextNode( ' ' ) );
+		}
 
 		// INPUT:
 		var fileInput = document.createElement( inputOrTextarea );
@@ -271,7 +275,7 @@ global $fm_FileRoot;
 
 						<input type="radio" name="uploadfile_source[<?php echo $lKey ?>]" value="upload"
 							<?php echo isset($uploadfile_source[$lKey]) && $uploadfile_source[$lKey] == 'upload' ? ' checked="checked"' : '' ?> />
-						<label for="uploadfile_url_<?php echo $lKey ?>"><?php echo T_('Upload by URL'); ?>:</label>
+						<label for="uploadfile_url_<?php echo $lKey ?>"><?php echo T_('Get from URL'); ?>:</label>
 						<input name="uploadfile_url[]" id="uploadfile_url_<?php echo $lKey ?>" size="70" type="text" class="upload_file"
 								value="<?php echo ( isset( $uploadfile_url[$lKey] ) ? format_to_output( $uploadfile_url[$lKey], 'formvalue' ) : '' );
 								?>" /><br />
@@ -309,10 +313,13 @@ global $fm_FileRoot;
 			</ul>
 
 			<script type="text/javascript">
-				(function() {
-					var handler = function() {
+				(function() 
+				{
+					var handler = function()
+					{
 						jQuery(this).prevAll("[type=radio]").eq(0).attr("checked", "checked")
 					}
+					jQuery(".upload_file").live("click", handler);
 					jQuery(".upload_file").live("keyup", handler);
 					jQuery(".upload_file").live("change", handler);
 				})();
@@ -366,6 +373,9 @@ global $fm_FileRoot;
 
 /*
  * $Log$
+ * Revision 1.10  2009/11/11 20:44:54  fplanque
+ * minor/cleanup
+ *
  * Revision 1.9  2009/10/29 22:17:22  blueyed
  * Filemanager upload: add "Upload by URL" fields. Cleanup/rewrite some JS on the go.
  *

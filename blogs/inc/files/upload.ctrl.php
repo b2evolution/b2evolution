@@ -229,6 +229,7 @@ param( 'upload_quickmode', 'integer', 0 );
  */
 $failedFiles = array();
 
+// Process files we want to get from an URL:
 param( 'uploadfile_url', 'array', array() );
 param( 'uploadfile_source', 'array', array() );
 if( $uploadfile_url )
@@ -244,7 +245,7 @@ if( $uploadfile_url )
 			// Validate URL and parse it for the file name
 			if( ! is_absolute_url($url)
 				|| ! ($parsed_url = parse_url($url))
-				||! isset($parsed_url['scheme'], $parsed_url['host'], $parsed_url['path']) )
+				|| ! isset($parsed_url['scheme'], $parsed_url['host'], $parsed_url['path']) )
 			{
 				$failedFiles[$k] = T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>)!');
 				continue;
@@ -265,12 +266,13 @@ if( $uploadfile_url )
 				if( ! fwrite($tmpfile, $file_contents) )
 				{
 					unlink($tmpfile);
-					$failedFiles[$k] = sprintf( T_('Could not write to temporary file (%s).'), $tmpfile );
+					$failedFiles[$k] = sprintf( 'Could not write to temporary file (%s).', $tmpfile );
 					continue;
 				}
 				fclose($tmpfile);
 
 				// Fake/inject info into PHP's array of uploaded files.
+	// fp> TODO! This is a nasty dirty hack. That kind of stuff always breaks somewhere down the line. Needs cleanup.
 				// This allows us to treat it (nearly) the same way as regular uploads, apart from
 				// is_uploaded_file(), which we skip and move_uploaded_file() (where we use rename()).
 				$_FILES['uploadfile']['name'][$k] = basename($parsed_url['path']);
@@ -544,6 +546,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2009/11/11 20:44:55  fplanque
+ * minor/cleanup
+ *
  * Revision 1.22  2009/11/11 20:16:14  fplanque
  * doc
  *
