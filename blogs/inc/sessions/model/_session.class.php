@@ -130,12 +130,12 @@ class Session
 
 				$timeout_sessions = NULL;
 				if( $this->user_ID != NULL )
-				{	// User is not anonymous and we can get custom session timeout
+				{	// User is not anonymous, get custom session timeout (may return NULL):
 					$timeout_sessions = $UserSettings->get( 'timeout_sessions', $this->user_ID );
 				}
 
 				if( empty( $timeout_sessions ) )
-				{	// User is anonymous or he has not custom session timeout. So, we use default session timeout.
+				{	// User is anonymous or has no custom session timeout. So, we use default session timeout:
 					$timeout_sessions = $Settings->get('timeout_sessions');
 				}
 
@@ -559,6 +559,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.20  2009/11/12 00:46:31  fplanque
+ * doc/minor/handle demo mode
+ *
  * Revision 1.19  2009/10/27 16:43:33  efy-maxim
  * custom session timeout
  *

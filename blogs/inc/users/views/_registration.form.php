@@ -90,7 +90,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Other options') );
 
-	$Form->checkbox_input( 'registration_require_country', $Settings->get('registration_require_country'), T_('Require country'), array( 'note'=>T_('Enable country required.') ) );
+	$Form->checkbox_input( 'registration_require_country', $Settings->get('registration_require_country'), T_('Require country'), array( 'note'=>T_('New users will have to specify their country in order to register.') ) );
 
 $Form->end_fieldset();
 
@@ -104,6 +104,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.7  2009/11/12 00:46:34  fplanque
+ * doc/minor/handle demo mode
+ *
  * Revision 1.6  2009/09/25 07:33:15  efy-cantor
  * replace get_cache to get_*cache
  *

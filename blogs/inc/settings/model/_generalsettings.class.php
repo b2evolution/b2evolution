@@ -120,7 +120,7 @@ class GeneralSettings extends AbstractSettings
 		'xmlrpc_default_title' => '',		//default title for posts created throgh blogger api
 
 		'nickname_editing' => 'edited-user',		// "never" - Never allow; "default-no" - Let users decide, default to "no" for new users; "default-yes" - Let users decide, default to "yes" for new users; "always" - Always allow
-		'multiple_sessions' => 'userset_default_no',//  multiple sessions settings
+		'multiple_sessions' => 'userset_default_no', // multiple sessions settings -- overriden for demo mode in contructor
 	);
 
 
@@ -137,7 +137,7 @@ class GeneralSettings extends AbstractSettings
 	 */
 	function GeneralSettings()
 	{
-		global $new_db_version, $DB;
+		global $new_db_version, $DB, $demo_mode;
 
 		$save_DB_show_errors = $DB->show_errors;
 		$save_DB_halt_on_error = $DB->halt_on_error;
@@ -146,7 +146,6 @@ class GeneralSettings extends AbstractSettings
 
 		// Init through the abstract constructor. This should be the first DB connection.
 		parent::AbstractSettings( 'T_settings', array( 'set_name' ), 'set_value', 0 );
-
 
 		// check DB version:
 		if( $this->get( 'db_version' ) != $new_db_version )
@@ -167,6 +166,12 @@ class GeneralSettings extends AbstractSettings
 
 		$DB->halt_on_error = $save_DB_halt_on_error;
 		$DB->show_errors = $save_DB_show_errors;
+
+
+		if( $demo_mode )
+		{ // Demo mode requires to allow multiple concurrent sessions:
+			$this->_defaults['multiple_sessions'] = 'always';
+		}
 	}
 
 
@@ -193,6 +198,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.25  2009/11/12 00:46:34  fplanque
+ * doc/minor/handle demo mode
+ *
  * Revision 1.24  2009/10/28 13:41:56  efy-maxim
  * default multiple sessions settings
  *

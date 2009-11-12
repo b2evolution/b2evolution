@@ -2,6 +2,8 @@
 
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+global $demo_mode;
+
 $AdminUI->set_path( 'users', 'usersettings' );
 
 param_action();
@@ -14,7 +16,15 @@ switch ( $action )
 
 		// UPDATE general settings:
 		param( 'uset_nickname_editing', 'string', 'edited-user' );
-		param( 'uset_multiple_sessions', 'string', 'default-no' );
+		if( $demo_mode )
+		{
+			$uset_multiple_sessions = 'always';
+			$Messages->add( 'Demo mode requires multiple sessions setting to be set to always.', 'note' );
+		}
+		else
+		{
+			param( 'uset_multiple_sessions', 'string', 'default-no' );
+		}
 
 		$Settings->set_array( array(
 									array( 'nickname_editing', $uset_nickname_editing ),
@@ -51,6 +61,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2009/11/12 00:46:34  fplanque
+ * doc/minor/handle demo mode
+ *
  * Revision 1.3  2009/10/25 19:24:51  efy-maxim
  * multiple_sessions param
  *

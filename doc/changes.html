@@ -64,23 +64,31 @@
 		                <li>Durations can now be entered in days/hours/minutes/seconds instead of large amounts of seconds (@evofactory)</li>
 		          </ul>
 		      </li>
-		      <li><strong>XML-RPC:</strong>
-			    <ul>
-			      <li>MetaWeblog API: Use mt_keyword field to get/set
-				      post tags. Affected methods: metaWeblog.newPost,
-				      metaWeblog.editPost, metaWeblog.getRecentPosts,
-			        metaweblog.getPost. (@tblue)</li>
-			        <li>MovableType API: Implemented mt.supportedMethods. (@tblue)</li>
-			        <li>MovableType API: Implemented mt.publishPost (@tblue,@waltercruz)</li>
-			        <li>MetaWeblog API: Implemented mt_allow_comments and mt_excerpt (@tblue,@waltercruz)</li>
-			        <li>WordPress API: basic support for the following methods: wp.getPageList, wp.getUsersBlogs, wp.getPageStatusList, wp.getPostStatusList, wp.getCategories and wp.uploadFile (@waltercruz)</li>
-			        <li>XML-RPC can be disabled (@tblue,@waltercruz)</li>
-			        <li>Added missing permission checks (@tblue)</li>
-					<li>Improved metaWeblog.newMediaObject (@tblue)</li>
-					<li>Fixed API method signatures (return values) (@tblue)</li>
-					<li>Use correct charsets. (@tblue)</li>
-					<li>Check extra categories before checking permissions to post to them (sends correct XML-RPC error on failure). (@tblue)</li>
-	            </ul>
+		      <li><strong>Users &amp; Groups:</strong>
+		        <ul>
+		          <li>Give the admin/users better control on whether or not they can have multiple concurrent sessions. (@evofactory)</li>
+	              <li>Option to have different session timeouts for different users (@evofactory)</li>
+	              <li>Option to have nicknames used as IDs set by the admin, not the user. (@evofactory)</li>
+		          <li>Modules &amp; Plugins can now define their own group permissions (@evofactory)</li>
+		        </ul>
+		      </li>
+				<li><strong>XML-RPC:</strong>
+			      <ul>
+			        <li>MetaWeblog API: Use mt_keyword field to get/set
+				        post tags. Affected methods: metaWeblog.newPost,
+				        metaWeblog.editPost, metaWeblog.getRecentPosts,
+			          metaweblog.getPost. (@tblue)</li>
+			          <li>MovableType API: Implemented mt.supportedMethods. (@tblue)</li>
+			          <li>MovableType API: Implemented mt.publishPost (@tblue,@waltercruz)</li>
+			          <li>MetaWeblog API: Implemented mt_allow_comments and mt_excerpt (@tblue,@waltercruz)</li>
+			          <li>WordPress API: basic support for the following methods: wp.getPageList, wp.getUsersBlogs, wp.getPageStatusList, wp.getPostStatusList, wp.getCategories and wp.uploadFile (@waltercruz)</li>
+			          <li>XML-RPC can be disabled (@tblue,@waltercruz)</li>
+			          <li>Added missing permission checks (@tblue)</li>
+					  <li>Improved metaWeblog.newMediaObject (@tblue)</li>
+					  <li>Fixed API method signatures (return values) (@tblue)</li>
+					  <li>Use correct charsets. (@tblue)</li>
+					  <li>Check extra categories before checking permissions to post to them (sends correct XML-RPC error on failure). (@tblue)</li>
+	                </ul>
 			  </li>
 				<li><strong>Technical mumbo-jumbo:</strong>
 					<ul>
@@ -99,7 +107,7 @@
 						<li>Plugin hooks: Always trigger AfterCommentUpdate/AfterItemUpdate,
 							not only if Comment/Item has changed. (@sir_yabs/@tblue)</li>
 					    <li>Increased core modularity</li>
-				    </ul>
+			        </ul>
 				</li>
 		    </ul>
 		  <h2>3.3.2-stable</h2>

@@ -1029,7 +1029,6 @@ class User extends DataObject
 				break;
 
 			default:
-
 				// Check pluggable permissions using user permission check function
 				$perm = Module::check_perm( $permname, $permlevel, $perm_target, 'user_func' );
 				if( $perm === true || $perm === NULL )
@@ -1861,6 +1860,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.64  2009/11/12 00:46:32  fplanque
+ * doc/minor/handle demo mode
+ *
  * Revision 1.63  2009/10/28 14:26:23  efy-maxim
  * allow selection of None/NULL for country
  *

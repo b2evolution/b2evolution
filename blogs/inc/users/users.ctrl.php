@@ -735,6 +735,10 @@ switch( $action )
 
 			$edited_User->confirm_delete( $msg, $action, get_memorized( 'action' ) );
 
+			// Display user identity form:
+			$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
+			break;
+
 	case 'promote':
 	default:
 		// Display user list:
@@ -750,6 +754,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.43  2009/11/12 00:46:33  fplanque
+ * doc/minor/handle demo mode
+ *
  * Revision 1.42  2009/10/28 13:41:57  efy-maxim
  * default multiple sessions settings
  *

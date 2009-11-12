@@ -203,6 +203,13 @@ function create_default_data()
 	$User_Admin->dbinsert();
 	echo "OK.<br />\n";
 
+	// Activating multiple sessions for administrator
+	echo 'Activating multiple sessions for administrator... ';
+	$DB->query( "
+		INSERT INTO T_users__usersettings ( uset_user_ID, uset_name, uset_value )
+		VALUES ( 1, 'login_multiple_sessions', '1' )" );
+	echo "OK.<br />\n";
+
 
 	// added in Phoenix-Alpha
 	echo 'Creating default Post Types... ';
@@ -267,13 +274,6 @@ function create_default_data()
 				   .' 1)' );
 		echo 'OK.<br />', "\n";
 	}
-
-	// Activating multiple sessions for administrator
-	echo 'Activating multiple sessions for administrator... ';
-	$DB->query( "
-		INSERT INTO T_users__usersettings ( uset_user_ID, uset_name, uset_value )
-		VALUES ( 1, 'login_multiple_sessions', '1' )" );
-	echo "OK.<br />\n";
 
 	create_default_settings();
 
@@ -1293,6 +1293,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.281  2009/11/12 00:46:34  fplanque
+ * doc/minor/handle demo mode
+ *
  * Revision 1.280  2009/10/28 13:41:58  efy-maxim
  * default multiple sessions settings
  *
