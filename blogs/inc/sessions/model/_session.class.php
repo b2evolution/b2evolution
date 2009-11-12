@@ -265,7 +265,7 @@ class Session
 			$multiple_sessions = $Settings->get( 'multiple_sessions' );
 
 			if( $multiple_sessions != 'always' && ( $multiple_sessions == 'never' || !$UserSettings->get('login_multiple_sessions', $user_ID) ) )
-			{ // The user does not want to have multiple sessions open at the same time:
+			{ // The user does not want/is not allowed to have multiple sessions open at the same time:
 				// Invalidate previous sessions:
 				global $Debuglog;
 				$Debuglog->add( 'Invalidating all previous user sessions, because login_multiple_sessions=0', 'session' );
@@ -559,6 +559,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.21  2009/11/12 03:54:17  fplanque
+ * wording/doc/cleanup
+ *
  * Revision 1.20  2009/11/12 00:46:31  fplanque
  * doc/minor/handle demo mode
  *

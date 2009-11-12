@@ -67,6 +67,8 @@ if( empty($tab) )
 			break;
 
 		case 'del_pagecache':
+			// Delete the page cache /blogs/cache
+			// fp> TODO: have an option to only PRUNE files older than for example 30 days
 			$current_User->check_perm('options', 'edit', true);
 
 			global $cache_path;
@@ -106,6 +108,8 @@ if( empty($tab) )
 			break;
 
 		case 'del_filecache':
+			// delete the thumbnail cahces .evocache
+			// fp> TODO: have an option to only PRUNE files older than for example 30 days
 			$current_User->check_perm('options', 'edit', true);
 
 			global $media_path;
@@ -131,6 +135,7 @@ if( empty($tab) )
 			break;
 
 		case 'optimize_tables':
+			// Optimize MyISAM tables
 			$current_User->check_perm('options', 'edit', true);
 
 			global $tableprefix;
@@ -183,7 +188,9 @@ if( empty($tab) )
 			 * Tblue> 2009-10-16: DB backups are now handled by BackupSettings::backup_database(),
 			 *                    thus this code here is obsolete - we now have two different
 			 *                    methods to backup the DB! That's redundant.
-			 */
+			 * fp> I think the backup tab is more powerful. So I am commenting this out.
+			 *  Please let me know if we are losing functionality by disabling the following...
+
 			$current_User->check_perm('options', 'edit', true);
 
 			if( $current_User->Group->ID != 1 )
@@ -249,6 +256,7 @@ if( empty($tab) )
 			// Download compressed file
 			$zipfile->download_file();
 			break;
+		*/
 	}
 }
 
@@ -283,14 +291,20 @@ if( empty($tab) )
 	// TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
 	if( $current_User->check_perm('options', 'edit') )
 	{ // default admin actions:
-		$block_item_Widget->title = T_('Advanced operations');
+		$block_item_Widget->title = T_('Cache management');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 		echo '<ul>';
-		echo '<li><a href="'.regenerate_url('action', 'action=del_itemprecache').'">'.T_('Delete pre-renderered item cache').'</a></li>';
-		echo '<li><a href="'.regenerate_url('action', 'action=del_pagecache').'">'.T_('Delete rendered pages from cache directory').'</a></li>';
-		echo '<li><a href="'.regenerate_url('action', 'action=del_filecache').'">'.T_('Delete cached thumbnails (.evocache directories)').'</a></li>';
-		echo '<li><a href="'.regenerate_url('action', 'action=optimize_tables').'">'.T_('Optimize database tables').'</a></li>';
-		echo '<li><a href="'.regenerate_url('action', 'action=backup_db').'">'.T_('Backup database').'</a></li>';
+		echo '<li><a href="'.regenerate_url('action', 'action=del_itemprecache').'">'.T_('Clear pre-renderered item cache (DB)').'</a></li>';
+		echo '<li><a href="'.regenerate_url('action', 'action=del_pagecache').'">'.T_('Clear full page cache (/cache directory)').'</a></li>';
+		echo '<li><a href="'.regenerate_url('action', 'action=del_filecache').'">'.T_('Clear thumbnail caches (.evocache directories)').'</a></li>';
+		echo '</ul>';
+		$block_item_Widget->disp_template_raw( 'block_end' );
+
+		$block_item_Widget->title = T_('Database management');
+		$block_item_Widget->disp_template_replaced( 'block_start' );
+		echo '<ul>';
+		echo '<li><a href="'.regenerate_url('action', 'action=optimize_tables').'">'.T_('Optimize database tables (MyISAM tables used for sessions & logs)').'</a></li>';
+		// echo '<li><a href="'.regenerate_url('action', 'action=backup_db').'">'.T_('Backup database').'</a></li>';
 		echo '</ul>';
 		$block_item_Widget->disp_template_raw( 'block_end' );
 	}
@@ -343,6 +357,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2009/11/12 03:54:17  fplanque
+ * wording/doc/cleanup
+ *
  * Revision 1.16  2009/10/16 18:41:47  tblue246
  * Cleanup/doc
  *

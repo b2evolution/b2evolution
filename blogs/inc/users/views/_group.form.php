@@ -48,7 +48,8 @@ $this->disp_payload_begin();
 
 /**
  * Display pluggable permissions
- * @param string perm block name
+ *
+ * @param string perm block name  'additional'|'system'
  */
 function display_pluggable_permissions( &$Form, $perm_block )
 {
@@ -178,8 +179,8 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 						), T_('Files'), true, T_('This setting will further restrict any media file permissions on specific blogs.') );
 
 
-// Display pluggable permissions
-display_pluggable_permissions( $Form, 'additional' );
+	// Display pluggable permissions
+	display_pluggable_permissions( $Form, 'additional' );
 
 $Form->end_fieldset();
 
@@ -211,8 +212,8 @@ $Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_pro
 							$perm_edit_option
 						), T_('Settings') );
 
-// Display pluggable permissions
-display_pluggable_permissions( $Form, 'system' );
+	// Display pluggable permissions
+	display_pluggable_permissions( $Form, 'system' );
 
 $Form->end_fieldset();
 
@@ -230,6 +231,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.20  2009/11/12 03:54:17  fplanque
+ * wording/doc/cleanup
+ *
  * Revision 1.19  2009/10/28 14:55:12  efy-maxim
  * pluggable permissions separated by blocks in group form
  *
