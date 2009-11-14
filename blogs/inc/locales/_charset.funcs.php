@@ -37,18 +37,85 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * Use iconv() to transliterate non-ASCII chars in a string encoded with $evo_charset.
+ *
+ * This function will figure out a usable LC_CTYPE setting and revert it to the original value
+ * after calling iconv().
+ *
+ * @author Tilman BLUMENBACH - tblue246
+ * 
+ * @param string The string to transliterate.
+ * @return string|boolean The transliterated ASCII string on success or false on failure.
+ */
+function evo_iconv_transliterate( $str )
+{
+	global $evo_charset, $current_locale, $default_locale;
+
+	if( ! function_exists( 'iconv' ) )
+	{
+		return false;
+	}
+
+	// iconv() needs a proper LC_CTYPE to work.
+	// See http://www.php.net/manual/en/function.iconv.php#94481
+	$orig_lc_ctype  = setlocale( LC_CTYPE, 0 );
+	$lc_evo_charset = strtolower( str_replace( '-', '', $evo_charset ) );
+
+	if( setlocale( LC_CTYPE,
+				str_replace( '-', '_', $current_locale ).'.'.$lc_evo_charset, // Try to use current b2evo locale
+				str_replace( '-', '_', $default_locale ).'.'.$lc_evo_charset  // Fallback to default b2evo locale
+		) === false )
+	{	// The last thing we try is to use the system locale with our charset.
+		if( ( $pos = strrpos( $orig_lc_ctype, '.' ) ) !== false )
+		{	// Remove existing charset string:
+			$syslocale = substr( $orig_lc_ctype, 0, $pos );
+		}
+		else
+		{
+			$syslocale = $orig_lc_ctype;
+		}
+
+		if( setlocale( LC_CTYPE, $syslocale.'.'.$lc_evo_charset ) === false )
+		{	// We could not set a usable locale, giving up...
+			return false;
+		}
+	}
+
+	//pre_dump( setlocale( LC_CTYPE, 0 ) );
+
+	// Transliterate the string:
+	$newstr = iconv( $evo_charset, 'ASCII//TRANSLIT', $str );
+
+	// Restore the original locale:
+	setlocale( LC_CTYPE, $orig_lc_ctype );
+
+	return $newstr;
+}
+
+
+/**
  * Convert special chars (like german umlauts) to ASCII characters.
  *
- * @param string
- * @return string
+ * @param string Input string to operate on
+ * @return string The input string with replaced chars.
  */
 function replace_special_chars( $str )
 {
 	global $evo_charset;
 
-	if( can_convert_charsets('UTF-8', $evo_charset) && can_convert_charsets('UTF-8', 'ISO-8859-1') /* source */ )
-	{
-		$str = convert_charset( $str, 'UTF-8', $evo_charset );
+	// Decode entities to be able to transliterate the associated chars:
+	// Tblue> TODO: Check if this could have side effects.
+	$str = html_entity_decode( $str, ENT_NOQUOTES, $evo_charset );
+
+	if( ( $newstr = evo_iconv_transliterate( $str ) ) !== false )
+	{	// iconv allows us to get nice URL titles by transliterating non-ASCII chars.
+		// Tblue> htmlentities() does not know anything about ASCII?! ISO-8859-1 will work too, though.
+		$newstr_charset = 'ISO-8859-1';
+	}
+	else if( can_convert_charsets('UTF-8', $evo_charset) && can_convert_charsets('UTF-8', 'ISO-8859-1') /* source */ )
+	{	// Fallback to the limited old method: Transliterate only a few known chars.
+		$newstr = convert_charset( $str, 'UTF-8', $evo_charset );
+		$newstr_charset = 'UTF-8';
 
 		// TODO: add more...?!
 		$search = array( 'Ä', 'ä', 'Ö', 'ö', 'Ü', 'ü', 'ß', 'à', 'ç', 'è', 'é', 'ì', 'ò', 'ô', 'ù' ); // iso-8859-1
@@ -58,31 +125,38 @@ function replace_special_chars( $str )
 		{ // convert $search to UTF-8
 			$search[$k] = convert_charset( $v, 'UTF-8', 'ISO-8859-1' );
 		}
-		$str = str_replace( $search, $replace, $str );
 
-		// Replace HTML entities
-		$str = htmlentities( $str, ENT_NOQUOTES, 'UTF-8' );
+		$newstr = str_replace( $search, $replace, $newstr );
 	}
 	else
 	{
-		// Replace HTML entities only
-		$str = htmlentities( $str, ENT_NOQUOTES, $evo_charset );
+		// Replace HTML entities only.
+		$newstr = $str;
+		$newstr_charset = $evo_charset;
 	}
 
-	// Keep only one char in entities!
-	$str = preg_replace( '/&(.).+?;/', '$1', $str );
-	// Replace non acceptable chars
-	$str = preg_replace( '/[^A-Za-z0-9_]+/', '-', $str );
-	// Remove '-' at start and end:
-	$str = preg_replace( '/^-+/', '', $str );
-	$str = preg_replace( '/-+$/', '', $str );
+	// Replace HTML entities
+	$newstr = htmlentities( $newstr, ENT_NOQUOTES, $newstr_charset );
 
-	return $str;
+	// Keep only one char in entities!
+	$newstr = preg_replace( '/&(.).+?;/', '$1', $newstr );
+	// Replace non acceptable chars
+	$newstr = preg_replace( '/[^A-Za-z0-9_]+/', '-', $newstr );
+	// Remove '-' at start and end:
+	$newstr = preg_replace( '/^-+/', '', $newstr );
+	$newstr = preg_replace( '/-+$/', '', $newstr );
+
+	//pre_dump( $str, $newstr );
+
+	return $newstr;
 }
 
 
 /*
  * $Log$
+ * Revision 1.5  2009/11/14 14:47:47  tblue246
+ * replace_special_chars(): Try to use iconv() to transliterate non-ASCII chars.
+ *
  * Revision 1.4  2009/10/19 21:50:36  blueyed
  * doc
  *

@@ -38,9 +38,9 @@ class ItemFuncsTestCase extends EvoUnitTestCase
 		}
 
 		$old_evo_charset = $evo_charset;
-		$evo_charset = 'ISO-8859-1';
 
 		// For ISO-8859-1:
+		$evo_charset = 'ISO-8859-1';
 		foreach( array(
 					//     arg1               arg2                    expected result
 					array( '  ', ' :: çà c\'est "VRAIMENT" tôa! ', 'ca-c-est-vraiment-toa' ),
@@ -59,7 +59,14 @@ class ItemFuncsTestCase extends EvoUnitTestCase
 
 		// For UTF-8:
 		$evo_charset = 'UTF-8';
-		$this->assertEqual( urltitle_validate( '', 'Äöüùé' ), 'aeoeueue' );
+		foreach( array(
+					array( '', 'Äöüùé', 'aeoeueue' ),
+					array( '', 'Založte si svůj vlastní blog za pomoci TextPattern', 'zalozte-si-svuj-vlastni-blog-za-pomoci-textpattern' ),
+					array( '', 'Zalo&#382;te si sv&#367;j vlastní blog za pomoci TextPattern', 'zalozte-si-svuj-vlastni-blog-za-pomoci-textpattern' ),
+				) as $test )
+		{
+			$this->assertEqual( urltitle_validate( $test[0], $test[1] ), $test[2] );
+		}
 
 		$evo_charset = $old_evo_charset;
 	}
