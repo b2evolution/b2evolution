@@ -42,6 +42,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * This function will figure out a usable LC_CTYPE setting and revert it to the original value
  * after calling iconv().
  *
+ * @todo Try to switch system locale to post locale
  * @author Tilman BLUMENBACH - tblue246
  * 
  * @param string The string to transliterate.
@@ -154,6 +155,9 @@ function replace_special_chars( $str )
 
 /*
  * $Log$
+ * Revision 1.6  2009/11/14 20:44:32  tblue246
+ * doc
+ *
  * Revision 1.5  2009/11/14 14:47:47  tblue246
  * replace_special_chars(): Try to use iconv() to transliterate non-ASCII chars.
  *
