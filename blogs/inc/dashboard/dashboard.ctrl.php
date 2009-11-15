@@ -398,12 +398,15 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	// Begin payload block:
 	$AdminUI->disp_payload_begin();
 
-	echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr>';
+	echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr><td>';
 
-	/*
-	 * LEFT COL
-	 */
-	// Note: hopefully, the updates will have been downloaded in the shutdown function of a previous page (including the login screen)
+	$block_item_Widget = & new Widget( 'block_item' );
+
+	$block_item_Widget->title = T_('Updates from b2evolution.net');
+	$block_item_Widget->disp_template_replaced( 'block_start' );
+
+
+	// Note: hopefully, the update swill have been downloaded in the shutdown function of a previous page (including the login screen)
 	// However if we have outdated info, we will load updates here.
 	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 	// Let's clear any remaining messages that should already have been displayed before...
@@ -411,12 +414,6 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	if( b2evonet_get_updates() !== NULL )
 	{	// Updates are allowed, display them:
-		echo '<td>';
-
-		$block_item_Widget = & new Widget( 'block_item' );
-
-		$block_item_Widget->title = T_('Updates from b2evolution.net');
-		$block_item_Widget->disp_template_replaced( 'block_start' );
 
 		// Display info & error messages
 		echo $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
@@ -443,15 +440,19 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		 * DashboardAdminMain to be added here (anyone?)
 		 */
 
-		echo '</td>';
 	}
+	else
+	{
+		echo '<p>Updates from b2evolution.net are disabled!</p>';
+		echo '<p>You will <b>NOT</b> be alerted if you are running an insecure configuration.</p>';
+	}
+	
+	echo '</td><td>';
 
 	/*
 	 * RIGHT COL
 	 */
-	echo '<td>';
-
-	$side_item_Widget = & new Widget( $allow_evo_stats !== false ? 'side_item' : 'block_item' );
+	$side_item_Widget = & new Widget( 'side_item' );
 
 	$side_item_Widget->title = T_('Administrative tasks');
 	$side_item_Widget->disp_template_replaced( 'block_start' );
@@ -491,6 +492,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.38  2009/11/15 19:05:45  fplanque
+ * no message
+ *
  * Revision 1.37  2009/11/11 03:24:52  fplanque
  * misc/cleanup
  *

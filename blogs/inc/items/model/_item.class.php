@@ -1375,6 +1375,7 @@ class Item extends ItemLight
 
 	/**
 	 * Does the post have different content parts (teaser/extension, devided by "<!--more-->")?
+	 *
 	 * @access public
 	 * @return boolean
 	 */
@@ -1394,6 +1395,7 @@ class Item extends ItemLight
 
 	/**
 	 * Should the teaser get hidden when displaying full post ($more).
+	 *
 	 * @access protected
 	 * @return boolean
 	 */
@@ -4054,6 +4056,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.154  2009/11/15 19:05:45  fplanque
+ * no message
+ *
  * Revision 1.153  2009/11/11 03:24:51  fplanque
  * misc/cleanup
  *

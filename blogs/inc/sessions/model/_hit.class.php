@@ -846,8 +846,10 @@ class Hit
 			global $DB;
 			$sql_agent_types = array($this->get_agent_type());
 			if( $sql_agent_types[0] != 'unknown' )
+			{
 				$sql_agent_types[] = 'unknown';
-
+			}
+			
 			if( $rows = $DB->get_results( "
 				SELECT agnt_ID, agnt_type FROM T_useragents
 				 WHERE agnt_signature = ".$DB->quote( $this->get_user_agent() )."
@@ -859,21 +861,29 @@ class Hit
 					if( $rows[0]->agnt_type == 'unknown' && $sql_agent_types[0] != 'unknown' )
 					{ // type is "unknown", but known now: update type
 						$DB->query( "
-						UPDATE T_useragents
-						   SET agnt_type = ".$DB->quote($sql_agent_types[0])."
-						   WHERE agnt_ID = ".$this->agent_ID );
+							UPDATE T_useragents
+							   SET agnt_type = ".$DB->quote($sql_agent_types[0])."
+							   WHERE agnt_ID = ".$this->agent_ID );
 					}
 				}
 				else
 				{ // two rows selected: "unknown" and detected type. This might be rows from before the case above was handled.
 					if( count($rows) != 2 )
+					{
 						debug_die('get_agent_ID: assertion failed: "unknown"+this != 2');
+					}
+					
 					foreach($rows as $row)
+					{
 						if( $row->agnt_type == 'unknown' )
+						{
 							$unknown_id = $row->agnt_ID;
+						}
 						else
+						{
 							$this->agent_ID = $row->agnt_ID;
-
+						}
+					}
 					// Convert entries
 					$DB->query( '
 						UPDATE T_hitlog
@@ -1213,6 +1223,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.46  2009/11/15 19:05:44  fplanque
+ * no message
+ *
  * Revision 1.45  2009/11/08 23:01:52  blueyed
  * Fix encoding/decoding of keyphrases from referers. Also, make the images.google code only apply to images.google.*
  *

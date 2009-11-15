@@ -156,6 +156,8 @@ if( $resolve_extra_path )
 		 *            404 Not found would be the right status code to return.
 		 *        fp: http://test.b2evo.net/HEAD/blogs/blog1.php/foo.php
 		 *            (compare to http://test.b2evo.net/HEAD/blogs/blog1.php/foo).
+		 * fp> I know I had a good reason for this back in 2003!! I can't remember exactly though :)
+		 * If you want, we can try to comment it out and see how it goes... (please do so, I am not sure exactly how much you want to comment out)
 		 */
 		if( isset( $path_elements[0] ) && preg_match( '#.*\.php[0-9]?$#', $path_elements[0] ) )
 		{ // Ignore element ending with .php (fp: note: may be just '.php')
@@ -629,6 +631,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.156  2009/11/15 19:05:45  fplanque
+ * no message
+ *
  * Revision 1.155  2009/10/29 20:44:30  blueyed
  * urldecode title and check if it can be found with the last invalid char removed.
  *

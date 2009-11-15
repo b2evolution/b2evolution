@@ -125,8 +125,7 @@ class Hitlist
 		// Prune when $localtime is a NEW day (which will be the 1st request after midnight):
 		$last_prune = $Settings->get( 'auto_prune_stats_done' );
 		if( $last_prune >= date('Y-m-d', $localtimenow) && $last_prune <= date('Y-m-d', $localtimenow+86400) )
-		{ // Already pruned today (and not more than one day in the future)
-		       # dh> I have a report from somebody with a date like 2080-10-25 07:07:40 - this should get pruned, too.
+		{ // Already pruned today (and not more than one day in the future -- which typically never happens)
 			return T_('Pruning has already been done today');
 		}
 
@@ -180,6 +179,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.19  2009/11/15 19:05:43  fplanque
+ * no message
+ *
  * Revision 1.18  2009/11/11 23:32:27  blueyed
  * Hitlist::dbprune: also prune if last prune is more than 1 day in the future.
  *
