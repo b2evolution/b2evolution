@@ -143,7 +143,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 		if( preg_match( '|^(\s*CREATE TABLE\s+)(IF NOT EXISTS\s+)?([^\s(]+)(.*)$|is', $qry, $match) )
 		{
-			$tablename = db_delta_remove_backticks(preg_replace( $DB->dbaliases, $DB->dbreplaces, $match[3] ));
+			$tablename = db_delta_remove_quotes(preg_replace( $DB->dbaliases, $DB->dbreplaces, $match[3] ));
 			$qry = $match[1].( empty($match[2]) ? '' : $match[2] ).$tablename.$match[4];
 
 			$items[strtolower($tablename)][] = array(
@@ -160,7 +160,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 		}
 		elseif( preg_match( '|^(\s*INSERT INTO\s+)([\S]+)(.*)$|is', $qry, $match) )
 		{
-			$tablename = db_delta_remove_backticks(preg_replace( $DB->dbaliases, $DB->dbreplaces, $match[2] ));
+			$tablename = db_delta_remove_quotes(preg_replace( $DB->dbaliases, $DB->dbreplaces, $match[2] ));
 			$items[strtolower($tablename)][] = array(
 				'queries' => array($match[1].$tablename.$match[3]),
 				'note' => '',
@@ -168,7 +168,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 		}
 		elseif( preg_match( '|^(\s*UPDATE\s+)([\S]+)(.*)$|is', $qry, $match) )
 		{
-			$tablename = db_delta_remove_backticks(preg_replace( $DB->dbaliases, $DB->dbreplaces, $match[2] ));
+			$tablename = db_delta_remove_quotes(preg_replace( $DB->dbaliases, $DB->dbreplaces, $match[2] ));
 			$items[strtolower($tablename)][] = array(
 				'queries' => array($match[1].$tablename.$match[3]),
 				'note' => '',
@@ -179,7 +179,6 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 			$Debuglog->add( 'db_delta: Unrecognized query type: '.$qry, 'note' );
 		}
 	}
-
 
 	/**
 	 * @global array Available tables in the current database
@@ -309,7 +308,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 		{ // For every field line specified in the query
 			// Extract the field name
 			preg_match( '|^([^\s(]+)|', trim($create_definition), $match );
-			$fieldname = db_delta_remove_backticks($match[1]);
+			$fieldname = db_delta_remove_quotes($match[1]);
 			$fieldname_lowered = strtolower($fieldname);
 
 			$create_definition = trim($create_definition, ", \r\n\t");
@@ -320,17 +319,18 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 					'create_definition' => $create_definition,
 				);
 
-				if( ! preg_match( '~^(PRIMARY(?:\s+KEY)|UNIQUE(?:\s+(?:INDEX|KEY))?|KEY|INDEX) (?:\s+(\w+))? (\s+USING \w+)? \s* \((.*)\)$~ix', $create_definition, $match ) )
+				if( ! preg_match( '~^(PRIMARY(?:\s+KEY)|UNIQUE(?:\s+(?:INDEX|KEY))?|KEY|INDEX|FULLTEXT\s+KEY) (?:\s+([`"])?(\w+)\\2?)? (\s+USING \w+)? \s* \((.*)\)$~ix', $create_definition, $match ) )
 				{ // invalid type, should not happen
 					debug_die( 'Invalid type in $indices: '.$create_definition );
+					// TODO: add test: Invalid type in $indices: KEY "coord" ("lon","lat")
 				}
 				$add_index['keyword'] = $match[1];
-				$add_index['name'] = strtoupper($match[2]);
-				$add_index['type'] = $match[3]; // "USING [type_name]"
-				$add_index['col_names'] = explode( ',', $match[4] );
+				$add_index['name'] = strtoupper($match[3]);
+				$add_index['type'] = $match[4]; // "USING [type_name]"
+				$add_index['col_names'] = explode( ',', $match[5] );
 				foreach( $add_index['col_names'] as $k => $v )
 				{
-					$add_index['col_names'][$k] = strtolower(db_delta_remove_backticks(trim($v)));
+					$add_index['col_names'][$k] = strtolower(db_delta_remove_quotes(trim($v)));
 				}
 
 				if( $fieldname_lowered == 'primary' )
@@ -439,7 +439,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 			{
 				$index_pattern .= 'PRIMARY(\s+KEY)?';
 				// optional primary key name:
-				$index_pattern .= '(\s+\w+)?';
+				$index_pattern .= '(\s+[`"]?\w+[`"]?)?';
 			}
 			elseif( $index_data['unique'] )
 			{
@@ -447,11 +447,11 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 			}
 			else
 			{
-				$index_pattern .= '(INDEX|KEY)';
+				$index_pattern .= '(INDEX|(?:FULLTEXT\s+)?KEY)';
 			}
 			if( $index_name != 'PRIMARY' )
 			{
-				$index_pattern .= '(\s+`?'.$index_name.'`?)?'; // optionally in backticks (and index name is optionally itself)
+				$index_pattern .= '(\s+[`"]?'.$index_name.'[`"]?)?'; // optionally in backticks (and index name is optionally itself)
 			}
 
 			$index_columns = '';
@@ -463,7 +463,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 					$index_columns .= '\s*,\s*';
 				}
 				// Add the field to the column list string
-				$index_columns .= '`?'.$column_data['fieldname'].'`?'; // optionally in backticks
+				$index_columns .= '[`"]?'.$column_data['fieldname'].'[`"]?'; // optionally in backticks
 				if( ! empty($column_data['subpart']) )
 				{
 					$index_columns .= '\s*\(\s*'.$column_data['subpart'].'\s*\)\s*';
@@ -487,7 +487,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				if( ! preg_match( '~^\w+\s+[^(]~', $index['create_definition'], $match ) )
 				{ // no key name given, make the name part optional, if it's the default one:
 					// (Default key name seems to be the first column, eventually with "_\d+"-suffix)
-					$auto_key = db_delta_remove_backticks(strtoupper($index['col_names'][0]));
+					$auto_key = db_delta_remove_quotes(strtoupper($index['col_names'][0]));
 					if( isset($used_auto_keys[$auto_key]) )
 					{
 						$used_auto_keys[$auto_key]++;
@@ -607,7 +607,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 			unset($type_matches); // have we detected the type as matching (for optional length param)
 			$fieldtype = '';
 
-			$pattern_field = '`?'.$tablefield->Field.'`?'; // optionally in backticks
+			$pattern_field = '[`"]?'.$tablefield->Field.'[`"]?'; // optionally in backticks
 
 			// Get the field type from the query
 			if( preg_match( '~^'.$pattern_field.'\s+ (TINYINT|SMALLINT|MEDIUMINT|INTEGER|INT|BIGINT|REAL|DOUBLE|FLOAT|DECIMAL|DEC|NUMERIC) ( \s* \([\d\s,]+\) )? (\s+ UNSIGNED)? (\s+ ZEROFILL)? (.*)$~ix', $column_definition, $match ) )
@@ -618,9 +618,9 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				{ // synonym
 					$fieldtype = 'INT';
 				}
-				elseif( $fieldtype == 'DECIMAL' )
+				elseif( $fieldtype == 'DEC' )
 				{ // synonym
-					$fieldtype = 'DEC';
+					$fieldtype = 'DECIMAL';
 				}
 
 				if( isset($match[2]) )
@@ -639,7 +639,10 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				$field_to_parse = $match[5];
 
 				// The length param is optional:
-				$matches_pattern = '~^'.preg_replace( '~\((\d+)\)~', '(\(\d+\))?', $tablefield->Type ).'$~i';
+				if( substr($fieldtype, 0, 7) == 'DECIMAL' )
+					$matches_pattern = '~^'.preg_quote($tablefield->Type, '~').'$~i';
+				else
+					$matches_pattern = '~^'.preg_replace( '~\((\d+)\)~', '(\(\d+\))?', $tablefield->Type ).'$~i';
 				$type_matches = preg_match( $matches_pattern, $fieldtype );
 			}
 			elseif( preg_match( '~^'.$pattern_field.'\s+(DATETIME|DATE|TIMESTAMP|TIME|YEAR|TINYBLOB|BLOB|MEDIUMBLOB|LONGBLOB|TINYTEXT|TEXT|MEDIUMTEXT|LONGTEXT) ( \s+ BINARY )? (.*)$~ix', $column_definition, $match ) )
@@ -1135,18 +1138,22 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 
 
 /**
- * Remove backticks around a field/table name.
- *
- * "backtick" means "single backquote" (`)
+ * Remove quotes/backticks around a field/table name.
  *
  * @param string Field name
+ * @param string List of quote chars to remove
  * @return string
  */
-function db_delta_remove_backticks($fieldname)
+function db_delta_remove_quotes($fieldname, $quotes = '`"')
 {
-	if( substr($fieldname, 0, 1) == '`' && substr($fieldname, -1) == '`' )
-	{ // backticks:
-		$fieldname = substr($fieldname, 1, -1);
+	for( $i = 0; $i < strlen($quotes); $i++ )
+	{
+		$char = $quotes[$i];
+		if( substr($fieldname, 0, 1) == $char && substr($fieldname, -1) == $char )
+		{ // found quotes:
+			$fieldname = substr($fieldname, 1, -1);
+			return $fieldname;
+		}
 	}
 	return $fieldname;
 }
@@ -1230,6 +1237,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.12  2009/11/15 23:01:16  blueyed
+ * Fix db_delta for ANSI style SQL (double quotes). Also fix/add support for fulltext indices.
+ *
  * Revision 1.11  2009/10/11 02:34:52  blueyed
  * db_delta: fix implicit default, if length is used for numeric fields, e.g. 'int(11)'
  *

@@ -1146,18 +1146,33 @@ class UpgradeFuncsTestCase extends EvoDbUnitTestCase
 	 */
 	function test_backticks_in_indexnames()
 	{
-		$sql = "
+		$this->assertNoDbChanges("
 			CREATE TABLE $GLOBALS[tableprefix]test_1 (
 				id int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 				PRIMARY KEY  (`id`)
-			)";
-		$this->test_DB->query($sql);
-
-		$r = $this->db_delta_wrapper($sql);
-
-		$this->assertIdentical( $r, array() );
+			)");
 	}
 
+
+	function test_decimal()
+	{
+		$this->assertNoDbChanges("
+		CREATE TABLE $GLOBALS[tableprefix]test_1 (
+			i decimal(4,2) default NULL,
+			j decimal(4,2) default '0.00'
+		);");
+	}
+
+
+	/**
+	 * Assert that there are no DB changes required (via live and db_delta).
+	 */
+	function assertNoDbChanges($sql)
+	{
+		$this->test_DB->query($sql);
+		$r = $this->db_delta_wrapper($sql);
+		$this->assertIdentical( $r, array() );
+	}
 }
 
 
