@@ -672,7 +672,7 @@ class _core_Module extends Module
 		}
 
 		if( !empty( $user_tab ) && $ctrl == 'users' )
-		{
+		{	// fp>max TODO: the following sub tabs should be added or replaced by users.ctrl
 			if( !empty( $user_ID ) )
 			{
 				$users_sub_entries = array();
@@ -775,6 +775,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.49  2009/11/15 20:01:09  fplanque
+ * todo
+ *
  * Revision 1.48  2009/11/11 03:24:49  fplanque
  * misc/cleanup
  *
