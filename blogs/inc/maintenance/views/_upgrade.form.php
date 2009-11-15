@@ -62,15 +62,15 @@ switch( $action )
 			switch( $upgrade_action['action'] )
 			{
 				case 'download':
-					$button = T_( 'Download, unzip & install now' );
+					$button = T_( 'Download, unzip & install now!' );
 					break;
 
 				case 'unzip':
-					$button = T_( 'Unzip & install now' );
+					$button = T_( 'Unzip & install now!' );
 					break;
 
 				case 'install':
-					$button = T_( 'Install now' );
+					$button = T_( 'Install now!' );
 					break;
 			}
 
@@ -96,6 +96,9 @@ switch( $action )
 
 /*
  * $Log$
+ * Revision 1.5  2009/11/15 19:44:02  fplanque
+ * minor
+ *
  * Revision 1.4  2009/10/22 10:52:57  efy-maxim
  * upgrade - messages
  *

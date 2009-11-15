@@ -60,16 +60,17 @@ switch( $action )
 {
 	case 'start':
 	default:
+		// STEP 1: Check for updates.
 		$block_item_Widget = & new Widget( 'block_item' );
 		$block_item_Widget->title = T_('Updates from b2evolution.net');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
-		// Note: hopefully, the update swill have been downloaded in the shutdown function of a previous page (including the login screen)
+		// Note: hopefully, the update will have been downloaded in the shutdown function of a previous page (including the login screen)
 		// However if we have outdated info, we will load updates here.
 		load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 		// Let's clear any remaining messages that should already have been displayed before...
 		$Messages->clear( 'all' );
-		b2evonet_get_updates();
+		b2evonet_get_updates( true );
 
 		// Display info & error messages
 		echo $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
@@ -95,14 +96,15 @@ switch( $action )
 		// Extract available updates:
 		$updates = $global_Cache->get( 'updates' );
 
-		$updates[0]['url'] = 'http://ubidev.com/b2evolution-1.0.0.zip'; // TODO: temporary URL
+		// DEBUG:
+		// $updates[0]['url'] = 'http://xxx/b2evolution-1.0.0.zip'; // TODO: temporary URL
 
 		$action = 'start';
 
 		break;
 
 	case 'download':
-
+		// STEP 2: DOWNLOAD.
 		$block_item_Widget = & new Widget( 'block_item' );
 		$block_item_Widget->title = T_('Downloading, unzipping & installing package...');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
@@ -131,7 +133,7 @@ switch( $action )
 		}
 
 	case 'unzip':
-
+		// STEP 3: UNZIP.
 		if( !isset( $block_item_Widget ) )
 		{
 			$block_item_Widget = & new Widget( 'block_item' );
@@ -170,7 +172,7 @@ switch( $action )
 		}
 
 	case 'install':
-
+		// STEP 4: INSTALL.
 		if( !isset( $block_item_Widget ) )
 		{
 			$block_item_Widget = & new Widget( 'block_item' );
@@ -278,6 +280,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2009/11/15 19:44:02  fplanque
+ * minor
+ *
  * Revision 1.4  2009/10/22 10:52:57  efy-maxim
  * upgrade - messages
  *

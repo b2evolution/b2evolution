@@ -21,10 +21,11 @@
  /**
  * Get updates from b2evolution.net
  *
+ * @param boolean useful when trying to upgrade to a release that has just been published (in the last 12 hours)
  * @return NULL|boolean True if there have been updates, false on error,
  *                      NULL if the user has turned off updates.
  */
-function b2evonet_get_updates()
+function b2evonet_get_updates( $force_short_delay = false )
 {
 	global $allow_evo_stats; // Possible values: true, false, 'anonymous'
 	global $DB, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow, $evo_charset;
@@ -40,8 +41,16 @@ function b2evonet_get_updates()
 		return NULL;
 	}
 
-	$update_every = 3600*12; // 12 hours
-	$attempt_every = 3600*4; // 4 hours
+	if( $force_short_delay )
+	{
+		$update_every = 180; // 3 minutes
+		$attempt_every = 60; // 1 minute
+	}
+	else
+	{
+		$update_every = 3600*12; // 12 hours
+		$attempt_every = 3600*4; // 4 hours
+	}
 
 	/* DEBUG: *
 	$update_every = 10;
@@ -158,6 +167,9 @@ function b2evonet_get_updates()
 
 /*
  * $Log$
+ * Revision 1.21  2009/11/15 19:44:02  fplanque
+ * minor
+ *
  * Revision 1.20  2009/07/04 16:40:56  tblue246
  * - b2evonet_get_updates():
  * 	- PHPdoc.
