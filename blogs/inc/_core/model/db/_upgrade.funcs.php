@@ -1146,7 +1146,9 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
  */
 function db_delta_remove_quotes($fieldname, $quotes = '`"')
 {
-	for( $i = 0; $i < strlen($quotes); $i++ )
+	$quotes_len = strlen( $quotes );
+
+	for( $i = 0; $i < $quotes_len; $i++ )
 	{
 		$char = $quotes[$i];
 		if( substr($fieldname, 0, 1) == $char && substr($fieldname, -1) == $char )
@@ -1237,6 +1239,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.13  2009/11/16 14:53:48  tblue246
+ * db_delta_remove_quotes(): Do not call strlen() on every for loop iteration.
+ *
  * Revision 1.12  2009/11/15 23:01:16  blueyed
  * Fix db_delta for ANSI style SQL (double quotes). Also fix/add support for fulltext indices.
  *
