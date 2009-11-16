@@ -491,7 +491,7 @@ class DB
 		}
 		else
 		{
-			return "'".mysql_real_escape_string($str, $this->dbhandle)."'";
+			return "'".$this->escape($str)."'";
 		}
 	}
 
@@ -917,9 +917,13 @@ class DB
 	 * Note: To be sure that you received NULL from the DB and not "no rows" check
 	 *       for {@link $num_rows}.
 	 *
+	 * @param string Optional query to execute
+	 * @param integer Column number (starting at and defaulting to 0)
+	 * @param integer Row (defaults to NULL for "next"/"do not seek")
+	 * @param string Optional title of query
 	 * @return mixed NULL if not found, the value otherwise (which may also be NULL).
 	 */
-	function get_var( $query = NULL, $x = 0, $y = 0, $title = '' )
+	function get_var( $query = NULL, $x = 0, $y = NULL, $title = '' )
 	{
 		// If there is a query then perform it if not then use cached results..
 		if( $query )
@@ -927,7 +931,8 @@ class DB
 			$this->query($query, $title);
 		}
 
-		if( $this->num_rows && mysql_data_seek($this->result, $y) )
+		if( $this->num_rows
+			&& ( $y === NULL || mysql_data_seek($this->result, $y) ) )
 		{
 			$row = mysql_fetch_row($this->result);
 
@@ -1649,6 +1654,10 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.43  2009/11/16 20:44:07  blueyed
+ *  - Use escape in quote (makes mocking in tests easier)
+ *  - get_var: add support for $y=NULL (next row)
+ *
  * Revision 1.42  2009/10/27 21:57:43  fplanque
  * minor/doc
  *
