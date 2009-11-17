@@ -139,6 +139,13 @@ function replace_special_chars( $str )
 	// Replace HTML entities
 	$newstr = htmlentities( $newstr, ENT_NOQUOTES, $newstr_charset );
 
+	// Handle special entities (e.g., use "-" instead of "a" for "&"):
+	$newstr = str_replace(
+		array( '&amp;', '&laquo;', '&raquo;' ),
+		'-',
+		$newstr );
+
+
 	// Keep only one char in entities!
 	$newstr = preg_replace( '/&(.).+?;/', '$1', $newstr );
 	// Replace non acceptable chars
@@ -155,6 +162,9 @@ function replace_special_chars( $str )
 
 /*
  * $Log$
+ * Revision 1.7  2009/11/17 21:09:38  blueyed
+ * replace_special_chars: special handling of entities '&amp;', '&laquo;', '&raquo;': replace by dash.
+ *
  * Revision 1.6  2009/11/14 20:44:32  tblue246
  * doc
  *
