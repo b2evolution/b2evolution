@@ -261,7 +261,7 @@ class Backup
 	 */
 	function backup_files( $backup_dirpath )
 	{
-		global $basepath, $backup_paths;
+		global $basepath, $backup_paths, $inc_path;
 
 		echo '<h4 style="color:green">'.T_( 'Creating folders/files backup...' ).'</h4>';
 		flush();
@@ -298,27 +298,30 @@ class Backup
 
 		if( $this->pack_backup_files )
 		{	// Create ZIPped backup
-			$zip = new ZipArchive();
 			$zip_filepath = $backup_dirpath.'files.zip';
+
+			// Pack using 'zlib' extension and PclZip wrapper
+			require_once( $inc_path.'_ext/pclzip/pclzip.lib.php' );
+
+			$PclZip = new PclZip( $zip_filepath );
 
 			echo sprintf( T_( 'Archiving files to &laquo;<strong>%s</strong>&raquo;...' ), $zip_filepath ).'<br/>';
 			flush();
 
-			if ( $zip->open($zip_filepath, ZIPARCHIVE::CREATE ) !== TRUE)
-			{
-	    		echo '<p style="color:red">'.sprintf( T_( 'Unable to create &laquo;%s&raquo;' ), $zip_filepath ).'</p>';
-	    		flush();
-
-				return false;
-			}
-
-			// Add folders and files to ZIP archive.
 			foreach( $included_files as $included_file )
 			{
-				$this->recurse_zip( no_trailing_slash( $included_file ), $zip, '', true );
-			}
+				echo sprintf( T_( 'Backing up &laquo;<strong>%s</strong>&raquo; ...' ), $basepath.$included_file ).'<br/>';
+				flush();
 
-			$zip->close();
+				$file_list = $PclZip->add( no_trailing_slash( $basepath.$included_file ), PCLZIP_OPT_REMOVE_PATH, no_trailing_slash( $basepath ) );
+				if ($file_list == 0)
+				{
+					echo '<p style="color:red">'.sprintf( T_( 'Unable to create &laquo;%s&raquo;' ), $zip_filepath ).'</p>';
+	    			flush();
+
+					return false;
+				}
+			}
 		}
 		else
 		{	// Copy directories and files to backup directory
@@ -340,7 +343,7 @@ class Backup
 	 */
 	function backup_database( $backup_dirpath )
 	{
-		global $DB, $db_config, $backup_tables;
+		global $DB, $db_config, $backup_tables, $inc_path;
 
 		echo '<h4 style="color:green">'.T_( 'Creating database backup...' ).'</h4>';
 		flush();
@@ -468,18 +471,21 @@ class Backup
 
 		if( $this->pack_backup_files )
 		{	// Pack created backup SQL script
-			$zip = new ZipArchive();
+
+			// Pack using 'zlib' extension and PclZip wrapper
+			require_once( $inc_path.'_ext/pclzip/pclzip.lib.php' );
+
 			$zip_filepath = $backup_dirpath.'db.zip';
-			if ( $zip->open($zip_filepath, ZIPARCHIVE::CREATE ) !== TRUE)
+			$PclZip = new PclZip( $zip_filepath );
+
+			$file_list = $PclZip->add( $backup_dirpath.$backup_sql_filename, PCLZIP_OPT_REMOVE_PATH, no_trailing_slash( $backup_dirpath ) );
+			if ($file_list == 0)
 			{
-	    		echo '<p style="color:red">'.sprintf( T_( 'Unable to create &laquo;%s&raquo;' ), $zip_filepath ).'</p>';
+				echo '<p style="color:red">'.sprintf( T_( 'Unable to create &laquo;%s&raquo;' ), $zip_filepath ).'</p>';
 	    		flush();
 
 				return false;
 			}
-
-			$zip->addFile( $backup_dirpath.$backup_sql_filename, $backup_sql_filename );
-			$zip->close();
 
 			unlink( $backup_sql_filepath );
 		}
@@ -525,61 +531,6 @@ class Backup
 		else
 		{
 			copy( $src, $dest );
-		}
-	}
-
-
-	/**
-	 * Zip directory recursively
-	 * @param string source directory
-	 * @param object instance of ZipArchive class
-	 * @param string prefix
-	 */
-	function recurse_zip( $path, &$zip, $prefix = '', $root = false )
-	{
-		global $basepath;
-
-		if( is_dir( $basepath.$path ) )
-		{
-			if( $dir = opendir( $basepath.$path ) )
-			{
-				$path .= '/';
-
-				$file_list = array();
-				while ( ( $file = readdir( $dir ) ) !== false )
-	            {
-	            	if( ($file !== ".") && ($file !== ".."))
-                    {	// Skip parent and root directories
-	            		$file_list[] = $file;
-                    }
-	            }
-
-	            if( count( $file_list ) == 0 )
-	            {	// Create empty directory
-	            	$zip->addEmptyDir( '/'.$path );
-	            }
-
-	            foreach( $file_list as $file )
-	            {
-	            	if( is_dir( $basepath.$path.$file ) )
-	            	{
-	            		if( $root )
-						{ 	// progressive display of what backup is doing
-							echo sprintf( T_( 'Backing up &laquo;<strong>%s</strong>&raquo; ...' ), $basepath.$path.$file ).'<br/>';
-							flush();
-						}
-	            		$this->recurse_zip( $path.$file, $zip );
-	            	}
-	            	else
-	            	{
-	            		$this->recurse_zip( $path.$file, $zip, '/' );
-	            	}
-	            }
-			}
-		}
-		else
-		{
-			$zip->addFile( $basepath.$path, $prefix.$path );
 		}
 	}
 
@@ -642,6 +593,9 @@ class Backup
 
 /*
  * $Log$
+ * Revision 1.5  2009/11/18 21:54:25  efy-maxim
+ * compatibility fix for PHP4
+ *
  * Revision 1.4  2009/10/21 14:27:39  efy-maxim
  * upgrade
  *

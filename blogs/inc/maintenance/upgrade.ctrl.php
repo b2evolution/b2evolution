@@ -197,7 +197,7 @@ switch( $action )
 			$read_only_list = array();
 			verify_overwrite( $upgrade_path.$upgrade_name, no_trailing_slash( $basepath ), 'Verifying', false, $read_only_list );
 
-			if( empty( $read_only_files ) )
+			if( empty( $read_only_list ) )
 			{	// We can do backup files and database
 
 				// Load Backup class (PHP4) and backup all of the folders and files
@@ -205,7 +205,7 @@ switch( $action )
 				$Backup = & new Backup();
 				$Backup->include_all();
 
-				if( !extension_loaded( 'zip' ) )
+				if( !function_exists('gzopen') )
 				{
 					$Backup->pack_backup_files = false;
 				}
@@ -218,7 +218,7 @@ switch( $action )
 					echo '<h4 style="color:green">'.T_( 'Copying new folders and files...' ).'</h4>';
 					flush();
 
-					verify_overwrite( $upgrade_path.$upgrade_name, no_trailing_slash( $basepath ), 'Copying', true );
+					verify_overwrite( $upgrade_path.$upgrade_name, no_trailing_slash( $basepath ), 'Copying', true, $read_only_list );
 
 					// Upgrade database using regular upgrader script
 					require_once( $install_path.'/_functions_install.php' );
@@ -243,7 +243,7 @@ switch( $action )
 			else
 			{
 				echo '<p style="color:red">'.T_( '<strong>The following folders and files can\'t be overwritten:</strong>' ).'</p>';
-				foreach( $read_only_files as $read_only_file )
+				foreach( $read_only_list as $read_only_file )
 				{
 					echo $read_only_file.'<br/>';
 				}
@@ -280,6 +280,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2009/11/18 21:54:25  efy-maxim
+ * compatibility fix for PHP4
+ *
  * Revision 1.5  2009/11/15 19:44:02  fplanque
  * minor
  *

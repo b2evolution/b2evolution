@@ -155,7 +155,7 @@ $Form->begin_fieldset( T_( 'Maintenance' ), array( 'class'=>'fieldset clear' ) )
 
 $Form->checkbox( 'bk_maintenance_mode', true, T_( 'Maintenance mode' ), T_( 'Put b2evolution into Maintenance Mode while backing up - Recommended' ) );
 
-if( extension_loaded( 'zip' ) )
+if( function_exists('gzopen') )
 {
 	$Form->checkbox( 'bk_pack_backup_files', $current_Backup->pack_backup_files, T_( 'ZIP' ), T_('Compress backup into ZIP files') );
 }
@@ -168,6 +168,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'S
 
 /*
  * $Log$
+ * Revision 1.5  2009/11/18 21:54:25  efy-maxim
+ * compatibility fix for PHP4
+ *
  * Revision 1.4  2009/10/21 14:27:39  efy-maxim
  * upgrade
  *

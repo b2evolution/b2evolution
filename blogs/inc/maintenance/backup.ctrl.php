@@ -79,6 +79,7 @@ switch( $action )
 
 		flush();
 
+		$success = true;
 		if( $maintenance_mode = param( 'bk_maintenance_mode', 'boolean' ) )
 		{	// Enable maintenance mode
 			$success = switch_maintenance_mode( true, T_( 'System backup is in progress. Please reload this page in a few minutes.' ) );
@@ -107,6 +108,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2009/11/18 21:54:25  efy-maxim
+ * compatibility fix for PHP4
+ *
  * Revision 1.3  2009/10/21 14:27:38  efy-maxim
  * upgrade
  *

@@ -168,23 +168,7 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false )
 		}
 	}
 
-	if( extension_loaded( 'zip' ) )
-	{	// Unpack using 'zip' extension and its ZipArchive class
-		$zip = new ZipArchive();
-
-		$zip->open( $src_file );
-		$success = $zip->extractTo( $dest_dir );
-		$zip->close();
-
-		if( !$success )
-		{
-			echo '<p style="color:red">'.sprintf( T_( 'Unable to unpack &laquo;%s&raquo; ZIP archive.' ), $src_file ).'</p>';
-			flush();
-
-			return false;
-		}
-	}
-	else if( function_exists('gzopen') )
+	if( function_exists('gzopen') )
 	{	// Unpack using 'zlib' extension and PclZip wrapper
 		require_once( $inc_path.'_ext/pclzip/pclzip.lib.php' );
 
@@ -211,11 +195,11 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false )
  *
  * @param string source directory
  * @param string destination directory
- * @param array read only file list
  * @param string action name
  * @param boolean overwrite
+ * @param array read only file list
  */
-function verify_overwrite( $src, $dest, $action = '', $overwrite = true, &$read_only_list = NULL )
+function verify_overwrite( $src, $dest, $action = '', $overwrite = true, &$read_only_list )
 {
 	$dir = opendir( $src );
 
@@ -228,7 +212,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, &$read_
 			$srcfile = $src.'/'.$file;
 			$destfile = $dest.'/'.$file;
 
-			if( $read_only_list != NULL && file_exists( $destfile ) && !is_writable( $destfile ) )
+			if( isset( $read_only_list ) && file_exists( $destfile ) && !is_writable( $destfile ) )
 			{	// Folder or file is not writable
 				$read_only_list[] = $destfile;
 			}
@@ -359,6 +343,9 @@ function aliases_to_tables( $aliases )
 
 /*
  * $Log$
+ * Revision 1.4  2009/11/18 21:54:25  efy-maxim
+ * compatibility fix for PHP4
+ *
  * Revision 1.3  2009/10/21 14:27:39  efy-maxim
  * upgrade
  *
