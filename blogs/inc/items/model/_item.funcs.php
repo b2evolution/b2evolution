@@ -180,11 +180,12 @@ function & get_featured_Item()
  * @param string The prefix of the database column names (e. g. "post_" for post_urltitle)
  * @param string The name of the post ID column
  * @param string The name of the DB table to use
+ * @param NULL|string The post locale or NULL if there is no specific locale.
  * @return string validated url title
  */
 function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false,
 									$dbSlugFieldName = 'post_urltitle', $dbIDname = 'post_ID',
-									$dbtable = 'T_items__item' )
+									$dbtable = 'T_items__item', $post_locale = NULL )
 {
 	global $DB, $Messages;
 
@@ -203,7 +204,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	// Replace special chars/umlauts, if we can convert charsets:
 	load_funcs('locales/_charset.funcs.php');
-	$urltitle = replace_special_chars($urltitle);
+	$urltitle = replace_special_chars($urltitle, $post_locale);
 
 	// Make everything lowercase
 	$urltitle = strtolower( $urltitle );
@@ -1042,6 +1043,9 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 
 /*
  * $Log$
+ * Revision 1.79  2009/11/19 17:25:09  tblue246
+ * Make evo_iconv_transliterate() aware of the post locale
+ *
  * Revision 1.78  2009/10/26 17:58:57  efy-maxim
  * mass create fix and design improvement
  *

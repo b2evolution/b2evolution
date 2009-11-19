@@ -42,13 +42,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * This function will figure out a usable LC_CTYPE setting and revert it to the original value
  * after calling iconv().
  *
- * @todo Try to switch system locale to post locale
  * @author Tilman BLUMENBACH - tblue246
+ * @todo Tblue> Try more locales.
  * 
  * @param string The string to transliterate.
+ * @param NULL|string The post locale. NULL to not try switching to it.
  * @return string|boolean The transliterated ASCII string on success or false on failure.
  */
-function evo_iconv_transliterate( $str )
+function evo_iconv_transliterate( $str, $post_locale = NULL )
 {
 	global $evo_charset, $current_locale, $default_locale;
 
@@ -62,10 +63,16 @@ function evo_iconv_transliterate( $str )
 	$orig_lc_ctype  = setlocale( LC_CTYPE, 0 );
 	$lc_evo_charset = strtolower( str_replace( '-', '', $evo_charset ) );
 
-	if( setlocale( LC_CTYPE,
-				str_replace( '-', '_', $current_locale ).'.'.$lc_evo_charset, // Try to use current b2evo locale
-				str_replace( '-', '_', $default_locale ).'.'.$lc_evo_charset  // Fallback to default b2evo locale
-		) === false )
+	$locales_to_try = array(
+		str_replace( '-', '_', $current_locale ).'.'.$lc_evo_charset, // Try to use current b2evo locale
+		str_replace( '-', '_', $default_locale ).'.'.$lc_evo_charset, // Fallback to default b2evo locale
+	);
+	if( $post_locale !== NULL )
+	{	// Try to switch to the post locale:
+		array_unshift( $locales_to_try, str_replace( '-', '_', $post_locale ).'.'.$lc_evo_charset );
+	}
+
+	if( setlocale( LC_CTYPE, $locales_to_try ) === false )
 	{	// The last thing we try is to use the system locale with our charset.
 		if( ( $pos = strrpos( $orig_lc_ctype, '.' ) ) !== false )
 		{	// Remove existing charset string:
@@ -98,9 +105,11 @@ function evo_iconv_transliterate( $str )
  * Convert special chars (like german umlauts) to ASCII characters.
  *
  * @param string Input string to operate on
+ * @param NULL|string The post locale or NULL if there is no specific locale.
+ *                    Gets passed to evo_iconv_transliterate().
  * @return string The input string with replaced chars.
  */
-function replace_special_chars( $str )
+function replace_special_chars( $str, $post_locale = NULL )
 {
 	global $evo_charset;
 
@@ -108,7 +117,7 @@ function replace_special_chars( $str )
 	// Tblue> TODO: Check if this could have side effects.
 	$str = html_entity_decode( $str, ENT_NOQUOTES, $evo_charset );
 
-	if( ( $newstr = evo_iconv_transliterate( $str ) ) !== false )
+	if( ( $newstr = evo_iconv_transliterate( $str, $post_locale ) ) !== false )
 	{	// iconv allows us to get nice URL titles by transliterating non-ASCII chars.
 		// Tblue> htmlentities() does not know anything about ASCII?! ISO-8859-1 will work too, though.
 		$newstr_charset = 'ISO-8859-1';
@@ -162,6 +171,9 @@ function replace_special_chars( $str )
 
 /*
  * $Log$
+ * Revision 1.8  2009/11/19 17:25:09  tblue246
+ * Make evo_iconv_transliterate() aware of the post locale
+ *
  * Revision 1.7  2009/11/17 21:09:38  blueyed
  * replace_special_chars: special handling of entities '&amp;', '&laquo;', '&raquo;': replace by dash.
  *

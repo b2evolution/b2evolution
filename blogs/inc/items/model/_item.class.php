@@ -3257,7 +3257,7 @@ class Item extends ItemLight
 		}
 
 		// validate url title / slug
-		$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $this->dbprefix.'urltitle', $this->dbIDname, $this->dbtablename) );
+		$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $this->dbprefix.'urltitle', $this->dbIDname, $this->dbtablename, $this->locale ) );
 
 		$this->update_renderers_from_Plugins();
 
@@ -3308,7 +3308,7 @@ class Item extends ItemLight
 		if( empty($this->urltitle) || isset($this->dbchanges['post_urltitle']) )
 		{ // Url title has changed or is empty
 			// echo 'updating url title';
-			$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $this->dbprefix.'urltitle', $this->dbIDname, $this->dbtablename ) );
+			$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $this->dbprefix.'urltitle', $this->dbIDname, $this->dbtablename, $this->locale ) );
 		}
 
 		$this->update_renderers_from_Plugins();
@@ -4056,6 +4056,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.155  2009/11/19 17:25:09  tblue246
+ * Make evo_iconv_transliterate() aware of the post locale
+ *
  * Revision 1.154  2009/11/15 19:05:45  fplanque
  * no message
  *
