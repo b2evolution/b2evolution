@@ -74,19 +74,25 @@ switch( $action )
 					break;
 			}
 
-			if( $upgrade_action['action'] == 'none' )
+			global $debug;
+
+			if( array_key_exists( 'status', $upgrade_action ) )
 			{
 				?><div class="action_messages">
 					<div class="log_error" style="text-align:center;font-weight:bold"><?php echo $upgrade_action['status']; ?></div>
 				</div><?php
+
+				if( $debug > 0 )
+				{
+					$button = T_( 'Force \'upgrade\' nonetheless' );
+				}
 			}
-			else
+
+			if( $debug > 0 || !array_key_exists( 'status', $upgrade_action ) )
 			{
 				$Form->hidden( 'upd_name', $upgrade_action['name'] );
 
-				$Form->end_form( array( array( 'submit', 'actionArray['.$upgrade_action['action'].']', $button, 'SaveButton' ),
-										array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
-
+				$Form->end_form( array( array( 'submit', 'actionArray['.$upgrade_action['action'].']', $button, 'SaveButton' ) ) );
 			}
 		}
 
@@ -96,6 +102,9 @@ switch( $action )
 
 /*
  * $Log$
+ * Revision 1.6  2009/11/19 12:10:53  efy-maxim
+ * Force 'upgrade' for debug mode
+ *
  * Revision 1.5  2009/11/15 19:44:02  fplanque
  * minor
  *

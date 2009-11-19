@@ -157,8 +157,10 @@ switch( $action )
 			// Unpack package
 			if( $success = unpack_archive( $upgrade_file, $upgrade_path.$upgrade_name, true ) )
 			{
+				global $debug;
+
 				$new_version_status = check_version( $upgrade_name );
-				if( !empty( $new_version_status ) )
+				if( $debug == 0 && !empty( $new_version_status ) )
 				{
 					echo '<h5 style="color:red">'.$new_version_status.'</h5>';
 					break;
@@ -284,6 +286,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2009/11/19 12:10:53  efy-maxim
+ * Force 'upgrade' for debug mode
+ *
  * Revision 1.7  2009/11/19 10:24:48  efy-maxim
  * maintenance module - 'Upgrade Database' button support.
  *

@@ -262,7 +262,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, &$read_
  */
 function get_upgrade_action( $download_url )
 {
-	global $upgrade_path, $servertimenow;
+	global $upgrade_path, $servertimenow, $debug;
 
 	// Construct version name from download URL
 	$slash_pos = strrpos( $download_url, '/' );
@@ -285,15 +285,21 @@ function get_upgrade_action( $download_url )
 		{
 			if( strpos( $dir_name, $version_name ) === 0 )
 			{
+				$action_props = array();
 				$new_version_status = check_version( $dir_name );
 				if( !empty( $new_version_status ) )
 				{
-					return array( 'action' => 'none', 'status' => $new_version_status );
+					$action_props['action'] = 'none';
+					$action_props['status'] = $new_version_status;
 				}
-				else
+
+				if( $debug > 0 || empty( $new_version_status ) )
 				{
-					return array( 'action' => 'install', 'name' => $dir_name );
+					$action_props['action'] = 'install';
+					$action_props['name'] = $dir_name;
 				}
+
+				return $action_props;
 			}
 		}
 
@@ -343,6 +349,9 @@ function aliases_to_tables( $aliases )
 
 /*
  * $Log$
+ * Revision 1.5  2009/11/19 12:10:51  efy-maxim
+ * Force 'upgrade' for debug mode
+ *
  * Revision 1.4  2009/11/18 21:54:25  efy-maxim
  * compatibility fix for PHP4
  *
