@@ -229,6 +229,14 @@ $user_agents = array(
 	array('robot', 'discobot/', 'Discovery Engine' ),
 	array('robot', 'Speedy Spider', 'Entireweb (Speedy Spider)' ),
 	array('robot', 'monit/', 'Monit'),
+	array('robot', 'Sogou web spider', 'Sogou'),
+	array('robot', 'Tagoobot/', 'Tagoobot'),
+	array('robot', 'MJ12bot/', 'Majestic-12'),
+	array('robot', 'ia_archiver', 'Alexa crawler'),
+	array('robot', 'KaloogaBot', 'Kalooga'),
+	array('robot', 'Flexum/', 'Flexum'),
+	array('robot', 'OOZBOT/', 'OOZBOT'),
+	array('robot', 'ApptusBot', 'Apptus'),
 	// Unknown robots:
 	array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:
