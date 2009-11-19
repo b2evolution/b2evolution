@@ -2714,9 +2714,18 @@ function upgrade_b2evo_tables()
 
 		if( ! $confirmed_db_upgrade )
 		{
-			global $action, $locale;
+			global $action, $locale, $form_action;
 			load_class( '_core/ui/forms/_form.class.php', 'Form' );
-			$Form = & new Form( NULL, '', 'post' );
+
+			if( !empty( $form_action ) )
+			{
+				$Form = & new Form( $form_action, '', 'post' );
+			}
+			else
+			{
+				$Form = & new Form( NULL, '', 'post' );
+			}
+
 			$Form->begin_form( 'fform', T_('Upgrade database') );
 			$Form->begin_fieldset();
 			$Form->hidden( 'upgrade_db_deltas_confirm_md5', md5(implode( '', $upgrade_db_deltas )) );
@@ -2751,6 +2760,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.344  2009/11/19 10:24:48  efy-maxim
+ * maintenance module - 'Upgrade Database' button support.
+ *
  * Revision 1.343  2009/10/27 23:06:43  fplanque
  * doc
  *

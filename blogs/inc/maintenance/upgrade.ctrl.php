@@ -227,7 +227,11 @@ switch( $action )
 					echo '<h4 style="color:green">'.T_( 'Upgrading data in existing b2evolution database...' ).'</h4>';
 					flush();
 
-					global $DB;
+					global $DB, $locale, $current_locale, $form_action;
+
+					$action = 'evoupgrade';
+					$form_action = 'install/index.php';
+					$locale = $current_locale;
 
 					$DB->begin();
 					if( $success = upgrade_b2evo_tables() )
@@ -280,6 +284,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2009/11/19 10:24:48  efy-maxim
+ * maintenance module - 'Upgrade Database' button support.
+ *
  * Revision 1.6  2009/11/18 21:54:25  efy-maxim
  * compatibility fix for PHP4
  *
