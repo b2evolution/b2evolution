@@ -449,18 +449,14 @@ class Item extends ItemLight
 		}
 
 		// Workflow stuff:
-		if( param( 'item_st_ID', 'integer', NULL ) !== NULL ) {
-			$this->set_from_Request( 'pst_ID', 'item_st_ID' );
-		}
+		param( 'item_st_ID', 'integer', NULL );
+		$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
 
-		if( param( 'item_assigned_user_ID', 'integer', NULL ) !== NULL ) {
-			$this->assign_to( get_param('item_assigned_user_ID') );
-		}
+		param( 'item_assigned_user_ID', 'integer', NULL );
+		$this->assign_to( get_param('item_assigned_user_ID') );
 
-		if( param( 'item_priority', 'integer', NULL ) !== NULL )
-		{
-			$this->set_from_Request( 'priority', 'item_priority', true );
-		}
+		param( 'item_priority', 'integer', NULL );
+		$this->set_from_Request( 'priority', 'item_priority', true );
 
 		$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
 
@@ -4056,6 +4052,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.156  2009/11/19 19:07:46  efy-maxim
+ * workflow debug
+ *
  * Revision 1.155  2009/11/19 17:25:09  tblue246
  * Make evo_iconv_transliterate() aware of the post locale
  *
