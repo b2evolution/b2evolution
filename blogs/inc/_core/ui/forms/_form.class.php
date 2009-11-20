@@ -712,6 +712,24 @@ class Form extends Widget
 
 
 	/**
+	 * Build username/login field.
+	 *
+	 * @param string the name of the input field
+	 * @param string initial value
+	 * @param integer size of the input field
+	 * @param string label displayed in front of the field
+	 * @param string note displayed with field
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function username( $field_name, $field_value, $field_label, $field_note = '' )
+	{
+		$field_params = array();
+
+		return $this->text_input( $field_name, $field_value, 10, $field_label, $field_note, $field_params );
+	}
+
+
+	/**
 	 * Builds a date input field.
 	 *
 	 * @param string the name of the input field
@@ -2993,6 +3011,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.69  2009/11/20 09:06:05  efy-maxim
+ * change owner
+ *
  * Revision 1.68  2009/10/28 09:39:50  efy-maxim
  * position of arguments of duration_input function have been changed
  *

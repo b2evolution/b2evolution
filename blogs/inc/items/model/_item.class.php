@@ -299,6 +299,19 @@ class Item extends ItemLight
 
 
 	/**
+	 * Set creator user
+	 *
+	 * @param string login
+	 */
+	function set_creator_login( $login )
+	{
+		$UserCache = & get_UserCache();
+		$creator_User = &$UserCache->get_by_login( $login );
+		$this->set( $this->creator_field, $creator_User->ID );
+	}
+
+
+	/**
 	 * @todo use extended dbchange instead of set_param...
 	 * @todo Normalize to set_assigned_User!?
 	 */
@@ -462,6 +475,11 @@ class Item extends ItemLight
 
 		param( 'item_order', 'double', NULL );
 		$this->set_from_Request( 'order', 'item_order', true );
+
+		if( param( 'item_owner_login', 'string', NULL ) !== NULL )
+		{
+			$this->set_creator_login( get_param( 'item_owner_login' ) );
+		}
 
 		// CUSTOM FIELDS double
 		for( $i = 1 ; $i <= 5; $i++ )
@@ -4052,6 +4070,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.157  2009/11/20 09:06:09  efy-maxim
+ * change owner
+ *
  * Revision 1.156  2009/11/19 19:07:46  efy-maxim
  * workflow debug
  *

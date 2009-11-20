@@ -234,7 +234,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	echo '<td class="input" width="97%">';
 	$Form->text_input( 'metadesc', $edited_Item->get('metadesc'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
 	echo '</td><td width="1"><!-- for IE7 --></td></tr>';
-	
+
 	echo '<tr><td class="label"><label for="metakeywords" title="&lt;meta name=&quot;keywords&quot;&gt;"><strong>'.T_('&lt;meta&gt; keywds').':</strong></label></td>';
 	echo '<td class="input" width="97%">';
 	$Form->text_input( 'metakeywords', $edited_Item->get('metakeywords'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
@@ -350,6 +350,14 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	$Form->text( 'item_order', $edited_Item->order, 10, '', T_('can be decimal') );
 	echo '</td></tr>';
 
+	if( $current_User->check_perm( 'users', 'edit' ) )
+	{
+		echo '<tr><td><strong>'.T_('Owner').':</strong></td><td>';
+		$creator_User = $edited_Item->get_creator_User();
+		$Form->username( 'item_owner_login', $creator_User->login, '', T_( 'login of this post\'s owner.') );
+		echo '</td></tr>';
+	}
+
 	// CUSTOM FIELDS double
 	for( $i = 1 ; $i <= 5; $i++ )
 	{	// For each custom double field:
@@ -425,6 +433,9 @@ if( $publishnow_displayed )
 
 /*
  * $Log$
+ * Revision 1.51  2009/11/20 09:06:09  efy-maxim
+ * change owner
+ *
  * Revision 1.50  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *
