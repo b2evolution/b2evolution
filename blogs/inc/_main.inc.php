@@ -47,11 +47,18 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+
 if( $maintenance_mode )
-{
+{	// Maintenance mode with a conf switch
 	header('HTTP/1.0 503 Service Unavailable');
 	echo '<h1>503 Service Unavailable</h1>';
 	die( 'The site is temporarily down for maintenance.' );
+}
+elseif( file_exists( $conf_path.'imaintenance.html') )
+{	// Maintenance mode with a file - "imaintenance.html" with an "i" prevents access to the site but NOT to install
+	header('HTTP/1.0 503 Service Unavailable');
+	readfile( $conf_path.'imaintenance.html');
+	die();
 }
 
 
@@ -672,6 +679,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.130  2009/11/20 23:56:39  fplanque
+ * minor  + doc
+ *
  * Revision 1.129  2009/09/29 03:47:06  fplanque
  * doc
  *

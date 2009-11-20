@@ -15,11 +15,11 @@ if( defined('EVO_CONFIG_LOADED') )
 	return;
 }
 
-if( file_exists(dirname(__FILE__).'/maintenance.txt') )
-{
+// HARD MAINTENANCE !
+if( file_exists(dirname(__FILE__).'/maintenance.html') )
+{ // Stop execution as soon as possible. This is useful while uploading new app files via FTP.
 	header('HTTP/1.0 503 Service Unavailable');
-	echo '<h1>503 Service Unavailable</h1>';
-	readfile(dirname(__FILE__).'/maintenance.txt');
+	readfile(dirname(__FILE__).'/maintenance.html');
 	die();
 }
 
@@ -58,6 +58,9 @@ if( file_exists(dirname(__FILE__).'/_overrides_TEST.php') )
 
 /*
  * $Log$
+ * Revision 1.57  2009/11/20 23:56:41  fplanque
+ * minor  + doc
+ *
  * Revision 1.56  2009/10/18 00:22:12  fplanque
  * doc/maintenance mode
  *

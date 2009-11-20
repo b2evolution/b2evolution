@@ -715,8 +715,8 @@ class Form extends Widget
 	 * Build username/login field.
 	 *
 	 * @param string the name of the input field
-	 * @param string initial value
-	 * @param integer size of the input field
+	 * @param string initial value TODO: change this to & $User object
+	 * @param integer size of the input field TODO: remove , size should be automatic (I think max length for usernames is 16)
 	 * @param string label displayed in front of the field
 	 * @param string note displayed with field
 	 * @return mixed true (if output) or the generated HTML if not outputting
@@ -3011,6 +3011,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.70  2009/11/20 23:56:36  fplanque
+ * minor  + doc
+ *
  * Revision 1.69  2009/11/20 09:06:05  efy-maxim
  * change owner
  *

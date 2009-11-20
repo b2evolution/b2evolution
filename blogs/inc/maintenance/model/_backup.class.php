@@ -301,6 +301,7 @@ class Backup
 			$zip_filepath = $backup_dirpath.'files.zip';
 
 			// Pack using 'zlib' extension and PclZip wrapper
+// fp>max TODO: please use load_class() like evrywhere in the app
 			require_once( $inc_path.'_ext/pclzip/pclzip.lib.php' );
 
 			$PclZip = new PclZip( $zip_filepath );
@@ -473,6 +474,7 @@ class Backup
 		{	// Pack created backup SQL script
 
 			// Pack using 'zlib' extension and PclZip wrapper
+// fp> TODO: load_class()
 			require_once( $inc_path.'_ext/pclzip/pclzip.lib.php' );
 
 			$zip_filepath = $backup_dirpath.'db.zip';
@@ -593,6 +595,9 @@ class Backup
 
 /*
  * $Log$
+ * Revision 1.6  2009/11/20 23:56:40  fplanque
+ * minor  + doc
+ *
  * Revision 1.5  2009/11/18 21:54:25  efy-maxim
  * compatibility fix for PHP4
  *

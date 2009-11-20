@@ -301,12 +301,14 @@ class Item extends ItemLight
 	/**
 	 * Set creator user
 	 *
+	 * @todo fp>max rename to set_creator_by_login
+	 *
 	 * @param string login
 	 */
 	function set_creator_login( $login )
 	{
 		$UserCache = & get_UserCache();
-		$creator_User = &$UserCache->get_by_login( $login );
+		$creator_User = & $UserCache->get_by_login( $login );
 		$this->set( $this->creator_field, $creator_User->ID );
 	}
 
@@ -476,6 +478,7 @@ class Item extends ItemLight
 		param( 'item_order', 'double', NULL );
 		$this->set_from_Request( 'order', 'item_order', true );
 
+// fp>max TODO: where is the permission check!!!!???
 		if( param( 'item_owner_login', 'string', NULL ) !== NULL )
 		{
 			$this->set_creator_login( get_param( 'item_owner_login' ) );
@@ -4070,6 +4073,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.158  2009/11/20 23:56:42  fplanque
+ * minor  + doc
+ *
  * Revision 1.157  2009/11/20 09:06:09  efy-maxim
  * change owner
  *
