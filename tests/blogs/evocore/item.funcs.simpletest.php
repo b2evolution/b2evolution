@@ -60,12 +60,16 @@ class ItemFuncsTestCase extends EvoUnitTestCase
 		// For UTF-8:
 		$evo_charset = 'UTF-8';
 		foreach( array(
-					array( '', 'Äöüùé', 'aeoeueue' ),
+					/* The last element of each array is the expected result, all other elements are
+					 * arguments for urltitle_validate().
+					 */
+					// We need to use a locale that contains German umlauts (de-DE) for this test:
+					array( '', 'Äöüùé', 0, false, 'post_urltitle', 'post_ID', 'T_items__item', 'de-DE', 'aeoeueue' ),
 					array( '', 'Založte si svůj vlastní blog za pomoci TextPattern', 'zalozte-si-svuj-vlastni-blog-za-pomoci-textpattern' ),
 					array( '', 'Zalo&#382;te si sv&#367;j vlastní blog za pomoci TextPattern', 'zalozte-si-svuj-vlastni-blog-za-pomoci-textpattern' ),
 				) as $test )
 		{
-			$this->assertEqual( urltitle_validate( $test[0], $test[1] ), $test[2] );
+			$this->assertEqual( call_user_func_array( 'urltitle_validate', array_slice( $test, 0, -1 ) ), array_pop( $test ) );
 		}
 
 		$evo_charset = $old_evo_charset;
