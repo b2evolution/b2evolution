@@ -456,9 +456,10 @@ switch( $action )
 
 		if( $edited_Item->status == 'published' )
 		{	// fp> I noticed that after publishing a new post, I always want to see how the blog looks like
-		  // If anyone doesn't want that, we can make this optional...
+			// If anyone doesn't want that, we can make this optional...
+			// sam2kb> Please make this optional, this is really annoying when you create more than one post or when you publish draft images created from FM.
 			$edited_Item->load_Blog();
-		  $redirect_to = $edited_Item->Blog->gen_blogurl();
+			$redirect_to = $edited_Item->Blog->gen_blogurl();
 		}
 
 		// REDIRECT / EXIT
@@ -1253,6 +1254,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.75  2009/11/20 21:59:04  sam2kb
+ * doc
+ *
  * Revision 1.74  2009/10/27 22:40:22  fplanque
  * removed UGLY UGLY UGLY messages from iframe
  *
