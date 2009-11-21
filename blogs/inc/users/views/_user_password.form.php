@@ -65,7 +65,7 @@ $Form = & new Form( NULL, 'user_checkchanges' );
 if( !$user_profile_only )
 {
 	$Form->global_icon( T_('Compose message'), 'comments', '?ctrl=threads&action=new&user_login='.$edited_User->login );
-	$Form->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', regenerate_url( 'user_ID,action' ) );
+	$Form->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', regenerate_url( 'user_ID,action,ctrl', 'ctrl=users' ) );
 }
 
 $Form->begin_form( 'fform', sprintf( T_('Change %s password'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' ) );
@@ -107,6 +107,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.2  2009/11/21 13:39:05  efy-maxim
+ * 'Cancel editing' fix
+ *
  * Revision 1.1  2009/10/28 10:02:42  efy-maxim
  * rename some php files
  *
