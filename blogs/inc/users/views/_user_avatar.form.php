@@ -68,4 +68,10 @@ $Form->end_form();
 // End payload block:
 $this->disp_payload_end();
 
+/*
+ * $Log$
+ * Revision 1.2  2009/11/21 13:35:00  efy-maxim
+ * log
+ *
+ */
 ?>

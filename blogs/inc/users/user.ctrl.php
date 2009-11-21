@@ -351,4 +351,10 @@ switch( $action )
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
+/*
+ * $Log$
+ * Revision 1.2  2009/11/21 13:35:00  efy-maxim
+ * log
+ *
+ */
 ?>
