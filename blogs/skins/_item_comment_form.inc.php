@@ -22,6 +22,7 @@ $params = array_merge( array(
 		'disp_comment_form'	   =>	true,
 		'form_title_start'     => '<h3>',
 		'form_title_end'       => '</h3>',
+		'form_title_text'      => T_('Leave a comment'),
 		'policy_text'          => '',
 		'textarea_lines'       => 10,
 		'default_text'         => '',
@@ -108,7 +109,7 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	}
 
 	echo $params['form_title_start'];
-	echo T_('Leave a comment');
+	echo $params['form_title_text'];
 	echo $params['form_title_end'];
 
 
@@ -221,6 +222,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.14  2009/11/21 17:33:05  sam2kb
+ * Configurable form title text
+ *
  * Revision 1.13  2009/05/20 13:56:57  fplanque
  * Huh? Textarea is styled wide with CSS. On non CSS supporting browsers you don't want it to be larger than the screen might be.
  *
