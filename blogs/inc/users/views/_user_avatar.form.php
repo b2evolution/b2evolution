@@ -1,0 +1,71 @@
+<?php
+
+if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+/**
+ * @var user permission, if user is only allowed to edit his profile
+ */
+global $user_profile_only;
+/**
+ * @var instance of User class
+ */
+global $edited_User;
+/**
+ * @var instance of User class
+ */
+global $current_User;
+/**
+ * @var current action
+ */
+global $action;
+
+// Begin payload block:
+$this->disp_payload_begin();
+
+$Form = & new Form( NULL, 'user_checkchanges' );
+
+if( !$user_profile_only )
+{
+	$Form->global_icon( T_('Compose message'), 'comments', '?ctrl=threads&action=new&user_login='.$edited_User->login );
+	$Form->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', regenerate_url( 'user_ID,action' ) );
+}
+
+$Form->begin_form( 'fform', sprintf( T_('Edit %s avatar'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' ) );
+
+$Form->hidden_ctrl();
+$Form->hidden( 'user_tab', 'avatar' );
+$Form->hidden( 'avatar_form', '1' );
+
+$Form->hidden( 'user_ID', $edited_User->ID );
+
+	/***************  Avatar  **************/
+
+$Form->begin_fieldset( T_('Avatar') );
+
+global $admin_url;
+$avatar_tag = $edited_User->get_avatar_imgtag();
+if( !empty( $avatar_tag ) )
+{
+	$avatar_tag .= ' '.action_icon( T_( 'Remove' ), 'delete', '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID.'&amp;action=remove_avatar', T_( 'Remove' ) );
+	if( $current_User->check_perm( 'files', 'view' ) )
+	{
+		$avatar_tag .= ' '.action_icon( T_( 'Change' ), 'link', '?ctrl=files&amp;user_ID='.$edited_User->ID, T_( 'Change' ).' &raquo;', 5, 5 );
+	}
+}
+elseif( $current_User->check_perm( 'files', 'view' ) )
+{
+	$avatar_tag .= ' '.action_icon( T_( 'Upload or choose an avatar' ), 'link', '?ctrl=files&amp;user_ID='.$edited_User->ID, T_( 'Upload/Select' ).' &raquo;', 5, 5 );
+}
+
+$Form->info( T_( 'Avatar' ), $avatar_tag );
+
+// fp> TODO: a javascript REFRAME feature would ne neat here: selecting a square area of the img and saving it as a new avatar image
+
+$Form->end_fieldset();
+
+$Form->end_form();
+
+// End payload block:
+$this->disp_payload_end();
+
+?>

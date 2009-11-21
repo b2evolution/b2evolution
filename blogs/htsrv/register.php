@@ -88,12 +88,12 @@ switch( $action )
 			'pass2'   => $pass2,
 			'email'   => $email,
 			'pass_required' => true );
-		
+
 		if( $registration_require_country )
 		{
 			$paramsList['country'] = $country;
 		}
-		
+
 		// Check profile params:
 		profile_check_params( $paramsList );
 
@@ -172,7 +172,7 @@ switch( $action )
 							.T_('Login:')." $login\n"
 							.T_('Email').": $email\n"
 							."\n"
-							.T_('Edit user').': '.$admin_url.'?ctrl=users&user_ID='.$new_User->ID."\n";
+							.T_('Edit user').': '.$admin_url.'?ctrl=user&user_tab=identity&user_ID='.$new_User->ID."\n";
 
 		send_mail( $AdminUser->get( 'email' ), NULL, T_('New user registration on your blog'), $message, $notify_from ); // ok, if this may fail..
 
@@ -225,6 +225,11 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.101  2009/11/21 13:31:57  efy-maxim
+ * 1. users controller has been refactored to users and user controllers
+ * 2. avatar tab
+ * 3. jQuery to show/hide custom duration
+ *
  * Revision 1.100  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *

@@ -290,8 +290,7 @@ class sessions_Module extends Module
 		 */
 		global $AdminUI;
 
-		$user_tab = param( 'user_tab', 'string', '' );
-		if( ( empty( $user_tab ) || $ctrl != 'users' ) && $current_User->check_perm( 'stats', 'view' ) )
+		if( $ctrl !== 'user' && $current_User->check_perm( 'stats', 'view' ) )
 		{	// Viewing aggregate + Permission to view stats for ALL blogs:
 			$sessions_menu = array(
 				'sessions' => array(
@@ -344,6 +343,11 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.26  2009/11/21 13:31:59  efy-maxim
+ * 1. users controller has been refactored to users and user controllers
+ * 2. avatar tab
+ * 3. jQuery to show/hide custom duration
+ *
  * Revision 1.25  2009/10/26 12:59:36  efy-maxim
  * users management
  *

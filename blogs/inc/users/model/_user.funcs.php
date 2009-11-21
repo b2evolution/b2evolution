@@ -403,7 +403,7 @@ function get_user_profile_url()
 
 	if( $is_admin_page || empty( $Blog ) )
 	{
-		$url = $admin_url.'?ctrl=users&amp;user_ID='.$current_User->ID;
+		$url = $admin_url.'?ctrl=user&amp;user_tab=identity&amp;user_ID='.$current_User->ID;
 	}
 	else
 	{
@@ -621,7 +621,7 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 		{	// Permission to view user details
 			global $admin_url;
 	// fp>dh why did you add $admin_url here? If this is gonna be used outside of admin, it should not point to the profile in the admin but rather to the profile disp in the public blog skin
-			$img_tag = '<a href="?ctrl=users&amp;user_ID='.$User->ID.'">'.$img_tag.'</a>';
+			$img_tag = '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID='.$User->ID.'">'.$img_tag.'</a>';
 		}
 
 	}
@@ -716,6 +716,11 @@ function seconds_to_fields( $duration )
 
 /*
  * $Log$
+ * Revision 1.23  2009/11/21 13:31:59  efy-maxim
+ * 1. users controller has been refactored to users and user controllers
+ * 2. avatar tab
+ * 3. jQuery to show/hide custom duration
+ *
  * Revision 1.22  2009/10/27 23:06:46  fplanque
  * doc
  *

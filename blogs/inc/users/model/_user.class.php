@@ -236,12 +236,13 @@ class User extends DataObject
 	 */
 	function load_from_Request()
 	{
-		global $Settings, $current_User;
+		global $DB, $Settings, $UserSettings, $GroupCache, $Messages;
+		global $current_User;
 
-		param( 'edited_user_login', 'string' );
-		param_check_not_empty( 'edited_user_login', T_('You must provide a login!') );
+		$edited_user_login = param( 'edited_user_login', 'string' );
+		param_check_not_empty( 'edited_user_login', T_( 'You must provide a login!' ) );
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
-		$this->set_from_Request('login', 'edited_user_login', true, 'strtolower');
+		$this->set_from_Request( 'login', 'edited_user_login', true, 'strtolower' );
 
 		// ******* Identity form ******* //
 
@@ -249,6 +250,71 @@ class User extends DataObject
 
 		if( $is_identity_form )
 		{
+			if( $current_User->check_perm( 'users', 'edit' ) )
+			{// changing level/group is allowed (not in profile mode)
+
+				param_integer_range( 'edited_user_level', 0, 10, T_('User level must be between %d and %d.') );
+				$this->set_from_Request( 'level', 'edited_user_level', true );
+
+				param( 'edited_user_validated', 'integer', 0 );
+				$this->set_from_Request( 'validated', 'edited_user_validated', true );
+
+				$edited_user_Group = $GroupCache->get_by_ID( param( 'edited_user_grp_ID', 'integer' ) );
+				$this->set_Group( $edited_user_Group );
+			}
+
+			// check if new login already exists for another user_ID
+			$query = '
+				SELECT user_ID
+				  FROM T_users
+				 WHERE user_login = '.$DB->quote( $edited_user_login ).'
+				   AND user_ID != '.$this->ID;
+
+			if( $q = $DB->get_var( $query ) )
+			{
+				param_error( 'edited_user_login',
+					sprintf( T_( 'This login already exists. Do you want to <a %s>edit the existing user</a>?' ),
+						'href="?ctrl=user&amp;user_tab=identity&amp;user_ID='.$q.'"' ) );
+			}
+
+			// EXPERIMENTAL user fields & EXISTING fields:
+			// Get indices of existing userfields:
+			$userfield_IDs = $DB->get_col( '
+						SELECT uf_ID
+							FROM T_users__fields
+						 WHERE uf_user_ID = '.$this->ID );
+
+			foreach( $userfield_IDs as $userfield_ID )
+			{
+				$uf_val = param( 'uf_'.$userfield_ID, 'string', '' );
+
+				// TODO: type checking
+				$this->userfield_update( $userfield_ID, $uf_val );
+			}
+
+			// NEW fields:
+			for( $i=1; $i<=3; $i++ )
+			{	// new fields:
+				$new_uf_type = param( 'new_uf_type_'.$i, 'integer', '' );
+				$new_uf_val = param( 'new_uf_val_'.$i, 'string', '' );
+				if( empty($new_uf_type) && empty($new_uf_val) )
+				{
+					continue;
+				}
+
+				if( empty($new_uf_type) )
+				{
+					param_error( 'new_uf_val_'.$i, T_('Please select a field type.') );
+				}
+				if( empty($new_uf_val) )
+				{
+					param_error( 'new_uf_val_'.$i, T_('Please enter a value.') );
+				}
+
+				// TODO: type checking
+				$this->userfield_add( $new_uf_type, $new_uf_val );
+			}
+
 			param( 'edited_user_email', 'string', true );
 			param_check_not_empty( 'edited_user_email', T_('Please enter an e-mail address.') );
 			param_check_email( 'edited_user_email', true );
@@ -313,7 +379,12 @@ class User extends DataObject
 		if( $is_password_form || ( $is_identity_form && $this->ID == 0 ) )
 		{
 			param( 'edited_user_pass1', 'string', true );
-			param( 'edited_user_pass2', 'string', true );
+			$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
+
+			if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true ) )
+			{ 	// We can set password
+				$this->set( 'pass', md5( $edited_user_pass2 ) );
+			}
 		}
 
 		// ******* Preferences form ******* //
@@ -325,23 +396,53 @@ class User extends DataObject
 			param( 'edited_user_locale', 'string', true );
 			$this->set_from_Request('locale', 'edited_user_locale', true);
 
-			param( 'edited_user_admin_skin', 'string', true );
+			$UserSettings->set( 'admin_skin', param( 'edited_user_admin_skin', 'string' ), $this->ID );
 
+			// Action icon params:
 			param_integer_range( 'edited_user_action_icon_threshold', 1, 5, T_('The threshold must be between 1 and 5.') );
+			$UserSettings->set( 'action_icon_threshold', param( 'edited_user_action_icon_threshold', 'integer', true ), $this->ID );
+
 			param_integer_range( 'edited_user_action_word_threshold', 1, 5, T_('The threshold must be between 1 and 5.') );
+			$UserSettings->set( 'action_word_threshold', param( 'edited_user_action_word_threshold', 'integer'), $this->ID );
 
-			param( 'edited_user_legend', 'integer', 0 );
-			param( 'edited_user_bozo', 'integer', 0 );
+			$UserSettings->set( 'display_icon_legend', param( 'edited_user_legend', 'integer', 0 ), $this->ID );
 
-			param( 'edited_user_focusonfirst', 'integer', 0 );
-			param( 'edited_user_results_per_page', 'integer', null );
+			// Set bozo validador activation
+			$UserSettings->set( 'control_form_abortions', param( 'edited_user_bozo', 'integer', 0 ), $this->ID );
 
-			param( 'edited_user_timeout_sessions', 'string', null );
+			// Focus on first
+			$UserSettings->set( 'focus_on_first_input', param( 'edited_user_focusonfirst', 'integer', 0 ), $this->ID );
+
+			// Results per page
+			$edited_user_results_per_page = param( 'edited_user_results_per_page', 'integer', NULL );
+			if( isset($edited_user_results_per_page) )
+			{
+				$UserSettings->set( 'results_per_page', $edited_user_results_per_page, $this->ID );
+			}
+
+			// Session timeout
+			$edited_user_timeout_sessions = param( 'edited_user_timeout_sessions', 'string', NULL );
+			if( isset( $edited_user_timeout_sessions ) && $current_User->check_perm( 'users', 'edit' ) )
+			{
+				switch( $edited_user_timeout_sessions )
+				{
+					case 'default':
+						$UserSettings->set( 'timeout_sessions', NULL, $this->ID );
+						break;
+					case 'custom':
+						$UserSettings->set( 'timeout_sessions', param_duration( 'timeout_sessions' ), $this->ID );
+						break;
+				}
+			}
 		}
 
 		if( $is_preferences_form || ( $is_identity_form && $this->ID == 0 ) )
-		{
-			param( 'edited_user_set_login_multiple_sessions', 'integer', 0 );
+		{	// Multiple session
+			$multiple_sessions = $Settings->get( 'multiple_sessions' );
+			if( ( $multiple_sessions != 'adminset_default_no' && $multiple_sessions != 'adminset_default_yes' ) || $current_User->check_perm( 'users', 'edit' ) )
+			{
+				$UserSettings->set( 'login_multiple_sessions', param( 'edited_user_set_login_multiple_sessions', 'integer', 0 ), $this->ID );
+			}
 		}
 
 		return ! param_errors_detected();
@@ -1860,6 +1961,11 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.65  2009/11/21 13:31:59  efy-maxim
+ * 1. users controller has been refactored to users and user controllers
+ * 2. avatar tab
+ * 3. jQuery to show/hide custom duration
+ *
  * Revision 1.64  2009/11/12 00:46:32  fplanque
  * doc/minor/handle demo mode
  *

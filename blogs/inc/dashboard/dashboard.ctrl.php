@@ -446,7 +446,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		echo '<p>Updates from b2evolution.net are disabled!</p>';
 		echo '<p>You will <b>NOT</b> be alerted if you are running an insecure configuration.</p>';
 	}
-	
+
 	echo '</td><td>';
 
 	/*
@@ -461,7 +461,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	echo '<ul>';
 		if( $current_User->check_perm( 'users', 'edit' ) )
 		{
-			echo '<li><a href="'.$dispatcher.'?ctrl=users&amp;action=new_user">'.T_('Create new user').' &raquo;</a></li>';
+			echo '<li><a href="'.$dispatcher.'?ctrl=user&amp;user_tab=identity&amp;action=new">'.T_('Create new user').' &raquo;</a></li>';
 		}
 		if( $current_User->check_perm( 'blogs', 'create' ) )
 		{
@@ -492,6 +492,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.39  2009/11/21 13:31:58  efy-maxim
+ * 1. users controller has been refactored to users and user controllers
+ * 2. avatar tab
+ * 3. jQuery to show/hide custom duration
+ *
  * Revision 1.38  2009/11/15 19:05:45  fplanque
  * no message
  *

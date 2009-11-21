@@ -172,12 +172,29 @@ if( $action != 'view' )
 
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{
-		$Form->radio( 'edited_user_timeout_sessions', $timeout_sessions_selected, array(
-					array( 'default', T_('use default duration') ),
-					array( 'custom', T_('use custom duration') ),
-				), T_('Session timeout'), true );
+		$Form->radio_input( 'edited_user_timeout_sessions', $timeout_sessions_selected, array(
+					array(
+						'value'   => 'default',
+						'label'   => T_('use default duration'),
+						'onclick' => 'jQuery("#timeout_sessions_container").hide();' ),
+					array(
+						'value'   => 'custom',
+						'label'   => T_('use custom duration'),
+						'onclick' => 'jQuery("#timeout_sessions_container").show();' ),
+				), T_('Session timeout'), array( 'lines' => true ) );
 
+		// Note: jQuery is not used below ( display:none is used instead ),
+		// Note: because using jQuery leads to 'timeout_sessions_container' flash for 'default duration' on page load.
+		if( $timeout_sessions_selected == 'default' )
+		{
+			echo '<div id="timeout_sessions_container" style="display:none">';
+		}
+		else
+		{
+			echo '<div id="timeout_sessions_container">';
+		}
 		$Form->duration_input( 'timeout_sessions', $timeout_sessions, T_('Custom duration'), 'months', 'seconds', array( 'minutes_step' => 1 ) );
+		echo '</div>';
 	}
 	else
 	{
@@ -272,6 +289,11 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.4  2009/11/21 13:31:59  efy-maxim
+ * 1. users controller has been refactored to users and user controllers
+ * 2. avatar tab
+ * 3. jQuery to show/hide custom duration
+ *
  * Revision 1.3  2009/10/28 15:11:55  efy-maxim
  * custom duration has been hidden for normal users
  *

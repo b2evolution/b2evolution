@@ -164,29 +164,7 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Identity') );
 
 if( $action != 'view' )
-{ // We can edit the values:
-
-	if( $edited_User->ID != 0 )
-	{
-		global $admin_url;
-		$avatar_tag = $edited_User->get_avatar_imgtag();
-		if( !empty($avatar_tag) )
-		{
-			$avatar_tag .= ' '.action_icon( T_('Remove'), 'delete', '?ctrl=users&amp;user_ID='.$edited_User->ID.'&amp;action=remove_avatar', T_('Remove') );
-			if( $current_User->check_perm( 'files', 'view' ) )
-			{
-				$avatar_tag .= ' '.action_icon( T_('Change'), 'link', '?ctrl=files&amp;user_ID='.$edited_User->ID, T_('Change' ).' &raquo;', 5, 5 );
-			}
-		}
-		elseif( $current_User->check_perm( 'files', 'view' ) )
-		{
-			$avatar_tag .= ' '.action_icon( T_('Upload or choose an avatar'), 'link', '?ctrl=files&amp;user_ID='.$edited_User->ID, T_('Upload/Select' ).' &raquo;', 5, 5 );
-		}
-
-		$Form->info( T_('Avatar'), $avatar_tag );
-	}
-
-	// fp> TODO: a javascript REFRAME feature would ne neat here: selecting a square area of the img and saving it as a new avatar image
+{   // We can edit the values:
 
 	$Form->text_input( 'edited_user_login', $edited_User->login, 20, T_('Login'), '', array( 'required' => true ) );
 	$Form->text_input( 'edited_user_firstname', $edited_User->firstname, 20, T_('First name'), '', array( 'maxlength' => 50 ) );
@@ -432,6 +410,11 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.4  2009/11/21 13:31:59  efy-maxim
+ * 1. users controller has been refactored to users and user controllers
+ * 2. avatar tab
+ * 3. jQuery to show/hide custom duration
+ *
  * Revision 1.3  2009/10/28 14:26:24  efy-maxim
  * allow selection of None/NULL for country
  *

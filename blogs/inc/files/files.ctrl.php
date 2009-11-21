@@ -1066,7 +1066,7 @@ switch( $action )
 		$Messages->add( T_('User avatar modified.'), 'success' );
 
 		// REDIRECT / EXIT
-		header_redirect( $admin_url.'?ctrl=users&user_ID='.$edited_User->ID );
+		header_redirect( $admin_url.'?ctrl=user&user_tab=avatar&user_ID='.$edited_User->ID );
 		break;
 
 	case 'link_data':
@@ -1674,6 +1674,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.43  2009/11/21 13:31:58  efy-maxim
+ * 1. users controller has been refactored to users and user controllers
+ * 2. avatar tab
+ * 3. jQuery to show/hide custom duration
+ *
  * Revision 1.42  2009/10/11 02:29:01  blueyed
  * Use API
  *

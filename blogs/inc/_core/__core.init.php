@@ -89,6 +89,7 @@ $ctrl_mappings = array(
 		'set_antispam' => 'antispam/antispam_settings.ctrl.php',
 		'stats'        => 'sessions/stats.ctrl.php',
 		'system'       => 'tools/system.ctrl.php',
+		'user'         => 'users/user.ctrl.php',
 		'users'        => 'users/users.ctrl.php',
 		'userfields'   => 'users/userfields.ctrl.php',
 		'usersettings' => 'users/settings.ctrl.php',
@@ -654,55 +655,47 @@ class _core_Module extends Module
 			$user_ID = param( 'user_ID', 'integer', NULL );
 		}
 		else
-		{	// Only perm to view his own profile:
+		{
+			$user_ID = $current_User->ID;
+			// Only perm to view his own profile:
 			$users_entries = array(
 						'text' => T_('My profile'),
 						'title' => T_('User profile'),
-						'href' => '?ctrl=users&amp;tab=identity' );
-
-			$user_ID = $current_User->ID;
+						'href' => '?ctrl=user&amp;user_tab=identity&amp;user_ID='.$user_ID );
 		}
 
-		$action = param( 'action', 'string', NULL );
-		$user_tab = param( 'user_tab', 'string', NULL );
-
-		if( $user_tab == NULL && $user_ID != NULL && $action != 'promote' && $action != 'delete' )
+		if( $ctrl == 'user' )
 		{
-			$user_tab = 'identity';
-		}
+			$users_sub_entries = array();
 
-		if( !empty( $user_tab ) && $ctrl == 'users' )
-		{	// fp>max TODO: the following sub tabs should be added or replaced by users.ctrl
+			$users_sub_entries['identity'] = array(
+								'text' => T_('Identity'),
+								'href' => '?ctrl=user&amp;user_tab=identity&amp;user_ID='.$user_ID	);
+
 			if( !empty( $user_ID ) )
 			{
-				$users_sub_entries = array();
+				$users_sub_entries['avatar'] = array(
+									'text' => T_('Avatar'),
+									'href' => '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$user_ID );
+			}
 
-				$users_sub_entries['identity'] = array(
-								'text' => T_('Identity'),
-								'href' => '?ctrl=users&amp;user_tab=identity&amp;user_ID='.$user_ID	);
-
+			if( $current_User->check_perm( 'users', 'view' ) && !empty( $user_ID ) )
+			{
 				if( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'edit' ) )
 				{
 					$users_sub_entries['password'] = array(
-									'text' => T_('Password'),
-									'href' => '?ctrl=users&amp;user_tab=password&amp;user_ID='.$user_ID );
+										'text' => T_('Password'),
+										'href' => '?ctrl=user&amp;user_tab=password&amp;user_ID='.$user_ID );
 				}
 
 				$users_sub_entries['preferences'] = array(
-								'text' => T_('Preferences'),
- 								'href' => '?ctrl=users&amp;user_tab=preferences&amp;user_ID='.$user_ID );
+									'text' => T_('Preferences'),
+	 								'href' => '?ctrl=user&amp;user_tab=preferences&amp;user_ID='.$user_ID );
+			}
 
-				$users_entries['entries'] = $users_sub_entries;
-			}
-			else
-			{
-				$users_entries['entries'] = array(
-							'identity' => array(
-								'text' => T_('Identity'),
-								'href' => '?ctrl=users&amp;user_tab=identity' ) );
-			}
+			$users_entries['entries'] = $users_sub_entries;
 		}
-		elseif( $current_User->check_perm( 'users', 'view' ) )
+		else
 		{
 			// fp> the following submenu needs even further breakdown.
 			$users_entries['entries'] = array(
@@ -775,6 +768,11 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.50  2009/11/21 13:31:57  efy-maxim
+ * 1. users controller has been refactored to users and user controllers
+ * 2. avatar tab
+ * 3. jQuery to show/hide custom duration
+ *
  * Revision 1.49  2009/11/15 20:01:09  fplanque
  * todo
  *

@@ -40,25 +40,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $AdminUI;
 
-param( 'user_tab', 'string' );
-
 param( 'user_ID', 'integer', NULL );	// Note: should NOT be memorized (would kill navigation/sorting) use memorize_param() if needed
 
 param_action( 'list' );
 
-if( $user_tab == NULL && $user_ID != NULL && $action != 'promote' && $action != 'delete' )
-{
-	$user_tab = 'identity';
-}
+$AdminUI->set_path( 'users', 'users' );
 
-$AdminUI->set_path( 'users', !empty( $user_tab ) ? $user_tab : 'users' );
-
-/**
- * @global boolean true, if user is only allowed to edit his profile
- */
-$user_profile_only = ! $current_User->check_perm( 'users', 'view' );
-
-if( $user_profile_only )
+if( !$current_User->check_perm( 'users', 'view' ) )
 { // User has no permissions to view: he can only edit his profile
 
 	if( isset($user_ID) && $user_ID != $current_User->ID )
@@ -68,9 +56,9 @@ if( $user_profile_only )
 
 	// Make sure the user only edits himself:
 	$user_ID = $current_User->ID;
-	if( ! in_array( $action, array( 'update', 'edit', 'default_settings' ) ) )
+	if( !in_array( $action, array( 'update', 'edit', 'default_settings' ) ) )
 	{
-		$action = 'edit';
+		header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&amp;action=edit&amp;user_ID='.$user_ID ) );
 	}
 }
 
@@ -81,13 +69,8 @@ if( $user_profile_only )
 $UserCache = & get_UserCache();
 
 if( ! is_null($user_ID) )
-{ // User selected
-	if( $action == 'update' && $user_ID == 0 )
-	{ // we create a new user
-		$edited_User = new User();
-		$edited_User->set_datecreated( $localtimenow );
-	}
-	elseif( ($edited_User = & $UserCache->get_by_ID( $user_ID, false )) === false )
+{   // User selected
+	if( ($edited_User = & $UserCache->get_by_ID( $user_ID, false )) === false )
 	{	// We could not find the User to edit:
 		unset( $edited_User );
 		forget_param( 'user_ID' );
@@ -104,15 +87,16 @@ if( ! is_null($user_ID) )
 		{
 			$action = 'view';
 		}
+		header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&amp;action='.$action.'&amp;user_ID='.$user_ID ) );
 	}
 
-	if( $action != 'view' && $action != 'list' )
+	if( $action != 'list' )
 	{ // check edit permissions
 		if( ! $current_User->check_perm( 'users', 'edit' )
 		    && $edited_User->ID != $current_User->ID )
 		{ // user is only allowed to _view_ other user's profiles
 			$Messages->add( T_('You have no permission to edit other users!'), 'error' );
-			$action = 'view';
+			header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&amp;action=view&amp;user_ID='.$user_ID ) );
 		}
 		elseif( $demo_mode )
 		{ // Demo mode restrictions: admin/demouser cannot be edited
@@ -126,13 +110,12 @@ if( ! is_null($user_ID) )
 				}
 				else
 				{
-					$action = 'view';
+					header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&amp;action=view&amp;user_ID='.$user_ID ) );
 				}
 			}
 		}
 	}
 }
-
 
 /*
  * Perform actions, if there were no errors:
@@ -141,24 +124,6 @@ if( !$Messages->count('error') )
 { // no errors
 	switch( $action )
 	{
-		case 'new':
-			// We want to create a new user:
-			if( isset( $edited_User ) )
-			{ // We want to use a template
-				$new_User = $edited_User; // Copy !
-				$new_User->set( 'ID', 0 );
-				$edited_User = & $new_User;
-			}
-			else
-			{ // We use an empty user:
-				$edited_User = & new User();
-			}
-
-			// Determine if the user must validate before using the system:
-			$edited_User->set( 'validated', ! $Settings->get('newusers_mustvalidate') );
-			break;
-
-
 		case 'change_admin_skin':
 			// Skin switch from menu
 			param( 'new_admin_skin', 'string', true );
@@ -172,379 +137,6 @@ if( !$Messages->count('error') )
 			header_redirect();
 			/* EXITED */
 			break;
-
-
-		case 'remove_avatar':
-			if( empty($edited_User) || !is_object($edited_User) )
-			{
-				$Messages->add( 'No user set!' ); // Needs no translation, should be prevented by UI.
-				$action = 'list';
-				break;
-			}
-
-			if( !$current_User->check_perm( 'users', 'edit' ) && $edited_User->ID != $current_User->ID )
-			{ // user is only allowed to update him/herself
-				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
-				$action = 'view';
-				break;
-			}
-
-			$edited_User->set( 'avatar_file_ID', NULL, true );
-
-			$edited_User->dbupdate();
-
-			$Messages->add( T_('Avatar has been removed.'), 'success' );
-
-			header_redirect( '?ctrl=users&user_ID='.$edited_User->ID, 303 ); // will save $Messages into Session
-			/* EXITED */
-			break;
-
-		case 'update':
-			// Update existing user OR create new user:
-			if( empty($edited_User) || !is_object($edited_User) )
-			{
-				$Messages->add( 'No user set!' ); // Needs no translation, should be prevented by UI.
-				$action = 'list';
-				break;
-			}
-
-			$reload_page = false; // We set it to true, if a setting changes that needs a page reload (locale, admin skin, ..)
-
-			if( !$current_User->check_perm( 'users', 'edit' ) && $edited_User->ID != $current_User->ID )
-			{ // user is only allowed to update him/herself
-				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
-				$action = 'view';
-				break;
-			}
-
-			$is_identity_form = param( 'identity_form', 'boolean', false );
-			$is_password_form = param( 'password_form', 'boolean', false );
-			$is_preferences_form = param( 'preferences_form', 'boolean', false );
-
-			if( $is_identity_form && $current_User->check_perm( 'users', 'edit' ) )
-			{ // changing level/group is allowed (not in profile mode)
-				param_integer_range( 'edited_user_level', 0, 10, T_('User level must be between %d and %d.') );
-				$edited_User->set( 'level', $edited_user_level );
-
-				param( 'edited_user_validated', 'integer', 0 );
-				if( $edited_User->set( 'validated', $edited_user_validated ) && $edited_User->ID == $current_User->ID )
-				{ // validated value has changed for the current user
-					$reload_page = true;
-				}
-				param( 'edited_user_grp_ID', 'integer', true );
-				$edited_user_Group = $GroupCache->get_by_ID( $edited_user_grp_ID );
-				$edited_User->set_Group( $edited_user_Group );
-				// echo 'new group = ';
-				// $edited_User->Group->disp('name');
-			}
-
-			// load data from request
-			if( $edited_User->load_from_Request() )
-			{	// We could load data from form without errors:
-
-				// check if new login already exists for another user_ID
-				$query = '
-					SELECT user_ID
-					  FROM T_users
-					 WHERE user_login = '.$DB->quote($edited_user_login).'
-					   AND user_ID != '.$edited_User->ID;
-				if( $q = $DB->get_var( $query ) )
-				{
-					param_error( 'edited_user_login',
-						sprintf( T_('This login already exists. Do you want to <a %s>edit the existing user</a>?'),
-							'href="?ctrl=users&amp;user_ID='.$q.'"' ) );
-				}
-
-				if( $is_password_form || $edited_User->ID == 0 )
-				{
-					if( !param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', ($edited_User->ID == 0) ) ) // required for new users
-					{ // passwords not the same or empty: empty them for the form
-						$edited_user_pass1 = '';
-						$edited_user_pass2 = '';
-					}
-				}
-
-				if( $is_identity_form )
-				{
-					// EXPERIMENTAL user fields:
-
-					// EXISTING fields:
-					// Get indices of existing userfields:
-					$userfield_IDs = $DB->get_col( '
-								SELECT uf_ID
-									FROM T_users__fields
-								 WHERE uf_user_ID = '.$edited_User->ID );
-					foreach( $userfield_IDs as $userfield_ID )
-					{
-						$uf_val = param( 'uf_'.$userfield_ID, 'string', '' );
-
-						// TODO: type checking
-
-						$edited_User->userfield_update( $userfield_ID, $uf_val );
-					}
-
-					// NEW fields:
-					for( $i=1; $i<=3; $i++ )
-					{	// new fields:
-						$new_uf_type = param( 'new_uf_type_'.$i, 'integer', '' );
-						$new_uf_val = param( 'new_uf_val_'.$i, 'string', '' );
-						if( empty($new_uf_type) && empty($new_uf_val) )
-						{
-							continue;
-						}
-
-						if( empty($new_uf_type) )
-						{
-							param_error( 'new_uf_val_'.$i, T_('Please select a field type.') );
-						}
-						if( empty($new_uf_val) )
-						{
-							param_error( 'new_uf_val_'.$i, T_('Please enter a value.') );
-						}
-
-						// echo $new_uf_type.':'.$new_uf_val;
-
-						// TODO: type checking
-
-						$edited_User->userfield_add( $new_uf_type, $new_uf_val );
-					}
-				}
-			}
-
-			if( $Messages->count( 'error' ) )
-			{	// We have found validation errors:
-				$action = 'edit';
-				break;
-			}
-
-			// OK, no error.
-			$new_pass = '';
-
-			if( !empty($edited_user_pass2) )
-			{ // Password provided, we must encode it
-				$new_pass = md5( $edited_user_pass2 );
-
-				$edited_User->set( 'pass', $new_pass ); // set password
-			}
-
-			if( $is_password_form && empty( $new_pass ) )
-			{
-				$Messages->add( T_('Password has not been changed.'), 'note' );
-				$user_created = false;
-			}
-			elseif( $edited_User->ID )
-			{ // Commit update to the DB:
-				$update_r = $edited_User->dbupdate();
-
-				if( $edited_User->ID == $current_User->ID )
-				{ // User updates his profile:
-					if( $update_r )
-					{
-						$msg = $is_password_form ? T_('Password has been changed.') : T_('Your profile has been updated.');
-						$Messages->add( $msg, 'success' );
-					}
-					else
-					{
-						$msg = $is_password_form ? T_('Password has not been changed.') : T_('Your profile has not been changed.');
-						$Messages->add( $msg, 'note' );
-					}
-				}
-				else
-				{
-					$msg = $is_password_form ? T_('Password has been changed') : T_('User has been updated.');
-					$Messages->add( $msg, 'success' );
-				}
-				$user_created = false;
-			}
-			else
-			{ // Insert user into DB
-				$edited_User->dbinsert();
-				$Messages->add( T_('New user has been created.'), 'success' );
-				$user_created = true;
-			}
-
-			// Now that the User exists in the DB and has an ID, update the settings:
-
-			if( $is_preferences_form )
-			{
-				if( $UserSettings->set( 'admin_skin', $edited_user_admin_skin, $edited_User->ID )
-						&& ($edited_User->ID == $current_User->ID) )
-				{ // admin_skin has changed or was set the first time for the current user
-					$reload_page = true;
-				}
-
-				// Action icon params:
-				$UserSettings->set( 'action_icon_threshold', $edited_user_action_icon_threshold, $edited_User->ID );
-				$UserSettings->set( 'action_word_threshold', $edited_user_action_word_threshold, $edited_User->ID );
-				$UserSettings->set( 'display_icon_legend', $edited_user_legend, $edited_User->ID );
-
-				// Set bozo validador activation
-				$UserSettings->set( 'control_form_abortions', $edited_user_bozo, $edited_User->ID );
-
-				// Focus on first
-				$UserSettings->set( 'focus_on_first_input', $edited_user_focusonfirst, $edited_User->ID );
-
-				// Results per page
-				if( isset($edited_user_results_per_page) )
-				{
-					$UserSettings->set( 'results_per_page', $edited_user_results_per_page, $edited_User->ID );
-				}
-
-				// Session timeout
-				if( isset( $edited_user_timeout_sessions ) && $current_User->check_perm( 'users', 'edit' ) )
-				{
-					switch( $edited_user_timeout_sessions )
-					{
-						case 'default':
-							$UserSettings->set( 'timeout_sessions', NULL, $edited_User->ID );
-							break;
-						case 'custom':
-							$UserSettings->set( 'timeout_sessions', param_duration( 'timeout_sessions' ), $edited_User->ID );
-							break;
-					}
-				}
-			}
-
-			if( isset( $edited_user_set_login_multiple_sessions ) )
-			{	// Multiple session
-				$multiple_sessions = $Settings->get( 'multiple_sessions' );
-				if( ( $multiple_sessions != 'adminset_default_no' && $multiple_sessions != 'adminset_default_yes' ) || $current_User->check_perm( 'users', 'edit' ) )
-				{
-					$UserSettings->set( 'login_multiple_sessions', $edited_user_set_login_multiple_sessions, $edited_User->ID );
-				}
-			}
-
-			// Update user settings:
-			if( !$is_password_form && $UserSettings->dbupdate() )
-			{
-				$Messages->add( T_('User feature settings have been changed.'), 'success');
-			}
-
-			if( $is_preferences_form )
-			{
-				// PluginUserSettings
-				load_funcs('plugins/_plugin.funcs.php');
-
-				$any_plugin_settings_updated = false;
-				$Plugins->restart();
-				while( $loop_Plugin = & $Plugins->get_next() )
-				{
-					$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
-					if( empty($pluginusersettings) )
-					{
-						continue;
-					}
-
-					// Loop through settings for this plugin:
-					foreach( $pluginusersettings as $set_name => $set_meta )
-					{
-						autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'UserSettings', $edited_User );
-					}
-
-					// Let the plugin handle custom fields:
-					$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array(
-						'User' => & $edited_User, 'action' => 'save' ) );
-
-					if( $ok_to_update === false )
-					{
-						$loop_Plugin->UserSettings->reset();
-					}
-					elseif( $loop_Plugin->UserSettings->dbupdate() )
-					{
-						$any_plugin_settings_updated = true;
-					}
-				}
-
-				if( $any_plugin_settings_updated )
-				{
-					$Messages->add( T_('Usersettings of Plugins have been updated.'), 'success' );
-				}
-			}
-
-			if( !$user_created )
-			{
-				header_redirect( regenerate_url( '', 'user_ID='.$edited_User->ID.'&action=edit&user_tab='.$user_tab, '', '&' ) );
-			}
-			else
-			{
-				header_redirect( regenerate_url( '', 'action=list', '', '&' ) );
-			}
-
-			break;
-
-
-		case 'default_settings':
-			$reload_page = false; // We set it to true, if a setting changes that needs a page reload (locale, admin skin, ..)
-
-			// Admin skin:
-			$cur_admin_skin = $UserSettings->get('admin_skin');
-
-			$UserSettings->delete( 'admin_skin', $edited_User->ID );
-			if( $cur_admin_skin
-					&& $UserSettings->get('admin_skin', $edited_User->ID ) != $cur_admin_skin
-					&& ($edited_User->ID == $current_User->ID) )
-			{ // admin_skin has changed:
-				$reload_page = true;
-			}
-
-			// Remove all UserSettings where a default exists:
-			foreach( $UserSettings->_defaults as $k => $v )
-			{
-				$UserSettings->delete( $k, $edited_User->ID );
-			}
-
-			// Update user settings:
-			if( $UserSettings->dbupdate() ) $Messages->add( T_('User feature settings have been changed.'), 'success');
-
-			// PluginUserSettings
-			$any_plugin_settings_updated = false;
-			$Plugins->restart();
-			while( $loop_Plugin = & $Plugins->get_next() )
-			{
-				$pluginusersettings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
-
-				if( empty($pluginusersettings) )
-				{
-					continue;
-				}
-
-				foreach( $pluginusersettings as $k => $l_meta )
-				{
-					if( isset($l_meta['layout']) || ! empty($l_meta['no_edit']) )
-					{ // a layout "setting" or not for editing
-						continue;
-					}
-
-					$loop_Plugin->UserSettings->delete($k, $edited_User->ID);
-				}
-
-				// Let the plugin handle custom fields:
-				$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginUserSettingsUpdateAction', $tmp_params = array(
-					'User' => & $edited_User, 'action' => 'reset' ) );
-
-				if( $ok_to_update === false )
-				{
-					$loop_Plugin->UserSettings->reset();
-				}
-				elseif( $loop_Plugin->UserSettings->dbupdate() )
-				{
-					$any_plugin_settings_updated = true;
-				}
-			}
-			if( $any_plugin_settings_updated )
-			{
-				$Messages->add( T_('Usersettings of Plugins have been updated.'), 'success' );
-			}
-
-			// Always display the profile again:
-			$action = 'edit';
-
-			if( $reload_page )
-			{ // reload the current page through header redirection:
-				header_redirect( regenerate_url( '', 'user_ID='.$edited_User->ID.'&action='.$action, '', '&' ) ); // will save $Messages into Session
-			}
-			break;
-
 
 		case 'promote':
 			param( 'prom', 'string', true );
@@ -675,12 +267,11 @@ if( !$Messages->count('error') )
 
 
 // We might delegate to this action from above:
-if( $action == 'edit' )
+/*if( $action == 'edit' )
 {
 	$Plugins->trigger_event( 'PluginUserSettingsEditAction', $tmp_params = array( 'User' => & $edited_User ) );
-
 	$Session->delete( 'core.changepwd.request_id' ); // delete the request_id for password change request (from /htsrv/login.php)
-}
+}*/
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -688,7 +279,6 @@ $AdminUI->disp_html_head();
 
 // Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
 $AdminUI->disp_body_top();
-
 
 /*
  * Display appropriate payload:
@@ -698,28 +288,6 @@ switch( $action )
 	case 'nil':
 		// Display NO payload!
 		break;
-
-		case 'new':
-		case 'view':
-		case 'edit':
-
-			switch( $user_tab )
-			{
-				case 'identity':
-					// Display user identity form:
-					$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
-					break;
-				case 'password':
-					// Display user password form:
-					$AdminUI->disp_view( 'users/views/_user_password.form.php' );
-					break;
-				case 'preferences':
-					// Display user preferences form:
-					$AdminUI->disp_view( 'users/views/_user_preferences.form.php' );
-					break;
-			}
-
-			break;
 
 	case 'delete':
 			// We need to ask for confirmation:
@@ -754,6 +322,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.44  2009/11/21 13:31:59  efy-maxim
+ * 1. users controller has been refactored to users and user controllers
+ * 2. avatar tab
+ * 3. jQuery to show/hide custom duration
+ *
  * Revision 1.43  2009/11/12 00:46:33  fplanque
  * doc/minor/handle demo mode
  *

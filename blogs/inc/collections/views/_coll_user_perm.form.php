@@ -172,7 +172,7 @@ $Results->grp_cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Login'),
 						'order' => 'user_login',
-						'td' => '<a href="?ctrl=users&amp;user_ID=$user_ID$">$user_login$</a>',
+						'td' => '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID=$user_ID$">$user_login$</a>',
 					);
 
 $Results->cols[] = array(
@@ -477,7 +477,7 @@ $Results->cols = array(); // RESET!
 $Results->cols[] = array(
 						'th' => T_('Login'),
 						'order' => 'user_login',
-						'td' => '<a href="?ctrl=users&amp;user_ID=$user_ID$">$user_login$</a>',
+						'td' => '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID=$user_ID$">$user_login$</a>',
 					);
 
 
@@ -547,6 +547,11 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.12  2009/11/21 13:31:58  efy-maxim
+ * 1. users controller has been refactored to users and user controllers
+ * 2. avatar tab
+ * 3. jQuery to show/hide custom duration
+ *
  * Revision 1.11  2009/09/25 20:26:26  fplanque
  * fixes/doc
  *
