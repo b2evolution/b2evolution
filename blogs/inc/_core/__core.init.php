@@ -555,31 +555,34 @@ class _core_Module extends Module
 				'href' => get_user_logout_url(),
 			);
 
-		if( $is_admin_page )
-		{
-			if( !empty( $Blog ) )
+		// AB switch:
+		if( $current_User->check_perm( 'admin', 'any' ) )
+		{	// User must have permission to access admin...
+			if( $is_admin_page )
 			{
-				$entries['abswitch'] = array(
-						'text' => T_('Blog').' '.get_icon('switch-to-blog'),
-						'href' => $Blog->get( 'url' ),
-					);
+				if( !empty( $Blog ) )
+				{
+					$entries['abswitch'] = array(
+							'text' => T_('Blog').' '.get_icon('switch-to-blog'),
+							'href' => $Blog->get( 'url' ),
+						);
+				}
+				else
+				{
+					$entries['abswitch'] = array(
+							'text' => T_('Home').' '.get_icon('switch-to-blog'),
+							'href' => $home_url,
+						);
+				}
 			}
 			else
 			{
 				$entries['abswitch'] = array(
-						'text' => T_('Home').' '.get_icon('switch-to-blog'),
-						'href' => $home_url,
+						'text' => T_('Admin').' '.get_icon('switch-to-admin'),
+						'href' => $admin_url,
 					);
 			}
 		}
-		else
-		{
-			$entries['abswitch'] = array(
-					'text' => T_('Admin').' '.get_icon('switch-to-admin'),
-					'href' => $admin_url,
-				);
-		}
-
 
 		$topright_Menu->add_menu_entries( NULL, $entries );
 
@@ -768,6 +771,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.51  2009/11/21 16:39:55  fplanque
+ * fix / doc
+ *
  * Revision 1.50  2009/11/21 13:31:57  efy-maxim
  * 1. users controller has been refactored to users and user controllers
  * 2. avatar tab

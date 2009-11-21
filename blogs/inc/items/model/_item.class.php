@@ -479,7 +479,7 @@ class Item extends ItemLight
 		$this->set_from_Request( 'order', 'item_order', true );
 
 		if( $current_User->check_perm( 'users', 'edit' ) && param( 'item_owner_login', 'string', NULL ) !== NULL )
-		{
+		{ // only admins can change this..
 			$this->set_creator_by_login( get_param( 'item_owner_login' ) );
 		}
 
@@ -4072,6 +4072,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.160  2009/11/21 16:39:55  fplanque
+ * fix / doc
+ *
  * Revision 1.159  2009/11/21 13:31:59  efy-maxim
  * 1. users controller has been refactored to users and user controllers
  * 2. avatar tab
