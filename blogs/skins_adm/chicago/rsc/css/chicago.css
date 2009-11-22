@@ -510,15 +510,16 @@ div.edit_actions input.SaveButton:hover {
 /*
  * Dashboard
  */
-.dashboard_post_even {
+.dashboard_post {
 	margin: 0;
 	padding: 8px 8px 4px 8px;
-	background-color: #F1F6F8;
+	border-bottom: 1px solid #9DB0BC;
+}
+.dashboard_post_even {
+	background-color: #f1f6f8;
 }
 .dashboard_post_odd {
-	margin: 0;
-	padding: 8px 8px 4px 8px;
-	background-color: #fff;
+	background-color: #e4ecf2;
 }
 
 .dashboard_post .small {
@@ -548,6 +549,7 @@ td.browse_right_col {
 }
 .dash_item {
 	border: 1px solid #9db0bc;
+	border-bottom: none;
 	background-color: #fff;
 }
 
