@@ -680,10 +680,7 @@ class _core_Module extends Module
 				$users_sub_entries['avatar'] = array(
 									'text' => T_('Avatar'),
 									'href' => '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$user_ID );
-			}
 
-			if( $current_User->check_perm( 'users', 'view' ) && !empty( $user_ID ) )
-			{
 				if( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'edit' ) )
 				{
 					$users_sub_entries['password'] = array(
@@ -771,6 +768,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.52  2009/11/22 19:06:48  efy-maxim
+ * show all user tabs
+ *
  * Revision 1.51  2009/11/21 16:39:55  fplanque
  * fix / doc
  *
