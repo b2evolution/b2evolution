@@ -86,6 +86,11 @@ if( $blog )
 		{ // Loop through comments:
 
 			echo '<div class="dashboard_post dashboard_post_'.($CommentList->current_idx % 2 ? 'even' : 'odd' ).'">';
+
+			echo '<div class="floatright"><span class="note status_'.$Comment->status.'">';
+			$Comment->status();
+			echo '</div>';
+
 			echo '<h3 class="dashboard_post_title">';
 			echo $Comment->get_title(array('author_format'=>'<strong>%s</strong>'));
 			$comment_Item = & $Comment->get_Item();
@@ -191,6 +196,12 @@ if( $blog )
 
 			echo '<h3 class="dashboard_post_title">';
 			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget( 'title' ).'</a>';
+			echo ' <span class="dashboard_post_details">';
+			$Item->status( array(
+					'before' => '<div class="floatright"><span class="status_'.$Item->status.'">',
+					'after'  => '</span></div>',
+				) );
+			echo '</span>';
 			echo '</h3>';
 
 			echo '</div>';
@@ -250,8 +261,8 @@ if( $blog )
 			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget( 'title' ).'</a>';
 			echo ' <span class="dashboard_post_details">';
 			$Item->status( array(
-					'before' => '',
-					'after'  => ' &bull; ',
+					'before' => '<div class="floatright"><span class="status_'.$Item->status.'">',
+					'after'  => '</span></div>',
 				) );
 			$Item->views();
 			echo '</span>';
@@ -492,6 +503,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.41  2009/11/22 20:05:12  fplanque
+ * highlight statuses on dashboard
+ *
  * Revision 1.40  2009/11/22 18:20:10  fplanque
  * Dashboard CSS enhancements
  *

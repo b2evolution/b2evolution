@@ -638,7 +638,8 @@ div.bPostpublished {
 	background-color: #fff;
 }
 .bPostpublished span.bStatus,
-div.bCommentpublished span.bStatus {
+div.bCommentpublished span.bStatus,
+.status_published {
 	color: #0b0;
 }
 
@@ -647,7 +648,8 @@ div.bCommentpublished span.bStatus {
 	background-color: #fff;
 	/* background-color: #fff7e7; */
 }
-.bPostprotected span.bStatus {
+.bPostprotected span.bStatus,
+.status_protected {
 	color: #ea0;
 }
 .bPostprotected > div.bSmallHead /* Direct child only */
@@ -659,7 +661,8 @@ div.bCommentpublished span.bStatus {
 	background-color: #fff;
 	/* background-color: #fee; */
 }
-.bPostprivate span.bStatus {
+.bPostprivate span.bStatus,
+.status_private {
 	color: #e00;
 }
 .bPostprivate > div.bSmallHead /* Direct child only */
@@ -673,8 +676,10 @@ div.bCommentdraft {
 	background-color: #ffb;
 }
 .bPostdraft span.bStatus,
-div.bCommentdraft span.bStatus {
+div.bCommentdraft span.bStatus,
+.status_draft {
 	color: #f96;
+	background-color: #ff9;
 }
 .bPostdraft > div.bSmallHead, /* Direct child only */
 div.bCommentdraft > div.bSmallHead /* Direct child only */
@@ -702,8 +707,10 @@ div.bCommentdeprecated {
 	color: #888;
 }
 .bPostdeprecated span.bStatus,
-div.bCommentdeprecated span.bStatus {
+div.bCommentdeprecated span.bStatus,
+.status_deprecated {
 	color: #000;
+	background-color: #ccc;
 }
 .bPostdeprecated > div.bSmallHead, /* Direct child only */
 div.bCommentdeprecated > div.bSmallHead /* Direct child only */
@@ -728,8 +735,10 @@ div.bCommentdeprecated div.CommentActionsArea {
 	border: 1px solid #639;
 	background-color: #dcf;
 }
-.bPostredirected span.bStatus {
+.bPostredirected span.bStatus,
+.status_redirected {
 	color: #639;
+	background-color: #c0b0e0;
 }
 .bPostredirected > div.bSmallHead /* Direct child only */
 {
