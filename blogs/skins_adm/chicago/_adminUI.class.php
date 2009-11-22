@@ -346,6 +346,15 @@ class AdminUI extends AdminUI_general
 						'block_end' => '</div></div>',
 					);
 
+			case 'dash_item':
+				return array(
+						'block_start' => '<div class="block_item_wrap"><div class="fieldset_title"><div class="fieldset_title_right"><div class="fieldset_title_bg">
+																		<span style="float:right">$global_icons$</span>$title$
+																	</div></div></div>
+																	<div class="dash_item">',
+						'block_end' => '</div></div>',
+					);
+
 			case 'side_item':
 				return array(
 						'block_start' => '<div class="browse_side_item_wrap"><div class="fieldset_title"><div class="fieldset_title_right"><div class="fieldset_title_bg">
@@ -379,6 +388,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.25  2009/11/22 18:20:08  fplanque
+ * Dashboard CSS enhancements
+ *
  * Revision 1.24  2009/10/12 23:03:32  blueyed
  * Fix displaying of Messages in $mode windows (e.g. file uploads) and enable
  * them in the attachment iframe.

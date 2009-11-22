@@ -61,7 +61,7 @@ if( $blog )
 
 	load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 
-	$block_item_Widget = & new Widget( 'block_item' );
+	$block_item_Widget = & new Widget( 'dash_item' );
 
 	$nb_blocks_displayed = 0;
 
@@ -85,7 +85,7 @@ if( $blog )
 		while( $Comment = & $CommentList->get_next() )
 		{ // Loop through comments:
 
-			echo '<div class="dashboard_post">';
+			echo '<div class="dashboard_post dashboard_post_'.($CommentList->current_idx % 2 ? 'even' : 'odd' ).'">';
 			echo '<h3 class="dashboard_post_title">';
 			echo $Comment->get_title(array('author_format'=>'<strong>%s</strong>'));
 			$comment_Item = & $Comment->get_Item();
@@ -174,7 +174,7 @@ if( $blog )
 
 		while( $Item = & $ItemList->get_item() )
 		{
-			echo '<div class="dashboard_post" lang="'.$Item->get('locale').'">';
+			echo '<div class="dashboard_post dashboard_post_'.($ItemList->current_idx % 2 ? 'even' : 'odd' ).'" lang="'.$Item->get('locale').'">';
 			// We don't switch locales in the backoffice, since we use the user pref anyway
 			// Load item's creator user:
 			$Item->get_creator_User();
@@ -233,7 +233,7 @@ if( $blog )
 
 		while( $Item = & $ItemList->get_item() )
 		{
-			echo '<div class="dashboard_post" lang="'.$Item->get('locale').'">';
+			echo '<div class="dashboard_post dashboard_post_'.($ItemList->current_idx % 2 ? 'even' : 'odd' ).'" lang="'.$Item->get('locale').'">';
 			// We don't switch locales in the backoffice, since we use the user pref anyway
 			// Load item's creator user:
 			$Item->get_creator_User();
@@ -492,6 +492,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.40  2009/11/22 18:20:10  fplanque
+ * Dashboard CSS enhancements
+ *
  * Revision 1.39  2009/11/21 13:31:58  efy-maxim
  * 1. users controller has been refactored to users and user controllers
  * 2. avatar tab

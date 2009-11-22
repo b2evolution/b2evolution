@@ -507,6 +507,24 @@ div.edit_actions input.SaveButton:hover {
 	color: #c00;
 }
 
+/*
+ * Dashboard
+ */
+.dashboard_post_even {
+	margin: 0;
+	padding: 8px 8px 4px 8px;
+	background-color: #F1F6F8;
+}
+.dashboard_post_odd {
+	margin: 0;
+	padding: 8px 8px 4px 8px;
+	background-color: #fff;
+}
+
+.dashboard_post .small {
+	margin: 4px 0 2px 0;
+}
+
 
 /*
  * browse Screen:
@@ -527,6 +545,10 @@ td.browse_right_col {
 	border: 1px solid #9db0bc;
 	background-color: #fff;
 	padding: 1ex;
+}
+.dash_item {
+	border: 1px solid #9db0bc;
+	background-color: #fff;
 }
 
 div.NavBar {

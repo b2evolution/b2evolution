@@ -358,7 +358,7 @@ class AdminUI_general extends Menu
 	 *
 	 * Typically includes title, menu, messages, etc.
 	 *
-	 * @param boolean Whether to display messages.
+	 * @param boolean Whether or not to display messages.
 	 */
 	function disp_body_top( $display_messages = true )
 	{
@@ -964,6 +964,7 @@ class AdminUI_general extends Menu
 				);
 
 			case 'block_item':
+			case 'dash_item':
 				return array(
 					'block_start' => '<div class="block_item"><h3><span style="float:right">$global_icons$</span>$title$</h3>',
 					'block_end' => '</div>',
@@ -1294,6 +1295,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.104  2009/11/22 18:20:11  fplanque
+ * Dashboard CSS enhancements
+ *
  * Revision 1.103  2009/11/22 16:05:39  tblue246
  * minor/doc
  *
