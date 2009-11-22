@@ -100,6 +100,10 @@ $Form->hidden( 'renderers_displayed', 1 );
 $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 $Form->hidden( 'item_featured', $edited_Item->featured );
 $Form->hidden( 'item_order', $edited_Item->order );
+
+$creator_User = &$edited_Item->get_creator_User();
+$Form->hidden( 'item_owner_login', $creator_User->login );
+
 // CUSTOM FIELDS double
 for( $i = 1 ; $i <= 5; $i++ )
 {	// For each custom double field:
@@ -286,6 +290,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.29  2009/11/22 18:52:21  efy-maxim
+ * change owner; is login
+ *
  * Revision 1.28  2009/07/06 22:49:11  fplanque
  * made some small changes on "publish now" handling.
  * Basically only display it for drafts everywhere.

@@ -73,6 +73,13 @@ class Item extends ItemLight
 
 
 	/**
+	 * Login of the user that created the item (lazy-filled)
+	 * @var string
+	 */
+	var $creator_user_login;
+
+
+	/**
 	 * The assigned User to the item.
 	 * Can be NULL
 	 * @see Item::get_assigned_User()
@@ -310,6 +317,10 @@ class Item extends ItemLight
 		{
 			$this->set( $this->creator_field, $creator_User->ID );
 		}
+		else
+		{
+
+		}
 	}
 
 
@@ -478,9 +489,14 @@ class Item extends ItemLight
 		param( 'item_order', 'double', NULL );
 		$this->set_from_Request( 'order', 'item_order', true );
 
-		if( $current_User->check_perm( 'users', 'edit' ) && param( 'item_owner_login', 'string', NULL ) !== NULL )
-		{ // only admins can change this..
-			$this->set_creator_by_login( get_param( 'item_owner_login' ) );
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{   // only admins can change this..
+			$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
+			if( param_check_not_empty( 'item_owner_login', T_('Please enter valid owner login.') )
+					&& param_check_login( 'item_owner_login', true ) )
+			{
+				$this->set_creator_by_login( get_param( 'item_owner_login' ) );
+			}
 		}
 
 		// CUSTOM FIELDS double
@@ -3604,6 +3620,22 @@ class Item extends ItemLight
 
 
 	/**
+	 * Get login of the User who created the Item.
+	 *
+	 * @return string login
+	 */
+	function get_creator_login()
+	{
+		$this->get_creator_User();
+		if( is_null( $this->creator_user_login ) && !is_null( $this->creator_User ) )
+		{
+			$this->creator_user_login = $this->creator_User->login;
+		}
+		return $this->creator_user_login;
+	}
+
+
+	/**
 	 * Execute or schedule post(=after) processing tasks
 	 *
 	 * Includes notifications & pings
@@ -4072,6 +4104,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.161  2009/11/22 18:52:21  efy-maxim
+ * change owner; is login
+ *
  * Revision 1.160  2009/11/21 16:39:55  fplanque
  * fix / doc
  *

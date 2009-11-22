@@ -1277,6 +1277,26 @@ function is_word( $word )
 
 
 /**
+ * Check if the login is valid
+ *
+ * @param string login
+ * @return boolean true if OK
+ */
+function is_login( $login )
+{
+	global $DB;
+
+	$SQL = new SQL();
+	$SQL->SELECT( 'COUNT(*)' );
+	$SQL->FROM( 'T_users' );
+	$SQL->WHERE( 'user_login = \''.$login.'\'' );
+
+	$var = $DB->get_var( $SQL->get() );
+	return $var > 0;
+}
+
+
+/**
  * Are we running on a Windows server?
  */
 function is_windows()
@@ -3642,6 +3662,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.183  2009/11/22 18:52:19  efy-maxim
+ * change owner; is login
+ *
  * Revision 1.182  2009/10/28 09:50:02  efy-maxim
  * Module::check_perm
  *

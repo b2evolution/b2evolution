@@ -551,7 +551,32 @@ function check_is_email( $email )
 {
 	if( !is_email( $email ) )
 	{
-		return T_('The email address is invalid.');
+		return T_( 'The email address is invalid.' );
+	}
+}
+
+
+/**
+ * @param string param name
+ * @return boolean true if OK
+ */
+function param_check_login( $var, $required = false )
+{
+	return param_validate( $var, 'check_is_login', $required, NULL );
+}
+
+
+/**
+ * Check that login is valid.
+ *
+ * @param string login to check
+ * @return string error message if login is not valid
+ */
+function check_is_login( $login )
+{
+	if( !is_login( $login ) )
+	{
+ 		return sprintf( T_( 'There is no any user with &laquo;%s&raquo; login.' ), $login );
 	}
 }
 
@@ -2070,6 +2095,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.52  2009/11/22 18:52:20  efy-maxim
+ * change owner; is login
+ *
  * Revision 1.51  2009/10/28 10:56:32  efy-maxim
  * param_duration
  *

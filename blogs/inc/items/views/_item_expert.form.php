@@ -353,8 +353,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{
 		echo '<tr><td><strong>'.T_('Owner').':</strong></td><td>';
-		$creator_User = $edited_Item->get_creator_User();
-		$Form->username( 'item_owner_login', $creator_User->login, '', T_( 'login of this post\'s owner.') );
+		$Form->username( 'item_owner_login', $edited_Item->get_creator_login(), '', T_( 'login of this post\'s owner.').'<br/>' );
 		echo '</td></tr>';
 	}
 
@@ -433,6 +432,9 @@ if( $publishnow_displayed )
 
 /*
  * $Log$
+ * Revision 1.52  2009/11/22 18:52:21  efy-maxim
+ * change owner; is login
+ *
  * Revision 1.51  2009/11/20 09:06:09  efy-maxim
  * change owner
  *

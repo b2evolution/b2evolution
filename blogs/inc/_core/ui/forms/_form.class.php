@@ -725,7 +725,7 @@ class Form extends Widget
 	{
 		$field_params = array();
 
-		return $this->text_input( $field_name, $field_value, 10, $field_label, $field_note, $field_params );
+		return $this->text_input( $field_name, $field_value, 12, $field_label, $field_note, $field_params );
 	}
 
 
@@ -3011,6 +3011,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.71  2009/11/22 18:52:20  efy-maxim
+ * change owner; is login
+ *
  * Revision 1.70  2009/11/20 23:56:36  fplanque
  * minor  + doc
  *
