@@ -1279,6 +1279,9 @@ function is_word( $word )
 /**
  * Check if the login is valid
  *
+ * @todo fp>max please rename to user_exists()
+ * @todo Please always use $DB->quote() when escaping user submitted content
+ *
  * @param string login
  * @return boolean true if OK
  */
@@ -3662,6 +3665,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.185  2009/11/22 20:29:38  fplanque
+ * minor/doc
+ *
  * Revision 1.184  2009/11/22 18:54:51  efy-maxim
  * PHP4 compatibility for is_login
  *

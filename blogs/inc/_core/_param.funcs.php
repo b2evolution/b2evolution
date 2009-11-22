@@ -576,7 +576,7 @@ function check_is_login( $login )
 {
 	if( !is_login( $login ) )
 	{
- 		return sprintf( T_( 'There is no any user with &laquo;%s&raquo; login.' ), $login );
+ 		return sprintf( T_( 'There is no user with username &laquo;%s&raquo;' ), $login );
 	}
 }
 
@@ -2095,6 +2095,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.53  2009/11/22 20:29:38  fplanque
+ * minor/doc
+ *
  * Revision 1.52  2009/11/22 18:52:20  efy-maxim
  * change owner; is login
  *

@@ -317,10 +317,6 @@ class Item extends ItemLight
 		{
 			$this->set( $this->creator_field, $creator_User->ID );
 		}
-		else
-		{
-
-		}
 	}
 
 
@@ -4104,6 +4100,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.162  2009/11/22 20:29:38  fplanque
+ * minor/doc
+ *
  * Revision 1.161  2009/11/22 18:52:21  efy-maxim
  * change owner; is login
  *
