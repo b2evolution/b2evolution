@@ -170,7 +170,9 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false )
 
 	if( function_exists('gzopen') )
 	{	// Unpack using 'zlib' extension and PclZip wrapper
-		require_once( $inc_path.'_ext/pclzip/pclzip.lib.php' );
+
+		// Load PclZip class (PHP4):
+		load_class( '_ext/pclzip/pclzip.lib.php', 'PclZip' );
 
 		$PclZip = new PclZip( $src_file );
 		if( $PclZip->extract( PCLZIP_OPT_PATH, $dest_dir ) == 0 )
@@ -349,6 +351,9 @@ function aliases_to_tables( $aliases )
 
 /*
  * $Log$
+ * Revision 1.6  2009/11/22 19:15:34  efy-maxim
+ * load class
+ *
  * Revision 1.5  2009/11/19 12:10:51  efy-maxim
  * Force 'upgrade' for debug mode
  *
