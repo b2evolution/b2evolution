@@ -485,10 +485,10 @@ if( isset($_FILES) && count( $_FILES ) )
 								' '.$link_msg, 5, 5, array( 'target' => $iframe_name ) )
 					.' ('.$link_note.')</li>'
 
-					.'<li>or <a href="#" onclick="if( window.focus && window.opener ){'
+					.'<li>'.T_('or').' <a href="#" onclick="if( window.focus && window.opener ){'
 					.'window.opener.focus(); textarea_wrap_selection( window.opener.document.getElementById(\'itemform_post_content\'), \''
 					.format_to_output( $newFile->get_tag(), 'formvalue' ).'\', \'\', 1, window.opener.document ); } return false;">'
-					.T_('Insert the following code snippet into your post').'</a> : <input type="text" value="'.$img_tag.'" size="60" /></li>'
+					.T_('insert the following code snippet into your post').'</a>: <input type="text" value="'.$img_tag.'" size="60" /></li>'
 					// fp> TODO: it would be supacool to have an ajaxy "tumbnail size selector" here that generates a thumnail of requested size on server and then changes the code in the input above
 				.'</ul>';
 		}
@@ -547,6 +547,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2009/11/22 16:22:27  tblue246
+ * Translation fixes
+ *
  * Revision 1.24  2009/11/11 20:53:24  fplanque
  * restricting get from url a little bit so it doesn't allow getting the root of a website (this case was aboring silently before)
  *
