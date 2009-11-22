@@ -1292,7 +1292,7 @@ function is_login( $login )
 	$SQL->WHERE( 'user_login = \''.$login.'\'' );
 
 	$var = $DB->get_var( $SQL->get() );
-	return $var > 0;
+	return $var > 0 ? true : false; // PHP4 compatibility
 }
 
 
@@ -3662,6 +3662,9 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.184  2009/11/22 18:54:51  efy-maxim
+ * PHP4 compatibility for is_login
+ *
  * Revision 1.183  2009/11/22 18:52:19  efy-maxim
  * change owner; is login
  *
