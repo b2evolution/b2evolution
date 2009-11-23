@@ -101,8 +101,9 @@ $Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
 $Form->hidden( 'item_featured', $edited_Item->featured );
 $Form->hidden( 'item_order', $edited_Item->order );
 
-$creator_User = &$edited_Item->get_creator_User();
+$creator_User = $edited_Item->get_creator_User();
 $Form->hidden( 'item_owner_login', $creator_User->login );
+$Form->hidden( 'item_owner_login_displayed', 1 );
 
 // CUSTOM FIELDS double
 for( $i = 1 ; $i <= 5; $i++ )
@@ -290,6 +291,9 @@ require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.30  2009/11/23 11:58:04  efy-maxim
+ * owner fix
+ *
  * Revision 1.29  2009/11/22 18:52:21  efy-maxim
  * change owner; is login
  *

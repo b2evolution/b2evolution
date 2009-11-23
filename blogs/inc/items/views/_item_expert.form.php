@@ -354,6 +354,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	{
 		echo '<tr><td><strong>'.T_('Owner').':</strong></td><td>';
 		$Form->username( 'item_owner_login', $edited_Item->get_creator_login(), '', T_( 'login of this post\'s owner.').'<br/>' );
+		$Form->hidden( 'item_owner_login_displayed', 1 );
 		echo '</td></tr>';
 	}
 
@@ -432,6 +433,9 @@ if( $publishnow_displayed )
 
 /*
  * $Log$
+ * Revision 1.53  2009/11/23 11:58:04  efy-maxim
+ * owner fix
+ *
  * Revision 1.52  2009/11/22 18:52:21  efy-maxim
  * change owner; is login
  *

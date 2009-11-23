@@ -254,6 +254,7 @@ class Item extends ItemLight
 		{ // New item:
 			if( isset($current_User) )
 			{ // use current user as default, if available (which won't be the case during install)
+				$this->creator_user_login = $current_User->login;
 				$this->set_creator_User( $current_User );
 			}
 			$this->set( 'notifications_status', 'noreq' );
@@ -485,13 +486,12 @@ class Item extends ItemLight
 		param( 'item_order', 'double', NULL );
 		$this->set_from_Request( 'order', 'item_order', true );
 
-		if( $current_User->check_perm( 'users', 'edit' ) )
+		$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
+		if( $current_User->check_perm( 'users', 'edit' ) && param( 'item_owner_login_displayed', 'string', NULL ) !== NULL )
 		{   // only admins can change this..
-			$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
-			if( param_check_not_empty( 'item_owner_login', T_('Please enter valid owner login.') )
-					&& param_check_login( 'item_owner_login', true ) )
+			if( param_check_not_empty( 'item_owner_login', T_('Please enter valid owner login.') ) && param_check_login( 'item_owner_login', true ) )
 			{
-				$this->set_creator_by_login( get_param( 'item_owner_login' ) );
+				$this->set_creator_by_login( $this->creator_user_login );
 			}
 		}
 
@@ -4100,6 +4100,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.163  2009/11/23 11:58:04  efy-maxim
+ * owner fix
+ *
  * Revision 1.162  2009/11/22 20:29:38  fplanque
  * minor/doc
  *
