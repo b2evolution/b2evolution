@@ -606,7 +606,8 @@ function skin_description_tag()
 
 		if( empty( $r )&& $Blog->get_setting( 'excerpts_meta_description' ) )
 		{	// Fall back to excerpt for the current single post:
-			$r = preg_replace( '|[\r\n]+|', '', $Item->get('excerpt') );
+			// Replace line breaks with single space
+			$r = preg_replace( '|[\r\n]+|', ' ', $Item->get('excerpt') );
 		}
 	}
 
@@ -894,6 +895,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.77  2009/11/23 00:09:06  sam2kb
+ * Replace line breaks with single space in meta description
+ *
  * Revision 1.76  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *
