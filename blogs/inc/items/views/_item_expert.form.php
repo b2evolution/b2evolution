@@ -49,7 +49,7 @@ global $Settings;
 global $pagenow;
 
 
-global $mode, $admin_url;
+global $mode, $admin_url, $rsc_url;
 global $post_comment_status, $trackback_url, $item_tags;
 global $bozo_start_modified, $creating;
 global $item_title, $item_content;
@@ -353,7 +353,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{
 		echo '<tr><td><strong>'.T_('Owner').':</strong></td><td>';
-		$Form->username( 'item_owner_login', $edited_Item->get_creator_login(), '', T_( 'login of this post\'s owner.').'<br/>' );
+		$Form->username( 'item_owner_login', $edited_Item->get_creator_User(), '', T_( 'login of this post\'s owner.').'<br/>' );
 		$Form->hidden( 'item_owner_login_displayed', 1 );
 		echo '</td></tr>';
 	}
@@ -433,6 +433,9 @@ if( $publishnow_displayed )
 
 /*
  * $Log$
+ * Revision 1.54  2009/11/23 21:50:37  efy-maxim
+ * ajax dropdown
+ *
  * Revision 1.53  2009/11/23 11:58:04  efy-maxim
  * owner fix
  *

@@ -715,17 +715,59 @@ class Form extends Widget
 	 * Build username/login field.
 	 *
 	 * @param string the name of the input field
-	 * @param string initial value TODO: change this to & $User object
-	 * @param integer size of the input field TODO: remove , size should be automatic (I think max length for usernames is 16)
+	 * @param User initial value
+	 * @param integer size of the input field
 	 * @param string label displayed in front of the field
 	 * @param string note displayed with field
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function username( $field_name, $field_value, $field_label, $field_note = '' )
+	function username( $field_name, &$User, $field_label, $field_note = '' )
 	{
+		global $baseurl;
+
 		$field_params = array();
 
-		return $this->text_input( $field_name, $field_value, 12, $field_label, $field_note, $field_params );
+		// TODO: remove , size should be automatic (I think max length for usernames is 16)
+		$field_params['size'] = 16;
+		$field_params['maxlength'] = 16;
+		$field_params['selectBoxOptions'] = '';
+		$field_params['onkeyup'] = 'loginlist_'.$field_name.'();';
+
+		if( !is_null( $User ) )
+		{
+			$field_params['value'] = $User->login;
+		}
+
+		if( !empty($field_note) )
+		{
+			$field_params['note'] = $field_note;
+		}
+
+		$this->handle_common_params( $field_params, $field_name, $field_label );
+
+		$r = $this->begin_field();
+
+		$r .= '<div>';
+		$r .= $this->get_input_element( $field_params );
+		$r .= '</div>';
+		$r .= '<script type="text/javascript">';
+		$r .= 'createEditableSelect(\''.$field_name.'\', \''.$field_name.'_id\');';
+		$r .= 'function loginlist_'.$field_name.'(){';
+		$r .= '$.ajax({';
+		$r .= 'type: \'POST\',';
+		$r .= 'url: \''.$baseurl.'ajax.php\',';
+		$r .= 'data: \'login_list_value=\' + document.getElementById(\''.$field_name.'\').value + \'&action=login_list\',';
+		$r .= 'success: function(html){';
+		$r .= 'var login_list = document.getElementById(\''.$field_name.'\');';
+		$r .= 'login_list.setAttribute(\'selectBoxOptions\', html);';
+		$r .= 'createEditableSelect(\''.$field_name.'\', \''.$field_name.'_id\');';
+		$r .= 'login_list.focus();';
+		$r .= 'showOptions(\''.$field_name.'_id\'); } }); }';
+		$r .= '</script>';
+
+		$r .= $this->end_field();
+
+		return $this->display_or_return( $r );
 	}
 
 
@@ -3011,6 +3053,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.72  2009/11/23 21:50:32  efy-maxim
+ * ajax dropdown
+ *
  * Revision 1.71  2009/11/22 18:52:20  efy-maxim
  * change owner; is login
  *
