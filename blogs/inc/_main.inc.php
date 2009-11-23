@@ -191,6 +191,19 @@ if( isset( $error_message ) )
 }
 
 
+// Check base domain for admin
+load_funcs( '_core/_url.funcs.php' );
+if( !empty($is_admin_page) )
+{	// Make sure we are calling the right page (on the right domain) to make sure that session cookie goes through:
+	if( ! is_same_url( $ReqHost.$ReqPath, $admin_url) )
+	{	// The requested URL does not look like it's under the admin URL...
+		header( 'HTTP/1.1 302 Found' );
+		header( 'Location: '.$admin_url, true, 302 ); // explictly setting the status is required for (fast)cgi
+		exit(0);
+	}
+}
+
+
 /**
  * Load modules.
  *
@@ -254,7 +267,6 @@ $localtimenow = $servertimenow + $time_difference;
 load_class( 'sessions/model/_hit.class.php', 'Hit' );
 // fp> The following constructor requires these right now:
 load_funcs('_core/_param.funcs.php');
-load_funcs('_core/_url.funcs.php');
 
 
 /**
@@ -679,6 +691,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.131  2009/11/23 18:41:17  fplanque
+ * Make sure we are calling the right page (on the right domain) to make sure that session cookie goes through
+ *
  * Revision 1.130  2009/11/20 23:56:39  fplanque
  * minor  + doc
  *
