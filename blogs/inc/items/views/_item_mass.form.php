@@ -134,7 +134,7 @@ for( $i = 1 ; $i <= 3; $i++ )
 	// ---------------------------- TEXTAREA -------------------------------------
 	$Form->fieldstart = '<div>';
 	$Form->fieldend = "</div>\n";
-	$Form->textarea_input( 'content', $item_content, 16, '', array( 'style' => 'width:99%;', 'note' => T_('Separate posts with a blank line'), 'cols' => 40 , 'rows' => 33, 'id' => 'itemform_post_content' ) );
+	$Form->textarea_input( 'content', $item_content, 16, '', array( 'style' => 'width:99%;', 'note' => T_('Separate posts with a blank line. The first line of each post becomes a title.'), 'cols' => 40 , 'rows' => 33, 'id' => 'itemform_post_content' ) );
 	$Form->fieldstart = '<div class="tile">';
 	$Form->fieldend = '</div>';
 	echo '<div style="height:6px"></div>';
@@ -221,6 +221,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.8  2009/11/23 00:35:19  sam2kb
+ * minor
+ *
  * Revision 1.7  2009/10/28 10:30:32  efy-maxim
  * 6px
  *
