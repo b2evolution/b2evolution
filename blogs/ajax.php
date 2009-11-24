@@ -155,4 +155,11 @@ switch( $action )
 		break;
 }
 
+
+/*
+ * $Log$
+ * Revision 1.3  2009/11/24 22:11:54  efy-maxim
+ * log
+ *
+ */
 ?>
