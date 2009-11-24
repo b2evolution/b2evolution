@@ -1,5 +1,7 @@
 <?php
 
+// TODO: dh> Why wouldn't you use htsrv/async.php?
+
 require_once dirname(__FILE__).'/conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 
@@ -158,6 +160,9 @@ switch( $action )
 
 /*
  * $Log$
+ * Revision 1.4  2009/11/24 23:17:51  blueyed
+ * todo
+ *
  * Revision 1.3  2009/11/24 22:11:54  efy-maxim
  * log
  *
