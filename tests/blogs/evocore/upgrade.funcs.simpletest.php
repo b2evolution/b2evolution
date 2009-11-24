@@ -417,8 +417,8 @@ class UpgradeFuncsTestCase extends EvoDbUnitTestCase
 
 		$this->assertTrue( isset($r["$GLOBALS[tableprefix]test_1"]) );
 		$this->assertEqual( count($r["$GLOBALS[tableprefix]test_1"]), 2 );
-		$this->assertEqual( "ALTER TABLE $GLOBALS[tableprefix]test_1 ADD PRIMARY KEY i ( i )", $r["$GLOBALS[tableprefix]test_1"][0]['queries'][0] );
-		$this->assertEqual( "ALTER TABLE $GLOBALS[tableprefix]test_1 DROP INDEX i", $r["$GLOBALS[tableprefix]test_1"][1]['queries'][0] );
+		$this->assertEqual( "ALTER TABLE $GLOBALS[tableprefix]test_1 DROP INDEX i", $r["$GLOBALS[tableprefix]test_1"][0]['queries'][0] );
+		$this->assertEqual( "ALTER TABLE $GLOBALS[tableprefix]test_1 ADD PRIMARY KEY i ( i )", $r["$GLOBALS[tableprefix]test_1"][1]['queries'][0] );
 	}
 
 
@@ -1162,6 +1162,31 @@ class UpgradeFuncsTestCase extends EvoDbUnitTestCase
 			j decimal(4,2) default '0.00'
 		);");
 	}
+
+
+	function test_drop_old_index_before_create_new()
+	{
+		$old_sql = "CREATE TABLE $GLOBALS[tableprefix]test_1 (
+			i VARCHAR(255),
+			j VARCHAR(255),
+			k VARCHAR(255),
+			FULLTEXT INDEX `myindex` (`i`, `j`, `k`) ) ENGINE=MyISAM";
+		$new_sql = "CREATE TABLE $GLOBALS[tableprefix]test_1 (
+			i VARCHAR(255),
+			j VARCHAR(255),
+			k VARCHAR(255),
+			FULLTEXT INDEX `myindex` (`i`, `j`) ) ENGINE=MyISAM";
+		$this->test_DB->query($old_sql);
+		$r = $this->db_delta_wrapper($new_sql);
+
+		$this->assertEqual( count($r["$GLOBALS[tableprefix]test_1"]), 2 );
+		$this->assertEqual( count($r["$GLOBALS[tableprefix]test_1"][0]['queries']), 1 );
+		$this->assertEqual( $r["$GLOBALS[tableprefix]test_1"][0]['queries'][0], 'ALTER TABLE evo_tests_test_1 DROP INDEX myindex' );
+
+		$this->assertEqual( count($r["$GLOBALS[tableprefix]test_1"][1]['queries']), 1 );
+		$this->assertEqual( $r["$GLOBALS[tableprefix]test_1"][1]['queries'][0], 'ALTER TABLE evo_tests_test_1 ADD FULLTEXT INDEX `myindex` (`i`, `j`)');
+	}
+
 
 
 	/**

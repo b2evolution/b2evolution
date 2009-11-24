@@ -319,7 +319,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 					'create_definition' => $create_definition,
 				);
 
-				if( ! preg_match( '~^(PRIMARY(?:\s+KEY)|UNIQUE(?:\s+(?:INDEX|KEY))?|KEY|INDEX|FULLTEXT\s+KEY) (?:\s+([`"])?(\w+)\\2?)? (\s+USING \w+)? \s* \((.*)\)$~ix', $create_definition, $match ) )
+				if( ! preg_match( '~^(PRIMARY(?:\s+KEY)|(?:FULLTEXT|UNIQUE)(?:\s+(?:INDEX|KEY))?|KEY|INDEX) (?:\s+([`"])?(\w+)\\2?)? (\s+USING \w+)? \s* \((.*)\)$~ix', $create_definition, $match ) )
 				{ // invalid type, should not happen
 					debug_die( 'Invalid type in $indices: '.$create_definition );
 					// TODO: add test: Invalid type in $indices: KEY "coord" ("lon","lat")
@@ -1056,7 +1056,8 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 		array_shift( $items[$table_lowered] );
 
 		// Add the remaining indices (which are not "inline" with a column definition and therefor already handled):
-		foreach( $indices as $index )
+		$add_index_queries = array();
+		foreach( $indices as $k => $index )
 		{
 			if( empty($index['create_definition']) )
 			{ // skip "inline"
@@ -1068,14 +1069,35 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				$query .= ' DROP PRIMARY KEY,';
 				unset( $obsolete_indices['PRIMARY'] );
 			}
-			// Push a query line into $items that adds the index to that table
-			$items[$table_lowered][] = array(
+
+			// Create a query that adds the index to the table
+			$query = array(
 				'queries' => array($query.' ADD '.$index['create_definition']),
 				'note' => 'Added index <strong>'.$index['create_definition'].'</strong>',
 				'type' => 'add_index' );
+
+			// Check if the index creation has to get appended after any DROPs (required for indices with the same name)
+			$append_after_drops = false;
+			foreach( $obsolete_indices as $obsolete_index )
+			{
+				if( strtolower($obsolete_index['name']) == strtolower($index['name']) )
+				{
+					$append_after_drops = true;
+					break;
+				}
+			}
+			if( $append_after_drops )
+			{ // do this after any DROPs (i.e. KEY name changes)
+				$add_index_queries[] = $query;
+			}
+			else
+			{ // this needs to get done before any other DROPs
+				// to prevent e.g. "Incorrect table definition; there can be only one auto column and it must be defined as a key(Errno=1075)"
+				$items[$table_lowered][] = $query;
+			}
 		}
 
-
+		// Now add queries to drop any (maybe changed!) indices
 		foreach( $obsolete_indices as $index_info )
 		{
 			// Push a query line into $items that drops the index from the table
@@ -1084,6 +1106,9 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				'note' => 'Dropped index <strong>'.$index_info['name'].'</strong>',
 				'type' => 'drop_index' );
 		}
+
+		// Add queries to (re)create (maybe changed indices) to the end
+		$items[$table_lowered] = array_merge($items[$table_lowered], $add_index_queries);
 	}
 
 
@@ -1239,6 +1264,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.14  2009/11/24 01:13:30  blueyed
+ * db_delta: another fix for fulltext indices, and another for renaming of indices, where the old one has to be dropped before the new one can be created.
+ *
  * Revision 1.13  2009/11/16 14:53:48  tblue246
  * db_delta_remove_quotes(): Do not call strlen() on every for loop iteration.
  *
