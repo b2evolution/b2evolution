@@ -76,80 +76,132 @@ if( $blog )
 		$nb_blocks_displayed++;
 
 		// TODO: fix badge with real numebr (wich may be greater than 5!)
-		$block_item_Widget->title = T_('Comments awaiting moderation').' <span class="badge">'.$CommentList->result_num_rows.'</span>';
+		$block_item_Widget->title = T_('Comments awaiting moderation').' <span id="badge" class="badge"></span>';
+
+		echo '<div id="comments_block">';
+
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
-    /**
-		 * @var Comment
-		 */
-		while( $Comment = & $CommentList->get_next() )
-		{ // Loop through comments:
-
-			echo '<div class="dashboard_post dashboard_post_'.($CommentList->current_idx % 2 ? 'even' : 'odd' ).'">';
-
-			echo '<div class="floatright"><span class="note status_'.$Comment->status.'">';
-			$Comment->status();
-			echo '</div>';
-
-			echo '<h3 class="dashboard_post_title">';
-			echo $Comment->get_title(array('author_format'=>'<strong>%s</strong>'));
-			$comment_Item = & $Comment->get_Item();
-			echo ' '.T_('in response to')
-					.' <a href="?ctrl=items&amp;blog='.$comment_Item->get_blog_ID().'&amp;p='.$comment_Item->ID.'"><strong>'.$comment_Item->dget('title').'</strong></a>';
-
-			echo '</h3>';
-
-			echo '<div class="notes">';
-			$Comment->rating( array(
-					'before'      => '',
-					'after'       => ' &bull; ',
-					'star_class'  => 'top',
-				) );
-			$Comment->date();
-			if( $Comment->author_url( '', ' &bull; Url: <span class="bUrl">', '</span>' ) )
-			{
-				if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-				{ // There is an URL and we have permission to ban...
-					// TODO: really ban the base domain! - not by keyword
-					echo ' <a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(get_ban_domain($Comment->author_url))
-						.'">'.get_icon( 'ban' ).'</a> ';
-				}
-			}
-			$Comment->author_email( '', ' &bull; Email: <span class="bEmail">', '</span> &bull; ' );
-			$Comment->author_ip( 'IP: <span class="bIP">', '</span> &bull; ' );
-			$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No Spam Karma') );
-			echo '</div>';
-		 ?>
-
-
-		<div class="small">
-			<?php $Comment->content() ?>
-		</div>
-
-		<div class="dashboard_action_area">
-		<?php
-			// Display edit button if current user has the rights:
-			$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton');
-
-			// Display publish NOW button if current user has the rights:
-			$Comment->publish_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', true );
-
-			// Display deprecate button if current user has the rights:
-			$Comment->deprecate_link( ' ', ' ', '#', '#', 'DeleteButton', '&amp;', true );
-
-			// Display delete button if current user has the rights:
-			$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton');
-		?>
-		<div class="clear"></div>
-		</div>
-
-
-		<?php
-			echo '</div>';
-		}
+		echo '<div id="comments_container"></div>';
 
 		$block_item_Widget->disp_template_raw( 'block_end' );
+
+		echo '</div>';
+
+		?>
+
+		<script type="text/javascript">
+
+			function updateBadge()
+			{
+				$.ajax({
+				type: 'POST',
+				url: '<?php echo $baseurl; ?>ajax.php',
+				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=get_comments_awaiting_moderation_number',
+				success: function(result)
+				{
+					if(result == '0')
+					{
+						var div = document.getElementById('comments_block');
+						var parent = div.parentNode;
+						parent.removeChild(div);
+					}
+					else
+					{
+						unloadCommentsAwaitingModeration();
+
+						var badge = document.getElementById('badge');
+						badge.innerHTML = result;
+
+						loadCommentsAwaitingModeration();
+					}
+				} });
+			}
+
+			function loadCommentsAwaitingModeration()
+			{
+				$.ajax({
+				type: 'POST',
+				url: '<?php echo $baseurl; ?>ajax.php',
+				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=get_comments_awaiting_moderation',
+				success: function(result)
+				{
+					var div = document.getElementById('comments_container');
+					div.innerHTML = result;
+
+				} });
+			}
+
+			function unloadCommentsAwaitingModeration()
+			{
+				var div = document.getElementById('comments_container');
+				if (div.hasChildNodes())
+				{
+				    while (div.childNodes.length >= 1)
+				    {
+				    	div.removeChild(div.firstChild);
+				    }
+				}
+			}
+
+			function processResult(result, id, background)
+			{
+				if(result == '1')
+				{
+					updateBadge();
+				}
+				else
+				{
+					var div = document.getElementById(id);
+					div.style.backgroundColor = background;
+					alert(result);
+				}
+			}
+
+			function setCommentStatus(id, status)
+			{
+				var divid = 'comment_' + id;
+				var div = document.getElementById(divid);
+				var background = div.style.backgroundColor;
+				switch(status)
+				{
+					case 'published':
+						div.style.backgroundColor  = 'green';
+						break;
+					case 'deprecated':
+						div.style.backgroundColor  = 'grey';
+						break;
+				};
+
+				$.ajax({
+				type: 'POST',
+				url: '<?php echo $baseurl; ?>ajax.php',
+				data: 'commentid=' + id + '&status=' + status + '&action=set_comment_status',
+				success: function(result) { processResult(result, divid, background);	} });
+			}
+
+			function deleteComment(id)
+			{
+				var divid = 'comment_' + id;
+				var div = document.getElementById(divid);
+				var background = div.style.backgroundColor;
+				div.style.backgroundColor = 'red';
+
+				$.ajax({
+				type: 'POST',
+				url: '<?php echo $baseurl; ?>ajax.php',
+				data: 'commentid=' + id + '&action=delete_comment',
+				success: function(result) { processResult(result, divid, background); } });
+			}
+
+			updateBadge();
+		</script>
+		<?php
 	}
+
+	global $baseurl;
+
+
 
 
 	/*
@@ -503,6 +555,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.42  2009/11/24 22:09:24  efy-maxim
+ * dashboard comments - ajax
+ *
  * Revision 1.41  2009/11/22 20:05:12  fplanque
  * highlight statuses on dashboard
  *

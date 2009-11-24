@@ -339,8 +339,8 @@ class Comment extends DataObject
 			return $this->author_url;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Template function: display the avatar of the comment's author.
 	 *
@@ -352,8 +352,8 @@ class Comment extends DataObject
 			echo $r;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Get the avatar of the comment's author.
 	 *
@@ -391,7 +391,7 @@ class Comment extends DataObject
 				$img_url .='&amp;size='.$params['size'];
 
 			if( !empty($params['default']) )
-				$img_url .= '&amp;default='.urlencode($params['default']);				
+				$img_url .= '&amp;default='.urlencode($params['default']);
 		}
 		$img_params = array(
 			'src' => $img_url,
@@ -405,7 +405,7 @@ class Comment extends DataObject
 			$img_params['class'] = $class;
 		}
 		$imgtag = '<img'.get_field_attribs_as_string($img_params).' />';
-		
+
 		return $imgtag;
 	}
 
@@ -676,8 +676,11 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param boolean true to make this a button instead of a link
+	 * @param string glue between url params
+	 * @param boolean save context?
+	 * @param boolean true if create AJAX button
 	 */
-	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button = false, $glue = '&amp;', $save_context = true )
+	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button = false, $glue = '&amp;', $save_context = true, $ajax_button = false )
 	{
 		global $current_User, $admin_url;
 
@@ -709,28 +712,39 @@ class Comment extends DataObject
 		if( $title == '#' ) $title = T_('Delete this comment');
 
 		$url = $admin_url.'?ctrl=comments&amp;action=delete&amp;comment_ID='.$this->ID;
-   	if( $save_context )
+   		if( $save_context )
 		{
 			$url .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
 		}
 
 		echo $before;
-		if( $button )
-		{ // Display as button
-			echo '<input type="button"';
-			echo ' value="'.$text.'" title="'.$title.'" onclick="if ( confirm(\'';
-			echo TS_('You are about to delete this comment!\\nThis cannot be undone!');
-			echo '\') ) { document.location.href=\''.$url.'\' }"';
-			if( !empty( $class ) ) echo ' class="'.$class.'"';
-			echo '/>';
-		}
-		else
-		{ // Display as link
-			echo '<a href="'.$url.'" title="'.$title.'" onclick="return confirm(\'';
+		if( $ajax_button )
+		{
+			echo '<a href="javascript:deleteComment('.$this->ID.');" title="'.$title.'" onclick="return confirm(\'';
 			echo TS_('You are about to delete this comment!\\nThis cannot be undone!');
 			echo '\')"';
 			if( !empty( $class ) ) echo ' class="'.$class.'"';
 			echo '>'.$text.'</a>';
+		}
+		else
+		{
+			if( $button )
+			{ // Display as button
+				echo '<input type="button"';
+				echo ' value="'.$text.'" title="'.$title.'" onclick="if ( confirm(\'';
+				echo TS_('You are about to delete this comment!\\nThis cannot be undone!');
+				echo '\') ) { document.location.href=\''.$url.'\' }"';
+				if( !empty( $class ) ) echo ' class="'.$class.'"';
+				echo '/>';
+			}
+			else
+			{ // Display as link
+				echo '<a href="'.$url.'" title="'.$title.'" onclick="return confirm(\'';
+				echo TS_('You are about to delete this comment!\\nThis cannot be undone!');
+				echo '\')"';
+				if( !empty( $class ) ) echo ' class="'.$class.'"';
+				echo '>'.$text.'</a>';
+			}
 		}
 		echo $after;
 
@@ -748,8 +762,9 @@ class Comment extends DataObject
 	 * @param string class name
 	 * @param string glue between url params
 	 * @param boolean save context?
+	 * @param boolean true if create AJAX button
 	 */
-	function get_deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true )
+	function get_deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
 	{
 		global $current_User, $admin_url;
 
@@ -768,11 +783,20 @@ class Comment extends DataObject
 
 		$r = $before;
 		$r .= '<a href="';
-		$r .= $admin_url.'?ctrl=comments'.$glue.'action=deprecate'.$glue.'comment_ID='.$this->ID;
-   	if( $save_context )
+
+		if( $ajax_button )
 		{
-			$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
+			$r .= 'javascript:setCommentStatus('.$this->ID.', \'deprecated\');';
 		}
+		else
+		{
+			$r .= $admin_url.'?ctrl=comments'.$glue.'action=deprecate'.$glue.'comment_ID='.$this->ID;
+	   		if( $save_context )
+			{
+				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
+			}
+		}
+
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 		$r .= '>'.$text.'</a>';
@@ -792,10 +816,11 @@ class Comment extends DataObject
 	 * @param string class name
 	 * @param string glue between url params
 	 * @param boolean save context?
+	 * @param boolean true if create AJAX button
 	 */
-	function deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true )
+	function deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
 	{
-		echo $this->get_deprecate_link( $before, $after, $text, $title, $class, $glue, $save_context );
+		echo $this->get_deprecate_link( $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button );
 	}
 
 
@@ -809,8 +834,9 @@ class Comment extends DataObject
 	 * @param string class name
 	 * @param string glue between url params
 	 * @param boolean save context?
+	 * @param boolean true if create AJAX button
 	 */
-	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true )
+	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
 	{
 		global $current_User, $admin_url;
 
@@ -829,11 +855,19 @@ class Comment extends DataObject
 
 		$r = $before;
 		$r .= '<a href="';
-		$r .= $admin_url.'?ctrl=comments'.$glue.'action=publish'.$glue.'comment_ID='.$this->ID;
-   	if( $save_context )
+		if( $ajax_button )
 		{
-			$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
+			$r .= 'javascript:setCommentStatus('.$this->ID.', \'published\');';
 		}
+		else
+		{
+			$r .= $admin_url.'?ctrl=comments'.$glue.'action=publish'.$glue.'comment_ID='.$this->ID;
+	   		if( $save_context )
+			{
+				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
+			}
+		}
+
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 		$r .= '>'.$text.'</a>';
@@ -853,10 +887,11 @@ class Comment extends DataObject
 	 * @param string class name
 	 * @param string glue between url params
 	 * @param boolean save context?
+	 * @param boolean true if create AJAX button
 	 */
-	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true )
+	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
 	{
-		echo $this->get_publish_link( $before, $after, $text, $title, $class, $glue, $save_context );
+		echo $this->get_publish_link( $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button );
 	}
 
 
@@ -1463,6 +1498,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.41  2009/11/24 22:09:24  efy-maxim
+ * dashboard comments - ajax
+ *
  * Revision 1.40  2009/09/30 00:38:14  sam2kb
  * Space is not needed before get_field_attribs_as_string()
  *
