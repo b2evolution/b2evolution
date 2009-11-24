@@ -849,7 +849,8 @@ class Hit
 			{
 				$sql_agent_types[] = 'unknown';
 			}
-			
+
+			$DB->begin(); // this _should_ be atomic
 			if( $rows = $DB->get_results( "
 				SELECT agnt_ID, agnt_type FROM T_useragents
 				 WHERE agnt_signature = ".$DB->quote( $this->get_user_agent() )."
@@ -863,33 +864,32 @@ class Hit
 						$DB->query( "
 							UPDATE T_useragents
 							   SET agnt_type = ".$DB->quote($sql_agent_types[0])."
-							   WHERE agnt_ID = ".$this->agent_ID );
+							 WHERE agnt_ID = ".$this->agent_ID );
 					}
 				}
 				else
-				{ // two rows selected: "unknown" and detected type. This might be rows from before the case above was handled.
-					if( count($rows) != 2 )
-					{
-						debug_die('get_agent_ID: assertion failed: "unknown"+this != 2');
-					}
-					
+				{ // Two (or more) rows selected.
+					// Typically this is "unknown" and detected type (from before the case above was handled).
+					// But this might also be two "rss" entries, or even two (or more) "unknown" (since this is not atomic here!)
+					$existing_ids = array();
 					foreach($rows as $row)
 					{
 						if( $row->agnt_type == 'unknown' )
-						{
-							$unknown_id = $row->agnt_ID;
+						{ // append "unknown" at the end
+							$existing_ids[] = $row->agnt_ID;
 						}
 						else
 						{
-							$this->agent_ID = $row->agnt_ID;
+							array_unshift($existing_ids, $row->agnt_ID);
 						}
 					}
+					$this->agent_ID = array_shift($existing_ids);
 					// Convert entries
 					$DB->query( '
 						UPDATE T_hitlog
 						   SET hit_agnt_ID = '.$this->agent_ID.'
-						   WHERE hit_agnt_ID = '.$unknown_id );
-					$DB->query( 'DELETE FROM T_useragents WHERE agnt_ID = '.$unknown_id );
+						   WHERE hit_agnt_ID IN ('.$DB->quote($existing_ids).')' );
+					$DB->query( 'DELETE FROM T_useragents WHERE agnt_ID IN ('.$DB->quote($existing_ids).')' );
 				}
 			}
 			else
@@ -900,6 +900,7 @@ class Hit
 
 				$this->agent_ID = $DB->insert_id;
 			}
+			$DB->commit();
 		}
 		return $this->agent_ID;
 	}
@@ -1223,6 +1224,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.47  2009/11/24 01:03:00  blueyed
+ * Fix transformation of duplicate entries in T_useragents.
+ *
  * Revision 1.46  2009/11/15 19:05:44  fplanque
  * no message
  *
