@@ -15,6 +15,8 @@ require_once( dirname(__FILE__).'/../config.simpletest.php' );
  */
 class SecurityChecksTestCase extends EvoUnitTestCase
 {
+	const slow_testcase = true;
+
 	/**
 	 * Below are the valid entry points.
 	 * These include files that properly initalize the config before doing anything (config proxies), thus making sure no
@@ -73,44 +75,9 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 		'inc/locales/_locale.funcs.php',
 	);
 
-	function SecurityChecksTestCase()
+	function __construct()
 	{
 		parent::__construct( 'Security tests' );
-	}
-
-
-	/**
-	 * Get all files below a path, excluding symlinks.
-	 * @return array
-	 */
-	function get_files_without_symlinks( $path, $pattern = '~\.(php|inc|html?)$~' )
-	{
-		$r = array();
-		foreach( get_filenames( $path, false, true, true, false ) as $dir )
-		{
-			if( is_link($dir) )
-			{
-				continue;
-			}
-
-			// files:
-			$files = get_filenames( $dir, true, false, true, false );
-			if( $pattern )
-			{
-				foreach( $files as $k => $v )
-				{
-					if( ! preg_match( $pattern, $v ) )
-					{ // Not a PHP file (include HTM(L), because it gets parsed sometimes, too)
-						unset($files[$k]);
-					}
-				}
-			}
-			$r = array_merge( $r, $files );
-
-			// subdirs:
-			$r = array_merge( $r, $this->get_files_without_symlinks($dir));
-		}
-		return $r;
 	}
 
 

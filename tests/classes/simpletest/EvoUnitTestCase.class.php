@@ -32,6 +32,13 @@ load_class( 'files/model/_filetype.class.php', 'FileType' );
 class EvoUnitTestCase extends UnitTestCase
 {
 	/**
+	 * Is this a slow / long running testcase?
+	 * This might be useful to skip later on.
+	 */
+	const slow_testcase = NULL;
+
+
+	/**
 	 * Setup required globals
 	 */
 	function setUp()
@@ -87,6 +94,41 @@ class EvoUnitTestCase extends UnitTestCase
 	function my_skip_message($message)
 	{
 		$this->reporter->paintSkip($message . $this->getAssertionLine());
+	}
+
+
+	/**
+	 * Get all files below a path, excluding symlinks.
+	 * @return array
+	 */
+	function get_files_without_symlinks( $path, $pattern = '~\.(php|inc|html?)$~' )
+	{
+		$r = array();
+		foreach( get_filenames( $path, false, true, true, false ) as $dir )
+		{
+			if( is_link($dir) )
+			{
+				continue;
+			}
+
+			// files:
+			$files = get_filenames( $dir, true, false, true, false );
+			if( $pattern )
+			{
+				foreach( $files as $k => $v )
+				{
+					if( ! preg_match( $pattern, $v ) )
+					{ // Not a PHP file (include HTM(L), because it gets parsed sometimes, too)
+						unset($files[$k]);
+					}
+				}
+			}
+			$r = array_merge( $r, $files );
+
+			// subdirs:
+			$r = array_merge( $r, $this->get_files_without_symlinks($dir));
+		}
+		return $r;
 	}
 }
 
