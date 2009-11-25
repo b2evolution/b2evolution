@@ -75,7 +75,7 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 
 	function SecurityChecksTestCase()
 	{
-		$this->EvoUnitTestCase( 'Security tests' );
+		parent::__construct( 'Security tests' );
 	}
 
 
