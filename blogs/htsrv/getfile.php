@@ -66,7 +66,6 @@ if( ! $public_access_to_media )
 	{	// No blog ID, we will check the global group perm
 		$perm_blog = NULL;
 	}
-	//pre_dump( $perm_blog );
 
 	// Check permission (#2):
 	$current_User->check_perm( 'files', 'view', true, $perm_blog );
@@ -114,14 +113,11 @@ if( !empty($size) && $File->is_image() )
 	list( $thumb_type, $thumb_width, $thumb_height, $thumb_quality ) = $thumbnail_sizes[$size_name];
 
 	$Filetype = & $File->get_Filetype();
-	// pre_dump( $Filetype );
 	// TODO: dh> Filetype may be NULL here! see also r1.18 (IIRC)
 	$mimetype = $Filetype->mimetype;
-	// pre_dump( $mimetype );
 
 	// Try to output the cached thumbnail:
 	$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime );
-	//pre_dump( $err );
 
 	if( $err == '!Thumbnail not found in .evocache' )
 	{	// The thumbnail wasn't already in the cache, try to generate and cache it now:
@@ -208,6 +204,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.42  2009/11/25 00:44:29  blueyed
+ * remove pre_dumps
+ *
  * Revision 1.41  2009/11/11 20:16:15  fplanque
  * doc
  *
