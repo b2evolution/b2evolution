@@ -247,7 +247,12 @@ if( $blog )
 			echo '</div>';
 
 			echo '<h3 class="dashboard_post_title">';
-			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget( 'title' ).'</a>';
+			$item_title = $Item->dget('title');
+			if( ! strlen($item_title) )
+			{
+				$item_title = '['.format_to_output(T_('No title')).']';
+			}
+			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$item_title.'</a>';
 			echo ' <span class="dashboard_post_details">';
 			$Item->status( array(
 					'before' => '<div class="floatright"><span class="status_'.$Item->status.'">',
@@ -310,7 +315,12 @@ if( $blog )
 			echo '</div>';
 
 			echo '<h3 class="dashboard_post_title">';
-			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget( 'title' ).'</a>';
+			$item_title = $Item->dget('title');
+			if( ! strlen($item_title) )
+			{
+				$item_title = '['.format_to_output(T_('No title')).']';
+			}
+			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$item_title.'</a>';
 			echo ' <span class="dashboard_post_details">';
 			$Item->status( array(
 					'before' => '<div class="floatright"><span class="status_'.$Item->status.'">',
@@ -555,6 +565,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.43  2009/11/25 01:33:37  blueyed
+ * Dashboard: display 'no title' if there is an empty title.
+ *
  * Revision 1.42  2009/11/24 22:09:24  efy-maxim
  * dashboard comments - ajax
  *
