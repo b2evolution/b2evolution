@@ -40,7 +40,7 @@ class ItemFuncsTestCase extends EvoUnitTestCase
 		$old_evo_charset = $evo_charset;
 
 		// For ISO-8859-1:
-		$evo_charset = 'ISO-8859-1';
+		$evo_charset = 'ISO-8859-1'; // this will trigger "ä" => "ae".. (since iconv appears to handle "ä" in latin1 different to "ä" in utf8 - for locale "en-US")
 		foreach( array(
 					//     arg1               arg2                    expected result
 					array( '  ', ' :: çà c\'est "VRAIMENT" tôa! ', 'ca-c-est-vraiment-toa' ),
@@ -99,7 +99,7 @@ class ItemFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( bpost_count_words( 'möre (again 3) ümläüts... öö üü ää ÄÄ ÖÖ ÜÜ' ), 9 );
 		$this->assertEqual( bpost_count_words( 'russian: Расширенные возможности - это удобный' ), 5 );
 		$this->assertEqual( bpost_count_words( 'A versão foi apelidade de Tilqi, porque era aniversário dele. numbers: 42' ), 11 );
-		$this->assertEqual( bpost_count_words( 'HTML tags -> <a href="http://b2evolution.net" target="_blank">visit b2evo!</a>. Some other chars: "\' \' " <<< < >>> > ``` -- versão удобный überladen' ), 10 ); 
+		$this->assertEqual( bpost_count_words( 'HTML tags -> <a href="http://b2evolution.net" target="_blank">visit b2evo!</a>. Some other chars: "\' \' " <<< < >>> > ``` -- versão удобный überladen' ), 10 );
 
 		$evo_charset = $old_evo_charset;
 	}
