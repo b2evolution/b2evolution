@@ -44,7 +44,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * @author Tilman BLUMENBACH - tblue246
  * @todo Tblue> Try more locales.
- * 
+ *
  * @param string The string to transliterate.
  * @param NULL|string The post locale. NULL to not try switching to it.
  * @return string|boolean The transliterated ASCII string on success or false on failure.
@@ -171,6 +171,9 @@ function replace_special_chars( $str, $post_locale = NULL )
 
 /*
  * $Log$
+ * Revision 1.9  2009/11/25 01:33:53  blueyed
+ * whitespace
+ *
  * Revision 1.8  2009/11/19 17:25:09  tblue246
  * Make evo_iconv_transliterate() aware of the post locale
  *
