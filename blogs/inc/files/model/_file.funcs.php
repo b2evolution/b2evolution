@@ -400,9 +400,16 @@ function no_trailing_slash( $path )
 	}
 }
 
+
+/**
+ * Remove leading slash, if any.
+ *
+ * @param string
+ * @return string
+ */
 function no_leading_slash( $path )
 {
-	if( $path[0] == '/' )
+	if( isset($path[0]) && $path[0] == '/' )
 	{
 		return substr( $path, 1 );
 	}
@@ -411,7 +418,6 @@ function no_leading_slash( $path )
 		return $path;
 	}
 }
-
 
 
 /**
@@ -856,6 +862,9 @@ if ( !function_exists('sys_get_temp_dir'))
 
 /*
  * $Log$
+ * Revision 1.29  2009/11/25 00:47:57  blueyed
+ * doc. fix notice.
+ *
  * Revision 1.28  2009/11/11 19:12:56  fplanque
  * Inproved actions after uploaded
  *
