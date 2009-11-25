@@ -1864,7 +1864,6 @@ class File extends DataObject
 	function output_cached_thumb( $size_name, $thumb_mimetype, $mtime = NULL )
 	{
 		$af_thumb_path = $this->get_af_thumb_path( $size_name, $thumb_mimetype, false );
-		//pre_dump($af_thumb_path);
 		if( $af_thumb_path[0] != '!' )
 		{	// We obtained a path for the thumbnail to be saved:
 			if( ! file_exists( $af_thumb_path ) )
@@ -1957,6 +1956,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.71  2009/11/25 00:45:51  blueyed
+ * minor
+ *
  * Revision 1.70  2009/11/11 20:16:14  fplanque
  * doc
  *
