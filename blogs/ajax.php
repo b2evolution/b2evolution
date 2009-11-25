@@ -6,6 +6,7 @@ require_once dirname(__FILE__).'/conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 
 global $DB;
+global $current_User;
 
 $action = param_action();
 
@@ -39,17 +40,29 @@ switch( $action )
 	case 'get_comments_awaiting_moderation':
 
 		$blog_ID = param( 'blogid', 'integer' );
+		$current_User->check_perm( 'blog_ismember', 1, true, $blog_ID );
+
+		$limit = 5;
+
+		$comment_IDs = array();
+		$ids = param( 'ids', 'string', NULL );
+		if( !empty( $ids ) )
+		{
+			$comment_IDs = explode( ',', $ids );
+			$limit = $limit - count( $comment_IDs );
+		}
 
 		$BlogCache = & get_BlogCache();
-
 		$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 
-		$CommentList = & new CommentList( $Blog, "'comment','trackback','pingback'", array( 'draft' ), '',	'',	'DESC',	'',	5 );
+		$CommentList = & new CommentList( $Blog, "'comment','trackback','pingback'", array( 'draft' ), '',	'',	'DESC',	'',	$limit, $comment_IDs );
 
+		$new_comment_IDs = array();
 		while( $Comment = & $CommentList->get_next() )
 		{ // Loop through comments:
-			echo '<div id="comment_'.$Comment->ID.'" class="dashboard_post dashboard_post_'.($CommentList->current_idx % 2 ? 'even' : 'odd' ).'">';
+			$new_comment_IDs[] = $Comment->ID;
 
+			echo '<div id="comment_'.$Comment->ID.'" class="dashboard_post dashboard_post_'.($CommentList->current_idx % 2 ? 'even' : 'odd' ).'">';
 			echo '<div class="floatright"><span class="note status_'.$Comment->status.'">';
 			$Comment->status();
 			echo '</div>';
@@ -105,21 +118,20 @@ switch( $action )
 		<div class="clear"></div>
 		</div>
 
-
 		<?php
 			echo '</div>';
 		}
+
+		echo '<input type="hidden" id="comments_'.param( 'ind', 'string' ).'" value="'.implode( ',', $new_comment_IDs ).'"/>';
 
 		break;
 
 	case 'get_comments_awaiting_moderation_number':
 
-		global $DB;
-
 		$blog_ID = param( 'blogid', 'integer' );
+		$current_User->check_perm( 'blog_ismember', 1, true, $blog_ID );
 
 		$BlogCache = & get_BlogCache();
-
 		$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 
 		$sql = 'SELECT COUNT(*)
@@ -140,6 +152,9 @@ switch( $action )
 
 	case 'set_comment_status':
 
+		$blog_ID = param( 'blogid', 'integer' );
+		$current_User->check_perm( 'blog_comments', 'edit', true, $blog_ID );
+
 		$edited_Comment = Comment_get_by_ID( param( 'commentid', 'integer' ) );
 		$status = param( 'status', 'string' );
 		$edited_Comment->set('status', $status );
@@ -150,6 +165,9 @@ switch( $action )
 
 	case 'delete_comment':
 
+		$blog_ID = param( 'blogid', 'integer' );
+		$current_User->check_perm( 'blog_comments', 'edit', true, $blog_ID );
+
 		$edited_Comment = Comment_get_by_ID( param( 'commentid', 'integer' ) );
 		$edited_Comment->dbdelete();
 		echo '1';
@@ -157,9 +175,11 @@ switch( $action )
 		break;
 }
 
-
 /*
  * $Log$
+ * Revision 1.5  2009/11/25 16:05:01  efy-maxim
+ * comments awaiting moderation improvements
+ *
  * Revision 1.4  2009/11/24 23:17:51  blueyed
  * todo
  *

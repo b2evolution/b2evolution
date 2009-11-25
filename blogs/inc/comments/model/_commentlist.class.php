@@ -54,7 +54,8 @@ class CommentList extends DataObjectList
 		$author = '',													// Not used yet
 		$order = 'DESC',											// ASC or DESC
 		$orderby = '',												// list of fields to order by
-		$limit = '' 													// # of comments to display on the page
+		$limit = '',
+		$exclude = array()											// # of comments to display on the page
 		)
 	{
 		global $DB;
@@ -93,6 +94,11 @@ class CommentList extends DataObjectList
 		// TODO: handle status dependencies with post
 		$this->sql .= ' AND '.statuses_where_clause();
 
+		// Exclude comments
+		if( !empty( $exclude ) )
+		{
+			$this->sql .= ' AND comment_ID NOT IN ('.implode( ",", $exclude ).')';
+		}
 
 		// order by stuff
 		if( (!empty($order)) && !in_array( strtoupper($order), array( 'ASC', 'DESC', 'RAND' ) ) )
@@ -167,6 +173,9 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.13  2009/11/25 16:05:02  efy-maxim
+ * comments awaiting moderation improvements
+ *
  * Revision 1.12  2009/09/14 12:46:36  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

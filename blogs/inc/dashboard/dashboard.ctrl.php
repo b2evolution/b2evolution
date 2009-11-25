@@ -88,10 +88,16 @@ if( $blog )
 
 		echo '</div>';
 
+		global $baseurl;
+
 		?>
 
 		<script type="text/javascript">
 
+			var commentIds = new Array();
+			var commentsInd = 0;
+
+			// Update badge
 			function updateBadge()
 			{
 				$.ajax({
@@ -102,107 +108,122 @@ if( $blog )
 				{
 					if(result == '0')
 					{
-						var div = document.getElementById('comments_block');
-						var parent = div.parentNode;
-						parent.removeChild(div);
+						$('#comments_block').remove();
 					}
 					else
 					{
-						unloadCommentsAwaitingModeration();
-
-						var badge = document.getElementById('badge');
-						badge.innerHTML = result;
-
-						loadCommentsAwaitingModeration();
+						$('#badge').text(result);
+						if(parseInt(result) > commentIds.length )
+						{
+							loadCommentsAwaitingModeration();
+						}
 					}
 				} });
 			}
 
+			// Load next comments awaiting moderation
 			function loadCommentsAwaitingModeration()
 			{
+				var ids = '';
+				for(var id in commentIds)
+				{
+					ids = ids + commentIds[id] + ',';
+				}
+				if(ids.length > 0)
+				{
+					ids = ids.substring(0, ids.length - 1);
+				}
+				commentsInd++;
+
 				$.ajax({
 				type: 'POST',
 				url: '<?php echo $baseurl; ?>ajax.php',
-				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=get_comments_awaiting_moderation',
+				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&ids=' + ids + '&ind=' + commentsInd + '&action=get_comments_awaiting_moderation',
 				success: function(result)
 				{
-					var div = document.getElementById('comments_container');
-					div.innerHTML = result;
+					if(result == '0')
+					{
+						alert(result);
+					}
+					else
+					{
+						$('#comments_container').html($('#comments_container').html() + result);
 
+						var newCommentIds = $('#comments_' + commentsInd).val().split(',');
+						for(index = 0; index < newCommentIds.length; index++)
+						{
+							var arrayIndex = 'comment_' + newCommentIds[index];
+							commentIds[arrayIndex] = newCommentIds[index];
+						}
+					}
 				} });
 			}
 
-			function unloadCommentsAwaitingModeration()
-			{
-				var div = document.getElementById('comments_container');
-				if (div.hasChildNodes())
-				{
-				    while (div.childNodes.length >= 1)
-				    {
-				    	div.removeChild(div.firstChild);
-				    }
-				}
-			}
-
+			// Process result after publish/deprecate/delete action has been completed
 			function processResult(result, id, background)
 			{
+				var divid = 'comment_' + id;
 				if(result == '1')
 				{
+					var options = {};
+					$('#' + divid).effect('blind', options, 200);
+					$('#' + divid).remove();
+					delete commentIds[divid];
 					updateBadge();
 				}
 				else
 				{
-					var div = document.getElementById(id);
-					div.style.backgroundColor = background;
+					$('#' + divid).css('background-color', background);
 					alert(result);
 				}
 			}
 
+			// Set comments status
 			function setCommentStatus(id, status)
 			{
 				var divid = 'comment_' + id;
-				var div = document.getElementById(divid);
-				var background = div.style.backgroundColor;
+				var background = $('#' + divid).css('background-color');
 				switch(status)
 				{
 					case 'published':
-						div.style.backgroundColor  = 'green';
+						fadeIn(divid, '#339900');
 						break;
 					case 'deprecated':
-						div.style.backgroundColor  = 'grey';
+						fadeIn(divid, '#656565');
 						break;
 				};
 
 				$.ajax({
 				type: 'POST',
 				url: '<?php echo $baseurl; ?>ajax.php',
-				data: 'commentid=' + id + '&status=' + status + '&action=set_comment_status',
-				success: function(result) { processResult(result, divid, background);	} });
+				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&status=' + status + '&action=set_comment_status',
+				success: function(result) { processResult(result, id, background);	} });
 			}
 
+			// Delete comment
 			function deleteComment(id)
 			{
 				var divid = 'comment_' + id;
-				var div = document.getElementById(divid);
-				var background = div.style.backgroundColor;
-				div.style.backgroundColor = 'red';
+				var background = $('#' + divid).css('background-color');
+				fadeIn(divid, '#EE0000');
 
 				$.ajax({
 				type: 'POST',
 				url: '<?php echo $baseurl; ?>ajax.php',
-				data: 'commentid=' + id + '&action=delete_comment',
-				success: function(result) { processResult(result, divid, background); } });
+				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&action=delete_comment',
+				success: function(result) { processResult(result, id, background); } });
+			}
+
+			// Fade in background color
+			function fadeIn(id, color)
+			{
+				jQuery('#' + id).animate({ backgroundColor: color }, 200);
 			}
 
 			updateBadge();
 		</script>
 		<?php
 	}
-
-	global $baseurl;
-
-
-
 
 	/*
 	 * RECENT DRAFTS
@@ -565,6 +586,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.44  2009/11/25 16:05:02  efy-maxim
+ * comments awaiting moderation improvements
+ *
  * Revision 1.43  2009/11/25 01:33:37  blueyed
  * Dashboard: display 'no title' if there is an empty title.
  *
