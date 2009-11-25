@@ -141,8 +141,7 @@ if( empty($tab) )
 			global $tableprefix;
 
 			$db_optimized = false;
-			// This fails if DB name is numeric!
-			$tables = $DB->get_results( 'SHOW TABLE STATUS FROM '.$DB->dbname.' LIKE \''.$tableprefix.'%\'');
+			$tables = $DB->get_results( 'SHOW TABLE STATUS FROM `'.$DB->dbname.'` LIKE \''.$tableprefix.'%\'');
 
 			foreach( $tables as $table )
 			{
@@ -168,7 +167,7 @@ if( empty($tab) )
 				$Messages->add( T_('Database tables are already optimized.'), 'success' );
 			}
 			break;
-		
+
 		case 'backup_db':
 			/* Tblue> There are a few problems with using the mysqldump program:
 			 *          - Windows hosts (?)
@@ -217,7 +216,7 @@ if( empty($tab) )
 						 .' --password='.escapeshellarg( $DB->dbpassword )
 						 .' --opt '.escapeshellarg( $DB->dbname )
 						 .' 2>&1 > '.$dump_filename;
-			
+
 			@exec( $backup_cmd, $output, $res );
 			if( $res > 0 )
 			{
@@ -249,10 +248,10 @@ if( empty($tab) )
 				}
 				break;
 			}
-			
+
 			// Delete dump file
 			@unlink($dump_filename);
-			
+
 			// Download compressed file
 			$zipfile->download_file();
 			break;
@@ -358,6 +357,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2009/11/25 19:53:58  blueyed
+ * Fix 'Optimize database tables' SQL: quote DB name.
+ *
  * Revision 1.18  2009/11/25 00:54:26  blueyed
  * todo
  *
