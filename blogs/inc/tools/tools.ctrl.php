@@ -292,6 +292,7 @@ if( empty($tab) )
 	if( $current_User->check_perm('options', 'edit') )
 	{ // default admin actions:
 		$block_item_Widget->title = T_('Cache management');
+		// dh> TODO: add link to delete all caches at once?
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 		echo '<ul>';
 		echo '<li><a href="'.regenerate_url('action', 'action=del_itemprecache').'">'.T_('Clear pre-renderered item cache (DB)').'</a></li>';
@@ -357,6 +358,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2009/11/25 00:54:26  blueyed
+ * todo
+ *
  * Revision 1.17  2009/11/12 03:54:17  fplanque
  * wording/doc/cleanup
  *
