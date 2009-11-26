@@ -732,6 +732,7 @@ class Form extends Widget
 		$field_params['maxlength'] = 16;
 		$field_params['selectBoxOptions'] = '';
 		$field_params['onkeyup'] = 'loginlist_'.$field_name.'();';
+		$field_params['autocomplete'] = 'off';
 
 		if( !is_null( $User ) )
 		{
@@ -3053,6 +3054,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.74  2009/11/26 16:00:44  efy-maxim
+ * autocomplete-off
+ *
  * Revision 1.73  2009/11/26 10:30:56  efy-maxim
  * ajax actions have been moved to async.php
  *
