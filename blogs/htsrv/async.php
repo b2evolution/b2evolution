@@ -122,6 +122,160 @@ switch( $action )
 		}
 		exit(0);
 
+	case 'get_login_list':
+
+		$text = trim( param( 'value', 'string' ) );
+		if( !empty( $text ) )
+		{
+			$SQL = &new SQl();
+			$SQL->SELECT( 'user_login' );
+			$SQL->FROM( 'T_users' );
+			$SQL->WHERE( 'user_login LIKE \''.$text.'%\'' );
+			$SQL->LIMIT( '10' );
+
+			$logins = array();
+			foreach( $DB->get_results( $SQL->get() ) as $row )
+			{
+				$logins[] = $row->user_login;
+			}
+			echo implode( ';', $logins );
+		}
+		exit(0);
+
+	case 'get_comments_awaiting_moderation':
+
+		$blog_ID = param( 'blogid', 'integer' );
+		$current_User->check_perm( 'blog_ismember', 1, true, $blog_ID );
+
+		$limit = 5;
+
+		$comment_IDs = array();
+		$ids = param( 'ids', 'string', NULL );
+		if( !empty( $ids ) )
+		{
+			$comment_IDs = explode( ',', $ids );
+			$limit = $limit - count( $comment_IDs );
+		}
+
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+
+		$CommentList = & new CommentList( $Blog, "'comment','trackback','pingback'", array( 'draft' ), '',	'',	'DESC',	'',	$limit, $comment_IDs );
+
+		$new_comment_IDs = array();
+		while( $Comment = & $CommentList->get_next() )
+		{ // Loop through comments:
+			$new_comment_IDs[] = $Comment->ID;
+
+			echo '<div id="comment_'.$Comment->ID.'" class="dashboard_post dashboard_post_'.($CommentList->current_idx % 2 ? 'even' : 'odd' ).'">';
+			echo '<div class="floatright"><span class="note status_'.$Comment->status.'">';
+			$Comment->status();
+			echo '</div>';
+
+			echo '<h3 class="dashboard_post_title">';
+			echo $Comment->get_title(array('author_format'=>'<strong>%s</strong>'));
+			$comment_Item = & $Comment->get_Item();
+			echo ' '.T_('in response to')
+					.' <a href="?ctrl=items&amp;blog='.$comment_Item->get_blog_ID().'&amp;p='.$comment_Item->ID.'"><strong>'.$comment_Item->dget('title').'</strong></a>';
+
+			echo '</h3>';
+
+			echo '<div class="notes">';
+			$Comment->rating( array(
+					'before'      => '',
+					'after'       => ' &bull; ',
+					'star_class'  => 'top',
+				) );
+			$Comment->date();
+			if( $Comment->author_url( '', ' &bull; Url: <span class="bUrl">', '</span>' ) )
+			{
+				if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+				{ // There is an URL and we have permission to ban...
+					// TODO: really ban the base domain! - not by keyword
+					echo ' <a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(get_ban_domain($Comment->author_url))
+						.'">'.get_icon( 'ban' ).'</a> ';
+				}
+			}
+			$Comment->author_email( '', ' &bull; Email: <span class="bEmail">', '</span> &bull; ' );
+			$Comment->author_ip( 'IP: <span class="bIP">', '</span> &bull; ' );
+			$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No Spam Karma') );
+			echo '</div>';
+		 ?>
+
+		<div class="small">
+			<?php $Comment->content() ?>
+		</div>
+
+		<div class="dashboard_action_area">
+		<?php
+			// Display edit button if current user has the rights:
+			$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton');
+
+			// Display publish NOW button if current user has the rights:
+			$Comment->publish_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', true, true );
+
+			// Display deprecate button if current user has the rights:
+			$Comment->deprecate_link( ' ', ' ', '#', '#', 'DeleteButton', '&amp;', true, true );
+
+			// Display delete button if current user has the rights:
+			$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', false, '&amp;', true, true );
+		?>
+		<div class="clear"></div>
+		</div>
+
+		<?php
+			echo '</div>';
+		}
+
+		echo '<input type="hidden" id="comments_'.param( 'ind', 'string' ).'" value="'.implode( ',', $new_comment_IDs ).'"/>';
+
+		exit(0);
+
+	case 'get_comments_awaiting_moderation_number':
+
+		$blog_ID = param( 'blogid', 'integer' );
+		$current_User->check_perm( 'blog_ismember', 1, true, $blog_ID );
+
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+
+		$sql = 'SELECT COUNT(*)
+					FROM T_comments
+						INNER JOIN T_items__item ON comment_post_ID = post_ID ';
+
+		$sql .= 'INNER JOIN T_postcats ON post_ID = postcat_post_ID
+					INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID ';
+
+		$sql .= 'WHERE '.$Blog->get_sql_where_aggregate_coll_IDs('othercats.cat_blog_ID');
+		$sql .= ' AND comment_type IN (\'comment\',\'trackback\',\'pingback\') ';
+		$sql .= ' AND comment_status = \'draft\'';
+		$sql .= ' AND '.statuses_where_clause();
+
+		echo $DB->get_var( $sql );
+
+		exit(0);
+
+	case 'set_comment_status':
+
+		$blog_ID = param( 'blogid', 'integer' );
+		$current_User->check_perm( 'blog_comments', 'edit', true, $blog_ID );
+
+		$edited_Comment = Comment_get_by_ID( param( 'commentid', 'integer' ) );
+		$status = param( 'status', 'string' );
+		$edited_Comment->set('status', $status );
+		$edited_Comment->dbupdate();
+		echo 'OK';
+		exit(0);
+
+	case 'delete_comment':
+
+		$blog_ID = param( 'blogid', 'integer' );
+		$current_User->check_perm( 'blog_comments', 'edit', true, $blog_ID );
+
+		$edited_Comment = Comment_get_by_ID( param( 'commentid', 'integer' ) );
+		$edited_Comment->dbdelete();
+		echo 'OK';
+		exit(0);
 }
 
 
@@ -138,6 +292,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.33  2009/11/26 10:30:52  efy-maxim
+ * ajax actions have been moved to async.php
+ *
  * Revision 1.32  2009/10/17 14:49:46  fplanque
  * doc
  *

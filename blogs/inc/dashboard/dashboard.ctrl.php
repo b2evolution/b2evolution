@@ -88,7 +88,7 @@ if( $blog )
 
 		echo '</div>';
 
-		global $baseurl;
+		global $htsrv_url;
 
 		?>
 
@@ -102,7 +102,7 @@ if( $blog )
 			{
 				$.ajax({
 				type: 'POST',
-				url: '<?php echo $baseurl; ?>ajax.php',
+				url: '<?php echo $htsrv_url; ?>async.php',
 				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=get_comments_awaiting_moderation_number',
 				success: function(result)
 				{
@@ -137,24 +137,17 @@ if( $blog )
 
 				$.ajax({
 				type: 'POST',
-				url: '<?php echo $baseurl; ?>ajax.php',
+				url: '<?php echo $htsrv_url; ?>async.php',
 				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&ids=' + ids + '&ind=' + commentsInd + '&action=get_comments_awaiting_moderation',
 				success: function(result)
 				{
-					if(result == '0')
-					{
-						alert(result);
-					}
-					else
-					{
-						$('#comments_container').html($('#comments_container').html() + result);
+					$('#comments_container').html($('#comments_container').html() + result);
 
-						var newCommentIds = $('#comments_' + commentsInd).val().split(',');
-						for(index = 0; index < newCommentIds.length; index++)
-						{
-							var arrayIndex = 'comment_' + newCommentIds[index];
-							commentIds[arrayIndex] = newCommentIds[index];
-						}
+					var newCommentIds = $('#comments_' + commentsInd).val().split(',');
+					for(index = 0; index < newCommentIds.length; index++)
+					{
+						var arrayIndex = 'comment_' + newCommentIds[index];
+						commentIds[arrayIndex] = newCommentIds[index];
 					}
 				} });
 			}
@@ -163,7 +156,7 @@ if( $blog )
 			function processResult(result, id, background)
 			{
 				var divid = 'comment_' + id;
-				if(result == '1')
+				if(result == 'OK')
 				{
 					var options = {};
 					$('#' + divid).effect('blind', options, 200);
@@ -195,7 +188,7 @@ if( $blog )
 
 				$.ajax({
 				type: 'POST',
-				url: '<?php echo $baseurl; ?>ajax.php',
+				url: '<?php echo $htsrv_url; ?>async.php',
 				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&status=' + status + '&action=set_comment_status',
 				success: function(result) { processResult(result, id, background);	} });
 			}
@@ -209,7 +202,7 @@ if( $blog )
 
 				$.ajax({
 				type: 'POST',
-				url: '<?php echo $baseurl; ?>ajax.php',
+				url: '<?php echo $htsrv_url; ?>async.php',
 				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&action=delete_comment',
 				success: function(result) { processResult(result, id, background); } });
 			}
@@ -586,6 +579,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.45  2009/11/26 10:30:58  efy-maxim
+ * ajax actions have been moved to async.php
+ *
  * Revision 1.44  2009/11/25 16:05:02  efy-maxim
  * comments awaiting moderation improvements
  *

@@ -723,7 +723,7 @@ class Form extends Widget
 	 */
 	function username( $field_name, &$User, $field_label, $field_note = '' )
 	{
-		global $baseurl;
+		global $htsrv_url;
 
 		$field_params = array();
 
@@ -755,8 +755,8 @@ class Form extends Widget
 		$r .= 'function loginlist_'.$field_name.'(){';
 		$r .= '$.ajax({';
 		$r .= 'type: \'POST\',';
-		$r .= 'url: \''.$baseurl.'ajax.php\',';
-		$r .= 'data: \'login_list_value=\' + document.getElementById(\''.$field_name.'\').value + \'&action=login_list\',';
+		$r .= 'url: \''.$htsrv_url.'async.php\',';
+		$r .= 'data: \'value=\' + document.getElementById(\''.$field_name.'\').value + \'&action=get_login_list\',';
 		$r .= 'success: function(html){';
 		$r .= 'var login_list = document.getElementById(\''.$field_name.'\');';
 		$r .= 'login_list.setAttribute(\'selectBoxOptions\', html);';
@@ -3053,6 +3053,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.73  2009/11/26 10:30:56  efy-maxim
+ * ajax actions have been moved to async.php
+ *
  * Revision 1.72  2009/11/23 21:50:32  efy-maxim
  * ajax dropdown
  *
