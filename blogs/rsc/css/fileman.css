@@ -290,4 +290,6 @@ div#FM_anchor {
 	text-align:center;
 }
 
-
+#fm_highlighted {
+	background-color:#ffe79f;
+}
