@@ -1188,6 +1188,15 @@ class UpgradeFuncsTestCase extends EvoDbUnitTestCase
 	}
 
 
+	function test_index_with_whitespace()
+	{
+		$this->assertNoDbChanges("
+		CREATE TABLE $GLOBALS[tableprefix]test_1 (
+			i decimal(4,2) default NULL,
+			KEY `Index 3` (i)
+		);");
+	}
+
 
 	/**
 	 * Assert that there are no DB changes required (via live and db_delta).

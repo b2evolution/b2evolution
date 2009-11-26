@@ -319,7 +319,8 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 					'create_definition' => $create_definition,
 				);
 
-				if( ! preg_match( '~^(PRIMARY(?:\s+KEY)|(?:FULLTEXT|UNIQUE)(?:\s+(?:INDEX|KEY))?|KEY|INDEX) (?:\s+([`"])?(\w+)\\2?)? (\s+USING \w+)? \s* \((.*)\)$~ix', $create_definition, $match ) )
+				if( !  preg_match( '~^(PRIMARY(?:\s+KEY)|(?:FULLTEXT|UNIQUE)(?:\s+(?:INDEX|KEY))?|KEY|INDEX) (?:\s+()     (\w+)      )? (\s+USING \w+)? \s* \((.*)\)$~ix', $create_definition, $match )
+					&& ! preg_match( '~^(PRIMARY(?:\s+KEY)|(?:FULLTEXT|UNIQUE)(?:\s+(?:INDEX|KEY))?|KEY|INDEX) (?:\s+([`"])([\w\s]+)\\2)? (\s+USING \w+)? \s* \((.*)\)$~ix', $create_definition, $match ) )
 				{ // invalid type, should not happen
 					debug_die( 'Invalid type in $indices: '.$create_definition );
 					// TODO: add test: Invalid type in $indices: KEY "coord" ("lon","lat")
@@ -1264,6 +1265,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.15  2009/11/26 21:55:46  blueyed
+ * db_delta: fix for indices containing whitespace
+ *
  * Revision 1.14  2009/11/24 01:13:30  blueyed
  * db_delta: another fix for fulltext indices, and another for renaming of indices, where the old one has to be dropped before the new one can be created.
  *
