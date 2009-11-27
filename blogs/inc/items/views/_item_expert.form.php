@@ -352,6 +352,12 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{
+		// Include JavaScript and CSS for item's owner dropdown.
+
+		// Form 'username' field requires the following JS and CSS.
+		echo '<script type="text/javascript" src="'.$rsc_url.'js/jquery.hintbox.min.js"></script>';
+		echo '<link rel="stylesheet" type="text/css" href="'.$rsc_url.'css/jquery.hintbox.css">';
+
 		echo '<tr><td><strong>'.T_('Owner').':</strong></td><td>';
 		$Form->username( 'item_owner_login', $edited_Item->get_creator_User(), '', T_( 'login of this post\'s owner.').'<br/>' );
 		$Form->hidden( 'item_owner_login_displayed', 1 );
@@ -433,6 +439,9 @@ if( $publishnow_displayed )
 
 /*
  * $Log$
+ * Revision 1.55  2009/11/27 12:29:06  efy-maxim
+ * drop down
+ *
  * Revision 1.54  2009/11/23 21:50:37  efy-maxim
  * ajax dropdown
  *

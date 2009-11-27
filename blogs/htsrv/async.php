@@ -124,7 +124,7 @@ switch( $action )
 
 	case 'get_login_list':
 
-		$text = trim( param( 'value', 'string' ) );
+		$text = trim( param( 'q', 'string', '' ) );
 		if( !empty( $text ) )
 		{
 			$SQL = &new SQl();
@@ -132,14 +132,16 @@ switch( $action )
 			$SQL->FROM( 'T_users' );
 			$SQL->WHERE( 'user_login LIKE \''.$text.'%\'' );
 			$SQL->LIMIT( '10' );
+			$SQL->ORDER_BY('user_login');
 
-			$logins = array();
+			$options = '';
 			foreach( $DB->get_results( $SQL->get() ) as $row )
 			{
-				$logins[] = $row->user_login;
+				$options .= $row->user_login."\n";
 			}
-			echo implode( ';', $logins );
+			echo $options;
 		}
+
 		exit(0);
 
 	case 'get_comments_awaiting_moderation':
@@ -292,6 +294,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.34  2009/11/27 12:29:04  efy-maxim
+ * drop down
+ *
  * Revision 1.33  2009/11/26 10:30:52  efy-maxim
  * ajax actions have been moved to async.php
  *

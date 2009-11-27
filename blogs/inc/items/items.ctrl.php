@@ -1070,18 +1070,11 @@ if( ! empty( $Blog->skin_ID) )
 }
 // else item_default.css ? is it still possible to have no skin set?
 
-if( $current_User->check_perm( 'users', 'edit' ) )
-{	// Include JavaScript and CSS for item's owner dropdown.
-	require_js( 'dropdown.js' );
-	require_css( 'dropdown.css' );
-}
-
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
 // Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
 $AdminUI->disp_body_top( $mode != 'iframe' );	// do NOT display stupid messages in iframe (UGLY UGLY UGLY!!!!)
-
 
 /**
  * Display payload:
@@ -1259,6 +1252,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.77  2009/11/27 12:29:06  efy-maxim
+ * drop down
+ *
  * Revision 1.76  2009/11/23 21:50:36  efy-maxim
  * ajax dropdown
  *

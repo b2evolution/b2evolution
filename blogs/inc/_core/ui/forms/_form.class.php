@@ -727,44 +727,23 @@ class Form extends Widget
 
 		$field_params = array();
 
-		// TODO: remove , size should be automatic (I think max length for usernames is 16)
-		$field_params['size'] = 16;
-		$field_params['maxlength'] = 16;
-		$field_params['selectBoxOptions'] = '';
-		$field_params['onkeyup'] = 'loginlist_'.$field_name.'();';
-		$field_params['autocomplete'] = 'off';
-
-		if( !is_null( $User ) )
-		{
-			$field_params['value'] = $User->login;
-		}
-
 		if( !empty($field_note) )
 		{
-			$field_params['note'] = $field_note;
-		}
+			$field_params['note'] = $field_note;		}
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
 		$r = $this->begin_field();
 
-		$r .= '<div>';
-		$r .= $this->get_input_element( $field_params );
-		$r .= '</div>';
 		$r .= '<script type="text/javascript">';
-		$r .= 'createEditableSelect(\''.$field_name.'\', \''.$field_name.'_id\');';
-		$r .= 'function loginlist_'.$field_name.'(){';
-		$r .= '$.ajax({';
-		$r .= 'type: \'POST\',';
-		$r .= 'url: \''.$htsrv_url.'async.php\',';
-		$r .= 'data: \'value=\' + document.getElementById(\''.$field_name.'\').value + \'&action=get_login_list\',';
-		$r .= 'success: function(html){';
-		$r .= 'var login_list = document.getElementById(\''.$field_name.'\');';
-		$r .= 'login_list.setAttribute(\'selectBoxOptions\', html);';
-		$r .= 'createEditableSelect(\''.$field_name.'\', \''.$field_name.'_id\');';
-		$r .= 'login_list.focus();';
-		$r .= 'showOptions(\''.$field_name.'_id\'); } }); }';
+		$r .= 'jQuery(document).ready(function(){';
+		$r .= 'jQuery(\'#'.$field_name.'_id\').hintbox({';
+		$r .= 'url: \''.$htsrv_url.'async.php?action=get_login_list\',';
+		$r .= 'matchHint: true';
+		$r .= '});';
+		$r .= '});';
 		$r .= '</script>';
+		$r .= '<input type="text" value="'.$User->login.'" id="'.$field_name.'_id" autocomplete="off"/>';
 
 		$r .= $this->end_field();
 
@@ -3054,6 +3033,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.75  2009/11/27 12:29:05  efy-maxim
+ * drop down
+ *
  * Revision 1.74  2009/11/26 16:00:44  efy-maxim
  * autocomplete-off
  *
