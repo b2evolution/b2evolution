@@ -737,13 +737,13 @@ class Form extends Widget
 
 		$r .= '<script type="text/javascript">';
 		$r .= 'jQuery(document).ready(function(){';
-		$r .= 'jQuery(\'#'.$field_name.'_id\').hintbox({';
+		$r .= 'jQuery(\'#'.$field_name.'\').hintbox({';
 		$r .= 'url: \''.$htsrv_url.'async.php?action=get_login_list\',';
 		$r .= 'matchHint: true';
 		$r .= '});';
 		$r .= '});';
 		$r .= '</script>';
-		$r .= '<input type="text" value="'.$User->login.'" id="'.$field_name.'_id" autocomplete="off"/>';
+		$r .= '<input type="text" value="'.$User->login.'" name="'.$field_name.'" id="'.$field_name.'"/>';
 
 		$r .= $this->end_field();
 
@@ -3033,6 +3033,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.76  2009/11/28 16:42:05  efy-maxim
+ * field name fix
+ *
  * Revision 1.75  2009/11/27 12:29:05  efy-maxim
  * drop down
  *

@@ -487,6 +487,7 @@ class Item extends ItemLight
 		$this->set_from_Request( 'order', 'item_order', true );
 
 		$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
+
 		if( $current_User->check_perm( 'users', 'edit' ) && param( 'item_owner_login_displayed', 'string', NULL ) !== NULL )
 		{   // only admins can change this..
 			if( param_check_not_empty( 'item_owner_login', T_('Please enter valid owner login.') ) && param_check_login( 'item_owner_login', true ) )
@@ -4100,6 +4101,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.164  2009/11/28 16:42:05  efy-maxim
+ * field name fix
+ *
  * Revision 1.163  2009/11/23 11:58:04  efy-maxim
  * owner fix
  *
