@@ -647,11 +647,29 @@ class ComponentWidget extends DataObject
 
 		return $res;
 	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 */
+	function dbupdate()
+	{
+		global $DB;
+
+		parent::dbupdate();
+
+		// This widget has been modified, cached content depending on it should be invalidated:
+		BlockCache::invalidate_key( 'wi_ID', $this->ID );
+	}
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.69  2009/11/30 23:27:13  fplanque
+ * added a dimension to cache invalidation
+ *
  * Revision 1.68  2009/11/30 23:16:24  fplanque
  * basic cache invalidation is working now
  *
