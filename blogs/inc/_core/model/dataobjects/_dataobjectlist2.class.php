@@ -148,7 +148,7 @@ class DataObjectList2 extends FilteredResults
 	 *
 	 * @param DataObjectCache
 	 * @param integer number of lines displayed on one screen (null for default [20])
-	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
+	 * @param string prefix to differentiate page/order params when multiple Results appear on same page
 	 * @param string default ordering of columns (special syntax)
 	 */
 	function DataObjectList2( & $Cache, $limit = null, $param_prefix = '', $default_order = NULL )
@@ -336,6 +336,9 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
+ * Revision 1.12  2009/11/30 22:56:09  blueyed
+ * typo
+ *
  * Revision 1.11  2009/09/14 10:38:23  efy-arrin
  * Include the ClassName in the load_class() with proper UpperCase
  *
