@@ -2013,13 +2013,10 @@ function debug_info( $force = false, $force_clean = false )
 	echo "\n\n\n";
 	echo ( $clean ? '*** Debug info ***'."\n\n" : '<div class="debug" id="debug_info"><h2>Debug info</h2>' );
 
-	$Debuglog->add( 'Len of serialized $cache_imgsize: '.strlen(serialize($cache_imgsize)), 'memory' );
-	$Debuglog->add( 'Len of serialized $cache_File: '.strlen(serialize($cache_File)), 'memory' );
-
 	if( !$obhandler_debug )
 	{ // don't display changing items when we want to test obhandler
 
-		// Timer table:
+		// ========================== Timer table ================================
 		$time_page = $Timer->get_duration( 'total' );
 		$timer_rows = array();
 		foreach( $Timer->get_categories() as $l_cat )
@@ -2030,14 +2027,15 @@ function debug_info( $force = false, $force_clean = false )
 			}
 			$timer_rows[ $l_cat ] = $Timer->get_duration( $l_cat );
 		}
-		// arsort( $timer_rows );
-		ksort( $timer_rows );
+		// Don't sort to see orginal order of creation
+		arsort( $timer_rows );
+		// ksort( $timer_rows );
 
-		// Remove "total", it will get outputted as the last one:
+		// Remove "total", it will get output as the last one:
 		$total_time = $timer_rows['total'];
 		unset($timer_rows['total']);
 
-		if ( $clean )
+		if( $clean )
 		{
 			echo '== Timers =='."\n\n";
 			echo '+'.str_repeat( '-', $table_headerlen ).'+'."\n";
@@ -2057,7 +2055,7 @@ function debug_info( $force = false, $force_clean = false )
 		{
 			$percent_l_cat = $time_page > 0 ? number_format( 100/$time_page * $l_time, 2 ) : '0';
 
-			if ( $clean )
+			if( $clean )
 			{
 				$row = sprintf( $printf_format, $l_cat, $l_time, $percent_l_cat.'%', $Timer->get_count( $l_cat ) );
 			}
@@ -2071,8 +2069,8 @@ function debug_info( $force = false, $force_clean = false )
 			}
 
 			// Maybe ignore this row later, but not for clean display.
-			if( ! $clean && $l_time < 0.005 )
-			{
+			if( ! $clean && ( $percent_l_cat < 1  ) )
+			{	// Hide everything that tool less tahn 5% of the time
 				$table_rows_collapse[] = $row;
 			}
 			else
@@ -2081,11 +2079,11 @@ function debug_info( $force = false, $force_clean = false )
 			}
 		}
 		$count_collapse = count($table_rows_collapse);
-
 		// Collapse ignored rows, allowing to expand them with Javascript:
 		if( $count_collapse > 5 )
 		{
-			echo '<tr><td colspan="4" class="center"> <a href="" onclick="var e = document.getElementById(\'evo-debuglog-timer-long\'); e.style.display = (e.style.display == \'none\' ? \'\' : \'none\'); return false;">+ '.$count_collapse.' &lt; 0.005s</a> </td></tr>';
+			echo '<tr><td colspan="4" class="center">';
+			echo '<a href="" onclick="var e = document.getElementById(\'evo-debuglog-timer-long\'); e.style.display = (e.style.display == \'none\' ? \'\' : \'none\'); return false;">+ '.$count_collapse.' queries &lt; 1%</a> </td></tr>';
 			echo '</tbody>';
 			echo '<tbody id="evo-debuglog-timer-long" style="display:none;">';
 		}
@@ -2120,18 +2118,30 @@ function debug_info( $force = false, $force_clean = false )
 			echo '</table>';
 		}
 
+		// ================================== DB Summary ================================
 		if( isset($DB) )
 		{
-			if ( $clean )
+			echo $DB->num_queries.' SQL queries executed in '.$Timer->get_duration( 'SQL QUERIES' )." seconds\n";
+			if( ! $clean )
 			{
-				echo 'Database queries: '.$DB->num_queries."\n";
-			}
-			else
-			{
-				echo '<a href="'.$ReqHostPathQuery.'#evo_debug_queries">Database queries: '.$DB->num_queries.'.</a><br />';
+				echo ' &nbsp; <a href="'.$ReqHostPathQuery.'#evo_debug_queries">scroll down to details</a><p>';
 			}
 		}
 
+		// ================================ Opcode caching ================================
+		$opcode_cache = 'none';
+		if( function_exists('apc_cache_info') )
+		{
+			$apc_info = apc_cache_info( '', true );
+			if( $apc_info['num_entries'] )
+			{
+				$opcode_cache = 'APC';
+			}
+		}
+		echo 'Opcode cache: '.$opcode_cache;
+		echo $clean ? "\n" : '<p>';
+
+		// ================================ Memory Usage ================================
 		foreach( array( // note: 8MB is default for memory_limit and is reported as 8388608 bytes
 			'memory_get_usage' => array( 'display' => 'Memory usage', 'high' => 8000000 ),
 			'memory_get_peak_usage' /* PHP 5.2 */ => array( 'display' => 'Memory peak usage', 'high' => 8000000 ) ) as $l_func => $l_var )
@@ -2154,7 +2164,17 @@ function debug_info( $force = false, $force_clean = false )
 				echo $clean ? "\n" : '<br />';
 			}
 		}
+
+		echo 'Len of serialized $cache_imgsize: '.strlen(serialize($cache_imgsize));
+		echo $clean ? "\n" : '<br />';
+		echo 'Len of serialized $cache_File: '.strlen(serialize($cache_File));
+		echo $clean ? "\n" : '<br />';
+
 	}
+
+
+
+
 
 	// DEBUGLOG(s) FROM PREVIOUS SESSIONS, after REDIRECT(s) (with list of categories at top):
 	if( isset($Session) && ($sess_Debuglogs = $Session->get('Debuglogs')) && ! empty($sess_Debuglogs) )
@@ -3403,7 +3423,7 @@ function hash_link_params( $link_array, $force_hash = NULL )
 		global $debug, $Debuglog;
 		if( $debug )
 		{
-			$Debuglog->add( 'Hash key: '.$hash, 'vars' );
+			$Debuglog->add( 'Hash key: '.$hash, 'request' );
 		}
 	}
 	//	echo "[$hash] ";
@@ -3665,6 +3685,10 @@ function & get_IconLegend()
 
 /*
  * $Log$
+ * Revision 1.186  2009/11/30 00:22:04  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.185  2009/11/22 20:29:38  fplanque
  * minor/doc
  *

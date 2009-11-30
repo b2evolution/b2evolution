@@ -123,7 +123,7 @@ switch( $action )
 		exit(0);
 
 	case 'get_login_list':
-
+// fp>max: CHECK PERM !!
 		$text = trim( param( 'q', 'string', '' ) );
 		if( !empty( $text ) )
 		{
@@ -148,7 +148,7 @@ switch( $action )
 
 		$blog_ID = param( 'blogid', 'integer' );
 		$current_User->check_perm( 'blog_ismember', 1, true, $blog_ID );
-
+// fp>max: wrong perm. check that comment moderation is allowed.
 		$limit = 5;
 
 		$comment_IDs = array();
@@ -237,6 +237,7 @@ switch( $action )
 
 		$blog_ID = param( 'blogid', 'integer' );
 		$current_User->check_perm( 'blog_ismember', 1, true, $blog_ID );
+// fp>max: wrong perm. check that comment moderation is allowed.
 
 		$BlogCache = & get_BlogCache();
 		$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
@@ -294,6 +295,10 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.35  2009/11/30 00:22:04  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.34  2009/11/27 12:29:04  efy-maxim
  * drop down
  *

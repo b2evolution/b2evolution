@@ -38,8 +38,9 @@ require_once $inc_path.'_core/_class'.floor(PHP_VERSION).'.funcs.php';
 require_once $inc_path.'_core/_misc.funcs.php';
 
 load_class( '_core/model/_log.class.php', 'Log');
-$Debuglog = & new Log( 'note' );
-$Messages = & new Log('error');
+$Debuglog = new Log();
+load_class( '_core/model/_messages.class.php', 'Messages');
+$Messages = new Messages();
 
 /**
  * Load modules.
@@ -719,6 +720,10 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.189  2009/11/30 00:22:05  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.188  2009/09/29 17:56:19  tblue246
  * minor
  *

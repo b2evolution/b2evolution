@@ -798,7 +798,7 @@ class DB
 		if( is_object($Timer) )
 		{
 			// Resume global query timer
-			$Timer->resume( 'sql_queries' );
+			$Timer->resume( 'SQL QUERIES' , false );
 			// Start a timer for this particular query:
 			$Timer->start( 'sql_query', false );
 
@@ -812,7 +812,7 @@ class DB
 			}
 
 			// Pause global query timer:
-			$Timer->pause( 'sql_queries' );
+			$Timer->pause( 'SQL QUERIES' , false );
 		}
 		else
 		{
@@ -1239,7 +1239,7 @@ class DB
 		global $Timer;
 		if( is_object( $Timer ) )
 		{
-			$time_queries = $Timer->get_duration( 'sql_queries', 4 );
+			$time_queries = $Timer->get_duration( 'SQL QUERIES' , 4 );
 		}
 		else
 		{
@@ -1654,6 +1654,10 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.44  2009/11/30 00:22:04  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.43  2009/11/16 20:44:07  blueyed
  *  - Use escape in quote (makes mocking in tests easier)
  *  - get_var: add support for $y=NULL (next row)

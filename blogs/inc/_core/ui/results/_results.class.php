@@ -33,6 +33,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+// DEBUG: (Turn switch on or off to log debug info for specified category)
+$GLOBALS['debug_results'] = false;
+
+
 load_class( '_core/ui/_uiwidget.class.php', 'Table' );
 load_class( '_core/ui/_uiwidget.class.php', 'Widget' );
 
@@ -1828,6 +1833,10 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.31  2009/11/30 00:22:04  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.30  2009/10/11 03:00:10  blueyed
  * Add "position" and "order" properties to attachments.
  * Position can be "teaser" or "aftermore" for now.

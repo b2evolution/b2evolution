@@ -73,7 +73,7 @@ $headlines = array();
 // Investigation for following code by Isaac - http://isaacschlueter.com/
 if( isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) )
 { // Warning: on some IIS installs it it set but empty!
-	$Debuglog->add( 'Getting ReqURI from REQUEST_URI', 'vars' );
+	$Debuglog->add( 'vars: vars: Getting ReqURI from REQUEST_URI', 'request' );
 	$ReqURI = $_SERVER['REQUEST_URI'];
 
 	// Build requested Path without query string:
@@ -89,7 +89,7 @@ if( isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) )
 }
 elseif( isset($_SERVER['URL']) )
 { // ISAPI
-	$Debuglog->add( 'Getting ReqPath from URL', 'vars' );
+	$Debuglog->add( 'vars: Getting ReqPath from URL', 'request' );
 	$ReqPath = $_SERVER['URL'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
@@ -97,15 +97,15 @@ elseif( isset($_SERVER['PATH_INFO']) )
 { // CGI/FastCGI
 	if( isset($_SERVER['SCRIPT_NAME']) )
 	{
-		$Debuglog->add( 'Getting ReqPath from PATH_INFO and SCRIPT_NAME', 'vars' );
+		$Debuglog->add( 'vars: Getting ReqPath from PATH_INFO and SCRIPT_NAME', 'request' );
 
 		if ($_SERVER['SCRIPT_NAME'] == $_SERVER['PATH_INFO'] )
 		{	/* both the same so just use one of them
 			 * this happens on a windoze 2003 box
 			 * gotta love microdoft
 			 */
-			$Debuglog->add( 'PATH_INFO and SCRIPT_NAME are the same', 'vars' );
-			$Debuglog->add( 'Getting ReqPath from PATH_INFO only instead', 'vars' );
+			$Debuglog->add( 'vars: PATH_INFO and SCRIPT_NAME are the same', 'request' );
+			$Debuglog->add( 'vars: Getting ReqPath from PATH_INFO only instead', 'request' );
 			$ReqPath = $_SERVER['PATH_INFO'];
 		}
 		else
@@ -115,7 +115,7 @@ elseif( isset($_SERVER['PATH_INFO']) )
 	}
 	else
 	{ // does this happen??
-		$Debuglog->add( 'Getting ReqPath from PATH_INFO only!', 'vars' );
+		$Debuglog->add( 'vars: Getting ReqPath from PATH_INFO only!', 'request' );
 
 		$ReqPath = $_SERVER['PATH_INFO'];
 	}
@@ -123,19 +123,19 @@ elseif( isset($_SERVER['PATH_INFO']) )
 }
 elseif( isset($_SERVER['ORIG_PATH_INFO']) )
 { // Tomcat 5.5.x with Herbelin PHP servlet and PHP 5.1
-	$Debuglog->add( 'Getting ReqPath from ORIG_PATH_INFO', 'vars' );
+	$Debuglog->add( 'vars: Getting ReqPath from ORIG_PATH_INFO', 'request' );
 	$ReqPath = $_SERVER['ORIG_PATH_INFO'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
 elseif( isset($_SERVER['SCRIPT_NAME']) )
 { // Some Odd Win2k Stuff
-	$Debuglog->add( 'Getting ReqPath from SCRIPT_NAME', 'vars' );
+	$Debuglog->add( 'vars: Getting ReqPath from SCRIPT_NAME', 'request' );
 	$ReqPath = $_SERVER['SCRIPT_NAME'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
 elseif( isset($_SERVER['PHP_SELF']) )
 { // The Old Stand-By
-	$Debuglog->add( 'Getting ReqPath from PHP_SELF', 'vars' );
+	$Debuglog->add( 'vars: Getting ReqPath from PHP_SELF', 'request' );
 	$ReqPath = $_SERVER['PHP_SELF'];
 	$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
 }
@@ -173,9 +173,9 @@ if( $is_web )
 	 */
 	$ReqHost = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://').$_SERVER['HTTP_HOST'];
 
-	$Debuglog->add( '$ReqHost: '.$ReqHost, 'vars' );
-	$Debuglog->add( '$ReqURI: '.$ReqURI, 'vars' );
-	$Debuglog->add( '$ReqPath: '.$ReqPath, 'vars' );
+	$Debuglog->add( 'vars: $ReqHost: '.$ReqHost, 'request' );
+	$Debuglog->add( 'vars: $ReqURI: '.$ReqURI, 'request' );
+	$Debuglog->add( 'vars: $ReqPath: '.$ReqPath, 'request' );
 
 
 	// on which page are we ?
@@ -306,6 +306,10 @@ $skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', ar
 
 /*
  * $Log$
+ * Revision 1.37  2009/11/30 00:22:04  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.36  2009/03/08 23:57:38  fplanque
  * 2009
  *

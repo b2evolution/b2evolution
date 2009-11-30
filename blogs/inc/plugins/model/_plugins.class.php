@@ -35,6 +35,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+// DEBUG: (Turn switch on or off to log debug info for specified category)
+$GLOBALS['debug_plugins'] = false;
+
+
 load_class( 'plugins/_plugin.class.php', 'Plugin' );
 
 
@@ -1930,6 +1935,10 @@ class Plugins
 
 /*
  * $Log$
+ * Revision 1.20  2009/11/30 00:22:05  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.19  2009/09/26 20:41:52  blueyed
  * todo
  *

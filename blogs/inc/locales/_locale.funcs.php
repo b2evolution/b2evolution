@@ -36,6 +36,11 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+
+// DEBUG: (Turn switch on or off to log debug info for specified category)
+$GLOBALS['debug_locale'] = false;
+
+
 // LOCALIZATION:
 if( $use_l10n )
 { // We are going to use localization:
@@ -844,10 +849,10 @@ function locale_updateDB()
  */
 function convert_charset( $string, $dest_charset, $src_charset )
 {
-	$GLOBALS['Timer']->resume('convert_charset');
+	$GLOBALS['Timer']->resume('convert_charset', false );
 	if( $dest_charset == $src_charset || $dest_charset == '' /* may happen if $evo_charset is not defined yet */ )
 	{ // no conversation required
-		$GLOBALS['Timer']->pause('convert_charset');
+		$GLOBALS['Timer']->pause('convert_charset', false );
 		return $string;
 	}
 
@@ -857,7 +862,7 @@ function convert_charset( $string, $dest_charset, $src_charset )
 	}
 	// pre_dump( $dest_charset, $src_charset, $string );
 
-	$GLOBALS['Timer']->pause('convert_charset');
+	$GLOBALS['Timer']->pause('convert_charset', false );
 	return $string;
 }
 
@@ -1053,6 +1058,10 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.36  2009/11/30 00:22:05  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.35  2009/10/01 18:50:15  tblue246
  * convert_charset(): Trying to remove unreliable charset detection and modify all calls accordingly -- needs testing to ensure all charset conversions work as expected.
  *

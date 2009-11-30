@@ -27,6 +27,10 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+// DEBUG: (Turn switch on or off to log debug info for specified category)
+$GLOBALS['debug_skins'] = false;
+
+
 /**
  * Template tag. Initializes internal states for the most common skin displays.
  *
@@ -71,12 +75,16 @@ function skin_init( $disp )
 	 */
 	global $disp_detail;
 
+	global $Timer;
+
+	$Timer->resume( 'skin_init' );
+
 	if( empty($disp_detail) )
 	{
 		$disp_detail = $disp;
 	}
 
-	$Debuglog->add('skin_init: '.$disp, 'skin');
+	$Debuglog->add('skin_init: '.$disp, 'skins' );
 
 	// This is the main template; it may be used to display very different things.
 	// Do inits depending on current $disp:
@@ -364,8 +372,12 @@ function skin_init( $disp )
 	global $global_Cache, $credit_links;
 	$credit_links = $global_Cache->get( 'creds' );
 
+	$Timer->pause( 'skin_init' );
+
 	// Initialize displaying....
+	$Timer->start( 'Skin:display_init' );
 	$Skin->display_init();
+	$Timer->pause( 'Skin:display_init' );
 }
 
 
@@ -395,6 +407,11 @@ function skin_include( $template_name, $params = array() )
 	global $current_User, $Hit, $Session, $Settings;
 	global $skin_url, $htsrv_url, $htsrv_url_sensitive;
 	global $credit_links, $skin_links, $francois_links, $fplanque_links, $skinfaktory_links;
+
+	global $Timer;
+
+	$timer_name = 'skin_include('.$template_name.')';
+	$Timer->resume( $timer_name );
 
 	if( $template_name == '$disp$' )
 	{ // This is a special case.
@@ -438,6 +455,7 @@ function skin_include( $template_name, $params = array() )
 		if( !isset( $disp_handlers['disp_'.$disp] ) )
 		{
 			printf( '<div class="skin_error">Unhandled disp type [%s]</div>', $disp );
+			$Timer->pause( $timer_name );
 			return;
 		}
 
@@ -445,6 +463,7 @@ function skin_include( $template_name, $params = array() )
 
 		if( empty( $template_name ) )
 		{	// The caller asked not to display this handler
+			$Timer->pause( $timer_name );
 			return;
 		}
 	}
@@ -530,6 +549,8 @@ function skin_include( $template_name, $params = array() )
 			printf( '<div class="skin_error">User level 10 help info: [%s]</div>', $ads_current_skin_path.$template_name );
 		}
 	}
+
+	$Timer->pause( $timer_name );
 }
 
 
@@ -895,6 +916,10 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.78  2009/11/30 00:22:05  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.77  2009/11/23 00:09:06  sam2kb
  * Replace line breaks with single space in meta description
  *

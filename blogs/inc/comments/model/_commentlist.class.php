@@ -54,8 +54,8 @@ class CommentList extends DataObjectList
 		$author = '',													// Not used yet
 		$order = 'DESC',											// ASC or DESC
 		$orderby = '',												// list of fields to order by
-		$limit = '',
-		$exclude = array()											// # of comments to display on the page
+		$limit = '',													// # of comments to display on the page
+		$exclude = array()											
 		)
 	{
 		global $DB;
@@ -173,6 +173,10 @@ class CommentList extends DataObjectList
 
 /*
  * $Log$
+ * Revision 1.14  2009/11/30 00:22:05  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.13  2009/11/25 16:05:02  efy-maxim
  * comments awaiting moderation improvements
  *

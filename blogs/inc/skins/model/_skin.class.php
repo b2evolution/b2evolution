@@ -182,6 +182,10 @@ class Skin extends DataObject
 		 */
 		global $Blog;
 		global $admin_url, $rsc_url;
+		global $Timer;
+
+		$timer_name = 'skin_container('.$sco_name.')';
+		$Timer->start($timer_name);
 
 		if( false )
 		{	// DEBUG:
@@ -199,9 +203,11 @@ class Skin extends DataObject
 		if( !empty($Widget_array) )
 		{
 			foreach( $Widget_array as $ComponentWidget )
-			{
-				// Let the Widget display itself (with contextual params):
+			{	// Let the Widget display itself (with contextual params):
+				$widget_timer_name = 'Widget->display('.$ComponentWidget->code.')';
+				$Timer->start($widget_timer_name);
 				$ComponentWidget->display( $params );
+				$Timer->pause($widget_timer_name);
 			}
 		}
 
@@ -210,6 +216,8 @@ class Skin extends DataObject
 			echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear" />';
 			echo '</div>';
 		}
+
+		$Timer->pause($timer_name);
 	}
 
 
@@ -638,6 +646,10 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.23  2009/11/30 00:22:05  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.22  2009/11/04 13:20:25  efy-maxim
  * some new functions
  *

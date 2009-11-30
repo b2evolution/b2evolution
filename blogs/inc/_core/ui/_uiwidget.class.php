@@ -334,7 +334,7 @@ class Table extends Widget
 		{	// Get fadeout_array from session:
 			if( ($this->fadeout_array = $Session->get('fadeout_array')) && is_array( $this->fadeout_array ) )
 			{
-				$Debuglog->add( 'Got fadeout_array from session data.', 'session' );
+				$Debuglog->add( 'UIwidget: Got fadeout_array from session data.', 'results' );
 				$Session->delete( 'fadeout_array' );
 			}
 			else
@@ -1012,6 +1012,10 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.16  2009/11/30 00:22:04  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.15  2009/09/27 13:52:22  tblue246
  * minor
  *

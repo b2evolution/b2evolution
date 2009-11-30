@@ -183,10 +183,10 @@ class Hit
 		if( $debug )
 		{
 			global $Debuglog;
-			$Debuglog->add( 'IP: '.$this->IP, 'hit' );
-			$Debuglog->add( 'UserAgent: '.$this->get_user_agent(), 'hit' );
-			$Debuglog->add( 'Referer: '.var_export($this->referer, true).'; type='.$this->referer_type, 'hit' );
-			$Debuglog->add( 'Remote Host: '.$this->get_remote_host( false ), 'hit' );
+			$Debuglog->add( 'Hit: IP: '.$this->IP, 'request' );
+			$Debuglog->add( 'Hit: UserAgent: '.$this->get_user_agent(), 'request' );
+			$Debuglog->add( 'Hit: Referer: '.var_export($this->referer, true).'; type='.$this->referer_type, 'request' );
+			$Debuglog->add( 'Hit: Remote Host: '.$this->get_remote_host( false ), 'request' );
 		}
 	}
 
@@ -201,7 +201,7 @@ class Hit
 		if( is_admin_page() )
 		{	// We are inside of admin, this supersedes 'direct' access
 			// NOTE: this is not really a referer type but more a hit type
-			$Debuglog->add( 'Referer is admin page.', 'hit' );
+			$Debuglog->add( 'Hit: Referer is admin page.', 'request' );
 			$this->referer_type = 'admin';
 			return true;
 		}
@@ -266,7 +266,7 @@ class Hit
 				// This type may be superseeded by admin page
 				if( ! $this->detect_admin_page() )
 				{	// Not an admin page:
-					$Debuglog->add( 'detect_referer(): self referer ('.$self_referer.')', 'hit' );
+					$Debuglog->add( 'Hit: detect_referer(): self referer ('.$self_referer.')', 'request' );
 					$this->referer_type = 'self';
 				}
 				return;
@@ -288,7 +288,7 @@ class Hit
 				// fp> 2009-05-10: because of the 12 char limit above the following is probably no longer needed. Please enable it back if anyone has a problem with admin being detected as blacklist
 				// if( ! $this->detect_admin_page() )
 				{	// Not an admin page:
-					$Debuglog->add( 'detect_referer(): blacklist ('.$lBlacklist.')', 'hit' );
+					$Debuglog->add( 'Hit: detect_referer(): blacklist ('.$lBlacklist.')', 'request' );
 					$this->referer_type = 'blacklist';
 				}
 				return;
@@ -301,7 +301,7 @@ class Hit
 		load_funcs('_core/_url.funcs.php');
 		if( $error = validate_url( $this->referer, 'commenting' ) )
 		{ // This is most probably referer spam!!
-			$Debuglog->add( 'detect_referer(): '.$error.' (SPAM)', 'hit');
+			$Debuglog->add( 'Hit: detect_referer(): '.$error.' (SPAM)', 'hit');
 			$this->referer_type = 'spam';
 
 			if( $Settings->get('antispam_block_spam_referers') )
@@ -321,7 +321,7 @@ class Hit
 		{
 			if( stristr($this->referer, $lSearchEngine) ) // search simulation
 			{
-				$Debuglog->add( 'detect_referer(): search engine ('.$lSearchEngine.')', 'hit' );
+				$Debuglog->add( 'Hit: detect_referer(): search engine ('.$lSearchEngine.')', 'request' );
 				$this->referer_type = 'search';
 				return;
 			}
@@ -432,8 +432,8 @@ class Hit
 			}
 			elseif( $browscap = $this->get_browser_caps() )
 			{
-				$Debuglog->add( 'detect_useragent(): Trying to detect platform using browscap', 'hit' );
-				$Debuglog->add( 'detect_useragent(): Raw platform string: '.$browscap->platform, 'hit' );
+				$Debuglog->add( 'Hit:detect_useragent(): Trying to detect platform using browscap', 'request' );
+				$Debuglog->add( 'Hit:detect_useragent(): Raw platform string: '.$browscap->platform, 'request' );
 
 				$platform = strtolower( $browscap->platform );
 				if( $platform == 'linux' || in_array( substr( $platform, 0, 3 ), array( 'win', 'mac' ) ) )
@@ -494,8 +494,8 @@ class Hit
 			}
 		}
 
-		$Debuglog->add( 'Agent name: '.$this->agent_name, 'hit' );
-		$Debuglog->add( 'Agent platform: '.$this->agent_platform, 'hit' );
+		$Debuglog->add( 'Hit:detect_useragent(): Agent name: '.$this->agent_name, 'request' );
+		$Debuglog->add( 'Hit:detect_useragent(): Agent platform: '.$this->agent_platform, 'request' );
 
 		/*
 		 * Detect requests for XML feeds by $skin / $tempskin param.
@@ -504,7 +504,7 @@ class Hit
 		 */
 		if( isset( $Skin ) && $Skin->type == 'feed' )
 		{
-			$Debuglog->add( 'detect_useragent(): RSS', 'hit' );
+			$Debuglog->add( 'Hit: detect_useragent(): RSS', 'request' );
 			$this->agent_type = 'rss';
 		}
 		else
@@ -514,7 +514,7 @@ class Hit
 			{
 				if( $lUserAgent[0] == 'robot' && strpos( $this->user_agent, $lUserAgent[1] ) !== false )
 				{
-					$Debuglog->add( 'detect_useragent(): robot', 'hit' );
+					$Debuglog->add( 'Hit:detect_useragent(): robot', 'request' );
 					$this->agent_type = 'robot';
 					$match = true;
 					break;
@@ -523,7 +523,7 @@ class Hit
 
 			if( ! $match && ($browscap = $this->get_browser_caps()) && $browscap->crawler )
 			{
-				$Debuglog->add( 'detect_useragent(): robot (through browscap)', 'hit' );
+				$Debuglog->add( 'Hit:detect_useragent(): robot (through browscap)', 'request' );
 				$this->agent_type = 'robot';
 			}
 		}
@@ -608,19 +608,19 @@ class Hit
 
 		if( $is_admin_page && ! $Settings->get('log_admin_hits') )
 		{	// We don't want to log admin hits:
-			$Debuglog->add( 'Hit NOT logged, (Admin page logging is disabled)', 'hit' );
+			$Debuglog->add( 'Hit: Hit NOT logged, (Admin page logging is disabled)', 'request' );
 			return false;
 		}
 
 		if( ! $is_admin_page && ! $Settings->get('log_public_hits') )
 		{	// We don't want to log public hits:
-			$Debuglog->add( 'Hit NOT logged, (Public page logging is disabled)', 'hit' );
+			$Debuglog->add( 'Hit: Hit NOT logged, (Public page logging is disabled)', 'request' );
 			return false;
 		}
 
 		if( $this->referer_type == 'spam' && ! $Settings->get('log_spam_hits') )
 		{	// We don't want to log referer spam hits:
-			$Debuglog->add( 'Hit NOT logged, (Referer spam)', 'hit' );
+			$Debuglog->add( 'Hit: Hit NOT logged, (Referer spam)', 'request' );
 			return false;
 		}
 
@@ -638,7 +638,7 @@ class Hit
 	{
 		global $DB, $Session, $ReqURI, $Blog, $blog, $localtimenow, $Debuglog;
 
-		$Debuglog->add( 'Recording the hit.', 'hit' );
+		$Debuglog->add( 'Hit: Recording the hit.', 'request' );
 
 		if( !empty($Blog) )
 		{
@@ -777,7 +777,7 @@ class Hit
 			if( $this->user_agent != strip_tags($this->user_agent) )
 			{ // then they have tried something funky, putting HTML or PHP into the user agent
 				global $Debuglog;
-				$Debuglog->add( 'detect_useragent(): '.T_('bad char in User Agent'), 'hit');
+				$Debuglog->add( 'Hit: detect_useragent(): '.T_('bad char in User Agent'), 'hit');
 				$this->user_agent = '';
 			}
 			else
@@ -991,7 +991,7 @@ class Hit
 			}
 			if( $DB->get_var( $sql, 0, 0, 'Hit: Check for reload' ) )
 			{
-				$Debuglog->add( 'No new view!', 'hit' );
+				$Debuglog->add( 'Hit: No new view!', 'request' );
 				$this->_is_new_view = false;  // We don't want to log this hit again
 			}
 			else
@@ -1224,6 +1224,10 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.48  2009/11/30 00:22:05  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.47  2009/11/24 01:03:00  blueyed
  * Fix transformation of duplicate entries in T_useragents.
  *

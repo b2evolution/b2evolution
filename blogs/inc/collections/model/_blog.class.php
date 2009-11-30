@@ -141,6 +141,10 @@ class Blog extends DataObject
 	 */
 	function Blog( $db_row = NULL )
 	{
+		global $Timer;
+
+		$Timer->start( 'Blog constructor' );
+
 		// Call parent constructor:
 		parent::DataObject( 'T_blogs', 'blog_', 'blog_ID' );
 
@@ -194,6 +198,8 @@ class Blog extends DataObject
 			$this->media_url = $db_row->blog_media_url;
 			$this->UID = $db_row->blog_UID;
 		}
+
+		$Timer->pause( 'Blog constructor' );
 	}
 
 
@@ -2151,6 +2157,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.89  2009/11/30 00:22:04  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.88  2009/09/30 00:38:13  sam2kb
  * Space is not needed before get_field_attribs_as_string()
  *

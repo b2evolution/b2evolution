@@ -43,6 +43,10 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+// DEBUG: (Turn switch on or off to log debug info for specified category)
+$GLOBALS['debug_params'] = false;
+
+
 /**
  * Sets a parameter with values from the request or to provided default,
  * except if param is already set!
@@ -2095,6 +2099,10 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.54  2009/11/30 00:22:04  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.53  2009/11/22 20:29:38  fplanque
  * minor/doc
  *

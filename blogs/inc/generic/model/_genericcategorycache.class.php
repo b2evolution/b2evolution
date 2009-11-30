@@ -39,6 +39,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'generic/model/_genericcache.class.php', 'GenericCache' );
 
 
+// DEBUG: (Turn switch on or off to log debug info for specified category)
+$GLOBALS['debug_CategoryCache'] = false;
+
+
 /**
  * GenericCategoryCache class
  *
@@ -198,7 +202,7 @@ class GenericCategoryCache extends GenericCache
 					/* RETURN */
 				}
 
-				$Timer->resume('reveal_children');
+				$Timer->resume('reveal_children', false );
 
 				$Debuglog->add( 'Revealing subset of children', 'CategoryCache' );
 
@@ -234,7 +238,7 @@ class GenericCategoryCache extends GenericCache
 						}
 					}
 
-					$Timer->pause('reveal_children');
+					$Timer->pause('reveal_children', false );
 
 				}
 
@@ -430,6 +434,10 @@ class GenericCategoryCache extends GenericCache
 
 /*
  * $Log$
+ * Revision 1.9  2009/11/30 00:22:05  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.8  2009/09/14 13:11:37  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

@@ -86,7 +86,7 @@ class PageCache
 
 			if( ! $Settings->get('general_cache_enabled') )
 			{	// We do NOT want caching for this collection
-				$Debuglog->add( 'General cache not enabled.', 'cache' );
+				$Debuglog->add( 'General cache not enabled.', 'pagecache' );
 			}
 			else
 			{
@@ -100,7 +100,7 @@ class PageCache
 
 			if( ! $Blog->get_setting('cache_enabled') )
 			{	// We do NOT want caching for this collection
-				$Debuglog->add( 'Cache not enabled for this blog.', 'cache' );
+				$Debuglog->add( 'Cache not enabled for this blog.', 'pagecache' );
 			}
 			else
 			{
@@ -125,11 +125,11 @@ class PageCache
 		{
 			$ReqAbsUrl = $ReqHost.$ReqURI;
 			// echo $ReqAbsUrl;
- 			$Debuglog->add( 'URL being cached: '.$ReqAbsUrl, 'cache' );
+ 			$Debuglog->add( 'URL being cached: '.$ReqAbsUrl, 'pagecache' );
 
  			$this->cache_filepath = $this->gen_filecache_path( $ReqAbsUrl );
 
- 			$Debuglog->add( 'Cache file: '.$this->cache_filepath, 'cache' );
+ 			$Debuglog->add( 'Cache file: '.$this->cache_filepath, 'pagecache' );
 		}
 
  		return $this->cache_filepath;
@@ -160,7 +160,7 @@ class PageCache
 		global $Debuglog;
 
 		// echo 'Invalidating:'.$url;
-		$Debuglog->add( 'Invalidating:'.$url, 'cache' );
+		$Debuglog->add( 'Invalidating:'.$url, 'pagecache' );
 
 		// What would be the cache file for the current URL?
 		$af_cache_file = $this->gen_filecache_path( $url );
@@ -212,19 +212,19 @@ class PageCache
 
 		if( ! $this->is_enabled )
 		{	// We do NOT want caching for this page
-			$Debuglog->add( 'Cache not enabled. No lookup nor caching performed.', 'cache' );
+			$Debuglog->add( 'Cache not enabled. No lookup nor caching performed.', 'pagecache' );
 			return false;
 		}
 
 		if( $disp == '404' )
 		{	// We do NOT want caching for 404 pages (illimited possibilities!)
-			$Debuglog->add( 'Never cache 404s!', 'cache' );
+			$Debuglog->add( 'Never cache 404s!', 'pagecache' );
 			return false;
 		}
 
 		if( is_logged_in() )
 		{	// We do NOT want caching when a user is logged in (private data)
-			$Debuglog->add( 'Never cache pages for/from logged in members!', 'cache' );
+			$Debuglog->add( 'Never cache pages for/from logged in members!', 'pagecache' );
 			return false;
 		}
 
@@ -233,16 +233,16 @@ class PageCache
 			// We do want to display those messages.
 			// There may also be more... like a "comment pending review" etc...
 			// DO NOT CACHE and do not present a cached page.
-			$Debuglog->add( 'Not caching because we have messages!', 'cache' );
+			$Debuglog->add( 'Not caching because we have messages!', 'pagecache' );
 			return false;
 		}
 
-	/* fp> It feels like a waste of time to do this for every page hit 
-	   sam2kb> I spent 20 minutes trying to figure out why caching doesn't work after upgrade, 
-		 checked directory perms etc... Do you think that everybody will save cache 
-		 dir content when they backup/upgrade b2evo? 
-		 If blog cache directoty is missing users will have to disable and reenable 
-		 caching for each blog (what if they have 100 blogs), 
+	/* fp> It feels like a waste of time to do this for every page hit
+	   sam2kb> I spent 20 minutes trying to figure out why caching doesn't work after upgrade,
+		 checked directory perms etc... Do you think that everybody will save cache
+		 dir content when they backup/upgrade b2evo?
+		 If blog cache directoty is missing users will have to disable and reenable
+		 caching for each blog (what if they have 100 blogs),
 		 but they won't because they will never know that caching is disabled ;)
 		 fp> Yeah, I'm actually still under the illusion that some people will just follow the upgrade instructions.
 		 Anyways, we can try to recreate the cache directory:
@@ -250,14 +250,14 @@ class PageCache
 			- everytime we try to write to it
 		 We canNOT try to recreate:
 		 	- everytime we try to read from it
-		 		    
+
 		if( ! $this->cache_create( false ) )
 		{	// Make sure that blog cache directory exists
-			$Debuglog->add( 'Could not create cache directory: '.$this->ads_collcache_path, 'cache' );
+			$Debuglog->add( 'Could not create cache directory: '.$this->ads_collcache_path, 'pagecache' );
 			return false;
 		}
 	*/
-		
+
 		// TODO: fp> If the user has submitted a comment, we might actually want to invalidate the cache...
 
 
@@ -269,7 +269,7 @@ class PageCache
 
 		$this->is_collecting = true;
 
-		$Debuglog->add( 'Collecting started', 'cache' );
+		$Debuglog->add( 'Collecting started', 'pagecache' );
 
 		ob_start( array( & $this, 'output_handler'), $this->output_chunk_size );
 
@@ -311,14 +311,14 @@ class PageCache
 		// might have ended up empty because PHP crashed while writing to it or sth like that...
 		if( ! empty($lines) )
 		{	// We have data in the cache!
-			$Debuglog->add( 'Retrieving from cache!', 'cache' );
+			$Debuglog->add( 'Retrieving from cache!', 'pagecache' );
 
 			// Check that the format of the file if OK.
 			$sep = trim($lines[2]);
 			unset($lines[2]);
 			if( $sep != '' )
 			{
-				$Debuglog->add( 'Cached file format not recognized, aborting retrieve.', 'cache' );
+				$Debuglog->add( 'Cached file format not recognized, aborting retrieve.', 'pagecache' );
 				return false;
 			}
 
@@ -327,7 +327,7 @@ class PageCache
 			unset($lines[0]);
 			if( $retrieved_url != $ReqHost.$ReqURI )
 			{
-				$Debuglog->add( 'Cached file URL ['.$retrieved_url.'] does not match current URL, aborting retrieve.', 'cache' );
+				$Debuglog->add( 'Cached file URL ['.$retrieved_url.'] does not match current URL, aborting retrieve.', 'pagecache' );
 				return false;
 			}
 
@@ -335,7 +335,7 @@ class PageCache
 			$retrieved_ts = trim($lines[1]);
 			unset($lines[1]);
 			$cache_age = $servertimenow-$retrieved_ts;
-			$Debuglog->add( 'Cache age: '.floor($cache_age/60).' min '.($cache_age % 60).' sec', 'cache' );
+			$Debuglog->add( 'Cache age: '.floor($cache_age/60).' min '.($cache_age % 60).' sec', 'pagecache' );
 			if( $cache_age > $this->max_age_seconds )
 			{	// Cache has expired
 				return false;
@@ -380,7 +380,7 @@ class PageCache
 			return;
 		}
 
- 		$Debuglog->add( 'Aborting cache data collection...', 'cache' );
+ 		$Debuglog->add( 'Aborting cache data collection...', 'pagecache' );
 
 		ob_end_flush();
 
@@ -413,7 +413,7 @@ class PageCache
 		// fp> TODO: this here should be ok, but it would be even better with locking the file when we start collecting cache
 		if( ! $fh = @fopen( $af_cache_file.'.tmp', 'x', false ) )
 		{
-			$Debuglog->add( 'Could not open cache file!', 'cache' );
+			$Debuglog->add( 'Could not open cache file!', 'pagecache' );
 		}
 		else
 		{
@@ -445,7 +445,7 @@ class PageCache
 			if( ! @rename( $af_cache_file.'.tmp', $af_cache_file ) )
 			{	// Rename failed, we are probably on windows PHP <= 5.2.5... http://bugs.php.net/bug.php?id=44805
 				// we have to split this:
-				$Debuglog->add( 'Renaming of cache file failed. (Windows?)', 'cache' );
+				$Debuglog->add( 'Renaming of cache file failed. (Windows?)', 'pagecache' );
 				// Kill cache:
 				unlink( $af_cache_file );
 				// Now, some other process might start to try caching (and will likely give up since the .tmp file already exists)
@@ -456,12 +456,12 @@ class PageCache
 				}
 				else
 				{
-					$Debuglog->add( 'Cache updated... after unlink+rename!', 'cache' );
+					$Debuglog->add( 'Cache updated... after unlink+rename!', 'pagecache' );
 				}
 			}
 			else
 			{
-				$Debuglog->add( 'Cache updated!', 'cache' );
+				$Debuglog->add( 'Cache updated!', 'pagecache' );
 			}
 		}
 	}
@@ -470,6 +470,10 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.13  2009/11/30 00:22:04  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.12  2009/09/08 21:32:41  fplanque
  * doc
  *

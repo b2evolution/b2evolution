@@ -33,6 +33,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+// DEBUG: (Turn switch on or off to log debug info for specified category)
+$GLOBALS['debug_timer'] = true;
+
+
 /**
  * This is a simple class to allow timing/profiling of code portions.
  */
@@ -77,9 +82,8 @@ class Timer
 	function start( $category, $log = true )
 	{
 		global $Debuglog;
-		if( $log && is_object( $Debuglog ) ) $Debuglog->add( 'Starting timer '.$category, 'timer' );
 		$this->reset( $category );
-		$this->resume( $category );
+		$this->resume( $category, $log );
 	}
 
 
@@ -95,10 +99,7 @@ class Timer
 		if( ! $this->pause( $category ) )
 			return false;
 
-		if( is_object( $Debuglog ) )
-		{
-			$Debuglog->add( 'Stopped timer '.$category.' at '.$this->get_duration( $category, 3 ), 'timer' );
-		}
+		$Debuglog->add( $category.' stopped at '.$this->get_duration( $category, 3 ), 'timer' );
 
 		return true;
 	}
@@ -111,15 +112,20 @@ class Timer
 	 *
 	 * @return boolean false, if the timer had not been started.
 	 */
-	function pause( $category )
+	function pause( $category, $log = true )
 	{
-		if( !isset($this->_times[$category]['resumed']) )
-		{ // Timer has not been started!
+		global $Debuglog;
+
+		if( $this->get_state($category) != 'running' )
+		{ // Timer is not running!
 			return false;
 		}
+		
 		$since_resume = $this->get_current_microtime() - $this->_times[$category]['resumed'];
 		$this->_times[$category]['total'] += $since_resume;
 		$this->_times[$category]['state'] = 'paused';
+
+		if( $log ) $Debuglog->add( $category.' paused at '.$this->get_duration( $category, 3 ), 'timer' );
 
 		return true;
 	}
@@ -128,19 +134,22 @@ class Timer
 	/**
 	 * Resumes the timer on a category.
 	 */
-	function resume( $category )
+	function resume( $category, $log = true )
 	{
+		global $Debuglog;
+
 		if( !isset($this->_times[$category]['total']) )
 		{
-			$this->start($category);
+			$this->start( $category, $log );
+			return;
 		}
-		else
-		{
-			$this->_times[$category]['resumed'] = $this->get_current_microtime();
-			$this->_times[$category]['count']++;
 
-			$this->_times[$category]['state'] = 'running';
-		}
+		$this->_times[$category]['resumed'] = $this->get_current_microtime();
+		$this->_times[$category]['count']++;
+
+		$this->_times[$category]['state'] = 'running';
+
+		if( $log ) $Debuglog->add( $category.' resumed at '.$this->get_duration( $category, 3 ), 'timer' );
 	}
 
 
@@ -267,6 +276,10 @@ class Timer_noop
 
 /*
  * $Log$
+ * Revision 1.5  2009/11/30 00:22:04  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.4  2009/09/20 16:55:14  blueyed
  * Performance boost: add Timer_noop class and use it when not in debug mode.
  *

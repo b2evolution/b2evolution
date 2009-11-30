@@ -38,6 +38,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+// DEBUG: (Turn switch on or off to log debug info for specified category)
+$GLOBALS['debug_dataobjects'] = false;
+
+
 /**
  * Data Object Cache Class
  *
@@ -651,6 +656,10 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.15  2009/11/30 00:22:04  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.14  2009/10/19 21:50:36  blueyed
  * doc
  *

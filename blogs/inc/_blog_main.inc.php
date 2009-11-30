@@ -24,7 +24,6 @@
  *
  * @version $Id$
  */
-
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
@@ -35,7 +34,13 @@ require_once dirname(__FILE__).'/_main.inc.php';
 load_funcs('skins/_skin.funcs.php');
 load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 
-$Timer->start( '_blog_main.inc' );
+// fp> A lot of time (like 40ms) will be consumed the first time a new Blog object is created.
+// This happens within _BLOG_MAIN bloc in non logged in mode and is pretty much perturbing.
+// Trying to create a dummy Blog below move the delay out.
+// The constructor doesn't consume any time at all.
+// This is very strange. Is it because of recursive class loading that happens when instanciating a Blog?
+//$dummy = new Blog();
+$Timer->start( '_BLOG_MAIN.inc' );
 
 
 /*
@@ -521,7 +526,7 @@ if( !empty( $skin ) && !skin_exists( $skin ) )
 }
 
 
-$Timer->pause( '_blog_main.inc');
+$Timer->pause( '_BLOG_MAIN.inc');
 
 
 /*
@@ -538,19 +543,21 @@ $Plugins->trigger_event( 'BeforeBlogDisplay', array('skin'=>$skin) );
 
 if( !empty( $skin ) )
 { // We want to display with a skin now:
-	$Timer->resume( 'skin_display' );
+	$Timer->resume( 'SKIN DISPLAY' );
 
-	$Debuglog->add('Selected skin: '.$skin, 'skin');
+	$Debuglog->add('Selected skin: '.$skin, 'skins' );
 
 	// Instantiate PageCache:
+	$Timer->resume( 'PageCache' );
 	load_class( '_core/model/_pagecache.class.php', 'PageCache' );
-	$PageCache = & new PageCache( $Blog );
+	$PageCache = new PageCache( $Blog );
 	// Check for cached content & Start caching if needed
 	// Note: there are some redirects inside the skins themselves for canonical URLs,
 	// If we have a cache hit, the redirect won't take place until the cache expires -- probably ok.
 	// If we start collecting and a redirect happens, the collecting will just be lost and that's what we want.
 	if( ! $PageCache->check() )
 	{	// Cache miss, we have to generate:
+		$Timer->pause( 'PageCache' );
 
 		if( $skin_provided_by_plugin = skin_provided_by_plugin($skin) )
 		{
@@ -581,33 +588,33 @@ if( !empty( $skin ) )
 			{
 				if( file_exists( $disp_handler = $ads_current_skin_path.$disp_handlers[$disp] ) )
 				{	// The skin has a customized page handler for this display:
-					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (custom to this skin)', 'skin');
+					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (custom to this skin)', 'skins' );
 					require $disp_handler;
 				}
 				elseif( $disp_handlers[$disp] == 'posts.main.php' && file_exists( $disp_handler = $ads_current_skin_path.'items.main.php' ) )
 				{	// Compatibility with skins < 2.2.0
-					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (compat with skins < 2.2.0)', 'skin');
+					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (compat with skins < 2.2.0)', 'skins' );
 					require $disp_handler;
 				}
 				elseif( $disp_handlers[$disp] == 'comments.main.php' && file_exists( $disp_handler = $ads_current_skin_path.'latestcom.tpl.php' ) )
 				{	// Compatibility with skins < 2.2.0
-					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (compat with skins < 2.2.0)', 'skin');
+					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (compat with skins < 2.2.0)', 'skins' );
 					require $disp_handler;
 				}
 				elseif( $disp_handlers[$disp] == 'feedback_popup.main.php' && file_exists( $disp_handler = $ads_current_skin_path.'feedback_popup.tpl.php' ) )
 				{	// Compatibility with skins < 2.2.0
-					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (compat with skins < 2.2.0)', 'skin');
+					$Debuglog->add('blog_main: include '.rel_path_to_base($disp_handler).' (compat with skins < 2.2.0)', 'skins' );
 					require $disp_handler;
 				}
 				else
 				{	// Use the default handler from the skins dir:
-					$Debuglog->add('blog_main: include '.rel_path_to_base($ads_current_skin_path.'index.main.php').' (default handler)', 'skin');
+					$Debuglog->add('blog_main: include '.rel_path_to_base($ads_current_skin_path.'index.main.php').' (default handler)', 'skins' );
 					require $ads_current_skin_path.'index.main.php';
 				}
 			}
 			else
 			{	// Use the default handler from the skins dir:
-				$Debuglog->add('blog_main: include '.rel_path_to_base($ads_current_skin_path.'index.main.php').' (default index handler)', 'skin');
+				$Debuglog->add('blog_main: include '.rel_path_to_base($ads_current_skin_path.'index.main.php').' (default index handler)', 'skins' );
 				require $ads_current_skin_path.'index.main.php';
 			}
 		}
@@ -615,8 +622,9 @@ if( !empty( $skin ) )
 		// Save collected cached data if needed:
 		$PageCache->end_collect();
 	}
+	$Timer->pause( 'PageCache' );
 
-	$Timer->pause( 'skin_display' );
+	$Timer->pause( 'SKIN DISPLAY' );
 
 	// We probably don't want to return to the caller if we have displayed a skin...
 	// That is useful if the caller implements a custom display but we still use skins for RSS/ Atom etc..
@@ -633,6 +641,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.158  2009/11/30 00:22:04  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.157  2009/11/15 19:33:05  tblue246
  * bugfix/testing
  *

@@ -33,6 +33,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+// DEBUG: (Turn switch on or off to log debug info for specified category)
+$GLOBALS['debug_perms'] = false;
+
+
 load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 
 /**
@@ -1961,6 +1966,10 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.66  2009/11/30 00:22:05  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.65  2009/11/21 13:31:59  efy-maxim
  * 1. users controller has been refactored to users and user controllers
  * 2. avatar tab

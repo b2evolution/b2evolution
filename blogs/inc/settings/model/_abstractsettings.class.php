@@ -33,6 +33,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+// DEBUG: (Turn switch on or off to log debug info for specified category)
+$GLOBALS['debug_settings'] = false;
+
+
 /**
  * Class to handle settings in an abstract manner (to get used with either 1, 2 or 3 DB column keys).
  *
@@ -274,7 +279,7 @@ class AbstractSettings
 		{
 			global $Debuglog, $Timer;
 			$this_class = get_class($this);
-			$Timer->resume('abstractsettings_'.$this_class.'_get');
+			$Timer->resume('abstractsettings_'.$this_class.'_get', false );
 		}
 
 		switch( $this->count_col_key_names )
@@ -374,7 +379,7 @@ class AbstractSettings
 			$Debuglog->add( $this_class.'::get( '.$col_key1.'/'.$col_key2.'/'.$col_key3.' ): '
 				.( isset($from_default) ? '[DEFAULT]: ' : '' )
 				.var_export( $r, true ), 'settings' );
-			$Timer->pause('abstractsettings_'.$this_class.'_get');
+			$Timer->pause('abstractsettings_'.$this_class.'_get', false );
 		}
 
 		return $r;
@@ -755,6 +760,10 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.7  2009/11/30 00:22:05  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.6  2009/10/08 20:05:52  efy-maxim
  * Modular/Pluggable Permissions
  *

@@ -134,7 +134,7 @@ class Hitlist
 		$rows_affected = $DB->query( "
 			DELETE FROM T_hitlog
 			WHERE hit_datetime < '".date('Y-m-d', $time_prune_before)."'", 'Autopruning hit log' );
-		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_hitlog.', 'hit' );
+		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_hitlog.', 'request' );
 
 		// Prune sessions that have timed out and are older than auto_prune_stats
 		$sess_prune_before = ($localtimenow - $Settings->get( 'timeout_sessions' ));
@@ -143,7 +143,7 @@ class Hitlist
 		$Plugins->trigger_event( 'BeforeSessionsDelete', $temp_array = array( 'cutoff_timestamp' => $smaller_time ) );
 
 		$rows_affected = $DB->query( 'DELETE FROM T_sessions WHERE sess_lastseen < '.$DB->quote(date('Y-m-d H:i:s', $smaller_time)), 'Autoprune sessions' );
-		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_sessions.', 'hit' );
+		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_sessions.', 'request' );
 
 		// Prune non-referrered basedomains (where the according hits got deleted)
 		// BUT only those with unknown dom_type/dom_status, because otherwise this
@@ -155,14 +155,14 @@ class Hitlist
 			 WHERE hit_referer_dom_ID IS NULL
 			 AND dom_type = 'unknown'
 			 AND dom_status = 'unknown'" );
-		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_basedomains.', 'hit' );
+		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_basedomains.', 'request' );
 
 		// Prune entries from T_useragents which are not referenced in T_hitlog anymore.
 		$rows_affected = $DB->query('
 			DELETE T_useragents
 			  FROM T_useragents LEFT JOIN T_hitlog ON agnt_ID = hit_agnt_ID
 			 WHERE hit_agnt_ID IS NULL');
-		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_useragents.', 'hit' );
+		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_useragents.', 'request' );
 
 		// Optimizing tables
 		$DB->query('OPTIMIZE TABLE T_hitlog');
@@ -179,6 +179,10 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.20  2009/11/30 00:22:05  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.19  2009/11/15 19:05:43  fplanque
  * no message
  *

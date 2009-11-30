@@ -136,12 +136,12 @@ require_once $inc_path.'/_core/_misc.funcs.php';
 if( $debug )
 {
 	load_class( '_core/model/_log.class.php', 'Log' );
-	$Debuglog = & new Log( 'note' );
+	$Debuglog = new Log();
 }
 else
 {
 	load_class( '_core/model/_log.class.php', 'Log_noop' );
-	$Debuglog = & new Log_noop( 'note' );
+	$Debuglog = new Log_noop();
 }
 
 
@@ -149,7 +149,8 @@ else
  * Info & error message log for end user (initialized here)
  * @global Log $Messages
  */
-$Messages = & new Log( 'error' );
+load_class( '_core/model/_messages.class.php', 'Messages' );
+$Messages = new Messages();
 
 
 /*
@@ -159,8 +160,7 @@ if( $debug )
 {
 	load_class( '_core/model/_timer.class.php', 'Timer' );
 	$Timer = & new Timer('total');
-
-	$Timer->resume( '_main.inc' );
+	$Timer->resume( '_MAIN.inc' );
 }
 else
 {
@@ -278,13 +278,13 @@ load_funcs('_core/_param.funcs.php');
  * See also http://forums.b2evolution.net//viewtopic.php?p=95100
  *
  */
-$Debuglog->add( 'default_locale from conf: '.$default_locale, 'locale' );
+$Debuglog->add( 'Login: default_locale from conf: '.$default_locale, 'locale' );
 
 locale_overwritefromDB();
-$Debuglog->add( 'default_locale from DB: '.$default_locale, 'locale' );
+$Debuglog->add( 'Login: default_locale from DB: '.$default_locale, 'locale' );
 
 $default_locale = locale_from_httpaccept(); // set default locale by autodetect
-$Debuglog->add( 'default_locale from HTTP_ACCEPT: '.$default_locale, 'locale' );
+$Debuglog->add( 'Login: default_locale from HTTP_ACCEPT: '.$default_locale, 'locale' );
 
 if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
 {
@@ -378,7 +378,7 @@ if( empty($generating_static) )
 	if( $Session->get( 'core.no_CachePageContent' ) )
 	{ // The event is disabled for this request:
 		$Session->delete('core.no_CachePageContent');
-		$Debuglog->add( 'Skipping CachePageContent event, because of core.no_CachePageContent setting.', 'plugins' );
+		$Debuglog->add( 'Login: Skipping CachePageContent event, because of core.no_CachePageContent setting.', 'plugins' );
 	}
 	elseif( ( $get_return = $Plugins->trigger_event_first_true( 'CachePageContent' ) ) // Plugin responded to the event
 			&& ( isset($get_return['data']) ) ) // cached content returned
@@ -436,8 +436,8 @@ elseif( isset($_GET['login'] ) )
 	unset($_GET['pwd']); // password will be hashed below
 }
 
-$Debuglog->add( 'login: '.var_export($login, true), 'login' );
-$Debuglog->add( 'pass: '.( empty($pass) ? '' : 'not' ).' empty', 'login' );
+$Debuglog->add( 'Login: login: '.var_export($login, true), 'request' );
+$Debuglog->add( 'Login: pass: '.( empty($pass) ? '' : 'not' ).' empty', 'request' );
 
 // either 'login' (normal) or 'redirect_to_backoffice' may be set here. This also helps to display the login form again, if either login or pass were empty.
 $login_action = param_arrayindex( 'login_action' );
@@ -446,7 +446,7 @@ $UserCache = & get_UserCache();
 
 if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 { // User is trying to login right now
-	$Debuglog->add( 'User is trying to log in.', 'login' );
+	$Debuglog->add( 'Login: User is trying to log in.', 'request' );
 
 	header_nocache();
 
@@ -463,7 +463,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	param('pwd_salt', 'string', ''); // just for comparison with the one from Session
 	$pwd_salt_sess = $Session->get('core.pwd_salt');
 
-	// $Debuglog->add( 'salt: '.var_export($pwd_salt, true).', session salt: '.var_export($pwd_salt_sess, true) );
+	// $Debuglog->add( 'Login: salt: '.var_export($pwd_salt, true).', session salt: '.var_export($pwd_salt_sess, true) );
 
 	$transmit_hashed_password = (bool)$Settings->get('js_passwd_hashing') && !(bool)$Plugins->trigger_event_first_true('LoginAttemptNeedsRawPassword');
 	if( $transmit_hashed_password )
@@ -475,7 +475,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		$pwd_hashed = '';
 	}
 
-	// $Debuglog->add( 'pwd_hashed: '.var_export($pwd_hashed, true).', pass: '.var_export($pass, true) );
+	// $Debuglog->add( 'Login: pwd_hashed: '.var_export($pwd_hashed, true).', pass: '.var_export($pass, true) );
 
 	$pass_ok = false;
 	// Trigger Plugin event, which could create the user, according to another database:
@@ -507,46 +507,46 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 			if( ! empty($pwd_hashed) )
 			{ // password hashed by JavaScript:
 
-				$Debuglog->add( 'Hashed password available.', 'login' );
+				$Debuglog->add( 'Login: Hashed password available.', 'request' );
 
 				if( empty($pwd_salt_sess) )
 				{ // no salt stored in session: either cookie problem or the user had already tried logging in (from another window for example)
-					$Debuglog->add( 'Empty salt_sess!', 'login' );
+					$Debuglog->add( 'Login: Empty salt_sess!', 'request' );
 					if( ($pos = strpos( $pass, '_hashed_' ) ) && substr($pass, $pos+8) == $Session->ID )
 					{ // session ID matches, no cookie problem
 						$Messages->add( T_('The login window has expired. Please try again.'), 'login_error' );
-						$Debuglog->add( 'Session ID matches.', 'login' );
+						$Debuglog->add( 'Login: Session ID matches.', 'request' );
 					}
 					else
 					{ // more general error:
 						$Messages->add( T_('Either you have not enabled cookies or this login window has expired.'), 'login_error' );
-						$Debuglog->add( 'Session ID does not match.', 'login' );
+						$Debuglog->add( 'Login: Session ID does not match.', 'request' );
 					}
 				}
 				elseif( $pwd_salt != $pwd_salt_sess )
 				{ // submitted salt differs from the one stored in the session
 					$Messages->add( T_('The login window has expired. Please try again.'), 'login_error' );
-					$Debuglog->add( 'Submitted salt and salt from Session do not match.', 'login' );
+					$Debuglog->add( 'Login: Submitted salt and salt from Session do not match.', 'request' );
 				}
 				else
 				{ // compare the password, using the salt stored in the Session:
 					#pre_dump( sha1($User->pass.$pwd_salt), $pwd_hashed );
 					$pass_ok = sha1($User->pass.$pwd_salt) == $pwd_hashed;
 					$Session->delete('core.pwd_salt');
-					$Debuglog->add( 'Compared hashed passwords. Result: '.(int)$pass_ok, 'login' );
+					$Debuglog->add( 'Login: Compared hashed passwords. Result: '.(int)$pass_ok, 'request' );
 				}
 			}
 			else
 			{
 				$pass_ok = ( $User->pass == $pass_md5 );
-				$Debuglog->add( 'Compared raw passwords. Result: '.(int)$pass_ok, 'login' );
+				$Debuglog->add( 'Login: Compared raw passwords. Result: '.(int)$pass_ok, 'request' );
 			}
 		}
 	}
 
 	if( $pass_ok )
 	{ // Login succeeded, set cookies
-		$Debuglog->add( 'User successfully logged in with username and password...', 'login');
+		$Debuglog->add( 'Login: User successfully logged in with username and password...', 'login');
 		// set the user from the login that succeeded
 		$current_User = & $UserCache->get_by_login($login);
 		// save the user for later hits
@@ -568,7 +568,7 @@ elseif( $Session->has_User() /* logged in */
 	// get the user ID from the session and set up the user again
 	$current_User = & $UserCache->get_by_ID( $Session->user_ID );
 
-	$Debuglog->add( 'Was already logged in... ['.$current_User->get('login').']', 'login' );
+	$Debuglog->add( 'Login: Was already logged in... ['.$current_User->get('login').']', 'request' );
 }
 else
 { // The Session has no user or $login is given (and differs from current user), allow alternate authentication through Plugin:
@@ -576,7 +576,7 @@ else
 	    && $Session->has_User()  # the plugin should have attached the user to $Session
 	)
 	{
-		$Debuglog->add( 'User has been authenticated through plugin #'.$event_return['plugin_ID'].' (AlternateAuthentication)', 'login' );
+		$Debuglog->add( 'Login: User has been authenticated through plugin #'.$event_return['plugin_ID'].' (AlternateAuthentication)', 'request' );
 		$current_User = & $UserCache->get_by_ID( $Session->user_ID );
 	}
 	elseif( $login_required )
@@ -586,7 +586,7 @@ else
 		 * ---------------------------------------------------------
 		 */
 		// echo ' NOT logged in...';
-		$Debuglog->add( 'NOT logged in... (did not try)', 'login' );
+		$Debuglog->add( 'Login: NOT logged in... (did not try)', 'request' );
 
 		$Messages->add( T_('You must log in!'), 'login_error' );
 	}
@@ -654,11 +654,11 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale && ! $loca
 	if( $current_locale == $current_User->get('locale') )
 	{
 		$default_locale = $current_locale;
-		$Debuglog->add( 'default_locale from user profile: '.$default_locale, 'locale' );
+		$Debuglog->add( 'Login: default_locale from user profile: '.$default_locale, 'locale' );
 	}
 	else
 	{
-		$Debuglog->add( 'locale from user profile could not be activated: '.$current_User->get('locale'), 'locale' );
+		$Debuglog->add( 'Login: locale from user profile could not be activated: '.$current_User->get('locale'), 'locale' );
 	}
 }
 
@@ -675,7 +675,7 @@ if( $Messages->count( 'login_error' ) )
 	exit(0);
 }
 
-$Timer->pause( '_main.inc');
+$Timer->pause( '_MAIN.inc');
 
 
 /**
@@ -691,6 +691,10 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.132  2009/11/30 00:22:04  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.131  2009/11/23 18:41:17  fplanque
  * Make sure we are calling the right page (on the right domain) to make sure that session cookie goes through
  *

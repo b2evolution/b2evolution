@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Log class FOR DEBUGGING
+ * This file implements the Messages class for displaying messages about performed actions.
  *
  * It additionally provides the class Log_noop that implements the same (used) methods, but as
  * no-operation functions. This is useful to create a more resource friendly object when
@@ -39,15 +39,17 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Log class. Logs notes and errors.
+ * Messages class. For displaying notes, successful actions & errors.
  *
+ * @todo CLEAN UP A LOT because of previous over factorization with Log class.
+ * 
  * Messages can be logged into different categories (aka levels)
  * Examples: 'note', 'error'. Note: 'all' is reserved to display all categories together.
  * Messages can later be displayed grouped by category/level.
  *
  * @package evocore
  */
-class Log
+class Messages
 {
 	/**
 	 * The stored messages (by category).
@@ -61,7 +63,7 @@ class Log
 	 * Default category for messages.
 	 * @var string
 	 */
-	var $defaultcategory = 'note';
+	var $defaultcategory = 'error';
 
 	/**
 	 * string or array to display before messages
@@ -87,7 +89,7 @@ class Log
 	 *
 	 * @param string sets default category
 	 */
-	function Log( $category = 'note' )
+	function Messages( $category = 'error' )
 	{
 		$this->defaultcategory = $category;
 
@@ -134,11 +136,6 @@ class Log
 		if( $category === NULL )
 		{ // By default, we use the default category:
 			$category = $this->defaultcategory;
-		}
-
-		if( isset($GLOBALS['debug_'.$category]) && $GLOBALS['debug_'.$category] == false )
-		{	// We don't want to debug this at this time:
-			return;
 		}
 
 		if( is_array($category) )
@@ -574,78 +571,9 @@ class Log
 
 }
 
-
-/**
- * This is a no-operation implementation of {@link Log}.
- *
- * It just implements the used methods {@link get()} and {@link display()}.
- *
- * This is used for $Debuglog, when $debug is not enabled.
- *
- * @package evocore
- */
-class Log_noop {
-	/**
-	 * This is a no-operation method.
-	 */
-	function Log_noop() {}
-
-	/**
-	 * This is a no-operation method.
-	 */
-	function add() {}
-
-	/**
-	 * This is a no-operation method.
-	 */
-	function add_messages() {}
-
-	/**
-	 * This is a no-operation method.
-	 */
-	function clear() {}
-
-	/**
-	 * This is a no-operation method.
-	 */
-	function count() {}
-
-	/**
-	 * This is a no-operation method.
-	 */
-	function disp() {}
-
-	/**
-	 * This is a no-operation method.
-	 */
-	function display() {}
-
-	/**
-	 * This is a no-operation method.
-	 */
-	function display_paragraphs() {}
-
-	/**
-	 * This is a no-operation method.
-	 */
-	function get_messages()
-	{
-		return array();
-	}
-
-	/**
-	 * This is a no-operation method.
-	 */
-	function get_string()
-	{
-		return '';
-	}
-}
-
-
 /*
  * $Log$
- * Revision 1.10  2009/11/30 00:22:04  fplanque
+ * Revision 1.1  2009/11/30 00:22:04  fplanque
  * clean up debug info
  * show more timers in view of block caching
  *

@@ -105,11 +105,11 @@ if( ! $admin_skin || ! file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
 { // there's no skin for the user
 	if( !$admin_skin )
 	{
-		$Debuglog->add( 'The user has no admin skin set.', 'skin' );
+		$Debuglog->add( 'The user has no admin skin set.', 'skins' );
 	}
 	else
 	{
-		$Debuglog->add( 'The admin skin ['.$admin_skin.'] set by the user does not exist.', 'skin' );
+		$Debuglog->add( 'The admin skin ['.$admin_skin.'] set by the user does not exist.', 'skins' );
 	}
 
 	$admin_skin = $Settings->get( 'admin_skin' );
@@ -118,7 +118,7 @@ if( ! $admin_skin || ! file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
 	{ // even the default skin does not exist!
 		if( !$admin_skin )
 		{
-			$Debuglog->add( 'There is no default admin skin set!', 'skin' );
+			$Debuglog->add( 'There is no default admin skin set!', 'skins' );
 		}
 		else
 		{
@@ -129,7 +129,7 @@ if( ! $admin_skin || ! file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
 		{ // 'legacy' does exist
 			$admin_skin = 'chicago';
 
-			$Debuglog->add( 'Falling back to legacy admin skin.', 'skin' );
+			$Debuglog->add( 'Falling back to legacy admin skin.', 'skins' );
 		}
 		else
 		{ // get the first one available one
@@ -146,18 +146,18 @@ if( ! $admin_skin || ! file_exists( sprintf( $admin_skin_path, $admin_skin ) ) )
 			else
 			{
 				$admin_skin = array_shift($admin_skin_dirs);
-				$Debuglog->add( 'Falling back to first available skin.', 'skin' );
+				$Debuglog->add( 'Falling back to first available skin.', 'skins' );
 			}
 		}
 	}
 }
 if( ! $admin_skin )
 {
-	$Debuglog->display( 'No admin skin available!', '', true, 'skin' );
+	$Debuglog->display( 'No admin skin available!', '', true, 'skins' );
 	die(1);
 }
 
-$Debuglog->add( 'Using admin skin &laquo;'.$admin_skin.'&raquo;', 'skin' );
+$Debuglog->add( 'Using admin skin &laquo;'.$admin_skin.'&raquo;', 'skins' );
 
 /**
  * Load the AdminUI class for the skin.
@@ -224,6 +224,10 @@ require $inc_path.$ctrl_mappings[$ctrl];
 
 /*
  * $Log$
+ * Revision 1.35  2009/11/30 00:22:04  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.34  2009/09/26 12:00:41  tblue246
  * Minor/coding style
  *

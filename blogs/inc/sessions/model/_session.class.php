@@ -107,26 +107,26 @@ class Session
 		global $Hit;
 		global $cookie_session, $cookie_expires, $cookie_path, $cookie_domain;
 
-		$Debuglog->add( 'cookie_domain='.$cookie_domain, 'session' );
-		$Debuglog->add( 'cookie_path='.$cookie_path, 'session' );
+		$Debuglog->add( 'Session: cookie_domain='.$cookie_domain, 'request' );
+		$Debuglog->add( 'Session: cookie_path='.$cookie_path, 'request' );
 
 		$session_cookie = param_cookie( $cookie_session, 'string', '' );
 		if( empty( $session_cookie ) )
 		{
-			$Debuglog->add( 'No session cookie received.', 'session' );
+			$Debuglog->add( 'Session: No session cookie received.', 'request' );
 		}
 		else
 		{ // session ID sent by cookie
 			if( ! preg_match( '~^(\d+)_(\w+)$~', $session_cookie, $match ) )
 			{
-				$Debuglog->add( 'Invalid session cookie format!', 'session' );
+				$Debuglog->add( 'Session: Invalid session cookie format!', 'request' );
 			}
 			else
 			{	// We have a valid session cookie:
 				$session_id_by_cookie = $match[1];
 				$session_key_by_cookie = $match[2];
 
-				$Debuglog->add( 'Session ID received from cookie: '.$session_id_by_cookie, 'session' );
+				$Debuglog->add( 'Session: Session ID received from cookie: '.$session_id_by_cookie, 'request' );
 
 				$timeout_sessions = NULL;
 				if( $this->user_ID != NULL )
@@ -147,21 +147,21 @@ class Session
 					   AND UNIX_TIMESTAMP(sess_lastseen) > '.( $localtimenow - $timeout_sessions ) );
 				if( empty( $row ) )
 				{
-					$Debuglog->add( 'Session ID/key combination is invalid!', 'session' );
+					$Debuglog->add( 'Session: Session ID/key combination is invalid!', 'request' );
 				}
 				else
 				{ // ID + key are valid: load data
-					$Debuglog->add( 'Session ID is valid.', 'session' );
+					$Debuglog->add( 'Session: Session ID is valid.', 'request' );
 					$this->ID = $row->sess_ID;
 					$this->key = $row->sess_key;
 					$this->user_ID = $row->sess_user_ID;
 					$this->is_validated = true;
 
-					$Debuglog->add( 'Session user_ID: '.var_export($this->user_ID, true), 'session' );
+					$Debuglog->add( 'Session: Session user_ID: '.var_export($this->user_ID, true), 'request' );
 
 					if( empty( $row->sess_data ) )
 					{
-						$Debuglog->add( 'No session data available.', 'session' );
+						$Debuglog->add( 'Session: No session data available.', 'request' );
 						$this->_data = array();
 					}
 					else
@@ -186,21 +186,21 @@ class Session
 
 						if( ! is_array($this->_data) )
 						{
-							$Debuglog->add( 'Session data corrupted!<br />
+							$Debuglog->add( 'Session: Session data corrupted!<br />
 								connection_charset: '.var_export($DB->connection_charset, true).'<br />
 								Serialized data was: --['.var_export($row->sess_data, true).']--', array('session','error') );
 							$this->_data = array();
 						}
 						else
 						{
-							$Debuglog->add( 'Session data loaded.', 'session' );
+							$Debuglog->add( 'Session: Session data loaded.', 'request' );
 
 							// Load a Messages object from session data, if available:
 							if( ($sess_Messages = $this->get('Messages')) && is_a( $sess_Messages, 'log' ) )
 							{
 								// dh> TODO: "old" messages should rather get prepended to any existing ones from the current request, rather than appended
 								$Messages->add_messages( $sess_Messages->messages );
-								$Debuglog->add( 'Added Messages from session data.', 'session' );
+								$Debuglog->add( 'Session: Added Messages from session data.', 'request' );
 								$this->delete( 'Messages' );
 							}
 						}
@@ -232,8 +232,8 @@ class Session
 			// Set a cookie valid for ~ 10 years:
 			setcookie( $cookie_session, $this->ID.'_'.$this->key, time()+315360000, $cookie_path, $cookie_domain );
 
-			$Debuglog->add( 'ID (generated): '.$this->ID, 'session' );
-			$Debuglog->add( 'Cookie sent.', 'session' );
+			$Debuglog->add( 'Session: ID (generated): '.$this->ID, 'request' );
+			$Debuglog->add( 'Session: Cookie sent.', 'request' );
 		}
 	}
 
@@ -268,7 +268,7 @@ class Session
 			{ // The user does not want/is not allowed to have multiple sessions open at the same time:
 				// Invalidate previous sessions:
 				global $Debuglog;
-				$Debuglog->add( 'Invalidating all previous user sessions, because login_multiple_sessions=0', 'session' );
+				$Debuglog->add( 'Session: Invalidating all previous user sessions, because login_multiple_sessions=0', 'request' );
 				$DB->query( '
 					UPDATE T_sessions
 					   SET sess_key = NULL
@@ -360,7 +360,7 @@ class Session
 			{ // expired or old format (without 'value' key)
 				unset( $this->_data[$param] );
 				$this->_session_needs_save = true;
-				$Debuglog->add( 'Session data['.$param.'] expired.', 'session' );
+				$Debuglog->add( 'Session: Session data['.$param.'] expired.', 'request' );
 			}
 		}
 
@@ -393,7 +393,7 @@ class Session
 				$this->set( 'core.no_CachePageContent', 1 );
 			}
 
-			$Debuglog->add( 'Session data['.$param.'] updated. Expire in: '.( $expire ? $expire.'s' : '-' ).'.', 'session' );
+			$Debuglog->add( 'Session: Session data['.$param.'] updated. Expire in: '.( $expire ? $expire.'s' : '-' ).'.', 'request' );
 
 			$this->_session_needs_save = true;
 		}
@@ -413,7 +413,7 @@ class Session
 		{
 			unset( $this->_data[$param] );
 
-			$Debuglog->add( 'Session data['.$param.'] deleted!', 'session' );
+			$Debuglog->add( 'Session: Session data['.$param.'] deleted!', 'request' );
 
 			$this->_session_needs_save = true;
 		}
@@ -431,7 +431,7 @@ class Session
 
 		if( ! $this->_session_needs_save )
 		{	// There have been no changes since the last save.
-			$Debuglog->add( 'Session is up to date and does not need to be saved.', 'session' );
+			$Debuglog->add( 'Session: Session is up to date and does not need to be saved.', 'request' );
 			return false;
 		}
 
@@ -454,7 +454,7 @@ class Session
 
 		$DB->query( $sql, 'Session::dbsave()' );
 
-		$Debuglog->add( 'Session data saved!', 'session' );
+		$Debuglog->add( 'Session: Session data saved!', 'request' );
 
 		$this->_session_needs_save = false;
 	}
@@ -490,7 +490,7 @@ class Session
 			$this->_data = $sess_data;
 		}
 
-		$Debuglog->add( 'Reloaded session data.' );
+		$Debuglog->add( 'Session: Reloaded session data.' );
 	}
 }
 
@@ -559,6 +559,10 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.22  2009/11/30 00:22:05  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.21  2009/11/12 03:54:17  fplanque
  * wording/doc/cleanup
  *

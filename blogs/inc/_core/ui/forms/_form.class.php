@@ -729,7 +729,8 @@ class Form extends Widget
 
 		if( !empty($field_note) )
 		{
-			$field_params['note'] = $field_note;		}
+			$field_params['note'] = $field_note;
+		}
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
@@ -3033,6 +3034,10 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.77  2009/11/30 00:22:04  fplanque
+ * clean up debug info
+ * show more timers in view of block caching
+ *
  * Revision 1.76  2009/11/28 16:42:05  efy-maxim
  * field name fix
  *
