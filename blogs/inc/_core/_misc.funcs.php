@@ -2129,16 +2129,7 @@ function debug_info( $force = false, $force_clean = false )
 		}
 
 		// ================================ Opcode caching ================================
-		$opcode_cache = 'none';
-		if( function_exists('apc_cache_info') )
-		{
-			$apc_info = apc_cache_info( '', true );
-			if( $apc_info['num_entries'] )
-			{
-				$opcode_cache = 'APC';
-			}
-		}
-		echo 'Opcode cache: '.$opcode_cache;
+		echo 'Opcode cache: '.get_active_opcode_cache();
 		echo $clean ? "\n" : '<p>';
 
 		// ================================ Memory Usage ================================
@@ -3683,8 +3674,30 @@ function & get_IconLegend()
 }
 
 
+/**
+ * Anyone using something else, please extend.
+ *
+ */
+function get_active_opcode_cache()
+{
+	$opcode_cache = 'none';
+	if( function_exists('apc_cache_info') )
+	{
+		$apc_info = apc_cache_info( '', true );
+		if( $apc_info['num_entries'] )
+		{
+			$opcode_cache = 'APC';
+		}
+	}
+
+	return $opcode_cache;
+}
+
 /*
  * $Log$
+ * Revision 1.187  2009/11/30 01:08:27  fplanque
+ * extended system optimization checks
+ *
  * Revision 1.186  2009/11/30 00:22:04  fplanque
  * clean up debug info
  * show more timers in view of block caching

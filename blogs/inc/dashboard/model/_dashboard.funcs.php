@@ -120,6 +120,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 											'php_gid' => new xmlrpcval( $gid, 'int' ),
 											'php_gname' => new xmlrpcval( $gname, 'string' ),	// Potential unsecure hosts will use names like 'nobody', 'www-data'
 											'php_reg_globals' => new xmlrpcval( ini_get('register_globals') ? 1 : 0, 'int' ), // if <5% we may actually refuse to run future version on this
+											'php_opcode_cache' => new xmlrpcval( get_active_opcode_cache(), 'string' ), // How many use one? Which is the most popular?
 											'gd_version' => new xmlrpcval( system_check_gd_version(), 'string' ),
 										), 'struct' ),
 								)
@@ -167,6 +168,9 @@ function b2evonet_get_updates( $force_short_delay = false )
 
 /*
  * $Log$
+ * Revision 1.22  2009/11/30 01:08:27  fplanque
+ * extended system optimization checks
+ *
  * Revision 1.21  2009/11/15 19:44:02  fplanque
  * minor
  *

@@ -83,6 +83,43 @@ $change_ini = '<p>'.T_('If possible, change this setting to <code>%s</code> in y
 
 echo '<h2>'.T_('About this system').'</h2>';
 
+
+	// Note: hopefully, the update swill have been downloaded in the shutdown function of a previous page (including the login screen)
+	// However if we have outdated info, we will load updates here.
+	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+	// Let's clear any remaining messages that should already have been displayed before...
+	$Messages->clear( 'all' );
+
+	if( b2evonet_get_updates( true ) !== NULL )
+	{	// Updates are allowed, display them:
+
+		// Display info & error messages
+		echo $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
+
+		/**
+		 * @var AbstractSettings
+		 */
+		global $global_Cache;
+		$version_status_msg = $global_Cache->get( 'version_status_msg' );
+		if( !empty($version_status_msg) )
+		{	// We have managed to get updates (right now or in the past):
+			$msg = '<p>'.$version_status_msg.'</p>';
+			$extra_msg = $global_Cache->get( 'extra_msg' );
+			if( !empty($extra_msg) )
+			{
+				$msg .= '<p>'.$extra_msg.'</p>';
+			}
+		}
+
+	}
+	else
+	{
+		$msg = '';
+		//$msg = '<p>Updates from b2evolution.net are disabled!</p>';
+		//$msg .= '<p>You will <b>NOT</b> be alerted if you are running an insecure configuration.</p>';
+	}
+
+
 $block_item_Widget = & new Widget( 'block_item' );
 
 
@@ -95,22 +132,41 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 // Version:
 $app_timestamp = mysql2timestamp( $app_date );
 init_system_check( T_( 'b2evolution version' ), sprintf( /* TRANS: First %s: App version, second %s: release date */ T_( '%s released on %s' ), $app_version, date_i18n( locale_datefmt(), $app_timestamp ) ) );
-$app_age = ($localtimenow - $app_timestamp) / 3600 / 24 / 30;	// approx age in months
-if( $app_age > 12 )
+if( ! empty($msg) )
 {
-	disp_system_check( 'error', sprintf( T_('This version is old. You should check for newer releases on <a %s>b2evolution.net</a>.'),
-		' href="http://b2evolution.net/downloads/"'	) );
-}
-elseif( $app_age > 6 )
-{
-	disp_system_check( 'warning', sprintf( T_('This version is aging. You may want to check for newer releases on <a %s>b2evolution.net</a>.'),
-		' href="http://b2evolution.net/downloads/"'	) );
+	switch( $global_Cache->get( 'version_status_color' ) )
+	{
+		case 'green':
+			disp_system_check( 'ok', $msg );
+			break;
+
+		case 'yellow':
+			disp_system_check( 'warning', $msg );
+			break;
+
+		default:
+			disp_system_check( 'error', $msg );
+	}
 }
 else
 {
-	disp_system_check( 'ok' );
-}
+	$msg = '<p>Updates from b2evolution.net are disabled!</p>
+			<p>You will <b>NOT</b> be alerted if you are running an insecure configuration.</p>';
 
+	$app_age = ($localtimenow - $app_timestamp) / 3600 / 24 / 30;	// approx age in months
+	if( $app_age > 12 )
+	{
+		$msg .= '<p>'.sprintf( T_('Furthermore, this version is old. You should check for newer releases on <a %s>b2evolution.net</a>.'),
+			' href="http://b2evolution.net/downloads/"'	).'</p>';
+	}
+	elseif( $app_age > 6 )
+	{
+		$msg .= '<p>'.sprintf( T_('Furthermore, This version is aging. You may want to check for newer releases on <a %s>b2evolution.net</a>.'),
+			' href="http://b2evolution.net/downloads/"'	).'</p>';
+	}
+
+	disp_system_check( 'error', $msg );
+}
 
 // Media folder writable?
 list( $mediadir_status, $mediadir_msg ) = system_check_media_dir();
@@ -395,6 +451,18 @@ else
 	disp_system_check( 'ok' );
 }
 
+// APC extension
+$opcode_cache = get_active_opcode_cache();
+init_system_check( T_( 'PHP APC extension' ), $opcode_cache );
+if( $opcode_cache == 'none' )
+{
+	disp_system_check( 'warning', T_( 'Using an opcode cache allows all your PHP scripts to run faster by caching a "compiled" (opcode) verison of the scripts instead of recompiling everything at every page load. Several opcode caches are available. We recommend APC.' ) );
+}
+else
+{
+	disp_system_check( 'ok' );
+}
+
 // pre_dump( get_loaded_extensions() );
 
 $block_item_Widget->disp_template_raw( 'block_end' );
@@ -500,6 +568,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2009/11/30 01:08:27  fplanque
+ * extended system optimization checks
+ *
  * Revision 1.21  2009/09/26 18:58:18  tblue246
  * GD info fix for PHP 5.3
  *
