@@ -26,6 +26,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
+load_class( '_core/model/_blockcache.class.php', 'BlockCache' );
 
 /**
  * ComponentWidget Class
@@ -451,6 +452,38 @@ class ComponentWidget extends DataObject
 
 
 	/**
+	 * Wraps display in a cacheable block
+	 */
+	function display_with_cache( $params )
+	{
+		global $Blog, $Timer;
+
+		if( ! $Blog->get_setting('cache_enabled_widgets') )
+		{	// We do NOT want caching for this collection
+			$this->display( $params );
+		}
+		else
+		{	// Instantiate BlockCache:
+			$Timer->resume( 'BlockCache' );
+			$keys = array( 'wi_ID' => $this->ID );
+			$this->BlockCache = new BlockCache( $keys );
+
+			if( ! $this->BlockCache->check() )
+			{	// Cache miss, we have to generate:
+				$Timer->pause( 'BlockCache' );
+
+				$this->display( $params );
+
+				// Save collected cached data if needed:
+				$this->BlockCache->end_collect();
+			}
+
+			$Timer->pause( 'BlockCache' );
+		}
+	}
+
+
+	/**
 	 * Note: a container can prevent display of titles with 'block_display_title'
 	 * This is useful for the lists in the headers
 	 * fp> I'm not sur if this param should be overridable by widgets themselves (priority problem)
@@ -614,6 +647,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.67  2009/11/30 04:31:38  fplanque
+ * BlockCache Proof Of Concept
+ *
  * Revision 1.66  2009/10/03 21:00:50  tblue246
  * Bugfixes
  *

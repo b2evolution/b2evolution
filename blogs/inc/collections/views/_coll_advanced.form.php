@@ -107,7 +107,8 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 
 
 	$Form->begin_fieldset( T_('Caching').' ['.T_('Admin').']' );
-		$Form->checkbox_input( 'cache_enabled', $edited_Blog->get_setting('cache_enabled'), T_('Enable cache'), array( 'note'=>T_('Cache rendered blog pages') ) );
+		$Form->checkbox_input( 'cache_enabled', $edited_Blog->get_setting('cache_enabled'), T_('Enable page cache'), array( 'note'=>T_('Cache rendered blog pages') ) );
+		$Form->checkbox_input( 'cache_enabled_widgets', $edited_Blog->get_setting('cache_enabled_widgets'), T_('Enable widget cache'), array( 'note'=>T_('Cache rendered widgets') ) );
 	$Form->end_fieldset();
 
 
@@ -188,6 +189,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.22  2009/11/30 04:31:38  fplanque
+ * BlockCache Proof Of Concept
+ *
  * Revision 1.21  2009/07/06 23:52:24  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *

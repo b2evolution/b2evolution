@@ -192,7 +192,7 @@ switch( $action )
 				$old_cache_status = $edited_Blog->get_setting('cache_enabled');
 				if( $edited_Blog->load_from_Request( array( 'pings', 'cache' ) ) )
 				{ // Commit update to the DB:
-					$new_cache_status =  $edited_Blog->get_setting('cache_enabled');
+					$new_cache_status = $edited_Blog->get_setting('cache_enabled');
 
 					load_class( '_core/model/_pagecache.class.php', 'PageCache' );
 					$PageCache = & new PageCache( $edited_Blog );
@@ -201,20 +201,19 @@ switch( $action )
 					{ // Caching has been turned ON:
 						if( $PageCache->cache_create() )
 						{
-							$Messages->add( T_('Caching has been enabled for this blog.'), 'success' );
+							$Messages->add( T_('Page caching has been enabled for this blog.'), 'success' );
 						}
 						else
 						{
-							$Messages->add( T_('Caching could not be enabled for this blog. Check /cache/ folder file permissions.'), 'error' );
+							$Messages->add( T_('Page caching could not be enabled for this blog. Check /cache/ folder file permissions.'), 'error' );
 							$edited_Blog->set_setting('cache_enabled', 0 );
 						}
 					}
 					elseif( $old_cache_status == true && $new_cache_status == false )
 					{ // Caching has been turned OFF:
 						$PageCache->cache_delete();
-						$Messages->add( T_('Caching has been disabled for this blog. All cache contents have been purged.'), 'note' );
+						$Messages->add( T_('Page caching has been disabled for this blog. All cache contents have been purged.'), 'note' );
 					}
-
 
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog settings have been updated'), 'success' );
@@ -311,6 +310,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2009/11/30 04:31:38  fplanque
+ * BlockCache Proof Of Concept
+ *
  * Revision 1.22  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *

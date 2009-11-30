@@ -153,6 +153,11 @@ class coll_media_index_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
+		if( $this->disp_params[ 'order_by' ] == 'RAND' && isset($this->BlockCache) )
+		{	// Do NOT cache if display order is random
+			$this->BlockCache->abort_collect();
+		}
+
 		global $Blog;
 		$list_blogs = ( $this->disp_params[ 'blog_ID' ] ? $this->disp_params[ 'blog_ID' ] : $Blog->ID );
 		//pre_dump( $list_blogs );
@@ -285,6 +290,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.17  2009/11/30 04:31:38  fplanque
+ * BlockCache Proof Of Concept
+ *
  * Revision 1.16  2009/09/27 15:59:13  tblue246
  * Photo index widget: Allow specifying multiple blogs
  *

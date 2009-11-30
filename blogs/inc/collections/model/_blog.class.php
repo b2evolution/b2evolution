@@ -463,6 +463,7 @@ class Blog extends DataObject
 		if( in_array( 'cache', $groups ) )
 		{ // we want to load the cache params:
 			$this->set_setting( 'cache_enabled', param( 'cache_enabled', 'integer', 0 ) );
+			$this->set_setting( 'cache_enabled_widgets', param( 'cache_enabled_widgets', 'integer', 0 ) );
 		}
 
 		if( in_array( 'features', $groups ) )
@@ -2157,6 +2158,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.90  2009/11/30 04:31:38  fplanque
+ * BlockCache Proof Of Concept
+ *
  * Revision 1.89  2009/11/30 00:22:04  fplanque
  * clean up debug info
  * show more timers in view of block caching

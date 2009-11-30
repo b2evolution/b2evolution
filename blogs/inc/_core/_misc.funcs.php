@@ -2028,7 +2028,7 @@ function debug_info( $force = false, $force_clean = false )
 			$timer_rows[ $l_cat ] = $Timer->get_duration( $l_cat );
 		}
 		// Don't sort to see orginal order of creation
-		arsort( $timer_rows );
+		// arsort( $timer_rows );
 		// ksort( $timer_rows );
 
 		// Remove "total", it will get output as the last one:
@@ -3695,6 +3695,9 @@ function get_active_opcode_cache()
 
 /*
  * $Log$
+ * Revision 1.188  2009/11/30 04:31:38  fplanque
+ * BlockCache Proof Of Concept
+ *
  * Revision 1.187  2009/11/30 01:08:27  fplanque
  * extended system optimization checks
  *

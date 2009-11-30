@@ -58,7 +58,7 @@ class coll_item_list_Widget extends ComponentWidget
 		 * @var ItemTypeCache
 		 */
 		$ItemTypeCache = & get_ItemTypeCache();
-		$item_type_options = 
+		$item_type_options =
 			array(
 				'#' => T_('Default'),
 				''  => T_('All'),
@@ -203,6 +203,11 @@ class coll_item_list_Widget extends ComponentWidget
 		global $timestamp_min, $timestamp_max;
 
 		$this->init_display( $params );
+
+		if( $this->disp_params[ 'order_by' ] == 'RAND' && isset($this->BlockCache) )
+		{	// Do NOT cache if display order is random
+			$this->BlockCache->abort_collect();
+		}
 
 		$listBlog = ( $this->disp_params[ 'blog_ID' ] ? $BlogCache->get_by_ID( $this->disp_params[ 'blog_ID' ], false ) : $Blog );
 
@@ -391,6 +396,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.17  2009/11/30 04:31:38  fplanque
+ * BlockCache Proof Of Concept
+ *
  * Revision 1.16  2009/09/25 07:33:31  efy-cantor
  * replace get_cache to get_*cache
  *

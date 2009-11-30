@@ -206,7 +206,7 @@ class Skin extends DataObject
 			{	// Let the Widget display itself (with contextual params):
 				$widget_timer_name = 'Widget->display('.$ComponentWidget->code.')';
 				$Timer->start($widget_timer_name);
-				$ComponentWidget->display( $params );
+				$ComponentWidget->display_with_cache( $params );
 				$Timer->pause($widget_timer_name);
 			}
 		}
@@ -646,6 +646,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.24  2009/11/30 04:31:38  fplanque
+ * BlockCache Proof Of Concept
+ *
  * Revision 1.23  2009/11/30 00:22:05  fplanque
  * clean up debug info
  * show more timers in view of block caching

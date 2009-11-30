@@ -127,6 +127,7 @@ class CollectionSettings extends AbstractSettings
 
 		// General settings:
 			'cache_enabled' => 0,
+			'cache_enabled_widgets' => 0,
 			'default_cat_ID' => NULL,						// Default Cat for new posts
 			'require_title' => 'required',  		// Is a title for items required ("required", "optional", "none")
 			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet,evo_twitter', // ping plugin codes, separated by comma
@@ -171,6 +172,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.39  2009/11/30 04:31:38  fplanque
+ * BlockCache Proof Of Concept
+ *
  * Revision 1.38  2009/09/29 16:56:12  tblue246
  * Added setting to disable sitemaps skins
  *

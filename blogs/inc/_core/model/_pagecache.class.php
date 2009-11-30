@@ -355,6 +355,8 @@ class PageCache
 
 			return true;
 		}
+
+		return false;
 	}
 
 
@@ -470,6 +472,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.14  2009/11/30 04:31:37  fplanque
+ * BlockCache Proof Of Concept
+ *
  * Revision 1.13  2009/11/30 00:22:04  fplanque
  * clean up debug info
  * show more timers in view of block caching
