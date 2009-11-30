@@ -199,8 +199,6 @@ function load_image( $path, $mimetype )
 /**
  * Output an image from memory to web client
  *
- * @todo dh> image* functions might fail here, e.g. no fs permission.
- *
  * @param resource image handle
  * @param string pathname of image file
  * @param string
@@ -215,21 +213,37 @@ function save_image( $imh, $path, $mimetype, $quality = 90, $chmod = NULL )
 	switch( $mimetype )
 	{
 		case 'image/jpeg':
-			imagejpeg( $imh, $path, $quality );
+			$r = @imagejpeg( $imh, $path, $quality );
 			break;
 
 		case 'image/gif':
-			imagegif( $imh, $path );
+			$r = @imagegif( $imh, $path );
 			break;
 
 		case 'image/png':
-			imagepng( $imh, $path );
+			$r = @imagepng( $imh, $path );
 			break;
 
  		default:
 			// Unrecognized mime type
 			$err = '!Unsupported format '.$mimetype.' (save_image)';
 			break;
+	}
+
+	// Catch any errors by image* functions:
+	if( ! $r )
+	{
+		// TODO: dh> This might become a generic function, since it's useful. Something similar is used in DB, too.
+		if( isset($php_errormsg) )
+			$err = '!'.$php_errormsg;
+		elseif( function_exists('error_get_last') ) // PHP 5.2
+		{
+			$err = error_get_last();
+			$err = '!'.$err['message'];
+		}
+
+		if( ! isset($err) )
+			$err = '!Unknown error in save_image().';
 	}
 
 	if( empty( $err ) )
@@ -337,6 +351,9 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.20  2009/11/30 22:17:38  blueyed
+ * Improve error messages in images. save_image: catch errors. getfile: shorten errors, if required.
+ *
  * Revision 1.19  2009/11/11 20:23:59  fplanque
  * oops, sorry.
  *

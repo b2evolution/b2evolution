@@ -151,18 +151,33 @@ if( !empty($size) && $File->is_image() )
 	if( !empty( $err ) )
 	{	// Generate an error image and try to squeeze an error message inside:
 		// Note: we write small and close to the upper left in order to have as much text as possible on small thumbs
+		$line_height = 11;
 		$err = substr( $err, 1 ); // crop 1st car
 		$car_width = ceil( ($thumb_width-4)/6 );
 		// $err = 'w='.$car_width.' '.$err;
-		$err = wordwrap( $err, $car_width, "\n" );
-		$err = split( "\n", $err );	// split into lines
+
+		// Wrap error message and split it into lines:
+		$err_lines = split( "\n", wordwrap( $err, $car_width, "\n", true ) );
 		$im_handle = imagecreatetruecolor( $thumb_width, $thumb_height ); // Create a black image
+		if( count($err_lines)*$line_height > $thumb_height )
+		{ // Message does not fit into picture:
+		  // Rewrite error messages, so they fit better into the generated images.
+			$rewritten = true;
+			if( preg_match('~Unable to open \'.*?\' for writing: Permission denied~', $err) )
+				$err = 'Cannot write: permission denied';
+			else
+				$rewritten = false;
+			// Recreate error lines, if it has been rewritten/shortened.
+			if( $rewritten )
+				$err_lines = split( "\n", wordwrap( $err, $car_width, "\n", true ) );
+		}
+
 		$text_color = imagecolorallocate( $im_handle, 255, 0, 0 );
 		$y = 0;
-		foreach( $err as $err_string )
+		foreach( $err_lines as $err_string )
 		{
 			imagestring( $im_handle, 2, 2, $y, $err_string, $text_color);
-			$y += 11;
+			$y += $line_height;
 		}
 		header('Content-type: image/png' );
 		// The URL refers to this specific file, therefore we can tell the browser that
@@ -208,6 +223,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.44  2009/11/30 22:17:38  blueyed
+ * Improve error messages in images. save_image: catch errors. getfile: shorten errors, if required.
+ *
  * Revision 1.43  2009/11/29 23:55:08  fplanque
  * leave pre_dumps! This has a tendency to crash a lot these days. prolly some faulty GD or PHP version. i'm not sure.
  *
