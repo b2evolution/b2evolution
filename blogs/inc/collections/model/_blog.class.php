@@ -1814,6 +1814,9 @@ class Blog extends DataObject
 		}
 
 		$DB->commit();
+
+		// This collection has been modified, cached content depending on it should be invalidated:
+		BlockCache::invalidate_key( 'coll_ID', $this->ID );
 	}
 
 
@@ -2158,6 +2161,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.91  2009/11/30 23:16:24  fplanque
+ * basic cache invalidation is working now
+ *
  * Revision 1.90  2009/11/30 04:31:38  fplanque
  * BlockCache Proof Of Concept
  *

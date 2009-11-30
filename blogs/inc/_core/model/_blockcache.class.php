@@ -35,6 +35,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class BlockCache
 {
+	var $type;
 	var $keys;
 	var $serialized_keys = '';
 
@@ -56,16 +57,18 @@ class BlockCache
 	/**
 	 * Constructor
 	 */
-	function BlockCache( $keys )
+	function BlockCache( $type, $keys )
 	{
+		$this->type = $type;
+
 		// Make sure keys are always in the same order:
 		ksort( $keys );
-
 		$this->keys = $keys;
 
+		$this->serialized_keys = $type;
 		foreach( $keys as $key => $val )
 		{
-			$this->serialized_keys .= $key.':'.$val.'-';
+			$this->serialized_keys .= '+'.$key.'='.$val;
 		}
 
 		// echo $this->serialized_keys;
@@ -74,24 +77,65 @@ class BlockCache
 
 
 	/**
+	 * Invalidate a special key
+	 *
+	 * All we do is store the timestamp of teh invalidation
+	 *
+	 */
+	function invalidate_key( $key, $val )
+	{
+		global $Debuglog, $servertimenow;
+
+		$lastchanged_key_name = 'last_changed+'.$key.'='.$val;
+
+		BlockCache::cacheproviderstore( $lastchanged_key_name, $servertimenow );
+
+		$Debuglog->add( 'Invalidated: '.$lastchanged_key_name, 'blockcache' );
+	}
+
+
+	/**
 	 * Check if cache contents are available, otherwise start collecting output to be cached
+	 *
+	 * Basically we get all the invalidation dates we need, then we get the
+	 * data and then we check if some invalidation occured after the data was cached.
+	 * If an invalidation date is missing we consider the cache to be
+	 * obsolete but we generate a new invalidation date for next time we try to retrieve.
 	 *
 	 * @return true if we found and have echoed content from the cache
 	 */
 	function check()
 	{
-		global $Debuglog;
+		global $Debuglog, $servertimenow;
 
-		if( $this->retrieve() )
-		{ // We could retrieve:
+		$missing_date = false;
+		$most_recent_invalidation_ts = 0;
+		foreach( $this->keys as $key => $val )
+		{
+			$lastchanged_key_name = 'last_changed+'.$key.'='.$val;
+			$last_changed_ts = $this->cacheproviderretrieve( $lastchanged_key_name, $success );
+			if( ! $success )
+			{	// We have lost the key! Recreate and keep going for other keys:
+				$Debuglog->add( 'Missing: '.$lastchanged_key_name, 'blockcache' );
+				$missing_date = true;
+				$this->cacheproviderstore( $lastchanged_key_name, $servertimenow );
+				continue;
+			}
+
+			if( $last_changed_ts > $most_recent_invalidation_ts )
+			{	// This is the new most recent invalidation date.
+				$most_recent_invalidation_ts = $last_changed_ts;
+			}
+		}
+
+		if( !$missing_date && $this->retrieve( $most_recent_invalidation_ts ) )
+		{ // cache was not invalidated yet and we could retrieve:
 			return true;
 		}
 
 		$this->is_collecting = true;
 
-		$Debuglog->add( 'Collecting started', 'blockcache' );
-
-		echo 'collecting:'.$this->serialized_keys;
+		$Debuglog->add( 'Collecting: '.$this->serialized_keys, 'blockcache' );
 
 		ob_start( array( & $this, 'output_handler'), $this->output_chunk_size );
 
@@ -103,23 +147,43 @@ class BlockCache
 	/**
 	 * Retrieve and output cache
 	 *
+	 * @param integer oldest acceptable timestamp
 	 * @return boolean true if we could retrieve
 	 */
-	function retrieve()
+	function retrieve( $oldest_acceptable_ts = NULL )
 	{
 		global $Debuglog;
 		global $servertimenow;
 
 		// return false;
 
-		$content = apc_fetch( $this->serialized_keys, $success );
+		$content = $this->cacheproviderretrieve( $this->serialized_keys, $success );
 
 		if( ! $success )
 		{
 			return false;
 		}
 
-		echo 'retrieved:'.$this->serialized_keys;
+		if( !is_null($oldest_acceptable_ts) )
+		{ // We want to do timestamp checking:
+
+			if( ! preg_match( '/^([0-9]+) (.*)$/m', $content, $matches ) )
+			{	// Could not find timestamp
+				$Debuglog->add( 'MISSING TIMESTAMP on retrieval of: '.$this->serialized_keys, 'blockcache' );
+				return false;
+			}
+
+			if( $matches[1] < $oldest_acceptable_ts )
+			{	// Timestamp too old (there has been an invalidation in between)
+				$Debuglog->add( 'Retrieved INVALIDATED cached content: '.$this->serialized_keys, 'blockcache' );
+				return false;
+			}
+
+			// OK, we have content that is still valid:
+			$content = $matches[2];
+		}
+
+		$Debuglog->add( 'Retrieved: '.$this->serialized_keys, 'blockcache' );
 
 		// SEND CONTENT!
 		echo $content;
@@ -161,10 +225,13 @@ class BlockCache
 
 	/**
 	 * End collecting output to be cached
+	 *
+	 * We just concatenate all the individual keys to have a single one
+	 * Then we store with the current timestamp
 	 */
 	function end_collect()
 	{
-		global $Debuglog;
+		global $Debuglog, $servertimenow;
 
 		if( ! $this->is_collecting )
 		{	// We are not collecting
@@ -173,99 +240,39 @@ class BlockCache
 
 		ob_end_flush();
 
-		$this->cacheproviderstore( $this->cached_page_content );
+		$this->cacheproviderstore( $this->serialized_keys, $servertimenow.' '.$this->cached_page_content );
 	}
 
 
-	function cacheproviderstore( $payload )
+	/**
+	 * put your comment there...
+	 *
+	 * @param mixed $key
+	 * @param mixed $payload
+	 */
+	function cacheproviderstore( $key, $payload )
 	{
-		apc_store( $this->serialized_keys, $payload, 3600 * 24 );
+		apc_store( $key, $payload, 3600 * 24 );
 	}
 
 	/**
-	 * Invalidate a special key
+	 * put your comment there...
 	 *
-	 * All we do is store the timestamp of teh invalidation
-	 *
+	 * @param mixed $key
+	 * @param mixed $success
 	 */
-	function invalidate_key2()
+	function cacheproviderretrieve( $key, & $success )
 	{
-		global $servertimenow;
-
-		cacheproviderstore( $invalidate_what, $servertimenow );
-	}
-
-	/**
-	 * Store something in the cache
-	 *
-	 * We just concatenate all the individual keys to have a single one
-	 * Then we store with the current timestamp
-	 *
-	 * @param array of keyname => keyvalue
-	 */
-	function store2( $keys, $payload )
-	{
-		global $servertimenow;
-
-		cacheproviderstore(
-            "itm:$key_item_ID-usr:$key_user_ID-etc-key:$key_cacheitem",
-             $servertimenow.' '.$payload );
-	}
-
-	/**
-	 * Retrieve something from the cache
-	 *
-	 * Basically we get all the invalidation dates we need, then we get the
-	 * data and then we check if some invalidation occured after the data was cached.
-	 * If an invalidation date is missing we consider the cache to be
-	 * obsolete but we generate a new invalidation date for next time we try to retrieve.
-	 *
-	 * @param array of keyname => keyvalue
-	 */
-	function retrieve2( $keys )
-	{
-		global $servertimenow;
-
-    $ts_last_invalidated_item_ID = cacheproviderretrieve( "special_key_itm_$key_item_ID" );
-     if( empty( $ts_last_invalidated_item_ID ) )
-     { // we lost the special key, regenerate the special key and abort retrieval for this time
-        cache_invalidate( 'itm_$key_item_ID', $servertimenow );
-        return NULL;
-     }
-
-     $ts_last_invalidated_user_ID = cacheproviderretrieve( "sepcial_key_usr_$key_user_ID" );
-     if( empty( $ts_last_invalidated_user_ID ) )
-     { // we lost the special key, regenerate the special key and abord retrieval for this time
-        cache_invalidate( 'usr_$key_user_ID', $servertimenow );
-        return NULL;
-     }
-
-     // Repeat for each... yeah I know it's not DRY but this is just  prototype :>
-
-     // Don't do anythign for $key_cacheitem
-
-     $raw_payload = cacheproviderretrieve( "itm:$key_item_ID-usr:$key_user_ID-etc-key:$key_cacheitem" );
-
-     list( $payload_ts, $real_payload ) = split( $raw_payload  );
-
-     if( $payload_ts > $ts_last_invalidated_item_ID
-        && $payload_ts > $ts_last_invalidated_user_ID
-        // && etc...
-        )
-     {   // We're good, the cache is fresher than all invalidation dates:
-          return $real_payload;
-     }
-
-     // The cache is older than some invalidation date:
-     cacheproviderdelete(  "itm:$key_item_ID-usr:$key_user_ID-etc-key:$key_cacheitem" );
-      return NULL;
-
+		return apc_fetch( $key, $success );
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.2  2009/11/30 23:16:24  fplanque
+ * basic cache invalidation is working now
+ *
  * Revision 1.1  2009/11/30 04:31:37  fplanque
  * BlockCache Proof Of Concept
  *

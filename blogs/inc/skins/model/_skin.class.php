@@ -206,7 +206,9 @@ class Skin extends DataObject
 			{	// Let the Widget display itself (with contextual params):
 				$widget_timer_name = 'Widget->display('.$ComponentWidget->code.')';
 				$Timer->start($widget_timer_name);
-				$ComponentWidget->display_with_cache( $params );
+				$ComponentWidget->display_with_cache( $params, array(
+						// 'sco_name' => $sco_name, // fp> not sure we need that for now
+					) );
 				$Timer->pause($widget_timer_name);
 			}
 		}
@@ -646,6 +648,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2009/11/30 23:16:24  fplanque
+ * basic cache invalidation is working now
+ *
  * Revision 1.24  2009/11/30 04:31:38  fplanque
  * BlockCache Proof Of Concept
  *

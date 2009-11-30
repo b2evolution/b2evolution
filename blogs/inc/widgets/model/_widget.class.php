@@ -26,7 +26,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
-load_class( '_core/model/_blockcache.class.php', 'BlockCache' );
 
 /**
  * ComponentWidget Class
@@ -453,8 +452,11 @@ class ComponentWidget extends DataObject
 
 	/**
 	 * Wraps display in a cacheable block
+	 *
+	 * @param array MUST contain at least the basic display params
+	 * @param array of extra keys to be used for cache keying
 	 */
-	function display_with_cache( $params )
+	function display_with_cache( $params, $keys = array() )
 	{
 		global $Blog, $Timer;
 
@@ -465,8 +467,11 @@ class ComponentWidget extends DataObject
 		else
 		{	// Instantiate BlockCache:
 			$Timer->resume( 'BlockCache' );
-			$keys = array( 'wi_ID' => $this->ID );
-			$this->BlockCache = new BlockCache( $keys );
+			$keys += array( // Extend keys:
+					'coll_ID' => $Blog->ID,
+					'wi_ID' => $this->ID
+				);
+			$this->BlockCache = new BlockCache( 'widget', $keys );
 
 			if( ! $this->BlockCache->check() )
 			{	// Cache miss, we have to generate:
@@ -647,6 +652,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.68  2009/11/30 23:16:24  fplanque
+ * basic cache invalidation is working now
+ *
  * Revision 1.67  2009/11/30 04:31:38  fplanque
  * BlockCache Proof Of Concept
  *

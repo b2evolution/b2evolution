@@ -234,6 +234,7 @@ class _core_Module extends Module
 		load_class( '_core/ui/forms/_form.class.php', 'Form' );
 		load_class( '_core/model/db/_sql.class.php', 'SQL' );
 		load_class( '_core/ui/results/_results.class.php', 'Results' );
+		load_class( '_core/model/_blockcache.class.php', 'BlockCache' );
 	}
 
 	/**
@@ -768,6 +769,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.53  2009/11/30 23:16:24  fplanque
+ * basic cache invalidation is working now
+ *
  * Revision 1.52  2009/11/22 19:06:48  efy-maxim
  * show all user tabs
  *
