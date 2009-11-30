@@ -2629,15 +2629,6 @@ function upgrade_b2evo_tables()
 	}
 
 
-	// ALWAYS reset polling times (since security warnings for example should be refreshed based on the new version that has been installed)
-	echo 'Resetting b2evolution.net polling times... ';
-	$DB->query( "
-		DELETE FROM T_settings
-		WHERE set_name = 'evonet_last_attempt'
-			 OR set_name = 'evonet_last_update'" );
-	echo "OK.<br />\n";
-
-
 	// This has to be at the end because plugin install may fail if the DB schema is not current (matching Plugins class).
 	// Only new default plugins will be installed, based on $old_db_version.
 	// dh> NOTE: if this fails (e.g. fatal error in one of the plugins), it will not get repeated
@@ -2760,6 +2751,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.345  2009/11/30 01:22:23  fplanque
+ * fix wrong version status message rigth after upgrade
+ *
  * Revision 1.344  2009/11/19 10:24:48  efy-maxim
  * maintenance module - 'Upgrade Database' button support.
  *

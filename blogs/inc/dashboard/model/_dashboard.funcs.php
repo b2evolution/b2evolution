@@ -56,20 +56,29 @@ function b2evonet_get_updates( $force_short_delay = false )
 	$update_every = 10;
 	$attempt_every = 5;
 	*/
+	
+	$version_id = $baseurl.' '.$instance_name.' '.$app_name.' '.$app_version.' '.$app_date;
+	// This is the last version we checked against the server:
+	$last_version_checked =  $Settings->get( 'evonet_last_version_checked' );
 
 	$servertime_last_update = $Settings->get( 'evonet_last_update' );
-	if( $servertime_last_update > $servertimenow - $update_every )
-	{	// The previous update was less than 12 hours ago, skip this
-		// echo 'recent update';
-		return false;
-	}
-
 	$servertime_last_attempt = $Settings->get( 'evonet_last_attempt' );
-	if( $servertime_last_attempt > $servertimenow - $attempt_every)
-	{	// The previous update attempt was less than 4 hours ago, skip this
-		// This is so all b2evo's don't go crazy if the server ever is down
-		// echo 'recent attempt';
-		return false;
+
+	if( $last_version_checked == $version_id )
+	{	// Current version has already been checked, don't check too often:
+
+		if( $servertime_last_update > $servertimenow - $update_every )
+		{	// The previous update was less than 12 hours ago, skip this
+			// echo 'recent update';
+			return false;
+		}
+
+		if( $servertime_last_attempt > $servertimenow - $attempt_every)
+		{	// The previous update attempt was less than 4 hours ago, skip this
+			// This is so all b2evo's don't go crazy if the server ever is down
+			// echo 'recent attempt';
+			return false;
+		}
 	}
 
 	$Debuglog->add( sprintf('Getting updates from %s.', $evonetsrv_host), 'evonet' );
@@ -150,6 +159,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 			$global_Cache->dbupdate();
 
 			$Settings->set( 'evonet_last_update', $servertimenow );
+			$Settings->set( 'evonet_last_version_checked', $version_id );
 			$Settings->dbupdate();
 
 			$Debuglog->add( 'Updates saved', 'evonet' );
@@ -168,6 +178,9 @@ function b2evonet_get_updates( $force_short_delay = false )
 
 /*
  * $Log$
+ * Revision 1.23  2009/11/30 01:22:23  fplanque
+ * fix wrong version status message rigth after upgrade
+ *
  * Revision 1.22  2009/11/30 01:08:27  fplanque
  * extended system optimization checks
  *
