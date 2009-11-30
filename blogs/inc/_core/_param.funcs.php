@@ -1132,26 +1132,25 @@ function check_is_phone( $phone )
  * @param string param name
  * @param string param name
  * @param boolean Is a password required? (non-empty)
+ * @param integer Minimum password length
  * @return boolean true if OK
  */
-function param_check_passwords( $var1, $var2, $required = false )
+function param_check_passwords( $var1, $var2, $required = false, $min_length = 6 )
 {
-	global $Settings;
+	$pass1 = get_param($var1);
+	$pass2 = get_param($var2);
 
-	$pass1 = $GLOBALS[$var1];
-	$pass2 = $GLOBALS[$var2];
-
-	if( empty($pass1) && empty($pass2) && ! $required )
+	if( ! strlen($pass1) && ! strlen($pass2) && ! $required )
 	{ // empty is OK:
 		return true;
 	}
 
-	if( empty($pass1) )
+	if( ! strlen($pass1) )
 	{
 		param_error( $var1, T_('Please enter your password twice.') );
 		return false;
 	}
-	if( empty($pass2) )
+	if( ! strlen($pass2) )
 	{
 		param_error( $var2, T_('Please enter your password twice.') );
 		return false;
@@ -1164,9 +1163,9 @@ function param_check_passwords( $var1, $var2, $required = false )
 		return false;
 	}
 
-	if( strlen($pass1) < $Settings->get('user_minpwdlen') )
+	if( strlen($pass1) < $min_length )
 	{
-		param_error_multiple( array( $var1, $var2), sprintf( T_('The minimum password length is %d characters.'), $Settings->get('user_minpwdlen') ) );
+		param_error_multiple( array( $var1, $var2), sprintf( T_('The minimum password length is %d characters.'), $min_length ) );
 		return false;
 	}
 
@@ -2099,6 +2098,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.55  2009/11/30 23:05:30  blueyed
+ * Remove dependency on Settings global out of _param.funcs. Adds min length param to param_check_passwords. Add tests.
+ *
  * Revision 1.54  2009/11/30 00:22:04  fplanque
  * clean up debug info
  * show more timers in view of block caching

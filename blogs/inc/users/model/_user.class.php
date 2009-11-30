@@ -386,7 +386,7 @@ class User extends DataObject
 			param( 'edited_user_pass1', 'string', true );
 			$edited_user_pass2 = param( 'edited_user_pass2', 'string', true );
 
-			if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true ) )
+			if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
 			{ 	// We can set password
 				$this->set( 'pass', md5( $edited_user_pass2 ) );
 			}
@@ -1966,6 +1966,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.67  2009/11/30 23:05:30  blueyed
+ * Remove dependency on Settings global out of _param.funcs. Adds min length param to param_check_passwords. Add tests.
+ *
  * Revision 1.66  2009/11/30 00:22:05  fplanque
  * clean up debug info
  * show more timers in view of block caching
