@@ -114,7 +114,7 @@ class DataObject
 	 *
 	 * @access protected
 	 * @param string Name of parameter
-	 * @param string DB field type ('string', 'number', 'date' )
+	 * @param string DB field type ('string', 'number', 'date', 'dbfield' )
 	 * @param mixed Pointer to value of parameter - dh> pointer? So it should be a reference? Would make sense IMHO anyway.. fp> I just wonder why it's not already a reference... :@
 	 */
 	function dbchange( $dbfieldname, $dbfieldtype, $valuepointer ) // TODO: dh> value by reference? see above..
@@ -159,6 +159,11 @@ class DataObject
 		$sql_changes = array();
 		foreach( $this->dbchanges as $loop_dbfieldname => $loop_dbchange )
 		{
+			if( $loop_dbchange['type'] == 'dbfield' )
+			{
+				$sql_changes[] = "`$loop_dbfieldname` = `".$loop_dbchange['value'].'` ';
+				continue;
+			}
 			// Get changed value (we use eval() to allow constructs like $loop_dbchange['value'] = 'Group->get(\'ID\')'):
 			eval( '$loop_value = $this->'.$loop_dbchange['value'].';' );
 			// Prepare matching statement:
@@ -813,6 +818,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.31  2009/11/30 22:57:27  blueyed
+ * Add 'dbfield' dbchange type. This allows setting something to a db field. E.g. 'lastupdate=lastupdate'.
+ *
  * Revision 1.30  2009/10/12 23:52:46  blueyed
  * todo
  *
