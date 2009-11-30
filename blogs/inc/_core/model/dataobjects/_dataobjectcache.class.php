@@ -196,11 +196,7 @@ class DataObjectCache
 							FROM '.$this->dbtablename.'
 						 ORDER BY '.$this->order_by;
 
-		foreach( $DB->get_results( $sql, OBJECT, 'Loading '.$this->objtype.'(ALL) into cache' ) as $row )
-		{
-			// Instantiate a custom object
-			$this->instantiate( $row );
-		}
+		$this->instantiate_list( $DB->get_results( $sql, OBJECT, 'Loading '.$this->objtype.'(ALL) into cache' ) );
 
 		$this->all_loaded = true;
 
@@ -209,9 +205,9 @@ class DataObjectCache
 
 
 	/**
-	 * Load a list of objects into the cache
+	 * Load a list of objects into the cache.
 	 *
-	 * @param string list of IDs of objects to load
+	 * @param array List of IDs of objects to load
 	 * @param boolean Invert list: Load all objects except those listed in the first parameter
 	 */
 	function load_list( $req_list, $invert = false )
@@ -221,19 +217,21 @@ class DataObjectCache
 		$Debuglog->add( 'Loading <strong>'.$this->objtype.'('.( $invert ? 'ALL except ' : '' ).$req_list.')</strong> into cache', 'dataobjects' );
 
 		if( empty( $req_list ) )
-		{
 			return false;
+
+		if( ! $invert )
+		{ // Remove entries which have already been loaded from the list
+			$req_list = array_diff($req_list, $this->get_ID_array());
 		}
+
+		if( empty( $req_list ) )
+			return false;
 
 		$sql = "SELECT *
 		          FROM $this->dbtablename
-		         WHERE $this->dbIDname ".( $invert ? 'NOT ' : '' )."IN ($req_list)";
+		         WHERE $this->dbIDname ".( $invert ? 'NOT ' : '' ).'IN ('.$DB->quote($req_list).')';
 
-		foreach( $DB->get_results( $sql ) as $row )
-		{
-			// Instantiate a custom object
-			$this->instantiate( $row );
-		}
+		$this->instantiate_list( $DB->get_results( $sql ) );
 	}
 
 
@@ -327,6 +325,22 @@ class DataObjectCache
 
 
 	/**
+	 * @access public
+	 * @param array List of DB rows
+	 * @return array List of DataObjects
+	 */
+	function instantiate_list($db_rows)
+	{
+		$r = array();
+		foreach( $db_rows as $db_row )
+		{
+			$r[] = $this->instantiate($db_row);
+		}
+		return $r;
+	}
+
+
+	/**
 	 * Clear the cache **extensively**
 	 *
 	 */
@@ -352,7 +366,7 @@ class DataObjectCache
 	 * This provides a simple interface for looping over the contents of the Cache.
 	 *
 	 * This should only be used for basic enumeration.
-	 * If you need complex filtering of the cache contents, you should probablt use a DataObjectList instead.
+	 * If you need complex filtering of the cache contents, you should probably use a DataObjectList instead.
 	 *
 	 * @see DataObject::get_next()
 	 *
@@ -371,7 +385,7 @@ class DataObjectCache
 	 * This provides a simple interface for looping over the contents of the Cache.
 	 *
 	 * This should only be used for basic enumeration.
-	 * If you need complex filtering of the cache contents, you should probablt use a DataObjectList instead.
+	 * If you need complex filtering of the cache contents, you should probably use a DataObjectList instead.
 	 *
 	 * @see DataObject::get_first()
 	 *
@@ -582,7 +596,7 @@ class DataObjectCache
 			}
 			else
 			{	// only load those items not listed in $ignore_IDs
-				$this->load_list( implode( ',', $ignore_IDs ), true );
+				$this->load_list( $ignore_IDs, true );
 			}
 		}
 
@@ -632,7 +646,7 @@ class DataObjectCache
 			}
 			else
 			{	// only load those items not listed in $ignore_IDs
-				$this->load_list( implode( ',', $ignore_IDs ), true );
+				$this->load_list( $ignore_IDs, true );
 			}
 		}
 
@@ -656,6 +670,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.16  2009/11/30 22:59:32  blueyed
+ * DataObjectCache: Add instantiate_list. load_list: remove already loaded objects from SQL query.
+ *
  * Revision 1.15  2009/11/30 00:22:04  fplanque
  * clean up debug info
  * show more timers in view of block caching
