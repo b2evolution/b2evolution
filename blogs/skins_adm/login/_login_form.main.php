@@ -86,7 +86,7 @@ $Form = & new Form( $htsrv_url_sensitive.'login.php', 'evo_login_form', 'post', 
 
 $Form->begin_form( 'fform' );
 
-	$Form->hiddens_by_key( $_POST, /* exclude: */ array('login_action', 'login', 'action') ); // passthrough POSTed data (when login is required after having POSTed something)
+	$Form->hiddens_by_key( remove_magic_quotes($_POST), /* exclude: */ array('login_action', 'login', 'action') ); // passthrough POSTed data (when login is required after having POSTed something)
 	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 
 	if( isset( $action, $reqID, $sessID ) && $action == 'validatemail' )
@@ -224,6 +224,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.15  2009/11/30 22:12:21  blueyed
+ * Use remove_magic_quotes when reusing POST in form.
+ *
  * Revision 1.14  2009/09/16 00:25:41  fplanque
  * rollback of stuff that doesn't make any sense at all!!!
  *
