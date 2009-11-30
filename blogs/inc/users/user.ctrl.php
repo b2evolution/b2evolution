@@ -161,15 +161,17 @@ if( !$Messages->count('error') )
 			// if new user is true then it will redirect to user list after user has been created
 			$is_new_user = $edited_User->ID == 0 ? true : false;
 
+			// Update user
 			$is_password_form = param( 'password_form', 'boolean', false );
-			if( param( 'identity_form', 'boolean', false ) || $is_password_form )
+			if( $edited_User->dbsave() )
 			{
-				if( $is_new_user ? $edited_User->dbinsert() : $edited_User->dbupdate() )
-				{
-					$msg = $is_new_user ? T_('New user has been created.') : (
-							$is_password_form ? T_('Password has been changed.') : T_('Profile has been updated.') );
-					$Messages->add( $msg, 'success' );
-				}
+				if( $is_new_user )
+					$msg = T_('New user has been created.');
+				elseif( $is_password_form )
+					$msg = T_('Password has been changed.');
+				else
+					$msg = T_('Profile has been updated.');
+				$Messages->add($msg, 'success');
 			}
 
 			// Update user settings:
@@ -353,6 +355,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.3  2009/11/30 22:42:44  blueyed
+ * Fix updating user preferences. This might break something else, please review.
+ *
  * Revision 1.2  2009/11/21 13:35:00  efy-maxim
  * log
  *
