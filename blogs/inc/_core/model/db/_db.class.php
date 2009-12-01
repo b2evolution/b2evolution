@@ -456,6 +456,7 @@ class DB
 					<li>Are you sure there is a valid database connection?</li>
 				</ol>', false );
 		}
+		$this->dbname = $db;
 	}
 
 
@@ -1654,6 +1655,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.45  2009/12/01 20:37:11  blueyed
+ * DB::select: set dbname
+ *
  * Revision 1.44  2009/11/30 00:22:04  fplanque
  * clean up debug info
  * show more timers in view of block caching
