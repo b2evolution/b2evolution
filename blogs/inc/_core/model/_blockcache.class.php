@@ -88,9 +88,12 @@ class BlockCache
 
 		$lastchanged_key_name = 'last_changed+'.$key.'='.$val;
 
-		BlockCache::cacheproviderstore( $lastchanged_key_name, $servertimenow );
+		// Invalidate using the real time (seconds may have elapsed since $sertimenow)
+		// Add 1 second because of teh granularity that's down to teh second
+		// Worst case scenario: content will be collected/cahced several times for a whole second (as well as the first request after the end of that second)
+		BlockCache::cacheproviderstore( $lastchanged_key_name, time()+1 );
 
-		$Debuglog->add( 'Invalidated: '.$lastchanged_key_name, 'blockcache' );
+		$Debuglog->add( 'Invalidated: '.$lastchanged_key_name.' @ '.(time()+1), 'blockcache' );
 	}
 
 
@@ -110,6 +113,7 @@ class BlockCache
 
 		$missing_date = false;
 		$most_recent_invalidation_ts = 0;
+		$most_recent_invaliating_key = '';
 		foreach( $this->keys as $key => $val )
 		{
 			$lastchanged_key_name = 'last_changed+'.$key.'='.$val;
@@ -125,10 +129,11 @@ class BlockCache
 			if( $last_changed_ts > $most_recent_invalidation_ts )
 			{	// This is the new most recent invalidation date.
 				$most_recent_invalidation_ts = $last_changed_ts;
+				$most_recent_invaliating_key = $lastchanged_key_name;
 			}
 		}
 
-		if( !$missing_date && $this->retrieve( $most_recent_invalidation_ts ) )
+		if( !$missing_date && $this->retrieve( $most_recent_invalidation_ts, $most_recent_invaliating_key ) )
 		{ // cache was not invalidated yet and we could retrieve:
 			return true;
 		}
@@ -150,7 +155,7 @@ class BlockCache
 	 * @param integer oldest acceptable timestamp
 	 * @return boolean true if we could retrieve
 	 */
-	function retrieve( $oldest_acceptable_ts = NULL )
+	function retrieve( $oldest_acceptable_ts = NULL, $most_recent_invaliating_key = '' )
 	{
 		global $Debuglog;
 		global $servertimenow;
@@ -167,7 +172,8 @@ class BlockCache
 		if( !is_null($oldest_acceptable_ts) )
 		{ // We want to do timestamp checking:
 
-			if( ! preg_match( '/^([0-9]+) (.*)$/m', $content, $matches ) )
+
+			if( ! preg_match( '/^([0-9]+) (.*)$/ms', $content, $matches ) )
 			{	// Could not find timestamp
 				$Debuglog->add( 'MISSING TIMESTAMP on retrieval of: '.$this->serialized_keys, 'blockcache' );
 				return false;
@@ -175,7 +181,7 @@ class BlockCache
 
 			if( $matches[1] < $oldest_acceptable_ts )
 			{	// Timestamp too old (there has been an invalidation in between)
-				$Debuglog->add( 'Retrieved INVALIDATED cached content: '.$this->serialized_keys, 'blockcache' );
+				$Debuglog->add( 'Retrieved INVALIDATED cached content: '.$this->serialized_keys.' (invalidated by '.$most_recent_invaliating_key.' - '.$matches[1].' < '.$oldest_acceptable_ts.')', 'blockcache' );
 				return false;
 			}
 
@@ -240,6 +246,7 @@ class BlockCache
 
 		ob_end_flush();
 
+		// We use servertimenow because we may have used data that was loaded at the very start of this page
 		$this->cacheproviderstore( $this->serialized_keys, $servertimenow.' '.$this->cached_page_content );
 	}
 
@@ -268,7 +275,7 @@ class BlockCache
 	{
 		if( function_exists('apc_fetch') )
 			return apc_fetch( $key, $success );
-	
+
 		$success = false;
 		return NULL;
 	}
@@ -277,6 +284,9 @@ class BlockCache
 
 /*
  * $Log$
+ * Revision 1.5  2009/12/01 03:33:19  fplanque
+ * Improved handling of invalidation dates
+ *
  * Revision 1.4  2009/12/01 02:04:45  fplanque
  * minor
  *
