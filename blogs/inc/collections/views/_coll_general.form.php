@@ -68,7 +68,12 @@ $Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear
 		// fp> Note: There are 2 reasons why we don't provide a select here:
 		// 1. If there are 1000 users, it's a pain.
 		// 2. A single blog owner is not necessarily allowed to see all other users.
-		$Form->text( 'owner_login', $owner_User->login, 20, T_('Owner'), T_('Login of this blog\'s owner.') );
+
+		// Form 'username' field requires the following JS and CSS.
+		global $rsc_url;
+		echo '<script type="text/javascript" src="'.$rsc_url.'js/jquery.hintbox.min.js"></script>';
+		echo '<link rel="stylesheet" type="text/css" href="'.$rsc_url.'css/jquery.hintbox.css">';
+		$Form->username( 'owner_login', $owner_User, T_('Owner'), T_('Login of this blog\'s owner.') );
 	}
 	else
 	{
@@ -122,6 +127,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.16  2009/12/01 14:56:58  efy-maxim
+ * blog settings - username field instead simple text field
+ *
  * Revision 1.15  2009/09/09 20:34:28  tblue246
  * Translation update
  *
