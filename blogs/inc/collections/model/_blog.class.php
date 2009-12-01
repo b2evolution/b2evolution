@@ -1815,8 +1815,14 @@ class Blog extends DataObject
 
 		$DB->commit();
 
+		// Thick grained invalidation:
 		// This collection has been modified, cached content depending on it should be invalidated:
 		BlockCache::invalidate_key( 'coll_ID', $this->ID );
+
+		// Fien grained invalidation:
+		// EXPERIMENTAL: Below are more granular invalidation dates:
+		BlockCache::invalidate_key( 'set_coll_ID', $this->ID ); // Settings have changed
+		// cont_coll_ID  // Content has not changed
 	}
 
 
@@ -2161,6 +2167,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.92  2009/12/01 03:45:37  fplanque
+ * multi dimensional invalidation
+ *
  * Revision 1.91  2009/11/30 23:16:24  fplanque
  * basic cache invalidation is working now
  *

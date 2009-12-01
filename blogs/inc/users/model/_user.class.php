@@ -1457,6 +1457,9 @@ class User extends DataObject
 
 		$DB->commit();
 
+		// This User has been modified, cached content depending on it should be invalidated:
+		BlockCache::invalidate_key( 'user_ID', $this->ID );
+
 		return true;
 	}
 
@@ -1966,6 +1969,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.68  2009/12/01 03:45:37  fplanque
+ * multi dimensional invalidation
+ *
  * Revision 1.67  2009/11/30 23:05:30  blueyed
  * Remove dependency on Settings global out of _param.funcs. Adds min length param to param_check_passwords. Add tests.
  *

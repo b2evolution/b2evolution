@@ -561,17 +561,14 @@ switch( $action )
 		 *     we can make this optional...
 		 */
 		if( ! $was_published && $edited_Item->status == 'published' )
-		{	/* The post's last status wasn't "published", but we're going
-			   to publish it now. Redirect to the blog: */
+		{	// The post's last status wasn't "published", but we're going to publish it now. Redirect to the blog:
 			$edited_Item->load_Blog();
 			$redirect_to = $edited_Item->Blog->gen_blogurl();
 		}
 
 		// REDIRECT / EXIT
-		header_redirect( $redirect_to );
-		// Switch to list mode:
-		// $action = 'list';
-		// init_list_mode();
+		header_redirect( $redirect_to, 303 );
+		/* EXITED */
 		break;
 
 
@@ -1252,6 +1249,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.78  2009/12/01 03:45:37  fplanque
+ * multi dimensional invalidation
+ *
  * Revision 1.77  2009/11/27 12:29:06  efy-maxim
  * drop down
  *

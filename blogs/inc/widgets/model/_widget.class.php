@@ -66,7 +66,7 @@ class ComponentWidget extends DataObject
 	/**
 	 * Array of params used during display()
 	 */
-	var $disp_params;
+	var $disp_params = NULL;
 
 	/**
 	 * Lazy instantiated
@@ -335,6 +335,11 @@ class ComponentWidget extends DataObject
 	{
 		global $admin_url;
 
+		if( !is_null($this->disp_params) )
+		{ // Params have been initialized before...
+			return;
+		}
+
 		// Generate widget defaults array:
 		$widget_defaults = array();
 		$defs = $this->get_param_definitions( array() );
@@ -430,7 +435,7 @@ class ComponentWidget extends DataObject
 		global $Plugins;
 		global $rsc_url;
 
-		$this->init_display( $params );
+		$this->init_display( $params ); // just in case it hasn't been done before
 
 		switch( $this->type )
 		{
@@ -460,6 +465,8 @@ class ComponentWidget extends DataObject
 	{
 		global $Blog, $Timer;
 
+		$this->init_display( $params );
+
 		if( ! $Blog->get_setting('cache_enabled_widgets') )
 		{	// We do NOT want caching for this collection
 			$this->display( $params );
@@ -467,10 +474,8 @@ class ComponentWidget extends DataObject
 		else
 		{	// Instantiate BlockCache:
 			$Timer->resume( 'BlockCache' );
-			$keys += array( // Extend keys:
-					'coll_ID' => $Blog->ID,
-					'wi_ID' => $this->ID
-				);
+			// Extend cache keys:
+			$keys += $this->get_cache_keys();
 			$this->BlockCache = new BlockCache( 'widget', $keys );
 
 			if( ! $this->BlockCache->check() )
@@ -485,6 +490,22 @@ class ComponentWidget extends DataObject
 
 			$Timer->pause( 'BlockCache' );
 		}
+	}
+
+
+	/**
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @return array of keys this widget depends on
+	 */
+	function get_cache_keys()
+	{
+		global $Blog;
+
+		return array(
+				'coll_ID' => $Blog->ID,		// Has the blog changed ?  (settings or content)
+				'wi_ID'   => $this->ID,			// Have the widget settings changed ?
+			);
 	}
 
 
@@ -667,6 +688,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.70  2009/12/01 03:45:37  fplanque
+ * multi dimensional invalidation
+ *
  * Revision 1.69  2009/11/30 23:27:13  fplanque
  * added a dimension to cache invalidation
  *

@@ -134,11 +134,32 @@ class coll_avatar_Widget extends ComponentWidget
 		return true;
 	}
 
+
+	/**
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @return array of keys this widget depends on
+	 */
+	function get_cache_keys()
+	{
+		global $Blog;
+
+		$owner_User = & $Blog->get_owner_User();
+
+		return array(
+				'coll_ID' => $Blog->ID,					// Has the blog changed ?  (settings or content)
+				'wi_ID'   => $this->ID,					// Have the widget settings changed ?
+				'user_ID' => $owner_User->ID, 	// Has the owner User changed? (name, avatar, etc..)
+			);
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.6  2009/12/01 03:45:37  fplanque
+ * multi dimensional invalidation
+ *
  * Revision 1.5  2009/10/03 21:00:50  tblue246
  * Bugfixes
  *

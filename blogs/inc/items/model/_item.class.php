@@ -3384,6 +3384,18 @@ class Item extends ItemLight
 			$DB->commit();
 		}
 
+		// Load the blog we're in:
+		$Blog = & $this->get_Blog();
+
+		// Thick grained invalidation:
+		// This collection has been modified, cached content depending on it should be invalidated:
+		BlockCache::invalidate_key( 'coll_ID', $Blog->ID );
+
+		// Fien grained invalidation:
+		// EXPERIMENTAL: Below are more granular invalidation dates:
+		// set_coll_ID // Settings have not changed
+		BlockCache::invalidate_key( 'cont_coll_ID', $Blog->ID ); // Conent has changed
+
 		return $result;
 	}
 
@@ -4101,6 +4113,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.165  2009/12/01 03:45:37  fplanque
+ * multi dimensional invalidation
+ *
  * Revision 1.164  2009/11/28 16:42:05  efy-maxim
  * field name fix
  *
