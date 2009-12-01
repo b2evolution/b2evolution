@@ -76,10 +76,11 @@ function header_content_type( $type = 'text/html', $charset = '#' )
  * @param string Destination URL to redirect to
  * @param boolean|integer is this a permanent redirect? if true, send a 301; otherwise a 303 OR response code 301,302,303
  */
-function header_redirect( $redirect_to = NULL, $permanent = false )
+function header_redirect( $redirect_to = NULL, $status = false )
 {
 	global $Hit, $baseurl, $Blog, $htsrv_url_sensitive;
 	global $Session, $Debuglog, $Messages;
+	global $http_response_code;
 
 	// TODO: fp> get this out to the caller, make a helper func like get_returnto_url()
 	if( empty($redirect_to) )
@@ -130,38 +131,42 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 		$redirect_to = preg_replace( '~(?<=\?|&) (login|pwd|confirm(ed)?) = [^&]+ ~x', '', $redirect_to );
 	}
 
-	// TODO: fp> change $permanent to $status in the params
-	if( is_integer($permanent) )
+	if( is_integer($status) )
 	{
-		$status = $permanent;
+		$http_response_code = $status;
 	}
 	else
 	{
-		$status = $permanent ? 301 : 303;
+		$http_response_code = $status ? 301 : 303;
 	}
- 	$Debuglog->add('Redirecting to '.$redirect_to.' (status '.$status.')');
+ 	$Debuglog->add('***** REDIRECT TO '.$redirect_to.' (status '.$http_response_code.') *****', 'request' );
 
 	// Transfer of Debuglog to next page:
 	if( $Debuglog->count('all') )
 	{ // Save Debuglog into Session, so that it's available after redirect (gets loaded by Session constructor):
 		$sess_Debuglogs = $Session->get('Debuglogs');
 		if( empty($sess_Debuglogs) )
+		{
 			$sess_Debuglogs = array();
+		}
 
 		$sess_Debuglogs[] = $Debuglog;
-		$Session->set( 'Debuglogs', $sess_Debuglogs, 60 /* expire in 60 seconds */ );
+		$Session->set( 'Debuglogs', $sess_Debuglogs /*, 60 /* expire in 60 seconds */ );
+	 	// echo 'Passing Debuglog(s) to next page';
+	 	// pre_dump( $sess_Debuglogs );
 	}
 
 	// Transfer of Messages to next page:
 	if( $Messages->count('all') )
 	{ // Set Messages into user's session, so they get restored on the next page (after redirect):
 		$Session->set( 'Messages', $Messages );
+	 // echo 'Passing Messages to next page';
 	}
 
 	$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
 
 	// see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-	switch( $status )
+	switch( $http_response_code )
 	{
 		case 301:
 			// This should be a permanent move redirect!
@@ -179,7 +184,7 @@ function header_redirect( $redirect_to = NULL, $permanent = false )
 			header( 'HTTP/1.1 302 Found' );
 	}
 
-	header( 'Location: '.$redirect_to, true, $status ); // explictly setting the status is required for (fast)cgi
+	header( 'Location: '.$redirect_to, true, $http_response_code ); // explictly setting the status is required for (fast)cgi
 	exit(0);
 }
 
@@ -1010,6 +1015,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.63  2009/12/01 01:52:08  fplanque
+ * Fixed issue with Debuglog in case of redirect -- Thanks @blueyed for help.
+ *
  * Revision 1.62  2009/11/11 03:24:50  fplanque
  * misc/cleanup
  *

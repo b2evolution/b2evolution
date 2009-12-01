@@ -223,11 +223,11 @@ if( !$Messages->count('error') )
 
 			if( $is_new_user )
 			{
-				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=users&amp;action=list', '', '&' ) );
+				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=users&amp;action=list', '', '&' ), 303 );
 			}
 			else
 			{
-				header_redirect( regenerate_url( '', 'user_ID='.$edited_User->ID.'&action=edit&user_tab='.$user_tab, '', '&' ) );
+				header_redirect( regenerate_url( '', 'user_ID='.$edited_User->ID.'&action=edit&user_tab='.$user_tab, '', '&' ), 303 );
 			}
 
 			break;
@@ -355,6 +355,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.4  2009/12/01 01:52:08  fplanque
+ * Fixed issue with Debuglog in case of redirect -- Thanks @blueyed for help.
+ *
  * Revision 1.3  2009/11/30 22:42:44  blueyed
  * Fix updating user preferences. This might break something else, please review.
  *

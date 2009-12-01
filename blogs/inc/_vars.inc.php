@@ -60,6 +60,11 @@ $is_web = ! $is_cli;
 $content_type_header = NULL;
 
 /**
+ * Default 200 = success
+ */
+$http_response_code = 200;
+
+/**
  * @global integer ID of featured post that is being displayed (will become an array() in the future) -- needed so we can filter it out of normal post flow
  */
 $featured_displayed_item_ID = NULL;
@@ -306,6 +311,9 @@ $skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', ar
 
 /*
  * $Log$
+ * Revision 1.38  2009/12/01 01:52:08  fplanque
+ * Fixed issue with Debuglog in case of redirect -- Thanks @blueyed for help.
+ *
  * Revision 1.37  2009/11/30 00:22:04  fplanque
  * clean up debug info
  * show more timers in view of block caching

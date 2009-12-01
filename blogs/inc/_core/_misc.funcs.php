@@ -1966,7 +1966,7 @@ function debug_info( $force = false, $force_clean = false )
 	global $debug, $debug_done, $Debuglog, $DB, $obhandler_debug, $Timer, $ReqHost, $ReqPath, $is_cli;
 	global $cache_imgsize, $cache_File;
 	global $Session;
-	global $db_config, $tableprefix;
+	global $db_config, $tableprefix, $http_response_code;
 	/**
 	 * @var Hit
 	 */
@@ -2164,6 +2164,10 @@ function debug_info( $force = false, $force_clean = false )
 	}
 
 
+	echo 'HTTP Response code: '.$http_response_code;
+	echo $clean ? "\n" : '<br />';
+
+
 	// DEBUGLOG(s) FROM PREVIOUS SESSIONS, after REDIRECT(s) (with list of categories at top):
 	if( isset($Session) && ($sess_Debuglogs = $Session->get('Debuglogs')) && ! empty($sess_Debuglogs) )
 	{
@@ -2189,7 +2193,7 @@ function debug_info( $force = false, $force_clean = false )
 		{
 			$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
 
-			if ( $clean )
+			if( $clean )
 			{
 				$log_container_head = "\n".'== Debug messages from redirected page (#'.($k+1).') =='."\n"
 									 .'See below for the Debuglog from the current request.'."\n";
@@ -2222,7 +2226,14 @@ function debug_info( $force = false, $force_clean = false )
 					'htmlbody' );
 			}
 		}
-		$Session->delete( 'Debuglogs' );
+
+		// Delete logs since they have been displayed...
+		// EXCEPT if we are redirecting, because in this case we won't see these logs in a browser (only in request debug tools)
+		// So in that case we want them to move over to the next page...
+		if( $http_response_code < 300 || $http_response_code >= 400 )
+		{	// This is NOT a 3xx redirect, assume debuglogs have been seen & delete them:
+			$Session->delete( 'Debuglogs' );
+		}
 	}
 
 
@@ -3692,6 +3703,9 @@ function get_active_opcode_cache()
 
 /*
  * $Log$
+ * Revision 1.190  2009/12/01 01:52:08  fplanque
+ * Fixed issue with Debuglog in case of redirect -- Thanks @blueyed for help.
+ *
  * Revision 1.189  2009/12/01 01:32:59  blueyed
  * whitespace/typo
  *

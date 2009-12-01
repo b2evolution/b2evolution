@@ -79,7 +79,7 @@ header_content_type( 'text/html' );
 	}
 
 	global $Debuglog;
-	$Debuglog->add( 'Admin-Path: '.var_export($this->path, true) );
+	$Debuglog->add( 'Admin-Path: '.var_export($this->path, true), 'skins' );
 
 	if( $this->get_path(0) == 'files'
 			|| ($this->get_path_range(0,1) == array('blogs', 'perm') )
@@ -286,6 +286,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.29  2009/12/01 01:52:08  fplanque
+ * Fixed issue with Debuglog in case of redirect -- Thanks @blueyed for help.
+ *
  * Revision 1.28  2009/09/25 22:50:31  tblue246
  * More outstanding bugfixes
  *

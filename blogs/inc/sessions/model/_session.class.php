@@ -212,7 +212,7 @@ class Session
 
 		if( $this->ID )
 		{ // there was a valid session before; data needs to be updated at page exit (lastseen)
-			$this->_session_needs_save = true;
+			$this->session_needs_save( true );
 		}
 		else
 		{ // create a new session! :
@@ -237,6 +237,12 @@ class Session
 		}
 	}
 
+
+	function session_needs_save( $session_needs_save )
+	{
+		// pre_dump( 'SETTING session needs save to', $session_needs_save );
+		$this->_session_needs_save = $session_needs_save;
+	}
 
 	/**
 	 * Attach a User object to the session.
@@ -277,7 +283,7 @@ class Session
 			}
 
 			$this->user_ID = $user_ID;
-			$this->_session_needs_save = true;
+			$this->session_needs_save( true );
 		}
 	}
 
@@ -299,7 +305,7 @@ class Session
 		// Invalidate the session key (no one will be able to use this session again)
 		$this->key = NULL;
 		$this->_data = array(); // We don't need to keep old data
-		$this->_session_needs_save = true;
+		$this->session_needs_save( true );
 		$this->dbsave();
 
 		$this->user_ID = NULL; // Unset user_ID after invalidating/saving the session above, to keep the user info attached to the old session.
@@ -359,7 +365,7 @@ class Session
 			else
 			{ // expired or old format (without 'value' key)
 				unset( $this->_data[$param] );
-				$this->_session_needs_save = true;
+				$this->session_needs_save( true );
 				$Debuglog->add( 'Session: Session data['.$param.'] expired.', 'request' );
 			}
 		}
@@ -395,7 +401,7 @@ class Session
 
 			$Debuglog->add( 'Session: Session data['.$param.'] updated. Expire in: '.( $expire ? $expire.'s' : '-' ).'.', 'request' );
 
-			$this->_session_needs_save = true;
+			$this->session_needs_save( true );
 		}
 	}
 
@@ -415,7 +421,7 @@ class Session
 
 			$Debuglog->add( 'Session: Session data['.$param.'] deleted!', 'request' );
 
-			$this->_session_needs_save = true;
+			$this->session_needs_save( true );
 		}
 	}
 
@@ -428,11 +434,13 @@ class Session
 	function dbsave()
 	{
 		global $DB, $Debuglog, $Hit, $localtimenow;
+
 		if( ! $this->_session_needs_save )
 		{	// There have been no changes since the last save.
 			$Debuglog->add( 'Session: Session is up to date and does not need to be saved.', 'request' );
 			return false;
 		}
+
 		$sess_data = empty($this->_data) ? NULL : serialize($this->_data);
 
 	 	// Note: The key actually only needs to be updated on a logout.
@@ -453,7 +461,8 @@ class Session
 		$DB->query( $sql, 'Session::dbsave()' );
 
 		$Debuglog->add( 'Session: Session data saved!', 'request' );
-		$this->_session_needs_save = false;
+
+		$this->session_needs_save( false );
 	}
 
 
@@ -556,6 +565,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.25  2009/12/01 01:52:08  fplanque
+ * Fixed issue with Debuglog in case of redirect -- Thanks @blueyed for help.
+ *
  * Revision 1.24  2009/12/01 01:32:59  blueyed
  * whitespace/typo
  *
