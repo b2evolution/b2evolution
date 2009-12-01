@@ -170,7 +170,7 @@ function shutdown()
 	debug_info();
 
 	// Update the SESSION again, at the very end:
-	// (e.g. "Debugslogs" may have been removed in debug_info())
+	// (e.g. "Debuglogs" may have been removed in debug_info())
 	$Session->dbsave();
 
 	$Timer->pause('shutdown');
@@ -2164,9 +2164,6 @@ function debug_info( $force = false, $force_clean = false )
 	}
 
 
-
-
-
 	// DEBUGLOG(s) FROM PREVIOUS SESSIONS, after REDIRECT(s) (with list of categories at top):
 	if( isset($Session) && ($sess_Debuglogs = $Session->get('Debuglogs')) && ! empty($sess_Debuglogs) )
 	{
@@ -3695,6 +3692,9 @@ function get_active_opcode_cache()
 
 /*
  * $Log$
+ * Revision 1.189  2009/12/01 01:32:59  blueyed
+ * whitespace/typo
+ *
  * Revision 1.188  2009/11/30 04:31:38  fplanque
  * BlockCache Proof Of Concept
  *

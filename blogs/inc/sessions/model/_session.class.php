@@ -428,13 +428,11 @@ class Session
 	function dbsave()
 	{
 		global $DB, $Debuglog, $Hit, $localtimenow;
-
 		if( ! $this->_session_needs_save )
 		{	// There have been no changes since the last save.
 			$Debuglog->add( 'Session: Session is up to date and does not need to be saved.', 'request' );
 			return false;
 		}
-
 		$sess_data = empty($this->_data) ? NULL : serialize($this->_data);
 
 	 	// Note: The key actually only needs to be updated on a logout.
@@ -455,7 +453,6 @@ class Session
 		$DB->query( $sql, 'Session::dbsave()' );
 
 		$Debuglog->add( 'Session: Session data saved!', 'request' );
-
 		$this->_session_needs_save = false;
 	}
 
@@ -559,6 +556,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.24  2009/12/01 01:32:59  blueyed
+ * whitespace/typo
+ *
  * Revision 1.23  2009/12/01 00:29:09  fplanque
  * bugfix
  *
