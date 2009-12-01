@@ -79,7 +79,7 @@ class DataObjectCache
 	 */
 	var $DataObject_array = array();
 
-  /**
+	/**
 	 * Index of current iteration
 	 * @see DataObjectCache::get_next()
 	 */
@@ -672,6 +672,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.18  2009/12/01 20:53:39  blueyed
+ * indent
+ *
  * Revision 1.17  2009/12/01 02:04:45  fplanque
  * minor
  *
