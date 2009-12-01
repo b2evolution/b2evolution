@@ -151,7 +151,7 @@ function header_redirect( $redirect_to = NULL, $status = false )
 		}
 
 		$sess_Debuglogs[] = $Debuglog;
-		$Session->set( 'Debuglogs', $sess_Debuglogs /*, 60 /* expire in 60 seconds */ );
+		$Session->set( 'Debuglogs', $sess_Debuglogs, 60 /* expire in 60 seconds */ );
 	 	// echo 'Passing Debuglog(s) to next page';
 	 	// pre_dump( $sess_Debuglogs );
 	}
@@ -1015,6 +1015,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.64  2009/12/01 02:09:32  fplanque
+ * oops
+ *
  * Revision 1.63  2009/12/01 01:52:08  fplanque
  * Fixed issue with Debuglog in case of redirect -- Thanks @blueyed for help.
  *
