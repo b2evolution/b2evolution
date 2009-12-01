@@ -578,7 +578,7 @@ function param_check_login( $var, $required = false )
  */
 function check_is_login( $login )
 {
-	if( !is_login( $login ) )
+	if( !user_exists( $login ) )
 	{
  		return sprintf( T_( 'There is no user with username &laquo;%s&raquo;' ), $login );
 	}
@@ -2098,6 +2098,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.56  2009/12/01 13:40:32  efy-maxim
+ * rename is_login to user_exists function
+ *
  * Revision 1.55  2009/11/30 23:05:30  blueyed
  * Remove dependency on Settings global out of _param.funcs. Adds min length param to param_check_passwords. Add tests.
  *

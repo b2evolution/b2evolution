@@ -1279,20 +1279,17 @@ function is_word( $word )
 /**
  * Check if the login is valid
  *
- * @todo fp>max please rename to user_exists()
- * @todo Please always use $DB->quote() when escaping user submitted content
- *
  * @param string login
  * @return boolean true if OK
  */
-function is_login( $login )
+function user_exists( $login )
 {
 	global $DB;
 
 	$SQL = new SQL();
 	$SQL->SELECT( 'COUNT(*)' );
 	$SQL->FROM( 'T_users' );
-	$SQL->WHERE( 'user_login = \''.$login.'\'' );
+	$SQL->WHERE( 'user_login = '.$DB->quote( $login ) );
 
 	$var = $DB->get_var( $SQL->get() );
 	return $var > 0 ? true : false; // PHP4 compatibility
@@ -3703,6 +3700,9 @@ function get_active_opcode_cache()
 
 /*
  * $Log$
+ * Revision 1.191  2009/12/01 13:40:32  efy-maxim
+ * rename is_login to user_exists function
+ *
  * Revision 1.190  2009/12/01 01:52:08  fplanque
  * Fixed issue with Debuglog in case of redirect -- Thanks @blueyed for help.
  *
