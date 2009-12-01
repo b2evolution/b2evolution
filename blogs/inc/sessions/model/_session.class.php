@@ -196,7 +196,7 @@ class Session
 							$Debuglog->add( 'Session: Session data loaded.', 'request' );
 
 							// Load a Messages object from session data, if available:
-							if( ($sess_Messages = $this->get('Messages')) && is_a( $sess_Messages, 'log' ) )
+							if( ($sess_Messages = $this->get('Messages')) && is_a( $sess_Messages, 'messages' ) )
 							{
 								// dh> TODO: "old" messages should rather get prepended to any existing ones from the current request, rather than appended
 								$Messages->add_messages( $sess_Messages->messages );
@@ -559,6 +559,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.23  2009/12/01 00:29:09  fplanque
+ * bugfix
+ *
  * Revision 1.22  2009/11/30 00:22:05  fplanque
  * clean up debug info
  * show more timers in view of block caching
