@@ -75,7 +75,7 @@ class FilteredResults extends Results
 	}
 
 
-  /**
+	/**
 	 * Get every active filter that is not the same as the defaults
 	 */
 	function get_active_filters()
@@ -100,7 +100,7 @@ class FilteredResults extends Results
 	}
 
 
-  /**
+	/**
 	 * Show every active filter that is not the same as the defaults
 	 */
 	function dump_active_filters()
@@ -177,7 +177,7 @@ class DataObjectList2 extends FilteredResults
 	 */
 	function & get_by_idx( $idx )
 	{
-		return $this->Cache->instantiate( $this->rows[$idx] );
+		return $this->Cache->instantiate( $this->rows[$idx] ); // pass by reference: creates $rows[$idx]!
 	}
 
 
@@ -218,8 +218,8 @@ class DataObjectList2 extends FilteredResults
 	{
 		$title_array = $this->get_filter_titles();
 
-  	if( empty( $title_array ) )
-  	{
+		if( empty( $title_array ) )
+		{
 			return '';
 		}
 
@@ -252,10 +252,10 @@ class DataObjectList2 extends FilteredResults
 
 		// Get the ID of the inferior element which his order is the nearest
 		$rows = $DB->get_results( 'SELECT '.$this->Cache->dbIDname
-														 	.' FROM '.$this->Cache->dbtablename
-														 .' WHERE '.$this->Cache->dbprefix.'order < '.$order
-													.' ORDER BY '.$this->Cache->dbprefix.'order DESC
-														 		LIMIT 0,1' );
+			 	.' FROM '.$this->Cache->dbtablename
+				.' WHERE '.$this->Cache->dbprefix.'order < '.$order
+				.' ORDER BY '.$this->Cache->dbprefix.'order DESC'
+				.' LIMIT 0,1' );
 
 		if( count( $rows ) )
 		{
@@ -336,6 +336,9 @@ class DataObjectList2 extends FilteredResults
 
 /*
  * $Log$
+ * Revision 1.13  2009/12/01 20:58:27  blueyed
+ * doc, indent
+ *
  * Revision 1.12  2009/11/30 22:56:09  blueyed
  * typo
  *
