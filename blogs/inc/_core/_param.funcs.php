@@ -2004,7 +2004,7 @@ function balance_tags( $text )
 	# b2 bug fix for LOVE <3 (and other situations with '<' before a number)
 	$text = preg_replace('#<([0-9]{1})#', '&lt;$1', $text);
 
-	while( preg_match('~<(\s*/?\w+)\s*(.*?)/?>~', $text, $regex) )
+	while( preg_match('~<(\s*/?\w+)\s*(.*?)/?>~s', $text, $regex) )
 	{
 		$newtext = $newtext . $tagqueue;
 
@@ -2098,6 +2098,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.57  2009/12/01 21:05:10  blueyed
+ * balance_tags: handle tags spanning multiple lines
+ *
  * Revision 1.56  2009/12/01 13:40:32  efy-maxim
  * rename is_login to user_exists function
  *
