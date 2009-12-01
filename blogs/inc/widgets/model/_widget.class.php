@@ -503,8 +503,8 @@ class ComponentWidget extends DataObject
 		global $Blog;
 
 		return array(
-				'coll_ID' => $Blog->ID,		// Has the blog changed ?  (settings or content)
-				'wi_ID'   => $this->ID,			// Have the widget settings changed ?
+				'wi_ID'   => $this->ID,				// Have the widget settings changed ?
+				'set_coll_ID' => $Blog->ID,		// Have the settings of the blog changed ? (ex: new skin)
 			);
 	}
 
@@ -688,6 +688,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.71  2009/12/01 04:19:25  fplanque
+ * even more invalidation dimensions
+ *
  * Revision 1.70  2009/12/01 03:45:37  fplanque
  * multi dimensional invalidation
  *

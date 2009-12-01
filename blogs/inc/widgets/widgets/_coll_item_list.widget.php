@@ -405,8 +405,8 @@ class coll_item_list_Widget extends ComponentWidget
 		$owner_User = & $Blog->get_owner_User();
 
 		return array(
-				'coll_ID' => $Blog->ID,					// Has the blog changed ?  (settings or content)
 				'wi_ID'   => $this->ID,					// Have the widget settings changed ?
+				'set_coll_ID' => $Blog->ID,			// Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => empty($this->disp_params['blog_ID']) ? $Blog->ID : $this->disp_params['blog_ID'], 	// Has the content of the displayed blog changed ?
 			);
 	}
@@ -415,6 +415,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.19  2009/12/01 04:19:25  fplanque
+ * even more invalidation dimensions
+ *
  * Revision 1.18  2009/12/01 03:45:37  fplanque
  * multi dimensional invalidation
  *

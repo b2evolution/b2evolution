@@ -1822,6 +1822,7 @@ class Blog extends DataObject
 		// Fien grained invalidation:
 		// EXPERIMENTAL: Below are more granular invalidation dates:
 		BlockCache::invalidate_key( 'set_coll_ID', $this->ID ); // Settings have changed
+		BlockCache::invalidate_key( 'set_coll_ID', 'any' ); // Settings of a have changed (for widgets tracking a change on ANY blog)
 		// cont_coll_ID  // Content has not changed
 	}
 
@@ -2167,6 +2168,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.93  2009/12/01 04:19:25  fplanque
+ * even more invalidation dimensions
+ *
  * Revision 1.92  2009/12/01 03:45:37  fplanque
  * multi dimensional invalidation
  *

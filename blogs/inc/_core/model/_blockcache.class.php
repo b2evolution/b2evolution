@@ -173,20 +173,24 @@ class BlockCache
 		{ // We want to do timestamp checking:
 
 
-			if( ! preg_match( '/^([0-9]+) (.*)$/ms', $content, $matches ) )
+			//if( ! preg_match( '/^([0-9]+) (.*)$/ms', $content, $matches ) )
+			if( ! $pos = strpos( $content, ' ' ) )
 			{	// Could not find timestamp
 				$Debuglog->add( 'MISSING TIMESTAMP on retrieval of: '.$this->serialized_keys, 'blockcache' );
 				return false;
 			}
 
-			if( $matches[1] < $oldest_acceptable_ts )
+			// if( $matches[1] < $oldest_acceptable_ts )
+			if( ($cache_ts = substr( $content, 0, $pos )) < $oldest_acceptable_ts )
 			{	// Timestamp too old (there has been an invalidation in between)
-				$Debuglog->add( 'Retrieved INVALIDATED cached content: '.$this->serialized_keys.' (invalidated by '.$most_recent_invaliating_key.' - '.$matches[1].' < '.$oldest_acceptable_ts.')', 'blockcache' );
+				$Debuglog->add( 'Retrieved INVALIDATED cached content: '.$this->serialized_keys
+					.' (invalidated by '.$most_recent_invaliating_key.' - '.$cache_ts.' < '.$oldest_acceptable_ts.')', 'blockcache' );
 				return false;
 			}
 
 			// OK, we have content that is still valid:
-			$content = $matches[2];
+			// $content = $matches[2];
+			$content = substr( $content, $pos+1 );
 		}
 
 		$Debuglog->add( 'Retrieved: '.$this->serialized_keys, 'blockcache' );
@@ -284,6 +288,9 @@ class BlockCache
 
 /*
  * $Log$
+ * Revision 1.6  2009/12/01 04:19:25  fplanque
+ * even more invalidation dimensions
+ *
  * Revision 1.5  2009/12/01 03:33:19  fplanque
  * Improved handling of invalidation dates
  *

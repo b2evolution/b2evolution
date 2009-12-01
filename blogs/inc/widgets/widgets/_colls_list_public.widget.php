@@ -117,11 +117,32 @@ class colls_list_public_Widget extends ComponentWidget
 
 		return true;
 	}
+
+
+	/**
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @return array of keys this widget depends on
+	 */
+	function get_cache_keys()
+	{
+		global $Blog;
+
+		$owner_User = & $Blog->get_owner_User();
+
+		return array(
+				'wi_ID'   => $this->ID,					// Have the widget settings changed ?
+				'set_coll_ID' =>'any', 					// Have the settings of ANY blog changed ? (ex: new skin here, new name on another)
+			);
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.10  2009/12/01 04:19:25  fplanque
+ * even more invalidation dimensions
+ *
  * Revision 1.9  2009/09/14 13:54:13  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

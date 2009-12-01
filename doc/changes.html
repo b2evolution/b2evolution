@@ -32,21 +32,27 @@
 
 			<h1>3.x series</h1>
 
-			<h2>3.4.0-dev</h2>
+			<h2>4.0.0-dev</h2>
 			<ul>
 				<li>3.3 TBD??? Additional plugin hooks
 				<ul>
 				<li>plugin disp types (yabs)</li>
 				</ul>
 				</li>
+				<li>Performance:
+				  <ul>
+				    <li>Optimized for PHP5 (still works on PHP4 but we strongly recommend PHP5)</li>
+			        <li>BlockCache stored to memroty (APC Cache): every widget is now cached individually and regenerated only when need (provided it declares proper dependency keys). This provides a significant performance boost. More underway. (@francoisplanque)</li>
+				  </ul>
+				</li>
 				<li><strong>Blog features:
 				  </strong>
 				  <ul>
 				    <li>Images can now be linked at the top or after &quot;more&quot; in a post (@blueyed)</li>
-				    <li>Avatar widget (@blueyed)</li>
-				    <li>Tag cloud widget now has a random order option (@waltercruz)</li>
-				  </ul>
-				</li>
+			        <li>Avatar widget (@blueyed)</li>
+			        <li>Tag cloud widget now has a random order option (@waltercruz)</li>
+			      </ul>
+			  </li>
 				<li><strong>Comments:</strong>
 				  <ul>
                     <li>Display avatars for comments (@sam2kb)</li>
