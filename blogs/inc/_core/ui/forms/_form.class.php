@@ -740,11 +740,12 @@ class Form extends Widget
 		$r .= 'jQuery(document).ready(function(){';
 		$r .= 'jQuery(\'#'.$field_name.'\').hintbox({';
 		$r .= 'url: \''.$htsrv_url.'async.php?action=get_login_list\',';
-		$r .= 'matchHint: true';
+		$r .= 'matchHint: true,';
+		$r .= 'autoDimentions: true';
 		$r .= '});';
 		$r .= '});';
 		$r .= '</script>';
-		$r .= '<input type="text" value="'.$User->login.'" name="'.$field_name.'" id="'.$field_name.'"/>';
+		$r .= '<input type="text" value="'.$User->login.'" name="'.$field_name.'" id="'.$field_name.'" onKeyPress="return disableEnterKey(event)"/>';
 
 		$r .= $this->end_field();
 
@@ -3034,6 +3035,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.78  2009/12/01 14:46:51  efy-maxim
+ * disable enter key to submit form
+ *
  * Revision 1.77  2009/11/30 00:22:04  fplanque
  * clean up debug info
  * show more timers in view of block caching
