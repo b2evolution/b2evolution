@@ -252,7 +252,10 @@ class BlockCache
 	 */
 	function cacheproviderstore( $key, $payload )
 	{
-		apc_store( $key, $payload, 3600 * 24 );
+		if( function_exists('apc_store') )
+			return apc_store( $key, $payload, 3600 * 24 );
+
+		return NULL;
 	}
 
 	/**
@@ -263,13 +266,19 @@ class BlockCache
 	 */
 	function cacheproviderretrieve( $key, & $success )
 	{
-		return apc_fetch( $key, $success );
+		if( function_exists('apc_fetch') )
+			return apc_fetch( $key, $success );
+
+		return NULL;
 	}
 
 }
 
 /*
  * $Log$
+ * Revision 1.3  2009/12/01 01:33:21  blueyed
+ * Fix install: wrap apc_*
+ *
  * Revision 1.2  2009/11/30 23:16:24  fplanque
  * basic cache invalidation is working now
  *
