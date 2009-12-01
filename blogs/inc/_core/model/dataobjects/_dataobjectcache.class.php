@@ -217,7 +217,9 @@ class DataObjectCache
 		$Debuglog->add( 'Loading <strong>'.$this->objtype.'('.( $invert ? 'ALL except ' : '' ).$req_list.')</strong> into cache', 'dataobjects' );
 
 		if( empty( $req_list ) )
+		{
 			return false;
+		}
 
 		if( ! $invert )
 		{ // Remove entries which have already been loaded from the list
@@ -670,6 +672,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.17  2009/12/01 02:04:45  fplanque
+ * minor
+ *
  * Revision 1.16  2009/11/30 22:59:32  blueyed
  * DataObjectCache: Add instantiate_list. load_list: remove already loaded objects from SQL query.
  *

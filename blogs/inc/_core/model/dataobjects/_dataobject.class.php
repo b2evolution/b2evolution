@@ -160,10 +160,11 @@ class DataObject
 		foreach( $this->dbchanges as $loop_dbfieldname => $loop_dbchange )
 		{
 			if( $loop_dbchange['type'] == 'dbfield' )
-			{
+			{	// Set to dbfield only:
 				$sql_changes[] = "`$loop_dbfieldname` = `".$loop_dbchange['value'].'` ';
 				continue;
 			}
+			
 			// Get changed value (we use eval() to allow constructs like $loop_dbchange['value'] = 'Group->get(\'ID\')'):
 			eval( '$loop_value = $this->'.$loop_dbchange['value'].';' );
 			// Prepare matching statement:
@@ -818,6 +819,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2009/12/01 02:04:45  fplanque
+ * minor
+ *
  * Revision 1.31  2009/11/30 22:57:27  blueyed
  * Add 'dbfield' dbchange type. This allows setting something to a db field. E.g. 'lastupdate=lastupdate'.
  *

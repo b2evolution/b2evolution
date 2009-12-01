@@ -268,7 +268,8 @@ class BlockCache
 	{
 		if( function_exists('apc_fetch') )
 			return apc_fetch( $key, $success );
-
+	
+		$success = false;
 		return NULL;
 	}
 
@@ -276,6 +277,9 @@ class BlockCache
 
 /*
  * $Log$
+ * Revision 1.4  2009/12/01 02:04:45  fplanque
+ * minor
+ *
  * Revision 1.3  2009/12/01 01:33:21  blueyed
  * Fix install: wrap apc_*
  *
