@@ -70,7 +70,8 @@ function db_index_exists( $table, $index_name )
 
 	$index_name = strtolower($index_name);
 
-	foreach( $DB->get_results('SHOW INDEX FROM '.$table) as $row )
+	$DB->query('SHOW INDEX FROM '.$table);
+	while( $row = $DB->get_row() )
 	{
 		if( strtolower($row->Key_name) == $index_name )
 		{
@@ -1732,10 +1733,27 @@ function upgrade_b2evo_tables()
 			ALTER TABLE T_categories
 				ADD COLUMN cat_urlname VARCHAR(255) NOT NULL' );
 
-		// TODO: dh> "catID" is not that readable, is it? Should use a function instead. Also use it for cafelog upgrade then.
-		$DB->query( '
-      UPDATE T_categories
-						SET cat_urlname = CONCAT( "cat" , cat_ID )' ); // if we use c## then you can't edit current categories ;)
+		// Create cat_urlname from cat_name:
+		// TODO: Also use it for cafelog upgrade.
+		load_funcs('locales/_charset.funcs.php');
+		foreach( $DB->get_results('SELECT cat_ID, cat_name FROM T_categories') as $cat )
+		{
+			$cat_name = trim($cat->cat_name);
+			if( strlen($cat_name) )
+			{
+				$cat_urlname = urltitle_validate('', $cat_name, $cat->cat_ID, false, 'cat_urlname', 'cat_ID', 'T_categories');
+			}
+			else
+			{
+				$cat_urlname = 'c'.$cat->cat_ID;
+			}
+
+			$DB->query( '
+				UPDATE T_categories
+					 SET cat_urlname = '.$DB->quote($cat_urlname).'
+				 WHERE cat_ID = '.$cat->cat_ID );
+		}
+
 		$DB->query( '
 			ALTER TABLE T_categories
 				ADD UNIQUE cat_urlname ( cat_urlname )' );
@@ -2751,6 +2769,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.346  2009/12/01 21:35:56  blueyed
+ * Merge from whissip: use get_row to not fetch all rows. Use proper category urlnames on upgrade.
+ *
  * Revision 1.345  2009/11/30 01:22:23  fplanque
  * fix wrong version status message rigth after upgrade
  *
