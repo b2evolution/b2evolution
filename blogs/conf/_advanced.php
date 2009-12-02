@@ -27,10 +27,21 @@ function NT_( $string )
  * 0 = no
  * 1 = yes
  * 2 = yes and potentially die() to display debug info (needed before redirects, e-g message_send.php)
+ * 'pwd' = require password
  *
  * @global integer
  */
-$debug = 0;
+$debug = 'pwd';
+
+/**
+ * When $debug is 'pwd' and you set a /password/ below,
+ * you can turn on debugging at any time by adding ?debug=/passwod/ to your url
+ * You can turn off by adding just ?debug=
+ *
+ * @var string
+ */
+$debug_pwd = '';
+
 
 // Most of the time you'll want to see all errors, including notices:
 // b2evo should run notice free! (plugins too!)

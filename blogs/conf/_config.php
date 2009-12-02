@@ -56,8 +56,39 @@ if( file_exists(dirname(__FILE__).'/_overrides_TEST.php') )
 	include_once dirname(__FILE__).'/_overrides_TEST.php';	// FOR TESTING / DEVELOPMENT OVERRIDES
 }
 
+// Handle debug cookie:
+if( $debug == 'pwd' )
+{	// Debug *can* be enabmes/disabled by cookie:
+
+	// Disabled until we find a reason to enable:
+	$debug = 0;
+
+	if( !empty($debug_pwd) )
+	{	// We have configured a password that could enable debug mode:
+		if( isset($_GET['debug']) )
+		{	// We have submitted a ?debug=password
+			if( $_GET['debug'] == $debug_pwd )
+			{	// Password matches
+				$debug = 1;
+				setcookie( 'debug', $debug_pwd, $cookie_expires, $cookie_path, $cookie_domain );
+			}
+			else
+			{	// Password doesn't match: turn off debug mode:
+				setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain );
+			}
+		}
+		elseif( !empty($_COOKIE['debug'])	&& $_COOKIE['debug'] == $debug_pwd )
+		{	// We have a cookie with the correct debug password:
+			$debug = 1;
+		}
+	}
+}
+
 /*
  * $Log$
+ * Revision 1.58  2009/12/02 00:05:29  fplanque
+ * Debug mode can be turned on & off through the URL with a password
+ *
  * Revision 1.57  2009/11/20 23:56:41  fplanque
  * minor  + doc
  *

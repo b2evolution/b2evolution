@@ -107,13 +107,14 @@
 			  </li>
 				<li><strong>Technical mumbo-jumbo:</strong>
 					<ul>
+						<li>Debug mode can be turned on &amp; off through the URL with a password (@francoisplanque)</li>
 						<li>SQL optimizations (@blueyed)
                           <ul>
                             <li>SQL_NO_CACHE for queries selecting from T_sessions/T_hitlog</li>
                             <li>Remove information about seconds from item issue and start date,
                               so that those queries can get cached for up to one minute now.</li>
                           </ul>
-                        </li>
+						</li>
 						<li>Fixed a bug in fetch_remote_page() (wrong $info array keys). (@tblue)</li>
 						<li>Item::get_tags(): Bugfix and optimization:
 							Remember items without tags and do not try to
@@ -123,7 +124,7 @@
 							not only if Comment/Item has changed. (@sir_yabs/@tblue)</li>
 					    <li>Increased core modularity</li>
 			        </ul>
-				</li>
+			  </li>
 		    </ul>
 		  <h2>3.3.2-stable</h2>
 	    <ul>
