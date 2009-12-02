@@ -425,6 +425,10 @@ class _core_Module extends Module
 						'text' => T_('Blog skin').'&hellip;',
 						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin'.$blog_param,
 					),
+				'skin_settings' => array(
+						'text' => T_('Blog skin settings').'&hellip;',
+						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin_settings'.$blog_param,
+					),
 				'widgets' => array(
 						'text' => T_('Blog widgets').'&hellip;',
 						'href' => $admin_url.'?ctrl=widgets'.$blog_param,
@@ -769,6 +773,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.54  2009/12/02 02:22:36  fplanque
+ * add menu entry
+ *
  * Revision 1.53  2009/11/30 23:16:24  fplanque
  * basic cache invalidation is working now
  *
