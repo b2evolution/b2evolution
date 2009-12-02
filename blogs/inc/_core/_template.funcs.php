@@ -526,7 +526,7 @@ function require_js( $js_file, $relative_to_base = false )
  * @param string title.  The title for the link tag
  * @param string media.  ie, 'print'
  */
-function require_css( $css_file, $relative_to_base = false, $title = NULL, $media = NULL )
+function require_css( $css_file, $relative_to_base = false, $title = NULL, $media = NULL, $version = '#' )
 {
 	global $rsc_url, $debug, $app_version;
 	static $required_css;
@@ -548,10 +548,17 @@ function require_css( $css_file, $relative_to_base = false, $title = NULL, $medi
 		$css_url = $rsc_url . 'css/' . $css_file;
 	}
 
-	// Be sure to get a fresh copy of this CSS file after application upgrades:
-	$css_url = url_add_param( $css_url, 'v='.$app_version );
+	if( !empty($version) )
+	{	// Be sure to get a fresh copy of this CSS file after application upgrades:
+		if( $version == '#' )
+		{
+			$version = $app_version;
+		}
+		$css_url = url_add_param( $css_url, 'v='.$version );
+	}
 
 	// Add to headlines, if not done already:
+	// fp> TODO: check for url without version to avoid duplicate load due to lack of verison in @import statements
 	if( empty( $required_css ) || ! in_array( strtolower($css_url), $required_css ) )
 	{
 		$required_css[] = strtolower($css_url);
@@ -1028,6 +1035,10 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.66  2009/12/02 03:54:39  fplanque
+ * Attempt to let more CSS be loaded sequentially instead of serially (which happens with @import)
+ * Also prepares for bundling.
+ *
  * Revision 1.65  2009/12/02 01:00:07  fplanque
  * header_nocache & header_noexpire
  *

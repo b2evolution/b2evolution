@@ -4,9 +4,10 @@
 * Distributed with b2evolution with written permission from Michael Heilemann (2007-01-25).
 */
 
-@import url("../../rsc/css/basic.css");	/* Import basic styles */
-@import url("../../rsc/css/blog_base.css");	/* Import default blog navigation styles */
-@import url("item.css");	/* Import blog content styles */
+/* The following are now requested in _skin.class.php::display_init() -- please see note there */
+/* @import url("../../rsc/css/basic.css");	/* Import basic styles */
+/* @import url("../../rsc/css/blog_base.css");	/* Import default blog navigation styles */
+/* @import url("item.css");	/* Import blog content styles */
 
 
 /* Begin Typography & Colors */
