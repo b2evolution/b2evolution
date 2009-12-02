@@ -3566,8 +3566,7 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 	else
 	{	// we want to send as js
 		header_content_type( 'text/javascript' );
-		header( 'Cache-Control: no-cache, must-revalidate' );
-		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header_nocache();
 		echo $output;
 	}
 
@@ -3700,6 +3699,9 @@ function get_active_opcode_cache()
 
 /*
  * $Log$
+ * Revision 1.192  2009/12/02 01:00:07  fplanque
+ * header_nocache & header_noexpire
+ *
  * Revision 1.191  2009/12/01 13:40:32  efy-maxim
  * rename is_login to user_exists function
  *

@@ -1881,12 +1881,12 @@ class File extends DataObject
 				return '!Thumbnail read error! Check filesystem permissions.';
 			}
 
-			if( $mtime && $mtime == $this->get_lastmod_ts() )
-			{
-				header('Expires: '.date('r', time()+315360000)); // 86400*365*10 (10 years)
-			}
 			header('Content-Type: '.$thumb_mimetype );
 			header('Content-Length: '.filesize( $af_thumb_path ) );
+			if( $mtime && $mtime == $this->get_lastmod_ts() )
+			{
+				header_noexpire();
+			}
 			// Output the content of the file
 			readfile( $af_thumb_path );
 			return NULL;
@@ -1961,6 +1961,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.73  2009/12/02 01:00:07  fplanque
+ * header_nocache & header_noexpire
+ *
  * Revision 1.72  2009/11/30 00:22:05  fplanque
  * clean up debug info
  * show more timers in view of block caching

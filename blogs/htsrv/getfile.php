@@ -184,7 +184,7 @@ if( !empty($size) && $File->is_image() )
 		// it does not expire anytime soon.
 		if( $mtime && $mtime == $File->get_lastmod_ts() ) // TODO: dh> use salt here?!
 		{
-			header('Expires: '.date('r', time()+315360000)); // 86400*365*10 (10 years)
+			header_noexpire();
 		}
 		imagepng( $im_handle );
 	}
@@ -214,7 +214,7 @@ else
 	// it does not expire anytime soon.
 	if( $mtime && $mtime == $File->get_lastmod_ts() ) // TODO: dh> use salt here?!
 	{
-		header('Expires: '.date('r', time()+315360000)); // 86400*365*10 (10 years)
+		header_noexpire();
 	}
 
 	// Display the content of the file
@@ -223,6 +223,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.45  2009/12/02 01:00:07  fplanque
+ * header_nocache & header_noexpire
+ *
  * Revision 1.44  2009/11/30 22:17:38  blueyed
  * Improve error messages in images. save_image: catch errors. getfile: shorten errors, if required.
  *
