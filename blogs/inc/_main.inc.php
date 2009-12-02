@@ -675,7 +675,7 @@ if( $Messages->count( 'login_error' ) )
 	exit(0);
 }
 
-$Timer->pause( '_MAIN.inc');
+$Timer->pause( '_MAIN.inc' );
 
 
 /**
@@ -691,6 +691,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.133  2009/12/02 00:05:52  fplanque
+ * no message
+ *
  * Revision 1.132  2009/11/30 00:22:04  fplanque
  * clean up debug info
  * show more timers in view of block caching

@@ -70,6 +70,7 @@ $Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear
 		// 2. A single blog owner is not necessarily allowed to see all other users.
 
 		// Form 'username' field requires the following JS and CSS.
+		// fp> TODO: think about a way to bundle this with other JS on the page -- maybe always load hintbox in the backoffice
 		global $rsc_url;
 		echo '<script type="text/javascript" src="'.$rsc_url.'js/jquery.hintbox.min.js"></script>';
 		echo '<link rel="stylesheet" type="text/css" href="'.$rsc_url.'css/jquery.hintbox.css">';
@@ -127,6 +128,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.17  2009/12/02 00:05:52  fplanque
+ * no message
+ *
  * Revision 1.16  2009/12/01 14:56:58  efy-maxim
  * blog settings - username field instead simple text field
  *

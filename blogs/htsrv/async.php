@@ -123,7 +123,7 @@ switch( $action )
 		exit(0);
 
 	case 'get_login_list':
-
+		// fp>max TODO: is there a permission to just 'view' users? It would be appropriate here
 		$current_User->check_perm( 'users', 'edit', true );
 
 		$text = trim( param( 'q', 'string', '' ) );
@@ -296,6 +296,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.37  2009/12/02 00:05:52  fplanque
+ * no message
+ *
  * Revision 1.36  2009/12/01 13:56:57  efy-maxim
  * check permissions
  *
