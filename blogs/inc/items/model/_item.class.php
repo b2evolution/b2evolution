@@ -1054,6 +1054,8 @@ class Item extends ItemLight
 	 * This is like a teaser with no HTML and a cropping.
 	 *
 	 * Note: Excerpt and Teaser are TWO DIFFERENT THINGS.
+	 *
+	 * @param int Max length of excerpt
 	 */
 	function get_content_excerpt( $crop_at = 200 )
 	{
@@ -1067,10 +1069,7 @@ class Item extends ItemLight
 		// Ger rid of all new lines:
 		$output = trim( str_replace( array( "\r", "\n", "\t" ), array( ' ', ' ', ' ' ), $output ) );
 
-		if( strlen( $output ) > $crop_at )
-		{
-			$output = substr( $output, 0, $crop_at ).'...';
-		}
+		$output = strmaxlen($output, $crop_at);
 
 		return $output;
 	}
@@ -4113,6 +4112,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.166  2009/12/03 23:03:15  blueyed
+ * Item::get_content_excerpt: use strmaxlen. Fixes broken chars when cut in the middle.
+ *
  * Revision 1.165  2009/12/01 03:45:37  fplanque
  * multi dimensional invalidation
  *
