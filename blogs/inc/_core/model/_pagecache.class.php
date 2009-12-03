@@ -287,6 +287,7 @@ class PageCache
 		global $Debuglog;
 		global $ReqHost, $ReqURI;
 		global $servertimenow;
+		global $Timer;
 
 		// What would be the cache file for the current URL?
 		$af_cache_file = $this->get_af_filecache_path();
@@ -306,12 +307,17 @@ class PageCache
 		}
 		*/
 
+		$Timer->resume( 'Read cache file' );
 		$lines = @file( $af_cache_file, false );
-		// fp> note we are using empty() so that we detect both the case where there is no file and the case wher ethe file
+		$Timer->pause( 'Read cache file' );
+
+		// fp> note we are using empty() so that we detect both the case where there is no file and the case where the file
 		// might have ended up empty because PHP crashed while writing to it or sth like that...
 		if( ! empty($lines) )
 		{	// We have data in the cache!
 			$Debuglog->add( 'Retrieving from cache!', 'pagecache' );
+
+			$Timer->resume( 'Cache file processing' );
 
 			// Check that the format of the file if OK.
 			$sep = trim($lines[2]);
@@ -351,7 +357,32 @@ class PageCache
 			unset($lines[$i]);
 
 			// SEND CONTENT!
-			echo implode('',$lines);
+			$body = implode('',$lines);
+
+			$Timer->pause( 'Cache file processing' );
+
+			$Timer->resume( 'Sending cached content' );
+
+			// Echo a first chunk (see explanation below)
+			$buffer_size = 12000;  // Empiric value, you can make it smaller if you show me screenshots of better timings with a smaller value
+			echo substr( $body, 0, $buffer_size );
+
+			ob_start();
+			// fp> So why do we want an ob_start here?
+			// fp> Because otherwise echo will "hang" until all the data gets passed through apache (on default Apache install with default SendBufferSize)
+			// fp> With ob_start() the script will terminate much faster and the total exec time of the script will look much smaller.
+			// fp> This doesn't actually improve the speed of the transmission, it just lets the PHP script exit earlier
+			// fp> DRAWBACK: shutdown will be executed *before* the "ob" data is actually sent :'(
+			// fp> This is why we send a first chunk of data before ob_start(). shutdown can occur while that data is sent. then the remainder is sent.
+			// Inspiration: http://wonko.com/post/seeing_poor_performance_using_phps_echo_statement_heres_why
+			//              http://fplanque.com/dev/linux/how-to-log-request-processing-times-in-apache
+			//              http://fplanque.com/dev/linux/why-echo-is-slow-in-php-how-to-make-it-really-fast
+			// fp> TODO: do something similar during page cache collection.
+
+			echo substr( $body, $buffer_size );
+			// ob_end_flush(); // fp> WARNING: Putting an end flush here would just kill the benefit of the ob_start() above.
+
+			$Timer->pause( 'Sending cached content' );
 
 			return true;
 		}
@@ -470,8 +501,12 @@ class PageCache
 
 }
 
+
 /*
  * $Log$
+ * Revision 1.15  2009/12/03 06:05:40  fplanque
+ * Make cache performance visible (instead of hidden behind Apache's SendBuffer)
+ *
  * Revision 1.14  2009/11/30 04:31:37  fplanque
  * BlockCache Proof Of Concept
  *
