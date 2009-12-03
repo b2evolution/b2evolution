@@ -48,8 +48,6 @@ $AdminUI->disp_html_head();
 // Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
 $AdminUI->disp_body_top();
 
-
-
 if( $blog )
 {	// We want to look at a specific blog:
 	// Begin payload block:
@@ -73,21 +71,6 @@ if( $blog )
 	if( $CommentList->result_num_rows )
 	{	// We have drafts
 
-		$nb_blocks_displayed++;
-
-		// TODO: fix badge with real numebr (wich may be greater than 5!)
-		$block_item_Widget->title = T_('Comments awaiting moderation').' <span id="badge" class="badge"></span>';
-
-		echo '<div id="comments_block">';
-
-		$block_item_Widget->disp_template_replaced( 'block_start' );
-
-		echo '<div id="comments_container"></div>';
-
-		$block_item_Widget->disp_template_raw( 'block_end' );
-
-		echo '</div>';
-
 		global $htsrv_url;
 
 		?>
@@ -97,37 +80,17 @@ if( $blog )
 			var commentIds = new Array();
 			var commentsInd = 0;
 
-			// Update badge
-			function updateBadge()
-			{
-				$.ajax({
-				type: 'POST',
-				url: '<?php echo $htsrv_url; ?>async.php',
-				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=get_comments_awaiting_moderation_number',
-				success: function(result)
-				{
-					if(result == '0')
-					{
-						$('#comments_block').remove();
-					}
-					else
-					{
-						$('#badge').text(result);
-						if(parseInt(result) > commentIds.length )
-						{
-							loadCommentsAwaitingModeration();
-						}
-					}
-				} });
-			}
-
 			// Load next comments awaiting moderation
 			function loadCommentsAwaitingModeration()
 			{
 				var ids = '';
 				for(var id in commentIds)
 				{
-					ids = ids + commentIds[id] + ',';
+					commentId = commentIds[id];
+					if(commentId)
+					{
+						ids = ids + commentId + ',';
+					}
 				}
 				if(ids.length > 0)
 				{
@@ -143,11 +106,20 @@ if( $blog )
 				{
 					$('#comments_container').html($('#comments_container').html() + result);
 
-					var newCommentIds = $('#comments_' + commentsInd).val().split(',');
-					for(index = 0; index < newCommentIds.length; index++)
+					var comments_number = $('#badge_' + commentsInd).val();
+					if(comments_number == '0')
 					{
-						var arrayIndex = 'comment_' + newCommentIds[index];
-						commentIds[arrayIndex] = newCommentIds[index];
+						$('#comments_block').remove();
+					}
+					else
+					{
+						$('#badge').text(comments_number);
+						var newCommentIds = $('#comments_' + commentsInd).val().split(',');
+						for(index = 0; index < newCommentIds.length; index++)
+						{
+							var arrayIndex = 'comment_' + newCommentIds[index];
+							commentIds[arrayIndex] = newCommentIds[index];
+						}
 					}
 				} });
 			}
@@ -162,7 +134,7 @@ if( $blog )
 					$('#' + divid).effect('blind', options, 200);
 					$('#' + divid).remove();
 					delete commentIds[divid];
-					updateBadge();
+					loadCommentsAwaitingModeration();
 				}
 				else
 				{
@@ -213,9 +185,26 @@ if( $blog )
 				jQuery('#' + id).animate({ backgroundColor: color }, 200);
 			}
 
-			updateBadge();
 		</script>
 		<?php
+
+		$nb_blocks_displayed++;
+
+		$block_item_Widget->title = T_('Comments awaiting moderation').' <span id="badge" class="badge">'.get_comments_awaiting_moderation_number( $Blog->ID ).'</span>';
+
+		echo '<div id="comments_block">';
+
+		$block_item_Widget->disp_template_replaced( 'block_start' );
+
+		echo '<div id="comments_container">';
+
+		show_comments_awaiting_moderation( $Blog->ID );
+
+		echo '</div>';
+
+		$block_item_Widget->disp_template_raw( 'block_end' );
+
+		echo '</div>';
 	}
 
 	/*
@@ -579,6 +568,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.46  2009/12/03 11:38:37  efy-maxim
+ * ajax calls have been improved
+ *
  * Revision 1.45  2009/11/26 10:30:58  efy-maxim
  * ajax actions have been moved to async.php
  *
