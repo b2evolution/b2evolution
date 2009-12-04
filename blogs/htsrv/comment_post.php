@@ -301,7 +301,6 @@ if( $action == 'preview' )
 
 	$redirect_to .= '#comment_preview';
 
-	header_nocache();
 	header_redirect();
 	exit(0);
 }
@@ -394,12 +393,14 @@ if( $Comment->ID )
 }
 
 
-header_nocache();
 header_redirect(); // Will save $Messages into Session
 
 
 /*
  * $Log$
+ * Revision 1.136  2009/12/04 23:27:48  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.135  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *

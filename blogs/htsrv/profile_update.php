@@ -95,7 +95,8 @@ profile_check_params( array(
 
 if( $Messages->count('error') )
 {
-	header_content_type( 'text/html' );
+	headers_content_mightcache( 'text/html', 0 );		// Do NOT cache error messages! (Users would not see they fixed them)
+
 	// TODO: dh> these error should get displayed with the profile form itself, or at least there should be a "real HTML page" here (without JS-backlink)
 	$Messages->display( T_('Cannot update profile. Please correct the following errors:'),
 		'[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
@@ -139,12 +140,14 @@ else
 }
 
 
-header_nocache();
 // redirect Will save $Messages into Session:
 header_redirect();
 
 /*
  * $Log$
+ * Revision 1.60  2009/12/04 23:27:49  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.59  2009/03/20 03:38:04  fplanque
  * rollback -- http://forums.b2evolution.net/viewtopic.php?t=18269
  *

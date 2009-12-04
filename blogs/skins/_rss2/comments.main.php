@@ -28,8 +28,7 @@ else
 	$selfurl = format_to_output( $Blog->get_comment_feed_url( '_rss2' ), 'xmlattr' );
 }
 
-header_content_type( 'application/xml' );	// Sets charset!
-
+headers_content_mightcache( 'application/xml' );		// In most situations, you do NOT want to cache dynamic content!
 
 // Add caching headers
 // TODO: Last-Modified

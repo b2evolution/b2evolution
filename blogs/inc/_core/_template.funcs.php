@@ -60,6 +60,37 @@ function header_content_type( $type = 'text/html', $charset = '#' )
 }
 
 
+/**
+ * This is a placeholder for future development.
+ *
+ * @param string content-type; override for RSS feeds
+ * @param integer seconds
+ */
+function headers_content_mightcache( $type = 'text/html', $max_age = '#', $charset = '#' )
+{
+	global $is_admin_page;
+
+	header_content_type( $type, $charset );
+
+	if( empty($max_age) || $is_admin_page || is_logged_in() )
+	{	// Don't cache if no max_age given + NEVER EVER allow admin pages to cache + NEVER EVER allow logged in data to be cached:
+		header_nocache();
+		return;
+	}
+
+	// If we are on a "normal" page, we may, under some circumstances, tell the browser it can cache the data.
+	// This MAY be extremely confusing though, every time a user logs in and gets back to a screen with no evobar!
+	// This cannot be enabled by default and requires admin switches.
+
+	// For feeds, it is a little bit less confusing. We might want to have the param enabled by default in that case.
+
+	// WARNING: extra special care needs to be taken before ever caching a blog page that might contain a form or a comment preview
+	// having user details cached would be extremely bad.
+
+	// in the meantime...
+	header_nocache();
+}
+
 
 /**
  * Sends HTTP header to redirect to the previous location (which
@@ -189,6 +220,7 @@ function header_redirect( $redirect_to = NULL, $status = false )
 }
 
 
+
 /**
  * Sends HTTP headers to avoid caching of the page.
  * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
@@ -205,6 +237,9 @@ function header_nocache()
 
 /**
  * This is to "force" (strongly suggest) caching.
+ *
+ * WARNING: use this only for STATIC content that does NOT depend on the current user.
+ *
  * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
  */
 function header_noexpire()
@@ -1035,6 +1070,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.67  2009/12/04 23:27:49  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.66  2009/12/02 03:54:39  fplanque
  * Attempt to let more CSS be loaded sequentially instead of serially (which happens with @import)
  * Also prepares for bundling.

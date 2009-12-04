@@ -1814,7 +1814,7 @@ function debug_die( $additional_info = '', $params = array() )
 		if( ! headers_sent() )
 		{
 			load_funcs('_core/_template.funcs.php');
-			header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
+			headers_content_mightcache( 'text/html', 0 );		// Do NOT cache error messages! (Users would not see they fixed them)
 			$status_header = $_SERVER['SERVER_PROTOCOL'].' '.$params['status'];
 			header($status_header);
 		}
@@ -1921,7 +1921,7 @@ function bad_request_die( $additional_info = '' )
 	if( ! headers_sent() )
 	{
 		load_funcs('_core/_template.funcs.php');
-		header_content_type( 'text/html' ); // it's ok, if a previous header would be replaced;
+		headers_content_mightcache( 'text/html', 0 );		// Do NOT cache error messages! (Users would not see they fixed them)
 		header('HTTP/1.0 400 Bad Request');
 	}
 
@@ -3558,15 +3558,14 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 
 	if( $send_as_html )
 	{	// we want to send as a html document
-		header_content_type();
+		headers_content_mightcache( 'text/html', 0 );		// Do NOT cache interactive communications.
 		echo '<html><head></head><body><script type="text/javascript">'."\n";
 		echo $output;
 		echo '</script></body></html>';
 	}
 	else
 	{	// we want to send as js
-		header_content_type( 'text/javascript' );
-		header_nocache();
+		headers_content_mightcache( 'text/javascript', 0 );		// Do NOT cache interactive communications.
 		echo $output;
 	}
 
@@ -3822,6 +3821,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.194  2009/12/04 23:27:49  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.193  2009/12/03 11:38:37  efy-maxim
  * ajax calls have been improved
  *

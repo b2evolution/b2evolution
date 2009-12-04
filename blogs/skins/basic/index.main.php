@@ -24,7 +24,6 @@ if( version_compare( $app_version, '2.4.1' ) < 0 )
 skin_init( $disp );
 
 // ----------------------------- HEADER BEGINS HERE ------------------------------
-header_content_type();	// Sets charset!
 ?>
 <html>
 <head>

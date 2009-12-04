@@ -26,9 +26,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-// Do not cache this page, because the JS password random salt has to match the one stored in the current session:
-header_nocache(); // do not cache this page, because the JS password salt has to match the session cookie
-
 
 // TODO: dh> the message below should also get displayed in _reg_form.
 // E.g., the user might have clicked accidently on an old password change link.
@@ -224,6 +221,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.16  2009/12/04 23:27:50  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.15  2009/11/30 22:12:21  blueyed
  * Use remove_magic_quotes when reusing POST in form.
  *

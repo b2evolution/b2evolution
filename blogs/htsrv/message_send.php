@@ -302,14 +302,15 @@ else
 }
 
 
-// Header redirection
-header_nocache();
 // redirect Will save $Messages into Session:
 header_redirect(); // exits!
 
 
 /*
  * $Log$
+ * Revision 1.63  2009/12/04 23:27:49  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.62  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *

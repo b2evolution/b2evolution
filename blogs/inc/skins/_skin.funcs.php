@@ -378,6 +378,10 @@ function skin_init( $disp )
 	$Timer->start( 'Skin:display_init' );
 	$Skin->display_init();
 	$Timer->pause( 'Skin:display_init' );
+
+	// Send default headers:
+	// See comments inside of this function:
+	headers_content_mightcache( 'text/html' );		// In most situations, you do NOT want to cache dynamic content!
 }
 
 
@@ -916,6 +920,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.79  2009/12/04 23:27:50  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.78  2009/11/30 00:22:05  fplanque
  * clean up debug info
  * show more timers in view of block caching

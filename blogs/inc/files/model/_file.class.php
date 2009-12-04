@@ -1883,10 +1883,11 @@ class File extends DataObject
 
 			header('Content-Type: '.$thumb_mimetype );
 			header('Content-Length: '.filesize( $af_thumb_path ) );
-			if( $mtime && $mtime == $this->get_lastmod_ts() )
-			{
-				header_noexpire();
-			}
+
+			// dh> if( $mtime && $mtime == $this->get_lastmod_ts() )
+			// fp> I don't think mtime changes anything to the cacheability of the data
+			header_noexpire(); // Static image
+
 			// Output the content of the file
 			readfile( $af_thumb_path );
 			return NULL;
@@ -1961,6 +1962,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.74  2009/12/04 23:27:50  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.73  2009/12/02 01:00:07  fplanque
  * header_nocache & header_noexpire
  *

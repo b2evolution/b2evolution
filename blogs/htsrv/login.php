@@ -60,7 +60,6 @@ switch( $action )
 
 		// TODO: to give the user feedback through Messages, we would need to start a new $Session here and append $Messages to it.
 
-		header_nocache();
 		header_redirect(); // defaults to redirect_to param and exits
 		/* exited */
 		break;
@@ -181,7 +180,6 @@ switch( $action )
 
 		// Redirect to the user's profile in the "users" controller:
 		// TODO: This will probably fail if the user has no admin-access permission! Redirect to profile page in blog instead!?
-		header_nocache();
 		// redirect Will save $Messages into Session:
 		header_redirect( url_add_param( $admin_url, 'ctrl=users&user_ID='.$ForgetfulUser->ID, '&' ) ); // display user's profile
 		/* exited */
@@ -253,7 +251,6 @@ switch( $action )
 		$Session->delete('core.validatemail.request_ids');
 		$Session->delete('core.validatemail.redirect_to');
 
-		header_nocache();
 		// redirect Will save $Messages into Session:
 		header_redirect();
 		/* exited */
@@ -417,6 +414,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.109  2009/12/04 23:27:49  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.108  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *

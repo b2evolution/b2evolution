@@ -26,7 +26,7 @@ else
   																	'',	'DESC',	'',	$Blog->get_setting('posts_per_feed') );
 }
 
-header_content_type( 'application/xml' );	// Sets charset!
+headers_content_mightcache( 'application/xml' );		// In most situations, you do NOT want to cache dynamic content!
 
 echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 ?>

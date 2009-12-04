@@ -26,7 +26,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-header_content_type( 'text/html' );
+headers_content_mightcache( 'text/html', 0 );		// NEVER cache the login pages!
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
@@ -60,6 +60,9 @@ $Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' 
 
 /*
  * $Log$
+ * Revision 1.10  2009/12/04 23:27:50  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.9  2009/09/19 23:09:02  blueyed
  * Improve usability by adding the short app_name at the end of html title.
  *

@@ -79,7 +79,8 @@ $FileRoot = & $FileRootCache->get_by_ID( $root );
 // Create file object
 $selected_File = & new File( $FileRoot->type , $FileRoot->in_type_ID, $path, true );
 
-header_content_type( 'text/html' );
+
+headers_content_mightcache( 'text/html' );		// In most situations, you do NOT want to cache dynamic content!
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
@@ -256,6 +257,9 @@ switch( $viewtype )
 <?php
 /*
  * $Log$
+ * Revision 1.26  2009/12/04 23:27:49  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.25  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

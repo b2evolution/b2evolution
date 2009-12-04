@@ -52,6 +52,10 @@ if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 }
 
 
+// Make sure the async responses are never cached:
+header_nocache();
+
+
 // Do not append Debuglog to response!
 $debug = false;
 
@@ -201,6 +205,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.39  2009/12/04 23:27:49  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.38  2009/12/03 11:38:37  efy-maxim
  * ajax calls have been improved
  *

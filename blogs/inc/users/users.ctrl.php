@@ -133,7 +133,6 @@ if( !$Messages->count('error') )
 			$UserSettings->dbupdate();
 			$Messages->add( sprintf( T_('Admin skin changed to &laquo;%s&raquo;'), $new_admin_skin ), 'success' );
 
-			header_nocache();
 			header_redirect();
 			/* EXITED */
 			break;
@@ -322,6 +321,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.45  2009/12/04 23:27:49  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.44  2009/11/21 13:31:59  efy-maxim
  * 1. users controller has been refactored to users and user controllers
  * 2. avatar tab

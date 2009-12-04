@@ -39,8 +39,7 @@ if( $feed_content == 'none' )
 	debug_die( 'Feeds are disabled.');
 }
 
-header_content_type( 'application/xml' );	// Sets charset!
-
+headers_content_mightcache( 'application/xml' );		// In most situations, you do NOT want to cache dynamic content!
 
 // Add caching headers
 header('Last-Modified: '.$MainList->get_lastpostdate('r'));

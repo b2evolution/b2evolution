@@ -26,18 +26,15 @@ else
   																	'',	'DESC',	'',	$Blog->get_setting('posts_per_feed') );
 }
 
-if( $debug)
+
+if($debug)
 {
-	header_content_type( 'application/xml' );	// Sets charset!
+	headers_content_mightcache( 'application/xml' );		// In most situations, you do NOT want to cache dynamic content!
 }
 else
 {
-	header_content_type( 'application/atom+xml' );	// Sets charset!
+	headers_content_mightcache( 'application/atom+xml' );		// In most situations, you do NOT want to cache dynamic content!
 }
-
-// Add caching headers
-// TODO: Last-Modified
-header('Expires: '.date('r', time() + 300)); // TODO: dh> should be a centralized setting. Maybe through the Skin class, if type is "feed"? fp> I'm not sure, maybe a blog param would be make sense (in the feeds section) -> depending on post frequency for a particular blog, you want different cache times
 
 
 echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';

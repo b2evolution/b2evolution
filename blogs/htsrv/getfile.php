@@ -147,6 +147,7 @@ if( !empty($size) && $File->is_image() )
 			}
 		}
 	}
+
 	// ERROR IMAGE
 	if( !empty( $err ) )
 	{	// Generate an error image and try to squeeze an error message inside:
@@ -169,7 +170,9 @@ if( !empty($size) && $File->is_image() )
 				$rewritten = false;
 			// Recreate error lines, if it has been rewritten/shortened.
 			if( $rewritten )
+			{
 				$err_lines = split( "\n", wordwrap( $err, $car_width, "\n", true ) );
+			}
 		}
 
 		$text_color = imagecolorallocate( $im_handle, 255, 0, 0 );
@@ -179,13 +182,10 @@ if( !empty($size) && $File->is_image() )
 			imagestring( $im_handle, 2, 2, $y, $err_string, $text_color);
 			$y += $line_height;
 		}
+
 		header('Content-type: image/png' );
-		// The URL refers to this specific file, therefore we can tell the browser that
-		// it does not expire anytime soon.
-		if( $mtime && $mtime == $File->get_lastmod_ts() ) // TODO: dh> use salt here?!
-		{
-			header_noexpire();
-		}
+		header_nocache();	// Do NOT cache errors! People won't see they have fixed them!!
+
 		imagepng( $im_handle );
 	}
 }
@@ -212,10 +212,9 @@ else
 
 	// The URL refers to this specific file, therefore we can tell the browser that
 	// it does not expire anytime soon.
-	if( $mtime && $mtime == $File->get_lastmod_ts() ) // TODO: dh> use salt here?!
-	{
-		header_noexpire();
-	}
+	// fp> I don't think mtime changes anything to the cacheability of the data
+	// if( $mtime && $mtime == $File->get_lastmod_ts() ) // TODO: dh> use salt here?! fp>what for?
+	header_noexpire();	// static file
 
 	// Display the content of the file
 	readfile( $file_path );
@@ -223,6 +222,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.46  2009/12/04 23:27:49  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.45  2009/12/02 01:00:07  fplanque
  * header_nocache & header_noexpire
  *

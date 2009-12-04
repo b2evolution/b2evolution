@@ -18,7 +18,6 @@ require_css( 'style.css', true );
 
 add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 
-header_content_type();	// Sets charset!
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">

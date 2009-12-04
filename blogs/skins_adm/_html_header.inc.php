@@ -37,7 +37,7 @@ global $io_charset, $rsc_url, $UserSettings, $Debuglog, $Plugins, $generating_st
 global $month, $month_abbrev, $weekday, $weekday_abbrev; /* for localized calendar */
 global $debug, $Hit;
 
-header_content_type( 'text/html' );
+headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache the admin pages!
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
@@ -286,6 +286,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.30  2009/12/04 23:27:50  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.29  2009/12/01 01:52:08  fplanque
  * Fixed issue with Debuglog in case of redirect -- Thanks @blueyed for help.
  *

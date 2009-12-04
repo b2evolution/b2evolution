@@ -52,8 +52,7 @@ $Timer->resume( 'display list' );
 // (see sitemap_plugin)
 
 // Note: since URLs are likely to be clean ASCII, $io_charset can probably be faked to UTF-8 here
-
-header_content_type( 'application/xml', 'UTF-8' );
+headers_content_mightcache( 'application/xml', '#', 'UTF-8' );		// In most situations, you do NOT want to cache dynamic content!
 
 echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 ?>

@@ -448,7 +448,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 { // User is trying to login right now
 	$Debuglog->add( 'Login: User is trying to log in.', 'request' );
 
-	header_nocache();
+	header_nocache();		// Don't take risks here :p
 
 	// Note: login and password cannot include '<' !
 	$login = strtolower(strip_tags(remove_magic_quotes($login)));
@@ -691,6 +691,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.134  2009/12/04 23:27:50  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.133  2009/12/02 00:05:52  fplanque
  * no message
  *

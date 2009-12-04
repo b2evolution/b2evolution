@@ -40,18 +40,18 @@ param( 'return', 'integer', 0 );
 
 add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 
-header_content_type( 'text/html' );
+headers_content_mightcache( 'text/html', 0 );		// Never even think about caching FORMs!
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>"><!-- InstanceBegin template="/Templates/Standard.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
 <title><?php echo T_('Contact Form Demo'); ?></title>
-<!-- InstanceEndEditable --> 
+<!-- InstanceEndEditable -->
 <link rel="stylesheet" href="rsc/css/fp02.css" type="text/css" />
 <!-- InstanceBeginEditable name="head" -->
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
- <!-- InstanceEndEditable --> 
+ <!-- InstanceEndEditable -->
 </head>
 <body>
 <!-- InstanceBeginEditable name="ToolBar" -->

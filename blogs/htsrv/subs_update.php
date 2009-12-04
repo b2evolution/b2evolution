@@ -69,8 +69,9 @@ profile_check_params( array( 'email' => array($newuser_email, 'newuser_email') )
 
 if( $Messages->count( 'error' ) )
 {
+	headers_content_mightcache( 'text/html', 0 );		// Do NOT cache error messages! (Users would not see they fixed them)
+
 	// TODO: dh> display errors with the form itself
-	header_content_type( 'text/html' );
 	$Messages->display( T_('Cannot update profile. Please correct the following errors:'),
 			'[<a href="javascript:history.go(-1)">' . T_('Back to profile') . '</a>]' );
 	exit(0);
@@ -124,13 +125,14 @@ if( count($unsubscribed) )
 
 $Messages->add( T_('Your profile & subscriptions have been updated.'), 'success' );
 
-
-header_nocache();
 // redirect Will save $Messages into Session:
 header_redirect();
 
 /*
  * $Log$
+ * Revision 1.27  2009/12/04 23:27:49  fplanque
+ * cleanup Expires: header handling
+ *
  * Revision 1.26  2009/03/08 23:57:37  fplanque
  * 2009
  *
