@@ -225,11 +225,16 @@ function header_redirect( $redirect_to = NULL, $status = false )
  * Sends HTTP headers to avoid caching of the page.
  * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
  */
-function header_nocache()
+function header_nocache( $timestamp = NULL )
 {
 	global $servertimenow;
-	header('Expires: '.gmdate('r',$servertimenow));
-	header('Last-Modified: '.gmdate('r',$servertimenow));
+	if( empty($timestamp) )
+	{
+		$timestamp = $servertimenow;
+	}
+
+	header('Expires: '.gmdate('r',$timestamp));
+	header('Last-Modified: '.gmdate('r',$timestamp));
 	header('Cache-Control: no-cache, must-revalidate');
 	header('Pragma: no-cache');
 }
@@ -1070,6 +1075,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.68  2009/12/05 01:22:00  fplanque
+ * PageChace 304 handling
+ *
  * Revision 1.67  2009/12/04 23:27:49  fplanque
  * cleanup Expires: header handling
  *

@@ -3700,6 +3700,8 @@ function get_active_opcode_cache()
 /**
  * Get comments awaiting moderation number
  *
+ * @todo fp>max please put this into dashboard.funcs
+ *
  * @param integer blog ID
  * @return integer
  */
@@ -3821,6 +3823,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.195  2009/12/05 01:22:00  fplanque
+ * PageChace 304 handling
+ *
  * Revision 1.194  2009/12/04 23:27:49  fplanque
  * cleanup Expires: header handling
  *

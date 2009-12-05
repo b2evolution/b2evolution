@@ -38,7 +38,7 @@ class PageCache
   /**
 	 * How old can a cached object get before we consider it outdated
 	 */
-	var $max_age_seconds = 300;  // 5 minutes for now
+	var $max_age_seconds = 900;  // 15 minutes for now
 
   /**
 	 * After how many bytes should we output sth live while collecting cache content:
@@ -347,7 +347,24 @@ class PageCache
 				return false;
 			}
 
-			// Go through headers
+
+			// Check if the request has an If-Modified-Since date
+	  	if( array_key_exists( 'HTTP_IF_MODIFIED_SINCE', $_SERVER) )
+    	{
+        $if_modified_since = strtotime( preg_replace('/;.*$/','',$_SERVER['HTTP_IF_MODIFIED_SINCE']) );
+        if( $retrieved_ts <= $if_modified_since )
+        {	// Cached version is equal to (or older than) $if_modified since; contents not modified, send 304!
+					header( 'HTTP/1.0 304 Not Modified' );
+					exit(0);
+        }
+			}
+
+			// ============== Ready to send cached version of the page =================
+
+			// Send no cache header including last modified date:
+			header_nocache( $retrieved_ts );
+
+			// Go through headers that were saved in the cache:
 			$i = 2;
 			while( $headerline = trim($lines[++$i]) )
 			{
@@ -504,6 +521,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.16  2009/12/05 01:21:59  fplanque
+ * PageChace 304 handling
+ *
  * Revision 1.15  2009/12/03 06:05:40  fplanque
  * Make cache performance visible (instead of hidden behind Apache's SendBuffer)
  *
