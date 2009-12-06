@@ -43,6 +43,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $GLOBALS['debug_dataobjects'] = false;
 
 
+load_class( '_core/model/db/_sql.class.php', 'SQL' );
+
+
 /**
  * Data Object Cache Class
  *
@@ -83,7 +86,7 @@ class DataObjectCache
 	 * Index of current iteration
 	 * @see DataObjectCache::get_next()
 	 */
-	var $current_idx = NULL;
+	var $current_idx = 0;
 
 	var $load_all = false;
 	var $all_loaded = false;
@@ -107,6 +110,13 @@ class DataObjectCache
 	 * @var mixed
 	 */
 	var $none_option_value;
+
+	/**
+	 * List of object IDs.
+	 * @see get_ID_array()
+	 * @access protected
+	 */
+	var $ID_array;
 
 
 	/**
@@ -192,11 +202,9 @@ class DataObjectCache
 		$this->clear( true );
 
 		$Debuglog->add( get_class($this).' - Loading <strong>'.$this->objtype.'(ALL)</strong> into cache', 'dataobjects' );
-		$sql = 'SELECT *
-							FROM '.$this->dbtablename.'
-						 ORDER BY '.$this->order_by;
 
-		$this->instantiate_list( $DB->get_results( $sql, OBJECT, 'Loading '.$this->objtype.'(ALL) into cache' ) );
+		$SQL = $this->get_SQL_object('Loading '.$this->objtype.'(ALL) into cache');
+		$this->load_by_sql($SQL);
 
 		$this->all_loaded = true;
 
@@ -212,28 +220,91 @@ class DataObjectCache
 	 */
 	function load_list( $req_list, $invert = false )
 	{
-		global $DB, $Debuglog;
-
-		$Debuglog->add( 'Loading <strong>'.$this->objtype.'('.( $invert ? 'ALL except ' : '' ).$req_list.')</strong> into cache', 'dataobjects' );
-
-		if( empty( $req_list ) )
-		{
-			return false;
-		}
+		global $Debuglog;
 
 		if( ! $invert )
-		{ // Remove entries which have already been loaded from the list
 			$req_list = array_diff($req_list, $this->get_ID_array());
-		}
 
 		if( empty( $req_list ) )
 			return false;
 
-		$sql = "SELECT *
-		          FROM $this->dbtablename
-		         WHERE $this->dbIDname ".( $invert ? 'NOT ' : '' ).'IN ('.$DB->quote($req_list).')';
+		$SQL = $this->get_SQL_object();
+		$SQL->WHERE_and($this->dbIDname.( $invert ? ' NOT' : '' ).' IN ('.implode(',', $req_list).')');
 
-		$this->instantiate_list( $DB->get_results( $sql ) );
+		return $this->load_by_sql($SQL);
+	}
+
+
+	/**
+	 * Load a set of objects into the cache.
+	 *
+	 * @param string SQL where expression
+	 */
+	function load_where( $sql_where )
+	{
+		$SQL = $this->get_SQL_object();
+		$SQL->WHERE($sql_where);
+		return $this->load_by_sql($SQL);
+	}
+
+
+	/**
+	 * Load a set of objects into the cache.
+	 * Already loaded objects get excluded via "NOT IN()"
+	 *
+	 * @param SQL SQL object
+	 * @return array List of DataObjects
+	 */
+	function load_by_sql( $SQL )
+	{
+		global $DB, $Debuglog;
+
+		if( is_a($Debuglog, 'Log') )
+		{
+			$sql_where = trim($SQL->get_where(''));
+			if( empty($sql_where) )
+				$sql_where = 'ALL';
+			$Debuglog->add( 'Loading <strong>'.$this->objtype.'('.$sql_where.')</strong> into cache', 'dataobjects' );
+		}
+
+		// Do not request already loaded objects
+		if( $loaded_IDs = $this->get_ID_array() )
+			$SQL->WHERE_and($this->dbIDname.' NOT IN ('.implode(',', $loaded_IDs).')');
+
+		return $this->instantiate_list($DB->get_results( $SQL->get(), OBJECT, $SQL->title ));
+	}
+
+
+	/**
+	 * Get base SQL object for queries.
+	 * This gets used internally and is a convenient method for derived caches to override SELECT behaviour.
+	 * @param string Optional query title
+	 * @return SQL
+	 */
+	function get_SQL_object($title = NULL)
+	{
+		$SQL = new SQL($title);
+		$SQL->SELECT('*');
+		$SQL->FROM($this->dbtablename);
+		$SQL->ORDER_BY($this->order_by);
+		return $SQL;
+	}
+
+
+	/**
+	 * Get list of objects, referenced by list of IDs.
+	 * @param array
+	 * @return array
+	 */
+	function get_list( $ids )
+	{
+		$this->load_list($ids);
+		$r = array();
+		foreach( $ids as $id )
+		{
+			$r[] = $this->get_by_ID($id);
+		}
+		return $r;
 	}
 
 
@@ -244,14 +315,16 @@ class DataObjectCache
 	 */
 	function get_ID_array()
 	{
-		$IDs = array();
-
-		foreach( $this->cache as $obj )
+		if( ! isset($this->ID_array) )
 		{
-			$IDs[] = $obj->ID;
+			$this->ID_array = array();
+			foreach( $this->cache as $obj )
+			{
+				$this->ID_array[] = $obj->ID;
+			}
 		}
 
-		return $IDs;
+		return $this->ID_array;
 	}
 
 
@@ -281,6 +354,8 @@ class DataObjectCache
 		$this->cache[$Obj->ID] = & $Obj;
 		// Add a reference in the object list:
 		$this->DataObject_array[] = & $Obj;
+		// Add the ID to the list of IDs
+		$this->ID_array[] = $Obj->ID;
 
 		return true;
 	}
@@ -360,7 +435,8 @@ class DataObjectCache
 		$this->cache = array();
 		$this->DataObject_array = array();
 		$this->all_loaded = false;
-		$this->current_idx = NULL;
+		$this->ID_array = NULL;
+		$this->rewind();
 	}
 
 
@@ -378,8 +454,18 @@ class DataObjectCache
 	{
 		$this->load_all();
 
-		$this->current_idx = -1;
+		$this->rewind();
 		return $this->get_next();
+	}
+
+
+	/**
+	 * Rewind internal index to first position.
+	 * @access public
+	 */
+	function rewind()
+	{
+		$this->current_idx = 0;
 	}
 
 
@@ -395,17 +481,16 @@ class DataObjectCache
 	 */
 	function & get_next()
 	{
-		$this->current_idx++;
 		// echo 'getting idx:'.$this->current_idx;
 
 		if( ! isset( $this->DataObject_array[$this->current_idx] ) )
 		{
-			$this->current_idx = NULL;
+			$this->rewind();
 			$r = NULL;
 			return $r;
 		}
 
-		return $this->DataObject_array[$this->current_idx];
+		return $this->DataObject_array[$this->current_idx++];
 	}
 
 
@@ -448,10 +533,9 @@ class DataObjectCache
 			{ // Load just the requested object:
 				$Debuglog->add( "Loading <strong>$this->objtype($req_ID)</strong> into cache", 'dataobjects' );
 				// Note: $req_ID MUST be an unsigned integer. This is how DataObject works.
-				$sql = "SELECT *
-				          FROM $this->dbtablename
-				         WHERE $this->dbIDname = $req_ID";
-				if( $row = $DB->get_row( $sql, OBJECT, 0, 'DataObjectCache::get_by_ID()' ) )
+				$SQL = $this->get_SQL_object();
+				$SQL->WHERE_and("$this->dbIDname = $req_ID");
+				if( $row = $DB->get_row( $SQL->get(), OBJECT, 0, 'DataObjectCache::get_by_ID()' ) )
 				{
 					if( ! $this->instantiate( $row ) )
 					{
@@ -460,7 +544,7 @@ class DataObjectCache
 				}
 				else
 				{
-					$Debuglog->add( 'Could not get DataObject by ID. Query: '.$sql, 'dataobjects' );
+					$Debuglog->add( 'Could not get DataObject by ID. Query: '.$SQL->get(), 'dataobjects' );
 				}
 			}
 		}
@@ -508,11 +592,10 @@ class DataObjectCache
 
 		// Load just the requested object:
 		$Debuglog->add( "Loading <strong>$this->objtype($req_name)</strong>", 'dataobjects' );
-		$sql = "SELECT *
-						  FROM $this->dbtablename
-						 WHERE $this->name_field = ".$DB->quote($req_name);
+		$SQL = $this->get_SQL_object();
+		$SQL->WHERE_and($this->name_field.' = '.$DB->quote($req_name));
 
-		if( $db_row = $DB->get_row( $sql, OBJECT, 0, 'DataObjectCache::get_by_name()' ) )
+		if( $db_row = $DB->get_row( $SQL->get(), OBJECT, 0, 'DataObjectCache::get_by_name()' ) )
 		{
 			$resolved_ID = $db_row->{$this->dbIDname};
 			$Debuglog->add( 'success; ID = '.$resolved_ID, 'dataobjects' );
@@ -548,6 +631,9 @@ class DataObjectCache
 	 */
 	function remove_by_ID( $req_ID )
 	{
+		# if( ($k = array_search($this->ID_array, $req_ID)) !== false )
+		# 	unset($this->ID_array[$k]);
+		$this->ID_array = NULL;
 		unset( $this->cache[$req_ID] );
 	}
 
@@ -672,6 +758,15 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.19  2009/12/06 22:20:29  blueyed
+ * DataObjectCache:
+ *  - Fix get_next to return first element on first call
+ *  - use SQL object internally, which makes it easy to extend
+ *  - cache ID_array (from get_ID_array)
+ *  - adds new methods: load_by_sql, load_where, get_SQL_object, get_list,
+ *    rewind
+ *  - Add test for get_next
+ *
  * Revision 1.18  2009/12/01 20:53:39  blueyed
  * indent
  *
