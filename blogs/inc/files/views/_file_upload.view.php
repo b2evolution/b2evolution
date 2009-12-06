@@ -176,7 +176,6 @@ global $fm_FileRoot;
 	// Begin payload block:
 	$this->disp_payload_begin();
 
-
 	$Form = & new Form( NULL, 'fm_upload_checkchanges', 'post', 'none', 'multipart/form-data' );
 	$Form->begin_form( 'fform' );
 		$Form->hidden_ctrl();
@@ -313,7 +312,7 @@ global $fm_FileRoot;
 			</ul>
 
 			<script type="text/javascript">
-				(function() 
+				(function()
 				{
 					var handler = function()
 					{
@@ -373,6 +372,11 @@ global $fm_FileRoot;
 
 /*
  * $Log$
+ * Revision 1.11  2009/12/06 22:55:21  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.10  2009/11/11 20:44:54  fplanque
  * minor/cleanup
  *

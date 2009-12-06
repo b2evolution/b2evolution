@@ -63,6 +63,13 @@ attach_browse_tabs();
 
 $AdminUI->set_path( 'items', 'settings', 'statuses' );
 
+$AdminUI->breadcrumbpath_init();
+$AdminUI->breadcrumbpath_add( T_('Contents'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
+$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings' );
+$AdminUI->breadcrumbpath_add( T_('Post statuses'), '?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=statuses' );
+
+
+
 $list_title = T_('Post statuses');
 $default_col_order = 'A';
 $edited_name_maxlen = 40;
@@ -89,6 +96,11 @@ require $inc_path.'generic/inc/_generic_listeditor.php';
 
 /*
  * $Log$
+ * Revision 1.5  2009/12/06 22:55:16  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.4  2009/09/24 13:50:32  efy-sergey
  * Moved the Global Settings>Post types & Post statuses tabs to "Posts / Comments > Settings > Post types & Post statuses"
  *

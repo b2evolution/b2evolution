@@ -52,11 +52,11 @@ function b2evonet_get_updates( $force_short_delay = false )
 		$attempt_every = 3600*4; // 4 hours
 	}
 
-	/* DEBUG: *
+	/* DEBUG: */
 	$update_every = 10;
 	$attempt_every = 5;
-	*/
-	
+
+
 	$version_id = $baseurl.' '.$instance_name.' '.$app_name.' '.$app_version.' '.$app_date;
 	// This is the last version we checked against the server:
 	$last_version_checked =  $Settings->get( 'evonet_last_version_checked' );
@@ -181,6 +181,11 @@ function b2evonet_get_updates( $force_short_delay = false )
 
 /*
  * $Log$
+ * Revision 1.25  2009/12/06 22:55:22  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.24  2009/12/06 03:24:11  fplanque
  * minor/doc/fixes
  *

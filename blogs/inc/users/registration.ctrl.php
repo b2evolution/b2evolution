@@ -43,41 +43,41 @@ switch ( $action )
 	case 'update':
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
-		
+
 		// UPDATE general settings:
 		param( 'newusers_canregister', 'integer', 0 );
-		
+
 		param( 'newusers_grp_ID', 'integer', true );
-		
+
 		param_integer_range( 'newusers_level', 0, 9, T_('User level must be between %d and %d.') );
-		
+
 		param( 'newusers_mustvalidate', 'integer', 0 );
-		
+
 		param( 'newusers_revalidate_emailchg', 'integer', 0 );
-		
+
 		param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimum password length must be between %d and %d.') );
-		
+
 		param( 'js_passwd_hashing', 'integer', 0 );
-		
+
 		param( 'registration_require_country', 'integer', 0 );
-		
+
 		$Settings->set_array( array(
 									 array( 'newusers_canregister', $newusers_canregister),
-									 
+
 									 array( 'newusers_grp_ID', $newusers_grp_ID),
-									 
+
 									 array( 'newusers_level', $newusers_level),
-									 
+
 									 array( 'newusers_mustvalidate', $newusers_mustvalidate),
-									 
+
 		                             array( 'newusers_revalidate_emailchg', $newusers_revalidate_emailchg),
-		                             
+
 									 array( 'user_minpwdlen', $user_minpwdlen),
-									 
+
 									 array( 'js_passwd_hashing', $js_passwd_hashing),
 
 									 array( 'registration_require_country', $registration_require_country)) );
-		
+
 		if( ! $Messages->count('error') )
 		{
 			if( $Settings->dbupdate() )
@@ -85,9 +85,15 @@ switch ( $action )
 				$Messages->add( T_('General settings updated.'), 'success' );
 			}
 		}
-	
+
 		break;
 }
+
+
+$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
+$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
+$AdminUI->breadcrumbpath_add( T_('Registration settings'), '?ctrl=registration' );
+
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -109,6 +115,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2009/12/06 22:55:19  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.5  2009/09/16 05:35:49  efy-bogdan
  * Require country checkbox added
  *

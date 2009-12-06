@@ -38,7 +38,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $current_User->check_perm( 'options', 'view', true );
 
 
-$AdminUI->set_path( 'options', 'filetypes' );
+$AdminUI->set_path( 'files', 'filetypes' );
 
 
 param( 'action', 'string' );
@@ -174,6 +174,13 @@ switch( $action )
 
 }
 
+file_controller_build_tabs();
+
+// fp> TODO: this here is a bit sketchy since we have Blog & fileroot not necessarilly in sync. Needs investigation / propositions.
+// Note: having both allows to post from any media dir into any blog.
+$AdminUI->breadcrumbpath_init();
+$AdminUI->breadcrumbpath_add( T_('Files'), '?ctrl=files&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_add( T_('File types'), '?ctrl=filetypes' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -225,6 +232,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2009/12/06 22:55:17  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.5  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *

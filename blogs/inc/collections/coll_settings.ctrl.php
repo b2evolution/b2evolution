@@ -244,6 +244,11 @@ $AdminUI->set_coll_list_params( 'blog_properties', 'edit',
 											array( 'ctrl' => 'coll_settings', 'tab' => $tab, 'action' => 'edit' ),
 											T_('List'), '?ctrl=collections&amp;blog=0' );
 
+
+$AdminUI->breadcrumbpath_init( false );
+$AdminUI->breadcrumbpath_add( T_('Blog settings'), '?ctrl=coll_settings&amp;blog=$blog$' );
+
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -310,6 +315,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2009/12/06 22:55:20  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.23  2009/11/30 04:31:38  fplanque
  * BlockCache Proof Of Concept
  *

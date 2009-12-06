@@ -301,7 +301,10 @@ if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale',
 	locale_overwritefromDB();
 }
 
-
+$AdminUI->breadcrumbpath_init();
+$AdminUI->breadcrumbpath_add( T_('Global settings'), '?ctrl=settings',
+		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
+$AdminUI->breadcrumbpath_add( T_('Regional settings'), '?ctrl=locales' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -324,6 +327,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2009/12/06 22:55:21  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.6  2009/09/14 13:18:14  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

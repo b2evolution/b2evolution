@@ -205,6 +205,19 @@ switch( $action )
 
 }
 
+$AdminUI->breadcrumbpath_init();
+$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats' );
+$AdminUI->breadcrumbpath_add( T_('Goal tracking'), '?ctrl=goals' );
+switch( $tab3 )
+{
+	case 'goals':
+		$AdminUI->breadcrumbpath_add( T_('Goal definitions'), '?ctrl=goals' );
+		break;
+	case 'stats':
+		$AdminUI->breadcrumbpath_add( T_('Goal hit stats'), '?ctrl=goals&amp;tab3=stats' );
+		break;
+}
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -267,6 +280,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2009/12/06 22:55:21  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.17  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *

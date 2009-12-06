@@ -44,7 +44,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $current_User->check_perm( 'options', 'view', true );
 
 
-$AdminUI->set_path( 'options', 'files' );
+$AdminUI->set_path( 'files', 'settings' );
 
 param( 'action', 'string' );
 
@@ -58,7 +58,6 @@ switch( $action )
 		if( isset($submit['restore_defaults']) )
 		{
 			$Settings->delete_array( array(
-					'fm_enabled',
 					'fm_enable_roots_blog',
 					'fm_enable_roots_user',
 					'fm_enable_roots_shared',
@@ -82,9 +81,6 @@ switch( $action )
 		else
 		{
 			// Filemanager
-			param( 'fm_enabled', 'integer', 0 );
-			$Settings->set( 'fm_enabled', $fm_enabled );
-
 			param( 'fm_enable_roots_blog', 'integer', 0 );
 			$Settings->set( 'fm_enable_roots_blog', $fm_enable_roots_blog );
 
@@ -160,6 +156,15 @@ switch( $action )
 		break;
 }
 
+file_controller_build_tabs();
+
+// fp> TODO: this here is a bit sketchy since we have Blog & fileroot not necessarilly in sync. Needs investigation / propositions.
+// Note: having both allows to post from any media dir into any blog.
+$AdminUI->breadcrumbpath_init();
+$AdminUI->breadcrumbpath_add( T_('Files'), '?ctrl=files&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=fileset' );
+
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -180,6 +185,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2009/12/06 22:55:18  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.4  2009/03/08 23:57:42  fplanque
  * 2009
  *

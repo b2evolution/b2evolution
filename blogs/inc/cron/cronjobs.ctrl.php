@@ -239,6 +239,11 @@ switch( $action )
 }
 
 
+$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
+$AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=crontab' );
+$AdminUI->breadcrumbpath_add( T_('Scheduler'), '?ctrl=crontab' );
+
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -274,6 +279,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2009/12/06 22:55:21  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.6  2009/10/28 10:56:33  efy-maxim
  * param_duration
  *

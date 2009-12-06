@@ -58,7 +58,9 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_page_head()
 	{
-		$r = '
+		$r = '<div class="breadcrumbpath">&bull; '.implode( ' &gt; ', $this->breadcrumbpath ).'</div>';
+
+		$r .= '
 		<div id="header">'
 			// Display MAIN menu:
 			.$this->get_html_menu().'
@@ -388,6 +390,11 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.26  2009/12/06 22:55:20  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.25  2009/11/22 18:20:08  fplanque
  * Dashboard CSS enhancements
  *

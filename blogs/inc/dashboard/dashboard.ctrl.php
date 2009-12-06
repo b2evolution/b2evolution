@@ -41,6 +41,7 @@ $AdminUI->set_coll_list_params( 'blog_ismember', 'view', array(), T_('Global'), 
 
 $AdminUI->set_path( 'dashboard' );
 
+$AdminUI->breadcrumbpath_init();
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -568,6 +569,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.47  2009/12/06 22:55:22  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.46  2009/12/03 11:38:37  efy-maxim
  * ajax calls have been improved
  *

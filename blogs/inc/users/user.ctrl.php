@@ -8,6 +8,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $AdminUI;
 
 param( 'user_tab', 'string' );
+if( empty($user_tab) )
+{
+	$user_tab = 'identity';
+}
 
 $AdminUI->set_path( 'users', $user_tab );
 
@@ -306,6 +310,26 @@ if( !$Messages->count('error') )
 	}
 }
 
+
+$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
+$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
+$AdminUI->breadcrumbpath_add( $edited_User->login, '?ctrl=user&amp;user_ID='.$edited_User->ID );
+switch( $user_tab )
+{
+	case 'identity':
+		$AdminUI->breadcrumbpath_add( T_('Identity'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+		break;
+	case 'avatar':
+		$AdminUI->breadcrumbpath_add( T_('Avatar'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+		break;
+	case 'password':
+		$AdminUI->breadcrumbpath_add( T_('Change password'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+		break;
+	case 'preferences':
+		$AdminUI->breadcrumbpath_add( T_('sPreferences'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+		break;
+}
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -355,6 +379,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2009/12/06 22:55:18  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.4  2009/12/01 01:52:08  fplanque
  * Fixed issue with Debuglog in case of redirect -- Thanks @blueyed for help.
  *

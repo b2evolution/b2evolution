@@ -858,10 +858,59 @@ if ( !function_exists('sys_get_temp_dir'))
   }
 }
 
+/**
+* Controller helper
+*/
+function file_controller_build_tabs()
+{
+	global $AdminUI, $current_User, $blog;
+
+	$AdminUI->add_menu_entries(
+			'files',
+			array(
+					'browse' => array(
+						'text' => T_('Browse'),
+						'href' => regenerate_url( 'ctrl', 'ctrl=files' ) ),
+					)
+				);
+
+	if( $current_User->check_perm( 'files', 'add', false, $blog ? $blog : NULL ) )
+	{ // Permission to upload: (no subtabs needed otherwise)
+		$AdminUI->add_menu_entries(
+				'files',
+				array(
+						'upload' => array(
+							'text' => T_('Upload'),
+							'href' => regenerate_url( 'ctrl', 'ctrl=upload' ) ),
+					)
+			);
+	}
+
+	if( $current_User->check_perm( 'options', 'view' ) )
+	{	// Permission to view settings:
+		$AdminUI->add_menu_entries(
+			'files',
+			array(
+						'settings' => array(
+							'text' => T_('Files'),
+							'href' => '?ctrl=fileset' ),
+						'filetypes' => array(
+							'text' => T_('File types'),
+							'href' => '?ctrl=filetypes' ),
+					)
+				);
+	}
+
+}
 
 
 /*
  * $Log$
+ * Revision 1.30  2009/12/06 22:55:20  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.29  2009/11/25 00:47:57  blueyed
  * doc. fix notice.
  *

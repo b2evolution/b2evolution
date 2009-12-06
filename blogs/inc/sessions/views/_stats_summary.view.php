@@ -28,7 +28,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $blog, $admin_url, $AdminUI;
 
 
-echo '<h2>'.T_('Global hits summary').get_manual_link('global_hits_summary').'</h2>';
+echo '<h2>'.T_('Global hits - Summary').get_manual_link('global_hits_summary').'</h2>';
 
 echo '<p class="notes">'.sprintf( T_('This page includes all recorded hits, split down by <a %s>user agent</a> type.'), ' href="?ctrl=stats&tab=useragents&blog='.$blog.'"' ).'</p>';
 
@@ -213,6 +213,11 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.13  2009/12/06 22:55:19  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.12  2009/10/12 22:11:28  blueyed
  * Fix blank.gif some: use conditional comments, where marked as being required for IE. Add ALT tags and close tags.
  *

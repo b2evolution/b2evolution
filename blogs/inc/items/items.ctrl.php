@@ -202,6 +202,8 @@ switch( $action )
 		debug_die( 'unhandled action 1:'.htmlspecialchars($action) );
 }
 
+$AdminUI->breadcrumbpath_init();
+$AdminUI->breadcrumbpath_add( T_('Contents'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
 
 /**
  * Perform action:
@@ -835,7 +837,7 @@ switch( $action )
  */
 function init_list_mode()
 {
-	global $tab, $Blog, $UserSettings, $ItemList;
+	global $tab, $Blog, $UserSettings, $ItemList, $AdminUI;
 
 	if ( param( 'p', 'integer', NULL ) || param( 'title', 'string', NULL ) )
 	{	// Single post requested, do not filter any post types. If the user
@@ -866,34 +868,40 @@ function init_list_mode()
 			$ItemList->set_default_filters( array(
 					'types' => NULL, // All types (suited for tab with full posts)
 				) );
+			$AdminUI->breadcrumbpath_add( T_('All items'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
 			break;
 
 		case 'list':
 			// Nothing special
+			$AdminUI->breadcrumbpath_add( T_('Regular posts'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
 			break;
 
 		case 'pages':
 			$ItemList->set_default_filters( array(
 					'types' => '1000', // Pages
 				) );
+ 			$AdminUI->breadcrumbpath_add( T_('Pages'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
 			break;
 
 		case 'intros':
 			$ItemList->set_default_filters( array(
 					'types' => '1500,1520,1530,1570,1600', // Intros
 				) );
+ 			$AdminUI->breadcrumbpath_add( T_('Intro posts'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
 			break;
 
 		case 'podcasts':
 			$ItemList->set_default_filters( array(
 					'types' => '2000', // Podcasts
 				) );
+ 			$AdminUI->breadcrumbpath_add( T_('Podcasts'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
 			break;
 
 		case 'links':
 			$ItemList->set_default_filters( array(
 					'types' => '3000', // Links
 				) );
+ 			$AdminUI->breadcrumbpath_add( T_('Links'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
 			break;
 
 /* see note soemwhere else
@@ -1067,16 +1075,17 @@ if( ! empty( $Blog->skin_ID) )
 }
 // else item_default.css ? is it still possible to have no skin set?
 
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
 // Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
 $AdminUI->disp_body_top( $mode != 'iframe' );	// do NOT display stupid messages in iframe (UGLY UGLY UGLY!!!!)
 
-/**
+
+/*
  * Display payload:
  */
-
 switch( $action )
 {
 	case 'nil':
@@ -1249,6 +1258,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.79  2009/12/06 22:55:17  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.78  2009/12/01 03:45:37  fplanque
  * multi dimensional invalidation
  *

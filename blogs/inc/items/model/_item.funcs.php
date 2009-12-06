@@ -467,8 +467,7 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 		$fieldset_title .= ' - <a href="'.$admin_url.'?ctrl=items&amp;action=edit_links&amp;mode=iframe&amp;iframe_name='.$iframe_name.'&amp;item_ID='.$edited_Item->ID
 					.'" target="'.$iframe_name.'">'.get_icon( 'refresh', 'imgtag' ).' '.T_('Refresh').'</a>';
 
-		if( $Settings->get( 'fm_enabled' )
-			&& $current_User->check_perm( 'files', 'view', false, $Blog->ID )
+		if( $current_User->check_perm( 'files', 'view', false, $Blog->ID )
 			&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 		{	// Check that we have permission to edit item:
 
@@ -1043,6 +1042,11 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 
 /*
  * $Log$
+ * Revision 1.80  2009/12/06 22:55:21  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.79  2009/11/19 17:25:09  tblue246
  * Make evo_iconv_transliterate() aware of the post locale
  *

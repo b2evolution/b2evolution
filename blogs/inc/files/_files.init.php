@@ -147,7 +147,7 @@ class files_Module extends Module
 		 */
 		global $AdminUI;
 
-		if( $Settings->get( 'fm_enabled' ) && $current_User->check_perm( 'files', 'view', false, $blog ? $blog : NULL ) )
+		if( $current_User->check_perm( 'files', 'view', false, $blog ? $blog : NULL ) )
 		{	// FM enabled and permission to view files:
 			$AdminUI->add_menu_entries( NULL, array(
 						'files' => array(
@@ -157,7 +157,6 @@ class files_Module extends Module
 							// Controller may add subtabs
 						),
 					) );
-
 		}
 
 	}
@@ -169,29 +168,6 @@ class files_Module extends Module
 	 */
 	function build_menu_3()
 	{
-		global $blog, $loc_transinfo, $ctrl, $dispatcher;
-		/**
-		 * @var User
-		 */
-		global $current_User;
-		global $Blog;
-		/**
-		 * @var AdminUI_general
-		 */
-		global $AdminUI;
-
-		if( $current_User->check_perm( 'options', 'view' ) )
-		{	// Permission to view settings:
-			$AdminUI->add_menu_entries( 'options', array(
-				'files' => array(
-					'text' => T_('Files'),
-					'href' => $dispatcher.'?ctrl=fileset' ),
-				'filetypes' => array(
-					'text' => T_('File types'),
-					'href' => $dispatcher.'?ctrl=filetypes' ),
-			) );
-		}
-
 	}
 }
 

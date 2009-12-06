@@ -255,6 +255,11 @@ switch( $action )
 
 }
 
+$AdminUI->breadcrumbpath_init();
+$AdminUI->breadcrumbpath_add( T_('Contents'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
+$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings' );
+$AdminUI->breadcrumbpath_add( T_('Post types'), '?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=types' );
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -310,6 +315,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2009/12/06 22:55:16  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.9  2009/09/29 18:44:00  fplanque
  * doc
  *

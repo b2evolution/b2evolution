@@ -50,16 +50,6 @@ if( $tab == 'sessions' && (!$perm_view_all || $blog != 0) )
 	$tab = 'summary';
 }
 $tab3 = param( 'tab3', 'string', '', true );
-if( $tab == 'sessions' )
-{ // Show this sub-tab in Users tab
-	$AdminUI->set_path( 'users', $tab, $tab3 );
-	$AdminUI->title = T_('Stats');
-}
-else
-{
-	$AdminUI->set_path( 'stats', $tab, $tab3 );
-	$AdminUI->title = T_('Stats');
-}
 
 param( 'action', 'string' );
 
@@ -142,6 +132,126 @@ if( $tab != 'sessions' )
 			$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ) );
 		}
 	}
+}
+
+$AdminUI->breadcrumbpath_init();
+switch( $tab )
+{
+	case 'summary':
+		$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( T_('Summary'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
+		if( empty($tab3) )
+		{
+			$tab3 = 'global';
+		}
+		switch( $tab3 )
+		{
+			case 'global':
+				$AdminUI->breadcrumbpath_add( T_('All'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+				break;
+
+			case 'browser':
+				$AdminUI->breadcrumbpath_add( T_('Browsers'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
+				break;
+
+			case 'robot':
+				$AdminUI->breadcrumbpath_add( T_('Robots'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
+				break;
+
+			case 'feed':
+				$AdminUI->breadcrumbpath_add( T_('RSS/Atom'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
+				break;
+		}
+		break;
+
+	case 'other':
+		$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( T_('Direct hits'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
+		break;
+
+	case 'referers':
+		$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( T_('referred by other sites'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
+		break;
+
+	case 'refsearches':
+		$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( T_('referred by search engines'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
+		if( empty($tab3) )
+		{
+			$tab3 = 'hits';
+		}
+		switch( $tab3 )
+		{
+			case 'hits':
+				break;
+
+			case 'keywords':
+				break;
+
+			case 'topengines':
+				break;
+		}
+		break;
+
+	case 'useragents':
+		$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( T_('User agents'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
+		break;
+
+	case 'domains':
+		$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( T_('Referring domains'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
+		break;
+
+	case 'sessions':
+		$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
+		$AdminUI->breadcrumbpath_add( T_('Sessions'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
+		if( empty($tab3) )
+		{
+			$tab3 = 'login';
+		}
+		switch( $tab3 )
+		{
+			case 'login':
+				$AdminUI->breadcrumbpath_add( T_('Session by user'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
+				break;
+			case 'sessid':
+				// fp> TODO: include username in path if we have one
+				$AdminUI->breadcrumbpath_add( T_('Recent sessions'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
+				break;
+			case 'hits':
+				$AdminUI->breadcrumbpath_add( T_('Recent hits'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
+				break;
+		}
+		break;
+
+	case 'goals':
+		$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( T_('Goal tracking'), '?ctrl=goals' );
+		switch( $tab3 )
+		{
+			case 'hits':
+				$AdminUI->breadcrumbpath_add( T_('Goal hits'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
+				break;
+		}
+		break;
+
+}
+
+if( $tab == 'sessions' )
+{ // Show this sub-tab in Users tab
+	$AdminUI->set_path( 'users', $tab, $tab3 );
+	$AdminUI->title = T_('Stats');
+}
+else
+{
+	$AdminUI->set_path( 'stats', $tab, $tab3 );
+	$AdminUI->title = T_('Stats');
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -243,7 +353,7 @@ switch( $AdminUI->get_path(1) )
 		break;
 
 	case 'goals':
-		// Display VIEW:
+		// Display VIEW for Goal HITS:
 		switch( $tab3 )
 		{
 			case 'hits':
@@ -262,6 +372,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2009/12/06 22:55:21  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.19  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *

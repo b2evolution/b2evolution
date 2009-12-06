@@ -40,6 +40,12 @@ $current_User->check_perm( 'options', 'view', true );
 
 $AdminUI->set_path( 'tools', 'system' );
 
+
+$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
+$AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=crontab' );
+$AdminUI->breadcrumbpath_add( T_('About this system'), '?ctrl=system' );
+
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -568,6 +574,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2009/12/06 22:55:20  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.22  2009/11/30 01:08:27  fplanque
  * extended system optimization checks
  *

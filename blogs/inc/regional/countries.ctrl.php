@@ -72,27 +72,27 @@ switch( $action )
 		{
 			$Messages->add( sprintf( 'The country with ID %d could not be instantiated.', $ctry_ID ), 'error' );
 			break;
-		}	
+		}
 
 		if ( $action == 'disable_country' )
 		{	// Disable this country by setting flag to false.
-			$edited_Country->set( 'enabled', 0 );			
+			$edited_Country->set( 'enabled', 0 );
 			$Messages->add( sprintf( T_('Disabled country (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
-		} 
+		}
 		elseif ( $action == 'enable_country' )
 		{	// Enable country by setting flag to true.
-			$edited_Country->set( 'enabled', 1 );			
+			$edited_Country->set( 'enabled', 1 );
 			$Messages->add( sprintf( T_('Enabled country (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
 		}
-		
+
 		// Update db with new flag value.
 		$edited_Country->dbupdate();
-		
+
 		// Reload list.
 		$action = 'list';
 // fp > TODO: REDIRECT 303!
 		break;
-		
+
 	case 'new':
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -239,6 +239,13 @@ switch( $action )
 
 }
 
+
+$AdminUI->breadcrumbpath_init();
+$AdminUI->breadcrumbpath_add( T_('Global settings'), '?ctrl=settings',
+		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
+$AdminUI->breadcrumbpath_add( T_('Countries'), '?ctrl=countries' );
+
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -255,7 +262,6 @@ switch( $action )
 	case 'nil':
 		// Do nothing
 		break;
-
 
 	case 'delete':
 		// We need to ask for confirmation:
@@ -287,6 +293,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2009/12/06 22:55:19  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.8  2009/09/29 03:14:22  fplanque
  * doc
  *

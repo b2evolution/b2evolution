@@ -690,7 +690,7 @@ div.bCommentdraft > div.bSmallHead /* Direct child only */
 .bPostdraft div.bSmallPrint {
 	border-top: 1px solid #fc3;
 }
-.bPostdraft div.PostActionsArea, 
+.bPostdraft div.PostActionsArea,
 div.bCommentdraft div.CommentActionsArea {
 	border: none;
 	border-top: 1px solid #fc3;
@@ -721,7 +721,7 @@ div.bCommentdeprecated > div.bSmallHead /* Direct child only */
 .bPostdeprecated div.bSmallPrint {
 	border-top: 1px solid #000;
 }
-.bPostdeprecated div.PostActionsArea, 
+.bPostdeprecated div.PostActionsArea,
 div.bCommentdeprecated div.CommentActionsArea {
 	border: none;
 	border-top: 1px solid #000;
@@ -1003,4 +1003,9 @@ div.system_check {
 .footer .copyright {
 	padding: 32px 0 0 35px;
 	font-size: 74%;
+}
+
+div.breadcrumbpath {
+	margin: 0 16px 8px;
+	font-size: 84%;
 }

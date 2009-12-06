@@ -53,6 +53,12 @@ if( $action == 'backup' && !$current_Backup->load_from_Request() )
 	$action = 'new';
 }
 
+
+$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
+$AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=crontab' );
+$AdminUI->breadcrumbpath_add( T_('Backup'), '?ctrl=backup' );
+
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -108,6 +114,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2009/12/06 22:55:18  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.4  2009/11/18 21:54:25  efy-maxim
  * compatibility fix for PHP4
  *

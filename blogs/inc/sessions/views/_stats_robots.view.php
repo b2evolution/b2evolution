@@ -33,7 +33,7 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 global $blog, $admin_url, $rsc_url, $AdminUI;
 
-echo '<h2>'.T_('Robot hits').'</h2>';
+echo '<h2>'.T_('Hits from indexing robots / spiders / crawlers - Summary').'</h2>';
 echo '<p class="notes">'.sprintf( T_('This page only includes hits identified as made by <a %s>indexing robots</a> a.k.a. web crawlers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_robot=1&amp;blog='.$blog.'"' ).'</p>';
 echo '<p class="notes">'.T_('In order to be detected, robots must be listed in /conf/_stats.php.').'</p>';
 
@@ -174,6 +174,11 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.12  2009/12/06 22:55:20  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.11  2009/10/03 20:43:40  tblue246
  * Commit message cleanup...
  *

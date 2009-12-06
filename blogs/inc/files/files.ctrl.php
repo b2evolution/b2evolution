@@ -61,12 +61,6 @@ global $dispatcher;
 
 global $blog;
 
-// Check global access permissions:
-if( ! $Settings->get( 'fm_enabled' ) )
-{
-	bad_request_die( 'The filemanager is disabled.' );
-}
-
 // Check permission:
 $current_User->check_perm( 'files', 'view', true, $blog ? $blog : NULL );
 
@@ -285,6 +279,9 @@ if( $fm_FileRoot )
 }
 
 
+file_controller_build_tabs();
+
+
 if( empty($ads_list_path) )
 { // We have no Root / list path, there was an error. Unset any action or mode.
 	$action = 'nil';
@@ -293,6 +290,11 @@ if( empty($ads_list_path) )
 	$AdminUI->disp_html_head();
 	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
 	$AdminUI->disp_body_top();
+	// Begin payload block:
+	$AdminUI->disp_payload_begin();
+	// nothing!
+	// End payload block:
+	$AdminUI->disp_payload_end();
 	$AdminUI->disp_global_footer();
 	exit(0);
 }
@@ -318,7 +320,7 @@ $Debuglog->add( count($fm_selected).' selected files/directories', 'files' );
  *
  * @global Filelist
  */
-$selected_Filelist = & new Filelist( $fm_FileRoot, false );
+$selected_Filelist = new Filelist( $fm_FileRoot, false );
 foreach( $fm_selected as $l_source_path )
 {
 	// echo '<br>'.$l_source_path;
@@ -1525,29 +1527,22 @@ switch( $fm_mode )
 }
 
 
-// Update sub-menu:
-if( $current_User->check_perm( 'files', 'add', false, $blog ? $blog : NULL ) )
-{ // Permission to upload: (no subtabs needed otherwise)
-	$AdminUI->add_menu_entries(
-			'files',
-			array(
-					'browse' => array(
-						'text' => T_('Browse'),
-						'href' => regenerate_url( 'ctrl', 'ctrl=files' ) ),
-					'upload' => array(
-						'text' => T_('Upload'),
-						'href' => regenerate_url( 'ctrl', 'ctrl=upload' ) ),
-				)
-		);
+// fp> TODO: this here is a bit sketchy since we have Blog & fileroot not necessarilly in sync. Needs investigation / propositions.
+// Note: having both allows to post from any media dir into any blog.
+$AdminUI->breadcrumbpath_init();
+$AdminUI->breadcrumbpath_add( T_('Files'), '?ctrl=files&amp;blog=$blog$' );
+if( !isset($Blog) || $fm_FileRoot->type != 'collection' || $fm_FileRoot->in_type_ID != $Blog->ID )
+{	// Display only if we're not browsing our home blog
+	$AdminUI->breadcrumbpath_add( $fm_FileRoot->name, '?ctrl=files&amp;blog=$blog$&amp;root='.$fm_FileRoot->ID,
+			(isset($Blog) && $fm_FileRoot->type == 'collection') ? sprintf( T_('You are ready to post files from %s into %s...'),
+			$fm_FileRoot->name, $Blog->get('shortname') ) : '' );
 }
-
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
 // Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
 $AdminUI->disp_body_top();
-
 
 // Display reload-icon in the opener window if we're a popup in the same CWD and the
 // Filemanager content differs.
@@ -1674,6 +1669,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.44  2009/12/06 22:55:18  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.43  2009/11/21 13:31:58  efy-maxim
  * 1. users controller has been refactored to users and user controllers
  * 2. avatar tab

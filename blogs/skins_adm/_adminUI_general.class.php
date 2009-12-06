@@ -128,6 +128,13 @@ class AdminUI_general extends Menu
 
 
 	/**
+	 * Bread crumb path
+	 *
+	 * Note: These are not real breadcrumbs. It's just "so to speak" for a hierarchical path.
+	 */
+	var $breadcrumbpath = array();
+
+	/**
 	 * Constructor.
 	 */
 	function AdminUI_general()
@@ -148,6 +155,42 @@ class AdminUI_general extends Menu
 	{
 	}
 
+	/**
+	* Note: These are not real breadcrumbs. It's just "so to speak" for a hierarchical path.
+	*
+	*/
+	function breadcrumbpath_init( $add_blog = true )
+	{
+		global $Blog;
+		$this->breadcrumbpath_add( T_('Dashboard'), '?ctrl=dashboard&amp;blog=0' );
+		if( $add_blog && isset($Blog) )
+		{
+			$this->breadcrumbpath_add( $Blog->dget('shortname'), '?ctrl=dashboard&amp;blog=$blog$' );
+		}
+	}
+
+	/**
+	* Note: These are not real breadcrumbs. It's just "so to speak" for a hierarchical path.
+	*
+	* @param mixed $text
+	* @param mixed $url
+	*/
+	function breadcrumbpath_add( $text, $url, $help = NULL )
+	{
+		global $Blog;
+
+		$blog_ID = isset($Blog) ? $Blog->ID : 0;
+		$url = str_replace( '$blog$', $blog_ID, $url );
+
+		$html = '<a href="'.$url.'">'.$text.'</a>';
+
+		if( !empty($help) )
+		{
+			$html .= ' <abbr title="'.$help.'">?</abbr>';
+		}
+
+		$this->breadcrumbpath[] = $html;
+	}
 
 	/**
 	 * Add menu entries to the beginning of the list for given path.
@@ -1295,6 +1338,11 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.105  2009/12/06 22:55:18  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.104  2009/11/22 18:20:11  fplanque
  * Dashboard CSS enhancements
  *

@@ -41,6 +41,12 @@ switch ( $action )
 		break;
 }
 
+
+$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
+$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
+$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=settings' );
+
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -61,6 +67,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2009/12/06 22:55:19  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.4  2009/11/12 00:46:34  fplanque
  * doc/minor/handle demo mode
  *

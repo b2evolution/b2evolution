@@ -43,9 +43,6 @@ global $edited_Group;
 
 global $action;
 
-// Begin payload block:
-$this->disp_payload_begin();
-
 /**
  * Display pluggable permissions
  *
@@ -226,11 +223,13 @@ if( $action != 'view_group' )
 
 $Form->end_form();
 
-// End payload block:
-$this->disp_payload_end();
-
 /*
  * $Log$
+ * Revision 1.21  2009/12/06 22:55:22  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.20  2009/11/12 03:54:17  fplanque
  * wording/doc/cleanup
  *

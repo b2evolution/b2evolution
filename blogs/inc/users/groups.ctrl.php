@@ -142,7 +142,7 @@ switch ( $action )
 			$action = 'list';
 			break;
 		}
-		
+
 		if( $edited_Group->load_from_Request() )
 		{
 
@@ -156,14 +156,14 @@ switch ( $action )
 					sprintf( T_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'),
 						'href="?ctrl=users&amp;grp_ID='.$q.'"' ) );
 			}
-	
+
 			if( $edited_Group->ID != 1 )
 			{ // Groups others than #1 can be prevented from logging in or editing users
 				$edited_Group->set( 'perm_admin', param( 'edited_grp_perm_admin', 'string', true ) );
 				$edited_Group->set( 'perm_users', param( 'edited_grp_perm_users', 'string', true ) );
 			}
 		}
-			
+
 		if( $Messages->count( 'error' ) )
 		{	// We have found validation errors:
 			$action = 'edit';
@@ -180,10 +180,10 @@ switch ( $action )
 			$edited_Group->dbupdate();
 			$Messages->add( T_('Group updated.'), 'success' );
 		}
-		
+
 		// Commit changes in cache:
 		$GroupCache->add( $edited_Group );
-		
+
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( '?ctrl=users', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
@@ -217,7 +217,7 @@ switch ( $action )
 			unset($edited_Group);
 			forget_param('grp_ID');
 			$Messages->add( $msg, 'success' );
-			
+
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=users', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
@@ -232,6 +232,11 @@ switch ( $action )
 		}
 		break;
 }
+
+
+$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
+$AdminUI->breadcrumbpath_add( T_('User groups'), '?ctrl=users' );
+$AdminUI->breadcrumbpath_add( $edited_Group->dget('name'), '?ctrl=groups&amp;group_ID='.$edited_Group->ID );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -265,6 +270,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2009/12/06 22:55:19  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.4  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *

@@ -75,6 +75,10 @@ switch( $action )
 }
 
 
+$AdminUI->breadcrumbpath_init();
+$AdminUI->breadcrumbpath_add( T_('Contents'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
+$AdminUI->breadcrumbpath_add( T_('Comments'), '?ctrl=comments&amp;blog=$blog$' );
+
 $AdminUI->set_path( 'items' );	// Sublevel may be attached below
 
 /**
@@ -275,6 +279,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2009/12/06 22:55:20  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.16  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *

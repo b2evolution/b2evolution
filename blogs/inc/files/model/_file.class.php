@@ -1815,14 +1815,21 @@ class File extends DataObject
 	function get_af_thumb_path( $size_name, $thumb_mimetype = NULL, $create_evocache_if_needed = false )
 	{
 		$Filetype = & $this->get_Filetype();
-		if( empty($thumb_mimetype) )
+		if( isset($Filetype) )
 		{
-			$thumb_mimetype = $Filetype->mimetype;
+			if( empty($thumb_mimetype) )
+			{
+				$thumb_mimetype = $Filetype->mimetype;
+			}
+			elseif( $thumb_mimetype != $Filetype->mimetype )
+			{
+				debug_die( 'Not supported. For now, thumbnails have to have same mime type as their parent file.' );
+				// TODO: extract prefered extension of filetypes config
+			}
 		}
-		elseif( $thumb_mimetype != $Filetype->mimetype )
+		elseif( !empty($thumb_mimetype) )
 		{
-			debug_die( 'Not supported. For now, thumbnails have to have same mime type as their parent file.' );
-			// TODO: extract prefered extension of filetypes config
+			debug_die( 'Not supported. Can\'t generate thumbnail for unknow parent file.' );
 		}
 
 		// Get the filename of the thumbnail
@@ -1962,6 +1969,11 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.75  2009/12/06 22:55:20  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.74  2009/12/04 23:27:50  fplanque
  * cleanup Expires: header handling
  *

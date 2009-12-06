@@ -27,7 +27,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $blog, $admin_url, $rsc_url, $AdminUI;
 
-echo '<h2>'.T_('XML hits summary').'</h2>';
+echo '<h2>'.T_('Hits from RSS/Atom feed readers - Summary').'</h2>';
 echo '<p class="notes">'.sprintf( T_('These are hits from <a %s>XML readers</a>. This includes RSS and Atom readers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_rss=1&amp;blog='.$blog.'"' ).'</p>';
 echo '<p class="notes">'.T_('Any user agent accessing the XML feeds will be flagged as an XML reader.').'</p>';
 $sql = "
@@ -87,6 +87,11 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.9  2009/12/06 22:55:19  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.8  2009/09/13 21:26:50  blueyed
  * SQL_NO_CACHE for SELECT queries using T_hitlog
  *

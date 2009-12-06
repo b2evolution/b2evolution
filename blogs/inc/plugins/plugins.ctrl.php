@@ -849,6 +849,12 @@ if( isset($edit_Plugin) && is_object($edit_Plugin) && isset( $admin_Plugins->plu
 }
 
 
+$AdminUI->breadcrumbpath_init();
+$AdminUI->breadcrumbpath_add( T_('Global settings'), '?ctrl=settings',
+		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
+$AdminUI->breadcrumbpath_add( T_('Plugin configuration'), '?ctrl=plugins' );
+
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -1036,7 +1042,6 @@ switch( $action )
 
 }
 
-
 switch( $action )
 {
 	case 'list':
@@ -1058,6 +1063,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2009/12/06 22:55:22  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.13  2009/09/25 07:32:53  efy-cantor
  * replace get_cache to get_*cache
  *

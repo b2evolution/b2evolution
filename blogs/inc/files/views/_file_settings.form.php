@@ -164,17 +164,13 @@ function JS_showhide_ffield_on_this( $field_id )
 }
 
 
-$Form = & new Form( NULL, 'files_checkchanges' );
+$Form = new Form( NULL, 'files_checkchanges' );
 
 $Form->begin_form( 'fform', T_('File Settings') );
 
 $Form->hidden( 'ctrl', 'fileset' );
 $Form->hidden( 'action', 'update' );
 
-$Form->begin_fieldset( T_('File Manager') );
-	$Form->checkbox_input( 'fm_enabled', $Settings->get('fm_enabled'), T_('Enable Filemanager'), array(
-		'note' => T_('Check to enable the Filemanager.' ), 'onclick' => JS_showhide_ids_on_this(array( 'ffset_fileroots', 'ffset_filecreate', 'ffset_fileadvanced' )) ) );
-$Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Accessible file roots'), array( 'id' => 'ffset_fileroots', 'class' => 'additional_file_settings' ) );
 	$Form->checkbox( 'fm_enable_roots_blog', $Settings->get('fm_enable_roots_blog'), T_('Enable blog directories'), T_('Check to enable root directories for blogs.' ) );
@@ -227,9 +223,6 @@ $Form->begin_fieldset( T_('Advanced options'), array( 'id' => 'ffset_fileadvance
 
 $Form->end_fieldset();
 
-// Javascript to init hidden/shown state:
-echo JS_showhide_ids_on_checkbox( array( 'ffset_fileroots', 'ffset_filecreate', 'ffset_fileadvanced' ), 'fm_enabled' );
-
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Form->buttons( array(
@@ -245,6 +238,11 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.8  2009/12/06 22:55:21  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.7  2009/08/06 15:02:48  fplanque
  * minor
  *

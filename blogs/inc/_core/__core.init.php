@@ -351,7 +351,7 @@ class _core_Module extends Module
 
 		$perm_comments = (! empty($Blog)) && $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID );
 		// Either permission for a specific blog or the global permission:
-		$perm_files    = $Settings->get( 'fm_enabled' ) && $current_User->check_perm( 'files', 'view', false, isset( $Blog ) ? $Blog->ID : NULL );
+		$perm_files    = $current_User->check_perm( 'files', 'view', false, isset( $Blog ) ? $Blog->ID : NULL );
 		$perm_chapters = (! empty($Blog)) && $current_User->check_perm( 'blog_cats', 'edit', false, $Blog->ID );
 
 		if( $perm_comments || $perm_files || $perm_chapters )
@@ -709,15 +709,15 @@ class _core_Module extends Module
 								'href' => '?ctrl=users'	),
 							// 'groups' =>
 							// 'defaultprofiles' =>
-							'userfields' => array(
-								'text' => T_('User fields'),
-								'href' => '?ctrl=userfields' ),
-							'registration' => array(
-								'text' => T_('Registration'),
- 								'href' => '?ctrl=registration' ),
 							'usersettings' => array(
 								'text' => T_('Settings'),
  								'href' => '?ctrl=usersettings' ),
+							'registration' => array(
+								'text' => T_('Registration'),
+ 								'href' => '?ctrl=registration' ),
+							'userfields' => array(
+								'text' => T_('User fields'),
+								'href' => '?ctrl=userfields' ),
 							);
 		}
 
@@ -773,6 +773,11 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.55  2009/12/06 22:55:21  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.54  2009/12/02 02:22:36  fplanque
  * add menu entry
  *

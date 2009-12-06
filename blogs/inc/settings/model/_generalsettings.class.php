@@ -70,7 +70,6 @@ class GeneralSettings extends AbstractSettings
 
 		'outbound_notifications_mode' => 'immediate', // 'immediate' is the safest mode for average installs (may be "off", "immediate" or "cron")
 
-		'fm_enabled' => '1',
 		'fm_enable_create_dir' => '1',
 		'fm_enable_create_file' => '1',
 		'fm_enable_roots_blog' => '1',
@@ -198,6 +197,11 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.26  2009/12/06 22:55:21  fplanque
+ * Started breadcrumbs feature in admin.
+ * Work in progress. Help welcome ;)
+ * Also move file settings to Files tab and made FM always enabled
+ *
  * Revision 1.25  2009/11/12 00:46:34  fplanque
  * doc/minor/handle demo mode
  *
