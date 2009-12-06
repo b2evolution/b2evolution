@@ -236,6 +236,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 			$content = str_replace( array('"', "'"), array('&quot;', '&#039;'), $content );
 			break;
 
+		case 'htmlspecialchars':
 		case 'formvalue':
 			// use as a form value: escapes &, quotes and < > but leaves code alone
 			$content = htmlspecialchars( $content, ENT_QUOTES );  // Handles &, ", ', < and >
@@ -1721,7 +1722,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 							$args[] = $l_arg;
 							break;
 						case 'string':
-							$args[] = '"'.htmlspecialchars(str_replace("\n", '', substr($l_arg, 0, 64))).((strlen($l_arg) > 64) ? '...' : '').'"';
+							$args[] = '"'.strmaxlen(str_replace("\n", '', $l_arg), 65, NULL, 'htmlbody').'"';
 							break;
 						case 'array':
 							$args[] = 'Array('.count($l_arg).')';
@@ -3848,6 +3849,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.197  2009/12/06 01:52:54  blueyed
+ * Add 'htmlspecialchars' type to format_to_output, same as formvalue, but less irritating. Useful for strmaxlen, which is being used in more places now.
+ *
  * Revision 1.196  2009/12/06 01:48:42  blueyed
  * strmaxlen: do not cut in the middle of an HTML entity, if format is not 'raw'
  *

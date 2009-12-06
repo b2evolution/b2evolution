@@ -44,7 +44,7 @@ function trackbacks( $post_trackbacks, $content, $post_title, $post_ID )
 {
 	global $Messages;
 
-	$excerpt = (evo_strlen(strip_tags($content)) > 255) ? evo_substr(strip_tags($content), 0, 252).'...' : strip_tags($content);
+	$excerpt = maxstrlen(strip_tags($content), 255, '...');
 	$Messages->add( T_('Excerpt sent in trackbacks:').' '.$excerpt, 'note' );
 	$trackback_urls = split('( )+', $post_trackbacks,10);		// fplanque: ;
 	foreach($trackback_urls as $tb_url)
@@ -226,6 +226,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.12  2009/12/06 01:52:55  blueyed
+ * Add 'htmlspecialchars' type to format_to_output, same as formvalue, but less irritating. Useful for strmaxlen, which is being used in more places now.
+ *
  * Revision 1.11  2009/10/04 23:06:30  fplanque
  * doc
  *

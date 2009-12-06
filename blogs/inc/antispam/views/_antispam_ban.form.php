@@ -141,15 +141,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 				<td><?php echo $row_stats['comment_author_IP'] ?></td>
 				<td><?php
 				$comment_content = strip_tags( $row_stats['comment_content'] );
-				if ( evo_strlen($comment_content) > 70 )
-				{
-					// Trail off (truncate and add '...') after 70 chars
-					echo evo_substr($comment_content, 0, 70) . "...";
-				}
-				else
-				{
-					echo $comment_content;
-				}
+				echo strmaxlen($comment_content, 71);
 				?></td>
 				<td><?php echo action_icon( T_('Edit...'), 'edit', '?ctrl=comments&amp;action=edit&amp;comment_ID='.$row_stats['comment_ID'] ) ?></td>
 				</tr>
@@ -211,6 +203,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.12  2009/12/06 01:52:55  blueyed
+ * Add 'htmlspecialchars' type to format_to_output, same as formvalue, but less irritating. Useful for strmaxlen, which is being used in more places now.
+ *
  * Revision 1.11  2009/09/13 21:26:50  blueyed
  * SQL_NO_CACHE for SELECT queries using T_hitlog
  *

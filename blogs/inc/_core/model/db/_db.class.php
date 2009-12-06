@@ -1156,11 +1156,7 @@ class DB
 				}
 				else
 				{
-					if( strlen( $item ) > 50 )
-					{
-						$item = substr( $item, 0, 50 ).'...';
-					}
-					$r .= htmlspecialchars($item);
+					$r .= strmaxlen($item, 50, NULL, 'htmlspecialchars');
 				}
 				$r .= '</td>';
 			}
@@ -1655,6 +1651,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.46  2009/12/06 01:52:54  blueyed
+ * Add 'htmlspecialchars' type to format_to_output, same as formvalue, but less irritating. Useful for strmaxlen, which is being used in more places now.
+ *
  * Revision 1.45  2009/12/01 20:37:11  blueyed
  * DB::select: set dbname
  *
