@@ -407,6 +407,20 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( strmaxlen('1&2', 3, NULL, 'htmlbody'), '1&amp;2' );
 		$this->assertEqual( strmaxlen('1&2', 3, NULL, 'raw'), '1&2' );
 		$this->assertEqual( strmaxlen('1&2', 3), '1&2' );
+
+		$this->assertEqual( strmaxlen('1&amp;2', 10, NULL, 'htmlbody'), '1&amp;2' );
+		$this->assertEqual( strmaxlen('1&amp;2', 10, NULL, 'formvalue'), '1&amp;amp;2' );
+
+		# special cases, where entities must not get cut in the middle
+		$this->assertEqual( strmaxlen('1&amp;2', 5, NULL, 'htmlbody'), '1&hellip;' );
+		$this->assertEqual( strmaxlen('1&amp;22', 7, NULL, 'htmlbody'), '1&amp;&hellip;' );
+		$this->assertEqual( strmaxlen('1&amp;2', 3, NULL, 'formvalue'), '1&hellip;' );
+		$this->assertEqual( strmaxlen('1&    2', 3, NULL, 'formvalue'), '1&amp;&hellip;' );
+		$this->assertEqual( strmaxlen('1&2', 3, NULL, 'formvalue'), '1&amp;2' );
+		$this->assertEqual( strmaxlen('12345678901234567890&amp;', 21, NULL, 'formvalue'),
+			'12345678901234567890&hellip;' );
+		$this->assertEqual( strmaxlen('123456789012345&amp;', 21, NULL, 'formvalue'),
+			'123456789012345&amp;amp;' );
 	}
 
 

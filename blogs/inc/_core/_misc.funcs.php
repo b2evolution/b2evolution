@@ -332,6 +332,10 @@ function zeroise( $number, $threshold )
 /**
  * Crop string to maxlen with &hellip; (default tail) at the end if needed.
  *
+ * If $format is not "raw", we make sure to not cut in the middle of an
+ * HTML entity, so that strmaxlen('1&amp;2', 3, NULL, 'formvalue') will not
+ * become/stay '1&amp;&hellip;'.
+ *
  * @param string
  * @param int Maximum length
  * @param string Tail to use, when string gets cropped. Its length gets
@@ -358,7 +362,28 @@ function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw' )
 		{ // special case; $tail length is >= $maxlen
 			$len = 1;
 		}
-		$str = format_to_output(evo_substr( $str, 0, $len ), $format);
+		$str_cropped = evo_substr( $str, 0, $len );
+		if( $format != 'raw' )
+		{ // if the format isn't raw we make sure that we do not cut in the middle of an HTML entity
+			$maxlen_entity = 7; # "&amp;" is 5, min 3!
+			$str_inspect = evo_substr($str_cropped, 1-$maxlen_entity);
+			$pos_amp = strpos($str_inspect, '&');
+			if( $pos_amp !== false )
+			{ // there's an ampersand at the end of the cropped string
+				$look_until = $pos_amp;
+				$str_cropped_len = evo_strlen($str_cropped);
+				if( $str_cropped_len < $maxlen_entity )
+				{ // we have to look at least for the length of an entity
+					$look_until += $maxlen_entity-$str_cropped_len;
+				}
+				if( strpos(evo_substr($str, $len, $look_until), ';') !== false )
+				{
+					$str_cropped = evo_substr( $str, 0, $len-evo_strlen($str_inspect)+$pos_amp);
+				}
+			}
+			// there's an HTML entity around the cut mark
+		}
+		$str = format_to_output($str_cropped, $format);
 		$str .= $tail;
 
 		return $str;
@@ -3823,6 +3848,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.196  2009/12/06 01:48:42  blueyed
+ * strmaxlen: do not cut in the middle of an HTML entity, if format is not 'raw'
+ *
  * Revision 1.195  2009/12/05 01:22:00  fplanque
  * PageChace 304 handling
  *
