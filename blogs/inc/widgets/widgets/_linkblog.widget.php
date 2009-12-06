@@ -101,18 +101,15 @@ class linkblog_Widget extends coll_item_list_Widget
 
 
 	/**
-	 * Display the widget!
+	 * Prepare display params
 	 *
 	 * @param array MUST contain at least the basic display params
 	 */
-	function display( $params )
+	function init_display( $params )
 	{
 		global $Blog;
 
-		$this->init_display( $params );
-
 		// Force some params (because this is a simplified widget):
-
 		if( $this->disp_params['blog_ID'] == 0 )
 		{	// We want to try and use previous defaults:
 			if( !empty( $this->disp_params['linkblog_ID'] ) )
@@ -125,15 +122,17 @@ class linkblog_Widget extends coll_item_list_Widget
 			}
 		}
 
-		parent::display( $params );
-
-		return true;
+		parent::init_display( $params );
 	}
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.25  2009/12/06 18:07:44  fplanque
+ * Fix simplified list widgets.
+ *
  * Revision 1.24  2009/09/14 13:54:13  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

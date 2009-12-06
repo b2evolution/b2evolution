@@ -101,24 +101,26 @@ class coll_page_list_Widget extends coll_item_list_Widget
 
 
 	/**
-	 * Display the widget!
+	 * Prepare display params
 	 *
 	 * @param array MUST contain at least the basic display params
 	 */
-	function display( $params )
+	function init_display( $params )
 	{
 		// Force some params (because this is a simplified widget):
 		$params['item_type'] = '1000';	// Use item types 1000 (pages) only
 
-		parent::display( $params );
-
-		return true;
+		parent::init_display( $params );
 	}
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.19  2009/12/06 18:07:44  fplanque
+ * Fix simplified list widgets.
+ *
  * Revision 1.18  2009/09/12 11:11:21  efy-arrin
  * Included the ClassName in the loadclass() with proper UpperCase
  *

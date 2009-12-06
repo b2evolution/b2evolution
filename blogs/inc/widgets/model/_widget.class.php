@@ -329,7 +329,7 @@ class ComponentWidget extends DataObject
 	 * @todo Document default params and default values.
 	 *       This might link to a wiki page, too.
 	 *
-	 * @param array
+	 * @param array MUST contain at least the basic display params
 	 */
 	function init_display( $params )
 	{
@@ -688,6 +688,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.72  2009/12/06 18:07:43  fplanque
+ * Fix simplified list widgets.
+ *
  * Revision 1.71  2009/12/01 04:19:25  fplanque
  * even more invalidation dimensions
  *
