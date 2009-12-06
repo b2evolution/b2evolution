@@ -1,12 +1,17 @@
 <?php
+// This is for www only. You don't want to include this when runnignin CLI (command line) mode
 /**
- * This file sets various general purpose arrays and global variables for use in the app.
+ * This file initializes everything BUT the blog!
+ *
+ * It is useful when you want to do very customized templates!
+ * It is also called by more complete initializers.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
+ * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -21,21 +26,26 @@
  * Daniel HAHLER grants Francois PLANQUE the right to license
  * Daniel HAHLER's contributions to this file and the b2evolution project
  * under any OSI approved OSS license (http://www.opensource.org/licenses/).
+ *
+ * Matt FOLLETT grants Francois PLANQUE the right to license
+ * Matt FOLLETT's contributions to this file and the b2evolution project
+ * under any OSI approved OSS license (http://www.opensource.org/licenses/).
  * }}
  *
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author blueyed: Daniel HAHLER.
- * @author cafelog (team)
- * @author fplanque: Francois PLANQUE.
- * @author jupiterx: Jordan RUNNING.
- * @author sakichan: Nobuo SAKIYAMA.
+ * @author fplanque: Francois PLANQUE
+ * @author blueyed: Daniel HAHLER
+ * @author mfollett: Matt FOLLETT
+ * @author mbruneau: Marc BRUNEAU / PROGIDISTRI
  *
  * @version $Id$
  */
-if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+
+$Timer->resume( '_init_hit' );
 
 /**
  * Do we want robots to index this page? -- Will be use to produce meta robots tag
@@ -48,14 +58,6 @@ $robots_index = NULL;
  * @global boolean or NULL to ignore
  */
 $robots_follow = NULL;
-
-
-/**
- * @global boolean Are we running on Command Line Interface instead of a web request?
- */
-$is_cli = empty($_SERVER['SERVER_SOFTWARE']) ? true : false;
-$is_web = ! $is_cli;
-// echo ($is_cli ? 'cli' : 'web' );
 
 $content_type_header = NULL;
 
@@ -167,124 +169,26 @@ else
 	<?php
 }
 
-if( $is_web )
-{
-	/**
-	 * Full requested Host (including protocol).
-	 *
-	 * {@internal Note: on IIS you can receive 'off' in the HTTPS field!! :[ }}
-	 *
-	 * @global string
-	 */
-	$ReqHost = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://').$_SERVER['HTTP_HOST'];
 
-	$Debuglog->add( 'vars: $ReqHost: '.$ReqHost, 'request' );
-	$Debuglog->add( 'vars: $ReqURI: '.$ReqURI, 'request' );
-	$Debuglog->add( 'vars: $ReqPath: '.$ReqPath, 'request' );
+/**
+ * Full requested Host (including protocol).
+ *
+ * {@internal Note: on IIS you can receive 'off' in the HTTPS field!! :[ }}
+ *
+ * @global string
+ */
+$ReqHost = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://').$_SERVER['HTTP_HOST'];
+
+$Debuglog->add( 'vars: $ReqHost: '.$ReqHost, 'request' );
+$Debuglog->add( 'vars: $ReqURI: '.$ReqURI, 'request' );
+$Debuglog->add( 'vars: $ReqPath: '.$ReqPath, 'request' );
 
 
-	// on which page are we ?
-	$pagenow = explode( '/', $_SERVER['PHP_SELF'] );
-	$pagenow = trim( $pagenow[(sizeof($pagenow) - 1)] );
-	$pagenow = explode( '?', $pagenow );
-	$pagenow = $pagenow[0];
-
-	// dummy var for backward compatibility with versions < 2.4.1 -- prevents "Undefined variable"
-	$credit_links = array();
-}
-
-// the weekdays and the months..
-$weekday[0] = NT_('Sunday');
-$weekday[1] = NT_('Monday');
-$weekday[2] = NT_('Tuesday');
-$weekday[3] = NT_('Wednesday');
-$weekday[4] = NT_('Thursday');
-$weekday[5] = NT_('Friday');
-$weekday[6] = NT_('Saturday');
-
-// the weekdays short form (typically 3 letters)
-// TRANS: abbrev. for Sunday
-$weekday_abbrev[0] = NT_('Sun');
-// TRANS: abbrev. for Monday
-$weekday_abbrev[1] = NT_('Mon');
-// TRANS: abbrev. for Tuesday
-$weekday_abbrev[2] = NT_('Tue');
-// TRANS: abbrev. for Wednesday
-$weekday_abbrev[3] = NT_('Wed');
-// TRANS: abbrev. for Thursday
-$weekday_abbrev[4] = NT_('Thu');
-// TRANS: abbrev. for Friday
-$weekday_abbrev[5] = NT_('Fri');
-// TRANS: abbrev. for Saturday
-$weekday_abbrev[6] = NT_('Sat');
-
-// the weekdays even shorter form (typically 1 letter)
-// TRANS: abbrev. for Sunday
-$weekday_letter[0] = NT_(' S ');
-// TRANS: abbrev. for Monday
-$weekday_letter[1] = NT_(' M ');
-// TRANS: abbrev. for Tuesday
-$weekday_letter[2] = NT_(' T ');
-// TRANS: abbrev. for Wednesday
-$weekday_letter[3] = NT_(' W ');
-// TRANS: abbrev. for Thursday
-$weekday_letter[4] = NT_(' T  ');
-// TRANS: abbrev. for Friday
-$weekday_letter[5] = NT_(' F ');
-// TRANS: abbrev. for Saturday
-$weekday_letter[6] = NT_(' S  ');
-
-// the months
-$month['00'] = '\?\?';	// This can happen when importing junk dates from WordPress
-$month['01'] = NT_('January');
-$month['02'] = NT_('February');
-$month['03'] = NT_('March');
-$month['04'] = NT_('April');
-// TRANS: space at the end only to differentiate from short form. You don't need to keep it in the translation.
-$month['05'] = NT_('May ');
-$month['06'] = NT_('June');
-$month['07'] = NT_('July');
-$month['08'] = NT_('August');
-$month['09'] = NT_('September');
-$month['10'] = NT_('October');
-$month['11'] = NT_('November');
-$month['12'] = NT_('December');
-
-// the months short form (typically 3 letters)
-// TRANS: abbrev. for January
-$month_abbrev['01'] = NT_('Jan');
-// TRANS: abbrev. for February
-$month_abbrev['02'] = NT_('Feb');
-// TRANS: abbrev. for March
-$month_abbrev['03'] = NT_('Mar');
-// TRANS: abbrev. for April
-$month_abbrev['04'] = NT_('Apr');
-// TRANS: abbrev. for May
-$month_abbrev['05'] = NT_('May');
-// TRANS: abbrev. for June
-$month_abbrev['06'] = NT_('Jun');
-// TRANS: abbrev. for July
-$month_abbrev['07'] = NT_('Jul');
-// TRANS: abbrev. for August
-$month_abbrev['08'] = NT_('Aug');
-// TRANS: abbrev. for September
-$month_abbrev['09'] = NT_('Sep');
-// TRANS: abbrev. for October
-$month_abbrev['10'] = NT_('Oct');
-// TRANS: abbrev. for November
-$month_abbrev['11'] = NT_('Nov');
-// TRANS: abbrev. for December
-$month_abbrev['12'] = NT_('Dec');
-
-// the post statuses:
-$post_statuses = array (
-	'published' => NT_('Published'),
-	'deprecated' => NT_('Deprecated'),
-	'redirected' => NT_('Redirected'),
-	'protected' => NT_('Protected'),
-	'private' => NT_('Private'),
-	'draft' => NT_('Draft'),
-);
+// on which page are we ?
+$pagenow = explode( '/', $_SERVER['PHP_SELF'] );
+$pagenow = trim( $pagenow[(sizeof($pagenow) - 1)] );
+$pagenow = explode( '?', $pagenow );
+$pagenow = $pagenow[0];
 
 
 /**
@@ -292,6 +196,95 @@ $post_statuses = array (
  * @var integer
  */
 $view_counts_on_this_page = 0;
+
+
+/**
+ * Locale selection:
+ * We need to do this as early as possible in order to set DB connection charset below
+ * fp> that does not explain why it needs to be here!! Why do we need to set the Db charset HERE? BEFORE WHAT?
+ *
+ * sam2kb> ideally we should set the right DB charset at the time when we connect to the database. The reason is until we do it all data pulled out from DB is in wrong encoding. I put the code here because it depends on _param.funcs, so if move the _param.funcs higher we can also move this code right under _connect_db
+ * See also http://forums.b2evolution.net//viewtopic.php?p=95100
+ *
+ */
+$Debuglog->add( 'Login: default_locale from conf: '.$default_locale, 'locale' );
+
+locale_overwritefromDB();
+$Debuglog->add( 'Login: default_locale from DB: '.$default_locale, 'locale' );
+
+$default_locale = locale_from_httpaccept(); // set default locale by autodetect
+$Debuglog->add( 'Login: default_locale from HTTP_ACCEPT: '.$default_locale, 'locale' );
+
+load_funcs('_core/_param.funcs.php');
+if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
+{
+	if( $locale_from_get != $default_locale )
+	{
+		if( isset( $locales[$locale_from_get] ) )
+		{
+			$default_locale = $locale_from_get;
+			$Debuglog->add('Overriding locale from REQUEST: '.$default_locale, 'locale');
+		}
+		else
+		{
+			$Debuglog->add('$locale_from_get ('.$locale_from_get.') is not set. Available locales: '.implode(', ', array_keys($locales)), 'locale');
+			$locale_from_get = false;
+		}
+	}
+	else
+	{
+		$Debuglog->add('$locale_from_get == $default_locale ('.$locale_from_get.').', 'locale');
+	}
+
+/* fp> what's a use case for this?
+	if( $locale_from_get )
+	{ // locale from GET being used. It should not get overridden below.
+		$redir = 'no'; // do not redirect to canonical URL
+	}
+*/
+}
+
+
+/**
+ * Activate default locale:
+ */
+locale_activate( $default_locale );
+
+// Set encoding for MySQL connection:
+$DB->set_connection_charset( $current_charset );
+
+
+/**
+ * The Hit class
+ */
+load_class( 'sessions/model/_hit.class.php', 'Hit' );
+/**
+ * @global Hit The Hit object
+ */
+$Hit = new Hit(); // This may INSERT a basedomain and a useragent but NOT the HIT itself!
+
+$Timer->pause( '_init_hit' );
+
+
+
+// Init user SESSION:
+if( $use_session )
+{
+	require dirname(__FILE__).'/_init_session.inc.php';
+}
+
+
+
+$Timer->resume( '_init_hit' );
+
+// Init charset handling:
+init_charsets( $current_charset );
+
+
+// fp> TODO: the following was in _vars.inc -- temporaily here, b2evolution stuff needs to move out of evoCORE.
+
+// dummy var for backward compatibility with versions < 2.4.1 -- prevents "Undefined variable"
+$credit_links = array();
 
 $francois_links = array( 'fr' => array( 'http://fplanque.net/', array( array( 78, 'Fran&ccedil;ois'),  array( 100, 'Francois') ) ),
 													'' => array( 'http://fplanque.com/', array( array( 78, 'Fran&ccedil;ois'),  array( 100, 'Francois') ) )
@@ -309,90 +302,14 @@ $skinfaktory_links = array( '' => array( array( 73, 'http://evofactory.com/', ar
 																				)
 												);
 
+$Timer->pause( '_init_hit' );
+
 /*
  * $Log$
- * Revision 1.38  2009/12/01 01:52:08  fplanque
- * Fixed issue with Debuglog in case of redirect -- Thanks @blueyed for help.
+ * Revision 1.1  2009/12/06 05:20:36  fplanque
+ * Violent refactoring for _main.inc.php
+ * Sorry for potential side effects.
+ * This needed to be done badly -- for clarity!
  *
- * Revision 1.37  2009/11/30 00:22:04  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.36  2009/03/08 23:57:38  fplanque
- * 2009
- *
- * Revision 1.35  2009/03/03 20:25:27  blueyed
- * Minor: drop commented out debug assignment.
- *
- * Revision 1.34  2009/01/23 17:23:09  fplanque
- * doc/minor
- *
- * Revision 1.33  2009/01/22 18:44:56  blueyed
- * Fix E_NOTICE if there is no featured item. Add TODO about this assignment.
- *
- * Revision 1.32  2009/01/19 21:40:59  fplanque
- * Featured post proof of concept
- *
- * Revision 1.31  2008/09/27 07:54:33  fplanque
- * minor
- *
- * Revision 1.30  2008/09/24 09:17:12  fplanque
- * rollback
- *
- * Revision 1.28  2008/03/15 19:07:25  fplanque
- * no message
- *
- * Revision 1.27  2008/01/21 09:35:23  fplanque
- * (c) 2008
- *
- * Revision 1.26  2008/01/19 14:42:38  yabs
- * bugfix : http://forums.b2evolution.net/viewtopic.php?t=13736
- *
- * Revision 1.25  2007/12/28 02:07:29  fplanque
- * no message
- *
- * Revision 1.24  2007/12/23 19:43:58  fplanque
- * trans fat reduction :p
- *
- * Revision 1.23  2007/12/22 21:02:50  fplanque
- * minor
- *
- * Revision 1.22  2007/11/02 02:43:04  fplanque
- * refactored blog settings / UI
- *
- * Revision 1.21  2007/10/10 18:03:52  fplanque
- * i18n
- *
- * Revision 1.20  2007/09/08 18:38:08  fplanque
- * MFB
- *
- * Revision 1.19  2007/06/25 10:58:51  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.18  2007/06/24 15:43:33  personman2
- * Reworking the process for a skin or plugin to add js and css files to a blog display.  Removed the custom header for nifty_corners.
- *
- * Revision 1.17  2007/05/02 20:39:27  fplanque
- * meta robots handling
- *
- * Revision 1.16  2007/04/26 00:11:05  fplanque
- * (c) 2007
- *
- * Revision 1.15  2007/04/25 18:47:41  fplanque
- * MFB 1.10: groovy links
- *
- * Revision 1.14  2007/03/11 23:57:07  fplanque
- * item editing: allow setting to 'redirected' status
- *
- * Revision 1.13  2007/03/05 04:49:17  fplanque
- * better precision for viewcounts
- *
- * Revision 1.12  2007/01/26 04:52:53  fplanque
- * clean comment popups (skins 2.0)
- *
- * Revision 1.11  2006/11/24 18:27:22  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.10  2006/11/13 13:45:23  blueyed
  */
 ?>
