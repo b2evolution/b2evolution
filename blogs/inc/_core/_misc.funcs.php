@@ -3763,7 +3763,7 @@ function get_comments_awaiting_moderation_number( $blog_ID )
  */
 function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs = array(), $script = true )
 {
-	global $current_User;
+	global $current_User, $dispatcher;
 
 	$BlogCache = & get_BlogCache();
 	$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
@@ -3849,6 +3849,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.198  2009/12/06 03:24:11  fplanque
+ * minor/doc/fixes
+ *
  * Revision 1.197  2009/12/06 01:52:54  blueyed
  * Add 'htmlspecialchars' type to format_to_output, same as formvalue, but less irritating. Useful for strmaxlen, which is being used in more places now.
  *

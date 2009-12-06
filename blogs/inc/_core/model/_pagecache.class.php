@@ -64,7 +64,7 @@ class PageCache
 	 */
 	var $cached_page_content = '';
 	/**
-	 * Are we currently recording cache contents for this page?
+	 * Are we currently recording cache contents
 	 */
 	var $is_collecting = false;
 
@@ -354,6 +354,13 @@ class PageCache
         $if_modified_since = strtotime( preg_replace('/;.*$/','',$_SERVER['HTTP_IF_MODIFIED_SINCE']) );
         if( $retrieved_ts <= $if_modified_since )
         {	// Cached version is equal to (or older than) $if_modified since; contents not modified, send 304!
+
+        // fp> IMPORTANT: thsi will not prevent you from logging out but it can prevent you from seeing you're logged out.
+        // It may tell you that the version with the evobar was not modified so your browser will show the evobar again
+        // TODO: investigate ETag & Vary Headers.
+        // Vary on cookie, does that work?
+        // ETag: maybe sending user ID would be enough  and then denying 304 whenever an Etag is sent back
+
 					header( 'HTTP/1.0 304 Not Modified' );
 					exit(0);
         }
@@ -521,6 +528,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.17  2009/12/06 03:24:11  fplanque
+ * minor/doc/fixes
+ *
  * Revision 1.16  2009/12/05 01:21:59  fplanque
  * PageChace 304 handling
  *

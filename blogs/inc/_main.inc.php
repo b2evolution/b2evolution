@@ -78,9 +78,6 @@ define( 'EVO_MAIN_INIT', true );
  * Security check for older PHP versions
  * Contributed by counterpoint / MAMBO team
  */
-// TODO: dh> this makes sense AFAICS. Please review.
-// fp> yeah I don't know about that. If you ask me, i'm not taking chances.
-// if( ini_get('register_globals') )
 {
 	$protects = array( '_REQUEST', '_GET', '_POST', '_COOKIE', '_FILES', '_SERVER', '_ENV', 'GLOBALS', '_SESSION' );
 	foreach( $protects as $protect )
@@ -96,24 +93,6 @@ define( 'EVO_MAIN_INIT', true );
 		}
 	}
 }
-
-/*
- * fp> We might want to kill all auto registered globals this way:
- * TODO: testing
- *
-$superglobals = array($_SERVER, $_ENV, $_FILES, $_COOKIE, $_POST, $_GET);
-if (isset( $_SESSION )) array_unshift ( $superglobals , $_SESSION );
-if (ini_get('register_globals') && !$this->mosConfig_register_globals)
-{
-	foreach ( $superglobals as $superglobal )
-	{
-		foreach ( $superglobal as $key => $value)
-		{
-			unset( $GLOBALS[$key]);
-		}
-	}
-}
-*/
 
 
 /**
@@ -260,15 +239,6 @@ $time_difference = $Settings->get('time_difference');
  */
 $localtimenow = $servertimenow + $time_difference;
 
-
-/**
- * The Hit class
- */
-load_class( 'sessions/model/_hit.class.php', 'Hit' );
-// fp> The following constructor requires these right now:
-load_funcs('_core/_param.funcs.php');
-
-
 /**
  * Locale selection:
  * We need to do this as early as possible in order to set DB connection charset below
@@ -286,6 +256,7 @@ $Debuglog->add( 'Login: default_locale from DB: '.$default_locale, 'locale' );
 $default_locale = locale_from_httpaccept(); // set default locale by autodetect
 $Debuglog->add( 'Login: default_locale from HTTP_ACCEPT: '.$default_locale, 'locale' );
 
+load_funcs('_core/_param.funcs.php');
 if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
 {
 	if( $locale_from_get != $default_locale )
@@ -325,6 +296,10 @@ $DB->set_connection_charset( $current_charset );
 
 
 /**
+ * The Hit class
+ */
+load_class( 'sessions/model/_hit.class.php', 'Hit' );
+/**
  * @global Hit The Hit object
  */
 $Hit = & new Hit(); // This may INSERT a basedomain and a useragent but NOT the HIT itself!
@@ -342,7 +317,7 @@ load_class( 'sessions/model/_session.class.php', 'Session' );
  * @todo dh> makes no sense in CLI mode (no cookie); Add isset() checks to calls on the $Session object, e.g. below?
  *       fp> We might want to use a special session for CLI. And for cron jobs through http as well.
  */
-$Session = & new Session(); // IF this can't pull asesion from the DB it will always INSERT a new one!
+$Session = & new Session(); // If this can't pull a session from the DB it will always INSERT a new one!
 
 /**
  * Handle saving the HIT and updating the SESSION at the end of the page
@@ -691,6 +666,9 @@ if( file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.135  2009/12/06 03:24:11  fplanque
+ * minor/doc/fixes
+ *
  * Revision 1.134  2009/12/04 23:27:50  fplanque
  * cleanup Expires: header handling
  *

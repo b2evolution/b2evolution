@@ -92,7 +92,10 @@ function b2evonet_get_updates( $force_short_delay = false )
 	// Construct XML-RPC client:
 	load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port );
-	// $client->debug = $debug;
+	if( $debug > 1 )
+	{
+		$client->debug = 1;
+	}
 
 	// Run system checks:
 	load_funcs( 'tools/model/_system.funcs.php' );
@@ -178,6 +181,9 @@ function b2evonet_get_updates( $force_short_delay = false )
 
 /*
  * $Log$
+ * Revision 1.24  2009/12/06 03:24:11  fplanque
+ * minor/doc/fixes
+ *
  * Revision 1.23  2009/11/30 01:22:23  fplanque
  * fix wrong version status message rigth after upgrade
  *

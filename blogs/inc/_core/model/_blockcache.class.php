@@ -286,8 +286,12 @@ class BlockCache
 
 }
 
+
 /*
  * $Log$
+ * Revision 1.7  2009/12/06 03:24:11  fplanque
+ * minor/doc/fixes
+ *
  * Revision 1.6  2009/12/01 04:19:25  fplanque
  * even more invalidation dimensions
  *
