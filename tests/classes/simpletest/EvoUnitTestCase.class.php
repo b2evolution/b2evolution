@@ -67,7 +67,7 @@ class EvoUnitTestCase extends UnitTestCase
 
 		// Reload conf and vars.
 		require EVODIR.'blogs/conf/_config.php';
-		require EVODIR.'blogs/inc/_vars.inc.php';
+		require EVODIR.'blogs/inc/_main.inc.php';
 	}
 
 
