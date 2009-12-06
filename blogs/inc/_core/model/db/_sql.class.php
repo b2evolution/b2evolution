@@ -47,13 +47,16 @@ class SQL
 	var $limit = '';
 	var $search_field = array();
 	var $search_field_regexp = array();
+	var $title;
 
 
 	/**
 	 * Constructor.
 	 */
-	function SQL()
+	function SQL($title = NULL)
 	{
+		if( $title )
+			$this->title = $title;
 	}
 
 
@@ -408,6 +411,9 @@ class SQL
 
 /*
  * $Log$
+ * Revision 1.6  2009/12/06 21:47:44  blueyed
+ * SQL: add title property
+ *
  * Revision 1.5  2009/10/11 02:32:18  blueyed
  * todo
  *
