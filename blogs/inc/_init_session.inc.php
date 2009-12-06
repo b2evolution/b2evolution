@@ -107,6 +107,16 @@ if( empty($generating_static) )
 //       This must not be exactly here, but before any output.
 
 
+// The following is needed during login, not sure that's right :/
+load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+/**
+ * Interface to user settings
+ *
+ * @global UserSettings $UserSettings
+ */
+$UserSettings = new UserSettings();
+
+
 // LOGIN:
 // fp> TODO: even if the session already has a user, we still need to get in there... that should be changed.
 $Timer->pause( '_init_session' );
@@ -137,19 +147,16 @@ if( is_logged_in() && $current_User->get('locale') != $current_locale && ! $loca
 }
 
 
-load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
-/**
- * Interface to user settings
- *
- * @global UserSettings $UserSettings
- */
-$UserSettings = new UserSettings();
-
 $Timer->pause( '_init_session' );
 
 
 /*
  * $Log$
+ * Revision 1.2  2009/12/06 05:34:31  fplanque
+ * Violent refactoring for _main.inc.php
+ * Sorry for potential side effects.
+ * This needed to be done badly -- for clarity!
+ *
  * Revision 1.1  2009/12/06 05:20:36  fplanque
  * Violent refactoring for _main.inc.php
  * Sorry for potential side effects.

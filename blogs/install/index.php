@@ -53,8 +53,11 @@ foreach( $modules as $module )
 	require_once $inc_path.$module.'/_'.$module.'.init.php';
 }
 
+// fp> TODO: we may want to try to get the base init into here somehow
+// $require_base_config = false;
+
 require_once $conf_path.'_upgrade.php';
-require_once $inc_path.'_vars.inc.php';
+// no longer exists: require_once $inc_path.'_vars.inc.php';
 load_class( '/_core/model/db/_db.class.php', 'DB' );
 //load_funcs('collections/model/_blog.funcs.php');
 //load_funcs('collections/model/_category.funcs.php');
@@ -68,7 +71,7 @@ load_class( '_core/model/_timer.class.php', 'Timer' );
 
 require_once dirname(__FILE__).'/_functions_install.php';
 
-$Timer = & new Timer('main');
+$Timer = new Timer('main');
 
 load_funcs('_core/_param.funcs.php');
 
@@ -720,6 +723,11 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.190  2009/12/06 05:34:31  fplanque
+ * Violent refactoring for _main.inc.php
+ * Sorry for potential side effects.
+ * This needed to be done badly -- for clarity!
+ *
  * Revision 1.189  2009/11/30 00:22:05  fplanque
  * clean up debug info
  * show more timers in view of block caching
