@@ -77,6 +77,8 @@ $blackList = array(
 	'/search?q=cache:',		// Google cache
 	// redirectors
 	'googlealert.com/',
+	// site status services
+	'host-tracker.com',
 	// add your own...
 );
 
@@ -93,8 +95,9 @@ $blackList = array(
  * @global array $search_engines
  */
 $search_engines = array(
-	'//www.google.', // q=  and optional start= or cd= when using ajax
-	'ask.com/web', // q=
+	'//www.google.',	// q=  and optional start= or cd= when using ajax
+	'//images.google.',
+ 	'//video.google.',
 	'.hotbot.',
 	'.altavista.',
 	'.excite.',
@@ -184,8 +187,8 @@ $known_search_params =  array(
 	'Gw',           // scroogle.org
 	'text',         // yandex.ru
 	'search_query',	// search.ukr.net
-	'wd',			// baidu.com
-	'keywords',		// gde.ru
+	'wd',						// baidu.com
+	'keywords',			// gde.ru
 );
 
 
