@@ -292,6 +292,12 @@ function request_title( $params = array() )
 			'format'              => 'htmlbody',
 			'arcdir_text'         => T_('Archive directory'),
 			'catdir_text'         => T_('Category directory'),
+			'msgform_text'        => T_('Send an email message'),
+			'profile_text'        => T_('User profile'),
+			'user_text'           => T_('User'),
+			'subs_text'           => T_('Subscriptions'),
+			'comments_text'       => T_('Latest comments'),
+			'feedback-popup_text' => T_('Feedback'),
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -325,11 +331,11 @@ function request_title( $params = array() )
 			global $Item;
 			if( isset( $Item ) )
 			{
-				$r[] = sprintf( /* TRANS: %s is an item title */ T_('Latest comments on %s'), $Item->get('title') );
+				$r[] = sprintf( /* TRANS: %s is an item title */ $params['comments_text'] . T_(' on %s'), $Item->get('title') );
 			}
 			else
 			{
-				$r[] = T_('Latest comments');
+				$r[] = $params['comments_text'];
 			}
 			break;
 
@@ -337,22 +343,22 @@ function request_title( $params = array() )
 			// We are requesting the comments on a specific post:
 			// Should be in first position
 			$Item = & $MainList->get_by_idx( 0 );
-			$r[] = sprintf( /* TRANS: %s is an item title */ T_('Feedback on %s'), $Item->get('title') );
+			$r[] = sprintf( /* TRANS: %s is an item title */ $params['feedback-popup_text'] . T_(' on %s'), $Item->get('title') );
 			break;
 
 		case 'profile':
 			// We are requesting the user profile:
-			$r[] = T_('User profile');
+			$r[] = $params['profile_text'];
 			break;
 
 		case 'subs':
 			// We are requesting the subscriptions screen:
-			$r[] = T_('Subscriptions');
+			$r[] = $params['subs_text'];
 			break;
 
 		case 'msgform':
 			// We are requesting the message form:
-			$r[] = T_('Send an email message');
+			$r[] = $params['msgform_text'];
 			break;
 
 		case 'single':
@@ -378,7 +384,7 @@ function request_title( $params = array() )
 
 		case 'user':
 			// We are requesting the message form:
-			$r[] = T_('User');
+			$r[] = $params['user_text'];
 			break;
 
 		default:
@@ -1075,6 +1081,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.69  2009/12/07 20:02:38  leeturner2701
+ * Added support for changing the request_title text for all disp types
+ *
  * Revision 1.68  2009/12/05 01:22:00  fplanque
  * PageChace 304 handling
  *
