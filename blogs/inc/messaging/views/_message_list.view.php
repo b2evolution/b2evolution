@@ -188,7 +188,6 @@ function user_avatar( $user_ID, $user_avatar_file_ID )
 	{
 		return '';
 	}
-
 	return '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-80x80' ).'</a>';
 }
 /**
@@ -290,6 +289,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.25  2009/12/07 23:07:34  blueyed
+ * Whitespace.
+ *
  * Revision 1.24  2009/11/21 13:31:59  efy-maxim
  * 1. users controller has been refactored to users and user controllers
  * 2. avatar tab

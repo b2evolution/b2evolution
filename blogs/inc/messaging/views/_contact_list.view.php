@@ -105,7 +105,6 @@ function user_avatar( $user_ID )
 	}
 	return '';
 }
-
 $Results->cols[] = array(
 					'th' => T_('Avatar'),
 					'th_class' => 'shrinkwrap',
@@ -220,6 +219,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.7  2009/12/07 23:07:34  blueyed
+ * Whitespace.
+ *
  * Revision 1.6  2009/10/11 12:26:07  efy-maxim
  * filter by user login, full name, nick name in contacts list
  *

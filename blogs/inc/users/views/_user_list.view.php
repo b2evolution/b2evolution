@@ -184,7 +184,6 @@ function user_avatar( $user_ID, $user_avatar_file_ID )
 	{
 		return '';
 	}
-
 	return '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-48x48' ).'</a>';
 }
 $Results->cols[] = array(
@@ -328,6 +327,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.21  2009/12/07 23:07:34  blueyed
+ * Whitespace.
+ *
  * Revision 1.20  2009/11/21 13:31:59  efy-maxim
  * 1. users controller has been refactored to users and user controllers
  * 2. avatar tab
