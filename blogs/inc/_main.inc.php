@@ -51,7 +51,7 @@ if( !isset($use_hacks) ) $use_hacks = false;
 
 
 if( defined( 'EVO_MAIN_INIT' ) )
-{ /*
+{	/*
 	 * Prevent double loading since require_once won't work in all situations
 	 * on windows when some subfolders have caps :(
 	 * (Check it out on static page generation)
@@ -61,7 +61,7 @@ if( defined( 'EVO_MAIN_INIT' ) )
 define( 'EVO_MAIN_INIT', true );
 
 
-// Initialize the most masic stuff
+// Initialize the most basic stuff
 require dirname(__FILE__).'/_init_base.inc.php';
 
 
@@ -77,8 +77,8 @@ if( $use_db )
 	$Timer->pause( 'init modules' );
 
 
-	// Initlialize Plugins
-	// AThis this point, teh first hook is "SessionLoaded"
+	// Initialize Plugins
+	// At this point, the first hook is "SessionLoaded"
 	// The dnsbl_antispam plugin is an example that uses this to check the user's IP against a list of DNS blacklists.
 	load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
 	/**
@@ -105,6 +105,9 @@ if( $use_hacks && file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.137  2009/12/07 17:32:51  blueyed
+ * fix typos
+ *
  * Revision 1.136  2009/12/06 05:20:36  fplanque
  * Violent refactoring for _main.inc.php
  * Sorry for potential side effects.
