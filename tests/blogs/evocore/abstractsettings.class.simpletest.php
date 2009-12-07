@@ -128,8 +128,9 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 
 	function test_delete_of_nonexistent()
 	{
-		$this->MockDB->expectCallCount('query', $this->__base_db_calls_count+1);
-		$this->MockDB->expectAt( $this->__base_db_calls_count, 'query', array(
+		$query_count = $this->MockDB->mock->getCallCount('query');
+		$this->MockDB->expectCallCount('query', $query_count+1);
+		$this->MockDB->expectAt( $query_count+1, 'query', array(
 			new IdenticalExpectation("REPLACE INTO testtable (test_name, test_value) VALUES ( 'foobar', '1' )") ), 'DB REPLACE-INTO ok.' );
 
 		// Should not do any query:
@@ -210,8 +211,9 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 
 	function test_get_undefined_then_set_updates_db()
 	{
-		$this->MockDB->expectCallCount('query', $this->__base_db_calls_count+1);
-		$this->MockDB->expectAt( $this->__base_db_calls_count, 'query', array(
+		$query_count = $this->MockDB->mock->getCallCount('query');
+		$this->MockDB->expectCallCount('query', $query_count+1);
+		$this->MockDB->expectAt( $query_count+1, 'query', array(
 			new IdenticalExpectation("REPLACE INTO T_test (key1, key2, val) VALUES ( '1', 'foo', '1' )") ), 'DB REPLACE-INTO ok.' );
 
 		$s = new AbstractSettings( 'T_test', array( 'key1', 'key2' ), 'val', 0 );

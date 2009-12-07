@@ -54,11 +54,6 @@ class EvoMockDbUnitTestCase extends EvoUnitTestCase
 		$this->MockDB->DB( $testDB_conf ); // this will do 2-3 calls to query() already
 		#pre_dump( $this->MockDB, get_class_methods($this->MockDB) ); die;
 
-		// HACK. Required https://sourceforge.net/tracker/?func=detail&aid=2867477&group_id=76550&atid=547458
-		$this->__base_db_calls_count = 2;
-		if( $GLOBALS['debug'] )
-			$this->__base_db_calls_count++;
-
 		$this->old_DB_EvoMockDbUnitTestCache = & $GLOBALS['DB'];
 		$GLOBALS['DB'] = & $this->MockDB;
 	}
