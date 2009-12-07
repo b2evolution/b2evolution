@@ -64,6 +64,7 @@ function display_container( $container, $legend_suffix = '' )
 
 	$Table->display_init();
 	// add ID for jQuery
+	// TODO: fp> Awfully dirty. This should be handled by the Table object
 	$Table->params['head_title'] = str_replace( '<table', '<table id="'.$table_id.'"', $Table->params['head_title'] );
 
 	/*
@@ -212,6 +213,9 @@ echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear" />';
 
 /*
  * $Log$
+ * Revision 1.20  2009/12/07 23:00:17  blueyed
+ * TODO, the 2nd. Please refactor. Users table wants an ID, too. Every results table should have one, makes finding the source for it a lot easier, too.
+ *
  * Revision 1.19  2009/10/12 22:11:28  blueyed
  * Fix blank.gif some: use conditional comments, where marked as being required for IE. Add ALT tags and close tags.
  *
