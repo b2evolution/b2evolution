@@ -100,7 +100,7 @@ class Userfield extends DataObject
 		// get new ID
 		if( param( 'new_ufdf_ID', 'string', NULL ) !== NULL )
 		{
-			param_check_number( 'new_ufdf_ID', T_('ID must be a number'), true );
+			param_check_number( 'new_ufdf_ID', T_('ID must be a number.'), true );
 			$this->set_from_Request( 'ID', 'new_ufdf_ID' );
 		}
 

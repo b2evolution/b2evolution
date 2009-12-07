@@ -86,7 +86,7 @@ class ItemType extends DataObject
 		// get new ID
 		if( param( 'new_ptyp_ID', 'string', NULL ) !== NULL )
 		{
-			param_check_number( 'new_ptyp_ID', T_('ID must be a number'), true );
+			param_check_number( 'new_ptyp_ID', T_('ID must be a number.'), true );
 			$this->set_from_Request( 'ID', 'new_ptyp_ID' );
 		}
 
@@ -135,6 +135,9 @@ class ItemType extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2009/12/07 23:59:09  blueyed
+ * Punctuation.
+ *
  * Revision 1.6  2009/09/29 18:43:58  fplanque
  * doc
  *
