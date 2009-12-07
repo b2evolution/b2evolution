@@ -93,7 +93,6 @@ $servertimenow = time();
 }
 
 
-
 if( !$config_is_done )
 { // base config is not done!
 	$error_message = 'Base configuration is not done! (see /conf/_basic_config.php)';
@@ -271,6 +270,9 @@ $Timer->pause( '_init_base' );
 
 /*
  * $Log$
+ * Revision 1.2  2009/12/07 17:41:20  blueyed
+ * whitespace
+ *
  * Revision 1.1  2009/12/06 05:20:36  fplanque
  * Violent refactoring for _main.inc.php
  * Sorry for potential side effects.
