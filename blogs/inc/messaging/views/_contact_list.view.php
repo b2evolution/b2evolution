@@ -174,17 +174,18 @@ function user_pm ( $block, $user_login )
 }
 
 $Results->cols[] = array(
-					'th' => T_('PM'),
-					'th_class' => 'shrinkwrap',
-					'td_class' => 'shrinkwrap',
-					'td' => '%user_pm( #mct_blocked#, #mct_to_user_login# )%',
-					);
+	'th' => /* TRANS: abbreviation for "Private Message" */ T_('PM'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'shrinkwrap',
+	'td' => '%user_pm( #mct_blocked#, #mct_to_user_login# )%',
+);
 
 $Results->cols[] = array(
-					'th' => /* TRANS: time related */ T_('Last contact'),
-					'th_class' => 'shrinkwrap',
-					'td_class' => 'shrinkwrap',
-					'td' => '%mysql2localedatetime(#mct_last_contact_datetime#)%' );
+	'th' => /* TRANS: time related */ T_('Last contact'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'shrinkwrap',
+	'td' => '%mysql2localedatetime(#mct_last_contact_datetime#)%'
+);
 
 /**
  * Get block/unblock icon
@@ -219,6 +220,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2009/12/07 23:54:13  blueyed
+ * trans doc. indent.
+ *
  * Revision 1.7  2009/12/07 23:07:34  blueyed
  * Whitespace.
  *
