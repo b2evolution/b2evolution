@@ -102,7 +102,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 {	// Permission to edit advanced admin settings
 
 	$Form->begin_fieldset( T_('Aggregation').' ['.T_('Admin').']' );
-		$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Blogs to aggregate'), T_('List blog IDs separated by ,'), 255 );
+		$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Blogs to aggregate'), T_('List blog IDs separated by , or use * for all blogs'), 255 );
 	$Form->end_fieldset();
 
 
@@ -189,6 +189,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.23  2009/12/07 20:07:21  leeturner2701
+ * Update the help text on the Blog Aggregation field to say you can use a * to aggregate all blogs
+ *
  * Revision 1.22  2009/11/30 04:31:38  fplanque
  * BlockCache Proof Of Concept
  *
