@@ -621,6 +621,13 @@ $cron_timeout_delay = 1800; // 30 minutes
 $tags_dash_fix = 0;
 
 
+/**
+ * Use hacks file (DEPRECATED) -- see /inc/_main.inc.php
+ */
+$use_hacks = false;
+
+
+
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
 $evonetsrv_host = 'rpc.b2evolution.net';
 $evonetsrv_port = 80;

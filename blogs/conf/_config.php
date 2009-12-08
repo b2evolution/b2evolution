@@ -84,8 +84,15 @@ if( $debug == 'pwd' )
 	}
 }
 
+// STUFF THAT SHOULD BE INITIALIZED (to avoid param injection on badly configured PHP)
+$use_db = true;
+$use_session = true;
+
 /*
  * $Log$
+ * Revision 1.59  2009/12/08 20:08:48  fplanque
+ * oops
+ *
  * Revision 1.58  2009/12/02 00:05:29  fplanque
  * Debug mode can be turned on & off through the URL with a password
  *
