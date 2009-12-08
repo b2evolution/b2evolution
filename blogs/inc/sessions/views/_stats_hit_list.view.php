@@ -40,19 +40,18 @@ $remote_IP = param( 'remote_IP', 'string', NULL, true );
 
 // Create result set:
 
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( 'SQL_NO_CACHE hit_ID, sess_ID, hit_datetime, hit_referer_type, hit_uri, hit_blog_ID, hit_referer, hit_remote_addr,'
-	. 'user_login, agnt_type, blog_shortname, dom_name, goal_name, keyp_phrase, hit_serprank' );
+	. 'user_login, hit_agent_type, blog_shortname, dom_name, goal_name, keyp_phrase, hit_serprank' );
 $SQL->FROM( 'T_hitlog LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID'
 	. ' LEFT JOIN T_track__keyphrase ON hit_keyphrase_keyp_ID = keyp_ID'
 	. ' LEFT JOIN T_sessions ON hit_sess_ID = sess_ID'
-	. ' LEFT JOIN T_useragents ON hit_agnt_ID = agnt_ID'
 	. ' LEFT JOIN T_blogs ON hit_blog_ID = blog_ID'
 	. ' LEFT JOIN T_users ON sess_user_ID = user_ID'
 	. ' LEFT JOIN T_track__goalhit ON hit_ID = ghit_hit_ID'
 	. ' LEFT JOIN T_track__goal ON ghit_goal_ID = goal_ID' );
 
-$CountSQL = & new SQL();
+$CountSQL = new SQL();
 $CountSQL->SELECT( 'SQL_NO_CACHE COUNT(hit_ID)' );
 $CountSQL->FROM( 'T_hitlog' );
 
@@ -124,8 +123,8 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => T_('U.A.'),
-		'order' => 'agnt_type',
-		'td' => '$agnt_type$',
+		'order' => 'hit_agent_type',
+		'td' => '$hit_agent_type$',
 	);
 
 $Results->cols[] = array(
@@ -183,6 +182,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.11  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.10  2009/09/25 20:26:26  fplanque
  * fixes/doc
  *

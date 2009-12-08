@@ -28,13 +28,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $blog, $admin_url, $rsc_url, $AdminUI;
 
 echo '<h2>'.T_('Hits from RSS/Atom feed readers - Summary').'</h2>';
-echo '<p class="notes">'.sprintf( T_('These are hits from <a %s>XML readers</a>. This includes RSS and Atom readers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_rss=1&amp;blog='.$blog.'"' ).'</p>';
+
 echo '<p class="notes">'.T_('Any user agent accessing the XML feeds will be flagged as an XML reader.').'</p>';
+
 $sql = "
 	SELECT SQL_NO_CACHE COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS year,
 			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
-		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-	 WHERE agnt_type = 'rss'";
+		FROM T_hitlog
+	 WHERE hit_agent_type = 'rss'";
 if( $blog > 0 )
 {
 	$sql .= ' AND hit_blog_ID = '.$blog;
@@ -87,6 +88,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.10  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.9  2009/12/06 22:55:19  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

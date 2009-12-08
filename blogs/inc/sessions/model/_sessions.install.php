@@ -68,17 +68,6 @@ $schema_queries['T_basedomains'] = array(
 			INDEX dom_type  (dom_type)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
 
-// fp> TODO: this table is crap. It has to go.
-$schema_queries['T_useragents'] = array(
-		'Creating table for user agents',
-		"CREATE TABLE T_useragents (
-			agnt_ID        INT UNSIGNED NOT NULL AUTO_INCREMENT,
-			agnt_signature VARCHAR(250) NOT NULL,
-			agnt_type      ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL ,
-			PRIMARY KEY (agnt_ID),
-			INDEX agnt_type ( agnt_type )
-		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
-
 $schema_queries['T_track__keyphrase'] = array(
 		'Creating table for Hit-Logs',
 		"CREATE TABLE T_track__keyphrase (
@@ -103,9 +92,8 @@ $schema_queries['T_hitlog'] = array(
 			hit_serprank					INT UNSIGNED DEFAULT NULL,
 			hit_blog_ID           int(11) UNSIGNED NULL DEFAULT NULL,
 			hit_remote_addr       VARCHAR(40) DEFAULT NULL,
-			hit_agnt_ID           INT UNSIGNED NULL,
+			hit_agent_type				ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL,
 			PRIMARY KEY              (hit_ID),
-			INDEX hit_agnt_ID        ( hit_agnt_ID ),
 			INDEX hit_blog_ID        ( hit_blog_ID ),
 			INDEX hit_uri            ( hit_uri ),
 			INDEX hit_referer_dom_ID ( hit_referer_dom_ID ),
@@ -154,6 +142,9 @@ $schema_queries['T_track__goalhit'] = array(
 
 /*
  * $Log$
+ * Revision 1.14  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.13  2009/09/21 03:16:48  fplanque
  * IPv6
  *

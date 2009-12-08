@@ -27,12 +27,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $blog, $admin_url, $AdminUI;
 
-
 echo '<h2>'.T_('Hits from web browsers - Summary').get_manual_link('browser_hits_summary').'</h2>';
-
-
-echo '<p class="notes">'.sprintf( T_('This page only includes hits identified as made by a <a %s>web browser</a>.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_browser=1&amp;blog='.$blog.'"' ).'</p>';
-
 
 // fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
 // Bug report: http://lists.mysql.com/bugs/36
@@ -43,13 +38,13 @@ echo '<p class="notes">'.sprintf( T_('This page only includes hits identified as
 // References:
 // http://dev.mysql.com/doc/refman/5.0/en/enum.html
 // http://dev.mysql.com/doc/refman/4.1/en/cast-functions.html
-// TODO: I've also limited this to agnt_type "browser" here, according to the change for "referers" (Rev 1.6)
+// TODO: I've also limited this to agent_type "browser" here, according to the change for "referers" (Rev 1.6)
 //       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
 $sql = '
 	SELECT SQL_NO_CACHE COUNT(*) AS hits, CONCAT(hit_referer_type) AS referer_type, EXTRACT(YEAR FROM hit_datetime) AS year,
 			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
-		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-	 WHERE agnt_type = "browser"';
+		FROM T_hitlog
+	 WHERE hit_agent_type = "browser"';
 if( $blog > 0 )
 {
 	$sql .= ' AND hit_blog_ID = '.$blog;
@@ -255,6 +250,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.14  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.13  2009/12/06 22:55:19  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

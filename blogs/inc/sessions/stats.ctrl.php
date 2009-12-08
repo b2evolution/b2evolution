@@ -198,11 +198,6 @@ switch( $tab )
 		}
 		break;
 
-	case 'useragents':
-		$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
-		$AdminUI->breadcrumbpath_add( T_('User agents'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
-		break;
-
 	case 'domains':
 		$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Referring domains'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
@@ -325,11 +320,6 @@ switch( $AdminUI->get_path(1) )
 		}
 		break;
 
-	case 'useragents':
-		// Display VIEW:
-		$AdminUI->disp_view( 'sessions/views/_stats_useragents.view.php' );
-		break;
-
 	case 'domains':
 		// Display VIEW:
 		$AdminUI->disp_view( 'sessions/views/_stats_refdomains.view.php' );
@@ -372,6 +362,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.20  2009/12/06 22:55:21  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

@@ -34,17 +34,17 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 global $blog, $admin_url, $rsc_url;
 
 // Create result set:
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( 'SQL_NO_CACHE hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname,'
 	. 'keyp_phrase, hit_serprank, hit_serprank IS NULL AS is_null_hit_serprank' );
 $SQL->FROM( 'T_hitlog INNER JOIN T_basedomains ON dom_ID = hit_referer_dom_ID'
-	. ' INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID'
 	. ' LEFT JOIN T_track__keyphrase ON hit_keyphrase_keyp_ID = keyp_ID'
 	. ' LEFT JOIN T_blogs ON hit_blog_ID = blog_ID' );
-$SQL->WHERE( 'hit_referer_type = "search" AND agnt_type = "browser"' );
+$SQL->WHERE( 'hit_referer_type = "search" AND hit_agent_type = "browser"' );
 if( ! empty( $blog ) )
 		$SQL->WHERE_and( 'hit_blog_ID = ' . $blog );
-$Results = & new Results( $SQL->get(), 'lstsrch', 'D' );
+
+$Results = new Results( $SQL->get(), 'lstsrch', 'D' );
 
 $Results->title = T_('Search browser hits');
 
@@ -119,6 +119,9 @@ echo '<p class="notes">'.T_('These are hits from people who came to this blog sy
 
 /*
  * $Log$
+ * Revision 1.16  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.15  2009/09/29 00:00:16  blueyed
  * Finish r8131: sort NULL hit_serprank values _always_ to the end.
  *

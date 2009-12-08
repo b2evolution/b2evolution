@@ -197,8 +197,6 @@ $known_search_params =  array(
  *
  * The following substrings will be looked up in the user_agent http header
  *
- * @todo move to admin interface (T_useragents list editor)
- *
  * 'type' aggregator currently gets only used to "translate" user agent strings.
  * An aggregator hit gets detected by accessing the feed.
  *

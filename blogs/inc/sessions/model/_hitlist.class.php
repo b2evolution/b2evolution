@@ -157,18 +157,10 @@ class Hitlist
 			 AND dom_status = 'unknown'" );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_basedomains.', 'request' );
 
-		// Prune entries from T_useragents which are not referenced in T_hitlog anymore.
-		$rows_affected = $DB->query('
-			DELETE T_useragents
-			  FROM T_useragents LEFT JOIN T_hitlog ON agnt_ID = hit_agnt_ID
-			 WHERE hit_agnt_ID IS NULL');
-		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$rows_affected.' rows from T_useragents.', 'request' );
-
 		// Optimizing tables
 		$DB->query('OPTIMIZE TABLE T_hitlog');
 		$DB->query('OPTIMIZE TABLE T_sessions');
 		$DB->query('OPTIMIZE TABLE T_basedomains');
-		$DB->query('OPTIMIZE TABLE T_useragents');
 
 		$Settings->set( 'auto_prune_stats_done', date('Y-m-d H:i:s', $localtimenow) ); // save exact datetime
 		$Settings->dbupdate();
@@ -179,6 +171,9 @@ class Hitlist
 
 /*
  * $Log$
+ * Revision 1.21  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.20  2009/11/30 00:22:05  fplanque
  * clean up debug info
  * show more timers in view of block caching
@@ -193,7 +188,7 @@ class Hitlist
  * Hitlist: Optimize tables after pruning entries.
  *
  * Revision 1.16  2009/09/19 12:52:54  blueyed
- * Remove obsolete entries from T_useragents when pruning hitlog info.
+ * Remove obsolete entries from T_ user agents when pruning hitlog info.
  *
  * Revision 1.15  2009/09/14 18:37:07  fplanque
  * doc/cleanup/minor
@@ -221,24 +216,5 @@ class Hitlist
  *
  * Revision 1.7  2009/07/02 00:01:50  fplanque
  * needs optimization.
- *
- * Revision 1.6  2009/06/15 18:50:50  blueyed
- * Fix SQL in session pruning: s/FOM/FROM/
- *
- * Revision 1.5  2009/06/14 14:58:09  blueyed
- * Use get_row to select sess_IDs for session pruning
- *
- * Revision 1.4  2009/06/14 12:17:32  yabs
- * adding BeforeSessionsDelete trigger to enable plugins to perform housekeeping based on the sessions that are about to be pruned
- *
- * Revision 1.3  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.2  2008/01/21 09:35:33  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:00:58  fplanque
- * MODULES (refactored MVC)
- *
  */
 ?>

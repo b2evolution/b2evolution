@@ -103,11 +103,9 @@ function refererList(
 	}
 
 	$sql_from_where = "
-			  FROM T_hitlog
-			 INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID
-			  LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
+			  FROM T_hitlog LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
 			 WHERE hit_referer_type IN (".$type.")
-			   AND agnt_type = 'browser'";
+			   AND hit_agent_type = 'browser'";
 	if( !empty($blog_ID) )
 	{
 		$sql_from_where .= " AND hit_blog_ID = '".$blog_ID."'";
@@ -292,6 +290,9 @@ function stats_search_keywords( $keyphrase, $length = 45 )
 
 /*
  * $Log$
+ * Revision 1.20  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.19  2009/10/03 20:43:40  tblue246
  * Commit message cleanup...
  *

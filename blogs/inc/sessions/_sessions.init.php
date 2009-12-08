@@ -42,7 +42,6 @@ $db_config['aliases']['T_track__keyphrase'] = $tableprefix.'track__keyphrase';
 $db_config['aliases']['T_sessions'] = $tableprefix.'sessions';
 $db_config['aliases']['T_track__goal'] = $tableprefix.'track__goal';
 $db_config['aliases']['T_track__goalhit'] = $tableprefix.'track__goalhit';
-$db_config['aliases']['T_useragents'] = $tableprefix.'useragents';
 
 
 /**
@@ -233,9 +232,6 @@ class sessions_Module extends Module
 								'other' => array(
 									'text' => T_('Direct B-hits'),
 									'href' => $dispatcher.'?ctrl=stats&amp;tab=other&amp;blog='.$blog ),
-								'useragents' => array(
-									'text' => T_('User agents'),
-									'href' => $dispatcher.'?ctrl=stats&amp;tab=useragents&amp;blog='.$blog ),
 								'domains' => array(
 									'text' => T_('Referring domains'),
 									'href' => $dispatcher.'?ctrl=stats&amp;tab=domains&amp;blog='.$blog ),
@@ -343,6 +339,9 @@ $sessions_Module = & new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.27  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.26  2009/11/21 13:31:59  efy-maxim
  * 1. users controller has been refactored to users and user controllers
  * 2. avatar tab

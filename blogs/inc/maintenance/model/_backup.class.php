@@ -109,7 +109,6 @@ $backup_tables = array(
 			'T_basedomains',
 			'T_track__goalhit',
 			'T_track__keyphrase',
-			'T_useragents',
 		),
 		'included' => false ) );
 
@@ -597,6 +596,9 @@ class Backup
 
 /*
  * $Log$
+ * Revision 1.8  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.7  2009/11/22 19:15:34  efy-maxim
  * load class
  *

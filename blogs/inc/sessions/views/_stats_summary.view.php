@@ -27,27 +27,23 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $blog, $admin_url, $AdminUI;
 
-
 echo '<h2>'.T_('Global hits - Summary').get_manual_link('global_hits_summary').'</h2>';
-
-echo '<p class="notes">'.sprintf( T_('This page includes all recorded hits, split down by <a %s>user agent</a> type.'), ' href="?ctrl=stats&tab=useragents&blog='.$blog.'"' ).'</p>';
-
 
 // fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
 // Bug report: http://lists.mysql.com/bugs/36
 // Solution : CAST to string
-// TODO: I've also limited this to agnt_type "browser" here, according to the change for "referers" (Rev 1.6)
+// TODO: I've also limited this to hit_agent_type "browser" here, according to the change for "referers" (Rev 1.6)
 //       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
 $sql = '
-	SELECT SQL_NO_CACHE COUNT(*) AS hits, agnt_type, EXTRACT(YEAR FROM hit_datetime) AS year,
+	SELECT SQL_NO_CACHE COUNT(*) AS hits, hit_agent_type, EXTRACT(YEAR FROM hit_datetime) AS year,
 			   EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day
-		FROM T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID';
+		FROM T_hitlog';
 if( $blog > 0 )
 {
 	$sql .= ' WHERE hit_blog_ID = '.$blog;
 }
-$sql .= ' GROUP BY year, month, day, agnt_type
-					ORDER BY year DESC, month DESC, day DESC, agnt_type';
+$sql .= ' GROUP BY year, month, day, hit_agent_type
+					ORDER BY year DESC, month DESC, day DESC, hit_agent_type';
 $res_hits = $DB->get_results( $sql, ARRAY_A, 'Get hit summary' );
 
 
@@ -85,7 +81,7 @@ if( count($res_hits) )
 				array_unshift( $chart[ 'chart_data' ][ 3 ], 0 );
 				array_unshift( $chart[ 'chart_data' ][ 4 ], 0 );
 		}
-		$col = $col_mapping[$row_stats['agnt_type']];
+		$col = $col_mapping[$row_stats['hit_agent_type']];
 		$chart['chart_data'][$col][0] = $row_stats['hits'];
 	}
 
@@ -169,8 +165,8 @@ if( count($res_hits) )
 			}
 
 			// Increment hitcounter:
-			$hits[$row_stats['agnt_type']] = $row_stats['hits'];
-			$hits_total[$row_stats['agnt_type']] += $row_stats['hits'];
+			$hits[$row_stats['hit_agent_type']] = $row_stats['hits'];
+			$hits_total[$row_stats['hit_agent_type']] += $row_stats['hits'];
 		}
 
 		if( $last_date != 0 )
@@ -213,6 +209,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.14  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.13  2009/12/06 22:55:19  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

@@ -34,14 +34,14 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 global $blog, $admin_url, $rsc_url, $AdminUI;
 
 echo '<h2>'.T_('Hits from indexing robots / spiders / crawlers - Summary').'</h2>';
-echo '<p class="notes">'.sprintf( T_('This page only includes hits identified as made by <a %s>indexing robots</a> a.k.a. web crawlers.'), ' href="?ctrl=stats&amp;tab=useragents&amp;agnt_robot=1&amp;blog='.$blog.'"' ).'</p>';
+
 echo '<p class="notes">'.T_('In order to be detected, robots must be listed in /conf/_stats.php.').'</p>';
 
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS hits, EXTRACT(YEAR FROM hit_datetime) AS year,'
 	. 'EXTRACT(MONTH FROM hit_datetime) AS month, EXTRACT(DAY FROM hit_datetime) AS day' );
-$SQL->FROM( 'T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID' );
-$SQL->WHERE( 'agnt_type = "robot"' );
+$SQL->FROM( 'T_hitlog' );
+$SQL->WHERE( 'hit_agent_type = "robot"' );
 if( $blog > 0 )
 {
 	$SQL->WHERE_and( 'hit_blog_ID = ' . $blog );
@@ -96,12 +96,12 @@ if( count($res_hits) )
 
 
 // TOP INDEXING ROBOTS
-
+/* put this back when we have a CONCISE table of robots
 // Create result set:
 $SQL = & new SQL();
 $SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS hit_count, agnt_signature' );
-$SQL->FROM( 'T_hitlog INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID' );
-$SQL->WHERE( 'agnt_type = "robot"' );
+$SQL->FROM( 'T_hitlog' );
+$SQL->WHERE( 'hit_agent_type = "robot"' );
 if( ! empty( $blog ) )
 	$SQL->WHERE_and( 'hit_blog_ID = ' . $blog );
 $SQL->GROUP_BY( 'agnt_signature' );
@@ -121,7 +121,7 @@ $Results->title = T_('Top Indexing Robots');
 /**
  * Helper function to translate agnt_signature to a "human-friendly" version from {@link $user_agents}.
  * @return string
- */
+ *
 function translate_user_agent( $agnt_signature )
 {
 	global $user_agents;
@@ -170,10 +170,13 @@ $Results->cols[] = array(
 
 // Display results:
 $Results->display();
-
+*/
 
 /*
  * $Log$
+ * Revision 1.13  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.12  2009/12/06 22:55:20  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

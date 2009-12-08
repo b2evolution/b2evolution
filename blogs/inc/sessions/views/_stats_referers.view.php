@@ -42,9 +42,8 @@ $SQL = & new SQL();
 $SQL->SELECT( 'SQL_NO_CACHE hit_ID, hit_datetime, hit_referer, dom_name, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname' );
 $SQL->FROM( 'T_hitlog INNER JOIN T_basedomains ON dom_ID = hit_referer_dom_ID'
 	. ' INNER JOIN T_sessions ON hit_sess_ID = sess_ID'
-	. ' INNER JOIN T_useragents ON hit_agnt_ID = agnt_ID'
 	. ' LEFT JOIN T_blogs ON hit_blog_ID = blog_ID' );
-$SQL->WHERE( 'hit_referer_type = "referer" AND agnt_type = "browser"' );
+$SQL->WHERE( 'hit_referer_type = "referer" AND hit_agent_type = "browser"' );
 if( ! empty( $blog ) )
 	$SQL->WHERE_and( 'hit_blog_ID = ' . $blog );
 $Results = & new Results( $SQL->get(), 'lstref_', 'D' );
@@ -211,6 +210,9 @@ if( count( $res_stats ) )
 
 /*
  * $Log$
+ * Revision 1.13  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.12  2009/09/25 13:09:36  efy-vyacheslav
  * Using the SQL class to prepare queries
  *

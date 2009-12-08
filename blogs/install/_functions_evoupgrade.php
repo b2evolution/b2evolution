@@ -924,7 +924,7 @@ function upgrade_b2evo_tables()
 			$DB->query( "CREATE TABLE T_useragents (
 										agnt_ID        INT UNSIGNED NOT NULL AUTO_INCREMENT,
 										agnt_signature VARCHAR(250) NOT NULL,
-										agnt_type      ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL ,
+										agnt_type      ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL,
 										PRIMARY KEY (agnt_ID) )" );
 			echo "OK.<br />\n";
 
@@ -2571,6 +2571,12 @@ function upgrade_b2evo_tables()
 	}
 
 
+	db_add_col( 'T_hitlog', 'hit_agent_type', "ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL AFTER hit_remote_addr" );
+	// UPDATE SET T_hitlog.hit_agent_type = T_useragent.agnt_type
+	// DEL agnt_type
+	// DEL evo_useragent table
+
+
 	/* Wait until we're sure and no longer experimental for that one...
 	task_begin( 'Moving user data to fields' );
 	// ICQ
@@ -2728,11 +2734,11 @@ function upgrade_b2evo_tables()
 
 			if( !empty( $form_action ) )
 			{
-				$Form = & new Form( $form_action, '', 'post' );
+				$Form = new Form( $form_action, '', 'post' );
 			}
 			else
 			{
-				$Form = & new Form( NULL, '', 'post' );
+				$Form = new Form( NULL, '', 'post' );
 			}
 
 			$Form->begin_form( 'fform', T_('Upgrade database') );
@@ -2769,6 +2775,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.347  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.346  2009/12/01 21:35:56  blueyed
  * Merge from whissip: use get_row to not fetch all rows. Use proper category urlnames on upgrade.
  *

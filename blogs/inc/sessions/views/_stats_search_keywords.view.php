@@ -116,9 +116,8 @@ else
 			$SQL->WHERE_and( 'goalhit_hit.hit_datetime <= '.$DB->quote($datestop.' 23:59:59') );
 		}
 	}
-	$SQL->FROM_add( 'INNER JOIN T_useragents ON T_hitlog.hit_agnt_ID = agnt_ID' );
 	$SQL->WHERE_and( ' T_hitlog.hit_referer_type = "search"
-						 				AND agnt_type = "browser"' );
+						 				AND hit_agent_type = "browser"' );
 	if( $split_engines )
 	{
 		$SQL->GROUP_BY( 'keyp_ID, T_hitlog.hit_referer_dom_ID' );
@@ -271,6 +270,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.7  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.6  2009/09/25 07:33:14  efy-cantor
  * replace get_cache to get_*cache
  *

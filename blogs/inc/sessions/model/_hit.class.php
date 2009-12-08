@@ -135,8 +135,6 @@ class Hit
 	/**
 	 * The user agent type.
 	 *
-	 * The default setting ('unknown') is taken for new entries (into T_useragents),
-	 * that are not detected as 'rss', 'robot' or 'browser'.
 	 * 'rss'|'robot'|'browser'|'unknown'
 	 *
 	 * @see Hit::get_agent_type()
@@ -144,15 +142,6 @@ class Hit
 	 * @var string
 	 */
 	var $agent_type;
-
-	/**
-	 * The ID of the user agent entry in T_useragents.
-	 * @see Hit::get_agent_ID()
-	 * @access protected
-	 * @var integer
-	 */
-	var $agent_ID;
-
 
 	/**
 	 * Extracted from search referers:
@@ -385,7 +374,7 @@ class Hit
 
 	/**
 	 * Set {@link $user_agent} and detect the browser.
-	 * This function also handles the relations with T_useragents and sets {@link $agent_type}.
+	 * This function also sets {@link $agent_type}.
 	 */
 	function detect_useragent()
 	{
@@ -690,11 +679,11 @@ class Hit
 		$sql = "
 			INSERT INTO T_hitlog(
 				hit_sess_ID, hit_datetime, hit_uri, hit_referer_type,
-				hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agnt_ID )
+				hit_referer, hit_referer_dom_ID, hit_keyphrase_keyp_ID, hit_serprank, hit_blog_ID, hit_remote_addr, hit_agent_type )
 			VALUES( '".$Session->ID."', FROM_UNIXTIME(".$localtimenow."), '".$DB->escape($hit_uri)."', '".$this->referer_type
 				."', '".$DB->escape($hit_referer)."', ".$DB->null($this->get_referer_domain_ID()).', '.$DB->null($keyp_ID)
-				.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', ".$this->get_agent_ID().'
-			)';
+				.', '.$DB->null($serprank).', '.$DB->null($blog_ID).", '".$DB->escape( $this->IP )."', '".$this->get_agent_type()."'
+			)";
 
 		$DB->query( $sql, 'Record the hit' );
 
@@ -835,78 +824,6 @@ class Hit
 
 
 	/**
-	 * Get DB ID for current user agent. This is used when logging the hit.
-	 *
-	 * @return integer
-	 */
-	function get_agent_ID()
-	{
-		if( ! isset($this->agent_ID) )
-		{
-			global $DB;
-			$sql_agent_types = array($this->get_agent_type());
-			if( $sql_agent_types[0] != 'unknown' )
-			{
-				$sql_agent_types[] = 'unknown';
-			}
-
-			$DB->begin(); // this _should_ be atomic
-			if( $rows = $DB->get_results( "
-				SELECT agnt_ID, agnt_type FROM T_useragents
-				 WHERE agnt_signature = ".$DB->quote( $this->get_user_agent() )."
-					 AND agnt_type IN (".$DB->quote($sql_agent_types).")" ) )
-			{ // this agent (with that type or "unknown") hit us once before, re-use ID
-				if( $DB->num_rows == 1 )
-				{ // just one result, that's it
-					$this->agent_ID = $rows[0]->agnt_ID;
-					if( $rows[0]->agnt_type == 'unknown' && $sql_agent_types[0] != 'unknown' )
-					{ // type is "unknown", but known now: update type
-						$DB->query( "
-							UPDATE T_useragents
-							   SET agnt_type = ".$DB->quote($sql_agent_types[0])."
-							 WHERE agnt_ID = ".$this->agent_ID );
-					}
-				}
-				else
-				{ // Two (or more) rows selected.
-					// Typically this is "unknown" and detected type (from before the case above was handled).
-					// But this might also be two "rss" entries, or even two (or more) "unknown" (since this is not atomic here!)
-					$existing_ids = array();
-					foreach($rows as $row)
-					{
-						if( $row->agnt_type == 'unknown' )
-						{ // append "unknown" at the end
-							$existing_ids[] = $row->agnt_ID;
-						}
-						else
-						{
-							array_unshift($existing_ids, $row->agnt_ID);
-						}
-					}
-					$this->agent_ID = array_shift($existing_ids);
-					// Convert entries
-					$DB->query( '
-						UPDATE T_hitlog
-						   SET hit_agnt_ID = '.$this->agent_ID.'
-						   WHERE hit_agnt_ID IN ('.$DB->quote($existing_ids).')' );
-					$DB->query( 'DELETE FROM T_useragents WHERE agnt_ID IN ('.$DB->quote($existing_ids).')' );
-				}
-			}
-			else
-			{ // create new user agent entry
-				$DB->query( "
-					INSERT INTO T_useragents ( agnt_signature, agnt_type )
-					VALUES ( ".$DB->quote( $this->get_user_agent() ).", ".$DB->quote($this->get_agent_type())." )" );
-
-				$this->agent_ID = $DB->insert_id;
-			}
-			$DB->commit();
-		}
-		return $this->agent_ID;
-	}
-
-
-	/**
 	 * Get the remote hostname.
 	 *
 	 * @return string
@@ -978,15 +895,14 @@ class Hit
 					 LIMIT 1";
 			}
 			else
-			{ // select by remote_addr/agnt_signature:
+			{ // select by remote_addr/hit_agent_type:
 				$sql = "
 					SELECT SQL_NO_CACHE hit_ID
-					  FROM T_hitlog INNER JOIN T_useragents
-					    ON hit_agnt_ID = agnt_ID
+					  FROM T_hitlog
 					 WHERE hit_datetime > '".date( 'Y-m-d H:i:s', $localtimenow - $Settings->get('reloadpage_timeout') )."'
 					   AND hit_remote_addr = ".$DB->quote( $this->IP )."
 					   AND hit_uri = '".$DB->escape( substr($ReqURI, 0, 250) )."'
-					   AND agnt_signature = ".$DB->quote($this->get_user_agent())."
+					   AND hit_agent_type = ".$DB->quote($this->get_agent_type())."
 					 LIMIT 1";
 			}
 			if( $DB->get_var( $sql, 0, 0, 'Hit: Check for reload' ) )
@@ -1224,12 +1140,15 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.49  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.48  2009/11/30 00:22:05  fplanque
  * clean up debug info
  * show more timers in view of block caching
  *
  * Revision 1.47  2009/11/24 01:03:00  blueyed
- * Fix transformation of duplicate entries in T_useragents.
+ * Fix transformation of duplicate entries in T_ user agents.
  *
  * Revision 1.46  2009/11/15 19:05:44  fplanque
  * no message
@@ -1301,116 +1220,5 @@ class Hit
  *
  * Revision 1.26  2009/07/08 02:38:55  sam2kb
  * Replaced strlen & substr with their mbstring wrappers evo_strlen & evo_substr when needed
- *
- * Revision 1.25  2009/05/10 00:28:51  fplanque
- * serp rank logging
- *
- * Revision 1.24  2009/03/21 23:00:21  fplanque
- * minor
- *
- * Revision 1.23  2009/03/21 01:00:41  waltercruz
- * Fixing http://forums.b2evolution.net//viewtopic.php?p=89122
- *
- * Revision 1.22  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.21  2009/03/06 14:11:09  tblue246
- * doc
- *
- * Revision 1.20  2009/03/04 00:10:42  blueyed
- * Make Hit constructor more lazy.
- *  - Move referer_dom_ID generation/fetching to own method
- *  - wrap Debuglog additons with "debug"
- *  - Conditionally call detect_useragent, if required. Move
- *    vars to methods for this
- *  - get_user_agent alone does not require detect_useragent
- * Feel free to revert it (since it changed all the is_foo vars
- * to methods - PHP5 would allow to use __get to handle legacy
- * access to those vars however), but please consider also
- * removing this stuff from HTML classnames, since that is kind
- * of disturbing/unreliable by itself).
- *
- * Revision 1.19  2009/03/03 20:32:11  blueyed
- * TODO about making Hit more lazy.
- *
- * Revision 1.18  2009/03/03 20:23:46  blueyed
- * Move extract_keyphrase_from_referer to Hit class. Otherwise it should get moved to hit.funcs.
- *
- * Revision 1.17  2009/02/23 20:34:31  blueyed
- * Cleanup whitespace/indent in comments for known_search_params
- *
- * Revision 1.16  2009/02/23 07:45:37  sam2kb
- * Added 'text' to known_search_params
- *
- * Revision 1.15  2009/02/13 19:57:50  blueyed
- * doc, indent
- *
- * Revision 1.14  2008/12/28 19:02:19  fplanque
- * minor
- *
- * Revision 1.13  2008/06/30 21:24:20  blueyed
- * - convert_charset(): auto-detect source encoding, if not given (UTF-8, ISO-8859-1, ISO-8859-15)
- * - extract_keyphrase_from_referer: use convert_charset() to convert query string to $evo_charset
- *
- * Revision 1.12  2008/05/10 22:59:10  fplanque
- * keyphrase logging
- *
- * Revision 1.10  2008/05/07 18:07:12  fplanque
- * trying to fix.
- *
- * Revision 1.9  2008/05/01 18:53:42  blueyed
- * Fix SQL injection through $blog
- *
- * Revision 1.8  2008/04/26 22:23:59  fplanque
- * reverted dirty hack (you must treat search engines through conf file)
- *
- * Revision 1.6  2008/02/19 11:11:18  fplanque
- * no message
- *
- * Revision 1.5  2008/01/21 09:35:33  fplanque
- * (c) 2008
- *
- * Revision 1.4  2008/01/19 15:45:28  fplanque
- * refactoring
- *
- * Revision 1.3  2007/09/18 00:00:59  fplanque
- * firefox mac specific forms
- *
- * Revision 1.2  2007/09/17 02:36:25  fplanque
- * CSS improvements
- *
- * Revision 1.1  2007/06/25 11:00:57  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.49  2007/04/27 09:11:37  fplanque
- * saving "spam" referers again (instead of buggy empty referers)
- *
- * Revision 1.48  2007/04/26 00:11:11  fplanque
- * (c) 2007
- *
- * Revision 1.47  2007/03/25 15:07:38  fplanque
- * multiblog fixes
- *
- * Revision 1.46  2007/02/19 13:15:34  waltercruz
- * Changing double quotes to single quotes in queries
- *
- * Revision 1.45  2007/02/06 13:44:05  waltercruz
- * Changing double quotes to single quotes
- *
- * Revision 1.44  2007/02/06 00:03:38  waltercruz
- * Changing double quotes to single quotes
- *
- * Revision 1.43  2006/12/07 23:13:11  fplanque
- * @var needs to have only one argument: the variable type
- * Otherwise, I can't code!
- *
- * Revision 1.42  2006/11/24 18:27:24  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
- *
- * Revision 1.41  2006/10/07 20:45:11  blueyed
- * Handle logging with referers longer than 250 chars
- *
- * Revision 1.40  2006/10/06 21:54:16  blueyed
- * Fixed hit_uri handling, especially in strict mode
  */
 ?>

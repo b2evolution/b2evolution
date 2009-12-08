@@ -53,18 +53,17 @@ if( param_errors_detected() )
 else
 {
 	// Create result set:
-	$SQL = & new SQL();
+	$SQL = new SQL();
 	$SQL->SELECT( 'hit_ID, sess_ID, sess_hitcount, hit_datetime, hit_referer_type, hit_uri, hit_blog_ID, hit_referer, hit_remote_addr,
-									user_login, agnt_type, dom_name, goal_name, keyp_phrase' );
+									user_login, hit_agent_type, dom_name, goal_name, keyp_phrase' );
 	$SQL->FROM( 'T_track__goalhit LEFT JOIN T_hitlog ON ghit_hit_ID = hit_ID
 									LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID
 								  LEFT JOIN T_track__keyphrase ON hit_keyphrase_keyp_ID = keyp_ID
 									LEFT JOIN T_sessions ON hit_sess_ID = sess_ID
-									LEFT JOIN T_useragents ON hit_agnt_ID = agnt_ID
 									LEFT JOIN T_users ON sess_user_ID = user_ID
 									LEFT JOIN T_track__goal ON ghit_goal_ID = goal_ID' );
 
-	$SQL_count = & new SQL();
+	$SQL_count = new SQL();
 	$SQL_count->SELECT( 'COUNT(ghit_ID)' );
 	$SQL_count->FROM( 'T_track__goalhit LEFT JOIN T_hitlog ON ghit_hit_ID = hit_ID' );
 
@@ -154,8 +153,8 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => T_('U.A.'),
-		'order' => 'agnt_type',
-		'td' => '$agnt_type$',
+		'order' => 'hit_agent_type',
+		'td' => '$hit_agent_type$',
 	);
 
 $Results->cols[] = array(
@@ -191,6 +190,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.7  2009/12/08 22:38:13  fplanque
+ * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
+ *
  * Revision 1.6  2009/09/20 00:27:08  fplanque
  * cleanup/doc/simplified
  *
