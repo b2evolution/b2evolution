@@ -331,7 +331,7 @@ function request_title( $params = array() )
 			global $Item;
 			if( isset( $Item ) )
 			{
-				$r[] = sprintf( /* TRANS: %s is an item title */ $params['comments_text'] . T_(' on %s'), $Item->get('title') );
+				$r[] = sprintf( $params['comments_text'] . T_(' on %s'), $Item->get('title') );
 			}
 			else
 			{
@@ -343,7 +343,7 @@ function request_title( $params = array() )
 			// We are requesting the comments on a specific post:
 			// Should be in first position
 			$Item = & $MainList->get_by_idx( 0 );
-			$r[] = sprintf( /* TRANS: %s is an item title */ $params['feedback-popup_text'] . T_(' on %s'), $Item->get('title') );
+			$r[] = sprintf( $params['feedback-popup_text'] . T_(' on %s'), $Item->get('title') );
 			break;
 
 		case 'profile':
@@ -1081,6 +1081,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.70  2009/12/08 20:21:10  fplanque
+ * no message
+ *
  * Revision 1.69  2009/12/07 20:02:38  leeturner2701
  * Added support for changing the request_title text for all disp types
  *
