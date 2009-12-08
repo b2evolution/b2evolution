@@ -216,7 +216,7 @@ switch( $action )
 
 	case 'new':
 	case 'new_mass':
-		$set_issue_date = 'now';
+		// $set_issue_date = 'now';
 		$item_issue_date = date_i18n( locale_datefmt(), $localtimenow );
 		$item_issue_time = date( 'H:i:s', $localtimenow );
 		// pre_dump( $item_issue_date, $item_issue_time );
@@ -224,7 +224,7 @@ switch( $action )
 		// New post form  (can be a bookmarklet form if mode == bookmarklet )
 
 		load_class( 'items/model/_item.class.php', 'Item' );
-		$edited_Item = & new Item();
+		$edited_Item = new Item();
 
 		$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 
@@ -337,8 +337,6 @@ switch( $action )
 		$item_tags = implode( ', ', $edited_Item->get_tags() );
 		$trackback_url = '';
 
-		$set_issue_date = 'set';
-
 		// Page title:
 		$js_doc_title_prefix = T_('Editing post').': ';
 		$AdminUI->title = $js_doc_title_prefix.$edited_Item->dget( 'title', 'htmlhead' );
@@ -360,10 +358,8 @@ switch( $action )
 		if( $action == 'create_publish' )
 		{
 			if( ! in_array( $post_status, array( 'private', 'protected' ) ) )
-			{	/* Only use "published" if something other than "private"
-				   or "protected" has been selected: */
+			{	// Only use "published" if something other than "private" or "protected" has been selected:
 				$post_status = 'published';
-				$set_issue_date = 'now';
 			}
 			else
 			{
@@ -384,7 +380,7 @@ switch( $action )
 
 		// CREATE NEW POST:
 		load_class( 'items/model/_item.class.php', 'Item' );
-		$edited_Item = & new Item();
+		$edited_Item = new Item();
 
 		// Set the params we already got:
 		$edited_Item->set( 'status', $post_status );
@@ -489,7 +485,6 @@ switch( $action )
 			{	/* Only use "published" if something other than "private"
 				   or "protected" has been selected: */
 				$post_status = 'published';
-				$set_issue_date = 'now';
 			}
 			else
 			{
@@ -1258,6 +1253,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.80  2009/12/08 20:16:12  fplanque
+ * Better handling of the publish! button on post forms
+ *
  * Revision 1.79  2009/12/06 22:55:17  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

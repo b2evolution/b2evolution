@@ -215,6 +215,12 @@ class Item extends ItemLight
 	 */
 	var $Links = NULL;
 
+	/**
+	 * Has the publish date been explicitely set?
+ 	 *
+	 * @var integer
+	 */
+	var $dateset = 1;
 
 	var $priorities;
 
@@ -257,10 +263,11 @@ class Item extends ItemLight
 				$this->creator_user_login = $current_User->login;
 				$this->set_creator_User( $current_User );
 			}
+			$this->set( 'dateset', 0 );	// Date not explicitely set yet
 			$this->set( 'notifications_status', 'noreq' );
 			// Set the renderer list to 'default' will trigger all 'opt-out' renderers:
 			$this->set( 'renderers', array('default') );
-			$this->set( 'status', 'published' );
+			// we prolluy don't need this: $this->set( 'status', 'published' );
 			$this->set( 'locale', $default_locale );
 			$this->set( 'priority', 3 );
 			$this->set( 'ptyp_ID', 1 /* Post */ );
@@ -271,6 +278,7 @@ class Item extends ItemLight
 			$this->creator_user_ID = $db_row->post_creator_user_ID; // Needed for history display
 			$this->lastedit_user_ID = $db_row->post_lastedit_user_ID; // Needed for history display
 			$this->assigned_user_ID = $db_row->post_assigned_user_ID;
+			$this->dateset = $db_row->post_dateset;
 			$this->status = $db_row->post_status;
 			$this->content = $db_row->post_content;
 			$this->titletag = $db_row->post_titletag;
@@ -397,7 +405,7 @@ class Item extends ItemLight
 	 */
 	function load_from_Request( $editing = false )
 	{
-		global $default_locale, $current_User, $localtimenow, $set_issue_date;
+		global $default_locale, $current_User, $localtimenow;
 		global $posttypes_reserved_IDs, $item_typ_ID;
 
 		if( param( 'post_locale', 'string', NULL ) !== NULL )
@@ -428,11 +436,9 @@ class Item extends ItemLight
 
 		if( $current_User->check_perm( 'edit_timestamp' ) )
 		{
-			$set_issue_date = param( 'set_issue_date', 'string', '' );
+			$this->set( 'dateset', param( 'item_dateset', 'integer', 0 ) );
 
-			// pre_dump( $set_issue_date, $editing );
-
-			if( $editing || $set_issue_date == 'set' )
+			if( $editing || $this->dateset == 1 )
 			{ // We can use user date:
 				if( param_date( 'item_issue_date', T_('Please enter a valid issue date.'), true )
 					&& param_time( 'item_issue_time' ) )
@@ -440,7 +446,7 @@ class Item extends ItemLight
 					$this->set( 'issue_date', form_date( get_param( 'item_issue_date' ), get_param( 'item_issue_time' ) ) ); // TODO: cleanup...
 				}
 			}
-			elseif( $set_issue_date == 'now' )
+			elseif( $this->dateset == 0 )
 			{	// Set date to NOW:
 				$this->set( 'issue_date', date('Y-m-d H:i:s', $localtimenow) );
 			}
@@ -3279,6 +3285,11 @@ class Item extends ItemLight
 
 		$DB->begin();
 
+		if( $this->status != 'draft' )
+		{	// The post is getting published in some form, set the publish date so it doesn't get auto updated in the future:
+			$this->set( 'dateset', 1 );
+		}
+
 		if( empty($this->creator_user_ID) )
 		{ // No creator assigned yet, use current user:
 			$this->set_creator_User( $current_User );
@@ -3331,6 +3342,11 @@ class Item extends ItemLight
 		global $DB, $Plugins;
 
 		$DB->begin();
+
+		if( $this->status != 'draft' )
+		{	// The post is getting published in some form, set the publish date so it doesn't get auto updated in the future:
+			$this->set( 'dateset', 1 );
+		}
 
 		// validate url title / slug
 		if( empty($this->urltitle) || isset($this->dbchanges['post_urltitle']) )
@@ -4112,6 +4128,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.167  2009/12/08 20:16:12  fplanque
+ * Better handling of the publish! button on post forms
+ *
  * Revision 1.166  2009/12/03 23:03:15  blueyed
  * Item::get_content_excerpt: use strmaxlen. Fixes broken chars when cut in the middle.
  *

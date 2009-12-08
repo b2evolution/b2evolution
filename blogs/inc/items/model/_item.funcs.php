@@ -846,26 +846,40 @@ function visibility_select( & $Form, $post_status, $mass_create = false )
  */
 function issue_date_control( $Form, $break = false )
 {
-	global $edited_Item, $set_issue_date;
+	global $edited_Item;
 
 	echo T_('Issue date').':<br />';
 
-	echo '<label><input type="radio" name="set_issue_date" id="set_issue_date_now" value="now" '
-				.( ($set_issue_date == 'now') ? 'checked="checked"' : '' )
-				.'/><strong>'.T_('Update issue date to NOW').'</strong></label>';
+	echo '<label><input type="radio" name="item_dateset" id="set_issue_date_now" value="0" '
+				.( ($edited_Item->dateset == 0) ? 'checked="checked"' : '' )
+				.'/><strong>'.T_('Update to NOW').'</strong></label>';
 
 	if( $break )
 	{
 		echo '<br />';
 	}
 
-	echo '<label><input type="radio" name="set_issue_date" id="set_issue_date_to" value="set" '
-				.( ($set_issue_date == 'set') ? 'checked="checked"' : '' )
+	echo '<label><input type="radio" name="item_dateset" id="set_issue_date_to" value="1" '
+				.( ($edited_Item->dateset == 1) ? 'checked="checked"' : '' )
 				.'/><strong>'.T_('Set to').':</strong></label>';
 	$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), '' );
 	echo ' '; // allow wrapping!
 	$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '', 'hh:mm:ss', '' );
 	echo ' '; // allow wrapping!
+
+	// Autoselect "change date" is the date is changed.
+	?>
+	<script>
+	jQuery( function()
+			{
+				jQuery('#item_issue_date, #item_issue_time').change(function()
+				{
+					jQuery('#set_issue_date_to').attr("checked", "checked")
+				})
+			}
+		)
+	</script>
+	<?php
 
 }
 
@@ -906,21 +920,53 @@ function item_link_by_urltitle( $params = array() )
 }
 
 
+function echo_publish_buttons( $Form, $creating, $edited_Item )
+{
+	global $Blog, $current_User;
+	global $next_action; // needs to be passed out for echo_publishnowbutton_js( $action )
+
+	// ---------- PREVIEW ----------
+	$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
+	$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
+
+	// ---------- SAVE ----------
+	$next_action = ($creating ? 'create' : 'update');
+	$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton' ) );
+	$Form->submit( array( 'actionArray['.$next_action.']', /* TRANS: This is the value of an input submit button */ T_('Save'), 'SaveButton' ) );
+
+	if( $edited_Item->status == 'draft'
+			&& $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID )	// TODO: if we actually set the primary cat to another blog, we may still get an ugly perm die
+			&& $current_User->check_perm( 'edit_timestamp', 'edit', false ) )
+	{	// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
+		$publish_style = 'display: inline';
+	}
+	else
+	{
+		$publish_style = 'display: none';
+	}
+	$Form->submit( array(
+		'actionArray['.$next_action.'_publish]',
+		/* TRANS: This is the value of an input submit button */ T_('Publish!'),
+		'SaveButton',
+		'',
+		$publish_style
+	) );
+}
+
 /**
  * Output JavaScript code to dynamically show or hide the "Publish NOW!"
  * button depending on the selected post status.
  *
  * This function is used by the simple and expert write screens.
- *
- * @param string Are we updating or creating? ('create' or 'update').
  */
-function echo_publishnowbutton_js( $action )
+function echo_publishnowbutton_js()
 {
+	global $next_action;
 	?>
 	<script type="text/javascript">
 		jQuery( '#itemform_visibility input[type=radio]' ).click( function()
 		{
-			var publishnow_btn = jQuery( '.edit_actions input[name=actionArray[<?php echo $action; ?>_publish]]' );
+			var publishnow_btn = jQuery( '.edit_actions input[name=actionArray[<?php echo $next_action; ?>_publish]]' );
 
 			if( this.value != 'draft' )
 			{	// Hide the "Publish NOW !" button:
@@ -1042,6 +1088,9 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 
 /*
  * $Log$
+ * Revision 1.81  2009/12/08 20:16:12  fplanque
+ * Better handling of the publish! button on post forms
+ *
  * Revision 1.80  2009/12/06 22:55:21  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

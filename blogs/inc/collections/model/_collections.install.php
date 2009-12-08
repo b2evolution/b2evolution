@@ -125,6 +125,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_creator_user_ID        int(11) unsigned NOT NULL,
 			post_lastedit_user_ID       int(11) unsigned NULL,
 			post_assigned_user_ID       int(11) unsigned NULL,
+			post_dateset                tinyint(1) NOT NULL DEFAULT 1,
 			post_datestart              DATETIME NOT NULL DEFAULT '2000-01-01 00:00:00',
 			post_datedeadline           datetime NULL,
 			post_datecreated            datetime NULL,

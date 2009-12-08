@@ -171,27 +171,7 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 	// CALL PLUGINS NOW:
 	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Item', 'edit_layout' => 'expert' ) );
 
-	// ---------- PREVIEW ----------
-	$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
-	$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
-
-	// ---------- SAVE ----------
-	$next_action = ($creating ? 'create' : 'update');
-	$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton' ) );
-	$Form->submit( array( 'actionArray['.$next_action.']', /* TRANS: This is the value of an input submit button */ T_('Save'), 'SaveButton' ) );
-
-	$publishnow_displayed = false;
-	if( $edited_Item->status == 'draft'
-			&& $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID )	// TODO: if we actually set the primary cat to another blog, we may still get an ugly perm die
-			&& $current_User->check_perm( 'edit_timestamp', 'edit', false ) )
-	{	// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
-		$Form->submit( array(
-			'actionArray['.$next_action.'_publish]',
-			/* TRANS: This is the value of an input submit button */ T_('Publish NOW !'),
-			'SaveButton',
-		) );
-		$publishnow_displayed = true;
-	}
+	echo_publish_buttons( $Form, $creating, $edited_Item );
 
 	echo '</div>';
 
@@ -431,14 +411,15 @@ $Form->hidden( 'preview_userid', $current_User->ID );
 // ================================== END OF EDIT FORM ==================================
 $Form->end_form();
 
-if( $publishnow_displayed )
-{	// fp> TODO: ideally this shoudd not be hacked in *here*
-	echo_publishnowbutton_js( $next_action );
-}
-
+// ####################### JS BEHAVIORS #########################
+echo_publishnowbutton_js();
+// require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.56  2009/12/08 20:16:12  fplanque
+ * Better handling of the publish! button on post forms
+ *
  * Revision 1.55  2009/11/27 12:29:06  efy-maxim
  * drop down
  *

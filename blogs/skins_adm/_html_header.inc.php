@@ -226,13 +226,6 @@ div.skin_wrapper_loggedin {
 	// Afwas> Done. Keeping this conversation for reference. The performance may be an issue.
 	// require_css( 'ui.datepicker.css' );
 
-	// Autoselect "change date" is the date is changed. fp> TODO: This has NOTHING TO DO in the generic header!!!
-	add_js_headline( 'jQuery(function(){
-			jQuery(\'#item_issue_date, #item_issue_time\').change(function(){
-				jQuery(\'#set_issue_date_to\').attr("checked", "checked")
-			})
-		})' );
-
 	// Add event to the item title field to update document title and init it (important when switching tabs/blogs):
 	global $js_doc_title_prefix;
 	if( isset($js_doc_title_prefix) )
@@ -286,6 +279,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.31  2009/12/08 20:16:13  fplanque
+ * Better handling of the publish! button on post forms
+ *
  * Revision 1.30  2009/12/04 23:27:50  fplanque
  * cleanup Expires: header handling
  *
