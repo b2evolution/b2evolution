@@ -54,7 +54,7 @@ $Results->title = T_('Goals');
  */
 function filter_goals( & $Form )
 {
-	$Form->checkbox_basic_input( 'final', get_param('final'), T_('Final only').' &bull;' );
+	$Form->checkbox_basic_input( 'final', get_param('final'), /* TODO: please add context for translators.. */ T_('Final only').' &bull;' );
 	$Form->text( 's', get_param('s'), 30, T_('Search'), '', 255 );
 }
 $Results->filter_area = array(
@@ -119,6 +119,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2009/12/08 00:07:23  blueyed
+ * todo@fp
+ *
  * Revision 1.7  2009/09/19 20:49:51  fplanque
  * Cleaner way of implementing permissions.
  *
