@@ -892,7 +892,7 @@ function file_controller_build_tabs()
 			'files',
 			array(
 						'settings' => array(
-							'text' => T_('Files'),
+							'text' => T_('Settings'),
 							'href' => '?ctrl=fileset' ),
 						'filetypes' => array(
 							'text' => T_('File types'),
@@ -906,6 +906,9 @@ function file_controller_build_tabs()
 
 /*
  * $Log$
+ * Revision 1.31  2009/12/08 23:42:03  fplanque
+ * minor
+ *
  * Revision 1.30  2009/12/06 22:55:20  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

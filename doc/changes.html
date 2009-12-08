@@ -43,8 +43,9 @@
 				  <ul>
 				    <li>Optimized for PHP5 (still works on PHP4 but we strongly recommend PHP5)</li>
 			        <li>BlockCache stored to memroty (APC Cache): every widget is now cached individually and regenerated only when need (provided it declares proper dependency keys). This provides a significant performance boost. More underway. (@francoisplanque)</li>
+				    <li>User agent type is now saved directly into the hits table instead of a costly lookup in user agents table (@francoisplanque)</li>
 				  </ul>
-				</li>
+			  </li>
 				<li><strong>Blog features:
 				  </strong>
 				  <ul>

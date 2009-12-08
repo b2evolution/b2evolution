@@ -166,7 +166,7 @@ function JS_showhide_ffield_on_this( $field_id )
 
 $Form = new Form( NULL, 'files_checkchanges' );
 
-$Form->begin_form( 'fform', T_('File Settings') );
+$Form->begin_form( 'fform', T_('File manager settings') );
 
 $Form->hidden( 'ctrl', 'fileset' );
 $Form->hidden( 'action', 'update' );
@@ -238,6 +238,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.9  2009/12/08 23:42:03  fplanque
+ * minor
+ *
  * Revision 1.8  2009/12/06 22:55:21  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)
