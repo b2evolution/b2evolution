@@ -199,6 +199,35 @@ class Hit
 
 
 	/**
+	 * Get HTTP referrer/referer.
+	 *
+	 * @return string
+	 */
+	function get_referer()
+	{
+		global $HTTP_REFERER; // might be set by PHP (give highest priority)
+
+		$referer = NULL;
+		if( isset( $HTTP_REFERER ) )
+		{ // Referer provided by PHP:
+			$referer = $HTTP_REFERER;
+		}
+		else
+		{
+			if( isset($_SERVER['HTTP_REFERER']) )
+			{
+				$referer = $_SERVER['HTTP_REFERER'];
+			}
+			else
+			{ // Fallback method (not thread safe :[[ ) - this function does not work in ISAPI mode.
+				$referer = getenv('HTTP_REFERER');
+			}
+		}
+		return $referer;
+	}
+
+
+	/**
 	 * Detect Referer (sic!).
 	 * Due to potential non-thread safety with getenv() (fallback), we'd better do this early.
 	 *
@@ -206,27 +235,12 @@ class Hit
 	 */
 	function detect_referer()
 	{
-		global $HTTP_REFERER; // might be set by PHP (give highest priority)
 		global $Debuglog, $debug;
 		global $self_referer_list, $blackList, $search_engines;  // used to detect $referer_type
 		global $skins_path;
 		global $Settings;
 
-		if( isset( $HTTP_REFERER ) )
-		{ // Referer provided by PHP:
-			$this->referer = $HTTP_REFERER;
-		}
-		else
-		{
-			if( isset($_SERVER['HTTP_REFERER']) )
-			{
-				$this->referer = $_SERVER['HTTP_REFERER'];
-			}
-			else
-			{ // Fallback method (not thread safe :[[ ) - this function does not work in ISAPI mode.
-				$this->referer = getenv('HTTP_REFERER');
-			}
-		}
+		$this->referer = $this->get_referer();
 
 		if( empty($this->referer) )
 		{	// NO referer
@@ -1140,6 +1154,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.51  2009/12/09 22:02:30  blueyed
+ * Hit refactoring: add get_referer method.
+ *
  * Revision 1.50  2009/12/09 20:09:32  blueyed
  * indent
  *
