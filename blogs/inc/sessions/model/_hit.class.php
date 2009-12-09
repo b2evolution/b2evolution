@@ -659,14 +659,14 @@ class Hit
 			$DB->begin();
 
 			$sql = 'SELECT keyp_ID
-								FROM T_track__keyphrase
-							 WHERE keyp_phrase = '.$DB->quote($keyphrase);
+			          FROM T_track__keyphrase
+			         WHERE keyp_phrase = '.$DB->quote($keyphrase);
 			$keyp_ID = $DB->get_var( $sql, 0, 0, 'Get keyphrase ID' );
 
 			if( empty( $keyp_ID ) )
 			{
 				$sql = 'INSERT INTO T_track__keyphrase( keyp_phrase )
-								VALUES ('.$DB->quote($keyphrase).')';
+					VALUES ('.$DB->quote($keyphrase).')';
 				$DB->query( $sql, 'Add new keyphrase' );
 				$keyp_ID = $DB->insert_id;
 			}
@@ -1140,6 +1140,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.50  2009/12/09 20:09:32  blueyed
+ * indent
+ *
  * Revision 1.49  2009/12/08 22:38:13  fplanque
  * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
  *
