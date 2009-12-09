@@ -61,10 +61,10 @@ $Results->Cache = & $admin_Plugins;
 /*
 // TODO: dh> make this an optional view (while also removing the "group" col then)?
 //           It's nice to have, but does not allow sorting by priority really..
-// fp> Yes, 90% pf the time, seing a grouped list is what we'd need most. (sorted by priority within each group by default)
+// fp> Yes, 90% of the time, seing a grouped list is what we'd need most. (sorted by priority within each group by default)
 // in the remaining 10% we need an overall priority view because a plugin is not in the right group or more problematic: in multiple groups
 // BTW, when does the priority apply besides for rendering? I think we should document that at the bottom of the screen. ("Apply" needs an short explanation too).
-// BTW, "category" or "class" or "family" would be a better name for plugin "group"s. "group" sounds arbitrary. I think this shoudl convey the idea of a "logical grouping" by "main" purpose of the plugin.
+// BTW, "category" or "class" or "family" would be a better name for plugin "group"s. "group" sounds arbitrary. I think this should convey the idea of a "logical grouping" by "main" purpose of the plugin.
 //
 $Results->group_by_obj_prop = 'group';
 $Results->grp_cols[] = array(
@@ -279,6 +279,9 @@ unset($Results); // free memory
 
 /*
  * $Log$
+ * Revision 1.6  2009/12/09 17:39:08  blueyed
+ * typos
+ *
  * Revision 1.5  2009/09/25 13:09:36  efy-vyacheslav
  * Using the SQL class to prepare queries
  *
