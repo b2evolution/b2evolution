@@ -320,17 +320,41 @@ class Hit
 
 		// Is the referer a search engine?
 		// Note: for debug simulation, you may need to add sth like $search_engines[] = '/credits.html'; into the conf
-		foreach( $search_engines as $lSearchEngine )
+		foreach( $search_engines as $search_engine_name => $lSearchEngine )
 		{
 			if( stristr($this->referer, $lSearchEngine) ) // search simulation
 			{
 				$Debuglog->add( 'Hit: detect_referer(): search engine ('.$lSearchEngine.')', 'request' );
 				$this->referer_type = 'search';
+
+				if( ctype_digit($search_engine_name) )
+				{ // no name defined in $search_engines
+					$this->search_engine = $lSearchEngine;
+				}
+				else
+				{
+					$this->search_engine = $search_engine_name;
+				}
 				return;
 			}
 		}
+		$this->search_engine = 'unknown';
 
 		$this->referer_type = 'referer';
+	}
+
+
+	/**
+	 * Get name of search engine.
+	 * This is only useful for referer_type="search".
+	 *
+	 * @return string Search engine name (or "pattern") from $search_engines. "unknown" if not detected.
+	 */
+	function get_search_engine()
+	{
+		if( ! isset($this->search_engine) )
+			$this->detect_referer();
+		return $this->search_engine;
 	}
 
 
@@ -1154,6 +1178,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.52  2009/12/09 22:04:37  blueyed
+ * Hit: add get_search_engine. This will return the matched search engine name (if defined as key in $search_engines) or the matched pattern.
+ *
  * Revision 1.51  2009/12/09 22:02:30  blueyed
  * Hit refactoring: add get_referer method.
  *
