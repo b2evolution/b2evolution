@@ -234,7 +234,7 @@ function item_edit_actions( $Item )
 	return $r;
 }
 $ItemList->cols[] = array(
-		'th' => T_('Act.'),
+		'th' => T_('Actions'),
 		'td_class' => 'shrinkwrap',
 		'td' => '%item_edit_actions( {Obj} )%',
 	);
@@ -264,6 +264,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.8  2009/12/09 21:10:57  sam2kb
+ * Act. => Actions
+ *
  * Revision 1.7  2009/03/08 23:57:44  fplanque
  * 2009
  *
