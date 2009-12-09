@@ -55,6 +55,22 @@ class HitTestCase extends EvoUnitTestCase
 		$evo_charset = 'utf-8';
 		$ref = 'http://images.google.de/imgres?imgurl=http://www.hahler.de/media/users/claudia/90506005.jpg&imgrefurl=http://claudia.hahler.de/rhabarberwahe_schweizer_rezept&usg=__4aU46UZlyKjUEhR1A8k2AYeCc3k=&h=480&w=640&sz=96&hl=de&start=7&tbnid=ojcNBFIQ8uAOwM:&tbnh=103&tbnw=137&prev=/images%3Fq%3Drhabarberw%25C3%25A4he%26gbv%3D1%26hl%3Dde%26sa%3DG';
 		$this->assertEqual( Hit::extract_keyphrase_from_referer($ref), 'rhabarberwähe' );
+
+		// "q" param is encoded in latin1. This must be detected.
+		$ref = 'http://suche.t-online.de/fast-cgi/tsc?mandant=toi&device=html&portallanguage=de&userlanguage=de&dia=adr&context=internet-tab&tpc=internet&ptl=std&classification=internet-tab_internet_std&start=0&num=10&type=all&lang=any&more=none&q=gut+gl%FCck';
+		$this->assertEqual( Hit::extract_keyphrase_from_referer($ref), 'gut glück' );
+
+		// "q" param in utf-8.
+		$ref = 'http://suche.t-online.de/?q=gut+gl%C3%BCck';
+		$this->assertEqual( Hit::extract_keyphrase_from_referer($ref), 'gut glück' );
+
+		// "€" in utf-8
+		$ref = 'http://suche.t-online.de/?q=%E2%82%AC';
+		$this->assertEqual( Hit::extract_keyphrase_from_referer($ref), '€' );
+
+		// "€" in iso-8859-15
+		$ref = 'http://suche.t-online.de/?q=%A4';
+		$this->assertEqual( Hit::extract_keyphrase_from_referer($ref), '€' );
 	}
 }
 
