@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2009-09-30 20:51+0200\n"
-"PO-Revision-Date: 2009-12-09 16:41-0500\n"
+"PO-Revision-Date: 2009-12-09 16:44-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -4114,7 +4114,7 @@ msgstr "Будет отображаться вверху блога."
 
 #: ../../../inc/collections/views/_coll_general.form.php:54
 msgid "Short name"
-msgstr "Краткое название"
+msgstr "Название"
 
 #: ../../../inc/collections/views/_coll_general.form.php:54
 msgid "Will be used in selection menus and throughout the admin interface."
