@@ -612,10 +612,11 @@ function upgrade_b2evo_tables()
 	if( $old_db_version < 8060 )
 	{ // upgrade to 0.9
 		// Important check:
-		$stub_list = $DB->get_col( "SELECT blog_stub
-																	FROM T_blogs
-																	GROUP BY blog_stub
-																	HAVING COUNT(*) > 1" );
+		$stub_list = $DB->get_col( "
+			SELECT blog_stub
+			  FROM T_blogs
+			 GROUP BY blog_stub
+			HAVING COUNT(*) > 1" );
 		if( !empty($stub_list) )
 		{
 			echo '<div class="error"><p class="error">';
@@ -2775,6 +2776,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.348  2009/12/09 17:36:45  blueyed
+ * indent
+ *
  * Revision 1.347  2009/12/08 22:38:13  fplanque
  * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
  *
