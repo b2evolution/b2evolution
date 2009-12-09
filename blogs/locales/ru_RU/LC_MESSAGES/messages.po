@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2009-09-30 20:51+0200\n"
-"PO-Revision-Date: 2009-10-24 20:51-0500\n"
+"PO-Revision-Date: 2009-12-09 16:41-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -1480,7 +1480,7 @@ msgstr "Дата последнего изменения"
 #: ../../../inc/_core/_misc.funcs.php:3660
 #: ../../../inc/collections/views/_coll_general.form.php:64
 msgid "URL \"filename\""
-msgstr "URL (имя файла)"
+msgstr "Короткая ссылка"
 
 #: ../../../inc/_core/_misc.funcs.php:3661
 #: ../../../inc/items/views/_item_expert.form.php:277
@@ -3522,15 +3522,15 @@ msgstr "Пользователь &laquo;%s&raquo; не существует!"
 
 #: ../../../inc/collections/model/_blog.class.php:557
 msgid "You must provide an URL blog name!"
-msgstr "Вы должны указать URL имя блога!"
+msgstr "Вы должны указать короткую ссылку блога!"
 
 #: ../../../inc/collections/model/_blog.class.php:563
 msgid "The url name is invalid."
-msgstr "Недопустимое url имя."
+msgstr "Недопустимая короткая ссылка."
 
 #: ../../../inc/collections/model/_blog.class.php:572
 msgid "This URL name is already in use by another blog. Please choose another name."
-msgstr "Это URL имя блога уже используется другим блогом. Пожалуйста, выберите новое имя."
+msgstr "Такая короткая ссылка уже используется другим блогом. Пожалуйста, выберите другую."
 
 #: ../../../inc/collections/model/_blog.class.php:587
 #: ../../../inc/collections/model/_blog.class.php:597
@@ -7268,7 +7268,7 @@ msgstr "Тип Mime"
 #: ../../../inc/files/views/_filetype.form.php:67
 #, php-format
 msgid "File name of the icon, must be in %s."
-msgstr "Имя файла иконки должно быть в %s."
+msgstr "Имя файла иконки, должна находиться в %s."
 
 #: ../../../inc/files/views/_filetype.form.php:67
 #: ../../../inc/files/views/_filetype_list.view.php:49
@@ -7826,7 +7826,7 @@ msgstr "Пинг %s..."
 #: ../../../inc/items/model/_item.funcs.php:262
 #, php-format
 msgid "Warning: the URL slug has been changed to &laquo;%s&raquo;."
-msgstr "Внимание: URL имя файла записи было изменено на &laquo;%s&raquo;."
+msgstr "Внимание: короткая ссылка записи была изменена на &laquo;%s&raquo;."
 
 #: ../../../inc/items/model/_item.funcs.php:447
 msgid "Images &amp; Attachments"
