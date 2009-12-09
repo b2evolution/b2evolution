@@ -1035,8 +1035,25 @@ class Hit
 				}
 			*/
 
-				// convert from "input encoding": Google might provide param "ie". Defaults to utf8.
-				$ie = isset($ref_params['ie']) ? $ref_params['ie'] : 'utf-8';
+				// convert from "input encoding": Google might provide param "ie".
+				if( isset($ref_params['ie']) )
+					$ie = $ref_params['ie'];
+				else
+				{
+					$ie = 'utf-8'; // default
+
+					if( can_check_encoding() )
+					{
+						foreach( array('utf-8', 'iso-8859-15') as $test_encoding )
+						{
+							if( check_encoding($q, $test_encoding) )
+							{
+								$ie = $test_encoding;
+								break;
+							}
+						}
+					}
+				}
 				$q = convert_charset($q, $evo_charset, $ie);
 
 				return $q;
@@ -1178,6 +1195,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.53  2009/12/09 22:05:46  blueyed
+ * Hit: extract_keyphrase_from_referer: test for utf-8 and iso-8859-15 in query string, where the referer contains no input encoding ("ie") hint.
+ *
  * Revision 1.52  2009/12/09 22:04:37  blueyed
  * Hit: add get_search_engine. This will return the matched search engine name (if defined as key in $search_engines) or the matched pattern.
  *
