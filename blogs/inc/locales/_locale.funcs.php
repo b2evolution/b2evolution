@@ -839,7 +839,6 @@ function locale_updateDB()
  * Convert a string from one charset to another.
  *
  * @todo Implement iconv and PHP mapping tables
- * @todo Remove unreliable mb_detect_encoding().
  *
  * @see can_convert_charsets()
  * @param string String to convert
@@ -895,6 +894,33 @@ function can_convert_charsets( $dest_charset, $src_charset )
 	}
 
 	return false;
+}
+
+
+/**
+ * Can we check for valid encodings of strings, using {@link check_encoding()}?
+ *
+ * @return boolean
+ */
+function can_check_encoding()
+{
+	return function_exists('mb_check_encoding');
+}
+
+
+/**
+ * Check if the string is valid for the specified encoding.
+ *
+ * @param string String to check
+ * @param string Encoding to check
+ * @return
+ */
+function check_encoding($str, $encoding)
+{
+	if( function_exists('mb_check_encoding') )
+	{
+		return mb_check_encoding($str, $encoding);
+	}
 }
 
 
@@ -1058,6 +1084,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.37  2009/12/09 21:59:40  blueyed
+ * Add check_encoding and can_check_encoding functions.
+ *
  * Revision 1.36  2009/11/30 00:22:05  fplanque
  * clean up debug info
  * show more timers in view of block caching
