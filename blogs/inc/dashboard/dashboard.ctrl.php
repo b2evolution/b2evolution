@@ -76,13 +76,13 @@ if( $blog )
 
 		?>
 
-		<script type="text/javascript">
+		<script type="text/javascript"><!--
 
 			var commentIds = new Array();
 			var commentsInd = 0;
 
-			// Load next comments awaiting moderation
-			function loadCommentsAwaitingModeration()
+			// Get comma separated IDs
+			function getCommentsIds()
 			{
 				var ids = '';
 				for(var id in commentIds)
@@ -99,56 +99,40 @@ if( $blog )
 				}
 				commentsInd++;
 
-				$.ajax({
-				type: 'POST',
-				url: '<?php echo $htsrv_url; ?>async.php',
-				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&ids=' + ids + '&ind=' + commentsInd + '&action=get_comments_awaiting_moderation',
-				success: function(result)
-				{
-					$('#comments_container').html($('#comments_container').html() + result);
-
-					var comments_number = $('#badge_' + commentsInd).val();
-					if(comments_number == '0')
-					{
-						$('#comments_block').remove();
-					}
-					else
-					{
-						$('#badge').text(comments_number);
-						var newCommentIds = $('#comments_' + commentsInd).val().split(',');
-						for(index = 0; index < newCommentIds.length; index++)
-						{
-							var arrayIndex = 'comment_' + newCommentIds[index];
-							commentIds[arrayIndex] = newCommentIds[index];
-						}
-					}
-				} });
+				return ids;
 			}
 
 			// Process result after publish/deprecate/delete action has been completed
-			function processResult(result, id, background)
+			function processResult(result, id)
 			{
-				var divid = 'comment_' + id;
-				if(result == 'OK')
+				$('#comments_container').html($('#comments_container').html() + result);
+
+				var comments_number = $('#badge_' + commentsInd).val();
+				if(comments_number == '0')
 				{
-					var options = {};
-					$('#' + divid).effect('blind', options, 200);
-					$('#' + divid).remove();
-					delete commentIds[divid];
-					loadCommentsAwaitingModeration();
+					$('#comments_block').remove();
 				}
 				else
 				{
-					$('#' + divid).css('background-color', background);
-					alert(result);
+					$('#badge').text(comments_number);
+					var newCommentIds = $('#comments_' + commentsInd).val().split(',');
+					for(index = 0; index < newCommentIds.length; index++)
+					{
+						var arrayIndex = 'comment_' + newCommentIds[index];
+						commentIds[arrayIndex] = newCommentIds[index];
+					}
 				}
+
+				var divid = 'comment_' + id;
+				var options = {};
+				$('#' + divid).effect('blind', options, 200);
+				$('#' + divid).remove();
 			}
 
 			// Set comments status
 			function setCommentStatus(id, status)
 			{
 				var divid = 'comment_' + id;
-				var background = $('#' + divid).css('background-color');
 				switch(status)
 				{
 					case 'published':
@@ -159,25 +143,30 @@ if( $blog )
 						break;
 				};
 
+				delete commentIds[divid];
+				var ids = getCommentsIds();
+
 				$.ajax({
 				type: 'POST',
 				url: '<?php echo $htsrv_url; ?>async.php',
-				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&status=' + status + '&action=set_comment_status',
-				success: function(result) { processResult(result, id, background);	} });
+				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&status=' + status + '&action=set_comment_status' + '&ids=' + ids + '&ind=' + commentsInd,
+				success: function(result) { processResult(result, id);	} });
 			}
 
 			// Delete comment
 			function deleteComment(id)
 			{
 				var divid = 'comment_' + id;
-				var background = $('#' + divid).css('background-color');
 				fadeIn(divid, '#EE0000');
+
+				delete commentIds[divid];
+				var ids = getCommentsIds();
 
 				$.ajax({
 				type: 'POST',
 				url: '<?php echo $htsrv_url; ?>async.php',
-				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&action=delete_comment',
-				success: function(result) { processResult(result, id, background); } });
+				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&action=delete_comment' + '&ids=' + ids + '&ind=' + commentsInd,
+				success: function(result) { processResult(result, id); } });
 			}
 
 			// Fade in background color
@@ -186,7 +175,7 @@ if( $blog )
 				jQuery('#' + id).animate({ backgroundColor: color }, 200);
 			}
 
-		</script>
+		--></script>
 		<?php
 
 		$nb_blocks_displayed++;
@@ -569,6 +558,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.48  2009/12/10 21:32:47  efy-maxim
+ * 1. single ajax call
+ * 2. comments of protected post fix
+ *
  * Revision 1.47  2009/12/06 22:55:22  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

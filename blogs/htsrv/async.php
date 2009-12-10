@@ -150,46 +150,54 @@ switch( $action )
 
 		exit(0);
 
-	case 'get_comments_awaiting_moderation':
-
-		$blog_ID = param( 'blogid', 'integer' );
-		$current_User->check_perm( 'blog_comments', 'edit', true, $blog_ID );
-
-		$limit = 5;
-
-		$comment_IDs = array();
-		$ids = param( 'ids', 'string', NULL );
-		if( !empty( $ids ) )
-		{
-			$comment_IDs = explode( ',', $ids );
-			$limit = $limit - count( $comment_IDs );
-		}
-
-		show_comments_awaiting_moderation( $blog_ID, $limit, $comment_IDs, false );
-
-		exit(0);
-
 	case 'set_comment_status':
 
-		$blog_ID = param( 'blogid', 'integer' );
-		$current_User->check_perm( 'blog_comments', 'edit', true, $blog_ID );
+		global $blog;
+
+		$blog = param( 'blogid', 'integer' );
+		$current_User->check_perm( 'blog_comments', 'edit', true, $blog );
 
 		$edited_Comment = Comment_get_by_ID( param( 'commentid', 'integer' ) );
 		$status = param( 'status', 'string' );
 		$edited_Comment->set('status', $status );
 		$edited_Comment->dbupdate();
-		echo 'OK';
+
+		get_comments_awaiting_moderation( $blog );
 		exit(0);
 
 	case 'delete_comment':
 
-		$blog_ID = param( 'blogid', 'integer' );
-		$current_User->check_perm( 'blog_comments', 'edit', true, $blog_ID );
+		global $blog;
+
+		$blog = param( 'blogid', 'integer' );
+		$current_User->check_perm( 'blog_comments', 'edit', true, $blog );
 
 		$edited_Comment = Comment_get_by_ID( param( 'commentid', 'integer' ) );
 		$edited_Comment->dbdelete();
-		echo 'OK';
+
+		get_comments_awaiting_moderation( $blog );
 		exit(0);
+}
+
+
+/**
+ * Get comments awaiting moderation
+ *
+ * @param integer blog_ID
+ */
+function get_comments_awaiting_moderation( $blog_ID )
+{
+	$limit = 5;
+
+	$comment_IDs = array();
+	$ids = param( 'ids', 'string', NULL );
+	if( !empty( $ids ) )
+	{
+		$comment_IDs = explode( ',', $ids );
+		$limit = $limit - count( $comment_IDs );
+	}
+
+	show_comments_awaiting_moderation( $blog_ID, $limit, $comment_IDs, false );
 }
 
 
@@ -205,6 +213,10 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.40  2009/12/10 21:32:47  efy-maxim
+ * 1. single ajax call
+ * 2. comments of protected post fix
+ *
  * Revision 1.39  2009/12/04 23:27:49  fplanque
  * cleanup Expires: header handling
  *
