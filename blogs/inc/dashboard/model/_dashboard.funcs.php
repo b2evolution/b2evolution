@@ -40,7 +40,6 @@ function b2evonet_get_updates( $force_short_delay = false )
 	{ // Get outta here as fast as you can, EdB style:
 		return NULL;
 	}
-
 	if( $force_short_delay )
 	{
 		$update_every = 180; // 3 minutes
@@ -53,8 +52,8 @@ function b2evonet_get_updates( $force_short_delay = false )
 	}
 
 	/* DEBUG: */
-	$update_every = 10;
-	$attempt_every = 5;
+	#$update_every = 10;
+	#$attempt_every = 5;
 
 
 	$version_id = $baseurl.' '.$instance_name.' '.$app_name.' '.$app_version.' '.$app_date;
@@ -181,6 +180,9 @@ function b2evonet_get_updates( $force_short_delay = false )
 
 /*
  * $Log$
+ * Revision 1.26  2009/12/10 20:41:46  blueyed
+ * Comment debug code out, which caused looking for updates nearly always.
+ *
  * Revision 1.25  2009/12/06 22:55:22  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)
