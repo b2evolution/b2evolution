@@ -164,7 +164,8 @@ $search_engines = array(
  * Typically http://google.com?s=keyphraz returns keyphraz
  *
  * fp> TODO: merge with above table
- *           dh> Piwik might have good data to build upon. fp> huh?
+ *           dh> Piwik (open source web analytics) might have good data to use for this (referrer/search param pairs)
+ *           dh> Also useful/required: default encoding of search_params values (e.g. latin1 for suche.t-online.de)
  * fp> TODO: put into configurable database table
  *
  * @global array $known_search_params
