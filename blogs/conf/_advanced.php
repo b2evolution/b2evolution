@@ -35,8 +35,8 @@ $debug = 'pwd';
 
 /**
  * When $debug is 'pwd' and you set a /password/ below,
- * you can turn on debugging at any time by adding ?debug=/passwod/ to your url
- * You can turn off by adding just ?debug=
+ * you can turn on debugging at any time by adding ?debug=1&debug_pwd=YOUR_PASSWORD to your url.
+ * You can turn off by adding just ?debug
  *
  * @var string
  */

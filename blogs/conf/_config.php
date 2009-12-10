@@ -58,7 +58,7 @@ if( file_exists(dirname(__FILE__).'/_overrides_TEST.php') )
 
 // Handle debug cookie:
 if( $debug == 'pwd' )
-{	// Debug *can* be enabmes/disabled by cookie:
+{	// Debug *can* be enabled/disabled by cookie:
 
 	// Disabled until we find a reason to enable:
 	$debug = 0;
@@ -66,20 +66,25 @@ if( $debug == 'pwd' )
 	if( !empty($debug_pwd) )
 	{	// We have configured a password that could enable debug mode:
 		if( isset($_GET['debug']) )
-		{	// We have submitted a ?debug=password
-			if( $_GET['debug'] == $debug_pwd )
-			{	// Password matches
-				$debug = 1;
-				setcookie( 'debug', $debug_pwd, $cookie_expires, $cookie_path, $cookie_domain );
+		{	// We have submitted a request to set $debug
+			$get_debug = (int)$_GET['debug'];
+			if( isset($_GET['debug_pwd']) && $_GET['debug_pwd'] == $debug_pwd )
+			{	// Password to set $debug is supplied and valid: set a session cookie to remember this
+				setcookie('debug', sha1($_SERVER['REMOTE_ADDR'].$debug_pwd.$get_debug).'_'.$get_debug, 0, $cookie_path, $cookie_domain);
+				$debug = $get_debug;
 			}
 			else
-			{	// Password doesn't match: turn off debug mode:
-				setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain );
+			{ // Password is not set or does not match: delete cookie
+				setcookie('debug', '', $cookie_expired, $cookie_path, $cookie_domain);
 			}
 		}
-		elseif( !empty($_COOKIE['debug'])	&& $_COOKIE['debug'] == $debug_pwd )
-		{	// We have a cookie with the correct debug password:
-			$debug = 1;
+		elseif( isset($_COOKIE['debug']) )
+		{
+			list($hash, $cookie_debug) = explode('_', $_COOKIE['debug']);
+			if( $hash == sha1($_SERVER['REMOTE_ADDR'].$debug_pwd.$cookie_debug) )
+			{	// We have a cookie with the correct hash (includes debug password):
+				$debug = $cookie_debug;
+			}
 		}
 	}
 }
@@ -90,6 +95,9 @@ $use_session = true;
 
 /*
  * $Log$
+ * Revision 1.60  2009/12/10 20:46:02  blueyed
+ * debug_pwd: extra param for the password, which allows setting debug=2, too. Also, hash the cookie value for some more security.
+ *
  * Revision 1.59  2009/12/08 20:08:48  fplanque
  * oops
  *
