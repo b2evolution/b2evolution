@@ -89,6 +89,13 @@ class DB
 	 */
 	var $halt_on_error = true;
 	/**
+	 * Log errors using {@link error_log()}?
+	 * There's no reason to disable this, apart from when you are expecting
+	 * to get an error, like with {@link get_db_version()}.
+	 * @var boolean
+	 */
+	var $log_errors = true;
+	/**
 	 * Has an error occured?
 	 * @var boolean
 	 */
@@ -572,21 +579,24 @@ class DB
 
 
 		// Send error to PHP's system logger.
-		// TODO: dh> respect $log_app_errors? Create a wrapper, e.g. evo_error_log, which can be used later to write into e.g. a DB table?!
-		if( isset($_SERVER['REQUEST_URI']) )
+		if( $this->log_errors )
 		{
-			$req_url = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ? 'https://' : 'http://' )
-				.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+			// TODO: dh> respect $log_app_errors? Create a wrapper, e.g. evo_error_log, which can be used later to write into e.g. a DB table?!
+			if( isset($_SERVER['REQUEST_URI']) )
+			{
+				$req_url = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ? 'https://' : 'http://' )
+					.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+			}
+			else
+			{
+				$req_url = '-';
+			}
+			$error_text = 'SQL ERROR: '. $this->last_error
+					. ', QUERY: "'.trim($this->last_query).'"'
+					. ', BACKTRACE: '.trim(strip_tags(debug_get_backtrace()))
+					. ', URL: '.$req_url;
+			error_log( preg_replace( '#\s+#', ' ', $error_text ) );
 		}
-		else
-		{
-			$req_url = '-';
-		}
-		$error_text = 'SQL ERROR: '. $this->last_error
-				. ', QUERY: "'.trim($this->last_query).'"'
-				. ', BACKTRACE: '.trim(strip_tags(debug_get_backtrace()))
-				. ', URL: '.$req_url;
-		error_log( preg_replace( '#\s+#', ' ', $error_text ) );
 
 
 		if( ! ( $this->halt_on_error || $this->show_errors ) )
@@ -700,6 +710,7 @@ class DB
 			'halt_on_error' => $this->halt_on_error,
 			'last_error'    => $this->last_error,
 			'error'         => $this->error,
+			'log_errors'    => $this->log_errors,
 		);
 	}
 
@@ -718,12 +729,9 @@ class DB
 		}
 		$state = array_pop($this->saved_error_states);
 
-		$this->show_errors   = $state['show_errors'];
-		$this->halt_on_error = $state['halt_on_error'];
-		$this->last_error    = $state['last_error'];
-		$this->error         = $state['error'];
+		foreach( $state as $k => $v )
+			$this->$k = $v;
 	}
-
 
 
 	/**
@@ -1651,6 +1659,10 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.47  2009/12/10 20:13:24  blueyed
+ * Add log_errors property to DB and set it to false in get_db_version to not
+ * log SQL errors which are expected during install.
+ *
  * Revision 1.46  2009/12/06 01:52:54  blueyed
  * Add 'htmlspecialchars' type to format_to_output, same as formvalue, but less irritating. Useful for strmaxlen, which is being used in more places now.
  *

@@ -233,6 +233,7 @@ function get_db_version()
 	$DB->save_error_state();
 	$DB->halt_on_error = false;
 	$DB->show_errors = false;
+	$DB->log_errors = false;
 
 	$r = NULL;
 
@@ -825,6 +826,10 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.81  2009/12/10 20:13:25  blueyed
+ * Add log_errors property to DB and set it to false in get_db_version to not
+ * log SQL errors which are expected during install.
+ *
  * Revision 1.80  2009/10/17 16:31:33  efy-maxim
  * Renamed: T_groupsettings to T_groups__groupsettings, T_usersettings to T_users__usersettings
  *
