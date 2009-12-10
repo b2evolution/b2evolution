@@ -231,6 +231,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 		case 'htmlattr':
 			// use as an attribute: strips tags and escapes quotes
+ 			// TODO: dh> why not just htmlspecialchars?
 			$content = strip_tags($content);
 			$content = convert_chars($content, 'html');
 			$content = str_replace( array('"', "'"), array('&quot;', '&#039;'), $content );
@@ -3240,15 +3241,7 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 
 		if( $format_to_output )
 		{
-			if( $l_attr == 'value' )
-			{
-				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'formvalue' ).'"';
-			}
-			else
-			{
-				// TODO: this uses strip_tags et al! Shouldn't we just use "formvalue" always? (E.g. it kills "for( var i=0; i<a; i++ )..." (in an onclick attr) from "<a" on. The workaround is to use spaces ("i < a"), but I was confused first)
-				$r .= ' '.$l_attr.'="'.format_to_output( $l_value, 'htmlattr' ).'"';
-			}
+			$r .= ' '.$l_attr.'="'.htmlspecialchars($l_value).'"';
 		}
 		else
 		{
@@ -3849,6 +3842,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.199  2009/12/10 21:01:02  blueyed
+ * get_field_attribs_as_string: just use htmlspecialchars to escape. todo.
+ *
  * Revision 1.198  2009/12/06 03:24:11  fplanque
  * minor/doc/fixes
  *
