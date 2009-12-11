@@ -66,25 +66,20 @@ if( $debug == 'pwd' )
 	if( !empty($debug_pwd) )
 	{	// We have configured a password that could enable debug mode:
 		if( isset($_GET['debug']) )
-		{	// We have submitted a request to set $debug
-			$get_debug = (int)$_GET['debug'];
-			if( isset($_GET['debug_pwd']) && $_GET['debug_pwd'] == $debug_pwd )
-			{	// Password to set $debug is supplied and valid: set a session cookie to remember this
-				setcookie('debug', sha1($_SERVER['REMOTE_ADDR'].$debug_pwd.$get_debug).'_'.$get_debug, 0, $cookie_path, $cookie_domain);
-				$debug = $get_debug;
+		{	// We have submitted a ?debug=password
+			if( $_GET['debug'] == $debug_pwd )
+			{	// Password matches
+				$debug = 1;
+				setcookie( 'debug', $debug_pwd, $cookie_expires, $cookie_path, $cookie_domain );
 			}
 			else
-			{ // Password is not set or does not match: delete cookie
-				setcookie('debug', '', $cookie_expired, $cookie_path, $cookie_domain);
+			{	// Password doesn't match: turn off debug mode:
+				setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain );
 			}
 		}
-		elseif( isset($_COOKIE['debug']) )
-		{
-			list($hash, $cookie_debug) = explode('_', $_COOKIE['debug']);
-			if( $hash == sha1($_SERVER['REMOTE_ADDR'].$debug_pwd.$cookie_debug) )
-			{	// We have a cookie with the correct hash (includes debug password):
-				$debug = $cookie_debug;
-			}
+		elseif( !empty($_COOKIE['debug'])	&& $_COOKIE['debug'] == $debug_pwd )
+		{	// We have a cookie with the correct debug password:
+			$debug = 1;
 		}
 	}
 }
@@ -95,6 +90,12 @@ $use_session = true;
 
 /*
  * $Log$
+ * Revision 1.61  2009/12/11 23:01:19  fplanque
+ * Reverted debug pwd changes.
+ * As said before, hashing a cookie does not improve security. You can still steal the cookie.
+ * Also requiring 2 params make it more painful to use.
+ * Add a different password for debug level 2 if you really need it, but I think it's fine if you cannot turn on level 2 through the URL.
+ *
  * Revision 1.60  2009/12/10 20:46:02  blueyed
  * debug_pwd: extra param for the password, which allows setting debug=2, too. Also, hash the cookie value for some more security.
  *
