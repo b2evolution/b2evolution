@@ -58,7 +58,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_page_head()
 	{
-		$r = '<div class="breadcrumbpath">&bull; '.implode( ' &gt; ', $this->breadcrumbpath ).'</div>';
+		$r = $this->breadcrumbpath_get_html();
 
 		$r .= '
 		<div id="header">'
@@ -390,6 +390,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.27  2009/12/11 03:01:16  fplanque
+ * breadcrumbs improved
+ *
  * Revision 1.26  2009/12/06 22:55:20  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

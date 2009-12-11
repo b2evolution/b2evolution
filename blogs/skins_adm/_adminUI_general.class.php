@@ -192,6 +192,23 @@ class AdminUI_general extends Menu
 		$this->breadcrumbpath[] = $html;
 	}
 
+
+	function breadcrumbpath_get_html()
+	{
+		$r = '<div class="breadcrumbpath">&bull; <strong>You are here:</strong> ';
+
+		for( $i=0; $i<count($this->breadcrumbpath)-1; $i++ )
+		{
+			$r .= $this->breadcrumbpath[$i].' &gt; ';
+		}
+
+		$r .= '<strong>'.$this->breadcrumbpath[$i].'</strong>';
+
+		$r .= "</div>\n";
+
+		return $r;
+	}
+
 	/**
 	 * Add menu entries to the beginning of the list for given path.
 	 *
@@ -1338,6 +1355,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.106  2009/12/11 03:01:13  fplanque
+ * breadcrumbs improved
+ *
  * Revision 1.105  2009/12/06 22:55:18  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)
