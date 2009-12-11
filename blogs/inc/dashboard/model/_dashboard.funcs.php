@@ -40,6 +40,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 	{ // Get outta here as fast as you can, EdB style:
 		return NULL;
 	}
+
 	if( $force_short_delay )
 	{
 		$update_every = 180; // 3 minutes
@@ -180,6 +181,9 @@ function b2evonet_get_updates( $force_short_delay = false )
 
 /*
  * $Log$
+ * Revision 1.27  2009/12/11 23:20:55  fplanque
+ * no message
+ *
  * Revision 1.26  2009/12/10 20:41:46  blueyed
  * Comment debug code out, which caused looking for updates nearly always.
  *
