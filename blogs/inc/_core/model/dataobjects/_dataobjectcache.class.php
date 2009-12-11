@@ -269,8 +269,10 @@ class DataObjectCache
 
 		// Do not request already loaded objects
 		if( $loaded_IDs = $this->get_ID_array() )
+		{
 			$SQL->WHERE_and($this->dbIDname.' NOT IN ('.implode(',', $loaded_IDs).')');
-
+		}
+		
 		return $this->instantiate_list($DB->get_results( $SQL->get(), OBJECT, $SQL->title ));
 	}
 
@@ -283,10 +285,10 @@ class DataObjectCache
 	 */
 	function get_SQL_object($title = NULL)
 	{
-		$SQL = new SQL($title);
-		$SQL->SELECT('*');
-		$SQL->FROM($this->dbtablename);
-		$SQL->ORDER_BY($this->order_by);
+		$SQL = new SQL( $title );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( $this->dbtablename );
+		$SQL->ORDER_BY( $this->order_by );
 		return $SQL;
 	}
 
@@ -758,6 +760,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.20  2009/12/11 23:18:23  fplanque
+ * doc
+ *
  * Revision 1.19  2009/12/06 22:20:29  blueyed
  * DataObjectCache:
  *  - Fix get_next to return first element on first call

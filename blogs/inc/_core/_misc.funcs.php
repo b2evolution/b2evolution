@@ -231,7 +231,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 		case 'htmlattr':
 			// use as an attribute: strips tags and escapes quotes
- 			// TODO: dh> why not just htmlspecialchars?
+ 			// TODO: dh> why not just htmlspecialchars?fp> because an attribute can never contain a tag?
 			$content = strip_tags($content);
 			$content = convert_chars($content, 'html');
 			$content = str_replace( array('"', "'"), array('&quot;', '&#039;'), $content );
@@ -3842,6 +3842,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.200  2009/12/11 23:18:23  fplanque
+ * doc
+ *
  * Revision 1.199  2009/12/10 21:01:02  blueyed
  * get_field_attribs_as_string: just use htmlspecialchars to escape. todo.
  *
