@@ -91,6 +91,7 @@ $blackList = array(
  * in order to identify search engines
  *
  * @todo move to admin interface (specific list editor), include query params
+ * @todo have regexps, for example for //www\.google\.[^/]/search
  *
  * @global array $search_engines
  */
