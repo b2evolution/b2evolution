@@ -42,7 +42,7 @@ $params = array_merge( array(
 		'before_more_link'    => '<p class="bMore">',
 		'after_more_link'     => '</p>',
 		'more_link_text'      => '#',
-		'anchor_text'         => '#',		// text to display as the more anchor (once the more link has been clicked)
+		'anchor_text'         => '<p class="bMore">...</p>',		// text to display as the more anchor (once the more link has been clicked, '#' defaults to "Follow up:")
 		'excerpt_before_text' => '<div class="excerpt">',
 		'excerpt_after_text'  => '</div>',
 		'excerpt_before_more' => ' <span class="excerpt_more">',
@@ -241,6 +241,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.26  2009/12/11 22:55:33  fplanque
+ * Changing default of "Follow up:" to "..."
+ *
  * Revision 1.25  2009/11/11 03:24:51  fplanque
  * misc/cleanup
  *

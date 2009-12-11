@@ -942,6 +942,11 @@ class Item extends ItemLight
 
 		$r = false;
 
+		if( !isset($Plugins) )
+		{	// This can happen in maintenance modules running with minimal init, during install, or in tests.
+			return $r;
+		}
+
 		foreach( $Plugins->get_list_by_event('ItemApplyAsRenderer') as $Plugin )
 		{
 			if( empty($Plugin->code) )
@@ -1367,7 +1372,7 @@ class Item extends ItemLight
 				'before'      => '<p class="bMore">',
 				'after'       => '</p>',
 				'link_text'   => '#',		// text to display as the more link
-				'anchor_text' => '#',		// text to display as the more anchor (once the more link has been clicked)
+				'anchor_text' => '#',		// text to display as the more anchor (once the more link has been clicked, # defaults to "Follow up:")
 				'disppage'    => '#',		// page number to display specific page, # for url parameter
 				'format'      => 'htmlbody',
 			), $params );
@@ -3302,8 +3307,11 @@ class Item extends ItemLight
 
 		$this->update_excerpt();
 
-		// TODO: allow a plugin to cancel update here (by returning false)?
-		$Plugins->trigger_event( 'PrependItemInsertTransact', $params = array( 'Item' => & $this ) );
+		if( isset($Plugins) )
+		{	// Note: Plugins may not be available during maintenance, install or test cases
+			// TODO: allow a plugin to cancel update here (by returning false)?
+			$Plugins->trigger_event( 'PrependItemInsertTransact', $params = array( 'Item' => & $this ) );
+		}
 
 		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
 
@@ -3318,7 +3326,10 @@ class Item extends ItemLight
 
 			$DB->commit();
 
-			$Plugins->trigger_event( 'AfterItemInsert', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
+			if( isset($Plugins) )
+			{	// Note: Plugins may not be available during maintenance, install or test cases
+				$Plugins->trigger_event( 'AfterItemInsert', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
+			}
 		}
 		else
 		{
@@ -4128,6 +4139,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.168  2009/12/11 22:55:33  fplanque
+ * Changing default of "Follow up:" to "..."
+ *
  * Revision 1.167  2009/12/08 20:16:12  fplanque
  * Better handling of the publish! button on post forms
  *
