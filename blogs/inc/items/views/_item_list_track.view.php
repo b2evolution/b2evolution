@@ -234,7 +234,7 @@ function item_edit_actions( $Item )
 	return $r;
 }
 $ItemList->cols[] = array(
-		'th' => T_('Actions'),
+		'th' => T_('Act.'),
 		'td_class' => 'shrinkwrap',
 		'td' => '%item_edit_actions( {Obj} )%',
 	);
@@ -264,6 +264,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.9  2009/12/11 23:22:21  fplanque
+ * revert: the goal was to save space
+ *
  * Revision 1.8  2009/12/09 21:10:57  sam2kb
  * Act. => Actions
  *
