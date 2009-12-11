@@ -90,8 +90,11 @@ $blackList = array(
  * The following substrings will be looked up in the referer http header
  * in order to identify search engines
  *
- * @todo move to admin interface (specific list editor), include query params
- * @todo have regexps, for example for //www\.google\.[^/]/search
+ * @todo fp> merge definitions for search engine sig + keyword param + position param into a single array
+ * @todo fp> move to admin interface (specific list editor), include query params
+ *       fp Actually, I'm not sure a DB table would be a good idea. It would slow down lookup and it's not really a table the average user is going to modify anyway...
+ * @todo fp> have regexps, for example for //www\.google\.[^/]/search
+ * 
  *
  * @global array $search_engines
  */

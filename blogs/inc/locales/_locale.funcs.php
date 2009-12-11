@@ -921,6 +921,8 @@ function check_encoding($str, $encoding)
 	{
 		return mb_check_encoding($str, $encoding);
 	}
+	
+	return NULL;
 }
 
 
@@ -1084,6 +1086,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.38  2009/12/11 23:55:48  fplanque
+ * doc
+ *
  * Revision 1.37  2009/12/09 21:59:40  blueyed
  * Add check_encoding and can_check_encoding functions.
  *

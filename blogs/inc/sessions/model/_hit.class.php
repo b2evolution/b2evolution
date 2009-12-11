@@ -201,6 +201,8 @@ class Hit
 	/**
 	 * Get HTTP referrer/referer.
 	 *
+	 * Due to potential non-thread safety with getenv() (fallback), we'd better do this early.
+	 *
 	 * @return string
 	 */
 	function get_referer()
@@ -228,7 +230,8 @@ class Hit
 
 
 	/**
-	 * Detect Referer (sic!).
+	 * Get & Analyze referer
+	 *
 	 * Due to potential non-thread safety with getenv() (fallback), we'd better do this early.
 	 *
 	 * referer_type: enum('search', 'blacklist', 'referer', 'direct'); 'spam' gets used internally
@@ -320,6 +323,7 @@ class Hit
 
 		// Is the referer a search engine?
 		// Note: for debug simulation, you may need to add sth like $search_engines[] = '/credits.html'; into the conf
+		// fp>dh: why add the code, but no matching data to stats.conf ?
 		foreach( $search_engines as $search_engine_name => $lSearchEngine )
 		{
 			if( stristr($this->referer, $lSearchEngine) ) // search simulation
@@ -1035,11 +1039,13 @@ class Hit
 				}
 			*/
 
-				// convert from "input encoding": Google might provide param "ie".
+				// convert from "input encoding":
 				if( isset($ref_params['ie']) )
+				{ // input encoding provided (Google does)
 					$ie = $ref_params['ie'];
+				}
 				else
-				{
+				{ // no input encoding provided, try to autodetect...
 					$ie = 'utf-8'; // default
 
 					if( can_check_encoding() )
@@ -1195,6 +1201,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.54  2009/12/11 23:55:48  fplanque
+ * doc
+ *
  * Revision 1.53  2009/12/09 22:05:46  blueyed
  * Hit: extract_keyphrase_from_referer: test for utf-8 and iso-8859-15 in query string, where the referer contains no input encoding ("ie") hint.
  *
