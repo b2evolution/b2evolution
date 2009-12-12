@@ -416,6 +416,10 @@ if( $display_mode == 'normal' )
 	require_css( 'blog_widgets.css' );
 
 
+	$AdminUI->breadcrumbpath_init( false );
+	$AdminUI->breadcrumbpath_add( T_('Blog settings'), '?ctrl=coll_settings&amp;blog=$blog$' );
+	$AdminUI->breadcrumbpath_add( T_('Widgets'), '?ctrl=widgets&amp;blog=$blog$' );
+
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 	$AdminUI->disp_html_head();
 
@@ -507,6 +511,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.37  2009/12/12 01:13:08  fplanque
+ * A little progress on breadcrumbs on menu structures alltogether...
+ *
  * Revision 1.36  2009/09/29 03:47:07  fplanque
  * doc
  *

@@ -195,16 +195,21 @@ class AdminUI_general extends Menu
 
 	function breadcrumbpath_get_html()
 	{
-		$r = '<div class="breadcrumbpath">&bull; <strong>You are here:</strong> ';
+		$r = '';
 
-		for( $i=0; $i<count($this->breadcrumbpath)-1; $i++ )
+		if( $count = count($this->breadcrumbpath) )
 		{
-			$r .= $this->breadcrumbpath[$i].' &gt; ';
+			$r = '<div class="breadcrumbpath">&bull; <strong>You are here:</strong> ';
+
+			for( $i=0; $i<$count-1; $i++ )
+			{
+				$r .= $this->breadcrumbpath[$i].' &gt; ';
+			}
+
+			$r .= '<strong>'.$this->breadcrumbpath[$i].'</strong>';
+
+			$r .= "</div>\n";
 		}
-
-		$r .= '<strong>'.$this->breadcrumbpath[$i].'</strong>';
-
-		$r .= "</div>\n";
 
 		return $r;
 	}
@@ -487,17 +492,22 @@ class AdminUI_general extends Menu
 		global $Plugins;
 
 		if( empty($this->displayed_sub_begin) )
-		{
+		{	// We haven't displayed sub menus yet (tabs):
 			$Plugins->trigger_event( 'AdminBeginPayload' );
 
 			// Display submenu (this also opens a div class="panelblock" or class="panelblocktabs")
 
 			//echo ' disp_submenu-BEGIN ';
-			$path = array( $this->get_path(0) );
-			$r = $this->get_html_menu( $path, 'sub' );
+			$path0 = $this->get_path(0);
+			$r = $this->get_html_menu( $path0, 'sub' );
 
 			echo $this->replace_vars( $r );
 			//echo ' disp_submenu-END ';
+
+			// Show 3rd level menu for settings tab
+			$path1 = $this->get_path(1);
+			echo $this->get_html_menu( array($path0, $path1), 'menu3' );
+
 
 			$this->displayed_sub_begin = 1;
 		}
@@ -1355,6 +1365,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.107  2009/12/12 01:13:07  fplanque
+ * A little progress on breadcrumbs on menu structures alltogether...
+ *
  * Revision 1.106  2009/12/11 03:01:13  fplanque
  * breadcrumbs improved
  *

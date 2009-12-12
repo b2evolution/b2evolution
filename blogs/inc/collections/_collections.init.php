@@ -464,16 +464,11 @@ class collections_Module extends Module
 
 			// What perms do we have?
 			$coll_settings_perm = $current_User->check_perm( 'blog_properties', 'any', false, $blog );
-			$coll_chapters_perm = $current_User->check_perm( 'blog_cats', '', false, $blog );
 
 			// Determine default page based on permissions:
 			if( $coll_settings_perm )
 			{	// Default: show General Blog Settings
 				$default_page = $dispatcher.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$blog;
-			}
-			elseif( $coll_chapters_perm )
-			{	// Default: show categories
-				$default_page = $dispatcher.'?ctrl=chapters&amp;blog='.$blog;
 			}
 			else
 			{	// Default: Show list of blogs
@@ -510,21 +505,6 @@ class collections_Module extends Module
 							'widgets' => array(
 								'text' => T_('Widgets'),
 								'href' => $dispatcher.'?ctrl=widgets&amp;blog='.$blog, ),
-						) );
-			}
-
-			if( $coll_chapters_perm )
-			{
-				$AdminUI->add_menu_entries( 'blogs',	array(
-							'chapters' => array(
-								'text' => T_('Categories'),
-								'href' => $dispatcher.'?ctrl=chapters&amp;blog='.$blog ),
-						) );
-			}
-
-			if( $coll_settings_perm )
-			{
-				$AdminUI->add_menu_entries( 'blogs',	array(
 							'urls' => array(
 								'text' => T_('URLs'),
 								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=urls&amp;blog='.$blog, ),

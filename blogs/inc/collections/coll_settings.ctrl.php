@@ -247,6 +247,48 @@ $AdminUI->set_coll_list_params( 'blog_properties', 'edit',
 
 $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Blog settings'), '?ctrl=coll_settings&amp;blog=$blog$' );
+switch( $AdminUI->get_path(1) )
+{
+	case 'general':
+		$AdminUI->breadcrumbpath_add( T_('General'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		break;
+
+	case 'features':
+		$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		break;
+
+	case 'skin':
+		$AdminUI->breadcrumbpath_add( T_('Skin selection'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		break;
+
+	case 'skin_settings':
+		$AdminUI->breadcrumbpath_add( T_('Settings for current skin'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		break;
+
+	case 'plugin_settings':
+		$AdminUI->breadcrumbpath_add( T_('Blog specific plugin settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		break;
+
+	case 'urls':
+		$AdminUI->breadcrumbpath_add( T_('URL configuration'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		break;
+
+	case 'seo':
+		$AdminUI->breadcrumbpath_add( T_('SEO settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		break;
+
+	case 'advanced':
+		$AdminUI->breadcrumbpath_add( T_('Advanced settings'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		break;
+
+	case 'perm':
+		$AdminUI->breadcrumbpath_add( T_('User permissions'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		break;
+
+	case 'permgroup':
+		$AdminUI->breadcrumbpath_add( T_('Group permissions'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		break;
+}
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -315,6 +357,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2009/12/12 01:13:08  fplanque
+ * A little progress on breadcrumbs on menu structures alltogether...
+ *
  * Revision 1.24  2009/12/06 22:55:20  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

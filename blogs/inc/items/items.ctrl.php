@@ -863,7 +863,7 @@ function init_list_mode()
 			$ItemList->set_default_filters( array(
 					'types' => NULL, // All types (suited for tab with full posts)
 				) );
-			$AdminUI->breadcrumbpath_add( T_('All items'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
+			// $AdminUI->breadcrumbpath_add( T_('All items'), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;filter=restore' );
 			break;
 
 		case 'list':
@@ -1253,6 +1253,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.81  2009/12/12 01:13:08  fplanque
+ * A little progress on breadcrumbs on menu structures alltogether...
+ *
  * Revision 1.80  2009/12/08 20:16:12  fplanque
  * Better handling of the publish! button on post forms
  *

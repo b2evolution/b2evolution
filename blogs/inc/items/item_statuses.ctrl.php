@@ -65,7 +65,7 @@ $AdminUI->set_path( 'items', 'settings', 'statuses' );
 
 $AdminUI->breadcrumbpath_init();
 $AdminUI->breadcrumbpath_add( T_('Contents'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings' );
+$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=statuses' );
 $AdminUI->breadcrumbpath_add( T_('Post statuses'), '?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=statuses' );
 
 
@@ -96,6 +96,9 @@ require $inc_path.'generic/inc/_generic_listeditor.php';
 
 /*
  * $Log$
+ * Revision 1.6  2009/12/12 01:13:08  fplanque
+ * A little progress on breadcrumbs on menu structures alltogether...
+ *
  * Revision 1.5  2009/12/06 22:55:16  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

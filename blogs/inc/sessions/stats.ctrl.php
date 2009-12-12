@@ -174,13 +174,13 @@ switch( $tab )
 	case 'referers':
 		$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
-		$AdminUI->breadcrumbpath_add( T_('referred by other sites'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
+		$AdminUI->breadcrumbpath_add( T_('Referred by other sites'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
 		break;
 
 	case 'refsearches':
 		$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
-		$AdminUI->breadcrumbpath_add( T_('referred by search engines'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
+		$AdminUI->breadcrumbpath_add( T_('Incoming searches'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab );
 		if( empty($tab3) )
 		{
 			$tab3 = 'hits';
@@ -188,12 +188,15 @@ switch( $tab )
 		switch( $tab3 )
 		{
 			case 'hits':
+				// $AdminUI->breadcrumbpath_add( T_('Latest'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
 				break;
 
 			case 'keywords':
+				$AdminUI->breadcrumbpath_add( T_('Searched keywords'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
 				break;
 
 			case 'topengines':
+				$AdminUI->breadcrumbpath_add( T_('Top search engines'), '?ctrl=stats&amp;blog=$blog$&tab='.$tab.'&amp;tab3='.$tab3 );
 				break;
 		}
 		break;
@@ -258,14 +261,6 @@ $AdminUI->disp_body_top();
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
-if( $tab == 'sessions' )
-{	// show sub-sub menu in Users tab
-	echo $AdminUI->get_html_menu( array( 'users', $tab ), 'menu3' );
-}
-else
-{
-	echo $AdminUI->get_html_menu( array( 'stats', $tab ), 'menu3' );
-}
 flush();
 
 switch( $AdminUI->get_path(1) )
@@ -362,6 +357,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2009/12/12 01:13:08  fplanque
+ * A little progress on breadcrumbs on menu structures alltogether...
+ *
  * Revision 1.21  2009/12/08 22:38:13  fplanque
  * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
  *

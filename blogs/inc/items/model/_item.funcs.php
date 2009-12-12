@@ -718,30 +718,30 @@ function attach_browse_tabs()
 				)
 		);
 
-/* fp> Custom types should be variations of normal posts by default
-  I am ok with giving extra tabs to SOME of them but then the
-	posttype list has to be transformed into a normal CREATE/UPDATE/DELETE (CRUD)
-	(see the stats>goals CRUD for an example of a clean CRUD)
-	and each post type must have a checkbox like "use separate tab"
-	Note: you can also make a select list "group with: posts|pages|etc...|other|own tab"
+	/* fp> Custom types should be variations of normal posts by default
+	  I am ok with giving extra tabs to SOME of them but then the
+		posttype list has to be transformed into a normal CREATE/UPDATE/DELETE (CRUD)
+		(see the stats>goals CRUD for an example of a clean CRUD)
+		and each post type must have a checkbox like "use separate tab"
+		Note: you can also make a select list "group with: posts|pages|etc...|other|own tab"
 
-	$ItemTypeCache = & get_ItemTypeCache();
-	$default_post_types = array(1,1000,1500,1520,1530,1570,1600,2000,3000);
-	$items_types = array_values( array_keys( $ItemTypeCache->get_option_array() ) );
-	// a tab for custom types
-	if ( array_diff($items_types,$default_post_types) )
-	{
-		$AdminUI->add_menu_entries(
-				'items',
-				array(
-					'custom' => array(
-						'text' => T_('Custom Types'),
-						'href' => $dispatcher.'?ctrl=items&amp;tab=custom&amp;filter=restore&amp;blog='.$Blog->ID,
-					),
-				)
-		);
-	}
-*/
+		$ItemTypeCache = & get_ItemTypeCache();
+		$default_post_types = array(1,1000,1500,1520,1530,1570,1600,2000,3000);
+		$items_types = array_values( array_keys( $ItemTypeCache->get_option_array() ) );
+		// a tab for custom types
+		if ( array_diff($items_types,$default_post_types) )
+		{
+			$AdminUI->add_menu_entries(
+					'items',
+					array(
+						'custom' => array(
+							'text' => T_('Custom Types'),
+							'href' => $dispatcher.'?ctrl=items&amp;tab=custom&amp;filter=restore&amp;blog='.$Blog->ID,
+						),
+					)
+			);
+		}
+	*/
 
 	if( $Blog->get_setting( 'use_workflow' ) )
 	{	// We want to use workflow properties for this blog:
@@ -769,28 +769,55 @@ function attach_browse_tabs()
 			);
 	}
 
-	// Add post types and statuses sub menu
-	$AdminUI->add_menu_entries(
+
+	// What perms do we have?
+	$coll_settings_perm = $current_User->check_perm( 'blog_properties', 'any', false, $Blog->ID );
+	$settings_url = '?ctrl=itemtypes&amp;tab=settings&amp;tab3=types';
+	if( $coll_chapters_perm = $current_User->check_perm( 'blog_cats', '', false, $Blog->ID ) )
+	{
+		$settings_url = '?ctrl=chapters&amp;blog='.$Blog->ID;
+	}
+
+	if( $coll_settings_perm || $coll_chapters_perm )
+	{
+		$AdminUI->add_menu_entries(
 			'items',
 			array(
 				'settings' => array(
 					'text' => T_('Settings'),
-					'href' => $dispatcher.'?ctrl=itemtypes&amp;tab=settings&amp;tab3=types',
-					'entries' => array(
-						'types' => array(
-							'text' => T_('Post types'),
-							'title' => T_('Post types management'),
-							'href' => $dispatcher.'?ctrl=itemtypes&amp;tab=settings&amp;tab3=types'
-							),
-						'statuses' => array(
-							'text' => T_('Post statuses'),
-							'title' => T_('Post statuses management'),
-							'href' => $dispatcher.'?ctrl=itemstatuses&amp;tab=settings&amp;tab3=statuses'
-							),
-						)
+					'href' => $settings_url,
 					)
 				)
-		);
+			);
+
+		if( $coll_chapters_perm )
+		{
+			$AdminUI->add_menu_entries( array('items','settings'), array(
+				'chapters' => array(
+					'text' => T_('Categories'),
+					'href' => '?ctrl=chapters&amp;blog='.$Blog->ID
+					),
+				)
+			);
+		}
+
+		if( $coll_settings_perm )
+		{
+			$AdminUI->add_menu_entries( array('items','settings'), array(
+				'types' => array(
+					'text' => T_('Post types'),
+					'title' => T_('Post types management'),
+					'href' => '?ctrl=itemtypes&amp;tab=settings&amp;tab3=types'
+					),
+				'statuses' => array(
+					'text' => T_('Post statuses'),
+					'title' => T_('Post statuses management'),
+					'href' => '?ctrl=itemstatuses&amp;tab=settings&amp;tab3=statuses'
+					),
+				)
+			);
+		}
+	}
 }
 
 
@@ -1088,6 +1115,9 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 
 /*
  * $Log$
+ * Revision 1.82  2009/12/12 01:13:08  fplanque
+ * A little progress on breadcrumbs on menu structures alltogether...
+ *
  * Revision 1.81  2009/12/08 20:16:12  fplanque
  * Better handling of the publish! button on post forms
  *

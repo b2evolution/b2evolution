@@ -33,9 +33,6 @@ else
 	$action = 'nil';
 }
 
-$AdminUI->set_path( 'blogs', 'chapters' );
-
-
 /**
  * Delete restrictions
  */
@@ -51,14 +48,8 @@ $restrict_title = T_('Cannot delete category');	 //&laquo;%s&raquo;
 $checked_delete = false;
 
 load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
-$GenericCategoryCache = & new ChapterCache();
+$GenericCategoryCache = new ChapterCache();
 
-
-/**
- * Display page header, menus & messages:
- */
-$AdminUI->set_coll_list_params( 'blog_cats', 'edit',
-		array( 'ctrl' => $ctrl ),	T_('List'), '?ctrl=collections&amp;blog=0' );
 
 // Restrict to chapters of the specific blog:
 $subset_ID = $blog;
@@ -326,6 +317,30 @@ switch( $action )
 		break;
 }
 
+/**
+ * Display page header, menus & messages:
+ */
+$AdminUI->set_coll_list_params( 'blog_cats', 'edit',
+		array( 'ctrl' => $ctrl ),	NULL );
+
+
+/**
+ * We need make this call to build menu for all modules
+ */
+$AdminUI->set_path( 'items' );
+
+/*
+ * Add sub menu entries:
+ * We do this here instead of _header because we need to include all filter params into regenerate_url()
+ */
+attach_browse_tabs();
+
+$AdminUI->set_path( 'items', 'settings', 'chapters' );
+
+$AdminUI->breadcrumbpath_init();
+$AdminUI->breadcrumbpath_add( T_('Contents'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
+$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=chapters&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_add( T_('Categories'), '?ctrl=chapters&amp;blog=$blog$' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -425,6 +440,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2009/12/12 01:13:08  fplanque
+ * A little progress on breadcrumbs on menu structures alltogether...
+ *
  * Revision 1.14  2009/09/14 11:26:19  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

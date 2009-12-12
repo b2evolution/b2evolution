@@ -268,10 +268,6 @@ $AdminUI->disp_body_top();
 
 $AdminUI->disp_payload_begin();
 
-// Show 3rd level menu for settings tab
-echo $AdminUI->get_html_menu( array( 'items', $tab ), 'menu3' );
-flush();
-
 /**
  * Display payload:
  */
@@ -315,6 +311,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2009/12/12 01:13:08  fplanque
+ * A little progress on breadcrumbs on menu structures alltogether...
+ *
  * Revision 1.10  2009/12/06 22:55:16  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

@@ -292,13 +292,6 @@ switch( $action )
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
-		// Show 3rd level menu for settings tab
-		if( isset( $tab ) && ($tab == 'settings') ) 
-		{
-			echo $AdminUI->get_html_menu( array( 'items', $tab ), 'menu3' );
-			flush();
-		}
-		
 		// Display VIEW:
 		if( !empty( $list_view ) )
 		{
@@ -327,6 +320,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2009/12/12 01:13:08  fplanque
+ * A little progress on breadcrumbs on menu structures alltogether...
+ *
  * Revision 1.6  2009/09/25 20:26:26  fplanque
  * fixes/doc
  *

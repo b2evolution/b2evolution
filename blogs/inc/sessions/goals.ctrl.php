@@ -226,8 +226,6 @@ $AdminUI->disp_body_top();
 
 $AdminUI->disp_payload_begin();
 
-echo $AdminUI->get_html_menu( array( 'stats', 'goals' ), 'menu3' );
-
 /**
  * Display payload:
  */
@@ -280,6 +278,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2009/12/12 01:13:08  fplanque
+ * A little progress on breadcrumbs on menu structures alltogether...
+ *
  * Revision 1.18  2009/12/06 22:55:21  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)
