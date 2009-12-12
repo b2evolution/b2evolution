@@ -6,7 +6,7 @@
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
  * @package skins
- * @subpackage custom
+ * @subpackage evopress
  *
  * @version $Id$
  */
@@ -65,6 +65,9 @@ class evopress_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.2  2009/12/12 19:22:36  fplanque
+ * minor
+ *
  * Revision 1.1  2009/12/02 03:54:39  fplanque
  * Attempt to let more CSS be loaded sequentially instead of serially (which happens with @import)
  * Also prepares for bundling.

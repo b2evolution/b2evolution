@@ -10,6 +10,7 @@
  * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
+ * @subpackage evopress
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -114,11 +115,4 @@ $params = array_merge( array(
 
 <?php
 locale_restore_previous();	// Restore previous locale (Blog locale)
-
-/*
- * $Log$
- * Revision 1.1  2009/05/23 14:12:42  fplanque
- * All default skins now support featured posts and intro posts.
- *
- */
 ?>
