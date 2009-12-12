@@ -21,13 +21,15 @@ $Form->hidden( 'action', 'update' );
 
 $Form->begin_fieldset( T_('Users settings') );
 
-$Form->radio( 'uset_nickname_editing', $Settings->get( 'nickname_editing' ), array(
+	$Form->checkbox_input( 'allow_avatars', $Settings->get('allow_avatars'), T_('Allow avatars'), array( 'note'=>T_('Allow users to upload avatars.') ) );
+
+	$Form->radio( 'uset_nickname_editing', $Settings->get( 'nickname_editing' ), array(
 					array( 'edited-user', T_('Can be edited by user') ),
 					array( 'edited-admin', T_('Can be edited by admins only') ),
 					array( 'hidden', T_('Hidden') )
 				), T_('Nickname'), true );
 
-$Form->radio( 'uset_multiple_sessions', $Settings->get( 'multiple_sessions' ), array(
+	$Form->radio( 'uset_multiple_sessions', $Settings->get( 'multiple_sessions' ), array(
 					array( 'never', T_('Never allow') ),
 					array( 'adminset_default_no', T_('Let admins decide for each user, default to "no" for new users') ),
 					array( 'userset_default_no', T_('Let users decide, default to "no" for new users') ),
@@ -48,6 +50,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.6  2009/12/12 19:14:12  fplanque
+ * made avatars optional + fixes on img props
+ *
  * Revision 1.5  2009/10/28 13:41:57  efy-maxim
  * default multiple sessions settings
  *

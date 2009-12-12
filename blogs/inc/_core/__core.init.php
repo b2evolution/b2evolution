@@ -500,9 +500,11 @@ class _core_Module extends Module
 		 */
 		global $localtimenow, $is_admin_page;
 
+		$allow_avatars = $Settings->get('allow_avatars');
+
 		$entries = array(
 			'userprefs' => array(
-					'text' => $current_User->get_avatar_imgtag( 'crop-15x15', '', 'top' ).' <strong>'.$current_User->login.'</strong>',
+					'text' => ($allow_avatars ? $current_User->get_avatar_imgtag( 'crop-15x15', '', 'top' ).' ' : '' ).'<strong>'.$current_User->login.'</strong>',
 					'href' => get_user_profile_url(),
 					'entries' => array(
 						'profile' => array(
@@ -609,7 +611,7 @@ class _core_Module extends Module
 	 */
 	function build_menu_3()
 	{
-		global $blog, $loc_transinfo, $ctrl, $dispatcher;
+		global $blog, $loc_transinfo, $ctrl, $dispatcher, $Settings;
 		/**
 		 * @var User
 		 */
@@ -682,9 +684,12 @@ class _core_Module extends Module
 
 			if( !empty( $user_ID ) )
 			{
-				$users_sub_entries['avatar'] = array(
+				if( $Settings->get('allow_avatars') )
+				{
+					$users_sub_entries['avatar'] = array(
 									'text' => T_('Avatar'),
 									'href' => '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$user_ID );
+				}
 
 				if( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'edit' ) )
 				{
@@ -773,6 +778,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.56  2009/12/12 19:14:12  fplanque
+ * made avatars optional + fixes on img props
+ *
  * Revision 1.55  2009/12/06 22:55:21  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

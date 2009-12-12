@@ -88,8 +88,16 @@ $count_sql = 'SELECT COUNT(*)
 							 	FROM T_users
 							 WHERE '.$where_clause.' 1';
 
+if( $Settings->get('allow_avatars') )
+{
+	$default_sort = '--A';
+}
+else
+{
+	$default_sort = '-A';
+}
 
-$Results = new Results( $SQL->get(), 'user_', '--A', NULL, $count_sql );
+$Results = new Results( $SQL->get(), 'user_', $default_sort, NULL, $count_sql );
 
 $Results->title = T_('Groups & Users');
 
@@ -172,26 +180,29 @@ $Results->cols[] = array(
 						'td' => '$user_ID$',
 					);
 
-function user_avatar( $user_ID, $user_avatar_file_ID )
+if( $Settings->get('allow_avatars') )
 {
-	$FileCache = & get_FileCache();
-
-	// Do not halt on error. A file can disappear without the profile being updated.
-	/**
-	 * @var File
-	 */
-	if( ! $File = & $FileCache->get_by_ID( $user_avatar_file_ID, false, false ) )
+	function user_avatar( $user_ID, $user_avatar_file_ID )
 	{
-		return '';
+		$FileCache = & get_FileCache();
+
+		// Do not halt on error. A file can disappear without the profile being updated.
+		/**
+		 * @var File
+		 */
+		if( ! $File = & $FileCache->get_by_ID( $user_avatar_file_ID, false, false ) )
+		{
+			return '';
+		}
+		return '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-48x48' ).'</a>';
 	}
-	return '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-48x48' ).'</a>';
+	$Results->cols[] = array(
+							'th' => T_('Avatar'),
+							'th_class' => 'shrinkwrap',
+							'td_class' => 'shrinkwrap center',
+							'td' => '%user_avatar( #user_ID#, #user_avatar_file_ID# )%',
+						);
 }
-$Results->cols[] = array(
-						'th' => T_('Avatar'),
-						'th_class' => 'shrinkwrap',
-						'td_class' => 'shrinkwrap center',
-						'td' => '%user_avatar( #user_ID#, #user_avatar_file_ID# )%',
-					);
 
 $Results->cols[] = array(
 						'th' => T_('Login'),
@@ -327,6 +338,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.22  2009/12/12 19:14:11  fplanque
+ * made avatars optional + fixes on img props
+ *
  * Revision 1.21  2009/12/07 23:07:34  blueyed
  * Whitespace.
  *

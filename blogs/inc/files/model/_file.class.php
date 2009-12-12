@@ -1584,7 +1584,7 @@ class File extends DataObject
 	 *
 	 * @param string
 	 */
-	function get_thumb_url( $size_name = 'fit-80x80' )
+	function get_thumb_url( $size_name = 'fit-80x80', $glue = '&amp;' )
 	{
 		global $public_access_to_media, $htsrv_url;
 
@@ -1608,7 +1608,7 @@ class File extends DataObject
 		}
 
 		// No thumbnail available (at least publicly), we need to go through getfile.php!
-		$url = $this->get_getfile_url().'&amp;size='.$size_name;
+		$url = $this->get_getfile_url($glue).$glue.'size='.$size_name;
 
 		return $url;
 	}
@@ -1618,15 +1618,15 @@ class File extends DataObject
 	 * Get the URL to access a file through getfile.php.
 	 * @return string
 	 */
-	function get_getfile_url()
+	function get_getfile_url( $glue = '&amp;' )
 	{
 		global $htsrv_url;
 		return $htsrv_url.'getfile.php/'
 			// This is for clean 'save as':
 			.rawurlencode( $this->_name )
 			// This is for locating the file:
-			.'?root='.$this->_FileRoot->ID.'&amp;path='.$this->_rdfp_rel_path
-			.'&amp;mtime='.$this->get_lastmod_ts(); // TODO: dh> use salt here?!
+			.'?root='.$this->_FileRoot->ID.$glue.'path='.$this->_rdfp_rel_path
+			.$glue.'mtime='.$this->get_lastmod_ts(); // TODO: dh> use salt here?!
 	}
 
 
@@ -1644,6 +1644,7 @@ class File extends DataObject
 		}
 
 		$img_attribs = $this->get_img_attribs($size_name);
+		// pre_dump( $img_attribs );
 
 		if( $class )
 		{ // add class
@@ -1698,7 +1699,7 @@ class File extends DataObject
 		}
 		else
 		{ // We want src to link to a thumbnail
-			$img_attribs['src'] = $this->get_thumb_url( $size_name );
+			$img_attribs['src'] = $this->get_thumb_url( $size_name, '&' );
 			$thumb_path = $this->get_af_thumb_path($size_name, NULL, true);
 			if( substr($thumb_path, 0, 1) != '!'
 				&& ( $size_arr = imgsize($thumb_path, 'widthheight_assoc') ) )
@@ -1969,6 +1970,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.76  2009/12/12 19:14:10  fplanque
+ * made avatars optional + fixes on img props
+ *
  * Revision 1.75  2009/12/06 22:55:20  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

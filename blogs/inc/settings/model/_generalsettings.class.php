@@ -88,6 +88,8 @@ class GeneralSettings extends AbstractSettings
 		'newusers_revalidate_emailchg' => '0',
 		'newusers_level' => '1',
 
+		'allow_avatars' => 1,
+
 		'regexp_filename' => '^[a-zA-Z0-9\-_. ]+$', // TODO: accept (spaces and) special chars / do full testing on this
 		'regexp_dirname' => '^[a-zA-Z0-9\-_]+$', // TODO: accept spaces and special chars / do full testing on this
 		'reloadpage_timeout' => '300',
@@ -197,6 +199,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.27  2009/12/12 19:14:13  fplanque
+ * made avatars optional + fixes on img props
+ *
  * Revision 1.26  2009/12/06 22:55:21  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

@@ -358,7 +358,10 @@ switch( $action )
 				break;
 			case 'avatar':
 				// Display user avatar form:
-				$AdminUI->disp_view( 'users/views/_user_avatar.form.php' );
+				if( $Settings->get('allow_avatars') )
+				{
+					$AdminUI->disp_view( 'users/views/_user_avatar.form.php' );
+				}
 				break;
 			case 'password':
 				// Display user password form:
@@ -379,6 +382,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2009/12/12 19:14:06  fplanque
+ * made avatars optional + fixes on img props
+ *
  * Revision 1.5  2009/12/06 22:55:18  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

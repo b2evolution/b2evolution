@@ -76,7 +76,8 @@ if( $blog )
 
 		?>
 
-		<script type="text/javascript"><!--
+		<script type="text/javascript">
+			<!--
 
 			var commentIds = new Array();
 			var commentsInd = 0;
@@ -175,7 +176,8 @@ if( $blog )
 				jQuery('#' + id).animate({ backgroundColor: color }, 200);
 			}
 
-		--></script>
+			-->
+		</script>
 		<?php
 
 		$nb_blocks_displayed++;
@@ -558,6 +560,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.49  2009/12/12 19:14:09  fplanque
+ * made avatars optional + fixes on img props
+ *
  * Revision 1.48  2009/12/10 21:32:47  efy-maxim
  * 1. single ajax call
  * 2. comments of protected post fix

@@ -7,11 +7,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $user_profile_only;
 /**
- * @var instance of User class
+ * @var User
  */
 global $edited_User;
 /**
- * @var instance of User class
+ * @var User
  */
 global $current_User;
 /**
@@ -22,7 +22,7 @@ global $action;
 // Begin payload block:
 $this->disp_payload_begin();
 
-$Form = & new Form( NULL, 'user_checkchanges' );
+$Form = new Form( NULL, 'user_checkchanges' );
 
 if( !$user_profile_only )
 {
@@ -44,17 +44,20 @@ $Form->begin_fieldset( T_('Avatar') );
 
 global $admin_url;
 $avatar_tag = $edited_User->get_avatar_imgtag();
-if( !empty( $avatar_tag ) )
+if( $current_User->check_perm( 'users', 'all' ) )
 {
-	$avatar_tag .= ' '.action_icon( T_( 'Remove' ), 'delete', '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID.'&amp;action=remove_avatar', T_( 'Remove' ) );
-	if( $current_User->check_perm( 'files', 'view' ) )
+	if( !empty( $avatar_tag ) )
 	{
-		$avatar_tag .= ' '.action_icon( T_( 'Change' ), 'link', '?ctrl=files&amp;user_ID='.$edited_User->ID, T_( 'Change' ).' &raquo;', 5, 5 );
+		$avatar_tag .= ' '.action_icon( T_( 'Remove' ), 'delete', '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID.'&amp;action=remove_avatar', T_( 'Remove' ) );
+		if( $current_User->check_perm( 'files', 'view' ) )
+		{
+			$avatar_tag .= ' '.action_icon( T_( 'Change' ), 'link', '?ctrl=files&amp;user_ID='.$edited_User->ID, T_( 'Change' ).' &raquo;', 5, 5 );
+		}
 	}
-}
-elseif( $current_User->check_perm( 'files', 'view' ) )
-{
-	$avatar_tag .= ' '.action_icon( T_( 'Upload or choose an avatar' ), 'link', '?ctrl=files&amp;user_ID='.$edited_User->ID, T_( 'Upload/Select' ).' &raquo;', 5, 5 );
+	elseif( $current_User->check_perm( 'files', 'view' ) )
+	{
+		$avatar_tag .= ' '.action_icon( T_( 'Upload or choose an avatar' ), 'link', '?ctrl=files&amp;user_ID='.$edited_User->ID, T_( 'Upload/Select' ).' &raquo;', 5, 5 );
+	}
 }
 
 $Form->info( T_( 'Avatar' ), $avatar_tag );
@@ -70,6 +73,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.4  2009/12/12 19:14:12  fplanque
+ * made avatars optional + fixes on img props
+ *
  * Revision 1.3  2009/11/21 13:39:05  efy-maxim
  * 'Cancel editing' fix
  *

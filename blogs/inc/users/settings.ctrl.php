@@ -15,6 +15,10 @@ switch ( $action )
 		$current_User->check_perm( 'options', 'edit', true );
 
 		// UPDATE general settings:
+
+		param( 'allow_avatars', 'integer', 0 );
+		$Settings->set( 'allow_avatars', $allow_avatars );
+
 		param( 'uset_nickname_editing', 'string', 'edited-user' );
 		if( $demo_mode )
 		{
@@ -67,6 +71,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2009/12/12 19:14:08  fplanque
+ * made avatars optional + fixes on img props
+ *
  * Revision 1.5  2009/12/06 22:55:19  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)
