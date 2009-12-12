@@ -848,10 +848,16 @@ function locale_updateDB()
  */
 function convert_charset( $string, $dest_charset, $src_charset )
 {
-	$GLOBALS['Timer']->resume('convert_charset', false );
+	if( isset($GLOBALS['Timer']) )
+	{
+		$GLOBALS['Timer']->resume('convert_charset', false );
+	}
 	if( $dest_charset == $src_charset || $dest_charset == '' /* may happen if $evo_charset is not defined yet */ )
 	{ // no conversation required
-		$GLOBALS['Timer']->pause('convert_charset', false );
+		if( isset($GLOBALS['Timer']) )
+		{
+			$GLOBALS['Timer']->pause('convert_charset', false );
+		}
 		return $string;
 	}
 
@@ -861,7 +867,10 @@ function convert_charset( $string, $dest_charset, $src_charset )
 	}
 	// pre_dump( $dest_charset, $src_charset, $string );
 
-	$GLOBALS['Timer']->pause('convert_charset', false );
+	if( isset($GLOBALS['Timer']) )
+	{
+		$GLOBALS['Timer']->pause('convert_charset', false );
+	}
 	return $string;
 }
 
@@ -1086,6 +1095,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.39  2009/12/12 03:54:05  blueyed
+ * convert_charset: do not depend on Timer global
+ *
  * Revision 1.38  2009/12/11 23:55:48  fplanque
  * doc
  *
