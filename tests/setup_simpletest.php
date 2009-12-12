@@ -17,8 +17,10 @@ param('action', 'string', '');
 
 <body>
 	<h1>Setup simpletest for b2evolution</h1>
-	<p>This will setup the simpletest framework for b2evolution, by unzipping
-	the <a href="../simpletest.tar.bz2">simpletest.tar.bz2 snapshot</a> shipped with b2evolution.</p>
+	<p>This will setup the simpletest framework for b2evolution, by unzipping the simpletest snapshot
+	<small>(<a href="http://evocms.cvs.sourceforge.net/viewvc/*checkout*/evocms/b2evolution/tests/simpletest.tar.bz2?revision=1.1">link to the CVS HEAD (most current) version</a>)</small> shipped with b2evolution.</p>
+
+	<p><small>This snapshot is provided for your convenience and gets packaged from <a href="http://github.com/blueyed/simpletest">http://github.com/blueyed/simpletest</a> (basically upstream trunk with useful/required patches)</small></p>
 
 <?php
 if( $action == 'unzip_simpletest' )
