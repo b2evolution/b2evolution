@@ -438,6 +438,7 @@ class Hit
 		$this->is_IE = false;
 		$this->is_winIE = false;
 		$this->is_macIE = false;
+		$this->is_chrome = false;
 		$this->is_safari = false;
 		$this->is_opera = false;
 		$this->is_NS4 = false;
@@ -504,6 +505,12 @@ class Hit
 				$this->is_IE = true;
 				$this->is_macIE = 1;
 				$this->agent_name = 'msie';
+				$this->agent_type = 'browser';
+			}
+			elseif(strpos($user_agent, 'Chrome/') !== false)
+			{
+				$this->is_chrome = true;
+				$this->agent_name = 'chrome';
 				$this->agent_type = 'browser';
 			}
 			elseif(strpos($user_agent, 'Safari/') !== false)
@@ -1166,6 +1173,17 @@ class Hit
 	}
 
 	/**
+	 * Is this Chrome?
+	 * @return boolean
+	 */
+	function is_chrome()
+	{
+		if( ! isset($this->is_chrome) )
+			$this->detect_useragent();
+		return $this->is_chrome;
+	}
+
+	/**
 	 * Is this Safari?
 	 * @return boolean
 	 */
@@ -1202,6 +1220,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.56  2009/12/12 22:43:02  sam2kb
+ * Detect Google Chrome. $Hit->is_chrome()
+ *
  * Revision 1.55  2009/12/12 02:04:10  blueyed
  * doc
  *
