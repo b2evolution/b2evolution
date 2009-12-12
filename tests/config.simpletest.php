@@ -36,11 +36,10 @@ if( !defined( 'SIMPLETEST_DIR' ) )
 	}
 }
 
-
-if( !file_exists( SIMPLETEST_DIR.'unit_tester.php' ) )
+if( !file_exists( SIMPLETEST_DIR.'unit_tester.php' ) || (isset($_GET['action']) && $_GET['action']=='unzip_simpletest') )
 {
 	echo 'SimpleTest framework not found: File '.SIMPLETEST_DIR.'unit_tester.php does not exist.';
-	require SIMPLETEST_DIR.'index.html';
+	require dirname(__FILE__).'/setup_simpletest.php';
 	die();
 }
 

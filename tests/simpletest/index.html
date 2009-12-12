@@ -1,41 +1,14 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<title>Setting up SimpleTest for b2evo</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>/tests/simpletest Folder</title>
 </head>
-
 <body>
-
-<h1>Setting up SimpleTest for b2evo</h1>
-
-<h2>1. Get the SimpleTest framework</h2>
-
-<p>If you want to run the <a href="http://simpletest.sourceforge.net/">SimpleTest</a> cases in /tests, you'll have to get the
-simpletest framework. Of course.</p>
-
-<p>You can
-<a href="http://sourceforge.net/project/showfiles.php?group_id=76550">download it from SourceForge</a> or get it straight from Subversion:</p>
-<pre>
-svn co https://simpletest.svn.sourceforge.net/svnroot/simpletest/simpletest/trunk simpletest
-</pre>
-
-Put it into the /tests/simpletest directory.
-
-<blockquote><font size="2">
-	<p>If you already have it somewhere, just create the file
-		/tests/config.simpletest.OVERRIDE.php (in the b2evo root directory)
-		define the constant SIMPLETEST_DIR, e.g.:</p>
-	<pre>&lt;?php
-define( 'SIMPLETEST_DIR', '/your/path/with/trailing/slash/' );
-?&gt;</pre>
-	<p>Simplest method, to not edit any config files:
-		Just put a symlink named "symlink" in this directory (where this file
-		is).</p>
-</font></blockquote>
-
-<h2>2. (Optionally) configure the SimpleTest framework</h2>
-<p>Edit /test/config.php .</p>
-
-<p>Happy testing..</p>
-
+	<h2><a href="http://evocore.net/">evoCore</a> FrameWork</h2>
+	<h1><code>/tests/simpletest</code> folder</h1>
+	<h3>If you are trying to setup simpletest, <a href="../setup_simpletest.php">click here to call the setup script</a> . </h3>
+	<p>This folder holds the <strong>simpletest framework</strong> files.</p>
+	<p><em>This folder should not be accessible through the web.</em></p>
 </body>
 </html>
