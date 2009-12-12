@@ -96,6 +96,11 @@ class coll_item_list_Widget extends ComponentWidget
 					'note' => T_( 'ID of the blog to use, leave empty for the current blog.' ),
 					'size' => 4,
 				),
+				'cat_IDs' => array(
+					'label' => T_( 'Categories' ),
+					'note' => T_( 'List category IDs separated by ,' ),
+					'size' => 15,
+				),
 				'item_group_by' => array(
 					'label' => T_('Group by'),
 					'note' => T_('Do you want to group the Items?'),
@@ -232,12 +237,15 @@ class coll_item_list_Widget extends ComponentWidget
 			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
 			$ItemList = & new ItemListLight( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCacheLight', $this->code.'_' );
 		}
+		
+		$cat_array = array_filter( array_map( 'trim', explode( ',', $this->disp_params[ 'cat_IDs' ] ) ) );
 
 		// Filter list:
 		$filters = array(
+				'cat_array' => $cat_array, // Restrict to selected categories
 				'orderby' => $this->disp_params[ 'order_by' ],
 				'order' => $this->disp_params[ 'order_dir' ],
-				'unit' => 'posts',						// We want to advertise all items (not just a page or a day)
+				'unit' => 'posts', // We want to advertise all items (not just a page or a day)
 			);
 
 		if( $this->disp_params['item_type'] != '#' )
@@ -415,6 +423,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.20  2009/12/12 23:51:53  sam2kb
+ * Restrict ItemList to selected categories
+ *
  * Revision 1.19  2009/12/01 04:19:25  fplanque
  * even more invalidation dimensions
  *
