@@ -164,6 +164,8 @@ if( $resolve_extra_path )
 		 * fp> I know I had a good reason for this back in 2003!! I can't remember exactly though :)
 		 * If you want, we can try to comment it out and see how it goes... (please do so, I am not sure exactly how much you want to comment out)
 		 * Tblue> Done, let's see if this has any side-effects.
+		 * dh> Well, http://test.b2evo.net/HEAD/blogs/blog1.php?c=1 still redirects (that's what
+		 *     I've meant above). Should params like those trigger redir=no internally?
 
 		if( isset( $path_elements[0] ) && preg_match( '#.*\.php[0-9]?$#', $path_elements[0] ) )
 		{ // Ignore element ending with .php (fp: note: may be just '.php')
@@ -641,6 +643,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.159  2009/12/12 02:16:17  blueyed
+ * doc
+ *
  * Revision 1.158  2009/11/30 00:22:04  fplanque
  * clean up debug info
  * show more timers in view of block caching
