@@ -324,6 +324,7 @@ class Hit
 		// Is the referer a search engine?
 		// Note: for debug simulation, you may need to add sth like $search_engines[] = '/credits.html'; into the conf
 		// fp>dh: why add the code, but no matching data to stats.conf ?
+		// dh> I wanted to refactor it, so that the data could contain the default encoding, too. Then I stopped this. I've left this though, since I thought it could turn out to be useful in the future.
 		foreach( $search_engines as $search_engine_name => $lSearchEngine )
 		{
 			if( stristr($this->referer, $lSearchEngine) ) // search simulation
@@ -1201,6 +1202,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.55  2009/12/12 02:04:10  blueyed
+ * doc
+ *
  * Revision 1.54  2009/12/11 23:55:48  fplanque
  * doc
  *

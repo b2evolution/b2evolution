@@ -93,7 +93,8 @@ $blackList = array(
  * @todo fp> merge definitions for search engine sig + keyword param + position param into a single array
  * @todo fp> move to admin interface (specific list editor), include query params
  *       fp Actually, I'm not sure a DB table would be a good idea. It would slow down lookup and it's not really a table the average user is going to modify anyway...
- * @todo fp> have regexps, for example for //www\.google\.[^/]/search
+ *       dh> It would be a cheap query, and the processing _might_ be even faster, if we can ask MySQL to do the lookup, instead of iterating the same list always. Also, this is a good thing for autoupdates. You're right about average users changing it though.
+ * @todo fp> have regexps, for example for //www\.google\.[^/]+/search
  * 
  *
  * @global array $search_engines
