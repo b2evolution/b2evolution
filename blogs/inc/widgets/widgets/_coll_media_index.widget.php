@@ -186,16 +186,16 @@ class coll_media_index_Widget extends ComponentWidget
 									INNER JOIN T_links ON post_ID = link_itm_ID
 									INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( 'cat_blog_ID IN ('.$list_blogs.')' ); // fp> TODO: want to restrict on images :]
-		$SQL->WHERE_and( 'post_status = "published"' );	// TODO: this is a dirty temporary hack. More should be shown.
+		$SQL->WHERE_and( 'post_status = "published"' );	// TODO: this is a dirty hack. More should be shown.
 		$SQL->WHERE_and( 'post_datestart <= \''.remove_seconds( $localtimenow ).'\'' );
 		$SQL->GROUP_BY( 'link_ID' );
-		$SQL->LIMIT( $this->disp_params[ 'limit' ] );
+		$SQL->LIMIT( $this->disp_params[ 'limit' ]*4 ); // fp> TODO: because we have no way of getting images only, we get 4 times more data than requested and hope that 25% at least will be images :/
 		$SQL->ORDER_BY(	gen_order_clause( $this->disp_params['order_by'], $this->disp_params['order_dir'],
 											'post_', 'post_ID '.$this->disp_params['order_dir'].', link_ID' ) );
 
 		$FileList->sql = $SQL->get();
 
-		$FileList->query( false, false, false );
+		$FileList->query( false, false, false, 'Media index widget' );
 
 		$layout = $this->disp_params[ 'thumb_layout' ];
 
@@ -215,12 +215,14 @@ class coll_media_index_Widget extends ComponentWidget
 		 */
 		while( $File = & $FileList->get_next() )
 		{
+			if( $count >= $this->disp_params[ 'limit' ] )
+			{	// We have enough images already!
+				break;
+			}
+
 			if( ! $File->is_image() )
 			{	// Skip anything that is not an image
-				// fp> TODO: maybe this property should be stored in link_ltype_ID
-				// Tblue> TODO: If LIMIT is 1 and we order by RAND(), we
-				//        sometimes get no images (only normal files) and
-				//        nothing is displayed "inside" the widget.
+				// fp> TODO: maybe this property should be stored in link_ltype_ID or in the files table
 				continue;
 			}
 
@@ -290,6 +292,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.18  2009/12/13 02:28:36  fplanque
+ * dirty fix / better than nothing
+ *
  * Revision 1.17  2009/11/30 04:31:38  fplanque
  * BlockCache Proof Of Concept
  *
