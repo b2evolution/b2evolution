@@ -83,9 +83,9 @@ $allow_evodb_reset = 0;	// Set to 1 to enable. Do not leave this on 1 on product
 /**
  * $baseurl is where your blogs reside by default. CHECK THIS CAREFULLY or nothing will work.
  * It should be set to the URL where you can find the blog templates and/or the blog stub files,
- * that means index.php, blog_b.php, etc.
+ * that means index.php, blog1.php, blog2.php, etc. as well as admin.php.
  * Note: Blogs can be in subdirectories of the baseurl. However, no blog should be outside
- * of there, or some tricky things may fail (e-g: pingback)
+ * of there, or some tricky things may fail (including intempestive logouts)
  *
  * IMPORTANT: If you want to test b2evolution on your local machine, do NOT use that machine's
  * name in the $baseurl!
