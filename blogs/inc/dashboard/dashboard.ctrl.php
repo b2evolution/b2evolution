@@ -111,6 +111,8 @@ if( $blog )
 				var comments_number = $('#badge_' + commentsInd).val();
 				if(comments_number == '0')
 				{
+					var options = {};
+					$('#comments_block').effect('blind', options, 200);
 					$('#comments_block').remove();
 				}
 				else
@@ -560,6 +562,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.50  2009/12/13 17:08:52  efy-maxim
+ * ajax - smooth comments disappearing
+ *
  * Revision 1.49  2009/12/12 19:14:09  fplanque
  * made avatars optional + fixes on img props
  *
