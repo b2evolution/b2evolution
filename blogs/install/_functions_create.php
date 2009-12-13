@@ -1101,9 +1101,11 @@ function create_demo_contents()
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = & new Item();
-	$edited_Item->insert( 1, T_("Apache optimization..."), T_("<p>In the <code>/blogs</code> folder there is a file called [<code>sample.htaccess</code>]. You should try renaming it to [<code>.htaccess</code>].</p>
+	$edited_Item->insert( 1, T_("Apache optimization..."), sprintf( T_("<p>In the <code>/blogs</code> folder there is a file called [<code>sample.htaccess</code>]. You should try renaming it to [<code>.htaccess</code>].</p>
 
-<p>This will optimize the way b2evolution is handled by the webserver (if you are using Apache). This file is not active by default because a few hosts would display an error right away when you try to use it. If this happens to you when you rename the file, just remove it and you'll be fine.</p>"),
+<p>This will optimize the way b2evolution is handled by the webserver (if you are using Apache). This file is not active by default because a few hosts would display an error right away when you try to use it. If this happens to you when you rename the file, just remove it and you'll be fine.</p>
+
+<p>For further optimization, please review the manual page about <a %s>Performance optimization</a>. Depending on your current configuration and on what your <a %s>web hosting</a> company allows you to do, you may increase the speed of b2evolution by up to a factor of 10!</p>"), 'href="http://manual.b2evolution.net/Performance_optimization"', 'href="http://b2evolution.net/web-hosting/"' ),
 												$now, $cat_b2evo, array( $cat_ann_b ) );
 
 	// Insert a post:
@@ -1293,6 +1295,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.282  2009/12/13 03:00:23  fplanque
+ * more info about speed optimization
+ *
  * Revision 1.281  2009/11/12 00:46:34  fplanque
  * doc/minor/handle demo mode
  *
