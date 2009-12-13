@@ -321,8 +321,10 @@ class coll_item_list_Widget extends ComponentWidget
 			while( $Item = & $ItemList->get_category_group() )
 			{
 				// Open new cat:
+				$Chapter = & $Item->get_main_Chapter();
+				
 				echo $this->disp_params['item_start'];
-				$Item->main_category();
+				echo '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get('name').'</a>';
 				echo $this->disp_params['group_start'];
 
 				while( $Item = & $ItemList->get_item() )
@@ -423,6 +425,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.22  2009/12/13 02:41:11  sam2kb
+ * Link to categories in chapter mode
+ *
  * Revision 1.21  2009/12/13 00:05:37  sam2kb
  * Restrict to categories fix
  *
