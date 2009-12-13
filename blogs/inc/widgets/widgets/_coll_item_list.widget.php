@@ -283,7 +283,7 @@ class coll_item_list_Widget extends ComponentWidget
 
 			# This is the array if categories to restrict the linkblog to (non recursive)
 			# Example: $linkblog_catsel = array( 4, 6, 7 );
-			$linkblog_catsel = array();
+			$linkblog_catsel = $cat_array;
 
 			// Compile cat array stuff:
 			$linkblog_cat_array = array();
@@ -423,6 +423,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.21  2009/12/13 00:05:37  sam2kb
+ * Restrict to categories fix
+ *
  * Revision 1.20  2009/12/12 23:51:53  sam2kb
  * Restrict ItemList to selected categories
  *
