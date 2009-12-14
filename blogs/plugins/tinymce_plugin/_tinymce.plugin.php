@@ -358,6 +358,9 @@ class tinymce_plugin extends Plugin
 							sprintf( $this->T_('Compressed TinyMCE javascript could not be loaded. Check the "%s" plugin setting.'),
 								$this->T_('URL to TinyMCE') ) ) ?>' );
 						tinymce_plugin_displayed_error = true;
+						try {
+							tinymce_plugin_init_tinymce(oninit);
+						} catch(e) {}
 					}
 					else
 					{
