@@ -1,0 +1,426 @@
+/*
+ * Original Design: sofaspud -- http://saltedsugar.com/
+*/
+
+@import url(../../rsc/css/basic.css);	/* Import basic styles */
+@import url(../../rsc/css/img.css);	/* Import standard image styles */
+@import url(../../rsc/css/blog_elements.css);	/* Import standard blog elements styles */
+@import url(../../rsc/css/forms.css);	/* Import default form styles */
+@import url(../../rsc/css/comments.css);	/* Import default comment styles */
+
+body{
+	margin:0px;
+	padding:0px;
+	background:#333 url(rsc/img/bodybg.png) repeat-x fixed top center;
+	font:11px Verdana,Arial,Helvetica,sans-serif;
+}
+#rap{
+	width:700px;
+	margin:auto;
+	padding-bottom:20px;
+}
+
+/* basic styles */
+h1,h2,h3,h4,h5,h6{
+	font-family:Georgia,Verdana,Arial,Helvetica,sans-serif;
+	font-weight:lighter;
+	margin:0;
+	padding:0;
+	color:#333;
+}
+h1{
+	font-size:1.2em;
+}
+h2, h3{
+	font-size:1.8em;
+	color:#0a294f;
+	margin:8px 0;
+}
+h4{
+	font-size:1.6em;
+	color:#911322;
+}
+h5{
+	font-size:1.4em;
+	color:#af3d0a;
+}
+h6{
+	font-size:1.2em;
+	font-weight:bold;
+	color:#333;
+}
+del{
+	color:#999;
+}
+acronym{
+	border:none;
+	background:url(rsc/img/dottedborder_dark.gif) repeat-x bottom center;
+	padding-bottom:1px;
+	cursor:help;
+}
+hr{
+	width:100%;
+	border:0;
+	margin:5px 0px !important;
+	margin:2px 0px 5px 0px;
+	height:1px;
+	color:#777;
+	background-color:#777;
+}
+fieldset
+{
+    border:none;
+}
+pre
+{
+	display:block;
+	margin:1em;
+	padding:1em;
+	font-family:"Courier New", Arial, Verdana, Serif;
+	font-size:1em;
+}
+abbr, acronym
+{
+	cursor:help;
+}
+table
+{
+	border:#eee 1px solid;
+	padding:5px;
+}
+th
+{
+	text-align:left;
+	padding:5px;
+}
+td, th
+{
+	padding:5px;
+}
+a{
+	color:#af2639;
+	text-decoration:none;
+}
+a:hover{
+	text-decoration:underline;
+}
+p{
+	line-height:20px;
+	margin:5px 0px 15px 0px;
+	/*text-align:justify;*/
+}
+
+img{
+	border:none;
+}
+
+/* floats, positioning, and widths */
+.left{
+	float:left;
+}
+.right{
+	float:right;
+}
+.w50{
+	width:50%;
+}
+.left p{
+	padding:0px 10px 0px 0px;
+}
+.right p{
+	padding:0px 0px 0px 10px;
+}
+
+/* rounded corners */
+.tl{background:#333 url(rsc/img/corners/tl.gif) no-repeat top left;}
+.tr{background:transparent url(rsc/img/corners/tr.gif) no-repeat top right;}
+.br{background:transparent url(rsc/img/corners/br.gif) no-repeat bottom right;}
+.bl{background:transparent url(rsc/img/corners/bl.gif) no-repeat bottom left;}
+
+/* forms */
+fieldset
+{
+	border:none;
+}
+form select,
+form input,
+form textarea{
+	font:1em Verdana,Arial,Helvetica,sans-serif;
+}
+form input:focus,
+form textarea:focus,
+form select:focus{
+	border:1px solid #666;
+}
+form select{
+	padding:2px;
+}
+form input{
+	padding:2px;
+}
+form label{
+	color:#666;
+}
+form textarea{
+	padding:1px;
+	line-height:16px;
+	width:90%;
+	height:20em;
+}
+form p{
+	margin:10px 0px;
+}
+
+/* top section */
+#top{
+	background:url(rsc/img/contentbg.gif) repeat-y top center;
+}
+
+/* very bottom curve */
+#bottom{
+	background:url(rsc/img/container_b.gif) no-repeat bottom center;
+	height:9px;
+}
+* html #bottom{
+	margin-top:-4px;
+}
+
+/* header */
+#header{
+	font:30px Georgia,Verdana,Arial,Helvetica,sans-serif;
+	width:680px;
+	height:175px;
+	margin:auto;
+	text-align:left;
+}
+.header1
+{
+	background:url(rsc/img/headers/h1.jpg) no-repeat top center;
+}
+.header2
+{
+	background:url(rsc/img/headers/h2.jpg) no-repeat top center;
+}
+.header3
+{
+	background:url(rsc/img/headers/h3.jpg) no-repeat top center;
+}
+.header4
+{
+	background:url(rsc/img/headers/h4.jpg) no-repeat top center;
+}
+
+#title{
+	margin-top:130px;
+	margin-left:13px;
+	position:absolute;
+	color:#fff;
+	background-color:transparent;
+	cursor:default;
+}
+#header h1 a
+{
+	color:#f0f0f0;
+}
+
+/* Blogs Menu */
+
+#menu {
+	float: right;
+	font-family: Trebuchet MS, Arial, Serif;
+}
+
+#menu ul {
+	margin: 0;
+	padding: 10px 15px 0 0;
+	list-style: none;
+	line-height: normal;
+}
+
+#menu li {
+	display: inline;
+}
+
+#menu a {
+	padding-left: 15px;
+	text-decoration: none;
+	font-size: 15px;
+	font-weight: bold;
+	color: #FFFFFF;
+}
+
+#menu a:hover {
+	text-decoration: underline;
+}
+
+/* menubar */
+.nav{
+	height:40px;
+	background-color:#222;
+	color:#fff;
+	width:680px;
+	margin:auto;
+	text-align:left;
+	font-size:11px;
+	text-transform:lowercase;
+}
+.nav2{
+	height:40px;
+}
+#slogan{
+	position:absolute;
+	margin:11px 0px 0px 15px;
+	font-size:1.1em;
+	font-style:italic;
+}
+#navdiv{
+	text-align:right;
+}
+#navlist
+{
+	font-size:120%;
+	list-style-type:none;
+	margin:0px;
+	padding:10px 8px 2px 0px;
+	font-family: Trebuchet MS, Arial, Serif;
+}
+#navlist li{
+	display:inline;
+}
+#navlist li a{
+	color:#999;
+	font-weight:bold;
+	text-decoration:none;
+	height:40px;
+	padding:10px 6px;
+}
+#navlist li a:hover,#navlist li a:active, #navlist li.current_page_item a{
+	color:#fff;
+}
+
+/* content */
+#content{
+	width:440px;
+	float:left;
+	padding:10px 10px 30px 20px;
+}
+* html #content{
+	padding-top:20px;
+}
+#content .post
+{
+	margin:0 0 3em 0;
+}
+#content .cat
+{
+	margin:0;
+	padding:0;
+	color:#999;
+}
+#content .post-info
+{
+	color:#777;
+	text-align:right;
+	background:url(rsc/img/dottedborder.gif) repeat-x top;
+}
+#content .post-info em
+{
+	font-style:normal;
+	float:left;
+	margin:0 5px 0 0;
+}
+
+/* sidebar */
+
+#sidebar {
+	float: right;
+	width: 186px;
+	padding: 25px 16px 0 0;
+}
+
+#sidebar h2 {
+	font-size: 14px;
+	font-weight: bold;
+}
+
+#sidebar ul, #sidebar ul ol {
+margin: 0;
+padding: 0;
+}
+
+#sidebar ul li {
+list-style-type: none;
+list-style-image: none;
+margin-bottom: 15px;
+}
+
+#sidebar ul p, #sidebar ul select {
+margin: 5px 0 8px;
+}
+
+#sidebar ul ul, #sidebar ul ol {
+margin: 5px 0 0 10px;
+}
+
+#sidebar ul ul ul, #sidebar ul ol {
+margin: 0 0 0 10px;
+}
+
+#sidebar ul ul li, #sidebar ul ol li {
+margin: 1px 0 0;
+padding: 0;
+}
+
+#sidebar ul ul li:before {
+content: "\00BB \0020";
+}
+
+/* footer */
+.footer{
+	height:50px;
+	width:680px;
+	margin:auto;
+	color:#fff;
+	text-align:left;
+	clear:both;
+	background:#222;
+}
+.footer div{
+	height:50px;
+}
+.footer .feed{
+	padding-left:15px;
+}
+#copyright{
+	text-align:left;
+	float:left;
+	padding:8px;
+	margin-top:3px;
+	color:#CCCCCC;
+}
+a.contact_link:hover {
+	text-decoration:underline;
+}
+#designcredit{
+	float:right;
+	padding:8px;
+	margin-top:-6px;
+	color:#649290;
+}
+.footer a{
+	color:#ccc;
+	text-decoration:none;
+}
+input.textbox, input[type="text"]
+{
+	border:1px solid #ccc;
+	margin:2px 0;
+	width:150px;
+}
+textarea{
+	border:1px solid #ccc;
+}
+#header, #content, #sidebar, #footer, .widget
+{
+	overflow:hidden;
+}

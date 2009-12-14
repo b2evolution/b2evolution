@@ -390,9 +390,11 @@ function install_basic_skins()
 	skin_install( 'asevo' );
 	skin_install( 'custom' );
 	skin_install( 'glossyblue' );
+	skin_install( 'intense' );
 	skin_install( 'natural_pink' );
 	skin_install( 'nifty_corners' );
 	skin_install( 'pixelgreen' );
+	skin_install( 'pluralism' );
 	skin_install( 'terrafirma' );
 	skin_install( 'vastitude' );
 	skin_install( '_atom' );
@@ -826,6 +828,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.82  2009/12/14 03:59:51  fplanque
+ * added 2 new skins
+ *
  * Revision 1.81  2009/12/10 20:13:25  blueyed
  * Add log_errors property to DB and set it to false in get_db_version to not
  * log SQL errors which are expected during install.
