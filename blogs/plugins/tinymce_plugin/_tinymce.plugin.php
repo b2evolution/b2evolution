@@ -463,14 +463,6 @@ class tinymce_plugin extends Plugin
 		</script>
 
 		<?php
-
-		// fp> todo: there is some confusion here between "enabled for use" and "currently selected"
-		// dh> Don't understand this. Should be the same: a user can either enable or disable the editor.
-		// fp> No: "disabled" intuitively means (for most English speaking people) it's not available (at all) when editing a post.
-		// When people disable they mean: "never ever try to load all that fancy JS for me, thank you"
-
-
-		// pre_dump( $edited_Item->editor_code );
 		if( is_object($edited_Item) && !empty($edited_Item->editor_code) )
 		{	// We have a preference for the current post, follow it:
 			// Use tinyMCE if code matched the code of the current plugin.
@@ -482,7 +474,6 @@ class tinymce_plugin extends Plugin
 
 			// Has the user used MCE last time he edited this particular blog?
 			$use_tinymce = $this->UserSettings->get('use_tinymce_coll'.$Blog->ID );
-			// pre_dump( $use_tinymce_for_this_blog );
 
 			if( is_null($use_tinymce) )
 			{	// We don't know for this blog, check if he used MCE last time he edited anything:
@@ -682,14 +673,14 @@ class tinymce_plugin extends Plugin
 		global $UserSettings;
 
 		$tmce_plugins_array = array( 'more', 'pagebreak', 'searchreplace', 'inlinepopups', 'table', 'media', 'visualchars', 'nonbreaking', 'safari', 'fullscreen' );
-		
+
 		// Requires cURL extension since fsockopen + ssl produce fatal error
 		// if PHP configured without openSSL
 		if( extension_loaded('curl') )
 		{
 			$tmce_plugins_array[] = 'spellchecker';
 		}
-		
+
 		$tmce_theme_advanced_buttons1_array = array();
 		$tmce_theme_advanced_buttons2_array = array();
 		$tmce_theme_advanced_buttons3_array = array();
@@ -751,14 +742,14 @@ class tinymce_plugin extends Plugin
 				$tmce_plugins_array[] = 'paste';
 				$tmce_theme_advanced_buttons3_array[] = 'pastetext,pasteword';
 			}
-			
+
 			// Requires cURL extension since fsockopen + ssl produce fatal error
 			// if PHP configured without openSSL
 			if( extension_loaded('curl') )
 			{
 				$tmce_theme_advanced_buttons3_array[] = 'spellchecker';
 			}
-			
+
 			$tmce_theme_advanced_buttons3_array[] = 'code,cleanup,|,help';
 
 			/* ----------- button row 4 ------------ */
