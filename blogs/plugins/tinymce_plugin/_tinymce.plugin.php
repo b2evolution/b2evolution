@@ -488,8 +488,7 @@ class tinymce_plugin extends Plugin
 		}
 
 		if( $use_tinymce )
-		{ // User used MCE last time, load MCE now:
- 			// fp> why do we need to wrap in jQuery() here?
+		{ // User used MCE last time, load MCE on document.ready:
 			echo '<script type="text/javascript">jQuery( tinymce_plugin_toggleEditor("'.$this->tmce_editor_id.'") );</script>';
 		}
 
