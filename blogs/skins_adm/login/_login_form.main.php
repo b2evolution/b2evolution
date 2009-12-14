@@ -103,6 +103,7 @@ $Form->begin_form( 'fform' );
 			// At that point, why not reset the salt at every reload? (it may be good to keep it, but I think the reason should be documented here)
 			$pwd_salt = generate_random_key(64);
 			$Session->set( 'core.pwd_salt', $pwd_salt, 86400 /* expire in 1 day */ );
+			$Session->dbsave(); // save now, in case there's an error later, and not saving it would prevent the user from logging in.
 		}
 		$Form->hidden( 'pwd_salt', $pwd_salt );
 		$Form->hidden( 'pwd_hashed', '' ); // gets filled by JS
@@ -221,6 +222,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.17  2009/12/14 19:47:27  blueyed
+ * Save core.pwd_salt directly, so login does not fail, if there is a fatal error later on (e.g. when logging the hit).
+ *
  * Revision 1.16  2009/12/04 23:27:50  fplanque
  * cleanup Expires: header handling
  *
