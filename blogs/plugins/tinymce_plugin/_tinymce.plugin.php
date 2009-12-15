@@ -907,8 +907,8 @@ class tinymce_plugin extends Plugin
 	/**
 	 * Return the list of Htsrv (HTTP-Services) provided by the plugin.
 	 *
-	 * fp> eeeeeeeeeeeeeeek? What is that for?
-	 * dh> Plugin interface for the list of methods that can get called through htsrv/call_plugin.php.
+	 * This implements the plugin interface for the list of methods that are valid to
+	 * get called through htsrv/call_plugin.php.
 	 *
 	 * @return array
 	 */
