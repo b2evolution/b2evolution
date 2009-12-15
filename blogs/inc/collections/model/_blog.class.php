@@ -993,10 +993,10 @@ class Blog extends DataObject
 
 			case 'rfishkin':
 				$this->set_setting( 'archive_links', 'extrapath' );
-				$this->set_setting( 'archive_posts_per_page', 50 );
-				$this->set_setting( 'chapter_links', 'subchap' );
-				$this->set_setting( 'chapter_posts_per_page', 50 );
-				$this->set_setting( 'tag_posts_per_page', 50 );
+				$this->set_setting( 'archive_posts_per_page', 75 );
+				$this->set_setting( 'chapter_links', 'chapters' );
+				$this->set_setting( 'chapter_posts_per_page', 75 );
+				$this->set_setting( 'tag_posts_per_page', 75 );
 				$this->set_setting( 'tag_links', 'colon' );
 				$this->set_setting( 'single_links', 'short' );
 
@@ -1031,6 +1031,9 @@ class Blog extends DataObject
 
 				$this->set_setting( 'permalinks', 'single' );
 				$this->set_setting( 'title_link_type', 'permalink' );
+
+				$this->set_setting( 'excerpts_meta_description', '1' );
+				$this->set_setting( '404_response', '301' );
 				break;
 
 			case 'sspencer':
@@ -2168,6 +2171,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.94  2009/12/15 06:24:25  fplanque
+ * no message
+ *
  * Revision 1.93  2009/12/01 04:19:25  fplanque
  * even more invalidation dimensions
  *

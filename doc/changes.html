@@ -129,14 +129,30 @@
 			        </ul>
 			  </li>
 		    </ul>
+			<h2>3.3.3-stable</h2>
+			<ul>
+				<li>Allow users to act on uploaded files (@francoisplanque/@tblue)</li>
+			    <li>Made avatars optional.</li>
+			    <li>Integrated 2 new skins.</li>
+			    <li>Updated SEO presets from Rand Fishkin.</li>
+			</ul>
+
 		  <h2>3.3.2-stable</h2>
-	    <ul>
-              <li>Bug fixes: @tblue</li>
-			  <li>icon to remove an avatar from a user profile (@francoisplanque)</li>
-			  <li>Improved Auto Links plugin (@francoisplanque)</li>
-			  <li>Fixed bug allowing multiple plugins to have per-blog specific settings (@francoisplanque)</li>
-		      <li>Additional bug fixes (@francoisplanque)</li>
-		  </ul>
+			<ul>
+				<li>Improved Auto Links plugin (@francoisplanque)</li>
+				<li>Fixed bug allowing multiple plugins to have per-blog specific settings (@francoisplanque)</li>
+				<li>Additional bug fixes (@francoisplanque/@tblue)</li>
+				<li>Check whether user is allowed to edit post when updating it (saving to DB) (@tblue)</li>
+				<li>XML-RPC:
+					<ul>
+						<li>Added missing permission checks (@tblue)</li>
+						<li>Improved metaWeblog.newMediaObject (@tblue)</li>
+						<li>Fixed API method signatures (return values) (@tblue)</li>
+						<li>Use correct charsets. (@tblue)</li>
+						<li>Check extra categories before checking permissions to post to them (sends correct XML-RPC error on failure). (@tblue)</li>
+					</ul>
+				</li>
+		 	 </ul>
 		  <h2>3.3.1-stable</h2>
 			<ul>
 			  <li>Improved Archive plugin (tblue246)</li>
