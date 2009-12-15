@@ -671,6 +671,7 @@ class tinymce_plugin extends Plugin
 		global $Plugins;
 		global $localtimenow, $debug, $rsc_url, $skins_url;
 		global $UserSettings;
+		global $ReqHost;
 
 		$tmce_plugins_array = array( 'more', 'pagebreak', 'searchreplace', 'inlinepopups', 'table', 'media', 'visualchars', 'nonbreaking', 'safari', 'fullscreen' );
 
@@ -825,22 +826,34 @@ class tinymce_plugin extends Plugin
 		// note: $version may not be needed below because of automatic suffix? not sure..
 		// TODO: we don't want all of basic.css here
 
-			// Load the appropriate ITEM/POST styles depending on the blog's skin:
-			if( ! empty( $Blog->skin_ID) )
-			{
-				$SkinCache = & get_SkinCache();
-				/**
-				 * @var Skin
-				 */
-				$Skin = $SkinCache->get_by_ID( $Blog->skin_ID );
-				$item_css_url = $skins_url.$Skin->folder.'/item.css';
-				// else: $item_css_url = $rsc_url.'css/item_base.css';
-				$content_css = ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
-			}
-			// else item_default.css -- is it still possible to have no skin ?
+		// Load the appropriate ITEM/POST styles depending on the blog's skin:
+		// This has to be the skins whole CSS to get real WYSIWYG handling.
+		// We can/should use class_filter to only keep useful classes.
+		// TODO: dh> this could also become a plugin setting with a list of classes separated by "," (defaulting to all classes with a ".bPost" or similar selector if empty)
+		$item_css_url = array_pop($this->get_item_css_path_and_url($Blog));
+		if( url_rel_to_same_host($item_css_url, $ReqHost) == $item_css_url )
+		{ // the resource is not on the same/current host, so we need to get the CSS via callback (so it can be accessed with JS (in e.g. FF 3.5))
+			$item_css_url = $this->get_htsrv_url('get_item_content_css', array('blog'=>$Blog->ID), '&');
+		}
+		// TODO: dh> I dropped inclusion of editor.css, since it mangles font settings etc. This should get dropped to get real WYSIWYG.
+		$init_options[] = 'content_css : "' #.$this->get_plugin_url().'editor.css?v='.$this->version.','
+									.$item_css_url.'"';
 
-		$init_options[] = 'content_css : "'.$this->get_plugin_url().'editor.css?v='.($debug ? $localtimenow : $this->version )
-									.$content_css.'"';
+		// Add callback which filters classes from content_css by classname and/or rule
+		$init_options[] = 'class_filter : function(cls, rule) {
+			var m = rule.match(/^\.bPost (.*)/);
+			if( m ) {
+				return cls;
+			}
+
+			if( cls == "center" || cls == "right" || cls == "left" ) { // TODO: dh> could get translated
+				return cls;
+			}
+
+			// console.log(cls, rule);
+			return false;
+		}';
+
 		// Generated HTML code options:
 		// do not make the path relative to "document_base_url":
 		$init_options[] = 'relative_urls : false';
@@ -866,6 +879,42 @@ class tinymce_plugin extends Plugin
 			$init .= ",\n// tmce_custom_conf (from PluginSettings):\n".$tmce_custom_conf;
 		}
 		return $init;
+	}
+
+
+	/**
+	 * Get URL of file to include as "content_css" for layout and classes in TinyMCE.
+	 *
+	 * @return array (path, url)
+	 */
+	function get_item_css_path_and_url($Blog)
+	{
+		global $skins_url, $skins_path;
+
+		# TODO: make this a setting
+		#if( $r = $this->Settings->get('content_css') )
+		#{
+		#	return $r;
+		#}
+
+		// Load the appropriate ITEM/POST styles depending on the blog's skin:
+		if( ! empty( $Blog->skin_ID) )
+		{
+			$SkinCache = & get_SkinCache();
+			/**
+			 * @var Skin
+			 */
+			$Skin = $SkinCache->get_by_ID( $Blog->skin_ID );
+			$item_css_path = $Skin->folder.'/item.css';		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
+			// else: $item_css_path = 'css/item_base.css';
+
+			$item_css_path = $Skin->folder.'/style.css';
+
+			return array($skins_path.$item_css_path, $skins_url.$item_css_path);
+		}
+		// else item_default.css -- is it still possible to have no skin ?
+
+		return array(NULL, NULL);
 	}
 
 
@@ -905,6 +954,35 @@ class tinymce_plugin extends Plugin
 
 
 	/**
+	 * HtSrv callback to get the contents of the CSS file configured for "content_css".
+	 * This gets used when the CSS is not on the same domain and the browser would not
+	 * allow to handle the CSS cross domain (e.g. FF 3.5).
+	 *
+	 * @param array Params passed to the HtSrv call
+	 *              - "blog": selected blog
+	 * @return string
+	 */
+	function htsrv_get_item_content_css($params)
+	{
+		$blog = $params['blog'];
+		$BlogCache = get_BlogCache($blog);
+		$Blog = $BlogCache->get_by_ID($blog);
+		$path = array_shift($this->get_item_css_path_and_url($Blog));
+		$r = file_get_contents($path);
+		if( $r )
+		{
+			header('Content-Type: text/css');
+			echo $r;
+		}
+		else
+		{
+			header('HTTP/1.0 404 Not Found');
+		}
+		exit;
+	}
+
+
+	/**
 	 * Return the list of Htsrv (HTTP-Services) provided by the plugin.
 	 *
 	 * This implements the plugin interface for the list of methods that are valid to
@@ -914,7 +992,7 @@ class tinymce_plugin extends Plugin
 	 */
 	function GetHtsrvMethods()
 	{
-		return array('save_editor_state');
+		return array('save_editor_state', 'get_item_content_css');
 	}
 }
 
