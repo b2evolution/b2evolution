@@ -31,6 +31,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @todo fp> see bbcode plugin for an example about how to convert [tag] to <tag> on the fly for editing purposes. May be used for [img:] tags in b2evo. May also be used for b2evo smilies display. ed.onBeforeSetContent ed.onPostProcess
  * @todo fp> lang.js files should be moved to the standard language packs. Maybe served by .php files outputting javascript.
  * @todo dh> This is a nice plugin to apply classes and IDs: http://www.bram.us/projects/tinymce-plugins/tinymce-classes-and-ids-plugin-bramus_cssextras/
+ * @todo dh> Integrate our Filemanager via http://wiki.moxiecode.com/index.php/TinyMCE:Configuration/file_browser_callback
  */
 class tinymce_plugin extends Plugin
 {
