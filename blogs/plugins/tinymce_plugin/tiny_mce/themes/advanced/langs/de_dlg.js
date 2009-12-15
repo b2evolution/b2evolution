@@ -1,6 +1,6 @@
 tinyMCE.addI18n('de.advanced_dlg',{
 about_title:"\u00DCber TinyMCE",
-about_general:"\u00DCber\u00C3\u00A2\u00C2\u0080\u00C2\u00A6",
+about_general:"\u00DCbersicht",
 about_help:"Hilfe",
 about_license:"Lizenzbedingungen",
 about_plugins:"Plugins",

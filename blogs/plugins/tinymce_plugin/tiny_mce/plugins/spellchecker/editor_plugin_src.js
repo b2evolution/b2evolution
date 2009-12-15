@@ -15,7 +15,7 @@
 				author : 'Moxiecode Systems AB',
 				authorurl : 'http://tinymce.moxiecode.com',
 				infourl : 'http://wiki.moxiecode.com/index.php/TinyMCE:Plugins/spellchecker',
-				version : "2.0.2"
+				version : tinymce.majorVersion + "." + tinymce.minorVersion
 			};
 		},
 
@@ -75,7 +75,7 @@
 
 			// Find selected language
 			t.languages = {};
-			each(ed.getParam('spellchecker_languages', '+English=en,Danish=da,Dutch=nl,Finnish=fi,French=fr,German=de,Italian=it,Polish=pl,Portuguese=pt,Russian=ru,Spanish=es,Swedish=sv', 'hash'), function(v, k) {
+			each(ed.getParam('spellchecker_languages', '+English=en,Danish=da,Dutch=nl,Finnish=fi,French=fr,German=de,Italian=it,Polish=pl,Portuguese=pt,Spanish=es,Swedish=sv', 'hash'), function(v, k) {
 				if (k.indexOf('+') === 0) {
 					k = k.substring(1);
 					t.selectedLang = v;
@@ -312,7 +312,7 @@
 		},
 
 		_sendRPC : function(m, p, cb) {
-			var t = this, url = t.editor.getParam("spellchecker_rpc_url", this.url+'/rpc.php');
+			var t = this, url = t.editor.getParam("spellchecker_rpc_url", "{backend}");
 
 			if (url == '{backend}') {
 				t.editor.setProgressState(0);

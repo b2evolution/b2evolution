@@ -1,7 +1,7 @@
 Information about this directory:
 ---------------------------------
 
-This is the jscripts/tiny_mce/ directory from TinyMCE 3.2.4.1
+This is the jscripts/tiny_mce/ directory from TinyMCE 3.2.7
 
 The tiny_mce_gzip.php from tinymce_compressor_php 2.0.2 is included and used by default.
 
