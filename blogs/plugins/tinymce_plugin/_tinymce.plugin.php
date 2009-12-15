@@ -840,6 +840,7 @@ class tinymce_plugin extends Plugin
 									.$item_css_url.'"';
 
 		// Add callback which filters classes from content_css by classname and/or rule
+		// Another option would be to use theme_advanced_styles (http://wiki.moxiecode.com/index.php/TinyMCE:Configuration/theme_advanced_styles)
 		$init_options[] = 'class_filter : function(cls, rule) {
 			var m = rule.match(/^\.bPost (.*)/);
 			if( m ) {
