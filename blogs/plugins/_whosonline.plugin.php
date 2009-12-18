@@ -158,7 +158,7 @@ class OnlineSessions
 	 * Online session timeout in seconds.
 	 *
 	 * Default value: 300 (5 minutes). Set by {@link OnlineSessions::OnlineSessions()}.
-	 * 
+	 *
 	 * @access protected
 	 */
 	var $_timeout_online_user;
@@ -201,9 +201,11 @@ class OnlineSessions
 		// NOTE: we do not use DISTINCT here, because guest users are all "NULL".
 		foreach( $DB->get_results( "
 			SELECT SQL_NO_CACHE sess_user_ID
-			  FROM T_sessions
+			  FROM T_sessions JOIN T_hitlog ON sess_ID = hit_sess_ID
 			 WHERE sess_lastseen > '".$timeout_YMD."'
-			   AND sess_key IS NOT NULL", OBJECT, 'Sessions: get list of relevant users.' ) as $row )
+			   AND sess_key IS NOT NULL
+			   AND hit_agent_type = 'browser'
+			 GROUP BY sess_ID", OBJECT, 'Sessions: get list of relevant users.' ) as $row )
 		{
 			if( !empty( $row->sess_user_ID )
 					&& ( $User = & $UserCache->get_by_ID( $row->sess_user_ID ) ) )
@@ -333,6 +335,9 @@ class OnlineSessions
 
 /*
  * $Log$
+ * Revision 1.10  2009/12/18 23:49:47  blueyed
+ * Who is online plugin: only select browser agent types
+ *
  * Revision 1.9  2009/09/26 12:00:44  tblue246
  * Minor/coding style
  *
