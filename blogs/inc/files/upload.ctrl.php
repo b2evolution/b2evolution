@@ -407,7 +407,7 @@ if( isset($_FILES) && count( $_FILES ) )
 			{
 				$old_name = $newName;
 				$newName = $path_info['filename'].'.'.$correct_extension;
-				$Messages->add( sprintf(T_('The extension of the file &laquo;%s&raquo; has been corrected. The new filename is &laquo;%s.&raquo;'), $old_name, $newName), 'warning' );
+				$Messages->add( sprintf(T_('The extension of the file &laquo;%s&raquo; has been corrected. The new filename is &laquo;%s&raquo;.'), $old_name, $newName), 'warning' );
 			}
 		}
 
@@ -549,6 +549,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.28  2009/12/18 18:54:32  blueyed
+ * trans/punctuation fix
+ *
  * Revision 1.27  2009/12/06 22:55:18  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)
