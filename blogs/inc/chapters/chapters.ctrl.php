@@ -62,10 +62,10 @@ $form_below_list = false;
 $edit_view_path = 'chapters/views/_chapter.form.php';
 
 
-// ---- Below is a modified generic categtory list editor: -----
+// ---- Below is a modified generic category list editor: -----
 
 
-// fp> this is an example of where we could benefit from controler classes wich could be derived
+// fp> this is an example of where we could benefit from controler classes which could be derived
 // fp> we basically need to add a "move" action.
 /*
 class Controler
@@ -91,12 +91,12 @@ if( param( $GenericCategoryCache->dbIDname, 'integer', NULL, true, false, false 
 		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Category') ), 'error' );
 		$action = 'nil';
 	}
-
 }
 
 if( !is_null( param( $GenericCategoryCache->dbprefix.'parent_ID', 'integer', NULL ) ) )
 {
-	if( ( $edited_parent_GenericElement = & $GenericCategoryCache->get_by_ID( ${$GenericCategoryCache->dbprefix.'parent_ID'}, false, true, $subset_ID ) ) === false )
+	$edited_parent_GenericElement = & $GenericCategoryCache->get_by_ID( ${$GenericCategoryCache->dbprefix.'parent_ID'}, false, true, $subset_ID );
+	if( $edited_parent_GenericElement === false )
 	{ // Parent generic category doesn't exist any longer.
 		unset( $GenericCategoryCache->dbIDname );
 		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Category') ), 'error' );
@@ -186,7 +186,7 @@ switch( $action )
 			// Insert in DB:
 			if( $edited_GenericCategory->dbinsert() !== false )
 			{
-				$Messages->add( T_('New element created.'), 'success' ); // TODO CHANGES THIS
+				$Messages->add( T_('New category created.'), 'success' );
 				// Add the ID of the new element to the result fadeout
 				$result_fadeout[$edited_GenericCategory->dbIDname][] = $edited_GenericCategory->ID;
 				$action = 'list';
@@ -239,7 +239,6 @@ switch( $action )
 		if( ! $current_User->check_perm( 'blog_cats', '', false, $edited_Blog->ID ) )
 		{
 			debug_die( 'No permission to edit source collection.' );
-			/* die */
 		}
 
  		// Control permission to edit destination blog:
@@ -263,8 +262,8 @@ switch( $action )
 		$dest_Blog = & $BlogCache->get_by_ID( $cat_coll_ID );
 		$Messages->add( /* TRANS: first %s is the moved category's name, the second one the new parent category */ sprintf( T_('The category &laquo;%s&raquo; has been moved (with children) to &laquo;%s&raquo;\'s root. You may want to nest it in another parent category below...'), $edited_GenericCategory->dget('name'), $dest_Blog->dget( 'shortname' )  ), 'success' );
 
+		// Redirect and EXIT:
 		header_redirect( url_add_param( $admin_url, 'ctrl=chapters&action=edit&blog='.$cat_coll_ID.'&cat_ID='.$cat_ID, '&' ) );	// will save $Messages
-		/* EXIT */
 
 		// In case we changed the redirect someday:
 		unset($edited_GenericCategory);
@@ -296,6 +295,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
+			// TODO: dh> allow to delete a category which has links (and unbreak those after confirmation).
 			// Get the page number we come from:
 			$previous_page = param( 'results_'.$GenericCategoryCache->dbprefix.'page', 'integer', 1, true );
 			if( ! $edited_GenericCategory->check_delete( sprintf( T_('Cannot delete element &laquo;%s&raquo;'), $edited_GenericCategory->dget( 'name' ) ) ) )
@@ -440,6 +440,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2009/12/18 23:32:30  blueyed
+ * Typos, trans todo nuked
+ *
  * Revision 1.15  2009/12/12 01:13:08  fplanque
  * A little progress on breadcrumbs on menu structures alltogether...
  *
