@@ -166,7 +166,7 @@ if( $resolve_extra_path )
 		 * Tblue> Done, let's see if this has any side-effects.
 		 * dh> Well, http://test.b2evo.net/HEAD/blogs/blog1.php?c=1 still redirects (that's what
 		 *     I've meant above). Should params like those trigger redir=no internally?
-
+		 * fp> ?c=1 should redirect because in 99% of use cases it gives a junk duplicate content page. If you don't want it to redirect, you should turn off redirects.
 		if( isset( $path_elements[0] ) && preg_match( '#.*\.php[0-9]?$#', $path_elements[0] ) )
 		{ // Ignore element ending with .php (fp: note: may be just '.php')
 			array_shift( $path_elements );
@@ -643,6 +643,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.160  2009/12/20 22:12:20  fplanque
+ * doc
+ *
  * Revision 1.159  2009/12/12 02:16:17  blueyed
  * doc
  *

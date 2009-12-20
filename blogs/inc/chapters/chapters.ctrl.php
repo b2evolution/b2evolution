@@ -239,6 +239,7 @@ switch( $action )
 		if( ! $current_User->check_perm( 'blog_cats', '', false, $edited_Blog->ID ) )
 		{
 			debug_die( 'No permission to edit source collection.' );
+			/* die */
 		}
 
  		// Control permission to edit destination blog:
@@ -262,8 +263,8 @@ switch( $action )
 		$dest_Blog = & $BlogCache->get_by_ID( $cat_coll_ID );
 		$Messages->add( /* TRANS: first %s is the moved category's name, the second one the new parent category */ sprintf( T_('The category &laquo;%s&raquo; has been moved (with children) to &laquo;%s&raquo;\'s root. You may want to nest it in another parent category below...'), $edited_GenericCategory->dget('name'), $dest_Blog->dget( 'shortname' )  ), 'success' );
 
-		// Redirect and EXIT:
 		header_redirect( url_add_param( $admin_url, 'ctrl=chapters&action=edit&blog='.$cat_coll_ID.'&cat_ID='.$cat_ID, '&' ) );	// will save $Messages
+		/* EXIT */
 
 		// In case we changed the redirect someday:
 		unset($edited_GenericCategory);
@@ -440,6 +441,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2009/12/20 22:12:16  fplanque
+ * doc
+ *
  * Revision 1.16  2009/12/18 23:32:30  blueyed
  * Typos, trans todo nuked
  *

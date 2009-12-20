@@ -201,7 +201,7 @@ class OnlineSessions
 		// NOTE: we do not use DISTINCT here, because guest users are all "NULL".
 		foreach( $DB->get_results( "
 			SELECT SQL_NO_CACHE sess_user_ID
-			  FROM T_sessions JOIN T_hitlog ON sess_ID = hit_sess_ID
+			  FROM T_sessions INNER JOIN T_hitlog ON sess_ID = hit_sess_ID
 			 WHERE sess_lastseen > '".$timeout_YMD."'
 			   AND sess_key IS NOT NULL
 			   AND hit_agent_type = 'browser'
@@ -335,6 +335,9 @@ class OnlineSessions
 
 /*
  * $Log$
+ * Revision 1.11  2009/12/20 22:12:19  fplanque
+ * doc
+ *
  * Revision 1.10  2009/12/18 23:49:47  blueyed
  * Who is online plugin: only select browser agent types
  *

@@ -231,7 +231,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 		case 'htmlattr':
 			// use as an attribute: strips tags and escapes quotes
- 			// TODO: dh> why not just htmlspecialchars?fp> because an attribute can never contain a tag? dh> well, "onclick='return 1<2;'" would get stripped, too. I'm just saying: why mess with it, when we can just use htmlspecialchars..
+ 			// TODO: dh> why not just htmlspecialchars?fp> because an attribute can never contain a tag? dh> well, "onclick='return 1<2;'" would get stripped, too. I'm just saying: why mess with it, when we can just use htmlspecialchars.. fp>ok
 			$content = strip_tags($content);
 			$content = convert_chars($content, 'html');
 			$content = str_replace( array('"', "'"), array('&quot;', '&#039;'), $content );
@@ -3842,6 +3842,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.202  2009/12/20 22:12:16  fplanque
+ * doc
+ *
  * Revision 1.201  2009/12/12 02:00:59  blueyed
  * doc
  *
