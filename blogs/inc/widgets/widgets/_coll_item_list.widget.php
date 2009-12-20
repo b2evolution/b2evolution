@@ -96,11 +96,13 @@ class coll_item_list_Widget extends ComponentWidget
 					'note' => T_( 'ID of the blog to use, leave empty for the current blog.' ),
 					'size' => 4,
 				),
+/* TODP: filter this out from all "SIMPLE" lists and keep it only in universal list
 				'cat_IDs' => array(
 					'label' => T_( 'Categories' ),
 					'note' => T_( 'List category IDs separated by ,' ),
 					'size' => 15,
 				),
+*/
 				'item_group_by' => array(
 					'label' => T_('Group by'),
 					'note' => T_('Do you want to group the Items?'),
@@ -237,12 +239,12 @@ class coll_item_list_Widget extends ComponentWidget
 			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
 			$ItemList = & new ItemListLight( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCacheLight', $this->code.'_' );
 		}
-		
+/* TODO: trim is not enough, convert each ID to a number for security		
 		$cat_array = array_filter( array_map( 'trim', explode( ',', $this->disp_params[ 'cat_IDs' ] ) ) );
-
+*/
 		// Filter list:
 		$filters = array(
-				'cat_array' => $cat_array, // Restrict to selected categories
+//				'cat_array' => $cat_array, // Restrict to selected categories
 				'orderby' => $this->disp_params[ 'order_by' ],
 				'order' => $this->disp_params[ 'order_dir' ],
 				'unit' => 'posts', // We want to advertise all items (not just a page or a day)
@@ -283,7 +285,7 @@ class coll_item_list_Widget extends ComponentWidget
 
 			# This is the array if categories to restrict the linkblog to (non recursive)
 			# Example: $linkblog_catsel = array( 4, 6, 7 );
-			$linkblog_catsel = $cat_array;
+			$linkblog_catsel = array(); // $cat_array;
 
 			// Compile cat array stuff:
 			$linkblog_cat_array = array();
@@ -425,6 +427,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.23  2009/12/20 23:15:00  fplanque
+ * rollback broken stuff
+ *
  * Revision 1.22  2009/12/13 02:41:11  sam2kb
  * Link to categories in chapter mode
  *

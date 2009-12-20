@@ -829,18 +829,28 @@ class tinymce_plugin extends Plugin
 		// TODO: we don't want all of basic.css here
 
 		// Load the appropriate ITEM/POST styles depending on the blog's skin:
-		// This has to be the skins whole CSS to get real WYSIWYG handling.
-		// We can/should use class_filter to only keep useful classes.
-		// TODO: dh> this could also become a plugin setting with a list of classes separated by "," (defaulting to all classes with a ".bPost" or similar selector if empty)
-		$item_css_url = array_pop($this->get_item_css_path_and_url($Blog));
-		if( url_rel_to_same_host($item_css_url, $ReqHost) == $item_css_url )
-		{ // the resource is not on the same/current host, so we need to get the CSS via callback (so it can be accessed with JS (in e.g. FF 3.5))
-			$item_css_url = $this->get_htsrv_url('get_item_content_css', array('blog'=>$Blog->ID), '&');
-		}
-		// TODO: dh> I dropped inclusion of editor.css, since it mangles font settings etc. This should get dropped to get real WYSIWYG.
-		$init_options[] = 'content_css : "' #.$this->get_plugin_url().'editor.css?v='.$this->version.','
-									.$item_css_url.'"';
+		// dh>This has to be the skins whole CSS to get real WYSIWYG handling.
+		// fp> we are not aiming for perfect wysiwyg (too heavy), just for a relevant look & feel.
+		// dh>We can/should use class_filter to only keep useful classes.
+		// fp> how???
+			if( ! empty( $Blog->skin_ID) )
+			{
+				$SkinCache = & get_SkinCache();
+				/**
+				 * @var Skin
+				 */
+				$Skin = $SkinCache->get_by_ID( $Blog->skin_ID );
+				$item_css_url = $skins_url.$Skin->folder.'/item.css';
+				// else: $item_css_url = $rsc_url.'css/item_base.css';
+				$content_css = ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
+			}
+			// else item_default.css -- is it still possible to have no skin ?
 
+		$init_options[] = 'content_css : "'.$this->get_plugin_url().'editor.css?v='.($debug ? $localtimenow : $this->version )
+									.$content_css.'"';
+
+/* fp> the following seems like something that filters classes but the way it's done doesn't make sense to me.
+   fp> the skin should provide a list of classes to include (with a default setting in the default skin class)
 		// Add callback which filters classes from content_css by classname and/or rule
 		// Another option would be to use theme_advanced_styles (http://wiki.moxiecode.com/index.php/TinyMCE:Configuration/theme_advanced_styles)
 		$init_options[] = 'class_filter : function(cls, rule) {
@@ -856,6 +866,7 @@ class tinymce_plugin extends Plugin
 			// console.log(cls, rule);
 			return false;
 		}';
+*/
 
 		// Generated HTML code options:
 		// do not make the path relative to "document_base_url":
@@ -889,7 +900,7 @@ class tinymce_plugin extends Plugin
 	 * Get URL of file to include as "content_css" for layout and classes in TinyMCE.
 	 *
 	 * @return array (path, url)
-	 */
+	 *
 	function get_item_css_path_and_url($Blog)
 	{
 		global $skins_url, $skins_path;
@@ -906,7 +917,7 @@ class tinymce_plugin extends Plugin
 			$SkinCache = & get_SkinCache();
 			/**
 			 * @var Skin
-			 */
+			 *
 			$Skin = $SkinCache->get_by_ID( $Blog->skin_ID );
 			$item_css_path = $Skin->folder.'/item.css';		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
 			// else: $item_css_path = 'css/item_base.css';
@@ -919,7 +930,7 @@ class tinymce_plugin extends Plugin
 
 		return array(NULL, NULL);
 	}
-
+	*/
 
 	/**
 	 * AJAX callback to save editor state (on or off).
@@ -964,7 +975,7 @@ class tinymce_plugin extends Plugin
 	 * @param array Params passed to the HtSrv call
 	 *              - "blog": selected blog
 	 * @return string
-	 */
+	 *
 	function htsrv_get_item_content_css($params)
 	{
 		$blog = $params['blog'];
@@ -983,7 +994,7 @@ class tinymce_plugin extends Plugin
 		}
 		exit;
 	}
-
+	*/
 
 	/**
 	 * Return the list of Htsrv (HTTP-Services) provided by the plugin.
