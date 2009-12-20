@@ -92,7 +92,7 @@ class coll_search_form_Widget extends ComponentWidget
 					'label' => T_( 'Search options' ),
 					'note' => T_( 'Display radio buttons for "All Words", "Some Word" and "Entire Phrase"' ),
 					'type' => 'checkbox',
-					'defaultvalue' => true,
+					'defaultvalue' => false,
 				),
 			), parent::get_param_definitions( $params )	);
 
@@ -117,20 +117,27 @@ class coll_search_form_Widget extends ComponentWidget
 		$this->disp_title();
 
 		form_formstart( $Blog->gen_blogurl(), 'search', 'SearchForm' );
-		echo '<div>';
+		if( $this->disp_params[ 'disp_search_options' ] )
+		{
+			echo '<div class="extended_search_form">';
+		}
+		else
+		{
+			echo '<div class="compact_search_form">';
+		}
 		$s = get_param( 's' );
-		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars($s).'" class="SearchField" />';
+		echo '<input type="text" name="s" size="25" value="'.htmlspecialchars($s).'" class="search_field SearchField" />';
 
 		if( $this->disp_params[ 'disp_search_options' ] )
 		{
 			$sentence = get_param( 'sentence' );
 			echo '<div class="search_options">';
-			echo '<div class="search_option"><input type="radio" name="sentence" value="AND" id="sentAND" '.( $sentence=='AND' ? 'checked="checked" ' : '' ).'/><label for="sentAND">'.T_('All Words').'</label></div>';
-			echo '<div class="search_option"><input type="radio" name="sentence" value="OR" id="sentOR" '.( $sentence=='OR' ? 'checked="checked" ' : '' ).'/><label for="sentOR">'.T_('Some Word').'</label></div>';
+			echo '<div class="search_option"><input type="radio" name="sentence" value="AND" id="sentAND" '.( $sentence=='AND' ? 'checked="checked" ' : '' ).'/><label for="sentAND">'.T_('All words').'</label></div>';
+			echo '<div class="search_option"><input type="radio" name="sentence" value="OR" id="sentOR" '.( $sentence=='OR' ? 'checked="checked" ' : '' ).'/><label for="sentOR">'.T_('Some word').'</label></div>';
 			echo '<div class="search_option"><input type="radio" name="sentence" value="sentence" id="sentence" '.( $sentence=='sentence' ? 'checked="checked" ' : '' ).'/><label for="sentence">'.T_('Entire phrase').'</label></div>';
 			echo '</div>';
 		}
-		echo '<input type="submit" name="submit" class="submit" value="'.T_('Search').'" />';
+		echo '<input type="submit" name="submit" class="search_submit submit" value="'.T_('Search').'" />';
 		echo '</div>';
 		echo '</form>';
 
@@ -143,6 +150,9 @@ class coll_search_form_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.17  2009/12/20 21:05:10  fplanque
+ * New default widget styles
+ *
  * Revision 1.16  2009/10/21 22:12:44  blueyed
  * whoops. fix is to use DIVs instead.
  *

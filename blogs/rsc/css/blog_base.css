@@ -176,3 +176,24 @@ form.bComment fieldset div.info
 	padding-top: .5ex;
 	/* border: 1px solid #f00;*/
 }
+
+/* Avatar widget */
+div.widget_core_coll_avatar {
+	margin: 1em auto;
+	text-align:center;
+}
+
+/* Search widget */
+div.compact_search_form input.search_field {
+	width: 120px;
+}
+div.compact_search_form input.search_submit {
+	margin-left: 4px;
+	width: 70px;
+}
+div.container_menu_top div.widget_core_coll_search_form {
+	float: right;
+}
+div.container_menu_top input.search_field {
+	width: 160px;	/* There is typically more space here */
+}

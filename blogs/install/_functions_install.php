@@ -541,6 +541,11 @@ function install_basic_widgets()
 							 SELECT blog_ID, "Menu", 4, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'login'))).'"
 							   FROM T_blogs' );
 
+	// Add search form to all blogs Menu Top:
+	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Menu Top", 1, "core", "coll_search_form"
+							   FROM T_blogs' );
+
 	// Add Avatar widget to all blog Sidebars:
 	$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							 SELECT blog_ID, "Sidebar", 10, "core", "coll_avatar"
@@ -828,6 +833,9 @@ function load_db_schema()
 
 /*
  * $Log$
+ * Revision 1.83  2009/12/20 21:05:08  fplanque
+ * New default widget styles
+ *
  * Revision 1.82  2009/12/14 03:59:51  fplanque
  * added 2 new skins
  *
