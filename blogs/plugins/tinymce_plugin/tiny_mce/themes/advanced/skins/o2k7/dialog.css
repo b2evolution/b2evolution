@@ -35,17 +35,25 @@ input.checkbox {border:1px none #000000; background:transparent; vertical-align:
 .input_noborder {border:0;}
 
 /* Buttons */
-#insert, #cancel, input.button, .updateButton {
-border:0; margin:0; padding:0;
-font-weight:bold;
-width:94px; height:26px;
-background:url(../default/img/buttons.png) 0 -26px;
-cursor:pointer;
-padding-bottom:2px;
+#insert, #cancel, #apply, .mceActionPanel .button, input.mceButton, .updateButton {
+	border: 1px solid #bbb; 
+	margin:0; 
+	padding:0 0 1px;
+	font-weight:bold;
+	font-size: 11px;
+	width:94px; 
+	height:24px;
+	background:url(img/fade-butt.png) 0 0;
+	cursor:pointer;
+	-moz-border-radius: 3px;
+	-khtml-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
 }
-
-#insert {background:url(../default/img/buttons.png) 0 -52px;}
-#cancel {background:url(../default/img/buttons.png) 0 0;}
+#insert:hover, #cancel:hover, input.mceButton:hover, .updateButton:hover,
+#insert:focus, #cancel:focus, input.mceButton:focus, .updateButton:focus {
+	border: 1px solid #555;
+}
 
 /* Browse */
 a.pickcolor, a.browse {text-decoration:none}
