@@ -614,3 +614,8 @@ hr.clear {
 	margin: 0px;
 	padding: 0px;
 }
+
+div.bText {
+	clear: both;
+	padding-top: 10px;
+}
