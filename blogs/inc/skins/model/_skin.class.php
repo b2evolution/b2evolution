@@ -225,7 +225,6 @@ class Skin extends DataObject
 
 	/**
 	 * Discover containers included in skin file
-	 * @todo browse all *.tpl.php
 	 */
 	function discover_containers()
 	{
@@ -234,38 +233,39 @@ class Skin extends DataObject
 		$this->container_list = array();
 
 		if( ! $dir = @opendir($skins_path.$this->folder) )
-		{
+		{	// Skin directory not found!
 			$Messages->add( 'Cannot open skin directory.', 'error' ); // No trans
 			return false;
 		}
 
+		// Go through all files in the skin directory:
 		while( ( $file = readdir($dir) ) !== false )
 		{
 			$rf_main_subpath = $this->folder.'/'.$file;
 			$af_main_path = $skins_path.$rf_main_subpath;
 
 			if( !is_file( $af_main_path ) || ! preg_match( '¤\.php$¤', $file ) )
-			{ // Not a php template file
+			{ // Not a php template file, go to next:
 				continue;
 			}
 
 			if( ! is_readable($af_main_path) )
-			{
+			{	// Cannot open PHP file:
 				$Messages->add( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error' );
 				continue;
 			}
 
 			$file_contents = @file_get_contents( $af_main_path );
 			if( ! is_string($file_contents) )
-			{
+			{	// Cannot get contents:
 				$Messages->add( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error' );
 				continue;
 			}
 
-
+			// DETECT if the file contains containers:
 			// if( ! preg_match_all( '~ \$Skin->container\( .*? (\' (.+?) \' )|(" (.+?) ") ~xmi', $file_contents, $matches ) )
 			if( ! preg_match_all( '~ (\$Skin->|skin_)container\( .*? ((\' (.+?) \')|(" (.+?) ")) ~xmi', $file_contents, $matches ) )
-			{	// No containers in this file
+			{	// No containers in this file, go to next:
 				continue;
 			}
 
@@ -276,10 +276,11 @@ class Skin extends DataObject
 			foreach( $container_list as $container )
 			{
 				if( empty($container) )
-				{	// regexp empty match
+				{	// regexp empty match -- NOT a container:
 					continue;
 				}
 
+				// We have one more container:
 				$c++;
 
 				if( in_array( $container, $this->container_list ) )
@@ -381,21 +382,37 @@ class Skin extends DataObject
 	{
 		global $DB;
 
-		if( empty( $this->container_list ) )
+		// Get a list of all currently empty containers:
+		$sql = 'SELECT sco_name
+						FROM T_skins__container LEFT JOIN T_widget ON ( sco_name = wi_sco_name )
+						WHERE sco_skin_ID = '.$this->ID.'
+						GROUP BY sco_name
+						HAVING COUNT(wi_ID) = 0';
+		$empty_containers_list = $DB->get_col( $sql, 0, 'Get empty containers' );
+		//pre_dump( $empty_containers_list );
+
+		// Delete empty containers:
+		foreach( $empty_containers_list as $empty_container )
 		{
-			return false;
+			if( !in_array( $empty_container, $this->container_list ) )
+			{	// This container has been removed from the skin + it's empty, so delete it from DB:
+				$DB->query( 'DELETE FROM T_skins__container
+									WHERE sco_name = '.$DB->quote($empty_container) );
+			}
 		}
 
-		$values = array();
-		foreach( $this->container_list as $container_name )
+		// Make sure new containers are added:
+		if( ! empty( $this->container_list ) )
 		{
-			$values [] = '( '.$this->ID.', '.$DB->quote($container_name).' )';
+			$values = array();
+			foreach( $this->container_list as $container_name )
+			{
+				$values [] = '( '.$this->ID.', '.$DB->quote($container_name).' )';
+			}
+
+			$DB->query( 'REPLACE INTO T_skins__container( sco_skin_ID, sco_name )
+										VALUES '.implode( ',', $values ), 'Insert containers' );
 		}
-
-		$DB->query( 'REPLACE INTO T_skins__container( sco_skin_ID, sco_name )
-									VALUES '.implode( ',', $values ), 'Insert containers' );
-
-		return true;
 	}
 
 
@@ -648,6 +665,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.26  2009/12/20 20:38:13  fplanque
+ * Enhanced skin containers reload for skin developers
+ *
  * Revision 1.25  2009/11/30 23:16:24  fplanque
  * basic cache invalidation is working now
  *

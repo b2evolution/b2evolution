@@ -46,6 +46,7 @@ switch( $action )
 {
  	case 'nil':
  	case 'list':
+ 	case 'reload':
 		// Do nothing
 		break;
 
@@ -82,6 +83,9 @@ switch( $action )
 		// echo $edited_ComponentWidget->coll_ID;
  		set_working_blog( $edited_ComponentWidget->coll_ID );
 		$BlogCache = & get_BlogCache();
+		/**
+		* @var Blog
+		*/
 		$Blog = & $BlogCache->get_by_ID( $blog );
 
 		break;
@@ -372,6 +376,28 @@ switch( $action )
  		send_javascript_message( array( 'sendWidgetOrderCallback' => array( 'blog='.$Blog->ID ) ) ); // exits() automatically
  		break;
 
+
+	case 'reload':
+		// Reload containers:
+
+ 		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		$SkinCache = & get_SkinCache();
+		/**
+		 * @var Skin
+		 */
+		$edited_Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
+
+		// Look for containers in skin file:
+		$edited_Skin->discover_containers();
+
+		// Save to DB:
+		$edited_Skin->db_save_containers();
+
+		header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
+		break;
+
 	default:
 		debug_die( 'Action: unhandled action' );
 }
@@ -511,6 +537,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.38  2009/12/20 20:38:26  fplanque
+ * Enhanced skin containers reload for skin developers
+ *
  * Revision 1.37  2009/12/12 01:13:08  fplanque
  * A little progress on breadcrumbs on menu structures alltogether...
  *

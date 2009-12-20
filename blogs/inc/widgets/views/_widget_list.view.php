@@ -21,6 +21,11 @@ global $container_Widget_array;
 
 global $container_list;
 
+if(	$current_User->check_perm( 'options', 'edit', false ) )
+{
+	echo '<div class="floatright small">'.action_icon( TS_('Reload containers!'), 'reload',
+	                        '?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload', T_('Reload containers!') ).'</div>';
+}
 
 // Load widgets for current collection:
 $WidgetCache = & get_WidgetCache();
@@ -208,11 +213,16 @@ global $rsc_url;
 echo '<!--[if IE]><img src="'.$rsc_url.'img/blank.gif" width="1" height="1" alt="" /><![endif]-->';
 
 echo '</fieldset>'."\n";
+
+
 echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear" />';
 
 
 /*
  * $Log$
+ * Revision 1.21  2009/12/20 20:38:34  fplanque
+ * Enhanced skin containers reload for skin developers
+ *
  * Revision 1.20  2009/12/07 23:00:17  blueyed
  * TODO, the 2nd. Please refactor. Users table wants an ID, too. Every results table should have one, makes finding the source for it a lot easier, too.
  *
