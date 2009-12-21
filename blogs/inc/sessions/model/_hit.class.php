@@ -66,7 +66,7 @@ class Hit
 	 * The type of referer.
 	 *
 	 * Note: "spam" referers do not get logged.
-	 * 'search'|'blacklist'|'referer'|'direct'|'spam'
+	 * 'search'|'blacklist'|'referer'|'direct'|'spam'|'self'
 	 *
 	 * @var string
 	 */
@@ -1220,6 +1220,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.57  2009/12/21 23:50:44  blueyed
+ * doc
+ *
  * Revision 1.56  2009/12/12 22:43:02  sam2kb
  * Detect Google Chrome. $Hit->is_chrome()
  *
