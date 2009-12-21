@@ -764,6 +764,8 @@ class ItemLight extends DataObject
 	 */
 	function get_title( $params = array() )
 	{
+		global $ReqHost, $ReqURI;
+
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'before'      => '',
@@ -783,6 +785,10 @@ class ItemLight extends DataObject
 		{	// Use default link type from settings:
 			if( $this->is_intro() )
 			{	// This is an intro, do not link title by default:
+				$params['link_type'] = 'none';
+			}
+			elseif( $this->get_permanent_url() == $ReqHost.$ReqURI )
+			{	// We are on the single url already:
 				$params['link_type'] = 'none';
 			}
 			else if( $this->ptyp_ID == 3000 )
@@ -968,6 +974,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.29  2009/12/21 00:40:18  fplanque
+ * don't link single page to itself
+ *
  * Revision 1.28  2009/09/28 23:56:22  blueyed
  * doc
  *
