@@ -787,7 +787,7 @@ class ItemLight extends DataObject
 			{	// This is an intro, do not link title by default:
 				$params['link_type'] = 'none';
 			}
-			elseif( $this->get_permanent_url() == $ReqHost.$ReqURI )
+			elseif( $this->get_permanent_url('','','&') == $ReqHost.$ReqURI )
 			{	// We are on the single url already:
 				$params['link_type'] = 'none';
 			}
@@ -974,6 +974,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.30  2009/12/21 01:29:54  fplanque
+ * little things
+ *
  * Revision 1.29  2009/12/21 00:40:18  fplanque
  * don't link single page to itself
  *

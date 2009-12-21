@@ -21,7 +21,6 @@ $params = array_merge( array(
 		'content_mode'    => 'auto',		// 'auto' will auto select depending on $disp-detail
 		'item_class'      => 'post',
 		'image_size'	    => 'fit-400x320',
-		'more_link_text'  => T_('Read more'),
 	), $params );
 
 ?>
@@ -43,8 +42,8 @@ $params = array_merge( array(
 
 	<h2><?php $Item->title(); ?></h2>
 
-		<p class="postinfo">
-		<?php
+	<p class="postinfo">
+	<?php
 		if( ! $Item->is_intro() )
 		{	// Display only if we're not displaying an intro post:
       $Item->author( array(
@@ -108,6 +107,9 @@ locale_restore_previous();	// Restore previous locale (Blog locale)
 
 /*
  * $Log$
+ * Revision 1.2  2009/12/21 01:29:54  fplanque
+ * little things
+ *
  * Revision 1.1  2009/05/23 14:12:42  fplanque
  * All default skins now support featured posts and intro posts.
  *

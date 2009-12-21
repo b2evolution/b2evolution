@@ -1390,7 +1390,9 @@ class Item extends ItemLight
 		{	// We're NOT in "more" mode:
 			if( $params['link_text'] == '#' )
 			{ // TRANS: this is the default text for the extended post "more" link
-				$params['link_text'] = T_('Read more').' &raquo;';
+				$params['link_text'] = T_('Full story').' &raquo;';
+				// Dummy in order to keep previous translation in the loop:
+				$dummy = T_('Read more');
 			}
 
 			return format_to_output( $params['before']
@@ -2041,14 +2043,16 @@ class Item extends ItemLight
 	 */
 	function feedback_link( $params )
 	{
+		global $ReqHost, $ReqURI;
+
 		if( ! $this->can_see_comments() )
 		{	// Comments disabled
 			return;
 		}
 
 		$params = array_merge( array(
-									'type' => 'feedbacks',
-									'status' => 'published',
+									'type' => 'feedbacks',		// Kind of feedbacks to count
+									'status' => 'published',	// Status of feedbacks to count
 									'link_before' => '',
 									'link_after' => '',
 									'link_text_zero' => '#',
@@ -2059,9 +2063,14 @@ class Item extends ItemLight
 									'link_anchor_more' => '#',
 									'link_title' => '#',
 									'use_popup' => false,
+									'show_in_single_mode' => false,		// Do we want to show this link even if we are viewing the current post in single view mode
 									'url' => '#',
 								), $params );
 
+		if( $params['show_in_single_mode'] == false & $this->get_permanent_url('','','&') == $ReqHost.$ReqURI )
+		{	// We are viewing the single page for this pos, which (typically) )contains comments, so we dpn't want to display this link
+			return;
+		}
 
 		// dh> TODO:	Add plugin hook, where a Pingback plugin could hook and provide "pingbacks"
 		switch( $params['type'] )
@@ -4139,6 +4148,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.169  2009/12/21 01:29:54  fplanque
+ * little things
+ *
  * Revision 1.168  2009/12/11 22:55:33  fplanque
  * Changing default of "Follow up:" to "..."
  *
