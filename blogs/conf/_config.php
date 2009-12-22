@@ -70,7 +70,7 @@ if( $debug == 'pwd' )
 			if( $_GET['debug'] == $debug_pwd )
 			{	// Password matches
 				$debug = 1;
-				setcookie( 'debug', $debug_pwd, $cookie_expires, $cookie_path, $cookie_domain );
+				setcookie( 'debug', $debug_pwd, 0, $cookie_path, $cookie_domain );
 			}
 			else
 			{	// Password doesn't match: turn off debug mode:
@@ -90,6 +90,9 @@ $use_session = true;
 
 /*
  * $Log$
+ * Revision 1.62  2009/12/22 09:03:19  fplanque
+ * lose debug cookie when closing browser
+ *
  * Revision 1.61  2009/12/11 23:01:19  fplanque
  * Reverted debug pwd changes.
  * As said before, hashing a cookie does not improve security. You can still steal the cookie.
