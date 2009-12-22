@@ -2573,8 +2573,15 @@ function upgrade_b2evo_tables()
 
 
 	db_add_col( 'T_hitlog', 'hit_agent_type', "ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL AFTER hit_remote_addr" );
+
+
 	// NOTE: dh> this should use the old "T_useragents" config/mapping (which has been removed already).
 	// UPDATE SET T_hitlog.hit_agent_type = T_useragent.agnt_type
+	// dh> the following worked for me (and will work better if the process might have timed out before):
+		#	UPDATE T_hitlog, T_useragents
+		#		 SET hit_agent_type = agnt_type
+		#	 WHERE hit_agnt_id = agnt_id
+		#		 AND hit_agent_type = "unknown"
 	// DEL agnt_type
 	// DEL evo_useragent table
 
@@ -2777,6 +2784,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.350  2009/12/22 02:55:06  blueyed
+ * doc/todo
+ *
  * Revision 1.349  2009/12/09 22:57:46  blueyed
  * todo/note
  *
