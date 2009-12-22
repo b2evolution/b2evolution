@@ -31,6 +31,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 	global $DB, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow, $evo_charset;
 	global $Messages, $Settings, $baseurl, $instance_name, $app_name, $app_version, $app_date;
 	global $Debuglog;
+	global $Timer;
 
 	if( ! isset( $allow_evo_stats ) )
 	{	// Set default value:
@@ -81,6 +82,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 		}
 	}
 
+	$Timer->resume('evonet: check for updates');
 	$Debuglog->add( sprintf('Getting updates from %s.', $evonetsrv_host), 'evonet' );
 	if( $debug )
 	{
@@ -167,6 +169,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 
 			$Debuglog->add( 'Updates saved', 'evonet' );
 
+			$Timer->pause('evonet: check for updates');
 			return true;
 		}
 		else
@@ -176,11 +179,16 @@ function b2evonet_get_updates( $force_short_delay = false )
 		}
 	}
 
+	$Timer->pause('evonet: check for updates');
 	return false;
 }
 
+
 /*
  * $Log$
+ * Revision 1.28  2009/12/22 02:11:30  blueyed
+ * Add Timer for getting updates from evonet.
+ *
  * Revision 1.27  2009/12/11 23:20:55  fplanque
  * no message
  *
