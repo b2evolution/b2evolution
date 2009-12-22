@@ -120,6 +120,7 @@ class test_plugin extends Plugin
 				'defaultvalue' => 'one',
 				'type' => 'select',
 				'options' => array( 'sun' => 'Sunday', 'mon' => 'Monday' ),
+				'note' => 'This combo is connected with the next field',
 			),
 			'a_disabled_one' => array(
 				'label' => 'This one is disabled',
@@ -836,6 +837,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.86  2009/12/22 12:13:47  waltercruz
+ * Adding note, fix PHP warning
+ *
  * Revision 1.85  2009/09/26 12:00:44  tblue246
  * Minor/coding style
  *
