@@ -265,10 +265,13 @@ class BlockCache
 	function cacheproviderstore( $key, $payload )
 	{
 		$ttl = 3600 * 24; // TODO: dh> should become a param to the method?!
+
 		if( function_exists('apc_store') )
 			return apc_store( $key, $payload, $ttl );
+
 		if( function_exists('xcache_set') && ini_get('xcache.var_size') > 0 )
 			return xcache_set( $key, $payload, $ttl );
+
 		if( function_exists('eaccelerator_put') )
 			return eaccelerator_put( $key, $data, $ttl );
 
@@ -287,10 +290,12 @@ class BlockCache
 	{
 		if( function_exists('apc_fetch') )
 			return apc_fetch( $key, $success );
+
 		if( function_exists('xcache_get') && ini_get('xcache.var_size') > 0 )
 			$r = xcache_get($key);
 		elseif( function_exists('eaccelerator_get') )
 			$r = eaccelerator_get($key);
+
 		if( isset($r) )
 		{
 			$success = true;
@@ -306,6 +311,9 @@ class BlockCache
 
 /*
  * $Log$
+ * Revision 1.10  2009/12/22 08:02:12  fplanque
+ * doc
+ *
  * Revision 1.9  2009/12/22 03:43:10  blueyed
  * todo
  *

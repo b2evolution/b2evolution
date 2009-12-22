@@ -245,26 +245,31 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 
 	/**
-	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 * May be overriden by some widgets, depending on what THEY depend on..
 	 *
 	 * @todo dh> this needs a custom implementation I believe.
 	 *           It could depend on tag_ID_any (once tags have an ID)
 	 *           or just the list of blogs (cont_coll_ID_*)?
+	 * fp> I don't understand what you mean.
 	 *
 	 * @return array of keys this widget depends on
-	 */
+	 *
 	function get_cache_keys()
 	{
 		return array(
 				'wi_ID'   => $this->ID,					// Have the widget settings changed ?
-				'item_ID' =>'any',
+				'item_ID' => 'any',							// doc???
 			);
 	}
+	*/
 }
 
 
 /*
  * $Log$
+ * Revision 1.26  2009/12/22 08:02:12  fplanque
+ * doc
+ *
  * Revision 1.25  2009/12/22 03:31:37  blueyed
  * todo about tag widget block cache keys
  *

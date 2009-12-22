@@ -462,6 +462,7 @@ class ComponentWidget extends DataObject
 	 *           by returning something in cache_keys (so
 	 *           ComponentWidget::get_cache_keys() should return
 	 *           an empty list or false by default).
+	 * fp> I don't understand what you mean.
 	 *
 	 * @param array MUST contain at least the basic display params
 	 * @param array of extra keys to be used for cache keying
@@ -696,6 +697,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.74  2009/12/22 08:02:11  fplanque
+ * doc
+ *
  * Revision 1.73  2009/12/22 03:31:10  blueyed
  * todo about cachable block handling
  *
