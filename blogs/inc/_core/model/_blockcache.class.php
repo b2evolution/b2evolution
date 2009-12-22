@@ -39,7 +39,7 @@ class BlockCache
 	var $keys;
 	var $serialized_keys = '';
 
-    /**
+	/**
 	 * After how many bytes should we output sth live while collecting cache content:
 	 */
 	var $output_chunk_size = 2000;
@@ -258,6 +258,7 @@ class BlockCache
 	/**
 	 * put your comment there...
 	 *
+	 * @todo dh> This method should get removed from here, it's not limited to BlockCache.
 	 * @param mixed $key
 	 * @param mixed $payload
 	 */
@@ -274,9 +275,11 @@ class BlockCache
 		return NULL;
 	}
 
+
 	/**
 	 * put your comment there...
 	 *
+	 * @todo dh> This method should get removed from here, it's not limited to BlockCache.
 	 * @param mixed $key
 	 * @param mixed $success
 	 */
@@ -303,6 +306,9 @@ class BlockCache
 
 /*
  * $Log$
+ * Revision 1.9  2009/12/22 03:43:10  blueyed
+ * todo
+ *
  * Revision 1.8  2009/12/22 02:56:35  blueyed
  * BlockCache: add support for xcache and eaccelerator
  *
