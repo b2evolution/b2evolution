@@ -297,6 +297,7 @@ function wp_getcommentcount( $m )
 	return new xmlrpcresp( new xmlrpcval( $data, 'struct' ) );
 }
 
+
 $wordpressdeletecomment_doc = 'Remove comment.';
 $wordpressdeletecomment_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcString));
 /**
@@ -404,6 +405,7 @@ $xmlrpc_procs['wp.getCommentCount'] = array(
 				'function' => 'wp_getcommentcount',
 				'signature' => $wordpressgetcommentcount_sig,
 				'docstring' => $wordpressgetcommentcount_doc);
+
 $xmlrpc_procs['wp.deleteComment'] = array(
 				'function' => 'wp_deletecomment',
 				'signature' => $wordpressdeletecomment_sig,
@@ -411,6 +413,9 @@ $xmlrpc_procs['wp.deleteComment'] = array(
 
 /*
  * $Log$
+ * Revision 1.11  2009/12/22 23:14:14  fplanque
+ * whitespace
+ *
  * Revision 1.10  2009/12/22 16:51:40  waltercruz
  * wp.deleteComment
  *
