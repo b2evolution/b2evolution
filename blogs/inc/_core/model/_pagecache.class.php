@@ -118,16 +118,14 @@ class PageCache
 	function get_af_filecache_path()
 	{
 		global $Debuglog;
-		global $ReqHost, $ReqURI;
+		global $ReqURL;
 
 		// We want the cache for the current URL
 		if( empty( $this->cache_filepath ) )
 		{
-			$ReqAbsUrl = $ReqHost.$ReqURI;
-			// echo $ReqAbsUrl;
- 			$Debuglog->add( 'URL being cached: '.$ReqAbsUrl, 'pagecache' );
+ 			$Debuglog->add( 'URL being cached: '.$ReqURL, 'pagecache' );
 
- 			$this->cache_filepath = $this->gen_filecache_path( $ReqAbsUrl );
+ 			$this->cache_filepath = $this->gen_filecache_path( $ReqURL );
 
  			$Debuglog->add( 'Cache file: '.$this->cache_filepath, 'pagecache' );
 		}
@@ -285,7 +283,7 @@ class PageCache
 	function retrieve()
 	{
 		global $Debuglog;
-		global $ReqHost, $ReqURI;
+		global $ReqURL;
 		global $servertimenow;
 		global $Timer;
 
@@ -331,7 +329,7 @@ class PageCache
 			// Retrieved cached URL:
 			$retrieved_url = trim($lines[0]);
 			unset($lines[0]);
-			if( $retrieved_url != $ReqHost.$ReqURI )
+			if( $retrieved_url != $ReqURL )
 			{
 				$Debuglog->add( 'Cached file URL ['.$retrieved_url.'] does not match current URL, aborting retrieve.', 'pagecache' );
 				return false;
@@ -477,8 +475,8 @@ class PageCache
 			// Put the URL of the page we are caching into the cache. You can never be to paranoid!
 			// People can change their domain names, folder structures, etc... AND you cannot trust the hash to give a
 			// different file name in 100.00% of the cases! Serving a page for a different URL would be REEEEEALLLY BAAAAAAD!
-			global $ReqHost, $ReqURI;
-			$file_head = $ReqHost.$ReqURI."\n";
+			global $ReqURL;
+			$file_head = $ReqURL."\n";
 
 			// Put the time of the page generation into the file (btw this is the time of when we started this script)
 			global $servertimenow;
@@ -528,6 +526,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.18  2009/12/22 08:53:34  fplanque
+ * global $ReqURL
+ *
  * Revision 1.17  2009/12/06 03:24:11  fplanque
  * minor/doc/fixes
  *

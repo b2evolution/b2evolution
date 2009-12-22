@@ -764,7 +764,7 @@ class ItemLight extends DataObject
 	 */
 	function get_title( $params = array() )
 	{
-		global $ReqHost, $ReqURI;
+		global $ReqURL;
 
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
@@ -787,7 +787,7 @@ class ItemLight extends DataObject
 			{	// This is an intro, do not link title by default:
 				$params['link_type'] = 'none';
 			}
-			elseif( $this->get_permanent_url('','','&') == $ReqHost.$ReqURI )
+			elseif( is_same_url( $this->get_permanent_url('','','&'), $ReqURL ) )
 			{	// We are on the single url already:
 				$params['link_type'] = 'none';
 			}
@@ -974,6 +974,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.31  2009/12/22 08:53:34  fplanque
+ * global $ReqURL
+ *
  * Revision 1.30  2009/12/21 01:29:54  fplanque
  * little things
  *

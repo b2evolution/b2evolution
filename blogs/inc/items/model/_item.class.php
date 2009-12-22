@@ -2043,7 +2043,7 @@ class Item extends ItemLight
 	 */
 	function feedback_link( $params )
 	{
-		global $ReqHost, $ReqURI;
+		global $ReqURL;
 
 		if( ! $this->can_see_comments() )
 		{	// Comments disabled
@@ -2067,7 +2067,7 @@ class Item extends ItemLight
 									'url' => '#',
 								), $params );
 
-		if( $params['show_in_single_mode'] == false & $this->get_permanent_url('','','&') == $ReqHost.$ReqURI )
+		if( $params['show_in_single_mode'] == false && is_same_url( $this->get_permanent_url('','','&'), $ReqURL ) )
 		{	// We are viewing the single page for this pos, which (typically) )contains comments, so we dpn't want to display this link
 			return;
 		}
@@ -4148,6 +4148,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.171  2009/12/22 08:53:32  fplanque
+ * global $ReqURL
+ *
  * Revision 1.170  2009/12/22 03:30:25  blueyed
  * cleanup
  *

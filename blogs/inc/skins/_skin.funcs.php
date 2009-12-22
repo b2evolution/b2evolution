@@ -59,7 +59,7 @@ function skin_init( $disp )
 	global $robots_index;
 	global $seo_page_type;
 
-	global $redir, $ReqHost, $ReqURI, $m, $w, $preview;
+	global $redir, $ReqURL, $ReqURI, $m, $w, $preview;
 
 	global $Chapter;
 	global $Debuglog;
@@ -139,7 +139,7 @@ function skin_init( $disp )
 					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
 				}
 
-				if( ! is_same_url( $ReqHost.$ReqURI, $canonical_url) )
+				if( ! is_same_url( $ReqURL, $canonical_url) )
 				{	// The requested URL does not look like the canonical URL for this post...
 					if( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
 					{	// REDIRECT TO THE CANONICAL URL:
@@ -206,7 +206,7 @@ function skin_init( $disp )
 							if( $Chapter )
 							{
 								$canonical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
-								if( ! is_same_url($ReqHost.$ReqURI, $canonical_url) )
+								if( ! is_same_url($ReqURL, $canonical_url) )
 								{	// fp> TODO: we're going to lose the additional params, it would be better to keep them...
 									// fp> what additional params actually?
 									if( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
@@ -235,7 +235,7 @@ function skin_init( $disp )
 							|| $Blog->get_setting( 'relcanonical_tag_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
-						if( ! is_same_url($ReqHost.$ReqURI, $canonical_url) )
+						if( ! is_same_url($ReqURL, $canonical_url) )
 						{
 							if( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
 							{	// REDIRECT TO THE CANONICAL URL:
@@ -258,7 +258,7 @@ function skin_init( $disp )
 							|| $Blog->get_setting( 'relcanonical_archive_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w, '&', $MainList->get_active_filter('page') );
-						if( ! is_same_url($ReqHost.$ReqURI, $canonical_url) )
+						if( ! is_same_url($ReqURL, $canonical_url) )
 						{
 							if( $Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
 							{	// REDIRECT TO THE CANONICAL URL:
@@ -295,7 +295,7 @@ function skin_init( $disp )
 						|| $Blog->get_setting( 'relcanonical_homepage' ) )
 				{ // Check if the URL was canonical:
 					$canonical_url = $Blog->gen_blogurl();
-					if( ! is_same_url($ReqHost.$ReqURI, $canonical_url) )
+					if( ! is_same_url($ReqURL, $canonical_url) )
 					{
 						if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 						{	// REDIRECT TO THE CANONICAL URL:
@@ -920,6 +920,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.80  2009/12/22 08:53:34  fplanque
+ * global $ReqURL
+ *
  * Revision 1.79  2009/12/04 23:27:50  fplanque
  * cleanup Expires: header handling
  *
