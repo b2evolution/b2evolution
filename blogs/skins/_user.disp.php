@@ -21,11 +21,15 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+/**
+* @var Blog
+*/
+global $Blog;
+
 $user_ID = param( 'user_ID', 'integer', '' );
 if( empty($user_ID) )
-{
-	echo '<p class="error">'.T_('No user specified.').'</p>';
-	return;
+{	// Grab the blog owner
+	$user_ID = $Blog->owner_user_ID;
 }
 
 $UserCache = & get_UserCache();
@@ -94,6 +98,12 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.9  2009/12/22 23:13:39  fplanque
+ * Skins v4, step 1:
+ * Added new disp modes
+ * Hooks for plugin disp modes
+ * Enhanced menu widgets (BIG TIME! :)
+ *
  * Revision 1.8  2009/09/26 12:00:44  tblue246
  * Minor/coding style
  *

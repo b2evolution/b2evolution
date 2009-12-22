@@ -579,9 +579,12 @@ if( !empty( $skin ) )
 					'mediaidx'       => 'mediaidx.main.php',
 					'msgform'        => 'msgform.main.php',
 					'page'           => 'page.main.php',
+					'postidx'        => 'postidx.main.php',
 					'posts'          => 'posts.main.php',
 					'profile'        => 'profile.main.php',
+					'search'         => 'search.main.php',
 					'single'         => 'single.main.php',
+					'sitemap'        => 'sitemap.main.php',
 					'subs'           => 'subs.main.php',
 					// All others will default to index.main.php
 				);
@@ -643,6 +646,12 @@ else
 
 /*
  * $Log$
+ * Revision 1.161  2009/12/22 23:13:37  fplanque
+ * Skins v4, step 1:
+ * Added new disp modes
+ * Hooks for plugin disp modes
+ * Enhanced menu widgets (BIG TIME! :)
+ *
  * Revision 1.160  2009/12/20 22:12:20  fplanque
  * doc
  *

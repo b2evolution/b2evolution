@@ -216,8 +216,7 @@ class Plugins_admin extends Plugins
 				'PluginUserSettingsEditAction' => 'Called as action before editing a user\'s settings.',
 
 				// allow plugins to handle $disp modes
-		// 3.3? fp> WARNING: EXPERIMENTAL. API MAY CHANGE. MAY NOT GO INTO 3.3
-				'GetDispModes' => 'Called when building possible $disp list',
+				'GetHandledDispModes' => 'Called when building possible $disp list',
 				'HandleDispMode' => 'Called when displaying $disp',
 			);
 
@@ -1470,6 +1469,12 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.25  2009/12/22 23:13:38  fplanque
+ * Skins v4, step 1:
+ * Added new disp modes
+ * Hooks for plugin disp modes
+ * Enhanced menu widgets (BIG TIME! :)
+ *
  * Revision 1.24  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *

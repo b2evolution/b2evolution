@@ -290,13 +290,17 @@ function request_title( $params = array() )
 			'title_page_after'    => '#',
 			'glue'                => ' - ',
 			'format'              => 'htmlbody',
-			'arcdir_text'         => T_('Archive directory'),
-			'catdir_text'         => T_('Category directory'),
-			'msgform_text'        => T_('Send an email message'),
-			'profile_text'        => T_('User profile'),
+			'arcdir_text'         => T_('Archive Directory'),
+			'catdir_text'         => T_('Category Directory'),
+			'mediaidx_text'       => T_('Photo Index'),
+			'postidx_text'        => T_('Post Index'),
+			'search_text'         => T_('Search'),
+			'sitemap_text'        => T_('Site Map'),
+			'msgform_text'        => T_('Send an Email Message'),
+			'profile_text'        => T_('User Profile'),
 			'user_text'           => T_('User'),
 			'subs_text'           => T_('Subscriptions'),
-			'comments_text'       => T_('Latest comments'),
+			'comments_text'       => T_('Latest Comments'),
 			'feedback-popup_text' => T_('Feedback'),
 		), $params );
 
@@ -324,6 +328,22 @@ function request_title( $params = array() )
 		case 'catdir':
 			// We are requesting the archive directory:
 			$r[] = $params['catdir_text'];
+			break;
+
+		case 'mediaidx':
+			$r[] = $params['mediaidx_text'];
+			break;
+
+		case 'postidx':
+			$r[] = $params['postidx_text'];
+			break;
+
+		case 'sitemap':
+			$r[] = $params['sitemap_text'];
+			break;
+
+		case 'search':
+			$r[] = $params['search_text'];
 			break;
 
 		case 'comments':
@@ -878,6 +898,8 @@ function mainlist_page_links( $params = array() )
 /**
  * Stub
  *
+ * Sets $Item ion global scope
+ *
  * @return Item
  */
 function & mainlist_get_item()
@@ -897,6 +919,9 @@ function & mainlist_get_item()
 	{
 		$Item = NULL;
 	}
+
+	$GLOBALS['Item'] = & $Item;
+
 	return $Item;
 }
 
@@ -1081,6 +1106,12 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.71  2009/12/22 23:13:38  fplanque
+ * Skins v4, step 1:
+ * Added new disp modes
+ * Hooks for plugin disp modes
+ * Enhanced menu widgets (BIG TIME! :)
+ *
  * Revision 1.70  2009/12/08 20:21:10  fplanque
  * no message
  *

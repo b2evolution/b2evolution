@@ -94,6 +94,12 @@ class coll_search_form_Widget extends ComponentWidget
 					'type' => 'checkbox',
 					'defaultvalue' => false,
 				),
+				'use_search_disp' => array(
+					'label' => T_( 'Results on search page' ),
+					'note' => T_( 'Use advanced search page to display results (disp=search)' ),
+					'type' => 'checkbox',
+					'defaultvalue' => true,
+				),
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -137,6 +143,10 @@ class coll_search_form_Widget extends ComponentWidget
 			echo '<div class="search_option"><input type="radio" name="sentence" value="sentence" id="sentence" '.( $sentence=='sentence' ? 'checked="checked" ' : '' ).'/><label for="sentence">'.T_('Entire phrase').'</label></div>';
 			echo '</div>';
 		}
+		if( $this->disp_params[ 'use_search_disp' ] )
+		{
+			echo '<input type="hidden" name="disp" value="search" />';
+		}
 		echo '<input type="submit" name="submit" class="search_submit submit" value="'.T_('Search').'" />';
 		echo '</div>';
 		echo '</form>';
@@ -150,6 +160,12 @@ class coll_search_form_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.18  2009/12/22 23:13:39  fplanque
+ * Skins v4, step 1:
+ * Added new disp modes
+ * Hooks for plugin disp modes
+ * Enhanced menu widgets (BIG TIME! :)
+ *
  * Revision 1.17  2009/12/20 21:05:10  fplanque
  * New default widget styles
  *

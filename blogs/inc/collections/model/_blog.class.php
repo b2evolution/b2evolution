@@ -1637,17 +1637,29 @@ class Blog extends DataObject
 			case 'lastcommentsurl':
 				return url_add_param( $this->gen_blogurl(), 'disp=comments' );
 
+			case 'searchurl':
+				return url_add_param( $this->gen_blogurl(), 'disp=search' );
+
 			case 'arcdirurl':
 				return url_add_param( $this->gen_blogurl(), 'disp=arcdir' );
 
 			case 'catdirurl':
 				return url_add_param( $this->gen_blogurl(), 'disp=catdir' );
 
+			case 'postidxurl':
+				return url_add_param( $this->gen_blogurl(), 'disp=postidx' );
+
 			case 'mediaidxurl':
 				return url_add_param( $this->gen_blogurl(), 'disp=mediaidx' );
 
+			case 'sitemapurl':
+				return url_add_param( $this->gen_blogurl(), 'disp=sitemap' );
+
 			case 'msgformurl':
 				return url_add_param( $this->gen_blogurl(), 'disp=msgform' );
+
+			case 'userurl':
+				return url_add_param( $this->gen_blogurl(), 'disp=user' );
 
 			case 'description':			// RSS wording
 			case 'shortdesc':
@@ -2104,10 +2116,18 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get URL of message form to contact the owner
+	 *
 	 * @param boolean do we want to redirect back to where we came from after message?
 	 */
 	function get_contact_url( $with_redirect = true )
 	{
+		$this->get_owner_User();
+		if( ! $this->owner_User->allow_msgform )
+		{ // user does not allow contact form
+			return NULL;
+		}
+
 		$r = url_add_param( $this->get('msgformurl'), 'recipient_id='.$this->owner_user_ID );
 
 		if( $with_redirect )
@@ -2171,6 +2191,12 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.96  2009/12/22 23:13:38  fplanque
+ * Skins v4, step 1:
+ * Added new disp modes
+ * Hooks for plugin disp modes
+ * Enhanced menu widgets (BIG TIME! :)
+ *
  * Revision 1.95  2009/12/22 03:30:25  blueyed
  * cleanup
  *

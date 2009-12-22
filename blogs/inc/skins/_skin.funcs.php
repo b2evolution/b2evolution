@@ -94,6 +94,7 @@ function skin_init( $disp )
 		case 'single':
 		case 'page':
 		case 'feedback-popup':
+		case 'search':
 			// We need to load posts for this display:
 
 			// Note: even if we request the same post as $Item above, the following will do more restrictions (dates, etc.)
@@ -316,6 +317,14 @@ function skin_init( $disp )
 
 			break;
 
+		case 'search':
+			$seo_page_type = 'Search page';
+			if( $Blog->get_setting( 'filtered_noindex' ) )
+			{	// We prefer robots not to index these pages:
+				$robots_index = false;
+			}
+			break;
+
 		// SPECIAL FEATURE PAGES:
 		case 'feedback-popup':
 			$seo_page_type = 'Comment popup';
@@ -431,29 +440,32 @@ function skin_include( $template_name, $params = array() )
 				'disp_mediaidx'       => '_mediaidx.disp.php',
 				'disp_msgform'        => '_msgform.disp.php',
 				'disp_page'           => '_page.disp.php',
+				'disp_postidx'        => '_postidx.disp.php',
 				'disp_posts'          => '_posts.disp.php',
 				'disp_profile'        => '_profile.disp.php',
+				'disp_search'					=> '_search.disp.php',
 				'disp_single'         => '_single.disp.php',
+				'disp_sitemap'        => '_sitemap.disp.php',
 				'disp_subs'           => '_subs.disp.php',
 				'disp_user'           => '_user.disp.php',
 			);
 
-		// 3.3? now add plugin disp handlers
-		if( $disp_Plugins = $Plugins->get_list_by_event( 'GetDispModes' ) )
+		// Add plugin disp handlers:
+		if( $disp_Plugins = $Plugins->get_list_by_event( 'GetHandledDispModes' ) )
 		{
-			$plugins_disp_handlers = array();
 			foreach( $disp_Plugins as $disp_Plugin )
-			{ // Go through whole list of disp plugins
-				if( $plugin_modes = $Plugins->call_method( $disp_Plugin->ID, 'GetDispModes', $disp_handlers ) )
-				{ // plugin provides some custom disp modes
-					$disp_handlers = array_merge( $disp_handlers, $plugin_modes );
- 					// store all disp modes a plugin handles:
- 					$plugins_disp_handlers[ $disp_Plugin->ID ] = array_keys( $plugin_modes );
+			{ // Go through whole list of plugins providing disps
+				if( $plugin_modes = $Plugins->call_method( $disp_Plugin->ID, 'GetHandledDispModes', $disp_handlers ) )
+				{ // plugin handles some custom disp modes
+					foreach( $plugin_modes as $plugin_mode )
+					{
+						$disp_handlers[$plugin_mode] = '#'.$disp_Plugin->ID;
+					}
 				}
 			}
 		}
 
-		// allow skin overrides
+		// Allow skin overrides as well as additional disp modes (This can be used in the famou shopping cart scenario...)
 		$disp_handlers = array_merge( $disp_handlers, $params );
 
 		if( !isset( $disp_handlers['disp_'.$disp] ) )
@@ -470,10 +482,20 @@ function skin_include( $template_name, $params = array() )
 			$Timer->pause( $timer_name );
 			return;
 		}
+
 	}
 
 	$disp_handled = false;
-	if( file_exists( $ads_current_skin_path.$template_name ) )
+
+	if( $template_name[0] == '#' )
+	{	// This disp mode is handled by a plugin:
+		$plug_ID = substr( $template_name, 1 );
+		$disp_params = array( 'disp' => $disp );
+		$Plugins->call_method( $plug_ID, 'HandleDispMode', $disp_params );
+		$disp_handled = true;
+	}
+
+	elseif( file_exists( $ads_current_skin_path.$template_name ) )
 	{	// The skin has a customized handler, use that one instead:
 		global $Debuglog;
 		$file = $ads_current_skin_path.$template_name;
@@ -490,60 +512,6 @@ function skin_include( $template_name, $params = array() )
 		require $file;
 		$disp_handled = true;
 	}
-
-	/* 3.3? fp> I am disabling this to get your attention so you can fix it quickly :p
-
-	1. Every time a plugin wants to handle a disp, it will go through 2 file_exists() which is heavy on the filesystem
-	It would make more sense to have plugin handlers begin with a special char for example '#' and pass handling over to Plugin if we detect that.
-	Making sense?
-
-	yabs >
-	this way it allows skins to override the plugins _foo.disp.php.
-	fp> this is awfully complex. What's a use case scenario for this?
-	yabs > As a user, I'm currently developing a shopping cart plugin
-				which would find it really useful to provide view cart/checkout/account
-				whilst still giving skinners the ability to redesign those views
-
-				Obviously that's just a "me" case study.
-
-				If you feel it's bloat then just roll it back ;)
-	fp> it's a fair use case. implementation feels heavy but if I can't come up with anything better, I'll leave it like that. may not put it into 3.3 in order to think some more.
-	yabs > I'll leave it to you to enable this code when/if you think it's right
-	fp> Actually we'll have to discuss this some more. I think it doesn't make sense like this.
-	I think in your use case, you need specific skins anyways (otherwise the plugin would just display "out of context" pages.
-	So selecting a PHP file should actually be a method of the Skin class and then,
-	your shopping cart enabled skins should just override the Skin class.
-
-	yabs> Would you prefer to discus this here, on the dev list, some alternative ?
-				Currently the plugin can work with any skin ( shedloads of work to do still ).
-				It's custom disps that allow it to do that.
-				I'm 100% happy with a system that involves the user upload disps to their skin
-				( or use a customised skin ) If you think that would be a better answer?
-				My goal isn't to bloat the core, I'd like to think that other plugins will make use of these hooks,
-				once they realise they exist ... if they exist .... do they exist? O_o
-
-	2. The disp should only be handled by ONE SINGLE plugin. Correct?
-	So going through a loop here again is a bit of a waste.
-	It would make more sense, I think, for the event handler plugin ID
-	to be stored in $disp_handlers[] array. Maybe something like
-	'disp_user' => '#12'  meaning this is handled by plugin ID 12?
-	Making sense?
-
-	yabs > yep
-	elseif( !empty( $plugins_disp_handlers ) )
-	{ // disp handled by plugin
-		foreach( $plugins_disp_handlers as $plug_ID => $plugin_disp_modes )
-		{ // Go through whole list of disp plugins
-			if( in_array( 'disp_'.$disp, $plugin_disp_modes ) )
-			{ // plugin handles this disp mode
-				$disp_params = array( 'disp' => $disp );
-				$Plugins->call_method( $plug_ID, 'HandleDispMode', $disp_params );
-				$disp_handled = true;
-				break; // no need to go through rest of plugins
-			}
-		}
-	}
-	*/
 
 	if( ! $disp_handled )
 	{ // nothing handled the disp mode
@@ -920,6 +888,12 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.81  2009/12/22 23:13:38  fplanque
+ * Skins v4, step 1:
+ * Added new disp modes
+ * Hooks for plugin disp modes
+ * Enhanced menu widgets (BIG TIME! :)
+ *
  * Revision 1.80  2009/12/22 08:53:34  fplanque
  * global $ReqURL
  *

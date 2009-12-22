@@ -96,25 +96,61 @@ class coll_common_links_Widget extends ComponentWidget
 					'type' => 'checkbox',
 					'label' => T_('Show "Recently"'),
 					'note' => T_('Go to the most recent posts / the blog\'s home.'),
-					'defaultvalue' => '1',
+					'defaultvalue' => 1,
+				),
+				'show_search' => array(
+					'type' => 'checkbox',
+					'label' => T_('Show "Search"'),
+					'note' => T_('Go to the search page.'),
+					'defaultvalue' => 0,
+				),
+				'show_postidx' => array(
+					'type' => 'checkbox',
+					'label' => T_('Show "Post index"'),
+					'note' => T_('Go to the post index.'),
+					'defaultvalue' => 0,
 				),
 				'show_archives' => array(
 					'type' => 'checkbox',
 					'label' => T_('Show "Archives"'),
 					'note' => T_('Go to the monthly/weekly/daily archive list.'),
-					'defaultvalue' => '1',
+					'defaultvalue' => 1,
 				),
 				'show_categories' => array(
 					'type' => 'checkbox',
 					'label' => T_('Show "Categories"'),
 					'note' => T_('Go to the category tree.'),
-					'defaultvalue' => '1',
+					'defaultvalue' => 1,
+				),
+				'show_mediaidx' => array(
+					'type' => 'checkbox',
+					'label' => T_('Show "Photo index"'),
+					'note' => T_('Go to the photo index / contact sheet.'),
+					'defaultvalue' => 0,
 				),
 				'show_latestcomments' => array(
 					'type' => 'checkbox',
 					'label' => T_('Show "Latest comments"'),
 					'note' => T_('Go to the latest comments.'),
-					'defaultvalue' => '1',
+					'defaultvalue' => 1,
+				),
+				'show_owneruserinfo' => array(
+					'type' => 'checkbox',
+					'label' => T_('Show "Owner details"'),
+					'note' => T_('Go to user infor about the blog owner.'),
+					'defaultvalue' => 0,
+				),
+				'show_ownercontact' => array(
+					'type' => 'checkbox',
+					'label' => T_('Show "Contact"'),
+					'note' => T_('Go to message form to contact the blog owner.'),
+					'defaultvalue' => 0,
+				),
+				'show_sitemap' => array(
+					'type' => 'checkbox',
+					'label' => T_('Show "Site map"'),
+					'note' => T_('Go to site map (HTML version).'),
+					'defaultvalue' => 0,
 				),
 			), parent::get_param_definitions( $params )	);
 
@@ -130,6 +166,9 @@ class coll_common_links_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
+		/**
+		* @var Blog
+		*/
 		global $Blog;
 
 		$this->init_display( $params );
@@ -149,6 +188,20 @@ class coll_common_links_Widget extends ComponentWidget
 			echo $this->disp_params['item_end'];
 		}
 
+		if( $this->disp_params['show_search'] )
+		{
+			echo $this->disp_params['item_start'];
+			echo '<strong><a href="'.$Blog->get('searchurl').'">'.T_('Search').'</a></strong>';
+			echo $this->disp_params['item_end'];
+		}
+
+		if( $this->disp_params['show_postidx'] )
+		{
+			echo $this->disp_params['item_start'];
+			echo '<strong><a href="'.$Blog->get('postidxurl').'">'.T_('Post index').'</a></strong>';
+			echo $this->disp_params['item_end'];
+		}
+
 		if( $this->disp_params['show_archives'] )
 		{
 			// fp> TODO: don't display this if archives plugin not installed... or depluginize archives (I'm not sure)
@@ -159,9 +212,15 @@ class coll_common_links_Widget extends ComponentWidget
 
 		if( $this->disp_params['show_categories'] )
 		{
-			// fp> TODO: don't display this if categories plugin not installed... or depluginize categories (I'm not sure)
 			echo $this->disp_params['item_start'];
 			echo '<strong><a href="'.$Blog->get('catdirurl').'">'.T_('Categories').'</a></strong>';
+			echo $this->disp_params['item_end'];
+		}
+
+		if( $this->disp_params['show_mediaidx'] )
+		{
+			echo $this->disp_params['item_start'];
+			echo '<strong><a href="'.$Blog->get('mediaidxurl').'">'.T_('Photo index').'</a></strong>';
 			echo $this->disp_params['item_end'];
 		}
 
@@ -169,6 +228,27 @@ class coll_common_links_Widget extends ComponentWidget
 		{
 			echo $this->disp_params['item_start'];
 			echo '<strong><a href="'.$Blog->get('lastcommentsurl').'">'.T_('Latest comments').'</a></strong>';
+			echo $this->disp_params['item_end'];
+		}
+
+		if( $this->disp_params['show_owneruserinfo'] )
+		{
+			echo $this->disp_params['item_start'];
+			echo '<strong><a href="'.$Blog->get('userurl').'">'.T_('Owner details').'</a></strong>';
+			echo $this->disp_params['item_end'];
+		}
+
+		if( $this->disp_params['show_ownercontact'] && $url = $Blog->get_contact_url( true ) )
+		{	// owner allows contact:
+			echo $this->disp_params['item_start'];
+			echo '<strong><a href="'.$url.'">'.T_('Contact').'</a></strong>';
+			echo $this->disp_params['item_end'];
+		}
+
+		if( $this->disp_params['show_sitemap'] )
+		{
+			echo $this->disp_params['item_start'];
+			echo '<strong><a href="'.$Blog->get('sitemapurl').'">'.T_('Site map').'</a></strong>';
 			echo $this->disp_params['item_end'];
 		}
 
@@ -182,6 +262,12 @@ class coll_common_links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.14  2009/12/22 23:13:39  fplanque
+ * Skins v4, step 1:
+ * Added new disp modes
+ * Hooks for plugin disp modes
+ * Enhanced menu widgets (BIG TIME! :)
+ *
  * Revision 1.13  2009/09/14 13:54:13  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

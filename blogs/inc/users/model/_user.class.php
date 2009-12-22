@@ -519,7 +519,7 @@ class User extends DataObject
 
 		if( $params['link_to'] == 'userpage' )
 		{
-			$url = $this->get_userpage_url( NULL );
+			$url = $this->get_userpage_url();
 		}
 		elseif( $params['link_to'] == 'userurl' )
 		{
@@ -719,24 +719,21 @@ class User extends DataObject
   /**
 	 * Get user page url
 	 */
-	function get_userpage_url( $blogurl = NULL )
+	function get_userpage_url()
 	{
-		if( empty($blogurl) )
+	  /**
+		 * @var Blog
+		 */
+		global $Blog;
+
+		if( empty($Blog) )
 		{
-	    /**
-			 * @var Blog
-			 */
-			global $Blog;
-
-			if( empty($Blog) )
-			{
-				return NULL;
-			}
-
-			$blogurl = $Blog->gen_blogurl();
+			return NULL;
 		}
 
-		return url_add_param( $blogurl, 'disp=user&amp;user_ID='.$this->ID );
+		$blogurl = $Blog->gen_blogurl();
+
+		return url_add_param( $Blog->get('userurl'), 'user_ID='.$this->ID );
 	}
 
 
@@ -1969,6 +1966,12 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.69  2009/12/22 23:13:39  fplanque
+ * Skins v4, step 1:
+ * Added new disp modes
+ * Hooks for plugin disp modes
+ * Enhanced menu widgets (BIG TIME! :)
+ *
  * Revision 1.68  2009/12/01 03:45:37  fplanque
  * multi dimensional invalidation
  *

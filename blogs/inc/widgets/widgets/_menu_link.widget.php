@@ -32,9 +32,16 @@ $menu_link_widget_link_types = array(
 		'home' => T_('Blog home'),
 		'arcdir' => T_('Archive directory'),
 		'catdir' => T_('Category directory'),
+		'postidx' => T_('Post index'),
+		'mediaidx' => T_('Photo index'),
+		'sitemap' => T_('Site Map'),
 		'latestcomments' => T_('Latest comments'),
+		'owneruserinfo' => T_('Blog owner details'),
 		'ownercontact' => T_('Blog owner contact form'),
-		'login' => T_('Log in form')
+		'search' => T_('Search page'),
+		'login' => T_('Log in form'),
+		'item' => T_('Any item (post, page, etc...)'),
+		'url' => T_('Any URL'),
 	);
 
 /**
@@ -74,15 +81,18 @@ class menu_link_Widget extends ComponentWidget
 
 		$this->load_param_array();
 
+
+		if( !empty($this->param_array['link_text']) )
+		{	// We have a custom link text:
+			return $this->param_array['link_text'];
+		}
+
 		if( !empty($this->param_array['link_type']) )
-		{
-			// TRANS: %s is the link type, e. g. "Blog home" or "Log in form"
+		{	// TRANS: %s is the link type, e. g. "Blog home" or "Log in form"
 			return sprintf( T_( '%s link' ), $menu_link_widget_link_types[$this->param_array['link_type']] );
 		}
-		else
-		{
-			return $this->get_name();
-		}
+
+		return $this->get_name();
 	}
 
 
@@ -114,6 +124,28 @@ class menu_link_Widget extends ComponentWidget
 					'options' => $menu_link_widget_link_types,
 					'defaultvalue' => 'home',
 				),
+				'link_text' => array(
+					'label' => T_('Link text'),
+					'note' => T_( 'Text to use for the link (leave empty for default).' ),
+					'type' => 'text',
+					'size' => 20,
+					'defaultvalue' => '',
+				),
+				// fp> TODO: ideally we would have a link icon to go click on the destination...
+				'item_ID' => array(
+					'label' => T_('Item ID'),
+					'note' => T_( 'ID of post, page, etc. for "Item" type links.' ),
+					'type' => 'text',
+					'size' => 5,
+					'defaultvalue' => '',
+				),
+				'link_href' => array(
+					'label' => T_('URL'),
+					'note' => T_( 'Destination URL for "URL" type links.' ),
+					'type' => 'text',
+					'size' => 30,
+					'defaultvalue' => '',
+				),
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -127,12 +159,20 @@ class menu_link_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
+		/**
+		* @var Blog
+		*/
 		global $Blog;
 
 		$this->init_display( $params );
 
 		switch(	$this->disp_params['link_type'] )
 		{
+			case 'search':
+				$url = $Blog->get('searchurl');
+				$text = T_('Search');
+				break;
+
 			case 'arcdir':
 				$url = $Blog->get('arcdirurl');
 				$text = T_('Archives');
@@ -143,19 +183,36 @@ class menu_link_Widget extends ComponentWidget
 				$text = T_('Categories');
 				break;
 
+			case 'postidx':
+				$url = $Blog->get('postidxurl');
+				$text = T_('Post index');
+				break;
+
+			case 'mediaidx':
+				$url = $Blog->get('mediaidxurl');
+				$text = T_('Photo index');
+				break;
+
+			case 'sitemap':
+				$url = $Blog->get('sitemapurl');
+				$text = T_('Site map');
+				break;
+
 			case 'latestcomments':
 				$url = $Blog->get('lastcommentsurl');
 				$text = T_('Latest comments');
 				break;
 
+			case 'owneruserinfo':
+				$url = $Blog->get('userurl');
+				$text = T_('Owner details');
+				break;
+
 			case 'ownercontact':
-				$Blog->get_owner_User();
-				// fp> TODO: move this test into $Blog->get_contact_url( true ); 
-				if( ! $Blog->owner_User->allow_msgform )
-				{ // user does not allow contact form
+				if( ! $url = $Blog->get_contact_url( true ) )
+				{ // user does not allow contact form:
 					return;
 				}
-				$url = $Blog->get_contact_url( true );
 				$text = T_('Contact');
 				break;
 
@@ -165,10 +222,36 @@ class menu_link_Widget extends ComponentWidget
 				$text = T_('Log in');
 				break;
 
+			case 'item':
+				$ItemCache = & get_ItemCache();
+				/**
+				* @var Item
+				*/
+				$item_ID = (integer)($this->disp_params['item_ID']);
+				$Item = & $ItemCache->get_by_ID( $item_ID, false, false );
+				if( empty($Item) )
+				{	// Item not found
+					return false;
+				}
+				$url = $Item->get_permanent_url();
+				$text = $Item->title;
+				break;
+
+			case 'url':
+				$url = $this->disp_params['link_href'];
+				$text = '[URL]';	// should normally be overriden below...
+				break;
+
 			case 'home':
 			default:
 				$url = $Blog->get('url');
 				$text = T_('Home');
+		}
+
+
+		if( !empty($this->param_array['link_text']) )
+		{	// We have a custom link text:
+			$text = $this->param_array['link_text'];
 		}
 
 		echo $this->disp_params['block_start'];
@@ -188,6 +271,12 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.17  2009/12/22 23:13:39  fplanque
+ * Skins v4, step 1:
+ * Added new disp modes
+ * Hooks for plugin disp modes
+ * Enhanced menu widgets (BIG TIME! :)
+ *
  * Revision 1.16  2009/09/14 13:54:13  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

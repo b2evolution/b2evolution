@@ -785,26 +785,20 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * 3.3? Return list of custom disp types handled by this plugin
+	 * Return list of custom disp types handled by this plugin
 	 *
-	 * @return array $disp_modes : list of disp modes supplied by this plugin
+	 * @return array list of disp modes handled by this plugin
 	 */
-	function GetDispModes()
+	function GetHandledDispModes()
 	{
 		return array(
-// fp> see skin_include() for todos about this
-// TODO: return an array with special codes.
-//				'disp_test' => '_test.disp.php', // display our test disp
+				'disp_test', // display our test disp
 			);
 	}
 
 
 	/**
-	 * 3.3? Display our custom disp mode(s)
-	 *
-	 * Only called if disp file doesn't exist in :
-	 * 	/skins/skin/
-	 * 	/skins/
+	 * Display our custom disp mode(s)
 	 *
 	 * @param mixed array $params
 	 * 		disp > display mode requested
@@ -813,14 +807,7 @@ class test_plugin extends Plugin
 	 */
 	function HandleDispMode( $params )
 	{
-		global $plugins_path;
-		$disp = 'disp_'.$params['disp'];
-		$my_modes = $this->GetDispModes( array() );	// fp> TODO: don't use an array from somewhere else, just put a switch case right here.
-		if( isset( $my_modes[$disp] ) )
-		{
-			require_once $plugins_path.'test_plugin/'.$my_modes[$disp];
-			return true;
-		}
+		echo '<p>This is the test plugin handling the ['.$params['disp'].'] disp mode.</p>';
 	}
 
 
@@ -837,6 +824,12 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.87  2009/12/22 23:13:39  fplanque
+ * Skins v4, step 1:
+ * Added new disp modes
+ * Hooks for plugin disp modes
+ * Enhanced menu widgets (BIG TIME! :)
+ *
  * Revision 1.86  2009/12/22 12:13:47  waltercruz
  * Adding note, fix PHP warning
  *

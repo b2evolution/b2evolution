@@ -96,7 +96,7 @@ class coll_item_list_Widget extends ComponentWidget
 					'note' => T_( 'ID of the blog to use, leave empty for the current blog.' ),
 					'size' => 4,
 				),
-/* TODP: filter this out from all "SIMPLE" lists and keep it only in universal list
+/* TODO: filter this out from all "SIMPLE" lists and keep it only in universal list
 				'cat_IDs' => array(
 					'label' => T_( 'Categories' ),
 					'note' => T_( 'List category IDs separated by ,' ),
@@ -239,7 +239,7 @@ class coll_item_list_Widget extends ComponentWidget
 			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
 			$ItemList = & new ItemListLight( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCacheLight', $this->code.'_' );
 		}
-/* TODO: trim is not enough, convert each ID to a number for security		
+/* TODO: trim is not enough, convert each ID to a number for security
 		$cat_array = array_filter( array_map( 'trim', explode( ',', $this->disp_params[ 'cat_IDs' ] ) ) );
 */
 		// Filter list:
@@ -425,6 +425,12 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.25  2009/12/22 23:13:39  fplanque
+ * Skins v4, step 1:
+ * Added new disp modes
+ * Hooks for plugin disp modes
+ * Enhanced menu widgets (BIG TIME! :)
+ *
  * Revision 1.24  2009/12/22 03:30:24  blueyed
  * cleanup
  *
