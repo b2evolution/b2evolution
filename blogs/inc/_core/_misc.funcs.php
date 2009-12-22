@@ -3840,8 +3840,116 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 	}
 }
 
+/**
+* Get $ReqPath, $ReqURI
+*
+* @return array ($ReqPath,$ReqURI);
+*/
+function get_ReqURI()
+{
+	global $Debuglog;
+
+	// Investigation for following code by Isaac - http://isaacschlueter.com/
+	if( isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI']) )
+	{ // Warning: on some IIS installs it it set but empty!
+		$Debuglog->add( 'vars: vars: Getting ReqURI from REQUEST_URI', 'request' );
+		$ReqURI = $_SERVER['REQUEST_URI'];
+
+		// Build requested Path without query string:
+		$pos = strpos( $ReqURI, '?' );
+		if( false !== $pos )
+		{
+			$ReqPath = substr( $ReqURI, 0, $pos  );
+		}
+		else
+		{
+			$ReqPath = $ReqURI;
+		}
+	}
+	elseif( isset($_SERVER['URL']) )
+	{ // ISAPI
+		$Debuglog->add( 'vars: Getting ReqPath from URL', 'request' );
+		$ReqPath = $_SERVER['URL'];
+		$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
+	}
+	elseif( isset($_SERVER['PATH_INFO']) )
+	{ // CGI/FastCGI
+		if( isset($_SERVER['SCRIPT_NAME']) )
+		{
+			$Debuglog->add( 'vars: Getting ReqPath from PATH_INFO and SCRIPT_NAME', 'request' );
+
+			if ($_SERVER['SCRIPT_NAME'] == $_SERVER['PATH_INFO'] )
+			{	/* both the same so just use one of them
+				 * this happens on a windoze 2003 box
+				 * gotta love microdoft
+				 */
+				$Debuglog->add( 'vars: PATH_INFO and SCRIPT_NAME are the same', 'request' );
+				$Debuglog->add( 'vars: Getting ReqPath from PATH_INFO only instead', 'request' );
+				$ReqPath = $_SERVER['PATH_INFO'];
+			}
+			else
+			{
+				$ReqPath = $_SERVER['SCRIPT_NAME'].$_SERVER['PATH_INFO'];
+			}
+		}
+		else
+		{ // does this happen??
+			$Debuglog->add( 'vars: Getting ReqPath from PATH_INFO only!', 'request' );
+
+			$ReqPath = $_SERVER['PATH_INFO'];
+		}
+		$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
+	}
+	elseif( isset($_SERVER['ORIG_PATH_INFO']) )
+	{ // Tomcat 5.5.x with Herbelin PHP servlet and PHP 5.1
+		$Debuglog->add( 'vars: Getting ReqPath from ORIG_PATH_INFO', 'request' );
+		$ReqPath = $_SERVER['ORIG_PATH_INFO'];
+		$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
+	}
+	elseif( isset($_SERVER['SCRIPT_NAME']) )
+	{ // Some Odd Win2k Stuff
+		$Debuglog->add( 'vars: Getting ReqPath from SCRIPT_NAME', 'request' );
+		$ReqPath = $_SERVER['SCRIPT_NAME'];
+		$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
+	}
+	elseif( isset($_SERVER['PHP_SELF']) )
+	{ // The Old Stand-By
+		$Debuglog->add( 'vars: Getting ReqPath from PHP_SELF', 'request' );
+		$ReqPath = $_SERVER['PHP_SELF'];
+		$ReqURI = isset($_SERVER['QUERY_STRING']) && !empty( $_SERVER['QUERY_STRING'] ) ? ($ReqPath.'?'.$_SERVER['QUERY_STRING']) : $ReqPath;
+	}
+	else
+	{
+		$ReqPath = false;
+		$ReqURI = false;
+		?>
+		<p class="error">
+		Warning: $ReqPath could not be set. Probably an odd IIS problem.
+		</p>
+		<p>
+		Go to your <a href="<?php echo $baseurl.$install_subdir ?>phpinfo.php">phpinfo page</a>,
+		look for occurences of <code><?php
+		// take the baseurlroot out..
+		echo preg_replace('#^'.$baseurlroot.'#', '', $baseurl.$install_subdir )
+		?>phpinfo.php</code> and copy all lines
+		containing this to the <a href="http://forums.b2evolution.net">forum</a>. Also specify what webserver
+		you're running on.
+		<br />
+		(If you have deleted your install folder &ndash; what is recommended after successful setup &ndash;
+		you have to upload it again before doing this).
+		</p>
+		<?php
+	}
+
+	return array($ReqPath,$ReqURI);
+}
+
+
 /*
  * $Log$
+ * Revision 1.203  2009/12/22 08:45:44  fplanque
+ * fix install
+ *
  * Revision 1.202  2009/12/20 22:12:16  fplanque
  * doc
  *

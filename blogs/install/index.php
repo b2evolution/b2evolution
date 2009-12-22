@@ -396,7 +396,12 @@ switch( $action )
 			$baseurl = 'http://'.( isset( $_SERVER['SERVER_NAME'] ) ? $_SERVER['SERVER_NAME'] : 'yourserver.com' );
 			if( isset( $_SERVER['SERVER_PORT'] ) && ( $_SERVER['SERVER_PORT'] != '80' ) )
 				$baseurl .= ':'.$_SERVER['SERVER_PORT'];
+
+			// ############ Get ReqPath & ReqURI ##############
+			list($ReqPath,$ReqURI) = get_ReqURI();
+
 			$baseurl .= preg_replace( '#/install(/(index.php)?)?$#', '', $ReqPath ).'/';
+
 			param( 'conf_baseurl', 'string', $baseurl );
 			param( 'conf_admin_email', 'string', $admin_email );
 
@@ -723,6 +728,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.191  2009/12/22 08:45:44  fplanque
+ * fix install
+ *
  * Revision 1.190  2009/12/06 05:34:31  fplanque
  * Violent refactoring for _main.inc.php
  * Sorry for potential side effects.
