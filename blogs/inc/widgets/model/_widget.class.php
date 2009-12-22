@@ -456,7 +456,12 @@ class ComponentWidget extends DataObject
 
 
 	/**
-	 * Wraps display in a cacheable block
+	 * Wraps display in a cacheable block.
+	 *
+	 * @todo dh> I think Widgets need to provide caching, e.g.
+	 *           by returning something in cache_keys (so
+	 *           ComponentWidget::get_cache_keys() should return
+	 *           an empty list or false by default).
 	 *
 	 * @param array MUST contain at least the basic display params
 	 * @param array of extra keys to be used for cache keying
@@ -476,6 +481,9 @@ class ComponentWidget extends DataObject
 			$Timer->resume( 'BlockCache' );
 			// Extend cache keys:
 			$keys += $this->get_cache_keys();
+
+			// TODO: dh> I think disp_params (after being processed in init_display) should get considered for the cache key, too.
+
 			$this->BlockCache = new BlockCache( 'widget', $keys );
 
 			if( ! $this->BlockCache->check() )
@@ -688,6 +696,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.73  2009/12/22 03:31:10  blueyed
+ * todo about cachable block handling
+ *
  * Revision 1.72  2009/12/06 18:07:43  fplanque
  * Fix simplified list widgets.
  *
