@@ -246,7 +246,6 @@ function wp_getcategories( $m )
 	return _wp_mw_getcategories ( $m ) ;
 }
 
-
 $wordpressgetcommentcount_doc = 'Retrieve comment count for a specific post.';
 $wordpressgetcommentcount_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcString));
 /**
@@ -260,6 +259,7 @@ $wordpressgetcommentcount_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcS
  *					1 username (string): Login for a Blogger user who has permission to edit the given
  *						post (either the user who originally created it or an admin of the blog).
  *					2 password (string): Password for said username.
+ *					3 post_id (string): The id of the post
  */
 function wp_getcommentcount( $m )
 {
@@ -295,6 +295,74 @@ function wp_getcommentcount( $m )
 			);
 
 	return new xmlrpcresp( new xmlrpcval( $data, 'struct' ) );
+}
+
+$wordpressdeletecomment_doc = 'Remove comment.';
+$wordpressdeletecomment_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcString));
+/**
+ * wp.deleteComment
+ *
+ * @see http://codex.wordpress.org/XML-RPC_wp
+ *
+ * @param xmlrpcmsg XML-RPC Message
+ *					0 blogid (string): Unique identifier of the blog the post will be added to.
+ *						Currently ignored in b2evo, in favor of the category.
+ *					1 username (string): Login for a Blogger user who has permission to edit the given
+ *						post (either the user who originally created it or an admin of the blog).
+ *					2 password (string): Password for said username.
+ *					3 comment_id (int): The id of the comment
+ */
+function wp_deletecomment( $m )
+{
+
+	global $DB, $cache_Comments;
+	// CHECK LOGIN:
+	/**
+	 * @var User
+	 */
+	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
+	{	// Login failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	// GET BLOG:
+	/**
+	 * @var Blog
+	 */
+	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	{	// Login failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	$comment_ID = $m->getParam(3);
+	$comment_ID = $comment_ID->scalarval();
+	
+	// I almost duplicate Comment_get_by_ID, cause it dies when not able to find a matching comment. Maybe we should improve that function!
+	if( empty($cache_Comments[$comment_ID]) )
+	{ // Load this entry into cache:
+		$query = "SELECT *
+							FROM T_comments
+							WHERE comment_ID = $comment_ID";
+		if( $row = $DB->get_row( $query, ARRAY_A ) )
+		{
+			$cache_Comments[$comment_ID] = new Comment( $row ); // COPY !
+		}
+	}
+	if( empty( $cache_Comments[ $comment_ID ] ) )
+	{
+			return xmlrpcs_resperror( 5, 'Requested comment does not exist.' ); // user error 5
+	}
+	else
+	{
+		$edited_Comment = $cache_Comments[$comment_ID];
+	}
+
+	// Check permission:
+	$current_User->check_perm( 'blog_comments', 'edit', true, $Blog->ID );
+
+	$edited_Comment->dbdelete();
+
+	return new xmlrpcresp( new xmlrpcval( 'true', 'boolean' ) );
 }
 
 // Wordpress has some aliases to metaweblog APIS.
@@ -336,9 +404,16 @@ $xmlrpc_procs['wp.getCommentCount'] = array(
 				'function' => 'wp_getcommentcount',
 				'signature' => $wordpressgetcommentcount_sig,
 				'docstring' => $wordpressgetcommentcount_doc);
+$xmlrpc_procs['wp.deleteComment'] = array(
+				'function' => 'wp_deletecomment',
+				'signature' => $wordpressdeletecomment_sig,
+				'docstring' => $wordpressdeletecomment_doc);
 
 /*
  * $Log$
+ * Revision 1.10  2009/12/22 16:51:40  waltercruz
+ * wp.deleteComment
+ *
  * Revision 1.9  2009/12/22 16:26:28  waltercruz
  * Support to wp.getCommentCount
  *
