@@ -39,7 +39,7 @@ class BlockCache
 	var $keys;
 	var $serialized_keys = '';
 
-  /**
+    /**
 	 * After how many bytes should we output sth live while collecting cache content:
 	 */
 	var $output_chunk_size = 2000;
@@ -263,8 +263,13 @@ class BlockCache
 	 */
 	function cacheproviderstore( $key, $payload )
 	{
+		$ttl = 3600 * 24; // TODO: dh> should become a param to the method?!
 		if( function_exists('apc_store') )
-			return apc_store( $key, $payload, 3600 * 24 );
+			return apc_store( $key, $payload, $ttl );
+		if( function_exists('xcache_set') && ini_get('xcache.var_size') > 0 )
+			return xcache_set( $key, $payload, $ttl );
+		if( function_exists('eaccelerator_put') )
+			return eaccelerator_put( $key, $data, $ttl );
 
 		return NULL;
 	}
@@ -279,6 +284,15 @@ class BlockCache
 	{
 		if( function_exists('apc_fetch') )
 			return apc_fetch( $key, $success );
+		if( function_exists('xcache_get') && ini_get('xcache.var_size') > 0 )
+			$r = xcache_get($key);
+		elseif( function_exists('eaccelerator_get') )
+			$r = eaccelerator_get($key);
+		if( isset($r) )
+		{
+			$success = true;
+			return $r;
+		}
 
 		$success = false;
 		return NULL;
@@ -289,6 +303,9 @@ class BlockCache
 
 /*
  * $Log$
+ * Revision 1.8  2009/12/22 02:56:35  blueyed
+ * BlockCache: add support for xcache and eaccelerator
+ *
  * Revision 1.7  2009/12/06 03:24:11  fplanque
  * minor/doc/fixes
  *
