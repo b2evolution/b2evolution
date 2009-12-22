@@ -58,6 +58,8 @@ function b2evonet_get_updates( $force_short_delay = false )
 	#$attempt_every = 5;
 
 
+	# TODO: dh> having $baseurl in here will cause too frequently updates, when you have the same install with different $baseurls.
+	#           Everytime this method gets called on another baseurl, there's a new check for updates!
 	$version_id = $baseurl.' '.$instance_name.' '.$app_name.' '.$app_version.' '.$app_date;
 	// This is the last version we checked against the server:
 	$last_version_checked =  $Settings->get( 'evonet_last_version_checked' );
@@ -186,6 +188,9 @@ function b2evonet_get_updates( $force_short_delay = false )
 
 /*
  * $Log$
+ * Revision 1.29  2009/12/22 02:22:03  blueyed
+ * b2evonet_get_updates: TODO about baseurl in version_id, causing too many update checks.
+ *
  * Revision 1.28  2009/12/22 02:11:30  blueyed
  * Add Timer for getting updates from evonet.
  *
