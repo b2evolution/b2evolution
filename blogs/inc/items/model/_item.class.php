@@ -3426,10 +3426,10 @@ class Item extends ItemLight
 		// This collection has been modified, cached content depending on it should be invalidated:
 		BlockCache::invalidate_key( 'coll_ID', $Blog->ID );
 
-		// Fien grained invalidation:
+		// Fine grained invalidation:
 		// EXPERIMENTAL: Below are more granular invalidation dates:
 		// set_coll_ID // Settings have not changed
-		BlockCache::invalidate_key( 'cont_coll_ID', $Blog->ID ); // Conent has changed
+		BlockCache::invalidate_key( 'cont_coll_ID', $Blog->ID ); // Content has changed
 
 		return $result;
 	}
@@ -4148,6 +4148,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.170  2009/12/22 03:30:25  blueyed
+ * cleanup
+ *
  * Revision 1.169  2009/12/21 01:29:54  fplanque
  * little things
  *

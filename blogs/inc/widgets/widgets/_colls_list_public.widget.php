@@ -128,8 +128,6 @@ class colls_list_public_Widget extends ComponentWidget
 	{
 		global $Blog;
 
-		$owner_User = & $Blog->get_owner_User();
-
 		return array(
 				'wi_ID'   => $this->ID,					// Have the widget settings changed ?
 				'set_coll_ID' =>'any', 					// Have the settings of ANY blog changed ? (ex: new skin here, new name on another)
@@ -140,6 +138,9 @@ class colls_list_public_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.11  2009/12/22 03:30:24  blueyed
+ * cleanup
+ *
  * Revision 1.10  2009/12/01 04:19:25  fplanque
  * even more invalidation dimensions
  *

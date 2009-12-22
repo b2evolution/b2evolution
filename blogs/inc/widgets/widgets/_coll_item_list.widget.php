@@ -324,7 +324,7 @@ class coll_item_list_Widget extends ComponentWidget
 			{
 				// Open new cat:
 				$Chapter = & $Item->get_main_Chapter();
-				
+
 				echo $this->disp_params['item_start'];
 				echo '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get('name').'</a>';
 				echo $this->disp_params['group_start'];
@@ -414,8 +414,6 @@ class coll_item_list_Widget extends ComponentWidget
 	{
 		global $Blog;
 
-		$owner_User = & $Blog->get_owner_User();
-
 		return array(
 				'wi_ID'   => $this->ID,					// Have the widget settings changed ?
 				'set_coll_ID' => $Blog->ID,			// Have the settings of the blog changed ? (ex: new skin)
@@ -427,6 +425,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.24  2009/12/22 03:30:24  blueyed
+ * cleanup
+ *
  * Revision 1.23  2009/12/20 23:15:00  fplanque
  * rollback broken stuff
  *

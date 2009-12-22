@@ -1822,7 +1822,7 @@ class Blog extends DataObject
 		// This collection has been modified, cached content depending on it should be invalidated:
 		BlockCache::invalidate_key( 'coll_ID', $this->ID );
 
-		// Fien grained invalidation:
+		// Fine grained invalidation:
 		// EXPERIMENTAL: Below are more granular invalidation dates:
 		BlockCache::invalidate_key( 'set_coll_ID', $this->ID ); // Settings have changed
 		BlockCache::invalidate_key( 'set_coll_ID', 'any' ); // Settings of a have changed (for widgets tracking a change on ANY blog)
@@ -2171,6 +2171,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.95  2009/12/22 03:30:25  blueyed
+ * cleanup
+ *
  * Revision 1.94  2009/12/15 06:24:25  fplanque
  * no message
  *
