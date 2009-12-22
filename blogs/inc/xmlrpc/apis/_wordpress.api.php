@@ -247,6 +247,56 @@ function wp_getcategories( $m )
 }
 
 
+$wordpressgetcommentcount_doc = 'Retrieve comment count for a specific post.';
+$wordpressgetcommentcount_sig =  array(array($xmlrpcArray,$xmlrpcString,$xmlrpcString,$xmlrpcString,$xmlrpcString));
+/**
+ * wp.getCommentCount
+ *
+ * @see http://codex.wordpress.org/XML-RPC_wp
+ *
+ * @param xmlrpcmsg XML-RPC Message
+ *					0 blogid (string): Unique identifier of the blog the post will be added to.
+ *						Currently ignored in b2evo, in favor of the category.
+ *					1 username (string): Login for a Blogger user who has permission to edit the given
+ *						post (either the user who originally created it or an admin of the blog).
+ *					2 password (string): Password for said username.
+ */
+function wp_getcommentcount( $m )
+{
+	// CHECK LOGIN:
+	/**
+	 * @var User
+	 */
+	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
+	{	// Login failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	// GET BLOG:
+	/**
+	 * @var Blog
+	 */
+	if( ! $Blog = & xmlrpcs_get_Blog( $m, 0 ) )
+	{	// Login failed, return (last) error:
+		return xmlrpcs_resperror();
+	}
+
+	$postid = $m->getParam(3);
+	$postid = $postid->scalarval();
+
+	$approved = generic_ctp_number($postid);
+	$awaiting_moderation = generic_ctp_number($postid,'comments','draft'); 
+	$total = generic_ctp_number($postid,'comments','total');
+	// maybe we should do a check_perm here?
+	$data = array( 'approved' => new xmlrpcval($approved,'int'),
+			'awaiting_moderation' => new xmlrpcval($awaiting_moderation,'int'),
+			'spam' => new xmlrpcval(0,'int'),
+			'total_comment' => new xmlrpcval($total,'int')
+			);
+
+	return new xmlrpcresp( new xmlrpcval( $data, 'struct' ) );
+}
+
 // Wordpress has some aliases to metaweblog APIS.
 
 $xmlrpc_procs['wp.getCategories'] = array(
@@ -282,8 +332,16 @@ $xmlrpc_procs['wp.getPostStatusList'] = array(
 				'signature' => $wordpressgetpagestatuslist_sig,
 				'docstring' => $wordpressgetpoststatuslist_doc);
 
+$xmlrpc_procs['wp.getCommentCount'] = array(
+				'function' => 'wp_getcommentcount',
+				'signature' => $wordpressgetcommentcount_sig,
+				'docstring' => $wordpressgetcommentcount_doc);
+
 /*
  * $Log$
+ * Revision 1.9  2009/12/22 16:26:28  waltercruz
+ * Support to wp.getCommentCount
+ *
  * Revision 1.8  2009/09/18 17:23:02  tblue246
  * Added CVS tags
  *
