@@ -27,6 +27,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectList2' );
 
 /**
  * ComponentWidget Class
@@ -292,6 +293,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.19  2009/12/23 01:38:46  fplanque
+ * one server was missing this...
+ *
  * Revision 1.18  2009/12/13 02:28:36  fplanque
  * dirty fix / better than nothing
  *
