@@ -34,8 +34,10 @@ $params = array_merge( array(
 		'after_images'        => '</div>',
 		'image_size'          => 'fit-400x320',
 		'image_limit'         =>  1000,
+		'image_link_to'       => 'original', // can be 'original', 'single' or empty
 		'excerpt_image_size'  => 'fit-80x80',
 		'excerpt_image_limit' =>  1,
+		'excerpt_image_link_to'  => 'single',
 		'before_url_link'     => '<p class="post_link">'.T_('Link:').' ',
 		'after_url_link'      => '</p>',
 		'url_link_text_template' => '$url$',
@@ -115,7 +117,7 @@ switch( $content_mode )
 					'after' =>               $params['after_images'],
 					'image_size' =>          $params['excerpt_image_size'],
 					'limit' =>               $params['excerpt_image_limit'],
-					'image_link_to' =>       'single',
+					'image_link_to' =>       $params['excerpt_image_link_to'],
 					'restrict_to_image_position' => 'teaser',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 				) );
 		}
@@ -157,6 +159,7 @@ switch( $content_mode )
 					'after' =>               $params['after_images'],
 					'image_size' =>          $params['image_size'],
 					'image' =>               $params['image_limit'],
+					'image_link_to' =>       $params['image_link_to'],
 					// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 					'restrict_to_image_position' => $Item->has_content_parts($params) ? 'teaser' : '',
 				) );
@@ -241,6 +244,10 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.27  2009/12/24 02:43:32  sam2kb
+ * Added 'image_link_to' param to images()
+ * See http://forums.b2evolution.net//viewtopic.php?t=20140
+ *
  * Revision 1.26  2009/12/11 22:55:33  fplanque
  * Changing default of "Follow up:" to "..."
  *
