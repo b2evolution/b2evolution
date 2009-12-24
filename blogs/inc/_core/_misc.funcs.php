@@ -3229,7 +3229,6 @@ function get_manual_link( $topic )
 function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 {
 	$r = '';
-
 	foreach( $field_attribs as $l_attr => $l_value )
 	{
 		if( $l_value === NULL )
@@ -3712,6 +3711,11 @@ function get_active_opcode_cache()
 		}
 	}
 
+	if( function_exists('xcache_set') && ini_get('xcache.var_size') > 0 )
+	{
+		$opcode_cache = 'xcache';
+	}
+
 	return $opcode_cache;
 }
 
@@ -3947,6 +3951,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.204  2009/12/24 12:33:21  waltercruz
+ * Adding Xcache do get_active_opcode_cache
+ *
  * Revision 1.203  2009/12/22 08:45:44  fplanque
  * fix install
  *
