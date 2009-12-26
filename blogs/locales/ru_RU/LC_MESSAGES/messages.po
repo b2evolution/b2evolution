@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2009-09-30 20:51+0200\n"
-"PO-Revision-Date: 2009-12-09 16:44-0500\n"
+"PO-Revision-Date: 2009-12-26 15:07-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -3076,7 +3076,7 @@ msgstr "Используется для красивых URL. Должна бы�
 
 #: ../../../inc/chapters/views/_chapter.form.php:71
 msgid "May be used as a title tag and/or meta description"
-msgstr "Может быть использован как тег <title> или как мета тег \"description\""
+msgstr "Может быть использован как тег &lt;title&gt; или как мета тег \"description\""
 
 #: ../../../inc/chapters/views/_chapter.form.php:75
 msgid "For manual ordering of the categories"
@@ -3163,7 +3163,7 @@ msgstr "<strong>Примечание:</strong> Перемещение рубри
 #: ../../../inc/chapters/views/_chapter_list.view.php:238
 #, php-format
 msgid "<strong>Note:</strong> Ordering of categories is currently set to %s in the %sglobal settings%s."
-msgstr "<strong>Примечание:</strong> В настоящее время активирована сортировка рубрик %s в %sобщих настройках%s."
+msgstr "<strong>Примечание:</strong> Используется сортировка рубрик \"%s\", вы можете изменить это в %sобщих настройках%s."
 
 #: ../../../inc/chapters/views/_chapter_list.view.php:239
 #: ../../../inc/settings/views/_features.form.php:198
@@ -12236,7 +12236,7 @@ msgstr "Уведомления"
 #: ../../../skins/_profile.disp.php:67
 #: ../../../skins/_user.disp.php:47
 msgid "Identity"
-msgstr "Идентификация"
+msgstr "О пользователе"
 
 #: ../../../inc/users/views/_user.form.php:170
 msgid "Remove"
