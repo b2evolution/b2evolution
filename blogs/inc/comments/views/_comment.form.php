@@ -35,6 +35,12 @@ global $comments_use_autobr, $mode, $month, $tab, $redirect_to;
 
 $Form = & new Form( NULL, 'comment_checkchanges', 'post' );
 
+$Form->global_icon( T_('Delete this comment'), 'delete', '?ctrl=comments&amp;action=delete&amp;comment_ID='.$edited_Comment->ID,
+			T_('delete'), 4, 3, array(
+				 'onclick' => 'return confirm(\''.TS_('You are about to delete this comment!\\nThis cannot be undone!').'\')',
+				 'style' => 'margin-right: 3ex;',	// Avoid misclicks by all means!
+		) );
+
 $Form->global_icon( T_('Cancel editing!'), 'close', str_replace( '&', '&amp;', $redirect_to), T_('cancel'), 4, 1 );
 
 $Form->begin_form( 'eform' );
@@ -269,6 +275,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.11  2009/12/28 07:57:18  sam2kb
+ * Added a link to delete comments
+ *
  * Revision 1.10  2009/09/26 15:10:26  tblue246
  * Translation fix
  *
