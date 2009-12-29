@@ -436,7 +436,7 @@ switch( $action )
 			else
 			{ // trackback now:
 				load_funcs('comments/_trackback.funcs.php');
-				trackbacks( $trackback_url, $edited_Item->content, $edited_Item->title, $edited_Item->ID);
+				trackbacks( $trackback_url, $edited_Item );
 			}
 		}
 
@@ -539,7 +539,7 @@ switch( $action )
 			else
 			{ // trackback now:
 				load_funcs('comments/_trackback.funcs.php');
-				trackbacks( $trackback_url, $edited_Item->content, $edited_Item->title, $edited_Item->ID );
+				trackbacks( $trackback_url, $edited_Item );
 			}
 		}
 
@@ -1253,6 +1253,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.82  2009/12/29 18:44:23  sam2kb
+ * Trackbacks use $Item->get_excerpt()
+ *
  * Revision 1.81  2009/12/12 01:13:08  fplanque
  * A little progress on breadcrumbs on menu structures alltogether...
  *

@@ -36,22 +36,21 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * Do multiple trackbacks
  *
- * @todo dh> Use Item->get_excerpt()?!  fp> good idea
- *
  * fplanque: added
  */
-function trackbacks( $post_trackbacks, $content, $post_title, $post_ID )
+function trackbacks( $post_trackbacks, $Item )
 {
 	global $Messages;
 
-	$excerpt = maxstrlen(strip_tags($content), 255, '...');
+	$excerpt = $Item->get_excerpt();
+	
 	$Messages->add( T_('Excerpt sent in trackbacks:').' '.$excerpt, 'note' );
 	$trackback_urls = split('( )+', $post_trackbacks,10);		// fplanque: ;
 	foreach($trackback_urls as $tb_url)
 	{ // trackback each url:
 		$tb_url = trim($tb_url);
 		if( empty( $tb_url ) ) continue;
-		trackback($tb_url, $post_title, $excerpt, $post_ID);
+		trackback( $tb_url, $Item->title, $excerpt, $Item->ID, $Item->get_permanent_url('', '', '&') );
 	}
 }
 
@@ -67,7 +66,8 @@ function trackback(
 	$trackback_url,
 	$title,
 	$excerpt,
-	$ID) // post ID
+	$ID,
+	$url ) // post ID
 {
 	global $app_name, $app_version, $Blog, $Messages;
 
@@ -76,9 +76,7 @@ function trackback(
 	$title = rawurlencode($title);
 	$excerpt = rawurlencode($excerpt);
 	$blog_name = rawurlencode($Blog->get( 'name' ));
-	$ItemCache = & get_ItemCache();
-	$Item = & $ItemCache->get_by_ID( $ID );
-	$url = rawurlencode( $Item->get_permanent_url('', '', '&') );
+	$url = rawurlencode($url);
 	// dis is the trackback stuff to be sent:
 	$query_string = 'title='.$title.'&url='.$url.'&blog_name='.$blog_name.'&excerpt='.$excerpt;
 	// echo "url:$trackback_url<br>$sending:$query_string<br />";
@@ -226,6 +224,9 @@ function trackback_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 
 /*
  * $Log$
+ * Revision 1.13  2009/12/29 18:44:22  sam2kb
+ * Trackbacks use $Item->get_excerpt()
+ *
  * Revision 1.12  2009/12/06 01:52:55  blueyed
  * Add 'htmlspecialchars' type to format_to_output, same as formvalue, but less irritating. Useful for strmaxlen, which is being used in more places now.
  *
