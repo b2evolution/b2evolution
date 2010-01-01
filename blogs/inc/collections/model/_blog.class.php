@@ -1661,6 +1661,9 @@ class Blog extends DataObject
 			case 'userurl':
 				return url_add_param( $this->gen_blogurl(), 'disp=user' );
 
+			case 'helpurl':
+				return url_add_param( $this->gen_blogurl(), 'disp=help' );
+
 			case 'description':			// RSS wording
 			case 'shortdesc':
 				return $this->shortdesc;
@@ -2086,6 +2089,31 @@ class Blog extends DataObject
 
 
 	/**
+	 * Template tag: display a link leading to the help page
+	 *
+	 * @param array
+	 */
+	function help_link( $params = array() )
+	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'      => ' ',
+				'after'       => ' ',
+				'text'        => 'Help', // Note: left untranslated, should be translated in skin anyway
+				'title'       => '',
+			), $params );
+
+
+		echo $params['before'];
+		echo '<a href="'.$this->get('helpurl').'" title="'.$params['title'].'" class="help_link">'
+					.$params['text'].'</a>';
+		echo $params['after'];
+
+		return true;
+	}
+
+
+	/**
 	 * Template tag: display footer text for the current Blog.
 	 *
 	 * @param array
@@ -2191,6 +2219,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.97  2010/01/01 20:37:43  fplanque
+ * help disp
+ *
  * Revision 1.96  2009/12/22 23:13:38  fplanque
  * Skins v4, step 1:
  * Added new disp modes

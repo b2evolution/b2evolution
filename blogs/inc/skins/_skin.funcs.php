@@ -437,6 +437,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_catdir'         => '_catdir.disp.php',
 				'disp_comments'       => '_comments.disp.php',
 				'disp_feedback-popup' => '_feedback_popup.disp.php',
+				'disp_help'		  			=> '_help.disp.php',
 				'disp_mediaidx'       => '_mediaidx.disp.php',
 				'disp_msgform'        => '_msgform.disp.php',
 				'disp_page'           => '_page.disp.php',
@@ -888,6 +889,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.82  2010/01/01 20:37:43  fplanque
+ * help disp
+ *
  * Revision 1.81  2009/12/22 23:13:38  fplanque
  * Skins v4, step 1:
  * Added new disp modes
