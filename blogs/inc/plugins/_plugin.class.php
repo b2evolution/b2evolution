@@ -1006,6 +1006,46 @@ class Plugin
 	// }}}
 
 
+	// Blog events: {{{
+
+	/**
+	 * Event handler: called at the end of {@link Blog::dbinsert() inserting
+	 * a blog into the database}, which means it has been created.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Blog': the related Blog (by reference)
+	 */
+	function AfterBlogInsert( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the end of {@link Blog::dbupdate() updating
+	 * a blog in the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Blog': the related Blog (by reference)
+	 */
+	function AfterBlogUpdate( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the end of {@link Blog::dbdelete() deleting
+	 * a blog from the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Blog': the related Blog (by reference)
+	 */
+	function AfterBlogDelete( & $params )
+	{
+	}
+
+	// }}}
+
+
 	// Item events: {{{
 
 	/**
@@ -2897,6 +2937,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.32  2010/01/02 20:11:08  sam2kb
+ * Added new hooks: AfterBlogInsert, AfterBlogUpdate, AfterBlogDelete
+ *
  * Revision 1.31  2009/09/25 07:32:53  efy-cantor
  * replace get_cache to get_*cache
  *

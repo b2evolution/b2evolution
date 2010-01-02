@@ -1793,7 +1793,7 @@ class Blog extends DataObject
 	 */
 	function dbinsert()
 	{
-		global $DB;
+		global $DB, $Plugins;
 
 		$DB->begin();
 
@@ -1809,6 +1809,8 @@ class Blog extends DataObject
 
 				$this->CollectionSettings->dbupdate();
 			}
+
+			$Plugins->trigger_event( 'AfterBlogInsert', $params = array( 'Blog' => & $this ) );
 		}
 
 		$DB->commit();
@@ -1820,7 +1822,7 @@ class Blog extends DataObject
 	 */
 	function dbupdate()
 	{
-		global $DB;
+		global $DB, $Plugins;
 
 		$DB->begin();
 
@@ -1832,6 +1834,8 @@ class Blog extends DataObject
 		}
 
 		$DB->commit();
+
+		$Plugins->trigger_event( 'AfterBlogUpdate', $params = array( 'Blog' => & $this ) );
 
 		// Thick grained invalidation:
 		// This collection has been modified, cached content depending on it should be invalidated:
@@ -1855,7 +1859,7 @@ class Blog extends DataObject
 	 */
 	function dbdelete($delete_static_file = false, $echo = false )
 	{
-		global $DB, $Messages;
+		global $DB, $Messages, $Plugins;
 
 		// Note: No need to localize the status messages...
 		if( $echo ) echo '<p>MySQL 3.23 compatibility mode!';
@@ -1948,8 +1952,18 @@ class Blog extends DataObject
 		// Unset cache entry:
 		// TODO
 
+		// remember ID, because parent method resets it to 0
+		$old_ID = $this->ID;
+
 		// Delete main (blog) object:
 		parent::dbdelete();
+
+		// re-set the ID for the Plugin event
+		$this->ID = $old_ID;
+
+		$Plugins->trigger_event( 'AfterBlogDelete', $params = array( 'Blog' => & $this ) );
+
+		$this->ID = 0;
 
 		if( $echo ) echo '<br />Done.</p>';
 	}
@@ -2219,6 +2233,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.98  2010/01/02 20:11:07  sam2kb
+ * Added new hooks: AfterBlogInsert, AfterBlogUpdate, AfterBlogDelete
+ *
  * Revision 1.97  2010/01/01 20:37:43  fplanque
  * help disp
  *

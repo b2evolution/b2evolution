@@ -119,6 +119,10 @@ class Plugins_admin extends Plugins
 				'AfterCommentDelete' => 'Gets called after a comment has been deleted from the database.',
 				'AfterCommentInsert' => 'Gets called after a comment has been inserted into the database.',
 				'AfterCommentUpdate' => 'Gets called after a comment has been updated in the database.',
+				
+				'AfterBlogDelete' => 'Gets called after a blog has been deleted from the database.',
+				'AfterBlogInsert' => 'Gets called after a blog has been inserted into the database.',
+				'AfterBlogUpdate' => 'Gets called after a blog has been updated in the database.',
 
 				'AfterItemDelete' => 'This gets called after an item has been deleted from the database.',
 				'PrependItemInsertTransact' => 'This gets called before an item is inserted into the database.',
@@ -1469,6 +1473,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.26  2010/01/02 20:11:08  sam2kb
+ * Added new hooks: AfterBlogInsert, AfterBlogUpdate, AfterBlogDelete
+ *
  * Revision 1.25  2009/12/22 23:13:38  fplanque
  * Skins v4, step 1:
  * Added new disp modes
