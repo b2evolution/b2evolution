@@ -2425,6 +2425,25 @@ class Form extends Widget
 
 
 	/**
+	 * Add a crumb to the current form
+	 *
+	 * Use this for all forms leading to DATA CHANGING actions
+	 * (anything other than info retrieval), for example:
+	 * -search forms don't need this
+	 * -create, update, delete actions definitely need this
+	 * -change order, change status and more subtle actions also need this
+	 *
+	 * @param string crumb name
+	 */
+	function add_crumb( $crumb_name )
+	{
+		global $Session;
+
+		$this->hidden( 'crumb_'.$crumb_name, $Session->create_crumb( $crumb_name ) );
+	}
+
+
+	/**
 	 * Add the "ctrl" param, used in the backoffice, as a hidden field.
 	 */
 	function hidden_ctrl()
@@ -3035,6 +3054,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.79  2010/01/02 17:24:31  fplanque
+ * Crumbs - Proof of concept
+ *
  * Revision 1.78  2009/12/01 14:46:51  efy-maxim
  * disable enter key to submit form
  *

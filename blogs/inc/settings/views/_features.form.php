@@ -55,6 +55,7 @@ $Form = & new Form( NULL, 'feats_checkchanges' );
 
 $Form->begin_form( 'fform', T_('Global Features') );
 
+$Form->add_crumb( 'globalsettings' );
 $Form->hidden( 'ctrl', 'features' );
 $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'features' );
@@ -213,6 +214,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.23  2010/01/02 17:24:30  fplanque
+ * Crumbs - Proof of concept
+ *
  * Revision 1.22  2009/09/02 14:05:32  tblue246
  * minor
  *

@@ -30,54 +30,69 @@
 		<div class="block2">
 		<div class="block3">
 
-			<h1>3.x series</h1>
-
+			<h1>4.x series</h1>
+			<p>Skins and plugins from v2 &amp; v3 are compatible with v3 and should run without problems.</p>
 			<h2>4.0.0-dev</h2>
 			<ul>
-				<li><strong>Performance:
-				  </strong>
-				  <ul>
-				    <li>Optimized for PHP5 (still works on PHP4 but we strongly recommend PHP5)</li>
-				    <li>BlockCache stored to memroty (APC Cache): every widget is now cached individually and regenerated only when need (provided it declares proper dependency keys). This provides a significant performance boost. More underway. (@francoisplanque)</li>
-				    <li>User agent type is now saved directly into the hits table instead of a costly lookup in user agents table (@francoisplanque)</li>
-			      </ul>
-				</li>
 				<li><strong>Blog features:</strong>
-				<ul>
-					<li>Separate search page -- disp=search -- destined to gather advaced search params (@francoisplanque)</li>
-				    <li>Post index feature -- disp=postidx (@francoisplanque)</li>
-				    <li>Site map feature (HTML, not XML which already existed) -- disp=sitemap (@francoisplanque)</li>
-				    <li>Images can now be linked at the top or after &quot;more&quot; in a post (@blueyed)</li>
+                  <ul>
+                    <li>Separate search page -- disp=search -- destined to gather advaced search params (@francoisplanque)</li>
+                    <li>Post index feature -- disp=postidx (@francoisplanque)</li>
+                    <li>Site map feature (HTML, not XML which already existed) -- disp=sitemap (@francoisplanque)</li>
+                    <li>Help page (to be completed) -- disp=help (@francoisplanque)</li>
+                    <li>Images can now be linked at the top or after &quot;more&quot; in a post (@blueyed)</li>
+                  </ul>
+                </li>
+			    <li><strong>Widgets:</strong></li>
+			    <ul>
+                  <li>Avatar widget (@blueyed)</li>
+			      <li>Enhanced Menu link widget (@francoisplanque)</li>
+			      <li>Enhanced Common navigation links widget (@francoisplanque)</li>
+			      <li>Tag cloud widget now has a random order option (@waltercruz)</li>
+		      </ul>
+			    <li><strong>Performance: </strong>
+			      <ul>
+			        <li>Optimized for PHP5 (still works on PHP4 but we strongly recommend PHP5)</li>
+			        <li>BlockCache stored to memrory (APC Cache &amp; more): every widget is now cached individually and regenerated only when needed (provided it declares proper dependency keys). This provides a significant performance boost. More underway. (@francoisplanque)</li>
+			        <li>User agent type is now saved directly into the hits table instead of a costly lookup in user agents table (@francoisplanque)</li>
+		            <li>SQL optimizations (@blueyed)
+                      <ul>
+                        <li>SQL_NO_CACHE for queries selecting from T_sessions/T_hitlog</li>
+                        <li>Remove information about seconds from item issue and start date,
+                          so that those queries can get cached for up to one minute now</li>
+                      </ul>
+		            </li>
 			      </ul>
-			  </li>
-				<li><strong>Widgets:</strong></li>
-				<ul>
-				  <li>Avatar widget (@blueyed)</li>
-				  <li>Enhanced Menu link widget (@francoisplanque)</li>
-				  <li>Enhanced Common navigation links widget (@francoisplanque)</li>
-				  <li>Tag cloud widget now has a random order option (@waltercruz)</li>
-			  </ul>
+		      </li>
+		      <li><strong>Maintenance:</strong>
+		        <ul>
+		          <li>Integrated backup feature (Database and files) (@evofactory)</li>
+	              <li>Automated upgrade feature -- WARNING: for testing only at this point. It will overwrite your current version! (@evofactory)</li>
+		        </ul>
+		      </li>
 				<li><strong>Comments:</strong>
-				<ul>
-					<li>Display avatars for comments (@sam2kb)</li>
-					<li>Backoffice comment editing: Allow changing of &quot;Allow message form&quot; setting for guest comments (@tblue)</li>
-				</ul>
+			      <ul>
+				      <li>Display avatars for comments (@sam2kb)</li>
+					  <li>Backoffice comment editing: Allow changing of &quot;Allow message form&quot; setting for guest comments (@tblue)</li>
+				      <li>Added option to sort comments by ascending or descending order (@tblue)</li>
+				    </ul>
+			  </li>
+				<li><strong>Post editing:</strong>
+				  <ul>
+				    <li>Better handling of &quot;Publish!&quot; button on post form (@francoisplanque)</li>
+				    <li>Improved actions after upload - link file or inset img tag (@blueyed,@francoisplanque)</li>
+				    <li>In addition to upload, there is now an option to get images from an URL (@blueyed)</li>
+				    <li>Linked files can now be visually located (@blueyed)</li>
+				    <li>Added post type permissions (@tblue)</li>
+				    <li>Mass post creation feature - useful for importing data to be released over time (@evofactory)</li>
+				  </ul>
 				</li>
-				<li><strong>Backoffice:</strong>
-				<ul>
-					<li>Messaging module (@evofactory)</li>
-					<li>Added post type permissions (@tblue)</li>
-					<li>Blog options: Added option to sort comments by ascending or descending order (@tblue)</li>
-					<li>Check whether user is allowed to edit post when updating it (saving to DB) (@tblue)</li>
-					<li>Improved actions after upload - link file or inset img tag (@blueyed,@francoisplanque)</li>
-					<li>In addition to upload, there is now an option to get images from an URL (@blueyed)</li>
-					<li>Linked files can now be visually located (@blueyed)</li>
-					<li>Durations can now be entered in days/hours/minutes/seconds instead of large amounts of seconds (@evofactory)</li>
-					<li>Mass post creation feature - useful for importing data to be released over time (@evofactory)</li>
-					<li>Support iconv() on urltitle generation (@tblue)</li>
-					<li>Better handling of &quot;Publish!&quot; button on post form (@francoisplanque)</li>
-				</ul>
-				</li>
+			  <li><strong>Backoffice:</strong>
+		        <ul>
+		          <li>Messaging module (@evofactory)</li>
+		          <li>Durations can now be entered in days/hours/minutes/seconds instead of large amounts of seconds (@evofactory)</li>
+		          </ul>
+			  </li>
 				<li><strong>Tools</strong>
 				<ul>
 					<li>Clear full page cache (/cache directory) (@sam2kb)</li>
@@ -95,32 +110,25 @@
 				</li>
 				<li><strong>XML-RPC:</strong>
 			      <ul>
-			        <li>MetaWeblog API: Use mt_keyword field to get/set
-				        post tags. Affected methods: metaWeblog.newPost,
-				        metaWeblog.editPost, metaWeblog.getRecentPosts,
-			          metaweblog.getPost. (@tblue)</li>
+			        <li>XML-RPC can now be disabled (@tblue,@waltercruz)</li>
+			          <li>MetaWeblog API: Use mt_keyword field to get/set
+			            post tags. Affected methods: metaWeblog.newPost,
+			            metaWeblog.editPost, metaWeblog.getRecentPosts,
+			            metaweblog.getPost. (@tblue)</li>
 			          <li>MovableType API: Implemented mt.supportedMethods. (@tblue)</li>
 			          <li>MovableType API: Implemented mt.publishPost (@tblue,@waltercruz)</li>
 			          <li>MetaWeblog API: Implemented mt_allow_comments and mt_excerpt (@tblue,@waltercruz)</li>
 			          <li>WordPress API: basic support for the following methods: wp.getPageList, wp.getUsersBlogs, wp.getPageStatusList, wp.getPostStatusList, wp.getCategories and wp.uploadFile (@waltercruz)</li>
-			          <li>XML-RPC can be disabled (@tblue,@waltercruz)</li>
-			          <li>Added missing permission checks (@tblue)</li>
-					  <li>Improved metaWeblog.newMediaObject (@tblue)</li>
+			          <li>Improved metaWeblog.newMediaObject (@tblue)</li>
 					  <li>Fixed API method signatures (return values) (@tblue)</li>
 					  <li>Use correct charsets. (@tblue)</li>
 					  <li>Check extra categories before checking permissions to post to them (sends correct XML-RPC error on failure). (@tblue)</li>
-	                </ul>
+                  </ul>
 			  </li>
 				<li><strong>Technical mumbo-jumbo:</strong>
 					<ul>
 						<li>Debug mode can be turned on &amp; off through the URL with a password (@francoisplanque)</li>
-						<li>SQL optimizations (@blueyed)
-                          <ul>
-                            <li>SQL_NO_CACHE for queries selecting from T_sessions/T_hitlog</li>
-                            <li>Remove information about seconds from item issue and start date,
-                              so that those queries can get cached for up to one minute now.</li>
-                          </ul>
-						</li>
+					  <li>Support iconv() on urltitle generation (@tblue)</li>
 						<li>Fixed a bug in fetch_remote_page() (wrong $info array keys). (@tblue)</li>
 						<li>Item::get_tags(): Bugfix and optimization:
 							Remember items without tags and do not try to
@@ -131,14 +139,26 @@
 					    <li>Added hooks to let plugins handle disp modes: GetHandledDispModes &amp; HandleDispMode (@sir_yabs, @francoisplanque)</li>
 					    <li>Extended skin tag params (@leeturner)</li>
 					    <li>Increased core modularity</li>
-					    <li>TinyMCE 3.2.7 (@blueyed)</li>
+					    <li>Upgraded to TinyMCE 3.2.7 (@blueyed)</li>
 			        </ul>
 			  </li>
-		    </ul>
+	      </ul>
+
+		</div>
+		</div>
+		</div>
+
+
+		<div class="block1">
+		<div class="block2">
+		<div class="block3">
+
+		  <h1>3.x series</h1>
+		  <p>Skins and plugins from v2 are compatible with v3 and should run without problems.</p>
 		  <h2>3.3.4-stable</h2>
-			<ul>
+		  <ul>
 				<li>Enhanced skin containers reload for skin developers (@francoisplanque)</li>
-			</ul>
+		  </ul>
 
 			<h2>3.3.3-stable</h2>
 			<ul>
@@ -163,7 +183,7 @@
 						<li>Check extra categories before checking permissions to post to them (sends correct XML-RPC error on failure). (@tblue)</li>
 					</ul>
 				</li>
-		 	 </ul>
+	 	  </ul>
 		  <h2>3.3.1-stable</h2>
 			<ul>
 			  <li>Improved Archive plugin (tblue246)</li>

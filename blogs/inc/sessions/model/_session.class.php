@@ -498,6 +498,85 @@ class Session
 
 		$Debuglog->add( 'Session: Reloaded session data.' );
 	}
+
+
+	/**
+	 * Create a crumb that will be saved into the Session and returned to the caller for inclusion in Form or action url.
+	 *
+	 * For any action, a new crumb is generated every hour and the previous one is saved. (2 hours are valid)
+	 *
+	 * @param string crumb name
+	 * @return string crumb value
+	 */
+	function create_crumb( $crumb_name )
+	{
+		global $servertimenow;
+
+		// Retrieve latest saved crumb:
+		$crumb_recalled = $this->get( 'crumb_latest_'.$crumb_name, '-0' );
+		list( $crumb_value, $crumb_time ) = explode( '-', $crumb_recalled );
+
+		if( $servertimenow - $crumb_time > 3600 )
+		{	// The crumb we already had is older than 1 hour...
+			// We'll need to generate a new value:
+			$crumb_value = '';
+			if( $servertimenow - $crumb_time < 7000 ) // Leave some margin here to make sure we do no overwrite a newer 1-2 hr crumb
+			{	// Not too old either, save as previous crumb:
+				$this->set( 'crumb_prev_'.$crumb_name, $crumb_recalled );
+			}
+		}
+
+		if( empty($crumb_value) )
+		{	// We need to generate a new crumb:
+			$crumb_value = generate_random_key( 32 );
+
+			// Save crumb into session so we can later compare it to what get got back from the user request:
+			$this->set( 'crumb_latest_'.$crumb_name, $crumb_value.'-'.$servertimenow );
+		}
+		return $crumb_value;
+	}
+
+
+	/**
+	 * Assert that we received a valid crumb for the object we want to act on
+	 *
+	 * This will DIE if we have not received a valid crumb.
+	 *
+	 * The received crumb must match a crumb we previously saved less than 2 hours ago.
+	 *
+	 * @param string crumb name
+	 */
+	function assert_received_crumb( $crumb_name )
+	{
+		global $servertimenow;
+
+		if( ! $crumb_received = param( 'crumb_'.$crumb_name, 'string', NULL ) )
+		{ // We did not receive a crumb!
+			debug_die( 'Missing crumb ['.$crumb_name.'] -- It looks like this request is not legit.' );
+		}
+
+		// Retrieve latest saved crumb:
+		$crumb_recalled = $this->get( 'crumb_latest_'.$crumb_name, '-0' );
+		list( $crumb_value, $crumb_time ) = explode( '-', $crumb_recalled );
+		if( $crumb_received == $crumb_value && $servertimenow - $crumb_time <= 7200 )
+		{	// Crumb is valid
+			// echo '<p>-<p>-<p>A';
+			return true;
+		}
+
+		// Retrieve previous saved crumb:
+		$crumb_recalled = $this->get( 'crumb_prev_'.$crumb_name, '-0' );
+		list( $crumb_value, $crumb_time ) = explode( '-', $crumb_recalled );
+		if( $crumb_received == $crumb_value && $servertimenow - $crumb_time <= 7200 )
+		{	// Crumb is valid
+			// echo '<p>-<p>-<p>B';
+			return true;
+		}
+
+		// fp> TODO: make this a nice message -- with a link to go back? history.back()? Try not to lose form edits...
+		debug_die( 'Incorrect crumb received ['.$crumb_name.'] -- Have you waited more than 2 hours to submit your request? We have refused the request for security reasons. Please go back and refresh the form before submitting.' );
+
+	}
 }
 
 
@@ -565,6 +644,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.26  2010/01/02 17:24:31  fplanque
+ * Crumbs - Proof of concept
+ *
  * Revision 1.25  2009/12/01 01:52:08  fplanque
  * Fixed issue with Debuglog in case of redirect -- Thanks @blueyed for help.
  *

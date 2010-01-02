@@ -51,6 +51,9 @@ param( 'action', 'string' );
 switch( $action )
 {
 	case 'update':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'globalsettings' );
+
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -229,6 +232,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2010/01/02 17:24:31  fplanque
+ * Crumbs - Proof of concept
+ *
  * Revision 1.13  2009/12/06 22:55:21  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)
