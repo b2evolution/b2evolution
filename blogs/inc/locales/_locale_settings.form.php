@@ -55,6 +55,7 @@ if( $action == 'edit' )
 
 	$Form->begin_form( 'fform', T_('Regional Settings') );
 
+	$Form->add_crumb( 'locales' );
 	$Form->hidden( 'ctrl', 'locales' );
 	$Form->hidden( 'loc_transinfo', $loc_transinfo );
 	$Form->hidden( 'action', ($edit_locale == '_new_') ? 'createlocale' : 'updatelocale' );
@@ -203,10 +204,11 @@ else
 
 	<?php // }}}
 
-	$Form = & new Form( $pagenow, 'loc_checkchanges' );
+	$Form = new Form( $pagenow, 'loc_checkchanges' );
 
 	$Form->begin_form( 'fform', T_('Regional Settings') );
 
+	$Form->add_crumb( 'locales' );
 	$Form->hidden( 'ctrl', 'locales' );
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'loc_transinfo', $loc_transinfo );
@@ -369,7 +371,8 @@ else
 			}
 			if( $i > 1 )
 			{ // show "move prio up"
-				echo action_icon( T_('Move priority up'), 'move_up', $pagenow.'?ctrl=locales&amp;action=prioup&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '') );
+				echo action_icon( T_('Move priority up'), 'move_up', '?ctrl=locales&amp;action=prioup&amp;edit_locale='
+								.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'&amp;'.url_crumb('locales') );
 			}
 			else
 			{
@@ -378,21 +381,23 @@ else
 
 			if( $i < count($locales) )
 			{ // show "move prio down"
-				echo action_icon( T_('Move priority down'), 'move_down', $pagenow.'?ctrl=locales&amp;action=priodown&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '') );
+				echo action_icon( T_('Move priority down'), 'move_down', '?ctrl=locales&amp;action=priodown&amp;edit_locale='
+								.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'&amp;'.url_crumb('locales') );
 			}
 			else
 			{
 				echo get_icon( 'nomove' ).' ';
 			}
 
-			echo action_icon( T_('Copy locale'), 'copy', $pagenow.'?ctrl=locales&amp;action=edit&amp;edit_locale=_new_&amp;template='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '' ) );
+			echo action_icon( T_('Copy locale'), 'copy', '?ctrl=locales&amp;action=edit&amp;edit_locale=_new_&amp;template='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '' ) );
 
-			echo action_icon( T_('Edit locale'), 'edit', $pagenow.'?ctrl=locales&amp;action=edit&amp;edit_locale=_new_&amp;template='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '' ) );
+			echo action_icon( T_('Edit locale'), 'edit', '?ctrl=locales&amp;action=edit&amp;edit_locale=_new_&amp;template='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '' ) );
 
 			if( isset($lval[ 'fromdb' ]) )
 			{ // allow to delete locales loaded from db
 				$l_atleastonefromdb = 1;
-				echo action_icon( T_('Restore default locale settings'), 'reload', $pagenow.'?ctrl=locales&amp;action=deletelocale&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '' ) );
+				echo action_icon( T_('Restore default locale settings'), 'reload', '?ctrl=locales&amp;action=resetlocale&amp;edit_locale='
+								.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '' ).'&amp;'.url_crumb('locales') );
 			}
 			echo '</td>';
 		}
@@ -483,7 +488,8 @@ else
 			{ // Translator options:
 				if( is_file( $po_file ) )
 				{
-					echo "\n\t".'<td class="lastcol">[<a href="'.$pagenow.'?ctrl=locales&amp;action=extract&amp;edit_locale='.$lkey.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'" title="'.T_('Extract .po file into b2evo-format').'">'.T_('Extract').'</a>]</td>';
+					echo "\n\t".'<td class="lastcol">[<a href="'.$pagenow.'?ctrl=locales&amp;action=extract&amp;edit_locale='.$lkey
+					.($loc_transinfo ? '&amp;loc_transinfo=1' : '').'&amp;'.url_crumb('locales').'" title="'.T_('Extract .po file into b2evo-format').'">'.T_('Extract').'</a>]</td>';
 				}
 			}
 		} // show message file percentage/extraction
@@ -499,7 +505,8 @@ else
 
 		if( isset($l_atleastonefromdb) )
 		{
-			echo '<p class="center"><a href="'.$pagenow.'?ctrl=locales&amp;action=reset'.( $loc_transinfo ? '&amp;loc_transinfo=1' : '' ).'" onclick="return confirm(\''.TS_('Are you sure you want to restore to default locales?\nAll custom locale definitions will be lost!').'\')">'.get_icon( 'reload' ).' '.T_('Restore defaults').'</a></p>';
+			echo '<p class="center"><a href="'.$pagenow.'?ctrl=locales&amp;action=reset'.( $loc_transinfo ? '&amp;loc_transinfo=1' : '' )
+						.'&amp;'.url_crumb('locales').'" onclick="return confirm(\''.TS_('Are you sure you want to restore to default locales?\nAll custom locale definitions will be lost!').'\')">'.get_icon( 'reload' ).' '.T_('Restore defaults').'</a></p>';
 		}
 	}
 
@@ -514,6 +521,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/02 21:13:31  fplanque
+ * demo of Crumbs in action urls (GET not POST).
+ * Normalized code a little (not perfect).
+ *
  * Revision 1.8  2009/07/11 18:30:10  tblue246
  * minor
  *

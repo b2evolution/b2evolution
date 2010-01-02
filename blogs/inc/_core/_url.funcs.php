@@ -574,6 +574,20 @@ function url_add_tail( $url, $tail )
 
 
 /**
+ * Create a crumb param to be passed in action urls...
+ *
+ * @param string crumb_name
+ */
+function url_crumb( $crumb_name )
+{
+	global $Session;
+
+	return 'crumb_'.$crumb_name.'='.$Session->create_crumb($crumb_name);
+}
+
+
+
+/**
  * Try to make $url relative to $target_url, if scheme, host, user and pass matches.
  *
  * This is useful for redirect_to params, to keep them short and avoid mod_security
@@ -794,6 +808,10 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.45  2010/01/02 21:13:32  fplanque
+ * demo of Crumbs in action urls (GET not POST).
+ * Normalized code a little (not perfect).
+ *
  * Revision 1.44  2009/10/27 21:57:45  fplanque
  * minor/doc
  *
