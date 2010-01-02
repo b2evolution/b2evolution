@@ -57,150 +57,98 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		param( 'submit', 'array', array() );
-		if( isset($submit['restore_defaults']) )
+		// fp> Restore defaults has been removed because it's extra maintenance work and no real benefit to the user.
+
+		// Online help
+		param( 'webhelp_enabled', 'integer', 0 );
+		$Settings->set( 'webhelp_enabled', $webhelp_enabled );
+
+		// Outbound pinging:
+ 		param( 'outbound_notifications_mode', 'string', true );
+		$Settings->set( 'outbound_notifications_mode',  get_param('outbound_notifications_mode') );
+
+		// Blog by email
+		param( 'eblog_enabled', 'boolean', 0 );
+		$Settings->set( 'eblog_enabled', $eblog_enabled );
+
+		param( 'eblog_method', 'string', true );
+		$Settings->set( 'eblog_method', strtolower(trim($eblog_method)));
+
+		param( 'eblog_encrypt', 'string', true );
+		$Settings->set( 'eblog_encrypt', $eblog_encrypt );
+
+		param( 'eblog_novalidatecert', 'boolean', 0 );
+		$Settings->set( 'eblog_novalidatecert', $eblog_novalidatecert );
+
+		param( 'eblog_server_host', 'string', true );
+		$Settings->set( 'eblog_server_host', strtolower(trim($eblog_server_host)));
+
+		param( 'eblog_server_port', 'integer', true );
+		$Settings->set( 'eblog_server_port', $eblog_server_port );
+
+		param( 'eblog_username', 'string', true );
+		$Settings->set( 'eblog_username', trim($eblog_username));
+
+		param( 'eblog_password', 'string', true );
+		$Settings->set( 'eblog_password', trim($eblog_password));
+
+		param( 'eblog_default_category', 'integer', true );
+		$Settings->set( 'eblog_default_category', $eblog_default_category );
+
+		param( 'eblog_subject_prefix', 'string', true );
+		$Settings->set( 'eblog_subject_prefix', trim($eblog_subject_prefix) );
+
+		param( 'AutoBR', 'boolean', 0 );
+		$Settings->set( 'AutoBR', $AutoBR );
+
+		param( 'eblog_body_terminator', 'string', true );
+		$Settings->set( 'eblog_body_terminator', trim($eblog_body_terminator) );
+
+		param( 'eblog_test_mode', 'boolean', 0 );
+		$Settings->set( 'eblog_test_mode', $eblog_test_mode );
+
+		param( 'eblog_add_imgtag', 'boolean', 0 );
+		$Settings->set( 'eblog_add_imgtag', $eblog_add_imgtag );
+
+		/* tblue> this isn't used/implemented at the moment
+		param( 'eblog_phonemail', 'integer', 0 );
+		$Settings->set( 'eblog_phonemail', $eblog_phonemail );
+
+		param( 'eblog_phonemail_separator', 'string', true );
+		$Settings->set( 'eblog_phonemail_separator', trim($eblog_phonemail_separator) );*/
+
+
+		// Hit & Session logs
+		$Settings->set( 'log_public_hits', param( 'log_public_hits', 'integer', 0 ) );
+		$Settings->set( 'log_admin_hits', param( 'log_admin_hits', 'integer', 0 ) );
+		$Settings->set( 'log_spam_hits', param( 'log_spam_hits', 'integer', 0 ) );
+
+		param( 'auto_prune_stats_mode', 'string', true );
+		$Settings->set( 'auto_prune_stats_mode',  get_param('auto_prune_stats_mode') );
+
+		// TODO: offer to set-up cron job if mode == 'cron' and to remove cron job if mode != 'cron'
+
+		param( 'auto_prune_stats', 'integer', $Settings->get_default('auto_prune_stats'), false, false, true, false );
+		$Settings->set( 'auto_prune_stats', get_param('auto_prune_stats') );
+
+
+		// Categories:
+		$Settings->set( 'allow_moving_chapters', param( 'allow_moving_chapters', 'integer', 0 ) );
+		$Settings->set( 'chapter_ordering', param( 'chapter_ordering', 'string', 'alpha' ) );
+
+		//XML-RPC
+		$Settings->set( 'general_xmlrpc', param( 'general_xmlrpc', 'integer', 0 ) );
+
+		param( 'xmlrpc_default_title', 'string', true );
+		$Settings->set( 'xmlrpc_default_title', trim($xmlrpc_default_title) );
+
+		if( ! $Messages->count('error') )
 		{
-			/*
-			// TODO: insert some default settings rather than just delete them all, as per original configuration in the _advanced.php file:
-
-			fp>> Isn't this done in $Settings anyway?
-
-			# mailserver settings
-			$mailserver_url = 'mail.example.com';
-			$mailserver_login = 'login@example.com';
-			$mailserver_pass = 'password';
-			$mailserver_port = 110;
-			# by default posts will have this category
-			$default_category = 1;
-			# subject prefix
-			$subjectprefix = 'blog:';
-			# body terminator string (starting from this string, everything will be ignored, including this string)
-			$bodyterminator = "___";
-			# set this to 1 to run in test mode
-			$thisisforfunonly = 0;
-			### Special Configuration for some phone email services
-			# some mobile phone email services will send identical subject & content on the same line
-			# if you use such a service, set $use_phoneemail to 1, and indicate a separator string
-			# when you compose your message, you'll type your subject then the separator string
-			# then you type your login:password, then the separator, then content
-			$use_phoneemail = 0;
-			$phoneemail_separator = ':::';
-			*/
-
-			$Settings->delete_array( array(
-				'eblog_enabled', 'eblog_method', 'eblog_encrypt', 'eblog_novalidatecert',
-				'eblog_server_host', 'eblog_server_port', 'eblog_username',
-				'eblog_password', 'eblog_default_category', 'eblog_subject_prefix',
-				'AutoBR', 'eblog_body_terminator', 'eblog_test_mode', 'eblog_add_imgtag',
-				'log_public_hits', 'log_admin_hits', 'auto_prune_stats_mode', 'auto_prune_stats',
-				'outbound_notifications_mode', 'webhelp_enabled', 'allow_moving_chapters',
-				'chapter_ordering', 'log_spam_hits', ) );
-
-			if( $Settings->dbupdate() )
-			{
-				$Messages->add( T_('Restored default values.'), 'success' );
-			}
-			else
-			{
-				$Messages->add( T_('Settings have not changed.'), 'note' );
-			}
-		}
-		else
-		{
-			// Online help
-			param( 'webhelp_enabled', 'integer', 0 );
-			$Settings->set( 'webhelp_enabled', $webhelp_enabled );
-
-			// Outbound pinging:
- 			param( 'outbound_notifications_mode', 'string', true );
-			$Settings->set( 'outbound_notifications_mode',  get_param('outbound_notifications_mode') );
-
-			// Blog by email
-			param( 'eblog_enabled', 'boolean', 0 );
-			$Settings->set( 'eblog_enabled', $eblog_enabled );
-
-			param( 'eblog_method', 'string', true );
-			$Settings->set( 'eblog_method', strtolower(trim($eblog_method)));
-
-			param( 'eblog_encrypt', 'string', true );
-			$Settings->set( 'eblog_encrypt', $eblog_encrypt );
-
-			param( 'eblog_novalidatecert', 'boolean', 0 );
-			$Settings->set( 'eblog_novalidatecert', $eblog_novalidatecert );
-
-			param( 'eblog_server_host', 'string', true );
-			$Settings->set( 'eblog_server_host', strtolower(trim($eblog_server_host)));
-
-			param( 'eblog_server_port', 'integer', true );
-			$Settings->set( 'eblog_server_port', $eblog_server_port );
-
-			param( 'eblog_username', 'string', true );
-			$Settings->set( 'eblog_username', trim($eblog_username));
-
-			param( 'eblog_password', 'string', true );
-			$Settings->set( 'eblog_password', trim($eblog_password));
-
-			param( 'eblog_default_category', 'integer', true );
-			$Settings->set( 'eblog_default_category', $eblog_default_category );
-
-			param( 'eblog_subject_prefix', 'string', true );
-			$Settings->set( 'eblog_subject_prefix', trim($eblog_subject_prefix) );
-
-			param( 'AutoBR', 'boolean', 0 );
-			$Settings->set( 'AutoBR', $AutoBR );
-
-			param( 'eblog_body_terminator', 'string', true );
-			$Settings->set( 'eblog_body_terminator', trim($eblog_body_terminator) );
-
-			param( 'eblog_test_mode', 'boolean', 0 );
-			$Settings->set( 'eblog_test_mode', $eblog_test_mode );
-
-			param( 'eblog_add_imgtag', 'boolean', 0 );
-			$Settings->set( 'eblog_add_imgtag', $eblog_add_imgtag );
-
-			/* tblue> this isn't used/implemented at the moment
-			param( 'eblog_phonemail', 'integer', 0 );
-			$Settings->set( 'eblog_phonemail', $eblog_phonemail );
-
-			param( 'eblog_phonemail_separator', 'string', true );
-			$Settings->set( 'eblog_phonemail_separator', trim($eblog_phonemail_separator) );*/
-
-
-			// Hit & Session logs
-			$Settings->set( 'log_public_hits', param( 'log_public_hits', 'integer', 0 ) );
-			$Settings->set( 'log_admin_hits', param( 'log_admin_hits', 'integer', 0 ) );
-			$Settings->set( 'log_spam_hits', param( 'log_spam_hits', 'integer', 0 ) );
-
-			param( 'auto_prune_stats_mode', 'string', true );
-			$Settings->set( 'auto_prune_stats_mode',  get_param('auto_prune_stats_mode') );
-
-			// TODO: offer to set-up cron job if mode == 'cron' and to remove cron job if mode != 'cron'
-
-			param( 'auto_prune_stats', 'integer', $Settings->get_default('auto_prune_stats'), false, false, true, false );
-			$Settings->set( 'auto_prune_stats', get_param('auto_prune_stats') );
-
-
-			// Categories:
-			$Settings->set( 'allow_moving_chapters', param( 'allow_moving_chapters', 'integer', 0 ) );
-			$Settings->set( 'chapter_ordering', param( 'chapter_ordering', 'string', 'alpha' ) );
-
-			//XML-RPC
-			$Settings->set( 'general_xmlrpc', param( 'general_xmlrpc', 'integer', 0 ) );
-
-			param( 'xmlrpc_default_title', 'string', true );
-			$Settings->set( 'xmlrpc_default_title', trim($xmlrpc_default_title) );
-
-			if( ! $Messages->count('error') )
-			{
-				if( $Settings->dbupdate() )
-				{
-					$Messages->add( T_('Settings updated.'), 'success' );
-				}
-				else
-				{
-					$Messages->add( T_('Settings have not changed.'), 'note' );
-				}
-			}
+			$Settings->dbupdate();
+			$Messages->add( T_('Settings updated.'), 'success' );
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=features', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 		break;
 }
@@ -232,6 +180,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2010/01/02 21:11:59  fplanque
+ * fat reduction / cleanup
+ *
  * Revision 1.14  2010/01/02 17:24:31  fplanque
  * Crumbs - Proof of concept
  *

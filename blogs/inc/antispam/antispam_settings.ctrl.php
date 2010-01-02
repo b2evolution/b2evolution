@@ -44,82 +44,61 @@ param( 'action', 'string' );
 switch( $action )
 {
 	case 'update':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'antispam' );
+
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		param( 'submit', 'array', array() );
-		if( isset($submit['restore_defaults']) )
-		{ // RESTORE DEFAULTS:
-			$Settings->delete_array( array(
-				'antispam_threshold_publish', 'antispam_threshold_delete', 'antispam_block_spam_referers' ) );
+		// fp> Restore defaults has been removed because it's extra maintenance work and no real benefit to the user.
 
-			// Set "spam detection relevance weight" back to 1 for all plugins:
-			$changed = $DB->query( 'UPDATE T_plugins SET plug_spam_weight = 1' );
+		param_integer_range( 'antispam_threshold_publish', -100, 100, T_('The threshold must be between -100 and 100.') );
+		$Settings->set( 'antispam_threshold_publish', $antispam_threshold_publish );
 
-			if( $Settings->dbupdate() || $changed )
+		param_integer_range( 'antispam_threshold_delete', -100, 100, T_('The threshold must be between -100 and 100.') );
+		$Settings->set( 'antispam_threshold_delete', $antispam_threshold_delete );
+
+		param( 'antispam_block_spam_referers', 'integer', 0 );
+		$Settings->set( 'antispam_block_spam_referers', $antispam_block_spam_referers );
+
+		param( 'antispam_report_to_central', 'integer', 0 );
+		$Settings->set( 'antispam_report_to_central', $antispam_report_to_central );
+
+		$changed_weight = false;
+		param( 'antispam_plugin_spam_weight', 'array', array() );
+		foreach( $antispam_plugin_spam_weight as $l_plugin_ID => $l_weight )
+		{
+			if( ! is_numeric($l_weight) )
 			{
-				$Messages->add( T_('Restored default values.'), 'success' );
+				continue;
 			}
-			else
+			if( $l_weight < 0 || $l_weight > 100 )
 			{
-				$Messages->add( T_('Settings have not changed.'), 'note' );
+				param_error( 'antispam_plugin_spam_weight['.$l_plugin_ID.']', T_('Spam weight has to be in the range of 0-100.') );
+				continue;
+			}
+			if( $DB->query( '
+					UPDATE T_plugins
+						 SET plug_spam_weight = '.$DB->quote($l_weight).'
+					 WHERE plug_ID = '.(int)$l_plugin_ID ) )
+			{
+				$changed_weight = true;
 			}
 		}
-		else
-		{ // UPDATE:
-			param_integer_range( 'antispam_threshold_publish', -100, 100, T_('The threshold must be between -100 and 100.') );
-			$Settings->set( 'antispam_threshold_publish', $antispam_threshold_publish );
-
-			param_integer_range( 'antispam_threshold_delete', -100, 100, T_('The threshold must be between -100 and 100.') );
-			$Settings->set( 'antispam_threshold_delete', $antispam_threshold_delete );
-
-			param( 'antispam_block_spam_referers', 'integer', 0 );
-			$Settings->set( 'antispam_block_spam_referers', $antispam_block_spam_referers );
-
-			param( 'antispam_report_to_central', 'integer', 0 );
-			$Settings->set( 'antispam_report_to_central', $antispam_report_to_central );
-
-			$changed_weight = false;
-			param( 'antispam_plugin_spam_weight', 'array', array() );
-			foreach( $antispam_plugin_spam_weight as $l_plugin_ID => $l_weight )
-			{
-				if( ! is_numeric($l_weight) )
-				{
-					continue;
-				}
-				if( $l_weight < 0 || $l_weight > 100 )
-				{
-					param_error( 'antispam_plugin_spam_weight['.$l_plugin_ID.']', T_('Spam weight has to be in the range of 0-100.') );
-					continue;
-				}
-				if( $DB->query( '
-						UPDATE T_plugins
-						   SET plug_spam_weight = '.$DB->quote($l_weight).'
-						 WHERE plug_ID = '.(int)$l_plugin_ID ) )
-				{
-					$changed_weight = true;
-				}
-			}
-			if( $changed_weight )
-			{ // Reload plugins table (for display):
-				$Plugins->loaded_plugins_table = false;
-				$Plugins->load_plugins_table();
-			}
-
-
-			if( ! $Messages->count('error') )
-			{
-				if( $Settings->dbupdate() || $changed_weight )
-				{
-					$Messages->add( T_('Settings updated.'), 'success' );
-				}
-				else
-				{
-					$Messages->add( T_('Settings have not changed.'), 'note' );
-				}
-			}
+		if( $changed_weight )
+		{ // Reload plugins table (for display):
+			$Plugins->loaded_plugins_table = false;
+			$Plugins->load_plugins_table();
 		}
-		break;
+
+
+		if( ! $Messages->count('error') )
+		{
+			$Messages->add( T_('Settings updated.'), 'success' );
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=set_antispam', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
 }
 
 
@@ -149,31 +128,12 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/02 21:12:27  fplanque
+ * fat reduction / cleanup
+ *
  * Revision 1.6  2009/12/06 22:55:22  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)
  * Also move file settings to Files tab and made FM always enabled
- *
- * Revision 1.5  2009/03/08 23:57:41  fplanque
- * 2009
- *
- * Revision 1.4  2008/04/04 17:02:24  fplanque
- * cleanup of global settings
- *
- * Revision 1.3  2008/01/21 09:35:25  fplanque
- * (c) 2008
- *
- * Revision 1.2  2007/09/04 14:56:19  fplanque
- * antispam cleanup
- *
- * Revision 1.1  2007/06/25 10:59:24  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.11  2007/04/26 00:11:14  fplanque
- * (c) 2007
- *
- * Revision 1.10  2006/11/26 01:42:09  fplanque
- * doc
- *
  */
 ?>

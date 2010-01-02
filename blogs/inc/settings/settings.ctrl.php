@@ -41,80 +41,80 @@ $current_User->check_perm( 'options', 'view', true );
 $AdminUI->set_path( 'options', 'general' );
 
 param( 'action', 'string' );
-param( 'edit_locale', 'string' );
-param( 'loc_transinfo', 'integer', 0 );
 
-if( in_array( $action, array( 'update', 'reset', 'updatelocale', 'createlocale', 'deletelocale', 'extract', 'prioup', 'priodown' )) )
-{ // We have an action to do..
-	// Check permission:
-	$current_User->check_perm( 'options', 'edit', true );
+switch( $action )
+{
+	case 'update':
+		// UPDATE general settings:
 
-	// clear settings cache
-	$cache_settings = '';
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'globalsettings' );
 
-	// UPDATE general settings:
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
 
-	if( param( 'default_blog_ID', 'integer', NULL ) !== NULL )
-	{
-		$Settings->set( 'default_blog_ID', $default_blog_ID );
-	}
-
-	// Session timeout
-	$timeout_sessions = param_duration( 'timeout_sessions' );
-
-	if( $timeout_sessions < 300 )
-	{ // lower than 5 minutes: not allowed
-		param_error( 'timeout_sessions', sprintf( T_( 'You cannot set a session timeout below %d seconds.' ), 300 ) );
-	}
-	elseif( $timeout_sessions < 86400 )
-	{ // lower than 1 day: notice/warning
-		$Messages->add( sprintf( T_( 'Warning: your session timeout is just %d seconds. Your users may have to re-login often!' ), $timeout_sessions ), 'note' );
-	}
-	$Settings->set( 'timeout_sessions', $timeout_sessions );
-
-	// Reload page timeout
-	$reloadpage_timeout = param_duration( 'reloadpage_timeout' );
-
-	if( $reloadpage_timeout > 99999 )
-	{
-		param_error( 'reloadpage_timeout', sprintf( T_( 'Reload-page timeout must be between %d and %d seconds.' ), 0, 99999 ) );
-	}
-	$Settings->set( 'reloadpage_timeout', $reloadpage_timeout );
-
-	$new_cache_status = param( 'general_cache_enabled', 'integer', 0 );
-	$old_cache_status = $Settings->get('general_cache_enabled');
-
-	load_class( '_core/model/_pagecache.class.php', 'PageCache' );
-	$PageCache = & new PageCache();
-
-	if( $old_cache_status == false && $new_cache_status == true )
-	{ // Caching has been turned ON:
-		if( $PageCache->cache_create() )
+		if( param( 'default_blog_ID', 'integer', NULL ) !== NULL )
 		{
-			$Messages->add( T_('General caching has been enabled.'), 'success' );
+			$Settings->set( 'default_blog_ID', $default_blog_ID );
 		}
-		else
-		{
-			$Messages->add( T_('General caching could not be enabled. Check /cache/ folder file permissions.'), 'error' );
-			$new_cache_status = 0;
+
+		// Session timeout
+		$timeout_sessions = param_duration( 'timeout_sessions' );
+
+		if( $timeout_sessions < 300 )
+		{ // lower than 5 minutes: not allowed
+			param_error( 'timeout_sessions', sprintf( T_( 'You cannot set a session timeout below %d seconds.' ), 300 ) );
 		}
-	}
-	elseif( $old_cache_status == true && $new_cache_status == false )
-	{ // Caching has been turned OFF:
-		$PageCache->cache_delete();
-		$Messages->add( T_('General caching has been disabled. All general cache contents have been purged.'), 'note' );
-	}
+		elseif( $timeout_sessions < 86400 )
+		{ // lower than 1 day: notice/warning
+			$Messages->add( sprintf( T_( 'Warning: your session timeout is just %d seconds. Your users may have to re-login often!' ), $timeout_sessions ), 'note' );
+		}
+		$Settings->set( 'timeout_sessions', $timeout_sessions );
 
-	$Settings->set( 'general_cache_enabled', $new_cache_status );
+		// Reload page timeout
+		$reloadpage_timeout = param_duration( 'reloadpage_timeout' );
 
-	if( ! $Messages->count('error') )
-	{
-		if( $Settings->dbupdate() )
+		if( $reloadpage_timeout > 99999 )
 		{
+			param_error( 'reloadpage_timeout', sprintf( T_( 'Reload-page timeout must be between %d and %d seconds.' ), 0, 99999 ) );
+		}
+		$Settings->set( 'reloadpage_timeout', $reloadpage_timeout );
+
+		$new_cache_status = param( 'general_cache_enabled', 'integer', 0 );
+		$old_cache_status = $Settings->get('general_cache_enabled');
+
+		load_class( '_core/model/_pagecache.class.php', 'PageCache' );
+		$PageCache = & new PageCache();
+
+		if( $old_cache_status == false && $new_cache_status == true )
+		{ // Caching has been turned ON:
+			if( $PageCache->cache_create() )
+			{
+				$Messages->add( T_('General caching has been enabled.'), 'success' );
+			}
+			else
+			{
+				$Messages->add( T_('General caching could not be enabled. Check /cache/ folder file permissions.'), 'error' );
+				$new_cache_status = 0;
+			}
+		}
+		elseif( $old_cache_status == true && $new_cache_status == false )
+		{ // Caching has been turned OFF:
+			$PageCache->cache_delete();
+			$Messages->add( T_('General caching has been disabled. All general cache contents have been purged.'), 'note' );
+		}
+
+		$Settings->set( 'general_cache_enabled', $new_cache_status );
+
+		if( ! $Messages->count('error') )
+		{
+			$Settings->dbupdate();
 			$Messages->add( T_('General settings updated.'), 'success' );
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=settings', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
-	}
-
+		break;
 }
 
 
@@ -142,8 +142,12 @@ $AdminUI->disp_payload_end();
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
 
+
 /*
  * $Log$
+ * Revision 1.19  2010/01/02 21:11:59  fplanque
+ * fat reduction / cleanup
+ *
  * Revision 1.18  2009/12/06 22:55:21  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)
@@ -191,44 +195,5 @@ $AdminUI->disp_global_footer();
  *
  * Revision 1.5  2009/09/02 17:47:25  fplanque
  * doc/minor
- *
- * Revision 1.4  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.3  2008/09/28 08:06:07  fplanque
- * Refactoring / extended page level caching
- *
- * Revision 1.2  2008/01/21 09:35:34  fplanque
- * (c) 2008
- *
- * Revision 1.1  2007/06/25 11:01:18  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.16  2007/04/26 00:11:14  fplanque
- * (c) 2007
- *
- * Revision 1.15  2007/03/25 13:20:52  fplanque
- * cleaned up blog base urls
- * needs extensive testing...
- *
- * Revision 1.14  2007/03/24 20:41:16  fplanque
- * Refactored a lot of the link junk.
- * Made options blog specific.
- * Some junk still needs to be cleaned out. Will do asap.
- *
- * Revision 1.13  2006/12/15 22:54:14  fplanque
- * allow disabling of password hashing
- *
- * Revision 1.12  2006/12/07 00:55:52  fplanque
- * reorganized some settings
- *
- * Revision 1.11  2006/12/04 19:41:11  fplanque
- * Each blog can now have its own "archive mode" settings
- *
- * Revision 1.10  2006/12/04 18:16:50  fplanque
- * Each blog can now have its own "number of page/days to display" settings
- *
- * Revision 1.9  2006/11/24 18:27:23  blueyed
- * Fixed link to b2evo CVS browsing interface in file docblocks
  */
 ?>

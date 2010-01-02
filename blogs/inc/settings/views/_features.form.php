@@ -205,15 +205,17 @@ $Form->end_fieldset();
 if( $current_User->check_perm( 'options', 'edit' ) )
 {
 	$Form->end_form( array(
-		array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
+		array( 'submit', '', T_('Update'), 'SaveButton' ),
 		array( 'reset', '', T_('Reset'), 'ResetButton' ),
-		array( 'submit', 'submit[restore_defaults]', T_('Restore defaults'), 'ResetButton' ),
 		) );
 }
 
 
 /*
  * $Log$
+ * Revision 1.24  2010/01/02 21:11:59  fplanque
+ * fat reduction / cleanup
+ *
  * Revision 1.23  2010/01/02 17:24:30  fplanque
  * Crumbs - Proof of concept
  *

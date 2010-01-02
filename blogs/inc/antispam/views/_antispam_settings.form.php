@@ -41,13 +41,14 @@ global $Settings;
 global $Plugins;
 
 
-$Form = & new Form( NULL, 'antispam_checkchanges' );
+$Form = new Form( NULL, 'antispam_checkchanges' );
 
 $Form->global_icon( T_('Antispam blacklist').' &raquo;', NULL, '?ctrl=antispam', NULL, 0, 5 );
 
 $Form->begin_form( 'fform', T_('Antispam Settings') );
-$Form->hiddens_by_key( get_memorized() );
 
+$Form->add_crumb( 'antispam' );
+$Form->hiddens_by_key( get_memorized() );
 $Form->hidden( 'action', 'update' );
 
 $Form->begin_fieldset( T_('Comments/Feedback') );
@@ -97,6 +98,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/02 21:12:27  fplanque
+ * fat reduction / cleanup
+ *
  * Revision 1.4  2009/03/08 23:57:41  fplanque
  * 2009
  *

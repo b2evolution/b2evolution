@@ -42,11 +42,12 @@ global $dispatcher;
 
 global $collections_Module;
 
-$Form = & new Form( NULL, 'settings_checkchanges' );
+$Form = new Form( NULL, 'settings_checkchanges' );
 $Form->begin_form( 'fform', T_('General Settings'),
 	// enable all form elements on submit (so values get sent):
 	array( 'onsubmit'=>'var es=this.elements; for( var i=0; i < es.length; i++ ) { es[i].disabled=false; };' ) );
 
+$Form->add_crumb( 'globalsettings' );
 $Form->hidden( 'ctrl', 'settings' );
 $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'general' );
@@ -105,6 +106,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.17  2010/01/02 21:11:59  fplanque
+ * fat reduction / cleanup
+ *
  * Revision 1.16  2009/10/28 09:39:52  efy-maxim
  * position of arguments of duration_input function have been changed
  *
