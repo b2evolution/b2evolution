@@ -42,9 +42,9 @@ global $action;
 
 $creating = is_create_action( $action );
 
-$Form = & new Form( NULL, 'userfield_checkchanges', 'post', 'compact' );
+$Form = new Form( NULL, 'userfield_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Delete this userfield!'), 'delete', regenerate_url( 'action', 'action=delete' ) );
+$Form->global_icon( T_('Delete this userfield!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('userfield') ) );
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', $creating ?  T_('New user field') : T_('User field') );
@@ -82,6 +82,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/03 17:45:21  fplanque
+ * crumbs & stuff
+ *
  * Revision 1.6  2010/01/03 13:45:37  fplanque
  * set some crumbs (needs checking)
  *

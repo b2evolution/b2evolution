@@ -16,11 +16,11 @@ $Form = new Form( NULL, 'usersettings_checkchanges' );
 
 $Form->begin_form( 'fform', '' );
 
-	$Form->add_crumb( 'user' );
+	$Form->add_crumb( 'usersettings' );
 	$Form->hidden( 'ctrl', 'usersettings' );
 	$Form->hidden( 'action', 'update' );
 
-$Form->begin_fieldset( T_('Users settings') );
+$Form->begin_fieldset( T_('User latitude') );
 
 	$Form->checkbox_input( 'allow_avatars', $Settings->get('allow_avatars'), T_('Allow avatars'), array( 'note'=>T_('Allow users to upload avatars.') ) );
 
@@ -51,6 +51,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/03 17:45:21  fplanque
+ * crumbs & stuff
+ *
  * Revision 1.7  2010/01/03 13:45:37  fplanque
  * set some crumbs (needs checking)
  *

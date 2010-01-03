@@ -113,6 +113,9 @@ if( !$Messages->count('error') )
 			break;
 
 		case 'remove_avatar':
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
 			if( empty($edited_User) || !is_object($edited_User) )
 			{
 				$Messages->add( 'No user set!' ); // Needs no translation, should be prevented by UI.
@@ -145,6 +148,9 @@ if( !$Messages->count('error') )
 				$action = 'list';
 				break;
 			}
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
 
 			//$reload_page = false; // We set it to true, if a setting changes that needs a page reload (locale, admin skin, ..)
 
@@ -237,6 +243,9 @@ if( !$Messages->count('error') )
 			break;
 
 		case 'default_settings':
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
 			$reload_page = false; // We set it to true, if a setting changes that needs a page reload (locale, admin skin, ..)
 
 			// Admin skin:
@@ -382,6 +391,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/03 17:45:21  fplanque
+ * crumbs & stuff
+ *
  * Revision 1.6  2009/12/12 19:14:06  fplanque
  * made avatars optional + fixes on img props
  *

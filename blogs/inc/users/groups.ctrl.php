@@ -136,6 +136,9 @@ switch ( $action )
 
 
 	case 'update':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'group' );
+
 		if( empty($edited_Group) || !is_object($edited_Group) )
 		{
 			$Messages->add( 'No group set!' ); // Needs no translation, should be prevented by UI.
@@ -194,8 +197,13 @@ switch ( $action )
 		/*
 		 * Delete group
 		 */
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'group' );
+
 		if( !isset($edited_Group) )
+		{
 			debug_die( 'no Group set' );
+		}
 
 		if( $edited_Group->ID == 1 )
 		{
@@ -270,6 +278,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/03 17:45:21  fplanque
+ * crumbs & stuff
+ *
  * Revision 1.6  2010/01/03 12:03:17  fplanque
  * More crumbs...
  *

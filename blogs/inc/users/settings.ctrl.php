@@ -4,13 +4,16 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 global $demo_mode;
 
-$AdminUI->set_path( 'users', 'usersettings' );
+$AdminUI->set_path( 'users', 'usersettings', 'usersettings' );
 
 param_action();
 
 switch ( $action )
 {
 	case 'update':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'usersettings' );
+
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -49,6 +52,7 @@ switch ( $action )
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
 $AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=settings' );
+$AdminUI->breadcrumbpath_add( T_('User latitude'), '?ctrl=usersettings' );
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -71,6 +75,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/03 17:45:21  fplanque
+ * crumbs & stuff
+ *
  * Revision 1.6  2009/12/12 19:14:08  fplanque
  * made avatars optional + fixes on img props
  *

@@ -44,12 +44,12 @@ global $dispatcher;
 
 global $collections_Module;
 
-$Form = & new Form( NULL, 'settings_checkchanges' );
+$Form = new Form( NULL, 'settings_checkchanges' );
 $Form->begin_form( 'fform', '',
 	// enable all form elements on submit (so values get sent):
 	array( 'onsubmit'=>'var es=this.elements; for( var i=0; i < es.length; i++ ) { es[i].disabled=false; };' ) );
 
-	$Form->add_crumb( 'register' );
+	$Form->add_crumb( 'registration' );
 	$Form->hidden( 'ctrl', 'registration' );
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'tab', 'registration' );
@@ -105,6 +105,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/03 17:45:21  fplanque
+ * crumbs & stuff
+ *
  * Revision 1.8  2010/01/03 13:45:37  fplanque
  * set some crumbs (needs checking)
  *

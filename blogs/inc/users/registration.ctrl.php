@@ -34,13 +34,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
 
-$AdminUI->set_path( 'users', 'registration' );
+$AdminUI->set_path( 'users', 'usersettings', 'registration' );
 
 param_action();
 
 switch ( $action )
 {
 	case 'update':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'registration' );
+
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -92,7 +95,8 @@ switch ( $action )
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-$AdminUI->breadcrumbpath_add( T_('Registration settings'), '?ctrl=registration' );
+$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
+$AdminUI->breadcrumbpath_add( T_('Registration'), '?ctrl=registration' );
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -115,6 +119,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/03 17:45:21  fplanque
+ * crumbs & stuff
+ *
  * Revision 1.6  2009/12/06 22:55:19  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

@@ -43,7 +43,7 @@ global $current_User;
 $current_User->check_perm( 'options', 'edit', true );
 
 // Set options path:
-$AdminUI->set_path( 'users', 'userfields' );
+$AdminUI->set_path( 'users', 'usersettings', 'userfields' );
 
 // Get action parameter from request:
 param_action();
@@ -92,6 +92,9 @@ switch( $action )
 	case 'create_copy': // Record Userfield and create similar
 		// Insert new user field...:
 		$edited_Userfield = & new Userfield();
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'userfield' );
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -151,6 +154,9 @@ switch( $action )
 	case 'update':
 		// Edit user field form...:
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'userfield' );
+
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -176,6 +182,9 @@ switch( $action )
 
 	case 'delete':
 		// Delete user field:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'userfield' );
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -208,6 +217,7 @@ switch( $action )
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
+$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
 $AdminUI->breadcrumbpath_add( T_('User fields configuration'), '?ctrl=userfields' );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

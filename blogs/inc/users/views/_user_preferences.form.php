@@ -68,7 +68,7 @@ global $Plugins;
 // Begin payload block:
 $this->disp_payload_begin();
 
-$Form = & new Form( NULL, 'user_checkchanges' );
+$Form = new Form( NULL, 'user_checkchanges' );
 
 if( !$user_profile_only )
 {
@@ -290,6 +290,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/03 17:45:21  fplanque
+ * crumbs & stuff
+ *
  * Revision 1.6  2010/01/03 13:45:37  fplanque
  * set some crumbs (needs checking)
  *
