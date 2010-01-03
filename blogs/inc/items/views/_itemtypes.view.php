@@ -65,7 +65,7 @@ function get_actions_for_itemtype( $id )
 										regenerate_url( 'action', 'ptyp_ID='.$id.'&amp;action=edit') )
 							.$action
 							.action_icon( T_('Delete this item type!'), 'delete',
-										regenerate_url( 'action', 'ptyp_ID='.$id.'&amp;action=delete') );
+										regenerate_url( 'action', 'ptyp_ID='.$id.'&amp;action=delete&amp;'.url_crumb('itemtype').'') );
 	}
 	return $action;
 }
@@ -122,6 +122,9 @@ $Results->display();
 
 /**
  * $Log$
+ * Revision 1.3  2010/01/03 13:10:57  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.2  2009/09/29 18:44:00  fplanque
  * doc
  *

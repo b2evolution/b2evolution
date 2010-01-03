@@ -133,7 +133,7 @@ if( $mode != 'upload' )
 		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 		{	// Check that we have permission to edit item:
 			$r .= action_icon( T_('Delete this link!'), 'unlink',
-	                      regenerate_url( 'action', 'link_ID='.$link_ID.'&amp;action=unlink') );
+	                      regenerate_url( 'action', 'link_ID='.$link_ID.'&amp;action=unlink&amp;'.url_crumb('link') ) );
 		}
 
 		return $r;
@@ -161,6 +161,9 @@ if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Ite
 
 /*
  * $Log$
+ * Revision 1.13  2010/01/03 13:10:58  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.12  2009/10/13 22:28:06  blueyed
  * "Locate this directory" for dirs. Cries for refactoring.
  *

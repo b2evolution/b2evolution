@@ -200,11 +200,11 @@ function contact_block( $block, $user_ID )
 
 	if( $block == 0 )
 	{
-		return action_icon( T_('Block contact'), 'file_allowed', $admin_url.'?ctrl=contacts&action=block&user_ID='.$user_ID );
+		return action_icon( T_('Block contact'), 'file_allowed', $admin_url.'?ctrl=contacts&action=block&user_ID='.$user_ID.'&amp;'.url_crumb('contact') );
 	}
 	else
 	{
-		return action_icon( T_('Unblock contact'), 'file_not_allowed', $admin_url.'?ctrl=contacts&action=unblock&user_ID='.$user_ID );
+		return action_icon( T_('Unblock contact'), 'file_not_allowed', $admin_url.'?ctrl=contacts&action=unblock&user_ID='.$user_ID.'&amp;'.url_crumb('contact') );
 	}
 }
 
@@ -220,6 +220,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/03 13:10:58  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.8  2009/12/07 23:54:13  blueyed
  * trans doc. indent.
  *

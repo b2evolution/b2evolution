@@ -62,7 +62,7 @@ $Results->title = T_('User fields');
 
 /**
  * Callback to enumerate possible user field types
- * 
+ *
  */
 function enumerate_types( $selected = '' ) {
 	$options = '<option value="">All</option>';
@@ -123,7 +123,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 									.action_icon( T_('Duplicate this user field...'), 'copy',
 										'%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=new\')%' )
 									.action_icon( T_('Delete this user field!'), 'delete',
-										'%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=delete\')%' ),
+										'%regenerate_url( \'action\', \'ufdf_ID=$ufdf_ID$&amp;action=delete&amp;'.url_crumb('userfield').'\')%' ),
 						);
 
   $Results->global_icon( T_('Create a new user field...'), 'new',
@@ -136,6 +136,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/03 13:10:57  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.8  2009/09/20 00:27:08  fplanque
  * cleanup/doc/simplified
  *

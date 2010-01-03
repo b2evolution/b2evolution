@@ -156,7 +156,7 @@ function grp_actions( & $row )
 
 	if( ($row->grp_ID != 1) && ($row->grp_ID != $Settings->get('newusers_grp_ID')) && !in_array( $row->grp_ID, $usedgroups ) )
 	{ // delete
-		$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=delete&amp;grp_ID='.$row->grp_ID ) );
+		$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=delete&amp;grp_ID='.$row->grp_ID.'&amp;'.url_crumb('group') ) );
 	}
 	else
 	{
@@ -292,7 +292,7 @@ else
 		if( $user_level > 0)
 		{
 			$r .= action_icon( TS_('Decrease user level'), 'decrease',
-							regenerate_url( 'action', 'action=promote&amp;prom=down&amp;user_ID='.$user_ID ) );
+							regenerate_url( 'action', 'action=promote&amp;prom=down&amp;user_ID='.$user_ID.'&amp;'.url_crumb('user') ) );
 		}
 		else
 		{
@@ -302,7 +302,7 @@ else
 		if( $user_level < 10 )
 		{
 			$r.= action_icon( TS_('Increase user level'), 'increase',
-							regenerate_url( 'action', 'action=promote&amp;prom=up&amp;user_ID='.$user_ID ) );
+							regenerate_url( 'action', 'action=promote&amp;prom=up&amp;user_ID='.$user_ID.'&amp;'.url_crumb('user') ) );
 		}
 		else
 		{
@@ -326,7 +326,7 @@ else
 										.action_icon( T_('Duplicate this user...'), 'copy', '%regenerate_url( \'ctrl,action\', \'ctrl=user&amp;action=new&amp;user_ID=$user_ID$&amp;user_tab=identity\' )%' )
 										.'¤conditional( (#user_ID# != 1) && (#nb_blogs# < 1) && (#user_ID# != '.$current_User->ID.'), \''
 											.action_icon( T_('Delete this user!'), 'delete',
-												'%regenerate_url( \'action\', \'action=delete&amp;user_ID=$user_ID$\' )%' ).'\', \''
+												'%regenerate_url( \'action\', \'action=delete&amp;user_ID=$user_ID$&amp;'.url_crumb('user').'\' )%' ).'\', \''
 	                    .get_icon( 'delete', 'noimg' ).'\' )¤'
 					);
 }
@@ -338,6 +338,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.23  2010/01/03 13:10:57  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.22  2009/12/12 19:14:11  fplanque
  * made avatars optional + fixes on img props
  *

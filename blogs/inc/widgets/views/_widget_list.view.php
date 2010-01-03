@@ -24,7 +24,7 @@ global $container_list;
 if(	$current_User->check_perm( 'options', 'edit', false ) )
 {
 	echo '<div class="floatright small">'.action_icon( TS_('Reload containers!'), 'reload',
-	                        '?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload', T_('Reload containers!') ).'</div>';
+	                        '?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Reload containers!') ).'</div>';
 }
 
 // Load widgets for current collection:
@@ -150,7 +150,7 @@ function display_container( $container, $legend_suffix = '' )
 			//echo $ComponentWidget->order.' ';
 			if( $widget_count > 1 )
 			{
-				echo action_icon( T_('Move up!'), 'move_up', regenerate_url( 'blog', 'action=move_up&amp;wi_ID='.$ComponentWidget->ID ) );
+				echo action_icon( T_('Move up!'), 'move_up', regenerate_url( 'blog', 'action=move_up&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
 			}
 			else
 			{
@@ -158,7 +158,7 @@ function display_container( $container, $legend_suffix = '' )
 			}
 			if( $widget_count < count($Widget_array))
 			{
-				echo action_icon( T_('Move down!'), 'move_down', regenerate_url( 'blog', 'action=move_down&amp;wi_ID='.$ComponentWidget->ID ) );
+				echo action_icon( T_('Move down!'), 'move_down', regenerate_url( 'blog', 'action=move_down&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
 			}
 			else
 			{
@@ -170,14 +170,14 @@ function display_container( $container, $legend_suffix = '' )
 			$Table->display_col_start();
 			if ( $enabled )
 			{
-				echo action_icon( T_( 'Disable this widget!' ), 'deactivate', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID ) );
+				echo action_icon( T_( 'Disable this widget!' ), 'deactivate', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
 			}
 			else
 			{
-				echo action_icon( T_( 'Enable this widget!' ), 'activate', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID ) );
+				echo action_icon( T_( 'Enable this widget!' ), 'activate', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
 			}
 			echo '<span class="edit_icon_hook">'.action_icon( T_('Edit widget settings!'), 'edit', regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$ComponentWidget->ID ) ).'</span>';
-			echo '<span class="delete_icon_hook">'.action_icon( T_('Remove this widget!'), 'delete', regenerate_url( 'blog', 'action=delete&amp;wi_ID='.$ComponentWidget->ID ) ).'</span>';
+			echo '<span class="delete_icon_hook">'.action_icon( T_('Remove this widget!'), 'delete', regenerate_url( 'blog', 'action=delete&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) ).'</span>';
 			$Table->display_col_end();
 
 			$Table->display_line_end();
@@ -220,6 +220,9 @@ echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear" />';
 
 /*
  * $Log$
+ * Revision 1.22  2010/01/03 13:10:57  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.21  2009/12/20 20:38:34  fplanque
  * Enhanced skin containers reload for skin developers
  *

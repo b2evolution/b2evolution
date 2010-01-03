@@ -192,7 +192,7 @@ function disp_actions( $curr_blog_ID )
 
 	if( $current_User->check_perm( 'blog_properties', 'edit', false, $curr_blog_ID ) )
 	{
-		$r .= action_icon( T_('Delete this blog...'), 'delete', regenerate_url( 'ctrl', 'ctrl=collections&amp;action=delete&amp;blog='.$curr_blog_ID ) );
+		$r .= action_icon( T_('Delete this blog...'), 'delete', regenerate_url( 'ctrl', 'ctrl=collections&amp;action=delete&amp;blog='.$curr_blog_ID.'&amp;'.url_crumb('collection') ) );
 	}
 
 	if( empty($r) )
@@ -215,6 +215,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.12  2010/01/03 13:10:58  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.11  2009/09/27 12:57:29  blueyed
  * strmaxlen: add format param, which is used on the (possibly) cropped string.
  *

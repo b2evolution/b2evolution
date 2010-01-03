@@ -288,7 +288,7 @@ $Form->begin_form();
 						$link_action = 'link_inpost';
 					}
 					echo action_icon( T_('Link this file!'), 'link',
-								regenerate_url( 'fm_selected', 'action='.$link_action.'&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ),
+								regenerate_url( 'fm_selected', 'action='.$link_action.'&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
 								NULL, NULL, NULL, $link_attribs );
 					echo ' ';
 				}
@@ -296,14 +296,14 @@ $Form->begin_form();
 				if( isset($edited_User) ) // fp> Perm already checked in controller
 				{	// Offer option to link the file to an Item (or anything else):
 					echo action_icon( T_('Use this as an avatar image!'), 'link',
-								regenerate_url( 'fm_selected', 'action=link_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ),
+								regenerate_url( 'fm_selected', 'action=link_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
 								NULL, NULL, NULL, array() );
 					echo ' ';
 				}
 				elseif( !$lFile->is_dir() && ! empty( $linkctrl ) && ! empty( $linkdata ) )
 				{
 					echo action_icon( T_('Link this file!'), 'link',
-								regenerate_url( 'fm_selected', 'action=link_data&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ),
+								regenerate_url( 'fm_selected', 'action=link_data&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
 								NULL, NULL, NULL, array() );
 
 					echo ' ';
@@ -436,7 +436,7 @@ $Form->begin_form();
 			echo action_icon( T_('Rename'), 'file_rename', regenerate_url( 'fm_selected', 'action=rename&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
 			echo action_icon( T_('Move'), 'file_move', regenerate_url( 'fm_mode,fm_sources,fm_sources_root', 'fm_mode=file_move&amp;fm_sources[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
 			echo action_icon( T_('Copy'), 'file_copy', regenerate_url( 'fm_mode,fm_sources,fm_sources_root', 'fm_mode=file_copy&amp;fm_sources[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
-			echo action_icon( T_('Delete'), 'file_delete', regenerate_url( 'fm_selected', 'action=delete&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ) ) );
+			echo action_icon( T_('Delete'), 'file_delete', regenerate_url( 'fm_selected', 'action=delete&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;'.url_crumb('file') ) );
 		}
 		echo '</td>';
 
@@ -655,10 +655,10 @@ $Form->begin_form();
 				var fm_hl = jQuery("#fm_highlighted");
 				if( fm_hl.length ) {
 					jQuery.getScript('<?php echo $rsc_url ?>js/jquery/jquery.scrollto.js', function () {
-						jQuery.scrollTo( fm_hl, 
-						{ onAfter: function() 
-							{ 
-								evoFadeHighlight( fm_hl ) 
+						jQuery.scrollTo( fm_hl,
+						{ onAfter: function()
+							{
+								evoFadeHighlight( fm_hl )
 							}
 						} );
 					});
@@ -675,6 +675,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.31  2010/01/03 13:10:57  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.30  2009/11/11 03:24:51  fplanque
  * misc/cleanup
  *

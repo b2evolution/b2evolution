@@ -125,7 +125,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	                    .action_icon( T_('Duplicate this file type...'), 'copy',
 	                        '%regenerate_url( \'action\', \'ftyp_ID=$ftyp_ID$&amp;action=copy\')%' )
 	                    .action_icon( T_('Delete this file type!'), 'delete',
-	                        '%regenerate_url( \'action\', \'ftyp_ID=$ftyp_ID$&amp;action=delete\')%' ),
+	                        '%regenerate_url( \'action\', \'ftyp_ID=$ftyp_ID$&amp;action=delete&amp;'.url_crumb('filetype').'\')%' ),
 						);
 
   $Results->global_icon( T_('Create a new file type...'), 'new', regenerate_url( 'action', 'action=new'), T_('New file type').' &raquo;', 3, 4  );
@@ -136,6 +136,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/03 13:10:58  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.7  2009/09/25 13:09:36  efy-vyacheslav
  * Using the SQL class to prepare queries
  *

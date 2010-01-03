@@ -163,7 +163,7 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	  {	// Check that we have permission to edit item:
 			$r .= action_icon( T_('Delete this link!'), 'unlink',
-			                  regenerate_url( 'p,itm_ID,action', "link_ID=$link_ID&amp;action=unlink" ) );
+			                  regenerate_url( 'p,itm_ID,action', 'link_ID='.$link_ID.'&amp;action=unlink&amp;'.url_crumb('link') ) );
 		}
 
 		// Change order.
@@ -172,7 +172,7 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 			if( $cur_idx > 0 )
 			{
 				echo action_icon( T_('Move upwards'), 'move_up',
-					regenerate_url( 'p,itm_ID,action', "link_ID=$link_ID&amp;action=link_move_up" ) );
+					regenerate_url( 'p,itm_ID,action', 'link_ID='.$link_ID.'&amp;action=link_move_up&amp;'.url_crumb('link') ) );
 			}
 			else
 			{
@@ -182,7 +182,7 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 			if( $cur_idx < $total_rows-1 )
 			{
 				echo action_icon( T_('Move down'), 'move_down',
-					regenerate_url( 'p,itm_ID,action', "link_ID=$link_ID&amp;action=link_move_down" ) );
+					regenerate_url( 'p,itm_ID,action', 'link_ID='.$link_ID.'&amp;action=link_move_down&amp;'.url_crumb('link') ) );
 			}
 			else
 			{
@@ -248,6 +248,9 @@ $Results->display( $AdminUI->get_template( 'compact_results' ) );
 
 /*
  * $Log$
+ * Revision 1.14  2010/01/03 13:10:57  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.13  2009/10/13 23:26:20  blueyed
  * Drop special handling of link_position + link_order: it is confusing, and will not scale well with more link_positions probably.
  *

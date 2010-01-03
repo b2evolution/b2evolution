@@ -117,7 +117,7 @@ function cat_line( $Chapter, $level )
 			$r .= action_icon( T_('Move to a different blog...'), 'file_move', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=move' ), T_('Move') );
 		}
 		$r .= action_icon( T_('New...'), 'new', regenerate_url( 'action,cat_ID,cat_parent_ID', 'cat_parent_ID='.$Chapter->ID.'&amp;action=new' ) )
-					.action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete' ) );
+					.action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete&amp;'.url_crumb('element') ) );
 	}
 	$r .= '</td>';
 	$r .=	'</tr>';
@@ -241,6 +241,9 @@ echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categori
 
 /*
  * $Log$
+ * Revision 1.19  2010/01/03 13:10:58  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.18  2009/07/06 23:52:24  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
  *

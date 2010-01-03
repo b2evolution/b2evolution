@@ -145,7 +145,7 @@ function crontab_actions( $ctsk_ID, $status )
 	if( $status != 'started' && $current_User->check_perm( 'options', 'edit', false, NULL ) )
 	{	// User can edit options:
     $col = action_icon( T_('Delete this job!'), 'delete',
-												regenerate_url( 'action', 'ctsk_ID='.$ctsk_ID.'&amp;action=delete') );
+												regenerate_url( 'action', 'ctsk_ID='.$ctsk_ID.'&amp;action=delete&amp;'.url_crumb('crontask') ) );
 	}
 
 	return $col;
@@ -168,6 +168,9 @@ echo '<p>[<a href="'.$cron_url.'cron_exec.php" onclick="return pop_up_window( \'
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/03 13:10:57  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.5  2009/03/08 23:57:42  fplanque
  * 2009
  *

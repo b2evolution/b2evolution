@@ -76,7 +76,7 @@ function cat_line( $GenericCategory, $level )
 					 <td class="lastcol shrinkwrap">'.
 						 action_icon( T_('New...'), 'new', regenerate_url( 'action,'.$GenericCategory->dbIDname.','.$GenericCategory->dbprefix.'parent_ID', $GenericCategory->dbprefix.'parent_ID='.$GenericCategory->ID.'&amp;action=new' ) ).
 						 action_icon( T_('Edit...'), 'edit', $edit_url ).
-						 action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,'.$GenericCategory->dbIDname, $GenericCategory->dbIDname.'='.$GenericCategory->ID.'&amp;action=delete' ) ).'
+						 action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,'.$GenericCategory->dbIDname, $GenericCategory->dbIDname.'='.$GenericCategory->ID.'&amp;action=delete&amp;'.url_crumb('element') ) ).'
 					 </td>';
 	}
 	else
@@ -142,7 +142,7 @@ echo '<table class="grouped" cellspacing="0">
 			<tr>
 					<th colspan="3" class="results_title">
 						<div class="results_title">';
-			
+
 
 if( $permission_to_edit )
 {	// We have permission permission to edit, so display global icon to add nex genereic element:
@@ -173,6 +173,9 @@ echo '</table>';
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/03 13:10:57  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.4  2009/03/08 23:57:43  fplanque
  * 2009
  *

@@ -143,7 +143,7 @@ if( count($res_hits) )
 				<tr class="<?php echo ( $count%2 == 1 ) ? 'odd' : 'even'; ?>">
 					<td class="firstcol"><?php if( $current_User->check_perm( 'stats', 'edit' ) )
 						{
-							echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog ) );
+							echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
 						}
 						echo date( locale_datefmt(), $last_date ) ?>
 					</td>
@@ -175,7 +175,7 @@ if( count($res_hits) )
 				<tr class="<?php echo ( $count%2 == 1 ) ? 'odd' : 'even'; ?>">
 				<td class="firstcol"><?php if( $current_User->check_perm( 'stats', 'edit' ) )
 					{
-						echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog ) );
+						echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
 					}
 					echo date( locale_datefmt(), $this_date ) ?>
 				</td>
@@ -209,6 +209,9 @@ if( count($res_hits) )
 
 /*
  * $Log$
+ * Revision 1.15  2010/01/03 13:10:57  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.14  2009/12/08 22:38:13  fplanque
  * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
  *

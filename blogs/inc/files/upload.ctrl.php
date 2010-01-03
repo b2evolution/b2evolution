@@ -484,7 +484,7 @@ if( isset($_FILES) && count( $_FILES ) )
 			}
 			$success_msg .= '<ul>'
 					.'<li>'.action_icon( T_('Link this file!'), 'link',
-								regenerate_url( 'fm_selected,ctrl', 'ctrl=files&amp;action=link_inpost&amp;fm_selected[]='.rawurlencode($newFile->get_rdfp_rel_path()) ),
+								regenerate_url( 'fm_selected,ctrl', 'ctrl=files&amp;action=link_inpost&amp;fm_selected[]='.rawurlencode($newFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
 								' '.$link_msg, 5, 5, array( 'target' => $iframe_name ) )
 					.' ('.$link_note.')</li>'
 
@@ -549,6 +549,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.29  2010/01/03 13:10:58  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.28  2009/12/18 18:54:32  blueyed
  * trans/punctuation fix
  *

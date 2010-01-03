@@ -73,10 +73,10 @@ $Results->cols[] = array(
 function link_name( $title , $ID )
 {
 	global $GenericElementCache;
-	
+
 	global $locked_IDs, $perm_name, $perm_level, $current_User;
-	
-	if( !in_array( $ID, $locked_IDs ) 
+
+	if( !in_array( $ID, $locked_IDs )
 			&& ( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, false ) ) )
 	{	// The element is not locked and we have permission permission to edit:
 		return '<strong><a href="'.regenerate_url( 'action,ID', $GenericElementCache->dbIDname.'='.$ID.'&amp;action=edit' ).'">'.$title.'</a></strong>';
@@ -114,7 +114,7 @@ if( !isset( $perm_name ) || $current_User->check_perm( $perm_name, $perm_level, 
 		{ // This element is NOT locked:
 			$r = action_icon( T_('Edit...'), 'edit', regenerate_url( 'action,'.$GenericElementCache->dbIDname, $GenericElementCache->dbIDname.'='.$ID.'&amp;action=edit' ) )
 						.$r
-						.action_icon( T_('Delete!'), 'delete', regenerate_url( 'action,'.$GenericElementCache->dbIDname, $GenericElementCache->dbIDname.'='.$ID.'&amp;action=delete' ) );
+						.action_icon( T_('Delete!'), 'delete', regenerate_url( 'action,'.$GenericElementCache->dbIDname, $GenericElementCache->dbIDname.'='.$ID.'&amp;action=delete&amp;'.url_crumb('element') ) );
 
 		}
 
@@ -141,6 +141,9 @@ $Results->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/03 13:10:57  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.5  2009/09/25 13:09:36  efy-vyacheslav
  * Using the SQL class to prepare queries
  *

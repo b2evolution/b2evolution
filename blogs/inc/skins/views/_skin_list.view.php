@@ -78,10 +78,10 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'td' => action_icon( TS_('Edit skin properties...'), 'properties',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=edit\')%' )
 	                    .action_icon( TS_('Reload containers!'), 'reload',
-	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=reload\')%' )
+	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=reload&amp;'.url_crumb('skin').'\')%' )
 											.'¤conditional( #nb_blogs# < 1, \''
 											.action_icon( TS_('Uninstall this skin!'), 'delete',
-	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=delete\')%' ).'\', \''
+	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=delete&amp;'.url_crumb('skin').'\')%' ).'\', \''
 	                        .get_icon( 'delete', 'noimg' ).'\' )¤',
 						);
 
@@ -97,6 +97,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/03 13:10:57  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.7  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *

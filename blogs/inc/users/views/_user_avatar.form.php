@@ -48,7 +48,7 @@ if( $current_User->check_perm( 'users', 'all' ) )
 {
 	if( !empty( $avatar_tag ) )
 	{
-		$avatar_tag .= ' '.action_icon( T_( 'Remove' ), 'delete', '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID.'&amp;action=remove_avatar', T_( 'Remove' ) );
+		$avatar_tag .= ' '.action_icon( T_( 'Remove' ), 'delete', '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID.'&amp;action=remove_avatar&amp;'.url_crumb('user').'', T_( 'Remove' ) );
 		if( $current_User->check_perm( 'files', 'view' ) )
 		{
 			$avatar_tag .= ' '.action_icon( T_( 'Change' ), 'link', '?ctrl=files&amp;user_ID='.$edited_User->ID, T_( 'Change' ).' &raquo;', 5, 5 );
@@ -73,6 +73,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/03 13:10:57  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.4  2009/12/12 19:14:12  fplanque
  * made avatars optional + fixes on img props
  *
