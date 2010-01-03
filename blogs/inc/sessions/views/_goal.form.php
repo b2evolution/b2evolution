@@ -39,6 +39,7 @@ $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) )
 
 $Form->begin_form( 'fform', $creating ?  T_('New goal') : T_('Goal') );
 
+	$Form->add_crumb( 'goal' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',goal_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
 	$Form->text_input( 'goal_name', $edited_Goal->name, 40, T_('Name'), '', array( 'maxlength'=> 50, 'required'=>true ) );
@@ -65,6 +66,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/03 16:28:35  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.7  2009/09/19 20:49:51  fplanque
  * Cleaner way of implementing permissions.
  *

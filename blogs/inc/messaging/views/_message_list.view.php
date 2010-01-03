@@ -275,20 +275,24 @@ if( $current_User->check_perm( 'perm_messaging', 'delete' ) )
 
 $Results->display();
 
-$Form = & new Form( NULL, 'messages_checkchanges', 'post', 'compact' );
+$Form = new Form( NULL, 'messages_checkchanges', 'post', 'compact' );
 
 $Form->begin_form( 'fform', '' );
 
-$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
+	$Form->add_crumb( 'message' );
+	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
-$Form->info_field(T_('Reply to'), get_avatar_imgtags( $recipients ), array('required'=>true));
+	$Form->info_field(T_('Reply to'), get_avatar_imgtags( $recipients ), array('required'=>true));
 
-$Form->textarea('msg_text', '', 10, '', '', 80, '', true);
+	$Form->textarea('msg_text', '', 10, '', '', 80, '', true);
 
 $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.26  2010/01/03 16:28:35  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.25  2009/12/07 23:07:34  blueyed
  * Whitespace.
  *
