@@ -48,6 +48,7 @@ $Form = & new Form( NULL, 'coll_features_checkchanges' );
 
 $Form->begin_form( 'fform' );
 
+$Form->add_crumb( 'collection' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'features' );
@@ -197,6 +198,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.20  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.19  2009/10/04 23:06:30  fplanque
  * doc
  *

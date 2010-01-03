@@ -158,6 +158,7 @@ if( empty($subject) )
 $Form = new Form( $htsrv_url.'message_send.php' );
 	$Form->begin_form( 'bComment' );
 
+	$Form->add_crumb( 'newmessage' );
 	if( !empty( $Blog ) )
 	{
 		$Form->hidden( 'blog', $Blog->ID );
@@ -206,6 +207,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/03 13:45:37  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.8  2009/09/26 12:00:44  tblue246
  * Minor/coding style
  *

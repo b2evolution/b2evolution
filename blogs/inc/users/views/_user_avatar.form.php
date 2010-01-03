@@ -32,11 +32,12 @@ if( !$user_profile_only )
 
 $Form->begin_form( 'fform', sprintf( T_('Edit %s avatar'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' ) );
 
-$Form->hidden_ctrl();
-$Form->hidden( 'user_tab', 'avatar' );
-$Form->hidden( 'avatar_form', '1' );
+	$Form->add_crumb( 'user' );
+	$Form->hidden_ctrl();
+	$Form->hidden( 'user_tab', 'avatar' );
+	$Form->hidden( 'avatar_form', '1' );
 
-$Form->hidden( 'user_ID', $edited_User->ID );
+	$Form->hidden( 'user_ID', $edited_User->ID );
 
 	/***************  Avatar  **************/
 
@@ -73,6 +74,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/03 13:45:37  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.5  2010/01/03 13:10:57  fplanque
  * set some crumbs (needs checking)
  *

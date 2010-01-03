@@ -921,14 +921,16 @@ switch( $action )
 		<div class="panelinfo">
 
 			<?php
-			$Form = & new Form( NULL, 'install_db_deltas', 'get' );
-			$Form->hidden_ctrl();
-			$Form->hidden( 'action', $next_action );
-			$Form->hidden( 'plugin_ID', $edit_Plugin->ID );
+			$Form = new Form( NULL, 'install_db_deltas', 'get' );
 
 			$Form->global_icon( T_('Cancel installation!'), 'close', regenerate_url() );
 
 			$Form->begin_form( 'fform', sprintf( /* TRANS: %d is ID, %d name */ T_('Finish setup for plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );
+
+			$Form->add_crumb( 'plugin' );
+			$Form->hidden_ctrl();
+			$Form->hidden( 'action', $next_action );
+			$Form->hidden( 'plugin_ID', $edit_Plugin->ID );
 
 			echo '<p>'.T_('The plugin needs the following database changes.').'</p>';
 
@@ -963,15 +965,18 @@ switch( $action )
 		<div class="panelinfo">
 
 			<?php
-			$Form = & new Form( '', 'uninstall_plugin', 'post' );
+			$Form = new Form( '', 'uninstall_plugin', 'post' );
+
+			$Form->global_icon( T_('Cancel uninstall!'), 'close', regenerate_url() );
+
+			$Form->begin_form( 'fform', sprintf( /* TRANS: %d is ID, %d name */ T_('Uninstall plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );
+
+			$Form->add_crumb( 'plugin' );
 			// We may need to use memorized params in the next page
 			$Form->hiddens_by_key( get_memorized( 'action,plugin_ID') );
 			$Form->hidden( 'action', 'uninstall' );
 			$Form->hidden( 'plugin_ID', $edit_Plugin->ID );
 			$Form->hidden( 'uninstall_confirmed_drop', 1 );
-			$Form->global_icon( T_('Cancel uninstall!'), 'close', regenerate_url() );
-
-			$Form->begin_form( 'fform', sprintf( /* TRANS: %d is ID, %d name */ T_('Uninstall plugin #%d (%s)'), $edit_Plugin->ID, $edit_Plugin->name ) );
 
 			if( $uninstall_tables_to_drop )
 			{
@@ -1009,7 +1014,7 @@ switch( $action )
 		// Display plugin info:
 		load_funcs('plugins/_plugin.funcs.php');
 
-		$Form = & new Form( $pagenow );
+		$Form = new Form( $pagenow );
 
 		if( $edit_Plugin->ID > 0 )
 		{ // Edit settings button (if installed):
@@ -1096,6 +1101,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2010/01/03 13:45:37  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.15  2010/01/03 12:26:32  fplanque
  * Crumbs for plugins. This is a little bit tough because it's a non standard controller.
  * There may be missing crumbs, especially during install. Please add missing ones when you spot them.

@@ -53,8 +53,10 @@ $redirect_to = param( 'redirect_to', 'string', '' );
 $ProfileForm = & new Form( $htsrv_url_sensitive.'profile_update.php', 'ProfileForm' );
 
 $ProfileForm->begin_form( 'bComment' );
-$ProfileForm->hidden( 'checkuser_id', $current_User->ID );
-$ProfileForm->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
+
+	$ProfileForm->add_crumb( 'profileform' );
+	$ProfileForm->hidden( 'checkuser_id', $current_User->ID );
+	$ProfileForm->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 
 $ProfileForm->begin_fieldset( T_('Email communications') );
 
@@ -118,6 +120,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.11  2010/01/03 13:45:37  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.10  2009/09/13 12:27:28  tblue246
  * Only display link to change to the avatar if user has appropriate permissions
  *

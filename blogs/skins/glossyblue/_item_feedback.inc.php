@@ -227,7 +227,7 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 	// _______________________________________________________________
 
 	if( $Blog->get_setting( 'feed_content' ) != 'none' )
-	{ 
+	{
 		// Display link for comments feed:
 		$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
 
@@ -307,6 +307,7 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	//           Actually, the best would be, if the $Form object could be changed by a plugin
 	//           before display!
 
+	$Form->add_crumb( 'addcomment' );
 	$Form->hidden( 'comment_post_ID', $Item->ID );
 	$Form->hidden( 'redirect_to',
 			// Make sure we get back to the right page (on the right domain)

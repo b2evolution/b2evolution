@@ -63,6 +63,7 @@ $Form->global_icon( T_('Quit copy/move mode!'), 'close', regenerate_url('fm_sour
 
 $Form->begin_form( 'fform', $fm_mode == 'file_copy' ? T_('Copy') : T_('Move') );
 
+	$Form->add_crumb( 'file' );
 	$Form->hidden_ctrl();
 	$Form->hiddens_by_key( get_memorized() );
 	$Form->hidden( 'confirm', 1 );
@@ -91,6 +92,9 @@ echo '<p class="notes"><strong>'.T_('You are in copy/move mode.')
 
 /*
  * $Log$
+ * Revision 1.4  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.3  2009/03/08 23:57:43  fplanque
  * 2009
  *

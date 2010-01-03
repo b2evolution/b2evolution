@@ -45,6 +45,7 @@ $Form = & new Form( NULL, 'blogperm_checkchanges', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
+$Form->add_crumb( 'collection' );
 $Form->hidden_ctrl();
 $Form->hidden( 'tab', 'permgroup' );
 $Form->hidden( 'blog', $edited_Blog->ID );
@@ -534,6 +535,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.12  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.11  2009/09/25 20:26:26  fplanque
  * fixes/doc
  *

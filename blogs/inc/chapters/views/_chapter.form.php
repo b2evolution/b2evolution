@@ -47,6 +47,7 @@ $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) )
 
 $Form->begin_form( 'fform', $creating ?  T_('New category') : T_('Category') );
 
+$Form->add_crumb( 'element' );
 $Form->hidden( 'action', $creating ? 'create' : 'update' );
 $Form->hiddens_by_key( get_memorized( 'action' ) );
 
@@ -91,6 +92,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/03 13:45:38  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.9  2009/06/29 02:14:04  fplanque
  * no message
  *

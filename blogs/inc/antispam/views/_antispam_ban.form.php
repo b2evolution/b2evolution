@@ -33,6 +33,7 @@ $Form->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 
+	$Form->add_crumb( 'antispam' );
 	$Form->hidden_ctrl();
 	$Form->hiddens_by_key( get_memorized() );
 	$Form->hidden( 'confirm', 'confirm' );
@@ -203,6 +204,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.13  2010/01/03 13:45:38  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.12  2009/12/06 01:52:55  blueyed
  * Add 'htmlspecialchars' type to format_to_output, same as formvalue, but less irritating. Useful for strmaxlen, which is being used in more places now.
  *

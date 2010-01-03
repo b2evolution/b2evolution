@@ -33,6 +33,7 @@ $Form->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', T_('New scheduled job') );
 
+	$Form->add_crumb( 'crontask' );
 	$Form->hiddens_by_key( get_memorized( 'action' ) );
 	$Form->hidden( 'action', 'create' );
 
@@ -58,6 +59,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/03 13:45:38  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.5  2009/10/28 09:39:52  efy-maxim
  * position of arguments of duration_input function have been changed
  *

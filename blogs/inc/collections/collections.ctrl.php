@@ -407,6 +407,7 @@ switch($action)
 
 				$Form->begin_form( 'inline' );
 
+				$Form->add_crumb( 'collection' );
 				$Form->hidden_ctrl();
 				$Form->hidden( 'action', 'delete' );
 				$Form->hidden( 'blog', $edited_Blog->ID );
@@ -457,6 +458,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2010/01/03 13:45:37  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.17  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *

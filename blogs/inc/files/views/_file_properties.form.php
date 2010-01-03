@@ -40,6 +40,8 @@ $Form = & new Form( NULL, 'fm_properties_checkchanges' );
 $Form->global_icon( T_('Close properties!'), 'close', regenerate_url() );
 
 $Form->begin_form( 'fform', T_('File properties') );
+
+	$Form->add_crumb( 'file' );
 	$Form->hidden_ctrl();
 	$Form->hidden( 'action', 'update_properties' );
 	$Form->hiddens_by_key( get_memorized() );
@@ -76,6 +78,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.6  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

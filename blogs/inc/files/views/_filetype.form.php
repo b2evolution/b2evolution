@@ -53,6 +53,7 @@ $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) )
 
 $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') );
 
+	$Form->add_crumb( 'filetype' );
 	$Form->hidden_ctrl();
 	$Form->hidden( 'action', $creating ? 'create' : 'update' );
 
@@ -110,6 +111,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.4  2009/03/08 23:57:43  fplanque
  * 2009
  *

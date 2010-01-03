@@ -83,6 +83,7 @@ $Form = & new Form( $htsrv_url_sensitive.'login.php', 'evo_login_form', 'post', 
 
 $Form->begin_form( 'fform' );
 
+	$Form->add_crumb( 'loginform' );
 	$Form->hiddens_by_key( remove_magic_quotes($_POST), /* exclude: */ array('login_action', 'login', 'action') ); // passthrough POSTed data (when login is required after having POSTed something)
 	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 
@@ -222,6 +223,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.18  2010/01/03 13:45:37  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.17  2009/12/14 19:47:27  blueyed
  * Save core.pwd_salt directly, so login does not fail, if there is a fatal error later on (e.g. when logging the hit).
  *

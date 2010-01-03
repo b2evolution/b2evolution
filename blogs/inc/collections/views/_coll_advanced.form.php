@@ -40,6 +40,7 @@ $Form = & new Form( NULL, 'blogadvanced_checkchanges' );
 
 $Form->begin_form( 'fform' );
 
+$Form->add_crumb( 'collection' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'advanced' );
@@ -189,6 +190,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.24  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.23  2009/12/07 20:07:21  leeturner2701
  * Update the help text on the Blog Aggregation field to say you can use a * to aggregate all blogs
  *

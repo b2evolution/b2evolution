@@ -2776,6 +2776,7 @@ function upgrade_b2evo_tables()
 			}
 
 			$Form->begin_form( 'fform', T_('Upgrade database') );
+
 			$Form->begin_fieldset();
 			$Form->hidden( 'upgrade_db_deltas_confirm_md5', md5(implode( '', $upgrade_db_deltas )) );
 			$Form->hidden( 'action', $action );
@@ -2809,6 +2810,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.352  2010/01/03 13:45:37  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.351  2009/12/22 08:45:44  fplanque
  * fix install
  *

@@ -53,6 +53,7 @@ $Form = & new Form( NULL, 'coll_features_checkchanges' );
 
 $Form->begin_form( 'fform' );
 
+$Form->add_crumb( 'collection' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'seo' );
@@ -379,6 +380,9 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.27  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.26  2009/07/23 15:39:22  waltercruz
  * Improving message
  *

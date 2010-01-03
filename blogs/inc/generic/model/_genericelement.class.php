@@ -115,10 +115,9 @@ class GenericElement extends DataObject
 
 		$Form->begin_form( 'fform', $creating ?  T_('New element') : T_('Element') );
 
+		$Form->add_crumb( 'element' );
 		$Form->hidden( 'action', $creating ? 'create' : 'update' );
-
 		$Form->hidden( 'ctrl', $ctrl );
-
 		$Form->hiddens_by_key( get_memorized( 'action, ctrl' ) );
 
 		$Form->text_input( $this->dbprefix.'name', $this->name, $edited_name_maxlen, T_('name'), '', array( 'required' => true ) );
@@ -153,6 +152,9 @@ class GenericElement extends DataObject
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/03 13:45:38  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.4  2009/09/14 12:25:47  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

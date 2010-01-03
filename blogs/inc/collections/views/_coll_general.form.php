@@ -34,6 +34,7 @@ $Form = new Form();
 
 $Form->begin_form( 'fform' );
 
+$Form->add_crumb( 'collection' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', $next_action );
 $Form->hidden( 'tab', $tab );
@@ -128,6 +129,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.18  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.17  2009/12/02 00:05:52  fplanque
  * no message
  *

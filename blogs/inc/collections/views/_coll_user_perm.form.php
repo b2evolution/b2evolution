@@ -45,6 +45,7 @@ $Form = & new Form( NULL, 'blogperm_checkchanges', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
+$Form->add_crumb( 'collection' );
 $Form->hidden_ctrl();
 $Form->hidden( 'tab', 'perm' );
 $Form->hidden( 'blog', $edited_Blog->ID );
@@ -547,6 +548,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.13  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.12  2009/11/21 13:31:58  efy-maxim
  * 1. users controller has been refactored to users and user controllers
  * 2. avatar tab

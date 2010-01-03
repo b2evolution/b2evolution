@@ -35,10 +35,11 @@ $page_title = T_('Lost password ?');
 $page_icon = 'icon_login.gif';
 require dirname(__FILE__).'/_html_header.inc.php';
 
-$Form = & new Form( $htsrv_url_sensitive.'login.php', '', 'post', 'fieldset' );
+$Form = new Form( $htsrv_url_sensitive.'login.php', '', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
+	$Form->add_crumb( 'lostpassform' );
 	$Form->hidden( 'action', 'retrievepassword' );
 	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 
@@ -62,6 +63,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.5  2009/05/28 20:21:28  blueyed
  * Streamline code to display form buttons.
  *

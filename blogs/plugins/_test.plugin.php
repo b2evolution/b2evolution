@@ -543,6 +543,8 @@ class test_plugin extends Plugin
 		// TODO: this is tedious.. should either be a global function (get_admin_Form()) or a plugin helper..
 		$Form = & new Form();
 		$Form->begin_form();
+
+		$Form->add_crumb( 'plugin_test' );
 		$Form->hidden_ctrl(); // needed to pass the "ctrl=tools" param
 		$Form->hiddens_by_key( get_memorized() ); // needed to pass all other memorized params, especially "tab"
 
@@ -824,6 +826,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.88  2010/01/03 13:45:37  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.87  2009/12/22 23:13:39  fplanque
  * Skins v4, step 1:
  * Added new disp modes

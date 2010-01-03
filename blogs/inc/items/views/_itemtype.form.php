@@ -51,7 +51,8 @@ $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) )
 
 $Form->begin_form( 'fform', $creating ?  T_('New item type') : T_('Item type') );
 
-$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',ptyp_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
+	$Form->add_crumb( 'itemtype' );
+	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',ptyp_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
 if( $creating )
 {
@@ -79,6 +80,9 @@ else
 
 /**
  * $Log$
+ * Revision 1.3  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.2  2009/09/29 18:44:00  fplanque
  * doc
  *

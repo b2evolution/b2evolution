@@ -316,6 +316,7 @@ if( isset( $edited_User ) )
 					$Form = & new Form( NULL, 'fmbar_create_checkchanges', 'post', 'none' );
 					$Form->begin_form();
 						$Form->hidden( 'action', 'createnew' );
+						$Form->add_crumb( 'file' );
 						$Form->hidden_ctrl();
 						$Form->hiddens_by_key( get_memorized() );
 						if( ! $Settings->get( 'fm_enable_create_dir' ) )
@@ -367,8 +368,9 @@ if( isset( $edited_User ) )
 				{	// Upload is enabled and we have permission to use it...
 					echo "<!-- QUICK UPLOAD: -->\n";
 					echo '<div class="toolbaritem">';
-					$Form = & new Form( NULL, 'fmbar_quick_upload', 'post', 'none', 'multipart/form-data' );
+					$Form = new Form( NULL, 'fmbar_quick_upload', 'post', 'none', 'multipart/form-data' );
 					$Form->begin_form();
+						$Form->add_crumb( 'file' );
 						$Form->hidden( 'ctrl', 'upload' );
 						$Form->hidden( 'upload_quickmode', 1 );
 						// The following is mainly a hint to the browser.
@@ -396,6 +398,9 @@ if( isset( $edited_User ) )
 
 /*
  * $Log$
+ * Revision 1.17  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.16  2009/08/29 12:23:56  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

@@ -12,12 +12,13 @@ global $Settings;
 global $current_User;
 
 
-$Form = & new Form( NULL, 'usersettings_checkchanges' );
+$Form = new Form( NULL, 'usersettings_checkchanges' );
 
 $Form->begin_form( 'fform', '' );
 
-$Form->hidden( 'ctrl', 'usersettings' );
-$Form->hidden( 'action', 'update' );
+	$Form->add_crumb( 'user' );
+	$Form->hidden( 'ctrl', 'usersettings' );
+	$Form->hidden( 'action', 'update' );
 
 $Form->begin_fieldset( T_('Users settings') );
 
@@ -50,6 +51,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/03 13:45:37  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.6  2009/12/12 19:14:12  fplanque
  * made avatars optional + fixes on img props
  *

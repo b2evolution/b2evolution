@@ -113,13 +113,14 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	echo $params['form_title_end'];
 
 
-	$Form = & new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post' );
+	$Form = new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post' );
 	$Form->begin_form( 'bComment', '', array( 'target' => '_self' ) );
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
 	//           Actually, the best would be, if the $Form object could be changed by a plugin
 	//           before display!
 
+	$Form->add_crumb( 'comment' );
 	$Form->hidden( 'comment_post_ID', $Item->ID );
 	$Form->hidden( 'redirect_to',
 			// Make sure we get back to the right page (on the right domain)
@@ -222,6 +223,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.15  2010/01/03 13:45:37  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.14  2009/11/21 17:33:05  sam2kb
  * Configurable form title text
  *

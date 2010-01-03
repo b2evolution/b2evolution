@@ -47,6 +47,8 @@ $Form = & new Form( NULL, 'fm_perms_checkchanges' );
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url() );
 
 $Form->begin_form( 'fform', T_('Change permissions') );
+
+	$Form->add_crumb( 'file' );
 	$Form->hidden_ctrl();
 	$Form->hiddens_by_key( get_memorized() );
 	$Form->hidden( 'action', 'edit_perms' );
@@ -125,6 +127,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.4  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.3  2009/03/08 23:57:43  fplanque
  * 2009
  *

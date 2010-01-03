@@ -40,10 +40,11 @@ $page_icon = 'icon_register.gif';
 require dirname(__FILE__).'/_html_header.inc.php';
 
 
-$Form = & new Form( $htsrv_url_sensitive.'register.php', '', 'post', 'fieldset' );
+$Form = new Form( $htsrv_url_sensitive.'register.php', '', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
+$Form->add_crumb( 'regform' );
 $Form->hidden( 'action', 'register');
 $Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 
@@ -67,13 +68,13 @@ $Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20
 	$Form->text_input( 'email', $email, 16, T_('Email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
 
 	$registration_require_country = (bool)$Settings->get('registration_require_country');
-	
+
 	if( $registration_require_country )
 	{
 		$CountryCache = & get_CountryCache();
 		$Form->select_input_object( 'country', $country, $CountryCache, 'Country', array('allow_none'=>true, 'required'=>true) );
 	}
-		
+
 	$Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Preferred language') );
 
 	$Plugins->trigger_event( 'DisplayRegisterFormFieldset', array( 'Form' => & $Form ) );
@@ -93,6 +94,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.12  2010/01/03 13:45:37  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.11  2009/10/10 21:43:09  tblue246
  * cleanup
  *

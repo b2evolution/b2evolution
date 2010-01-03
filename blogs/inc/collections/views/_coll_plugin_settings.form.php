@@ -49,6 +49,7 @@ while( $loop_Plugin = & $Plugins->get_next() )
 {
 	$Form->begin_form( 'fform' );
 
+		$Form->add_crumb( 'collection' );
 		$Form->hidden_ctrl();
 		$Form->hidden( 'tab', 'plugin_settings' );
 		$Form->hidden( 'action', 'update' );
@@ -102,6 +103,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.4  2009/08/09 19:15:12  fplanque
  * fix for when there are multiple plugins with blog specific settings
  *

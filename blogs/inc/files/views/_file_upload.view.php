@@ -178,6 +178,8 @@ global $fm_FileRoot;
 
 	$Form = & new Form( NULL, 'fm_upload_checkchanges', 'post', 'none', 'multipart/form-data' );
 	$Form->begin_form( 'fform' );
+
+		$Form->add_crumb( 'file' );
 		$Form->hidden_ctrl();
 		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); // Just a hint for the browser.
 		$Form->hidden( 'upload_quickmode', $upload_quickmode );
@@ -372,6 +374,9 @@ global $fm_FileRoot;
 
 /*
  * $Log$
+ * Revision 1.12  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.11  2009/12/06 22:55:21  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

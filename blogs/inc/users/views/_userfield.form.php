@@ -49,6 +49,8 @@ $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) )
 
 $Form->begin_form( 'fform', $creating ?  T_('New user field') : T_('User field') );
 
+	$Form->add_crumb( 'userfield' );
+
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',ufdf_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
 	if( $creating )
@@ -80,6 +82,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/03 13:45:37  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.5  2009/09/17 00:55:24  fplanque
  * fix
  *

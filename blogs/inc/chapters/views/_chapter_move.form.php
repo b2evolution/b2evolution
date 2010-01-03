@@ -47,6 +47,7 @@ $Form->global_icon( T_('Cancel move!'), 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', T_('Move category') );
 
+$Form->add_crumb( 'element' );
 $Form->hidden( 'action', 'update_move' );
 $Form->hiddens_by_key( get_memorized( 'action' ) );
 
@@ -67,6 +68,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.4  2010/01/03 13:45:38  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.3  2009/03/08 23:57:42  fplanque
  * 2009
  *

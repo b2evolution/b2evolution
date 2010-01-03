@@ -168,9 +168,9 @@ $Form = new Form( NULL, 'files_checkchanges' );
 
 $Form->begin_form( 'fform', T_('File manager settings') );
 
+$Form->add_crumb( 'file' );
 $Form->hidden( 'ctrl', 'fileset' );
 $Form->hidden( 'action', 'update' );
-
 
 $Form->begin_fieldset( T_('Accessible file roots'), array( 'id' => 'ffset_fileroots', 'class' => 'additional_file_settings' ) );
 	$Form->checkbox( 'fm_enable_roots_blog', $Settings->get('fm_enable_roots_blog'), T_('Enable blog directories'), T_('Check to enable root directories for blogs.' ) );
@@ -238,6 +238,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.9  2009/12/08 23:42:03  fplanque
  * minor
  *

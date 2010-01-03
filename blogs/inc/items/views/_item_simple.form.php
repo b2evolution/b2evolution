@@ -65,58 +65,59 @@ if( !empty( $bozo_start_modified ) )
 }
 $Form->begin_form( '', '', $params );
 
-$Form->hidden( 'ctrl', 'items' );
-$Form->hidden( 'blog', $Blog->ID );
-if( isset( $mode ) )   $Form->hidden( 'mode', $mode ); // used by bookmarklet
-if( isset( $edited_Item ) )   $Form->hidden( 'post_ID', $edited_Item->ID );
-$Form->hidden( 'redirect_to', $redirect_to );
+	$Form->add_crumb( 'item' );
+	$Form->hidden( 'ctrl', 'items' );
+	$Form->hidden( 'blog', $Blog->ID );
+	if( isset( $mode ) )   $Form->hidden( 'mode', $mode ); // used by bookmarklet
+	if( isset( $edited_Item ) )   $Form->hidden( 'post_ID', $edited_Item->ID );
+	$Form->hidden( 'redirect_to', $redirect_to );
 
-// In case we send this to the blog for a preview :
-$Form->hidden( 'preview', 1 );
-$Form->hidden( 'more', 1 );
-$Form->hidden( 'preview_userid', $current_User->ID );
-
-
-// Fields used in "advanced" form, but not here:
-$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
-$Form->hidden( 'item_typ_ID', $edited_Item->ptyp_ID );
-$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
-$Form->hidden( 'post_excerpt', $edited_Item->get( 'excerpt' ) );
-$Form->hidden( 'post_urltitle', $edited_Item->get( 'urltitle' ) );
-$Form->hidden( 'titletag', $edited_Item->get( 'titletag' ) );
-$Form->hidden( 'metadesc', $edited_Item->get( 'metadesc' ) );
-$Form->hidden( 'metakeywords', $edited_Item->get( 'metakeywords' ) );
+	// In case we send this to the blog for a preview :
+	$Form->hidden( 'preview', 1 );
+	$Form->hidden( 'more', 1 );
+	$Form->hidden( 'preview_userid', $current_User->ID );
 
 
-if( $Blog->get_setting( 'use_workflow' ) )
-{	// We want to use workflow properties for this blog:
-	$Form->hidden( 'item_priority', $edited_Item->priority );
-	$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
-	$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
-	$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
-}
-$Form->hidden( 'trackback_url', $trackback_url );
-$Form->hidden( 'renderers_displayed', 1 );
-$Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
-$Form->hidden( 'item_featured', $edited_Item->featured );
-$Form->hidden( 'item_order', $edited_Item->order );
+	// Fields used in "advanced" form, but not here:
+	$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
+	$Form->hidden( 'item_typ_ID', $edited_Item->ptyp_ID );
+	$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
+	$Form->hidden( 'post_excerpt', $edited_Item->get( 'excerpt' ) );
+	$Form->hidden( 'post_urltitle', $edited_Item->get( 'urltitle' ) );
+	$Form->hidden( 'titletag', $edited_Item->get( 'titletag' ) );
+	$Form->hidden( 'metadesc', $edited_Item->get( 'metadesc' ) );
+	$Form->hidden( 'metakeywords', $edited_Item->get( 'metakeywords' ) );
 
-$creator_User = $edited_Item->get_creator_User();
-$Form->hidden( 'item_owner_login', $creator_User->login );
-$Form->hidden( 'item_owner_login_displayed', 1 );
 
-// CUSTOM FIELDS double
-for( $i = 1 ; $i <= 5; $i++ )
-{	// For each custom double field:
-	$Form->hidden( 'item_double'.$i, $edited_Item->{'double'.$i} );
-}
-// CUSTOM FIELDS varchar
-for( $i = 1 ; $i <= 3; $i++ )
-{	// For each custom varchar field:
-	$Form->hidden( 'item_varchar'.$i, $edited_Item->{'varchar'.$i} );
-}
+	if( $Blog->get_setting( 'use_workflow' ) )
+	{	// We want to use workflow properties for this blog:
+		$Form->hidden( 'item_priority', $edited_Item->priority );
+		$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
+		$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
+		$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
+	}
+	$Form->hidden( 'trackback_url', $trackback_url );
+	$Form->hidden( 'renderers_displayed', 1 );
+	$Form->hidden( 'renderers', $edited_Item->get_renderers_validated() );
+	$Form->hidden( 'item_featured', $edited_Item->featured );
+	$Form->hidden( 'item_order', $edited_Item->order );
 
-// TODO: Form::hidden() do not add, if NULL?!
+	$creator_User = $edited_Item->get_creator_User();
+	$Form->hidden( 'item_owner_login', $creator_User->login );
+	$Form->hidden( 'item_owner_login_displayed', 1 );
+
+	// CUSTOM FIELDS double
+	for( $i = 1 ; $i <= 5; $i++ )
+	{	// For each custom double field:
+		$Form->hidden( 'item_double'.$i, $edited_Item->{'double'.$i} );
+	}
+	// CUSTOM FIELDS varchar
+	for( $i = 1 ; $i <= 3; $i++ )
+	{	// For each custom varchar field:
+		$Form->hidden( 'item_varchar'.$i, $edited_Item->{'varchar'.$i} );
+	}
+
+	// TODO: Form::hidden() do not add, if NULL?!
 
 ?>
 
@@ -266,6 +267,9 @@ echo_publishnowbutton_js();
 
 /*
  * $Log$
+ * Revision 1.32  2010/01/03 13:45:36  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.31  2009/12/08 20:16:12  fplanque
  * Better handling of the publish! button on post forms
  *

@@ -31,9 +31,10 @@ $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) )
 
 $Form->begin_form( 'fform', sprintf( $creating ?  T_('New widget %s in %s') : T_('Edit widget %s in %s'), $edited_ComponentWidget->get_name(), $edited_ComponentWidget->get( 'sco_name' ) ) );
 
-$Form->hidden( 'action', $creating ? 'create' : 'update' );
-$Form->hidden( 'wi_ID', $edited_ComponentWidget->ID );
-$Form->hiddens_by_key( get_memorized( 'action' ) );
+	$Form->add_crumb( 'widget' );
+	$Form->hidden( 'action', $creating ? 'create' : 'update' );
+	$Form->hidden( 'wi_ID', $edited_ComponentWidget->ID );
+	$Form->hiddens_by_key( get_memorized( 'action' ) );
 
 // Display properties:
 $Form->begin_fieldset( T_('Properties') );
@@ -79,6 +80,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/03 13:45:38  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.8  2009/03/08 23:57:46  fplanque
  * 2009
  *

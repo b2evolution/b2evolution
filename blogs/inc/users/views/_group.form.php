@@ -88,9 +88,10 @@ else
 	$Form->begin_form( 'fform', $title );
 }
 
-$Form->hidden_ctrl();
-$Form->hidden( 'action', 'update' );
-$Form->hidden( 'grp_ID', $edited_Group->ID );
+	$Form->add_crumb( 'group' );
+	$Form->hidden_ctrl();
+	$Form->hidden( 'action', 'update' );
+	$Form->hidden( 'grp_ID', $edited_Group->ID );
 
 $perm_none_option = array( 'none', T_('No Access') );
 $perm_view_option = array( 'view', T_('View details') );
@@ -225,6 +226,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.22  2010/01/03 13:45:37  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.21  2009/12/06 22:55:22  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

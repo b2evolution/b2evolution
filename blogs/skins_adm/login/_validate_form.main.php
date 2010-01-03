@@ -41,6 +41,7 @@ $Form = & new Form( $htsrv_url_sensitive.'login.php', 'form_validatemail', 'post
 
 $Form->begin_form( 'fform' );
 
+$Form->add_crumb( 'validateform' );
 $Form->hidden( 'action', 'req_validatemail');
 $Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 $Form->hidden( 'req_validatemail_submit', 1 ); // to know if the form has been submitted
@@ -66,6 +67,7 @@ if( $current_User->group_ID == 1 )
 	$Form = & new Form( $htsrv_url_sensitive.'login.php', 'form_validatemail', 'post', 'fieldset' );
 	$Form->begin_form( 'fform' );
 
+	$Form->add_crumb( 'validateform' );
 	$Form->hidden( 'action', 'validatemail');
 	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 	$Form->hidden( 'reqID', 1 );
@@ -90,6 +92,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.4  2010/01/03 13:45:37  fplanque
+ * set some crumbs (needs checking)
+ *
  * Revision 1.3  2009/03/08 23:58:09  fplanque
  * 2009
  *
