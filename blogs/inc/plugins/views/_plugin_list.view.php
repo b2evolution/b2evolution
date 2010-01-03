@@ -235,18 +235,18 @@ $Results->cols[] = array(
 function plugin_results_td_actions($Plugin)
 {
 	global $dispatcher;
-	
+
 	$r = '';
 	if( $Plugin->status == 'enabled' )
 	{
-		$r .= action_icon( T_('Disable the plugin!'), 'deactivate', $dispatcher.'?ctrl=plugins&amp;action=disable_plugin&amp;plugin_ID='.$Plugin->ID );
+		$r .= action_icon( T_('Disable the plugin!'), 'deactivate', $dispatcher.'?ctrl=plugins&amp;action=disable_plugin&amp;plugin_ID='.$Plugin->ID.'&amp;'.url_crumb('plugin') );
 	}
 	elseif( $Plugin->status != 'broken' )
 	{
-		$r .= action_icon( T_('Enable the plugin!'), 'activate', $dispatcher.'?ctrl=plugins&amp;action=enable_plugin&amp;plugin_ID='.$Plugin->ID );
+		$r .= action_icon( T_('Enable the plugin!'), 'activate', $dispatcher.'?ctrl=plugins&amp;action=enable_plugin&amp;plugin_ID='.$Plugin->ID.'&amp;'.url_crumb('plugin') );
 	}
 	$r .= $Plugin->get_edit_settings_link();
-	$r .= action_icon( T_('Un-install this plugin!'), 'delete', $dispatcher.'?ctrl=plugins&amp;action=uninstall&amp;plugin_ID='.$Plugin->ID );
+	$r .= action_icon( T_('Un-install this plugin!'), 'delete', $dispatcher.'?ctrl=plugins&amp;action=uninstall&amp;plugin_ID='.$Plugin->ID.'&amp;'.url_crumb('plugin') );
 	return $r;
 }
 if( $current_User->check_perm( 'options', 'edit', false ) )
@@ -262,7 +262,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 if( $current_User->check_perm( 'options', 'edit' ) )
 { // Display action link to reload plugins:
-	$Results->global_icon( T_('Reload events and codes for installed plugins.'), 'reload', regenerate_url( 'action', 'action=reload_plugins' ), T_('Reload plugins'), 3, 4 );
+	$Results->global_icon( T_('Reload events and codes for installed plugins.'), 'reload', regenerate_url( 'action', 'action=reload_plugins' ).'&amp;'.url_crumb('plugin'), T_('Reload plugins'), 3, 4 );
 }
 
 $Results->global_icon( T_('Install new plugin...'), 'new', regenerate_url( 'action', 'action=list_available' ), T_('Install new'), 3, 4 );
@@ -279,6 +279,10 @@ unset($Results); // free memory
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/03 12:26:32  fplanque
+ * Crumbs for plugins. This is a little bit tough because it's a non standard controller.
+ * There may be missing crumbs, especially during install. Please add missing ones when you spot them.
+ *
  * Revision 1.6  2009/12/09 17:39:08  blueyed
  * typos
  *

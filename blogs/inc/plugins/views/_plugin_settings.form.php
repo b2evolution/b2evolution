@@ -49,9 +49,7 @@ global $admin_url;
 load_funcs('plugins/_plugin.funcs.php');
 
 
-$Form = & new Form( NULL, 'pluginsettings_checkchanges' );
-$Form->hidden_ctrl();
-
+$Form = new Form( NULL, 'pluginsettings_checkchanges' );
 
 // Info button:
 $Form->global_icon( T_('Display info'), 'info', regenerate_url( 'action,plugin_class', 'action=info&amp;plugin_class='.$edit_Plugin->classname ) );
@@ -63,7 +61,9 @@ $Form->begin_form( 'fform', '',
 	// enable all form elements on submit (so values get sent):
 	array( 'onsubmit'=>'var es=this.elements; for( var i=0; i < es.length; i++ ) { es[i].disabled=false; };' ) );
 
-$Form->hidden( 'plugin_ID', $edit_Plugin->ID );
+	$Form->add_crumb( 'plugin' );
+	$Form->hidden_ctrl();
+	$Form->hidden( 'plugin_ID', $edit_Plugin->ID );
 
 
 // --------------------------- INFO ---------------------------
@@ -111,15 +111,15 @@ if( $edit_Plugin->Settings ) // NOTE: this triggers PHP5 autoloading through Plu
 
 // --------------------------- VARIABLES ---------------------------
 $Form->begin_fieldset( T_('Plugin variables').' ('.T_('Advanced').')', array( 'class' => 'clear' ) );
-$Form->text_input( 'edited_plugin_code', $edited_plugin_code, 15, T_('Code'), T_('The code to call the plugin by code. This is also used to link renderer plugins to items.'), array('maxlength'=>32) );
-$Form->text_input( 'edited_plugin_priority', $edited_plugin_priority, 4, T_('Priority'), '', array( 'maxlength' => 4 ) );
-$render_note = get_manual_link('Plugin/apply_rendering');
-if( empty( $edited_plugin_code ) )
-{
-	$render_note .= ' '.T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
-}
-$Form->select_input_array( 'edited_plugin_apply_rendering', $edited_plugin_apply_rendering,
-		$admin_Plugins->get_apply_rendering_values(), T_('Apply rendering'), $render_note );
+	$Form->text_input( 'edited_plugin_code', $edited_plugin_code, 15, T_('Code'), T_('The code to call the plugin by code. This is also used to link renderer plugins to items.'), array('maxlength'=>32) );
+	$Form->text_input( 'edited_plugin_priority', $edited_plugin_priority, 4, T_('Priority'), '', array( 'maxlength' => 4 ) );
+	$render_note = get_manual_link('Plugin/apply_rendering');
+	if( empty( $edited_plugin_code ) )
+	{
+		$render_note .= ' '.T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
+	}
+	$Form->select_input_array( 'edited_plugin_apply_rendering', $edited_plugin_apply_rendering,
+			$admin_Plugins->get_apply_rendering_values(), T_('Apply rendering'), $render_note );
 $Form->end_fieldset();
 
 
@@ -187,6 +187,10 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/03 12:26:32  fplanque
+ * Crumbs for plugins. This is a little bit tough because it's a non standard controller.
+ * There may be missing crumbs, especially during install. Please add missing ones when you spot them.
+ *
  * Revision 1.4  2009/03/08 23:57:45  fplanque
  * 2009
  *

@@ -174,7 +174,7 @@ while( $loop_Plugin = & $AvailablePlugins->get_next() )
 					     || $registrations < $loop_Plugin->number_of_installs ) )
 			{ // number of installations are not limited or not reached yet and user has "edit options" perms
 				?>
-				[<a href="<?php echo $dispatcher ?>?ctrl=plugins&amp;action=install&amp;plugin=<?php echo rawurlencode($loop_Plugin->classname) ?>"><?php
+				[<a href="<?php echo $dispatcher ?>?ctrl=plugins&amp;action=install&amp;plugin=<?php echo rawurlencode($loop_Plugin->classname).'&amp;'.url_crumb('plugin') ?>"><?php
 					echo T_('Install');
 					if( $registrations )
 					{	// This plugin is already installed
@@ -214,6 +214,10 @@ echo '</p>';
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/03 12:26:32  fplanque
+ * Crumbs for plugins. This is a little bit tough because it's a non standard controller.
+ * There may be missing crumbs, especially during install. Please add missing ones when you spot them.
+ *
  * Revision 1.8  2009/09/14 13:30:09  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

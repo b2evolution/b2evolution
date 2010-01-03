@@ -172,6 +172,10 @@ switch( $action )
 {
 	case 'disable_plugin':
 		// Disable a plugin, only if it is "enabled"
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'plugin' );
+
 		$current_User->check_perm( 'options', 'edit', true );
 
 		param( 'plugin_ID', 'integer', true );
@@ -209,6 +213,10 @@ switch( $action )
 
 	case 'enable_plugin':
 		// Try to enable a plugin, only if it is in state "disabled" or "needs_config"
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'plugin' );
+
 		$current_User->check_perm( 'options', 'edit', true );
 
 		param( 'plugin_ID', 'integer', true );
@@ -273,6 +281,10 @@ switch( $action )
 		// Register new events
 		// Unregister obsolete events
 		// Detect plugins with no code and try to have at least one plugin with the default code
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'plugin' );
+
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -322,6 +334,10 @@ switch( $action )
 	case 'install':
 		// Install a plugin. This may be a two-step action, when DB changes have to be confirmed
 		$action = 'list';
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'plugin' );
+
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -338,6 +354,13 @@ switch( $action )
 
 	case 'install_db_schema':
 		// we come here from the first step ("install")
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'plugin' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
 		param( 'plugin_ID', 'integer', 0 );
 
 		if( $plugin_ID )
@@ -387,9 +410,14 @@ switch( $action )
 
 
 	case 'uninstall':
+		// Uninstall plugin:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'plugin' );
+
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
-		// Uninstall plugin:
+
 		param( 'plugin_ID', 'integer', true );
 		param( 'uninstall_confirmed_drop', 'integer', 0 );
 
@@ -463,6 +491,9 @@ switch( $action )
 
 	case 'update_settings':
 		// Update plugin settings:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'plugin' );
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -674,7 +705,12 @@ switch( $action )
 		break;
 
 
-	case 'default_settings': // Restore default settings
+	case 'default_settings':
+		// Restore default settings
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'plugin' );
+
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -779,6 +815,10 @@ switch( $action )
 	case 'info':
 	case 'disp_help':
 	case 'disp_help_plain': // just the help, without any payload
+
+		// Check permission: (with plugins... you never know...)
+		$current_User->check_perm( 'options', 'edit', true );
+
 		param( 'plugin_class', 'string', true );
 
 		if( ! ( $edit_Plugin = & $admin_Plugins->get_by_classname( $plugin_class ) ) )
@@ -800,13 +840,6 @@ switch( $action )
 		break;
 
 }
-
-/*
-if( 1 || $Settings->get( 'plugins_disp_log_in_admin' ) )
-{
-	$Messages->add_messages( $Debuglog->get_messages('plugins') );
-}
-*/
 
 
 // Extend titlearea for some actions and add JS:
@@ -1063,6 +1096,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2010/01/03 12:26:32  fplanque
+ * Crumbs for plugins. This is a little bit tough because it's a non standard controller.
+ * There may be missing crumbs, especially during install. Please add missing ones when you spot them.
+ *
  * Revision 1.14  2009/12/06 22:55:22  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)
@@ -1076,80 +1113,5 @@ $AdminUI->disp_global_footer();
  *
  * Revision 1.11  2009/07/06 23:52:24  sam2kb
  * Hardcoded "admin.php" replaced with $dispatcher
- *
- * Revision 1.10  2009/05/26 16:56:55  fplanque
- * keeping cool on the gets...
- *
- * Revision 1.9  2009/05/10 17:00:45  tblue246
- * Fix plugin info screen
- *
- * Revision 1.8  2009/03/08 23:57:45  fplanque
- * 2009
- *
- * Revision 1.7  2009/02/26 22:16:54  blueyed
- * Use load_class for classes (.class.php), and load_funcs for funcs (.funcs.php)
- *
- * Revision 1.6  2008/02/19 11:11:18  fplanque
- * no message
- *
- * Revision 1.5  2008/01/21 09:35:32  fplanque
- * (c) 2008
- *
- * Revision 1.4  2007/12/18 10:24:50  yabs
- * bugfix ( http://forums.b2evolution.net/viewtopic.php?t=13589 )
- *
- * Revision 1.3  2007/08/21 22:32:31  blueyed
- * Use get_Cache() for singleton $Plugins_admin instance. This fixes at least the installation of flickr_plugin.
- *
- * Revision 1.2  2007/07/04 23:38:27  blueyed
- * Fixed unregistration of plugin instances to get the default code.
- *
- * Revision 1.1  2007/06/25 11:00:43  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.79  2007/06/19 20:41:11  fplanque
- * renamed generic functions to autoform_*
- *
- * Revision 1.78  2007/06/19 18:47:27  fplanque
- * Nuked unnecessary Param (or I'm missing something badly :/)
- *
- * Revision 1.77  2007/04/26 00:11:14  fplanque
- * (c) 2007
- *
- * Revision 1.76  2007/01/14 08:21:01  blueyed
- * Optimized "info", "disp_help" and "disp_help_plain" actions by refering to them through classname, which makes Plugins::discover() unnecessary
- *
- * Revision 1.75  2007/01/14 05:53:14  blueyed
- * Optimized init of "info" action: do not discover available Plugins, if not necessary
- *
- * Revision 1.74  2007/01/10 21:41:00  blueyed
- * Step 2 is installing the DB changes
- *
- * Revision 1.73  2007/01/07 05:26:01  fplanque
- * doc
- *
- * Revision 1.72  2006/12/20 23:07:23  blueyed
- * Moved list of available plugins to separate sub-screen/form
- *
- * Revision 1.71  2006/12/04 22:34:30  blueyed
- * Use Plugins_admin::register() to instantiate $default_Plugin
- *
- * Revision 1.70  2006/12/01 20:41:37  blueyed
- * Moved Plugins::uninstall() to Plugins_admin class
- *
- * Revision 1.69  2006/12/01 20:01:38  blueyed
- * Moved Plugins::validate_dependencies() to Plugins_admin class
- *
- * Revision 1.68  2006/11/30 05:43:39  blueyed
- * Moved Plugins::discover() to Plugins_admin::discover(); Renamed Plugins_no_DB to Plugins_admin_no_DB (and deriving from Plugins_admin)
- *
- * Revision 1.67  2006/11/30 00:30:33  blueyed
- * Some minor memory optimizations regarding "Plugins" screen
- *
- * Revision 1.66  2006/11/26 23:40:34  blueyed
- * trans
- *
- * Revision 1.65  2006/11/26 01:42:09  fplanque
- * doc
  */
 ?>
