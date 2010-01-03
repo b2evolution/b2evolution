@@ -459,7 +459,7 @@ else
 
 // APC extension
 $opcode_cache = get_active_opcode_cache();
-init_system_check( T_( 'PHP opcode extension' ), $opcode_cache );
+init_system_check( T_( 'PHP opcode cache' ), $opcode_cache );
 if( $opcode_cache == 'none' )
 {
 	disp_system_check( 'warning', T_( 'Using an opcode cache allows all your PHP scripts to run faster by caching a "compiled" (opcode) verison of the scripts instead of recompiling everything at every page load. Several opcode caches are available. We recommend APC.' ) );
@@ -574,6 +574,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2010/01/03 12:39:08  fplanque
+ * no message
+ *
  * Revision 1.24  2009/12/24 12:32:07  waltercruz
  * Minor
  *
