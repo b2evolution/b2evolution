@@ -31,8 +31,9 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'a
 { // add keyword or domain
 	global $keyword;
 
-	$Form = & new Form( NULL, 'antispam_add', 'post', 'compact' );
+	$Form = new Form( NULL, 'antispam_add', 'post', 'compact' );
 	$Form->begin_form( 'fform', T_('Add a banned keyword') );
+		$Form->add_crumb('antispam');
 		$Form->hidden_ctrl();
 		$Form->hidden( 'action', 'ban' );
 		$Form->text( 'keyword', $keyword, 50, T_('Keyword/phrase to ban'), '', 80 ); // TODO: add note
@@ -56,7 +57,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 { // User can edit:
 	?>
 	<p class="center">
-		[<a href="?ctrl=antispam&amp;action=poll"><?php echo T_('Request abuse update from centralized blacklist!') ?></a>]
+		[<a href="?ctrl=antispam&amp;action=poll&amp;<?php echo url_crumb('antispam') ?>"><?php echo T_('Request abuse update from centralized blacklist!') ?></a>]
 		[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
 	</p>
 	<?php
@@ -145,7 +146,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 { // User can edit, spamlist: add controls to output columns:
 	// Add CHECK to 1st column:
 	$Results->cols[0]['td'] = action_icon( TS_('Allow keyword back (Remove it from the blacklist)'), 'allowback',
-															 '?ctrl=antispam&amp;action=remove&amp;hit_ID=$aspm_ID$' )
+															 '?ctrl=antispam&amp;action=remove&amp;hit_ID=$aspm_ID$&amp;'.url_crumb('antispam') )
 															 .$Results->cols[0]['td'];
 
 	// Add a column for actions:
@@ -178,6 +179,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/03 17:56:05  fplanque
+ * crumbs & stuff
+ *
  * Revision 1.6  2009/09/25 20:26:27  fplanque
  * fixes/doc
  *

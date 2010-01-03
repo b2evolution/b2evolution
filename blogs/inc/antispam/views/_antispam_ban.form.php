@@ -191,8 +191,9 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 $Form->end_form();
 
 
-$Form = & new Form( NULL, 'antispam_add', 'post', 'compact' );
+$Form = new Form( NULL, 'antispam_add', 'post', 'compact' );
 $Form->begin_form( 'fform', T_('Add a banned keyword') );
+	$Form->add_crumb('antispam');
 	$Form->hidden_ctrl();
 	$Form->hidden( 'action', 'ban' );
 	$Form->text( 'keyword', $keyword, 50, T_('Keyword/phrase to ban'), '', 80 ); // TODO: add note
@@ -204,6 +205,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.14  2010/01/03 17:56:05  fplanque
+ * crumbs & stuff
+ *
  * Revision 1.13  2010/01/03 13:45:38  fplanque
  * set some crumbs (needs checking)
  *
