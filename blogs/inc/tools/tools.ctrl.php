@@ -58,6 +58,9 @@ if( empty($tab) )
 	switch( $action )
 	{
 		case 'del_itemprecache':
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'tools' );
+
 			// TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
 			$current_User->check_perm('options', 'edit', true);
 
@@ -68,6 +71,9 @@ if( empty($tab) )
 
 		case 'del_pagecache':
 			// Delete the page cache /blogs/cache
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'tools' );
+
 			// fp> TODO: have an option to only PRUNE files older than for example 30 days
 			$current_User->check_perm('options', 'edit', true);
 
@@ -109,6 +115,9 @@ if( empty($tab) )
 
 		case 'del_filecache':
 			// delete the thumbnail cahces .evocache
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'tools' );
+
 			// fp> TODO: have an option to only PRUNE files older than for example 30 days
 			$current_User->check_perm('options', 'edit', true);
 
@@ -136,6 +145,9 @@ if( empty($tab) )
 
 		case 'optimize_tables':
 			// Optimize MyISAM tables
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'tools' );
+
 			$current_User->check_perm('options', 'edit', true);
 
 			global $tableprefix;
@@ -167,95 +179,6 @@ if( empty($tab) )
 				$Messages->add( T_('Database tables are already optimized.'), 'success' );
 			}
 			break;
-
-		case 'backup_db':
-			/* Tblue> There are a few problems with using the mysqldump program:
-			 *          - Windows hosts (?)
-			 *          - Shared hosting (perhaps no access to MySQL helper programs)
-			 *          - Hosting with PHP's safe_mode enabled (because
-			 *            only files from the safe_mode_exec_dir can be
-			 *            executed).
-			 *          - The DB password passed to mysqldump can show up
-			 *            in the process list.
-			 *         Perhaps it would be better to directly query the
-			 *         database (and halt the script if we run out of time;
-			 *         the user would then need to click on a link to resume
-			 *         the backup process. For this to work, we would need
-			 *         to "remember" the progress at the time the script
-			 *         had to halt.).
-			 *
-			 * Tblue> 2009-10-16: DB backups are now handled by BackupSettings::backup_database(),
-			 *                    thus this code here is obsolete - we now have two different
-			 *                    methods to backup the DB! That's redundant.
-			 * fp> I think the backup tab is more powerful. So I am commenting this out.
-			 *  Please let me know if we are losing functionality by disabling the following...
-
-			$current_User->check_perm('options', 'edit', true);
-
-			if( $current_User->Group->ID != 1 )
-			{
-				$Messages->add( T_('You don\'t have permission to backup the database.'), 'error' );
-				break;
-			}
-
-			$dump_filename = dirname(__FILE__).'/'.$DB->dbname.'.sql';
-
-			// Get the MySQL basedir path
-			$mysql_basedir = $DB->get_var( 'SHOW VARIABLES LIKE \'basedir\'', 1 );
-			if( empty( $mysql_basedir ) )
-			{	// Tblue> Is this even possible?
-				$Messages->add( T_( 'Could not get MySQL base directory!' ), 'error' );
-				break;
-			}
-
-			// Dump the database
-			$backup_cmd = trailing_slash( $mysql_basedir ).'bin/mysqldump'
-						 .' --host='.escapeshellarg( $DB->dbhost )
-						 .' --user='.escapeshellarg( $DB->dbuser )
-						 // Tblue> Note: Could be a security risk (shows up in process list)!
-						 .' --password='.escapeshellarg( $DB->dbpassword )
-						 .' --opt '.escapeshellarg( $DB->dbname )
-						 .' 2>&1 > '.$dump_filename;
-
-			@exec( $backup_cmd, $output, $res );
-			if( $res > 0 )
-			{
-				//$Messages->add( sprintf( T_('Backup failed (command: %s): %s'), $backup_cmd, '<br />'.implode( '<br />', $output) ), 'error' );
-				$Messages->add( sprintf( T_('Backup failed: %s'), '<br />'.implode( '<br />', $output) ), 'error' );
-				break;
-			}
-
-			// Compress and download the file
-			load_class( '_ext/_zip_archives.php', 'zip_file' );
-
-			$options = array(
-				'basedir'	=> dirname(__FILE__),
-				'inmemory'	=> 1,
-				'overwrite'	=> 1,
-				'type'		=> 'zip',
-			);
-
-			$zipfile = & new zip_file( $DB->dbname.'.zip' );
-			$zipfile->set_options( $options );
-			$zipfile->add_files( $DB->dbname.'.sql' );
-			$zipfile->create_archive();
-
-			if( $zipfile->error )
-			{
-				foreach($zipfile->error as $v)
-				{
-					$Messages->add( $v, 'error' );
-				}
-				break;
-			}
-
-			// Delete dump file
-			@unlink($dump_filename);
-
-			// Download compressed file
-			$zipfile->download_file();
-			break;
-		*/
 	}
 }
 
@@ -278,7 +201,7 @@ $AdminUI->disp_payload_begin();
 if( empty($tab) )
 {
 
-	$block_item_Widget = & new Widget( 'block_item' );
+	$block_item_Widget = new Widget( 'block_item' );
 
 
 	// Event AdminToolPayload for each Plugin:
@@ -299,16 +222,16 @@ if( empty($tab) )
 		// dh> TODO: add link to delete all caches at once?
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 		echo '<ul>';
-		echo '<li><a href="'.regenerate_url('action', 'action=del_itemprecache').'">'.T_('Clear pre-renderered item cache (DB)').'</a></li>';
-		echo '<li><a href="'.regenerate_url('action', 'action=del_pagecache').'">'.T_('Clear full page cache (/cache directory)').'</a></li>';
-		echo '<li><a href="'.regenerate_url('action', 'action=del_filecache').'">'.T_('Clear thumbnail caches (.evocache directories)').'</a></li>';
+		echo '<li><a href="'.regenerate_url('action', 'action=del_itemprecache&amp;'.url_crumb('tools')).'">'.T_('Clear pre-renderered item cache (DB)').'</a></li>';
+		echo '<li><a href="'.regenerate_url('action', 'action=del_pagecache&amp;'.url_crumb('tools')).'">'.T_('Clear full page cache (/cache directory)').'</a></li>';
+		echo '<li><a href="'.regenerate_url('action', 'action=del_filecache&amp;'.url_crumb('tools')).'">'.T_('Clear thumbnail caches (.evocache directories)').'</a></li>';
 		echo '</ul>';
 		$block_item_Widget->disp_template_raw( 'block_end' );
 
 		$block_item_Widget->title = T_('Database management');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 		echo '<ul>';
-		echo '<li><a href="'.regenerate_url('action', 'action=optimize_tables').'">'.T_('Optimize database tables (MyISAM tables used for sessions & logs)').'</a></li>';
+		echo '<li><a href="'.regenerate_url('action', 'action=optimize_tables&amp;'.url_crumb('tools')).'">'.T_('Optimize database tables (MyISAM tables used for sessions & logs)').'</a></li>';
 		// echo '<li><a href="'.regenerate_url('action', 'action=backup_db').'">'.T_('Backup database').'</a></li>';
 		echo '</ul>';
 		$block_item_Widget->disp_template_raw( 'block_end' );
@@ -362,6 +285,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2010/01/03 18:07:37  fplanque
+ * crumbs
+ *
  * Revision 1.20  2009/12/06 22:55:20  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)
