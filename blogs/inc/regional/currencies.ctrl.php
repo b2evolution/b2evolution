@@ -92,6 +92,9 @@ switch( $action )
 		// Insert new currency:
 		$edited_Currency = & new Currency();
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'currency' );
+
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -144,6 +147,9 @@ switch( $action )
 	case 'update':
 		// Edit currency form:
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'currency' );
+
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -180,6 +186,9 @@ switch( $action )
 
 	case 'delete':
 		// Delete currency:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'currency' );
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -238,7 +247,7 @@ switch( $action )
 		// We need to ask for confirmation:
 		$edited_Currency->confirm_delete(
 				sprintf( T_('Delete currency &laquo;%s&raquo;?'), $edited_Currency->dget('name') ),
-				$action, get_memorized( 'action' ) );
+				'currency', $action, get_memorized( 'action' ) );
 	case 'new':
 	case 'create':
 	case 'create_new':
@@ -264,6 +273,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/03 12:03:17  fplanque
+ * More crumbs...
+ *
  * Revision 1.9  2009/12/06 22:55:19  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

@@ -163,7 +163,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Message->confirm_delete( T_('Delete message?'),
-				$action, get_memorized( 'action' ) );
+				'message', $action, get_memorized( 'action' ) );
 	default:
 		// No specific request, list all messages:
 		// Cleanup context:
@@ -181,6 +181,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2010/01/03 12:03:17  fplanque
+ * More crumbs...
+ *
  * Revision 1.14  2009/12/06 22:55:20  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

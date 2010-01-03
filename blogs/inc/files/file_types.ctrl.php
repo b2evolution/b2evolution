@@ -203,7 +203,7 @@ switch( $action )
 		// We need to ask for confirmation:
 		$edited_Filetype->confirm_delete(
 				sprintf( T_('Delete file type &laquo;%s&raquo;?'),  $edited_Filetype->dget('name') ),
-				$action, get_memorized( 'action' ) );
+				'filetype', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':
 	case 'copy':
@@ -232,6 +232,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/03 12:03:17  fplanque
+ * More crumbs...
+ *
  * Revision 1.6  2009/12/06 22:55:17  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

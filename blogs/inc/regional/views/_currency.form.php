@@ -47,6 +47,7 @@ $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) )
 
 $Form->begin_form( 'fform', $creating ?  T_('New currency') : T_('Currency') );
 
+	$Form->add_crumb( 'currency' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',curr_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
 	$Form->text_input( 'curr_code', $edited_Currency->code, 3, T_('Code'), '', array( 'maxlength'=> 3, 'required'=>true ) );
@@ -70,6 +71,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/03 12:03:17  fplanque
+ * More crumbs...
+ *
  * Revision 1.5  2009/09/03 23:52:34  fplanque
  * minor
  *

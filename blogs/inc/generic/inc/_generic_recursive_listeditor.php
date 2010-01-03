@@ -235,7 +235,7 @@ switch( $action )
 		{	// We need to ask for confirmation:
 			$edited_GenericCategory->confirm_delete(
 					sprintf( T_('Delete element &laquo;%s&raquo;?'),  $edited_GenericCategory->dget( 'name' ) ),
-					$action, get_memorized( 'action' ) );
+					'element', $action, get_memorized( 'action' ) );
 		}
 
 		if( $form_below_list )
@@ -299,6 +299,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/03 12:03:17  fplanque
+ * More crumbs...
+ *
  * Revision 1.4  2009/08/30 19:54:24  fplanque
  * less translation messgaes for infrequent errors
  *

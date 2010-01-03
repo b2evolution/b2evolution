@@ -183,7 +183,7 @@ switch( $action )
 		// We need to ask for confirmation:
 		$edited_Skin->confirm_delete(
 				sprintf( T_('Uninstall skin &laquo;%s&raquo;?'),  $edited_Skin->dget( 'name' ) ),
-				$action, get_memorized( 'action' ) );
+				'skin', $action, get_memorized( 'action' ) );
 	case 'edit':
 	case 'update':	// we return in this state after a validation error
 		// Display VIEW:
@@ -204,6 +204,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/03 12:03:18  fplanque
+ * More crumbs...
+ *
  * Revision 1.8  2009/12/06 22:55:22  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

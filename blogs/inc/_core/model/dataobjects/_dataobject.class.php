@@ -164,7 +164,7 @@ class DataObject
 				$sql_changes[] = "`$loop_dbfieldname` = `".$loop_dbchange['value'].'` ';
 				continue;
 			}
-			
+
 			// Get changed value (we use eval() to allow constructs like $loop_dbchange['value'] = 'Group->get(\'ID\')'):
 			eval( '$loop_value = $this->'.$loop_dbchange['value'].';' );
 			// Prepare matching statement:
@@ -446,15 +446,15 @@ class DataObject
 	 * Displays form to confirm deletion of this object
 	 *
 	 * @param string Title for confirmation
+	 * @param string crumb name
 	 * @param string "action" param value to use (hidden field)
 	 * @param array Hidden keys (apart from "action")
-	 * @param string most of the time we don't need a cancel action since we'll want to return to the default display
 	 */
-	function confirm_delete( $confirm_title, $delete_action, $hiddens, $cancel_action = NULL )
+	function confirm_delete( $confirm_title, $crumb_name, $delete_action, $hiddens )
 	{
 		global $Messages;
 
-		$block_item_Widget = & new Widget( 'block_item' );
+		$block_item_Widget = new Widget( 'block_item' );
 
 		$block_item_Widget->title = $confirm_title;
 		$block_item_Widget->disp_template_replaced( 'block_start' );
@@ -470,23 +470,20 @@ class DataObject
 		echo '<p class="warning">'.$confirm_title.'</p>';
 		echo '<p class="warning">'.T_('THIS CANNOT BE UNDONE!').'</p>';
 
-		$Form = & new Form( '', 'form_confirm', 'get', '' );
+		$Form = new Form( '', 'form_confirm', 'get', '' );
 
 		$Form->begin_form( 'inline' );
+			$Form->add_crumb( $crumb_name );
 			$Form->hiddens_by_key( $hiddens );
 			$Form->hidden( 'action', $delete_action );
 			$Form->hidden( 'confirm', 1 );
 			$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton' ) );
 		$Form->end_form();
 
-		$Form = & new Form( '', 'form_cancel', 'get', '' );
+		$Form = new Form( '', 'form_cancel', 'get', '' );
 
 		$Form->begin_form( 'inline' );
 			$Form->hiddens_by_key( $hiddens );
-			if( !empty( $cancel_action ) )
-			{
-				$Form->hidden( 'action', $cancel_action );
-			}
 			$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
 		$Form->end_form();
 
@@ -819,6 +816,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.33  2010/01/03 12:03:17  fplanque
+ * More crumbs...
+ *
  * Revision 1.32  2009/12/01 02:04:45  fplanque
  * minor
  *

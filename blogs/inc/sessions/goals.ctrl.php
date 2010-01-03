@@ -240,7 +240,7 @@ switch( $action )
 		// We need to ask for confirmation:
 		$edited_Goal->confirm_delete(
 				sprintf( T_('Delete goal &laquo;%s&raquo;?'), $edited_Goal->dget('name') ),
-				$action, get_memorized( 'action' ) );
+				'goal', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':
 	case 'copy':
@@ -278,6 +278,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2010/01/03 12:03:17  fplanque
+ * More crumbs...
+ *
  * Revision 1.19  2009/12/12 01:13:08  fplanque
  * A little progress on breadcrumbs on menu structures alltogether...
  *

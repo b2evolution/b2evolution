@@ -43,13 +43,14 @@ global $edited_Country;
 global $action;
 $creating = is_create_action( $action );
 
-$Form = & new Form( NULL, 'country_checkchanges', 'post', 'compact' );
+$Form = new Form( NULL, 'country_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Delete this country!'), 'delete', regenerate_url( 'action', 'action=delete' ) );
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', $creating ?  T_('New country') : T_('Country') );
 
+	$Form->add_crumb( 'country' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',ctry_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
 	$Form->text_input( 'ctry_code', $edited_Country->code, 2, T_('Code'), '', array( 'maxlength'=> 2, 'required'=>true ) );
@@ -75,6 +76,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.11  2010/01/03 12:03:17  fplanque
+ * More crumbs...
+ *
  * Revision 1.10  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *

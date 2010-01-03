@@ -64,6 +64,9 @@ switch( $action )
 {
 	case 'disable_country':
 	case 'enable_country':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'country' );
+
 		// Disable a country only if it is enabled, and user has edit access.
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -88,9 +91,9 @@ switch( $action )
 		// Update db with new flag value.
 		$edited_Country->dbupdate();
 
-		// Reload list.
-		$action = 'list';
-// fp > TODO: REDIRECT 303!
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=countries', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 
 	case 'new':
@@ -120,7 +123,10 @@ switch( $action )
 	case 'create_new': // Record country and create new
 	case 'create_copy': // Record country and create similar
 		// Insert new country:
-		$edited_Country = & new Country();
+		$edited_Country = new Country();
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'country' );
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -174,6 +180,9 @@ switch( $action )
 	case 'update':
 		// Edit country form:
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'country' );
+
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -210,6 +219,9 @@ switch( $action )
 
 	case 'delete':
 		// Delete country:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'country' );
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -267,7 +279,7 @@ switch( $action )
 		// We need to ask for confirmation:
 		$edited_Country->confirm_delete(
 				sprintf( T_('Delete country &laquo;%s&raquo;?'), $edited_Country->dget('name') ),
-				$action, get_memorized( 'action' ) );
+				'country', $action, get_memorized( 'action' ) );
 	case 'new':
 	case 'create':
 	case 'create_new':
@@ -293,6 +305,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/03 12:03:17  fplanque
+ * More crumbs...
+ *
  * Revision 1.9  2009/12/06 22:55:19  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

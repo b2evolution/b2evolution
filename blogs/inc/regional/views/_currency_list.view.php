@@ -37,7 +37,7 @@ global $dispatcher;
 $s = param( 's', 'string', '', true );
 
 //Create query
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( '*' );
 $SQL->FROM( 'T_currency' );
 
@@ -48,7 +48,7 @@ if( !empty($s) )
 }
 
 // Create result set:
-$Results = & new Results( $SQL->get(), 'curr_' );
+$Results = new Results( $SQL->get(), 'curr_' );
 
 $Results->Cache = & get_CurrencyCache();
 
@@ -113,7 +113,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	                    .action_icon( T_('Duplicate this currency...'), 'copy',
 	                        '%regenerate_url( \'action\', \'curr_ID=$curr_ID$&amp;action=new\')%' )
 	                    .action_icon( T_('Delete this currency!'), 'delete',
-	                        '%regenerate_url( \'action\', \'curr_ID=$curr_ID$&amp;action=delete\')%' ),
+	                        '%regenerate_url( \'action\', \'curr_ID=$curr_ID$&amp;action=delete&amp;'.url_crumb('currency').'\')%' ),
 						);
 
   $Results->global_icon( T_('Create a new currency ...'), 'new', regenerate_url( 'action', 'action=new'), T_('New currency').' &raquo;', 3, 4  );
@@ -123,6 +123,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/03 12:03:17  fplanque
+ * More crumbs...
+ *
  * Revision 1.7  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *

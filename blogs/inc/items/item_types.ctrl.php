@@ -282,7 +282,7 @@ switch( $action )
 		// We need to ask for confirmation:
 		$edited_Itemtype->confirm_delete(
 				sprintf( T_('Delete item type &laquo;%s&raquo;?'),  $edited_Itemtype->dget('name') ),
-				$action, get_memorized( 'action' ) );
+				'itemtype', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':
 	case 'create':
@@ -311,6 +311,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2010/01/03 12:03:18  fplanque
+ * More crumbs...
+ *
  * Revision 1.11  2009/12/12 01:13:08  fplanque
  * A little progress on breadcrumbs on menu structures alltogether...
  *

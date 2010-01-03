@@ -265,7 +265,7 @@ switch( $action )
 		{	// We need to ask for confirmation:
 			$edited_GenericElement->confirm_delete(
 					sprintf( T_('Delete element &laquo;%s&raquo;?'),  $edited_GenericElement->dget( 'name' ) ),
-					$action, get_memorized( 'action' ) );
+					'element', $action, get_memorized( 'action' ) );
 		}
 
 		if( $form_below_list )
@@ -320,6 +320,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/03 12:03:17  fplanque
+ * More crumbs...
+ *
  * Revision 1.7  2009/12/12 01:13:08  fplanque
  * A little progress on breadcrumbs on menu structures alltogether...
  *

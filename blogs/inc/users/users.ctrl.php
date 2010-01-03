@@ -304,7 +304,7 @@ switch( $action )
 				$msg = sprintf( T_('Delete user &laquo;%s&raquo;?'), $edited_User->dget( 'login' ) );
 			}
 
-			$edited_User->confirm_delete( $msg, $action, get_memorized( 'action' ) );
+			$edited_User->confirm_delete( $msg, 'user', $action, get_memorized( 'action' ) );
 
 			// Display user identity form:
 			$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
@@ -325,6 +325,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.47  2010/01/03 12:03:17  fplanque
+ * More crumbs...
+ *
  * Revision 1.46  2009/12/06 22:55:19  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

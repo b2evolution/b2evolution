@@ -177,7 +177,7 @@ switch( $action )
 		// We need to ask for confirmation:
 		$edited_Thread->confirm_delete(
 				sprintf( T_('Delete thread &laquo;%s&raquo;?'), $edited_Thread->dget('title') ),
-				$action, get_memorized( 'action' ) );
+				'thread', $action, get_memorized( 'action' ) );
 		$AdminUI->disp_view( 'messaging/views/_thread_list.view.php' );
 		break;
 
@@ -203,6 +203,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2010/01/03 12:03:17  fplanque
+ * More crumbs...
+ *
  * Revision 1.13  2009/12/06 22:55:20  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

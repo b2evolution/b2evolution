@@ -231,8 +231,8 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Userfield->confirm_delete(
-				sprintf( T_('Delete user field &laquo;%s&raquo;?'),  $edited_Userfield->dget('name') ),
-				$action, get_memorized( 'action' ) );
+				sprintf( T_('Delete user field &laquo;%s&raquo;?'), $edited_Userfield->dget('name') ),
+				'userfield', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':
 	case 'create':
