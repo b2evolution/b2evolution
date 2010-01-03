@@ -784,7 +784,7 @@ function attach_browse_tabs()
 			'items',
 			array(
 				'settings' => array(
-					'text' => T_('Settings'),
+					'text' => T_('Content settings'),
 					'href' => $settings_url,
 					)
 				)
@@ -1115,6 +1115,9 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 
 /*
  * $Log$
+ * Revision 1.83  2010/01/03 18:52:57  fplanque
+ * crumbs...
+ *
  * Revision 1.82  2009/12/12 01:13:08  fplanque
  * A little progress on breadcrumbs on menu structures alltogether...
  *

@@ -350,6 +350,9 @@ switch( $action )
 	case 'create_edit':
 	case 'create':
 	case 'create_publish':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
 		// We need early decoding of these in order to check permissions:
 		param( 'post_category', 'integer', true );
 		param( 'post_extracats', 'array', array() );
@@ -393,7 +396,7 @@ switch( $action )
 		$Plugins->trigger_event( 'AdminBeforeItemEditCreate', array( 'Item' => & $edited_Item ) );
 
 		if( !empty( $mass_create ) )
-		{
+		{	// ------ MASS CREATE ------
 			$Items = & create_multiple_posts( $edited_Item, param( 'paragraphs_linebreak', 'boolean', 0 ) );
 			if( empty( $Items ) )
 			{
@@ -471,6 +474,9 @@ switch( $action )
 	case 'update_edit':
 	case 'update':
 	case 'update_publish':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
 		// Check edit permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
@@ -572,6 +578,9 @@ switch( $action )
 	case 'publish':
 		// Publish NOW:
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
 		$post_status = 'published';
 		// Check permissions:
 		/* TODO: Check extra categories!!! */
@@ -606,6 +615,8 @@ switch( $action )
 
 
 	case 'deprecate':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
 
 		$post_status = 'deprecated';
 		// Check permissions:
@@ -630,6 +641,9 @@ switch( $action )
 
 	case 'delete':
 		// Delete an Item:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
 
 		// Check permission:
 		$current_User->check_perm( 'blog_del_post', '', true, $blog );
@@ -699,6 +713,9 @@ switch( $action )
 	case 'unlink':
  		// Delete a link:
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
@@ -726,6 +743,9 @@ switch( $action )
 
 	case 'link_move_up':
 	case 'link_move_down':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
@@ -796,6 +816,9 @@ switch( $action )
 
 
 	case 'set_item_link_position':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
@@ -1253,6 +1276,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.83  2010/01/03 18:52:57  fplanque
+ * crumbs...
+ *
  * Revision 1.82  2009/12/29 18:44:23  sam2kb
  * Trackbacks use $Item->get_excerpt()
  *

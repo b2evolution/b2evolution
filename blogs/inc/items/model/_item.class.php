@@ -2436,7 +2436,7 @@ class Item extends ItemLight
 		{
 			$actionurl = $admin_url.'?ctrl=items&amp;action=delete&amp;post_ID=';
 		}
-		$url = $actionurl.$this->ID;
+		$url = $actionurl.$this->ID.'&amp;'.url_crumb('item');
 
 		$r = $before;
 		if( $button )
@@ -2582,7 +2582,7 @@ class Item extends ItemLight
 		if( $title == '#' ) $title = T_('Publish now using current date and time.');
 
 		$r = $before;
-		$r .= '<a href="'.$admin_url.'?ctrl=items'.$glue.'action=publish'.$glue.'post_ID='.$this->ID;
+		$r .= '<a href="'.$admin_url.'?ctrl=items'.$glue.'action=publish'.$glue.'post_ID='.$this->ID.$glue.url_crumb('item');
 		if( $save_context )
 		{
 			$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
@@ -2628,7 +2628,7 @@ class Item extends ItemLight
 		if( $title == '#' ) $title = T_('Deprecate this post!');
 
 		$r = $before;
-		$r .= '<a href="'.$admin_url.'?ctrl=items'.$glue.'action=deprecate'.$glue.'post_ID='.$this->ID;
+		$r .= '<a href="'.$admin_url.'?ctrl=items'.$glue.'action=deprecate'.$glue.'post_ID='.$this->ID.$glue.url_crumb('item');
 		$r .= '" title="'.$title.'"';
 		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
 		$r .= '>'.$text.'</a>';
@@ -4148,6 +4148,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.172  2010/01/03 18:52:57  fplanque
+ * crumbs...
+ *
  * Revision 1.171  2009/12/22 08:53:32  fplanque
  * global $ReqURL
  *

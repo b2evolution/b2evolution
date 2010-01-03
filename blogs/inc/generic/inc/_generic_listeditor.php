@@ -97,6 +97,9 @@ switch( $action )
 	case 'create':
 		// Insert new element...:
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'element' );
+
 		if( isset( $perm_name ) )
 		{	// We need to Check permission:
 			$current_User->check_perm( $perm_name, $perm_level, true );
@@ -122,6 +125,9 @@ switch( $action )
 	case 'update':
 		// Make sure we got an ID:
 		param( $GenericElementCache->dbIDname, 'integer', true );
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'element' );
 
 		if( isset( $perm_name ) )
 		{	// We need to Check permission:
@@ -170,6 +176,9 @@ switch( $action )
 		// Move up the element order
 		param( $GenericElementCache->dbIDname, 'integer', true );
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'element' );
+
 		if( isset( $perm_name ) )
 		{	// We need to Check permission:
 			$current_User->check_perm( $perm_name, $perm_level, true );
@@ -184,6 +193,9 @@ switch( $action )
 		// Move down the element order
 		param( $GenericElementCache->dbIDname, 'integer', true );
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'element' );
+
 		if( isset( $perm_name ) )
 		{	// We need to Check permission:
 			$current_User->check_perm( $perm_name, $perm_level, true );
@@ -197,6 +209,9 @@ switch( $action )
 	case 'delete':
 		// Delete entry:
 		param( $GenericElementCache->dbIDname, 'integer', true );
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'element' );
 
 		if( isset( $perm_name ) )
 		{	// We need to Check permission:
@@ -320,6 +335,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/03 18:52:57  fplanque
+ * crumbs...
+ *
  * Revision 1.8  2010/01/03 12:03:17  fplanque
  * More crumbs...
  *

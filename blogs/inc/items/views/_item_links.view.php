@@ -147,6 +147,30 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 
 		$r = '';
 
+		// Change order.
+		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+		{	// Check that we have permission to edit item:
+			if( $cur_idx > 0 )
+			{
+				$r .= action_icon( T_('Move upwards'), 'move_up',
+					regenerate_url( 'p,itm_ID,action', 'link_ID='.$link_ID.'&amp;action=link_move_up&amp;'.url_crumb('item') ) );
+			}
+			else
+			{
+				$r .= get_icon( 'nomove' ).' ';
+			}
+
+			if( $cur_idx < $total_rows-1 )
+			{
+				$r .= action_icon( T_('Move down'), 'move_down',
+					regenerate_url( 'p,itm_ID,action', 'link_ID='.$link_ID.'&amp;action=link_move_down&amp;'.url_crumb('item') ) );
+			}
+			else
+			{
+				$r .= get_icon( 'nomove' ).' ';
+			}
+		}
+
 		if( isset($current_File) )
 		{
 			if( $current_File->is_dir() )
@@ -154,7 +178,7 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 			else
 				$title = T_('Locate this file!');
 			$url = $current_File->get_linkedit_url( $edited_Item->ID );
-			$r = '<a href="'.$url.'" onclick="return pop_up_window( \''
+			$r .= '<a href="'.$url.'" onclick="return pop_up_window( \''
 						.url_add_param( $url, 'mode=upload&amp;iframe_name='.$iframe_name.'' ).'\', \'fileman_upload\', 1000 )" target="_parent" title="'.$title.'">'
 						.get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ).'</a> ';
 		}
@@ -163,31 +187,7 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	  {	// Check that we have permission to edit item:
 			$r .= action_icon( T_('Delete this link!'), 'unlink',
-			                  regenerate_url( 'p,itm_ID,action', 'link_ID='.$link_ID.'&amp;action=unlink&amp;'.url_crumb('link') ) );
-		}
-
-		// Change order.
-		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
-		{	// Check that we have permission to edit item:
-			if( $cur_idx > 0 )
-			{
-				echo action_icon( T_('Move upwards'), 'move_up',
-					regenerate_url( 'p,itm_ID,action', 'link_ID='.$link_ID.'&amp;action=link_move_up&amp;'.url_crumb('link') ) );
-			}
-			else
-			{
-				echo get_icon( 'nomove' ).' ';
-			}
-
-			if( $cur_idx < $total_rows-1 )
-			{
-				echo action_icon( T_('Move down'), 'move_down',
-					regenerate_url( 'p,itm_ID,action', 'link_ID='.$link_ID.'&amp;action=link_move_down&amp;'.url_crumb('link') ) );
-			}
-			else
-			{
-				echo get_icon( 'nomove' ).' ';
-			}
+			                  regenerate_url( 'p,itm_ID,action', 'link_ID='.$link_ID.'&amp;action=unlink&amp;'.url_crumb('item') ) );
 		}
 
 		return $r;
@@ -205,6 +205,7 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
  */
 function display_position( & $row )
 {
+	// TODO: fp>dh: can you please implement cumbs in here? I don't clearly understand your code.
 	// TODO: dh> centralize somewhere.. might get parsed out of ENUM info?!
 	// Should be ordered like the ENUM.
 	$positions = array(
@@ -217,7 +218,8 @@ function display_position( & $row )
 	$id = 'display_position_'.$row->link_ID;
 
 	// NOTE: dh> using method=get so that we can use regenerate_url (for non-JS).
-	$r = '<form action="" method="post"><select id="'.$id.'" name="link_position">'
+	$r = '<form action="" method="post">
+		<select id="'.$id.'" name="link_position">'
 		.Form::get_select_options_string($positions, $row->link_position, true).'</select>'
 		.'<script type="text/javascript">jQuery("#'.$id.'").change( evo_display_position_onchange );</script>';
 
@@ -248,6 +250,9 @@ $Results->display( $AdminUI->get_template( 'compact_results' ) );
 
 /*
  * $Log$
+ * Revision 1.15  2010/01/03 18:52:57  fplanque
+ * crumbs...
+ *
  * Revision 1.14  2010/01/03 13:10:57  fplanque
  * set some crumbs (needs checking)
  *
