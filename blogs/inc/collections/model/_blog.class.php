@@ -1810,7 +1810,7 @@ class Blog extends DataObject
 				$this->CollectionSettings->dbupdate();
 			}
 
-			$Plugins->trigger_event( 'AfterBlogInsert', $params = array( 'Blog' => & $this ) );
+			$Plugins->trigger_event( 'AfterCollectionInsert', $params = array( 'Blog' => & $this ) );
 		}
 
 		$DB->commit();
@@ -1833,9 +1833,9 @@ class Blog extends DataObject
 			$this->CollectionSettings->dbupdate();
 		}
 
-		$DB->commit();
+		$Plugins->trigger_event( 'AfterCollectionUpdate', $params = array( 'Blog' => & $this ) );
 
-		$Plugins->trigger_event( 'AfterBlogUpdate', $params = array( 'Blog' => & $this ) );
+		$DB->commit();
 
 		// Thick grained invalidation:
 		// This collection has been modified, cached content depending on it should be invalidated:
@@ -1960,9 +1960,7 @@ class Blog extends DataObject
 
 		// re-set the ID for the Plugin event
 		$this->ID = $old_ID;
-
-		$Plugins->trigger_event( 'AfterBlogDelete', $params = array( 'Blog' => & $this ) );
-
+		$Plugins->trigger_event( 'AfterCollectionDelete', $params = array( 'Blog' => & $this ) );
 		$this->ID = 0;
 
 		if( $echo ) echo '<br />Done.</p>';
@@ -2233,6 +2231,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.99  2010/01/03 12:36:15  fplanque
+ * Renamed hooks
+ *
  * Revision 1.98  2010/01/02 20:11:07  sam2kb
  * Added new hooks: AfterBlogInsert, AfterBlogUpdate, AfterBlogDelete
  *

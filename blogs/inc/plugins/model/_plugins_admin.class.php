@@ -120,9 +120,9 @@ class Plugins_admin extends Plugins
 				'AfterCommentInsert' => 'Gets called after a comment has been inserted into the database.',
 				'AfterCommentUpdate' => 'Gets called after a comment has been updated in the database.',
 				
-				'AfterBlogDelete' => 'Gets called after a blog has been deleted from the database.',
-				'AfterBlogInsert' => 'Gets called after a blog has been inserted into the database.',
-				'AfterBlogUpdate' => 'Gets called after a blog has been updated in the database.',
+				'AfterCollectionDelete' => 'Gets called after a blog has been deleted from the database.',
+				'AfterCollectionInsert' => 'Gets called after a blog has been inserted into the database.',
+				'AfterCollectionUpdate' => 'Gets called after a blog has been updated in the database.',
 
 				'AfterItemDelete' => 'This gets called after an item has been deleted from the database.',
 				'PrependItemInsertTransact' => 'This gets called before an item is inserted into the database.',
@@ -1473,6 +1473,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.27  2010/01/03 12:36:15  fplanque
+ * Renamed hooks
+ *
  * Revision 1.26  2010/01/02 20:11:08  sam2kb
  * Added new hooks: AfterBlogInsert, AfterBlogUpdate, AfterBlogDelete
  *

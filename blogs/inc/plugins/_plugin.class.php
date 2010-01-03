@@ -1015,7 +1015,7 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'Blog': the related Blog (by reference)
 	 */
-	function AfterBlogInsert( & $params )
+	function AfterCollectionInsert( & $params )
 	{
 	}
 
@@ -1027,7 +1027,7 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'Blog': the related Blog (by reference)
 	 */
-	function AfterBlogUpdate( & $params )
+	function AfterCollectionUpdate( & $params )
 	{
 	}
 
@@ -1039,7 +1039,7 @@ class Plugin
 	 * @param array Associative array of parameters
 	 *   - 'Blog': the related Blog (by reference)
 	 */
-	function AfterBlogDelete( & $params )
+	function AfterCollectionDelete( & $params )
 	{
 	}
 
@@ -2937,6 +2937,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.33  2010/01/03 12:36:15  fplanque
+ * Renamed hooks
+ *
  * Revision 1.32  2010/01/02 20:11:08  sam2kb
  * Added new hooks: AfterBlogInsert, AfterBlogUpdate, AfterBlogDelete
  *
