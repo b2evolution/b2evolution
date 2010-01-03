@@ -359,11 +359,6 @@ form {
 	margin: 0;
 	padding: 0;
 } /* thanks #mozilla */
-form.inline {
-	margin: 0px;
-	padding:0px;
-	display: inline;
-}
 
 fieldset.input {
 	margin: 0;

@@ -38,6 +38,10 @@ code {
 .clear{
 	clear: both;
 }
+.inline {
+	display: inline;
+}
+
 .border {
 	border: 1px solid #000;
 }

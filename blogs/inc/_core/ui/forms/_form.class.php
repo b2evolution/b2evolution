@@ -1513,7 +1513,7 @@ class Form extends Widget
 		}
 
 		// Display all buffered hidden fields in a 0 height DIV (for XHTML):
-		$r .= '<div style="height:0">'.implode( '', $this->hiddens ).'</div>';
+		$r .= '<div class="inline">'.implode( '', $this->hiddens ).'</div>';
 
 		// $r .= '</div>';
 		$r .= "\n</form>\n\n";
@@ -3054,6 +3054,10 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.80  2010/01/03 11:46:11  fplanque
+ * fixed delte confirmations display
+ * (thanks to whoever broke that years ago and never fixed it!)
+ *
  * Revision 1.79  2010/01/02 17:24:31  fplanque
  * Crumbs - Proof of concept
  *
