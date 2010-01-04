@@ -454,7 +454,16 @@ function create_default_currencies()
 			(152, 'XDR', 'XDR', 'SDR'),
 			(153, 'XPD', 'XPD', 'Palladium'),
 			(154, 'XPT', 'XPT', 'Platinum'),
-			(155, 'XAG', 'XAG', 'Silver')" );
+			(155, 'XAG', 'XAG', 'Silver'),
+			(156, 'COP', '$', 'Colombian peso'),
+			(157, 'CUP', '$', 'Cuban peso'),
+			(158, 'SVC', 'SVC', 'Salvadoran colon'),
+			(159, 'CLP', '$', 'Chilean peso'),
+			(160, 'HTG', 'G', 'Haitian gourde'),
+			(161, 'MXN', '$', 'Mexican peso'),
+			(162, 'PAB', 'PAB', 'Panamanian balboa'),
+			(163, 'UYU', '$', 'Uruguayan peso')
+			" );
 	echo "OK.<br />\n";
 }
 
@@ -513,11 +522,11 @@ function create_default_countries()
 			(41, 'ky', 'Cayman Islands', 32),
 			(42, 'cf', 'Central African Republic', 29),
 			(43, 'td', 'Chad', 29),
-			(44, 'cl', 'Chile', 152),
+			(44, 'cl', 'Chile', 159),
 			(45, 'cn', 'China', 33),
 			(46, 'cx', 'Christmas Island', 11),
 			(47, 'cc', 'Cocos Islands', 11),
-			(48, 'co', 'Colombia', 153),
+			(48, 'co', 'Colombia', 156),
 			(49, 'km', 'Comoros', 34),
 			(50, 'cg', 'Congo', 29),
 			(51, 'cd', 'Congo Republic', 35),
@@ -525,7 +534,7 @@ function create_default_countries()
 			(53, 'cr', 'Costa Rica', 37),
 			(54, 'ci', 'Cote Divoire', 19),
 			(55, 'hr', 'Croatia', 38),
-			(56, 'cu', 'Cuba', 154),
+			(56, 'cu', 'Cuba', 157),
 			(57, 'cy', 'Cyprus', 2),
 			(58, 'cz', 'Czech Republic', 39),
 			(59, 'dk', 'Denmark', 40),
@@ -534,7 +543,7 @@ function create_default_countries()
 			(62, 'do', 'Dominican Republic', 42),
 			(63, 'ec', 'Ecuador', 5),
 			(64, 'eg', 'Egypt', 43),
-			(65, 'sv', 'El Salvador', 155),
+			(65, 'sv', 'El Salvador', 158),
 			(66, 'gq', 'Equatorial Guinea', 29),
 			(67, 'er', 'Eritrea', 44),
 			(68, 'ee', 'Estonia', 45),
@@ -561,9 +570,9 @@ function create_default_countries()
 			(89, 'gt', 'Guatemala', 54),
 			(90, 'gg', 'Guernsey', 55),
 			(91, 'gn', 'Guinea', 56),
-			(92, 'gw', 'Guinea-bissau', 156),
+			(92, 'gw', 'Guinea-bissau', 19),
 			(93, 'gy', 'Guyana', 57),
-			(94, 'ht', 'Haiti', 157),
+			(94, 'ht', 'Haiti', 160),
 			(95, 'hm', 'Heard Island And Mcdonald Islands', 11),
 			(96, 'va', 'Holy See (vatican City State)', 2),
 			(97, 'hn', 'Honduras', 58),
@@ -611,7 +620,7 @@ function create_default_countries()
 			(139, 'mr', 'Mauritania', 89),
 			(140, 'mu', 'Mauritius', 90),
 			(141, 'yt', 'Mayotte', 2),
-			(142, 'mx', 'Mexico', 158),
+			(142, 'mx', 'Mexico', 161),
 			(143, 'fm', 'Micronesia', 2),
 			(144, 'md', 'Moldova', 91),
 			(145, 'mc', 'Monaco', 2),
@@ -639,7 +648,7 @@ function create_default_countries()
 			(167, 'pk', 'Pakistan', 101),
 			(168, 'pw', 'Palau', 5),
 			(169, 'ps', 'Palestinian Territory', NULL),
-			(170, 'pa', 'Panama', 159),
+			(170, 'pa', 'Panama', 162),
 			(171, 'pg', 'Papua New Guinea', 102),
 			(172, 'py', 'Paraguay', 103),
 			(173, 'pe', 'Peru', 104),
@@ -704,7 +713,7 @@ function create_default_countries()
 			(232, 'gb', 'United Kingdom', 55),
 			(233, 'us', 'United States', 5),
 			(234, 'um', 'United States Minor Outlying Islands', 5),
-			(235, 'uy', 'Uruguay', 160),
+			(235, 'uy', 'Uruguay', 163),
 			(236, 'uz', 'Uzbekistan', 140),
 			(237, 'vu', 'Vanuatu', 141),
 			(239, 've', 'Venezuela', 142),
@@ -1295,6 +1304,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.283  2010/01/04 13:06:24  efy-maxim
+ * new currencies have been added
+ *
  * Revision 1.282  2009/12/13 03:00:23  fplanque
  * more info about speed optimization
  *
