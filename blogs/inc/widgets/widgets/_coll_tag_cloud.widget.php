@@ -134,6 +134,13 @@ class coll_tag_cloud_Widget extends ComponentWidget
 					'defaultvalue' => 'ASC',
 					'note' => T_( 'How to sort the tag cloud.' ),
 				),
+			'filter_list' => array(
+					'type' => 'textarea',
+					'label' => T_('Filter tags'),
+					'note' => T_('This is a comma seperated list of tags to filter'),
+					'size' => 40,
+					'rows' => 2,
+				),
 			), parent::get_param_definitions( $params )	);
 
 		// add limit default 100
@@ -179,7 +186,22 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		$sql .= "
 			 INNER JOIN T_items__item ON itag_itm_ID = post_ID
 			 WHERE $where_cats
-			   AND post_status = 'published' AND post_datestart < '".remove_seconds($localtimenow)."'
+			   AND post_status = 'published' AND post_datestart < '".remove_seconds($localtimenow)."'";
+		
+		if( $this->disp_params['filter_list'] )
+		{	// Filter tags
+			$filter_list = explode( ',', $this->disp_params['filter_list'] ) ;
+			
+			$filter_tags = array();
+			foreach( $filter_list as $l_tag )
+			{
+				$filter_tags[] = '"'.$DB->escape(trim($l_tag)).'"';
+			}
+			
+			$sql .= ' AND tag_name NOT IN ('.implode(', ', $filter_tags).')';
+		}
+		
+		$sql .= "
 			 GROUP BY tag_name
 			 ORDER BY tag_count DESC
 			 LIMIT ".$this->disp_params['max_tags'];
@@ -267,6 +289,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.27  2010/01/08 20:21:17  sam2kb
+ * Filter unwanted tags
+ *
  * Revision 1.26  2009/12/22 08:02:12  fplanque
  * doc
  *
