@@ -137,7 +137,7 @@ class coll_tag_cloud_Widget extends ComponentWidget
 			'filter_list' => array(
 					'type' => 'textarea',
 					'label' => T_('Filter tags'),
-					'note' => T_('This is a comma seperated list of tags to filter'),
+					'note' => T_('This is a comma separated list of tags to ignore.'),
 					'size' => 40,
 					'rows' => 2,
 				),
@@ -289,6 +289,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.28  2010/01/08 22:24:18  blueyed
+ * tagcloud widget: Trans fix.
+ *
  * Revision 1.27  2010/01/08 20:21:17  sam2kb
  * Filter unwanted tags
  *
