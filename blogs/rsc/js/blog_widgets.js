@@ -90,7 +90,7 @@ jQuery(document).ready( function()
 	jQuery( '.widget_row td:nth-child(5)' ).each( function()
 	{
 		var widget_id = jQuery( this ).find( 'a' ).attr( "href" );
-		widget_id = widget_id.substr( widget_id.indexOf( "wi_ID=" ) + 6, widget_id.length ); // extract ID
+		widget_id = widget_id.match(/wi_ID=([0-9]+)/)[1] // extract ID
 		jQuery( this ).parent().attr( "id", "wi_ID_"+widget_id ); // add ID to parent row
 	});
 
