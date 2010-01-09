@@ -317,7 +317,8 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 		
 		return $r;
 	}
-	elseif( function_exists( 'fsockopen' ) ) // may have been disabled
+	
+	if( function_exists( 'fsockopen' ) ) // may have been disabled
 	{	// FSOCKOPEN:
 		$info['used_method'] = 'fsockopen';
 
@@ -810,6 +811,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.47  2010/01/09 17:46:05  fplanque
+ * minor
+ *
  * Revision 1.46  2010/01/09 01:11:01  sam2kb
  * Prevent PHP warning caused by CURLOPT_FOLLOWLOCATION and safe_mode/open_basedir
  * Added missing return to CURL method

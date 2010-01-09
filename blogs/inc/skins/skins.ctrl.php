@@ -98,7 +98,6 @@ switch( $action )
 			// We want to highlight the edited object on next list display:
  			$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
 
-			$action = 'list';
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
@@ -127,7 +126,6 @@ switch( $action )
 		// We want to highlight the edited object on next list display:
  		$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
 
-		$action = 'list';
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $redirect_to, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
@@ -150,8 +148,8 @@ switch( $action )
 		{ // confirmed, Delete from DB:
 			$msg = sprintf( T_('Skin &laquo;%s&raquo; uninstalled.'), $edited_Skin->dget('name') );
 			$edited_Skin->dbdelete( true );
-			unset( $edited_Skin );
-			forget_param( 'skin_ID' );
+			//unset( $edited_Skin );
+			//forget_param( 'skin_ID' );
 			$Messages->add( $msg, 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
@@ -223,6 +221,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2010/01/09 17:46:04  fplanque
+ * minor
+ *
  * Revision 1.11  2010/01/09 13:30:12  efy-yury
  * added redirect 303 for prevent dublicate sql executions
  *
