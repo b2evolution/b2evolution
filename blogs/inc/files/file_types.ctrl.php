@@ -40,6 +40,9 @@ $current_User->check_perm( 'options', 'view', true );
 
 $AdminUI->set_path( 'files', 'filetypes' );
 
+//URL for redirect
+$rederect_url = '?ctrl=filetypes';
+
 
 param( 'action', 'string' );
 
@@ -122,6 +125,9 @@ switch( $action )
 			else
 			{
 				$action = 'list';
+				// Redirect so that a reload doesn't write to the DB twice:
+				header_redirect( $rederect_url, 303 ); // Will EXIT
+				// We have EXITed already at this point!!
 			}
 		}
 		break;
@@ -142,6 +148,9 @@ switch( $action )
 			$edited_Filetype->dbupdate();
 			$Messages->add( T_('File type updated.'), 'success' );
 			$action = 'list';
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $rederect_url, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 		break;
 
@@ -162,6 +171,9 @@ switch( $action )
 			forget_param( 'ftyp_ID' );
 			$Messages->add( $msg, 'success' );
 			$action = 'list';
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $rederect_url, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 		else
 		{	// not confirmed, Check for restrictions:
@@ -232,6 +244,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/09 13:30:12  efy-yury
+ * added redirect 303 for prevent dublicate sql executions
+ *
  * Revision 1.7  2010/01/03 12:03:17  fplanque
  * More crumbs...
  *

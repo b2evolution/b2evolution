@@ -99,6 +99,9 @@ switch( $action )
  			$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
 
 			$action = 'list';
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $redirect_to, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 		break;
 
@@ -125,6 +128,9 @@ switch( $action )
  		$Session->set( 'fadeout_array', array( 'skin_ID' => array($edited_Skin->ID) ) );
 
 		$action = 'list';
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $redirect_to, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 
 
@@ -148,8 +154,9 @@ switch( $action )
 			forget_param( 'skin_ID' );
 			$Messages->add( $msg, 'success' );
 
-			// PREVENT RELOAD & Switch to list mode:
-			header_redirect( '?ctrl=skins' );
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $redirect_to, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 		else
 		{	// not confirmed, Check for restrictions:
@@ -216,6 +223,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2010/01/09 13:30:12  efy-yury
+ * added redirect 303 for prevent dublicate sql executions
+ *
  * Revision 1.10  2010/01/03 17:45:21  fplanque
  * crumbs & stuff
  *
