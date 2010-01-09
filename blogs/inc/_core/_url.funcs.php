@@ -302,7 +302,7 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, $timeout );
 		curl_setopt( $ch, CURLOPT_TIMEOUT, $timeout );
-		@curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true );
+		@curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true ); // made silent due to possible errors with safe_mode/open_basedir(?)
 		curl_setopt( $ch, CURLOPT_MAXREDIRS, 3 );
 		$r = curl_exec( $ch );
 
@@ -811,6 +811,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.48  2010/01/09 21:04:06  blueyed
+ * doc
+ *
  * Revision 1.47  2010/01/09 17:46:05  fplanque
  * minor
  *
