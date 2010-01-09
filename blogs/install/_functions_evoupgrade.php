@@ -2621,14 +2621,15 @@ function upgrade_b2evo_tables()
 
 		db_add_col( 'T_hitlog', 'hit_agent_type', "ENUM('rss','robot','browser','unknown') DEFAULT 'unknown' NOT NULL AFTER hit_remote_addr" );
 
-		$DB->query( 'UPDATE T_hitlog, '.$tableprefix.'useragents
-									  SET hit_agent_type = agnt_type
-								  WHERE hit_agnt_ID = agnt_ID
-								  	AND agnt_type <> "unknown"' ); // We already have the unknown as default
-
-		db_drop_col( 'T_hitlog', 'hit_agnt_ID' );
-
-		$DB->query( 'DROP TABLE '.$tableprefix.'useragents' );
+		if( db_col_exists('T_hitlog', 'hit_agnt_ID') )
+		{
+			$DB->query( 'UPDATE T_hitlog, '.$tableprefix.'useragents
+			                SET hit_agent_type = agnt_type
+			              WHERE hit_agnt_ID = agnt_ID
+			                AND agnt_type <> "unknown"' ); // We already have the unknown as default
+			db_drop_col( 'T_hitlog', 'hit_agnt_ID' );
+		}
+		$DB->query( 'DROP TABLE IF EXISTS '.$tableprefix.'useragents' );
 
 		task_end();
 
@@ -2810,6 +2811,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.353  2010/01/09 18:19:06  blueyed
+ * Upgrade: make upgrade of hitlog more robust in regard to already done changes.
+ *
  * Revision 1.352  2010/01/03 13:45:37  fplanque
  * set some crumbs (needs checking)
  *
