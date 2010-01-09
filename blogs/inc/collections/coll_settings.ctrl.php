@@ -39,7 +39,7 @@ param_action( 'edit' );
 param( 'tab', 'string', 'general', true );
 
 //URL for redirect
-$rederect_url = '?ctrl=coll_settings';
+$redirect_url = '?ctrl=coll_settings';
 
 // Check permissions on requested blog and autoselect an appropriate blog if necessary.
 // This will prevent a fat error when switching tabs and you have restricted perms on blog properties.
@@ -115,7 +115,7 @@ switch( $action )
 		// Update DB:
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
-		$update_rederect_url = $rederect_url.'&tab='.$tab.'&blog='.$blog;
+		$update_redirect_url = $redirect_url.'&tab='.$tab.'&blog='.$blog;
 
 		switch( $tab )
 		{
@@ -126,7 +126,7 @@ switch( $action )
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog settings have been updated'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( $update_rederect_url, 303 ); // Will EXIT
+					header_redirect( $update_redirect_url, 303 ); // Will EXIT
 				}
 				break;
 
@@ -136,7 +136,7 @@ switch( $action )
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog settings have been updated'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( $update_rederect_url, 303 ); // Will EXIT
+					header_redirect( $update_redirect_url, 303 ); // Will EXIT
 				}
 				break;
 
@@ -146,7 +146,7 @@ switch( $action )
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog settings have been updated'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( $update_rederect_url, 303 ); // Will EXIT
+					header_redirect( $update_redirect_url, 303 ); // Will EXIT
 				}
 				break;
 
@@ -169,7 +169,7 @@ switch( $action )
 					$edited_Skin->dbupdate_settings();
 					$Messages->add( T_('Skin settings have been updated'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( $update_rederect_url, 303 ); // Will EXIT
+					header_redirect( $update_redirect_url, 303 ); // Will EXIT
 				}
 				break;
 
@@ -198,7 +198,7 @@ switch( $action )
 					$Blog->dbupdate();
 					$Messages->add( T_('Plugin settings have been updated'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( $update_rederect_url, 303 ); // Will EXIT
+					header_redirect( $update_redirect_url, 303 ); // Will EXIT
 				}
 				break;
 
@@ -232,7 +232,7 @@ switch( $action )
 					$edited_Blog->dbupdate();
 					$Messages->add( T_('The blog settings have been updated'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( $update_rederect_url, 303 ); // Will EXIT
+					header_redirect( $update_redirect_url, 303 ); // Will EXIT
 				}
 				break;
 
@@ -373,6 +373,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.27  2010/01/09 21:07:06  blueyed
+ * fix typo
+ *
  * Revision 1.26  2010/01/09 13:30:12  efy-yury
  * added redirect 303 for prevent dublicate sql executions
  *
