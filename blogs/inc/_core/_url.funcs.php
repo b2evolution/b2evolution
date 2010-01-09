@@ -302,7 +302,7 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, $timeout );
 		curl_setopt( $ch, CURLOPT_TIMEOUT, $timeout );
-		curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true );
+		@curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, true );
 		curl_setopt( $ch, CURLOPT_MAXREDIRS, 3 );
 		$r = curl_exec( $ch );
 
@@ -314,6 +314,8 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 			$info['error'] .= ' (#'.$errno.')';
 		}
 		curl_close( $ch );
+		
+		return $r;
 	}
 	elseif( function_exists( 'fsockopen' ) ) // may have been disabled
 	{	// FSOCKOPEN:
@@ -808,6 +810,10 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.46  2010/01/09 01:11:01  sam2kb
+ * Prevent PHP warning caused by CURLOPT_FOLLOWLOCATION and safe_mode/open_basedir
+ * Added missing return to CURL method
+ *
  * Revision 1.45  2010/01/02 21:13:32  fplanque
  * demo of Crumbs in action urls (GET not POST).
  * Normalized code a little (not perfect).
