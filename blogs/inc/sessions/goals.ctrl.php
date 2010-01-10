@@ -84,6 +84,9 @@ switch( $action )
 		// Insert new file type...:
 		$edited_Goal = & new Goal();
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'goal' );
+
 		// Check permission:
 		$sessions_Module->check_perm( 'edit' );
 
@@ -135,6 +138,9 @@ switch( $action )
 	case 'update':
 		// Edit file type form...:
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'goal' );
+
 		// Check permission:
 		$sessions_Module->check_perm( 'edit' );
 
@@ -176,6 +182,9 @@ switch( $action )
 
 	case 'delete':
 		// Delete file type:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'goal' );
 
 		// Check permission:
 		$sessions_Module->check_perm( 'edit' );
@@ -278,6 +287,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2010/01/10 23:24:09  fplanque
+ * crumbs...
+ *
  * Revision 1.20  2010/01/03 12:03:17  fplanque
  * More crumbs...
  *

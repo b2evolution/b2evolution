@@ -675,7 +675,7 @@ class _core_Module extends Module
 		}
 
 		if( $ctrl == 'user' )
-		{
+		{	// Viewing a specific user:
 			$users_sub_entries = array();
 
 			$users_sub_entries['identity'] = array(
@@ -706,23 +706,27 @@ class _core_Module extends Module
 			$users_entries['entries'] = $users_sub_entries;
 		}
 		else
-		{
+		{	// Viewing all users:
 			// fp> the following submenu needs even further breakdown.
 			$users_entries['entries'] = array(
 							'users' => array(
 								'text' => T_('Users & Groups'),
 								'href' => '?ctrl=users'	),
-							// 'groups' =>
-							// 'defaultprofiles' =>
 							'usersettings' => array(
-								'text' => T_('Settings'),
- 								'href' => '?ctrl=usersettings' ),
-							'registration' => array(
-								'text' => T_('Registration'),
- 								'href' => '?ctrl=registration' ),
-							'userfields' => array(
-								'text' => T_('User fields'),
-								'href' => '?ctrl=userfields' ),
+								'text' => T_('User settings'),
+ 								'href' => '?ctrl=usersettings',
+ 								'entries' => array(
+									'usersettings' => array(
+										'text' => T_('User latitude'),
+ 										'href' => '?ctrl=usersettings' ),
+									'registration' => array(
+										'text' => T_('Registration'),
+ 										'href' => '?ctrl=registration' ),
+									'userfields' => array(
+										'text' => T_('User fields'),
+										'href' => '?ctrl=userfields' ),
+									),
+								),
 							);
 		}
 
@@ -778,6 +782,9 @@ $_core_Module = & new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.57  2010/01/10 23:24:09  fplanque
+ * crumbs...
+ *
  * Revision 1.56  2009/12/12 19:14:12  fplanque
  * made avatars optional + fixes on img props
  *

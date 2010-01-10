@@ -740,7 +740,8 @@ class DataObject
 		}
 
 		return action_icon( $this->get_action_title($action), $action,
-	              				regenerate_url( 'action', $this->dbIDname.'='.$this->ID.'&amp;action='.$action ) );
+	              				regenerate_url( 'action', $this->dbIDname.'='.$this->ID.'&amp;action='.$action
+	              												.'&amp;'.url_crumb(strtolower(get_class($this))) ) );
 	}
 
 
@@ -816,6 +817,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.34  2010/01/10 23:24:07  fplanque
+ * crumbs...
+ *
  * Revision 1.33  2010/01/03 12:03:17  fplanque
  * More crumbs...
  *

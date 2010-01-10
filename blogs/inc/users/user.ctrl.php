@@ -239,7 +239,6 @@ if( !$Messages->count('error') )
 			{
 				header_redirect( regenerate_url( '', 'user_ID='.$edited_User->ID.'&action=edit&user_tab='.$user_tab, '', '&' ), 303 );
 			}
-
 			break;
 
 		case 'default_settings':
@@ -391,6 +390,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/10 23:24:09  fplanque
+ * crumbs...
+ *
  * Revision 1.7  2010/01/03 17:45:21  fplanque
  * crumbs & stuff
  *
