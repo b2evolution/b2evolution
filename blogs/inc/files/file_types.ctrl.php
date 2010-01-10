@@ -40,10 +40,6 @@ $current_User->check_perm( 'options', 'view', true );
 
 $AdminUI->set_path( 'files', 'filetypes' );
 
-//URL for redirect
-$redirect_url = '?ctrl=filetypes';
-
-
 param( 'action', 'string' );
 
 if( param( 'ftyp_ID', 'integer', '', true) )
@@ -126,7 +122,7 @@ switch( $action )
 			{
 				$action = 'list';
 				// Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( $redirect_url, 303 ); // Will EXIT
+				header_redirect( '?ctrl=filetypes', 303 ); // Will EXIT
 				// We have EXITed already at this point!!
 			}
 		}
@@ -149,7 +145,7 @@ switch( $action )
 			$Messages->add( T_('File type updated.'), 'success' );
 			$action = 'list';
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $redirect_url, 303 ); // Will EXIT
+			header_redirect( '?ctrl=filetypes', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		break;
@@ -172,7 +168,7 @@ switch( $action )
 			$Messages->add( $msg, 'success' );
 			$action = 'list';
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $redirect_url, 303 ); // Will EXIT
+			header_redirect( '?ctrl=filetypes', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
@@ -244,6 +240,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/10 17:57:54  efy-yury
+ * minor: replace $redirect_url on constant value
+ *
  * Revision 1.9  2010/01/09 21:07:06  blueyed
  * fix typo
  *

@@ -38,9 +38,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 param_action( 'edit' );
 param( 'tab', 'string', 'general', true );
 
-//URL for redirect
-$redirect_url = '?ctrl=coll_settings';
-
 // Check permissions on requested blog and autoselect an appropriate blog if necessary.
 // This will prevent a fat error when switching tabs and you have restricted perms on blog properties.
 if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm check
@@ -115,7 +112,7 @@ switch( $action )
 		// Update DB:
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
-		$update_redirect_url = $redirect_url.'&tab='.$tab.'&blog='.$blog;
+		$update_redirect_url = '?ctrl=coll_settings&tab='.$tab.'&blog='.$blog;
 
 		switch( $tab )
 		{
@@ -373,6 +370,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.28  2010/01/10 17:57:33  efy-yury
+ * minor: replace $redirect_url on constant value
+ *
  * Revision 1.27  2010/01/09 21:07:06  blueyed
  * fix typo
  *
