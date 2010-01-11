@@ -95,6 +95,10 @@ switch( $action )
 
 	case 'create':
 		// Insert new file type...:
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'filetype' );
+		
 		$edited_Filetype = & new Filetype();
 
 		// Check permission:
@@ -130,6 +134,9 @@ switch( $action )
 
 	case 'update':
 		// Edit file type form...:
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'filetype' );
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -152,6 +159,9 @@ switch( $action )
 
 	case 'delete':
 		// Delete file type:
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'filetype' );
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -240,6 +250,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2010/01/11 16:06:37  efy-yury
+ * More crumbs
+ *
  * Revision 1.10  2010/01/10 17:57:54  efy-yury
  * minor: replace $redirect_url on constant value
  *

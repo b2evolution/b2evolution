@@ -110,6 +110,10 @@ switch( $action )
 
 	case 'update':
 		// Update DB:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'collection' );
+		
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 		$update_redirect_url = '?ctrl=coll_settings&tab='.$tab.'&blog='.$blog;
@@ -370,6 +374,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.29  2010/01/11 16:06:23  efy-yury
+ * More crumbs
+ *
  * Revision 1.28  2010/01/10 17:57:33  efy-yury
  * minor: replace $redirect_url on constant value
  *
