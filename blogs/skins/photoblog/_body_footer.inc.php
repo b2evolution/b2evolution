@@ -26,6 +26,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					'text'   => T_('Contact'),
 					'title'  => T_('Send a message to the owner of this blog...'),
 				) );
+			// Display a link to help page:
+		    $Blog->help_link( array(
+		            'before'      => ' ',
+		            'after'       => ' | ',
+		            'text'        => T_('Help'),
+		        ) );
 		?>
 
 		<a href="<?php $Blog->disp( 'lastcommentsurl', 'raw' ) ?>"><?php echo T_('Latest comments') ?></a>
