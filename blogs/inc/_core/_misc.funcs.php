@@ -3754,6 +3754,8 @@ function get_comments_awaiting_moderation_number( $blog_ID )
 /**
  * Show comments awaiting moderation
  *
+ * @todo fp> move this to a more appropriate place
+ *
  * @param integer blog ID
  * @param integer limit
  * @param array comment IDs to exclude
@@ -3798,7 +3800,7 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 			{ // There is an URL and we have permission to ban...
 				// TODO: really ban the base domain! - not by keyword
 				echo ' <a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(get_ban_domain($Comment->author_url))
-					.'">'.get_icon( 'ban' ).'</a> ';
+					.'&amp;'.url_crumb('antispam').'">'.get_icon( 'ban' ).'</a> ';
 			}
 		}
 		$Comment->author_email( '', ' &bull; Email: <span class="bEmail">', '</span> &bull; ' );
@@ -3951,6 +3953,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.205  2010/01/12 15:56:05  fplanque
+ * crumbs
+ *
  * Revision 1.204  2009/12/24 12:33:21  waltercruz
  * Adding Xcache do get_active_opcode_cache
  *

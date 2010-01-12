@@ -192,6 +192,7 @@ if( $blog )
 
 		echo '<div id="comments_container">';
 
+		// GET COMMENTS AWAITING MODERATION (the code generation is shared with the AJAX callback):
 		show_comments_awaiting_moderation( $Blog->ID );
 
 		echo '</div>';
@@ -562,6 +563,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.51  2010/01/12 15:56:11  fplanque
+ * crumbs
+ *
  * Revision 1.50  2009/12/13 17:08:52  efy-maxim
  * ajax - smooth comments disappearing
  *
