@@ -26,16 +26,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		// Display a link to contact the owner of this blog (if owner accepts messages):
 		$Blog->contact_link( array(
 				'before'      => '',
-				'after'       => ' : ',
+				'after'       => ' - ',
 				'text'   => T_('Contact'),
 				'title'  => T_('Send a message to the owner of this blog...'),
 			) );
 		// Display a link to help page:
-    	$Blog->help_link( array(
-	            'before'      => ' ',
-	            'after'       => ' : ',
-	            'text'        => T_('Help'),
-	        ) );
+		$Blog->help_link( array(
+				'before'      => ' ',
+				'after'       => ' - ',
+				'text'        => T_('Help'),
+			) );
 		?>
 
 		<a href="http://www.evocamp.com/" target="_blank">evoCamp skin</a>
