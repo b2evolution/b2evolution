@@ -104,6 +104,10 @@ switch( $action )
 
 	case 'create':
 		// Insert into DB:
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'collection' );
+		
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
 
@@ -235,6 +239,9 @@ switch( $action )
 
 	case 'delete':
 		// ----------  Delete a blog from DB ----------
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'collection' );
+		
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 
@@ -257,6 +264,9 @@ switch( $action )
 			$UserSettings->dbupdate();
 
 			$action = 'list';
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=collections', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 		break;
 
@@ -458,6 +468,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2010/01/13 19:31:06  efy-yury
+ * update collections: crumbs, redirect
+ *
  * Revision 1.18  2010/01/03 13:45:37  fplanque
  * set some crumbs (needs checking)
  *
