@@ -45,9 +45,9 @@ $Form->global_icon( T_('Cancel editing!'), 'close', str_replace( '&', '&amp;', $
 
 $Form->begin_form( 'eform' );
 
+$Form->add_crumb( 'comment' );
 $Form->hidden( 'ctrl', 'comments' );
 $Form->hidden( 'action', 'update' );
-$Form->add_crumb( 'comment' );
 $Form->hidden( 'redirect_to', $redirect_to );
 $Form->hidden( 'comment_ID', $edited_Comment->ID );
 ?>
@@ -238,7 +238,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 			echo '</p>';
 		$Form->end_fieldset();
 		*/
-		
+
 		$Form->begin_fieldset( T_('Visibility'), array( 'id' => 'commentform_visibility' ) );
 
 		$sharing_options[] = array( 'published', T_('Published (Public)') );
@@ -276,6 +276,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.13  2010/01/13 22:09:44  fplanque
+ * normalized
+ *
  * Revision 1.12  2010/01/13 19:49:45  efy-yury
  * update comments: crumbs
  *

@@ -35,14 +35,11 @@ param( 'action', 'string', 'list' );
  */
 switch( $action )
 {
+	case 'edit':
 	case 'update':
 	case 'publish':
 	case 'deprecate':
 	case 'delete':
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'comment' );
-	case 'edit':
-		
 		param( 'comment_ID', 'integer', true );
 		$edited_Comment = Comment_get_by_ID( $comment_ID );
 
@@ -102,6 +99,9 @@ switch( $action )
 	case 'update':
 		// fp> TODO: $edited_Comment->load_from_Request( true );
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+
 		if( ! $edited_Comment->get_author_User() )
 		{ // If this is not a member comment
 			param( 'newcomment_author', 'string', true );
@@ -160,6 +160,9 @@ switch( $action )
 
 
 	case 'publish':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+
 		$edited_Comment->set('status', 'published' );
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
@@ -172,6 +175,9 @@ switch( $action )
 
 
 	case 'deprecate':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+
 		$edited_Comment->set('status', 'deprecated' );
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
@@ -184,6 +190,9 @@ switch( $action )
 
 
 	case 'delete':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+
 		// fp> TODO: non JS confirm
 
 		// Delete from DB:
@@ -218,7 +227,7 @@ switch( $action )
 		/*
 		 * List of comments to display:
 		 */
-		$CommentList = & new CommentList( $Blog, "'comment','trackback','pingback'", $show_statuses, '',	'',	'DESC',	'',	20 );
+		$CommentList = new CommentList( $Blog, "'comment','trackback','pingback'", $show_statuses, '',	'',	'DESC',	'',	20 );
 		break;
 
 
@@ -282,6 +291,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2010/01/13 22:09:44  fplanque
+ * normalized
+ *
  * Revision 1.18  2010/01/13 19:49:45  efy-yury
  * update comments: crumbs
  *

@@ -194,7 +194,7 @@ switch( $action )
 				$result_fadeout[$edited_GenericCategory->dbIDname][] = $edited_GenericCategory->ID;
 				$action = 'list';
 				// We want to highlight the edited object on next list display:
- 				$Session->set( 'fadeout_array', array($edited_GenericCategory->ID));
+				$Session->set( 'fadeout_array', array($edited_GenericCategory->ID) );
  			
 				// Redirect so that a reload doesn't write to the DB twice:
 				header_redirect( '?ctrl=chapters&blog='.$blog, 303 ); // Will EXIT
@@ -474,6 +474,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2010/01/13 22:09:44  fplanque
+ * normalized
+ *
  * Revision 1.19  2010/01/13 19:19:41  efy-yury
  * update cahpters: crumbs, fadeouts, redirect, action_icon
  *

@@ -177,6 +177,7 @@ switch( $action )
 		}
 		break;
 
+
 	case 'delete':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'crontask' );
@@ -217,8 +218,8 @@ switch( $action )
 			$Messages->add(  sprintf( T_('Scheduled job #%d deleted.'), $ctsk_ID ), 'success' );
 		}
 
-		forget_param( 'ctsk_ID' );
-		$action = 'list';
+		//forget_param( 'ctsk_ID' );
+		//$action = 'list';
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( '?ctrl=crontab', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
@@ -291,6 +292,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/13 22:09:44  fplanque
+ * normalized
+ *
  * Revision 1.8  2010/01/13 20:06:18  efy-yury
  * update crontab: crumbs, redirect
  *
