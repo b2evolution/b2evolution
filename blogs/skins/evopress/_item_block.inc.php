@@ -44,8 +44,8 @@ $params = array_merge( array(
 	<h2><?php $Item->title(); ?></h2>
 
 	<?php
-		if( ! $Item->is_intro() )
-		{	// Display only if we're not displaying an intro post:
+		if( (!$Item->is_intro()) && $Skin->get_setting( 'display_post_date') )
+		{	// Display only if we're *not* displaying an intro post AND we want to see the date:
 			$Item->issue_time( array(
 					'before'      => '<small>',
 					'after'       => '</small>',

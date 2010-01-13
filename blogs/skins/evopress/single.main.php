@@ -131,20 +131,25 @@ while( $Item = & mainlist_get_item() )
 						) );
 				?>
 				<?php
-					$Item->issue_time( array(
-							'before'      => /* TRANS: date */ T_('This entry was posted on '),
-							'time_format' => 'F jS, Y',
-						) );
-				?>
-				<?php
-					$Item->issue_time( array(
-							'before'      => /* TRANS: time */ T_('at '),
-						) );
-				?>
-				<?php
-					$Item->author( array(
-							'before'      => T_('by '),
-						) );
+					if( $Skin->get_setting( 'display_post_date') )
+					{	// We want to display the post date:
+						$Item->issue_time( array(
+								'before'      => /* TRANS: date */ T_('This entry was posted on '),
+								'time_format' => 'F jS, Y',
+							) );
+						$Item->issue_time( array(
+								'before'      => /* TRANS: time */ T_('at '),
+							) );
+						$Item->author( array(
+								'before'      => T_('by '),
+							) );
+					}
+					else
+					{
+						$Item->author( array(
+								'before'      => T_('This entry was posted by '),
+							) );
+					}
 				?>
 				<?php
 					$Item->categories( array(

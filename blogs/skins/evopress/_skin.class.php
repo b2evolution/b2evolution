@@ -39,6 +39,27 @@ class evopress_Skin extends Skin
 
 
 	/**
+   * Get definitions for editable params
+   *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		$r = array_merge( array(
+				'display_post_date' => array(
+					'label' => T_('Post date'),
+					'note' => T_('Display the date of each post'),
+					'defaultvalue' => 1,
+					'type' => 'checkbox',
+				),
+			), parent::get_param_definitions( $params )	);
+
+		return $r;
+	}
+
+
+	/**
 	 * Get ready for displaying the skin.
 	 *
 	 * This may register some CSS or JS...
@@ -65,6 +86,9 @@ class evopress_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.3  2010/01/13 23:57:48  fplanque
+ * Date param.
+ *
  * Revision 1.2  2009/12/12 19:22:36  fplanque
  * minor
  *
