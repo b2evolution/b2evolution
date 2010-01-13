@@ -123,6 +123,9 @@ switch( $action )
 		break;
 
 	case 'create':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'crontask' );
+		
 		// Check that we have permission to edit options:
 		$current_User->check_perm( 'options', 'edit', true, NULL );
 
@@ -168,10 +171,16 @@ switch( $action )
 			$Messages->add( T_('New job has been scheduled.'), 'success' );
 
 			$action = 'list';
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=crontab', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 		break;
 
 	case 'delete':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'crontask' );
+		
 		// Make sure we got an ord_ID:
 		param( 'ctsk_ID', 'integer', true );
 
@@ -210,6 +219,9 @@ switch( $action )
 
 		forget_param( 'ctsk_ID' );
 		$action = 'list';
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=crontab', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 
 
@@ -279,6 +291,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/13 20:06:18  efy-yury
+ * update crontab: crumbs, redirect
+ *
  * Revision 1.7  2009/12/06 22:55:21  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)
