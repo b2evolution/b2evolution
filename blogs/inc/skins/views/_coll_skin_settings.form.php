@@ -38,11 +38,11 @@ global $edited_Skin;
 global $Blog;
 
 
-$Form = & new Form( NULL, 'skin_settings_checkchanges' );
+$Form = new Form( NULL, 'skin_settings_checkchanges' );
 
 $Form->begin_form( 'fform' );
 
-	$Form->add_crumb( 'skin' );
+	$Form->add_crumb( 'collection' );
 	$Form->hidden_ctrl();
 	$Form->hidden( 'tab', 'skin_settings' );
 	$Form->hidden( 'action', 'update' );
@@ -96,6 +96,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/13 22:48:57  fplanque
+ * Missing crumbs
+ *
  * Revision 1.4  2010/01/03 13:45:37  fplanque
  * set some crumbs (needs checking)
  *

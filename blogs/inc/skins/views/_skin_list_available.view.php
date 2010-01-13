@@ -51,7 +51,7 @@ foreach( $skin_folders as $skin_folder )
 	}
 
 	// Display skinshot:
-	$function_url = '?ctrl=skins&amp;action=create&amp;skin_folder='.rawurlencode($skin_folder).'&amp;redirect_to='.rawurlencode($redirect_to);
+	$function_url = '?ctrl=skins&amp;action=create&amp;skin_folder='.rawurlencode($skin_folder).'&amp;redirect_to='.rawurlencode($redirect_to).'&amp;'.url_crumb('skin');
 	Skin::disp_skinshot( $skin_folder, $skin_folder, 'install', false, NULL, $function_url );
 }
 
@@ -60,6 +60,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/13 22:48:57  fplanque
+ * Missing crumbs
+ *
  * Revision 1.9  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *

@@ -46,7 +46,7 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 		}
 
 		$selected = ($edited_Blog->skin_ID == $Skin->ID);
-		$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;blog_skin_ID='.$Skin->ID;
+		$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;blog_skin_ID='.$Skin->ID.'&amp;'.url_crumb('collection');
 		$preview_url = url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode($Skin->folder) );
 
 		// Display skinshot:
@@ -59,6 +59,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/13 22:48:57  fplanque
+ * Missing crumbs
+ *
  * Revision 1.8  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *
