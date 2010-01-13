@@ -342,6 +342,11 @@ if( !isset($timestamp_min) ) $timestamp_min = '';
 if( !isset($timestamp_max) ) $timestamp_max = '';
 
 
+
+// Front page detection & selection should probably occur here.
+
+
+
 /*
  * ____________________________ Get specific Item if requested ____________________________
  */
@@ -646,6 +651,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.162  2010/01/13 23:39:17  fplanque
+ * doc
+ *
  * Revision 1.161  2009/12/22 23:13:37  fplanque
  * Skins v4, step 1:
  * Added new disp modes
