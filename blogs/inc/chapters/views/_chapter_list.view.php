@@ -41,9 +41,11 @@ global $permission_to_edit;
 
 global $subset_ID;
 
-global $result_fadeout;
-
 global $current_default_cat_ID;
+
+global $Session;
+
+$result_fadeout = $Session->get( 'fadeout_array' );
 
 $current_default_cat_ID = $Blog->get_setting('default_cat_ID');
 
@@ -59,21 +61,23 @@ $line_class = 'odd';
  */
 function cat_line( $Chapter, $level )
 {
-	global $line_class, $result_fadeout, $permission_to_edit, $current_User, $Settings;
+	global $line_class, $permission_to_edit, $current_User, $Settings;
 	global $GenericCategoryCache, $current_default_cat_ID;
-
+	
+	global $Session;
+	$result_fadeout = $Session->get( 'fadeout_array' );
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 
 	$r = '<tr id="tr-'.$Chapter->ID.'"class="'.$line_class.
 					' chapter_parent_'.( $Chapter->parent_ID ? $Chapter->parent_ID : '0' ).
 					// Fadeout?
-					( isset($result_fadeout[$GenericCategoryCache->dbIDname]) && in_array( $Chapter->ID, $result_fadeout[$GenericCategoryCache->dbIDname] ) ? ' fadeout-ffff00': '' ).'">
+					( isset($result_fadeout) && in_array( $Chapter->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">
 					<td class="firstcol shrinkwrap">'.
 						$Chapter->ID.'
 				</td>';
 
-	$makedef_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=make_default' );
+	$makedef_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=make_default&amp;'.url_crumb('element') );
 	$makedef_title = T_('Click to make this the default category');
 
 	if( $current_default_cat_ID == $Chapter->ID )
@@ -238,9 +242,13 @@ if( ! $Settings->get('allow_moving_chapters') )
 echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categories is currently set to %s in the %sglobal settings%s.'),
 	$Settings->get('chapter_ordering') == 'manual' ? /* TRANS: Manual here = "by hand" */ T_('Manual ') : T_('Alphabetical'), '<a href="'.$dispatcher.'?ctrl=features#categories">', '</a>' ).'</p> ';
 
-
+//Flush fadeout
+$Session->delete( 'fadeout_array');
 /*
  * $Log$
+ * Revision 1.20  2010/01/13 19:19:47  efy-yury
+ * update cahpters: crumbs, fadeouts, redirect, action_icon
+ *
  * Revision 1.19  2010/01/03 13:10:58  fplanque
  * set some crumbs (needs checking)
  *
