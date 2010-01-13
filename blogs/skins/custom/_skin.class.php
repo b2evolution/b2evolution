@@ -62,11 +62,10 @@ class custom_Skin extends Skin
 																		'error'=>T_('Invalid color code.') ),
 				),
 				'display_post_time' => array(
-					'label' => T_(''),
+					'label' => T_('Post time'),
 					'note' => T_('Display time for each post'),
+					'defaultvalue' => 1,
 					'type' => 'checkbox',
-					'defaultvalue' => 'checked',
-					
 				),
 			), parent::get_param_definitions( $params )	);
 
@@ -84,6 +83,9 @@ class custom_Skin extends Skin
 		// call parent:
 		parent::display_init();
 
+		// Make sure standard CSS is called ahead of custom CSS generated below:
+		require_css( 'style.css', true );
+
 		// Add custom CSS:
 		$custom_css = '';
 
@@ -99,8 +101,7 @@ class custom_Skin extends Skin
 
 		if( !empty( $custom_css ) )
 		{
-			$custom_css = '
-	<style type="text/css">
+			$custom_css = '<style type="text/css">
 	<!--
 '.$custom_css.'	-->
 	</style>';
@@ -113,6 +114,9 @@ class custom_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/13 23:40:21  fplanque
+ * cleanup
+ *
  * Revision 1.4  2010/01/13 17:21:40  efy-eugene
  * Checkbox parameter added
  *

@@ -38,26 +38,19 @@ $params = array_merge( array(
 				'text' => '#icon#',
 			) );
 
-		if( $Blog->get_setting("skin{$Blog->skin_ID}_display_post_time")=='1')
-		{
-				$Item->issue_time( array(
+		if( $Skin->get_setting( 'display_post_time') )
+		{	// We want to display the post time:
+			$Item->issue_time( array(
 					'before'    => ' ',
-					'after'     => '',
-				));
-	
-				$Item->author( array(
-					'before'    => ', '.T_('by').' ',
-					'after'     => '',
+					'after'     => ', ',
 				) );
 		}
-		else
-		{
-				$Item->author( array(
-					'before'    => ' '.T_('by').' ',
-					'after'     => '',
-				) );			
-		}
-		
+
+		$Item->author( array(
+			'before'    => ' '.T_('by').' ',
+			'after'     => '',
+		) );
+
 		$Item->msgform_link();
 		echo ', ';
 
@@ -163,6 +156,9 @@ $params = array_merge( array(
 
 /*
  * $Log$
+ * Revision 1.3  2010/01/13 23:40:22  fplanque
+ * cleanup
+ *
  * Revision 1.2  2010/01/13 17:21:40  efy-eugene
  * Checkbox parameter added
  *

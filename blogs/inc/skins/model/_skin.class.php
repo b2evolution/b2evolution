@@ -607,6 +607,9 @@ class Skin extends DataObject
 	 */
 	function display_init()
 	{
+		// Make sure standard CSS is called ahead of custom CSS generated below:
+		// require_css( 'style.css', true );
+
 		// override in specific skins...
 	}
 
@@ -665,6 +668,9 @@ class Skin extends DataObject
 
 /*
  * $Log$
+ * Revision 1.27  2010/01/13 23:40:22  fplanque
+ * cleanup
+ *
  * Revision 1.26  2009/12/20 20:38:13  fplanque
  * Enhanced skin containers reload for skin developers
  *
