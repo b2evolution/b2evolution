@@ -61,6 +61,13 @@ class custom_Skin extends Skin
 					'valid_pattern' => array( 'pattern'=>'¤^(#([a-f0-9]{3}){1,2})?$¤i',
 																		'error'=>T_('Invalid color code.') ),
 				),
+				'display_post_time' => array(
+					'label' => T_(''),
+					'note' => T_('Display time for each post'),
+					'type' => 'checkbox',
+					'defaultvalue' => 'checked',
+					
+				),
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -106,6 +113,9 @@ class custom_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.4  2010/01/13 17:21:40  efy-eugene
+ * Checkbox parameter added
+ *
  * Revision 1.3  2009/05/24 21:14:38  fplanque
  * _skin.class.php can now provide skin specific settings.
  * Demo: the custom skin has configurable header colors.

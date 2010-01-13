@@ -38,16 +38,26 @@ $params = array_merge( array(
 				'text' => '#icon#',
 			) );
 
-		$Item->issue_time( array(
-				'before'    => ' ',
-				'after'     => '',
-			));
-
-		$Item->author( array(
-				'before'    => ', '.T_('by').' ',
-				'after'     => '',
-			) );
-
+		if( $Blog->get_setting("skin{$Blog->skin_ID}_display_post_time")=='1')
+		{
+				$Item->issue_time( array(
+					'before'    => ' ',
+					'after'     => '',
+				));
+	
+				$Item->author( array(
+					'before'    => ', '.T_('by').' ',
+					'after'     => '',
+				) );
+		}
+		else
+		{
+				$Item->author( array(
+					'before'    => ' '.T_('by').' ',
+					'after'     => '',
+				) );			
+		}
+		
 		$Item->msgform_link();
 		echo ', ';
 
@@ -153,6 +163,9 @@ $params = array_merge( array(
 
 /*
  * $Log$
+ * Revision 1.2  2010/01/13 17:21:40  efy-eugene
+ * Checkbox parameter added
+ *
  * Revision 1.1  2009/05/23 14:12:42  fplanque
  * All default skins now support featured posts and intro posts.
  *
