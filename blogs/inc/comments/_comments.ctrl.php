@@ -35,11 +35,14 @@ param( 'action', 'string', 'list' );
  */
 switch( $action )
 {
-	case 'edit':
 	case 'update':
 	case 'publish':
 	case 'deprecate':
 	case 'delete':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+	case 'edit':
+		
 		param( 'comment_ID', 'integer', true );
 		$edited_Comment = Comment_get_by_ID( $comment_ID );
 
@@ -279,6 +282,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2010/01/13 19:49:45  efy-yury
+ * update comments: crumbs
+ *
  * Revision 1.17  2009/12/06 22:55:20  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

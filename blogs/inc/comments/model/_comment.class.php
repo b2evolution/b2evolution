@@ -711,7 +711,7 @@ class Comment extends DataObject
 		}
 		if( $title == '#' ) $title = T_('Delete this comment');
 
-		$url = $admin_url.'?ctrl=comments&amp;action=delete&amp;comment_ID='.$this->ID;
+		$url = $admin_url.'?ctrl=comments&amp;action=delete&amp;comment_ID='.$this->ID.'&amp;'.url_crumb('comment') ;
    		if( $save_context )
 		{
 			$url .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
@@ -790,7 +790,7 @@ class Comment extends DataObject
 		}
 		else
 		{
-			$r .= $admin_url.'?ctrl=comments'.$glue.'action=deprecate'.$glue.'comment_ID='.$this->ID;
+			$r .= $admin_url.'?ctrl=comments'.$glue.'action=deprecate'.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
 	   		if( $save_context )
 			{
 				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
@@ -861,7 +861,7 @@ class Comment extends DataObject
 		}
 		else
 		{
-			$r .= $admin_url.'?ctrl=comments'.$glue.'action=publish'.$glue.'comment_ID='.$this->ID;
+			$r .= $admin_url.'?ctrl=comments'.$glue.'action=publish'.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
 	   		if( $save_context )
 			{
 				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
@@ -1498,6 +1498,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.42  2010/01/13 19:49:45  efy-yury
+ * update comments: crumbs
+ *
  * Revision 1.41  2009/11/24 22:09:24  efy-maxim
  * dashboard comments - ajax
  *

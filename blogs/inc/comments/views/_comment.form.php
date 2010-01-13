@@ -47,6 +47,7 @@ $Form->begin_form( 'eform' );
 
 $Form->hidden( 'ctrl', 'comments' );
 $Form->hidden( 'action', 'update' );
+$Form->add_crumb( 'comment' );
 $Form->hidden( 'redirect_to', $redirect_to );
 $Form->hidden( 'comment_ID', $edited_Comment->ID );
 ?>
@@ -275,6 +276,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.12  2010/01/13 19:49:45  efy-yury
+ * update comments: crumbs
+ *
  * Revision 1.11  2009/12/28 07:57:18  sam2kb
  * Added a link to delete comments
  *
