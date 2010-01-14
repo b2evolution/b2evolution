@@ -253,7 +253,7 @@ skin_include( '_html_header.inc.php' );
 			// Display a link to help page:
 		    $Blog->help_link( array(
 		            'before'      => ' ',
-		            'after'       => ' • ',
+		            'after'       => ' &bull; ',
 		            'text'        => T_('Help'),
 		        ) );
 		?>

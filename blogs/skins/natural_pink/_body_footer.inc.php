@@ -27,7 +27,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			// Display a link to help page:
 		    $Blog->help_link( array(
 		            'before'      => ' ',
-		            'after'       => ' • ',
+		            'after'       => ' &bull; ',
 		            'text'        => T_('Help'),
 		        ) );
 		?>
