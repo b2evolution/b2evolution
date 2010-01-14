@@ -60,6 +60,9 @@
  * in which case "done", I also added in <php> </php> ( was an easier regex :p )
  * obviously we originally picked the tag names to suit ourselves
  *
+ * @todo dh> I'd like to be able to disable line numbering in codeblocks.
+ *           Line numbers do not make sense for short code blocks (and also for longer ones
+ *           not necessarily).
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -631,6 +634,9 @@ class code_highlight_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.26  2010/01/14 00:26:09  blueyed
+ * todo: disable line numbering in codeblocks
+ *
  * Revision 1.25  2009/08/25 16:43:14  tblue246
  * Code highlight plugin: Correctly unfilter item contents. Bug found by Yabs.
  *
