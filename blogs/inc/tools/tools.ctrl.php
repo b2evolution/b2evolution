@@ -125,13 +125,14 @@ if( empty($tab) )
 
 			// TODO> handle custom media directories
 			$dirs = get_filenames( $media_path, false );
+			$deleted_dirs = 0;
 			foreach( $dirs as $dir )
 			{
 				if( basename($dir) == '.evocache' )
 				{	// Delete .evocache directory recursively
 					if( rmdir_r( $dir ) )
 					{
-						$Messages->add( sprintf( T_('Directory deleted: %s'), $dir ), 'note' );
+						$deleted_dirs++;
 					}
 					else
 					{
@@ -139,8 +140,7 @@ if( empty($tab) )
 					}
 				}
 			}
-
-			$Messages->add( T_('Files cache deleted.'), 'success' );
+			$Messages->add( sprintf( T_('Deleted %d directories.'), $deleted_dirs ), 'success' );
 			break;
 
 		case 'optimize_tables':
@@ -285,6 +285,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2010/01/14 21:30:31  blueyed
+ * Make deleting .evocache folders far less verbose.
+ *
  * Revision 1.21  2010/01/03 18:07:37  fplanque
  * crumbs
  *
