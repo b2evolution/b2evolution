@@ -73,7 +73,10 @@ load_messaging_thread_recipients( $thrd_ID );
 switch( $action )
 {
 	case 'create': // Record new message
-
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'message' );
+		
 		// Insert new message:
 		$edited_Message = & new Message();
 		$edited_Message->thread_ID = $thrd_ID;
@@ -109,6 +112,9 @@ switch( $action )
 
 	case 'delete':
 		// Delete message:
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'message' );
 
 		// Check permission:
 		$current_User->check_perm( 'perm_messaging', 'delete', true );
@@ -181,6 +187,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2010/01/15 16:57:38  efy-yury
+ * update messaging: crumbs
+ *
  * Revision 1.15  2010/01/03 12:03:17  fplanque
  * More crumbs...
  *

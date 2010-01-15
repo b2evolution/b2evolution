@@ -40,7 +40,7 @@ $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) )
 
 $Form->begin_form( 'fform', T_('New thread') );
 
-	$Form->add_crumb( 'message' );
+	$Form->add_crumb( 'thread' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',msg_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
 $recent_recipients = $DB->get_var('SELECT GROUP_CONCAT(DISTINCT user_login SEPARATOR \', \')
@@ -70,6 +70,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 
 /*
  * $Log$
+ * Revision 1.13  2010/01/15 16:57:38  efy-yury
+ * update messaging: crumbs
+ *
  * Revision 1.12  2010/01/03 16:28:35  fplanque
  * set some crumbs (needs checking)
  *

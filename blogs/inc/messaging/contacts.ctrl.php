@@ -45,10 +45,14 @@ load_messaging_threads_recipients( $current_User->ID );
 switch( $action )
 {
 	case 'block': // Block selected contact
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'contact' );
 		$mct_blocked = 1;
 		break;
 
 	case 'unblock': // Unblock selected contact
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'contact' );
 		$mct_blocked = 0;
 		break;
 }
@@ -103,6 +107,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/15 16:57:37  efy-yury
+ * update messaging: crumbs
+ *
  * Revision 1.5  2009/10/08 20:05:52  efy-maxim
  * Modular/Pluggable Permissions
  *
