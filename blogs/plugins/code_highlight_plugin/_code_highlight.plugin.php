@@ -63,7 +63,8 @@
  * @todo dh> I'd like to be able to disable line numbering in codeblocks.
  *           Line numbers do not make sense for short code blocks (and also for longer ones
  *           not necessarily).
- * fp> how about if no line=".." attribute is specified then no numbering?
+ *       fp> how about if no line=".." attribute is specified then no numbering?
+ *       dh> very OK with me.
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -635,6 +636,9 @@ class code_highlight_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.28  2010/01/15 19:25:30  blueyed
+ * doc
+ *
  * Revision 1.27  2010/01/15 16:43:36  fplanque
  * doc
  *
