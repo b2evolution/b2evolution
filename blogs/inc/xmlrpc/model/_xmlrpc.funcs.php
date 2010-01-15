@@ -30,7 +30,7 @@ elseif( !(bool)ini_get('enable_dl') || (bool)ini_get('safe_mode'))
 }
 elseif( !empty($WINDIR) )
 {	// Win 32 fix. From: "Leo West" <lwest@imaginet.fr>
-	if (@dl('php3_xml.dll'))
+	if (function_exists('dl') && @dl('php3_xml.dll'))
 	{
 		/**
 		 * @ignore
@@ -47,7 +47,7 @@ elseif( !empty($WINDIR) )
 }
 else
 {
-	if (@dl('xml.so'))
+	if (function_exists('dl') && @dl('xml.so'))
 	{
 		/**
 		 * @ignore

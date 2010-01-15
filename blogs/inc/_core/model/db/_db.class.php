@@ -355,15 +355,21 @@ class DB
 
 		if( ! extension_loaded('mysql') )
 		{ // The mysql extension is not loaded, try to dynamically load it:
-			$mysql_ext_file = is_windows() ? 'php_mysql.dll' : 'mysql.so';
-			$php_errormsg = null;
-			$old_track_errors = ini_set('track_errors', 1);
-			$old_html_errors = ini_set('html_errors', 0);
-			@dl( $mysql_ext_file );
-			$error_msg = $php_errormsg;
-			if( $old_track_errors !== false ) ini_set('track_errors', $old_track_errors);
-			if( $old_html_errors !== false ) ini_set('html_errors', $old_html_errors);
-
+			if( function_exists('dl') )
+			{
+				$mysql_ext_file = is_windows() ? 'php_mysql.dll' : 'mysql.so';
+				$php_errormsg = null;
+				$old_track_errors = ini_set('track_errors', 1);
+				$old_html_errors = ini_set('html_errors', 0);
+				@dl( $mysql_ext_file );
+				$error_msg = $php_errormsg;
+				if( $old_track_errors !== false ) ini_set('track_errors', $old_track_errors);
+				if( $old_html_errors !== false ) ini_set('html_errors', $old_html_errors);
+			}
+			else
+			{
+				$error_msg = 'The PHP mysql extension is not installed and we cannot load it dynamically.';
+			}
 			if( ! extension_loaded('mysql') )
 			{ // Still not loaded:
 				$this->print_error( 'The PHP MySQL module could not be loaded.', '
@@ -1659,6 +1665,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.48  2010/01/15 18:34:12  blueyed
+ * The dl function is deprecated and not available in PHP 5.3. Do not make us produce white pages.
+ *
  * Revision 1.47  2009/12/10 20:13:24  blueyed
  * Add log_errors property to DB and set it to false in get_db_version to not
  * log SQL errors which are expected during install.
@@ -1925,3 +1934,7 @@ class DB
  * Fixed possible fatal error while collecting col_info for CREATE and DROP queries
  */
 ?>
+
+--
+hundred-and-one symptoms of being an internet addict:
+253. You wait for a slow loading web page before going to the toilet.
