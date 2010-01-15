@@ -62,6 +62,39 @@ if( param( 'curr_ID', 'integer', '', true) )
 
 switch( $action )
 {
+	case 'disable_currency':
+	case 'enable_currency':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'currency' );
+
+		// Disable a currency only if it is enabled, and user has edit access.
+		$current_User->check_perm( 'options', 'edit', true );
+
+		// Make sure the currency information was loaded. If not, just exit with error.
+		if( empty($edited_Currency) )
+		{
+			$Messages->add( sprintf( 'The currency with ID %d could not be instantiated.', $curr_ID ), 'error' );
+			break;
+		}
+
+		if ( $action == 'disable_currency' )
+		{	// Disable this currency by setting flag to false.
+			$edited_Currency->set( 'enabled', 0 );
+			$Messages->add( sprintf( T_('Disabled currency (%s, #%d).'), $edited_Currency->name, $edited_Currency->ID ), 'success' );
+		}
+		elseif ( $action == 'enable_currency' )
+		{	// Enable currency by setting flag to true.
+			$edited_Currency->set( 'enabled', 1 );
+			$Messages->add( sprintf( T_('Enabled currency (%s, #%d).'), $edited_Currency->name, $edited_Currency->ID ), 'success' );
+		}
+
+		// Update db with new flag value.
+		$edited_Currency->dbupdate();
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=currencies', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 
 	case 'new':
 		// Check permission:
@@ -273,6 +306,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2010/01/15 17:27:27  efy-asimo
+ * Global Settings > Currencies - Add Enable/Disable column
+ *
  * Revision 1.10  2010/01/03 12:03:17  fplanque
  * More crumbs...
  *

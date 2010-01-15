@@ -267,6 +267,7 @@ $schema_queries = array(
 			curr_code char(3) NOT NULL,
 			curr_shortcut varchar(30) NOT NULL,
 			curr_name varchar(40) NOT NULL,
+			curr_enabled tinyint(1) NOT NULL DEFAULT 1,
 			PRIMARY KEY curr_ID (curr_ID),
 			UNIQUE curr_code (curr_code)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" )
@@ -274,6 +275,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.44  2010/01/15 17:27:23  efy-asimo
+ * Global Settings > Currencies - Add Enable/Disable column
+ *
  * Revision 1.43  2009/10/17 16:31:32  efy-maxim
  * Renamed: T_groupsettings to T_groups__groupsettings, T_usersettings to T_users__usersettings
  *

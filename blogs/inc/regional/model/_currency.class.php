@@ -42,6 +42,7 @@ class Currency extends DataObject
 	var $code = '';
 	var $shortcut = '';
 	var $name = '';
+	var $enabled = 1;
 
 	/**
 	 * Constructor
@@ -65,6 +66,7 @@ class Currency extends DataObject
 			$this->code          = $db_row->curr_code;
 			$this->shortcut      = $db_row->curr_shortcut;
 			$this->name          = $db_row->curr_name;
+			$this->enabled		 = $db_row->curr_enabled;
 		}
 	}
 
@@ -109,6 +111,7 @@ class Currency extends DataObject
 				$parvalue = strtoupper($parvalue);
 			case 'shortcut':
 			case 'name':
+			case 'enabled':
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
@@ -140,6 +143,9 @@ class Currency extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2010/01/15 17:27:28  efy-asimo
+ * Global Settings > Currencies - Add Enable/Disable column
+ *
  * Revision 1.11  2009/09/20 20:07:18  blueyed
  *  - DataObject::dbexists quotes always
  *  - phpdoc fixes

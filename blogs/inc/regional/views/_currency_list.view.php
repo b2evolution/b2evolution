@@ -54,6 +54,28 @@ $Results->Cache = & get_CurrencyCache();
 
 $Results->title = T_('Currencies list');
 
+/*
+ * STATUS TD:
+ */
+function curr_td_enabled( $curr_enabled, $curr_ID )
+{
+
+	if( $curr_enabled == true )
+	{
+		return get_icon('enabled', 'imgtag', array('title'=>T_('The currency is enabled.')) );
+	}
+	else
+	{
+		return get_icon('disabled', 'imgtag', array('title'=>T_('The currency is disabled.')) );
+	}
+}
+$Results->cols[] = array(
+		'th' => /* TRANS: shortcut for enabled */ T_('En'),
+		'order' => 'curr_enabled',
+		'td' => '%curr_td_enabled( #curr_enabled#, #curr_ID# )%',
+		'td_class' => 'center'
+	);
+
 /**
  * Callback to add filters on top of the result set
  *
@@ -102,27 +124,52 @@ $Results->cols[] = array(
 						'td' => '$curr_name$',
 					);
 
+/*
+ * ACTIONS TD:
+ */
+function curr_td_actions($curr_enabled, $curr_ID )
+{
+	global $dispatcher;
+
+	$r = '';
+
+	if( $curr_enabled == true )
+	{
+		$r .= action_icon( T_('Disable the currency!'), 'deactivate', $dispatcher.'?ctrl=currencies&amp;action=disable_currency&amp;curr_ID='.$curr_ID.'&amp;'.url_crumb('currency') );
+	}
+	else
+	{
+		$r .= action_icon( T_('Enable the currency!'), 'activate', $dispatcher.'?ctrl=currencies&amp;action=enable_currency&amp;curr_ID='.$curr_ID.'&amp;'.url_crumb('currency') );
+	}
+	$r .= action_icon( T_('Edit this currency...'), 'edit',
+										regenerate_url( 'action', 'curr_ID='.$curr_ID.'&amp;action=edit' ) );
+	$r .= action_icon( T_('Duplicate this currency...'), 'copy',
+										regenerate_url( 'action', 'curr_ID='.$curr_ID.'&amp;action=new' ) );
+	$r .= action_icon( T_('Delete this currency!'), 'delete',
+										regenerate_url( 'action', 'curr_ID='.$curr_ID.'&amp;action=delete&amp;'.url_crumb('currency') ) );
+
+	return $r;
+}
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
-							'th' => T_('Actions'),
-							'th_class' => 'shrinkwrap',
-							'td_class' => 'shrinkwrap',
-							'td' => action_icon( T_('Edit this currency...'), 'edit',
-	                        '%regenerate_url( \'action\', \'curr_ID=$curr_ID$&amp;action=edit\')%' )
-	                    .action_icon( T_('Duplicate this currency...'), 'copy',
-	                        '%regenerate_url( \'action\', \'curr_ID=$curr_ID$&amp;action=new\')%' )
-	                    .action_icon( T_('Delete this currency!'), 'delete',
-	                        '%regenerate_url( \'action\', \'curr_ID=$curr_ID$&amp;action=delete&amp;'.url_crumb('currency').'\')%' ),
-						);
+			'th' => T_('Actions'),
+			'th_class' => 'shrinkwrap',
+			'td' => '%curr_td_actions( #curr_enabled#, #curr_ID# )%',
+			'td_class' => 'shrinkwrap',
+		);
 
-  $Results->global_icon( T_('Create a new currency ...'), 'new', regenerate_url( 'action', 'action=new'), T_('New currency').' &raquo;', 3, 4  );
+	$Results->global_icon( T_('Create a new currency ...'), 'new',
+				regenerate_url( 'action', 'action=new'), T_('New currency').' &raquo;', 3, 4  );
 }
 
 $Results->display();
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/15 17:27:33  efy-asimo
+ * Global Settings > Currencies - Add Enable/Disable column
+ *
  * Revision 1.8  2010/01/03 12:03:17  fplanque
  * More crumbs...
  *
