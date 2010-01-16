@@ -219,11 +219,11 @@ skin_include( '_html_header.inc.php' );
 						'title'  => T_('Send a message to the owner of this blog...'),
 					) );
 				// Display a link to help page:
-			    $Blog->help_link( array(
-			            'before'      => ' &bull; ',
-			            'after'       => ' ',
-			            'text'        => T_('Help'),
-			        ) );
+				$Blog->help_link( array(
+						'before'      => ' &bull; ',
+						'after'       => ' ',
+						'text'        => T_('Help'),
+					) );
 			?>
 			<?php
 				// Display footer text (text can be edited in Blog Settings):

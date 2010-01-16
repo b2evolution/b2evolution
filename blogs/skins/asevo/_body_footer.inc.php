@@ -34,11 +34,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					'title'  => T_('Send a message to the owner of this blog...'),
 				) );
 			// Display a link to help page:
-		    $Blog->help_link( array(
-		            'before'      => ' ',
-		            'after'       => ' | ',
-		            'text'        => T_('Help'),
-		        ) );
+			$Blog->help_link( array(
+					'before'      => ' ',
+					'after'       => ' | ',
+					'text'        => T_('Help'),
+				) );
 		?>
 
 		<?php display_param_link( $skin_links ) ?> by <a href="http://asevo.com/">Asevo</a>

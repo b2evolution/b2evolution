@@ -35,11 +35,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				'title'  => T_('Send a message to the owner of this blog...'),
 			) );
 		// Display a link to help page:
-	    $Blog->help_link( array(
-	            'before'      => ' ',
-	            'after'       => ' | ',
-	            'text'        => T_('Help'),
-	        ) );
+		$Blog->help_link( array(
+				'before'      => ' ',
+				'after'       => ' | ',
+				'text'        => T_('Help'),
+			) );
 		?>
 
 		<?php display_param_link(array( '' => array( 'http://themefolio.com/', array( array( 70, 'Pluralism skin'),array( 84, 'Themefolio skin'),array( 88, 'b2evolution skin'),array( 91, 'blog skin'),array( 96, 'blog theme'),array( 100, 'blog template'))))); ?>
