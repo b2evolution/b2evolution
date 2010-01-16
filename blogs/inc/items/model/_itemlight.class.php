@@ -854,15 +854,15 @@ class ItemLight extends DataObject
 			return;
 		}
 
-		$extra_status = $Element->get('name');
+		$type_name = $Element->get('name');
 
 		if( $format == 'raw' )
 		{
-			$this->disp( $extra_status, 'raw' );
+			$this->disp( $type_name, 'raw' );
 		}
 		else
 		{
-			echo $before.format_to_output( T_( $extra_status ), $format ).$after;
+			echo $before.format_to_output( $type_name, $format ).$after;
 		}
 	}
 
@@ -974,6 +974,10 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.32  2010/01/16 17:51:14  sam2kb
+ * Never translate post types, they translated twice if already in user locale.
+ * Plus default types aren't defined anywhere and don't get translated anyway.
+ *
  * Revision 1.31  2009/12/22 08:53:34  fplanque
  * global $ReqURL
  *
