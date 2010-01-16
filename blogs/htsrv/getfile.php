@@ -126,23 +126,38 @@ if( !empty($size) && $File->is_image() )
 	if( $err == '!Thumbnail not found in .evocache' )
 	{	// The thumbnail wasn't already in the cache, try to generate and cache it now:
 		$err = NULL;		// Short error code
-		list( $err, $src_imh ) = load_image( $File->get_full_path(), $mimetype );
-
-		if( empty( $err ) )
-		{
-			list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height );
+		
+		list( $src_width, $src_height ) = imgsize( $File->get_full_path() );
+		
+		if( $src_width <= $thumb_width && $src_height <= $thumb_height )
+		{	// There is no need to resample, use original!
+			$err = $File->get_af_thumb_path( $size_name, $mimetype, true );
+			
+			if( $err[0] != '!' && @copy( $File->get_full_path(), $err ) )
+			{	// File was saved. Ouput that same file immediately:
+				$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime );
+			}
+		}
+		else
+		{	// Resample
+			list( $err, $src_imh ) = load_image( $File->get_full_path(), $mimetype );
+	
 			if( empty( $err ) )
 			{
-				$err = $File->save_thumb_to_cache( $dest_imh, $size_name, $mimetype, $thumb_quality );
+				list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height );
 				if( empty( $err ) )
-				{	// File was saved. Ouput that same file immediately:
-					// This is probably better than recompressing the memory image..
-					$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime );
-				}
-				else
-				{	// File could not be saved.
-					// fp> We might want to output dynamically...
-					// $err = output_image( $dest_imh, $mimetype );
+				{
+					$err = $File->save_thumb_to_cache( $dest_imh, $size_name, $mimetype, $thumb_quality );
+					if( empty( $err ) )
+					{	// File was saved. Ouput that same file immediately:
+						// This is probably better than recompressing the memory image..
+						$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime );
+					}
+					else
+					{	// File could not be saved.
+						// fp> We might want to output dynamically...
+						// $err = output_image( $dest_imh, $mimetype );
+					}
 				}
 			}
 		}
@@ -222,6 +237,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.47  2010/01/16 06:05:42  sam2kb
+ * Copy original image to .evocache if its size is lower or equal to requested thumb size
+ *
  * Revision 1.46  2009/12/04 23:27:49  fplanque
  * cleanup Expires: header handling
  *
