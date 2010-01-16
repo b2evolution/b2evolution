@@ -90,10 +90,6 @@ switch( $action )
 
 		// Update db with new flag value.
 		$edited_Currency->dbupdate();
-
-		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( '?ctrl=currencies', 303 ); // Will EXIT
-		// We have EXITed already at this point!!
 		break;
 
 	case 'new':
@@ -306,6 +302,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2010/01/16 14:16:32  efy-asimo
+ * Currencies/Countries cosmetics and regenerate_url after Enable/Disable
+ *
  * Revision 1.11  2010/01/15 17:27:27  efy-asimo
  * Global Settings > Currencies - Add Enable/Disable column
  *

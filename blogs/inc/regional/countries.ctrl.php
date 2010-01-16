@@ -91,9 +91,6 @@ switch( $action )
 		// Update db with new flag value.
 		$edited_Country->dbupdate();
 
-		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( '?ctrl=countries', 303 ); // Will EXIT
-		// We have EXITed already at this point!!
 		break;
 
 	case 'new':
@@ -305,6 +302,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2010/01/16 14:16:31  efy-asimo
+ * Currencies/Countries cosmetics and regenerate_url after Enable/Disable
+ *
  * Revision 1.10  2010/01/03 12:03:17  fplanque
  * More crumbs...
  *

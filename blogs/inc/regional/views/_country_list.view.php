@@ -181,14 +181,16 @@ function ctry_td_actions($ctry_enabled, $ctry_ID )
 	global $dispatcher;
 
 	$r = '';
-// fp> TODO: regenerate URL so that page is not lost
+
 	if( $ctry_enabled == true )
 	{
-		$r .= action_icon( T_('Disable the country!'), 'deactivate', $dispatcher.'?ctrl=countries&amp;action=disable_country&amp;ctry_ID='.$ctry_ID.'&amp;'.url_crumb('country') );
+		$r .= action_icon( T_('Disable the country!'), 'deactivate', 
+										regenerate_url( 'action', 'action=disable_country&amp;ctry_ID='.$ctry_ID.'&amp;'.url_crumb('country') ) );
 	}
 	else
 	{
-		$r .= action_icon( T_('Enable the country!'), 'activate', $dispatcher.'?ctrl=countries&amp;action=enable_country&amp;ctry_ID='.$ctry_ID.'&amp;'.url_crumb('country') );
+		$r .= action_icon( T_('Enable the country!'), 'activate',
+										regenerate_url( 'action', 'action=enable_country&amp;ctry_ID='.$ctry_ID.'&amp;'.url_crumb('country') ) );
 	}
 	$r .= action_icon( T_('Edit this country...'), 'edit',
 										regenerate_url( 'action', 'ctry_ID='.$ctry_ID.'&amp;action=edit' ) );
@@ -215,6 +217,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.17  2010/01/16 14:16:32  efy-asimo
+ * Currencies/Countries cosmetics and regenerate_url after Enable/Disable
+ *
  * Revision 1.16  2010/01/03 12:03:17  fplanque
  * More crumbs...
  *

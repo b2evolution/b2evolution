@@ -48,7 +48,7 @@ if( !empty($s) )
 }
 
 // Create result set:
-$Results = new Results( $SQL->get(), 'curr_' );
+$Results = new Results( $SQL->get(), 'curr_', '-A');
 
 $Results->Cache = & get_CurrencyCache();
 
@@ -100,6 +100,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'order' => 'curr_code',
 							'td' => '<strong><a href="'.$dispatcher.'?ctrl=currencies&amp;curr_ID=$curr_ID$&amp;action=edit" title="'.
 											T_('Edit this currency...').'">$curr_code$</a></strong>',
+							'td_class' => 'center',
 						);
 }
 else
@@ -108,6 +109,7 @@ else
 							'th' => T_('Code'),
 							'order' => 'curr_code',
 							'td' => '<strong>$curr_code$</strong>',
+							'td_class' => 'center',
 						);
 
 }
@@ -116,6 +118,7 @@ $Results->cols[] = array(
 						'th' => T_('Shortcut'),
 						'order' => 'curr_shortcut',
 						'td' => '$curr_shortcut$',
+						'td_class' => 'center',
 					);
 
 $Results->cols[] = array(
@@ -135,11 +138,13 @@ function curr_td_actions($curr_enabled, $curr_ID )
 
 	if( $curr_enabled == true )
 	{
-		$r .= action_icon( T_('Disable the currency!'), 'deactivate', $dispatcher.'?ctrl=currencies&amp;action=disable_currency&amp;curr_ID='.$curr_ID.'&amp;'.url_crumb('currency') );
+		$r .= action_icon( T_('Disable the currency!'), 'deactivate', 
+										regenerate_url( 'action', 'action=disable_currency&amp;curr_ID='.$curr_ID.'&amp;'.url_crumb('currency') ) );
 	}
 	else
 	{
-		$r .= action_icon( T_('Enable the currency!'), 'activate', $dispatcher.'?ctrl=currencies&amp;action=enable_currency&amp;curr_ID='.$curr_ID.'&amp;'.url_crumb('currency') );
+		$r .= action_icon( T_('Enable the currency!'), 'activate', 
+										regenerate_url( 'action', 'action=enable_currency&amp;curr_ID='.$curr_ID.'&amp;'.url_crumb('currency') ) );
 	}
 	$r .= action_icon( T_('Edit this currency...'), 'edit',
 										regenerate_url( 'action', 'curr_ID='.$curr_ID.'&amp;action=edit' ) );
@@ -156,7 +161,6 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 			'th' => T_('Actions'),
 			'th_class' => 'shrinkwrap',
 			'td' => '%curr_td_actions( #curr_enabled#, #curr_ID# )%',
-			'td_class' => 'shrinkwrap',
 		);
 
 	$Results->global_icon( T_('Create a new currency ...'), 'new',
@@ -167,6 +171,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/16 14:16:32  efy-asimo
+ * Currencies/Countries cosmetics and regenerate_url after Enable/Disable
+ *
  * Revision 1.9  2010/01/15 17:27:33  efy-asimo
  * Global Settings > Currencies - Add Enable/Disable column
  *
