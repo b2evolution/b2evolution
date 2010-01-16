@@ -892,13 +892,7 @@ switch( $action )
 
 				$order = 1;
 				do
-				{	// LOOP Through images:
-					if( ! $l_File->is_image() )
-					{
-						$Messages->add( sprintf( T_('Cannot post &laquo;%s&raquo; because it is not an image.'), $l_File->dget('name') ), 'error' );
-						continue;
-					}
-
+				{	// LOOP through files:
 					// echo '<br>file meta: '.$l_File->meta;
 					if(	$l_File->meta == 'notfound' )
 					{	// That file has no meta data yet, create it now!
@@ -926,12 +920,6 @@ switch( $action )
 				// MULTIPLE POST (1 per image):
 				while( $l_File = & $selected_Filelist->get_next() )
 				{
-					if( ! $l_File->is_image() )
-					{
-						$Messages->add( sprintf( T_('Cannot post &laquo;%s&raquo; because it is not an image.'), $l_File->dget('name') ), 'error' );
-						continue;
-					}
-
 					// Create a post:
 					$edited_Item = & new Item();
 					$edited_Item->set( 'status', $item_status );
@@ -1702,6 +1690,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.50  2010/01/16 22:37:44  blueyed
+ * make_post/make_posts: do not limit to images only.
+ *
  * Revision 1.49  2010/01/16 22:35:49  blueyed
  * typo
  *
