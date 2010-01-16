@@ -890,6 +890,7 @@ switch( $action )
 				// INSERT NEW POST INTO DB:
 				$edited_Item->dbinsert();
 
+				$order = 1;
 				do
 				{	// LOOP Through images:
 					if( ! $l_File->is_image() )
@@ -909,6 +910,7 @@ switch( $action )
 					$edited_Link->set( 'itm_ID', $edited_Item->ID );
 					$edited_Link->set( 'file_ID', $l_File->ID );
 					$edited_Link->set( 'position', 'teaser' );
+					$edited_Link->set( 'order', $order++ );
 					$edited_Link->dbinsert();
 
 					$Messages->add( sprintf( T_('&laquo;%s&raquo; has been attached.'), $l_File->dget('name') ), 'success' );
@@ -958,6 +960,7 @@ switch( $action )
 					$edited_Link->set( 'itm_ID', $edited_Item->ID );
 					$edited_Link->set( 'file_ID', $l_File->ID );
 					$edited_Link->set( 'position', 'teaser' );
+					$edited_Link->set( 'order', 1 );
 					$edited_Link->dbinsert();
 
 					$DB->commit();
@@ -1699,6 +1702,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.48  2010/01/16 22:34:39  blueyed
+ * Fix missing order in make_post and make_posts actions.
+ *
  * Revision 1.47  2010/01/16 22:27:08  blueyed
  * Fix missing position in make_post and make_posts actions.
  *
