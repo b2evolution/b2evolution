@@ -308,7 +308,7 @@ $Debuglog->add( 'path: '.var_export( $path, true ), 'files' );
 /**
  * A list of filepaths which are selected in the FM list.
  *
- * @todo fp> This could probably be further simpplified by using "fm_sources" for selections.
+ * @todo fp> This could probably be further simplified by using "fm_sources" for selections.
  * Note: fm_sources is better because it also handles sources/selections on a different fileroot
  *
  * @global array
@@ -1702,6 +1702,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.49  2010/01/16 22:35:49  blueyed
+ * typo
+ *
  * Revision 1.48  2010/01/16 22:34:39  blueyed
  * Fix missing order in make_post and make_posts actions.
  *
