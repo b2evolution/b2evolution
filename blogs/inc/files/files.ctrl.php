@@ -908,6 +908,7 @@ switch( $action )
 					$edited_Link = & new Link();
 					$edited_Link->set( 'itm_ID', $edited_Item->ID );
 					$edited_Link->set( 'file_ID', $l_File->ID );
+					$edited_Link->set( 'position', 'teaser' );
 					$edited_Link->dbinsert();
 
 					$Messages->add( sprintf( T_('&laquo;%s&raquo; has been attached.'), $l_File->dget('name') ), 'success' );
@@ -956,6 +957,7 @@ switch( $action )
 					$edited_Link = & new Link();
 					$edited_Link->set( 'itm_ID', $edited_Item->ID );
 					$edited_Link->set( 'file_ID', $l_File->ID );
+					$edited_Link->set( 'position', 'teaser' );
 					$edited_Link->dbinsert();
 
 					$DB->commit();
@@ -1697,6 +1699,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.47  2010/01/16 22:27:08  blueyed
+ * Fix missing position in make_post and make_posts actions.
+ *
  * Revision 1.46  2010/01/16 22:23:35  blueyed
  * typo
  *
