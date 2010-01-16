@@ -1665,6 +1665,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.49  2010/01/16 05:21:25  sam2kb
+ * Deleted crap text at the bottom
+ *
  * Revision 1.48  2010/01/15 18:34:12  blueyed
  * The dl function is deprecated and not available in PHP 5.3. Do not make us produce white pages.
  *
@@ -1934,7 +1937,3 @@ class DB
  * Fixed possible fatal error while collecting col_info for CREATE and DROP queries
  */
 ?>
-
---
-hundred-and-one symptoms of being an internet addict:
-253. You wait for a slow loading web page before going to the toilet.
