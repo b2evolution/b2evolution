@@ -7,7 +7,7 @@
  * Actions disappear if you browse to a different location.
  * Examples of actions: file properties, file edit.
  *
- * fp>> Movr/copy should not be a mode (too geeky). All we need is a dir selection tree inside of upload and move.
+ * fp>> Move/copy should not be a mode (too geeky). All we need is a dir selection tree inside of upload and move.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -1697,6 +1697,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.46  2010/01/16 22:23:35  blueyed
+ * typo
+ *
  * Revision 1.45  2010/01/16 14:27:03  efy-yury
  * crumbs, fadeouts, redirect, action_icon
  *
