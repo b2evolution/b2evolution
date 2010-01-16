@@ -102,6 +102,9 @@ switch( $action )
 
 
 	case 'prune': // PRUNE hits for a certain date
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'stats' );
+		
 		// Check permission:
 		$current_User->check_perm( 'stats', 'edit', true );
 
@@ -114,6 +117,9 @@ switch( $action )
 		{
 			$Messages->add( sprintf( /* TRANS: %s is a date */ T_('No hits deleted for %s.'), date( locale_datefmt(), $date) ), 'note' );
 		}
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=stats', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 }
 
@@ -357,6 +363,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2010/01/16 12:47:37  efy-yury
+ * update stats: crumbs and redirect
+ *
  * Revision 1.22  2009/12/12 01:13:08  fplanque
  * A little progress on breadcrumbs on menu structures alltogether...
  *
