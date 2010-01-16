@@ -67,6 +67,14 @@ class custom_Skin extends Skin
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),
+				'sidebar_position' => array(
+					'label' => T_('Sidebar position'),
+					'note' => T_(''),
+					'defaultvalue' => 'right',
+					'options' => array( 'left' => $this->T_('Left'), 'right' => $this->T_('Right') ),
+					'type' => 'select',
+				),
+				
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -114,6 +122,9 @@ class custom_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/16 17:08:36  efy-eugene
+ * Selection of sidebar position added
+ *
  * Revision 1.5  2010/01/13 23:40:21  fplanque
  * cleanup
  *

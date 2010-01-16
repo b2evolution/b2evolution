@@ -89,8 +89,15 @@ hr {
 	border-top: 1px solid #78a;
 }
 
-div#wrapper {
-	background: #fff url(img/bg_content.gif) repeat-y 0 0;
+div#wrapper_left {
+	background: #fff url(img/bg_content_left.gif) repeat-y 0 0;
+	width: 740px;
+	margin: 0 auto;
+	padding: 0;
+}
+
+div#wrapper_right {
+	background: #fff url(img/bg_content_right.gif) repeat-y 0 0;
 	width: 740px;
 	margin: 0 auto;
 	padding: 0;
@@ -186,12 +193,20 @@ h2 {
 
 
 /* Styles for posts */
-.bPosts {
+.bPosts_right {
 	float: left;
 	width: 480px;
 	overflow: hidden;
 	/* background: #090;*/
 }
+
+.bPosts_left {
+	float: right;
+	width: 480px;
+	overflow: hidden;
+	/* background: #090;*/
+}
+
 div.action_messages {
 	margin: 0 2ex;
 }
@@ -258,12 +273,21 @@ input.preview:hover {
 }
 
 /* Styles for sidebar (right) */
-.bSideBar {
+.bSideBar_right {
 	width: 259px;
 	float: right;
 	overflow: hidden;
 	/* background: #900; */
 }
+
+/* Styles for sidebar (left) */
+.bSideBar_left {
+	width: 259px;
+	float: left;
+	overflow: hidden;
+	/* background: #900; */
+}
+
 .bSideItem {
 	margin: 2ex;
 	padding: 0 0 2ex 0;
