@@ -237,6 +237,9 @@ param( 'uploadfile_url', 'array', array() );
 param( 'uploadfile_source', 'array', array() );
 if( $uploadfile_url )
 {
+	// Check that this action request is not a CSRF hacked request:
+	$Session->assert_received_crumb( 'file' );
+	
 	foreach($uploadfile_url as $k => $url)
 	{
 		if( ! isset($uploadfile_source[$k]) || $uploadfile_source[$k] != 'upload' )
@@ -300,7 +303,11 @@ if( $uploadfile_url )
 
 // Process uploaded files:
 if( isset($_FILES) && count( $_FILES ) )
-{ // Some files have been uploaded:
+{ 
+	// Check that this action request is not a CSRF hacked request:
+	$Session->assert_received_crumb( 'file' );
+	
+	// Some files have been uploaded:
 	param( 'uploadfile_title', 'array', array() );
 	param( 'uploadfile_alt', 'array', array() );
 	param( 'uploadfile_desc', 'array', array() );
@@ -500,7 +507,6 @@ if( isset($_FILES) && count( $_FILES ) )
 
 		// Store File object into DB:
 		$newFile->dbsave();
-
 	}
 
 	if( $upload_quickmode && !empty($failedFiles) )
@@ -549,6 +555,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.30  2010/01/16 14:27:03  efy-yury
+ * crumbs, fadeouts, redirect, action_icon
+ *
  * Revision 1.29  2010/01/03 13:10:58  fplanque
  * set some crumbs (needs checking)
  *

@@ -51,6 +51,9 @@ param( 'action', 'string' );
 switch( $action )
 {
 	case 'update':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
+		
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -152,6 +155,9 @@ switch( $action )
 				}
 			}
 		}
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=fileset', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 
 		break;
 }
@@ -185,6 +191,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/16 14:27:03  efy-yury
+ * crumbs, fadeouts, redirect, action_icon
+ *
  * Revision 1.5  2009/12/06 22:55:18  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

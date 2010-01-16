@@ -44,6 +44,10 @@ switch ( $action )
 				$Messages->add( T_('General settings updated.'), 'success' );
 			}
 		}
+		
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=usersettings', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 
 		break;
 }
@@ -75,6 +79,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/16 14:27:04  efy-yury
+ * crumbs, fadeouts, redirect, action_icon
+ *
  * Revision 1.7  2010/01/03 17:45:21  fplanque
  * crumbs & stuff
  *

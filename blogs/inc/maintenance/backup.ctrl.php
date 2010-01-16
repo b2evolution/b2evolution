@@ -78,6 +78,9 @@ switch( $action )
 		break;
 
 	case 'backup':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'backup' );
+		
 		$Form = & new Form( NULL, 'backup_progress', 'post' );
 
 		// Interactive / flush() backup should start here
@@ -114,6 +117,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/16 14:27:04  efy-yury
+ * crumbs, fadeouts, redirect, action_icon
+ *
  * Revision 1.5  2009/12/06 22:55:18  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

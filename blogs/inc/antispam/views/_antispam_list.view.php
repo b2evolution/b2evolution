@@ -157,13 +157,13 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 		if( $row->aspm_source == 'local' )
 		{
 			$output .= '[<a href="'.regenerate_url( 'action,keyword', 'action=report&amp;keyword='
-									.rawurlencode( $row->aspm_string )).'" title="'.
+									.rawurlencode( $row->aspm_string )).'&amp;'.url_crumb('antispam').'" title="'.
 									T_('Report abuse to centralized ban blacklist!').'">'.
 									T_('Report').'</a>]';
 		}
 
 		return $output.'[<a href="'.regenerate_url( 'action,keyword', 'action=ban&amp;keyword='
-									.rawurlencode( $row->aspm_string )).'" title="'.
+									.rawurlencode( $row->aspm_string )).'&amp;'.url_crumb('antispam').'" title="'.
 									T_('Check hit-logs and comments for this keyword!').'">'.
 									T_('Re-check').'</a>]';
 	}
@@ -179,6 +179,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/16 14:27:03  efy-yury
+ * crumbs, fadeouts, redirect, action_icon
+ *
  * Revision 1.7  2010/01/03 17:56:05  fplanque
  * crumbs & stuff
  *

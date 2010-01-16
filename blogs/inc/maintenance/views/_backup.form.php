@@ -159,7 +159,7 @@ if( function_exists('gzopen') )
 {
 	$Form->checkbox( 'bk_pack_backup_files', $current_Backup->pack_backup_files, T_( 'ZIP' ), T_('Compress backup into ZIP files') );
 }
-
+$Form->add_crumb( 'backup' );
 $Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'SaveButton' ),
@@ -168,6 +168,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'S
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/16 14:27:04  efy-yury
+ * crumbs, fadeouts, redirect, action_icon
+ *
  * Revision 1.5  2009/11/18 21:54:25  efy-maxim
  * compatibility fix for PHP4
  *

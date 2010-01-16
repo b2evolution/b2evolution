@@ -101,6 +101,9 @@ switch( $action )
 			if( antispam_create( $keyword ) )
 			{
 				$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars($keyword) ), 'success' );
+				// Redirect so that a reload doesn't write to the DB twice:
+				header_redirect( '?ctrl=antispam', 303 ); // Will EXIT
+				// We have EXITed already at this point!!
 			}
 			else
 			{ // TODO: message?
@@ -110,7 +113,7 @@ switch( $action )
 		if( $report )
 		{ // Report this keyword as abuse:
 			antispam_report_abuse( $keyword );
-		}
+		}	
 
 		// We'll ask the user later what to do, if no "sub-action" given.
 		break;
@@ -133,6 +136,9 @@ switch( $action )
 
 	case 'report':
 		// Report an entry as abuse to centralized blacklist:
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
 		$current_User->check_perm( 'spamblacklist', 'edit', true );
@@ -193,6 +199,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/16 14:27:03  efy-yury
+ * crumbs, fadeouts, redirect, action_icon
+ *
  * Revision 1.8  2010/01/03 17:56:05  fplanque
  * crumbs & stuff
  *

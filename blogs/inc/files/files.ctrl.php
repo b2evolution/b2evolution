@@ -585,6 +585,9 @@ switch( $action )
 		// TODO: We don't need the Filelist, move UP!
 		// TODO: provide optional zip formats (tgz, ..) - the used lib provides more..
 		// TODO: use "inmemory"=>false, so that you can download bigger archives faster!
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
 
 		$action_title = T_('Download');
 
@@ -648,7 +651,6 @@ switch( $action )
 	case 'rename':
 		// TODO: We don't need the Filelist, move UP!
 		// Rename a file:
-
 		// This will not allow to overwrite existing files, the same way Windows and MacOS do not allow it. Adding an option will only clutter the interface and satisfy geeks only.
 		if( ! $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
 		{ // We do not have permission to edit files
@@ -701,6 +703,8 @@ switch( $action )
 
 		if( $confirmed )
 		{ // Rename is confirmed, let's proceed:
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'file' );
 			$selected_Filelist->restart();
 			while( $loop_src_File = & $selected_Filelist->get_next() )
 			{
@@ -743,6 +747,9 @@ switch( $action )
 	case 'delete':
 		// TODO: We don't need the Filelist, move UP!
 		// Delete a file or directory:
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
 
 		if( ! $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
 		{ // We do not have permission to edit files
@@ -779,6 +786,9 @@ switch( $action )
 				}
 			}
 			$action = 'list';
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=files&blog='.$blog.'&root='.$root.'&path='.$path, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 		else
 		{
@@ -805,6 +815,9 @@ switch( $action )
 			if( ! $selected_Filelist->count() )
 			{ // no files left in list, cancel action
 				$action = 'list';
+				// Redirect so that a reload doesn't write to the DB twice:
+				header_redirect( '?ctrl=files&blog='.$blog.'&root='.$root.'&path='.$path, 303 ); // Will EXIT
+				// We have EXITed already at this point!!
 			}
 		}
 		break;
@@ -1015,6 +1028,9 @@ switch( $action )
 		// TODO: We don't need the Filelist, move UP!
 		// Update File properties (Meta Data); on success this ends the file_properties mode:
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
+		
 		// Check permission!
  		$current_User->check_perm( 'files', 'edit', true, $blog ? $blog : NULL );
 
@@ -1035,6 +1051,9 @@ switch( $action )
 		{
 			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $edited_File->dget('name') ), 'note' );
 		}
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=files&blog='.$blog.'&root='.$root.'&path='.$path, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 
 
@@ -1427,6 +1446,9 @@ switch( $fm_mode )
 		if( $confirm && $fm_source_Filelist->count() )
 		{ // Copy/move is confirmed (and we still have files to copy/move), let's proceed:
 
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'file' );
+			
 			// Loop through files:
 			$fm_source_Filelist->restart();
 			while( $loop_src_File = & $fm_source_Filelist->get_next() )
@@ -1454,6 +1476,9 @@ switch( $fm_mode )
 						param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Could not copy &laquo;%s&raquo; to &laquo;%s&raquo;.'),
 																		$loop_src_File->get_rdfp_rel_path(), $dest_File->get_rdfp_rel_path() ) );
 					}
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=files&blog='.$blog.'&root='.$root.'&path='.$path, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
 				}
 				elseif( $fm_mode == 'file_move' )
 				{ // MOVE
@@ -1500,6 +1525,9 @@ switch( $fm_mode )
 					}
 
 					$DB->commit();
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=files&blog='.$blog.'&root='.$root.'&path='.$path, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
 				}
 				else debug_die( 'Unhandled file copy/move mode' );
 			}
@@ -1669,6 +1697,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.45  2010/01/16 14:27:03  efy-yury
+ * crumbs, fadeouts, redirect, action_icon
+ *
  * Revision 1.44  2009/12/06 22:55:18  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

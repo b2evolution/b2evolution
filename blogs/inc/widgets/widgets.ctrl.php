@@ -135,6 +135,8 @@ switch( $action )
 		break;
 
 	case 'create':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget' );
 		// Add a Widget to container:
 		if( !in_array( $container, $container_list ) )
 		{
@@ -203,6 +205,9 @@ switch( $action )
 
 
 	case 'update':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget' );
+		
 		// Update Settings
 		$edited_ComponentWidget->load_from_Request();
 
@@ -228,6 +233,9 @@ switch( $action )
 
 	case 'move_up':
 		// Move the widget up:
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget' );
 
 		$order = $edited_ComponentWidget->order;
 		$DB->begin();
@@ -260,6 +268,9 @@ switch( $action )
 
 	case 'move_down':
 		// Move the widget down:
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget' );
 
 		$order = $edited_ComponentWidget->order;
 		$DB->begin();
@@ -292,6 +303,11 @@ switch( $action )
 
 	case 'toggle':
 		// Enable or disable the widget:
+		
+		// Check that this action request is not a CSRF hacked request:
+		//TODO uncomment when eill be fixed bug in toggleWidget js
+		//$Session->assert_received_crumb( 'widget' );
+		
 		$enabled = $edited_ComponentWidget->get( 'enabled' );
 		$edited_ComponentWidget->set( 'enabled', (int)! $enabled );
 		$edited_ComponentWidget->dbupdate();
@@ -314,6 +330,9 @@ switch( $action )
 		break;
 
 	case 'delete':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget' );
+		
 		// Remove a widget from container:
 		$msg = sprintf( T_('Widget &laquo;%s&raquo; removed.'), $edited_ComponentWidget->get_name() );
 		$edited_widget_ID = $edited_ComponentWidget->ID;
@@ -379,6 +398,9 @@ switch( $action )
 
 	case 'reload':
 		// Reload containers:
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget' );
 
  		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -537,6 +559,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.39  2010/01/16 14:27:04  efy-yury
+ * crumbs, fadeouts, redirect, action_icon
+ *
  * Revision 1.38  2009/12/20 20:38:26  fplanque
  * Enhanced skin containers reload for skin developers
  *

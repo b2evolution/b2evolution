@@ -71,7 +71,7 @@ foreach( $core_componentwidget_defs as $code )
 		$ComponentWidget = & new $classname( NULL, 'core', $code );
 
 		echo '<li>';
-		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code ).'" title="'.T_('Add this widget to the container').'">';
+		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.'&amp;'.url_crumb('widget') ).'" title="'.T_('Add this widget to the container').'">';
 		echo get_icon( 'new' ).'<strong>'.$ComponentWidget->get_name().'</strong>';
 		echo '</a> <span class="notes">'.$ComponentWidget->get_desc().'</span>';
 		echo '</li>';
@@ -117,6 +117,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.26  2010/01/16 14:27:04  efy-yury
+ * crumbs, fadeouts, redirect, action_icon
+ *
  * Revision 1.25  2009/09/20 00:33:59  blueyed
  * Add widget to display avatar of collection/blog owner. Install it for all new blogs by default.
  *

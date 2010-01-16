@@ -171,6 +171,10 @@ if( !$Messages->count('error') )
 			/*
 			 * Delete user
 			 */
+			
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+			
 			if( !isset($edited_User) )
 				debug_die( 'no User set' );
 
@@ -204,6 +208,9 @@ if( !$Messages->count('error') )
 				forget_param('user_ID');
 				$Messages->add( $msg, 'success' );
 				$action = 'list';
+				// Redirect so that a reload doesn't write to the DB twice:
+				header_redirect( '?ctrl=users', 303 ); // Will EXIT
+				// We have EXITed already at this point!!
 			}
 			else
 			{	// not confirmed, Check for restrictions:
@@ -325,6 +332,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.48  2010/01/16 14:27:04  efy-yury
+ * crumbs, fadeouts, redirect, action_icon
+ *
  * Revision 1.47  2010/01/03 12:03:17  fplanque
  * More crumbs...
  *
