@@ -208,6 +208,13 @@ switch( $action )
 
 		$Messages->add( /* TRANS: plugin name, class name and ID */ sprintf( T_('Disabled "%s" plugin (%s, #%d).'), $edit_Plugin->name, $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
 
+		//save fadeout item
+		$Session->set('fadeout_id', $plugin_ID);
+		
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=plugins', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+			
 		break;
 
 
@@ -273,6 +280,13 @@ switch( $action )
 		{
 			$Messages->add( T_('The plugin has not been enabled.').( empty($enable_return) ? '' : '<br />'.$enable_return ), 'error' );
 		}
+		
+		//save fadeout item
+		$Session->set('fadeout_id', $plugin_ID);
+		
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=plugins', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 
 		break;
 
@@ -328,6 +342,10 @@ switch( $action )
 			$Messages->add( T_('Plugins have not changed.'), 'note' );
 		}
 		$action = 'list';
+		
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=plugins', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 
 
@@ -406,6 +424,9 @@ switch( $action )
 		{ // Add notes from dependencies
 			$Messages->add_messages( array( 'note' => $edit_Plugin->install_dep_notes ) );
 		}
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=plugins', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 
 
@@ -477,7 +498,10 @@ switch( $action )
 				$admin_Plugins->uninstall( $edit_Plugin->ID );
 
 				$Messages->add( /* %s = plugin's classname, %d = plugin's ID */
-					sprintf( T_('The &laquo;%s&raquo; plugin (#%d) has been uninstalled.'), $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
+				sprintf( T_('The &laquo;%s&raquo; plugin (#%d) has been uninstalled.'), $edit_Plugin->classname, $edit_Plugin->ID ), 'success' );
+				// Redirect so that a reload doesn't write to the DB twice:
+				header_redirect( '?ctrl=plugins', 303 ); // Will EXIT
+				// We have EXITed already at this point!!
 				break;
 			}
 		}
@@ -670,6 +694,13 @@ switch( $action )
 		{ // there were errors
 			$action = 'edit_settings';
 		}
+		
+		//save fadeout item
+		$Session->set('fadeout_id', $edit_Plugin->ID);
+				
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=plugins', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 
 
@@ -1101,6 +1132,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2010/01/16 11:19:23  efy-yury
+ * update plugins: redirect and fadeouts
+ *
  * Revision 1.16  2010/01/03 13:45:37  fplanque
  * set some crumbs (needs checking)
  *

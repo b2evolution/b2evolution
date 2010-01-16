@@ -47,7 +47,10 @@ global $current_User;
  */
 global $admin_Plugins;
 
-global $edit_Plugin;
+global $Session;
+
+$fadeout_id = $Session->get('fadeout_id');
+
 load_funcs('plugins/_plugin.funcs.php');
 
 $SQL = & new SQL();
@@ -269,16 +272,22 @@ $Results->global_icon( T_('Install new plugin...'), 'new', regenerate_url( 'acti
 
 
 
-// if there happened something with a plugin_ID, apply fadeout to the row:
-$highlight_fadeout = empty($edit_Plugin) || ! is_object($edit_Plugin) /* may be error string */ ? array() : array( 'plug_ID'=>array($edit_Plugin->ID) );
+// if there happened something with a plugin, apply fadeout to the row:
+$highlight_fadeout = empty($fadeout_id) /* may be error string */ ? array() : array( 'plug_ID'=>array($fadeout_id) );
 
 $Results->display( NULL, $highlight_fadeout );
 
 unset($Results); // free memory
 
+//Flush fadeout
+$Session->delete( 'fadeout_id');
+
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/16 11:19:23  efy-yury
+ * update plugins: redirect and fadeouts
+ *
  * Revision 1.7  2010/01/03 12:26:32  fplanque
  * Crumbs for plugins. This is a little bit tough because it's a non standard controller.
  * There may be missing crumbs, especially during install. Please add missing ones when you spot them.
