@@ -161,9 +161,10 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 			'th' => T_('Actions'),
 			'th_class' => 'shrinkwrap',
 			'td' => '%curr_td_actions( #curr_enabled#, #curr_ID# )%',
+			'td_class' => 'shrinkwrap',
 		);
 
-	$Results->global_icon( T_('Create a new currency ...'), 'new',
+	$Results->global_icon( T_('Create a new currency...'), 'new',
 				regenerate_url( 'action', 'action=new'), T_('New currency').' &raquo;', 3, 4  );
 }
 
@@ -171,6 +172,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.11  2010/01/17 04:14:44  fplanque
+ * minor / fixes
+ *
  * Revision 1.10  2010/01/16 14:16:32  efy-asimo
  * Currencies/Countries cosmetics and regenerate_url after Enable/Disable
  *

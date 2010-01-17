@@ -53,7 +53,7 @@ switch( $action )
 	case 'update':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
-		
+
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
@@ -191,6 +191,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/17 04:14:41  fplanque
+ * minor / fixes
+ *
  * Revision 1.6  2010/01/16 14:27:03  efy-yury
  * crumbs, fadeouts, redirect, action_icon
  *

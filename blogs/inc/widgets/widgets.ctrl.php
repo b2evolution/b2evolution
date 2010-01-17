@@ -135,9 +135,11 @@ switch( $action )
 		break;
 
 	case 'create':
+		// Add a Widget to container:
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
-		// Add a Widget to container:
+
 		if( !in_array( $container, $container_list ) )
 		{
 			$Messages->add( T_('WARNING: you are adding to a container that does not seem to be part of the current skin.'), 'error' );
@@ -149,7 +151,7 @@ switch( $action )
 				// Check the requested core widget is valid:
 				$objtype = $code.'_Widget';
 				load_class( 'widgets/widgets/_'.$code.'.widget.php', $objtype );
-				$edited_ComponentWidget = & new $objtype();
+				$edited_ComponentWidget = new $objtype();
 				break;
 
 			case 'plugin':
@@ -161,7 +163,7 @@ switch( $action )
 				{
 					debug_die( 'Requested plugin does not support SkinTag' );
 				}
-				$edited_ComponentWidget = & new ComponentWidget( NULL, 'plugin', $code );
+				$edited_ComponentWidget = new ComponentWidget( NULL, 'plugin', $code );
 				break;
 
 			default:
@@ -205,10 +207,11 @@ switch( $action )
 
 
 	case 'update':
+		// Update Settings
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
-		
-		// Update Settings
+
 		$edited_ComponentWidget->load_from_Request();
 
 		if(	! param_errors_detected() )
@@ -233,7 +236,7 @@ switch( $action )
 
 	case 'move_up':
 		// Move the widget up:
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
@@ -268,7 +271,7 @@ switch( $action )
 
 	case 'move_down':
 		// Move the widget down:
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
@@ -303,9 +306,9 @@ switch( $action )
 
 	case 'toggle':
 		// Enable or disable the widget:
-		
+
 		// Check that this action request is not a CSRF hacked request:
-		//TODO uncomment when eill be fixed bug in toggleWidget js
+		//TODO yuri>uncomment when will be fixed bug in toggleWidget js
 		//$Session->assert_received_crumb( 'widget' );
 		
 		$enabled = $edited_ComponentWidget->get( 'enabled' );
@@ -330,10 +333,11 @@ switch( $action )
 		break;
 
 	case 'delete':
+		// Remove a widget from container:
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
-		
-		// Remove a widget from container:
+
 		$msg = sprintf( T_('Widget &laquo;%s&raquo; removed.'), $edited_ComponentWidget->get_name() );
 		$edited_widget_ID = $edited_ComponentWidget->ID;
 		$edited_ComponentWidget->dbdelete( true );
@@ -398,7 +402,7 @@ switch( $action )
 
 	case 'reload':
 		// Reload containers:
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
@@ -559,6 +563,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.40  2010/01/17 04:14:38  fplanque
+ * minor / fixes
+ *
  * Revision 1.39  2010/01/16 14:27:04  efy-yury
  * crumbs, fadeouts, redirect, action_icon
  *

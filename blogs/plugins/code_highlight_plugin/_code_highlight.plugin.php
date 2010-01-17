@@ -64,7 +64,7 @@
  *           Line numbers do not make sense for short code blocks (and also for longer ones
  *           not necessarily).
  *       fp> how about if no line=".." attribute is specified then no numbering?
- *       dh> very OK with me.
+ *       dh> very OK with me. fp> yeah you gotta do it if you want it :p 
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -636,6 +636,9 @@ class code_highlight_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.29  2010/01/17 04:14:45  fplanque
+ * minor / fixes
+ *
  * Revision 1.28  2010/01/15 19:25:30  blueyed
  * doc
  *

@@ -113,7 +113,7 @@ switch( $action )
 		if( $report )
 		{ // Report this keyword as abuse:
 			antispam_report_abuse( $keyword );
-		}	
+		}
 
 		// We'll ask the user later what to do, if no "sub-action" given.
 		break;
@@ -199,6 +199,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/17 04:14:45  fplanque
+ * minor / fixes
+ *
  * Revision 1.9  2010/01/16 14:27:03  efy-yury
  * crumbs, fadeouts, redirect, action_icon
  *

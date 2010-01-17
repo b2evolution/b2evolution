@@ -66,7 +66,7 @@ class Currency extends DataObject
 			$this->code          = $db_row->curr_code;
 			$this->shortcut      = $db_row->curr_shortcut;
 			$this->name          = $db_row->curr_name;
-			$this->enabled		 = $db_row->curr_enabled;
+			$this->enabled       = $db_row->curr_enabled;
 		}
 	}
 
@@ -143,6 +143,9 @@ class Currency extends DataObject
 
 /*
  * $Log$
+ * Revision 1.13  2010/01/17 04:14:40  fplanque
+ * minor / fixes
+ *
  * Revision 1.12  2010/01/15 17:27:28  efy-asimo
  * Global Settings > Currencies - Add Enable/Disable column
  *
