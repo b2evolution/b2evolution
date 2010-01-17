@@ -59,7 +59,7 @@ function get_affected_paths( $path )
 {
 	global $basepath;
 
-	$affected_paths = T_( 'Affected_paths: ');
+	$affected_paths = T_( 'Affected paths:' ).' ';
 	if( is_array( $path ) )
 	{
 		$paths = array();
@@ -112,7 +112,7 @@ function get_affected_tables( $table )
 {
 	global $DB;
 
-	$affected_tables = T_( 'Affected tables: ' );
+	$affected_tables = T_( 'Affected tables:' ).' ';
 	if( is_array( $table ) )
 	{
 		$affected_tables .= implode( ', ', aliases_to_tables( $table ) );
@@ -157,7 +157,7 @@ $Form->checkbox( 'bk_maintenance_mode', true, T_( 'Maintenance mode' ), T_( 'Put
 
 if( function_exists('gzopen') )
 {
-	$Form->checkbox( 'bk_pack_backup_files', $current_Backup->pack_backup_files, T_( 'ZIP' ), T_('Compress backup into ZIP files') );
+	$Form->checkbox( 'bk_pack_backup_files', $current_Backup->pack_backup_files, 'ZIP', T_('Compress backup into ZIP files') );
 }
 $Form->add_crumb( 'backup' );
 $Form->end_fieldset();
@@ -168,6 +168,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'S
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/17 16:15:24  sam2kb
+ * Localization clean-up
+ *
  * Revision 1.6  2010/01/16 14:27:04  efy-yury
  * crumbs, fadeouts, redirect, action_icon
  *

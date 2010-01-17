@@ -334,7 +334,7 @@ switch( $user_tab )
 		$AdminUI->breadcrumbpath_add( T_('Change password'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 		break;
 	case 'preferences':
-		$AdminUI->breadcrumbpath_add( T_('sPreferences'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+		$AdminUI->breadcrumbpath_add( T_('Preferences'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 		break;
 }
 
@@ -390,6 +390,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/17 16:15:24  sam2kb
+ * Localization clean-up
+ *
  * Revision 1.8  2010/01/10 23:24:09  fplanque
  * crumbs...
  *

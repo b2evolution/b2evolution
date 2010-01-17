@@ -235,7 +235,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, &$read_
 		if( !empty( $action ) )
 		{
 			// progressive display of what backup is doing
-			echo $action.sprintf( T_( ' &laquo;<strong>%s</strong>&raquo; ...' ), $dest_dir ).'<br/>';
+			echo $action.' &laquo;<strong>'.$dest_dir.'</strong>&raquo;...<br />';
 			flush();
 		}
 
@@ -351,6 +351,9 @@ function aliases_to_tables( $aliases )
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/17 16:15:24  sam2kb
+ * Localization clean-up
+ *
  * Revision 1.6  2009/11/22 19:15:34  efy-maxim
  * load class
  *

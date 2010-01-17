@@ -269,7 +269,7 @@ if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) 
 			$new_ptyp_ID = 1;
 			$perm = ''; // No need to check
 
-			$ItemList->global_icon( T_( 'Mass create...' ), 'new', '?ctrl=items&amp;action=new_mass&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$new_ptyp_ID, T_( 'Mass create' ).' &raquo;', 3, 4 );
+			$ItemList->global_icon( T_( 'Create multiple posts...' ), 'new', '?ctrl=items&amp;action=new_mass&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$new_ptyp_ID, T_( 'Mass create' ).' &raquo;', 3, 4 );
 
 			break;
 	}
@@ -295,6 +295,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.22  2010/01/17 16:15:22  sam2kb
+ * Localization clean-up
+ *
  * Revision 1.21  2009/12/11 23:20:34  fplanque
  * revert: the goal was to save space
  *

@@ -858,7 +858,7 @@ function visibility_select( & $Form, $post_status, $mass_create = false )
 
 	if( !$mass_create && $current_User->check_perm( 'blog_post!redirected', 'edit', false, $Blog->ID ) )
 	{
-		$sharing_options[] = array( 'redirected', T_('Redirected').' <span class="notes">'.T_('(301)').'</span>' );
+		$sharing_options[] = array( 'redirected', T_('Redirected').' <span class="notes">(301)</span>' );
 	}
 
 	$Form->radio( 'post_status', $post_status, $sharing_options, '', true );
@@ -1115,6 +1115,9 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 
 /*
  * $Log$
+ * Revision 1.84  2010/01/17 16:15:22  sam2kb
+ * Localization clean-up
+ *
  * Revision 1.83  2010/01/03 18:52:57  fplanque
  * crumbs...
  *

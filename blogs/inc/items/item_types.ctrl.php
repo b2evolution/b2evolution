@@ -81,7 +81,7 @@ if( param( 'ptyp_ID', 'integer', '', true) )
 	{	// We could not find the item type to edit:
 		unset( $edited_Itemtype );
 		forget_param( 'ptyp_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Itemtype') ), 'error' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), 'Itemtype' ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -128,7 +128,7 @@ switch( $action )
 			if( ($edited_Itemtype->ID > $reserved_ids[0]) && ($edited_Itemtype->ID < $reserved_ids[1]) )
 			{ // is reserved item type
 				param_error( 'ptyp_ID',
-					sprintf( T_('Item types with ID from '.$reserved_ids[0].' to '.$reserved_ids[1].' are reserved. Please use another ID' ) ) );
+					sprintf( T_('Item types with ID from %d to %d are reserved. Please use another ID.' ), $reserved_ids[0], $reserved_ids[1] ) );
 			}
 			else
 			{ // ID is good
@@ -198,7 +198,7 @@ switch( $action )
 			if( ($edited_Itemtype->ID > $reserved_ids[0]) && ($edited_Itemtype->ID < $reserved_ids[1]) )
 			{ // is reserved item type
 				param_error( 'ptyp_ID',
-					sprintf( T_('Item types with ID from '.$reserved_ids[0].' to '.$reserved_ids[1].' are reserved. You can not edit this item type' ) ) );
+					sprintf( T_('Item types with ID from %d to %d are reserved. You can not edit this item type.' ), $reserved_ids[0], $reserved_ids[1] ) );
 			}
 			else
 			{ // ID is good
@@ -228,7 +228,7 @@ switch( $action )
 		if( ($edited_Itemtype->ID > $reserved_ids[0]) && ($edited_Itemtype->ID < $reserved_ids[1]) )
 		{ // is reserved item type
 			param_error( 'ptyp_ID',
-				sprintf( T_('Item types with ID from '.$reserved_ids[0].' to '.$reserved_ids[1].' are reserved. You can not delete this item type' ) ) );
+				sprintf( T_('Item types with ID from %d to %d are reserved. You can not delete this item type' ), $reserved_ids[0], $reserved_ids[1] ) );
 		}
 		else
 		{ // ID is good
@@ -311,6 +311,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2010/01/17 16:15:16  sam2kb
+ * Localization clean-up
+ *
  * Revision 1.12  2010/01/03 12:03:18  fplanque
  * More crumbs...
  *
