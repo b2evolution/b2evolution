@@ -116,6 +116,10 @@ switch( $action )
 	case 'create_new': // Record Itemtype and create new
 	case 'create_copy': // Record Itemtype and create similar
 		// Insert new item type...:
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'itemtype' );
+		
 		$edited_Itemtype = & new ItemType();
 
 		// Check permission:
@@ -184,6 +188,9 @@ switch( $action )
 
 	case 'update':
 		// Edit item type form...:
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'itemtype' );
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -218,6 +225,9 @@ switch( $action )
 
 	case 'delete':
 		// Delete item type:
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'itemtype' );
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -311,6 +321,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2010/01/18 20:13:55  efy-yury
+ * update items: crumbs
+ *
  * Revision 1.13  2010/01/17 16:15:16  sam2kb
  * Localization clean-up
  *

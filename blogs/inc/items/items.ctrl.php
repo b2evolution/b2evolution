@@ -1016,7 +1016,7 @@ switch( $action )
 				{ // User has no right to delete this post
 					break;
 				}
-				$AdminUI->global_icon( T_('Delete this post'), 'delete', '?ctrl=items&amp;action=delete&amp;post_ID='.$edited_Item->ID,
+				$AdminUI->global_icon( T_('Delete this post'), 'delete', '?ctrl=items&amp;action=delete&amp;post_ID='.$edited_Item->ID.'&amp;'.url_crumb('item'),
 						 T_('delete'), 4, 3, array(
 						 		'onclick' => 'return confirm(\''.TS_('You are about to delete this post!\\nThis cannot be undone!').'\')',
 						 		'style' => 'margin-right: 3ex;',	// Avoid misclicks by all means!
@@ -1276,6 +1276,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.84  2010/01/18 20:14:13  efy-yury
+ * update items: crumbs
+ *
  * Revision 1.83  2010/01/03 18:52:57  fplanque
  * crumbs...
  *
