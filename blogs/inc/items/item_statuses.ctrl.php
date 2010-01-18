@@ -45,6 +45,18 @@ global $current_User;
 
 global $dispatcher;
 
+param( 'action', 'string', 'list' );
+
+switch( $action )
+{
+	case 'copy':
+	case 'create':	
+	case 'update':
+	case 'delete':	
+		$Session->assert_received_crumb( 'element' );
+		break;
+}
+		
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
 
@@ -96,6 +108,9 @@ require $inc_path.'generic/inc/_generic_listeditor.php';
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/18 20:47:53  efy-yury
+ * update items: crumbs
+ *
  * Revision 1.6  2009/12/12 01:13:08  fplanque
  * A little progress on breadcrumbs on menu structures alltogether...
  *
