@@ -1867,15 +1867,15 @@ class Item extends ItemLight
 	function get_files( $params = array(), $format = 'htmlbody' )
 	{
 		$params = array_merge( array(
-				'before' =>              '<ul class="bFiles">',
-				'before_file' =>         '<li>',
-				'before_file_size' =>    ' <span class="file_size">',
-				'after_file_size' =>     '</span>',
-				'after_file' =>          '</li>',
-				'after' =>               '</ul>',
+				'before' =>              '<div class="attchments"><h3>'.T_('Attachments').':</h3><ul>',
+				'before_attach' =>         '<li>',
+				'before_attach_size' =>    ' <span class="file_size">',
+				'after_attach_size' =>     '</span>',
+				'after_attach' =>          '</li>',
+				'after' =>               '</ul></div>',
 			// fp> TODO: we should only have one limit param. Or is there a good reason for having two?
 			// sam2kb> It's needed only for flexibility, in the meantime if user attaches 200 files he expects to see all of them in skin, I think.
-				'limit_files' =>         1000, // Max # of files displayed
+				'limit_attach' =>        1000, // Max # of files displayed
 				'limit' =>               1000,
 				'restrict_to_image_position' => '',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 			), $params );
@@ -1892,16 +1892,13 @@ class Item extends ItemLight
 		 * @var File
 		 */
 		$File = NULL;
-		while( ( $File = & $FileList->get_next() ) && $params['limit_files'] > $i )
+		while( ( $File = & $FileList->get_next() ) && $params['limit_attach'] > $i )
 		{
 			if( $File->is_image() )
 			{	// Skip images because these are displayed inline already
 				// fp> TODO: have a setting for each linked file to decide whether it should be displayed inline or as an attachment
 				continue;
 			}
-
-			// fp> note: it actually makes sense to show directories if the admin chose to link a directory
-			// it may be a convenient way to link 1000 files at once... or even a whole source code tree of folders & files... and let apache do the navigation
 
 			if ( $File->is_audio() )
 			{
@@ -1911,11 +1908,11 @@ class Item extends ItemLight
 			}
 			else
 			{
-				$r_file[$i] = $params['before_file'];
+				$r_file[$i] = $params['before_attach'];
 				$r_file[$i] .= action_icon( T_('Download file'), 'download', $File->get_url(), '', 5 ).' ';
 				$r_file[$i] .= $File->get_view_link( $File->get_name() );
-				$r_file[$i] .= $params['before_file_size'].'('.bytesreadable( $File->get_size() ).')'.$params['after_file_size'];
-				$r_file[$i] .= $params['after_file'];
+				$r_file[$i] .= $params['before_attach_size'].'('.bytesreadable( $File->get_size() ).')'.$params['after_attach_size'];
+				$r_file[$i] .= $params['after_attach'];
 			}
 
 			$i++;
@@ -4148,6 +4145,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.173  2010/01/18 08:06:17  sam2kb
+ * ~file renamed to ~attach
+ *
  * Revision 1.172  2010/01/03 18:52:57  fplanque
  * crumbs...
  *

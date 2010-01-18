@@ -40,7 +40,7 @@ $params = array_merge( array(
 		'excerpt_image_link_to'  => 'single',
 		'before_url_link'     => '<p class="post_link">'.T_('Link:').' ',
 		'after_url_link'      => '</p>',
-		'url_link_text_template' => '$url$',
+		'url_link_text_template' => '$url$', // If evaluates to empty, nothing will be displayed (except player if podcast)
 		'before_more_link'    => '<p class="bMore">',
 		'after_more_link'     => '</p>',
 		'more_link_text'      => '#',
@@ -50,14 +50,13 @@ $params = array_merge( array(
 		'excerpt_before_more' => ' <span class="excerpt_more">',
 		'excerpt_after_more'  => '</span>',
 		'excerpt_more_text'   => T_('more').' &raquo;',
-	// fp> todo: rename 'files' to 'attach' (as in attachments)
-		'limit_files'         => 1000,
-		'file_list_start'     => '<div class="attchments"><h3>'.T_('Attachments').':</h3><ul>',
-		'file_list_end'       => '</ul></div>',
-		'file_start'          => '<li>',
-		'file_end'            => '</li>',
-		'before_file_size'    => ' <span class="file_size">',
-		'after_file_size'     => '</span>',
+		'limit_attach'        => 1000,
+		'attach_list_start'   => '<div class="attchments"><h3>'.T_('Attachments').':</h3><ul>',
+		'attach_list_end'     => '</ul></div>',
+		'attach_start'        => '<li>',
+		'attach_end'          => '</li>',
+		'before_attach_size'  => ' <span class="file_size">',
+		'after_attach_size'   => '</span>',
 	), $params );
 
 // Determine content mode to use..
@@ -225,17 +224,17 @@ switch( $content_mode )
 		<?php
 
 
-		if( ! empty($params['limit_files'])
+		if( ! empty($params['limit_attach'])
 			&& ( $more || ! $Item->has_content_parts($params) ) )
 		{	// Display attachments/files that are linked to this post:
 			$Item->files( array(
-					'before' =>              $params['file_list_start'],
-					'before_file' =>         $params['file_start'],
-					'before_file_size' =>    $params['before_file_size'],
-					'after_file_size' =>     $params['after_file_size'],
-					'after_file' =>          $params['file_end'],
-					'after' =>               $params['file_list_end'],
-					'limit_files' =>         $params['limit_files'],
+					'before' =>              $params['attach_list_start'],
+					'before_attach' =>         $params['attach_start'],
+					'before_attach_size' =>    $params['before_attach_size'],
+					'after_attach_size' =>     $params['after_attach_size'],
+					'after_attach' =>          $params['attach_end'],
+					'after' =>               $params['attach_list_end'],
+					'limit_attach' =>         $params['limit_attach'],
 				) );
 		}
 
@@ -244,6 +243,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.28  2010/01/18 08:06:30  sam2kb
+ * ~file renamed to ~attach
+ *
  * Revision 1.27  2009/12/24 02:43:32  sam2kb
  * Added 'image_link_to' param to images()
  * See http://forums.b2evolution.net//viewtopic.php?t=20140
