@@ -90,9 +90,21 @@ switch( $action )
 
 		// Update db with new flag value.
 		$edited_Country->dbupdate();
+		
+		$parameters = '';
+		$page = $_GET['results_ctry_page'];
+		$order = $_GET['results_ctry_order'];
+		if ( $page != '' )
+		{
+			$parameters = '&results_ctry_page='.$page;
+		}
+		if ( $order != '' )
+		{
+			$parameters = $parameters.'&results_ctry_order='.$order;
+		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( '?ctrl=countries', 303 ); // Will EXIT
+		header_redirect( '?ctrl=countries'.$parameters, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -305,6 +317,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2010/01/18 18:25:32  efy-asimo
+ * Redirect fix - Countries&Currencies
+ *
  * Revision 1.12  2010/01/17 04:14:43  fplanque
  * minor / fixes
  *

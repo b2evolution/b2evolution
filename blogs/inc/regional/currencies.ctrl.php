@@ -90,9 +90,21 @@ switch( $action )
 
 		// Update db with new flag value.
 		$edited_Currency->dbupdate();
-
+		
+		$parameters = '';
+		$page = $_GET['results_curr_page'];
+		$order = $_GET['results_curr_order'];
+		if ( $page != '' )
+		{
+			$parameters = '&results_curr_page='.$page;
+		}
+		if ( $order != '' )
+		{
+			$parameters = $parameters.'&results_curr_order='.$order;
+		}
+		
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( '?ctrl=currencies', 303 ); // Will EXIT
+		header_redirect( '?ctrl=currencies'.$parameters, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -306,6 +318,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2010/01/18 18:25:55  efy-asimo
+ * Redirect fix - Countries&Currencies
+ *
  * Revision 1.13  2010/01/17 04:14:43  fplanque
  * minor / fixes
  *
