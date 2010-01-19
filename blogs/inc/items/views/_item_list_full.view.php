@@ -350,7 +350,7 @@ while( $Item = & $ItemList->get_item() )
 
 			$Form->begin_form( 'bComment' );
 
-			$Form->add_crumb( 'addcomment' );
+			$Form->add_crumb( 'comment' );
 			$Form->hidden( 'comment_post_ID', $Item->ID );
 			$Form->hidden( 'redirect_to', $ReqURI );
 			?>
@@ -396,6 +396,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.28  2010/01/19 21:10:28  efy-yury
+ * update: crumbs
+ *
  * Revision 1.27  2010/01/17 16:15:22  sam2kb
  * Localization clean-up
  *

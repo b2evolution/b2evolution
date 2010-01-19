@@ -39,6 +39,7 @@ $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url('fm_mode') );
 
 $Form->begin_form( 'fform', T_('Editing:').' '.$edited_File->get_rdfs_rel_path() );
 	$Form->hidden_ctrl();
+	$Form->add_crumb( 'file' );
 	$Form->hidden( 'action', 'update_file' );
 	$Form->hiddens_by_key( get_memorized() );
 
@@ -57,6 +58,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/19 21:10:25  efy-yury
+ * update: crumbs
+ *
  * Revision 1.4  2009/03/08 23:57:43  fplanque
  * 2009
  *

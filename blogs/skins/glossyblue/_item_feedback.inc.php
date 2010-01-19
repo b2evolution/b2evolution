@@ -307,7 +307,7 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	//           Actually, the best would be, if the $Form object could be changed by a plugin
 	//           before display!
 
-	$Form->add_crumb( 'addcomment' );
+	$Form->add_crumb( 'comment' );
 	$Form->hidden( 'comment_post_ID', $Item->ID );
 	$Form->hidden( 'redirect_to',
 			// Make sure we get back to the right page (on the right domain)

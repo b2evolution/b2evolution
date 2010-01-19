@@ -372,6 +372,9 @@ switch( $action )
 
 	case 'createnew_dir':
 		// We are probably comming from 'createnew' but there is no guarantee!
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
+		
 		// Check permission:
 		$current_User->check_perm( 'files', 'add', true, $blog ? $blog : NULL );
 
@@ -422,6 +425,9 @@ switch( $action )
 
 	case 'createnew_file':
 		// We are probably comming from 'createnew' but there is no guarantee!
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
+		
 		// Check permission:
 		$current_User->check_perm( 'files', 'add', true, $blog ? $blog : NULL );
 
@@ -465,6 +471,9 @@ switch( $action )
 
 
   case 'update_settings':
+  		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
+			
 		// Update settings NOW since they may affect the FileList
 		$UserSettings->set( 'fm_dirsnotattop',   1-param( 'option_dirsattop',        'integer', 0 ) );
 		$UserSettings->set( 'fm_permlikelsl',      param( 'option_permlikelsl',      'integer', 0 ) );
@@ -585,9 +594,6 @@ switch( $action )
 		// TODO: We don't need the Filelist, move UP!
 		// TODO: provide optional zip formats (tgz, ..) - the used lib provides more..
 		// TODO: use "inmemory"=>false, so that you can download bigger archives faster!
-		
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'file' );
 
 		$action_title = T_('Download');
 
@@ -976,6 +982,9 @@ switch( $action )
 	case 'edit_file':
 		// TODO: We don't need the Filelist, move UP!
 		// Edit Text File
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
 
 		// Check permission!
  		$current_User->check_perm( 'files', 'edit', true, $blog ? $blog : NULL );
@@ -1009,6 +1018,9 @@ switch( $action )
 	case 'edit_properties':
 		// TODO: We don't need the Filelist, move UP!
 		// Edit File properties (Meta Data)
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
 
 		// Check permission!
  		$current_User->check_perm( 'files', 'edit', true, $blog ? $blog : NULL );
@@ -1184,6 +1196,9 @@ switch( $action )
 	case 'edit_perms':
 		// TODO: We don't need the Filelist, move UP!
 		// Edit file or directory permissions:
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
 
 		if( ! $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
 		{ // We do not have permission to edit files
@@ -1691,6 +1706,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.52  2010/01/19 21:10:24  efy-yury
+ * update: crumbs
+ *
  * Revision 1.51  2010/01/17 04:14:42  fplanque
  * minor / fixes
  *

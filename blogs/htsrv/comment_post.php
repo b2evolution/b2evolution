@@ -32,6 +32,9 @@ require_once $inc_path.'_main.inc.php';
 
 header( 'Content-Type: text/html; charset='.$io_charset );
 
+// Check that this action request is not a CSRF hacked request:
+$Session->assert_received_crumb( 'comment' );
+
 // Getting GET or POST parameters:
 param( 'comment_post_ID', 'integer', true ); // required
 param( 'redirect_to', 'string', '' );
@@ -398,6 +401,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.137  2010/01/19 21:10:18  efy-yury
+ * update: crumbs
+ *
  * Revision 1.136  2009/12/04 23:27:48  fplanque
  * cleanup Expires: header handling
  *
