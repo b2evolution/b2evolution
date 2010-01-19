@@ -51,7 +51,7 @@ $params = array_merge( array(
 		'excerpt_after_more'  => '</span>',
 		'excerpt_more_text'   => T_('more').' &raquo;',
 		'limit_attach'        => 1000,
-		'attach_list_start'   => '<div class="attchments"><h3>'.T_('Attachments').':</h3><ul>',
+		'attach_list_start'   => '<div class="attachments"><h3>'.T_('Attachments').':</h3><ul class="bFiles">',
 		'attach_list_end'     => '</ul></div>',
 		'attach_start'        => '<li>',
 		'attach_end'          => '</li>',
@@ -243,6 +243,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.29  2010/01/19 19:38:33  fplanque
+ * minor
+ *
  * Revision 1.28  2010/01/18 08:06:30  sam2kb
  * ~file renamed to ~attach
  *

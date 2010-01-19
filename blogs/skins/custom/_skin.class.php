@@ -69,7 +69,7 @@ class custom_Skin extends Skin
 				),
 				'sidebar_position' => array(
 					'label' => T_('Sidebar position'),
-					'note' => T_(''),
+					'note' => '',
 					'defaultvalue' => 'right',
 					'options' => array( 'left' => $this->T_('Left'), 'right' => $this->T_('Right') ),
 					'type' => 'select',
@@ -122,6 +122,9 @@ class custom_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/19 19:38:41  fplanque
+ * minor
+ *
  * Revision 1.6  2010/01/16 17:08:36  efy-eugene
  * Selection of sidebar position added
  *

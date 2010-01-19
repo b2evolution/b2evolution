@@ -188,7 +188,7 @@ switch( $action )
 
 	case 'update':
 		// Edit item type form...:
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'itemtype' );
 
@@ -225,7 +225,7 @@ switch( $action )
 
 	case 'delete':
 		// Delete item type:
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'itemtype' );
 
@@ -321,6 +321,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2010/01/19 19:38:44  fplanque
+ * minor
+ *
  * Revision 1.14  2010/01/18 20:13:55  efy-yury
  * update items: crumbs
  *

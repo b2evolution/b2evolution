@@ -1867,7 +1867,7 @@ class Item extends ItemLight
 	function get_files( $params = array(), $format = 'htmlbody' )
 	{
 		$params = array_merge( array(
-				'before' =>              '<div class="attchments"><h3>'.T_('Attachments').':</h3><ul>',
+				'before' =>              '<div class="item_attachments"><h3>'.T_('Attachments').':</h3><ul class="bFiles">',
 				'before_attach' =>         '<li>',
 				'before_attach_size' =>    ' <span class="file_size">',
 				'after_attach_size' =>     '</span>',
@@ -1899,6 +1899,9 @@ class Item extends ItemLight
 				// fp> TODO: have a setting for each linked file to decide whether it should be displayed inline or as an attachment
 				continue;
 			}
+
+			// fp> note: it actually makes sense to show directories if the admin chose to link a directory
+			// it may be a convenient way to link 1000 files at once... or even a whole source code tree of folders & files... and let apache do the navigation
 
 			if ( $File->is_audio() )
 			{
@@ -4145,6 +4148,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.174  2010/01/19 19:38:45  fplanque
+ * minor
+ *
  * Revision 1.173  2010/01/18 08:06:17  sam2kb
  * ~file renamed to ~attach
  *
