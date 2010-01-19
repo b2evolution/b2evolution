@@ -136,6 +136,7 @@ if( !empty($size) && $File->is_image() )
 			if( $err[0] != '!' && @copy( $File->get_full_path(), $err ) )
 			{	// File was saved. Ouput that same file immediately:
 // fp>alex TODO: how do you know the file was saved? you put an @ in front of @copy!!
+// sam2kb> @copy returns FALSE on failure, if not muted it'll print the error on screen
 				$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime );
 			}
 		}
@@ -238,6 +239,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.49  2010/01/19 19:14:20  sam2kb
+ * doc
+ *
  * Revision 1.48  2010/01/19 19:03:06  fplanque
  * doc
  *
