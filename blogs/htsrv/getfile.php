@@ -135,6 +135,7 @@ if( !empty($size) && $File->is_image() )
 			
 			if( $err[0] != '!' && @copy( $File->get_full_path(), $err ) )
 			{	// File was saved. Ouput that same file immediately:
+// fp>alex TODO: how do you know the file was saved? you put an @ in front of @copy!!
 				$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime );
 			}
 		}
@@ -237,6 +238,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.48  2010/01/19 19:03:06  fplanque
+ * doc
+ *
  * Revision 1.47  2010/01/16 06:05:42  sam2kb
  * Copy original image to .evocache if its size is lower or equal to requested thumb size
  *
