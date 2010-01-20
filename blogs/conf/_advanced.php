@@ -31,7 +31,8 @@ function NT_( $string )
  *
  * @global integer
  */
-$debug = 'pwd';
+//$debug = 'pwd';
+$debug = 1;
 
 /**
  * When $debug is 'pwd' and you set a /password/ below,
