@@ -38,6 +38,8 @@ if( $feed_content == 'none' )
 	debug_die( 'Feeds are disabled.');
 }
 
+$image_size = $Blog->get_setting( 'image_size' );
+
 
 if($debug)
 {
@@ -155,7 +157,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 						'after_image_legend' =>  '</i></div>',
 						'after_image' =>         '</div>',
 						'after' =>               '</div>',
-						'image_size' =>          'fit-320x320'
+						'image_size' =>          $image_size,
 					), 'htmlbody' );
 
 				$content .= $Item->get_content_teaser( 1, false );

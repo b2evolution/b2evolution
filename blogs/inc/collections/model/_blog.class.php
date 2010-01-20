@@ -312,6 +312,11 @@ class Blog extends DataObject
 			param_check_url( 'rss2_redirect', 'commenting' );
 			$this->set_setting( 'rss2_redirect', get_param( 'rss2_redirect' ) );
 		}
+		
+		if( param( 'image_size', 'string', NULL ) !== NULL )
+		{
+			$this->set_setting( 'image_size', get_param( 'image_size' ));
+		}
 
 		if( param( 'tag_links',   'string', NULL ) !== NULL )
 		{ // Tag page link type:
@@ -2231,6 +2236,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.100  2010/01/20 20:08:29  efy-asimo
+ * Countries&Currencies redirect fix + RSS/Atom feeds image size select list
+ *
  * Revision 1.99  2010/01/03 12:36:15  fplanque
  * Renamed hooks
  *

@@ -39,6 +39,8 @@ if( $feed_content == 'none' )
 	debug_die( 'Feeds are disabled.');
 }
 
+$image_size = $Blog->get_setting( 'image_size' );
+
 headers_content_mightcache( 'application/xml' );		// In most situations, you do NOT want to cache dynamic content!
 
 // Add caching headers
@@ -180,7 +182,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 						'after_image_legend' =>  '</i></div>',
 						'after_image' =>         '</div>',
 						'after' =>               '</div>',
-						'image_size' =>          'fit-320x320'
+						'image_size' =>          $image_size,
 					), 'entityencoded' );
 
 				$content .= $Item->get_content_teaser( 1, false, 'entityencoded' );

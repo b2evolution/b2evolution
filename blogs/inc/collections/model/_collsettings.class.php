@@ -121,6 +121,7 @@ class CollectionSettings extends AbstractSettings
 			'feed_content'   => 'normal',
 			'posts_per_feed' => '8',
 			'xml_item_footer_text' => '<p><small><a href="$item_perm_url$">Original post</a> blogged on <a href="http://b2evolution.net/">b2evolution</a>.</small></p>',
+			'image_size'	=> 'fit-320x320',
 
 		// Sitemaps settings:
 			'enable_sitemaps' => 1,
@@ -172,6 +173,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.40  2010/01/20 20:08:30  efy-asimo
+ * Countries&Currencies redirect fix + RSS/Atom feeds image size select list
+ *
  * Revision 1.39  2009/11/30 04:31:38  fplanque
  * BlockCache Proof Of Concept
  *

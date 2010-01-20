@@ -118,6 +118,8 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('RSS/Atom feeds') );
+	load_funcs( 'files/model/_image.funcs.php' );
+	
 	$Form->radio( 'feed_content', $edited_Blog->get_setting('feed_content'),
 								array(  array( 'none', T_('No feeds') ),
 												array( 'title', T_('Titles only') ),
@@ -126,6 +128,8 @@ $Form->begin_fieldset( T_('RSS/Atom feeds') );
 												array( 'full', T_('Full post contents (including after "&lt;!-- more -->")') ),
 											), T_('Feed contents'), true, T_('How much content do you want to make available in feeds?') );
 	$Form->text( 'posts_per_feed', $edited_Blog->get_setting('posts_per_feed'), 4, T_('Posts in feeds'),  T_('How many of the latest posts do you want to include in RSS & Atom feeds?'), 4 );
+	$params['force_keys_as_values'] = true;
+	$Form->select_input_array( 'image_size', $edited_Blog->get_setting('image_size') , get_available_thumb_sizes (), T_('Image size'), '', $params );
 $Form->end_fieldset();
 
 
@@ -198,6 +202,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.21  2010/01/20 20:08:31  efy-asimo
+ * Countries&Currencies redirect fix + RSS/Atom feeds image size select list
+ *
  * Revision 1.20  2010/01/03 13:45:36  fplanque
  * set some crumbs (needs checking)
  *
