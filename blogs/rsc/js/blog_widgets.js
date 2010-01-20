@@ -553,7 +553,7 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 function toggleWidget( wi_ID )
 {
 	//console.log( 'Toggling widget #' + wi_ID.substr( 6 ) );
-	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ) );
+	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ),);
 	return false;
 }
 

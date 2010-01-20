@@ -226,6 +226,7 @@ switch( $action )
 					break;
 			}
 			$action = 'list';
+			header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
 		}
 		elseif( $display_mode == 'js' )
 		{ // send errors back as js
@@ -308,8 +309,7 @@ switch( $action )
 		// Enable or disable the widget:
 
 		// Check that this action request is not a CSRF hacked request:
-		//TODO yuri>uncomment when will be fixed bug in toggleWidget js
-		//$Session->assert_received_crumb( 'widget' );
+		$Session->assert_received_crumb( 'widget' );
 		
 		$enabled = $edited_ComponentWidget->get( 'enabled' );
 		$edited_ComponentWidget->set( 'enabled', (int)! $enabled );
@@ -330,6 +330,7 @@ switch( $action )
 			// EXITS:
 			send_javascript_message( array( 'doToggle' => array( $edited_ComponentWidget->ID, (int)! $enabled ) ) );
 		}
+		header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
 		break;
 
 	case 'delete':
@@ -563,6 +564,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.41  2010/01/20 20:46:47  efy-yury
+ * fix: toggleWidget bug in js
+ * add: widjets controller redirect
+ *
  * Revision 1.40  2010/01/17 04:14:38  fplanque
  * minor / fixes
  *
