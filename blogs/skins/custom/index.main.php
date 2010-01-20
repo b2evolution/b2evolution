@@ -36,7 +36,7 @@ skin_include( '_html_header.inc.php' );
 ?>
 
 
-<div id="wrapper_<?php echo $Skin->get_setting( 'sidebar_position' ); ?>">
+<div id="wrapper" class="wrapper_<?php echo $Skin->get_setting( 'sidebar_position' ); ?>">
 
 <div class="PageTop">
 	<?php

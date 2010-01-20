@@ -89,15 +89,21 @@ hr {
 	border-top: 1px solid #78a;
 }
 
-div#wrapper_left {
+div.wrapper_left {
 	background: #fff url(img/bg_content_left.gif) repeat-y 0 0;
 	width: 740px;
 	margin: 0 auto;
 	padding: 0;
 }
 
-div#wrapper_right {
+div.wrapper_right {
 	background: #fff url(img/bg_content_right.gif) repeat-y 0 0;
+	width: 740px;
+	margin: 0 auto;
+	padding: 0;
+}
+
+div#wrapper {
 	width: 740px;
 	margin: 0 auto;
 	padding: 0;
