@@ -28,16 +28,17 @@
 
 
 # CATCH EVERYTHING INTO B2EVO:
-# The following will allow you to have URL right off the site root,
-# using index.php as a stub but not showing it.
+# The following will allow you to have a blog running right off the site root,
+# using index.php as a stub but not showing it in the URLs.
 # This will add support for URLs like:  http://example.com/2006/08/29/post-title
+<IfModule mod_rewrite.c>
+	RewriteEngine On
 
-#RewriteEngine On
+	# This line may be needed:
+	RewriteBase /
 
-# This line may be needed:
-#RewriteBase /
-
-# Redirect anything that's not an existing directory or file to index.php:
-#RewriteCond %{REQUEST_FILENAME} !-d
-#RewriteCond %{REQUEST_FILENAME} !-f
-#RewriteRule ^  index.php
+	# Redirect anything that's not an existing directory or file to index.php:
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^  index.php
+</IfModule>
