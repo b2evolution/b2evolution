@@ -38,7 +38,7 @@ $container_Widget_array = & $WidgetCache->get_by_coll_ID( $Blog->ID );
 function display_container( $container, $legend_suffix = '' )
 {
 	global $Blog;
-	global $edited_ComponentWidget;
+	global $Session;
 
 	$Table = & new Table();
 
@@ -66,8 +66,8 @@ function display_container( $container, $legend_suffix = '' )
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap' ),
 		);
-
-	$Table->display_init();
+	//enable fadeouts here
+	$Table->display_init( NULL, array('fadeouts' => true) );
 	// add ID for jQuery
 	// TODO: fp> Awfully dirty. This should be handled by the Table object
 	$Table->params['head_title'] = str_replace( '<table', '<table id="'.$table_id.'"', $Table->params['head_title'] );
@@ -109,9 +109,11 @@ function display_container( $container, $legend_suffix = '' )
 			$widget_count++;
 			$enabled = $ComponentWidget->get( 'enabled' );
 
-			if( isset($edited_ComponentWidget) && $edited_ComponentWidget->ID == $ComponentWidget->ID )
+			$fadeout_id = $Session->get( 'fadeout_id' );
+			if( isset($fadeout_id) && $ComponentWidget->ID == $fadeout_id )
 			{
 				$fadeout = true;
+				$Session->delete( 'fadeout_id' );
 			}
 			else
 			{
@@ -220,6 +222,9 @@ echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear" />';
 
 /*
  * $Log$
+ * Revision 1.23  2010/01/21 18:16:49  efy-yury
+ * update: fadeouts
+ *
  * Revision 1.22  2010/01/03 13:10:57  fplanque
  * set some crumbs (needs checking)
  *

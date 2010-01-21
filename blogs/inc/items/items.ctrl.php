@@ -568,6 +568,8 @@ switch( $action )
 			$edited_Item->load_Blog();
 			$redirect_to = $edited_Item->Blog->gen_blogurl();
 		}
+		//Set highlight
+		$Session->set('highlight_id', $edited_Item->ID);
 
 		// REDIRECT / EXIT
 		header_redirect( $redirect_to, 303 );
@@ -1276,6 +1278,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.85  2010/01/21 18:16:49  efy-yury
+ * update: fadeouts
+ *
  * Revision 1.84  2010/01/18 20:14:13  efy-yury
  * update items: crumbs
  *

@@ -29,11 +29,15 @@ global $Blog;
 global $ItemList;
 
 global $edit_item_url, $delete_item_url;
-
+global $Session;
 
 if( $highlight = param( 'highlight', 'integer', NULL ) )
 {	// There are lines we want to highlight:
 	$result_fadeout = array( 'post_ID' => array($highlight) );
+} elseif ( $highlight = $Session->get( 'highlight_id' ) )
+{
+	$result_fadeout = array( 'post_ID' => array($highlight) );
+	$Session->delete( 'highlight_id' );
 }
 else
 {	// Nothing to highlight
@@ -264,6 +268,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/21 18:16:49  efy-yury
+ * update: fadeouts
+ *
  * Revision 1.9  2009/12/11 23:22:21  fplanque
  * revert: the goal was to save space
  *

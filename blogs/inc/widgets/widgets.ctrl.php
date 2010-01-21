@@ -226,6 +226,7 @@ switch( $action )
 					break;
 			}
 			$action = 'list';
+			$Session->set( 'fadeout_id', $edited_ComponentWidget->ID );
 			header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
 		}
 		elseif( $display_mode == 'js' )
@@ -564,6 +565,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.42  2010/01/21 18:16:49  efy-yury
+ * update: fadeouts
+ *
  * Revision 1.41  2010/01/20 20:46:47  efy-yury
  * fix: toggleWidget bug in js
  * add: widjets controller redirect
