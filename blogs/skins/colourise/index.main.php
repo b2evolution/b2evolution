@@ -2,7 +2,7 @@
   // Emulate WordPress!! (Use this for development only!)
   // Make sure you replace this with proper b2evolution markup before redistributing.
   // Using this will NOT provide you with full b2evolution functionality!
-  //skin_include( '_wp_compatibility.inc.php' );
+  skin_include( '_wp_compatibility.inc.php' );
  
  
   // This is the main template; it may be used to display very different things.
@@ -59,6 +59,7 @@
 </div>
 
 <div id="content-wrap">
+
 	<div id="main">
 		<?php
 		// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
@@ -87,13 +88,10 @@ skin_include( '_body_footer.inc.php' );
 // Note: You can customize the default BODY footer by copying the
 // _body_footer.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------
-  ?>
- 
- 
-  <?php
-  // ------------------------- HTML FOOTER INCLUDED HERE --------------------------
-  skin_include( '_html_footer.inc.php' );
-  // Note: You can customize the default HTML footer by copying the
-  // _html_footer.inc.php file into the current skin folder.
-  // ------------------------------- END OF FOOTER --------------------------------
-  ?>
+
+// ------------------------- HTML FOOTER INCLUDED HERE --------------------------
+skin_include( '_html_footer.inc.php' );
+// Note: You can customize the default HTML footer by copying the
+// _html_footer.inc.php file into the current skin folder.
+// ------------------------------- END OF FOOTER --------------------------------
+?>

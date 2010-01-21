@@ -16,7 +16,7 @@ body {
 	font: 11px/165% 'Lucida Grande', Geneva, Verdana, Arial, Helvetica, sans-serif;
 	color: #5B5B5B; 	
 	margin: 0; 	padding: 0; 
-	background: #070707 url(images/bg.jpg) no-repeat center top;
+	background: #070707 url(img/bg.jpg) no-repeat center top;
 	text-align: center;
 }
 
@@ -71,10 +71,9 @@ dd {
   padding-left: 25px; 
 }
 
-/* images */
+/* img */
 img {
 	background: #1B1B1B;
-   border: 1px solid #1B1B1B;
 	padding: 5px;
 }
 img.float-right {
@@ -101,7 +100,7 @@ acronym {
 blockquote {
 	margin: 15px 10px;
  	padding: 10px 10px 10px 35px;  
-   background: #111 url(images/quote.jpg) no-repeat 10px 10px;
+   background: #111 url(img/quote.jpg) no-repeat 10px 10px;
 	font-weight: normal;
 	font-size: 18px;
 	line-height: 1.6em;
@@ -231,7 +230,7 @@ input.button {
 	padding: 0; margin: 0;
 	border: none;
 	width: 262px; height: 30px;
-	background: url(images/header-search.jpg) no-repeat;	
+	background: url(img/header-search.jpg) no-repeat;	
 	z-index: 999999;
 }
 #header form#quick-search p {
@@ -351,7 +350,7 @@ input.button {
 	margin-top: 10px;
 	padding: 15px 5px 10px 5px; 
 	font: normal 1.8em 'Trebuchet MS', Tahoma, Helvetica, Arial, sans-serif;				
-	background: url(images/footer-top.jpg) no-repeat center bottom;
+	background: url(img/footer-top.jpg) no-repeat center bottom;
 	color: #fefefe;
 }
 #sidebar ul {
@@ -398,7 +397,7 @@ input.button {
 	padding: 1em 0 2.5em 0;
 	margin-top: 30px;
 	font: normal 1em 'Trebuchet MS', Tahoma, sans-serif;	
-	background: #070707 url(images/footer-top.jpg) no-repeat center top;
+	background: #070707 url(img/footer-top.jpg) no-repeat center top;
 	color: #555;
 	width: 900px;
 	float: left;	
@@ -493,8 +492,14 @@ input.button {
 	content: "."; 
 }
 
-div#debug_info, div.debug {
-	display: none!important;
+div.image_block a:hover {
+	border: 0;
 }
 
+div.image_block a {
+	border: 0;
+}
 
+div#sidebar li.widget_core_coll_title h3 {
+	background: none;
+}
