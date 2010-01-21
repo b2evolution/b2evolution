@@ -128,6 +128,7 @@ switch( $action )
 		break;
 
 	default:
+		$action = 'default';
 		$title = '';
 }
 
@@ -717,8 +718,10 @@ block_close();
 	<?php
 		// We need to manually call debug_info since there is no shutdown function registered during the install process.
 		// debug_info( true ); // force output of debug info
-		// the following comment gets checked in the automatic install script of demo.b2evolution.net:
+
+		// The following comments get checked in the automatic install script of demo.b2evolution.net:
 ?>
+<!-- b2evo-install-action:<?php echo $action ?> -->
 <!-- b2evo-install-end -->
 	<!-- InstanceEndEditable -->
 </body>
@@ -728,6 +731,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.192  2010/01/21 22:49:10  blueyed
+ * Installer: sanitize $action always. Add marker with the action done into the footer, used by the automatic installer.
+ *
  * Revision 1.191  2009/12/22 08:45:44  fplanque
  * fix install
  *
