@@ -95,7 +95,7 @@ skin_include( '_html_header.inc.php' );
 
 
 <!-- =================================== START OF MAIN AREA =================================== -->
-<div class="bPosts_<?php echo $Skin->get_setting( 'sidebar_position' ); ?>">
+<div class="bPosts bPosts_<?php echo $Skin->get_setting( 'sidebar_position' ); ?>">
 
 	<?php
 		// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
@@ -211,7 +211,7 @@ skin_include( '_html_header.inc.php' );
 
 
 <!-- =================================== START OF SIDEBAR =================================== -->
-<div class="bSideBar_<?php echo $Skin->get_setting( 'sidebar_position'); ?>">
+<div class="bSideBar bSideBar_<?php echo $Skin->get_setting( 'sidebar_position'); ?>">
 
 	<?php
 		// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------

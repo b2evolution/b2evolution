@@ -91,16 +91,10 @@ hr {
 
 div.wrapper_left {
 	background: #fff url(img/bg_content_left.gif) repeat-y 0 0;
-	width: 740px;
-	margin: 0 auto;
-	padding: 0;
 }
 
 div.wrapper_right {
 	background: #fff url(img/bg_content_right.gif) repeat-y 0 0;
-	width: 740px;
-	margin: 0 auto;
-	padding: 0;
 }
 
 div#wrapper {
@@ -199,7 +193,7 @@ h2 {
 
 
 /* Styles for posts */
-.bPosts_right {
+.bPosts {
 	float: left;
 	width: 480px;
 	overflow: hidden;
@@ -208,9 +202,6 @@ h2 {
 
 .bPosts_left {
 	float: right;
-	width: 480px;
-	overflow: hidden;
-	/* background: #090;*/
 }
 
 div.action_messages {
@@ -279,7 +270,7 @@ input.preview:hover {
 }
 
 /* Styles for sidebar (right) */
-.bSideBar_right {
+.bSideBar {
 	width: 259px;
 	float: right;
 	overflow: hidden;
@@ -288,10 +279,7 @@ input.preview:hover {
 
 /* Styles for sidebar (left) */
 .bSideBar_left {
-	width: 259px;
 	float: left;
-	overflow: hidden;
-	/* background: #900; */
 }
 
 .bSideItem {
