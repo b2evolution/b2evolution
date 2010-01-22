@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 ?>
 
-<div id="page">
+<div id="page" class="page-<?php echo $Skin->get_setting( 'sidebar_position' ); ?>">
 
 <div id="header">
 	<div id="headerimg">

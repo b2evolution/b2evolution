@@ -13,7 +13,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 ?>
-<div id="sidebar">
+<div id="sidebar" class="sidebar-<?php echo $Skin->get_setting( 'sidebar_position' ); ?>">
 
 	<ul>
 	<?php

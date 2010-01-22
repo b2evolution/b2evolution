@@ -191,7 +191,14 @@ margin: 20px auto;
 padding: 0;
 width: 760px;
 /* border: 1px solid #959596; */
-background: url("img/kubrickbg-ltr.jpg");
+}
+
+.page-left {
+background: url("img/kubrickbg-ltr-left.jpg");
+}
+
+.page-right {
+background: url("img/kubrickbg-ltr-right.jpg");
 }
 
 #header {
@@ -201,11 +208,22 @@ height: 200px;
 width: 758px;
 }
 
-.narrowcolumn {
+div.page-right .narrowcolumn {
 float: left;
 padding: 0 0 20px 45px;
 margin: 0px 0 0;
 width: 450px;
+}
+
+div.page-left .narrowcolumn {
+float:right;
+margin:0 0 0;
+padding:0 40px 10px;
+width:460px;
+}
+
+.narrowcolumn {
+margin: 0px 0 0;
 }
 
 .widecolumn {
@@ -384,11 +402,18 @@ padding: 0;
 
 
 /* Begin Sidebar */
-#sidebar
-{
-padding: 20px 0 10px 0;
-margin-left: 545px;
-width: 190px;
+.sidebar-left {
+	margin-left:25px;
+	width:190px;
+}
+
+.sidebar-right {
+	margin-left: 545px;
+	width: 190px;
+}
+
+#sidebar {
+	padding: 20px 0 10px 0;
 }
 
 #sidebar form {
@@ -514,4 +539,12 @@ text-decoration: underline;
 }
 div.top_menu a.selected {
 text-decoration: underline;
+}
+
+div.top_menu_left {
+	margin-left: 220px;
+}
+
+div.top_menu_right {
+	margin-left: 0px;
 }

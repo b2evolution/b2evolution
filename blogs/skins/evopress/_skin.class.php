@@ -53,6 +53,13 @@ class evopress_Skin extends Skin
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),
+				'sidebar_position' => array(
+					'label' => T_('Sidebar position'),
+					'note' => '',
+					'defaultvalue' => 'right',
+					'options' => array( 'left' => $this->T_('Left'), 'right' => $this->T_('Right') ),
+					'type' => 'select',
+				),
 			), parent::get_param_definitions( $params )	);
 
 		return $r;
@@ -86,6 +93,9 @@ class evopress_Skin extends Skin
 
 /*
  * $Log$
+ * Revision 1.4  2010/01/22 12:19:46  efy-eugene
+ * Adding left/right switch to evopress
+ *
  * Revision 1.3  2010/01/13 23:57:48  fplanque
  * Date param.
  *

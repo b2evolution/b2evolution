@@ -39,7 +39,7 @@ skin_include( '_body_header.inc.php' );
 
 
 
-<div class="top_menu top_menu_narrow">
+<div class="top_menu top_menu_narrow top_menu_<?php echo $Skin->get_setting( 'sidebar_position' ); ?>">
 	<ul>
 	<?php
 		// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
