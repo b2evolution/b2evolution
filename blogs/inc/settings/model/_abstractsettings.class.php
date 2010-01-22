@@ -547,7 +547,7 @@ class AbstractSettings
 	{
 		foreach( $array as $lDel )
 		{
-			call_user_func_array( array( & $this, 'delete' ), $lDel );
+			call_user_func_array( array( & $this, 'delete' ), array($lDel) );
 		}
 	}
 
@@ -760,6 +760,9 @@ class AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/22 08:39:02  sam2kb
+ * Fixied warning: call_user_func_array() expects parameter 2 to be array
+ *
  * Revision 1.7  2009/11/30 00:22:05  fplanque
  * clean up debug info
  * show more timers in view of block caching
