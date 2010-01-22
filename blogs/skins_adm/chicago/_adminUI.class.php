@@ -50,7 +50,7 @@ class AdminUI extends AdminUI_general
 		require_css( 'skins_adm/chicago/rsc/css/chicago.css', true );
 
 		//added for blog
-		require_css( 'rsc/css/blog_base.css', true )
+		require_css( 'rsc/css/blog_base.css', true );
 	}
 
 
@@ -393,6 +393,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.29  2010/01/22 15:34:30  efy-isaias
+ * css
+ *
  * Revision 1.28  2010/01/22 13:49:47  efy-isaias
  * avatar - blog
  *
