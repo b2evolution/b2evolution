@@ -1043,11 +1043,11 @@ switch( $action )
 		$edited_File = & $selected_Filelist->get_by_idx(0);
 		// Load meta data:
 		$edited_File->load_meta();
-
+		
 		$edited_File->set( 'title', param( 'title', 'string', '' ) );
 		$edited_File->set( 'alt', param( 'alt', 'string', '' ) );
 		$edited_File->set( 'desc', param( 'desc', 'string', '' ) );
-
+		
 		// Store File object into DB:
 		if( $edited_File->dbsave() )
 		{
@@ -1057,6 +1057,54 @@ switch( $action )
 		{
 			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $edited_File->dget('name') ), 'note' );
 		}
+		
+		$old_name = $edited_File->get_name();
+		$new_name = param( 'name', 'string', '' );
+		
+		if( $new_name != $old_name && $new_name != '' )
+		{ // Name has changed...
+			
+			$confirmed = 1;
+			// Check if provided name is okay:
+			$new_name = trim( strip_tags($new_name) );
+
+			if( !$edited_File->is_dir() )
+			{
+				if( $error_filename = validate_filename( $new_name, $allow_locked_filetypes ) )
+				{ // Not a file name or not an allowed extension
+					$confirmed = 0;
+					param_error( '$new_name', $error_filename );
+				}
+			}
+			elseif( $error_dirname = validate_dirname( $new_name ) )
+			{ // directory name
+				$confirmed = 0;
+				param_error( $new_name, $error_dirname );
+			}
+			
+			if( $confirmed )
+			{// Perform rename:
+				if( $edited_File->rename_to( $new_name ) )
+				{
+					$Messages->add( sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'),
+							$old_name, $new_name ), 'success' );
+					
+					// We have moved in same dir, update caches:
+					$fm_Filelist->update_caches();
+					
+					if( $fm_Filelist->contains( $edited_File ) === false )
+					{ // File not in filelist (expected if not same dir)
+						$fm_Filelist->add( $File );
+					}
+				}
+				else
+				{
+					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
+							$old_name, $new_name ), 'error' );
+				}
+			}
+		}
+
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( '?ctrl=files&blog='.$blog.'&root='.$root.'&path='.$path, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
@@ -1706,6 +1754,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.53  2010/01/22 20:20:18  efy-asimo
+ * Remove File manager rename file
+ *
  * Revision 1.52  2010/01/19 21:10:24  efy-yury
  * update: crumbs
  *

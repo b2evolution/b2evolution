@@ -47,7 +47,14 @@ $Form->begin_form( 'fform', T_('File properties') );
 	$Form->hiddens_by_key( get_memorized() );
 
 	$Form->begin_fieldset( T_('Properties') );
-		$Form->info( T_('Filename'), $edited_File->dget('name'), T_('This is the name of the file on the server hard drive.') );
+		if( $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
+		{ // User can edit: 
+			$Form->text( 'name', $edited_File->dget('name'), 32, T_('Filename'), T_('This is the name of the file on the server hard drive.'), 128 );
+		}
+		else
+		{ // User can view only:
+			$Form->info( T_('Filename'), $edited_File->dget('name'), T_('This is the name of the file on the server hard drive.') );	
+		}
 		$Form->info( T_('Type'), $edited_File->get_icon().' '.$edited_File->get_type() );
 	$Form->end_fieldset();
 
@@ -78,6 +85,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/22 20:20:21  efy-asimo
+ * Remove File manager rename file
+ *
  * Revision 1.7  2010/01/03 13:45:36  fplanque
  * set some crumbs (needs checking)
  *

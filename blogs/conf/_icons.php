@@ -89,11 +89,6 @@ function get_icon_info($name)
 			'alt'  => T_('Move'),
 			'size' => array( 16, 16 ),
 		);
-		case 'file_rename': return array(   // rename a file/folder
-			'file' => 'icons/filerename.png',
-			'alt'  => T_('Rename'),
-			'size' => array( 16, 16 ),
-		);
 		case 'file_delete': return array(   // delete a file/folder
 			'file' => 'icons/filedelete.png',
 			'alt'  => T_('Del'),
@@ -528,6 +523,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.70  2010/01/22 20:20:16  efy-asimo
+ * Remove File manager rename file
+ *
  * Revision 1.69  2008/03/31 21:13:47  fplanque
  * Reverted übergeekyness
  *
