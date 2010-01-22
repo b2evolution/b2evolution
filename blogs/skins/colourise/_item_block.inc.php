@@ -101,24 +101,21 @@ $params = array_merge( array(
 			<p class="postmeta">
 				
 				<?php
-				
 					$Item->more_link( array(
-				           'force_more'  => false,
-				           'before'      => '',
-				           'after'       => ' | ',
-				           'link_text'   => 'Read more',
-				           'anchor_text' => '#',
-				           'disppage'    => '#',
-				           'format'      => 'htmlbody'
-				  ) );
+							'force_more'  => false,
+							'before'      => '',
+							'after'       => ' | ',
+							'link_text'   => 'Read more',
+							'anchor_text' => '#',
+							'disppage'    => '#',
+							'format'      => 'htmlbody'
+						) );
 				
 					$Item->edit_link( array( // Link to backoffice for editing
 							'before'    => '',
 							'after'     => '',
 						) );
-				?>
-
-				<?php
+					
 					// Link to comments, trackbacks, etc.:
 					$Item->feedback_link( array(
 							'type' => 'comments',
@@ -130,10 +127,26 @@ $params = array_merge( array(
 							'link_title' => '#',
 							'use_popup' => false,
 						) );
+						
+					$Item->issue_time( array(
+							'before'    => ' | ',
+							'after'     => ' ',
+						) );
+						
 				?>
 				</p>
 			<?php
 		}
+	?>
+	<?php
+		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
+		skin_include( '_item_feedback.inc.php', array(
+				'before_section_title' => '<h4>',
+				'after_section_title'  => '</h4>',
+			) );
+		// Note: You can customize the default item feedback by copying the generic
+		// /skins/_item_feedback.inc.php file into the current skin folder.
+		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
 	?>
 </div>
 

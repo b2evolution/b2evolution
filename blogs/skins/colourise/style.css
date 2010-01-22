@@ -73,7 +73,6 @@ dd {
 
 /* img */
 img {
-	background: #1B1B1B;
 	padding: 5px;
 }
 img.float-right {
@@ -502,4 +501,19 @@ div.image_block a {
 
 div#sidebar li.widget_core_coll_title h3 {
 	background: none;
+}
+
+div.bComment, form.bComment {
+	border:1px solid #111111;
+	margin:1ex 2ex;
+	padding:0 1ex 7px;
+}
+textarea {
+	display:block;
+	height:100px;
+	width:380px;
+}
+
+div.feedback_feed_msg p img {
+	padding:0;
 }
