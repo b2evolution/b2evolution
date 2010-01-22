@@ -79,6 +79,7 @@ while( $Comment = & $CommentList->get_next() )
 		</div>
 		<div class="bCommentText">
 			<?php $Comment->rating(); ?>
+			<?php $Comment->avatar(); ?>
 			<?php $Comment->content() ?>
 		</div>
 		</div>
@@ -110,6 +111,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/22 13:42:22  efy-isaias
+ * avatar
+ *
  * Revision 1.9  2009/03/08 23:57:42  fplanque
  * 2009
  *
