@@ -427,7 +427,7 @@ switch( $action )
 		// We are probably comming from 'createnew' but there is no guarantee!
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
-		
+
 		// Check permission:
 		$current_User->check_perm( 'files', 'add', true, $blog ? $blog : NULL );
 
@@ -471,9 +471,9 @@ switch( $action )
 
 
   case 'update_settings':
-  		// Check that this action request is not a CSRF hacked request:
+		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
-			
+
 		// Update settings NOW since they may affect the FileList
 		$UserSettings->set( 'fm_dirsnotattop',   1-param( 'option_dirsattop',        'integer', 0 ) );
 		$UserSettings->set( 'fm_permlikelsl',      param( 'option_permlikelsl',      'integer', 0 ) );
@@ -1043,11 +1043,11 @@ switch( $action )
 		$edited_File = & $selected_Filelist->get_by_idx(0);
 		// Load meta data:
 		$edited_File->load_meta();
-		
+
 		$edited_File->set( 'title', param( 'title', 'string', '' ) );
 		$edited_File->set( 'alt', param( 'alt', 'string', '' ) );
 		$edited_File->set( 'desc', param( 'desc', 'string', '' ) );
-		
+
 		// Store File object into DB:
 		if( $edited_File->dbsave() )
 		{
@@ -1244,7 +1244,7 @@ switch( $action )
 	case 'edit_perms':
 		// TODO: We don't need the Filelist, move UP!
 		// Edit file or directory permissions:
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
 
@@ -1754,6 +1754,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.54  2010/01/23 00:18:05  fplanque
+ * no message
+ *
  * Revision 1.53  2010/01/22 20:20:18  efy-asimo
  * Remove File manager rename file
  *
