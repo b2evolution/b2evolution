@@ -501,6 +501,9 @@ switch( $action )
 
 	case 'update_file':
 		// Update File:
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
 
 		if( $demo_mode )
 		{
@@ -1113,6 +1116,7 @@ switch( $action )
 
 	case 'link_user':
 		// TODO: We don't need the Filelist, move UP!
+		
 		// Link File to User:
 		if( ! isset($edited_User) )
  		{	// No User to link to
@@ -1146,7 +1150,7 @@ switch( $action )
 
 	case 'link_data':
 		// fp> do we need to go through this block + redirect or could the link icons link directly to $linkctrl ?
-
+		
 		// Get the file we want to link:
 		if( !$selected_Filelist->count() )
 		{
@@ -1167,6 +1171,9 @@ switch( $action )
 	case 'link_inpost':	// In the context of a post
 		// TODO: We don't need the Filelist, move UP!
 		// Link File to Item
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
 
 		// Note: we are not modifying any file here, we're just linking it
 		// we only need read perm on file, but we'll need write perm on destination object (to be checked below)
@@ -1212,6 +1219,9 @@ switch( $action )
 	case 'unlink':
 		// TODO: We don't need the Filelist, move UP!
 		// Unlink File from Item (or other object if extended):
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'link' );
 
 		// Note: we are not modifying any file here, we're just linking it
 		// we only need read perm on file, but we'll need write perm on destination object (to be checked below)
@@ -1754,6 +1764,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.55  2010/01/23 11:45:11  efy-yury
+ * add: crumbs
+ *
  * Revision 1.54  2010/01/23 00:18:05  fplanque
  * no message
  *
