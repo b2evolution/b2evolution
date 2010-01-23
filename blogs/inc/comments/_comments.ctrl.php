@@ -242,6 +242,8 @@ switch( $action )
 
 $AdminUI->set_path( 'items', 'comments' );
 
+require_css( 'rsc/css/blog_base.css', true );
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -291,6 +293,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2010/01/23 00:30:09  fplanque
+ * no message
+ *
  * Revision 1.19  2010/01/13 22:09:44  fplanque
  * normalized
  *

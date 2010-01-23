@@ -48,9 +48,6 @@ class AdminUI extends AdminUI_general
 	{
 		// This is included before controller specifc require_css() calls:
 		require_css( 'skins_adm/chicago/rsc/css/chicago.css', true );
-
-		//added for blog
-		require_css( 'rsc/css/blog_base.css', true );
 	}
 
 
@@ -393,11 +390,8 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
- * Revision 1.29  2010/01/22 15:34:30  efy-isaias
- * css
- *
- * Revision 1.28  2010/01/22 13:49:47  efy-isaias
- * avatar - blog
+ * Revision 1.30  2010/01/23 00:30:09  fplanque
+ * no message
  *
  * Revision 1.27  2009/12/11 03:01:16  fplanque
  * breadcrumbs improved
