@@ -36,6 +36,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $rsc_url, $dispatcher;
 
+global $Session;
+
 // Create result set:
 $SQL = & new SQL();
 $SQL->SELECT( '*' );
@@ -131,11 +133,21 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
   $Results->global_icon( T_('Create a new file type...'), 'new', regenerate_url( 'action', 'action=new'), T_('New file type').' &raquo;', 3, 4  );
 }
 
+$fadeout_id = $Session->get('fadeout_id');
 
-$Results->display();
+// if there happened something with a item, apply fadeout to the row:
+$highlight_fadeout = empty($fadeout_id) ? array() : array( 'ftyp_ID'=>array($fadeout_id) );
+
+$Results->display(NULL, $highlight_fadeout );
+
+//Flush fadeout
+$Session->delete( 'fadeout_id');
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/23 12:54:49  efy-yury
+ * add: fadeouts
+ *
  * Revision 1.8  2010/01/03 13:10:58  fplanque
  * set some crumbs (needs checking)
  *

@@ -151,6 +151,8 @@ switch( $action )
 			$edited_Filetype->dbupdate();
 			$Messages->add( T_('File type updated.'), 'success' );
 			$action = 'list';
+			//save fadeout item
+			$Session->set('fadeout_id', $ftyp_ID);
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=filetypes', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
@@ -250,6 +252,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2010/01/23 12:54:49  efy-yury
+ * add: fadeouts
+ *
  * Revision 1.11  2010/01/11 16:06:37  efy-yury
  * More crumbs
  *
