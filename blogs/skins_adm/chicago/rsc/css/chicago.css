@@ -600,15 +600,15 @@ div.bSideItem {
 	color: #929292;
 }
 
-div.bComment, /* Entire comment block */
-form.bComment /* New comment form */
+div.bFeedback div.bComment, /* Entire comment block */
+div.bFeedback form.bComment /* New comment form */
 {
 	border: 1px solid #becdd6;
 	padding: 0;
 	margin: 1ex;
 }
 div.bComment > p { /* padding for e.g. "No feedback for this post yet..." */
-    padding: 1ex;
+	padding: 1ex;
 }
 
 
