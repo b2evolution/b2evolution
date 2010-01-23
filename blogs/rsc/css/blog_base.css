@@ -179,7 +179,8 @@ form.bComment fieldset div.info
 
 /* Avatar widget */
 div.widget_core_coll_avatar {
-	margin: 1em auto;
+	margin-top: 1em;
+	margin-bottom: 1em;
 	text-align:center;
 }
 
