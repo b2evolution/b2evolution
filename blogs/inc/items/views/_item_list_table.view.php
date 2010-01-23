@@ -36,7 +36,8 @@ if( $highlight = param( 'highlight', 'integer', NULL ) )
 {	// There are lines we want to highlight:
 	$result_fadeout = array( 'post_ID' => array($highlight) );
 
-} elseif ( $highlight = $Session->get( 'highlight_id' ) )
+} 
+elseif ( $highlight = $Session->get( 'highlight_id' ) )
 {
 	$result_fadeout = array( 'post_ID' => array($highlight) );
 	$Session->delete( 'highlight_id' );
@@ -301,6 +302,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.24  2010/01/23 12:24:30  efy-yury
+ * minor
+ *
  * Revision 1.23  2010/01/21 18:16:49  efy-yury
  * update: fadeouts
  *
