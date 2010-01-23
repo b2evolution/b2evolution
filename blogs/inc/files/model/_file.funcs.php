@@ -556,6 +556,35 @@ function validate_dirname( $dirname )
 
 
 /**
+ * Check if file rename is acceptable
+ * 
+ * @uses for rename a file, File settings
+ * @param string the new name
+ * @param boolean 0 if directory
+ * @param boolean 0 if permission denied 
+ * @return nothing if the rename is acceptable, error message if not 
+ */
+function check_rename ( & $newname, $is_dir, $allow_locked_filetypes )
+{
+	// Check if provided name is okay:
+	$newname = trim( strip_tags($newname) );
+
+	if( ! $is_dir )
+	{
+		if( $error_filename = validate_filename( $newname, $allow_locked_filetypes ) )
+		{ // Not a file name or not an allowed extension
+			return $error_filename;
+		}
+	}
+	elseif( $error_dirname = validate_dirname( $newname ) )
+	{ // directory name
+		return $error_dirname;
+	}
+	return;
+}
+
+	
+/**
  * Return the path without the leading {@link $basepath}, or if not
  * below {@link $basepath}, just the basename of it.
  *
@@ -906,6 +935,9 @@ function file_controller_build_tabs()
 
 /*
  * $Log$
+ * Revision 1.32  2010/01/23 12:37:30  efy-asimo
+ * add check_rename function
+ *
  * Revision 1.31  2009/12/08 23:42:03  fplanque
  * minor
  *

@@ -692,21 +692,10 @@ switch( $action )
 			}
 
 			// Check if provided name is okay:
-			$new_names[$loop_src_File->get_md5_ID()] = trim(strip_tags($new_names[$loop_src_File->get_md5_ID()]));
-
-			if( !$loop_src_File->is_dir() )
+			if( $check_error = check_rename( & $new_names[$loop_src_File->get_md5_ID()], $loop_src_File->is_dir(), $allow_locked_filetypes ) )
 			{
-				if( $error_filename = validate_filename( $new_names[$loop_src_File->get_md5_ID()], $allow_locked_filetypes ) )
-				{ // Not a file name or not an allowed extension
-					$confirmed = 0;
-					param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $error_filename );
-					continue;
-				}
-			}
-			elseif( $error_dirname = validate_dirname( $new_names[$loop_src_File->get_md5_ID()] ) )
-			{ // directory name
 				$confirmed = 0;
-				param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $error_dirname );
+				param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $check_error );
 				continue;
 			}
 		}
@@ -741,7 +730,6 @@ switch( $action )
 				{ // File not in filelist (expected if not same dir)
 					$fm_Filelist->add( $File );
 				}
-
 
 				$Messages->add( sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'),
 						$old_name, $new_name ), 'success' );
@@ -1064,41 +1052,22 @@ switch( $action )
 		$old_name = $edited_File->get_name();
 		$new_name = param( 'name', 'string', '' );
 		
-		if( $new_name != $old_name && $new_name != '' )
+		if( $new_name != $old_name)
 		{ // Name has changed...
-			
-			$confirmed = 1;
-			// Check if provided name is okay:
-			$new_name = trim( strip_tags($new_name) );
-
-			if( !$edited_File->is_dir() )
+			$allow_locked_filetypes = $current_User->check_perm( 'files', 'all' );
+			if( $check_error = check_rename( $new_name, $edited_File->is_dir(), $allow_locked_filetypes ) )
 			{
-				if( $error_filename = validate_filename( $new_name, $allow_locked_filetypes ) )
-				{ // Not a file name or not an allowed extension
-					$confirmed = 0;
-					param_error( '$new_name', $error_filename );
-				}
+				param_error( 'new_name', $check_error );
 			}
-			elseif( $error_dirname = validate_dirname( $new_name ) )
-			{ // directory name
-				$confirmed = 0;
-				param_error( $new_name, $error_dirname );
-			}
-			
-			if( $confirmed )
-			{// Perform rename:
+			else
+			{ // Perform rename:
 				if( $edited_File->rename_to( $new_name ) )
 				{
 					$Messages->add( sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'),
 							$old_name, $new_name ), 'success' );
 					
-					// We have moved in same dir, update caches:
+					// We have renamed teh file, update caches:
 					$fm_Filelist->update_caches();
-					
-					if( $fm_Filelist->contains( $edited_File ) === false )
-					{ // File not in filelist (expected if not same dir)
-						$fm_Filelist->add( $File );
-					}
 				}
 				else
 				{
@@ -1764,6 +1733,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.56  2010/01/23 12:37:30  efy-asimo
+ * add check_rename function
+ *
  * Revision 1.55  2010/01/23 11:45:11  efy-yury
  * add: crumbs
  *
