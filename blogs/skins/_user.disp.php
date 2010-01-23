@@ -46,6 +46,8 @@ $ProfileForm = & new Form( '', 'ProfileForm' );
 
 $ProfileForm->begin_form( 'bComment' );
 
+$ProfileForm->add_crumb( 'profileform' );
+
 echo $User->get_avatar_imgtag( 'fit-160x160', 'rightmargin' );
 
 $ProfileForm->begin_fieldset( T_('Identity') );
@@ -98,6 +100,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/23 12:00:12  efy-yury
+ * add: crumbs
+ *
  * Revision 1.9  2009/12/22 23:13:39  fplanque
  * Skins v4, step 1:
  * Added new disp modes
