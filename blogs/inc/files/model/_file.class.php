@@ -1083,6 +1083,51 @@ class File extends DataObject
 
 
 	/**
+	 * Rewrite the file paths, because one the parent folder name was changed - recursive function
+	 * This function should be used just after a folder rename
+	 * @access should be private
+	 * @param string relative path for this file's parent directory
+	 * @param string full path for this file's parent directory 
+	 * @return 
+	 */
+	function modify_path ( $rel_dir, $full_dir )
+	{
+		if( $this->is_dir() )
+		{
+			$new_rel_dir = $rel_dir.$this->_name.'/';
+			$new_full_dir = $full_dir.$this->_name.'/';
+			
+			$temp_Filelist = new Filelist( $this->_FileRoot, $this->_adfp_full_path );
+			$temp_Filelist->load();
+			
+			while ( $temp_File = $temp_Filelist->get_next() )
+			{
+				$temp_File->modify_path( $new_rel_dir, $new_full_dir );
+			}
+		}
+
+		$this->load_meta();
+		$this->_rdfp_rel_path = $rel_dir.$this->_name;
+		$this->_dir = $full_dir;
+		$this->_adfp_full_path = $this->_dir.$this->_name;
+		$this->_md5ID = md5( $this->_adfp_full_path );
+
+		if( $this->meta == 'loaded' )
+		{	// We have meta data, we need to deal with it:
+			// unchanged : $this->set( 'root_type', $this->_FileRoot->type );
+			// unchanged : $this->set( 'root_ID', $this->_FileRoot->in_type_ID );
+			$this->set( 'path', $this->_rdfp_rel_path );
+			// Record to DB:
+			$this->dbupdate();
+		}
+		else
+		{	// There might be some old meta data to *recycle* in the DB...
+			$this->load_meta();
+		}
+	}
+	
+
+	/**
 	 * Rename the file in its current directory on disk.
 	 *
 	 * Also update meta data in DB.
@@ -1093,8 +1138,6 @@ class File extends DataObject
 	 */
 	function rename_to( $newname )
 	{
-		// echo "newname= $newname ";
-
 		// rename() will fail if newname already exists on windows
 		// if it doesn't work that way on linux we need the extra check below
 		// but then we have an integrity issue!! :(
@@ -1102,9 +1145,28 @@ class File extends DataObject
 		{
 			return false;
 		}
+		
+		if( $this->is_dir() )
+		{ //modify folder content file paths in db 
+			$rel_dir = dirname( $this->_rdfp_rel_path ).'/';
+			if( $rel_dir == './' )
+			{
+				$rel_dir = '';
+			}
+			$rel_dir = $rel_dir.$newname.'/';
+			$full_dir = $this->_dir.$newname.'/';
+			
+			$temp_Filelist = new Filelist( $this->_FileRoot, $this->_adfp_full_path );
+			$temp_Filelist->load();
+			
+			while ( $temp_File = $temp_Filelist->get_next() )
+			{
+				$temp_File->modify_path ( $rel_dir, $full_dir, $paths );
+			}
+		}
 
 		// Note: what happens if someone else creates $newname right at this moment here?
-
+		
 		if( ! @rename( $this->_adfp_full_path, $this->_dir.$newname ) )
 		{ // Rename will fail if $newname already exists (at least on windows)
 			return false;
@@ -1970,6 +2032,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.77  2010/01/24 14:47:25  efy-asimo
+ * Update file paths after folder rename
+ *
  * Revision 1.76  2009/12/12 19:14:10  fplanque
  * made avatars optional + fixes on img props
  *
