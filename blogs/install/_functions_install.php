@@ -831,8 +831,58 @@ function load_db_schema()
 }
 
 
+/**
+ * Install htaccess: Check if it works with the webserver, and install it.
+ * 
+ * @return string empty if already was installed or if installation was succesfull, error message otherwise. 
+ */
+function install_htaccess()
+{
+	global $baseurl;
+	global $basepath;
+	
+	if( @file_exists($basepath.'.htaccess') )
+	{
+		echo '<p>'.T_('You already have a file named .htaccess at your base url.').'</p>';
+		return '';
+	}
+	
+	if( ! @file_exists($basepath.'sample.htaccess') )
+	{
+		return T_('Can not find file ').'[ sample.htaccess ]'.T_(' at your base url.');	
+	}
+	
+	if( ! @copy( $basepath.'sample.htaccess', $basepath.'install/test/.htaccess' ) )
+	{
+		return T_('Failed to copy files!');
+	}
+
+	load_funcs('_core/_url.funcs.php');
+	$info = array();
+	if( ! $remote_page = fetch_remote_page( $baseurl.'install/test/', $info ) )
+	{
+		return $info[error];
+	}
+	
+	if( $remote_page != 'Test successful.' )
+	{
+		return T_('install/test/index.html was changed');
+	}
+	
+	if( ! @copy( $basepath.'sample.htaccess', $basepath.'.htaccess' ) )
+	{
+		return T_('Test was successful, but failed to copy files!');
+	}
+	
+	return '';
+}
+
+
 /*
  * $Log$
+ * Revision 1.84  2010/01/25 18:18:21  efy-asimo
+ * .htaccess automatic install
+ *
  * Revision 1.83  2009/12/20 21:05:08  fplanque
  * New default widget styles
  *

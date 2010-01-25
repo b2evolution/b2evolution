@@ -501,7 +501,7 @@ switch( $action )
 				?>
 				/>
 				<label for="evoupgrade"><?php echo T_('<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version. <strong>WARNING:</strong> If you have modified your database, this operation may fail. Make sure you have a backup.') ?></label></p>
-
+				
 			<?php
 				if( $allow_evodb_reset == 1 )
 				{
@@ -610,6 +610,16 @@ switch( $action )
 			?>
 			<p><?php echo T_('Upgrade completed successfully!')?></p>
 			<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'"', 'b2evolution')?></p>
+			<?php
+		}
+		
+		// Install .htaccess:
+		$error_message = install_htaccess();
+		if ( $error_message != '' )
+		{
+			?>
+			<p><?php echo T_('Error occured during installation .htaccess:').$error_message ?></p>
+			<p><?php printf( T_('Everything will work, but for optimization you may manually install as explained <a %s>here</a>.'), 'href="http://manual.b2evolution.net/Tricky_stuff"') ?></p>
 			<?php
 		}
 		break;
@@ -731,6 +741,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.193  2010/01/25 18:18:25  efy-asimo
+ * .htaccess automatic install
+ *
  * Revision 1.192  2010/01/21 22:49:10  blueyed
  * Installer: sanitize $action always. Add marker with the action done into the footer, used by the automatic installer.
  *
