@@ -46,8 +46,6 @@ $ProfileForm = & new Form( '', 'ProfileForm' );
 
 $ProfileForm->begin_form( 'bComment' );
 
-$ProfileForm->add_crumb( 'profileform' );
-
 echo $User->get_avatar_imgtag( 'fit-160x160', 'rightmargin' );
 
 $ProfileForm->begin_fieldset( T_('Identity') );
@@ -100,6 +98,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.11  2010/01/25 18:18:42  efy-yury
+ * add : crumbs
+ *
  * Revision 1.10  2010/01/23 12:00:12  efy-yury
  * add: crumbs
  *

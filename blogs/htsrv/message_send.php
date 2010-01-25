@@ -39,8 +39,12 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
+global $Session;
+
 header( 'Content-Type: text/html; charset='.$io_charset );
 
+// Check that this action request is not a CSRF hacked request:
+$Session->assert_received_crumb( 'newmessage' );
 
 // TODO: Flood protection (Use Hit class to prevent mass mailings to members..)
 
@@ -308,6 +312,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.64  2010/01/25 18:18:21  efy-yury
+ * add : crumbs
+ *
  * Revision 1.63  2009/12/04 23:27:49  fplanque
  * cleanup Expires: header handling
  *

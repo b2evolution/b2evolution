@@ -36,6 +36,10 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
+global $Session;
+// Check that this action request is not a CSRF hacked request:
+$Session->assert_received_crumb( 'subsform' );
+
 // Getting GET or POST parameters:
 param( 'checkuser_id', 'integer', true );
 param( 'newuser_email', 'string', true );
@@ -130,6 +134,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.28  2010/01/25 18:18:27  efy-yury
+ * add : crumbs
+ *
  * Revision 1.27  2009/12/04 23:27:49  fplanque
  * cleanup Expires: header handling
  *

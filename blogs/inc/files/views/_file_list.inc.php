@@ -490,6 +490,7 @@ $Form->begin_form();
 
 			<?php
 			echo $Form->check_all();
+			$Form->add_crumb( 'file' );
 
 			$field_options = array();
 
@@ -674,6 +675,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.33  2010/01/25 18:18:29  efy-yury
+ * add : crumbs
+ *
  * Revision 1.32  2010/01/22 20:20:21  efy-asimo
  * Remove File manager rename file
  *

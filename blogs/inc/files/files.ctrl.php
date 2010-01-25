@@ -825,6 +825,9 @@ switch( $action )
 	case 'make_posts':
 		// TODO: We don't need the Filelist, move UP!
 		// Make posts with selected images:
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
 
 		if( ! $selected_Filelist->count() )
 		{
@@ -1085,6 +1088,9 @@ switch( $action )
 
 	case 'link_user':
 		// TODO: We don't need the Filelist, move UP!
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
 		
 		// Link File to User:
 		if( ! isset($edited_User) )
@@ -1733,6 +1739,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.57  2010/01/25 18:18:28  efy-yury
+ * add : crumbs
+ *
  * Revision 1.56  2010/01/23 12:37:30  efy-asimo
  * add check_rename function
  *
