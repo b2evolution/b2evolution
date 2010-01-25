@@ -374,7 +374,7 @@ function editWidget( widget )
 {
 	jQuery( '#server_messages' ).html( '' );
 	msg = "wi_ID="+widget.substr( 6, widget.length );
-	SendAdminRequest( "widgets", "edit", msg );
+	SendAdminRequest( "widgets", "edit", msg, true );
 	return false;
 }
 
@@ -484,7 +484,7 @@ function addNewWidget( widget_list_item, admin_call )
 	var destination = jQuery( '.available_widgets' ).attr( 'id' );
 	destination = destination.substr( 18, destination.length ).replace( '_', ' ' );
 
-	SendAdminRequest( 'widgets', 'create', admin_call+"&container="+destination );
+	SendAdminRequest( 'widgets', 'create', admin_call+"&container="+destination, true );
 }
 
 
@@ -553,7 +553,7 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 function toggleWidget( wi_ID )
 {
 	//console.log( 'Toggling widget #' + wi_ID.substr( 6 ) );
-	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ),);
+	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ), true );
 	return false;
 }
 
