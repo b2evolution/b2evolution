@@ -267,6 +267,14 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			}
 			$Form->select_input_object( $input_name, $set_value, $UserCache, $set_label, $params );
 			break;
+			
+		case 'radio':
+			if( ! isset($parmeta['field_lines']) )
+			{
+				$parmeta['field_lines'] = false;
+			}
+			$Form->radio( $input_name, $set_value, $parmeta['options'], $set_label, $parmeta['field_lines'], $parmeta['note'] );
+			break;
 
 		case 'array':
 			$has_array_type = true;
@@ -662,6 +670,10 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 				$l_param_type = 'integer';
 				$l_param_default = 0;
 				break;
+				
+			case 'radio':
+				$l_param_type = 'array';
+				break;
 
 			case 'html_input':
 			case 'html_textarea':
@@ -826,6 +838,23 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 					return false;
 				}
 				break;
+				
+			case 'radio':
+				$check_options = $value;
+				if( ! is_array($check_options) )
+				{
+					param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $check_options ) );
+				}
+				
+				foreach($check_options as $v)
+				{
+					if( ! is_array($v) )
+					{
+						param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $v ) );
+						return false;
+					}
+				}
+				
 
 			case 'select':
 				$check_options = $value;
@@ -1023,6 +1052,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /*
  * $Log$
+ * Revision 1.15  2010/01/26 15:49:35  efy-asimo
+ * Widget param type radio
+ *
  * Revision 1.14  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *

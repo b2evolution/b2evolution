@@ -120,8 +120,9 @@ class coll_item_list_Widget extends ComponentWidget
 				'order_dir' => array(
 					'label' => T_('Direction'),
 					'note' => T_('How to sort the items'),
-					'type' => 'select', // should be a radio button set
-					'options' => array( 'ASC'  => T_('Ascending'), 'DESC' => T_('Descending') ),
+					'type' => 'radio',
+					'options' => array( 'ASC'  => array( 'ASC', T_('Ascending') ), 
+										'DESC' => array( 'DESC', T_('Descending') ) ),
 					'defaultvalue' => 'DESC',
 				),
 				'limit' => array(
@@ -425,6 +426,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.26  2010/01/26 15:49:35  efy-asimo
+ * Widget param type radio
+ *
  * Revision 1.25  2009/12/22 23:13:39  fplanque
  * Skins v4, step 1:
  * Added new disp modes
