@@ -54,7 +54,9 @@ jQuery(document).ready( function()
 	// grab some constants -- fp> TODO: this is flawed. Fails when starting with an empty blog having ZERO widgets. Init that in .php
 	edit_icon_tag = jQuery( '.edit_icon_hook' ).find( 'a' ).html();// grab the edit icon
 	delete_icon_tag = jQuery( '.delete_icon_hook' ).find( 'a' ).html();// grab the delete icon
-
+	//get crumb url from delete url and then add it in toggleWidget
+	var crumb_url = jQuery( '.delete_icon_hook' ).find( 'a' ).attr('href');
+	crumb_url = crumb_url.match(/crumb_.*?$/);
 	// Modify the current widgets screen
 	// remove the "no widgets yet" placeholder:
 	jQuery( ".new_widget" ).parent().parent().remove();
@@ -124,7 +126,7 @@ jQuery(document).ready( function()
 		// create widget entry for each widget in each container
 		for( widget in the_widgets[container] )
 		{	// loop through all widgets in this container
-			createWidget( widget, container, 0, the_widgets[container][widget]["name"], the_widgets[container][widget]["class"], the_widgets[container][widget]["enabled"] );
+			createWidget( widget, container, 0, the_widgets[container][widget]["name"], the_widgets[container][widget]["class"], the_widgets[container][widget]["enabled"], crumb_url );
 		}
 	}
 
@@ -499,7 +501,7 @@ function addNewWidget( widget_list_item, admin_call )
 function addNewWidgetCallback( wi_ID, container, wi_order, wi_name )
 {
 	jQuery( '.fade_me' ).removeClass( 'fade_me' ); // kill any active fades
-	createWidget( 'wi_ID_'+wi_ID, container.replace( ' ', '_' ),wi_order, '<strong>'+wi_name+'</strong>', '', 1 );
+	createWidget( 'wi_ID_'+wi_ID, container.replace( ' ', '_' ),wi_order, '<strong>'+wi_name+'</strong>', '', 1, '' );
 	doFade( '#wi_ID_'+wi_ID );
 	if( reorder_delay_remaining > 0 )
 	{	// send outstanding updates
@@ -519,8 +521,9 @@ function addNewWidgetCallback( wi_ID, container, wi_order, wi_name )
  * @param integer wi_order ( unused atm ) Order of the widget on the server
  * @param string wi_name Name of the new widget
  * @param boolean wi_enabled Is the widget enabled?
+ * @param string crumb url
  */
-function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled )
+function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled, crumb_url )
 {
 	//	window.alert( wi_ID + ' : ' + container + ' : ' + wi_name + ' : ' +wi_class );
 	var newWidget = jQuery( '<li id="'+wi_ID+'" class="draggable_widget"><a class="widget_name" href="#" onclick="return editWidget( \''+wi_ID+'\' );">'+wi_name+'</a></li>' );
@@ -533,7 +536,7 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 	jQuery( newWidget ).prepend( jQuery( '<span class="widget_state">'+( wi_enabled ? enabled_icon_tag : disabled_icon_tag )+'</span>' ) );
 
 	// Add action icons:
-	var actionIcons = jQuery( '<span class="widget_actions"><a href="#" class="toggle_action" onclick="return toggleWidget( \''+wi_ID+'\' );">'
+	var actionIcons = jQuery( '<span class="widget_actions"><a href="#" class="toggle_action" onclick="return toggleWidget( \''+wi_ID+'\', \''+crumb_url+'\' );">'
 				+( wi_enabled ? deactivate_icon_tag : activate_icon_tag )+'</a><a href="#" onclick="return editWidget( \''+wi_ID+'\' );">'
 				+edit_icon_tag+'</a><a href="#" onclick="return deleteWidget( \''+wi_ID+'\' );">'
 				+delete_icon_tag+'</a></span>' );
@@ -549,11 +552,12 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
  * Toggle the widget state.
  *
  * @param string Widget ID.
+ * @param string Crumb url.
  */
-function toggleWidget( wi_ID )
+function toggleWidget( wi_ID, crumb_url )
 {
-	//console.log( 'Toggling widget #' + wi_ID.substr( 6 ) );
-	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ), true );
+	 //console.log( 'Toggling widget #' + wi_ID.substr( 6 ) );
+	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ) + '&' + crumb_url, true );
 	return false;
 }
 
