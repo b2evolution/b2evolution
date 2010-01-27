@@ -13,6 +13,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 ?>
 
+<div class="clearer"></div>
 <!-- =================================== START OF FOOTER =================================== -->
 <div id="footer">
 	<p>

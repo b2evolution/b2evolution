@@ -52,7 +52,7 @@ skin_include( '_body_header.inc.php' );
 		?>
 	</div>
 
-	<div id="sidebar">
+	
 		<?php
 		// ------------------------- SIDEBAR INCLUDED HERE --------------------------
 		skin_include( '_sidebar.inc.php' );
@@ -60,7 +60,7 @@ skin_include( '_body_header.inc.php' );
 		// _body_footer.inc.php file into the current skin folder.
 		// ----------------------------- END OF SIDEBAR -----------------------------
 		?>
-	</div>
+	
 </div>
 
 <?php 

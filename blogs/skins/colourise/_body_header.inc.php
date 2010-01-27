@@ -6,7 +6,7 @@
 ?>
 <div id="wrap">
 	<div id="header" class="pageHeader">
-	
+		<div id="top_menu">
 		<?php
 			// Display container and contents:
 			skin_container( NT_('Page Top'), array(
@@ -20,6 +20,7 @@
 					'item_end' => '</li>',
 				) );
 		?>
+		</div>
 			
 		<?php
 			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------

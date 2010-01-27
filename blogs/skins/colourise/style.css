@@ -74,7 +74,7 @@ dd {
 div.pageHeader {
 	padding: 1ex;
 	margin: 0 1px 0 1px;
-	border-bottom: 1px solid #000;
+	/*border-bottom: 1px solid #000;*/
 	text-align: center;
 	background: #78a;
 }
@@ -267,14 +267,13 @@ div#skin_wrapper div.compact_search_form input.search_submit {
 }
 #content-wrap {
 	position: relative;
-	clear: both;
 	width: 900px;	
-	padding: 0; 		
+	padding:0 0 30px;
 	margin-left: 5px;	
 	background: transparent;
-	float: left;	
 	display: inline;	
 	border-top: 1px solid #1A1A1A;
+	background: transparent url(img/footer-top.jpg) no-repeat scroll center bottom;
 }
 #header {
 	position: relative;
@@ -292,7 +291,7 @@ div#skin_wrapper div.compact_search_form input.search_submit {
 	border: none;
 	width: 262px; height: 30px;
 	background: url(img/header-search.jpg) no-repeat;	
-	z-index: 999999;
+	z-index: 80;
 }
 #header form#quick-search p {
 	margin: 0; padding: 0;		
@@ -310,6 +309,7 @@ div#skin_wrapper div.compact_search_form input.search_submit {
 
 /*  Navigation  */
 #nav {
+	border-bottom:1px solid #1A1A1A;
 	height:40px;
 	left:0;
 	margin:0;
@@ -457,6 +457,14 @@ div.pageHeader div.widget_core_coll_tagline {
 	margin: 0;		
 	border-bottom: 1px solid #111;
 }
+
+#sidebar ul li:last-child {
+	list-style: none;
+	padding: 8px 10px;
+	margin: 0;		
+	border-bottom: none;
+}
+
 * html body #sidebar ul li {
 	height: 1%;
 }
@@ -482,7 +490,8 @@ div.pageHeader div.widget_core_coll_tagline {
 	color: #fff;	
 }
 #sidebar ul ul { margin: 0 0 0 5px; padding: 0; }
-#sidebar ul ul li { border: none; }
+#sidebar ul ul li { border-bottom:1px solid #111111; }
+#sidebar ul ul li:last-child { border: none; }
 
 /* footer */
 #footer-wrap {
@@ -615,12 +624,40 @@ div.feedback_feed_msg p img {
 
 div#skin_wrapper form.bComment fieldset div.info {
 	margin:0 0 0 20%;
-	padding-top:11px;
+	padding-top: 4px;
 }
 
 div#skin_wrapper form.bComment fieldset div.input {
 	margin:0 0 0 20%;
 	padding-top: 7px;
+}
+
+div#skin_wrapper form.bComment input.submit {
+	padding-top: 7px;
+	width: 100px;
+}
+
+div#skin_wrapper form.bComment input.preview {
+	padding-top: 7px;
+	width: 100px;
+}
+
+div#skin_wrapper form.bComment input.SaveButton {
+	width: 100px;
+}
+
+div#skin_wrapper form.bComment input.ResetButton {
+	width: 100px;
+}
+
+div#skin_wrapper form.bComment fieldset div.input input.checkbox {
+	padding-top: 7px;
+	width: 25px;
+}
+
+div#skin_wrapper form.bComment fieldset div.input label {
+	padding-top: 7px;
+	display: inline;
 }
 
 div#skin_wrapper form.bComment input {
@@ -725,4 +762,78 @@ div.widget_core_colls_list_public ul li.selected a.selected:hover {
 	border:medium none;
 	color:#0077B5;
 	text-decoration:none;
+}
+
+div.bCommentSmallPrint a img {
+	display: none;
+}
+
+div.feedback_feed_msg img {
+	display: none;
+}
+
+/*div.bPostpublished a img {
+	display: none;
+}*/
+
+div#skin_wrapper div.edit_link {
+	display: inline;
+}
+
+div#skin_wrapper div.edit_link img {
+	display: none;
+}
+
+div#skin_wrapper p.postmetadata small a img{
+	padding: 0px;
+}
+
+div#skin_wrapper p.postmetadata {
+	padding: 0px;
+	height: 33px;
+	background: #0C0C0C;
+}
+
+div#top_menu {
+	border-bottom:1px solid #1A1A1A;
+	height:40px;
+	left:0;
+	margin:0;
+	padding:0;
+	position:absolute;
+	top:35px;
+	width:900px;
+}
+
+div#footer {
+	background:#070707 url(img/footer-top.jpg) no-repeat scroll center top;
+	margin:5px;
+	padding:5px;
+	text-align:center;
+}
+
+/* Calendar */
+
+table.bCalendarTable {
+	border-collapse:separate;
+	border-spacing:0;
+	font-size:77%;
+	margin: 0;
+}
+
+td.bCalendarCell, td.bCalendarLinkPost, td.bCalendarEmptyCell {
+	width: 40px;
+	padding: 0px;
+	margin: 0px;
+}
+
+th.bCalendarHeaderCell {
+	width: 40px;
+	padding: 0px;
+	text-align: center;
+}
+
+li.widget_core_coll_avatar {
+	text-align: center;
+	border: 0;
 }
