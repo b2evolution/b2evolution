@@ -234,7 +234,7 @@ if( $recipient_User )
 { // Member:
 	if( !empty( $Blog ) )
 	{
-		$message_footer .= T_("You can edit your profile to not reveive mails through a form:")
+		$message_footer .= T_("You can edit your profile to not receive emails through a form:")
 			."\n".url_add_param( str_replace( '&amp;', '&', $Blog->get('url') ), 'disp=profile', '&' );
 	}
 	// TODO: else go to admin
@@ -312,6 +312,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.65  2010/01/27 02:46:22  sam2kb
+ * minor/typo
+ *
  * Revision 1.64  2010/01/25 18:18:21  efy-yury
  * add : crumbs
  *
