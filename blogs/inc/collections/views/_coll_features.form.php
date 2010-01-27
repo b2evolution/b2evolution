@@ -95,11 +95,10 @@ $Form->begin_fieldset( T_('Feedback options') );
 	$Form->select_input_array( 'new_feedback_status', $edited_Blog->get_setting('new_feedback_status'), $status_options,
 				T_('New feedback status'), T_('This status will be assigned to new comments/trackbacks from non moderators (unless overriden by plugins).') );
 
-	// TODO: radio button
-	$Form->select_input_array( 'comments_orderdir', $edited_Blog->get_setting('comments_orderdir'), array(
-														'ASC'  => T_('Chronologic'),
-														'DESC' => T_('Reverse'),
-													), T_('Display order') );
+	$Form->radio( 'comments_orderdir', $edited_Blog->get_setting('comments_orderdir'),
+						array(	array( 'ASC', T_('Chronologic') ),
+								array ('DESC', T_('Reverse') ),	
+						), T_('Display order'), true );
 
 	echo '</div>';
 
@@ -202,6 +201,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.23  2010/01/27 15:20:07  efy-asimo
+ * Change select list to radio button
+ *
  * Revision 1.22  2010/01/22 04:28:51  fplanque
  * fixes
  *

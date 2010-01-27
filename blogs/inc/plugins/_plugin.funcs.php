@@ -670,10 +670,6 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 				$l_param_type = 'integer';
 				$l_param_default = 0;
 				break;
-				
-			case 'radio':
-				$l_param_type = 'array';
-				break;
 
 			case 'html_input':
 			case 'html_textarea':
@@ -840,21 +836,26 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 				break;
 				
 			case 'radio':
-				$check_options = $value;
-				if( ! is_array($check_options) )
+				$check_value = false;							
+				foreach($meta['options'] as $arr)
 				{
-					param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $check_options ) );
-				}
-				
-				foreach($check_options as $v)
-				{
-					if( ! is_array($v) )
+					if( ! is_array($arr) )
 					{
-						param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $v ) );
+						param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $arr ) );
 						return false;
 					}
+					if( $value == $arr[0] )
+					{
+						$check_value = true;
+						break;
+					}
 				}
-				
+				if ( ! $check_value )
+				{
+					param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $value ) );
+					return false;
+				}
+				break;
 
 			case 'select':
 				$check_options = $value;
@@ -1052,6 +1053,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /*
  * $Log$
+ * Revision 1.16  2010/01/27 15:20:08  efy-asimo
+ * Change select list to radio button
+ *
  * Revision 1.15  2010/01/26 15:49:35  efy-asimo
  * Widget param type radio
  *

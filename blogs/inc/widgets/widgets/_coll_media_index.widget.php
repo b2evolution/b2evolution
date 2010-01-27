@@ -101,8 +101,9 @@ class coll_media_index_Widget extends ComponentWidget
 			'order_dir' => array(
 				'label' => T_('Direction'),
 				'note' => T_('How to sort the items'),
-				'type' => 'select',
-				'options' => array( 'ASC'  => T_('Ascending'), 'DESC' => T_('Descending') ),
+				'type' => 'radio',
+				'options' => array( array( 'ASC', T_('Ascending') ),
+									array( 'DESC', T_('Descending') ) ),
 				'defaultvalue' => 'DESC',
 			),
 			'blog_ID' => array(
@@ -293,6 +294,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.20  2010/01/27 15:20:08  efy-asimo
+ * Change select list to radio button
+ *
  * Revision 1.19  2009/12/23 01:38:46  fplanque
  * one server was missing this...
  *

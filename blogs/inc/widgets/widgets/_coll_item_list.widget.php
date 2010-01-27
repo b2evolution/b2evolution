@@ -87,9 +87,10 @@ class coll_item_list_Widget extends ComponentWidget
 				'follow_mainlist' => array(
 					'label' => T_('Follow Main List'),
 					'note' => T_('Do you want to restrict to contents related to what is displayed in the main area?'),
-					'type' => 'select', // should be a radio button set
-					'options' => array( 'no'  => T_('No'), 'tags' => T_('By tags') ), // may be extended
-					'defaultvalue' => 'none',
+					'type' => 'radio',
+					'options' => array( array ('no', T_('No') ), 
+										array ('tags', T_('By tags') ) ), // may be extended
+					'defaultvalue' => 'no',
 				),
 				'blog_ID' => array(
 					'label' => T_( 'Blog' ),
@@ -106,8 +107,9 @@ class coll_item_list_Widget extends ComponentWidget
 				'item_group_by' => array(
 					'label' => T_('Group by'),
 					'note' => T_('Do you want to group the Items?'),
-					'type' => 'select', // should be a radio button set
-					'options' => array( 'none'  => T_('None'), 'chapter' => T_('By category/chapter') ),
+					'type' => 'radio',
+					'options' => array( array( 'none', T_('None') ), 
+										array( 'chapter', T_('By category/chapter') ) ),
 					'defaultvalue' => 'none',
 				),
 				'order_by' => array(
@@ -121,8 +123,8 @@ class coll_item_list_Widget extends ComponentWidget
 					'label' => T_('Direction'),
 					'note' => T_('How to sort the items'),
 					'type' => 'radio',
-					'options' => array( 'ASC'  => array( 'ASC', T_('Ascending') ), 
-										'DESC' => array( 'DESC', T_('Descending') ) ),
+					'options' => array( array( 'ASC', T_('Ascending') ), 
+										array( 'DESC', T_('Descending') ) ),
 					'defaultvalue' => 'DESC',
 				),
 				'limit' => array(
@@ -426,6 +428,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.27  2010/01/27 15:20:08  efy-asimo
+ * Change select list to radio button
+ *
  * Revision 1.26  2010/01/26 15:49:35  efy-asimo
  * Widget param type radio
  *
