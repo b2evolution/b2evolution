@@ -825,7 +825,7 @@ switch( $action )
 	case 'make_posts':
 		// TODO: We don't need the Filelist, move UP!
 		// Make posts with selected images:
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
 
@@ -1125,7 +1125,7 @@ switch( $action )
 
 	case 'link_data':
 		// fp> do we need to go through this block + redirect or could the link icons link directly to $linkctrl ?
-		
+
 		// Get the file we want to link:
 		if( !$selected_Filelist->count() )
 		{
@@ -1739,6 +1739,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.58  2010/01/28 03:42:18  fplanque
+ * minor
+ *
  * Revision 1.57  2010/01/25 18:18:28  efy-yury
  * add : crumbs
  *

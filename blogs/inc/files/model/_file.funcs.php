@@ -558,7 +558,8 @@ function validate_dirname( $dirname )
 /**
  * Check if file rename is acceptable
  * 
- * @uses for rename a file, File settings
+ * used when renaming a file, File settings
+ *
  * @param string the new name
  * @param boolean 0 if directory
  * @param boolean 0 if permission denied 
@@ -935,6 +936,9 @@ function file_controller_build_tabs()
 
 /*
  * $Log$
+ * Revision 1.33  2010/01/28 03:42:20  fplanque
+ * minor
+ *
  * Revision 1.32  2010/01/23 12:37:30  efy-asimo
  * add check_rename function
  *

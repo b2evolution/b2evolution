@@ -37,6 +37,7 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 
 global $Session;
+
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'subsform' );
 
@@ -134,6 +135,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.29  2010/01/28 03:42:19  fplanque
+ * minor
+ *
  * Revision 1.28  2010/01/25 18:18:27  efy-yury
  * add : crumbs
  *

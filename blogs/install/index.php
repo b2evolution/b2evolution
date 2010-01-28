@@ -501,7 +501,7 @@ switch( $action )
 				?>
 				/>
 				<label for="evoupgrade"><?php echo T_('<strong>Upgrade from a previous version of b2evolution</strong>: Upgrade your b2evolution database tables in order to make them compatible with the current version. <strong>WARNING:</strong> If you have modified your database, this operation may fail. Make sure you have a backup.') ?></label></p>
-				
+
 			<?php
 				if( $allow_evodb_reset == 1 )
 				{
@@ -741,6 +741,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.194  2010/01/28 03:42:19  fplanque
+ * minor
+ *
  * Revision 1.193  2010/01/25 18:18:25  efy-asimo
  * .htaccess automatic install
  *

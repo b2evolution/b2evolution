@@ -138,13 +138,16 @@ $fadeout_id = $Session->get('fadeout_id');
 // if there happened something with a item, apply fadeout to the row:
 $highlight_fadeout = empty($fadeout_id) ? array() : array( 'ftyp_ID'=>array($fadeout_id) );
 
-$Results->display(NULL, $highlight_fadeout );
+$Results->display( NULL, $highlight_fadeout );
 
 //Flush fadeout
 $Session->delete( 'fadeout_id');
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/28 03:42:20  fplanque
+ * minor
+ *
  * Revision 1.9  2010/01/23 12:54:49  efy-yury
  * add: fadeouts
  *
