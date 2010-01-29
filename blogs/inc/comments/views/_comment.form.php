@@ -47,7 +47,6 @@ $Form->begin_form( 'eform' );
 
 $Form->add_crumb( 'comment' );
 $Form->hidden( 'ctrl', 'comments' );
-$Form->hidden( 'action', 'update' );
 $Form->hidden( 'redirect_to', $redirect_to );
 $Form->hidden( 'comment_ID', $edited_Comment->ID );
 ?>
@@ -132,8 +131,6 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 	<div class="edit_actions">
 
-	<input type="submit" value="<?php /* TRANS: This is the value of an input submit button */ echo T_('Save !'); ?>" class="SaveButton" tabindex="10" />
-
 	<?php
 	// ---------- DELETE ----------
 	if( $action == 'editcomment' )
@@ -144,6 +141,8 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 	// CALL PLUGINS NOW:
 	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Comment', 'edit_layout' => NULL ) );
+	
+	echo_comment_buttons( $Form, $edited_Comment );
 
 	?>
 	</div>
@@ -274,8 +273,15 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 <?php
 $Form->end_form();
 
+// ####################### JS BEHAVIORS #########################
+echo_comment_publishbt_js();
+
+
 /*
  * $Log$
+ * Revision 1.14  2010/01/29 23:07:05  efy-asimo
+ * Publish Comment button
+ *
  * Revision 1.13  2010/01/13 22:09:44  fplanque
  * normalized
  *

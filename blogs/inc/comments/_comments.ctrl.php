@@ -28,7 +28,7 @@ global $AdminUI;
  */
 global $UserSettings;
 
-param( 'action', 'string', 'list' );
+$action = param_action( 'list' );
 
 /*
  * Init the objects we want to work on.
@@ -39,6 +39,7 @@ switch( $action )
 	case 'update':
 	case 'publish':
 	case 'deprecate':
+	case 'update_publish':
 	case 'delete':
 		param( 'comment_ID', 'integer', true );
 		$edited_Comment = Comment_get_by_ID( $comment_ID );
@@ -96,6 +97,7 @@ switch( $action )
 		break;
 
 
+	case 'update_publish':
 	case 'update':
 		// fp> TODO: $edited_Comment->load_from_Request( true );
 
@@ -138,8 +140,12 @@ switch( $action )
 		param( 'comment_rating', 'integer', NULL );
 		$edited_Comment->set_from_Request( 'rating' );
 
-		param( 'comment_status', 'string', 'published' );
-		$edited_Comment->set_from_Request( 'status' );
+		$comment_status = param( 'comment_status', 'string', 'published' );
+		if( $action == 'update_publish' )
+		{
+			$comment_status = 'published';
+		}
+		$edited_Comment->set( 'status', $comment_status );
 
 		param( 'comment_nofollow', 'integer', 0 );
 		$edited_Comment->set_from_Request( 'nofollow' );
@@ -261,6 +267,7 @@ switch( $action )
 
 
 	case 'edit':
+	case 'update_publish':
 	case 'update':	// on error
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
@@ -275,7 +282,7 @@ switch( $action )
 
 
 	case 'list':
-	default:
+	default:		
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
@@ -293,6 +300,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2010/01/29 23:07:01  efy-asimo
+ * Publish Comment button
+ *
  * Revision 1.20  2010/01/23 00:30:09  fplanque
  * no message
  *

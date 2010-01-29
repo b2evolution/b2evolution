@@ -217,9 +217,76 @@ function comments_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 	echo $blah;
 }
 
+/**
+ * Create comment form submit buttons
+ * 
+ * @param $Form
+ * @param $edited_Comment
+ * 
+ */
+function echo_comment_buttons( $Form, $edited_Comment )
+{
+	global $Blog, $current_User;
+	
+	// ---------- SAVE ------------
+	
+	$Form->submit( array( 'actionArray[update]', T_('Save!'), 'SaveButton' ) );
+	
+	// ---------- PUBLISH ---------
+	
+	if( $edited_Comment->status == 'draft'
+			&& $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID )	// TODO: if we actually set the primary cat to another blog, we may still get an ugly perm die
+			&& $current_User->check_perm( 'edit_timestamp', 'edit', false ) )
+	{
+		 $publish_style = 'display: inline';
+	}
+	else
+	{
+		$publish_style = 'display: none';
+	}
+	$Form->submit( array(
+		'actionArray[update_publish]',
+		/* TRANS: This is the value of an input submit button */ T_('Publish!'),
+		'SaveButton',
+		'',
+		$publish_style
+	) );
+}
+
+
+/**
+ * Output JavaScript code to dynamically show or hide the "Publish!" 
+ * button depending on the selected comment status.
+ *
+ * This function is used by the comment edit screen.
+ */
+function echo_comment_publishbt_js()
+{
+	global $next_action;
+	?>
+	<script type="text/javascript">
+	jQuery( '#commentform_visibility input[type=radio]' ).click( function()
+	{
+		var commentpublish_btn = jQuery( '.edit_actions input[name=actionArray[update_publish]]' );
+
+		if( this.value != 'draft' )
+		{	// Hide the "Publish NOW !" button:
+			commentpublish_btn.css( 'display', 'none' );
+		}
+		else
+		{	// Show the button:
+			commentpublish_btn.css( 'display', 'inline' );
+		}
+	} );
+	</script>
+	<?php
+}
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/29 23:07:04  efy-asimo
+ * Publish Comment button
+ *
  * Revision 1.6  2009/09/14 12:46:36  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *
