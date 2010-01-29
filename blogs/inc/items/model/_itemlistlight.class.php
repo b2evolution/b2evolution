@@ -888,7 +888,8 @@ class ItemListLight extends DataObjectList2
 	 * @todo cleanup some displays
 	 * @todo implement HMS part of YMDHMS
 	 *
-	 * @return array
+	 * @return array List of titles to display, which are escaped for HTML display
+	 *               (dh> only checked this for 'authors'/?authors=, where the output was not escaped)
 	 */
 	function get_filter_titles( $ignore = array(), $params = array() )
 	{
@@ -1015,7 +1016,18 @@ class ItemListLight extends DataObjectList2
 		// AUTHORS:
 		if( !empty($this->filters['authors']) )
 		{
-			$title_array[] = T_('Author(s)').': '.$this->filters['authors'];
+			$authors = preg_split('~\s*,\s*~', $this->filters['authors'], -1, PREG_SPLIT_NO_EMPTY);
+			if( $authors ) {
+				$UserCache = get_UserCache();
+				$author_names = array();
+				foreach( $authors as $author_ID ) {
+					if( $tmp_Author = $UserCache->get_by_ID($author_ID, false) ) {
+						$author_names[] = htmlspecialchars($tmp_Author->get_preferred_name());
+					}
+				}
+				$authors = implode(', ', $author_names);
+			}
+			$title_array[] = T_('Author(s)').': '.$authors;
 		}
 
 
@@ -1514,6 +1526,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.35  2010/01/29 00:32:21  blueyed
+ * Display preferred user name in author filter.
+ *
  * Revision 1.34  2009/09/25 07:32:52  efy-cantor
  * replace get_cache to get_*cache
  *
