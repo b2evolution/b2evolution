@@ -365,6 +365,9 @@ switch( $action )
 		break;
 
  	case 're-order' : // js request
+ 		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget' );
+		
  		$DB->begin();
 
  		// Reset the current orders and make container names temp to avoid duplicate entry errors
@@ -565,6 +568,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.43  2010/01/29 17:21:38  efy-yury
+ * add: crumbs in ajax calls
+ *
  * Revision 1.42  2010/01/21 18:16:49  efy-yury
  * update: fadeouts
  *

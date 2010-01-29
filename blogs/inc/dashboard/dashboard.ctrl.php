@@ -152,7 +152,7 @@ if( $blog )
 				$.ajax({
 				type: 'POST',
 				url: '<?php echo $htsrv_url; ?>async.php',
-				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&status=' + status + '&action=set_comment_status' + '&ids=' + ids + '&ind=' + commentsInd,
+				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&status=' + status + '&action=set_comment_status' + '&ids=' + ids + '&ind=' + commentsInd + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
 				success: function(result) { processResult(result, id);	} });
 			}
 
@@ -168,7 +168,7 @@ if( $blog )
 				$.ajax({
 				type: 'POST',
 				url: '<?php echo $htsrv_url; ?>async.php',
-				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&action=delete_comment' + '&ids=' + ids + '&ind=' + commentsInd,
+				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&action=delete_comment' + '&ids=' + ids + '&ind=' + commentsInd + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
 				success: function(result) { processResult(result, id); } });
 			}
 
@@ -563,6 +563,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.52  2010/01/29 17:21:38  efy-yury
+ * add: crumbs in ajax calls
+ *
  * Revision 1.51  2010/01/12 15:56:11  fplanque
  * crumbs
  *

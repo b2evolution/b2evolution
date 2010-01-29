@@ -43,6 +43,12 @@ var reorder_delay = 2000;
  */
 var reorder_delay_remaining = 0;
 
+/**
+ * @internal string current_widgets
+ * crumb url contain here
+ */
+var crumb_url = '';
+
 
 /**
  * Init()
@@ -55,7 +61,7 @@ jQuery(document).ready( function()
 	edit_icon_tag = jQuery( '.edit_icon_hook' ).find( 'a' ).html();// grab the edit icon
 	delete_icon_tag = jQuery( '.delete_icon_hook' ).find( 'a' ).html();// grab the delete icon
 	//get crumb url from delete url and then add it in toggleWidget
-	var crumb_url = jQuery( '.delete_icon_hook' ).find( 'a' ).attr('href');
+	crumb_url = jQuery( '.delete_icon_hook' ).find( 'a' ).attr('href');
 	crumb_url = crumb_url.match(/crumb_.*?$/);
 	// Modify the current widgets screen
 	// remove the "no widgets yet" placeholder:
@@ -126,7 +132,7 @@ jQuery(document).ready( function()
 		// create widget entry for each widget in each container
 		for( widget in the_widgets[container] )
 		{	// loop through all widgets in this container
-			createWidget( widget, container, 0, the_widgets[container][widget]["name"], the_widgets[container][widget]["class"], the_widgets[container][widget]["enabled"], crumb_url );
+			createWidget( widget, container, 0, the_widgets[container][widget]["name"], the_widgets[container][widget]["class"], the_widgets[container][widget]["enabled"] );
 		}
 	}
 
@@ -289,6 +295,8 @@ function bufferedServerCall()
 		jQuery( '#server_messages' ).html( '<div class="log_container"><div class="log_message">'+T_( 'Saving changes' )+'</div></a>' ); // inform user
 
 		current_widgets = new_widget_order; // store current order
+		//add crumbs here
+		new_widget_order += '&' + crumb_url;
 		jQuery( '.pending_update' ).removeClass( 'pending_update' ).addClass( 'server_updating' ); // change class to "updating"
 
 		SendAdminRequest( 'widgets', 're-order', new_widget_order, false ); // send current order to server
@@ -501,7 +509,7 @@ function addNewWidget( widget_list_item, admin_call )
 function addNewWidgetCallback( wi_ID, container, wi_order, wi_name )
 {
 	jQuery( '.fade_me' ).removeClass( 'fade_me' ); // kill any active fades
-	createWidget( 'wi_ID_'+wi_ID, container.replace( ' ', '_' ),wi_order, '<strong>'+wi_name+'</strong>', '', 1, '' );
+	createWidget( 'wi_ID_'+wi_ID, container.replace( ' ', '_' ),wi_order, '<strong>'+wi_name+'</strong>', '', 1 );
 	doFade( '#wi_ID_'+wi_ID );
 	if( reorder_delay_remaining > 0 )
 	{	// send outstanding updates
@@ -521,9 +529,8 @@ function addNewWidgetCallback( wi_ID, container, wi_order, wi_name )
  * @param integer wi_order ( unused atm ) Order of the widget on the server
  * @param string wi_name Name of the new widget
  * @param boolean wi_enabled Is the widget enabled?
- * @param string crumb url
  */
-function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled, crumb_url )
+function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled )
 {
 	//	window.alert( wi_ID + ' : ' + container + ' : ' + wi_name + ' : ' +wi_class );
 	var newWidget = jQuery( '<li id="'+wi_ID+'" class="draggable_widget"><a class="widget_name" href="#" onclick="return editWidget( \''+wi_ID+'\' );">'+wi_name+'</a></li>' );
@@ -552,9 +559,8 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
  * Toggle the widget state.
  *
  * @param string Widget ID.
- * @param string Crumb url.
  */
-function toggleWidget( wi_ID, crumb_url )
+function toggleWidget( wi_ID )
 {
 	 //console.log( 'Toggling widget #' + wi_ID.substr( 6 ) );
 	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ) + '&' + crumb_url, true );

@@ -151,6 +151,9 @@ switch( $action )
 		exit(0);
 
 	case 'set_comment_status':
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
 
 		global $blog;
 
@@ -166,7 +169,10 @@ switch( $action )
 		exit(0);
 
 	case 'delete_comment':
-
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+		
 		global $blog;
 
 		$blog = param( 'blogid', 'integer' );
@@ -213,6 +219,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.41  2010/01/29 17:21:37  efy-yury
+ * add: crumbs in ajax calls
+ *
  * Revision 1.40  2009/12/10 21:32:47  efy-maxim
  * 1. single ajax call
  * 2. comments of protected post fix
