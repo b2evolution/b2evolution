@@ -1017,11 +1017,14 @@ class ItemListLight extends DataObjectList2
 		if( !empty($this->filters['authors']) )
 		{
 			$authors = preg_split('~\s*,\s*~', $this->filters['authors'], -1, PREG_SPLIT_NO_EMPTY);
-			if( $authors ) {
+			if( $authors ) 
+			{
 				$UserCache = get_UserCache();
 				$author_names = array();
-				foreach( $authors as $author_ID ) {
-					if( $tmp_Author = $UserCache->get_by_ID($author_ID, false) ) {
+				foreach( $authors as $author_ID ) 
+				{
+					if( $tmp_Author = $UserCache->get_by_ID($author_ID, false) ) 
+					{
 						$author_names[] = htmlspecialchars($tmp_Author->get_preferred_name());
 					}
 				}
@@ -1526,6 +1529,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.36  2010/01/30 03:40:11  fplanque
+ * minor
+ *
  * Revision 1.35  2010/01/29 00:32:21  blueyed
  * Display preferred user name in author filter.
  *

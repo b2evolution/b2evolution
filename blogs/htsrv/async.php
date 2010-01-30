@@ -127,7 +127,7 @@ switch( $action )
 		exit(0);
 
 	case 'get_login_list':
-		// fp>max TODO: is there a permission to just 'view' users? It would be appropriate here
+		// fp> TODO: is there a permission to just 'view' users? It would be appropriate here
 		$current_User->check_perm( 'users', 'edit', true );
 
 		$text = trim( param( 'q', 'string', '' ) );
@@ -219,6 +219,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.42  2010/01/30 03:40:11  fplanque
+ * minor
+ *
  * Revision 1.41  2010/01/29 17:21:37  efy-yury
  * add: crumbs in ajax calls
  *

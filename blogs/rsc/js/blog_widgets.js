@@ -45,7 +45,7 @@ var reorder_delay_remaining = 0;
 
 /**
  * @internal string current_widgets
- * crumb url contain here
+ * crumb to be added to urls
  */
 var crumb_url = '';
 
