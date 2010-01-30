@@ -225,7 +225,7 @@ function display_position( & $row )
 
 	$r .= '<noscript>';
 	// Add hidden fields for non-JS
-	$url = regenerate_url( 'p,itm_ID,action', 'link_ID='.$row->link_ID.'&action=set_item_link_position', '', '&' );
+	$url = regenerate_url( 'p,itm_ID,action', 'link_ID='.$row->link_ID.'&action=set_item_link_position&'.url_crumb('item'), '', '&' );
 	$params = explode('&', substr($url, strpos($url, '?')+1));
 
 	foreach($params as $param)
@@ -250,6 +250,9 @@ $Results->display( $AdminUI->get_template( 'compact_results' ) );
 
 /*
  * $Log$
+ * Revision 1.16  2010/01/30 10:29:07  efy-yury
+ * add: crumbs
+ *
  * Revision 1.15  2010/01/03 18:52:57  fplanque
  * crumbs...
  *

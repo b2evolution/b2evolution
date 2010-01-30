@@ -693,10 +693,7 @@ switch( $action )
 		add_js_headline('
 		function evo_display_position_onchange() {
 			var oThis = this;
-			jQuery.get(\''.$htsrv_url.'async.php\', {
-				action: "set_item_link_position",
-				link_ID: this.id.substr(17),
-				link_position: this.value
+			jQuery.get(\''.$htsrv_url.'async.php?action=set_item_link_position&link_ID=\' + this.id.substr(17)+\'&link_position=\'+this.value+\'&'.url_crumb('itemlink').'\', {
 			}, function(r, status) {
 				if( r == "OK" ) {
 					evoFadeSuccess( jQuery(oThis.form).closest(\'tr\') );
@@ -1278,6 +1275,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.86  2010/01/30 10:29:07  efy-yury
+ * add: crumbs
+ *
  * Revision 1.85  2010/01/21 18:16:49  efy-yury
  * update: fadeouts
  *

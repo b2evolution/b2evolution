@@ -109,6 +109,10 @@ switch( $action )
 		exit(0);
 
 	case 'set_item_link_position':
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'itemlink' );
+		
 		param('link_ID', 'integer', true);
 		param('link_position', 'string', true);
 
@@ -219,6 +223,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.43  2010/01/30 10:29:05  efy-yury
+ * add: crumbs
+ *
  * Revision 1.42  2010/01/30 03:40:11  fplanque
  * minor
  *
