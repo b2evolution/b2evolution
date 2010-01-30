@@ -1146,6 +1146,9 @@ class File extends DataObject
 			return false;
 		}
 		
+		global $DB;
+		$DB->begin();
+		
 		if( $this->is_dir() )
 		{ //modify folder content file paths in db 
 			$rel_dir = dirname( $this->_rdfp_rel_path ).'/';
@@ -1164,8 +1167,6 @@ class File extends DataObject
 				$temp_File->modify_path ( $rel_dir, $full_dir, $paths );
 			}
 		}
-
-		// Note: what happens if someone else creates $newname right at this moment here?
 		
 		if( ! @rename( $this->_adfp_full_path, $this->_dir.$newname ) )
 		{ // Rename will fail if $newname already exists (at least on windows)
@@ -1198,7 +1199,8 @@ class File extends DataObject
 			// unchanged : $this->set( 'root_ID', $this->_FileRoot->in_type_ID );
 			$this->set( 'path', $this->_rdfp_rel_path );
 			// Record to DB:
-			$this->dbupdate();
+			if ( ! $this->dbupdate() )
+				return false;
 		}
 		else
 		{	// There might be some old meta data to *recycle* in the DB...
@@ -1210,6 +1212,8 @@ class File extends DataObject
 			// experience proves that users are inconsistent!
 			$this->load_meta();
 		}
+		
+		$DB->commit();
 
 		return true;
 	}
@@ -2032,6 +2036,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.78  2010/01/30 09:55:34  efy-asimo
+ * return to the properties form after file rename error + user transaction during file rename
+ *
  * Revision 1.77  2010/01/24 14:47:25  efy-asimo
  * Update file paths after folder rename
  *

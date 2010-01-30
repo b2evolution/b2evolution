@@ -1054,12 +1054,14 @@ switch( $action )
 		
 		$old_name = $edited_File->get_name();
 		$new_name = param( 'name', 'string', '' );
+		$error_occured = false;
 		
 		if( $new_name != $old_name)
 		{ // Name has changed...
 			$allow_locked_filetypes = $current_User->check_perm( 'files', 'all' );
 			if( $check_error = check_rename( $new_name, $edited_File->is_dir(), $allow_locked_filetypes ) )
 			{
+				$error_occured = true;
 				param_error( 'new_name', $check_error );
 			}
 			else
@@ -1074,13 +1076,20 @@ switch( $action )
 				}
 				else
 				{
+					$error_occured = true;
 					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
 							$old_name, $new_name ), 'error' );
+					
 				}
 			}
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
+		if( $error_occured )
+		{
+			header_redirect( regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode($edited_File->get_rdfp_rel_path() ).'&amp;'.url_crumb('file'), '', '&' ), 303 );
+			// We have EXITed already, no need else.
+		}
 		header_redirect( '?ctrl=files&blog='.$blog.'&root='.$root.'&path='.$path, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
@@ -1739,6 +1748,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.59  2010/01/30 09:55:28  efy-asimo
+ * return to the properties form after file rename error + user transaction during file rename
+ *
  * Revision 1.58  2010/01/28 03:42:18  fplanque
  * minor
  *
