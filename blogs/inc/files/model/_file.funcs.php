@@ -672,7 +672,7 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 	else
 	{
 		// We'll go through files in current dir:
-		$Nodelist = & new Filelist( $Root, trailing_slash($ads_full_path) );
+		$Nodelist = new Filelist( $Root, trailing_slash($ads_full_path) );
 		$Nodelist->load();
 		$Nodelist->sort( 'name' );
 		$has_sub_dirs = $Nodelist->count_dirs();
@@ -936,6 +936,9 @@ function file_controller_build_tabs()
 
 /*
  * $Log$
+ * Revision 1.34  2010/01/30 18:55:26  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.33  2010/01/28 03:42:20  fplanque
  * minor
  *

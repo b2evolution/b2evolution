@@ -84,7 +84,7 @@ switch( $action )
 		$old_cache_status = $Settings->get('general_cache_enabled');
 
 		load_class( '_core/model/_pagecache.class.php', 'PageCache' );
-		$PageCache = & new PageCache();
+		$PageCache = new PageCache();
 
 		if( $old_cache_status == false && $new_cache_status == true )
 		{ // Caching has been turned ON:
@@ -145,6 +145,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2010/01/30 18:55:34  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.19  2010/01/02 21:11:59  fplanque
  * fat reduction / cleanup
  *

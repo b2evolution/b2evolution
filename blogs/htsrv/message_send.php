@@ -201,7 +201,7 @@ elseif( ! empty( $comment_id ) )
 		'SELECT *
 		   FROM T_comments
 		  WHERE comment_ID = '.$comment_id, ARRAY_A );
-	$Comment = & new Comment( $row );
+	$Comment = new Comment( $row );
 
 	if( $comment_author_User = & $Comment->get_author_User() )
 	{ // Comment is from a registered user:
@@ -312,6 +312,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.66  2010/01/30 18:55:15  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.65  2010/01/27 02:46:22  sam2kb
  * minor/typo
  *

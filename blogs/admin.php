@@ -168,7 +168,7 @@ require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
  *
  * @global AdminUI
  */
-$AdminUI = & new AdminUI();
+$AdminUI = new AdminUI();
 
 
 /*
@@ -224,6 +224,9 @@ require $inc_path.$ctrl_mappings[$ctrl];
 
 /*
  * $Log$
+ * Revision 1.36  2010/01/30 18:55:13  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.35  2009/11/30 00:22:04  fplanque
  * clean up debug info
  * show more timers in view of block caching

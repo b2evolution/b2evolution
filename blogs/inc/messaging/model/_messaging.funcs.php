@@ -34,7 +34,7 @@ function load_messaging_threads_recipients( $user_ID )
 {
 	global $DB;
 
-	$SQL = & new SQL();
+	$SQL = new SQL();
 
 	$SQL->SELECT( 'DISTINCT u.*' );
 
@@ -67,7 +67,7 @@ function load_messaging_thread_recipients( $thrd_ID )
 {
 	global $DB;
 
-	$SQL = & new SQL();
+	$SQL = new SQL();
 
 	$SQL->SELECT( 'u.*' );
 
@@ -99,7 +99,7 @@ function check_blocked_contacts( $recipients_list )
 {
 	global $DB, $current_User;
 
-	$SQL = & new SQL();
+	$SQL = new SQL();
 
 	$SQL->SELECT( 'u.user_login' );
 
@@ -126,6 +126,9 @@ function check_blocked_contacts( $recipients_list )
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.5  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *

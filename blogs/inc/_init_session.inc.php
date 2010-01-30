@@ -71,7 +71,7 @@ load_class( 'sessions/model/_session.class.php', 'Session' );
  * @todo dh> makes no sense in CLI mode (no cookie); Add isset() checks to calls on the $Session object, e.g. below?
  *       fp> We might want to use a special session for CLI. And for cron jobs through http as well.
  */
-$Session = & new Session(); // If this can't pull a session from the DB it will always INSERT a new one!
+$Session = new Session(); // If this can't pull a session from the DB it will always INSERT a new one!
 
 /**
  * Handle saving the HIT and updating the SESSION at the end of the page
@@ -152,6 +152,9 @@ $Timer->pause( '_init_session' );
 
 /*
  * $Log$
+ * Revision 1.3  2010/01/30 18:55:15  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.2  2009/12/06 05:34:31  fplanque
  * Violent refactoring for _main.inc.php
  * Sorry for potential side effects.

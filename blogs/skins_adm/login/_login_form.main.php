@@ -79,7 +79,7 @@ require dirname(__FILE__).'/_html_header.inc.php';
 
 
 // The login form has to point back to itself, in case $htsrv_url_sensitive is a "https" link and $redirect_to is not!
-$Form = & new Form( $htsrv_url_sensitive.'login.php', 'evo_login_form', 'post', 'fieldset' );
+$Form = new Form( $htsrv_url_sensitive.'login.php', 'evo_login_form', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
@@ -223,6 +223,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.19  2010/01/30 18:55:39  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.18  2010/01/03 13:45:37  fplanque
  * set some crumbs (needs checking)
  *

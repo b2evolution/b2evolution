@@ -45,7 +45,7 @@ $AdminUI->set_path( 'tools', 'backup' );
 param_action( 'start' );
 
 // Create instance of Backup class
-$current_Backup = & new Backup();
+$current_Backup = new Backup();
 
 // Load backup settings from request
 if( $action == 'backup' && !$current_Backup->load_from_Request() )
@@ -81,7 +81,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'backup' );
 		
-		$Form = & new Form( NULL, 'backup_progress', 'post' );
+		$Form = new Form( NULL, 'backup_progress', 'post' );
 
 		// Interactive / flush() backup should start here
 		$Form->begin_form( 'fform', T_('System backup is in progress...') );
@@ -117,6 +117,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.6  2010/01/16 14:27:04  efy-yury
  * crumbs, fadeouts, redirect, action_icon
  *

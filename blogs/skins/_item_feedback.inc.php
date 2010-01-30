@@ -153,7 +153,7 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 	echo implode( ', ', $disp_title);
 	echo $params['after_section_title'];
 
-	$CommentList = & new CommentList( NULL, implode(',', $type_list), array('published'), $Item->ID, '', $Blog->get_setting( 'comments_orderdir' ) );
+	$CommentList = new CommentList( NULL, implode(',', $type_list), array('published'), $Item->ID, '', $Blog->get_setting( 'comments_orderdir' ) );
 
 	echo $params['comment_list_start'];
 	/**
@@ -207,6 +207,9 @@ skin_include( '_item_comment_form.inc.php', $params );
 
 /*
  * $Log$
+ * Revision 1.22  2010/01/30 18:55:37  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.21  2009/09/28 23:58:16  blueyed
  * whitespace
  *

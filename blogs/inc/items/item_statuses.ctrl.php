@@ -90,12 +90,15 @@ $restrict_title = T_('Cannot delete item status');	 //&laquo;%s&raquo;
 // It must be initialized to false before checking the delete restrictions
 $checked_delete = false;
 
-$GenericElementCache = & new GenericCache( 'GenericElement', false, 'T_items__status', 'pst_', 'pst_ID' );
+$GenericElementCache = new GenericCache( 'GenericElement', false, 'T_items__status', 'pst_', 'pst_ID' );
 
 require $inc_path.'generic/inc/_generic_listeditor.php';
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/30 18:55:28  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.8  2010/01/19 21:10:28  efy-yury
  * update: crumbs
  *

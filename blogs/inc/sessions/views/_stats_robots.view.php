@@ -98,7 +98,7 @@ if( count($res_hits) )
 // TOP INDEXING ROBOTS
 /* put this back when we have a CONCISE table of robots
 // Create result set:
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS hit_count, agnt_signature' );
 $SQL->FROM( 'T_hitlog' );
 $SQL->WHERE( 'hit_agent_type = "robot"' );
@@ -106,12 +106,12 @@ if( ! empty( $blog ) )
 	$SQL->WHERE_and( 'hit_blog_ID = ' . $blog );
 $SQL->GROUP_BY( 'agnt_signature' );
 
-$CountSQL = & new SQL();
+$CountSQL = new SQL();
 $CountSQL->SELECT( 'SQL_NO_CACHE COUNT( DISTINCT agnt_signature )' );
 $CountSQL->FROM( $SQL->get_from( '' ) );
 $CountSQL->WHERE( $SQL->get_where( '' ) );
 
-$Results = & new Results( $SQL->get(), 'topidx', '-D', 20, $CountSQL->get() );
+$Results = new Results( $SQL->get(), 'topidx', '-D', 20, $CountSQL->get() );
 
 $CountSQL->SELECT( 'SQL_NO_CACHE COUNT(*)' );
 $total_hit_count = $DB->get_var( $CountSQL->get() );
@@ -174,6 +174,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.14  2010/01/30 18:55:34  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.13  2009/12/08 22:38:13  fplanque
  * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
  *

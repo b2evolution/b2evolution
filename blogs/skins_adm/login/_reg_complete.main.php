@@ -35,7 +35,7 @@ $page_icon = 'icon_register.gif';
 require dirname(__FILE__).'/_html_header.inc.php';
 
 // dh> TODO: this form is not really required and only used for the info fields below.
-$Form =& new Form( $htsrv_url_sensitive.'login.php', 'login', 'post', 'fieldset' );
+$Form =new Form( $htsrv_url_sensitive.'login.php', 'login', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
@@ -66,6 +66,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/30 18:55:39  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.4  2009/03/08 23:58:01  fplanque
  * 2009
  *

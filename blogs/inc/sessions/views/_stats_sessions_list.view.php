@@ -35,11 +35,11 @@ require_once dirname(__FILE__).'/_stats_view.funcs.php';
 $user = param( 'user', 'string', '', true );
 
 // Create result set:
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( 'SQL_NO_CACHE sess_ID, user_login, sess_hitcount, sess_lastseen, sess_ipaddress' );
 $SQL->FROM( 'T_sessions LEFT JOIN T_users ON sess_user_ID = user_ID' );
 
-$Count_SQL = & new SQL();
+$Count_SQL = new SQL();
 $Count_SQL->SELECT( 'SQL_NO_CACHE COUNT(sess_ID)' );
 $Count_SQL->FROM( 'T_sessions LEFT JOIN T_users ON sess_user_ID = user_ID' );
 
@@ -49,7 +49,7 @@ if( !empty( $user ) )
 	$Count_SQL->WHERE( 'user_login LIKE "%'.$DB->escape($user).'%"' );
 }
 
-$Results = & new Results( $SQL->get(), 'sess_', 'D', 20, $Count_SQL->get() );
+$Results = new Results( $SQL->get(), 'sess_', 'D', 20, $Count_SQL->get() );
 
 $Results->title = T_('Recent sessions');
 
@@ -111,6 +111,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/30 18:55:34  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.7  2009/09/15 18:39:25  efy-sasha
  * Converted old style SQL request using SQL class.
  *

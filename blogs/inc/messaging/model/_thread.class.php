@@ -242,7 +242,7 @@ class Thread extends DataObject
 
 		if( empty( $this->recipients_list ) )
 		{
-			$SQL = & new SQL();
+			$SQL = new SQL();
 			$SQL->SELECT( 'tsta_user_ID' );
 			$SQL->FROM( 'T_messaging__threadstatus' );
 			$SQL->WHERE( 'tsta_thread_ID = '.$this->ID );
@@ -269,7 +269,7 @@ class Thread extends DataObject
 
 		if( empty( $this->contacts_list ) )
 		{
-			$SQL = & new SQL();
+			$SQL = new SQL();
 			$SQL->SELECT( 'u.user_ID' );
 			$SQL->FROM( 'T_messaging__threadstatus ts
 							INNER JOIN T_messaging__contact mc
@@ -319,6 +319,9 @@ class Thread extends DataObject
 
 /*
  * $Log$
+ * Revision 1.19  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.18  2009/10/10 10:45:43  efy-maxim
  * messaging module - @action_icon()@
  *

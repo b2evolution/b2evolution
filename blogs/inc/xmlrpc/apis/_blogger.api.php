@@ -440,7 +440,7 @@ function blogger_getrecentposts( $m )
 
 	// Get the posts to display:
 	load_class( 'items/model/_itemlist.class.php', 'ItemList' );
-	$MainList = & new ItemList2( $Blog, NULL, NULL, $numposts );
+	$MainList = new ItemList2( $Blog, NULL, NULL, $numposts );
 
 	// Protected and private get checked by statuses_where_clause().
 	$statuses = array( 'published', 'redirected', 'protected', 'private' );
@@ -533,6 +533,9 @@ $xmlrpc_procs['blogger.getRecentPosts'] = array(
 
 /*
  * $Log$
+ * Revision 1.13  2010/01/30 18:55:36  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.12  2009/09/18 19:09:04  tblue246
  * XML-RPC: Check extracats in addition to maincat before calling check_perm(). Fixes debug_die()ing and sends an XML-RPC error instead.
  *

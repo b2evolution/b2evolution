@@ -177,10 +177,10 @@ class coll_media_index_Widget extends ComponentWidget
 
 		$FileCache = & get_FileCache();
 
-		$FileList = & new DataObjectList2( $FileCache );
+		$FileList = new DataObjectList2( $FileCache );
 
 		// Query list of files:
-		$SQL = & new SQL();
+		$SQL = new SQL();
 		$SQL->SELECT( 'post_ID, post_datestart, post_datemodified, post_main_cat_ID, post_urltitle, post_ptyp_ID, post_title, post_excerpt, post_url,
 									file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
 		$SQL->FROM( 'T_categories INNER JOIN T_postcats ON cat_ID = postcat_cat_ID
@@ -248,7 +248,7 @@ class coll_media_index_Widget extends ComponentWidget
 			// $link = url_add_param( $Blog->get('url'), 'paged='.$count );
 
 			// 3/ Instantiate a light object in order to get permamnent url:
-			$ItemLight = & new ItemLight( $FileList->get_row_by_idx( $FileList->current_idx - 1 ) );	// index had already been incremented
+			$ItemLight = new ItemLight( $FileList->get_row_by_idx( $FileList->current_idx - 1 ) );	// index had already been incremented
 
 			echo '<a href="'.$ItemLight->get_permanent_url().'">';
 			// Generate the IMG THUMBNAIL tag with all the alt, title and desc if available
@@ -294,6 +294,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.21  2010/01/30 18:55:36  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.20  2010/01/27 15:20:08  efy-asimo
  * Change select list to radio button
  *

@@ -27,7 +27,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $localtimenow, $cron_job_names;
 
-$Form = & new Form( NULL, 'cronjob' );
+$Form = new Form( NULL, 'cronjob' );
 
 $Form->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
 
@@ -59,6 +59,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/30 18:55:22  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.6  2010/01/03 13:45:38  fplanque
  * set some crumbs (needs checking)
  *

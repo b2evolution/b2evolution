@@ -113,7 +113,7 @@ function & get_featured_Item()
 		return $Item;
 	}
 
-	$FeaturedList = & new ItemList2( $Blog, $timestamp_min, $timestamp_max, 1 );
+	$FeaturedList = new ItemList2( $Blog, $timestamp_min, $timestamp_max, 1 );
 
 	$FeaturedList->set_default_filters( $MainList->filters );
 
@@ -1115,6 +1115,9 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 
 /*
  * $Log$
+ * Revision 1.85  2010/01/30 18:55:30  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.84  2010/01/17 16:15:22  sam2kb
  * Localization clean-up
  *

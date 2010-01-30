@@ -33,7 +33,7 @@ global $Settings;
 global $dispatcher;
 
 
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( 'T_blogs.*, user_login' );
 $SQL->FROM( 'T_blogs INNER JOIN T_users ON blog_owner_user_ID = user_ID' );
 
@@ -58,7 +58,7 @@ else
 }
 
 // Create result set:
-$Results = & new Results( $SQL->get(), 'blog_' );
+$Results = new Results( $SQL->get(), 'blog_' );
 $Results->Cache = & get_BlogCache();
 $Results->title = T_('Blog list');
 $Results->no_results_text = $no_results;
@@ -215,6 +215,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.13  2010/01/30 18:55:21  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.12  2010/01/03 13:10:58  fplanque
  * set some crumbs (needs checking)
  *

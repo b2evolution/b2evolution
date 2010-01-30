@@ -235,12 +235,12 @@ class coll_item_list_Widget extends ComponentWidget
 
 		if( $this->disp_params['disp_teaser'] )
 		{ // We want to show some of the post content, we need to load more info: use ItemList2
-			$ItemList = & new ItemList2( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCache', $this->code.'_' );
+			$ItemList = new ItemList2( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCache', $this->code.'_' );
 		}
 		else
 		{ // no excerpts, use ItemListLight
 			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
-			$ItemList = & new ItemListLight( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCacheLight', $this->code.'_' );
+			$ItemList = new ItemListLight( $listBlog, $timestamp_min, $timestamp_max, $limit, 'ItemCacheLight', $this->code.'_' );
 		}
 /* TODO: trim is not enough, convert each ID to a number for security
 		$cat_array = array_filter( array_map( 'trim', explode( ',', $this->disp_params[ 'cat_IDs' ] ) ) );
@@ -428,6 +428,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.28  2010/01/30 18:55:36  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.27  2010/01/27 15:20:08  efy-asimo
  * Change select list to radio button
  *

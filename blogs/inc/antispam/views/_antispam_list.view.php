@@ -69,7 +69,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
  */
 $keywords = param( 'keywords', 'string', '', true );
 
-$SQL = & new SQL();
+$SQL = new SQL();
 
 $SQL->SELECT( 'aspm_ID, aspm_string, aspm_source' );
 $SQL->FROM( 'T_antispam' );
@@ -81,7 +81,7 @@ if( !empty( $keywords ) )
 }
 
 // Create result set:
-$Results = & new Results( $SQL->get(), 'antispam_' );
+$Results = new Results( $SQL->get(), 'antispam_' );
 
 $Results->title = T_('Banned keywords blacklist');
 
@@ -179,6 +179,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/30 18:55:20  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.8  2010/01/16 14:27:03  efy-yury
  * crumbs, fadeouts, redirect, action_icon
  *

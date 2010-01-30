@@ -37,12 +37,12 @@ load_class( 'items/model/_itemtype.class.php', 'ItemType' );
 global $dispatcher;
 
 // Create query
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( '*' );
 $SQL->FROM( 'T_items__type' );
 
 // Create result set:
-$Results = & new Results( $SQL->get(), 'ptyp_' );
+$Results = new Results( $SQL->get(), 'ptyp_' );
 
 $Results->title = T_('Item/Post/Page types');
 
@@ -122,6 +122,9 @@ $Results->display();
 
 /**
  * $Log$
+ * Revision 1.4  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.3  2010/01/03 13:10:57  fplanque
  * set some crumbs (needs checking)
  *

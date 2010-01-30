@@ -60,7 +60,7 @@ global $user_profile_only;
 // Begin payload block:
 $this->disp_payload_begin();
 
-$Form = & new Form( NULL, 'user_checkchanges' );
+$Form = new Form( NULL, 'user_checkchanges' );
 
 if( !$user_profile_only )
 {
@@ -108,6 +108,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.4  2010/01/30 18:55:35  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.3  2010/01/03 16:28:35  fplanque
  * set some crumbs (needs checking)
  *

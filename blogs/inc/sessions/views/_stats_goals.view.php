@@ -25,7 +25,7 @@ $final = param( 'final', 'integer', 0, true );
 $s = param( 's', 'string', '', true );
 
 // Create query:
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( '*' );
 $SQL->FROM( 'T_track__goal' );
 
@@ -41,7 +41,7 @@ if( !empty($s) )
 }
 
 // Create result set:
-$Results = & new Results( $SQL->get(), 'goals_', '-A' );
+$Results = new Results( $SQL->get(), 'goals_', '-A' );
 
 $Results->Cache = & get_GoalCache();
 
@@ -119,6 +119,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/30 18:55:34  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.8  2009/12/08 00:07:23  blueyed
  * todo@fp
  *

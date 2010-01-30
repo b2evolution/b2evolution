@@ -40,7 +40,7 @@ if( CANUSEXMLRPC !== TRUE || ! $Settings->get('general_xmlrpc') )
 	$errMessage = CANUSEXMLRPC !== TRUE
 					? ( 'Cannot use XML-RPC. Probably the server is missing the XML extension. Error: '.CANUSEXMLRPC )
 					: 'XML-RPC services are disabled on this system.';
-	$errResponse = & new xmlrpcresp( 0, 17, $errMessage );
+	$errResponse = new xmlrpcresp( 0, 17, $errMessage );
 	die( $errResponse->serialize() );
 }
 
@@ -73,7 +73,7 @@ include_once $inc_path.'xmlrpc/apis/_wordpress.api.php';
 load_funcs('xmlrpc/model/_xmlrpcs.funcs.php'); // This will add generic remote calls
 
 // Set up the XML-RPC server:
-$s = & new xmlrpc_server( $xmlrpc_procs, false );
+$s = new xmlrpc_server( $xmlrpc_procs, false );
 // Use the request encoding for the response:
 $s->response_charset_encoding = 'auto';
 // DO THE SERVING:
@@ -82,6 +82,9 @@ $s->service();
 
 /*
  * $Log$
+ * Revision 1.156  2010/01/30 18:55:40  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.155  2009/09/18 19:27:08  tblue246
  * Minor/doc
  *

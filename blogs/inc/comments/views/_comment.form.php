@@ -33,7 +33,7 @@ global $Plugins;
 
 global $comments_use_autobr, $mode, $month, $tab, $redirect_to;
 
-$Form = & new Form( NULL, 'comment_checkchanges', 'post' );
+$Form = new Form( NULL, 'comment_checkchanges', 'post' );
 
 $Form->global_icon( T_('Delete this comment'), 'delete', '?ctrl=comments&amp;action=delete&amp;comment_ID='.$edited_Comment->ID,
 			T_('delete'), 4, 3, array(
@@ -279,6 +279,9 @@ echo_comment_publishbt_js();
 
 /*
  * $Log$
+ * Revision 1.15  2010/01/30 18:55:22  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.14  2010/01/29 23:07:05  efy-asimo
  * Publish Comment button
  *

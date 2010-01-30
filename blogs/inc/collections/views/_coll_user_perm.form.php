@@ -41,7 +41,7 @@ echo '
 <script type="text/javascript">var htsrv_url = "'.$htsrv_url.'";</script>
 <script type="text/javascript" src="'.$rsc_url.'js/collectionperms.js"></script>';
 
-$Form = & new Form( NULL, 'blogperm_checkchanges', 'post', 'fieldset' );
+$Form = new Form( NULL, 'blogperm_checkchanges', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
@@ -68,7 +68,7 @@ else
 	set_param( 'keywords2', $keywords );
 }
 
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( 'user_ID, user_login, user_level, bloguser_perm_poststatuses, bloguser_perm_edit, bloguser_ismember,'
 	. 'bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,'
 	. 'bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,'
@@ -115,7 +115,7 @@ echo '</div>';
 <?php
 
 
-$Results = & new Results( $SQL->get(), 'colluser_' );
+$Results = new Results( $SQL->get(), 'colluser_' );
 
 // Tell the Results class that we already have a form for this page:
 $Results->Form = & $Form;
@@ -548,6 +548,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.14  2010/01/30 18:55:22  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.13  2010/01/03 13:45:36  fplanque
  * set some crumbs (needs checking)
  *

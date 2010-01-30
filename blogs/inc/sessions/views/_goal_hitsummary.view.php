@@ -31,7 +31,7 @@ foreach( $hitgroup_rows as $hitgroup_row )
 
 
 // Get list of all goals
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( 'goal_ID, goal_name' );
 $SQL->FROM( 'T_track__goal' );
 if( !empty($final) )
@@ -46,7 +46,7 @@ $SQL->ORDER_BY( 'goal_name' );
 $goal_rows = $DB->get_results( $SQL->get(), OBJECT, 'Get list of all goals' );
 
 
-$Table = & new Table( NULL, 'ghs_' );
+$Table = new Table( NULL, 'ghs_' );
 
 $Table->title = T_('Goal hit summary');
 
@@ -137,6 +137,9 @@ $Table->display_list_end();
 
 /*
  * $Log$
+ * Revision 1.3  2010/01/30 18:55:33  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.2  2009/03/08 23:57:45  fplanque
  * 2009
  *

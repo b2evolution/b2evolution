@@ -39,19 +39,19 @@ global $mode;
 if( $mode != 'upload' )
 {	// If not opearting in a popup opened from post edit screen:
 
-	$Form = & new Form( NULL, 'fm_links', 'post', 'fieldset' );
+	$Form = new Form( NULL, 'fm_links', 'post', 'fieldset' );
 
 
 	$Form->begin_form( 'fform' );
 
 	$Form->hidden_ctrl();
 
-	$SQL = & new SQL();
+	$SQL = new SQL();
 	$SQL->SELECT( 'link_ID, link_ltype_ID, T_files.*' );
 	$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 	$SQL->WHERE( 'link_itm_ID = ' . $edited_Item->ID );
 
-	$Results = & new Results( $SQL->get(), 'link_' );
+	$Results = new Results( $SQL->get(), 'link_' );
 
 	$Results->title = sprintf( T_('Files linked to &laquo;%s&raquo;'),
 					'<a href="?ctrl=items&amp;blog='.$edited_Item->get_blog_ID().'&amp;p='.$edited_Item->ID.'" title="'
@@ -161,6 +161,9 @@ if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Ite
 
 /*
  * $Log$
+ * Revision 1.14  2010/01/30 18:55:27  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.13  2010/01/03 13:10:58  fplanque
  * set some crumbs (needs checking)
  *

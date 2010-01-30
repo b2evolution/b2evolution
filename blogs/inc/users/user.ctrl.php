@@ -105,7 +105,7 @@ if( !$Messages->count('error') )
 			}
 			else
 			{ // We use an empty user:
-				$edited_User = & new User();
+				$edited_User = new User();
 			}
 
 			// Determine if the user must validate before using the system:
@@ -390,6 +390,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/30 18:55:35  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.9  2010/01/17 16:15:24  sam2kb
  * Localization clean-up
  *

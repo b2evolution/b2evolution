@@ -95,7 +95,7 @@ else
 	}
 }
 
-$Results = & new Results( $SQL->get(), 'hits_', '--D', 20, $SQL_count->get() );
+$Results = new Results( $SQL->get(), 'hits_', '--D', 20, $SQL_count->get() );
 
 $Results->title = T_('Recent goal hits');
 
@@ -190,6 +190,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/30 18:55:34  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.7  2009/12/08 22:38:13  fplanque
  * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
  *

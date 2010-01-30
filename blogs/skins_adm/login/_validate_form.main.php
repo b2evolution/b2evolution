@@ -37,7 +37,7 @@ $page_title = T_('Email address validation');
 $page_icon = 'icon_register.gif';
 require dirname(__FILE__).'/_html_header.inc.php';
 
-$Form = & new Form( $htsrv_url_sensitive.'login.php', 'form_validatemail', 'post', 'fieldset' );
+$Form = new Form( $htsrv_url_sensitive.'login.php', 'form_validatemail', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
@@ -64,7 +64,7 @@ $Form->end_form( array(array( 'name'=>'form_validatemail_submit', 'value'=>T_('S
 
 if( $current_User->group_ID == 1 )
 { // allow admin users to validate themselves by a single click:
-	$Form = & new Form( $htsrv_url_sensitive.'login.php', 'form_validatemail', 'post', 'fieldset' );
+	$Form = new Form( $htsrv_url_sensitive.'login.php', 'form_validatemail', 'post', 'fieldset' );
 	$Form->begin_form( 'fform' );
 
 	$Form->add_crumb( 'validateform' );
@@ -92,6 +92,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/30 18:55:39  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.4  2010/01/03 13:45:37  fplanque
  * set some crumbs (needs checking)
  *

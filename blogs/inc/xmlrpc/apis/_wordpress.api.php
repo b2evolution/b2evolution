@@ -52,7 +52,7 @@ function wp_getpagelist( $m )
 
 	// Get the pages to display:
 	load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
-	$MainList = & new ItemListLight( $Blog, NULL, NULL,  50000 );
+	$MainList = new ItemListLight( $Blog, NULL, NULL,  50000 );
 
 	// Protected and private get checked by statuses_where_clause().
 	$statuses = array( 'published', 'redirected', 'protected', 'private' );
@@ -413,6 +413,9 @@ $xmlrpc_procs['wp.deleteComment'] = array(
 
 /*
  * $Log$
+ * Revision 1.12  2010/01/30 18:55:36  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.11  2009/12/22 23:14:14  fplanque
  * whitespace
  *

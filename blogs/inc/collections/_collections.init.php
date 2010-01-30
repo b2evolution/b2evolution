@@ -568,7 +568,7 @@ class collections_Module extends Module
 	}
 }
 
-$collections_Module = & new collections_Module();
+$collections_Module = new collections_Module();
 
 
 /*

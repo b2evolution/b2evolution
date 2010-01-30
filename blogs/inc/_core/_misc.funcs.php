@@ -3767,7 +3767,7 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 	$BlogCache = & get_BlogCache();
 	$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 
-	$CommentList = & new CommentList( $Blog, "'comment','trackback','pingback'", array( 'draft' ), '',	'',	'DESC',	'',	$limit, $comment_IDs );
+	$CommentList = new CommentList( $Blog, "'comment','trackback','pingback'", array( 'draft' ), '',	'',	'DESC',	'',	$limit, $comment_IDs );
 
 	$new_comment_IDs = array();
 	while( $Comment = & $CommentList->get_next() )
@@ -3953,6 +3953,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.206  2010/01/30 18:55:15  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.205  2010/01/12 15:56:05  fplanque
  * crumbs
  *

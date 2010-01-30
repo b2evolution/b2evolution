@@ -55,7 +55,7 @@ class GenericCache extends DataObjectCache
 	 *
 	 * @param object|NULL
 	 */
-	function & new_obj( $row = NULL )
+	function new_obj( $row = NULL )
 	{
 		$objtype = $this->objtype;
 
@@ -68,6 +68,9 @@ class GenericCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/30 18:55:27  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.4  2009/09/14 12:25:47  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

@@ -38,7 +38,7 @@ global $Blog;
 global $Plugins;
 
 
-$Form = & new Form( NULL, 'plugin_settings_checkchanges' );
+$Form = new Form( NULL, 'plugin_settings_checkchanges' );
 
 // PluginUserSettings
 load_funcs('plugins/_plugin.funcs.php');
@@ -103,6 +103,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/30 18:55:21  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.5  2010/01/03 13:45:36  fplanque
  * set some crumbs (needs checking)
  *

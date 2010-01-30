@@ -131,7 +131,7 @@ switch( $action )
 
 		// CREATE OBJECT:
 		load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
-		$edited_Cronjob = & new Cronjob();
+		$edited_Cronjob = new Cronjob();
 
 		$cjob_type = param( 'cjob_type', 'string', true );
 		if( !isset( $cron_job_params[$cjob_type] ) )
@@ -292,6 +292,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/30 18:55:22  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.9  2010/01/13 22:09:44  fplanque
  * normalized
  *

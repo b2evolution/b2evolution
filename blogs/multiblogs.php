@@ -54,7 +54,7 @@ $ads_current_skin_path = dirname(__FILE__).'/';
 // Note: This is totally optional. General caching must be enabled in Global settings, otherwise this will do nothing.
 // Delete this block if you don't care about page level caching. Don't forget to delete the matching section at the end of the page.
 load_class( '_core/model/_pagecache.class.php', 'PageCache' );
-$PageCache = & new PageCache( NULL );
+$PageCache = new PageCache( NULL );
 // Check for cached content & Start caching if needed:
 if( ! $PageCache->check() )
 {	// Cache miss, we have to generate:
@@ -309,7 +309,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 
 			<h3>#2: <a href="<?php $Blog_B->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog_B->disp( 'name', 'htmlbody' ) ?></a></h3>
 			<?php
-			$BlogBList = & new ItemList2( $Blog_B, $timestamp_min, $timestamp_max, $posts );
+			$BlogBList = new ItemList2( $Blog_B, $timestamp_min, $timestamp_max, $posts );
 
 			$BlogBList->set_filters( array(
 					'authors' => $author,
@@ -368,7 +368,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		?>
 		<h3>#3: <a href="<?php $Blog_roll->disp( 'blogurl', 'raw' ) ?>"><?php echo $Blog_roll->disp( 'name', 'htmlbody' ) ?></a></h3>
 		<?php
-		$LinkblogList = & new ItemList2( $Blog_roll, $timestamp_min, $timestamp_max, $posts );
+		$LinkblogList = new ItemList2( $Blog_roll, $timestamp_min, $timestamp_max, $posts );
 
 		$LinkblogList->set_filters( array(
 				'authors' => $author,

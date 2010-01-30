@@ -169,7 +169,7 @@ class archives_plugin extends Plugin
 			$params['day_date_format'] = $dateformat;
 		}
 
-		$ArchiveList = & new ArchiveList( $params['mode'], $params['limit'], $params['sort_order'], ($params['link_type'] == 'context'),
+		$ArchiveList = new ArchiveList( $params['mode'], $params['limit'], $params['sort_order'], ($params['link_type'] == 'context'),
 																			$this->dbtable, $this->dbprefix, $this->dbIDname );
 
 		echo $params['block_start'];
@@ -382,7 +382,7 @@ class ArchiveList extends Results
 		/*
 		 * WE ARE GOING TO CONSTRUCT THE WHERE CLOSE...
 		 */
-		$this->ItemQuery = & new ItemQuery( $this->dbtable, $this->dbprefix, $this->dbIDname ); // TEMPORARY OBJ
+		$this->ItemQuery = new ItemQuery( $this->dbtable, $this->dbprefix, $this->dbIDname ); // TEMPORARY OBJ
 
 		// - - Select a specific Item:
 		// $this->ItemQuery->where_ID( $p, $title );
@@ -631,6 +631,9 @@ class ArchiveList extends Results
 
 /*
  * $Log$
+ * Revision 1.61  2010/01/30 18:55:36  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.60  2009/09/14 14:10:46  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

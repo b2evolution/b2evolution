@@ -115,7 +115,7 @@ class ItemListLight extends DataObjectList2
 		parent::DataObjectList2( get_Cache($cache_name), $limit, $param_prefix, NULL );
 
 		// The SQL Query object:
-		$this->ItemQuery = & new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
+		$this->ItemQuery = new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
 
 		$this->Blog = & $Blog;
 
@@ -175,7 +175,7 @@ class ItemListLight extends DataObjectList2
 	function reset()
 	{
 		// The SQL Query object:
-		$this->ItemQuery = & new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
+		$this->ItemQuery = new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
 
 		parent::reset();
 	}
@@ -830,7 +830,7 @@ class ItemListLight extends DataObjectList2
 		// GENERATE THE QUERY:
 
 		// The SQL Query object:
-		$lastpost_ItemQuery = & new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
+		$lastpost_ItemQuery = new ItemQuery( $this->Cache->dbtablename, $this->Cache->dbprefix, $this->Cache->dbIDname );
 
 		/*
 		 * filtering stuff:
@@ -1529,6 +1529,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.37  2010/01/30 18:55:30  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.36  2010/01/30 03:40:11  fplanque
  * minor
  *

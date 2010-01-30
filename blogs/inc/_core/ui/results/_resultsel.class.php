@@ -543,7 +543,7 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 					<p>
 
 				<?php
-					$Form = & new Form( regenerate_url('', '', '', '&'), 'form_confirm', 'post', '' );
+					$Form = new Form( regenerate_url('', '', '', '&'), 'form_confirm', 'post', '' );
 
 					$action = '';
 
@@ -557,7 +557,7 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 
 					unset( $Form );
 
-					$Form = & new Form( regenerate_url('', '', '', '&'), 'form_cancel', 'post', '' );
+					$Form = new Form( regenerate_url('', '', '', '&'), 'form_cancel', 'post', '' );
 
 					$Form->begin_form( 'inline' );
 					$Form->button( array( 'submit', '', T_('CANCEL'), 'CancelButton' ) );
@@ -595,6 +595,9 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/30 18:55:17  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.6  2009/09/14 10:40:07  efy-arrin
  * Include the ClassName in the load_class() with proper UpperCase
  *

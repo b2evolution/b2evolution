@@ -638,7 +638,7 @@ switch( $action )
 			'recurse' => (1 - $exclude_sd),
 		);
 
-		$zipfile = & new zip_file( $zipname );
+		$zipfile = new zip_file( $zipname );
 		$zipfile->set_options( $options );
 		$zipfile->add_files( $arraylist );
 		$zipfile->create_archive();
@@ -873,7 +873,7 @@ switch( $action )
 			case 'make_post':
 				// SINGLE POST:
 				// Create a post:
-				$edited_Item = & new Item();
+				$edited_Item = new Item();
 				$edited_Item->set( 'status', $item_status );
 				$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
 
@@ -901,7 +901,7 @@ switch( $action )
 					}
 
 					// Let's make the link!
-					$edited_Link = & new Link();
+					$edited_Link = new Link();
 					$edited_Link->set( 'itm_ID', $edited_Item->ID );
 					$edited_Link->set( 'file_ID', $l_File->ID );
 					$edited_Link->set( 'position', 'teaser' );
@@ -922,7 +922,7 @@ switch( $action )
 				while( $l_File = & $selected_Filelist->get_next() )
 				{
 					// Create a post:
-					$edited_Item = & new Item();
+					$edited_Item = new Item();
 					$edited_Item->set( 'status', $item_status );
 					$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
 
@@ -945,7 +945,7 @@ switch( $action )
 					}
 
 					// Let's make the link!
-					$edited_Link = & new Link();
+					$edited_Link = new Link();
 					$edited_Link->set( 'itm_ID', $edited_Item->ID );
 					$edited_Link->set( 'file_ID', $l_File->ID );
 					$edited_Link->set( 'position', 'teaser' );
@@ -969,7 +969,7 @@ switch( $action )
 		// Reset stuff so it doesn't interfere with upcomming display
 		unset( $edited_Item );
 		unset( $edited_Link );
-		$selected_Filelist = & new Filelist( $fm_Filelist->get_FileRoot(), false );
+		$selected_Filelist = new Filelist( $fm_Filelist->get_FileRoot(), false );
 		break;
 
 
@@ -1379,11 +1379,11 @@ switch( $fm_mode )
 
 			if( $sources_Root )
 			{ // instantiate the source list for the selected sources
-				$fm_source_Filelist = & new Filelist( $sources_Root );
+				$fm_source_Filelist = new Filelist( $sources_Root );
 			}
 			else
 			{ // Fallback: source files are considered to be in the current root
-				$fm_source_Filelist = & new Filelist( $fm_Filelist->get_FileRoot() );
+				$fm_source_Filelist = new Filelist( $fm_Filelist->get_FileRoot() );
 				$Debuglog->add( 'SourceList without explicit root!', 'error' );
 			}
 
@@ -1748,6 +1748,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.60  2010/01/30 18:55:24  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.59  2010/01/30 09:55:28  efy-asimo
  * return to the properties form after file rename error + user transaction during file rename
  *

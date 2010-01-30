@@ -42,7 +42,7 @@ global $selected_Filelist;
 global $more_than_one_selected_file, $perms_read_readonly, $field_options_read_readonly;
 
 
-$Form = & new Form( NULL, 'fm_perms_checkchanges' );
+$Form = new Form( NULL, 'fm_perms_checkchanges' );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url() );
 
@@ -127,6 +127,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/30 18:55:27  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.4  2010/01/03 13:45:36  fplanque
  * set some crumbs (needs checking)
  *

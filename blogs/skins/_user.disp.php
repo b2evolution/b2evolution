@@ -42,7 +42,7 @@ $User = & $UserCache->get_by_ID( $user_ID );
  * form to update the profile
  * @var Form
  */
-$ProfileForm = & new Form( '', 'ProfileForm' );
+$ProfileForm = new Form( '', 'ProfileForm' );
 
 $ProfileForm->begin_form( 'bComment' );
 
@@ -98,6 +98,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.12  2010/01/30 18:55:37  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.11  2010/01/25 18:18:42  efy-yury
  * add : crumbs
  *

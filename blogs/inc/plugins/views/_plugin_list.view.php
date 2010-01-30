@@ -53,7 +53,7 @@ $fadeout_id = $Session->get('fadeout_id');
 
 load_funcs('plugins/_plugin.funcs.php');
 
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( 'plug_status, plug_ID, plug_priority, plug_code, plug_apply_rendering' );
 $SQL->FROM( 'T_plugins' );
 
@@ -285,6 +285,9 @@ $Session->delete( 'fadeout_id');
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/30 18:55:33  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.8  2010/01/16 11:19:23  efy-yury
  * update plugins: redirect and fadeouts
  *

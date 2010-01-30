@@ -227,7 +227,7 @@ class Group extends DataObject
 	{
 		if( ! isset( $this->GroupSettings ) )
 		{
-			$this->GroupSettings = & new GroupSettings();
+			$this->GroupSettings = new GroupSettings();
 			$this->GroupSettings->load( $this->ID );
 		}
 		return $this->GroupSettings;
@@ -686,6 +686,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.28  2010/01/30 18:55:35  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.27  2009/10/28 09:50:03  efy-maxim
  * Module::check_perm
  *

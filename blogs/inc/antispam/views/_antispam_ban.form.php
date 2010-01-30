@@ -27,7 +27,7 @@ global $keyword;
 
 global $row_stats;	// for hit functions
 
-$Form = & new Form( NULL, 'antispam_ban', 'post', 'compact' );
+$Form = new Form( NULL, 'antispam_ban', 'post', 'compact' );
 
 $Form->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
 
@@ -205,6 +205,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.15  2010/01/30 18:55:20  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.14  2010/01/03 17:56:05  fplanque
  * crumbs & stuff
  *

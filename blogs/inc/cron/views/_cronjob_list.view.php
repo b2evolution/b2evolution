@@ -39,7 +39,7 @@ if( !$ctst_pending && !$ctst_started && !$ctst_timeout && !$ctst_error && !$ctst
 /*
  * Create result set :
  */
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( 'ctsk_ID, ctsk_start_datetime, ctsk_name, ctsk_repeat_after, IFNULL( clog_status, "pending" ) as status' );
 $SQL->FROM( 'T_cron__task LEFT JOIN T_cron__log ON ctsk_ID = clog_ctsk_ID' );
 if( $ctst_pending )
@@ -64,7 +64,7 @@ if( $ctst_finished )
 }
 $SQL->ORDER_BY( '*, ctsk_ID' );
 
-$Results = & new Results( $SQL->get(), 'crontab_', '-A' );
+$Results = new Results( $SQL->get(), 'crontab_', '-A' );
 
 $Results->title = T_('Scheduled jobs').get_manual_link('scheduler');
 
@@ -168,6 +168,9 @@ echo '<p>[<a href="'.$cron_url.'cron_exec.php" onclick="return pop_up_window( \'
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/30 18:55:23  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.6  2010/01/03 13:10:57  fplanque
  * set some crumbs (needs checking)
  *

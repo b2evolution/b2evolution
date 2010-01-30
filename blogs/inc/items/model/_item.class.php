@@ -1957,7 +1957,7 @@ class Item extends ItemLight
 
 		$FileList = new DataObjectList2( $FileCache ); // IN FUNC
 
-		$SQL = & new SQL();
+		$SQL = new SQL();
 		$SQL->SELECT( 'file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
 		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( 'link_itm_ID = '.$this->ID );
@@ -3754,7 +3754,7 @@ class Item extends ItemLight
 
 			// CREATE OBJECT:
 			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
-			$edited_Cronjob = & new Cronjob();
+			$edited_Cronjob = new Cronjob();
 
 			// start datetime. We do not want to ping before the post is effectively published:
 			$edited_Cronjob->set( 'start_datetime', $this->issue_date );
@@ -4148,6 +4148,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.175  2010/01/30 18:55:30  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.174  2010/01/19 19:38:45  fplanque
  * minor
  *

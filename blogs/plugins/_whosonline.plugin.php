@@ -115,7 +115,7 @@ class whosonline_plugin extends Plugin
 		echo T_('Who\'s Online?');
 		echo $params['block_title_end'];
 
-		$OnlineSessions = & new OnlineSessions( $params['timeout_online_user'] );
+		$OnlineSessions = new OnlineSessions( $params['timeout_online_user'] );
 		$OnlineSessions->display_onliners( $params );
 
 		echo $params['block_end'];
@@ -335,6 +335,9 @@ class OnlineSessions
 
 /*
  * $Log$
+ * Revision 1.12  2010/01/30 18:55:36  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.11  2009/12/20 22:12:19  fplanque
  * doc
  *

@@ -31,7 +31,7 @@ global $read_unread_recipients;
 
 // Select read/unread users for each thread
 
-$recipients_SQL = & new SQL();
+$recipients_SQL = new SQL();
 
 $recipients_SQL->SELECT( 'ts.tsta_thread_ID AS thr_ID,
 							GROUP_CONCAT(DISTINCT ur.user_login ORDER BY ur.user_login SEPARATOR \', \') AS thr_read,
@@ -139,7 +139,7 @@ else
 
 // Create result set:
 
-$Results = & new Results( $select_SQL, 'thrd_', '', NULL, $count_SQL );
+$Results = new Results( $select_SQL, 'thrd_', '', NULL, $count_SQL );
 
 $Results->Cache = & get_ThreadCache();
 
@@ -221,6 +221,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.25  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.24  2009/10/27 18:48:48  fplanque
  * minor
  *

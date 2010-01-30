@@ -44,7 +44,7 @@ global $edited_Blog;
 </script>
 <?php
 
-$Form = & new Form( NULL, 'coll_features_checkchanges' );
+$Form = new Form( NULL, 'coll_features_checkchanges' );
 
 $Form->begin_form( 'fform' );
 
@@ -201,6 +201,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.24  2010/01/30 18:55:21  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.23  2010/01/27 15:20:07  efy-asimo
  * Change select list to radio button
  *

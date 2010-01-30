@@ -1028,7 +1028,7 @@ param( 'import_mode', 'string', 'normal' );
 
 				if( !$simulate )
 				{
-					$edited_Item = & new Item();
+					$edited_Item = new Item();
 					$edited_Item->set_creator_User($item_Author);
 					$edited_Item->set('title', $post_title);
 					$edited_Item->set('content', $post_content);
@@ -1674,6 +1674,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.17  2010/01/30 18:55:35  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.16  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *

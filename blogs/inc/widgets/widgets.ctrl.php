@@ -255,7 +255,7 @@ switch( $action )
 													 LIMIT 0,1' );
 		if( !empty( $row) )
 		{
-			$prev_ComponentWidget = & new ComponentWidget( $row );
+			$prev_ComponentWidget = new ComponentWidget( $row );
 			$prev_order = $prev_ComponentWidget->order;
 
 			$edited_ComponentWidget->set( 'order', 0 );	// Temporary
@@ -290,7 +290,7 @@ switch( $action )
 													 LIMIT 0,1' );
 		if( !empty( $row ) )
 		{
-			$next_ComponentWidget = & new ComponentWidget( $row );
+			$next_ComponentWidget = new ComponentWidget( $row );
 			$next_order = $next_ComponentWidget->order;
 
 			$edited_ComponentWidget->set( 'order', 0 );	// Temporary
@@ -568,6 +568,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.44  2010/01/30 18:55:35  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.43  2010/01/29 17:21:38  efy-yury
  * add: crumbs in ajax calls
  *

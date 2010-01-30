@@ -126,7 +126,7 @@ echo '<h2>'.T_('About this system').'</h2>';
 	}
 
 
-$block_item_Widget = & new Widget( 'block_item' );
+$block_item_Widget = new Widget( 'block_item' );
 
 
 /**
@@ -574,6 +574,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.26  2010/01/30 18:55:35  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.25  2010/01/03 12:39:08  fplanque
  * no message
  *

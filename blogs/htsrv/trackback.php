@@ -153,7 +153,7 @@ if( empty($comment) )
 /**
  * @global Comment Trackback object
  */
-$Comment = & new Comment();
+$Comment = new Comment();
 $Comment->set( 'type', 'trackback' );
 $Comment->set_Item( $commented_Item );
 $Comment->set( 'author', $blog_name );
@@ -210,6 +210,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.72  2010/01/30 18:55:15  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.71  2009/09/27 12:57:29  blueyed
  * strmaxlen: add format param, which is used on the (possibly) cropped string.
  *

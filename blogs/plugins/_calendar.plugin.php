@@ -181,7 +181,7 @@ class calendar_plugin extends Plugin
 		if(!isset($params['title'])) $params['title'] = '';
 
 
-		$Calendar = & new Calendar( $m, $params );
+		$Calendar = new Calendar( $m, $params );
 
 		// TODO: automate with a table inside of Calendatr object. Table should also contain descriptions and default values to display in help screen.
 		// Note: minbrowse and maxbrowe already work this way.
@@ -906,7 +906,7 @@ class Calendar
 		if( $this->params['min_timestamp'] == 'query' || $this->params['max_timestamp'] == 'query' )
 		{ // Do inits:
 			// WE NEED SPECIAL QUERY PARAMS WHEN MOVING THOUGH MONTHS ( NO dstart especially! )
-			$nav_ItemQuery = & new ItemQuery( $this->dbtable, $this->dbprefix, $this->dbIDname );	// TEMP object
+			$nav_ItemQuery = new ItemQuery( $this->dbtable, $this->dbprefix, $this->dbIDname );	// TEMP object
 			// Restrict to selected blog/categories:
 			$nav_ItemQuery->where_chapter2( $this->ItemQuery->Blog, $this->ItemQuery->cat_array, $this->ItemQuery->cat_modifier );
 			// Restrict to the statuses we want to show:
@@ -1147,6 +1147,9 @@ class Calendar
 
 /*
  * $Log$
+ * Revision 1.58  2010/01/30 18:55:36  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.57  2009/06/24 18:47:54  tblue246
  * Make widget plugin names translatable
  *

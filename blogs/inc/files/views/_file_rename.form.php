@@ -39,7 +39,7 @@ global $selected_Filelist;
 global $new_names;
 
 
-$Form = & new Form( NULL, 'fm_rename_checkchanges' );
+$Form = new Form( NULL, 'fm_rename_checkchanges' );
 
 $Form->global_icon( T_('Cancel rename!'), 'close', regenerate_url() );
 
@@ -68,6 +68,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Rename'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/30 18:55:27  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.4  2010/01/03 13:45:36  fplanque
  * set some crumbs (needs checking)
  *

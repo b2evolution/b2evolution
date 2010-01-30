@@ -183,7 +183,7 @@ if( empty($comment) )
 /**
  * Create comment object. Gets validated, before recording it into DB:
  */
-$Comment = & new Comment();
+$Comment = new Comment();
 $Comment->set( 'type', 'comment' );
 $Comment->set_Item( $commented_Item );
 if( $User )
@@ -390,7 +390,7 @@ if( $Comment->ID )
 		// Note: this is approximative and may not cover all URLs where the user expects to see the comment...
 		// TODO: fp> solution: touch dates?
 		load_class( '_core/model/_pagecache.class.php', 'PageCache' );
-		$PageCache = & new PageCache( $Comment->Item->Blog );
+		$PageCache = new PageCache( $Comment->Item->Blog );
 		$PageCache->invalidate( $Comment->Item->get_single_url() );
 	}
 }
@@ -401,6 +401,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.138  2010/01/30 18:55:15  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.137  2010/01/19 21:10:18  efy-yury
  * update: crumbs
  *

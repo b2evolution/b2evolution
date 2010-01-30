@@ -91,7 +91,7 @@ $FileRootCache = & get_FileRootCache();
 $FileRoot = & $FileRootCache->get_by_ID( $root );
 
 // Load file object (not the file content):
-$File = & new File( $FileRoot->type, $FileRoot->in_type_ID, $path );
+$File = new File( $FileRoot->type, $FileRoot->in_type_ID, $path );
 
 if( !empty($size) && $File->is_image() )
 {	// We want a thumbnail:
@@ -238,6 +238,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.51  2010/01/30 18:55:15  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.50  2010/01/22 04:28:51  fplanque
  * fixes
  *

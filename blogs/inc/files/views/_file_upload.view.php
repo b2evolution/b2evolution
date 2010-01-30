@@ -176,7 +176,7 @@ global $fm_FileRoot;
 	// Begin payload block:
 	$this->disp_payload_begin();
 
-	$Form = & new Form( NULL, 'fm_upload_checkchanges', 'post', 'none', 'multipart/form-data' );
+	$Form = new Form( NULL, 'fm_upload_checkchanges', 'post', 'none', 'multipart/form-data' );
 	$Form->begin_form( 'fform' );
 
 		$Form->add_crumb( 'file' );
@@ -186,7 +186,7 @@ global $fm_FileRoot;
 		$Form->hiddens_by_key( get_memorized() );
 
 
-	$Widget = & new Widget( 'file_browser' );
+	$Widget = new Widget( 'file_browser' );
 
 	$Widget->global_icon( T_('Quit upload mode!'), 'close', regenerate_url( 'ctrl,fm_mode', 'ctrl=files' ) );
 
@@ -374,6 +374,9 @@ global $fm_FileRoot;
 
 /*
  * $Log$
+ * Revision 1.13  2010/01/30 18:55:27  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.12  2010/01/03 13:45:36  fplanque
  * set some crumbs (needs checking)
  *

@@ -2022,7 +2022,7 @@ class File extends DataObject
 		$this->load_meta( true );
 
 		// Let's make the link!
-		$edited_Link = & new Link();
+		$edited_Link = new Link();
 		$edited_Link->set( 'itm_ID', $edited_Item->ID );
 		$edited_Link->set( 'file_ID', $this->ID );
 		$edited_Link->set( 'position', $position );
@@ -2036,6 +2036,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.79  2010/01/30 18:55:25  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.78  2010/01/30 09:55:34  efy-asimo
  * return to the properties form after file rename error + user transaction during file rename
  *

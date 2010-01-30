@@ -179,7 +179,7 @@ function create_default_data()
 	global $timestamp, $admin_email, $default_locale, $install_password;
 	global $random_password;
 
-	$User_Admin = & new User();
+	$User_Admin = new User();
 	$User_Admin->set( 'login', 'admin' );
 	if( !isset( $install_password ) )
 	{
@@ -745,7 +745,7 @@ function create_blog(
 {
 	global $default_locale;
 
- 	$Blog = & new Blog( NULL );
+ 	$Blog = new Blog( NULL );
 
 	$Blog->init_by_kind( $kind, $blog_name, $blog_shortname, $blog_urlname );
 
@@ -791,7 +791,7 @@ function create_demo_contents()
 	load_class( 'items/model/_link.class.php', 'Link' );
 
 	task_begin('Assigning avatar to Admin... ');
-	$edit_File = & new File( 'user', 1, 'faceyourmanga_admin_boy.png' );
+	$edit_File = new File( 'user', 1, 'faceyourmanga_admin_boy.png' );
 	// Load meta data AND MAKE SURE IT IS CREATED IN DB:
 	$edit_File->load_meta( true );
 	$UserCache = & get_UserCache();
@@ -801,7 +801,7 @@ function create_demo_contents()
 	task_end();
 
 	task_begin('Creating demo blogger user... ');
-	$User_Blogger = & new User();
+	$User_Blogger = new User();
 	$User_Blogger->set( 'login', 'ablogger' );
 	$User_Blogger->set( 'pass', md5($random_password) ); // random
 	$User_Blogger->set( 'nickname', 'Blogger A' );
@@ -817,7 +817,7 @@ function create_demo_contents()
 	task_end();
 
 	task_begin('Creating demo user... ');
-	$User_Demo = & new User();
+	$User_Demo = new User();
 	$User_Demo->set( 'login', 'demouser' );
 	$User_Demo->set( 'pass', md5($random_password) ); // random
 	$User_Demo->set( 'nickname', 'Mr. Demo' );
@@ -922,14 +922,14 @@ function create_demo_contents()
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('First Post'), T_('<p>This is the first post.</p>
 
 <p>It appears in a single category.</p>'), $now, $cat_ann_a );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Second post'), T_('<p>This is the second post.</p>
 
 <p>It appears in multiple categories.</p>'), $now, $cat_news, array( $cat_ann_a ) );
@@ -944,42 +944,42 @@ function create_demo_contents()
 
 	// Insert a post into photoblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Bus Stop Ahead'), 'In the middle of nowhere: a school bus stop where you wouldn\'t really expect it!',
 					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
-	$edit_File = & new File( 'shared', 0, 'monument-valley/bus-stop-ahead.jpg' );
+	$edit_File = new File( 'shared', 0, 'monument-valley/bus-stop-ahead.jpg' );
 	$edit_File->link_to_Item( $edited_Item );
 
 	// Insert a post into photoblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('John Ford Point'), 'Does this scene look familiar? You\'ve probably seen it in a couple of John Ford westerns!',
 					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
-	$edit_File = & new File( 'shared', 0, 'monument-valley/john-ford-point.jpg' );
+	$edit_File = new File( 'shared', 0, 'monument-valley/john-ford-point.jpg' );
 	$edit_File->link_to_Item( $edited_Item );
 
 	// Insert a post into photoblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Monuments'), 'This is one of the most famous views in Monument Valley. I like to frame it with the dirt road in order to give a better idea of the size of those things!',
 					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
-	$edit_File = & new File( 'shared', 0, 'monument-valley/monuments.jpg' );
+	$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
 	$edit_File->link_to_Item( $edited_Item );
 
 	// Insert a post into photoblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Road to Monument Valley'), 'This gives a pretty good idea of the Monuments you\'re about to drive into...',
 					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
-	$edit_File = & new File( 'shared', 0, 'monument-valley/monument-valley-road.jpg' );
+	$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley-road.jpg' );
 	$edit_File->link_to_Item( $edited_Item );
 
 	// Insert a post into photoblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Monument Valley'), T_('This is a short photo album demo. Use the arrows to navigate between photos. Click on "Index" to see a thumbnail index.'),
 					 $now, $cat_photo_album, array(), 'published','en-US', '', 'http://fplanque.com/photo/monument-valley' );
-	$edit_File = & new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
+	$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
 	$edit_File->link_to_Item( $edited_Item );
 
 
@@ -990,42 +990,42 @@ function create_demo_contents()
     // It will show a bug on linkblog agregation by category
 	$timestamp++;
 	$now = date('Y-m-d H:i:s',$timestamp + 59);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, 'Danny', '', $now, $cat_linkblog_contrib, array(), 'published',	'en-US', '', 'http://personman.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, 'Daniel', '', $now, $cat_linkblog_contrib, array(), 'published',	'de-DE', '', 'http://daniel.hahler.de/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, 'Francois', '', $now, $cat_linkblog_contrib, array(), 'published',	 'fr-FR', '', 'http://fplanque.com/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, 'Tilman', '', $now, $cat_linkblog_contrib, array(), 'published',	 'de-DE', '', 'http://ax86.net/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, 'Blog news', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://b2evolution.net/news.php', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, 'Web hosting', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://b2evolution.net/web-hosting/blog/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, 'Manual', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://manual.b2evolution.net/', 'disabled', array() );
 
 	// Insert a post into linkblog:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, 'Support', '', $now, $cat_linkblog_b2evo, array(), 'published',	'en-US', '', 'http://forums.b2evolution.net/', 'disabled', array() );
 
 
@@ -1040,19 +1040,19 @@ function create_demo_contents()
 
 	// Insert a PAGE:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_("About Blog B"), sprintf( $info_page, T_('Blog B') ), $now, $cat_ann_b,
 		array(), 'published', '#', '', '', 'open', array('default'), 1000 );
 
 	// Insert a PAGE:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_("About Blog A"), sprintf( $info_page, T_('Blog A') ), $now, $cat_ann_a,
 		array(), 'published', '#', '', '', 'open', array('default'), 1000 );
 
 	// Insert a PAGE:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_("About this system"), T_("<p>This blog platform is powered by b2evolution.</p>
 
 <p>You are currently looking at an info page about this system. It is cross-posted among the demo blogs. Thus, this page will be linked on each of these blogs.</p>
@@ -1061,33 +1061,33 @@ function create_demo_contents()
 
 <p>If needed, an evoskin can format info pages differently from regular posts.</p>"), $now, $cat_ann_a,
 		array( $cat_ann_a, $cat_ann_b, $cat_linkblog_b2evo ), 'published', '#', '', '', 'open', array('default'), 1000 );
-	$edit_File = & new File( 'shared', 0, 'logos/b2evolution8.png' );
+	$edit_File = new File( 'shared', 0, 'logos/b2evolution8.png' );
 	$edit_File->link_to_Item( $edited_Item );
 
 
 	/*
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_("Default Intro post"), T_("This uses post type \"Intro-All\"."),
 												$now, $cat_b2evo, array( $cat_ann_b ), 'published', '#', '', '', 'open', array('default'), 1600 );
 	*/
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s', ($timestamp++ - 31536000) ); // A year ago
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_("Main Intro post"), T_("This is the main intro post. It appears on the homepage only."),
 												$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 1500 );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s', ($timestamp++ - 31536000) ); // A year ago
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_("b2evolution tips category &ndash; Sub Intro post"), T_("This uses post type \"Intro-Cat\" and is attached to the desired Category(ies)."),
 												$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 1520 );
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s', ($timestamp++ - 31536000) ); // A year ago
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_("Widgets tag &ndash; Sub Intro post"), T_("This uses post type \"Intro-Tag\" and is tagged with the desired Tag(s)."),
 												$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 1530 );
 	$edited_Item->set_tags_from_string( 'widgets' );
@@ -1097,7 +1097,7 @@ function create_demo_contents()
 	// Insert a post:
 	// TODO: move to Blog A
 	$now = date('Y-m-d H:i:s', $timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_("Featured post"), T_("<p>This is a demo of a featured post.</p>
 
 <p>It will be featured whenever we have no specific \"Intro\" post to display for the current request. To see it in action, try displaying the \"Announcements\" category.</p>
@@ -1109,7 +1109,7 @@ function create_demo_contents()
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_("Apache optimization..."), sprintf( T_("<p>In the <code>/blogs</code> folder there is a file called [<code>sample.htaccess</code>]. You should try renaming it to [<code>.htaccess</code>].</p>
 
 <p>This will optimize the way b2evolution is handled by the webserver (if you are using Apache). This file is not active by default because a few hosts would display an error right away when you try to use it. If this happens to you when you rename the file, just remove it and you'll be fine.</p>
@@ -1119,7 +1119,7 @@ function create_demo_contents()
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_("Skins, Stubs, Templates &amp; website integration..."), T_("<p>By default, blogs are displayed using an evoskin. (More on skins in another post.)</p>
 
 <p>This means, blogs are accessed through '<code>index.php</code>', which loads default parameters from the database and then passes on the display job to a skin.</p>
@@ -1139,7 +1139,7 @@ function create_demo_contents()
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_("About widgets..."), T_('<p>b2evolution blogs are installed with a default selection of Widgets. For example, the sidebar of this blog includes widgets like a calendar, a search field, a list of categories, a list of XML feeds, etc.</p>
 
 <p>You can add, remove and reorder widgets from the Blog Settings tab in the admin interface.</p>
@@ -1151,7 +1151,7 @@ function create_demo_contents()
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_("About skins..."), T_('<p>By default, b2evolution blogs are displayed using an evoskin.</p>
 
 <p>You can change the skin used by any blog by editing the blog settings in the admin interface.</p>
@@ -1171,17 +1171,17 @@ function create_demo_contents()
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Image post'), T_('<p>This post has an image attached to it. The image is automatically resized to fit the current blog skin. You can zoom in by clicking on the thumbnail.</p>
 
 <p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>'), $now, $cat_bg );
-	$edit_File = & new File( 'shared', 0, 'monument-valley/monuments.jpg' );
+	$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
 	$edit_File->link_to_Item( $edited_Item );
 
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('This is a multipage post'), T_('<p>This is page 1 of a multipage post.</p>
 
 <p>You can see the other pages by clicking on the links below the text.</p>
@@ -1203,7 +1203,7 @@ function create_demo_contents()
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Extended post with no teaser'), T_('<p>This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.</p>
 
 <!--more--><!--noteaser-->
@@ -1213,7 +1213,7 @@ function create_demo_contents()
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_('Extended post'), T_('<p>This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.</p>
 
 <!--more-->
@@ -1223,7 +1223,7 @@ function create_demo_contents()
 
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->insert( 1, T_("Welcome to b2evolution!"), T_("<p>Four blogs have been created with sample contents:</p>
 
 <ul>
@@ -1234,7 +1234,7 @@ function create_demo_contents()
 </ul>
 
 <p>You can add new blogs, delete unwanted blogs and customize existing blogs (title, sidebar, blog skin, widgets, etc.) from the Blog Settings tab in the admin interface.</p>"), $now, $cat_ann_a );
-	$edit_File = & new File( 'shared', 0, 'logos/b2evolution8.png' );
+	$edit_File = new File( 'shared', 0, 'logos/b2evolution8.png' );
 	$edit_File->link_to_Item( $edited_Item );
 
 
@@ -1304,6 +1304,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.284  2010/01/30 18:55:36  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.283  2010/01/04 13:06:24  efy-maxim
  * new currencies have been added
  *

@@ -31,7 +31,7 @@ global $read_unread_recipients;
 
 // Create SELECT query
 
-$select_SQL = & new SQL();
+$select_SQL = new SQL();
 $select_SQL->SELECT( 	'mc.mct_to_user_ID, mc.mct_blocked, mc.mct_last_contact_datetime,
 						u.user_login AS mct_to_user_login, u.user_nickname AS mct_to_user_nickname,
 						CONCAT_WS( " ", u.user_firstname, u.user_lastname ) AS mct_to_user_name,
@@ -45,7 +45,7 @@ $select_SQL->WHERE( 'mc.mct_from_user_ID = '.$current_User->ID );
 
 // Create COUNT quiery
 
-$count_SQL = & new SQL();
+$count_SQL = new SQL();
 
 $count_SQL->SELECT( 'COUNT(*)' );
 
@@ -68,7 +68,7 @@ else
 
 // Create result set:
 
-$Results = & new Results( $select_SQL->get(), 'mct_', '', NULL, $count_SQL->get() );
+$Results = new Results( $select_SQL->get(), 'mct_', '', NULL, $count_SQL->get() );
 
 $Results->title = T_('Contacts list');
 
@@ -220,6 +220,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.9  2010/01/03 13:10:58  fplanque
  * set some crumbs (needs checking)
  *

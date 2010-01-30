@@ -64,7 +64,7 @@ class GroupSettings extends AbstractSettings
 		if( $grp_ID != 0 )
 		{
 			// Select current group permission from database
-			$SQL = & new SQL();
+			$SQL = new SQL();
 			$SQL->SELECT( '*' );
 			$SQL->FROM( 'T_groups__groupsettings' );
 			$SQL->WHERE( 'gset_grp_ID = '.$grp_ID );

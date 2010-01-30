@@ -72,8 +72,8 @@ switch( $action )
 		$Session->assert_received_crumb( 'thread' );
 		
 		// Insert new thread:
-		$edited_Thread = & new Thread();
-		$edited_Message = & new Message();
+		$edited_Thread = new Thread();
+		$edited_Message = new Message();
 		$edited_Message->Thread = & $edited_Thread;
 
 		// Check permission:
@@ -207,6 +207,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.15  2010/01/15 16:57:38  efy-yury
  * update messaging: crumbs
  *

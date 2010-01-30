@@ -39,14 +39,14 @@ global $blog, $admin_url, $rsc_url;
 <?php
 // Create result set:
 
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( 'SQL_NO_CACHE hit_ID, hit_datetime, hit_blog_ID, hit_uri, hit_remote_addr, blog_shortname' );
 $SQL->FROM( 'T_hitlog LEFT JOIN T_blogs ON hit_blog_ID = blog_ID' );
 $SQL->WHERE( 'hit_referer_type = "direct" AND hit_agent_type = "browser"' );
 if( ! empty( $blog ) )
 	$SQL->WHERE_and( 'hit_blog_ID = ' . $blog );
 
-$Results = & new Results( $SQL->get(), 'lstref_', 'D' );
+$Results = new Results( $SQL->get(), 'lstref_', 'D' );
 
 $Results->title = T_('Direct browser hits');
 
@@ -98,6 +98,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/30 18:55:34  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.8  2009/12/08 22:38:13  fplanque
  * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
  *

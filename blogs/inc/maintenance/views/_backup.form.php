@@ -40,7 +40,7 @@ global $action;
 global $current_Backup;
 
 
-$Form = & new Form( NULL, 'backup_settings', 'post' );
+$Form = new Form( NULL, 'backup_settings', 'post' );
 
 
 $Form->begin_form( 'fform', T_('Backup application files and data') );
@@ -168,6 +168,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'S
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.7  2010/01/17 16:15:24  sam2kb
  * Localization clean-up
  *

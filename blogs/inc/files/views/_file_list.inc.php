@@ -79,7 +79,7 @@ global $linkctrl, $linkdata;
 // Name of the iframe we want some atiosn to come back to:
 global $iframe_name;
 
-$Form = & new Form( NULL, 'FilesForm', 'post', 'none' );
+$Form = new Form( NULL, 'FilesForm', 'post', 'none' );
 $Form->begin_form();
 	$Form->hidden_ctrl();
 
@@ -675,6 +675,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.34  2010/01/30 18:55:27  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.33  2010/01/25 18:18:29  efy-yury
  * add : crumbs
  *

@@ -334,11 +334,14 @@ class sessions_Module extends Module
 
 }
 
-$sessions_Module = & new sessions_Module();
+$sessions_Module = new sessions_Module();
 
 
 /*
  * $Log$
+ * Revision 1.28  2010/01/30 18:55:33  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.27  2009/12/08 22:38:13  fplanque
  * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
  *

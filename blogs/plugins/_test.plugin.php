@@ -541,7 +541,7 @@ class test_plugin extends Plugin
 		echo $this->text_from_AdminTabAction;
 
 		// TODO: this is tedious.. should either be a global function (get_admin_Form()) or a plugin helper..
-		$Form = & new Form();
+		$Form = new Form();
 		$Form->begin_form();
 
 		$Form->add_crumb( 'plugin_test' );
@@ -826,6 +826,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.89  2010/01/30 18:55:36  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.88  2010/01/03 13:45:37  fplanque
  * set some crumbs (needs checking)
  *

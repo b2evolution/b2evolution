@@ -109,7 +109,7 @@ class WidgetCache extends DataObjectCache
 	/**
 	 * Instanciate a new object within this cache
 	 */
-	function & new_obj( $row = NULL )
+	function new_obj( $row = NULL )
 	{
 		global $inc_path;
 
@@ -154,6 +154,9 @@ class WidgetCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/30 18:55:35  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.8  2009/09/14 13:53:32  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

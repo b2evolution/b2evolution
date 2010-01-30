@@ -549,7 +549,7 @@
 					if ($rebuild_xmlrpcvals)
 					{
 						// build the xmlrpc val out of the data received, and substitute it
-						$temp =& new xmlrpcval($GLOBALS['_xh']['value'], $GLOBALS['_xh']['vt']);
+						$temp =new xmlrpcval($GLOBALS['_xh']['value'], $GLOBALS['_xh']['vt']);
 						// in case we got info about underlying php class, save it
 						// in the object we're rebuilding
 						if (isset($GLOBALS['_xh']['php_class']))
@@ -1122,7 +1122,7 @@
 			}
 			elseif(is_string($msg))
 			{
-				$n =& new xmlrpcmsg('');
+				$n =new xmlrpcmsg('');
 				$n->payload = $msg;
 				$msg = $n;
 			}
@@ -1712,7 +1712,7 @@
 						}
 						else
 						{
-							$result =& new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['multicall_error'], $GLOBALS['xmlrpcstr']['multicall_error']);
+							$result =new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['multicall_error'], $GLOBALS['xmlrpcstr']['multicall_error']);
 						}
 					}
 				}
@@ -1759,17 +1759,17 @@
 			$calls = array();
 			foreach($msgs as $msg)
 			{
-				$call['methodName'] =& new xmlrpcval($msg->method(),'string');
+				$call['methodName'] =new xmlrpcval($msg->method(),'string');
 				$numParams = $msg->getNumParams();
 				$params = array();
 				for($i = 0; $i < $numParams; $i++)
 				{
 					$params[$i] = $msg->getParam($i);
 				}
-				$call['params'] =& new xmlrpcval($params, 'array');
-				$calls[] =& new xmlrpcval($call, 'struct');
+				$call['params'] =new xmlrpcval($params, 'array');
+				$calls[] =new xmlrpcval($call, 'struct');
 			}
-			$multicall =& new xmlrpcmsg('system.multicall');
+			$multicall =new xmlrpcmsg('system.multicall');
 			$multicall->addParam(new xmlrpcval($calls, 'array'));
 
 			// Attempt RPC call
@@ -1817,7 +1817,7 @@
 								return false;		// Bad value
 							}
 							// Normal return value
-							$response[$i] =& new xmlrpcresp($val[0], 0, '', 'phpvals');
+							$response[$i] =new xmlrpcresp($val[0], 0, '', 'phpvals');
 							break;
 						case 2:
 							///	@todo remove usage of @: it is apparently quite slow
@@ -1831,7 +1831,7 @@
 							{
 								return false;
 							}
-							$response[$i] =& new xmlrpcresp(0, $code, $str);
+							$response[$i] =new xmlrpcresp(0, $code, $str);
 							break;
 						default:
 							return false;
@@ -1864,7 +1864,7 @@
 								return false;		// Bad value
 							}
 							// Normal return value
-							$response[$i] =& new xmlrpcresp($val->arraymem(0));
+							$response[$i] =new xmlrpcresp($val->arraymem(0));
 							break;
 						case 'struct':
 							$code = $val->structmem('faultCode');
@@ -1877,7 +1877,7 @@
 							{
 								return false;
 							}
-							$response[$i] =& new xmlrpcresp(0, $code->scalarval(), $str->scalarval());
+							$response[$i] =new xmlrpcresp(0, $code->scalarval(), $str->scalarval());
 							break;
 						default:
 							return false;
@@ -2392,7 +2392,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 						if(!$data = decode_chunked($data))
 						{
 							error_log('XML-RPC: xmlrpcmsg::parseResponse: errors occurred when trying to rebuild the chunked data received from server');
-							$r =& new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['dechunk_fail'], $GLOBALS['xmlrpcstr']['dechunk_fail']);
+							$r =new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['dechunk_fail'], $GLOBALS['xmlrpcstr']['dechunk_fail']);
 							return $r;
 						}
 					}
@@ -2422,14 +2422,14 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 								else
 								{
 									error_log('XML-RPC: xmlrpcmsg::parseResponse: errors occurred when trying to decode the deflated data received from server');
-									$r =& new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['decompress_fail'], $GLOBALS['xmlrpcstr']['decompress_fail']);
+									$r =new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['decompress_fail'], $GLOBALS['xmlrpcstr']['decompress_fail']);
 									return $r;
 								}
 							}
 							else
 							{
 								error_log('XML-RPC: xmlrpcmsg::parseResponse: the server sent deflated data. Your php install must have the Zlib extension compiled in to support this.');
-								$r =& new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['cannot_decompress'], $GLOBALS['xmlrpcstr']['cannot_decompress']);
+								$r =new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['cannot_decompress'], $GLOBALS['xmlrpcstr']['cannot_decompress']);
 								return $r;
 							}
 						}
@@ -2461,7 +2461,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 			if($data == '')
 			{
 				error_log('XML-RPC: xmlrpcmsg::parseResponse: no response received from server.');
-				$r =& new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['no_data'], $GLOBALS['xmlrpcstr']['no_data']);
+				$r =new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['no_data'], $GLOBALS['xmlrpcstr']['no_data']);
 				return $r;
 			}
 
@@ -2521,7 +2521,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 			// if user wants back raw xml, give it to him
 			if ($return_type == 'xml')
 			{
-				$r =& new xmlrpcresp($data, 0, '', 'xml');
+				$r =new xmlrpcresp($data, 0, '', 'xml');
 				$r->hdrs = $GLOBALS['_xh']['headers'];
 				$r->_cookies = $GLOBALS['_xh']['cookies'];
 				$r->raw_data = $raw_data;
@@ -2613,7 +2613,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 					/// @todo echo something for user?
 				}
 
-				$r =& new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['invalid_return'],
+				$r =new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['invalid_return'],
 				$GLOBALS['xmlrpcstr']['invalid_return'] . ' ' . $GLOBALS['_xh']['isf_reason']);
 			}
 			// third error check: parsing of the response has somehow gone boink.
@@ -2663,7 +2663,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 						$errno = -1;
 					}
 
-					$r =& new xmlrpcresp(0, $errno, $errstr);
+					$r =new xmlrpcresp(0, $errno, $errstr);
 				}
 				else
 				{
@@ -3337,20 +3337,20 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 		{
 			case 'string':
 				if (in_array('auto_dates', $options) && preg_match('/^[0-9]{8}T[0-9]{2}:[0-9]{2}:[0-9]{2}$/', $php_val))
-					$xmlrpc_val =& new xmlrpcval($php_val, $GLOBALS['xmlrpcDateTime']);
+					$xmlrpc_val =new xmlrpcval($php_val, $GLOBALS['xmlrpcDateTime']);
 				else
-					$xmlrpc_val =& new xmlrpcval($php_val, $GLOBALS['xmlrpcString']);
+					$xmlrpc_val =new xmlrpcval($php_val, $GLOBALS['xmlrpcString']);
 				break;
 			case 'integer':
-				$xmlrpc_val =& new xmlrpcval($php_val, $GLOBALS['xmlrpcInt']);
+				$xmlrpc_val =new xmlrpcval($php_val, $GLOBALS['xmlrpcInt']);
 				break;
 			case 'double':
-				$xmlrpc_val =& new xmlrpcval($php_val, $GLOBALS['xmlrpcDouble']);
+				$xmlrpc_val =new xmlrpcval($php_val, $GLOBALS['xmlrpcDouble']);
 				break;
 				// <G_Giunta_2001-02-29>
 				// Add support for encoding/decoding of booleans, since they are supported in PHP
 			case 'boolean':
-				$xmlrpc_val =& new xmlrpcval($php_val, $GLOBALS['xmlrpcBoolean']);
+				$xmlrpc_val =new xmlrpcval($php_val, $GLOBALS['xmlrpcBoolean']);
 				break;
 				// </G_Giunta_2001-02-29>
 			case 'array':
@@ -3373,11 +3373,11 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 				}
 				if($ko)
 				{
-					$xmlrpc_val =& new xmlrpcval($arr, $GLOBALS['xmlrpcStruct']);
+					$xmlrpc_val =new xmlrpcval($arr, $GLOBALS['xmlrpcStruct']);
 				}
 				else
 				{
-					$xmlrpc_val =& new xmlrpcval($arr, $GLOBALS['xmlrpcArray']);
+					$xmlrpc_val =new xmlrpcval($arr, $GLOBALS['xmlrpcArray']);
 				}
 				break;
 			case 'object':
@@ -3392,7 +3392,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 					{
 						$arr[$k] = php_xmlrpc_encode($v, $options);
 					}
-					$xmlrpc_val =& new xmlrpcval($arr, $GLOBALS['xmlrpcStruct']);
+					$xmlrpc_val =new xmlrpcval($arr, $GLOBALS['xmlrpcStruct']);
 					if (in_array('encode_php_objs', $options))
 					{
 						// let's save original class name into xmlrpcval:
@@ -3404,32 +3404,32 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 			case 'NULL':
 				if (in_array('extension_api', $options))
 				{
-					$xmlrpc_val =& new xmlrpcval('', $GLOBALS['xmlrpcString']);
+					$xmlrpc_val =new xmlrpcval('', $GLOBALS['xmlrpcString']);
 				}
 				if (in_array('null_extension', $options))
 				{
-					$xmlrpc_val =& new xmlrpcval('', $GLOBALS['xmlrpcNull']);
+					$xmlrpc_val =new xmlrpcval('', $GLOBALS['xmlrpcNull']);
 				}
 				else
 				{
-					$xmlrpc_val =& new xmlrpcval();
+					$xmlrpc_val =new xmlrpcval();
 				}
 				break;
 			case 'resource':
 				if (in_array('extension_api', $options))
 				{
-					$xmlrpc_val =& new xmlrpcval((int)$php_val, $GLOBALS['xmlrpcInt']);
+					$xmlrpc_val =new xmlrpcval((int)$php_val, $GLOBALS['xmlrpcInt']);
 				}
 				else
 				{
-					$xmlrpc_val =& new xmlrpcval();
+					$xmlrpc_val =new xmlrpcval();
 				}
 			// catch "user function", "unknown type"
 			default:
 				// giancarlo pinerolo <ping@alt.it>
 				// it has to return
 				// an empty object in case, not a boolean.
-				$xmlrpc_val =& new xmlrpcval();
+				$xmlrpc_val =new xmlrpcval();
 				break;
 			}
 			return $xmlrpc_val;
@@ -3493,15 +3493,15 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 				{
 					$vc = $v->structmem('faultCode');
 					$vs = $v->structmem('faultString');
-					$r =& new xmlrpcresp(0, $vc->scalarval(), $vs->scalarval());
+					$r =new xmlrpcresp(0, $vc->scalarval(), $vs->scalarval());
 				}
 				else
 				{
-					$r =& new xmlrpcresp($v);
+					$r =new xmlrpcresp($v);
 				}
 				return $r;
 			case 'methodcall':
-				$m =& new xmlrpcmsg($GLOBALS['_xh']['method']);
+				$m =new xmlrpcmsg($GLOBALS['_xh']['method']);
 				for($i=0; $i < count($GLOBALS['_xh']['params']); $i++)
 				{
 					$m->addParam($GLOBALS['_xh']['params'][$i]);
@@ -3697,6 +3697,9 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/30 18:55:19  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.5  2009/08/29 12:23:55  tblue246
  * - SECURITY:
  * 	- Implemented checking of previously (mostly) ignored blog_media_(browse|upload|change) permissions.

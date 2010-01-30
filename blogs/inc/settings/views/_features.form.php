@@ -51,7 +51,7 @@ global $Settings;
 global $baseurl;
 
 
-$Form = & new Form( NULL, 'feats_checkchanges' );
+$Form = new Form( NULL, 'feats_checkchanges' );
 
 $Form->begin_form( 'fform', T_('Global Features') );
 
@@ -213,6 +213,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.25  2010/01/30 18:55:34  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.24  2010/01/02 21:11:59  fplanque
  * fat reduction / cleanup
  *

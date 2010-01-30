@@ -44,7 +44,7 @@ global $admin_Plugins;
 
 global $dispatcher;
 
-$Table = & new Table();
+$Table = new Table();
 
 $Table->title = T_('Plugins available for installation');
 
@@ -73,7 +73,7 @@ $Table->display_body_start();
 if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_admin_no_DB' ) )
 { // (may have been instantiated for action 'info')
 	load_class( 'plugins/model/_plugins_admin_no_db.class.php', 'Plugins_admin_no_DB' );
-	$AvailablePlugins = & new Plugins_admin_no_DB(); // do not load registered plugins/events from DB
+	$AvailablePlugins = new Plugins_admin_no_DB(); // do not load registered plugins/events from DB
 	$AvailablePlugins->discover();
 }
 
@@ -214,6 +214,9 @@ echo '</p>';
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/30 18:55:33  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.9  2010/01/03 12:26:32  fplanque
  * Crumbs for plugins. This is a little bit tough because it's a non standard controller.
  * There may be missing crumbs, especially during install. Please add missing ones when you spot them.

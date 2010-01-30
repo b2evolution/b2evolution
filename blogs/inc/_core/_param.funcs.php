@@ -1906,7 +1906,7 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 	{ // We want to validate XHTML:
 		load_class( 'xhtml_validator/_xhtml_validator.class.php', 'XHTML_Validator' );
 
-		$XHTML_Validator = & new XHTML_Validator( $context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, $encoding );
+		$XHTML_Validator = new XHTML_Validator( $context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, $encoding );
 
 		if( ! $XHTML_Validator->check( $content ) ) // TODO: see if we need to use convert_chars( $content, 'html' )
 		{
@@ -2098,6 +2098,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.58  2010/01/30 18:55:16  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.57  2009/12/01 21:05:10  blueyed
  * balance_tags: handle tags spanning multiple lines
  *

@@ -41,7 +41,7 @@ echo '
 
 
 
-$Form = & new Form( NULL, 'blogperm_checkchanges', 'post', 'fieldset' );
+$Form = new Form( NULL, 'blogperm_checkchanges', 'post', 'fieldset' );
 
 $Form->begin_form( 'fform' );
 
@@ -69,7 +69,7 @@ else
 }
 
 
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( 'grp_ID, grp_name, bloggroup_perm_poststatuses, bloggroup_perm_edit, bloggroup_ismember,'
 	. 'bloggroup_perm_comments, bloggroup_perm_delpost, bloggroup_perm_cats,'
 	. 'bloggroup_perm_properties, bloggroup_perm_admin, bloggroup_perm_media_upload,'
@@ -110,7 +110,7 @@ echo '</div>';
 <?php
 
 
-$Results = & new Results( $SQL->get(), 'collgroup_' );
+$Results = new Results( $SQL->get(), 'collgroup_' );
 
 // Tell the Results class that we already have a form for this page:
 $Results->Form = & $Form;
@@ -535,6 +535,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.13  2010/01/30 18:55:21  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.12  2010/01/03 13:45:36  fplanque
  * set some crumbs (needs checking)
  *

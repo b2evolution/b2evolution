@@ -57,7 +57,7 @@ global $fm_source_Filelist;
 global $new_names;
 
 
-$Form = & new Form( NULL, 'fm_copymove_checkchanges' );
+$Form = new Form( NULL, 'fm_copymove_checkchanges' );
 
 $Form->global_icon( T_('Quit copy/move mode!'), 'close', regenerate_url('fm_sources,fm_mode') );
 
@@ -92,6 +92,9 @@ echo '<p class="notes"><strong>'.T_('You are in copy/move mode.')
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/30 18:55:26  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.4  2010/01/03 13:45:36  fplanque
  * set some crumbs (needs checking)
  *

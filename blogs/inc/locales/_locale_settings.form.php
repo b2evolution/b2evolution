@@ -51,7 +51,7 @@ if( $action == 'edit' )
 { // Edit a locale:
 	param( 'template', 'string', ($edit_locale == '_new_') ? T_('Create new locale') : T_('Edit locale'), 'createnew' );
 
-	$Form = & new Form( $pagenow, 'loc_checkchanges' );
+	$Form = new Form( $pagenow, 'loc_checkchanges' );
 
 	$Form->begin_form( 'fform', T_('Regional Settings') );
 
@@ -521,6 +521,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.9  2010/01/02 21:13:31  fplanque
  * demo of Crumbs in action urls (GET not POST).
  * Normalized code a little (not perfect).

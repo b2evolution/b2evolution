@@ -79,7 +79,7 @@ if( isset( $edited_User ) )
 <!-- FILE BROWSER -->
 
 <?php
-	$Widget = & new Widget( 'file_browser' );
+	$Widget = new Widget( 'file_browser' );
 
 	if( $current_User->check_perm( 'files', 'add', false, $blog ? $blog : NULL ) )
 	{
@@ -107,7 +107,7 @@ if( isset( $edited_User ) )
 
 					echo '<div class="toolbaritem">';
 
-					$Form = & new Form( NULL, 'fmbar_filter_checkchanges', 'get', 'none' );
+					$Form = new Form( NULL, 'fmbar_filter_checkchanges', 'get', 'none' );
 					$Form->begin_form();
 					$Form->hidden_ctrl();
 					$Form->hiddens_by_key( get_memorized(), array('fm_filter', 'fm_filter_regex') );
@@ -149,7 +149,7 @@ if( isset( $edited_User ) )
 			<!-- ROOTS SELECT -->
 
 			<?php
-				$Form = & new Form( NULL, 'fmbar_roots', 'post', 'none' );
+				$Form = new Form( NULL, 'fmbar_roots', 'post', 'none' );
 				$Form->begin_form();
 				// $Form->hidden_ctrl();
 				$Form->hiddens_by_key( get_memorized() );
@@ -313,7 +313,7 @@ if( isset( $edited_User ) )
 					global $create_type;
 
 					echo '<div class="toolbaritem">';
-					$Form = & new Form( NULL, 'fmbar_create_checkchanges', 'post', 'none' );
+					$Form = new Form( NULL, 'fmbar_create_checkchanges', 'post', 'none' );
 					$Form->begin_form();
 						$Form->hidden( 'action', 'createnew' );
 						$Form->add_crumb( 'file' );
@@ -398,6 +398,9 @@ if( isset( $edited_User ) )
 
 /*
  * $Log$
+ * Revision 1.18  2010/01/30 18:55:26  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.17  2010/01/03 13:45:36  fplanque
  * set some crumbs (needs checking)
  *

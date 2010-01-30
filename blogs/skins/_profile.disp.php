@@ -50,7 +50,7 @@ $redirect_to = param( 'redirect_to', 'string', '' );
  * form to update the profile
  * @var Form
  */
-$ProfileForm = & new Form( $htsrv_url_sensitive.'profile_update.php', 'ProfileForm' );
+$ProfileForm = new Form( $htsrv_url_sensitive.'profile_update.php', 'ProfileForm' );
 
 $ProfileForm->begin_form( 'bComment' );
 
@@ -120,6 +120,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.12  2010/01/30 18:55:37  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.11  2010/01/03 13:45:37  fplanque
  * set some crumbs (needs checking)
  *

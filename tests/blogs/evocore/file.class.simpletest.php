@@ -91,10 +91,10 @@ class FileTestCase extends EvoFilemanUnitTestCase
 	 */
 	function testGetExt()
 	{
-		$File =& new File( 'user', 1, 'abc.def' );
+		$File =new File( 'user', 1, 'abc.def' );
 		$this->assertEqual( $File->get_ext(), 'def', 'Simple file extension recognized.' );
 
-		$File =& new File( 'user', 1, 'abc.noext.def' );
+		$File =new File( 'user', 1, 'abc.noext.def' );
 		$this->assertEqual( $File->get_ext(), 'def', 'File extension recognized.' );
 	}
 }

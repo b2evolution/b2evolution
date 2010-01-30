@@ -41,14 +41,14 @@ global $blog;
  */
 global $edited_Item;
 
-$SQL = & new SQL();
+$SQL = new SQL();
 
 $SQL->SELECT( 'link_ID, link_ltype_ID, file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
 $SQL->FROM( 'T_links LEFT JOIN T_files ON link_file_ID = file_ID' );
 $SQL->WHERE( 'link_itm_ID = '.$edited_Item->ID );
 $SQL->ORDER_BY( 'link_ID' );
 
-$Results = & new Results( $SQL->get(), 'link_' );
+$Results = new Results( $SQL->get(), 'link_' );
 
 $Results->title = T_('Attachments');
 
@@ -194,6 +194,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.9  2010/01/03 13:10:58  fplanque
  * set some crumbs (needs checking)
  *

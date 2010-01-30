@@ -29,7 +29,7 @@ $creating = is_create_action( $action );
 param( 'results_goals_page', 'integer', '', true );
 param( 'results_goals_order', 'string', '', true );
 
-$Form = & new Form( NULL, 'goal_checkchanges', 'post', 'compact' );
+$Form = new Form( NULL, 'goal_checkchanges', 'post', 'compact' );
 
 if( ! $creating )
 {
@@ -66,6 +66,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/30 18:55:33  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.8  2010/01/03 16:28:35  fplanque
  * set some crumbs (needs checking)
  *

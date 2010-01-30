@@ -129,7 +129,7 @@ switch ( $action )
 		}
 		else
 		{ // We use an empty group:
-			$edited_Group = & new Group();
+			$edited_Group = new Group();
 		}
 
 		break;
@@ -278,6 +278,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/30 18:55:35  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.7  2010/01/03 17:45:21  fplanque
  * crumbs & stuff
  *

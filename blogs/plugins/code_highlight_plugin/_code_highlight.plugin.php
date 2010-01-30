@@ -599,7 +599,7 @@ class code_highlight_plugin extends Plugin
 				{ // language class exists, lets load and cache an instance of it
 					require_once $language_file;
 					$class = 'am_'.$language.'_highlighter';
-					$this->languageCache[ $language ] = & new $class( $this );
+					$this->languageCache[ $language ] = new $class( $this );
 				}
 				else
 				{	// language class doesn't exists, fallback to default highlighter
@@ -612,7 +612,7 @@ class code_highlight_plugin extends Plugin
 							require_once $language_file;
 							$class = 'am_'.$language.'_highlighter';
 							// add the language to the cache
-							$this->languageCache[ $language ] = & new $class( $this );
+							$this->languageCache[ $language ] = new $class( $this );
 						}
 						else
 						{ // if we hit this we might as well go to the pub ;)
@@ -636,6 +636,9 @@ class code_highlight_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.30  2010/01/30 18:55:37  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.29  2010/01/17 04:14:45  fplanque
  * minor / fixes
  *

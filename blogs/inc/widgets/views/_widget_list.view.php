@@ -40,7 +40,7 @@ function display_container( $container, $legend_suffix = '' )
 	global $Blog;
 	global $Session;
 
-	$Table = & new Table();
+	$Table = new Table();
 
 	$Table->title = '<span class="container_name">'.T_($container).'</span>'.$legend_suffix;
 
@@ -222,6 +222,9 @@ echo '<img src="'.$rsc_url.'/img/blank.gif" alt="" class="clear" />';
 
 /*
  * $Log$
+ * Revision 1.24  2010/01/30 18:55:35  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.23  2010/01/21 18:16:49  efy-yury
  * update: fadeouts
  *

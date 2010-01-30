@@ -40,7 +40,7 @@ global $edited_Currency;
 global $action;
 $creating = is_create_action( $action );
 
-$Form = & new Form( NULL, 'currency_checkchanges', 'post', 'compact' );
+$Form = new Form( NULL, 'currency_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Delete this currency!'), 'delete', regenerate_url( 'action', 'action=delete' ) );
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
@@ -71,6 +71,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/30 18:55:33  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.6  2010/01/03 12:03:17  fplanque
  * More crumbs...
  *

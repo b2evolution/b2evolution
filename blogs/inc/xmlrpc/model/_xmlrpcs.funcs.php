@@ -695,7 +695,7 @@ function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_ID
 
 	// INSERT NEW POST INTO DB:
 	load_class( 'items/model/_item.class.php', 'Item' );
-	$edited_Item = & new Item();
+	$edited_Item = new Item();
 	$edited_Item->set( 'title', $post_title );
 	$edited_Item->set( 'content', $content );
 	$edited_Item->set( 'datestart', $post_date );
@@ -906,6 +906,9 @@ function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.24  2010/01/30 18:55:36  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.23  2009/10/16 20:33:42  tblue246
  * Avoid problems caused by mbstring.func_overload
  *

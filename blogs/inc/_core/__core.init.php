@@ -777,11 +777,14 @@ class _core_Module extends Module
 	}
 }
 
-$_core_Module = & new _core_Module();
+$_core_Module = new _core_Module();
 
 
 /*
  * $Log$
+ * Revision 1.58  2010/01/30 18:55:15  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.57  2010/01/10 23:24:09  fplanque
  * crumbs...
  *

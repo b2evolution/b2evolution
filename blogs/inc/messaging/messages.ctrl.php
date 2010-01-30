@@ -78,7 +78,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'message' );
 		
 		// Insert new message:
-		$edited_Message = & new Message();
+		$edited_Message = new Message();
 		$edited_Message->thread_ID = $thrd_ID;
 
 		// Check permission:
@@ -187,6 +187,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.16  2010/01/15 16:57:38  efy-yury
  * update messaging: crumbs
  *

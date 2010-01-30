@@ -28,7 +28,7 @@ load_funcs( 'skins/_skin.funcs.php' );
 // Note: This is totally optional. General caching must be enabled in Global settings, otherwise this will do nothing.
 // Delete this block if you don't care about page level caching. Don't forget to delete the matching section at the end of the page.
 load_class( '_core/model/_pagecache.class.php', 'PageCache' );
-$PageCache = & new PageCache( NULL );
+$PageCache = new PageCache( NULL );
 // Check for cached content & Start caching if needed:
 if( ! $PageCache->check() )
 {	// Cache miss, we have to generate:
@@ -128,7 +128,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		<ul>
 		<?php	// Get the 3 last posts for each blog:
 
-			$BlogBList = & new ItemList2( $l_Blog, NULL, 'now', 3 );
+			$BlogBList = new ItemList2( $l_Blog, NULL, 'now', 3 );
 
 			$BlogBList->set_filters( array(
 					'order' => 'DESC',

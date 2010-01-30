@@ -91,7 +91,7 @@ switch( $action )
 	case 'create_new': // Record Userfield and create new
 	case 'create_copy': // Record Userfield and create similar
 		// Insert new user field...:
-		$edited_Userfield = & new Userfield();
+		$edited_Userfield = new Userfield();
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'userfield' );

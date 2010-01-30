@@ -82,7 +82,7 @@ switch( $action )
 	case 'create_new': // Record goal and create new
 	case 'create_copy': // Record goal and create similar
 		// Insert new file type...:
-		$edited_Goal = & new Goal();
+		$edited_Goal = new Goal();
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'goal' );
@@ -287,6 +287,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2010/01/30 18:55:33  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.21  2010/01/10 23:24:09  fplanque
  * crumbs...
  *

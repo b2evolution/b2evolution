@@ -39,7 +39,7 @@ $DB->query( 'UPDATE T_messaging__threadstatus
 
 // Select all recipients
 
-$recipients_SQL = & new SQL();
+$recipients_SQL = new SQL();
 
 $recipients_SQL->SELECT( 'GROUP_CONCAT(u.user_login ORDER BY u.user_login SEPARATOR \',\')' );
 
@@ -53,7 +53,7 @@ $recipients = explode( ',', $DB->get_var( $recipients_SQL->get() ) );
 
 // Select unread recipients
 
-$unread_recipients_SQL = & new SQL();
+$unread_recipients_SQL = new SQL();
 
 $unread_recipients_SQL->SELECT( 'mm.msg_ID, GROUP_CONCAT(uu.user_login ORDER BY uu.user_login SEPARATOR \',\') AS msg_unread' );
 
@@ -106,7 +106,7 @@ foreach( $DB->get_results( $unread_recipients_SQL->get() ) as $row )
 
 // Create SELECT query:
 
-$select_SQL = & new SQL();
+$select_SQL = new SQL();
 
 $select_SQL->SELECT( 	'mm.msg_ID, mm.msg_author_user_ID, mm.msg_thread_ID, mm.msg_datetime,
 						u.user_ID AS msg_user_ID, u.user_login AS msg_author,
@@ -122,7 +122,7 @@ $select_SQL->ORDER_BY( 'mm.msg_datetime' );
 
 // Create COUNT query
 
-$count_SQL = & new SQL();
+$count_SQL = new SQL();
 $count_SQL->SELECT( 'COUNT(*)' );
 
 // Get params from request
@@ -144,7 +144,7 @@ else
 
 // Create result set:
 
-$Results = & new Results( $select_SQL->get(), 'msg_', '', 0, $count_SQL->get() );
+$Results = new Results( $select_SQL->get(), 'msg_', '', 0, $count_SQL->get() );
 
 $Results->Cache = & get_MessageCache();
 
@@ -290,6 +290,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.27  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.26  2010/01/03 16:28:35  fplanque
  * set some crumbs (needs checking)
  *

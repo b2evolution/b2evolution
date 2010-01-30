@@ -92,7 +92,7 @@ switch( $action )
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
 
-		$edited_Blog = & new Blog( NULL );
+		$edited_Blog = new Blog( NULL );
 
 		param( 'kind', 'string', true );
 		$edited_Blog->init_by_kind( $kind );
@@ -111,7 +111,7 @@ switch( $action )
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
 
-		$edited_Blog = & new Blog( NULL );
+		$edited_Blog = new Blog( NULL );
 
 		param( 'kind', 'string', true );
 		$edited_Blog->init_by_kind( $kind );
@@ -157,7 +157,7 @@ switch( $action )
 
 			// Create default category:
 			load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
-			$edited_Chapter = & new Chapter( NULL, $edited_Blog->ID );
+			$edited_Chapter = new Chapter( NULL, $edited_Blog->ID );
 			$edited_Chapter->set( 'name', T_('Uncategorized') );
 			$edited_Chapter->set( 'urlname', 'main' );
 			$edited_Chapter->dbinsert();
@@ -413,7 +413,7 @@ switch($action)
 
 			<?php
 
-				$Form = & new Form( NULL, '', 'get', 'none' );
+				$Form = new Form( NULL, '', 'get', 'none' );
 
 				$Form->begin_form( 'inline' );
 
@@ -468,6 +468,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2010/01/30 18:55:21  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.19  2010/01/13 19:31:06  efy-yury
  * update collections: crumbs, redirect
  *

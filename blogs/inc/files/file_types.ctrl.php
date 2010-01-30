@@ -67,7 +67,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		$edited_Filetype = & new Filetype();
+		$edited_Filetype = new Filetype();
 		$AdminUI->append_to_titlearea( T_('Add a file type...') );
 		break;
 
@@ -99,7 +99,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'filetype' );
 		
-		$edited_Filetype = & new Filetype();
+		$edited_Filetype = new Filetype();
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -120,7 +120,7 @@ switch( $action )
 			elseif( $submit == T_('Record, then Create New') ) // TODO: do not use submit value for this!
 			{
 				$action = 'new';
-				$edited_Filetype = & new Filetype();
+				$edited_Filetype = new Filetype();
 			}
 			else
 			{
@@ -252,6 +252,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2010/01/30 18:55:24  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.12  2010/01/23 12:54:49  efy-yury
  * add: fadeouts
  *

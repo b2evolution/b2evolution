@@ -677,7 +677,7 @@ for ( $index = 1; $index <= $imap_obj->Nmsgs; $index++ )
 	if( $do_real_posting )
 	{
 		// INSERT NEW POST INTO DB:
-		$edited_Item = & new Item();
+		$edited_Item = new Item();
 
 		$post_ID = $edited_Item->insert( $current_User->ID, $post_title, $content, $post_date, $post_category, array(), 'published', $current_User->locale );
 
@@ -712,6 +712,9 @@ if( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.43  2010/01/30 18:55:15  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.42  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *

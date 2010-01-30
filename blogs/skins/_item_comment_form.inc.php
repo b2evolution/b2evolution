@@ -69,7 +69,7 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	}
 	else
 	{ // New comment:
-		$Comment = & new Comment();
+		$Comment = new Comment();
 		if( $PageCache->is_collecting )
 		{	// This page is going into the cache, we don't want personal data cached!!!
 			// fp> These fields should be filled out locally with Javascript tapping directly into the cookies. Anyone JS savvy enough to do that?
@@ -223,6 +223,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.16  2010/01/30 18:55:37  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.15  2010/01/03 13:45:37  fplanque
  * set some crumbs (needs checking)
  *

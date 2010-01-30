@@ -145,7 +145,7 @@ class coll_comment_list_Widget extends ComponentWidget
 		$limit = $this->disp_params[ 'limit' ];
 		$order = $this->disp_params[ 'disp_order' ];
 
-		$CommentList = & new CommentList( $listBlog, "'comment','trackback','pingback'", array('published'), '',	'',	$order,	'',	$limit );
+		$CommentList = new CommentList( $listBlog, "'comment','trackback','pingback'", array('published'), '',	'',	$order,	'',	$limit );
 
 		echo $this->disp_params[ 'block_start'];
 
@@ -180,6 +180,9 @@ class coll_comment_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.17  2010/01/30 18:55:35  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.16  2009/09/26 12:00:44  tblue246
  * Minor/coding style
  *

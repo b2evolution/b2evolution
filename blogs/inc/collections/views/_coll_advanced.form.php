@@ -36,7 +36,7 @@ global $Plugins;
 
 global $basepath, $rsc_url, $dispatcher;
 
-$Form = & new Form( NULL, 'blogadvanced_checkchanges' );
+$Form = new Form( NULL, 'blogadvanced_checkchanges' );
 
 $Form->begin_form( 'fform' );
 
@@ -190,6 +190,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.25  2010/01/30 18:55:21  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.24  2010/01/03 13:45:36  fplanque
  * set some crumbs (needs checking)
  *

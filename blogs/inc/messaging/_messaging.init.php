@@ -266,7 +266,7 @@ class messaging_Module extends Module
 			);
 
 			// Count unread messages for current user
-			$SQL = & new SQL();
+			$SQL = new SQL();
 
 			$SQL->SELECT( 'COUNT(*)' );
 
@@ -328,10 +328,13 @@ class messaging_Module extends Module
 	}
 }
 
-$messaging_Module = & new messaging_Module();
+$messaging_Module = new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.19  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.18  2009/10/28 14:55:11  efy-maxim
  * pluggable permissions separated by blocks in group form
  *

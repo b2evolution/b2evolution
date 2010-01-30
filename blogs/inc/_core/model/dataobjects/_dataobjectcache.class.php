@@ -172,7 +172,7 @@ class DataObjectCache
 	/**
 	 * Instanciate a new object within this cache
 	 */
-	function & new_obj( $row = NULL )
+	function new_obj( $row = NULL )
 	{
 		$objtype = $this->objtype;
 
@@ -760,6 +760,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.21  2010/01/30 18:55:16  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.20  2009/12/11 23:18:23  fplanque
  * doc
  *

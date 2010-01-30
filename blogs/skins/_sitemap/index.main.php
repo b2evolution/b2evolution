@@ -17,7 +17,7 @@ $Timer->resume( 'prepare list' );
 load_class( '/items/model/_itemlistlight.class.php', 'ItemListLight' );
 
 // Use a LIGHT Item List:  (Sitemap = 50000 entries max)
-$MainList = & new ItemListLight( $Blog, $timestamp_min, $timestamp_max, 50000 );
+$MainList = new ItemListLight( $Blog, $timestamp_min, $timestamp_max, 50000 );
 
 // By default we only want items that have the MAIN cat in this blog,
 // i-e with its canonical URL in this blog (cross posted stuff will be listed in its main blog)

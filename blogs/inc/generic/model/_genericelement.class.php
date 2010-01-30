@@ -106,7 +106,7 @@ class GenericElement extends DataObject
 		// Determine if we are creating or updating...
 		$creating = is_create_action( $action );
 
-		$Form = & new Form( NULL, 'form' );
+		$Form = new Form( NULL, 'form' );
 
 		if( !$form_below_list )
 		{ // We need to display a link to cancel editing:
@@ -152,6 +152,9 @@ class GenericElement extends DataObject
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/30 18:55:27  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.5  2010/01/03 13:45:38  fplanque
  * set some crumbs (needs checking)
  *

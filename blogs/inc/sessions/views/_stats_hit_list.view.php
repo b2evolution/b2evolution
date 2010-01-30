@@ -70,7 +70,7 @@ elseif( !empty($remote_IP) ) // TODO: allow combine
 	$CountSQL->WHERE( $filter );
 }
 
-$Results = & new Results( $SQL->get(), 'hits_', '--D', 20, $CountSQL->get() );
+$Results = new Results( $SQL->get(), 'hits_', '--D', 20, $CountSQL->get() );
 
 $Results->title = T_('Recent hits');
 
@@ -182,6 +182,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.12  2010/01/30 18:55:34  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.11  2009/12/08 22:38:13  fplanque
  * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
  *

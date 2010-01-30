@@ -60,14 +60,14 @@ if( $blog )
 
 	load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 
-	$block_item_Widget = & new Widget( 'dash_item' );
+	$block_item_Widget = new Widget( 'dash_item' );
 
 	$nb_blocks_displayed = 0;
 
 	/*
 	 * COMMENTS:
 	 */
-	$CommentList = & new CommentList( $Blog, "'comment','trackback','pingback'", array( 'draft' ), '',	'',	'DESC',	'',	5 );
+	$CommentList = new CommentList( $Blog, "'comment','trackback','pingback'", array( 'draft' ), '',	'',	'DESC',	'',	5 );
 
 	if( $CommentList->result_num_rows )
 	{	// We have drafts
@@ -206,7 +206,7 @@ if( $blog )
 	 * RECENT DRAFTS
 	 */
 	// Create empty List:
-	$ItemList = & new ItemList2( $Blog, NULL, NULL );
+	$ItemList = new ItemList2( $Blog, NULL, NULL );
 
 	// Filter list:
 	$ItemList->set_filters( array(
@@ -271,7 +271,7 @@ if( $blog )
 	 * RECENTLY EDITED
 	 */
 	// Create empty List:
-	$ItemList = & new ItemList2( $Blog, NULL, NULL );
+	$ItemList = new ItemList2( $Blog, NULL, NULL );
 
 	// Filter list:
 	$ItemList->set_filters( array(
@@ -381,7 +381,7 @@ if( $blog )
 	 * RIGHT COL
 	 */
 
-	$side_item_Widget = & new Widget( 'side_item' );
+	$side_item_Widget = new Widget( 'side_item' );
 
 	$side_item_Widget->title = T_('Manage your blog');
 	$side_item_Widget->disp_template_replaced( 'block_start' );
@@ -471,7 +471,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr><td>';
 
-	$block_item_Widget = & new Widget( 'block_item' );
+	$block_item_Widget = new Widget( 'block_item' );
 
 	$block_item_Widget->title = T_('Updates from b2evolution.net');
 	$block_item_Widget->disp_template_replaced( 'block_start' );
@@ -523,7 +523,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	/*
 	 * RIGHT COL
 	 */
-	$side_item_Widget = & new Widget( 'side_item' );
+	$side_item_Widget = new Widget( 'side_item' );
 
 	$side_item_Widget->title = T_('Administrative tasks');
 	$side_item_Widget->disp_template_replaced( 'block_start' );
@@ -563,6 +563,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.53  2010/01/30 18:55:23  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.52  2010/01/29 17:21:38  efy-yury
  * add: crumbs in ajax calls
  *

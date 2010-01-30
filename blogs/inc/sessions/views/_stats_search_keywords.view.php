@@ -73,7 +73,7 @@ if( param_errors_detected() )
 }
 else
 {
-	$SQL = & new SQL();
+	$SQL = new SQL();
 	if( empty( $goal_ID ) && empty($goal_name)  )
 	{	// We're not restricting to one or more Goals, get ALL possible keyphrases:
 		$SQL->FROM( 'T_track__keyphrase INNER JOIN T_hitlog ON keyp_ID = hit_keyphrase_keyp_ID' );
@@ -164,7 +164,7 @@ else
 }
 
 // Create result set:
-$Results = & new Results( $sql, '', $split_engines ? '--D' : '-D' , NULL, $sql_count );
+$Results = new Results( $sql, '', $split_engines ? '--D' : '-D' , NULL, $sql_count );
 
 $Results->title = T_('Keyphrases');
 
@@ -270,6 +270,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/30 18:55:34  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.7  2009/12/08 22:38:13  fplanque
  * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
  *

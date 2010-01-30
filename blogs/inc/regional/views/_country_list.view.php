@@ -40,7 +40,7 @@ global $dispatcher;
 $s = param( 's', 'string', '', true );
 
 // Create query
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( 'ctry_ID, ctry_code, ctry_name, curr_shortcut, curr_code, ctry_enabled' );
 $SQL->FROM( 'T_country	LEFT JOIN T_currency ON ctry_curr_ID=curr_ID' );
 
@@ -51,7 +51,7 @@ if( !empty($s) )
 }
 
 // Create result set:
-$Results = & new Results( $SQL->get(), 'ctry_', '-A' );
+$Results = new Results( $SQL->get(), 'ctry_', '-A' );
 
 $Results->title = T_('Countries list');
 
@@ -217,6 +217,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.18  2010/01/30 18:55:33  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.17  2010/01/16 14:16:32  efy-asimo
  * Currencies/Countries cosmetics and regenerate_url after Enable/Disable
  *

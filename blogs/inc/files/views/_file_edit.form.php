@@ -33,7 +33,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_File;
 
-$Form = & new Form( NULL, 'file_edit' );
+$Form = new Form( NULL, 'file_edit' );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url('fm_mode') );
 
@@ -58,6 +58,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/30 18:55:26  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.5  2010/01/19 21:10:25  efy-yury
  * update: crumbs
  *

@@ -35,7 +35,7 @@ switch( $action )
 
 		global $updates;
 
-		$Form = & new Form( NULL, 'upgrade_form', 'post', 'compact' );
+		$Form = new Form( NULL, 'upgrade_form', 'post', 'compact' );
 
 		$Form->hiddens_by_key( get_memorized( 'action' ) );
 
@@ -102,6 +102,9 @@ switch( $action )
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.6  2009/11/19 12:10:53  efy-maxim
  * Force 'upgrade' for debug mode
  *

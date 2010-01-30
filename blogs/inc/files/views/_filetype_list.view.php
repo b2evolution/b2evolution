@@ -39,11 +39,11 @@ global $rsc_url, $dispatcher;
 global $Session;
 
 // Create result set:
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( '*' );
 $SQL->FROM( 'T_filetypes' );
 
-$Results = & new Results( $SQL->get(), 'ftyp_' );
+$Results = new Results( $SQL->get(), 'ftyp_' );
 $Results->Cache = & get_FiletypeCache();
 $Results->title = T_('File types list');
 
@@ -145,6 +145,9 @@ $Session->delete( 'fadeout_id');
 
 /*
  * $Log$
+ * Revision 1.11  2010/01/30 18:55:27  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.10  2010/01/28 03:42:20  fplanque
  * minor
  *

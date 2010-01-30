@@ -68,7 +68,7 @@ foreach( $core_componentwidget_defs as $code )
 		$classname = $code.'_Widget';
 		load_class( 'widgets/widgets/_'.$code.'.widget.php', $classname);
 
-		$ComponentWidget = & new $classname( NULL, 'core', $code );
+		$ComponentWidget = new $classname( NULL, 'core', $code );
 
 		echo '<li>';
 		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.'&amp;'.url_crumb('widget') ).'" title="'.T_('Add this widget to the container').'">';
@@ -117,6 +117,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.27  2010/01/30 18:55:35  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.26  2010/01/16 14:27:04  efy-yury
  * crumbs, fadeouts, redirect, action_icon
  *

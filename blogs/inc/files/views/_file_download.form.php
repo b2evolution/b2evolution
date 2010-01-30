@@ -35,7 +35,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $zipname, $exclude_sd, $selected_Filelist;
 
-$Form = & new Form( NULL, 'fm_download_checkchanges' );
+$Form = new Form( NULL, 'fm_download_checkchanges' );
 
 $Form->global_icon( T_('Cancel download!'), 'close', regenerate_url() );
 
@@ -65,6 +65,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.4  2010/01/30 18:55:26  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.3  2009/03/08 23:57:43  fplanque
  * 2009
  *

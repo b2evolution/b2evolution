@@ -171,7 +171,7 @@ class files_Module extends Module
 	}
 }
 
-$files_Module = & new files_Module();
+$files_Module = new files_Module();
 
 
 /*

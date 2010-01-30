@@ -27,7 +27,7 @@
  * @author evofactory-test
  * @author fplanque: Francois Planque.
  *
- * @version $Id$
+ * @version _userfields.view.php,v 1.9 2010/01/03 13:10:57 fplanque Exp
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -40,7 +40,7 @@ $s = param( 's', 'string', '', true );
 $s_type = param( 's_type', 'string', '', true );
 
 // Create query
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( '*' );
 $SQL->FROM( 'T_users__fielddefs' );
 
@@ -56,7 +56,7 @@ if( !empty( $s_type ) )
 }
 
 // Create result set:
-$Results = & new Results( $SQL->get(), 'ufdf_', 'A' );
+$Results = new Results( $SQL->get(), 'ufdf_', 'A' );
 
 $Results->title = T_('User fields');
 
@@ -135,7 +135,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 $Results->display();
 
 /*
- * $Log$
+ * _userfields.view.php,v
  * Revision 1.9  2010/01/03 13:10:57  fplanque
  * set some crumbs (needs checking)
  *

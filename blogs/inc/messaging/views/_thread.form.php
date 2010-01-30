@@ -34,7 +34,7 @@ global $DB, $action;
 
 $creating = is_create_action( $action );
 
-$Form = & new Form( NULL, 'thread_checkchanges', 'post', 'compact' );
+$Form = new Form( NULL, 'thread_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
@@ -70,6 +70,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 
 /*
  * $Log$
+ * Revision 1.14  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.13  2010/01/15 16:57:38  efy-yury
  * update messaging: crumbs
  *

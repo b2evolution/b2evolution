@@ -38,7 +38,7 @@ global $dispatcher;
 /*
  * Display comments:
  */
-$block_item_Widget = & new Widget( 'block_item' );
+$block_item_Widget = new Widget( 'block_item' );
 
 $block_item_Widget->title = T_('Feedback (Comments, Trackbacks...)');
 $block_item_Widget->disp_template_replaced( 'block_start' );
@@ -54,6 +54,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/30 18:55:22  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.5  2009/03/08 23:57:42  fplanque
  * 2009
  *

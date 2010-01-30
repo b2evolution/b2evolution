@@ -35,7 +35,7 @@ global $edited_File;
 
 global $blog;
 
-$Form = & new Form( NULL, 'fm_properties_checkchanges' );
+$Form = new Form( NULL, 'fm_properties_checkchanges' );
 
 $Form->global_icon( T_('Close properties!'), 'close', regenerate_url() );
 
@@ -85,6 +85,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/30 18:55:27  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.8  2010/01/22 20:20:21  efy-asimo
  * Remove File manager rename file
  *

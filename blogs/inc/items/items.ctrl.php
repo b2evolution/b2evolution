@@ -1244,7 +1244,7 @@ switch( $action )
 			// would be used for moderation rules.
 			if( $Blog->get( 'notes' ) )
 			{
-				$block_item_Widget = & new Widget( 'block_item' );
+				$block_item_Widget = new Widget( 'block_item' );
 				$block_item_Widget->title = T_('Notes');
 				// show a quicklink to edit if user has permission:
 /* fp> TODO: use an action icon (will appear on the right)
@@ -1275,6 +1275,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.87  2010/01/30 18:55:28  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.86  2010/01/30 10:29:07  efy-yury
  * add: crumbs
  *

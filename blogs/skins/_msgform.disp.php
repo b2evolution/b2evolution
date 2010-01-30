@@ -93,7 +93,7 @@ elseif( ! empty($comment_id) )
 
 	if( $row )
 	{
-		$Comment = & new Comment( $row );
+		$Comment = new Comment( $row );
 
 		if( $comment_author_User = & $Comment->get_author_User() )
 		{ // Source comment is from a registered user:
@@ -207,6 +207,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/30 18:55:37  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.9  2010/01/03 13:45:37  fplanque
  * set some crumbs (needs checking)
  *

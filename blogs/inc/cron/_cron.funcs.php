@@ -76,7 +76,7 @@ function call_job( $job_name, $job_params = array() )
 		if( ! is_object($Plugins) )
 		{
 			load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
-			$Plugins = & new Plugins();
+			$Plugins = new Plugins();
 		}
 
 		$Plugin = & $Plugins->get_by_ID( $match[1] );
@@ -128,6 +128,9 @@ function call_job( $job_name, $job_params = array() )
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/30 18:55:22  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.9  2009/09/19 13:14:55  blueyed
  * Fix indent
  *

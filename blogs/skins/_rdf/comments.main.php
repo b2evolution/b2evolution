@@ -17,12 +17,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 if( isset($Item) )
 {	// Comments for a specific Item:
-  $CommentList = & new CommentList( $Blog, "'comment'", array('published'), $Item->ID,
+  $CommentList = new CommentList( $Blog, "'comment'", array('published'), $Item->ID,
   																	'', 'DESC', '', $Blog->get_setting('posts_per_feed') );
 }
 else
 {	// Comments for the blog:
-  $CommentList = & new CommentList( $Blog, "'comment'", array('published'), '',
+  $CommentList = new CommentList( $Blog, "'comment'", array('published'), '',
   																	'',	'DESC',	'',	$Blog->get_setting('posts_per_feed') );
 }
 

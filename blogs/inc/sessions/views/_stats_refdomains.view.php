@@ -52,7 +52,7 @@ if( !$dtyp_normal && !$dtyp_searcheng && !$dtyp_aggregator && !$dtyp_unknown )
 
 echo '<h2>'.T_('Referring domains').'</h2>';
 
-$SQL = & new SQL();
+$SQL = new SQL();
 
 $selected_agnt_types = array();
 if( $dtyp_normal ) $selected_agnt_types[] = "'normal'";
@@ -80,12 +80,12 @@ $total_hit_count = $DB->get_var( $SQL->get(), 0, 0, 'Get total hit count - refer
 $SQL->SELECT( 'SQL_NO_CACHE dom_name, dom_status, dom_type, COUNT( * ) AS hit_count' );
 $SQL->GROUP_BY( 'dom_ID' );
 
-$CountSQL = & new SQL();
+$CountSQL = new SQL();
 $CountSQL->SELECT( 'SQL_NO_CACHE COUNT( DISTINCT dom_ID )' );
 $CountSQL->FROM( $SQL->get_from( '' ) );
 $CountSQL->WHERE( $SQL->get_where( '' ) );
 
-$Results = & new Results( $SQL->get(), 'refdom_', '---D', 20, $CountSQL->get() );
+$Results = new Results( $SQL->get(), 'refdom_', '---D', 20, $CountSQL->get() );
 
 /**
  * Callback to add filters on top of the result set
@@ -160,6 +160,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/30 18:55:34  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.5  2009/09/25 13:09:36  efy-vyacheslav
  * Using the SQL class to prepare queries
  *

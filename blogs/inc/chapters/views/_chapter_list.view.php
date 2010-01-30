@@ -175,7 +175,7 @@ $callbacks = array(
 
 //____________________________________ Display generic categories _____________________________________
 
-$Table = & new Table();
+$Table = new Table();
 
 $Table->title = sprintf( T_('Categories for blog: %s'), $Blog->get_maxlen_name( 50 ) );
 
@@ -246,6 +246,9 @@ echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categori
 $Session->delete( 'fadeout_array');
 /*
  * $Log$
+ * Revision 1.21  2010/01/30 18:55:20  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.20  2010/01/13 19:19:47  efy-yury
  * update cahpters: crumbs, fadeouts, redirect, action_icon
  *

@@ -456,7 +456,7 @@ function mw_getrecentposts( $m )
 
 	// Get the posts to display:
 	load_class( 'items/model/_itemlist.class.php', 'ItemList' );
-	$MainList = & new ItemList2( $Blog, NULL, NULL, $numposts );
+	$MainList = new ItemList2( $Blog, NULL, NULL, $numposts );
 
 	// Protected and private get checked by statuses_where_clause().
 	$statuses = array( 'published', 'redirected', 'protected', 'private' );
@@ -691,6 +691,9 @@ $xmlrpc_procs['metaWeblog.getUsersBlogs'] = array(
 
 /*
  * $Log$
+ * Revision 1.28  2010/01/30 18:55:36  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.27  2009/09/25 07:33:31  efy-cantor
  * replace get_cache to get_*cache
  *

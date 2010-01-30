@@ -41,7 +41,7 @@ global $ItemList;
 
 load_funcs( 'skins/_skin.funcs.php' );
 
-$Widget = & new Widget();
+$Widget = new Widget();
 $template = $AdminUI->get_template( 'side_item' );
 
 $Widget->title = format_to_output( $Blog->get_maxlen_name( 22 ), 'htmlbody' );
@@ -58,7 +58,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 
 echo $template['block_end'];
 
-$Widget = & new Widget();
+$Widget = new Widget();
 $Widget->title = T_('Filters');
 if( $ItemList->is_filtered() )
 {	// List is filtered, offer option to reset filters:
@@ -66,7 +66,7 @@ if( $ItemList->is_filtered() )
 }
 echo $Widget->replace_vars( $template['block_start'] );
 
-	$Form = & new Form( NULL, 'resetform', 'get', 'none' );
+	$Form = new Form( NULL, 'resetform', 'get', 'none' );
 
 	$Form->begin_form( '' );
 
@@ -270,6 +270,9 @@ echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.17  2010/01/30 18:55:31  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.16  2009/09/26 12:00:43  tblue246
  * Minor/coding style
  *

@@ -154,7 +154,7 @@ class SkinCache extends DataObjectCache
 	/**
 	 * Instanciate a new object within this cache
 	 */
-	function & new_obj( $row = NULL, $skin_folder = NULL )
+	function new_obj( $row = NULL, $skin_folder = NULL )
 	{
 		if( is_null($skin_folder) )
 		{	// This happens when using the default skin
@@ -187,6 +187,9 @@ class SkinCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.6  2010/01/30 18:55:34  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.5  2009/09/14 13:42:44  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

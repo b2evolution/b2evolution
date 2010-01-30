@@ -268,7 +268,7 @@ class Message extends DataObject
 
 		// select contacts of the current user
 
-		$SQL = & new SQL();
+		$SQL = new SQL();
 
 		$SQL->SELECT( 'mct_to_user_ID' );
 		$SQL->FROM( 'T_messaging__contact' );
@@ -320,7 +320,7 @@ class Message extends DataObject
 		// Also, it can't be improved right now because it depends of
 		// (pls. see blueyed's comment for $DB->query() function)
 
-		$select_SQL = & new SQL();
+		$select_SQL = new SQL();
 		$select_SQL->SELECT( 'GROUP_CONCAT(tsta_user_ID SEPARATOR \',\')' );
 		$select_SQL->FROM( 'T_messaging__threadstatus' );
 		$select_SQL->WHERE( 'tsta_thread_ID = '.$this->Thread->ID );
@@ -417,7 +417,7 @@ class Message extends DataObject
 		global $app_name;
 
 		// Select recipients of the current thread:
-		$SQL = & new SQL();
+		$SQL = new SQL();
 		$SQL->SELECT( 'u.user_login, u.user_email' );
 		$SQL->FROM( 'T_messaging__threadstatus ts
 						INNER JOIN T_messaging__contact c
@@ -478,6 +478,9 @@ class Message extends DataObject
 
 /*
  * $Log$
+ * Revision 1.25  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.24  2009/10/25 23:39:27  fplanque
  * doc
  *

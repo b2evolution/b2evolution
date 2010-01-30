@@ -16,16 +16,16 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Create result set:
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( 'T_skins__skin.*, COUNT(blog_ID) AS nb_blogs' );
 $SQL->FROM( 'T_skins__skin LEFT JOIN T_blogs ON skin_ID = blog_skin_ID' );
 $SQL->GROUP_BY( 'skin_ID' );
 
-$CountSQL = & new SQL();
+$CountSQL = new SQL();
 $CountSQL->SELECT( 'COUNT( * )' );
 $CountSQL->FROM( 'T_skins__skin' );
 
-$Results = & new Results( $SQL->get(), '', '', NULL, $CountSQL->get() );
+$Results = new Results( $SQL->get(), '', '', NULL, $CountSQL->get() );
 
 $Results->Cache = & get_SkinCache();
 
@@ -97,6 +97,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/30 18:55:34  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.8  2010/01/03 13:10:57  fplanque
  * set some crumbs (needs checking)
  *

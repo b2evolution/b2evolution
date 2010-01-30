@@ -67,7 +67,7 @@ switch( $action )
 	case 'start':
 	default:
 		// STEP 1: Check for updates.
-		$block_item_Widget = & new Widget( 'block_item' );
+		$block_item_Widget = new Widget( 'block_item' );
 		$block_item_Widget->title = T_('Updates from b2evolution.net');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
@@ -111,7 +111,7 @@ switch( $action )
 
 	case 'download':
 		// STEP 2: DOWNLOAD.
-		$block_item_Widget = & new Widget( 'block_item' );
+		$block_item_Widget = new Widget( 'block_item' );
 		$block_item_Widget->title = T_('Downloading, unzipping & installing package...');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
@@ -142,7 +142,7 @@ switch( $action )
 		// STEP 3: UNZIP.
 		if( !isset( $block_item_Widget ) )
 		{
-			$block_item_Widget = & new Widget( 'block_item' );
+			$block_item_Widget = new Widget( 'block_item' );
 			$block_item_Widget->title = T_('Unzipping & installing package...');
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
@@ -183,7 +183,7 @@ switch( $action )
 		// STEP 4: INSTALL.
 		if( !isset( $block_item_Widget ) )
 		{
-			$block_item_Widget = & new Widget( 'block_item' );
+			$block_item_Widget = new Widget( 'block_item' );
 			$block_item_Widget->title = T_('Installing package...');
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
@@ -210,7 +210,7 @@ switch( $action )
 
 				// Load Backup class (PHP4) and backup all of the folders and files
 				load_class( 'maintenance/model/_backup.class.php', 'Backup' );
-				$Backup = & new Backup();
+				$Backup = new Backup();
 				$Backup->include_all();
 
 				if( !function_exists('gzopen') )
@@ -292,6 +292,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/30 18:55:32  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.9  2009/12/06 22:55:18  fplanque
  * Started breadcrumbs feature in admin.
  * Work in progress. Help welcome ;)

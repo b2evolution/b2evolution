@@ -22,7 +22,7 @@ global $edited_Blog;
 
 global $admin_url, $dispatcher;
 
-$block_item_Widget = & new Widget( 'block_item' );
+$block_item_Widget = new Widget( 'block_item' );
 
 $block_item_Widget->title = T_('Choose a skin');
 
@@ -59,6 +59,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.10  2010/01/30 18:55:34  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.9  2010/01/13 22:48:57  fplanque
  * Missing crumbs
  *

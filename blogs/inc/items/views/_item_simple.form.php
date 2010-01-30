@@ -51,7 +51,7 @@ global $redirect_to;
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
 
-$Form = & new Form( NULL, 'item_checkchanges', 'post' );
+$Form = new Form( NULL, 'item_checkchanges', 'post' );
 $Form->labelstart = '<strong>';
 $Form->labelend = "</strong>\n";
 
@@ -267,6 +267,9 @@ echo_publishnowbutton_js();
 
 /*
  * $Log$
+ * Revision 1.33  2010/01/30 18:55:31  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.32  2010/01/03 13:45:36  fplanque
  * set some crumbs (needs checking)
  *

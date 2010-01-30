@@ -113,7 +113,7 @@ switch( $action )
 
 		$DB->begin();
 
-		$new_User = & new User();
+		$new_User = new User();
 		$new_User->set( 'login', $login );
 		$new_User->set( 'pass', md5($pass1) ); // encrypted
 		$new_User->set( 'nickname', $login );
@@ -225,6 +225,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.102  2010/01/30 18:55:15  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.101  2009/11/21 13:31:57  efy-maxim
  * 1. users controller has been refactored to users and user controllers
  * 2. avatar tab

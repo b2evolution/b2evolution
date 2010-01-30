@@ -149,7 +149,7 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 	echo implode( ', ', $disp_title);
 	echo $params['after_section_title'];
 
-	$CommentList = & new CommentList( NULL, implode(',', $type_list), array('published'), $Item->ID, '', $Blog->get_setting( 'comments_orderdir' ) );
+	$CommentList = new CommentList( NULL, implode(',', $type_list), array('published'), $Item->ID, '', $Blog->get_setting( 'comments_orderdir' ) );
 ?>
 
 <ol class="commentlist">
@@ -283,7 +283,7 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	}
 	else
 	{ // New comment:
-		$Comment = & new Comment();
+		$Comment = new Comment();
 		$comment_author = isset($_COOKIE[$cookie_name]) ? trim($_COOKIE[$cookie_name]) : '';
 		$comment_author_email = isset($_COOKIE[$cookie_email]) ? trim($_COOKIE[$cookie_email]) : '';
 		$comment_author_url = isset($_COOKIE[$cookie_url]) ? trim($_COOKIE[$cookie_url]) : '';
@@ -300,7 +300,7 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	echo $params['form_title_end'];
 
 
-	$Form = & new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post' );
+	$Form = new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post' );
 	$Form->begin_form( 'bComment', '', array( 'target' => '_self' ) );
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.

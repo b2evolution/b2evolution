@@ -120,7 +120,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'itemtype' );
 		
-		$edited_Itemtype = & new ItemType();
+		$edited_Itemtype = new ItemType();
 
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -321,6 +321,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2010/01/30 18:55:28  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.15  2010/01/19 19:38:44  fplanque
  * minor
  *

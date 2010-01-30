@@ -126,7 +126,7 @@ switch( $action )
 	case 'create_new': // Record currency and create new
 	case 'create_copy': // Record currency and create similar
 		// Insert new currency:
-		$edited_Currency = & new Currency();
+		$edited_Currency = new Currency();
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'currency' );
@@ -309,6 +309,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2010/01/30 18:55:33  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.15  2010/01/20 20:08:32  efy-asimo
  * Countries&Currencies redirect fix + RSS/Atom feeds image size select list
  *

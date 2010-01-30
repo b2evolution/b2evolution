@@ -33,7 +33,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $edited_Skin;
 
 
-$Form = & new Form( NULL, 'skin_checkchanges' );
+$Form = new Form( NULL, 'skin_checkchanges' );
 
 $Form->global_icon( T_('Uninstall this skin!'), 'delete', regenerate_url( 'action', 'action=delete' ) );
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
@@ -80,6 +80,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.8  2010/01/30 18:55:34  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.7  2010/01/03 13:45:37  fplanque
  * set some crumbs (needs checking)
  *

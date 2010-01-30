@@ -307,7 +307,7 @@ class ChapterCache extends GenericCategoryCache
  	 * @param object|NULL
  	 * @param integer|NULL subset to use for new object
 	 */
-	function & new_obj( $row = NULL, $subset_ID = NULL )
+	function new_obj( $row = NULL, $subset_ID = NULL )
 	{
 		// Instantiate a custom object
 		$Chapter = new Chapter( $row, $subset_ID ); // Copy
@@ -318,6 +318,9 @@ class ChapterCache extends GenericCategoryCache
 
 /*
  * $Log$
+ * Revision 1.9  2010/01/30 18:55:20  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.8  2009/09/14 12:29:35  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

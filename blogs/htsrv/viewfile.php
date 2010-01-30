@@ -77,7 +77,7 @@ $FileRootCache = & get_FileRootCache();
 $FileRoot = & $FileRootCache->get_by_ID( $root );
 
 // Create file object
-$selected_File = & new File( $FileRoot->type , $FileRoot->in_type_ID, $path, true );
+$selected_File = new File( $FileRoot->type , $FileRoot->in_type_ID, $path, true );
 
 
 headers_content_mightcache( 'text/html' );		// In most situations, you do NOT want to cache dynamic content!
@@ -257,6 +257,9 @@ switch( $viewtype )
 <?php
 /*
  * $Log$
+ * Revision 1.27  2010/01/30 18:55:15  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.26  2009/12/04 23:27:49  fplanque
  * cleanup Expires: header handling
  *

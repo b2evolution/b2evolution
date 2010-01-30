@@ -49,13 +49,13 @@ if ( !isset( $default_col_order ) )
 }
 
 // Create result set:
-$SQL = & new SQL();
+$SQL = new SQL();
 $SQL->SELECT( $GenericElementCache->dbIDname . ', '
 	. $GenericElementCache->dbprefix . 'name, '
 	. $GenericElementCache->dbprefix . 'order' );
 $SQL->FROM( $GenericElementCache->dbtablename );
 
-$Results = & new Results( $SQL->get(), $GenericElementCache->dbprefix, $default_col_order );
+$Results = new Results( $SQL->get(), $GenericElementCache->dbprefix, $default_col_order );
 
 if( isset( $list_title ) )
 {
@@ -141,6 +141,9 @@ $Results->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.7  2010/01/30 18:55:28  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.6  2010/01/03 13:10:57  fplanque
  * set some crumbs (needs checking)
  *

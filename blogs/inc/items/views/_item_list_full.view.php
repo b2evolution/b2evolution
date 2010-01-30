@@ -56,7 +56,7 @@ $postIDarray = $ItemList->get_page_ID_array();
 
 
 
-$block_item_Widget = & new Widget( 'block_item' );
+$block_item_Widget = new Widget( 'block_item' );
 
 if( $action == 'view' )
 {	// We are displaying a single post:
@@ -346,7 +346,7 @@ while( $Item = & $ItemList->get_item() )
 
 			<?php
 
-			$Form = & new Form( $htsrv_url.'comment_post.php', 'comment_checkchanges' );
+			$Form = new Form( $htsrv_url.'comment_post.php', 'comment_checkchanges' );
 
 			$Form->begin_form( 'bComment' );
 
@@ -396,6 +396,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.29  2010/01/30 18:55:31  blueyed
+ * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
+ *
  * Revision 1.28  2010/01/19 21:10:28  efy-yury
  * update: crumbs
  *

@@ -33,7 +33,7 @@ class ExtLibsTestCase extends EvoUnitTestCase
 
 	/**
 	 * Test {@link XHTML_Validator::check()} for encoding issues.
-	 * NOTE: assignment by "& new" is required for PHP4! See also http://de3.php.net/manual/en/function.xml-set-object.php#46107
+	 * NOTE: assignment by "new" is required for PHP4! See also http://de3.php.net/manual/en/function.xml-set-object.php#46107
 	 *       Alternatively, multiple vars for each test may work, or unsetting the last one..
 	 */
 	function test_htmlchecker_check_encoding()
@@ -52,36 +52,36 @@ class ExtLibsTestCase extends EvoUnitTestCase
 		$allow_objects = false;
 
 		// default encoding
-		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects );
+		$SHC = new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects );
 		$SHC->check( 'foo bar' );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'ISO-8859-1' );
+		$SHC = new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'ISO-8859-1' );
 		$SHC->check( 'foo дц bar' );
 
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects );
+		$SHC = new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects );
 		$SHC->check( utf8_encode('foo дц bar') );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'utf-8' );
+		$SHC = new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'utf-8' );
 		$SHC->check( 'foo bar' );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'utf-8' );
+		$SHC = new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'utf-8' );
 		$SHC->check( utf8_encode('foo дц bar' ) );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'utf-8' );
+		$SHC = new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'utf-8' );
 		$SHC->check( 'foo дц bar' );
 		$this->assertFalse( $SHC->isOK() );
 
-		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'iso-8859-1' );
+		$SHC = new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'iso-8859-1' );
 		$SHC->check( 'foo дц bar' );
 		$this->assertTrue( $SHC->isOK() );
 
-		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'iso-8859-15' );
+		$SHC = new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'iso-8859-15' );
 		$SHC->check( utf8_encode('foo д bar') );
 		$this->assertTrue( $SHC->isOK() );
 
@@ -94,7 +94,7 @@ class ExtLibsTestCase extends EvoUnitTestCase
 			$this->assertEqual( $SHC->encoding, 'ISO-8859-15' );
 		}
 
-		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'iso-8859-1' );
+		$SHC = new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects, 'iso-8859-1' );
 		$SHC->check( utf8_encode('foo д bar') );
 		$this->assertTrue( $SHC->isOK() );
 		$this->assertEqual( $SHC->encoding, 'ISO-8859-1' );
@@ -103,7 +103,7 @@ class ExtLibsTestCase extends EvoUnitTestCase
 
 	/**
 	 * Test {@link SafeHtmlChecker::check()}.
-	 * NOTE: assignment by "& new" is required for PHP4! See also http://de3.php.net/manual/en/function.xml-set-object.php#46107
+	 * NOTE: assignment by "new" is required for PHP4! See also http://de3.php.net/manual/en/function.xml-set-object.php#46107
 	 *       Alternatively, multiple vars for each test may work, or unsetting the last one..
 	 */
 	function test_htmlchecker_check()
@@ -116,13 +116,13 @@ class ExtLibsTestCase extends EvoUnitTestCase
 		$allow_javascript = false;
 		$allow_objects = false;
 
-		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects );
+		$SHC = new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects );
 		$SHC->check( '<moo>foo</moo>' );
 		$this->assertEqual( $GLOBALS['Messages']->messages['error'][0],
 			T_('Illegal tag').': <code>moo</code>' );
 		$Messages->clear();
 
-		$SHC = & new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects );
+		$SHC = new XHTML_Validator($context, $allow_css_tweaks, $allow_iframes, $allow_javascript, $allow_objects );
 		$SHC->check( '<img>foo</img>' );
 		$this->assertEqual( $GLOBALS['Messages']->messages['error'][0],
 			sprintf( T_('Tag &lt;%s&gt; may not contain raw character data'), '<code>img</code>' ) );
