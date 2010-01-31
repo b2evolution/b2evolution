@@ -33,7 +33,7 @@ class ExtLibsTestCase extends EvoUnitTestCase
 
 	/**
 	 * Test {@link XHTML_Validator::check()} for encoding issues.
-	 * NOTE: assignment by "new" is required for PHP4! See also http://de3.php.net/manual/en/function.xml-set-object.php#46107
+	 * NOTE: assignment by "& new" is required for PHP4! See also http://de3.php.net/manual/en/function.xml-set-object.php#46107
 	 *       Alternatively, multiple vars for each test may work, or unsetting the last one..
 	 */
 	function test_htmlchecker_check_encoding()
@@ -103,7 +103,7 @@ class ExtLibsTestCase extends EvoUnitTestCase
 
 	/**
 	 * Test {@link SafeHtmlChecker::check()}.
-	 * NOTE: assignment by "new" is required for PHP4! See also http://de3.php.net/manual/en/function.xml-set-object.php#46107
+	 * NOTE: assignment by "& new" is required for PHP4! See also http://de3.php.net/manual/en/function.xml-set-object.php#46107
 	 *       Alternatively, multiple vars for each test may work, or unsetting the last one..
 	 */
 	function test_htmlchecker_check()

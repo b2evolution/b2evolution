@@ -209,8 +209,8 @@
 			$str = $err->faultString();
 		}
 		$struct = array();
-		$struct['faultCode'] =new xmlrpcval($code, 'int');
-		$struct['faultString'] =new xmlrpcval($str, 'string');
+		$struct['faultCode'] = new xmlrpcval($code, 'int');
+		$struct['faultString'] = new xmlrpcval($str, 'string');
 		return new xmlrpcval($struct, 'struct');
 	}
 
@@ -245,7 +245,7 @@
 		}
 		$numParams = $params->arraysize();
 
-		$msg =new xmlrpcmsg($methName->scalarval());
+		$msg = new xmlrpcmsg($methName->scalarval());
 		for($i = 0; $i < $numParams; $i++)
 		{
 			if(!$msg->addParam($params->arraymem($i)))
@@ -821,14 +821,14 @@
 						}
 						else
 						{
-							$r =new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['server_decompress_fail'], $GLOBALS['xmlrpcstr']['server_decompress_fail']);
+							$r = new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['server_decompress_fail'], $GLOBALS['xmlrpcstr']['server_decompress_fail']);
 							return $r;
 						}
 					}
 					else
 					{
 						//error_log('The server sent deflated data. Your php install must have the Zlib extension compiled in to support this.');
-						$r =new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['server_cannot_decompress'], $GLOBALS['xmlrpcstr']['server_cannot_decompress']);
+						$r = new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['server_cannot_decompress'], $GLOBALS['xmlrpcstr']['server_cannot_decompress']);
 						return $r;
 					}
 				}
@@ -1098,11 +1098,11 @@
 					error_log("XML-RPC: xmlrpc_server::execute: function $func registered as method handler does not return an xmlrpcresp object");
 					if (is_a($r, 'xmlrpcval'))
 					{
-						$r =new xmlrpcresp($r);
+						$r = new xmlrpcresp($r);
 					}
 					else
 					{
-						$r =new xmlrpcresp(
+						$r = new xmlrpcresp(
 							0,
 							$GLOBALS['xmlrpcerr']['server_error'],
 							$GLOBALS['xmlrpcstr']['server_error'] . ": function does not return xmlrpcresp object"
@@ -1128,13 +1128,13 @@
 						// an eror response
 						if (is_array($r) && array_key_exists('faultCode', $r) && array_key_exists('faultString', $r))
 						{
-							$r =new xmlrpcresp(0, (integer)$r['faultCode'], (string)$r['faultString']);
+							$r = new xmlrpcresp(0, (integer)$r['faultCode'], (string)$r['faultString']);
 						}
 						else
 						{
 							// functions using EPI api should NOT return resp objects,
 							// so make sure we encode the return type correctly
-							$r =new xmlrpcresp(php_xmlrpc_encode($r, array('extension_api')));
+							$r = new xmlrpcresp(php_xmlrpc_encode($r, array('extension_api')));
 						}
 					}
 					else
@@ -1147,7 +1147,7 @@
 				{
 					// what should we assume here about automatic encoding of datetimes
 					// and php classes instances???
-					$r =new xmlrpcresp(php_xmlrpc_encode($r, array('auto_dates')));
+					$r = new xmlrpcresp(php_xmlrpc_encode($r, array('auto_dates')));
 				}
 			}
 			if($this->debug > 2)
@@ -1204,6 +1204,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2010/01/31 18:11:49  blueyed
+ * Fix previous &new replacements.
+ *
  * Revision 1.4  2010/01/30 18:55:19  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *
