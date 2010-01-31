@@ -3794,14 +3794,17 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 				'star_class'  => 'top',
 			) );
 		$Comment->date();
-		if( $Comment->author_url( '', ' &bull; Url: <span class="bUrl">', '</span>' ) )
+		if( $Comment->author_url( '', ' <span &bull; Url: id="commenturl_'.$Comment->ID.'" <span class="bUrl" >', '</span>' ) )
 		{
 			if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{ // There is an URL and we have permission to ban...
 				// TODO: really ban the base domain! - not by keyword
 				echo ' <a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(get_ban_domain($Comment->author_url))
 					.'&amp;'.url_crumb('antispam').'">'.get_icon( 'ban' ).'</a> ';
+				//echo ' <a href="javascript:delete_comment_url('.$Comment->ID.');" title="'.$title.'" onclick="return confirm(\'';" class=deleteurl'.get_icon( 'delete' ).'</a>';
+				$Comment->deleteurl_link();
 			}
+			echo '</span>';
 		}
 		$Comment->author_email( '', ' &bull; Email: <span class="bEmail">', '</span> &bull; ' );
 		$Comment->author_ip( 'IP: <span class="bIP">', '</span> &bull; ' );
@@ -3953,6 +3956,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.207  2010/01/31 17:39:47  efy-asimo
+ * delete url from comments in dashboard and comments form
+ *
  * Revision 1.206  2010/01/30 18:55:15  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

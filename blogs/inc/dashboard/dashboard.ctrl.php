@@ -178,6 +178,22 @@ if( $blog )
 				jQuery('#' + id).animate({ backgroundColor: color }, 200);
 			}
 
+			// Delete comment author_url
+			function delete_comment_url(id)
+			{
+				var divid = 'commenturl_' + id;
+				fadeIn(divid, '#EE0000');
+
+				var ids = getCommentsIds();
+				
+				$.ajax({
+					type: 'POST',
+					url: '<?php echo $htsrv_url; ?>async.php',
+					data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&action=delete_comment_url' + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
+					success: function(result) { $('#' + divid).remove(); }
+				});
+			}
+
 			-->
 		</script>
 		<?php
@@ -563,6 +579,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.54  2010/01/31 17:40:04  efy-asimo
+ * delete url from comments in dashboard and comments form
+ *
  * Revision 1.53  2010/01/30 18:55:23  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

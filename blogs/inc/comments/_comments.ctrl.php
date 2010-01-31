@@ -39,6 +39,7 @@ switch( $action )
 	case 'update':
 	case 'publish':
 	case 'deprecate':
+	case 'delete_url':
 	case 'update_publish':
 	case 'delete':
 		param( 'comment_ID', 'integer', true );
@@ -195,6 +196,21 @@ switch( $action )
 		break;
 
 
+	case 'delete_url':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+		
+		$edited_Comment->set('author_url', NULL );
+		
+		$edited_Comment->dbupdate();	// Commit update to the DB
+
+		$Messages->add( T_('Comment url has been deleted.'), 'success' );
+
+		header_redirect( $redirect_to );
+		/* exited */
+		break;
+
+
 	case 'delete':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
@@ -300,6 +316,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2010/01/31 17:39:51  efy-asimo
+ * delete url from comments in dashboard and comments form
+ *
  * Revision 1.21  2010/01/29 23:07:01  efy-asimo
  * Publish Comment button
  *

@@ -58,6 +58,7 @@ while( $Comment = & $CommentList->get_next() )
 				// TODO: really ban the base domain! - not by keyword
 				echo ' <a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(get_ban_domain($Comment->author_url))
 					.'">'.get_icon( 'ban' ).'</a> ';
+				$Comment->deleteurl_link(false);
 			}
 			$Comment->author_email( '', ' &middot; Email: <span class="bEmail">', '</span>' );
 			$Comment->author_ip( ' &middot; IP: <span class="bIP">', '</span>' );
@@ -111,6 +112,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.11  2010/01/31 17:40:04  efy-asimo
+ * delete url from comments in dashboard and comments form
+ *
  * Revision 1.10  2010/01/22 13:42:22  efy-isaias
  * avatar
  *

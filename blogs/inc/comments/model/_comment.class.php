@@ -668,6 +668,35 @@ class Comment extends DataObject
 
 
 	/**
+	 * Display delete icon for deleting author_url if user has proper rights
+	 * @param boolean true if create ajax button
+	 * @param glue between url params
+	 */
+	function deleteurl_link( $ajax_button = true, $glue='&amp' )
+	{
+		global $current_User, $admin_url;
+		
+		if( ! is_logged_in() ) return false;
+		
+		$this->get_Item();
+		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get_blog_ID() ) )
+		{ // If User has no permission to edit comments:
+			return false;
+		}
+
+		if( $ajax_button )
+		{
+			echo ' <a href="javascript:delete_comment_url('.$this->ID.');"'.get_icon( 'delete' ).'</a>';
+		}
+		else
+		{
+			$url = $admin_url.'?ctrl=comments&amp;action=delete_url&amp;comment_ID='.$this->ID.'&amp;'.url_crumb('comment') ;
+			echo ' <a href="'.$url.$glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ).'"'.get_icon( 'delete' ).'</a>';
+		}
+	}
+
+
+	/**
 	 * Displays button for deleeing the Comment if user has proper rights
 	 *
 	 * @param string to display before link
@@ -1498,6 +1527,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.43  2010/01/31 17:39:52  efy-asimo
+ * delete url from comments in dashboard and comments form
+ *
  * Revision 1.42  2010/01/13 19:49:45  efy-yury
  * update comments: crumbs
  *

@@ -187,6 +187,20 @@ switch( $action )
 
 		get_comments_awaiting_moderation( $blog );
 		exit(0);
+
+	case 'delete_comment_url':
+		$Session->assert_received_crumb( 'comment' );
+		
+		global $blog;
+		
+		$blog = param( 'blogid', 'integer' );
+		$current_User->check_perm( 'blog_comments', 'edit', true, $blog );
+		
+		$edited_Comment = Comment_get_by_ID( param( 'commentid', 'integer' ) );
+		$edited_Comment->set( 'author_url', null );
+		$edited_Comment->dbupdate();
+		
+		exit(0);
 }
 
 
@@ -223,6 +237,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.44  2010/01/31 17:39:41  efy-asimo
+ * delete url from comments in dashboard and comments form
+ *
  * Revision 1.43  2010/01/30 10:29:05  efy-yury
  * add: crumbs
  *
