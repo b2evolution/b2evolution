@@ -1416,6 +1416,7 @@ class Item extends ItemLight
 
 	/**
 	 * Does the post have different content parts (teaser/extension, devided by "<!--more-->")?
+	 * This is also true for posts that have images with "aftermore" position.
 	 *
 	 * @access public
 	 * @return boolean
@@ -1430,7 +1431,7 @@ class Item extends ItemLight
 
 		$content_page = $this->get_content_page($params['disppage'], $params['format']);
 
-		return strpos($content_page, '<!--more-->') !== false;
+		return strpos($content_page, '<!--more-->') !== false || $this->get_images( array('restrict_to_image_position'=>'aftermore') );
 	}
 
 
@@ -4148,6 +4149,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.176  2010/01/31 19:23:24  blueyed
+ * Item::has_content_parts: return true also if there are images with 'aftermore' position. This avoids having to add a MORE separator into an image-only post.
+ *
  * Revision 1.175  2010/01/30 18:55:30  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

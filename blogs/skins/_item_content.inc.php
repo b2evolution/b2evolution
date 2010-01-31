@@ -160,7 +160,7 @@ switch( $content_mode )
 					'image' =>               $params['image_limit'],
 					'image_link_to' =>       $params['image_link_to'],
 					// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
-					'restrict_to_image_position' => $Item->has_content_parts($params) ? 'teaser' : '',
+					'restrict_to_image_position' => 'teaser',
 				) );
 		}
 
@@ -243,6 +243,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.30  2010/01/31 19:23:43  blueyed
+ * Item::has_content_parts: return true also if there are images with 'aftermore' position. This avoids having to add a MORE separator into an image-only post.
+ *
  * Revision 1.29  2010/01/19 19:38:33  fplanque
  * minor
  *
