@@ -113,13 +113,13 @@ $params = array_merge( array(
 				
 					$Item->edit_link( array( // Link to backoffice for editing
 							'before'    => '',
-							'after'     => '',
+							'after'     => ' | ',
 						) );
 					
 					// Link to comments, trackbacks, etc.:
 					$Item->feedback_link( array(
 							'type' => 'comments',
-							'link_before' => ' | ',
+							'link_before' => '',
 							'link_after' => '',
 							'link_text_zero' => '#',
 							'link_text_one' => '#',

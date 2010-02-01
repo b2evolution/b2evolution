@@ -87,8 +87,8 @@ while( $Item = & mainlist_get_item() )
 	mainlist_page_links( array(
 			'block_start' => '<div class="navigation">',
 			'block_end' => '</div>',
-   		'prev_text' => '&lt;&lt;',
-   		'next_text' => '&gt;&gt;',
+			'prev_text' => '&lt;&lt;',
+			'next_text' => '&gt;&gt;',
 		) );
 	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 ?>

@@ -169,7 +169,7 @@ form {
 label {
 	display: block;
 	font-weight: bold;
-	margin: 8px 0;
+	/*margin: 8px 0;*/
 	color: #fff;
 }
 input, select, textarea {
@@ -491,6 +491,7 @@ div.pageHeader div.widget_core_coll_tagline {
 }
 #sidebar ul ul { margin: 0 0 0 5px; padding: 0; }
 #sidebar ul ul li { border-bottom:1px solid #111111; }
+*+html #sidebar ul ul li{ border: none!important; }
 #sidebar ul ul li:last-child { border: none; }
 
 /* footer */
@@ -624,7 +625,8 @@ div.feedback_feed_msg p img {
 
 div#skin_wrapper form.bComment fieldset div.info {
 	margin:0 0 0 20%;
-	padding-top: 4px;
+	/*padding-top: 4px;*/
+	padding-top: 0.5ex;
 }
 
 div#skin_wrapper form.bComment fieldset div.input {
@@ -836,4 +838,27 @@ th.bCalendarHeaderCell {
 li.widget_core_coll_avatar {
 	text-align: center;
 	border: 0;
+}
+
+#comment_preview {
+	background: #1C1C1C;
+}
+
+div.log_container div.log_success, div.action_messages div.log_success, div.success {
+	background:#1A1A1A none repeat scroll 0 0;
+	border:1px solid #99DD99;
+	color:#00CC00;
+}
+
+div.log_container div, div.action_messages div {
+	background:#1A1A1A none repeat scroll 0 0;
+	border:1px solid #6287C2;
+	margin:1ex auto;
+	padding:1ex;
+}
+
+div.log_container div.log_error, div.action_messages div.log_error, div.error, td.error {
+	background:#1A1A1A none repeat scroll 0 0;
+	border:1px solid #DD9999;
+	color:#EE0000;
 }
