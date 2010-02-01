@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2010-01-09 19:22+0100\n"
-"PO-Revision-Date: 2010-01-16 23:00-0500\n"
+"PO-Revision-Date: 2010-01-31 20:05-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -11699,7 +11699,7 @@ msgstr "Свойства темы"
 
 #: ../../../inc/skins/views/_skin.form.php:52
 msgid "As seen by blog owners"
-msgstr "Как видно по владельцам блогов"
+msgstr "Для владельцев блогов"
 
 #: ../../../inc/skins/views/_skin.form.php:57
 msgid "Normal"
