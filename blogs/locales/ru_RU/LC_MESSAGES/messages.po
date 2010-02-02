@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2010-01-09 19:22+0100\n"
-"PO-Revision-Date: 2010-01-31 20:05-0500\n"
+"PO-Revision-Date: 2010-02-01 23:55-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -813,7 +813,7 @@ msgstr "Ваш профиль был обновлен."
 #: ../../../htsrv/login.php:304
 #, php-format
 msgid "An email has been sent to your email address (%s). Please click on the link therein to validate your account."
-msgstr "Email был отправлен на ваш адрес (%s). Пожалуйста пройдите по ссылке для подтверждения вашей регистрации."
+msgstr "Email был отправлен на ваш адрес (%s). Пожалуйста пройдите по ссылке в письме для подтверждения вашей регистрации."
 
 #: ../../../htsrv/login.php:308
 #: ../../../htsrv/register.php:192
