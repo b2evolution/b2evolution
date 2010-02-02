@@ -48,6 +48,7 @@ global $Settings;
 
 global $pagenow;
 
+global $Session;
 
 global $mode, $admin_url, $rsc_url;
 global $post_comment_status, $trackback_url, $item_tags;
@@ -77,7 +78,17 @@ $Form->begin_form( '', '', $params );
 	$Form->hidden( 'ctrl', 'items' );
 	$Form->hidden( 'blog', $Blog->ID );
 	if( isset( $mode ) )   $Form->hidden( 'mode', $mode );	// used by bookmarklet
-	if( isset( $edited_Item ) )   $Form->hidden( 'post_ID', $edited_Item->ID );
+	if( isset( $edited_Item ) )
+	{
+		$Form->hidden( 'post_ID', $edited_Item->ID );
+		// here we add js code for attaching file popup window
+		if( !empty( $edited_Item->ID ) && ( $Session->get('create_edit_attachment') === true ) )
+		{//item also created => we have $edited_Item->ID for popup window
+			echo_attaching_files_button_js();
+			//clear session variable
+			$Session->delete('create_edit_attachment');
+		}
+	}
 	$Form->hidden( 'redirect_to', $redirect_to );
 
 	// In case we send this to the blog for a preview :
@@ -414,10 +425,14 @@ $Form->end_form();
 
 // ####################### JS BEHAVIORS #########################
 echo_publishnowbutton_js();
+echo_set_is_attachments();
 // require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.59  2010/02/02 21:21:27  efy-yury
+ * update expert form: attachments popup now opens when pushed the button 'Save and start attaching files'
+ *
  * Revision 1.58  2010/01/30 18:55:31  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *
