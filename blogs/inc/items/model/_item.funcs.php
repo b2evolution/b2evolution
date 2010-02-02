@@ -452,7 +452,8 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 	if( $creating )
 	{	// Creating new post
 		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks' ) );
-
+		$Form->hidden( 'is_attachments', 'false' );
+		
 		echo '<table cellspacing="0" cellpadding="0"><tr><td>';
    	$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & start attaching files'), 'SaveEditButton' ) );
 		echo '</td></tr></table>';
@@ -981,6 +982,37 @@ function echo_publish_buttons( $Form, $creating, $edited_Item )
 }
 
 /**
+ * Output JavaScript code to dynamically show popup files attachment window
+ */
+function echo_attaching_files_button_js()
+{
+	global $dispatcher;
+	global $edited_Item;
+	$iframe_name = 'attach_'.generate_random_key( 16 );
+	?>
+	<script type="text/javascript">
+			pop_up_window( '<?php echo $dispatcher; ?>?ctrl=files&amp;mode=upload&amp;iframe_name=<?php echo $iframe_name ?>&amp;fm_mode=link_item&amp;item_ID=<?php echo $edited_Item->ID?>', 'fileman_upload', 1000 );
+	</script>
+	<?php
+}
+
+/**
+ * Output JavaScript code to set hidden filed is_attachments
+ * which indicate that we must show attachments files popup window
+ */
+function echo_set_is_attachments()
+{
+	?>
+	<script type="text/javascript">
+			jQuery( '#itemform_createlinks td input' ).click( function()
+			{
+				jQuery( 'input[name=is_attachments]' ).attr("value", "true");
+			} );
+	</script>
+	<?php
+}
+
+/**
  * Output JavaScript code to dynamically show or hide the "Publish NOW!"
  * button depending on the selected post status.
  *
@@ -1115,6 +1147,9 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 
 /*
  * $Log$
+ * Revision 1.86  2010/02/02 21:17:17  efy-yury
+ * update: attachments popup now opens when pushed the button 'Save and start attaching files'
+ *
  * Revision 1.85  2010/01/30 18:55:30  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

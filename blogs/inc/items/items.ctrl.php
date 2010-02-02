@@ -428,6 +428,14 @@ switch( $action )
 			$edited_Item->dbinsert();
 		}
 
+		param( 'is_attachments', 'string' );
+		// setup here session variable for dynamic create js popup
+		if( !empty( $is_attachments ) && $is_attachments === 'true' )
+		{
+			//print_r($is_attachments);
+			$Session->set('create_edit_attachment', true);
+		}
+
 		// post post-publishing operations:
 		param( 'trackback_url', 'string' );
 		if( !empty( $trackback_url ) )
@@ -1275,6 +1283,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.88  2010/02/02 21:16:35  efy-yury
+ * update: attachments popup now opens when pushed the button 'Save and start attaching files'
+ *
  * Revision 1.87  2010/01/30 18:55:28  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *
