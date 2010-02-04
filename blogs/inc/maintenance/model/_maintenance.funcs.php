@@ -33,11 +33,11 @@ function check_version( $new_version_dir )
 
 	if( $new_version == $current_version )
 	{
-		return T_( 'This package already installed!' );
+		return T_( 'This package is already installed!' );
 	}
 	elseif( $new_version < $current_version )
 	{
-		return T_( 'This is old version!' );
+		return T_( 'This is an old version!' );
 	}
 
 	return NULL;
@@ -351,6 +351,9 @@ function aliases_to_tables( $aliases )
 
 /*
  * $Log$
+ * Revision 1.8  2010/02/04 19:29:53  blueyed
+ * wording
+ *
  * Revision 1.7  2010/01/17 16:15:24  sam2kb
  * Localization clean-up
  *
