@@ -426,10 +426,14 @@ $Form->end_form();
 // ####################### JS BEHAVIORS #########################
 echo_publishnowbutton_js();
 echo_set_is_attachments();
+echo_link_files_js();
 // require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.60  2010/02/04 16:41:19  efy-yury
+ * add "Add/Link files" link
+ *
  * Revision 1.59  2010/02/02 21:21:27  efy-yury
  * update expert form: attachments popup now opens when pushed the button 'Save and start attaching files'
  *

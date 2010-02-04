@@ -451,6 +451,8 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 
 	if( $creating )
 	{	// Creating new post
+		$fieldset_title .= ' - <a id="title_file_add" href="#" >'.get_icon( 'folder', 'imgtag' ).' '.T_('Add/Link files').'</a> <span class="note">(popup)</span>';
+		
 		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks' ) );
 		$Form->hidden( 'is_attachments', 'false' );
 		
@@ -1013,6 +1015,22 @@ function echo_set_is_attachments()
 }
 
 /**
+ * Output JavaScript code for "Add/Link files" link
+ */
+function echo_link_files_js()
+{
+	?>
+	<script type="text/javascript">
+			jQuery( '#title_file_add' ).click( function()
+			{
+				jQuery( 'input[name=is_attachments]' ).attr("value", "true");
+				jQuery( '#itemform_createlinks input[name=actionArray[create_edit]]' ).click();
+			} );
+	</script>
+	<?php
+}
+
+/**
  * Output JavaScript code to dynamically show or hide the "Publish NOW!"
  * button depending on the selected post status.
  *
@@ -1147,6 +1165,9 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 
 /*
  * $Log$
+ * Revision 1.87  2010/02/04 16:41:11  efy-yury
+ * add "Add/Link files" link
+ *
  * Revision 1.86  2010/02/02 21:17:17  efy-yury
  * update: attachments popup now opens when pushed the button 'Save and start attaching files'
  *
