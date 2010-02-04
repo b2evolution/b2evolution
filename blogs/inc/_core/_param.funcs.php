@@ -580,7 +580,7 @@ function check_is_login( $login )
 {
 	if( !user_exists( $login ) )
 	{
- 		return sprintf( T_( 'There is no user with username &laquo;%s&raquo;' ), $login );
+ 		return sprintf( T_( 'There is no user with username &laquo;%s&raquo;.' ), $login );
 	}
 }
 
@@ -601,7 +601,7 @@ function param_check_url( $var, $context, $field_err_msg = NULL )
 
 	if( $error_detail = validate_url( $GLOBALS[$var], $context, ! $Group->perm_bypass_antispam ) )
 	{
-		param_error( $var, sprintf( T_('Supplied URL is invalid. (%s)'), $error_detail ), $field_err_msg );
+		param_error( $var, /* TRANS: %s contains error details */ sprintf( T_('Supplied URL is invalid. (%s)'), $error_detail ), $field_err_msg );
 		return false;
 	}
 	return true;
@@ -618,7 +618,7 @@ function check_is_url( $url )
 {
 	if( !is_url( $url ) )
 	{
-		return T_('Please enter a valid URL, like for example: http://www.b2evolution.net/');
+		return sprintf( T_('Please enter a valid URL, like for example: http://www.b2evolution.net/');
 	}
 }
 
@@ -1123,7 +1123,7 @@ function check_is_phone( $phone )
 {
 	if( !is_phone( $phone ) )
 	{
-		return T_('Please enter a valid phone number like for example: +1 401-555-1234');
+		return sprintf( T_('Please enter a valid phone number like for example: %s.'), '+1 401-555-1234' );
 	}
 }
 
@@ -1875,13 +1875,13 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 		{
 			$errmsg = ($context == 'commenting')
 				? T_('Illegal content found (spam?)')
-				: sprintf( T_('Illegal content found: blacklisted word "%s"'), $block );
+				: sprintf( T_('Illegal content found: blacklisted word "%s".'), $block );
 		}
 		else
 		{
 			$errmsg = ($context == 'commenting')
-				? T_('Illegal content found (spam?)')
-				: sprintf( T_('Illegal content found: blacklisted word &laquo;%s&raquo;'), htmlspecialchars($block) );
+				? T_('Illegal content found (spam?).')
+				: sprintf( T_('Illegal content found: blacklisted word &laquo;%s&raquo;.'), htmlspecialchars($block) );
 		}
 
 		$Messages->add(	$errmsg, 'error' );
@@ -2098,6 +2098,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.59  2010/02/04 19:23:09  blueyed
+ * trans fixes: punctuation.
+ *
  * Revision 1.58  2010/01/30 18:55:16  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *
