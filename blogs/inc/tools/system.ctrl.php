@@ -162,13 +162,13 @@ else
 	$app_age = ($localtimenow - $app_timestamp) / 3600 / 24 / 30;	// approx age in months
 	if( $app_age > 12 )
 	{
-		$msg .= '<p>'.sprintf( T_('Furthermore, this version is old. You should check for newer releases on <a %s>b2evolution.net</a>.'),
-			' href="http://b2evolution.net/downloads/"'	).'</p>';
+		$msg .= '<p>'.sprintf( T_('Furthermore, this version is old. You should check for newer releases on %s.'),
+			'<a href="http://b2evolution.net/downloads/">b2evolution.net</a>' ).'</p>';
 	}
 	elseif( $app_age > 6 )
 	{
-		$msg .= '<p>'.sprintf( T_('Furthermore, This version is aging. You may want to check for newer releases on <a %s>b2evolution.net</a>.'),
-			' href="http://b2evolution.net/downloads/"'	).'</p>';
+		$msg .= '<p>'.sprintf( T_('Furthermore, this version is aging. You may want to check for newer releases on %s..'),
+			'<a href="http://b2evolution.net/downloads/">b2evolution.net</a>' ).'</p>';
 	}
 
 	disp_system_check( 'error', $msg );
@@ -574,6 +574,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.27  2010/02/04 19:37:13  blueyed
+ * trans cleanup
+ *
  * Revision 1.26  2010/01/30 18:55:35  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *
