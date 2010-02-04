@@ -153,11 +153,11 @@ $Form->end_fieldset();
 // Enable/Disable maintenance mode
 $Form->begin_fieldset( T_( 'Maintenance' ), array( 'class'=>'fieldset clear' ) );
 
-$Form->checkbox( 'bk_maintenance_mode', true, T_( 'Maintenance mode' ), T_( 'Put b2evolution into Maintenance Mode while backing up - Recommended' ) );
+$Form->checkbox( 'bk_maintenance_mode', true, T_( 'Maintenance mode' ), T_( 'Put the site into maintenance mode while backing up (recommended).' ) );
 
 if( function_exists('gzopen') )
 {
-	$Form->checkbox( 'bk_pack_backup_files', $current_Backup->pack_backup_files, 'ZIP', T_('Compress backup into ZIP files') );
+	$Form->checkbox( 'bk_pack_backup_files', $current_Backup->pack_backup_files, 'ZIP', T_('Compress backup files into ZIP archive.') );
 }
 $Form->add_crumb( 'backup' );
 $Form->end_fieldset();
@@ -168,6 +168,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'S
 
 /*
  * $Log$
+ * Revision 1.9  2010/02/04 19:32:38  blueyed
+ * trans fixes
+ *
  * Revision 1.8  2010/01/30 18:55:32  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *
