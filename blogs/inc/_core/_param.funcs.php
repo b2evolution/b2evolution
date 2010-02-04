@@ -618,7 +618,7 @@ function check_is_url( $url )
 {
 	if( !is_url( $url ) )
 	{
-		return sprintf( T_('Please enter a valid URL, like for example: http://www.b2evolution.net/');
+		return sprintf( T_('Please enter a valid URL, like for example: %s.'), 'http://www.b2evolution.net/' );
 	}
 }
 
@@ -2098,6 +2098,9 @@ function balance_tags( $text )
 
 /*
  * $Log$
+ * Revision 1.60  2010/02/04 20:37:18  blueyed
+ * Fix parse error.
+ *
  * Revision 1.59  2010/02/04 19:23:09  blueyed
  * trans fixes: punctuation.
  *
