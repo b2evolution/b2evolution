@@ -427,10 +427,14 @@ $Form->end_form();
 echo_publishnowbutton_js();
 echo_set_is_attachments();
 echo_link_files_js();
+echo_onchange_newcat();
 // require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.61  2010/02/05 09:51:40  efy-asimo
+ * create categories on the fly
+ *
  * Revision 1.60  2010/02/04 16:41:19  efy-yury
  * add "Add/Link files" link
  *

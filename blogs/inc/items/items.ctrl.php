@@ -354,8 +354,6 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		// We need early decoding of these in order to check permissions:
-		param( 'post_category', 'integer', true );
-		param( 'post_extracats', 'array', array() );
 		param( 'post_status', 'string', 'published' );
 
 		if( $action == 'create_publish' )
@@ -373,9 +371,8 @@ switch( $action )
 
 		}
 
-		// make sure main cat is in extracat list and there are no duplicates
-		$post_extracats[] = $post_category;
-		$post_extracats = array_unique( $post_extracats );
+		check_categories( $post_category, $post_extracats );
+
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
 		// Check permission on post type:
@@ -489,8 +486,6 @@ switch( $action )
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		// We need early decoding of these in order to check permissions:
-		param( 'post_category', 'integer', true );
-		param( 'post_extracats', 'array', array() );
 		param( 'post_status', 'string', 'published' );
 
 		if( $action == 'update_publish' )
@@ -509,9 +504,8 @@ switch( $action )
 
 		}
 
-		// make sure main cat is in extracat list and there are no duplicates
-		$post_extracats[] = $post_category;
-		$post_extracats = array_unique( $post_extracats );
+		check_categories( $post_category, $post_extracats);
+		
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
 		// Check permission on post type:
@@ -1283,6 +1277,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.89  2010/02/05 09:51:27  efy-asimo
+ * create categories on the fly
+ *
  * Revision 1.88  2010/02/02 21:16:35  efy-yury
  * update: attachments popup now opens when pushed the button 'Save and start attaching files'
  *

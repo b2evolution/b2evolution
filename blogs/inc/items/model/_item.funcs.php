@@ -490,6 +490,18 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 }
 
 /**
+ * Creates a link to new category, with properties icon
+ * @return string link url 
+ */
+function get_newcategory_link()
+{
+	global $dispatcher, $blog;
+	$new_url = $dispatcher.'?ctrl=chapters&amp;action=new&amp;blog='.$blog;
+	$link = ' <span class="floatright">'.action_icon( T_('Add new category'), 'properties', $new_url, '', 5, 1, array( 'target' => '_blank' ) ).'</span>';
+	return $link;
+}
+
+/**
  * Allow recursive category selection.
  *
  * @todo Allow to use a dropdown (select) to switch between blogs ( CSS / JS onchange - no submit.. )
@@ -503,7 +515,7 @@ function cat_select( $Form, $form_fields = true )
 					$blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
 	global $cat_sel_total_count, $dispatcher;
 
-	$Form->begin_fieldset( T_('Categories').get_manual_link('item_categories_fieldset'), array( 'class'=>'extracats', 'id' => 'itemform_categories' ) );
+	$Form->begin_fieldset( get_newcategory_link().T_('Categories').get_manual_link('item_categories_fieldset'), array( 'class'=>'extracats', 'id' => 'itemform_categories' ) );
 
 	$cat_sel_total_count = 0;
 	$r ='';
@@ -549,23 +561,11 @@ function cat_select( $Form, $form_fields = true )
 
 	}
 
+	$r .= cat_select_new();
+
 	$r .= '</table>';
 
-	if( $current_User->check_perm( 'blog_cats', '', false, $blog ) )
-	{
-		$r .= '<p class="extracatnote"><a href="'.$dispatcher.'?ctrl=chapters&amp;action=new&amp;blog='.$blog.'">'.T_('Add a new category').' &raquo;</a></p>';
-	}
-
-	if( $cat_sel_total_count > 10 )	// Check in IE for adjusting threshhold. IE lines are FAT
-	{	// display within a div of constrained height
-  	echo '<div class="extracats"><div>';
-		echo $r;
-		echo '</div></div>';
-	}
-	else
-	{	// Plain display
-		echo $r;
-	}
+	echo $r;
 
 	$Form->end_fieldset();
 }
@@ -582,7 +582,7 @@ function cat_select_header()
 	{ // This is current blog or we allow moving posts accross blogs
 		$r .= '<th class="selector catsel_extra" title="'.T_('Additional category').'">'.T_('Extra').'</th>';
 	}
-	$r .= '<th class="catsel_name">'.T_('Category').'</th></tr></thead>';
+	$r .= '<th class="catsel_name">'.T_('Category').'</th><th width="1"><!-- for IE7 --></th></tr></thead>';
 	return $r;
 }
 
@@ -662,8 +662,9 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 				.htmlspecialchars($thisChapter->name).'</label>'
 				.' <a href="'.htmlspecialchars($thisChapter->get_permanent_url()).'" title="'.htmlspecialchars(T_('View category in blog.')).'">'
 				.'&nbsp;&raquo;&nbsp; ' // TODO: dh> provide an icon instead? // fp> maybe the A(dmin)/B(log) icon from the toolbar? And also use it for permalinks to posts?
-				.'</a>'
-				."</td></tr>\n";
+				.'</a></td>'
+				.'<td width="1"><!-- for IE7 --></td></tr>'
+				."\n";
 
 	return $r;
 }
@@ -682,6 +683,34 @@ function cat_select_after_each( $cat_ID, $level )
 function cat_select_after_last( $parent_cat_ID, $level )
 { // callback to end sublist
 	return ''; // "</ul>\n";
+}
+
+/**
+ * new category line for catselect table
+ * @return string new row code
+ */
+function cat_select_new()
+{
+	global $cat_sel_total_count;
+	$cat_sel_total_count++;
+	$r = "\n".'<tr class="'.( $cat_sel_total_count%2 ? 'odd' : 'even' ).'">';
+	// RADIO for new main cat:
+	$r .= '<td class="selector catsel_main"><input type="radio" name="post_category" class="checkbox" title="'
+						.T_('Select as MAIN category').'" value="0"';
+	$r .= ' id="sel_maincat_new"';
+	$r .= ' onclick="check_extracat(this);"/></td>';
+
+	// CHECKBOX
+	$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
+						.T_('Select as an additional category').'" value="0" id="sel_extracat_new"/></td>';
+
+	// INPUT TEXT for new category name
+	$r .= '<td class="catsel_name">'
+				.'<input maxlength="255" style="width: 100%;" value="" size="20" type="text" name="category_name" id="new_category_name" />'
+				."</td>";
+	$r .= '<td width="1">&nbsp<!-- for IE7 -->';
+	$r .= "</td></tr>";
+	return $r;
 }
 
 
@@ -1163,8 +1192,81 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 	return $Items;
 }
 
+
+function check_categories( & $post_category, & $post_extracats )
+{
+	$post_category = param( 'post_category', 'integer', true );
+	$post_extracats = param( 'post_extracats', 'array', array() );
+	global $Messages, $blog;
+
+	if( ! $post_category || in_array(0, $post_extracats ) )
+	{
+		load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
+		$GenericCategoryCache = & get_ChapterCache();
+
+		$category_name = param( 'category_name', 'string', true );
+		$new_GenericCategory = & $GenericCategoryCache->new_obj( NULL, $blog );
+		$new_GenericCategory->set( 'name', $category_name );
+		if( $new_GenericCategory->dbinsert() !== false )
+		{
+			$Messages->add( T_('New category created.'), 'success' );
+			if( ! $post_category )
+			{
+				$post_category = $new_GenericCategory->ID;
+			}
+
+			if( ( $extracat_key = array_search( '0', $post_extracats ) ) || $post_extracats[0] == '0' )
+			{
+				if( $extracat_key )
+				{
+					unset($post_extracats[$extracat_key]);
+				}
+				else
+				{
+					unset($post_extracats[0]);
+				}
+				$post_extracats[] = $new_GenericCategory->ID;
+			}
+
+			$GenericCategoryCache->add($new_GenericCategory);
+		}
+		else
+		{
+			$Messages->add( T_('New category creation failed.'), 'error' );
+			return false;
+		}
+	}
+
+	// make sure main cat is in extracat list and there are no duplicates
+	$post_extracats[] = $post_category;
+	$post_extracats = array_unique( $post_extracats );
+
+	return true;
+}
+
+
+function echo_onchange_newcat()
+{
+?>
+	<script type="text/javascript">
+		jQuery( '#new_category_name' ).keypress( function()
+		{
+			var newcategory_radio = jQuery( '#sel_maincat_new' );
+			if( ! newcategory_radio.attr('checked') )
+			{
+				newcategory_radio.attr('checked', true);
+				jQuery( '#sel_extracat_new' ).attr('checked', true);
+			}
+		} );
+	</script>
+<?php
+}
+
 /*
  * $Log$
+ * Revision 1.88  2010/02/05 09:51:34  efy-asimo
+ * create categories on the fly
+ *
  * Revision 1.87  2010/02/04 16:41:11  efy-yury
  * add "Add/Link files" link
  *

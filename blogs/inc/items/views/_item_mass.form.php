@@ -219,9 +219,14 @@ $Form->begin_form( '', '', $params );
 
 $Form->end_form();
 
+// ####################### JS BEHAVIORS #########################
+echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.11  2010/02/05 09:51:40  efy-asimo
+ * create categories on the fly
+ *
  * Revision 1.10  2010/01/30 18:55:31  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *
