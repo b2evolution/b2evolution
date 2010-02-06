@@ -137,7 +137,7 @@ class coll_common_links_Widget extends ComponentWidget
 				'show_owneruserinfo' => array(
 					'type' => 'checkbox',
 					'label' => T_('Show "Owner details"'),
-					'note' => T_('Go to user infor about the blog owner.'),
+					'note' => T_('Go to user info about the blog owner.'),
 					'defaultvalue' => 0,
 				),
 				'show_ownercontact' => array(
@@ -262,6 +262,9 @@ class coll_common_links_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.15  2010/02/06 23:10:50  sam2kb
+ * minor
+ *
  * Revision 1.14  2009/12/22 23:13:39  fplanque
  * Skins v4, step 1:
  * Added new disp modes

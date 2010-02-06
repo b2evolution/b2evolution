@@ -849,7 +849,7 @@ function install_htaccess()
 	
 	if( ! @file_exists($basepath.'sample.htaccess') )
 	{
-		return T_('Can not find file ').'[ sample.htaccess ]'.T_(' at your base url.');	
+		return T_('Can not find file [ sample.htaccess ] at your base url.');	
 	}
 	
 	if( ! @copy( $basepath.'sample.htaccess', $basepath.'install/test/.htaccess' ) )
@@ -880,6 +880,9 @@ function install_htaccess()
 
 /*
  * $Log$
+ * Revision 1.85  2010/02/06 23:10:50  sam2kb
+ * minor
+ *
  * Revision 1.84  2010/01/25 18:18:21  efy-asimo
  * .htaccess automatic install
  *
