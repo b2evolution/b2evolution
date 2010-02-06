@@ -476,7 +476,8 @@ class Blog extends DataObject
 			$this->set_setting( 'allow_subscriptions',  param( 'allow_subscriptions', 'integer', 0 ) );
 			$this->set( 'advanced_perms',  param( 'advanced_perms', 'integer', 0 ) );
 			$this->set_setting( 'use_workflow',  param( 'blog_use_workflow', 'integer', 0 ) );
-
+			$this->set_setting( 'enable_goto_blog',  param( 'enable_goto_blog', 'integer', 0 ) );
+			
 			$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
 			$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
 
@@ -2236,6 +2237,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.101  2010/02/06 11:48:31  efy-yury
+ * add checkbox 'go to blog after posting' in blog settings
+ *
  * Revision 1.100  2010/01/20 20:08:29  efy-asimo
  * Countries&Currencies redirect fix + RSS/Atom feeds image size select list
  *

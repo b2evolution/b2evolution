@@ -464,12 +464,23 @@ switch( $action )
 		{	// fp> I noticed that after publishing a new post, I always want to see how the blog looks like
 			// If anyone doesn't want that, we can make this optional...
 			// sam2kb> Please make this optional, this is really annoying when you create more than one post or when you publish draft images created from FM.
+			
+			// Get config value, if enabled - go to blog after posting
+			// otherwise go to posting list
+			$goto_blog = $edited_Item->Blog->get_setting( 'enable_goto_blog' );
+	
+			if($goto_blog != 1)
+			{
+				// redirect to posts list
+				header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
+			}
 			$edited_Item->load_Blog();
 			$redirect_to = $edited_Item->Blog->gen_blogurl();
 		}
 
 		// REDIRECT / EXIT
 		header_redirect( $redirect_to );
+		
 		// Switch to list mode:
 		// $action = 'list';
 		//init_list_mode();
@@ -566,7 +577,18 @@ switch( $action )
 		 *     we can make this optional...
 		 */
 		if( ! $was_published && $edited_Item->status == 'published' )
-		{	// The post's last status wasn't "published", but we're going to publish it now. Redirect to the blog:
+		{	// The post's last status wasn't "published", but we're going to publish it now.
+			
+			// Get config value, if enabled - go to blog after posting
+			// otherwise go to posting list
+			$goto_blog = $edited_Item->Blog->get_setting( 'enable_goto_blog' );
+	
+			if($goto_blog != 1)
+			{
+				// redirect to posts list
+				header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
+			}
+			
 			$edited_Item->load_Blog();
 			$redirect_to = $edited_Item->Blog->gen_blogurl();
 		}
@@ -609,9 +631,21 @@ switch( $action )
 		// If anyone doesn't want that, we can make this optional...
 		$edited_Item->load_Blog();
 		$redirect_to = $edited_Item->Blog->gen_blogurl();
+		
+		// Get config value, if enabled - go to blog after posting
+		// otherwise go to posting list
+		$goto_blog = $edited_Item->Blog->get_setting( 'enable_goto_blog' );
 
-		// REDIRECT / EXIT
-		header_redirect( $redirect_to );
+		if($goto_blog == 1)
+		{
+			// Redirect on blog
+			header_redirect( $redirect_to );
+		}
+		else
+		{
+			// Redirect on posts list
+			header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
+		}
 		// Switch to list mode:
 		// $action = 'list';
 		// init_list_mode();
@@ -1277,6 +1311,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.90  2010/02/06 11:48:32  efy-yury
+ * add checkbox 'go to blog after posting' in blog settings
+ *
  * Revision 1.89  2010/02/05 09:51:27  efy-asimo
  * create categories on the fly
  *

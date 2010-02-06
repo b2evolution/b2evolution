@@ -60,6 +60,9 @@ $Form->begin_fieldset( T_('Post options') );
 												array( 'optional', T_('Optional'), T_('The blogger can leave the title field empty') ),
 												array( 'none', T_('Never'), T_('No title field') ),
 											), T_('Post titles'), true );
+											
+	$Form->checkbox( 'enable_goto_blog', $edited_Blog->get_setting( 'enable_goto_blog' ),
+						T_( 'Go to blog after posting' ), T_( 'If it is checked will shown the blog after posting otherwise will shown the posts list.' ) );
 
 	// FP> TODO:
 	// -post_url  always('required')|optional|never
@@ -201,6 +204,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.25  2010/02/06 11:48:32  efy-yury
+ * add checkbox 'go to blog after posting' in blog settings
+ *
  * Revision 1.24  2010/01/30 18:55:21  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

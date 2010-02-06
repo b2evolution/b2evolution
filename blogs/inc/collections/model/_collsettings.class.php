@@ -137,6 +137,7 @@ class CollectionSettings extends AbstractSettings
 			'aggregate_coll_IDs' => '',
 			'blog_footer_text' => '&copy;$year$ by $owner$',
 			'max_footer_credits' => 3,
+			'enable_goto_blog' => 1,
 
 		);
 
@@ -173,6 +174,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.41  2010/02/06 11:48:32  efy-yury
+ * add checkbox 'go to blog after posting' in blog settings
+ *
  * Revision 1.40  2010/01/20 20:08:30  efy-asimo
  * Countries&Currencies redirect fix + RSS/Atom feeds image size select list
  *
