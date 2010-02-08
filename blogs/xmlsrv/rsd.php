@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @todo fp> do we want to restrict API definitions to a specific blog with blogID="" ?
  *
@@ -67,6 +67,9 @@ echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 
 /*
  * $Log$
+ * Revision 1.5  2010/02/08 17:57:04  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.4  2009/03/08 23:58:15  fplanque
  * 2009
  *

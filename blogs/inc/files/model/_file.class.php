@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -2036,6 +2036,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.80  2010/02/08 17:52:15  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.79  2010/01/30 18:55:25  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

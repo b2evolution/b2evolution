@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal Open Source relicensing agreement:
  * }}
@@ -316,6 +316,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2010/02/08 17:52:09  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.22  2010/01/31 17:39:51  efy-asimo
  * delete url from comments in dashboard and comments form
  *

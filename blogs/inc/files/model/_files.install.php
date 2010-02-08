@@ -2,11 +2,11 @@
 /**
  * This is the install file for the files module
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evocore
  *
- * @version $Id$
+ * @version _files.install.php,v 1.3 2009/08/30 12:31:44 tblue246 Exp
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -51,7 +51,7 @@ $schema_queries['T_filetypes'] = array(
 
 
 /*
- * $Log$
+ * _files.install.php,v
  * Revision 1.3  2009/08/30 12:31:44  tblue246
  * Fixed CVS keywords
  *

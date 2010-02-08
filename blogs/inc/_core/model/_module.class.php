@@ -3,7 +3,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2009-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in

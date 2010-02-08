@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2005-2007 by Yabba/Scott - {@link http://astonishme.co.uk/contact/}.
  *
  * {@internal License choice
@@ -636,6 +636,9 @@ class code_highlight_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.31  2010/02/08 17:56:01  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.30  2010/01/30 18:55:37  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

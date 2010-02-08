@@ -23,7 +23,7 @@
  * @author Stephan Knauss
  * @author tblue246: Tilman Blumenbach
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  * This file built upon code from original b2 - http://cafelog.com/
  *
  * @todo check different encodings. only tested with iso-8859-1
@@ -712,6 +712,9 @@ if( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.44  2010/02/08 17:50:51  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.43  2010/01/30 18:55:15  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

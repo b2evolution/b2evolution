@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.com/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -119,6 +119,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.10  2010/02/08 17:53:55  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.9  2010/01/30 18:55:34  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

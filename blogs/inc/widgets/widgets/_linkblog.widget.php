@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -130,6 +130,9 @@ class linkblog_Widget extends coll_item_list_Widget
 
 /*
  * $Log$
+ * Revision 1.26  2010/02/08 17:54:48  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.25  2009/12/06 18:07:44  fplanque
  * Fix simplified list widgets.
  *

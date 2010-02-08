@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
  */
@@ -137,6 +137,9 @@ $params = array_merge( array(
 
 /*
  * $Log$
+ * Revision 1.2  2010/02/08 17:56:14  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.1  2009/05/23 14:12:42  fplanque
  * All default skins now support featured posts and intro posts.
  *

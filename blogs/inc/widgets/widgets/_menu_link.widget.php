@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -271,6 +271,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.18  2010/02/08 17:54:48  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.17  2009/12/22 23:13:39  fplanque
  * Skins v4, step 1:
  * Added new disp modes

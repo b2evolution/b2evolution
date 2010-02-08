@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -119,6 +119,9 @@ echo '<p class="notes">'.T_('These are hits from people who came to this blog sy
 
 /*
  * $Log$
+ * Revision 1.17  2010/02/08 17:53:55  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.16  2009/12/08 22:38:13  fplanque
  * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
  *

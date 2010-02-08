@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
  */
@@ -71,6 +71,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.10  2010/02/08 17:56:10  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.9  2010/01/30 18:55:37  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

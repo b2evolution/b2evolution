@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @see http://manual.b2evolution.net/B2_API
  *
@@ -176,6 +176,9 @@ $xmlrpc_procs['b2.getPostURL'] = array(
 
 /*
  * $Log$
+ * Revision 1.11  2010/02/08 17:55:17  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.10  2009/09/25 07:33:31  efy-cantor
  * replace get_cache to get_*cache
  *

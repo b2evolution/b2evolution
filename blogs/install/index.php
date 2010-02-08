@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package install
  */
@@ -718,7 +718,7 @@ block_close();
 			<?php echo T_('Online resources') ?>: <a href="http://b2evolution.net/" target="_blank"><?php echo T_('Official website') ?></a> &bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" target="_blank"><?php echo T_('Find a host') ?></a> &bull; <a href="http://manual.b2evolution.net/" target="_blank"><?php echo T_('Manual') ?></a> &bull; <a href="http://forums.b2evolution.net/" target="_blank"><?php echo T_('Forums') ?></a>
 		<!-- InstanceEndEditable --></div>
 
-	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright &copy; 2003-2009 by Fran&ccedil;ois Planque &amp; others &middot; <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
+	<div class="copyright"><!-- InstanceBeginEditable name="CopyrightTail" -->Copyright &copy; 2003-2010 by Fran&ccedil;ois Planque &amp; others &middot; <a href="http://b2evolution.net/about/license.html" target="_blank">GNU GPL license</a> &middot; <a href="http://b2evolution.net/contact/" target="_blank">Contact</a>
 		<!-- InstanceEndEditable --></div>
 
 	</div>
@@ -741,6 +741,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.195  2010/02/08 17:55:42  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.194  2010/01/28 03:42:19  fplanque
  * minor
  *

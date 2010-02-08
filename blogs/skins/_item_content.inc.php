@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
  */
@@ -243,6 +243,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.31  2010/02/08 17:56:12  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.30  2010/01/31 19:23:43  blueyed
  * Item::has_content_parts: return true also if there are images with 'aftermore' position. This avoids having to add a MORE separator into an image-only post.
  *

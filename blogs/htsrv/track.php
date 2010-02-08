@@ -4,7 +4,7 @@
  *
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -106,6 +106,9 @@ $DB->query( $sql );
 
 /*
  * $Log$
+ * Revision 1.9  2010/02/08 17:51:16  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.8  2009/10/12 22:08:15  blueyed
  * Track: send nocache headers as per todo.
  *

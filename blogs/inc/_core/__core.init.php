@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -782,6 +782,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.59  2010/02/08 17:51:26  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.58  2010/01/30 18:55:15  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

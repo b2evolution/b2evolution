@@ -4,7 +4,7 @@
  *
  * This file is part of the b2evolution project - {@link http://b2evolution.net/}
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal License choice
@@ -335,6 +335,9 @@ class OnlineSessions
 
 /*
  * $Log$
+ * Revision 1.13  2010/02/08 17:55:47  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.12  2010/01/30 18:55:36  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

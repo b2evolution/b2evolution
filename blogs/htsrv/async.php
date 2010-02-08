@@ -8,7 +8,7 @@
  * fp> TODO: it would be better to have the code for the actions below part of the controllers they belong to.
  * This would require some refectoring but would be better for maintenance and code clarity.
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -237,6 +237,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.45  2010/02/08 17:50:53  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.44  2010/01/31 17:39:41  efy-asimo
  * delete url from comments in dashboard and comments form
  *

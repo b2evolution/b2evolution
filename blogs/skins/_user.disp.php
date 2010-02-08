@@ -8,7 +8,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}.
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -98,6 +98,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.13  2010/02/08 17:56:14  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.12  2010/01/30 18:55:37  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

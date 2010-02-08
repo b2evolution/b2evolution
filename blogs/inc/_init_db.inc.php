@@ -10,7 +10,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -95,6 +95,9 @@ $Timer->pause( '_init_db' );
 
 /*
  * $Log$
+ * Revision 1.2  2010/02/08 17:51:25  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.1  2009/12/06 05:20:36  fplanque
  * Violent refactoring for _main.inc.php
  * Sorry for potential side effects.

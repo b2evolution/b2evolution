@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal Open Source relicensing agreement:
  * }}
@@ -1311,6 +1311,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.91  2010/02/08 17:53:05  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.90  2010/02/06 11:48:32  efy-yury
  * add checkbox 'go to blog after posting' in blog settings
  *

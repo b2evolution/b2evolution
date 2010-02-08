@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  * (dh please re-add)
  *
  * {@internal License choice
@@ -555,6 +555,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.31  2010/02/08 17:52:15  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.30  2010/01/16 14:27:03  efy-yury
  * crumbs, fadeouts, redirect, action_icon
  *

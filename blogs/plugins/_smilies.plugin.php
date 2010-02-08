@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @author fplanque: Francois PLANQUE.
  * @author gorgeb: Bertrand GORGE / EPISTEMA
@@ -418,6 +418,9 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.52  2010/02/08 17:55:47  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.51  2009/09/30 21:23:33  blueyed
  * smilies_plugin: version 4.0.0-dev, cleaned up image processing. Outputs width/height now.
  *

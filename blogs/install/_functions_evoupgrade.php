@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal Open Source relicensing agreement:
  * Daniel HAHLER grants Francois PLANQUE the right to license
@@ -2811,6 +2811,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.354  2010/02/08 17:55:33  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.353  2010/01/09 18:19:06  blueyed
  * Upgrade: make upgrade of hitlog more robust in regard to already done changes.
  *

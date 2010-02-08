@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -186,6 +186,9 @@ class LinkCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.9  2010/02/08 17:53:16  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.8  2009/10/11 02:37:03  blueyed
  * Nasty bugfix for LinkCache: if an item got added, the list for the corresponding item would not get loaded anymore. Please verify and backport.
  *

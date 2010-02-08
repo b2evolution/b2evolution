@@ -2,7 +2,7 @@
 /**
  * This is the install file for the collections module
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evocore
  *

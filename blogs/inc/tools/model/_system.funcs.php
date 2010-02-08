@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal Open Source relicensing agreement:
  * }}
@@ -213,6 +213,9 @@ function system_check_gd_version()
 
 /*
  * $Log$
+ * Revision 1.7  2010/02/08 17:54:47  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.6  2009/05/15 19:11:37  fplanque
  * attempt to not kill the '?'
  *

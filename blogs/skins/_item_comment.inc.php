@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
  */
@@ -105,6 +105,9 @@ $Comment = & $params['Comment'];
 
 /*
  * $Log$
+ * Revision 1.8  2010/02/08 17:56:10  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.7  2009/09/29 00:19:12  blueyed
  * Link author of comments by default, instead of displaying the URL separately. Document template function call. Leave old call to author_url commented.
  *

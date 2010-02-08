@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
  */
@@ -107,6 +107,9 @@ locale_restore_previous();	// Restore previous locale (Blog locale)
 
 /*
  * $Log$
+ * Revision 1.3  2010/02/08 17:56:22  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.2  2009/12/21 01:29:54  fplanque
  * little things
  *

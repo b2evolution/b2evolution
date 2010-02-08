@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * {@internal License choice
@@ -130,6 +130,9 @@ class GenericOrdered extends GenericElement
 
 /*
  * $Log$
+ * Revision 1.7  2010/02/08 17:53:03  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.6  2009/09/14 12:25:47  efy-arrin
  * Included the ClassName in load_class() call with proper UpperCase
  *

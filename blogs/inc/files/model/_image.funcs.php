@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -351,6 +351,9 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.21  2010/02/08 17:52:18  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.20  2009/11/30 22:17:38  blueyed
  * Improve error messages in images. save_image: catch errors. getfile: shorten errors, if required.
  *

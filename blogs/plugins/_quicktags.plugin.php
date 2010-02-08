@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package plugins
  */
@@ -421,6 +421,9 @@ class quicktags_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.36  2010/02/08 17:55:47  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.35  2009/03/21 23:00:21  fplanque
  * minor
  *

@@ -5,7 +5,7 @@
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * {@internal Open Source relicensing agreement:
  * }}
@@ -188,6 +188,9 @@ function b2evonet_get_updates( $force_short_delay = false )
 
 /*
  * $Log$
+ * Revision 1.31  2010/02/08 17:52:14  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.30  2009/12/22 08:02:11  fplanque
  * doc
  *

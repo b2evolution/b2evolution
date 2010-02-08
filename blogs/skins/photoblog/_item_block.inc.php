@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
  * @package evoskins
  */
@@ -188,6 +188,9 @@ $params = array_merge( array(
 <?php
 /*
  * $Log$
+ * Revision 1.5  2010/02/08 17:56:36  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.4  2009/11/11 03:24:51  fplanque
  * misc/cleanup
  *

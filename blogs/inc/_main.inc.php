@@ -8,7 +8,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2009 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -105,6 +105,9 @@ if( $use_hacks && file_exists($conf_path.'hacks.php') )
 
 /*
  * $Log$
+ * Revision 1.138  2010/02/08 17:51:25  efy-yury
+ * copyright 2009 -> 2010
+ *
  * Revision 1.137  2009/12/07 17:32:51  blueyed
  * fix typos
  *
