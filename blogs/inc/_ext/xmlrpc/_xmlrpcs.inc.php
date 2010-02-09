@@ -87,13 +87,13 @@
 		$outAr=array();
 		foreach($server->dmap as $key => $val)
 		{
-			$outAr[]=&new xmlrpcval($key, 'string');
+			$outAr[]=new xmlrpcval($key, 'string');
 		}
 		if($server->allow_system_funcs)
 		{
 			foreach($GLOBALS['_xmlrpcs_dmap'] as $key => $val)
 			{
-				$outAr[]=&new xmlrpcval($key, 'string');
+				$outAr[]=new xmlrpcval($key, 'string');
 			}
 		}
 		return new xmlrpcresp(new xmlrpcval($outAr, 'array'));
@@ -132,22 +132,22 @@
 					$cursig=array();
 					foreach($inSig as $sig)
 					{
-						$cursig[]=&new xmlrpcval($sig, 'string');
+						$cursig[]=new xmlrpcval($sig, 'string');
 					}
-					$sigs[]=&new xmlrpcval($cursig, 'array');
+					$sigs[]=new xmlrpcval($cursig, 'array');
 				}
-				$r=&new xmlrpcresp(new xmlrpcval($sigs, 'array'));
+				$r=new xmlrpcresp(new xmlrpcval($sigs, 'array'));
 			}
 			else
 			{
 				// NB: according to the official docs, we should be returning a
 				// "none-array" here, which means not-an-array
-				$r=&new xmlrpcresp(new xmlrpcval('undef', 'string'));
+				$r=new xmlrpcresp(new xmlrpcval('undef', 'string'));
 			}
 		}
 		else
 		{
-			$r=&new xmlrpcresp(0,$GLOBALS['xmlrpcerr']['introspect_unknown'], $GLOBALS['xmlrpcstr']['introspect_unknown']);
+			$r=new xmlrpcresp(0,$GLOBALS['xmlrpcerr']['introspect_unknown'], $GLOBALS['xmlrpcstr']['introspect_unknown']);
 		}
 		return $r;
 	}
@@ -179,16 +179,16 @@
 		{
 			if(isset($dmap[$methName]['docstring']))
 			{
-				$r=&new xmlrpcresp(new xmlrpcval($dmap[$methName]['docstring']), 'string');
+				$r=new xmlrpcresp(new xmlrpcval($dmap[$methName]['docstring']), 'string');
 			}
 			else
 			{
-				$r=&new xmlrpcresp(new xmlrpcval('', 'string'));
+				$r=new xmlrpcresp(new xmlrpcval('', 'string'));
 			}
 		}
 		else
 		{
-			$r=&new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['introspect_unknown'], $GLOBALS['xmlrpcstr']['introspect_unknown']);
+			$r=new xmlrpcresp(0, $GLOBALS['xmlrpcerr']['introspect_unknown'], $GLOBALS['xmlrpcstr']['introspect_unknown']);
 		}
 		return $r;
 	}
@@ -959,7 +959,7 @@
 			if(!xml_parse($parser, $data, 1))
 			{
 				// return XML error as a faultCode
-				$r=&new xmlrpcresp(0,
+				$r=new xmlrpcresp(0,
 				$GLOBALS['xmlrpcerrxml']+xml_get_error_code($parser),
 				sprintf('XML error: %s at line %d, column %d',
 					xml_error_string(xml_get_error_code($parser)),
@@ -969,7 +969,7 @@
 			elseif ($GLOBALS['_xh']['isf'])
 			{
 				xml_parser_free($parser);
-				$r=&new xmlrpcresp(0,
+				$r=new xmlrpcresp(0,
 					$GLOBALS['xmlrpcerr']['invalid_request'],
 					$GLOBALS['xmlrpcstr']['invalid_request'] . ' ' . $GLOBALS['_xh']['isf_reason']);
 			}
@@ -987,7 +987,7 @@
 				else
 				{
 					// build an xmlrpcmsg object with data parsed from xml
-					$m=&new xmlrpcmsg($GLOBALS['_xh']['method']);
+					$m=new xmlrpcmsg($GLOBALS['_xh']['method']);
 					// now add parameters in
 					for($i=0; $i<count($GLOBALS['_xh']['params']); $i++)
 					{
@@ -1197,13 +1197,16 @@
 		*/
 		function echoInput()
 		{
-			$r=&new xmlrpcresp(new xmlrpcval( "'Aha said I: '" . $GLOBALS['HTTP_RAW_POST_DATA'], 'string'));
+			$r=new xmlrpcresp(new xmlrpcval( "'Aha said I: '" . $GLOBALS['HTTP_RAW_POST_DATA'], 'string'));
 			print $r->serialize();
 		}
 	}
 
 /*
  * $Log$
+ * Revision 1.6  2010/02/09 17:20:39  efy-yury
+ * &new -> new
+ *
  * Revision 1.5  2010/01/31 18:11:49  blueyed
  * Fix previous &new replacements.
  *

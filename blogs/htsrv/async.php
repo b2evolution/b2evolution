@@ -137,7 +137,7 @@ switch( $action )
 		$text = trim( param( 'q', 'string', '' ) );
 		if( !empty( $text ) )
 		{
-			$SQL = &new SQl();
+			$SQL = new SQl();
 			$SQL->SELECT( 'user_login' );
 			$SQL->FROM( 'T_users' );
 			$SQL->WHERE( 'user_login LIKE \''.$text.'%\'' );
@@ -237,6 +237,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.46  2010/02/09 17:20:33  efy-yury
+ * &new -> new
+ *
  * Revision 1.45  2010/02/08 17:50:53  efy-yury
  * copyright 2009 -> 2010
  *
