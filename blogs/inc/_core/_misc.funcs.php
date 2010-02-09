@@ -1530,6 +1530,7 @@ function debug_fclose($fp)
  * Wrap pre tag around {@link var_dump()} for better debugging.
  *
  * @param $var__var__var__var__,... mixed variable(s) to dump
+ * @return true
  */
 function pre_dump( $var__var__var__var__ )
 {
@@ -1602,6 +1603,8 @@ function pre_dump( $var__var__var__var__ )
 		echo "</pre>\n";
 		ini_set('html_errors', $orig_html_errors);
 	}
+	flush();
+	return true;
 }
 
 
@@ -3956,6 +3959,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.209  2010/02/09 19:22:46  blueyed
+ * pre_dump: flush and return true
+ *
  * Revision 1.208  2010/02/08 17:51:28  efy-yury
  * copyright 2009 -> 2010
  *
