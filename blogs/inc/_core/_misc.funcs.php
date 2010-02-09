@@ -353,6 +353,8 @@ function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw' )
 		$tail = '&hellip;';
 	}
 
+	$str = rtrim($str);
+
 	if( evo_strlen( $str ) > $maxlen )
 	{
 		// Replace all HTML entities by a single char. html_entity_decode for example
@@ -383,9 +385,8 @@ function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw' )
 					$str_cropped = evo_substr( $str, 0, $len-evo_strlen($str_inspect)+$pos_amp);
 				}
 			}
-			// there's an HTML entity around the cut mark
 		}
-		$str = format_to_output($str_cropped, $format);
+		$str = format_to_output(rtrim($str_cropped), $format);
 		$str .= $tail;
 
 		return $str;
@@ -3959,6 +3960,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.210  2010/02/09 22:23:28  blueyed
+ * rtrim in strmaxlen
+ *
  * Revision 1.209  2010/02/09 19:22:46  blueyed
  * pre_dump: flush and return true
  *
