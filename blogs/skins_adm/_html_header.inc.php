@@ -244,29 +244,35 @@ div.skin_wrapper_loggedin {
 
 
 	$datefmt = locale_datefmt();
-	$datefmt = str_replace( array( 'd', 'm', 'Y' ), array( 'dd', 'mm', 'yy' ), $datefmt );
+	$datefmt = str_replace( array( 'j', 'd', 'm', 'Y' ), array( 'd', 'dd', 'mm', 'yy' ), $datefmt );
 	add_js_headline( 'jQuery(function(){
-			var monthNames = [\'' . T_( 'January' ) . '\',\'' . T_( 'February' ) . '\', \'' . T_( 'March' ) . '\', \'' . T_( 'April' ) . '\', \'' . T_( 'May' ) . '\', \'' . T_( 'June' ) . '\', \'' . T_( 'July' ) . '\', \'' . T_( 'August' ) . '\', \'' . T_( 'September' ) . '\', \'' . T_( 'October' ) . '\', \'' . T_( 'November' ) . '\', \'' . T_( 'December' ) . '\']
-			var dayNamesMin = [\'' . T_( 'Sun' ) . '\', \'' . T_( 'Mon' ) . '\', \'' . T_( 'Tue' ) . '\', \'' . T_( 'Wed' ) . '\', \'' . T_( 'Thu' ) . '\', \'' . T_( 'Fri' ) . '\', \'' . T_( 'Sat' ) . '\']
-			var docHead = document.getElementsByTagName(\'head\')[0];
-			for (i=0;i<dayNamesMin.length;i++)
-				dayNamesMin[i] = dayNamesMin[i].substr(0, 2)
-
-			jQuery(".form_date_input").datepicker({
-				beforeShow: function(){ // Dynamically add stylesheet just before display
-					jQuery(document.createElement(\'link\'))
-						.attr({type: \'text/css\', href: \'' . $rsc_url . 'css/ui.datepicker.css\', rel: \'stylesheet\', media: \'screen\'})
-						.appendTo(docHead)
-				},
-				dateFormat: \'' . $datefmt . '\',
-				monthNames: monthNames,
-				dayNamesMin: dayNamesMin,
-				firstDay: '.locale_startofweek().',
-				onClose: function(){ // Dynamically removing stylesheet, prevents duplicates
-					jQuery(docHead).find("link[href=\'' . $rsc_url . 'css/ui.datepicker.css\']").remove();
-				}
-			})
-		})' );
+		var monthNames = ["'.T_('January').'","'.T_('February').'", "'.T_('March').'",
+						  "'.T_('April').'", "'.T_('May').'", "'.T_('June').'",
+						  "'.T_('July').'", "'.T_('August').'", "'.T_('September').'",
+						  "'.T_('October').'", "'.T_('November').'", "'.T_('December').'"];
+		
+		var dayNamesMin = ["'.T_('Sun').'", "'.T_('Mon').'", "'.T_('Tue').'",
+						  "'.T_('Wed').'", "'.T_('Thu').'", "'.T_('Fri').'", "'.T_('Sat').'"];
+		
+		var docHead = document.getElementsByTagName("head")[0];
+		for (i=0;i<dayNamesMin.length;i++)
+			dayNamesMin[i] = dayNamesMin[i].substr(0, 2)
+	
+		jQuery(".form_date_input").datepicker({
+			beforeShow: function(){ // Dynamically add stylesheet just before display
+				jQuery(document.createElement("link"))
+					.attr({type: "text/css", href: "'.$rsc_url.'css/ui.datepicker.css", rel: "stylesheet", media: "screen"})
+					.appendTo(docHead)
+			},
+			dateFormat: "'.$datefmt.'",
+			monthNames: monthNames,
+			dayNamesMin: dayNamesMin,
+			firstDay: '.locale_startofweek().',
+			onClose: function(){ // Dynamically removing stylesheet, prevents duplicates
+				jQuery(docHead).find(\'link[href="'.$rsc_url.'css/ui.datepicker.css"]\').remove();
+			}
+		})
+	  })' );
 
 	// CALL PLUGINS NOW:
 	global $Plugins;
@@ -279,6 +285,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.33  2010/02/10 05:15:31  sam2kb
+ * Date format "j" failes in datepicker. Code clean-up.
+ *
  * Revision 1.32  2010/02/08 17:56:48  efy-yury
  * copyright 2009 -> 2010
  *
