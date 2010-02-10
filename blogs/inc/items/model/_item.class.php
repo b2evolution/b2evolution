@@ -513,9 +513,9 @@ class Item extends ItemLight
 
 		// CUSTOM FIELDS varchar
 		for( $i = 1 ; $i <= 3; $i++ )
-		{	// For each custom double field:
-			if( param( 'item_varchar'.$i, 'string', NULL ) !== NULL )
-			{
+		{	// For each custom varchar field:
+			if( param( 'item_varchar'.$i, 'html', NULL ) !== NULL )
+			{	// sam2kb> I see no reason why we can't use 'html' here
 				$this->set_from_Request( 'varchar'.$i, 'item_varchar'.$i, true );
 			}
 		}
@@ -4149,6 +4149,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.178  2010/02/10 22:16:17  sam2kb
+ * Allow HTML in item_varchar fields
+ *
  * Revision 1.177  2010/02/08 17:53:10  efy-yury
  * copyright 2009 -> 2010
  *
