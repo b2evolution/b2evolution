@@ -112,6 +112,10 @@ class Comment extends DataObject
 	var $allow_msgform;
 
 	var $nofollow;
+	/**
+	 * @var string
+	 */
+	var $secret;
 
 	/**
 	 * Constructor
@@ -154,6 +158,7 @@ class Comment extends DataObject
 			$this->nofollow = $db_row['comment_nofollow'];
 			$this->spam_karma = $db_row['comment_spam_karma'];
 			$this->allow_msgform = $db_row['comment_allow_msgform'];
+			$this->secret = $db_row['comment_secret'];
 		}
 	}
 
@@ -1287,7 +1292,7 @@ class Comment extends DataObject
 	 */
 	function send_email_notifications()
 	{
-		global $DB, $admin_url, $debug, $Debuglog;
+		global $DB, $admin_url, $debug, $Debuglog, $baseurl;
 
 		$edited_Item = & $this->get_Item();
 		$edited_Blog = & $edited_Item->get_Blog();
@@ -1410,11 +1415,14 @@ class Comment extends DataObject
 			{
 				$notify_message .= T_('Rating').": $this->rating\n";
 			}
+			
+			$secret_value = '&secret='.$this->secret;
 
 			$notify_message .= $this->get('content')
 				."\n\n-- \n"
 				.T_('Edit/Delete').': '.$admin_url.'?ctrl=items&blog='.$edited_Blog->ID.'&p='.$edited_Item->ID.'&c=1#c'.$this->ID."\n\n"
-				.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->gen_blogurl(), 'disp=subs' ) )."\n";
+				.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->gen_blogurl(), 'disp=subs' ) )."\n"
+				.T_('Quick Edit').': '.$baseurl.'htsrv/comment_review.php?cmt_ID='.$this->ID.$secret_value."\n";
 
 			if( $debug )
 			{
@@ -1485,6 +1493,8 @@ class Comment extends DataObject
 				return false;
 			}
 		}
+		
+		$this->set( 'secret', generate_random_key() );
 
 		$dbchanges = $this->dbchanges;
 
@@ -1527,6 +1537,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.45  2010/02/10 11:45:04  efy-asimo
+ * Quick Edit option on comment notification
+ *
  * Revision 1.44  2010/02/08 17:52:12  efy-yury
  * copyright 2009 -> 2010
  *
