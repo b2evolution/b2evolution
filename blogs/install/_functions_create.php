@@ -76,13 +76,10 @@ function create_default_data()
 
 	// added in 0.8.7
 	echo 'Creating default blacklist entries... ';
-	$query = "INSERT INTO T_antispam(aspm_string) VALUES ".
-	"('online-casino'), ('penis-enlargement'), ".
-	"('order-viagra'), ('order-phentermine'), ('order-xenical'), ".
-	"('order-prophecia'), ('sexy-lingerie'), ('-porn-'), ".
-	"('-adult-'), ('-tits-'), ('buy-phentermine'), ".
-	"('order-cheap-pills'), ('buy-xenadrine'),	('xxx'), ".
-	"('paris-hilton'), ('parishilton'), ('camgirls'), ('adult-models')";
+	//This string contain antispam information that is obfuscated because some hosting
+	//companies prevent uploading PHP files containing "spam" strings.
+	//pre_dump(get_antispam_query());
+	$query = get_antispam_query();
 	$DB->query( $query );
 	echo "OK.<br />\n";
 
@@ -1304,6 +1301,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.286  2010/02/12 18:22:03  efy-yury
+ * add atnispam query obfuscating
+ *
  * Revision 1.285  2010/02/08 17:55:17  efy-yury
  * copyright 2009 -> 2010
  *
