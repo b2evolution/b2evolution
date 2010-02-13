@@ -428,10 +428,18 @@ echo_publishnowbutton_js();
 echo_set_is_attachments();
 echo_link_files_js();
 echo_onchange_newcat();
+// if we creating new post - we add slug autofiller JS
+if( empty( $edited_Item->ID ) )
+{
+	echo_slug_filler();
+}
 // require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.63  2010/02/13 16:22:30  efy-yury
+ * slug field autofill
+ *
  * Revision 1.62  2010/02/08 17:53:16  efy-yury
  * copyright 2009 -> 2010
  *

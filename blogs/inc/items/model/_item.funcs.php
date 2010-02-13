@@ -201,7 +201,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	}
 
 	// echo 'starting with: '.$urltitle.'<br />';
-
+	 
 	// Replace special chars/umlauts, if we can convert charsets:
 	load_funcs('locales/_charset.funcs.php');
 	$urltitle = replace_special_chars($urltitle, $post_locale);
@@ -209,6 +209,23 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	// Make everything lowercase
 	$urltitle = strtolower( $urltitle );
 
+	// leave only first 5 words
+	$title_words = array();
+	$title_words = explode('-', $urltitle);
+	if(count($title_words) > 5)
+	{
+		$count_of_words = 5;
+		$urltitle = '';
+		for($i = 0; $i < $count_of_words; $i++)
+		{
+			$urltitle .= $title_words[$i].'-';
+		}
+		//delete last '-'
+		$urltitle = substr($urltitle, 0, strlen($urltitle) - 1);
+	}
+	
+	// echo 'leaving 5 words: '.$urltitle.'<br />';
+	
 	// Normalize to 200 chars + a number
 	preg_match( '/^(.*?)((-|_)+([0-9]+))?$/', $urltitle, $matches );
 	$urlbase = substr( $matches[1], 0, 200 );
@@ -1262,8 +1279,38 @@ function echo_onchange_newcat()
 <?php
 }
 
+/**
+ * Make the slug field automatically update when a title is typed.
+ * Variable slug_changed hold true if slug was manually changed 
+ * (we already do not need autocomplete) and false in other case.
+ * 
+ */
+function echo_slug_filler()
+{
+?>
+	<script type="text/javascript">
+		var slug_changed = false;
+		jQuery( '#post_title' ).keyup( function()
+		{
+			if(!slug_changed)
+			{
+				jQuery( '#post_urltitle' ).val( jQuery( '#post_title' ).val() );
+			}
+		} );
+
+		jQuery( '#post_urltitle' ).change( function()
+		{
+			slug_changed = true;
+		} );
+	</script>
+<?php
+}
+
 /*
  * $Log$
+ * Revision 1.90  2010/02/13 16:22:30  efy-yury
+ * slug field autofill
+ *
  * Revision 1.89  2010/02/08 17:53:10  efy-yury
  * copyright 2009 -> 2010
  *
