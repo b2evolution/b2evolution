@@ -3957,22 +3957,11 @@ function get_ReqURI()
 	return array($ReqPath,$ReqURI);
 }
 
-/**
-* Return antispam SQL query.  
-* This is obfuscated because some hosting companies prevent uploading PHP files 
-* containing "spam" strings. 
-*
-* @return string;
-*/
-function get_antispam_query()
-{
-	//used base64_encode() for getting this code
-	return base64_decode('SU5TRVJUIElOVE8gVF9hbnRpc3BhbShhc3BtX3N0cmluZykgVkFMVUVTICgnb25saW5lLWNhc2lubycpLCAoJ3BlbmlzLWVubGFyZ2VtZW50JyksICgnb3JkZXItdmlhZ3JhJyksICgnb3JkZXItcGhlbnRlcm1pbmUnKSwgKCdvcmRlci14ZW5pY2FsJyksICgnb3JkZXItcHJvcGhlY2lhJyksICgnc2V4eS1saW5nZXJpZScpLCAoJy1wb3JuLScpLCAoJy1hZHVsdC0nKSwgKCctdGl0cy0nKSwgKCdidXktcGhlbnRlcm1pbmUnKSwgKCdvcmRlci1jaGVhcC1waWxscycpLCAoJ2J1eS14ZW5hZHJpbmUnKSwJKCd4eHgnKSwgKCdwYXJpcy1oaWx0b24nKSwgKCdwYXJpc2hpbHRvbicpLCAoJ2NhbWdpcmxzJyksICgnYWR1bHQtbW9kZWxzJyk=');
-}
-
-
 /*
  * $Log$
+ * Revision 1.212  2010/02/13 13:42:26  efy-yury
+ * move get_antispam_query()
+ *
  * Revision 1.211  2010/02/12 18:22:00  efy-yury
  * add atnispam query obfuscating
  *
