@@ -213,7 +213,7 @@ else
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'loc_transinfo', $loc_transinfo );
 
-	$Form->begin_fieldset( T_('Regional settings') );
+	$Form->begin_fieldset( T_('Regional settings').get_manual_link('Regional_settings') );
 
 	// Time difference:
 	$td_value = $Settings->get('time_difference');
@@ -521,6 +521,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.12  2010/02/14 14:18:39  efy-asimo
+ * insert manual links
+ *
  * Revision 1.11  2010/02/08 17:53:23  efy-yury
  * copyright 2009 -> 2010
  *

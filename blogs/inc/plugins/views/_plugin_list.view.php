@@ -76,7 +76,7 @@ $Results->grp_cols[] = array(
 	);
 */
 
-$Results->title = T_('Installed plugins');
+$Results->title = T_('Installed plugins').get_manual_link('Installed_plugins');
 
 /*
  * STATUS TD:
@@ -285,6 +285,9 @@ $Session->delete( 'fadeout_id');
 
 /*
  * $Log$
+ * Revision 1.11  2010/02/14 14:18:39  efy-asimo
+ * insert manual links
+ *
  * Revision 1.10  2010/02/08 17:53:55  efy-yury
  * copyright 2009 -> 2010
  *

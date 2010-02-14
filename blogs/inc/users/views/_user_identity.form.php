@@ -96,7 +96,7 @@ else
 
 	/***************  User permissions  **************/
 
-$Form->begin_fieldset( T_('User permissions'), array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( T_('User permissions').get_manual_link('User_permissions'), array( 'class'=>'fieldset clear' ) );
 
 $edited_User->get_Group();
 
@@ -411,6 +411,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.9  2010/02/14 14:18:39  efy-asimo
+ * insert manual links
+ *
  * Revision 1.8  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *

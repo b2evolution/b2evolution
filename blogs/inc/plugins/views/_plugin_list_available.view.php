@@ -46,7 +46,7 @@ global $dispatcher;
 
 $Table = new Table();
 
-$Table->title = T_('Plugins available for installation');
+$Table->title = T_('Plugins available for installation').get_manual_link('Plugins_available_for_installation');
 
 $Table->global_icon( T_('Cancel install!'), 'close', regenerate_url(), T_('Cancel'), 3, 4 );
 
@@ -214,6 +214,9 @@ echo '</p>';
 
 /*
  * $Log$
+ * Revision 1.12  2010/02/14 14:18:39  efy-asimo
+ * insert manual links
+ *
  * Revision 1.11  2010/02/08 17:53:55  efy-yury
  * copyright 2009 -> 2010
  *

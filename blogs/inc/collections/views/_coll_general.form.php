@@ -48,7 +48,7 @@ else
 	$Form->hidden( 'blog', $blog );
 }
 
-$Form->begin_fieldset( T_('General parameters'), array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( T_('General parameters').get_manual_link('Blogs_general_parameters'), array( 'class'=>'fieldset clear' ) );
 
 	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Title'), T_('Will be displayed on top of the blog.'), 255 );
 
@@ -129,6 +129,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.20  2010/02/14 14:18:39  efy-asimo
+ * insert manual links
+ *
  * Revision 1.19  2010/02/08 17:52:09  efy-yury
  * copyright 2009 -> 2010
  *

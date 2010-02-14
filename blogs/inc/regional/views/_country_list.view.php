@@ -53,7 +53,7 @@ if( !empty($s) )
 // Create result set:
 $Results = new Results( $SQL->get(), 'ctry_', '-A' );
 
-$Results->title = T_('Countries list');
+$Results->title = T_('Countries list').get_manual_link('Countries_list');
 
 /*
  * STATUS TD:
@@ -217,6 +217,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.19  2010/02/14 14:18:39  efy-asimo
+ * insert manual links
+ *
  * Revision 1.18  2010/01/30 18:55:33  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

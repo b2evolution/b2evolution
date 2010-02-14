@@ -56,7 +56,7 @@ $Form->hidden( 'tab', 'general' );
 
 if( isset($collections_Module) )
 {
-	$Form->begin_fieldset( T_('Display options') );
+	$Form->begin_fieldset( T_('Display options').get_manual_link('Display_options') );
 
 	$BlogCache = & get_BlogCache();
 
@@ -106,6 +106,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.19  2010/02/14 14:18:39  efy-asimo
+ * insert manual links
+ *
  * Revision 1.18  2010/02/08 17:53:55  efy-yury
  * copyright 2009 -> 2010
  *

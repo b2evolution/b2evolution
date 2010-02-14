@@ -51,7 +51,7 @@ $Form->add_crumb( 'antispam' );
 $Form->hiddens_by_key( get_memorized() );
 $Form->hidden( 'action', 'update' );
 
-$Form->begin_fieldset( T_('Comments/Feedback') );
+$Form->begin_fieldset( T_('Comments/Feedback').get_manual_link('antispam_comments/feedback') );
 	$Form->text( 'antispam_threshold_publish', $Settings->get('antispam_threshold_publish'), 3, T_('Publishing threshold'), T_("(-100 to 100). Automatically publish feedbacks with a spam karma below this value.") );
 	$Form->text( 'antispam_threshold_delete', $Settings->get('antispam_threshold_delete'), 3, T_('Deletion threshold'), T_("(-100 to 100). Automatically delete feedbacks with a spam karma over this value.") );
 
@@ -98,6 +98,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.7  2010/02/14 14:18:39  efy-asimo
+ * insert manual links
+ *
  * Revision 1.6  2010/02/08 17:52:06  efy-yury
  * copyright 2009 -> 2010
  *
