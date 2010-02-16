@@ -212,9 +212,9 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	// leave only first 5 words
 	$title_words = array();
 	$title_words = explode('-', $urltitle);
-	if(count($title_words) > 5)
+	$count_of_words = 5;
+	if(count($title_words) > $count_of_words)
 	{
-		$count_of_words = 5;
 		$urltitle = '';
 		for($i = 0; $i < $count_of_words; $i++)
 		{
@@ -1308,6 +1308,9 @@ function echo_slug_filler()
 
 /*
  * $Log$
+ * Revision 1.91  2010/02/16 16:52:46  efy-yury
+ * slugs
+ *
  * Revision 1.90  2010/02/13 16:22:30  efy-yury
  * slug field autofill
  *
