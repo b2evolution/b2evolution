@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2010-02-04 20:40+0100\n"
-"PO-Revision-Date: 2010-02-06 18:09-0500\n"
+"PO-Revision-Date: 2010-02-14 12:32-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -16864,7 +16864,7 @@ msgstr "Ваш браузер должен принимать cookie, чтобы
 #: ../../../skins_adm/login/_lostpass_form.main.php:34
 #: ../../../skins_adm/login/_lostpass_form.main.php:46
 msgid "Lost password ?"
-msgstr "Потеряли пароль ?"
+msgstr "Забыли пароль ?"
 
 #: ../../../skins_adm/login/_login_form.main.php:135
 msgid "Log in!"
