@@ -158,8 +158,10 @@ switch( $action )
 			// Create default category:
 			load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
 			$edited_Chapter = new Chapter( NULL, $edited_Blog->ID );
+
+			$blog_urlname = param( 'blog_urlname', 'string' );
 			$edited_Chapter->set( 'name', T_('Uncategorized') );
-			$edited_Chapter->set( 'urlname', 'main' );
+			$edited_Chapter->set( 'urlname', $blog_urlname.'-main' );
 			$edited_Chapter->dbinsert();
 
 			$Messages->add( T_('A default category has been created for this blog.'), 'success' );
@@ -468,6 +470,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2010/02/16 16:46:25  efy-yury
+ * default category slugs
+ *
  * Revision 1.21  2010/02/08 17:52:07  efy-yury
  * copyright 2009 -> 2010
  *
