@@ -40,7 +40,7 @@ global $Settings;
 
 global $UserSettings;
 
-global $upload_quickmode, $failedFiles, $ads_list_path, $uploadwithproperties;
+global $upload_quickmode, $failedFiles, $ads_list_path, $uploadwithproperties, $renamedMessages;
 
 global $fm_FileRoot;
 ?>
@@ -234,19 +234,40 @@ global $fm_FileRoot;
 		{
 			echo '<p class="error">'.T_('Some file uploads failed. Please check the errors below.').'</p>';
 		}
+		if( count( $renamedMessages) )
+		{
+			echo '<p class="error">'.T_('Some uploaded file name has been modified. Please check the messages below.').'</p>';
+		}
 		?>
 
 			<div class="upload_title"><?php echo T_('Files to upload') ?></div>
 
 			<ul id="uploadfileinputs">
 				<?php
-					if( empty($failedFiles) )
-					{ // No failed files, display 5 empty input blocks:
+					if( empty($failedFiles) && empty($renamedMessages) )
+					{ // No failed files, no renamed files display 5 empty input blocks:
 						$displayFiles = array( NULL, NULL, NULL, NULL, NULL );
 					}
-					else
+					elseif ( ! empty($failedFiles) )
 					{ // Display failed files:
 						$displayFiles = & $failedFiles;
+						if( ! empty($renamedMessages) )
+						{ // There are renamed files
+							foreach( $renamedMessages as $lKey => $data )
+							{
+								if( $displayFiles[$lKey] == null )
+								{
+									$displayFiles[$lKey] = $data['message'];
+								}
+							}
+						}
+					}
+					else
+					{ // Display renamed files:
+						foreach( $renamedMessages as $lKey => $data )
+						{
+							$displayFiles[$lKey] = $data['message'];
+						}
 					}
 
 					global $uploadfile_alt, $uploadfile_desc, $uploadfile_name, $uploadfile_title;
@@ -254,10 +275,18 @@ global $fm_FileRoot;
 					foreach( $displayFiles as $lKey => $lMessage )
 					{ // For each file upload block to display:
 
-						if( $lMessage !== NULL )
-						{ // This is a failed upload:
-							echo '<li class="invalid" title="'
-											./* TRANS: will be displayed as title for failed file uploads */ T_('Invalid submission.').'">';
+						if( ($lMessage !== NULL) )
+						{
+							if( ! array_key_exists( $lKey, $renamedMessages ) )
+							{ // This is a failed upload:
+								echo '<li class="invalid" title="'
+												./* TRANS: will be displayed as title for failed file uploads */ T_('Invalid submission.').'">';
+							}
+							else
+							{ // This filename arlready exists:
+								echo '<li class="invalid" title="'
+												./* TRANS: will be displayed as title in case of renamed file uploads */ T_('File name changed.').'">';
+							}
 							echo '<p class="error">'.$lMessage.'</p>';
 						}
 						else
@@ -267,6 +296,9 @@ global $fm_FileRoot;
 
 						// fp> TODO: would be cool to add a close icon starting at the 2nd <li>
 						// dh> TODO: it may be useful to add the "accept" attrib to the INPUT elements to give the browser a hint about the accepted MIME types
+						
+						if( ! array_key_exists( $lKey, $renamedMessages ) )
+						{
 						?>
 
 						<input type="radio" name="uploadfile_source[<?php echo $lKey ?>]" value="file"
@@ -282,6 +314,17 @@ global $fm_FileRoot;
 								?>" /><br />
 
 						<?php
+						}
+						else
+						{
+							?>
+							<input type="radio" name="<?php echo 'Renamed_'.$lKey ?>" value="Yes" id=" <?php echo 'Yes_'.$lKey ?>"/>
+							<label for="<?php echo 'Yes_'.$lKey ?>">
+							<?php echo sprintf( T_("Replace the old version -%s- with the new version -%s-."), $renamedMessages[$lKey]['oldThumb'], $renamedMessages[$lKey]['newThumb'] ) ?></label><br />
+							<input type="radio" name="<?php echo 'Renamed_'.$lKey ?>" value="No" id=" <?php echo 'No_'.$lKey ?>"  checked="checked"/>
+							<label for="<?php echo 'Yes_'.$lKey ?>"><?php echo T_("Don't touch the old version") ?> </label><br />
+							<?php
+						}
 						if( $uploadwithproperties )
 						{	// We want file properties on the upload form:
 							?>
@@ -374,6 +417,9 @@ global $fm_FileRoot;
 
 /*
  * $Log$
+ * Revision 1.15  2010/02/17 12:59:59  efy-asimo
+ * Replace existing file task
+ *
  * Revision 1.14  2010/02/08 17:53:02  efy-yury
  * copyright 2009 -> 2010
  *

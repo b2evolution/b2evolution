@@ -232,6 +232,13 @@ param( 'upload_quickmode', 'integer', 0 );
  */
 $failedFiles = array();
 
+/**
+ * Remember renamed files (and the messages)
+ * @var array
+ */
+param( 'renamedFiles', 'array', array(), true );
+$renamedMessages = array();
+
 // Process files we want to get from an URL:
 param( 'uploadfile_url', 'array', array() );
 param( 'uploadfile_source', 'array', array() );
@@ -298,6 +305,41 @@ if( $uploadfile_url )
 					isset($info['used_method']) ? $info['used_method'] : '-');
 			}
 		}
+	}
+}
+
+// Process replace old versions
+if( ! empty($renamedFiles) )
+{
+	foreach( $renamedFiles as $rKey => $rData )
+	{
+		$replace_old = param( 'Renamed_'.$rKey, 'string', null );
+		if( $replace_old == "Yes" )
+		{
+			$FileCache = & get_FileCache();
+			$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$renamedFiles[$rKey]['newName'], true );
+			$oldFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$renamedFiles[$rKey]['oldName'], true );
+			$oldFile->rm_cache();
+			$newFile->rm_cache();
+			if( @unlink( $oldFile->get_full_path() ) )
+			{
+				if( ! @rename( $newFile->get_full_path(), $oldFile->get_full_path() ) )// rename_to($oldFile->get_name());
+				{
+					$Messages->add( T_('Couldn\'t replace the old version'), 'error' );
+				}
+				$Messages->add( T_('The old version has been replaced!'), 'success' );
+			}
+			else
+			{
+				$Messages->add( T_('Couldn\'t replace the old version'), 'error' );
+			}
+		}
+	}
+	unset( $renamedFiles );
+	
+	if( $upload_quickmode )
+	{
+		header_redirect( regenerate_url( 'ctrl', 'ctrl=files', '', '&' ) );
 	}
 }
 
@@ -422,12 +464,31 @@ if( isset($_FILES) && count( $_FILES ) )
 		$FileCache = & get_FileCache();
 		$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
 
-		if( $newFile->exists() )
+		$num_ext = 0;
+		$oldName = $newName;
+
+		while( $newFile->exists() )
 		{ // The file already exists in the target location!
-			// TODO: Rename/Overwriting (save as filename_<numeric_extension> and provide interface to confirm, rename or overwrite)
-			$failedFiles[$lKey] = sprintf( T_('The file &laquo;%s&raquo; already exists.'), $newFile->dget('name') );
-			// Abort upload for this file:
-			continue;
+			$num_ext++;
+			$ext_pos = strrpos( $newName, '.');
+			if( $num_ext == 1 )
+			{
+				$newName = substr_replace( $newName, '-'.$num_ext.'.', $ext_pos, 1 );
+				if( $image_info )
+				{
+					$oldFile_thumb = $newFile->get_preview_thumb( 'fulltype' );
+				}
+				else
+				{
+					$oldFile_thumb = $newFile->get_size_formatted();
+				}
+			}
+			else
+			{
+				$replace_length = strlen( '-'.($num_ext-1) );
+				$newName = substr_replace( $newName, '-'.$num_ext, $ext_pos-$replace_length, $replace_length ); 
+			}
+			$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
 		}
 
 		// Attempt to move the uploaded file to the requested target location:
@@ -455,6 +516,25 @@ if( isset($_FILES) && count( $_FILES ) )
 
 		// Refreshes file properties (type, size, perms...)
 		$newFile->load_properties();
+		
+		if( $num_ext )
+		{ // The file name was changed!
+			if( $image_info )
+			{
+				$newFile_thumb = $newFile->get_preview_thumb( 'fulltype' );
+			}
+			else
+			{
+				$newFile_thumb = $newFile->get_size_formatted();
+			}
+			//$newFile_size = bytesreadable ($_FILES['uploadfile']['size'][$lKey]);
+			$renamedMessages[$lKey]['message'] = sprintf( T_('"I have renamed %s to %s. Would you like to replace %s with the new version instead?'),
+													   $oldName, $newName, $oldName );
+			$renamedMessages[$lKey]['oldThumb'] = $oldFile_thumb;
+			$renamedMessages[$lKey]['newThumb'] = $newFile_thumb;
+			$renamedFiles[$lKey]['oldName'] = $oldName;
+			$renamedFiles[$lKey]['newName'] = $newName;
+		}
 
 		// Store extra info about the file into File Object:
 		if( isset( $uploadfile_title[$lKey] ) )
@@ -514,7 +594,8 @@ if( isset($_FILES) && count( $_FILES ) )
 		$Messages->add( $failedFiles[0], 'error' );
 		unset($failedFiles);
 	}
-	if( empty($failedFiles) )
+	
+	if( empty($failedFiles) && empty($renamedFiles) )
 	{ // quick mode or no failed files, Go back to Browsing
 		// header_redirect( $dispatcher.'?ctrl=files&root='.$fm_FileRoot->ID.'&path='.rawurlencode($path) );
 		header_redirect( regenerate_url( 'ctrl', 'ctrl=files', '', '&' ) );
@@ -555,6 +636,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.32  2010/02/17 12:59:52  efy-asimo
+ * Replace existing file task
+ *
  * Revision 1.31  2010/02/08 17:52:15  efy-yury
  * copyright 2009 -> 2010
  *
