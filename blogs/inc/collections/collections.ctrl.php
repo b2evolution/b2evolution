@@ -167,6 +167,9 @@ switch( $action )
 			$Messages->add( T_('A default category has been created for this blog.'), 'success' );
 
 			// ADD DEFAULT WIDGETS:
+			load_funcs( 'widgets/_widgets.funcs.php' );
+			insert_basic_widgets( $edited_Blog->ID );
+			/*
 			if( $edited_Blog->get( 'in_bloglist' ) )
 			{	// This is a public blog, let's give it a public global navigation list by default:
 				$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
@@ -222,7 +225,7 @@ switch( $action )
 			// Add XML feeds to all blogs Sidebars:
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 									 VALUES( '.$edited_Blog->ID.', "Sidebar", 80, "core", "coll_xml_feeds" )' );
-
+*/
 			$Messages->add( T_('Default widgets have been set-up for this blog.'), 'success' );
 
 			$DB->commit();
@@ -470,6 +473,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2010/02/18 06:59:36  efy-yury
+ * localization of widgets create code
+ *
  * Revision 1.22  2010/02/16 16:46:25  efy-yury
  * default category slugs
  *
