@@ -62,15 +62,15 @@ function crop_to_constraint( $src_width, $src_height, $max_width, $max_height )
 	$max_ratio = $max_width / $max_height;
 	if( $max_ratio <= $src_ratio )
 	{
-		$x = ($src_width - $src_height) / 2;
 		$y = 0;
-		$src_width = $src_height;
+		$x = ($src_width - ($src_width * ($max_ratio/$src_ratio))) / 2;
+		$src_width = $src_width * ($max_ratio/$src_ratio);
 	}
 	else
 	{
 		$x = 0;
-		$y = ($src_height - $src_width) / 2;
-		$src_height = $src_width;
+		$y = ($src_height - $src_width/$max_ratio) / 2;
+		$src_height = $src_width/$max_ratio;
 	}
 
 	return array( $x, $y, $src_width, $src_height );
@@ -351,6 +351,9 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.22  2010/02/21 04:47:07  sam2kb
+ * crop_to_constraint: fixed crop proportions
+ *
  * Revision 1.21  2010/02/08 17:52:18  efy-yury
  * copyright 2009 -> 2010
  *
