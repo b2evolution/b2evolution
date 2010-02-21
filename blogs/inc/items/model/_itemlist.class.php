@@ -202,7 +202,7 @@ class ItemList2 extends ItemListLight
 		// CUSTOM FIELDS varchar
 		for( $i = 1 ; $i <= 3; $i++ )
 		{	// For each custom varchar field:
-			$this->sql .= $DB->quote(param( 'item_varchar'.$i, 'html', '' )).' AS post_varchar'.$i.",\n";
+			$this->sql .= $DB->quote(param( 'item_varchar'.$i, 'string', '' )).' AS post_varchar'.$i.",\n";
 		}
 
 		$this->sql .= $DB->quote(param( 'item_order', 'double', NULL )).' AS post_order'.",\n"
@@ -719,6 +719,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.30  2010/02/21 01:25:47  sam2kb
+ * item_varchar fields rolled back to 'string'
+ *
  * Revision 1.29  2010/02/10 22:16:26  sam2kb
  * Allow HTML in item_varchar fields
  *
