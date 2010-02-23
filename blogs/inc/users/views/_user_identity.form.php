@@ -356,23 +356,23 @@ $userfielddefs = $DB->get_results( '
 // TODO: JS for adding more than 3 at a time.
 for( $i=1; $i<=3; $i++ )
 {
-	$label = '<select name="new_uf_type_'.$i.'"><option value="">Add field...</option><optgroup label="Instant Messaging">';
+	$label = '<select name="new_uf_type_'.$i.'"><option value="">'.T_('Add field...').'</option><optgroup label="'.T_('Instant Messaging').'">';
 	foreach( $userfielddefs as $fielddef )
 	{
 		// check for group header:
 		switch( $fielddef->ufdf_ID )
 		{
 			case 50000:
-				$label .= "\n".'</optgroup><optgroup label="Phone">';
+				$label .= "\n".'</optgroup><optgroup label="'.T_('Phone').'">';
 				break;
 			case 100000:
-				$label .= "\n".'</optgroup><optgroup label="Web">';
+				$label .= "\n".'</optgroup><optgroup label="'.T_('Web').'">';
 				break;
 			case 200000:
-				$label .= "\n".'</optgroup><optgroup label="Organization">';
+				$label .= "\n".'</optgroup><optgroup label="'.T_('Organization').'">';
 				break;
 			case 300000:
-				$label .= "\n".'</optgroup><optgroup label="Address">';
+				$label .= "\n".'</optgroup><optgroup label="'.T_('Address').'">';
 				break;
 		}
 		$label .= "\n".'<option value="'.$fielddef->ufdf_ID.'"';
@@ -411,6 +411,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.10  2010/02/23 05:01:46  sam2kb
+ * minor
+ *
  * Revision 1.9  2010/02/14 14:18:39  efy-asimo
  * insert manual links
  *
