@@ -154,7 +154,7 @@ class Plugins_admin extends Plugins
 				'AfterUserDelete' => 'This gets called after an user has been deleted from the database.',
 				'AfterUserInsert' => 'This gets called after an user has been inserted into the database.',
 				'AfterUserUpdate' => 'This gets called after an user has been updated in the database.',
-
+				
 				// fp> This is actually RENDERing, right?
 				// TODO: Rename to "DispRender"
 				'FilterIpAddress' => 'Called when displaying an IP address.',
@@ -176,7 +176,9 @@ class Plugins_admin extends Plugins
 				'DisplayLoginFormFieldset' => 'Called when displaying the "Login" form.',
 				'DisplayRegisterFormFieldset' => 'Called when displaying the "Register" form.',
 				'DisplayValidateAccountFormFieldset' => 'Called when displaying the "Validate account" form.',
+				'DisplayProfileFormFieldset' => 'Called when displaying the "User profile" form.',
 
+				'ProfileFormSent' => 'Called when a private profile form has been sent and gets received.',
 				'CommentFormSent' => 'Called when a public comment form has been sent and gets received.',
 				'BeforeCommentFormInsert' => 'Called before a comment gets recorded through the public comment form.',
 				'AfterCommentFormInsert' => 'Called after a comment has been added through public form.',
@@ -1473,6 +1475,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.29  2010/02/23 05:07:17  sam2kb
+ * New plugin hooks: DisplayProfileFormFieldset and ProfileFormSent
+ *
  * Revision 1.28  2010/02/08 17:53:24  efy-yury
  * copyright 2009 -> 2010
  *

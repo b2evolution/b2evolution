@@ -2100,8 +2100,61 @@ class Plugin
 	function ValidateAccountFormSent( & $params )
 	{
 	}
+	
+	
+	/**
+	 * Event handler: Called at the end of the "User profile" form.
+	 *
+	 * The corresponding action event is {@link Plugin::ProfileFormSent()}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Form': the user profile form generating object (by reference)
+	 *   - 'User': the edited user object (by reference)
+	 *   - 'edit_layout':
+	 *			"public" - public frontend user profile form (info only),
+	 *			"private" - private frontend user profile form (editable),
+	 */
+	function DisplayProfileFormFieldset( & $params )
+	{
+		if( $params['edit_layout'] == 'public' )
+		{ // Do nothing in public mode
+			return false;
+		}
+
+		return false;		// Do nothing by default.
+	}
 
 
+	/**
+	 * Event handler: Called before at the beginning, if a profile form gets sent (and received).
+	 *
+	 * Use this to filter input
+	 *
+	 * @see Plugin::DisplayProfileFormFieldset()
+	 * @param array Associative array of parameters
+	 *   - 'User': edited {@link User} object (by reference)
+	 *   - 'newuser_firstname': firstname (by reference)
+	 *   - 'newuser_lastname': lastname (by reference)
+	 *   - 'newuser_nickname': nickname (by reference)
+	 *   - 'newuser_idmode': "Identity shown" mode (by reference)
+	 *   - 'newuser_locale': locale (by reference)
+	 *   - 'newuser_icq': ICQ (by reference)
+	 *   - 'newuser_aim': AOL I.M. (by reference)
+	 *   - 'newuser_msn': MSN I.M. (by reference)
+	 *   - 'newuser_yim': Yahoo I.M. (by reference)
+	 *   - 'newuser_url': URL (by reference)
+	 *   - 'newuser_email': email (by reference)
+	 *   - 'newuser_allow_msgform': "message form" status (by reference)
+	 *   - 'newuser_notify': "notifications" status (by reference)
+	 *   - 'newuser_showonline': "show online" status (by reference)
+	 *   - 'pass1': pass1 (by reference)
+	 *   - 'pass2': pass2 (by reference)
+	 */
+	function ProfileFormSent( & $params )
+	{
+	}
+	
+	
 	/**
 	 * Event handler: called at the end of the login process, if the user did not try to
 	 *                login (by sending "login" and "pwd"), the session has no user attached
@@ -2937,6 +2990,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.35  2010/02/23 05:07:17  sam2kb
+ * New plugin hooks: DisplayProfileFormFieldset and ProfileFormSent
+ *
  * Revision 1.34  2010/02/08 17:53:23  efy-yury
  * copyright 2009 -> 2010
  *

@@ -85,6 +85,30 @@ if( $demo_mode && ($current_User->ID == 1 || $current_User->login == 'demouser')
 		. T_('Back to profile') . '</a>]' );
 }
 
+
+// Trigger event: a Plugin could add a $category="error" message here..
+// This must get triggered before any internal validation and must pass all relevant params.
+$Plugins->trigger_event( 'ProfileFormSent', array(
+		'newuser_firstname' => & $newuser_firstname,
+		'newuser_lastname' => & $newuser_lastname,
+		'newuser_nickname' => & $newuser_nickname,
+		'newuser_idmode' => & $newuser_idmode,
+		'newuser_locale' => & $newuser_locale,
+		'newuser_icq' => & $newuser_icq,
+		'newuser_aim' => & $newuser_aim,
+		'newuser_msn' => & $newuser_msn,
+		'newuser_yim' => & $newuser_yim,
+		'newuser_url' => & $newuser_url,
+		'newuser_email' => & $newuser_email,
+		'newuser_allow_msgform' => & $newuser_allow_msgform,
+		'newuser_notify' => & $newuser_notify,
+		'newuser_showonline' => & $newuser_showonline,
+		'pass1' => & $pass1,
+		'pass2' => & $pass2,
+		'User' => & $current_User,
+	) );
+
+
 /**
  * Additional checks:
  */
@@ -150,6 +174,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.63  2010/02/23 05:06:55  sam2kb
+ * New plugin hooks: DisplayProfileFormFieldset and ProfileFormSent
+ *
  * Revision 1.62  2010/02/08 17:51:14  efy-yury
  * copyright 2009 -> 2010
  *

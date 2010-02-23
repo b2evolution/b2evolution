@@ -93,11 +93,16 @@ $ProfileForm->begin_fieldset( T_('Miscellaneous') );
 
 $ProfileForm->end_fieldset();
 
+$Plugins->trigger_event( 'DisplayProfileFormFieldset', array( 'Form' => & $ProfileForm, 'User' => & $User, 'edit_layout' => 'public' ) );
+
 $ProfileForm->end_form();
 
 
 /*
  * $Log$
+ * Revision 1.14  2010/02/23 05:07:19  sam2kb
+ * New plugin hooks: DisplayProfileFormFieldset and ProfileFormSent
+ *
  * Revision 1.13  2010/02/08 17:56:14  efy-yury
  * copyright 2009 -> 2010
  *
