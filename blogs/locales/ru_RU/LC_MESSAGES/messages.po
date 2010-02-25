@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2010-02-04 20:40+0100\n"
-"PO-Revision-Date: 2010-02-14 12:32-0500\n"
+"PO-Revision-Date: 2010-02-25 17:48-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -6532,7 +6532,7 @@ msgstr "%d связанных записей"
 #: ../../../inc/files/model/_file.class.php:239
 #, php-format
 msgid "%d linked users (avatars)"
-msgstr "%d связанных пользователей (аватаров)"
+msgstr "%d связанных пользователей (аватар)"
 
 #: ../../../inc/files/model/_file.class.php:559
 #, php-format
