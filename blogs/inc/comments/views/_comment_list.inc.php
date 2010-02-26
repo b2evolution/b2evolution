@@ -57,7 +57,7 @@ while( $Comment = & $CommentList->get_next() )
 			{ // There is an URL and we have permission to ban...
 				// TODO: really ban the base domain! - not by keyword
 				echo ' <a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(get_ban_domain($Comment->author_url))
-					.'">'.get_icon( 'ban' ).'</a> ';
+					.'&amp;'.url_crumb('antispam').'">'.get_icon( 'ban' ).'</a> ';
 				$Comment->deleteurl_link(false);
 			}
 			$Comment->author_email( '', ' &middot; Email: <span class="bEmail">', '</span>' );
@@ -112,6 +112,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.13  2010/02/26 08:34:33  efy-asimo
+ * dashboard -> ban icon should be javascripted task
+ *
  * Revision 1.12  2010/02/08 17:52:13  efy-yury
  * copyright 2009 -> 2010
  *

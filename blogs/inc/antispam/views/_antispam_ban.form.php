@@ -29,7 +29,7 @@ global $row_stats;	// for hit functions
 
 $Form = new Form( NULL, 'antispam_ban', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class'=>'action_icon', 'id'=>'close_button' ) );
 
 $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 
@@ -205,6 +205,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.17  2010/02/26 08:34:33  efy-asimo
+ * dashboard -> ban icon should be javascripted task
+ *
  * Revision 1.16  2010/02/08 17:52:06  efy-yury
  * copyright 2009 -> 2010
  *

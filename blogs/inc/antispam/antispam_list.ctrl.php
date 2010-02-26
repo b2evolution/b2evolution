@@ -36,7 +36,12 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-$AdminUI->set_path( 'tools', 'antispam' );
+param( 'display_mode', string );
+
+if( $display_mode != 'js' )
+{
+	$AdminUI->set_path( 'tools', 'antispam' );
+}
 
 param_action( '' );
 param( 'confirm', 'string' );
@@ -88,6 +93,15 @@ switch( $action )
 
 		if( $delcomments )
 		{ // Then all banned comments
+			if( $display_mode == 'js' )
+			{
+				$query = 'SELECT comment_ID FROM T_comments
+							  WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
+							   OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
+							   OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
+							   OR comment_content LIKE '.$DB->quote('%'.$keyword.'%');
+				$deleted_ids = implode( ',', $DB->get_col($query, 0, 'Get comment ids awaiting for delete') );
+			};
 			$r = $DB->query('DELETE FROM T_comments
 			                  WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
 			                     OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
@@ -102,8 +116,11 @@ switch( $action )
 			{
 				$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars($keyword) ), 'success' );
 				// Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=antispam', 303 ); // Will EXIT
-				// We have EXITed already at this point!!
+				if( $display_mode != 'js' )
+				{
+					header_redirect( '?ctrl=antispam', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+				}
 			}
 			else
 			{ // TODO: message?
@@ -113,6 +130,19 @@ switch( $action )
 		if( $report )
 		{ // Report this keyword as abuse:
 			antispam_report_abuse( $keyword );
+		}
+		
+		param( 'request', 'string', '' );
+		if( $display_mode == 'js' && $request != 'checkban' )
+		{
+			if( $delcomments )
+				{
+					send_javascript_message( array( 'refresh_comments' => array( $deleted_ids ), 'closeAntispamSettings' => array() ), true );
+				}
+				else
+				{
+					send_javascript_message( array( 'closeAntispamSettings' => array() ), true );
+				}
 		}
 
 		// We'll ask the user later what to do, if no "sub-action" given.
@@ -164,21 +194,22 @@ switch( $action )
 		break;
 }
 
+if( $display_mode != 'js')
+{
+	$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
+	$AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=crontab' );
+	$AdminUI->breadcrumbpath_add( T_('Antispam blacklist'), '?ctrl=antispam' );
+	
+	
+	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
+	
+	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+	$AdminUI->disp_body_top();
 
-
-$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=crontab' );
-$AdminUI->breadcrumbpath_add( T_('Antispam blacklist'), '?ctrl=antispam' );
-
-
-// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-$AdminUI->disp_html_head();
-
-// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-$AdminUI->disp_body_top();
-
-// Begin payload block:
-$AdminUI->disp_payload_begin();
+	// Begin payload block:
+	$AdminUI->disp_payload_begin();
+}
 
 
 if( $action == 'ban' && !$Messages->count('error') && !( $delhits || $delcomments || $blacklist_locally || $report ) )
@@ -191,14 +222,20 @@ else
 }
 
 // End payload block:
-$AdminUI->disp_payload_end();
+if( $display_mode != 'js')
+{
+	$AdminUI->disp_payload_end();
 
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
+	// Display body bottom, debug info and close </html>:
+	$AdminUI->disp_global_footer();
+}
 
 
 /*
  * $Log$
+ * Revision 1.12  2010/02/26 08:34:33  efy-asimo
+ * dashboard -> ban icon should be javascripted task
+ *
  * Revision 1.11  2010/02/08 17:52:06  efy-yury
  * copyright 2009 -> 2010
  *

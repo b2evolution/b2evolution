@@ -3803,9 +3803,8 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 			if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{ // There is an URL and we have permission to ban...
 				// TODO: really ban the base domain! - not by keyword
-				echo ' <a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(get_ban_domain($Comment->author_url))
-					.'&amp;'.url_crumb('antispam').'">'.get_icon( 'ban' ).'</a> ';
-				//echo ' <a href="javascript:delete_comment_url('.$Comment->ID.');" title="'.$title.'" onclick="return confirm(\'';" class=deleteurl'.get_icon( 'delete' ).'</a>';
+				$authorurl = '\''.rawurlencode(get_ban_domain($Comment->author_url)).'\''; 
+				echo ' <a id="ban_url" href="javascript:ban_url('.$authorurl.');"'.get_icon( 'ban' ).'</a>';
 				$Comment->deleteurl_link();
 			}
 			echo '</span>';
@@ -3959,6 +3958,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.213  2010/02/26 08:34:33  efy-asimo
+ * dashboard -> ban icon should be javascripted task
+ *
  * Revision 1.212  2010/02/13 13:42:26  efy-yury
  * move get_antispam_query()
  *

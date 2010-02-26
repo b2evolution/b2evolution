@@ -189,6 +189,8 @@ switch( $action )
 		exit(0);
 
 	case 'delete_comment_url':
+		
+		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 		
 		global $blog;
@@ -200,6 +202,19 @@ switch( $action )
 		$edited_Comment->set( 'author_url', null );
 		$edited_Comment->dbupdate();
 		
+		exit(0);
+	
+	case 'refresh_comments':
+		
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+		
+		global $blog;
+
+		$blog = param( 'blogid', 'integer' );
+		$current_User->check_perm( 'blog_comments', 'edit', true, $blog );
+		
+		get_comments_awaiting_moderation( $blog );
 		exit(0);
 }
 
@@ -237,6 +252,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.47  2010/02/26 08:34:33  efy-asimo
+ * dashboard -> ban icon should be javascripted task
+ *
  * Revision 1.46  2010/02/09 17:20:33  efy-yury
  * &new -> new
  *

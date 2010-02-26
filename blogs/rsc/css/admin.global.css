@@ -70,6 +70,48 @@ h3.dashboard_post_title {
 
 
 /*
+ * Overlay screen:
+ */
+#screen_mask{
+position:fixed;
+top: 0;
+left: 0;
+background: #000;
+height: 100%;
+width: 100%;
+display:none;
+z-index:998;
+}
+
+#overlay_page{
+display:none;
+}
+
+#overlay_page.overlay_page_active{
+position:fixed;
+bottom:5%;
+right:5%;
+height:90%;
+width:90%;
+overflow:auto;
+z-index:999;
+background:#f1f6f8;
+border:1px solid #ccc;
+display:block;
+}
+
+.overlay_page_active form{
+padding:1em;
+}
+
+#overlay_postback{
+position:absolute;
+top:-1000em;
+left:-1000em;
+}
+
+
+/*
  * Compose screen:
  */
 table.compose_layout {

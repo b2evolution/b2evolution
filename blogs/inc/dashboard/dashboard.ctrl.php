@@ -41,6 +41,8 @@ $AdminUI->set_coll_list_params( 'blog_ismember', 'view', array(), T_('Global'), 
 
 $AdminUI->set_path( 'dashboard' );
 
+require_js( 'communication.js' ); // auto requires jQuery
+
 $AdminUI->breadcrumbpath_init();
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -52,6 +54,8 @@ $AdminUI->disp_body_top();
 if( $blog )
 {	// We want to look at a specific blog:
 	// Begin payload block:
+	echo '<div class="first_payload_block">'."\n";	
+
 	$AdminUI->disp_payload_begin();
 
 	echo '<h2>'.$Blog->dget( 'name' ).'</h2>';
@@ -104,7 +108,7 @@ if( $blog )
 			}
 
 			// Process result after publish/deprecate/delete action has been completed
-			function processResult(result, id)
+			function processResult(result, ids)
 			{
 				$('#comments_container').html($('#comments_container').html() + result);
 
@@ -126,10 +130,13 @@ if( $blog )
 					}
 				}
 
-				var divid = 'comment_' + id;
-				var options = {};
-				$('#' + divid).effect('blind', options, 200);
-				$('#' + divid).remove();
+				for( var i=0;i<ids.length; ++i )
+				{
+					var divid = 'comment_' + ids[i];
+					var options = {};
+					$('#' + divid).effect('blind', options, 200);
+					$('#' + divid).remove();
+				}
 			}
 
 			// Set comments status
@@ -153,7 +160,13 @@ if( $blog )
 				type: 'POST',
 				url: '<?php echo $htsrv_url; ?>async.php',
 				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&status=' + status + '&action=set_comment_status' + '&ids=' + ids + '&ind=' + commentsInd + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
-				success: function(result) { processResult(result, id);	} });
+				success: function(result) 
+					{
+						modified_ids = new Array();
+						modified_ids.push(id);
+						processResult(result, modified_ids);	
+					}
+				});
 			}
 
 			// Delete comment
@@ -169,7 +182,13 @@ if( $blog )
 				type: 'POST',
 				url: '<?php echo $htsrv_url; ?>async.php',
 				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&action=delete_comment' + '&ids=' + ids + '&ind=' + commentsInd + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
-				success: function(result) { processResult(result, id); } });
+				success: function(result) 
+					{
+						var deleted_ids = new Array();
+						deleted_ids.push(id);
+						processResult(result, deleted_ids); 
+					} 
+				});
 			}
 
 			// Fade in background color
@@ -183,14 +202,94 @@ if( $blog )
 			{
 				var divid = 'commenturl_' + id;
 				fadeIn(divid, '#EE0000');
-
-				var ids = getCommentsIds();
 				
 				$.ajax({
 					type: 'POST',
 					url: '<?php echo $htsrv_url; ?>async.php',
 					data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&action=delete_comment_url' + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
 					success: function(result) { $('#' + divid).remove(); }
+				});
+			}
+
+			// This is called when we get the response from the server:
+			function antispamSettings( the_html )
+			{
+				// add placeholder for antispam settings form:
+				jQuery( 'body' ).append( '<div id="screen_mask" onclick="closeAntispamSettings()"></div><div id="overlay_page"></div>' );
+				var evobar_height = jQuery( '#evo_toolbar' ).height();
+				jQuery( '#screen_mask' ).css({ top: evobar_height });
+				jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
+				jQuery( '#overlay_page' ).html( the_html ).addClass( 'overlay_page_active' );
+				AttachServerRequest( 'antispam_ban' ); // send form via hidden iframe
+				jQuery( '#close_button' ).bind( 'click', closeAntispamSettings );
+				jQuery( '.SaveButton' ).bind( 'click', refresh_overlay );
+			}
+
+			// This is called to close the antispam ban overlay page
+			function closeAntispamSettings()
+			{
+				jQuery( '#overlay_page' ).hide();
+				jQuery( '.action_messages').remove();
+				jQuery( '#server_messages' ).insertBefore( '.first_payload_block' );
+				jQuery( '#overlay_page' ).remove();
+				jQuery( '#screen_mask' ).remove();
+				return false;
+			}
+
+			// Ban comment url
+			function ban_url(authorurl)
+			{
+				$.ajax({
+					type: 'POST',
+					url: '<?php echo $admin_url; ?>',
+					data: 'ctrl=antispam&action=ban&display_mode=js&mode=iframe&request=checkban&keyword=' + authorurl +
+						  '&' + <?php echo '\''.url_crumb('antispam').'\''; ?>,
+					success: function(result) 
+					{
+						antispamSettings( result );
+					}
+				});
+			}
+
+			// Refresh overlay page after Check&ban button click
+			function refresh_overlay()
+			{
+				var parameters = jQuery( '#antispam_add' ).serialize();
+				
+				$.ajax({
+					type: 'POST',
+					url: '<?php echo $admin_url; ?>',
+					data: 'action=ban&display_mode=js&mode=iframe&request=checkban&' + parameters,
+					success: function(result) 
+					{
+						antispamSettings( result );
+					}
+				});
+				return false;
+			}
+
+			// Refresh comments on dashboard after ban url -> delete comment
+			function refresh_comments(deleted_ids)
+			{
+				var comment_ids = String(deleted_ids).split(',');
+				for( var i=0;i<comment_ids.length; ++i )
+				{
+					var divid = 'comment_' + comment_ids[i];
+					fadeIn(divid, '#EE0000');
+
+					delete commentIds[divid];
+				}
+
+				var ids = getCommentsIds();
+				
+				$.ajax({
+					type: 'POST',
+					url: '<?php echo $htsrv_url; ?>async.php',
+					data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_comments&ids=' + ids + '&ind=' + commentsInd + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
+					success: function(result) 
+					{
+						processResult(result, comment_ids);
+					}
 				});
 			}
 
@@ -207,7 +306,7 @@ if( $blog )
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
 		echo '<div id="comments_container">';
-
+		
 		// GET COMMENTS AWAITING MODERATION (the code generation is shared with the AJAX callback):
 		show_comments_awaiting_moderation( $Blog->ID );
 
@@ -459,6 +558,8 @@ if( $blog )
 
 	// End payload block:
 	$AdminUI->disp_payload_end();
+	
+	echo '</div>'."\n";
 }
 else
 {	// We're on the GLOBAL tab...
@@ -579,6 +680,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.55  2010/02/26 08:34:34  efy-asimo
+ * dashboard -> ban icon should be javascripted task
+ *
  * Revision 1.54  2010/01/31 17:40:04  efy-asimo
  * delete url from comments in dashboard and comments form
  *
