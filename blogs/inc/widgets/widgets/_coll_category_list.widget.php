@@ -209,7 +209,7 @@ class coll_category_list_Widget extends ComponentWidget
 			}
 			else
 			{
-				$coll_ID_array = explode( ',', $aggregate_coll_IDs );
+				$coll_ID_array = array_filter( array_map( 'trim', explode( ',', $aggregate_coll_IDs ) ) );
 			}
 			foreach( $coll_ID_array as $curr_blog_ID )
 			{
@@ -397,6 +397,9 @@ class coll_category_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.26  2010/02/26 02:05:09  sam2kb
+ * Sanitize aggregate_coll_IDs array
+ *
  * Revision 1.25  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *
