@@ -516,6 +516,8 @@ function & xmlrpcs_login( $m, $login_param, $pass_param )
 		return $r;
 	}
 
+	// fp>Yury TODO: Add API perm check here  --  return 'User has no permission to use this API.'
+
 	logIO( 'Login OK - User: '.$current_User->ID.' - '.$current_User->login );
 
   // This may be needed globally for status permissions in ItemList2, etc..
@@ -840,7 +842,7 @@ function xmlrpcs_can_view_item( & $Item, & $current_User )
  * in a Blog's context and try to fix errors.
  *
  * @author Tilman BLUMENBACH / Tblue
- * 
+ *
  * @param integer The main category to check (by reference).
  * @param object The Blog to which the category is supposed to belong to (by reference).
  * @param array Extra categories for the post (by reference).
@@ -906,6 +908,9 @@ function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.25  2010/02/26 21:46:15  fplanque
+ * todo
+ *
  * Revision 1.24  2010/01/30 18:55:36  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *
