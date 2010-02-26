@@ -55,7 +55,7 @@ class GenericCache extends DataObjectCache
 	 *
 	 * @param object|NULL
 	 */
-	function new_obj( $row = NULL )
+	function & new_obj( $row = NULL )
 	{
 		$objtype = $this->objtype;
 
@@ -68,6 +68,9 @@ class GenericCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.7  2010/02/26 18:36:04  fplanque
+ * this seemed wrong
+ *
  * Revision 1.6  2010/02/08 17:53:02  efy-yury
  * copyright 2009 -> 2010
  *
