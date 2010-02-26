@@ -40,6 +40,13 @@ function wp_getpagelist( $m )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
+	}
 
 	// GET BLOG:
 	/**
@@ -154,6 +161,13 @@ function wp_getpagestatuslist( $m )
 	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
+	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 
 	// GET BLOG:
@@ -271,6 +285,13 @@ function wp_getcommentcount( $m )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
+	}
 
 	// GET BLOG:
 	/**
@@ -324,6 +345,13 @@ function wp_deletecomment( $m )
 	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
+	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 
 	// GET BLOG:
@@ -413,6 +441,9 @@ $xmlrpc_procs['wp.deleteComment'] = array(
 
 /*
  * $Log$
+ * Revision 1.13  2010/02/26 16:18:52  efy-yury
+ * add: permission "Can use APIs"
+ *
  * Revision 1.12  2010/01/30 18:55:36  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

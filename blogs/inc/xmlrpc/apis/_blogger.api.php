@@ -55,6 +55,13 @@ function blogger_newpost( $m )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
+	}
 
 	// GET BLOG:
 	/**
@@ -153,6 +160,13 @@ function blogger_editpost($m)
 	if( ! $current_User = & xmlrpcs_login( $m, 2, 3 ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
+	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 
 	// GET POST:
@@ -308,6 +322,13 @@ function blogger_getuserinfo($m)
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
+	}
 
 	// INFO about logged in user
 	$struct = new xmlrpcval( array(
@@ -353,6 +374,13 @@ function blogger_getpost($m)
 	if( ! $current_User = & xmlrpcs_login( $m, 2, 3 ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
+	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 
 	// GET POST:
@@ -423,6 +451,13 @@ function blogger_getrecentposts( $m )
 	if( ! $current_User = & xmlrpcs_login( $m, 2, 3 ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
+	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 
 	// GET BLOG:
@@ -533,6 +568,9 @@ $xmlrpc_procs['blogger.getRecentPosts'] = array(
 
 /*
  * $Log$
+ * Revision 1.15  2010/02/26 16:18:52  efy-yury
+ * add: permission "Can use APIs"
+ *
  * Revision 1.14  2010/02/08 17:55:17  efy-yury
  * copyright 2009 -> 2010
  *

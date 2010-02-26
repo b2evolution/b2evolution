@@ -67,6 +67,13 @@ function b2_newpost($m)
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
+	}
 	logIO( 'Permission granted.' );
 
 	$postdate = $m->getParam(8);
@@ -153,6 +160,13 @@ function b2_getposturl($m)
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
+	}
 
 	logIO( 'OK.' );
 	return new xmlrpcresp( new xmlrpcval( $edited_Item->get_permanent_url() ) );
@@ -176,6 +190,9 @@ $xmlrpc_procs['b2.getPostURL'] = array(
 
 /*
  * $Log$
+ * Revision 1.12  2010/02/26 16:18:52  efy-yury
+ * add: permission "Can use APIs"
+ *
  * Revision 1.11  2010/02/08 17:55:17  efy-yury
  * copyright 2009 -> 2010
  *

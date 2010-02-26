@@ -326,6 +326,106 @@ class collections_Module extends Module
 		load_class( 'comments/model/_commentlist.class.php', 'CommentList' );
 		load_class( 'items/model/_itemquery.class.php', 'ItemQuery' );
 	}
+	
+	/**
+	 * Get default module permissions
+	 *
+	 * #param integer Group ID
+	 * @return array
+	 */
+	function get_default_group_permissions( $grp_ID )
+	{
+		switch( $grp_ID )
+		{
+			case 1: // Administrators group ID equals 1
+				$permname = 'always';
+				break;
+			default: // Other groups
+				$permname = 'never';
+				break;
+		}
+
+		// We can return as many default permissions as we want:
+		// e.g. array ( permission_name => permission_value, ... , ... )
+		return $permissions = array( 'perm_api' => $permname );
+	}
+
+
+	/**
+	 * Get available group permissions
+	 *
+	 * @return array
+	 */
+	function get_available_group_permissions()
+	{
+		// 'label' is used in the group form as label for radio buttons group
+		// 'user_func' function used to check user permission. This function should be defined in Module.
+		// 'group_func' function used to check group permission. This function should be defined in Module.
+		// 'perm_block' group form block where this permissions will be displayed. Now available, the following blocks: additional, system
+		// 'options' is permission options
+		$permissions = array(
+			'perm_api' => array(
+				'label' => T_('Can use APIs'),
+				'user_func'  => 'check_api_user_perm',
+				'group_func' => 'check_api_group_perm',
+				'perm_block' => 'system',
+				'options'  => array(
+						// format: array( radio_button_value, radio_button_label, radio_button_note )
+						array( 'never', T_( 'Never' ), '' ),
+						array( 'always', T_( 'Always' ), '' ),
+					),
+				),
+			);
+		return $permissions;
+	}
+
+
+	/**
+	 * Check a permission for the user. ( see 'user_func' in get_available_group_permissions() function  )
+	 *
+	 * @param string Requested permission level
+	 * @param string Permission value
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
+	function check_api_user_perm( $permlevel, $permvalue, $permtarget )
+	{
+		return true;
+	}
+
+
+	/**
+	 * Check a permission for the group. ( see 'group_func' in get_available_group_permissions() function )
+	 *
+	 * @param string Requested permission level
+	 * @param string Permission value
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
+	function check_api_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		$perm = false;
+		switch ( $permvalue )
+		{
+			case 'always':
+				// Users can use APIs
+				if( $permlevel == 'always' )
+				{ 
+					$perm = true;
+					break;
+				}
+
+			case 'never':
+				// Users can`t use APIs
+				if( $permlevel == 'never' )
+				{
+					$perm = false;
+					break;
+				}
+		}
+
+		return $perm;
+	}
 
 
 	/**

@@ -55,6 +55,13 @@ function mt_setPostCategories($m)
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
+	}
 
 	// GET POST:
 	/**
@@ -150,6 +157,13 @@ function mt_getPostCategories($m)
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
+	}
 
 	// GET POST:
 	/**
@@ -244,6 +258,13 @@ function mt_publishPost($m)
 	}
 	logIO( 'mt_publishPost: Login OK' );
 
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
+	}
+	
 	// GET POST:
 	/**
 	 * @var Item
@@ -319,6 +340,9 @@ $xmlrpc_procs['mt.publishPost'] = array(
 
 /*
  * $Log$
+ * Revision 1.13  2010/02/26 16:18:52  efy-yury
+ * add: permission "Can use APIs"
+ *
  * Revision 1.12  2010/02/08 17:55:17  efy-yury
  * copyright 2009 -> 2010
  *

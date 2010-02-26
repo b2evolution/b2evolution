@@ -198,6 +198,13 @@ function mw_newpost($m)
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
+	}
 
 	// GET BLOG:
 	/**
@@ -292,6 +299,13 @@ function mw_editpost( $m )
 	if( ! $current_User = & xmlrpcs_login( $m, 1, 2 ) )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
+	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 
 	// GET POST:
@@ -440,6 +454,13 @@ function mw_getrecentposts( $m )
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
+	}
 
 	// GET BLOG:
 	/**
@@ -576,6 +597,13 @@ function mw_getpost($m)
 	{	// Login failed, return (last) error:
 		return xmlrpcs_resperror();
 	}
+	
+	// CHECK PERMISSION: check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return xmlrpcs_resperror( 3 );	// User error 3
+	}
 
 	// GET POST:
 	/**
@@ -691,6 +719,9 @@ $xmlrpc_procs['metaWeblog.getUsersBlogs'] = array(
 
 /*
  * $Log$
+ * Revision 1.30  2010/02/26 16:18:52  efy-yury
+ * add: permission "Can use APIs"
+ *
  * Revision 1.29  2010/02/08 17:55:17  efy-yury
  * copyright 2009 -> 2010
  *
