@@ -115,6 +115,16 @@ class ItemQuery extends SQL
 
 		if( empty( $pl ) ) return $r; // nothing to do
 
+		if( substr( $this->pl, 0, 1 ) == '-' )
+		{	// List starts with MINUS sign:
+			$eq = 'NOT IN';
+			$this->pl = substr( $this->pl, 1 );
+		}
+		else
+		{
+			$eq = 'IN';
+		}
+
 		$p_ID_array = array();
 		$p_id_list = explode( ',', $this->pl );
 		foreach( $p_id_list as $p_id )
@@ -124,7 +134,7 @@ class ItemQuery extends SQL
 
 		$this->pl = implode( ',', $p_ID_array );
 
-		$this->WHERE_and( $this->dbIDname.' IN( '.$this->pl.' )' );
+		$this->WHERE_and( $this->dbIDname.' '.$eq.'( '.$this->pl.' )' );
 		$r = true;
 
 		return $r;
@@ -724,6 +734,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.18  2010/02/26 04:13:52  sam2kb
+ * where_ID_list() now accepts a minus (-) modifier
+ *
  * Revision 1.17  2010/02/26 02:05:53  sam2kb
  * typo
  *
