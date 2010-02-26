@@ -76,9 +76,9 @@ function create_default_data()
 
 	// added in 0.8.7
 	echo 'Creating default blacklist entries... ';
-	//This string contain antispam information that is obfuscated because some hosting
-	//companies prevent uploading PHP files containing "spam" strings.
-	//pre_dump(get_antispam_query());
+	// This string contains antispam information that is obfuscated because some hosting
+	// companies prevent uploading PHP files containing "spam" strings.
+	// pre_dump(get_antispam_query());
 	$query = get_antispam_query();
 	$DB->query( $query );
 	echo "OK.<br />\n";
@@ -1301,6 +1301,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.287  2010/02/26 22:15:48  fplanque
+ * whitespace/doc/minor
+ *
  * Revision 1.286  2010/02/12 18:22:03  efy-yury
  * add atnispam query obfuscating
  *

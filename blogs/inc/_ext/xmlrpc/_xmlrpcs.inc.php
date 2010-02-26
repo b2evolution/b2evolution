@@ -1204,8 +1204,9 @@
 
 /*
  * $Log$
- * Revision 1.7  2010/02/26 21:24:02  fplanque
- * rollback - did not seem right
+ * Revision 1.8  2010/02/26 22:15:47  fplanque
+ * whitespace/doc/minor
+ *
  *
  * Revision 1.6  2010/02/09 17:20:39  efy-yury
  * &new -> new

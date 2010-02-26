@@ -1475,8 +1475,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
- * Revision 1.30  2010/02/26 21:24:08  fplanque
- * rollback - did not seem right
+ * Revision 1.31  2010/02/26 22:15:48  fplanque
+ * whitespace/doc/minor
+ *
  *
  * Revision 1.29  2010/02/23 05:07:17  sam2kb
  * New plugin hooks: DisplayProfileFormFieldset and ProfileFormSent

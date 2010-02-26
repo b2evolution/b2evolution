@@ -1307,8 +1307,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.92  2010/02/26 21:24:02  fplanque
- * rollback - did not seem right
+ * Revision 1.93  2010/02/26 22:15:53  fplanque
+ * whitespace/doc/minor
  *
  * Revision 1.91  2010/02/08 17:53:05  efy-yury
  * copyright 2009 -> 2010

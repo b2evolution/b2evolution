@@ -135,7 +135,10 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 $Results->display();
 
 /*
- * _userfields.view.php,v
+ * $Log$
+ * Revision 1.11  2010/02/26 22:15:48  fplanque
+ * whitespace/doc/minor
+ *
  * Revision 1.9  2010/01/03 13:10:57  fplanque
  * set some crumbs (needs checking)
  *

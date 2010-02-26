@@ -3697,8 +3697,8 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 
 /*
  * $Log$
- * Revision 1.9  2010/02/26 21:24:00  fplanque
- * rollback - did not seem right
+ * Revision 1.10  2010/02/26 22:15:47  fplanque
+ * whitespace/doc/minor
  *
  * Revision 1.8  2010/02/09 17:20:38  efy-yury
  * &new -> new

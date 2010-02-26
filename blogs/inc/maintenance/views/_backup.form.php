@@ -168,8 +168,8 @@ $Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'S
 
 /*
  * $Log$
- * Revision 1.10  2010/02/26 21:24:08  fplanque
- * rollback - did not seem right
+ * Revision 1.11  2010/02/26 22:15:52  fplanque
+ * whitespace/doc/minor
  *
  * Revision 1.9  2010/02/04 19:32:38  blueyed
  * trans fixes

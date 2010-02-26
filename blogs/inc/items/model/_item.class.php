@@ -4150,8 +4150,8 @@ class Item extends ItemLight
 
 /*
  * $Log$
- * Revision 1.180  2010/02/26 21:24:08  fplanque
- * rollback - did not seem right
+ * Revision 1.181  2010/02/26 22:15:47  fplanque
+ * whitespace/doc/minor
  *
  * Revision 1.179  2010/02/21 01:25:47  sam2kb
  * item_varchar fields rolled back to 'string'

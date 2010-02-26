@@ -374,9 +374,9 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		echo 'Creating default blacklist entries... ';
-		//This string contain antispam information that is obfuscated because some hosting
-		//companies prevent uploading PHP files containing "spam" strings.
-		//pre_dump(get_antispam_query());
+		// This string contains antispam information that is obfuscated because some hosting
+		// companies prevent uploading PHP files containing "spam" strings.
+		// pre_dump(get_antispam_query());
 		$query = get_antispam_query();
 		$DB->query( $query );
 		echo "OK.<br />\n";
@@ -2808,6 +2808,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.356  2010/02/26 22:15:50  fplanque
+ * whitespace/doc/minor
+ *
  * Revision 1.355  2010/02/12 18:22:05  efy-yury
  * add atnispam query obfuscating
  *

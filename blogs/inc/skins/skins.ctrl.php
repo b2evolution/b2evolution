@@ -48,7 +48,7 @@ if( param( 'skin_ID', 'integer', '', true) )
  * Perform action:
  */
 switch( $action )
-{		
+{
 	case 'create':
 		param( 'skin_folder', 'string', true );
 		// Check validity of requested skin name:
@@ -221,6 +221,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2010/02/26 22:15:48  fplanque
+ * whitespace/doc/minor
+ *
  * Revision 1.14  2010/02/26 15:52:20  efy-asimo
  * combine skin and skin settings tab into one single tab
  *

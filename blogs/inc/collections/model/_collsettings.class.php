@@ -173,8 +173,8 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
- * Revision 1.43  2010/02/26 21:24:02  fplanque
- * rollback - did not seem right
+ * Revision 1.44  2010/02/26 22:15:52  fplanque
+ * whitespace/doc/minor
  *
  * Revision 1.42  2010/02/08 17:52:09  efy-yury
  * copyright 2009 -> 2010
