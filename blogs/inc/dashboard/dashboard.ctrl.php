@@ -537,7 +537,7 @@ if( $blog )
 
 		echo '<li><a href="'.$dispatcher.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID.'">'.T_('Blog properties').' &raquo;</a></li>';
 		echo '<li><a href="'.$dispatcher.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$Blog->ID.'">'.T_('Blog features').' &raquo;</a></li>';
-		echo '<li><a href="'.$dispatcher.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$Blog->ID.'">'.T_('Blog skin').' &raquo;</a></li>';
+		echo '<li><a href="'.$dispatcher.'?ctrl=coll_settings&amp;tab=skin&amp;skinpage=selection&amp;blog='.$Blog->ID.'">'.T_('Blog skin').' &raquo;</a></li>';
 		echo '<li><a href="'.$dispatcher.'?ctrl=widgets&amp;blog='.$Blog->ID.'">'.T_('Blog widgets').' &raquo;</a></li>';
 		echo '<li><a href="'.$dispatcher.'?ctrl=coll_settings&amp;tab=urls&amp;blog='.$Blog->ID.'">'.T_('Blog URLs').' &raquo;</a></li>';
 
@@ -680,6 +680,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.56  2010/02/26 15:52:20  efy-asimo
+ * combine skin and skin settings tab into one single tab
+ *
  * Revision 1.55  2010/02/26 08:34:34  efy-asimo
  * dashboard -> ban icon should be javascripted task
  *

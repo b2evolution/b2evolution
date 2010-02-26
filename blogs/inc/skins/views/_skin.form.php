@@ -35,7 +35,7 @@ global $edited_Skin;
 
 $Form = new Form( NULL, 'skin_checkchanges' );
 
-$Form->global_icon( T_('Uninstall this skin!'), 'delete', regenerate_url( 'action', 'action=delete' ) );
+$Form->global_icon( T_('Uninstall this skin!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('skin') ) );
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', T_('Skin properties') );
@@ -80,6 +80,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.10  2010/02/26 15:52:20  efy-asimo
+ * combine skin and skin settings tab into one single tab
+ *
  * Revision 1.9  2010/02/08 17:54:43  efy-yury
  * copyright 2009 -> 2010
  *

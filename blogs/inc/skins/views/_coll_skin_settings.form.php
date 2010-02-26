@@ -44,11 +44,13 @@ $Form->begin_form( 'fform' );
 
 	$Form->add_crumb( 'collection' );
 	$Form->hidden_ctrl();
-	$Form->hidden( 'tab', 'skin_settings' );
+	$Form->hidden( 'tab', 'skin' );
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'blog', $Blog->ID );
 
-	$Form->begin_fieldset( T_('Current skin') );
+	$change_skin_link = ' <span class="floatright">'.action_icon( T_('Select another skin...'), 'edit', regenerate_url( 'action', 'ctrl=coll_settings&amp;skinpage=selection' ), T_('Select another').' &raquo;', 3, 4 );
+	
+	$Form->begin_fieldset( T_('Current skin').' '.$change_skin_link );
 
 		Skin::disp_skinshot( $edited_Skin->folder, $edited_Skin->name );
 
@@ -96,6 +98,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.7  2010/02/26 15:52:20  efy-asimo
+ * combine skin and skin settings tab into one single tab
+ *
  * Revision 1.6  2010/02/08 17:54:43  efy-yury
  * copyright 2009 -> 2010
  *

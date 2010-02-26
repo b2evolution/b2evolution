@@ -29,7 +29,8 @@ $block_item_Widget->title = T_('Choose a skin');
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
   $block_item_Widget->global_icon( T_('Manage installed skins...'), 'properties', $dispatcher.'?ctrl=skins', T_('Manage skins'), 3, 4 );
-  $block_item_Widget->global_icon( T_('Install new skin...'), 'new', $dispatcher.'?ctrl=skins&amp;action=new&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $admin_url)), T_('Install new'), 3, 4 );
+  $block_item_Widget->global_icon( T_('Install new skin...'), 'new', $dispatcher.'?ctrl=skins&amp;action=new&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','skinpage=selection','','&'), $admin_url)), T_('Install new'), 3, 4 );
+  $block_item_Widget->global_icon( T_('Keep current skin!'), 'close', regenerate_url( 'skinpage' ), T_('cancel'), 4, 1 );
 }
 
 $block_item_Widget->disp_template_replaced( 'block_start' );
@@ -46,7 +47,7 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 		}
 
 		$selected = ($edited_Blog->skin_ID == $Skin->ID);
-		$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;blog_skin_ID='.$Skin->ID.'&amp;'.url_crumb('collection');
+		$select_url = '?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;blog_skin_ID='.$Skin->ID.'&amp;'.url_crumb('collection');
 		$preview_url = url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode($Skin->folder) );
 
 		// Display skinshot:
@@ -59,6 +60,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.12  2010/02/26 15:52:20  efy-asimo
+ * combine skin and skin settings tab into one single tab
+ *
  * Revision 1.11  2010/02/08 17:54:42  efy-yury
  * copyright 2009 -> 2010
  *

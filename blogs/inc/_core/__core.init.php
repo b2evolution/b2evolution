@@ -425,10 +425,6 @@ class _core_Module extends Module
 						'text' => T_('Blog skin').'&hellip;',
 						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin'.$blog_param,
 					),
-				'skin_settings' => array(
-						'text' => T_('Blog skin settings').'&hellip;',
-						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin_settings'.$blog_param,
-					),
 				'widgets' => array(
 						'text' => T_('Blog widgets').'&hellip;',
 						'href' => $admin_url.'?ctrl=widgets'.$blog_param,
@@ -782,6 +778,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.60  2010/02/26 15:52:20  efy-asimo
+ * combine skin and skin settings tab into one single tab
+ *
  * Revision 1.59  2010/02/08 17:51:26  efy-yury
  * copyright 2009 -> 2010
  *

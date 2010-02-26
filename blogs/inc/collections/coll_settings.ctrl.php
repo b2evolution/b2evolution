@@ -70,7 +70,8 @@ else
 
 memorize_param( 'blog', 'integer', -1 );	// Needed when generating static page for example
 
-if( $tab == 'skin_settings' )
+param( 'skinpage', 'string', '' );
+if( $tab == 'skin' && $skinpage != 'selection' )	// If not screen selection => screen settings
 {
 	$SkinCache = & get_SkinCache();
 	/**
@@ -152,25 +153,27 @@ switch( $action )
 				break;
 
 			case 'skin':
-				if( $edited_Blog->load_from_Request( array() ) )
-				{ // Commit update to the DB:
-					$edited_Blog->dbupdate();
-					$Messages->add( T_('The blog skin has been changed.')
-										.' <a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
-					header_redirect( $edited_Blog->gen_blogurl() );
+				if( $skinpage == 'selection' )
+				{
+					if( $edited_Blog->load_from_Request( array() ) )
+					{ // Commit update to the DB:
+						$edited_Blog->dbupdate();
+						$Messages->add( T_('The blog skin has been changed.')
+											.' <a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
+						header_redirect( $edited_Blog->gen_blogurl() );
+					}
 				}
-				break;
-
-			case 'skin_settings':
-				// Update params/Settings
-				$edited_Skin->load_params_from_Request();
-
-				if(	! param_errors_detected() )
-				{	// Update settings:
-					$edited_Skin->dbupdate_settings();
-					$Messages->add( T_('Skin settings have been updated'), 'success' );
-					// Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( $update_redirect_url, 303 ); // Will EXIT
+				else
+				{ // Update params/Settings
+					$edited_Skin->load_params_from_Request();
+	
+					if(	! param_errors_detected() )
+					{	// Update settings:
+						$edited_Skin->dbupdate_settings();
+						$Messages->add( T_('Skin settings have been updated'), 'success' );
+						// Redirect so that a reload doesn't write to the DB twice:
+						header_redirect( $update_redirect_url, 303 ); // Will EXIT
+					}
 				}
 				break;
 
@@ -275,11 +278,14 @@ switch( $AdminUI->get_path(1) )
 		break;
 
 	case 'skin':
-		$AdminUI->breadcrumbpath_add( T_('Skin selection'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
-		break;
-
-	case 'skin_settings':
-		$AdminUI->breadcrumbpath_add( T_('Settings for current skin'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		if( $skinpage == 'selection' )
+		{
+			$AdminUI->breadcrumbpath_add( T_('Skin selection'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab.'&amp;skinpage=selection' );
+		}
+		else
+		{
+			$AdminUI->breadcrumbpath_add( T_('Settings for current skin'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+		}
 		break;
 
 	case 'plugin_settings':
@@ -332,11 +338,14 @@ switch( $AdminUI->get_path(1) )
 		break;
 
 	case 'skin':
-		$AdminUI->disp_view( 'skins/views/_coll_skin.view.php' );
-		break;
-
-	case 'skin_settings':
-		$AdminUI->disp_view( 'skins/views/_coll_skin_settings.form.php' );
+		if( $skinpage == 'selection' )
+		{
+			$AdminUI->disp_view( 'skins/views/_coll_skin.view.php' );
+		}
+		else
+		{
+			$AdminUI->disp_view( 'skins/views/_coll_skin_settings.form.php' );
+		}
 		break;
 
 	case 'plugin_settings':
@@ -374,6 +383,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.32  2010/02/26 15:52:20  efy-asimo
+ * combine skin and skin settings tab into one single tab
+ *
  * Revision 1.31  2010/02/08 17:52:07  efy-yury
  * copyright 2009 -> 2010
  *

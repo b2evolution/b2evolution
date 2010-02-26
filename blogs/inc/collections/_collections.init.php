@@ -496,9 +496,6 @@ class collections_Module extends Module
 							'skin' => array(
 								'text' => T_('Skin'),
 								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog, ),
-							'skin_settings' => array(
-								'text' => T_('Skin settings'),
-								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=skin_settings&amp;blog='.$blog, ),
 							'plugin_settings' => array(
 								'text' => T_('Plugin settings'),
 								'href' => $dispatcher.'?ctrl=coll_settings&amp;tab=plugin_settings&amp;blog='.$blog, ),
