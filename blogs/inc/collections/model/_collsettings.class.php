@@ -137,8 +137,7 @@ class CollectionSettings extends AbstractSettings
 			'aggregate_coll_IDs' => '',
 			'blog_footer_text' => '&copy;$year$ by $owner$',
 			'max_footer_credits' => 3,
-			'enable_goto_blog' => 1,
-
+			'enable_goto_blog' => 1,						// Go to blog after publishing post
 		);
 
 
@@ -174,6 +173,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.43  2010/02/26 21:24:02  fplanque
+ * rollback - did not seem right
+ *
  * Revision 1.42  2010/02/08 17:52:09  efy-yury
  * copyright 2009 -> 2010
  *

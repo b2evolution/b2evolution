@@ -137,7 +137,7 @@ switch( $action )
 		$text = trim( param( 'q', 'string', '' ) );
 		if( !empty( $text ) )
 		{
-			$SQL = new SQl();
+			$SQL = new SQL();
 			$SQL->SELECT( 'user_login' );
 			$SQL->FROM( 'T_users' );
 			$SQL->WHERE( 'user_login LIKE \''.$text.'%\'' );
@@ -252,6 +252,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.48  2010/02/26 21:23:52  fplanque
+ * rollback - did not seem right
+ *
  * Revision 1.47  2010/02/26 08:34:33  efy-asimo
  * dashboard -> ban icon should be javascripted task
  *

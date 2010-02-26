@@ -269,7 +269,7 @@ class ItemQuery extends SQL
 
 		if( !isset( $this->blog ) )
 		{
-			debug_die( 'Status restriction requires to work with specific blog first.' );
+			debug_die( 'Status restriction requires to work with a specific blog first.' );
 		}
 
 		$this->WHERE_and( statuses_where_clause( $show_statuses, $this->dbprefix, $this->blog ) );
@@ -734,6 +734,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.19  2010/02/26 21:24:08  fplanque
+ * rollback - did not seem right
+ *
  * Revision 1.18  2010/02/26 04:13:52  sam2kb
  * where_ID_list() now accepts a minus (-) modifier
  *

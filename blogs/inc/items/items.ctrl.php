@@ -465,22 +465,18 @@ switch( $action )
 			// If anyone doesn't want that, we can make this optional...
 			// sam2kb> Please make this optional, this is really annoying when you create more than one post or when you publish draft images created from FM.
 			
-			// Get config value, if enabled - go to blog after posting
-			// otherwise go to posting list
-			$goto_blog = $edited_Item->Blog->get_setting( 'enable_goto_blog' );
-	
-			if($goto_blog != 1)
-			{
-				// redirect to posts list
+			// Where do we want to go after publishing?
+			if( ! $edited_Item->Blog->get_setting( 'enable_goto_blog' ) )
+			{	// redirect to posts list:
 				header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
 			}
+			// go to blog:
 			$edited_Item->load_Blog();
 			$redirect_to = $edited_Item->Blog->gen_blogurl();
 		}
 
 		// REDIRECT / EXIT
 		header_redirect( $redirect_to );
-		
 		// Switch to list mode:
 		// $action = 'list';
 		//init_list_mode();
@@ -1311,6 +1307,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.92  2010/02/26 21:24:02  fplanque
+ * rollback - did not seem right
+ *
  * Revision 1.91  2010/02/08 17:53:05  efy-yury
  * copyright 2009 -> 2010
  *

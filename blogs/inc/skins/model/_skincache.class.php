@@ -154,7 +154,7 @@ class SkinCache extends DataObjectCache
 	/**
 	 * Instanciate a new object within this cache
 	 */
-	function new_obj( $row = NULL, $skin_folder = NULL )
+	function & new_obj( $row = NULL, $skin_folder = NULL )
 	{
 		if( is_null($skin_folder) )
 		{	// This happens when using the default skin
@@ -187,6 +187,9 @@ class SkinCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.8  2010/02/26 21:24:09  fplanque
+ * rollback - did not seem right
+ *
  * Revision 1.7  2010/02/08 17:54:42  efy-yury
  * copyright 2009 -> 2010
  *

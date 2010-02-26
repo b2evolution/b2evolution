@@ -109,7 +109,7 @@ class WidgetCache extends DataObjectCache
 	/**
 	 * Instanciate a new object within this cache
 	 */
-	function new_obj( $row = NULL )
+	function & new_obj( $row = NULL )
 	{
 		global $inc_path;
 
@@ -154,6 +154,9 @@ class WidgetCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.11  2010/02/26 21:27:37  fplanque
+ * rollback - did not seem right
+ *
  * Revision 1.10  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *

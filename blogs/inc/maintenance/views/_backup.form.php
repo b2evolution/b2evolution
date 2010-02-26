@@ -153,7 +153,7 @@ $Form->end_fieldset();
 // Enable/Disable maintenance mode
 $Form->begin_fieldset( T_( 'Maintenance' ), array( 'class'=>'fieldset clear' ) );
 
-$Form->checkbox( 'bk_maintenance_mode', true, T_( 'Maintenance mode' ), T_( 'Put the site into maintenance mode while backing up (recommended).' ) );
+$Form->checkbox( 'bk_maintenance_mode', true, T_( 'Maintenance mode' ), T_( 'Put b2evolution into Maintenance Mode while backing up - Recommended' ) );
 
 if( function_exists('gzopen') )
 {
@@ -168,6 +168,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'S
 
 /*
  * $Log$
+ * Revision 1.10  2010/02/26 21:24:08  fplanque
+ * rollback - did not seem right
+ *
  * Revision 1.9  2010/02/04 19:32:38  blueyed
  * trans fixes
  *

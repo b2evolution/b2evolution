@@ -3956,8 +3956,12 @@ function get_ReqURI()
 	return array($ReqPath,$ReqURI);
 }
 
+
 /*
  * $Log$
+ * Revision 1.214  2010/02/26 21:23:58  fplanque
+ * rollback - did not seem right
+ *
  * Revision 1.213  2010/02/26 08:34:33  efy-asimo
  * dashboard -> ban icon should be javascripted task
  *

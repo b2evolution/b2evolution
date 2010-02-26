@@ -205,7 +205,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_karma         INT(11) NOT NULL DEFAULT 0,
 			comment_spam_karma    TINYINT NULL,
 			comment_allow_msgform TINYINT NOT NULL DEFAULT 0,
-			comment_secret		  varchar(32) NULL default NULL,
+			comment_secret        varchar(32) NULL default NULL,
 			PRIMARY KEY comment_ID (comment_ID),
 			KEY comment_post_ID (comment_post_ID),
 			KEY comment_date (comment_date),

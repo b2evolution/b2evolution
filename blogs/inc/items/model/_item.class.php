@@ -515,7 +515,7 @@ class Item extends ItemLight
 		for( $i = 1 ; $i <= 3; $i++ )
 		{	// For each custom varchar field:
 			if( param( 'item_varchar'.$i, 'string', NULL ) !== NULL )
-			{	// sam2kb> I see no reason why we can't use 'html' here
+			{	// we restrict to string to prevent javascript injection as in <b onhover="steal_cookies()">
 				$this->set_from_Request( 'varchar'.$i, 'item_varchar'.$i, true );
 			}
 		}
@@ -1415,7 +1415,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Does the post have different content parts (teaser/extension, devided by "<!--more-->")?
+	 * Does the post have different content parts (teaser/extension, divided by "<!--more-->")?
 	 * This is also true for posts that have images with "aftermore" position.
 	 *
 	 * @access public
@@ -1431,7 +1431,8 @@ class Item extends ItemLight
 
 		$content_page = $this->get_content_page($params['disppage'], $params['format']);
 
-		return strpos($content_page, '<!--more-->') !== false || $this->get_images( array('restrict_to_image_position'=>'aftermore') );
+		return strpos($content_page, '<!--more-->') !== false 
+			|| $this->get_images( array('restrict_to_image_position'=>'aftermore') );
 	}
 
 
@@ -4149,6 +4150,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.180  2010/02/26 21:24:08  fplanque
+ * rollback - did not seem right
+ *
  * Revision 1.179  2010/02/21 01:25:47  sam2kb
  * item_varchar fields rolled back to 'string'
  *

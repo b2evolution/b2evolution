@@ -154,7 +154,7 @@ class Plugins_admin extends Plugins
 				'AfterUserDelete' => 'This gets called after an user has been deleted from the database.',
 				'AfterUserInsert' => 'This gets called after an user has been inserted into the database.',
 				'AfterUserUpdate' => 'This gets called after an user has been updated in the database.',
-				
+
 				// fp> This is actually RENDERing, right?
 				// TODO: Rename to "DispRender"
 				'FilterIpAddress' => 'Called when displaying an IP address.',
@@ -1475,6 +1475,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.30  2010/02/26 21:24:08  fplanque
+ * rollback - did not seem right
+ *
  * Revision 1.29  2010/02/23 05:07:17  sam2kb
  * New plugin hooks: DisplayProfileFormFieldset and ProfileFormSent
  *
