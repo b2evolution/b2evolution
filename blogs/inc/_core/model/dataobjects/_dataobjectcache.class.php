@@ -172,7 +172,7 @@ class DataObjectCache
 	/**
 	 * Instanciate a new object within this cache
 	 */
-	function new_obj( $row = NULL )
+	function & new_obj( $row = NULL )
 	{
 		$objtype = $this->objtype;
 
@@ -760,6 +760,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.23  2010/02/26 17:25:20  fplanque
+ * This one did look like a massive replace side-effect. Am I mistaken?
+ *
  * Revision 1.22  2010/02/08 17:51:50  efy-yury
  * copyright 2009 -> 2010
  *
