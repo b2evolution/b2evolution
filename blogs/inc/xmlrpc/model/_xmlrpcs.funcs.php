@@ -523,7 +523,10 @@ function & xmlrpcs_login( $m, $login_param, $pass_param )
 	$group = $current_User->get_Group();
 	if( ! $group->check_perm('perm_api', 'always') )
 	{	// Permission denied
-		return 'User has no permission to use this API.';
+		$xmlrpcs_errcode = $xmlrpcerruser+1;
+		$xmlrpcs_errmsg = 'User has no permission to use this API: '.$username.' / '.starify($password);
+		$r = NULL;
+		return $r;
 	}
 
 	logIO( 'Login OK - User: '.$current_User->ID.' - '.$current_User->login );
@@ -914,6 +917,9 @@ function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.27  2010/02/28 22:04:50  fplanque
+ * fix
+ *
  * Revision 1.26  2010/02/28 13:42:08  efy-yury
  * move APIs permissions check in xmlrpcs_login func
  *
