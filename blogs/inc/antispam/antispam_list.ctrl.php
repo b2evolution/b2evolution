@@ -36,7 +36,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-param( 'display_mode', string );
+param( 'display_mode', 'string' );
 
 if( $display_mode != 'js' )
 {
@@ -93,6 +93,7 @@ switch( $action )
 
 		if( $delcomments )
 		{ // Then all banned comments
+// fp> do we need a begin/commit?
 			if( $display_mode == 'js' )
 			{
 				$query = 'SELECT comment_ID FROM T_comments
@@ -136,13 +137,13 @@ switch( $action )
 		if( $display_mode == 'js' && $request != 'checkban' )
 		{
 			if( $delcomments )
-				{
-					send_javascript_message( array( 'refresh_comments' => array( $deleted_ids ), 'closeAntispamSettings' => array() ), true );
-				}
-				else
-				{
-					send_javascript_message( array( 'closeAntispamSettings' => array() ), true );
-				}
+			{
+				send_javascript_message( array( 'refresh_comments' => array( $deleted_ids ), 'closeAntispamSettings' => array() ), true );
+			}
+			else
+			{
+				send_javascript_message( array( 'closeAntispamSettings' => array() ), true );
+			}
 		}
 
 		// We'll ask the user later what to do, if no "sub-action" given.
@@ -166,7 +167,7 @@ switch( $action )
 
 	case 'report':
 		// Report an entry as abuse to centralized blacklist:
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'antispam' );
 
@@ -233,6 +234,9 @@ if( $display_mode != 'js')
 
 /*
  * $Log$
+ * Revision 1.13  2010/02/28 23:38:39  fplanque
+ * minor changes
+ *
  * Revision 1.12  2010/02/26 08:34:33  efy-asimo
  * dashboard -> ban icon should be javascripted task
  *

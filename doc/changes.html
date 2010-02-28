@@ -50,21 +50,28 @@
 			      <li>Enhanced Common navigation links widget (@francoisplanque)</li>
 			      <li>Tag cloud widget now has a random order option (@waltercruz)</li>
 		      </ul>
-			    <li><strong>Performance: </strong>
-			      <ul>
-			        <li>Optimized for PHP5 (still works on PHP4 but we strongly recommend PHP5)</li>
-			        <li>BlockCache stored to memrory (APC Cache &amp; more): every widget is now cached individually and regenerated only when needed (provided it declares proper dependency keys). This provides a significant performance boost. More underway. (@francoisplanque)</li>
-			        <li>User agent type is now saved directly into the hits table instead of a costly lookup in user agents table (@francoisplanque)</li>
-		            <li>SQL optimizations (@blueyed)
-                      <ul>
-                        <li>SQL_NO_CACHE for queries selecting from T_sessions/T_hitlog</li>
+		      <li><strong>Backoffice:</strong>
+		        <ul>
+		          <li>It is now possible to remove spam URL from comments with a single click in the dashboard (@evofactory) </li>
+	              <li>It is now possible to call the Antispam tool as an Ajax overlay in the dashboard. (@evofactory)</li>
+	              <li>The comment edit form has now a 1 click Publish button -- visible only if Comment is a Draft (@evofactory).</li>
+		        </ul>
+		      </li>
+		        <li><strong>Performance: </strong>
+		          <ul>
+		            <li>Optimized for PHP5 (still works on PHP4 but we strongly recommend PHP5)</li>
+		            <li>BlockCache stored to memrory (APC Cache &amp; more): every widget is now cached individually and regenerated only when needed (provided it declares proper dependency keys). This provides a significant performance boost. More underway. (@francoisplanque)</li>
+		            <li>User agent type is now saved directly into the hits table instead of a costly lookup in user agents table (@francoisplanque)</li>
+	                <li>SQL optimizations (@blueyed)
+	                  <ul>
+	                    <li>SQL_NO_CACHE for queries selecting from T_sessions/T_hitlog</li>
                         <li>Remove information about seconds from item issue and start date,
                           so that those queries can get cached for up to one minute now</li>
                       </ul>
-		            </li>
-			      </ul>
-		      </li>
-		      <li><strong>Maintenance:</strong>
+	                </li>
+		          </ul>
+	          </li>
+	          <li><strong>Maintenance:</strong>
 		        <ul>
 		          <li>Integrated backup feature (Database and files) (@evofactory)</li>
 	              <li>Automated upgrade feature -- WARNING: for testing only at this point. It will overwrite your current version! (@evofactory)</li>

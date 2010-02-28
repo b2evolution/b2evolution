@@ -677,7 +677,7 @@ class Comment extends DataObject
 	 * @param boolean true if create ajax button
 	 * @param glue between url params
 	 */
-	function deleteurl_link( $ajax_button = true, $glue='&amp' )
+	function deleteurl_link( $ajax_button = true, $glue = '&amp' )
 	{
 		global $current_User, $admin_url;
 		
@@ -1537,6 +1537,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.46  2010/02/28 23:38:40  fplanque
+ * minor changes
+ *
  * Revision 1.45  2010/02/10 11:45:04  efy-asimo
  * Quick Edit option on comment notification
  *

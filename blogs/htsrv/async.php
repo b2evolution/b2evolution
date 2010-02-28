@@ -189,7 +189,7 @@ switch( $action )
 		exit(0);
 
 	case 'delete_comment_url':
-		
+		// Delete spam URL from a comment directly in the dashboard - comment remains otherwise untouched
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 		
@@ -198,7 +198,7 @@ switch( $action )
 		$blog = param( 'blogid', 'integer' );
 		$current_User->check_perm( 'blog_comments', 'edit', true, $blog );
 		
-		$edited_Comment = Comment_get_by_ID( param( 'commentid', 'integer' ) );
+		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ) );
 		$edited_Comment->set( 'author_url', null );
 		$edited_Comment->dbupdate();
 		
@@ -252,6 +252,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.49  2010/02/28 23:38:38  fplanque
+ * minor changes
+ *
  * Revision 1.48  2010/02/26 21:23:52  fplanque
  * rollback - did not seem right
  *

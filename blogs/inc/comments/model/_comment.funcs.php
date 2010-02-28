@@ -220,6 +220,8 @@ function comments_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 /**
  * Create comment form submit buttons
  * 
+ * Note: Publsih in only displayed when comment is in draft status
+ *
  * @param $Form
  * @param $edited_Comment
  * 
@@ -229,11 +231,9 @@ function echo_comment_buttons( $Form, $edited_Comment )
 	global $Blog, $current_User;
 	
 	// ---------- SAVE ------------
-	
 	$Form->submit( array( 'actionArray[update]', T_('Save!'), 'SaveButton' ) );
 	
 	// ---------- PUBLISH ---------
-	
 	if( $edited_Comment->status == 'draft'
 			&& $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID )	// TODO: if we actually set the primary cat to another blog, we may still get an ugly perm die
 			&& $current_User->check_perm( 'edit_timestamp', 'edit', false ) )
@@ -255,7 +255,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 
 
 /**
- * Output JavaScript code to dynamically show or hide the "Publish!" 
+ * JS Behaviour: Output JavaScript code to dynamically show or hide the "Publish!" 
  * button depending on the selected comment status.
  *
  * This function is used by the comment edit screen.
@@ -284,6 +284,9 @@ function echo_comment_publishbt_js()
 
 /*
  * $Log$
+ * Revision 1.9  2010/02/28 23:38:40  fplanque
+ * minor changes
+ *
  * Revision 1.8  2010/02/08 17:52:13  efy-yury
  * copyright 2009 -> 2010
  *

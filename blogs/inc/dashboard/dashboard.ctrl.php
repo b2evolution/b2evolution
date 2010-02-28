@@ -54,6 +54,8 @@ $AdminUI->disp_body_top();
 if( $blog )
 {	// We want to look at a specific blog:
 	// Begin payload block:
+	
+	// fp> why do we need the following div?
 	echo '<div class="first_payload_block">'."\n";	
 
 	$AdminUI->disp_payload_begin();
@@ -306,7 +308,7 @@ if( $blog )
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
 		echo '<div id="comments_container">';
-		
+
 		// GET COMMENTS AWAITING MODERATION (the code generation is shared with the AJAX callback):
 		show_comments_awaiting_moderation( $Blog->ID );
 
@@ -537,7 +539,7 @@ if( $blog )
 
 		echo '<li><a href="'.$dispatcher.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID.'">'.T_('Blog properties').' &raquo;</a></li>';
 		echo '<li><a href="'.$dispatcher.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$Blog->ID.'">'.T_('Blog features').' &raquo;</a></li>';
-		echo '<li><a href="'.$dispatcher.'?ctrl=coll_settings&amp;tab=skin&amp;skinpage=selection&amp;blog='.$Blog->ID.'">'.T_('Blog skin').' &raquo;</a></li>';
+		echo '<li><a href="'.$dispatcher.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$Blog->ID.'">'.T_('Blog skin').' &raquo;</a></li>';
 		echo '<li><a href="'.$dispatcher.'?ctrl=widgets&amp;blog='.$Blog->ID.'">'.T_('Blog widgets').' &raquo;</a></li>';
 		echo '<li><a href="'.$dispatcher.'?ctrl=coll_settings&amp;tab=urls&amp;blog='.$Blog->ID.'">'.T_('Blog URLs').' &raquo;</a></li>';
 
@@ -680,6 +682,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.57  2010/02/28 23:38:38  fplanque
+ * minor changes
+ *
  * Revision 1.56  2010/02/26 15:52:20  efy-asimo
  * combine skin and skin settings tab into one single tab
  *

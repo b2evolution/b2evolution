@@ -3803,9 +3803,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 			if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{ // There is an URL and we have permission to ban...
 				// TODO: really ban the base domain! - not by keyword
+				$Comment->deleteurl_link();
 				$authorurl = '\''.rawurlencode(get_ban_domain($Comment->author_url)).'\''; 
 				echo ' <a id="ban_url" href="javascript:ban_url('.$authorurl.');"'.get_icon( 'ban' ).'</a>';
-				$Comment->deleteurl_link();
 			}
 			echo '</span>';
 		}
@@ -3959,6 +3959,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.216  2010/02/28 23:38:38  fplanque
+ * minor changes
+ *
  * Revision 1.215  2010/02/26 22:15:48  fplanque
  * whitespace/doc/minor
  *
