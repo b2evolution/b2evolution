@@ -68,12 +68,6 @@ function b2_newpost($m)
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 	
-	// CHECK PERMISSION: check here ability to use APIs
-	$group = $current_User->get_Group();
-	if( ! $group->check_perm('perm_api', 'always') )
-	{	// Permission denied
-		return xmlrpcs_resperror( 3 );	// User error 3
-	}
 	logIO( 'Permission granted.' );
 
 	$postdate = $m->getParam(8);
@@ -161,13 +155,6 @@ function b2_getposturl($m)
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
 	
-	// CHECK PERMISSION: check here ability to use APIs
-	$group = $current_User->get_Group();
-	if( ! $group->check_perm('perm_api', 'always') )
-	{	// Permission denied
-		return xmlrpcs_resperror( 3 );	// User error 3
-	}
-
 	logIO( 'OK.' );
 	return new xmlrpcresp( new xmlrpcval( $edited_Item->get_permanent_url() ) );
 }
@@ -190,6 +177,9 @@ $xmlrpc_procs['b2.getPostURL'] = array(
 
 /*
  * $Log$
+ * Revision 1.13  2010/02/28 13:42:07  efy-yury
+ * move APIs permissions check in xmlrpcs_login func
+ *
  * Revision 1.12  2010/02/26 16:18:52  efy-yury
  * add: permission "Can use APIs"
  *

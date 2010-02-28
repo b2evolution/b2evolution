@@ -516,12 +516,18 @@ function & xmlrpcs_login( $m, $login_param, $pass_param )
 		return $r;
 	}
 
-	// fp>Yury TODO: Add API perm check here  --  return 'User has no permission to use this API.'
-
-	logIO( 'Login OK - User: '.$current_User->ID.' - '.$current_User->login );
-
   // This may be needed globally for status permissions in ItemList2, etc..
 	$GLOBALS['current_User'] = & $current_User;
+	
+	// Check here ability to use APIs
+	$group = $current_User->get_Group();
+	if( ! $group->check_perm('perm_api', 'always') )
+	{	// Permission denied
+		return 'User has no permission to use this API.';
+	}
+
+	logIO( 'Login OK - User: '.$current_User->ID.' - '.$current_User->login );
+	
 
 	return $current_User;
 }
@@ -908,6 +914,9 @@ function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.26  2010/02/28 13:42:08  efy-yury
+ * move APIs permissions check in xmlrpcs_login func
+ *
  * Revision 1.25  2010/02/26 21:46:15  fplanque
  * todo
  *
