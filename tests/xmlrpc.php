@@ -33,6 +33,7 @@ switch( $target )
 	case 'local':
 		$test_user = 'admin';
 		$test_pass = $install_password;
+		pre_dump( $test_user, $test_pass );
 		$client = new xmlrpc_client( $basesubpath.$xmlsrv_subdir.'xmlrpc.php', $basehost, $baseport );
 		break;
 

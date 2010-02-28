@@ -43,6 +43,7 @@ global $edited_Group;
 
 global $action;
 
+
 /**
  * Display pluggable permissions
  *
@@ -153,6 +154,9 @@ $Form->begin_fieldset( T_('Blogging permissions').get_manual_link('group_propert
 	$Form->checkbox( 'apply_antispam', ! $edited_Group->get('perm_bypass_antispam'), T_('Antispam filtering'),
 										T_('Inputs from these users will be checked against the antispam blacklist.') );
 
+	// Display pluggable permissions:
+	display_pluggable_permissions( $Form, 'blogging' );
+
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_properties_additional_permissions') );
@@ -177,7 +181,7 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 						), T_('Files'), true, T_('This setting will further restrict any media file permissions on specific blogs.') );
 
 
-	// Display pluggable permissions
+	// Display pluggable permissions:
 	display_pluggable_permissions( $Form, 'additional' );
 
 $Form->end_fieldset();
@@ -210,7 +214,7 @@ $Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_pro
 							$perm_edit_option
 						), T_('Settings') );
 
-	// Display pluggable permissions
+	// Display pluggable permissions:
 	display_pluggable_permissions( $Form, 'system' );
 
 $Form->end_fieldset();
@@ -226,6 +230,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.25  2010/02/28 22:41:00  fplanque
+ * Permission to use XML-RPC APIs can now be granted/denied on a group basis
+ *
  * Revision 1.24  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *

@@ -330,17 +330,21 @@ class collections_Module extends Module
 	/**
 	 * Get default module permissions
 	 *
-	 * #param integer Group ID
+	 * @param integer Group ID
 	 * @return array
 	 */
 	function get_default_group_permissions( $grp_ID )
 	{
 		switch( $grp_ID )
 		{
-			case 1: // Administrators group ID equals 1
+			case 1:		// Administrators (group ID 1) have permission by default:
+			case 2:		// Privileged bloggers (group ID 2) have permission by default:
+			case 3:		// Bloggers (group ID 3) have permission by default:
 				$permname = 'always';
 				break;
-			default: // Other groups
+				
+			default: 
+				// Other groups have no permission by default
 				$permname = 'never';
 				break;
 		}
@@ -368,7 +372,7 @@ class collections_Module extends Module
 				'label' => T_('Can use APIs'),
 				'user_func'  => 'check_api_user_perm',
 				'group_func' => 'check_api_group_perm',
-				'perm_block' => 'system',
+				'perm_block' => 'blogging',
 				'options'  => array(
 						// format: array( radio_button_value, radio_button_label, radio_button_note )
 						array( 'never', T_( 'Never' ), '' ),
