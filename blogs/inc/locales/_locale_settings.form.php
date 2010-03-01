@@ -213,7 +213,7 @@ else
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'loc_transinfo', $loc_transinfo );
 
-	$Form->begin_fieldset( T_('Regional settings').get_manual_link('Regional_settings') );
+	$Form->begin_fieldset( T_('Regional settings').get_manual_link('regional_settings') );
 
 	// Time difference:
 	$td_value = $Settings->get('time_difference');
@@ -521,6 +521,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.13  2010/03/01 07:52:40  efy-asimo
+ * Set manual links to lowercase
+ *
  * Revision 1.12  2010/02/14 14:18:39  efy-asimo
  * insert manual links
  *

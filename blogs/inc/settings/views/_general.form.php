@@ -56,7 +56,7 @@ $Form->hidden( 'tab', 'general' );
 
 if( isset($collections_Module) )
 {
-	$Form->begin_fieldset( T_('Display options').get_manual_link('Display_options') );
+	$Form->begin_fieldset( T_('Display options').get_manual_link('display_options') );
 
 	$BlogCache = & get_BlogCache();
 
@@ -106,6 +106,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.20  2010/03/01 07:52:51  efy-asimo
+ * Set manual links to lowercase
+ *
  * Revision 1.19  2010/02/14 14:18:39  efy-asimo
  * insert manual links
  *

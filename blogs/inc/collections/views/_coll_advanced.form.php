@@ -47,7 +47,7 @@ $Form->hidden( 'tab', 'advanced' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
 
-$Form->begin_fieldset( T_('After each new post...').get_manual_link('After_each_new_post') );
+$Form->begin_fieldset( T_('After each new post...').get_manual_link('after_each_new_post') );
 	$ping_plugins = preg_split( '~\s*,\s*~', $edited_Blog->get_setting('ping_plugins'), -1, PREG_SPLIT_NO_EMPTY);
 
 	$available_ping_plugins = $Plugins->get_list_by_event('ItemSendPing');
@@ -190,6 +190,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.28  2010/03/01 07:52:30  efy-asimo
+ * Set manual links to lowercase
+ *
  * Revision 1.27  2010/02/14 14:18:39  efy-asimo
  * insert manual links
  *

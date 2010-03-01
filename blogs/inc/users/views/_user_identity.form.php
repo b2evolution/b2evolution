@@ -96,7 +96,7 @@ else
 
 	/***************  User permissions  **************/
 
-$Form->begin_fieldset( T_('User permissions').get_manual_link('User_permissions'), array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( T_('User permissions').get_manual_link('user_permissions'), array( 'class'=>'fieldset clear' ) );
 
 $edited_User->get_Group();
 
@@ -411,6 +411,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.11  2010/03/01 07:52:51  efy-asimo
+ * Set manual links to lowercase
+ *
  * Revision 1.10  2010/02/23 05:01:46  sam2kb
  * minor
  *

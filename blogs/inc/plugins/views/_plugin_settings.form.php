@@ -113,7 +113,7 @@ if( $edit_Plugin->Settings ) // NOTE: this triggers PHP5 autoloading through Plu
 $Form->begin_fieldset( T_('Plugin variables').' ('.T_('Advanced').')', array( 'class' => 'clear' ) );
 	$Form->text_input( 'edited_plugin_code', $edited_plugin_code, 15, T_('Code'), T_('The code to call the plugin by code. This is also used to link renderer plugins to items.'), array('maxlength'=>32) );
 	$Form->text_input( 'edited_plugin_priority', $edited_plugin_priority, 4, T_('Priority'), '', array( 'maxlength' => 4 ) );
-	$render_note = get_manual_link('Plugin/apply_rendering');
+	$render_note = get_manual_link('plugin/apply_rendering');
 	if( empty( $edited_plugin_code ) )
 	{
 		$render_note .= ' '.T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
@@ -187,6 +187,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.7  2010/03/01 07:52:51  efy-asimo
+ * Set manual links to lowercase
+ *
  * Revision 1.6  2010/02/08 17:53:55  efy-yury
  * copyright 2009 -> 2010
  *

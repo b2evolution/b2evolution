@@ -88,7 +88,7 @@ $Form->begin_form( 'fform', sprintf( T_('Edit %s preferences'), $edited_User->dg
 
 	/***************  Preferences  **************/
 
-$Form->begin_fieldset( T_('Preferences').get_manual_link('User_preferences') );
+$Form->begin_fieldset( T_('Preferences').get_manual_link('user_preferences') );
 
 $value_admin_skin = get_param('edited_user_admin_skin');
 if( !$value_admin_skin )
@@ -290,6 +290,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.10  2010/03/01 07:52:51  efy-asimo
+ * Set manual links to lowercase
+ *
  * Revision 1.9  2010/02/14 14:18:39  efy-asimo
  * insert manual links
  *

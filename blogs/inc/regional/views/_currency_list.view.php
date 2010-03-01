@@ -52,7 +52,7 @@ $Results = new Results( $SQL->get(), 'curr_', '-A');
 
 $Results->Cache = & get_CurrencyCache();
 
-$Results->title = T_('Currencies list').get_manual_link('Currencies_list');
+$Results->title = T_('Currencies list').get_manual_link('currencies_list');
 
 /*
  * STATUS TD:
@@ -172,6 +172,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.13  2010/03/01 07:52:51  efy-asimo
+ * Set manual links to lowercase
+ *
  * Revision 1.12  2010/02/14 14:18:39  efy-asimo
  * insert manual links
  *

@@ -46,7 +46,7 @@ global $dispatcher;
 
 $Table = new Table();
 
-$Table->title = T_('Plugins available for installation').get_manual_link('Plugins_available_for_installation');
+$Table->title = T_('Plugins available for installation').get_manual_link('plugins_available_for_installation');
 
 $Table->global_icon( T_('Cancel install!'), 'close', regenerate_url(), T_('Cancel'), 3, 4 );
 
@@ -214,6 +214,9 @@ echo '</p>';
 
 /*
  * $Log$
+ * Revision 1.13  2010/03/01 07:52:51  efy-asimo
+ * Set manual links to lowercase
+ *
  * Revision 1.12  2010/02/14 14:18:39  efy-asimo
  * insert manual links
  *

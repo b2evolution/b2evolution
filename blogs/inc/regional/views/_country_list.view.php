@@ -53,7 +53,7 @@ if( !empty($s) )
 // Create result set:
 $Results = new Results( $SQL->get(), 'ctry_', '-A' );
 
-$Results->title = T_('Countries list').get_manual_link('Countries_list');
+$Results->title = T_('Countries list').get_manual_link('countries_list');
 
 /*
  * STATUS TD:
@@ -217,6 +217,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.20  2010/03/01 07:52:51  efy-asimo
+ * Set manual links to lowercase
+ *
  * Revision 1.19  2010/02/14 14:18:39  efy-asimo
  * insert manual links
  *
