@@ -27,7 +27,7 @@ class adsense_plugin extends Plugin
 	var $help_url = 'http://b2evolution.net/blog-ads/adsense-plugin.php';
 	var $short_desc;
 	var $long_desc;
-	var $version = '0.9.1';
+	var $version = '0.9.2';
 	var $number_of_installs = 1;
 
 	/**
@@ -43,17 +43,11 @@ class adsense_plugin extends Plugin
 
 
 	/**
-	 * Get the settings that the plugin can use.
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
 	 *
-	 * Those settings are transfered into a Settings member object of the plugin
-	 * and can be edited in the backoffice (Settings / Plugins).
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @see PluginSettings
-	 * @see Plugin::PluginSettingsValidateSet()
-	 * @return array
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
-	function GetDefaultSettings( & $params )
+	function get_coll_setting_definitions( & $params )
 	{
 		$r = array(
 			'adsense_block' => array(
@@ -84,9 +78,9 @@ class adsense_plugin extends Plugin
 	}
 
 
-  /**
-   * Comments out the adsense tags so that they don't get worked on by other renderers like Auto-P
-   *
+	/**
+	 * Comments out the adsense tags so that they don't get worked on by other renderers like Auto-P
+	 *
 	 * @param mixed $params
 	 */
 	function FilterItemContents( & $params )
@@ -152,12 +146,14 @@ class adsense_plugin extends Plugin
 	}
 
 
-  /**
+	/**
 	 *
 	 */
 	function DisplayItem_callback( $matches )
 	{
-	  /**
+		global $Blog;
+		
+	  	/**
 		 * How many blocks already displayed?
 		 */
 		static $adsense_blocks_counter = 0;
@@ -167,10 +163,10 @@ class adsense_plugin extends Plugin
 		if( $adsense_blocks_counter > $this->Settings->get( 'max_blocks_in_content' ) )
 		{
 			return '<!-- Adsense block #'.$adsense_blocks_counter.' not displayed since it exceed the limit of '
-							.$this->Settings->get( 'max_blocks_in_content' ).' -->';
+							.$this->Settings->get_coll_setting( 'max_blocks_in_content', $Blog ).' -->';
 		}
 
-		return $this->Settings->get( 'adsense_block' );
+		return $this->Settings->get_coll_setting( 'adsense_block', $Blog );
 	}
 
 	/**
@@ -212,6 +208,9 @@ class adsense_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.7  2010/03/01 04:05:58  sam2kb
+ * Per-blog plugin settings
+ *
  * Revision 1.6  2010/02/08 17:55:50  efy-yury
  * copyright 2009 -> 2010
  *
