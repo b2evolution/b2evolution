@@ -43,12 +43,19 @@ class adsense_plugin extends Plugin
 
 
 	/**
-	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 * Get the settings that the plugin can use.
 	 *
-	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 * Those settings are transfered into a Settings member object of the plugin
+	 * and can be edited in the backoffice (Settings / Plugins).
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @see PluginSettings
+	 * @see Plugin::PluginSettingsValidateSet()
+	 * @return array
 	 */
-	function get_coll_setting_definitions( & $params )
+	function GetDefaultSettings( & $params )
 	{
+
 		$r = array(
 			'adsense_block' => array(
 					'label' => 'AdSense block',
@@ -70,6 +77,37 @@ class adsense_plugin extends Plugin
 					'size' => 2,
 					'maxlength' => 2,
 					'defaultvalue' => 3,
+					'note' => T_('Maximum number of AdSense blocks the plugin should expand in post contents. Google terms typically set the limit to 3. You may wish to set it to less if you add blocks into the sidebar.'),
+				),
+			);
+
+		return $r;
+	}
+
+
+
+	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		$r = array(
+			'coll_adsense_block' => array(
+					'label' => 'AdSense block',
+					'type' => 'html_textarea',
+					'cols' => 60,
+					'rows' => 10,
+					'defaultvalue' => $this->Settings->get('adsense_block'),
+					'note' => 'Copy/Paste your AdSense code from Google into here. You can surround it with some CSS for decoration and/or positionning.',
+				),
+			'coll_max_blocks_in_content' => array(
+					'label' => 'Max # of blocks',
+					'type' => 'integer',
+					'size' => 2,
+					'maxlength' => 2,
+					'defaultvalue' => $this->Settings->get('max_blocks_in_content'),
 					'note' => T_('Maximum number of AdSense blocks the plugin should expand in post contents. Google terms typically set the limit to 3. You may wish to set it to less if you add blocks into the sidebar.'),
 				),
 			);
@@ -163,10 +201,10 @@ class adsense_plugin extends Plugin
 		if( $adsense_blocks_counter > $this->Settings->get( 'max_blocks_in_content' ) )
 		{
 			return '<!-- Adsense block #'.$adsense_blocks_counter.' not displayed since it exceed the limit of '
-							.$this->Settings->get_coll_setting( 'max_blocks_in_content', $Blog ).' -->';
+							.$this->get_coll_setting( 'coll_max_blocks_in_content', $Blog ).' -->';
 		}
 
-		return $this->Settings->get_coll_setting( 'adsense_block', $Blog );
+		return $this->get_coll_setting( 'coll_adsense_block', $Blog );
 	}
 
 	/**
@@ -208,6 +246,9 @@ class adsense_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.8  2010/03/01 04:24:33  sam2kb
+ * Save plugin settings after update
+ *
  * Revision 1.7  2010/03/01 04:05:58  sam2kb
  * Per-blog plugin settings
  *
