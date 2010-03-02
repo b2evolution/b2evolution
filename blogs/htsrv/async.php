@@ -236,6 +236,7 @@ function get_comments_awaiting_moderation( $blog_ID )
 		$limit = $limit - count( $comment_IDs );
 	}
 
+	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 	show_comments_awaiting_moderation( $blog_ID, $limit, $comment_IDs, false );
 }
 
@@ -252,6 +253,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.50  2010/03/02 12:37:08  efy-asimo
+ * remove show_comments_awaiting_moderation function from _misc_funcs.php to _dashboard.func.php
+ *
  * Revision 1.49  2010/02/28 23:38:38  fplanque
  * minor changes
  *

@@ -325,6 +325,7 @@ if( $blog )
 
 		echo '<div id="comments_container">';
 
+		load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 		// GET COMMENTS AWAITING MODERATION (the code generation is shared with the AJAX callback):
 		show_comments_awaiting_moderation( $Blog->ID );
 
@@ -698,6 +699,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.59  2010/03/02 12:37:23  efy-asimo
+ * remove show_comments_awaiting_moderation function from _misc_funcs.php to _dashboard.func.php
+ *
  * Revision 1.58  2010/03/02 11:59:17  efy-asimo
  * refresh icon for dashboard comment list
  *
