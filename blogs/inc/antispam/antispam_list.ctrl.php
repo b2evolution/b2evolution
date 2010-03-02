@@ -93,7 +93,7 @@ switch( $action )
 
 		if( $delcomments )
 		{ // Then all banned comments
-// fp> do we need a begin/commit?
+			// fp> do we need a begin/commit? - asimo> we don't need transaction here 
 			if( $display_mode == 'js' )
 			{
 				$query = 'SELECT comment_ID FROM T_comments
@@ -103,6 +103,7 @@ switch( $action )
 							   OR comment_content LIKE '.$DB->quote('%'.$keyword.'%');
 				$deleted_ids = implode( ',', $DB->get_col($query, 0, 'Get comment ids awaiting for delete') );
 			};
+			// If a comment whit this keyword content was inserted here, the user will not even observe that (This is good)
 			$r = $DB->query('DELETE FROM T_comments
 			                  WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
 			                     OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
@@ -136,7 +137,7 @@ switch( $action )
 		param( 'request', 'string', '' );
 		if( $display_mode == 'js' && $request != 'checkban' )
 		{
-			if( $delcomments )
+			if( $delcomments && $r ) // $r not null => means the commentlist was deleted successful
 			{
 				send_javascript_message( array( 'refresh_comments' => array( $deleted_ids ), 'closeAntispamSettings' => array() ), true );
 			}
@@ -234,6 +235,9 @@ if( $display_mode != 'js')
 
 /*
  * $Log$
+ * Revision 1.14  2010/03/02 11:59:11  efy-asimo
+ * refresh icon for dashboard comment list
+ *
  * Revision 1.13  2010/02/28 23:38:39  fplanque
  * minor changes
  *

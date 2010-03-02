@@ -271,18 +271,32 @@ if( $blog )
 			}
 
 			// Refresh comments on dashboard after ban url -> delete comment
+			// Or absolute refresh, if deleted_ids is an empty string
 			function refresh_comments(deleted_ids)
 			{
-				var comment_ids = String(deleted_ids).split(',');
-				for( var i=0;i<comment_ids.length; ++i )
-				{
-					var divid = 'comment_' + comment_ids[i];
-					fadeIn(divid, '#EE0000');
-
-					delete commentIds[divid];
+				if(deleted_ids != '')
+				{ // ban url -> delete comment
+					var ids = getCommentsIds();
+					var comment_ids = String(deleted_ids).split(',');
+					for( var i=0;i<comment_ids.length; ++i )
+					{
+						var divid = 'comment_' + comment_ids[i];
+						fadeIn(divid, '#EE0000');
+	
+						delete commentIds[divid];
+					}
 				}
-
-				var ids = getCommentsIds();
+				else
+				{ // absolute refresh
+					comment_ids = new Array();
+					var ids = new Array();
+					for(var id in commentIds)
+					{
+						var divid = commentIds[id];
+						delete commentIds[divid];
+						comment_ids.push(divid);
+					}
+				}
 				
 				$.ajax({
 					type: 'POST',
@@ -300,8 +314,10 @@ if( $blog )
 		<?php
 
 		$nb_blocks_displayed++;
-
-		$block_item_Widget->title = T_('Comments awaiting moderation').' <span id="badge" class="badge">'.get_comments_awaiting_moderation_number( $Blog->ID ).'</span>';
+		
+		$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', 'javascript:refresh_comments(\'\')' ).'</span> ';
+		
+		$block_item_Widget->title = $refresh_link.T_('Comments awaiting moderation').' <span id="badge" class="badge">'.get_comments_awaiting_moderation_number( $Blog->ID ).'</span>';
 
 		echo '<div id="comments_block">';
 
@@ -682,6 +698,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.58  2010/03/02 11:59:17  efy-asimo
+ * refresh icon for dashboard comment list
+ *
  * Revision 1.57  2010/02/28 23:38:38  fplanque
  * minor changes
  *
