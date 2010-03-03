@@ -30,7 +30,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
   $block_item_Widget->global_icon( T_('Manage installed skins...'), 'properties', $dispatcher.'?ctrl=skins', T_('Manage skins'), 3, 4 );
   $block_item_Widget->global_icon( T_('Install new skin...'), 'new', $dispatcher.'?ctrl=skins&amp;action=new&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','skinpage=selection','','&'), $admin_url)), T_('Install new'), 3, 4 );
-  $block_item_Widget->global_icon( T_('Keep current skin!'), 'close', regenerate_url( 'skinpage' ), T_('cancel'), 4, 1 );
+  $block_item_Widget->global_icon( T_('Keep current skin!'), 'close', regenerate_url( 'skinpage' ), ' '.T_('Don\'t change'), 3, 4 );
 }
 
 $block_item_Widget->disp_template_replaced( 'block_start' );
@@ -60,6 +60,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.13  2010/03/03 15:59:46  fplanque
+ * minor/doc
+ *
  * Revision 1.12  2010/02/26 15:52:20  efy-asimo
  * combine skin and skin settings tab into one single tab
  *

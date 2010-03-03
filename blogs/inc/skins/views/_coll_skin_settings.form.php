@@ -48,7 +48,7 @@ $Form->begin_form( 'fform' );
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'blog', $Blog->ID );
 
-	$change_skin_link = ' <span class="floatright">'.action_icon( T_('Select another skin...'), 'edit', regenerate_url( 'action', 'ctrl=coll_settings&amp;skinpage=selection' ), T_('Select another').' &raquo;', 3, 4 );
+	$change_skin_link = ' <span class="floatright">'.action_icon( T_('Select another skin...'), 'edit', regenerate_url( 'action', 'ctrl=coll_settings&amp;skinpage=selection' ), T_('Use a different skin').' &raquo;', 3, 4 );
 	
 	$Form->begin_fieldset( T_('Current skin').' '.$change_skin_link );
 
@@ -98,6 +98,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.8  2010/03/03 15:59:46  fplanque
+ * minor/doc
+ *
  * Revision 1.7  2010/02/26 15:52:20  efy-asimo
  * combine skin and skin settings tab into one single tab
  *
