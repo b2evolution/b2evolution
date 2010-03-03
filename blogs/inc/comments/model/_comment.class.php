@@ -680,9 +680,9 @@ class Comment extends DataObject
 	function deleteurl_link( $ajax_button = true, $glue = '&amp;' )
 	{
 		global $current_User, $admin_url;
-		
+
 		if( ! is_logged_in() ) return false;
-		
+
 		$this->get_Item();
 		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get_blog_ID() ) )
 		{ // If User has no permission to edit comments:
@@ -1415,14 +1415,14 @@ class Comment extends DataObject
 			{
 				$notify_message .= T_('Rating').": $this->rating\n";
 			}
-			
+
 			$secret_value = '&secret='.$this->secret;
 
 			$notify_message .= $this->get('content')
 				."\n\n-- \n"
-				.T_('Quick moderation').': '.$baseurl.'htsrv/comment_review.php?cmt_ID='.$this->ID.$secret_value."\n\n";
+				.T_('Quick moderation').': '.$baseurl.'htsrv/comment_review.php?cmt_ID='.$this->ID.$secret_value."\n\n"
 				.T_('Edit screen').': '.$admin_url.'?ctrl=items&blog='.$edited_Blog->ID.'&p='.$edited_Item->ID.'&c=1#c'.$this->ID."\n\n"
-				.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->gen_blogurl(), 'disp=subs' ) )."\n"
+				.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->gen_blogurl(), 'disp=subs' ) )."\n";
 
 			if( $debug )
 			{
@@ -1493,7 +1493,7 @@ class Comment extends DataObject
 				return false;
 			}
 		}
-		
+
 		$this->set( 'secret', generate_random_key() );
 
 		$dbchanges = $this->dbchanges;
@@ -1537,6 +1537,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.50  2010/03/03 19:49:08  fplanque
+ * fix
+ *
  * Revision 1.49  2010/03/03 16:29:15  fplanque
  * minor
  *
