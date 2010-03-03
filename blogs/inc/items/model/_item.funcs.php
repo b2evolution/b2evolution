@@ -210,6 +210,8 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	$urltitle = strtolower( $urltitle );
 
 	// leave only first 5 words
+	// fp>yury TODO: this should only happen when the slug is auto generated.
+	// when submitting a specific slug, it can contain any number of words.
 	$title_words = array();
 	$title_words = explode('-', $urltitle);
 	$count_of_words = 5;
@@ -1031,6 +1033,8 @@ function echo_publish_buttons( $Form, $creating, $edited_Item )
 
 /**
  * Output JavaScript code to dynamically show popup files attachment window
+ *
+ * This is a part of the process that makes it smoother to "Save & start attaching files".
  */
 function echo_attaching_files_button_js()
 {
@@ -1039,29 +1043,33 @@ function echo_attaching_files_button_js()
 	$iframe_name = 'attach_'.generate_random_key( 16 );
 	?>
 	<script type="text/javascript">
-			pop_up_window( '<?php echo $dispatcher; ?>?ctrl=files&amp;mode=upload&amp;iframe_name=<?php echo $iframe_name ?>&amp;fm_mode=link_item&amp;item_ID=<?php echo $edited_Item->ID?>', 'fileman_upload', 1000 );
+			pop_up_window( '<?php echo $dispatcher; ?>?ctrl=files&mode=upload&iframe_name=<?php echo $iframe_name ?>&fm_mode=link_item&item_ID=<?php echo $edited_Item->ID?>', 'fileman_upload', 1000 );
 	</script>
 	<?php
 }
 
 /**
- * Output JavaScript code to set hidden filed is_attachments
- * which indicate that we must show attachments files popup window
+ * Output JavaScript code to set hidden field is_attachments
+ * which indicates that we must show attachments files popup window
+ *
+ * This is a part of the process that makes it smoother to "Save & start attaching files".
  */
 function echo_set_is_attachments()
 {
 	?>
 	<script type="text/javascript">
-			jQuery( '#itemform_createlinks td input' ).click( function()
-			{
-				jQuery( 'input[name=is_attachments]' ).attr("value", "true");
-			} );
+		jQuery( '#itemform_createlinks td input' ).click( function()
+		{
+			jQuery( 'input[name=is_attachments]' ).attr("value", "true");
+		} );
 	</script>
 	<?php
 }
 
 /**
  * Output JavaScript code for "Add/Link files" link
+ *
+ * This is a part of the process that makes it smoother to "Save & start attaching files".
  */
 function echo_link_files_js()
 {
@@ -1308,6 +1316,9 @@ function echo_slug_filler()
 
 /*
  * $Log$
+ * Revision 1.92  2010/03/03 21:04:31  fplanque
+ * minor / doc
+ *
  * Revision 1.91  2010/02/16 16:52:46  efy-yury
  * slugs
  *

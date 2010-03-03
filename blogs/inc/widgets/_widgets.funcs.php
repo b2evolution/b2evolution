@@ -22,6 +22,12 @@
  *
  */
 
+
+/**
+ * @todo factorize!
+ *
+ * @param integer should never be 0
+ */
 function insert_basic_widgets( $blog_id = 0 )
 {
 	global $DB;
