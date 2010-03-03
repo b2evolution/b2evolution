@@ -1420,9 +1420,9 @@ class Comment extends DataObject
 
 			$notify_message .= $this->get('content')
 				."\n\n-- \n"
-				.T_('Edit/Delete').': '.$admin_url.'?ctrl=items&blog='.$edited_Blog->ID.'&p='.$edited_Item->ID.'&c=1#c'.$this->ID."\n\n"
+				.T_('Quick Publish/Delete').': '.$baseurl.'htsrv/comment_review.php?cmt_ID='.$this->ID.$secret_value."\n\n";
+				.T_('Edit screen').': '.$admin_url.'?ctrl=items&blog='.$edited_Blog->ID.'&p='.$edited_Item->ID.'&c=1#c'.$this->ID."\n\n"
 				.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->gen_blogurl(), 'disp=subs' ) )."\n"
-				.T_('Quick Edit').': '.$baseurl.'htsrv/comment_review.php?cmt_ID='.$this->ID.$secret_value."\n";
 
 			if( $debug )
 			{
@@ -1537,6 +1537,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.48  2010/03/03 16:25:13  fplanque
+ * todo
+ *
  * Revision 1.47  2010/03/01 08:34:25  efy-asimo
  *  delete url come back to the same screen
  *

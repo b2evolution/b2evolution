@@ -1,5 +1,5 @@
 <?php
-/** 
+/**
  * This is file implements the comments quick edit operations after mail notification.
  */
 
@@ -10,9 +10,9 @@ require_once dirname(dirname(__FILE__)).'/conf/_config.php';
 
 require_once dirname(dirname(__FILE__)).'/inc/_main.inc.php';
 
-$cmt_ID = param('cmt_ID', integer, '' );
-$secret = param('secret', string, '' );
-$action = param('action', string, '' );
+$cmt_ID = param('cmt_ID', 'integer', '' );
+$secret = param('secret', 'string', '' );
+$action = param('action', 'string', '' );
 $redirect_to = $admin_url.'?ctrl=dashboard';
 
 if( $cmt_ID != null )
@@ -25,17 +25,22 @@ else
 	header_redirect( $redirect_to );
 }
 
-// perform action if action is not null 
+// fp>asimo TODO: Have a check for the secret here. In all cases where the secret is invalid, redirect to the normal comment
+// edit form (which requires to be logged in.)
+// Also, please delete the secret in Comment:dbupdate if the status is no longer draft.
+
+
+// perform action if action is not null
 switch( $action )
 {
 	case 'publish':
-		// check the secret paramater
+		// Check the secret paramater (This doubles as a CRUMB)
 		if( $secret == $posted_Comment->get('secret') )
 		{
 			$posted_Comment->set('status', 'published' );
-	
+
 			$posted_Comment->dbupdate();	// Commit update to the DB
-	
+
 			$Messages->add( T_('Comment has been published.'), 'success' );
 		}
 		else
@@ -49,13 +54,13 @@ switch( $action )
 
 
 	case 'deprecate':
-		// check the secret paramater
+		// Check the secret paramater (This doubles as a CRUMB)
 		if( $secret == $posted_Comment->get('secret') )
 		{
 			$posted_Comment->set('status', 'deprecated' );
-	
+
 			$posted_Comment->dbupdate();	// Commit update to the DB
-	
+
 			$Messages->add( T_('Comment has been deprecated.'), 'success' );
 		}
 		else
@@ -65,25 +70,25 @@ switch( $action )
 
 		header_redirect( $redirect_to );
 		/* exited */
-		break;	
+		break;
 
 
 	case 'delete':
-		// check the secret paramater
+		// Check the secret paramater (This doubles as a CRUMB)
 		if( $secret == $posted_Comment->get('secret') )
 		{
 			// Delete from DB:
 			$posted_Comment->dbdelete();
-			
+
 			$Messages->add( T_('Comment has been deleted.'), 'success' );
 		}
 		else
 		{
 			$Messages->add( T_('Can not delete the comment, invalid call!'), 'error' );
 		}
-		
+
 		header_redirect( $redirect_to );
-		break;		
+		break;
 }
 
 // No action => display the form
@@ -104,24 +109,26 @@ if ($secret == $posted_Comment->get('secret') && ($secret != NULL) )
 {
 	// delete button
 	echo '<input type="submit" name="delete"';
-	echo ' value="'.T_('Delete').'" title="'.T_('Delete this comment').'"'; 
+	echo ' value="'.T_('Delete').'" title="'.T_('Delete this comment').'"';
 	echo ' onClick="document.pressed=this.name"/>';
+// fp>asimo: TODO: this screen needs to work 100% without Javascript. Please use action[] names and param_action() for buttons.
+// Use hidden form fields for $secret and $cmt_ID
 	echo "\n";
-	
+
 	// deprecate button
 	if( $posted_Comment->status != 'deprecated')
 	{
 		echo '<input type="submit" name="deprecate"';
-		echo ' value="'.T_('Deprecate').'" title="'.T_('Deprecate this comment').'"'; 
+		echo ' value="'.T_('Deprecate').'" title="'.T_('Deprecate this comment').'"';
 		echo ' onClick="document.pressed=this.name"/>';
 		echo "\n";
 	}
-	
+
 	// publish button
 	if( $posted_Comment->status != 'published' )
 	{
 		echo '<input type="submit" name="publish"';
-		echo ' value="'.T_('Publish').'" title="'.T_('Publish this comment').'"'; 
+		echo ' value="'.T_('Publish').'" title="'.T_('Publish this comment').'"';
 		echo ' onClick="document.pressed=this.name"/>';
 		echo "\n";
 	}
