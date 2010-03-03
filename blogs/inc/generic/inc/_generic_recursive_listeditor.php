@@ -120,6 +120,9 @@ switch( $action )
 	case 'create':
 		// Insert new element...:
 
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'element' );
+
 		if( ! $permission_to_edit )
 		{
 			debug_die( 'No permission to edit' );
@@ -145,6 +148,9 @@ switch( $action )
 	case 'update':
 		// Make sure we got an ID:
 		param( $GenericCategoryCache->dbIDname, 'integer', true );
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'element' );
 
 		if( ! $permission_to_edit )
 		{
@@ -174,6 +180,9 @@ switch( $action )
 	case 'delete':
 		// Delete entry:
 		param( $GenericCategoryCache->dbIDname, 'integer', true );
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'element' );
 
 		if( ! $permission_to_edit )
 		{
@@ -299,6 +308,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.7  2010/03/03 18:56:50  fplanque
+ * minor
+ *
  * Revision 1.6  2010/02/08 17:53:02  efy-yury
  * copyright 2009 -> 2010
  *
