@@ -169,63 +169,7 @@ switch( $action )
 			// ADD DEFAULT WIDGETS:
 			load_funcs( 'widgets/_widgets.funcs.php' );
 			insert_basic_widgets( $edited_Blog->ID );
-			/*
-			if( $edited_Blog->get( 'in_bloglist' ) )
-			{	// This is a public blog, let's give it a public global navigation list by default:
-				$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-										 VALUES( '.$edited_Blog->ID.', "Page Top", 1, "core", "colls_list_public" )' );
-			}
-			else
-			{	// This is not a public blog, let's give it a restricted navigation list by default:
-				$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-										 VALUES( '.$edited_Blog->ID.', "Page Top", 1, "core", "colls_list_owner" )' );
-			}
 
-			// Add title to all blog Headers:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Header", 1, "core", "coll_title" )' );
-			// Add tagline to all blogs Headers:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Header", 2, "core", "coll_tagline" )' );
-
-			// Add home link to all blogs Menus:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-									 VALUES( '.$edited_Blog->ID.', "Menu", 1, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'home'))).'" )' );
-			// Add info pages to all blogs Menus:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Menu", 2, "core", "coll_page_list" )' );
-			// Add contact link to all blogs Menus:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-									 VALUES( '.$edited_Blog->ID.', "Menu", 3, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'ownercontact'))).'" )' );
-			// Add login link to all blogs Menus:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-									 VALUES( '.$edited_Blog->ID.', "Menu", 4, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'login'))).'" )' );
-
-			// Add Avatar widget to all blog Sidebars:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Sidebar", 10, "core", "coll_avatar" )' );
-			// Add Calendar plugin to all blog Sidebars:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Sidebar", 20, "plugin", "evo_Calr" )' );
-			// Add title to all blog Sidebars:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Sidebar", 30, "core", "coll_title" )' );
-			// Add longdesc to all blogs Sidebars:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Sidebar", 40, "core", "coll_longdesc" )' );
-			// Add common links to all blogs Sidebars:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Sidebar", 50, "core", "coll_common_links" )' );
-			// Add search form to all blogs Sidebars:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Sidebar", 60, "core", "coll_search_form" )' );
-			// Add category links to all blog Sidebars:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Sidebar", 70, "core", "coll_category_list" )' );
-			// Add XML feeds to all blogs Sidebars:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-									 VALUES( '.$edited_Blog->ID.', "Sidebar", 80, "core", "coll_xml_feeds" )' );
-*/
 			$Messages->add( T_('Default widgets have been set-up for this blog.'), 'success' );
 
 			$DB->commit();
@@ -473,6 +417,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2010/03/03 21:34:32  fplanque
+ * minor
+ *
  * Revision 1.23  2010/02/18 06:59:36  efy-yury
  * localization of widgets create code
  *
