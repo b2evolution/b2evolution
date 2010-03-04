@@ -657,7 +657,7 @@ class ItemListLight extends DataObjectList2
 		/*
 		 * ORDER BY stuff:
 		 */
-		if( $this->filters['post_ID_list'] )
+		if( false ) // $this->filters['post_ID_list'] )
 		{
 			$order_by = 'FIELD('.$this->Cache->dbIDname.', '.$this->filters['post_ID_list'].')';
 		}
@@ -1536,6 +1536,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.40  2010/03/04 16:40:35  fplanque
+ * minor
+ *
  * Revision 1.39  2010/03/04 00:58:32  sam2kb
  * query_init(): preserve post order in post_ID_list
  *

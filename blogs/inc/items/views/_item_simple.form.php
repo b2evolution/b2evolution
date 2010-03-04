@@ -73,11 +73,12 @@ $Form->begin_form( '', '', $params );
 	if( isset( $edited_Item ) )   
 	{
 		$Form->hidden( 'post_ID', $edited_Item->ID );
-		// here we add js code for attaching file popup window
+
+		// Here we add js code for attaching file popup window: (Yury)
 		if( !empty( $edited_Item->ID ) && ( $Session->get('create_edit_attachment') === true ) )
-		{//item also created => we have $edited_Item->ID for popup window
+		{ // item also created => we have $edited_Item->ID for popup window:
 			echo_attaching_files_button_js();
-			//clear session variable
+			// clear session variable:
 			$Session->delete('create_edit_attachment');
 		}
 	}
@@ -276,11 +277,16 @@ $Form->end_form();
 echo_publishnowbutton_js();
 echo_set_is_attachments();
 echo_link_files_js();
+
 echo_onchange_newcat();
+
 // require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.38  2010/03/04 16:40:34  fplanque
+ * minor
+ *
  * Revision 1.37  2010/02/08 17:53:19  efy-yury
  * copyright 2009 -> 2010
  *

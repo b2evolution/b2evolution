@@ -426,10 +426,8 @@ switch( $action )
 		}
 
 		param( 'is_attachments', 'string' );
-		// setup here session variable for dynamic create js popup
 		if( !empty( $is_attachments ) && $is_attachments === 'true' )
-		{
-			//print_r($is_attachments);
+		{ // Set session variable to dynamically create js popup:
 			$Session->set('create_edit_attachment', true);
 		}
 
@@ -627,19 +625,15 @@ switch( $action )
 		// If anyone doesn't want that, we can make this optional...
 		$edited_Item->load_Blog();
 		$redirect_to = $edited_Item->Blog->gen_blogurl();
-		
-		// Get config value, if enabled - go to blog after posting
-		// otherwise go to posting list
-		$goto_blog = $edited_Item->Blog->get_setting( 'enable_goto_blog' );
 
-		if($goto_blog == 1)
-		{
-			// Redirect on blog
+		// REDIRECT / EXIT
+		if( $edited_Item->Blog->get_setting( 'enable_goto_blog' ) )
+		{	// Redirect to blog:
 			header_redirect( $redirect_to );
 		}
 		else
 		{
-			// Redirect on posts list
+			// Redirect to posts list:
 			header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
 		}
 		// Switch to list mode:
@@ -1307,6 +1301,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.94  2010/03/04 16:40:34  fplanque
+ * minor
+ *
  * Revision 1.93  2010/02/26 22:15:53  fplanque
  * whitespace/doc/minor
  *
