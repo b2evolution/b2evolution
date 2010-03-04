@@ -657,7 +657,14 @@ class ItemListLight extends DataObjectList2
 		/*
 		 * ORDER BY stuff:
 		 */
-		$order_by = gen_order_clause( $this->filters['orderby'], $this->filters['order'], $this->Cache->dbprefix, $this->Cache->dbIDname );
+		if( $this->filters['post_ID_list'] )
+		{
+			$order_by = 'FIELD('.$this->Cache->dbIDname.', '.$this->filters['post_ID_list'].')';
+		}
+		else
+		{
+			$order_by = gen_order_clause( $this->filters['orderby'], $this->filters['order'], $this->Cache->dbprefix, $this->Cache->dbIDname );
+		}
 
 		$this->ItemQuery->order_by( $order_by );
 
@@ -1529,6 +1536,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.39  2010/03/04 00:58:32  sam2kb
+ * query_init(): preserve post order in post_ID_list
+ *
  * Revision 1.38  2010/02/08 17:53:15  efy-yury
  * copyright 2009 -> 2010
  *
