@@ -2632,7 +2632,13 @@ function upgrade_b2evo_tables()
 
 		// set_upgrade_checkpoint( '9990' );
 	}
-
+	
+	
+	// Integrate comment_secret
+	task_begin( 'Extending Comment table... ' );
+	db_add_col( 'T_comments', 'comment_secret', 'varchar(32) NULL default NULL' );
+	task_end();
+	
 
 	/*
 	 * ADD UPGRADES HERE.
@@ -2808,6 +2814,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.357  2010/03/04 15:55:17  efy-asimo
+ * integrate comment_secret into the upgrade procedure
+ *
  * Revision 1.356  2010/02/26 22:15:50  fplanque
  * whitespace/doc/minor
  *
