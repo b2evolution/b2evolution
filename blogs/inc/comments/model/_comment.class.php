@@ -1456,8 +1456,8 @@ class Comment extends DataObject
 	{
 		global $Plugins;
 		
-		if( $this->status != 'draft' && $this->secret != null )
-		{
+		if( $this->status != 'draft' )
+		{	// We don't want to keep "secret" moderation access once we've published or deprecated a comment
 			$this->set( 'secret', null );
 		}
 
@@ -1504,7 +1504,7 @@ class Comment extends DataObject
 		}
 
 		if( $this->status == 'draft' )
-		{
+		{	// We will allow "secret" moderation only to draft comments:
 			$this->set( 'secret', generate_random_key() );
 		}
 
@@ -1549,6 +1549,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.52  2010/03/04 18:21:26  fplanque
+ * minor/doc
+ *
  * Revision 1.51  2010/03/04 15:46:02  efy-asimo
  * remove javascript from comment_review + add comment_secret just for draft comments
  *

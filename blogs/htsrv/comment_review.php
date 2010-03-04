@@ -27,8 +27,9 @@ else
 	header_redirect( $to_dashboard );
 }
 
+// Check the secret paramater (This doubles as a CRUMB)
 if( $secret != $posted_Comment->get('secret') )
-{
+{	// Invalid secret, no moderation allowed here, go to regular form with regular login requirements:
 	header_redirect( $to_comment_edit );
 }
 
@@ -36,21 +37,11 @@ if( $secret != $posted_Comment->get('secret') )
 switch( $action )
 {
 	case 'publish':
-		// Check the secret paramater (This doubles as a CRUMB)
-		if( $secret == $posted_Comment->get('secret') )
-		{
-			$posted_Comment->set('status', 'published' );
+		$posted_Comment->set('status', 'published' );
 
-			$posted_Comment->dbupdate();	// Commit update to the DB
+		$posted_Comment->dbupdate();	// Commit update to the DB
 
-			$Messages->add( T_('Comment has been published.'), 'success' );
-		}
-		else
-		{
-			$Messages->add( T_('Comment can not be published, invalid call!'), 'error' );
-			header_redirect( $to_comment_edit );
-			/* exited */
-		}
+		$Messages->add( T_('Comment has been published.'), 'success' );
 
 		header_redirect( $to_dashboard );
 		/* exited */
@@ -58,21 +49,11 @@ switch( $action )
 
 
 	case 'deprecate':
-		// Check the secret paramater (This doubles as a CRUMB)
-		if( $secret == $posted_Comment->get('secret') )
-		{
-			$posted_Comment->set('status', 'deprecated' );
+		$posted_Comment->set('status', 'deprecated' );
 
-			$posted_Comment->dbupdate();	// Commit update to the DB
+		$posted_Comment->dbupdate();	// Commit update to the DB
 
-			$Messages->add( T_('Comment has been deprecated.'), 'success' );
-		}
-		else
-		{
-			$Messages->add( T_('Comment can not be deprecated, invalid call!'), 'error' );
-			header_redirect( $to_comment_edit );
-			/* exited */
-		}
+		$Messages->add( T_('Comment has been deprecated.'), 'success' );
 
 		header_redirect( $to_dashboard );
 		/* exited */
@@ -80,20 +61,10 @@ switch( $action )
 
 
 	case 'delete':
-		// Check the secret paramater (This doubles as a CRUMB)
-		if( $secret == $posted_Comment->get('secret') )
-		{
-			// Delete from DB:
-			$posted_Comment->dbdelete();
+		// Delete from DB:
+		$posted_Comment->dbdelete();
 
-			$Messages->add( T_('Comment has been deleted.'), 'success' );
-		}
-		else
-		{
-			$Messages->add( T_('Can not delete the comment, invalid call!'), 'error' );
-			header_redirect( $to_comment_edit );
-			/* exited */
-		}
+		$Messages->add( T_('Comment has been deleted.'), 'success' );
 
 		header_redirect( $to_dashboard );
 		break;
