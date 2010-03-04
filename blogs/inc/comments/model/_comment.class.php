@@ -1416,13 +1416,17 @@ class Comment extends DataObject
 				$notify_message .= T_('Rating').": $this->rating\n";
 			}
 
-			$secret_value = '&secret='.$this->secret;
-
 			$notify_message .= $this->get('content')
-				."\n\n-- \n"
-				.T_('Quick moderation').': '.$baseurl.'htsrv/comment_review.php?cmt_ID='.$this->ID.$secret_value."\n\n"
-				.T_('Edit screen').': '.$admin_url.'?ctrl=items&blog='.$edited_Blog->ID.'&p='.$edited_Item->ID.'&c=1#c'.$this->ID."\n\n"
-				.T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->gen_blogurl(), 'disp=subs' ) )."\n";
+				."\n\n-- \n";
+				
+			if( $this->status == 'draft' )
+			{
+				$secret_value = '&secret='.$this->secret;
+				$notify_message .= T_('Quick moderation').': '.$baseurl.'htsrv/comment_review.php?cmt_ID='.$this->ID.$secret_value."\n\n";
+			}
+			
+			$notify_message .= T_('Edit screen').': '.$admin_url.'?ctrl=items&blog='.$edited_Blog->ID.'&p='.$edited_Item->ID.'&c=1#c'.$this->ID."\n\n"
+							   .T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->gen_blogurl(), 'disp=subs' ) )."\n";
 
 			if( $debug )
 			{
@@ -1451,6 +1455,11 @@ class Comment extends DataObject
 	function dbupdate()
 	{
 		global $Plugins;
+		
+		if( $this->status != 'draft' && $this->secret != null )
+		{
+			$this->set( 'secret', null );
+		}
 
 		$dbchanges = $this->dbchanges;
 
@@ -1494,7 +1503,10 @@ class Comment extends DataObject
 			}
 		}
 
-		$this->set( 'secret', generate_random_key() );
+		if( $this->status == 'draft' )
+		{
+			$this->set( 'secret', generate_random_key() );
+		}
 
 		$dbchanges = $this->dbchanges;
 
@@ -1537,6 +1549,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.51  2010/03/04 15:46:02  efy-asimo
+ * remove javascript from comment_review + add comment_secret just for draft comments
+ *
  * Revision 1.50  2010/03/03 19:49:08  fplanque
  * fix
  *

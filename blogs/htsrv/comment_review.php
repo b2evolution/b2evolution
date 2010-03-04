@@ -10,10 +10,12 @@ require_once dirname(dirname(__FILE__)).'/conf/_config.php';
 
 require_once dirname(dirname(__FILE__)).'/inc/_main.inc.php';
 
-$cmt_ID = param('cmt_ID', 'integer', '' );
-$secret = param('secret', 'string', '' );
-$action = param('action', 'string', '' );
-$redirect_to = $admin_url.'?ctrl=dashboard';
+param('cmt_ID', 'integer', '' );
+param('secret', 'string', '' );
+param_action();
+
+$to_dashboard = $admin_url.'?ctrl=dashboard';
+$to_comment_edit = $admin_url.'?ctrl=comments&action=edit&comment_ID='.$cmt_ID;
 
 if( $cmt_ID != null )
 {
@@ -22,13 +24,13 @@ if( $cmt_ID != null )
 else
 {
 	$Messages->add( 'Requested comment does not exist!' );
-	header_redirect( $redirect_to );
+	header_redirect( $to_dashboard );
 }
 
-// fp>asimo TODO: Have a check for the secret here. In all cases where the secret is invalid, redirect to the normal comment
-// edit form (which requires to be logged in.)
-// Also, please delete the secret in Comment:dbupdate if the status is no longer draft.
-
+if( $secret != $posted_Comment->get('secret') )
+{
+	header_redirect( $to_comment_edit );
+}
 
 // perform action if action is not null
 switch( $action )
@@ -46,9 +48,11 @@ switch( $action )
 		else
 		{
 			$Messages->add( T_('Comment can not be published, invalid call!'), 'error' );
+			header_redirect( $to_comment_edit );
+			/* exited */
 		}
 
-		header_redirect( $redirect_to );
+		header_redirect( $to_dashboard );
 		/* exited */
 		break;
 
@@ -66,9 +70,11 @@ switch( $action )
 		else
 		{
 			$Messages->add( T_('Comment can not be deprecated, invalid call!'), 'error' );
+			header_redirect( $to_comment_edit );
+			/* exited */
 		}
 
-		header_redirect( $redirect_to );
+		header_redirect( $to_dashboard );
 		/* exited */
 		break;
 
@@ -85,9 +91,11 @@ switch( $action )
 		else
 		{
 			$Messages->add( T_('Can not delete the comment, invalid call!'), 'error' );
+			header_redirect( $to_comment_edit );
+			/* exited */
 		}
 
-		header_redirect( $redirect_to );
+		header_redirect( $to_dashboard );
 		break;
 }
 
@@ -101,37 +109,37 @@ switch( $action )
 
 <body>
 
-<form method="post" name="review" onSubmit="return OnSubmitForm()">
+<form method="post" name="review">
 
 <?php
 
 if ($secret == $posted_Comment->get('secret') && ($secret != NULL) )
 {
 	// delete button
-	echo '<input type="submit" name="delete"';
-	echo ' value="'.T_('Delete').'" title="'.T_('Delete this comment').'"';
-	echo ' onClick="document.pressed=this.name"/>';
-// fp>asimo: TODO: this screen needs to work 100% without Javascript. Please use action[] names and param_action() for buttons.
-// Use hidden form fields for $secret and $cmt_ID
+	echo '<input type="submit" name="actionArray[delete]"';
+	echo ' value="'.T_('Delete').'" title="'.T_('Delete this comment').'"/>';
 	echo "\n";
 
 	// deprecate button
 	if( $posted_Comment->status != 'deprecated')
 	{
-		echo '<input type="submit" name="deprecate"';
-		echo ' value="'.T_('Deprecate').'" title="'.T_('Deprecate this comment').'"';
-		echo ' onClick="document.pressed=this.name"/>';
+		echo '<input type="submit" name="actionArray[deprecate]"';
+		echo ' value="'.T_('Deprecate').'" title="'.T_('Deprecate this comment').'"/>';
 		echo "\n";
 	}
 
 	// publish button
 	if( $posted_Comment->status != 'published' )
 	{
-		echo '<input type="submit" name="publish"';
-		echo ' value="'.T_('Publish').'" title="'.T_('Publish this comment').'"';
-		echo ' onClick="document.pressed=this.name"/>';
+		echo '<input type="submit" name="actionArray[publish]"';
+		echo ' value="'.T_('Publish').'" title="'.T_('Publish this comment').'"/>';
 		echo "\n";
 	}
+	
+	echo '<input type="hidden" name="secret" value="'.$secret.'"';
+	echo "\n";
+	echo '<input type="hidden" name="cmt_ID" value="'.$cmt_ID.'"';
+	echo "\n";
 }
 else
 {
@@ -168,28 +176,6 @@ else
 </fieldset>
 
 </form>
-
-
-<script language="JavaScript">
-function OnSubmitForm()
-{
-	if(document.pressed == 'deprecate')
-	{
-		document.review.action ='comment_review.php?action=deprecate&secret=<?php echo $secret;?>&cmt_ID=<?php echo $cmt_ID;?>';
-  	}
-	else
-	if(document.pressed == 'publish')
-	{
-		document.review.action ='comment_review.php?action=publish&secret=<?php echo $secret;?>&cmt_ID=<?php echo $cmt_ID;?>';
-	}
-	else
-	if(document.pressed == 'delete')
-	{
-		document.review.action ='comment_review.php?action=delete&secret=<?php echo $secret;?>&cmt_ID=<?php echo $cmt_ID;?>';
-	}
-	return true;
-}
-</script>
 
 </body>
 </html>
