@@ -277,13 +277,16 @@ $Form->end_form();
 echo_publishnowbutton_js();
 echo_set_is_attachments();
 echo_link_files_js();
-
+// New category input box:
 echo_onchange_newcat();
 
 // require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.39  2010/03/04 19:36:04  fplanque
+ * minor/doc
+ *
  * Revision 1.38  2010/03/04 16:40:34  fplanque
  * minor
  *

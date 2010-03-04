@@ -573,21 +573,18 @@ switch( $action )
 		if( ! $was_published && $edited_Item->status == 'published' )
 		{	// The post's last status wasn't "published", but we're going to publish it now.
 			
-			// Get config value, if enabled - go to blog after posting
-			// otherwise go to posting list
-			$goto_blog = $edited_Item->Blog->get_setting( 'enable_goto_blog' );
-	
-			if($goto_blog != 1)
-			{
-				// redirect to posts list
+			if( ! $edited_Item->Blog->get_setting( 'enable_goto_blog' ) )
+			{	// redirect to posts list
+
+				//Set highlight
+				$Session->set('highlight_id', $edited_Item->ID);
+
 				header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
 			}
 			
 			$edited_Item->load_Blog();
 			$redirect_to = $edited_Item->Blog->gen_blogurl();
 		}
-		//Set highlight
-		$Session->set('highlight_id', $edited_Item->ID);
 
 		// REDIRECT / EXIT
 		header_redirect( $redirect_to, 303 );
@@ -1301,6 +1298,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.95  2010/03/04 19:36:04  fplanque
+ * minor/doc
+ *
  * Revision 1.94  2010/03/04 16:40:34  fplanque
  * minor
  *

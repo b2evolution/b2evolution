@@ -209,6 +209,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	// Make everything lowercase
 	$urltitle = strtolower( $urltitle );
 
+	/*
 	// leave only first 5 words
 	// fp>yury TODO: this should only happen when the slug is auto generated.
 	// when submitting a specific slug, it can contain any number of words.
@@ -227,6 +228,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	}
 	
 	// echo 'leaving 5 words: '.$urltitle.'<br />';
+	*/
 	
 	// Normalize to 200 chars + a number
 	preg_match( '/^(.*?)((-|_)+([0-9]+))?$/', $urltitle, $matches );
@@ -510,13 +512,14 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 
 /**
  * Creates a link to new category, with properties icon
+ *
  * @return string link url 
  */
 function get_newcategory_link()
 {
 	global $dispatcher, $blog;
 	$new_url = $dispatcher.'?ctrl=chapters&amp;action=new&amp;blog='.$blog;
-	$link = ' <span class="floatright">'.action_icon( T_('Add new category'), 'properties', $new_url, '', 5, 1, array( 'target' => '_blank' ) ).'</span>';
+	$link = ' <span class="floatright">'.action_icon( T_('Add new category'), 'new', $new_url, '', 5, 1 ).'</span>';
 	return $link;
 }
 
@@ -1217,7 +1220,7 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 	return $Items;
 }
 
-
+// fp> TODO: Doc!
 function check_categories( & $post_category, & $post_extracats )
 {
 	$post_category = param( 'post_category', 'integer', true );
@@ -1288,10 +1291,10 @@ function echo_onchange_newcat()
 }
 
 /**
- * Make the slug field automatically update when a title is typed.
+ * Automatically update the slug field when a title is typed.
+ *
  * Variable slug_changed hold true if slug was manually changed 
  * (we already do not need autocomplete) and false in other case.
- * 
  */
 function echo_slug_filler()
 {
@@ -1316,6 +1319,9 @@ function echo_slug_filler()
 
 /*
  * $Log$
+ * Revision 1.93  2010/03/04 19:36:04  fplanque
+ * minor/doc
+ *
  * Revision 1.92  2010/03/03 21:04:31  fplanque
  * minor / doc
  *

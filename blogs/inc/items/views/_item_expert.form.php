@@ -432,13 +432,16 @@ if( empty( $edited_Item->ID ) )
 { // if we creating new post - we add slug autofiller JS
 	echo_slug_filler();
 }
-
+// New category input box:
 echo_onchange_newcat();
 
 // require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.65  2010/03/04 19:36:04  fplanque
+ * minor/doc
+ *
  * Revision 1.64  2010/03/04 16:40:34  fplanque
  * minor
  *

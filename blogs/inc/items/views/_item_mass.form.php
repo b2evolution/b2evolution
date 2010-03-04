@@ -220,10 +220,14 @@ $Form->begin_form( '', '', $params );
 $Form->end_form();
 
 // ####################### JS BEHAVIORS #########################
+// New category input box:
 echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.12  2010/03/04 19:36:04  fplanque
+ * minor/doc
+ *
  * Revision 1.11  2010/02/05 09:51:40  efy-asimo
  * create categories on the fly
  *
