@@ -507,11 +507,11 @@ function install_plugin( $plugin )
 function install_basic_widgets()
 {
 	load_funcs( 'widgets/_widgets.funcs.php' );
-	
+
 	echo 'Installing default widgets... ';
 
 	insert_basic_widgets();
-	
+
 	echo "OK.<br />\n";
 }
 
@@ -737,58 +737,86 @@ function load_db_schema()
 
 
 /**
- * Install htaccess: Check if it works with the webserver, and install it.
- * 
- * @return string empty if already was installed or if installation was succesfull, error message otherwise. 
+ * Install htaccess: Check if it works with the webserver, then install it for real.
+ *
+ * @return string error message
  */
-function install_htaccess()
+function install_htaccess( $upgrade = false )
+{
+	echo '<p>Preparing to install .htaccess ... ';
+
+	$error_message = do_install_htaccess( $upgrade );
+
+	if( $error_message)
+	{
+		echo 'ERROR!<br/><b>'.$error_message.'</b><br />';
+		printf( T_('Everything should still work, but for optimization you should follow <a %s>these instructions</a>.'.'</p>'), 'href="http://manual.b2evolution.net/Tricky_stuff" target="_blank"');
+	}
+}
+
+/**
+ * This does the actual file manipulations for installing .htaccess
+ *
+ * @param boolean are we upgrading (vs installing)?
+ * @return mixed
+ */
+function do_install_htaccess( $upgrade = false )
 {
 	global $baseurl;
 	global $basepath;
-	
+
 	if( @file_exists($basepath.'.htaccess') )
 	{
-		echo '<p>'.T_('You already have a file named .htaccess at your base url.').'</p>';
-		return '';
-	}
-	
-	if( ! @file_exists($basepath.'sample.htaccess') )
-	{
-		return T_('Can not find file [ sample.htaccess ] at your base url.');	
-	}
-	
-	if( ! @copy( $basepath.'sample.htaccess', $basepath.'install/test/.htaccess' ) )
-	{
-		return T_('Failed to copy files!');
+		if( $upgrade )
+		{
+			echo 'Already installed.';
+			return ''; // all is well :)
+		}
+		return 'You already have a file named .htaccess in your your base url folder.';
 	}
 
+	// Make sure we have a sample file to start with:
+	if( ! @file_exists($basepath.'sample.htaccess') )
+	{
+		return 'Can not find file [ sample.htaccess ] in your base url folder.';
+	}
+
+	// Try to copy that file to the test folder:
+	if( ! @copy( $basepath.'sample.htaccess', $basepath.'install/test/.htaccess' ) )
+	{
+		return 'Failed to copy files!';
+	}
+
+	// Make sure .htaccess does not crash in the test folder:
 	load_funcs('_core/_url.funcs.php');
 	$info = array();
 	if( ! $remote_page = fetch_remote_page( $baseurl.'install/test/', $info ) )
 	{
 		return $info[error];
 	}
-	
 	if( $remote_page != 'Test successful.' )
 	{
-		return T_('install/test/index.html was changed');
+		return 'install/test/index.html was not found as expected.';
 	}
-	
+
+	// Now we consider it's safe, copy .htaccess to its real location:
 	if( ! @copy( $basepath.'sample.htaccess', $basepath.'.htaccess' ) )
 	{
-		return T_('Test was successful, but failed to copy files!');
+		return 'Test was successful, but failed to copy .htaccess into baseurl directory!';
 	}
-	
+
+	echo 'Install successful.';
 	return '';
 }
 
+
 /**
-* Return antispam SQL query.  
-* This is obfuscated because some hosting companies prevent uploading PHP files 
-* containing "spam" strings. 
-*
-* @return string;
-*/
+ * Return antispam SQL query.
+ * This is obfuscated because some hosting companies prevent uploading PHP files
+ * containing "spam" strings.
+ *
+ * @return string;
+ */
 function get_antispam_query()
 {
 	//used base64_encode() for getting this code
@@ -799,6 +827,9 @@ function get_antispam_query()
 
 /*
  * $Log$
+ * Revision 1.90  2010/03/04 18:02:50  fplanque
+ * Cleaned up .htaccess install
+ *
  * Revision 1.89  2010/03/03 18:56:50  fplanque
  * minor
  *

@@ -590,7 +590,24 @@ switch( $action )
 			break;
 		}
 
+		if( $old_db_version = get_db_version() )
+		{
+			echo '<p><strong>'.T_('OOPS! It seems b2evolution is already installed!').'</strong></p>';
 
+			if( $old_db_version < $new_db_version )
+			{
+				echo '<p>'.sprintf( T_('Would you like to <a %s>upgrade your existing installation now</a>?'), 'href="?action=evoupgrade"' ).'</p>';
+			}
+
+			break;
+		}
+
+		echo '<h2>'.T_('Checking files...').'</h2>';
+		flush();
+		// Check for .htaccess:
+		install_htaccess( false );
+
+		// Here's the meat!
 		install_newdb();
 		break;
 
@@ -603,6 +620,12 @@ switch( $action )
 		 */
 		require_once( dirname(__FILE__). '/_functions_evoupgrade.php' );
 
+
+		echo '<h2>'.T_('Checking files...').'</h2>';
+		flush();
+		// Check for .htaccess:
+		install_htaccess( true );
+
 		echo '<h2>'.T_('Upgrading data in existing b2evolution database...').'</h2>';
 		flush();
 		if( upgrade_b2evo_tables() )
@@ -610,16 +633,6 @@ switch( $action )
 			?>
 			<p><?php echo T_('Upgrade completed successfully!')?></p>
 			<p><?php printf( T_('Now you can <a %s>log in</a> with your usual %s username and password.'), 'href="'.$admin_url.'"', 'b2evolution')?></p>
-			<?php
-		}
-		
-		// Install .htaccess:
-		$error_message = install_htaccess();
-		if ( $error_message != '' )
-		{
-			?>
-			<p><?php echo T_('Error occured during installation .htaccess:').$error_message ?></p>
-			<p><?php printf( T_('Everything will work, but for optimization you may manually install as explained <a %s>here</a>.'), 'href="http://manual.b2evolution.net/Tricky_stuff"') ?></p>
 			<?php
 		}
 		break;
@@ -741,6 +754,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.196  2010/03/04 18:02:55  fplanque
+ * Cleaned up .htaccess install
+ *
  * Revision 1.195  2010/02/08 17:55:42  efy-yury
  * copyright 2009 -> 2010
  *
