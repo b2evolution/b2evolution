@@ -139,7 +139,7 @@ switch( $action )
 		{
 			if( $delcomments && $r ) // $r not null => means the commentlist was deleted successfully
 			{
-				send_javascript_message( array( 'refresh_comments' => array( $deleted_ids ), 'closeAntispamSettings' => array() ), true );
+				send_javascript_message( array( 'refreshAfterBan' => array( $deleted_ids ), 'closeAntispamSettings' => array() ), true );
 			}
 			else
 			{
@@ -235,6 +235,9 @@ if( $display_mode != 'js')
 
 /*
  * $Log$
+ * Revision 1.16  2010/03/05 09:22:25  efy-asimo
+ * modify refresh comments visual effect on dashboard
+ *
  * Revision 1.15  2010/03/03 15:59:46  fplanque
  * minor/doc
  *

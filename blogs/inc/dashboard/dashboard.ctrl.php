@@ -271,31 +271,16 @@ if( $blog )
 			}
 
 			// Refresh comments on dashboard after ban url -> delete comment
-			// Or absolute refresh, if deleted_ids is an empty string
-			function refresh_comments(deleted_ids)
+			function refreshAfterBan(deleted_ids)
 			{
-				if(deleted_ids != '')
-				{ // ban url -> delete comment
-					var ids = getCommentsIds();
-					var comment_ids = String(deleted_ids).split(',');
-					for( var i=0;i<comment_ids.length; ++i )
-					{
-						var divid = 'comment_' + comment_ids[i];
-						fadeIn(divid, '#EE0000');
-	
-						delete commentIds[divid];
-					}
-				}
-				else
-				{ // absolute refresh
-					comment_ids = new Array();
-					var ids = new Array();
-					for(var id in commentIds)
-					{
-						var divid = commentIds[id];
-						delete commentIds[divid];
-						comment_ids.push(divid);
-					}
+				var ids = getCommentsIds();
+				var comment_ids = String(deleted_ids).split(',');
+				for( var i=0;i<comment_ids.length; ++i )
+				{
+					var divid = 'comment_' + comment_ids[i];
+					fadeIn(divid, '#EE0000');
+
+					delete commentIds[divid];
 				}
 				
 				$.ajax({
@@ -309,13 +294,36 @@ if( $blog )
 				});
 			}
 
+			// Absolute refresh comment list
+			function refreshComments()
+			{
+				var ids = new Array();
+				for(var id in commentIds)
+				{
+					var divid = commentIds[id];
+					delete commentIds[divid];
+				}
+
+				$.ajax({
+					type: 'POST',
+					url: '<?php echo $htsrv_url; ?>async.php',
+					data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_comments&ids=' + ids + '&ind=' + commentsInd + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
+					success: function(result) 
+					{
+						$('#comments_container').replaceWith(result);
+						var comments_number = $('#badge_' + commentsInd).val();
+						$('#badge').text(comments_number);
+					}
+				});
+			}
+
 			-->
 		</script>
 		<?php
 
 		$nb_blocks_displayed++;
 		
-		$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', 'javascript:refresh_comments(\'\')' ).'</span> ';
+		$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', 'javascript:refreshComments(\'\')' ).'</span> ';
 		
 		$block_item_Widget->title = $refresh_link.T_('Comments awaiting moderation').' <span id="badge" class="badge">'.get_comments_awaiting_moderation_number( $Blog->ID ).'</span>';
 
@@ -699,6 +707,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.60  2010/03/05 09:22:26  efy-asimo
+ * modify refresh comments visual effect on dashboard
+ *
  * Revision 1.59  2010/03/02 12:37:23  efy-asimo
  * remove show_comments_awaiting_moderation function from _misc_funcs.php to _dashboard.func.php
  *
