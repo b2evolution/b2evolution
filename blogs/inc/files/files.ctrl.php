@@ -1079,7 +1079,6 @@ switch( $action )
 					$error_occured = true;
 					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
 							$old_name, $new_name ), 'error' );
-					
 				}
 			}
 		}
@@ -1134,6 +1133,9 @@ switch( $action )
 
 	case 'link_data':
 		// fp> do we need to go through this block + redirect or could the link icons link directly to $linkctrl ?
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'file' );
 
 		// Get the file we want to link:
 		if( !$selected_Filelist->count() )
@@ -1748,6 +1750,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.62  2010/03/05 13:30:35  fplanque
+ * cleanup/wording
+ *
  * Revision 1.61  2010/02/08 17:52:14  efy-yury
  * copyright 2009 -> 2010
  *

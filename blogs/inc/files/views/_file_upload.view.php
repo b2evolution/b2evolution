@@ -236,7 +236,7 @@ global $fm_FileRoot;
 		}
 		if( count( $renamedMessages) )
 		{
-			echo '<p class="error">'.T_('Some uploaded file name has been modified. Please check the messages below.').'</p>';
+			echo '<p class="error">'.T_('Some uploaded files have been renamed due to conflicting file names. Please check the messages below:').'</p>';
 		}
 		?>
 
@@ -299,30 +299,30 @@ global $fm_FileRoot;
 						
 						if( ! array_key_exists( $lKey, $renamedMessages ) )
 						{
-						?>
+							?>
 
-						<input type="radio" name="uploadfile_source[<?php echo $lKey ?>]" value="file"
-							<?php echo ! isset($uploadfile_source[$lKey]) || $uploadfile_source[$lKey] == 'file' ? ' checked="checked"' : '' ?> />
-						<label for="uploadfile_<?php echo $lKey ?>"><?php echo T_('Choose a file'); ?>:</label>
-						<input name="uploadfile[]" id="uploadfile_<?php echo $lKey ?>" size="70" type="file" class="upload_file" /><br />
+							<input type="radio" name="uploadfile_source[<?php echo $lKey ?>]" value="file"
+								<?php echo ! isset($uploadfile_source[$lKey]) || $uploadfile_source[$lKey] == 'file' ? ' checked="checked"' : '' ?> />
+							<label for="uploadfile_<?php echo $lKey ?>"><?php echo T_('Choose a file'); ?>:</label>
+							<input name="uploadfile[]" id="uploadfile_<?php echo $lKey ?>" size="70" type="file" class="upload_file" /><br />
 
-						<input type="radio" name="uploadfile_source[<?php echo $lKey ?>]" value="upload"
-							<?php echo isset($uploadfile_source[$lKey]) && $uploadfile_source[$lKey] == 'upload' ? ' checked="checked"' : '' ?> />
-						<label for="uploadfile_url_<?php echo $lKey ?>"><?php echo T_('Get from URL'); ?>:</label>
-						<input name="uploadfile_url[]" id="uploadfile_url_<?php echo $lKey ?>" size="70" type="text" class="upload_file"
-								value="<?php echo ( isset( $uploadfile_url[$lKey] ) ? format_to_output( $uploadfile_url[$lKey], 'formvalue' ) : '' );
-								?>" /><br />
+							<input type="radio" name="uploadfile_source[<?php echo $lKey ?>]" value="upload"
+								<?php echo isset($uploadfile_source[$lKey]) && $uploadfile_source[$lKey] == 'upload' ? ' checked="checked"' : '' ?> />
+							<label for="uploadfile_url_<?php echo $lKey ?>"><?php echo T_('Get from URL'); ?>:</label>
+							<input name="uploadfile_url[]" id="uploadfile_url_<?php echo $lKey ?>" size="70" type="text" class="upload_file"
+									value="<?php echo ( isset( $uploadfile_url[$lKey] ) ? format_to_output( $uploadfile_url[$lKey], 'formvalue' ) : '' );
+									?>" /><br />
 
-						<?php
+							<?php
 						}
 						else
 						{
 							?>
 							<input type="radio" name="<?php echo 'Renamed_'.$lKey ?>" value="Yes" id=" <?php echo 'Yes_'.$lKey ?>"/>
 							<label for="<?php echo 'Yes_'.$lKey ?>">
-							<?php echo sprintf( T_("Replace the old version -%s- with the new version -%s-."), $renamedMessages[$lKey]['oldThumb'], $renamedMessages[$lKey]['newThumb'] ) ?></label><br />
+							<?php echo sprintf( T_("Replace the old version %s with the new version %s"), $renamedMessages[$lKey]['oldThumb'], $renamedMessages[$lKey]['newThumb'] ) ?></label><br />
 							<input type="radio" name="<?php echo 'Renamed_'.$lKey ?>" value="No" id=" <?php echo 'No_'.$lKey ?>"  checked="checked"/>
-							<label for="<?php echo 'Yes_'.$lKey ?>"><?php echo T_("Don't touch the old version") ?> </label><br />
+							<label for="<?php echo 'Yes_'.$lKey ?>"><?php echo T_("Don't touch the old version. Keep 2 separate versions.") ?> </label><br />
 							<?php
 						}
 						if( $uploadwithproperties )
@@ -417,6 +417,9 @@ global $fm_FileRoot;
 
 /*
  * $Log$
+ * Revision 1.16  2010/03/05 13:30:36  fplanque
+ * cleanup/wording
+ *
  * Revision 1.15  2010/02/17 12:59:59  efy-asimo
  * Replace existing file task
  *

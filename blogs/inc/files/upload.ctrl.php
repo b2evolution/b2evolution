@@ -308,7 +308,7 @@ if( $uploadfile_url )
 	}
 }
 
-// Process replace old versions
+// Process renaming/replacing of old versions:
 if( ! empty($renamedFiles) )
 {
 	foreach( $renamedFiles as $rKey => $rData )
@@ -528,7 +528,7 @@ if( isset($_FILES) && count( $_FILES ) )
 				$newFile_thumb = $newFile->get_size_formatted();
 			}
 			//$newFile_size = bytesreadable ($_FILES['uploadfile']['size'][$lKey]);
-			$renamedMessages[$lKey]['message'] = sprintf( T_('"I have renamed %s to %s. Would you like to replace %s with the new version instead?'),
+			$renamedMessages[$lKey]['message'] = sprintf( T_('"%s was renamed to %s. Would you like to replace %s with the new version instead?'),
 													   $oldName, $newName, $oldName );
 			$renamedMessages[$lKey]['oldThumb'] = $oldFile_thumb;
 			$renamedMessages[$lKey]['newThumb'] = $newFile_thumb;
@@ -636,6 +636,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.33  2010/03/05 13:30:35  fplanque
+ * cleanup/wording
+ *
  * Revision 1.32  2010/02/17 12:59:52  efy-asimo
  * Replace existing file task
  *
