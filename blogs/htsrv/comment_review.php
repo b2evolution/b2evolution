@@ -33,6 +33,8 @@ if( $secret != $posted_Comment->get('secret') )
 	header_redirect( $to_comment_edit );
 }
 
+$antispam_url = $admin_url.'?ctrl=antispam&action=ban&keyword='.$posted_Comment->author_url.'&'.url_crumb( 'antispam' );
+
 // perform action if action is not null
 switch( $action )
 {
@@ -67,6 +69,23 @@ switch( $action )
 		$Messages->add( T_('Comment has been deleted.'), 'success' );
 
 		header_redirect( $to_dashboard );
+		break;
+		
+	case 'deleteurl':
+		// Delete author url:
+		$posted_Comment->set( 'author_url', null );
+
+		$posted_Comment->dbupdate();	// Commit update to the DB
+
+		$Messages->add( T_('Comment url has been deleted.'), 'success' );
+		
+		break;
+		
+	case 'antispamtool':
+		// Redirect to the Antispam ban screen
+
+		header_redirect( $antispam_url );
+		/* exited */
 		break;
 }
 
@@ -107,6 +126,19 @@ if ($secret == $posted_Comment->get('secret') && ($secret != NULL) )
 		echo "\n";
 	}
 	
+	if( $posted_Comment->author_url != null )
+	{
+		// delete url button
+		echo '<input type="submit" name="actionArray[deleteurl]"';
+		echo ' value="'.T_('Delete URL').'" title="'.T_('Delete comment URL').'"/>';
+		echo "\n";
+		
+		// antispam tool button
+		echo '<input type="submit" name="actionArray[antispamtool]"';
+		echo ' value="'.T_('Antispam tool').'" title="'.T_('Antispam tool').'"/>';
+		echo "\n";
+	}
+	
 	echo '<input type="hidden" name="secret" value="'.$secret.'"';
 	echo "\n";
 	echo '<input type="hidden" name="cmt_ID" value="'.$cmt_ID.'"';
@@ -127,6 +159,11 @@ else
 		<span class="bTime"><?php $posted_Comment->time( 'H:i' ); ?></span>
 		<?php
 				$posted_Comment->author_url( '', ' &middot; Url: <span class="bUrl">', '</span>' );
+				if( $posted_Comment->author_url != null )
+				{
+					echo ' '.action_icon( T_('Delete comment url'), 'delete', regenerate_url( '', array( 'action=deleteurl', 'cmt_ID='.$cmt_ID, 'secret='.$secret ) ) ).' ';
+					echo ' '.action_icon( T_('Antispam tool'), 'ban', $antispam_url );
+				}
 				$posted_Comment->author_email( '', ' &middot; Email: <span class="bEmail">', '</span>' );
 				$posted_Comment->author_ip( ' &middot; IP: <span class="bIP">', '</span>' );
 				echo ' &middot; <span class="bKarma">';
