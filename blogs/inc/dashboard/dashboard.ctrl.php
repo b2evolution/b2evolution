@@ -294,9 +294,14 @@ if( $blog )
 				});
 			}
 
+			function startRefreshComments()
+			{
+				$('#comments_container').slideUp('fast', refreshComments());
+			}
+
 			// Absolute refresh comment list
 			function refreshComments()
-			{
+			{	
 				var ids = new Array();
 				for(var id in commentIds)
 				{
@@ -308,11 +313,12 @@ if( $blog )
 					type: 'POST',
 					url: '<?php echo $htsrv_url; ?>async.php',
 					data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_comments&ids=' + ids + '&ind=' + commentsInd + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
-					success: function(result) 
+					success: function(result)
 					{
-						$('#comments_container').replaceWith(result);
+						$('#comments_container').html(result);
 						var comments_number = $('#badge_' + commentsInd).val();
 						$('#badge').text(comments_number);
+						$('#comments_container').slideDown('fast');
 					}
 				});
 			}
@@ -323,7 +329,7 @@ if( $blog )
 
 		$nb_blocks_displayed++;
 		
-		$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', 'javascript:refreshComments(\'\')' ).'</span> ';
+		$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', 'javascript:startRefreshComments()' ).'</span> ';
 		
 		$block_item_Widget->title = $refresh_link.T_('Comments awaiting moderation').' <span id="badge" class="badge">'.get_comments_awaiting_moderation_number( $Blog->ID ).'</span>';
 
@@ -707,6 +713,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.61  2010/03/05 16:00:16  efy-asimo
+ * collapse/expand comment list before/after refresh
+ *
  * Revision 1.60  2010/03/05 09:22:26  efy-asimo
  * modify refresh comments visual effect on dashboard
  *
