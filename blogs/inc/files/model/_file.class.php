@@ -1084,11 +1084,12 @@ class File extends DataObject
 
 	/**
 	 * Rewrite the file paths, because one the parent folder name was changed - recursive function
+	 *
 	 * This function should be used just after a folder rename
+	 *
 	 * @access should be private
 	 * @param string relative path for this file's parent directory
 	 * @param string full path for this file's parent directory 
-	 * @return 
 	 */
 	function modify_path ( $rel_dir, $full_dir )
 	{
@@ -1150,7 +1151,7 @@ class File extends DataObject
 		$DB->begin();
 		
 		if( $this->is_dir() )
-		{ //modify folder content file paths in db 
+		{ // modify folder content file paths in db 
 			$rel_dir = dirname( $this->_rdfp_rel_path ).'/';
 			if( $rel_dir == './' )
 			{
@@ -1170,6 +1171,7 @@ class File extends DataObject
 		
 		if( ! @rename( $this->_adfp_full_path, $this->_dir.$newname ) )
 		{ // Rename will fail if $newname already exists (at least on windows)
+// fp>asimo why is there no DB commit or rollback here???
 			return false;
 		}
 
@@ -1200,7 +1202,10 @@ class File extends DataObject
 			$this->set( 'path', $this->_rdfp_rel_path );
 			// Record to DB:
 			if ( ! $this->dbupdate() )
+			{
+// fp>asimo why is there no DB commit or rollback here???
 				return false;
+			}
 		}
 		else
 		{	// There might be some old meta data to *recycle* in the DB...
@@ -2036,6 +2041,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.81  2010/03/05 13:38:31  fplanque
+ * doc/todo
+ *
  * Revision 1.80  2010/02/08 17:52:15  efy-yury
  * copyright 2009 -> 2010
  *
