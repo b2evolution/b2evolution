@@ -55,7 +55,7 @@ if( $blog )
 {	// We want to look at a specific blog:
 	// Begin payload block:
 	
-	// fp> why do we need the following div?
+	// This div is to know where to display the message after overlay close.
 	echo '<div class="first_payload_block">'."\n";	
 
 	$AdminUI->disp_payload_begin();
@@ -273,7 +273,6 @@ if( $blog )
 			// Refresh comments on dashboard after ban url -> delete comment
 			function refreshAfterBan(deleted_ids)
 			{
-				var ids = getCommentsIds();
 				var comment_ids = String(deleted_ids).split(',');
 				for( var i=0;i<comment_ids.length; ++i )
 				{
@@ -282,6 +281,8 @@ if( $blog )
 
 					delete commentIds[divid];
 				}
+
+				var ids = getCommentsIds();
 				
 				$.ajax({
 					type: 'POST',
@@ -713,6 +714,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.62  2010/03/06 12:58:13  efy-asimo
+ * fix refresh after ban url
+ *
  * Revision 1.61  2010/03/05 16:00:16  efy-asimo
  * collapse/expand comment list before/after refresh
  *
