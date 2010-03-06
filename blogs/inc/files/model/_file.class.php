@@ -1171,7 +1171,7 @@ class File extends DataObject
 		
 		if( ! @rename( $this->_adfp_full_path, $this->_dir.$newname ) )
 		{ // Rename will fail if $newname already exists (at least on windows)
-// fp>asimo why is there no DB commit or rollback here???
+			$DB->rollback();
 			return false;
 		}
 
@@ -1203,7 +1203,7 @@ class File extends DataObject
 			// Record to DB:
 			if ( ! $this->dbupdate() )
 			{
-// fp>asimo why is there no DB commit or rollback here???
+				$DB->rollback();
 				return false;
 			}
 		}
@@ -2041,6 +2041,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.82  2010/03/06 12:53:40  efy-asimo
+ * Replace existing file bugfix
+ *
  * Revision 1.81  2010/03/05 13:38:31  fplanque
  * doc/todo
  *

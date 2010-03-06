@@ -335,6 +335,7 @@ if( ! empty($renamedFiles) )
 			}
 		}
 	}
+	forget_param( 'renamedFiles' );
 	unset( $renamedFiles );
 	
 	if( $upload_quickmode )
@@ -636,6 +637,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.34  2010/03/06 12:53:40  efy-asimo
+ * Replace existing file bugfix
+ *
  * Revision 1.33  2010/03/05 13:30:35  fplanque
  * cleanup/wording
  *
