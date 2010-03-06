@@ -538,7 +538,7 @@ class Session
 
 
 	/**
-	 * Assert that we received a valid crumb for the object we want to act on
+	 * Assert that we received a valid crumb for the object we want to act on.
 	 *
 	 * This will DIE if we have not received a valid crumb.
 	 *
@@ -644,6 +644,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.28  2010/03/06 00:33:59  blueyed
+ * doc
+ *
  * Revision 1.27  2010/02/08 17:53:55  efy-yury
  * copyright 2009 -> 2010
  *
