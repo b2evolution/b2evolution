@@ -1220,27 +1220,36 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 	return $Items;
 }
 
-// fp> TODO: Doc!
+/**
+ * 
+ * Check if new category was created or not.
+ * If the new category radio is checked creates the new category and set it to post category
+ * If the new category checkbox is checked creates the new category and set it to post extracat
+ *
+ * @param Object Post category (by reference).
+ * @param Array Post extra categories (by reference).
+ * @return boolean true - if there is no new category, or new category created succesfull; false if new category creation failed.
+ */
 function check_categories( & $post_category, & $post_extracats )
 {
 	$post_category = param( 'post_category', 'integer', true );
 	$post_extracats = param( 'post_extracats', 'array', array() );
 	global $Messages, $blog;
 
-	if( ! $post_category || in_array(0, $post_extracats ) )
+	if( ! $post_category || in_array(0, $post_extracats ) )	// if category key is 0 => means it is a new category
 	{
 		load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
 		$GenericCategoryCache = & get_ChapterCache();
 
 		$category_name = param( 'category_name', 'string', true );
-		$new_GenericCategory = & $GenericCategoryCache->new_obj( NULL, $blog );
+		$new_GenericCategory = & $GenericCategoryCache->new_obj( NULL, $blog );	// create new category object
 		$new_GenericCategory->set( 'name', $category_name );
 		if( $new_GenericCategory->dbinsert() !== false )
 		{
 			$Messages->add( T_('New category created.'), 'success' );
-			if( ! $post_category )
+			if( ! $post_category ) // if new category is main category
 			{
-				$post_category = $new_GenericCategory->ID;
+				$post_category = $new_GenericCategory->ID;	// set the new ID
 			}
 
 			if( ( $extracat_key = array_search( '0', $post_extracats ) ) || $post_extracats[0] == '0' )
@@ -1272,7 +1281,9 @@ function check_categories( & $post_category, & $post_extracats )
 	return true;
 }
 
-
+/*
+ * check the new category radio button, if the new category text has changed
+ */
 function echo_onchange_newcat()
 {
 ?>
@@ -1319,6 +1330,9 @@ function echo_slug_filler()
 
 /*
  * $Log$
+ * Revision 1.94  2010/03/06 13:24:38  efy-asimo
+ * doc for check_categories function
+ *
  * Revision 1.93  2010/03/04 19:36:04  fplanque
  * minor/doc
  *
