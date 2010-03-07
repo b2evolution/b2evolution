@@ -209,26 +209,27 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	// Make everything lowercase
 	$urltitle = strtolower( $urltitle );
 
-	/*
-	// leave only first 5 words
-	// fp>yury TODO: this should only happen when the slug is auto generated.
-	// when submitting a specific slug, it can contain any number of words.
-	$title_words = array();
-	$title_words = explode('-', $urltitle);
-	$count_of_words = 5;
-	if(count($title_words) > $count_of_words)
-	{
-		$urltitle = '';
-		for($i = 0; $i < $count_of_words; $i++)
-		{
-			$urltitle .= $title_words[$i].'-';
-		}
-		//delete last '-'
-		$urltitle = substr($urltitle, 0, strlen($urltitle) - 1);
-	}
 	
-	// echo 'leaving 5 words: '.$urltitle.'<br />';
-	*/
+	// leave only first 5 words
+	$slug_changed = param( 'slug_changed' );
+	if( empty( $slug_changed ) )
+	{ // this should only happen when the slug is auto generated
+		$title_words = array();
+		$title_words = explode('-', $urltitle);
+		$count_of_words = 5;
+		if(count($title_words) > $count_of_words)
+		{
+			$urltitle = '';
+			for($i = 0; $i < $count_of_words; $i++)
+			{
+				$urltitle .= $title_words[$i].'-';
+			}
+			//delete last '-'
+			$urltitle = substr($urltitle, 0, strlen($urltitle) - 1);
+		}
+		
+		// echo 'leaving 5 words: '.$urltitle.'<br />';
+	}
 	
 	// Normalize to 200 chars + a number
 	preg_match( '/^(.*?)((-|_)+([0-9]+))?$/', $urltitle, $matches );
@@ -1323,6 +1324,7 @@ function echo_slug_filler()
 		jQuery( '#post_urltitle' ).change( function()
 		{
 			slug_changed = true;
+			$('#post_urltitle').append('<input type="hidden" name="slug_changed" value="true"/>')
 		} );
 	</script>
 <?php
@@ -1330,6 +1332,9 @@ function echo_slug_filler()
 
 /*
  * $Log$
+ * Revision 1.95  2010/03/07 12:59:50  efy-yury
+ * update slugs
+ *
  * Revision 1.94  2010/03/06 13:24:38  efy-asimo
  * doc for check_categories function
  *
