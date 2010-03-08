@@ -1014,9 +1014,11 @@ class Hit
 		if( substr($pu['host'], 0, 14) == 'images.google.' && isset($ref_params['prev']) )
 		{
 			$prev = @parse_url($ref_params['prev']);
-			if( $prev === false ) {
+			if( $prev === false ) 
+			{
 				$prev = @parse_url($pu['host'].$ref_params['prev']);
-				if( ! $prev ) {
+				if( ! $prev ) 
+				{
 					return NULL;
 				}
 			}
@@ -1226,6 +1228,9 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.60  2010/03/08 21:55:55  fplanque
+ * bleh
+ *
  * Revision 1.59  2010/03/08 21:53:37  blueyed
  * Fix Hit::extract_keyphrase_from_referer for cases where parse_url fails with missing host, e.g. ":1" at the end.
  *
