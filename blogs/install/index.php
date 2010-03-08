@@ -127,6 +127,12 @@ switch( $action )
 		$title = T_('Base configuration');
 		break;
 
+	case 'conf':
+	case 'menu':
+	case 'localeinfo':
+		$title = '';
+		break;
+
 	default:
 		$action = 'default';
 		$title = '';
@@ -754,6 +760,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.197  2010/03/08 18:16:53  sam2kb
+ * Added missing actions
+ *
  * Revision 1.196  2010/03/04 18:02:55  fplanque
  * Cleaned up .htaccess install
  *
