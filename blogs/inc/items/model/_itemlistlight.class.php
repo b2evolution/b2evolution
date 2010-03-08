@@ -657,11 +657,16 @@ class ItemListLight extends DataObjectList2
 		/*
 		 * ORDER BY stuff:
 		 */
-		if( false ) // $this->filters['post_ID_list'] )
+		if( $this->filters['post_ID_list'] && $this->filters['orderby'] == 'ID_list' )
 		{
 			$order_by = 'FIELD('.$this->Cache->dbIDname.', '.$this->filters['post_ID_list'].')';
 		}
-		else
+		elseif( $this->filters['orderby'] == 'ID_list' )
+		{	// Use blog setting here because 'orderby' might be set to 'ID_list' as default filter
+			$this->filters['orderby'] = $this->Blog->get_setting('orderby');
+		}
+		
+		if( empty($order_by) )
 		{
 			$order_by = gen_order_clause( $this->filters['orderby'], $this->filters['order'], $this->Cache->dbprefix, $this->Cache->dbIDname );
 		}
@@ -1536,6 +1541,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.41  2010/03/08 18:18:24  sam2kb
+ * Fixes to query_init(): preserve post order in post_ID_list
+ *
  * Revision 1.40  2010/03/04 16:40:35  fplanque
  * minor
  *
