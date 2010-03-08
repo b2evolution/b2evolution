@@ -209,7 +209,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	// Make everything lowercase
 	$urltitle = strtolower( $urltitle );
 
-	
+/*	
 	// leave only first 5 words
 	$slug_changed = param( 'slug_changed' );
 	if( empty( $slug_changed ) )
@@ -230,7 +230,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 		
 		// echo 'leaving 5 words: '.$urltitle.'<br />';
 	}
-	
+*/	
 	// Normalize to 200 chars + a number
 	preg_match( '/^(.*?)((-|_)+([0-9]+))?$/', $urltitle, $matches );
 	$urlbase = substr( $matches[1], 0, 200 );
@@ -1223,7 +1223,7 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 
 /**
  * 
- * Check if new category was created or not.
+ * Check if new category needs to be created or not (after post editing).
  * If the new category radio is checked creates the new category and set it to post category
  * If the new category checkbox is checked creates the new category and set it to post extracat
  *
@@ -1332,6 +1332,9 @@ function echo_slug_filler()
 
 /*
  * $Log$
+ * Revision 1.96  2010/03/08 21:06:36  fplanque
+ * minor/doc
+ *
  * Revision 1.95  2010/03/07 12:59:50  efy-yury
  * update slugs
  *

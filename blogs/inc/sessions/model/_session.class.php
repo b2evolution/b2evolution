@@ -553,6 +553,7 @@ class Session
 		if( ! $crumb_received = param( 'crumb_'.$crumb_name, 'string', NULL ) )
 		{ // We did not receive a crumb!
 			# TODO: dh> this spams the error_log (via $log_app_errors) a lot (for "comment" crumb). Add "log_app_error" param to debug_die and pass 0 here?
+			# fp> that means it catches a lot of spam :)  -- Yes, sounds reasonable nto to include in error log.
 			debug_die( 'Missing crumb ['.$crumb_name.'] -- It looks like this request is not legit.' );
 		}
 
@@ -645,6 +646,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.30  2010/03/08 21:06:31  fplanque
+ * minor/doc
+ *
  * Revision 1.29  2010/03/06 01:03:35  blueyed
  * todo
  *

@@ -1171,6 +1171,7 @@ class File extends DataObject
 		
 		if( ! @rename( $this->_adfp_full_path, $this->_dir.$newname ) )
 		{ // Rename will fail if $newname already exists (at least on windows)
+// fp>asimo why is there no DB commit or rollback here???
 			$DB->rollback();
 			return false;
 		}
@@ -1203,6 +1204,7 @@ class File extends DataObject
 			// Record to DB:
 			if ( ! $this->dbupdate() )
 			{
+// fp>asimo: the file has already been renamed on disk. I'm not sure what DB changes took place at this point. Can you confirm it's better to roll back everything rather than committing what has already been done?
 				$DB->rollback();
 				return false;
 			}
@@ -2041,6 +2043,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.83  2010/03/08 21:06:27  fplanque
+ * minor/doc
+ *
  * Revision 1.82  2010/03/06 12:53:40  efy-asimo
  * Replace existing file bugfix
  *

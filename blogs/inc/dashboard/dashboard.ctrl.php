@@ -55,7 +55,7 @@ if( $blog )
 {	// We want to look at a specific blog:
 	// Begin payload block:
 	
-	// This div is to know where to display the message after overlay close.
+	// This div is to know where to display the message after overlay close:
 	echo '<div class="first_payload_block">'."\n";	
 
 	$AdminUI->disp_payload_begin();
@@ -714,6 +714,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.63  2010/03/08 21:06:31  fplanque
+ * minor/doc
+ *
  * Revision 1.62  2010/03/06 12:58:13  efy-asimo
  * fix refresh after ban url
  *
