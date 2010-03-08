@@ -27,7 +27,7 @@ class adsense_plugin extends Plugin
 	var $help_url = 'http://b2evolution.net/blog-ads/adsense-plugin.php';
 	var $short_desc;
 	var $long_desc;
-	var $version = '0.9.2';
+	var $version = '4.0.0';
 	var $number_of_installs = 1;
 
 	/**
@@ -58,7 +58,7 @@ class adsense_plugin extends Plugin
 
 		$r = array(
 			'adsense_block' => array(
-					'label' => 'AdSense block',
+					'label' => 'Default AdSense block',
 					'type' => 'html_textarea',
 					'cols' => 60,
 					'rows' => 10,
@@ -72,7 +72,7 @@ class adsense_plugin extends Plugin
 					'note' => 'Copy/Paste your AdSense code from Google into here. You can surround it with some CSS for decoration and/or positionning.',
 				),
 			'max_blocks_in_content' => array(
-					'label' => 'Max # of blocks',
+					'label' => 'Default Max # of blocks',
 					'type' => 'integer',
 					'size' => 2,
 					'maxlength' => 2,
@@ -246,6 +246,9 @@ class adsense_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.9  2010/03/08 21:26:27  fplanque
+ * minor/doc
+ *
  * Revision 1.8  2010/03/01 04:24:33  sam2kb
  * Save plugin settings after update
  *
