@@ -71,6 +71,9 @@ class HitTestCase extends EvoUnitTestCase
 		// "€" in iso-8859-15
 		$ref = 'http://suche.t-online.de/?q=%A4';
 		$this->assertEqual( Hit::extract_keyphrase_from_referer($ref), '€' );
+
+		$ref = 'http://images.google.de/imgres?imgurl=http://www.hahler.de/media/dAny%2520und%2520dAni%2520am%2520Strand.jpg&imgrefurl=http://dany.hahler.de/lass_die_sonne_rein&usg=__j10Oj7RuDyfJFrwaWaEmzZ84vaE=&h=450&w=600&sz=66&hl=de&start=6&um=1&itbs=1&tbnid=l3WSDzMHaY9e8M:&tbnh=101&tbnw=135&prev=/images%3Fq%3Dstrand%2Bpag%26um%3D1%26hl%3Dde%26sa%3DN%26rlz%3D1B3GGGL_deDE334DE334%26tbs%3Disch:1';
+		$this->assertEqual( Hit::extract_keyphrase_from_referer($ref), 'strand pag' );
 	}
 }
 
