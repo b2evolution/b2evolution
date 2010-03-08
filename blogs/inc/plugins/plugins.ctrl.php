@@ -210,11 +210,11 @@ switch( $action )
 
 		//save fadeout item
 		$Session->set('fadeout_id', $plugin_ID);
-		
+
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( '?ctrl=plugins', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
-			
+
 		break;
 
 
@@ -280,10 +280,10 @@ switch( $action )
 		{
 			$Messages->add( T_('The plugin has not been enabled.').( empty($enable_return) ? '' : '<br />'.$enable_return ), 'error' );
 		}
-		
+
 		//save fadeout item
 		$Session->set('fadeout_id', $plugin_ID);
-		
+
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( '?ctrl=plugins', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
@@ -342,7 +342,7 @@ switch( $action )
 			$Messages->add( T_('Plugins have not changed.'), 'note' );
 		}
 		$action = 'list';
-		
+
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( '?ctrl=plugins', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
@@ -694,10 +694,10 @@ switch( $action )
 		{ // there were errors
 			$action = 'edit_settings';
 		}
-		
+
 		//save fadeout item
 		$Session->set('fadeout_id', $edit_Plugin->ID);
-				
+
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( '?ctrl=plugins', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
@@ -1096,6 +1096,7 @@ switch( $action )
 			if( ! isset( $edit_Plugin->number_of_installs )
 					|| ( $admin_Plugins->count_regs($edit_Plugin->classname) < $edit_Plugin->number_of_installs ) )
 			{ // number of installations are not limited or not reached yet
+				$Form->add_crumb('plugin');
 				$Form->hidden( 'action', 'install' );
 				$Form->hidden( 'plugin', $edit_Plugin->classname );
 
@@ -1132,6 +1133,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2010/03/08 21:25:35  fplanque
+ * fix
+ *
  * Revision 1.18  2010/02/08 17:53:23  efy-yury
  * copyright 2009 -> 2010
  *
