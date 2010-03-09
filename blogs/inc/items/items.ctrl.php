@@ -238,10 +238,10 @@ switch( $action )
 		// but we need to make sure the requested/default one is ok:
 		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );
 
+		// Check if new category was started to create. If yes then set up parameters for next page
+		check_categories_nosave( $post_category, $post_extracats );
 
-		param( 'post_extracats', 'array', array() );
-
-		$edited_Item->set('main_cat_ID', param( 'post_category', 'integer', $Blog->get_default_cat_ID() ));
+		$edited_Item->set('main_cat_ID', $post_category);
 		if( $edited_Item->main_cat_ID && $allow_cross_posting < 3 && $edited_Item->get_blog_ID() != $blog )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
@@ -300,8 +300,10 @@ switch( $action )
 		// from tab to tab via javascript when the editor wants to switch views...
 		$edited_Item->load_from_Request( true ); // needs Blog set
 
-		param( 'post_extracats', 'array', array() );
-		$edited_Item->set('main_cat_ID', param( 'post_category', 'integer', $edited_Item->main_cat_ID ));
+		// Check if new category was started to create. If yes then set up parameters for next page
+		check_categories_nosave( $post_category, $post_extracats );
+
+		$edited_Item->set('main_cat_ID', $post_category);
 		if( $edited_Item->main_cat_ID && $allow_cross_posting < 3 && $edited_Item->get_blog_ID() != $blog )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
@@ -371,8 +373,9 @@ switch( $action )
 
 		}
 
+		// Check if new category was started to create. If yes check if it is valid.
 		check_categories( $post_category, $post_extracats );
-
+		
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
 		// Check permission on post type:
@@ -509,7 +512,8 @@ switch( $action )
 
 		}
 
-		check_categories( $post_category, $post_extracats);
+		// Check if new category was started to create.  If yes check if it is valid.
+		$isset_category = check_categories( $post_category, $post_extracats );
 		
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'edit', true, $post_extracats );
@@ -522,8 +526,12 @@ switch( $action )
 		// UPDATE POST:
 		// Set the params we already got:
 		$edited_Item->set( 'status', $post_status );
-		$edited_Item->set( 'main_cat_ID', $post_category );
-		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
+		
+		if( $isset_category )
+		{ // we change the categories only if the check was succesfull
+			$edited_Item->set( 'main_cat_ID', $post_category );
+			$edited_Item->set( 'extra_cat_IDs', $post_extracats );
+		}
 
 		// Set object params:
 		$edited_Item->load_from_Request( false );
@@ -1298,6 +1306,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.96  2010/03/09 11:30:19  efy-asimo
+ * create categories on the fly -  fix
+ *
  * Revision 1.95  2010/03/04 19:36:04  fplanque
  * minor/doc
  *

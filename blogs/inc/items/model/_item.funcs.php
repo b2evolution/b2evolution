@@ -714,22 +714,42 @@ function cat_select_after_last( $parent_cat_ID, $level )
  */
 function cat_select_new()
 {
+	$new_maincat = param( 'new_maincat', 'boolean', false );
+	$new_extracat = param( 'new_extracat', 'boolean', false );
+	if( $new_maincat || $new_extracat )
+	{
+		$category_name = param( 'category_name', 'string', '' );
+	}
+	else
+	{
+		$category_name = '';
+	}
+	
 	global $cat_sel_total_count;
 	$cat_sel_total_count++;
 	$r = "\n".'<tr class="'.( $cat_sel_total_count%2 ? 'odd' : 'even' ).'">';
 	// RADIO for new main cat:
 	$r .= '<td class="selector catsel_main"><input type="radio" name="post_category" class="checkbox" title="'
 						.T_('Select as MAIN category').'" value="0"';
+	if( $new_maincat )
+	{
+		$r.= ' checked="checked"';
+	}
 	$r .= ' id="sel_maincat_new"';
 	$r .= ' onclick="check_extracat(this);"/></td>';
 
 	// CHECKBOX
 	$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
-						.T_('Select as an additional category').'" value="0" id="sel_extracat_new"/></td>';
+						.T_('Select as an additional category').'" value="0"';
+	if( $new_extracat )
+	{
+		$r.= ' checked="checked"';
+	}
+	$r .= 'id="sel_extracat_new"/></td>';
 
 	// INPUT TEXT for new category name
 	$r .= '<td class="catsel_name">'
-				.'<input maxlength="255" style="width: 100%;" value="" size="20" type="text" name="category_name" id="new_category_name" />'
+				.'<input maxlength="255" style="width: 100%;" value="'.$category_name.'" size="20" type="text" name="category_name" id="new_category_name" />'
 				."</td>";
 	$r .= '<td width="1">&nbsp<!-- for IE7 -->';
 	$r .= "</td></tr>";
@@ -1227,6 +1247,8 @@ function & create_multiple_posts( & $Item, $linebreak = false )
  * If the new category radio is checked creates the new category and set it to post category
  * If the new category checkbox is checked creates the new category and set it to post extracat
  *
+ * Function is called during post creation or post update
+ *
  * @param Object Post category (by reference).
  * @param Array Post extra categories (by reference).
  * @return boolean true - if there is no new category, or new category created succesfull; false if new category creation failed.
@@ -1237,12 +1259,18 @@ function check_categories( & $post_category, & $post_extracats )
 	$post_extracats = param( 'post_extracats', 'array', array() );
 	global $Messages, $blog;
 
-	if( ! $post_category || in_array(0, $post_extracats ) )	// if category key is 0 => means it is a new category
+	if( ! $post_category || in_array( 0, $post_extracats ) )	// if category key is 0 => means it is a new category
 	{
+		$category_name = param( 'category_name', 'string', true );
+		if( $category_name == '' )
+		{
+			check_categories_nosave( $post_category, $post_extracats); // set up the category parameters
+			$Messages->add( T_('Please provide a name for new category!'), 'error' );
+			return false;
+		}
 		load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
 		$GenericCategoryCache = & get_ChapterCache();
 
-		$category_name = param( 'category_name', 'string', true );
 		$new_GenericCategory = & $GenericCategoryCache->new_obj( NULL, $blog );	// create new category object
 		$new_GenericCategory->set( 'name', $category_name );
 		if( $new_GenericCategory->dbinsert() !== false )
@@ -1280,6 +1308,40 @@ function check_categories( & $post_category, & $post_extracats )
 	$post_extracats = array_unique( $post_extracats );
 
 	return true;
+}
+
+/*
+ * Set up params for new category creation
+ * It is called after simple/expert tab switch, and can be called during post creation or modification
+ *
+ * @param Object Post category (by reference).
+ * @param Array Post extra categories (by reference).
+ *
+ */
+function check_categories_nosave( & $post_category, & $post_extracats )
+{
+	global $Blog;
+	$post_category = param( 'post_category', 'integer', $Blog->get_default_cat_ID() );
+	$post_extracats = param( 'post_extracats', 'array', array() );
+	
+	if( ! $post_category )	// if category key is 0 => means it is a new category
+	{
+		$post_category = $Blog->get_default_cat_ID();
+		param( 'new_maincat', 'boolean', 1 );
+	}
+	
+	if( ! empty( $post_extracats) && ( ( $extracat_key = array_search( '0', $post_extracats ) ) || $post_extracats[0] == '0' ) )
+	{
+		param( 'new_extracat', 'boolean', 1 );
+		if( $extracat_key )
+		{
+			unset($post_extracats[$extracat_key]);
+		}
+		else
+		{
+			unset($post_extracats[0]);
+		}
+	}
 }
 
 /*
@@ -1332,6 +1394,9 @@ function echo_slug_filler()
 
 /*
  * $Log$
+ * Revision 1.97  2010/03/09 11:30:21  efy-asimo
+ * create categories on the fly -  fix
+ *
  * Revision 1.96  2010/03/08 21:06:36  fplanque
  * minor/doc
  *

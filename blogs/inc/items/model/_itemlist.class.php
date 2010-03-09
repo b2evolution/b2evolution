@@ -110,6 +110,10 @@ class ItemList2 extends ItemListLight
 		{ // dh> workaround for param() bug. See rev 1.93 of /inc/_misc/_misc.funcs.php
 			$renderers = array('default');
 		}
+		if( $post_category == 0 )
+		{
+			$post_category = $this->Blog->get_default_cat_ID();
+		}
 		$comment_Blog = & $BlogCache->get_by_ID( get_catblog( $post_category ) );
 		if( $comment_Blog->allowcomments == 'post_by_post' )
 		{ // param is required
@@ -719,6 +723,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.31  2010/03/09 11:30:21  efy-asimo
+ * create categories on the fly -  fix
+ *
  * Revision 1.30  2010/02/21 01:25:47  sam2kb
  * item_varchar fields rolled back to 'string'
  *

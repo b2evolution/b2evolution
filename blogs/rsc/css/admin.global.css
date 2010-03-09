@@ -200,6 +200,9 @@ table.catselect td.selector {
 	text-align:center;
 	border-right: 1px solid #bbb;
 }
+table.catselect #new_category_name {
+	background-color:white;
+}
 
 
 /*
