@@ -1955,8 +1955,10 @@ class Blog extends DataObject
 			}
 		}
 
-		// Unset cache entry:
-		// TODO
+		// Delete the blog cache folder - try to delete even if cache is disabled
+		load_class( '_core/model/_pagecache.class.php', 'PageCache' );
+		$PageCache = new PageCache( $this );
+		$PageCache->cache_delete();
 
 		// remember ID, because parent method resets it to 0
 		$old_ID = $this->ID;
@@ -2237,6 +2239,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.103  2010/03/10 15:06:31  efy-asimo
+ * Delete blog cache entry if blog is deleted
+ *
  * Revision 1.102  2010/02/08 17:52:07  efy-yury
  * copyright 2009 -> 2010
  *
