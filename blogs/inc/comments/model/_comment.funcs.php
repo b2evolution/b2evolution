@@ -154,22 +154,8 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
  */
 function Comment_get_by_ID( $comment_ID )
 {
-	global $DB, $cache_Comments;
-
-	if( empty($cache_Comments[$comment_ID]) )
-	{ // Load this entry into cache:
-		$query = "SELECT *
-							FROM T_comments
-							WHERE comment_ID = $comment_ID";
-		if( $row = $DB->get_row( $query, ARRAY_A ) )
-		{
-			$cache_Comments[$comment_ID] = new Comment( $row ); // COPY !
-		}
-	}
-
-	if( empty( $cache_Comments[ $comment_ID ] ) ) die('Requested comment does not exist!');
-
-	return $cache_Comments[ $comment_ID ];
+	$CommentCache = & get_CommentCache();
+	return $CommentCache->get_by_ID( $comment_ID );
 }
 
 
@@ -284,6 +270,9 @@ function echo_comment_publishbt_js()
 
 /*
  * $Log$
+ * Revision 1.10  2010/03/11 10:34:53  efy-asimo
+ * Rewrite CommentList to CommentList2 task
+ *
  * Revision 1.9  2010/02/28 23:38:40  fplanque
  * minor changes
  *

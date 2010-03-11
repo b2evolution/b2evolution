@@ -73,7 +73,18 @@ if( $blog )
 	/*
 	 * COMMENTS:
 	 */
-	$CommentList = new CommentList( $Blog, "'comment','trackback','pingback'", array( 'draft' ), '',	'',	'DESC',	'',	5 );
+	$CommentList = new CommentList2( $Blog );
+
+	// Filter list:
+	$CommentList->set_filters( array(
+			'types' => array( 'comment','trackback','pingback' ),
+			'statuses' => array ( 'draft' ),
+			'order' => 'DESC',
+			'comments' => 5,
+		) );
+
+	// Get ready for display (runs the query):
+	$CommentList->display_init();
 
 	if( $CommentList->result_num_rows )
 	{	// We have drafts
@@ -714,6 +725,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.64  2010/03/11 10:34:59  efy-asimo
+ * Rewrite CommentList to CommentList2 task
+ *
  * Revision 1.63  2010/03/08 21:06:31  fplanque
  * minor/doc
  *

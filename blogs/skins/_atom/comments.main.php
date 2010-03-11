@@ -15,16 +15,25 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+$Post_ID = NULL;
 if( isset($Item) )
 {	// Comments for a specific Item:
-  $CommentList = new CommentList( $Blog, "'comment'", array('published'), $Item->ID,
-  																	'', 'DESC', '', $Blog->get_setting('posts_per_feed') );
+  $Post_ID = $Item->ID;
 }
-else
-{	// Comments for the blog:
-  $CommentList = new CommentList( $Blog, "'comment'", array('published'), '',
-  																	'',	'DESC',	'',	$Blog->get_setting('posts_per_feed') );
-}
+
+$CommentList = new CommentList2( $Blog );
+
+// Filter list:
+$CommentList->set_filters( array(
+		'types' => array( 'comment' ),
+		'statuses' => array ( 'published' ),
+		'post_ID' => $Post_ID,
+		'order' => 'DESC',
+		'comments' => $Blog->get_setting('posts_per_feed'),
+	) );
+
+// Get ready for display (runs the query):
+$CommentList->display_init();
 
 
 if($debug)

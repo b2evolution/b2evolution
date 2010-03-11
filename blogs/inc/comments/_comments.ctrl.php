@@ -43,7 +43,7 @@ switch( $action )
 	case 'update_publish':
 	case 'delete':
 		param( 'comment_ID', 'integer', true );
-		$edited_Comment = Comment_get_by_ID( $comment_ID );
+		$edited_Comment = & Comment_get_by_ID( $comment_ID );
 
 		$edited_Comment_Item = & $edited_Comment->get_Item();
 		set_working_blog( $edited_Comment_Item->get_blog_ID() );
@@ -249,7 +249,18 @@ switch( $action )
 		/*
 		 * List of comments to display:
 		 */
-		$CommentList = new CommentList( $Blog, "'comment','trackback','pingback'", $show_statuses, '',	'',	'DESC',	'',	20 );
+		$CommentList = new CommentList2( $Blog );
+	
+		// Filter list:
+		$CommentList->set_filters( array(
+				'types' => array( 'comment','trackback','pingback' ),
+				'statuses' => $show_statuses,
+				'order' => 'DESC',
+				'comments' => 20,
+			) );
+	
+		// Get ready for display (runs the query):
+		$CommentList->display_init();
 		break;
 
 
@@ -316,6 +327,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2010/03/11 10:34:33  efy-asimo
+ * Rewrite CommentList to CommentList2 task
+ *
  * Revision 1.23  2010/02/08 17:52:09  efy-yury
  * copyright 2009 -> 2010
  *

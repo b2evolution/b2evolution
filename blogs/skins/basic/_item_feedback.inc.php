@@ -64,7 +64,7 @@ if(  $disp_comments )
 {	// We requested to display comments
 	if( $Item->can_see_comments() )
 	{ // User can see a comments
-		$type_list[] = "'comment'";
+		$type_list[] = 'comment';
 		$disp_title[] = T_("Comments");
 	}
 	else
@@ -75,12 +75,12 @@ if(  $disp_comments )
 	<a id="comments"></a>
 <?php }
 if( $disp_trackbacks ) {
-	$type_list[] = "'trackback'";
+	$type_list[] = 'trackback';
 	$disp_title[] = T_("Trackbacks"); ?>
 	<a id="trackbacks"></a>
 <?php }
 if( $disp_pingbacks ) {
-	$type_list[] = "'pingback'";
+	$type_list[] = 'pingback';
 	$disp_title[] = T_("Pingbacks"); ?>
 	<a id="pingbacks"></a>
 <?php } ?>
@@ -114,7 +114,18 @@ if( $disp_comments || $disp_trackbacks || $disp_pingbacks  )
 <h4><?php echo implode( ", ", $disp_title) ?>:</h4>
 
 <?php
-$CommentList = new CommentList( NULL, implode(',', $type_list), array('published'), $Item->ID, '', $Blog->get_setting( 'comments_orderdir' ) );
+$CommentList = new CommentList2( $Blog );
+
+// Filter list:
+$CommentList->set_filters( array(
+		'types' => $type_list,
+		'statuses' => array ( 'published' ),
+		'post_ID' => $Item->ID,
+		'order' => $Blog->get_setting( 'comments_orderdir' ),
+	) );
+
+// Get ready for display (runs the query):
+$CommentList->display_init();
 
 $CommentList->display_if_empty( array(
 		'msg_empty' => sprintf( /* TRANS: NO comments/trackbacks/pingbacks/ FOR THIS POST... */

@@ -202,8 +202,25 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 	$BlogCache = & get_BlogCache();
 	$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 
-	$CommentList = new CommentList( $Blog, "'comment','trackback','pingback'", array( 'draft' ), '',	'',	'DESC',	'',	$limit, $comment_IDs );
+	$CommentList = new CommentList2( $Blog );
+	$exlude_ID_list = NULL;
+	if( !empty($comment_IDs) )
+	{
+		$exlude_ID_list = '-'.implode( ",", $comment_IDs );
+	}
 
+	// Filter list:
+	$CommentList->set_filters( array(
+			'types' => array( 'comment','trackback','pingback' ),
+			'statuses' => array ( 'draft' ),
+			'comment_ID_list' => $exlude_ID_list,
+			'order' => 'DESC',
+			'comments' => $limit,
+		) );
+
+	// Get ready for display (runs the query):
+	$CommentList->display_init();
+	
 	$new_comment_IDs = array();
 	while( $Comment = & $CommentList->get_next() )
 	{ // Loop through comments:
@@ -286,6 +303,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.33  2010/03/11 10:35:03  efy-asimo
+ * Rewrite CommentList to CommentList2 task
+ *
  * Revision 1.32  2010/03/02 12:37:23  efy-asimo
  * remove show_comments_awaiting_moderation function from _misc_funcs.php to _dashboard.func.php
  *

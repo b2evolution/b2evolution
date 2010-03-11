@@ -134,31 +134,31 @@ class Comment extends DataObject
 		}
 		else
 		{
-			$this->ID = $db_row['comment_ID'];
-			$this->item_ID = $db_row['comment_post_ID'];
-			if( ! empty($db_row['comment_author_ID']) )
+			$this->ID = $db_row->comment_ID;
+			$this->item_ID = $db_row->comment_post_ID;
+			if( ! empty($db_row->comment_author_ID) )
 			{
-				$this->author_user_ID = $db_row['comment_author_ID'];
+				$this->author_user_ID = $db_row->comment_author_ID;
 			}
-			$this->type = $db_row['comment_type'];
-			$this->status = $db_row['comment_status'];
-			$this->author = $db_row['comment_author'];
-			$this->author_email = $db_row['comment_author_email'];
-			$url = trim( $db_row['comment_author_url'] );
+			$this->type = $db_row->comment_type;
+			$this->status = $db_row->comment_status;
+			$this->author = $db_row->comment_author;
+			$this->author_email = $db_row->comment_author_email;
+			$url = trim( $db_row->comment_author_url );
 			if( ! empty($url) && ! preg_match( '~^\w+://~', $url ) )
 			{ // URL given and does not start with a protocol:
 				$url = 'http://'.$url;
 			}
 			$this->author_url = $url;
-			$this->author_IP = $db_row['comment_author_IP'];
-			$this->date = $db_row['comment_date'];
-			$this->content = $db_row['comment_content'];
-			$this->rating = $db_row['comment_rating'];
-			$this->featured = $db_row['comment_featured'];
-			$this->nofollow = $db_row['comment_nofollow'];
-			$this->spam_karma = $db_row['comment_spam_karma'];
-			$this->allow_msgform = $db_row['comment_allow_msgform'];
-			$this->secret = $db_row['comment_secret'];
+			$this->author_IP = $db_row->comment_author_IP;
+			$this->date = $db_row->comment_date;
+			$this->content = $db_row->comment_content;
+			$this->rating = $db_row->comment_rating;
+			$this->featured = $db_row->comment_featured;
+			$this->nofollow = $db_row->comment_nofollow;
+			$this->spam_karma = $db_row->comment_spam_karma;
+			$this->allow_msgform = $db_row->comment_allow_msgform;
+			$this->secret = $db_row->comment_secret;
 		}
 	}
 
@@ -1549,6 +1549,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.53  2010/03/11 10:34:36  efy-asimo
+ * Rewrite CommentList to CommentList2 task
+ *
  * Revision 1.52  2010/03/04 18:21:26  fplanque
  * minor/doc
  *

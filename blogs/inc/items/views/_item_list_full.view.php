@@ -327,7 +327,17 @@ while( $Item = & $ItemList->get_item() )
 			<?php
 			global $CommentList;
 
-			$CommentList = new CommentList( NULL, "'comment','trackback','pingback'", array(), $Item->ID, '', 'ASC' );
+			$CommentList = new CommentList2( $Blog );
+	
+			// Filter list:
+			$CommentList->set_filters( array(
+				'types' => array( 'comment','trackback','pingback' ),
+				'order' => 'ASC',
+				'post_ID' => $Item->ID,
+			) );
+
+			// Get ready for display (runs the query):
+			$CommentList->display_init();
 
 			$CommentList->display_if_empty( array(
 					'before'    => '<div class="bComment"><p>',
@@ -396,6 +406,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.31  2010/03/11 10:35:05  efy-asimo
+ * Rewrite CommentList to CommentList2 task
+ *
  * Revision 1.30  2010/02/08 17:53:19  efy-yury
  * copyright 2009 -> 2010
  *

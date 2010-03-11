@@ -80,7 +80,7 @@ if( $params['disp_comments'] )
 {	// We requested to display comments
 	if( $Item->can_see_comments() )
 	{ // User can see a comments
-		$type_list[] = "'comment'";
+		$type_list[] = 'comment';
 		if( $title = $Item->get_feedback_title( 'comments' ) )
 		{
 			$disp_title[] = $title;
@@ -95,7 +95,7 @@ if( $params['disp_comments'] )
 
 if( $params['disp_trackbacks'] )
 {
-	$type_list[] = "'trackback'";
+	$type_list[] = 'trackback';
 	if( $title = $Item->get_feedback_title( 'trackbacks' ) )
 	{
 		$disp_title[] = $title;
@@ -105,7 +105,7 @@ if( $params['disp_trackbacks'] )
 
 if( $params['disp_pingbacks'] )
 {
-	$type_list[] = "'pingback'";
+	$type_list[] = 'pingback';
 	if( $title = $Item->get_feedback_title( 'pingbacks' ) )
 	{
 		$disp_title[] = $title;
@@ -149,7 +149,18 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 	echo implode( ', ', $disp_title);
 	echo $params['after_section_title'];
 
-	$CommentList = new CommentList( NULL, implode(',', $type_list), array('published'), $Item->ID, '', $Blog->get_setting( 'comments_orderdir' ) );
+	$CommentList = new CommentList2( $Blog );
+
+	// Filter list:
+	$CommentList->set_filters( array(
+			'types' => $type_list,
+			'statuses' => array ( 'published' ),
+			'post_ID' => $Item->ID,
+			'order' => $Blog->get_setting( 'comments_orderdir' ),
+		) );
+
+	// Get ready for display (runs the query):
+	$CommentList->display_init();
 ?>
 
 <ol class="commentlist">

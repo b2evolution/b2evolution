@@ -145,7 +145,18 @@ class coll_comment_list_Widget extends ComponentWidget
 		$limit = $this->disp_params[ 'limit' ];
 		$order = $this->disp_params[ 'disp_order' ];
 
-		$CommentList = new CommentList( $listBlog, "'comment','trackback','pingback'", array('published'), '',	'',	$order,	'',	$limit );
+		$CommentList = new CommentList2( $listBlog );
+
+		// Filter list:
+		$CommentList->set_filters( array(
+				'types' => array( 'comment','trackback','pingback' ),
+				'statuses' => array( 'published' ),
+				'order' => $order,
+				'comments' => $limit,
+			) );
+
+		// Get ready for display (runs the query):
+		$CommentList->display_init();
 
 		echo $this->disp_params[ 'block_start'];
 
@@ -180,6 +191,9 @@ class coll_comment_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.19  2010/03/11 10:35:09  efy-asimo
+ * Rewrite CommentList to CommentList2 task
+ *
  * Revision 1.18  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *

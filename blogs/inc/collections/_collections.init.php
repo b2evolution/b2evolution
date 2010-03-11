@@ -221,6 +221,25 @@ function & get_ItemTypeCache()
 }
 
 /**
+ * Get the CommentCache
+ *
+ * @return CommentCache
+ */
+function & get_CommentCache()
+{
+	global $Plugins;
+	global $CommentCache;
+
+	if( ! isset( $CommentCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'comments/model/_commentcache.class.php', 'CommentCache' );
+		$Plugins->get_object_from_cacheplugin_or_create( 'CommentCache', 'new CommentCache()' );
+	}
+
+	return $CommentCache;
+}
+
+/**
  * Get the LinkCache
  *
  * @return LinkCache
@@ -323,8 +342,9 @@ class collections_Module extends Module
 		load_class( 'items/model/_link.class.php', 'Link' );
 		load_funcs( 'comments/model/_comment.funcs.php');
 		load_funcs( 'items/model/_item.funcs.php');
-		load_class( 'comments/model/_commentlist.class.php', 'CommentList' );
+		load_class( 'comments/model/_commentlist.class.php', 'CommentList2' );
 		load_class( 'items/model/_itemquery.class.php', 'ItemQuery' );
+		load_class( 'comments/model/_commentquery.class.php', 'CommentQuery' );
 	}
 	
 	/**

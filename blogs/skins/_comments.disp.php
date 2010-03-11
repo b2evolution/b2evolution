@@ -16,7 +16,18 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-$CommentList = new CommentList( $Blog, "'comment','trackback','pingback'", array('published'), '',	'',	'DESC',	'',	20 );
+$CommentList = new CommentList2( $Blog );
+
+// Filter list:
+$CommentList->set_filters( array(
+		'types' => array( 'comment', 'trackback', 'pingback' ),
+		'statuses' => array ( 'published' ),
+		'order' => 'DESC',
+		'comments' => 20,
+	) );
+
+// Get ready for display (runs the query):
+$CommentList->display_init();
 
 $CommentList->display_if_empty();
 
@@ -71,6 +82,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.11  2010/03/11 10:35:13  efy-asimo
+ * Rewrite CommentList to CommentList2 task
+ *
  * Revision 1.10  2010/02/08 17:56:10  efy-yury
  * copyright 2009 -> 2010
  *

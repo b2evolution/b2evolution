@@ -164,7 +164,7 @@ switch( $action )
 		$blog = param( 'blogid', 'integer' );
 		$current_User->check_perm( 'blog_comments', 'edit', true, $blog );
 
-		$edited_Comment = Comment_get_by_ID( param( 'commentid', 'integer' ) );
+		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ) );
 		$status = param( 'status', 'string' );
 		$edited_Comment->set('status', $status );
 		$edited_Comment->dbupdate();
@@ -182,7 +182,7 @@ switch( $action )
 		$blog = param( 'blogid', 'integer' );
 		$current_User->check_perm( 'blog_comments', 'edit', true, $blog );
 
-		$edited_Comment = Comment_get_by_ID( param( 'commentid', 'integer' ) );
+		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ) );
 		$edited_Comment->dbdelete();
 
 		get_comments_awaiting_moderation( $blog );
@@ -253,6 +253,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.51  2010/03/11 10:34:21  efy-asimo
+ * Rewrite CommentList to CommentList2 task
+ *
  * Revision 1.50  2010/03/02 12:37:08  efy-asimo
  * remove show_comments_awaiting_moderation function from _misc_funcs.php to _dashboard.func.php
  *

@@ -19,7 +19,7 @@ $to_comment_edit = $admin_url.'?ctrl=comments&action=edit&comment_ID='.$cmt_ID;
 
 if( $cmt_ID != null )
 {
-	$posted_Comment = Comment_get_by_ID( $cmt_ID );
+	$posted_Comment = & Comment_get_by_ID( $cmt_ID );
 }
 else
 {
