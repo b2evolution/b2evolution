@@ -636,7 +636,7 @@ class Comment extends DataObject
 	 * @param string class name
 	 * @return boolean
 	 */
-	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true )
+	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $redirect_to = NULL )
 	{
 		global $current_User, $admin_url;
 
@@ -661,7 +661,14 @@ class Comment extends DataObject
 		echo '<a href="'.$admin_url.'?ctrl=comments&amp;action=edit&amp;comment_ID='.$this->ID;
    	if( $save_context )
 		{
-			echo $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
+			if( $redirect_to != NULL )
+			{
+				echo $glue.'redirect_to='.$redirect_to;
+			}
+			else
+			{
+				echo $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
+			}
 		}
 		echo '" title="'.$title.'"';
 		if( !empty( $class ) ) echo ' class="'.$class.'"';
@@ -1549,6 +1556,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.54  2010/03/11 13:10:08  efy-asimo
+ * Fix ajax refresh on dashboard
+ *
  * Revision 1.53  2010/03/11 10:34:36  efy-asimo
  * Rewrite CommentList to CommentList2 task
  *

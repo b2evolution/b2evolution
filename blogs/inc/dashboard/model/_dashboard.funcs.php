@@ -268,7 +268,13 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 		echo '<div class="dashboard_action_area">';
 		// Display edit button if current user has the rights:
-		$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton');
+		$redirect_to = NULL;
+		if( ! $script )
+		{ // Set page, where to redirect, because the function is called from async.php (regenerate_url gives => async.php)
+			global $admin_url;
+			$redirect_to = $admin_url.'?ctrl=dashboard&blog='.$blog_ID;
+		}
+		$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton', '&amp;', true, $redirect_to );
 
 		// Display publish NOW button if current user has the rights:
 		$Comment->publish_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', true, true );
@@ -303,6 +309,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.34  2010/03/11 13:10:09  efy-asimo
+ * Fix ajax refresh on dashboard
+ *
  * Revision 1.33  2010/03/11 10:35:03  efy-asimo
  * Rewrite CommentList to CommentList2 task
  *
