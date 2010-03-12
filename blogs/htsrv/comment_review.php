@@ -70,7 +70,7 @@ switch( $action )
 
 		header_redirect( $to_dashboard );
 		break;
-		
+
 	case 'deleteurl':
 		// Delete author url:
 		$posted_Comment->set( 'author_url', null );
@@ -78,9 +78,11 @@ switch( $action )
 		$posted_Comment->dbupdate();	// Commit update to the DB
 
 		$Messages->add( T_('Comment url has been deleted.'), 'success' );
-		
+
+		// redirect to this page, without action param!!!
+		header_redirect( regenerate_url( 'action', array ( 'cmt_ID='.$cmt_ID, 'secret='.$secret ), '', '&' ) );
 		break;
-		
+
 	case 'antispamtool':
 		// Redirect to the Antispam ban screen
 
