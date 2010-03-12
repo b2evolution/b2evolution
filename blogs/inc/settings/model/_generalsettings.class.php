@@ -97,6 +97,7 @@ class GeneralSettings extends AbstractSettings
 		'timeout_sessions' => '604800',     // seconds (604800 == 7 days)
 		'upload_enabled' => '1',
 		'upload_maxkb' => '2048',
+		'evocache_foldername' => '.evocache',
 
 		'user_minpwdlen' => '5',
 		'js_passwd_hashing' => '1',					// Use JS password hashing by default
@@ -199,6 +200,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.29  2010/03/12 10:52:56  efy-asimo
+ * Set EvoCache  folder names - task
+ *
  * Revision 1.28  2010/02/08 17:53:55  efy-yury
  * copyright 2009 -> 2010
  *

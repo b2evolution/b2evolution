@@ -123,7 +123,7 @@ if( !empty($size) && $File->is_image() )
 	$err = $File->output_cached_thumb( $size_name, $mimetype, $mtime );
 	//pre_dump( $err );
 
-	if( $err == '!Thumbnail not found in .evocache' )
+	if( $err == '!Thumbnail not found in'.$Settings->get( 'evocache_foldername' ) )
 	{	// The thumbnail wasn't already in the cache, try to generate and cache it now:
 		$err = NULL;		// Short error code
 		
@@ -238,6 +238,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.53  2010/03/12 10:52:52  efy-asimo
+ * Set EvoCache  folder names - task
+ *
  * Revision 1.52  2010/02/08 17:51:05  efy-yury
  * copyright 2009 -> 2010
  *

@@ -1674,7 +1674,8 @@ class File extends DataObject
 				if( @is_file( $af_thumb_path ) )
 				{	// The thumb IS already in cache! :)
 					// Let's point directly into the cache:
-					$url = $this->_FileRoot->ads_url.dirname($this->_rdfp_rel_path).'/.evocache/'.$this->_name.'/'.$size_name.'.'.$this->get_ext().'?mtime='.$this->get_lastmod_ts();
+					global $Settings;
+					$url = $this->_FileRoot->ads_url.dirname($this->_rdfp_rel_path).'/'.$Settings->get( 'evocache_foldername' ).'/'.$this->_name.'/'.$size_name.'.'.$this->get_ext().'?mtime='.$this->get_lastmod_ts();
 					return $url;
 				}
 			}
@@ -1832,18 +1833,19 @@ class File extends DataObject
 	 */
 	function get_ads_evocache( $create_if_needed = false )
 	{
-		if( strpos( $this->_dir, '/.evocache/' ) !== false )
+		global $Settings;
+		if( strpos( $this->_dir, '/'.$Settings->get( 'evocache_foldername' ).'/' ) !== false )
 		{	// We are already in an evocache folder: refuse to go further!
 			return '!Recursive caching not allowed';
 		}
 
-		$adp_evocache = $this->_dir.'.evocache/'.$this->_name;
+		$adp_evocache = $this->_dir.$Settings->get( 'evocache_foldername' ).'/'.$this->_name;
 
 		if( $create_if_needed && !is_dir( $adp_evocache ) )
 		{	// Create the directory:
 			if( ! mkdir_r( $adp_evocache ) )
 			{	// Could not create
-				return '!.evocache folder read/write error! Check filesystem permissions.';
+				return '!'.$Settings->get( 'evocache_foldername' ).' folder read/write error! Check filesystem permissions.';
 			}
 		}
 
@@ -1856,21 +1858,21 @@ class File extends DataObject
 	 */
 	function rm_cache()
 	{
-		global $Messages;
+		global $Messages, $Settings;
 
 		// Remove cached elts for teh current file:
 		$ads_filecache = $this->get_ads_evocache( false );
 		if( $ads_filecache[0] == '!' )
 		{
 			// This creates unwanted noise
-			// $Messages->add( 'Cannot remove .evocache for file. - '.$ads_filecache, 'error' );
+			// $Messages->add( 'Cannot remove '.$Settings->get( 'evocache_foldername' ).' for file. - '.$ads_filecache, 'error' );
 		}
 		else
 		{
 			rmdir_r( $ads_filecache );
 
 			// In case cache is now empty, delete the folder:
-			$adp_evocache = $this->_dir.'.evocache';
+			$adp_evocache = $this->_dir.$Settings->get( 'evocache_foldername' );
 			@rmdir( $adp_evocache );
 		}
 	}
@@ -1954,7 +1956,8 @@ class File extends DataObject
 		{	// We obtained a path for the thumbnail to be saved:
 			if( ! file_exists( $af_thumb_path ) )
 			{	// The thumbnail was not found...
-				return '!Thumbnail not found in .evocache'; // WARNING: exact wording match on return
+				global $Settings;
+				return '!Thumbnail not found in'.$Settings->get( 'evocache_foldername' ); // WARNING: exact wording match on return
 			}
 
 			if( ! is_readable( $af_thumb_path ) )
@@ -2043,6 +2046,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.84  2010/03/12 10:52:53  efy-asimo
+ * Set EvoCache  folder names - task
+ *
  * Revision 1.83  2010/03/08 21:06:27  fplanque
  * minor/doc
  *

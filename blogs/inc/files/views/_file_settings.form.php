@@ -220,6 +220,10 @@ $Form->begin_fieldset( T_('Advanced options'), array( 'id' => 'ffset_fileadvance
 											255 );
 		}
 	}
+	
+	$Form->radio_input( 'evocache_foldername', $Settings->get( 'evocache_foldername' ), array(
+						array( 'value' => '.evocache', 'label' => T_('Yes, use .evocache folders') ),
+						array( 'value' => '_evocache', 'label' => T_('No, use _evocache folders') ) ), T_('Use hidden folders for caching'), array( 'lines' => 2 ) );
 
 $Form->end_fieldset();
 
@@ -238,6 +242,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.14  2010/03/12 10:52:56  efy-asimo
+ * Set EvoCache  folder names - task
+ *
  * Revision 1.13  2010/03/01 07:52:34  efy-asimo
  * Set manual links to lowercase
  *

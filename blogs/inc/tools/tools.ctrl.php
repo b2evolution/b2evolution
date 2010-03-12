@@ -121,14 +121,14 @@ if( empty($tab) )
 			// fp> TODO: have an option to only PRUNE files older than for example 30 days
 			$current_User->check_perm('options', 'edit', true);
 
-			global $media_path;
+			global $media_path, $Settings;
 
 			// TODO> handle custom media directories
 			$dirs = get_filenames( $media_path, false );
 			$deleted_dirs = 0;
 			foreach( $dirs as $dir )
 			{
-				if( basename($dir) == '.evocache' )
+				if( basename($dir) == $Settings->get( 'evocache_foldername' ) )
 				{	// Delete .evocache directory recursively
 					if( rmdir_r( $dir ) )
 					{
@@ -218,13 +218,15 @@ if( empty($tab) )
 	// TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
 	if( $current_User->check_perm('options', 'edit') )
 	{ // default admin actions:
+		global $Settings;
+		
 		$block_item_Widget->title = T_('Cache management');
 		// dh> TODO: add link to delete all caches at once?
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 		echo '<ul>';
 		echo '<li><a href="'.regenerate_url('action', 'action=del_itemprecache&amp;'.url_crumb('tools')).'">'.T_('Clear pre-renderered item cache (DB)').'</a></li>';
 		echo '<li><a href="'.regenerate_url('action', 'action=del_pagecache&amp;'.url_crumb('tools')).'">'.T_('Clear full page cache (/cache directory)').'</a></li>';
-		echo '<li><a href="'.regenerate_url('action', 'action=del_filecache&amp;'.url_crumb('tools')).'">'.T_('Clear thumbnail caches (.evocache directories)').'</a></li>';
+		echo '<li><a href="'.regenerate_url('action', 'action=del_filecache&amp;'.url_crumb('tools')).'">'.T_('Clear thumbnail caches ('.$Settings->get( 'evocache_foldername' ).' directories)').'</a></li>';
 		echo '</ul>';
 		$block_item_Widget->disp_template_raw( 'block_end' );
 
@@ -285,6 +287,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2010/03/12 10:52:56  efy-asimo
+ * Set EvoCache  folder names - task
+ *
  * Revision 1.23  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *

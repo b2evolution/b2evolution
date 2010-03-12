@@ -142,6 +142,8 @@ switch( $action )
 			{
 				$Settings->set( 'regexp_dirname', $regexp_dirname );
 			}
+			param( 'evocache_foldername', 'string', '');
+			$Settings->set( 'evocache_foldername', $evocache_foldername );
 
 			if( ! $Messages->count('error') )
 			{
@@ -191,6 +193,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2010/03/12 10:52:52  efy-asimo
+ * Set EvoCache  folder names - task
+ *
  * Revision 1.8  2010/02/08 17:52:14  efy-yury
  * copyright 2009 -> 2010
  *
