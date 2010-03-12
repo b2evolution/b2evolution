@@ -403,7 +403,7 @@ class Item extends ItemLight
 	 * @param boolean true if we are returning to edit mode (new, switchtab...)
 	 * @return boolean true if loaded data seems valid.
 	 */
-	function load_from_Request( $editing = false )
+	function load_from_Request( $editing = false, $creating = false )
 	{
 		global $default_locale, $current_User, $localtimenow;
 		global $posttypes_reserved_IDs, $item_typ_ID;
@@ -561,7 +561,7 @@ class Item extends ItemLight
 			$this->get_Blog();
 			$require_title = $this->Blog->get_setting('require_title');
 
-			if( ! $editing && $require_title == 'required' )
+			if( ( ! $editing || $creating ) && $require_title == 'required' ) // creating is important, when the action is create_edit
 			{
 				param_check_not_empty( 'post_title', T_('Please provide a title.'), '' );
 			}
@@ -4150,6 +4150,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.182  2010/03/12 10:20:27  efy-asimo
+ * Don't let to create a post with no title if, always needs a title is set
+ *
  * Revision 1.181  2010/02/26 22:15:47  fplanque
  * whitespace/doc/minor
  *

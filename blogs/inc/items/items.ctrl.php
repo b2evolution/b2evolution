@@ -391,7 +391,7 @@ switch( $action )
 		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
 		// Set object params:
-		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit') );
+		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit'), /* creating? */ true );
 
 		$Plugins->trigger_event( 'AdminBeforeItemEditCreate', array( 'Item' => & $edited_Item ) );
 
@@ -1306,6 +1306,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.97  2010/03/12 10:20:27  efy-asimo
+ * Don't let to create a post with no title if, always needs a title is set
+ *
  * Revision 1.96  2010/03/09 11:30:19  efy-asimo
  * create categories on the fly -  fix
  *
