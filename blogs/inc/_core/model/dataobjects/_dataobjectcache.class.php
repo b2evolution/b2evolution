@@ -670,7 +670,7 @@ class DataObjectCache
 	 *
 	 * Load the cache if necessary
 	 *
-	 * @param integer selected ID
+	 * @param integer|array selected ID(s) (list for multi-selects)
 	 * @param boolean provide a choice for "none" with ID ''
 	 * @param string Callback method name
 	 * @param array IDs to ignore.
@@ -678,6 +678,11 @@ class DataObjectCache
 	 */
 	function get_option_list( $default = 0, $allow_none = false, $method = 'get_name', $ignore_IDs = array() )
 	{
+		if( !is_array( $default ) )
+		{
+			$default = array( $default );
+		}
+
 		if( ! $this->all_loaded && $this->load_all )
 		{ // We have not loaded all items so far, but we're allowed to.
 			if ( empty( $ignore_IDs ) )
@@ -707,7 +712,7 @@ class DataObjectCache
 			}
 
 			$r .=  '<option value="'.$loop_Obj->ID.'"';
-			if( $loop_Obj->ID == $default ) $r .= ' selected="selected"';
+			if( in_array( $loop_Obj->ID, $default ) ) $r .= ' selected="selected"';
 			$r .= '>';
 			$r .= format_to_output( $loop_Obj->$method(), 'htmlbody' );
 			$r .=  '</option>'."\n";
@@ -760,6 +765,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.24  2010/03/12 00:17:08  blueyed
+ * Support list of defaults for get_option_list. Patch by yabs.
+ *
  * Revision 1.23  2010/02/26 17:25:20  fplanque
  * This one did look like a massive replace side-effect. Am I mistaken?
  *
