@@ -1264,9 +1264,14 @@ function check_categories( & $post_category, & $post_extracats )
 		$category_name = param( 'category_name', 'string', true );
 		if( $category_name == '' )
 		{
+			$show_error = ! $post_category;	// new main category without name => error message
 			check_categories_nosave( $post_category, $post_extracats); // set up the category parameters
-			$Messages->add( T_('Please provide a name for new category!'), 'error' );
-			return false;
+			if( $show_error )
+			{ // new main category without name
+				$Messages->add( T_('Please provide a name for new category!'), 'error' );
+				return false;
+			}
+			return true;
 		}
 		load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
 		$GenericCategoryCache = & get_ChapterCache();
@@ -1312,6 +1317,8 @@ function check_categories( & $post_category, & $post_extracats )
 
 /*
  * Set up params for new category creation
+ * Set main category to default category, if the current category does not exist yet
+ * Delete non existing category from extracats
  * It is called after simple/expert tab switch, and can be called during post creation or modification
  *
  * @param Object Post category (by reference).
@@ -1394,6 +1401,9 @@ function echo_slug_filler()
 
 /*
  * $Log$
+ * Revision 1.98  2010/03/12 09:47:34  efy-asimo
+ * New category creation fix
+ *
  * Revision 1.97  2010/03/09 11:30:21  efy-asimo
  * create categories on the fly -  fix
  *
