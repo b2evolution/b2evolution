@@ -111,11 +111,11 @@ class Plugins_admin extends Plugins
 				'AdminBeforeItemEditDelete' => 'This gets called before an existing item gets deleted from the backoffice.',
 
 				'AdminBeginPayload' => 'This gets called before the main payload in the backoffice is displayed.',
-
+				
 				'CacheObjects' => 'Cache data objects.',
 				'CachePageContent' => 'Cache page content.',
 				'CacheIsCollectingContent' => 'Gets asked for if we are generating cached content.',
-
+				
 				'AfterCommentDelete' => 'Gets called after a comment has been deleted from the database.',
 				'AfterCommentInsert' => 'Gets called after a comment has been inserted into the database.',
 				'AfterCommentUpdate' => 'Gets called after a comment has been updated in the database.',
@@ -167,6 +167,9 @@ class Plugins_admin extends Plugins
 				'SkinTag' => 'This method gets invoked when a plugin is called by its code. Providing this method causes the plugin to be listed as a widget.',
 
 				'AppendHitLog' => 'Called when a hit gets logged, but before it gets recorded.',
+				
+				'BeforeThumbCreate' => 'This gets called before an image thumbnail gets created.',
+				'AfterFileUpload' => 'Called before an uploaded file gets saved on server.',
 
 				'DisplayCommentToolbar' => 'Display a toolbar on the public feedback form',
 				'DisplayCommentFormButton' => 'Called in the submit button section of the frontend comment form.',
@@ -1475,6 +1478,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.32  2010/03/14 06:36:58  sam2kb
+ * New plugin hooks: BeforeThumbCreate, AfterFileUpload
+ *
  * Revision 1.31  2010/02/26 22:15:48  fplanque
  * whitespace/doc/minor
  *

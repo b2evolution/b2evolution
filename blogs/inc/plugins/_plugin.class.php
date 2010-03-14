@@ -1757,6 +1757,23 @@ class Plugin
 	function CacheIsCollectingContent()
 	{
 	}
+	
+	
+	/**
+	 * This gets called before an image thumbnail gets created.
+	 *
+	 * This is useful to post-process the thumbnail image (add a watermark or change colors).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'File': the related File (by reference)
+	 *   - 'imh': image resource (by reference)
+	 *   - 'size': size name (by reference)
+	 *   - 'mimetype': mimetype of thumbnail (by reference)
+	 *   - 'quality': JPEG image quality [0-100] (by reference)
+	 */
+	function BeforeThumbCreate( & $params )
+	{
+	}
 
 	// }}}
 
@@ -2339,6 +2356,25 @@ class Plugin
 		// Do nothing by default:
 		return false;
 	}
+	
+	
+	/**
+	 * Event handler: Called before an uploaded file gets saved on server.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'File': The "File" object (by reference).
+	 *   - 'name': file name (by reference).
+	 *   - 'type': file mimetype (by reference).
+	 *   - 'tmp_name': file location (by reference).
+	 *   - 'size': file size in bytes  (by reference).
+	 *
+	 * @return boolean 'false' to abort file upload, otherwise return 'true'
+	 */
+	function AfterFileUpload( & $params )
+	{
+		return array(); // Do nothing by default:
+	}
+	
 
 	/*
 	 * Event handlers }}}
@@ -2990,6 +3026,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.36  2010/03/14 06:36:57  sam2kb
+ * New plugin hooks: BeforeThumbCreate, AfterFileUpload
+ *
  * Revision 1.35  2010/02/23 05:07:17  sam2kb
  * New plugin hooks: DisplayProfileFormFieldset and ProfileFormSent
  *

@@ -38,10 +38,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 load_class( 'files/model/_filelist.class.php', 'FileList' );
 
-/**
- * @var User
- */
-global $current_User;
+global $current_User, $Plugins;
 
 global $dispatcher;
 
@@ -492,6 +489,19 @@ if( isset($_FILES) && count( $_FILES ) )
 			$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
 		}
 
+		// Trigger plugin event
+		if( $Plugins->trigger_event_first_false( 'AfterFileUpload', array(
+				  'File' => & $newFile,
+				  'name' => & $_FILES['uploadfile']['name'][$lKey],
+				  'type' => & $_FILES['uploadfile']['type'][$lKey],
+				  'tmp_name' => & $_FILES['uploadfile']['tmp_name'][$lKey],
+				  'size' => & $_FILES['uploadfile']['size'][$lKey],
+			  ) ) )
+		{
+			// Plugin returned 'false'. Abort file upload
+			continue;
+		}
+		
 		// Attempt to move the uploaded file to the requested target location:
 		if( isset($_FILES['uploadfile']['_evo_fetched_url'][$lKey]) )
 		{ // fetched remotely
@@ -514,7 +524,7 @@ if( isset($_FILES) && count( $_FILES ) )
 		{ // add a note, this is no error!
 			$Messages->add( sprintf( T_('Could not change permissions of &laquo;%s&raquo; to default chmod setting.'), $newFile->dget('name') ), 'note' );
 		}
-
+		
 		// Refreshes file properties (type, size, perms...)
 		$newFile->load_properties();
 		
@@ -637,6 +647,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.35  2010/03/14 06:36:57  sam2kb
+ * New plugin hooks: BeforeThumbCreate, AfterFileUpload
+ *
  * Revision 1.34  2010/03/06 12:53:40  efy-asimo
  * Replace existing file bugfix
  *

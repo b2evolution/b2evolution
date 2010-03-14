@@ -1926,10 +1926,20 @@ class File extends DataObject
 	 * @param resource
 	 * @param string size name
 	 * @param string mimetype of thumbnail
-	 * @param string short error code
+	 * @param integer JPEG image quality
 	 */
 	function save_thumb_to_cache( $thumb_imh, $size_name, $thumb_mimetype, $thumb_quality = 90 )
 	{
+		global $Plugins;
+		
+		$Plugins->trigger_event( 'BeforeThumbCreate', array(
+			  'imh' => & $thumb_imh,
+			  'size' => & $size_name,
+			  'mimetype' => & $thumb_mimetype,
+			  'quality' => & $thumb_mimetype,
+			  'File' => & $this,
+		  ) );
+		
 		$af_thumb_path = $this->get_af_thumb_path( $size_name, $thumb_mimetype, true );
 		if( $af_thumb_path[0] != '!' )
 		{	// We obtained a path for the thumbnail to be saved:
@@ -2046,6 +2056,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.85  2010/03/14 06:36:56  sam2kb
+ * New plugin hooks: BeforeThumbCreate, AfterFileUpload
+ *
  * Revision 1.84  2010/03/12 10:52:53  efy-asimo
  * Set EvoCache  folder names - task
  *
