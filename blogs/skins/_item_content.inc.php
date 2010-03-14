@@ -157,7 +157,7 @@ switch( $content_mode )
 					'after_image' =>         $params['after_image_legend'],
 					'after' =>               $params['after_images'],
 					'image_size' =>          $params['image_size'],
-					'image' =>               $params['image_limit'],
+					'limit' =>               $params['image_limit'],
 					'image_link_to' =>       $params['image_link_to'],
 					// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 					'restrict_to_image_position' => 'teaser',
@@ -243,6 +243,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.32  2010/03/14 21:38:22  sam2kb
+ * minor
+ *
  * Revision 1.31  2010/02/08 17:56:12  efy-yury
  * copyright 2009 -> 2010
  *
