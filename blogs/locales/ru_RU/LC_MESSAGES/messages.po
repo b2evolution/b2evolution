@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2010-02-04 20:40+0100\n"
-"PO-Revision-Date: 2010-02-25 17:48-0500\n"
+"PO-Revision-Date: 2010-03-14 23:02-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -1908,7 +1908,7 @@ msgstr "Следующие зависимости мешают удалению:
 
 #: ../../../inc/_core/model/dataobjects/_dataobject.class.php:437
 msgid "Please delete related objects before you proceed."
-msgstr "Пожалуйста, удалите связанный объект перед продолжением."
+msgstr "Пожалуйста, удалите связанные объекты для продолжения."
 
 #: ../../../inc/_core/model/dataobjects/_dataobject.class.php:466
 msgid "WARNING: Deleting this object will also delete:"
@@ -1919,7 +1919,7 @@ msgstr "ВНИМАНИЕ: Удаление этого объекта также 
 #: ../../../inc/collections/collections.ctrl.php:410
 #: ../../../inc/plugins/plugins.ctrl.php:1027
 msgid "THIS CANNOT BE UNDONE!"
-msgstr "НЕ МОЖЕТ БЫТЬ ОТМЕНЕНО!"
+msgstr "ЭТО НЕОБРАТИМО!"
 
 #: ../../../inc/_core/model/dataobjects/_dataobject.class.php:480
 #: ../../../inc/_core/ui/results/_resultsel.class.php:555
@@ -3072,12 +3072,12 @@ msgstr "%d вложенных рубрик"
 #: ../../../inc/chapters/chapters.ctrl.php:41
 #, php-format
 msgid "%d posts within category through main cat"
-msgstr "%d записей в рубрике под главной рубрикой"
+msgstr "%d записей используют эту рубрику в качестве основной"
 
 #: ../../../inc/chapters/chapters.ctrl.php:42
 #, php-format
 msgid "%d posts within category through extra cat"
-msgstr "%d записей в рубрике под дополнительной рубрикой"
+msgstr "%d записей используют эту рубрику в качестве дополнительной"
 
 #: ../../../inc/chapters/chapters.ctrl.php:45
 msgid "Cannot delete category"
