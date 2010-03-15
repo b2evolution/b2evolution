@@ -212,6 +212,9 @@ $Form->begin_form( '', '', $params );
 			echo '</td><td width="1"><!-- for IE7 --></td></tr>';
 		}
 	}
+	
+	//add slug_changed field - needed for slug trim, if this field = 0 slug will trimmed
+	$Form->hidden( 'slug_changed', 0 );
 
 	echo '<tr><td class="label"><label for="post_urltitle" title="'.T_('&quot;slug&quot; to be used in permalinks').'"><strong>'.T_('URL title "slug"').':</strong></label></td>';
 	echo '<td class="input" width="97%">';
@@ -432,6 +435,11 @@ if( empty( $edited_Item->ID ) )
 { // if we creating new post - we add slug autofiller JS
 	echo_slug_filler();
 }
+else
+{
+	// if we editing post
+	echo_set_slug_changed();
+}
 // New category input box:
 echo_onchange_newcat();
 
@@ -439,6 +447,9 @@ echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.66  2010/03/15 20:12:38  efy-yury
+ * slug fix
+ *
  * Revision 1.65  2010/03/04 19:36:04  fplanque
  * minor/doc
  *

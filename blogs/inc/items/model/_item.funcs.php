@@ -209,10 +209,10 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	// Make everything lowercase
 	$urltitle = strtolower( $urltitle );
 
-/*	
+	
 	// leave only first 5 words
 	$slug_changed = param( 'slug_changed' );
-	if( empty( $slug_changed ) )
+	if( $slug_changed == 0 )
 	{ // this should only happen when the slug is auto generated
 		$title_words = array();
 		$title_words = explode('-', $urltitle);
@@ -230,7 +230,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 		
 		// echo 'leaving 5 words: '.$urltitle.'<br />';
 	}
-*/	
+	
 	// Normalize to 200 chars + a number
 	preg_match( '/^(.*?)((-|_)+([0-9]+))?$/', $urltitle, $matches );
 	$urlbase = substr( $matches[1], 0, 200 );
@@ -1393,14 +1393,29 @@ function echo_slug_filler()
 		jQuery( '#post_urltitle' ).change( function()
 		{
 			slug_changed = true;
-			$('#post_urltitle').append('<input type="hidden" name="slug_changed" value="true"/>')
+			jQuery( '[name=slug_changed]' ).val( 1 );
 		} );
 	</script>
 <?php
 }
 
+
+/**
+ * Set slug_changed to 1 for cases when it is not needed trim slug
+ */
+function echo_set_slug_changed()
+{
+?>
+	<script type="text/javascript">
+		jQuery( '[name=slug_changed]' ).val( 1 );
+	</script>
+<?php
+}
 /*
  * $Log$
+ * Revision 1.99  2010/03/15 20:12:24  efy-yury
+ * slug fix
+ *
  * Revision 1.98  2010/03/12 09:47:34  efy-asimo
  * New category creation fix
  *
