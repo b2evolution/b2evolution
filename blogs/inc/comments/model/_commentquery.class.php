@@ -40,7 +40,7 @@ class CommentQuery extends SQL
 	var $author_url;
 	var $author_IP;
 	var $rating;
-	var $statuses;
+	var $show_statuses;
 	var $types;
 	var $keywords;
 
@@ -307,18 +307,17 @@ class CommentQuery extends SQL
 	 *
 	 * @param string List of statuses to restrict to (must have been previously validated)
 	 */
-	function where_statuses( $statuses )
+	function where_statuses( $show_statuses )
 	{
-		$this->statuses = $statuses;
-
-		if( empty( $statuses ) )
-		{
-			return;
+		if( empty( $show_statuses ) )
+		{ // initialize if emty
+			$show_statuses = array( 'published', 'draft', 'deprecated' );
 		}
+		$this->show_statuses = $show_statuses;
 
 		$list = '';
 		$sep = '';
-		foreach( $statuses as $status )
+		foreach( $show_statuses as $status )
 		{
 			$list .= $sep.'\''.$status.'\'';
 			$sep = ',';

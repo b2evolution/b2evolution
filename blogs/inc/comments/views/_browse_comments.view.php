@@ -30,7 +30,7 @@ global $Blog;
 /**
  * @var CommentList
  */
-global $CommentList;
+global $CommentList, $show_statuses;
 
 global $dispatcher;
 
@@ -43,17 +43,49 @@ $block_item_Widget = new Widget( 'block_item' );
 $block_item_Widget->title = T_('Feedback (Comments, Trackbacks...)');
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
+$CommentList->query();
+
+// Display filters title
+echo $CommentList->get_filter_title( '<h3>', '</h3>', '<br />', NULL, 'htmlbody' );
+
+$display_params = array(
+				'header_start' => '<div class="NavBar center">',
+					'header_text' => '<strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$',
+					'header_text_single' => T_('1 page'),
+				'header_end' => '</div>',
+				'footer_start' => '',
+					'footer_text' => '<div class="NavBar center"><strong>'.T_('Pages').'</strong>: $prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$</div>',
+					'footer_text_single' => '',
+						'prev_text' => T_('Previous'),
+						'next_text' => T_('Next'),
+						'list_prev_text' => T_('...'),
+						'list_next_text' => T_('...'),
+						'list_span' => 11,
+						'scroll_list_range' => 5,
+				'footer_end' => ''
+			);
 
 $CommentList->display_if_empty();
 
+$CommentList->display_init( $display_params );
+
+// Display navigation:
+$CommentList->display_nav( 'header' );
+
 // Display list of comments:
 require dirname(__FILE__).'/_comment_list.inc.php';
+
+// Display navigation:
+$CommentList->display_nav( 'footer' );
 
 $block_item_Widget->disp_template_replaced( 'block_end' );
 
 
 /*
  * $Log$
+ * Revision 1.8  2010/03/15 17:12:11  efy-asimo
+ * Add filters to Comment page
+ *
  * Revision 1.7  2010/02/08 17:52:13  efy-yury
  * copyright 2009 -> 2010
  *

@@ -195,7 +195,7 @@ class CommentList2 extends DataObjectList2
 			/*
 			 * Restrict to selected statuses:
 			 */
-			memorize_param( $this->param_prefix.'status', 'string', $this->default_filters['statuses'], $this->filters['statuses'] );  // List of statuses to restrict to
+			memorize_param( $this->param_prefix.'show_statuses', 'array', $this->default_filters['statuses'], $this->filters['statuses'] );  // List of statuses to restrict to
 
 			/*
 			 * Restrict to selected comment type:
@@ -222,6 +222,59 @@ class CommentList2 extends DataObjectList2
 			// 'paged'
 			memorize_param( $this->page_param, 'integer', 1, $this->filters['page'] );      // List page number in paged display
 		}
+	}
+	
+	
+/**
+	 * Init filter params from Request params
+	 *
+	 * @param boolean do we want to use saved filters ?
+	 * @return boolean true if we could apply a filterset based on Request params (either explicit or reloaded)
+	 */
+	function load_from_Request( )
+	{
+		$this->filters = $this->default_filters;
+
+		/*
+		 * Restrict to selected author:
+		 */
+		$this->filters['author'] = param( $this->param_prefix.'author', '/^-?[0-9]+(,[0-9]+)*$/', $this->default_filters['author'], true );      // List of authors to restrict to
+		$this->filters['author_email'] = param( $this->param_prefix.'author_email', 'string', $this->default_filters['author_email'], true ); 
+		$this->filters['author_url'] = param( $this->param_prefix.'author_url', 'string', $this->default_filters['author_url'], true );
+		//$this->filters['author_IP'] = param( $this->param_prefix.'author_IP', 'string', $this->default_filters['author_IP'], true );
+
+		/*
+		 * Restrict to selected statuses:
+		 */
+		$this->filters['statuses'] = param( $this->param_prefix.'show_statuses', 'array', $this->default_filters['statuses'], true );      // List of statuses to restrict to
+
+		/*
+		 * Restrict to selected types:
+		 */
+		$this->filters['types'] = param( $this->param_prefix.'types', 'array', $this->default_filters['types'], true );      // List of types to restrict to
+
+
+		/*
+		 * Restrict by keywords
+		 */
+		$this->filters['keywords'] = param( $this->param_prefix.'s', 'string', $this->default_filters['keywords'], true );         // Search string
+		$this->filters['phrase'] = param( $this->param_prefix.'sentence', 'string', $this->default_filters['phrase'], true ); 		// Search for sentence or for words
+		$this->filters['exact'] = param( $this->param_prefix.'exact', 'integer', $this->default_filters['exact'], true );        // Require exact match of title or contents
+
+		// 'limit'
+		$this->filters['comments'] = param( $this->param_prefix.'comments', 'integer', $this->default_filters['comments'], true ); 			// # of units to display on the page
+		$this->limit = $this->filters['comments']; // for compatibility with parent class
+
+		// 'paged'
+		$this->filters['page'] = param( $this->page_param, 'integer', 1, true );      // List page number in paged display
+		$this->page = $this->filters['page'];
+
+		if( param_errors_detected() )
+		{
+			return false;
+		}
+
+		return true;
 	}
 	
 	
@@ -302,6 +355,16 @@ class CommentList2 extends DataObjectList2
 		$this->CommentQuery->order_by( $order_by );
 		
 		/*
+		 * GET TOTAL ROW COUNT:
+		 */
+		$sql_count = '
+				SELECT COUNT( DISTINCT '.$this->Cache->dbIDname.') '
+					.$this->CommentQuery->get_from()
+					.$this->CommentQuery->get_where();
+
+		parent::count_total_rows( $sql_count );
+		
+		/*
 		 * Page set up:
 		 */
 		if( $this->page > 1 )
@@ -378,6 +441,34 @@ class CommentList2 extends DataObjectList2
 	
 	
 	/**
+	 * Generate a title for the current list, depending on its filtering params
+	 *
+	 * @return array List of titles to display, which are escaped for HTML display
+	 */
+	function get_filter_titles( $ignore = array(), $params = array() )
+	{
+		$title_array = array();
+		
+		if( empty ($this->filters) )
+		{ // Filters have no been set before, we'll use the default filterset
+			$this->set_filters( $this->default_filters );
+		}
+		
+		if( count($this->filters['statuses']) < 3 )
+		{
+			$title_array['statuses'] = T_('Visibility').': '.implode( ', ', $this->filters['statuses'] );
+		}
+		
+		if( !empty($this->filters['keywords']) )
+		{
+			$title_array[T_('keywords')] = T_('Keywords').': '.$this->filters['keywords'];
+		}
+		
+		return $title_array;
+	}
+	
+	
+	/**
 	 * If the list is sorted by category...
  	 *
  	 * This is basically just a stub for backward compatibility
@@ -417,6 +508,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.17  2010/03/15 17:12:10  efy-asimo
+ * Add filters to Comment page
+ *
  * Revision 1.16  2010/03/11 10:34:57  efy-asimo
  * Rewrite CommentList to CommentList2 task
  *

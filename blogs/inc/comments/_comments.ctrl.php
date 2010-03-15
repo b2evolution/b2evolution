@@ -232,8 +232,6 @@ switch( $action )
 		 */
 		$AdminUI->title = $AdminUI->title_titlearea = T_('Latest comments');
 
-		param( 'show_statuses', 'array', array(), true );	// Array of cats to restrict to
-
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_comments', 'edit',
 						array( 'ctrl' => 'comments' ), NULL, '' );
@@ -250,17 +248,15 @@ switch( $action )
 		 * List of comments to display:
 		 */
 		$CommentList = new CommentList2( $Blog );
-	
+
 		// Filter list:
-		$CommentList->set_filters( array(
-				'types' => array( 'comment','trackback','pingback' ),
-				'statuses' => $show_statuses,
-				'order' => 'DESC',
-				'comments' => 20,
+		$CommentList->set_default_filters( array(
+				'statuses' => array ( 'published', 'draft', 'deprecated'),
+				'comments' => 5,
 			) );
-	
-		// Get ready for display (runs the query):
-		$CommentList->display_init();
+
+		$CommentList->load_from_Request();
+
 		break;
 
 
@@ -313,8 +309,18 @@ switch( $action )
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
+		echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr>';
+		echo '<td class="browse_left_col">';
 		// Display VIEW:
 		$AdminUI->disp_view( 'comments/views/_browse_comments.view.php' );
+		echo '</td>';
+		
+		echo '<td class="browse_right_col">';
+			// Display VIEW:
+			$AdminUI->disp_view( 'comments/views/_comments_sidebar.view.php' );
+		echo '</td>';
+
+		echo '</tr></table>';
 
 		// End payload block:
 		$AdminUI->disp_payload_end();
@@ -327,6 +333,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2010/03/15 17:12:09  efy-asimo
+ * Add filters to Comment page
+ *
  * Revision 1.24  2010/03/11 10:34:33  efy-asimo
  * Rewrite CommentList to CommentList2 task
  *
