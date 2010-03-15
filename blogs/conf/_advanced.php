@@ -147,6 +147,18 @@ $minimum_comment_interval = 30;
 $antispam_on_message_form = 1;
 
 
+/**
+ * By default images get copied into b2evo cache without resapling if they are smaller
+ * than requested thumbnails.
+ *
+ * Althought, if you want to use the BeforeThumbCreate event (Watermark plugin),
+ * this should be set to 'true' in order to process smaller images.
+ *
+ * @global boolean Default: false
+ */
+$resample_all_images = false;
+
+
 // Get hostname out of baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
 if( preg_match( '#^(https?://(.+?)(:(.+?))?)(/.*)$#', $baseurl, $matches ) )

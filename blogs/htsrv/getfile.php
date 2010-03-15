@@ -129,7 +129,7 @@ if( !empty($size) && $File->is_image() )
 		
 		list( $src_width, $src_height ) = imgsize( $File->get_full_path() );
 		
-		if( $src_width <= $thumb_width && $src_height <= $thumb_height )
+		if( ! $resample_all_images && $src_width <= $thumb_width && $src_height <= $thumb_height )
 		{	// There is no need to resample, use original!
 			$err = $File->get_af_thumb_path( $size_name, $mimetype, true );
 			
@@ -238,6 +238,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.54  2010/03/15 03:01:26  sam2kb
+ * New plugin: Watermark. Adds text watermark to generated thumbnails e.g. copyright notice
+ *
  * Revision 1.53  2010/03/12 10:52:52  efy-asimo
  * Set EvoCache  folder names - task
  *
