@@ -692,7 +692,7 @@ switch( $action )
 			}
 
 			// Check if provided name is okay:
-			if( $check_error = check_rename( & $new_names[$loop_src_File->get_md5_ID()], $loop_src_File->is_dir(), $allow_locked_filetypes ) )
+			if( $check_error = check_rename( $new_names[$loop_src_File->get_md5_ID()], $loop_src_File->is_dir(), $allow_locked_filetypes ) )
 			{
 				$confirmed = 0;
 				param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $check_error );
@@ -1750,6 +1750,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.63  2010/03/15 10:23:18  efy-asimo
+ * Fix check_rename warning
+ *
  * Revision 1.62  2010/03/05 13:30:35  fplanque
  * cleanup/wording
  *
