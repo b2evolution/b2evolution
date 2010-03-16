@@ -302,10 +302,10 @@ switch( $action )
 				),
 				array(
 					"\$db_config = array(\n"
-						."\t'user'     => '".str_replace( "'", "\'", $conf_db_user )."',\$1"
-						."\t'password' => '".str_replace( "'", "\'", $conf_db_password )."',\$2"
-						."\t'name'     => '".str_replace( "'", "\'", $conf_db_name )."',\$3"
-						."\t'host'     => '".str_replace( "'", "\'", $conf_db_host )."',\$4",
+						."\t'user'     => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $conf_db_user )."',\$1"
+						."\t'password' => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $conf_db_password )."',\$2"
+						."\t'name'     => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $conf_db_name )."',\$3"
+						."\t'host'     => '".str_replace( array( "'", "\$" ), array( "\'", "\\$" ), $conf_db_host )."',\$4",
 					"tableprefix = '".str_replace( "'", "\'", $conf_db_tableprefix )."';",
 					"baseurl = '".str_replace( "'", "\'", $conf_baseurl )."';",
 					"admin_email = '".str_replace( "'", "\'", $conf_admin_email )."';",
@@ -760,6 +760,9 @@ block_close();
 <?php
 /*
  * $Log$
+ * Revision 1.198  2010/03/16 13:59:00  efy-asimo
+ * Install Database Password - bugfix
+ *
  * Revision 1.197  2010/03/08 18:16:53  sam2kb
  * Added missing actions
  *
