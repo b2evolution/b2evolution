@@ -1449,6 +1449,12 @@ class Plugin
 	 *
 	 * Use this to filter input, e.g. the OpenID uses this to provide alternate authentication.
 	 *
+	 * If you need to delegate to another service (what OpenID does), you need to remember all
+	 * these params (use array_keys($params)) and restore them when coming back.
+	 * Only comment_post_ID is required at the beginning of comment_post.php (where this hook)
+	 * is located (and has to be passed via GET/POST) - all other params can get stored in a
+	 * local session and restored when coming back (this is recommended.)
+	 *
 	 * @since 1.10.0
 	 * @see Plugin::DisplayCommentFormFieldset()
 	 * @param array Associative array of parameters
@@ -1465,6 +1471,8 @@ class Plugin
 	 *   - 'anon_allow_msgform': "Allow msgform" preference of the anonymous commenter (by reference)
 	 *   - 'anon_cookies': "Remember me" preference of the anonymous commenter (by reference)
 	 *   - 'redirect_to': URL where to redirect to in the end of comment posting (by reference)
+	 *   - 'crumb_comment': Crumb expected for the comment (see {@link Session::assert_received_crumb()})
+	 *     (by reference).
 	 */
 	function CommentFormSent( & $params )
 	{
@@ -1757,8 +1765,8 @@ class Plugin
 	function CacheIsCollectingContent()
 	{
 	}
-	
-	
+
+
 	/**
 	 * This gets called before an image thumbnail gets created.
 	 *
@@ -2117,8 +2125,8 @@ class Plugin
 	function ValidateAccountFormSent( & $params )
 	{
 	}
-	
-	
+
+
 	/**
 	 * Event handler: Called at the end of the "User profile" form.
 	 *
@@ -2170,8 +2178,8 @@ class Plugin
 	function ProfileFormSent( & $params )
 	{
 	}
-	
-	
+
+
 	/**
 	 * Event handler: called at the end of the login process, if the user did not try to
 	 *                login (by sending "login" and "pwd"), the session has no user attached
@@ -2356,8 +2364,8 @@ class Plugin
 		// Do nothing by default:
 		return false;
 	}
-	
-	
+
+
 	/**
 	 * Event handler: Called before an uploaded file gets saved on server.
 	 *
@@ -2374,7 +2382,7 @@ class Plugin
 	{
 		return array(); // Do nothing by default:
 	}
-	
+
 
 	/*
 	 * Event handlers }}}
@@ -3026,6 +3034,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.37  2010/03/18 21:58:59  blueyed
+ * doc
+ *
  * Revision 1.36  2010/03/14 06:36:57  sam2kb
  * New plugin hooks: BeforeThumbCreate, AfterFileUpload
  *
