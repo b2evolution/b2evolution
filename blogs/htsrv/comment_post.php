@@ -79,7 +79,7 @@ else
 param( 'comment_rating', 'integer', NULL );
 
 // Manually fetch crumb_comment here, to pass it to/through CommentFormSent
-param( 'crumb_comment', 'string', 'string', NULL );
+param( 'crumb_comment', 'string', NULL );
 
 
 $now = date( 'Y-m-d H:i:s', $localtimenow );
@@ -405,6 +405,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.141  2010/03/18 22:53:38  blueyed
+ * Fix param params
+ *
  * Revision 1.140  2010/03/18 21:58:32  blueyed
  * comment_post.php: pass crumb_comment to CommentFormSent plugin hook and assert the valid crumb after this hook (required to fix OpenID).
  *
