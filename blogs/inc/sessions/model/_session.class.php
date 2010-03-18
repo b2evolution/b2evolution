@@ -552,9 +552,7 @@ class Session
 
 		if( ! $crumb_received = param( 'crumb_'.$crumb_name, 'string', NULL ) )
 		{ // We did not receive a crumb!
-			# TODO: dh> this spams the error_log (via $log_app_errors) a lot (for "comment" crumb). Add "log_app_error" param to debug_die and pass 0 here?
-			# fp> that means it catches a lot of spam :)  -- Yes, sounds reasonable nto to include in error log.
-			debug_die( 'Missing crumb ['.$crumb_name.'] -- It looks like this request is not legit.' );
+			bad_request_die( 'Missing crumb ['.$crumb_name.'] -- It looks like this request is not legit.' );
 		}
 
 		// Retrieve latest saved crumb:
@@ -575,9 +573,12 @@ class Session
 			return true;
 		}
 
-		// fp> TODO: make this a nice message -- with a link to go back? history.back()? Try not to lose form edits...
+		// fp> TODO: make this a nice message -- with a link to go back? history.back()?
+		//           Try not to lose form edits...!
+		// dh>       This should provide a form, including all POST/GET data, but only a refreshed crumb,
+		//           warning the user about security, but when this was a legit request, it can easily
+		//           be resubmitted.
 		debug_die( 'Incorrect crumb received ['.$crumb_name.'] -- Have you waited more than 2 hours to submit your request? We have refused the request for security reasons. Please go back and refresh the form before submitting.' );
-
 	}
 }
 
@@ -646,6 +647,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.31  2010/03/18 19:33:54  blueyed
+ * assert_received_crumb: use bad_request_die, not debug_die. doc/todo
+ *
  * Revision 1.30  2010/03/08 21:06:31  fplanque
  * minor/doc
  *
