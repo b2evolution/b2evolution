@@ -1192,7 +1192,7 @@ switch( $action )
 		// Forget selected files
 		if( $files_count > 1 ) $fm_selected = NULL;
 
-		$Messages->add( T_('Selected files has been linked to item.'), 'success' );
+		$Messages->add( T_('Selected files have been linked to item.'), 'success' );
 
 		// In case the mode had been closed, reopen it:
 		$fm_mode = 'link_item';
@@ -1757,6 +1757,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.65  2010/03/18 06:20:44  sam2kb
+ * minor
+ *
  * Revision 1.64  2010/03/18 06:14:33  sam2kb
  * Link multiple files to item
  *
