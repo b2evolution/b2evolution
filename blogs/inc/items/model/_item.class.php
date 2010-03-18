@@ -505,8 +505,9 @@ class Item extends ItemLight
 		// CUSTOM FIELDS double
 		for( $i = 1 ; $i <= 5; $i++ )
 		{	// For each custom double field:
-			if( param( 'item_double'.$i, 'double', NULL ) !== NULL )
-			{
+			if( isset_param('item_double'.$i) )
+			{ // it is set
+				param( 'item_double'.$i, 'double', NULL ); // get par value
 				$this->set_from_Request( 'double'.$i, 'item_double'.$i, true );
 			}
 		}
@@ -4150,6 +4151,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.184  2010/03/18 16:20:17  efy-asimo
+ * bug about custom fields - fix
+ *
  * Revision 1.183  2010/03/18 09:42:09  efy-asimo
  * mass edit posts - task
  *

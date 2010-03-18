@@ -2096,8 +2096,23 @@ function balance_tags( $text )
 }
 
 
+/**
+ * Check if a parameter is set or not
+ * Used to decide, if a numeric parameter value is NULL because it isn't set, or because it's set to NULL
+ * 
+ * @param string parameter name
+ * @return boolean true if parameter is set
+ */
+function isset_param( $var )
+{
+	return isset($_POST[$var]) || isset($_GET[$var]);
+}
+
 /*
  * $Log$
+ * Revision 1.62  2010/03/18 16:20:16  efy-asimo
+ * bug about custom fields - fix
+ *
  * Revision 1.61  2010/02/08 17:51:30  efy-yury
  * copyright 2009 -> 2010
  *
