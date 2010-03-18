@@ -71,12 +71,12 @@ global $edited_User;
 
 global $Blog, $blog;
 
-global $fm_hide_dirtree, $create_name, $ads_list_path;
+global $fm_mode, $fm_hide_dirtree, $create_name, $ads_list_path;
 
 // Abstract data we want to pass through:
 global $linkctrl, $linkdata;
 
-// Name of the iframe we want some atiosn to come back to:
+// Name of the iframe we want some actions to come back to:
 global $iframe_name;
 
 $Form = new Form( NULL, 'FilesForm', 'post', 'none' );
@@ -503,6 +503,7 @@ $Form->begin_form();
 
 			if( $mode == 'upload' )
 			{	// We are uploading in a popup opened by an edit screen
+				$field_options['link'] = T_('Link files to post');
 				$field_options['img_tag'] = T_('Insert IMG/link into post');
 			}
 
@@ -527,8 +528,6 @@ $Form->begin_form();
 			// This has to be simplified to ONE single set of permissions for all selected files. (If you need different perms, click again)
 			$field_options['file_perms'] = T_('Change permissions for the selected files...');
 			*/
-
-			// TODO: dh> Add "Link items" action, if opened from a post, which would attach the selected files to the post.
 
 			$Form->switch_layout( 'none' );
 			$Form->select_input_array( 'group_action', $action, $field_options, ' &mdash; <strong>'.T_('With selected files').'</strong>' );
@@ -675,6 +674,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.36  2010/03/18 06:14:33  sam2kb
+ * Link multiple files to item
+ *
  * Revision 1.35  2010/02/08 17:52:57  efy-yury
  * copyright 2009 -> 2010
  *

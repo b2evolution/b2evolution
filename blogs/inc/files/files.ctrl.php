@@ -1179,12 +1179,20 @@ switch( $action )
 			$Messages->add( T_('Nothing selected.'), 'error' );
 			break;
 		}
-		$edited_File = & $selected_Filelist->get_by_idx(0);
+		
+		$files_count = $selected_Filelist->count();
+		while( $edited_File = & $selected_Filelist->get_next() )
+		{	// Let's make the link!
+			$edited_File->link_to_Item($edited_Item);
+			
+			// Reset LinkCache to autoincrement link_order
+			if( $files_count > 1 ) unset($GLOBALS['LinkCache']);
+		}
+		
+		// Forget selected files
+		if( $files_count > 1 ) $fm_selected = NULL;
 
-		// Let's make the link!
-		$edited_File->link_to_Item($edited_Item);
-
-		$Messages->add( T_('Selected file has been linked to item.'), 'success' );
+		$Messages->add( T_('Selected files has been linked to item.'), 'success' );
 
 		// In case the mode had been closed, reopen it:
 		$fm_mode = 'link_item';
@@ -1200,7 +1208,6 @@ switch( $action )
  			header_redirect( regenerate_url( '', '', '', '&' ) );
 		}
 		break;
-
 
 	case 'unlink':
 		// TODO: We don't need the Filelist, move UP!
@@ -1750,6 +1757,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.64  2010/03/18 06:14:33  sam2kb
+ * Link multiple files to item
+ *
  * Revision 1.63  2010/03/15 10:23:18  efy-asimo
  * Fix check_rename warning
  *
