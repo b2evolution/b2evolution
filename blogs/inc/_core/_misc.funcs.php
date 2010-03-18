@@ -1750,19 +1750,18 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 			$call = "<strong>\n";
 			if( isset($l_trace['class']) )
 			{
-				$call .= $l_trace['class'];
+				$call .= htmlspecialchars($l_trace['class']);
 			}
 			if( isset($l_trace['type']) )
 			{
-				$call .= $l_trace['type'];
+				$call .= htmlspecialchars($l_trace['type']);
 			}
-			$call .= $l_trace['function']."( </strong>\n";
+			$call .= htmlspecialchars($l_trace['function'])."( </strong>\n";
 			if( $args )
 			{
-				$call .= ' '.implode( ', ', $args ).' ';
+				$call .= ' '.htmlspecialchars(implode( ', ', $args )).' ';
 			}
 			$call .='<strong>)</strong>';
-
 			$r .= $call."<br />\n";
 
 			$r .= '<strong>';
@@ -3862,6 +3861,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.219  2010/03/18 21:16:11  blueyed
+ * debug_get_backtrace: properly escape function call/args for html.
+ *
  * Revision 1.218  2010/03/18 19:30:20  blueyed
  * doc
  *
