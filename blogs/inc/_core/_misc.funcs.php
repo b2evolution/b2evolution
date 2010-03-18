@@ -1939,7 +1939,7 @@ function debug_die( $additional_info = '', $params = array() )
 /**
  * Outputs Bad request Error message. When in debug mode it also prints a backtrace.
  *
- * This should be used when a bad user input is detected?
+ * This should be used when a bad user input is detected.
  *
  * @param string Message to output (HTML)
  */
@@ -3862,6 +3862,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.218  2010/03/18 19:30:20  blueyed
+ * doc
+ *
  * Revision 1.217  2010/03/02 12:37:10  efy-asimo
  * remove show_comments_awaiting_moderation function from _misc_funcs.php to _dashboard.func.php
  *
