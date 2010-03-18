@@ -32,9 +32,6 @@ require_once $inc_path.'_main.inc.php';
 
 header( 'Content-Type: text/html; charset='.$io_charset );
 
-// Check that this action request is not a CSRF hacked request:
-$Session->assert_received_crumb( 'comment' );
-
 // Getting GET or POST parameters:
 param( 'comment_post_ID', 'integer', true ); // required
 param( 'redirect_to', 'string', '' );
@@ -81,6 +78,9 @@ else
 
 param( 'comment_rating', 'integer', NULL );
 
+// Manually fetch crumb_comment here, to pass it to/through CommentFormSent
+param( 'crumb_comment', 'string', 'string', NULL );
+
 
 $now = date( 'Y-m-d H:i:s', $localtimenow );
 
@@ -91,7 +91,7 @@ $original_comment = $comment;
 
 // Trigger event: a Plugin could add a $category="error" message here..
 // This must get triggered before any internal validation and must pass all relevant params.
-// openID plugin will validate a given OpenID here
+// The OpenID plugin will validate a given OpenID here (via redirect and coming back here).
 $Plugins->trigger_event( 'CommentFormSent', array(
 		'comment_post_ID' => $comment_post_ID,
 		'comment' => & $comment,
@@ -106,7 +106,11 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 		'anon_cookies' => & $comment_cookies,
 		'User' => & $User,
 		'redirect_to' => & $redirect_to,
+		'crumb_comment' => & $crumb_comment,
 	) );
+
+// Check that this action request is not a CSRF hacked request:
+$Session->assert_received_crumb( 'comment' );
 
 $commented_Item->get_Blog(); // Make sure Blog is loaded (will be needed wether logged in or not)
 
@@ -401,6 +405,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.140  2010/03/18 21:58:32  blueyed
+ * comment_post.php: pass crumb_comment to CommentFormSent plugin hook and assert the valid crumb after this hook (required to fix OpenID).
+ *
  * Revision 1.139  2010/02/08 17:50:53  efy-yury
  * copyright 2009 -> 2010
  *
