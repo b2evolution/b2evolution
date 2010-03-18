@@ -3367,7 +3367,7 @@ class Item extends ItemLight
 
 		if( $this->status != 'draft' )
 		{	// The post is getting published in some form, set the publish date so it doesn't get auto updated in the future:
-			$this->set( 'dateset', 1 );
+			$this->set( 'dateset', '1' );
 		}
 
 		// validate url title / slug
@@ -4150,6 +4150,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.183  2010/03/18 09:42:09  efy-asimo
+ * mass edit posts - task
+ *
  * Revision 1.182  2010/03/12 10:20:27  efy-asimo
  * Don't let to create a post with no title if, always needs a title is set
  *
