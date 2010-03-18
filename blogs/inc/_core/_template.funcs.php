@@ -215,6 +215,10 @@ function header_redirect( $redirect_to = NULL, $status = false )
 			header( 'HTTP/1.1 302 Found' );
 	}
 
+	if( headers_sent() )
+	{
+		debug_die('Headers have already been sent. Cannot <a href="'.htmlspecialchars($redirect_to).'">redirect</a>.');
+	}
 	header( 'Location: '.$redirect_to, true, $http_response_code ); // explictly setting the status is required for (fast)cgi
 	exit(0);
 }
@@ -1106,6 +1110,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.73  2010/03/18 21:17:31  blueyed
+ * header_redirect: add call to debug_die, if headers have been sent already.
+ *
  * Revision 1.72  2010/02/08 17:51:34  efy-yury
  * copyright 2009 -> 2010
  *
