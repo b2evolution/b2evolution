@@ -1219,6 +1219,9 @@ switch( $action )
 
 
 	case 'edit_links':
+		// Memorize 'action' for prev/next links
+		memorize_param( 'action', 'string', NULL );
+		
 		// View attachments
 		$AdminUI->disp_view( 'items/views/_item_links.view.php' );
 		break;
@@ -1306,6 +1309,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.98  2010/03/18 03:32:49  sam2kb
+ * Memorize action for prev/next links in attachments iframe
+ *
  * Revision 1.97  2010/03/12 10:20:27  efy-asimo
  * Don't let to create a post with no title if, always needs a title is set
  *
