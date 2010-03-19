@@ -1785,7 +1785,9 @@ function param_check_html( $var, $err_msg = '#', $field_err_msg = '#', $autobr =
  */
 function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NULL )
 {
-	$ret = check_html_sanity( $content, ( $is_comment ? 'commenting' : 'posting' ), $autobr, $encoding );
+	global $current_User;
+
+	$ret = check_html_sanity( $content, ( $is_comment ? 'commenting' : 'posting' ), $autobr, $current_User, $encoding );
 	if( $ret === false )
 	{	// ERROR
 		return $content;
@@ -1813,25 +1815,30 @@ function format_to_post( $content, $autobr = 0, $is_comment = 0, $encoding = NUL
  * @param string The content to format
  * @param string
  * @param integer Create automated <br /> tags?
+ * @param User User (used for "posting" and "xmlrpc_posting" context). Default: $current_User
  * @param string Encoding (used for XHTML_Validator only!); defaults to $io_charset
  * @return boolean|string
  */
-function check_html_sanity( $content, $context = 'posting', $autobr = false, $encoding = NULL )
+function check_html_sanity( $content, $context = 'posting', $autobr = false, $User = NULL, $encoding = NULL )
 {
 	global $use_balanceTags, $admin_url;
 	global $io_charset, $use_xhtmlvalidation_for_comments, $comment_allowed_tags, $comments_allow_css_tweaks;
 	global $Messages;
 
-	/**
-	 * @var User
-	 */
-	global $current_User;
+	if( empty($User) )
+	{
+		/**
+		 * @var User
+		 */
+		global $current_User;
+		$User = $current_User;
+	}
 
 	switch( $context )
 	{
 		case 'posting':
 		case 'xmlrpc_posting':
-			$Group = & $current_User->get_Group();
+			$Group = $User->get_Group();
 			if( $context == 'posting' )
 			{
 				$xhtmlvalidation  = ($Group->perm_xhtmlvalidation == 'always');
@@ -1970,9 +1977,9 @@ function check_html_sanity( $content, $context = 'posting', $autobr = false, $en
 
 	if( $error )
 	{
-		if( !empty($current_User)
+		if( !empty($User)
 				&& !empty($Group)  // This one will basically prevent this case from happening when commenting
-				&& $current_User->check_perm( 'users', 'edit', false ) )
+				&& $User->check_perm( 'users', 'edit', false ) )
 		{
 			$Messages->add( sprintf( T_('(Note: To get rid of the above validation warnings, you can deactivate unwanted validation rules in your <a %s>Group settings</a>.)'),
 										'href="'.$admin_url.'?ctrl=users&amp;grp_ID='.$Group->ID.'"' ), 'error' );
@@ -2099,7 +2106,7 @@ function balance_tags( $text )
 /**
  * Check if a parameter is set or not
  * Used to decide, if a numeric parameter value is NULL because it isn't set, or because it's set to NULL
- * 
+ *
  * @param string parameter name
  * @return boolean true if parameter is set
  */
@@ -2110,6 +2117,9 @@ function isset_param( $var )
 
 /*
  * $Log$
+ * Revision 1.63  2010/03/19 01:31:44  blueyed
+ * check_html_sanity: add User param, defaulting to current User. This is required if posting User is not logged in (e.g. commenting via OpenID, but logged out).
+ *
  * Revision 1.62  2010/03/18 16:20:16  efy-asimo
  * bug about custom fields - fix
  *

@@ -42,7 +42,6 @@ $action = param_arrayindex( 'submit_comment_post_'.$comment_post_ID, 'save' );
 
 $ItemCache = & get_ItemCache();
 $commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
-
 if( ! $commented_Item->can_comment( NULL ) )
 {
 	$Messages->add( T_('You cannot leave comments on this post!'), 'error' );
@@ -115,7 +114,7 @@ $Session->assert_received_crumb( 'comment' );
 $commented_Item->get_Blog(); // Make sure Blog is loaded (will be needed wether logged in or not)
 
 if( $User )
-{	// User is logged in
+{	// User is logged in (or provided, e.g. via OpenID plugin)
 	// Does user have permission to edit?
 	$perm_comment_edit = $User->check_perm( 'blog_comments', 'edit', false, $commented_Item->Blog->ID );
 }
@@ -171,7 +170,7 @@ else
 // TODO: AutoBR should really be a "comment renderer" (like with Items)
 // OLD stub: $comment = format_to_post( $comment, $comment_autobr, 1 ); // includes antispam
 $saved_comment = $comment;
-$comment = check_html_sanity( $comment, $perm_comment_edit ? 'posting' : 'commenting', $comment_autobr );
+$comment = check_html_sanity( $comment, $perm_comment_edit ? 'posting' : 'commenting', $comment_autobr, $User );
 if( $comment === false )
 {	// ERROR
 	$comment = $saved_comment;
@@ -405,6 +404,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.142  2010/03/19 01:31:42  blueyed
+ * check_html_sanity: add User param, defaulting to current User. This is required if posting User is not logged in (e.g. commenting via OpenID, but logged out).
+ *
  * Revision 1.141  2010/03/18 22:53:38  blueyed
  * Fix param params
  *
