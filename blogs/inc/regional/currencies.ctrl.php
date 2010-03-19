@@ -245,7 +245,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Currency->check_delete( sprintf( T_('Cannot delete currency &laquo;%s&raquo;'), $edited_Currency->dget('name') ) ) )
+			if( ! $edited_Currency->check_delete( sprintf( T_('Cannot delete currency &laquo;%s&raquo;'), $edited_Currency->dget('name') ), array(), true ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -309,6 +309,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2010/03/19 09:48:59  efy-asimo
+ * file deleting restrictions - task
+ *
  * Revision 1.16  2010/01/30 18:55:33  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

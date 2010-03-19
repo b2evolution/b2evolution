@@ -797,7 +797,7 @@ switch( $action )
 			while( $l_File = & $selected_Filelist->get_next() )
 			{
 				// Check if there are delete restrictions on this file:
-				$l_File->check_relations( 'delete_restrictions' );
+				$l_File->check_relations( 'delete_restrictions', array(), true );
 
 				if( $Messages->count('restrict') )
 				{ // There are restrictions:
@@ -1757,6 +1757,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.66  2010/03/19 09:48:57  efy-asimo
+ * file deleting restrictions - task
+ *
  * Revision 1.65  2010/03/18 06:20:44  sam2kb
  * minor
  *

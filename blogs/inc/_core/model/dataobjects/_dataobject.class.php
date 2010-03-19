@@ -392,7 +392,7 @@ class DataObject
 	 * Check relations for restrictions or cascades.
 	 * @todo dh> Add link to affected items, e.g. items when trying to delete an attachment, where it gets used.
 	 */
-	function check_relations( $what, $ignore = array() )
+	function check_relations( $what, $ignore = array(), $addlink = false )
 	{
 		global $DB, $Messages;
 
@@ -400,14 +400,30 @@ class DataObject
 		{
 			if( !in_array( $restriction['fk'], $ignore ) )
 			{
-				$count = $DB->get_var(
+				if( $addlink )
+				{ // get linked objects and add a link
+					$link = '';
+					if( $addlink )
+					{ // get link from derived class
+						$link = $this->get_restriction_link( $restriction );
+					}
+					// without restriction => don't display the message
+					if( $link != '' )
+					{
+						$Messages->add( $link, 'restrict' );
+					}
+				}
+				else
+				{ // count and show how many object is connected
+					$count = $DB->get_var(
 					'SELECT COUNT(*)
 					   FROM '.$restriction['table'].'
 					  WHERE '.$restriction['fk'].' = '.$this->ID,
 					0, 0, 'restriction/cascade check' );
-				if( $count )
-				{
-					$Messages->add( sprintf( $restriction['msg'], $count ), 'restrict' );
+					if( $count )
+					{
+						$Messages->add( sprintf( $restriction['msg'], $count ), 'restrict' );
+					}
 				}
 			}
 		}
@@ -421,20 +437,22 @@ class DataObject
 	 * @param array list of foreign keys to ignore
 	 * @return boolean true if no restriction prevents deletion
 	 */
-	function check_delete( $restrict_title, $ignore = array() )
+	function check_delete( $restrict_title, $ignore = array(), $addlink = false )
 	{
 		global $Messages;
 
 		// Check restrictions:
-		$this->check_relations( 'delete_restrictions', $ignore );
+		$this->check_relations( 'delete_restrictions', $ignore, $addlink );
 
 		if( $Messages->count('restrict') )
 		{	// There are restrictions:
-			$Messages->head = array(
+			$head = array(
 					'container' => $restrict_title,
 					'restrict' => T_('The following relations prevent deletion:')
 				);
-			$Messages->foot =	T_('Please delete related objects before you proceed.');
+			$foot = T_('Please delete related objects before you proceed.');
+			$Messages->add( $Messages->display( $head, $foot, false, 'restrict', '', 'ul', false ) );
+			$Messages->clear( 'restrict' );
 			return false;	// Can't delete
 		}
 
@@ -817,6 +835,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2010/03/19 09:48:55  efy-asimo
+ * file deleting restrictions - task
+ *
  * Revision 1.35  2010/02/08 17:51:50  efy-yury
  * copyright 2009 -> 2010
  *

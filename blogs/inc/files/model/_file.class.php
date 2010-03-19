@@ -2051,11 +2051,71 @@ class File extends DataObject
 
 		$DB->commit();
 	}
+
+
+	/**
+	 * Get link to restricted object
+	 * Use when try to delete a file, which is attached to a post, or to a user
+	 * 
+	 * @param array restriction
+	 * @return string message with links to objects
+	 */
+	function get_restriction_link( $restriction )
+	{
+		global $DB, $admin_url;
+
+		switch( $restriction['table'] )
+		{ // can be restricted to different tables
+			case 'T_links':
+				$object_ID = 'post_ID';			// related table object ID
+				$object_name = 'post_title';	// related table object name
+				
+				// link to object
+				$link = '<a href="'.$admin_url.'?ctrl=items&action=edit&p=%d">%s</a>';
+				$object_query = 'SELECT post_ID, post_title FROM T_items__item'
+									.' WHERE post_ID IN'
+									.' (SELECT link_Itm_ID'
+									.' FROM '.$restriction['table']
+									.' WHERE '.$restriction['fk'].' = '.$this->ID.')';
+				break;
+
+			case 'T_users':
+				$object_ID = 'user_ID';			// related table object ID
+				$object_name = 'user_login';	// related table object name
+
+				// link to object
+				$link = '<a href="'.$admin_url.'?ctrl=user&user_tab=avatar&user_ID=%d">%s</a>';
+				$object_query = 'SELECT user_ID, user_login FROM T_users'
+									.' WHERE '.$restriction['fk'].' = '.$this->ID;
+				break;
+
+			default:
+				// not defined restriction
+				debug_die ( 'unhandled restriction:' . htmlspecialchars ( $restriction['table'] ) );
+		}
+
+		$result_link = '';
+		$query_result = $DB->get_results( $object_query );
+		foreach( $query_result as $row )
+		{ // create links for each related object
+			$result_link .= '<br/>'.sprintf( $link, $row->$object_ID, $row->$object_name );
+		}
+
+		if( $count = count($query_result) > 0 )
+		{ // there are restrictions
+			return sprintf( $restriction['msg'].$result_link, $count );
+		}
+		// no restriction
+		return '';
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.86  2010/03/19 09:48:57  efy-asimo
+ * file deleting restrictions - task
+ *
  * Revision 1.85  2010/03/14 06:36:56  sam2kb
  * New plugin hooks: BeforeThumbCreate, AfterFileUpload
  *

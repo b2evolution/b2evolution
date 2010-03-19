@@ -138,11 +138,49 @@ class Currency extends DataObject
 	{
 		return $this->code;
 	}
+
+
+	/**
+	 * Get link to Countries, where this Currencie is used
+	 * Use when try to delete a currencie
+	 *  
+	 * @param array restriction array 
+	 * @return string link to currency's countries
+	 */
+	function get_restriction_link( $restriction )
+	{
+		global $DB, $admin_url;
+
+		if( $restriction['fk'] != 'ctry_curr_ID' )
+		{ // currency restriction exists only for countries
+			die( 'Restriction does not exists' );
+		}
+
+		// link to country object
+		$link = '<a href="'.$admin_url.'?ctrl=countries&action=edit&ctry_ID=%d">%s</a>';
+		// set sql to get country ID and name
+		$objectID_query = 'SELECT ctry_ID, ctry_name'
+						.' FROM '.$restriction['table']
+						.' WHERE '.$restriction['fk'].' = '.$this->ID;
+
+		$result_link = '';
+		$query_result = $DB->get_results( $objectID_query );
+		foreach( $query_result as $row )
+		{
+			$result_link .= '<br/>'.sprintf( $link, $row->ctry_ID, $row->ctry_name );
+		}
+
+		$result_link = sprintf( $restriction['msg'].$result_link, count($query_result) );
+		return $result_link;
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.14  2010/03/19 09:48:59  efy-asimo
+ * file deleting restrictions - task
+ *
  * Revision 1.13  2010/01/17 04:14:40  fplanque
  * minor / fixes
  *
