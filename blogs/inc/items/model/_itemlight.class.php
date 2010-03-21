@@ -772,9 +772,15 @@ class ItemLight extends DataObject
 				'after'       => '',
 				'format'      => 'htmlbody',
 				'link_type'   => '#',
+				'max_length'  => '',
 			), $params );
 
 		$title = format_to_output( $this->title, $params['format'] );
+
+		if( $params['max_length'] != '' )
+		{	// Crop long title
+			$title = strmaxlen( $title, intval($params['max_length']) );
+		}
 
 		if( empty( $title ) )
 		{
@@ -974,6 +980,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.34  2010/03/21 05:03:15  sam2kb
+ * get_title: option to crop title to 'max_length' characters
+ *
  * Revision 1.33  2010/02/08 17:53:14  efy-yury
  * copyright 2009 -> 2010
  *
