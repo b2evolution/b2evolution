@@ -28,11 +28,10 @@
  *
  * @param integer should never be 0
  */
-function insert_basic_widgets( $blog_id = 0 )
+function insert_basic_widgets( $blog_id )
 {
 	global $DB;
 
-	
 	if( empty( $blog_id ) )
 	{//if $blog_id is empty hence we make installation
 		$DB->query('INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
@@ -47,11 +46,11 @@ function insert_basic_widgets( $blog_id = 0 )
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
 							 SELECT blog_ID, "Menu", 1, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'home'))).'"
 							   FROM T_blogs' );
-		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-							 SELECT blog_ID, "Menu", 3, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'ownercontact'))).'"
-							   FROM T_blogs' );
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							 SELECT blog_ID, "Menu", 2, "core", "coll_page_list"
+							   FROM T_blogs' );
+		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
+							 SELECT blog_ID, "Menu", 3, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'ownercontact'))).'"
 							   FROM T_blogs' );
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
 							 SELECT blog_ID, "Menu", 4, "core", "menu_link", "'.$DB->escape(serialize(array('link_type'=>'login'))).'"
@@ -67,31 +66,23 @@ function insert_basic_widgets( $blog_id = 0 )
 							   FROM T_blogs
 							  WHERE blog_ID > 1' );
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 40, "core", "coll_longdesc"
+							 SELECT blog_ID, "Sidebar", 30, "core", "coll_title"
 							   FROM T_blogs' );
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 30, "core", "coll_title"
+							 SELECT blog_ID, "Sidebar", 40, "core", "coll_longdesc"
 							   FROM T_blogs' );
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							 SELECT blog_ID, "Sidebar", 50, "core", "coll_common_links"
 							   FROM T_blogs' );
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
+							 SELECT blog_ID, "Sidebar", 70, "core", "coll_category_list"
+							   FROM T_blogs' );
+		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							 SELECT blog_ID, "Sidebar", 60, "core", "coll_search_form"
 							   FROM T_blogs' );
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
-							 SELECT blog_ID, "Sidebar", 70, "core", "coll_category_list"
-							   FROM T_blogs' );
-		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-							 SELECT blog_ID, "Sidebar", 80, "core", "coll_media_index", \'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";s:7:"blog_ID";s:1:"4";s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\'
-							   FROM T_blogs
-							  WHERE blog_ID <> 2' );
-		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							 SELECT blog_ID, "Sidebar", 100, "core", "coll_xml_feeds"
 							   FROM T_blogs' );
-		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-							 SELECT blog_ID, "Sidebar", 90, "core", "linkblog", "'.$DB->escape(serialize(array('blog_ID'=>3))).'"
-							   FROM T_blogs
-							  WHERE blog_ID <= 2' );
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 								 SELECT blog_ID, "Sidebar 2", 1, "core", "coll_post_list"
 								   FROM T_blogs' );
