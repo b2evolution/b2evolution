@@ -506,13 +506,21 @@ function install_plugin( $plugin )
  */
 function install_basic_widgets()
 {
+	/**
+	* @var DB
+	*/
+	global $DB;
+
 	load_funcs( 'widgets/_widgets.funcs.php' );
 
-	echo 'Installing default widgets... ';
+	$blog_ids = $DB->get_col( 'SELECT blog_ID FROM T_blogs' );
+	foreach( $blog_ids as $blog_id )
+	{
+		echo 'Installing default widgets for blog #'.$blog_id.'... ';
+		insert_basic_widgets( $blog_id );
+		echo "OK.<br />\n";
+	}
 
-	insert_basic_widgets();
-
-	echo "OK.<br />\n";
 }
 
 
@@ -827,6 +835,9 @@ function get_antispam_query()
 
 /*
  * $Log$
+ * Revision 1.91  2010/03/22 23:50:55  fplanque
+ * Fixed widget install factorization
+ *
  * Revision 1.90  2010/03/04 18:02:50  fplanque
  * Cleaned up .htaccess install
  *
