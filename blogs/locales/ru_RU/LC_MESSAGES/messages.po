@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2010-02-04 20:40+0100\n"
-"PO-Revision-Date: 2010-03-14 23:02-0500\n"
+"PO-Revision-Date: 2010-03-22 22:21-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -1444,7 +1444,7 @@ msgstr "Настройки пользователя"
 #: ../../../inc/users/settings.ctrl.php:59
 #: ../../../inc/users/views/_settings.form.php:23
 msgid "User latitude"
-msgstr "Широта пользователя"
+msgstr ""
 
 #: ../../../inc/_core/__core.init.php:723
 #: ../../../inc/users/registration.ctrl.php:102
@@ -1454,7 +1454,7 @@ msgstr "Регистрация"
 #: ../../../inc/_core/__core.init.php:726
 #: ../../../inc/users/views/_userfields.view.php:61
 msgid "User fields"
-msgstr ""
+msgstr "Параметры пользователей"
 
 #: ../../../inc/_core/__core.init.php:747
 msgid "System"
@@ -1904,11 +1904,11 @@ msgstr "URL не разрешен"
 
 #: ../../../inc/_core/model/dataobjects/_dataobject.class.php:435
 msgid "The following relations prevent deletion:"
-msgstr "Следующие зависимости мешают удалению:"
+msgstr "Следующие зависимости препятствуют удалению:"
 
 #: ../../../inc/_core/model/dataobjects/_dataobject.class.php:437
 msgid "Please delete related objects before you proceed."
-msgstr "Пожалуйста, удалите связанные объекты для продолжения."
+msgstr "Пожалуйста, удалите перечисленные объекты для продолжения."
 
 #: ../../../inc/_core/model/dataobjects/_dataobject.class.php:466
 msgid "WARNING: Deleting this object will also delete:"
@@ -12592,42 +12592,39 @@ msgstr "Изменение пароля"
 #: ../../../inc/users/userfields.ctrl.php:58
 #: ../../../inc/users/views/_userfield.form.php:50
 msgid "User field"
-msgstr ""
+msgstr "Параметр пользователя"
 
 #: ../../../inc/users/userfields.ctrl.php:120
-#, fuzzy, php-format
+#, php-format
 msgid "This user field already exists. Do you want to <a %s>edit the existing user field</a>?"
-msgstr "Такое уже существует. Хотите ли вы <a %s>изменить его</a>?"
+msgstr "Такй параметр уже существует. Хотите ли вы <a %s>изменить его</a>?"
 
 #: ../../../inc/users/userfields.ctrl.php:126
-#, fuzzy
 msgid "New User field created."
-msgstr "Новый пользователь создан."
+msgstr "Новый параметр создан."
 
 #: ../../../inc/users/userfields.ctrl.php:174
-#, fuzzy
 msgid "User field updated."
-msgstr "Пользователь обновлен."
+msgstr "Параметр обновлен."
 
 #: ../../../inc/users/userfields.ctrl.php:197
-#, fuzzy, php-format
+#, php-format
 msgid "User field &laquo;%s&raquo; deleted."
-msgstr "Пользователь &laquo;%s&raquo; удален."
+msgstr "Параметр &laquo;%s&raquo; удален."
 
 #: ../../../inc/users/userfields.ctrl.php:209
-#, fuzzy, php-format
+#, php-format
 msgid "Cannot delete user field &laquo;%s&raquo;"
-msgstr "Невозможно удалить пользователя &laquo;%s&raquo;"
+msgstr "Невозможно удалить параметр пользователя &laquo;%s&raquo;"
 
 #: ../../../inc/users/userfields.ctrl.php:221
-#, fuzzy
 msgid "User fields configuration"
-msgstr "Основные настройки"
+msgstr "Настройки параметров пользователей"
 
 #: ../../../inc/users/userfields.ctrl.php:244
-#, fuzzy, php-format
+#, php-format
 msgid "Delete user field &laquo;%s&raquo;?"
-msgstr "Удалить пользователя &laquo;%s&raquo;?"
+msgstr "Удалить параметр пользователя &laquo;%s&raquo;?"
 
 #: ../../../inc/users/users.ctrl.php:134
 #, php-format
@@ -13362,34 +13359,29 @@ msgid "Custom duration"
 msgstr "Выбрать длительность"
 
 #: ../../../inc/users/views/_userfield.form.php:47
-#, fuzzy
 msgid "Delete this userfield!"
-msgstr "Удалить этого пользователя!"
+msgstr ""
 
 #: ../../../inc/users/views/_userfield.form.php:50
 #: ../../../inc/users/views/_userfields.view.php:130
-#, fuzzy
 msgid "New user field"
-msgstr "Новый пользователь создан."
+msgstr "Новый параметр пользователя"
 
 #: ../../../inc/users/views/_userfields.view.php:121
-#, fuzzy
 msgid "Edit this user field..."
-msgstr "Редактировать этого  пользователя..."
+msgstr "Редактировать этот параметр..."
 
 #: ../../../inc/users/views/_userfields.view.php:123
-#, fuzzy
 msgid "Duplicate this user field..."
-msgstr "Дублировать этого пользователя..."
+msgstr "Дублировать этот параметр..."
 
 #: ../../../inc/users/views/_userfields.view.php:125
-#, fuzzy
 msgid "Delete this user field!"
-msgstr "Удалить этого пользователя!"
+msgstr "Удалить этот параметр!"
 
 #: ../../../inc/users/views/_userfields.view.php:129
 msgid "Create a new user field..."
-msgstr ""
+msgstr "Создать новый параметр пользователя..."
 
 #: ../../../inc/widgets/model/_widget.class.php:164
 #: ../../../inc/widgets/model/_widget.class.php:219
