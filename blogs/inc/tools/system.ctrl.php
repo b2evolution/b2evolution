@@ -545,7 +545,17 @@ else
 	{
 		disp_system_check( 'ok' );
 	}
-
+	
+	// FreeType:
+	init_system_check( T_( 'GD FreeType Support' ), !empty($gd_info['FreeType Support']) ?  T_('Yes') : T_('No') );
+	if( empty($gd_info['FreeType Support']) )
+	{
+		disp_system_check( 'warning', T_('You will not be able to write text to images using TrueType fonts.') );
+	}
+	else
+	{
+		disp_system_check( 'ok' );
+	}
 	// pre_dump( $gd_info );
 }
 $block_item_Widget->disp_template_raw( 'block_end' );
@@ -574,6 +584,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.29  2010/03/23 03:16:40  sam2kb
+ * Added info about GD FreeType Support
+ *
  * Revision 1.28  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *
