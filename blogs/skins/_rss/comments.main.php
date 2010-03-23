@@ -15,10 +15,10 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-$Post_ID = NULL;
+$post_ID = NULL;
 if( isset($Item) )
 {	// Comments for a specific Item:
-  $Post_ID = $Item->ID;
+  $post_ID = $Item->ID;
 }
 
 $CommentList = new CommentList2( $Blog );
@@ -27,7 +27,7 @@ $CommentList = new CommentList2( $Blog );
 $CommentList->set_filters( array(
 		'types' => array( 'comment' ),
 		'statuses' => array ( 'published' ),
-		'post_ID' => $Post_ID,
+		'post_ID' => $post_ID,
 		'order' => 'DESC',
 		'comments' => $Blog->get_setting('posts_per_feed'),
 	) );
