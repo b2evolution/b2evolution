@@ -933,9 +933,40 @@ function file_controller_build_tabs()
 
 }
 
+/**
+ * Rename evocache folders after File settings update, whe evocahe folder name was chaned
+ * 
+ * @param string old evocache folder name
+ * @param string new evocache folder name
+ * 
+ */
+function rename_cachefolders( $oldname, $newname )
+{
+	$FileRootCache = & get_FileRootCache();
+
+	$available_Roots = $FileRootCache->get_available_FileRoots();
+	
+	foreach( $available_Roots as $fileRoot )
+	{
+		$dirnames = get_filenames( $fileRoot->ads_path, false );
+		foreach( $dirnames as $dirname )
+		{ // search ?evocache folders
+			$position = strrpos( $dirname, $oldname );
+			if( $position !== false )
+			{ // this is a ?evocache folder
+				$new_dirname = str_replace( $oldname, $newname, $dirname);
+				@rename( $dirname, $new_dirname );
+			}
+		}
+	}
+}
+
 
 /*
  * $Log$
+ * Revision 1.36  2010/03/24 12:35:58  efy-asimo
+ * Rename evocache folders after File settings update
+ *
  * Revision 1.35  2010/02/08 17:52:18  efy-yury
  * copyright 2009 -> 2010
  *

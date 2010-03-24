@@ -143,7 +143,12 @@ switch( $action )
 				$Settings->set( 'regexp_dirname', $regexp_dirname );
 			}
 			param( 'evocache_foldername', 'string', '');
-			$Settings->set( 'evocache_foldername', $evocache_foldername );
+			$old_foldername = $Settings->get( 'evocache_foldername' );
+			if( $old_foldername != $evocache_foldername)
+			{ // ? evocache folder has changed
+				rename_cachefolders( $old_foldername, $evocache_foldername );
+				$Settings->set( 'evocache_foldername', $evocache_foldername );
+			}
 
 			if( ! $Messages->count('error') )
 			{
@@ -193,6 +198,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2010/03/24 12:35:58  efy-asimo
+ * Rename evocache folders after File settings update
+ *
  * Revision 1.9  2010/03/12 10:52:52  efy-asimo
  * Set EvoCache  folder names - task
  *
