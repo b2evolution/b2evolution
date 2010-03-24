@@ -310,9 +310,21 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	echo T_('Leave a comment');
 	echo $params['form_title_end'];
 
+	echo '<script type="text/javascript">
+		  /* <![CDATA[ */
+		  function validateCommentForm(form)
+		  {
+		      if( form.p.value.replace(/^\s+|\s+$/g,"").length == 0 )
+			  {
+				  alert("'.TS_('Please do not send empty comments.').'");
+				  return false;
+			  }
+		  }
+		  /* ]]> */
+		  </script>';
 
 	$Form = new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post' );
-	$Form->begin_form( 'bComment', '', array( 'target' => '_self' ) );
+	$Form->begin_form( 'bComment', '', array( 'target' => '_self', 'onsubmit' => 'return validateCommentForm(this);' ) );
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
 	//           Actually, the best would be, if the $Form object could be changed by a plugin

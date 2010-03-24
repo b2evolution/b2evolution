@@ -113,8 +113,21 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 	echo $params['form_title_end'];
 
 
+	echo '<script type="text/javascript">
+		  /* <![CDATA[ */
+		  function validateCommentForm(form)
+		  {
+		      if( form.p.value.replace(/^\s+|\s+$/g,"").length == 0 )
+			  {
+				  alert("'.TS_('Please do not send empty comments.').'");
+				  return false;
+			  }
+		  }
+		  /* ]]> */
+		  </script>';
+
 	$Form = new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post' );
-	$Form->begin_form( 'bComment', '', array( 'target' => '_self' ) );
+	$Form->begin_form( 'bComment', '', array( 'target' => '_self', 'onsubmit' => 'return validateCommentForm(this);' ) );
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
 	//           Actually, the best would be, if the $Form object could be changed by a plugin
@@ -223,6 +236,9 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 /*
  * $Log$
+ * Revision 1.18  2010/03/24 02:56:28  sam2kb
+ * JS comment form validation, checks if text area is empty
+ *
  * Revision 1.17  2010/02/08 17:56:12  efy-yury
  * copyright 2009 -> 2010
  *
