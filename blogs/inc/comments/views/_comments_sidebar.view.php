@@ -35,7 +35,8 @@ global $Blog;
 
 global $CommentList;
 
-global $show_statuses, $s, $sentence, $exact, $rating_toshow, $rating_turn, $rating_limit;
+global $show_statuses, $s, $sentence, $exact;
+global $rating_toshow, $rating_turn, $rating_limit, $url_match, $author_url, $include_emptyurl;
 
 load_funcs( 'skins/_skin.funcs.php' );
 
@@ -143,6 +144,32 @@ $Form->begin_form( '' );
 
 	<?php
 	echo '</fieldset>';
+
+	echo '<fieldset>';
+	echo '<legend>'.T_('Author URL').'</legend>';
+
+	echo $Form->inputstart;
+	?>
+	<div><input type="text" name="author_url" size="20" value="<?php echo htmlspecialchars($author_url) ?>" class="SearchField" /></div>
+	<?php
+	echo $Form->inputend;
+	?>
+	<div>
+		<input type="radio" name="url_match" value="=" id="with_url" class="radio" <?php if( $url_match=='=' ) echo 'checked="checked" '?> />
+		<label for="with_url"><?php echo T_('With this') ?></label>
+
+		<input type="radio" name="url_match" value="!=" id="without_url" class="radio" <?php if( $url_match=='!=' ) echo 'checked="checked" '?> />
+		<label for="without_url"><?php echo T_('Without this') ?></label>
+	</div>
+	<div>
+		<input type="checkbox" name="include_emptyurl" value="true" id="without_any_url" class="checkbox" <?php if( $include_emptyurl ) echo 'checked="checked" '?> />
+		<label for="without_any_url"><?php echo T_('Include comments with no url') ?> <span class="notes">(<?php echo T_('Works only when url filter is set') ?>)</span></label><br />
+	</div>
+
+	<?php
+	echo '</fieldset>';
+
+	$Form->submit( array( 'submit', T_('Search'), 'search' ) );
 
 $Form->end_form();
 

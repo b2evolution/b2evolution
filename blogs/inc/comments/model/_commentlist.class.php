@@ -94,6 +94,8 @@ class CommentList2 extends DataObjectList2
 				'author' => NULL,
 				'author_email' => NULL,
 				'author_url' => NULL,
+				'url_match' => '=',
+				'include_emptyurl' => NULL,
 				'author_IP' => NULL,
 				'post_ID' => NULL,
 				'comment_ID' => NULL,
@@ -114,8 +116,8 @@ class CommentList2 extends DataObjectList2
 				'featured' => NULL,
 		) );
 	}
-	
-	
+
+
 	/**
 	 * Reset the query -- EXPERIMENTAL
 	 *
@@ -178,17 +180,19 @@ class CommentList2 extends DataObjectList2
 			 * Restrict to selected authors attribute:
 			 */
 			memorize_param( $this->param_prefix.'author', 'string', $this->default_filters['author'], $this->filters['author'] );  // List of authors ID to restrict to
-			memorize_param( $this->param_prefix.'author_email', 'string', $this->default_filters['author_email'], $this->filters['author_email'] );  // List of authors ID to restrict to
-			memorize_param( $this->param_prefix.'author_url', 'string', $this->default_filters['author_url'], $this->filters['author_url'] );  // List of authors ID to restrict to
-			memorize_param( $this->param_prefix.'author_IP', 'string', $this->default_filters['author_IP'], $this->filters['author_IP'] );  // List of authors ID to restrict to
-			
+			memorize_param( $this->param_prefix.'author_email', 'string', $this->default_filters['author_email'], $this->filters['author_email'] );  // List of authors email to restrict to
+			memorize_param( $this->param_prefix.'author_url', 'string', $this->default_filters['author_url'], $this->filters['author_url'] );  // List of authors url to restrict to
+			memorize_param( $this->param_prefix.'url_match', 'string', $this->default_filters['url_match'], $this->filters['url_match'] );  // List of authors url to restrict to
+			memorize_param( $this->param_prefix.'include_emptyurl', 'string', $this->default_filters['include_emptyurl'], $this->filters['include_emptyurl'] );  // List of authors url to restrict to
+			memorize_param( $this->param_prefix.'author_IP', 'string', $this->default_filters['author_IP'], $this->filters['author_IP'] );  // List of authors ip to restrict to
+
 			/*
 			 * Restrict to selected rating:
 			 */
 			memorize_param( $this->param_prefix.'rating_toshow', 'array', $this->default_filters['rating_toshow'], $this->filters['rating_toshow'] );  // Rating to restrict to
 			memorize_param( $this->param_prefix.'rating_turn', 'string', $this->default_filters['rating_turn'], $this->filters['rating_turn'] );  // Rating to restrict to
 			memorize_param( $this->param_prefix.'rating_limit', 'integer', $this->default_filters['rating_limit'], $this->filters['rating_limit'] );  // Rating to restrict to
-			
+
 			/*
 			 * Restrict by keywords
 			 */
@@ -245,6 +249,8 @@ class CommentList2 extends DataObjectList2
 		$this->filters['author'] = param( $this->param_prefix.'author', '/^-?[0-9]+(,[0-9]+)*$/', $this->default_filters['author'], true );      // List of authors to restrict to
 		$this->filters['author_email'] = param( $this->param_prefix.'author_email', 'string', $this->default_filters['author_email'], true ); 
 		$this->filters['author_url'] = param( $this->param_prefix.'author_url', 'string', $this->default_filters['author_url'], true );
+		$this->filters['url_match'] = param( $this->param_prefix.'url_match', 'string', $this->default_filters['url_match'], true );
+		$this->filters['include_emptyurl'] = param( $this->param_prefix.'include_emptyurl', 'string', $this->default_filters['include_emptyurl'], true );
 		//$this->filters['author_IP'] = param( $this->param_prefix.'author_IP', 'string', $this->default_filters['author_IP'], true );
 
 		/*
@@ -347,7 +353,7 @@ class CommentList2 extends DataObjectList2
 		 */
 		$this->CommentQuery->where_author( $this->filters['author'] );
 		$this->CommentQuery->where_author_email( $this->filters['author_email'] );
-		$this->CommentQuery->where_author_url( $this->filters['author_url'] );
+		$this->CommentQuery->where_author_url( $this->filters['author_url'], $this->filters['url_match'], $this->filters['include_emptyurl'] );
 		$this->CommentQuery->where_author_IP( $this->filters['author_IP'] );
 		$this->CommentQuery->where_post_ID( $this->filters['post_ID'] );
 		$this->CommentQuery->where_ID( $this->filters['comment_ID'], $this->filters['author'] );
@@ -519,6 +525,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.19  2010/03/25 10:45:57  efy-asimo
+ * add filter by URL to comments screen
+ *
  * Revision 1.18  2010/03/25 07:47:40  efy-asimo
  * Add filter by rating to comments screen
  *

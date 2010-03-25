@@ -38,6 +38,8 @@ class CommentQuery extends SQL
 	var $author;
 	var $author_email;
 	var $author_url;
+	var $url_match;
+	var $include_emptyurl;
 	var $author_IP;
 	var $rating_toshow;
 	var $rating_turn;
@@ -220,31 +222,35 @@ class CommentQuery extends SQL
 
 
 	/**
-	 * Restrict to specific author urls
+	 * Restrict to specific author url
 	 *
-	 * @param string List of authors urls to restrict to (must have been previously validated)
+	 * @param string authors url to restrict to
+	 * @param string equal or not equal restriction
+	 * @param boolean include or not comments, with no url 
 	 */
-	function where_author_url( $author_url )
+	function where_author_url( $author_url, $url_match, $include_emptyurl )
 	{
 		$this->author_url = $author_url;
+		$this->url_match = $url_match;
+		$this->include_emptyurl = $include_emptyurl;
 
 		if( empty( $author_url ) )
 		{
 			return;
 		}
 
-		if( substr( $author_url, 0, 1 ) == '-' )
-		{	// List starts with MINUS sign:
-			$eq = 'NOT IN';
-			$author_url_list = substr( $author_url, 1 );
-		}
-		else
+		if( empty( $url_match) )
 		{
-			$eq = 'IN';
-			$author_url_list = $author_url;
+			$url_match = "IN";
 		}
 
-		$this->WHERE_and( $this->dbprefix.'author_url '.$eq.' ('.$author_url_list.')' );
+		$include_empty = '';
+		if( $include_emptyurl )
+		{	// include comments with no url
+			$include_empty = ' OR '.$this->dbprefix.'author_url IS NULL';
+		}
+
+		$this->WHERE_and( $this->dbprefix.'author_url '.$url_match.' ("'.$author_url.'")'.$include_empty );
 	}
 
 
