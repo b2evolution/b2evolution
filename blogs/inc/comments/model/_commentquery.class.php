@@ -39,10 +39,14 @@ class CommentQuery extends SQL
 	var $author_email;
 	var $author_url;
 	var $author_IP;
-	var $rating;
+	var $rating_toshow;
+	var $rating_turn;
+	var $rating_limit;
 	var $show_statuses;
 	var $types;
 	var $keywords;
+	var $phrase;
+	var $exact;
 
 	var $Blog;
 
@@ -274,31 +278,54 @@ class CommentQuery extends SQL
 
 
 	/**
-	 * Restrict to specific rating
+	 * Restrict to specific rating or rating interval
 	 *
-	 * @param string a minimum or maximum rating to restrict to (must have been previously validated)
+	 * @param array show none rated comments or show comments with specific rating values or none/both
+	 * @param string search above, below or exact rating values
+	 * @param integer rating value - limit
 	 */
-	function where_rating( $rating )
+	function where_rating( $rating_toshow, $rating_turn, $rating_limit )
 	{
-		$this->rating = $rating;
+		$this->rating_toshow = $rating_toshow;
+		$this->rating_turn = $rating_turn;
+		$this->rating_limit = $rating_limit;
 
-		if( empty( $rating ) )
-		{
+		if( empty( $rating_toshow) )
+		{	//	no nead where condition for ratings
 			return;
 		}
 
-		if( substr( $rating, 0, 1 ) == '-' )
-		{	// List starts with MINUS sign:
-			$comp = '<';
-			$rating_limit = substr( $rating, 1 );
-		}
-		else
-		{
-			$comp = '>';
-			$rating_limit = $rating;
+		$search = '';
+		if( in_array( 'norating', $rating_toshow ) )
+		{	//	include comments with no rating
+			$search = $this->dbprefix.'rating IS NULL';
 		}
 
-		$this->WHERE_and( $this->dbprefix.'rating '.$comp.' ('.$rating_limit.')' );
+		if( in_array( 'haverating', $rating_toshow ) )
+		{	//	specify search direction
+			switch( $rating_turn )
+			{
+				case 'exact':
+					$comp = '=';
+					break;
+				case 'above':
+					$comp = '>=';
+					break;
+				case 'below':
+					$comp = '<=';
+					break;
+				default:
+					debug_die( 'Unknown search direction!' );
+			}
+			if( $search != '' )
+			{
+				$search = ' '.$search.' OR ';
+				$where_end = ' )';
+			}
+			$search = $search.$this->dbprefix.'rating '.$comp.' '.$rating_limit;
+		}
+
+		$this->WHERE_and( $search );
 	}
 
 

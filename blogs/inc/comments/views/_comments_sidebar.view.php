@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements theright sidebar for the comment browsing screen.
+ * This file implements the right sidebar for the comment browsing screen.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -35,7 +35,7 @@ global $Blog;
 
 global $CommentList;
 
-global $show_statuses, $s, $sentence, $exact;
+global $show_statuses, $s, $sentence, $exact, $rating_toshow, $rating_turn, $rating_limit;
 
 load_funcs( 'skins/_skin.funcs.php' );
 
@@ -81,7 +81,6 @@ $Form->begin_form( '' );
 	<div><input type="text" name="s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" /></div>
 	<?php
 	echo $Form->inputend;
-	// echo T_('Words').' : ';
 	?>
 	<div class="tile">
 		<input type="radio" name="sentence" value="AND" id="sentAND" class="radio" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> />
@@ -98,6 +97,48 @@ $Form->begin_form( '' );
 	<div class="tile">
 		<input type="checkbox" name="exact" value="1" id="exact" class="checkbox" <?php if( $exact ) echo 'checked="checked" '?> />
 		<label for="exact"><?php echo T_('Exact match') ?></label>
+	</div>
+
+	<?php
+	echo '</fieldset>';
+
+	echo '<fieldset>';
+	echo '<legend>'.T_('Rating').'</legend>';
+
+	?>
+	<div class="rating">
+		<input type="checkbox" name="rating_toshow[]" value="norating" id="rating_ts_norating" class="checkbox" <?php if( isset( $rating_toshow ) && in_array( "norating", $rating_toshow ) ) echo 'checked="checked" '?> />
+		<label for="rating_ts_norating"><?php echo T_('No rating') ?> </label><br />
+		
+		<input type="checkbox" name="rating_toshow[]" value="haverating" id="rating_ts_haverating" class="checkbox" <?php if( isset( $rating_toshow ) && in_array( "haverating", $rating_toshow ) ) echo 'checked="checked" '?> />
+		<label for="rating_ts_haverating"><?php echo T_('Have rating') ?> </label><br />
+	</div>
+	<div class="rating">
+		<input type="radio" name="rating_turn" value="above" id="rating_above" class="radio" <?php if( $rating_turn=='above' ) echo 'checked="checked" '?> />
+		<label for="rating_above"><?php echo T_('Above') ?></label>
+
+		<input type="radio" name="rating_turn" value="below" id="rating_below" class="radio" <?php if( $rating_turn=='below' ) echo 'checked="checked" '?> />
+		<label for="rating_below"><?php echo T_('Below') ?></label><br />
+
+		<input type="radio" name="rating_turn" value="exact" id="rating_exact" class="radio" <?php if( $rating_turn=='exact' ) echo 'checked="checked" '?> />
+		<label for="rating_norating"><?php echo T_('Exact') ?></label>
+	</div>
+	<div class="rating">
+		<?php
+		echo T_('Poor');
+
+		for( $i=1; $i<=5; $i++ )
+		{
+			echo '<input type="radio" name="rating_limit" value="'.$i.'" class="radio"';
+			if( $rating_limit == $i )
+			{
+				echo ' checked="checked"';
+			}
+			echo ' />';
+		}
+
+		echo T_('Excellent');
+		?>
 	</div>
 
 	<?php

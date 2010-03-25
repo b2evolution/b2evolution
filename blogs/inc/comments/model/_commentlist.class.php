@@ -98,7 +98,9 @@ class CommentList2 extends DataObjectList2
 				'post_ID' => NULL,
 				'comment_ID' => NULL,
 				'comment_ID_list' => NULL,
-				'rating' => NULL,
+				'rating_toshow' => NULL,
+				'rating_turn' => 'above',
+				'rating_limit' => 1,
 				'keywords' => NULL,
 				'phrase' => 'AND',
 				'exact' => 0,
@@ -183,7 +185,9 @@ class CommentList2 extends DataObjectList2
 			/*
 			 * Restrict to selected rating:
 			 */
-			memorize_param( $this->param_prefix.'rating', 'integer', $this->default_filters['rating'], $this->filters['rating'] );  // List of statuses to restrict to
+			memorize_param( $this->param_prefix.'rating_toshow', 'array', $this->default_filters['rating_toshow'], $this->filters['rating_toshow'] );  // Rating to restrict to
+			memorize_param( $this->param_prefix.'rating_turn', 'string', $this->default_filters['rating_turn'], $this->filters['rating_turn'] );  // Rating to restrict to
+			memorize_param( $this->param_prefix.'rating_limit', 'integer', $this->default_filters['rating_limit'], $this->filters['rating_limit'] );  // Rating to restrict to
 			
 			/*
 			 * Restrict by keywords
@@ -260,6 +264,13 @@ class CommentList2 extends DataObjectList2
 		$this->filters['keywords'] = param( $this->param_prefix.'s', 'string', $this->default_filters['keywords'], true );         // Search string
 		$this->filters['phrase'] = param( $this->param_prefix.'sentence', 'string', $this->default_filters['phrase'], true ); 		// Search for sentence or for words
 		$this->filters['exact'] = param( $this->param_prefix.'exact', 'integer', $this->default_filters['exact'], true );        // Require exact match of title or contents
+
+		/*
+		 * Restrict to selected rating:
+		 */
+		$this->filters['rating_toshow'] = param( $this->param_prefix.'rating_toshow', 'array', $this->default_filters['rating_toshow'], true );      // Rating to restrict to
+		$this->filters['rating_turn'] = param( $this->param_prefix.'rating_turn', 'string', $this->default_filters['rating_turn'], true );      // Rating to restrict to
+		$this->filters['rating_limit'] = param( $this->param_prefix.'rating_limit', 'integer', $this->default_filters['rating_limit'], true ); 	// Rating to restrict to
 
 		// 'limit'
 		$this->filters['comments'] = param( $this->param_prefix.'comments', 'integer', $this->default_filters['comments'], true ); 			// # of units to display on the page
@@ -341,7 +352,7 @@ class CommentList2 extends DataObjectList2
 		$this->CommentQuery->where_post_ID( $this->filters['post_ID'] );
 		$this->CommentQuery->where_ID( $this->filters['comment_ID'], $this->filters['author'] );
 		$this->CommentQuery->where_ID_list( $this->filters['comment_ID_list'] );
-		$this->CommentQuery->where_rating( $this->filters['rating'] );
+		$this->CommentQuery->where_rating( $this->filters['rating_toshow'], $this->filters['rating_turn'], $this->filters['rating_limit'] );
 		$this->CommentQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 		$this->CommentQuery->where_statuses( $this->filters['statuses'] );
 		$this->CommentQuery->where_types( $this->filters['types'] );
@@ -508,6 +519,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.18  2010/03/25 07:47:40  efy-asimo
+ * Add filter by rating to comments screen
+ *
  * Revision 1.17  2010/03/15 17:12:10  efy-asimo
  * Add filters to Comment page
  *
