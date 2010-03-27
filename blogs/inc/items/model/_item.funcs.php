@@ -201,7 +201,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	}
 
 	// echo 'starting with: '.$urltitle.'<br />';
-	 
+
 	// Replace special chars/umlauts, if we can convert charsets:
 	load_funcs('locales/_charset.funcs.php');
 	$urltitle = replace_special_chars($urltitle, $post_locale);
@@ -209,7 +209,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	// Make everything lowercase
 	$urltitle = strtolower( $urltitle );
 
-	
+
 	// leave only first 5 words
 	$slug_changed = param( 'slug_changed' );
 	if( $slug_changed == 0 )
@@ -227,10 +227,10 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 			//delete last '-'
 			$urltitle = substr($urltitle, 0, strlen($urltitle) - 1);
 		}
-		
+
 		// echo 'leaving 5 words: '.$urltitle.'<br />';
 	}
-	
+
 	// Normalize to 200 chars + a number
 	preg_match( '/^(.*?)((-|_)+([0-9]+))?$/', $urltitle, $matches );
 	$urlbase = substr( $matches[1], 0, 200 );
@@ -474,10 +474,10 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 	if( $creating )
 	{	// Creating new post
 		$fieldset_title .= ' - <a id="title_file_add" href="#" >'.get_icon( 'folder', 'imgtag' ).' '.T_('Add/Link files').'</a> <span class="note">(popup)</span>';
-		
+
 		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks' ) );
 		$Form->hidden( 'is_attachments', 'false' );
-		
+
 		echo '<table cellspacing="0" cellpadding="0"><tr><td>';
    	$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & start attaching files'), 'SaveEditButton' ) );
 		echo '</td></tr></table>';
@@ -514,7 +514,7 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 /**
  * Creates a link to new category, with properties icon
  *
- * @return string link url 
+ * @return string link url
  */
 function get_newcategory_link()
 {
@@ -724,7 +724,7 @@ function cat_select_new()
 	{
 		$category_name = '';
 	}
-	
+
 	global $cat_sel_total_count;
 	$cat_sel_total_count++;
 	$r = "\n".'<tr class="'.( $cat_sel_total_count%2 ? 'odd' : 'even' ).'">';
@@ -1242,7 +1242,7 @@ function & create_multiple_posts( & $Item, $linebreak = false )
 }
 
 /**
- * 
+ *
  * Check if new category needs to be created or not (after post editing).
  * If the new category radio is checked creates the new category and set it to post category
  * If the new category checkbox is checked creates the new category and set it to post extracat
@@ -1330,13 +1330,13 @@ function check_categories_nosave( & $post_category, & $post_extracats )
 	global $Blog;
 	$post_category = param( 'post_category', 'integer', $Blog->get_default_cat_ID() );
 	$post_extracats = param( 'post_extracats', 'array', array() );
-	
+
 	if( ! $post_category )	// if category key is 0 => means it is a new category
 	{
 		$post_category = $Blog->get_default_cat_ID();
 		param( 'new_maincat', 'boolean', 1 );
 	}
-	
+
 	if( ! empty( $post_extracats) && ( ( $extracat_key = array_search( '0', $post_extracats ) ) || $post_extracats[0] == '0' ) )
 	{
 		param( 'new_extracat', 'boolean', 1 );
@@ -1374,7 +1374,7 @@ function echo_onchange_newcat()
 /**
  * Automatically update the slug field when a title is typed.
  *
- * Variable slug_changed hold true if slug was manually changed 
+ * Variable slug_changed hold true if slug was manually changed
  * (we already do not need autocomplete) and false in other case.
  */
 function echo_slug_filler()
@@ -1413,6 +1413,9 @@ function echo_set_slug_changed()
 }
 /*
  * $Log$
+ * Revision 1.100  2010/03/27 15:37:00  blueyed
+ * whitespace
+ *
  * Revision 1.99  2010/03/15 20:12:24  efy-yury
  * slug fix
  *
