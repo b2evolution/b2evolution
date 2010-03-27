@@ -62,7 +62,7 @@ if( $plugin_ID )
 
 	if( ! $Plugin )
 	{
-		debug_die( 'Invalid Plugin!' );
+		bad_request_die( 'Invalid Plugin! (maybe not enabled?)' );
 	}
 
 
@@ -70,17 +70,17 @@ if( $plugin_ID )
 	{ // TODO: get_htsrv_methods is deprecated, but should stay here for transformation! (blueyed, 2006-04-27)
 		if( ! in_array( $method, $Plugin->get_htsrv_methods() ) )
 		{
-			debug_die( 'Call to non-htsrv Plugin method!' );
+			bad_request_die( 'Call to non-htsrv Plugin method!' );
 		}
 	}
 	else
 	if( ! in_array( $method, $Plugin->GetHtsrvMethods() ) )
 	{
-		debug_die( 'Call to non-htsrv Plugin method!' );
+		bad_request_die( 'Call to non-htsrv Plugin method!' );
 	}
 	elseif( ! method_exists( $Plugin, 'htsrv_'.$method ) )
 	{
-		debug_die( 'htsrv method does not exist!' );
+		bad_request_die( 'htsrv method does not exist!' );
 	}
 
 	// Call the method:
@@ -90,6 +90,9 @@ if( $plugin_ID )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.14  2010/03/27 15:37:55  blueyed
+ * call_plugin htsrv: use bad_request_die for bad requests instead of debug_die
+ *
  * Revision 1.13  2010/02/08 17:50:53  efy-yury
  * copyright 2009 -> 2010
  *
