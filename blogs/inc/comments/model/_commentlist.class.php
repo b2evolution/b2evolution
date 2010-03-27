@@ -49,7 +49,7 @@ class CommentList2 extends DataObjectList2
 	 * Blog object this CommentList refers to
 	 */
 	var $Blog;
-	
+
 	/**
 	 * Constructor
 	 *
@@ -68,7 +68,7 @@ class CommentList2 extends DataObjectList2
 		)
 	{
 		global $Settings;
-		
+
 		// Call parent constructor:
 		parent::DataObjectList2( get_Cache($cache_name), $limit, $param_prefix, NULL );
 
@@ -130,8 +130,8 @@ class CommentList2 extends DataObjectList2
 
 		parent::reset();
 	}
-	
-	
+
+
 	/**
 	 * Set default filter values we always want to use if not individually specified otherwise:
 	 *
@@ -143,8 +143,8 @@ class CommentList2 extends DataObjectList2
 		$this->default_filters = array_merge( $this->default_filters, $default_filters );
 		$this->preset_filters = $preset_filters;
 	}
-	
-	
+
+
 	/**
 	 * Set/Activate filterset
 	 *
@@ -231,10 +231,10 @@ class CommentList2 extends DataObjectList2
 			memorize_param( $this->page_param, 'integer', 1, $this->filters['page'] );      // List page number in paged display
 		}
 	}
-	
-	
-/**
-	 * Init filter params from Request params
+
+
+	/**
+	 * Init filter params from request params
 	 *
 	 * @param boolean do we want to use saved filters ?
 	 * @return boolean true if we could apply a filterset based on Request params (either explicit or reloaded)
@@ -247,7 +247,7 @@ class CommentList2 extends DataObjectList2
 		 * Restrict to selected author:
 		 */
 		$this->filters['author'] = param( $this->param_prefix.'author', '/^-?[0-9]+(,[0-9]+)*$/', $this->default_filters['author'], true );      // List of authors to restrict to
-		$this->filters['author_email'] = param( $this->param_prefix.'author_email', 'string', $this->default_filters['author_email'], true ); 
+		$this->filters['author_email'] = param( $this->param_prefix.'author_email', 'string', $this->default_filters['author_email'], true );
 		$this->filters['author_url'] = param( $this->param_prefix.'author_url', 'string', $this->default_filters['author_url'], true );
 		$this->filters['url_match'] = param( $this->param_prefix.'url_match', 'string', $this->default_filters['url_match'], true );
 		$this->filters['include_emptyurl'] = param( $this->param_prefix.'include_emptyurl', 'string', $this->default_filters['include_emptyurl'], true );
@@ -262,7 +262,6 @@ class CommentList2 extends DataObjectList2
 		 * Restrict to selected types:
 		 */
 		$this->filters['types'] = param( $this->param_prefix.'types', 'array', $this->default_filters['types'], true );      // List of types to restrict to
-
 
 		/*
 		 * Restrict by keywords
@@ -286,15 +285,10 @@ class CommentList2 extends DataObjectList2
 		$this->filters['page'] = param( $this->page_param, 'integer', 1, true );      // List page number in paged display
 		$this->page = $this->filters['page'];
 
-		if( param_errors_detected() )
-		{
-			return false;
-		}
-
-		return true;
+		return ! param_errors_detected();
 	}
-	
-	
+
+
 	/**
 	 * Activate preset default filters if necessary
 	 *
@@ -314,8 +308,8 @@ class CommentList2 extends DataObjectList2
 		// Save the name of the preset in order for is_filtered() to work properly:
 		$this->default_filters['filter_preset'] = $this->filters['filter_preset'];
 	}
-	
-	
+
+
 	/**
 	 *
 	 *
@@ -336,7 +330,7 @@ class CommentList2 extends DataObjectList2
 		}
 
 		// GENERATE THE QUERY:
-		
+
 		/*
 		 * Resrict to selected blog
 		 */
@@ -370,7 +364,7 @@ class CommentList2 extends DataObjectList2
 		$order_by = gen_order_clause( $this->filters['orderby'], $this->filters['order'], $this->Cache->dbprefix, $this->Cache->dbIDname );
 
 		$this->CommentQuery->order_by( $order_by );
-		
+
 		/*
 		 * GET TOTAL ROW COUNT:
 		 */
@@ -380,7 +374,7 @@ class CommentList2 extends DataObjectList2
 					.$this->CommentQuery->get_where();
 
 		parent::count_total_rows( $sql_count );
-		
+
 		/*
 		 * Page set up:
 		 */
@@ -398,8 +392,8 @@ class CommentList2 extends DataObjectList2
 			$this->CommentQuery->LIMIT( $this->limit );
 		}
 	}
-	
-	
+
+
 	/**
 	 * Run Query: GET DATA ROWS *** HEAVY ***
 	 */
@@ -455,8 +449,8 @@ class CommentList2 extends DataObjectList2
 		// ATTENTION: we skip the parent on purpose here!! fp> refactor
 		DataObjectList2::query( false, false, false, 'CommentList2::Query() Step 2' );
 	}
-	
-	
+
+
 	/**
 	 * Generate a title for the current list, depending on its filtering params
 	 *
@@ -465,26 +459,26 @@ class CommentList2 extends DataObjectList2
 	function get_filter_titles( $ignore = array(), $params = array() )
 	{
 		$title_array = array();
-		
+
 		if( empty ($this->filters) )
 		{ // Filters have no been set before, we'll use the default filterset
 			$this->set_filters( $this->default_filters );
 		}
-		
+
 		if( count($this->filters['statuses']) < 3 )
 		{
 			$title_array['statuses'] = T_('Visibility').': '.implode( ', ', $this->filters['statuses'] );
 		}
-		
+
 		if( !empty($this->filters['keywords']) )
 		{
 			$title_array[T_('keywords')] = T_('Keywords').': '.$this->filters['keywords'];
 		}
-		
+
 		return $title_array;
 	}
-	
-	
+
+
 	/**
 	 * If the list is sorted by category...
  	 *
@@ -504,8 +498,8 @@ class CommentList2 extends DataObjectList2
 
 		return $Comment;
 	}
-	
-	
+
+
 	/**
 	 * Template function: display message if list is empty
 	 *
@@ -525,6 +519,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.20  2010/03/27 15:51:17  blueyed
+ * Minor doc. whitespace.
+ *
  * Revision 1.19  2010/03/25 10:45:57  efy-asimo
  * add filter by URL to comments screen
  *
