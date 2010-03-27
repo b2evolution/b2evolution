@@ -317,8 +317,6 @@ class CommentList2 extends DataObjectList2
 	 */
 	function query_init()
 	{
-		global $current_User;
-
 		if( empty( $this->filters ) )
 		{	// Filters have not been set before, we'll use the default filterset:
 			// If there is a preset filter, we need to activate its specific defaults:
@@ -519,6 +517,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.21  2010/03/27 15:55:48  blueyed
+ * cleanup
+ *
  * Revision 1.20  2010/03/27 15:51:17  blueyed
  * Minor doc. whitespace.
  *
