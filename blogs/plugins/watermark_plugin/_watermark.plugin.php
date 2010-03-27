@@ -35,6 +35,8 @@ class watermark_plugin extends Plugin
 	{
 		$this->short_desc = T_('Adds text watermark to generated thumbnails');
 		$this->long_desc = T_('Adds text watermark to generated thumbnails');
+
+		$this->fonts_dir = dirname(__FILE__).'/fonts';
 	}
 
 
@@ -58,7 +60,7 @@ class watermark_plugin extends Plugin
 					'label' => 'Font file name',
 					'size' => 30,
 					'defaultvalue' => '',
-					'note' => T_('You can upload your own fonts to the <b>/fonts</b> directory in plugin\'s folder.'),
+					'note' => sprintf(T_('You can upload your own fonts to the font directory (%s).'), rel_path_to_base($this->fonts_dir)),
 				),
 			'font_size' => array(
 					'label' => 'Font size',
@@ -77,14 +79,16 @@ class watermark_plugin extends Plugin
 		
 		$font = $this->Settings->get('font');
 		
-		if( !empty($font) && !is_readable(dirname(__FILE__).'/fonts/'.$font) )
+		if( !empty($font) && !is_readable($this->fonts_dir.'/'.$font) )
 		{
-			$this->msg( sprintf( T_('Unable to load font file: %s'), dirname(__FILE__).'/fonts/'.$font ), 'error' );
+			$this->msg( sprintf( T_('Unable to load font file: %s'), $this->fonts_dir.'/'.$font ), 'error' );
 			return false;
 		}
 		else
 		{	// Delete file cache
 			// TODO> clear cache only if settings are changed
+			//       (could use PluginSettingsValidateSet for this)
+			// TODO: dh> this should use a single function and the same should get used in the Tools menu action, too.
 			$dirs = get_filenames( $media_path, false );
 			foreach( $dirs as $dir )
 			{
@@ -140,7 +144,7 @@ class watermark_plugin extends Plugin
 		
 		if( $font = $this->Settings->get('font') )
 		{	// Custom font
-			$font = dirname(__FILE__).'/fonts/'.$font;
+			$font = $this->fonts_dir.'/'.$font;
 		}
 		else
 		{	// Default font
@@ -149,6 +153,7 @@ class watermark_plugin extends Plugin
 		
 		if( !is_readable($font) )
 		{	// Font file not found
+			// TODO: debuglog
 			return;
 		}
 		
