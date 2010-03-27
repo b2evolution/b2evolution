@@ -67,6 +67,10 @@ class CommentQuery extends SQL
 		$this->dbIDname = $dbIDname;
 
 		$this->FROM( $this->dbtablename );
+
+		# Add constraints to only include comments on items visible for the current User!
+		$this->FROM_add('INNER JOIN T_items__item ON post_ID = comment_post_ID');
+		$this->WHERE_and(statuses_where_clause());
 	}
 
 
@@ -97,8 +101,8 @@ class CommentQuery extends SQL
 
 		return $r;
 	}
-	
-	
+
+
 	/**
 	 * Restrict to a specific list of comments
 	 */
@@ -226,7 +230,7 @@ class CommentQuery extends SQL
 	 *
 	 * @param string authors url to restrict to
 	 * @param string equal or not equal restriction
-	 * @param boolean include or not comments, with no url 
+	 * @param boolean include or not comments, with no url
 	 */
 	function where_author_url( $author_url, $url_match, $include_emptyurl )
 	{
@@ -451,18 +455,18 @@ class CommentQuery extends SQL
 
 	/**
 	 * Restrict to specific blog
-	 * 
+	 *
 	 * @param integer blog to restrict to
 	 */
 	function blog_restrict( $Blog )
 	{
 		$this->Blog = $Blog;
-		
+
 		if( empty($Blog) )
 		{
 			return;
 		}
-		
+
 		$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbprefix.'post_ID = postcat_post_ID
 						 INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID ' );
 
