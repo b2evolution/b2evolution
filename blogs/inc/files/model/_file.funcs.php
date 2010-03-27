@@ -557,13 +557,13 @@ function validate_dirname( $dirname )
 
 /**
  * Check if file rename is acceptable
- * 
+ *
  * used when renaming a file, File settings
  *
  * @param string the new name
  * @param boolean 0 if directory
- * @param boolean 0 if permission denied 
- * @return nothing if the rename is acceptable, error message if not 
+ * @param boolean 0 if permission denied
+ * @return nothing if the rename is acceptable, error message if not
  */
 function check_rename ( & $newname, $is_dir, $allow_locked_filetypes )
 {
@@ -584,7 +584,7 @@ function check_rename ( & $newname, $is_dir, $allow_locked_filetypes )
 	return;
 }
 
-	
+
 /**
  * Return the path without the leading {@link $basepath}, or if not
  * below {@link $basepath}, just the basename of it.
@@ -935,17 +935,17 @@ function file_controller_build_tabs()
 
 /**
  * Rename evocache folders after File settings update, whe evocahe folder name was chaned
- * 
+ *
  * @param string old evocache folder name
  * @param string new evocache folder name
- * 
+ *
  */
 function rename_cachefolders( $oldname, $newname )
 {
 	$FileRootCache = & get_FileRootCache();
 
 	$available_Roots = $FileRootCache->get_available_FileRoots();
-	
+
 	foreach( $available_Roots as $fileRoot )
 	{
 		$dirnames = get_filenames( $fileRoot->ads_path, false );
@@ -962,8 +962,43 @@ function rename_cachefolders( $oldname, $newname )
 }
 
 
+/**
+ * Delete any ?evocache folders.
+ *
+ * @param Log Pass a Log object here to have error messages added to it.
+ * @return integer Number of deleted dirs.
+ */
+function delete_cachefolders( $Log = NULL )
+{
+	global $media_path, $Settings;
+
+	$evocache_foldername = $Settings->get( 'evocache_foldername' );
+
+	$dirs = get_filenames( $media_path, false );
+	$deleted_dirs = 0;
+	foreach( $dirs as $dir )
+	{
+		if( basename($dir) == $evocache_foldername )
+		{	// Delete .evocache directory recursively
+			if( rmdir_r( $dir ) )
+			{
+				$deleted_dirs++;
+			}
+			elseif( $Log )
+			{
+				$Log->add( sprintf( T_('Could not delete directory: %s'), $dir ), 'error' );
+			}
+		}
+	}
+	return $deleted_dirs;
+}
+
+
 /*
  * $Log$
+ * Revision 1.37  2010/03/27 19:57:30  blueyed
+ * Add delete_cachefolders function and use it in the Tools Misc actions and with the watermark plugin. The latter will also remove caches when it gets enabled or disabled.
+ *
  * Revision 1.36  2010/03/24 12:35:58  efy-asimo
  * Rename evocache folders after File settings update
  *

@@ -121,25 +121,8 @@ if( empty($tab) )
 			// fp> TODO: have an option to only PRUNE files older than for example 30 days
 			$current_User->check_perm('options', 'edit', true);
 
-			global $media_path, $Settings;
-
-			// TODO> handle custom media directories
-			$dirs = get_filenames( $media_path, false );
-			$deleted_dirs = 0;
-			foreach( $dirs as $dir )
-			{
-				if( basename($dir) == $Settings->get( 'evocache_foldername' ) )
-				{	// Delete .evocache directory recursively
-					if( rmdir_r( $dir ) )
-					{
-						$deleted_dirs++;
-					}
-					else
-					{
-						$Messages->add( sprintf( T_('Could not delete directory: %s'), $dir ), 'error' );
-					}
-				}
-			}
+			// TODO> handle custom media directories dh> ??
+			$deleted_dirs = delete_cachefolders($Messages);
 			$Messages->add( sprintf( T_('Deleted %d directories.'), $deleted_dirs ), 'success' );
 			break;
 
@@ -219,7 +202,7 @@ if( empty($tab) )
 	if( $current_User->check_perm('options', 'edit') )
 	{ // default admin actions:
 		global $Settings;
-		
+
 		$block_item_Widget->title = T_('Cache management');
 		// dh> TODO: add link to delete all caches at once?
 		$block_item_Widget->disp_template_replaced( 'block_start' );
@@ -287,6 +270,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2010/03/27 19:57:30  blueyed
+ * Add delete_cachefolders function and use it in the Tools Misc actions and with the watermark plugin. The latter will also remove caches when it gets enabled or disabled.
+ *
  * Revision 1.24  2010/03/12 10:52:56  efy-asimo
  * Set EvoCache  folder names - task
  *

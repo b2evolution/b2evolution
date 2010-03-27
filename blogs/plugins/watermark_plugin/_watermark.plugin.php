@@ -85,20 +85,11 @@ class watermark_plugin extends Plugin
 			$this->msg( sprintf( T_('Unable to load font file: %s'), $this->fonts_dir.'/'.$font ), 'error' );
 			return false;
 		}
-		else
-		{	// Delete file cache
-			// TODO> clear cache only if settings are changed
-			//       (could use PluginSettingsValidateSet for this)
-			// TODO: dh> this should use a single function and the same should get used in the Tools menu action, too.
-			$dirs = get_filenames( $media_path, false );
-			foreach( $dirs as $dir )
-			{
-				if( basename($dir) == $Settings->get( 'evocache_foldername' ) )
-				{	// Delete .evocache directories recursively
-					rmdir_r( $dir );
-				}
-			}
-		}
+
+		// Delete file cache
+		// TODO> clear cache only if settings are changed
+		//       (could use PluginSettingsValidateSet for this)
+		delete_cachefolders();
 	}
 
 
@@ -109,7 +100,15 @@ class watermark_plugin extends Plugin
 			return T_('The function imagettftext() is not available.');
 		}
 
+		delete_cachefolders();
+
 		return true;
+	}
+
+
+	function BeforeDisable()
+	{
+		delete_cachefolders();
 	}
 
 
