@@ -1736,7 +1736,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 							$args[] = 'Object('.get_class($l_arg).')';
 							break;
 						case 'resource':
-							$args[] = 'Resource('.strstr($l_arg, '#').')';
+							$args[] = $l_arg;
 							break;
 						case 'boolean':
 							$args[] = $l_arg ? 'true' : 'false';
@@ -3861,6 +3861,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.220  2010/03/27 19:40:08  blueyed
+ * debug_get_backtrace: strstr on resources does not work for PHP 5.3 anymore. Use the arg as-is (untested).
+ *
  * Revision 1.219  2010/03/18 21:16:11  blueyed
  * debug_get_backtrace: properly escape function call/args for html.
  *
