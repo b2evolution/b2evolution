@@ -96,7 +96,7 @@ class GeneralSettings extends AbstractSettings
 		'time_difference' => '0',
 		'timeout_sessions' => '604800',     // seconds (604800 == 7 days)
 		'upload_enabled' => '1',
-		'upload_maxkb' => '2048',
+		'upload_maxkb' => '10000',					// 10 MB
 		'evocache_foldername' => '.evocache',
 
 		'user_minpwdlen' => '5',
@@ -200,6 +200,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.30  2010/03/28 17:27:15  fplanque
+ * changed upload default max kb
+ *
  * Revision 1.29  2010/03/12 10:52:56  efy-asimo
  * Set EvoCache  folder names - task
  *
