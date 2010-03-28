@@ -33,7 +33,7 @@ if( $secret != $posted_Comment->get('secret') )
 	header_redirect( $to_comment_edit );
 }
 
-$antispam_url = $admin_url.'?ctrl=antispam&action=ban&keyword='.$posted_Comment->author_url.'&'.url_crumb( 'antispam' );
+$antispam_url = $admin_url.'?ctrl=antispam&action=ban&keyword='.rawurlencode(get_ban_domain($posted_Comment->author_url)).'&'.url_crumb( 'antispam' );
 
 // perform action if action is not null
 switch( $action )
