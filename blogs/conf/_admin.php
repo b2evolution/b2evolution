@@ -22,9 +22,9 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  *
  * @todo fp>This should be moved to the backoffice.
  * In the BO, this should actually be split into:
- * App Settings:
+ * Global Settings:
  *  checkbox         [] allow cross posting
- *  another checkbox [] allow moving posting between different blogs
+ *  another checkbox [] allow moving posts between different blogs
  * Each blog's settings: radio between:
  *    o One category per post
  *    o Multiple categories per post (requires transparent handling of main cat)
