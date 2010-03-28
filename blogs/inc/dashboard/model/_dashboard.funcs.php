@@ -211,7 +211,7 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 	// Filter list:
 	$CommentList->set_filters( array(
-			'types' => array( 'comment','trackback','pingback' ),
+			'types' => array( 'comment', 'trackback', 'pingback' ),
 			'statuses' => array ( 'draft' ),
 			'comment_ID_list' => $exlude_ID_list,
 			'order' => 'DESC',
@@ -309,6 +309,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.35  2010/03/28 19:27:47  fplanque
+ * minor
+ *
  * Revision 1.34  2010/03/11 13:10:09  efy-asimo
  * Fix ajax refresh on dashboard
  *

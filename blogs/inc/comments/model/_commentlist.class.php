@@ -19,9 +19,9 @@
  * @package evocore
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author blueyed: Daniel HAHLER.
+ * @author asimo: Evo Factory - Attila Simo
+ * @author blueyed: Daniel HAHLER
  * @author fplanque: Francois PLANQUE
- * @author asimo: Evo Factory / Attila Simo
  *
  * @version $Id$
  */
@@ -517,6 +517,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.22  2010/03/28 19:27:47  fplanque
+ * minor
+ *
  * Revision 1.21  2010/03/27 15:55:48  blueyed
  * cleanup
  *
@@ -533,132 +536,6 @@ class CommentList2 extends DataObjectList2
  * Add filters to Comment page
  *
  * Revision 1.16  2010/03/11 10:34:57  efy-asimo
- * Rewrite CommentList to CommentList2 task
- *
- * Revision 1.15  2010/02/08 17:52:13  efy-yury
- * copyright 2009 -> 2010
- *
- * Revision 1.14  2009/11/30 00:22:05  fplanque
- * clean up debug info
- * show more timers in view of block caching
- *
- * Revision 1.13  2009/11/25 16:05:02  efy-maxim
- * comments awaiting moderation improvements
- *
- * Revision 1.12  2009/09/14 12:46:36  efy-arrin
- * Included the ClassName in load_class() call with proper UpperCase
- *
- * Revision 1.11  2009/03/08 23:57:42  fplanque
- * 2009
- *
- * Revision 1.10  2009/03/03 20:45:07  blueyed
- * Drop unnecessary global assignments in CommentList.
- *
- * Revision 1.9  2009/01/25 19:09:32  blueyed
- * phpdoc fixes
- *
- * Revision 1.8  2009/01/23 00:05:24  blueyed
- * Add Blog::get_sql_where_aggregate_coll_IDs, which adds support for '*' in list of aggregated blogs.
- *
- * Revision 1.7  2008/09/24 08:46:45  fplanque
- * Fixed random order
- *
- * Revision 1.6  2008/01/21 09:35:27  fplanque
- * (c) 2008
- *
- * Revision 1.5  2008/01/10 19:56:58  fplanque
- * moved to v-3-0
- *
- * Revision 1.4  2008/01/09 00:25:51  blueyed
- * Vastly improve performance in CommentList for large number of comments:
- * - add index comment_date_ID; and force it in the SQL (falling back to comment_date)
- *
- * Revision 1.3  2007/12/24 10:36:07  yabs
- * adding random order
- *
- * Revision 1.2  2007/11/03 21:04:26  fplanque
- * skin cleanup
- *
- * Revision 1.1  2007/06/25 10:59:42  fplanque
- * MODULES (refactored MVC)
- *
- * Revision 1.9  2007/06/20 23:00:14  blueyed
- * doc fixes
- *
- * Revision 1.8  2007/05/14 02:43:04  fplanque
- * Started renaming tables. There probably won't be a better time than 2.0.
- *
- * Revision 1.7  2007/04/26 00:11:08  fplanque
- * (c) 2007
- *
- * Revision 1.6  2006/12/17 23:42:38  fplanque
- * Removed special behavior of blog #1. Any blog can now aggregate any other combination of blogs.
- * Look into Advanced Settings for the aggregating blog.
- * There may be side effects and new bugs created by this. Please report them :]
- *
- * Revision 1.5  2006/07/04 17:32:29  fplanque
- * no message
- *
- * Revision 1.4  2006/04/20 16:31:30  fplanque
- * comment moderation (finished for 1.8)
- *
- * Revision 1.3  2006/04/18 19:29:51  fplanque
- * basic comment status implementation
- *
- * Revision 1.2  2006/03/12 23:08:58  fplanque
- * doc cleanup
- *
- * Revision 1.1  2006/02/23 21:11:57  fplanque
- * File reorganization to MVC (Model View Controller) architecture.
- * See index.hml files in folders.
- * (Sorry for all the remaining bugs induced by the reorg... :/)
- *
- * Revision 1.14  2005/12/19 19:30:14  fplanque
- * minor
- *
- * Revision 1.13  2005/12/12 19:21:21  fplanque
- * big merge; lots of small mods; hope I didn't make to many mistakes :]
- *
- * Revision 1.12  2005/11/21 20:37:39  fplanque
- * Finished RSS skins; turned old call files into stubs.
- *
- * Revision 1.11  2005/11/18 22:05:41  fplanque
- * no message
- *
- * Revision 1.10  2005/10/03 18:10:07  fplanque
- * renamed post_ID field
- *
- * Revision 1.9  2005/09/06 17:13:54  fplanque
- * stop processing early if referer spam has been detected
- *
- * Revision 1.8  2005/08/25 16:06:45  fplanque
- * Isolated compilation of categories to use in an ItemList.
- * This was one of the oldest bugs on the list! :>
- *
- * Revision 1.7  2005/04/07 17:55:50  fplanque
- * minor changes
- *
- * Revision 1.6  2005/03/14 20:22:19  fplanque
- * refactoring, some cacheing optimization
- *
- * Revision 1.5  2005/03/09 20:29:39  fplanque
- * added 'unit' param to allow choice between displaying x days or x posts
- * deprecated 'paged' mode (ultimately, everything should be pageable)
- *
- * Revision 1.4  2005/03/06 16:30:40  blueyed
- * deprecated global table names.
- *
- * Revision 1.3  2005/02/28 09:06:32  blueyed
- * removed constants for DB config (allows to override it from _config_TEST.php), introduced EVO_CONFIG_LOADED
- *
- * Revision 1.2  2004/10/14 18:31:25  blueyed
- * granting copyright
- *
- * Revision 1.1  2004/10/13 22:46:32  fplanque
- * renamed [b2]evocore/*
- *
- * Revision 1.20  2004/10/11 19:13:14  fplanque
- * Edited code documentation.
- *
+ * Rewrite CommentList to CommentList2 rewrite
  */
 ?>
