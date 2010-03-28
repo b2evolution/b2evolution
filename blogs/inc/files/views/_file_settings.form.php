@@ -220,10 +220,10 @@ $Form->begin_fieldset( T_('Advanced options'), array( 'id' => 'ffset_fileadvance
 											255 );
 		}
 	}
-	
+
 	$Form->radio_input( 'evocache_foldername', $Settings->get( 'evocache_foldername' ), array(
-						array( 'value' => '.evocache', 'label' => T_('Yes, use .evocache folders') ),
-						array( 'value' => '_evocache', 'label' => T_('No, use _evocache folders') ) ), T_('Use hidden folders for caching'), array( 'lines' => 2 ) );
+						array( 'value' => '.evocache', 'label' => T_('Use .evocache folders (system hidden folders)') ),
+						array( 'value' => '_evocache', 'label' => T_('Use _evocache folders (compatible with all webservers)') ) ), T_('Cache folder names'), array( 'lines' => 2 ) );
 
 $Form->end_fieldset();
 
@@ -236,12 +236,20 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 		) );
 }
 
-
 $Form->end_form();
+
+if( $current_User->check_perm( 'options', 'edit', false ) )
+{	// TODO: better perm check
+	echo '<p class="note">'.T_('See also:').' ';
+	echo T_('Blog Settings').' &gt; '.T_('Advanced').' &gt; '.T_('Media directory location');
+}
 
 
 /*
  * $Log$
+ * Revision 1.15  2010/03/28 17:08:08  fplanque
+ * minor
+ *
  * Revision 1.14  2010/03/12 10:52:56  efy-asimo
  * Set EvoCache  folder names - task
  *

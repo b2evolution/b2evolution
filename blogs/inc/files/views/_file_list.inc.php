@@ -494,6 +494,15 @@ $Form->begin_form();
 
 			$field_options = array();
 
+			/*
+			 * TODO: fp> the following is a good idea but in case we also have $mode == 'upload' it currently doesn't refresh the list of attachements
+			 * which makes it seem like this feature is broken. Please add necessary javascript for this.
+			 */
+			if( $fm_mode == 'link_item' && $mode != 'upload' )
+			{	// We are linking to a post...
+				$field_options['link'] = T_('Link files to current post');
+			}
+
 			if( $mode != 'upload' && ($fm_Filelist->get_root_type() == 'collection' || !empty($Blog)) )
 			{	// We are browsing files for a collection:
 				// fp> TODO: use current as default but let user choose into which blog he wants to post
@@ -503,7 +512,6 @@ $Form->begin_form();
 
 			if( $mode == 'upload' )
 			{	// We are uploading in a popup opened by an edit screen
-				$field_options['link'] = T_('Link files to post');
 				$field_options['img_tag'] = T_('Insert IMG/link into post');
 			}
 
@@ -674,6 +682,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.37  2010/03/28 17:08:08  fplanque
+ * minor
+ *
  * Revision 1.36  2010/03/18 06:14:33  sam2kb
  * Link multiple files to item
  *

@@ -39,23 +39,6 @@ $Form->global_icon( T_('Close settings!'), 'close', regenerate_url() );
 
 $Form->begin_form( 'fform', T_('Display settings') );
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
-{	// TODO: better perm check
-	echo '<p class="note">'.T_('See also:').' ';
-
-  /**
-	 * @var FileRoot
-	 */
-	global $fm_FileRoot;
-	if( $fm_FileRoot->type == 'collection' )
-	{
-		echo T_('Blog Settings').' &gt; '.T_('Advanced').' &gt; <a href="?ctrl=coll_settings&tab=advanced&blog='.$fm_FileRoot->in_type_ID.'">'
-					.T_('Media directory location').'</a> &bull; ';
-	}
-
-	echo T_('Global settings').' &gt; <a href="?ctrl=fileset">'.T_('Files').'</a> &amp; <a href="?ctrl=filetypes">'.T_('File types').'</a></p>';
-}
-
 	$Form->add_crumb( 'file' );
 	$Form->hidden_ctrl();
 	$Form->hiddens_by_key( get_memorized() );
@@ -87,11 +70,29 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 				array( 'value'=>'regexp', 'label'=>T_('With regular expressions') ) ), T_('Filter box') );
 	$Form->end_fieldset();
 
+if( $current_User->check_perm( 'options', 'edit', false ) )
+{	// TODO: better perm check
+	echo '<p class="note">'.T_('See also:').' ';
+
+  /**
+	 * @var FileRoot
+	 */
+	global $fm_FileRoot;
+	if( $fm_FileRoot->type == 'collection' )
+	{
+		echo T_('Blog Settings').' &gt; '.T_('Advanced').' &gt; <a href="?ctrl=coll_settings&tab=advanced&blog='.$fm_FileRoot->in_type_ID.'">'
+					.T_('Media directory location').'</a>';
+	}
+}
+
 $Form->end_form( array( array( 'submit', 'actionArray[update_settings]', T_('Update !'), 'ActionButton'),
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
 /*
  * $Log$
+ * Revision 1.8  2010/03/28 17:08:08  fplanque
+ * minor
+ *
  * Revision 1.7  2010/02/08 17:52:51  efy-yury
  * copyright 2009 -> 2010
  *

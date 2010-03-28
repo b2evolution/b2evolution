@@ -1209,6 +1209,7 @@ switch( $action )
 		}
 		break;
 
+
 	case 'unlink':
 		// TODO: We don't need the Filelist, move UP!
 		// Unlink File from Item (or other object if extended):
@@ -1757,6 +1758,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.67  2010/03/28 17:08:09  fplanque
+ * minor
+ *
  * Revision 1.66  2010/03/19 09:48:57  efy-asimo
  * file deleting restrictions - task
  *

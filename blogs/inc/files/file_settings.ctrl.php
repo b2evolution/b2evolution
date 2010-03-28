@@ -145,7 +145,7 @@ switch( $action )
 			param( 'evocache_foldername', 'string', '');
 			$old_foldername = $Settings->get( 'evocache_foldername' );
 			if( $old_foldername != $evocache_foldername)
-			{ // ? evocache folder has changed
+			{ // ?evocache folder name has changed
 				rename_cachefolders( $old_foldername, $evocache_foldername );
 				$Settings->set( 'evocache_foldername', $evocache_foldername );
 			}
@@ -198,6 +198,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2010/03/28 17:08:08  fplanque
+ * minor
+ *
  * Revision 1.10  2010/03/24 12:35:58  efy-asimo
  * Rename evocache folders after File settings update
  *

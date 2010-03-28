@@ -524,7 +524,7 @@ if( isset($_FILES) && count( $_FILES ) )
 		{ // add a note, this is no error!
 			$Messages->add( sprintf( T_('Could not change permissions of &laquo;%s&raquo; to default chmod setting.'), $newFile->dget('name') ), 'note' );
 		}
-		
+
 		// Refreshes file properties (type, size, perms...)
 		$newFile->load_properties();
 		
@@ -647,6 +647,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.36  2010/03/28 17:08:09  fplanque
+ * minor
+ *
  * Revision 1.35  2010/03/14 06:36:57  sam2kb
  * New plugin hooks: BeforeThumbCreate, AfterFileUpload
  *

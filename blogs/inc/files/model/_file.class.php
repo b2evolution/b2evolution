@@ -1936,7 +1936,7 @@ class File extends DataObject
 			  'imh' => & $thumb_imh,
 			  'size' => & $size_name,
 			  'mimetype' => & $thumb_mimetype,
-			  'quality' => & $thumb_mimetype,
+			  'quality' => & $thumb_quality,
 			  'File' => & $this,
 		  ) );
 		
@@ -2055,7 +2055,8 @@ class File extends DataObject
 
 	/**
 	 * Get link to restricted object
-	 * Use when try to delete a file, which is attached to a post, or to a user
+	 *
+	 * Used when try to delete a file, which is attached to a post, or to a user
 	 * 
 	 * @param array restriction
 	 * @return string message with links to objects
@@ -2113,6 +2114,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.87  2010/03/28 17:08:08  fplanque
+ * minor
+ *
  * Revision 1.86  2010/03/19 09:48:57  efy-asimo
  * file deleting restrictions - task
  *
