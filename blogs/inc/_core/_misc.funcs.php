@@ -1727,7 +1727,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 							$args[] = $l_arg;
 							break;
 						case 'string':
-							$args[] = '"'.strmaxlen(str_replace("\n", '', $l_arg), 65, NULL, 'htmlbody').'"';
+							$args[] = '"'.strmaxlen(str_replace("\n", '\n', $l_arg), 255, NULL, 'htmlspecialchars').'"';
 							break;
 						case 'array':
 							$args[] = 'Array('.count($l_arg).')';
@@ -1736,7 +1736,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 							$args[] = 'Object('.get_class($l_arg).')';
 							break;
 						case 'resource':
-							$args[] = $l_arg;
+							$args[] = htmlspecialchars((string)$l_arg);
 							break;
 						case 'boolean':
 							$args[] = $l_arg ? 'true' : 'false';
@@ -1759,7 +1759,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 			$call .= htmlspecialchars($l_trace['function'])."( </strong>\n";
 			if( $args )
 			{
-				$call .= ' '.htmlspecialchars(implode( ', ', $args )).' ';
+				$call .= ' '.implode( ', ', $args ).' ';
 			}
 			$call .='<strong>)</strong>';
 			$r .= $call."<br />\n";
@@ -3861,6 +3861,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.221  2010/03/29 20:31:36  blueyed
+ * debug_get_backtrace: crop string args after 255 chars (not 65). Fix escaping of args and handling of resource args.
+ *
  * Revision 1.220  2010/03/27 19:40:08  blueyed
  * debug_get_backtrace: strstr on resources does not work for PHP 5.3 anymore. Use the arg as-is (untested).
  *
