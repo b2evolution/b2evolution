@@ -96,8 +96,12 @@ class Slug extends DataObject
 		// title
 		$slug_title = param( 'slug_title', 'string', true );
 		// enable just numbers and letters and '-' and '_'
-		if( preg_match( '#^[0-9A-Za-z]|-|_+$#', $slug_title ) )
+		if( preg_match( '#^([0-9A-Za-z]|-)+$#', $slug_title ) )
 		{
+			if( $this->dbexists( 'slug_title', $slug_title ) )
+			{
+				$Messages->add( sprintf( T_('%s slug title is already exists!'), $slug_title ) ); 
+			}
 			$this->set( 'title', $slug_title );
 		}
 		else
