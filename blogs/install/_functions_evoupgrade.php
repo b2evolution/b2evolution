@@ -2638,7 +2638,26 @@ function upgrade_b2evo_tables()
 	task_begin( 'Extending Comment table... ' );
 	db_add_col( 'T_comments', 'comment_secret', 'varchar(32) NULL default NULL' );
 	task_end();
-	
+
+
+	// Create T_slug table and, Insert all slug from T_items
+	task_begin( 'Create Slug table... ' );
+	$DB->query( 'CREATE TABLE T_slug (
+					slug_ID int(10) unsigned NOT NULL auto_increment,
+					slug_title varchar(255) NOT NULL COLLATE ascii_bin,
+					slug_type char(6) NOT NULL DEFAULT "item",
+					slug_itm_ID int(11) unsigned,
+					PRIMARY KEY slug_title (slug_title),
+					UNIQUE	slug_ID (slug_ID)
+				) ENGINE = innodb' );
+	task_end();
+
+	task_begin( 'Insert existing slugs into Slug table... ' );
+	$DB->query( 'INSERT INTO T_slug( slug_title, slug_type, slug_itm_ID)
+						SELECT post_urltitle, "item", post_ID
+						FROM T_items__item' );
+	task_end();
+
 
 	/*
 	 * ADD UPGRADES HERE.
@@ -2814,6 +2833,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.358  2010/03/29 12:25:31  efy-asimo
+ * allow multiple slugs per post
+ *
  * Revision 1.357  2010/03/04 15:55:17  efy-asimo
  * integrate comment_secret into the upgrade procedure
  *

@@ -133,6 +133,7 @@ class ItemLight extends DataObject
 				array( 'table'=>'T_postcats', 'fk'=>'postcat_post_ID', 'msg'=>T_('%d links to extra categories') ),
 				array( 'table'=>'T_comments', 'fk'=>'comment_post_ID', 'msg'=>T_('%d comments') ),
 				array( 'table'=>'T_items__version', 'fk'=>'iver_itm_ID', 'msg'=>T_('%d versions') ),
+				array( 'table'=>'T_slug', 'fk'=>'slug_itm_ID', 'msg'=>T_('%d slugs') ),
 			);
 
 		$this->objtype = $objtype;
@@ -980,6 +981,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.35  2010/03/29 12:25:31  efy-asimo
+ * allow multiple slugs per post
+ *
  * Revision 1.34  2010/03/21 05:03:15  sam2kb
  * get_title: option to crop title to 'max_length' characters
  *

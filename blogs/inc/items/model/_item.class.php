@@ -39,7 +39,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Includes:
  */
 load_funcs( 'items/model/_item.funcs.php');
-
+load_class( 'slugs/model/_slug.class.php', 'Slug' );
 
 /**
  * Item Class
@@ -3312,8 +3312,11 @@ class Item extends ItemLight
 			$this->set_creator_User( $current_User );
 		}
 
-		// validate url title / slug
-		$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $this->dbprefix.'urltitle', $this->dbIDname, $this->dbtablename, $this->locale ) );
+		// Create new slug with validated title
+		$new_Slug = new Slug();
+		$new_Slug->set( 'title', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $new_Slug->dbprefix.'title', $new_Slug->dbIDname, $new_Slug->dbtablename, $this->locale ) );
+		$new_Slug->set( 'type', 'item' );
+		$this->set( 'urltitle', $new_Slug->get( 'title' ) );
 
 		$this->update_renderers_from_Plugins();
 
@@ -3335,6 +3338,10 @@ class Item extends ItemLight
 
 			// Let's handle the tags:
 			$this->insert_update_tags( 'insert' );
+
+			// Let's handle the slugs:
+			$new_Slug->set( 'itm_ID', $this->ID );
+			$new_Slug->dbinsert();
 
 			$DB->commit();
 
@@ -3375,7 +3382,15 @@ class Item extends ItemLight
 		if( empty($this->urltitle) || isset($this->dbchanges['post_urltitle']) )
 		{ // Url title has changed or is empty
 			// echo 'updating url title';
-			$this->set( 'urltitle', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $this->dbprefix.'urltitle', $this->dbIDname, $this->dbtablename, $this->locale ) );
+
+		    // Create new slug with validated title
+			$new_Slug = new Slug();
+			$new_Slug->set( 'title', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $new_Slug->dbprefix.'title', $new_Slug->dbIDname, $new_Slug->dbtablename, $this->locale ) );
+			$new_Slug->set( 'type', 'item' );
+			$new_Slug->set( 'itm_ID', $this->ID );
+
+			// Set item urltitle
+			$this->set( 'urltitle', $new_Slug->get( 'title' ) );
 		}
 
 		$this->update_renderers_from_Plugins();
@@ -3410,6 +3425,12 @@ class Item extends ItemLight
 
 			// Let's handle the tags:
 			$this->insert_update_tags( 'update' );
+			
+			// Let's handle the slugs:
+			if( isset( $new_Slug ) )
+			{
+				$new_Slug->dbinsert();
+			}
 
 			$this->delete_prerendered_content();
 
@@ -4151,6 +4172,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.185  2010/03/29 12:25:31  efy-asimo
+ * allow multiple slugs per post
+ *
  * Revision 1.184  2010/03/18 16:20:17  efy-asimo
  * bug about custom fields - fix
  *

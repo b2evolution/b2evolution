@@ -270,11 +270,25 @@ $schema_queries = array(
 			curr_enabled tinyint(1) NOT NULL DEFAULT 1,
 			PRIMARY KEY curr_ID (curr_ID),
 			UNIQUE curr_code (curr_code)
-		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_slug' => array(
+		'Creating table for Post slug title',
+		"CREATE TABLE T_slug (
+			slug_ID int(10) unsigned NOT NULL auto_increment,
+			slug_title varchar(255) NOT NULL COLLATE ascii_bin,
+			slug_type	char(6) NOT NULL DEFAULT 'item',
+			slug_itm_ID	int(11) unsigned,
+			PRIMARY KEY slug_title (slug_title),
+			UNIQUE	slug_ID (slug_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 );
 
 /*
  * $Log$
+ * Revision 1.46  2010/03/29 12:25:30  efy-asimo
+ * allow multiple slugs per post
+ *
  * Revision 1.45  2010/02/08 17:51:38  efy-yury
  * copyright 2009 -> 2010
  *

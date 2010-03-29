@@ -60,6 +60,7 @@ $db_config['aliases'] = array(
 		'T_users__fielddefs'      => $tableprefix.'users__fielddefs',
 		'T_users__fields'         => $tableprefix.'users__fields',
 		'T_users__usersettings'   => $tableprefix.'users__usersettings',
+		'T_slug'                  => $tableprefix.'slug',
 	);
 
 
@@ -96,6 +97,7 @@ $ctrl_mappings = array(
 		'registration' => 'users/registration.ctrl.php',
 		'groups'       => 'users/groups.ctrl.php',
 		'upload'       => 'files/upload.ctrl.php',
+		'slugs'        => 'slugs/slugs.ctrl.php',
 	);
 
 
@@ -210,6 +212,24 @@ function & get_UserFieldCache()
 
 
 /**
+ * Get the SlugCache
+ *
+ * @return SlugCache
+ */
+function & get_SlugCache()
+{
+	global $SlugCache;
+
+	if( ! isset( $SlugCache ) )
+	{	// Cache doesn't exist yet:
+		$SlugCache = new DataObjectCache( 'Slug', false, 'T_slug', 'slug_', 'slug_ID', 'slug_title', 'slug_title' );
+	}
+
+	return $SlugCache;
+}
+
+
+/**
  * _core_Module definition
  */
 class _core_Module extends Module
@@ -235,6 +255,7 @@ class _core_Module extends Module
 		load_class( '_core/model/db/_sql.class.php', 'SQL' );
 		load_class( '_core/ui/results/_results.class.php', 'Results' );
 		load_class( '_core/model/_blockcache.class.php', 'BlockCache' );
+		load_class( 'slugs/model/_slug.class.php', 'Slug' );
 	}
 
 	/**
@@ -646,6 +667,9 @@ class _core_Module extends Module
 								'plugins' => array(
 									'text' => T_('Plugins'),
 									'href' => '?ctrl=plugins'),
+								'slugs'	=> array(
+									'text' => T_('Slugs'),
+									'href' => '?ctrl=slugs'),
 							)
 						),
 					) );
@@ -778,6 +802,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.61  2010/03/29 12:25:30  efy-asimo
+ * allow multiple slugs per post
+ *
  * Revision 1.60  2010/02/26 15:52:20  efy-asimo
  * combine skin and skin settings tab into one single tab
  *
