@@ -64,7 +64,7 @@
  *           Line numbers do not make sense for short code blocks (and also for longer ones
  *           not necessarily).
  *       fp> how about if no line=".." attribute is specified then no numbering?
- *       dh> very OK with me. fp> yeah you gotta do it if you want it :p 
+ *       dh> very OK with me. fp> yeah you gotta do it if you want it :p
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -155,7 +155,6 @@ class code_highlight_plugin extends Plugin
 	}
 
 
-
 	/**
 	 * Allowing the user to override the display of the toolbar.
 	 *
@@ -210,6 +209,7 @@ class code_highlight_plugin extends Plugin
 		}
 		$this->DisplayCodeToolbar();
 	}
+
 
 	function DisplayCodeToolbar()
 	{
@@ -320,6 +320,7 @@ class code_highlight_plugin extends Plugin
 		}
 	}
 
+
 	function BeforeCommentFormInsert( $params )
 	{
 		if( $this->Settings->get( 'render_comments' ) )
@@ -328,8 +329,6 @@ class code_highlight_plugin extends Plugin
 			$params['Comment']->content =  preg_replace( '#(<\!--\s*codeblock[^-]*?\s*-->)<code>(.+?)</code>(<\!--\s+/codeblock\s*-->)#is', '$1<pre><code>$2</code></pre>$3', $params['Comment']->content );
 		}
 	}
-
-
 
 
 	/**
@@ -362,6 +361,7 @@ class code_highlight_plugin extends Plugin
 
 		return true;
 	}
+
 
 	/**
 	 * Perform rendering
@@ -565,7 +565,6 @@ class code_highlight_plugin extends Plugin
 	}
 
 
-
 	/**
 	 * Formats codeblock ready for displaying
 	 * Each language is stored as a classfile
@@ -630,12 +629,14 @@ class code_highlight_plugin extends Plugin
 		}
 		return $code;
 	}
-
 }
 
 
 /*
  * $Log$
+ * Revision 1.32  2010/03/29 19:59:20  blueyed
+ * Normalize whitespace.
+ *
  * Revision 1.31  2010/02/08 17:56:01  efy-yury
  * copyright 2009 -> 2010
  *
