@@ -1193,35 +1193,67 @@ class DB
 	/**
 	 * Format a SQL query
 	 * @static
-	 * @todo dh> Steal the code from phpMyAdmin :)
 	 * @param string SQL
 	 * @param boolean Format with/for HTML?
 	 */
-	function format_query( $sql, $html = true )
+	function format_query( $sql, $html = true, $maxlen = NULL )
 	{
 		$sql = trim( str_replace("\t", '  ', $sql ) );
+		if( $maxlen )
+		{
+			$sql = strmaxlen($sql, $maxlen, '...');
+		}
+
+		$new = '';
+		$word = '';
+		$in_comment = false;
+		$in_literal = false;
+		for( $i = 0, $n = strlen($sql); $i < $n; $i++ )
+		{
+			$c = $sql[$i];
+			if( $in_comment )
+			{
+				if( $in_comment === '/*' && substr($sql, $i, 2) == '*/' )
+					$in_comment = false;
+				elseif( $c == "\n" )
+					$in_comment = false;
+			}
+			elseif( $in_literal )
+			{
+				if( $c == $in_literal )
+					$in_literal = false;
+			}
+			elseif( $c == '#' || ($c == '-' && substr($sql, $i, 3) == '-- ') )
+			{
+				$in_comment = true;
+			}
+			elseif( ctype_space($c) )
+			{
+				$uword = strtoupper($word);
+				if( in_array($uword, array('SELECT', 'FROM', 'WHERE', 'GROUP', 'ORDER', 'LIMIT', 'VALUES', 'AND', 'OR', 'LEFT', 'RIGHT', 'INNER')) )
+				{
+					$new = rtrim($new)."\n".str_pad($word, 6, ' ', STR_PAD_LEFT).' ';
+					# Remove any trailing whitespace after keywords
+					while( ctype_space($sql[$i+1]) ) {
+						++$i;
+					}
+				}
+				else
+				{
+					$new .= $word.$c;
+				}
+				$word = '';
+				continue;
+			}
+			$word .= $c;
+		}
+		$sql = trim($new.$word);
+
 		if( $html )
-		{
-			$sql = htmlspecialchars( $sql );
-			$replace_prefix = "<br />\n";
+		{ // poor man's indent
+			$sql = preg_replace_callback("~^(\s+)~m", create_function('$m', 'return str_replace(" ", "&nbsp;", $m[1]);'), $sql);
+			$sql = nl2br($sql);
 		}
-		else
-		{
-			$replace_prefix = "\n";
-		}
-
-		// Split by FROM, WHERE, .. and AND, OR (if there's no comment sign before)
-		// TODO: dh> should not wrap in comments/string literals
-		$search = array(
-			'~(FROM|WHERE|GROUP BY|ORDER BY|LIMIT|VALUES)~',
-			'~(AND |OR )~',
-			);
-		$replace = array(
-				$replace_prefix.'$1',
-				$replace_prefix.( $html ? '&nbsp;' : ' ' ).' $1',
-			);
-		$sql = preg_replace( $search, $replace, $sql );
-
 		return $sql;
 	}
 
@@ -1264,39 +1296,39 @@ class DB
 		// Javascript function to toggle DIVs (EXPLAIN, results, backtraces).
 		if( $html )
 		{
-			echo '<script type="text/javascript">
-				function debug_onclick_toggle_div( div_id, text_show, text_hide ) {
-					var div = document.getElementById(div_id);
-
-					var a = document.createElement("a");
-					a.href= "#";
-					var a_onclick = function() {
-						if( div.style.display == \'\' ) {
-							div.style.display = \'none\';
-							a.innerHTML = " [" + text_show + "] ";
-						} else {
-							div.style.display = \'\';
-							a.innerHTML = " [" + text_hide + "] ";
-						}
-						return false;
-					};
-					a.onclick = a_onclick;
-					div.parentNode.insertBefore(a, div);
-					a_onclick();
-				};
-				</script>';
+			global $rsc_url;
+			echo '<script type="text/javascript" src="'.$rsc_url.'js/debug.js"></script>';
 		}
 
 		foreach( $this->queries as $i => $query )
 		{
 			$count_queries++;
 
+			$get_md5_query = create_function( '', '
+				static $r; if( isset($r) ) return $r;
+				global $query;
+				$r = md5(serialize($query))."-".rand();
+				return $r;' );
+
 			if ( $html )
 			{
 				echo '<h4>Query #'.$count_queries.': '.$query['title']."</h4>\n";
-				echo '<code>';
-				echo $this->format_query( $query['sql'] );
-				echo "</code>\n";
+
+				$div_id = 'db_query_sql_'.$i.'_'.$get_md5_query();
+				if( strlen($query['sql']) > 512 )
+				{
+					$sql_short = $this->format_query( $query['sql'], true, 512 );
+					$sql = $this->format_query( $query['sql'], true );
+
+					echo '<code id="'.$div_id.'" style="display:none">'.$sql_short.'</code>';
+					echo '<code id="'.$div_id.'_full">'.$sql.'</code>';
+					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.','.$div_id.'_full", "Hide full SQL", "Show full SQL");</script>';
+				}
+				else
+				{
+					echo '<code>'.$this->format_query( $query['sql'] ).'</code>';
+				}
+				echo "\n";
 			}
 			else
 			{
@@ -1374,11 +1406,6 @@ class DB
 			}
 			echo $html ? '</div>' : "\n\n";
 
-			if( $this->debug_explain_joins || $query['results'] != 'unknown' || isset($query_['function_trace']) )
-			{
-				$md5_query = md5(serialize($query));
-			}
-
 			// EXPLAIN JOINS ??
 			if( $this->debug_explain_joins && preg_match( '#^ [\s(]* SELECT \s #ix', $query['sql']) )
 			{ // Query was a select, let's try to explain joins...
@@ -1390,15 +1417,16 @@ class DB
 
 					if( $html )
 					{
-						$div_id = 'db_query_explain_'.$i.'_'.$md5_query;
+						$div_id = 'db_query_explain_'.$i.'_'.$get_md5_query();
 						echo '<div id="'.$div_id.'">';
 						echo $this->debug_get_rows_table( 100, true );
 						echo '</div>';
 						echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show EXPLAIN", "Hide EXPLAIN");</script>';
-				}
-				else
-				{ // TODO: dh> contains html.
-					echo $query['explain'];
+					}
+					else
+					{ // TODO: dh> contains html.
+						echo $this->debug_get_rows_table( 100, true );
+					}
 				}
 			}
 
@@ -1407,19 +1435,18 @@ class DB
 			{
 				if( $html )
 				{
-					$div_id = 'db_query_profile_'.$i.'_'.md5(serialize($query));
+					$div_id = 'db_query_profile_'.$i.'_'.$get_md5_query();
 					echo '<div id="'.$div_id.'">';
 					echo $query['profile'];
 					echo '</div>';
 					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show PROFILE", "Hide PROFILE");</script>';
-					}
-					else
-					{ // TODO: dh> contains html.
-						echo $this->debug_get_rows_table( 100, true );
-					}
-
-					mysql_free_result($this->result);
 				}
+				else
+				{ // TODO: dh> contains html.
+					echo $this->debug_get_rows_table( 100, true );
+				}
+
+				mysql_free_result($this->result);
 			}
 
 			// Results:
@@ -1427,7 +1454,7 @@ class DB
 			{
 				if( $html )
 				{
-					$div_id = 'db_query_results_'.$i.'_'.md5(serialize($query));
+					$div_id = 'db_query_results_'.$i.'_'.$get_md5_query();
 					echo '<div id="'.$div_id.'">';
 					echo $query['results'];
 					echo '</div>';
@@ -1444,7 +1471,7 @@ class DB
 			{
 				if( $html )
 				{
-					$div_id = 'db_query_backtrace_'.$i.'_'.md5(serialize($query));
+					$div_id = 'db_query_backtrace_'.$i.'_'.$get_md5_query();
 					echo '<div id="'.$div_id.'">';
 					echo $query['function_trace'];
 					echo '</div>';
@@ -1462,20 +1489,26 @@ class DB
 		}
 
 		$time_queries_profiled = number_format($time_queries_profiled, 4);
-		$time_diff_percentage = $time_queries_profiled != 0 ? round($time_queries / $time_queries_profiled * 100) : 0;
+		$time_diff_percentage = $time_queries_profiled != 0 ? round($time_queries / $time_queries_profiled * 100) : false;
 		if ( $html )
 		{
 			echo "\nTotal rows: $count_rows<br />\n";
 			echo "\nMeasured time: {$time_queries}s<br />\n";
 			echo "\nProfiled time: {$time_queries_profiled}s<br />\n";
-			echo "\nTime difference: {$time_diff_percentage}%<br />\n";
+			if( $time_diff_percentage !== false )
+			{
+				echo "\nTime difference: {$time_diff_percentage}%<br />\n";
+			}
 		}
 		else
 		{
 			echo 'Total rows: '.$count_rows."\n";
 			echo "Measured time: {$time_queries}s\n";
 			echo "Profiled time: {$time_queries_profiled}s\n";
-			echo "Time difference: {$time_diff_percentage}%\n";
+			if( $time_diff_percentage !== false )
+			{
+				echo "Time difference: {$time_diff_percentage}%\n";
+			}
 		}
 	}
 
@@ -1665,6 +1698,12 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.51  2010/03/29 19:02:00  blueyed
+ * DB class: improve debugging
+ *  - Improve format_query parsing
+ *  - dump_queries: crop long queries (toggable)
+ *  - Move toggle JS to rsc/js/debug.js
+ *
  * Revision 1.50  2010/02/08 17:51:51  efy-yury
  * copyright 2009 -> 2010
  *
