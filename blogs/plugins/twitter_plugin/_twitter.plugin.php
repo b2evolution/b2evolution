@@ -17,6 +17,8 @@
  * @author Lee Turner
  * @author fplanque: Francois PLANQUE.
  *
+ * @todo dh> use OAuth instead of username/password: http://apiwiki.twitter.com/Authentication
+ *
  * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -255,6 +257,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.18  2010/03/29 19:35:14  blueyed
+ * doc/todo
+ *
  * Revision 1.17  2009/09/15 18:02:05  fplanque
  * please make a separate plugin for identi.ca
  *
