@@ -1975,7 +1975,7 @@ class Item extends ItemLight
 
 		$FileList->sql = $SQL->get();
 
-		$FileList->query( false, false, false );
+		$FileList->query( false, false, false, 'get_attachment_FileList' );
 
 		return $FileList;
 	}
@@ -4172,6 +4172,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.186  2010/03/29 20:17:44  blueyed
+ * Query title. This needs optimization.
+ *
  * Revision 1.185  2010/03/29 12:25:31  efy-asimo
  * allow multiple slugs per post
  *
