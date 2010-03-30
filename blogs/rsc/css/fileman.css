@@ -152,7 +152,7 @@ table.filelist td.icon_type {
 	white-space: nowrap;
 	width: 1%;
 	max-width:500px; /* safetynet for backtraces in here */
-	overflow:hidden; /* safetynet for backtraces in here */
+	overflow:auto; /* safetynet for backtraces in here */
 }
 table.filelist td#fileman_error, /* used when an error (e.g. "no files") gets displayed */
 table.filelist td.fm_filename {
