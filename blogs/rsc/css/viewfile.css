@@ -1,4 +1,4 @@
-/* This file has been lost. Quick regen... */
+/* This file has been lost. Quick regen... OMG! */
 
 @import url("basic.css");	/* Import basic styles */
 
@@ -7,11 +7,15 @@ body {
 	padding: 0;
 }
 
-.fileheader {
-	background: #ccc;
+.content-type-text .filebody {
+	margin:1em;
 }
 
-.fileheader p,
+.fileheader, .eof {
+	background: #ccc;
+	padding:1ex;
+}
+
 div.subline p {
 	margin: 0;
 }
@@ -22,7 +26,7 @@ pre.rawcontent {
 }
 
 div.img_preview {
-	background: #ccc;	
+	background: #ccc;
 	text-align: center;
 }
 div.img_preview img {
@@ -39,10 +43,8 @@ div.subline {
 	border: 1px solid #000;
 }
 
-.linenr {
-	background: #ddd;
-}
-
-.eof {
-	background: #ccc;
+div.filecode {
+	font-family:monospace;
+	color:black;
+	font-weight:normal;font-style:normal; /* to be sure */
 }
