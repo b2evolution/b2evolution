@@ -1432,7 +1432,7 @@ class Item extends ItemLight
 
 		$content_page = $this->get_content_page($params['disppage'], $params['format']);
 
-		return strpos($content_page, '<!--more-->') !== false 
+		return strpos($content_page, '<!--more-->') !== false
 			|| $this->get_images( array('restrict_to_image_position'=>'aftermore') );
 	}
 
@@ -3425,7 +3425,7 @@ class Item extends ItemLight
 
 			// Let's handle the tags:
 			$this->insert_update_tags( 'update' );
-			
+
 			// Let's handle the slugs:
 			if( isset( $new_Slug ) )
 			{
@@ -4172,6 +4172,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.187  2010/03/30 23:23:13  blueyed
+ * whitespace
+ *
  * Revision 1.186  2010/03/29 20:17:44  blueyed
  * Query title. This needs optimization.
  *

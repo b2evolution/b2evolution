@@ -374,7 +374,7 @@ switch( $action )
 		// We are probably comming from 'createnew' but there is no guarantee!
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
-		
+
 		// Check permission:
 		$current_User->check_perm( 'files', 'add', true, $blog ? $blog : NULL );
 
@@ -501,7 +501,7 @@ switch( $action )
 
 	case 'update_file':
 		// Update File:
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
 
@@ -976,7 +976,7 @@ switch( $action )
 	case 'edit_file':
 		// TODO: We don't need the Filelist, move UP!
 		// Edit Text File
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
 
@@ -1012,7 +1012,7 @@ switch( $action )
 	case 'edit_properties':
 		// TODO: We don't need the Filelist, move UP!
 		// Edit File properties (Meta Data)
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
 
@@ -1051,11 +1051,11 @@ switch( $action )
 		{
 			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $edited_File->dget('name') ), 'note' );
 		}
-		
+
 		$old_name = $edited_File->get_name();
 		$new_name = param( 'name', 'string', '' );
 		$error_occured = false;
-		
+
 		if( $new_name != $old_name)
 		{ // Name has changed...
 			$allow_locked_filetypes = $current_User->check_perm( 'files', 'all' );
@@ -1070,7 +1070,7 @@ switch( $action )
 				{
 					$Messages->add( sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'),
 							$old_name, $new_name ), 'success' );
-					
+
 					// We have renamed teh file, update caches:
 					$fm_Filelist->update_caches();
 				}
@@ -1096,10 +1096,10 @@ switch( $action )
 
 	case 'link_user':
 		// TODO: We don't need the Filelist, move UP!
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
-		
+
 		// Link File to User:
 		if( ! isset($edited_User) )
  		{	// No User to link to
@@ -1157,7 +1157,7 @@ switch( $action )
 	case 'link_inpost':	// In the context of a post
 		// TODO: We don't need the Filelist, move UP!
 		// Link File to Item
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
 
@@ -1179,16 +1179,16 @@ switch( $action )
 			$Messages->add( T_('Nothing selected.'), 'error' );
 			break;
 		}
-		
+
 		$files_count = $selected_Filelist->count();
 		while( $edited_File = & $selected_Filelist->get_next() )
 		{	// Let's make the link!
 			$edited_File->link_to_Item($edited_Item);
-			
+
 			// Reset LinkCache to autoincrement link_order
 			if( $files_count > 1 ) unset($GLOBALS['LinkCache']);
 		}
-		
+
 		// Forget selected files
 		if( $files_count > 1 ) $fm_selected = NULL;
 
@@ -1213,7 +1213,7 @@ switch( $action )
 	case 'unlink':
 		// TODO: We don't need the Filelist, move UP!
 		// Unlink File from Item (or other object if extended):
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'link' );
 
@@ -1509,7 +1509,7 @@ switch( $fm_mode )
 
 			// Check that this action request is not a CSRF hacked request:
 			$Session->assert_received_crumb( 'file' );
-			
+
 			// Loop through files:
 			$fm_source_Filelist->restart();
 			while( $loop_src_File = & $fm_source_Filelist->get_next() )
@@ -1758,6 +1758,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.68  2010/03/30 23:24:12  blueyed
+ * whitespace
+ *
  * Revision 1.67  2010/03/28 17:08:09  fplanque
  * minor
  *
