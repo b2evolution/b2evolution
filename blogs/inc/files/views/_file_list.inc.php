@@ -421,7 +421,8 @@ $Form->begin_form();
 		{ // User can edit:
 			if( $lFile->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
 			{
-				echo action_icon( T_('Edit file...'), 'edit', regenerate_url( 'fm_selected', 'action=edit_file&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
+				global $Session;
+				echo action_icon( T_('Edit file...'), 'edit', regenerate_url( 'fm_selected', 'action=edit_file&amp;crumb_file='.$Session->create_crumb('file').'&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
 			}
 			else
 			{
@@ -682,6 +683,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.38  2010/03/30 23:25:09  blueyed
+ * Fix edit file links. They were missing the crumb. Coming next: Syntax highlighting.
+ *
  * Revision 1.37  2010/03/28 17:08:08  fplanque
  * minor
  *
