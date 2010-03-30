@@ -62,12 +62,29 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	echo '<table cellspacing="0" class="compose_layout">';
 
 	echo '<tr><td width="1%"><strong>'.T_('In response to').':</strong></td>';
-	echo '<td class="input">';
+	echo '<td>';
 	$comment_Item = & $edited_Comment->get_Item();
 	$comment_Item->title( array(
 			'link_type' => 'admin_view',
+			'max_length' => '30'
 		) );
-	echo '</td></tr>';
+	echo '</td>';
+
+	if( $Blog->get_owner_User()->ID == $current_User->ID )
+	{ // User has prmission to change comment's post
+		$Form->switch_layout( 'none' );
+
+		// Move to another post
+		echo '<td width="1%">&nbsp;&nbsp;<strong>'.T_('Move to post ID').':</strong></td>';
+		echo '<td class="input">';
+		$Form->text_input( 'moveto_post', $comment_Item->ID, 20, '', '', array('maxlength'=>100, 'style'=>'width:25%;') );
+		echo '</td>';
+
+		$Form->switch_layout( NULL );
+	}
+
+	echo '</tr></table>';
+	echo '<table cellspacing="0" class="compose_layout">';
 
 	if( ! $edited_Comment->get_author_User() )
 	{ // This is not a member comment
@@ -75,7 +92,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 		echo '<tr><td width="1%"><strong>'.T_('Author').':</strong></td>';
 		echo '<td class="input">';
-		$Form->text_input( 'newcomment_author', $edited_Comment->author, 20, '', '', array('maxlength'=>100, 'style'=>'width: 100%;') );
+		$Form->text_input( 'newcomment_author', $edited_Comment->author, 20, '', '', array('maxlength'=>100, 'style'=>'width: 100%;' ) );
 		echo '</td></tr>';
 
 		echo '<tr><td width="1%"><strong>'.T_('Email').':</strong></td>';
@@ -279,6 +296,9 @@ echo_comment_publishbt_js();
 
 /*
  * $Log$
+ * Revision 1.17  2010/03/30 11:14:03  efy-asimo
+ * move comments from one post to another
+ *
  * Revision 1.16  2010/02/08 17:52:13  efy-yury
  * copyright 2009 -> 2010
  *

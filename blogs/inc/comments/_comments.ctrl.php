@@ -121,6 +121,33 @@ switch( $action )
 			$edited_Comment->set( 'allow_msgform', $comment_allow_msgform );
 		}
 
+		// Move to different post
+		if( param( 'moveto_post', 'string', false ) )
+		{ // Move to post is set
+			$comment_Item = & $edited_Comment->get_Item();
+			if( $comment_Item->ID != $moveto_post )
+			{ // Move to post was changed
+				// Check destination post
+				$ItemCache = & get_ItemCache();
+				if( ( $dest_Item = $ItemCache->get_by_ID( $moveto_post, false, false) ) !== false )
+				{ // the item exists
+					if( $current_User->ID == $dest_Item->get_Blog()->get_owner_User()->ID &&
+						$current_User->ID == $comment_Item->get_Blog()->get_owner_User()->ID )
+					{ // current user has permission
+						$edited_Comment->set_Item( $dest_Item );
+					}
+					else
+					{
+						$Messages->add( T_('Destination post blog owner is different!'), 'error' );
+					}
+				}
+				else
+				{ // the item doesn't exists
+					$Messages->add( sprintf( T_('Post ID &laquo;%d&raquo; does not exist!'), $moveto_post ), 'error' );
+				}
+			}
+		}
+
 		// Content:
 		param( 'content', 'html' );
 		param( 'post_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 );
@@ -333,6 +360,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.26  2010/03/30 11:14:01  efy-asimo
+ * move comments from one post to another
+ *
  * Revision 1.25  2010/03/15 17:12:09  efy-asimo
  * Add filters to Comment page
  *
