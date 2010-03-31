@@ -261,7 +261,7 @@ if( $fm_FileRoot )
 
 		if( !is_dir( $ads_list_path ) )
 		{ // This should never happen, but just in case the diretory does not exist:
-			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $path ), 'error' );
+			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $path ), 'error' ); # better "path" than "directory"
 			$path = '';		// fp> added
 			$ads_list_path = NULL;
 		}
@@ -502,6 +502,8 @@ switch( $action )
 	case 'update_file':
 		// Update File:
 
+		# TODO: dh> Changes linebreaks! e.g. "\n" => "\r\n", when only saving again.
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
 
@@ -527,18 +529,24 @@ switch( $action )
 		param( 'file_content', 'html', '', false );
 
 
-    $full_path = $edited_File->get_full_path();
-		if( $rsc_handle = fopen( $full_path, 'w+') )
+    $fpath = $edited_File->get_full_path();
+    if( file_exists($fpath) && ! is_writeable($fpath) ) {
+    	$Messages->add( sprintf('The file &laquo;%s&raquo; is not writable.', rel_path_to_base($fpath)), 'error' );
+    	break;
+    }
+
+    # TODO: dh> just use file_put_contents
+    $fh = fopen( $fpath, 'w+');
+		if( $fh )
 		{
-			fwrite( $rsc_handle, $file_content );
-			fclose( $rsc_handle );
+			fwrite( $fh, $file_content );
+			fclose( $fh );
 			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; has been updated.' ), $edited_File->dget('name') ), 'success' );
 		}
 		else
 		{
 			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; could not be updated.' ), $edited_File->dget('name') ), 'error' );
 		}
-
 		header_redirect( regenerate_url( '', '', '', '&' ) );
 		// $action = 'list';
 		break;
@@ -1758,6 +1766,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.69  2010/03/31 00:01:17  blueyed
+ * Improve handling of non-writable file (update_file).
+ *
  * Revision 1.68  2010/03/30 23:24:12  blueyed
  * whitespace
  *
