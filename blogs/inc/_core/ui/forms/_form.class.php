@@ -2438,7 +2438,6 @@ class Form extends Widget
 	function add_crumb( $crumb_name )
 	{
 		global $Session;
-
 		$this->hidden( 'crumb_'.$crumb_name, $Session->create_crumb( $crumb_name ) );
 	}
 
@@ -3054,6 +3053,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.82  2010/03/31 00:00:13  blueyed
+ * whitespace
+ *
  * Revision 1.81  2010/02/08 17:51:58  efy-yury
  * copyright 2009 -> 2010
  *
