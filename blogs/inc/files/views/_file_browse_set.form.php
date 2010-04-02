@@ -61,7 +61,8 @@ $Form->begin_form( 'fform', T_('Display settings') );
 	$Form->end_fieldset();
 
 	$Form->begin_fieldset( T_('Options') );
-		$Form->checkbox( 'option_showhidden', $UserSettings->get('fm_showhidden'), T_('Hidden files'), T_('Check to show hidden files. Hidden files start with a dot (.)') );
+		$Form->checkbox( 'option_showhidden', $UserSettings->get('fm_showhidden'), T_('Hidden files'), T_('Check this to show system hidden files. System hidden files start with a dot (.)') );
+		$Form->checkbox( 'option_showevocache', $UserSettings->get('fm_showevocache'), '', T_('Check this to show _evocache folders (not recommended)') );
 		$Form->checkbox( 'option_dirsattop', !$UserSettings->get('fm_dirsnotattop'), T_('Folders first'), T_('Check to always display folders before files') );
 		$Form->checkbox( 'option_recursivedirsize', $UserSettings->get('fm_recursivedirsize'), T_('Folder sizes'), T_('Check to compute recursive size of folders') );
 		$Form->radio_input( 'option_allowfiltering', $UserSettings->get('fm_allowfiltering'), array(
@@ -90,6 +91,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update_settings]', T_('Upd
 
 /*
  * $Log$
+ * Revision 1.9  2010/04/02 07:27:11  efy-asimo
+ * cache folders rename and Filelist navigation - fix
+ *
  * Revision 1.8  2010/03/28 17:08:08  fplanque
  * minor
  *

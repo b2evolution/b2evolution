@@ -249,6 +249,13 @@ class Filelist
 	var $_show_hidden_files = false;
 
 	/**
+	 * User preference: Load and show _evocache folder?
+	 *
+	 * @var boolean
+	 */
+	var $_show_evocache = false;
+
+	/**
 	 * User preference: recursive size of dirs?
 	 *
 	 * The load() & sort() methods use this.
@@ -337,6 +344,12 @@ class Filelist
 			// Check for hidden status...
 			if( ( ! $this->_show_hidden_files) && (substr($name, 0, 1) == '.') )
 			{ // Do not load & show hidden files (prefixed with .)
+				continue;
+			}
+
+			// Check for _evocache...
+			if( ( ! $this->_show_evocache ) && ( $name == '_evocache') )
+			{ // Do not load & show _evocache folder
 				continue;
 			}
 
@@ -1247,6 +1260,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.10  2010/04/02 07:27:11  efy-asimo
+ * cache folders rename and Filelist navigation - fix
+ *
  * Revision 1.9  2010/02/08 17:52:18  efy-yury
  * copyright 2009 -> 2010
  *

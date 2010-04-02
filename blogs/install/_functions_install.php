@@ -341,6 +341,7 @@ function create_default_settings( $override = array() )
 		'default_locale' => $default_locale,
 		'newusers_grp_ID' => $Group_Users->ID,
 		'default_blog_ID' => 1,
+		'evocache_foldername' => '_evocache',
 	);
 
 	$settings = array_merge( array_keys($defaults), array_keys($override) );
@@ -835,6 +836,9 @@ function get_antispam_query()
 
 /*
  * $Log$
+ * Revision 1.92  2010/04/02 07:27:11  efy-asimo
+ * cache folders rename and Filelist navigation - fix
+ *
  * Revision 1.91  2010/03/22 23:50:55  fplanque
  * Fixed widget install factorization
  *

@@ -444,11 +444,13 @@ function get_canonical_path( $ads_path )
 	{
 		$ads_path = str_replace( '/./', '/', $ads_path );
 	}
-	while( ($ads_realpath = preg_replace( '#(^|/)([^/^.]+)/\.\./#', '$1', $ads_path )) != $ads_path )
-	{ // While we find /../ back references to dereference...
-		// echo '*';
-		$ads_path = $ads_realpath;
+	if( ( $substr_index = strpos( $ads_path, '/../' ) ) !== false )
+	{ // we founnd /../ back reference to dereference...
+		$ads_path = substr( $ads_path, 0, $substr_index );
+		// we need the last parent folder path
+		$ads_path = substr( $ads_path, 0, strrpos( $ads_path, '/' ) + 1 );
 	}
+	$ads_realpath = $ads_path;
 
 	// pre_dump( 'get_canonical_path()', $ads_path, $ads_realpath );
 
@@ -673,6 +675,7 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 	{
 		// We'll go through files in current dir:
 		$Nodelist = new Filelist( $Root, trailing_slash($ads_full_path) );
+		check_showparams( $Nodelist );
 		$Nodelist->load();
 		$Nodelist->sort( 'name' );
 		$has_sub_dirs = $Nodelist->count_dirs();
@@ -938,7 +941,7 @@ function file_controller_build_tabs()
  *
  * @param string old evocache folder name
  * @param string new evocache folder name
- *
+ * @return bool true on success
  */
 function rename_cachefolders( $oldname, $newname )
 {
@@ -946,19 +949,23 @@ function rename_cachefolders( $oldname, $newname )
 
 	$available_Roots = $FileRootCache->get_available_FileRoots();
 
+	$result = true;
 	foreach( $available_Roots as $fileRoot )
 	{
 		$dirnames = get_filenames( $fileRoot->ads_path, false );
 		foreach( $dirnames as $dirname )
 		{ // search ?evocache folders
-			$position = strrpos( $dirname, $oldname );
+			// searching at the end of the path -> ?evocache length = 9
+			$position = strrpos( $dirname, $oldname, strlen( $dirname ) - 9 );
 			if( $position !== false )
 			{ // this is a ?evocache folder
 				$new_dirname = str_replace( $oldname, $newname, $dirname);
-				@rename( $dirname, $new_dirname );
+				// result is true only if all rename call return true (success)
+				$result = $result && @rename( $dirname, $new_dirname );
 			}
 		}
 	}
+	return $result;
 }
 
 
@@ -994,8 +1001,26 @@ function delete_cachefolders( $Log = NULL )
 }
 
 
+function check_showparams( & $Filelist )
+{
+	global $UserSettings;
+
+	if( $UserSettings->param_Request( 'fm_showhidden', 'fm_showhidden', 'integer', 0 ) )
+	{
+		$Filelist->_show_hidden_files = true;
+	}
+	if( $UserSettings->param_Request( 'fm_showevocache', 'fm_showevocache', 'integer', 0 ) )
+	{
+		$Filelist->_show_evocache = true;
+	}
+}
+
+
 /*
  * $Log$
+ * Revision 1.38  2010/04/02 07:27:11  efy-asimo
+ * cache folders rename and Filelist navigation - fix
+ *
  * Revision 1.37  2010/03/27 19:57:30  blueyed
  * Add delete_cachefolders function and use it in the Tools Misc actions and with the watermark plugin. The latter will also remove caches when it gets enabled or disabled.
  *

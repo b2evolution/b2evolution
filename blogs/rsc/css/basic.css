@@ -563,6 +563,14 @@ td.error {
 	background:#fbf2ee;
 	color:#e00;
 }
+div.log_container div.log_redwarning,
+div.action_messages div.log_redwarning,
+div.redwarning,
+td.redwarning {
+	border:1px solid #d99;
+	background:#fbf2ee;
+	color:#e00;
+}
 
 p.error,
 span.error,

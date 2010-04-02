@@ -487,6 +487,7 @@ switch( $action )
 		$UserSettings->set( 'fm_showfsgroup',      param( 'option_showfsgroup',      'integer', 0 ) );
 
 		$UserSettings->set( 'fm_showhidden',       param( 'option_showhidden',       'integer', 0 ) );
+		$UserSettings->set( 'fm_showevocache',     param( 'option_showevocache',     'integer', 0 ) );
 		$UserSettings->set( 'fm_recursivedirsize', param( 'option_recursivedirsize', 'integer', 0 ) );
 		$UserSettings->set( 'fm_allowfiltering',   param( 'option_allowfiltering', 'string', 'simple' ) );
 
@@ -575,10 +576,7 @@ if( $UserSettings->param_Request( 'fm_recursivedirsize', 'fm_recursivedirsize', 
 {
 	$fm_Filelist->_use_recursive_dirsize = true;
 }
-if( $UserSettings->param_Request( 'fm_showhidden', 'fm_showhidden', 'integer', 0 ) )
-{
-	$fm_Filelist->_show_hidden_files = true;
-}
+check_showparams( $fm_Filelist );
 if( param( 'fm_flatmode', '', NULL, true ) )
 {
 	$fm_Filelist->flatmode = true;
@@ -1766,6 +1764,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.70  2010/04/02 07:27:11  efy-asimo
+ * cache folders rename and Filelist navigation - fix
+ *
  * Revision 1.69  2010/03/31 00:01:17  blueyed
  * Improve handling of non-writable file (update_file).
  *

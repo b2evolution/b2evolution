@@ -146,7 +146,14 @@ switch( $action )
 			$old_foldername = $Settings->get( 'evocache_foldername' );
 			if( $old_foldername != $evocache_foldername)
 			{ // ?evocache folder name has changed
-				rename_cachefolders( $old_foldername, $evocache_foldername );
+				if( rename_cachefolders( $old_foldername, $evocache_foldername ) )
+				{
+					$Messages->add( sprintf( T_( 'All %s folders have been renamed to %s' ), $old_foldername, $evocache_foldername ), 'success' );
+				}
+				else
+				{
+					$Messages->add( sprintf( T_( 'Some %s folders could not be renamed to %s' ), $old_foldername, $evocache_foldername ), 'redwarning' );
+				}
 				$Settings->set( 'evocache_foldername', $evocache_foldername );
 			}
 
@@ -198,6 +205,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2010/04/02 07:27:11  efy-asimo
+ * cache folders rename and Filelist navigation - fix
+ *
  * Revision 1.11  2010/03/28 17:08:08  fplanque
  * minor
  *
