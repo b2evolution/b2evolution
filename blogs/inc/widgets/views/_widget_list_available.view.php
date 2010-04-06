@@ -106,7 +106,7 @@ if( ! empty($Plugin_array) )
 	foreach( $Plugin_array as $ID => $Plugin )
 	{
 		echo '<li>';
-		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code ).'" title="'.T_('Add this widget to the container').'">';
+		echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code.'&amp;'.url_crumb('widget') ).'" title="'.T_('Add this widget to the container').'">';
 		echo get_icon( 'new' ).'<strong>'.$Plugin->name.'</strong>';
 		echo '</a> <span class="notes">'.$Plugin->short_desc.'</span>';
 		echo '</li>';
@@ -117,6 +117,9 @@ echo '</ul>';
 
 /*
  * $Log$
+ * Revision 1.29  2010/04/06 16:01:26  waltercruz
+ * Crumbs was missing from Plugin Widgets
+ *
  * Revision 1.28  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *
