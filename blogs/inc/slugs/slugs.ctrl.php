@@ -125,7 +125,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Slug->check_delete( sprintf( T_('Cannot delete goal &laquo;%s&raquo;'), $edited_Slug->dget('title') ), array(), false, false ) )
+			if( ! $edited_Slug->check_delete( sprintf( T_('Cannot delete slug &laquo;%s&raquo;'), $edited_Slug->dget('title') ), array(), true ) )
 			{	// There are restrictions:
 				$action = 'list';
 			}

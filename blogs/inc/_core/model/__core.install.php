@@ -279,13 +279,16 @@ $schema_queries = array(
 			slug_title varchar(255) NOT NULL COLLATE ascii_bin,
 			slug_type	char(6) NOT NULL DEFAULT 'item',
 			slug_itm_ID	int(11) unsigned,
-			PRIMARY KEY slug_title (slug_title),
-			UNIQUE	slug_ID (slug_ID)
+			PRIMARY KEY slug_ID (slug_ID),
+			UNIQUE	slug_title (slug_title)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 );
 
 /*
  * $Log$
+ * Revision 1.47  2010/04/07 08:26:10  efy-asimo
+ * Allow multiple slugs per post - update & fix
+ *
  * Revision 1.46  2010/03/29 12:25:30  efy-asimo
  * allow multiple slugs per post
  *

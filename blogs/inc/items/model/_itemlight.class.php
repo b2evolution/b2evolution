@@ -59,8 +59,10 @@ class ItemLight extends DataObject
  	var $title;
 
  	var $excerpt;
+ 
+ 	var $urltitle;
 
-	var $urltitle;
+	var $canonical_slug_ID;
 
 	/**
 	 * External URL the item links to (if any).
@@ -153,6 +155,7 @@ class ItemLight extends DataObject
 			$this->datestart = $db_row->post_datestart;
 			$this->mod_date = $db_row->post_datemodified;
 			$this->main_cat_ID = $db_row->post_main_cat_ID;
+			$this->canonical_slug_ID = $db_row->post_canonical_slug_ID;
 			$this->urltitle = $db_row->post_urltitle;
 			$this->title = $db_row->post_title;
 			$this->excerpt = $db_row->post_excerpt;
@@ -940,6 +943,9 @@ class ItemLight extends DataObject
 			case 'ptyp_ID':
 				return $this->set_param( $parname, 'number', $parvalue, true );
 
+			case 'canonical_slug_ID':
+				return $this->set_param( $parname, 'number', $parvalue, true );
+
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
@@ -981,6 +987,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2010/04/07 08:26:11  efy-asimo
+ * Allow multiple slugs per post - update & fix
+ *
  * Revision 1.35  2010/03/29 12:25:31  efy-asimo
  * allow multiple slugs per post
  *

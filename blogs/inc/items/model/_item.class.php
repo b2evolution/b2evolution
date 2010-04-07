@@ -3341,16 +3341,21 @@ class Item extends ItemLight
 
 			// Let's handle the slugs:
 			$new_Slug->set( 'itm_ID', $this->ID );
-			$new_Slug->dbinsert();
+			if( $result = ( $result && $new_Slug->dbinsert() ) )
+			{
+				$this->set( 'canonical_slug_ID', $new_Slug->ID );
+				if( $result = ( $result && parent::dbupdate() ) )
+				{
+					$DB->commit();
 
-			$DB->commit();
-
-			if( isset($Plugins) )
-			{	// Note: Plugins may not be available during maintenance, install or test cases
-				$Plugins->trigger_event( 'AfterItemInsert', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
+					if( isset($Plugins) )
+					{	// Note: Plugins may not be available during maintenance, install or test cases
+						$Plugins->trigger_event( 'AfterItemInsert', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
+					}
+				}
 			}
 		}
-		else
+		if( ! $result )
 		{
 			$DB->rollback();
 		}
@@ -3367,7 +3372,7 @@ class Item extends ItemLight
 	 * @param boolean do we want to auto track the mod date?
 	 * @return boolean true on success
 	 */
-	function dbupdate( $auto_track_modification = true )
+	function dbupdate( $auto_track_modification = true, $update_slug = true )
 	{
 		global $DB, $Plugins;
 
@@ -3379,7 +3384,7 @@ class Item extends ItemLight
 		}
 
 		// validate url title / slug
-		if( empty($this->urltitle) || isset($this->dbchanges['post_urltitle']) )
+		if( ( empty($this->urltitle) || isset($this->dbchanges['post_urltitle']) ) && $update_slug )
 		{ // Url title has changed or is empty
 			// echo 'updating url title';
 
@@ -3417,7 +3422,7 @@ class Item extends ItemLight
 			$DB->query( $sql, 'Save a version of the Item' );
 		}
 
-		if( ( $result = parent::dbupdate( $auto_track_modification ) ) !== false )
+		if( $result = ( parent::dbupdate( $auto_track_modification ) !== false ) )
 		{ // We could update the item object:
 
 			// Let's handle the extracats:
@@ -3429,9 +3434,17 @@ class Item extends ItemLight
 			// Let's handle the slugs:
 			if( isset( $new_Slug ) )
 			{
-				$new_Slug->dbinsert();
+				$new_Slug->set( 'itm_ID', $this->ID );
+				if( $result = $result && $new_Slug->dbinsert() )
+				{
+					$this->set( 'canonical_slug_ID', $new_Slug->ID );
+					$result = $result && parent::dbupdate();
+				}
 			}
+		}
 
+		if( $result )
+		{
 			$this->delete_prerendered_content();
 
 			$DB->commit();
@@ -3440,7 +3453,7 @@ class Item extends ItemLight
 		}
 		else
 		{
-			$DB->commit();
+			$DB->rollback();
 		}
 
 		// Load the blog we're in:
@@ -4172,6 +4185,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.188  2010/04/07 08:26:10  efy-asimo
+ * Allow multiple slugs per post - update & fix
+ *
  * Revision 1.187  2010/03/30 23:23:13  blueyed
  * whitespace
  *

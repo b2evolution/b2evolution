@@ -242,47 +242,49 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 		$urltitle .= '-'.$matches[4];
 	}
 
-
-	// CHECK FOR UNIQUENESS:
-	// Find all occurrences of urltitle-number in the DB:
-	$sql = 'SELECT '.$dbSlugFieldName.'
-					  FROM '.$dbtable.'
-					 WHERE '.$dbSlugFieldName." REGEXP '^".$urlbase."(-[0-9]+)?$'";
-	if( $post_ID )
-	{	// Ignore current post
-		$sql .= ' AND '.$dbIDname.' <> '.$post_ID;
-	}
-	$exact_match = false;
-	$highest_number = 0;
-	foreach( $DB->get_results( $sql, ARRAY_A ) as $row )
+	if( !$query_only )
 	{
-		$existing_urltitle = $row[$dbSlugFieldName];
-		// echo "existing = $existing_urltitle <br />";
-		if( $existing_urltitle == $urltitle )
-		{ // We have an exact match, we'll have to change the number.
-			$exact_match = true;
+		// CHECK FOR UNIQUENESS:
+		// Find all occurrences of urltitle-number in the DB:
+		$sql = 'SELECT '.$dbSlugFieldName.'
+						  FROM '.$dbtable.'
+						 WHERE '.$dbSlugFieldName." REGEXP '^".$urlbase."(-[0-9]+)?$'";
+		if( $post_ID )
+		{	// Ignore current post
+			$sql .= ' AND '.$dbIDname.' <> '.$post_ID;
 		}
-		if( preg_match( '/-([0-9]+)$/', $existing_urltitle, $matches ) )
-		{ // This one has a number, we extract it:
-			$existing_number = (integer) $matches[1];
-			if( $existing_number > $highest_number )
-			{ // This is the new high
-				$highest_number = $existing_number;
+		$exact_match = false;
+		$highest_number = 0;
+		foreach( $DB->get_results( $sql, ARRAY_A ) as $row )
+		{
+			$existing_urltitle = $row[$dbSlugFieldName];
+			// echo "existing = $existing_urltitle <br />";
+			if( $existing_urltitle == $urltitle )
+			{ // We have an exact match, we'll have to change the number.
+				$exact_match = true;
+			}
+			if( preg_match( '/-([0-9]+)$/', $existing_urltitle, $matches ) )
+			{ // This one has a number, we extract it:
+				$existing_number = (integer) $matches[1];
+				if( $existing_number > $highest_number )
+				{ // This is the new high
+					$highest_number = $existing_number;
+				}
 			}
 		}
-	}
-	// echo "highest existing number = $highest_number <br />";
-
-	if( $exact_match && !$query_only )
-	{ // We got an exact match, we need to change the number:
-		$urltitle = $urlbase.'-'.($highest_number + 1);
+		// echo "highest existing number = $highest_number <br />";
+	
+		if( $exact_match && !$query_only )
+		{ // We got an exact match, we need to change the number:
+			$urltitle = $urlbase.'-'.($highest_number + 1);
+		}
 	}
 
 	// echo "using = $urltitle <br />";
 
 	if( !empty($orig_title) && $urltitle != $orig_title )
 	{
-		$Messages->add( sprintf(T_('Warning: the URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'error' );
+		$Messages->add( sprintf(T_('Warning: the URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'note' );
 	}
 
 	return $urltitle;
@@ -1413,6 +1415,9 @@ function echo_set_slug_changed()
 }
 /*
  * $Log$
+ * Revision 1.101  2010/04/07 08:26:10  efy-asimo
+ * Allow multiple slugs per post - update & fix
+ *
  * Revision 1.100  2010/03/27 15:37:00  blueyed
  * whitespace
  *

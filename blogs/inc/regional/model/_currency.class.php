@@ -153,7 +153,7 @@ class Currency extends DataObject
 
 		if( $restriction['fk'] != 'ctry_curr_ID' )
 		{ // currency restriction exists only for countries
-			die( 'Restriction does not exists' );
+			debug_die( 'Restriction does not exists' );
 		}
 
 		// link to country object
@@ -178,6 +178,9 @@ class Currency extends DataObject
 
 /*
  * $Log$
+ * Revision 1.15  2010/04/07 08:26:11  efy-asimo
+ * Allow multiple slugs per post - update & fix
+ *
  * Revision 1.14  2010/03/19 09:48:59  efy-asimo
  * file deleting restrictions - task
  *

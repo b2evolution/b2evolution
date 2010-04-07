@@ -40,13 +40,18 @@ class Slug extends DataObject
 
 	var $itm_ID;
 
+	/*
+	 * constructor
+	 * 
+	 * object table Database row
+	 */
 	function Slug( $db_row = NULL )
 	{
 		// Call parent constructor:
 		parent::DataObject( 'T_slug', 'slug_', 'slug_ID' );
 
 		$this->delete_restrictions = array(
-				array( 'table'=>'T_items__item', 'fk'=>'post_urltitle', 'msg'=>T_('%d related post') ),
+				array( 'table'=>'T_items__item', 'fk'=>'post_canonical_slug_ID', 'msg'=>T_('%d related post') ),
 			);
 
 		if( $db_row != NULL )
@@ -95,25 +100,25 @@ class Slug extends DataObject
 		global $Messages;
 		// title
 		$slug_title = param( 'slug_title', 'string', true );
-		// enable just numbers and letters and '-' and '_'
-		if( preg_match( '#^([0-9A-Za-z]|-)+$#', $slug_title ) )
+		$slug_title = urltitle_validate( $slug_title, '', 0, true, 'slug_title', 'slug_ID', 'T_slug' );
+		if( $this->dbexists( 'slug_title', $slug_title ) )
 		{
-			if( $this->dbexists( 'slug_title', $slug_title ) )
-			{
-				$Messages->add( sprintf( T_('%s slug title is already exists!'), $slug_title ) ); 
-			}
-			$this->set( 'title', $slug_title );
+			$Messages->add( sprintf( T_('%s slug title already exists!'), $slug_title ), 'error' ); 
 		}
-		else
-		{
-			$Messages->add( T_('Title with spaces and spceial characters are not allowed!'), 'error' );
-		}
+		$this->set( 'title', $slug_title );
 
 		// type
 		$this->set_string_from_param( 'type', true );
 
 		// object ID:
 		$object_id = param( 'slug_object_ID', 'string' );
+		// All DataObject ID must be a number
+		if( ! is_number( $object_id ) )
+		{ // not a number
+			$Messages->add( T_('Object ID must be a number!'), 'error' );
+			return false;
+		}
+
 		switch( $this->type )
 		{
 			case 'item':
@@ -133,41 +138,89 @@ class Slug extends DataObject
 	}
 
 
-	function check_relations( $what, $ignore = array(), $addlink = false )
+	/*
+	 * Create a link to the related oject
+	 * 
+	 * @return string empty if no related item | link to related item
+	 */
+	function get_link_to_object()
+	{
+		global $DB, $admin_url;
+
+		switch( $this->type )
+		{ // can be different type of object
+			case 'item':
+				$object_ID = 'post_ID';			// related table object ID
+				$object_name = 'post_title';	// related table object name
+				
+				// link to object
+				$link = '<a href="'.$admin_url.'?ctrl=items&action=edit&p=%d">%s</a>';
+				$object_query = 'SELECT post_ID, post_title FROM T_items__item'
+									.' WHERE post_canonical_slug_ID = '.$this->ID;;
+				break;
+
+			default:
+				// not defined restriction
+				debug_die ( 'Unhandled object type:' . htmlspecialchars ( $this->type ) );
+		}
+
+		$result_link = '';
+		$query_result = $DB->get_results( $object_query );
+		foreach( $query_result as $row )
+		{ // create links for each related object
+			$result_link .= '<br/>'.sprintf( $link, $row->$object_ID, $row->$object_name );
+		}
+
+		return $result_link;
+	}
+
+
+	/**
+	 * Get link to restricted object
+	 *
+	 * Used when try to delete a slug, which is another object slug
+	 * 
+	 * @param array restriction
+	 * @return string message with links to objects
+	 */
+	function get_restriction_link( $restriction )
+	{
+		$restriction_link = $this->get_link_to_object();
+		if( $restriction_link != '' )
+		{ // there are restrictions
+			return sprintf( $restriction['msg'].$restriction_link, 1 );
+		}
+		// no restriction
+		return '';
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 *
+	 * @return boolean true on success
+	 */
+	function dbupdate()
 	{
 		global $DB, $Messages;
+		$ItemCache = & get_ItemCache();
+		$Item = $ItemCache->get_by_id( $this->itm_ID );
 
-		foreach( $this->$what as $restriction )
+		$DB->begin();
+		if( $Item->get( 'canonical_slug_ID' ) == $this->ID )
 		{
-			if( !in_array( $restriction['fk'], $ignore ) )
+			$Item->set( 'urltitle', $this->title );
+			if( ! $Item->dbupdate( true, false ) )
 			{
-				if( $addlink )
-				{ // get linked objects and add a link
-					$link = '';
-					if( $addlink )
-					{ // get link from derived class
-						$link = $this->get_restriction_link( $restriction );
-					}
-					// without restriction => don't display the message
-					if( $link != '' )
-					{
-						$Messages->add( $link, 'restrict' );
-					}
-				}
-				else
-				{ // count and show how many object is connected
-					$count = $DB->get_var(
-					'SELECT COUNT(*)
-					   FROM '.$restriction['table'].'
-					  WHERE '.$restriction['fk'].' = '.$DB->quote( $this->title ),
-					0, 0, 'restriction/cascade check' );
-					if( $count )
-					{
-						$Messages->add( sprintf( $restriction['msg'], $count ), 'restrict' );
-					}
-				}
+				$DB->rollback();
+				return false;
 			}
+			$Messages->add( 'WARNING: this change also changed the canoncial slug of the post!'.$this->get_link_to_object(), 'redwarning' );
 		}
+
+		parent::dbupdate();
+		$DB->commit();
+		return true;
 	}
 }
 

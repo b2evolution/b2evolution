@@ -711,6 +711,13 @@ function create_relations()
 											on delete restrict
 											on update restrict' );
 
+	$DB->query( 'alter table T_slug
+								add constraint FK_slug_itm_ID
+											foreign key (slug_itm_ID)
+											references T_items__item (post_ID)
+											on delete restrict
+											on update restrict' );
+
 	echo "OK.<br />\n";
 }
 
@@ -836,6 +843,9 @@ function get_antispam_query()
 
 /*
  * $Log$
+ * Revision 1.93  2010/04/07 08:26:11  efy-asimo
+ * Allow multiple slugs per post - update & fix
+ *
  * Revision 1.92  2010/04/02 07:27:11  efy-asimo
  * cache folders rename and Filelist navigation - fix
  *

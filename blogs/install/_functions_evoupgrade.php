@@ -2639,7 +2639,6 @@ function upgrade_b2evo_tables()
 	db_add_col( 'T_comments', 'comment_secret', 'varchar(32) NULL default NULL' );
 	task_end();
 
-
 	// Create T_slug table and, Insert all slug from T_items
 	task_begin( 'Create Slug table... ' );
 	$DB->query( 'CREATE TABLE T_slug (
@@ -2647,8 +2646,8 @@ function upgrade_b2evo_tables()
 					slug_title varchar(255) NOT NULL COLLATE ascii_bin,
 					slug_type char(6) NOT NULL DEFAULT "item",
 					slug_itm_ID int(11) unsigned,
-					PRIMARY KEY slug_title (slug_title),
-					UNIQUE	slug_ID (slug_ID)
+					PRIMARY KEY slug_ID (slug_ID),
+					UNIQUE	slug_title (slug_title)
 				) ENGINE = innodb' );
 	task_end();
 
@@ -2658,6 +2657,15 @@ function upgrade_b2evo_tables()
 						FROM T_items__item' );
 	task_end();
 
+	task_begin( 'Add canonical slug ID to post table...' );
+	db_add_col( 'T_items__item', 'post_canonical_slug_ID', 'int(10) unsigned NOT NULL default 0 after post_urltitle' );
+	task_end();
+
+	task_begin( 'Upgrading posts...' );
+	$DB->query( 'UPDATE T_items__item, T_slug
+		SET post_canonical_slug_ID = slug_ID
+		WHERE post_urltitle = slug_title' );
+	task_end();
 
 	/*
 	 * ADD UPGRADES HERE.
@@ -2833,6 +2841,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.359  2010/04/07 08:26:11  efy-asimo
+ * Allow multiple slugs per post - update & fix
+ *
  * Revision 1.358  2010/03/29 12:25:31  efy-asimo
  * allow multiple slugs per post
  *
