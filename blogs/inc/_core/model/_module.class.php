@@ -92,11 +92,14 @@ class Module
 	 * @return boolean True on success (permission is granted), false if permission is not granted
 	 *                 NULL if permission not implemented.
 	 */
-	function check_perm( $permname, $permlevel, $permtarget, $function )
+	function check_perm( $permname, $permlevel, $permtarget, $function, $Group = NULL )
 	{
-		global $current_User;
+		if( ! isset( $Group ) )
+		{
+			global $current_User;
 
-		$Group = & $current_User->get_Group();
+			$Group = & $current_User->get_Group();
+		}
 		$GroupSettings = & $Group->get_GroupSettings();
 
 		if( array_key_exists( $permname, $GroupSettings->permission_modules ) )

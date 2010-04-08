@@ -65,7 +65,23 @@ function display_pluggable_permissions( &$Form, $perm_block )
 				$perm = $permissions[$perm_name];
 				if( $perm['perm_block'] == $perm_block )
 				{
-					$Form->radio( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], $perm['options'], $perm['label'], true );
+					if( isset( $perm['perm_type'] ) )
+					{
+						switch( $perm['perm_type'] )
+						{
+							case 'checkbox':
+								$Form->checkbox_input( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name] == 'allowed', $perm['label'], array( 'input_suffix' => ' '.$perm['note'], 'value' => 'allowed' ) );
+							break;
+
+							case 'radiobox':
+								$Form->radio( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], $perm['options'], $perm['label'], true );
+							break;
+						}
+					}
+					else
+					{
+						$Form->radio( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], $perm['options'], $perm['label'], true );
+					}
 				}
 			}
 		}
@@ -230,6 +246,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.26  2010/04/08 10:35:23  efy-asimo
+ * Allow users to create a new blog for themselves - task
+ *
  * Revision 1.25  2010/02/28 22:41:00  fplanque
  * Permission to use XML-RPC APIs can now be granted/denied on a group basis
  *

@@ -172,16 +172,36 @@ if( !$Messages->count('error') )
 			$is_new_user = $edited_User->ID == 0 ? true : false;
 
 			// Update user
+			$DB->begin();
+
 			$is_password_form = param( 'password_form', 'boolean', false );
 			if( $edited_User->dbsave() )
 			{
 				if( $is_new_user )
-					$msg = T_('New user has been created.');
+				{
+					$Messages->add( T_('New user has been created.'), 'success' );
+					if( $edited_User->get_Group()->check_perm( 'perm_getblog', 'allowed' ) )
+					{ // automatically create new blog for this user
+						$new_Blog = new Blog( NULL );
+						$shortname = $edited_User->get( 'login' );
+						$new_Blog->set( 'owner_user_ID', $edited_User->ID );
+						$new_Blog->set( 'shortname', $shortname );
+						$new_Blog->set( 'name', $shortname.'\'s blog' );
+						$new_Blog->set( 'urlname', urltitle_validate( $shortname, $shortname, $new_Blog->ID, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
+						$new_Blog->create();
+					}
+				}
 				elseif( $is_password_form )
-					$msg = T_('Password has been changed.');
+					$Messages->add( T_('Password has been changed.'), 'success' );
 				else
-					$msg = T_('Profile has been updated.');
-				$Messages->add($msg, 'success');
+					$Messages->add( T_('Profile has been updated.'), 'success' );
+
+				$DB->commit();
+			}
+			else
+			{
+				$DB->rollback();
+				$Messages->add( 'New user creation error', 'error' );
 			}
 
 			// Update user settings:
@@ -390,6 +410,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2010/04/08 10:35:23  efy-asimo
+ * Allow users to create a new blog for themselves - task
+ *
  * Revision 1.10  2010/01/30 18:55:35  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

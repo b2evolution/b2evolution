@@ -701,6 +701,10 @@ class Blog extends DataObject
 
 
 		}
+		else
+		{ // user has no permission to change blog_urlname
+			$this->set( 'urlname', urltitle_validate( $this->urlname, '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
+		}
 
 		return ! param_errors_detected();
 	}
@@ -1823,6 +1827,66 @@ class Blog extends DataObject
 	}
 
 
+	function create()
+	{
+		global $DB, $Messages, $basepath, $current_User;
+		$DB->begin();
+
+		// DB INSERT
+		$this->dbinsert();
+
+		$Messages->add( T_('The new blog has been created.'), 'success' );
+
+		// Change access mode if a stub file exists:
+		$stub_filename = 'blog'.$this->ID.'.php';
+		if( is_file( $basepath.$stub_filename ) )
+		{	// Stub file exists and is waiting ;)
+			$DB->query( 'UPDATE T_blogs
+						SET blog_access_type = "relative", blog_siteurl = "'.$stub_filename.'"
+						WHERE blog_ID = '.$this->ID );
+			$Messages->add( sprintf(T_('The new blog has been associated with the stub file &laquo;%s&raquo;.'), $stub_filename ), 'success' );
+		}
+		else
+		{
+			$Messages->add( sprintf(T_('No stub file named &laquo;%s&raquo; was found.'), $stub_filename ), 'info' );
+		}
+
+
+		// Set default user permissions for this blog (All permissions for the current user)
+		// Proceed insertions:
+		$DB->query( "
+				INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+						bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
+						bloguser_perm_cats, bloguser_perm_properties,
+						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
+				VALUES ( $this->ID, $current_User->ID, 1,
+						'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1 )" );
+
+		// Create default category:
+		load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
+		$edited_Chapter = new Chapter( NULL, $this->ID );
+
+		$blog_urlname = $this->get( 'url_name' );
+		$edited_Chapter->set( 'name', T_('Uncategorized') );
+		$edited_Chapter->set( 'urlname', $blog_urlname.'-main' );
+		$edited_Chapter->dbinsert();
+
+		$Messages->add( T_('A default category has been created for this blog.'), 'success' );
+
+		// ADD DEFAULT WIDGETS:
+		load_funcs( 'widgets/_widgets.funcs.php' );
+		insert_basic_widgets( $this->ID );
+
+		$Messages->add( T_('Default widgets have been set-up for this blog.'), 'success' );
+
+		$DB->commit();
+
+		// Commit changes in cache:
+		$BlogCache = & get_BlogCache();
+		$BlogCache->add( $this );
+	}
+
+
 	/**
 	 * Update the DB based on previously recorded changes
 	 */
@@ -2239,6 +2303,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.104  2010/04/08 10:35:23  efy-asimo
+ * Allow users to create a new blog for themselves - task
+ *
  * Revision 1.103  2010/03/10 15:06:31  efy-asimo
  * Delete blog cache entry if blog is deleted
  *

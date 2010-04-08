@@ -354,24 +354,38 @@ class collections_Module extends Module
 	 * @return array
 	 */
 	function get_default_group_permissions( $grp_ID )
-	{
+	{	
 		switch( $grp_ID )
 		{
 			case 1:		// Administrators (group ID 1) have permission by default:
+				$permname = 'always';
+				$permcreateblog = 'allowed';
+				$permgetblog = 'denied';
+				break;
+
 			case 2:		// Privileged bloggers (group ID 2) have permission by default:
+				$permname = 'always';
+				$permcreateblog = 'allowed';
+				$permgetblog = 'allowed';
+				break;
+
 			case 3:		// Bloggers (group ID 3) have permission by default:
 				$permname = 'always';
+				$permcreateblog = 'denied';
+				$permgetblog = 'denied';
 				break;
-				
+
 			default: 
 				// Other groups have no permission by default
 				$permname = 'never';
+				$permcreateblog = 'denied';
+				$permgetblog = 'denied';
 				break;
 		}
 
 		// We can return as many default permissions as we want:
 		// e.g. array ( permission_name => permission_value, ... , ... )
-		return $permissions = array( 'perm_api' => $permname );
+		return $permissions = array( 'perm_api' => $permname, 'perm_createblog' => $permcreateblog, 'perm_getblog' => $permgetblog );
 	}
 
 
@@ -398,6 +412,22 @@ class collections_Module extends Module
 						array( 'never', T_( 'Never' ), '' ),
 						array( 'always', T_( 'Always' ), '' ),
 					),
+				),
+			'perm_createblog' => array(
+				'label' => T_( 'Creating new blogs' ),
+				'user_func'  => 'check_createblog_user_perm',
+				'group_func' => 'check_createblog_group_perm',
+				'perm_block' => 'blogging',
+				'perm_type' => 'checkbox',
+				'note' => T_( 'Users can create new blogs for themselves'),
+				),
+			'perm_getblog' => array(
+				'label' => '',
+				'user_func'  => 'check_getblog_user_perm',
+				'group_func' => 'check_getblog_group_perm',
+				'perm_block' => 'blogging',
+				'perm_type' => 'checkbox',
+				'note' => T_( 'New user automatically get a new blog'),
 				),
 			);
 		return $permissions;
@@ -452,6 +482,17 @@ class collections_Module extends Module
 	}
 
 
+	function check_createblog_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		return $permvalue == 'allowed';
+	}
+
+	function check_getblog_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		return $permvalue == 'allowed';
+	}
+
+
 	/**
 	 * Build teh evobar menu
 	 */
@@ -469,7 +510,7 @@ class collections_Module extends Module
 
 		$entries = array();
 
-		if( $current_User->check_perm( 'blogs', 'create' ) )
+		if( $current_User->check_perm( 'blogs', 'create' ) || $current_User->check_perm( 'perm_createblog', 'allowed' ))
 		{
 			$entries['newblog'] = array(
 					'text' => T_('Create new blog').'&hellip;',

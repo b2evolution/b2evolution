@@ -94,6 +94,8 @@ switch( $action )
 
 		$edited_Blog = new Blog( NULL );
 
+		$edited_Blog->set( 'owner_user_ID', $current_User->ID );
+
 		param( 'kind', 'string', true );
 		$edited_Blog->init_by_kind( $kind );
 
@@ -112,6 +114,8 @@ switch( $action )
 		$current_User->check_perm( 'blogs', 'create', true );
 
 		$edited_Blog = new Blog( NULL );
+
+		$edited_Blog->set( 'owner_user_ID', $current_User->ID );
 
 		param( 'kind', 'string', true );
 		$edited_Blog->init_by_kind( $kind );
@@ -417,6 +421,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2010/04/08 10:35:23  efy-asimo
+ * Allow users to create a new blog for themselves - task
+ *
  * Revision 1.24  2010/03/03 21:34:32  fplanque
  * minor
  *

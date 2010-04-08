@@ -189,7 +189,14 @@ class Group extends DataObject
 		$GroupSettings = & $this->get_GroupSettings();
 		foreach( $GroupSettings->permission_values as $name => $value )
 		{
-			$value = param( 'edited_grp_'.$name, 'string', true );
+			if( $name == 'perm_createblog' || $name == 'perm_getblog' )
+			{
+				$value = param( 'edited_grp_'.$name, 'string', 'denied' );
+			}
+			else
+			{
+				$value = param( 'edited_grp_'.$name, 'string', true );
+			}
 			$GroupSettings->set( $name, $value, $this->ID );
 		}
 
@@ -316,6 +323,10 @@ class Group extends DataObject
 							break;
 						}
 				}
+				if( ! $perm && ( $permlevel == 'create' ) && $this->check_perm( 'perm_createblog', 'allowed' ) )
+				{ // Permission granted
+					$perm = true;
+				}
 				break;
 
 			case 'spamblacklist':
@@ -412,7 +423,7 @@ class Group extends DataObject
 			default:
 
 				// Check pluggable permissions using group permission check function
-				$perm = Module::check_perm( $permname, $permlevel, $perm_target, 'group_func' );
+				$perm = Module::check_perm( $permname, $permlevel, $perm_target, 'group_func', $this );
 				if( $perm === NULL )
 				{	// Even if group permisson check function doesn't exist we should return false value
 					$perm = false;
@@ -686,6 +697,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.30  2010/04/08 10:35:23  efy-asimo
+ * Allow users to create a new blog for themselves - task
+ *
  * Revision 1.29  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *
