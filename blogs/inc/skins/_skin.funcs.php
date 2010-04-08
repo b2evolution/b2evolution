@@ -640,12 +640,12 @@ function skin_keywords_tag()
 
 		$r = $Item->get_metakeywords();
 
-		/* fp> TODO:
+
 		if( empty( $r ) && $Blog->get_setting( 'tags_meta_keywords' ) )
 		{	// Fall back to tags for the current single post:
-
+			$r = implode( ', ', $Item->get_tags() );
 		}
-		*/
+
 	}
 
 	if( !empty($r) )
@@ -889,6 +889,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.84  2010/04/08 21:02:43  waltercruz
+ * Tags as meta-description fallback
+ *
  * Revision 1.83  2010/02/08 17:53:55  efy-yury
  * copyright 2009 -> 2010
  *

@@ -183,6 +183,9 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 	$Form->checkbox( 'excerpts_meta_description', $edited_Blog->get_setting( 'excerpts_meta_description' ),
 			T_('Meta description'), T_('Fallback to excerpt as meta description for posts and pages if meta description for item is empty') );
 
+	$Form->checkbox( 'tags_meta_keywords', $edited_Blog->get_setting( 'tags_meta_keywords' ),
+			T_('Meta Keywords'), T_('Fallback to tags as meta keywords for posts and pages if meta keywords for item is empty') );
+
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_seo') );
@@ -380,6 +383,9 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.30  2010/04/08 21:02:43  waltercruz
+ * Tags as meta-description fallback
+ *
  * Revision 1.29  2010/02/08 17:52:09  efy-yury
  * copyright 2009 -> 2010
  *

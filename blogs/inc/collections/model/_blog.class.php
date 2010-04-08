@@ -112,6 +112,8 @@ class Blog extends DataObject
 	var $media_subdir = '';
 	var $media_fullpath = '';
 	var $media_url = '';
+	var $frontpage = 'posts';
+	var $frontpage_id = NULL;
 
 	/**
 	 * Additional settings for the collection.  lazy filled.
@@ -317,6 +319,14 @@ class Blog extends DataObject
 		{
 			$this->set_setting( 'image_size', get_param( 'image_size' ));
 		}
+
+
+		if( param( 'frontpage', 'string', NULL ) !== NULL )
+		{
+			$this->set_setting( 'frontpage', param( 'frontpage', 'string', '' ) );
+			$this->set_setting( 'frontpage_id', param('frontpage_id', 'integer', 0) );
+		}
+
 
 		if( param( 'tag_links',   'string', NULL ) !== NULL )
 		{ // Tag page link type:
@@ -527,6 +537,7 @@ class Blog extends DataObject
 			$this->set_setting( '404_response',  param( '404_response', 'string', '' ) );
 			$this->set_setting( 'excerpts_meta_description', param( 'excerpts_meta_description', 'integer', 0 ) );
 			$this->set_setting( 'categories_meta_description', param( 'categories_meta_description', 'integer', 0 ) );
+			$this->set_setting( 'tags_meta_keywords', param( 'tags_meta_keywords', 'integer', 0 ) );
 		}
 
 
@@ -2303,6 +2314,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.105  2010/04/08 21:02:43  waltercruz
+ * Tags as meta-description fallback
+ *
  * Revision 1.104  2010/04/08 10:35:23  efy-asimo
  * Allow users to create a new blog for themselves - task
  *
