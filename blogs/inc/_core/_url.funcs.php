@@ -314,10 +314,10 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 			$info['error'] .= ' (#'.$errno.')';
 		}
 		curl_close( $ch );
-		
+
 		return $r;
 	}
-	
+
 	if( function_exists( 'fsockopen' ) ) // may have been disabled
 	{	// FSOCKOPEN:
 		$info['used_method'] = 'fsockopen';
@@ -579,15 +579,26 @@ function url_add_tail( $url, $tail )
 /**
  * Create a crumb param to be passed in action urls...
  *
+ * @access public
  * @param string crumb_name
  */
 function url_crumb( $crumb_name )
 {
-	global $Session;
-
-	return 'crumb_'.$crumb_name.'='.$Session->create_crumb($crumb_name);
+	return 'crumb_'.$crumb_name.'='.get_crumb($crumb_name);
 }
 
+
+/**
+ * Get crumb via {@link $Session}.
+ * @access public
+ * @param string crumb_name
+ * @return string
+ */
+function get_crumb($crumb_name)
+{
+	global $Session;
+	return $Session->create_crumb($crumb_name);
+}
 
 
 /**
@@ -811,6 +822,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.50  2010/04/08 18:28:02  blueyed
+ * crumb refactoring: add get_crumb
+ *
  * Revision 1.49  2010/02/08 17:51:38  efy-yury
  * copyright 2009 -> 2010
  *
