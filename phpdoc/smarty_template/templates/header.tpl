@@ -54,7 +54,7 @@
 		<input value="Google Search" name="btnG" type="hidden" />
 		<input name="as_q" value="inurl:/HEAD/" type="hidden" />
 		<input name="as_dt" value="i" type="hidden" />
-		<input value="doc.b2evolution.net" name="as_sitesearch" type="hidden" />
+		<input value="doc.b2evo.net" name="as_sitesearch" type="hidden" />
 		<input value="off" name="safe" type="hidden" /></p>
 	</form>
 </div>
