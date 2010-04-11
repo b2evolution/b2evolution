@@ -319,8 +319,8 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 					'create_definition' => $create_definition,
 				);
 
-				if( !  preg_match( '~^(PRIMARY(?:\s+KEY)|(?:FULLTEXT|UNIQUE)(?:\s+(?:INDEX|KEY))?|KEY|INDEX) (?:\s+()     (\w+)      )? (\s+USING \w+)? \s* \((.*)\)$~ix', $create_definition, $match )
-					&& ! preg_match( '~^(PRIMARY(?:\s+KEY)|(?:FULLTEXT|UNIQUE)(?:\s+(?:INDEX|KEY))?|KEY|INDEX) (?:\s+([`"])([\w\s]+)\\2)? (\s+USING \w+)? \s* \((.*)\)$~ix', $create_definition, $match ) )
+				if( !  preg_match( '~^(PRIMARY(?:\s+KEY)|(?:FULLTEXT|UNIQUE)(?:\s+(?:INDEX|KEY))?|KEY|INDEX) (?:\s+()     (\w+)      )? (\s+USING\s+\w+)? \s* \((.*)\)$~ix', $create_definition, $match )
+					&& ! preg_match( '~^(PRIMARY(?:\s+KEY)|(?:FULLTEXT|UNIQUE)(?:\s+(?:INDEX|KEY))?|KEY|INDEX) (?:\s+([`"])([\w\s]+)\\2)? (\s+USING\s+\w+)? \s* \((.*)\)$~ix', $create_definition, $match ) )
 				{ // invalid type, should not happen
 					debug_die( 'Invalid type in $indices: '.$create_definition );
 					// TODO: add test: Invalid type in $indices: KEY "coord" ("lon","lat")
@@ -1265,6 +1265,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.17  2010/04/11 23:02:27  blueyed
+ * db_delta: fix regexp for indices using 'USING \w+'
+ *
  * Revision 1.16  2010/02/08 17:51:55  efy-yury
  * copyright 2009 -> 2010
  *
