@@ -2023,6 +2023,7 @@ class Form extends Widget
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - 'cols': Number of columns (integer, default 50)
 	 *              - 'note_format': Format of the note (%s being replaced by the note)
+	 *              - 'format_value': Format of value content, see {@link format_to_output()} (string, default 'formvalue')
 	 */
 	function textarea_input( $field_name, $field_value, $field_rows, $field_label, $field_params = array() )
 	{
@@ -2031,8 +2032,11 @@ class Form extends Widget
 		// Default params
 		$field_params += array(
 			'cols' => 50,
-			'note_format' => '<br/><span class="notes">%s</span>',
+			'note_format' => '<br/><span class="notes">%s</span>', // handled as common param
+			'format_value' => 'formvalue',
 		);
+		$format_value = $field_params['format_value'];
+		unset($field_params['format_value']); // no HTML attrib
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
@@ -2064,7 +2068,7 @@ class Form extends Widget
 			.'<textarea'
 			.get_field_attribs_as_string( $field_params )
 			.' rows="'.$field_rows.'">'
-			.format_to_output( $field_value, 'formvalue' )
+			.format_to_output( $field_value, $format_value )
 			.'</textarea>'
 			// NOTE: this one is for compensating the previous pixel in case of center aligns.
 			.'<img src="'.$rsc_url.'img/blank.gif" width="1" height="1" alt="" />'
@@ -3049,6 +3053,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.85  2010/04/12 19:51:08  blueyed
+ * Form::textarea_input: field_params: Add format_value param.
+ *
  * Revision 1.84  2010/04/12 19:50:35  blueyed
  * Form::textarea_input: field_params: simplify default param handling. Fix doc.
  *
