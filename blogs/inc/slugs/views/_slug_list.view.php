@@ -29,9 +29,22 @@ $SQL = new SQL();
 $SQL->SELECT( 'slug_ID, slug_title, slug_type, slug_itm_ID' );
 $SQL->FROM( 'T_slug' );
 
-if( get_param('slug_filter') )
-{
+if( get_param( 'slug_filter' ) )
+{ // add slug_title filter
 	$SQL->WHERE_and( 'slug_title LIKE '.$DB->quote( '%'.get_param('slug_filter').'%' ) );
+}
+switch( get_param( 'slug_ftype' ) )
+{ // add filter for item type
+	case 'item':
+		if( get_param( 'slug_fobject') )
+		{ // add item object filter
+			$SQL->WHERE_and( 'slug_itm_ID = '.get_param( 'slug_fobject' ) );
+		}
+		else
+		{
+			$SQL->WHERE_and( 'slug_type = '.get_param( 'slug_ftype' ) );
+		}
+	break;
 }
 
 // Create result set:

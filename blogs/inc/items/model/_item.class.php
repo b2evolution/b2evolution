@@ -3340,13 +3340,29 @@ class Item extends ItemLight
 			$this->insert_update_tags( 'insert' );
 
 			// Let's handle the slugs:
+			// set slug item ID
 			$new_Slug->set( 'itm_ID', $this->ID );
-			if( $result = ( $result && $new_Slug->dbinsert() ) )
+
+			//create tiny slug
+			$new_tiny_Slug = new Slug();
+			load_funcs( 'slugs/model/_slug.funcs.php' );
+			$tinyurl = getnext_tinyurl();
+			$new_tiny_Slug->set( 'title', $tinyurl );
+			$new_tiny_Slug->set( 'type', 'item' );
+			$new_tiny_Slug->set( 'itm_ID', $this->ID );
+
+			if( $result = ( $new_Slug->dbinsert() && $new_tiny_Slug->dbinsert() ) )
 			{
 				$this->set( 'canonical_slug_ID', $new_Slug->ID );
-				if( $result = ( $result && parent::dbupdate() ) )
+				$this->set( 'tiny_slug_ID', $new_tiny_Slug->ID );
+				if( $result = parent::dbupdate() )
 				{
 					$DB->commit();
+
+					// save the last tinyurl
+					global $Settings;
+					$Settings->set( 'tinyurl', $tinyurl );
+					$Settings->dbupdate();
 
 					if( isset($Plugins) )
 					{	// Note: Plugins may not be available during maintenance, install or test cases
@@ -3435,10 +3451,10 @@ class Item extends ItemLight
 			if( isset( $new_Slug ) )
 			{
 				$new_Slug->set( 'itm_ID', $this->ID );
-				if( $result = $result && $new_Slug->dbinsert() )
+				if( $result = $new_Slug->dbinsert() )
 				{
 					$this->set( 'canonical_slug_ID', $new_Slug->ID );
-					$result = $result && parent::dbupdate();
+					$result = parent::dbupdate();
 				}
 			}
 		}
@@ -4180,11 +4196,124 @@ class Item extends ItemLight
 
 		return array_unique( $r );
 	}
+
+
+	/*
+	 * Get the item tinyurl. If not exists -> create new
+	 * 
+	 * @return string|boolean tinyurl on success, false otherwise
+	 */
+	function get_tinyurl()
+	{
+		$tinyurl_ID = $this->tiny_slug_ID;
+		if( $tinyurl_ID != NULL )
+		{ // the tiny url for this item was already created
+			$SlugCache = & get_SlugCache();
+			return $SlugCache->get_by_ID($tinyurl_ID)->get( 'title' );
+		}
+		else
+		{ // create new tiny Slug for this item
+			$Slug = new Slug();
+			$Slug->set( 'title', getnext_tinyurl() );
+			$Slug->set( 'itm_ID', $this->ID );
+			$Slug->set( 'type', 'item' );
+			global $DB;
+			$DB->begin();
+			if( ! $Slug->dbinsert() )
+			{ // Slug dbinsert failed
+				$DB->rollback();
+				return false;
+			}
+			$this->set( 'tiny_slug_ID', $Slug->ID );
+			if( ! $this->dbupdate() )
+			{ // Item dbupdate failed
+				$DB->rollback();
+				return false;
+			}
+			$DB->commit();
+
+			// update last tinyurl value on database
+			global $Settings;
+			$Settings->set( 'tinyurl', $Slug->get( 'title' ) );
+
+			return $Slug->get( 'title' );
+		}
+	}
+
+
+	/*
+	 * Creates and redutn the item tinyurl link
+	 * 
+	 * @param array Params:
+	 *  - 'before': to display before link
+	 *  - 'after': to display after link
+	 *  - 'text': link text
+	 *  - 'title': link title
+	 *  - 'class': class name
+	 *  - 'style': link style
+	 *  
+	 * @return string the tinyurl link on success, empty string otherwise
+	 */
+	function get_tinyurl_link( $params = array() )
+	{
+		if( ( $tinyurl = $this->get_tinyurl() ) == false )
+		{
+			return '';
+		}
+
+		if( ! $this->ID )
+		{ // preview..
+			return false;
+		}
+
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'       => ' ',
+				'after'        => ' ',
+				'text'         => '#',
+				'title'        => '#',
+				'class'        => '',
+				'style'		   => '',
+			), $params );
+
+		if( $params['title'] == '#' )
+		{
+			$params['title'] = T_( 'This is a tinyurl you can copy/paste into twitter, emails and other places where you need a short link to this post' );
+		}
+		if( $params['text'] == '#' )
+		{
+			$params['text'] = $tinyurl;
+		}
+
+		$actionurl = $this->get_Blog()->get( 'url').'/'.$tinyurl;
+
+		$r = $params['before'];
+		$r .= '<a href="'.$actionurl;
+		$r .= '" title="'.$params['title'].'"';
+		if( !empty( $params['class'] ) ) $r .= ' class="'.$params['class'].'"';
+		if( !empty( $params['style'] ) ) $r .= ' style="'.$params['style'].'"';
+		$r .=  '>'.$params['text'].'</a>';
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/*
+	 * Display the item tinyurl link
+	 */
+	function tinyurl_link( $params = array() )
+	{
+		echo $this->get_tinyurl_link( $params );
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.189  2010/04/12 09:41:36  efy-asimo
+ * private URL shortener - task
+ *
  * Revision 1.188  2010/04/07 08:26:10  efy-asimo
  * Allow multiple slugs per post - update & fix
  *

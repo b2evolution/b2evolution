@@ -20,7 +20,7 @@
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author asimo: Evo Factory / Attila Simo
  *
- * @version $
+ * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -52,6 +52,7 @@ class Slug extends DataObject
 
 		$this->delete_restrictions = array(
 				array( 'table'=>'T_items__item', 'fk'=>'post_canonical_slug_ID', 'msg'=>T_('%d related post') ),
+				array( 'table'=>'T_items__item', 'fk'=>'post_tiny_slug_ID', 'msg'=>T_('%d related post') ),
 			);
 
 		if( $db_row != NULL )
@@ -143,7 +144,7 @@ class Slug extends DataObject
 	 * 
 	 * @return string empty if no related item | link to related item
 	 */
-	function get_link_to_object()
+	function get_link_to_object( $fk = 'post_canonical_slug_ID' )
 	{
 		global $DB, $admin_url;
 
@@ -156,7 +157,7 @@ class Slug extends DataObject
 				// link to object
 				$link = '<a href="'.$admin_url.'?ctrl=items&action=edit&p=%d">%s</a>';
 				$object_query = 'SELECT post_ID, post_title FROM T_items__item'
-									.' WHERE post_canonical_slug_ID = '.$this->ID;;
+								.' WHERE '.$fk.' = '.$this->ID;
 				break;
 
 			default:
@@ -168,7 +169,11 @@ class Slug extends DataObject
 		$query_result = $DB->get_results( $object_query );
 		foreach( $query_result as $row )
 		{ // create links for each related object
-			$result_link .= '<br/>'.sprintf( $link, $row->$object_ID, $row->$object_name );
+			if( ! ( $obj_name_value = $row->$object_name ) )
+			{ // the object name is empty
+				$obj_name_value = T_('No name');
+			}
+			$result_link .= '<br/>'.sprintf( $link, $row->$object_ID, $obj_name_value );
 		}
 
 		return $result_link;
@@ -185,7 +190,7 @@ class Slug extends DataObject
 	 */
 	function get_restriction_link( $restriction )
 	{
-		$restriction_link = $this->get_link_to_object();
+		$restriction_link = $this->get_link_to_object( $restriction['fk'] );
 		if( $restriction_link != '' )
 		{ // there are restrictions
 			return sprintf( $restriction['msg'].$restriction_link, 1 );

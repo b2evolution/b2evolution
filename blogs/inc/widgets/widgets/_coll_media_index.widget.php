@@ -181,8 +181,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 		// Query list of files:
 		$SQL = new SQL();
-		$SQL->SELECT( 'post_ID, post_datestart, post_datemodified, post_main_cat_ID, post_urltitle, post_ptyp_ID, post_title, post_excerpt, post_url,
-									file_ID, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
+		$SQL->SELECT( 'post_ID, post_datestart, post_datemodified, post_main_cat_ID, post_urltitle, post_canonical_slug_ID,
+									post_tiny_slug_ID, post_ptyp_ID, post_title, post_excerpt, post_url, file_ID,
+									file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc' );
 		$SQL->FROM( 'T_categories INNER JOIN T_postcats ON cat_ID = postcat_cat_ID
 									INNER JOIN T_items__item ON postcat_post_ID = post_ID
 									INNER JOIN T_links ON post_ID = link_itm_ID
@@ -294,6 +295,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.23  2010/04/12 09:41:36  efy-asimo
+ * private URL shortener - task
+ *
  * Revision 1.22  2010/02/08 17:54:48  efy-yury
  * copyright 2009 -> 2010
  *

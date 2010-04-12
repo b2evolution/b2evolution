@@ -2632,8 +2632,8 @@ function upgrade_b2evo_tables()
 
 		// set_upgrade_checkpoint( '9990' );
 	}
-	
-	
+
+
 	// Integrate comment_secret
 	task_begin( 'Extending Comment table... ' );
 	db_add_col( 'T_comments', 'comment_secret', 'varchar(32) NULL default NULL' );
@@ -2651,14 +2651,30 @@ function upgrade_b2evo_tables()
 				) ENGINE = innodb' );
 	task_end();
 
+	task_begin( 'Upgrading posts urltitle...' );
+	$sql = 'SELECT post_ID, post_title
+			 FROM T_items__item
+			 WHERE post_urltitle IS NULL OR post_urltitle = ""';
+	$rows = $DB->get_results( $sql, OBJECT, 'Get posts with emty urltitle' );
+	foreach( $rows as $row )
+	{
+		$DB->query( 'UPDATE T_items__item
+			SET post_urltitle = "'.urltitle_validate( '', $row->post_title, 0 ).'"
+			WHERE post_ID = '.$row->post_ID, 'Set posts urltitle' );
+	}
+	task_end();
+
 	task_begin( 'Insert existing slugs into Slug table... ' );
 	$DB->query( 'INSERT INTO T_slug( slug_title, slug_type, slug_itm_ID)
 						SELECT post_urltitle, "item", post_ID
 						FROM T_items__item' );
 	task_end();
 
-	task_begin( 'Add canonical slug ID to post table...' );
-	db_add_col( 'T_items__item', 'post_canonical_slug_ID', 'int(10) unsigned NOT NULL default 0 after post_urltitle' );
+	task_begin( 'Add canonical and tiny slug IDs to post table...' );
+	// modify post_urltitle column -> Not allow NULL value
+	db_add_col( 'T_items__item', 'post_urltitle', 'VARCHAR(210) NOT NULL' );
+	db_add_col( 'T_items__item', 'post_canonical_slug_ID', 'int(10) unsigned NULL default NULL after post_urltitle' );
+	db_add_col( 'T_items__item', 'post_tiny_slug_ID', 'int(10) unsigned NULL default NULL after post_canonical_slug_ID' );
 	task_end();
 
 	task_begin( 'Upgrading posts...' );
@@ -2841,6 +2857,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.360  2010/04/12 09:41:36  efy-asimo
+ * private URL shortener - task
+ *
  * Revision 1.359  2010/04/07 08:26:11  efy-asimo
  * Allow multiple slugs per post - update & fix
  *

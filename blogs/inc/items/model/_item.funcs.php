@@ -206,9 +206,13 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	load_funcs('locales/_charset.funcs.php');
 	$urltitle = replace_special_chars($urltitle, $post_locale);
 
-	// Make everything lowercase
-	$urltitle = strtolower( $urltitle );
+	// Make everything lowercase and use trim again after replace_special_chars
+	$urltitle = strtolower( trim ( $urltitle ) );
 
+	if( empty( $urltitle ) )
+	{
+		$urltitle = 'title';
+	}
 
 	// leave only first 5 words
 	$slug_changed = param( 'slug_changed' );
@@ -1415,6 +1419,9 @@ function echo_set_slug_changed()
 }
 /*
  * $Log$
+ * Revision 1.102  2010/04/12 09:41:36  efy-asimo
+ * private URL shortener - task
+ *
  * Revision 1.101  2010/04/07 08:26:10  efy-asimo
  * Allow multiple slugs per post - update & fix
  *

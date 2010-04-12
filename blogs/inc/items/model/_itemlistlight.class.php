@@ -807,7 +807,7 @@ class ItemListLight extends DataObjectList2
 
 		// QUERY:
 		$this->sql = 'SELECT DISTINCT '.$this->Cache->dbIDname.', post_datestart, post_datemodified, post_title, post_url,
-									post_excerpt, post_urltitle, post_canonical_slug_ID, post_main_cat_ID, post_ptyp_ID '
+									post_excerpt, post_urltitle, post_canonical_slug_ID, post_tiny_slug_ID, post_main_cat_ID, post_ptyp_ID '
 									.$this->ItemQuery->get_from()
 									.$this->ItemQuery->get_where()
 									.$this->ItemQuery->get_group_by()
@@ -1541,6 +1541,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.43  2010/04/12 09:41:36  efy-asimo
+ * private URL shortener - task
+ *
  * Revision 1.42  2010/04/07 08:26:11  efy-asimo
  * Allow multiple slugs per post - update & fix
  *

@@ -265,6 +265,13 @@ while( $Item = & $ItemList->get_item() )
 					'class' => 'permalink_right',
 				) );
 
+			// Item slug controll
+			$Item->tinyurl_link( array( 'class' => 'small', 'style' => 'float: right' ) );
+			global $admin_url;
+			echo action_icon( 'Edit slugs...', 'edit',
+				$admin_url.'?ctrl=slugs&amp;slug_ftype=item&amp;slug_fobject='.$Item->ID,
+				NULL, NULL, NULL, array( 'class' => 'small', 'style' => 'float: right' ) );
+
 			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="ActionButton">'.T_('View...').'</a>';
 
 			// Display edit button if current user has the rights:
@@ -407,6 +414,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.33  2010/04/12 09:41:36  efy-asimo
+ * private URL shortener - task
+ *
  * Revision 1.32  2010/03/18 09:42:09  efy-asimo
  * mass edit posts - task
  *
