@@ -178,14 +178,7 @@ function create_default_data()
 
 	$User_Admin = new User();
 	$User_Admin->set( 'login', 'admin' );
-	if( !isset( $install_password ) )
-	{
-		$random_password = generate_random_passwd(); // no ambiguous chars
-	}
-	else
-	{
-		$random_password = $install_password;
-	}
+	$random_password = isset($install_password) ? $install_password : generate_random_passwd();
 	$User_Admin->set( 'pass', md5($random_password) );	// random
 	$User_Admin->set( 'nickname', 'admin' );
 	$User_Admin->set_email( $admin_email );
@@ -774,7 +767,7 @@ function create_demo_contents()
 	global $Group_Admins, $Group_Privileged, $Group_Bloggers, $Group_Users;
 	global $blog_all_ID, $blog_a_ID, $blog_b_ID, $blog_linkblog_ID;
 	global $DB;
-	global $default_locale, $install_password;
+	global $default_locale;
 	global $Plugins;
 
   /**
@@ -1301,6 +1294,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.288  2010/04/12 21:27:40  blueyed
+ * code cleanup
+ *
  * Revision 1.287  2010/02/26 22:15:48  fplanque
  * whitespace/doc/minor
  *
