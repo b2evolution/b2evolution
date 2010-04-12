@@ -202,7 +202,7 @@ ul.sf-menu li li li.sfHover ul {
 .sf-menu-right a {
 	padding: 		3px 1ex 0px;  /* .5em need to macth global height above */
 }
-.sf-menu a, .sf-menu a:visited  { /* visited pseudo selector so IE6 applies text colour*/
+.sf-menu a, .sf-menu a:link, .sf-menu a:visited  { /* visited pseudo selector so IE6 applies text colour*/
 	color:			ButtonText;
 }
 .sf-menu li {
