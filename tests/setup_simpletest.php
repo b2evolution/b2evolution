@@ -28,7 +28,7 @@ if( $action == 'unzip_simpletest' )
 	echo '<h1>Unzipping...</h1>';
 
 	$target_dir = dirname(__FILE__);
-	$source_file = dirname(__FILE__).'/simpletest.tar.bz2';
+	$source_file = 'simpletest.tar.bz2';
 
 	# Test if "tar" exists
 	exec( 'tar --version', $output, $return );
@@ -50,7 +50,9 @@ if( $action == 'unzip_simpletest' )
 	}
 	else
 	{
-		$command = 'tar xjv -C '.escapeshellarg($target_dir).' -f '.escapeshellarg($source_file).' 2>&1';
+		// Change to target dir (instead of "-C") and use filename without path for tar in cygwin
+		chdir($target_dir);
+		$command = 'tar xjv -f '.escapeshellarg($source_file).' 2>&1';
 		exec( $command, $output, $return );
 		if( $return !== 0 )
 		{ // Error
@@ -60,7 +62,7 @@ if( $action == 'unzip_simpletest' )
 		else
 		{ // Success
 			echo '<p class="success">The simpletest framework has been extracted successfully.</p>';
-			echo '<p><a href="index.php">Now go testing...</a></p>';
+			echo '<p><a href="../">Now go testing...</a></p>'; # link to current dir (index.php is not present in e.g. evocore/blogs/)
 		}
 		echo '<p><strong>Command output:</strong></p>';
 		echo '<ul style="font-size:smaller"><li>'.implode('</li><li>', $output).'</li></ul>';
