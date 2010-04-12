@@ -851,7 +851,7 @@ class Blog extends DataObject
 		{
 			case 'default':
 			case 'index.php':
-				return $baseurl.$this->siteurl;
+				return $baseurl.$this->siteurl.'index.php/';
 
 			case 'extrapath':
 				// We want to use extra path info, use the blog urlname:
@@ -2314,6 +2314,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.106  2010/04/12 15:14:25  efy-asimo
+ * resolver bug - fix
+ *
  * Revision 1.105  2010/04/08 21:02:43  waltercruz
  * Tags as meta-description fallback
  *

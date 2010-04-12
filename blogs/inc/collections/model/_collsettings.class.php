@@ -65,7 +65,7 @@ class CollectionSettings extends AbstractSettings
 		// Single post settings:
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
 			'relcanonical_item_urls' => 1,			// If no 301, fall back to rel="canoncial" ?
-			'single_links'   => 'ymd',
+			'single_links'   => 'short',
 			'single_item_footer_text' => '',
 
 		// Comment settings:
@@ -173,6 +173,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.45  2010/04/12 15:14:25  efy-asimo
+ * resolver bug - fix
+ *
  * Revision 1.44  2010/02/26 22:15:52  fplanque
  * whitespace/doc/minor
  *

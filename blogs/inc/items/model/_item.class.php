@@ -4285,7 +4285,7 @@ class Item extends ItemLight
 			$params['text'] = $tinyurl;
 		}
 
-		$actionurl = $this->get_Blog()->get( 'url').'/'.$tinyurl;
+		$actionurl = url_add_tail( $this->get_Blog()->get( 'url'), '/'.$tinyurl );
 
 		$r = $params['before'];
 		$r .= '<a href="'.$actionurl;
@@ -4311,6 +4311,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.190  2010/04/12 15:14:25  efy-asimo
+ * resolver bug - fix
+ *
  * Revision 1.189  2010/04/12 09:41:36  efy-asimo
  * private URL shortener - task
  *
