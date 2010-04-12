@@ -2022,20 +2022,17 @@ class Form extends Widget
 	 * @param string Label for the field
 	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
 	 *              - 'cols': Number of columns (integer, default 50)
+	 *              - 'note_format': Format of the note (%s being replaced by the note)
 	 */
 	function textarea_input( $field_name, $field_value, $field_rows, $field_label, $field_params = array() )
 	{
 		global $rsc_url;
 
-		if( !isset($field_params['cols']) )
-		{
-			$field_params['cols'] = 50;
-		}
-
-		if( !isset($field_params['note_format']) )
-		{ // Default note_format for <textarea>:
-			$field_params['note_format'] = '<br/><span class="notes">%s</span>';
-		}
+		// Default params
+		$field_params += array(
+			'cols' => 50,
+			'note_format' => '<br/><span class="notes">%s</span>',
+		);
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
@@ -3052,6 +3049,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.84  2010/04/12 19:50:35  blueyed
+ * Form::textarea_input: field_params: simplify default param handling. Fix doc.
+ *
  * Revision 1.83  2010/04/08 18:28:02  blueyed
  * crumb refactoring: add get_crumb
  *
