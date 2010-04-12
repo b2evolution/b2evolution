@@ -142,7 +142,7 @@ class Slug extends DataObject
 	/*
 	 * Create a link to the related oject
 	 * 
-	 * @return string empty if no related item | link to related item
+	 * @return string empty if no related item, or link to related item
 	 */
 	function get_link_to_object( $fk = 'post_canonical_slug_ID' )
 	{
@@ -173,6 +173,7 @@ class Slug extends DataObject
 			{ // the object name is empty
 				$obj_name_value = T_('No name');
 			}
+			// TODO: dh> please remove "<br/>" here. We should return an array here instead (if there are multiple return values possible after all!?!).
 			$result_link .= '<br/>'.sprintf( $link, $row->$object_ID, $obj_name_value );
 		}
 
