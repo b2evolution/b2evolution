@@ -251,6 +251,7 @@ if( ! empty($current_User)
 }
 else
 { // Trigger plugin event that allows the plugins to re-act on the login event:
+	// TODO: dh> these events should provide a flag "login_attempt_failed".
 	if( empty($current_User) )
 	{
 		$Plugins->trigger_event( 'AfterLoginAnonymousUser', array() );
@@ -290,6 +291,9 @@ $Timer->pause( '_init_login' );
 
 /*
  * $Log$
+ * Revision 1.3  2010/04/12 19:14:31  blueyed
+ * doc
+ *
  * Revision 1.2  2010/02/08 17:51:25  efy-yury
  * copyright 2009 -> 2010
  *
