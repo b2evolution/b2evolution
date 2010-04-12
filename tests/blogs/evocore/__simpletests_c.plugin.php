@@ -1,4 +1,7 @@
 <?php
+/**
+ * Test plugin used e.g. in test_get_registered_events
+ */
 class simpletests_c_plugin extends Plugin
 {
 	var $name = 'Simpletests C plugin';
