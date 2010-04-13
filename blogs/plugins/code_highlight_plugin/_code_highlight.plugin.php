@@ -64,7 +64,10 @@
  *           Line numbers do not make sense for short code blocks (and also for longer ones
  *           not necessarily).
  *       fp> how about if no line=".." attribute is specified then no numbering?
- *       dh> very OK with me. fp> yeah you gotta do it if you want it :p
+ *       dh> Well.. this would change the default "[codeblock]" though. Yes, when
+ *           clicking the button it uses '[codeblock lang="" line="1"][/codeblock]', but
+ *           the "default" is still just the tag, and at least I've been using that
+ *           (typing instead of clicking).
  */
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
@@ -634,6 +637,9 @@ class code_highlight_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.33  2010/04/13 21:48:14  blueyed
+ * doc/todo
+ *
  * Revision 1.32  2010/03/29 19:59:20  blueyed
  * Normalize whitespace.
  *
