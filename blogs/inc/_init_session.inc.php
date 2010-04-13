@@ -53,9 +53,8 @@ if( !empty($is_admin_page) )
 {	// Make sure we are calling the right page (on the right domain) to make sure that session cookie goes through:
 	if( ! is_same_url( $ReqHost.$ReqPath, $admin_url) )
 	{	// The requested URL does not look like it's under the admin URL...
-		header( 'HTTP/1.1 302 Found' );
-		header( 'Location: '.$admin_url, true, 302 ); // explictly setting the status is required for (fast)cgi
-		exit(0);
+		header('X-Evo-Redirect: Redirect to canonical $admin_url'); // Add debug header to find the cause for infinite redirects better!
+		header_redirect( $admin_url, 302 );
 	}
 }
 
@@ -152,6 +151,9 @@ $Timer->pause( '_init_session' );
 
 /*
  * $Log$
+ * Revision 1.5  2010/04/13 22:23:38  blueyed
+ * Use header_redirect for canonical admin redirect. Also add extra header to aid debugging.
+ *
  * Revision 1.4  2010/02/08 17:51:25  efy-yury
  * copyright 2009 -> 2010
  *
