@@ -217,6 +217,7 @@ class code_highlight_plugin extends Plugin
 	function DisplayCodeToolbar()
 	{
 		echo '<div class="edit_toolbar code_toolbar">';
+		// TODO: dh> make this optional.. just like with line numbers, this "Code" line is not feasible with oneliners.
 		echo T_('Code').': ';
 		echo '<input type="button" id="codespan" title="'.T_('Insert codespan').'" class="quicktags" onclick="codespan_tag(\'\');" value="'.T_('codespan').'" />';
 		echo '<input type="button" id="codeblock" title="'.T_('Insert codeblock').'" style="margin-left:8px;" class="quicktags" onclick="codeblock_tag(\'\');" value="'.T_('codeblock').'" />';
@@ -637,6 +638,9 @@ class code_highlight_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.34  2010/04/13 21:49:58  blueyed
+ * todo about making 'Code' paragraph/heading optional.
+ *
  * Revision 1.33  2010/04/13 21:48:14  blueyed
  * doc/todo
  *
