@@ -194,7 +194,10 @@ function header_redirect( $redirect_to = NULL, $status = false )
 	 // echo 'Passing Messages to next page';
 	}
 
-	$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
+	if( ! empty($Session) )
+	{
+		$Session->dbsave(); // If we don't save now, we run the risk that the redirect goes faster than the PHP script shutdown.
+	}
 
 	// see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 	switch( $http_response_code )
@@ -1110,6 +1113,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.74  2010/04/13 22:23:11  blueyed
+ * Check if $Session is existing before calling save on it.
+ *
  * Revision 1.73  2010/03/18 21:17:31  blueyed
  * header_redirect: add call to debug_die, if headers have been sent already.
  *
