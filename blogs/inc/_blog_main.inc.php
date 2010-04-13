@@ -413,6 +413,18 @@ if( !empty($p) || !empty($title) )
 		}
 
 		if( ! $title_fallback )
+		{
+			$SlugCache = & get_SlugCache();
+			$Slug = & $SlugCache->get_by_name( $title, false, false );
+			if( ! empty($Slug) && $Slug->get( 'type' ) == 'help' )
+			{
+				$disp = 'help';
+				$title_fallback = true;
+				$title = NULL;
+			}
+		}
+
+		if( ! $title_fallback )
 		{	// We were not able to fallback to anythign meaningful:
 			$disp = '404';
 			$disp_detail = '404-post_not_found';
@@ -651,6 +663,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.164  2010/04/13 13:50:51  efy-asimo
+ * slugs help radio optoin - slugs task
+ *
  * Revision 1.163  2010/02/08 17:51:18  efy-yury
  * copyright 2009 -> 2010
  *

@@ -41,10 +41,11 @@ $Form->begin_form( 'fform', $creating ?  T_('New Slug') : T_('Slug') );
 	$Form->text_input( 'slug_title', $edited_Slug->get( 'title' ), 50, T_('Slug'), '', array( 'maxlength'=> 255, 'required'=>true ) );
 
 	$Form->radio_input( 'slug_type', $creating ? 'item' : $edited_Slug->get( 'type' ), array( 
-						array( 'value' => 'item', 'label' => T_('Item') )),
-						T_('Type') );
+						array( 'value' => 'item', 'label' => T_( 'Item' ) ),
+						array( 'value' => 'help', 'label' => T_( 'Help' ) ) ),
+						T_('Type'), array( 'lines' => 1 ) );
 
-	$Form->text_input( 'slug_object_ID', $edited_Slug->get( 'itm_ID' ), 50, T_('Object ID'), '', array( 'maxlength'=> 11, 'required'=>true ) );
+	$Form->text_input( 'slug_object_ID', $edited_Slug->get( 'itm_ID' ), 50, T_('Object ID'), '', array( 'maxlength'=> 11, 'required'=>false ) );
 
 if( $creating )
 {

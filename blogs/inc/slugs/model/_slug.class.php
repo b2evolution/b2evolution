@@ -114,7 +114,7 @@ class Slug extends DataObject
 		// object ID:
 		$object_id = param( 'slug_object_ID', 'string' );
 		// All DataObject ID must be a number
-		if( ! is_number( $object_id ) )
+		if( ! is_number( $object_id ) && $this->type != 'help' )
 		{ // not a number
 			$Messages->add( T_('Object ID must be a number!'), 'error' );
 			return false;
@@ -160,6 +160,9 @@ class Slug extends DataObject
 								.' WHERE '.$fk.' = '.$this->ID;
 				break;
 
+			case 'help':
+				return '';
+
 			default:
 				// not defined restriction
 				debug_die ( 'Unhandled object type:' . htmlspecialchars ( $this->type ) );
@@ -173,8 +176,7 @@ class Slug extends DataObject
 			{ // the object name is empty
 				$obj_name_value = T_('No name');
 			}
-			// TODO: dh> please remove "<br/>" here. We should return an array here instead (if there are multiple return values possible after all!?!).
-			$result_link .= '<br/>'.sprintf( $link, $row->$object_ID, $obj_name_value );
+			$result_link .= sprintf( $link, $row->$object_ID, $obj_name_value );
 		}
 
 		return $result_link;
@@ -194,7 +196,7 @@ class Slug extends DataObject
 		$restriction_link = $this->get_link_to_object( $restriction['fk'] );
 		if( $restriction_link != '' )
 		{ // there are restrictions
-			return sprintf( $restriction['msg'].$restriction_link, 1 );
+			return sprintf( $restriction['msg'].'<br/>'.$restriction_link, 1 );
 		}
 		// no restriction
 		return '';
