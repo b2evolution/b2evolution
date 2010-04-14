@@ -563,6 +563,7 @@ td.error {
 	background:#fbf2ee;
 	color:#e00;
 }
+/* TODO: dh> why is there "red" in the name? why not just .log_warning/.warning? */
 div.log_container div.log_redwarning,
 div.action_messages div.log_redwarning,
 div.redwarning,
