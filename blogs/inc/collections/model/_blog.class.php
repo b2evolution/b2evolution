@@ -714,6 +714,7 @@ class Blog extends DataObject
 		}
 		else
 		{ // user has no permission to change blog_urlname
+		  // dh> ? are you sure you've missed the correct IF block with this ELSE? I don't understand it at least, so please fix doc.
 			$this->set( 'urlname', urltitle_validate( $this->urlname, '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
 		}
 
@@ -2314,6 +2315,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.107  2010/04/14 23:01:09  blueyed
+ * doc
+ *
  * Revision 1.106  2010/04/12 15:14:25  efy-asimo
  * resolver bug - fix
  *
