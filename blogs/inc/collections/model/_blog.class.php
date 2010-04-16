@@ -2161,7 +2161,7 @@ class Blog extends DataObject
 	function contact_link( $params = array() )
 	{
 		$this->get_owner_User();
-		if( ! $this->owner_User->allow_msgform )
+		if( ! $this->owner_User->get_msgform_settings() )
 		{
 			return false;
 		}
@@ -2247,7 +2247,7 @@ class Blog extends DataObject
 	function get_contact_url( $with_redirect = true )
 	{
 		$this->get_owner_User();
-		if( ! $this->owner_User->allow_msgform )
+		if( ! $this->owner_User->get_msgform_settings() )
 		{ // user does not allow contact form
 			return NULL;
 		}
@@ -2315,6 +2315,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.108  2010/04/16 10:42:10  efy-asimo
+ * users messages options- send private messages to users from front-office - task
+ *
  * Revision 1.107  2010/04/14 23:01:09  blueyed
  * doc
  *

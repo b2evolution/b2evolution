@@ -144,7 +144,12 @@ if( $action != 'view' )
 	{ // info only:
 		$Form->info( T_('Validated email'), ( $edited_User->get('validated') ? T_('yes') : T_('no') ), T_('Has this email address been validated (through confirmation email)?') );
 	}
-	$Form->checkbox( 'edited_user_allow_msgform', $edited_User->get('allow_msgform'), T_('Message form'), T_('Check this to allow receiving emails through a message form.') );
+	$Form->radio_input( 'edited_user_allow_msgform', $edited_User->get('allow_msgform'), array(
+		array( 'value' => '1', 'label' => T_( 'Allow others to send me emails through a message form' ) ),
+		array( 'value' => '2', 'label' => T_( 'Allow registered users to send me private messages and others to send me emails through a message form.' ) ),
+		array( 'value' => '3', 'label' => T_( 'Allow registered users to send me private messages; don\'t allow others to contact me.' ) ),
+		array( 'value' => '0', 'label' => T_( 'Do not allow anyone to contact me.' ) ) ),
+		T_( 'Message form' ), array( 'lines' => 1 ) );
 	$Form->checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive a notification whenever someone else comments on one of <strong>your</strong> posts.') );
 
 }
@@ -411,6 +416,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.12  2010/04/16 10:42:11  efy-asimo
+ * users messages options- send private messages to users from front-office - task
+ *
  * Revision 1.11  2010/03/01 07:52:51  efy-asimo
  * Set manual links to lowercase
  *

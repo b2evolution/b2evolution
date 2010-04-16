@@ -113,7 +113,7 @@ $schema_queries = array(
 			user_yim varchar(50) NULL,
 			user_locale varchar(20) DEFAULT 'en-EU' NOT NULL,
 			user_idmode varchar(20) NOT NULL DEFAULT 'login',
-			user_allow_msgform TINYINT NOT NULL DEFAULT '1',
+			user_allow_msgform TINYINT NOT NULL DEFAULT '2',
 			user_notify tinyint(1) NOT NULL default 1,
 			user_showonline tinyint(1) NOT NULL default 1,
 			user_grp_ID int(4) NOT NULL default 1,
@@ -286,6 +286,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.48  2010/04/16 10:42:10  efy-asimo
+ * users messages options- send private messages to users from front-office - task
+ *
  * Revision 1.47  2010/04/07 08:26:10  efy-asimo
  * Allow multiple slugs per post - update & fix
  *

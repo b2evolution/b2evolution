@@ -195,7 +195,7 @@ class User extends DataObject
 				$this->group_ID = $Settings->get('newusers_grp_ID');
 			}
 
- 			$this->set( 'allow_msgform', 1 );
+ 			$this->set( 'allow_msgform', 2 );
  			$this->set( 'notify', 1 );
  			$this->set( 'showonline', 1 );
 		}
@@ -703,11 +703,7 @@ class User extends DataObject
 	{
 		global $ReqURI;
 
-		if( empty($this->email) )
-		{ // We have no email for this Author :(
-			return NULL;
-		}
-		if( empty($this->allow_msgform) )
+		if( ! $this->get_msgform_settings() )
 		{
 			return NULL;
 		}
@@ -1374,6 +1370,46 @@ class User extends DataObject
 
 
 	/**
+	 * Get allow_msgform settings for this user
+	 * 
+	 * @return NULL|string NULL if contact not allowed for current user, the allowed form otherwise
+	 */
+	function get_msgform_settings()
+	{
+		global $current_User;
+		switch( $this->allow_msgform )
+		{
+			case 1:
+				if( ! empty($this->email) )
+				{ // Allow others to send emails
+					return 'email';
+				}
+				// We have no email for this Author :(
+				return NULL;
+
+			case 2:
+				//  Allow registered users to send private messages, and others to send emails
+				if( ! is_logged_in() && ! empty($this->email) )
+				{
+					return 'email';
+				}
+				// no break
+			case 3:
+				// Allow registered users to send private messages; don't allow others to contact.
+				if( is_logged_in() )
+				{
+					return 'private_message';
+				}
+				// no break
+			case 0:
+			default:
+				// Do not allow to contact
+				return NULL;
+		}
+	}
+
+
+	/**
 	 * Insert object into DB based on previously recorded changes
 	 *
 	 * Triggers the plugin event AfterUserInsert.
@@ -1668,7 +1704,7 @@ class User extends DataObject
 		{ // We have no email for this User :(
 			return false;
 		}
-		if( empty($this->allow_msgform) )
+		if( ! $this->get_msgform_settings() )
 		{
 			return false;
 		}
@@ -1966,6 +2002,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.71  2010/04/16 10:42:11  efy-asimo
+ * users messages options- send private messages to users from front-office - task
+ *
  * Revision 1.70  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *

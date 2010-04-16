@@ -182,7 +182,8 @@ if( ! empty( $recipient_id ) )
 	$UserCache = & get_UserCache();
 	$recipient_User = & $UserCache->get_by_ID( $recipient_id );
 
-	if( empty($recipient_User->allow_msgform) )
+	$allow_msgform = $recipient_User->get_msgform_settings();
+	if( empty($allow_msgform) )
 	{ // should be prevented by UI
 		debug_die( 'Invalid recipient!' );
 	}
@@ -205,7 +206,7 @@ elseif( ! empty( $comment_id ) )
 
 	if( $comment_author_User = & $Comment->get_author_User() )
 	{ // Comment is from a registered user:
-		if( ! $comment_author_User->allow_msgform )
+		if( ! $comment_author_User->get_msgform_settings() )
 		{ // should be prevented by UI
 			debug_die( 'Invalid recipient!' );
 		}
@@ -229,62 +230,70 @@ if( empty($recipient_address) )
 }
 
 
-// opt-out links:
-if( $recipient_User )
-{ // Member:
+if( $allow_msgform == 'email' )
+{
+	// opt-out links:
+	if( $recipient_User )
+	{ // Member:
+		if( !empty( $Blog ) )
+		{
+			$message_footer .= T_("You can edit your profile to not receive emails through a form:")
+				."\n".url_add_param( str_replace( '&amp;', '&', $Blog->get('url') ), 'disp=profile', '&' );
+		}
+		// TODO: else go to admin
+	}
+	elseif( $Comment )
+	{ // Visitor:
+		$message_footer .= T_("Click on the following link to not receive e-mails on your comments\nfor this e-mail address anymore:")
+			."\n".$htsrv_url.'message_send.php?optout_cmt_email='.rawurlencode($Comment->author_email);
+	}
+	
+	
+	// Trigger event: a Plugin could add a $category="error" message here..
+	$Plugins->trigger_event( 'MessageFormSent', array(
+		'recipient_ID' => & $recipient_id,
+		'item_ID' => $post_id,
+		'comment_ID' => $comment_id,
+		'subject' => & $subject,
+		'message' => & $message,
+		'message_footer' => & $message_footer,
+		'Blog' => & $Blog,
+		'sender_name' => & $sender_name,
+		'sender_email' => & $sender_address,
+		) );
+	
+	
+	if( $Messages->count( 'error' ) )
+	{ // there were errors: display them and get out of here
+		$Messages->display( T_('Cannot send email, please correct these errors:'),
+		'[<a href="javascript:history.go(-1)">'. T_('Back to email editing') . '</a>]' );
+		exit(0);
+	}
+
 	if( !empty( $Blog ) )
 	{
-		$message_footer .= T_("You can edit your profile to not receive emails through a form:")
-			."\n".url_add_param( str_replace( '&amp;', '&', $Blog->get('url') ), 'disp=profile', '&' );
+		$message = $message
+			."\n\n-- \n"
+			.sprintf( T_('This message was sent via the messaging system on %s.'), $Blog->name )."\n"
+			.$Blog->get('url')."\n\n"
+			.$message_footer;
 	}
-	// TODO: else go to admin
-}
-elseif( $Comment )
-{ // Visitor:
-	$message_footer .= T_("Click on the following link to not receive e-mails on your comments\nfor this e-mail address anymore:")
-		."\n".$htsrv_url.'message_send.php?optout_cmt_email='.rawurlencode($Comment->author_email);
-}
+	else
+	{
+		$message = $message
+			."\n\n-- \n"
+			.sprintf( T_('This message was sent via the messaging system on %s.'), $baseurl )."\n\n"
+			.$message_footer;
+	}
 
-
-// Trigger event: a Plugin could add a $category="error" message here..
-$Plugins->trigger_event( 'MessageFormSent', array(
-	'recipient_ID' => & $recipient_id,
-	'item_ID' => $post_id,
-	'comment_ID' => $comment_id,
-	'subject' => & $subject,
-	'message' => & $message,
-	'message_footer' => & $message_footer,
-	'Blog' => & $Blog,
-	'sender_name' => & $sender_name,
-	'sender_email' => & $sender_address,
-	) );
-
-
-if( $Messages->count( 'error' ) )
-{ // there were errors: display them and get out of here
-	$Messages->display( T_('Cannot send email, please correct these errors:'),
-	'[<a href="javascript:history.go(-1)">'. T_('Back to email editing') . '</a>]' );
-	exit(0);
-}
-
-if( !empty( $Blog ) )
-{
-	$message = $message
-		."\n\n-- \n"
-		.sprintf( T_('This message was sent via the messaging system on %s.'), $Blog->name )."\n"
-		.$Blog->get('url')."\n\n"
-		.$message_footer;
+	 // Send mail
+	$success_mail = send_mail( $recipient_address, $recipient_name, $subject, $message, $sender_address, $sender_name );
 }
 else
-{
-	$message = $message
-		."\n\n-- \n"
-		.sprintf( T_('This message was sent via the messaging system on %s.'), $baseurl )."\n\n"
-		.$message_footer;
+{ // Send private message
+	load_funcs( 'messaging/model/_messaging.funcs.php' );
+	$success_mail = send_message( $recipient_User->get( 'login' ), $subject, $message );
 }
-
-// Send mail
-$success_mail = send_mail( $recipient_address, $recipient_name, $subject, $message, $sender_address, $sender_name );
 
 
 // Plugins should cleanup their temporary data here:
@@ -312,6 +321,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.68  2010/04/16 10:42:10  efy-asimo
+ * users messages options- send private messages to users from front-office - task
+ *
  * Revision 1.67  2010/02/08 17:51:14  efy-yury
  * copyright 2009 -> 2010
  *

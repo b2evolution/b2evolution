@@ -124,8 +124,46 @@ function check_blocked_contacts( $recipients_list )
 	return $blocked_contacts;
 }
 
+/**
+ * Send a private message to a user
+ * 
+ * @param string recipient user login name
+ * @param string message title/subject
+ * @param string message text
+ * @return boolean true on success
+ */
+function send_message( $recipient, $subject, $text )
+{
+	global $current_User, $Messages;
+
+	if( $current_User->get( 'login' ) == $recipient )
+	{ // user wants to send a private message to himself
+		$Messages->add( T_('You cannot send threads to yourself').':'.$recipient );
+		return false;
+	}
+
+	load_class( 'messaging/model/_message.class.php', 'Message' );
+	load_class( 'messaging/model/_thread.class.php', 'Thread' );
+	// new thread:
+	$edited_Thread = new Thread();
+	$edited_Message = new Message();
+	$edited_Message->Thread = & $edited_Thread;
+
+	// set nessage attributes
+	$edited_Message->set( 'text', $text );
+	$edited_Thread->set( 'title', $subject );
+	$edited_Thread->set( 'recipients', $recipient );
+	$edited_Thread->param_check__recipients( 'thrd_recipients', $recipient );
+
+	// send the message
+	return $edited_Message->dbinsert_discussion();
+}
+
 /*
  * $Log$
+ * Revision 1.7  2010/04/16 10:42:11  efy-asimo
+ * users messages options- send private messages to users from front-office - task
+ *
  * Revision 1.6  2010/01/30 18:55:32  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *
