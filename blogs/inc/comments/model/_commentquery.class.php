@@ -247,6 +247,16 @@ class CommentQuery extends SQL
 		{
 			$url_match = "IN";
 		}
+		elseif( $url_match == '=' )
+		{
+			$author_url = '%'.$author_url.'%';
+			$url_match = 'LIKE';
+		}
+		elseif( $url_match == '!=' )
+		{
+			$author_url = '%'.$author_url.'%';
+			$url_match = 'NOT LIKE';
+		}
 
 		$include_empty = '';
 		if( $include_emptyurl )
