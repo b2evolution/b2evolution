@@ -340,10 +340,12 @@ if( $blog )
 		<?php
 
 		$nb_blocks_displayed++;
-		
+
 		$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', 'javascript:startRefreshComments()' ).'</span> ';
-		
-		$block_item_Widget->title = $refresh_link.T_('Comments awaiting moderation').' <span id="badge" class="badge">'.get_comments_awaiting_moderation_number( $Blog->ID ).'</span>';
+
+		$block_item_Widget->title = $refresh_link.T_('Comments awaiting moderation').
+			' <a href="'.$admin_url.'?ctrl=comments&amp;show_statuses[]=draft'.'">'.
+			'<span id="badge" class="badge">'.get_comments_awaiting_moderation_number( $Blog->ID ).'</span></a>';
 
 		echo '<div id="comments_block">';
 
@@ -725,6 +727,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.65  2010/04/16 11:36:54  efy-asimo
+ * make the red badge clickable on the dashboard
+ *
  * Revision 1.64  2010/03/11 10:34:59  efy-asimo
  * Rewrite CommentList to CommentList2 task
  *
