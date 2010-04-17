@@ -444,11 +444,14 @@ function get_canonical_path( $ads_path )
 	{
 		$ads_path = str_replace( '/./', '/', $ads_path );
 	}
-	if( ( $substr_index = strpos( $ads_path, '/../' ) ) !== false )
+	while( ( $substr_index = strpos( $ads_path, '/../' ) ) !== false )
 	{ // we founnd /../ back reference to dereference...
-		$ads_path = substr( $ads_path, 0, $substr_index );
+		$ads_path_begin = substr( $ads_path, 0, $substr_index );
+		$ads_path_end = substr( $ads_path, $substr_index + 4 );
 		// we need the last parent folder path
-		$ads_path = substr( $ads_path, 0, strrpos( $ads_path, '/' ) + 1 );
+		$ads_path_begin = substr( $ads_path_begin, 0, strrpos( $ads_path_begin, '/' ) + 1 );
+		// create new path
+		$ads_path = $ads_path_begin.$ads_path_end;
 	}
 	$ads_realpath = $ads_path;
 
@@ -1018,6 +1021,9 @@ function check_showparams( & $Filelist )
 
 /*
  * $Log$
+ * Revision 1.39  2010/04/17 11:51:50  efy-asimo
+ * $ads_path resolving - bugfix
+ *
  * Revision 1.38  2010/04/02 07:27:11  efy-asimo
  * cache folders rename and Filelist navigation - fix
  *
