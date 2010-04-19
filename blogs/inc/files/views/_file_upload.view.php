@@ -43,6 +43,9 @@ global $UserSettings;
 global $upload_quickmode, $failedFiles, $ads_list_path, $uploadwithproperties, $renamedMessages;
 
 global $fm_FileRoot;
+
+
+/* TODO: dh> move JS to external file. */
 ?>
 
 <script type="text/javascript">
@@ -172,28 +175,23 @@ global $fm_FileRoot;
 	// -->
 </script>
 
+
 <?php
 	// Begin payload block:
 	$this->disp_payload_begin();
 
 	$Form = new Form( NULL, 'fm_upload_checkchanges', 'post', 'none', 'multipart/form-data' );
 	$Form->begin_form( 'fform' );
-
-		$Form->add_crumb( 'file' );
-		$Form->hidden_ctrl();
-		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); // Just a hint for the browser.
-		$Form->hidden( 'upload_quickmode', $upload_quickmode );
-		$Form->hiddens_by_key( get_memorized() );
-
+	$Form->add_crumb( 'file' );
+	$Form->hidden_ctrl();
+	$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); // Just a hint for the browser.
+	$Form->hidden( 'upload_quickmode', $upload_quickmode );
+	$Form->hiddens_by_key( get_memorized() );
 
 	$Widget = new Widget( 'file_browser' );
-
 	$Widget->global_icon( T_('Quit upload mode!'), 'close', regenerate_url( 'ctrl,fm_mode', 'ctrl=files' ) );
-
 	$Widget->title = T_('File upload').get_manual_link('upload_multiple');
 	$Widget->disp_template_replaced( 'block_start' );
-
-
 ?>
 
 <table id="fm_browser" cellspacing="0" cellpadding="0">
@@ -217,17 +215,17 @@ global $fm_FileRoot;
 	<tbody>
 		<tr>
 			<?php
-				echo '<td id="fm_dirtree">';
+			echo '<td id="fm_dirtree">';
 
-				// Version with all roots displayed
-				echo get_directory_tree( NULL, NULL, $ads_list_path, true );
+			// Version with all roots displayed
+			echo get_directory_tree( NULL, NULL, $ads_list_path, true );
 
-				// Version with only the current root displayed:
-				// echo get_directory_tree( $fm_FileRoot, $fm_FileRoot->ads_path, $ads_list_path, true );
+			// Version with only the current root displayed:
+			// echo get_directory_tree( $fm_FileRoot, $fm_FileRoot->ads_path, $ads_list_path, true );
 
-				echo '</td>';
+			echo '</td>';
 
-				echo '<td id="fm_files">';
+			echo '<td id="fm_files">';
 
 
 		if( count( $failedFiles ) )
@@ -296,7 +294,7 @@ global $fm_FileRoot;
 
 						// fp> TODO: would be cool to add a close icon starting at the 2nd <li>
 						// dh> TODO: it may be useful to add the "accept" attrib to the INPUT elements to give the browser a hint about the accepted MIME types
-						
+
 						if( ! array_key_exists( $lKey, $renamedMessages ) )
 						{
 							?>
@@ -406,17 +404,21 @@ global $fm_FileRoot;
 	</tbody>
 </table>
 
+
 <?php
+$Widget->disp_template_raw( 'block_end' );
 
-	$Widget->disp_template_raw( 'block_end' );
+$Form->end_form();
 
-	$Form->end_form();
+// End payload block:
+$this->disp_payload_end();
 
-	// End payload block:
-	$this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.17  2010/04/19 17:06:23  blueyed
+ * doc/indent
+ *
  * Revision 1.16  2010/03/05 13:30:36  fplanque
  * cleanup/wording
  *
