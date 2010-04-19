@@ -243,7 +243,7 @@ if( $uploadfile_url )
 {
 	// Check that this action request is not a CSRF hacked request:
 	$Session->assert_received_crumb( 'file' );
-	
+
 	foreach($uploadfile_url as $k => $url)
 	{
 		if( ! isset($uploadfile_source[$k]) || $uploadfile_source[$k] != 'upload' )
@@ -286,7 +286,7 @@ if( $uploadfile_url )
 	// fp> TODO! This is a nasty dirty hack. That kind of stuff always breaks somewhere down the line. Needs cleanup.
 				// This allows us to treat it (nearly) the same way as regular uploads, apart from
 				// is_uploaded_file(), which we skip and move_uploaded_file() (where we use rename()).
-				$_FILES['uploadfile']['name'][$k] = basename($parsed_url['path']);
+				$_FILES['uploadfile']['name'][$k] = rawurldecode(basename($parsed_url['path']));
 				$_FILES['uploadfile']['size'][$k] = evo_bytes($file_contents);
 				$_FILES['uploadfile']['error'][$k] = 0;
 				$_FILES['uploadfile']['tmp_name'][$k] = $tmpfile_name;
@@ -334,7 +334,7 @@ if( ! empty($renamedFiles) )
 	}
 	forget_param( 'renamedFiles' );
 	unset( $renamedFiles );
-	
+
 	if( $upload_quickmode )
 	{
 		header_redirect( regenerate_url( 'ctrl', 'ctrl=files', '', '&' ) );
@@ -343,10 +343,10 @@ if( ! empty($renamedFiles) )
 
 // Process uploaded files:
 if( isset($_FILES) && count( $_FILES ) )
-{ 
+{
 	// Check that this action request is not a CSRF hacked request:
 	$Session->assert_received_crumb( 'file' );
-	
+
 	// Some files have been uploaded:
 	param( 'uploadfile_title', 'array', array() );
 	param( 'uploadfile_alt', 'array', array() );
@@ -484,7 +484,7 @@ if( isset($_FILES) && count( $_FILES ) )
 			else
 			{
 				$replace_length = strlen( '-'.($num_ext-1) );
-				$newName = substr_replace( $newName, '-'.$num_ext, $ext_pos-$replace_length, $replace_length ); 
+				$newName = substr_replace( $newName, '-'.$num_ext, $ext_pos-$replace_length, $replace_length );
 			}
 			$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
 		}
@@ -501,7 +501,7 @@ if( isset($_FILES) && count( $_FILES ) )
 			// Plugin returned 'false'. Abort file upload
 			continue;
 		}
-		
+
 		// Attempt to move the uploaded file to the requested target location:
 		if( isset($_FILES['uploadfile']['_evo_fetched_url'][$lKey]) )
 		{ // fetched remotely
@@ -527,7 +527,7 @@ if( isset($_FILES) && count( $_FILES ) )
 
 		// Refreshes file properties (type, size, perms...)
 		$newFile->load_properties();
-		
+
 		if( $num_ext )
 		{ // The file name was changed!
 			if( $image_info )
@@ -540,7 +540,7 @@ if( isset($_FILES) && count( $_FILES ) )
 			}
 			//$newFile_size = bytesreadable ($_FILES['uploadfile']['size'][$lKey]);
 			$renamedMessages[$lKey]['message'] = sprintf( T_('"%s was renamed to %s. Would you like to replace %s with the new version instead?'),
-													   $oldName, $newName, $oldName );
+													   '&laquo;'.$oldName.'&raquo;', '&laquo;'.$newName.'&raquo;', '&laquo;'.$oldName.'&raquo;' );
 			$renamedMessages[$lKey]['oldThumb'] = $oldFile_thumb;
 			$renamedMessages[$lKey]['newThumb'] = $newFile_thumb;
 			$renamedFiles[$lKey]['oldName'] = $oldName;
@@ -605,7 +605,7 @@ if( isset($_FILES) && count( $_FILES ) )
 		$Messages->add( $failedFiles[0], 'error' );
 		unset($failedFiles);
 	}
-	
+
 	if( empty($failedFiles) && empty($renamedFiles) )
 	{ // quick mode or no failed files, Go back to Browsing
 		// header_redirect( $dispatcher.'?ctrl=files&root='.$fm_FileRoot->ID.'&path='.rawurlencode($path) );
@@ -647,6 +647,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.37  2010/04/19 17:19:02  blueyed
+ * Upload controller:
+ *  - rawurldecode the filename given in the URL. Especially for %20 etc. Fixes 'Invalid file name.'.
+ *  - add laquo/raquo to filename in was-renamed error message. Usability nightmare there btw.
+ *
  * Revision 1.36  2010/03/28 17:08:09  fplanque
  * minor
  *
