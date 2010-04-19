@@ -462,19 +462,6 @@ ul.widget_list li {
 	width: 60%;
 }
 
-.badge {
-	position: relative;
-	top: -1px;
-	-moz-border-radius:12px;
-	-webkit-border-radius:12px;
-	background-color:red;
-	border:2px solid #fff;
-	color:#fff;
-	font-size:10px;
-	padding:0 6px
-}
-
-
 #iframe_wrapper .action_messages {
 	margin:0;
 	padding:0.2ex 1ex;
