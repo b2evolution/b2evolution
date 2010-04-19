@@ -67,6 +67,7 @@ $comments_allow_css_tweaks = false;
  *
  * here is a list of the tags that are allowed in the comments.
  * If XHTML validation is disabled all tags not in this list will be filtered out anyway before we do any checking
+ * @deprecated
  */
 $comment_allowed_tags = '<p><ul><ol><li><dl><dt><dd><address><blockquote><ins><del><span><bdo><br><em><strong><dfn><code><samp><kdb><var><cite><abbr><acronym><q><sub><sup><tt><i><b><big><small>';
 
