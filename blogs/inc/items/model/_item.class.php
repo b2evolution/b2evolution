@@ -4214,6 +4214,7 @@ class Item extends ItemLight
 		else
 		{ // create new tiny Slug for this item
 			$Slug = new Slug();
+			load_funcs( 'slugs/model/_slug.funcs.php' );
 			$Slug->set( 'title', getnext_tinyurl() );
 			$Slug->set( 'itm_ID', $this->ID );
 			$Slug->set( 'type', 'item' );
@@ -4311,6 +4312,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.191  2010/04/19 18:38:37  blueyed
+ * Fix get_tinyurl, via /blogs/admin.php?ctrl=items&blog=1&filter=restore
+ *
  * Revision 1.190  2010/04/12 15:14:25  efy-asimo
  * resolver bug - fix
  *
