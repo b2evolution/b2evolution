@@ -150,11 +150,13 @@ if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
 	}
 
 /* fp> what's a use case for this?
+ * dh> well. When we redirect, it's lost. So why do you have commented out this only?
+ *     USE CASE: override locale via GET param. I'm using this to quickly get the orig string for a translation to search for.
+ */
 	if( $locale_from_get )
 	{ // locale from GET being used. It should not get overridden below.
 		$redir = 'no'; // do not redirect to canonical URL
 	}
-*/
 }
 
 
@@ -219,6 +221,9 @@ $Timer->pause( '_init_hit' );
 
 /*
  * $Log$
+ * Revision 1.4  2010/04/19 17:00:13  blueyed
+ * Make locale_from_get work again.
+ *
  * Revision 1.3  2010/02/08 17:51:25  efy-yury
  * copyright 2009 -> 2010
  *
