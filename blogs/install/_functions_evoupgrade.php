@@ -2680,7 +2680,7 @@ function upgrade_b2evo_tables()
 	task_begin( 'Upgrading posts...' );
 	$DB->query( 'UPDATE T_items__item, T_slug
 		SET post_canonical_slug_ID = slug_ID
-		WHERE post_urltitle = slug_title' );
+		WHERE CONVERT( post_urltitle USING ASCII ) COLLATE ascii_bin = slug_title' );
 	task_end();
 
 	/*
@@ -2857,6 +2857,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.361  2010/04/20 07:00:21  efy-asimo
+ * Upgrading T_items__item table (urltitle & slug_title illegal mix of collation) - fix
+ *
  * Revision 1.360  2010/04/12 09:41:36  efy-asimo
  * private URL shortener - task
  *
