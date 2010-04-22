@@ -219,7 +219,7 @@ class Plugin
 	/**
 	 * Name of the current class. (AUTOMATIC)
 	 *
-	 * Will be set automatically (from filename) when registering plugin.
+	 * Will be set automatically (from filename) when registering the plugin.
 	 *
 	 * @var string
 	 */
@@ -271,14 +271,6 @@ class Plugin
 	 * @var string
 	 */
 	var $status;
-
-	/**
-	 * The "mother" object, where this Plugin got instantiated from.
-	 *
-	 * @deprecated since 2.0
-	 * @var Plugins|Plugins_admin
-	 */
-	var $Plugins;
 
 	/**
 	 * The translations keyed by locale. They get loaded through include() of _global.php.
@@ -604,7 +596,7 @@ class Plugin
 	 * Override this method to define methods/functions that you want to make accessible
 	 * through /htsrv/call_plugin.php, which allows you to call those methods by HTTP request.
 	 *
-	 * This is useful for things like AJAX or displaying an <iframe> element, where the content
+	 * This is useful for things like AJAX or displaying an IFRAME element, where the content
 	 * should get provided by the plugin itself.
 	 *
 	 * E.g., the image captcha plugin uses this method to serve a generated image.
@@ -3034,6 +3026,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.38  2010/04/22 18:58:31  blueyed
+ * Fix doc
+ *
  * Revision 1.37  2010/03/18 21:58:59  blueyed
  * doc
  *
