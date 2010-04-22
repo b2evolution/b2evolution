@@ -273,6 +273,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 	 *           It could depend on tag_ID_any (once tags have an ID)
 	 *           or just the list of blogs (cont_coll_ID_*)?
 	 * fp> I don't understand what you mean.
+	 * dh> That the widget should get cached, and needs a custom implementation
+	 *     of this method (get_cache_keys).
+	 *     Cache contents should get invalidated when any tags get changed.
 	 *
 	 * @return array of keys this widget depends on
 	 *
@@ -289,6 +292,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.31  2010/04/22 19:41:01  blueyed
+ * doc
+ *
  * Revision 1.30  2010/04/22 18:56:55  blueyed
  * Save one byte per tag link. Todo.
  *
