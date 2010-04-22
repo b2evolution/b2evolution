@@ -256,7 +256,7 @@ class BlockCache
 
 
 	/**
-	 * put your comment there...
+	 * Store payload/data into the cache provider.
 	 *
 	 * @todo dh> This method should get removed from here, it's not limited to BlockCache.
 	 * @param mixed $key
@@ -280,9 +280,12 @@ class BlockCache
 
 
 	/**
-	 * put your comment there...
+	 * Fetch key from the cache provider.
+	 *
+	 * {@internal JFI: apc_fetch supports fetching an array of keys}}
 	 *
 	 * @todo dh> This method should get removed from here, it's not limited to BlockCache.
+	 * @todo dh> Add $default param, defaulting to NULL. This will be used on lookup failures.
 	 * @param mixed $key
 	 * @param mixed $success
 	 */
@@ -311,6 +314,9 @@ class BlockCache
 
 /*
  * $Log$
+ * Revision 1.13  2010/04/22 20:29:53  blueyed
+ * doc for cacheproviderstore/cacheproviderretrieve
+ *
  * Revision 1.12  2010/04/22 20:29:04  blueyed
  * Fix eaccelerator implementation of cacheproviderstore (passing correct argument).
  *
