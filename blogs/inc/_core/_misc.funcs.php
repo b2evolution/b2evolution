@@ -137,8 +137,8 @@ function shutdown()
 	global $Timer;
 	global $shutdown_count_item_views;
 
-	// TODO: not enabled in my php-(fast)cgi
-	if( is_callable('pcntl_fork') )
+	// Try forking a background process and let the parent return as fast as possbile.
+	if( is_callable('pcntl_fork') ) // NOTE: not enabled in php5-fpm (via dotdeb)
 	{
 		if( $pid = pcntl_fork() )
 			return; // Parent
@@ -162,9 +162,6 @@ function shutdown()
 
 		// Now running as a daemon. This process will even survive
 		// an apachectl stop.
-		$fp = fopen("/tmp/sdf123", "w");
-		fprintf($fp, "PID = %s\n", posix_getpid());
-		fclose($fp); 
 	}
 
 	$Timer->resume('shutdown');
@@ -3904,6 +3901,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.223  2010/04/22 19:41:25  blueyed
+ * doc/cleanup
+ *
  * Revision 1.222  2010/04/22 18:55:20  blueyed
  * An attempt to save views during shutdown.
  *
