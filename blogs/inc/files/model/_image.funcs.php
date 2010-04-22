@@ -184,6 +184,7 @@ function load_image( $path, $mimetype )
 
 	if( $imh === false )
 	{
+		trigger_error( 'load_image failed: '.$path.' / '.$mimetype ); // DEBUG
 		// e.g. "imagecreatefromjpeg(): $FILE is not a valid JPEG file"
 		$err = '!load_image failed (no valid image?)';
 	}
@@ -351,6 +352,9 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height )
 
 /*
  * $Log$
+ * Revision 1.23  2010/04/22 20:43:27  blueyed
+ * trigger_error, if load_image failed
+ *
  * Revision 1.22  2010/02/21 04:47:07  sam2kb
  * crop_to_constraint: fixed crop proportions
  *
