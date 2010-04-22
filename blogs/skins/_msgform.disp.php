@@ -89,7 +89,7 @@ elseif( ! empty($comment_id) )
 	$row = $DB->get_row( '
 		SELECT *
 		  FROM T_comments
-		 WHERE comment_ID = '.$comment_id, ARRAY_A );
+		 WHERE comment_ID = '.$comment_id );
 
 	if( $row )
 	{
@@ -207,6 +207,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.12  2010/04/22 18:56:15  blueyed
+ * Fix "Load comment from DB" (DB query result type)
+ *
  * Revision 1.11  2010/02/08 17:56:14  efy-yury
  * copyright 2009 -> 2010
  *
