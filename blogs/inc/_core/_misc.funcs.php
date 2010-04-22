@@ -134,8 +134,38 @@ function shutdown()
 
 	global $Settings;
 	global $Debuglog;
-
 	global $Timer;
+	global $shutdown_count_item_views;
+
+	// TODO: not enabled in my php-(fast)cgi
+	if( is_callable('pcntl_fork') )
+	{
+		if( $pid = pcntl_fork() )
+			return; // Parent
+
+		function shutdown_kill() {
+			posix_kill(posix_getpid(), SIGHUP);
+		}
+
+		ob_end_clean(); // Discard the output buffer and close
+		fclose(STDIN);  // Close all of the standard
+		fclose(STDOUT); // file descriptors as we
+		fclose(STDERR); // are running as a daemon. 
+
+		register_shutdown_function('shutdown_kill');
+
+		if( posix_setsid() < 0 )
+			return;
+
+		if( $pid = pcntl_fork() )
+			return;     // Parent
+
+		// Now running as a daemon. This process will even survive
+		// an apachectl stop.
+		$fp = fopen("/tmp/sdf123", "w");
+		fprintf($fp, "PID = %s\n", posix_getpid());
+		fclose($fp); 
+	}
 
 	$Timer->resume('shutdown');
 
@@ -147,6 +177,19 @@ function shutdown()
 	// Note: it might be useful at some point to do special processing if the script has been aborted or has timed out
 	// connection_aborted()
 	// connection_status()
+
+	if( ! empty($shutdown_count_item_views) )
+	{
+		foreach( $shutdown_count_item_views as $item_ID )
+		{
+			$ItemCache = get_ItemCache();
+			if( $Item = $ItemCache->get_by_ID($item_ID, false) ) {
+				$Item->count_view( array(
+					'allow_multiple_counts_per_page' => false,
+				) );
+			}
+		}
+	}
 
 	// Save the current HIT:
 	$Hit->log();
@@ -231,7 +274,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 		case 'htmlattr':
 			// use as an attribute: strips tags and escapes quotes
- 			// TODO: dh> why not just htmlspecialchars?fp> because an attribute can never contain a tag? dh> well, "onclick='return 1<2;'" would get stripped, too. I'm just saying: why mess with it, when we can just use htmlspecialchars.. fp>ok
+			// TODO: dh> why not just htmlspecialchars?fp> because an attribute can never contain a tag? dh> well, "onclick='return 1<2;'" would get stripped, too. I'm just saying: why mess with it, when we can just use htmlspecialchars.. fp>ok
 			$content = strip_tags($content);
 			$content = convert_chars($content, 'html');
 			$content = str_replace( array('"', "'"), array('&quot;', '&#039;'), $content );
@@ -1828,7 +1871,7 @@ function debug_die( $additional_info = '', $params = array() )
 
 	$params = array_merge( array(
 		'status' => '500 Internal Server Error',
-   		), $params );
+		), $params );
 
 	if( $is_cli )
 	{ // Command line interface, e.g. in cron_exec.php:
@@ -3103,7 +3146,7 @@ function jsspecialchars($s)
  */
 function compact_date( $date )
 {
- 	return preg_replace( '#[^0-9]#', '', $date );
+	return preg_replace( '#[^0-9]#', '', $date );
 }
 
 
@@ -3525,7 +3568,7 @@ function generate_link_from_params( $link_params, $params = array() )
  * @todo dh> Move this out into some more specific (not always included) file.
  *
  * @param array $methods javascript funtions to call with array of parameters
- *            	format : 'function_name' => array( param1, parm2, param3 )
+ *		format : 'function_name' => array( param1, parm2, param3 )
  * @param boolean $send_as_html Wrap the script into an html page with script tag; default is to send as js file
  * @param string $target prepended to function calls : blank or window.parent
  */
@@ -3861,6 +3904,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.222  2010/04/22 18:55:20  blueyed
+ * An attempt to save views during shutdown.
+ *
  * Revision 1.221  2010/03/29 20:31:36  blueyed
  * debug_get_backtrace: crop string args after 255 chars (not 65). Fix escaping of args and handling of resource args.
  *

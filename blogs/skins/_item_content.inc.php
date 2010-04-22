@@ -16,6 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $disp_detail;
 global $more;
+global $shutdown_count_item_views;
 
 // Default params:
 $params = array_merge( array(
@@ -142,9 +143,7 @@ switch( $content_mode )
 		echo $params['content_start_full'];
 
 		// Increment view count of first post on page:
-		$Item->count_view( array(
-				'allow_multiple_counts_per_page' => false,
-			) );
+		$shutdown_count_item_views[] = $Item->ID;
 
 		if( ! empty($params['image_size']) )
 		{
@@ -243,6 +242,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.33  2010/04/22 18:55:20  blueyed
+ * An attempt to save views during shutdown.
+ *
  * Revision 1.32  2010/03/14 21:38:22  sam2kb
  * minor
  *
