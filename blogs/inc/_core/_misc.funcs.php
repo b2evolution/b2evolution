@@ -3680,6 +3680,92 @@ function get_available_sort_options()
 
 
 /**
+ * Get a value from a volatile/lossy cache.
+ * @param string key
+ * @param boolean success (by reference)
+ * @return mixed True in case of success, false in case of failure. NULL, if no
+ * backend is available.
+ */
+function get_from_mem_cache($key, & $success = NULL)
+{
+	global $Timer;
+
+	$Timer->resume('get_from_mem_cache');
+
+	if( function_exists('apc_fetch') )
+		$r = apc_fetch( $key, $success );
+	elseif( function_exists('xcache_get') && ini_get('xcache.var_size') > 0 )
+		$r = xcache_get($key);
+	elseif( function_exists('eaccelerator_get') )
+		$r = eaccelerator_get($key);
+
+	if( ! isset($success) )
+	{ // set $success for implementation that do not set it itself (only APC does so)
+		$success = isset($r);
+	}
+	if( ! $success )
+	{
+		global $Debuglog;
+		$Debuglog->add('No caching backend available for reading "'.$key.'".', 'cache');
+	}
+
+	$Timer->pause('get_from_mem_cache');
+	return $r;
+}
+
+
+/**
+ * Set a value to a volatile/lossy cache.
+ * There's no guarantee that the data is still available, since e.g. old
+ * values might get purged.
+ * @param string key
+ * @param mixed Data. Objects would have to be serialized.
+ * @param int Time to live (seconds). Default is 0 and means "forever".
+ * @return mixed
+ */
+function set_to_mem_cache($key, $payload, $ttl = 0)
+{
+	global $Timer;
+
+	$Timer->resume('set_to_mem_cache');
+
+	if( function_exists('apc_store') )
+		$r = apc_store( $key, $payload, $ttl );
+	elseif( function_exists('xcache_set') && ini_get('xcache.var_size') > 0 )
+		$r = xcache_set( $key, $payload, $ttl );
+	elseif( function_exists('eaccelerator_put') )
+		$r = eaccelerator_put( $key, $payload, $ttl );
+	else {
+		global $Debuglog;
+		$Debuglog->add('No caching backend available for writing "'.$key.'".', 'cache');
+		$r = NULL;
+	}
+
+	$Timer->pause('set_to_mem_cache');
+
+	return $r;
+}
+
+
+/**
+ * Remove a given key from the volatile/lossy cache.
+ * @param string key
+ * @return boolean True on success, false on failure. NULL if no backend available.
+ */
+function unset_from_mem_cache($key)
+{
+	if( function_exists('apc_delete') )
+		return apc_delete( $key );
+
+	if( function_exists('xcache_unset') )
+		return xcache_unset(gen_key_for_cache($key));
+
+	if( function_exists('eaccelerator_rm') )
+		return eaccelerator_rm(gen_key_for_cache($key));
+}
+
+
+/**
  * Generate order by clause
  *
  * @return string
@@ -3899,6 +3985,10 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.226  2010/04/22 20:56:11  blueyed
+ *  - Move/Refactor BlockCache::cacheproviderstore/cacheproviderretrieve into get_from_mem_cache/set_to_mem_cache
+ *  - Add unset_from_mem_cache
+ *
  * Revision 1.225  2010/04/22 20:49:39  blueyed
  * debug_info: handle unset host with db_config output. Make output code more compact.
  *
