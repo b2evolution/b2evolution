@@ -98,7 +98,7 @@ switch( $viewtype )
 		/*
 		 * Image file view:
 		 */
-		echo '<div class="img_preview">';
+		echo '<div class="img_preview content-type-image">';
 
 		if( $imgSize = $selected_File->get_image_size( 'widthheight' ) )
 		{
@@ -131,6 +131,7 @@ switch( $viewtype )
 		break;
 
 	case 'text':
+		echo '<div class="content-type-text">';
  		/*
 		 * Text file view:
 		 */
@@ -243,6 +244,7 @@ switch( $viewtype )
 		{
 			echo '<p class="error">'.sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $selected_File->get_rdfs_rel_path( $selected_File ) ).'</p>';
 		}
+		echo '</div>';
 		break;
 
 	default:
@@ -257,6 +259,9 @@ switch( $viewtype )
 <?php
 /*
  * $Log$
+ * Revision 1.30  2010/04/22 18:32:14  blueyed
+ * viewfile.php: Add content-type-foo classes, namely content-type-image and content-type-text
+ *
  * Revision 1.29  2010/04/22 18:28:26  blueyed
  * getfile.php: Memorize root, viewtype and path params.
  *
