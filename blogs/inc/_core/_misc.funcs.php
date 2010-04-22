@@ -3739,8 +3739,9 @@ function & get_IconLegend()
 
 
 /**
- * Anyone using something else, please extend.
- *
+ * Get name of active opcode cache, or "none".
+ * {@internal Anyone using something else, please extend.}}
+ * @return string
  */
 function get_active_opcode_cache()
 {
@@ -3754,8 +3755,10 @@ function get_active_opcode_cache()
 		}
 	}
 
-	if( function_exists('xcache_set') && ini_get('xcache.var_size') > 0 )
+	// xcache: xcache.var_size must be > 0. xcache_set is not necessary (might have been disabled).
+	if( ini_get('xcache.size') > 0 )
 	{
+		assert('$opcode_cache == "none"'); // xcache gets disabled, if APC is enabled already
 		$opcode_cache = 'xcache';
 	}
 
@@ -3901,6 +3904,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.224  2010/04/22 20:28:37  blueyed
+ * get_active_opcode_cache: fix xcache detection (checking for xcache.size rather than xcache.var_size). Also xcache_set must not be available for this. doc.
+ *
  * Revision 1.223  2010/04/22 19:41:25  blueyed
  * doc/cleanup
  *
