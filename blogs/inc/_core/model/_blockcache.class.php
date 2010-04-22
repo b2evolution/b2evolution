@@ -273,7 +273,7 @@ class BlockCache
 			return xcache_set( $key, $payload, $ttl );
 
 		if( function_exists('eaccelerator_put') )
-			return eaccelerator_put( $key, $data, $ttl );
+			return eaccelerator_put( $key, $payload, $ttl );
 
 		return NULL;
 	}
@@ -311,6 +311,9 @@ class BlockCache
 
 /*
  * $Log$
+ * Revision 1.12  2010/04/22 20:29:04  blueyed
+ * Fix eaccelerator implementation of cacheproviderstore (passing correct argument).
+ *
  * Revision 1.11  2010/02/08 17:51:42  efy-yury
  * copyright 2009 -> 2010
  *
