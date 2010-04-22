@@ -265,7 +265,18 @@ class BlockCache
 	 */
 	function cacheproviderstore( $key, $payload, $ttl = 86400 )
 	{
-		return set_to_mem_cache($key, $payload, $ttl);
+		if( function_exists('apc_store') )
+			return apc_store( $key, $payload, $ttl );
+
+		if( function_exists('xcache_set') && ini_get('xcache.var_size') > 0 )
+			return xcache_set( $key, $payload, $ttl );
+
+		if( function_exists('eaccelerator_put') )
+			return eaccelerator_put( $key, $payload, $ttl );
+
+		global $Debuglog;
+		$Debuglog->add('No caching backend available for writing "'.$key.'".', 'cache');
+		return NULL;
 	}
 
 
@@ -277,11 +288,31 @@ class BlockCache
 	 * @todo dh> This method should get removed from here, it's not limited to BlockCache.
 	 * @todo dh> Add $default param, defaulting to NULL. This will be used on lookup failures.
 	 * @param mixed $key
-	 * @param boolean $success (by reference)
+	 * @param mixed $success
 	 */
 	function cacheproviderretrieve( $key, & $success )
 	{
-		return get_from_mem_cache($key, $success);
+		if( function_exists('apc_fetch') )
+			return apc_fetch( $key, $success );
+
+		if( function_exists('xcache_get') && ini_get('xcache.var_size') > 0 )
+			$r = xcache_get($key);
+		elseif( function_exists('eaccelerator_get') )
+			$r = eaccelerator_get($key);
+
+		if( isset($r) )
+		{
+			$success = true;
+			return $r;
+		}
+		else
+		{
+			global $Debuglog;
+			$Debuglog->add('No caching backend available for reading "'.$key.'".', 'cache');
+		}
+
+		$success = false;
+		return NULL;
 	}
 
 }
@@ -289,8 +320,8 @@ class BlockCache
 
 /*
  * $Log$
- * Revision 1.15  2010/04/22 20:43:26  blueyed
- * trigger_error, if load_image failed
+ * Revision 1.16  2010/04/22 20:54:14  blueyed
+ * Revert accidental commit (r1.15).
  *
  * Revision 1.14  2010/04/22 20:31:45  blueyed
  * cacheproviderstore/cacheproviderretrieve: add Debuglog entries when there's no backend available.
