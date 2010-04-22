@@ -261,11 +261,10 @@ class BlockCache
 	 * @todo dh> This method should get removed from here, it's not limited to BlockCache.
 	 * @param mixed $key
 	 * @param mixed $payload
+	 * @param int Time to live in seconds (default: 86400; 0 means "as long as possible")
 	 */
-	function cacheproviderstore( $key, $payload )
+	function cacheproviderstore( $key, $payload, $ttl = 86400 )
 	{
-		$ttl = 3600 * 24; // TODO: dh> should become a param to the method?!
-
 		if( function_exists('apc_store') )
 			return apc_store( $key, $payload, $ttl );
 
@@ -275,6 +274,8 @@ class BlockCache
 		if( function_exists('eaccelerator_put') )
 			return eaccelerator_put( $key, $payload, $ttl );
 
+		global $Debuglog;
+		$Debuglog->add('No caching backend available for writing "'.$key.'".', 'cache');
 		return NULL;
 	}
 
@@ -304,6 +305,11 @@ class BlockCache
 			$success = true;
 			return $r;
 		}
+		else
+		{
+			global $Debuglog;
+			$Debuglog->add('No caching backend available for reading "'.$key.'".', 'cache');
+		}
 
 		$success = false;
 		return NULL;
@@ -314,6 +320,10 @@ class BlockCache
 
 /*
  * $Log$
+ * Revision 1.14  2010/04/22 20:31:45  blueyed
+ * cacheproviderstore/cacheproviderretrieve: add Debuglog entries when there's no backend available.
+ * cacheproviderstore: move $ttl to function arguments.
+ *
  * Revision 1.13  2010/04/22 20:29:53  blueyed
  * doc for cacheproviderstore/cacheproviderretrieve
  *
