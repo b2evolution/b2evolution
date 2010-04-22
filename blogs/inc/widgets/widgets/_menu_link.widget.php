@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the xyz Widget class.
+ * This file implements the menu_link_Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -49,6 +49,10 @@ $menu_link_widget_link_types = array(
  *
  * A ComponentWidget is a displayable entity that can be placed into a Container on a web page.
  *
+ * @todo dh> this needs to implement BlockCaching cache_keys properly:
+ *            - "login": depends on $currentUser being set or not
+ *            ...
+ *
  * @package evocore
  */
 class menu_link_Widget extends ComponentWidget
@@ -96,8 +100,7 @@ class menu_link_Widget extends ComponentWidget
 	}
 
 
-
-  /**
+	/**
 	 * Get short description
 	 */
 	function get_desc()
@@ -106,9 +109,9 @@ class menu_link_Widget extends ComponentWidget
 	}
 
 
-  /**
-   * Get definitions for editable params
-   *
+	/**
+	 * Get definitions for editable params
+	 *
 	 * @see Plugin::GetDefaultSettings()
 	 * @param local params like 'for_editing' => true
 	 */
@@ -271,6 +274,9 @@ class menu_link_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.19  2010/04/22 22:49:28  blueyed
+ * menu widgets: doc/todo/indent
+ *
  * Revision 1.18  2010/02/08 17:54:48  efy-yury
  * copyright 2009 -> 2010
  *
