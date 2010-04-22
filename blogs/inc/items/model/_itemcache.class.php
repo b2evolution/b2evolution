@@ -69,8 +69,9 @@ class ItemCache extends DataObjectCache
 	 *
 	 * @param string stub of object to load
 	 * @param boolean false if you want to return false on error
+	 * @param boolean true if function should die on empty/null
 	 */
-	function & get_by_urltitle( $req_urltitle, $halt_on_error = true )
+	function & get_by_urltitle( $req_urltitle, $halt_on_error = true, $halt_on_empty = true )
 	{
 		global $DB, $Debuglog;
 
@@ -78,7 +79,7 @@ class ItemCache extends DataObjectCache
 		{ // not yet in cache:
 		    // Get from slugCache
 			$SlugCache = & get_SlugCache();
-			$req_Slug =  $SlugCache->get_by_name( $req_urltitle, $halt_on_error );
+			$req_Slug =  $SlugCache->get_by_name( $req_urltitle, $halt_on_error, $halt_on_empty );
 			if( $req_Slug && $req_Slug->get( 'type' ) == 'item' )
 			{	// It is in SlugCache
 				if( $Item = $this->get_by_ID( $req_Slug->get( 'itm_ID' ), $halt_on_error ) !== false )
@@ -160,6 +161,9 @@ class ItemCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.9  2010/04/22 18:59:09  blueyed
+ * Add halt_on_empty param to get_by_urltitle and use it. Bug: did when looking up single char bad URLs.
+ *
  * Revision 1.8  2010/03/29 12:25:31  efy-asimo
  * allow multiple slugs per post
  *

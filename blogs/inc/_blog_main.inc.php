@@ -367,7 +367,7 @@ if( !empty($p) || !empty($title) )
 
 		if( empty($Item) && substr($title, -1) == '-' )
 		{ // Try lookup by removing last invalid char, which might have been e.g. ">"
-			$Item = $ItemCache->get_by_urltitle(substr($title, 0, -1), false);
+			$Item = $ItemCache->get_by_urltitle(substr($title, 0, -1), false, false);
 		}
 	}
 	if( empty( $Item ) )
@@ -663,6 +663,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.165  2010/04/22 18:59:09  blueyed
+ * Add halt_on_empty param to get_by_urltitle and use it. Bug: did when looking up single char bad URLs.
+ *
  * Revision 1.164  2010/04/13 13:50:51  efy-asimo
  * slugs help radio optoin - slugs task
  *
