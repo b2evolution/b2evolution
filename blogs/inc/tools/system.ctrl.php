@@ -462,7 +462,7 @@ $opcode_cache = get_active_opcode_cache();
 init_system_check( T_( 'PHP opcode cache' ), $opcode_cache );
 if( $opcode_cache == 'none' )
 {
-	disp_system_check( 'warning', T_( 'Using an opcode cache allows all your PHP scripts to run faster by caching a "compiled" (opcode) verison of the scripts instead of recompiling everything at every page load. Several opcode caches are available. We recommend APC.' ) );
+	disp_system_check( 'warning', T_( 'Using an opcode cache allows all your PHP scripts to run faster by caching a "compiled" (opcode) version of the scripts instead of recompiling everything at every page load. Several opcode caches are available. We recommend APC.' ) );
 }
 else
 {
@@ -545,7 +545,7 @@ else
 	{
 		disp_system_check( 'ok' );
 	}
-	
+
 	// FreeType:
 	init_system_check( T_( 'GD FreeType Support' ), !empty($gd_info['FreeType Support']) ?  T_('Yes') : T_('No') );
 	if( empty($gd_info['FreeType Support']) )
@@ -584,6 +584,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.30  2010/04/22 20:45:09  blueyed
+ * Fix typo with "PHP opcode cache" message
+ *
  * Revision 1.29  2010/03/23 03:16:40  sam2kb
  * Added info about GD FreeType Support
  *
