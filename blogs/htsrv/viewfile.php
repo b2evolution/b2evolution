@@ -48,7 +48,7 @@ if( ! isset($current_User) )
 }
 
 // We need this param early to check blog perms, if possible
-param( 'root', 'string', true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
+param( 'root', 'string', true, true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
 if( preg_match( '/^collection_(\d+)$/', $root, $perm_blog ) )
 {	// OK, we got a blog ID:
 	$perm_blog = $perm_blog[1];
@@ -64,8 +64,8 @@ $current_User->check_perm( 'files', 'view', true, $perm_blog );
 
 
 // Load the other params:
-param( 'viewtype', 'string', true );
-param( 'path', 'string', true );
+param( 'viewtype', 'string', true, true );
+param( 'path', 'string', true, true );
 
 if ( false !== strpos( urldecode( $path ), '..' ) )
 {
@@ -257,6 +257,9 @@ switch( $viewtype )
 <?php
 /*
  * $Log$
+ * Revision 1.29  2010/04/22 18:28:26  blueyed
+ * getfile.php: Memorize root, viewtype and path params.
+ *
  * Revision 1.28  2010/02/08 17:51:18  efy-yury
  * copyright 2009 -> 2010
  *
