@@ -71,7 +71,7 @@ class videoplug_plugin extends Plugin
 
 		// vimeo
 		// blueyed> TODO: might want to use oEmbed (to get title etc separately and display it below video): http://vimeo.com/api/docs/oembed
-		$content = preg_replace( '#\[video:vimeo:(.+?)]#', '<div class="videoblock"><object data="http://vimeo.com/moogaloop.swf?clip_id=$1&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" width="400" height="225" type="application/x-shockwave-flash">	<param name="allowfullscreen" value="true" />	<param name="allowscriptaccess" value="always" />	<param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$1&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /></object></div>', $content );
+		$content = preg_replace( '#\[video:vimeo:(.+?)]#', '<div class="videoblock"><object data="http://vimeo.com/moogaloop.swf?clip_id=$1&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" width="640" height="360" type="application/x-shockwave-flash">	<param name="allowfullscreen" value="true" />	<param name="allowscriptaccess" value="always" />	<param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=$1&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=&amp;fullscreen=1" /></object></div>', $content );
 
 		return true;
 	}
@@ -179,6 +179,9 @@ class videoplug_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.23  2010/04/22 20:25:40  blueyed
+ * Adjust size of Vimeo tag. Very old change, do not remember a particular reason, apart from 'nicer probably'.
+ *
  * Revision 1.22  2010/02/08 17:56:01  efy-yury
  * copyright 2009 -> 2010
  *
