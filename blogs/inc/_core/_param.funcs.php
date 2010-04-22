@@ -340,9 +340,12 @@ function param_arrayindex( $param_name, $default = '' )
  */
 function param_action( $default = '', $memorize = false )
 {
-	$action = param( 'action', 'string', NULL, $memorize );
+	if( ! isset($_POST['actionArray']) )
+	{ // if actionArray is POSTed, use this instead of any "action" (which might come via GET)
+		$action = param( 'action', 'string', NULL, $memorize );
+	}
 
-	if( is_null($action) )
+	if( ! isset($action) )
 	{ // Check $actionArray
 		$action = param_arrayindex( 'actionArray', $default );
 
@@ -2117,6 +2120,9 @@ function isset_param( $var )
 
 /*
  * $Log$
+ * Revision 1.64  2010/04/22 18:57:35  blueyed
+ * param_action: prefer actionArray, if it is being POSTed. Bug: when posting to a action=foo url, the action from actionArray would get ignored. Pretty nasty with the items controller. This either slipped in recently, or (my) nginx (setup) behaves different from my apache "stack".
+ *
  * Revision 1.63  2010/03/19 01:31:44  blueyed
  * check_html_sanity: add User param, defaulting to current User. This is required if posting User is not logged in (e.g. commenting via OpenID, but logged out).
  *
