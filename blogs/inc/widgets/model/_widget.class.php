@@ -463,6 +463,10 @@ class ComponentWidget extends DataObject
 	 *           ComponentWidget::get_cache_keys() should return
 	 *           an empty list or false by default).
 	 * fp> I don't understand what you mean.
+	 * dh> Caching should get triggered accordingly to if a Widget/Plugin returns something in get_cache_keys. And the default should be false (=> no caching).
+	 *
+	 * @todo dh> The same mechanism should get used for SkinTag plugin handling, too - shouldn't it?
+	 *           It would be great to have some documentation about this, e.g. on the wiki.
 	 *
 	 * @param array MUST contain at least the basic display params
 	 * @param array of extra keys to be used for cache keying
@@ -697,6 +701,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.76  2010/04/22 22:36:00  blueyed
+ * doc/todo
+ *
  * Revision 1.75  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *
