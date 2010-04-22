@@ -2352,17 +2352,12 @@ function debug_info( $force = false, $force_clean = false )
 
 	if($db_config)
 	{
-		if ( ! $clean )
-		{
-			echo '<pre>';
-		}
-
+		echo $clean ? "" : '<pre>';
 		echo T_('DB Username').': '.$db_config['user']."\n".
 			 T_('DB Database').': '.$db_config['name']."\n".
-			 T_('DB Host').': '.$db_config['host']."\n".
+			 T_('DB Host').': '.(isset($db_config['host']) ? $db_config['host'] : 'unset (localhost)')."\n".
 			 T_('DB tables prefix').': '.$tableprefix."\n".
 			 T_('DB connection charset').': '.$db_config['connection_charset']."\n";
-
 		echo $clean ? "\n" : '</pre>';
 	}
 
@@ -3904,6 +3899,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.225  2010/04/22 20:49:39  blueyed
+ * debug_info: handle unset host with db_config output. Make output code more compact.
+ *
  * Revision 1.224  2010/04/22 20:28:37  blueyed
  * get_active_opcode_cache: fix xcache detection (checking for xcache.size rather than xcache.var_size). Also xcache_set must not be available for this. doc.
  *
