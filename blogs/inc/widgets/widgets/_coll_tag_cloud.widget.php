@@ -248,8 +248,8 @@ class coll_tag_cloud_Widget extends ComponentWidget
 			$size = floor( $row->tag_count * $size_span / $count_span + $min_size );
 
 			echo $Blog->get_tag_link( $row->tag_name, $tag_name_disp, array(
-				'style' => 'font-size: '.$size.'pt;',
-				'title' => sprintf( T_('%d posts'), $row->tag_count ) ) );
+				'style' => 'font-size:'.$size.'pt;',
+				'title' => sprintf( T_('%d posts'), $row->tag_count ) ) ); // TODO: dh> improve title, along "Display items tagged as «%s»"
 			$count++;
 		}
 		echo $this->disp_params['tag_cloud_end'];
@@ -289,6 +289,9 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.30  2010/04/22 18:56:55  blueyed
+ * Save one byte per tag link. Todo.
+ *
  * Revision 1.29  2010/02/08 17:54:48  efy-yury
  * copyright 2009 -> 2010
  *
