@@ -271,6 +271,12 @@ function create_default_data()
 	create_default_currencies();
 	create_default_countries();
 
+	echo 'Creating default "help" slug... ';
+	$DB->query( '
+		INSERT INTO T_slug( slug_title, slug_type )
+		VALUES( "help", "help" )', 'Add "help" slug' );
+	echo "OK.<br />\n";
+
 	install_basic_skins();
 
 	install_basic_plugins();
@@ -1294,6 +1300,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.289  2010/04/22 10:09:36  efy-asimo
+ * Creating "help" slug on install and upgrade procedure
+ *
  * Revision 1.288  2010/04/12 21:27:40  blueyed
  * code cleanup
  *

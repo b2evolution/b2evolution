@@ -151,6 +151,18 @@ function db_add_index( $table, $name, $def, $type = 'INDEX' )
 
 
 /**
+ * Check if a key item value already exists on database
+ */
+function db_key_exists( $table, $field_name, $field_value )
+{
+	global $DB;
+	return $DB->get_var( '
+		SELECT COUNT('.$field_name.')
+		FROM '.$table.'
+		WHERE '.$field_name.' = '.$field_value );
+}
+
+/**
  * Converts languages in a given table into according locales
  *
  * @param string name of the table
@@ -2683,6 +2695,19 @@ function upgrade_b2evo_tables()
 		WHERE CONVERT( post_urltitle USING ASCII ) COLLATE ascii_bin = slug_title' );
 	task_end();
 
+	task_begin( 'Add "help" slug...' );
+	if( db_key_exists( 'T_slug', 'slug_title', '"help"' ) )
+	{
+		echo '<strong>Warning: "help" slug already exists!</strong><br /> ';
+	}
+	else
+	{
+		$DB->query( '
+		INSERT INTO T_slug( slug_title, slug_type )
+		VALUES( "help", "help" )', 'Add "help" slug' );
+		task_end();
+	}
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -2857,6 +2882,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.362  2010/04/22 10:09:36  efy-asimo
+ * Creating "help" slug on install and upgrade procedure
+ *
  * Revision 1.361  2010/04/20 07:00:21  efy-asimo
  * Upgrading T_items__item table (urltitle & slug_title illegal mix of collation) - fix
  *
