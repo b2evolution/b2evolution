@@ -136,9 +136,14 @@ function send_message( $recipient, $subject, $text )
 {
 	global $current_User, $Messages;
 
+	if( !is_logged_in() )
+	{
+		debug_die( 'Active user not found.' );
+	}
+
 	if( $current_User->get( 'login' ) == $recipient )
 	{ // user wants to send a private message to himself
-		$Messages->add( T_('You cannot send threads to yourself').':'.$recipient );
+		$Messages->add( T_('You cannot send a private message to yourself.') );
 		return false;
 	}
 
@@ -161,6 +166,9 @@ function send_message( $recipient, $subject, $text )
 
 /*
  * $Log$
+ * Revision 1.8  2010/04/23 11:37:57  efy-asimo
+ * send messages - fix
+ *
  * Revision 1.7  2010/04/16 10:42:11  efy-asimo
  * users messages options- send private messages to users from front-office - task
  *

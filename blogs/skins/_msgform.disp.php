@@ -73,7 +73,8 @@ if( ! empty($recipient_id) )
 
 	if( $recipient_User )
 	{
-		if( empty($recipient_User->allow_msgform) )
+		$allow_msgform = $recipient_User->get_msgform_settings();
+		if( ! $allow_msgform )
 		{ // should be prevented by UI
 			echo '<p class="error">The user does not want to receive emails through the message form.</p>';
 			return;
@@ -94,10 +95,10 @@ elseif( ! empty($comment_id) )
 	if( $row )
 	{
 		$Comment = new Comment( $row );
-
-		if( $comment_author_User = & $Comment->get_author_User() )
+		if( $recipient_User = & $Comment->get_author_User() )
 		{ // Source comment is from a registered user:
-			if( ! $comment_author_User->allow_msgform )
+			$allow_msgform = $recipient_User->get_msgform_settings();
+			if( ! $allow_msgform )
 			{
 				echo '<p class="error">The user does not want to get contacted through the message form.</p>'; // should be prevented by UI
 				return;
@@ -108,17 +109,29 @@ elseif( ! empty($comment_id) )
 			echo '<p class="error">This commentator does not want to get contacted through the message form.</p>'; // should be prevented by UI
 			return;
 		}
+		else
+		{
+			$allow_msgform = 'email';
+		}
 
 		$recipient_name = $Comment->get_author_name();
 		$recipient_address = $Comment->get_author_email();
 	}
 }
 
-if( empty($recipient_address) )
+if( !isset($recipient_User) && empty($recipient_address) )
 {	// We should never have called this in the first place!
 	// Could be that commenter did not provide an email, etc...
 	echo 'No recipient specified!';
 	return;
+}
+
+if( isset($recipient_User) && $recipient_User->get_msgform_settings() == 'private_message' && ! is_logged_in() )
+{
+	global $htsrv_path, $Messages;
+	$Messages->add( 'You must log in to send a message' );
+	$thispage_url = regenerate_url( '', 'recipient_id='.$recipient_User->ID, '', '&' );
+	header_redirect( $htsrv_url.'login.php'.'?redirect_to='.rawurlencode( $thispage_url ) );
 }
 
 // Get the suggested subject for the email:
@@ -178,8 +191,16 @@ $Form = new Form( $htsrv_url.'message_send.php' );
 	<?php
 	// Note: we use funky field name in order to defeat the most basic guestbook spam bots:
 	$Form->text( 'd', $email_author, 40, T_('From'),  T_('Your name.'), 50, 'bComment' );
-	$Form->text( 'f', $email_author_address, 40, T_('Email'), T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'), 100, 'bComment' );
-	$Form->text( 'g', $subject, 40, T_('Subject'), T_('Subject of email message.'), 255, 'bComment' );
+	if( $allow_msgform == 'email' )
+	{
+		$Form->text( 'f', $email_author_address, 40, T_('Email'), T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'), 100, 'bComment' );
+		$subject_note = T_('Subject of email message.');
+	}
+	else
+	{
+		$subject_note = T_('Subject of private message.');
+	}
+	$Form->text( 'g', $subject, 40, T_('Subject'), $subject_note, 255, 'bComment' );
 	$Form->textarea( 'h', '', 15, T_('Message'), T_('Plain text only.'), 40, 'bComment' );
 
 	$Plugins->trigger_event( 'DisplayMessageFormFieldset', array( 'Form' => & $Form,
@@ -207,6 +228,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.13  2010/04/23 11:37:57  efy-asimo
+ * send messages - fix
+ *
  * Revision 1.12  2010/04/22 18:56:15  blueyed
  * Fix "Load comment from DB" (DB query result type)
  *

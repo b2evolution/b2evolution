@@ -127,14 +127,6 @@ if( empty($sender_name) )
 {
 	$Messages->add( T_('Please fill in your name.'), 'error' );
 }
-if( empty($sender_address) )
-{
-	$Messages->add( T_('Please fill in your email.'), 'error' );
-}
-elseif( !is_email($sender_address) || antispam_check( $sender_address ) ) // TODO: dh> using antispam_check() here might not allow valid users to contact the admin in case of problems due to the antispam list itself.. :/
-{
-	$Messages->add( T_('Supplied email address is invalid.'), 'error' );
-}
 
 if( empty($subject) )
 {
@@ -183,7 +175,7 @@ if( ! empty( $recipient_id ) )
 	$recipient_User = & $UserCache->get_by_ID( $recipient_id );
 
 	$allow_msgform = $recipient_User->get_msgform_settings();
-	if( empty($allow_msgform) )
+	if( ! $allow_msgform )
 	{ // should be prevented by UI
 		debug_die( 'Invalid recipient!' );
 	}
@@ -201,20 +193,24 @@ elseif( ! empty( $comment_id ) )
 	$row = $DB->get_row(
 		'SELECT *
 		   FROM T_comments
-		  WHERE comment_ID = '.$comment_id, ARRAY_A );
+		  WHERE comment_ID = '.$comment_id );
 	$Comment = new Comment( $row );
 
-	if( $comment_author_User = & $Comment->get_author_User() )
+	if( $recipient_User = & $Comment->get_author_User() )
 	{ // Comment is from a registered user:
-		if( ! $comment_author_User->get_msgform_settings() )
+		$allow_msgform = $recipient_User->get_msgform_settings();
+		if( ! $allow_msgform )
 		{ // should be prevented by UI
 			debug_die( 'Invalid recipient!' );
 		}
-		$recipient_User = & $comment_author_User;
 	}
 	elseif( empty($Comment->allow_msgform) )
 	{ // should be prevented by UI
 		debug_die( 'Invalid recipient!' );
+	}
+	else
+	{
+		$allow_msgform = 'email';
 	}
 
 	$recipient_name = trim($Comment->get_author_name());
@@ -224,14 +220,22 @@ elseif( ! empty( $comment_id ) )
 	locale_temp_switch($Blog->locale);
 }
 
-if( empty($recipient_address) )
-{ // should be prevented by UI
-	debug_die( 'No recipient specified!' );
-}
-
-
 if( $allow_msgform == 'email' )
 {
+	if( empty($sender_address) )
+	{
+		$Messages->add( T_('Please fill in your email.'), 'error' );
+	}
+	elseif( !is_email($sender_address) || antispam_check( $sender_address ) ) // TODO: dh> using antispam_check() here might not allow valid users to contact the admin in case of problems due to the antispam list itself.. :/
+	{
+		$Messages->add( T_('Supplied email address is invalid.'), 'error' );
+	}
+
+	if( empty($recipient_address) )
+	{ // should be prevented by UI
+		debug_die( 'No recipient specified!' );
+	}
+
 	// opt-out links:
 	if( $recipient_User )
 	{ // Member:
@@ -310,8 +314,15 @@ if( $success_mail )
 }
 else
 {
-	$Messages->add( T_('Sorry, could not send email.')
+	if( $allow_msgform == 'email' )
+	{
+		$Messages->add( T_('Sorry, could not send email.')
 				.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
+	}
+	else
+	{
+		$Messages->add( T_('Sorry, could not send your message.'), 'error' );
+	}
 }
 
 
@@ -321,6 +332,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.69  2010/04/23 11:37:57  efy-asimo
+ * send messages - fix
+ *
  * Revision 1.68  2010/04/16 10:42:10  efy-asimo
  * users messages options- send private messages to users from front-office - task
  *

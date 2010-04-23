@@ -1396,10 +1396,7 @@ class User extends DataObject
 				// no break
 			case 3:
 				// Allow registered users to send private messages; don't allow others to contact.
-				if( is_logged_in() )
-				{
-					return 'private_message';
-				}
+				return 'private_message';
 				// no break
 			case 0:
 			default:
@@ -2002,6 +1999,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.72  2010/04/23 11:37:57  efy-asimo
+ * send messages - fix
+ *
  * Revision 1.71  2010/04/16 10:42:11  efy-asimo
  * users messages options- send private messages to users from front-office - task
  *
