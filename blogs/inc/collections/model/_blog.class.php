@@ -535,6 +535,7 @@ class Blog extends DataObject
 			$this->set_setting( 'title_link_type',  param( 'title_link_type', 'string', '' ) );
 			$this->set_setting( 'permalinks',  param( 'permalinks', 'string', '' ) );
 			$this->set_setting( '404_response',  param( '404_response', 'string', '' ) );
+			$this->set_setting( 'help_link',  param( 'help_link', 'string', '' ) );
 			$this->set_setting( 'excerpts_meta_description', param( 'excerpts_meta_description', 'integer', 0 ) );
 			$this->set_setting( 'categories_meta_description', param( 'categories_meta_description', 'integer', 0 ) );
 			$this->set_setting( 'tags_meta_keywords', param( 'tags_meta_keywords', 'integer', 0 ) );
@@ -1684,7 +1685,14 @@ class Blog extends DataObject
 				return url_add_param( $this->gen_blogurl(), 'disp=user' );
 
 			case 'helpurl':
-				return url_add_param( $this->gen_blogurl(), 'disp=help' );
+				if( $this->get_setting( 'help_link' ) == 'slug' )
+				{
+					return url_add_tail( $this->gen_blogurl(), '/help' );
+				}
+				else
+				{
+					return url_add_param( $this->gen_blogurl(), 'disp=help' );
+				}
 
 			case 'description':			// RSS wording
 			case 'shortdesc':
@@ -2315,6 +2323,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.109  2010/04/23 09:39:44  efy-asimo
+ * "SEO setting" for help link and Groups slugs permission implementation
+ *
  * Revision 1.108  2010/04/16 10:42:10  efy-asimo
  * users messages options- send private messages to users from front-office - task
  *

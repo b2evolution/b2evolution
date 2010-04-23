@@ -372,6 +372,14 @@ $Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
 				array( '404', T_('404 "Not found" response') ),
 				array( '410', T_('410 "Gone" response') ),
 			), T_('404 "Not Found" response'), true );
+
+	$Form->radio( 'help_link', $edited_Blog->get_setting('help_link'),
+		array(
+			array( 'param', T_('Use param').': ?disp=help', T_('E-g: ')
+				.url_add_param( $blogurl, '<strong>disp=help</strong>' ) ),
+			array( 'slug', T_('Use extra-path').': '.'/help', T_('E-g: ')
+				.url_add_tail( $blogurl, '<strong>/help</strong>' ) ),
+			), T_('Help page'), true );
 $Form->end_fieldset();
 
 
@@ -383,6 +391,9 @@ echo '<p class="note right">SEO portraits kindly provided by <a href="http://www
 
 /*
  * $Log$
+ * Revision 1.31  2010/04/23 09:39:44  efy-asimo
+ * "SEO setting" for help link and Groups slugs permission implementation
+ *
  * Revision 1.30  2010/04/08 21:02:43  waltercruz
  * Tags as meta-description fallback
  *

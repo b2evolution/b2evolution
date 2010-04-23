@@ -24,9 +24,9 @@ load_class( 'slugs/model/_slug.class.php', 'Slug' );
 global $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'view', true );
+$current_User->check_perm( 'slugs', 'view', true );
 
-$AdminUI->set_path( 'options', 'slugs' );
+$AdminUI->set_path( 'tools', 'slugs' );
 
 param_action( 'list' );
 
@@ -68,6 +68,9 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'slug' );
 
+		// Check that current user has permission to create slugs:
+		$current_User->check_perm( 'slugs', 'edit', true );
+
 		// load data from request
 		if( $edited_Slug->load_from_Request() )
 		{	// We could load data from form without errors:
@@ -87,6 +90,9 @@ switch( $action )
 		
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'slug' );
+
+		// Check that current user has permission to edit slugs:
+		$current_User->check_perm( 'slugs', 'edit', true );
 
 		// Make sure we got an slug_ID:
 		param( 'slug_ID', 'integer', true );
@@ -110,6 +116,9 @@ switch( $action )
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'slug' );
+
+		// Check that current user has permission to edit slugs:
+		$current_User->check_perm( 'slugs', 'edit', true );
 
 		// Make sure we got an slug_ID:
 		param( 'slug_ID', 'integer', true );

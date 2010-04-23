@@ -210,6 +210,12 @@ $Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_pro
 							array( 'edit', T_('Full Access') )
 						), T_('Antispam'), false );
 
+	$Form->radio( 'edited_grp_perm_slugs', $edited_Group->get('perm_slugs'),
+			array(  $perm_none_option,
+							array( 'view', T_('View only') ),
+							array( 'edit', T_('Full Access') )
+						), T_('Slug manager'), false );
+
 	$Form->checkbox( 'edited_grp_perm_templates', $edited_Group->get('perm_templates'), T_('Skins'), T_('Check to allow access to skin files.') );
 
 	if( $edited_Group->ID != 1 )
@@ -246,6 +252,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.27  2010/04/23 09:39:44  efy-asimo
+ * "SEO setting" for help link and Groups slugs permission implementation
+ *
  * Revision 1.26  2010/04/08 10:35:23  efy-asimo
  * Allow users to create a new blog for themselves - task
  *

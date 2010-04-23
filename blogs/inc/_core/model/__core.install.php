@@ -59,6 +59,7 @@ $schema_queries = array(
 			grp_perm_xhtml_objects           TINYINT(1) NOT NULL DEFAULT 0,
 			grp_perm_stats enum('none','user','view','edit') NOT NULL default 'none',
 			grp_perm_spamblacklist enum('none','view','edit') NOT NULL default 'none',
+			grp_perm_slugs enum('none','view','edit') NOT NULL default 'none',
 			grp_perm_options enum('none','view','edit') NOT NULL default 'none',
 			grp_perm_users enum('none','view','edit') NOT NULL default 'none',
 			grp_perm_templates TINYINT NOT NULL DEFAULT 0,
@@ -286,6 +287,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.49  2010/04/23 09:39:44  efy-asimo
+ * "SEO setting" for help link and Groups slugs permission implementation
+ *
  * Revision 1.48  2010/04/16 10:42:10  efy-asimo
  * users messages options- send private messages to users from front-office - task
  *

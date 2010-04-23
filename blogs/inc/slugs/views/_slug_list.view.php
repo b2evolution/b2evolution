@@ -22,12 +22,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Slug
  */
-global $Sug;
+global $Sug, $current_User;
 
 $SQL = new SQL();
 
-$SQL->SELECT( 'slug_ID, slug_title, slug_type, slug_itm_ID' );
-$SQL->FROM( 'T_slug' );
+$SQL->SELECT( 'slug_ID, slug_title, slug_type, slug_itm_ID as target_ID, post_title as target_title' );
+$SQL->FROM( 'T_slug LEFT OUTER JOIN T_items__item ON slug_itm_ID = post_ID' );
 
 if( get_param( 'slug_filter' ) )
 { // add slug_title filter
@@ -48,7 +48,7 @@ switch( get_param( 'slug_ftype' ) )
 }
 
 // Create result set:
-$Results = new Results( $SQL->get(), 'slug_', '__A' );
+$Results = new Results( $SQL->get(), 'slug_', 'A' );
 
 $Results->title = T_('Slugs').' ('.$Results->total_rows.')';
 
@@ -85,25 +85,46 @@ $Results->cols[] = array(
 			'td_class' => 'small',
 		);
 
+/**
+ * Get a link to the target object 
+ * 
+ * @param integer target object ID
+ * @param string target object name or title
+ * @param string target object type
+ * @return string target link if exists, target title otherwise
+ */
+function get_target_link( $target_ID, $target_title, $type )
+{
+	global $admin_url;
+
+	if( $type == 'item' )
+	{
+		return sprintf( '<a href="'.$admin_url.'?ctrl=items&action=edit&p=%d">%s</a>', $target_ID, $target_title );
+	}
+	return $target_title;
+}
 $Results->cols[] = array(
-			'th' => T_('Owner ID'),
+			'th' => T_('Target'),
 			'th_class' => 'small',
-			'order' => 'slug_itm_ID',
-			'td' => '$slug_itm_ID$',
+			'order' => 'target_title',
+			'td' => '%get_target_link(#target_ID#,#target_title#,#slug_type#)%',
 			'td_class' => 'small center',
 		);
 
-$Results->cols[] = array(
-			'th' => T_('Actions'),
-			'th_class' => 'shrinkwrap small',
-			'td_class' => 'shrinkwrap',
-			'td' => action_icon( TS_('Edit this slug...'), 'properties',
-	        		'admin.php?ctrl=slugs&amp;slug_ID=$slug_ID$&amp;action=edit' )
-	                 .action_icon( T_('Delete this slug!'), 'delete',
-	                  regenerate_url( 'slug_ID,action', 'slug_ID=$slug_ID$&amp;action=delete&amp;'.url_crumb('slug') ) ),
-					);
+if( $current_User->check_perm( 'slugs', 'edit' ) )
+{
+	$Results->cols[] = array(
+				'th' => T_('Actions'),
+				'th_class' => 'shrinkwrap small',
+				'td_class' => 'shrinkwrap',
+				'td' => action_icon( TS_('Edit this slug...'), 'properties',
+		        		'admin.php?ctrl=slugs&amp;slug_ID=$slug_ID$&amp;action=edit' )
+		                 .action_icon( T_('Delete this slug!'), 'delete',
+		                  regenerate_url( 'slug_ID,action', 'slug_ID=$slug_ID$&amp;action=delete&amp;'.url_crumb('slug') ) ),
+						);
 
-$Results->global_icon( T_('Add a new slug...'), 'new', regenerate_url( 'action', 'action=new'), T_('New slug').' &raquo;', 3, 4  );
+	$Results->global_icon( T_('Add a new slug...'), 'new', regenerate_url( 'action', 'action=new'), T_('New slug').' &raquo;', 3, 4  );
+}
 
 $Results->display();
 ?>

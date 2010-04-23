@@ -114,6 +114,7 @@ class CollectionSettings extends AbstractSettings
 			'msgform_noindex' => '1',						// META NOINDEX on Message forms
 			'special_noindex' => '1',						// META NOINDEX on other special pages
 			'404_response' => '404',
+			'help_link' => 'param',
 
 		// Feed settings: (should probably be duplicated for comment feed, category feeds, etc...)
 			'atom_redirect' => '',
@@ -173,6 +174,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.46  2010/04/23 09:39:44  efy-asimo
+ * "SEO setting" for help link and Groups slugs permission implementation
+ *
  * Revision 1.45  2010/04/12 15:14:25  efy-asimo
  * resolver bug - fix
  *

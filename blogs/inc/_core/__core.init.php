@@ -461,7 +461,8 @@ class _core_Module extends Module
 		// TOOLS:
 		$perm_spam = $current_User->check_perm( 'spamblacklist', 'view', false );
 		$perm_options = $current_User->check_perm( 'options', 'view' );
-		if( $perm_spam || $perm_options )
+		$perm_slugs = $current_User->check_perm( 'slugs', 'view' );
+		if( $perm_spam || $perm_options || $perm_slugs )
 		{	// Permission to view settings:
 			if( $perm_spam )
 			{
@@ -477,6 +478,13 @@ class _core_Module extends Module
 						'text' => T_('Scheduler').'&hellip;',
 						'href' => $admin_url.'?ctrl=crontab',
 					);
+			}
+
+			if( $perm_slugs )
+			{
+				$entries['tools']['entries']['slugs'] = array(
+						'text' => T_('Slugs').'&hellip;',
+						'href' => $admin_url.'?ctrl=slugs' );
 			}
 		}
 
@@ -667,9 +675,6 @@ class _core_Module extends Module
 								'plugins' => array(
 									'text' => T_('Plugins'),
 									'href' => '?ctrl=plugins'),
-								'slugs'	=> array(
-									'text' => T_('Slugs'),
-									'href' => '?ctrl=slugs'),
 							)
 						),
 					) );
@@ -752,47 +757,48 @@ class _core_Module extends Module
 
 		$AdminUI->add_menu_entries( NULL, array( 'users' => $users_entries ) );
 
-		if( $current_User->check_perm( 'options', 'view' ) )
-		{	// Permission to view settings:
-			// FP> This assumes that we don't let regular users access the tools, including plugin tools.
-				$AdminUI->add_menu_entries( NULL, array(
-						'tools' => array(
-							'text' => T_('Tools'),
-							'href' => '?ctrl=crontab',
-							'entries' =>  array(
-								'cron' => array(
-									'text' => T_('Scheduler'),
-									'href' => '?ctrl=crontab' ),
-								'system' => array(
-									'text' => T_('System'),
-									'href' => '?ctrl=system' ),
-									),
-								),
-							) );
+		$perm_options = $current_User->check_perm( 'options', 'view' );
+		$perm_spam = $current_User->check_perm( 'spamblacklist', 'view' );
+		$perm_slugs = $current_User->check_perm( 'slugs', 'view' );
+		if( $perm_options || $perm_spam || $perm_slugs )
+		{	// Permission to view tools, antispam or slugs.
+			$tools_entries = array( 'tools' => array(
+					'text' => T_('Tools'),
+					'entries' => array(),
+				) );
 
-				if( $current_User->check_perm( 'spamblacklist', 'view' ) )
-				{	// Permission to view antispam:
-					$AdminUI->add_menu_entries( 'tools', array(
-									'antispam' => array(
-										'text' => T_('Antispam'),
-										'href' => '?ctrl=antispam'	),
-									) );
+			if( $perm_options )
+			{	// Permission to view settings:
+				// FP> This assumes that we don't let regular users access the tools, including plugin tools.
+				$tools_entries['tools']['href'] = '?ctrl=crontab';
+				$tools_entries['tools']['entries']['cron'] = array(
+									'text' => T_('Scheduler'),
+									'href' => '?ctrl=crontab' );
+				$tools_entries['tools']['entries']['system'] = array(
+									'text' => T_('System'),
+									'href' => '?ctrl=system' );
+			}
+			if( $perm_spam )
+			{	// Permission to view antispam:
+				if( !$perm_options )
+				{
+					$tools_entries['tools']['href'] = '?ctrl=antispam';
 				}
-		}
-		elseif( $current_User->check_perm( 'spamblacklist', 'view' ) )
-		{	// Permission to view antispam but NOT tools:
-			// Give it it's own tab:
-			$AdminUI->add_menu_entries( NULL, array(
-						'tools' => array(
-							'text' => T_('Tools'),
-							'href' => '?ctrl=antispam',
-							'entries' =>  array(
-								'antispam' => array(
+				$tools_entries['tools']['entries']['antispam'] = array(
 									'text' => T_('Antispam'),
-									'href' => '?ctrl=antispam'	),
-								),
-						),
-					) );
+									'href' => '?ctrl=antispam' );
+			}
+			if( $perm_slugs )
+			{	// Permission to view slugs:
+				if( !$perm_options && !$perm_spam )
+				{
+					$tools_entries['tools']['href'] = '?ctrl=slugs';
+				}
+				$tools_entries['tools']['entries']['slugs'] = array(
+									'text' => T_('Slugs'),
+									'href' => '?ctrl=slugs' );
+			}
+			$AdminUI->add_menu_entries( NULL, $tools_entries );
 		}
 	}
 }
@@ -802,6 +808,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.62  2010/04/23 09:39:44  efy-asimo
+ * "SEO setting" for help link and Groups slugs permission implementation
+ *
  * Revision 1.61  2010/03/29 12:25:30  efy-asimo
  * allow multiple slugs per post
  *

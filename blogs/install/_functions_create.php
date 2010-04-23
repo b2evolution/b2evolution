@@ -92,6 +92,7 @@ function create_default_data()
 	$Group_Admins->set( 'perm_blogs', 'editall' );
 	$Group_Admins->set( 'perm_stats', 'edit' );
 	$Group_Admins->set( 'perm_spamblacklist', 'edit' );
+	$Group_Admins->set( 'perm_slugs', 'edit' );
 	$Group_Admins->set( 'perm_files', 'all' );
 	$Group_Admins->set( 'perm_options', 'edit' );
 	$Group_Admins->set( 'perm_templates', 1 );
@@ -105,6 +106,7 @@ function create_default_data()
 	$Group_Privileged->set( 'perm_blogs', 'viewall' );
 	$Group_Privileged->set( 'perm_stats', 'user' );
 	$Group_Privileged->set( 'perm_spamblacklist', 'edit' );
+	$Group_Privileged->set( 'perm_slugs', 'view' );
 	$Group_Privileged->set( 'perm_files', 'add' );
 	$Group_Privileged->set( 'perm_options', 'view' );
 	$Group_Privileged->set( 'perm_templates', 0 );
@@ -118,6 +120,7 @@ function create_default_data()
 	$Group_Bloggers->set( 'perm_blogs', 'user' );
 	$Group_Bloggers->set( 'perm_stats', 'none' );
 	$Group_Bloggers->set( 'perm_spamblacklist', 'view' );
+	$Group_Bloggers->set( 'perm_slugs', 'view' );
 	$Group_Bloggers->set( 'perm_files', 'view' );
 	$Group_Bloggers->set( 'perm_options', 'none' );
 	$Group_Bloggers->set( 'perm_templates', 0 );
@@ -131,6 +134,7 @@ function create_default_data()
 	$Group_Users->set( 'perm_blogs', 'user' );
 	$Group_Users->set( 'perm_stats', 'none' );
 	$Group_Users->set( 'perm_spamblacklist', 'none' );
+	$Group_Users->set( 'perm_slugs', 'none' );
 	$Group_Users->set( 'perm_files', 'none' );
 	$Group_Users->set( 'perm_options', 'none' );
 	$Group_Users->set( 'perm_templates', 0 );
@@ -1300,6 +1304,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.290  2010/04/23 09:39:44  efy-asimo
+ * "SEO setting" for help link and Groups slugs permission implementation
+ *
  * Revision 1.289  2010/04/22 10:09:36  efy-asimo
  * Creating "help" slug on install and upgrade procedure
  *

@@ -66,6 +66,7 @@ class Group extends DataObject
 	var $perm_xhtml_javascript = false;
 	var $perm_xhtml_objects = false;
 	var $perm_spamblacklist;
+	var $perm_slugs;
 	var $perm_templates;
 	var $perm_stats;
 	var $perm_files;
@@ -104,6 +105,7 @@ class Group extends DataObject
 			$this->set( 'perm_admin', 'visible' );
 			$this->set( 'perm_blogs', 'user' );
 			$this->set( 'perm_spamblacklist', 'none' );
+			$this->set( 'perm_slugs', 'none' );
 			$this->set( 'perm_templates', 0 );
 			$this->set( 'perm_stats', 'none' );
 			$this->set( 'perm_files', 'none' );
@@ -125,6 +127,7 @@ class Group extends DataObject
 			$this->perm_xhtml_javascript        = $db_row->grp_perm_xhtml_javascript;
 			$this->perm_xhtml_objects           = $db_row->grp_perm_xhtml_objects;
 			$this->perm_spamblacklist           = $db_row->grp_perm_spamblacklist;
+			$this->perm_slugs                   = $db_row->grp_perm_slugs;
 			$this->perm_templates               = $db_row->grp_perm_templates;
 			$this->perm_stats                   = $db_row->grp_perm_stats;
 			$this->perm_files                   = $db_row->grp_perm_files;
@@ -172,6 +175,9 @@ class Group extends DataObject
 
 		// Spam blacklist
 		$this->set( 'perm_spamblacklist', param( 'edited_grp_perm_spamblacklist', 'string', true ) );
+
+		// Slug manager
+		$this->set( 'perm_slugs', param( 'edited_grp_perm_slugs', 'string', true ) );
 
 		// Templates
 		$this->set( 'perm_templates', param( 'edited_grp_perm_templates', 'integer', 0 ) );
@@ -330,6 +336,7 @@ class Group extends DataObject
 				break;
 
 			case 'spamblacklist':
+			case 'slugs':
 			case 'stats':
 			case 'options':
 			case 'users':
@@ -697,6 +704,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.31  2010/04/23 09:39:44  efy-asimo
+ * "SEO setting" for help link and Groups slugs permission implementation
+ *
  * Revision 1.30  2010/04/08 10:35:23  efy-asimo
  * Allow users to create a new blog for themselves - task
  *

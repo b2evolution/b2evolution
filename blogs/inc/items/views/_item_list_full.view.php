@@ -268,9 +268,12 @@ while( $Item = & $ItemList->get_item() )
 			// Item slug controll
 			$Item->tinyurl_link( array( 'class' => 'small', 'style' => 'float: right' ) );
 			global $admin_url;
-			echo action_icon( 'Edit slugs...', 'edit',
-				$admin_url.'?ctrl=slugs&amp;slug_ftype=item&amp;slug_fobject='.$Item->ID,
-				NULL, NULL, NULL, array( 'class' => 'small', 'style' => 'float: right' ) );
+			if( $current_User->check_perm( 'slugs', 'view' ) )
+			{ // user has permmission to view slugs
+				echo action_icon( 'Edit slugs...', 'edit',
+					$admin_url.'?ctrl=slugs&amp;slug_ftype=item&amp;slug_fobject='.$Item->ID,
+					NULL, NULL, NULL, array( 'class' => 'small', 'style' => 'float: right' ) );
+			}
 
 			echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="ActionButton">'.T_('View...').'</a>';
 
@@ -414,6 +417,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.34  2010/04/23 09:39:44  efy-asimo
+ * "SEO setting" for help link and Groups slugs permission implementation
+ *
  * Revision 1.33  2010/04/12 09:41:36  efy-asimo
  * private URL shortener - task
  *

@@ -2708,6 +2708,15 @@ function upgrade_b2evo_tables()
 		task_end();
 	}
 
+	task_begin( 'Updgrading groups.Giving Administrator Group edit perms on slugs...' );
+	db_add_col( 'T_groups', 'grp_perm_slugs', "enum('none','view','edit') NOT NULL default 'none'" );
+
+	$DB->query( 'UPDATE T_groups
+	             SET grp_perm_slugs = "edit"
+	             WHERE grp_ID = 1' );
+ 	// Later versions give 'view' on install for Bloggers and privilaged Bloggers.
+	task_end();
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -2882,6 +2891,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.363  2010/04/23 09:39:45  efy-asimo
+ * "SEO setting" for help link and Groups slugs permission implementation
+ *
  * Revision 1.362  2010/04/22 10:09:36  efy-asimo
  * Creating "help" slug on install and upgrade procedure
  *
