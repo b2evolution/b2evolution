@@ -2653,7 +2653,7 @@ function upgrade_b2evo_tables()
 
 	// Create T_slug table and, Insert all slug from T_items
 	task_begin( 'Create Slug table... ' );
-	$DB->query( 'CREATE TABLE T_slug (
+	$DB->query( 'CREATE TABLE IF NOT EXISTS T_slug (
 					slug_ID int(10) unsigned NOT NULL auto_increment,
 					slug_title varchar(255) NOT NULL COLLATE ascii_bin,
 					slug_type char(6) NOT NULL DEFAULT "item",
@@ -2677,7 +2677,7 @@ function upgrade_b2evo_tables()
 	task_end();
 
 	task_begin( 'Insert existing slugs into Slug table... ' );
-	$DB->query( 'INSERT INTO T_slug( slug_title, slug_type, slug_itm_ID)
+	$DB->query( 'REPLACE INTO T_slug( slug_title, slug_type, slug_itm_ID)
 						SELECT post_urltitle, "item", post_ID
 						FROM T_items__item' );
 	task_end();
@@ -2891,6 +2891,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.364  2010/04/27 19:29:39  blueyed
+ * Make inner upgrades for T_slug init more reliable.
+ *
  * Revision 1.363  2010/04/23 09:39:45  efy-asimo
  * "SEO setting" for help link and Groups slugs permission implementation
  *
