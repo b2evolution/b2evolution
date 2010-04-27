@@ -427,6 +427,7 @@ padding-right:3ex;
 	background-image:  url("../icons/mandatory_star_small.gif");
 	background-position: right top;
 	background-repeat: no-repeat;
+	padding-right:13px;
 }
 
 input.field_required,
