@@ -53,6 +53,9 @@ class Timer
 	var $_times = array();
 
 
+	var $indent = 0;
+
+
 	/**
 	 * Constructor.
 	 *
@@ -99,7 +102,7 @@ class Timer
 		if( ! $this->pause( $category ) )
 			return false;
 
-		$Debuglog->add( $category.' stopped at '.$this->get_duration( $category, 3 ), 'timer' );
+		$Debuglog->add( str_repeat('&nbsp;', $this->indent*4).$category.' stopped at '.$this->get_duration( $category, 3 ), 'timer' );
 
 		return true;
 	}
@@ -120,13 +123,15 @@ class Timer
 		{ // Timer is not running!
 			return false;
 		}
-		
+
 		$since_resume = $this->get_current_microtime() - $this->_times[$category]['resumed'];
 		$this->_times[$category]['total'] += $since_resume;
 		$this->_times[$category]['state'] = 'paused';
 
-		if( $log ) $Debuglog->add( $category.' paused at '.$this->get_duration( $category, 3 ), 'timer' );
-
+		if( $log ) {
+			$this->indent--;
+			$Debuglog->add( str_repeat('&nbsp;', $this->indent*4).$category.' paused at '.$this->get_duration( $category, 3 ).' (+'.number_format($since_resume, 4).')', 'timer' );
+		}
 		return true;
 	}
 
@@ -149,7 +154,10 @@ class Timer
 
 		$this->_times[$category]['state'] = 'running';
 
-		if( $log ) $Debuglog->add( $category.' resumed at '.$this->get_duration( $category, 3 ), 'timer' );
+		if( $log ) {
+			$Debuglog->add( str_repeat('&nbsp;', $this->indent*4).$category.' resumed at '.$this->get_duration( $category, 3 ), 'timer' );
+			$this->indent++;
+		}
 	}
 
 
@@ -276,6 +284,9 @@ class Timer_noop
 
 /*
  * $Log$
+ * Revision 1.7  2010/04/27 19:43:24  blueyed
+ * Timer: indent debuglog messages according to their nesting. Also log relative time since resuming when pausing.
+ *
  * Revision 1.6  2010/02/08 17:51:48  efy-yury
  * copyright 2009 -> 2010
  *
