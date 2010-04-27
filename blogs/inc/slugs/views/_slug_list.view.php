@@ -26,12 +26,15 @@ global $Sug, $current_User;
 
 $SQL = new SQL();
 
-$SQL->SELECT( 'slug_ID, slug_title, slug_type, slug_itm_ID as target_ID, post_title as target_title' );
+$SQL->SELECT( '*, post_title AS target_title' ); // select target_title for sorting
 $SQL->FROM( 'T_slug LEFT OUTER JOIN T_items__item ON slug_itm_ID = post_ID' );
 
 if( get_param( 'slug_filter' ) )
 { // add slug_title filter
-	$SQL->WHERE_and( 'slug_title LIKE '.$DB->quote( '%'.get_param('slug_filter').'%' ) );
+	$like = $DB->quote('%'.strtolower(get_param('slug_filter')).'%');
+	$SQL->WHERE_and( "(
+		LOWER(slug_title) LIKE $like
+		OR LOWER(post_title) LIKE $like" );
 }
 switch( get_param( 'slug_ftype' ) )
 { // add filter for item type
@@ -51,6 +54,7 @@ switch( get_param( 'slug_ftype' ) )
 $Results = new Results( $SQL->get(), 'slug_', 'A' );
 
 $Results->title = T_('Slugs').' ('.$Results->total_rows.')';
+$Results->Cache = get_SlugCache();
 
 /**
  * Callback to add filters on top of the result set
@@ -86,28 +90,25 @@ $Results->cols[] = array(
 		);
 
 /**
- * Get a link to the target object 
- * 
- * @param integer target object ID
- * @param string target object name or title
- * @param string target object type
+ * Get a link to the target object
+ *
+ * @param Slug Slug object
  * @return string target link if exists, target title otherwise
  */
-function get_target_link( $target_ID, $target_title, $type )
+function get_target_link( $Slug )
 {
-	global $admin_url;
-
-	if( $type == 'item' )
-	{
-		return sprintf( '<a href="'.$admin_url.'?ctrl=items&action=edit&p=%d">%s</a>', $target_ID, $target_title );
+	$target = $Slug->get_object();
+	if( ! $target )
+	{ // e.g. for "help"
+		return '';
 	}
-	return $target_title;
+	return '<a href="'.$target->get_edit_url().'">'.$target->dget('title').'</a>';
 }
 $Results->cols[] = array(
 			'th' => T_('Target'),
 			'th_class' => 'small',
 			'order' => 'target_title',
-			'td' => '%get_target_link(#target_ID#,#target_title#,#slug_type#)%',
+			'td' => '%get_target_link({Obj})%',
 			'td_class' => 'small center',
 		);
 

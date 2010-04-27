@@ -2386,7 +2386,7 @@ class Item extends ItemLight
 				$text = '';
 		}
 
-		$text = preg_replace_callback( '¤\$([a-z_]+)\$¤', array( $this, 'replace_callback' ), $text );
+		$text = preg_replace_callback( '?\$([a-z_]+)\$?', array( $this, 'replace_callback' ), $text );
 
 		if( empty($text) )
 		{
@@ -2497,15 +2497,9 @@ class Item extends ItemLight
 	{
 		global $current_User, $admin_url;
 
-		if( ! is_logged_in() ) return false;
-
-		if( ! $this->ID )
-		{ // preview..
-			return false;
-		}
-
-		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
-		{ // User has no right to edit this post
+		$actionurl = $this->get_edit_url($params);
+		if( ! $actionurl )
+		{
 			return false;
 		}
 
@@ -2521,15 +2515,7 @@ class Item extends ItemLight
 
 
 		if( $params['text'] == '#' ) $params['text'] = get_icon( 'edit' ).' '.T_('Edit...');
-
 		if( $params['title'] == '#' ) $params['title'] = T_('Edit this post...');
-
-		$actionurl = $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$this->ID;
-		if( $params['save_context'] )
-		{
-			$actionurl .= '&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ).'#'.$this->get_anchor_id() );
-		}
-
 
 		$r = $params['before'];
 		$r .= '<a href="'.$actionurl;
@@ -2539,6 +2525,40 @@ class Item extends ItemLight
 		$r .= $params['after'];
 
 		return $r;
+	}
+
+
+	/**
+	 * Get URL to edit a post if user has edit rights.
+	 *
+	 * @param array Params:
+	 *  - 'save_context': redirect to current URL?
+	 */
+	function get_edit_url($params = array())
+	{
+		global $admin_url, $current_User;
+
+		if( ! is_logged_in() ) return false;
+
+		if( ! $this->ID )
+		{ // preview..
+			return false;
+		}
+
+		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		{ // User has no right to edit this post
+			return false;
+		}
+
+		// default params
+		$params += array('save_context' => true);
+
+		$url = $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$this->ID;
+		if( $params['save_context'] )
+		{
+			$url .= '&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ).'#'.$this->get_anchor_id() );
+		}
+		return $url;
 	}
 
 
@@ -4311,6 +4331,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.193  2010/04/27 20:58:39  blueyed
+ * Slug refactoring.
+ *
  * Revision 1.192  2010/04/27 20:08:59  blueyed
  * doc fixes
  *

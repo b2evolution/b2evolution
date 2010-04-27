@@ -104,7 +104,7 @@ class Slug extends DataObject
 		$slug_title = urltitle_validate( $slug_title, '', 0, true, 'slug_title', 'slug_ID', 'T_slug' );
 		if( $this->dbexists( 'slug_title', $slug_title ) )
 		{
-			$Messages->add( sprintf( T_('The slug &laquo;%s&raquo; already exists.'), $slug_title ), 'error' ); 
+			$Messages->add( sprintf( T_('The slug &laquo;%s&raquo; already exists.'), $slug_title ), 'error' );
 		}
 		$this->set( 'title', $slug_title );
 
@@ -139,47 +139,39 @@ class Slug extends DataObject
 	}
 
 
-	/*
-	 * Create a link to the related oject
-	 * 
+	/**
+	 * Create a link to the related oject (in the admin!).
+	 *
+	 * @todo dh> Please add a method to get the URL only.
+	 * @todo dh> Proxy method to get the "public" URL (for 'item':
+	 *           Item::get_single_url())?
 	 * @return string empty if no related item, or link to related item
 	 */
 	function get_link_to_object( $fk = 'post_canonical_slug_ID' )
 	{
-		global $DB, $admin_url;
-
-		switch( $this->type )
-		{ // can be different type of object
-			case 'item':
-				$object_ID = 'post_ID';			// related table object ID
-				$object_name = 'post_title';	// related table object name
-				
-				// link to object
-				$link = '<a href="'.$admin_url.'?ctrl=items&action=edit&p=%d">%s</a>';
-				$object_query = 'SELECT post_ID, post_title FROM T_items__item'
-								.' WHERE '.$fk.' = '.$this->ID;
-				break;
-
-			case 'help':
-				return '';
-
-			default:
-				// not defined restriction
-				debug_die ( 'Unhandled object type:' . htmlspecialchars ( $this->type ) );
+		if( $object = $this->get_object($fk) )
+		{
+			return $object->get_edit_link();
 		}
+		return '';
+	}
 
-		$result_link = '';
-		$query_result = $DB->get_results( $object_query );
-		foreach( $query_result as $row )
-		{ // create links for each related object
-			if( ! ( $obj_name_value = $row->$object_name ) )
-			{ // the object name is empty
-				$obj_name_value = T_('No name');
-			}
-			$result_link .= sprintf( $link, $row->$object_ID, $obj_name_value );
+
+	/**
+	 * Create a link to the related oject (in the admin!).
+	 *
+	 * @todo dh> Please add a method to get the URL only.
+	 * @todo dh> Proxy method to get the "public" URL (for 'item':
+	 *           Item::get_single_url())?
+	 * @return string empty if no related item, or link to related item
+	 */
+	function get_url_to_object( $fk = 'post_canonical_slug_ID' )
+	{
+		if( $object = $this->get_object($fk) )
+		{
+			return $object->get_edit_url();
 		}
-
-		return $result_link;
+		return '';
 	}
 
 
@@ -187,16 +179,16 @@ class Slug extends DataObject
 	 * Get link to restricted object
 	 *
 	 * Used when try to delete a slug, which is another object slug
-	 * 
+	 *
 	 * @param array restriction
 	 * @return string message with links to objects
 	 */
 	function get_restriction_link( $restriction )
 	{
-		$restriction_link = $this->get_link_to_object( $restriction['fk'] );
+		$restriction_link = $this->get_link_to_object( /* $restriction['fk'] */ );
 		if( $restriction_link != '' )
 		{ // there are restrictions
-			return sprintf( $restriction['msg'].'<br/>'.$restriction_link, 1 );
+			return sprintf( $restriction['msg'].'<br/>'.str_replace('%', '%%', $restriction_link), 1 );
 		}
 		// no restriction
 		return '';
@@ -204,7 +196,35 @@ class Slug extends DataObject
 
 
 	/**
-	 * Update the DB based on previously recorded changes
+	 * Get linked object.
+	 * @return object
+	 */
+	function get_object( /* $fk = 'post_canonical_slug_ID' */ )
+	{
+		global $DB, $admin_url;
+
+		switch( $this->type )
+		{ // can be different type of object
+			case 'item':
+				// TODO: dh> should use ItemCache altogether
+				// was: $object_query = 'SELECT post_ID, post_title FROM T_items__item WHERE '.$fk.' = '.$this->ID;
+				$ItemCache = get_ItemCache();
+				return $ItemCache->get_by_ID($this->itm_ID);
+
+			case 'help':
+				return false;
+
+			default:
+				// not defined restriction
+				debug_die('Slug::get_object: Unhandled object type: '.htmlspecialchars($this->type));
+		}
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes.
+	 *
+	 * @todo dh> this is very Item specific, and should get fixed probably.
 	 *
 	 * @return boolean true on success
 	 */
@@ -223,7 +243,7 @@ class Slug extends DataObject
 				$DB->rollback();
 				return false;
 			}
-			$Messages->add( 'WARNING: this change also changed the canoncial slug of the post!'.$this->get_link_to_object(), 'redwarning' );
+			$Messages->add( sprintf(T_('Warning: this change also changed the canonical slug of the post! (%s)'), $this->get_link_to_object()), 'redwarning' );
 		}
 
 		parent::dbupdate();
