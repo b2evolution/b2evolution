@@ -57,6 +57,9 @@ global $topright_Menu;
 $topright_Menu = new Menu();
 
 
+// Switch to users locale:
+locale_temp_switch($current_User->locale);
+
 // Let the modules construct the menu:
 modules_call_method( 'build_evobar_menu' );
 
@@ -87,3 +90,7 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
  		?>
 	</div>
 </div>
+
+<?php
+locale_restore_previous();
+?>
