@@ -104,7 +104,7 @@ function display_base_config_recap()
 	if( !isset($conf_db_user) ) $conf_db_user = $db_config['user'];
 	if( !isset($conf_db_password) ) $conf_db_password = $db_config['password'];
 	if( !isset($conf_db_name) ) $conf_db_name = $db_config['name'];
-	if( !isset($conf_db_host) ) $conf_db_host = $db_config['host'];
+	if( !isset($conf_db_host) ) $conf_db_host = isset($db_config['host']) ? $db_config['host'] : 'localhost';
 
 	echo '<pre>',
 	T_('MySQL Username').': '.$conf_db_user."\n".
@@ -843,6 +843,9 @@ function get_antispam_query()
 
 /*
  * $Log$
+ * Revision 1.94  2010/04/27 19:25:57  blueyed
+ * Installer: fix for undefined host in db_config.
+ *
  * Revision 1.93  2010/04/07 08:26:11  efy-asimo
  * Allow multiple slugs per post - update & fix
  *
