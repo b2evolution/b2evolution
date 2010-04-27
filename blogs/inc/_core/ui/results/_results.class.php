@@ -622,6 +622,9 @@ class Results extends Table
 	 *
 	 * @todo dh> This might get done using SQL_CALC_FOUND_ROWS (I noted this somewhere else already)
 	 * fp> I have a vague memory about issues with SQL_CALC_FOUND_ROWS. Maybe it was not returned accurate counts. Or maybe it didn't work with GROUP BY. Sth like that.
+	 * dh> We could just try it. Adding some assertion in there, leaving the old
+	 *     code in place. I'm quite certain that it is working correctly with
+	 *     recent MySQL versions.
 	 *
 	 * @todo allow overriding?
 	 * @todo handle problem of empty groups!
@@ -1833,6 +1836,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.33  2010/04/27 20:22:06  blueyed
+ * doc
+ *
  * Revision 1.32  2010/02/08 17:52:01  efy-yury
  * copyright 2009 -> 2010
  *
