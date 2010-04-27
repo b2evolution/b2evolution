@@ -4198,9 +4198,9 @@ class Item extends ItemLight
 	}
 
 
-	/*
+	/**
 	 * Get the item tinyurl. If not exists -> create new
-	 * 
+	 *
 	 * @return string|boolean tinyurl on success, false otherwise
 	 */
 	function get_tinyurl()
@@ -4242,9 +4242,9 @@ class Item extends ItemLight
 	}
 
 
-	/*
-	 * Creates and redutn the item tinyurl link
-	 * 
+	/**
+	 * Create and return the item tinyurl link.
+	 *
 	 * @param array Params:
 	 *  - 'before': to display before link
 	 *  - 'after': to display after link
@@ -4252,7 +4252,6 @@ class Item extends ItemLight
 	 *  - 'title': link title
 	 *  - 'class': class name
 	 *  - 'style': link style
-	 *  
 	 * @return string the tinyurl link on success, empty string otherwise
 	 */
 	function get_tinyurl_link( $params = array() )
@@ -4312,6 +4311,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.192  2010/04/27 20:08:59  blueyed
+ * doc fixes
+ *
  * Revision 1.191  2010/04/19 18:38:37  blueyed
  * Fix get_tinyurl, via /blogs/admin.php?ctrl=items&blog=1&filter=restore
  *

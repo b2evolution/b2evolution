@@ -40,10 +40,10 @@ class Slug extends DataObject
 
 	var $itm_ID;
 
-	/*
-	 * constructor
-	 * 
-	 * object table Database row
+	/**
+	 * Constructor
+	 *
+	 * @param object table Database row
 	 */
 	function Slug( $db_row = NULL )
 	{
