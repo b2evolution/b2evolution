@@ -575,10 +575,10 @@ class Session
 
 		// fp> TODO: make this a nice message -- with a link to go back? history.back()?
 		//           Try not to lose form edits...!
-		// dh>       This should provide a form, including all POST/GET data, but only a refreshed crumb,
-		//           warning the user about security, but when this was a legit request, it can easily
-		//           be resubmitted.
-		debug_die( 'Incorrect crumb received ['.$crumb_name.'] -- Have you waited more than 2 hours to submit your request? We have refused the request for security reasons. Please go back and refresh the form before submitting.' );
+		// dh>   This should provide a form, including all POST/GET data, but only a refreshed crumb.
+		//       It warns the user about security, but when this was a legit request, it can easily
+		//       get resubmitted by the user.
+		bad_request_die( 'Incorrect crumb received ['.$crumb_name.'] -- Have you waited more than 2 hours to submit your request? We have refused the request for security reasons. Please go back and refresh the form before submitting.' );
 	}
 }
 
@@ -647,6 +647,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.32  2010/04/28 21:15:44  blueyed
+ * assert_received_crumb: use bad_request_die some more. Improve doc/todo.
+ *
  * Revision 1.31  2010/03/18 19:33:54  blueyed
  * assert_received_crumb: use bad_request_die, not debug_die. doc/todo
  *
