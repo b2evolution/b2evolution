@@ -53,6 +53,10 @@ class Timer
 	var $_times = array();
 
 
+	/**
+	 * @access protected
+	 * @var integer Level of internal indentation, used to indent Debuglog messages.
+	 */
 	var $indent = 0;
 
 
@@ -117,21 +121,20 @@ class Timer
 	 */
 	function pause( $category, $log = true )
 	{
-		global $Debuglog;
-
+		$since_resume = $this->get_current_microtime() - $this->_times[$category]['resumed'];
+		if( $log ) {
+			global $Debuglog;
+			$this->indent--;
+			$Debuglog->add( str_repeat('&nbsp;', $this->indent*4).$category.' paused at '.$this->get_duration( $category, 3 ).' (<strong>+'.number_format($since_resume, 4).'</strong>)', 'timer' );
+		}
 		if( $this->get_state($category) != 'running' )
 		{ // Timer is not running!
 			return false;
 		}
 
-		$since_resume = $this->get_current_microtime() - $this->_times[$category]['resumed'];
 		$this->_times[$category]['total'] += $since_resume;
 		$this->_times[$category]['state'] = 'paused';
 
-		if( $log ) {
-			$this->indent--;
-			$Debuglog->add( str_repeat('&nbsp;', $this->indent*4).$category.' paused at '.$this->get_duration( $category, 3 ).' (+'.number_format($since_resume, 4).')', 'timer' );
-		}
 		return true;
 	}
 
@@ -284,6 +287,9 @@ class Timer_noop
 
 /*
  * $Log$
+ * Revision 1.8  2010/04/28 20:41:10  blueyed
+ * Timer: fix indenting when pause gets called several times / recursivly (and it was already paused).
+ *
  * Revision 1.7  2010/04/27 19:43:24  blueyed
  * Timer: indent debuglog messages according to their nesting. Also log relative time since resuming when pausing.
  *
