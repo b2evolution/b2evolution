@@ -121,14 +121,15 @@ class Timer
 	 */
 	function pause( $category, $log = true )
 	{
+		global $Debuglog;
 		$since_resume = $this->get_current_microtime() - $this->_times[$category]['resumed'];
 		if( $log ) {
-			global $Debuglog;
 			$this->indent--;
 			$Debuglog->add( str_repeat('&nbsp;', $this->indent*4).$category.' paused at '.$this->get_duration( $category, 3 ).' (<strong>+'.number_format($since_resume, 4).'</strong>)', 'timer' );
 		}
 		if( $this->get_state($category) != 'running' )
 		{ // Timer is not running!
+			$Debuglog->add("Warning: tried to pause already paused '$category'.", 'timer');
 			return false;
 		}
 
@@ -287,6 +288,9 @@ class Timer_noop
 
 /*
  * $Log$
+ * Revision 1.9  2010/04/28 20:43:52  blueyed
+ * Timer: add warning to Debuglog when trying to pause already paused cat.
+ *
  * Revision 1.8  2010/04/28 20:41:10  blueyed
  * Timer: fix indenting when pause gets called several times / recursivly (and it was already paused).
  *
