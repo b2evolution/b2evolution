@@ -54,7 +54,12 @@ function evocms_autoload_class( $classname )
 	$classname = strtolower($classname);
 	if( isset($map_class_path[$classname]) )
 	{
-		require_once $map_class_path[$classname];
+		$filename = $map_class_path[$classname];
+		if( ! is_readable($filename) )
+		{ // sleep for a tiny amount of time (in case the file just gets updated by editing or something alike)
+			usleep(rand(250, 750));
+		}
+		require_once $filename;
 	}
 }
 
@@ -106,6 +111,9 @@ function duplicate( $Obj )
 
 /*
  * $Log$
+ * Revision 1.29  2010/04/28 21:26:15  blueyed
+ * Autoloading in PHP5: if source file is not readable, wait for 250-750ms and fire off require_once afterwards.
+ *
  * Revision 1.28  2010/02/08 17:51:28  efy-yury
  * copyright 2009 -> 2010
  *
