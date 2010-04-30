@@ -444,12 +444,28 @@ function get_canonical_path( $ads_path )
 	{
 		$ads_path = str_replace( '/./', '/', $ads_path );
 	}
+	// asimo>> This was changed from regular expression to this, because the version with
+	// regular expression didn't work right for paths with hidden folder names, ex. ".evovache"
 	while( ( $substr_index = strpos( $ads_path, '/../' ) ) !== false )
 	{ // we founnd /../ back reference to dereference...
 		$ads_path_begin = substr( $ads_path, 0, $substr_index );
 		$ads_path_end = substr( $ads_path, $substr_index + 4 );
 		// we need the last parent folder path
-		$ads_path_begin = substr( $ads_path_begin, 0, strrpos( $ads_path_begin, '/' ) + 1 );
+		if( strrpos( $ads_path_begin, '/' ) !== false )
+		{ // there is still at least one folder before /../
+			$ads_path_begin = substr( $ads_path_begin, 0, strrpos( $ads_path_begin, '/' ) + 1 );
+		}
+		else
+		{ // no more folder before /../
+			if( ! strlen( $ads_path_begin ) )
+			{ // if there is nothing before /../ 
+				return NULL;
+			}
+			else
+			{
+				$ads_path_begin = '';
+			}
+		}
 		// create new path
 		$ads_path = $ads_path_begin.$ads_path_end;
 	}
@@ -1021,6 +1037,9 @@ function check_showparams( & $Filelist )
 
 /*
  * $Log$
+ * Revision 1.40  2010/04/30 07:33:53  efy-asimo
+ * get_canonical_path function fix - for all test case
+ *
  * Revision 1.39  2010/04/17 11:51:50  efy-asimo
  * $ads_path resolving - bugfix
  *
