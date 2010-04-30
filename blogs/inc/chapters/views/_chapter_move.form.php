@@ -39,7 +39,7 @@ $edited_Chapter = & $edited_GenericCategory;
  */
 global $BlogCache;
 
-global $action, $subset_ID;
+global $action;
 
 $Form = new Form( NULL, 'form' );
 
@@ -68,6 +68,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.7  2010/04/30 20:36:20  blueyed
+ * Nuke unused global
+ *
  * Revision 1.6  2010/02/08 17:52:07  efy-yury
  * copyright 2009 -> 2010
  *
