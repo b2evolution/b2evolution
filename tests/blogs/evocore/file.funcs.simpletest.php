@@ -114,6 +114,7 @@ class FileFuncsTestCase extends EvoUnitTestCase
 		$this->assertIdentical( get_canonical_path( '/.//////.././//./.' ), NULL );
 		$this->assertIdentical( get_canonical_path( '/.//////foo/.././//./.' ), '/' );
 		$this->assertIdentical( get_canonical_path( '/.//////../foo/.///./.' ), NULL );
+		$this->assertIdentical( get_canonical_path( 'C:\\Folder\\.evocache\\..\\' ), 'C:/Folder/' );
 	}
 }
 
