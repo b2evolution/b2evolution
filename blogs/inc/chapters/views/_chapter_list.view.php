@@ -63,6 +63,7 @@ function cat_line( $Chapter, $level )
 {
 	global $line_class, $permission_to_edit, $current_User, $Settings;
 	global $GenericCategoryCache, $current_default_cat_ID;
+	global $number_of_posts_in_cat;
 	
 	global $Session;
 	$result_fadeout = $Session->get( 'fadeout_array' );
@@ -104,12 +105,15 @@ function cat_line( $Chapter, $level )
 					 </td>';
 	}
 
-	$r .= '<td>'.$Chapter->dget('urlname').'</td>';
+		$edit_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=edit' );
+	$r .= '<td><a href="'.htmlspecialchars($Chapter->get_permanent_url()).'">'.$Chapter->dget('urlname').'</a></td>';
 
 	if( $Settings->get('chapter_ordering') == 'manual' )
 	{
 		$r .= '<td class="center">'.$Chapter->dget('order').'</td>';
 	}
+
+	$r .= '<td>'.(int)$number_of_posts_in_cat[$Chapter->ID].'</td>';
 
 	$r .= '<td class="lastcol shrinkwrap">';
 	if( $permission_to_edit )
@@ -194,7 +198,6 @@ $Table->cols[] = array(
 $Table->cols[] = array(
 						'th' => T_('URL "slug"'),
 					);
-
 if( $Settings->get('chapter_ordering') == 'manual' )
 {
 	$Table->cols[] = array(
@@ -202,6 +205,11 @@ if( $Settings->get('chapter_ordering') == 'manual' )
 							'th_class' => 'shrinkwrap',
 						);
 }
+// TODO: dh> would be useful to sort by this
+$Table->cols[] = array(
+						'th' => T_('Number of posts'),
+						'th_class' => 'shrinkwrap',
+					);
 
 if( $permission_to_edit )
 {	// We have permission permission to edit, so display action column:
@@ -209,6 +217,15 @@ if( $permission_to_edit )
 							'th' => T_('Actions'),
 						);
 }
+
+global $number_of_posts_in_cat;
+$number_of_posts_in_cat = $DB->get_assoc("
+	SELECT cat_ID, count(cat_id) c
+	  FROM evo_items__item
+	  JOIN evo_postcats ON `postcat_post_ID` = post_ID
+	  JOIN evo_categories ON `postcat_cat_ID` = cat_id
+	 WHERE cat_blog_ID = $subset_ID
+	 GROUP BY cat_ID");
 
 $Table->display_init( NULL, $result_fadeout );
 
@@ -246,6 +263,9 @@ echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categori
 $Session->delete( 'fadeout_array');
 /*
  * $Log$
+ * Revision 1.23  2010/04/30 20:37:10  blueyed
+ * Add "Number of posts" column to chapter view. This is useful to get an overview about how often a category is being used.
+ *
  * Revision 1.22  2010/02/08 17:52:07  efy-yury
  * copyright 2009 -> 2010
  *
