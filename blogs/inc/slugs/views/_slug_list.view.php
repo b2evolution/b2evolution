@@ -34,7 +34,7 @@ if( get_param( 'slug_filter' ) )
 	$like = $DB->quote('%'.strtolower(get_param('slug_filter')).'%');
 	$SQL->WHERE_and( "(
 		LOWER(slug_title) LIKE $like
-		OR LOWER(post_title) LIKE $like" );
+		OR LOWER(post_title) LIKE $like)" );
 }
 switch( get_param( 'slug_ftype' ) )
 { // add filter for item type
