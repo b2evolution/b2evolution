@@ -662,12 +662,7 @@ $Form->begin_form();
 				var fm_hl = jQuery("#fm_highlighted");
 				if( fm_hl.length ) {
 					jQuery.getScript('<?php echo $rsc_url ?>js/jquery/jquery.scrollto.js', function () {
-						jQuery.scrollTo( fm_hl,
-						{ onAfter: function()
-							{
-								evoFadeHighlight( fm_hl )
-							}
-						} );
+						jQuery.scrollTo( fm_hl, { onAfter: function() { evoFadeHighlight( fm_hl ) } } );
 					});
 				}
 			} );
@@ -682,6 +677,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.40  2010/04/30 20:26:33  blueyed
+ * Code compression with scrollTo code.
+ *
  * Revision 1.39  2010/04/08 18:28:02  blueyed
  * crumb refactoring: add get_crumb
  *
