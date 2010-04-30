@@ -203,6 +203,17 @@ table.catselect td.selector {
 table.catselect #new_category_name {
 	background-color:white;
 }
+/* Limit height of .catselect container in item admin view */
+#itemform_categories {
+	max-height:500px;
+	overflow:scroll;
+}
+#itemform_categories {
+	border:none;
+}
+#itemform_categories table.catselect {
+	border:1px solid #9DB0BC;
+}
 
 
 /*
