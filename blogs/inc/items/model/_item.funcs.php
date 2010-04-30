@@ -543,6 +543,7 @@ function cat_select( $Form, $form_fields = true )
 	global $allow_cross_posting, $cache_categories,
 					$blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
 	global $cat_sel_total_count, $dispatcher;
+	global $rsc_url;
 
 	$Form->begin_fieldset( get_newcategory_link().T_('Categories').get_manual_link('item_categories_fieldset'), array( 'class'=>'extracats', 'id' => 'itemform_categories' ) );
 
@@ -574,12 +575,16 @@ function cat_select( $Form, $form_fields = true )
 			if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) )
 				continue;
 
-			$r .= '<tr class="group"><td colspan="3">'.$l_Blog->dget('name')."</td></tr>\n";
+			$r .= '<tr class="group" id="catselect_blog'.$l_Blog->ID.'"><td colspan="3">'.$l_Blog->dget('name')."</td></tr>\n";
 			$cat_sel_total_count++; // the header uses 1 line
 
 			$current_blog_ID = $l_Blog->ID;	// Global needed in callbacks
 			$r .= cat_children( $cache_categories, $l_Blog->ID, NULL, 'cat_select_before_first',
 										'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
+			if( $blog == $l_Blog->ID )
+			{
+				$r .= cat_select_new();
+			}
 		}
 	}
 	else
@@ -587,15 +592,18 @@ function cat_select( $Form, $form_fields = true )
 		$current_blog_ID = $blog;
 		$r .= cat_children( $cache_categories, $current_blog_ID, NULL, 'cat_select_before_first',
 									'cat_select_before_each', 'cat_select_after_each', 'cat_select_after_last', 1 );
-
+		$r .= cat_select_new();
 	}
-
-	$r .= cat_select_new();
 
 	$r .= '</table>';
 
 	echo $r;
 
+	if( $allow_cross_posting >= 2 && isset($blog) ) {
+		echo '<script type="text/javascript">jQuery.getScript("'.$rsc_url.'js/jquery/jquery.scrollto.js", function () {
+			jQuery("#itemform_categories").scrollTo( "#catselect_blog'.$blog.'" );
+		});</script>';
+	}
 	$Form->end_fieldset();
 }
 
@@ -1419,6 +1427,14 @@ function echo_set_slug_changed()
 }
 /*
  * $Log$
+ * Revision 1.103  2010/04/30 20:35:55  blueyed
+ * Item edit form:
+ *  - allow_cross_posting=2 related fixes:
+ *    - add cat_select_new input box at the end of the main category blog,
+ *      not at the end of the list.
+ *    - scroll to selected blog in category list DIV (TODO: test with IE),
+ *      adds HTML IDs to the table groups.
+ *
  * Revision 1.102  2010/04/12 09:41:36  efy-asimo
  * private URL shortener - task
  *
