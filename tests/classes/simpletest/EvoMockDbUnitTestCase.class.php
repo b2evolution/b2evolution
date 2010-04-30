@@ -52,9 +52,8 @@ class EvoMockDbUnitTestCase extends EvoUnitTestCase
 		$classname = 'EvoMockDbUnitTestCase_DB_'.get_class($this);
 		$this->MockDB = new $classname($this);
 		$this->MockDB->DB( $testDB_conf ); // this will do 2-3 calls to query() already
-		#pre_dump( $this->MockDB, get_class_methods($this->MockDB) ); die;
 
-		$this->old_DB_EvoMockDbUnitTestCache = & $GLOBALS['DB'];
+		$this->old_DB_EvoMockDbUnitTestCase = & $GLOBALS['DB'];
 		$GLOBALS['DB'] = & $this->MockDB;
 	}
 
@@ -64,7 +63,7 @@ class EvoMockDbUnitTestCase extends EvoUnitTestCase
 	 */
 	function tearDown()
 	{
-		$GLOBALS['DB'] = $this->old_DB_EvoMockDbUnitTestCache;
+		$GLOBALS['DB'] = $this->old_DB_EvoMockDbUnitTestCase;
 
 		parent::tearDown();
 	}
