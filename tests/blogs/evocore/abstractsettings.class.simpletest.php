@@ -36,7 +36,7 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 
 	function test_load()
 	{
-		$this->MockDB->expectOnce( 'get_results', array( new PatternExpectation('/SELECT test_name, test_value\s+FROM testtable/i'), ARRAY_A ), 'DB select ok.' );
+		$this->MockDB->expectOnce( 'get_results', array( new PatternExpectation('/SELECT test_name, test_value\s+FROM testtable/i'), ARRAY_A, 'Settings::load' ), 'DB select ok.' );
 		$this->TestSettings->load_all();
 		$this->TestSettings->load_all();
 	}
@@ -116,7 +116,7 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 	 */
 	function test_PreferExplicitSet()
 	{
-		$this->MockDB->expectOnce( 'get_results', array( new PatternExpectation('/SELECT test_name, test_value\s+FROM testtable/i'), ARRAY_A ), 'DB select ok.' );
+		$this->MockDB->expectOnce( 'get_results', array( new PatternExpectation('/SELECT test_name, test_value\s+FROM testtable/i'), ARRAY_A, 'Settings::load' ), 'DB select ok.' );
 		$this->TestSettings->set( 'lala', 1 );
 
 		$this->TestSettings->load_all();
@@ -170,7 +170,7 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 
 	function test_loadonlyonce_nocachebycolkeys()
 	{
-		$this->MockDB->expectOnce( 'get_results', array( new PatternExpectation('/^\s*SELECT key1, key2, val\s+FROM T_test$/i'), ARRAY_A ), 'DB select-all-once ok.' );
+		$this->MockDB->expectOnce( 'get_results', array( new PatternExpectation('/^\s*SELECT key1, key2, val\s+FROM T_test$/i'), ARRAY_A, 'Settings::load' ), 'DB select-all-once ok.' );
 
 		$s = new AbstractSettings( 'T_test', array( 'key1', 'key2' ), 'val', 0 );
 		$s->get(1, 'foo');
@@ -181,7 +181,7 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 	function test_loadonlyonce_cachebycolkeys1of2()
 	{
 		$this->MockDB->expectOnce( 'get_results', array( new PatternExpectation(
-			'/SELECT key1, key2, val\s+FROM T_test WHERE key1 = \'1\'/i'), ARRAY_A ), 'DB select-all-once ok.' );
+			'/SELECT key1, key2, val\s+FROM T_test WHERE key1 = \'1\'/i'), ARRAY_A, 'Settings::load' ), 'DB select-all-once ok.' );
 
 		$s = new AbstractSettings( 'T_test', array( 'key1', 'key2' ), 'val', 1 );
 		$s->get(1, 'foo');
@@ -192,10 +192,10 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 	function test_loadonlyonce_cachebycolkeys2of2()
 	{
 		$this->MockDB->expectAt( 0, 'get_results', array( new PatternExpectation(
-			'/^\s*SELECT key1, key2, key3, val\s+FROM T_test WHERE key1 = \'1\' AND key2 = \'2\'$/i'), ARRAY_A ), 'DB select-all-once ok.' );
+			'/^\s*SELECT key1, key2, key3, val\s+FROM T_test WHERE key1 = \'1\' AND key2 = \'2\'$/i'), ARRAY_A, 'Settings::load' ), 'DB select-all-once ok.' );
 
 		$this->MockDB->expectAt( 1, 'get_results', array( new PatternExpectation(
-			'/^\s*SELECT key1, key2, key3, val\s+FROM T_test WHERE key1 = \'1_2\' AND key2 = \'2\'$/i'), ARRAY_A ), 'DB select-all-once ok.' );
+			'/^\s*SELECT key1, key2, key3, val\s+FROM T_test WHERE key1 = \'1_2\' AND key2 = \'2\'$/i'), ARRAY_A, 'Settings::load' ), 'DB select-all-once ok.' );
 
 		$s = new AbstractSettings( 'T_test', array( 'key1', 'key2', 'key3' ), 'val', 2 );
 		// 1st query
@@ -283,7 +283,7 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 		$s->_defaults = array('3' => 'bar');
 
 		$this->MockDB->expectAt( 0, 'get_results', array(
-			new PatternExpectation("/SELECT key1, key2, key3, val\s+FROM T_test$/"), ARRAY_A ), 'DB SELECT ok.' );
+			new PatternExpectation("/SELECT key1, key2, key3, val\s+FROM T_test$/"), ARRAY_A, 'Settings::load' ), 'DB SELECT ok.' );
 		$this->MockDB->expectOnce('get_results');
 
 		// Mock the return value of get_results, to simulate saved settings.
@@ -304,7 +304,7 @@ class AbstractSettingsTestCase extends EvoMockDbUnitTestCase
 	function test_cache_only_once()
 	{
 		$this->MockDB->expectAt( 0, 'get_results', array(
-			new PatternExpectation("/SELECT cset_coll_ID, cset_name, cset_value\s+FROM T_coll_settings$/"), ARRAY_A ), 'DB SELECT ok.' );
+			new PatternExpectation("/SELECT cset_coll_ID, cset_name, cset_value\s+FROM T_coll_settings$/"), ARRAY_A, 'Settings::load' ), 'DB SELECT ok.' );
 		$this->MockDB->expectOnce('get_results');
 
 		$s = new AbstractSettings( 'T_coll_settings', array( 'cset_coll_ID', 'cset_name' ), 'cset_value', 0 );
