@@ -444,32 +444,22 @@ function get_canonical_path( $ads_path )
 	{
 		$ads_path = str_replace( '/./', '/', $ads_path );
 	}
-	// asimo>> This was changed from regular expression to this, because the version with
-	// regular expression didn't work right for paths with hidden folder names, ex. ".evovache"
-	while( ( $substr_index = strpos( $ads_path, '/../' ) ) !== false )
-	{ // we founnd /../ back reference to dereference...
-		$ads_path_begin = substr( $ads_path, 0, $substr_index );
-		$ads_path_end = substr( $ads_path, $substr_index + 4 );
-		// we need the last parent folder path
-		if( strrpos( $ads_path_begin, '/' ) !== false )
-		{ // there is still at least one folder before /../
-			$ads_path_begin = substr( $ads_path_begin, 0, strrpos( $ads_path_begin, '/' ) + 1 );
+	$parts = explode('/', $ads_path);
+	for( $i = 0; $i < count($parts); $i++ )
+	{
+		if( $parts[$i] != '..' ) {
+			continue;
 		}
-		else
-		{ // no more folder before /../
-			if( ! strlen( $ads_path_begin ) )
-			{ // if there is nothing before /../ 
-				return NULL;
-			}
-			else
-			{
-				$ads_path_begin = '';
-			}
+		if( $i <= 0 || $parts[$i-1] == '' || substr($parts[$i-1], -1) == ':' /* windows drive letter */ ) {
+			return NULL;
 		}
-		// create new path
-		$ads_path = $ads_path_begin.$ads_path_end;
+		// Remove ".." and the part before it
+		unset($parts[$i-1], $parts[$i]);
+		// Respin array
+		$parts = array_values($parts);
+		$i = $i-2;
 	}
-	$ads_realpath = $ads_path;
+	$ads_realpath = implode('/', $parts);
 
 	// pre_dump( 'get_canonical_path()', $ads_path, $ads_realpath );
 
@@ -1037,6 +1027,10 @@ function check_showparams( & $Filelist )
 
 /*
  * $Log$
+ * Revision 1.41  2010/04/30 19:44:49  blueyed
+ * fixes bug(s): https://launchpad.net/bugs/571791
+ * Better fix for LP:#571791 (get_canonical_url)
+ *
  * Revision 1.40  2010/04/30 07:33:53  efy-asimo
  * get_canonical_path function fix - for all test case
  *
