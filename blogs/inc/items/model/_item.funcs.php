@@ -619,7 +619,7 @@ function cat_select_header()
 	{ // This is current blog or we allow moving posts accross blogs
 		$r .= '<th class="selector catsel_extra" title="'.T_('Additional category').'">'.T_('Extra').'</th>';
 	}
-	$r .= '<th class="catsel_name">'.T_('Category').'</th><th width="1"><!-- for IE7 --></th></tr></thead>';
+	$r .= '<th class="catsel_name">'.T_('Category').'</th><!--[if IE 7]><th width="1"><!-- for IE7 --></th><![endif]--></tr></thead>';
 	return $r;
 }
 
@@ -700,7 +700,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 				.' <a href="'.htmlspecialchars($thisChapter->get_permanent_url()).'" title="'.htmlspecialchars(T_('View category in blog.')).'">'
 				.'&nbsp;&raquo;&nbsp; ' // TODO: dh> provide an icon instead? // fp> maybe the A(dmin)/B(log) icon from the toolbar? And also use it for permalinks to posts?
 				.'</a></td>'
-				.'<td width="1"><!-- for IE7 --></td></tr>'
+				.'<!--[if IE 7]><td width="1"><!-- for IE7 --></td><![endif]--></tr>'
 				."\n";
 
 	return $r;
@@ -765,8 +765,8 @@ function cat_select_new()
 	$r .= '<td class="catsel_name">'
 				.'<input maxlength="255" style="width: 100%;" value="'.$category_name.'" size="20" type="text" name="category_name" id="new_category_name" />'
 				."</td>";
-	$r .= '<td width="1">&nbsp<!-- for IE7 -->';
-	$r .= "</td></tr>";
+	$r .= '<!--[if IE 7]><td width="1">&nbsp</td><![endif]-->';
+	$r .= "</tr>";
 	return $r;
 }
 
@@ -1427,6 +1427,9 @@ function echo_set_slug_changed()
 }
 /*
  * $Log$
+ * Revision 1.104  2010/05/01 16:14:56  blueyed
+ * Item categories form: use IE Conditional Comments for IE7 code. I do not know if IE8 should use the same workaround. But Firefox does not and an extra table column looks ugly here.
+ *
  * Revision 1.103  2010/04/30 20:35:55  blueyed
  * Item edit form:
  *  - allow_cross_posting=2 related fixes:
