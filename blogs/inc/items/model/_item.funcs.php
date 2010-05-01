@@ -215,6 +215,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	}
 
 	// leave only first 5 words
+	// TODO: dh> why is that? we have a limit of 200 chars that should get used instead. This unnecessarily crops the urlname.
 	$slug_changed = param( 'slug_changed' );
 	if( $slug_changed == 0 )
 	{ // this should only happen when the slug is auto generated
@@ -277,7 +278,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 			}
 		}
 		// echo "highest existing number = $highest_number <br />";
-	
+
 		if( $exact_match && !$query_only )
 		{ // We got an exact match, we need to change the number:
 			$urltitle = $urlbase.'-'.($highest_number + 1);
@@ -1427,6 +1428,9 @@ function echo_set_slug_changed()
 }
 /*
  * $Log$
+ * Revision 1.105  2010/05/01 18:43:53  blueyed
+ * TODO/doc: why limit urlnames to 5 words?
+ *
  * Revision 1.104  2010/05/01 16:14:56  blueyed
  * Item categories form: use IE Conditional Comments for IE7 code. I do not know if IE8 should use the same workaround. But Firefox does not and an extra table column looks ugly here.
  *
