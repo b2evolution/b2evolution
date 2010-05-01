@@ -38,15 +38,7 @@ if( $action == 'unzip_simpletest' )
 	}
 	elseif( ! is_dir($target_dir) || ! is_writable($target_dir) )
 	{
-		echo '<p><strong>ERROR: Target directory is not writable (for me).</strong></p>';
-		echo '<p>Target directory: '.htmlspecialchars($target_dir).'</p>';
-		break;
-	}
-	elseif( ! is_dir($target_dir) || ! is_writable($target_dir) )
-	{
-		echo '<p><strong>ERROR: Target directory is not writable (for me).</strong></p>';
-		echo '<p>Target directory: '.htmlspecialchars($target_dir).'</p>';
-		break;
+		printf('<p><strong>ERROR: Target directory (%s) is not writable (for me).</strong></p>', htmlspecialchars($target_dir));
 	}
 	else
 	{
