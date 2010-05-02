@@ -3406,9 +3406,11 @@ class Item extends ItemLight
 	 * Update the DB based on previously recorded changes
 	 *
 	 * @param boolean do we want to auto track the mod date?
+	 * @param boolean Update slug (you may inject a slug object here, e.g. via {@link update_slug()})
+	 * @param boolean Update excerpt?
 	 * @return boolean true on success
 	 */
-	function dbupdate( $auto_track_modification = true, $update_slug = true )
+	function dbupdate( $auto_track_modification = true, $update_slug = true, $update_excerpt = true )
 	{
 		global $DB, $Plugins;
 
@@ -3420,29 +3422,27 @@ class Item extends ItemLight
 		}
 
 		// validate url title / slug
-		if( ( empty($this->urltitle) || isset($this->dbchanges['post_urltitle']) ) && $update_slug )
-		{ // Url title has changed or is empty
-			// echo 'updating url title';
-
-			// Create new slug with validated title
-			$new_Slug = new Slug();
-			$new_Slug->set( 'title', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $new_Slug->dbprefix.'title', $new_Slug->dbprefix.'itm_ID', $new_Slug->dbtablename, $this->locale ) );
-			$new_Slug->set( 'type', 'item' );
-			$new_Slug->set( 'itm_ID', $this->ID );
-
-			// Set item urltitle
-			$this->set( 'urltitle', $new_Slug->get( 'title' ) );
-
-			$SlugCache = get_SlugCache();
-			if( $SlugCache->get_by_name($new_Slug->get('title'), false, false) )
-			{ // slug already exists (for this same item)
-				unset($new_Slug);
+		if( $update_slug )
+		{
+			if( is_a($update_slug, 'Slug') )
+			{
+				$new_Slug = $update_slug;
 			}
+			elseif( empty($this->urltitle) || isset($this->dbchanges['post_urltitle'])  )
+			{ // Url title has changed or is empty
+				$new_Slug = $this->update_slug();
+			}
+			if( isset($new_Slug) )
+			{ // Set item urltitle
+				$this->set( 'urltitle', $new_Slug->get( 'title' ) );
 		}
 
 		$this->update_renderers_from_Plugins();
 
-		$this->update_excerpt();
+		if( $update_excerpt )
+		{
+			$this->update_excerpt();
+		}
 
 		// TODO: dh> allow a plugin to cancel update here (by returning false)?
 		$Plugins->trigger_event( 'PrependItemUpdateTransact', $params = array( 'Item' => & $this ) );
@@ -3474,13 +3474,23 @@ class Item extends ItemLight
 			$this->insert_update_tags( 'update' );
 
 			// Let's handle the slugs:
-			if( isset( $new_Slug ) )
+			// TODO: dh> $result handling here feels wrong: when it's true already, it should not become false (add "|| $result"?)
+			if( isset($new_Slug) )
 			{
-				$new_Slug->set( 'itm_ID', $this->ID );
-				if( $result = $new_Slug->dbinsert() )
+				$SlugCache = get_SlugCache();
+				$prev_Slug = $SlugCache->get_by_name($new_Slug->get('title'), false, false);
+				if( ! $prev_Slug )
 				{
-					$this->set( 'canonical_slug_ID', $new_Slug->ID );
-					$result = parent::dbupdate();
+					$new_Slug->set( 'itm_ID', $this->ID );
+					if( $result = $new_Slug->dbinsert() )
+					{
+						$this->set( 'canonical_slug_ID', $new_Slug->ID );
+						$result = parent::dbupdate();
+					}
+				}
+				else
+				{
+					assert('$prev_Slug->get("itm_ID") == $new_Slug->get("itm_ID")');
 				}
 			}
 		}
@@ -3511,6 +3521,26 @@ class Item extends ItemLight
 		BlockCache::invalidate_key( 'cont_coll_ID', $Blog->ID ); // Content has changed
 
 		return $result;
+	}
+
+
+	/**
+	 * Create new slug with validated title
+	 *
+	 * @return Slug
+	 */
+	function update_slug($urltitle = NULL)
+	{
+		if( ! isset($urltitle) )
+		{
+			$urltitle = $this->urltitle;
+		}
+		$new_Slug = new Slug();
+		$new_Slug->set( 'title', urltitle_validate( $urltitle, $this->title, $this->ID, false, $new_Slug->dbprefix.'title', $new_Slug->dbprefix.'itm_ID', $new_Slug->dbtablename, $this->locale ) );
+		$new_Slug->set( 'type', 'item' );
+		$new_Slug->set( 'itm_ID', $this->ID );
+
+		return $new_Slug;
 	}
 
 
@@ -4337,6 +4367,13 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.195  2010/05/02 00:11:35  blueyed
+ * Item::dbupdate:
+ *  - Add $update_excerpt param to skip updating the excerpt
+ *  - You can pass a Slug object via $update_slug now
+ *  - Add update_slug method to factorize default slug handling/creation
+ *  - TODO about result handling, which feels wrong
+ *
  * Revision 1.194  2010/05/02 00:02:06  blueyed
  * Fix items slug handling on item update: with an empty slug the currently used slug should get used. Not a new one: fix dbIDname param passed to urltitle_validate (item ID, not slug ID) and do not insert the slug if it already exists.
  *
