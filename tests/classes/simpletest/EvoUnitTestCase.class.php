@@ -68,6 +68,38 @@ class EvoUnitTestCase extends UnitTestCase
 		// Reload conf and vars.
 		require EVODIR.'blogs/conf/_config.php';
 		require EVODIR.'blogs/inc/_main.inc.php';
+
+		$this->_saved_globals = array();
+	}
+
+
+	/**
+	 * Revert any changed globals.
+	 * @see change_global()
+	 */
+	function tearDown()
+	{
+		parent::tearDown();
+		foreach( $this->_saved_globals as $k => $v )
+		{
+			$GLOBALS[$k] = $v;
+		}
+	}
+
+
+	/**
+	 * Temporarily change a global, which gets reset in {@link tearDown()}.
+	 * @param string Name of global
+	 * @param mixed value
+	 * @return
+	 */
+	function change_global($global, $value)
+	{
+		if( ! isset($this->_saved_globals[$global]) )
+		{
+			$this->_saved_globals[$global] = $GLOBALS[$global];
+		}
+		$GLOBALS[$global] = $value;
 	}
 
 
