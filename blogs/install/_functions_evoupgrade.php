@@ -2652,8 +2652,8 @@ function upgrade_b2evo_tables()
 	db_add_col( 'T_comments', 'comment_secret', 'varchar(32) NULL default NULL' );
 	task_end();
 
-	// Create T_slug table and, Insert all slug from T_items
-	task_begin( 'Create Slug table... ' );
+	// Create T_slug table and, Insert all slugs from T_items
+	task_begin( 'Create Slugs table... ' );
 	$DB->query( 'CREATE TABLE IF NOT EXISTS T_slug (
 					slug_ID int(10) unsigned NOT NULL auto_increment,
 					slug_title varchar(255) NOT NULL COLLATE ascii_bin,
@@ -2664,24 +2664,26 @@ function upgrade_b2evo_tables()
 				) ENGINE = innodb' );
 	task_end();
 
-	task_begin( 'Upgrading posts urltitle...' );
+	task_begin( 'Making sure all posts have a slug...' );
+	// Get posts with empty urltitle:
 	$sql = 'SELECT post_ID, post_title
-			 FROM T_items__item
-			 WHERE post_urltitle IS NULL OR post_urltitle = ""';
-	$rows = $DB->get_results( $sql, OBJECT, 'Get posts with emty urltitle' );
+			      FROM T_items__item
+			     WHERE post_urltitle IS NULL OR post_urltitle = ""';
+	$rows = $DB->get_results( $sql, OBJECT, 'Get posts with empty urltitle' );
+	// Create URL titles when non existent:
 	foreach( $rows as $row )
 	{
 		// TODO: dh> pass locale (useful for transliteration).
 		$DB->query( 'UPDATE T_items__item
-			SET post_urltitle = "'.urltitle_validate( '', $row->post_title, 0 ).'"
-			WHERE post_ID = '.$row->post_ID, 'Set posts urltitle' );
+			              SET post_urltitle = "'.urltitle_validate( '', $row->post_title, 0 ).'"
+	                WHERE post_ID = '.$row->post_ID, 'Set posts urltitle' );
 	}
 	task_end();
 
-	task_begin( 'Insert existing slugs into Slug table... ' );
+	task_begin( 'Populating Slugs table... ' );
 	$DB->query( 'REPLACE INTO T_slug( slug_title, slug_type, slug_itm_ID)
-						SELECT post_urltitle, "item", post_ID
-						FROM T_items__item' );
+	              SELECT post_urltitle, "item", post_ID
+						      FROM T_items__item' );
 	task_end();
 
 	task_begin( 'Add canonical and tiny slug IDs to post table...' );
@@ -2693,30 +2695,28 @@ function upgrade_b2evo_tables()
 
 	task_begin( 'Upgrading posts...' );
 	$DB->query( 'UPDATE T_items__item, T_slug
-		SET post_canonical_slug_ID = slug_ID
-		WHERE CONVERT( post_urltitle USING ASCII ) COLLATE ascii_bin = slug_title' );
+		              SET post_canonical_slug_ID = slug_ID
+		            WHERE CONVERT( post_urltitle USING ASCII ) COLLATE ascii_bin = slug_title' );
 	task_end();
 
-	task_begin( 'Add "help" slug...' );
+	task_begin( 'Adding "help" slug...' );
 	if( db_key_exists( 'T_slug', 'slug_title', '"help"' ) )
 	{
 		echo '<strong>Warning: "help" slug already exists!</strong><br /> ';
 	}
 	else
 	{
-		$DB->query( '
-		INSERT INTO T_slug( slug_title, slug_type )
-		VALUES( "help", "help" )', 'Add "help" slug' );
+		$DB->query( 'INSERT INTO T_slug( slug_title, slug_type )
+		             VALUES( "help", "help" )', 'Add "help" slug' );
 		task_end();
 	}
 
-	task_begin( 'Updgrading groups.Giving Administrator Group edit perms on slugs...' );
+	// fp> Next time we should use pluggable permissions instead.
+	task_begin( 'Updgrading groups: Giving Administrators Group edit perms on slugs...' );
 	db_add_col( 'T_groups', 'grp_perm_slugs', "enum('none','view','edit') NOT NULL default 'none'" );
-
 	$DB->query( 'UPDATE T_groups
 	             SET grp_perm_slugs = "edit"
 	             WHERE grp_ID = 1' );
- 	// Later versions give 'view' on install for Bloggers and privilaged Bloggers.
 	task_end();
 
 	/*
@@ -2893,6 +2893,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.366  2010/05/02 16:10:40  fplanque
+ * minor
+ *
  * Revision 1.365  2010/05/02 00:09:27  blueyed
  * todo: pass locale to urltitle_validate calls
  *

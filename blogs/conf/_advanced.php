@@ -148,7 +148,7 @@ $antispam_on_message_form = 1;
 
 
 /**
- * By default images get copied into b2evo cache without resapling if they are smaller
+ * By default images get copied into b2evo cache without resampling if they are smaller
  * than requested thumbnails.
  *
  * Althought, if you want to use the BeforeThumbCreate event (Watermark plugin),

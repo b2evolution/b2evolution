@@ -182,7 +182,14 @@ function create_default_data()
 
 	$User_Admin = new User();
 	$User_Admin->set( 'login', 'admin' );
-	$random_password = isset($install_password) ? $install_password : generate_random_passwd();
+	if( !isset( $install_password ) )
+	{
+		$random_password = generate_random_passwd(); // no ambiguous chars
+	}
+	else
+	{
+		$random_password = $install_password;
+	}
 	$User_Admin->set( 'pass', md5($random_password) );	// random
 	$User_Admin->set( 'nickname', 'admin' );
 	$User_Admin->set_email( $admin_email );
@@ -1304,6 +1311,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.292  2010/05/02 16:10:40  fplanque
+ * minor
+ *
  * Revision 1.291  2010/04/24 07:47:27  efy-asimo
  * change slugs permissions and help link default value
  *
