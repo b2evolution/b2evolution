@@ -256,6 +256,15 @@ $post_statuses = array (
 
 
 /**
+ * IDs of items for which we should increment the view count on shutdown
+ *
+ * @var array
+ * @todo fp> find a better place to init this
+ */
+$shutdown_count_item_views = array();
+
+
+/**
  * Load modules.
  *
  * This initializes table name aliases and is required before trying to connect to the DB.
@@ -270,6 +279,9 @@ $Timer->pause( '_init_base' );
 
 /*
  * $Log$
+ * Revision 1.4  2010/05/02 19:03:05  fplanque
+ * Made poor init a little less poor...
+ *
  * Revision 1.3  2010/02/08 17:51:25  efy-yury
  * copyright 2009 -> 2010
  *
