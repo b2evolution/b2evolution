@@ -131,6 +131,7 @@ if( isset($recipient_User) && $recipient_User->get_msgform_settings() == 'privat
 	global $htsrv_path, $Messages;
 	$Messages->add( 'You must log in to send a message' );
 	$thispage_url = regenerate_url( '', 'recipient_id='.$recipient_User->ID, '', '&' );
+debug_die('This requires a new login implementation.');
 	header_redirect( $htsrv_url.'login.php'.'?redirect_to='.rawurlencode( $thispage_url ) );
 }
 
@@ -228,6 +229,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.14  2010/05/02 16:58:40  fplanque
+ * todo
+ *
  * Revision 1.13  2010/04/23 11:37:57  efy-asimo
  * send messages - fix
  *
