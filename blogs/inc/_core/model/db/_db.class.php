@@ -1428,6 +1428,7 @@ class DB
 						echo $this->debug_get_rows_table( 100, true );
 					}
 				}
+				mysql_free_result($this->result);
 			}
 
 			// Profile:
@@ -1445,8 +1446,6 @@ class DB
 				{ // TODO: dh> contains html.
 					echo $this->debug_get_rows_table( 100, true );
 				}
-
-				mysql_free_result($this->result);
 			}
 
 			// Results:
@@ -1698,6 +1697,9 @@ class DB
 
 /*
  * $Log$
+ * Revision 1.52  2010/05/02 00:02:30  blueyed
+ * DB::dump_queries: Fix mysql_free_result when using profiling/explain.
+ *
  * Revision 1.51  2010/03/29 19:02:00  blueyed
  * DB class: improve debugging
  *  - Improve format_query parsing
