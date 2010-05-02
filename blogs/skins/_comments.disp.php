@@ -66,10 +66,11 @@ while( $Comment = & $CommentList->get_next() )
 		<div class="bCommentSmallPrint">
 			<?php
 				$Comment->permanent_link( array(
-					'nofollow' => true,
-					'text' => mysql2date('Y-m-d', $Comment->date).' @ '.mysql2date('H:i', $Comment->date),
+						'class'    => 'permalink_right',
+						'nofollow' => true,
 					) );
 			?>
+			<?php $Comment->date() ?> @ <?php $Comment->time( 'H:i' ) ?>
 			<?php $Comment->edit_link( ' &middot; ' ) /* Link to backoffice for editing */ ?>
 			<?php $Comment->delete_link( ' &middot; ' ); /* Link to backoffice for deleting */ ?>
 		</div>
@@ -81,6 +82,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.13  2010/05/02 18:43:48  fplanque
+ * rollback unapproved change
+ *
  * Revision 1.12  2010/04/22 20:24:44  blueyed
  * Use comment data and time as text for permanent_link in bCommentSmallPrint. More compact and useful.
  *
