@@ -249,28 +249,44 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	if( !$query_only )
 	{
+		// TODO: dh> this might get used to utilize the SlugCache instead of the processing below.
+		#if( $post_ID && $dbtable == 'T_slug' )
+		#{
+		#	$existing_Slug = get_SlugCache()->get_by_name($urltitle, false, false);
+		#	if( $existing_Slug )
+		#	{
+		#		$slug_field_name = preg_replace('~^slug_~', '', $dbIDname);
+		#		if( $existing_Slug->get($slug_field_name) == $urltitle )
+		#		{
+		#			// OK
+		#		}
+		#	}
+		#}
 		// CHECK FOR UNIQUENESS:
 		// Find all occurrences of urltitle-number in the DB:
-		$sql = 'SELECT '.$dbSlugFieldName.'
+		$sql = 'SELECT '.$dbSlugFieldName.', '.$dbIDname.'
 						  FROM '.$dbtable.'
 						 WHERE '.$dbSlugFieldName." REGEXP '^".$urlbase."(-[0-9]+)?$'";
-		if( $post_ID )
-		{	// Ignore current post
-			$sql .= ' AND '.$dbIDname.' <> '.$post_ID;
-		}
 		$exact_match = false;
 		$highest_number = 0;
+		$use_existing_number = NULL;
 		foreach( $DB->get_results( $sql, ARRAY_A ) as $row )
 		{
 			$existing_urltitle = $row[$dbSlugFieldName];
 			// echo "existing = $existing_urltitle <br />";
-			if( $existing_urltitle == $urltitle )
+			if( $existing_urltitle == $urltitle && $row[$dbIDname] != $post_ID )
 			{ // We have an exact match, we'll have to change the number.
 				$exact_match = true;
 			}
 			if( preg_match( '/-([0-9]+)$/', $existing_urltitle, $matches ) )
 			{ // This one has a number, we extract it:
-				$existing_number = (integer) $matches[1];
+				$existing_number = (int)$matches[1];
+
+				if( ! isset($use_existing_number) && $row[$dbIDname] == $post_ID )
+				{ // if there is a numbered entry for the current ID, use this.
+					$use_existing_number = $existing_number;
+				}
+
 				if( $existing_number > $highest_number )
 				{ // This is the new high
 					$highest_number = $existing_number;
@@ -280,8 +296,9 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 		// echo "highest existing number = $highest_number <br />";
 
 		if( $exact_match && !$query_only )
-		{ // We got an exact match, we need to change the number:
-			$urltitle = $urlbase.'-'.($highest_number + 1);
+		{ // We got an exact (existing) match, we need to change the number:
+			$number = $use_existing_number ? $use_existing_number : ($highest_number+1);
+			$urltitle = $urlbase.'-'.$number;
 		}
 	}
 
@@ -1428,6 +1445,9 @@ function echo_set_slug_changed()
 }
 /*
  * $Log$
+ * Revision 1.106  2010/05/02 00:13:28  blueyed
+ * urltitle_validate: make it use the current urlname, if invoked via empty urltitle, instead of creating a new one over and over again. See tests.
+ *
  * Revision 1.105  2010/05/01 18:43:53  blueyed
  * TODO/doc: why limit urlnames to 5 words?
  *
