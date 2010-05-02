@@ -3334,7 +3334,7 @@ class Item extends ItemLight
 
 		// Create new slug with validated title
 		$new_Slug = new Slug();
-		$new_Slug->set( 'title', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $new_Slug->dbprefix.'title', $new_Slug->dbIDname, $new_Slug->dbtablename, $this->locale ) );
+		$new_Slug->set( 'title', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $new_Slug->dbprefix.'title', $new_Slug->dbprefix.'itm_ID', $new_Slug->dbtablename, $this->locale ) );
 		$new_Slug->set( 'type', 'item' );
 		$this->set( 'urltitle', $new_Slug->get( 'title' ) );
 
@@ -3424,14 +3424,20 @@ class Item extends ItemLight
 		{ // Url title has changed or is empty
 			// echo 'updating url title';
 
-		    // Create new slug with validated title
+			// Create new slug with validated title
 			$new_Slug = new Slug();
-			$new_Slug->set( 'title', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $new_Slug->dbprefix.'title', $new_Slug->dbIDname, $new_Slug->dbtablename, $this->locale ) );
+			$new_Slug->set( 'title', urltitle_validate( $this->urltitle, $this->title, $this->ID, false, $new_Slug->dbprefix.'title', $new_Slug->dbprefix.'itm_ID', $new_Slug->dbtablename, $this->locale ) );
 			$new_Slug->set( 'type', 'item' );
 			$new_Slug->set( 'itm_ID', $this->ID );
 
 			// Set item urltitle
 			$this->set( 'urltitle', $new_Slug->get( 'title' ) );
+
+			$SlugCache = get_SlugCache();
+			if( $SlugCache->get_by_name($new_Slug->get('title'), false, false) )
+			{ // slug already exists (for this same item)
+				unset($new_Slug);
+			}
 		}
 
 		$this->update_renderers_from_Plugins();
@@ -4331,6 +4337,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.194  2010/05/02 00:02:06  blueyed
+ * Fix items slug handling on item update: with an empty slug the currently used slug should get used. Not a new one: fix dbIDname param passed to urltitle_validate (item ID, not slug ID) and do not insert the slug if it already exists.
+ *
  * Revision 1.193  2010/04/27 20:58:39  blueyed
  * Slug refactoring.
  *
