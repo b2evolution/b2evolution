@@ -150,7 +150,7 @@ function shutdown()
 		ob_end_clean(); // Discard the output buffer and close
 		fclose(STDIN);  // Close all of the standard
 		fclose(STDOUT); // file descriptors as we
-		fclose(STDERR); // are running as a daemon. 
+		fclose(STDERR); // are running as a daemon.
 
 		register_shutdown_function('shutdown_kill');
 
@@ -3690,7 +3690,7 @@ function get_from_mem_cache($key, & $success = NULL)
 {
 	global $Timer;
 
-	$Timer->resume('get_from_mem_cache');
+	$Timer->resume('get_from_mem_cache', false);
 
 	if( function_exists('apc_fetch') )
 		$r = apc_fetch( $key, $success );
@@ -3709,7 +3709,7 @@ function get_from_mem_cache($key, & $success = NULL)
 		$Debuglog->add('No caching backend available for reading "'.$key.'".', 'cache');
 	}
 
-	$Timer->pause('get_from_mem_cache');
+	$Timer->pause('get_from_mem_cache', false);
 	return $r;
 }
 
@@ -3727,7 +3727,7 @@ function set_to_mem_cache($key, $payload, $ttl = 0)
 {
 	global $Timer;
 
-	$Timer->resume('set_to_mem_cache');
+	$Timer->resume('set_to_mem_cache', false);
 
 	if( function_exists('apc_store') )
 		$r = apc_store( $key, $payload, $ttl );
@@ -3741,7 +3741,7 @@ function set_to_mem_cache($key, $payload, $ttl = 0)
 		$r = NULL;
 	}
 
-	$Timer->pause('set_to_mem_cache');
+	$Timer->pause('set_to_mem_cache', false);
 
 	return $r;
 }
@@ -3985,6 +3985,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.227  2010/05/02 00:09:51  blueyed
+ * Do not log timer resuming/pausing with *_mem_cache functions.
+ *
  * Revision 1.226  2010/04/22 20:56:11  blueyed
  *  - Move/Refactor BlockCache::cacheproviderstore/cacheproviderretrieve into get_from_mem_cache/set_to_mem_cache
  *  - Add unset_from_mem_cache
