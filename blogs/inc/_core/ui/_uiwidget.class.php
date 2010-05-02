@@ -454,7 +454,7 @@ class Table extends Widget
 					$ignore = $this->page_param;
 				}
 
-				$this->Form = new Form( regenerate_url( $ignore, '', '', '&' ), $this->param_prefix.'form_search', 'post', 'blockspan' ); // COPY!!
+				$this->Form = new Form( regenerate_url( $ignore, '', '', '&' ), $this->param_prefix.'form_search', 'get', 'blockspan' ); // COPY!!
 
 				$this->Form->begin_form( '' );
 			}
@@ -1012,6 +1012,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.18  2010/05/02 01:34:00  blueyed
+ * Results: filter_area: use GET instead of POST. Makes going back more smooth. Also, GET is semantically more correct anyway.
+ *
  * Revision 1.17  2010/02/08 17:51:58  efy-yury
  * copyright 2009 -> 2010
  *
