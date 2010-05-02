@@ -399,9 +399,13 @@ function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw' )
 	{
 		// Replace all HTML entities by a single char. html_entity_decode for example
 		// would not handle &hellip;.
-		$tail_for_length = preg_replace('~&\w+?;~', '.', $tail);
-		$tail_length = evo_strlen( html_entity_decode($tail_for_length) );
-		$len = $maxlen-$tail_length;
+		$len = $maxlen;
+		if( strpos($tail, '&') !== false )
+		{
+			$tail_for_length = preg_replace('~&\w+?;~', '.', $tail);
+			$tail_length = evo_strlen( html_entity_decode($tail_for_length) );
+			$len -= $tail_length;
+		}
 		if( $len < 1 )
 		{ // special case; $tail length is >= $maxlen
 			$len = 1;
@@ -3985,6 +3989,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.228  2010/05/02 00:10:19  blueyed
+ * Minor optimization for strmaxlen
+ *
  * Revision 1.227  2010/05/02 00:09:51  blueyed
  * Do not log timer resuming/pausing with *_mem_cache functions.
  *
