@@ -16,8 +16,10 @@ load_funcs('items/model/_item.funcs.php');
 /**
  * @package tests
  */
-class ItemFuncsTestCase extends EvoUnitTestCase
+class ItemFuncsTestCase extends EvoMockDbUnitTestCase
 {
+	var $mocked_DB_methods = array('get_results');
+
 	function __construct()
 	{
 		parent::__construct( 'Item functions test' );
@@ -38,6 +40,8 @@ class ItemFuncsTestCase extends EvoUnitTestCase
 		}
 
 		$old_evo_charset = $evo_charset;
+
+		$this->MockDB->returns('get_results', array());
 
 		// For ISO-8859-1:
 		$evo_charset = 'ISO-8859-1'; // this will trigger "ä" => "ae".. (since iconv appears to handle "ä" in latin1 different to "ä" in utf8 - for locale "en-US")
@@ -73,6 +77,47 @@ class ItemFuncsTestCase extends EvoUnitTestCase
 		}
 
 		$evo_charset = $old_evo_charset;
+	}
+
+
+	function test_urltitle_validate_use_current()
+	{
+		$this->MockDB->returnsAt(0, 'get_results', array(
+			array('post_urltitle' => 'foo', 'post_ID' => 1),
+			array('post_urltitle' => 'foo-1', 'post_ID' => 1),
+		));
+		$this->assertEqual(
+			urltitle_validate('', 'foo', 1), 'foo'
+		);
+	}
+
+
+	function test_urltitle_validate_use_current_numbered()
+	{
+		$this->MockDB->returns('get_results', array(
+			array('post_urltitle' => 'foo', 'post_ID' => 1),
+			array('post_urltitle' => 'foo-1', 'post_ID' => 1),
+		));
+
+		$this->assertEqual(urltitle_validate('', 'foo-5'), 'foo-5');
+
+		$this->assertEqual(
+			urltitle_validate('', 'foo-1', 1), 'foo-1'
+		);
+	}
+
+
+	function test_urltitle_validate_use_highest_number()
+	{
+		$this->MockDB->returns('get_results', array(
+			array('post_urltitle' => 'foo', 'post_ID' => 1),
+			array('post_urltitle' => 'foo-1', 'post_ID' => 2),
+			array('post_urltitle' => 'foo-2', 'post_ID' => 1),
+		));
+
+		$this->assertEqual(
+			urltitle_validate('', 'foo-1', 1), 'foo-2'
+		);
 	}
 
 
