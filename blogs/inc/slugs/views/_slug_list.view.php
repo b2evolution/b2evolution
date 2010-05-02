@@ -89,6 +89,9 @@ $Results->cols[] = array(
 			'td_class' => 'small',
 		);
 
+
+# TODO: dh> add action icon ("www") to view the target (i.e. the post in the public skin)
+
 /**
  * Get a link to the target object
  *
