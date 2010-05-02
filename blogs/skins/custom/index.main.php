@@ -272,7 +272,6 @@ skin_include( '_html_header.inc.php' );
 					'after'       => ' &bull; ',
 				) );
 
-		// TODO: dh> nitpicking: it should use "bPostProtected", not "bPostprotected"..
 		// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ptyp_ID though..?!
 		?>
 

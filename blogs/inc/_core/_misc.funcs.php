@@ -134,6 +134,7 @@ function shutdown()
 
 	global $Settings;
 	global $Debuglog;
+
 	global $Timer;
 	global $shutdown_count_item_views;
 
@@ -143,7 +144,8 @@ function shutdown()
 		if( $pid = pcntl_fork() )
 			return; // Parent
 
-		function shutdown_kill() {
+		function shutdown_kill() 
+		{
 			posix_kill(posix_getpid(), SIGHUP);
 		}
 
@@ -176,7 +178,7 @@ function shutdown()
 	// connection_status()
 
 	if( ! empty($shutdown_count_item_views) )
-	{
+	{ // Increment view counts for Items:
 		foreach( $shutdown_count_item_views as $item_ID )
 		{
 			$ItemCache = get_ItemCache();
@@ -1802,6 +1804,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 				$call .= ' '.implode( ', ', $args ).' ';
 			}
 			$call .='<strong>)</strong>';
+
 			$r .= $call."<br />\n";
 
 			$r .= '<strong>';
@@ -2352,12 +2355,17 @@ function debug_info( $force = false, $force_clean = false )
 
 	if($db_config)
 	{
-		echo $clean ? "" : '<pre>';
+		if ( ! $clean )
+		{
+			echo '<pre>';
+		}
+
 		echo T_('DB Username').': '.$db_config['user']."\n".
 			 T_('DB Database').': '.$db_config['name']."\n".
 			 T_('DB Host').': '.(isset($db_config['host']) ? $db_config['host'] : 'unset (localhost)')."\n".
 			 T_('DB tables prefix').': '.$tableprefix."\n".
 			 T_('DB connection charset').': '.$db_config['connection_charset']."\n";
+
 		echo $clean ? "\n" : '</pre>';
 	}
 
@@ -3985,6 +3993,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.230  2010/05/02 19:04:28  fplanque
+ * no message
+ *
  * Revision 1.229  2010/05/02 00:35:09  blueyed
  * Revert 'Minor optimization for strmaxlen'. Buggy and not worth it.
  *
