@@ -3677,8 +3677,7 @@ class Item extends ItemLight
 									 WHERE tag_name IN ('.$DB->quote($this->tags).')';
 				$existing_tags = $DB->get_col( $query, 0, 'Find existing tags' );
 
-				$new_tags = array_diff( $this->tags, $existing_tags );
-				//pre_dump($new_tags);
+				$new_tags = array_diff( array_map('strtolower', $this->tags), $existing_tags );
 
 				if( !empty( $new_tags ) )
 				{	// insert new tags:
@@ -4367,6 +4366,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.196  2010/05/02 00:11:59  blueyed
+ * Fix SQL error when an uppercase tag would get created, but the same tag exists lowercased already.
+ *
  * Revision 1.195  2010/05/02 00:11:35  blueyed
  * Item::dbupdate:
  *  - Add $update_excerpt param to skip updating the excerpt
