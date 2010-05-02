@@ -3598,6 +3598,7 @@ class Item extends ItemLight
 			$stripped_content = str_replace( '<p>', ' <p>', $this->content );
 			$stripped_content = trim(strip_tags($stripped_content));
 			$excerpt = trim( evo_substr( $stripped_content, 0, $crop_length ) );
+			// $excerpt = preg_replace('~(\r?\n)+~', '\n', $excerpt);
 			if( !empty($excerpt) )
 			{	// We finally have something to act as an excerpt...
 				if( evo_strlen( $excerpt ) < evo_strlen( $stripped_content ) )
@@ -4366,6 +4367,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.197  2010/05/02 00:12:27  blueyed
+ * Proposition: remove duplicate newlines in excerpt.
+ *
  * Revision 1.196  2010/05/02 00:11:59  blueyed
  * Fix SQL error when an uppercase tag would get created, but the same tag exists lowercased already.
  *
