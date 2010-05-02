@@ -162,8 +162,7 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 
 	function test_validate_url()
 	{
-		global $evo_charset;
-		$evo_charset = 'latin1';
+		$this->change_global('evo_charset', 'latin1');
 
 		// valid:
 		foreach( array(
@@ -257,6 +256,8 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 	 */
 	function test_get_base_domain()
 	{
+		$this->change_global('evo_charset', 'iso-8859-1');
+
 		$this->assertEqual( get_base_domain(''), '' ); // Example: empty referer
 		$this->assertEqual( get_base_domain('hostname'), 'hostname' );
 		$this->assertEqual( get_base_domain('http://hostname'), 'hostname' );
@@ -339,22 +340,19 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 	 */
 	function test_format_to_output()
 	{
-		global $evo_charset;
+		$this->change_global('evo_charset', 'latin1');
 
-		$evo_charset = 'latin1';
 		$this->assertEqual( format_to_output('<a href="">link</a>  text', 'text'), 'link text' );
 		$this->assertEqual( format_to_output('<b>���</b>', 'htmlbody'), '<b>&#233;&#234;&#232;</b>' );
 		$this->assertEqual( format_to_output('<b>���</b>', 'xml'), '&#233;&#234;&#232;' );
 		$this->assertEqual( format_to_output( chr(128).'&#128;' ), '&#8364;&#8364;' ); // Euro sign, Windows style
 
-		$evo_charset = 'utf-8';
+		$this->change_global('evo_charset', 'utf-8');
 		$this->assertEqual( format_to_output('<a href="">link</a>  text', 'text'), 'link text' );
 		$this->assertEqual( format_to_output('<b>éêèë</b>', 'htmlbody'), '<b>éêèë</b>' );
 		$this->assertEqual( format_to_output('<b>éêèë</b>', 'xml'), 'éêèë' );
 
 		$this->assertEqual( format_to_output('2 > &1', 'htmlbody'), '2 > &amp;1' );
-
-		$evo_charset = 'latin1';
 	}
 
 

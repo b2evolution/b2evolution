@@ -31,20 +31,16 @@ class ItemFuncsTestCase extends EvoMockDbUnitTestCase
 	 */
 	function test_urltitle_validate()
 	{
-		global $evo_charset;
-
 		if( ! can_convert_charsets( 'ISO-8859-1', 'UTF-8' ) )
 		{
 			echo 'Skipping tests (cannot convert charsets)...<br />', "\n";
 			return;
 		}
 
-		$old_evo_charset = $evo_charset;
-
 		$this->MockDB->returns('get_results', array());
 
 		// For ISO-8859-1:
-		$evo_charset = 'ISO-8859-1'; // this will trigger "ä" => "ae".. (since iconv appears to handle "ä" in latin1 different to "ä" in utf8 - for locale "en-US")
+		$this->change_global('evo_charset', 'ISO-8859-1'); // this will trigger "ä" => "ae".. (since iconv appears to handle "ä" in latin1 different to "ä" in utf8 - for locale "en-US")
 		foreach( array(
 					//     arg1               arg2                    expected result
 					array( '  ', ' :: çà c\'est "VRAIMENT" tôa! ', 'ca-c-est-vraiment-toa' ),
@@ -62,7 +58,7 @@ class ItemFuncsTestCase extends EvoMockDbUnitTestCase
 		}
 
 		// For UTF-8:
-		$evo_charset = 'UTF-8';
+		$this->change_global('evo_charset', 'UTF-8');
 		foreach( array(
 					/* The last element of each array is the expected result, all other elements are
 					 * arguments for urltitle_validate().
@@ -75,8 +71,6 @@ class ItemFuncsTestCase extends EvoMockDbUnitTestCase
 		{
 			$this->assertEqual( call_user_func_array( 'urltitle_validate', array_slice( $test, 0, -1 ) ), array_pop( $test ) );
 		}
-
-		$evo_charset = $old_evo_charset;
 	}
 
 
