@@ -1751,6 +1751,7 @@ function upgrade_b2evo_tables()
 			$cat_name = trim($cat->cat_name);
 			if( strlen($cat_name) )
 			{
+				// TODO: dh> pass locale (useful for transliteration). From main blog?
 				$cat_urlname = urltitle_validate('', $cat_name, $cat->cat_ID, false, 'cat_urlname', 'cat_ID', 'T_categories');
 			}
 			else
@@ -2670,6 +2671,7 @@ function upgrade_b2evo_tables()
 	$rows = $DB->get_results( $sql, OBJECT, 'Get posts with emty urltitle' );
 	foreach( $rows as $row )
 	{
+		// TODO: dh> pass locale (useful for transliteration).
 		$DB->query( 'UPDATE T_items__item
 			SET post_urltitle = "'.urltitle_validate( '', $row->post_title, 0 ).'"
 			WHERE post_ID = '.$row->post_ID, 'Set posts urltitle' );
@@ -2891,6 +2893,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.365  2010/05/02 00:09:27  blueyed
+ * todo: pass locale to urltitle_validate calls
+ *
  * Revision 1.364  2010/04/27 19:29:39  blueyed
  * Make inner upgrades for T_slug init more reliable.
  *

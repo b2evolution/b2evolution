@@ -182,6 +182,7 @@ if( !$Messages->count('error') )
 					$Messages->add( T_('New user has been created.'), 'success' );
 					if( $edited_User->get_Group()->check_perm( 'perm_getblog', 'allowed' ) )
 					{ // automatically create new blog for this user
+						// TODO: dh> also set locale, or use it at least for urltitle_validate below. From the User (new blog owner)?
 						$new_Blog = new Blog( NULL );
 						$shortname = $edited_User->get( 'login' );
 						$new_Blog->set( 'owner_user_ID', $edited_User->ID );
@@ -410,6 +411,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2010/05/02 00:09:27  blueyed
+ * todo: pass locale to urltitle_validate calls
+ *
  * Revision 1.11  2010/04/08 10:35:23  efy-asimo
  * Allow users to create a new blog for themselves - task
  *
