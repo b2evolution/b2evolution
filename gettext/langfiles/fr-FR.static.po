@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2004-04-26 03:00+0200\n"
-"PO-Revision-Date: 2009-08-08 17:25+0100\n"
+"PO-Revision-Date: 2010-04-20 20:47+0100\n"
 "Last-Translator: Francois Planque <http://fplanque.com>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -327,7 +327,7 @@ msgstr "Si vous mettez à jour depuis une version inférieure a 2.0, il est hautem
 
 #: ../../doc/upgradefrom_b2evo.src.html:38
 msgid "Upload <strong>all new b2evolution files from the /blogs folder</strong> to your site. We cannot stress this enough: <strong>ALL FILES</strong>! And that means you cannot reuse your default /conf files, default skin templates or default plugins if you have modified them without renaming them.<br /> <br /> Since your custom configurations, custom skins and custom plugins should be using different names, they should typically not be overwritten. Same for your media files.<br /> <br /> The single one file you must absolutely pay attention to is <code>/blogs/conf/_basic_config.php</code>. You will need to either keep, recreate or restore that file from backup (see step 1) before you can proceed with the upgrade."
-msgstr "Téléchargez <strong>tous les nouveaux fichiers b2evolution du dossier /blogs</strong> sur votre serveur. Nous ne pouvons insister suffisament sur ce point: <strong>TOUS LES FICHIERS</strong>! Et ceci signifie que vous ne pouvez pas réutiliser les fichiers que vous avez modifiés dans /conf, /skins et /plugins si vous en les avez pas renommés.<br /> <br />Etant donné que vous configurations personnalisées, gabarits personnalisés et plugins personnalisés sont censés porter des noms différents, ils ne seront typiquement pas écrasés. De même pour les fichiers du répertoire /media.<br /> <br />Le seul fichier auquel vous devez porter une attention particulière est <code>/blogs/_basic_config.php</code>. Vous devez conserver, recréer ou encore restaurer ce fichier depuis votre backup (voir étape 1) avant de pouvoir continuer avec la mise à jour."
+msgstr "Téléchargez <strong>tous les nouveaux fichiers b2evolution du dossier /blogs</strong> sur votre serveur. Nous ne pouvons insister suffisament sur ce point: <strong>TOUS LES FICHIERS</strong>! Et ceci signifie que vous ne pouvez pas réutiliser les fichiers que vous avez modifiés dans /conf, /skins et /plugins si vous ne les avez pas renommés.<br /> <br />Etant donné que vous configurations personnalisées, gabarits personnalisés et plugins personnalisés sont censés porter des noms différents, ils ne seront typiquement pas écrasés. De même pour les fichiers du répertoire /media.<br /> <br />Le seul fichier auquel vous devez porter une attention particulière est <code>/blogs/_basic_config.php</code>. Vous devez conserver, recréer ou encore restaurer ce fichier depuis votre backup (voir étape 1) avant de pouvoir continuer avec la mise à jour."
 
 #: ../../doc/upgradefrom_b2evo.src.html:43
 msgid "Run the installation/upgrade script on your server. It is located in <code>http://yoursite.com/yourblogsfolder/install</code>/ . Then, simply follow the on screen instructions.<br /> <br /> The installer/upgrader will  allow you to run a database upgrade from <strong>any</strong> b2evolution version to the new one."
