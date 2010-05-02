@@ -92,6 +92,9 @@ class DataObjectCache
 	var $all_loaded = false;
 
 
+	/**
+	 * @var string SQL name field (not necessarily with the object).
+	 */
 	var $name_field;
 	var $order_by;
 
@@ -170,7 +173,11 @@ class DataObjectCache
 
 
 	/**
-	 * Instanciate a new object within this cache
+	 * Instanciate a new object within this cache.
+	 *
+	 * This is used by {@link instantiate()} to get the object which then gets passed to {@link add()}.
+	 *
+	 * @param object DB row
 	 */
 	function & new_obj( $row = NULL )
 	{
@@ -272,7 +279,7 @@ class DataObjectCache
 		{
 			$SQL->WHERE_and($this->dbIDname.' NOT IN ('.implode(',', $loaded_IDs).')');
 		}
-		
+
 		return $this->instantiate_list($DB->get_results( $SQL->get(), OBJECT, $SQL->title ));
 	}
 
@@ -397,6 +404,13 @@ class DataObjectCache
 		{ // Not already cached, add new object:
 			// echo "adding new {$this->objtype} $obj_ID ";
 			$this->add( $this->new_obj( $db_row ) );
+		}
+
+		// Add to named cache:
+		if( ! empty($this->name_field) )
+		{ // NOTE: this should get done in add() really, but there the mapping of $name_field => object property is not given.
+			//       (handled by DataObject constructors).
+			$this->cache_name[$db_row->{$this->name_field}] = & $this->cache[$obj_ID];
 		}
 
 		return $this->cache[$obj_ID];
@@ -592,37 +606,44 @@ class DataObjectCache
 			return $r;
 		}
 
-		// Load just the requested object:
-		$Debuglog->add( "Loading <strong>$this->objtype($req_name)</strong>", 'dataobjects' );
-		$SQL = $this->get_SQL_object();
-		$SQL->WHERE_and($this->name_field.' = '.$DB->quote($req_name));
+		if( isset($this->cache_name[$req_name]) )
+		{
+			return $this->cache_name[$req_name];
+		}
 
-		if( $db_row = $DB->get_row( $SQL->get(), OBJECT, 0, 'DataObjectCache::get_by_name()' ) )
+		if( ! $this->all_loaded )
 		{
-			$resolved_ID = $db_row->{$this->dbIDname};
-			$Debuglog->add( 'success; ID = '.$resolved_ID, 'dataobjects' );
-			if( ! isset( $this->cache[$resolved_ID] ) )
-			{	// Object is not already in cache:
-				$Debuglog->add( 'Adding to cache...', 'dataobjects' );
-				//$Obj = new $this->objtype( $row ); // COPY !!
-				//if( ! $this->add( $this->new_obj( $db_row ) ) )
-				if( ! $this->add( $this->new_obj( $db_row ) ) )
-				{	// could not add
-					$Debuglog->add( 'Could not add() object to cache!', 'dataobjects' );
-				}
-			}
-			return $this->cache[$resolved_ID];
-		}
-		else
-		{
-			$Debuglog->add( 'Could not get DataObject by name.', 'dataobjects' );
-			if( $halt_on_error )
+			// Load just the requested object:
+			$Debuglog->add( "Loading <strong>$this->objtype($req_name)</strong>", 'dataobjects' );
+			$SQL = $this->get_SQL_object();
+			$SQL->WHERE_and($this->name_field.' = '.$DB->quote($req_name));
+
+			if( $db_row = $DB->get_row( $SQL->get(), OBJECT, 0, 'DataObjectCache::get_by_name()' ) )
 			{
-				debug_die( "Requested $this->objtype does not exist!" );
+				$resolved_ID = $db_row->{$this->dbIDname};
+				$Debuglog->add( 'success; ID = '.$resolved_ID, 'dataobjects' );
+				if( ! isset( $this->cache[$resolved_ID] ) )
+				{	// Object is not already in cache:
+					$Debuglog->add( 'Adding to cache...', 'dataobjects' );
+					//$Obj = new $this->objtype( $row ); // COPY !!
+					//if( ! $this->add( $this->new_obj( $db_row ) ) )
+					if( ! $this->add( $this->new_obj( $db_row ) ) )
+					{	// could not add
+						$Debuglog->add( 'Could not add() object to cache!', 'dataobjects' );
+					}
+				}
+				$this->cache_name[$req_name] = $this->cache[$resolved_ID];
+				return $this->cache[$resolved_ID];
 			}
-			$r = NULL;
-			return $r;
 		}
+
+		$Debuglog->add( 'Could not get DataObject by name.', 'dataobjects' );
+		if( $halt_on_error )
+		{
+			debug_die( "Requested $this->objtype does not exist!" );
+		}
+		$r = NULL;
+		return $r;
 	}
 
 
@@ -765,6 +786,9 @@ class DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.25  2010/05/02 00:11:09  blueyed
+ * DataObjectCache: add cache_name, to cache results for/from get_by_name.
+ *
  * Revision 1.24  2010/03/12 00:17:08  blueyed
  * Support list of defaults for get_option_list. Patch by yabs.
  *
