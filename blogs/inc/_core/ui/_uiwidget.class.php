@@ -454,6 +454,7 @@ class Table extends Widget
 					$ignore = $this->page_param;
 				}
 
+// fp> CHECKPOINT: If filters break, revert this to 'post'.
 				$this->Form = new Form( regenerate_url( $ignore, '', '', '&' ), $this->param_prefix.'form_search', 'get', 'blockspan' ); // COPY!!
 
 				$this->Form->begin_form( '' );
@@ -1012,6 +1013,9 @@ class Table extends Widget
 
 /*
  * $Log$
+ * Revision 1.19  2010/05/02 19:50:51  fplanque
+ * no message
+ *
  * Revision 1.18  2010/05/02 01:34:00  blueyed
  * Results: filter_area: use GET instead of POST. Makes going back more smooth. Also, GET is semantically more correct anyway.
  *

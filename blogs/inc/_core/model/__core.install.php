@@ -274,7 +274,7 @@ $schema_queries = array(
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_slug' => array(
-		'Creating table for Post slug title',
+		'Creating table for slugs',
 		"CREATE TABLE T_slug (
 			slug_ID int(10) unsigned NOT NULL auto_increment,
 			slug_title varchar(255) NOT NULL COLLATE ascii_bin,
@@ -287,6 +287,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.50  2010/05/02 19:50:51  fplanque
+ * no message
+ *
  * Revision 1.49  2010/04/23 09:39:44  efy-asimo
  * "SEO setting" for help link and Groups slugs permission implementation
  *

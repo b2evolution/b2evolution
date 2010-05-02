@@ -97,9 +97,9 @@ class Module
 		if( ! isset( $Group ) )
 		{
 			global $current_User;
-
 			$Group = & $current_User->get_Group();
 		}
+		
 		$GroupSettings = & $Group->get_GroupSettings();
 
 		if( array_key_exists( $permname, $GroupSettings->permission_modules ) )
@@ -129,5 +129,9 @@ class Module
 }
 
 /*
+ * $Log$
+ * Revision 1.5  2010/05/02 19:50:51  fplanque
+ * no message
+ *
  */
 ?>

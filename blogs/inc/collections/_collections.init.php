@@ -6,7 +6,7 @@
  *
  * @package admin
  *
- * @version _collections.init.php,v 1.4 2009/08/30 14:18:07 tblue246 Exp
+ * @version $Id$
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -734,7 +734,11 @@ $collections_Module = new collections_Module();
 
 
 /*
- * _collections.init.php,v
+ * $Log$
+ * Revision 1.20  2010/05/02 19:50:50  fplanque
+ * no message
+ *
+ *
  * Revision 1.4  2009/08/30 14:18:07  tblue246
  * evoBar: Fixed b2evolution menu
  *
