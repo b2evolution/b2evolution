@@ -54,12 +54,7 @@ function evocms_autoload_class( $classname )
 	$classname = strtolower($classname);
 	if( isset($map_class_path[$classname]) )
 	{
-		$filename = $map_class_path[$classname];
-		if( ! is_readable($filename) )
-		{ // sleep for a tiny amount of time (in case the file just gets updated by editing or something alike)
-			usleep(rand(250, 750));
-		}
-		require_once $filename;
+		require_once $map_class_path[$classname];
 	}
 }
 
@@ -111,6 +106,9 @@ function duplicate( $Obj )
 
 /*
  * $Log$
+ * Revision 1.31  2010/05/02 19:27:24  fplanque
+ * rollback. Not worth the 10 million additional fstats.
+ *
  * Revision 1.30  2010/04/28 21:27:21  blueyed
  * doc
  *
