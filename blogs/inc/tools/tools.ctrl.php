@@ -180,13 +180,8 @@ if( empty($tab) )
 
 				if( $new_Slug->get('title') != $prev_urltitle )
 				{
-					#pre_dump( $prev_urltitle, $new_Slug ); die;
 					$r = $Item->dbupdate(/* do not autotrack modification */ false, /* update slug */ $new_Slug, /* do not update excerpt */ false);
-					if( ! assert('$r') )
-					{
-						pre_dump( $Item );
-						debug_die();
-					}
+					assert('$r');
 					$count_slugs++;
 				}
 			}
@@ -305,6 +300,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.27  2010/05/02 00:15:07  blueyed
+ * cleanup
+ *
  * Revision 1.26  2010/05/02 00:14:07  blueyed
  * Add recreate_itemslugs tool to re-generate slugs for all items.
  *
