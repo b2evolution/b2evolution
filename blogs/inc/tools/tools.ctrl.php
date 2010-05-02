@@ -162,6 +162,36 @@ if( empty($tab) )
 				$Messages->add( T_('Database tables are already optimized.'), 'success' );
 			}
 			break;
+
+		case 'recreate_itemslugs':
+			$ItemCache = get_ItemCache();
+			$SlugCache = get_SlugCache();
+			$ItemCache->load_all();
+			$SlugCache->load_all();
+			$items = $ItemCache->get_ID_array();
+			$count_slugs = 0;
+			@set_time_limit(0);
+			foreach( $items as $item_ID )
+			{
+				$Item = $ItemCache->get_by_ID($item_ID);
+
+				$prev_urltitle = $Item->get('urltitle');
+				$new_Slug = $Item->update_slug('');
+
+				if( $new_Slug->get('title') != $prev_urltitle )
+				{
+					#pre_dump( $prev_urltitle, $new_Slug ); die;
+					$r = $Item->dbupdate(/* do not autotrack modification */ false, /* update slug */ $new_Slug, /* do not update excerpt */ false);
+					if( ! assert('$r') )
+					{
+						pre_dump( $Item );
+						debug_die();
+					}
+					$count_slugs++;
+				}
+			}
+			$Messages->add( sprintf('Created %d new URL slugs for %d total posts.', $count_slugs, count($items)), 'success' );
+			break;
 	}
 }
 
@@ -220,6 +250,11 @@ if( empty($tab) )
 		// echo '<li><a href="'.regenerate_url('action', 'action=backup_db').'">'.T_('Backup database').'</a></li>';
 		echo '</ul>';
 		$block_item_Widget->disp_template_raw( 'block_end' );
+
+		$block_item_Widget->title = T_('Recreate item slugs');
+		$block_item_Widget->disp_template_replaced( 'block_start' );
+		echo '&raquo; <a href="'.regenerate_url('action', 'action=recreate_itemslugs').'">'.T_('Recreate all item slugs. Old slugs will still work, but redirect to the new one.').'</a>';
+		$block_item_Widget->disp_template_raw( 'block_end' );
 	}
 
 
@@ -270,6 +305,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.26  2010/05/02 00:14:07  blueyed
+ * Add recreate_itemslugs tool to re-generate slugs for all items.
+ *
  * Revision 1.25  2010/03/27 19:57:30  blueyed
  * Add delete_cachefolders function and use it in the Tools Misc actions and with the watermark plugin. The latter will also remove caches when it gets enabled or disabled.
  *
