@@ -3435,6 +3435,7 @@ class Item extends ItemLight
 			if( isset($new_Slug) )
 			{ // Set item urltitle
 				$this->set( 'urltitle', $new_Slug->get( 'title' ) );
+			}
 		}
 
 		$this->update_renderers_from_Plugins();
@@ -4367,6 +4368,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.198  2010/05/02 00:12:52  blueyed
+ * Fix missing curly brace.
+ *
  * Revision 1.197  2010/05/02 00:12:27  blueyed
  * Proposition: remove duplicate newlines in excerpt.
  *
