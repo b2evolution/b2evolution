@@ -42,6 +42,7 @@ $action = param_arrayindex( 'submit_comment_post_'.$comment_post_ID, 'save' );
 
 $ItemCache = & get_ItemCache();
 $commented_Item = & $ItemCache->get_by_ID( $comment_post_ID );
+
 if( ! $commented_Item->can_comment( NULL ) )
 {
 	$Messages->add( T_('You cannot leave comments on this post!'), 'error' );
@@ -404,6 +405,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.143  2010/05/02 16:38:34  fplanque
+ * minor
+ *
  * Revision 1.142  2010/03/19 01:31:42  blueyed
  * check_html_sanity: add User param, defaulting to current User. This is required if posting User is not logged in (e.g. commenting via OpenID, but logged out).
  *

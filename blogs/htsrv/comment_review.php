@@ -1,6 +1,15 @@
 <?php
 /**
  * This is file implements the comments quick edit operations after mail notification.
+ *
+ * This file is part of the evoCore framework - {@link http://evocore.net/}
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @package htsrv
+ *
+ * @version $Id$
  */
 
 /**
@@ -127,20 +136,20 @@ if ($secret == $posted_Comment->get('secret') && ($secret != NULL) )
 		echo ' value="'.T_('Publish').'" title="'.T_('Publish this comment').'"/>';
 		echo "\n";
 	}
-	
+
 	if( $posted_Comment->author_url != null )
 	{
 		// delete url button
 		echo '<input type="submit" name="actionArray[deleteurl]"';
 		echo ' value="'.T_('Delete URL').'" title="'.T_('Delete comment URL').'"/>';
 		echo "\n";
-		
+
 		// antispam tool button
 		echo '<input type="submit" name="actionArray[antispamtool]"';
 		echo ' value="'.T_('Antispam tool').'" title="'.T_('Antispam tool').'"/>';
 		echo "\n";
 	}
-	
+
 	echo '<input type="hidden" name="secret" value="'.$secret.'"';
 	echo "\n";
 	echo '<input type="hidden" name="cmt_ID" value="'.$cmt_ID.'"';
@@ -189,3 +198,13 @@ else
 
 </body>
 </html>
+<?php
+/*
+ * $Log$
+ * Revision 1.9  2010/05/02 16:38:34  fplanque
+ * minor
+ *
+ *
+ * Created by efy-asimo
+ */
+?>
