@@ -66,6 +66,61 @@ global $action;
  */
 global $user_profile_only;
 
+$GroupCache = & get_GroupCache();
+$group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
+
+// we need jQuery
+require_js( 'communication.js' );
+
+// User Groups dropdown list handler
+?>
+<script type="text/javascript">
+	function user_group_changed()
+	{
+		var val = jQuery( '#edited_user_grp_ID' ).val();
+		if( val == null )
+		{ // there is no groups drop down list
+			return;
+		}
+
+		var perms = [];
+
+		<?php
+		foreach( $group_msg_perm as $key => $value )
+		{ // set groups permissions
+			echo 'perms['.$key.'] = '.($value ? 'true' : 'false').';';
+		}
+		?>
+
+		if( perms[val] )
+		{ // private messages are allowed in selected group - show options
+			if( ! jQuery( '#edited_user_allow_msgform_radio_2' ).is(':visible') )
+			{
+				jQuery( '#edited_user_allow_msgform_radio_2' ).show();
+				jQuery( "label[for='edited_user_allow_msgform_radio_2']").show();
+				jQuery( '#edited_user_allow_msgform_radio_3' ).show();
+				jQuery( "label[for='edited_user_allow_msgform_radio_3']").show();
+			}
+		}
+		else
+		{ // private messages are allowed in selected group - hide options
+			if( jQuery( '#edited_user_allow_msgform_radio_2' ).is(':visible') )
+			{
+				jQuery( '#edited_user_allow_msgform_radio_2' ).hide();
+				jQuery( "label[for='edited_user_allow_msgform_radio_2']").hide();
+				jQuery( '#edited_user_allow_msgform_radio_3' ).hide();
+				jQuery( "label[for='edited_user_allow_msgform_radio_3']").hide();
+				var bla = jQuery( '#edited_user_allow_msgform_radio_4' ).attr('checked');
+				if( ! jQuery( '#edited_user_allow_msgform_radio_4' ).attr('checked')
+					&& ! jQuery( '#edited_user_allow_msgform_radio_1' ).attr('checked') )
+				{ // no selected option => select allow emails
+					jQuery( '#edited_user_allow_msgform_radio_1' ).attr('checked', true);
+				}
+			}
+		}
+	}
+</script>
+<?php
 
 // Begin payload block:
 $this->disp_payload_begin();
@@ -106,7 +161,7 @@ if( $edited_User->ID != 1 && $has_full_access )
 {	// This is not Admin and we're not restricted: we're allowed to change the user group:
 	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get('newusers_grp_ID') : $edited_User->Group->ID;
 	$GroupCache = & get_GroupCache();
-	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group') );
+	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, T_('User group'), '', false, '', 'get_option_list', 'user_group_changed()' );
 }
 else
 {
@@ -413,9 +468,18 @@ $Form->end_form();
 // End payload block:
 $this->disp_payload_end();
 
+// call the ussers group dropdown list handler
+?>
+	<script type="text/javascript">
+		user_group_changed();
+	</script>
+<?php
 
 /*
  * $Log$
+ * Revision 1.13  2010/05/05 09:37:08  efy-asimo
+ * add _login.disp.php and change groups&users messaging perm
+ *
  * Revision 1.12  2010/04/16 10:42:11  efy-asimo
  * users messages options- send private messages to users from front-office - task
  *

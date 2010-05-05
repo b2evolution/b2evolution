@@ -700,10 +700,23 @@ class Group extends DataObject
 
 		$DB->commit();
 	}
+
+
+	/**
+	 * Check if this group users have messaging permission and have access to admin interface
+	 * @return boolean true if group has the necessarry permissions
+	 */
+	function check_messaging_perm()
+	{
+		return $this->check_perm( 'perm_messaging', 'write' ) && ( $this->get( 'perm_admin' ) != 'none' );
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.32  2010/05/05 09:37:08  efy-asimo
+ * add _login.disp.php and change groups&users messaging perm
+ *
  * Revision 1.31  2010/04/23 09:39:44  efy-asimo
  * "SEO setting" for help link and Groups slugs permission implementation
  *

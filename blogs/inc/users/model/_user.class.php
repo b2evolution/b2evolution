@@ -70,6 +70,8 @@ class User extends DataObject
 
 	/**
 	 * Does the user accept emails through a message form?
+	 * This attribute value must be asked with get_msgform_settings() function
+	 * Exception is the user_identity form where needs exactly this setting
 	 * @var boolean
 	 */
 	var $allow_msgform;
@@ -195,6 +197,7 @@ class User extends DataObject
 				$this->group_ID = $Settings->get('newusers_grp_ID');
 			}
 
+			// This attribute value must be asked with get_msgform_settings() function 
  			$this->set( 'allow_msgform', 2 );
  			$this->set( 'notify', 1 );
  			$this->set( 'showonline', 1 );
@@ -1396,7 +1399,18 @@ class User extends DataObject
 				// no break
 			case 3:
 				// Allow registered users to send private messages; don't allow others to contact.
-				return 'private_message';
+				if( is_logged_in() )
+				{
+					if( $this->check_perm( 'perm_messaging', 'write' ) && ($this->get_Group()->get('perm_admin') != 'none') )
+					{
+						return 'private_message';
+					}
+					//return NULL
+				}
+				else
+				{ // If isn't logged in first needs to log in to send private message
+					return 'private_message';
+				}
 				// no break
 			case 0:
 			default:
@@ -1999,6 +2013,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.73  2010/05/05 09:37:08  efy-asimo
+ * add _login.disp.php and change groups&users messaging perm
+ *
  * Revision 1.72  2010/04/23 11:37:57  efy-asimo
  * send messages - fix
  *

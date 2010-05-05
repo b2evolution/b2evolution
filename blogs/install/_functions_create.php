@@ -834,6 +834,7 @@ function create_demo_contents()
 	$User_Demo->set( 'domain', 'localhost' );
 	$User_Demo->set( 'level', 0 );
 	$User_Demo->set( 'locale', $default_locale );
+	$User_Demo->set( 'allow_msgform', 1 );
 	$User_Demo->set_datecreated( $timestamp++ );
 	$User_Demo->set_Group( $Group_Users );
 	$User_Demo->dbinsert();
@@ -1311,6 +1312,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.293  2010/05/05 09:37:08  efy-asimo
+ * add _login.disp.php and change groups&users messaging perm
+ *
  * Revision 1.292  2010/05/02 16:10:40  fplanque
  * minor
  *
