@@ -1011,9 +1011,9 @@ class AdminUI_general extends Menu
 					'formstart' => '',
 					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
 					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
-					'fieldset_begin' => '<fieldset $fieldset_attribs$>'."\n"
+					'fieldset_begin' => '<div class="fieldset_wrapper$class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$>'."\n"
 															.'<legend $title_attribs$>$fieldset_title$</legend>'."\n",
-					'fieldset_end' => '</fieldset>'."\n",
+					'fieldset_end' => '</fieldset></div>'."\n",
 					'fieldstart' => '<fieldset $ID$>'."\n",
 					'labelstart' => '<div class="label">',
 					'labelend' => "</div>\n",
@@ -1365,6 +1365,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.109  2010/05/06 18:59:31  blueyed
+ * Admin: skin: base: add div.fieldset_wrapper_ID to 'Form' fieldset_begin (consistent with chicago skin).
+ *
  * Revision 1.108  2010/02/08 17:56:45  efy-yury
  * copyright 2009 -> 2010
  *
