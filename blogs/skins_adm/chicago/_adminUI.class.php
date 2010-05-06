@@ -314,9 +314,9 @@ class AdminUI extends AdminUI_general
 					'title_fmt' => '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n",
 					'no_title_fmt' => '<span style="float:right">$global_icons$</span>'."\n",
 					'fieldstart' => '<fieldset $ID$>'."\n",
-					'fieldset_begin' => '<div class="fieldset_wrapper$class$" id="$id$"><div class="fieldset_title"><div class="fieldset_title_right">
-																<div class="fieldset_title_bg" $title_attribs$>$fieldset_title$</div></div></div>
-																<fieldset $fieldset_attribs$>'."\n",
+					'fieldset_begin' => '<div class="fieldset_wrapper$class$" id="fieldset_wrapper_$id$"><div class="fieldset_title"><div class="fieldset_title_right">
+						<div class="fieldset_title_bg" $title_attribs$>$fieldset_title$</div></div></div>
+						<fieldset $fieldset_attribs$>'."\n", // $fieldset_attribs will contain ID
 					'fieldset_end' => '</fieldset></div>'."\n",
 					'labelstart' => '<div class="label">',
 					'labelend' => "</div>\n",
@@ -390,6 +390,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.32  2010/05/06 18:58:14  blueyed
+ * Admin: skin: chicago: fix duplicate ID within fieldset_begin. Use fieldset_wrapper_ID for the wrapper.
+ *
  * Revision 1.31  2010/02/08 17:56:48  efy-yury
  * copyright 2009 -> 2010
  *
