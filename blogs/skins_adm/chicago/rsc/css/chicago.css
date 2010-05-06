@@ -833,10 +833,7 @@ fieldset.extracats div.extracats div {
 }
 table.catselect {
 	width:100%;
-	border-left: none;
-	border-right: none;
-	border-top: none;
-	border-color: #9db0bc;
+	border: none;
 }
 table.catselect th {
 	background-color: #CCDCE6;
