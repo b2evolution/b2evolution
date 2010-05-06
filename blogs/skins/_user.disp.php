@@ -60,7 +60,22 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 	}
 	else
 	{
-	  $ProfileForm->info( T_('Contact'), T_('This user does not wish to be contacted directly.') );
+	  if( is_logged_in() && $User->check_msgform_PM() )
+	  {
+	    global $current_User;
+	    if( $current_User->check_msgform_PM() )
+	    {
+	      $ProfileForm->info( T_('Contact'), T_('You cannot send a private message to yourself.') );	
+	    }
+	    else
+	    {
+	      $ProfileForm->info( T_('Contact'), T_('This user allows only private messages.') );
+	    }
+	  }
+	  else
+	  {
+	    $ProfileForm->info( T_('Contact'), T_('This user does not wish to be contacted directly.') ); 
+	  }
 	}
 
 	if( !empty($User->url) )
@@ -100,6 +115,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.15  2010/05/06 10:32:17  efy-asimo
+ * messaging options fix update
+ *
  * Revision 1.14  2010/02/23 05:07:19  sam2kb
  * New plugin hooks: DisplayProfileFormFieldset and ProfileFormSent
  *
