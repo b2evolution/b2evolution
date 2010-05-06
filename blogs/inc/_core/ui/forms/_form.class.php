@@ -1584,7 +1584,8 @@ class Form extends Widget
 
 			$loop_field_note = isset($option[5]) ? $option[5] : '';
 
-			$r .= '<label class="">';
+			// asimo>> add id for label: id = label_for_fieldname_fieldvalue
+			$r .= '<label class="" id="label_for_'.$loop_field_name.'_'.$option[1].'">';
 
 			if( $add_highlight_spans )
 			{ // Need it to highlight checkbox for check_all and uncheck_all mouseover
@@ -3053,6 +3054,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.86  2010/05/06 09:24:13  efy-asimo
+ * Messaging options - fix
+ *
  * Revision 1.85  2010/04/12 19:51:08  blueyed
  * Form::textarea_input: field_params: Add format_value param.
  *

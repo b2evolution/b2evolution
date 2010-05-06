@@ -84,38 +84,36 @@ require_js( 'communication.js' );
 		}
 
 		var perms = [];
+		var msgform = 0;
 
 		<?php
 		foreach( $group_msg_perm as $key => $value )
 		{ // set groups permissions
 			echo 'perms['.$key.'] = '.($value ? 'true' : 'false').';';
 		}
+		echo 'msgform = '.$edited_User->get( 'allow_msgform' );
 		?>
 
 		if( perms[val] )
-		{ // private messages are allowed in selected group - show options
-			if( ! jQuery( '#edited_user_allow_msgform_radio_2' ).is(':visible') )
+		{ // private messages are allowed in selected group - enable option
+			if( $( '.checkbox[name=PM]' ).attr('disabled') )
 			{
-				jQuery( '#edited_user_allow_msgform_radio_2' ).show();
-				jQuery( "label[for='edited_user_allow_msgform_radio_2']").show();
-				jQuery( '#edited_user_allow_msgform_radio_3' ).show();
-				jQuery( "label[for='edited_user_allow_msgform_radio_3']").show();
+				$( '.checkbox[name=PM]' ).removeAttr('disabled');
+				$( '#label_for_PM_1' ).removeAttr('disabled');
+				if( msgform % 2 == 1 )
+				{ // if user allows PM check PM box
+					$( '.checkbox[name=PM]' ).attr('checked', true );
+				}
 			}
 		}
 		else
-		{ // private messages are allowed in selected group - hide options
-			if( jQuery( '#edited_user_allow_msgform_radio_2' ).is(':visible') )
+		{ // private messages are not allowed in selected group - disable option
+			if( ! $( '.checkbox[name=PM]' ).attr('disabled') )
 			{
-				jQuery( '#edited_user_allow_msgform_radio_2' ).hide();
-				jQuery( "label[for='edited_user_allow_msgform_radio_2']").hide();
-				jQuery( '#edited_user_allow_msgform_radio_3' ).hide();
-				jQuery( "label[for='edited_user_allow_msgform_radio_3']").hide();
-				var bla = jQuery( '#edited_user_allow_msgform_radio_4' ).attr('checked');
-				if( ! jQuery( '#edited_user_allow_msgform_radio_4' ).attr('checked')
-					&& ! jQuery( '#edited_user_allow_msgform_radio_1' ).attr('checked') )
-				{ // no selected option => select allow emails
-					jQuery( '#edited_user_allow_msgform_radio_1' ).attr('checked', true);
-				}
+				// uncheck PM box, because it is not a valid option
+				$( '.checkbox[name=PM]' ).attr('checked', false );
+				$( '.checkbox[name=PM]' ).attr('disabled','disabled');
+				$( '#label_for_PM_1' ).attr('disabled','disabled');
 			}
 		}
 	}
@@ -199,12 +197,10 @@ if( $action != 'view' )
 	{ // info only:
 		$Form->info( T_('Validated email'), ( $edited_User->get('validated') ? T_('yes') : T_('no') ), T_('Has this email address been validated (through confirmation email)?') );
 	}
-	$Form->radio_input( 'edited_user_allow_msgform', $edited_User->get('allow_msgform'), array(
-		array( 'value' => '1', 'label' => T_( 'Allow others to send me emails through a message form' ) ),
-		array( 'value' => '2', 'label' => T_( 'Allow registered users to send me private messages and others to send me emails through a message form.' ) ),
-		array( 'value' => '3', 'label' => T_( 'Allow registered users to send me private messages; don\'t allow others to contact me.' ) ),
-		array( 'value' => '0', 'label' => T_( 'Do not allow anyone to contact me.' ) ) ),
-		T_( 'Message form' ), array( 'lines' => 1 ) );
+	$messaging_options = array(
+		array( 'PM', 1, T_( 'Allow others to send me private messages' ), ( $edited_User->get( 'allow_msgform' ) % 2 == 1 ) ),
+		array( 'email', 2, T_( 'Allow others to send me emails through a message form (email address will never be displayed)' ),  $edited_User->get( 'allow_msgform' ) > 1 ) );
+	$Form->checklist( $messaging_options, 'edited_user_msgform', T_('Message form') );
 	$Form->checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive a notification whenever someone else comments on one of <strong>your</strong> posts.') );
 
 }
@@ -477,6 +473,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.14  2010/05/06 09:24:14  efy-asimo
+ * Messaging options - fix
+ *
  * Revision 1.13  2010/05/05 09:37:08  efy-asimo
  * add _login.disp.php and change groups&users messaging perm
  *

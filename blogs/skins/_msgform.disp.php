@@ -126,7 +126,7 @@ if( !isset($recipient_User) && empty($recipient_address) )
 	return;
 }
 
-if( isset($recipient_User) && $recipient_User->get_msgform_settings() == 'private_message' && ! is_logged_in() )
+if( isset($recipient_User) && $allow_msgform == 'PM' && ! is_logged_in() )
 {
 	global $htsrv_path, $Messages;
 	$Messages->add( 'You must log in to send a message' );
@@ -229,6 +229,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.16  2010/05/06 09:24:14  efy-asimo
+ * Messaging options - fix
+ *
  * Revision 1.15  2010/05/05 09:37:09  efy-asimo
  * add _login.disp.php and change groups&users messaging perm
  *

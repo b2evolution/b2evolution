@@ -69,9 +69,11 @@ class User extends DataObject
 	var $ctry_ID;
 
 	/**
-	 * Does the user accept emails through a message form?
-	 * This attribute value must be asked with get_msgform_settings() function
-	 * Exception is the user_identity form where needs exactly this setting
+	 * Does the user accept messages?
+	 * Options: 0 - NO, 1 - only private messages, 2 - only emails, 3 - private messages and emails
+	 * This attribute can be asked with get_msgform_settings(), check_msgform_PM(),
+	 * and check_msgform_email() functions to get complete sense.
+	 * It is because posibble that user allow PM, but user group does not.
 	 * @var boolean
 	 */
 	var $allow_msgform;
@@ -197,8 +199,10 @@ class User extends DataObject
 				$this->group_ID = $Settings->get('newusers_grp_ID');
 			}
 
-			// This attribute value must be asked with get_msgform_settings() function 
- 			$this->set( 'allow_msgform', 2 );
+			// This attribute can be asked with get_msgform_settings(), check_msgform_PM, check_msgform_email functions
+			// Default value: Allow both
+ 			$this->set( 'allow_msgform', 3 );
+
  			$this->set( 'notify', 1 );
  			$this->set( 'showonline', 1 );
 		}
@@ -328,8 +332,9 @@ class User extends DataObject
 			param_check_email( 'edited_user_email', true );
 			$this->set_from_Request('email', 'edited_user_email', true);
 
-			param( 'edited_user_allow_msgform', 'integer', 0 );
-			$this->set_from_Request('allow_msgform', 'edited_user_allow_msgform', true);
+			// set allow_msgform: 0 - none, 1 - only private message, 2 - only email, 3 - private message and email 
+			$allow_msgform = param( 'PM', 'integer', 0 ) + param( 'email', 'integer', 0 );
+			$this->set( 'allow_msgform', $allow_msgform );
 
 			param( 'edited_user_notify', 'integer', 0 );
 			$this->set_from_Request('notify', 'edited_user_notify', true);
@@ -1373,50 +1378,58 @@ class User extends DataObject
 
 
 	/**
-	 * Get allow_msgform settings for this user
+	 * Check if this user and his group allow private messages or not
+	 * @return boolean
+	 */
+	function check_msgform_PM()
+	{
+		return ( $this->allow_msgform % 2 == 1 ) && $this->get_Group()->check_messaging_perm();
+	}
+
+
+	/**
+	 * Check if this user allow emails and has email adress
+	 * @return boolean
+	 */
+	function check_msgform_email()
+	{
+		return ( $this->allow_msgform > 1 ) && ( ! empty( $this->email ) );
+	}
+
+
+	/**
+	 * Get msgform settings between current user and this user
 	 * 
-	 * @return NULL|string NULL if contact not allowed for current user, the allowed form otherwise
+	 * @return NULL|string NULL no messaging option between current_User and this user,
+	 * 	the allowed messging form otherwise
 	 */
 	function get_msgform_settings()
 	{
-		global $current_User;
-		switch( $this->allow_msgform )
-		{
-			case 1:
-				if( ! empty($this->email) )
-				{ // Allow others to send emails
-					return 'email';
-				}
-				// We have no email for this Author :(
-				return NULL;
-
-			case 2:
-				//  Allow registered users to send private messages, and others to send emails
-				if( ! is_logged_in() && ! empty($this->email) )
-				{
-					return 'email';
-				}
-				// no break
-			case 3:
-				// Allow registered users to send private messages; don't allow others to contact.
-				if( is_logged_in() )
-				{
-					if( $this->check_perm( 'perm_messaging', 'write' ) && ($this->get_Group()->get('perm_admin') != 'none') )
-					{
-						return 'private_message';
-					}
-					//return NULL
-				}
-				else
-				{ // If isn't logged in first needs to log in to send private message
-					return 'private_message';
-				}
-				// no break
-			case 0:
-			default:
-				// Do not allow to contact
-				return NULL;
+		if( is_logged_in() )
+		{ // current User is a registered user
+			global $current_User;
+			if( $this->check_msgform_PM() && $current_User->check_msgform_PM() && ( $this->ID != $current_User->ID ) )
+			{ // both user has permission to send or receive private message and not the same user
+				return 'PM';
+			}
+			if( $this->check_msgform_email() )
+			{ // this user allows email => send email
+				return 'email';
+			}
 		}
+		else
+		{ // current User is not logged in
+			if( $this->check_msgform_email() )
+			{ // this user allows email 
+				return 'email';
+			}
+			if( $this->check_msgform_PM() )
+			{ // no email option try to log in and send private message (just registered users can send PM)
+				return 'PM';
+			}
+		}
+		// no messaging option between current_User and this user
+		return NULL;
 	}
 
 
@@ -2013,6 +2026,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.74  2010/05/06 09:24:14  efy-asimo
+ * Messaging options - fix
+ *
  * Revision 1.73  2010/05/05 09:37:08  efy-asimo
  * add _login.disp.php and change groups&users messaging perm
  *
