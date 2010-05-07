@@ -112,7 +112,7 @@ $Results->cols[] = array(
 		'td' => '$ufdf_name$',
 	);
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( $current_User->check_perm( 'users', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
@@ -136,6 +136,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.12  2010/05/07 08:07:14  efy-asimo
+ * Permissions check update (User tab, Global Settings tab) - bugfix
+ *
  * Revision 1.11  2010/02/26 22:15:48  fplanque
  * whitespace/doc/minor
  *

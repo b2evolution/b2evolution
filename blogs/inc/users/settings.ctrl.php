@@ -6,6 +6,8 @@ global $demo_mode;
 
 $AdminUI->set_path( 'users', 'usersettings', 'usersettings' );
 
+$current_User->check_perm( 'users', 'view', true );
+
 param_action();
 
 switch ( $action )
@@ -15,7 +17,7 @@ switch ( $action )
 		$Session->assert_received_crumb( 'usersettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		$current_User->check_perm( 'users', 'edit', true );
 
 		// UPDATE general settings:
 
@@ -79,6 +81,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2010/05/07 08:07:14  efy-asimo
+ * Permissions check update (User tab, Global Settings tab) - bugfix
+ *
  * Revision 1.8  2010/01/16 14:27:04  efy-yury
  * crumbs, fadeouts, redirect, action_icon
  *

@@ -97,7 +97,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( $current_User->check_perm( 'users', 'edit' ) )
 {
 	$Form->end_form( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
 													array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
@@ -105,6 +105,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.10  2010/05/07 08:07:14  efy-asimo
+ * Permissions check update (User tab, Global Settings tab) - bugfix
+ *
  * Revision 1.9  2010/01/03 17:45:21  fplanque
  * crumbs & stuff
  *

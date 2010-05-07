@@ -241,7 +241,7 @@ $Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_pro
 
 $Form->end_fieldset();
 
-if( $action != 'view_group' )
+if( $action != 'view' )
 {
 	$Form->buttons( array(
 		array( '', '', T_('Save !'), 'SaveButton' ),
@@ -252,6 +252,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.28  2010/05/07 08:07:14  efy-asimo
+ * Permissions check update (User tab, Global Settings tab) - bugfix
+ *
  * Revision 1.27  2010/04/23 09:39:44  efy-asimo
  * "SEO setting" for help link and Groups slugs permission implementation
  *

@@ -41,7 +41,7 @@ load_class( 'regional/model/_currency.class.php', 'Currency' );
 global $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'edit', true );
+$current_User->check_perm( 'options', 'view', true );
 
 // Set options path:
 $AdminUI->set_path( 'options', 'currencies' );
@@ -309,6 +309,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2010/05/07 08:07:14  efy-asimo
+ * Permissions check update (User tab, Global Settings tab) - bugfix
+ *
  * Revision 1.17  2010/03/19 09:48:59  efy-asimo
  * file deleting restrictions - task
  *

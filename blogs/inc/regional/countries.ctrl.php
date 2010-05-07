@@ -41,7 +41,7 @@ load_class( 'regional/model/_country.class.php', 'Country' );
 global $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'edit', true );
+$current_User->check_perm( 'options', 'view', true );
 
 // Set options path:
 $AdminUI->set_path( 'options', 'countries' );
@@ -308,6 +308,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2010/05/07 08:07:14  efy-asimo
+ * Permissions check update (User tab, Global Settings tab) - bugfix
+ *
  * Revision 1.14  2010/01/20 20:08:32  efy-asimo
  * Countries&Currencies redirect fix + RSS/Atom feeds image size select list
  *

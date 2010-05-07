@@ -2917,7 +2917,7 @@ class Plugin
 	{
 		global $current_User, $admin_url;
 
-		if( ! $current_User->check_perm( 'options', 'view', false ) )
+		if( ! $current_User->check_perm( 'options', 'edit', false ) )
 		{
 			return false;
 		}
@@ -3026,6 +3026,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.39  2010/05/07 08:07:14  efy-asimo
+ * Permissions check update (User tab, Global Settings tab) - bugfix
+ *
  * Revision 1.38  2010/04/22 18:58:31  blueyed
  * Fix doc
  *

@@ -848,7 +848,7 @@ switch( $action )
 	case 'disp_help_plain': // just the help, without any payload
 
 		// Check permission: (with plugins... you never know...)
-		$current_User->check_perm( 'options', 'edit', true );
+		$current_User->check_perm( 'options', 'view', true );
 
 		param( 'plugin_class', 'string', true );
 
@@ -1047,7 +1047,7 @@ switch( $action )
 
 		$Form = new Form( $pagenow );
 
-		if( $edit_Plugin->ID > 0 )
+		if( $edit_Plugin->ID > 0 && $current_User->check_perm( 'options', 'edit', false ) )
 		{ // Edit settings button (if installed):
 			$Form->global_icon( T_('Edit plugin settings!'), 'edit', $admin_url.'?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$edit_Plugin->ID );
 		}
@@ -1133,6 +1133,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2010/05/07 08:07:14  efy-asimo
+ * Permissions check update (User tab, Global Settings tab) - bugfix
+ *
  * Revision 1.19  2010/03/08 21:25:35  fplanque
  * fix
  *

@@ -52,12 +52,12 @@ if( $user_view_group_only )
 
 	if( isset($grp_ID) )
 	{ // User is trying to edit something he should not: add error message (Should be prevented by UI)
-		$Messages->add( T_('You have no permission to edit groups!'), 'error' );
+		$Messages->add( T_('You have no permission to edit groups!'), 'warning' );
 	}
 
 	// Make sure the user only edits himself:
 
-	$grp_ID = NULL;
+	//$grp_ID = NULL;
 	if( ! in_array( $action, array( 'new', 'view') ) )
 	{
 		$action = 'view';
@@ -278,6 +278,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2010/05/07 08:07:14  efy-asimo
+ * Permissions check update (User tab, Global Settings tab) - bugfix
+ *
  * Revision 1.8  2010/01/30 18:55:35  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

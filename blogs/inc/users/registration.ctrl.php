@@ -32,7 +32,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'view', true );
+$current_User->check_perm( 'users', 'view', true );
 
 $AdminUI->set_path( 'users', 'usersettings', 'registration' );
 
@@ -45,7 +45,7 @@ switch ( $action )
 		$Session->assert_received_crumb( 'registration' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		$current_User->check_perm( 'users', 'edit', true );
 
 		// UPDATE general settings:
 		param( 'newusers_canregister', 'integer', 0 );
@@ -122,6 +122,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2010/05/07 08:07:14  efy-asimo
+ * Permissions check update (User tab, Global Settings tab) - bugfix
+ *
  * Revision 1.8  2010/01/09 13:30:12  efy-yury
  * added redirect 303 for prevent dublicate sql executions
  *

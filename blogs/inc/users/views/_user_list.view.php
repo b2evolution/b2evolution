@@ -148,19 +148,23 @@ $Results->grp_cols[] = array(
 
 function grp_actions( & $row )
 {
-	global $usedgroups, $Settings;
+	global $usedgroups, $Settings, $current_User;
 
-	$r = action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;grp_ID='.$row->grp_ID ) );
-
-	$r .= action_icon( T_('Duplicate this group...'), 'copy', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=new&amp;grp_ID='.$row->grp_ID ) );
-
-	if( ($row->grp_ID != 1) && ($row->grp_ID != $Settings->get('newusers_grp_ID')) && !in_array( $row->grp_ID, $usedgroups ) )
-	{ // delete
-		$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=delete&amp;grp_ID='.$row->grp_ID.'&amp;'.url_crumb('group') ) );
-	}
-	else
+	$r = '';
+	if( $current_User->check_perm( 'users', 'edit', false ) )
 	{
-		$r .= get_icon( 'delete', 'noimg' );
+		$r = action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;grp_ID='.$row->grp_ID ) );
+	
+		$r .= action_icon( T_('Duplicate this group...'), 'copy', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=new&amp;grp_ID='.$row->grp_ID ) );
+	
+		if( ($row->grp_ID != 1) && ($row->grp_ID != $Settings->get('newusers_grp_ID')) && !in_array( $row->grp_ID, $usedgroups ) )
+		{ // delete
+			$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=delete&amp;grp_ID='.$row->grp_ID.'&amp;'.url_crumb('group') ) );
+		}
+		else
+		{
+			$r .= get_icon( 'delete', 'noimg' );
+		}
 	}
 	return $r;
 }
@@ -338,6 +342,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.25  2010/05/07 08:07:14  efy-asimo
+ * Permissions check update (User tab, Global Settings tab) - bugfix
+ *
  * Revision 1.24  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *
