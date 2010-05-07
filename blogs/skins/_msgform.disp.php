@@ -126,10 +126,10 @@ if( !isset($recipient_User) && empty($recipient_address) )
 	return;
 }
 
-if( isset($recipient_User) && $allow_msgform == 'PM' && ! is_logged_in() )
-{
+if( $allow_msgform == 'login' )
+{ // try to login to send private message (there is no other option)
 	global $htsrv_path, $Messages;
-	$Messages->add( 'You must log in to send a message' );
+	$Messages->add( 'You must log in before you can contact this user' );
 	//$thispage_url = regenerate_url( '', 'recipient_id='.$recipient_User->ID, '', '&' );
 	require '_login.disp.php';
 }
@@ -229,6 +229,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.17  2010/05/07 06:12:38  efy-asimo
+ * small modification about messaging
+ *
  * Revision 1.16  2010/05/06 09:24:14  efy-asimo
  * Messaging options - fix
  *

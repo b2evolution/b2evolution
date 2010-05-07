@@ -69,7 +69,7 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 	    }
 	    else
 	    {
-	      $ProfileForm->info( T_('Contact'), T_('This user allows only private messages.') );
+	      $ProfileForm->info( T_('Contact'), T_('This user only accepts private messages but you are not allowed to send any private messages.') );
 	    }
 	  }
 	  else
@@ -115,6 +115,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.16  2010/05/07 06:12:38  efy-asimo
+ * small modification about messaging
+ *
  * Revision 1.15  2010/05/06 10:32:17  efy-asimo
  * messaging options fix update
  *

@@ -1425,7 +1425,7 @@ class User extends DataObject
 			}
 			if( $this->check_msgform_PM() )
 			{ // no email option try to log in and send private message (just registered users can send PM)
-				return 'PM';
+				return 'login';
 			}
 		}
 		// no messaging option between current_User and this user
@@ -2026,6 +2026,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.75  2010/05/07 06:12:38  efy-asimo
+ * small modification about messaging
+ *
  * Revision 1.74  2010/05/06 09:24:14  efy-asimo
  * Messaging options - fix
  *
