@@ -38,12 +38,17 @@ global $dispatcher;
 /*
  * Display comments:
  */
-$block_item_Widget = new Widget( 'block_item' );
-
-$block_item_Widget->title = T_('Feedback (Comments, Trackbacks...)');
-$block_item_Widget->disp_template_replaced( 'block_start' );
 
 $CommentList->query();
+
+$block_item_Widget = new Widget( 'block_item' );
+
+if( $CommentList->is_filtered() )
+{	// List is filtered, offer option to reset filters:
+	$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3 );
+}
+$block_item_Widget->title = T_('Feedback (Comments, Trackbacks...)');
+$block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Display filters title
 echo $CommentList->get_filter_title( '<h3>', '</h3>', '<br />', NULL, 'htmlbody' );
@@ -83,6 +88,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.9  2010/05/10 14:26:17  efy-asimo
+ * Paged Comments & filtering & add comments listview
+ *
  * Revision 1.8  2010/03/15 17:12:11  efy-asimo
  * Add filters to Comment page
  *

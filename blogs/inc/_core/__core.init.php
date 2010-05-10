@@ -390,7 +390,7 @@ class _core_Module extends Module
 			{	// Comments:
 				$entries['manage']['entries']['comments'] = array(
 						'text' => T_('Comments').'&hellip;',
-						'href' => $admin_url.'?ctrl=comments&amp;blog='.$Blog->ID,
+						'href' => $admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=restore',
 					);
 			}
 
@@ -808,6 +808,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.63  2010/05/10 14:26:17  efy-asimo
+ * Paged Comments & filtering & add comments listview
+ *
  * Revision 1.62  2010/04/23 09:39:44  efy-asimo
  * "SEO setting" for help link and Groups slugs permission implementation
  *

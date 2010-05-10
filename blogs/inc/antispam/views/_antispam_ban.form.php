@@ -29,7 +29,13 @@ global $row_stats;	// for hit functions
 
 $Form = new Form( NULL, 'antispam_ban', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class'=>'action_icon', 'id'=>'close_button' ) );
+$redirect_to = param( 'redirect_to', 'string', NULL );
+if( $redirect_to == NULL )
+{
+	$redirect_to = regenerate_url( 'action' );
+}
+
+$Form->global_icon( T_('Cancel!'), 'close', $redirect_to, '', 3, 2, array( 'class'=>'action_icon', 'id'=>'close_button' ) );
 
 $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 
@@ -205,6 +211,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.18  2010/05/10 14:26:17  efy-asimo
+ * Paged Comments & filtering & add comments listview
+ *
  * Revision 1.17  2010/02/26 08:34:33  efy-asimo
  * dashboard -> ban icon should be javascripted task
  *

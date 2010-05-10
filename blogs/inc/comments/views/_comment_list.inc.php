@@ -52,14 +52,8 @@ while( $Comment = & $CommentList->get_next() )
 			@
 			<span class="bTime"><?php $Comment->time( 'H:i' ); ?></span>
 			<?php
-			if( $Comment->author_url( '', ' &middot; Url: <span class="bUrl">', '</span>' )
-					&& $current_User->check_perm( 'spamblacklist', 'edit' ) )
-			{ // There is an URL and we have permission to ban...
-				// TODO: really ban the base domain! - not by keyword
-				$Comment->deleteurl_link(false);
-				echo ' <a href="'.$dispatcher.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode(get_ban_domain($Comment->author_url))
-					.'&amp;'.url_crumb('antispam').'">'.get_icon( 'ban' ).'</a> ';
-			}
+			$redirect_to = param( 'redirect_to', 'string', NULL, true );
+			$Comment->author_url_with_actions( $redirect_to, false, true );
 			$Comment->author_email( '', ' &middot; Email: <span class="bEmail">', '</span>' );
 			$Comment->author_ip( ' &middot; IP: <span class="bIP">', '</span>' );
 			echo ' &middot; <span class="bKarma">';
@@ -90,8 +84,9 @@ while( $Comment = & $CommentList->get_next() )
 						'class'    => 'permalink_right'
 					) );
 
+				$redirect_to = param( 'redirect_to', 'string', NULL, true );
 				// Display edit button if current user has the rights:
-				$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton');
+				$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton', '&amp;', true, $redirect_to );
 
 				// Display publish NOW button if current user has the rights:
 				$Comment->publish_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', true );
@@ -112,6 +107,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.15  2010/05/10 14:26:17  efy-asimo
+ * Paged Comments & filtering & add comments listview
+ *
  * Revision 1.14  2010/02/28 23:38:39  fplanque
  * minor changes
  *

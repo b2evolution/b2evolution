@@ -870,9 +870,21 @@ function attach_browse_tabs()
 				array(
 						'comments' => array(
 							'text' => T_('Comments'),
-							'href' => $dispatcher.'?ctrl=comments&amp;blog='.$Blog->ID,
+							'href' => $dispatcher.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=restore',
 							),
 					)
+			);
+
+		$AdminUI->add_menu_entries( array('items','comments'), array(
+				'fullview' => array(
+					'text' => T_('Full text view'),
+					'href' => $dispatcher.'?ctrl=comments&amp;tab3=fullview&amp;filter=restore'
+					),
+				'listview' => array(
+					'text' => T_('List view'),
+					'href' => $dispatcher.'?ctrl=comments&amp;tab3=listview&amp;filter=restore'
+					),
+				)
 			);
 	}
 
@@ -1445,6 +1457,9 @@ function echo_set_slug_changed()
 }
 /*
  * $Log$
+ * Revision 1.107  2010/05/10 14:26:17  efy-asimo
+ * Paged Comments & filtering & add comments listview
+ *
  * Revision 1.106  2010/05/02 00:13:28  blueyed
  * urltitle_validate: make it use the current urlname, if invoked via empty urltitle, instead of creating a new one over and over again. See tests.
  *

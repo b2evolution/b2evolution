@@ -415,7 +415,6 @@ class Comment extends DataObject
 	}
 
 
-
 	/**
 	 * Template function: display author of comment
 	 *
@@ -599,6 +598,26 @@ class Comment extends DataObject
 
 
 	/**
+	 * Display author url, delete icon and ban icon if user has proper rights
+	 * @param boolean true to use ajax button
+	 * @param boolean true to check user permission to edit this comment and antispam screen
+	 */
+	function author_url_with_actions( $redirect_to = NULL, $ajax_button = false, $check_perms = true )
+	{
+		global $current_User;
+		if( $this->author_url( '', ' <span &bull; Url: id="commenturl_'.$this->ID.'" <span class="bUrl" >', '</span>' ) )
+		{
+			if( $current_User->check_perm( 'blog_comments', '', false, $this->get_Item()->get_blog_ID() ) )
+			{ // There is an URL and we have permission to edit this comment...
+				$this->deleteurl_link( $redirect_to, $ajax_button, false );
+				$this->banurl_link( $redirect_to, $ajax_button, true );
+			}
+			echo '</span>';
+		}
+	}
+
+
+	/**
 	 * Template function: display spam karma of the comment (in percent)
 	 *
 	 * "%s" gets replaced by the karma value
@@ -659,7 +678,7 @@ class Comment extends DataObject
 
 		echo $before;
 		echo '<a href="'.$admin_url.'?ctrl=comments&amp;action=edit&amp;comment_ID='.$this->ID;
-   	if( $save_context )
+   		if( $save_context )
 		{
 			if( $redirect_to != NULL )
 			{
@@ -682,19 +701,26 @@ class Comment extends DataObject
 	/**
 	 * Display delete icon for deleting author_url if user has proper rights
 	 * @param boolean true if create ajax button
+	 * @param boolean true if need permission check, because it wasn't check before
 	 * @param glue between url params
+	 * @return link on success, false otherwise
 	 */
-	function deleteurl_link( $ajax_button = true, $glue = '&amp;' )
+	function deleteurl_link( $redirect_to, $ajax_button = false, $check_perm = true, $glue = '&amp;' )
 	{
 		global $current_User, $admin_url;
 
 		if( ! is_logged_in() ) return false;
 
-		$this->get_Item();
-		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get_blog_ID() ) )
-		{ // If User has no permission to edit comments:
+		if( $check_perm && ! $current_User->check_perm( 'blog_comments', '', false, $this->get_Item()->get_blog_ID() ) )
+		{ // If current user has no permission to edit comments:
 			return false;
 		}
+
+		if( $redirect_to == NULL )
+		{
+			$redirect_to = regenerate_url( '', '', '', '&' );
+		}
+		$redirect_to = rawurlencode( $redirect_to );
 
 		if( $ajax_button )
 		{
@@ -703,7 +729,45 @@ class Comment extends DataObject
 		else
 		{
 			$url = $admin_url.'?ctrl=comments&amp;action=delete_url&amp;comment_ID='.$this->ID.'&amp;'.url_crumb('comment') ;
-			echo ' <a href="'.$url.$glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ).'"'.get_icon( 'delete' ).'</a>';
+			echo ' <a href="'.$url.$glue.'redirect_to='.$redirect_to.'"'.get_icon( 'delete' ).'</a>';
+		}
+	}
+
+
+	/**
+	 * Display ban icon, which goes to the antispam screen with keyword=author_url
+	 * @param boolean true if create ajax button
+	 * @param boolean true if need permission check, because it wasn't check before
+	 * @param glue between url params
+	 * @return link on success, false otherwise
+	 */
+	function banurl_link( $redirect_to, $ajax_button = false, $check_perm = true, $glue = '&amp;')
+	{
+		global $current_User, $admin_url;
+
+		if( ! is_logged_in() ) return false;
+
+		if( $check_perm && ! $current_User->check_perm( 'spamblacklist', 'edit' ) )
+		{ // if current user has no permission to edit spams
+			return false;
+		}
+
+		if( $redirect_to == NULL )
+		{
+			$redirect_to = regenerate_url( '', '', '', '&' );
+		}
+		$redirect_to = rawurlencode( $redirect_to );
+
+		// TODO: really ban the base domain! - not by keyword
+		$authorurl = rawurlencode(get_ban_domain($this->author_url)); 
+		if( $ajax_button )
+		{
+			echo ' <a id="ban_url" href="javascript:ban_url('.'\''.$authorurl.'\''.');"'.get_icon( 'ban' ).'</a>';
+		}
+		else
+		{
+			echo ' <a href="'.$admin_url.'?ctrl=antispam&amp;action=ban&amp;keyword='.$authorurl
+					.'&amp;redirect_to='.$redirect_to.'&amp;'.url_crumb('antispam').'">'.get_icon( 'ban' ).'</a> ';
 		}
 	}
 
@@ -1556,6 +1620,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.55  2010/05/10 14:26:17  efy-asimo
+ * Paged Comments & filtering & add comments listview
+ *
  * Revision 1.54  2010/03/11 13:10:08  efy-asimo
  * Fix ajax refresh on dashboard
  *

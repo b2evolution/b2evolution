@@ -246,17 +246,7 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 				'star_class'  => 'top',
 			) );
 		$Comment->date();
-		if( $Comment->author_url( '', ' <span &bull; Url: id="commenturl_'.$Comment->ID.'" <span class="bUrl" >', '</span>' ) )
-		{
-			if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
-			{ // There is an URL and we have permission to ban...
-				// TODO: really ban the base domain! - not by keyword
-				$Comment->deleteurl_link();
-				$authorurl = '\''.rawurlencode(get_ban_domain($Comment->author_url)).'\''; 
-				echo ' <a id="ban_url" href="javascript:ban_url('.$authorurl.');"'.get_icon( 'ban' ).'</a>';
-			}
-			echo '</span>';
-		}
+		$Comment->author_url_with_actions( '', true );
 		$Comment->author_email( '', ' &bull; Email: <span class="bEmail">', '</span> &bull; ' );
 		$Comment->author_ip( 'IP: <span class="bIP">', '</span> &bull; ' );
 		$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No Spam Karma') );
@@ -309,6 +299,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.36  2010/05/10 14:26:17  efy-asimo
+ * Paged Comments & filtering & add comments listview
+ *
  * Revision 1.35  2010/03/28 19:27:47  fplanque
  * minor
  *

@@ -555,7 +555,7 @@ if( $blog )
  		echo '<li>'.T_('Browse').':<ul>';
 		echo '<li><a href="'.$dispatcher.'?ctrl=items&tab=full&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (full)').' &raquo;</a></li>';
 		echo '<li><a href="'.$dispatcher.'?ctrl=items&tab=list&filter=restore&blog='.$Blog->ID.'">'.T_('Posts (list)').' &raquo;</a></li>';
-		echo '<li><a href="'.$dispatcher.'?ctrl=comments&amp;blog='.$Blog->ID.'">'.T_('Comments').' &raquo;</a></li>';
+		echo '<li><a href="'.$dispatcher.'?ctrl=comments&amp;filter=restore&amp;blog='.$Blog->ID.'">'.T_('Comments').' &raquo;</a></li>';
 		echo '</ul></li>';
 
 		if( $current_User->check_perm( 'blog_cats', '', false, $Blog->ID ) )
@@ -727,6 +727,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.66  2010/05/10 14:26:17  efy-asimo
+ * Paged Comments & filtering & add comments listview
+ *
  * Revision 1.65  2010/04/16 11:36:54  efy-asimo
  * make the red badge clickable on the dashboard
  *

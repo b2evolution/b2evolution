@@ -79,7 +79,7 @@ switch( $action )
 
 $AdminUI->breadcrumbpath_init();
 $AdminUI->breadcrumbpath_add( T_('Contents'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
-$AdminUI->breadcrumbpath_add( T_('Comments'), '?ctrl=comments&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_add( T_('Comments'), '?ctrl=comments&amp;blog=$blog$&amp;filter=restore' );
 
 $AdminUI->set_path( 'items' );	// Sublevel may be attached below
 
@@ -261,7 +261,7 @@ switch( $action )
 
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_comments', 'edit',
-						array( 'ctrl' => 'comments' ), NULL, '' );
+						array( 'ctrl' => 'comments', 'filter' => 'restore' ), NULL, '' );
 
 		/*
 		 * Add sub menu entries:
@@ -270,6 +270,10 @@ switch( $action )
 		attach_browse_tabs();
 
 		$AdminUI->append_path_level( 'comments' );
+
+		// Set the third level tab
+		param( 'tab3', 'string', 'fullview', true );
+		$AdminUI->set_path( 'items', 'comments', $tab3 );
 
 		/*
 		 * List of comments to display:
@@ -339,7 +343,14 @@ switch( $action )
 		echo '<table class="browse" cellspacing="0" cellpadding="0" border="0"><tr>';
 		echo '<td class="browse_left_col">';
 		// Display VIEW:
-		$AdminUI->disp_view( 'comments/views/_browse_comments.view.php' );
+		if( $tab3 == 'fullview' )
+		{
+			$AdminUI->disp_view( 'comments/views/_browse_comments.view.php' );
+		}
+		else
+		{
+			$AdminUI->disp_view( 'comments/views/_comment_list_table.view.php' );
+		}
 		echo '</td>';
 		
 		echo '<td class="browse_right_col">';
@@ -360,6 +371,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.27  2010/05/10 14:26:17  efy-asimo
+ * Paged Comments & filtering & add comments listview
+ *
  * Revision 1.26  2010/03/30 11:14:01  efy-asimo
  * move comments from one post to another
  *

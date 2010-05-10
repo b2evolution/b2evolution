@@ -37,6 +37,7 @@ global $CommentList;
 
 global $show_statuses, $s, $sentence, $exact;
 global $rating_toshow, $rating_turn, $rating_limit, $url_match, $author_url, $include_emptyurl;
+global $tab3;
 
 load_funcs( 'skins/_skin.funcs.php' );
 
@@ -52,6 +53,7 @@ $Form = new Form( NULL, 'comment_filter_form', 'get', 'none' );
 $Form->begin_form( '' );
 
 	$Form->hidden_ctrl();
+	$Form->hidden( 'tab3', $tab3 );
 	$Form->submit( array( 'submit', T_('Search'), 'search', '', 'float:right' ) );
 
 	echo '<fieldset>';

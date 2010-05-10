@@ -153,7 +153,7 @@ class CommentList2 extends DataObjectList2
 	 * @param array
 	 * @param boolean
 	 */
-	function set_filters( $filters, $memorize = false )
+	function set_filters( $filters, $memorize = true )
 	{
 		if( !empty( $filters ) )
 		{ // Activate the filterset (fallback to default filter when a value is not set):
@@ -239,10 +239,41 @@ class CommentList2 extends DataObjectList2
 	 * @param boolean do we want to use saved filters ?
 	 * @return boolean true if we could apply a filterset based on Request params (either explicit or reloaded)
 	 */
-	function load_from_Request( )
+	function load_from_Request( $use_filters = true )
 	{
 		$this->filters = $this->default_filters;
 
+		if( $use_filters )
+		{
+			// Do we want to restore filters or do we want to create a new filterset
+			$filter_action = param( $this->param_prefix.'filter', 'string', 'save' );
+			switch( $filter_action )
+			{
+				case 'restore':
+					return $this->restore_filterset();
+					/* BREAK */
+
+				case 'reset':
+					// We want to reset the memorized filterset:
+					global $Session;
+					$Session->delete( $this->filterset_name );
+
+					// Memorize global variables:
+					$this->set_filters( array(), true );
+
+					// We have applied no filterset:
+					return false;
+					/* BREAK */
+			}
+
+			/**
+			 * Filter preset
+			 */
+			$this->filters['filter_preset'] = param( $this->param_prefix.'filter_preset', 'string', $this->default_filters['filter_preset'], true );
+
+			// Activate preset default filters if necessary:
+			$this->activate_preset_filters();
+		}
 		/*
 		 * Restrict to selected author:
 		 */
@@ -280,10 +311,16 @@ class CommentList2 extends DataObjectList2
 		// 'limit'
 		$this->filters['comments'] = param( $this->param_prefix.'comments', 'integer', $this->default_filters['comments'], true ); 			// # of units to display on the page
 		$this->limit = $this->filters['comments']; // for compatibility with parent class
+		$this->filters['limit'] = $this->limit;
 
 		// 'paged'
 		$this->filters['page'] = param( $this->page_param, 'integer', 1, true );      // List page number in paged display
 		$this->page = $this->filters['page'];
+
+		if( $use_filters && $filter_action == 'save' )
+		{
+			$this->save_filterset();
+		}
 
 		return ! param_errors_detected();
 	}
@@ -307,6 +344,55 @@ class CommentList2 extends DataObjectList2
 
 		// Save the name of the preset in order for is_filtered() to work properly:
 		$this->default_filters['filter_preset'] = $this->filters['filter_preset'];
+	}
+
+
+	/**
+	 * Save current filterset to session.
+	 */
+	function save_filterset()
+	{
+		/**
+		 * @var Session
+		 */
+		global $Session, $Debuglog;
+
+		$Debuglog->add( 'Saving filterset <strong>'.$this->filterset_name.'</strong>', 'filters' );
+
+		$Session->set( $this->filterset_name, $this->filters );
+	}
+
+
+	/**
+	 * Load previously saved filterset from session.
+	 *
+	 * @return boolean true if we could restore something
+	 */
+	function restore_filterset()
+	{
+	  /**
+	   * @var Session
+	   */
+		global $Session;
+	  /**
+	   * @var Request
+	   */
+
+		global $Debuglog;
+
+		$filters = $Session->get( $this->filterset_name );
+
+		if( empty($filters) )
+		{ // set_filters() expects array
+			$filters = array();
+		}
+
+		$Debuglog->add( 'Restoring filterset <strong>'.$this->filterset_name.'</strong>', 'filters' );
+
+		// Restore filters:
+		$this->set_filters( $filters );
+
+		return true;
 	}
 
 
@@ -463,7 +549,7 @@ class CommentList2 extends DataObjectList2
 			$this->set_filters( $this->default_filters );
 		}
 
-		if( count($this->filters['statuses']) < 3 )
+		if( isset( $this->filters['statuses'] ) && count($this->filters['statuses']) < 3 )
 		{
 			$title_array['statuses'] = T_('Visibility').': '.implode( ', ', $this->filters['statuses'] );
 		}
@@ -517,6 +603,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.23  2010/05/10 14:26:17  efy-asimo
+ * Paged Comments & filtering & add comments listview
+ *
  * Revision 1.22  2010/03/28 19:27:47  fplanque
  * minor
  *
