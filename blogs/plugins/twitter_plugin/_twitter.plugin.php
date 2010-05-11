@@ -137,7 +137,7 @@ class twitter_plugin extends Plugin
 
 		$title =  $params['Item']->dget('title', 'xml');
 		$excerpt =  $params['Item']->dget('excerpt', 'xml');
-		$url = $params['Item']->get_permanent_url();
+		$url = $params['Item']->get_tinyurl();
 
 		$msg = str_replace( '$title$', $title, $msg );
 		$msg = str_replace( '$excerpt$', $excerpt, $msg );
@@ -257,6 +257,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.19  2010/05/11 11:56:31  efy-asimo
+ * twitter plugin use tiny url
+ *
  * Revision 1.18  2010/03/29 19:35:14  blueyed
  * doc/todo
  *

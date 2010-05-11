@@ -4256,17 +4256,17 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get the item tinyurl. If not exists -> create new
+	 * Get the item tinyslug. If not exists -> create new
 	 *
-	 * @return string|boolean tinyurl on success, false otherwise
+	 * @return string|boolean tinyslug on success, false otherwise
 	 */
-	function get_tinyurl()
+	function get_tinyslug()
 	{
-		$tinyurl_ID = $this->tiny_slug_ID;
-		if( $tinyurl_ID != NULL )
-		{ // the tiny url for this item was already created
+		$tinyslug_ID = $this->tiny_slug_ID;
+		if( $tinyslug_ID != NULL )
+		{ // the tiny slug for this item was already created
 			$SlugCache = & get_SlugCache();
-			return $SlugCache->get_by_ID($tinyurl_ID)->get( 'title' );
+			return $SlugCache->get_by_ID($tinyslug_ID)->get( 'title' );
 		}
 		else
 		{ // create new tiny Slug for this item
@@ -4298,6 +4298,19 @@ class Item extends ItemLight
 		}
 	}
 
+	/**
+	 * Get the item tiny url
+	 * @return string the tiny url on success, empty string otherwise
+	 */
+	function get_tinyurl()
+	{
+		if( ( $tinyslug = $this->get_tinyslug() ) == false )
+		{
+			return '';
+		}
+		return url_add_tail( $this->get_Blog()->get( 'url'), '/'.$tinyslug );
+	}
+
 
 	/**
 	 * Create and return the item tinyurl link.
@@ -4313,7 +4326,7 @@ class Item extends ItemLight
 	 */
 	function get_tinyurl_link( $params = array() )
 	{
-		if( ( $tinyurl = $this->get_tinyurl() ) == false )
+		if( ( $tinyslug = $this->get_tinyslug() ) == false )
 		{
 			return '';
 		}
@@ -4339,10 +4352,10 @@ class Item extends ItemLight
 		}
 		if( $params['text'] == '#' )
 		{
-			$params['text'] = $tinyurl;
+			$params['text'] = $tinyslug;
 		}
 
-		$actionurl = url_add_tail( $this->get_Blog()->get( 'url'), '/'.$tinyurl );
+		$actionurl = $this->get_tinyurl();
 
 		$r = $params['before'];
 		$r .= '<a href="'.$actionurl;
@@ -4393,6 +4406,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.200  2010/05/11 11:56:31  efy-asimo
+ * twitter plugin use tiny url
+ *
  * Revision 1.199  2010/05/11 11:20:12  efy-asimo
  * Slugs table view modificaitons
  *
