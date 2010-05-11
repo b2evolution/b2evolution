@@ -833,14 +833,14 @@ class Plugin
 	}
 
 	/**
-	 * Called when a plugin gets called by its @{link $code}.
+	 * Called when a plugin gets called by its {@link $code}.
 	 *
 	 * If you provide this event, b2evolution will assume your plugin
 	 * provides a widget and list it in the "Available widgets" list.
 	 *
 	 * @see $code
 	 * @see Plugins::call_by_code()
-	 * @param array The array passed to @{link Plugins::call_by_code()}.
+	 * @param array The array passed to {@link Plugins::call_by_code()}.
 	 */
 	function SkinTag( & $params )
 	{
@@ -3026,6 +3026,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.40  2010/05/11 16:30:01  blueyed
+ * fix doc
+ *
  * Revision 1.39  2010/05/07 08:07:14  efy-asimo
  * Permissions check update (User tab, Global Settings tab) - bugfix
  *
