@@ -9,25 +9,23 @@
  * (Delete this first paragraph, of course)
  * -----------------------------------------------------------------------------------------
  *
- * This file implements the PLUGIN_NAME plugin for {@link http://b2evolution.net/}.
+ * This file implements the Foo Plugin for {@link http://b2evolution.net/}.
  *
- * @copyright (c)2006 by Your NAME - {@link http://example.com/}.
+ * @copyright (c)2010 by Your NAME - {@link http://example.com/}.
  *
  * @license GNU General Public License 2 (GPL) - http://www.opensource.org/licenses/gpl-license.php
  *
  * @package plugins
  *
- * @author YOUR NAME
- *
- * @version $Id$
+ * @author Your NAME
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
 /**
- * PLUGIN_NAME Plugin
+ * Foo Plugin
  *
- * Some description
+ * Your description
  *
  * @package plugins
  */
@@ -37,7 +35,10 @@ class pluginname_plugin extends Plugin
 	 * Variables below MUST be overriden by plugin implementations,
 	 * either in the subclass declaration or in the subclass constructor.
 	 */
-	var $name = 'PLUGIN_NAME';
+	/**
+	 * Human readable plugin name.
+	 */
+	var $name = 'Plugin Name';
 	/**
 	 * Code, if this is a renderer or pingback plugin.
 	 */
@@ -51,9 +52,7 @@ class pluginname_plugin extends Plugin
 
 
 	/**
-	 * Init
-	 *
-	 * This gets called after a plugin has been registered/instantiated.
+	 * Init: This gets called after a plugin has been registered/instantiated.
 	 */
 	function PluginInit( & $params )
 	{
@@ -67,9 +66,7 @@ class pluginname_plugin extends Plugin
 	 */
 	function GetDefaultSettings()
 	{
-		return array(
-
-			);
+		return array();
 	}
 
 
@@ -78,9 +75,7 @@ class pluginname_plugin extends Plugin
 	 */
 	function GetDefaultUserSettings()
 	{
-		return array(
-
-			);
+		return array();
 	}
 
 
@@ -91,7 +86,5 @@ class pluginname_plugin extends Plugin
 
 	// Add the methods to hook into here...
 	// See http://doc.b2evolution.net/stable/plugins/Plugin.html
-
-
 }
 ?>
