@@ -31,8 +31,8 @@ $AdminUI->set_path( 'tools', 'slugs' );
 param_action( 'list' );
 
 param( 'slug_filter', 'string', '', true );
-param( 'slug_ftype', 'string', NULL, true );
-param( 'slug_fobject', 'integer', NULL, true );
+param( 'slug_item_ID', 'string', '', true );
+// other slug object type IDs come here
 
 if( param( 'slug_ID', 'integer', '', true) )
 {// Load file type:

@@ -270,8 +270,7 @@ while( $Item = & $ItemList->get_item() )
 			global $admin_url;
 			if( $current_User->check_perm( 'slugs', 'view' ) )
 			{ // user has permmission to view slugs
-				echo action_icon( 'Edit slugs...', 'edit',
-					$admin_url.'?ctrl=slugs&amp;slug_ftype=item&amp;slug_fobject='.$Item->ID,
+				echo action_icon( 'Edit slugs...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
 					NULL, NULL, NULL, array( 'class' => 'small', 'style' => 'float: right' ) );
 			}
 
@@ -417,6 +416,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.35  2010/05/11 11:20:13  efy-asimo
+ * Slugs table view modificaitons
+ *
  * Revision 1.34  2010/04/23 09:39:44  efy-asimo
  * "SEO setting" for help link and Groups slugs permission implementation
  *

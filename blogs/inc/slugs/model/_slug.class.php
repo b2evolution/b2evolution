@@ -51,8 +51,8 @@ class Slug extends DataObject
 		parent::DataObject( 'T_slug', 'slug_', 'slug_ID' );
 
 		$this->delete_restrictions = array(
-				array( 'table'=>'T_items__item', 'fk'=>'post_canonical_slug_ID', 'msg'=>T_('%d related post') ),
-				array( 'table'=>'T_items__item', 'fk'=>'post_tiny_slug_ID', 'msg'=>T_('%d related post') ),
+				array( 'table'=>'T_items__item', 'fk'=>'post_canonical_slug_ID', 'fk_short'=>'canonical_slug_ID', 'msg'=>T_('%d related post') ),
+				array( 'table'=>'T_items__item', 'fk'=>'post_tiny_slug_ID', 'fk_short'=>'tiny_slug_ID', 'msg'=>T_('%d related post') ),
 			);
 
 		if( $db_row != NULL )
@@ -140,18 +140,43 @@ class Slug extends DataObject
 
 
 	/**
-	 * Create a link to the related oject (in the admin!).
+	 * Create a link to the related oject.
 	 *
-	 * @todo dh> Please add a method to get the URL only.
-	 * @todo dh> Proxy method to get the "public" URL (for 'item':
-	 *           Item::get_single_url())?
-	 * @return string empty if no related item, or link to related item
+	 * @param string Display text - if NULL, will get the object title
+	 * @param string type values:
+	 * 		- 'admin_view': link to this object admin interface view
+	 * 		- 'public_view': link to this object public interface view (on blog)
+	 * 		- 'edit': link to this object edit screen
+	 * @return string link to related object, or empty if no related object, or url does not exist.
 	 */
-	function get_link_to_object( $fk = 'post_canonical_slug_ID' )
+	function get_link_to_object( $link_text = NULL, $type = 'admin_view' )
 	{
-		if( $object = $this->get_object($fk) )
+		if( $object = $this->get_object() )
 		{
-			return $object->get_edit_link();
+			if( ! isset($link_text ) )
+			{ // link_text is not set -> get object title for link text
+				$link_text = $object->get( 'title' );
+			}
+			// get respective url
+			$link_url = $this->get_url_to_object( $type );
+			if( $link_url != '' )
+			{ // URL exists
+				// add link title
+				if( $type == 'public_view' || $type == 'admin_view' )
+				{
+					$link_title = ' title="'.sprintf( T_('View this %s...'), $this->get( 'type') ).'"';
+				}
+				elseif( $type == 'edit' )
+				{
+					$link_title = ' title="'.sprintf( T_('Edit this %s...'), $this->get( 'type') ).'"';
+				}
+				else
+				{
+					$link_title = '';
+				}
+				// return created link
+				return '<a href="'.$link_url.'"'.$link_title.'>'.$link_text.'</a>';
+			}
 		}
 		return '';
 	}
@@ -160,16 +185,18 @@ class Slug extends DataObject
 	/**
 	 * Create a link to the related oject (in the admin!).
 	 *
-	 * @todo dh> Please add a method to get the URL only.
-	 * @todo dh> Proxy method to get the "public" URL (for 'item':
-	 *           Item::get_single_url())?
-	 * @return string empty if no related item, or link to related item
+	 * @param string type values:
+	 * 		- 'admin_view': url to this item admin interface view
+	 * 		- 'public_view': url to this item public interface view (on blog)
+	 * 		- 'edit': url to this item edit screen
+	 * @return string URL to related object, or empty if no related object or URL does not exist.
 	 */
-	function get_url_to_object( $fk = 'post_canonical_slug_ID' )
+	function get_url_to_object( $type = 'admin_view' )
 	{
-		if( $object = $this->get_object($fk) )
-		{
-			return $object->get_edit_url();
+		if( $object = $this->get_object() )
+		{ // related object exists
+			// asimo> Every slug target class need to have get_url() function
+			return $object->get_url( $type );
 		}
 		return '';
 	}
@@ -185,8 +212,15 @@ class Slug extends DataObject
 	 */
 	function get_restriction_link( $restriction )
 	{
-		$restriction_link = $this->get_link_to_object( /* $restriction['fk'] */ );
-		if( $restriction_link != '' )
+		if( $object = $this->get_object() )
+		{ // object exists
+			// check if this is a restriction for this sulg or not!
+			if( $object->get( $restriction['fk_short'] ) == $this->ID )
+			{
+				$restriction_link = $this->get_link_to_object();
+			}
+		}
+		if( isset( $restriction_link ) )
 		{ // there are restrictions
 			return sprintf( $restriction['msg'].'<br/>'.str_replace('%', '%%', $restriction_link), 1 );
 		}
@@ -199,7 +233,7 @@ class Slug extends DataObject
 	 * Get linked object.
 	 * @return object
 	 */
-	function get_object( /* $fk = 'post_canonical_slug_ID' */ )
+	function get_object()
 	{
 		global $DB, $admin_url;
 

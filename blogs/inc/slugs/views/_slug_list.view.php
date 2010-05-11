@@ -29,6 +29,7 @@ $SQL = new SQL();
 $SQL->SELECT( '*, post_title AS target_title' ); // select target_title for sorting
 $SQL->FROM( 'T_slug LEFT OUTER JOIN T_items__item ON slug_itm_ID = post_ID' );
 
+// filters
 if( get_param( 'slug_filter' ) )
 { // add slug_title filter
 	$like = $DB->quote('%'.strtolower(get_param('slug_filter')).'%');
@@ -36,18 +37,16 @@ if( get_param( 'slug_filter' ) )
 		LOWER(slug_title) LIKE $like
 		OR LOWER(post_title) LIKE $like)" );
 }
-switch( get_param( 'slug_ftype' ) )
+if( $filter_type = get_param( 'slug_type' ) )
 { // add filter for item type
-	case 'item':
-		if( get_param( 'slug_fobject') )
-		{ // add item object filter
-			$SQL->WHERE_and( 'slug_itm_ID = '.get_param( 'slug_fobject' ) );
-		}
-		else
-		{
-			$SQL->WHERE_and( 'slug_type = '.get_param( 'slug_ftype' ) );
-		}
-	break;
+	$SQL->WHERE_and( 'slug_type = '.get_param( 'slug_ftype' ) );
+}
+if( $filter_item_ID = get_param( 'slug_item_ID' ) )
+{ // add filter for item ID
+	if( is_number( $filter_item_ID ) )
+	{
+		$SQL->WHERE_and( 'slug_itm_ID = '.$filter_item_ID );
+	}
 }
 
 // Create result set:
@@ -63,7 +62,17 @@ $Results->Cache = get_SlugCache();
  */
 function filter_slugs( & $Form )
 {
-	$Form->text_input( 'slug_filter', get_param('slug_filter'), 40, T_('Slug'), '', array( 'maxlength'=>253 ) );
+	$Form->text_input( 'slug_filter', get_param('slug_filter'), 24, T_('Slug'), '', array( 'maxlength' => 253 ) );
+
+	$item_ID_filter_note = '';
+	if( $filter_item_ID = get_param( 'slug_item_ID' ) )
+	{ // check item_Id filter. It must be a number
+		if( ! is_number( $filter_item_ID ) )
+		{ // It is not a number
+			$item_ID_filter_note = T_('Must be a number');
+		}
+	}
+	$Form->text_input( 'slug_item_ID', $filter_item_ID, 9, T_('Item ID'), $item_ID_filter_note, array( 'maxlength' => 9 ) );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_slugs',
@@ -73,12 +82,24 @@ $Results->filter_area = array(
 		)
 	);
 
+function get_slug_link( $Slug )
+{
+	global $current_User;
+	if( $current_User->check_perm( 'slugs', 'edit') )
+	{
+		return '<strong><a href="admin.php?ctrl=slugs&amp;slug_ID='.$Slug->ID.'&amp;action=edit">'.$Slug->get('title').'</a></strong>';
+	}
+	else
+	{
+		return '<strong>'.$Slug->get('title').'</strong>';
+	}
+}
 $Results->cols[] = array(
-			'th' => T_('Slug title'),
+			'th' => T_('Slug'),
 			'th_class' => 'small',
 			'td_class' => 'small',
 			'order' => 'slug_title',
-			'td' => '$slug_title$',
+			'td' => '%get_slug_link({Obj})%',
 		);
 
 $Results->cols[] = array(
@@ -98,21 +119,50 @@ $Results->cols[] = array(
  * @param Slug Slug object
  * @return string target link if exists, target title otherwise
  */
-function get_target_link( $Slug )
+function get_target_coll( $Slug )
 {
+	global $current_User;
 	$target = $Slug->get_object();
 	if( ! $target )
 	{ // e.g. for "help"
 		return '';
 	}
-	return '<a href="'.$target->get_edit_url().'">'.$target->dget('title').'</a>';
+
+	$allow_edit = false;
+	$allow_view = false;
+	switch( $Slug->get( 'type') )
+	{
+		case 'item':
+			$allow_edit = $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $target );
+			$allow_view = $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $target );
+			break;
+		// Other types permission check write here
+	}
+	if( $allow_view )
+	{ // view object link
+		$coll = $Slug->get_link_to_object();
+	}
+	else
+	{ // Display just the title (If there is no object title need to change this)
+		$coll = $target->get( 'title' );
+	}
+
+	if( $allow_edit )
+	{ // edit object link
+		$coll .= ' '.action_icon( sprintf( T_('Edit this %s...'), $Slug->get( 'type' ) ), 
+					'properties', $Slug->get_url_to_object( 'edit' ) );
+	}
+
+	// permanent link to object
+	$coll .= ' '.action_icon( T_('Permanent link to full entry'), 'permalink', $Slug->get_url_to_object( 'public_view' ) );
+	return $coll;//'<a href="'.$target->get_single_url().'">'.$target->dget('title').'</a>';
 }
 $Results->cols[] = array(
 			'th' => T_('Target'),
 			'th_class' => 'small',
 			'order' => 'target_title',
-			'td' => '%get_target_link({Obj})%',
-			'td_class' => 'small center',
+			'td' => '%get_target_coll({Obj})%',
+			'td_class' => 'small left',
 		);
 
 if( $current_User->check_perm( 'slugs', 'edit' ) )

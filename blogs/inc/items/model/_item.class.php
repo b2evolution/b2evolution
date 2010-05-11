@@ -4356,18 +4356,46 @@ class Item extends ItemLight
 	}
 
 
-	/*
+	/**
 	 * Display the item tinyurl link
 	 */
 	function tinyurl_link( $params = array() )
 	{
 		echo $this->get_tinyurl_link( $params );
 	}
+
+
+	/**
+	 * Get an url to this item
+	 * @param string values:
+	 * 		- 'admin_view': url to this item admin interface view
+	 * 		- 'public_view': url to this item public interface view (permanent url)
+	 * 		- 'edit': url to this item edit screen
+	 * @return string the url if exists, empty string otherwise
+	 */
+	function get_url( $type )
+	{
+		global $admin_url;
+		switch( $type )
+		{
+			case 'admin_view':
+				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID;
+			case 'public_view':
+				return $this->get_permanent_url();
+			case 'edit':
+				return $this->get_edit_url();
+			default:
+				return '';
+		}
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.199  2010/05/11 11:20:12  efy-asimo
+ * Slugs table view modificaitons
+ *
  * Revision 1.198  2010/05/02 00:12:52  blueyed
  * Fix missing curly brace.
  *
