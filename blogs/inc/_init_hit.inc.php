@@ -129,8 +129,11 @@ $default_locale = locale_from_httpaccept(); // set default locale by autodetect
 $Debuglog->add( 'Login: default_locale from HTTP_ACCEPT: '.$default_locale, 'locale' );
 
 load_funcs('_core/_param.funcs.php');
+
+// $locale_from_get: USE CASE: allow overriding the locale via GET param, e.g. for tests.
 if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
 {
+	$locale_from_get = str_replace('_', '-', $locale_from_get);
 	if( $locale_from_get != $default_locale )
 	{
 		if( isset( $locales[$locale_from_get] ) )
@@ -149,10 +152,6 @@ if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
 		$Debuglog->add('$locale_from_get == $default_locale ('.$locale_from_get.').', 'locale');
 	}
 
-/* fp> what's a use case for this?
- * dh> well. When we redirect, it's lost. So why do you have commented out this only?
- *     USE CASE: override locale via GET param. I'm using this to quickly get the orig string for a translation to search for.
- */
 	if( $locale_from_get )
 	{ // locale from GET being used. It should not get overridden below.
 		$redir = 'no'; // do not redirect to canonical URL
@@ -221,6 +220,9 @@ $Timer->pause( '_init_hit' );
 
 /*
  * $Log$
+ * Revision 1.5  2010/05/13 18:52:04  blueyed
+ * doc
+ *
  * Revision 1.4  2010/04/19 17:00:13  blueyed
  * Make locale_from_get work again.
  *
