@@ -69,7 +69,9 @@ class ComponentWidget extends DataObject
 	var $disp_params = NULL;
 
 	/**
-	 * Lazy instantiated
+	 * Lazy instantiated.
+	 *
+	 * This gets set/used for widget plugins (those that hook into SkinTag).
 	 * (false if this Widget is not handled by a Plugin)
 	 * @see get_Plugin()
 	 * @var Plugin
@@ -108,26 +110,17 @@ class ComponentWidget extends DataObject
 
 
 	/**
-	 * Get ref to Plugin handling this Widget
+	 * Get ref to the Plugin handling this Widget.
 	 *
 	 * @return Plugin
 	 */
 	function & get_Plugin()
 	{
-		global $Plugins;
-
 		if( is_null( $this->Plugin ) )
 		{
-			if( $this->type != 'plugin' )
-			{
-				$this->Plugin = false;
-			}
-			else
-			{
-				$this->Plugin = & $Plugins->get_by_code( $this->code );
-			}
+			global $Plugins;
+			$this->Plugin = $this->type == 'plugin' ? $Plugins->get_by_code( $this->code ) : false;
 		}
-
 		return $this->Plugin;
 	}
 
@@ -180,7 +173,8 @@ class ComponentWidget extends DataObject
 
 
 	/**
-	 * Get a clean description to display in the widget list
+	 * Get a clean description to display in the widget list.
+	 * @return string
 	 */
 	function get_desc_for_list()
 	{
@@ -224,10 +218,10 @@ class ComponentWidget extends DataObject
 
 
 	/**
-	 * Get definitions for editable params
+	 * Get definitions for editable params.
 	 *
 	 * @see Plugin::GetDefaultSettings()
-	 * @param local params like 'for_editing' => true
+	 * @param array Local params like 'for_editing' => true
 	 */
 	function get_param_definitions( $params )
 	{
@@ -257,7 +251,7 @@ class ComponentWidget extends DataObject
 
 
 	/**
-	 * Load param array
+	 * Load param array.
 	 */
 	function load_param_array()
 	{
@@ -274,8 +268,9 @@ class ComponentWidget extends DataObject
 
 
 	/**
- 	 * param value
- 	 *
+ 	 * Get param value.
+ 	 * @param string
+ 	 * @return mixed
 	 */
 	function get_param( $parname )
 	{
@@ -528,7 +523,7 @@ class ComponentWidget extends DataObject
 	 * fp> I'm not sur if this param should be overridable by widgets themselves (priority problem)
 	 * Maybe an "auto" setting.
 	 *
-	 * @protected
+	 * @access protected
 	 */
 	function disp_title( $title = NULL )
 	{
@@ -701,6 +696,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.77  2010/05/13 19:13:10  blueyed
+ * doc
+ *
  * Revision 1.76  2010/04/22 22:36:00  blueyed
  * doc/todo
  *
