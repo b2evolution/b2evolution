@@ -50,6 +50,11 @@ class pluginname_plugin extends Plugin
 
 	var $apply_rendering = 'opt-in';
 
+	/**
+	 * Group of the plugin, e.g. "widget", "rendering", "antispam"
+	 */
+	var $group;
+
 
 	/**
 	 * Init: This gets called after a plugin has been registered/instantiated.
@@ -74,6 +79,19 @@ class pluginname_plugin extends Plugin
 	 * Define user settings that the plugin uses/provides.
 	 */
 	function GetDefaultUserSettings()
+	{
+		return array();
+	}
+
+
+	/**
+	 * Param definitions when added as a widget.
+	 *
+	 * Plugins used as widget need to implement the SkinTag hook.
+	 *
+	 * @return array
+	 */
+	function get_widget_param_definitions( $params )
 	{
 		return array();
 	}
