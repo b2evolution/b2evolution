@@ -38,7 +38,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 
 // DEBUG: (Turn switch on or off to log debug info for specified category)
-$GLOBALS['debug_locale'] = false;
+$GLOBALS['debug_locale'] = true;
 
 
 // LOCALIZATION:
@@ -1095,6 +1095,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.41  2010/05/13 19:09:08  blueyed
+ * debug_locale=true
+ *
  * Revision 1.40  2010/02/08 17:53:23  efy-yury
  * copyright 2009 -> 2010
  *
