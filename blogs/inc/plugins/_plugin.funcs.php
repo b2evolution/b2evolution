@@ -245,7 +245,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 		case 'select':
 			$params['force_keys_as_values'] = true; // so that numeric keys get used as values! autoform_validate_param_value() checks for the keys only.
-			$Form->select_input_array( $input_name, $set_value, $parmeta['options'], $set_label, $parmeta['note'], $params );
+			$Form->select_input_array( $input_name, $set_value, $parmeta['options'], $set_label, isset($parmeta['note']) ? $parmeta['note'] : NULL, $params );
 			break;
 
 		case 'select_blog':
@@ -267,7 +267,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			}
 			$Form->select_input_object( $input_name, $set_value, $UserCache, $set_label, $params );
 			break;
-			
+
 		case 'radio':
 			if( ! isset($parmeta['field_lines']) )
 			{
@@ -834,9 +834,9 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 					return false;
 				}
 				break;
-				
+
 			case 'radio':
-				$check_value = false;							
+				$check_value = false;
 				foreach($meta['options'] as $arr)
 				{
 					if( ! is_array($arr) )
@@ -1053,6 +1053,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /*
  * $Log$
+ * Revision 1.18  2010/05/13 15:13:13  blueyed
+ * Fix E_NOTICE with empty/optional 'note' entry in 'select' entries.
+ *
  * Revision 1.17  2010/02/08 17:53:23  efy-yury
  * copyright 2009 -> 2010
  *
