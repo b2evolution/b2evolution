@@ -2719,6 +2719,13 @@ function upgrade_b2evo_tables()
 	             WHERE grp_ID = 1' );
 	task_end();
 
+	task_begin( 'Upgrading settings table... ');
+	$DB->query( 'UPDATE T_settings
+	             SET set_value = 1
+	             WHERE set_name = "fm_enable_roots_user"
+	             AND set_value = 0' );
+	task_end();
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -2893,6 +2900,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.367  2010/05/13 05:52:00  efy-asimo
+ * upgrade "'fm_enable_roots_user' => '1',"
+ *
  * Revision 1.366  2010/05/02 16:10:40  fplanque
  * minor
  *
