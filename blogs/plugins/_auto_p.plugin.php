@@ -141,10 +141,8 @@ class auto_p_plugin extends Plugin
 
 			$text_after_tag = substr( $text, strlen($match[0]) );
 
-
-			if( empty($match[4]) || strpos($match[4], '/') === false )
-			{ // No self-closing tag: handle text in tag:
-				// Opening tag:
+			if( empty($match[4]) || substr(rtrim($match[4]), -1) != '/' )
+			{ // Opening tag (and not self-closing): handle text in tag:
 				$new_text .= $match[2];
 
 				// Find closing tag:
@@ -635,6 +633,9 @@ class auto_p_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.45  2010/05/13 02:45:16  blueyed
+ * Fix Auto-P plugin for block tags containing a slash, e.g. with SCRIPT@type
+ *
  * Revision 1.44  2009/08/01 19:09:47  blueyed
  * auto_p_plugin: BR not allowed in DL, but DD AND DT. Add test.
  *

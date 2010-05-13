@@ -325,6 +325,9 @@ class AutoPPluginTestCase extends EvoPluginUnitTestCase
 		$this->assertEqual(
 			"<p>foo</p>\n\n<script>\n\n</script>\n\n<p>bar</p>",
 			$this->render("foo\n\n<script>\n\n</script>\n\nbar") );
+		$this->assertEqual(
+			"<p>foo</p>\n\n<script type='text/javascript'>\n\n</script>\n\n<p>bar</p>",
+			$this->render("foo\n\n<script type='text/javascript'>\n\n</script>\n\nbar") );
 
 		// Do not add BR in html comments, nor wrap it in a P:
 		$this->assertEqual(
