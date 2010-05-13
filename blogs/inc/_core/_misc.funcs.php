@@ -384,7 +384,7 @@ function zeroise( $number, $threshold )
  * @param int Maximum length
  * @param string Tail to use, when string gets cropped. Its length gets
  *               substracted from the total length (with HTML entities
- *               being decoded)
+ *               being decoded). Default is "&hellip;" (HTML entity)
  * @param string Format, see {@link format_to_output()}
  * @return string
  */
@@ -3993,6 +3993,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.231  2010/05/13 15:12:03  blueyed
+ * doc
+ *
  * Revision 1.230  2010/05/02 19:04:28  fplanque
  * no message
  *

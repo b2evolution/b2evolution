@@ -200,7 +200,8 @@ class Item extends ItemLight
 	 * Array of tags (strings)
 	 *
 	 * Lazy loaded.
-	 *
+	 * @see Item::get_tags()
+	 * @access protected
 	 * @var array
 	 */
 	var $tags = NULL;
@@ -1068,6 +1069,7 @@ class Item extends ItemLight
 	 * Note: Excerpt and Teaser are TWO DIFFERENT THINGS.
 	 *
 	 * @param int Max length of excerpt
+	 * @return string
 	 */
 	function get_content_excerpt( $crop_at = 200 )
 	{
@@ -4406,6 +4408,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.201  2010/05/13 15:15:49  blueyed
+ * doc
+ *
  * Revision 1.200  2010/05/11 11:56:31  efy-asimo
  * twitter plugin use tiny url
  *

@@ -54,7 +54,7 @@ class Plugin
 	/**
 	 * Default plugin name as it will appear in lists.
 	 *
-	 * To make it available for translations set it in the constructor by
+	 * To make it available for translation set it in the constructor by
 	 * using the {@link Plugin::T_()} function.
 	 *
 	 * This should be no longer than 50 characters.
@@ -504,7 +504,7 @@ class Plugin
    * Get definitions for widget specific editable params
    *
 	 * @see Plugin::GetDefaultSettings()
-	 * @param local params like 'for_editing' => true
+	 * @param array Local params like 'for_editing' => true
 	 */
 	function get_widget_param_definitions( $params )
 	{
@@ -3026,6 +3026,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.41  2010/05/13 15:12:04  blueyed
+ * doc
+ *
  * Revision 1.40  2010/05/11 16:30:01  blueyed
  * fix doc
  *
