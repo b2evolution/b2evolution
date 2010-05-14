@@ -1044,22 +1044,19 @@ function prune_page_cache()
 
 	foreach( $cache_content as $file_path )
 	{
-		//get file name from path
-		$last_dir_pos = strrpos(  $file_path, '/' );
-		if( ( $last_dir_pos == 0 ) || ( $last_dir_pos >= strlen( $file_path ) ) )
-		{ // This error can happen, only if get_filenames function doesn't work right
-			return T_('Could not get the files from cache folder.');
-		}
-		$file_name = substr( $file_path, ( $last_dir_pos + 1 ) );
+		// get file name from path
+		$file_name = basename($file_path);
 
+		// TODO: use a positive list instead - if possible? Otherwise maybe exclude index.* at least.
 		if( $file_name != 'index.html' && substr( $file_name, 0, 1 ) != '.' )
 		{ // this file is not an index.html and it is not hidden
 			$datediff = $localtimenow - filemtime( $file_path );
-			if( $datediff > 60/*86400*//* 60*60*24 = 24 hour*/)
-			{ // older then 24 hours
+			if( $datediff > 86400 /* 60*60*24 = 24 hour*/)
+			{ // older than 24 hours
+				// TODO: I think errors should not get suppressed - would show up in error log / cron mail, but that's good IMHO
 				if( ! @unlink( $file_path ) )
-				{ // delete the file
-					$error = error_get_last();
+				{ // deleting the file failed: return error
+					$error = error_get_last(); // XXX: requires PHP 5.2
 					return $error['message'];
 				}
 			}
@@ -1072,6 +1069,9 @@ function prune_page_cache()
 
 /*
  * $Log$
+ * Revision 1.43  2010/05/14 21:56:49  blueyed
+ * Fix/doc/todo prune_page_cache.
+ *
  * Revision 1.42  2010/05/14 07:40:15  efy-asimo
  * prune page cache - task
  *
