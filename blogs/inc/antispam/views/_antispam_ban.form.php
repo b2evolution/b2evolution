@@ -101,63 +101,45 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	}
 
 	// Check for potentially affected comments:
-	$sql = 'SELECT comment_ID, comment_date, comment_author, comment_author_url,
-									comment_author_IP, comment_content
-						FROM T_comments
-					 WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
-								 OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
-							 	 OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
-    				   	 OR comment_content LIKE '.$DB->quote('%'.$keyword.'%').'
-					 ORDER BY comment_date ASC
-					 LIMIT 500';
-	$res_affected_comments = $DB->get_results( $sql, ARRAY_A, 'Find matching comments' );
+	$sql = 'SELECT * FROM T_comments
+			 WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
+				 OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
+			 	 OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
+    		   	 OR comment_content LIKE '.$DB->quote('%'.$keyword.'%').'
+			 ORDER BY comment_date ASC
+			 LIMIT 500';
+	$res_affected_comments = $DB->get_results( $sql, OBJECT, 'Find matching comments' );
 	if( $DB->num_rows == 0 )
 	{ // No matching hits.
 		printf( '<p><strong>'.T_('No comments match the keyword [%s].').'</strong></p>', htmlspecialchars($keyword) );
 	}
 	else
-	{
-	?>
-		<p>
-			<input type="checkbox" name="delcomments" id="delcomments_cb" value="1" checked="checked" />
-			<label for="delcomments_cb">
-			<strong><?php printf ( T_('Delete the following %s comments:'), $DB->num_rows == 500 ? '500+' : $DB->num_rows ) ?></strong>
-			</label>
-		</p>
-		<table class="grouped" cellspacing="0">
-			<thead>
-			<tr>
-				<th class="firstcol"><?php echo T_('Date') ?></th>
-				<th><?php echo T_('Author') ?></th>
-				<th><?php echo T_('Auth. URL') ?></th>
-				<th><?php echo T_('Auth. IP') ?></th>
-				<th><?php echo T_('Content starts with...') ?></th>
-				<th><?php echo T_('Action') ?></th>
-			</tr>
-			</thead>
-			<tbody>
-			<?php
-			$count = 0;
-			foreach( $res_affected_comments as $row_stats )
-			{ // TODO: new Comment( $row_stats )
-				?>
-				<tr class="<?php echo ($count%2 == 1) ? 'odd' : 'even' ?>">
-				<td class="firstcol"><?php echo mysql2date(locale_datefmt().' '.locale_timefmt(), $row_stats['comment_date'] ); ?></td>
-				<td><?php echo $row_stats['comment_author'] ?></td>
-				<td><?php disp_url( $row_stats['comment_author_url'], 50 ); ?></td>
-				<td><?php echo $row_stats['comment_author_IP'] ?></td>
-				<td><?php
-				$comment_content = strip_tags( $row_stats['comment_content'] );
-				echo strmaxlen($comment_content, 71);
-				?></td>
-				<td><?php echo action_icon( T_('Edit...'), 'edit', '?ctrl=comments&amp;action=edit&amp;comment_ID='.$row_stats['comment_ID'] ) ?></td>
-				</tr>
-				<?php
-			$count++;
-			} ?>
-			</tbody>
-		</table>
-	<?php
+	{ // creat comment arrays
+		$draft_comments = array();
+		$published_comments = array();
+		$deprecated_comments = array();
+		foreach( $res_affected_comments as $row_stats )
+		{ // select comments
+			$affected_Comment = new Comment($row_stats);
+			switch( $affected_Comment->get( 'status' ) )
+			{
+				case 'draft':
+					$draft_comments[] = $affected_Comment;
+					break;
+				case 'published':
+					$published_comments[] = $affected_Comment;
+					break;
+				case 'deprecated':
+					$deprecated_comments[] = $affected_Comment;
+					break;
+				default:
+					debug_die( 'Invalid comment status' );
+			}
+		}
+		// show comments
+		echo_affected_comments( $draft_comments, 'draft', $keyword );
+		echo_affected_comments( $published_comments, 'published', $keyword );
+		echo_affected_comments( $deprecated_comments, 'deprecated', $keyword );
 	}
 
 	// Check if the string is already in the blacklist:
@@ -211,6 +193,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.19  2010/05/14 08:16:04  efy-asimo
+ * antispam tool ban form - create seperate table for different comments
+ *
  * Revision 1.18  2010/05/10 14:26:17  efy-asimo
  * Paged Comments & filtering & add comments listview
  *

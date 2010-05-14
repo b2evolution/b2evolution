@@ -335,8 +335,62 @@ function get_ban_domain( $url )
 }
 
 
+/**
+ * Show affected comments
+ * 
+ * @param array affected Comment list, all comments in this list must have the same status
+ * @param string Comment visibility status in this list
+ * @param string ban keyword
+ */
+function echo_affected_comments( $affected_comments, $status, $keyword )
+{
+	$num_comments = count( $affected_comments );
+	if( $num_comments == 0 )
+	{
+		printf( '<p><strong>'.T_('No %s comments match the keyword [%s].').'</strong></p>', $status, htmlspecialchars($keyword) );
+		return;
+	}
+
+	echo '<p>';
+	echo '<input type="checkbox" name="del'.$status.'" id="del'.$status.'_cb" value="1" checked="checked" />';
+	echo '<label for="del'.$status.'_cb">';
+	echo sprintf ( T_('Delete the following %s %s comments:'), $num_comments == 500 ? '500+' : $num_comments, '<strong>'.$status.'</strong>' );
+	echo '</label>';
+	echo '</p>';
+
+	echo '<table class="grouped" cellspacing="0">';
+	echo '<thead><tr>';
+	echo '<th class="firstcol">'.T_('Date').'</th>';
+	echo '<th>'.T_('Author').'</th>';
+	echo '<th>'.T_('Auth. URL').'</th>';
+	echo '<th>'.T_('Auth. IP').'</th>';
+	echo '<th>'.T_('Content starts with...').'</th>';
+	echo '<th>'.T_('Action').'</th>';
+	echo '</tr></thead>';
+	$count = 0;
+	foreach( $affected_comments as $Comment )
+	{
+		echo '<tr class="'.(($count%2 == 1) ? 'odd' : 'even').'">';
+		echo '<td class="firstcol">'.mysql2date(locale_datefmt().' '.locale_timefmt(), $Comment->get( 'date' ) ).'</td>';
+		echo '<td>'.$Comment->get_author_name().'</td>';
+		echo '<td>';
+		disp_url( $Comment->get_author_url(), 50 );
+		echo '</td>';
+		echo '<td>'.$Comment->get_author_ip().'</td>';
+		echo '<td>'.strmaxlen(strip_tags( $Comment->get_content() ), 71).'</td>';
+		echo '<td>'.action_icon( T_('Edit...'), 'edit', '?ctrl=comments&amp;action=edit&amp;comment_ID='.$Comment->ID ).'</td>';
+		echo '</tr>';
+		$count++;
+	}
+	echo "</tbody></table>";
+}
+
+
 /*
  * $Log$
+ * Revision 1.11  2010/05/14 08:16:04  efy-asimo
+ * antispam tool ban form - create seperate table for different comments
+ *
  * Revision 1.10  2010/02/08 17:52:06  efy-yury
  * copyright 2009 -> 2010
  *

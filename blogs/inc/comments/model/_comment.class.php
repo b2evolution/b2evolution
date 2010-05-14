@@ -346,6 +346,19 @@ class Comment extends DataObject
 	}
 
 
+	function get_author_ip()
+	{
+		if( $this->get_author_User() )
+		{ // Author is a user
+			return $this->author_User->get('ip');
+		}
+		else
+		{
+			return $this->author_IP;
+		}
+	}
+
+
 	/**
 	 * Template function: display the avatar of the comment's author.
 	 *
@@ -759,7 +772,8 @@ class Comment extends DataObject
 		$redirect_to = rawurlencode( $redirect_to );
 
 		// TODO: really ban the base domain! - not by keyword
-		$authorurl = rawurlencode(get_ban_domain($this->author_url)); 
+		$authorurl = rawurlencode(get_ban_domain($this->get_author_url()));
+
 		if( $ajax_button )
 		{
 			echo ' <a id="ban_url" href="javascript:ban_url('.'\''.$authorurl.'\''.');"'.get_icon( 'ban' ).'</a>';
@@ -1620,6 +1634,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.56  2010/05/14 08:16:04  efy-asimo
+ * antispam tool ban form - create seperate table for different comments
+ *
  * Revision 1.55  2010/05/10 14:26:17  efy-asimo
  * Paged Comments & filtering & add comments listview
  *

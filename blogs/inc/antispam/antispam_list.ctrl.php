@@ -70,7 +70,9 @@ switch( $action )
 
 		$keyword = evo_substr( $keyword, 0, 80 );
 		param( 'delhits', 'integer', 0 );
-		param( 'delcomments', 'integer', 0 );
+		param( 'deldraft', 'integer', 0 );
+		param( 'delpublished', 'integer', 0 );
+		param( 'deldeprecated', 'integer', 0 );
 		param( 'blacklist_locally', 'integer', 0 );
 		param( 'report', 'integer', 0 );
 
@@ -91,24 +93,44 @@ switch( $action )
 			$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'success' );
 		}
 
+		$delcomments = $deldraft || $delpublished || $deldeprecated;
 		if( $delcomments )
-		{ // Then all banned comments
+		{ // Then selected banned comments
+			$del_condition = '';
+			if( ! ( $deldraft && $delpublished && $deldeprecated ) )
+			{
+				$del_condition = ' AND (';
+				$or = '';
+				if( $deldraft )
+				{
+					$del_condition .= 'comment_status = "draft"';
+					$or = ' OR ';
+				}
+				if( $delpublished )
+				{
+					$del_condition .= $or.'comment_status = "published"';
+					$or = ' OR ';
+				}
+				if( $deldeprecated )
+				{
+					$del_condition .= $or.'comment_status = "deprecated"';
+				}
+				$del_condition .= ')';
+			}
+			$keyword_cond = '(comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
+							OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
+							OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
+							OR comment_content LIKE '.$DB->quote('%'.$keyword.'%').')';
 			// asimo> we don't need transaction here 
 			if( $display_mode == 'js' )
 			{
 				$query = 'SELECT comment_ID FROM T_comments
-							  WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
-							   OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
-							   OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
-							   OR comment_content LIKE '.$DB->quote('%'.$keyword.'%');
+							  WHERE '.$keyword_cond.$del_condition;
 				$deleted_ids = implode( ',', $DB->get_col($query, 0, 'Get comment ids awaiting for delete') );
 			};
 			// asimo> If a comment whith this keyword content was inserted here, the user will not even observe that (This is good)
 			$r = $DB->query('DELETE FROM T_comments
-			                  WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
-			                     OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
-			                     OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
-			                     OR comment_content LIKE '.$DB->quote('%'.$keyword.'%') );
+			                  WHERE '.$keyword_cond.$del_condition );
 			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars($keyword) ), 'success' );
 		}
 
@@ -133,7 +155,7 @@ switch( $action )
 		{ // Report this keyword as abuse:
 			antispam_report_abuse( $keyword );
 		}
-		
+
 		param( 'request', 'string', '' );
 		if( $display_mode == 'js' && $request != 'checkban' )
 		{
@@ -235,6 +257,9 @@ if( $display_mode != 'js')
 
 /*
  * $Log$
+ * Revision 1.17  2010/05/14 08:16:04  efy-asimo
+ * antispam tool ban form - create seperate table for different comments
+ *
  * Revision 1.16  2010/03/05 09:22:25  efy-asimo
  * modify refresh comments visual effect on dashboard
  *
