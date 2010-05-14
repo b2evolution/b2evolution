@@ -60,6 +60,7 @@ if( $action == 'new' || $action == 'create' )
 			'error' => T_('Error test job'),
 			'anstispam_poll' => T_('Poll the antispam blacklist'),
 			'prune_hits_sessions' => T_('Prune old hits & sessions'),
+			'prune_page_cache' => T_('Prune old files from page cache'),
 			// post notifications, not user schedulable
 		);
 	$cron_job_params = array(
@@ -74,6 +75,9 @@ if( $action == 'new' || $action == 'create' )
 				'params' => NULL ),
 			'prune_hits_sessions' => array(
 				'ctrl' => 'cron/jobs/_prune_hits_sessions.job.php',
+				'params' => NULL ),
+			'prune_page_cache' => array(
+				'ctrl' => 'cron/jobs/_prune_page_cache.job.php',
 				'params' => NULL ),
 			// post notifications, not user schedulable
 		);
@@ -292,6 +296,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2010/05/14 07:40:15  efy-asimo
+ * prune page cache - task
+ *
  * Revision 1.11  2010/02/08 17:52:13  efy-yury
  * copyright 2009 -> 2010
  *
