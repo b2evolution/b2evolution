@@ -77,6 +77,14 @@ class UrlFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual(
 			url_rel_to_same_host('//hostA/bar', '//hostB/baz'),
 			'//hostA/bar' );
+
+		$this->assertEqual(
+			url_rel_to_same_host('http://host/?query#fragment', 'http://host/'),
+			'/?query#fragment' );
+
+		$this->assertEqual(
+			url_rel_to_same_host('http://host/0?0#0', 'http://host/'),
+			'/0?0#0' );
 	}
 
 

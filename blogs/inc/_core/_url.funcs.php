@@ -658,12 +658,12 @@ function url_rel_to_same_host( $url, $target_url )
 
 	// We can make the URL relative:
 	$r = '';
-	if( ! empty($parsed_url['path']) )
+	if( isset($parsed_url['path']) && strlen($parsed_url['path']) )
 		$r .= $parsed_url['path'];
-	if( ! empty($parsed_url['query']) )
+	if( isset($parsed_url['query']) && strlen($parsed_url['query']) )
 		$r .= '?'.$parsed_url['query'];
-	if( ! empty($parsed_url['fragment']) )
-		$r .= '?'.$parsed_url['fragment'];
+	if( isset($parsed_url['fragment']) && strlen($parsed_url['fragment']) )
+		$r .= '#'.$parsed_url['fragment'];
 
 	return $r;
 }
@@ -822,6 +822,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.51  2010/05/15 21:12:04  blueyed
+ * Fix url_rel_to_same_host for both '0' as path, query or fragment, and the fragment itself ('#' instead of '?').
+ *
  * Revision 1.50  2010/04/08 18:28:02  blueyed
  * crumb refactoring: add get_crumb
  *
