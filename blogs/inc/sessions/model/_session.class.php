@@ -578,6 +578,8 @@ class Session
 		// dh>   This should provide a form, including all POST/GET data, but only a refreshed crumb.
 		//       It warns the user about security, but when this was a legit request, it can easily
 		//       get resubmitted by the user.
+		// dh> This also happens, if you reload the same page more than once (e.g. the login form, resending POSTed info).
+		//     Likely a new crumb gets generated everytime, but the old one being resent - this should at least get listed as possible reason, too.
 		bad_request_die( 'Incorrect crumb received ['.$crumb_name.'] -- Have you waited more than 2 hours to submit your request? We have refused the request for security reasons. Please go back and refresh the form before submitting.' );
 	}
 }
@@ -647,6 +649,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.33  2010/05/15 21:13:20  blueyed
+ * doc
+ *
  * Revision 1.32  2010/04/28 21:15:44  blueyed
  * assert_received_crumb: use bad_request_die some more. Improve doc/todo.
  *
