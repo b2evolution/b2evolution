@@ -573,14 +573,28 @@ class Session
 			return true;
 		}
 
-		// fp> TODO: make this a nice message -- with a link to go back? history.back()?
-		//           Try not to lose form edits...!
-		// dh>   This should provide a form, including all POST/GET data, but only a refreshed crumb.
-		//       It warns the user about security, but when this was a legit request, it can easily
-		//       get resubmitted by the user.
-		// dh> This also happens, if you reload the same page more than once (e.g. the login form, resending POSTed info).
-		//     Likely a new crumb gets generated everytime, but the old one being resent - this should at least get listed as possible reason, too.
-		bad_request_die( 'Incorrect crumb received ['.$crumb_name.'] -- Have you waited more than 2 hours to submit your request? We have refused the request for security reasons. Please go back and refresh the form before submitting.' );
+		// ERROR MESSAGE, with form/button to bypass and enough warning hopefully.
+		// TODO: dh> please review carefully!
+		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
+		echo '<h3 style="color:#f00;">'.T_('Incorrect crumb received!').'</h3>';
+		echo '<p>'.T_('We have refused the request for security reasons.').'</p>';
+		echo '<p>'.T_('Do you have waited more than 2 hours to submit your request?').'</p>';
+		echo '<p>'.T_('Please go back via your browser and refresh the form before submitting.').'</p>';
+		echo '<p>'.T_('If you are <strong>sure that the request is legit</strong> and you are not being tricked, you can resend the form with a refreshed the crumb.').'</p>';
+		echo '</div>';
+
+		echo '<div>';
+		echo '<p class="warning">'.T_('Do you want to resend this request with a refreshed crumb?').'</p>';
+		$Form = new Form( '', 'evo_session_crumb_resend', $_SERVER['REQUEST_METHOD'] );
+		$Form->begin_form( 'inline' );
+		$Form->add_crumb( $crumb_name );
+		$Form->hiddens_by_key( remove_magic_quotes($_REQUEST) );
+		$Form->button( array( 'submit', '', T_('I am sure!'), 'ActionButton' ) );
+		$Form->end_form();
+		// echo '<a href="javascript:history.go(-1)">'.T_('No, I am not sure.').' '.T_('I want to go back / abort.').'</a>';
+		echo '</div>';
+
+		die();
 	}
 }
 
@@ -649,6 +663,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.34  2010/05/15 22:24:23  blueyed
+ * Session::assert_crumb: better error message, and most importantly, a way to bypass.
+ *
  * Revision 1.33  2010/05/15 21:13:20  blueyed
  * doc
  *
