@@ -843,6 +843,8 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				}
 			}
 
+			// TODO: "COLLATE" and other attribute handling should happen here, based on $field_to_parse
+
 
 			if( ! isset($type_matches) )
 			{ // not tried to match before
@@ -1265,6 +1267,9 @@ function install_make_db_schema_current( $display = true )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.18  2010/05/15 22:18:20  blueyed
+ * db_delta: add failing test_field_collate_changes test. COLLATE attribute for e.g. VARCHAR gets not looked at.
+ *
  * Revision 1.17  2010/04/11 23:02:27  blueyed
  * db_delta: fix regexp for indices using 'USING \w+'
  *

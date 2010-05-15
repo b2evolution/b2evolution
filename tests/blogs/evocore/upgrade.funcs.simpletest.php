@@ -1207,6 +1207,23 @@ class UpgradeFuncsTestCase extends EvoDbUnitTestCase
 		$r = $this->db_delta_wrapper($sql);
 		$this->assertIdentical( $r, array() );
 	}
+
+
+	function test_field_collate_changes()
+	{
+		$this->test_DB->query( "
+			CREATE TABLE $GLOBALS[tableprefix]test_1 (
+				a VARCHAR(50) COLLATE 'utf8_bin'
+			)" );
+
+		$r = $this->db_delta_wrapper( "
+			CREATE TABLE $GLOBALS[tableprefix]test_1 (
+				a VARCHAR(50) COLLATE 'binary'
+			)" );
+
+		$this->assertEqual( $r["$GLOBALS[tableprefix]test_1"][0]['queries'][0],
+			"ALTER TABLE $GLOBALS[tableprefix]test_1 CHANGE COLUMN a a VARCHAR(50) COLLATE 'binary'" );
+	}
 }
 
 
