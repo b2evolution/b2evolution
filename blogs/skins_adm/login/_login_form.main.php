@@ -84,7 +84,6 @@ $Form = new Form( $htsrv_url_sensitive.'login.php', 'evo_login_form', 'post', 'f
 $Form->begin_form( 'fform' );
 
 	$Form->add_crumb( 'loginform' );
-	$Form->hiddens_by_key( remove_magic_quotes($_POST), /* exclude: */ array('login_action', 'login', 'action') ); // passthrough POSTed data (when login is required after having POSTed something)
 	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 
 	if( isset( $action, $reqID, $sessID ) && $action == 'validatemail' )
@@ -144,6 +143,10 @@ $Form->begin_form( 'fform' );
 
 	$Form->end_fieldset();
 
+	// Passthrough REQUEST data (when login is required after having POSTed something)
+	// (Exclusion of 'login_action', 'login', and 'action' has been removed. This should get handled via detection in Form (included_input_field_names),
+	//  and "action" is protected via crumbs)
+	$Form->hiddens_by_key( remove_magic_quotes($_REQUEST) );
 $Form->end_form();
 
 ?>
@@ -223,6 +226,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.21  2010/05/15 22:19:22  blueyed
+ * login form: bypass all params (not being used in the form). Also, use REQUEST instead of POST.
+ *
  * Revision 1.20  2010/02/08 17:56:56  efy-yury
  * copyright 2009 -> 2010
  *
