@@ -1366,6 +1366,8 @@ class Plugin
 	 * NOTE: this is especially useful for lazy Plugins, which would look
 	 *       at the content and decide, if they apply.
 	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the {@link Item} object (by reference)
 	 * @return boolean|NULL If true, the Plugin gets added as a renderer, false
 	 *         removes it as a renderer (if existing) and NULL does not change the
 	 *         renderer setting regarding your Plugin.
@@ -2994,7 +2996,7 @@ class Plugin
 		// Try default values:
 		$params = $this->get_coll_setting_definitions( $tmp_params = array('for_editing'=>true) );
 		if( isset( $params[$parname]['defaultvalue'] ) )
-		{	// We ahve a default value:
+		{	// We have a default value:
 			return $params[$parname]['defaultvalue'] ;
 		}
 
@@ -3026,6 +3028,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.42  2010/05/16 23:10:31  blueyed
+ * Fix doc
+ *
  * Revision 1.41  2010/05/13 15:12:04  blueyed
  * doc
  *
