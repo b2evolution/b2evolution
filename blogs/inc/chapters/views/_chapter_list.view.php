@@ -113,7 +113,14 @@ function cat_line( $Chapter, $level )
 		$r .= '<td class="center">'.$Chapter->dget('order').'</td>';
 	}
 
-	$r .= '<td>'.(int)$number_of_posts_in_cat[$Chapter->ID].'</td>';
+	if( isset( $number_of_posts_in_cat[$Chapter->ID] ) )
+	{
+		$r .= '<td>'.(int)$number_of_posts_in_cat[$Chapter->ID].'</td>';
+	}
+	else
+	{
+		$r .= '<td>0</td>';
+	}
 
 	$r .= '<td class="lastcol shrinkwrap">';
 	if( $permission_to_edit )
@@ -263,6 +270,9 @@ echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categori
 $Session->delete( 'fadeout_array');
 /*
  * $Log$
+ * Revision 1.24  2010/05/18 07:08:51  efy-asimo
+ * Notice in chapter_list_view - fix
+ *
  * Revision 1.23  2010/04/30 20:37:10  blueyed
  * Add "Number of posts" column to chapter view. This is useful to get an overview about how often a category is being used.
  *
