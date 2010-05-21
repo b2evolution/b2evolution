@@ -521,11 +521,55 @@ class PageCache
 		}
 	}
 
+
+	/**
+	 * Delete any file that is older than 24 hours from the whole /cache folder (recursively) 
+	 * except index.html files and hiddenfiles (starting with .)
+	 * 
+	 * @return string empty string on success, error message otherwise
+	 */
+	public static function prune_page_cache()
+	{
+		global $cache_path, $localtimenow;
+
+		$cache_content = get_filenames( $cache_path, true, false );
+
+		if( $cache_content == false )
+		{
+			return T_('Cache directory could not be accessed.');
+		}
+
+		foreach( $cache_content as $file_path )
+		{
+			// get file name from path
+			$file_name = basename($file_path);
+
+			// TODO: use a positive list instead - if possible? Otherwise maybe exclude index.* at least.
+			if( $file_name != 'index.html' && substr( $file_name, 0, 1 ) != '.' )
+			{ // this file is not an index.html and it is not hidden
+				$datediff = $localtimenow - filemtime( $file_path );
+				if( $datediff > 86400 /* 60*60*24 = 24 hour*/)
+				{ // older than 24 hours
+					// TODO: I think errors should not get suppressed - would show up in error log / cron mail, but that's good IMHO
+					if( ! @unlink( $file_path ) )
+					{ // deleting the file failed: return error
+						$error = error_get_last(); // XXX: requires PHP 5.2
+						return $error['message'];
+					}
+				}
+			}
+		}
+
+		return '';
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.20  2010/05/21 10:46:31  efy-asimo
+ * move prune_page_cache() function from _file.funcs.php to _pagecache.class.php
+ *
  * Revision 1.19  2010/02/08 17:51:48  efy-yury
  * copyright 2009 -> 2010
  *
