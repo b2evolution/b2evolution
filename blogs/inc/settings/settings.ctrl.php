@@ -106,6 +106,9 @@ switch( $action )
 
 		$Settings->set( 'general_cache_enabled', $new_cache_status );
 
+		$Settings->set( 'cross_posting', param( 'cross_posting', 'integer', 0 ) );
+		$Settings->set( 'cross_posting_blogs', param( 'cross_posting_blogs', 'integer', 0 ) );
+
 		if( ! $Messages->count('error') )
 		{
 			$Settings->dbupdate();
@@ -145,6 +148,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2010/05/22 12:22:49  efy-asimo
+ * move $allow_cross_posting in the backoffice
+ *
  * Revision 1.21  2010/02/08 17:53:55  efy-yury
  * copyright 2009 -> 2010
  *

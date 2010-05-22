@@ -69,6 +69,13 @@ $Form->begin_fieldset( T_('Post options') );
 	// -multilingual:  true|false   or better yet: provide a list to narrow down the active locales
 	// -tags  always('required')|optional|never
 
+	$Form->radio( 'post_categories', $edited_Blog->get_setting('post_categories'),
+	array( array( 'one_cat_post', T_('One category per post') ),
+			array( 'multiple_cat_post', T_('Multiple categories per post') ),
+			array( 'main_extra_cat_post', T_('Main cat + extra cats') ),
+			array( 'no_cat_post', T_('Don\'t user categories') ) ),
+			T_('Post Categories'), true );
+
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Feedback options') );
@@ -204,6 +211,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.29  2010/05/22 12:22:49  efy-asimo
+ * move $allow_cross_posting in the backoffice
+ *
  * Revision 1.28  2010/02/26 22:15:47  fplanque
  * whitespace/doc/minor
  *

@@ -860,7 +860,7 @@ function xmlrpcs_can_view_item( & $Item, & $current_User )
  */
 function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
 {
-	global $allow_cross_posting, $xmlrpcs_errcode, $xmlrpcs_errmsg, $xmlrpcerruser;
+	global $xmlrpcs_errcode, $xmlrpcs_errmsg, $xmlrpcerruser;
 
 	// Trim $maincat and $extracats (qtm sends whitespace before the cat IDs):
 	$maincat   = trim( $maincat );
@@ -881,7 +881,7 @@ function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
 		$maincat = $Blog->get_default_cat_ID();
 		logIO( 'Invalid main cat ID - new ID: '.$maincat );
 	}
-	else if( $allow_cross_posting < 3 && get_catblog( $maincat ) != $Blog->ID )
+	else if( get_allow_cross_posting() < 2 && get_catblog( $maincat ) != $Blog->ID )
 	{	// We cannot use a maincat of another blog than the current one:
 		$xmlrpcs_errcode = $xmlrpcerruser + 11;
 		$xmlrpcs_errmsg = 'Current crossposting setting does not allow moving posts to a different blog.';
@@ -917,6 +917,9 @@ function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.28  2010/05/22 12:22:49  efy-asimo
+ * move $allow_cross_posting in the backoffice
+ *
  * Revision 1.27  2010/02/28 22:04:50  fplanque
  * fix
  *

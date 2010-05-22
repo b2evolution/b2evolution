@@ -1283,10 +1283,10 @@ function fieldset_cats()
 
 		function import_cat_select_before_each( $cat_ID, $level )
 		{	// callback to display sublist element
-			global $current_blog_ID, $blog, $cat, $postdata, $default_main_cat, $action, $tabindex, $allow_cross_posting;
+			global $current_blog_ID, $blog, $cat, $postdata, $default_main_cat, $action, $tabindex;
 			echo '<li>';
 
-			if( $allow_cross_posting )
+			if( get_allow_cross_posting() >= 1 )
 			{ // We allow cross posting, display checkbox:
 				echo'<input type="checkbox" name="post_extracats[]" class="checkbox" title="', T_('Select as an additionnal category') , '" value="',$cat_ID,'"';
 				echo ' />';
@@ -1674,6 +1674,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.19  2010/05/22 12:22:49  efy-asimo
+ * move $allow_cross_posting in the backoffice
+ *
  * Revision 1.18  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *

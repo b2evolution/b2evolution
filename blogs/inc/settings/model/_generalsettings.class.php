@@ -107,6 +107,9 @@ class GeneralSettings extends AbstractSettings
 		'allow_moving_chapters' => '0',				// Do not allow moving chapters by default
 		'chapter_ordering' => 'alpha',
 
+		'cross_posting' => 0,						// Allow additional categories from other blogs
+		'cross_posting_blog' => 0,					// Allow to choose main category from another blog
+
 		'general_cache_enabled' => 0,
 
 		'eblog_enabled' => 0,						// blog by email
@@ -200,6 +203,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.31  2010/05/22 12:22:49  efy-asimo
+ * move $allow_cross_posting in the backoffice
+ *
  * Revision 1.30  2010/03/28 17:27:15  fplanque
  * changed upload default max kb
  *

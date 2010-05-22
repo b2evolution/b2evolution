@@ -249,7 +249,7 @@ switch( $action )
 		check_categories_nosave ( $post_category, $post_extracats );
 		
 		$edited_Item->set ( 'main_cat_ID', $post_category );
-		if( $edited_Item->main_cat_ID && $allow_cross_posting < 3 && $edited_Item->get_blog_ID() != $blog )
+		if( $edited_Item->main_cat_ID && ( get_allow_cross_posting() < 2 ) && $edited_Item->get_blog_ID() != $blog )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 		}
@@ -311,7 +311,7 @@ switch( $action )
 		check_categories_nosave ( $post_category, $post_extracats );
 		
 		$edited_Item->set ( 'main_cat_ID', $post_category );
-		if( $edited_Item->main_cat_ID && $allow_cross_posting < 3 && $edited_Item->get_blog_ID() != $blog )
+		if( $edited_Item->main_cat_ID && ( get_allow_cross_posting() < 2 ) && $edited_Item->get_blog_ID() != $blog )
 		{ // the main cat is not in the list of categories; this happens, if the user switches blogs during editing:
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 		}
@@ -1384,6 +1384,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.101  2010/05/22 12:22:49  efy-asimo
+ * move $allow_cross_posting in the backoffice
+ *
  * Revision 1.100  2010/05/02 19:45:50  fplanque
  * Whitespace WTF!?
  *

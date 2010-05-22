@@ -492,6 +492,8 @@ class Blog extends DataObject
 			$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
 
 			$this->set_setting( 'enable_sitemaps', param( 'enable_sitemaps', 'integer', 0 ) );
+			
+			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
 		}
 
 		if( param( 'blog_allowcomments',   'string', NULL ) !== NULL )
@@ -2323,6 +2325,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.110  2010/05/22 12:22:49  efy-asimo
+ * move $allow_cross_posting in the backoffice
+ *
  * Revision 1.109  2010/04/23 09:39:44  efy-asimo
  * "SEO setting" for help link and Groups slugs permission implementation
  *

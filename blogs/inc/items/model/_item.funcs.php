@@ -536,6 +536,34 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 }
 
 /**
+ * Get post category setting
+ * 
+ * @param int blog id
+ * @return int setting value
+ */
+function get_post_cat_setting( $blog )
+{
+	$BlogCache = & get_BlogCache();
+	$Blog = $BlogCache->get_by_ID( $blog, false, false );
+	if( ! $Blog )
+	{
+		return -1;
+	}
+	$post_categories = $Blog->get_setting( 'post_categories' );
+	switch( $post_categories )
+	{
+		case 'no_cat_post':
+			return 0;
+		case 'one_cat_post':
+			return 1;
+		case 'multiple_cat_post':
+			return 2;
+		case 'main_extra_cat_post':
+			return 3;
+	}
+}
+
+/**
  * Creates a link to new category, with properties icon
  *
  * @return string link url
@@ -558,10 +586,14 @@ function get_newcategory_link()
  */
 function cat_select( $Form, $form_fields = true )
 {
-	global $allow_cross_posting, $cache_categories,
-					$blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
+	global $cache_categories, $blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
 	global $cat_sel_total_count, $dispatcher;
 	global $rsc_url;
+
+	if( get_post_cat_setting( $blog ) < 1 )
+	{ // No categories for $blog
+		return;
+	}
 
 	$Form->begin_fieldset( get_newcategory_link().T_('Categories').get_manual_link('item_categories_fieldset'), array( 'class'=>'extracats', 'id' => 'itemform_categories' ) );
 
@@ -573,9 +605,13 @@ function cat_select( $Form, $form_fields = true )
 	cat_load_cache(); // make sure the caches are loaded
 
 	$r .= '<table cellspacing="0" class="catselect">';
-	$r .= cat_select_header();
+	if( get_post_cat_setting($blog) == 3 )
+	{ // Main + Extra cats option is set, display header
+		$r .= cat_select_header();
+	}
 
-	if( $allow_cross_posting >= 2 )
+	if( get_allow_cross_posting() >= 2 ||
+	  ( isset( $blog) && get_post_cat_setting( $blog ) > 1 && get_allow_cross_posting() == 1 ) )
 	{ // If BLOG cross posting enabled, go through all blogs with cats:
 		/**
 		 * @var BlogCache
@@ -617,7 +653,7 @@ function cat_select( $Form, $form_fields = true )
 
 	echo $r;
 
-	if( $allow_cross_posting >= 2 && isset($blog) ) {
+	if( isset($blog) && get_allow_cross_posting() ) {
 		echo '<script type="text/javascript">jQuery.getScript("'.$rsc_url.'js/jquery/jquery.scrollto.js", function () {
 			jQuery("#itemform_categories").scrollTo( "#catselect_blog'.$blog.'" );
 		});</script>';
@@ -630,14 +666,15 @@ function cat_select( $Form, $form_fields = true )
  */
 function cat_select_header()
 {
-	global $current_blog_ID, $blog, $allow_cross_posting;
-
+	// main cat header
 	$r = '<thead><tr><th class="selector catsel_main" title="'.T_('Main category').'">'.T_('Main').'</th>';
-	if( $allow_cross_posting >= 1 )
-	{ // This is current blog or we allow moving posts accross blogs
-		$r .= '<th class="selector catsel_extra" title="'.T_('Additional category').'">'.T_('Extra').'</th>';
-	}
+
+	// extra cat header
+	$r .= '<th class="selector catsel_extra" title="'.T_('Additional category').'">'.T_('Extra').'</th>';
+
+	// category header
 	$r .= '<th class="catsel_name">'.T_('Category').'</th><!--[if IE 7]><th width="1"><!-- for IE7 --></th><![endif]--></tr></thead>';
+
 	return $r;
 }
 
@@ -655,7 +692,7 @@ function cat_select_before_first( $parent_cat_ID, $level )
 function cat_select_before_each( $cat_ID, $level, $total_count )
 { // callback to display sublist element
 	global $current_blog_ID, $blog, $post_extracats, $edited_Item;
-	global $creating, $allow_cross_posting, $cat_select_level, $cat_select_form_fields;
+	global $creating, $cat_select_level, $cat_select_form_fields;
 	global $cat_sel_total_count;
 
 	$cat_sel_total_count++;
@@ -665,52 +702,63 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	$r = "\n".'<tr class="'.( $total_count%2 ? 'odd' : 'even' ).'">';
 
 	// RADIO for main cat:
-	if( ($current_blog_ID == $blog) || ($allow_cross_posting > 2) )
-	{ // This is current blog or we allow moving posts accross blogs
-		if( $cat_select_form_fields )
-		{	// We want a form field:
-			$r .= '<td class="selector catsel_main"><input type="radio" name="post_category" class="checkbox" title="'
-						.T_('Select as MAIN category').'" value="'.$cat_ID.'"';
-			if( $cat_ID == $edited_Item->main_cat_ID )
-			{ // main cat of the Item or set as default main cat above
-				$r .= ' checked="checked"';
+	if( get_post_cat_setting($blog) != 2 )
+	{ // if no "Multiple categories per post" option is set display radio
+		if( ($current_blog_ID == $blog) || (get_allow_cross_posting( $blog ) >= 2) )
+		{ // This is current blog or we allow moving posts accross blogs
+			if( $cat_select_form_fields )
+			{	// We want a form field:
+				$r .= '<td class="selector catsel_main"><input type="radio" name="post_category" class="checkbox" title="'
+							.T_('Select as MAIN category').'" value="'.$cat_ID.'"';
+				if( $cat_ID == $edited_Item->main_cat_ID )
+				{ // main cat of the Item or set as default main cat above
+					$r .= ' checked="checked"';
+				}
+				$r .= ' id="sel_maincat_'.$cat_ID.'"';
+				$r .= ' onclick="check_extracat(this);" /></td>';
 			}
-			$r .= ' id="sel_maincat_'.$cat_ID.'"';
-			$r .= ' onclick="check_extracat(this);" /></td>';
+			else
+			{	// We just want info:
+				$r .= '<td class="selector catsel_main">'.bullet( $cat_ID == $edited_Item->main_cat_ID ).'</td>';
+			}
 		}
 		else
-		{	// We just want info:
-			$r .= '<td class="selector catsel_main">'.bullet( $cat_ID == $edited_Item->main_cat_ID ).'</td>';
+		{ // Don't allow to select this cat as a main cat
+			$r .= '<td class="selector catsel_main">&nbsp;</td>';
 		}
-	}
-	else
-	{ // Don't allow to select this cat as a main cat
-		$r .= '<td class="selector catsel_main">&nbsp;</td>';
 	}
 
 	// CHECKBOX:
-	if( $allow_cross_posting )
-	{ // We allow cross posting, display checkbox:
-		if( $cat_select_form_fields )
-		{	// We want a form field:
-			$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
-						.T_('Select as an additional category').'" value="'.$cat_ID.'"';
-			// if( ($cat_ID == $edited_Item->main_cat_ID) || (in_array( $cat_ID, $post_extracats )) )  <--- We don't want to precheck the default cat because it will stay checked if we change the default main. On edit, the checkbox will always be in the array.
-			if( (in_array( $cat_ID, $post_extracats )) )
-			{
-				$r .= ' checked="checked"';
+	if( get_post_cat_setting( $blog ) >= 2 )
+	{ // We allow multiple categories or main + extra cat,  display checkbox:
+		if( ($current_blog_ID == $blog) || ( get_allow_cross_posting( $blog ) % 2 == 1 ) )
+		{ // This is the current blog or we allow cross posting (select extra cat from another blog)
+			if( $cat_select_form_fields )
+			{	// We want a form field:
+				$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
+							.T_('Select as an additional category').'" value="'.$cat_ID.'"';
+				// if( ($cat_ID == $edited_Item->main_cat_ID) || (in_array( $cat_ID, $post_extracats )) )  <--- We don't want to precheck the default cat because it will stay checked if we change the default main. On edit, the checkbox will always be in the array.
+				if( (in_array( $cat_ID, $post_extracats )) )
+				{
+					$r .= ' checked="checked"';
+				}
+				$r .= ' id="sel_extracat_'.$cat_ID.'"';
+				$r .= ' /></td>';
 			}
-			$r .= ' id="sel_extracat_'.$cat_ID.'"';
-			$r .= ' /></td>';
+			else
+			{	// We just want info:
+				$r .= '<td class="selector catsel_main">'.bullet( ($cat_ID == $edited_Item->main_cat_ID) || (in_array( $cat_ID, $post_extracats )) ).'</td>';
+			}
 		}
 		else
-		{	// We just want info:
-			$r .= '<td class="selector catsel_main">'.bullet( ($cat_ID == $edited_Item->main_cat_ID) || (in_array( $cat_ID, $post_extracats )) ).'</td>';
+		{ // Don't allow to select this cat as an extra cat
+			$r .= '<td class="selector catsel_main">&nbsp;</td>';
 		}
 	}
 
+	$BlogCache = & get_BlogCache();
 	$r .= '<td class="catsel_name"><label'
-				.' for="'.( $allow_cross_posting
+				.' for="'.( get_post_cat_setting( $blog ) == 2
 					? 'sel_extracat_'.$cat_ID
 					: 'sel_maincat_'.$cat_ID ).'"'
 				.' style="padding-left:'.($level-1).'em;">'
@@ -746,6 +794,7 @@ function cat_select_after_last( $parent_cat_ID, $level )
  */
 function cat_select_new()
 {
+	global $blog;
 	$new_maincat = param( 'new_maincat', 'boolean', false );
 	$new_extracat = param( 'new_extracat', 'boolean', false );
 	if( $new_maincat || $new_extracat )
@@ -760,24 +809,32 @@ function cat_select_new()
 	global $cat_sel_total_count;
 	$cat_sel_total_count++;
 	$r = "\n".'<tr class="'.( $cat_sel_total_count%2 ? 'odd' : 'even' ).'">';
-	// RADIO for new main cat:
-	$r .= '<td class="selector catsel_main"><input type="radio" name="post_category" class="checkbox" title="'
-						.T_('Select as MAIN category').'" value="0"';
-	if( $new_maincat )
-	{
-		$r.= ' checked="checked"';
-	}
-	$r .= ' id="sel_maincat_new"';
-	$r .= ' onclick="check_extracat(this);"/></td>';
 
-	// CHECKBOX
-	$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
-						.T_('Select as an additional category').'" value="0"';
-	if( $new_extracat )
+	if( get_post_cat_setting( $blog ) != 2 )
 	{
-		$r.= ' checked="checked"';
+		// RADIO for new main cat:
+		$r .= '<td class="selector catsel_main"><input type="radio" name="post_category" class="checkbox" title="'
+							.T_('Select as MAIN category').'" value="0"';
+		if( $new_maincat )
+		{
+			$r.= ' checked="checked"';
+		}
+		$r .= ' id="sel_maincat_new"';
+		$r .= ' onclick="check_extracat(this);"';
+		$r .= '/></td>';
 	}
-	$r .= 'id="sel_extracat_new"/></td>';
+
+	if( get_post_cat_setting( $blog ) >= 2 )
+	{
+		// CHECKBOX
+		$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
+							.T_('Select as an additional category').'" value="0"';
+		if( $new_extracat )
+		{
+			$r.= ' checked="checked"';
+		}
+		$r .= 'id="sel_extracat_new"/></td>';
+	}
 
 	// INPUT TEXT for new category name
 	$r .= '<td class="catsel_name">'
@@ -1299,9 +1356,41 @@ function & create_multiple_posts( & $Item, $linebreak = false )
  */
 function check_categories( & $post_category, & $post_extracats )
 {
-	$post_category = param( 'post_category', 'integer', true );
+	$post_category = param( 'post_category', 'integer', -1 );
 	$post_extracats = param( 'post_extracats', 'array', array() );
-	global $Messages, $blog;
+	global $Messages, $Blog, $blog;
+
+	if( $post_category == -1 )
+	{ // no main cat select
+		if( count( $post_extracats ) == 0 )
+		{ // no extra cat select
+			$post_category = $Blog->get_default_cat_ID();
+		}
+		else
+		{ // first extracat become main_cat
+			if( get_allow_cross_posting() >= 2 )
+			{ // allow moving posts between different blogs is enabled, set first selected cat as main cat
+				$post_category = $post_extracats[0];
+			}
+			else
+			{ // allow moving posts between different blogs is disabled - we need a main cat from $blog 
+				foreach( $post_extracats as $cat )
+				{
+					if( get_cat_blog( $cat ) != $blog )
+					{ // this cat is not from $blog
+						continue;
+					}
+					// set first cat from $blog as main cat
+					$post_category = $cat;
+					break;
+				}
+				if( $post_category == -1 )
+				{ // wasn't cat selected from $blog select a default as main cat
+					$post_category = $Blog->get_default_cat_ID();
+				}
+			}
+		}
+	}
 
 	if( ! $post_category || in_array( 0, $post_extracats ) )	// if category key is 0 => means it is a new category
 	{
@@ -1457,6 +1546,9 @@ function echo_set_slug_changed()
 }
 /*
  * $Log$
+ * Revision 1.108  2010/05/22 12:22:49  efy-asimo
+ * move $allow_cross_posting in the backoffice
+ *
  * Revision 1.107  2010/05/10 14:26:17  efy-asimo
  * Paged Comments & filtering & add comments listview
  *

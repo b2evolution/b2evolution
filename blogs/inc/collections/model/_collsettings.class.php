@@ -139,6 +139,8 @@ class CollectionSettings extends AbstractSettings
 			'blog_footer_text' => '&copy;$year$ by $owner$',
 			'max_footer_credits' => 3,
 			'enable_goto_blog' => 1,						// Go to blog after publishing post
+
+			'post_categories' => 'main_extra_cat_post',		// Post category setting
 		);
 
 
@@ -174,6 +176,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.48  2010/05/22 12:22:49  efy-asimo
+ * move $allow_cross_posting in the backoffice
+ *
  * Revision 1.47  2010/04/24 07:47:27  efy-asimo
  * change slugs permissions and help link default value
  *

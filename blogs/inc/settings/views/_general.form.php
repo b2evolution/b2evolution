@@ -98,6 +98,17 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
+$Form->begin_fieldset( T_('Cross posting') );
+
+	$Form->checklist( array(
+		array( 'cross_posting', 1, T_('Allow cross posting'), $Settings->get('cross_posting') ),
+		array( 'cross_posting_blogs', 1, T_('Allow moving posts between different blogs'), $Settings->get('cross_posting_blogs') ) ),
+		'allow_cross_posting', T_('Cross Posting') );
+
+$Form->end_fieldset();
+
+// --------------------------------------------
+
 if( $current_User->check_perm( 'options', 'edit' ) )
 {
 	$Form->end_form( array( array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
@@ -106,6 +117,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.21  2010/05/22 12:22:49  efy-asimo
+ * move $allow_cross_posting in the backoffice
+ *
  * Revision 1.20  2010/03/01 07:52:51  efy-asimo
  * Set manual links to lowercase
  *

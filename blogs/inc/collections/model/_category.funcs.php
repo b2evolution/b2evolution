@@ -473,6 +473,23 @@ function cat_req( $parent_cat_ID, $level )
 	}
 }
 
+
+/**
+ * Get global cross posting settings
+ * 
+ * @return int
+ * 		0 - cross posting disabled
+ * 		1 - cross posting enabled for extra categories
+ * 		2 - cross posting enabled for main categories
+ * 		3 - cross posting enabled for main and extracats
+ */
+function get_allow_cross_posting()
+{
+	global $Settings;
+	return $Settings->get( 'cross_posting' ) + ( 2 *  $Settings->get( 'cross_posting_blogs' ) );
+}
+
+
 /**
  * Callback used in compile_cat_array()
  */
@@ -482,6 +499,9 @@ function cat_req_dummy()
 
 /*
  * $Log$
+ * Revision 1.13  2010/05/22 12:22:49  efy-asimo
+ * move $allow_cross_posting in the backoffice
+ *
  * Revision 1.12  2010/02/08 17:52:09  efy-yury
  * copyright 2009 -> 2010
  *
