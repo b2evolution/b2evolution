@@ -111,11 +111,11 @@ class Plugins_admin extends Plugins
 				'AdminBeforeItemEditDelete' => 'This gets called before an existing item gets deleted from the backoffice.',
 
 				'AdminBeginPayload' => 'This gets called before the main payload in the backoffice is displayed.',
-				
+
 				'CacheObjects' => 'Cache data objects.',
 				'CachePageContent' => 'Cache page content.',
 				'CacheIsCollectingContent' => 'Gets asked for if we are generating cached content.',
-				
+
 				'AfterCommentDelete' => 'Gets called after a comment has been deleted from the database.',
 				'AfterCommentInsert' => 'Gets called after a comment has been inserted into the database.',
 				'AfterCommentUpdate' => 'Gets called after a comment has been updated in the database.',
@@ -1478,6 +1478,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.33  2010/05/24 14:50:40  fplanque
+ * no message
+ *
  * Revision 1.32  2010/03/14 06:36:58  sam2kb
  * New plugin hooks: BeforeThumbCreate, AfterFileUpload
  *
