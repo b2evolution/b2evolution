@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2010-05-15 00:11+0200\n"
-"PO-Revision-Date: 2010-05-16 17:31-0500\n"
+"PO-Revision-Date: 2010-05-24 14:34-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -740,14 +740,12 @@ msgstr "Комментарий был удален."
 
 #: ../../../htsrv/comment_review.php:89
 #: ../../../inc/comments/_comments.ctrl.php:234
-#, fuzzy
 msgid "Comment url has been deleted."
-msgstr "Комментарий был удален."
+msgstr "Ссылка комментария была удалена."
 
 #: ../../../htsrv/comment_review.php:108
-#, fuzzy
 msgid "Comment review"
-msgstr "Дата комментария"
+msgstr "Просмотр комментария"
 
 #: ../../../htsrv/comment_review.php:121
 #: ../../../inc/comments/model/_comment.class.php:831
@@ -756,45 +754,37 @@ msgid "Delete this comment"
 msgstr "Удалить этот комментарий"
 
 #: ../../../htsrv/comment_review.php:128
-#, fuzzy
 msgid "Deprecate this comment"
-msgstr "Отклонить этот комментарий!"
+msgstr "Отклонить этот комментарий"
 
 #: ../../../htsrv/comment_review.php:136
-#, fuzzy
 msgid "Publish this comment"
-msgstr "Опубликовать этот комментарий!"
+msgstr "Опубликовать этот комментарий"
 
 #: ../../../htsrv/comment_review.php:144
-#, fuzzy
 msgid "Delete URL"
-msgstr "Удалить"
+msgstr "Удалить ссылку"
 
 #: ../../../htsrv/comment_review.php:144
-#, fuzzy
 msgid "Delete comment URL"
-msgstr "Удалить этот комментарий"
+msgstr "Удалить ссылку комментария"
 
 #: ../../../htsrv/comment_review.php:149
 #: ../../../htsrv/comment_review.php:176
-#, fuzzy
 msgid "Antispam tool"
 msgstr "Антиспам"
 
 #: ../../../htsrv/comment_review.php:160
-#, fuzzy
 msgid "Invalid link!"
-msgstr "Недопустимый подзаголовок"
+msgstr "Недопустимая ссылка!"
 
 #: ../../../htsrv/comment_review.php:165
-#, fuzzy
 msgid "Posted comment"
-msgstr "Отправить комментарий"
+msgstr "Опубликованный комментарий"
 
 #: ../../../htsrv/comment_review.php:175
-#, fuzzy
 msgid "Delete comment url"
-msgstr "Удалить этот комментарий"
+msgstr "Удалить ссылку комментария"
 
 #: ../../../htsrv/comment_review.php:181
 #: ../../../inc/comments/views/_comment_list.inc.php:60
@@ -1037,9 +1027,8 @@ msgid "Your message has been sent."
 msgstr "Ваше сообщение было отправлено."
 
 #: ../../../htsrv/message_send.php:324
-#, fuzzy
 msgid "Sorry, could not send your message."
-msgstr "Извините, невозможно отправить email."
+msgstr "Извините, ваше сообщение отправить не удалось."
 
 #: ../../../htsrv/profile_update.php:74
 #: ../../../htsrv/subs_update.php:55
@@ -4266,9 +4255,8 @@ msgid "Check this to automatically view the blog after publishing a post."
 msgstr ""
 
 #: ../../../inc/collections/views/_coll_features.form.php:65
-#, fuzzy
 msgid "View blog after publishing"
-msgstr "Удаленная публикация"
+msgstr "Открывать блог после создания записи"
 
 #: ../../../inc/collections/views/_coll_features.form.php:74
 msgid "Feedback options"
@@ -5316,9 +5304,8 @@ msgid "Meta description"
 msgstr "Мета тег \"description\""
 
 #: ../../../inc/collections/views/_coll_seo.form.php:187
-#, fuzzy
 msgid "Fallback to tags as meta keywords for posts and pages if meta keywords for item is empty"
-msgstr "Использовать выдержку в мета тегах \"description\" для записей и страниц в случаях, когда поле &lt;meta&gt; desc пустое."
+msgstr "Использовать теги в качестве мета \"keywords\" для записей и страниц в случаях, когда поле &lt;meta&gt; kwds пустое."
 
 #: ../../../inc/collections/views/_coll_seo.form.php:187
 msgid "Meta Keywords"
@@ -5604,9 +5591,9 @@ msgid "Destination post blog owner is different!"
 msgstr "Блог назначения не выбран."
 
 #: ../../../inc/comments/_comments.ctrl.php:146
-#, fuzzy, php-format
+#, php-format
 msgid "Post ID &laquo;%d&raquo; does not exist!"
-msgstr "Пользователь &laquo;%s&raquo; не существует!"
+msgstr "Запись с ID &laquo;%d&raquo; не существует!"
 
 #: ../../../inc/comments/_comments.ctrl.php:155
 msgid "Invalid comment text."
@@ -6348,9 +6335,8 @@ msgid "Global"
 msgstr "Список"
 
 #: ../../../inc/dashboard/dashboard.ctrl.php:344
-#, fuzzy
 msgid "Refresh comment list"
-msgstr "Список комментариев"
+msgstr "Обновить список комментариев"
 
 #: ../../../inc/dashboard/dashboard.ctrl.php:346
 msgid "Comments awaiting moderation"
@@ -6523,9 +6509,9 @@ msgid "All %s folders have been renamed to %s"
 msgstr ""
 
 #: ../../../inc/files/file_settings.ctrl.php:155
-#, fuzzy, php-format
+#, php-format
 msgid "Some %s folders could not be renamed to %s"
-msgstr "&laquo;%s&raquo; не может быть переименован в &laquo;%s&raquo;"
+msgstr "Следующие %s папок не удалось переименовать в %s"
 
 #: ../../../inc/files/file_settings.ctrl.php:164
 msgid "File settings updated."
@@ -6797,9 +6783,8 @@ msgid "User avatar modified."
 msgstr "Аватар пользователя был изменен."
 
 #: ../../../inc/files/files.ctrl.php:1201
-#, fuzzy
 msgid "Selected files have been linked to item."
-msgstr "Выбранный файл связан с записью."
+msgstr "Выбранные файлы были привязаны к записи."
 
 #: ../../../inc/files/files.ctrl.php:1242
 #, php-format
@@ -7007,9 +6992,8 @@ msgid "Could not delete directory: %s"
 msgstr "Не удалось удалить директорию: %s"
 
 #: ../../../inc/files/model/_file.funcs.php:1042
-#, fuzzy
 msgid "Cache directory could not be accessed."
-msgstr "Директория &laquo;%s&raquo; не может быть создана."
+msgstr "Нет доступа к папке кэша."
 
 #: ../../../inc/files/model/_filelist.class.php:334
 #, php-format
@@ -7097,14 +7081,12 @@ msgstr "Не удалось получить файл. Ошибка: %s (ста�
 
 #: ../../../inc/files/upload.ctrl.php:325
 #: ../../../inc/files/upload.ctrl.php:331
-#, fuzzy
 msgid "Couldn't replace the old version"
-msgstr "Не удалось обработать заголовок даты!"
+msgstr "Не удалось заменить старую версию"
 
 #: ../../../inc/files/upload.ctrl.php:327
-#, fuzzy
 msgid "The old version has been replaced!"
-msgstr "Разрешения блога обновлены"
+msgstr "Старая версия была заменена!"
 
 #: ../../../inc/files/upload.ctrl.php:367
 msgid "Please select a local file to upload."
@@ -7419,9 +7401,8 @@ msgid "Options"
 msgstr "Настройки"
 
 #: ../../../inc/files/views/_file_browse_set.form.php:64
-#, fuzzy
 msgid "Check this to show system hidden files. System hidden files start with a dot (.)"
-msgstr "Отметьте для показа скрытых файлов. Скрытые файлы начинаются с точки (.)"
+msgstr "Отметьте для показа скрытых системных файлов. Именя скрытых файлов начинаются с точки (.)"
 
 #: ../../../inc/files/views/_file_browse_set.form.php:64
 msgid "Hidden files"
@@ -7640,9 +7621,8 @@ msgid "No files found."
 msgstr "Файлы не найдены."
 
 #: ../../../inc/files/views/_file_list.inc.php:503
-#, fuzzy
 msgid "Link files to current post"
-msgstr "Добавить этот файл к вашей записи"
+msgstr "Привязать файлы к текущей записи"
 
 #: ../../../inc/files/views/_file_list.inc.php:509
 msgid "Make one post (including all images)"
@@ -7872,9 +7852,8 @@ msgid "Use .evocache folders (system hidden folders)"
 msgstr ""
 
 #: ../../../inc/files/views/_file_settings.form.php:226
-#, fuzzy
 msgid "Cache folder names"
-msgstr "Имя архива"
+msgstr "Названия папок для кеша"
 
 #: ../../../inc/files/views/_file_settings.form.php:226
 msgid "Use _evocache folders (compatible with all webservers)"
@@ -7939,9 +7918,8 @@ msgstr "Недопустимое подтверждение."
 
 #. TRANS: will be displayed as title in case of renamed file uploads
 #: ../../../inc/files/views/_file_upload.view.php:286
-#, fuzzy
 msgid "File name changed."
-msgstr "Уровень пользователя изменен."
+msgstr "Имя файла изменено."
 
 #: ../../../inc/files/views/_file_upload.view.php:309
 msgid "Get from URL"
@@ -8259,9 +8237,8 @@ msgid "Post has been updated."
 msgstr "Запись обновлена."
 
 #: ../../../inc/items/items.ctrl.php:652
-#, fuzzy
 msgid "post(s) has been updated!"
-msgstr "Запись обновлена."
+msgstr "записи(ей) было обновлено!"
 
 #: ../../../inc/items/items.ctrl.php:656
 #, fuzzy
@@ -8652,13 +8629,12 @@ msgid "Save & start attaching files"
 msgstr "Сохранить и добавить файлы"
 
 #: ../../../inc/items/model/_item.funcs.php:547
-#, fuzzy
 msgid "Add new category"
 msgstr "Добавить новую рубрику"
 
 #: ../../../inc/items/model/_item.funcs.php:635
 msgid "Main"
-msgstr "Основная"
+msgstr "Осн"
 
 #: ../../../inc/items/model/_item.funcs.php:635
 msgid "Main category"
@@ -8670,7 +8646,7 @@ msgstr "Дополнительные рубрики"
 
 #: ../../../inc/items/model/_item.funcs.php:638
 msgid "Extra"
-msgstr "Экстра"
+msgstr "Доп"
 
 #: ../../../inc/items/model/_item.funcs.php:673
 #: ../../../inc/items/model/_item.funcs.php:765
@@ -9994,9 +9970,8 @@ msgid "Maintenance mode"
 msgstr "Служебный режим"
 
 #: ../../../inc/maintenance/views/_backup.form.php:156
-#, fuzzy
 msgid "Put b2evolution into Maintenance Mode while backing up - Recommended"
-msgstr "Ввести сайт в Служебный режим на время резервного копирования (рекомендуется)."
+msgstr "Ввести сайт в Служебный режим на время резервного копирования - Рекомендуется."
 
 #: ../../../inc/maintenance/views/_backup.form.php:160
 msgid "Compress backup files into ZIP archive."
@@ -10131,15 +10106,13 @@ msgid "This is an automatically generated message; please do not reply to this e
 msgstr "Это письмо сгенерировано автоматически, пожалуйста не отвечайте на него!"
 
 #: ../../../inc/messaging/model/_messaging.funcs.php:146
-#, fuzzy
 msgid "You don't have permission to send private message."
-msgstr "У вас нет разрешений на создание сообщений в этой переписке."
+msgstr "У вас нет разрешений на отправку личных сообщений."
 
 #: ../../../inc/messaging/model/_messaging.funcs.php:152
 #: ../../../skins/_user.disp.php:68
-#, fuzzy
 msgid "You cannot send a private message to yourself."
-msgstr "Вы не можете отправлять сообщения самому себе: %s"
+msgstr "Вы не можете отправлять личные сообщения самому себе."
 
 #: ../../../inc/messaging/model/_thread.class.php:92
 msgid "Please enter a subject"
@@ -12162,7 +12135,7 @@ msgstr "Выбрать другую тему..."
 
 #: ../../../inc/skins/views/_coll_skin_settings.form.php:51
 msgid "Use a different skin"
-msgstr ""
+msgstr "Использовать другую тему"
 
 #: ../../../inc/skins/views/_coll_skin_settings.form.php:53
 msgid "Current skin"
@@ -12685,7 +12658,7 @@ msgstr "Поддержка FreeType в GD"
 
 #: ../../../inc/tools/system.ctrl.php:553
 msgid "You will not be able to write text to images using TrueType fonts."
-msgstr ""
+msgstr "Вы не сможете добавлять текстовые подписи на картинки используя TrueType шрифты."
 
 #: ../../../inc/tools/tools.ctrl.php:33
 #, php-format
@@ -16857,7 +16830,7 @@ msgstr "Указан не правильный видео ID."
 #: ../../../plugins/watermark_plugin/_watermark.plugin.php:36
 #: ../../../plugins/watermark_plugin/_watermark.plugin.php:37
 msgid "Adds text watermark to generated thumbnails"
-msgstr ""
+msgstr "Добавляет текстовые подписи на создаваемые миниатюры картинок"
 
 #: ../../../plugins/watermark_plugin/_watermark.plugin.php:57
 msgid "The text to write on the image."
@@ -16875,7 +16848,7 @@ msgstr "Не удалось загрузить файл шрифта: %s"
 
 #: ../../../plugins/watermark_plugin/_watermark.plugin.php:100
 msgid "The function imagettftext() is not available."
-msgstr ""
+msgstr "Функция imagettftext() недоступна."
 
 #: ../../../skins/_body_footer.inc.php:24
 #: ../../../skins/asevo/_body_footer.inc.php:34
