@@ -556,7 +556,7 @@ class CommentList2 extends DataObjectList2
 
 		if( !empty($this->filters['keywords']) )
 		{
-			$title_array[T_('keywords')] = T_('Keywords').': '.$this->filters['keywords'];
+			$title_array['keywords'] = T_('Keywords').': '.$this->filters['keywords'];
 		}
 
 		return $title_array;
@@ -603,6 +603,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.24  2010/05/24 21:27:58  sam2kb
+ * Fixed some translated strings
+ *
  * Revision 1.23  2010/05/10 14:26:17  efy-asimo
  * Paged Comments & filtering & add comments listview
  *

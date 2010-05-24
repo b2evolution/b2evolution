@@ -766,8 +766,9 @@ function install_htaccess( $upgrade = false )
 	if( $error_message)
 	{
 		echo 'ERROR!<br/><b>'.$error_message.'</b><br />';
-		printf( T_('Everything should still work, but for optimization you should follow <a %s>these instructions</a>.'.'</p>'), 'href="http://manual.b2evolution.net/Tricky_stuff" target="_blank"');
+		printf( T_('Everything should still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="http://manual.b2evolution.net/Tricky_stuff" target="_blank"');
 	}
+	echo '</p>';
 }
 
 /**
@@ -843,6 +844,9 @@ function get_antispam_query()
 
 /*
  * $Log$
+ * Revision 1.95  2010/05/24 21:27:58  sam2kb
+ * Fixed some translated strings
+ *
  * Revision 1.94  2010/04/27 19:25:57  blueyed
  * Installer: fix for undefined host in db_config.
  *

@@ -54,7 +54,7 @@ $ItemList->query();
 
 if( $ItemList->get_num_rows() > 100 )
 {
-	$Form->info( '', T_( 'There are ' ).$ItemList->get_num_rows().T_( ' posts in your selection, only the first 100 are displayed' ) );
+	$Form->info( '', sprintf( T_('There are %d posts in your selection, only the first 100 are displayed'), $ItemList->get_num_rows() ) );
 }
 
 /*
@@ -69,9 +69,9 @@ while( $Item = & $ItemList->get_item() )
 	
 	$Form->begin_fieldset( '', array( 'class' => 'fieldset clear' ));
 	
-	$Form->text( 'mass_title_'.$Item->ID , $Item->get( 'title'),50, T_('Title'), '', 255 );
-	$Form->text( 'mass_urltitle_'.$Item->ID, $Item->get( 'urltitle'), 50, T_('URL title "slug"'), '', 255 );
-	$Form->text( 'mass_titletag_'.$Item->ID, $Item->get( 'titletag'), 50, T_( htmlspecialchars('<title> tag') ), '', 255 );
+	$Form->text( 'mass_title_'.$Item->ID , $Item->get( 'title'), 70, T_('Title'), '', 255 );
+	$Form->text( 'mass_urltitle_'.$Item->ID, $Item->get( 'urltitle'), 70, T_('URL title "slug"'), '', 255 );
+	$Form->text( 'mass_titletag_'.$Item->ID, $Item->get( 'titletag'), 70, T_( htmlspecialchars('<title> tag') ), '', 255 );
 
 	$Form->end_fieldset();
 }

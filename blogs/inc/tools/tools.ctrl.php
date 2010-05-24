@@ -234,7 +234,7 @@ if( empty($tab) )
 		echo '<ul>';
 		echo '<li><a href="'.regenerate_url('action', 'action=del_itemprecache&amp;'.url_crumb('tools')).'">'.T_('Clear pre-renderered item cache (DB)').'</a></li>';
 		echo '<li><a href="'.regenerate_url('action', 'action=del_pagecache&amp;'.url_crumb('tools')).'">'.T_('Clear full page cache (/cache directory)').'</a></li>';
-		echo '<li><a href="'.regenerate_url('action', 'action=del_filecache&amp;'.url_crumb('tools')).'">'.T_('Clear thumbnail caches ('.$Settings->get( 'evocache_foldername' ).' directories)').'</a></li>';
+		echo '<li><a href="'.regenerate_url('action', 'action=del_filecache&amp;'.url_crumb('tools')).'">'.sprintf( T_('Clear thumbnail caches (%s directories)'), $Settings->get( 'evocache_foldername' ) ).'</a></li>';
 		echo '</ul>';
 		$block_item_Widget->disp_template_raw( 'block_end' );
 
@@ -300,6 +300,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.28  2010/05/24 21:27:58  sam2kb
+ * Fixed some translated strings
+ *
  * Revision 1.27  2010/05/02 00:15:07  blueyed
  * cleanup
  *
