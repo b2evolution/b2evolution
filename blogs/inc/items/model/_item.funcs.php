@@ -731,15 +731,18 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	// CHECKBOX:
 	if( get_post_cat_setting( $blog ) >= 2 )
 	{ // We allow multiple categories or main + extra cat,  display checkbox:
-		if( ($current_blog_ID == $blog) || ( get_allow_cross_posting( $blog ) % 2 == 1 ) )
+		if( ($current_blog_ID == $blog) || ( get_allow_cross_posting( $blog ) % 2 == 1 )
+			|| ( ( get_allow_cross_posting( $blog ) == 2 ) && ( get_post_cat_setting( $blog ) == 2 ) ) )
 		{ // This is the current blog or we allow cross posting (select extra cat from another blog)
 			if( $cat_select_form_fields )
 			{	// We want a form field:
 				$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
 							.T_('Select as an additional category').'" value="'.$cat_ID.'"';
 				// if( ($cat_ID == $edited_Item->main_cat_ID) || (in_array( $cat_ID, $post_extracats )) )  <--- We don't want to precheck the default cat because it will stay checked if we change the default main. On edit, the checkbox will always be in the array.
-				if( (in_array( $cat_ID, $post_extracats )) )
-				{
+				if( (in_array( $cat_ID, $post_extracats ))
+					|| ( count( $post_extracats ) == 0 && in_array( $cat_ID, $edited_Item->extra_cat_IDs )
+					&& ! param( 'new_maincat', 'boolean', false ) && ! param( 'new_extracat', 'boolean', false ) ) )
+				{ // This category was selected or if wasn't select any category but this is the default
 					$r .= ' checked="checked"';
 				}
 				$r .= ' id="sel_extracat_'.$cat_ID.'"';
@@ -1360,6 +1363,9 @@ function check_categories( & $post_category, & $post_extracats )
 	$post_extracats = param( 'post_extracats', 'array', array() );
 	global $Messages, $Blog, $blog;
 
+	load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
+	$GenericCategoryCache = & get_ChapterCache();
+
 	if( $post_category == -1 )
 	{ // no main cat select
 		if( count( $post_extracats ) == 0 )
@@ -1376,7 +1382,7 @@ function check_categories( & $post_category, & $post_extracats )
 			{ // allow moving posts between different blogs is disabled - we need a main cat from $blog 
 				foreach( $post_extracats as $cat )
 				{
-					if( get_cat_blog( $cat ) != $blog )
+					if( get_catblog( $cat ) != $blog )
 					{ // this cat is not from $blog
 						continue;
 					}
@@ -1389,6 +1395,11 @@ function check_categories( & $post_category, & $post_extracats )
 					$post_category = $Blog->get_default_cat_ID();
 				}
 			}
+		}
+		if( $post_category )
+		{ // If main cat is not a new category, and has been autoselected
+			$Messages->add( sprintf( T_('The main category for this post has been automatically set to "%s" (Blog "%s")'),
+				$GenericCategoryCache->get_by_ID( $post_category )->get_name(), $Blog->get( 'name') ), 'redwarning' );
 		}
 	}
 
@@ -1406,8 +1417,6 @@ function check_categories( & $post_category, & $post_extracats )
 			}
 			return true;
 		}
-		load_class( 'chapters/model/_chaptercache.class.php', 'ChapterCache' );
-		$GenericCategoryCache = & get_ChapterCache();
 
 		$new_GenericCategory = & $GenericCategoryCache->new_obj( NULL, $blog );	// create new category object
 		$new_GenericCategory->set( 'name', $category_name );
@@ -1546,6 +1555,9 @@ function echo_set_slug_changed()
 }
 /*
  * $Log$
+ * Revision 1.109  2010/05/24 07:18:53  efy-asimo
+ * Allow cross posting - fix
+ *
  * Revision 1.108  2010/05/22 12:22:49  efy-asimo
  * move $allow_cross_posting in the backoffice
  *
