@@ -40,6 +40,7 @@ while( $Comment = & $CommentList->get_next() )
 	<!-- ========== START of a COMMENT/TB/PB ========== -->
 	<div id="c<?php echo $Comment->ID ?>" class="bComment bComment<?php $Comment->status('raw') ?>">
 		<div class="bSmallHead">
+         <div>
 			<?php
 				echo '<div class="bSmallHeadRight">';
 				echo T_('Visibility').': ';
@@ -52,14 +53,19 @@ while( $Comment = & $CommentList->get_next() )
 			@
 			<span class="bTime"><?php $Comment->time( 'H:i' ); ?></span>
 			<?php
-			$redirect_to = param( 'redirect_to', 'string', NULL, true );
-			$Comment->author_url_with_actions( $redirect_to, false, true );
 			$Comment->author_email( '', ' &middot; Email: <span class="bEmail">', '</span>' );
-			$Comment->author_ip( ' &middot; IP: <span class="bIP">', '</span>' );
 			echo ' &middot; <span class="bKarma">';
 			$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No Spam Karma') );
 			echo '</span>';
-		 ?>
+			?>
+         </div>
+         <div style="padding-top:3px">
+         	<?php
+			$Comment->author_ip( 'IP: <span class="bIP">', '</span> &middot; ' );
+		 	$redirect_to = param( 'redirect_to', 'string', NULL, true );
+			$Comment->author_url_with_actions( $redirect_to, false, true );
+		 	?>
+         </div>
 		</div>
 		<div class="bCommentContent">
 		<div class="bTitle">
@@ -107,6 +113,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.16  2010/05/24 19:04:19  sam2kb
+ * Comment header split into 2 lines
+ *
  * Revision 1.15  2010/05/10 14:26:17  efy-asimo
  * Paged Comments & filtering & add comments listview
  *
