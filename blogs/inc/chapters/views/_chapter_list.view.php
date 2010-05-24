@@ -79,7 +79,7 @@ function cat_line( $Chapter, $level )
 				</td>';
 
 	$makedef_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=make_default&amp;'.url_crumb('element') );
-	$makedef_title = T_('Click to make this the default category');
+	$makedef_title = format_to_output( T_('Click to make this the default category'), 'htmlattr' );
 
 	if( $current_default_cat_ID == $Chapter->ID )
 	{
@@ -270,6 +270,9 @@ echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categori
 $Session->delete( 'fadeout_array');
 /*
  * $Log$
+ * Revision 1.25  2010/05/24 19:13:44  sam2kb
+ * Properly encode "title" text
+ *
  * Revision 1.24  2010/05/18 07:08:51  efy-asimo
  * Notice in chapter_list_view - fix
  *
