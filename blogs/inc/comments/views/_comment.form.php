@@ -35,7 +35,7 @@ global $comments_use_autobr, $mode, $month, $tab, $redirect_to;
 
 $Form = new Form( NULL, 'comment_checkchanges', 'post' );
 
-$Form->global_icon( T_('Delete this comment'), 'delete', '?ctrl=comments&amp;action=delete&amp;comment_ID='.$edited_Comment->ID,
+$Form->global_icon( T_('Delete this comment'), 'delete', '?ctrl=comments&amp;action=delete&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment'),
 			T_('delete'), 4, 3, array(
 				 'onclick' => 'return confirm(\''.TS_('You are about to delete this comment!\\nThis cannot be undone!').'\')',
 				 'style' => 'margin-right: 3ex;',	// Avoid misclicks by all means!
@@ -296,6 +296,9 @@ echo_comment_publishbt_js();
 
 /*
  * $Log$
+ * Revision 1.18  2010/05/29 03:47:20  sam2kb
+ * Added missing crumb
+ *
  * Revision 1.17  2010/03/30 11:14:03  efy-asimo
  * move comments from one post to another
  *
