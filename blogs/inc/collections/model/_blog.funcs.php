@@ -470,8 +470,60 @@ function set_working_blog( $new_blog_ID )
 }
 
 
+/**
+ * @param string
+ * @return array|string
+ */
+function get_collection_kinds( $kind = NULL )
+{
+	global $Plugins;
+	
+	$kinds = array(
+		'std' => array(
+				'name' => T_('Standard blog'),
+				'desc' => T_('A standard blog with the most common features.'),
+			),
+		'photo' => array(
+				'name' => T_('Photoblog'),
+				'desc' => T_('A blog optimized to publishing photos.'),
+			),
+		'group' => array(
+				'name' => T_('Group blog'),
+				'desc' => T_('A blog optimized for team/collaborative editing. Posts can be assigned to different reviewers before being published. Look for the workflow properties at the bottom of the post editing form.'),
+			),
+		);
+	
+	// Define blog kinds, their names and description.
+	$plugin_kinds = $Plugins->trigger_collect( 'GetCollectionKinds', array('kinds' => & $kinds) );
+	
+	foreach( $plugin_kinds as $l_kinds )
+	{
+		$kinds = array_merge( $l_kinds, $kinds );
+	}
+	
+	if( is_null($kind) )
+	{	// Return kinds array
+		return $kinds;
+	}
+	
+	if( array_key_exists( $kind, $kinds ) && !empty($kinds[$kind]['name']) )
+	{
+		return $kinds[$kind]['name'];
+	}
+	else
+	{	// Use default collection kind
+		return $kinds['std']['name'];
+	}
+}
+
+
 /*
  * $Log$
+ * Revision 1.10  2010/06/01 02:44:44  sam2kb
+ * New hooks added: GetCollectionKinds and InitCollectionKinds.
+ * Use them to define new and override existing presets for new blogs.
+ * See http://forums.b2evolution.net/viewtopic.php?t=21015
+ *
  * Revision 1.9  2010/02/08 17:52:09  efy-yury
  * copyright 2009 -> 2010
  *

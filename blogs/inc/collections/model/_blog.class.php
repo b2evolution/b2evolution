@@ -234,28 +234,16 @@ class Blog extends DataObject
 				$this->set( 'urlname', empty($urlname) ? 'blog' : $urlname );
 				break;
 		}
-	}
-
-
-	/**
-	 * @static
-	 *
-	 * @param string
-	 * @return string
-	 */
-	function kind_name( $kind )
-	{
-  	switch( $kind )
-		{
-			case 'photo':
-				return T_('Photoblog');
-
-			case 'group':
-				return T_('Group blog');
-
-			case 'std':
-			default:
-				return T_('Standard blog');
+		
+		if( empty($name) && empty($shortname) && empty($urlname) )
+		{	// Not in installation mode, init custom collection kinds.
+			global $Plugins;
+			
+			// Defines blog settings by its kind.
+			$Plugins->trigger_event( 'InitCollectionKinds', array(
+							'Blog' => & $this,
+							'kind' => & $kind,
+						) );
 		}
 	}
 
@@ -2325,6 +2313,11 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.111  2010/06/01 02:44:44  sam2kb
+ * New hooks added: GetCollectionKinds and InitCollectionKinds.
+ * Use them to define new and override existing presets for new blogs.
+ * See http://forums.b2evolution.net/viewtopic.php?t=21015
+ *
  * Revision 1.110  2010/05/22 12:22:49  efy-asimo
  * move $allow_cross_posting in the backoffice
  *

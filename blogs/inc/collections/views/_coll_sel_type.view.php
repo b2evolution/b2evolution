@@ -21,28 +21,36 @@ echo '<h2>'.T_('What kind of blog would you like to create?').'</h2>';
 
 echo '<table class="coll_kind">';
 
+if( $blog_kinds = get_collection_kinds() )
+{
+	foreach( $blog_kinds as $kind => $info )
+	{
+		echo '<tr>';
+			echo '<td class="coll_kind"><h3><a href="?ctrl=collections&amp;action=new-selskin&amp;kind='.$kind.'">'.$info['name'].' &raquo;</a></h3></td>';
+			echo '<td>'.$info['desc'].'<td>';
+		echo '</tr>';
+	}
+}
+else
+{
 	echo '<tr>';
 		echo '<td class="coll_kind"><h3><a href="?ctrl=collections&amp;action=new-selskin&amp;kind=std">'.T_('Standard').' &raquo;</a></h3></td>';
 		echo '<td>'.T_('A standard blog with the most common features.').'<td>';
 	echo '</tr>';
-
-	echo '<tr>';
-		echo '<td class="coll_kind"><h3><a href="?ctrl=collections&amp;action=new-selskin&amp;kind=photo">'.T_('Photoblog').' &raquo;</a></h3></td>';
-		echo '<td>'.T_('A blog optimized to publishing photos.').'<td>';
-	echo '</tr>';
-
-	echo '<tr>';
-		echo '<td class="coll_kind"><h3><a href="?ctrl=collections&amp;action=new-selskin&amp;kind=group">'.T_('Group blog').' &raquo;</a></h3></td>';
-		echo '<td>'.T_('A blog optimized for team/collaborative editing. Posts can be assigned to different reviewers before being published. Look for the workflow properties at the bottom of the post editing form.').'<td>';
-	echo '</tr>';
+}
 
 echo '</table>';
-
-echo '<p>'.T_('Your selection here will pre-configure your blog in order to optimize it for a particular use. Nothing is final though. You can change all the settings at any time and any kind of blog can be transformed into any other at any time.').'</p>';
-
+	
+	echo '<p>'.T_('Your selection here will pre-configure your blog in order to optimize it for a particular use. Nothing is final though. You can change all the settings at any time and any kind of blog can be transformed into any other at any time.').'</p>';
+	
 
 /*
  * $Log$
+ * Revision 1.5  2010/06/01 02:44:44  sam2kb
+ * New hooks added: GetCollectionKinds and InitCollectionKinds.
+ * Use them to define new and override existing presets for new blogs.
+ * See http://forums.b2evolution.net/viewtopic.php?t=21015
+ *
  * Revision 1.4  2010/02/08 17:52:09  efy-yury
  * copyright 2009 -> 2010
  *

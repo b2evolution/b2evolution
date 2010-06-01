@@ -1034,6 +1034,38 @@ class Plugin
 	function AfterCollectionDelete( & $params )
 	{
 	}
+	
+	
+	/**
+	 * Event handler: Defines blog kinds, their names and description.
+	 * Define blog settings in {@link Plugin::InitCollectionKinds()} method of your plugin.
+	 *
+	 * Note: You can change default blog kinds $params['default_kinds'] (which get passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'kinds': dafault blog kinds (by reference)
+	 * @retun: array
+	 */
+	function GetCollectionKinds( & $params )
+	{
+		return array();
+	}
+	
+	
+	/**
+	 * Event handler: Defines blog settings by its kind. Use {@link get_collection_kinds()} to return
+	 * an array of available blog kinds and their names.
+	 * Define new blog kinds in {@link Plugin::GetCollectionKinds()} method of your plugin.
+	 *
+	 * Note: You have to change $params['Blog'] (which gets passed by reference).
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Blog': created Blog (by reference)
+	 *   - 'kind': the kind of created blog (by reference)
+	 */
+	function InitCollectionKinds( & $params )
+	{
+	}
 
 	// }}}
 
@@ -3028,6 +3060,11 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.43  2010/06/01 02:44:44  sam2kb
+ * New hooks added: GetCollectionKinds and InitCollectionKinds.
+ * Use them to define new and override existing presets for new blogs.
+ * See http://forums.b2evolution.net/viewtopic.php?t=21015
+ *
  * Revision 1.42  2010/05/16 23:10:31  blueyed
  * Fix doc
  *

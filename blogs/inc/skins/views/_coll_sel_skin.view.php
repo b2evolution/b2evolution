@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $kind;
 
-echo '<h2>'.sprintf( T_('New %s'), Blog::kind_name($kind) ).':</h2>';
+echo '<h2>'.sprintf( T_('New %s'), get_collection_kinds($kind) ).':</h2>';
 
 echo '<h3>'.T_('Pick a skin:').'</h3>';
 
@@ -40,6 +40,11 @@ echo '<div class="clear"></div>';
 
 /*
  * $Log$
+ * Revision 1.8  2010/06/01 02:44:44  sam2kb
+ * New hooks added: GetCollectionKinds and InitCollectionKinds.
+ * Use them to define new and override existing presets for new blogs.
+ * See http://forums.b2evolution.net/viewtopic.php?t=21015
+ *
  * Revision 1.7  2010/02/08 17:54:42  efy-yury
  * copyright 2009 -> 2010
  *

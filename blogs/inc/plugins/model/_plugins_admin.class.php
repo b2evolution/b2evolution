@@ -123,6 +123,9 @@ class Plugins_admin extends Plugins
 				'AfterCollectionDelete' => 'Gets called after a blog has been deleted from the database.',
 				'AfterCollectionInsert' => 'Gets called after a blog has been inserted into the database.',
 				'AfterCollectionUpdate' => 'Gets called after a blog has been updated in the database.',
+				
+				'GetCollectionKinds' => 'Defines blog kinds, their names and description.',
+				'InitCollectionKinds' => 'Defines blog settings by its kind.',
 
 				'AfterItemDelete' => 'This gets called after an item has been deleted from the database.',
 				'PrependItemInsertTransact' => 'This gets called before an item is inserted into the database.',
@@ -1478,6 +1481,11 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.34  2010/06/01 02:44:44  sam2kb
+ * New hooks added: GetCollectionKinds and InitCollectionKinds.
+ * Use them to define new and override existing presets for new blogs.
+ * See http://forums.b2evolution.net/viewtopic.php?t=21015
+ *
  * Revision 1.33  2010/05/24 14:50:40  fplanque
  * no message
  *

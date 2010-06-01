@@ -83,8 +83,8 @@ switch( $action )
 		param( 'kind', 'string', true );
 
 		// dh> TODO: "New %s" is probably too generic. What can %s become? (please comment it in "TRANS")
-		// Tblue> Look at Blog::kind_name(). I wrote a TRANS comment (30.01.09 22:03, HEAD).
-		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( /* TRANS: %s can become "Photoblog", "Group blog" or "Standard blog" */ T_('New %s'), Blog::kind_name($kind) ) ) );
+		// Tblue> Look at get_collection_kinds(). I wrote a TRANS comment (30.01.09 22:03, HEAD).
+		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( /* TRANS: %s can become "Photoblog", "Group blog" or "Standard blog" */ T_('New %s'), get_collection_kinds($kind) ) ) );
 		break;
 
 	case 'new-name':
@@ -101,7 +101,7 @@ switch( $action )
 
  		param( 'skin_ID', 'integer', true );
 
-		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( T_('New %s'), Blog::kind_name($kind) ) ) );
+		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( T_('New %s'), get_collection_kinds($kind) ) ) );
 		break;
 
 	case 'create':
@@ -341,7 +341,7 @@ switch($action)
 		$AdminUI->disp_payload_begin();
 
 		// ---------- "New blog" form ----------
-		echo '<h2>'.sprintf( T_('New %s'), Blog::kind_name($kind) ).':</h2>';
+		echo '<h2>'.sprintf( T_('New %s'), get_collection_kinds($kind) ).':</h2>';
 
 		$next_action = 'create';
 
@@ -421,6 +421,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.26  2010/06/01 02:44:44  sam2kb
+ * New hooks added: GetCollectionKinds and InitCollectionKinds.
+ * Use them to define new and override existing presets for new blogs.
+ * See http://forums.b2evolution.net/viewtopic.php?t=21015
+ *
  * Revision 1.25  2010/04/08 10:35:23  efy-asimo
  * Allow users to create a new blog for themselves - task
  *
