@@ -51,7 +51,7 @@ switch( $action )
 		$Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission:
-		$current_User->check_perm( 'blog_comments', 'edit', true, $blog );
+		$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
 
 		// Where are we going to redirect to?
 		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment->item_ID, '&' ) );
@@ -59,7 +59,7 @@ switch( $action )
 
 	case 'list':
 	  // Check permission:
-	  $selected = autoselect_blog( 'blog_comments', 'edit' );
+		$selected = autoselect_blog( 'blog_comments', 'edit' );
 		if( ! $selected )
 		{ // No blog could be selected
 			$Messages->add( T_('You have no permission to edit comments.' ), 'error' );
@@ -282,7 +282,7 @@ switch( $action )
 
 		// Filter list:
 		$CommentList->set_default_filters( array(
-				'statuses' => array ( 'published', 'draft', 'deprecated'),
+				'statuses' => get_allowed_statuses( $blog ),
 				'comments' => 5,
 			) );
 
@@ -371,6 +371,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.28  2010/06/01 11:33:19  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.27  2010/05/10 14:26:17  efy-asimo
  * Paged Comments & filtering & add comments listview
  *

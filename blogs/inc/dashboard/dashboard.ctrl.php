@@ -30,7 +30,7 @@ global $dispatcher, $allow_evo_stats;
 
 if( $blog )
 {
-	if( ! $current_User->check_perm( 'blog_ismember', 1, false, $blog ) )
+	if( ! $current_User->check_perm( 'blog_ismember', 'view', false, $blog ) )
 	{	// We don't have permission for the requested blog (may happen if we come to admin from a link on a different blog)
 		set_working_blog( 0 );
 		unset( $Blog );
@@ -727,6 +727,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.67  2010/06/01 11:33:19  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.66  2010/05/10 14:26:17  efy-asimo
  * Paged Comments & filtering & add comments listview
  *

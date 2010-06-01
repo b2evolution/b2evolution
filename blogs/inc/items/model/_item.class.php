@@ -2363,7 +2363,7 @@ class Item extends ItemLight
 								), $params );
 		*/
 
-		if( isset($current_User) && $current_User->check_perm( 'blog_comments', 'any', false, $this->get_blog_ID() ) )
+		if( isset($current_User) && $current_User->check_perm( 'blog_draft_comments', 'edit', false, $this->get_blog_ID() ) )
 		{	// We jave permission to edit comments:
 			if( $edit_comments_link == '#' )
 			{	// Use default link:
@@ -4479,6 +4479,10 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.204  2010/06/01 11:33:20  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.203  2010/05/16 23:09:56  blueyed
  * Fix return value of add_renderer, if the renderer got added. Fixes ItemApplyAsRenderer workflow.
  *

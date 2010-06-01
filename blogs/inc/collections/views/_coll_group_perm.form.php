@@ -71,12 +71,13 @@ else
 
 $SQL = new SQL();
 $SQL->SELECT( 'grp_ID, grp_name, bloggroup_perm_poststatuses, bloggroup_perm_edit, bloggroup_ismember,'
-	. 'bloggroup_perm_comments, bloggroup_perm_delpost, bloggroup_perm_cats,'
+	. 'bloggroup_perm_draft_cmts, bloggroup_perm_publ_cmts, bloggroup_perm_depr_cmts,'
+	. 'bloggroup_perm_delpost, bloggroup_perm_cats,'
 	. 'bloggroup_perm_properties, bloggroup_perm_admin, bloggroup_perm_media_upload,'
 	. 'bloggroup_perm_media_browse, bloggroup_perm_media_change, bloggroup_perm_page,'
 	. 'bloggroup_perm_intro, bloggroup_perm_podcast, bloggroup_perm_sidebar' );
-$SQL->FROM( 'T_groups LEFT JOIN T_coll_group_perms ON grp_ID = bloggroup_group_ID' );
-$SQL->WHERE( 'bloggroup_blog_ID = ' . $edited_Blog->ID );
+$SQL->FROM( 'T_groups LEFT JOIN T_coll_group_perms ON
+			( grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$edited_Blog->ID.' )' );
 $SQL->ORDER_BY( 'bloggroup_ismember DESC, *, grp_name, grp_ID' );
 
 if( !empty( $keywords ) )
@@ -346,11 +347,13 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Edit<br />comts'),
+						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Edit<br />commts'),
 						'th_class' => 'checkright',
-						'order' => 'bloggroup_perm_comments',
+						'order' => 'bloggroup_perm_publ_cmts',
 						'default_dir' => 'D',
-						'td' => '%coll_perm_checkbox( {row}, \'perm_comments\', \''.TS_('Permission to edit comments in this blog').'\' )%',
+						'td' => '%coll_perm_checkbox( {row}, \'perm_draft_cmts\', \''.TS_('Permission to edit draft comments in this blog').'\' )%'.
+								'%coll_perm_checkbox( {row}, \'perm_publ_cmts\', \''.TS_('Permission to edit published comments in this blog').'\' )%'.
+								'%coll_perm_checkbox( {row}, \'perm_depr_cmts\', \''.TS_('Permission to edit deprecated comments in this blog').'\' )%',
 						'td_class' => 'center',
 					);
 
@@ -535,6 +538,10 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.15  2010/06/01 11:33:19  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.14  2010/02/08 17:52:09  efy-yury
  * copyright 2009 -> 2010
  *

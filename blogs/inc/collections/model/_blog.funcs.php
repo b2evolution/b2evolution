@@ -108,7 +108,9 @@ function blog_update_perms( $blog, $context = 'user' )
 				'bloguser_ismember' => 0,
 				'bloguser_perm_poststatuses' => array(),
 				'bloguser_perm_delpost' => 0,
-				'bloguser_perm_comments' => 0,
+				'bloguser_perm_draft_cmts' => 0,
+				'bloguser_perm_publ_cmts' => 0,
+				'bloguser_perm_depr_cmts' => 0,
 				'bloguser_perm_media_upload' => 0,
 				'bloguser_perm_media_browse' => 0,
 				'bloguser_perm_media_change' => 0,
@@ -165,7 +167,9 @@ function blog_update_perms( $blog, $context = 'user' )
 
 				case 'moderator':
 					$easy_perms['bloguser_perm_poststatuses'][] = 'redirected';
-					$easy_perms['bloguser_perm_comments'] = 1;
+					$easy_perms['bloguser_perm_draft_cmts'] = 1;
+					$easy_perms['bloguser_perm_publ_cmts'] = 1;
+					$easy_perms['bloguser_perm_depr_cmts'] = 1;
 					$easy_perms['bloguser_perm_media_upload'] = 1;
 					$easy_perms['bloguser_perm_media_browse'] = 1;
 					$easy_perms['bloguser_perm_media_change'] = 1;
@@ -196,7 +200,8 @@ function blog_update_perms( $blog, $context = 'user' )
 			$inserted_values[] = " ( $blog, $loop_ID, ".$easy_perms['bloguser_ismember']
 														.', '.$DB->quote($easy_perms['bloguser_perm_poststatuses'])
 														.', '.$DB->quote($easy_perms['bloguser_perm_edit'])
-														.', '.$easy_perms['bloguser_perm_delpost'].', '.$easy_perms['bloguser_perm_comments']
+														.', '.$easy_perms['bloguser_perm_delpost'].', '.$easy_perms['bloguser_perm_draft_cmts']
+														.', '.$easy_perms['bloguser_perm_publ_cmts'].', '.$easy_perms['bloguser_perm_depr_cmts']
 														.', '.$easy_perms['bloguser_perm_cats'].', '.$easy_perms['bloguser_perm_properties']
 														.', '.$easy_perms['bloguser_perm_admin']
 														.', '.$easy_perms['bloguser_perm_media_upload'].', '.$easy_perms['bloguser_perm_media_browse']
@@ -236,7 +241,9 @@ function blog_update_perms( $blog, $context = 'user' )
 			$perm_edit = param( 'blog_perm_edit_'.$loop_ID, 'string', 'no' );
 
 			$perm_delpost = param( 'blog_perm_delpost_'.$loop_ID, 'integer', 0 );
-			$perm_comments = param( 'blog_perm_comments_'.$loop_ID, 'integer', 0 );
+			$perm_draft_comments = param( 'blog_perm_draft_cmts_'.$loop_ID, 'integer', 0 );
+			$perm_publ_comments = param( 'blog_perm_publ_cmts_'.$loop_ID, 'integer', 0 );
+			$perm_depr_comments = param( 'blog_perm_depr_cmts_'.$loop_ID, 'integer', 0 );
 			$perm_cats = param( 'blog_perm_cats_'.$loop_ID, 'integer', 0 );
 			$perm_properties = param( 'blog_perm_properties_'.$loop_ID, 'integer', 0 );
 
@@ -255,17 +262,18 @@ function blog_update_perms( $blog, $context = 'user' )
 
 			// Update those permissions in DB:
 
-			if( $ismember || count($perm_post) || $perm_delpost || $perm_comments || $perm_cats || $perm_properties
-										|| $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change )
+			if( $ismember || count($perm_post) || $perm_delpost || $perm_draft_comments || $perm_publ_comments || $perm_publ_comments || 
+				$perm_cats || $perm_properties || $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change )
 			{ // There are some permissions for this user:
 				$ismember = 1;	// Must have this permission
 
 				// insert new perms:
 				$inserted_values[] = " ( $blog, $loop_ID, $ismember, ".$DB->quote(implode(',',$perm_post)).",
 																	".$DB->quote($perm_edit).",
-																	$perm_delpost, $perm_comments, $perm_cats, $perm_properties, $perm_admin,
-																	$perm_media_upload, $perm_media_browse, $perm_media_change, $perm_page,
-																	$perm_intro, $perm_podcast, $perm_sidebar )";
+																	$perm_delpost, $perm_draft_comments, $perm_publ_comments, $perm_depr_comments, 
+																	$perm_cats, $perm_properties, $perm_admin, $perm_media_upload, 
+																	$perm_media_browse, $perm_media_change, $perm_page,	$perm_intro, $perm_podcast, 
+																	$perm_sidebar )";
 			}
 		}
 	}
@@ -274,7 +282,8 @@ function blog_update_perms( $blog, $context = 'user' )
 	if( count( $inserted_values ) )
 	{
 		$DB->query( "INSERT INTO $table( {$prefix}blog_ID, {$ID_field}, {$prefix}ismember,
-											{$prefix}perm_poststatuses, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_comments,
+											{$prefix}perm_poststatuses, {$prefix}perm_edit, {$prefix}perm_delpost,
+											{$prefix}perm_draft_cmts, {$prefix}perm_publ_cmts, {$prefix}perm_depr_cmts,
 											{$prefix}perm_cats, {$prefix}perm_properties, {$prefix}perm_admin,
 											{$prefix}perm_media_upload, {$prefix}perm_media_browse, {$prefix}perm_media_change,
 											{$prefix}perm_page, {$prefix}perm_intro, {$prefix}perm_podcast, {$prefix}perm_sidebar )
@@ -323,7 +332,9 @@ function blogperms_get_easy2( $perms, $context = 'user' )
 									+ (in_array( 'published', $perms_post ) ? 1 : 0);
 
 	$perms_moderator = (in_array( 'redirected', $perms_post ) ? 1 : 0)
-									+(int)$perms->{'blog'.$context.'_perm_comments'}
+									+(int)$perms->{'blog'.$context.'_perm_draft_cmts'}
+									+(int)$perms->{'blog'.$context.'_perm_publ_cmts'}
+									+(int)$perms->{'blog'.$context.'_perm_depr_cmts'}
 									+(int)$perms->{'blog'.$context.'_perm_media_change'};
 
 	$perms_owner =   (int)$perms->{'blog'.$context.'_perm_properties'}
@@ -336,17 +347,17 @@ function blogperms_get_easy2( $perms, $context = 'user' )
 
 	// echo "<br> $perms_contrib $perms_editor $perms_moderator $perms_admin $perm_edit ";
 
-	if( $perms_contrib == 4 && $perms_editor == 3 && $perms_moderator == 3 && $perms_owner == 3 && $perms_admin == 1 && $perm_edit == 'all' )
+	if( $perms_contrib == 4 && $perms_editor == 3 && $perms_moderator == 5 && $perms_owner == 3 && $perms_admin == 1 && $perm_edit == 'all' )
 	{ // has full admin rights
 		return 'admin';
 	}
 
-	if( $perms_contrib == 4 && $perms_editor == 3 && $perms_moderator == 3 && $perms_owner == 3 && $perms_admin == 0 && $perm_edit == 'all' )
+	if( $perms_contrib == 4 && $perms_editor == 3 && $perms_moderator == 5 && $perms_owner == 3 && $perms_admin == 0 && $perm_edit == 'all' )
 	{ // has full editor rights
 		return 'owner';
 	}
 
-	if( $perms_contrib == 4 && $perms_editor == 3 && $perms_moderator == 3 && $perms_owner == 0 && $perms_admin == 0 && $perm_edit == 'lt' )
+	if( $perms_contrib == 4 && $perms_editor == 3 && $perms_moderator == 5 && $perms_owner == 0 && $perms_admin == 0 && $perm_edit == 'lt' )
 	{ // moderator
 		return 'moderator';
 	}
@@ -519,6 +530,10 @@ function get_collection_kinds( $kind = NULL )
 
 /*
  * $Log$
+ * Revision 1.11  2010/06/01 11:33:19  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.10  2010/06/01 02:44:44  sam2kb
  * New hooks added: GetCollectionKinds and InitCollectionKinds.
  * Use them to define new and override existing presets for new blogs.

@@ -95,28 +95,8 @@ switch( $action )
 
 		$delcomments = $deldraft || $delpublished || $deldeprecated;
 		if( $delcomments )
-		{ // Then selected banned comments
-			$del_condition = '';
-			if( ! ( $deldraft && $delpublished && $deldeprecated ) )
-			{
-				$del_condition = ' AND (';
-				$or = '';
-				if( $deldraft )
-				{
-					$del_condition .= 'comment_status = "draft"';
-					$or = ' OR ';
-				}
-				if( $delpublished )
-				{
-					$del_condition .= $or.'comment_status = "published"';
-					$or = ' OR ';
-				}
-				if( $deldeprecated )
-				{
-					$del_condition .= $or.'comment_status = "deprecated"';
-				}
-				$del_condition .= ')';
-			}
+		{ // select banned comments
+			$del_condition = blog_restrict( $deldraft, $delpublished, $deldeprecated );
 			$keyword_cond = '(comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
 							OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
 							OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
@@ -257,6 +237,10 @@ if( $display_mode != 'js')
 
 /*
  * $Log$
+ * Revision 1.18  2010/06/01 11:33:19  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.17  2010/05/14 08:16:04  efy-asimo
  * antispam tool ban form - create seperate table for different comments
  *

@@ -3870,7 +3870,7 @@ function get_comments_awaiting_moderation_number( $blog_ID )
 	$BlogCache = & get_BlogCache();
 	$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 
-	$sql = 'SELECT COUNT(*)
+	$sql = 'SELECT COUNT(DISTINCT(comment_ID))
 				FROM T_comments
 					INNER JOIN T_items__item ON comment_post_ID = post_ID ';
 
@@ -3993,6 +3993,10 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.232  2010/06/01 11:33:19  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.231  2010/05/13 15:12:03  blueyed
  * doc
  *

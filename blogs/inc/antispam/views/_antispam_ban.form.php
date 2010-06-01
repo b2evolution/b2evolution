@@ -22,7 +22,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Settings;
+global $Settings, $current_User;
 global $keyword;
 
 global $row_stats;	// for hit functions
@@ -121,15 +121,28 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 		foreach( $res_affected_comments as $row_stats )
 		{ // select comments
 			$affected_Comment = new Comment($row_stats);
+			$comment_blog = $affected_Comment->get_Item()->get_blog_ID();
 			switch( $affected_Comment->get( 'status' ) )
 			{
 				case 'draft':
+					if( ! $current_User->check_perm( 'blog_draft_comments', 'edit', false, $comment_blog ) )
+					{ // no permission to delete
+						continue;
+					}
 					$draft_comments[] = $affected_Comment;
 					break;
 				case 'published':
+					if( ! $current_User->check_perm( 'blog_published_comments', 'edit', false, $comment_blog ) )
+					{ // no permission to delete
+						continue;
+					}
 					$published_comments[] = $affected_Comment;
 					break;
 				case 'deprecated':
+					if( ! $current_User->check_perm( 'blog_deprecated_comments', 'edit', false, $comment_blog ) )
+					{ // no permission to delete
+						continue;
+					}
 					$deprecated_comments[] = $affected_Comment;
 					break;
 				default:
@@ -193,6 +206,10 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.20  2010/06/01 11:33:19  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.19  2010/05/14 08:16:04  efy-asimo
  * antispam tool ban form - create seperate table for different comments
  *

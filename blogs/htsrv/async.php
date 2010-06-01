@@ -109,10 +109,10 @@ switch( $action )
 		exit(0);
 
 	case 'set_item_link_position':
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'itemlink' );
-		
+
 		param('link_ID', 'integer', true);
 		param('link_position', 'string', true);
 
@@ -155,16 +155,16 @@ switch( $action )
 		exit(0);
 
 	case 'set_comment_status':
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
 		global $blog;
 
 		$blog = param( 'blogid', 'integer' );
-		$current_User->check_perm( 'blog_comments', 'edit', true, $blog );
-
 		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ) );
+		$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+
 		$status = param( 'status', 'string' );
 		$edited_Comment->set('status', $status );
 		$edited_Comment->dbupdate();
@@ -173,16 +173,16 @@ switch( $action )
 		exit(0);
 
 	case 'delete_comment':
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
-		
+
 		global $blog;
 
 		$blog = param( 'blogid', 'integer' );
-		$current_User->check_perm( 'blog_comments', 'edit', true, $blog );
-
 		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ) );
+		$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+
 		$edited_Comment->dbdelete();
 
 		get_comments_awaiting_moderation( $blog );
@@ -192,28 +192,27 @@ switch( $action )
 		// Delete spam URL from a comment directly in the dashboard - comment remains otherwise untouched
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
-		
-		global $blog;
-		
-		$blog = param( 'blogid', 'integer' );
-		$current_User->check_perm( 'blog_comments', 'edit', true, $blog );
-		
-		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ) );
-		$edited_Comment->set( 'author_url', null );
-		$edited_Comment->dbupdate();
-		
-		exit(0);
-	
-	case 'refresh_comments':
-		
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'comment' );
-		
+
 		global $blog;
 
 		$blog = param( 'blogid', 'integer' );
-		$current_User->check_perm( 'blog_comments', 'edit', true, $blog );
-		
+		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ) );
+		$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+
+		$edited_Comment->set( 'author_url', null );
+		$edited_Comment->dbupdate();
+
+		exit(0);
+
+	case 'refresh_comments':
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+
+		global $blog;
+
+		$blog = param( 'blogid', 'integer' );
+
 		get_comments_awaiting_moderation( $blog );
 		exit(0);
 }
@@ -253,6 +252,10 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.52  2010/06/01 11:33:19  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.51  2010/03/11 10:34:21  efy-asimo
  * Rewrite CommentList to CommentList2 task
  *

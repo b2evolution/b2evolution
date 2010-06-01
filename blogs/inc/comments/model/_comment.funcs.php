@@ -204,6 +204,31 @@ function comments_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 }
 
 /**
+ * Get advanced perm for comments on this blog
+ * 
+ * @param int blog ID
+ * @return array statuses - current user has permission for comments with statuses
+ */
+function get_allowed_statuses( $blog )
+{
+	global $current_User;
+	$statuses = array();
+	if( $current_User->check_perm( 'blog_draft_comments', 'edit', false, $blog ) )
+	{
+		$statuses[] = 'draft';
+	}
+	if( $current_User->check_perm( 'blog_published_comments', 'edit', false, $blog ) )
+	{
+		$statuses[] = 'published';
+	}
+	if( $current_User->check_perm( 'blog_deprecated_comments', 'edit', false, $blog ) )
+	{
+		$statuses[] = 'deprecated';
+	}
+	return $statuses;
+}
+
+/**
  * Create comment form submit buttons
  * 
  * Note: Publsih in only displayed when comment is in draft status
@@ -270,6 +295,10 @@ function echo_comment_publishbt_js()
 
 /*
  * $Log$
+ * Revision 1.11  2010/06/01 11:33:19  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.10  2010/03/11 10:34:53  efy-asimo
  * Rewrite CommentList to CommentList2 task
  *

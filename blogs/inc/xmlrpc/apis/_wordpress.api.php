@@ -359,7 +359,7 @@ function wp_deletecomment( $m )
 	}
 
 	// Check permission:
-	$current_User->check_perm( 'blog_comments', 'edit', true, $Blog->ID );
+	$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $Blog->ID );
 
 	$edited_Comment->dbdelete();
 
@@ -413,6 +413,10 @@ $xmlrpc_procs['wp.deleteComment'] = array(
 
 /*
  * $Log$
+ * Revision 1.15  2010/06/01 11:33:20  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.14  2010/02/28 13:42:07  efy-yury
  * move APIs permissions check in xmlrpcs_login func
  *

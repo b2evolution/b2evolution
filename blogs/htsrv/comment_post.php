@@ -117,7 +117,7 @@ $commented_Item->get_Blog(); // Make sure Blog is loaded (will be needed wether 
 if( $User )
 {	// User is logged in (or provided, e.g. via OpenID plugin)
 	// Does user have permission to edit?
-	$perm_comment_edit = $User->check_perm( 'blog_comments', 'edit', false, $commented_Item->Blog->ID );
+	$perm_comment_edit = $User->check_perm( 'blog_published_comments', 'edit', false, $commented_Item->Blog->ID );
 }
 else
 {	// User is still not logged in
@@ -405,6 +405,10 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.144  2010/06/01 11:33:19  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.143  2010/05/02 16:38:34  fplanque
  * minor
  *

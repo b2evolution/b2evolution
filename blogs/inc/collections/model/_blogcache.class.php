@@ -304,12 +304,21 @@ class BlogCache extends DataObjectCache
 							   OR bloggroup_perm_poststatuses <> ''";
 				break;
 
+			case 'blog_comments':
+				// user needs to have permission at least one kind of comments (published, draft, deprecated)
+				$sql .= "OR bloguser_perm_draft_cmts <> 0
+						OR bloguser_perm_publ_cmts <> 0
+						OR bloguser_perm_depr_cmts <> 0
+						OR bloggroup_perm_draft_cmts <> 0
+						OR bloggroup_perm_publ_cmts <> 0
+						OR bloggroup_perm_depr_cmts <> 0";
+				break;
+
 			case 'stats':
 				$permname = 'blog_properties';	// TEMP
 			case 'blog_cats':
 			case 'blog_properties':
 			case 'blog_admin':
-			case 'blog_comments':
 			case 'blog_media_browse':
 				$short_permname = substr( $permname, 5 );
 				$sql .= "OR bloguser_perm_{$short_permname} <> 0
@@ -357,6 +366,10 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.13  2010/06/01 11:33:19  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.12  2010/02/08 17:52:09  efy-yury
  * copyright 2009 -> 2010
  *

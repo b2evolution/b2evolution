@@ -620,7 +620,7 @@ class Comment extends DataObject
 		global $current_User;
 		if( $this->author_url( '', ' <span &bull; Url: id="commenturl_'.$this->ID.'" <span class="bUrl" >', '</span>' ) )
 		{
-			if( $current_User->check_perm( 'blog_comments', '', false, $this->get_Item()->get_blog_ID() ) )
+			if( $current_User->check_perm( $this->blogperm_name(), '', false, $this->get_Item()->get_blog_ID() ) )
 			{ // There is an URL and we have permission to edit this comment...
 				$this->deleteurl_link( $redirect_to, $ajax_button, false );
 				$this->banurl_link( $redirect_to, $ajax_button, true );
@@ -681,8 +681,8 @@ class Comment extends DataObject
 
 		$this->get_Item();
 
-		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get_blog_ID() ) )
-		{ // If User has no permission to edit comments:
+		if( ! $current_User->check_perm( $this->blogperm_name(), '', false, $this->Item->get_blog_ID() ) )
+		{ // If User has no permission to edit comments with this comment status:
 			return false;
 		}
 
@@ -724,8 +724,8 @@ class Comment extends DataObject
 
 		if( ! is_logged_in() ) return false;
 
-		if( $check_perm && ! $current_User->check_perm( 'blog_comments', '', false, $this->get_Item()->get_blog_ID() ) )
-		{ // If current user has no permission to edit comments:
+		if( $check_perm && ! $current_User->check_perm( $this->blogperm_name(), '', false, $this->get_Item()->get_blog_ID() ) )
+		{ // If current user has no permission to edit comments, with this comment status:
 			return false;
 		}
 
@@ -812,8 +812,8 @@ class Comment extends DataObject
 
 		$this->get_Item();
 
-		if( ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get_blog_ID() ) )
-		{ // If User has no permission to edit comments:
+		if( ! $current_User->check_perm( $this->blogperm_name(), '', false, $this->Item->get_blog_ID() ) )
+		{ // If User has no permission to edit comments, with this comment status:
 			return false;
 		}
 
@@ -892,8 +892,8 @@ class Comment extends DataObject
 		$this->get_Item();
 
 		if( ($this->status == 'deprecated') // Already deprecateded!
-			|| ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get_blog_ID() ) )
-		{ // If User has no permission to edit comments:
+			|| ! $current_User->check_perm( $this->blogperm_name(), '', false, $this->Item->get_blog_ID() ) )
+		{ // If User has no permission to edit comments, with this comment status:
 			return false;
 		}
 
@@ -964,8 +964,8 @@ class Comment extends DataObject
 		$this->get_Item();
 
 		if( ($this->status == 'published') // Already published!
-			|| ! $current_User->check_perm( 'blog_comments', '', false, $this->Item->get_blog_ID() ) )
-		{ // If User has no permission to edit comments:
+			|| ! $current_User->check_perm( $this->blogperm_name(), '', false, $this->Item->get_blog_ID() ) )
+		{ // If User has no permission to edit comments, with this comment status:
 			return false;
 		}
 
@@ -1629,11 +1629,35 @@ class Comment extends DataObject
 		return $r;
 	}
 
+
+	/** Get the blog advanced permission name for this comment 
+	 * 
+	 * @return string status specific blog comment permission name
+	 */
+	function blogperm_name()
+	{
+		switch( $this->get( 'status' ) )
+		{
+			case 'published':
+				return 'blog_published_comments';
+			case 'draft':
+				return 'blog_draft_comments';
+			case 'deprecated':
+				return 'blog_deprecated_comments';
+			default:
+				debug_die( 'Invalid comment status!' );
+		}
+	}
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.57  2010/06/01 11:33:19  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.56  2010/05/14 08:16:04  efy-asimo
  * antispam tool ban form - create seperate table for different comments
  *

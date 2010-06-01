@@ -2726,6 +2726,36 @@ function upgrade_b2evo_tables()
 	             AND set_value = 0' );
 	task_end();
 
+	task_begin( 'Upgrading Blog-User permissions...' );
+	db_add_col( 'T_coll_user_perms', 'bloguser_perm_draft_cmts', 'tinyint NOT NULL default 0 AFTER bloguser_perm_comments' );
+	db_add_col( 'T_coll_user_perms', 'bloguser_perm_publ_cmts', 'tinyint NOT NULL default 0 AFTER bloguser_perm_comments' );
+	db_add_col( 'T_coll_user_perms', 'bloguser_perm_depr_cmts', 'tinyint NOT NULL default 0 AFTER bloguser_perm_comments' );
+
+	if( db_col_exists( 'T_coll_user_perms', 'bloguser_perm_comments' ) )
+	{ // udate all new perm, with perm_comments value
+		$DB->query( 'UPDATE T_coll_user_perms
+					SET bloguser_perm_draft_cmts = bloguser_perm_comments,
+						bloguser_perm_publ_cmts = bloguser_perm_comments,
+						bloguser_perm_depr_cmts = bloguser_perm_comments');
+		db_drop_col( 'T_coll_user_perms', 'bloguser_perm_comments' );
+	}
+	task_end();
+
+	task_begin( 'Upgrading Blog-Group permissions...' );
+	db_add_col( 'T_coll_group_perms', 'bloggroup_perm_draft_cmts', 'tinyint NOT NULL default 0 AFTER bloggroup_perm_comments' );
+	db_add_col( 'T_coll_group_perms', 'bloggroup_perm_publ_cmts', 'tinyint NOT NULL default 0 AFTER bloggroup_perm_comments' );
+	db_add_col( 'T_coll_group_perms', 'bloggroup_perm_depr_cmts', 'tinyint NOT NULL default 0 AFTER bloggroup_perm_comments' );
+
+	if( db_col_exists( 'T_coll_group_perms', 'bloggroup_perm_comments' ) )
+	{ // udate all new group perm, with perm_comments value
+		$DB->query( 'UPDATE T_coll_group_perms
+					SET bloggroup_perm_draft_cmts = bloggroup_perm_comments,
+						bloggroup_perm_publ_cmts = bloggroup_perm_comments,
+						bloggroup_perm_depr_cmts = bloggroup_perm_comments');
+		db_drop_col( 'T_coll_group_perms', 'bloggroup_perm_comments' );
+	}
+	task_end();
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -2900,6 +2930,10 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.368  2010/06/01 11:33:20  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.367  2010/05/13 05:52:00  efy-asimo
  * upgrade "'fm_enable_roots_user' => '1',"
  *

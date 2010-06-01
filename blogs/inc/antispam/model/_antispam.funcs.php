@@ -336,6 +336,63 @@ function get_ban_domain( $url )
 
 
 /**
+ * Get the blog restricted condition
+ * 
+ * @param boolean delete draft comments
+ * @param boolean delete published comments
+ * @param boolean delete deprecated comments
+ * @return string sql WHERE condition part, corresponding the user permissions
+ */
+function blog_restrict( $deldraft, $delpubl, $deldepr )
+{
+	global $current_User;
+	$BlogCache = & get_BlogCache();
+	$draft = '';
+	$published = '';
+	$deprecated = '';
+	for( $l_Blog = & $BlogCache->get_first(); !is_null($l_Blog); $l_Blog = & $BlogCache->get_next() )
+	{ // check all blogs permission
+		if( $deldraft && $current_User->check_perm( 'blog_draft_comments', 'edit', false, $l_Blog->ID ) )
+		{
+			$draft .= $l_Blog->ID.','; 
+		}
+		if( $delpubl != null && $current_User->check_perm( 'blog_published_comments', 'edit', false, $l_Blog->ID ) )
+		{
+			$published .= $l_Blog->ID.','; 
+		}
+		if( $deldepr && $current_User->check_perm( 'blog_deprecated_comments', 'edit', false, $l_Blog->ID ) )
+		{
+			$deprecated .= $l_Blog->ID.','; 
+		}
+	}
+	// blog and comment status restriction condition
+	$restriction = '( comment_status = "%s" AND comment_post_ID IN 
+					(SELECT post_ID from T_items__item INNER JOIN T_categories ON post_main_cat_ID = cat_ID
+						WHERE cat_blog_ID IN (%s) ) )';
+	$or = '';
+	if( $draft != '' )
+	{ // there is at least one blog on which current user has edit draft comments permission
+		$draft = substr( $draft, 0, strlen($draft) - 1 );
+		$draft = sprintf( $restriction, 'draft', $draft );
+		$or = ' OR ';
+	}
+	if( $published != '' )
+	{ // there is at least one blog on which current user has edit published comments permission
+		$published = substr( $published, 0, strlen($published) - 1 );
+		$published = $or.sprintf( $restriction, 'published', $published );
+		$or = ' OR ';
+	}
+	if( $deprecated != '' )
+	{ // there is at least one blog on which current user has edit deprecated comments permission
+		$deprecated = substr( $deprecated, 0, strlen($deprecated) - 1 );
+		$deprecated = $or.sprintf( $restriction, 'deprecated', $deprecated );
+	}
+
+	return ' AND ( '.$draft.$published.$deprecated.' )';
+}
+
+
+/**
  * Show affected comments
  * 
  * @param array affected Comment list, all comments in this list must have the same status
@@ -352,7 +409,7 @@ function echo_affected_comments( $affected_comments, $status, $keyword )
 	}
 
 	echo '<p>';
-	echo '<input type="checkbox" name="del'.$status.'" id="del'.$status.'_cb" value="1" checked="checked" />';
+	echo '<input type="checkbox" name="del'.$status.'" id="del'.$status.'_cb" value="1" checked="checked"/>';
 	echo '<label for="del'.$status.'_cb">';
 	echo sprintf ( T_('Delete the following %s %s comments:'), $num_comments == 500 ? '500+' : $num_comments, '<strong>'.$status.'</strong>' );
 	echo '</label>';
@@ -378,6 +435,7 @@ function echo_affected_comments( $affected_comments, $status, $keyword )
 		echo '</td>';
 		echo '<td>'.$Comment->get_author_ip().'</td>';
 		echo '<td>'.strmaxlen(strip_tags( $Comment->get_content() ), 71).'</td>';
+		// no permission check, because affected_comments contains current user editable comments
 		echo '<td>'.action_icon( T_('Edit...'), 'edit', '?ctrl=comments&amp;action=edit&amp;comment_ID='.$Comment->ID ).'</td>';
 		echo '</tr>';
 		$count++;
@@ -388,6 +446,10 @@ function echo_affected_comments( $affected_comments, $status, $keyword )
 
 /*
  * $Log$
+ * Revision 1.12  2010/06/01 11:33:19  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.11  2010/05/14 08:16:04  efy-asimo
  * antispam tool ban form - create seperate table for different comments
  *

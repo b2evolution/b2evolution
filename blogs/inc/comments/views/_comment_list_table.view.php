@@ -107,21 +107,24 @@ $CommentList->cols[] = array(
  */
 function comment_edit_actions( $Comment )
 {
-	global $Blog;
+	global $Blog, $current_User;
 
-	$redirect_to = rawurlencode( regenerate_url( 'comment_ID,action', 'tab3=listview', '', '&' ) );
+	// Display edit and delete button if current user has the rights:
+	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ))
+	{
+		$redirect_to = rawurlencode( regenerate_url( 'comment_ID,action', 'tab3=listview', '', '&' ) );
 
-	// Display edit button if current user has the rights:
-	$r = action_icon( TS_('Edit this comment...'), 'properties',
-	        		'admin.php?ctrl=comments&amp;comment_ID='.$Comment->ID.'&amp;action=edit&amp;redirect_to='.$redirect_to );
+		$r = action_icon( TS_('Edit this comment...'), 'properties',
+		  'admin.php?ctrl=comments&amp;comment_ID='.$Comment->ID.'&amp;action=edit&amp;redirect_to='.$redirect_to );
 
-	// Display delete icon if current user has the rights:
-	$r .=  action_icon( T_('Delete this comment!'), 'delete',
+		$r .=  action_icon( T_('Delete this comment!'), 'delete',
 			'admin.php?ctrl=comments&amp;comment_ID='.$Comment->ID.'&amp;action=delete&amp;'.url_crumb('comment')
 			.'&amp;redirect_to='.$redirect_to, NULL, NULL, NULL,
 			array( 'onclick' => "return confirm('".TS_('You are about to delete this comment!\\nThis cannot be undone!')."')") );
 
-	return $r;
+		return $r;
+	}
+	return '';
 }
 $CommentList->cols[] = array(
 			'th' => T_('Actions'),

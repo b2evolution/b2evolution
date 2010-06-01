@@ -70,7 +70,8 @@ else
 
 $SQL = new SQL();
 $SQL->SELECT( 'user_ID, user_login, user_level, bloguser_perm_poststatuses, bloguser_perm_edit, bloguser_ismember,'
-	. 'bloguser_perm_comments, bloguser_perm_delpost, bloguser_perm_cats,'
+	. 'bloguser_perm_draft_cmts, bloguser_perm_publ_cmts, bloguser_perm_depr_cmts,'
+	. 'bloguser_perm_delpost, bloguser_perm_cats,'
 	. 'bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,'
 	. 'bloguser_perm_media_browse, bloguser_perm_media_change, bloguser_perm_page,'
 	. 'bloguser_perm_intro, bloguser_perm_podcast, bloguser_perm_sidebar' );
@@ -357,11 +358,13 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Edit<br />comts'),
+						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Edit<br />commts'),
 						'th_class' => 'checkright',
-						'order' => 'bloguser_perm_comments',
+						'order' => 'bloguser_perm_publ_cmts',
 						'default_dir' => 'D',
-						'td' => '%coll_perm_checkbox( {row}, \'perm_comments\', \''.TS_('Permission to edit comments in this blog').'\' )%',
+						'td' => '%coll_perm_checkbox( {row}, \'perm_draft_cmts\', \''.TS_('Permission to edit draft comments in this blog').'\' )%'.
+								'%coll_perm_checkbox( {row}, \'perm_publ_cmts\', \''.TS_('Permission to edit published comments in this blog').'\' )%'.
+								'%coll_perm_checkbox( {row}, \'perm_depr_cmts\', \''.TS_('Permission to edit deprecated comments in this blog').'\' )%',
 						'td_class' => 'center',
 					);
 
@@ -548,6 +551,10 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.16  2010/06/01 11:33:19  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.15  2010/02/08 17:52:09  efy-yury
  * copyright 2009 -> 2010
  *

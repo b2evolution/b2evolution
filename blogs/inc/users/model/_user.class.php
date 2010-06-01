@@ -972,6 +972,9 @@ class User extends DataObject
 			case 'blog_post!redirected':
 			case 'blog_del_post':
 			case 'blog_comments':
+			case 'blog_draft_comments':
+			case 'blog_published_comments':
+			case 'blog_deprecated_comments':
 			case 'blog_properties':
 			case 'blog_cats':
 			case 'blog_genstatic':
@@ -1250,6 +1253,9 @@ class User extends DataObject
 						'blog_edit' => 'no',
 						'blog_del_post' => '0',
 						'blog_comments' => '0',
+						'blog_draft_comments' => '0',
+						'blog_published_comments' => '0',
+						'blog_deprecated_comments' => '0',
 						'blog_cats' => '0',
 						'blog_properties' => '0',
 						'blog_admin' => '0',
@@ -1276,7 +1282,11 @@ class User extends DataObject
 
 				$this->blog_post_statuses[$perm_target_blog]['blog_edit'] = $row['bloguser_perm_edit'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_del_post'] = $row['bloguser_perm_delpost'];
-				$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloguser_perm_comments'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloguser_perm_publ_cmts']
+					+ $row['bloguser_perm_draft_cmts'] +  $row['bloguser_perm_depr_cmts'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_draft_comments'] = $row['bloguser_perm_draft_cmts'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_published_comments'] = $row['bloguser_perm_publ_cmts'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_deprecated_comments'] = $row['bloguser_perm_depr_cmts'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_cats'] = $row['bloguser_perm_cats'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_properties'] = $row['bloguser_perm_properties'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_admin'] = $row['bloguser_perm_admin'];
@@ -2026,6 +2036,10 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.76  2010/06/01 11:33:20  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.75  2010/05/07 06:12:38  efy-asimo
  * small modification about messaging
  *

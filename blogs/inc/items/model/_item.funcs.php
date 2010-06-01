@@ -924,7 +924,7 @@ function attach_browse_tabs()
 	}
 
 	if( $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID ) )
-	{
+	{ // User has permission to edit publ, draft or deprecated comments (at least one kind)
 		$AdminUI->add_menu_entries(
 				'items',
 				array(
@@ -1555,6 +1555,10 @@ function echo_set_slug_changed()
 }
 /*
  * $Log$
+ * Revision 1.110  2010/06/01 11:33:20  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.109  2010/05/24 07:18:53  efy-asimo
  * Allow cross posting - fix
  *

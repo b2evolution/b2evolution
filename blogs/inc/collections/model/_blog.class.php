@@ -1866,11 +1866,12 @@ class Blog extends DataObject
 		// Proceed insertions:
 		$DB->query( "
 				INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
-						bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
+						bloguser_perm_poststatuses, bloguser_perm_delpost,
+						bloguser_perm_draft_cmts, bloguser_perm_publ_cmts, bloguser_perm_depr_cmts,
 						bloguser_perm_cats, bloguser_perm_properties,
 						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
 				VALUES ( $this->ID, $current_User->ID, 1,
-						'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1 )" );
+						'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1, 1, 1 )" );
 
 		// Create default category:
 		load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
@@ -2313,6 +2314,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.112  2010/06/01 11:33:19  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.111  2010/06/01 02:44:44  sam2kb
  * New hooks added: GetCollectionKinds and InitCollectionKinds.
  * Use them to define new and override existing presets for new blogs.

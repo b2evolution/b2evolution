@@ -342,6 +342,7 @@ while( $Item = & $ItemList->get_item() )
 			// Filter list:
 			$CommentList->set_filters( array(
 				'types' => array( 'comment','trackback','pingback' ),
+				'statuses' => get_allowed_statuses( $Blog->ID ),
 				'order' => 'ASC',
 				'post_ID' => $Item->ID,
 			) );
@@ -416,6 +417,10 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.36  2010/06/01 11:33:20  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
+ *
  * Revision 1.35  2010/05/11 11:20:13  efy-asimo
  * Slugs table view modificaitons
  *
