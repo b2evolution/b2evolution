@@ -155,6 +155,58 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 		echo_affected_comments( $deprecated_comments, 'deprecated', $keyword );
 	}
 
+	// Check for potentially affected comments:
+	$sql = 'SELECT * FROM T_users
+			 WHERE user_url LIKE '.$DB->quote('%'.$keyword.'%').'
+				 OR user_email LIKE '.$DB->quote('%'.$keyword.'%').'
+			 ORDER BY user_login ASC
+			 LIMIT 500';
+	$res_affected_users = $DB->get_results( $sql, OBJECT, 'Find matching users' );
+	if( $DB->num_rows != 0 )
+	{ // if matching found display users table
+		?>
+		<p><label><strong><?php echo( T_('Affected users').':' )?></strong></label></p>
+		<table class="grouped" cellspacing="0">
+			<thead><tr>
+			<th class="firstcol"><?php printf( T_('Login') )?></th>
+			<th><?php echo( T_('First name') )?></th>
+			<th><?php echo( T_('Last name') )?></th>
+			<th><?php echo( T_('Nickname') )?></th>
+			<th><?php echo( T_('URL') )?></th>
+			</tr></thead>
+		 	<?php
+		 	$count = 0;
+			foreach( $res_affected_users as $row_stats )
+			{ // Display affected users
+				$affected_User = new User($row_stats);
+				?>
+				<tr class="<?php echo ($count%2 == 1) ? 'odd' : 'even' ?>">
+				<td class="firstcol">
+					<?php
+					if( $current_User->check_perm( 'users', 'edit', false ) )
+					{
+						echo '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID='
+							.$affected_User->ID.'"><strong>'.$affected_User->login.'</strong></a>';
+					}
+					else
+					{
+						echo '<strong>'.$affected_User->login.'</strong>';
+					}
+					?>
+				</td>
+				<td><?php echo $affected_User->first_name() ?></td>
+				<td><?php echo $affected_User->last_name() ?></td>
+				<td><?php echo $affected_User->nick_name() ?></td>
+				<td><?php echo '<strong>'.$affected_User->get('url').'</strong>' ?></td>
+				</tr>
+				<?php
+				$count++;
+			}
+		 	?>
+		</table>
+		<?php
+	}
+
 	// Check if the string is already in the blacklist:
 	if( antispam_check($keyword) )
 	{ // Already there:
@@ -206,6 +258,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.21  2010/06/02 07:29:57  efy-asimo
+ * Antispam tool - add affected users table
+ *
  * Revision 1.20  2010/06/01 11:33:19  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)
