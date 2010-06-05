@@ -194,8 +194,8 @@ $known_search_params =  array(
 	'Gw',           // scroogle.org
 	'text',         // yandex.ru
 	'search_query',	// search.ukr.net
-	'wd',						// baidu.com
-	'keywords',			// gde.ru
+	'wd',			// baidu.com
+	'keywords',		// gde.ru
 );
 
 
@@ -214,7 +214,7 @@ $user_agents = array(
 	array('robot', 'Googlebot', 'Google (Googlebot)' ), // removed slash in order to also match "Googlebot-Image", "Googlebot-Mobile", "Googlebot-Sitemaps"
 	array('robot', 'Slurp/', 'Inktomi (Slurp)' ),
 	array('robot', 'Yahoo! Slurp;', 'Yahoo (Slurp)' ),
-	array('robot', 'msnbot/', 'MSN Search (msnbot)' ),
+	array('robot', 'msnbot', 'MSN Search (msnbot)' ), // removed slash in order to also match "msnbot-media"
 	array('robot', 'Frontier/',	'Userland (Frontier)' ),
 	array('robot', 'ping.blo.gs/', 'blo.gs' ),
 	array('robot', 'organica/',	'Organica' ),
@@ -245,6 +245,10 @@ $user_agents = array(
 	array('robot', 'Flexum/', 'Flexum'),
 	array('robot', 'OOZBOT/', 'OOZBOT'),
 	array('robot', 'ApptusBot', 'Apptus'),
+	array('robot', 'Purebot', 'Pure Search'),
+	array('robot', 'Sosospider', 'Sosospider'),
+	array('robot', 'TopBlogsInfo', 'TopBlogsInfo'),
+	array('robot', 'spbot/', 'SEOprofiler'),
 	// Unknown robots:
 	array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:
