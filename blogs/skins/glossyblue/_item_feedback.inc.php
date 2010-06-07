@@ -36,6 +36,10 @@ $params = array_merge( array(
 		'after_section_title'  => '</h3>',
 		'form_title_start' => '<h3>',
 		'form_title_end'  => '</h3>',
+		'before_comment_error' => '<p><em>',
+		'after_comment_error'  => '</em></p>',
+		'before_comment_form'  => '',
+		'after_comment_form'   => '',
 	), $params );
 
 
@@ -253,10 +257,10 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 /*
  * Comment form:
  */
-if( $params['disp_comment_form'] && $Item->can_comment() )
+if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_error'], $params['after_comment_error'] ) )
 { // We want to display the comments form and the item can be commented on:
 
-
+	echo $params['before_comment_form'];
 
 	if( $Comment = $Session->get('core.preview_Comment') )
 	{	// We have a comment to preview
@@ -425,5 +429,7 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 	<?php
 	$Form->end_form();
+	
+	echo $params['after_comment_form'];
 }
 ?>

@@ -29,14 +29,20 @@ $params = array_merge( array(
 		'preview_start'        => '<div class="bComment" id="comment_preview">',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
 		'preview_end'          => '</div>',
+		'before_comment_error' => '<p><em>',
+		'after_comment_error'  => '</em></p>',
+		'before_comment_form'  => '',
+		'after_comment_form'   => '',
 	), $params );
 
 /*
  * Comment form:
  */
-if( $params['disp_comment_form'] && $Item->can_comment() )
+if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_error'], $params['after_comment_error'] ) )
 { // We want to display the comments form and the item can be commented on:
 
+	echo $params['before_comment_form'];
+	
 	// INIT/PREVIEW:
 	if( $Comment = $Session->get('core.preview_Comment') )
 	{	// We have a comment to preview
@@ -231,11 +237,16 @@ if( $params['disp_comment_form'] && $Item->can_comment() )
 
 	<?php
 	$Form->end_form();
+	
+	echo $params['after_comment_form'];
 }
 
 
 /*
  * $Log$
+ * Revision 1.19  2010/06/07 19:05:58  sam2kb
+ * Added missing params
+ *
  * Revision 1.18  2010/03/24 02:56:28  sam2kb
  * JS comment form validation, checks if text area is empty
  *
