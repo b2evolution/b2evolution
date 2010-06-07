@@ -2915,18 +2915,29 @@ class Item extends ItemLight
 	/**
 	 * Output classes for the Item <div>
 	 */
-	function div_classes( $params = array() )
+	function div_classes( $params = array(), $output = true )
 	{
-		global $post_statuses;
+		global $post_statuses, $disp;
 
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'item_class'        => 'bPost',
 				'item_type_class'   => 'bPost_ptyp',
 				'item_status_class' => 'bPost',
+				'item_disp_mode'    => 'bPostdisp_',
 			), $params );
 
-		echo $params['item_class'].' '.$params['item_type_class'].$this->ptyp_ID.' '.$params['item_status_class'].$this->status;
+		$classes = array( $params['item_class'],
+						  $params['item_type_class'].$this->ptyp_ID,
+						  $params['item_status_class'].$this->status,
+						  $params['item_disp_mode'].$disp,
+						);
+
+		$r = implode( ' ', $classes );
+		
+		if( ! $output ) return $r;
+		
+		echo $r;
 	}
 
 
@@ -4479,6 +4490,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.205  2010/06/07 18:55:14  sam2kb
+ * Added new class in div_classes()
+ *
  * Revision 1.204  2010/06/01 11:33:20  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)
