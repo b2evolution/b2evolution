@@ -211,6 +211,7 @@ class coll_item_list_Widget extends ComponentWidget
 		global $MainList;
 		global $BlogCache, $Blog;
 		global $timestamp_min, $timestamp_max;
+		global $Item;
 
 		$this->init_display( $params );
 
@@ -273,6 +274,11 @@ class coll_item_list_Widget extends ComponentWidget
 			}
 
 			$filters['tags'] = implode(',',$all_tags);
+			
+			if( !empty($Item) )
+			{	// Exclude current Item
+				$filters['post_ID'] = '-'.$Item->ID;
+			}
 
 			// fp> TODO: in addition to just filtering, offer ordering in a way where the posts with the most matching tags come first
 		}
@@ -428,6 +434,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.30  2010/06/07 19:00:17  sam2kb
+ * Exclude current Item from related posts list
+ *
  * Revision 1.29  2010/02/08 17:54:48  efy-yury
  * copyright 2009 -> 2010
  *

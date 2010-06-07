@@ -84,19 +84,39 @@ class ItemQuery extends SQL
 
 		$this->p = $p;
 		$this->title = $title;
-
+		
 		// if a post number is specified, load that post
 		if( !empty($p) )
 		{
-			$this->WHERE_and( $this->dbIDname.' = '. intval($p) );
+			if( substr( $this->p, 0, 1 ) == '-' )
+			{	// Starts with MINUS sign:
+				$eq_p = ' <> ';
+				$this->p = substr( $this->p, 1 );
+			}
+			else
+			{
+				$eq_p = ' = ';
+			}
+			
+			$this->WHERE_and( $this->dbIDname.$eq_p.intval($this->p) );
 			$r = true;
 		}
 
 		// if a post urltitle is specified, load that post
 		if( !empty( $title ) )
 		{
+			if( substr( $this->title, 0, 1 ) == '-' )
+			{	// Starts with MINUS sign:
+				$eq_title = ' <> ';
+				$this->title = substr( $this->title, 1 );
+			}
+			else
+			{
+				$eq_title = ' = ';
+			}
+			
 			global $DB;
-			$this->WHERE_and( $this->dbprefix.'urltitle = '.$DB->quote($title) );
+			$this->WHERE_and( $this->dbprefix.'urltitle'.$eq_title.$DB->quote($this->title) );
 			$r = true;
 		}
 
@@ -734,6 +754,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.21  2010/06/07 19:00:17  sam2kb
+ * Exclude current Item from related posts list
+ *
  * Revision 1.20  2010/02/26 22:15:47  fplanque
  * whitespace/doc/minor
  *
