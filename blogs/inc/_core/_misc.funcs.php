@@ -3713,6 +3713,8 @@ function get_from_mem_cache($key, & $success = NULL)
 	}
 	if( ! $success )
 	{
+		$r = NULL;
+		
 		global $Debuglog;
 		$Debuglog->add('No caching backend available for reading "'.$key.'".', 'cache');
 	}
@@ -3993,6 +3995,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.233  2010/06/08 22:45:19  sam2kb
+ * Fixed "Undefined variable: $r" error in get_from_mem_cache()
+ *
  * Revision 1.232  2010/06/01 11:33:19  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)
