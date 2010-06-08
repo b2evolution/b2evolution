@@ -45,7 +45,7 @@ $params = array_merge( array(
 	), $params );
 
 
-global $c, $tb, $pb;
+global $c, $tb, $pb, $redir;
 
 
 if( ! $Item->can_see_comments() )
@@ -153,19 +153,31 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 	echo implode( ', ', $disp_title);
 	echo $params['after_section_title'];
 
-	$CommentList = new CommentList2( $Blog );
+	$CommentList = new CommentList2( $Blog, $Blog->get_setting('comments_per_page'), 'CommentCache', 'c_' );
 
 	// Filter list:
-	$CommentList->set_filters( array(
+	$CommentList->set_default_filters( array(
 			'types' => $type_list,
 			'statuses' => array ( 'published' ),
 			'post_ID' => $Item->ID,
 			'order' => $Blog->get_setting( 'comments_orderdir' ),
 		) );
+	
+	$CommentList->load_from_Request();
 
 	// Get ready for display (runs the query):
 	$CommentList->display_init();
-
+	
+	// Set redir=no in order to open comment pages
+	$old_redir = $redir;
+	memorize_param( 'redir', 'string', $old_redir, 'no' );
+	
+	// Prev/Next page navigation
+	$CommentList->page_links( array(
+			'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
+		) );
+	
+	
 	echo $params['comment_list_start'];
 	/**
 	 * @var Comment
@@ -185,7 +197,15 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 
 	}	// End of comment list loop.
 	echo $params['comment_list_end'];
-
+	
+	
+	// Prev/Next page navigation
+	$CommentList->page_links( array(
+			'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
+		) );
+	
+	// Restore "redir" param
+	forget_param('redir');
 
 	// _______________________________________________________________
 
@@ -218,6 +238,9 @@ skin_include( '_item_comment_form.inc.php', $params );
 
 /*
  * $Log$
+ * Revision 1.25  2010/06/08 01:49:53  sam2kb
+ * Paged comments in frontend
+ *
  * Revision 1.24  2010/03/11 10:35:15  efy-asimo
  * Rewrite CommentList to CommentList2 task
  *

@@ -72,6 +72,7 @@ class CollectionSettings extends AbstractSettings
 			'new_feedback_status' => 'draft',  	// 'draft', 'published' or 'deprecated'
 			'allow_rating'   => 'never',
 			'comments_orderdir' => 'ASC',
+			'comments_per_page' => 10,
 
 		// Archive settings:
 			'arcdir_noindex' => '1',						// META NOINDEX on Archive directory
@@ -176,6 +177,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.49  2010/06/08 01:49:53  sam2kb
+ * Paged comments in frontend
+ *
  * Revision 1.48  2010/05/22 12:22:49  efy-asimo
  * move $allow_cross_posting in the backoffice
  *

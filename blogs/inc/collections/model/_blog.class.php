@@ -491,6 +491,9 @@ class Blog extends DataObject
 			$this->set_setting( 'allow_rating', param( 'allow_rating', 'string', 'never' ) );
 			$this->set( 'allowtrackbacks', param( 'blog_allowtrackbacks', 'integer', 0 ) );
 			$this->set_setting( 'comments_orderdir', param( 'comments_orderdir', '/^(?:ASC|DESC)$/', 'ASC' ) );
+			
+			param_integer_range( 'comments_per_page', 1, 9999, T_('Comments per page must be between %d and %d.') );
+			$this->set_setting( 'comments_per_page', get_param( 'comments_per_page' ) );
 
 			// Public blog list
 			$this->set( 'in_bloglist',   param( 'blog_in_bloglist',   'integer', 0 ) );
@@ -2314,6 +2317,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.113  2010/06/08 01:49:53  sam2kb
+ * Paged comments in frontend
+ *
  * Revision 1.112  2010/06/01 11:33:19  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)

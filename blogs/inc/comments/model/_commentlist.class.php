@@ -598,11 +598,66 @@ class CommentList2 extends DataObjectList2
 
 		return parent::display_if_empty( $params );
 	}
+	
+	
+	/**
+	 * Template tag
+	 */
+	function page_links( $params = array() )
+	{
+		global $generating_static;
 
+		$default_params = array(
+				'block_start' => '<p class="center">',
+				'block_end' => '</p>',
+				'block_single' => '',
+				'links_format' => '#',
+				'page_url' => '', // All generated links will refer to the current page
+				'prev_text' => '&lt;&lt;',
+				'next_text' => '&gt;&gt;',
+				'no_prev_text' => '',
+				'no_next_text' => '',
+				'list_prev_text' => '...',
+				'list_next_text' => '...',
+				'list_span' => 11,
+				'scroll_list_range' => 5,
+			);
+		
+		if( !empty($generating_static) )
+		{	// When generating a static page, act as if we were currently on the blog main page:
+			$default_params['page_url'] = $this->Blog->get('url');
+		}
+
+		// Use defaults + overrides:
+		$params = array_merge( $default_params, $params );
+
+		if( $this->total_pages <= 1 )
+		{	// Single page:
+			echo $params['block_single'];
+			return;
+		}
+
+		if( $params['links_format'] == '#' )
+		{
+			$params['links_format'] = '$prev$ $first$ $list_prev$ $list$ $list_next$ $last$ $next$';
+		}
+
+ 		if( $this->Blog->get_setting( 'paged_nofollowto' ) )
+		{	// We prefer robots not to follow to pages:
+			$this->nofollow_pagenav = true;
+		}
+
+		echo $params['block_start'];
+		echo $this->replace_vars( $params['links_format'], $params );
+		echo $params['block_end'];
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.25  2010/06/08 01:49:53  sam2kb
+ * Paged comments in frontend
+ *
  * Revision 1.24  2010/05/24 21:27:58  sam2kb
  * Fixed some translated strings
  *

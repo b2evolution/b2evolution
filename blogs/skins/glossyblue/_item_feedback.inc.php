@@ -43,7 +43,7 @@ $params = array_merge( array(
 	), $params );
 
 
-global $c, $tb, $pb, $comment_allowed_tags, $comments_use_autobr;
+global $c, $tb, $pb, $redir, $comment_allowed_tags, $comments_use_autobr;
 
 global $cookie_name, $cookie_email, $cookie_url;
 
@@ -153,18 +153,29 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 	echo implode( ', ', $disp_title);
 	echo $params['after_section_title'];
 
-	$CommentList = new CommentList2( $Blog );
+	$CommentList = new CommentList2( $Blog, $Blog->get_setting('comments_per_page'), 'CommentCache', 'c_' );
 
 	// Filter list:
-	$CommentList->set_filters( array(
+	$CommentList->set_default_filters( array(
 			'types' => $type_list,
 			'statuses' => array ( 'published' ),
 			'post_ID' => $Item->ID,
 			'order' => $Blog->get_setting( 'comments_orderdir' ),
 		) );
+	
+	$CommentList->load_from_Request();
 
 	// Get ready for display (runs the query):
 	$CommentList->display_init();
+	
+	// Set redir=no in order to open comment pages
+	$old_redir = $redir;
+	memorize_param( 'redir', 'string', $old_redir, 'no' );
+	
+	// Prev/Next page navigation
+	$CommentList->page_links( array(
+			'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
+		) );
 ?>
 
 <ol class="commentlist">
@@ -232,6 +243,14 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 ?>
 </ol><?php
 
+	// Prev/Next page navigation
+	$CommentList->page_links( array(
+			'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
+		) );
+	
+	// Restore "redir" param
+	forget_param('redir');
+	
 	// _______________________________________________________________
 
 	// Display count of comments to be moderated:

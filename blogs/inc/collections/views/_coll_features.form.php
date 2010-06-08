@@ -109,6 +109,8 @@ $Form->begin_fieldset( T_('Feedback options') );
 						array(	array( 'ASC', T_('Chronologic') ),
 								array ('DESC', T_('Reverse') ),	
 						), T_('Display order'), true );
+	
+	$Form->text( 'comments_per_page', $edited_Blog->get_setting('comments_per_page'), 4, T_('Comments per page'),  T_('How many comments do you want to display on one page?'), 4 );
 
 	echo '</div>';
 
@@ -211,6 +213,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.30  2010/06/08 01:49:53  sam2kb
+ * Paged comments in frontend
+ *
  * Revision 1.29  2010/05/22 12:22:49  efy-asimo
  * move $allow_cross_posting in the backoffice
  *
