@@ -244,7 +244,7 @@ div.skin_wrapper_loggedin {
 
 
 	$datefmt = locale_datefmt();
-	$datefmt = str_replace( array( 'j', 'd', 'm', 'Y' ), array( 'd', 'dd', 'mm', 'yy' ), $datefmt );
+	$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
 	add_js_headline( 'jQuery(function(){
 		var monthNames = ["'.T_('January').'","'.T_('February').'", "'.T_('March').'",
 						  "'.T_('April').'", "'.T_('May').'", "'.T_('June').'",
@@ -285,6 +285,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.34  2010/06/08 20:16:54  sam2kb
+ * Changed $datefmt search/replace sequence
+ *
  * Revision 1.33  2010/02/10 05:15:31  sam2kb
  * Date format "j" failes in datepicker. Code clean-up.
  *
