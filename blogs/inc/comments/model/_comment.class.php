@@ -393,23 +393,29 @@ class Comment extends DataObject
 		// See if plugin supplies an image
 		// $img_url = $Plugins->trigger_event( 'GetCommentAvatar', array( 'Comment' => & $this, 'size' => $size ) );
 
+		$default_gravatar = $this->Item->Blog->get_setting('default_gravatar');
+		if( $default_gravatar == 'b2evo' )
+		{
+			$default_gravatar = $default_avatar;
+		}
+
 		if( empty($img_url) )
 		{	// Use gravatar
 			$params = array_merge( array(
-					'default'	=> $default_avatar,
+					'default'	=> $default_gravatar,
 					'size'		=> '64',
 				), $params );
 
 			$img_url = 'http://www.gravatar.com/avatar.php?gravatar_id='.md5( $this->get_author_email() );
 
 			if( !empty($params['rating']) )
-				$img_url .= '&amp;rating='.$params['rating'];
+				$img_url .= '&rating='.$params['rating'];
 
 			if( !empty($params['size']) )
-				$img_url .='&amp;size='.$params['size'];
+				$img_url .='&size='.$params['size'];
 
 			if( !empty($params['default']) )
-				$img_url .= '&amp;default='.urlencode($params['default']);
+				$img_url .= '&default='.urlencode($params['default']);
 		}
 		$img_params = array(
 			'src' => $img_url,
@@ -1654,6 +1660,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.58  2010/06/08 22:29:25  sam2kb
+ * Per blog settings for different default gravatar types
+ *
  * Revision 1.57  2010/06/01 11:33:19  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)

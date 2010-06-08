@@ -73,6 +73,7 @@ class CollectionSettings extends AbstractSettings
 			'allow_rating'   => 'never',
 			'comments_orderdir' => 'ASC',
 			'comments_per_page' => 10,
+			'default_gravatar' => 'b2evo',
 
 		// Archive settings:
 			'arcdir_noindex' => '1',						// META NOINDEX on Archive directory
@@ -177,6 +178,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.50  2010/06/08 22:29:25  sam2kb
+ * Per blog settings for different default gravatar types
+ *
  * Revision 1.49  2010/06/08 01:49:53  sam2kb
  * Paged comments in frontend
  *

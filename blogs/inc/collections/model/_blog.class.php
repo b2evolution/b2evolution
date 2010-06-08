@@ -494,6 +494,7 @@ class Blog extends DataObject
 			
 			param_integer_range( 'comments_per_page', 1, 9999, T_('Comments per page must be between %d and %d.') );
 			$this->set_setting( 'comments_per_page', get_param( 'comments_per_page' ) );
+			$this->set_setting( 'default_gravatar',  param( 'default_gravatar', 'string', 'b2evo' ) );
 
 			// Public blog list
 			$this->set( 'in_bloglist',   param( 'blog_in_bloglist',   'integer', 0 ) );
@@ -2317,6 +2318,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.114  2010/06/08 22:29:25  sam2kb
+ * Per blog settings for different default gravatar types
+ *
  * Revision 1.113  2010/06/08 01:49:53  sam2kb
  * Paged comments in frontend
  *

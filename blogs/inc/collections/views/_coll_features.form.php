@@ -111,6 +111,15 @@ $Form->begin_fieldset( T_('Feedback options') );
 						), T_('Display order'), true );
 	
 	$Form->text( 'comments_per_page', $edited_Blog->get_setting('comments_per_page'), 4, T_('Comments per page'),  T_('How many comments do you want to display on one page?'), 4 );
+	
+	global $default_avatar;
+	$Form->radio( 'default_gravatar', $edited_Blog->get_setting('default_gravatar'),
+						array(	array( 'b2evo', T_('Default image'), $default_avatar ),
+								array ('', T_('Gravatar') ),
+								array ('identicon', T_('Identicon') ),
+								array ('monsterid', T_('Monsterid') ),
+								array ('wavatar', T_('Wavatar') ),
+						), T_('Default gravatars'), true, T_('Gravatar users can choose to set up a unique icon for themselves, and if they don\'t, they will be assigned a default image.') );
 
 	echo '</div>';
 
@@ -213,6 +222,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.31  2010/06/08 22:29:25  sam2kb
+ * Per blog settings for different default gravatar types
+ *
  * Revision 1.30  2010/06/08 01:49:53  sam2kb
  * Paged comments in frontend
  *
