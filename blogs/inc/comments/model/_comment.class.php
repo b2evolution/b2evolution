@@ -393,6 +393,7 @@ class Comment extends DataObject
 		// See if plugin supplies an image
 		// $img_url = $Plugins->trigger_event( 'GetCommentAvatar', array( 'Comment' => & $this, 'size' => $size ) );
 
+		$this->Item->load_Blog();
 		$default_gravatar = $this->Item->Blog->get_setting('default_gravatar');
 		if( $default_gravatar == 'b2evo' )
 		{
@@ -1660,6 +1661,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.59  2010/06/11 02:29:59  sam2kb
+ * Load the Blog object
+ *
  * Revision 1.58  2010/06/08 22:29:25  sam2kb
  * Per blog settings for different default gravatar types
  *
