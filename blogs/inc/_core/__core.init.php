@@ -372,7 +372,7 @@ class _core_Module extends Module
 		// Check if user has permission for published, draft or depreceted comments (any of these)
 		$perm_comments = (! empty($Blog)) && $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID );
 		// Either permission for a specific blog or the global permission:
-		$perm_files    = $current_User->check_perm( 'files', 'view', false, isset( $Blog ) ? $Blog->ID : NULL );
+		$perm_files    = $current_User->check_perm( 'files', 'view', false, (! empty($Blog)) ? $Blog->ID : NULL );
 		$perm_chapters = (! empty($Blog)) && $current_User->check_perm( 'blog_cats', 'edit', false, $Blog->ID );
 
 		if( $perm_comments || $perm_files || $perm_chapters )
@@ -808,6 +808,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.65  2010/06/13 22:29:05  sam2kb
+ * minor
+ *
  * Revision 1.64  2010/06/01 11:33:19  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)
