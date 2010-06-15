@@ -190,6 +190,17 @@ if( empty($tab) )
 	}
 }
 
+		case 'del_obsolete_tags':
+			$Session->assert_received_crumb( 'tools' );
+			$current_User->check_perm('options', 'edit', true);
+			$DB->query('
+				DELETE T_items__tag
+				  FROM T_items__tag
+			 	  LEFT JOIN T_items__itemtag ON tag_ID = itag_tag_ID
+				 WHERE itag_itm_ID IS NULL');
+			$Messages->add( sprintf(T_('Removed %d obsolete tag entries.'), $DB->rows_affected), 'success' );
+			break;
+
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=crontab' );
@@ -242,6 +253,7 @@ if( empty($tab) )
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 		echo '<ul>';
 		echo '<li><a href="'.regenerate_url('action', 'action=optimize_tables&amp;'.url_crumb('tools')).'">'.T_('Optimize database tables (MyISAM tables used for sessions & logs)').'</a></li>';
+		echo '<li><a href="'.regenerate_url('action', 'action=del_obsolete_tags&amp;'.url_crumb('tools')).'">'.T_('Remove obsolete (unused) tag entries').'</a></li>';
 		// echo '<li><a href="'.regenerate_url('action', 'action=backup_db').'">'.T_('Backup database').'</a></li>';
 		echo '</ul>';
 		$block_item_Widget->disp_template_raw( 'block_end' );
@@ -300,6 +312,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.29  2010/06/15 21:20:37  blueyed
+ * Add tools action to remove obsolete/unused tags.
+ *
  * Revision 1.28  2010/05/24 21:27:58  sam2kb
  * Fixed some translated strings
  *
