@@ -59,6 +59,7 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 	add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 
  	require_js( '#jqueryUI#' );
+ 	require_css( 'jquery/smoothness/jquery-ui.css' );
 
 	require_js( 'form_extensions.js'); // script allowing to check and uncheck all boxes in forms -- TODO: jQueryfy
 
@@ -250,14 +251,14 @@ div.skin_wrapper_loggedin {
 						  "'.T_('April').'", "'.T_('May').'", "'.T_('June').'",
 						  "'.T_('July').'", "'.T_('August').'", "'.T_('September').'",
 						  "'.T_('October').'", "'.T_('November').'", "'.T_('December').'"];
-		
+
 		var dayNamesMin = ["'.T_('Sun').'", "'.T_('Mon').'", "'.T_('Tue').'",
 						  "'.T_('Wed').'", "'.T_('Thu').'", "'.T_('Fri').'", "'.T_('Sat').'"];
-		
+
 		var docHead = document.getElementsByTagName("head")[0];
 		for (i=0;i<dayNamesMin.length;i++)
 			dayNamesMin[i] = dayNamesMin[i].substr(0, 2)
-	
+
 		jQuery(".form_date_input").datepicker({
 			beforeShow: function(){ // Dynamically add stylesheet just before display
 				jQuery(document.createElement("link"))
@@ -285,6 +286,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.35  2010/06/15 20:17:55  blueyed
+ * Load jQuery UI css.
+ *
  * Revision 1.34  2010/06/08 20:16:54  sam2kb
  * Changed $datefmt search/replace sequence
  *
