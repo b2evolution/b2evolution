@@ -70,7 +70,7 @@ $Form->begin_form( '', '', $params );
 	$Form->hidden( 'ctrl', 'items' );
 	$Form->hidden( 'blog', $Blog->ID );
 	if( isset( $mode ) )   $Form->hidden( 'mode', $mode ); // used by bookmarklet
-	if( isset( $edited_Item ) )   
+	if( isset( $edited_Item ) )
 	{
 		$Form->hidden( 'post_ID', $edited_Item->ID );
 
@@ -279,11 +279,15 @@ echo_set_is_attachments();
 echo_link_files_js();
 // New category input box:
 echo_onchange_newcat();
+echo_autocomplete_tags();
 
 // require dirname(__FILE__).'/inc/_item_form_behaviors.inc.php';
 
 /*
  * $Log$
+ * Revision 1.40  2010/06/15 20:12:51  blueyed
+ * Autocompletion for tags in item edit forms, via echo_autocomplete_tags
+ *
  * Revision 1.39  2010/03/04 19:36:04  fplanque
  * minor/doc
  *

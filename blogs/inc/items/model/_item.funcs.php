@@ -537,7 +537,7 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 
 /**
  * Get post category setting
- * 
+ *
  * @param int blog id
  * @return int setting value
  */
@@ -1240,6 +1240,63 @@ function echo_publishnowbutton_js()
 	<?php
 }
 
+
+/**
+ * Output Javascript for tags autocompletion.
+ */
+function echo_autocomplete_tags()
+{
+	global $htsrv_url;
+
+	$url_crumb = url_crumb('item');
+
+	echo <<<EOD
+	<script type="text/javascript">
+	(function($){
+		$(function() {
+			function split(val) {
+				return val.split(/\s*,\s*/);
+			}
+			function extractLast(term) {
+				return split(term).pop();
+			}
+
+			$("#item_tags").autocomplete({
+				source: function(request, response) {
+					$.getJSON("${htsrv_url}async.php?action=get_tags&${url_crumb}", {
+						term: extractLast(request.term)
+					}, response);
+				},
+				search: function() {
+					// custom minLength
+					var term = extractLast(this.value);
+					if (term.length < 1) {
+						return false;
+					}
+				},
+				focus: function() {
+					// prevent value inserted on focus
+					return false;
+				},
+				select: function(event, ui) {
+					var terms = split( this.value );
+					// remove the current input
+					terms.pop();
+					// add the selected item
+					terms.push( ui.item.value );
+					// add placeholder to get the comma-and-space at the end
+					terms.push("");
+					this.value = terms.join(", ");
+					return false;
+				}
+			});
+		});
+	})(jQuery);
+	</script>
+EOD;
+}
+
+
 /**
  * Assert that the supplied post type can be used by the current user in
  * the post's extra categories' context.
@@ -1379,7 +1436,7 @@ function check_categories( & $post_category, & $post_extracats )
 				$post_category = $post_extracats[0];
 			}
 			else
-			{ // allow moving posts between different blogs is disabled - we need a main cat from $blog 
+			{ // allow moving posts between different blogs is disabled - we need a main cat from $blog
 				foreach( $post_extracats as $cat )
 				{
 					if( get_catblog( $cat ) != $blog )
@@ -1555,6 +1612,9 @@ function echo_set_slug_changed()
 }
 /*
  * $Log$
+ * Revision 1.111  2010/06/15 20:12:51  blueyed
+ * Autocompletion for tags in item edit forms, via echo_autocomplete_tags
+ *
  * Revision 1.110  2010/06/01 11:33:20  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)
