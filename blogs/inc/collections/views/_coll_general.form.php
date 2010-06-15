@@ -72,6 +72,7 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link('blogs_general_p
 
 		// Form 'username' field requires the following JS and CSS.
 		// fp> TODO: think about a way to bundle this with other JS on the page -- maybe always load hintbox in the backoffice
+		// dh> TODO: should probably also get ported to use jquery.ui.autocomplete
 		global $rsc_url;
 		echo '<script type="text/javascript" src="'.$rsc_url.'js/jquery.hintbox.min.js"></script>';
 		echo '<link rel="stylesheet" type="text/css" href="'.$rsc_url.'css/jquery.hintbox.css">';
@@ -129,6 +130,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.22  2010/06/15 20:17:22  blueyed
+ * todo
+ *
  * Revision 1.21  2010/03/01 07:52:30  efy-asimo
  * Set manual links to lowercase
  *
