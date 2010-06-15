@@ -144,12 +144,7 @@ switch( $action )
 			$SQL->LIMIT( '10' );
 			$SQL->ORDER_BY('user_login');
 
-			$options = '';
-			foreach( $DB->get_results( $SQL->get() ) as $row )
-			{
-				$options .= $row->user_login."\n";
-			}
-			echo $options;
+			echo implode("\n", $DB->get_col($SQL->get()));
 		}
 
 		exit(0);
@@ -252,6 +247,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.53  2010/06/15 19:54:28  blueyed
+ * async.php: simplify get_login_list
+ *
  * Revision 1.52  2010/06/01 11:33:19  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)
