@@ -210,6 +210,30 @@ switch( $action )
 
 		get_comments_awaiting_moderation( $blog );
 		exit(0);
+
+	case 'get_tags':
+		// Get list of tags, where $term matches at the beginning or anywhere (sorted)
+		$Session->assert_received_crumb( 'item' ); // via item forms
+
+		if( ! function_exists('json_encode') )
+		{ // PHP 5.2 - to lazy to hunt for some backport. TODO: add backport of json_encode, e.g. into this file.
+			exit(1);
+		}
+		$term = param('term', 'string');
+
+		echo json_encode( $DB->get_col('
+			(
+			SELECT tag_name
+			  FROM T_items__tag
+			 WHERE tag_name LIKE '.$DB->quote($term.'%').'
+			 ORDER BY tag_name
+			) UNION (
+			SELECT tag_name
+			  FROM T_items__tag
+			 WHERE tag_name LIKE '.$DB->quote('%'.$term.'%').'
+			 ORDER BY tag_name
+			)') );
+		exit(0);
 }
 
 
@@ -247,6 +271,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.54  2010/06/15 20:02:42  blueyed
+ * async.php: add get_tags callback, to be used for tags auto completion.
+ *
  * Revision 1.53  2010/06/15 19:54:28  blueyed
  * async.php: simplify get_login_list
  *
