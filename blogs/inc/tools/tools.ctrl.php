@@ -187,20 +187,18 @@ if( empty($tab) )
 			}
 			$Messages->add( sprintf('Created %d new URL slugs for %d total posts.', $count_slugs, count($items)), 'success' );
 			break;
-	}
-}
 
 		case 'del_obsolete_tags':
 			$Session->assert_received_crumb( 'tools' );
 			$current_User->check_perm('options', 'edit', true);
 			$DB->query('
-				DELETE T_items__tag
-				  FROM T_items__tag
-			 	  LEFT JOIN T_items__itemtag ON tag_ID = itag_tag_ID
+				DELETE T_items__tag FROM T_items__tag
+				  LEFT JOIN T_items__itemtag ON tag_ID = itag_tag_ID
 				 WHERE itag_itm_ID IS NULL');
 			$Messages->add( sprintf(T_('Removed %d obsolete tag entries.'), $DB->rows_affected), 'success' );
 			break;
-
+	}
+}
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=crontab' );
@@ -312,6 +310,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.30  2010/06/15 21:33:24  blueyed
+ * Fix patch failure.
+ *
  * Revision 1.29  2010/06/15 21:20:37  blueyed
  * Add tools action to remove obsolete/unused tags.
  *
