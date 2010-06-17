@@ -629,6 +629,10 @@ class Comment extends DataObject
 		{
 			if( $current_User->check_perm( $this->blogperm_name(), '', false, $this->get_Item()->get_blog_ID() ) )
 			{ // There is an URL and we have permission to edit this comment...
+				if( $redirect_to == NULL )
+				{
+					$redirect_to = rawurlencode( regenerate_url( '', '', '', '&' ) );
+				}
 				$this->deleteurl_link( $redirect_to, $ajax_button, false );
 				$this->banurl_link( $redirect_to, $ajax_button, true );
 			}
@@ -738,9 +742,8 @@ class Comment extends DataObject
 
 		if( $redirect_to == NULL )
 		{
-			$redirect_to = regenerate_url( '', '', '', '&' );
+			$redirect_to = rawurlencode( regenerate_url( '', '', '', '&' ) );
 		}
-		$redirect_to = rawurlencode( $redirect_to );
 
 		if( $ajax_button )
 		{
@@ -774,9 +777,8 @@ class Comment extends DataObject
 
 		if( $redirect_to == NULL )
 		{
-			$redirect_to = regenerate_url( '', '', '', '&' );
+			$redirect_to = rawurlencode( regenerate_url( '', '', '', '&' ) );
 		}
-		$redirect_to = rawurlencode( $redirect_to );
 
 		// TODO: really ban the base domain! - not by keyword
 		$authorurl = rawurlencode(get_ban_domain($this->get_author_url()));
@@ -1661,6 +1663,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.60  2010/06/17 06:42:44  efy-asimo
+ * Fix comment actions redirect on item full page
+ *
  * Revision 1.59  2010/06/11 02:29:59  sam2kb
  * Load the Blog object
  *

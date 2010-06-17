@@ -34,6 +34,8 @@ global $CommentList;
 
 global $dispatcher;
 
+$redirect_to = rawurlencode( regenerate_url( '', '', '', '&' ) );
+
 while( $Comment = & $CommentList->get_next() )
 { // Loop through comments:
 	?>
@@ -62,7 +64,6 @@ while( $Comment = & $CommentList->get_next() )
          <div style="padding-top:3px">
          	<?php
 			$Comment->author_ip( 'IP: <span class="bIP">', '</span> &middot; ' );
-		 	$redirect_to = param( 'redirect_to', 'string', NULL, true );
 			$Comment->author_url_with_actions( $redirect_to, false, true );
 		 	?>
          </div>
@@ -90,7 +91,6 @@ while( $Comment = & $CommentList->get_next() )
 						'class'    => 'permalink_right'
 					) );
 
-				$redirect_to = param( 'redirect_to', 'string', NULL, true );
 				// Display edit button if current user has the rights:
 				$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton', '&amp;', true, $redirect_to );
 
@@ -113,6 +113,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.17  2010/06/17 06:42:44  efy-asimo
+ * Fix comment actions redirect on item full page
+ *
  * Revision 1.16  2010/05/24 19:04:19  sam2kb
  * Comment header split into 2 lines
  *
