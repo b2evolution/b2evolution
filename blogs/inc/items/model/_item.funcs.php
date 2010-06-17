@@ -1243,6 +1243,8 @@ function echo_publishnowbutton_js()
 
 /**
  * Output Javascript for tags autocompletion.
+ * @todo dh> a more facebook like widget would be: http://plugins.jquery.com/project/facelist
+ *           "ListBuilder" is being planned for jQuery UI: http://wiki.jqueryui.com/ListBuilder
  */
 function echo_autocomplete_tags()
 {
@@ -1612,6 +1614,9 @@ function echo_set_slug_changed()
 }
 /*
  * $Log$
+ * Revision 1.112  2010/06/17 17:42:54  blueyed
+ * doc
+ *
  * Revision 1.111  2010/06/15 20:12:51  blueyed
  * Autocompletion for tags in item edit forms, via echo_autocomplete_tags
  *
