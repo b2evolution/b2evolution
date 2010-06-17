@@ -76,6 +76,7 @@ class EvoUnitTestCase extends UnitTestCase
 	/**
 	 * Revert any changed globals.
 	 * @see change_global()
+	 * @see change_server()
 	 */
 	function tearDown()
 	{
@@ -83,6 +84,10 @@ class EvoUnitTestCase extends UnitTestCase
 		foreach( $this->_saved_globals as $k => $v )
 		{
 			$GLOBALS[$k] = $v;
+		}
+		foreach( $this->_saved_server as $k => $v )
+		{
+			$_SERVER[$k] = $v;
 		}
 	}
 
@@ -100,6 +105,22 @@ class EvoUnitTestCase extends UnitTestCase
 			$this->_saved_globals[$global] = $GLOBALS[$global];
 		}
 		$GLOBALS[$global] = $value;
+	}
+
+
+	/**
+	 * Temporarily change a $_SERVER setting, which gets reset in {@link tearDown()}.
+	 * @param string Name of $_SERVER setting, e.g. 'HTTP_ACCEPT_LANGUAGE'
+	 * @param mixed value
+	 * @return
+	 */
+	function change_server($key, $value)
+	{
+		if( ! isset($this->_saved_server[$key]) )
+		{
+			$this->_saved_server[$key] = $_SERVER[$key];
+		}
+		$_SERVER[$key] = $value;
 	}
 
 
