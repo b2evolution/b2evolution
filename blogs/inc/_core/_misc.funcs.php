@@ -3837,7 +3837,7 @@ function & get_IconLegend()
 function get_active_opcode_cache()
 {
 	$opcode_cache = 'none';
-	if( function_exists('apc_cache_info') )
+	if( function_exists('apc_cache_info') && ini_get('apc.enabled') )
 	{
 		$apc_info = apc_cache_info( '', true );
 		if( $apc_info['num_entries'] )
@@ -3995,6 +3995,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.234  2010/06/17 19:44:32  blueyed
+ * Test for apc.enabled before calling apc_cache_info.
+ *
  * Revision 1.233  2010/06/08 22:45:19  sam2kb
  * Fixed "Undefined variable: $r" error in get_from_mem_cache()
  *
