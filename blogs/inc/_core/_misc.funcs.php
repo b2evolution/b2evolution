@@ -3837,19 +3837,13 @@ function & get_IconLegend()
 function get_active_opcode_cache()
 {
 	$opcode_cache = 'none';
-	if( function_exists('apc_cache_info') && ini_get('apc.enabled') )
+	if( function_exists('apc_cache_info') && ini_get('apc.enabled') ) # disabled for CLI (see apc.enable_cli), however: just use this setting and do not call the function.
 	{
-		$apc_info = apc_cache_info( '', true );
-		if( $apc_info['num_entries'] )
-		{
-			$opcode_cache = 'APC';
-		}
+		$opcode_cache = 'APC';
 	}
-
 	// xcache: xcache.var_size must be > 0. xcache_set is not necessary (might have been disabled).
-	if( ini_get('xcache.size') > 0 )
+	elseif( ini_get('xcache.size') > 0 )
 	{
-		assert('$opcode_cache == "none"'); // xcache gets disabled, if APC is enabled already
 		$opcode_cache = 'xcache';
 	}
 
@@ -3995,6 +3989,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.235  2010/06/17 20:47:27  blueyed
+ * get_active_opcode_cache: do not call apc_cache_info, only use setting/info.
+ *
  * Revision 1.234  2010/06/17 19:44:32  blueyed
  * Test for apc.enabled before calling apc_cache_info.
  *
