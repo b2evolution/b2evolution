@@ -398,13 +398,21 @@ function blog_restrict( $deldraft, $delpubl, $deldepr )
  * @param array affected Comment list, all comments in this list must have the same status
  * @param string Comment visibility status in this list
  * @param string ban keyword
+ * @param integer The number of corresponding comments on which current user has no permission
  */
-function echo_affected_comments( $affected_comments, $status, $keyword )
+function echo_affected_comments( $affected_comments, $status, $keyword, $noperms_count )
 {
 	$num_comments = count( $affected_comments );
 	if( $num_comments == 0 )
 	{
-		printf( '<p><strong>'.T_('No %s comments match the keyword [%s].').'</strong></p>', $status, htmlspecialchars($keyword) );
+		if( $noperms_count == 0 )
+		{ // There isn't any affected comment witch corresponding status
+			printf( '<p>'.T_('No %s comments match the keyword [%s].').'</p>', '<strong>'.$status.'</strong>', htmlspecialchars($keyword) );
+		}
+		else
+		{ // There are affected comment witch corresponding status, but current user has no permission
+			printf( '<p>'.T_('There are %d matching %s comments, but you have no permission to edit them.').'</p>', $noperms_count, '<strong>'.$status.'</strong>' );
+		}
 		return;
 	}
 
@@ -420,9 +428,9 @@ function echo_affected_comments( $affected_comments, $status, $keyword )
 	echo '<th class="firstcol">'.T_('Date').'</th>';
 	echo '<th>'.T_('Author').'</th>';
 	echo '<th>'.T_('Auth. URL').'</th>';
-	echo '<th>'.T_('Auth. IP').'</th>';
+	echo '<th class="center">'.T_('Auth. IP').'</th>';
 	echo '<th>'.T_('Content starts with...').'</th>';
-	echo '<th>'.T_('Action').'</th>';
+	echo '<th class="shrinkwrap">'.T_('Action').'</th>';
 	echo '</tr></thead>';
 	$count = 0;
 	foreach( $affected_comments as $Comment )
@@ -433,10 +441,10 @@ function echo_affected_comments( $affected_comments, $status, $keyword )
 		echo '<td>';
 		disp_url( $Comment->get_author_url(), 50 );
 		echo '</td>';
-		echo '<td>'.$Comment->get_author_ip().'</td>';
+		echo '<td class="center">'.$Comment->get_author_ip().'</td>';
 		echo '<td>'.strmaxlen(strip_tags( $Comment->get_content() ), 71).'</td>';
 		// no permission check, because affected_comments contains current user editable comments
-		echo '<td>'.action_icon( T_('Edit...'), 'edit', '?ctrl=comments&amp;action=edit&amp;comment_ID='.$Comment->ID ).'</td>';
+		echo '<td class="shrinkwrap">'.action_icon( T_('Edit...'), 'edit', '?ctrl=comments&amp;action=edit&amp;comment_ID='.$Comment->ID ).'</td>';
 		echo '</tr>';
 		$count++;
 	}
@@ -446,6 +454,9 @@ function echo_affected_comments( $affected_comments, $status, $keyword )
 
 /*
  * $Log$
+ * Revision 1.13  2010/06/17 08:54:52  efy-asimo
+ * antispam screen, antispam tool dispplay fix
+ *
  * Revision 1.12  2010/06/01 11:33:19  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)

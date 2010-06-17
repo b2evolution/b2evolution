@@ -118,6 +118,9 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 		$draft_comments = array();
 		$published_comments = array();
 		$deprecated_comments = array();
+		$draft_noperms_count = 0;
+		$publ_noperms_count = 0;
+		$depr_noperms_count = 0;
 		foreach( $res_affected_comments as $row_stats )
 		{ // select comments
 			$affected_Comment = new Comment($row_stats);
@@ -127,6 +130,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 				case 'draft':
 					if( ! $current_User->check_perm( 'blog_draft_comments', 'edit', false, $comment_blog ) )
 					{ // no permission to delete
+						$draft_noperms_count++;
 						continue;
 					}
 					$draft_comments[] = $affected_Comment;
@@ -134,6 +138,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 				case 'published':
 					if( ! $current_User->check_perm( 'blog_published_comments', 'edit', false, $comment_blog ) )
 					{ // no permission to delete
+						$publ_noperms_count++;
 						continue;
 					}
 					$published_comments[] = $affected_Comment;
@@ -141,6 +146,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 				case 'deprecated':
 					if( ! $current_User->check_perm( 'blog_deprecated_comments', 'edit', false, $comment_blog ) )
 					{ // no permission to delete
+						$depr_noperms_count++;
 						continue;
 					}
 					$deprecated_comments[] = $affected_Comment;
@@ -150,61 +156,82 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 			}
 		}
 		// show comments
-		echo_affected_comments( $draft_comments, 'draft', $keyword );
-		echo_affected_comments( $published_comments, 'published', $keyword );
-		echo_affected_comments( $deprecated_comments, 'deprecated', $keyword );
+		echo_affected_comments( $draft_comments, 'draft', $keyword, $draft_noperms_count );
+		echo_affected_comments( $published_comments, 'published', $keyword, $publ_noperms_count );
+		echo_affected_comments( $deprecated_comments, 'deprecated', $keyword, $depr_noperms_count );
 	}
 
 	// Check for potentially affected comments:
-	$sql = 'SELECT * FROM T_users
-			 WHERE user_url LIKE '.$DB->quote('%'.$keyword.'%').'
-				 OR user_email LIKE '.$DB->quote('%'.$keyword.'%').'
+	$quoted_keyword = $DB->quote('%'.$keyword.'%');
+	$sql = 'SELECT T_users.* FROM T_users LEFT JOIN T_users__fields ON user_ID = uf_user_ID
+			 WHERE user_url LIKE '.$quoted_keyword.'
+				 OR user_email LIKE '.$quoted_keyword.'
+				 OR user_domain LIKE '.$quoted_keyword.'
+				 OR user_nickname LIKE '.$quoted_keyword.'
+				 OR user_firstname LIKE '.$quoted_keyword.'
+				 OR user_lastname LIKE '.$quoted_keyword.'
+				 OR user_aim LIKE '.$quoted_keyword.'
+				 OR user_msn LIKE '.$quoted_keyword.'
+				 OR user_yim LIKE '.$quoted_keyword.'
+				 OR uf_varchar LIKE '.$quoted_keyword.'
 			 ORDER BY user_login ASC
 			 LIMIT 500';
 	$res_affected_users = $DB->get_results( $sql, OBJECT, 'Find matching users' );
 	if( $DB->num_rows != 0 )
-	{ // if matching found display users table
-		?>
-		<p><label><strong><?php echo( T_('Affected users').':' )?></strong></label></p>
-		<table class="grouped" cellspacing="0">
-			<thead><tr>
-			<th class="firstcol"><?php printf( T_('Login') )?></th>
-			<th><?php echo( T_('First name') )?></th>
-			<th><?php echo( T_('Last name') )?></th>
-			<th><?php echo( T_('Nickname') )?></th>
-			<th><?php echo( T_('URL') )?></th>
-			</tr></thead>
-		 	<?php
-		 	$count = 0;
-			foreach( $res_affected_users as $row_stats )
-			{ // Display affected users
-				$affected_User = new User($row_stats);
-				?>
-				<tr class="<?php echo ($count%2 == 1) ? 'odd' : 'even' ?>">
-				<td class="firstcol">
-					<?php
-					if( $current_User->check_perm( 'users', 'edit', false ) )
-					{
-						echo '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID='
-							.$affected_User->ID.'"><strong>'.$affected_User->login.'</strong></a>';
-					}
-					else
-					{
-						echo '<strong>'.$affected_User->login.'</strong>';
-					}
+	{
+		if( ! $current_User->check_perm( 'users', 'view', false ) )
+		{ // current user has no permission to view users
+			printf( '<p>'.T_('There are %d matching %s but you have no permission to see them.').'</p>', $DB->num_rows, '<strong>'.T_('users').'</strong>' );
+		}
+		else
+		{ // matching found, and current user has permission to view -> display users table
+			?>
+			<p><label><strong><?php echo( T_('Affected users').':' )?></strong></label></p>
+			<table class="grouped" cellspacing="0">
+				<thead><tr>
+				<th class="firstcol"><?php printf( T_('Login') )?></th>
+				<th><?php echo( T_('First name') )?></th>
+				<th><?php echo( T_('Last name') )?></th>
+				<th><?php echo( T_('Nickname') )?></th>
+				<th><?php echo( T_('URL') )?></th>
+				</tr></thead>
+			 	<?php
+			 	$count = 0;
+				$current_user_edit_perm = $current_User->check_perm( 'users', 'edit', false );
+				foreach( $res_affected_users as $row_stats )
+				{ // Display affected users
+					$affected_User = new User($row_stats);
 					?>
-				</td>
-				<td><?php echo $affected_User->first_name() ?></td>
-				<td><?php echo $affected_User->last_name() ?></td>
-				<td><?php echo $affected_User->nick_name() ?></td>
-				<td><?php echo '<strong>'.$affected_User->get('url').'</strong>' ?></td>
-				</tr>
-				<?php
-				$count++;
-			}
-		 	?>
-		</table>
-		<?php
+					<tr class="<?php echo ($count%2 == 1) ? 'odd' : 'even' ?>">
+					<td class="firstcol">
+						<?php
+							if( $current_user_edit_perm )
+						{
+							echo '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID='
+								.$affected_User->ID.'"><strong>'.$affected_User->login.'</strong></a>';
+						}
+						else
+						{
+							echo '<strong>'.$affected_User->login.'</strong>';
+						}
+						?>
+					</td>
+					<td><?php echo $affected_User->first_name() ?></td>
+					<td><?php echo $affected_User->last_name() ?></td>
+					<td><?php echo $affected_User->nick_name() ?></td>
+					<td><?php echo '<strong>'.$affected_User->get('url').'</strong>' ?></td>
+					</tr>
+					<?php
+					$count++;
+				}
+			 	?>
+			</table>
+			<?php
+		}
+	}
+	else
+	{ // There is no affected users
+		printf( '<p>'.T_('No %s match the keyword [%s]').'</p>', '<strong>'.T_('users').'</strong>', $keyword );
 	}
 
 	// Check if the string is already in the blacklist:
@@ -218,7 +245,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 		<p>
 		<input type="checkbox" name="blacklist_locally" id="blacklist_locally_cb" value="1" checked="checked" />
 		<label for="blacklist_locally_cb">
-			<strong><?php printf ( T_('Blacklist the keyword [%s] locally.'), htmlspecialchars($keyword) ) ?></strong>
+			<?php printf ( T_('%s the keyword [%s] locally.'), '<strong>'.T_('Blacklist').'</strong>', htmlspecialchars($keyword) ) ?>
 		</label>
 		</p>
 
@@ -229,7 +256,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 			<p>
 			<input type="checkbox" name="report" id="report_cb" value="1" checked="checked" />
 			<label for="report_cb">
-				<strong><?php printf ( T_('Report the keyword [%s] as abuse to b2evolution.net.'), htmlspecialchars($keyword) ) ?></strong>
+				<?php printf ( T_('%s the keyword [%s] as abuse to b2evolution.net.'), '<strong>'.T_('Report').'</strong>', htmlspecialchars($keyword) ) ?>
 			</label>
 			[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
 			</p>
@@ -258,6 +285,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.22  2010/06/17 08:54:52  efy-asimo
+ * antispam screen, antispam tool dispplay fix
+ *
  * Revision 1.21  2010/06/02 07:29:57  efy-asimo
  * Antispam tool - add affected users table
  *
