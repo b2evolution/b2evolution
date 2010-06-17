@@ -604,63 +604,99 @@ function locale_options_return( $default = '' )
 
 
 /**
- * Detect language from HTTP_ACCEPT_LANGUAGE
+ * Detect language from HTTP_ACCEPT_LANGUAGE.
  *
- * First matched full locale code in HTTP_ACCEPT_LANGUAGE will win
- * Otherwise, first locale in table matching a lang code will win
+ * HTTP_ACCEPT_LANGUAGE is sorted by prio and then the best match is used
+ * (either full locale ("en-US") or best fitting locale for a short one ("en").
  *
- * @return locale made out of HTTP_ACCEPT_LANGUAGE or $default_locale, if no match
+ * This gets tested in {@link test_locale_from_httpaccept()}.
+ *
+ * @return string Locale made out of HTTP_ACCEPT_LANGUAGE or $default_locale, if no match
  */
 function locale_from_httpaccept()
 {
 	global $locales, $default_locale;
 	if( isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) )
 	{
-		// echo $_SERVER['HTTP_ACCEPT_LANGUAGE'];
 		$accept = strtolower( $_SERVER['HTTP_ACCEPT_LANGUAGE'] );
-		// echo 'http_accept_language:<br />'; pre_dump($accept);
-		$selected_locale = '';
-		$selected_match_pos = 10000;
-		$selected_full_match = false;
 
-		foreach( $locales as $localekey => $locale )
-		{ // Check each locale
-			if( empty($locale['enabled']) )
-			{ // We only want to use activated locales
+		// Create list of accepted locales.
+		if( ! preg_match_all('/([a-z]{1,8}(?:-[a-z]{1,8})?)\s*(?:;\s*q\s*=\s*(1|0(?:\.[0-9]+)?))?/i', $accept, $accept_list) )
+		{
+			return $default_locale;
+		}
+		// Create list of enabled locales.
+		$enabled_locales = array();
+		foreach($locales as $k => $v)
+		{
+			if( empty($v['enabled']) )
+			{
 				continue;
 			}
-			// echo '<br />searching ', $localekey, ' in HTTP_ACCEPT_LANGUAGE ';
-			if( ($pos = strpos( $accept, strtolower($localekey) )) !== false )
-			{ // We found full locale
-				if( !$selected_full_match || ($pos <= $selected_match_pos) )
-				{ // This is a better choice than what we had before OR EQUIVALENT but with exact locale
-					// echo $localekey.' @ '.$pos.' is better than '.
-					//		$selected_locale.' @ '.$selected_match_pos.'<br />';
-					$selected_locale = $localekey;
-					$selected_match_pos = $pos;
-					$selected_full_match = true;
-				}
-				// else echo $localekey.' @ '.$pos.' is not better than '.
-				//					$selected_locale.' @ '.$selected_match_pos.'<br />';
-			}
-
-			if( !$selected_full_match && ($pos = strpos( $accept, substr($localekey, 0, 2) )) !== false )
-			{ // We have no exact match yet but found lang code match
-				if( $pos < $selected_match_pos )
-				{ // This is a better choice than what we had before
-					// echo $localekey.' @ '.$pos.' is better than '.
-					//		$selected_locale.' @ '.$selected_match_pos.'<br />';
-					$selected_locale = $localekey;
-					$selected_match_pos = $pos;
-				}
-				// else echo $localekey.' @ '.$pos.' is not better than '.
-				//					$selected_locale.' @ '.$selected_match_pos.'<br />';
+			$enabled_locales[strtolower($k)] = $k;
+		}
+		if( empty($enabled_locales) )
+		{
+			return $default_locale;
+		}
+		// Build mapping of short code to long code(s)
+		$short_locales = array();
+		foreach($enabled_locales as $v)
+		{
+			if( $pos = strpos($v, '-') )
+			{
+				$short = substr($v, 0, $pos);
+				$short_locales[$short][] = $v;
 			}
 		}
-
-		if( !empty($selected_locale) )
+		// Create "locale" => "prio" list
+		$accept_list = array_combine($accept_list[1], $accept_list[2]);
+		$maxq = count($accept_list)+1;
+		foreach( $accept_list as $k => $v )
 		{
-			return $selected_locale;
+			if( $v === '' )
+			{ // should be kept in order
+				$accept_list[$k] = $maxq--;
+			}
+			elseif( $v == 0 )
+			{ // not acceptable (RFC 2616)
+				unset($accept_list[$k]);
+			}
+		}
+		arsort($accept_list);
+		$accept_list = array_values(array_keys($accept_list));
+
+		// Go through the list of accepted locales and find best match.
+		for( $i = 0, $n = count($accept_list); $i<$n; $i++ )
+		{
+			$test = $accept_list[$i];
+
+			if( isset($enabled_locales[$test]) )
+			{ // the accepted locale is enabled and a full match
+				return $enabled_locales[$test];
+			}
+			if( isset($short_locales[$test]) )
+			{ // this is a short locale: find the best/first match in accepted locales
+				$first = NULL;
+				foreach($short_locales[$test] as $v)
+				{
+					$pos = array_search(strtolower($v), $accept_list);
+					if( $pos !== false && ( ! isset($first) || $pos < $first ) )
+					{
+						$first = $pos;
+					}
+				}
+				if( isset($first) )
+				{ // found exact match, via short locale.
+					return $enabled_locales[$accept_list[$first]];
+				}
+				if( isset($enabled_locales[$test.'-'.$test]) )
+				{ // test for e.g. "de-DE" when only "de" is accepted
+					return $enabled_locales[$test.'-'.$test];
+				}
+				// Fallback: use first enabled locale matching the short accepted
+				return $short_locales[$test][0];
+			}
 		}
 	}
 	return $default_locale;
@@ -1095,6 +1131,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.42  2010/06/17 17:48:46  blueyed
+ * Fix locale_from_httpaccept, complete rewrite.
+ *
  * Revision 1.41  2010/05/13 19:09:08  blueyed
  * debug_locale=true
  *
