@@ -736,12 +736,13 @@ class Form extends Widget
 
 		$r = $this->begin_field();
 
+		// Add jQuery hintbox (autocompletion).
 		$r .= '<script type="text/javascript">';
-		$r .= 'jQuery(document).ready(function(){';
+		$r .= 'jQuery(function(){';
 		$r .= 'jQuery(\'#'.$field_name.'\').hintbox({';
-		$r .= 'url: \''.$htsrv_url.'async.php?action=get_login_list\',';
-		$r .= 'matchHint: true,';
-		$r .= 'autoDimentions: true';
+		$r .= ' url: \''.$htsrv_url.'async.php?action=get_login_list\',';
+		$r .= ' matchHint: true,';
+		$r .= ' autoDimentions: true';
 		$r .= '});';
 		$r .= '});';
 		$r .= '</script>';
@@ -3054,6 +3055,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.87  2010/06/18 23:48:54  blueyed
+ * minor hintbox cleanup.
+ *
  * Revision 1.86  2010/05/06 09:24:13  efy-asimo
  * Messaging options - fix
  *
