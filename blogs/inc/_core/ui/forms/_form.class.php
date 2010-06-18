@@ -737,6 +737,7 @@ class Form extends Widget
 		$r = $this->begin_field();
 
 		// Add jQuery hintbox (autocompletion).
+		// TODO: dh> may not be loaded..! handle it via http://www.appelsiini.net/projects/lazyload ?
 		$r .= '<script type="text/javascript">';
 		$r .= 'jQuery(function(){';
 		$r .= 'jQuery(\'#'.$field_name.'\').hintbox({';
@@ -3055,6 +3056,9 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.88  2010/06/18 23:56:02  blueyed
+ * todo
+ *
  * Revision 1.87  2010/06/18 23:48:54  blueyed
  * minor hintbox cleanup.
  *
