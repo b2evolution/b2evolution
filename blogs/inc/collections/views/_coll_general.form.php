@@ -74,8 +74,8 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link('blogs_general_p
 		// fp> TODO: think about a way to bundle this with other JS on the page -- maybe always load hintbox in the backoffice
 		// dh> TODO: should probably also get ported to use jquery.ui.autocomplete
 		global $rsc_url;
-		echo '<script type="text/javascript" src="'.$rsc_url.'js/jquery.hintbox.min.js"></script>';
-		echo '<link rel="stylesheet" type="text/css" href="'.$rsc_url.'css/jquery.hintbox.css">';
+		echo '<script type="text/javascript" src="'.$rsc_url.'js/jquery/jquery.hintbox.min.js"></script>';
+		echo '<link rel="stylesheet" type="text/css" href="'.$rsc_url.'css/jquery/jquery.hintbox.css">';
 		$Form->username( 'owner_login', $owner_User, T_('Owner'), T_('Login of this blog\'s owner.') );
 	}
 	else
@@ -130,6 +130,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.23  2010/06/18 23:57:46  blueyed
+ * Move hintbox to jquery subdir.
+ *
  * Revision 1.22  2010/06/15 20:17:22  blueyed
  * todo
  *

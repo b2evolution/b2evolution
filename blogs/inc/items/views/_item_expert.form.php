@@ -357,8 +357,8 @@ $Form->begin_form( '', '', $params );
 		// Include JavaScript and CSS for item's owner dropdown.
 
 		// Form 'username' field requires the following JS and CSS.
-		echo '<script type="text/javascript" src="'.$rsc_url.'js/jquery.hintbox.min.js"></script>';
-		echo '<link rel="stylesheet" type="text/css" href="'.$rsc_url.'css/jquery.hintbox.css">';
+		echo '<script type="text/javascript" src="'.$rsc_url.'js/jquery/jquery.hintbox.min.js"></script>';
+		echo '<link rel="stylesheet" type="text/css" href="'.$rsc_url.'css/jquery/jquery.hintbox.css">';
 
 		echo '<tr><td><strong>'.T_('Owner').':</strong></td><td>';
 		$Form->username( 'item_owner_login', $edited_Item->get_creator_User(), '', T_( 'login of this post\'s owner.').'<br/>' );
@@ -454,6 +454,9 @@ echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.69  2010/06/18 23:57:46  blueyed
+ * Move hintbox to jquery subdir.
+ *
  * Revision 1.68  2010/06/15 20:12:51  blueyed
  * Autocompletion for tags in item edit forms, via echo_autocomplete_tags
  *
