@@ -1,5 +1,5 @@
 /**
- * jquery.hintbox.js v1.3 - www.wiipass.com
+ * jquery.hintbox.js v1.4 - www.wiipass.com
  *
  * @author Tiziano Treccani <treccani.tiziano@tiscali.it>
  * Copyright (c) 2009 Tiziano Treccani - released under MIT License
@@ -31,6 +31,11 @@
 
 ********** REVISION HISTORY **********
 
+2010-04-04 : jQuery Hintbox 1.4 released (Easter release). From this function jQuery 1.4 will be used.
+- New event 'onListRetrieved' added. See examples and documentation to learn more about it.
+- ImmediateList option added. Thans to jaco-pixeldump for the code :-)
+- Fix not required full list caching bug
+- Minor bugs fixed 
 
 
 2009-08-18 : jQuery Hintbox 1.3 released
