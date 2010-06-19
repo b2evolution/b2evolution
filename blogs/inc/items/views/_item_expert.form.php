@@ -354,12 +354,6 @@ $Form->begin_form( '', '', $params );
 
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{
-		// Include JavaScript and CSS for item's owner dropdown.
-
-		// Form 'username' field requires the following JS and CSS.
-		echo '<script type="text/javascript" src="'.$rsc_url.'js/jquery/jquery.hintbox.min.js"></script>';
-		echo '<link rel="stylesheet" type="text/css" href="'.$rsc_url.'css/jquery/jquery.hintbox.css">';
-
 		echo '<tr><td><strong>'.T_('Owner').':</strong></td><td>';
 		$Form->username( 'item_owner_login', $edited_Item->get_creator_User(), '', T_( 'login of this post\'s owner.').'<br/>' );
 		$Form->hidden( 'item_owner_login_displayed', 1 );
@@ -454,6 +448,18 @@ echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.70  2010/06/19 01:09:31  blueyed
+ * Improve jQuery hintbox integration.
+ *
+ *  - Load js/css in form class method
+ *  - Use JS to load the CSS, since LINK is not valid in HTML BODY
+ *  - Remove disableEnterKey onkeypress: handled properly by
+ *    hintbox (patch sent upstream). This allows form submission from
+ * 	 the input field now again.
+ *  - Add proper CSS class to input field. This makes the "loading"
+ *    background image not appear anymore, but that depends on the
+ * 	 admin skin.
+ *
  * Revision 1.69  2010/06/18 23:57:46  blueyed
  * Move hintbox to jquery subdir.
  *

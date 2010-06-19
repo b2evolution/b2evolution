@@ -737,7 +737,18 @@ class Form extends Widget
 		$r = $this->begin_field();
 
 		// Add jQuery hintbox (autocompletion).
-		// TODO: dh> may not be loaded..! handle it via http://www.appelsiini.net/projects/lazyload ?
+		// Form 'username' field requires the following JS and CSS.
+		// fp> TODO: think about a way to bundle this with other JS on the page -- maybe always load hintbox in the backoffice
+		//     dh> Handle it via http://www.appelsiini.net/projects/lazyload ?
+		// dh> TODO: should probably also get ported to use jquery.ui.autocomplete (or its successor)
+		global $rsc_url;
+		$r .= '<script type="text/javascript" src="'.$rsc_url.'js/jquery/jquery.hintbox.min.js"></script>';
+		$r .= '<script type="text/javascript">$("<link>").appendTo("head").attr({
+			rel: "stylesheet",
+			type: "text/css",
+			href: "'.$rsc_url.'css/jquery/jquery.hintbox.css"
+			});</script>';
+
 		$r .= '<script type="text/javascript">';
 		$r .= 'jQuery(function(){';
 		$r .= 'jQuery(\'#'.$field_name.'\').hintbox({';
@@ -747,7 +758,7 @@ class Form extends Widget
 		$r .= '});';
 		$r .= '});';
 		$r .= '</script>';
-		$r .= '<input type="text" value="'.$User->login.'" name="'.$field_name.'" id="'.$field_name.'" onKeyPress="return disableEnterKey(event)"/>';
+		$r .= '<input type="text" class="form_text_input" value="'.$User->login.'" name="'.$field_name.'" id="'.$field_name.'" />';
 
 		$r .= $this->end_field();
 
@@ -3056,6 +3067,18 @@ class Form extends Widget
 
 /*
  * $Log$
+ * Revision 1.89  2010/06/19 01:09:31  blueyed
+ * Improve jQuery hintbox integration.
+ *
+ *  - Load js/css in form class method
+ *  - Use JS to load the CSS, since LINK is not valid in HTML BODY
+ *  - Remove disableEnterKey onkeypress: handled properly by
+ *    hintbox (patch sent upstream). This allows form submission from
+ * 	 the input field now again.
+ *  - Add proper CSS class to input field. This makes the "loading"
+ *    background image not appear anymore, but that depends on the
+ * 	 admin skin.
+ *
  * Revision 1.88  2010/06/18 23:56:02  blueyed
  * todo
  *

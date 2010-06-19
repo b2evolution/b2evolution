@@ -69,13 +69,6 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link('blogs_general_p
 		// fp> Note: There are 2 reasons why we don't provide a select here:
 		// 1. If there are 1000 users, it's a pain.
 		// 2. A single blog owner is not necessarily allowed to see all other users.
-
-		// Form 'username' field requires the following JS and CSS.
-		// fp> TODO: think about a way to bundle this with other JS on the page -- maybe always load hintbox in the backoffice
-		// dh> TODO: should probably also get ported to use jquery.ui.autocomplete
-		global $rsc_url;
-		echo '<script type="text/javascript" src="'.$rsc_url.'js/jquery/jquery.hintbox.min.js"></script>';
-		echo '<link rel="stylesheet" type="text/css" href="'.$rsc_url.'css/jquery/jquery.hintbox.css">';
 		$Form->username( 'owner_login', $owner_User, T_('Owner'), T_('Login of this blog\'s owner.') );
 	}
 	else
@@ -130,6 +123,18 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.24  2010/06/19 01:09:31  blueyed
+ * Improve jQuery hintbox integration.
+ *
+ *  - Load js/css in form class method
+ *  - Use JS to load the CSS, since LINK is not valid in HTML BODY
+ *  - Remove disableEnterKey onkeypress: handled properly by
+ *    hintbox (patch sent upstream). This allows form submission from
+ * 	 the input field now again.
+ *  - Add proper CSS class to input field. This makes the "loading"
+ *    background image not appear anymore, but that depends on the
+ * 	 admin skin.
+ *
  * Revision 1.23  2010/06/18 23:57:46  blueyed
  * Move hintbox to jquery subdir.
  *
