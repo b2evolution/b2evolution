@@ -133,7 +133,10 @@ div#evo_toolbar img {
 	vertical-align: top; /* required in strict mode (where no 'align="top"' gets added to IMGs, FF3). Otherwise text next to the img wraps out of the evobar */
 }
 
+
 /* *** SuperFish *** */
+/* TODO: dh> move this to an extra file: this is only used for logged in users, and only for the sf-menu (which may not get used). */
+/* TODO: dh> Do not use style for "a" itself, but "a:link" and "a:visited" in particular. Makes it easier to overwrite/use the skin settings */
 
 /*** ESSENTIAL STYLES ***/
 .sf-menu, .sf-menu * {
