@@ -144,7 +144,7 @@ function shutdown()
 		if( $pid = pcntl_fork() )
 			return; // Parent
 
-		function shutdown_kill() 
+		function shutdown_kill()
 		{
 			posix_kill(posix_getpid(), SIGHUP);
 		}
@@ -2054,10 +2054,23 @@ function debug_info( $force = false, $force_clean = false )
 			return;
 		}
 
-		if( $debug < 2 && ( empty($Hit) || $Hit->get_agent_type() != 'browser' ) )
-		{	// Don't display if it's not a browser (very needed for proper RSS display btw)
-			// ($Hit is empty e.g. during install)
-			return;
+		// Do not display, if no content-type header has been sent or it's != "text/html" (debug > 1 skips this)
+		if( $debug < 2 )
+		{
+			$content_type = NULL;
+			foreach(headers_list() as $header)
+			{
+				if( stripos($header, 'content-type:') !== false )
+				{ // content type sent
+					# "Content-Type:text/html;charset=utf-8" => "text/html"
+					$content_type = trim(array_shift(explode(';', array_pop(explode(':', $header, 2)))));
+					break;
+				}
+			}
+			if( $content_type != 'text/html' )
+			{
+				return;
+			}
 		}
 	}
 	//Make sure debug output only happens once:
@@ -2230,7 +2243,6 @@ function debug_info( $force = false, $force_clean = false )
 		echo $clean ? "\n" : '<br />';
 		echo 'Len of serialized $cache_File: '.strlen(serialize($cache_File));
 		echo $clean ? "\n" : '<br />';
-
 	}
 
 
@@ -3714,7 +3726,7 @@ function get_from_mem_cache($key, & $success = NULL)
 	if( ! $success )
 	{
 		$r = NULL;
-		
+
 		global $Debuglog;
 		$Debuglog->add('No caching backend available for reading "'.$key.'".', 'cache');
 	}
@@ -3989,6 +4001,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.236  2010/06/19 02:06:57  blueyed
+ * debug_info: Use content-type to decide if debug info should get output.
+ *
  * Revision 1.235  2010/06/17 20:47:27  blueyed
  * get_active_opcode_cache: do not call apc_cache_info, only use setting/info.
  *
