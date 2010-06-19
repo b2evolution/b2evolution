@@ -2127,8 +2127,8 @@ function debug_info( $force = false, $force_clean = false )
 		}
 		else
 		{
-			echo '<table><thead>'
-				.'<tr><th colspan="4" class="center">Timers</th></tr>'
+			echo '<table class="debug_timer"><thead>'
+				.'<tr><td colspan="4" class="center">Timers</td></tr>'
 				.'<tr><th>Category</th><th>Time</th><th>%</th><th>Count</th></tr>'
 				.'</thead><tbody>';
 		}
@@ -2165,7 +2165,7 @@ function debug_info( $force = false, $force_clean = false )
 		// Collapse ignored rows, allowing to expand them with Javascript:
 		if( $count_collapse > 5 )
 		{
-			echo '<tr><td colspan="4" class="center">';
+			echo '<tr><td colspan="4" class="center" id="evo-debuglog-timer-long-header">';
 			echo '<a href="" onclick="var e = document.getElementById(\'evo-debuglog-timer-long\'); e.style.display = (e.style.display == \'none\' ? \'\' : \'none\'); return false;">+ '.$count_collapse.' queries &lt; 1%</a> </td></tr>';
 			echo '</tbody>';
 			echo '<tbody id="evo-debuglog-timer-long" style="display:none;">';
@@ -2184,11 +2184,11 @@ function debug_info( $force = false, $force_clean = false )
 		}
 		else
 		{
-			echo "\n<tr>"
+			echo "\n</tbody><tfoot><tr>"
 				.'<td>total</td>'
 				.'<td class="right">'.$total_time.'</td>'
 				.'<td class="right">'.$percent_total.'%</td>'
-				.'<td class="right">'.$Timer->get_count('total').'</td></tr>';
+				.'<td class="right">'.$Timer->get_count('total').'</td></tr></tfoot>';
 		}
 
 		if ( $clean )
@@ -2197,8 +2197,25 @@ function debug_info( $force = false, $force_clean = false )
 		}
 		else
 		{
-			echo '</tbody>';
 			echo '</table>';
+
+			// add jquery.tablesorter to the "Debug info" table.
+			global $rsc_url;
+			echo '
+			<script type="text/javascript" src="'.$rsc_url.'js/jquery/jquery.tablesorter.min.js"></script>
+			<script type="text/javascript">
+			(function($){
+				var clicked_once;
+				$("table.debug_timer th").click( function(event) {
+					if( clicked_once ) return; else clicked_once = true;
+					$("#evo-debuglog-timer-long tr").appendTo($("table.debug_timer tbody")[0]);
+					$("#evo-debuglog-timer-long-header").remove();
+					// click for tablesorter:
+					$("table.debug_timer").tablesorter();
+					jQuery(event.currentTarget).click();
+				});
+			})(jQuery);
+			</script>';
 		}
 
 		// ================================== DB Summary ================================
@@ -4001,6 +4018,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.237  2010/06/19 02:12:17  blueyed
+ * Add jquery.tablesorter and use it for 'Debug info' table.
+ *
  * Revision 1.236  2010/06/19 02:06:57  blueyed
  * debug_info: Use content-type to decide if debug info should get output.
  *
