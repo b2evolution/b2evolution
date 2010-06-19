@@ -2118,6 +2118,8 @@ function debug_info( $force = false, $force_clean = false )
 		$total_time = $timer_rows['total'];
 		unset($timer_rows['total']);
 
+		$percent_total = $time_page > 0 ? number_format( 100/$time_page * $total_time, 2 ) : '0';
+
 		if( $clean )
 		{
 			echo '== Timers =='."\n\n";
@@ -2128,9 +2130,18 @@ function debug_info( $force = false, $force_clean = false )
 		else
 		{
 			echo '<table class="debug_timer"><thead>'
-				.'<tr><td colspan="4" class="center">Timers</td></tr>'
+				.'<tr><td colspan="4" class="center">Timers</td></tr>' // dh> TODO: should be TH. Workaround so that tablesorter does not pick it up. Feedback from author requested.
 				.'<tr><th>Category</th><th>Time</th><th>%</th><th>Count</th></tr>'
-				.'</thead><tbody>';
+				.'</thead>';
+
+			// Output "total":
+			echo "\n<tfoot><tr>"
+				.'<td>total</td>'
+				.'<td class="right">'.$total_time.'</td>'
+				.'<td class="right">'.$percent_total.'%</td>'
+				.'<td class="right">'.$Timer->get_count('total').'</td></tr></tfoot>';
+
+			echo '<tbody>';
 		}
 
 		$table_rows_collapse = array();
@@ -2171,33 +2182,15 @@ function debug_info( $force = false, $force_clean = false )
 			echo '<tbody id="evo-debuglog-timer-long" style="display:none;">';
 		}
 		echo implode( "\n", $table_rows_collapse )."\n";
-		if( $count_collapse > 5 )
-		{
-			echo '</tbody><tbody>';
-		}
 
-		// Output "total":
-		$percent_total = $time_page > 0 ? number_format( 100/$time_page * $total_time, 2 ) : '0';
 		if ( $clean )
-		{
+		{ // "total" (done in tfoot for html above)
 			echo sprintf( $printf_format, 'total', $total_time, $percent_total.'%', $Timer->get_count('total') );
-		}
-		else
-		{
-			echo "\n</tbody><tfoot><tr>"
-				.'<td>total</td>'
-				.'<td class="right">'.$total_time.'</td>'
-				.'<td class="right">'.$percent_total.'%</td>'
-				.'<td class="right">'.$Timer->get_count('total').'</td></tr></tfoot>';
-		}
-
-		if ( $clean )
-		{
 			echo '+'.str_repeat( '-', $table_headerlen ).'+'."\n\n";
 		}
 		else
 		{
-			echo '</table>';
+			echo "\n</tbody></table>";
 
 			// add jquery.tablesorter to the "Debug info" table.
 			global $rsc_url;
@@ -4018,6 +4011,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.238  2010/06/19 02:33:45  blueyed
+ * debug_info: fix html for tbody and tfoot. doc/todo.
+ *
  * Revision 1.237  2010/06/19 02:12:17  blueyed
  * Add jquery.tablesorter and use it for 'Debug info' table.
  *
