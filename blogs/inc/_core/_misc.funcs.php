@@ -660,7 +660,7 @@ function evo_substr( $string, $start = 0, $length = '#' )
 	global $current_charset;
 
 	if( ! $length )
-	{ // make mb_substr and substr behave consistently
+	{ // make mb_substr and substr behave consistently (mb_substr returns string for length=0)
 		return '';
 	}
 	if( $length == '#' )
@@ -4031,6 +4031,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.240  2010/06/23 22:00:46  blueyed
+ * doc
+ *
  * Revision 1.239  2010/06/23 19:39:43  blueyed
  * - evo_substr: return "" for length=0 (mb_substr would return string as-is)
  * - maxstrlen: add $cut_at_whitespace param, with tests
