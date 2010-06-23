@@ -393,7 +393,8 @@ class Comment extends DataObject
 		// See if plugin supplies an image
 		// $img_url = $Plugins->trigger_event( 'GetCommentAvatar', array( 'Comment' => & $this, 'size' => $size ) );
 
-		$this->Item->load_Blog();
+		$comment_Item = $this->get_Item();
+		$comment_Item->load_Blog();
 		$default_gravatar = $this->Item->Blog->get_setting('default_gravatar');
 		if( $default_gravatar == 'b2evo' )
 		{
@@ -1684,6 +1685,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.62  2010/06/23 09:53:39  efy-asimo
+ * comment get_avatar() function fix
+ *
  * Revision 1.61  2010/06/23 09:30:55  efy-asimo
  * Comments display and Antispam ban form modifications
  *
