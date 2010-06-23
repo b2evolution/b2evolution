@@ -342,7 +342,7 @@ while( $Item = & $ItemList->get_item() )
 			// Filter list:
 			$CommentList->set_filters( array(
 				'types' => array( 'comment','trackback','pingback' ),
-				'statuses' => get_allowed_statuses( $Blog->ID ),
+				'statuses' => array( 'published', 'draft', 'deprecated' ),
 				'order' => 'ASC',
 				'post_ID' => $Item->ID,
 			) );
@@ -355,6 +355,10 @@ while( $Item = & $ItemList->get_item() )
 					'after'     => '</p></div>',
 					'msg_empty' => T_('No feedback for this post yet...'),
 				) );
+
+			// we do not want to comment actions use new redirect
+			param( 'save_context', 'boolean', false );
+			param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$Item->ID, '&' ), false, true );
 
 			// Display list of comments:
 			require $inc_path.'comments/views/_comment_list.inc.php';
@@ -417,6 +421,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.37  2010/06/23 09:30:55  efy-asimo
+ * Comments display and Antispam ban form modifications
+ *
  * Revision 1.36  2010/06/01 11:33:20  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)

@@ -57,7 +57,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	$res_affected_hits = $DB->get_results( $sql, ARRAY_A );
 	if( $DB->num_rows == 0 )
 	{ // No matching hits.
-		printf( '<p><strong>'.T_('No log-hits match the keyword [%s].').'</strong></p>', htmlspecialchars($keyword) );
+		printf( '<p>'.T_('No %s match the keyword [%s].').'</p>', '<strong>'.T_('log-hits').'</strong>', htmlspecialchars($keyword) );
 	}
 	else
 	{
@@ -65,7 +65,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 		<p>
 			<input type="checkbox" name="delhits" id="delhits_cb" value="1" checked="checked" />
 			<label for="delhits_cb">
-			<strong><?php printf ( T_('Delete the following %s referer hits:'), $DB->num_rows == 500 ? '500+' : $DB->num_rows ) ?></strong>
+			<?php printf ( T_('Delete the following %s %s:'), $DB->num_rows == 500 ? '500+' : $DB->num_rows , '<strong>'.T_('referer hits').'</strong>' ) ?>
 			</label>
 		</p>
 		<table class="grouped" cellspacing="0">
@@ -111,7 +111,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	$res_affected_comments = $DB->get_results( $sql, OBJECT, 'Find matching comments' );
 	if( $DB->num_rows == 0 )
 	{ // No matching hits.
-		printf( '<p><strong>'.T_('No comments match the keyword [%s].').'</strong></p>', htmlspecialchars($keyword) );
+		printf( '<p>'.T_('No %s match the keyword [%s].').'</p>', '<strong>'.T_('comments').'</strong>', htmlspecialchars($keyword) );
 	}
 	else
 	{ // creat comment arrays
@@ -170,6 +170,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 				 OR user_nickname LIKE '.$quoted_keyword.'
 				 OR user_firstname LIKE '.$quoted_keyword.'
 				 OR user_lastname LIKE '.$quoted_keyword.'
+				 OR user_login LIKE '.$quoted_keyword.'
 				 OR user_aim LIKE '.$quoted_keyword.'
 				 OR user_msn LIKE '.$quoted_keyword.'
 				 OR user_yim LIKE '.$quoted_keyword.'
@@ -237,7 +238,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	// Check if the string is already in the blacklist:
 	if( antispam_check($keyword) )
 	{ // Already there:
-		printf( '<p><strong>'.T_('The keyword [%s] is already handled by the blacklist.').'</strong></p>', htmlspecialchars($keyword) );
+		printf( '<p>'.T_('The keyword [%s] is %s by the blacklist.').'</p>', htmlspecialchars($keyword), '<strong>'.T_('already handled').'</strong>' );
 	}
 	else
 	{ // Not in blacklist
@@ -285,6 +286,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.23  2010/06/23 09:30:55  efy-asimo
+ * Comments display and Antispam ban form modifications
+ *
  * Revision 1.22  2010/06/17 08:54:52  efy-asimo
  * antispam screen, antispam tool dispplay fix
  *

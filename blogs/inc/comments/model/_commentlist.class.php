@@ -317,6 +317,9 @@ class CommentList2 extends DataObjectList2
 		$this->filters['page'] = param( $this->page_param, 'integer', 1, true );      // List page number in paged display
 		$this->page = $this->filters['page'];
 
+		$this->filters['order'] = param( $this->param_prefix.'order', 'string', $this->default_filters['order'], true );   		// ASC or DESC
+		$this->filters['orderby'] = param( $this->param_prefix.'orderby', 'string', $this->default_filters['orderby'], true );  // list of fields to order by (TODO: change that crap)
+
 		if( $use_filters && $filter_action == 'save' )
 		{
 			$this->save_filterset();
@@ -651,10 +654,77 @@ class CommentList2 extends DataObjectList2
 		echo $this->replace_vars( $params['links_format'], $params );
 		echo $params['block_end'];
 	}
+
+
+	/**
+	 * Returns values needed to make sort links for a given column
+	 *
+	 * Returns an array containing the following values:
+	 *  - current_order : 'ASC', 'DESC' or ''
+	 *  - order_asc : url needed to order in ascending order
+	 *  - order_desc
+	 *  - order_toggle : url needed to toggle sort order
+	 *
+	 * @param integer column to sort
+	 * @return array
+	 */
+	function get_col_sort_values( $col_idx )
+	{
+		$col_order_fields = $this->cols[$col_idx]['order'];
+
+		// pre_dump( $col_order_fields, $this->filters['orderby'], $this->filters['order'] );
+
+		// Current order:
+		if( $this->filters['orderby'] == $col_order_fields )
+		{
+			$col_sort_values['current_order'] = $this->filters['order'];
+		}
+		else
+		{
+			$col_sort_values['current_order'] = '';
+		}
+
+
+		// Generate sort values to use for sorting on the current column:
+		$col_sort_values['order_asc'] = regenerate_url( array($this->param_prefix.'order',$this->param_prefix.'orderby'),
+																			$this->param_prefix.'order=ASC&amp;'.$this->param_prefix.'orderby='.$col_order_fields );
+		$col_sort_values['order_desc'] = regenerate_url(  array($this->param_prefix.'order',$this->param_prefix.'orderby'),
+																			$this->param_prefix.'order=DESC&amp;'.$this->param_prefix.'orderby='.$col_order_fields );
+
+		if( !$col_sort_values['current_order'] && isset( $this->cols[$col_idx]['default_dir'] ) )
+		{	// There is no current order on this column and a default order direction is set for it
+			// So set a default order direction for it
+
+			if( $this->cols[$col_idx]['default_dir'] == 'A' )
+			{	// The default order direction is A, so set its toogle  order to the order_asc
+				$col_sort_values['order_toggle'] = $col_sort_values['order_asc'];
+			}
+			else
+			{ // The default order direction is A, so set its toogle order to the order_desc
+				$col_sort_values['order_toggle'] = $col_sort_values['order_desc'];
+			}
+		}
+		elseif( $col_sort_values['current_order'] == 'ASC' )
+		{	// There is an ASC current order on this column, so set its toogle order to the order_desc
+			$col_sort_values['order_toggle'] = $col_sort_values['order_desc'];
+		}
+		else
+		{ // There is a DESC or NO current order on this column,  so set its toogle order to the order_asc
+			$col_sort_values['order_toggle'] = $col_sort_values['order_asc'];
+		}
+
+		// pre_dump( $col_sort_values );
+
+		return $col_sort_values;
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.26  2010/06/23 09:30:55  efy-asimo
+ * Comments display and Antispam ban form modifications
+ *
  * Revision 1.25  2010/06/08 01:49:53  sam2kb
  * Paged comments in frontend
  *

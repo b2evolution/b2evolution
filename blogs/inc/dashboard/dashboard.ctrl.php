@@ -70,23 +70,28 @@ if( $blog )
 
 	$nb_blocks_displayed = 0;
 
-	/*
-	 * COMMENTS:
-	 */
-	$CommentList = new CommentList2( $Blog );
+	$user_draftc_perm = $current_User->check_perm( 'blog_draft_comments', 'edit', false, $blog );
 
-	// Filter list:
-	$CommentList->set_filters( array(
-			'types' => array( 'comment','trackback','pingback' ),
-			'statuses' => array ( 'draft' ),
-			'order' => 'DESC',
-			'comments' => 5,
-		) );
+	if( $user_draftc_perm )
+	{
+		/*
+		 * COMMENTS:
+		 */
+		$CommentList = new CommentList2( $Blog );
+	
+		// Filter list:
+		$CommentList->set_filters( array(
+				'types' => array( 'comment','trackback','pingback' ),
+				'statuses' => array ( 'draft' ),
+				'order' => 'DESC',
+				'comments' => 5,
+			) );
+	
+		// Get ready for display (runs the query):
+		$CommentList->display_init();
+	}
 
-	// Get ready for display (runs the query):
-	$CommentList->display_init();
-
-	if( $CommentList->result_num_rows )
+	if( $user_draftc_perm && $CommentList->result_num_rows )
 	{	// We have drafts
 
 		global $htsrv_url;
@@ -727,6 +732,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.68  2010/06/23 09:30:55  efy-asimo
+ * Comments display and Antispam ban form modifications
+ *
  * Revision 1.67  2010/06/01 11:33:19  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)

@@ -32,14 +32,22 @@ global $Blog;
  */
 global $CommentList;
 
+global $current_User;
+
 global $dispatcher;
 
-$redirect_to = rawurlencode( regenerate_url( '', '', '', '&' ) );
+// If rediret_to was not set, create new redirect
+$redirect_to = param( 'redirect_to', 'string', regenerate_url( '', 'filter=restore', '', '&' ) );
+$redirect_to = rawurlencode( $redirect_to );
+$save_context = param( 'save_context', 'boolean', 'true' );
 
 while( $Comment = & $CommentList->get_next() )
 { // Loop through comments:
+	$is_published = ( $Comment->get( 'status' ) == 'published' );
+	/* ========== START of a COMMENT/TB/PB ========== */
+	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) )
+	{
 	?>
-	<!-- ========== START of a COMMENT/TB/PB ========== -->
 	<div id="c<?php echo $Comment->ID ?>" class="bComment bComment<?php $Comment->status('raw') ?>">
 		<div class="bSmallHead">
          <div>
@@ -92,27 +100,72 @@ while( $Comment = & $CommentList->get_next() )
 					) );
 
 				// Display edit button if current user has the rights:
-				$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton', '&amp;', true, $redirect_to );
+				$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton', '&amp;', $save_context, $redirect_to );
 
 				// Display publish NOW button if current user has the rights:
-				$Comment->publish_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', true );
+				$Comment->publish_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', $save_context );
 
 				// Display deprecate button if current user has the rights:
-				$Comment->deprecate_link( ' ', ' ', '#', '#', 'DeleteButton', '&amp;', true );
+				$Comment->deprecate_link( ' ', ' ', '#', '#', 'DeleteButton', '&amp;', $save_context );
 
 				// Display delete button if current user has the rights:
-				$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton');
+				$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', false, '&amp;', $save_context );
 			?>
    		<div class="clear"></div>
 		</div>
 
 	</div>
 	<!-- ========== END of a COMMENT/TB/PB ========== -->
-	<?php //end of the loop, don't delete
-}
+	<?php
+	}
+	else
+	{
+	?>
+	<div id="c<?php echo $Comment->ID ?>" class="bComment bComment<?php $Comment->status('raw') ?>">
+		<div class="bSmallHead">
+         <div>
+			<?php
+				echo '<div class="bSmallHeadRight">';
+				echo T_('Visibility').': ';
+				echo '<span class="bStatus">';
+				$Comment->status();
+				echo '</span>';
+				echo '</div>';
+			?>
+			<span class="bDate"><?php $Comment->date(); ?></span>
+			@
+			<span class="bTime"><?php $Comment->time( 'H:i' ); ?></span>
+		 </div>
+		</div>
+		<?php
+		if( $is_published )
+		{
+		?>
+			<div class="bCommentContent">
+				<div class="bCommentTitle">
+				<?php echo $Comment->get_title(); ?>
+				</div>
+				<div class="bCommentText">
+				<?php $Comment->rating(); ?>
+				<?php $Comment->avatar(); ?>
+				<?php $Comment->content() ?>
+				</div>
+			</div>
+			<div class="clear"></div>
+		<?php
+		}
+	?>
+	</div>
+	<?php
+	}
+	/* ========== END of a COMMENT/TB/PB ========== */
+} //end of the loop, don't delete
 
 /*
  * $Log$
+ * Revision 1.18  2010/06/23 09:30:55  efy-asimo
+ * Comments display and Antispam ban form modifications
+ *
  * Revision 1.17  2010/06/17 06:42:44  efy-asimo
  * Fix comment actions redirect on item full page
  *

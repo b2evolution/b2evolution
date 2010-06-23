@@ -39,8 +39,6 @@ global $show_statuses, $s, $sentence, $exact;
 global $rating_toshow, $rating_turn, $rating_limit, $url_match, $author_url, $include_emptyurl;
 global $tab3;
 
-$allowed_statuses = get_allowed_statuses( $Blog->ID );
-
 load_funcs( 'skins/_skin.funcs.php' );
 
 $Widget = new Widget();
@@ -65,26 +63,17 @@ $Form->begin_form( '' );
 	<div>
 
 	<input type="checkbox" name="show_statuses[]" value="published" id="sh_published" class="checkbox" 
-		<?php
-			if( in_array( "published", $show_statuses ) ) echo 'checked="checked" ';
-			if( ! in_array( "published", $allowed_statuses ) ) echo 'DISABLED ';
-		?>
+		<?php if( in_array( "published", $show_statuses ) ) echo 'checked="checked" '; ?>
 	/>
 	<label for="sh_published"><?php echo T_('Published') ?> <span class="notes">(<?php echo T_('Public') ?>)</span></label><br />
 
 	<input type="checkbox" name="show_statuses[]" value="draft" id="sh_draft" class="checkbox" 
-		<?php
-			if( in_array( "draft", $show_statuses ) ) echo 'checked="checked" ';
-			if( ! in_array( "draft", $allowed_statuses ) ) echo 'DISABLED ';
-		?>
+		<?php if( in_array( "draft", $show_statuses ) ) echo 'checked="checked" '; ?>
 	/>
 	<label for="sh_draft"><?php echo T_('Draft') ?> <span class="notes">(<?php echo T_('Not published!') ?>)</span></label><br />
 
 	<input type="checkbox" name="show_statuses[]" value="deprecated" id="sh_deprecated" class="checkbox" 
-		<?php
-			if( in_array( "deprecated", $show_statuses ) ) echo 'checked="checked" ';
-			if( ! in_array( "deprecated", $allowed_statuses ) ) echo 'DISABLED ';
-		?>
+		<?php if( in_array( "deprecated", $show_statuses ) ) echo 'checked="checked" '; ?>
 	/>
 	<label for="sh_deprecated"><?php echo T_('Deprecated') ?> <span class="notes">(<?php echo T_('Not published!') ?>)</span></label><br />
 

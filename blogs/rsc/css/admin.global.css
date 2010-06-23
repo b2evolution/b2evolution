@@ -471,3 +471,20 @@ ul.widget_list li {
 	margin:0;
 	padding:0.2ex 1ex;
 }
+
+
+/*
+ * Comments
+ */
+
+.tdCommentpublished {
+	color: #0b0;
+}
+
+.tdCommentdraft {
+	color: #f96;
+}
+
+.tdCommentdeprecated {
+	color: #888;
+}

@@ -54,7 +54,7 @@ switch( $action )
 		$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
 
 		// Where are we going to redirect to?
-		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment->item_ID, '&' ) );
+		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment_Item->ID, '&' ) );
 		break;
 
 	case 'list':
@@ -282,7 +282,7 @@ switch( $action )
 
 		// Filter list:
 		$CommentList->set_default_filters( array(
-				'statuses' => get_allowed_statuses( $blog ),
+				'statuses' => array( 'published', 'draft', 'deprecated' ),
 				'comments' => 5,
 			) );
 
@@ -371,6 +371,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.29  2010/06/23 09:30:55  efy-asimo
+ * Comments display and Antispam ban form modifications
+ *
  * Revision 1.28  2010/06/01 11:33:19  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)

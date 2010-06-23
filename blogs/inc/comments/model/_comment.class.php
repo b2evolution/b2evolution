@@ -622,7 +622,7 @@ class Comment extends DataObject
 	 * @param boolean true to use ajax button
 	 * @param boolean true to check user permission to edit this comment and antispam screen
 	 */
-	function author_url_with_actions( $redirect_to = NULL, $ajax_button = false, $check_perms = true )
+	function author_url_with_actions( $redirect_to = NULL, $ajax_button = false, $check_perms = true, $save_context = true )
 	{
 		global $current_User;
 		if( $this->author_url( '', ' <span &bull; Url: id="commenturl_'.$this->ID.'" <span class="bUrl" >', '</span>' ) )
@@ -631,10 +631,10 @@ class Comment extends DataObject
 			{ // There is an URL and we have permission to edit this comment...
 				if( $redirect_to == NULL )
 				{
-					$redirect_to = rawurlencode( regenerate_url( '', '', '', '&' ) );
+					$redirect_to = rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
 				}
-				$this->deleteurl_link( $redirect_to, $ajax_button, false );
-				$this->banurl_link( $redirect_to, $ajax_button, true );
+				$this->deleteurl_link( $redirect_to, $ajax_button, false, '&amp;', $save_context );
+				$this->banurl_link( $redirect_to, $ajax_button, true, '&amp;', $save_context );
 			}
 			echo '</span>';
 		}
@@ -710,7 +710,7 @@ class Comment extends DataObject
 			}
 			else
 			{
-				echo $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
+				echo $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
 			}
 		}
 		echo '" title="'.$title.'"';
@@ -729,7 +729,7 @@ class Comment extends DataObject
 	 * @param glue between url params
 	 * @return link on success, false otherwise
 	 */
-	function deleteurl_link( $redirect_to, $ajax_button = false, $check_perm = true, $glue = '&amp;' )
+	function deleteurl_link( $redirect_to, $ajax_button = false, $check_perm = true, $glue = '&amp;', $save_context = true )
 	{
 		global $current_User, $admin_url;
 
@@ -740,9 +740,17 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( $redirect_to == NULL )
+		if( $save_context )
 		{
-			$redirect_to = rawurlencode( regenerate_url( '', '', '', '&' ) );
+			if( $redirect_to == NULL )
+			{
+				$redirect_to = rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
+			}
+			$redirect_to = $glue.'redirect_to='.$redirect_to;
+		}
+		else
+		{
+			$redirect_to = '';
 		}
 
 		if( $ajax_button )
@@ -752,7 +760,7 @@ class Comment extends DataObject
 		else
 		{
 			$url = $admin_url.'?ctrl=comments&amp;action=delete_url&amp;comment_ID='.$this->ID.'&amp;'.url_crumb('comment') ;
-			echo ' <a href="'.$url.$glue.'redirect_to='.$redirect_to.'"'.get_icon( 'delete' ).'</a>';
+			echo ' <a href="'.$url.$redirect_to.'"'.get_icon( 'delete' ).'</a>';
 		}
 	}
 
@@ -764,7 +772,7 @@ class Comment extends DataObject
 	 * @param glue between url params
 	 * @return link on success, false otherwise
 	 */
-	function banurl_link( $redirect_to, $ajax_button = false, $check_perm = true, $glue = '&amp;')
+	function banurl_link( $redirect_to, $ajax_button = false, $check_perm = true, $glue = '&amp;', $save_context = true )
 	{
 		global $current_User, $admin_url;
 
@@ -775,9 +783,17 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( $redirect_to == NULL )
+		if( $save_context )
 		{
-			$redirect_to = rawurlencode( regenerate_url( '', '', '', '&' ) );
+			if( $redirect_to == NULL )
+			{
+				$redirect_to = rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
+			}
+			$redirect_to = $glue.'redirect_to='.$redirect_to;
+		}
+		else
+		{
+			$redirect_to = '';
 		}
 
 		// TODO: really ban the base domain! - not by keyword
@@ -790,7 +806,7 @@ class Comment extends DataObject
 		else
 		{
 			echo ' <a href="'.$admin_url.'?ctrl=antispam&amp;action=ban&amp;keyword='.$authorurl
-					.'&amp;redirect_to='.$redirect_to.'&amp;'.url_crumb('antispam').'">'.get_icon( 'ban' ).'</a> ';
+					.$redirect_to.'&amp;'.url_crumb('antispam').'">'.get_icon( 'ban' ).'</a> ';
 		}
 	}
 
@@ -842,7 +858,7 @@ class Comment extends DataObject
 		$url = $admin_url.'?ctrl=comments&amp;action=delete&amp;comment_ID='.$this->ID.'&amp;'.url_crumb('comment') ;
    		if( $save_context )
 		{
-			$url .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
+			$url .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
 		}
 
 		echo $before;
@@ -921,7 +937,7 @@ class Comment extends DataObject
 			$r .= $admin_url.'?ctrl=comments'.$glue.'action=deprecate'.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
 	   		if( $save_context )
 			{
-				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
+				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
 			}
 		}
 
@@ -992,7 +1008,7 @@ class Comment extends DataObject
 			$r .= $admin_url.'?ctrl=comments'.$glue.'action=publish'.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
 	   		if( $save_context )
 			{
-				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) );
+				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
 			}
 		}
 
@@ -1117,6 +1133,11 @@ class Comment extends DataObject
 	 */
 	function get_permanent_link( $text = '#', $title = '#', $class = '', $nofollow = false )
 	{
+		if( $this->status != 'published' )
+		{
+			return '';
+		}
+
 		global $current_User, $baseurl;
 
 		switch( $text )
@@ -1663,6 +1684,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.61  2010/06/23 09:30:55  efy-asimo
+ * Comments display and Antispam ban form modifications
+ *
  * Revision 1.60  2010/06/17 06:42:44  efy-asimo
  * Fix comment actions redirect on item full page
  *

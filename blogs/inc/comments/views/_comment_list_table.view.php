@@ -46,58 +46,176 @@ if( $CommentList->is_filtered() )
 // Issue date:
 $CommentList->cols[] = array(
 		'th' => T_('Date'),
-		'order' => 'datestart',
+		'order' => 'date',
 		'default_dir' => 'D',
 		'th_class' => 'nowrap',
 		'td_class' => 'nowrap',
 		'td' => '@get_permanent_link( get_icon(\'permalink\') )@ <span class="date">@date()@</span>',
 	);
 
-// Comment title:
+/*
+ * Get comment type. Return '---' if user has no permission to edit this comment
+ */
+function get_type( $Comment )
+{
+	global $current_User, $Blog;
+	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) )
+	{
+		return $Comment->get( 'type' );
+	}
+	else
+	{
+		return '<span class="dimmed">---</span>';
+	}
+}
+
+// Comment kind:
 $CommentList->cols[] = array(
-		'th' => T_('Comment title'),
+		'th' => T_('Kind'),
+		'order' => 'type',
 		'th_class' => 'nowrap',
-		'td' => '@get_title()@',
+		'td' => '%get_type( {Obj} )%',
 	);
+
+/*
+ * Get comment author. Return '---' if user has no permission to edit this comment
+ */
+function get_author( $Comment )
+{
+	global $current_User, $Blog;
+	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) ||
+		$Comment->get('status') == 'published' )
+	{
+		return $Comment->get_author();
+	}
+	else
+	{
+		return '<span class="dimmed">---</span>';
+	}
+}
+
+// Comment author:
+$CommentList->cols[] = array(
+		'th' => T_('Author'),
+		'order' => 'author',
+		'th_class' => 'nowrap',
+		'td' => '%get_author( {Obj} )%',
+	);
+
+/*
+ * Get comment author url. Return '---' if user has no permission to edit this comment
+ */
+function get_url( $Comment )
+{
+	global $current_User, $Blog;
+	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) )
+	{
+		return $Comment->author_url_with_actions( NULL, false );
+	}
+	else
+	{
+		return '<span class="dimmed">---</span>';
+	}
+}
 
 // Comment url:
 $CommentList->cols[] = array(
 		'th' => T_('URL'),
+		'order' => 'author_url',
 		'th_class' => 'nowrap',
 		//'td_class' => 'nowrap',
-		'td' => '@author_url_with_actions( NULL, false )@'
+		'td' => '%get_url( {Obj} )%',
 	);
+
+/*
+ * Get comment author email. Return '---' if user has no permission to edit this comment
+ */
+function get_author_email( $Comment )
+{
+	global $current_User, $Blog;
+	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) )
+	{
+		return $Comment->get_author_email();
+	}
+	else
+	{
+		return '<span class="dimmed">---</span>';
+	}
+}
 
 // Comment author email:
 $CommentList->cols[] = array(
 		'th' => T_('Email'),
+		'order' => 'author_email',
 		'th_class' => 'nowrap',
 		'td_class' => 'nowrap',
-		'td' => '@get_author_email()@',
+		'td' => '%get_author_email( {Obj} )%',
 	);
+
+/*
+ * Get comment author ip. Return '---' if user has no permission to edit this comment
+ */
+function get_author_ip( $Comment )
+{
+	global $current_User, $Blog;
+	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) )
+	{
+		return $Comment->get_author_ip();
+	}
+	else
+	{
+		return '<span class="dimmed">---</span>';
+	}
+}
 
 // Comment author IP:
 $CommentList->cols[] = array(
 		'th' => T_('IP'),
+		'order' => 'author_IP',
 		'th_class' => 'nowrap',
 		'td_class' => 'nowrap',
-		'td' => '@author_ip()@',
+		'td' => '%get_author_ip( {Obj} )%',
 	);
+
+/*
+ * Get comment spam karma. Return '---' if user has no permission to edit this comment
+ */
+function get_spam_karma( $Comment )
+{
+	global $current_User, $Blog;
+	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) )
+	{
+		return $Comment->get( 'spam_karma' );
+	}
+	else
+	{
+		return '<span class="dimmed">---</span>';
+	}
+}
 
 // Comment spam karma
 $CommentList->cols[] = array(
 		'th' => T_('Spam karma'),
+		'order' => 'spam_karma',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
-		'td' => '@spam_karma()@',
+		'td' => '%get_spam_karma( {Obj} )%'
 	);
+
+/*
+ * Get comment status. Return '---' if user has no permission to edit this comment
+ */
+function get_colored_status( $Comment ) {
+	return '<span class="tdComment'.$Comment->get('status').'">'.$Comment->get('t_status').'</span>';
+}
 
 // Comment visibility:
 $CommentList->cols[] = array(
 		'th' => T_('Visibility'),
+		'order' => 'status',
 		'th_class' => 'nowrap',
 		'td_class' => 'nowrap',
-		'td' => '@status()@',
+		'td' => '%get_colored_status( {Obj} )%',
 	);
 
 /**
@@ -128,7 +246,7 @@ function comment_edit_actions( $Comment )
 }
 $CommentList->cols[] = array(
 			'th' => T_('Actions'),
-			'th_class' => 'shrinkwrap small',
+			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
 			'td' => '%comment_edit_actions( {Obj} )%' );
 
