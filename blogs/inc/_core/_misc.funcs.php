@@ -386,9 +386,11 @@ function zeroise( $number, $threshold )
  *               substracted from the total length (with HTML entities
  *               being decoded). Default is "&hellip;" (HTML entity)
  * @param string Format, see {@link format_to_output()}
+ * @param boolean Crop at whitespace, if possible?
+ *        (any word split at the end will get its head removed)
  * @return string
  */
-function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw' )
+function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw', $cut_at_whitespace = false  )
 {
 	if( is_null($tail) )
 	{
@@ -399,14 +401,13 @@ function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw' )
 
 	if( evo_strlen( $str ) > $maxlen )
 	{
-		// Replace all HTML entities by a single char. html_entity_decode for example
-		// would not handle &hellip;.
+		// Replace all HTML entities by a single char. html_entity_decode for example would not handle &hellip;.
 		$tail_for_length = preg_replace('~&\w+?;~', '.', $tail);
 		$tail_length = evo_strlen( html_entity_decode($tail_for_length) );
 		$len = $maxlen-$tail_length;
 		if( $len < 1 )
 		{ // special case; $tail length is >= $maxlen
-			$len = 1;
+			$len = 0;
 		}
 		$str_cropped = evo_substr( $str, 0, $len );
 		if( $format != 'raw' )
@@ -428,6 +429,21 @@ function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw' )
 				}
 			}
 		}
+
+		if( $cut_at_whitespace )
+		{
+			if( ! ctype_space($str[strlen($str_cropped)]) )
+			{ // first character being cut off is not whitespace
+				$i = evo_strlen($str_cropped);
+				while( $i && ! ctype_space($str_cropped[--$i]) )
+				{}
+				if( $i )
+				{
+					$str_cropped = substr($str_cropped, 0, $i);
+				}
+			}
+		}
+
 		$str = format_to_output(rtrim($str_cropped), $format);
 		$str .= $tail;
 
@@ -643,6 +659,10 @@ function evo_substr( $string, $start = 0, $length = '#' )
 {
 	global $current_charset;
 
+	if( ! $length )
+	{ // make mb_substr and substr behave consistently
+		return '';
+	}
 	if( $length == '#' )
 	{
 		$length = evo_strlen($string);
@@ -4011,6 +4031,10 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.239  2010/06/23 19:39:43  blueyed
+ * - evo_substr: return "" for length=0 (mb_substr would return string as-is)
+ * - maxstrlen: add $cut_at_whitespace param, with tests
+ *
  * Revision 1.238  2010/06/19 02:33:45  blueyed
  * debug_info: fix html for tbody and tfoot. doc/todo.
  *

@@ -397,10 +397,12 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( strmaxlen('foobar', 5, '...'), 'fo...' );
 		$this->assertEqual( strmaxlen('foobar', 5, '&amp;&hellip;'), 'foo&amp;&hellip;' );
 
+		$this->assertEqual( strmaxlen('M?', 2), 'M?', 'Do not cut utf8 char in the middle' );
+
 		$this->assertEqual( strmaxlen('1', 1, '&hellip;'), '1' );
 		$this->assertEqual( strmaxlen('1', 1, '...'), '1' );
-		$this->assertEqual( strmaxlen('123', 1, '...'), '1...' );
-		$this->assertEqual( strmaxlen('12345', 1, '...'), '1...' );
+		$this->assertEqual( strmaxlen('123', 1, '...'), '...' );
+		$this->assertEqual( strmaxlen('12345', 1, '...'), '...' );
 
 		$this->assertEqual( strmaxlen('1&2', 3, NULL, 'htmlbody'), '1&amp;2' );
 		$this->assertEqual( strmaxlen('1&2', 3, NULL, 'raw'), '1&2' );
@@ -426,6 +428,17 @@ class MiscFuncsTestCase extends EvoUnitTestCase
 		$this->assertEqual( strmaxlen('foo bar', 4), 'foo&hellip;' );
 		$this->assertEqual( strmaxlen('foo bar', 5), 'foo&hellip;' );
 		$this->assertEqual( strmaxlen('foo bar', 6), 'foo b&hellip;' );
+
+		// test cut_at_whitespace:
+		$this->assertEqual( strmaxlen('foo bar', 5, ''), 'foo b' );
+		$this->assertEqual( strmaxlen('foo bar', 5, '', 'raw', true), 'foo' );
+		$this->assertEqual( strmaxlen('foo bar', 5, '.', 'raw', true), 'foo.' );
+		$this->assertEqual( strmaxlen('foo bar', 4, '.', 'raw', true), 'foo.' );
+		$this->assertEqual( strmaxlen('foo bar', 2, '', 'raw', true), 'fo' );
+		$this->assertEqual( strmaxlen('foo bar', 2, '..', 'raw', true), '..' );
+		$this->assertEqual( strmaxlen("foo\nbar", 2, '', 'raw', true), 'fo' );
+		$this->assertEqual( strmaxlen("foo\nbar", 3, '', 'raw', true), 'foo' );
+		$this->assertEqual( strmaxlen("foo\nbar", 4, '', 'raw', true), 'foo' );
 	}
 
 
