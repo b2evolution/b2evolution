@@ -70,6 +70,7 @@ class EvoUnitTestCase extends UnitTestCase
 		require EVODIR.'blogs/inc/_main.inc.php';
 
 		$this->_saved_globals = array();
+		$this->_saved_server = array();
 	}
 
 
