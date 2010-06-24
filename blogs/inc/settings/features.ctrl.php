@@ -136,6 +136,9 @@ switch( $action )
 		$Settings->set( 'allow_moving_chapters', param( 'allow_moving_chapters', 'integer', 0 ) );
 		$Settings->set( 'chapter_ordering', param( 'chapter_ordering', 'string', 'alpha' ) );
 
+		$Settings->set( 'cross_posting', param( 'cross_posting', 'integer', 0 ) );
+		$Settings->set( 'cross_posting_blogs', param( 'cross_posting_blogs', 'integer', 0 ) );
+
 		//XML-RPC
 		$Settings->set( 'general_xmlrpc', param( 'general_xmlrpc', 'integer', 0 ) );
 
@@ -180,6 +183,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2010/06/24 07:03:11  efy-asimo
+ * move the cross posting options to the bottom of teh Features tab & fix error message after moving post
+ *
  * Revision 1.16  2010/02/08 17:53:55  efy-yury
  * copyright 2009 -> 2010
  *

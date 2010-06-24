@@ -106,9 +106,6 @@ switch( $action )
 
 		$Settings->set( 'general_cache_enabled', $new_cache_status );
 
-		$Settings->set( 'cross_posting', param( 'cross_posting', 'integer', 0 ) );
-		$Settings->set( 'cross_posting_blogs', param( 'cross_posting_blogs', 'integer', 0 ) );
-
 		if( ! $Messages->count('error') )
 		{
 			$Settings->dbupdate();
@@ -148,6 +145,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2010/06/24 07:03:11  efy-asimo
+ * move the cross posting options to the bottom of teh Features tab & fix error message after moving post
+ *
  * Revision 1.22  2010/05/22 12:22:49  efy-asimo
  * move $allow_cross_posting in the backoffice
  *

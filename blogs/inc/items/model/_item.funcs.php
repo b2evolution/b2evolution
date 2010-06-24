@@ -1457,8 +1457,10 @@ function check_categories( & $post_category, & $post_extracats )
 		}
 		if( $post_category )
 		{ // If main cat is not a new category, and has been autoselected
+			$GenericCategory = & $GenericCategoryCache->get_by_ID( $post_category );
+			$post_category_Blog = $GenericCategory->get_Blog();
 			$Messages->add( sprintf( T_('The main category for this post has been automatically set to "%s" (Blog "%s")'),
-				$GenericCategoryCache->get_by_ID( $post_category )->get_name(), $Blog->get( 'name') ), 'redwarning' );
+				$GenericCategory->get_name(), $post_category_Blog->get( 'name') ), 'redwarning' );
 		}
 	}
 
@@ -1614,6 +1616,9 @@ function echo_set_slug_changed()
 }
 /*
  * $Log$
+ * Revision 1.113  2010/06/24 07:03:11  efy-asimo
+ * move the cross posting options to the bottom of teh Features tab & fix error message after moving post
+ *
  * Revision 1.112  2010/06/17 17:42:54  blueyed
  * doc
  *
