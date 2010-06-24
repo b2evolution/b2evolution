@@ -526,12 +526,16 @@ class PageCache
 	 * Delete any file that is older than 24 hours from the whole /cache folder (recursively) 
 	 * except index.html files and hiddenfiles (starting with .)
 	 * 
-	 * @return string empty string on success, error message otherwise
+	 * @static
+	 *
+	 * @return string empty string on success, error message otherwise.
 	 */
-	public static function prune_page_cache()
+	function prune_page_cache()
 	{
 		global $cache_path, $localtimenow;
 
+		// fp> TODO: on large sites this is not a good scaling mechanism. We should rewrite this and delete files immediately after
+		// finding them instead of creating an ENORMOUS list of files in memory.
 		$cache_content = get_filenames( $cache_path, true, false );
 
 		if( $cache_content == false )
@@ -539,27 +543,34 @@ class PageCache
 			return T_('Cache directory could not be accessed.');
 		}
 
+		$first_error = '';
 		foreach( $cache_content as $file_path )
 		{
 			// get file name from path
 			$file_name = basename($file_path);
 
-			// TODO: use a positive list instead - if possible? Otherwise maybe exclude index.* at least.
+			// Note: index.html pages are in the cache to hide the contents from browsers in case the webserver whould should a listing
 			if( $file_name != 'index.html' && substr( $file_name, 0, 1 ) != '.' )
 			{ // this file is not an index.html and it is not hidden
 				$datediff = $localtimenow - filemtime( $file_path );
 				if( $datediff > 86400 /* 60*60*24 = 24 hour*/)
 				{ // older than 24 hours
 					// TODO: I think errors should not get suppressed - would show up in error log / cron mail, but that's good IMHO
-					if( ! @unlink( $file_path ) )
+					// fp> TODO: do not stop deletion when one file cannot be deleted
+					if( ( ! @unlink( $file_path ) ) && ($first_error == '') )
 					{ // deleting the file failed: return error
-						$error = error_get_last(); // XXX: requires PHP 5.2
-						return $error['message'];
+						//$error = error_get_last(); // XXX: requires PHP 5.2
+						//$error['message']; - concat this to the first
+						$first_error = $file_name;
 					}
 				}
 			}
 		}
 
+		if( $first_error != '' )
+		{
+			return sprintf( T_('Some files could not be deleted (including: %s).'), $first_error );
+		}
 		return '';
 	}
 }
@@ -567,6 +578,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.21  2010/06/24 06:03:59  efy-asimo
+ * Prune page cache - don't stop after the first error - fix
+ *
  * Revision 1.20  2010/05/21 10:46:31  efy-asimo
  * move prune_page_cache() function from _file.funcs.php to _pagecache.class.php
  *
