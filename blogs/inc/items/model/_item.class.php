@@ -4350,7 +4350,8 @@ class Item extends ItemLight
 		if( $tinyslug_ID != NULL )
 		{ // the tiny slug for this item was already created
 			$SlugCache = & get_SlugCache();
-			return $SlugCache->get_by_ID($tinyslug_ID)->get( 'title' );
+			$Slug = & $SlugCache->get_by_ID($tinyslug_ID);
+			return $Slug->get( 'title' );
 		}
 		else
 		{ // create new tiny Slug for this item
@@ -4392,7 +4393,8 @@ class Item extends ItemLight
 		{
 			return '';
 		}
-		return url_add_tail( $this->get_Blog()->get( 'url'), '/'.$tinyslug );
+		$Blog = & $this->get_Blog();
+		return url_add_tail( $Blog->get( 'url' ), '/'.$tinyslug );
 	}
 
 
@@ -4490,6 +4492,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.206  2010/06/24 08:54:05  efy-asimo
+ * PHP 4 compatibility
+ *
  * Revision 1.205  2010/06/07 18:55:14  sam2kb
  * Added new class in div_classes()
  *

@@ -70,7 +70,8 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		) );
 	echo '</td>';
 
-	if( $Blog->get_owner_User()->ID == $current_User->ID )
+	$Blog_owner_User = & $Blog->get_owner_User();
+	if( $Blog_owner_User->ID == $current_User->ID )
 	{ // User has prmission to change comment's post
 		$Form->switch_layout( 'none' );
 
@@ -296,6 +297,9 @@ echo_comment_publishbt_js();
 
 /*
  * $Log$
+ * Revision 1.19  2010/06/24 08:54:05  efy-asimo
+ * PHP 4 compatibility
+ *
  * Revision 1.18  2010/05/29 03:47:20  sam2kb
  * Added missing crumb
  *

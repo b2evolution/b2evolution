@@ -628,7 +628,8 @@ class Comment extends DataObject
 		global $current_User;
 		if( $this->author_url( '', ' <span &bull; Url: id="commenturl_'.$this->ID.'" <span class="bUrl" >', '</span>' ) )
 		{
-			if( $current_User->check_perm( $this->blogperm_name(), '', false, $this->get_Item()->get_blog_ID() ) )
+			$Item = & $this->get_Item();
+			if( $current_User->check_perm( $this->blogperm_name(), '', false, $Item->get_blog_ID() ) )
 			{ // There is an URL and we have permission to edit this comment...
 				if( $redirect_to == NULL )
 				{
@@ -736,7 +737,8 @@ class Comment extends DataObject
 
 		if( ! is_logged_in() ) return false;
 
-		if( $check_perm && ! $current_User->check_perm( $this->blogperm_name(), '', false, $this->get_Item()->get_blog_ID() ) )
+		$Item = & $this->get_Item();
+		if( $check_perm && ! $current_User->check_perm( $this->blogperm_name(), '', false, $Item->get_blog_ID() ) )
 		{ // If current user has no permission to edit comments, with this comment status:
 			return false;
 		}
@@ -1685,6 +1687,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.63  2010/06/24 08:54:05  efy-asimo
+ * PHP 4 compatibility
+ *
  * Revision 1.62  2010/06/23 09:53:39  efy-asimo
  * comment get_avatar() function fix
  *

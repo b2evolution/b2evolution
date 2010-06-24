@@ -124,7 +124,8 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 		foreach( $res_affected_comments as $row_stats )
 		{ // select comments
 			$affected_Comment = new Comment($row_stats);
-			$comment_blog = $affected_Comment->get_Item()->get_blog_ID();
+			$affected_Item = & $affected_Comment->get_Item();
+			$comment_blog = $affected_Item->get_blog_ID();
 			switch( $affected_Comment->get( 'status' ) )
 			{
 				case 'draft':
@@ -286,6 +287,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.24  2010/06/24 08:54:05  efy-asimo
+ * PHP 4 compatibility
+ *
  * Revision 1.23  2010/06/23 09:30:55  efy-asimo
  * Comments display and Antispam ban form modifications
  *

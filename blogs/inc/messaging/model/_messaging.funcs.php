@@ -141,7 +141,8 @@ function send_message( $recipient, $subject, $text )
 		debug_die( 'Active user not found.' );
 	}
 
-	if( ! $current_User->get_Group()->check_messaging_perm() )
+	$Group = & $current_User->get_Group();
+	if( ! $Group->check_messaging_perm() )
 	{ // current User are has no access to messages or to the admin interface
 		$Messages->add( T_('You don\'t have permission to send private message.') );
 		return false;
@@ -172,6 +173,9 @@ function send_message( $recipient, $subject, $text )
 
 /*
  * $Log$
+ * Revision 1.10  2010/06/24 08:54:05  efy-asimo
+ * PHP 4 compatibility
+ *
  * Revision 1.9  2010/05/05 09:37:08  efy-asimo
  * add _login.disp.php and change groups&users messaging perm
  *

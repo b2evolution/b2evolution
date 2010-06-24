@@ -1389,11 +1389,17 @@ class User extends DataObject
 
 	/**
 	 * Check if this user and his group allow private messages or not
+	 * 
 	 * @return boolean
 	 */
 	function check_msgform_PM()
 	{
-		return ( $this->allow_msgform % 2 == 1 ) && $this->get_Group()->check_messaging_perm();
+		if( $this->allow_msgform % 2 == 1 )
+		{
+			$Group = & $this->get_Group();
+			return $Group->check_messaging_perm();
+		}
+		return false;
 	}
 
 
@@ -2036,6 +2042,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.77  2010/06/24 08:54:05  efy-asimo
+ * PHP 4 compatibility
+ *
  * Revision 1.76  2010/06/01 11:33:20  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)

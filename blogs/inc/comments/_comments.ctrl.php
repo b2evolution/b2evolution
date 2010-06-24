@@ -131,8 +131,15 @@ switch( $action )
 				$ItemCache = & get_ItemCache();
 				if( ( $dest_Item = $ItemCache->get_by_ID( $moveto_post, false, false) ) !== false )
 				{ // the item exists
-					if( $current_User->ID == $dest_Item->get_Blog()->get_owner_User()->ID &&
-						$current_User->ID == $comment_Item->get_Blog()->get_owner_User()->ID )
+
+					$dest_Item_Blog = & $dest_Item->get_Blog();
+					$dest_Item_Blog_User = & $dest_Item_Blog->get_owner_User();
+
+					$comment_Item_Blog = & $comment_Item->get_Blog();
+					$comment_Item_Blog_User = & $comment_Item_Blog->get_owner_User();
+
+					if( $current_User->ID == $dest_Item_Blog_User->ID &&
+						$current_User->ID == $comment_Item_Blog_User->ID )
 					{ // current user has permission
 						$edited_Comment->set_Item( $dest_Item );
 					}
@@ -371,6 +378,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.30  2010/06/24 08:54:05  efy-asimo
+ * PHP 4 compatibility
+ *
  * Revision 1.29  2010/06/23 09:30:55  efy-asimo
  * Comments display and Antispam ban form modifications
  *
