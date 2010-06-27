@@ -155,7 +155,7 @@ $search_engines = array(
 	'inbox.com/search/', // q
 	'scroogle.org/', // GW=
 	'cuil.com/',
-	'yandex.ru/yandsearch',
+	'yandex.',
 	'go.mail.ru/search',
 	'//www.bing.com', //q=
 	'//cc.bingj.com', // q=
