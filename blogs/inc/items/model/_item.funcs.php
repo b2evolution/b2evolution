@@ -1511,6 +1511,37 @@ function check_categories( & $post_category, & $post_extracats )
 		}
 	}
 
+	if( get_allow_cross_posting() == 2 )
+	{ // Extra cats in different blogs is disabled, check selected extra cats
+		$post_category_blog = get_catblog( $post_category );
+		$ignored_cats = '';
+		foreach( $post_extracats as $key => $cat )
+		{
+			if( get_catblog( $cat ) != $post_category_blog )
+			{ // this cat is not from main category blog, it has to be ingnored
+				$GenericCategory = & $GenericCategoryCache->get_by_ID( $cat );
+				$ignored_cats = $ignored_cats.$GenericCategory->get_name().', ';
+				unset( $post_extracats[$key] );
+			}
+		}
+		$ingnored_length = strlen( $ignored_cats );
+		if( $ingnored_length > 2 )
+		{ // ingnore list is not empty
+			global $current_User, $admin_url;
+			if( $current_User->check_perm( 'options', 'view', false ) )
+			{
+				$cross_posting_text = '<a href="'.$admin_url.'?ctrl=features">'.T_('cross-posting is disabled').'</a>';
+			}
+			else
+			{
+				$cross_posting_text = T_('cross-posting is disabled');
+			}
+			$ignored_cats = substr( $ignored_cats, 0, $ingnored_length - 2 );
+			$Messages->add( sprintf( T_('The category selection "%s" was ignored since %s'),
+				$ignored_cats,$cross_posting_text ), 'redwarning' );
+		}
+	}
+
 	// make sure main cat is in extracat list and there are no duplicates
 	$post_extracats[] = $post_category;
 	$post_extracats = array_unique( $post_extracats );
@@ -1616,6 +1647,9 @@ function echo_set_slug_changed()
 }
 /*
  * $Log$
+ * Revision 1.114  2010/06/30 07:34:42  efy-asimo
+ * Cross posting fix - ingore extra cats from different blogs, when cross posting is disabled
+ *
  * Revision 1.113  2010/06/24 07:03:11  efy-asimo
  * move the cross posting options to the bottom of teh Features tab & fix error message after moving post
  *
