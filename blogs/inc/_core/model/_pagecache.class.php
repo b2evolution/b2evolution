@@ -546,6 +546,10 @@ class PageCache
 		$first_error = '';
 		foreach( $cache_content as $file_path )
 		{
+			if( strpos( $file_path, 'CVS' ) !== false )
+			{ // skip CVS folders - This should be changed, along with the other todos
+				continue;
+			}
 			// get file name from path
 			$file_name = basename($file_path);
 
@@ -578,6 +582,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.22  2010/06/30 05:44:19  efy-asimo
+ * prune page cache fix - don't delete CVS folders and content
+ *
  * Revision 1.21  2010/06/24 06:03:59  efy-asimo
  * Prune page cache - don't stop after the first error - fix
  *
