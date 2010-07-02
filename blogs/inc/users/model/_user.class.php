@@ -71,8 +71,8 @@ class User extends DataObject
 	/**
 	 * Does the user accept messages?
 	 * Options: 0 - NO, 1 - only private messages, 2 - only emails, 3 - private messages and emails
-	 * This attribute can be asked with get_msgform_settings(), check_msgform_PM(),
-	 * and check_msgform_email() functions to get complete sense.
+	 * This attribute can be asked with get_msgform_settings(), accepts_pm(),
+	 * and accepts_email() functions to get complete sense.
 	 * It is because posibble that user allow PM, but user group does not.
 	 * @var boolean
 	 */
@@ -199,7 +199,7 @@ class User extends DataObject
 				$this->group_ID = $Settings->get('newusers_grp_ID');
 			}
 
-			// This attribute can be asked with get_msgform_settings(), check_msgform_PM, check_msgform_email functions
+			// This attribute can be asked with get_msgform_settings(), accepts_pm, accepts_email functions
 			// Default value: Allow both
  			$this->set( 'allow_msgform', 3 );
 
@@ -707,7 +707,7 @@ class User extends DataObject
   /**
 	 * Get message form url
 	 */
-	function get_msgform_url( $formurl )
+	function get_msgform_url( $formurl, $redirect_to )
 	{
 		global $ReqURI;
 
@@ -716,7 +716,12 @@ class User extends DataObject
 			return NULL;
 		}
 
-		return url_add_param( $formurl, 'recipient_id='.$this->ID.'&amp;redirect_to='.rawurlencode($ReqURI) );
+		if( $redirect_to == NULL )
+		{
+			$redirect_to = $ReqURI;
+		}
+
+		return url_add_param( $formurl, 'recipient_id='.$this->ID.'&amp;redirect_to='.rawurlencode( $redirect_to ) );
 	}
 
 
@@ -1392,7 +1397,7 @@ class User extends DataObject
 	 * 
 	 * @return boolean
 	 */
-	function check_msgform_PM()
+	function accepts_pm()
 	{
 		if( $this->allow_msgform % 2 == 1 )
 		{
@@ -1407,7 +1412,7 @@ class User extends DataObject
 	 * Check if this user allow emails and has email adress
 	 * @return boolean
 	 */
-	function check_msgform_email()
+	function accepts_email()
 	{
 		return ( $this->allow_msgform > 1 ) && ( ! empty( $this->email ) );
 	}
@@ -1419,27 +1424,30 @@ class User extends DataObject
 	 * @return NULL|string NULL no messaging option between current_User and this user,
 	 * 	the allowed messging form otherwise
 	 */
-	function get_msgform_settings()
+	function get_msgform_settings( $current_User = NULL )
 	{
 		if( is_logged_in() )
 		{ // current User is a registered user
-			global $current_User;
-			if( $this->check_msgform_PM() && $current_User->check_msgform_PM() && ( $this->ID != $current_User->ID ) )
+			if( $current_User == NULL )
+			{
+				global $current_User;
+			}
+			if( $this->accepts_pm() && $current_User->accepts_pm() && ( $this->ID != $current_User->ID ) )
 			{ // both user has permission to send or receive private message and not the same user
 				return 'PM';
 			}
-			if( $this->check_msgform_email() )
+			if( $this->accepts_email() )
 			{ // this user allows email => send email
 				return 'email';
 			}
 		}
 		else
 		{ // current User is not logged in
-			if( $this->check_msgform_email() )
+			if( $this->accepts_email() )
 			{ // this user allows email 
 				return 'email';
 			}
-			if( $this->check_msgform_PM() )
+			if( $this->accepts_pm() )
 			{ // no email option try to log in and send private message (just registered users can send PM)
 				return 'login';
 			}
@@ -1476,6 +1484,20 @@ class User extends DataObject
 			// Notify plugins:
 			// A user could be created also in another DB (to synchronize it with b2evo)
 			$Plugins->trigger_event( 'AfterUserInsert', $params = array( 'User' => & $this ) );
+
+			$Group = & $this->get_Group();
+			if( $Group->check_perm( 'perm_getblog', 'allowed' ) )
+			{ // automatically create new blog for this user
+				// TODO: dh> also set locale, or use it at least for urltitle_validate below. From the User (new blog owner)?
+				$new_Blog = new Blog( NULL );
+				$shortname = $this->get( 'login' );
+				$new_Blog->set( 'owner_user_ID', $this->ID );
+				$new_Blog->set( 'shortname', $shortname );
+				$new_Blog->set( 'name', $shortname.'\'s blog' );
+				$new_Blog->set( 'locale', $this->get( 'locale' ));
+				$new_Blog->set( 'urlname', urltitle_validate( $shortname, $shortname, $new_Blog->ID, false, 'blog_urlname', 'blog_ID', 'T_blogs', $this->get( 'locale' ) ) );
+				$new_Blog->create();
+			}
 		}
 
 		$DB->commit();
@@ -2042,6 +2064,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.78  2010/07/02 08:14:19  efy-asimo
+ * Messaging redirect modification and "new user get a new blog" fix
+ *
  * Revision 1.77  2010/06/24 08:54:05  efy-asimo
  * PHP 4 compatibility
  *

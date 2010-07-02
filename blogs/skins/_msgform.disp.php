@@ -76,7 +76,22 @@ if( ! empty($recipient_id) )
 		$allow_msgform = $recipient_User->get_msgform_settings();
 		if( ! $allow_msgform )
 		{ // should be prevented by UI
-			echo '<p class="error">The user does not want to receive emails through the message form.</p>';
+			if( is_logged_in() && $recipient_User->accepts_pm() )
+			{
+		    	global $current_User;
+		    	if( $current_User->accepts_pm() )
+			    {
+			    	echo '<p class="error">'.T_('You cannot send a private message to yourself.').'</p>';
+			    }
+			    else
+			    {
+			    	echo '<p class="error">'.T_('This user only accepts private messages but you are not allowed to send any private messages.').'</p>';
+			    }
+			}
+			else
+			{
+				echo '<p class="error">'.T_('This user does not wish to be contacted directly.').'</p>'; 
+			}
 			return;
 		}
 		$recipient_name = $recipient_User->get('preferredname');
@@ -229,6 +244,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.18  2010/07/02 08:14:19  efy-asimo
+ * Messaging redirect modification and "new user get a new blog" fix
+ *
  * Revision 1.17  2010/05/07 06:12:38  efy-asimo
  * small modification about messaging
  *

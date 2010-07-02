@@ -53,17 +53,18 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 	$ProfileForm->info( T_('Name'), $User->get( 'preferredname' ) );
   $ProfileForm->info( T_('Login'), $User->get('login') );
 
-	$msgform_url = $User->get_msgform_url( $Blog->get('msgformurl') );
+	$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=msgform&recipient_id='.$User->ID, '&' );
+	$msgform_url = $User->get_msgform_url( $Blog->get('msgformurl'), $redirect_to );
 	if( !empty($msgform_url) )
 	{
 	  $ProfileForm->info( T_('Contact'), '<a href="'.$msgform_url.'">'.T_('Send a message').'</a>' );
 	}
 	else
 	{
-	  if( is_logged_in() && $User->check_msgform_PM() )
+	  if( is_logged_in() && $User->accepts_pm() )
 	  {
 	    global $current_User;
-	    if( $current_User->check_msgform_PM() )
+	    if( $current_User->accepts_pm() )
 	    {
 	      $ProfileForm->info( T_('Contact'), T_('You cannot send a private message to yourself.') );	
 	    }
@@ -115,6 +116,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.17  2010/07/02 08:14:19  efy-asimo
+ * Messaging redirect modification and "new user get a new blog" fix
+ *
  * Revision 1.16  2010/05/07 06:12:38  efy-asimo
  * small modification about messaging
  *

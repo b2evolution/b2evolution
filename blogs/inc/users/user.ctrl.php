@@ -180,23 +180,15 @@ if( !$Messages->count('error') )
 				if( $is_new_user )
 				{
 					$Messages->add( T_('New user has been created.'), 'success' );
-					$Group = & $edited_User->get_Group();
-					if( $Group->check_perm( 'perm_getblog', 'allowed' ) )
-					{ // automatically create new blog for this user
-						// TODO: dh> also set locale, or use it at least for urltitle_validate below. From the User (new blog owner)?
-						$new_Blog = new Blog( NULL );
-						$shortname = $edited_User->get( 'login' );
-						$new_Blog->set( 'owner_user_ID', $edited_User->ID );
-						$new_Blog->set( 'shortname', $shortname );
-						$new_Blog->set( 'name', $shortname.'\'s blog' );
-						$new_Blog->set( 'urlname', urltitle_validate( $shortname, $shortname, $new_Blog->ID, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
-						$new_Blog->create();
-					}
 				}
 				elseif( $is_password_form )
+				{
 					$Messages->add( T_('Password has been changed.'), 'success' );
+				}
 				else
+				{
 					$Messages->add( T_('Profile has been updated.'), 'success' );
+				}
 
 				$DB->commit();
 			}
@@ -412,6 +404,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2010/07/02 08:14:19  efy-asimo
+ * Messaging redirect modification and "new user get a new blog" fix
+ *
  * Revision 1.13  2010/06/24 08:54:06  efy-asimo
  * PHP 4 compatibility
  *

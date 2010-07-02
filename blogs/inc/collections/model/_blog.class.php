@@ -1843,7 +1843,7 @@ class Blog extends DataObject
 
 	function create()
 	{
-		global $DB, $Messages, $basepath, $current_User;
+		global $DB, $Messages, $basepath;
 		$DB->begin();
 
 		// DB INSERT
@@ -1874,14 +1874,14 @@ class Blog extends DataObject
 						bloguser_perm_draft_cmts, bloguser_perm_publ_cmts, bloguser_perm_depr_cmts,
 						bloguser_perm_cats, bloguser_perm_properties,
 						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
-				VALUES ( $this->ID, $current_User->ID, 1,
+				VALUES ( $this->ID, $this->owner_user_ID, 1,
 						'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1, 1, 1 )" );
 
 		// Create default category:
 		load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
 		$edited_Chapter = new Chapter( NULL, $this->ID );
 
-		$blog_urlname = $this->get( 'url_name' );
+		$blog_urlname = $this->get( 'urlname' );
 		$edited_Chapter->set( 'name', T_('Uncategorized') );
 		$edited_Chapter->set( 'urlname', $blog_urlname.'-main' );
 		$edited_Chapter->dbinsert();
@@ -2163,8 +2163,8 @@ class Blog extends DataObject
 	 */
 	function contact_link( $params = array() )
 	{
-		$this->get_owner_User();
-		if( ! $this->owner_User->get_msgform_settings() )
+		$owner_User = & $this->get_owner_User();
+		if( ! $owner_User->get_msgform_settings() )
 		{
 			return false;
 		}
@@ -2249,8 +2249,8 @@ class Blog extends DataObject
 	 */
 	function get_contact_url( $with_redirect = true )
 	{
-		$this->get_owner_User();
-		if( ! $this->owner_User->get_msgform_settings() )
+		$owner_User = & $this->get_owner_User();
+		if( ! $owner_User->get_msgform_settings() )
 		{ // user does not allow contact form
 			return NULL;
 		}
@@ -2259,9 +2259,16 @@ class Blog extends DataObject
 
 		if( $with_redirect )
 		{
-			$r .= '&amp;redirect_to='
+			if( $owner_User->get_msgform_settings() != 'login' )
+			{
+				$r .= '&amp;redirect_to='
 					// The URL will be made relative on the next page (this is needed when $htsrv_url is on another domain! -- multiblog situation )
 					.rawurlencode( regenerate_url('','','','&') );
+			}
+			else
+			{
+				$r .= '&amp;redirect_to='.rawurlencode( url_add_param( $this->gen_blogurl(), 'disp=msgform&recipient_id='.$owner_User->ID, '&' ) );
+			}
 		}
 
 		return $r;
@@ -2318,6 +2325,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.115  2010/07/02 08:14:19  efy-asimo
+ * Messaging redirect modification and "new user get a new blog" fix
+ *
  * Revision 1.114  2010/06/08 22:29:25  sam2kb
  * Per blog settings for different default gravatar types
  *
