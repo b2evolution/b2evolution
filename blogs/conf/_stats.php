@@ -161,6 +161,7 @@ $search_engines = array(
 	'//cc.bingj.com', // q=
 	'.qip.ru/', // query=
 	'://duckduckgo.com/', //q=
+	'rambler.ru', // query=
 );
 
 
