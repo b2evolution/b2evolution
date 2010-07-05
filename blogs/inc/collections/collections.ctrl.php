@@ -106,10 +106,10 @@ switch( $action )
 
 	case 'create':
 		// Insert into DB:
-		
+
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'collection' );
-		
+
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
 
@@ -125,63 +125,8 @@ switch( $action )
 
 		if( $edited_Blog->load_from_Request( array() ) )
 		{
-			$DB->begin();
-
-			// DB INSERT
-			$edited_Blog->dbinsert();
-
-			$Messages->add( T_('The new blog has been created.'), 'success' );
-
-
-			// Change access mode if a stub file exists:
-			$stub_filename = 'blog'.$edited_Blog->ID.'.php';
-			if( is_file( $basepath.$stub_filename ) )
-			{	// Stub file exists and is waiting ;)
-				$DB->query( 'UPDATE T_blogs
-												SET blog_access_type = "relative",
-														blog_siteurl = "'.$stub_filename.'"
-											WHERE blog_ID = '.$edited_Blog->ID );
-				$Messages->add( sprintf(T_('The new blog has been associated with the stub file &laquo;%s&raquo;.'), $stub_filename ), 'success' );
-			}
-			else
-			{
-				$Messages->add( sprintf(T_('No stub file named &laquo;%s&raquo; was found.'), $stub_filename ), 'info' );
-			}
-
-
-			// Set default user permissions for this blog (All permissions for the current user)
-			// Proceed insertions:
-			$DB->query( "
-					INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
-							bloguser_perm_poststatuses, bloguser_perm_delpost,
-							bloguser_perm_draft_cmts, bloguser_perm_publ_cmts, bloguser_perm_depr_cmts,
-							bloguser_perm_cats, bloguser_perm_properties,
-							bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
-					VALUES ( $edited_Blog->ID, $current_User->ID, 1,
-							'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1, 1, 1 )" );
-
-			// Create default category:
-			load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
-			$edited_Chapter = new Chapter( NULL, $edited_Blog->ID );
-
-			$blog_urlname = param( 'blog_urlname', 'string' );
-			$edited_Chapter->set( 'name', T_('Uncategorized') );
-			$edited_Chapter->set( 'urlname', $blog_urlname.'-main' );
-			$edited_Chapter->dbinsert();
-
-			$Messages->add( T_('A default category has been created for this blog.'), 'success' );
-
-			// ADD DEFAULT WIDGETS:
-			load_funcs( 'widgets/_widgets.funcs.php' );
-			insert_basic_widgets( $edited_Blog->ID );
-
-			$Messages->add( T_('Default widgets have been set-up for this blog.'), 'success' );
-
-			$DB->commit();
-
-			// Commit changes in cache:
-			$BlogCache = & get_BlogCache();
-			$BlogCache->add( $edited_Blog );
+			// create the new blog
+			$edited_Blog->create();
 
 			// We want to highlight the edited object on next list display:
  			// $Session->set( 'fadeout_array', array( 'blog_ID' => array($edited_Blog->ID) ) );
@@ -422,6 +367,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.28  2010/07/05 08:40:13  efy-asimo
+ * Factorize Blog::create() function, and change default blog url to "extrapath"
+ *
  * Revision 1.27  2010/06/01 11:33:19  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)

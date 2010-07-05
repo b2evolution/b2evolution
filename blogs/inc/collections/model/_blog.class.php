@@ -168,7 +168,7 @@ class Blog extends DataObject
 			// echo 'Creating blank blog';
 			$this->owner_user_ID = 1; // DB default
 			$this->set( 'locale', $default_locale );
-			$this->set( 'access_type', 'index.php' );
+			$this->set( 'access_type', 'extrapath' );
 			$this->skin_ID = 1;	// TODO: this is the DB default, but it will fail if skin #1 does not exist
 		}
 		else
@@ -1841,9 +1841,12 @@ class Blog extends DataObject
 	}
 
 
+	/**
+	 * Create a new blog...
+	 */
 	function create()
 	{
-		global $DB, $Messages, $basepath;
+		global $DB, $Messages, $basepath, $current_User;
 		$DB->begin();
 
 		// DB INSERT
@@ -1860,22 +1863,24 @@ class Blog extends DataObject
 						WHERE blog_ID = '.$this->ID );
 			$Messages->add( sprintf(T_('The new blog has been associated with the stub file &laquo;%s&raquo;.'), $stub_filename ), 'success' );
 		}
-		else
-		{
+		else if( $this->access_type == 'relative' )
+		{ // Show error message only if stub file should exists!
 			$Messages->add( sprintf(T_('No stub file named &laquo;%s&raquo; was found.'), $stub_filename ), 'info' );
 		}
 
-
 		// Set default user permissions for this blog (All permissions for the current user)
-		// Proceed insertions:
-		$DB->query( "
-				INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+		// current_User can be NULL only during new user registration process, when new user automatically get a new blog
+		if( $current_User != NULL )
+		{ // Proceed insertions:
+			$DB->query( "
+					INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
 						bloguser_perm_poststatuses, bloguser_perm_delpost,
 						bloguser_perm_draft_cmts, bloguser_perm_publ_cmts, bloguser_perm_depr_cmts,
 						bloguser_perm_cats, bloguser_perm_properties,
 						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
-				VALUES ( $this->ID, $this->owner_user_ID, 1,
+					VALUES ( $this->ID, $current_User->ID, 1,
 						'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1, 1, 1 )" );
+		}
 
 		// Create default category:
 		load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
@@ -2325,6 +2330,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.116  2010/07/05 08:40:13  efy-asimo
+ * Factorize Blog::create() function, and change default blog url to "extrapath"
+ *
  * Revision 1.115  2010/07/02 08:14:19  efy-asimo
  * Messaging redirect modification and "new user get a new blog" fix
  *
