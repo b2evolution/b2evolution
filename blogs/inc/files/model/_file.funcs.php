@@ -964,8 +964,13 @@ function rename_cachefolders( $oldname, $newname )
 		$dirnames = get_filenames( $fileRoot->ads_path, false );
 		foreach( $dirnames as $dirname )
 		{ // search ?evocache folders
+			$dirname_length = strlen( $dirname );
+			if( $dirname_length < 9 )
+			{ // The path is to short, can not contains ?evocache folder name
+				continue;
+			}
 			// searching at the end of the path -> ?evocache length = 9
-			$position = strrpos( $dirname, $oldname, strlen( $dirname ) - 9 );
+			$position = strrpos( $dirname, $oldname, $dirname_length - 9 );
 			if( $position !== false )
 			{ // this is a ?evocache folder
 				$new_dirname = str_replace( $oldname, $newname, $dirname);
@@ -1027,6 +1032,9 @@ function check_showparams( & $Filelist )
 
 /*
  * $Log$
+ * Revision 1.45  2010/07/05 06:15:20  efy-asimo
+ * ?evocache rename - fix warning
+ *
  * Revision 1.44  2010/05/21 10:46:31  efy-asimo
  * move prune_page_cache() function from _file.funcs.php to _pagecache.class.php
  *
