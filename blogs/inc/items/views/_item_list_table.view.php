@@ -282,7 +282,8 @@ if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) 
 	}
 
 	if( empty( $perm ) || $current_User->check_perm( 'blog_'.$perm, 'edit', false, $Blog->ID ) )
-	{	// We have the permission to create posts with this post type:
+	{	// We have the permission to create and edit posts with this post type:
+		$ItemList->global_icon( T_('Mass edit the current post list...'), '', '?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.regenerate_url( 'action', '', '', '&'), T_('Mass edit').' &raquo;', 3, 4 );
 		$ItemList->global_icon( $title, 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$new_ptyp_ID, $label.' &raquo;', 3, 4 );
 	}
 }
@@ -302,6 +303,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.26  2010/07/05 06:54:00  efy-asimo
+ * Add "Mass edit >>" link to all relevant tabs
+ *
  * Revision 1.25  2010/02/08 17:53:19  efy-yury
  * copyright 2009 -> 2010
  *
