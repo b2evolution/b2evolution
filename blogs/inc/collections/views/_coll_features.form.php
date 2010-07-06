@@ -159,12 +159,6 @@ $Form->begin_fieldset( T_('Sitemaps') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Multiple authors') );
-	$Form->checkbox( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ), T_('Use advanced perms'), T_('This will turn on the advanced User and Group permissions tabs for this blog.') );
-	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
-$Form->end_fieldset();
-
-
 $Form->begin_fieldset( T_('Custom field names') );
 	$notes = array(
 			T_('Ex: Price'),
@@ -222,6 +216,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.32  2010/07/06 08:17:39  efy-asimo
+ * Move "Multiple authors" block to Blog setings advanced tab. Fix validating urlname when user has no blog_admin permission.
+ *
  * Revision 1.31  2010/06/08 22:29:25  sam2kb
  * Per blog settings for different default gravatar types
  *

@@ -208,7 +208,7 @@ switch( $action )
 
 			case 'advanced':
 				$old_cache_status = $edited_Blog->get_setting('cache_enabled');
-				if( $edited_Blog->load_from_Request( array( 'pings', 'cache' ) ) )
+				if( $edited_Blog->load_from_Request( array( 'pings', 'cache', 'authors' ) ) )
 				{ // Commit update to the DB:
 					$new_cache_status = $edited_Blog->get_setting('cache_enabled');
 
@@ -383,6 +383,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.33  2010/07/06 08:17:39  efy-asimo
+ * Move "Multiple authors" block to Blog setings advanced tab. Fix validating urlname when user has no blog_admin permission.
+ *
  * Revision 1.32  2010/02/26 15:52:20  efy-asimo
  * combine skin and skin settings tab into one single tab
  *

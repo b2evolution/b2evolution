@@ -469,11 +469,15 @@ class Blog extends DataObject
 			$this->set_setting( 'cache_enabled_widgets', param( 'cache_enabled_widgets', 'integer', 0 ) );
 		}
 
+		if( in_array( 'authors', $groups ) )
+		{ // we want to load the multiple authors params
+			$this->set( 'advanced_perms',  param( 'advanced_perms', 'integer', 0 ) );
+			$this->set_setting( 'use_workflow',  param( 'blog_use_workflow', 'integer', 0 ) );
+		}
+
 		if( in_array( 'features', $groups ) )
 		{ // we want to load the workflow checkboxes:
 			$this->set_setting( 'allow_subscriptions',  param( 'allow_subscriptions', 'integer', 0 ) );
-			$this->set( 'advanced_perms',  param( 'advanced_perms', 'integer', 0 ) );
-			$this->set_setting( 'use_workflow',  param( 'blog_use_workflow', 'integer', 0 ) );
 			$this->set_setting( 'enable_goto_blog',  param( 'enable_goto_blog', 'integer', 0 ) );
 			
 			$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
@@ -706,11 +710,6 @@ class Blog extends DataObject
 			}
 
 
-		}
-		else
-		{ // user has no permission to change blog_urlname
-		  // dh> ? are you sure you've missed the correct IF block with this ELSE? I don't understand it at least, so please fix doc.
-			$this->set( 'urlname', urltitle_validate( $this->urlname, '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
 		}
 
 		return ! param_errors_detected();
@@ -1865,7 +1864,7 @@ class Blog extends DataObject
 		}
 		else if( $this->access_type == 'relative' )
 		{ // Show error message only if stub file should exists!
-			$Messages->add( sprintf(T_('No stub file named &laquo;%s&raquo; was found.'), $stub_filename ), 'info' );
+			$Messages->add( sprintf(T_('No stub file named &laquo;%s&raquo; was found. You must create it for the blog to function properly with the current settings.'), $stub_filename ), 'error' );
 		}
 
 		// Set default user permissions for this blog (All permissions for the current user)
@@ -2330,6 +2329,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.117  2010/07/06 08:17:39  efy-asimo
+ * Move "Multiple authors" block to Blog setings advanced tab. Fix validating urlname when user has no blog_admin permission.
+ *
  * Revision 1.116  2010/07/05 08:40:13  efy-asimo
  * Factorize Blog::create() function, and change default blog url to "extrapath"
  *

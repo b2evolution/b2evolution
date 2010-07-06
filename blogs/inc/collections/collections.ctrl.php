@@ -119,6 +119,12 @@ switch( $action )
 
 		param( 'kind', 'string', true );
 		$edited_Blog->init_by_kind( $kind );
+		if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+		{ // validate the urlname, which was already set by init_by_kind() function
+		 	// It needs to validated, because the user can not set the blog urlname, and every new blog would have the same urlname without validation.
+		 	// When user has edit permission to blog admin part, the urlname will be validated in load_from_request() function.
+			$edited_Blog->set( 'urlname', urltitle_validate( $edited_Blog->get( 'urlname' ) , '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
+		}
 
  		param( 'skin_ID', 'integer', true );
 		$edited_Blog->set( 'skin_ID', $skin_ID );
@@ -367,6 +373,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.29  2010/07/06 08:17:39  efy-asimo
+ * Move "Multiple authors" block to Blog setings advanced tab. Fix validating urlname when user has no blog_admin permission.
+ *
  * Revision 1.28  2010/07/05 08:40:13  efy-asimo
  * Factorize Blog::create() function, and change default blog url to "extrapath"
  *
