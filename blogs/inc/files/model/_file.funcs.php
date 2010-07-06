@@ -958,24 +958,26 @@ function rename_cachefolders( $oldname, $newname )
 
 	$available_Roots = $FileRootCache->get_available_FileRoots();
 
+	$slash_oldname = '/'.$oldname;
+
 	$result = true;
 	foreach( $available_Roots as $fileRoot )
 	{
-		$dirnames = get_filenames( $fileRoot->ads_path, false );
-		foreach( $dirnames as $dirname )
+		$dirpaths = get_filenames( $fileRoot->ads_path, false );
+		foreach( $dirpaths as $dirpath )
 		{ // search ?evocache folders
-			$dirname_length = strlen( $dirname );
-			if( $dirname_length < 9 )
+			$dirpath_length = strlen( $dirpath );
+			if( $dirpath_length < 10 )
 			{ // The path is to short, can not contains ?evocache folder name
 				continue;
 			}
-			// searching at the end of the path -> ?evocache length = 9
-			$position = strrpos( $dirname, $oldname, $dirname_length - 9 );
-			if( $position !== false )
+			// searching at the end of the path -> '/' character + ?evocache, length = 1 + 9
+			$path_end = substr( $dirpath, $dirpath_length - 10 );
+			if( $path_end == $slash_oldname )
 			{ // this is a ?evocache folder
-				$new_dirname = str_replace( $oldname, $newname, $dirname);
+				$new_dirpath = substr_replace( $dirpath, $newname, $dirpath_length - 9 );
 				// result is true only if all rename call return true (success)
-				$result = $result && @rename( $dirname, $new_dirname );
+				$result = $result && @rename( $dirpath, $new_dirpath );
 			}
 		}
 	}
@@ -1032,6 +1034,9 @@ function check_showparams( & $Filelist )
 
 /*
  * $Log$
+ * Revision 1.46  2010/07/06 09:24:54  efy-asimo
+ * ?evocache rename warning fix
+ *
  * Revision 1.45  2010/07/05 06:15:20  efy-asimo
  * ?evocache rename - fix warning
  *
