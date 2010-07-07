@@ -103,7 +103,7 @@ class ItemList2 extends ItemListLight
 		$post_metakeywords = param( 'metakeywords', 'string', true );
 		$post_excerpt = param( 'post_excerpt', 'string', true );
 		$post_url = param( 'post_url', 'string', '' );
-		$post_category = param( 'post_category', 'integer', true );
+		check_categories_nosave( $post_category, $post_extracats );
 		$post_views = param( 'post_views', 'integer', 0 );
 		$renderers = param( 'renderers', 'array', array('default') );
 		if( ! is_array($renderers) )
@@ -725,6 +725,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.33  2010/07/07 08:50:35  efy-asimo
+ * Fix item preview, when no main category is set
+ *
  * Revision 1.32  2010/04/17 11:49:56  efy-asimo
  * Notice: Undefined properties: stdClass::$post_canonical_slug_ID stdClass::$post_tiny_slug_ID - bugfix
  *
