@@ -171,6 +171,7 @@ class ItemList2 extends ItemListLight
 			'$item_issue_date' AS post_datestart,
 			'$item_issue_date' AS post_datecreated,
 			'$item_issue_date' AS post_datemodified,
+			0 AS post_dateset,
 			'".$DB->escape($post_status)."' AS post_status,
 			'".$DB->escape($post_locale)."' AS post_locale,
 			'".$DB->escape($content)."' AS post_content,
@@ -725,6 +726,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.34  2010/07/08 05:29:54  efy-asimo
+ * post_dateset notice on preview item page - fix
+ *
  * Revision 1.33  2010/07/07 08:50:35  efy-asimo
  * Fix item preview, when no main category is set
  *
