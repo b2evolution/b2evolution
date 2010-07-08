@@ -3475,7 +3475,17 @@ class Item extends ItemLight
 	 * Update the DB based on previously recorded changes
 	 *
 	 * @param boolean do we want to auto track the mod date?
-	 * @param boolean Update slug (you may inject a slug object here, e.g. via {@link update_slug()})
+	 * @param boolean Update slug (you may inject a slug object here, e.g. via {@link update_slug()} asimo>>we may not inject a slug object)
+	 * 
+	 * asimo>fp There is no reason for the oporunity to insert a new slug object here, and it shouldn't happen!
+	 * It just complicate the function! Only in tools.ctrl.php (case 'recreate_itemslugs') exists an item>update() call where $update_slug param is a slug object,
+	 *  but I am sure that we can handle it some other way. I dind't get exactly the menaing of this 'recreate_itemslugs'.
+	 * The most important thing about this is that the urltitle validation should happen from this dbupdate() function transaction (between the DB->begin(), DB->commit() part) 
+	 * @todo fp>asimo: ok, plase make sure all these comments go into HEAD so that Daniel/blueyed can see them when
+	 * he gets back from wherever he is. Then, please remove all the unecessary code & unecessary complexity from the v-4-0 branch.
+	 * Please also remove the "recreate slugs" tool from v-4-0. I don't understand what we need it for either.
+	 * We'll see if we keep it in v 4.1 when Daniel gets back.
+	 * 
 	 * @param boolean Update excerpt?
 	 * @return boolean true on success
 	 */
@@ -3493,17 +3503,17 @@ class Item extends ItemLight
 		// validate url title / slug
 		if( $update_slug )
 		{
+// fp>blueyed : please document what you're trying to do here. And please be verbose.
+// asimo> : From tools.ctrl/'recreate_itemslugs' pass only a string or nothing.
+			// asimo? This if statement should be removed, the elseif statement should remain( only the if )
 			if( is_a($update_slug, 'Slug') )
 			{
 				$new_Slug = $update_slug;
+				$this->set( 'urltitle', $new_Slug->get( 'title' ) );
 			}
 			elseif( empty($this->urltitle) || isset($this->dbchanges['post_urltitle'])  )
 			{ // Url title has changed or is empty
 				$new_Slug = $this->update_slug();
-			}
-			if( isset($new_Slug) )
-			{ // Set item urltitle
-				$this->set( 'urltitle', $new_Slug->get( 'title' ) );
 			}
 		}
 
@@ -3544,22 +3554,27 @@ class Item extends ItemLight
 			$this->insert_update_tags( 'update' );
 
 			// Let's handle the slugs:
+// fp> needs doc
 			// TODO: dh> $result handling here feels wrong: when it's true already, it should not become false (add "|| $result"?)
+			// asimo>dh The result handling is in a transaction. If somehow the new slug creation fails, then the item insertion should rollback either 
 			if( isset($new_Slug) )
-			{
+			{ // if $new_Slug is set, we have to insert it into the database
 				$SlugCache = get_SlugCache();
+				// asimo> It is a check if this slug title already in use or not. It was already checked,
+				// and if it doesn't modify the $result value, then it doesn't have too much sense.
 				$prev_Slug = $SlugCache->get_by_name($new_Slug->get('title'), false, false);
 				if( ! $prev_Slug )
 				{
-					$new_Slug->set( 'itm_ID', $this->ID );
 					if( $result = $new_Slug->dbinsert() )
-					{
+					{ // new slug was inserted successful, update item canonical_slug_ID 
 						$this->set( 'canonical_slug_ID', $new_Slug->ID );
 						$result = parent::dbupdate();
 					}
 				}
 				else
 				{
+					// change result to false, because the new slug was not inserted, and the item canonical_slug_ID wasn't set.
+					$result = false;
 					assert('$prev_Slug->get("itm_ID") == $new_Slug->get("itm_ID")');
 				}
 			}
@@ -3605,10 +3620,14 @@ class Item extends ItemLight
 		{
 			$urltitle = $this->urltitle;
 		}
+		// create new slug 
 		$new_Slug = new Slug();
 		$new_Slug->set( 'title', urltitle_validate( $urltitle, $this->title, $this->ID, false, $new_Slug->dbprefix.'title', $new_Slug->dbprefix.'itm_ID', $new_Slug->dbtablename, $this->locale ) );
 		$new_Slug->set( 'type', 'item' );
 		$new_Slug->set( 'itm_ID', $this->ID );
+
+		// set the item urltitle
+		$this->set( 'urltitle', $new_Slug->get( 'title' ) );
 
 		return $new_Slug;
 	}
@@ -4492,6 +4511,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.207  2010/07/08 06:53:01  efy-asimo
+ * item dbupdate() function slug modifications doc
+ *
  * Revision 1.206  2010/06/24 08:54:05  efy-asimo
  * PHP 4 compatibility
  *
