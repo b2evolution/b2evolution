@@ -179,10 +179,13 @@ function shutdown()
 
 	if( ! empty($shutdown_count_item_views) )
 	{ // Increment view counts for Items:
+		$ItemCache = & get_ItemCache();
 		foreach( $shutdown_count_item_views as $item_ID )
 		{
-			$ItemCache = get_ItemCache();
-			if( $Item = $ItemCache->get_by_ID($item_ID, false) ) {
+			// asimo> Inserted the $item_ID != 0 check, because another way comes unexpected error on preview page
+			// Another solution would be, that set ItemCache->get_by_ID function halt_one_empty param false
+			// Does the second solution mess up something?
+			if( ( $item_ID != 0 ) && ( $Item = $ItemCache->get_by_ID($item_ID, false) ) ) {
 				$Item->count_view( array(
 					'allow_multiple_counts_per_page' => false,
 				) );
@@ -4031,6 +4034,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.241  2010/07/08 05:56:17  efy-asimo
+ * Unexpected exception fix on item preview
+ *
  * Revision 1.240  2010/06/23 22:00:46  blueyed
  * doc
  *
