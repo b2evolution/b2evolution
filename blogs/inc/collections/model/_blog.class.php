@@ -2168,7 +2168,7 @@ class Blog extends DataObject
 	function contact_link( $params = array() )
 	{
 		$owner_User = & $this->get_owner_User();
-		if( ! $owner_User->get_msgform_settings() )
+		if( ! $owner_User->get_msgform_possibility() )
 		{
 			return false;
 		}
@@ -2254,7 +2254,7 @@ class Blog extends DataObject
 	function get_contact_url( $with_redirect = true )
 	{
 		$owner_User = & $this->get_owner_User();
-		if( ! $owner_User->get_msgform_settings() )
+		if( ! $owner_User->get_msgform_possibility() )
 		{ // user does not allow contact form
 			return NULL;
 		}
@@ -2263,7 +2263,7 @@ class Blog extends DataObject
 
 		if( $with_redirect )
 		{
-			if( $owner_User->get_msgform_settings() != 'login' )
+			if( $owner_User->get_msgform_possibility() != 'login' )
 			{
 				$r .= '&amp;redirect_to='
 					// The URL will be made relative on the next page (this is needed when $htsrv_url is on another domain! -- multiblog situation )
@@ -2329,6 +2329,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.118  2010/07/12 09:07:37  efy-asimo
+ * rename get_msgform_settings() to get_msgform_possibility
+ *
  * Revision 1.117  2010/07/06 08:17:39  efy-asimo
  * Move "Multiple authors" block to Blog setings advanced tab. Fix validating urlname when user has no blog_admin permission.
  *

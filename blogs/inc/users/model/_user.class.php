@@ -71,7 +71,7 @@ class User extends DataObject
 	/**
 	 * Does the user accept messages?
 	 * Options: 0 - NO, 1 - only private messages, 2 - only emails, 3 - private messages and emails
-	 * This attribute can be asked with get_msgform_settings(), accepts_pm(),
+	 * This attribute can be asked with get_msgform_possibility(), accepts_pm(),
 	 * and accepts_email() functions to get complete sense.
 	 * It is because posibble that user allow PM, but user group does not.
 	 * @var boolean
@@ -199,7 +199,7 @@ class User extends DataObject
 				$this->group_ID = $Settings->get('newusers_grp_ID');
 			}
 
-			// This attribute can be asked with get_msgform_settings(), accepts_pm, accepts_email functions
+			// This attribute can be asked with get_msgform_possibility(), accepts_pm, accepts_email functions
 			// Default value: Allow both
  			$this->set( 'allow_msgform', 3 );
 
@@ -711,7 +711,7 @@ class User extends DataObject
 	{
 		global $ReqURI;
 
-		if( ! $this->get_msgform_settings() )
+		if( ! $this->get_msgform_possibility() )
 		{
 			return NULL;
 		}
@@ -1424,7 +1424,7 @@ class User extends DataObject
 	 * @return NULL|string NULL no messaging option between current_User and this user,
 	 * 	the allowed messging form otherwise
 	 */
-	function get_msgform_settings( $current_User = NULL )
+	function get_msgform_possibility( $current_User = NULL )
 	{
 		if( is_logged_in() )
 		{ // current User is a registered user
@@ -1766,7 +1766,7 @@ class User extends DataObject
 		{ // We have no email for this User :(
 			return false;
 		}
-		if( ! $this->get_msgform_settings() )
+		if( ! $this->get_msgform_possibility() )
 		{
 			return false;
 		}
@@ -2064,6 +2064,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.79  2010/07/12 09:07:37  efy-asimo
+ * rename get_msgform_settings() to get_msgform_possibility
+ *
  * Revision 1.78  2010/07/02 08:14:19  efy-asimo
  * Messaging redirect modification and "new user get a new blog" fix
  *

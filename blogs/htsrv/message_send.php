@@ -174,7 +174,7 @@ if( ! empty( $recipient_id ) )
 	$UserCache = & get_UserCache();
 	$recipient_User = & $UserCache->get_by_ID( $recipient_id );
 
-	$allow_msgform = $recipient_User->get_msgform_settings();
+	$allow_msgform = $recipient_User->get_msgform_possibility();
 	if( ! $allow_msgform )
 	{ // should be prevented by UI
 		debug_die( 'Invalid recipient!' );
@@ -198,7 +198,7 @@ elseif( ! empty( $comment_id ) )
 
 	if( $recipient_User = & $Comment->get_author_User() )
 	{ // Comment is from a registered user:
-		$allow_msgform = $recipient_User->get_msgform_settings();
+		$allow_msgform = $recipient_User->get_msgform_possibility();
 		if( ! $allow_msgform )
 		{ // should be prevented by UI
 			debug_die( 'Invalid recipient!' );
@@ -332,6 +332,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.70  2010/07/12 09:07:37  efy-asimo
+ * rename get_msgform_settings() to get_msgform_possibility
+ *
  * Revision 1.69  2010/04/23 11:37:57  efy-asimo
  * send messages - fix
  *

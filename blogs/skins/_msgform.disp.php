@@ -73,7 +73,7 @@ if( ! empty($recipient_id) )
 
 	if( $recipient_User )
 	{
-		$allow_msgform = $recipient_User->get_msgform_settings();
+		$allow_msgform = $recipient_User->get_msgform_possibility();
 		if( ! $allow_msgform )
 		{ // should be prevented by UI
 			if( is_logged_in() && $recipient_User->accepts_pm() )
@@ -112,7 +112,7 @@ elseif( ! empty($comment_id) )
 		$Comment = new Comment( $row );
 		if( $recipient_User = & $Comment->get_author_User() )
 		{ // Source comment is from a registered user:
-			$allow_msgform = $recipient_User->get_msgform_settings();
+			$allow_msgform = $recipient_User->get_msgform_possibility();
 			if( ! $allow_msgform )
 			{
 				echo '<p class="error">The user does not want to get contacted through the message form.</p>'; // should be prevented by UI
@@ -244,6 +244,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.19  2010/07/12 09:07:37  efy-asimo
+ * rename get_msgform_settings() to get_msgform_possibility
+ *
  * Revision 1.18  2010/07/02 08:14:19  efy-asimo
  * Messaging redirect modification and "new user get a new blog" fix
  *
