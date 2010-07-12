@@ -307,7 +307,7 @@ class ChapterCache extends GenericCategoryCache
  	 * @param object|NULL
  	 * @param integer|NULL subset to use for new object
 	 */
-	function new_obj( $row = NULL, $subset_ID = NULL )
+	function & new_obj( $row = NULL, $subset_ID = NULL )
 	{
 		// Instantiate a custom object
 		$Chapter = new Chapter( $row, $subset_ID ); // Copy
@@ -318,6 +318,9 @@ class ChapterCache extends GenericCategoryCache
 
 /*
  * $Log$
+ * Revision 1.11  2010/07/12 09:09:30  efy-asimo
+ * Fix notice, when creating new category
+ *
  * Revision 1.10  2010/02/08 17:52:07  efy-yury
  * copyright 2009 -> 2010
  *
