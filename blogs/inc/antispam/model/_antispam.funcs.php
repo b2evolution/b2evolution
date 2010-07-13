@@ -338,6 +338,10 @@ function get_ban_domain( $url )
 /**
  * Get the blog restricted condition
  * 
+ * Creates an sql command part, which is a condition, that restrict to show comments from those blogs,
+ * where current user has no edit permission for comments.
+ * It is used by the antispam_list.ctrl, when current_User wants to delete the affected comments.
+ * 
  * @param boolean delete draft comments
  * @param boolean delete published comments
  * @param boolean delete deprecated comments
@@ -454,6 +458,9 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 
 /*
  * $Log$
+ * Revision 1.14  2010/07/13 08:51:17  efy-asimo
+ * doc - reply to todo fp>asimo
+ *
  * Revision 1.13  2010/06/17 08:54:52  efy-asimo
  * antispam screen, antispam tool dispplay fix
  *

@@ -834,7 +834,7 @@ function create_demo_contents()
 	$User_Demo->set( 'domain', 'localhost' );
 	$User_Demo->set( 'level', 0 );
 	$User_Demo->set( 'locale', $default_locale );
-	$User_Demo->set( 'allow_msgform', 2 );
+	$User_Demo->set( 'allow_msgform', 2 ); // set user msgform settings to allow only emails ( 2 = only emails )
 	$User_Demo->set_datecreated( $timestamp++ );
 	$User_Demo->set_Group( $Group_Users );
 	$User_Demo->dbinsert();
@@ -1313,6 +1313,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.296  2010/07/13 08:51:17  efy-asimo
+ * doc - reply to todo fp>asimo
+ *
  * Revision 1.295  2010/06/01 11:33:20  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)
