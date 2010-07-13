@@ -44,8 +44,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $current_User->check_perm( 'options', 'view', true );
 
 
-$AdminUI->set_path( 'files', 'settings' );
-
 param( 'action', 'string' );
 
 switch( $action )
@@ -176,12 +174,20 @@ switch( $action )
 		break;
 }
 
+/**
+ * We need make this call to build menu for all modules
+ */
+$AdminUI->set_path( 'files' );
+
 file_controller_build_tabs();
+
+$AdminUI->set_path( 'files', 'settings', 'settings' );
 
 // fp> TODO: this here is a bit sketchy since we have Blog & fileroot not necessarilly in sync. Needs investigation / propositions.
 // Note: having both allows to post from any media dir into any blog.
 $AdminUI->breadcrumbpath_init();
 $AdminUI->breadcrumbpath_add( T_('Files'), '?ctrl=files&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=settings' );
 $AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=fileset' );
 
 
@@ -205,6 +211,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2010/07/13 07:10:15  efy-asimo
+ * Group file settings and file types tabs into a single Settings tab, with a 3rd level selection
+ *
  * Revision 1.12  2010/04/02 07:27:11  efy-asimo
  * cache folders rename and Filelist navigation - fix
  *

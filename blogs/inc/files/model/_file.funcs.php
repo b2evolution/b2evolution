@@ -933,14 +933,24 @@ function file_controller_build_tabs()
 		$AdminUI->add_menu_entries(
 			'files',
 			array(
-						'settings' => array(
-							'text' => T_('Settings'),
-							'href' => '?ctrl=fileset' ),
-						'filetypes' => array(
-							'text' => T_('File types'),
-							'href' => '?ctrl=filetypes' ),
+				'settings' => array(
+					'text' => T_('Settings'),
+					'href' => '?ctrl=fileset',
 					)
-				);
+				)
+			);
+
+		$AdminUI->add_menu_entries(
+			array('files', 'settings'),
+			array(
+					'settings' => array(
+						'text' => T_('Settings'),
+						'href' => '?ctrl=fileset' ),
+					'filetypes' => array(
+						'text' => T_('File types'),
+						'href' => '?ctrl=filetypes' ),
+				)
+			);
 	}
 
 }
@@ -1034,6 +1044,9 @@ function check_showparams( & $Filelist )
 
 /*
  * $Log$
+ * Revision 1.47  2010/07/13 07:10:15  efy-asimo
+ * Group file settings and file types tabs into a single Settings tab, with a 3rd level selection
+ *
  * Revision 1.46  2010/07/06 09:24:54  efy-asimo
  * ?evocache rename warning fix
  *
