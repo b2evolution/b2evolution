@@ -73,7 +73,7 @@ $Form->begin_fieldset( T_('Post options') );
 	array( array( 'one_cat_post', T_('One category per post') ),
 			array( 'multiple_cat_post', T_('Multiple categories per post') ),
 			array( 'main_extra_cat_post', T_('Main cat + extra cats') ),
-			array( 'no_cat_post', T_('Don\'t user categories') ) ),
+			array( 'no_cat_post', T_('Don\'t use categories') ) ),
 			T_('Post Categories'), true );
 
 $Form->end_fieldset();
@@ -216,6 +216,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.33  2010/07/13 23:54:50  sam2kb
+ * type
+ *
  * Revision 1.32  2010/07/06 08:17:39  efy-asimo
  * Move "Multiple authors" block to Blog setings advanced tab. Fix validating urlname when user has no blog_admin permission.
  *
