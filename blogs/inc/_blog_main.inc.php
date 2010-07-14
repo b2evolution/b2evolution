@@ -413,11 +413,11 @@ if( !empty($p) || !empty($title) )
 		}
 
 		if( ! $title_fallback )
-		{
+		{	// Let's try to fall back to the help...
 			$SlugCache = & get_SlugCache();
 			$Slug = & $SlugCache->get_by_name( $title, false, false );
 			if( ! empty($Slug) && $Slug->get( 'type' ) == 'help' )
-			{
+			{ // We could match a help slug from the extra path:
 				$disp = 'help';
 				$title_fallback = true;
 				$title = NULL;
@@ -663,6 +663,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.166  2010/07/14 09:06:14  efy-asimo
+ * todo fp>asimo modifications
+ *
  * Revision 1.165  2010/04/22 18:59:09  blueyed
  * Add halt_on_empty param to get_by_urltitle and use it. Bug: did when looking up single char bad URLs.
  *

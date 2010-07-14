@@ -333,7 +333,15 @@ class User extends DataObject
 			$this->set_from_Request('email', 'edited_user_email', true);
 
 			// set allow_msgform: 0 - none, 1 - only private message, 2 - only email, 3 - private message and email 
-			$allow_msgform = param( 'PM', 'integer', 0 ) + param( 'email', 'integer', 0 );
+			$allow_msgform = 0;
+			if( param( 'PM', 'integer', 0 ) )
+			{ // PM is enabled
+				$allow_msgform = 1;
+			}
+			if( param( 'email', 'integer', 0 ) )
+			{ // email is enabled
+				$allow_msgform = $allow_msgform + 2;
+			}
 			$this->set( 'allow_msgform', $allow_msgform );
 
 			param( 'edited_user_notify', 'integer', 0 );
@@ -2064,6 +2072,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.80  2010/07/14 09:06:14  efy-asimo
+ * todo fp>asimo modifications
+ *
  * Revision 1.79  2010/07/12 09:07:37  efy-asimo
  * rename get_msgform_settings() to get_msgform_possibility
  *

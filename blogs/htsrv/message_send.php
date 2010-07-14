@@ -291,12 +291,12 @@ if( $allow_msgform == 'email' )
 	}
 
 	 // Send mail
-	$success_mail = send_mail( $recipient_address, $recipient_name, $subject, $message, $sender_address, $sender_name );
+	$success_message = send_mail( $recipient_address, $recipient_name, $subject, $message, $sender_address, $sender_name );
 }
 else
 { // Send private message
 	load_funcs( 'messaging/model/_messaging.funcs.php' );
-	$success_mail = send_message( $recipient_User->get( 'login' ), $subject, $message );
+	$success_message = send_private_message( $recipient_User->get( 'login' ), $subject, $message );
 }
 
 
@@ -307,7 +307,7 @@ $Plugins->trigger_event( 'MessageFormSentCleanup' );
 // restore the locale to the blog visitor language
 locale_restore_previous();
 
-if( $success_mail )
+if( $success_message )
 {
 	// Never say to whom we sent the email -- prevent user enumeration.
 	$Messages->add( T_('Your message has been sent.'), 'success' );
@@ -332,6 +332,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.71  2010/07/14 09:06:14  efy-asimo
+ * todo fp>asimo modifications
+ *
  * Revision 1.70  2010/07/12 09:07:37  efy-asimo
  * rename get_msgform_settings() to get_msgform_possibility
  *

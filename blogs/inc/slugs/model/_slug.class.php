@@ -272,7 +272,7 @@ class Slug extends DataObject
 		if( $Item->get( 'canonical_slug_ID' ) == $this->ID )
 		{
 			$Item->set( 'urltitle', $this->title );
-			if( ! $Item->dbupdate( true, false ) )
+			if( ! $Item->dbupdate( true, false, false ) )
 			{
 				$DB->rollback();
 				return false;

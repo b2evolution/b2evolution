@@ -195,8 +195,9 @@ class Group extends DataObject
 		$GroupSettings = & $this->get_GroupSettings();
 		foreach( $GroupSettings->permission_values as $name => $value )
 		{
+			// We need to handle separately checkobxes and radioboxes, because when a checkbox isn't checked the checkbox variable is not sent
 			if( $name == 'perm_createblog' || $name == 'perm_getblog' )
-			{
+			{ // These two permission are represented by checkboxes, all other pluggable group permissions are represented by radiobox.
 				$value = param( 'edited_grp_'.$name, 'string', 'denied' );
 			}
 			else
@@ -721,6 +722,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.34  2010/07/14 09:06:14  efy-asimo
+ * todo fp>asimo modifications
+ *
  * Revision 1.33  2010/06/01 11:33:20  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)

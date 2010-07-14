@@ -69,9 +69,6 @@ global $user_profile_only;
 $GroupCache = & get_GroupCache();
 $group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
 
-// we need jQuery
-require_js( 'communication.js' );
-
 // User Groups dropdown list handler
 ?>
 <script type="text/javascript">
@@ -473,6 +470,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.15  2010/07/14 09:06:14  efy-asimo
+ * todo fp>asimo modifications
+ *
  * Revision 1.14  2010/05/06 09:24:14  efy-asimo
  * Messaging options - fix
  *
