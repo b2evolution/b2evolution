@@ -21,6 +21,10 @@ if( is_logged_in() )
 	return;
 }
 
+if( $action == 'req_login' ) {
+	$login_required = true;
+}
+
 global $admin_url, $ReqHost, $htsvr_url;
 
 if( $Messages->count( 'all' ) > 0 )

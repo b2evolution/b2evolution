@@ -715,7 +715,7 @@ class User extends DataObject
   /**
 	 * Get message form url
 	 */
-	function get_msgform_url( $formurl, $redirect_to )
+	function get_msgform_url( $formurl, $redirect_to = NULL )
 	{
 		global $ReqURI;
 
@@ -2072,6 +2072,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.81  2010/07/15 06:37:24  efy-asimo
+ * Fix messaging warning, also fix redirect after login display
+ *
  * Revision 1.80  2010/07/14 09:06:14  efy-asimo
  * todo fp>asimo modifications
  *

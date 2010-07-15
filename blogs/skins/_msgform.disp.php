@@ -146,6 +146,7 @@ if( $allow_msgform == 'login' )
 	global $htsrv_path, $Messages;
 	$Messages->add( 'You must log in before you can contact this user' );
 	//$thispage_url = regenerate_url( '', 'recipient_id='.$recipient_User->ID, '', '&' );
+	param( 'action', 'string', 'req_login' );
 	require '_login.disp.php';
 }
 else
@@ -244,6 +245,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.20  2010/07/15 06:37:24  efy-asimo
+ * Fix messaging warning, also fix redirect after login display
+ *
  * Revision 1.19  2010/07/12 09:07:37  efy-asimo
  * rename get_msgform_settings() to get_msgform_possibility
  *

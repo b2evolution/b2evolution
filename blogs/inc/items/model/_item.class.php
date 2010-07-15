@@ -1705,7 +1705,8 @@ class Item extends ItemLight
 		}
 
 		$this->get_creator_User();
-		$params['form_url'] = $this->creator_User->get_msgform_url( url_add_param( $params['form_url'], 'post_id='.$this->ID ) );
+		$redirect_to = url_add_param( $params['form_url'], 'post_id='.$this->ID.'&recipient_id='.$this->creator_User->ID, '&' );
+		$params['form_url'] = $this->creator_User->get_msgform_url( url_add_param( $params['form_url'], 'post_id='.$this->ID ), $redirect_to );
 
 		if( empty( $params['form_url'] ) )
 		{
@@ -4511,6 +4512,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.208  2010/07/15 06:37:24  efy-asimo
+ * Fix messaging warning, also fix redirect after login display
+ *
  * Revision 1.207  2010/07/08 06:53:01  efy-asimo
  * item dbupdate() function slug modifications doc
  *
