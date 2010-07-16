@@ -1150,6 +1150,8 @@ class File extends DataObject
 		global $DB;
 		$DB->begin();
 		
+		$oldname = $this->get_name();
+
 		if( $this->is_dir() )
 		{ // modify folder content file paths in db 
 			$rel_dir = dirname( $this->_rdfp_rel_path ).'/';
@@ -1171,7 +1173,6 @@ class File extends DataObject
 		
 		if( ! @rename( $this->_adfp_full_path, $this->_dir.$newname ) )
 		{ // Rename will fail if $newname already exists (at least on windows)
-// fp>asimo why is there no DB commit or rollback here???
 			$DB->rollback();
 			return false;
 		}
@@ -1205,7 +1206,14 @@ class File extends DataObject
 			if ( ! $this->dbupdate() )
 			{
 // fp>asimo: the file has already been renamed on disk. I'm not sure what DB changes took place at this point. Can you confirm it's better to roll back everything rather than committing what has already been done?
-				$DB->rollback();
+// asimo>fp: With this modification it should be really safe, but still it is improbable!
+				// update failed, try to rollback the rename on disk
+				if( ! @rename( $this->_adfp_full_path, $this->_dir.$oldname ) )
+				{ // rename failed
+					$DB->rollback();
+					return false;
+				}
+				// Maybe needs a specific error message here, the db and the disk is out of sync
 				return false;
 			}
 		}
@@ -2114,6 +2122,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.88  2010/07/16 08:39:25  efy-asimo
+ * file rename_to and "replace existing file" - fix
+ *
  * Revision 1.87  2010/03/28 17:08:08  fplanque
  * minor
  *

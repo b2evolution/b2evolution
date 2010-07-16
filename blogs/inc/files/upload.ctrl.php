@@ -312,7 +312,7 @@ if( ! empty($renamedFiles) )
 	{
 		$replace_old = param( 'Renamed_'.$rKey, 'string', null );
 		if( $replace_old == "Yes" )
-		{
+		{ // replace the old file with the new one
 			$FileCache = & get_FileCache();
 			$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$renamedFiles[$rKey]['newName'], true );
 			$oldFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$renamedFiles[$rKey]['oldName'], true );
@@ -323,6 +323,13 @@ if( ! empty($renamedFiles) )
 				if( ! @rename( $newFile->get_full_path(), $oldFile->get_full_path() ) )// rename_to($oldFile->get_name());
 				{
 					$Messages->add( T_('Couldn\'t replace the old version'), 'error' );
+				}
+				else
+				{ // We have to delete the newly created file from the database. We delete the new object, so the old file attributes will stay in place. 
+					// The new file is a garbage in the database, because no file exists on the hard drive with this title, it was renamed.
+					// Note: Maybe would be a better solution, to do not insert in the database, but right now it's easier this way.
+					// The file was inserted the database right now, so deleting the file must process without errors (but it has 0.5% risk)  
+					$newFile->dbdelete();
 				}
 				$Messages->add( T_('The old version has been replaced!'), 'success' );
 			}
@@ -647,6 +654,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.38  2010/07/16 08:39:26  efy-asimo
+ * file rename_to and "replace existing file" - fix
+ *
  * Revision 1.37  2010/04/19 17:19:02  blueyed
  * Upload controller:
  *  - rawurldecode the filename given in the URL. Especially for %20 etc. Fixes 'Invalid file name.'.
