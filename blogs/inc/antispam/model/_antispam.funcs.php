@@ -445,7 +445,7 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 		echo '<td>';
 		disp_url( $Comment->get_author_url(), 50 );
 		echo '</td>';
-		echo '<td class="center">'.$Comment->get_author_ip().'</td>';
+		echo '<td class="center">'.$Comment->get( 'author_IP' ).'</td>';
 		echo '<td>'.strmaxlen(strip_tags( $Comment->get_content() ), 71).'</td>';
 		// no permission check, because affected_comments contains current user editable comments
 		echo '<td class="shrinkwrap">'.action_icon( T_('Edit...'), 'edit', '?ctrl=comments&amp;action=edit&amp;comment_ID='.$Comment->ID ).'</td>';
@@ -458,6 +458,9 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 
 /*
  * $Log$
+ * Revision 1.15  2010/07/19 06:13:35  efy-asimo
+ * use Comment->get( 'author_IP') instead of get_author_ip() function
+ *
  * Revision 1.14  2010/07/13 08:51:17  efy-asimo
  * doc - reply to todo fp>asimo
  *

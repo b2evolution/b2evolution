@@ -160,7 +160,7 @@ function get_author_ip( $Comment )
 	global $current_User, $Blog;
 	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) )
 	{
-		return $Comment->get_author_ip();
+		return $Comment->get( 'author_IP' );
 	}
 	else
 	{
