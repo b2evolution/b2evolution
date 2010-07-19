@@ -61,7 +61,11 @@ $ProfileForm->begin_form( 'bComment' );
 $ProfileForm->begin_fieldset( T_('Email communications') );
 
 	$ProfileForm->text_input( 'newuser_email', $current_User->get( 'email' ), 40, T_('Email'), '', array( 'maxlength' => 100, 'class' => 'bComment' ) );
-	$ProfileForm->checkbox( 'newuser_allow_msgform', $current_User->get('allow_msgform'), T_('Message form'), T_('Check this to allow receiving emails through a message form.') );
+	$Group = & $current_User->get_Group();
+	$messaging_options = array(
+		array( 'allow_pm', 1, '', $current_User->accepts_pm(), /*true = disabled*/! $Group->check_messaging_perm(), T_( 'Allow others to send me private messages' ) ),
+		array( 'allow_email', 2, '',  $current_User->accepts_email(), /*true = disabled*/false, T_( 'Allow others to send me emails through a message form (email address will never be displayed)' ) ) );
+	$ProfileForm->checklist( $messaging_options, 'newuser_allow_msgform', T_('Message form') );
 	$ProfileForm->checkbox( 'newuser_notify', $current_User->get( 'notify' ), T_('Notifications'), T_('Check this to receive a notification whenever someone else comments on one of <strong>your</strong> posts.') );
 
 $ProfileForm->end_fieldset();
@@ -122,6 +126,10 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.15  2010/07/19 09:35:03  efy-asimo
+ * Fix messaging permission setup
+ * Update comments number per page
+ *
  * Revision 1.14  2010/02/23 05:07:18  sam2kb
  * New plugin hooks: DisplayProfileFormFieldset and ProfileFormSent
  *

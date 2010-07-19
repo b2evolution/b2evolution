@@ -290,7 +290,7 @@ switch( $action )
 		// Filter list:
 		$CommentList->set_default_filters( array(
 				'statuses' => array( 'published', 'draft', 'deprecated' ),
-				'comments' => 5,
+				'comments' => $UserSettings->get( 'results_per_page', $current_User->ID ),
 			) );
 
 		$CommentList->load_from_Request();
@@ -378,6 +378,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.31  2010/07/19 09:35:02  efy-asimo
+ * Fix messaging permission setup
+ * Update comments number per page
+ *
  * Revision 1.30  2010/06/24 08:54:05  efy-asimo
  * PHP 4 compatibility
  *

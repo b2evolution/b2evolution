@@ -60,7 +60,8 @@ param( 'newuser_msn', 'string', '' );
 param( 'newuser_yim', 'string', '' );
 param( 'newuser_url', 'string', '' );
 param( 'newuser_email', 'string', '' );
-param( 'newuser_allow_msgform', 'integer', 0 ); // checkbox
+param( 'allow_pm', 'integer', 0 );           // checkbox
+param( 'allow_email', 'integer', 0 );        // checkbox
 param( 'newuser_notify', 'integer', 0 );        // checkbox
 param( 'newuser_showonline', 'integer', 0 );    // checkbox
 param( 'pass1', 'string', '' );
@@ -100,7 +101,8 @@ $Plugins->trigger_event( 'ProfileFormSent', array(
 		'newuser_yim' => & $newuser_yim,
 		'newuser_url' => & $newuser_url,
 		'newuser_email' => & $newuser_email,
-		'newuser_allow_msgform' => & $newuser_allow_msgform,
+		'allow_pm' => & $allow_pm,
+		'allow_email' => & $allow_email,
 		'newuser_notify' => & $newuser_notify,
 		'newuser_showonline' => & $newuser_showonline,
 		'pass1' => & $pass1,
@@ -153,6 +155,20 @@ $current_User->set( 'msn', $newuser_msn );
 $current_User->set( 'yim', $newuser_yim );
 $current_User->set( 'idmode', $newuser_idmode );
 $current_User->set( 'locale', $newuser_locale );
+// set allow_msgform: 
+// 0 - none, 
+// 1 - only private message, 
+// 2 - only email, 
+// 3 - private message and email
+$newuser_allow_msgform = 0;
+if( $allow_pm )
+{ // PM is enabled
+	$newuser_allow_msgform = 1;
+}
+if( $allow_email )
+{ // email is enabled
+	$newuser_allow_msgform = $newuser_allow_msgform + 2;
+}
 $current_User->set( 'allow_msgform', $newuser_allow_msgform );
 $current_User->set( 'notify', $newuser_notify );
 $current_User->set( 'showonline', $newuser_showonline );
@@ -174,6 +190,10 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.64  2010/07/19 09:35:02  efy-asimo
+ * Fix messaging permission setup
+ * Update comments number per page
+ *
  * Revision 1.63  2010/02/23 05:06:55  sam2kb
  * New plugin hooks: DisplayProfileFormFieldset and ProfileFormSent
  *
