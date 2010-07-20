@@ -73,23 +73,24 @@ if( ! empty($recipient_id) )
 
 	if( $recipient_User )
 	{
+		// get_msgform_possibility returns NULL (false), only if there is no messaging option between current_User and recipient user
 		$allow_msgform = $recipient_User->get_msgform_possibility();
 		if( ! $allow_msgform )
 		{ // should be prevented by UI
 			if( is_logged_in() && $recipient_User->accepts_pm() )
-			{
+			{ // current User is loggeg in, and recipient User accepts private messages. 
 		    	global $current_User;
 		    	if( $current_User->accepts_pm() )
-			    {
+			    { // if recipient user accepts private messages and current user accpets as well, then allow_msgform can be false, only if this two users are the same
 			    	echo '<p class="error">'.T_('You cannot send a private message to yourself.').'</p>';
 			    }
 			    else
 			    {
-			    	echo '<p class="error">'.T_('This user only accepts private messages but you are not allowed to send any private messages.').'</p>';
+			    	echo '<p class="error">'.T_('This user can only be contacted through private messages but you are not allowed to send any private messages.').'</p>';
 			    }
 			}
 			else
-			{
+			{ // recipient User doesn't accepts private messages, and doesn't accept email
 				echo '<p class="error">'.T_('This user does not wish to be contacted directly.').'</p>'; 
 			}
 			return;
@@ -245,6 +246,10 @@ else
 
 /*
  * $Log$
+ * Revision 1.21  2010/07/20 06:49:28  efy-asimo
+ * admin user can move comments to different post
+ * add comments to msgform
+ *
  * Revision 1.20  2010/07/15 06:37:24  efy-asimo
  * Fix messaging warning, also fix redirect after login display
  *

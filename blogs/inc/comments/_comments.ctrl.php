@@ -138,9 +138,11 @@ switch( $action )
 					$comment_Item_Blog = & $comment_Item->get_Blog();
 					$comment_Item_Blog_User = & $comment_Item_Blog->get_owner_User();
 
-					if( $current_User->ID == $dest_Item_Blog_User->ID &&
-						$current_User->ID == $comment_Item_Blog_User->ID )
-					{ // current user has permission
+					if( ($current_User->ID == $dest_Item_Blog_User->ID &&
+						$current_User->ID == $comment_Item_Blog_User->ID ) ||
+						( $current_User->check_perm( 'blog_admin', 'edit', false, $dest_Item_Blog->ID ) &&
+						$current_User->check_perm( 'blog_admin', 'edit', false, $comment_Item_Blog->ID ) ) )
+					{ // current user is the owner of both the source and the destination blogs or current user is admin with full access permission
 						$edited_Comment->set_Item( $dest_Item );
 					}
 					else
@@ -378,6 +380,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.32  2010/07/20 06:49:28  efy-asimo
+ * admin user can move comments to different post
+ * add comments to msgform
+ *
  * Revision 1.31  2010/07/19 09:35:02  efy-asimo
  * Fix messaging permission setup
  * Update comments number per page

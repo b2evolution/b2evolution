@@ -71,8 +71,8 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	echo '</td>';
 
 	$Blog_owner_User = & $Blog->get_owner_User();
-	if( $Blog_owner_User->ID == $current_User->ID )
-	{ // User has prmission to change comment's post
+	if( ( $Blog_owner_User->ID == $current_User->ID ) || $current_User->check_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+	{ // User has prmission to change comment's post, because user is the owner of the current blog, or user has admin full access permission for current blog
 		$Form->switch_layout( 'none' );
 
 		// Move to another post
@@ -297,6 +297,10 @@ echo_comment_publishbt_js();
 
 /*
  * $Log$
+ * Revision 1.20  2010/07/20 06:49:28  efy-asimo
+ * admin user can move comments to different post
+ * add comments to msgform
+ *
  * Revision 1.19  2010/06/24 08:54:05  efy-asimo
  * PHP 4 compatibility
  *
