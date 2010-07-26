@@ -2441,7 +2441,7 @@ function upgrade_b2evo_tables()
 		echo "OK.<br />\n";
 
 		// fp> The following is more tricky to do with CHARACTER SET. During upgrade, we don't know what the admin actually wants.
-		task_begin( 'Making sure all tables use desired storage ENGINE...' );
+		task_begin( 'Making sure all tables use desired storage ENGINE as specified in the b2evo schema...' );
 		foreach( $schema_queries as $table_name=>$table_def )
 		{
 			if( $DB->query( 'SHOW TABLES LIKE \''.$table_name.'\'' )
@@ -2573,9 +2573,8 @@ function upgrade_b2evo_tables()
 		task_end();
 
 		// Rename T_usersettings table to T_users__usersettings
-
 		task_begin( 'Rename T_usersettings table to T_users__usersettings... ' );
-		$DB->query( 'RENAME TABLE '.$tableprefix.'usersettings TO T_users__usersettings' );
+		$DB->query( 'ALTER TABLE '.$tableprefix.'usersettings RENAME TO T_users__usersettings' );
 		task_end();
 
 		set_upgrade_checkpoint( '9970' );
@@ -2643,118 +2642,148 @@ function upgrade_b2evo_tables()
 
 		task_end();
 
-		// set_upgrade_checkpoint( '9990' );
+		set_upgrade_checkpoint( '9990' );
 	}
 
-
-	// Integrate comment_secret
-	task_begin( 'Extending Comment table... ' );
-	db_add_col( 'T_comments', 'comment_secret', 'varchar(32) NULL default NULL' );
-	task_end();
-
-	// Create T_slug table and, Insert all slugs from T_items
-	task_begin( 'Create Slugs table... ' );
-	$DB->query( 'CREATE TABLE IF NOT EXISTS T_slug (
-					slug_ID int(10) unsigned NOT NULL auto_increment,
-					slug_title varchar(255) NOT NULL COLLATE ascii_bin,
-					slug_type char(6) NOT NULL DEFAULT "item",
-					slug_itm_ID int(11) unsigned,
-					PRIMARY KEY slug_ID (slug_ID),
-					UNIQUE	slug_title (slug_title)
-				) ENGINE = innodb' );
-	task_end();
-
-	task_begin( 'Making sure all posts have a slug...' );
-	// Get posts with empty urltitle:
-	$sql = 'SELECT post_ID, post_title
-			      FROM T_items__item
-			     WHERE post_urltitle IS NULL OR post_urltitle = ""';
-	$rows = $DB->get_results( $sql, OBJECT, 'Get posts with empty urltitle' );
-	// Create URL titles when non existent:
-	foreach( $rows as $row )
-	{
-		// TODO: dh> pass locale (useful for transliteration).
-		$DB->query( 'UPDATE T_items__item
-			              SET post_urltitle = "'.urltitle_validate( '', $row->post_title, 0 ).'"
-	                WHERE post_ID = '.$row->post_ID, 'Set posts urltitle' );
-	}
-	task_end();
-
-	task_begin( 'Populating Slugs table... ' );
-	$DB->query( 'REPLACE INTO T_slug( slug_title, slug_type, slug_itm_ID)
-	              SELECT post_urltitle, "item", post_ID
-						      FROM T_items__item' );
-	task_end();
-
-	task_begin( 'Add canonical and tiny slug IDs to post table...' );
-	// modify post_urltitle column -> Not allow NULL value
-	db_add_col( 'T_items__item', 'post_urltitle', 'VARCHAR(210) NOT NULL' );
-	db_add_col( 'T_items__item', 'post_canonical_slug_ID', 'int(10) unsigned NULL default NULL after post_urltitle' );
-	db_add_col( 'T_items__item', 'post_tiny_slug_ID', 'int(10) unsigned NULL default NULL after post_canonical_slug_ID' );
-	task_end();
-
-	task_begin( 'Upgrading posts...' );
-	$DB->query( 'UPDATE T_items__item, T_slug
-		              SET post_canonical_slug_ID = slug_ID
-		            WHERE CONVERT( post_urltitle USING ASCII ) COLLATE ascii_bin = slug_title' );
-	task_end();
-
-	task_begin( 'Adding "help" slug...' );
-	if( db_key_exists( 'T_slug', 'slug_title', '"help"' ) )
-	{
-		echo '<strong>Warning: "help" slug already exists!</strong><br /> ';
-	}
-	else
-	{
-		$DB->query( 'INSERT INTO T_slug( slug_title, slug_type )
-		             VALUES( "help", "help" )', 'Add "help" slug' );
+	if( $old_db_version < 10000 )
+	{	// 4.0 part 4
+		// Integrate comment_secret
+		task_begin( 'Extending Comment table... ' );
+		db_add_col( 'T_comments', 'comment_secret', 'varchar(32) NULL default NULL' );
 		task_end();
+
+		// Create T_slug table and, Insert all slugs from T_items
+		task_begin( 'Create Slugs table... ' );
+		$DB->query( 'CREATE TABLE IF NOT EXISTS T_slug (
+						slug_ID int(10) unsigned NOT NULL auto_increment,
+						slug_title varchar(255) NOT NULL COLLATE ascii_bin,
+						slug_type char(6) NOT NULL DEFAULT "item",
+						slug_itm_ID int(11) unsigned,
+						PRIMARY KEY slug_ID (slug_ID),
+						UNIQUE	slug_title (slug_title)
+					) ENGINE = innodb' );
+		task_end();
+
+		task_begin( 'Making sure all posts have a slug...' );
+		// Get posts with empty urltitle:
+		$sql = 'SELECT post_ID, post_title
+				      FROM T_items__item
+				     WHERE post_urltitle IS NULL OR post_urltitle = ""';
+		$rows = $DB->get_results( $sql, OBJECT, 'Get posts with empty urltitle' );
+		// Create URL titles when non existent:
+		foreach( $rows as $row )
+		{
+			// TODO: dh> pass locale (useful for transliteration).
+			$DB->query( 'UPDATE T_items__item
+				              SET post_urltitle = "'.urltitle_validate( '', $row->post_title, 0 ).'"
+		                WHERE post_ID = '.$row->post_ID, 'Set posts urltitle' );
+		}
+		task_end();
+
+		task_begin( 'Populating Slugs table... ' );
+		$DB->query( 'REPLACE INTO T_slug( slug_title, slug_type, slug_itm_ID)
+		              SELECT post_urltitle, "item", post_ID
+							      FROM T_items__item' );
+		task_end();
+
+		task_begin( 'Add canonical and tiny slug IDs to post table...' );
+		// modify post_urltitle column -> Not allow NULL value
+		db_add_col( 'T_items__item', 'post_urltitle', 'VARCHAR(210) NOT NULL' );
+		db_add_col( 'T_items__item', 'post_canonical_slug_ID', 'int(10) unsigned NULL default NULL after post_urltitle' );
+		db_add_col( 'T_items__item', 'post_tiny_slug_ID', 'int(10) unsigned NULL default NULL after post_canonical_slug_ID' );
+		task_end();
+
+		task_begin( 'Upgrading posts...' );
+		$DB->query( 'UPDATE T_items__item, T_slug
+			              SET post_canonical_slug_ID = slug_ID
+			            WHERE CONVERT( post_urltitle USING ASCII ) COLLATE ascii_bin = slug_title' );
+		task_end();
+
+		task_begin( 'Adding "help" slug...' );
+		if( db_key_exists( 'T_slug', 'slug_title', '"help"' ) )
+		{
+			echo '<strong>Warning: "help" slug already exists!</strong><br /> ';
+		}
+		else
+		{
+			$DB->query( 'INSERT INTO T_slug( slug_title, slug_type )
+			             VALUES( "help", "help" )', 'Add "help" slug' );
+			task_end();
+		}
+
+		// fp> Next time we should use pluggable permissions instead.
+		task_begin( 'Updgrading groups: Giving Administrators Group edit perms on slugs...' );
+		db_add_col( 'T_groups', 'grp_perm_slugs', "enum('none','view','edit') NOT NULL default 'none'" );
+		$DB->query( 'UPDATE T_groups
+		             SET grp_perm_slugs = "edit"
+		             WHERE grp_ID = 1' );
+		task_end();
+
+		task_begin( 'Upgrading settings table... ');
+		$DB->query( 'UPDATE T_settings
+		             SET set_value = 1
+		             WHERE set_name = "fm_enable_roots_user"
+		             AND set_value = 0' );
+		task_end();
+
+		// New perms for comment moderation depending on status:
+		task_begin( 'Upgrading Blog-User permissions...' );
+		db_add_col( 'T_coll_user_perms', 'bloguser_perm_draft_cmts', 'tinyint NOT NULL default 0 AFTER bloguser_perm_comments' );
+		db_add_col( 'T_coll_user_perms', 'bloguser_perm_publ_cmts', 'tinyint NOT NULL default 0 AFTER bloguser_perm_comments' );
+		db_add_col( 'T_coll_user_perms', 'bloguser_perm_depr_cmts', 'tinyint NOT NULL default 0 AFTER bloguser_perm_comments' );
+
+		if( db_col_exists( 'T_coll_user_perms', 'bloguser_perm_comments' ) )
+		{ // if user had perm_comments he now gets all 3 new perms also:
+			$DB->query( 'UPDATE T_coll_user_perms
+						SET bloguser_perm_draft_cmts = bloguser_perm_comments,
+							bloguser_perm_publ_cmts = bloguser_perm_comments,
+							bloguser_perm_depr_cmts = bloguser_perm_comments');
+			db_drop_col( 'T_coll_user_perms', 'bloguser_perm_comments' );
+		}
+		task_end();
+
+		task_begin( 'Upgrading Blog-Group permissions...' );
+		db_add_col( 'T_coll_group_perms', 'bloggroup_perm_draft_cmts', 'tinyint NOT NULL default 0 AFTER bloggroup_perm_comments' );
+		db_add_col( 'T_coll_group_perms', 'bloggroup_perm_publ_cmts', 'tinyint NOT NULL default 0 AFTER bloggroup_perm_comments' );
+		db_add_col( 'T_coll_group_perms', 'bloggroup_perm_depr_cmts', 'tinyint NOT NULL default 0 AFTER bloggroup_perm_comments' );
+
+		if( db_col_exists( 'T_coll_group_perms', 'bloggroup_perm_comments' ) )
+		{ // if group had perm_comments he now gets all 3 new perms also:
+			$DB->query( 'UPDATE T_coll_group_perms
+						SET bloggroup_perm_draft_cmts = bloggroup_perm_comments,
+							bloggroup_perm_publ_cmts = bloggroup_perm_comments,
+							bloggroup_perm_depr_cmts = bloggroup_perm_comments');
+			db_drop_col( 'T_coll_group_perms', 'bloggroup_perm_comments' );
+		}
+		task_end();
+
+		task_begin( 'Upgrading messaging permissions...' );
+		$DB->query( 'ALTER TABLE T_users ALTER COLUMN user_allow_msgform SET DEFAULT "2"' );
+		$DB->query( 'UPDATE T_users
+					SET user_allow_msgform = 3
+					WHERE user_allow_msgform = 1');
+		task_end();
+
+		task_begin( 'Upgrading currency table...' );
+		$DB->query( 'ALTER TABLE T_currency ADD COLUMN curr_enabled tinyint(1) NOT NULL DEFAULT 1 AFTER curr_name' );
+		task_end();
+
+		task_begin( 'Upgrading default blog access type for new blogs...' );
+		$DB->query( 'ALTER TABLE T_blogs ALTER COLUMN blog_access_type SET DEFAULT "extrapath"' );
+		task_end();
+
+		task_begin( 'Upgrading tags table...' );
+		$DB->query( 'ALTER TABLE T_items__tag CHANGE COLUMN tag_name tag_name varbinary(50) not null' );
+		task_end();
+
+		// fp> I don't understand why we need to carry this out "again" but I observed the installer barking on
+		// this setting missing when upgrading from older 2.x versions. I figured it would be no big deal to do it twice...
+		task_begin( 'Makin sure usersettings table is InnoDB...' );
+		$DB->query( 'ALTER TABLE T_users__usersettings ENGINE=innodb' );
+		task_end();
+
+		// set_upgrade_checkpoint( '10000' );
 	}
-
-	// fp> Next time we should use pluggable permissions instead.
-	task_begin( 'Updgrading groups: Giving Administrators Group edit perms on slugs...' );
-	db_add_col( 'T_groups', 'grp_perm_slugs', "enum('none','view','edit') NOT NULL default 'none'" );
-	$DB->query( 'UPDATE T_groups
-	             SET grp_perm_slugs = "edit"
-	             WHERE grp_ID = 1' );
-	task_end();
-
-	task_begin( 'Upgrading settings table... ');
-	$DB->query( 'UPDATE T_settings
-	             SET set_value = 1
-	             WHERE set_name = "fm_enable_roots_user"
-	             AND set_value = 0' );
-	task_end();
-
-	task_begin( 'Upgrading Blog-User permissions...' );
-	db_add_col( 'T_coll_user_perms', 'bloguser_perm_draft_cmts', 'tinyint NOT NULL default 0 AFTER bloguser_perm_comments' );
-	db_add_col( 'T_coll_user_perms', 'bloguser_perm_publ_cmts', 'tinyint NOT NULL default 0 AFTER bloguser_perm_comments' );
-	db_add_col( 'T_coll_user_perms', 'bloguser_perm_depr_cmts', 'tinyint NOT NULL default 0 AFTER bloguser_perm_comments' );
-
-	if( db_col_exists( 'T_coll_user_perms', 'bloguser_perm_comments' ) )
-	{ // udate all new perm, with perm_comments value
-		$DB->query( 'UPDATE T_coll_user_perms
-					SET bloguser_perm_draft_cmts = bloguser_perm_comments,
-						bloguser_perm_publ_cmts = bloguser_perm_comments,
-						bloguser_perm_depr_cmts = bloguser_perm_comments');
-		db_drop_col( 'T_coll_user_perms', 'bloguser_perm_comments' );
-	}
-	task_end();
-
-	task_begin( 'Upgrading Blog-Group permissions...' );
-	db_add_col( 'T_coll_group_perms', 'bloggroup_perm_draft_cmts', 'tinyint NOT NULL default 0 AFTER bloggroup_perm_comments' );
-	db_add_col( 'T_coll_group_perms', 'bloggroup_perm_publ_cmts', 'tinyint NOT NULL default 0 AFTER bloggroup_perm_comments' );
-	db_add_col( 'T_coll_group_perms', 'bloggroup_perm_depr_cmts', 'tinyint NOT NULL default 0 AFTER bloggroup_perm_comments' );
-
-	if( db_col_exists( 'T_coll_group_perms', 'bloggroup_perm_comments' ) )
-	{ // udate all new group perm, with perm_comments value
-		$DB->query( 'UPDATE T_coll_group_perms
-					SET bloggroup_perm_draft_cmts = bloggroup_perm_comments,
-						bloggroup_perm_publ_cmts = bloggroup_perm_comments,
-						bloggroup_perm_depr_cmts = bloggroup_perm_comments');
-		db_drop_col( 'T_coll_group_perms', 'bloggroup_perm_comments' );
-	}
-	task_end();
 
 	/*
 	 * ADD UPGRADES HERE.
@@ -2930,6 +2959,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.369  2010/07/26 06:52:27  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.368  2010/06/01 11:33:20  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)

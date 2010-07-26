@@ -183,4 +183,11 @@ $Form->end_form();
 
 echo $template['block_end'];
 
+
+/*
+ * $Log$
+ * Revision 1.7  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
+ */
 ?>

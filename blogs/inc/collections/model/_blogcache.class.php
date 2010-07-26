@@ -305,7 +305,7 @@ class BlogCache extends DataObjectCache
 				break;
 
 			case 'blog_comments':
-				// user needs to have permission at least one kind of comments (published, draft, deprecated)
+				// user needs to have permission for at least one kind of comments (published, draft, deprecated)
 				$sql .= "OR bloguser_perm_draft_cmts <> 0
 						OR bloguser_perm_publ_cmts <> 0
 						OR bloguser_perm_depr_cmts <> 0
@@ -366,6 +366,9 @@ class BlogCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.14  2010/07/26 06:52:15  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.13  2010/06/01 11:33:19  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)

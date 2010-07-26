@@ -172,6 +172,7 @@ function & get_featured_Item()
  *
  * Using title as a source if url title is empty.
  * We allow up to 200 chars (which is ridiculously long) for WP import compatibility.
+ * New slugs will be cropped to 5 words so the URLs are not too long.
  *
  * @param string url title to validate
  * @param string real title to use as a source if $urltitle is empty (encoded in $evo_charset)
@@ -214,8 +215,9 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 		$urltitle = 'title';
 	}
 
-	// leave only first 5 words
-	// TODO: dh> why is that? we have a limit of 200 chars that should get used instead. This unnecessarily crops the urlname.
+	// Leave only first 5 words in order to get a shorter URL 
+	// (which is generally accepted as a better practice)
+	// User can manually enter a very long URL if he wants
 	$slug_changed = param( 'slug_changed' );
 	if( $slug_changed == 0 )
 	{ // this should only happen when the slug is auto generated
@@ -283,7 +285,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 				$existing_number = (int)$matches[1];
 
 				if( ! isset($use_existing_number) && $row[$dbIDname] == $post_ID )
-				{ // if there is a numbered entry for the current ID, use this.
+				{ // if there is a numbered entry for the current ID, use this:
 					$use_existing_number = $existing_number;
 				}
 
@@ -306,7 +308,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	if( !empty($orig_title) && $urltitle != $orig_title )
 	{
-		$Messages->add( sprintf(T_('Warning: the URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'note' );
+		$Messages->add( sprintf(T_('Warning: the URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'error' );
 	}
 
 	return $urltitle;
@@ -653,7 +655,8 @@ function cat_select( $Form, $form_fields = true )
 
 	echo $r;
 
-	if( isset($blog) && get_allow_cross_posting() ) {
+	if( isset($blog) && get_allow_cross_posting() ) 
+	{
 		echo '<script type="text/javascript">jQuery.getScript("'.$rsc_url.'js/jquery/jquery.scrollto.js", function () {
 			jQuery("#itemform_categories").scrollTo( "#catselect_blog'.$blog.'" );
 		});</script>';
@@ -924,7 +927,7 @@ function attach_browse_tabs()
 	}
 
 	if( $current_User->check_perm( 'blog_comments', 'edit', false, $Blog->ID ) )
-	{ // User has permission to edit publ, draft or deprecated comments (at least one kind)
+	{ // User has permission to edit published, draft or deprecated comments (at least one kind)
 		$AdminUI->add_menu_entries(
 				'items',
 				array(
@@ -1647,6 +1650,9 @@ function echo_set_slug_changed()
 }
 /*
  * $Log$
+ * Revision 1.115  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.114  2010/06/30 07:34:42  efy-asimo
  * Cross posting fix - ingore extra cats from different blogs, when cross posting is disabled
  *

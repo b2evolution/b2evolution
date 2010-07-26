@@ -118,10 +118,9 @@ $admin_email = 'postmaster@localhost';
 $config_is_done = 0;
 
 
-# IMPORTANT: you will find more parameters in the other files of the /conf folder.
-# IT IS RECOMMENDED YOU DO NOT TOUCH THOSE SETTINGS
-# UNTIL YOU ARE FAMILIAR WITH THE DEFAULT INSTALLATION.
-#
-# It is however strongly recommended you browse through these files as soon as you've
-# got your basic installation working. They'll let you customize a lot of things!
+/*
+ * IMPORTANT: you will find more parameters in the other files of the /conf folder.
+ * IT IS RECOMMENDED YOU DO NOT TOUCH THOSE SETTINGS
+ * UNTIL YOU ARE FAMILIAR WITH THE DEFAULT INSTALLATION.
+ */
 ?>

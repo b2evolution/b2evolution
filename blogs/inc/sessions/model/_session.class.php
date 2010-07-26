@@ -576,22 +576,20 @@ class Session
 		// ERROR MESSAGE, with form/button to bypass and enough warning hopefully.
 		// TODO: dh> please review carefully!
 		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
-		echo '<h3 style="color:#f00;">'.T_('Incorrect crumb received!').'</h3>';
-		echo '<p>'.T_('We have refused the request for security reasons.').'</p>';
-		echo '<p>'.T_('Do you have waited more than 2 hours to submit your request?').'</p>';
-		echo '<p>'.T_('Please go back via your browser and refresh the form before submitting.').'</p>';
-		echo '<p>'.T_('If you are <strong>sure that the request is legit</strong> and you are not being tricked, you can resend the form with a refreshed the crumb.').'</p>';
+		echo '<h3 style="color:#f00;">'.T_('Incorrect crumb received!').' ['.$crumb_name.']</h3>';
+		echo '<p>'.T_('Your request was stopped for security reasons.').'</p>';
+		echo '<p>'.T_('Have you waited more than 2 hours before submitting your request?').'</p>';
+		echo '<p>'.T_('Please go back to the previous page and refresh it before submitting the form again.').'</p>';
 		echo '</div>';
 
 		echo '<div>';
-		echo '<p class="warning">'.T_('Do you want to resend this request with a refreshed crumb?').'</p>';
+		echo '<p class="warning">'.T_('Alternatively, you can try to resubmit your request with a refreshed crumb:').'</p>';
 		$Form = new Form( '', 'evo_session_crumb_resend', $_SERVER['REQUEST_METHOD'] );
 		$Form->begin_form( 'inline' );
 		$Form->add_crumb( $crumb_name );
 		$Form->hiddens_by_key( remove_magic_quotes($_REQUEST) );
-		$Form->button( array( 'submit', '', T_('I am sure!'), 'ActionButton' ) );
+		$Form->button( array( 'submit', '', T_('Resubmit now!'), 'ActionButton' ) );
 		$Form->end_form();
-		// echo '<a href="javascript:history.go(-1)">'.T_('No, I am not sure.').' '.T_('I want to go back / abort.').'</a>';
 		echo '</div>';
 
 		die();
@@ -663,6 +661,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.35  2010/07/26 06:52:27  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.34  2010/05/15 22:24:23  blueyed
  * Session::assert_crumb: better error message, and most importantly, a way to bypass.
  *

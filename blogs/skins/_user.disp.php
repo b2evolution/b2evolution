@@ -70,7 +70,7 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 	    }
 	    else
 	    {
-	      $ProfileForm->info( T_('Contact'), T_('This user only accepts private messages but you are not allowed to send any private messages.') );
+	      $ProfileForm->info( T_('Contact'), T_('This user can only be contacted through private messages but you are not allowed to send any private messages.') );
 	    }
 	  }
 	  else
@@ -116,6 +116,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.18  2010/07/26 06:52:27  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.17  2010/07/02 08:14:19  efy-asimo
  * Messaging redirect modification and "new user get a new blog" fix
  *

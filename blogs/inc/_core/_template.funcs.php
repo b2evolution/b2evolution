@@ -303,7 +303,7 @@ function request_title( $params = array() )
 			'postidx_text'        => T_('Post Index'),
 			'search_text'         => T_('Search'),
 			'sitemap_text'        => T_('Site Map'),
-			'msgform_text'        => T_('Send an Email Message'),
+			'msgform_text'        => T_('Send a Message'),
 			'profile_text'        => T_('User Profile'),
 			'user_text'           => T_('User'),
 			'subs_text'           => T_('Subscriptions'),
@@ -1113,6 +1113,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.75  2010/07/26 06:52:15  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.74  2010/04/13 22:23:11  blueyed
  * Check if $Session is existing before calling save on it.
  *

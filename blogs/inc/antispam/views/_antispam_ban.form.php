@@ -88,7 +88,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 				<tr class="<?php echo ($count%2 == 1) ? 'odd' : 'even' ?>">
 					<td class="firstcol"><?php stats_time() ?></td>
 					<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
-					<td><?php stats_hit_remote_addr() ?></td>
+					<td class="center"><?php stats_hit_remote_addr() ?></td>
 					<td><?php echo format_to_output( $row_stats['blog_shortname'], 'htmlbody' ); ?></td>
 					<td><?php disp_url( $row_stats['hit_uri'], 50 ); ?></td>
 				</tr>
@@ -101,7 +101,8 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	}
 
 	// Check for potentially affected comments:
-	$sql = 'SELECT * FROM T_comments
+	$sql = 'SELECT * 
+				FROM T_comments
 			 WHERE comment_author LIKE '.$DB->quote('%'.$keyword.'%').'
 				 OR comment_author_email LIKE '.$DB->quote('%'.$keyword.'%').'
 			 	 OR comment_author_url LIKE '.$DB->quote('%'.$keyword.'%').'
@@ -114,7 +115,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 		printf( '<p>'.T_('No %s match the keyword [%s].').'</p>', '<strong>'.T_('comments').'</strong>', htmlspecialchars($keyword) );
 	}
 	else
-	{ // creat comment arrays
+	{ // create comment arrays
 		$draft_comments = array();
 		$published_comments = array();
 		$deprecated_comments = array();
@@ -164,7 +165,8 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 
 	// Check for potentially affected comments:
 	$quoted_keyword = $DB->quote('%'.$keyword.'%');
-	$sql = 'SELECT T_users.* FROM T_users LEFT JOIN T_users__fields ON user_ID = uf_user_ID
+	$sql = 'SELECT T_users.* 
+				FROM T_users LEFT JOIN T_users__fields ON user_ID = uf_user_ID
 			 WHERE user_url LIKE '.$quoted_keyword.'
 				 OR user_email LIKE '.$quoted_keyword.'
 				 OR user_domain LIKE '.$quoted_keyword.'
@@ -287,6 +289,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.25  2010/07/26 06:52:15  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.24  2010/06/24 08:54:05  efy-asimo
  * PHP 4 compatibility
  *

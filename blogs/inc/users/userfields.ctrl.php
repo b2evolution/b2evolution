@@ -27,7 +27,7 @@
  * @author evofactory-test
  * @author fplanque: Francois Planque.
  *
- * @version userfields.ctrl.php,v 1.5 2009/09/16 18:29:35 fplanque Exp
+ * @version $Id$
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -270,7 +270,7 @@ $AdminUI->disp_payload_end();
 $AdminUI->disp_global_footer();
 
 /*
- * userfields.ctrl.php,v
+ * $ Log: userfields.ctrl.php,v $
  * Revision 1.5  2009/09/16 18:29:35  fplanque
  * doc
  *

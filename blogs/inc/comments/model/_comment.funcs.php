@@ -152,7 +152,7 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
  * @param integer
  * @return Comment
  */
-function Comment_get_by_ID( $comment_ID )
+function & Comment_get_by_ID( $comment_ID )
 {
 	$CommentCache = & get_CommentCache();
 	return $CommentCache->get_by_ID( $comment_ID );
@@ -204,27 +204,31 @@ function comments_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 }
 
 /**
- * Get advanced perm for comments on this blog
+ * Get advanced perm for comment moderation on this blog
  * 
  * @param int blog ID
- * @return array statuses - current user has permission for comments with statuses
+ * @return array statuses - current user has permission to moderate comments with these statuses
  */
 function get_allowed_statuses( $blog )
 {
 	global $current_User;
 	$statuses = array();
+
 	if( $current_User->check_perm( 'blog_draft_comments', 'edit', false, $blog ) )
 	{
 		$statuses[] = 'draft';
 	}
+
 	if( $current_User->check_perm( 'blog_published_comments', 'edit', false, $blog ) )
 	{
 		$statuses[] = 'published';
 	}
+
 	if( $current_User->check_perm( 'blog_deprecated_comments', 'edit', false, $blog ) )
 	{
 		$statuses[] = 'deprecated';
 	}
+
 	return $statuses;
 }
 
@@ -295,6 +299,9 @@ function echo_comment_publishbt_js()
 
 /*
  * $Log$
+ * Revision 1.12  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.11  2010/06/01 11:33:19  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)

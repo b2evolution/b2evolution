@@ -82,4 +82,11 @@ $Form->buttons( array(array('submit', 'actionArray[mass_save]', T_('Save changes
 
 $Form->end_form();
 
+
+/*
+ * $Log$
+ * Revision 1.3  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
+ */
 ?>

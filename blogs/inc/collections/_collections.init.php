@@ -6,7 +6,7 @@
  *
  * @package admin
  *
- * @version $Id$
+ * @version _collections.init.php,v 1.20 2010/05/02 19:50:50 fplanque Exp
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -239,6 +239,7 @@ function & get_CommentCache()
 	return $CommentCache;
 }
 
+
 /**
  * Get the LinkCache
  *
@@ -427,7 +428,7 @@ class collections_Module extends Module
 				'group_func' => 'check_getblog_group_perm',
 				'perm_block' => 'blogging',
 				'perm_type' => 'checkbox',
-				'note' => T_( 'New user automatically get a new blog'),
+				'note' => T_( 'New users automatically get a new blog'),
 				),
 			);
 		return $permissions;
@@ -734,7 +735,7 @@ $collections_Module = new collections_Module();
 
 
 /*
- * $Log$
+ * _collections.init.php,v
  * Revision 1.20  2010/05/02 19:50:50  fplanque
  * no message
  *

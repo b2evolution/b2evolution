@@ -251,4 +251,12 @@ $CommentList->cols[] = array(
 			'td' => '%comment_edit_actions( {Obj} )%' );
 
 $CommentList->display();
+
+
+/*
+ * $Log$
+ * Revision 1.5  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
+ */
 ?>

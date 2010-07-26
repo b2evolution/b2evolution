@@ -70,11 +70,11 @@ $Form->begin_fieldset( T_('Post options') );
 	// -tags  always('required')|optional|never
 
 	$Form->radio( 'post_categories', $edited_Blog->get_setting('post_categories'),
-	array( array( 'one_cat_post', T_('One category per post') ),
-			array( 'multiple_cat_post', T_('Multiple categories per post') ),
-			array( 'main_extra_cat_post', T_('Main cat + extra cats') ),
-			array( 'no_cat_post', T_('Don\'t use categories') ) ),
-			T_('Post Categories'), true );
+		array( array( 'one_cat_post', T_('Allow only one category per post') ),
+			array( 'multiple_cat_post', T_('Allow multiple categories per post') ),
+			array( 'main_extra_cat_post', T_('Allow one main + several extra categories') ),
+			array( 'no_cat_post', T_('Don\'t allow category selections'), T_('(Main cat will be assigned automatically)') ) ),
+			T_('Post category options'), true );
 
 $Form->end_fieldset();
 
@@ -216,6 +216,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.34  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.33  2010/07/13 23:54:50  sam2kb
  * type
  *

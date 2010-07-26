@@ -57,4 +57,12 @@ else
 	$Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 							array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 }
+
+
+/*
+ * $Log$
+ * Revision 1.3  2010/07/26 06:52:27  efy-asimo
+ * MFB v-4-0
+ *
+ */
 ?>

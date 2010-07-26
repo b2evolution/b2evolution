@@ -243,8 +243,8 @@ global $fm_FileRoot;
 			<ul id="uploadfileinputs">
 				<?php
 					if( empty($failedFiles) && empty($renamedMessages) )
-					{ // No failed files, no renamed files display a single empty input block:
-						$displayFiles = array( NULL );
+					{ // No failed files, no renamed files display 5 empty input blocks:
+						$displayFiles = array( NULL, NULL, NULL, NULL, NULL );
 					}
 					elseif ( ! empty($failedFiles) )
 					{ // Display failed files:
@@ -416,6 +416,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.19  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.18  2010/04/19 17:07:14  blueyed
  * upload form: display a single input fieldset only.
  *

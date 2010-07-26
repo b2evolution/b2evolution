@@ -98,10 +98,19 @@ $Debuglog->add( 'vars: $ReqPath: '.$ReqPath, 'request' );
 
 
 // on which page are we ?
+/* old:
 $pagenow = explode( '/', $_SERVER['PHP_SELF'] );
-$pagenow = trim( $pagenow[(sizeof($pagenow) - 1)] );
+$pagenow = trim( $pagenow[(count($pagenow) - 1)] );
 $pagenow = explode( '?', $pagenow );
 $pagenow = $pagenow[0];
+*/
+// find precisely the first occurrence of something.php in PHP_SELF, extract that and ignore any extra path.
+if( ! preg_match( '#/([A-Za-z0-9_\-]+\.php[0-9]?)#', $_SERVER['PHP_SELF'], $matches ))
+{
+	debug_die('Can\'t identify current .php script name in PHP_SELF.');
+}
+$pagenow = $matches[1];
+//pre_dump( '', $_SERVER['PHP_SELF'], $pagenow );
 
 
 /**
@@ -130,7 +139,7 @@ $Debuglog->add( 'Login: default_locale from HTTP_ACCEPT: '.$default_locale, 'loc
 
 load_funcs('_core/_param.funcs.php');
 
-// $locale_from_get: USE CASE: allow overriding the locale via GET param, e.g. for tests.
+// $locale_from_get: USE CASE: allow overriding the locale via GET param &locale=, e.g. for tests.
 if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
 {
 	$locale_from_get = str_replace('_', '-', $locale_from_get);
@@ -220,6 +229,9 @@ $Timer->pause( '_init_hit' );
 
 /*
  * $Log$
+ * Revision 1.6  2010/07/26 06:52:15  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.5  2010/05/13 18:52:04  blueyed
  * doc
  *

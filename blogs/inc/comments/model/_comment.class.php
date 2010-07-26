@@ -346,19 +346,6 @@ class Comment extends DataObject
 	}
 
 
-	function get_author_ip()
-	{
-		if( $this->get_author_User() )
-		{ // Author is a user
-			return $this->author_User->get('ip');
-		}
-		else
-		{
-			return $this->author_IP;
-		}
-	}
-
-
 	/**
 	 * Template function: display the avatar of the comment's author.
 	 *
@@ -620,6 +607,7 @@ class Comment extends DataObject
 
 	/**
 	 * Display author url, delete icon and ban icon if user has proper rights
+	 *
 	 * @param boolean true to use ajax button
 	 * @param boolean true to check user permission to edit this comment and antispam screen
 	 */
@@ -727,7 +715,7 @@ class Comment extends DataObject
 	/**
 	 * Display delete icon for deleting author_url if user has proper rights
 	 * @param boolean true if create ajax button
-	 * @param boolean true if need permission check, because it wasn't check before
+	 * @param boolean true if need permission check, because it wasn't checked before
 	 * @param glue between url params
 	 * @return link on success, false otherwise
 	 */
@@ -770,6 +758,7 @@ class Comment extends DataObject
 
 	/**
 	 * Display ban icon, which goes to the antispam screen with keyword=author_url
+	 *
 	 * @param boolean true if create ajax button
 	 * @param boolean true if need permission check, because it wasn't check before
 	 * @param glue between url params
@@ -1663,7 +1652,8 @@ class Comment extends DataObject
 	}
 
 
-	/** Get the blog advanced permission name for this comment 
+	/** 
+	 * Get the blog advanced permission name for this comment
 	 * 
 	 * @return string status specific blog comment permission name
 	 */
@@ -1673,10 +1663,13 @@ class Comment extends DataObject
 		{
 			case 'published':
 				return 'blog_published_comments';
+
 			case 'draft':
 				return 'blog_draft_comments';
+
 			case 'deprecated':
 				return 'blog_deprecated_comments';
+
 			default:
 				debug_die( 'Invalid comment status!' );
 		}
@@ -1687,6 +1680,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.64  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.63  2010/06/24 08:54:05  efy-asimo
  * PHP 4 compatibility
  *

@@ -47,6 +47,12 @@ $Form->hidden( 'tab', 'advanced' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
 
+$Form->begin_fieldset( T_('Multiple authors') );
+	$Form->checkbox( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ), T_('Use advanced perms'), T_('This will turn on the advanced User and Group permissions tabs for this blog.') );
+	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
+$Form->end_fieldset();
+
+
 $Form->begin_fieldset( T_('After each new post...').get_manual_link('after_each_new_post') );
 	$ping_plugins = preg_split( '~\s*,\s*~', $edited_Blog->get_setting('ping_plugins'), -1, PREG_SPLIT_NO_EMPTY);
 
@@ -182,11 +188,6 @@ $Form->begin_fieldset( T_('Software credits') );
 	$Form->text( 'max_footer_credits', $max_credits, 1, T_('Max footer credits'), $note, 1 );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Multiple authors') );
-	$Form->checkbox( 'advanced_perms', $edited_Blog->get( 'advanced_perms' ), T_('Use advanced perms'), T_('This will turn on the advanced User and Group permissions tabs for this blog.') );
-	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
-$Form->end_fieldset();
-
 
 $Form->end_form( array(
 	array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
@@ -195,6 +196,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.30  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.29  2010/07/06 08:17:39  efy-asimo
  * Move "Multiple authors" block to Blog setings advanced tab. Fix validating urlname when user has no blog_admin permission.
  *

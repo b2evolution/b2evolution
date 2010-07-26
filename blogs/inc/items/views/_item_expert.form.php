@@ -437,8 +437,7 @@ if( empty( $edited_Item->ID ) )
 	echo_slug_filler();
 }
 else
-{
-	// if we editing post
+{	// if we are editing the post
 	echo_set_slug_changed();
 }
 // New category input box:
@@ -448,6 +447,9 @@ echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.71  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.70  2010/06/19 01:09:31  blueyed
  * Improve jQuery hintbox integration.
  *

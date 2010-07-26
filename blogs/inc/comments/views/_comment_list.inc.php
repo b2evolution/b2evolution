@@ -46,7 +46,7 @@ while( $Comment = & $CommentList->get_next() )
 	$is_published = ( $Comment->get( 'status' ) == 'published' );
 	/* ========== START of a COMMENT/TB/PB ========== */
 	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) )
-	{
+	{	// User is allowed to edit this comment:
 	?>
 	<div id="c<?php echo $Comment->ID ?>" class="bComment bComment<?php $Comment->status('raw') ?>">
 		<div class="bSmallHead">
@@ -119,7 +119,7 @@ while( $Comment = & $CommentList->get_next() )
 	<?php
 	}
 	else
-	{
+	{ // User is NOT allowed to edit this comment
 	?>
 	<div id="c<?php echo $Comment->ID ?>" class="bComment bComment<?php $Comment->status('raw') ?>">
 		<div class="bSmallHead">
@@ -163,6 +163,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.19  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.18  2010/06/23 09:30:55  efy-asimo
  * Comments display and Antispam ban form modifications
  *

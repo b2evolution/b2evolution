@@ -2108,6 +2108,7 @@ function balance_tags( $text )
 
 /**
  * Check if a parameter is set or not
+ *
  * Used to decide, if a numeric parameter value is NULL because it isn't set, or because it's set to NULL
  *
  * @param string parameter name
@@ -2120,6 +2121,9 @@ function isset_param( $var )
 
 /*
  * $Log$
+ * Revision 1.65  2010/07/26 06:52:15  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.64  2010/04/22 18:57:35  blueyed
  * param_action: prefer actionArray, if it is being POSTed. Bug: when posting to a action=foo url, the action from actionArray would get ignored. Pretty nasty with the items controller. This either slipped in recently, or (my) nginx (setup) behaves different from my apache "stack".
  *

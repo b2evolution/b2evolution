@@ -113,14 +113,7 @@ function cat_line( $Chapter, $level )
 		$r .= '<td class="center">'.$Chapter->dget('order').'</td>';
 	}
 
-	if( isset( $number_of_posts_in_cat[$Chapter->ID] ) )
-	{
-		$r .= '<td>'.(int)$number_of_posts_in_cat[$Chapter->ID].'</td>';
-	}
-	else
-	{
-		$r .= '<td>0</td>';
-	}
+	$r .= '<td class="center">'.(int)$number_of_posts_in_cat[$Chapter->ID].'</td>';
 
 	$r .= '<td class="lastcol shrinkwrap">';
 	if( $permission_to_edit )
@@ -212,9 +205,10 @@ if( $Settings->get('chapter_ordering') == 'manual' )
 							'th_class' => 'shrinkwrap',
 						);
 }
+
 // TODO: dh> would be useful to sort by this
 $Table->cols[] = array(
-						'th' => T_('Number of posts'),
+						'th' => T_('Posts'),
 						'th_class' => 'shrinkwrap',
 					);
 
@@ -225,12 +219,11 @@ if( $permission_to_edit )
 						);
 }
 
+// Get # of posts for each category
 global $number_of_posts_in_cat;
 $number_of_posts_in_cat = $DB->get_assoc("
-	SELECT cat_ID, count(cat_id) c
-	  FROM evo_items__item
-	  JOIN evo_postcats ON `postcat_post_ID` = post_ID
-	  JOIN evo_categories ON `postcat_cat_ID` = cat_id
+	SELECT cat_ID, count(postcat_post_ID) c
+	  FROM evo_categories LEFT JOIN evo_postcats ON postcat_cat_ID = cat_id
 	 WHERE cat_blog_ID = $subset_ID
 	 GROUP BY cat_ID");
 
@@ -270,6 +263,9 @@ echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categori
 $Session->delete( 'fadeout_array');
 /*
  * $Log$
+ * Revision 1.26  2010/07/26 06:52:15  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.25  2010/05/24 19:13:44  sam2kb
  * Properly encode "title" text
  *

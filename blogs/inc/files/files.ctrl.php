@@ -261,7 +261,7 @@ if( $fm_FileRoot )
 
 		if( !is_dir( $ads_list_path ) )
 		{ // This should never happen, but just in case the diretory does not exist:
-			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $path ), 'error' ); # better "path" than "directory"
+			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $path ), 'error' );
 			$path = '';		// fp> added
 			$ads_list_path = NULL;
 		}
@@ -1764,6 +1764,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.71  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.70  2010/04/02 07:27:11  efy-asimo
  * cache folders rename and Filelist navigation - fix
  *

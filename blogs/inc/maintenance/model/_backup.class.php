@@ -223,7 +223,7 @@ class Backup
 			$backup_files_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'files/';
 
 			// Prepare files backup directory
-			if( $success = prepare_maintenance_dir( $backup_files_path ) )
+			if( $success = prepare_maintenance_dir( $backup_files_path, false ) )
 			{	// We can backup files
 				$success = $this->backup_files( $backup_files_path );
 			}
@@ -235,7 +235,7 @@ class Backup
 			$backup_tables_path = $this->pack_backup_files ? $cbackup_path : $cbackup_path.'db/';
 
 			// Prepare database backup directory
-			if( $success = prepare_maintenance_dir( $backup_tables_path ) )
+			if( $success = prepare_maintenance_dir( $backup_tables_path, false ) )
 			{	// We can backup database
 				$success = $this->backup_database( $backup_tables_path );
 			}
@@ -262,7 +262,7 @@ class Backup
 	{
 		global $basepath, $backup_paths, $inc_path;
 
-		echo '<h4 style="color:green">'.T_( 'Creating folders/files backup...' ).'</h4>';
+		echo '<h4>'.T_( 'Creating folders/files backup...' ).'</h4>';
 		flush();
 
 		// Find included and excluded files
@@ -346,7 +346,7 @@ class Backup
 	{
 		global $DB, $db_config, $backup_tables, $inc_path;
 
-		echo '<h4 style="color:green">'.T_( 'Creating database backup...' ).'</h4>';
+		echo '<h4>'.T_( 'Creating database backup...' ).'</h4>';
 		flush();
 
 		// Collect all included tables
@@ -413,12 +413,15 @@ class Backup
 
 		$f = @fopen( $backup_sql_filepath , 'w+' );
 		if( $f == false )
-		{	// Stop backup, because it can't open backup file for writting
+		{	// Stop backup, because it can't open backup file for writing
 			echo '<p style="color:red">'.sprintf( T_( 'Unable to write database dump. Could not open &laquo;%s&raquo; for writing.' ), $backup_sql_filepath ).'</p>';
 			flush();
 
 			return false;
 		}
+
+		echo sprintf( T_( 'Dumping tables to &laquo;<strong>%s</strong>&raquo;...' ), $backup_sql_filepath ).'<br/>';
+		flush();
 
 		// Create and save created SQL backup script
 		foreach( $ready_to_backup as $table )
@@ -596,6 +599,9 @@ class Backup
 
 /*
  * $Log$
+ * Revision 1.9  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.8  2009/12/08 22:38:13  fplanque
  * User agent type is now saved directly into the hits table instead of a costly lookup in user agents table
  *

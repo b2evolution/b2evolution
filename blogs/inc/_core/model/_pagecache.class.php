@@ -564,7 +564,7 @@ class PageCache
 					if( ( ! @unlink( $file_path ) ) && ($first_error == '') )
 					{ // deleting the file failed: return error
 						//$error = error_get_last(); // XXX: requires PHP 5.2
-						//$error['message']; - concat this to the first
+						//$error['message'];
 						$first_error = $file_name;
 					}
 				}
@@ -582,6 +582,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.23  2010/07/26 06:52:15  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.22  2010/06/30 05:44:19  efy-asimo
  * prune page cache fix - don't delete CVS folders and content
  *

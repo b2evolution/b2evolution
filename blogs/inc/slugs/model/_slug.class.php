@@ -286,4 +286,11 @@ class Slug extends DataObject
 	}
 }
 
+
+/*
+ * $Log$
+ * Revision 1.12  2010/07/26 06:52:27  efy-asimo
+ * MFB v-4-0
+ *
+ */
 ?>

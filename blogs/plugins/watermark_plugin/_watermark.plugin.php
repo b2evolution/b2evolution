@@ -21,6 +21,7 @@ class watermark_plugin extends Plugin
 {
 	var $code = 'evo_watermark';
 	var $name = 'Watermark';
+	var $group = 'files';
 	var $priority = 10;
 	var $apply_rendering = 'never';
 	var $short_desc;
@@ -28,13 +29,16 @@ class watermark_plugin extends Plugin
 	var $version = '1.0.0';
 	var $number_of_installs = 1;
 
+	// fp>alex: please init vars properly
+	var $fonts_dir;
+
 	/**
 	 * Init
 	 */
 	function PluginInit( & $params )
 	{
 		$this->short_desc = T_('Adds text watermark to generated thumbnails');
-		$this->long_desc = T_('Adds text watermark to generated thumbnails');
+		$this->long_desc = T_('Adds text watermark to generated thumbnails greater than 160x160 pixels');
 
 		$this->fonts_dir = dirname(__FILE__).'/fonts';
 	}
@@ -223,4 +227,8 @@ class watermark_plugin extends Plugin
 
 }
 
+
+/*
+ * $ Log: $
+ */
 ?>

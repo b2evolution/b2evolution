@@ -70,10 +70,15 @@ class User extends DataObject
 
 	/**
 	 * Does the user accept messages?
-	 * Options: 0 - NO, 1 - only private messages, 2 - only emails, 3 - private messages and emails
+	 * Options: 
+	 *		0 - NO, 
+	 *		1 - only private messages, 
+	 *		2 - only emails, 
+	 *		3 - private messages and emails
 	 * This attribute can be asked with get_msgform_possibility(), accepts_pm(),
 	 * and accepts_email() functions to get complete sense.
-	 * It is because posibble that user allow PM, but user group does not.
+	 * This is because it's possible that user allows PM, but user group does not.
+	 *
 	 * @var boolean
 	 */
 	var $allow_msgform;
@@ -199,7 +204,7 @@ class User extends DataObject
 				$this->group_ID = $Settings->get('newusers_grp_ID');
 			}
 
-			// This attribute can be asked with get_msgform_possibility(), accepts_pm, accepts_email functions
+			// This attribute can be asked with get_msgform_possibility(), accepts_pm(), accepts_email() functions
 			// Default value: Allow both
  			$this->set( 'allow_msgform', 3 );
 
@@ -332,7 +337,11 @@ class User extends DataObject
 			param_check_email( 'edited_user_email', true );
 			$this->set_from_Request('email', 'edited_user_email', true);
 
-			// set allow_msgform: 0 - none, 1 - only private message, 2 - only email, 3 - private message and email 
+			// set allow_msgform: 
+			// 0 - none, 
+			// 1 - only private message, 
+			// 2 - only email, 
+			// 3 - private message and email
 			$allow_msgform = 0;
 			if( param( 'PM', 'integer', 0 ) )
 			{ // PM is enabled
@@ -1401,7 +1410,7 @@ class User extends DataObject
 
 
 	/**
-	 * Check if this user and his group allow private messages or not
+	 * Check if this user and his group accept receiving private messages or not
 	 * 
 	 * @return boolean
 	 */
@@ -1417,7 +1426,8 @@ class User extends DataObject
 
 
 	/**
-	 * Check if this user allow emails and has email adress
+	 * Check if this user accepts receiving emails and has an email address
+	 *
 	 * @return boolean
 	 */
 	function accepts_email()
@@ -1427,10 +1437,9 @@ class User extends DataObject
 
 
 	/**
-	 * Get msgform settings between current user and this user
+	 * Get messaging possibilities between current user and this user
 	 * 
-	 * @return NULL|string NULL no messaging option between current_User and this user,
-	 * 	the allowed messging form otherwise
+	 * @return NULL|string allowed messaging possibility: PM > email > login > NULL
 	 */
 	function get_msgform_possibility( $current_User = NULL )
 	{
@@ -1775,7 +1784,7 @@ class User extends DataObject
 			return false;
 		}
 		if( ! $this->get_msgform_possibility() )
-		{
+		{	// There is no way this user accepts receiving messages.
 			return false;
 		}
 
@@ -2072,6 +2081,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.82  2010/07/26 06:52:27  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.81  2010/07/15 06:37:24  efy-asimo
  * Fix messaging warning, also fix redirect after login display
  *

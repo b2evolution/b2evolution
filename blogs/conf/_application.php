@@ -15,13 +15,13 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible with {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '4.0.0-dev';
+$app_version = '4.0.0-alpha';
 
 /**
  * Release date (ISO)
  * @global string
  */
-$app_date = '2010-01-14';
+$app_date = '2010-07-18';
 
 /**
  * This is used to check if the database is up to date.
@@ -31,7 +31,7 @@ $app_date = '2010-01-14';
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 9990;
+$new_db_version = 10000;
 
 /**
  * Is displayed on the login screen:

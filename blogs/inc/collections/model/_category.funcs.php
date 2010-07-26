@@ -475,7 +475,7 @@ function cat_req( $parent_cat_ID, $level )
 
 
 /**
- * Get global cross posting settings
+ * Get global cross posting settings -- (cross posting = 1 post in multiple blogs)
  * 
  * @return int
  * 		0 - cross posting disabled
@@ -499,6 +499,9 @@ function cat_req_dummy()
 
 /*
  * $Log$
+ * Revision 1.14  2010/07/26 06:52:15  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.13  2010/05/22 12:22:49  efy-asimo
  * move $allow_cross_posting in the backoffice
  *

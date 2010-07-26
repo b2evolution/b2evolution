@@ -122,6 +122,7 @@ if( empty($tab) )
 			$current_User->check_perm('options', 'edit', true);
 
 			// TODO> handle custom media directories dh> ??
+			// Delete any ?evocache folders:
 			$deleted_dirs = delete_cachefolders($Messages);
 			$Messages->add( sprintf( T_('Deleted %d directories.'), $deleted_dirs ), 'success' );
 			break;
@@ -175,14 +176,21 @@ if( empty($tab) )
 			{
 				$Item = $ItemCache->get_by_ID($item_ID);
 
-				$prev_urltitle = $Item->get('urltitle');
-				$new_Slug = $Item->update_slug('');
+				$prev_urltitle = $Item->get( 'urltitle' );
+				$item_title = $Item->get( 'title' );
 
-				if( $new_Slug->get('title') != $prev_urltitle )
+				// check if post title is not empty and urltitle was auto generated ( equals title or title-[0-9]+ )
+				// Note: urltitle will be auto generated on this form (title-[0-9]+), if post title wass empty and, urltitle was not set
+				// Note: Even if a post title was set to 'title' on purpose it's possible, that this tool will change the post urltitle
+				if( ( ! empty( $item_title ) ) && ( ( $prev_urltitle == 'title' ) || ( preg_match( '#^title-[0-9]+$#', $prev_urltitle ) ) ) )
 				{
-					$r = $Item->dbupdate(/* do not autotrack modification */ false, /* update slug */ $new_Slug, /* do not update excerpt */ false);
-					assert('$r');
-					$count_slugs++;
+					// set urltitle empty, so the item update function will regenerate the item slug
+					$Item->set( 'urltitle', '' );
+					$result = $Item->dbupdate(/* do not autotrack modification */ false, /* update slug */ $new_Slug, /* do not update excerpt */ false); 
+					if( ( $result ) && ( $prev_urltitle != $Item->get( 'urltitle' ) ) )
+					{ // update was successful, and item urltitle was changed
+						$count_slugs++;
+					}
 				}
 			}
 			$Messages->add( sprintf('Created %d new URL slugs for %d total posts.', $count_slugs, count($items)), 'success' );
@@ -243,7 +251,7 @@ if( empty($tab) )
 		echo '<ul>';
 		echo '<li><a href="'.regenerate_url('action', 'action=del_itemprecache&amp;'.url_crumb('tools')).'">'.T_('Clear pre-renderered item cache (DB)').'</a></li>';
 		echo '<li><a href="'.regenerate_url('action', 'action=del_pagecache&amp;'.url_crumb('tools')).'">'.T_('Clear full page cache (/cache directory)').'</a></li>';
-		echo '<li><a href="'.regenerate_url('action', 'action=del_filecache&amp;'.url_crumb('tools')).'">'.sprintf( T_('Clear thumbnail caches (%s directories)'), $Settings->get( 'evocache_foldername' ) ).'</a></li>';
+		echo '<li><a href="'.regenerate_url('action', 'action=del_filecache&amp;'.url_crumb('tools')).'">'.T_('Clear thumbnail caches (?evocache directories)').'</a></li>';
 		echo '</ul>';
 		$block_item_Widget->disp_template_raw( 'block_end' );
 
@@ -310,6 +318,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.31  2010/07/26 06:52:27  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.30  2010/06/15 21:33:24  blueyed
  * Fix patch failure.
  *

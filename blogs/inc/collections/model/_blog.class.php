@@ -112,8 +112,6 @@ class Blog extends DataObject
 	var $media_subdir = '';
 	var $media_fullpath = '';
 	var $media_url = '';
-	var $frontpage = 'posts';
-	var $frontpage_id = NULL;
 
 	/**
 	 * Additional settings for the collection.  lazy filled.
@@ -307,14 +305,6 @@ class Blog extends DataObject
 		{
 			$this->set_setting( 'image_size', get_param( 'image_size' ));
 		}
-
-
-		if( param( 'frontpage', 'string', NULL ) !== NULL )
-		{
-			$this->set_setting( 'frontpage', param( 'frontpage', 'string', '' ) );
-			$this->set_setting( 'frontpage_id', param('frontpage_id', 'integer', 0) );
-		}
-
 
 		if( param( 'tag_links',   'string', NULL ) !== NULL )
 		{ // Tag page link type:
@@ -1867,8 +1857,9 @@ class Blog extends DataObject
 			$Messages->add( sprintf(T_('No stub file named &laquo;%s&raquo; was found. You must create it for the blog to function properly with the current settings.'), $stub_filename ), 'error' );
 		}
 
-		// Set default user permissions for this blog (All permissions for the current user)
-		// current_User can be NULL only during new user registration process, when new user automatically get a new blog
+		// Set default user permissions for this blog (All permissions for the current user, typically the admin who is creating the blog)
+		// Note: current_User can be NULL only during new user registration process, when new user automatically get a new blog
+		// Note: The owner of teh blog has permissions just by the sole fact he is registered as the owner.
 		if( $current_User != NULL )
 		{ // Proceed insertions:
 			$DB->query( "
@@ -1950,8 +1941,13 @@ class Blog extends DataObject
 	{
 		global $DB, $Messages, $Plugins;
 
+		// Try to obtain some serious time to do some serious processing (5 minutes)
+		@set_time_limit( 300 );
+
 		// Note: No need to localize the status messages...
 		if( $echo ) echo '<p>MySQL 3.23 compatibility mode!';
+
+		$DB->begin();
 
 		// Get list of cats that are going to be deleted (3.23)
 		if( $echo ) echo '<br />Getting category list to delete... ';
@@ -2048,6 +2044,8 @@ class Blog extends DataObject
 
 		// Delete main (blog) object:
 		parent::dbdelete();
+
+		$DB->commit();
 
 		// re-set the ID for the Plugin event
 		$this->ID = $old_ID;
@@ -2329,6 +2327,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.119  2010/07/26 06:52:15  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.118  2010/07/12 09:07:37  efy-asimo
  * rename get_msgform_settings() to get_msgform_possibility
  *

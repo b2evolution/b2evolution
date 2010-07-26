@@ -116,11 +116,20 @@ class ComponentWidget extends DataObject
 	 */
 	function & get_Plugin()
 	{
+		global $Plugins;
+
 		if( is_null( $this->Plugin ) )
 		{
-			global $Plugins;
-			$this->Plugin = $this->type == 'plugin' ? $Plugins->get_by_code( $this->code ) : false;
+			if( $this->type != 'plugin' )
+			{
+				$this->Plugin = false;
+			}
+			else
+			{
+				$this->Plugin = & $Plugins->get_by_code( $this->code );
+			}
 		}
+
 		return $this->Plugin;
 	}
 
@@ -696,6 +705,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.78  2010/07/26 06:52:27  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.77  2010/05/13 19:13:10  blueyed
  * doc
  *

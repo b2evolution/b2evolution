@@ -618,10 +618,9 @@ switch( $action )
 		$update_nr = 0;
 
 		while ( $Item = & $ItemList->get_item () ) 
-		{
-			// check user permission
+		{	// check user permission
 			$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item );
-			
+
 			$title = param ( 'mass_title_' . $Item->ID, 'string', NULL );
 			$urltitle = param ( 'mass_urltitle_' . $Item->ID, 'string', NULL );
 			$titletag = param ( 'mass_titletag_' . $Item->ID, 'string', NULL );
@@ -1384,6 +1383,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.102  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.101  2010/05/22 12:22:49  efy-asimo
  * move $allow_cross_posting in the backoffice
  *

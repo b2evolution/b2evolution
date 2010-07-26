@@ -250,6 +250,7 @@ $user_agents = array(
 	array('robot', 'Sosospider', 'Sosospider'),
 	array('robot', 'TopBlogsInfo', 'TopBlogsInfo'),
 	array('robot', 'spbot/', 'SEOprofiler'),
+	array('robot', 'StackRambler', 'Rambler' ),
 	// Unknown robots:
 	array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:

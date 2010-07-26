@@ -124,6 +124,7 @@ switch( $action )
 		// Move to different post
 		if( param( 'moveto_post', 'string', false ) )
 		{ // Move to post is set
+
 			$comment_Item = & $edited_Comment->get_Item();
 			if( $comment_Item->ID != $moveto_post )
 			{ // Move to post was changed
@@ -380,6 +381,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.33  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.32  2010/07/20 06:49:28  efy-asimo
  * admin user can move comments to different post
  * add comments to msgform

@@ -274,6 +274,7 @@ class CommentList2 extends DataObjectList2
 			// Activate preset default filters if necessary:
 			$this->activate_preset_filters();
 		}
+
 		/*
 		 * Restrict to selected author:
 		 */
@@ -722,6 +723,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.27  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.26  2010/06/23 09:30:55  efy-asimo
  * Comments display and Antispam ban form modifications
  *

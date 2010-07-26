@@ -34,8 +34,10 @@
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 
-	# This line may be needed:
-	RewriteBase /
+	# This line may be needed or not.
+	# enabling this would prevent running ina subdir like /blog/index.php
+	# This has been disabled in v 4.0.0-alpha. Please let us know if you find it needs to be enabled.
+	# RewriteBase /
 
 	# Redirect anything that's not an existing directory or file to index.php:
 	RewriteCond %{REQUEST_FILENAME} !-d

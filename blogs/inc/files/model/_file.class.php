@@ -1204,10 +1204,7 @@ class File extends DataObject
 			$this->set( 'path', $this->_rdfp_rel_path );
 			// Record to DB:
 			if ( ! $this->dbupdate() )
-			{
-// fp>asimo: the file has already been renamed on disk. I'm not sure what DB changes took place at this point. Can you confirm it's better to roll back everything rather than committing what has already been done?
-// asimo>fp: With this modification it should be really safe, but still it is improbable!
-				// update failed, try to rollback the rename on disk
+			{	// Update failed, try to rollback the rename on disk:
 				if( ! @rename( $this->_adfp_full_path, $this->_dir.$oldname ) )
 				{ // rename failed
 					$DB->rollback();
@@ -2122,6 +2119,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.89  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.88  2010/07/16 08:39:25  efy-asimo
  * file rename_to and "replace existing file" - fix
  *

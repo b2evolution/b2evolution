@@ -6,7 +6,7 @@
  *
  * @package evocore
  *
- * * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  * @author asimo: Evo Factory / Attila Simo
  * 
  * @version $Id$
@@ -21,7 +21,8 @@ if( is_logged_in() )
 	return;
 }
 
-if( $action == 'req_login' ) {
+if( $action == 'req_login' ) 
+{
 	$login_required = true;
 }
 
@@ -89,4 +90,12 @@ $Form->begin_form( 'bComment' );
 	$Form->end_fieldset();
 
 $Form->end_form();
+
+
+/*
+ * $Log$
+ * Revision 1.3  2010/07/26 06:52:27  efy-asimo
+ * MFB v-4-0
+ *
+ */
 ?>

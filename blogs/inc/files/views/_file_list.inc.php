@@ -662,7 +662,12 @@ $Form->begin_form();
 				var fm_hl = jQuery("#fm_highlighted");
 				if( fm_hl.length ) {
 					jQuery.getScript('<?php echo $rsc_url ?>js/jquery/jquery.scrollto.js', function () {
-						jQuery.scrollTo( fm_hl, { onAfter: function() { evoFadeHighlight( fm_hl ) } } );
+						jQuery.scrollTo( fm_hl,
+						{ onAfter: function()
+							{
+								evoFadeHighlight( fm_hl )
+							}
+						} );
 					});
 				}
 			} );
@@ -677,6 +682,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.41  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.40  2010/04/30 20:26:33  blueyed
  * Code compression with scrollTo code.
  *

@@ -59,6 +59,10 @@ $AdminUI->disp_body_top();
 
 $AdminUI->disp_payload_begin();
 
+echo '<h2 class="red">WARNING: EXPERIMENTAL FEATURE!</h2>';
+
+echo '<h3>Use for testing only at this point!</h3>';
+
 /**
  * Display payload:
  */
@@ -128,13 +132,28 @@ switch( $action )
 			echo '<p>'.sprintf( T_( 'Downloading package to &laquo;<strong>%s</strong>&raquo;...' ), $upgrade_file ).'</p>';
 			flush();
 
-			if( !$success = copy( $download_url, $upgrade_file ) )
-			{
-				echo '<p style="color:red">'.sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $download_url ).'</p>';
-				flush();
+			// Downloading
+			$file_contents = fetch_remote_page( $download_url, $info, 1800 );
 
-				// Additional check
-				@unlink( $upgrade_file );
+			if( $file_contents !== false )
+			{
+				$upgrade_file_handle = fopen( $upgrade_file, 'w' );
+				if( $upgrade_file_handle !== false )
+				{
+					if( ! fwrite( $upgrade_file_handle, $file_contents ) )
+					{
+						echo '<p style="color:red">'.sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $download_url ).'</p>';
+						flush();
+
+						@unlink( $upgrade_file );
+					}
+					fclose( $upgrade_file_handle );
+				}
+				else
+				{
+					echo '<p style="color:red">'.sprintf( T_( 'Unable to create &laquo;%s&raquo file;' ), $upgrade_file ).'</p>';
+					flush();
+				}
 			}
 		}
 
@@ -168,7 +187,7 @@ switch( $action )
 				$new_version_status = check_version( $upgrade_name );
 				if( $debug == 0 && !empty( $new_version_status ) )
 				{
-					echo '<h5 style="color:red">'.$new_version_status.'</h5>';
+					echo '<h4 style="color:red">'.$new_version_status.'</h4>';
 					break;
 				}
 			}
@@ -199,11 +218,11 @@ switch( $action )
 			set_max_execution_time( 1800 ); // 30 minutes
 
 			// Verify that all destination files can be overwritten
-			echo '<h4 style="color:green">'.T_( 'Verifying that all destination files can be overwritten...' ).'</h4>';
+			echo '<h4>'.T_( 'Verifying that all destination files can be overwritten...' ).'</h4>';
 			flush();
 
 			$read_only_list = array();
-			verify_overwrite( $upgrade_path.$upgrade_name, no_trailing_slash( $basepath ), 'Verifying', false, $read_only_list );
+			verify_overwrite( $upgrade_path.$upgrade_name.'/b2evolution/blogs', no_trailing_slash( $basepath ), 'Verifying', false, $read_only_list );
 
 			if( empty( $read_only_list ) )
 			{	// We can do backup files and database
@@ -223,16 +242,16 @@ switch( $action )
 				{	// We can upgrade files and database
 
 					// Copying new folders and files
-					echo '<h4 style="color:green">'.T_( 'Copying new folders and files...' ).'</h4>';
+					echo '<h4>'.T_( 'Copying new folders and files...' ).'</h4>';
 					flush();
 
-					verify_overwrite( $upgrade_path.$upgrade_name, no_trailing_slash( $basepath ), 'Copying', true, $read_only_list );
+					verify_overwrite( $upgrade_path.$upgrade_name.'/b2evolution/blogs', no_trailing_slash( $basepath ), 'Copying', true, $read_only_list );
 
 					// Upgrade database using regular upgrader script
 					require_once( $install_path.'/_functions_install.php' );
 					require_once( $install_path.'/_functions_evoupgrade.php' );
 
-					echo '<h4 style="color:green">'.T_( 'Upgrading data in existing b2evolution database...' ).'</h4>';
+					echo '<h4>'.T_( 'Upgrading data in existing b2evolution database...' ).'</h4>';
 					flush();
 
 					global $DB, $locale, $current_locale, $form_action;
@@ -268,11 +287,11 @@ switch( $action )
 
 		if( $success )
 		{
-			echo '<h5 style="color:green">'.T_( 'Upgrade completed successfully!' ).'</h5>';
+			echo '<h4 style="color:green">'.T_( 'Upgrade completed successfully!' ).'</h4>';
 		}
 		else
 		{
-			echo '<h5 style="color:red">'.T_( 'Upgrade failed!' ).'</h5>';
+			echo '<h4 style="color:red">'.T_( 'Upgrade failed!' ).'</h4>';
 		}
 
 		break;
@@ -292,6 +311,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.10  2010/01/30 18:55:32  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

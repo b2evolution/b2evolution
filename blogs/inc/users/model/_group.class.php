@@ -66,7 +66,7 @@ class Group extends DataObject
 	var $perm_xhtml_javascript = false;
 	var $perm_xhtml_objects = false;
 	var $perm_spamblacklist;
-	var $perm_slugs;
+	var $perm_slugs;		// managing slugs
 	var $perm_templates;
 	var $perm_stats;
 	var $perm_files;
@@ -195,9 +195,9 @@ class Group extends DataObject
 		$GroupSettings = & $this->get_GroupSettings();
 		foreach( $GroupSettings->permission_values as $name => $value )
 		{
-			// We need to handle separately checkobxes and radioboxes, because when a checkbox isn't checked the checkbox variable is not sent
+			// We need to handle checkboxes and radioboxes separately , because when a checkbox isn't checked the checkbox variable is not sent
 			if( $name == 'perm_createblog' || $name == 'perm_getblog' )
-			{ // These two permission are represented by checkboxes, all other pluggable group permissions are represented by radiobox.
+			{ // These two permissions are represented by checkboxes, all other pluggable group permissions are represented by radiobox.
 				$value = param( 'edited_grp_'.$name, 'string', 'denied' );
 			}
 			else
@@ -330,8 +330,9 @@ class Group extends DataObject
 							break;
 						}
 				}
+				
 				if( ! $perm && ( $permlevel == 'create' ) && $this->check_perm( 'perm_createblog', 'allowed' ) )
-				{ // Permission granted
+				{ // User is allowed to create a blog (for himself)
 					$perm = true;
 				}
 				break;
@@ -711,7 +712,8 @@ class Group extends DataObject
 
 
 	/**
-	 * Check if this group users have messaging permission and have access to admin interface
+	 * Check if this group users have messaging permission and have access to the admin interface
+	 *
 	 * @return boolean true if group has the necessarry permissions
 	 */
 	function check_messaging_perm()
@@ -722,6 +724,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.35  2010/07/26 06:52:27  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.34  2010/07/14 09:06:14  efy-asimo
  * todo fp>asimo modifications
  *

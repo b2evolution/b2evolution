@@ -181,4 +181,12 @@ if( $current_User->check_perm( 'slugs', 'edit' ) )
 }
 
 $Results->display();
+
+
+/*
+ * $Log$
+ * Revision 1.8  2010/07/26 06:52:27  efy-asimo
+ * MFB v-4-0
+ *
+ */
 ?>

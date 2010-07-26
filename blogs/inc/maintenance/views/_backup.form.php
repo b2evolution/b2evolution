@@ -27,7 +27,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var back up configuration
  */
-global $backup_paths, $backup_tables;
+global $backup_paths, $backup_tables, $backup_path;
 
 /**
  * @var action
@@ -44,6 +44,8 @@ $Form = new Form( NULL, 'backup_settings', 'post' );
 
 
 $Form->begin_form( 'fform', T_('Backup application files and data') );
+
+echo '<p>Your backups will be saved into the directory: <b>'.$backup_path.'</b> (on your web server).</p>';
 
 $Form->hiddens_by_key( get_memorized( 'action' ) );
 
@@ -168,6 +170,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'S
 
 /*
  * $Log$
+ * Revision 1.12  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.11  2010/02/26 22:15:52  fplanque
  * whitespace/doc/minor
  *

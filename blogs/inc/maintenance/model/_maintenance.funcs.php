@@ -4,40 +4,35 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Check version
+ * Check version of downloaded upgrade vs. current version
+ *
  * @param new version dir name
  * @return string message or NULL
  */
 function check_version( $new_version_dir )
 {
-	global $install_subdir, $install_path, $upgrade_path;
-	// Upgrade database using regular upgrader script
-	require_once( $install_path.'/_version.php' );
-	require_once( $install_path.'/_version.php' );
+	global $rsc_url, $upgrade_path, $conf_path;
 
-	$new_version_file = $upgrade_path.$new_version_dir.'/'.$install_subdir.'_version.php';
-	$current_version_file = $install_path.'/_version.php';
-
-	if( !file_exists( $current_version_file ) )
-	{
-		return T_( 'Installed version doesn\'t support upgrade!' );
-	}
+	$new_version_file = $upgrade_path.$new_version_dir.'/b2evolution/blogs/conf/_application.php';
 
 	require( $new_version_file );
-	$new_version = $current_version;
 
-	unset( $current_version );
+	$vc = version_compare( $app_version, $GLOBALS['app_version'] );
 
-	require( $current_version_file );
-	$current_version = $current_version;
-
-	if( $new_version == $current_version )
-	{
-		return T_( 'This package is already installed!' );
-	}
-	elseif( $new_version < $current_version )
+	if( $vc < 0 )
 	{
 		return T_( 'This is an old version!' );
+	}
+	elseif( $vc == 0 )
+	{
+		if( $app_date == $GLOBALS['app_date'] )
+		{
+			return T_( 'This package is already installed!' );
+		}
+		elseif( $app_date < $GLOBALS['app_date'] )
+		{
+			return T_( 'This is an old version!' );
+		}
 	}
 
 	return NULL;
@@ -68,7 +63,7 @@ function switch_maintenance_mode( $enable, $msg = '' )
 {
 	global $conf_path;
 
-	$maintenance_mode_file = 'maintenance.txt';
+	$maintenance_mode_file = 'maintenance.html';
 
 	if( $enable )
 	{	// Create maintenance file
@@ -85,14 +80,40 @@ function switch_maintenance_mode( $enable, $msg = '' )
 		}
 		else
 		{	// Write content
-			fwrite( $f, $msg );
+			fwrite( $f, '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>Site temporarily down for maintenance.</title>
+</head>
+
+<body>
+
+<h1>503 Service Unavailable</h1>
+
+<p>'.$msg.'</p>
+
+<!--
+
+In order to put b2evolution into maintenance mode, rename this file to maintenance.html (with NO _ at the beginning).
+
+In order to put b2evolution into maintenance mode but still allow access to the install script,
+rename this file to imaintenance.html (with an i at the beginning).
+
+Edit the contents of this file to change the message that is displayed during maintenance.
+
+-->
+
+</body>
+
+</html>' );
 			fclose($f);
 		}
 	}
 	else
 	{	// Delete maintenance file
 		echo '<p>'.T_('Switching out of maintenance mode...').'</p>';
-		unlink( $conf_path.$maintenance_mode_file );
+		@unlink( $conf_path.$maintenance_mode_file );
 	}
 
 	return true;
@@ -106,8 +127,10 @@ function switch_maintenance_mode( $enable, $msg = '' )
  * @param boolean create .htaccess file with 'deny from all' text
  * @return boolean
  */
-function prepare_maintenance_dir( $dir_name, $deny_access = false )
+function prepare_maintenance_dir( $dir_name, $deny_access = true )
 {
+
+	// echo '<p>'.T_('Checking destination directory: ').$dir_name.'</p>';
 	if( !file_exists( $dir_name ) )
 	{	// We can create directory
 		if ( ! mkdir_r( $dir_name ) )
@@ -121,6 +144,8 @@ function prepare_maintenance_dir( $dir_name, $deny_access = false )
 
 	if( $deny_access )
 	{	// Create .htaccess file
+		echo '<p>'.T_('Checking .htaccess denial for directory: ').$dir_name.'</p>';
+
 		$htaccess_name = $dir_name.'.htaccess';
 
 		if( !file_exists( $htaccess_name ) )
@@ -139,6 +164,8 @@ function prepare_maintenance_dir( $dir_name, $deny_access = false )
 				fclose($f);
 			}
 		}
+
+		// fp> TODO: make sure "deny all" actually works by trying to request the directory through HTTP
 	}
 
 	return true;
@@ -213,6 +240,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, &$read_
 		{
 			$srcfile = $src.'/'.$file;
 			$destfile = $dest.'/'.$file;
+			// pre_dump($srcfile,$destfile);
 
 			if( isset( $read_only_list ) && file_exists( $destfile ) && !is_writable( $destfile ) )
 			{	// Folder or file is not writable
@@ -351,6 +379,9 @@ function aliases_to_tables( $aliases )
 
 /*
  * $Log$
+ * Revision 1.9  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.8  2010/02/04 19:29:53  blueyed
  * wording
  *

@@ -70,6 +70,7 @@ $GroupCache = & get_GroupCache();
 $group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
 
 // User Groups dropdown list handler
+// Depending on the group it may be impossible for a user to access private messages
 ?>
 <script type="text/javascript">
 	function user_group_changed()
@@ -461,7 +462,7 @@ $Form->end_form();
 // End payload block:
 $this->disp_payload_end();
 
-// call the ussers group dropdown list handler
+// call the users group dropdown list handler
 ?>
 	<script type="text/javascript">
 		user_group_changed();
@@ -470,6 +471,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.16  2010/07/26 06:52:27  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.15  2010/07/14 09:06:14  efy-asimo
  * todo fp>asimo modifications
  *

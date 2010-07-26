@@ -522,6 +522,7 @@ if( $blog )
 
 		$nb_blocks_displayed++;
 
+		$block_item_Widget = new Widget( 'block_item' );
 		$block_item_Widget->title = T_('Getting started');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
@@ -732,6 +733,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.69  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.68  2010/06/23 09:30:55  efy-asimo
  * Comments display and Antispam ban form modifications
  *

@@ -72,8 +72,8 @@ else
 		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3 );
 	}
 
-	$block_item_Widget->global_icon( T_('Mass edit the current post list...'), '', '?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$blog.'&amp;redirect_to='.regenerate_url( 'action', '', '', '&'), T_('Mass edit').' &raquo;', 3, 4 );
 	$block_item_Widget->global_icon( T_('Create multiple posts...'), 'new', '?ctrl=items&amp;action=new_mass&amp;blog='.$blog, T_('Mass create').' &raquo;', 3, 4 );
+	$block_item_Widget->global_icon( T_('Mass edit the current post list...'), '', '?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$blog.'&amp;redirect_to='.regenerate_url( 'action', '', '', '&'), T_('Mass edit').' &raquo;', 3, 4 );
 	$block_item_Widget->global_icon( T_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$blog, T_('New post').' &raquo;', 3, 4 );
 }
 
@@ -265,11 +265,11 @@ while( $Item = & $ItemList->get_item() )
 					'class' => 'permalink_right',
 				) );
 
-			// Item slug controll
+			// Item slug control:
 			$Item->tinyurl_link( array( 'class' => 'small', 'style' => 'float: right' ) );
 			global $admin_url;
 			if( $current_User->check_perm( 'slugs', 'view' ) )
-			{ // user has permmission to view slugs
+			{ // user has permission to view slugs:
 				echo action_icon( 'Edit slugs...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
 					NULL, NULL, NULL, array( 'class' => 'small', 'style' => 'float: right' ) );
 			}
@@ -345,6 +345,7 @@ while( $Item = & $ItemList->get_item() )
 				'statuses' => array( 'published', 'draft', 'deprecated' ),
 				'order' => 'ASC',
 				'post_ID' => $Item->ID,
+				'comments' => 1000,
 			) );
 
 			// Get ready for display (runs the query):
@@ -421,6 +422,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.38  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.37  2010/06/23 09:30:55  efy-asimo
  * Comments display and Antispam ban form modifications
  *

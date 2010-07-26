@@ -447,10 +447,12 @@ function get_canonical_path( $ads_path )
 	$parts = explode('/', $ads_path);
 	for( $i = 0; $i < count($parts); $i++ )
 	{
-		if( $parts[$i] != '..' ) {
+		if( $parts[$i] != '..' )
+		{
 			continue;
 		}
-		if( $i <= 0 || $parts[$i-1] == '' || substr($parts[$i-1], -1) == ':' /* windows drive letter */ ) {
+		if( $i <= 0 || $parts[$i-1] == '' || substr($parts[$i-1], -1) == ':' /* windows drive letter */ )
+		{
 			return NULL;
 		}
 		// Remove ".." and the part before it
@@ -1005,13 +1007,15 @@ function delete_cachefolders( $Log = NULL )
 {
 	global $media_path, $Settings;
 
+	// Get this, just in case someone comes up with a different naming:
 	$evocache_foldername = $Settings->get( 'evocache_foldername' );
 
 	$dirs = get_filenames( $media_path, false );
 	$deleted_dirs = 0;
 	foreach( $dirs as $dir )
 	{
-		if( basename($dir) == $evocache_foldername )
+		$basename = basename($dir);
+		if( $basename == '.evocache' || $basename == '_evocache' || $basename == $evocache_foldername )
 		{	// Delete .evocache directory recursively
 			if( rmdir_r( $dir ) )
 			{
@@ -1026,7 +1030,9 @@ function delete_cachefolders( $Log = NULL )
 	return $deleted_dirs;
 }
 
-
+/**
+ * ???
+ */
 function check_showparams( & $Filelist )
 {
 	global $UserSettings;
@@ -1035,6 +1041,7 @@ function check_showparams( & $Filelist )
 	{
 		$Filelist->_show_hidden_files = true;
 	}
+
 	if( $UserSettings->param_Request( 'fm_showevocache', 'fm_showevocache', 'integer', 0 ) )
 	{
 		$Filelist->_show_evocache = true;
@@ -1044,6 +1051,9 @@ function check_showparams( & $Filelist )
 
 /*
  * $Log$
+ * Revision 1.48  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.47  2010/07/13 07:10:15  efy-asimo
  * Group file settings and file types tabs into a single Settings tab, with a 3rd level selection
  *

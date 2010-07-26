@@ -77,7 +77,7 @@ class ItemCache extends DataObjectCache
 
 		if( !isset( $this->urltitle_index[$req_urltitle] ) )
 		{ // not yet in cache:
-		    // Get from slugCache
+	    // Get from SlugCache
 			$SlugCache = & get_SlugCache();
 			$req_Slug =  $SlugCache->get_by_name( $req_urltitle, $halt_on_error, $halt_on_empty );
 			if( $req_Slug && $req_Slug->get( 'type' ) == 'item' )
@@ -161,6 +161,9 @@ class ItemCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.10  2010/07/26 06:52:16  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.9  2010/04/22 18:59:09  blueyed
  * Add halt_on_empty param to get_by_urltitle and use it. Bug: did when looking up single char bad URLs.
  *

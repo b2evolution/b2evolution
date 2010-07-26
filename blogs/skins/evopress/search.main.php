@@ -61,36 +61,78 @@ skin_include( '_body_header.inc.php' );
 
 <div id="content" class="narrowcolumn">
 
-	<?php
-		// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
-		messages( array(
+<?php
+	// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
+	messages( array(
 			'block_start' => '<div class="action_messages">',
 			'block_end'   => '</div>',
 		) );
-		// --------------------------------- END OF MESSAGES ---------------------------------
-	?>
+	// --------------------------------- END OF MESSAGES ---------------------------------
+?>
 
-	<?php
-		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
-		request_title( array(
-				'title_before'=> '<h2>',
-				'title_after' => '</h2>',
-				'title_none'  => '',
-				'glue'        => ' - ',
-				'title_single_disp' => true,
-				'format'      => 'htmlbody',
-			) );
-		// ------------------------------ END OF REQUEST TITLE -----------------------------
-	?>
+<?php
+	// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
+	request_title( array(
+			'title_before'=> '<h2>',
+			'title_after' => '</h2>',
+			'title_none'  => '',
+			'glue'        => ' - ',
+			'title_single_disp' => true,
+			'format'      => 'htmlbody',
+		) );
+	// ------------------------------ END OF REQUEST TITLE -----------------------------
 
-	<?php
-		// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
-		skin_include( '$disp$', array(
+
+	// --------------------------------- START OF COMMON LINKS --------------------------------
+	skin_widget( array(
+			// CODE for the widget:
+			'widget' => 'coll_search_form',
+			// Optional display params
+			'block_start' => '<div style="margin: 1em 0">',
+			'block_end' => '</div>',
+			'block_display_title' => false,
+			'disp_search_options' => 1,
+			'use_search_disp' => 1,
+		) );
+	// ---------------------------------- END OF COMMON LINKS ---------------------------------
+
+
+	// Display message if no post:
+	display_if_empty( array(
+					'before'      => '<p class="msg_nothing" style="margin: 2em 0">',
+					'after'       => '</p>',
+					'msg_empty'   => T_('Sorry, we could not find anything matching your request, please try to broaden your search.'),
+				) );
+
+	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+	mainlist_page_links( array(
+			'block_start' => '<div class="navigation">',
+			'block_end' => '</div>',
+   		'prev_text' => '&lt;&lt;',
+   		'next_text' => '&gt;&gt;',
+		) );
+	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+
+	while( $Item = & mainlist_get_item() )
+	{	// For each blog post:
+		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
+		skin_include( '_item_block.inc.php', array(
+				'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
+				'image_size'	 =>	'fit-400x320',
 			) );
-		// Note: you can customize any of the sub templates included here by
-		// copying the matching php file into your skin directory.
-		// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
-	?>
+		// ----------------------------END ITEM BLOCK  ----------------------------
+	}
+
+	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
+	mainlist_page_links( array(
+			'block_start' => '<div class="navigation">',
+			'block_end' => '</div>',
+   		'prev_text' => '&lt;&lt;',
+   		'next_text' => '&gt;&gt;',
+		) );
+	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+?>
+
 
 </div>
 
@@ -101,15 +143,19 @@ skin_include( '_sidebar.inc.php' );
 // Note: You can customize the default BODY footer by copying the
 // _body_footer.inc.php file into the current skin folder.
 // ----------------------------- END OF SIDEBAR -----------------------------
+?>
 
 
+<?php
 // ------------------------- BODY FOOTER INCLUDED HERE --------------------------
 skin_include( '_body_footer.inc.php' );
 // Note: You can customize the default BODY footer by copying the
 // _body_footer.inc.php file into the current skin folder.
 // ------------------------------- END OF FOOTER --------------------------------
+?>
 
 
+<?php
 // ------------------------- HTML FOOTER INCLUDED HERE --------------------------
 skin_include( '_html_footer.inc.php' );
 // Note: You can customize the default HTML footer by copying the

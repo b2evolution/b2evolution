@@ -183,9 +183,7 @@ function shutdown()
 		foreach( $shutdown_count_item_views as $item_ID )
 		{
 			// asimo> Inserted the $item_ID != 0 check, because another way comes unexpected error on preview page
-			// Another solution would be, that set ItemCache->get_by_ID function halt_one_empty param false
-			// Does the second solution mess up something?
-			if( ( $item_ID != 0 ) && ( $Item = $ItemCache->get_by_ID($item_ID, false) ) ) {
+			if( !empty($item_ID) && ( $Item = $ItemCache->get_by_ID($item_ID, false) ) ) {
 				$Item->count_view( array(
 					'allow_multiple_counts_per_page' => false,
 				) );
@@ -2276,6 +2274,7 @@ function debug_info( $force = false, $force_clean = false )
 		echo $clean ? "\n" : '<br />';
 		echo 'Len of serialized $cache_File: '.strlen(serialize($cache_File));
 		echo $clean ? "\n" : '<br />';
+
 	}
 
 
@@ -3734,12 +3733,12 @@ function get_available_sort_options()
 
 /**
  * Get a value from a volatile/lossy cache.
+ *
  * @param string key
  * @param boolean success (by reference)
- * @return mixed True in case of success, false in case of failure. NULL, if no
- * backend is available.
+ * @return mixed True in case of success, false in case of failure. NULL, if no backend is available.
  */
-function get_from_mem_cache($key, & $success = NULL)
+function get_from_mem_cache($key, & $success )
 {
 	global $Timer;
 
@@ -3771,8 +3770,10 @@ function get_from_mem_cache($key, & $success = NULL)
 
 /**
  * Set a value to a volatile/lossy cache.
+ *
  * There's no guarantee that the data is still available, since e.g. old
  * values might get purged.
+ *
  * @param string key
  * @param mixed Data. Objects would have to be serialized.
  * @param int Time to live (seconds). Default is 0 and means "forever".
@@ -3804,6 +3805,7 @@ function set_to_mem_cache($key, $payload, $ttl = 0)
 
 /**
  * Remove a given key from the volatile/lossy cache.
+ *
  * @param string key
  * @return boolean True on success, false on failure. NULL if no backend available.
  */
@@ -3881,18 +3883,24 @@ function & get_IconLegend()
  */
 function get_active_opcode_cache()
 {
-	$opcode_cache = 'none';
+
 	if( function_exists('apc_cache_info') && ini_get('apc.enabled') ) # disabled for CLI (see apc.enable_cli), however: just use this setting and do not call the function.
 	{
-		$opcode_cache = 'APC';
-	}
-	// xcache: xcache.var_size must be > 0. xcache_set is not necessary (might have been disabled).
-	elseif( ini_get('xcache.size') > 0 )
-	{
-		$opcode_cache = 'xcache';
+		// fp>blueyed? why did you remove the following 2 lines? your comment above is not clear.
+		$apc_info = apc_cache_info( '', true );
+		if( $apc_info['num_entries'] )
+		{
+			return 'APC';
+		}
 	}
 
-	return $opcode_cache;
+	// xcache: xcache.var_size must be > 0. xcache_set is not necessary (might have been disabled).
+	if( ini_get('xcache.size') > 0 )
+	{
+		return 'xcache';
+	}
+
+	return 'none';
 }
 
 
@@ -4034,6 +4042,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.242  2010/07/26 06:52:15  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.241  2010/07/08 05:56:17  efy-asimo
  * Unexpected exception fix on item preview
  *

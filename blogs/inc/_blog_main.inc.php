@@ -123,9 +123,9 @@ if( $resolve_extra_path )
 
 	// Remove trailer:
 	$blog_baseuri_regexp = preg_replace( '¤(\.php[0-9]?)?/?$¤', '', $blog_baseuri );
-	// Readd possibilities in order to get a broad match:
+	// Read possibilities in order to get a broad match:
 	$blog_baseuri_regexp = '¤^'.preg_quote( $blog_baseuri_regexp ).'(\.php[0-9]?)?/(.+)$¤';
-	// pre_dump( 'blog_baseuri_regexp: "', $blog_baseuri_regexp );
+	// pre_dump( '', 'blog_baseuri_regexp: "', $blog_baseuri_regexp );
 
 	if( preg_match( $blog_baseuri_regexp, $ReqPath, $matches ) )
 	{ // We have extra path info
@@ -144,35 +144,14 @@ if( $resolve_extra_path )
 
 		// Slice the path:
 		$path_elements = preg_split( '~/~', $path_string, 20, PREG_SPLIT_NO_EMPTY );
-		// pre_dump( '',$path_elements );
+		// pre_dump( '', $path_elements, $pagenow );
 
-		/* Tblue> This breaks proper error handling for non-existent php
-		 *        files (returns HTTP 301 instead of 404) because the last
-		 *        part of the URI is being removed and b2evo then redirects
-		 *        to the canonical blog homepage URL.
-		 *        Why is this done here? Blog base URLs ending with *.php
-		 *        will be removed above and blog stub names will be removed
-		 *        below anyway?!
-		 * dh> I've fallen into this myself, e.g. with some GET-var => $debug hacking.
-		 *     The workaround appears to be using redir=no.
-		 *     Apart from that, I'm not that much involved in this part of the code.
-		 * fp> Can you give an example URL of undesired behaviour on the demo blog?
-		 * Tblue> dh: Even when using redir=no, 200 OK is returned when
-		 *            404 Not found would be the right status code to return.
-		 *        fp: http://test.b2evo.net/HEAD/blogs/blog1.php/foo.php
-		 *            (compare to http://test.b2evo.net/HEAD/blogs/blog1.php/foo).
-		 * fp> I know I had a good reason for this back in 2003!! I can't remember exactly though :)
-		 * If you want, we can try to comment it out and see how it goes... (please do so, I am not sure exactly how much you want to comment out)
-		 * Tblue> Done, let's see if this has any side-effects.
-		 * dh> Well, http://test.b2evo.net/HEAD/blogs/blog1.php?c=1 still redirects (that's what
-		 *     I've meant above). Should params like those trigger redir=no internally?
-		 * fp> ?c=1 should redirect because in 99% of use cases it gives a junk duplicate content page. If you don't want it to redirect, you should turn off redirects.
-		if( isset( $path_elements[0] ) && preg_match( '#.*\.php[0-9]?$#', $path_elements[0] ) )
-		{ // Ignore element ending with .php (fp: note: may be just '.php')
+		// PREVENT index.php or blog1.php etc from being considered as a slug later on.
+		if( isset( $path_elements[0] ) && $path_elements[0] == $pagenow )
+		{ // Ignore element that is the current PHP file name (ideally this URL will later be redirected to a canonical URL without any .php file in the URL)
 			array_shift( $path_elements );
 			$Debuglog->add( 'Ignoring *.php in extra path info' , 'params' );
 		}
-		*/
 
 		if( isset( $path_elements[0] )
 				&& ( $path_elements[0] == $Blog->stub
@@ -413,7 +392,7 @@ if( !empty($p) || !empty($title) )
 		}
 
 		if( ! $title_fallback )
-		{	// Let's try to fall back to the help...
+		{	// Let's try to fall back to a help slug...
 			$SlugCache = & get_SlugCache();
 			$Slug = & $SlugCache->get_by_name( $title, false, false );
 			if( ! empty($Slug) && $Slug->get( 'type' ) == 'help' )
@@ -424,8 +403,21 @@ if( !empty($p) || !empty($title) )
 			}
 		}
 
+/*	fp> The following is alternative code for filtering out index.php or blog1.php but this should not be needed
+				since I have re-enabled (a new version of) $pagenow removal earlier in this file.
+		if( ! $title_fallback && $orig_title == $pagenow )
+		{	// We are actually searching for something named after the PHP filename!
+			// Example: blog1.php
+			// Consider this as a request for the homepage:
+			// pre_dump( '', $title, $orig_title, $pagenow, $disp );
+			// Already set: $disp = 'posts';
+			$title_fallback = true;
+			$title = NULL;
+		}
+*/
+
 		if( ! $title_fallback )
-		{	// We were not able to fallback to anythign meaningful:
+		{	// We were not able to fallback to anything meaningful:
 			$disp = '404';
 			$disp_detail = '404-post_not_found';
 		}
@@ -663,6 +655,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.167  2010/07/26 06:52:15  efy-asimo
+ * MFB v-4-0
+ *
  * Revision 1.166  2010/07/14 09:06:14  efy-asimo
  * todo fp>asimo modifications
  *
