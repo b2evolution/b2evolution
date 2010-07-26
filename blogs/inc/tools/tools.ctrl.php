@@ -186,7 +186,7 @@ if( empty($tab) )
 				{
 					// set urltitle empty, so the item update function will regenerate the item slug
 					$Item->set( 'urltitle', '' );
-					$result = $Item->dbupdate(/* do not autotrack modification */ false, /* update slug */ $new_Slug, /* do not update excerpt */ false); 
+					$result = $Item->dbupdate(/* do not autotrack modification */ false, /* update slug */ true, /* do not update excerpt */ false); 
 					if( ( $result ) && ( $prev_urltitle != $Item->get( 'urltitle' ) ) )
 					{ // update was successful, and item urltitle was changed
 						$count_slugs++;
@@ -266,7 +266,7 @@ if( empty($tab) )
 
 		$block_item_Widget->title = T_('Recreate item slugs');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
-		echo '&raquo; <a href="'.regenerate_url('action', 'action=recreate_itemslugs').'">'.T_('Recreate all item slugs. Old slugs will still work, but redirect to the new one.').'</a>';
+		echo '&raquo; <a href="'.regenerate_url('action', 'action=recreate_itemslugs').'">'.T_('Recreate all item slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but redirect to the new one.').'</a>';
 		$block_item_Widget->disp_template_raw( 'block_end' );
 	}
 
@@ -318,6 +318,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.32  2010/07/26 07:24:27  efy-asimo
+ * Tools recreate item slugs (change description + fix notice)
+ *
  * Revision 1.31  2010/07/26 06:52:27  efy-asimo
  * MFB v-4-0
  *
