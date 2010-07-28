@@ -174,7 +174,7 @@ if( $current_User->check_perm( 'slugs', 'edit' ) )
 				'td' => action_icon( TS_('Edit this slug...'), 'properties',
 		        		'admin.php?ctrl=slugs&amp;slug_ID=$slug_ID$&amp;action=edit' )
 		                 .action_icon( T_('Delete this slug!'), 'delete',
-		                  regenerate_url( 'slug_ID,action', 'slug_ID=$slug_ID$&amp;action=delete&amp;'.url_crumb('slug') ) ),
+		                  regenerate_url( 'slug_ID,action,slug_filter', 'slug_ID=$slug_ID$&amp;action=delete&amp;'.url_crumb('slug') ) ),
 						);
 
 	$Results->global_icon( T_('Add a new slug...'), 'new', regenerate_url( 'action', 'action=new'), T_('New slug').' &raquo;', 3, 4  );
@@ -185,6 +185,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.9  2010/07/28 08:15:36  efy-asimo
+ * fix slug list view filtering
+ *
  * Revision 1.8  2010/07/26 06:52:27  efy-asimo
  * MFB v-4-0
  *
