@@ -166,9 +166,7 @@ if( empty($tab) )
 
 		case 'recreate_itemslugs':
 			$ItemCache = get_ItemCache();
-			$SlugCache = get_SlugCache();
-			$ItemCache->load_all();
-			$SlugCache->load_all();
+			$ItemCache->load_where( '( post_title != "" ) AND ( post_urltitle = "title" OR post_urltitle LIKE "title-%" )');
 			$items = $ItemCache->get_ID_array();
 			$count_slugs = 0;
 			@set_time_limit(0);
@@ -193,7 +191,7 @@ if( empty($tab) )
 					}
 				}
 			}
-			$Messages->add( sprintf('Created %d new URL slugs for %d total posts.', $count_slugs, count($items)), 'success' );
+			$Messages->add( sprintf( 'Created %d new URL slugs.', $count_slugs ), 'success' );
 			break;
 
 		case 'del_obsolete_tags':
@@ -318,6 +316,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.33  2010/07/28 07:58:53  efy-asimo
+ * Add where condition to recreate slugs tool query
+ *
  * Revision 1.32  2010/07/26 07:24:27  efy-asimo
  * Tools recreate item slugs (change description + fix notice)
  *
