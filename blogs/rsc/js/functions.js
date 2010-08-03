@@ -195,6 +195,7 @@ function textarea_wrap_selection( myField, before, after, replace, target_docume
 		return;
 	}
 	if( window.opener
+		&& ( typeof window.opener != "undefined" )
 		&& window.opener.b2evo_Callbacks
 		&& ( typeof window.opener.b2evo_Callbacks != "undefined" ) )
 	{ // callback in parent document (e.g. "Files" popup)
