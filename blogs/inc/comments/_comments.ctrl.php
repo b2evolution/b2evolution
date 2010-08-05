@@ -313,6 +313,7 @@ switch( $action )
 $AdminUI->set_path( 'items', 'comments' );
 
 require_css( 'rsc/css/blog_base.css', true );
+require_js( 'communication.js' ); // auto requires jQuery
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -381,6 +382,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.34  2010/08/05 08:04:12  efy-asimo
+ * Ajaxify comments on itemList FullView and commentList FullView pages
+ *
  * Revision 1.33  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

@@ -77,8 +77,13 @@ $CommentList->display_init( $display_params );
 // Display navigation:
 $CommentList->display_nav( 'header' );
 
+load_funcs( 'comments/model/_comment_js.funcs.php' );
+
 // Display list of comments:
+// comments_container value is -1, because in this case we have to show all comments in current blog (Not just one item comments)
+echo '<div id="comments_container" value="-1">';
 require dirname(__FILE__).'/_comment_list.inc.php';
+echo '</div>';
 
 // Display navigation:
 $CommentList->display_nav( 'footer' );
@@ -88,6 +93,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.10  2010/08/05 08:04:12  efy-asimo
+ * Ajaxify comments on itemList FullView and commentList FullView pages
+ *
  * Revision 1.9  2010/05/10 14:26:17  efy-asimo
  * Paged Comments & filtering & add comments listview
  *

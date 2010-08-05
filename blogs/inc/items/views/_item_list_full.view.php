@@ -333,12 +333,18 @@ while( $Item = & $ItemList->get_item() )
 			?>
 			<div class="bFeedback">
 			<a id="comments"></a>
-			<h4><?php echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks') ?>:</h4>
+			<h4>
+			<?php 
+				echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks');
+				$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', 'javascript:startRefreshComments('.$Item->ID.')' ).'</span> ';
+				echo $refresh_link;
+			?>:</h4>
 			<?php
+
 			global $CommentList;
 
 			$CommentList = new CommentList2( $Blog );
-	
+
 			// Filter list:
 			$CommentList->set_filters( array(
 				'types' => array( 'comment','trackback','pingback' ),
@@ -347,22 +353,59 @@ while( $Item = & $ItemList->get_item() )
 				'post_ID' => $Item->ID,
 				'comments' => 1000,
 			) );
+			$CommentList->query();
+			$comments_number = $CommentList->get_num_rows();
 
-			// Get ready for display (runs the query):
-			$CommentList->display_init();
-
-			$CommentList->display_if_empty( array(
-					'before'    => '<div class="bComment"><p>',
-					'after'     => '</p></div>',
-					'msg_empty' => T_('No feedback for this post yet...'),
-				) );
+			$show_comments = param( 'show_comments', 'string', ''/*, true*/ );
+			if( $show_comments == '' ) {
+				// decide to show all comments, or only drafts
+				// consider that we have to show all comments
+				$show_comments = 'all';
+				if( $comments_number > 5 )
+				{ // there is more then 5 comments, check if draft exists
+					while( ( $Comment = & $CommentList->get_next() ) )
+					{ // there is no draft comments yet
+						if( $Comment->get( 'status' ) == 'draft' )
+						{
+							$show_comments = 'draft';
+							break; // draft comment was found
+						}
+					}
+					$CommentList->restart();
+				}
+				// set new show_comments param
+				param( 'show_comments', 'string', $show_comments, false, true );
+			}
 
 			// we do not want to comment actions use new redirect
 			param( 'save_context', 'boolean', false );
 			param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$Item->ID, '&' ), false, true );
 
-			// Display list of comments:
+			// display status filter
+			?>
+			<div class="tile">
+				<input type="radio" name="show_comments" value="draft" id="only_draft" class="radio" <?php if( $show_comments == 'draft' ) echo 'checked="checked" '?> />
+				<label for="only_draft"><?php echo T_('Show drafts') ?></label>
+			</div>
+			<div class="tile">
+				<input type="radio" name="show_comments" value="all" id="show_all" class="radio" <?php if( $show_comments == 'all' ) echo 'checked="checked" '?> />
+				<label for="show_all"><?php echo T_('Show all comments') ?></label>
+			</div>
+			<?php
+
+			load_funcs( 'comments/model/_comment_js.funcs.php' );
+
+			// comments_container value shows, current Item ID
+			echo '<div id="comments_container" value="'.$Item->ID.'">';
+			// display comments
+			$CommentList->display_if_empty( array(
+				'before'    => '<div class="bComment"><p>',
+				'after'     => '</p></div>',
+				'msg_empty' => T_('No feedback for this post yet...'),
+			) );
+
 			require $inc_path.'comments/views/_comment_list.inc.php';
+			echo '</div>'; // comments_container div
 
 			if( $Item->can_comment() )
 			{ // User can leave a comment
@@ -414,6 +457,8 @@ while( $Item = & $ItemList->get_item() )
 <?php
 }
 
+echo_show_comments_changed();
+
 // Display navigation:
 $ItemList->display_nav( 'footer' );
 
@@ -422,6 +467,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.39  2010/08/05 08:04:12  efy-asimo
+ * Ajaxify comments on itemList FullView and commentList FullView pages
+ *
  * Revision 1.38  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

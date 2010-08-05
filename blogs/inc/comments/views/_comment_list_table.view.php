@@ -33,6 +33,11 @@ global $Blog;
  */
 global $CommentList;
 
+/*
+ * Display comments:
+ */
+$CommentList->query();
+
 // Display title depending on selection params:
 echo $CommentList->get_filter_title( '<h2>', '</h2>', '<br />', NULL, 'htmlbody' );
 
@@ -230,7 +235,7 @@ function comment_edit_actions( $Comment )
 	// Display edit and delete button if current user has the rights:
 	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ))
 	{
-		$redirect_to = rawurlencode( regenerate_url( 'comment_ID,action', 'tab3=listview', '', '&' ) );
+		$redirect_to = rawurlencode( regenerate_url( 'comment_ID,action', 'filter=restore', '', '&' ) );
 
 		$r = action_icon( TS_('Edit this comment...'), 'properties',
 		  'admin.php?ctrl=comments&amp;comment_ID='.$Comment->ID.'&amp;action=edit&amp;redirect_to='.$redirect_to );
@@ -255,6 +260,9 @@ $CommentList->display();
 
 /*
  * $Log$
+ * Revision 1.6  2010/08/05 08:04:12  efy-asimo
+ * Ajaxify comments on itemList FullView and commentList FullView pages
+ *
  * Revision 1.5  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

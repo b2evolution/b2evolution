@@ -1173,6 +1173,7 @@ if( !empty($tab) )
 
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
 require_css( $rsc_url.'css/blog_base.css' );
+require_js( 'communication.js' ); // auto requires jQuery
 
 // Load the appropriate ITEM/POST styles depending on the blog's skin:
 if( ! empty( $Blog->skin_ID) )
@@ -1383,6 +1384,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.103  2010/08/05 08:04:12  efy-asimo
+ * Ajaxify comments on itemList FullView and commentList FullView pages
+ *
  * Revision 1.102  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

@@ -1648,8 +1648,238 @@ function echo_set_slug_changed()
 	</script>
 <?php
 }
+
+
+/**
+ * Handle show_comments radioboxes on item list full view
+ */
+function echo_show_comments_changed()
+{
+?>
+	<script type="text/javascript">
+		jQuery( '[name |= show_comments]' ).change( function()
+		{
+			var item_id = $('#comments_container').attr('value');
+			if( ! isDefined( item_id) )
+			{ // if item_id is not defined, we have to show all comments from current blog 
+				item_id = -1;
+			}
+			refresh_item_comments( item_id );
+		} );
+	</script>
+<?php
+}
+
+
+/**
+ * Display CommentList with the given filters
+ * 
+ * @param int blog
+ * @param item item
+ * @param array status filters
+ * @param int limit
+ * @param $comment_IDs
+ * @param string comment IDs string to exclude from the list
+ */
+function echo_item_comments( $blog_ID, $item_ID, $statuses = array( 'draft', 'published', 'deprecated' ),
+	$limit = 1000, $comment_IDs = array() )
+{
+	global $inc_path, $status_list, $Blog, $admin_url;
+
+	$BlogCache = & get_BlogCache();
+	$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+
+	global $CommentList;
+	$CommentList = new CommentList2( $Blog );
+
+	$exlude_ID_list = NULL;
+	if( !empty($comment_IDs) )
+	{
+		$exlude_ID_list = '-'.implode( ",", $comment_IDs );
+	}
+
+	// if item_ID == -1 then don't use item filter! display all comments from current blog 
+	if( $item_ID == -1 )
+	{
+		$item_ID = NULL;
+	}
+	// set redirect_to 
+	if( $item_ID != null )
+	{ // redirect to the items full view
+		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog_ID.'&p='.$item_ID, '&' ) );
+		// Filter list:
+		$CommentList->set_filters( array(
+			'types' => array( 'comment', 'trackback', 'pingback' ),
+			'statuses' => $statuses,
+			'comment_ID_list' => $exlude_ID_list,
+			'post_ID' => $item_ID,
+			'order' => 'ASC',//$order,
+			'comments' => $limit,
+		) );
+	}
+	else
+	{ // redirect to the comments full view
+		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=comments&blog='.$blog_ID.'&filter=restore', '&' ) );
+		// this is an ajax call we always have to restore the filterst (we can set filters only without ajax call)
+		$CommentList->set_filters( array(
+			'types' => array( 'comment', 'trackback', 'pingback' ),
+		) );
+		$CommentList->restore_filterset();
+	}
+
+	// Get ready for display (runs the query):
+	$CommentList->display_init();
+
+	$CommentList->display_if_empty( array(
+		'before'    => '<div class="bComment"><p>',
+		'after'     => '</p></div>',
+		'msg_empty' => T_('No feedback for this post yet...'),
+	) );
+
+	// display comments
+	require $inc_path.'comments/views/_comment_list.inc.php';
+}
+
+
+/**
+ * Display a comment corresponding the given comment id
+ * 
+ * @param int comment id
+ * @param string where to redirect after comment edit
+ * @param boolean true to set the new redirect param, false otherwise
+ */
+function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
+{
+	global $current_User;
+
+	$CommentCache = & get_CommentCache();
+	$Comment = $CommentCache->get_by_ID( $comment_ID );
+
+	$is_published = ( $Comment->get( 'status' ) == 'published' );
+
+	$Item = & $Comment->get_Item(); 
+	$Blog = & $Item->get_Blog();
+
+	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) )
+	{
+		echo '<div id="c'.$comment_ID.'" class="bComment bComment';
+		$Comment->status('raw');
+		echo '">';
+
+		echo '<div class="bSmallHead">';
+		echo '<div>';
+
+		echo '<div class="bSmallHeadRight">';
+		echo T_('Visibility').': ';
+		echo '<span class="bStatus">';
+		$Comment->status();
+		echo '</span>';
+		echo '</div>';
+
+		echo '<span class="bDate">';
+		$Comment->date();
+		echo '</span>@<span class = "bTime">';
+		$Comment->time( 'H:i' );
+		echo '</span>';
+
+		$Comment->author_email( '', ' &middot; Email: <span class="bEmail">', '</span>' );
+		echo ' &middot; <span class="bKarma">';
+		$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No Spam Karma') );
+		echo '</span>';
+
+		echo '</div>';
+		echo '<div style="padding-top:3px">';
+		$Comment->author_ip( 'IP: <span class="bIP">', '</span> &middot; ' );
+		$Comment->author_url_with_actions( /*$redirect_to*/'', true, true );
+		echo '</div>';
+		echo '</div>';
+
+		echo '<div class="bCommentContent">';
+		echo '<div class="bTitle">';
+		echo T_('In response to:')
+				.' <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'">'.$Item->dget('title').'</a>';
+		echo '</div>';
+		echo '<div class="bCommentTitle">';
+		echo $Comment->get_title();
+		echo '</div>';
+		echo '<div class="bCommentText">';
+		$Comment->rating();
+		$Comment->avatar();
+		$Comment->content();
+		echo '</div>';
+		echo '</div>';
+
+		echo '<div class="CommentActionsArea">';
+		$Comment->permanent_link( array(
+				'class'    => 'permalink_right'
+			) );
+
+		// Display edit button if current user has the rights:
+		$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton', '&amp;', $save_context, $redirect_to );
+
+		// Display publish NOW button if current user has the rights:
+		$Comment->publish_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', $save_context, true, $redirect_to );
+
+		// Display deprecate button if current user has the rights:
+		$Comment->deprecate_link( ' ', ' ', '#', '#', 'DeleteButton', '&amp;', $save_context, true, $redirect_to );
+
+		// Display delete button if current user has the rights:
+		$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', false, '&amp;', $save_context, true );
+
+		echo '<div class="clear"></div>';
+		echo '</div>';
+		echo '</div>';
+	}
+	else
+	{
+		echo '<div id="c'.$comment_ID.'" class="bComment bComment';
+		$Comment->status('raw');
+		echo '">';
+
+		echo '<div class="bSmallHead">';
+		echo '<div>';
+
+		echo '<div class="bSmallHeadRight">';
+		echo T_('Visibility').': ';
+		echo '<span class="bStatus">';
+		$Comment->status();
+		echo '</span>';
+		echo '</div>';
+
+		echo '<span class="bDate">';
+		$Comment->date();
+		echo '</span>@<span class = "bTime">';
+		$Comment->time( 'H:i' );
+		echo '</span>';
+
+		echo '</div>';
+		echo '</div>';
+
+		if( $is_published )
+		{
+			echo '<div class="bCommentContent">';
+			echo '<div class="bCommentTitle">';
+			echo $Comment->get_title();
+			echo '</div>';
+			echo '<div class="bCommentText">';
+			$Comment->rating();
+			$Comment->avatar();
+			$Comment->content();
+			echo '</div>';
+			echo '</div>';
+		}
+
+		echo '<div class="clear"></div>';
+		echo '</div>';
+	}
+}
+
+
 /*
  * $Log$
+ * Revision 1.116  2010/08/05 08:04:12  efy-asimo
+ * Ajaxify comments on itemList FullView and commentList FullView pages
+ *
  * Revision 1.115  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

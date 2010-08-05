@@ -40,129 +40,24 @@ global $dispatcher;
 $redirect_to = param( 'redirect_to', 'string', regenerate_url( '', 'filter=restore', '', '&' ) );
 $redirect_to = rawurlencode( $redirect_to );
 $save_context = param( 'save_context', 'boolean', 'true' );
+$show_comments = param( 'show_comments', 'string', 'all' );
 
 while( $Comment = & $CommentList->get_next() )
 { // Loop through comments:
-	$is_published = ( $Comment->get( 'status' ) == 'published' );
-	/* ========== START of a COMMENT/TB/PB ========== */
-	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) )
-	{	// User is allowed to edit this comment:
-	?>
-	<div id="c<?php echo $Comment->ID ?>" class="bComment bComment<?php $Comment->status('raw') ?>">
-		<div class="bSmallHead">
-         <div>
-			<?php
-				echo '<div class="bSmallHeadRight">';
-				echo T_('Visibility').': ';
-				echo '<span class="bStatus">';
-				$Comment->status();
-				echo '</span>';
-				echo '</div>';
-			?>
-			<span class="bDate"><?php $Comment->date(); ?></span>
-			@
-			<span class="bTime"><?php $Comment->time( 'H:i' ); ?></span>
-			<?php
-			$Comment->author_email( '', ' &middot; Email: <span class="bEmail">', '</span>' );
-			echo ' &middot; <span class="bKarma">';
-			$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No Spam Karma') );
-			echo '</span>';
-			?>
-         </div>
-         <div style="padding-top:3px">
-         	<?php
-			$Comment->author_ip( 'IP: <span class="bIP">', '</span> &middot; ' );
-			$Comment->author_url_with_actions( $redirect_to, false, true );
-		 	?>
-         </div>
-		</div>
-		<div class="bCommentContent">
-		<div class="bTitle">
-			<?php
-			$comment_Item = & $Comment->get_Item();
-			echo T_('In response to:')
-				.' <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$comment_Item->ID.'">'.$comment_Item->dget('title').'</a>';
-			?>
-		</div>
-		<div class="bCommentTitle">
-			<?php echo $Comment->get_title(); ?>
-		</div>
-		<div class="bCommentText">
-			<?php $Comment->rating(); ?>
-			<?php $Comment->avatar(); ?>
-			<?php $Comment->content() ?>
-		</div>
-		</div>
-		<div class="CommentActionsArea">
-			<?php
-				$Comment->permanent_link( array(
-						'class'    => 'permalink_right'
-					) );
-
-				// Display edit button if current user has the rights:
-				$Comment->edit_link( ' ', ' ', '#', '#', 'ActionButton', '&amp;', $save_context, $redirect_to );
-
-				// Display publish NOW button if current user has the rights:
-				$Comment->publish_link( ' ', ' ', '#', '#', 'PublishButton', '&amp;', $save_context );
-
-				// Display deprecate button if current user has the rights:
-				$Comment->deprecate_link( ' ', ' ', '#', '#', 'DeleteButton', '&amp;', $save_context );
-
-				// Display delete button if current user has the rights:
-				$Comment->delete_link( ' ', ' ', '#', '#', 'DeleteButton', false, '&amp;', $save_context );
-			?>
-   		<div class="clear"></div>
-		</div>
-
-	</div>
-	<!-- ========== END of a COMMENT/TB/PB ========== -->
-	<?php
+	if( ( $show_comments == 'draft' ) && ( $Comment->get( 'status' ) != 'draft' ) )
+	{ // if show only draft comments, and current comment status isn't draft, then continue with the next comment
+		continue;
 	}
-	else
-	{ // User is NOT allowed to edit this comment
-	?>
-	<div id="c<?php echo $Comment->ID ?>" class="bComment bComment<?php $Comment->status('raw') ?>">
-		<div class="bSmallHead">
-         <div>
-			<?php
-				echo '<div class="bSmallHeadRight">';
-				echo T_('Visibility').': ';
-				echo '<span class="bStatus">';
-				$Comment->status();
-				echo '</span>';
-				echo '</div>';
-			?>
-			<span class="bDate"><?php $Comment->date(); ?></span>
-			@
-			<span class="bTime"><?php $Comment->time( 'H:i' ); ?></span>
-		 </div>
-		</div>
-		<?php
-		if( $is_published )
-		{
-		?>
-			<div class="bCommentContent">
-				<div class="bCommentTitle">
-				<?php echo $Comment->get_title(); ?>
-				</div>
-				<div class="bCommentText">
-				<?php $Comment->rating(); ?>
-				<?php $Comment->avatar(); ?>
-				<?php $Comment->content() ?>
-				</div>
-			</div>
-			<div class="clear"></div>
-		<?php
-		}
-	?>
-	</div>
-	<?php
-	}
-	/* ========== END of a COMMENT/TB/PB ========== */
+	echo '<div id="comment_'.$Comment->ID.'">';
+	echo_comment( $Comment->ID, $redirect_to, $save_context );
+	echo'</div>';
 } //end of the loop, don't delete
 
 /*
  * $Log$
+ * Revision 1.20  2010/08/05 08:04:12  efy-asimo
+ * Ajaxify comments on itemList FullView and commentList FullView pages
+ *
  * Revision 1.19  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

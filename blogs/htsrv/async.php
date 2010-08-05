@@ -158,13 +158,22 @@ switch( $action )
 
 		$blog = param( 'blogid', 'integer' );
 		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ) );
+		$moderation = param( 'moderation', 'string', NULL );
+		$redirect_to = param( 'redirect_to', 'string', NULL );
 		$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
 
 		$status = param( 'status', 'string' );
 		$edited_Comment->set('status', $status );
 		$edited_Comment->dbupdate();
 
-		get_comments_awaiting_moderation( $blog );
+		if( $moderation == NULL )
+		{
+			get_comments_awaiting_moderation( $blog );
+		}
+		else
+		{
+			echo_comment( $edited_Comment->ID, rawurlencode( $redirect_to ), true );
+		}
 		exit(0);
 
 	case 'delete_comment':
@@ -181,6 +190,28 @@ switch( $action )
 		$edited_Comment->dbdelete();
 
 		get_comments_awaiting_moderation( $blog );
+		exit(0);
+
+	case 'delete_comments':
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+
+		global $blog;
+
+		$blog = param( 'blogid', 'integer' );
+		$commentIds = param( 'commentIds', 'array' );
+		$item_ID = param( 'itemid', 'integer' );
+
+		foreach( $commentIds as $commentID )
+		{
+			$edited_Comment = & Comment_get_by_ID( $commentID );
+			$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+
+			$edited_Comment->dbdelete();
+		}
+
+		echo_item_comments( $blog, $item_ID, NULL );
 		exit(0);
 
 	case 'delete_comment_url':
@@ -209,6 +240,26 @@ switch( $action )
 		$blog = param( 'blogid', 'integer' );
 
 		get_comments_awaiting_moderation( $blog );
+		exit(0);
+
+	case 'refresh_item_comments':
+		// refresh all item comments, or refresh all blog comments, if param itemid = -1
+		load_funcs( 'items/model/_item.funcs.php' );
+
+		$blog = param( 'blogid', 'integer' );
+		$item_ID = param( 'itemid', 'integer', NULL );
+		$statuses = param( 'statuses', 'string', NULL );
+		//$statuses = init_show_comments();
+		if( strlen($statuses) > 2 )
+		{
+			$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
+		}
+		$status_list = explode( ',', $statuses );
+		if( $status_list == NULL )
+		{
+			$status_list = array( 'published', 'draft', 'deprecated' );
+		}
+		echo_item_comments( $blog, $item_ID, $status_list );
 		exit(0);
 
 	case 'get_tags':
@@ -271,6 +322,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.55  2010/08/05 08:04:12  efy-asimo
+ * Ajaxify comments on itemList FullView and commentList FullView pages
+ *
  * Revision 1.54  2010/06/15 20:02:42  blueyed
  * async.php: add get_tags callback, to be used for tags auto completion.
  *

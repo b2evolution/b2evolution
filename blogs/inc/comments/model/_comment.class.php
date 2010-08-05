@@ -900,7 +900,7 @@ class Comment extends DataObject
 	 * @param boolean save context?
 	 * @param boolean true if create AJAX button
 	 */
-	function get_deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
+	function get_deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
 		global $current_User, $admin_url;
 
@@ -922,7 +922,11 @@ class Comment extends DataObject
 
 		if( $ajax_button )
 		{
-			$r .= 'javascript:setCommentStatus('.$this->ID.', \'deprecated\');';
+			if( $save_context && ( $redirect_to == NULL ) )
+			{
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
+			}
+			$r .= 'javascript:setCommentStatus('.$this->ID.', \'deprecated\', \''.$redirect_to.'\');';
 		}
 		else
 		{
@@ -954,9 +958,9 @@ class Comment extends DataObject
 	 * @param boolean save context?
 	 * @param boolean true if create AJAX button
 	 */
-	function deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
+	function deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
-		echo $this->get_deprecate_link( $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button );
+		echo $this->get_deprecate_link( $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button, $redirect_to );
 	}
 
 
@@ -972,7 +976,7 @@ class Comment extends DataObject
 	 * @param boolean save context?
 	 * @param boolean true if create AJAX button
 	 */
-	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
+	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
 		global $current_User, $admin_url;
 
@@ -993,7 +997,11 @@ class Comment extends DataObject
 		$r .= '<a href="';
 		if( $ajax_button )
 		{
-			$r .= 'javascript:setCommentStatus('.$this->ID.', \'published\');';
+			if( $save_context && ( $redirect_to == NULL ) )
+			{
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
+			}
+			$r .= 'javascript:setCommentStatus('.$this->ID.', \'published\', \''.$redirect_to.'\');';
 		}
 		else
 		{
@@ -1025,9 +1033,9 @@ class Comment extends DataObject
 	 * @param boolean save context?
 	 * @param boolean true if create AJAX button
 	 */
-	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false )
+	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
-		echo $this->get_publish_link( $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button );
+		echo $this->get_publish_link( $before, $after, $text, $title, $class, $glue, $save_context, $ajax_button, $redirect_to );
 	}
 
 
@@ -1680,6 +1688,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.65  2010/08/05 08:04:12  efy-asimo
+ * Ajaxify comments on itemList FullView and commentList FullView pages
+ *
  * Revision 1.64  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *
