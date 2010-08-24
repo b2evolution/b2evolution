@@ -238,7 +238,7 @@ if( $action != 'view' )
 
 		ob_start();
 		// UserSettings:
-		$plugin_user_settings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true) );
+		$plugin_user_settings = $loop_Plugin->GetDefaultUserSettings( $tmp_params = array('for_editing'=>true, 'user_ID' => $edited_User->ID) );
 		if( is_array($plugin_user_settings) )
 		{
 			foreach( $plugin_user_settings as $l_name => $l_meta )
@@ -290,6 +290,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.11  2010/08/24 08:20:19  efy-asimo
+ * twitter plugin oAuth
+ *
  * Revision 1.10  2010/03/01 07:52:51  efy-asimo
  * Set manual links to lowercase
  *

@@ -3042,12 +3042,17 @@ class Plugin
 	 * @param string parameter name
 	 * @param mixed parameter value
 	 */
-	function set_coll_setting( $parname, $parvalue )
+	function set_coll_setting( $parname, $parvalue, $blog = NULL )
 	{
 		/**
 		 * @var Blog
 		 */
 		global $Blog;
+		if( empty( $Blog ) )
+		{
+			$BlogCache = & get_BlogCache();
+			$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+		}
 
 		// Name of the setting in the blog settings:
 		$blog_setting_name = 'plugin'.$this->ID.'_'.$parname;
@@ -3060,6 +3065,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.44  2010/08/24 08:20:19  efy-asimo
+ * twitter plugin oAuth
+ *
  * Revision 1.43  2010/06/01 02:44:44  sam2kb
  * New hooks added: GetCollectionKinds and InitCollectionKinds.
  * Use them to define new and override existing presets for new blogs.

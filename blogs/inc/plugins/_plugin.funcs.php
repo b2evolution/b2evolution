@@ -430,6 +430,10 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			$Form->text_input( $input_name, $set_value, $size, $set_label, '', $params ); // TEMP: Note already in params
 			break;
 
+		case 'info':
+			$Form->info( $parmeta['label'], $parmeta['info'] );
+			break;
+
 		default:
 			debug_die( 'Unsupported type ['.$parmeta['type'].'] from GetDefaultSettings()!' );
 	}
@@ -1053,6 +1057,9 @@ function handle_array_keys_in_plugin_settings( & $a )
 
 /*
  * $Log$
+ * Revision 1.19  2010/08/24 08:20:19  efy-asimo
+ * twitter plugin oAuth
+ *
  * Revision 1.18  2010/05/13 15:13:13  blueyed
  * Fix E_NOTICE with empty/optional 'note' entry in 'select' entries.
  *

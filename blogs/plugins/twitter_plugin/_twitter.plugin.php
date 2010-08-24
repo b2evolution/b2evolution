@@ -61,6 +61,12 @@ class twitter_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
+		// Check php version
+		if( version_compare( phpversion(), '5.0.0', '<' ) )
+		{ // the plugin is not supported
+			return false;
+		}
+
 		$this->name = T_('Twitter plugin');
 		$this->short_desc = $this->T_('Post to your Twitter account when you post to your blog');
 		$this->long_desc = $this->T_('Posts to your Twitter account to update Twitter.com with details of your blog post.');
@@ -96,6 +102,16 @@ class twitter_plugin extends Plugin
 			return T_('The twitter plugin needs a non-empty code.');
 		}
 
+		if( version_compare( phpversion(), '5.0.0', '<' ) )
+		{
+			return T_('The twitter plugin requires php5.');
+		}
+
+		if( !extension_loaded( 'curl') )
+		{
+			return T_( 'The twitter plugin requires curl extension.');
+		}
+
 		// OK:
 		return true;
 	}
@@ -114,19 +130,19 @@ class twitter_plugin extends Plugin
 		$item_Blog = $params['Item']->get_Blog();
 
 		// Try to get twitter account for Blog:
-		$username = $this->get_coll_setting( 'twitter_username', $item_Blog );
-		$password = $this->get_coll_setting( 'twitter_password', $item_Blog );
-		if( empty($username) || empty($password) )
+		$oauth_token = $this->get_coll_setting( 'twitter_token', $item_Blog );
+		$oauth_token_secret = $this->get_coll_setting( 'twitter_secret', $item_Blog );
+		if( empty($oauth_token) || empty($oauth_token_secret) )
 		{ // Not found, fallback to Trying to get twitter account for User:
-			$username = $this->UserSettings->get( 'twitter_username' );
-			$password = $this->UserSettings->get( 'twitter_password' );
-			if( empty($username) || empty($password) )
+			$oauth_token = $this->UserSettings->get( 'twitter_token' );
+			$oauth_token_secret = $this->UserSettings->get( 'twitter_secret' );
+			if( empty($oauth_token) || empty($oauth_token_secret) )
 			{	// Still no twitter account found:
 				$params['xmlrpcresp'] = T_('You must configure a twitter username/password before you can post to twitter.');
 				return false;
 			}
 			else
-				{	// Get additional params from User Setttings:
+			{	// Get additional params from User Setttings:
 				$msg = $this->UserSettings->get( 'twitter_msg_format' );
 			}
 		}
@@ -143,44 +159,10 @@ class twitter_plugin extends Plugin
 		$msg = str_replace( '$excerpt$', $excerpt, $msg );
 		$msg = str_replace( '$url$', $url, $msg );
 
-		if( extension_loaded( 'curl' ) )
-		{ // CURL available
-			$session = curl_init();
-			curl_setopt( $session, CURLOPT_URL, 'http://twitter.com/statuses/update.xml' );
-			curl_setopt( $session, CURLOPT_POSTFIELDS, 'status='.urlencode($msg));
-			curl_setopt( $session, CURLOPT_HTTPAUTH, CURLAUTH_BASIC );
-			curl_setopt( $session, CURLOPT_HEADER, false );
-			curl_setopt( $session, CURLOPT_CONNECTTIMEOUT, 5);
-			curl_setopt( $session, CURLOPT_USERPWD, $username.':'.$password );
-			curl_setopt( $session, CURLOPT_RETURNTRANSFER, 1 );
-			curl_setopt( $session, CURLOPT_POST, 1);
-			$result = curl_exec ( $session ); // will be an XML message
-			curl_close( $session );
-		}
-		else
-		{ // fallback to fsockopen
-			$host = 'twitter.com';
-			$url = '/statuses/update.xml?status='.urlencode( $msg );
-			// Build the header
-			$header  = 'POST '.$url.' HTTP/1.0'."\r\n";
-			$header .= 'Host: '.$host."\r\n";
-			$header .= 'Authorization: Basic '.base64_encode( $username.':'.$password )."\r\n";
-			$header .= 'Connection: Close'."\r\n\r\n";
-			if( $fp = fsockopen($host, 80) )
-			{
-				fputs($fp, $header );
-				$result = '';
-				while( !feof( $fp ) )
-				{
-					$result .= fgets( $fp, 1024 );
-				}
-				fclose($fp);
-			}
-			else
-			{ // unable to tweet
-				$params['xmlrpcresp'] = T_('No ping method available, please contact your host about using CURL or fsockopen');
-			}
-		}
+		require_once 'twitteroauth/twitteroauth.php';
+		$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth_token, $oauth_token_secret );
+
+		$result = $connection->post('statuses/update', array( 'status' => $msg ));
 
 		if( empty($result) )
 		{
@@ -192,7 +174,9 @@ class twitter_plugin extends Plugin
 			return false;
 		}
 
-		$params['xmlrpcresp'] = T_('Posted to account: @').$username;
+		$account = $connection->get('account/verify_credentials');
+
+		$params['xmlrpcresp'] = T_('Posted to account: @').$account->screen_name;
 		return true;
 	}
 
@@ -203,14 +187,16 @@ class twitter_plugin extends Plugin
 	 */
 	function GetDefaultUserSettings( & $params )
 	{
+		$info = NULL;
+		if( isset( $params['user_ID'] ) )
+		{ // initialize info only once, when needs to display the link (user_ID is set)
+			$info = $this->get_twitter_link( 'user', $params['user_ID'] );
+		}
 		return array(
-				'twitter_username' => array(
-					'label' => T_( 'Twitter username' ),
-					'type' => 'text',
-				),
-				'twitter_password' => array(
-					'label' => T_( 'Twitter password' ),
-					'type' => 'password',
+				'twitter_contact' => array(
+					'label' => T_('Twitter account status'),
+					'info' => $info,
+					'type' => 'info',
 				),
 				'twitter_msg_format' => array(
 					'label' => T_( 'Message format' ),
@@ -233,14 +219,16 @@ class twitter_plugin extends Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
+		$info = NULL;
+		if( isset( $params['blog_ID'] ) )
+		{ // initialize info only once, when needs to display the link
+			$info = $this->get_twitter_link( 'blog', $params['blog_ID'] );
+		}
 		return array(
-				'twitter_username' => array(
-					'label' => T_( 'Twitter username' ),
-					'type' => 'text',
-				),
-				'twitter_password' => array(
-					'label' => T_( 'Twitter password' ),
-					'type' => 'password',
+				'twitter_contact' => array(
+					'label' => T_('Twitter account status'),
+					'info' => $info,
+					'type' => 'info',
 				),
 				'twitter_msg_format' => array(
 					'label' => T_( 'Message format' ),
@@ -253,10 +241,93 @@ class twitter_plugin extends Plugin
 			);
 	}
 
+
+	/**
+	 * Get link to twitter oAuth
+	 * 
+	 * @param string target type can be "blog" or "user", depends if we set blog or user setting 
+	 * @param string current blog id or edited user id
+	 * @return string twitter oAuth link
+	 */
+	function get_twitter_link( $target_type, $target_id )
+	{
+		require_once 'twitteroauth/twitteroauth.php';
+		global $BlogCache;
+
+		// decide to set Plugin CollSettings or UserSettings
+		if( $target_type == 'blog' )
+		{ // CollSettings
+			// get setting from db
+			$Blog = $BlogCache->get_by_ID( $target_id, false, false );
+			if( empty( $Blog ) ) {
+				return '<p>'.T_( 'Could not initialize' ).'</p>';
+			}
+			$oauth_token = $this->get_coll_setting( 'twitter_token', $Blog );
+			if( !empty( $oauth_token ) )
+			{ // blog has already a linked twitter user, get token secret
+				$oauth_token_secret = $this->get_coll_setting( 'twitter_secret', $Blog );
+			}
+		}
+		else if ( $target_type = 'user' )
+		{ // UserSettings
+			// get setting from db
+			if( empty ( $this->UserSettings ) ) {
+				return NULL;
+			}
+			$oauth_token = $this->UserSettings->get( 'twitter_token', $target_id );
+			if( !empty( $oauth_token ) )
+			{ // user has already a linked twitter user, get token secret
+				$oauth_token_secret = $this->UserSettings->get( 'twitter_secret', $target_id );
+			}
+		}
+
+		if( !empty( $oauth_token ) )
+		{ // already linked
+			$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth_token, $oauth_token_secret );
+			// get linked user account
+			$account = $connection->get('account/verify_credentials');
+			$result = T_('Linked to').': @'.$account->screen_name.'. ';
+		}
+
+		// create new connection
+		$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET);
+
+		global $baseurl;
+
+		// set callback params
+		$callback = TWITTER_CALLBACK.'?target_type='.$target_type.'&target_id='.$target_id.'&plugin_id='.$this->ID;
+
+		$req_token = $connection->getRequestToken( $callback );
+
+		$token = $req_token['oauth_token'];
+
+		/* Save temporary credentials to session. */
+		global $Session;
+		$Session->delete( 'oauth_token' );
+		$Session->delete( 'oauth_token_secret' );
+		$Session->set( 'oauth_token', $req_token['oauth_token'] );
+		$Session->set( 'oauth_token_secret', $req_token['oauth_token_secret'] );
+		$Session->dbsave();
+
+		if( empty( $result ) )
+		{ // wasn't linked to twitter
+			$result = '<a href='.$connection->getAuthorizeURL( $req_token, false ).'>'.T_( 'Click here to link to your twitter account' ).'</a>';
+		}
+		else
+		{
+			$result = $result.'<a href='.$connection->getAuthorizeURL( $req_token, false ).'>'.T_( 'Link to another account' ).'</a>';
+		}
+
+		return $result;
+	}
+
 }
 
 /*
  * $Log$
+ * Revision 1.20  2010/08/24 08:20:19  efy-asimo
+ * twitter plugin oAuth
+ *
  * Revision 1.19  2010/05/11 11:56:31  efy-asimo
  * twitter plugin use tiny url
  *

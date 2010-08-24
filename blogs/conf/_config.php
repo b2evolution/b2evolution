@@ -84,12 +84,23 @@ if( $debug == 'pwd' )
 	}
 }
 
+// Twitter params initialization
+define( 'TWITTER_CONSUMER_KEY', 'z680vsCAnATc0ZQNgMVwbg' );
+define( 'TWITTER_CONSUMER_SECRET', 'OBo8xI6pvTR1KI0LBHEkjpPPd6nN99tq4SAY8qrBp8' );
+define( 'TWITTER_CALLBACK', $baseurl.'plugins/twitter_plugin/_twitter_callback.php' );
+//test app
+/*define( 'TWITTER_CONSUMER_KEY', 'PTJjBJraSkghuFVXQysPTg' );
+define( 'TWITTER_CONSUMER_SECRET', 'pcGfALMLaOF6VCaG6FwVO5hI1jtTPEgbLyj6Yo0DN04' );*/
+
 // STUFF THAT SHOULD BE INITIALIZED (to avoid param injection on badly configured PHP)
 $use_db = true;
 $use_session = true;
 
 /*
  * $Log$
+ * Revision 1.63  2010/08/24 08:20:19  efy-asimo
+ * twitter plugin oAuth
+ *
  * Revision 1.62  2009/12/22 09:03:19  fplanque
  * lose debug cookie when closing browser
  *

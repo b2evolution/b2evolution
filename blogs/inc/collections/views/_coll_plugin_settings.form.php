@@ -62,7 +62,7 @@ while( $loop_Plugin = & $Plugins->get_next() )
 
 	ob_start();
 
-	$plugin_settings = $loop_Plugin->get_coll_setting_definitions( $tmp_params = array('for_editing'=>true) );
+	$plugin_settings = $loop_Plugin->get_coll_setting_definitions( $tmp_params = array( 'for_editing' => true, 'blog_ID' => $Blog->ID ) );
 	if( is_array($plugin_settings) )
 	{
 		foreach( $plugin_settings as $l_name => $l_meta )
@@ -103,6 +103,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.8  2010/08/24 08:20:19  efy-asimo
+ * twitter plugin oAuth
+ *
  * Revision 1.7  2010/02/08 17:52:09  efy-yury
  * copyright 2009 -> 2010
  *
