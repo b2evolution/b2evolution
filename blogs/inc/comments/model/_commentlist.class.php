@@ -220,6 +220,7 @@ class CommentList2 extends DataObjectList2
 			 * OLD STYLE orders:
 			 */
 			memorize_param( $this->param_prefix.'order', 'string', $this->default_filters['order'], $this->filters['order'] );   		// ASC or DESC
+			// This order style is OK, because sometimes the commentList is not displayed on a table so we cannot say we want to order by a specific column.
 			memorize_param( $this->param_prefix.'orderby', 'string', $this->default_filters['orderby'], $this->filters['orderby'] );  // list of fields to order by (TODO: change that crap)
 
 			/*
@@ -319,6 +320,7 @@ class CommentList2 extends DataObjectList2
 		$this->page = $this->filters['page'];
 
 		$this->filters['order'] = param( $this->param_prefix.'order', 'string', $this->default_filters['order'], true );   		// ASC or DESC
+		// This order style is OK, because sometimes the commentList is not displayed on a table so we cannot say we want to order by a specific column. It's not a crap.
 		$this->filters['orderby'] = param( $this->param_prefix.'orderby', 'string', $this->default_filters['orderby'], true );  // list of fields to order by (TODO: change that crap)
 
 		if( $use_filters && $filter_action == 'save' )
@@ -659,6 +661,8 @@ class CommentList2 extends DataObjectList2
 
 	/**
 	 * Returns values needed to make sort links for a given column
+	 * It needs because the order is not handled by the result class.
+	 * Reason: Sometimes the comment list needs to be ordered without having a display table, and columns. The result class order is based on columns.
 	 *
 	 * Returns an array containing the following values:
 	 *  - current_order : 'ASC', 'DESC' or ''
@@ -723,6 +727,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.28  2010/09/02 07:48:32  efy-asimo
+ * ItemList and CommentList doc
+ *
  * Revision 1.27  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

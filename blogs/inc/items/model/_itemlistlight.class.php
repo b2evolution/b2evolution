@@ -310,6 +310,7 @@ class ItemListLight extends DataObjectList2
 			 * OLD STYLE orders:
 			 */
 			memorize_param( $this->param_prefix.'order', 'string', $this->default_filters['order'], $this->filters['order'] );   		// ASC or DESC
+			// This order style is OK, because sometimes the commentList is not displayed on a table so we cannot say we want to order by a specific column. It's not a crap.
 			memorize_param( $this->param_prefix.'orderby', 'string', $this->default_filters['orderby'], $this->filters['orderby'] );  // list of fields to order by (TODO: change that crap)
 
 			/*
@@ -490,6 +491,7 @@ class ItemListLight extends DataObjectList2
 		 * Ordering:
 		 */
 		$this->filters['order'] = param( $this->param_prefix.'order', '/^(ASC|asc|DESC|desc)$/', $this->default_filters['order'], true );		// ASC or DESC
+		// This order style is OK, because sometimes the commentList is not displayed on a table so we cannot say we want to order by a specific column. It's not a crap.
 		$this->filters['orderby'] = param( $this->param_prefix.'orderby', '/^([A-Za-z0-9_]+([ ,][A-Za-z0-9_]+)*)?$/', $this->default_filters['orderby'], true );   // list of fields to order by (TODO: change that crap)
 
 		/*
@@ -1541,6 +1543,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.44  2010/09/02 07:48:33  efy-asimo
+ * ItemList and CommentList doc
+ *
  * Revision 1.43  2010/04/12 09:41:36  efy-asimo
  * private URL shortener - task
  *

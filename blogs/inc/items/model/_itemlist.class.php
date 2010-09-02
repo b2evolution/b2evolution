@@ -361,6 +361,8 @@ class ItemList2 extends ItemListLight
 
 	/**
 	 * Returns values needed to make sort links for a given column
+	 * It needs because the order is not handled by the result class.
+	 * Reason: Sometimes the item list needs to be ordered without having a display table, and columns. The result class order is based on columns.
 	 *
 	 * Returns an array containing the following values:
 	 *  - current_order : 'ASC', 'DESC' or ''
@@ -726,6 +728,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.35  2010/09/02 07:48:33  efy-asimo
+ * ItemList and CommentList doc
+ *
  * Revision 1.34  2010/07/08 05:29:54  efy-asimo
  * post_dateset notice on preview item page - fix
  *
