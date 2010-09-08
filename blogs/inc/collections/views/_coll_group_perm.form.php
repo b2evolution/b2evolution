@@ -51,7 +51,7 @@ $Form->hidden( 'tab', 'permgroup' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 $Form->hidden( 'layout', $layout );
 
-$Form->begin_fieldset( T_('Group permissions') );
+$Form->begin_fieldset( T_('Group permissions').get_manual_link('group_permissions') );
 
 
 /*
@@ -538,6 +538,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.16  2010/09/08 15:07:44  efy-asimo
+ * manual links
+ *
  * Revision 1.15  2010/06/01 11:33:19  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)

@@ -58,7 +58,7 @@ while( $loop_Plugin = & $Plugins->get_next() )
 	// We use output buffers here to display the fieldset only if there's content in there
 	ob_start();
 
-	$Form->begin_fieldset( $loop_Plugin->name );
+	$Form->begin_fieldset( $loop_Plugin->name.get_manual_link('blog_plugin_settings') );
 
 	ob_start();
 
@@ -103,6 +103,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.9  2010/09/08 15:07:44  efy-asimo
+ * manual links
+ *
  * Revision 1.8  2010/08/24 08:20:19  efy-asimo
  * twitter plugin oAuth
  *

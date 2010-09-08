@@ -29,7 +29,7 @@ $Results = new Results( $SQL->get(), '', '', NULL, $CountSQL->get() );
 
 $Results->Cache = & get_SkinCache();
 
-$Results->title = T_('Installed skins');
+$Results->title = T_('Installed skins').get_manual_link('installed_skins');
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
@@ -97,6 +97,9 @@ $Results->display( NULL, 'session' );
 
 /*
  * $Log$
+ * Revision 1.11  2010/09/08 15:07:45  efy-asimo
+ * manual links
+ *
  * Revision 1.10  2010/02/08 17:54:43  efy-yury
  * copyright 2009 -> 2010
  *

@@ -27,7 +27,7 @@ $SkinCache->load_all();
 
 $block_item_Widget = new Widget( 'block_item' );
 
-$block_item_Widget->title = T_('Skins available for installation');
+$block_item_Widget->title = T_('Skins available for installation').get_manual_link('installing_skins');
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
@@ -60,6 +60,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.13  2010/09/08 15:07:45  efy-asimo
+ * manual links
+ *
  * Revision 1.12  2010/02/08 17:54:43  efy-yury
  * copyright 2009 -> 2010
  *

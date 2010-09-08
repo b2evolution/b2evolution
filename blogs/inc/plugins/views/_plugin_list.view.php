@@ -76,7 +76,7 @@ $Results->grp_cols[] = array(
 	);
 */
 
-$Results->title = T_('Installed plugins').get_manual_link('installed_plugins');
+$Results->title = T_('Installed plugins').get_manual_link('plugins');
 
 /*
  * STATUS TD:
@@ -285,6 +285,9 @@ $Session->delete( 'fadeout_id');
 
 /*
  * $Log$
+ * Revision 1.13  2010/09/08 15:07:44  efy-asimo
+ * manual links
+ *
  * Revision 1.12  2010/03/01 07:52:51  efy-asimo
  * Set manual links to lowercase
  *

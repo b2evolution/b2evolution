@@ -49,8 +49,8 @@ $Form->begin_form( 'fform' );
 	$Form->hidden( 'blog', $Blog->ID );
 
 	$change_skin_link = ' <span class="floatright">'.action_icon( T_('Select another skin...'), 'edit', regenerate_url( 'action', 'ctrl=coll_settings&amp;skinpage=selection' ), T_('Use a different skin').' &raquo;', 3, 4 );
-	
-	$Form->begin_fieldset( T_('Current skin').' '.$change_skin_link );
+
+	$Form->begin_fieldset( T_('Current skin').get_manual_link('blog_skin_settings').' '.$change_skin_link );
 
 		Skin::disp_skinshot( $edited_Skin->folder, $edited_Skin->name );
 
@@ -98,6 +98,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.9  2010/09/08 15:07:45  efy-asimo
+ * manual links
+ *
  * Revision 1.8  2010/03/03 15:59:46  fplanque
  * minor/doc
  *

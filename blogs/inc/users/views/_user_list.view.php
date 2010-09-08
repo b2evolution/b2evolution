@@ -99,7 +99,7 @@ else
 
 $Results = new Results( $SQL->get(), 'user_', $default_sort, NULL, $count_sql );
 
-$Results->title = T_('Groups & Users');
+$Results->title = T_('Groups & Users').get_manual_link('users_and_groups');
 
 /*
  * Table icons:
@@ -342,6 +342,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.26  2010/09/08 15:07:45  efy-asimo
+ * manual links
+ *
  * Revision 1.25  2010/05/07 08:07:14  efy-asimo
  * Permissions check update (User tab, Global Settings tab) - bugfix
  *

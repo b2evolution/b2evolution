@@ -54,7 +54,7 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'features' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
-$Form->begin_fieldset( T_('Post options') );
+$Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_settings') );
 	$Form->radio( 'require_title', $edited_Blog->get_setting('require_title'),
 								array(  array( 'required', T_('Always'), T_('The blogger must provide a title') ),
 												array( 'optional', T_('Optional'), T_('The blogger can leave the title field empty') ),
@@ -216,6 +216,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.35  2010/09/08 15:07:44  efy-asimo
+ * manual links
+ *
  * Revision 1.34  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *
