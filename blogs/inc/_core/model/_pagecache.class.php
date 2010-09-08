@@ -523,6 +523,90 @@ class PageCache
 
 
 	/**
+	 * Check if the file with the given file path should be removed during prune page cache
+	 * 
+	 * @static
+	 * 
+	 * @param $file_path
+	 * @return boolean true if the file should be removed, false otherwise
+	 */
+	function checkDelete( $file_path )
+	{
+		if( strpos( $file_path, 'CVS' ) !== false )
+		{ // skip CVS folders - This could be more specific
+			return false;
+		}
+		// get file name from path
+		$file_name = basename($file_path);
+
+		// Note: index.html pages are in the cache to hide the contents from browsers in case the webserver whould should a listing
+		if( ( $file_name == 'index.html' ) || ( substr( $file_name, 0, 1 ) == '.' ) )
+		{ // this file is index.html or it is hidden, should not delete it.
+			return false;
+		}
+
+		global $localtimenow;
+		$datediff = $localtimenow - filemtime( $file_path );
+		if( $datediff < 86400 /* 60*60*24 = 24 hour*/)
+		{ // the file is not older then 24 hour, should not delete it.
+			return false;
+		}
+
+		// the file can be deleted
+		return true;
+	}
+
+
+	/**
+	 * Delete those files from the given directory, which results true value on checkDelete function
+	 * 
+	 * @static
+	 * 
+	 * @param string directory path
+	 * @param string the first error occured deleting the directory content
+	 */
+	function deleteDirContent( $path, & $first_error )
+	{
+		$path = trailing_slash( $path );
+
+		if( $dir = @opendir($path) )
+		{
+			while( ( $file = readdir($dir) ) !== false )
+			{
+				if( $file == '.' || $file == '..' )
+				{
+					continue;
+				}
+				$file_path = $path.$file;
+				if( is_dir($file_path) )
+				{
+					PageCache::deleteDirContent( $file_path, $first_error );
+				}
+				else
+				{
+					if( PageCache::checkDelete( $file_path ) )
+					{
+						if( ( ! @unlink( $file_path ) ) && ($first_error == '') )
+						{ // deleting the file failed: return error
+							//$error = error_get_last(); // XXX: requires PHP 5.2
+							//$error['message'];
+							$first_error = sprintf( T_('Some files could not be deleted (including: %s).'), $file);
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			if( $first_error == '' )
+			{
+				$first_error = sprintf( T_('Can not access directory: %s).'), $path );;
+			}
+		}
+	}
+
+
+	/**
 	 * Delete any file that is older than 24 hours from the whole /cache folder (recursively) 
 	 * except index.html files and hiddenfiles (starting with .)
 	 * 
@@ -532,56 +616,23 @@ class PageCache
 	 */
 	function prune_page_cache()
 	{
-		global $cache_path, $localtimenow;
+		global $cache_path;
 
-		// fp> TODO: on large sites this is not a good scaling mechanism. We should rewrite this and delete files immediately after
-		// finding them instead of creating an ENORMOUS list of files in memory.
-		$cache_content = get_filenames( $cache_path, true, false );
-
-		if( $cache_content == false )
-		{
-			return T_('Cache directory could not be accessed.');
-		}
+		$path = trailing_slash( $cache_path );
 
 		$first_error = '';
-		foreach( $cache_content as $file_path )
-		{
-			if( strpos( $file_path, 'CVS' ) !== false )
-			{ // skip CVS folders - This should be changed, along with the other todos
-				continue;
-			}
-			// get file name from path
-			$file_name = basename($file_path);
+		PageCache::deleteDirContent( $path, $first_error );
 
-			// Note: index.html pages are in the cache to hide the contents from browsers in case the webserver whould should a listing
-			if( $file_name != 'index.html' && substr( $file_name, 0, 1 ) != '.' )
-			{ // this file is not an index.html and it is not hidden
-				$datediff = $localtimenow - filemtime( $file_path );
-				if( $datediff > 86400 /* 60*60*24 = 24 hour*/)
-				{ // older than 24 hours
-					// TODO: I think errors should not get suppressed - would show up in error log / cron mail, but that's good IMHO
-					// fp> TODO: do not stop deletion when one file cannot be deleted
-					if( ( ! @unlink( $file_path ) ) && ($first_error == '') )
-					{ // deleting the file failed: return error
-						//$error = error_get_last(); // XXX: requires PHP 5.2
-						//$error['message'];
-						$first_error = $file_name;
-					}
-				}
-			}
-		}
-
-		if( $first_error != '' )
-		{
-			return sprintf( T_('Some files could not be deleted (including: %s).'), $first_error );
-		}
-		return '';
+		return $first_error;
 	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.24  2010/09/08 13:32:19  efy-asimo
+ * prune page cache - without caching the file names
+ *
  * Revision 1.23  2010/07/26 06:52:15  efy-asimo
  * MFB v-4-0
  *
