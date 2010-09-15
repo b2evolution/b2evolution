@@ -60,6 +60,7 @@ function skin_init( $disp )
 	global $seo_page_type;
 
 	global $redir, $ReqURL, $ReqURI, $m, $w, $preview;
+	global $cross_post_nav_in_same_blog;
 
 	global $Chapter;
 	global $Debuglog;
@@ -142,7 +143,7 @@ function skin_init( $disp )
 
 				if( ! is_same_url( $ReqURL, $canonical_url) )
 				{	// The requested URL does not look like the canonical URL for this post...
-					if( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
+					if( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' && !$cross_post_nav_in_same_blog)
 					{	// REDIRECT TO THE CANONICAL URL:
 						$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].' );
 						header_redirect( $canonical_url, true );
@@ -889,6 +890,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.85  2010/09/15 13:04:06  efy-asimo
+ * Cross post navigatation
+ *
  * Revision 1.84  2010/04/08 21:02:43  waltercruz
  * Tags as meta-description fallback
  *

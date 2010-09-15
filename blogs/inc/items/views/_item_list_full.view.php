@@ -206,7 +206,7 @@ while( $Item = & $ItemList->get_item() )
 
 		<div class="bContent">
 			<!-- TODO: Tblue> Do not display link if item does not get displayed in the frontend (e. g. not published). -->
-			<h3 class="bTitle"><?php $Item->title() ?></h3>
+			<h3 class="bTitle"><?php $Item->title( array( 'target_blog' => '' )) ?></h3>
 
 			<?php
 				// Display images that are linked to this post:
@@ -467,6 +467,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.40  2010/09/15 13:04:06  efy-asimo
+ * Cross post navigatation
+ *
  * Revision 1.39  2010/08/05 08:04:12  efy-asimo
  * Ajaxify comments on itemList FullView and commentList FullView pages
  *

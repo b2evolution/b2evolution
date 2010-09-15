@@ -870,6 +870,8 @@ function item_prevnext_links( $params = array() )
 {
 	global $MainList;
 
+	$params = array_merge( array( 'target_blog' => 'auto' ), $params );
+
 	if( isset($MainList) )
 	{
 		$MainList->prevnext_item_links( $params );
@@ -1113,6 +1115,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.76  2010/09/15 13:04:06  efy-asimo
+ * Cross post navigatation
+ *
  * Revision 1.75  2010/07/26 06:52:15  efy-asimo
  * MFB v-4-0
  *

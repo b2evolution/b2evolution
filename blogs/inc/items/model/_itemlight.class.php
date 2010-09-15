@@ -666,6 +666,49 @@ class ItemLight extends DataObject
 
 
 	/**
+	 * Check if cross post navigation should stay in the current blog or not.
+	 * Also check that this item has at least one category that belongs to the given blog.
+	 * If current blog is the same as item blog then, this function will return false, because no need to check.
+	 * 
+	 * @param string 'auto' value means this call needs to decide to stay in the current blog or not. Every other value will return false!
+	 * @param integer the given blog ID (its usually the current blog id)
+	 * @return boolean true if we have to stay in the current blog, false otherwise
+	 */
+	function check_cross_post_nav( $target_blog, $blog_ID )
+	{
+		global $DB, $cross_post_nav_in_same_blog;
+
+		if( $target_blog != 'auto' )
+		{ // target_blog is not set to auto, we have to navigate to the item's main cat's blog.
+			return false;
+		}
+
+		$this->get_Blog();
+		if( $this->Blog->ID == $blog_ID )
+		{ // item's blog is the same as target blog 
+			return false;
+		}
+
+		if( ! $cross_post_nav_in_same_blog )
+		{ // we have to navigate to the item's main cat's blog.
+			return false;
+		}
+
+		$cat_count = $DB->get_var( '
+				SELECT count( cat_ID )
+				FROM T_categories, T_postcats
+				WHERE
+					T_categories.cat_ID = T_postcats.postcat_cat_ID
+					and T_categories.cat_blog_ID = '.$blog_ID.'
+					and T_postcats.postcat_post_ID = '.$this->ID
+		);
+
+		// $cat_count>0 means that this item has at least one category that belongs to the target blog.
+		return $cat_count > 0;
+	}
+
+
+	/**
 	 * Template function: display permalink for item
 	 *
 	 * Note: This actually only outputs the URL, to display a real link, use {@link Item::permanent_link()}
@@ -688,9 +731,9 @@ class ItemLight extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 */
-	function get_permanent_link( $text = '#', $title = '#', $class = '' )
+	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '' )
 	{
-		global $current_User;
+		global $current_User, $Blog;
 
 		switch( $text )
 		{
@@ -713,7 +756,15 @@ class ItemLight extends DataObject
 
 		if( $title == '#' ) $title = T_('Permanent link to full entry');
 
-		$url = $this->get_permanent_url();
+		$blogurl = '';
+		$permalink_type = '';
+		if( $this->check_cross_post_nav( $target_blog, $Blog->ID ) )
+		{
+			$permalink_type =  $Blog->get_setting( 'permalinks' );
+			$blogurl = $Blog->gen_blogurl();
+		}
+
+		$url = $this->get_permanent_url( $permalink_type, $blogurl );
 
 		// Display as link
 		$r = '<a href="'.$url.'" title="'.$title.'"';
@@ -742,10 +793,11 @@ class ItemLight extends DataObject
 				'text'        => '#',	// possible special values: '#', '#icon#', '#text#', '#title#'
 				'title'       => '#',
 				'class'       => '',
+				'target_blog' => '',
 			//	'format'      => 'htmlbody',
 			), $params );
 
-		$link = $this->get_permanent_link( $params['text'], $params['title'], $params['class'] );
+		$link = $this->get_permanent_link( $params['text'], $params['title'], $params['class'], $params['target_blog'] );
 
 		if( !empty( $link ) )
 		{
@@ -761,6 +813,9 @@ class ItemLight extends DataObject
 	 */
 	function title( $params = array() )
 	{
+		$params = array_merge( array(
+				'target_blog'  => 'auto',
+			), $params );
 		echo $this->get_title($params);
 	}
 
@@ -771,7 +826,7 @@ class ItemLight extends DataObject
 	 */
 	function get_title( $params = array() )
 	{
-		global $ReqURL;
+		global $ReqURL, $Blog;
 
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
@@ -780,7 +835,14 @@ class ItemLight extends DataObject
 				'format'      => 'htmlbody',
 				'link_type'   => '#',
 				'max_length'  => '',
+				'target_blog' => '',
 			), $params );
+
+		$blogurl = '';
+		if( $this->check_cross_post_nav( $params['target_blog'], $Blog->ID ) )
+		{
+			$blogurl = $Blog->gen_blogurl();
+		}
 
 		$title = format_to_output( $this->title, $params['format'] );
 
@@ -800,7 +862,7 @@ class ItemLight extends DataObject
 			{	// This is an intro, do not link title by default:
 				$params['link_type'] = 'none';
 			}
-			elseif( is_same_url( $this->get_permanent_url('','','&'), $ReqURL ) )
+			elseif( is_same_url( $this->get_permanent_url( '', $blogurl, '&' ), $ReqURL ) )
 			{	// We are on the single url already:
 				$params['link_type'] = 'none';
 			}
@@ -822,7 +884,7 @@ class ItemLight extends DataObject
 				break;
 
 			case 'permalink':
-				$url = $this->get_permanent_url();
+				$url = $this->get_permanent_url( '', $blogurl );
 				break;
 
 			case 'linkto_url':
@@ -989,6 +1051,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2010/09/15 13:04:06  efy-asimo
+ * Cross post navigatation
+ *
  * Revision 1.37  2010/04/12 09:41:36  efy-asimo
  * private URL shortener - task
  *

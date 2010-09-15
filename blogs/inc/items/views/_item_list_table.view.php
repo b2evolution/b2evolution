@@ -76,7 +76,7 @@ $ItemList->cols[] = array(
 		'default_dir' => 'D',
 		'th_class' => 'nowrap',
 		'td_class' => 'nowrap',
-		'td' => '@get_permanent_link( get_icon(\'permalink\') )@ <span class="date">@get_issue_date()@</span>',
+		'td' => '@get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\' )@ <span class="date">@get_issue_date()@</span>',
 	);
 
 
@@ -303,6 +303,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.27  2010/09/15 13:04:06  efy-asimo
+ * Cross post navigatation
+ *
  * Revision 1.26  2010/07/05 06:54:00  efy-asimo
  * Add "Mass edit >>" link to all relevant tabs
  *

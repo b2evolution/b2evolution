@@ -440,10 +440,11 @@ class ItemList2 extends ItemListLight
 									'next_text' => '$title$ &raquo;',
 									'next_end' => '',
 									'next_no_item' => '',
+									'target_blog' => '',
 								), $params );
 
-		$prev = $this->prev_item_link( $params['prev_start'], $params['prev_end'], $params[ 'prev_text' ], $params[ 'prev_no_item' ], false );
-		$next = $this->next_item_link( $params['next_start'], $params['next_end'], $params[ 'next_text' ], $params[ 'next_no_item' ], false );
+		$prev = $this->prev_item_link( $params['prev_start'], $params['prev_end'], $params[ 'prev_text' ], $params[ 'prev_no_item' ], false, $params[ 'target_blog'] );
+		$next = $this->next_item_link( $params['next_start'], $params['next_end'], $params[ 'next_text' ], $params[ 'next_no_item' ], false, $params[ 'target_blog'] );
 
 		$output = str_replace( '$prev$', $prev, $params['template'] );
 		$output = str_replace( '$next$', $next, $output );
@@ -460,7 +461,7 @@ class ItemList2 extends ItemListLight
 	/**
 	 * Skip to previous
 	 */
-	function prev_item_link( $before = '', $after = '', $text = '&laquo; $title$', $no_item = '', $display = true )
+	function prev_item_link( $before = '', $after = '', $text = '&laquo; $title$', $no_item = '', $display = true, $target_blog = '' )
 	{
 		/**
 		 * @var Item
@@ -470,7 +471,7 @@ class ItemList2 extends ItemListLight
 		if( !is_null($prev_Item) )
 		{
 			$output = $before;
-			$output .= $prev_Item->get_permanent_link( $text );
+			$output .= $prev_Item->get_permanent_link( $text, '#', '', $target_blog );
 			$output .= $after;
 		}
 		else
@@ -485,7 +486,7 @@ class ItemList2 extends ItemListLight
 	/**
 	 * Skip to next
 	 */
-	function next_item_link(  $before = '', $after = '', $text = '$title$ &raquo;', $no_item = '', $display = true )
+	function next_item_link(  $before = '', $after = '', $text = '$title$ &raquo;', $no_item = '', $display = true, $target_blog = '' )
 	{
 		/**
 		 * @var Item
@@ -495,7 +496,7 @@ class ItemList2 extends ItemListLight
 		if( !is_null($next_Item) )
 		{
 			$output = $before;
-			$output .= $next_Item->get_permanent_link( $text );
+			$output .= $next_Item->get_permanent_link( $text, '#', '', $target_blog );
 			$output .= $after;
 		}
 		else
@@ -728,6 +729,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.36  2010/09/15 13:04:06  efy-asimo
+ * Cross post navigatation
+ *
  * Revision 1.35  2010/09/02 07:48:33  efy-asimo
  * ItemList and CommentList doc
  *
