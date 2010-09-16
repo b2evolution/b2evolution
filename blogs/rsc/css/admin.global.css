@@ -488,3 +488,12 @@ ul.widget_list li {
 .tdCommentdeprecated {
 	color: #888;
 }
+
+/*
+ * Avatar selection:
+ */
+div.avatartag {
+	float: left;
+	margin: 0.2ex;
+	padding: 0;
+}

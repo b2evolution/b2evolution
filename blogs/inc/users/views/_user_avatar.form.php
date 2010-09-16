@@ -22,7 +22,7 @@ global $action;
 // Begin payload block:
 $this->disp_payload_begin();
 
-$Form = new Form( NULL, 'user_checkchanges' );
+$Form = new Form( NULL, 'user_checkchanges', 'post', NULL, 'multipart/form-data' );
 
 if( !$user_profile_only )
 {
@@ -65,6 +65,60 @@ $Form->info( T_( 'Avatar' ), $avatar_tag );
 
 // fp> TODO: a javascript REFRAME feature would ne neat here: selecting a square area of the img and saving it as a new avatar image
 
+if( ( $current_User->check_perm( 'users', 'all' ) ) || ( $current_User->ID == $edited_User->ID ) )
+{
+	// Upload or select:
+	global $Settings;
+	if( $Settings->get('upload_enabled') && ( $Settings->get( 'fm_enable_roots_user' ) ) )
+	{	// Upload is enabled and we have permission to use it...
+		load_class( 'files/model/_filelist.class.php', 'Filelist' );
+		load_class( 'files/model/_fileroot.class.php', 'FileRoot' );
+		$path = 'profile_pictures';
+
+		$Form->hidden( 'ctrl', 'upload' );
+		$Form->hidden( 'root', FileRoot::gen_ID( 'user', $edited_User->ID ) );
+		$Form->hidden( 'path', $path );
+		$Form->hidden( 'action', 'avatar_upload' );
+		$Form->hidden( 'redirect_to', regenerate_url( '', 'user_tab=avatar&user_ID='.$edited_User->ID.'&action=update_avatar', '', '&') );
+		// The following is mainly a hint to the browser.
+		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
+		$Form->hiddens_by_key( get_memorized('ctrl') );
+		$Form->add_crumb( 'file' );
+
+		// upload part
+		$info_content = '<input name="uploadfile[]" type="file" size="10" />';
+		$info_content .= '<input class="ActionButton" type="submit" value="&gt; '.T_('Upload!').'" />';
+		$Form->info( T_('Upload a new avatar'), $info_content );
+
+		$FileRootCache = & get_FileRootCache();
+		$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $edited_User->ID );
+		$ads_list_path = get_canonical_path( $user_FileRoot->ads_path.$path );
+
+		if( is_dir( $ads_list_path ) )
+		{ // profile_picture folder exists in the user root dir
+			$user_avatar_Filelist = new Filelist( $user_FileRoot, $ads_list_path );
+			$user_avatar_Filelist->load();
+
+			if( $user_avatar_Filelist->count() > 0 )
+			{ // profile_pictures folder is not empty
+				$info_content = '';
+				while( $lFile = & $user_avatar_Filelist->get_next() )
+				{ // Loop through all Files:
+					$lFile->load_meta();
+					if( $lFile->is_image() )
+					{
+						$url = regenerate_url( '', 'user_tab=avatar&user_ID='.$edited_User->ID.'&action=update_avatar&file_ID='.$lFile->ID.'&'.url_crumb('user'), '', '&');
+						$info_content .= '<div class="avatartag">';
+						$info_content .= '<a href="'.$url.'">'.'<img '.$lFile->get_thumb_imgtag( 'crop-64x64' ).'</a>';
+						$info_content .= '</div>';
+					}
+				}
+				$Form->info( T_('Select a previously uploaded avatar'), $info_content );
+			}
+		}
+	}
+}
+
 $Form->end_fieldset();
 
 $Form->end_form();
@@ -74,6 +128,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.7  2010/09/16 14:12:24  efy-asimo
+ * New avatar upload
+ *
  * Revision 1.6  2010/01/03 13:45:37  fplanque
  * set some crumbs (needs checking)
  *

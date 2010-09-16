@@ -295,10 +295,13 @@ $Form->begin_form();
 
 				if( isset($edited_User) ) // fp> Perm already checked in controller
 				{	// Offer option to link the file to an Item (or anything else):
-					echo action_icon( T_('Use this as an avatar image!'), 'link',
-								regenerate_url( 'fm_selected', 'action=link_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
-								NULL, NULL, NULL, array() );
-					echo ' ';
+					if( $lFile->is_image() )
+					{
+						echo action_icon( T_('Use this as an avatar image!'), 'link',
+									regenerate_url( 'fm_selected', 'action=link_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
+									NULL, NULL, NULL, array() );
+						echo ' ';
+					}
 				}
 				elseif( !$lFile->is_dir() && ! empty( $linkctrl ) && ! empty( $linkdata ) )
 				{
@@ -682,6 +685,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.42  2010/09/16 14:12:24  efy-asimo
+ * New avatar upload
+ *
  * Revision 1.41  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

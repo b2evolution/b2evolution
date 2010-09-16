@@ -140,6 +140,40 @@ if( !$Messages->count('error') )
 			/* EXITED */
 			break;
 
+		case 'update_avatar':
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			if( empty($edited_User) || !is_object($edited_User) )
+			{
+				$Messages->add( 'No user set!' ); // Needs no translation, should be prevented by UI.
+				$action = 'list';
+				break;
+			}
+
+			if( !$current_User->check_perm( 'users', 'edit' ) && $edited_User->ID != $current_User->ID )
+			{ // user is only allowed to update him/herself
+				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
+				$action = 'view';
+				break;
+			}
+
+			$file_ID = param( 'file_ID', 'integer', NULL );
+			if( $file_ID == NULL )
+			{
+				$Messages->add( T_('Could not change the avatar!'), 'error' );
+				$action = 'view';
+				break;
+			}
+
+			$edited_User->set( 'avatar_file_ID', $file_ID, true );
+
+			$edited_User->dbupdate();
+
+			$Messages->add( T_('Avatar has been set successfull.'), 'success' );
+			$action = 'avatar';
+			break;
+
 		case 'update':
 			// Update existing user OR create new user:
 			if( empty($edited_User) || !is_object($edited_User) )
@@ -404,6 +438,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.15  2010/09/16 14:12:24  efy-asimo
+ * New avatar upload
+ *
  * Revision 1.14  2010/07/02 08:14:19  efy-asimo
  * Messaging redirect modification and "new user get a new blog" fix
  *
