@@ -56,7 +56,7 @@ $Form->begin_fieldset( T_('Properties') );
 	// We're essentially double checking here...
 	$edited_Blog = & $edited_Chapter->get_Blog();
 	$move = '';
-	if( $Settings->get('allow_moving_chapters') )
+	if( $Settings->get('allow_moving_chapters') && ( ! $creating ) )
 	{ // If moving cats between blogs is allowed:
 		$move = ' '.action_icon( T_('Move to a different blog...'), 'file_move', regenerate_url( 'action,cat_ID', 'cat_ID='.$edited_Chapter->ID.'&amp;action=move' ), T_('Move') );
 	}
@@ -92,6 +92,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.13  2010/09/16 14:35:23  efy-asimo
+ * don't show 'move to another blog' icon on create new category page
+ *
  * Revision 1.12  2010/02/08 17:52:07  efy-yury
  * copyright 2009 -> 2010
  *
