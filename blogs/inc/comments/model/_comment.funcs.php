@@ -185,7 +185,7 @@ function comments_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
 		global $id;
 		$post_ID = $id;
 	}
-	$number = generic_ctp_number( $post_ID, 'comments' );
+	$number = generic_ctp_number( $post_ID, 'comments', 'total' );
 	if ($number == 0)
 	{
 		$blah = $zero;
@@ -299,6 +299,9 @@ function echo_comment_publishbt_js()
 
 /*
  * $Log$
+ * Revision 1.13  2010/09/20 13:06:06  efy-asimo
+ * show total comments number on item full view - fix
+ *
  * Revision 1.12  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *
