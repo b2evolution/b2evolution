@@ -100,37 +100,30 @@ if( $blog )
 
 		<script type="text/javascript">
 			<!--
-
-			var commentIds = new Array();
-			var commentsInd = 0;
-
-			// Get comma separated IDs
-			function getCommentsIds()
-			{
-				var ids = '';
-				for(var id in commentIds)
-				{
-					commentId = commentIds[id];
-					if(commentId)
-					{
-						ids = ids + commentId + ',';
-					}
-				}
-				if(ids.length > 0)
-				{
-					ids = ids.substring(0, ids.length - 1);
-				}
-				commentsInd++;
-
-				return ids;
-			}
+			// currently midified comments id and status. After update is done, the appropiate item will be removed.
+			var modifieds = new Array();
 
 			// Process result after publish/deprecate/delete action has been completed
-			function processResult(result, ids)
+			function processResult(result, modifiedlist)
 			{
-				$('#comments_container').html($('#comments_container').html() + result);
+				$('#comments_container').html(result);
+				for(var id in modifiedlist)
+				{
+					switch(modifiedlist[id])
+					{
+						case 'published':
+							fadeIn(id, '#339900');
+							break;
+						case 'deprecated':
+							fadeIn(id, '#656565');
+							break;
+						case 'deleted':
+							fadeIn(id, '#EE0000');
+							break;
+					};
+				}
 
-				var comments_number = $('#badge_' + commentsInd).val();
+				var comments_number = $('#new_badge').val();
 				if(comments_number == '0')
 				{
 					var options = {};
@@ -140,20 +133,6 @@ if( $blog )
 				else
 				{
 					$('#badge').text(comments_number);
-					var newCommentIds = $('#comments_' + commentsInd).val().split(',');
-					for(index = 0; index < newCommentIds.length; index++)
-					{
-						var arrayIndex = 'comment_' + newCommentIds[index];
-						commentIds[arrayIndex] = newCommentIds[index];
-					}
-				}
-
-				for( var i=0;i<ids.length; ++i )
-				{
-					var divid = 'comment_' + ids[i];
-					var options = {};
-					$('#' + divid).effect('blind', options, 200);
-					$('#' + divid).remove();
 				}
 			}
 
@@ -171,18 +150,17 @@ if( $blog )
 						break;
 				};
 
-				delete commentIds[divid];
-				var ids = getCommentsIds();
+				modifieds[divid] = status;
 
 				$.ajax({
 				type: 'POST',
 				url: '<?php echo $htsrv_url; ?>async.php',
-				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&status=' + status + '&action=set_comment_status' + '&ids=' + ids + '&ind=' + commentsInd + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
-				success: function(result) 
+				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&status=' + status + '&action=set_comment_status&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
+				success: function(result)
 					{
-						modified_ids = new Array();
-						modified_ids.push(id);
-						processResult(result, modified_ids);	
+						// var divid = 'comment_' + id;
+						delete modifieds[divid];
+						processResult(result, modifieds);
 					}
 				});
 			}
@@ -193,19 +171,18 @@ if( $blog )
 				var divid = 'comment_' + id;
 				fadeIn(divid, '#EE0000');
 
-				delete commentIds[divid];
-				var ids = getCommentsIds();
+				modifieds[divid] = 'deleted';
 
 				$.ajax({
 				type: 'POST',
 				url: '<?php echo $htsrv_url; ?>async.php',
-				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&action=delete_comment' + '&ids=' + ids + '&ind=' + commentsInd + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
-				success: function(result) 
+				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&action=delete_comment&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
+				success: function(result)
 					{
-						var deleted_ids = new Array();
-						deleted_ids.push(id);
-						processResult(result, deleted_ids); 
-					} 
+						// var divid = 'comment_' + id;
+						delete modifieds[divid];
+						processResult(result, modifieds);
+					}
 				});
 			}
 
@@ -262,7 +239,7 @@ if( $blog )
 					url: '<?php echo $admin_url; ?>',
 					data: 'ctrl=antispam&action=ban&display_mode=js&mode=iframe&request=checkban&keyword=' + authorurl +
 						  '&' + <?php echo '\''.url_crumb('antispam').'\''; ?>,
-					success: function(result) 
+					success: function(result)
 					{
 						antispamSettings( result );
 					}
@@ -294,19 +271,15 @@ if( $blog )
 				{
 					var divid = 'comment_' + comment_ids[i];
 					fadeIn(divid, '#EE0000');
-
-					delete commentIds[divid];
 				}
 
-				var ids = getCommentsIds();
-				
 				$.ajax({
 					type: 'POST',
 					url: '<?php echo $htsrv_url; ?>async.php',
-					data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_comments&ids=' + ids + '&ind=' + commentsInd + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
-					success: function(result) 
+					data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_comments&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
+					success: function(result)
 					{
-						processResult(result, comment_ids);
+						processResult(result, modifieds);
 					}
 				});
 			}
@@ -318,23 +291,14 @@ if( $blog )
 
 			// Absolute refresh comment list
 			function refreshComments()
-			{	
-				var ids = new Array();
-				for(var id in commentIds)
-				{
-					var divid = commentIds[id];
-					delete commentIds[divid];
-				}
-
+			{
 				$.ajax({
 					type: 'POST',
 					url: '<?php echo $htsrv_url; ?>async.php',
-					data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_comments&ids=' + ids + '&ind=' + commentsInd + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
+					data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_comments&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
 					success: function(result)
 					{
-						$('#comments_container').html(result);
-						var comments_number = $('#badge_' + commentsInd).val();
-						$('#badge').text(comments_number);
+						processResult(result, modifieds);
 						$('#comments_container').slideDown('fast');
 					}
 				});
@@ -515,7 +479,6 @@ if( $blog )
 
 		$block_item_Widget->disp_template_raw( 'block_end' );
 	}
-
 
 	if( $nb_blocks_displayed == 0 )
 	{	// We haven't displayed anything yet!
@@ -733,6 +696,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.70  2010/09/20 13:00:44  efy-asimo
+ * dashboard ajax calls - fix
+ *
  * Revision 1.69  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

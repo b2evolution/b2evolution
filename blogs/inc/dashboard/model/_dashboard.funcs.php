@@ -220,7 +220,7 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 	// Get ready for display (runs the query):
 	$CommentList->display_init();
-	
+
 	$new_comment_IDs = array();
 	while( $Comment = & $CommentList->get_next() )
 	{ // Loop through comments:
@@ -279,26 +279,18 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 		echo '</div>';
 	}
 
-	if( $script )
-	{	// Show script to know which comments IDs have been already loaded. This code is needed for AJAX.
-		echo '<script type="text/javascript">';
-		foreach( $new_comment_IDs as $new_comment_ID )
-		{
-			echo 'commentIds[\'comment_'.$new_comment_ID.'\'] = '.$new_comment_ID.';';
-		}
-		echo '</script>';
-	}
-	else
+	if( !$script )
 	{
-		$ind = param( 'ind', 'string' );
-		echo '<input type="hidden" id="comments_'.$ind.'" value="'.implode( ',', $new_comment_IDs ).'"/>';
-		echo '<input type="hidden" id="badge_'.$ind.'" value="'.get_comments_awaiting_moderation_number( $blog_ID ).'"/>';
+		echo '<input type="hidden" id="new_badge" value="'.get_comments_awaiting_moderation_number( $blog_ID ).'"/>';
 	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.37  2010/09/20 13:00:45  efy-asimo
+ * dashboard ajax calls - fix
+ *
  * Revision 1.36  2010/05/10 14:26:17  efy-asimo
  * Paged Comments & filtering & add comments listview
  *

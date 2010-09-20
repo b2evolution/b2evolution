@@ -297,16 +297,8 @@ function get_comments_awaiting_moderation( $blog_ID )
 {
 	$limit = 5;
 
-	$comment_IDs = array();
-	$ids = param( 'ids', 'string', NULL );
-	if( !empty( $ids ) )
-	{
-		$comment_IDs = explode( ',', $ids );
-		$limit = $limit - count( $comment_IDs );
-	}
-
 	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
-	show_comments_awaiting_moderation( $blog_ID, $limit, $comment_IDs, false );
+	show_comments_awaiting_moderation( $blog_ID, $limit, array(), false );
 }
 
 
@@ -322,6 +314,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.56  2010/09/20 13:00:44  efy-asimo
+ * dashboard ajax calls - fix
+ *
  * Revision 1.55  2010/08/05 08:04:12  efy-asimo
  * Ajaxify comments on itemList FullView and commentList FullView pages
  *
