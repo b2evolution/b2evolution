@@ -143,7 +143,7 @@ switch( $action )
 						$current_User->ID == $comment_Item_Blog_User->ID ) ||
 						( $current_User->check_perm( 'blog_admin', 'edit', false, $dest_Item_Blog->ID ) &&
 						$current_User->check_perm( 'blog_admin', 'edit', false, $comment_Item_Blog->ID ) ) )
-					{ // current user is the owner of both the source and the destination blogs or current user is admin with full access permission
+					{ // current user is the owner of both the source and the destination blogs or current user is admin for both blogs
 						$edited_Comment->set_Item( $dest_Item );
 					}
 					else
@@ -382,6 +382,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.35  2010/09/20 14:26:23  efy-asimo
+ * doc - merged from v-4-0
+ *
  * Revision 1.34  2010/08/05 08:04:12  efy-asimo
  * Ajaxify comments on itemList FullView and commentList FullView pages
  *
