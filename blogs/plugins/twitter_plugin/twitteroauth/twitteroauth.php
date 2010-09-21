@@ -79,6 +79,10 @@ class TwitterOAuth {
     }
     $request = $this->oAuthRequest($this->requestTokenURL(), 'GET', $parameters);
     $token = OAuthUtil::parse_parameters($request);
+    if( !isset( $token['oauth_token'] ) || !isset( $token['oauth_token_secret'] ) )
+    {
+    	return NULL;
+    }
     $this->token = new OAuthConsumer($token['oauth_token'], $token['oauth_token_secret']);
     return $token;
   }

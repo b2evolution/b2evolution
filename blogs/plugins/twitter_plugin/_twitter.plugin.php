@@ -168,15 +168,20 @@ class twitter_plugin extends Plugin
 		{
 			return false;
 		}
-		elseif( preg_match( '¤<error>(.*)</error>¤', $result, $matches ) )
+		elseif( !empty($result->error) )
 		{
-			$params['xmlrpcresp'] = $matches[1];
+			$params['xmlrpcresp'] = $result->error;
 			return false;
 		}
 
+		$account_name = T_('unknown');
 		$account = $connection->get('account/verify_credentials');
+		if( empty( $account->error ) && isset( $account->screen_name ) )
+		{
+			$account_name = $account->screen_name;
+		}
 
-		$params['xmlrpcresp'] = T_('Posted to account: @').$account->screen_name;
+		$params['xmlrpcresp'] = T_('Posted to account: @').$account_name;
 		return true;
 	}
 
@@ -286,7 +291,10 @@ class twitter_plugin extends Plugin
 			$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth_token, $oauth_token_secret );
 			// get linked user account
 			$account = $connection->get('account/verify_credentials');
-			$result = T_('Linked to').': @'.$account->screen_name.'. ';
+			if( empty($account->error) )
+			{
+				$result = T_('Linked to').': @'.$account->screen_name.'. ';
+			}
 		}
 
 		// create new connection
@@ -298,6 +306,11 @@ class twitter_plugin extends Plugin
 		$callback = TWITTER_CALLBACK.'?target_type='.$target_type.'&target_id='.$target_id.'&plugin_id='.$this->ID;
 
 		$req_token = $connection->getRequestToken( $callback );
+
+		if( $req_token == NULL )
+		{
+			return T_( 'Connection is not available!' );
+		}
 
 		$token = $req_token['oauth_token'];
 
@@ -325,6 +338,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.21  2010/09/21 13:00:57  efy-asimo
+ * Twitter plugin fix
+ *
  * Revision 1.20  2010/08/24 08:20:19  efy-asimo
  * twitter plugin oAuth
  *
