@@ -344,6 +344,11 @@ if( !empty($p) || !empty($title) )
 		$title = preg_replace( '/[^A-Za-z0-9_]/', '-', $title );
 		$Item = & $ItemCache->get_by_urltitle( $title, false );
 
+		if( ( !empty( $Item ) ) && ( $Item !== false ) && (! $Item->is_part_of_blog( $blog ) ) )
+		{ // we have found an Item object, but it doesn't belong to the current blog 
+			$Item = false;
+		}
+
 		if( empty($Item) && substr($title, -1) == '-' )
 		{ // Try lookup by removing last invalid char, which might have been e.g. ">"
 			$Item = $ItemCache->get_by_urltitle(substr($title, 0, -1), false, false);
@@ -655,6 +660,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.168  2010/09/21 14:38:20  efy-asimo
+ * Requesting a post in the wrong blog - fix
+ *
  * Revision 1.167  2010/07/26 06:52:15  efy-asimo
  * MFB v-4-0
  *

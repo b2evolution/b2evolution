@@ -666,6 +666,29 @@ class ItemLight extends DataObject
 
 
 	/**
+	 * Check if current item has at least one category, which belongs to the given blog
+	 * 
+	 * @param integer the given blog ID
+	 * @return boolean true if there is at least one category in the given blog, false otherwise
+	 */
+	function is_part_of_blog( $blog_ID )
+	{
+		global $DB;
+		$cat_count = $DB->get_var( '
+				SELECT count( cat_ID )
+				FROM T_categories, T_postcats
+				WHERE
+					T_categories.cat_ID = T_postcats.postcat_cat_ID
+					and T_categories.cat_blog_ID = '.$blog_ID.'
+					and T_postcats.postcat_post_ID = '.$this->ID
+		);
+
+		// $cat_count>0 means that this item has at least one category that belongs to the target blog.
+		return $cat_count > 0;
+	}
+
+
+	/**
 	 * Check if cross post navigation should stay in the current blog or not.
 	 * Also check that this item has at least one category that belongs to the given blog.
 	 * If current blog is the same as item blog then, this function will return false, because no need to check.
@@ -676,7 +699,7 @@ class ItemLight extends DataObject
 	 */
 	function check_cross_post_nav( $target_blog, $blog_ID )
 	{
-		global $DB, $cross_post_nav_in_same_blog;
+		global $cross_post_nav_in_same_blog;
 
 		if( $target_blog != 'auto' )
 		{ // target_blog is not set to auto, we have to navigate to the item's main cat's blog.
@@ -694,17 +717,8 @@ class ItemLight extends DataObject
 			return false;
 		}
 
-		$cat_count = $DB->get_var( '
-				SELECT count( cat_ID )
-				FROM T_categories, T_postcats
-				WHERE
-					T_categories.cat_ID = T_postcats.postcat_cat_ID
-					and T_categories.cat_blog_ID = '.$blog_ID.'
-					and T_postcats.postcat_post_ID = '.$this->ID
-		);
-
-		// $cat_count>0 means that this item has at least one category that belongs to the target blog.
-		return $cat_count > 0;
+		// return true if current item has at least one category, which belongs to the corresponding blog, false otherwise
+		return $this->is_part_of_blog( $blog_ID );
 	}
 
 
@@ -1051,6 +1065,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.39  2010/09/21 14:38:20  efy-asimo
+ * Requesting a post in the wrong blog - fix
+ *
  * Revision 1.38  2010/09/15 13:04:06  efy-asimo
  * Cross post navigatation
  *
