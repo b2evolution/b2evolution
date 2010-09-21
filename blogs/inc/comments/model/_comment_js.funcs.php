@@ -180,6 +180,10 @@ function refresh_item_comments( item_id )
 	{
 		statuses = '(draft)';
 	}
+	else if( $('#only_published') && $('#only_published').attr('checked') )
+	{
+		statuses = '(published)';
+	}
 	else
 	{
 		statuses = '(draft,published,deprecated)';

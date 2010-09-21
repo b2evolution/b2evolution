@@ -357,7 +357,8 @@ while( $Item = & $ItemList->get_item() )
 			$comments_number = $CommentList->get_num_rows();
 
 			$show_comments = param( 'show_comments', 'string', ''/*, true*/ );
-			if( $show_comments == '' ) {
+			if( $show_comments == '' )
+			{
 				// decide to show all comments, or only drafts
 				// consider that we have to show all comments
 				$show_comments = 'all';
@@ -383,13 +384,18 @@ while( $Item = & $ItemList->get_item() )
 
 			// display status filter
 			?>
+			<div class="tile"><label><?php echo T_('Show').':' ?></label></div>
 			<div class="tile">
 				<input type="radio" name="show_comments" value="draft" id="only_draft" class="radio" <?php if( $show_comments == 'draft' ) echo 'checked="checked" '?> />
-				<label for="only_draft"><?php echo T_('Show drafts') ?></label>
+				<label for="only_draft"><?php echo T_('Drafts') ?></label>
+			</div>
+			<div class="tile">
+				<input type="radio" name="show_comments" value="published" id="only_published" class="radio" <?php if( $show_comments == 'published' ) echo 'checked="checked" '?> />
+				<label for="only_published"><?php echo T_('Published') ?></label>
 			</div>
 			<div class="tile">
 				<input type="radio" name="show_comments" value="all" id="show_all" class="radio" <?php if( $show_comments == 'all' ) echo 'checked="checked" '?> />
-				<label for="show_all"><?php echo T_('Show all comments') ?></label>
+				<label for="show_all"><?php echo T_('All comments') ?></label>
 			</div>
 			<?php
 
@@ -467,6 +473,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.41  2010/09/21 11:47:21  efy-asimo
+ * Add 'Published ' radio comment filter to item list full view
+ *
  * Revision 1.40  2010/09/15 13:04:06  efy-asimo
  * Cross post navigatation
  *
