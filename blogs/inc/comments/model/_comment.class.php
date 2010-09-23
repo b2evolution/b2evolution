@@ -1215,10 +1215,18 @@ class Comment extends DataObject
 	 * Template function: display content of comment
 	 *
 	 * @param string Output format, see {@link format_to_output()}
+	 * @param boolean Add ban url icon after each url or not
 	 */
-	function content( $format = 'htmlbody' )
+	function content( $format = 'htmlbody', $ban_urls = false )
 	{
-		echo $this->get_content( $format );
+		if( $ban_urls )
+		{
+			echo add_ban_icons( $this->get_content( $format ) );
+		}
+		else
+		{
+			echo $this->get_content( $format );
+		}
 	}
 
 
@@ -1688,6 +1696,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.66  2010/09/23 14:21:00  efy-asimo
+ * antispam in comment text feature
+ *
  * Revision 1.65  2010/08/05 08:04:12  efy-asimo
  * Ajaxify comments on itemList FullView and commentList FullView pages
  *

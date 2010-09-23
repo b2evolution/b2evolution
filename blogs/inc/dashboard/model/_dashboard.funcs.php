@@ -253,7 +253,7 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 		echo '</div>';
 
 		echo '<div class="small">';
-		$Comment->content();
+		$Comment->content( 'htmlbody', true );
 		echo '</div>';
 
 		echo '<div class="dashboard_action_area">';
@@ -288,6 +288,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.38  2010/09/23 14:21:00  efy-asimo
+ * antispam in comment text feature
+ *
  * Revision 1.37  2010/09/20 13:00:45  efy-asimo
  * dashboard ajax calls - fix
  *

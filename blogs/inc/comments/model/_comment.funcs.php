@@ -297,8 +297,77 @@ function echo_comment_publishbt_js()
 	<?php
 }
 
+
+/**
+ * Add a javascript ban action icon after the given url
+ * 
+ * @param string url
+ * @return string the url with ban icon
+ */
+function add_jsban( $url )
+{
+	$url = rawurlencode(get_ban_domain( $url ));
+	return '<a id="ban_url" href="javascript:ban_url('.'\''.$url.'\''.');"'.get_icon( 'ban' ).'</a>';
+}
+
+
+/**
+ * Add a javascript ban action icon after each url in the given content
+ * 
+ * @param string Comment content
+ * @return string the same content with a ban icon after each url
+ */
+function add_ban_icons( $content )
+{
+	$atags = get_atags( $content );
+	$urls = get_urls( $content );
+	$result = '';
+	$from = 0; // current processing position
+	$length = 0; // current url or tag length
+	$i = 0; // url counter
+	$j = 0; // "a" tag counter
+	while( isset($urls[$i]) )
+	{ // there is unprocessed url
+		$url = $urls[$i];
+		if( validate_url( $url, 'posting', false ) )
+		{ // skip not valid urls
+			$i++;
+			continue;
+		}
+		$pos = strpos( $content, $url, $from );
+		$length = strlen($url);
+		$i++;
+		if( isset($atags[$j]) )
+		{ // there is unprocessed "a" tag
+			$tag = $atags[$j];
+			if( ( ( $urlpos = strpos( $tag, $url ) ) !== false ) && ( $pos > strpos( $content, $tag, $from ) ) )
+			{ // the url is inside the current tag, we have to add ban icon after the tag
+				$pos = strpos( $content, $tag, $from );
+				$length = strlen($tag);
+				while( isset($urls[$i]) && ( ( $urlpos = strpos( $tag, $urls[$i], $urlpos + 1 ) ) !== false ) )
+				{ // skip all other urls from this tag
+					$i++;
+				}
+				$j++;
+			}
+		}
+		// add processed part and ban icon to result and set current position
+		$result .= substr( $content, $from, $pos + $length - $from );
+		$from = $pos + $length;
+		$result .= add_jsban( $url );
+	}
+
+	// add the end of the content to the result
+	$result .= substr( $content, $from, strlen($content) - $from );
+	return $result;
+}
+
+
 /*
  * $Log$
+ * Revision 1.14  2010/09/23 14:21:00  efy-asimo
+ * antispam in comment text feature
+ *
  * Revision 1.13  2010/09/20 13:06:06  efy-asimo
  * show total comments number on item full view - fix
  *

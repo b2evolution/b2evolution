@@ -1396,6 +1396,37 @@ function is_windows()
 }
 
 
+/**
+ * Get all "a" tags from the given content
+ *  
+ * @param string content
+ * @return array all <a../a> part from the given content
+ */
+function get_atags( $content )
+{
+	$tag = 'a';
+	$regexp = '{<'.$tag.'[^>]*>(.*?)</'.$tag.'>}';
+
+	preg_match_all( $regexp, $content, $result );
+	return $result[0];
+}
+
+
+/**
+ * Get all urls from the given content
+ *  
+ * @param string content
+ * @return array all url from content
+ */
+function get_urls( $content )
+{
+	$regexp = '^(?#Protocol)(?:(?:ht|f)tp(?:s?)\:\/\/|~\/|\/)?(?#Username:Password)(?:\w+:\w+@)?(?#Subdomains)(?:(?:[-\w]+\.)+(?#TopLevel Domains)(?:com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|travel|[a-z]{2}))(?#Port)(?::[\d]{1,5})?(?#Directories)(?:(?:(?:\/(?:[-\w~!$+|.,=]|%[a-f\d]{2})+)+|\/)+|\?|#)?(?#Query)(?:(?:\?(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=?(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)(?:&(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=?(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)*)*(?#Anchor)(?:#(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)?^';
+
+	preg_match_all( $regexp, $content, $result );
+	return $result[0];
+}
+
+
 function xmlrpc_getposttitle($content)
 {
 	global $post_default_title;
@@ -4042,6 +4073,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.243  2010/09/23 14:21:00  efy-asimo
+ * antispam in comment text feature
+ *
  * Revision 1.242  2010/07/26 06:52:15  efy-asimo
  * MFB v-4-0
  *

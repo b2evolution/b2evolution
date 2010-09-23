@@ -1805,7 +1805,7 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 		echo '<div class="bCommentText">';
 		$Comment->rating();
 		$Comment->avatar();
-		$Comment->content();
+		$Comment->content( 'htmlbody', 'true' );
 		echo '</div>';
 		echo '</div>';
 
@@ -1877,6 +1877,9 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 
 /*
  * $Log$
+ * Revision 1.117  2010/09/23 14:21:00  efy-asimo
+ * antispam in comment text feature
+ *
  * Revision 1.116  2010/08/05 08:04:12  efy-asimo
  * Ajaxify comments on itemList FullView and commentList FullView pages
  *
