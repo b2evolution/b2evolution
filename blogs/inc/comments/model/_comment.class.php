@@ -1219,14 +1219,18 @@ class Comment extends DataObject
 	 */
 	function content( $format = 'htmlbody', $ban_urls = false )
 	{
+		global $current_User;
 		if( $ban_urls )
-		{
-			echo add_ban_icons( $this->get_content( $format ) );
+		{ // add ban icons
+			$Item = & $this->get_Item();
+			if( $current_User->check_perm( $this->blogperm_name(), '', false, $Item->get_blog_ID() ) )
+			{ // current user has edit permission for this comment
+				echo add_ban_icons( $this->get_content( $format ) );
+				return; // return after content display
+			}
 		}
-		else
-		{
-			echo $this->get_content( $format );
-		}
+
+		echo $this->get_content( $format );
 	}
 
 
@@ -1696,6 +1700,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.67  2010/09/23 15:12:14  efy-asimo
+ * antispam in comment text feature - add permission check - fix
+ *
  * Revision 1.66  2010/09/23 14:21:00  efy-asimo
  * antispam in comment text feature
  *

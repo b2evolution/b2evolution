@@ -315,10 +315,16 @@ function add_jsban( $url )
  * Add a javascript ban action icon after each url in the given content
  * 
  * @param string Comment content
- * @return string the same content with a ban icon after each url
+ * @return string the content with a ban icon after each url if the user has spamblacklist permission, the incoming content otherwise 
  */
 function add_ban_icons( $content )
 {
+	global $currentUser;
+	if( ! $current_User->check_perm( 'spamblacklist', 'edit' ) )
+	{
+		return $content;
+	}
+
 	$atags = get_atags( $content );
 	$urls = get_urls( $content );
 	$result = '';
@@ -365,6 +371,9 @@ function add_ban_icons( $content )
 
 /*
  * $Log$
+ * Revision 1.15  2010/09/23 15:12:14  efy-asimo
+ * antispam in comment text feature - add permission check - fix
+ *
  * Revision 1.14  2010/09/23 14:21:00  efy-asimo
  * antispam in comment text feature
  *
