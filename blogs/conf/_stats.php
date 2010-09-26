@@ -162,6 +162,8 @@ $search_engines = array(
 	'.qip.ru/', // query=
 	'://duckduckgo.com/', //q=
 	'rambler.ru', // query=
+	'nigma.ru', // s=
+	'ask.com', // q=
 );
 
 
@@ -251,6 +253,8 @@ $user_agents = array(
 	array('robot', 'TopBlogsInfo', 'TopBlogsInfo'),
 	array('robot', 'spbot/', 'SEOprofiler'),
 	array('robot', 'StackRambler', 'Rambler' ),
+	array('robot', 'AportWorm', 'Aport.ru' ),
+	array('robot', 'ScoutJet', 'ScoutJet' ),
 	// Unknown robots:
 	array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:
