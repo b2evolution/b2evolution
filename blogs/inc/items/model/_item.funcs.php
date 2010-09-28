@@ -1682,7 +1682,7 @@ function echo_show_comments_changed()
  * @param string comment IDs string to exclude from the list
  */
 function echo_item_comments( $blog_ID, $item_ID, $statuses = array( 'draft', 'published', 'deprecated' ),
-	$limit = 1000, $comment_IDs = array() )
+	$currentpage = 1, $limit = 50, $comment_IDs = array() )
 {
 	global $inc_path, $status_list, $Blog, $admin_url;
 
@@ -1707,6 +1707,17 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = array( 'draft', 'pu
 	if( $item_ID != null )
 	{ // redirect to the items full view
 		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog_ID.'&p='.$item_ID, '&' ) );
+		param( 'item_id', 'integer', $item_ID );
+		param( 'currentpage', 'integer', $currentpage );
+		if( count( $statuses ) == 1 )
+		{
+			$show_comments = $statuses[0];
+		}
+		else
+		{
+			$show_comments = 'all';
+		}
+		param( 'comments_number', 'integer', generic_ctp_number( $item_ID, 'comments', $show_comments ) );
 		// Filter list:
 		$CommentList->set_filters( array(
 			'types' => array( 'comment', 'trackback', 'pingback' ),
@@ -1715,6 +1726,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = array( 'draft', 'pu
 			'post_ID' => $item_ID,
 			'order' => 'ASC',//$order,
 			'comments' => $limit,
+			'page' => $currentpage,
 		) );
 	}
 	else
@@ -1875,8 +1887,67 @@ function echo_comment( $comment_ID, $redirect_to = NULL, $save_context = false )
 }
 
 
+/**
+ * Display a page link on item full view
+ * 
+ * @param integer the item id
+ * @param string link text 
+ * @param integer the page number
+ */
+function echo_pagenumber( $item_ID, $text, $value )
+{
+	echo ' <a href="javascript:startRefreshComments( '.$item_ID.', '.$value.' )">'.$text.'</a>';
+}
+
+
+/**
+ * Display page links on item full view
+ * 
+ * @param integer the item id
+ * @param integer current page number
+ * @param integer all comments number in the list
+ */
+function echo_pages( $item_ID, $currentpage, $comments_number )
+{
+	$comments_per_page = 50;
+	if( ( ( $currentpage - 1 ) * $comments_per_page ) >= $comments_number )
+	{ // current page number is greater then all page number, set current page to the last existing page
+		$currentpage = intval( ( $comments_number - 1 ) / $comments_per_page ) + 1;
+	}
+	echo '<div id="currentpage" value='.$currentpage.' /></div>';
+	echo '<div class="results_nav" id="paging">';
+	if( $comments_number > 0 )
+	{
+		echo '<strong>'.T_('Pages').'</strong>:';
+		if( $currentpage > 1 )
+		{ // previous link
+			echo_pagenumber( $item_ID, T_('Previous'), $currentpage - 1 );
+		}
+		for( $i = 1; ( ( $i - 1 ) * $comments_per_page ) < $comments_number; $i++ )
+		{
+			if( $i == $currentpage )
+			{
+				echo ' <strong>'.$i.'</strong>';
+			}
+			else
+			{
+				echo_pagenumber( $item_ID, $i, $i );
+			}
+		}
+		if( ( $currentpage * $comments_per_page ) < $comments_number )
+		{ // next link
+			echo_pagenumber( $item_ID, T_('Next'), $currentpage + 1 );
+		}
+	}
+	echo '</div>';
+}
+
+
 /*
  * $Log$
+ * Revision 1.118  2010/09/28 13:03:16  efy-asimo
+ * Paged comments on item full view
+ *
  * Revision 1.117  2010/09/23 14:21:00  efy-asimo
  * antispam in comment text feature
  *

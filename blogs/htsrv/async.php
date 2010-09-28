@@ -201,7 +201,9 @@ switch( $action )
 
 		$blog = param( 'blogid', 'integer' );
 		$commentIds = param( 'commentIds', 'array' );
+		$statuses = param( 'statuses', 'string', NULL );
 		$item_ID = param( 'itemid', 'integer' );
+		$currentpage = param( 'currentpage', 'integer', 1 );
 
 		foreach( $commentIds as $commentID )
 		{
@@ -211,7 +213,17 @@ switch( $action )
 			$edited_Comment->dbdelete();
 		}
 
-		echo_item_comments( $blog, $item_ID, NULL );
+		if( strlen($statuses) > 2 )
+		{
+			$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
+		}
+		$status_list = explode( ',', $statuses );
+		if( $status_list == NULL )
+		{
+			$status_list = array( 'published', 'draft', 'deprecated' );
+		}
+
+		echo_item_comments( $blog, $item_ID, $status_list, $currentpage );
 		exit(0);
 
 	case 'delete_comment_url':
@@ -249,6 +261,8 @@ switch( $action )
 		$blog = param( 'blogid', 'integer' );
 		$item_ID = param( 'itemid', 'integer', NULL );
 		$statuses = param( 'statuses', 'string', NULL );
+		$currentpage = param( 'currentpage', 'string', 1 );
+
 		//$statuses = init_show_comments();
 		if( strlen($statuses) > 2 )
 		{
@@ -259,7 +273,8 @@ switch( $action )
 		{
 			$status_list = array( 'published', 'draft', 'deprecated' );
 		}
-		echo_item_comments( $blog, $item_ID, $status_list );
+
+		echo_item_comments( $blog, $item_ID, $status_list, $currentpage );
 		exit(0);
 
 	case 'get_tags':
@@ -314,6 +329,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.57  2010/09/28 13:03:16  efy-asimo
+ * Paged comments on item full view
+ *
  * Revision 1.56  2010/09/20 13:00:44  efy-asimo
  * dashboard ajax calls - fix
  *

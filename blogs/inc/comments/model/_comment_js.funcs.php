@@ -77,16 +77,21 @@ function deleteComment( commentIds )
 			fadeIn(divid, '#EE0000');
 		}
 	}
+
+	var statuses = get_show_statuses();
+
 	var item_id = $('#comments_container').attr('value');
 	if( ! isDefined( item_id) )
 	{
 		item_id = -1;
 	}
 
+	var currentpage = get_current_page();
+
 	$.ajax({
 	type: 'POST',
 	url: '<?php echo $htsrv_url; ?>async.php',
-	data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentIds=' + commentIds + '&action=delete_comments&itemid=' + item_id + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
+	data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentIds=' + commentIds + '&action=delete_comments&itemid=' + item_id + '&statuses=' + statuses + '&currentpage=' + currentpage + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
 	success: function(result)
 		{
 			$('#comments_container').html(result);
@@ -164,29 +169,49 @@ function refreshAfterBan( deleted_ids )
 	refresh_item_comments( item_id );
 }
 
-function startRefreshComments( item_id )
+function startRefreshComments( item_id, currentpage )
 {
 	$('#comments_container').fadeTo( 'slow', 0.1, function() {
-		refresh_item_comments( item_id );
-		$('#comments_container').fadeTo( "slow", 1 );
+		refresh_item_comments( item_id, currentpage );
 	} );
 }
 
-function refresh_item_comments( item_id )
+function endRefreshComments( result )
 {
-	var statuses;
+	$('#comments_container').html(result);
+		$('#comments_container').fadeTo( "slow", 1 );
+}
 
+function get_current_page()
+{
+	if( ( isDefined( $('#currentpage') ) ) && isDefined( $('#currentpage').attr('value') ) )
+	{
+		return $('#currentpage').attr('value');
+	}
+	return 1;
+}
+
+function get_show_statuses()
+{
 	if( $('#only_draft') && $('#only_draft').attr('checked') )
 	{
-		statuses = '(draft)';
+		return '(draft)';
 	}
 	else if( $('#only_published') && $('#only_published').attr('checked') )
 	{
-		statuses = '(published)';
+		return '(published)';
 	}
-	else
+
+	return '(draft,published,deprecated)';
+}
+
+function refresh_item_comments( item_id, currentpage )
+{
+	var statuses = get_show_statuses();
+
+	if( ! isDefined( currentpage ) )
 	{
-		statuses = '(draft,published,deprecated)';
+		currentpage = get_current_page();
 	}
 	if( ! isDefined( item_id) )
 	{ // show all comments
@@ -195,10 +220,10 @@ function refresh_item_comments( item_id )
 	$.ajax({
 		type: 'POST',
 		url: '<?php echo $htsrv_url; ?>async.php',
-		data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_item_comments&itemid=' + item_id + '&statuses=' + statuses,
+		data: 'blogid=' + <?php echo $Blog->ID; ?> + '&action=refresh_item_comments&itemid=' + item_id + '&statuses=' + statuses + '&currentpage=' + currentpage,
 		success: function(result)
 		{
-			$('#comments_container').html(result);
+			endRefreshComments( result );
 		}
 	});
 }

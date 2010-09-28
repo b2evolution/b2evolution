@@ -42,6 +42,14 @@ $redirect_to = rawurlencode( $redirect_to );
 $save_context = param( 'save_context', 'boolean', 'true' );
 $show_comments = param( 'show_comments', 'string', 'all' );
 
+$item_id = param( 'item_id', 'integer', 0 );
+$currentpage = param( 'currentpage', 'integer', 0 );
+$comments_number = param( 'comments_number', 'integer', 0 );
+if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
+{
+	echo_pages( $item_id, $currentpage, $comments_number );
+}
+
 while( $Comment = & $CommentList->get_next() )
 { // Loop through comments:
 	if( ( $show_comments == 'draft' ) && ( $Comment->get( 'status' ) != 'draft' ) )
@@ -53,8 +61,16 @@ while( $Comment = & $CommentList->get_next() )
 	echo'</div>';
 } //end of the loop, don't delete
 
+if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
+{
+	echo_pages( $item_id, $currentpage, $comments_number );
+}
+
 /*
  * $Log$
+ * Revision 1.21  2010/09/28 13:03:16  efy-asimo
+ * Paged comments on item full view
+ *
  * Revision 1.20  2010/08/05 08:04:12  efy-asimo
  * Ajaxify comments on itemList FullView and commentList FullView pages
  *

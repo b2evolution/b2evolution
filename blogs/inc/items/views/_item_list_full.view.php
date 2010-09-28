@@ -341,46 +341,41 @@ while( $Item = & $ItemList->get_item() )
 			?>:</h4>
 			<?php
 
-			global $CommentList;
+			$total_comments_number = generic_ctp_number( $Item->ID, 'total', 'total' );
+			$draft_comments_number = generic_ctp_number( $Item->ID, 'total', 'draft' );
+			// decide to show all comments, or only drafts
+			if( $total_comments_number > 5 && $draft_comments_number > 0 )
+			{ // show only drafts
+				$statuses = array( 'draft' );
+				$show_comments = 'draft';
+				param( 'comments_number', 'integer', $draft_comments_number );
+			}
+			else
+			{ // show all comments
+				$statuses = array( 'published', 'draft', 'deprecated' );
+				$show_comments = 'all';
+				param( 'comments_number', 'integer', $total_comments_number );
+			}
 
+			global $CommentList;
 			$CommentList = new CommentList2( $Blog );
 
 			// Filter list:
 			$CommentList->set_filters( array(
 				'types' => array( 'comment','trackback','pingback' ),
-				'statuses' => array( 'published', 'draft', 'deprecated' ),
+				'statuses' => $statuses,
 				'order' => 'ASC',
 				'post_ID' => $Item->ID,
-				'comments' => 1000,
+				'comments' => 50,
 			) );
 			$CommentList->query();
-			$comments_number = $CommentList->get_num_rows();
-
-			$show_comments = param( 'show_comments', 'string', ''/*, true*/ );
-			if( $show_comments == '' )
-			{
-				// decide to show all comments, or only drafts
-				// consider that we have to show all comments
-				$show_comments = 'all';
-				if( $comments_number > 5 )
-				{ // there is more then 5 comments, check if draft exists
-					while( ( $Comment = & $CommentList->get_next() ) )
-					{ // there is no draft comments yet
-						if( $Comment->get( 'status' ) == 'draft' )
-						{
-							$show_comments = 'draft';
-							break; // draft comment was found
-						}
-					}
-					$CommentList->restart();
-				}
-				// set new show_comments param
-				param( 'show_comments', 'string', $show_comments, false, true );
-			}
 
 			// we do not want to comment actions use new redirect
 			param( 'save_context', 'boolean', false );
 			param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$Item->ID, '&' ), false, true );
+			param( 'item_id', 'integer', $Item->ID );
+			param( 'currentpage', 'integer', 1 );
+			param( 'show_comments', 'string', $show_comments, false, true );
 
 			// display status filter
 			?>
@@ -473,6 +468,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.42  2010/09/28 13:03:16  efy-asimo
+ * Paged comments on item full view
+ *
  * Revision 1.41  2010/09/21 11:47:21  efy-asimo
  * Add 'Published ' radio comment filter to item list full view
  *
