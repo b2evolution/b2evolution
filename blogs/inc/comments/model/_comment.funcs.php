@@ -319,7 +319,7 @@ function add_jsban( $url )
  */
 function add_ban_icons( $content )
 {
-	global $currentUser;
+	global $current_User;
 	if( ! $current_User->check_perm( 'spamblacklist', 'edit' ) )
 	{
 		return $content;
@@ -371,6 +371,9 @@ function add_ban_icons( $content )
 
 /*
  * $Log$
+ * Revision 1.16  2010/09/28 11:33:06  efy-asimo
+ * add_ban_icons - fix
+ *
  * Revision 1.15  2010/09/23 15:12:14  efy-asimo
  * antispam in comment text feature - add permission check - fix
  *
