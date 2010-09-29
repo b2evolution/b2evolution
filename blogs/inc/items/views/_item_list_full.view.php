@@ -366,11 +366,11 @@ while( $Item = & $ItemList->get_item() )
 				'statuses' => $statuses,
 				'order' => 'ASC',
 				'post_ID' => $Item->ID,
-				'comments' => 50,
+				'comments' => 20,
 			) );
 			$CommentList->query();
 
-			// we do not want to comment actions use new redirect
+			// We do not want to comment actions use new redirect
 			param( 'save_context', 'boolean', false );
 			param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$Item->ID, '&' ), false, true );
 			param( 'item_id', 'integer', $Item->ID );
@@ -468,6 +468,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.43  2010/09/29 14:53:50  efy-asimo
+ * Item full view comment list - fix
+ *
  * Revision 1.42  2010/09/28 13:03:16  efy-asimo
  * Paged comments on item full view
  *

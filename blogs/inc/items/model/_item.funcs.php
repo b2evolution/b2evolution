@@ -1664,7 +1664,7 @@ function echo_show_comments_changed()
 			{ // if item_id is not defined, we have to show all comments from current blog 
 				item_id = -1;
 			}
-			refresh_item_comments( item_id );
+			refresh_item_comments( item_id, 1 );
 		} );
 	</script>
 <?php
@@ -1682,7 +1682,7 @@ function echo_show_comments_changed()
  * @param string comment IDs string to exclude from the list
  */
 function echo_item_comments( $blog_ID, $item_ID, $statuses = array( 'draft', 'published', 'deprecated' ),
-	$currentpage = 1, $limit = 50, $comment_IDs = array() )
+	$currentpage = 1, $limit = 20, $comment_IDs = array() )
 {
 	global $inc_path, $status_list, $Blog, $admin_url;
 
@@ -1909,7 +1909,7 @@ function echo_pagenumber( $item_ID, $text, $value )
  */
 function echo_pages( $item_ID, $currentpage, $comments_number )
 {
-	$comments_per_page = 50;
+	$comments_per_page = 20;
 	if( ( ( $currentpage - 1 ) * $comments_per_page ) >= $comments_number )
 	{ // current page number is greater then all page number, set current page to the last existing page
 		$currentpage = intval( ( $comments_number - 1 ) / $comments_per_page ) + 1;
@@ -1945,6 +1945,9 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 
 /*
  * $Log$
+ * Revision 1.119  2010/09/29 14:53:50  efy-asimo
+ * Item full view comment list - fix
+ *
  * Revision 1.118  2010/09/28 13:03:16  efy-asimo
  * Paged comments on item full view
  *
