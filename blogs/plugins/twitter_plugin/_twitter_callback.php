@@ -2,6 +2,8 @@
 /**
  * This file implements the twitter plugin _twitter_callback
  *
+ * This file will be called back from twitter, after twitter user allows or deny the b2evo_twitter_plugin
+ *
  * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @package evocore
@@ -103,6 +105,9 @@ header_redirect( $redirect_to );
 
 /*
  * $Log$
+ * Revision 1.2  2010/09/29 14:32:29  efy-asimo
+ * doc and small modificaitons
+ *
  * Revision 1.1  2010/08/24 08:20:19  efy-asimo
  * twitter plugin oAuth
  *

@@ -346,7 +346,7 @@ if( !empty($p) || !empty($title) )
 
 		if( ( !empty( $Item ) ) && ( $Item !== false ) && (! $Item->is_part_of_blog( $blog ) ) )
 		{ // we have found an Item object, but it doesn't belong to the current blog 
-			$Item = false;
+			unset($Item);
 		}
 
 		if( empty($Item) && substr($title, -1) == '-' )
@@ -660,6 +660,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.169  2010/09/29 14:32:29  efy-asimo
+ * doc and small modificaitons
+ *
  * Revision 1.168  2010/09/21 14:38:20  efy-asimo
  * Requesting a post in the wrong blog - fix
  *
