@@ -252,6 +252,22 @@ switch( $action )
 		}
 
 		break;
+
+	case 'twitter_unlink':
+		// delete twitter account settings and update db
+		global $Plugins, $Blog;
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'collection' );
+
+		$Plugin = & $Plugins->get_by_code( 'evo_twitter' );
+		$Plugin->delete_coll_setting( 'twitter_token' );
+		$Plugin->delete_coll_setting( 'twitter_secret' );
+		$Blog->dbupdate();
+
+		$Messages->add( T_('Twitter account have been unlinked'), 'success' );
+
+		break;
 }
 
 $AdminUI->set_path( 'blogs',  $tab  );
@@ -383,6 +399,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.34  2010/09/29 13:19:02  efy-asimo
+ * Twitter user unlink, and twitter config params move to plugin
+ *
  * Revision 1.33  2010/07/06 08:17:39  efy-asimo
  * Move "Multiple authors" block to Blog setings advanced tab. Fix validating urlname when user has no blog_admin permission.
  *

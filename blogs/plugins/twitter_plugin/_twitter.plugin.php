@@ -23,6 +23,15 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $baseurl;
+
+// Twitter params initialization
+define( 'TWITTER_CONSUMER_KEY', 'z680vsCAnATc0ZQNgMVwbg' );
+define( 'TWITTER_CONSUMER_SECRET', 'OBo8xI6pvTR1KI0LBHEkjpPPd6nN99tq4SAY8qrBp8' );
+define( 'TWITTER_CALLBACK', $baseurl.'plugins/twitter_plugin/_twitter_callback.php' );
+//test app
+//define( 'TWITTER_CONSUMER_KEY', 'PTJjBJraSkghuFVXQysPTg' );
+//define( 'TWITTER_CONSUMER_SECRET', 'pcGfALMLaOF6VCaG6FwVO5hI1jtTPEgbLyj6Yo0DN04' );
 
 /**
  * Twitter Plugin
@@ -104,12 +113,12 @@ class twitter_plugin extends Plugin
 
 		if( version_compare( phpversion(), '5.0.0', '<' ) )
 		{
-			return T_('The twitter plugin requires php5.');
+			return T_('The twitter plugin requires PHP 5.');
 		}
 
 		if( !extension_loaded( 'curl') )
 		{
-			return T_( 'The twitter plugin requires curl extension.');
+			return T_( 'The twitter plugin requires the PHP curl extension.');
 		}
 
 		// OK:
@@ -329,6 +338,15 @@ class twitter_plugin extends Plugin
 		else
 		{
 			$result = $result.'<a href='.$connection->getAuthorizeURL( $req_token, false ).'>'.T_( 'Link to another account' ).'</a>';
+			if( $target_type == 'blog' )
+			{
+				$redirect_to = regenerate_url( '', 'action=twitter_unlink&amp;'.url_crumb( 'collection' ) );
+			}
+			else
+			{
+				$redirect_to = regenerate_url( '', 'action=twitter_unlink&amp;user_tab=preferences&amp;user_ID='.$target_id.'&amp;'.url_crumb( 'user' ) );
+			}
+			$result = $result.' / '.'<a href="'.$redirect_to.'">'.T_( 'Unlink this account' ).'</a>';
 		}
 
 		return $result;
@@ -338,6 +356,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.22  2010/09/29 13:19:03  efy-asimo
+ * Twitter user unlink, and twitter config params move to plugin
+ *
  * Revision 1.21  2010/09/21 13:00:57  efy-asimo
  * Twitter plugin fix
  *

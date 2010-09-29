@@ -3060,11 +3060,36 @@ class Plugin
 	}
 
 
+	/**
+	 * Delete param setting from current Blog
+	 *
+	 * @param string parameter name
+	 * @param string blog id
+	 */
+	function delete_coll_setting( $parname, $blog = NULL )
+	{
+		/**
+		 * @var Blog
+		 */
+		global $Blog;
+		if( empty( $Blog ) )
+		{
+			$BlogCache = & get_BlogCache();
+			$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+		}
+
+		// Name of the setting in the blog settings:
+		$blog_setting_name = 'plugin'.$this->ID.'_'.$parname;
+		$Blog->delete_setting( $blog_setting_name );
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.45  2010/09/29 13:19:02  efy-asimo
+ * Twitter user unlink, and twitter config params move to plugin
+ *
  * Revision 1.44  2010/08/24 08:20:19  efy-asimo
  * twitter plugin oAuth
  *

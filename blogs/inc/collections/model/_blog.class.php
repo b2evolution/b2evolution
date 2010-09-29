@@ -1781,6 +1781,20 @@ class Blog extends DataObject
 
 
 	/**
+	 * Delete a setting.
+	 *
+	 * @return boolean true, if the value has been set, false if it has not changed.
+	 */
+	function delete_setting( $parname )
+	{
+	 	// Make sure collection settings are loaded
+		$this->load_CollectionSettings();
+
+		return $this->CollectionSettings->delete( $this->ID, $parname );
+	}
+
+
+	/**
 	 * Make sure collection settings are loaded.
 	 * This keeps a single instance across all blogs.
 	 * fp> why?
@@ -2327,6 +2341,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.120  2010/09/29 13:19:02  efy-asimo
+ * Twitter user unlink, and twitter config params move to plugin
+ *
  * Revision 1.119  2010/07/26 06:52:15  efy-asimo
  * MFB v-4-0
  *
