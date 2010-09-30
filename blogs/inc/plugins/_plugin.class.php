@@ -3047,8 +3047,12 @@ class Plugin
 		/**
 		 * @var Blog
 		 */
-		global $Blog;
-		if( empty( $Blog ) )
+
+		if( empty( $blog ) )
+		{
+			global $Blog;
+		}
+		else
 		{
 			$BlogCache = & get_BlogCache();
 			$Blog = & $BlogCache->get_by_ID( $blog, false, false );
@@ -3071,8 +3075,12 @@ class Plugin
 		/**
 		 * @var Blog
 		 */
-		global $Blog;
-		if( empty( $Blog ) )
+
+		if( empty( $blog ) )
+		{
+			global $Blog;
+		}
+		else
 		{
 			$BlogCache = & get_BlogCache();
 			$Blog = & $BlogCache->get_by_ID( $blog, false, false );
@@ -3087,6 +3095,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.46  2010/09/30 13:18:01  efy-asimo
+ * use blog param instead global Blog
+ *
  * Revision 1.45  2010/09/29 13:19:02  efy-asimo
  * Twitter user unlink, and twitter config params move to plugin
  *
