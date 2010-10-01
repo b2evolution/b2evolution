@@ -192,11 +192,14 @@ if( !$Messages->count('error') )
 				break;
 			}
 
+			$plugin_ID = param( 'plugin_ID', 'integer', true );
+
 			global $Plugins;
-			$Plugin = & $Plugins->get_by_code( 'evo_twitter' );
+			$Plugin = & $Plugins->get_by_ID( $plugin_ID );
 
 			$Plugin->UserSettings->delete( 'twitter_token', $edited_User->ID );
-			$Plugin->UserSettings->set( 'twitter_secret', $edited_User->ID );
+			$Plugin->UserSettings->delete( 'twitter_secret', $edited_User->ID );
+			$Plugin->UserSettings->delete( 'twitter_contact', $edited_User->ID );
 			$Plugin->UserSettings->dbupdate();
 
 			$Messages->add( T_('Twitter account have been unlinked'), 'success' );
@@ -467,6 +470,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.17  2010/10/01 13:56:32  efy-asimo
+ * twitter plugin save contact and fix
+ *
  * Revision 1.16  2010/09/29 13:19:02  efy-asimo
  * Twitter user unlink, and twitter config params move to plugin
  *

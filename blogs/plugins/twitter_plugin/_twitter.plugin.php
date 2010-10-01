@@ -153,11 +153,13 @@ class twitter_plugin extends Plugin
 			else
 			{	// Get additional params from User Setttings:
 				$msg = $this->UserSettings->get( 'twitter_msg_format' );
+				$oauth_contact = $this->UserSettings->get( 'twitter_contact' );
 			}
 		}
 		else
 		{	// Get additional params from Blog Setttings:
 			$msg = $this->get_coll_setting( 'twitter_msg_format', $item_Blog );
+			$oauth_contact = $this->get_coll_setting( 'twitter_contact', $item_Blog );
 		}
 
 		$title =  $params['Item']->dget('title', 'xml');
@@ -183,14 +185,12 @@ class twitter_plugin extends Plugin
 			return false;
 		}
 
-		$account_name = T_('unknown');
-		$account = $connection->get('account/verify_credentials');
-		if( empty( $account->error ) && isset( $account->screen_name ) )
+		if( empty( $oauth_contact ) )
 		{
-			$account_name = $account->screen_name;
+			$oauth_contact = twitter_plugin::get_twitter_contact( $oauth_token, $oauth_token_secret );
 		}
 
-		$params['xmlrpcresp'] = T_('Posted to account: @').$account_name;
+		$params['xmlrpcresp'] = T_('Posted to account: @').$oauth_contact;
 		return true;
 	}
 
@@ -280,6 +280,7 @@ class twitter_plugin extends Plugin
 			if( !empty( $oauth_token ) )
 			{ // blog has already a linked twitter user, get token secret
 				$oauth_token_secret = $this->get_coll_setting( 'twitter_secret', $Blog );
+				$oauth_contact = $this->get_coll_setting( 'twitter_contact', $Blog );
 			}
 		}
 		else if ( $target_type = 'user' )
@@ -292,18 +293,30 @@ class twitter_plugin extends Plugin
 			if( !empty( $oauth_token ) )
 			{ // user has already a linked twitter user, get token secret
 				$oauth_token_secret = $this->UserSettings->get( 'twitter_secret', $target_id );
+				$oauth_contact = $this->UserSettings->get( 'twitter_contact', $target_id );
 			}
 		}
 
 		if( !empty( $oauth_token ) )
 		{ // already linked
-			$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth_token, $oauth_token_secret );
-			// get linked user account
-			$account = $connection->get('account/verify_credentials');
-			if( empty($account->error) )
+			if( empty( $oauth_contact ) )
 			{
-				$result = T_('Linked to').': @'.$account->screen_name.'. ';
+				$oauth_contact = twitter_plugin::get_twitter_contact( $oauth_token, $oauth_token_secret );
+				if( ! empty( $oauth_contact ) )
+			{
+					if( $target_type == 'blog' )
+					{ // CollSettings
+						$this->set_coll_setting( 'twitter_contact', $oauth_contact, $Blog->ID );
+						$Blog->dbupdate();
+					}
+					else if( $target_type == 'user' )
+					{ // UserSettings
+						$this->UserSettings->set( 'twitter_contact', $oauth_contact, $target_id );
+						$this->UserSettings->dbupdate();
+					}
 			}
+		}
+			$result = T_('Linked to').': @'.$oauth_contact.'. ';
 		}
 
 		// create new connection
@@ -340,11 +353,11 @@ class twitter_plugin extends Plugin
 			$result = $result.'<a href='.$connection->getAuthorizeURL( $req_token, false ).'>'.T_( 'Link to another account' ).'</a>';
 			if( $target_type == 'blog' )
 			{
-				$redirect_to = regenerate_url( '', 'action=twitter_unlink&amp;'.url_crumb( 'collection' ) );
+				$redirect_to = regenerate_url( '', 'action=twitter_unlink&amp;plugin_ID='.$this->ID.'&amp;'.url_crumb( 'collection' ) );
 			}
 			else
 			{
-				$redirect_to = regenerate_url( '', 'action=twitter_unlink&amp;user_tab=preferences&amp;user_ID='.$target_id.'&amp;'.url_crumb( 'user' ) );
+				$redirect_to = regenerate_url( '', 'action=twitter_unlink&amp;user_tab=preferences&amp;user_ID='.$target_id.'&amp;plugin_ID='.$this->ID.'&amp;'.url_crumb( 'user' ) );
 			}
 			$result = $result.' / '.'<a href="'.$redirect_to.'">'.T_( 'Unlink this account' ).'</a>';
 		}
@@ -352,10 +365,34 @@ class twitter_plugin extends Plugin
 		return $result;
 	}
 
+
+	/**
+	 * Get twitter contact display name
+	 * 
+	 * @static
+	 * 
+	 * @param string oauth_token
+	 * @param string oauth tokensecret
+	 * @return string contact display name on success, empty string on error
+	 */
+	function get_twitter_contact( $oauth_token, $oauth_token_secret )
+	{
+		$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth_token, $oauth_token_secret );
+		// get linked user account
+		$account = $connection->get('account/verify_credentials');
+		if( empty($account->error) )
+		{
+			return $account->screen_name;
+		}
+		return '';
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.23  2010/10/01 13:56:32  efy-asimo
+ * twitter plugin save contact and fix
+ *
  * Revision 1.22  2010/09/29 13:19:03  efy-asimo
  * Twitter user unlink, and twitter config params move to plugin
  *

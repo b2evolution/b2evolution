@@ -16,6 +16,7 @@
 require_once dirname(__FILE__).'/../../conf/_config.php';
 require_once dirname(__FILE__).'/twitteroauth/twitteroauth.php';
 require_once $inc_path.'_main.inc.php';
+require_once dirname(__FILE__).'/_twitter.plugin.php';
 load_funcs('_core/_param.funcs.php');
 
 global $Session, $Messages, $admin_url;
@@ -79,20 +80,29 @@ if( empty( $Plugin ) )
 {
 	$Messages->add( T_( 'Can not find twitter plugin!' ), 'error' );
 }
-else if( $target_type == 'blog' )
-{ // blog settings
-	$Plugin->set_coll_setting( 'twitter_token', $access_token['oauth_token'], $target_id );
-	$Plugin->set_coll_setting( 'twitter_secret', $access_token['oauth_token_secret'], $target_id );
-	// save Collection settings
-	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID( $target_id, false, false );
-	$Blog->dbupdate();
-}
-else if( $target_type == 'user' )
-{ // user preferences
-	$Plugin->UserSettings->set( 'twitter_token', $access_token['oauth_token'], $target_id );
-	$Plugin->UserSettings->set( 'twitter_secret', $access_token['oauth_token_secret'], $target_id );
-	$Plugin->UserSettings->dbupdate();
+else
+{
+	// get oauth params
+	$token = $access_token['oauth_token'];
+	$secret = $access_token['oauth_token_secret'];
+	$contact = twitter_plugin::get_twitter_contact( $token, $secret );
+	if( $target_type == 'blog' )
+	{ // blog settings
+		$Plugin->set_coll_setting( 'twitter_token', $token, $target_id );
+		$Plugin->set_coll_setting( 'twitter_secret', $secret, $target_id );
+		$Plugin->set_coll_setting( 'twitter_contact', $contact, $target_id );
+		// save Collection settings
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $target_id, false, false );
+		$Blog->dbupdate();
+	}
+	else if( $target_type == 'user' )
+	{ // user preferences
+		$Plugin->UserSettings->set( 'twitter_token', $token, $target_id );
+		$Plugin->UserSettings->set( 'twitter_secret', $secret, $target_id );
+		$Plugin->UserSettings->set( 'twitter_contact', $contact, $target_id );
+		$Plugin->UserSettings->dbupdate();
+	}
 }
 
 /* Remove no longer needed request tokens */
@@ -105,6 +115,9 @@ header_redirect( $redirect_to );
 
 /*
  * $Log$
+ * Revision 1.3  2010/10/01 13:56:32  efy-asimo
+ * twitter plugin save contact and fix
+ *
  * Revision 1.2  2010/09/29 14:32:29  efy-asimo
  * doc and small modificaitons
  *

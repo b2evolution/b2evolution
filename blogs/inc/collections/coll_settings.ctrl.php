@@ -260,9 +260,12 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'collection' );
 
-		$Plugin = & $Plugins->get_by_code( 'evo_twitter' );
+		$plugin_ID = param( 'plugin_ID', 'integer', true );
+
+		$Plugin = & $Plugins->get_by_ID( $plugin_ID );
 		$Plugin->delete_coll_setting( 'twitter_token' );
 		$Plugin->delete_coll_setting( 'twitter_secret' );
+		$Plugin->delete_coll_setting( 'twitter_contact' );
 		$Blog->dbupdate();
 
 		$Messages->add( T_('Twitter account have been unlinked'), 'success' );
@@ -399,6 +402,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.35  2010/10/01 13:56:32  efy-asimo
+ * twitter plugin save contact and fix
+ *
  * Revision 1.34  2010/09/29 13:19:02  efy-asimo
  * Twitter user unlink, and twitter config params move to plugin
  *
