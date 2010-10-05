@@ -19,14 +19,12 @@ require_once $inc_path.'_main.inc.php';
 require_once dirname(__FILE__).'/_twitter.plugin.php';
 load_funcs('_core/_param.funcs.php');
 
-global $Session, $Messages, $admin_url;
+global $Session, $Messages, $admin_url, $Plugins, $current_User;
 
-$req_token = param( 'oauth_token', 'string', '' );
-$oauth_verifier = param( 'oauth_verifier', 'string', '' );
-$oauth_token = $Session->get( 'oauth_token' );
 $target_type = param( 'target_type', 'string', '' );
 $target_id = param( 'target_id', 'string', '' );
 $plugin_id = param( 'plugin_id', 'string', NULL );
+$action = param( 'action', 'string', NULL );
 
 $redirect_to = '';
 if( $target_type == 'blog' )
@@ -41,6 +39,55 @@ else
 {
 	debug_die( 'Target type missing!' );
 }
+
+// check plugin
+if( empty( $plugin_id ) )
+{
+	debug_die( 'Missing plugin ID!' );
+}
+$Plugin = & $Plugins->get_by_ID( $plugin_id );
+if( $Plugin == false )
+{
+	debug_die( 'Missing twitter plugin!' );
+}
+
+if( $action == 'twitter_unlink' )
+{
+	if( $target_type == 'blog' )
+	{ // Blog Settings
+		$BlogCache = & get_BlogCache();
+		$Blog = $BlogCache->get_by_ID( $target_id );
+
+		$Plugin->delete_coll_setting( 'twitter_token', $target_id );
+		$Plugin->delete_coll_setting( 'twitter_secret', $target_id );
+		$Plugin->delete_coll_setting( 'twitter_contact', $target_id );
+
+		$Blog->dbupdate();
+	}
+	else
+	{ // User Settings
+		if( isset( $current_User ) && ( !$current_User->check_perm( 'users', 'edit' ) ) && ( $target_id != $current_User->ID ) )
+		{ // user is only allowed to update him/herself
+			$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
+			header_redirect( $redirect_to );
+			// We have EXITed already at this point!!
+		}
+
+		$Plugin->UserSettings->delete( 'twitter_token', $target_id );
+		$Plugin->UserSettings->delete( 'twitter_secret', $target_id );
+		$Plugin->UserSettings->delete( 'twitter_contact', $target_id );
+		$Plugin->UserSettings->dbupdate();
+	}
+
+	$Messages->add( T_('Twitter account have been unlinked'), 'success' );
+	header_redirect( $redirect_to );
+	// We have EXITed already at this point!!
+}
+
+// callback from twitter.com
+$req_token = param( 'oauth_token', 'string', '' );
+$oauth_verifier = param( 'oauth_verifier', 'string', '' );
+$oauth_token = $Session->get( 'oauth_token' );
 
 // check tokens
 //if (isset($_REQUEST['oauth_token']) && $Session->get( 'oauth_token' ) !== $_REQUEST['oauth_token']) {
@@ -115,6 +162,9 @@ header_redirect( $redirect_to );
 
 /*
  * $Log$
+ * Revision 1.4  2010/10/05 12:53:46  efy-asimo
+ * Move twitter_unlink into twitter_plugin
+ *
  * Revision 1.3  2010/10/01 13:56:32  efy-asimo
  * twitter plugin save contact and fix
  *

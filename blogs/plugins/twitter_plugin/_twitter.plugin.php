@@ -351,15 +351,8 @@ class twitter_plugin extends Plugin
 		else
 		{
 			$result = $result.'<a href='.$connection->getAuthorizeURL( $req_token, false ).'>'.T_( 'Link to another account' ).'</a>';
-			if( $target_type == 'blog' )
-			{
-				$redirect_to = regenerate_url( '', 'action=twitter_unlink&amp;plugin_ID='.$this->ID.'&amp;'.url_crumb( 'collection' ) );
-			}
-			else
-			{
-				$redirect_to = regenerate_url( '', 'action=twitter_unlink&amp;user_tab=preferences&amp;user_ID='.$target_id.'&amp;plugin_ID='.$this->ID.'&amp;'.url_crumb( 'user' ) );
-			}
-			$result = $result.' / '.'<a href="'.$redirect_to.'">'.T_( 'Unlink this account' ).'</a>';
+			$unlink_url = $callback.'&action=twitter_unlink';
+			$result = $result.' / '.'<a href="'.$unlink_url.'">'.T_( 'Unlink this account' ).'</a>';
 		}
 
 		return $result;
@@ -390,6 +383,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.24  2010/10/05 12:53:46  efy-asimo
+ * Move twitter_unlink into twitter_plugin
+ *
  * Revision 1.23  2010/10/01 13:56:32  efy-asimo
  * twitter plugin save contact and fix
  *

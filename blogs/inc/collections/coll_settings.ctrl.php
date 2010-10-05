@@ -252,25 +252,6 @@ switch( $action )
 		}
 
 		break;
-
-	case 'twitter_unlink':
-		// delete twitter account settings and update db
-		global $Plugins, $Blog;
-
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'collection' );
-
-		$plugin_ID = param( 'plugin_ID', 'integer', true );
-
-		$Plugin = & $Plugins->get_by_ID( $plugin_ID );
-		$Plugin->delete_coll_setting( 'twitter_token' );
-		$Plugin->delete_coll_setting( 'twitter_secret' );
-		$Plugin->delete_coll_setting( 'twitter_contact' );
-		$Blog->dbupdate();
-
-		$Messages->add( T_('Twitter account have been unlinked'), 'success' );
-
-		break;
 }
 
 $AdminUI->set_path( 'blogs',  $tab  );
@@ -402,6 +383,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.36  2010/10/05 12:53:46  efy-asimo
+ * Move twitter_unlink into twitter_plugin
+ *
  * Revision 1.35  2010/10/01 13:56:32  efy-asimo
  * twitter plugin save contact and fix
  *

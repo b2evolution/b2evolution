@@ -174,38 +174,6 @@ if( !$Messages->count('error') )
 			$action = 'avatar';
 			break;
 
-		case 'twitter_unlink':
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'user' );
-
-			if( empty($edited_User) || !is_object($edited_User) )
-			{
-				$Messages->add( 'No user set!' ); // Needs no translation, should be prevented by UI.
-				$action = 'list';
-				break;
-			}
-
-			if( !$current_User->check_perm( 'users', 'edit' ) && $edited_User->ID != $current_User->ID )
-			{ // user is only allowed to update him/herself
-				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
-				$action = 'view';
-				break;
-			}
-
-			$plugin_ID = param( 'plugin_ID', 'integer', true );
-
-			global $Plugins;
-			$Plugin = & $Plugins->get_by_ID( $plugin_ID );
-
-			$Plugin->UserSettings->delete( 'twitter_token', $edited_User->ID );
-			$Plugin->UserSettings->delete( 'twitter_secret', $edited_User->ID );
-			$Plugin->UserSettings->delete( 'twitter_contact', $edited_User->ID );
-			$Plugin->UserSettings->dbupdate();
-
-			$Messages->add( T_('Twitter account have been unlinked'), 'success' );
-
-			break;
-
 		case 'update':
 			// Update existing user OR create new user:
 			if( empty($edited_User) || !is_object($edited_User) )
@@ -470,6 +438,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2010/10/05 12:53:46  efy-asimo
+ * Move twitter_unlink into twitter_plugin
+ *
  * Revision 1.17  2010/10/01 13:56:32  efy-asimo
  * twitter plugin save contact and fix
  *
