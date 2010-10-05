@@ -54,7 +54,7 @@ if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
 
 // Make sure the async responses are never cached:
 header_nocache();
-
+header_content_type( 'text/html', $io_charset );
 
 // Do not append Debuglog to response!
 $debug = false;
@@ -70,7 +70,6 @@ switch( $action )
 {
 	case 'add_plugin_sett_set':
 		// Add a Plugin(User)Settings set (for "array" type settings):
-    header_content_type( 'text/html' );
 
 		param( 'plugin_ID', 'integer', true );
 
@@ -329,6 +328,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.58  2010/10/05 15:33:15  efy-asimo
+ * Ajax comment moderation - fix locale changes
+ *
  * Revision 1.57  2010/09/28 13:03:16  efy-asimo
  * Paged comments on item full view
  *
