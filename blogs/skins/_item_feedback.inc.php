@@ -161,6 +161,7 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 			'statuses' => array ( 'published' ),
 			'post_ID' => $Item->ID,
 			'order' => $Blog->get_setting( 'comments_orderdir' ),
+			'comments' => 1000,
 		) );
 	
 	$CommentList->load_from_Request();
@@ -238,6 +239,9 @@ skin_include( '_item_comment_form.inc.php', $params );
 
 /*
  * $Log$
+ * Revision 1.26  2010/10/11 12:03:29  efy-asimo
+ * Comments number on front office - fix
+ *
  * Revision 1.25  2010/06/08 01:49:53  sam2kb
  * Paged comments in frontend
  *

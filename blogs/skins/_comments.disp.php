@@ -23,7 +23,7 @@ $CommentList->set_filters( array(
 		'types' => array( 'comment', 'trackback', 'pingback' ),
 		'statuses' => array ( 'published' ),
 		'order' => 'DESC',
-		'comments' => 20,
+		'comments' => 50,
 	) );
 
 // Get ready for display (runs the query):
@@ -82,6 +82,9 @@ while( $Comment = & $CommentList->get_next() )
 
 /*
  * $Log$
+ * Revision 1.14  2010/10/11 12:03:29  efy-asimo
+ * Comments number on front office - fix
+ *
  * Revision 1.13  2010/05/02 18:43:48  fplanque
  * rollback unapproved change
  *
