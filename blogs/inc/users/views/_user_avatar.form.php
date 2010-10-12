@@ -45,7 +45,7 @@ $Form->begin_fieldset( T_('Avatar') );
 
 global $admin_url;
 $avatar_tag = $edited_User->get_avatar_imgtag();
-if( $current_User->check_perm( 'users', 'all' ) )
+if( $current_User->check_perm( 'users', 'all' ) || ( $current_User->ID == $edited_User->ID ) )
 {
 	if( !empty( $avatar_tag ) )
 	{
@@ -128,6 +128,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.8  2010/10/12 13:22:17  efy-asimo
+ * Allow users to change their own avatars - fix
+ *
  * Revision 1.7  2010/09/16 14:12:24  efy-asimo
  * New avatar upload
  *
