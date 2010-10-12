@@ -23,12 +23,10 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $baseurl;
-
 // Twitter params initialization
 define( 'TWITTER_CONSUMER_KEY', 'z680vsCAnATc0ZQNgMVwbg' );
 define( 'TWITTER_CONSUMER_SECRET', 'OBo8xI6pvTR1KI0LBHEkjpPPd6nN99tq4SAY8qrBp8' );
-define( 'TWITTER_CALLBACK', $baseurl.'plugins/twitter_plugin/_twitter_callback.php' );
+
 //test app
 //define( 'TWITTER_CONSUMER_KEY', 'PTJjBJraSkghuFVXQysPTg' );
 //define( 'TWITTER_CONSUMER_SECRET', 'pcGfALMLaOF6VCaG6FwVO5hI1jtTPEgbLyj6Yo0DN04' );
@@ -187,7 +185,7 @@ class twitter_plugin extends Plugin
 
 		if( empty( $oauth_contact ) )
 		{
-			$oauth_contact = twitter_plugin::get_twitter_contact( $oauth_token, $oauth_token_secret );
+			$oauth_contact = $this->get_twitter_contact( $oauth_token, $oauth_token_secret );
 		}
 
 		$params['xmlrpcresp'] = T_('Posted to account: @').$oauth_contact;
@@ -301,7 +299,7 @@ class twitter_plugin extends Plugin
 		{ // already linked
 			if( empty( $oauth_contact ) )
 			{
-				$oauth_contact = twitter_plugin::get_twitter_contact( $oauth_token, $oauth_token_secret );
+				$oauth_contact = $this->get_twitter_contact( $oauth_token, $oauth_token_secret );
 				if( ! empty( $oauth_contact ) )
 			{
 					if( $target_type == 'blog' )
@@ -322,10 +320,8 @@ class twitter_plugin extends Plugin
 		// create new connection
 		$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET);
 
-		global $baseurl;
-
-		// set callback params
-		$callback = TWITTER_CALLBACK.'?target_type='.$target_type.'&target_id='.$target_id.'&plugin_id='.$this->ID;
+		// set callback url
+		$callback = $this->get_htsrv_url( 'twitter_callback', array( 'target_type' => $target_type, 'target_id' => $target_id ), '&', true );
 
 		$req_token = $connection->getRequestToken( $callback );
 
@@ -351,7 +347,8 @@ class twitter_plugin extends Plugin
 		else
 		{
 			$result = $result.'<a href='.$connection->getAuthorizeURL( $req_token, false ).'>'.T_( 'Link to another account' ).'</a>';
-			$unlink_url = $callback.'&action=twitter_unlink';
+			$unlink_url = $this->get_htsrv_url( 'unlink_account', array( 'target_type' => $target_type, 'target_id' => $target_id ), '&' );
+			$unlink_url = $unlink_url.'&'.url_crumb( $target_type );
 			$result = $result.' / '.'<a href="'.$unlink_url.'">'.T_( 'Unlink this account' ).'</a>';
 		}
 
@@ -362,7 +359,7 @@ class twitter_plugin extends Plugin
 	/**
 	 * Get twitter contact display name
 	 * 
-	 * @static
+	 * @access private
 	 * 
 	 * @param string oauth_token
 	 * @param string oauth tokensecret
@@ -379,10 +376,182 @@ class twitter_plugin extends Plugin
 		}
 		return '';
 	}
+
+
+	/**
+	 * Return the list of Htsrv (HTTP-Services) provided by the plugin.
+	 *
+	 * This implements the plugin interface for the list of methods that are valid to
+	 * get called through htsrv/call_plugin.php.
+	 *
+	 * @return array
+	 */
+	function GetHtsrvMethods()
+	{
+		return array( 'unlink_account', 'twitter_callback' );
+	}
+
+
+	/**
+	 * This callback method save the user's twitter oAuth, after the user allowed the b2evo_twitter plugin.
+	 * It's the twitter site callback.
+	 */
+	function htsrv_twitter_callback( $params )
+	{
+		global $Session, $Messages, $admin_url;
+
+		if( ! isset( $params['target_type'] ) || ! isset( $params['target_id'] ) )
+		{
+			bad_request_die( 'Missing target params!' );
+		}
+
+		$target_type = $params['target_type'];
+		$target_id = $params['target_id'];
+
+		if( $target_type == 'blog' )
+		{ // redirect to blog settings
+			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugin_settings&blog='.$target_id );
+		}
+		else if ($target_type == 'user' )
+		{ // redirect to user preferences form
+			$redirect_to = url_add_param( $admin_url, 'ctrl=user&user_tab=preferences&user_ID='.$target_id );
+		}
+		else
+		{
+			debug_die( 'Target type has incorrect value!' );
+		}
+
+		$req_token = param( 'oauth_token', 'string', '' );
+		$oauth_verifier = param( 'oauth_verifier', 'string', '' );
+		$oauth_token = $Session->get( 'oauth_token' );
+
+		// check tokens
+		//if (isset($_REQUEST['oauth_token']) && $Session->get( 'oauth_token' ) !== $_REQUEST['oauth_token']) {
+		if( ( !empty( $req_token ) && ( $oauth_token !== $req_token ) ) || empty( $target_type ) || empty( $target_id ) )
+		{
+			$Messages->add( T_( 'Error occured during twitter plugin initialization. Pleas try again.' ), 'error' );
+			/* Remove no longer needed request tokens */
+			$Session->delete( 'oauth_token' );
+			$Session->delete( 'oauth_token_secret' );
+			$Session->dbsave();
+			header_redirect( $redirect_to );
+		}
+
+		if( empty( $oauth_verifier ) )
+		{ // twitter refused the connection
+			$denied = param( 'denied', 'string', '' );
+			if( empty( $denied ) )
+			{
+				$Messages->add( T_( 'Error occured during verifying twitter plugin initialization. Pleas try again.' ), 'error' );
+			}
+			else
+			{ // user didn't allow the connection
+				$Messages->add( T_( 'Twitter plugin connection denied.' ), 'error' );
+			}
+			header_redirect( $redirect_to ); // !!!! Where to redirect
+		}
+
+		require_once 'twitteroauth/twitteroauth.php';
+		$connection = new TwitterOAuth( TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth_token, $Session->get( 'oauth_token_secret' ) );
+
+		//get access token
+		$access_token = $connection->getAccessToken( $oauth_verifier );
+
+		// get oauth params
+		$token = $access_token['oauth_token'];
+		$secret = $access_token['oauth_token_secret'];
+		$contact = $this->get_twitter_contact( $token, $secret );
+		if( $target_type == 'blog' )
+		{ // blog settings
+			$this->set_coll_setting( 'twitter_token', $token, $target_id );
+			$this->set_coll_setting( 'twitter_secret', $secret, $target_id );
+			$this->set_coll_setting( 'twitter_contact', $contact, $target_id );
+			// save Collection settings
+			$BlogCache = & get_BlogCache();
+			$Blog = & $BlogCache->get_by_ID( $target_id, false, false );
+			$Blog->dbupdate();
+		}
+		else if( $target_type == 'user' )
+		{ // user preferences
+			$this->UserSettings->set( 'twitter_token', $token, $target_id );
+			$this->UserSettings->set( 'twitter_secret', $secret, $target_id );
+			$this->UserSettings->set( 'twitter_contact', $contact, $target_id );
+			$this->UserSettings->dbupdate();
+		}
+
+		/* Remove no longer needed request tokens */
+		$Session->delete( 'oauth_token' );
+		$Session->delete( 'oauth_token_secret' );
+		$Session->dbsave();
+
+		$Messages->add( T_( 'Twitter plugin was initialized successful!' ), 'success' );
+		header_redirect( $redirect_to );
+	}
+
+
+	/**
+	 * This callback method removes the twitter user oAuth data from DB.
+	 */
+	function htsrv_unlink_account( $params )
+	{
+		global $current_User, $Messages, $admin_url, $Session;
+
+		if( ! isset( $params['target_type'] ) || ! isset( $params['target_id'] ) )
+		{
+			bad_request_die( 'Missing target params!' );
+		}
+
+		$target_type = $params['target_type'];
+		$target_id = $params['target_id'];
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( $target_type );
+
+		if( $target_type == 'blog' )
+		{ // Blog settings
+			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugin_settings&blog='.$target_id );
+
+			$BlogCache = & get_BlogCache();
+			$Blog = $BlogCache->get_by_ID( $target_id );
+
+			$this->delete_coll_setting( 'twitter_token', $target_id );
+			$this->delete_coll_setting( 'twitter_secret', $target_id );
+			$this->delete_coll_setting( 'twitter_contact', $target_id );
+
+			$Blog->dbupdate();
+		}
+		else if ($target_type == 'user' )
+		{ // User settings
+			$redirect_to = url_add_param( $admin_url, 'ctrl=user&user_tab=preferences&user_ID='.$target_id );
+
+			if( isset( $current_User ) && ( !$current_User->check_perm( 'users', 'edit' ) ) && ( $target_id != $current_User->ID ) )
+			{ // user is only allowed to update him/herself
+				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
+				header_redirect( $redirect_to );
+				// We have EXITed already at this point!!
+			}
+
+			$this->UserSettings->delete( 'twitter_token', $target_id );
+			$this->UserSettings->delete( 'twitter_secret', $target_id );
+			$this->UserSettings->delete( 'twitter_contact', $target_id );
+			$this->UserSettings->dbupdate();
+		}
+		else
+		{
+			debug_die( 'Target type has incorrect value!' );
+		}
+
+		$Messages->add( T_('Twitter account have been unlinked'), 'success' );
+		header_redirect( $redirect_to );
+		// We have EXITed already at this point!!
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.25  2010/10/12 12:52:17  efy-asimo
+ * Move twitter callback and twitter unlink into twitter plugin class
+ *
  * Revision 1.24  2010/10/05 12:53:46  efy-asimo
  * Move twitter_unlink into twitter_plugin
  *
