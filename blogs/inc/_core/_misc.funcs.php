@@ -1413,6 +1413,22 @@ function get_atags( $content )
 
 
 /**
+ * Get all "img" tags from the given content
+ *  
+ * @param string content
+ * @return array all <img../img> part from the given content
+ */
+function get_imgtags( $content )
+{
+	$tag = 'img';
+	$regexp = '{<'.$tag.'[^>]*[ (</'.$tag.'>) | (/>) ]}';
+
+	preg_match_all( $regexp, $content, $result );
+	return $result[0];
+}
+
+
+/**
  * Get all urls from the given content
  *  
  * @param string content
@@ -1420,7 +1436,7 @@ function get_atags( $content )
  */
 function get_urls( $content )
 {
-	$regexp = '^(?#Protocol)(?:(?:ht|f)tp(?:s?)\:\/\/|~\/|\/)?(?#Username:Password)(?:\w+:\w+@)?(?#Subdomains)(?:(?:[-\w]+\.)+(?#TopLevel Domains)(?:com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|travel|[a-z]{2}))(?#Port)(?::[\d]{1,5})?(?#Directories)(?:(?:(?:\/(?:[-\w~!$+|.,=]|%[a-f\d]{2})+)+|\/)+|\?|#)?(?#Query)(?:(?:\?(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=?(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)(?:&(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=?(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)*)*(?#Anchor)(?:#(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)?^';
+	$regexp = '^(?#Protocol)(?:(?:ht|f)tp(?:s?)\:\/\/|~\/|\/)?(?#Username:Password)(?:\w+:\w+@)?(?#Subdomains)(?:(?:[-\w]+\.)+(?#TopLevel Domains)(?:com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|travel|[a-z]{2,4}))(?#Port)(?::[\d]{1,5})?(?#Directories)(?:(?:(?:\/(?:[-\w~!$+|.,=]|%[a-f\d]{2})+)+|\/)+|\?|#)?(?#Query)(?:(?:\?(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=?(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)(?:&(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=?(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)*)*(?#Anchor)(?:#(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)?^';
 
 	preg_match_all( $regexp, $content, $result );
 	return $result[0];
@@ -4073,6 +4089,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.244  2010/10/12 12:38:22  efy-asimo
+ * Comment inline antispam - fix
+ *
  * Revision 1.243  2010/09/23 14:21:00  efy-asimo
  * antispam in comment text feature
  *

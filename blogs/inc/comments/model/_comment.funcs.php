@@ -326,12 +326,14 @@ function add_ban_icons( $content )
 	}
 
 	$atags = get_atags( $content );
+	$imgtags = get_imgtags( $content );
 	$urls = get_urls( $content );
 	$result = '';
 	$from = 0; // current processing position
 	$length = 0; // current url or tag length
 	$i = 0; // url counter
 	$j = 0; // "a" tag counter
+	$k = 0; // "img" tag counter
 	while( isset($urls[$i]) )
 	{ // there is unprocessed url
 		$url = $urls[$i];
@@ -340,9 +342,26 @@ function add_ban_icons( $content )
 			$i++;
 			continue;
 		}
+		while( isset( $imgtags[$k] ) && ( strpos( $content, $imgtags[$k] ) < $from ) )
+		{ // skipp already passed img tags
+			$k++;
+		}
+
 		$pos = strpos( $content, $url, $from );
 		$length = strlen($url);
 		$i++;
+
+		// check img tags
+		if( isset( $imgtags[$k] ) && ( strpos( $imgtags[$k], $url ) !== false )
+			&& ( $pos > strpos( $content, $imgtags[$k], $from ) ) )
+		{ // current url is inside the img tag, we need to skip this url.
+			$result .= substr( $content, $from, $pos + $length - $from );
+			$from = $pos + $length;
+			$k++;
+			continue;
+		}
+
+		// check a tags
 		if( isset($atags[$j]) )
 		{ // there is unprocessed "a" tag
 			$tag = $atags[$j];
@@ -371,6 +390,9 @@ function add_ban_icons( $content )
 
 /*
  * $Log$
+ * Revision 1.17  2010/10/12 12:38:22  efy-asimo
+ * Comment inline antispam - fix
+ *
  * Revision 1.16  2010/09/28 11:33:06  efy-asimo
  * add_ban_icons - fix
  *
