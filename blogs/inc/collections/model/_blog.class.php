@@ -485,7 +485,8 @@ class Blog extends DataObject
 			$this->set_setting( 'allow_rating', param( 'allow_rating', 'string', 'never' ) );
 			$this->set( 'allowtrackbacks', param( 'blog_allowtrackbacks', 'integer', 0 ) );
 			$this->set_setting( 'comments_orderdir', param( 'comments_orderdir', '/^(?:ASC|DESC)$/', 'ASC' ) );
-			
+
+			$this->set_setting( 'paged_comments', param( 'paged_comments', 'integer', 0 ) );
 			param_integer_range( 'comments_per_page', 1, 9999, T_('Comments per page must be between %d and %d.') );
 			$this->set_setting( 'comments_per_page', get_param( 'comments_per_page' ) );
 			$this->set_setting( 'default_gravatar',  param( 'default_gravatar', 'string', 'b2evo' ) );
@@ -2341,6 +2342,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.121  2010/10/13 14:07:55  efy-asimo
+ * Optional paged comments in the front end
+ *
  * Revision 1.120  2010/09/29 13:19:02  efy-asimo
  * Twitter user unlink, and twitter config params move to plugin
  *

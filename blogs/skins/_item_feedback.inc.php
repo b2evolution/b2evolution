@@ -161,24 +161,25 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 			'statuses' => array ( 'published' ),
 			'post_ID' => $Item->ID,
 			'order' => $Blog->get_setting( 'comments_orderdir' ),
-			'comments' => 1000,
 		) );
-	
+
 	$CommentList->load_from_Request();
 
 	// Get ready for display (runs the query):
 	$CommentList->display_init();
-	
+
 	// Set redir=no in order to open comment pages
 	$old_redir = $redir;
 	memorize_param( 'redir', 'string', $old_redir, 'no' );
-	
-	// Prev/Next page navigation
-	$CommentList->page_links( array(
-			'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
-		) );
-	
-	
+
+	if( $Blog->get_setting( 'paged_comments' ) )
+	{ // Prev/Next page navigation
+		$CommentList->page_links( array(
+				'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
+			) );
+	}
+
+
 	echo $params['comment_list_start'];
 	/**
 	 * @var Comment
@@ -198,13 +199,15 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 
 	}	// End of comment list loop.
 	echo $params['comment_list_end'];
-	
-	
-	// Prev/Next page navigation
-	$CommentList->page_links( array(
-			'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
-		) );
-	
+
+
+	if( $Blog->get_setting( 'paged_comments' ) )
+	{ // Prev/Next page navigation
+		$CommentList->page_links( array(
+				'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
+			) );
+	}
+
 	// Restore "redir" param
 	forget_param('redir');
 
@@ -239,6 +242,9 @@ skin_include( '_item_comment_form.inc.php', $params );
 
 /*
  * $Log$
+ * Revision 1.27  2010/10/13 14:07:56  efy-asimo
+ * Optional paged comments in the front end
+ *
  * Revision 1.26  2010/10/11 12:03:29  efy-asimo
  * Comments number on front office - fix
  *

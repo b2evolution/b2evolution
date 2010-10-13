@@ -72,7 +72,8 @@ class CollectionSettings extends AbstractSettings
 			'new_feedback_status' => 'draft',  	// 'draft', 'published' or 'deprecated'
 			'allow_rating'   => 'never',
 			'comments_orderdir' => 'ASC',
-			'comments_per_page' => 10,
+			'paged_comments' => '0',
+			'comments_per_page' => 1000,
 			'default_gravatar' => 'b2evo',
 
 		// Archive settings:
@@ -178,6 +179,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.51  2010/10/13 14:07:55  efy-asimo
+ * Optional paged comments in the front end
+ *
  * Revision 1.50  2010/06/08 22:29:25  sam2kb
  * Per blog settings for different default gravatar types
  *

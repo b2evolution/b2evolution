@@ -109,9 +109,11 @@ $Form->begin_fieldset( T_('Feedback options') );
 						array(	array( 'ASC', T_('Chronologic') ),
 								array ('DESC', T_('Reverse') ),	
 						), T_('Display order'), true );
-	
-	$Form->text( 'comments_per_page', $edited_Blog->get_setting('comments_per_page'), 4, T_('Comments per page'),  T_('How many comments do you want to display on one page?'), 4 );
-	
+
+	$Form->checkbox( 'paged_comments', $edited_Blog->get_setting( 'paged_comments' ), T_( 'Paged comments' ), T_( 'Check to enable paged comments on the public pages.' ) );
+
+	$Form->text( 'comments_per_page', $edited_Blog->get_setting('comments_per_page'), 4, T_('Comments/Page'),  T_('How many comments do you want to display on one page?'), 4 );
+
 	global $default_avatar;
 	$Form->radio( 'default_gravatar', $edited_Blog->get_setting('default_gravatar'),
 						array(	array( 'b2evo', T_('Default image'), $default_avatar ),
@@ -213,9 +215,28 @@ $Form->end_form( array(
 	array( 'submit', 'submit', T_('Save !'), 'SaveButton' ),
 	array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 
+?>
+<script type="text/javascript">
+	jQuery( '#paged_comments' ).click( function()
+	{
+		if ( $('#paged_comments').is(':checked') )
+		{
+			$('#comments_per_page').val('20');
+		}
+		else
+		{
+			$('#comments_per_page').val('1000');
+		}
+	} );
+</script>
+<?php
+
 
 /*
  * $Log$
+ * Revision 1.36  2010/10/13 14:07:55  efy-asimo
+ * Optional paged comments in the front end
+ *
  * Revision 1.35  2010/09/08 15:07:44  efy-asimo
  * manual links
  *

@@ -162,20 +162,22 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 			'post_ID' => $Item->ID,
 			'order' => $Blog->get_setting( 'comments_orderdir' ),
 		) );
-	
+
 	$CommentList->load_from_Request();
 
 	// Get ready for display (runs the query):
 	$CommentList->display_init();
-	
+
 	// Set redir=no in order to open comment pages
 	$old_redir = $redir;
 	memorize_param( 'redir', 'string', $old_redir, 'no' );
-	
-	// Prev/Next page navigation
-	$CommentList->page_links( array(
-			'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
-		) );
+
+	if( $Blog->get_setting( 'paged_comments' ) )
+	{ // Prev/Next page navigation
+		$CommentList->page_links( array(
+				'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
+			) );
+	}
 ?>
 
 <ol class="commentlist">
@@ -243,11 +245,13 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 ?>
 </ol><?php
 
-	// Prev/Next page navigation
-	$CommentList->page_links( array(
-			'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
-		) );
-	
+	if( $Blog->get_setting( 'paged_comments' ) )
+	{ // Prev/Next page navigation
+		$CommentList->page_links( array(
+				'page_url' => url_add_tail( $Item->get_permanent_url(), '#comments' ),
+			) );
+	}
+
 	// Restore "redir" param
 	forget_param('redir');
 	

@@ -61,7 +61,7 @@ class CommentList2 extends DataObjectList2
 	 */
 	function CommentList2(
 		$Blog,
-		$limit = 20,
+		$limit = 1000,
 		$cache_name = 'CommentCache',	// name of cache to be used
 		$param_prefix = '',
 		$filterset_name = ''			// Name to be used when saving the filterset (leave empty to use default for collection)
@@ -727,6 +727,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.29  2010/10/13 14:07:55  efy-asimo
+ * Optional paged comments in the front end
+ *
  * Revision 1.28  2010/09/02 07:48:32  efy-asimo
  * ItemList and CommentList doc
  *
