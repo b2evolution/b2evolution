@@ -307,6 +307,9 @@ class autolinks_plugin extends Plugin
 			if( in_array( $url, $this->already_linked_array ) )
 			{	// Do not repeat link to same destination:
 				// pre_dump( 'already linked:'. $url );
+				// save previous word
+				$this->previous_word = $word;
+				$this->previous_lword = $lword;
 				return $r;
 			}
 
@@ -315,6 +318,9 @@ class autolinks_plugin extends Plugin
 				if( $this->previous_lword != $previous )
 				{	// We do not have the required previous word
 					// pre_dump( 'previous word does not match', $this->previous_lword, $previous );
+					// save previous word
+					$this->previous_word = $word;
+					$this->previous_lword = $lword;
 					return $r;
 				}
 				$r = '==!#DEL#!==<a href="'.$url.'">'.$this->previous_word.' '.$word.'</a>';
@@ -339,6 +345,9 @@ class autolinks_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.30  2010/10/14 12:23:30  efy-asimo
+ * autolinks plugin save previous word - fix
+ *
  * Revision 1.29  2010/02/08 17:55:47  efy-yury
  * copyright 2009 -> 2010
  *
