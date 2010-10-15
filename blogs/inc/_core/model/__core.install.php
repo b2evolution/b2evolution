@@ -58,12 +58,7 @@ $schema_queries = array(
 			grp_perm_xhtml_javascript        TINYINT(1) NOT NULL DEFAULT 0,
 			grp_perm_xhtml_objects           TINYINT(1) NOT NULL DEFAULT 0,
 			grp_perm_stats enum('none','user','view','edit') NOT NULL default 'none',
-			grp_perm_spamblacklist enum('none','view','edit') NOT NULL default 'none',
-			grp_perm_slugs enum('none','view','edit') NOT NULL default 'none',
-			grp_perm_options enum('none','view','edit') NOT NULL default 'none',
 			grp_perm_users enum('none','view','edit') NOT NULL default 'none',
-			grp_perm_templates TINYINT NOT NULL DEFAULT 0,
-			grp_perm_files enum('none','view','add','edit','all') NOT NULL default 'none',
 			PRIMARY KEY grp_ID (grp_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -287,6 +282,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.51  2010/10/15 13:10:09  efy-asimo
+ * Convert group permissions to pluggable permissions - part1
+ *
  * Revision 1.50  2010/05/02 19:50:51  fplanque
  * no message
  *

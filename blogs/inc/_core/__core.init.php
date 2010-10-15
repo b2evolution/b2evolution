@@ -258,6 +258,173 @@ class _core_Module extends Module
 		load_class( 'slugs/model/_slug.class.php', 'Slug' );
 	}
 
+
+	/**
+	 * Get default module permissions
+	 *
+	 * @param integer Group ID
+	 * @return array
+	 */
+	function get_default_group_permissions( $grp_ID )
+	{
+		switch( $grp_ID )
+		{
+			case 1:		// Administrators (group ID 1) have permission by default:
+				$permspam = 'edit';
+				$permslugs = 'edit';
+				$permtemplates = 'allowed';
+				$permoptions = 'edit';
+				break;
+
+			case 2:		// Privileged bloggers (group ID 2) have permission by default:
+				$permspam = 'edit';
+				$permslugs = 'none';
+				$permtemplates = 'denied';
+				$permoptions = 'view';
+				break;
+
+			case 3:		// Bloggers (group ID 3) have permission by default:
+				$permspam = 'view';
+				$permslugs = 'none';
+				$permtemplates = 'denied';
+				$permoptions = 'none';
+				break;
+
+			default: 
+				// Other groups have no permission by default
+				$permspam = 'none';
+				$permslugs = 'none';
+				$permtemplates = 'denied';
+				$permoptions = 'none';
+				break;
+		}
+
+		// We can return as many default permissions as we want:
+		// e.g. array ( permission_name => permission_value, ... , ... )
+		return $permissions = array(
+			'perm_spamblacklist' => $permspam,
+			'perm_slugs' => $permslugs,
+			'perm_templates' => $permtemplates,
+			'perm_options' => $permoptions );
+	}
+
+
+	/**
+	 * Get available group permissions
+	 *
+	 * @return array
+	 */
+	function get_available_group_permissions()
+	{
+		$none_option = array( 'none', T_( 'No Access' ), '' );
+		$view_option = array( 'view', T_( 'View only' ), '' );
+		$full_option = array( 'edit', T_( 'Full Access' ), '' );
+		$view_details = array( 'view', T_('View details') );
+		$edit_option = array( 'edit', T_('Edit/delete all') );
+		// 'label' is used in the group form as label for radio buttons group
+		// 'user_func' function used to check user permission. This function should be defined in Module.
+		// 'group_func' function used to check group permission. This function should be defined in Module.
+		// 'perm_block' group form block where this permissions will be displayed. Now available, the following blocks: additional, system
+		// 'options' is permission options
+		// 'perm_type' is used in the group form to decide to show radiobox or checkbox
+		// 'field_lines' is used in the group form to decide to show radio options in multiple lines or not 
+		$permissions = array(
+			'perm_spamblacklist' => array(
+				'label' => T_( 'Antispam' ),
+				'user_func'  => 'check_core_user_perm',
+				'group_func' => 'check_core_group_perm',
+				'perm_block' => 'core',
+				'options'  => array( $none_option, $view_option, $full_option ),
+				'perm_type' => 'radiobox',
+				'field_lines' => false,
+				),
+			'perm_slugs' => array(
+				'label' => T_('Slug manager'),
+				'user_func'  => 'check_core_user_perm',
+				'group_func' => 'check_core_group_perm',
+				'perm_block' => 'core',
+				'options'  => array( $none_option, $view_option, $full_option ),
+				'perm_type' => 'radiobox',
+				'field_lines' => false,
+				),
+			'perm_templates' => array(
+				'label' => T_('Skins'),
+				'user_func'  => 'check_template_user_perm',
+				'group_func' => 'check_template_group_perm',
+				'perm_block' => 'core',
+				'perm_type' => 'checkbox',
+				'note' => T_( 'Check to allow access to skin files.' ),
+				),
+			'perm_options' => array(
+				'label' => T_('Settings'),
+				'user_func'  => 'check_core_user_perm',
+				'group_func' => 'check_core_group_perm',
+				'perm_block' => 'core2',
+				'options'  => array( $none_option, $view_details, $edit_option ),
+				'perm_type' => 'radiobox',
+				'field_lines' => false,
+				),
+			// put here perm_options with perm_block 'core1'
+			);
+		return $permissions;
+	}
+
+	/**
+	 * Check a permission for the user. ( see 'user_func' in get_available_group_permissions() function  )
+	 *
+	 * @param string Requested permission level
+	 * @param string Permission value, this is the value on the database
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
+	function check_core_user_perm( $permlevel, $permvalue, $permtarget )
+	{
+		return true;
+	}
+
+	/**
+	 * Check a permission for the group. ( see 'group_func' in get_available_group_permissions() function )
+	 *
+	 * @param string Requested permission level
+	 * @param string Permission value
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
+	function check_core_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		$perm = false;
+		switch ( $permvalue )
+		{
+			case 'edit':
+				// Users has edit perms
+				if( $permlevel == 'edit' )
+				{ 
+					$perm = true;
+					break;
+				}
+
+			case 'view':
+				// Users has view perms
+				if( $permlevel == 'view' )
+				{
+					$perm = true;
+					break;
+				}
+
+		}
+
+		return $perm;
+	}
+
+	/**
+	 * Check permission for the group
+	 */
+	function check_template_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		// Only 'allowed' value means group has permission
+		return $permvalue == 'allowed';
+	}
+
 	/**
 	 * Build teh evobar menu
 	 */
@@ -808,6 +975,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.66  2010/10/15 13:10:09  efy-asimo
+ * Convert group permissions to pluggable permissions - part1
+ *
  * Revision 1.65  2010/06/13 22:29:05  sam2kb
  * minor
  *

@@ -65,12 +65,7 @@ class Group extends DataObject
 	var $perm_xhtml_iframes = false;
 	var $perm_xhtml_javascript = false;
 	var $perm_xhtml_objects = false;
-	var $perm_spamblacklist;
-	var $perm_slugs;		// managing slugs
-	var $perm_templates;
 	var $perm_stats;
-	var $perm_files;
-	var $perm_options;
 	var $perm_users;
 
 	/**
@@ -104,12 +99,7 @@ class Group extends DataObject
 			$this->set( 'name', T_('New group') );
 			$this->set( 'perm_admin', 'visible' );
 			$this->set( 'perm_blogs', 'user' );
-			$this->set( 'perm_spamblacklist', 'none' );
-			$this->set( 'perm_slugs', 'none' );
-			$this->set( 'perm_templates', 0 );
 			$this->set( 'perm_stats', 'none' );
-			$this->set( 'perm_files', 'none' );
-			$this->set( 'perm_options', 'none' );
 			$this->set( 'perm_users', 'none' );
 		}
 		else
@@ -126,12 +116,7 @@ class Group extends DataObject
 			$this->perm_xhtml_iframes           = $db_row->grp_perm_xhtml_iframes;
 			$this->perm_xhtml_javascript        = $db_row->grp_perm_xhtml_javascript;
 			$this->perm_xhtml_objects           = $db_row->grp_perm_xhtml_objects;
-			$this->perm_spamblacklist           = $db_row->grp_perm_spamblacklist;
-			$this->perm_slugs                   = $db_row->grp_perm_slugs;
-			$this->perm_templates               = $db_row->grp_perm_templates;
 			$this->perm_stats                   = $db_row->grp_perm_stats;
-			$this->perm_files                   = $db_row->grp_perm_files;
-			$this->perm_options                 = $db_row->grp_perm_options;
 			$this->perm_users                   = $db_row->grp_perm_users;
 		}
 	}
@@ -173,30 +158,15 @@ class Group extends DataObject
 		// Objects
 		$this->set( 'perm_xhtml_objects', param( 'prevent_objects', 'integer', 0 ) ? 0 : 1 );
 
-		// Spam blacklist
-		$this->set( 'perm_spamblacklist', param( 'edited_grp_perm_spamblacklist', 'string', true ) );
-
-		// Slug manager
-		$this->set( 'perm_slugs', param( 'edited_grp_perm_slugs', 'string', true ) );
-
-		// Templates
-		$this->set( 'perm_templates', param( 'edited_grp_perm_templates', 'integer', 0 ) );
-
 		// Stats
 		$this->set( 'perm_stats', param( 'edited_grp_perm_stats', 'string', true ) );
-
-		// Options
-		$this->set( 'perm_options', param( 'edited_grp_perm_options', 'string', true ) );
-
-		// Files
-		$this->set( 'perm_files', param( 'edited_grp_perm_files', 'string', true ) );
 
 		// Load pluggable group permissions from request
 		$GroupSettings = & $this->get_GroupSettings();
 		foreach( $GroupSettings->permission_values as $name => $value )
 		{
 			// We need to handle checkboxes and radioboxes separately , because when a checkbox isn't checked the checkbox variable is not sent
-			if( $name == 'perm_createblog' || $name == 'perm_getblog' )
+			if( $name == 'perm_createblog' || $name == 'perm_getblog' || $name == 'perm_templates' )
 			{ // These two permissions are represented by checkboxes, all other pluggable group permissions are represented by radiobox.
 				$value = param( 'edited_grp_'.$name, 'string', 'denied' );
 			}
@@ -282,6 +252,10 @@ class Group extends DataObject
 			$permvalue = false; // This will result in $perm == false always. We go on for the $Debuglog..
 		}
 
+		$pluggable_perms = array( 'spamblacklist', 'slugs', 'templates', 'options', 'files' );
+		if( in_array( $permname, $pluggable_perms ) ) {
+			$permname = 'perm_'.$permname;
+		}
 		// echo "<br>Checking group perm $permname:$permlevel against $permvalue";
 
 		// Check group permission:
@@ -306,13 +280,6 @@ class Group extends DataObject
 				}
 				break;
 
-			case 'templates':
-				if( $permvalue )
-				{ // Permission granted
-					$perm = true;
-				}
-				break;
-
 			case 'blogs':
 				switch( $permvalue )
 				{ // Depending on current group permission:
@@ -330,17 +297,14 @@ class Group extends DataObject
 							break;
 						}
 				}
-				
+
 				if( ! $perm && ( $permlevel == 'create' ) && $this->check_perm( 'perm_createblog', 'allowed' ) )
 				{ // User is allowed to create a blog (for himself)
 					$perm = true;
 				}
 				break;
 
-			case 'spamblacklist':
-			case 'slugs':
 			case 'stats':
-			case 'options':
 			case 'users':
 				switch( $permvalue )
 				{ // Depending on current group permission:
@@ -724,6 +688,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.36  2010/10/15 13:10:09  efy-asimo
+ * Convert group permissions to pluggable permissions - part1
+ *
  * Revision 1.35  2010/07/26 06:52:27  efy-asimo
  * MFB v-4-0
  *

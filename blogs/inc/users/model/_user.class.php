@@ -935,6 +935,10 @@ class User extends DataObject
 			return $this->cache_perms[$permname][$permlevel][$perm_target_ID];
 		}
 
+		$pluggable_perms = array( 'spamblacklist', 'slugs', 'templates', 'options', 'files' );
+		if( in_array( $permname, $pluggable_perms ) ) {
+			$permname = 'perm_'.$permname;
+		}
 		//$Debuglog->add( "Querying perm [$permname][$permlevel]".( isset( $perm_target_ID ) ? '['.$perm_target_ID.']' : '' ).']', 'perms' );
 		//pre_dump( 'Perm target: '.var_export( $perm_target, true ) );
 
@@ -1101,9 +1105,10 @@ class User extends DataObject
 				$perm = ($this->level >= 5);
 				break;
 
-			case 'files':
+			// asimo> files permission was converted to pluggable permission
+			/*case 'files':
 				$this->get_Group();
-				$perm = $this->Group->check_perm( $permname, $permlevel );
+				$perm = $this->Group->check_perm( $permname, $permlevel );*/
 
 				/* Notes:
 				 *  - $perm_target can be:
@@ -1158,7 +1163,7 @@ class User extends DataObject
 					}
 				}
 */
-				break;
+				//break;
 
 			default:
 				// Check pluggable permissions using user permission check function
@@ -2081,6 +2086,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.83  2010/10/15 13:10:09  efy-asimo
+ * Convert group permissions to pluggable permissions - part1
+ *
  * Revision 1.82  2010/07/26 06:52:27  efy-asimo
  * MFB v-4-0
  *

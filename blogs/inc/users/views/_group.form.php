@@ -65,22 +65,28 @@ function display_pluggable_permissions( &$Form, $perm_block )
 				$perm = $permissions[$perm_name];
 				if( $perm['perm_block'] == $perm_block )
 				{
-					if( isset( $perm['perm_type'] ) )
+					if( ! isset( $perm['perm_type'] ) )
 					{
-						switch( $perm['perm_type'] )
-						{
-							case 'checkbox':
-								$Form->checkbox_input( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name] == 'allowed', $perm['label'], array( 'input_suffix' => ' '.$perm['note'], 'value' => 'allowed' ) );
-							break;
-
-							case 'radiobox':
-								$Form->radio( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], $perm['options'], $perm['label'], true );
-							break;
-						}
+						$perm['perm_type'] = 'radiobox';
 					}
-					else
+
+					switch( $perm['perm_type'] )
 					{
-						$Form->radio( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], $perm['options'], $perm['label'], true );
+						case 'checkbox':
+							$Form->checkbox_input( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name] == 'allowed', $perm['label'], array( 'input_suffix' => ' '.$perm['note'], 'value' => 'allowed' ) );
+						break;
+
+						case 'radiobox':
+							if( ! isset( $perm['field_lines'] ) )
+							{
+								$perm['field_lines'] = true;
+							}
+							if( ! isset( $perm['field_note'] ) )
+							{
+								$perm['field_note'] = '';
+							}
+							$Form->radio( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], $perm['options'], $perm['label'], $perm['field_lines'], $perm['field_note'] );
+						break;
 					}
 				}
 			}
@@ -184,19 +190,6 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 							array( 'edit', T_('Full Access'), T_('Includes deleting/reassigning of stats') )
 						), T_('Stats'), true );
 
-	// fp> todo perm check
-	$filetypes_linkstart = '<a href="?ctrl=filetypes" title="'.T_('Edit locked file types...').'">';
-	$filetypes_linkend = '</a>';
-	$Form->radio( 'edited_grp_perm_files', $edited_Group->get('perm_files'),
-			array(	$perm_none_option,
-							array( 'view', T_('View files for all allowed roots') ),
-							array( 'add', T_('Add/Upload files to allowed roots') ),
-							array( 'edit', sprintf( T_('Edit %sunlocked files'), $filetypes_linkstart.get_icon('file_allowed').$filetypes_linkend ) ),
-							array( 'all', sprintf( T_('Edit all files, including %slocked ones'), $filetypes_linkstart.get_icon('file_not_allowed').$filetypes_linkend ), T_('Needed for editing PHP files in skins.') ),
-
-						), T_('Files'), true, T_('This setting will further restrict any media file permissions on specific blogs.') );
-
-
 	// Display pluggable permissions:
 	display_pluggable_permissions( $Form, 'additional' );
 
@@ -204,19 +197,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_properties_system_permissions') );
 
-	$Form->radio( 'edited_grp_perm_spamblacklist', $edited_Group->get('perm_spamblacklist'),
-			array(  $perm_none_option,
-							array( 'view', T_('View only') ),
-							array( 'edit', T_('Full Access') )
-						), T_('Antispam'), false );
-
-	$Form->radio( 'edited_grp_perm_slugs', $edited_Group->get('perm_slugs'),
-			array(  $perm_none_option,
-							array( 'view', T_('View only') ),
-							array( 'edit', T_('Full Access') )
-						), T_('Slug manager'), false );
-
-	$Form->checkbox( 'edited_grp_perm_templates', $edited_Group->get('perm_templates'), T_('Skins'), T_('Check to allow access to skin files.') );
+	display_pluggable_permissions( $Form, 'core');
 
 	if( $edited_Group->ID != 1 )
 	{	// Groups others than #1 can be prevented from editing users
@@ -230,11 +211,9 @@ $Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_pro
 	{	// Group #1 always has user management right:
 		$Form->info( T_('Users & Groups'), T_('Full Access') );
 	}
-	$Form->radio( 'edited_grp_perm_options', $edited_Group->get('perm_options'),
-			array(	$perm_none_option,
-							$perm_view_option,
-							$perm_edit_option
-						), T_('Settings') );
+
+	// asimo>After perm_users will be converted to pluggable permission 'core2' can be changed to 'core' 
+	display_pluggable_permissions( $Form, 'core2' );
 
 	// Display pluggable permissions:
 	display_pluggable_permissions( $Form, 'system' );
@@ -252,6 +231,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.29  2010/10/15 13:10:09  efy-asimo
+ * Convert group permissions to pluggable permissions - part1
+ *
  * Revision 1.28  2010/05/07 08:07:14  efy-asimo
  * Permissions check update (User tab, Global Settings tab) - bugfix
  *

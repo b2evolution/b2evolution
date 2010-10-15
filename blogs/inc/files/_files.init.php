@@ -120,6 +120,142 @@ class files_Module extends Module
 		load_class( 'files/model/_filetypecache.class.php', 'FileTypeCache' );
 	}
 
+	/**
+	 * Get default module permissions
+	 *
+	 * @param integer Group ID
+	 * @return array
+	 */
+	function get_default_group_permissions( $grp_ID )
+	{
+		switch( $grp_ID )
+		{
+			case 1: // Administrators group ID equals 1
+				$permname = 'all';
+				break;
+			case 2: // Privileged Bloggers group equals 2
+				$permname = 'add';
+				break;
+			case 3: // Bloggers group ID equals 3
+				$permname = 'view';
+				break;
+			default: // Other groups
+				$permname = 'none';
+				break;
+		}
+
+		// We can return as many default permissions as we want:
+		// e.g. array ( permission_name => permission_value, ... , ... )
+		return $permissions = array( 'perm_files' => $permname );
+	}
+
+	/**
+	 * Get available group permissions
+	 *
+	 * @return array
+	 */
+	function get_available_group_permissions()
+	{
+		global $current_User;
+		// fp> todo perm check
+		$filetypes_linkstart = '<a href="?ctrl=filetypes" title="'.T_('Edit locked file types...').'">';
+		$filetypes_linkend = '</a>';
+		$filetypes_allowed = '';
+		$filetypes_not_allowed = '';
+		if( isset( $current_User ) && $current_User->check_perm( 'options', 'edit' ) ) {
+			$filetypes_allowed = $filetypes_linkstart.get_icon('file_allowed').$filetypes_linkend;
+			$filetypes_not_allowed = $filetypes_linkstart.get_icon('file_not_allowed').$filetypes_linkend;
+		}
+		// 'label' is used in the group form as label for radio buttons group
+		// 'user_func' is used to check user permission. This function should be defined in module initializer.
+		// 'group_func' is used to check group permission. This function should be defined in module initializer.
+		// 'perm_block' group form block where this permissions will be displayed. Now available, the following blocks: additional, system
+		// 'options' is permission options
+		$permissions = array(
+			'perm_files' => array(
+				'label' => T_('Files'),
+				'user_func'  => 'check_files_user_perm',
+				'group_func' => 'check_files_group_perm',
+				'perm_block' => 'additional',
+				'options'  => array(
+						// format: array( radio_button_value, radio_button_label, radio_button_note )
+						array( 'none', T_('No Access') ),
+						array( 'view', T_('View files for all allowed roots') ),
+						array( 'add', T_('Add/Upload files to allowed roots') ),
+						array( 'edit', sprintf( T_('Edit %sunlocked files'), $filetypes_linkstart.get_icon('file_allowed').$filetypes_linkend ) ),
+						array( 'all', sprintf( T_('Edit all files, including %slocked ones'), $filetypes_linkstart.get_icon('file_not_allowed').$filetypes_linkend ), T_('Needed for editing PHP files in skins.') ),
+					),
+				'perm_type' => 'radiobox',
+				'field_lines' => true,
+				'field_note' => T_('This setting will further restrict any media file permissions on specific blogs.'),
+				),
+		);
+		// We can return as many permissions as we want.
+		// In other words, one module can return many pluggable permissions.
+		return $permissions;
+	}
+
+	/**
+	 * Check a permission for the user. ( see 'user_func' in get_available_group_permissions() function  )
+	 *
+	 * @param string Requested permission level
+	 * @param string Permission value
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
+	function check_files_user_perm( $permlevel, $permvalue, $permtarget )
+	{
+		return true;
+	}
+
+	/**
+	 * Check a permission for the group. ( see 'group_func' in get_available_group_permissions() function )
+	 *
+	 * @param string Requested permission level
+	 * @param string Permission value
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
+	function check_files_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		$perm = false;
+		switch ( $permvalue )
+		{
+			case 'all':
+				global $demo_mode;
+				if( ( ! $demo_mode ) && ( $permlevel == 'all' ) )
+				{ // All permissions granted
+					$perm = true;
+					break;
+				}
+
+			case 'edit':
+				// User can ask for normal edit perm...
+				if( $permlevel == 'edit' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'add':
+				// User can ask for add perm...
+				if( $permlevel == 'add' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'view':
+				// User can ask for view perm...
+				if( $permlevel == 'view' )
+				{
+					$perm = true;
+					break;
+				}
+		}
+
+		return $perm;
+	}
 
 	/**
 	 * Build teh evobar menu
@@ -128,7 +264,6 @@ class files_Module extends Module
 	{
 
 	}
-
 
 	/**
 	 * Builds the 1st half of the menu. This is the one with the most important features
