@@ -221,11 +221,11 @@ if( $permission_to_edit )
 
 // Get # of posts for each category
 global $number_of_posts_in_cat;
-$number_of_posts_in_cat = $DB->get_assoc("
+$number_of_posts_in_cat = $DB->get_assoc('
 	SELECT cat_ID, count(postcat_post_ID) c
-	  FROM evo_categories LEFT JOIN evo_postcats ON postcat_cat_ID = cat_id
-	 WHERE cat_blog_ID = $subset_ID
-	 GROUP BY cat_ID");
+	FROM T_categories LEFT JOIN T_postcats ON postcat_cat_ID = cat_id
+	WHERE cat_blog_ID = '.$DB->quote($subset_ID).'
+	GROUP BY cat_ID');
 
 $Table->display_init( NULL, $result_fadeout );
 
@@ -263,6 +263,9 @@ echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categori
 $Session->delete( 'fadeout_array');
 /*
  * $Log$
+ * Revision 1.27  2010/10/16 22:04:28  sam2kb
+ * Fixed hard-coded table prefix
+ *
  * Revision 1.26  2010/07/26 06:52:15  efy-asimo
  * MFB v-4-0
  *
