@@ -54,6 +54,7 @@ $usedgroups = $DB->get_col( 'SELECT grp_ID
  * Query user list:
  */
 $keywords = param( 'keywords', 'string', '', true );
+$usr_unconfirmed = param( 'usr_unconfirmed', 'boolean', false, true );
 
 $where_clause = '';
 
@@ -65,6 +66,10 @@ if( !empty( $keywords ) )
 		// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
 		$where_clause .= 'CONCAT_WS( " ", user_login, user_firstname, user_lastname, user_nickname, user_email) LIKE "%'.$DB->escape($kw).'%" AND ';
 	}
+}
+if( $usr_unconfirmed )
+{
+	$where_clause .= 'user_validated = 0 AND ';
 }
 
 $SQL = new SQL();
@@ -125,6 +130,7 @@ $Results->filter_area = array(
 	'url_ignore' => 'results_user_page,keywords',
 	'presets' => array(
 		'all' => array( T_('All users'), '?ctrl=users' ),
+		'unconfirmed' => array( T_('Unconfirmed email'), '?ctrl=users&amp;usr_unconfirmed=1' ),
 		)
 	);
 
@@ -290,6 +296,15 @@ if( ! $current_User->check_perm( 'users', 'edit', false ) )
 }
 else
 {
+	$Results->cols[] = array(
+						'th' => T_('Confirmed'),
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
+						'order' => 'user_validated',
+						'default_dir' => 'D',
+						'td' => '%get_icon( (#user_validated# ? "allowback" : "ban") )%',
+					);
+	
 	function display_level( $user_level, $user_ID )
 	{
 		$r = '';
@@ -342,6 +357,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.27  2010/10/17 18:51:57  sam2kb
+ * Display email validation status
+ *
  * Revision 1.26  2010/09/08 15:07:45  efy-asimo
  * manual links
  *
