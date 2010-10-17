@@ -134,6 +134,13 @@ switch( $action )
 		$current_User->check_perm( 'users', 'edit', true );
 
 		$text = trim( param( 'q', 'string', '' ) );
+
+		if( preg_match( '~%u[0-9a-f]{3,4}~i', $text ) && version_compare(PHP_VERSION, '5', '>=') )
+		{	// Decode UTF-8 string (PHP 5 and up)
+			$text = preg_replace( '~%u([0-9a-f]{3,4})~i', '&#x\\1;', urldecode($text) );
+			$text = html_entity_decode( $text, ENT_COMPAT, 'UTF-8' );
+		}
+
 		if( !empty( $text ) )
 		{
 			$SQL = new SQL();
@@ -328,6 +335,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.59  2010/10/17 23:12:57  sam2kb
+ * Correctly decode utf-8 logins
+ *
  * Revision 1.58  2010/10/05 15:33:15  efy-asimo
  * Ajax comment moderation - fix locale changes
  *
