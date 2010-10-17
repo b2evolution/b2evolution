@@ -64,6 +64,7 @@ $Form = new Form( NULL, 'user_checkchanges' );
 
 if( !$user_profile_only )
 {
+	$Form->global_icon( T_('Delete this user!'), 'delete', '?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete'), 3, 4  );
 	$Form->global_icon( T_('Compose message'), 'comments', '?ctrl=threads&action=new&user_login='.$edited_User->login );
 	$Form->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', regenerate_url( 'user_ID,action,ctrl', 'ctrl=users' ) );
 }
@@ -108,6 +109,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.6  2010/10/17 18:53:04  sam2kb
+ * Added a link to delete edited user
+ *
  * Revision 1.5  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *
