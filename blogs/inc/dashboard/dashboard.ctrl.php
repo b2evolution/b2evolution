@@ -218,6 +218,15 @@ if( $blog )
 				AttachServerRequest( 'antispam_ban' ); // send form via hidden iframe
 				jQuery( '#close_button' ).bind( 'click', closeAntispamSettings );
 				jQuery( '.SaveButton' ).bind( 'click', refresh_overlay );
+
+				var keycode_esc = 27;
+				jQuery(document).keyup(function(e)
+				{
+					if( e.keyCode == keycode_esc )
+					{
+						closeAntispamSettings();
+					}
+				});
 			}
 
 			// This is called to close the antispam ban overlay page
@@ -696,6 +705,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.71  2010/10/18 15:36:35  efy-asimo
+ * close antispam overlay on escape key
+ *
  * Revision 1.70  2010/09/20 13:00:44  efy-asimo
  * dashboard ajax calls - fix
  *
