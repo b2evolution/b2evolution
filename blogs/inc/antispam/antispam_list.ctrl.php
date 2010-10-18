@@ -42,6 +42,10 @@ if( $display_mode != 'js' )
 {
 	$AdminUI->set_path( 'tools', 'antispam' );
 }
+else
+{
+	header_content_type( 'text/html', $io_charset );
+}
 
 param_action( '' );
 param( 'confirm', 'string' );
@@ -237,6 +241,9 @@ if( $display_mode != 'js')
 
 /*
  * $Log$
+ * Revision 1.19  2010/10/18 15:29:35  efy-asimo
+ * ajax calls charset - fix
+ *
  * Revision 1.18  2010/06/01 11:33:19  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)
