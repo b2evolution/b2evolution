@@ -133,11 +133,21 @@ switch( $action )
 		// fp> TODO: is there a permission to just 'view' users? It would be appropriate here
 		$current_User->check_perm( 'users', 'edit', true );
 
-		$text = trim( param( 'q', 'string', '' ) );
+		$text = trim( urldecode( param( 'q', 'string', '' ) ) );
 
+		/**
+		 * sam2kb> The code below decodes percent-encoded unicode string produced by Javascript "escape"
+		 * function in format %uxxxx where xxxx is a Unicode value represented as four hexadecimal digits.
+		 * Example string "MAMA" (cyrillic letters) encoded with "escape": %u041C%u0410%u041C%u0410
+		 * Same word encoded with "encodeURI": %D0%9C%D0%90%D0%9C%D0%90
+		 *
+		 * jQuery hintbox plugin uses "escape" function to encode URIs
+		 *
+		 * More info here: http://en.wikipedia.org/wiki/Percent-encoding#Non-standard_implementations
+		 */
 		if( preg_match( '~%u[0-9a-f]{3,4}~i', $text ) && version_compare(PHP_VERSION, '5', '>=') )
 		{	// Decode UTF-8 string (PHP 5 and up)
-			$text = preg_replace( '~%u([0-9a-f]{3,4})~i', '&#x\\1;', urldecode($text) );
+			$text = preg_replace( '~%u([0-9a-f]{3,4})~i', '&#x\\1;', $text );
 			$text = html_entity_decode( $text, ENT_COMPAT, 'UTF-8' );
 		}
 
@@ -146,7 +156,7 @@ switch( $action )
 			$SQL = new SQL();
 			$SQL->SELECT( 'user_login' );
 			$SQL->FROM( 'T_users' );
-			$SQL->WHERE( 'user_login LIKE \''.$text.'%\'' );
+			$SQL->WHERE( 'user_login LIKE "'.$DB->escape($text).'%"' );
 			$SQL->LIMIT( '10' );
 			$SQL->ORDER_BY('user_login');
 
@@ -335,6 +345,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.60  2010/10/18 23:47:46  sam2kb
+ * doc
+ *
  * Revision 1.59  2010/10/17 23:12:57  sam2kb
  * Correctly decode utf-8 logins
  *
