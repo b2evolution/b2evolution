@@ -727,6 +727,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.30  2010/10/19 02:00:53  fplanque
+ * MFB
+ *
  * Revision 1.29  2010/10/13 14:07:55  efy-asimo
  * Optional paged comments in the front end
  *

@@ -214,7 +214,7 @@ class Slug extends DataObject
 	{
 		if( $object = $this->get_object() )
 		{ // object exists
-			// check if this is a restriction for this sulg or not!
+			// check if this is a restriction for this slug or not!
 			if( $object->get( $restriction['fk_short'] ) == $this->ID )
 			{
 				$restriction_link = $this->get_link_to_object();
@@ -233,7 +233,7 @@ class Slug extends DataObject
 	 * Get linked object.
 	 * @return object
 	 */
-	function get_object()
+	function & get_object()
 	{
 		global $DB, $admin_url;
 
@@ -242,8 +242,8 @@ class Slug extends DataObject
 			case 'item':
 				// TODO: dh> should use ItemCache altogether
 				// was: $object_query = 'SELECT post_ID, post_title FROM T_items__item WHERE '.$fk.' = '.$this->ID;
-				$ItemCache = get_ItemCache();
-				return $ItemCache->get_by_ID($this->itm_ID);
+				$ItemCache = & get_ItemCache();
+				return $ItemCache->get_by_ID( $this->itm_ID, false );
 
 			case 'help':
 				return false;
@@ -266,7 +266,7 @@ class Slug extends DataObject
 	{
 		global $DB, $Messages;
 		$ItemCache = & get_ItemCache();
-		$Item = $ItemCache->get_by_id( $this->itm_ID );
+		$Item = & $ItemCache->get_by_id( $this->itm_ID );
 
 		$DB->begin();
 		if( $Item->get( 'canonical_slug_ID' ) == $this->ID )
@@ -289,8 +289,17 @@ class Slug extends DataObject
 
 /*
  * $Log$
- * Revision 1.12  2010/07/26 06:52:27  efy-asimo
- * MFB v-4-0
+ * Revision 1.13  2010/10/19 02:00:54  fplanque
+ * MFB
+ *
+ * Revision 1.10.2.4  2010/10/19 00:33:16  fplanque
+ * enhanced slug manager
+ *
+ * Revision 1.10.2.3  2010/07/14 09:05:19  efy-asimo
+ * todo fp>asimo modifications
+ *
+ * Revision 1.10.2.2  2010/07/13 00:57:50  fplanque
+ * doc
  *
  */
 ?>

@@ -43,12 +43,12 @@ hypertexte;;;webreference.fr/defintions/www/hypertexte
 
 ; Twitter handles:
 @b2evolution;;;twitter.com/b2evolution
-@tblue;;;twitter.com/tblue
 @leeturner;;;twitter.com/leeturner
 @waltercruz;;;twitter.com/waltercruz
 @francoisplanque;;;twitter.com/francoisplanque
 @sam2kb;;;twitter.com/sam2kb
 @blueyed;;;twitter.com/blueyed
+@evofactory;;;twitter.com/evofactory
 ; Aliases
 @b2evo;;;twitter.com/b2evolution
 @fplanque;;;twitter.com/francoisplanque

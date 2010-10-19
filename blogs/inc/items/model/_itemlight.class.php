@@ -59,7 +59,7 @@ class ItemLight extends DataObject
  	var $title;
 
  	var $excerpt;
- 
+
  	var $urltitle;
 
 	var $canonical_slug_ID;
@@ -667,7 +667,7 @@ class ItemLight extends DataObject
 
 	/**
 	 * Check if current item has at least one category, which belongs to the given blog
-	 * 
+	 *
 	 * @param integer the given blog ID
 	 * @return boolean true if there is at least one category in the given blog, false otherwise
 	 */
@@ -692,9 +692,9 @@ class ItemLight extends DataObject
 	 * Check if cross post navigation should stay in the current blog or not.
 	 * Also check that this item has at least one category that belongs to the given blog.
 	 * If current blog is the same as item blog then, this function will return false, because no need to check.
-	 * 
+	 *
 	 * @param string 'auto' value means this call needs to decide to stay in the current blog or not. Every other value will return false!
-	 * @param integer the given blog ID (its usually the current blog id)
+	 * @param integer the given "current" blog ID (its usually the current blog id)
 	 * @return boolean true if we have to stay in the current blog, false otherwise
 	 */
 	function check_cross_post_nav( $target_blog, $blog_ID )
@@ -708,7 +708,7 @@ class ItemLight extends DataObject
 
 		$this->get_Blog();
 		if( $this->Blog->ID == $blog_ID )
-		{ // item's blog is the same as target blog 
+		{ // item's blog is the same as target blog
 			return false;
 		}
 
@@ -772,9 +772,9 @@ class ItemLight extends DataObject
 
 		$blogurl = '';
 		$permalink_type = '';
-		if( $this->check_cross_post_nav( $target_blog, $Blog->ID ) )
+		if( !empty($Blog) && $this->check_cross_post_nav( $target_blog, $Blog->ID ) )
 		{
-			$permalink_type =  $Blog->get_setting( 'permalinks' );
+			$permalink_type = $Blog->get_setting( 'permalinks' );
 			$blogurl = $Blog->gen_blogurl();
 		}
 
@@ -853,7 +853,7 @@ class ItemLight extends DataObject
 			), $params );
 
 		$blogurl = '';
-		if( $this->check_cross_post_nav( $params['target_blog'], $Blog->ID ) )
+		if( !empty($Blog) && $this->check_cross_post_nav( $params['target_blog'], $Blog->ID ) )
 		{
 			$blogurl = $Blog->gen_blogurl();
 		}
@@ -1065,10 +1065,16 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
- * Revision 1.39  2010/09/21 14:38:20  efy-asimo
+ * Revision 1.40  2010/10/19 02:00:53  fplanque
+ * MFB
+ *
+ * Revision 1.37.2.3  2010/10/17 19:35:35  fplanque
+ * fix
+ *
+ * Revision 1.37.2.2  2010/09/21 14:37:41  efy-asimo
  * Requesting a post in the wrong blog - fix
  *
- * Revision 1.38  2010/09/15 13:04:06  efy-asimo
+ * Revision 1.37.2.1  2010/09/15 13:03:30  efy-asimo
  * Cross post navigatation
  *
  * Revision 1.37  2010/04/12 09:41:36  efy-asimo

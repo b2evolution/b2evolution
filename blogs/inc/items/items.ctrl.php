@@ -164,7 +164,7 @@ switch( $action )
 		break;
 	
 	case 'mass_save' :
-		param ( 'redirect_to', 'string', url_add_param ( $admin_url, 'ctrl=items&filter=restore&blog=' . $Blog->ID, '&' ) );
+		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog=' . $Blog->ID, '&' ) );
 		break;
 	
 	case 'new' :
@@ -852,13 +852,13 @@ switch( $action )
 		if( $action == 'link_move_up' )
 		{
 			$switchcond = 'return ($loop_Link->get("order") > $i
-				&& $loop_Link->get("order") < ' . $edited_Link->get ( "order" ) . ');';
-			$i = - 1;
+				&& $loop_Link->get("order") < '.$edited_Link->get("order").');';
+			$i = -1;
 		}
 		else
 		{
 			$switchcond = 'return ($loop_Link->get("order") < $i
-				&& $loop_Link->get("order") > ' . $edited_Link->get ( "order" ) . ');';
+				&& $loop_Link->get("order") > '.$edited_Link->get("order").');';
 			$i = PHP_INT_MAX;
 		}
 		foreach( $itemLinks as $loop_Link )
@@ -1384,11 +1384,14 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.104  2010/10/19 02:01:23  fplanque
+ * MFB
+ *
  * Revision 1.103  2010/08/05 08:04:12  efy-asimo
  * Ajaxify comments on itemList FullView and commentList FullView pages
  *
- * Revision 1.102  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
+ * Revision 1.101.2.1  2010/07/05 20:51:42  fplanque
+ * no message
  *
  * Revision 1.101  2010/05/22 12:22:49  efy-asimo
  * move $allow_cross_posting in the backoffice

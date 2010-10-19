@@ -40,12 +40,15 @@ else
 }
 
 echo '</table>';
-	
-	echo '<p>'.T_('Your selection here will pre-configure your blog in order to optimize it for a particular use. Nothing is final though. You can change all the settings at any time and any kind of blog can be transformed into any other at any time.').'</p>';
-	
+
+echo '<p>'.T_('Your selection here will pre-configure your blog in order to optimize it for a particular use. Nothing is final though. You can change all the settings at any time and any kind of blog can be transformed into any other at any time.').'</p>';
+
 
 /*
  * $Log$
+ * Revision 1.6  2010/10/19 02:00:53  fplanque
+ * MFB
+ *
  * Revision 1.5  2010/06/01 02:44:44  sam2kb
  * New hooks added: GetCollectionKinds and InitCollectionKinds.
  * Use them to define new and override existing presets for new blogs.

@@ -604,7 +604,7 @@ function locale_options_return( $default = '' )
 
 
 /**
- * Detect language from HTTP_ACCEPT_LANGUAGE.
+ * Detect language from HTTP_ACCEPT_LANGUAGE
  *
  * HTTP_ACCEPT_LANGUAGE is sorted by prio and then the best match is used
  * (either full locale ("en-US") or best fitting locale for a short one ("en").
@@ -1131,6 +1131,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.44  2010/10/19 02:00:54  fplanque
+ * MFB
+ *
  * Revision 1.43  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

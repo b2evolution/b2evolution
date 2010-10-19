@@ -337,7 +337,7 @@ function get_ban_domain( $url )
 
 /**
  * Get the blog restricted condition
- * 
+ *
  * Creates an sql command part, which is a condition, that restrict to show comments from those blogs,
  * where current user has no edit permission for comments.
  * It is used by the antispam_list.ctrl, when current_User wants to delete the affected comments.
@@ -422,7 +422,7 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 
 	echo '<p>';
 	echo '<input type="checkbox" name="del'.$status.'" id="del'.$status.'_cb" value="1" checked="checked"/>';
-	echo '<label for="del'.$status.'_cb">';
+	echo '<label for="del'.$status.'_cb"> ';
 	echo sprintf ( T_('Delete the following %s %s comments:'), $num_comments == 500 ? '500+' : $num_comments, '<strong>'.$status.'</strong>' );
 	echo '</label>';
 	echo '</p>';
@@ -458,6 +458,9 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 
 /*
  * $Log$
+ * Revision 1.16  2010/10/19 02:00:53  fplanque
+ * MFB
+ *
  * Revision 1.15  2010/07/19 06:13:35  efy-asimo
  * use Comment->get( 'author_IP') instead of get_author_ip() function
  *

@@ -319,6 +319,12 @@ function next_posts_link( $link_text = 'Next' )
 
 /*
  * $Log$
+ * Revision 1.7  2010/10/19 02:00:54  fplanque
+ * MFB
+ *
+ * Revision 1.6.8.1  2010/07/18 18:06:18  fplanque
+ * no message
+ *
  * Revision 1.6  2008/09/27 00:05:55  fplanque
  * minor/version bump
  *
@@ -338,3 +344,4 @@ function next_posts_link( $link_text = 'Next' )
  * WordPress compatibility layer
  *
  */
+?>

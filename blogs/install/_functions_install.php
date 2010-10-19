@@ -773,6 +773,7 @@ function install_htaccess( $upgrade = false )
 
 /**
  * This does the actual file manipulations for installing .htaccess
+ * This will verify that the provided sample.htaccess does not crash apache in a test folder before installing it for real.
  *
  * @param boolean are we upgrading (vs installing)?
  * @return mixed
@@ -811,7 +812,7 @@ function do_install_htaccess( $upgrade = false )
 	{
 		return $info[error];
 	}
-	if( $remote_page != 'Test successful.' )
+	if( substr( $remote_page, 0, 16 ) != 'Test successful.' )
 	{
 		return 'install/test/index.html was not found as expected.';
 	}
@@ -844,6 +845,12 @@ function get_antispam_query()
 
 /*
  * $Log$
+ * Revision 1.96  2010/10/19 02:00:54  fplanque
+ * MFB
+ *
+ * Revision 1.94.2.2  2010/10/17 19:35:36  fplanque
+ * fix
+ *
  * Revision 1.95  2010/05/24 21:27:58  sam2kb
  * Fixed some translated strings
  *

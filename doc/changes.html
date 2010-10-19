@@ -31,102 +31,128 @@
 		<div class="block3">
 
 			<h1>4.x series</h1>
-			<p>Skins and plugins from v2 &amp; v3 are compatible with v3 and should run without problems.</p>
-			<h2>4.0.0-dev</h2>
+			<p>Skins and plugins from v2 &amp; v3 are compatible with v4 and should run without problems.</p>
+			<h2>4.0.2-beta</h2>
+            <ul>
+              <li>Fixed tinyurls (@evofactory)</li>
+              <li>Allow closing of antispam popup by pressing Escape (@evofactory)</li>
+              <li>Enhanced slug manager (@fplanque)</li>
+            </ul>
+        <h2>4.0.1-beta</h2>
 			<ul>
-				<li><strong>Blog features:</strong>
-                  <ul>
-                    <li>Separate search page -- disp=search -- destined to gather advanced search params (@francoisplanque)</li>
-                    <li>Post index feature -- disp=postidx (@francoisplanque)</li>
-                    <li>Site map feature (HTML, not XML which already existed) -- disp=sitemap (@francoisplanque)</li>
-                    <li>Help page (to be completed) -- disp=help (@francoisplanque)</li>
-                    <li>Images can now be linked at the top or after &quot;more&quot; in a post (@blueyed)</li>
-                    <li>It is now possible to choose the size of the images included in RSS feeds (@evofactory)</li>
-                  </ul>
+			  <li>Better dashboard AJAX handling (@evofactory)</li>
+		      <li>Paged comments (AJAX) in the backoffice (@evofactory)</li>
+		      <li>Cleaner navigation for crossposted posts. You now stay in the same blog and teh page includes a &quot;canonical tag&quot;. If you prefered the old way, change $cross_post_nav_in_same_blog in the advanced conf file. (@evofactory)</li>
+		      <li>Twitter plugin now uses OAuth (requires PHP5). (@evofactory)</li>
+		      <li>Many bug fixes...</li>
+	      </ul>
+    <h2>4.0.0-alpha</h2>
+			<ul>
+				<li><strong>Skins:</strong>
+                	<ul>
+                        <li>Separate search page -- disp=search -- destined to gather advanced search params (@francoisplanque)</li>
+                        <li>Post index feature -- disp=postidx (@francoisplanque)</li>
+                        <li>Site map feature (HTML, not XML which already existed) -- disp=sitemap (@francoisplanque) </li>
+                        <li>Help page -- disp=help (@francoisplanque)</li>
+                        <li>Skins can now embed the login form - experimental - implemented for sending private messages (@evofactory)</li>
+            		</ul>
                 </li>
-			    <li><strong>Widgets:</strong></li>
-			    <ul>
-                  <li>Avatar widget (@blueyed)</li>
-			      <li>Enhanced Menu link widget (@francoisplanque)</li>
-			      <li>Enhanced Common navigation links widget (@francoisplanque)</li>
-			      <li>Tag cloud widget now has a random order option (@waltercruz)</li>
-		      </ul>
-		      <li><strong>Backoffice:</strong>
-		        <ul>
-		          <li>It is now possible to remove spam URL from comments with a single click in the dashboard (@evofactory) </li>
-	              <li>It is now possible to call the Antispam tool as an Ajax overlay in the dashboard. (@evofactory)</li>
-	              <li>The comment edit form has now a 1 click Publish button -- visible only if Comment is a Draft (@evofactory).</li>
-		        </ul>
-		      </li>
-		        <li><strong>Performance: </strong>
-		          <ul>
-		            <li>Optimized for PHP5 (still works on PHP4 but we strongly recommend PHP5)</li>
-		            <li>BlockCache stored to memrory (APC Cache &amp; more): every widget is now cached individually and regenerated only when needed (provided it declares proper dependency keys). This provides a significant performance boost. More underway. (@francoisplanque)</li>
-		            <li>User agent type is now saved directly into the hits table instead of a costly lookup in user agents table (@francoisplanque)</li>
-	                <li>SQL optimizations (@blueyed)
-	                  <ul>
-	                    <li>SQL_NO_CACHE for queries selecting from T_sessions/T_hitlog</li>
-                        <li>Remove information about seconds from item issue and start date,
-                          so that those queries can get cached for up to one minute now</li>
-                      </ul>
-	                </li>
-		          </ul>
-	          </li>
-	          <li><strong>Maintenance:</strong>
-		        <ul>
-		          <li>Integrated backup feature (Database and files) (@evofactory)</li>
-	              <li>Automated upgrade feature -- WARNING: for testing only at this point. It will overwrite your current version! (@evofactory)</li>
-		        </ul>
-		      </li>
-				<li><strong>Comments:</strong>
-			      <ul>
-				      <li>Display avatars for comments (@sam2kb)</li>
-				      <li>Per blog settings for different default gravatar types (@sam2kb)</li>
-					  <li>Backoffice comment editing: Allow changing of &quot;Allow message form&quot; setting for guest comments (@tblue)</li>
-				      <li>Added option to sort comments by ascending or descending order (@tblue)</li>
-				      <li>Refresh comments on dashboard through Ajax (@evofactory)</li>
-			          <li>A quick moderation link in comment notifications allows to moderate with minimum # of clicks. No login necessary! (@evofactory)</li>
-			          <li>The comment moderation screen now features various filters (@evofactory)</li>
-			          <li>Paginated comment list in skin (@sam2kb)</li>
-			      </ul>
-		    </li>
-				<li><strong>Post editing:</strong>
+			  	<li><strong>Widgets:</strong>
+                    <ul>
+                      <li>Avatar widget (@blueyed)</li>
+                      <li>Enhanced Menu link widget (@francoisplanque)</li>
+                      <li>Enhanced Common navigation links widget (@francoisplanque)</li>
+                      <li>Tag cloud widget now has a random order option (@waltercruz)</li>
+                    </ul>
+                </li>
+			    <li><strong>RSS Feeds:</strong>
+			    	<ul>
+			    	  <li>It is now possible to choose the size of the images included in RSS feeds (@evofactory)</li>
+		      		</ul>
+                </li>
+			    <li><strong>Post editing:</strong>
 				  <ul>
 				    <li>When typing a new post, it is now possible to create a new category on the fly without leaving the edit screen (@evofactory).</li>
+				    <li>Images can now be linked to the top of a post or at the top of the &quot;more&quot; section. (@blueyed)</li>
 				    <li>Better handling of &quot;Publish!&quot; button on post form (@francoisplanque)</li>
 				    <li>Better handling of &quot;Add/link files&quot; on new posts - 1 single click will save draft &amp; open file attach window (@evofactory)</li>
-				    <li>Improved actions after upload - link file or inset img tag (@blueyed,@francoisplanque)</li>
+				    <li>Improved actions after upload - you can now link the file to the current post or insert an &lt;img&gt; tag into the post text (@blueyed,@francoisplanque)</li>
 				    <li>In addition to upload, there is now an option to get images from an URL (@blueyed)</li>
 				    <li>Linked files can now be visually located (@blueyed)</li>
-              <li>[Not functional in this context; but functional when you click on Files button in the posts lisrt] Option to link multiple files with one click (@sam2kb)</li>
-				    <li>Added post type permissions (@tblue)</li>
+              		<li>Option to link multiple files with one click (@sam2kb)</li>
 				    <li>Mass post creation feature - useful for importing data to be released over time (@evofactory)</li>
 				    <li>Option to stay in backoffice after publishing a post (instead of viewing the blog) (@evofactory)</li>
 				    <li>Automatic post slugs will only include 5 words by default -- but you can always manually enter your own and longer slug (@evofactory)</li>
-				  </ul>
-				</li>
-			  <li><strong>Backoffice:</strong>
-		        <ul>
-		          <li>Messaging module (@evofactory)</li>
-		          <li>Durations can now be entered in days/hours/minutes/seconds instead of large amounts of seconds (@evofactory)</li>
-		          </ul>
-			  </li>
-				<li><strong>Tools</strong>
+				    <li>Multiblog cross positing as well as extra category posting options can now be configured through the backoffice (@evofactory)</li>
+				    <li>Ability to mass edit post attributes (Title vs slug vs &lt;title&gt; tags). (@evofactory)</li>
+			      </ul>
+			    </li>
+		        <li><strong>Comments &amp; Antispam:</strong>
+                  <ul>
+                    <li>Comments can now display avatars (including Gravatars) (@sam2kb)</li>
+                    <li>Option to display comments by ascending or descending order (@tblue)</li>
+                    <li>A quick moderation link in comment notifications by email allows to moderate comments with minimum # of clicks. No login necessary! (@evofactory)</li>
+                    <li>Dashboard:
+                      <ul>
+                        <li>Refreshing comments on dashboard through Ajax (@evofactory)</li>
+                        <li>It is now possible to remove spam URLs from comments with a single click in the dashboard (@evofactory) </li>
+                        <li>It is now possible to call the Antispam tool as an Ajax overlay in the dashboard. (@evofactory)</li>
+                      </ul>
+                    </li>
+                    <li>Backoffice comment editing: 
+                      <ul>
+                        <li>It is now possible to change &quot;Allow message form&quot;  guest comments (@tblue)</li>
+                        <li>It is now possible to move comments from one post to another (@evofactory)</li>
+                        <li> 1 click Publish button -- visible only if Comment is a Draft (@evofactory).</li>
+                      </ul>
+                    </li>
+                    <li>Comment  list in teh admin:
+                      <ul>
+                        <li> There is now a list view in addition to the full text view (@evofactory)</li>
+                        <li>Various filters are now possible (@evofactory)</li>
+                      </ul>
+                    </li>
+                    <li>Extended antispam tool: (@evofactory)
+                      <ul>
+                        <li>Separate permissions allow moderators to separately moderate drafts, published and deprecated comments. (@evofactory)</li>
+                        <li>The antispam tool now also checks user profiles. (@evofactory)</li>
+                      </ul>
+                    </li>
+                  </ul>
+		        </li>
+	          	<li><strong>File management:</strong>
+			    <ul>
+                  <li>When you try to delete an image, b2evo now gives you a list of all posts to which that image is linked. (@evofactory)</li>
+			      <li>The filemanager can now use _evocache folders instead of .evocache which will increase compatibility with more web hosts (@evofactory).</li>
+	          	</ul>
+                </li>
+			    <li><strong>Messaging:</strong>
+                  <ul>
+                    <li>Messaging module giving users the ability to exchange private messages in the admin area. (@evofactory)</li>
+                    <li>Possibility to contact blog, post or comment authors through private messages (PMs) instead of email. (@evofactory)</li>
+                  </ul>
+			    </li>
+		      	<li><strong>Maintenance:</strong>
+                <ul>
+                  <li>Integrated backup feature (Database and files) (@evofactory)</li>
+                  <li>Automated upgrade feature - EXPERIMENTAL - WARNING: for testing only at this point. It will overwrite your current version! (@evofactory)</li>
+                  <li>Scheduled task to prune *old files* (&gt;24 hours) from the full page cache (@evofactory)</li>
+                  <li>                      Tool to clear *all files* full page cache (/cache directory) (@sam2kb)</li>
+                  <li>Tool to clear thumbnail caches (.evocache directories) (@sam2kb)</li>
+                  <li>Tool to optimize database tables (MyISAM tables used for sessions &amp; logs)</li>
+                </ul>
+                </li>
+			    <li><strong>Users &amp; Groups:</strong>
 				<ul>
-					<li>Clear full page cache (/cache directory) (@sam2kb)</li>
-					<li>Clear thumbnail caches (.evocache directories) (@sam2kb)</li>
-					<li>Optimize database tables (MyISAM tables used for sessions &amp; logs)</li>
-				</ul>
-				</li>
-				<li><strong>Users &amp; Groups:</strong>
-				<ul>
-					<li>Give the admin/users better control on whether or not they can have multiple concurrent sessions. (@evofactory)</li>
+					<li>Users may now create new blogs for themselves (depending on group permission) (@evofactory)</li>
+					<li>Admin/users now have better control on whether or not they can have multiple concurrent sessions. (@evofactory)</li>
 					<li>Option to have different session timeouts for different users (@evofactory)</li>
 					<li>Option to have nicknames used as IDs set by the admin, not the user. (@evofactory)</li>
 					<li>Modules &amp; Plugins can now define their own group permissions (@evofactory)</li>
-				</ul>
+			        <li>Added post type permissions (@tblue)</li>
+			      </ul>
 				</li>
-				<li><strong>XML-RPC:</strong>
+			    <li><strong>XML-RPC:</strong>
 			      <ul>
 			        <li>XML-RPC can now be disabled (@tblue,@waltercruz)</li>
 			          <li>MetaWeblog API: Use mt_keyword field to get/set
@@ -143,36 +169,54 @@
 					  <li>Check extra categories before checking permissions to post to them (sends correct XML-RPC error on failure). (@tblue)</li>
                   </ul>
 			  </li>
-			  <li><strong>Plugins:</strong>
+		      <li><strong>Plugins:</strong>
 			    <ul>
 			      <li>Adsense plugin now has 'per blog' settings (@sam2kb).</li>
                   <li>New plugin: Watermark. Adds text watermark to generated thumbnails e.g. copyright notice (@sam2kb).</li>
-                  <li>Events GetCollectionKinds and InitCollectionKinds added to the Test plugin (@sam2kb).</li>
-		        </ul>
+		          <li>Twitter plugins now uses optimized private tiny urls (@evofactory)</li>
+		          <li>Code highlight plugin: Correctly unfilter item contents. (@sir_yabs/@tblue)</li>
+	            </ul>
 			  </li>
-	            <li><strong>Technical mumbo-jumbo:</strong>
-	              <ul>
-	                <li>Installer will take care of testing .htaccess and install it if proven compatible with current webserver (@evofactory)</li>
-					  <li>Debug mode can be turned on &amp; off through the URL with a password (@francoisplanque)</li>
-					  <li>Support iconv() on urltitle generation (@tblue)</li>
-					  <li>Fixed a bug in fetch_remote_page() (wrong $info array keys). (@tblue)</li>
-					  <li>Item::get_tags(): Bugfix and optimization:
-						    Remember items without tags and do not try to
-					      fetch tags for them on the next call. (@sir_yabs, @tblue)</li>
-					  <li>Code highlight plugin: Correctly unfilter item contents. (@sir_yabs/@tblue)</li>
-					  <li>Plugin hooks: Always trigger AfterCommentUpdate/AfterItemUpdate,
-					      not only if Comment/Item has changed. (@sir_yabs/@tblue)</li>
-				      <li>Added hooks to let plugins handle disp modes: GetHandledDispModes &amp; HandleDispMode (@sir_yabs, @francoisplanque)</li>
-				      <li>Added hooks: AfterCollectionInsert, AfterCollectionUpdate, AfterCollectionDelete, DisplayProfileFormFieldset, ProfileFormSent, AfterFileUpload, BeforeThumbCreate, GetCollectionKinds, InitCollectionKinds (@sam2kb)</li>
-				      <li>Extended skin tag params (@leeturner)</li>
-				      <li>Increased core modularity</li>
-				      <li>Upgraded to TinyMCE 3.2.7 (@blueyed)</li>
-		              <li>The filemanager can now use _evocache folders instead of .evocache which will increase compatibility with more web hosts (@evofactory).</li>
-		              <li>CommentList has been rewritten to CommentList2 offering greater flexibility (especially on filtering) and matching the programming style of ItemList2  (@evofactory)</li>
-		              <li>Other bug fixes (@sam2kb,@francoisplanque)</li>
-				    </ul>
-              </li>
-		  </ul>
+		      <li><strong>General:</strong>
+                <ul>
+                  <li>Durations can now be entered in days/hours/minutes/seconds instead of large amounts of seconds (@evofactory)</li>
+                  <li>Installer will take care of testing .htaccess and install it if proven compatible with current webserver (@evofactory)</li>
+                </ul>
+			  </li>
+			  <li><strong>Performance:</strong>
+                  <ul>
+                    <li>Optimized for PHP5 (still works on PHP4 but we strongly recommend PHP5)</li>
+                    <li>BlockCache stored to memrory (APC Cache &amp; more): every widget is now cached individually and regenerated only when needed (provided it declares proper dependency keys). This provides a significant performance boost. More underway. (@francoisplanque)</li>
+                    <li>User agent type is now saved directly into the hits table instead of a costly lookup in user agents table (@francoisplanque)</li>
+                    <li>SQL optimizations (@blueyed):
+                      <ul>
+                          <li>SQL_NO_CACHE for queries selecting from T_sessions/T_hitlog</li>
+                        <li>Remove information about seconds from item issue and start date,
+                          so that those queries can get cached for up to one minute</li>
+                      </ul>
+                    </li>
+                  </ul>
+			    </li>
+			    <li><strong>Technical mumbo-jumbo:</strong>
+		          <ul>
+		            <li>Debug mode can be turned on &amp; off through the URL with a password (@francoisplanque)</li>
+		            <li>Support iconv() on urltitle generation (@tblue)</li>
+		            <li>Fixed a bug in fetch_remote_page() (wrong $info array keys). (@tblue)</li>
+		            <li>Item::get_tags(): Bugfix and optimization:
+		              Remember items without tags and do not try to
+		              fetch tags for them on the next call. (@sir_yabs, @tblue)</li>
+		            <li>Plugin hooks: Always trigger AfterCommentUpdate/AfterItemUpdate,
+		              not only if Comment/Item has changed. (@sir_yabs/@tblue)</li>
+		            <li>Added hooks to let plugins handle disp modes: GetHandledDispModes &amp; HandleDispMode (@sir_yabs, @francoisplanque)</li>
+		            <li>Added hooks: AfterCollectionInsert, AfterCollectionUpdate, AfterCollectionDelete, DisplayProfileFormFieldset, ProfileFormSent, AfterFileUpload, BeforeThumbCreate (@sam2kb)</li>
+		            <li>Extended skin tag params (@leeturner)</li>
+		            <li>Increased core modularity</li>
+		            <li>Upgraded to TinyMCE 3.2.7 (@blueyed)</li>
+		            <li>CommentList has been rewritten to CommentList2 offering greater flexibility (especially on filtering) and matching the programming style of ItemList2  (@evofactory)</li>
+		            <li>Other bug fixes (@sam2kb,@francoisplanque,@evofactory)</li>
+	              </ul>
+			    </li>
+	      </ul>
 
 		</div>
 		</div>

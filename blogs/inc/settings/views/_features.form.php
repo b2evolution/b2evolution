@@ -203,7 +203,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Cross posting') );
 	$Form->checklist( array(
-		array( 'cross_posting', 1, T_('Allow cross posting post to several blogs'), $Settings->get('cross_posting'), false, T_('(Extra cats in different blogs)') ),
+		array( 'cross_posting', 1, T_('Allow cross-posting posts to several blogs'), $Settings->get('cross_posting'), false, T_('(Extra cats in different blogs)') ),
 		array( 'cross_posting_blogs', 1, T_('Allow moving posts between different blogs'), $Settings->get('cross_posting_blogs'), false, T_('(Main cat can move to different blog)') ) ),
 		'allow_cross_posting', T_('Cross Posting') );
 $Form->end_fieldset();
@@ -219,7 +219,13 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
- * Revision 1.27  2010/06/24 07:03:11  efy-asimo
+ * Revision 1.28  2010/10/19 02:00:53  fplanque
+ * MFB
+ *
+ * Revision 1.26.2.2  2010/09/28 20:35:18  fplanque
+ * minor/doc
+ *
+ * Revision 1.26.2.1  2010/06/24 07:02:37  efy-asimo
  * move the cross posting options to the bottom of teh Features tab & fix error message after moving post
  *
  * Revision 1.26  2010/02/08 17:53:55  efy-yury

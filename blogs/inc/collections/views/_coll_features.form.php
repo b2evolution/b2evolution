@@ -107,7 +107,7 @@ $Form->begin_fieldset( T_('Feedback options') );
 
 	$Form->radio( 'comments_orderdir', $edited_Blog->get_setting('comments_orderdir'),
 						array(	array( 'ASC', T_('Chronologic') ),
-								array ('DESC', T_('Reverse') ),	
+								array ('DESC', T_('Reverse') ),
 						), T_('Display order'), true );
 
 	$Form->checkbox( 'paged_comments', $edited_Blog->get_setting( 'paged_comments' ), T_( 'Paged comments' ), T_( 'Check to enable paged comments on the public pages.' ) );
@@ -234,6 +234,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.37  2010/10/19 02:00:53  fplanque
+ * MFB
+ *
  * Revision 1.36  2010/10/13 14:07:55  efy-asimo
  * Optional paged comments in the front end
  *

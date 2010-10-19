@@ -6,7 +6,7 @@
  *
  * @package admin
  *
- * @version _files.init.php,v 1.3 2009/08/30 12:31:44 tblue246 Exp
+ * @version $Id$
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -265,6 +265,7 @@ class files_Module extends Module
 
 	}
 
+
 	/**
 	 * Builds the 1st half of the menu. This is the one with the most important features
 	 */
@@ -310,7 +311,13 @@ $files_Module = new files_Module();
 
 
 /*
- * _files.init.php,v
+ * $Log$
+ * Revision 1.11  2010/10/19 02:00:54  fplanque
+ * MFB
+ *
+ * Revision 1.9.2.3  2010/10/19 01:04:48  fplanque
+ * doc
+ *
  * Revision 1.3  2009/08/30 12:31:44  tblue246
  * Fixed CVS keywords
  *

@@ -469,12 +469,12 @@ class Blog extends DataObject
 		{ // we want to load the workflow checkboxes:
 			$this->set_setting( 'allow_subscriptions',  param( 'allow_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'enable_goto_blog',  param( 'enable_goto_blog', 'integer', 0 ) );
-			
+
 			$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
 			$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
 
 			$this->set_setting( 'enable_sitemaps', param( 'enable_sitemaps', 'integer', 0 ) );
-			
+
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
 		}
 
@@ -2342,6 +2342,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.122  2010/10/19 02:00:53  fplanque
+ * MFB
+ *
  * Revision 1.121  2010/10/13 14:07:55  efy-asimo
  * Optional paged comments in the front end
  *

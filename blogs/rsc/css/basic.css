@@ -133,10 +133,7 @@ div#evo_toolbar img {
 	vertical-align: top; /* required in strict mode (where no 'align="top"' gets added to IMGs, FF3). Otherwise text next to the img wraps out of the evobar */
 }
 
-
 /* *** SuperFish *** */
-/* TODO: dh> move this to an extra file: this is only used for logged in users, and only for the sf-menu (which may not get used). */
-/* TODO: dh> Do not use style for "a" itself, but "a:link" and "a:visited" in particular. Makes it easier to overwrite/use the skin settings */
 
 /*** ESSENTIAL STYLES ***/
 .sf-menu, .sf-menu * {
@@ -430,7 +427,6 @@ padding-right:3ex;
 	background-image:  url("../icons/mandatory_star_small.gif");
 	background-position: right top;
 	background-repeat: no-repeat;
-	padding-right:13px;
 }
 
 input.field_required,
@@ -567,7 +563,7 @@ td.error {
 	background:#fbf2ee;
 	color:#e00;
 }
-/* TODO: dh> why is there "red" in the name? why not just .log_warning/.warning? */
+
 div.log_container div.log_redwarning,
 div.action_messages div.log_redwarning,
 div.redwarning,

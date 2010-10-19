@@ -222,17 +222,17 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	if( $slug_changed == 0 )
 	{ // this should only happen when the slug is auto generated
 		$title_words = array();
-		$title_words = explode('-', $urltitle);
+		$title_words = explode( '-', $urltitle );
 		$count_of_words = 5;
-		if(count($title_words) > $count_of_words)
+		if( count($title_words) > $count_of_words )
 		{
 			$urltitle = '';
-			for($i = 0; $i < $count_of_words; $i++)
+			for( $i = 0; $i < $count_of_words; $i++ )
 			{
 				$urltitle .= $title_words[$i].'-';
 			}
 			//delete last '-'
-			$urltitle = substr($urltitle, 0, strlen($urltitle) - 1);
+			$urltitle = substr( $urltitle, 0, strlen($urltitle) - 1 );
 		}
 
 		// echo 'leaving 5 words: '.$urltitle.'<br />';
@@ -1945,6 +1945,9 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 
 /*
  * $Log$
+ * Revision 1.120  2010/10/19 02:00:53  fplanque
+ * MFB
+ *
  * Revision 1.119  2010/09/29 14:53:50  efy-asimo
  * Item full view comment list - fix
  *

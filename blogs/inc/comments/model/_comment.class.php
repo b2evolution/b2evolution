@@ -692,7 +692,7 @@ class Comment extends DataObject
 
 		echo $before;
 		echo '<a href="'.$admin_url.'?ctrl=comments&amp;action=edit&amp;comment_ID='.$this->ID;
-   		if( $save_context )
+		if( $save_context )
 		{
 			if( $redirect_to != NULL )
 			{
@@ -1215,7 +1215,7 @@ class Comment extends DataObject
 	 * Template function: display content of comment
 	 *
 	 * @param string Output format, see {@link format_to_output()}
-	 * @param boolean Add ban url icon after each url or not
+	 * @param boolean Add ban url action icon after each url or not
 	 */
 	function content( $format = 'htmlbody', $ban_urls = false )
 	{
@@ -1545,13 +1545,13 @@ class Comment extends DataObject
 
 			$notify_message .= $this->get('content')
 				."\n\n-- \n";
-				
+
 			if( $this->status == 'draft' )
 			{
 				$secret_value = '&secret='.$this->secret;
 				$notify_message .= T_('Quick moderation').': '.$baseurl.'htsrv/comment_review.php?cmt_ID='.$this->ID.$secret_value."\n\n";
 			}
-			
+
 			$notify_message .= T_('Edit screen').': '.$admin_url.'?ctrl=items&blog='.$edited_Blog->ID.'&p='.$edited_Item->ID.'&c=1#c'.$this->ID."\n\n"
 							   .T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->gen_blogurl(), 'disp=subs' ) )."\n";
 
@@ -1582,7 +1582,7 @@ class Comment extends DataObject
 	function dbupdate()
 	{
 		global $Plugins;
-		
+
 		if( $this->status != 'draft' )
 		{	// We don't want to keep "secret" moderation access once we've published or deprecated a comment
 			$this->set( 'secret', null );
@@ -1674,7 +1674,7 @@ class Comment extends DataObject
 
 	/** 
 	 * Get the blog advanced permission name for this comment
-	 * 
+	 *
 	 * @return string status specific blog comment permission name
 	 */
 	function blogperm_name()
@@ -1700,6 +1700,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.68  2010/10/19 02:00:53  fplanque
+ * MFB
+ *
  * Revision 1.67  2010/09/23 15:12:14  efy-asimo
  * antispam in comment text feature - add permission check - fix
  *

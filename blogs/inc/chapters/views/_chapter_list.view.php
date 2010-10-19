@@ -105,7 +105,7 @@ function cat_line( $Chapter, $level )
 					 </td>';
 	}
 
-		$edit_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=edit' );
+	$edit_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=edit' );
 	$r .= '<td><a href="'.htmlspecialchars($Chapter->get_permanent_url()).'">'.$Chapter->dget('urlname').'</a></td>';
 
 	if( $Settings->get('chapter_ordering') == 'manual' )
@@ -263,11 +263,17 @@ echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categori
 $Session->delete( 'fadeout_array');
 /*
  * $Log$
+ * Revision 1.28  2010/10/19 02:00:53  fplanque
+ * MFB
+ *
  * Revision 1.27  2010/10/16 22:04:28  sam2kb
  * Fixed hard-coded table prefix
  *
  * Revision 1.26  2010/07/26 06:52:15  efy-asimo
  * MFB v-4-0
+ *
+ * Revision 1.25.2.1  2010/07/06 00:24:37  fplanque
+ * I believe the code for # of posts was unnecessarily complex.
  *
  * Revision 1.25  2010/05/24 19:13:44  sam2kb
  * Properly encode "title" text

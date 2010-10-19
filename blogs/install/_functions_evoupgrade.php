@@ -1975,7 +1975,7 @@ function upgrade_b2evo_tables()
 		echo "Creating Tag tables...";
 		$DB->query( "CREATE TABLE T_items__tag (
 		      tag_ID   int(11) unsigned not null AUTO_INCREMENT,
-		      tag_name varchar(50)      not null,
+		      tag_name varchar(50) not null,
 		      primary key (tag_ID),
 		      UNIQUE tag_name( tag_name )
 		    )" );
@@ -2721,9 +2721,9 @@ function upgrade_b2evo_tables()
 
 		task_begin( 'Upgrading settings table... ');
 		$DB->query( 'UPDATE T_settings
-		             SET set_value = 1
-		             WHERE set_name = "fm_enable_roots_user"
-		             AND set_value = 0' );
+		                SET set_value = 1
+		              WHERE set_name = "fm_enable_roots_user"
+		                    AND set_value = 0' );
 		task_end();
 
 		// New perms for comment moderation depending on status:
@@ -2855,7 +2855,7 @@ function upgrade_b2evo_tables()
 
 
 
-	// Just in case, make sure the db schema version is upto date at the end.
+	// Just in case, make sure the db schema version is up to date at the end.
 	if( $old_db_version != $new_db_version )
 	{ // Update DB schema version to $new_db_version
 		set_upgrade_checkpoint( $new_db_version );
@@ -2986,6 +2986,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.371  2010/10/19 02:00:54  fplanque
+ * MFB
+ *
  * Revision 1.370  2010/10/15 13:10:09  efy-asimo
  * Convert group permissions to pluggable permissions - part1
  *

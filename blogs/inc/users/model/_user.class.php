@@ -1443,7 +1443,7 @@ class User extends DataObject
 
 	/**
 	 * Get messaging possibilities between current user and this user
-	 * 
+	 *
 	 * @return NULL|string allowed messaging possibility: PM > email > login > NULL
 	 */
 	function get_msgform_possibility( $current_User = NULL )
@@ -1466,7 +1466,7 @@ class User extends DataObject
 		else
 		{ // current User is not logged in
 			if( $this->accepts_email() )
-			{ // this user allows email 
+			{ // this user allows email
 				return 'email';
 			}
 			if( $this->accepts_pm() )
@@ -2086,6 +2086,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.84  2010/10/19 02:00:53  fplanque
+ * MFB
+ *
  * Revision 1.83  2010/10/15 13:10:09  efy-asimo
  * Convert group permissions to pluggable permissions - part1
  *
