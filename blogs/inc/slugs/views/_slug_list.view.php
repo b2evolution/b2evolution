@@ -32,20 +32,20 @@ $SQL->FROM( 'T_slug LEFT OUTER JOIN T_items__item ON slug_itm_ID = post_ID' );
 // filters
 if( get_param( 'slug_filter' ) )
 { // add slug_title filter
-	$like = $DB->quote('%'.strtolower(get_param('slug_filter')).'%');
-	$SQL->WHERE_and( "(
-		LOWER(slug_title) LIKE $like
-		OR LOWER(post_title) LIKE $like)" );
+	$like = $DB->escape( strtolower(get_param( 'slug_filter' )) );
+	$SQL->WHERE_and( '(
+		LOWER(slug_title) LIKE "%'.$like.'%"
+		OR LOWER(post_title) LIKE "%'.$like.'%")' );
 }
 if( $filter_type = get_param( 'slug_type' ) )
 { // add filter for item type
-	$SQL->WHERE_and( 'slug_type = '.get_param( 'slug_ftype' ) );
+	$SQL->WHERE_and( 'slug_type = "'.$DB->escape( get_param('slug_ftype') ).'"' );
 }
 if( $filter_item_ID = get_param( 'slug_item_ID' ) )
 { // add filter for item ID
 	if( is_number( $filter_item_ID ) )
 	{
-		$SQL->WHERE_and( 'slug_itm_ID = '.$filter_item_ID );
+		$SQL->WHERE_and( 'slug_itm_ID = '.$DB->quote($filter_item_ID) );
 	}
 }
 
@@ -102,14 +102,6 @@ $Results->cols[] = array(
 			'td' => '%get_slug_link({Obj})%',
 		);
 
-$Results->cols[] = array(
-			'th' => T_('Type'),
-			'th_class' => 'small',
-			'order' => 'slug_type',
-			'td' => '$slug_type$',
-			'td_class' => 'small',
-		);
-
 
 # TODO: dh> add action icon ("www") to view the target (i.e. the post in the public skin)
 
@@ -122,7 +114,13 @@ $Results->cols[] = array(
 function get_target_coll( $Slug )
 {
 	global $current_User;
-	$target = $Slug->get_object();
+	
+	if( $Slug->get('type') == 'item' && $Slug->itm_ID == 0 )
+	{
+		return 'Item ID is 0. This should never happen.';
+	}
+
+	$target = $Slug->get_object( false ); // don't halt on error
 	if( ! $target )
 	{ // e.g. for "help"
 		return '';
@@ -130,7 +128,8 @@ function get_target_coll( $Slug )
 
 	$allow_edit = false;
 	$allow_view = false;
-	switch( $Slug->get( 'type') )
+	$coll = '';
+	switch( $Slug->get('type') )
 	{
 		case 'item':
 			$allow_edit = $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $target );
@@ -138,23 +137,25 @@ function get_target_coll( $Slug )
 			break;
 		// Other types permission check write here
 	}
-	if( $allow_view )
-	{ // view object link
-		$coll = $Slug->get_link_to_object();
-	}
-	else
-	{ // Display just the title (If there is no object title need to change this)
-		$coll = $target->get( 'title' );
-	}
-
+	
 	if( $allow_edit )
 	{ // edit object link
-		$coll .= ' '.action_icon( sprintf( T_('Edit this %s...'), $Slug->get( 'type' ) ), 
-					'properties', $Slug->get_url_to_object( 'edit' ) );
+		$coll .= action_icon( sprintf( T_('Edit this %s...'), $Slug->get( 'type' ) ), 
+					'properties', $Slug->get_url_to_object( 'edit' ) ).' ';
 	}
 
 	// permanent link to object
-	$coll .= ' '.action_icon( T_('Permanent link to full entry'), 'permalink', $Slug->get_url_to_object( 'public_view' ) );
+	$coll .= action_icon( T_('Permanent link to full entry'), 'permalink', $Slug->get_url_to_object( 'public_view' ) );
+	
+	if( $allow_view )
+	{ // view object link
+		$coll .= ' '.$Slug->get_link_to_object();
+	}
+	else
+	{ // Display just the title (If there is no object title need to change this)
+		$coll .= ' '.$target->get( 'title' );
+	}
+
 	return $coll;//'<a href="'.$target->get_single_url().'">'.$target->dget('title').'</a>';
 }
 $Results->cols[] = array(
@@ -163,6 +164,14 @@ $Results->cols[] = array(
 			'order' => 'target_title',
 			'td' => '%get_target_coll({Obj})%',
 			'td_class' => 'small left',
+		);
+
+$Results->cols[] = array(
+			'th' => T_('Type'),
+			'th_class' => 'small shrinkwrap',
+			'order' => 'slug_type',
+			'td' => '$slug_type$',
+			'td_class' => 'small',
 		);
 
 if( $current_User->check_perm( 'slugs', 'edit' ) )
@@ -185,6 +194,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.10  2010/10/19 01:23:14  sam2kb
+ * Escape & quote SQL queries. Rearranged slugs list.
+ *
  * Revision 1.9  2010/07/28 08:15:36  efy-asimo
  * fix slug list view filtering
  *
