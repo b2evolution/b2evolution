@@ -150,12 +150,13 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
  * Get a Comment by ID. Exits if the requested comment does not exist!
  *
  * @param integer
+ * @param boolean
  * @return Comment
  */
-function & Comment_get_by_ID( $comment_ID )
+function & Comment_get_by_ID( $comment_ID, $halt_on_error = true )
 {
 	$CommentCache = & get_CommentCache();
-	return $CommentCache->get_by_ID( $comment_ID );
+	return $CommentCache->get_by_ID( $comment_ID, $halt_on_error );
 }
 
 
@@ -390,6 +391,9 @@ function add_ban_icons( $content )
 
 /*
  * $Log$
+ * Revision 1.18  2010/10/19 13:31:31  efy-asimo
+ * Ajax comment moderation - fix
+ *
  * Revision 1.17  2010/10/12 12:38:22  efy-asimo
  * Comment inline antispam - fix
  *

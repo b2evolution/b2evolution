@@ -173,23 +173,29 @@ switch( $action )
 		global $blog;
 
 		$blog = param( 'blogid', 'integer' );
-		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ) );
 		$moderation = param( 'moderation', 'string', NULL );
-		$redirect_to = param( 'redirect_to', 'string', NULL );
-		$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ), false );
+		if( $edited_Comment !== false )
+		{ // The comment still exists
+			$redirect_to = param( 'redirect_to', 'string', NULL );
+			$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
 
-		$status = param( 'status', 'string' );
-		$edited_Comment->set('status', $status );
-		$edited_Comment->dbupdate();
+			$status = param( 'status', 'string' );
+			$edited_Comment->set('status', $status );
+			$edited_Comment->dbupdate();
+
+			if( $moderation != NULL )
+			{
+				echo_comment( $edited_Comment->ID, rawurlencode( $redirect_to ), true );
+				exit(0);
+			}
+		}
 
 		if( $moderation == NULL )
 		{
 			get_comments_awaiting_moderation( $blog );
 		}
-		else
-		{
-			echo_comment( $edited_Comment->ID, rawurlencode( $redirect_to ), true );
-		}
+
 		exit(0);
 
 	case 'delete_comment':
@@ -200,10 +206,12 @@ switch( $action )
 		global $blog;
 
 		$blog = param( 'blogid', 'integer' );
-		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ) );
-		$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
-
-		$edited_Comment->dbdelete();
+		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ), false );
+		if( $edited_Comment !== false )
+		{ // The comment still exists
+			$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+			$edited_Comment->dbdelete();
+		}
 
 		get_comments_awaiting_moderation( $blog );
 		exit(0);
@@ -223,10 +231,12 @@ switch( $action )
 
 		foreach( $commentIds as $commentID )
 		{
-			$edited_Comment = & Comment_get_by_ID( $commentID );
-			$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
-
-			$edited_Comment->dbdelete();
+			$edited_Comment = & Comment_get_by_ID( $commentID, false );
+			if( $edited_Comment !== false )
+			{ // The comment still exists
+				$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+				$edited_Comment->dbdelete();
+			}
 		}
 
 		if( strlen($statuses) > 2 )
@@ -250,11 +260,13 @@ switch( $action )
 		global $blog;
 
 		$blog = param( 'blogid', 'integer' );
-		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ) );
-		$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
-
-		$edited_Comment->set( 'author_url', null );
-		$edited_Comment->dbupdate();
+		$edited_Comment = & Comment_get_by_ID( param( 'commentid', 'integer' ), false );
+		if( $edited_Comment !== false && $edited_Comment->author_url != NULL )
+		{ // The comment still exists
+			$current_User->check_perm( $edited_Comment->blogperm_name(), 'edit', true, $blog );
+			$edited_Comment->set( 'author_url', NULL );
+			$edited_Comment->dbupdate();
+		}
 
 		exit(0);
 
@@ -345,6 +357,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.61  2010/10/19 13:31:31  efy-asimo
+ * Ajax comment moderation - fix
+ *
  * Revision 1.60  2010/10/18 23:47:46  sam2kb
  * doc
  *
