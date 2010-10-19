@@ -330,16 +330,6 @@ while( $Item = & $ItemList->get_item() )
 
 
   		// ---------- comments ----------
-			?>
-			<div class="bFeedback">
-			<a id="comments"></a>
-			<h4>
-			<?php 
-				echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks');
-				$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', 'javascript:startRefreshComments('.$Item->ID.')' ).'</span> ';
-				echo $refresh_link;
-			?>:</h4>
-			<?php
 
 			$total_comments_number = generic_ctp_number( $Item->ID, 'total', 'total' );
 			$draft_comments_number = generic_ctp_number( $Item->ID, 'total', 'draft' );
@@ -379,6 +369,16 @@ while( $Item = & $ItemList->get_item() )
 
 			// display status filter
 			?>
+			<div class="bFeedback">
+			<a id="comments"></a>
+			<h4>
+			<?php 
+				echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks').' ('.$CommentList->total_rows.')';
+				$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', 'javascript:startRefreshComments('.$Item->ID.')' ).'</span> ';
+				echo $refresh_link;
+			?>:</h4>
+            
+            
 			<div class="tile"><label><?php echo T_('Show').':' ?></label></div>
 			<div class="tile">
 				<input type="radio" name="show_comments" value="draft" id="only_draft" class="radio" <?php if( $show_comments == 'draft' ) echo 'checked="checked" '?> />
@@ -468,6 +468,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.44  2010/10/19 01:42:16  sam2kb
+ * Added feedbacks counter
+ *
  * Revision 1.43  2010/09/29 14:53:50  efy-asimo
  * Item full view comment list - fix
  *
