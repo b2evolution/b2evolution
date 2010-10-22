@@ -258,6 +258,11 @@ else
 	$AdminUI->title = T_('Stats');
 }
 
+if( ( $tab3 == 'keywords' ) || ( $tab == 'goals' && $tab3 == 'hits' ) )
+{ // Load the data picker style for _stats_search_keywords.view.php and _stats_goalhits.view.php
+	require_css( 'ui.datepicker.css' );
+}
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -363,6 +368,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2010/10/22 15:09:57  efy-asimo
+ * Remove autoloading datepciker css, instead load before every usage, also remove jquery-ui.css load
+ *
  * Revision 1.24  2010/02/08 17:53:55  efy-yury
  * copyright 2009 -> 2010
  *

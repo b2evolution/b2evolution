@@ -59,7 +59,8 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 	add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 
  	require_js( '#jqueryUI#' );
- 	require_css( 'jquery/smoothness/jquery-ui.css' );
+ 	// asimo> This was permanently removed, because we didn't find any usage of this.
+ 	// require_css( 'jquery/smoothness/jquery-ui.css' );
 
 	require_js( 'form_extensions.js'); // script allowing to check and uncheck all boxes in forms -- TODO: jQueryfy
 
@@ -260,18 +261,10 @@ div.skin_wrapper_loggedin {
 			dayNamesMin[i] = dayNamesMin[i].substr(0, 2)
 
 		jQuery(".form_date_input").datepicker({
-			beforeShow: function(){ // Dynamically add stylesheet just before display
-				jQuery(document.createElement("link"))
-					.attr({type: "text/css", href: "'.$rsc_url.'css/ui.datepicker.css", rel: "stylesheet", media: "screen"})
-					.appendTo(docHead)
-			},
 			dateFormat: "'.$datefmt.'",
 			monthNames: monthNames,
 			dayNamesMin: dayNamesMin,
-			firstDay: '.locale_startofweek().',
-			onClose: function(){ // Dynamically removing stylesheet, prevents duplicates
-				jQuery(docHead).find(\'link[href="'.$rsc_url.'css/ui.datepicker.css"]\').remove();
-			}
+			firstDay: '.locale_startofweek().'
 		})
 	  })' );
 
@@ -286,6 +279,9 @@ div.skin_wrapper_loggedin {
 <?php
 /*
  * $Log$
+ * Revision 1.36  2010/10/22 15:09:57  efy-asimo
+ * Remove autoloading datepciker css, instead load before every usage, also remove jquery-ui.css load
+ *
  * Revision 1.35  2010/06/15 20:17:55  blueyed
  * Load jQuery UI css.
  *

@@ -260,6 +260,10 @@ $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of kee
 $AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=crontab' );
 $AdminUI->breadcrumbpath_add( T_('Scheduler'), '?ctrl=crontab' );
 
+if( ( $action == 'new' ) || ( $action == 'create' ) )
+{ // load date picker style for cronjob.form.php
+	require_css( 'ui.datepicker.css' );
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -296,6 +300,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2010/10/22 15:09:57  efy-asimo
+ * Remove autoloading datepciker css, instead load before every usage, also remove jquery-ui.css load
+ *
  * Revision 1.12  2010/05/14 07:40:15  efy-asimo
  * prune page cache - task
  *

@@ -312,6 +312,11 @@ switch( $action )
 
 $AdminUI->set_path( 'items', 'comments' );
 
+if( ( $action == 'edit' ) || ( $action == 'update_publish' ) || ( $action == 'update' ) )
+{ // load date picker style for _comment.form.php
+	require_css( 'ui.datepicker.css' );
+}
+
 require_css( 'rsc/css/blog_base.css', true );
 require_js( 'communication.js' ); // auto requires jQuery
 
@@ -382,6 +387,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.36  2010/10/22 15:09:57  efy-asimo
+ * Remove autoloading datepciker css, instead load before every usage, also remove jquery-ui.css load
+ *
  * Revision 1.35  2010/09/20 14:26:23  efy-asimo
  * doc - merged from v-4-0
  *

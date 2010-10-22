@@ -1171,6 +1171,8 @@ if( !empty($tab) )
 	$AdminUI->append_path_level( $tab );
 }
 
+// Load the date picker style for _item_simple.form.php and _item_expert.form.php
+require_css( 'ui.datepicker.css' );
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
 require_css( $rsc_url.'css/blog_base.css' );
 require_js( 'communication.js' ); // auto requires jQuery
@@ -1384,6 +1386,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.105  2010/10/22 15:09:57  efy-asimo
+ * Remove autoloading datepciker css, instead load before every usage, also remove jquery-ui.css load
+ *
  * Revision 1.104  2010/10/19 02:01:23  fplanque
  * MFB
  *
