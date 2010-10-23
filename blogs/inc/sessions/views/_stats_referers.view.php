@@ -91,7 +91,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 	 */
 	function referer_ban_link( $uri )
 	{
-		return '<a href="?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain( $uri ) )
+		return '<a href="?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain( $uri ) ).'&amp;'.url_crumb('antispam')
 				.'" title="'.T_('Ban this domain!').'">'.get_icon('ban').'</a>';
 	}
 	$Results->cols[] = array(
@@ -183,7 +183,7 @@ if( count( $res_stats ) )
 			<?php
 			if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			{ // user can ban:
-				echo '<td class="center">'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'ctrl,action,keyword', 'ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain($row_stats['hit_referer']) ) ) ).'</td>'; // we use hit_referer, because unlike dom_name it includes subdomains (especially 'www.')
+				echo '<td class="center">'.action_icon( T_('Ban this domain!'), 'ban', regenerate_url( 'ctrl,action,keyword', 'ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( get_ban_domain($row_stats['hit_referer']) ).'&amp;'.url_crumb('antispam') ) ).'</td>'; // we use hit_referer, because unlike dom_name it includes subdomains (especially 'www.')
 			}
 			?>
 			<td class="right"<?php
@@ -210,6 +210,9 @@ if( count( $res_stats ) )
 
 /*
  * $Log$
+ * Revision 1.16  2010/10/23 08:27:17  sam2kb
+ * Added missing antispam crumb
+ *
  * Revision 1.15  2010/02/08 17:53:55  efy-yury
  * copyright 2009 -> 2010
  *
