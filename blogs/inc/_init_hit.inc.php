@@ -86,7 +86,11 @@ list($ReqPath,$ReqURI) = get_ReqURI();
  *
  * @global string
  */
-$ReqHost = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://').$_SERVER['HTTP_HOST'];
+$ReqHost = '';
+if( !empty($_SERVER['HTTP_HOST']) )
+{
+	$ReqHost = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://').$_SERVER['HTTP_HOST'];
+}
 
 
 $ReqURL = $ReqHost.$ReqURI;
@@ -229,6 +233,9 @@ $Timer->pause( '_init_hit' );
 
 /*
  * $Log$
+ * Revision 1.7  2010/10/24 02:52:09  sam2kb
+ * Check if $_SERVER['HTTP_HOST'] is set before using it
+ *
  * Revision 1.6  2010/07/26 06:52:15  efy-asimo
  * MFB v-4-0
  *
