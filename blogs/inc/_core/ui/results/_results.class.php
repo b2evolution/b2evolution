@@ -1230,8 +1230,8 @@ class Results extends Table
 			}
 		}
 
-		$col_sort_values['order_asc'] = regenerate_url( $this->order_param, $this->order_param.'='.$order_asc );
-		$col_sort_values['order_desc'] = regenerate_url( $this->order_param, $this->order_param.'='.$order_desc );
+		$col_sort_values['order_asc'] = regenerate_url( $this->order_param, $this->order_param.'='.$order_asc, $this->params['page_url'] );
+		$col_sort_values['order_desc'] = regenerate_url( $this->order_param, $this->order_param.'='.$order_desc, $this->params['page_url'] );
 
 
 		if( !$col_sort_values['current_order'] && isset( $this->cols[$col_idx]['default_dir'] ) )
@@ -1836,6 +1836,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.34  2010/10/25 00:43:15  sam2kb
+ * Point order links to "page_url", similar to prev/next links
+ *
  * Revision 1.33  2010/04/27 20:22:06  blueyed
  * doc
  *
