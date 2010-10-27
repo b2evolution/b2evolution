@@ -92,6 +92,9 @@ switch( $action )
 		if( $maintenance_mode = param( 'bk_maintenance_mode', 'boolean' ) )
 		{	// Enable maintenance mode
 			$success = switch_maintenance_mode( true, T_( 'System backup is in progress. Please reload this page in a few minutes.' ) );
+			
+			// Make sure we exit the maintenance mode if PHP dies
+			register_shutdown_function( 'switch_maintenance_mode', false );
 		}
 
 		if( $success )
@@ -117,6 +120,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.8  2010/10/27 23:55:40  sam2kb
+ * Register shutdown function to exit the maintenance mode if PHP dies
+ *
  * Revision 1.7  2010/01/30 18:55:32  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *
