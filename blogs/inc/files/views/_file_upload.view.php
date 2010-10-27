@@ -40,7 +40,7 @@ global $Settings;
 
 global $UserSettings;
 
-global $upload_quickmode, $failedFiles, $ads_list_path, $uploadwithproperties, $renamedMessages;
+global $upload_quickmode, $failedFiles, $ads_list_path, $uploadwithproperties, $renamedMessages, $renamedFiles;
 
 global $fm_FileRoot;
 
@@ -318,9 +318,9 @@ global $fm_FileRoot;
 							?>
 							<input type="radio" name="<?php echo 'Renamed_'.$lKey ?>" value="Yes" id=" <?php echo 'Yes_'.$lKey ?>"/>
 							<label for="<?php echo 'Yes_'.$lKey ?>">
-							<?php echo sprintf( T_("Replace the old version %s with the new version %s"), $renamedMessages[$lKey]['oldThumb'], $renamedMessages[$lKey]['newThumb'] ) ?></label><br />
+							<?php echo sprintf( T_("Replace the old version %s with the new version %s and keep old version as %s."), $renamedMessages[$lKey]['oldThumb'], $renamedMessages[$lKey]['newThumb'], $renamedFiles[$lKey]['newName'] ) ?></label><br />
 							<input type="radio" name="<?php echo 'Renamed_'.$lKey ?>" value="No" id=" <?php echo 'No_'.$lKey ?>"  checked="checked"/>
-							<label for="<?php echo 'Yes_'.$lKey ?>"><?php echo T_("Don't touch the old version. Keep 2 separate versions.") ?> </label><br />
+							<label for="<?php echo 'Yes_'.$lKey ?>"><?php echo sprintf( T_("Don't touch the old version and keep the new version as %s."), $renamedFiles[$lKey]['newName'] ) ?> </label><br />
 							<?php
 						}
 						if( $uploadwithproperties )
@@ -416,6 +416,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.20  2010/10/27 14:56:42  efy-asimo
+ * when replacing a file, keep a backup
+ *
  * Revision 1.19  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

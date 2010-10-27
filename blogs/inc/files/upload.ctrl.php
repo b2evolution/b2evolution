@@ -326,26 +326,45 @@ if( ! empty($renamedFiles) )
 			$FileCache = & get_FileCache();
 			$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$renamedFiles[$rKey]['newName'], true );
 			$oldFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$renamedFiles[$rKey]['oldName'], true );
+			$new_filename = $newFile->get_name();
+			$old_filename = $oldFile->get_name();
+			$dir = $newFile->get_dir();
 			$oldFile->rm_cache();
 			$newFile->rm_cache();
-			if( @unlink( $oldFile->get_full_path() ) )
+			$error_message = '';
+
+			// rename new uploaded file to temp file name
+			$index = 0;
+			$temp_filename = 'temp'.$index.'-'.$new_filename;
+			while( file_exists( $dir.$temp_filename ) )
+			{ // find an unused filename
+				$index++;
+				$temp_filename = 'temp'.$index.'-'.$new_filename;
+			}
+
+			// @rename will overwrite a file with the same name if exists. In this case it shouldn't be a problem.
+			if( ! @rename( $newFile->get_full_path(), $dir.$temp_filename ) )
+			{ // rename new file to temp file name failed
+				$error_message = $Messages->add( sprintf( T_('The new file could not be renamed to %s'), $temp_filename ), 'error' );
+			}
+
+			if( empty( $error_message ) && ( ! @rename( $oldFile->get_full_path(), $dir.$new_filename ) ) )
+			{ // rename original file to the new file name failed
+				$error_message = sprintf( T_( "The original file could not be renamed to %s. The new file is now named %s." ), $new_filename, $temp_filename );
+			}
+
+			if( empty( $error_message ) && ( ! @rename( $dir.$temp_filename, $dir.$old_filename ) ) )
+			{ // rename new file to the original file name failed
+				$error_message = sprintf( T_( "The new file could not be renamed to %s. It is now named %s." ), $old_filename, $temp_filename );
+			}
+
+			if( empty( $error_message ) )
 			{
-				if( ! @rename( $newFile->get_full_path(), $oldFile->get_full_path() ) )// rename_to($oldFile->get_name());
-				{
-					$Messages->add( T_('Couldn\'t replace the old version'), 'error' );
-				}
-				else
-				{ // We have to delete the newly created file from the database. We delete the new object, so the old file attributes will stay in place. 
-					// The new file is a garbage in the database, because no file exists on the hard drive with this title, it was renamed.
-					// Note: Maybe would be a better solution, to do not insert in the database, but right now it's easier this way.
-					// The file was inserted the database right now, so deleting the file must process without errors (but it has 0.5% risk)  
-					$newFile->dbdelete();
-				}
-				$Messages->add( T_('The old version has been replaced!'), 'success' );
+				$Messages->add( sprintf( T_('%s has been replaced with the new version!'), $old_filename ), 'success' );
 			}
 			else
 			{
-				$Messages->add( T_('Couldn\'t replace the old version'), 'error' );
+				$Messages->add( $error_message, 'error' );
 			}
 		}
 	}
@@ -683,6 +702,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.40  2010/10/27 14:56:42  efy-asimo
+ * when replacing a file, keep a backup
+ *
  * Revision 1.39  2010/09/16 14:12:24  efy-asimo
  * New avatar upload
  *
