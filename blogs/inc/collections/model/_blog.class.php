@@ -566,24 +566,29 @@ class Blog extends DataObject
 			}
 
 
-			if( param( 'blog_urlname',   'string', NULL ) !== NULL )
+			if( ($blog_urlname = param( 'blog_urlname', 'string', NULL )) !== NULL )
 			{	// check urlname
 				if( param_check_not_empty( 'blog_urlname', T_('You must provide an URL blog name!') ) )
 				{
-					$this->set_from_Request( 'urlname' );
-
-					if( ! preg_match( '|^[A-Za-z0-9\-]+$|', $this->urlname ) )
+					if( ! preg_match( '|^[A-Za-z0-9\-]+$|', $blog_urlname ) )
 					{
-						param_error( 'blog_urlname', T_('The url name is invalid.') );
+						param_error( 'blog_urlname', sprintf( T_('The url name %s is invalid.'), "&laquo;$blog_urlname&raquo;" ) );
+						$blog_urlname = NULL;
 					}
 
-					if( $DB->get_var( 'SELECT COUNT(*)
+					if( isset($blog_urlname) && $DB->get_var( 'SELECT COUNT(*)
 															 FROM T_blogs
-															WHERE blog_urlname = '.$DB->quote($this->get( 'urlname' )).'
+															WHERE blog_urlname = '.$DB->quote($blog_urlname).'
 															  AND blog_ID <> '.$this->ID
 															) )
 					{ // urlname is already in use
-						param_error( 'blog_urlname', T_('This URL name is already in use by another blog. Please choose another name.') );
+						param_error( 'blog_urlname', sprintf( T_('The URL name %s is already in use by another blog. Please choose another name.'), "&laquo;$blog_urlname&raquo;" ) );
+						$blog_urlname = NULL;
+					}
+
+					if( isset($blog_urlname) )
+					{
+						$this->set_from_Request( 'urlname' );
 					}
 				}
 			}
@@ -2342,6 +2347,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.123  2010/11/02 02:30:32  sam2kb
+ * Do not set invalid blog_urlname, otherwise evobar displays broken blog links
+ *
  * Revision 1.122  2010/10/19 02:00:53  fplanque
  * MFB
  *
