@@ -1229,6 +1229,9 @@ class Item extends ItemLight
 		$content_parts = explode( '<!--more-->', $content_page );
 		// echo ' Parts:'.count($content_parts);
 
+		// Balance HTML tags
+		$content_parts = array_map( 'balance_tags', $content_parts );
+
 		return $content_parts;
 	}
 
@@ -4522,6 +4525,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.211  2010/11/02 02:57:54  sam2kb
+ * Balance HTML tags after we split post by "<!--more-->"
+ *
  * Revision 1.210  2010/11/02 02:37:48  sam2kb
  * Balance HTML tags after we split post pages
  *
