@@ -1075,6 +1075,9 @@ class Item extends ItemLight
 			// SPLIT PAGES:
 			$this->content_pages[$format] = explode( '<!--nextpage-->', $this->get_prerendered_content($format) );
 
+			// Balance HTML tags
+			$this->content_pages[$format] = array_map( 'balance_tags', $this->content_pages[$format] );
+
 			$this->pages = count( $this->content_pages[$format] );
 			// echo ' Pages:'.$this->pages;
 		}
@@ -4519,6 +4522,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.210  2010/11/02 02:37:48  sam2kb
+ * Balance HTML tags after we split post pages
+ *
  * Revision 1.209  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *
