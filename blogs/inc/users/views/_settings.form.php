@@ -23,7 +23,7 @@ $Form->begin_form( 'fform', '' );
 
 $Form->begin_fieldset( T_('User latitude') );
 
-	$Form->checkbox_input( 'allow_avatars', $Settings->get('allow_avatars'), T_('Allow avatars'), array( 'note'=>T_('Allow users to upload avatars.') ) );
+	$Form->checkbox_input( 'allow_avatars', $Settings->get( 'allow_avatars', true ), T_('Allow avatars'), array( 'note'=>T_('Allow users to upload avatars.') ) );
 
 	$Form->radio( 'uset_nickname_editing', $Settings->get( 'nickname_editing' ), array(
 					array( 'edited-user', T_('Can be edited by user') ),
@@ -52,6 +52,13 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.10  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.9  2010/05/07 08:07:14  efy-asimo
  * Permissions check update (User tab, Global Settings tab) - bugfix
  *

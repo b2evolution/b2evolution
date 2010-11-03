@@ -55,6 +55,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Dependencies
  */
 load_funcs('antispam/model/_antispam.funcs.php');
+
+// @todo sam2kb> Move core functions get_admin_skins, get_filenames, cleardir_r, rmdir_r and some other
+// to a separate file, and split files_Module from _core_Module
 load_funcs('files/model/_file.funcs.php');
 
 
@@ -1380,7 +1383,7 @@ function user_exists( $login )
 	$SQL = new SQL();
 	$SQL->SELECT( 'COUNT(*)' );
 	$SQL->FROM( 'T_users' );
-	$SQL->WHERE( 'user_login = '.$DB->quote( $login ) );
+	$SQL->WHERE( 'user_login = "'.$DB->escape($login).'"' );
 
 	$var = $DB->get_var( $SQL->get() );
 	return $var > 0 ? true : false; // PHP4 compatibility
@@ -4089,6 +4092,13 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.246  2010/11/03 19:44:14  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.245  2010/10/19 13:58:48  efy-asimo
  * antispam in comment text - fix
  *

@@ -189,10 +189,10 @@ $Form->begin_form( '', '', $params );
 
 
 	// ####################### ATTACHMENTS/LINKS #########################
-
-	attachment_iframe( $Form, $creating, $edited_Item, $Blog );
-
-
+	if( isset($GLOBALS['files_Module']) )
+	{
+		attachment_iframe( $Form, $creating, $edited_Item, $Blog );
+	}
 	// ############################ ADVANCED #############################
 
 	$Form->begin_fieldset( T_('Meta info').get_manual_link('post_simple_meta_fieldset'), array( 'id' => 'itemform_adv_props' ) );
@@ -285,6 +285,13 @@ echo_autocomplete_tags();
 
 /*
  * $Log$
+ * Revision 1.41  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.40  2010/06/15 20:12:51  blueyed
  * Autocompletion for tags in item edit forms, via echo_autocomplete_tags
  *

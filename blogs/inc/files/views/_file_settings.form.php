@@ -182,7 +182,7 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('File creation options'), array( 'id' => 'ffset_filecreate', 'class' => 'additional_file_settings' ) );
 	$Form->checkbox( 'fm_enable_create_dir', $Settings->get('fm_enable_create_dir'), T_('Enable creation of folders'), T_('Check to enable creation of directories.' ) );
 	$Form->checkbox( 'fm_enable_create_file', $Settings->get('fm_enable_create_file'), T_('Enable creation of files'), T_('Check to enable creation of files.' ) );
-	$Form->checkbox_input( 'upload_enabled', $Settings->get('upload_enabled'), T_('Enable upload of files'), array(
+	$Form->checkbox_input( 'upload_enabled', $Settings->get( 'upload_enabled', true ), T_('Enable upload of files'), array(
 		'note' => T_('Check to allow uploading files in general.' ), 'onclick' => JS_showhide_ffield_on_this('upload_maxkb') ) );
 	$Form->text_input( 'upload_maxkb', $Settings->get('upload_maxkb'), 6, T_('Maximum upload filesize'), sprintf( /* TRANS: first %s is php.ini limit, second is setting/var name, third is file name, 4th is limit in b2evo conf */ T_('KB. This cannot be higher than your PHP/Webserver setting (PHP: %s) and the limit of %s (in %s), which is currently %s!'), ini_get('upload_max_filesize').'/'.ini_get('post_max_size').' (upload_max_filesize/post_max_size)', '$upload_maxmaxkb', '/conf/_advanced.php', $upload_maxmaxkb.' '.T_('KB') ), array( 'maxlength'=>7, 'required'=>true ) );
 	// Javascript to init hidden/shown state:
@@ -247,6 +247,13 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 /*
  * $Log$
+ * Revision 1.16  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.15  2010/03/28 17:08:08  fplanque
  * minor
  *

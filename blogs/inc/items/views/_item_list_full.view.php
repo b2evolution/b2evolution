@@ -283,8 +283,11 @@ while( $Item = & $ItemList->get_item() )
 					'class'     => 'ActionButton'
 				) );
 
-			echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_item&amp;item_ID='.$Item->ID )
+			if( isset($GLOBALS['files_Module']) )
+			{
+				echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_item&amp;item_ID='.$Item->ID )
 							.'" class="ActionButton">'.get_icon( 'folder', 'imgtag' ).' '.T_('Files...').'</a>';
+			}
 
 			// Display publish NOW button if current user has the rights:
 			$Item->publish_link( ' ', ' ', '#', '#', 'PublishButton');
@@ -315,21 +318,22 @@ while( $Item = & $ItemList->get_item() )
 		if( $action == 'view' )
 		{ // We are looking at a single post, include files and comments:
 
-			// Files:
-			echo '<div class="bFeedback">';	// TODO
+			if( isset($GLOBALS['files_Module']) )
+			{	// Files:
+				echo '<div class="bFeedback">';	// TODO
+	
+				/**
+				 * Needed by file display funcs
+				 * @var Item
+				 */
+				global $edited_Item;
+				$edited_Item = $Item;	// COPY or it will be out of scope for display funcs
+				require dirname(__FILE__).'/inc/_item_links.inc.php';
+				echo '</div>';
+			}
 
-			/**
-			 * Needed by file display funcs
-			 * @var Item
-			 */
-			global $edited_Item;
-			$edited_Item = $Item;	// COPY or it will be out of scope for display funcs
-			require dirname(__FILE__).'/inc/_item_links.inc.php';
-			echo '</div>';
 
-
-
-  		// ---------- comments ----------
+  			// ---------- comments ----------
 
 			$total_comments_number = generic_ctp_number( $Item->ID, 'total', 'total' );
 			$draft_comments_number = generic_ctp_number( $Item->ID, 'total', 'draft' );
@@ -468,6 +472,13 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.45  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.44  2010/10/19 01:42:16  sam2kb
  * Added feedbacks counter
  *

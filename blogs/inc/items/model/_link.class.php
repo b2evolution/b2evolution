@@ -89,10 +89,17 @@ class Link extends DataObject
 	{
 		if( ! isset($this->File) )
 		{
-			$FileCache = & get_FileCache();
-			// fp> do not halt on error. For some reason (ahem bug) a file can disappear and if we fail here then we won't be
-			// able to delete the link
-			$this->File = & $FileCache->get_by_ID( $this->file_ID, false, false );
+			if( isset($GLOBALS['files_Module']) )
+			{
+				$FileCache = & get_FileCache();
+				// fp> do not halt on error. For some reason (ahem bug) a file can disappear and if we fail here then we won't be
+				// able to delete the link
+				$this->File = & $FileCache->get_by_ID( $this->file_ID, false, false );
+			}
+			else
+			{
+				$this->File = NULL;
+			}
 		}
 		return $this->File;
 	}
@@ -118,6 +125,13 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.11  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.10  2010/02/08 17:53:16  efy-yury
  * copyright 2009 -> 2010
  *

@@ -193,16 +193,17 @@ elseif( !empty($edited_Item) )
 	// This is useful when clicking "attach files" from the post edit screen: it takes you to the root where you have
 	// already attached files from. Otherwise the next block below will default to the Blog's fileroot.
 	// Get list of attached files:
-	$FileList = $edited_Item->get_attachment_FileList( 1 );
-	// Get first file:
-	/**
-	 * @var File
-	 */
-	$File = & $FileList->get_next();
-	if( !empty( $File ) )
-	{	// Obtain and use file root of first file:
-		$fm_FileRoot = & $File->get_FileRoot();
-		$path = dirname( $File->get_rdfs_rel_path() ).'/';
+	if( $FileList = $edited_Item->get_attachment_FileList( 1 ) )
+	{	// Get first file:
+		/**
+		 * @var File
+		 */
+		$File = & $FileList->get_next();
+		if( !empty( $File ) )
+		{	// Obtain and use file root of first file:
+			$fm_FileRoot = & $File->get_FileRoot();
+			$path = dirname( $File->get_rdfs_rel_path() ).'/';
+		}
 	}
 }
 
@@ -1764,6 +1765,13 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.72  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.71  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

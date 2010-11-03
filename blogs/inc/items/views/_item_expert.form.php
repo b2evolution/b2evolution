@@ -192,10 +192,10 @@ $Form->begin_form( '', '', $params );
 
 
 	// ####################### ATTACHMENTS/LINKS #########################
-
-	attachment_iframe( $Form, $creating, $edited_Item, $Blog );
-
-
+	if( isset($GLOBALS['files_Module']) )
+	{
+		attachment_iframe( $Form, $creating, $edited_Item, $Blog );
+	}
 	// ############################ ADVANCED #############################
 
 	$Form->begin_fieldset( T_('Advanced properties').get_manual_link('post_advanced_properties_fieldset'), array( 'id' => 'itemform_adv_props' ) );
@@ -447,6 +447,13 @@ echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.72  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.71  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

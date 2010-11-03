@@ -495,6 +495,8 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 	global $current_User;
 	global $Settings;
 
+	if( ! isset($GLOBALS['files_Module']) ) return;
+
 	$fieldset_title = T_('Images &amp; Attachments').get_manual_link('post_attachments_fieldset');
 
 	if( $creating )
@@ -1945,6 +1947,13 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 
 /*
  * $Log$
+ * Revision 1.121  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.120  2010/10/19 02:00:53  fplanque
  * MFB
  *

@@ -1950,7 +1950,9 @@ class User extends DataObject
 
 	function has_avatar()
 	{
-		return ! empty( $this->avatar_file_ID );
+		global $Settings;
+
+		return ( !empty( $this->avatar_file_ID ) && $Settings->get('allow_avatars') );
 	}
 
 
@@ -1961,11 +1963,9 @@ class User extends DataObject
 	 */
 	function & get_avatar_File()
 	{
-		if( empty($this->avatar_file_ID) )
-		{
-			$File = NULL;
-		}
-		else
+		$File = NULL;
+
+		if( $this->has_avatar() )
 		{
 			$FileCache = & get_FileCache();
 
@@ -2086,6 +2086,13 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.85  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.84  2010/10/19 02:00:53  fplanque
  * MFB
  *

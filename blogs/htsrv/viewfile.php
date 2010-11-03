@@ -41,6 +41,11 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'/_main.inc.php';
 
 
+if( ! isset($GLOBALS['files_Module']) )
+{
+	debug_die( 'Files module is disabled or missing!' );
+}
+
 // Check permission (#1):
 if( ! isset($current_User) )
 {
@@ -259,6 +264,13 @@ switch( $viewtype )
 <?php
 /*
  * $Log$
+ * Revision 1.31  2010/11/03 19:44:14  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.30  2010/04/22 18:32:14  blueyed
  * viewfile.php: Add content-type-foo classes, namely content-type-image and content-type-text
  *

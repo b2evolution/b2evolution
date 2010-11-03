@@ -25,7 +25,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $dispatcher;
-global $current_User;
+global $current_User, $Settings;
 global $unread_messages_count;
 global $read_unread_recipients;
 
@@ -89,28 +89,33 @@ $Results->filter_area = array(
 		)
 	);
 
-/**
- * Get user avatar
- *
- * @param integer user ID
- * @return string
- */
-function user_avatar( $user_ID )
+
+if( $Settings->get('allow_avatars') )
 {
-	$UserCache = & get_UserCache();
-	$User = & $UserCache->get_by_ID( $user_ID, false, false );
-	if( $User )
+	/**
+	 * Get user avatar
+	 *
+	 * @param integer user ID
+	 * @return string
+	 */
+	function user_avatar( $user_ID )
 	{
-		return $User->get_avatar_imgtag();
+		$UserCache = & get_UserCache();
+		$User = & $UserCache->get_by_ID( $user_ID, false, false );
+		if( $User )
+		{
+			return $User->get_avatar_imgtag();
+		}
+		return '';
 	}
-	return '';
+	$Results->cols[] = array(
+						'th' => T_('Avatar'),
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
+						'td' => '%user_avatar( #mct_to_user_ID# )%',
+						);
 }
-$Results->cols[] = array(
-					'th' => T_('Avatar'),
-					'th_class' => 'shrinkwrap',
-					'td_class' => 'shrinkwrap',
-					'td' => '%user_avatar( #mct_to_user_ID# )%',
-					);
+
 
 $Results->cols[] = array(
 					'th' => T_('Login'),
@@ -220,6 +225,13 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.11  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.10  2010/01/30 18:55:32  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

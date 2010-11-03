@@ -182,6 +182,8 @@ $Results->filter_area = array(
  */
 function user_avatar( $user_ID, $user_avatar_file_ID )
 {
+	if( ! $GLOBALS['Settings']->get('allow_avatars') ) return '';
+
 	$FileCache = & get_FileCache();
 
 	if( ! $File = & $FileCache->get_by_ID( $user_avatar_file_ID, false, false ) )
@@ -208,7 +210,7 @@ function author( $user_ID, $user_login, $user_first_name, $user_last_name, $user
 
 	if( !empty( $avatar ) )
 	{
-		$author = $avatar.'<br/>'.$author;
+		$author = $avatar.'<br />'.$author;
 	}
 
 	$full_name = '';
@@ -225,16 +227,16 @@ function author( $user_ID, $user_login, $user_first_name, $user_last_name, $user
 
 	if( !empty( $full_name ) )
 	{
-		$author .= '<br/>'.$full_name;
+		$author .= '<br />'.$full_name;
 	}
 
-	return $author.'<br/><span class="note">'.mysql2localedatetime( $datetime ).'</span>';
+	return $author.'<br /><span class="note">'.mysql2localedatetime( $datetime ).'</span>';
 }
 $Results->cols[] = array(
 		'th' => T_('Author'),
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'left top',
-		'td' => '%author( #msg_user_ID#,  #msg_author#, #msg_firstname#, #msg_lastname#, #msg_user_avatar_ID#, #msg_datetime#)%'
+		'td' => '%author( #msg_user_ID#, #msg_author#, #msg_firstname#, #msg_lastname#, #msg_user_avatar_ID#, #msg_datetime#)%'
 	);
 
 /*
@@ -290,6 +292,13 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.28  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.27  2010/01/30 18:55:32  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

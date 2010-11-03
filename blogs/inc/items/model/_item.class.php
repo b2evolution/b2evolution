@@ -1864,7 +1864,10 @@ class Item extends ItemLight
 			), $params );
 
 		// Get list of attached files
-		$FileList = $this->get_attachment_FileList( $params['limit'], $params['restrict_to_image_position'] );
+		if( ! $FileList = $this->get_attachment_FileList( $params['limit'], $params['restrict_to_image_position'] ) )
+		{
+			return '';
+		}
 
 		$r = '';
 		/**
@@ -1942,7 +1945,10 @@ class Item extends ItemLight
 			), $params );
 
 		// Get list of attached files
-		$FileList = $this->get_attachment_FileList( $params['limit'], $params['restrict_to_image_position'] );
+		if( ! $FileList = $this->get_attachment_FileList( $params['limit'], $params['restrict_to_image_position'] ) )
+		{
+			return '';
+		}
 
 		load_funcs('files/model/_file.funcs.php');
 
@@ -2008,10 +2014,15 @@ class Item extends ItemLight
 	 * @param integer
 	 * @param string Restrict to files/images linked to a specific position. Position can be 'teaser'|'aftermore'
 	 * @param string
-	 * @return DataObjectList2
+	 * @return DataObjectList2 on success or NULL if no linked files found
 	 */
 	function get_attachment_FileList( $limit = 1000, $position = NULL, $order = 'link_ID' )
 	{
+		if( ! isset($GLOBALS['files_Module']) )
+		{
+			return NULL;
+		}
+
 		load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectList2' );
 
 		$FileCache = & get_FileCache();
@@ -2034,6 +2045,11 @@ class Item extends ItemLight
 		$FileList->sql = $SQL->get();
 
 		$FileList->query( false, false, false, 'get_attachment_FileList' );
+
+		if( $FileList->result_num_rows == 0 )
+		{	// Nothing found
+			$FileList = NULL;
+		}
 
 		return $FileList;
 	}
@@ -4525,6 +4541,13 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.212  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.211  2010/11/02 02:57:54  sam2kb
  * Balance HTML tags after we split post by "<!--more-->"
  *

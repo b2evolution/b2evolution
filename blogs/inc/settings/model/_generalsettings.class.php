@@ -197,12 +197,49 @@ class GeneralSettings extends AbstractSettings
 		return $public_key_salt;
 	}
 
+
+	/**
+	 * Get a member param by its name
+	 *
+	 * @param mixed Name of parameter
+	 * @param boolean true to return param's real value
+	 * @return mixed Value of parameter
+	 */
+	function get( $parname, $real_value = false )
+	{
+		if( $real_value )
+		{
+			return parent::get( $parname );
+		}
+		
+		switch($parname)
+		{
+			case 'allow_avatars':
+				return ( parent::get( $parname ) && isset($GLOBALS['files_Module']) );
+				break;
+
+			case 'upload_enabled':
+				return ( parent::get( $parname ) && isset($GLOBALS['files_Module']) );
+				break;
+
+			default:
+				return parent::get( $parname );
+		}
+	}
+
 }
 
 
 
 /*
  * $Log$
+ * Revision 1.32  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.31  2010/05/22 12:22:49  efy-asimo
  * move $allow_cross_posting in the backoffice
  *

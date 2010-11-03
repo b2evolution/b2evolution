@@ -376,7 +376,10 @@ switch( $user_tab )
 		$AdminUI->breadcrumbpath_add( T_('Identity'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 		break;
 	case 'avatar':
-		$AdminUI->breadcrumbpath_add( T_('Avatar'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+		if( isset($GLOBALS['files_Module']) )
+		{
+			$AdminUI->breadcrumbpath_add( T_('Avatar'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+		}
 		break;
 	case 'password':
 		$AdminUI->breadcrumbpath_add( T_('Change password'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
@@ -438,6 +441,13 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.18  2010/10/05 12:53:46  efy-asimo
  * Move twitter_unlink into twitter_plugin
  *

@@ -115,6 +115,12 @@ class WidgetCache extends DataObjectCache
 
 		if( $row->wi_type == 'core' )
 		{
+			if( ! isset($GLOBALS['files_Module']) && in_array( $row->wi_code, array('coll_media_index', 'coll_avatar') ) )
+			{	// Disable widgets dependent on files_Module
+				$r = NULL;
+				return $r;
+			}
+
 			if( ! file_exists( $inc_path.'widgets/widgets/_'.$row->wi_code.'.widget.php' ) )
 			{	// For some reason, that widget doesn't seem to exist... (any more?)
 				// echo "Widget $row->wi_code could not be loaded! ";
@@ -154,6 +160,13 @@ class WidgetCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.12  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.11  2010/02/26 21:27:37  fplanque
  * rollback - did not seem right
  *

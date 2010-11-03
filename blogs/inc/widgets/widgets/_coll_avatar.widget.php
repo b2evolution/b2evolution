@@ -75,20 +75,13 @@ class coll_avatar_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $thumbnail_sizes;
-
-		$options = array();
-		// PHP 4 replacement for array_combine():
-		foreach( array_keys( $thumbnail_sizes ) as $thumb_size )
-		{
-			$options[$thumb_size] = $thumb_size;
-		}
+		load_funcs( 'files/model/_image.funcs.php' );
 
 		$r = array_merge( array(
 			'thumb_size' => array(
 					'type' => 'select',
 					'label' => T_('Image size'),
-					'options' => $options,
+					'options' => get_available_thumb_sizes(),
 					'note' => sprintf( /* TRANS: %s is a config variable name */ T_('List of available image sizes is defined in %s.'), '$thumbnail_sizes' ),
 					'defaultvalue' => 'fit-160x160',
 				),
@@ -157,6 +150,13 @@ class coll_avatar_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.9  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.8  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *

@@ -210,8 +210,13 @@ function item_edit_actions( $Item )
 {
 	global $Blog;
 
-	$r = action_icon( T_('Edit linked files...'), 'folder',
+	$r = '';
+
+	if( isset($GLOBALS['files_Module']) )
+	{
+		$r .= action_icon( T_('Edit linked files...'), 'folder',
 					url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_item&amp;item_ID='.$Item->ID ), T_('Files') );
+	}
 
 	// Display edit button if current user has the rights:
 	$r .= $Item->get_edit_link( array(
@@ -303,6 +308,13 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.28  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.27  2010/09/15 13:04:06  efy-asimo
  * Cross post navigatation
  *

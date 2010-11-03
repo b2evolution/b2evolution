@@ -246,7 +246,10 @@ if( $action != 'view' )
 else
 { // display only
 
-	$Form->info( T_('Avatar'), $edited_User->get_avatar_imgtag() );
+	if( $Settings->get('allow_avatars') )
+	{
+		$Form->info( T_('Avatar'), $edited_User->get_avatar_imgtag() );
+	}
 
 	$Form->info( T_('Login'), $edited_User->get('login') );
 	$Form->info( T_('First name'), $edited_User->get('firstname') );
@@ -472,6 +475,13 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.18  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.17  2010/10/17 18:53:04  sam2kb
  * Added a link to delete edited user
  *

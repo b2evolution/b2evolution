@@ -149,9 +149,12 @@ $Form->begin_fieldset( T_('RSS/Atom feeds') );
 											), T_('Feed contents'), true, T_('How much content do you want to make available in feeds?') );
 	$Form->text( 'posts_per_feed', $edited_Blog->get_setting('posts_per_feed'), 4, T_('Posts in feeds'),  T_('How many of the latest posts do you want to include in RSS & Atom feeds?'), 4 );
 
-	load_funcs( 'files/model/_image.funcs.php' );
-	$params['force_keys_as_values'] = true;
-	$Form->select_input_array( 'image_size', $edited_Blog->get_setting('image_size') , get_available_thumb_sizes(), T_('Image size'), '', $params );
+	if( isset($GLOBALS['files_Module']) )
+	{
+		load_funcs( 'files/model/_image.funcs.php' );
+		$params['force_keys_as_values'] = true;
+		$Form->select_input_array( 'image_size', $edited_Blog->get_setting('image_size') , get_available_thumb_sizes(), T_('Image size'), '', $params );
+	}
 $Form->end_fieldset();
 
 
@@ -234,6 +237,13 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.38  2010/11/03 19:44:14  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.37  2010/10/19 02:00:53  fplanque
  * MFB
  *

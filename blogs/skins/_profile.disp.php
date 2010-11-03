@@ -36,6 +36,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $Settings, $admin_url;
 
 if( ! is_logged_in() )
 { // must be logged in!
@@ -72,13 +73,15 @@ $ProfileForm->end_fieldset();
 
 $ProfileForm->begin_fieldset( T_('Identity') );
 
-	global $admin_url;
-	$avatar_tag = $current_User->get_avatar_imgtag();
-	if( $current_User->check_perm( 'admin', 'any' ) && $current_User->check_perm( 'files', 'view' ) )
+	if( $Settings->get('allow_avatars') )
 	{
-		$avatar_tag .= ' <a href="'.$admin_url.'?ctrl=files&amp;user_ID='.$current_User->ID.'">'.T_('change').' &raquo;</a>';
+		$avatar_tag = $current_User->get_avatar_imgtag();
+		if( $current_User->check_perm( 'admin', 'any' ) && $current_User->check_perm( 'files', 'view' ) )
+		{
+			$avatar_tag .= ' <a href="'.$admin_url.'?ctrl=files&amp;user_ID='.$current_User->ID.'">'.T_('change').' &raquo;</a>';
+		}
+		$ProfileForm->info( T_('Avatar'), $avatar_tag );
 	}
-	$ProfileForm->info( T_('Avatar'), $avatar_tag );
 
 	$ProfileForm->info( T_('Login'), $current_User->get('login') );
 	$ProfileForm->text_input( 'newuser_firstname', $current_User->get( 'firstname' ), 40, T_('First name'), '', array( 'maxlength' => 50, 'class' => 'bComment' ) );
@@ -126,6 +129,13 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.16  2010/11/03 19:44:15  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.15  2010/07/19 09:35:03  efy-asimo
  * Fix messaging permission setup
  * Update comments number per page

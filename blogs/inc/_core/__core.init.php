@@ -692,11 +692,9 @@ class _core_Module extends Module
 		 */
 		global $localtimenow, $is_admin_page;
 
-		$allow_avatars = $Settings->get('allow_avatars');
-
 		$entries = array(
 			'userprefs' => array(
-					'text' => ($allow_avatars ? $current_User->get_avatar_imgtag( 'crop-15x15', '', 'top' ).' ' : '' ).'<strong>'.$current_User->login.'</strong>',
+					'text' => ($current_User->has_avatar() ? $current_User->get_avatar_imgtag( 'crop-15x15', '', 'top' ).' ' : '' ).'<strong>'.$current_User->login.'</strong>',
 					'href' => get_user_profile_url(),
 					'entries' => array(
 						'profile' => array(
@@ -975,6 +973,13 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.67  2010/11/03 19:44:14  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.66  2010/10/15 13:10:09  efy-asimo
  * Convert group permissions to pluggable permissions - part1
  *

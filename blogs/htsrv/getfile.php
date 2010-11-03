@@ -45,6 +45,11 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'/_main.inc.php';
 
+if( ! isset($GLOBALS['files_Module']) )
+{
+	debug_die( 'Files module is disabled or missing!' );
+}
+
 // We need this param early to check blog perms, if possible
 param( 'root', 'string', true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
 
@@ -238,6 +243,13 @@ else
 
 /*
  * $Log$
+ * Revision 1.55  2010/11/03 19:44:14  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.54  2010/03/15 03:01:26  sam2kb
  * New plugin: Watermark. Adds text watermark to generated thumbnails e.g. copyright notice
  *

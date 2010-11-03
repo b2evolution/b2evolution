@@ -41,9 +41,13 @@ require_once dirname( __FILE__ ) . '/../conf/_config.php';
 require_once $inc_path . '_main.inc.php';
 
 load_class( 'items/model/_itemlist.class.php', 'ItemList' );
-load_funcs('files/model/_file.funcs.php');
 load_class( '_ext/mime_parser/rfc822_addresses.php', 'rfc822_addresses_class' );
 load_class( '_ext/mime_parser/mime_parser.php', 'mime_parser_class' );
+
+if( isset($GLOBALS['files_Module']) )
+{
+	load_funcs( 'files/model/_file.funcs.php');
+}
 
 if( !$Settings->get( 'eblog_enabled' ) )
 {
@@ -651,14 +655,21 @@ for ( $index = 1; $index <= $imap_obj->Nmsgs; $index++ )
 	// handle attachments
 	if( $hasAttachment )
 	{
-		$mediadir = $Blog->get_media_dir();
-		if( $mediadir )
+		if( isset($GLOBALS['files_Module']) )
 		{
-			processAttachments( $parsedMIME['Attachments'], $mediadir, $Blog->get_media_url(), $Settings->get('eblog_add_imgtag') );
+			$mediadir = $Blog->get_media_dir();
+			if( $mediadir )
+			{
+				processAttachments( $parsedMIME['Attachments'], $mediadir, $Blog->get_media_url(), $Settings->get('eblog_add_imgtag') );
+			}
+			else
+			{
+				echo_message( T_( 'Unable to access media directory. No attachments processed.' ), ERROR, 0 );
+			}
 		}
 		else
 		{
-			echo_message( T_( 'Unable to access media directory. No attachments processed.' ), ERROR, 0 );
+			echo_message( T_( 'Files module is disabled or missing!' ), ERROR, 0 );
 		}
 	}
 
@@ -712,6 +723,13 @@ if( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.45  2010/11/03 19:44:14  sam2kb
+ * Increased modularity - files_Module
+ * Todo:
+ * - split core functions from _file.funcs.php
+ * - check mtimport.ctrl.php and wpimport.ctrl.php
+ * - do not create demo Photoblog and posts with images (Blog A)
+ *
  * Revision 1.44  2010/02/08 17:50:51  efy-yury
  * copyright 2009 -> 2010
  *
