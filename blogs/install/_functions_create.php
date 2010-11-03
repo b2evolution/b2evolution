@@ -91,6 +91,11 @@ function create_default_data()
 	$Group_Admins->set( 'perm_admin', 'visible' );
 	$Group_Admins->set( 'perm_blogs', 'editall' );
 	$Group_Admins->set( 'perm_stats', 'edit' );
+	$Group_Admins->set( 'perm_spamblacklist', 'edit' );
+	$Group_Admins->set( 'perm_slugs', 'edit' );
+	$Group_Admins->set( 'perm_files', 'all' );
+	$Group_Admins->set( 'perm_options', 'edit' );
+	$Group_Admins->set( 'perm_templates', 1 );
 	$Group_Admins->set( 'perm_users', 'edit' );
 	$Group_Admins->set( 'perm_xhtml_css_tweaks', 1 );
 	$Group_Admins->dbinsert();
@@ -100,6 +105,11 @@ function create_default_data()
 	$Group_Privileged->set( 'perm_admin', 'visible' );
 	$Group_Privileged->set( 'perm_blogs', 'viewall' );
 	$Group_Privileged->set( 'perm_stats', 'user' );
+	$Group_Privileged->set( 'perm_spamblacklist', 'edit' );
+	$Group_Privileged->set( 'perm_slugs', 'none' );
+	$Group_Privileged->set( 'perm_files', 'add' );
+	$Group_Privileged->set( 'perm_options', 'view' );
+	$Group_Privileged->set( 'perm_templates', 0 );
 	$Group_Privileged->set( 'perm_users', 'view' );
 	$Group_Privileged->set( 'perm_xhtml_css_tweaks', 1 );
 	$Group_Privileged->dbinsert();
@@ -109,6 +119,11 @@ function create_default_data()
 	$Group_Bloggers->set( 'perm_admin', 'visible' );
 	$Group_Bloggers->set( 'perm_blogs', 'user' );
 	$Group_Bloggers->set( 'perm_stats', 'none' );
+	$Group_Bloggers->set( 'perm_spamblacklist', 'view' );
+	$Group_Bloggers->set( 'perm_slugs', 'none' );
+	$Group_Bloggers->set( 'perm_files', 'view' );
+	$Group_Bloggers->set( 'perm_options', 'none' );
+	$Group_Bloggers->set( 'perm_templates', 0 );
 	$Group_Bloggers->set( 'perm_users', 'none' );
 	$Group_Bloggers->set( 'perm_xhtml_css_tweaks', 1 );
 	$Group_Bloggers->dbinsert();
@@ -118,6 +133,11 @@ function create_default_data()
 	$Group_Users->set( 'perm_admin', 'none' );
 	$Group_Users->set( 'perm_blogs', 'user' );
 	$Group_Users->set( 'perm_stats', 'none' );
+	$Group_Users->set( 'perm_spamblacklist', 'none' );
+	$Group_Users->set( 'perm_slugs', 'none' );
+	$Group_Users->set( 'perm_files', 'none' );
+	$Group_Users->set( 'perm_options', 'none' );
+	$Group_Users->set( 'perm_templates', 0 );
 	$Group_Users->set( 'perm_users', 'none' );
 	$Group_Users->dbinsert();
 	echo "OK.<br />\n";
@@ -1293,15 +1313,17 @@ function create_demo_contents()
 
 /*
  * $Log$
- * Revision 1.297  2010/10/15 13:10:09  efy-asimo
- * Convert group permissions to pluggable permissions - part1
+ * Revision 1.298  2010/11/03 23:36:14  fplanque
+ * rolled back stuff that should not be in Branch (head only)
  *
- * Revision 1.296  2010/07/13 08:51:17  efy-asimo
+ * Revision 1.294.2.3  2010/07/13 08:49:54  efy-asimo
  * doc - reply to todo fp>asimo
  *
- * Revision 1.295  2010/06/01 11:33:20  efy-asimo
- * Split blog_comments advanced permission (published, deprecated, draft)
- * Use this new permissions (Antispam tool,when edit/delete comments)
+ * Revision 1.294.2.2  2010/07/05 00:37:34  fplanque
+ * doc/minor/cleanup
+ *
+ * Revision 1.294.2.1  2010/06/05 10:45:06  efy-asimo
+ * Merge From Head - Antispam tool show affected registered users, show separate different comments (draft, published, deprecated). Use different permission for different comment status.
  *
  * Revision 1.294  2010/05/06 09:24:14  efy-asimo
  * Messaging options - fix
