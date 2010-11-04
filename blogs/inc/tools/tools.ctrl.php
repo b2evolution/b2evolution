@@ -52,18 +52,19 @@ $AdminUI->set_path( 'tools', $tab );
 
 
 if( empty($tab) )
-{ // "Main tab" actions:
-	param( 'action', 'string', '' );
+{	// "Main tab" actions:
+	if( param( 'action', 'string', '' ) )
+	{
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'tools' );
+	
+		// fp> TODO: have an option to only PRUNE files older than for example 30 days
+		$current_User->check_perm('options', 'edit', true);
+	}
 
 	switch( $action )
 	{
 		case 'del_itemprecache':
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'tools' );
-
-			// TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
-			$current_User->check_perm('options', 'edit', true);
-
 			$DB->query('DELETE FROM T_items__prerendering WHERE 1=1');
 
 			$Messages->add( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
@@ -71,12 +72,6 @@ if( empty($tab) )
 
 		case 'del_pagecache':
 			// Delete the page cache /blogs/cache
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'tools' );
-
-			// fp> TODO: have an option to only PRUNE files older than for example 30 days
-			$current_User->check_perm('options', 'edit', true);
-
 			global $cache_path;
 
 			// Clear general cache directory
@@ -115,12 +110,6 @@ if( empty($tab) )
 
 		case 'del_filecache':
 			// delete the thumbnail cahces .evocache
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'tools' );
-
-			// fp> TODO: have an option to only PRUNE files older than for example 30 days
-			$current_User->check_perm('options', 'edit', true);
-
 			// TODO> handle custom media directories dh> ??
 			// Delete any ?evocache folders:
 			$deleted_dirs = delete_cachefolders($Messages);
@@ -129,11 +118,6 @@ if( empty($tab) )
 
 		case 'optimize_tables':
 			// Optimize MyISAM tables
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'tools' );
-
-			$current_User->check_perm('options', 'edit', true);
-
 			global $tableprefix;
 
 			$db_optimized = false;
@@ -195,13 +179,18 @@ if( empty($tab) )
 			break;
 
 		case 'del_obsolete_tags':
-			$Session->assert_received_crumb( 'tools' );
-			$current_User->check_perm('options', 'edit', true);
 			$DB->query('
 				DELETE T_items__tag FROM T_items__tag
 				  LEFT JOIN T_items__itemtag ON tag_ID = itag_tag_ID
 				 WHERE itag_itm_ID IS NULL');
 			$Messages->add( sprintf(T_('Removed %d obsolete tag entries.'), $DB->rows_affected), 'success' );
+			break;
+
+		case 'view_phpinfo':
+			// Display PHP info and exit
+			headers_content_mightcache('text/html');
+			phpinfo();
+			exit();
 			break;
 	}
 }
@@ -264,7 +253,7 @@ if( empty($tab) )
 
 		$block_item_Widget->title = T_('Recreate item slugs');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
-		echo '&raquo; <a href="'.regenerate_url('action', 'action=recreate_itemslugs').'">'.T_('Recreate all item slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but redirect to the new one.').'</a>';
+		echo '&raquo; <a href="'.regenerate_url('action', 'action=recreate_itemslugs&amp;'.url_crumb('tools')).'">'.T_('Recreate all item slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but redirect to the new one.').'</a>';
 		$block_item_Widget->disp_template_raw( 'block_end' );
 	}
 
@@ -316,6 +305,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.34  2010/11/04 03:16:10  sam2kb
+ * Display PHP info in a pop-up window
+ *
  * Revision 1.33  2010/07/28 07:58:53  efy-asimo
  * Add where condition to recreate slugs tool query
  *

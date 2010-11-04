@@ -290,7 +290,10 @@ disp_system_check( 'note' );
 
 
 // PHP version
-init_system_check( T_( 'PHP version' ), PHP_VERSION );
+$phpinfo_url = '?ctrl=tools&amp;action=view_phpinfo&amp;'.url_crumb('tools');
+$phpinfo_link = action_icon( T_('View PHP info'), 'info', $phpinfo_url, '', 5, '', array( 'target'=>'_blank', 'onclick'=>'return pop_up_window( \''.$phpinfo_url.'\', \'phpinfo\', 650 )' ) );
+init_system_check( T_( 'PHP version' ), PHP_VERSION.' '.$phpinfo_link );
+
 if( version_compare( PHP_VERSION, '4.1', '<' ) )
 {
 	disp_system_check( 'error', T_('This version is too old. b2evolution will not run correctly. You must ask your host to upgrade PHP before you can run b2evolution.') );
@@ -584,6 +587,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.31  2010/11/04 03:16:10  sam2kb
+ * Display PHP info in a pop-up window
+ *
  * Revision 1.30  2010/04/22 20:45:09  blueyed
  * Fix typo with "PHP opcode cache" message
  *
