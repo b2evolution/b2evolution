@@ -2785,6 +2785,33 @@ function upgrade_b2evo_tables()
 		// set_upgrade_checkpoint( '10000' );
 	}
 
+	task_begin( 'Convert group permissions to pluggable permissions...' );
+	// asimo>This delete query needs just in case if this version of b2evo was used, before upgrade process call
+	$DB->query( 'DELETE FROM T_groups__groupsettings 
+					WHERE gset_name = "perm_files" OR gset_name = "perm_options" OR gset_name = "perm_templates"' );
+	// Get current permission values from groups table 
+	$sql = 'SELECT grp_ID, grp_perm_spamblacklist, grp_perm_slugs, grp_perm_files, grp_perm_options, grp_perm_templates
+			      FROM T_groups';
+	$rows = $DB->get_results( $sql, OBJECT, 'Get groups converted permissions' );
+	// Insert values into groupsettings table
+	foreach( $rows as $row )
+	{
+		$DB->query( 'INSERT INTO T_groups__groupsettings( gset_grp_ID, gset_name, gset_value )
+						VALUES( '.$row->grp_ID.', "perm_spamblacklist", "'.$row->perm_spamblacklist.'" ),
+							( '.$row->grp_ID.', "perm_slugs", "'.$row->grp_perm_slugs.'" ),
+							( '.$row->grp_ID.', "perm_files", "'.$row->grp_perm_files.'" ),
+							( '.$row->grp_ID.', "perm_options", "'.$row->grp_perm_options.'" ),
+							( '.$row->grp_ID.', "perm_templates", "'.$row->grp_perm_templates.'" )' );
+	}
+
+	// Drop all converted permissin colums from groups table
+	db_drop_col( 'T_groups', 'grp_perm_spamblacklist' );
+	db_drop_col( 'T_groups', 'grp_perm_slugs' );
+	db_drop_col( 'T_groups', 'grp_perm_files' );
+	db_drop_col( 'T_groups', 'grp_perm_options' );
+	db_drop_col( 'T_groups', 'grp_perm_templates' );
+	task_end();
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -2959,30 +2986,21 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
- * Revision 1.372  2010/11/03 23:36:14  fplanque
- * rolled back stuff that should not be in Branch (head only)
- *
- * Revision 1.367.2.7  2010/07/19 09:34:04  efy-asimo
- * Update comments number per page on on _item_list_full.view, and comment views
- * Fix messaging permission setup
- *
- * Revision 1.367.2.6  2010/07/17 22:53:33  fplanque
- * fix
- *
- * Revision 1.367.2.5  2010/07/17 20:09:47  fplanque
+ * Revision 1.373  2010/11/04 00:48:17  fplanque
  * no message
  *
- * Revision 1.367.2.4  2010/07/15 21:33:48  fplanque
- * minor
+ * Revision 1.371  2010/10/19 02:00:54  fplanque
+ * MFB
  *
- * Revision 1.367.2.3  2010/07/13 00:58:41  fplanque
- * updated installer for v4
+ * Revision 1.370  2010/10/15 13:10:09  efy-asimo
+ * Convert group permissions to pluggable permissions - part1
  *
- * Revision 1.367.2.2  2010/07/05 00:37:35  fplanque
- * doc/minor/cleanup
+ * Revision 1.369  2010/07/26 06:52:27  efy-asimo
+ * MFB v-4-0
  *
- * Revision 1.367.2.1  2010/06/05 10:45:06  efy-asimo
- * Merge From Head - Antispam tool show affected registered users, show separate different comments (draft, published, deprecated). Use different permission for different comment status.
+ * Revision 1.368  2010/06/01 11:33:20  efy-asimo
+ * Split blog_comments advanced permission (published, deprecated, draft)
+ * Use this new permissions (Antispam tool,when edit/delete comments)
  *
  * Revision 1.367  2010/05/13 05:52:00  efy-asimo
  * upgrade "'fm_enable_roots_user' => '1',"

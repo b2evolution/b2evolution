@@ -209,7 +209,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 					<tr class="<?php echo ($count%2 == 1) ? 'odd' : 'even' ?>">
 					<td class="firstcol">
 						<?php
-							if( $current_user_edit_perm )
+						if( $current_user_edit_perm )
 						{
 							echo '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID='
 								.$affected_User->ID.'"><strong>'.$affected_User->login.'</strong></a>';
@@ -289,6 +289,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.26  2010/11/04 00:48:17  fplanque
+ * no message
+ *
  * Revision 1.25  2010/07/26 06:52:15  efy-asimo
  * MFB v-4-0
  *
