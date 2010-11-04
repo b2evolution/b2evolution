@@ -387,6 +387,9 @@ switch( $user_tab )
 	case 'preferences':
 		$AdminUI->breadcrumbpath_add( T_('Preferences'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 		break;
+	case 'blogs':
+		$AdminUI->breadcrumbpath_add( T_('Personal blogs'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+		break;
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -430,6 +433,10 @@ switch( $action )
 				// Display user preferences form:
 				$AdminUI->disp_view( 'users/views/_user_preferences.form.php' );
 				break;
+			case 'blogs':
+				// Display user blog list:
+				$AdminUI->disp_view( 'users/views/_user_coll_list.view.php' );
+				break;
 		}
 
 		break;
@@ -441,6 +448,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.20  2010/11/04 18:29:46  sam2kb
+ * View personal blogs in user profile
+ *
  * Revision 1.19  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:

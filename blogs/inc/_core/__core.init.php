@@ -890,7 +890,11 @@ class _core_Module extends Module
 
 				$users_sub_entries['preferences'] = array(
 									'text' => T_('Preferences'),
-	 								'href' => '?ctrl=user&amp;user_tab=preferences&amp;user_ID='.$user_ID );
+	 								'href' => '?ctrl=user&amp;user_tab=preferences&amp;user_ID='.$user_ID );								
+
+				$users_sub_entries['blogs'] = array(
+									'text' => T_('Personal blogs'),
+	 								'href' => '?ctrl=user&amp;user_tab=blogs&amp;user_ID='.$user_ID );
 			}
 
 			$users_entries['entries'] = $users_sub_entries;
@@ -973,6 +977,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.68  2010/11/04 18:29:46  sam2kb
+ * View personal blogs in user profile
+ *
  * Revision 1.67  2010/11/03 19:44:14  sam2kb
  * Increased modularity - files_Module
  * Todo:
