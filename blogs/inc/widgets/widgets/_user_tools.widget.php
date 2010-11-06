@@ -66,24 +66,24 @@ class user_tools_Widget extends ComponentWidget
 				'size' => 40,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
-				'defaultvalue' => T_( 'Login' ),
+				'defaultvalue' => /* TRANS: with tailing space = action to log in */ T_( 'Login ' ),
 			),
 			'user_logout_link' => array(
-				'label' => T_( 'Logout link'),
+				'label' => T_( 'Logout link' ),
 				'size' => 40,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
 				'defaultvalue' => T_( 'Logout' ),
 			),
 			'user_profile_link' => array(
-				'label' => T_( 'Profile link'),
+				'label' => T_( 'Profile link' ),
 				'size' => 40,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
 				'defaultvalue' => T_( 'Profile' ),
 			),
 			'user_subs_link' => array(
-				'label' => T_( 'Subscriptions link'),
+				'label' => T_( 'Subscriptions link' ),
 				'size' => 40,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
@@ -167,6 +167,9 @@ class user_tools_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.11  2010/11/06 04:22:18  fplanque
+ * minor
+ *
  * Revision 1.10  2010/02/08 17:54:48  efy-yury
  * copyright 2009 -> 2010
  *
