@@ -102,7 +102,10 @@ class FileRoot
 		{
 			case 'user':
 				$UserCache = & get_UserCache();
-				$User = & $UserCache->get_by_ID( $root_in_type_ID );
+				if( ! $User = & $UserCache->get_by_ID( $root_in_type_ID, false, false ) )
+				{	// User not found
+					return false;
+				}
 				$this->name = $User->get( 'preferredname' ); //.' ('. /* TRANS: short for "user" */ T_('u').')';
 				$this->ads_path = $User->get_media_dir( $create );
 				$this->ads_url = $User->get_media_url();
@@ -110,10 +113,10 @@ class FileRoot
 
 			case 'collection':
 				$BlogCache = & get_BlogCache();
-				/**
-				 * @var Blog
-				 */
-				$Blog = & $BlogCache->get_by_ID( $root_in_type_ID );
+				if( ! $Blog = & $BlogCache->get_by_ID( $root_in_type_ID, false, false ) )
+				{	// Blog not found
+					return false;
+				}
 				$this->name = $Blog->get( 'shortname' ); //.' ('. /* TRANS: short for "blog" */ T_('b').')';
 				$this->ads_path = $Blog->get_media_dir( $create );
 				$this->ads_url = $Blog->get_media_url();
@@ -209,6 +212,9 @@ class FileRoot
 
 /*
  * $Log$
+ * Revision 1.13  2010/11/07 04:42:33  sam2kb
+ * Do not halt on error when the object a file belongs to is deleted
+ *
  * Revision 1.12  2010/02/08 17:52:18  efy-yury
  * copyright 2009 -> 2010
  *
