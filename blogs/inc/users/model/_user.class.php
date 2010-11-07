@@ -70,10 +70,10 @@ class User extends DataObject
 
 	/**
 	 * Does the user accept messages?
-	 * Options: 
-	 *		0 - NO, 
-	 *		1 - only private messages, 
-	 *		2 - only emails, 
+	 * Options:
+	 *		0 - NO,
+	 *		1 - only private messages,
+	 *		2 - only emails,
 	 *		3 - private messages and emails
 	 * This attribute can be asked with get_msgform_possibility(), accepts_pm(),
 	 * and accepts_email() functions to get complete sense.
@@ -337,10 +337,10 @@ class User extends DataObject
 			param_check_email( 'edited_user_email', true );
 			$this->set_from_Request('email', 'edited_user_email', true);
 
-			// set allow_msgform: 
-			// 0 - none, 
-			// 1 - only private message, 
-			// 2 - only email, 
+			// set allow_msgform:
+			// 0 - none,
+			// 1 - only private message,
+			// 2 - only email,
 			// 3 - private message and email
 			$allow_msgform = 0;
 			if( param( 'PM', 'integer', 0 ) )
@@ -525,7 +525,7 @@ class User extends DataObject
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'format'       => 'htmlbody',
-				'link_to'		   => 'userpage',
+				'link_to'		   => 'userpage', // userurl userpage 'userurl>userpage'
 				'link_text'    => 'preferredname',
 				'link_rel'     => '',
 				'link_class'   => '',
@@ -542,13 +542,28 @@ class User extends DataObject
 			$r = $this->dget( 'preferredname', $params['format'] );
 		}
 
-		if( $params['link_to'] == 'userpage' )
+		switch( $params['link_to'] )
 		{
-			$url = $this->get_userpage_url();
-		}
-		elseif( $params['link_to'] == 'userurl' )
-		{
-			$url = $this->url;
+			case 'userpage':
+			case 'userpage>userurl':
+				$url = $this->get_userpage_url();
+				break;
+
+			case 'userurl':
+				$url = $this->url;
+				break;
+
+			case 'userurl>userpage':
+				// We give priority to user submitted url:
+				if( strlen($this->url)>10 )
+				{
+					$url = $this->url;
+				}
+				else
+				{
+					$url = $this->get_userpage_url();
+				}
+				break;
 		}
 
 		if( !empty($url) )
@@ -1416,7 +1431,7 @@ class User extends DataObject
 
 	/**
 	 * Check if this user and his group accept receiving private messages or not
-	 * 
+	 *
 	 * @return boolean
 	 */
 	function accepts_pm()
@@ -2086,6 +2101,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.86  2010/11/07 18:50:44  fplanque
+ * Added Comment::author2() with skins v2 style params.
+ *
  * Revision 1.85  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:

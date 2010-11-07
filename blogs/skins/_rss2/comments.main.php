@@ -78,7 +78,7 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 			?>
 		<item>
 			<title><?php echo format_to_output( sprintf( /* TRANS: First %s: Commentator's name, second %s: post title */ T_( '%s in response to: %s' ),
-													$Comment->get_author( '', '#', '', '#', 'raw' ),
+													$Comment->get_author( array( 'format' => 'raw', 'link_to' => '' ) ),
 													$Comment->Item->get_title( array(
 														'format' => 'raw',
 														'link_type' => 'none',

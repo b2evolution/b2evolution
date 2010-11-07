@@ -91,7 +91,7 @@ function get_author( $Comment )
 	if( $current_User->check_perm( $Comment->blogperm_name(), 'edit', false, $Blog->ID ) ||
 		$Comment->get('status') == 'published' )
 	{
-		return $Comment->get_author();
+		return $Comment->get_author( array( 'link_to' => 'userpage' )  );
 	}
 	else
 	{
@@ -260,6 +260,9 @@ $CommentList->display();
 
 /*
  * $Log$
+ * Revision 1.7  2010/11/07 18:50:45  fplanque
+ * Added Comment::author2() with skins v2 style params.
+ *
  * Revision 1.6  2010/08/05 08:04:12  efy-asimo
  * Ajaxify comments on itemList FullView and commentList FullView pages
  *

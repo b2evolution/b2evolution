@@ -426,6 +426,7 @@ class Comment extends DataObject
 	/**
 	 * Template function: display author of comment
 	 *
+	 * @deprecated use Comment::author2() instead
 	 * @param string String to display before author name if not a user
 	 * @param string String to display after author name if not a user
 	 * @param string String to display before author name if he's a user
@@ -436,62 +437,95 @@ class Comment extends DataObject
 	function author( $before = '', $after = '#', $before_user = '', $after_user = '#',
 										$format = 'htmlbody', $makelink = false )
 	{
-		echo $this->get_author($before, $after, $before_user, $after_user, $format, $makelink);
+		echo $this->get_author( array(
+					'before'       => $before,
+					'after'        => $after,
+					'before_user'  => $before_user,
+					'after_user'   => $after_user,
+					'format'       => $format,
+					'link_to'		   => ( $makelink ? 'userurl>userpage' : '' )
+				)
+			);
+	}
+
+
+	/**
+	 * Template function: display author of comment
+	 *
+	 * @param array
+	 */
+	function author2( $params = array()  )
+	{
+		echo $this->get_author( $params );
 	}
 
 
 	/**
 	 * Get author of comment
 	 *
-	 * @param string String to display before author name if not a user
-	 * @param string String to display after author name if not a user
-	 * @param string String to display before author name if he's a user
-	 * @param string String to display after author name if he's a user
-	 * @param string Output format, see {@link format_to_output()}
-	 * @param boolean true for link, false if you want NO html link
+	 * @param array
 	 * @return string
 	 */
-	function get_author( $before = '', $after = '#', $before_user = '', $after_user = '#',
-										$format = 'htmlbody', $makelink = false )
+	function get_author( $params = array() )
 	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'       => ' ',
+				'after'        => '#',
+				'before_user'  => '',
+				'after_user'   => '#',
+				'format'       => 'htmlbody',
+				'link_to'		   => 'userurl>userpage',		// 'userpage' or 'userurl' or 'userurl>userpage' 'userpage>userurl'
+				'link_text'    => 'preferredname',
+				'link_rel'     => '',
+				'link_class'   => '',
+				'thumb_size'   => 'crop-32x32',
+				'thumb_class'  => '',
+			), $params );
+
 		global $Plugins;
 
 		if( $this->get_author_User() )
-		{ // Author is a user
-			if( strlen( $this->author_User->url ) <= 10 )
-			{
-				$makelink = false;
-			}
-			if( $after_user == '#' ) $after_user = ' ['.T_('Member').']';
+		{ // Author is a registered user:
+			if( $params['after_user'] == '#' ) $params['after_user'] = ' ['.T_('Member').']';
 
-			$author_name = format_to_output( $this->author_User->get_preferred_name(), $format );
+			$author_name = format_to_output( $this->author_User->get_preferred_name(), $params['format'] );
 
-			$before = $before_user;
-			$after = $after_user;
+			$r = $this->author_User->get_link( $params );
 
+			$r = $params['before_user'].$r.$params['after_user'];
 		}
 		else
-		{ // Display info recorded at edit time:
+		{	// Not a registered user, display info recorded at edit time:
+			if( $params['after'] == '#' ) $params['after'] = ' ['.T_('Visitor').']';
+
 			if( strlen( $this->author_url ) <= 10 )
-			{
-				$makelink = false;
+			{	// URL is too short anyways...
+				$params['link_to'] = '';
 			}
-			if( $after == '#' ) $after = ' ['.T_('Visitor').']';
 
-			$author_name = $this->dget( 'author', $format );
+			$author_name = $this->dget( 'author', $params['format'] );
 
+			switch( $params['link_to'] )
+			{
+				case 'userurl':
+				case 'userurl>userpage':
+				case 'userpage>userurl':
+					// Make a link:
+					$r = $this->get_author_url_link( $author_name, $params['before'], $params['after'], true );
+					break;
+
+				default:
+					// Display the name: (NOTE: get_author_url_link( with nolink option ) would NOT handle this correctly when url is empty
+					$r = $params['before'].$author_name.$params['after'];
+					break;
+			}
 		}
 
-		if( $makelink )
-		{	// Make a link:
-			$r = $this->get_author_url_link( $author_name, $before, $after, true );
-		}
-		else
-		{	// Display the name: (NOTE: get_author_url_link( with nolink option ) would NOT handle this correctly when url is empty
-			$r = $before.$author_name.$after;
-		}
+		$params['data'] = & $r;
+		$params['Comment'] = & $this;
 
-		$Plugins->trigger_event( 'FilterCommentAuthor', array( 'data' => & $r, 'makelink' => $makelink, 'Comment' => $this ) );
+		$Plugins->trigger_event( 'FilterCommentAuthor', $params );
 
 		return $r;
 	}
@@ -1552,7 +1586,7 @@ class Comment extends DataObject
 				$notify_message .= T_('Quick moderation').': '.$baseurl.'htsrv/comment_review.php?cmt_ID='.$this->ID.$secret_value."\n\n";
 			}
 
-			$notify_message .= T_('Edit screen').': '.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$this->ID."\n\n"
+			$notify_message .= T_('Edit comment').': '.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$this->ID."\n\n"
 							   .T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->gen_blogurl(), 'disp=subs' ) )."\n";
 
 			if( $debug )
@@ -1672,7 +1706,7 @@ class Comment extends DataObject
 	}
 
 
-	/** 
+	/**
 	 * Get the blog advanced permission name for this comment
 	 *
 	 * @return string status specific blog comment permission name
@@ -1700,6 +1734,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.70  2010/11/07 18:50:45  fplanque
+ * Added Comment::author2() with skins v2 style params.
+ *
  * Revision 1.69  2010/11/02 15:36:34  sam2kb
  * Notification email: direct link to comment edit form
  *

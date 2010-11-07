@@ -17,6 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $params = array_merge( array(
     'comment_start'  => '<div class="bComment">',
     'comment_end'    => '</div>',
+		'link_to'		     => 'userurl>userpage',		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
     'Comment'        => NULL, // This object MUST be passed as a param!
 	), $params );
 
@@ -49,13 +50,16 @@ $Comment = & $params['Comment'];
 							'nofollow'	=> true,
 						) );
 				}
-				$Comment->author(
-					/* before: */ '',
-					/* after:  */ '#',
-					/* before_user: */ '',
-					/* after_user:  */ '#',
-					/* format: */ 'htmlbody',
-					/* makelink: */ true );
+				$Comment->author2( array(
+						'before'       => ' ',
+						'after'        => '#',
+						'before_user'  => '',
+						'after_user'   => '#',
+						'format'       => 'htmlbody',
+						'link_to'		   => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
+						'link_text'    => 'preferredname',
+					) );
+
 				$Comment->msgform_link( $Blog->get('msgformurl') );
 				// $Comment->author_url( '', ' &middot; ', '' );
 				break;
@@ -105,6 +109,9 @@ $Comment = & $params['Comment'];
 
 /*
  * $Log$
+ * Revision 1.9  2010/11/07 18:50:45  fplanque
+ * Added Comment::author2() with skins v2 style params.
+ *
  * Revision 1.8  2010/02/08 17:56:10  efy-yury
  * copyright 2009 -> 2010
  *

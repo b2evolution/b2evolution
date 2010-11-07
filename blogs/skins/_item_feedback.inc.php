@@ -40,6 +40,7 @@ $params = array_merge( array(
 		'preview_start'        => '<div class="bComment" id="comment_preview">',
 		'preview_end'          => '</div>',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
+		'link_to'		           => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'form_title_start'     => '<h3>',
 		'form_title_end'       => '</h3>',
 	), $params );
@@ -189,9 +190,10 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 
 		// ------------------ COMMENT INCLUDED HERE ------------------
 		skin_include( $params['comment_template'], array(
-				'Comment'              => & $Comment,
-			  'comment_start'        => $params['comment_start'],
-			  'comment_end'          => $params['comment_end'],
+				'Comment'         => & $Comment,
+			  'comment_start'   => $params['comment_start'],
+			  'comment_end'     => $params['comment_end'],
+				'link_to'		      => $params['link_to'],		// 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_comment.inc.php file into the current skin folder.
@@ -242,6 +244,9 @@ skin_include( '_item_comment_form.inc.php', $params );
 
 /*
  * $Log$
+ * Revision 1.28  2010/11/07 18:50:45  fplanque
+ * Added Comment::author2() with skins v2 style params.
+ *
  * Revision 1.27  2010/10/13 14:07:56  efy-asimo
  * Optional paged comments in the front end
  *
