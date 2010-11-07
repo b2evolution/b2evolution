@@ -155,14 +155,14 @@ form.bComment fieldset label {
 form.bComment fieldset div.label
 { /* label of form line */
 	float: left;
-	width: 18%;
+	width: 100px;
 	text-align: right;
 	font-weight: bold;
 	/* border: 1px solid #f00; */
 }
 form.bComment fieldset div.input
 { /* input zone of form line */
-	margin: 0 0 0 20%;
+	margin: 0 0 0 108px;
 	/* border: 1px solid #f00; */
 }
 form.bComment fieldset.input{
@@ -171,9 +171,9 @@ form.bComment fieldset.input{
 }
 form.bComment fieldset div.info
 { /* info zone of form line */
-	margin: 0 0 0 20%;
+	margin: 0 0 0 108px;
 	padding-top: .5ex;
-	/* border: 1px solid #f00;*/
+	/* border: 1px solid #f00; */
 }
 
 /* Avatar widget */
