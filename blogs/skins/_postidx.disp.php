@@ -25,12 +25,16 @@ skin_widget( array(
 		'block_display_title' => false,
 		'order_by' => 'title',
 		'order_dir' => 'ASC',
+		'limit' => 1000,
 	) );
 // ---------------------------------- END OF POST LIST ---------------------------------
 
 
 /*
  * $Log$
+ * Revision 1.3  2010/11/08 16:13:52  efy-asimo
+ * disp=postidx shows 1000 posts
+ *
  * Revision 1.2  2010/02/08 17:56:14  efy-yury
  * copyright 2009 -> 2010
  *
