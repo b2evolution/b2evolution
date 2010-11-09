@@ -101,6 +101,9 @@ switch( $action )
 }
 
 // No action => display the form
+
+headers_content_mightcache( 'text/html', 0 );
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
@@ -201,6 +204,9 @@ else
 <?php
 /*
  * $Log$
+ * Revision 1.10  2010/11/09 16:29:14  sam2kb
+ * Send content-type and no-cache headers
+ *
  * Revision 1.9  2010/05/02 16:38:34  fplanque
  * minor
  *
