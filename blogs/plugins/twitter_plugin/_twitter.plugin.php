@@ -71,6 +71,13 @@ class twitter_plugin extends Plugin
 		// Check php version
 		if( version_compare( phpversion(), '5.0.0', '<' ) )
 		{ // the plugin is not supported
+			$this->set_status( 'disabled' );
+			return false;
+		}
+
+		if( !extension_loaded( 'curl' ) )
+		{ // the plugin is not supported
+			$this->set_status( 'disabled' );
 			return false;
 		}
 
@@ -114,7 +121,7 @@ class twitter_plugin extends Plugin
 			return T_('The twitter plugin requires PHP 5.');
 		}
 
-		if( !extension_loaded( 'curl') )
+		if( !extension_loaded( 'curl' ) )
 		{
 			return T_( 'The twitter plugin requires the PHP curl extension.');
 		}
@@ -549,6 +556,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.26  2010/11/09 16:19:57  efy-asimo
+ * disable twitter plugin, if curl is not loaded
+ *
  * Revision 1.25  2010/10/12 12:52:17  efy-asimo
  * Move twitter callback and twitter unlink into twitter plugin class
  *
