@@ -148,6 +148,125 @@ if( empty($tab) )
 			}
 			break;
 
+		case 'del_broken_posts':
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'tools' );
+
+			$current_User->check_perm('options', 'edit', true);
+
+			// load item class
+			load_class( 'items/model/_item.class.php', 'Item' );
+
+			// select broken items
+			$sql = 'SELECT * FROM T_items__item
+						WHERE post_canonical_slug_ID NOT IN (
+							SELECT slug_ID FROM T_slug )';
+			$broken_items = $DB->get_results( $sql, OBJECT, 'Find broken posts' );
+			$num_deleted = 0;
+			foreach( $broken_items as $row )
+			{ // delete broken items
+				$broken_Item = new Item( $row );
+				if( $broken_Item->dbdelete() )
+				{
+					$num_deleted++;
+				}
+			}
+
+			$Messages->add( sprintf( T_('Deleted %d posts.'), $num_deleted ), 'success' );
+			break;
+
+		case 'del_broken_slugs':
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'tools' );
+
+			$current_User->check_perm('options', 'edit', true);
+
+			// delete broken slugs
+			$r = $DB->query( 'DELETE FROM T_slug
+								WHERE slug_type = "item" and slug_itm_ID NOT IN (
+									SELECT post_ID FROM T_items__item )' );
+
+			if( $r !== false )
+			{
+				$Messages->add( sprintf( T_('Deleted %d slugs.'), $r ), 'success' );
+			}
+			break;
+
+		case 'create_sample_comments':
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'tools' );
+
+			$current_User->check_perm('options', 'edit', true);
+
+			$blog_ID = param( 'blog_ID', 'string', 0 );
+			$num_comments = param( 'num_comments', 'string', 0 );
+			$num_posts = param( 'num_posts', 'string', 0 );
+
+			if ( ! ( param_check_number( 'blog_ID', T_('Blog ID must be a number'), true ) &&
+				param_check_number( 'num_comments', T_('Comments per post must be a number'), true ) &&
+				param_check_number( 'num_posts', T_('"How many posts" field must be a number'), true ) ) )
+			{ // param errors
+				$action = 'show_create_comments';
+				break;
+			}
+
+			// check blog_ID
+			$BlogCache = & get_BlogCache();
+			if( $BlogCache->get_by_ID( $blog_ID, false, false ) == NULL )
+			{
+				$Messages->add( T_( 'Blog ID must be a valid Blog ID!' ), 'error' );
+				$action = 'show_create_comments';
+				break;
+			}
+
+			// find the $num_posts latest posts in blog
+			$sql = 'SELECT post_ID 
+						FROM T_items__item INNER JOIN T_categories ON post_main_cat_ID = cat_ID
+					 WHERE cat_blog_ID = '.$blog_ID.' AND post_status = '.$DB->quote( 'published' ).'
+					 ORDER BY post_datecreated DESC
+					 LIMIT '.$num_posts;
+			$items_result = $DB->get_results( $sql, ARRAY_A, 'Find the x latest posts in blog' );
+
+			$count = 1;
+			$fix_content = 'This is an auto generated comment for testing the moderation features.
+							http://www.test.com/test_comment_';
+			// go through on selected items
+			foreach( $items_result as $row )
+			{
+				$item_ID = $row['post_ID'];
+				// create $num_comments comments for each item
+				for( $i = 0; $i < $num_comments; $i++ )
+				{
+					$author = 'Test '.$count;
+					$email = 'test_'.$count.'@test.com';
+					$url = 'http://www.test.com/test_comment_'.$count;
+
+					$content = $fix_content.$count;
+					for( $j = 0; $j < 50; $j++ )
+					{ // create 50 random word
+						$length = rand(1, 15);
+						$word = generate_random_key( $length, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' );
+						$content = $content.' '.$word;
+					}
+
+					// create and save a new comment
+					$Comment = new Comment();
+					$Comment->set( 'post_ID', $item_ID );
+					$Comment->set( 'status', 'draft' );
+					$Comment->set( 'author', $author );
+					$Comment->set( 'author_email', $email );
+					$Comment->set( 'author_url', $url );
+					$Comment->set( 'content', $content );
+					$Comment->set( 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
+					$Comment->set( 'author_IP', $Hit->IP );
+					$Comment->dbsave();
+					$count++;
+				}
+			}
+
+			$Messages->add( sprintf( T_('Created %d comments.'), $count - 1 ), 'success' );
+			break;
+
 		case 'recreate_itemslugs':
 			$ItemCache = get_ItemCache();
 			$ItemCache->load_where( '( post_title != "" ) AND ( post_urltitle = "title" OR post_urltitle LIKE "title-%" )');
@@ -212,69 +331,24 @@ $AdminUI->disp_payload_begin();
 
 if( empty($tab) )
 {
-
-	$block_item_Widget = new Widget( 'block_item' );
-
-
-	// Event AdminToolPayload for each Plugin:
-	$tool_plugins = $Plugins->get_list_by_event( 'AdminToolPayload' );
-	foreach( $tool_plugins as $loop_Plugin )
+	switch( $action )
 	{
-		$block_item_Widget->title = format_to_output($loop_Plugin->name);
-		$block_item_Widget->disp_template_replaced( 'block_start' );
-		$Plugins->call_method_if_active( $loop_Plugin->ID, 'AdminToolPayload', $params = array() );
-		$block_item_Widget->disp_template_raw( 'block_end' );
+		case 'find_broken_posts':
+			$AdminUI->disp_view( 'tools/views/_broken_posts.view.php' );
+			break;
+
+		case 'find_broken_slugs':
+			$AdminUI->disp_view( 'tools/views/_broken_slugs.view.php' );
+			break;
+
+		case 'show_create_comments':
+			$AdminUI->disp_view( 'tools/views/_create_comments.form.php' );
+			break;
+
+		default:
+			$AdminUI->disp_view( 'tools/views/_misc_tools.view.php' );
+			break;
 	}
-
-
-	// TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
-	if( $current_User->check_perm('options', 'edit') )
-	{ // default admin actions:
-		global $Settings;
-
-		$block_item_Widget->title = T_('Cache management');
-		// dh> TODO: add link to delete all caches at once?
-		$block_item_Widget->disp_template_replaced( 'block_start' );
-		echo '<ul>';
-		echo '<li><a href="'.regenerate_url('action', 'action=del_itemprecache&amp;'.url_crumb('tools')).'">'.T_('Clear pre-renderered item cache (DB)').'</a></li>';
-		echo '<li><a href="'.regenerate_url('action', 'action=del_pagecache&amp;'.url_crumb('tools')).'">'.T_('Clear full page cache (/cache directory)').'</a></li>';
-		echo '<li><a href="'.regenerate_url('action', 'action=del_filecache&amp;'.url_crumb('tools')).'">'.T_('Clear thumbnail caches (?evocache directories)').'</a></li>';
-		echo '</ul>';
-		$block_item_Widget->disp_template_raw( 'block_end' );
-
-		$block_item_Widget->title = T_('Database management');
-		$block_item_Widget->disp_template_replaced( 'block_start' );
-		echo '<ul>';
-		echo '<li><a href="'.regenerate_url('action', 'action=optimize_tables&amp;'.url_crumb('tools')).'">'.T_('Optimize database tables (MyISAM tables used for sessions & logs)').'</a></li>';
-		echo '<li><a href="'.regenerate_url('action', 'action=del_obsolete_tags&amp;'.url_crumb('tools')).'">'.T_('Remove obsolete (unused) tag entries').'</a></li>';
-		// echo '<li><a href="'.regenerate_url('action', 'action=backup_db').'">'.T_('Backup database').'</a></li>';
-		echo '</ul>';
-		$block_item_Widget->disp_template_raw( 'block_end' );
-
-		$block_item_Widget->title = T_('Recreate item slugs');
-		$block_item_Widget->disp_template_replaced( 'block_start' );
-		echo '&raquo; <a href="'.regenerate_url('action', 'action=recreate_itemslugs&amp;'.url_crumb('tools')).'">'.T_('Recreate all item slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but redirect to the new one.').'</a>';
-		$block_item_Widget->disp_template_raw( 'block_end' );
-	}
-
-
-	// fp> TODO: pluginize MT! :P
-	$block_item_Widget->title = T_('Movable Type Import');
-	$block_item_Widget->disp_template_replaced( 'block_start' );
-	?>
-		<ol>
-			<li><?php echo T_('Use MT\'s export functionnality to create a .TXT file containing your posts;') ?></li>
-			<li><?php printf( T_('Follow the instructions in <a %s>Daniel\'s Movable Type Importer</a>.'), ' href="?ctrl=mtimport"' ) ?></li>
-		</ol>
-	<?php
-	$block_item_Widget->disp_template_raw( 'block_end' );
-
-
-	$block_item_Widget->title = T_('WordPress Import');
-	$block_item_Widget->disp_template_replaced( 'block_start' );
-	printf( '<p>'.T_('You can import contents from your WordPress 2.3 database into your b2evolution database by using <a %s>Hari\'s WordPress Importer</a>.').'</p>', ' href="?ctrl=wpimport"' );
-	$block_item_Widget->disp_template_raw( 'block_end' );
-
 }
 elseif( $tab_Plugin )
 { // Plugin tab
@@ -305,6 +379,12 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.35  2010/11/12 15:13:31  efy-asimo
+ * MFB:
+ * Tool 1: "Find all broken posts that have no matching category"
+ * Tool 2: "Find all broken slugs that have no matching target post"
+ * Tool 3: "Create sample comments for testing moderation"
+ *
  * Revision 1.34  2010/11/04 03:16:10  sam2kb
  * Display PHP info in a pop-up window
  *
