@@ -58,6 +58,7 @@ if( !isset($login_required) )
 	$login_required = false;
 }
 
+global $login_error;
 
 $login = NULL;
 $pass = NULL;
@@ -130,7 +131,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		$UserCache->clear();
 	}
 
-	if( $Messages->count('login_error') )
+	if( ! empty( $login_error ) )
 	{ // A plugin has thrown a login error..
 		// Do nothing, the error will get displayed in the login form..
 
@@ -154,18 +155,18 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 					$Debuglog->add( 'Login: Empty salt_sess!', 'request' );
 					if( ($pos = strpos( $pass, '_hashed_' ) ) && substr($pass, $pos+8) == $Session->ID )
 					{ // session ID matches, no cookie problem
-						$Messages->add( T_('The login window has expired. Please try again.'), 'login_error' );
+						$login_error = T_('The login window has expired. Please try again.');
 						$Debuglog->add( 'Login: Session ID matches.', 'request' );
 					}
 					else
 					{ // more general error:
-						$Messages->add( T_('Either you have not enabled cookies or this login window has expired.'), 'login_error' );
+						$login_error = T_('Either you have not enabled cookies or this login window has expired.');
 						$Debuglog->add( 'Login: Session ID does not match.', 'request' );
 					}
 				}
 				elseif( $pwd_salt != $pwd_salt_sess )
 				{ // submitted salt differs from the one stored in the session
-					$Messages->add( T_('The login window has expired. Please try again.'), 'login_error' );
+					$login_error = T_('The login window has expired. Please try again.');
 					$Debuglog->add( 'Login: Submitted salt and salt from Session do not match.', 'request' );
 				}
 				else
@@ -192,10 +193,10 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 		// save the user for later hits
 		$Session->set_User( $current_User );
 	}
-	elseif( ! $Messages->count('login_error') )
-	{ // if there's no login_error message yet, add the default one:
+	elseif( empty( $login_error ) )
+	{ // if the login_error wasn't set yet, add the default one:
 		// This will cause the login screen to "popup" (again)
-		$Messages->add( T_('Wrong login/password.'), 'login_error' );
+		$login_error = T_('Wrong login/password.');
 	}
 
 }
@@ -228,7 +229,7 @@ else
 		// echo ' NOT logged in...';
 		$Debuglog->add( 'Login: NOT logged in... (did not try)', 'request' );
 
-		$Messages->add( T_('You must log in!'), 'login_error' );
+		$login_error = T_('You must log in!');
 	}
 }
 unset($pass);
@@ -246,7 +247,7 @@ if( ! empty($current_User)
 	if( $action != 'req_validatemail' && $action != 'validatemail' )
 	{ // we're not in that action already:
 		$action = 'req_validatemail'; // for login.php
-		$Messages->add( T_('You must validate your email address before you can log in.'), 'login_error' );
+		$login_error = T_('You must validate your email address before you can log in.');
 	}
 }
 else
@@ -277,7 +278,7 @@ else
 	}
 }
 
-if( $Messages->count( 'login_error' ) )
+if( ! empty( $login_error ) )
 {
 	// Init charset handling:
 	init_charsets( $current_charset );
@@ -291,6 +292,9 @@ $Timer->pause( '_init_login' );
 
 /*
  * $Log$
+ * Revision 1.4  2010/11/18 15:09:16  efy-asimo
+ * create $login_error global variable
+ *
  * Revision 1.3  2010/04/12 19:14:31  blueyed
  * doc
  *

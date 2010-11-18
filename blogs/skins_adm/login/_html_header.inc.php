@@ -56,10 +56,18 @@ headers_content_mightcache( 'text/html', 0 );		// NEVER cache the login pages!
 <div class="clear"></div>
 
 <?php
-$Messages->display( '', '', true, 'all', array( 'login_error' => array( 'class' => 'log_error' ) ) );
+if( ! empty( $login_error ) )
+{
+	echo '<div class="log_container">';
+	echo '<div class="log_error"> '.$login_error. ' </div>';
+	echo '</div>';
+}
 
 /*
  * $Log$
+ * Revision 1.12  2010/11/18 15:09:16  efy-asimo
+ * create $login_error global variable
+ *
  * Revision 1.11  2010/02/08 17:56:54  efy-yury
  * copyright 2009 -> 2010
  *

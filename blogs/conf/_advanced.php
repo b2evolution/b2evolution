@@ -583,6 +583,14 @@ $cross_post_nav_in_same_blog = true;
 
 
 /**
+ * Login error message
+ *
+ * @global string
+ */
+$login_error = '';
+
+
+/**
  * File extensions that the admin will not be able to enable in the Settings
  */
 $force_upload_forbiddenext = array( 'cgi', 'exe', 'htaccess', 'htpasswd', 'php', 'php3', 'php4', 'php5', 'php6', 'phtml', 'pl', 'vbs' );

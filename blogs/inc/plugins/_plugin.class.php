@@ -1960,6 +1960,8 @@ class Plugin
 	 * Use this for example to read some cookie and define further handling of
 	 * this visitor or force them to login, by {@link Plugin::msg() adding a message}
 	 * of class "login_error", which will trigger the login screen.
+	 * asimo> There is no message with "login_error" class anymore, 
+	 * there is a $login_error global variable
 	 */
 	function AfterLoginAnonymousUser( & $params )
 	{
@@ -1978,6 +1980,8 @@ class Plugin
 	 * You can also {@link Plugin::msg() add a message} of class "login_error"
 	 * to prevent the user from accessing the site and triggering
 	 * the login screen.
+	 * asimo> There is no message with "login_error" class anymore, 
+	 * there is a $login_error global variable
 	 */
 	function AfterLoginRegisteredUser( & $params )
 	{
@@ -3095,6 +3099,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.47  2010/11/18 15:09:16  efy-asimo
+ * create $login_error global variable
+ *
  * Revision 1.46  2010/09/30 13:18:01  efy-asimo
  * use blog param instead global Blog
  *
