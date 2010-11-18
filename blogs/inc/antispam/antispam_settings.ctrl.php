@@ -94,6 +94,8 @@ switch( $action )
 
 		if( ! $Messages->count('error') )
 		{
+			$Settings->dbupdate();
+
 			$Messages->add( T_('Settings updated.'), 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=set_antispam', 303 ); // Will EXIT
@@ -128,6 +130,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.9  2010/11/18 21:19:40  sam2kb
+ * Added missing dbupdate()
+ *
  * Revision 1.8  2010/02/08 17:52:06  efy-yury
  * copyright 2009 -> 2010
  *
