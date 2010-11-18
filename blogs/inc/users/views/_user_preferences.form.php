@@ -63,6 +63,37 @@ global $user_profile_only;
  * @var Plugins
  */
 global $Plugins;
+/**
+ * $var AdminUI
+ */
+global $AdminUI;
+
+
+// Admin skin dropdown list handler
+// Display settings corresponding only for the current (loaded) admin skin
+?>
+<script type="text/javascript">
+	function admin_skin_changed()
+	{
+		// admin skin dropdown list selected value
+		var val = jQuery( '#edited_user_admin_skin' ).val();
+
+		if( val == null )
+		{ // there is no admin skin drop down list
+			return;
+		}
+
+		if( val != jQuery( '[name |= current_admin_skin]' ).val() )
+		{ // popup selected value is different then current admin skin => hide skin settings
+			jQuery( '#admin_skin_settings_div' ).hide();
+		}
+		else
+		{ // popup selected value is the same as the current admin skin => show skin settings
+			jQuery( '#admin_skin_settings_div' ).show();
+		}
+	}
+</script>
+<?php
 
 
 // Begin payload block:
@@ -101,12 +132,14 @@ if( !$value_admin_skin )
 	$value_admin_skin = $Settings->get('admin_skin');
 }
 
+$Form->hidden( 'current_admin_skin', $value_admin_skin );
+
 if( $action != 'view' )
 { // We can edit the values:
 
 	$Form->select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options_return', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
 
-	$Form->select_input_array( 'edited_user_admin_skin', $value_admin_skin, get_admin_skins(), T_('Admin skin'), T_('The skin defines how the backoffice appears to you.') );
+	$Form->select_input_array( 'edited_user_admin_skin', $value_admin_skin, get_admin_skins(), T_('Admin skin'), T_('The skin defines how the backoffice appears to you.'), array( 'onchange' => 'admin_skin_changed()' ) );
 
   // fp> TODO: We gotta have something like $edited_User->UserSettings->get('legend');
 	// Icon/text thresholds:
@@ -217,6 +250,15 @@ else
 
 $Form->end_fieldset();
 
+	/***************  Admin skin settings  **************/
+// asimo> this div is need to make sure the settings show/hide js part always work without reference to the AdminUI.
+echo '<div id="admin_skin_settings_div">';
+if( $current_User->ID == $edited_User->ID )
+{
+	$AdminUI->display_skin_settings( & $Form );
+}
+echo '</div>';
+
 	/***************  Plugins  **************/
 
 if( $action != 'view' )
@@ -291,6 +333,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.13  2010/11/18 13:56:06  efy-asimo
+ * admin skin preferences
+ *
  * Revision 1.12  2010/10/17 18:53:04  sam2kb
  * Added a link to delete edited user
  *

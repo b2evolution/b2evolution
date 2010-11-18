@@ -73,6 +73,10 @@ class UserSettings extends AbstractSettings
 		'timeout_sessions' => NULL,			// user session timeout (NULL means application default)
 
 		'results_per_page' => 20,
+
+		'show_evobar' => 1,
+		'show_breadcrumbs' => 1,
+		'show_menu' => 1,
 	);
 
 
@@ -211,6 +215,9 @@ class UserSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.14  2010/11/18 13:56:06  efy-asimo
+ * admin skin preferences
+ *
  * Revision 1.13  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *

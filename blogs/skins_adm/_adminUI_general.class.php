@@ -451,17 +451,24 @@ class AdminUI_general extends Menu
 			return;
 		}
 
-		require $skins_path.'_toolbar.inc.php';
-
-		echo "\n";
+		$skin_wrapper_class = 'skin_wrapper';
 		if( is_logged_in() )
-		{
-			echo '<div id="skin_wrapper" class="skin_wrapper_loggedin">';
+		{ // user is logged in
+			if( $this->get_show_evobar() )
+			{ // show evobar options is enabled for this admin skin
+				require $skins_path.'_toolbar.inc.php';
+				$skin_wrapper_class = $skin_wrapper_class.'_loggedin';
+			}
 		}
 		else
-		{
-			echo '<div id="skin_wrapper" class="skin_wrapper_anonymous">';
+		{ // user is not logged in
+			require $skins_path.'_toolbar.inc.php';
+			$skin_wrapper_class = $skin_wrapper_class.'_anonymous';
 		}
+
+		echo "\n";
+		echo '<div id="skin_wrapper" class="'.$skin_wrapper_class.'">';
+
 		echo "\n<!-- Start of skin_wrapper -->\n";
 
 		echo $this->get_body_top();
@@ -1360,11 +1367,42 @@ class AdminUI_general extends Menu
 		}
 		debug_die( 'unknown color' );
 	}
+
+
+	/**
+	 * Display skin options.
+	 * There is no common skin option.
+	 */
+	function display_skin_settings( $Form )
+	{
+	}
+
+
+	/**
+	 * Set skin specific options.
+	 * There is no common skin option.
+	 */
+	function set_skin_settings( $user_ID )
+	{
+	}
+
+
+	/**
+	 * Get show evobar setting. Default true for every admin skin.
+	 * @return boolean 
+	 */
+	function get_show_evobar()
+	{
+		return true;
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.110  2010/11/18 13:56:06  efy-asimo
+ * admin skin preferences
+ *
  * Revision 1.109  2010/05/06 18:59:31  blueyed
  * Admin: skin: base: add div.fieldset_wrapper_ID to 'Form' fieldset_begin (consistent with chicago skin).
  *

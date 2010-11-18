@@ -235,6 +235,12 @@ if( !$Messages->count('error') )
 			// Update user settings:
 			if( param( 'preferences_form', 'boolean', false ) )
 			{
+				$current_admin_skin = param( 'current_admin_skin', 'string' );
+				if( $edited_User->ID == $current_User->ID && ( $current_admin_skin == $UserSettings->get( 'admin_skin', $edited_User->ID ) ) )
+				{ // Save Admin skin display settings if admin skin wasn't changed
+					$AdminUI->set_skin_settings( $edited_User->ID );
+				}
+
 				if( $UserSettings->dbupdate() )
 				{
 					$Messages->add( T_('User feature settings have been changed.'), 'success');
@@ -448,6 +454,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2010/11/18 13:56:06  efy-asimo
+ * admin skin preferences
+ *
  * Revision 1.20  2010/11/04 18:29:46  sam2kb
  * View personal blogs in user profile
  *

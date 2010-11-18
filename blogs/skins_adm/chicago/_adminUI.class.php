@@ -58,14 +58,22 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_page_head()
 	{
-		$r = $this->breadcrumbpath_get_html();
+		global $UserSettings, $current_User;
 
-		$r .= '
-		<div id="header">'
-			// Display MAIN menu:
-			.$this->get_html_menu().'
-		</div>
-		';
+		$r = '';
+		if( $UserSettings->get( 'show_breadcrumbs', $current_User->ID ) ) {
+			$r = $this->breadcrumbpath_get_html();
+		}
+
+		if( $UserSettings->get( 'show_menu', $current_User->ID) )
+		{
+			$r .= '
+			<div id="header">'
+				// Display MAIN menu:
+				.$this->get_html_menu().'
+			</div>
+			';
+		}
 
 		return $r;
 	}
@@ -385,11 +393,71 @@ class AdminUI extends AdminUI_general
 		}
 		debug_die( 'unknown color' );
 	}
+
+
+	/**
+	 * Display skin specific options
+	 */
+	function display_skin_settings( $Form )
+	{
+		global $UserSettings, $current_User;
+		$Form->begin_fieldset( T_( 'Admin skin settings' ), array( 'id' => 'admin_skin_settings' ) );
+		parent::display_skin_settings( $Form );
+
+		$Form->checklist( array(
+					array( 'show_evobar', 1, T_('Show evobar'), $UserSettings->get( 'show_evobar', $current_User->ID ) ),
+					array( 'show_breadcrumbs', 1, T_('Show breadcrumbs path'), $UserSettings->get( 'show_breadcrumbs', $current_User->ID ) ),
+					array( 'show_menu', 1, T_('Show Menu'), $UserSettings->get( 'show_menu', $current_User->ID ) ) ),
+				'chicago_settings', T_('Chicago skin settings') );
+
+		$Form->end_fieldset();
+
+		// JavaScript code to dynamically change display settings. show_evobar or show_menu always have to be checked
+		?>
+		<script type="text/javascript">
+		jQuery( '[name = show_evobar], [name = show_menu]' ).click( function()
+		{
+			if( ! ( jQuery( '[name = show_evobar]' ).attr( 'checked' ) || jQuery( '[name = show_menu]' ).attr( 'checked' ) ) )
+			{
+				jQuery( '[name = show_evobar]' ).attr( 'checked', true );
+			}
+		} );
+		</script>
+		<?php
+	}
+
+
+	/**
+	 * Set skin specific options
+	 */
+	function set_skin_settings( $user_ID )
+	{
+		global $UserSettings;
+		$UserSettings->set( 'show_evobar', param( 'show_evobar', 'boolean' ), $user_ID );
+		$UserSettings->set( 'show_breadcrumbs', param( 'show_breadcrumbs', 'boolean' ), $user_ID );
+		$UserSettings->set( 'show_menu', param( 'show_menu', 'boolean' ), $user_ID );
+		// It will be saved by the user.ctrl
+		// $UserSettings->dbupdate();
+	}
+
+
+	/**
+	 * Get show evobar setting
+	 * @return boolean 
+	 */
+	function get_show_evobar()
+	{
+		global $UserSettings, $current_User;
+		return $UserSettings->get( 'show_evobar', $current_User->ID );
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.33  2010/11/18 13:56:06  efy-asimo
+ * admin skin preferences
+ *
  * Revision 1.32  2010/05/06 18:58:14  blueyed
  * Admin: skin: chicago: fix duplicate ID within fieldset_begin. Use fieldset_wrapper_ID for the wrapper.
  *
