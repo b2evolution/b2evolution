@@ -59,7 +59,9 @@ switch( $action )
 		logout();          // logout $Session and set $current_User = NULL
 
 		// TODO: to give the user feedback through Messages, we would need to start a new $Session here and append $Messages to it.
-
+		
+		if( $redirect_to == $ReqURI ) $redirect_to = $baseurl;
+		
 		header_redirect(); // defaults to redirect_to param and exits
 		/* exited */
 		break;
@@ -414,6 +416,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.111  2010/11/20 19:19:03  sam2kb
+ * Redirect to $baseurl on logout if redirect URI is not set. Temporarily fix until we remove actions from redirect URIs
+ *
  * Revision 1.110  2010/02/08 17:51:05  efy-yury
  * copyright 2009 -> 2010
  *
