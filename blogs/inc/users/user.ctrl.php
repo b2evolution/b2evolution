@@ -236,8 +236,10 @@ if( !$Messages->count('error') )
 			if( param( 'preferences_form', 'boolean', false ) )
 			{
 				$current_admin_skin = param( 'current_admin_skin', 'string' );
-				if( $edited_User->ID == $current_User->ID && ( $current_admin_skin == $UserSettings->get( 'admin_skin', $edited_User->ID ) ) )
-				{ // Save Admin skin display settings if admin skin wasn't changed
+				if( ( $current_admin_skin == $UserSettings->get( 'admin_skin', $current_User->ID ) ) && 
+					( $current_admin_skin == $UserSettings->get( 'admin_skin', $edited_User->ID ) ) )
+				{ // Save Admin skin display settings if admin skin wasn't changed, and 
+					// edited user admin skin is the same as current user admin skin 
 					$AdminUI->set_skin_settings( $edited_User->ID );
 				}
 
@@ -454,6 +456,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2010/11/22 13:44:33  efy-asimo
+ * Admin skin preferences update
+ *
  * Revision 1.21  2010/11/18 13:56:06  efy-asimo
  * admin skin preferences
  *

@@ -1373,7 +1373,7 @@ class AdminUI_general extends Menu
 	 * Display skin options.
 	 * There is no common skin option.
 	 */
-	function display_skin_settings( $Form )
+	function display_skin_settings( $Form, $user_ID )
 	{
 	}
 
@@ -1400,6 +1400,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.111  2010/11/22 13:44:33  efy-asimo
+ * Admin skin preferences update
+ *
  * Revision 1.110  2010/11/18 13:56:06  efy-asimo
  * admin skin preferences
  *

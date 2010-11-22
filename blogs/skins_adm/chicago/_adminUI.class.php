@@ -398,17 +398,25 @@ class AdminUI extends AdminUI_general
 	/**
 	 * Display skin specific options
 	 */
-	function display_skin_settings( $Form )
+	function display_skin_settings( $Form, $user_ID )
 	{
 		global $UserSettings, $current_User;
 		$Form->begin_fieldset( T_( 'Admin skin settings' ), array( 'id' => 'admin_skin_settings' ) );
-		parent::display_skin_settings( $Form );
+		parent::display_skin_settings( $Form, $user_ID );
 
-		$Form->checklist( array(
-					array( 'show_evobar', 1, T_('Show evobar'), $UserSettings->get( 'show_evobar', $current_User->ID ) ),
-					array( 'show_breadcrumbs', 1, T_('Show breadcrumbs path'), $UserSettings->get( 'show_breadcrumbs', $current_User->ID ) ),
-					array( 'show_menu', 1, T_('Show Menu'), $UserSettings->get( 'show_menu', $current_User->ID ) ) ),
-				'chicago_settings', T_('Chicago skin settings') );
+		$user_admin_skin = $UserSettings->get( 'admin_skin', $user_ID );
+		if( $UserSettings->get( 'admin_skin', $current_User->ID ) == $user_admin_skin )
+		{
+			$Form->checklist( array(
+						array( 'show_evobar', 1, T_('Show evobar'), $UserSettings->get( 'show_evobar', $user_ID ) ),
+						array( 'show_breadcrumbs', 1, T_('Show breadcrumbs path'), $UserSettings->get( 'show_breadcrumbs', $user_ID ) ),
+						array( 'show_menu', 1, T_('Show Menu'), $UserSettings->get( 'show_menu', $user_ID ) ) ),
+					'chicago_settings', T_('Chicago skin settings') );
+		}
+		else
+		{
+			$Form->info( '', sprintf( T_( 'Admin skin settings for this user cannot be edited because this user is using a different admin skin (%s)' ), $user_admin_skin ) );
+		}
 
 		$Form->end_fieldset();
 
@@ -455,6 +463,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.34  2010/11/22 13:44:33  efy-asimo
+ * Admin skin preferences update
+ *
  * Revision 1.33  2010/11/18 13:56:06  efy-asimo
  * admin skin preferences
  *
