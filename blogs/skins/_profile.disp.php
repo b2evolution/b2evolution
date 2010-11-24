@@ -36,6 +36,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'regional/model/_country.class.php', 'Country' );
+
 global $Settings, $admin_url;
 
 if( ! is_logged_in() )
@@ -88,6 +90,11 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 	$ProfileForm->text_input( 'newuser_lastname', $current_User->get( 'lastname' ), 40, T_('Last name'), '', array( 'maxlength' => 50, 'class' => 'bComment' ) );
 	$ProfileForm->text_input( 'newuser_nickname', $current_User->get( 'nickname' ), 40, T_('Nickname'), '', array( 'maxlength' => 50, 'class' => 'bComment' ) );
 	$ProfileForm->select( 'newuser_idmode', $current_User->get('idmode'), array( &$current_User, 'callback_optionsForIdMode' ), T_('Identity shown'), '', 'bComment' );
+
+	$require_country = (bool)$Settings->get( 'registration_require_country' );
+	$CountryCache = & get_CountryCache();
+	$ProfileForm->select_input_object( 'newuser_ctry_ID', $current_User->ctry_ID, $CountryCache, T_( 'Country' ), array( 'allow_none' => !$require_country ) );
+
 	$ProfileForm->checkbox( 'newuser_showonline', $current_User->get( 'showonline' ), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
 
 	if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
@@ -137,6 +144,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.18  2010/11/24 16:05:52  efy-asimo
+ * User country and gender options modifications
+ *
  * Revision 1.17  2010/11/24 14:55:30  efy-asimo
  * Add user gender
  *

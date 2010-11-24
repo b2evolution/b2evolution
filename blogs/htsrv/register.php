@@ -98,8 +98,7 @@ switch( $action )
 			$paramsList['country'] = $country;
 		}
 
-		if( ( $registration_require_gender == 'required' ) || 
-			( ( $registration_require_gender == 'optional' ) && ( ! empty( $gender ) ) ) )
+		if( $registration_require_gender == 'required' )
 		{
 			$paramsList['gender'] = $gender;
 		}
@@ -236,6 +235,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.105  2010/11/24 16:05:52  efy-asimo
+ * User country and gender options modifications
+ *
  * Revision 1.104  2010/11/24 14:55:30  efy-asimo
  * Add user gender
  *

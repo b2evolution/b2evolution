@@ -63,6 +63,7 @@ param( 'newuser_email', 'string', '' );
 param( 'allow_pm', 'integer', 0 );           // checkbox
 param( 'allow_email', 'integer', 0 );        // checkbox
 param( 'newuser_notify', 'integer', 0 );        // checkbox
+param( 'newuser_ctry_ID', 'integer', 0 );
 param( 'newuser_showonline', 'integer', 0 );    // checkbox
 param( 'newuser_gender', 'string', NULL );
 param( 'pass1', 'string', '' );
@@ -105,6 +106,7 @@ $Plugins->trigger_event( 'ProfileFormSent', array(
 		'allow_pm' => & $allow_pm,
 		'allow_email' => & $allow_email,
 		'newuser_notify' => & $newuser_notify,
+		'newuser_ctry_ID' => & $newuser_ctry_ID,
 		'newuser_showonline' => & $newuser_showonline,
 		'newuser_gender' => & $newuser_gender,
 		'pass1' => & $pass1,
@@ -173,6 +175,7 @@ if( $allow_email )
 }
 $current_User->set( 'allow_msgform', $newuser_allow_msgform );
 $current_User->set( 'notify', $newuser_notify );
+$current_User->set( 'ctry_ID', $newuser_ctry_ID );
 $current_User->set( 'showonline', $newuser_showonline );
 $current_User->set( 'gender', $newuser_gender );
 
@@ -193,6 +196,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.66  2010/11/24 16:05:52  efy-asimo
+ * User country and gender options modifications
+ *
  * Revision 1.65  2010/11/24 14:55:30  efy-asimo
  * Add user gender
  *
