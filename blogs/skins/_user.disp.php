@@ -21,6 +21,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'regional/model/_country.class.php', 'Country' );
+
 /**
 * @var Blog
 */
@@ -84,6 +86,13 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 		$ProfileForm->info( T_('Website'), '<a href="'.$User->url.'" rel="nofollow" target="_blank">'.$User->url.'</a>' );
 	}
 
+	if( ! empty( $User->ctry_ID ) )
+	{
+		$CountryCache = & get_CountryCache();
+		$user_Country = $CountryCache->get_by_ID( $User->ctry_ID );
+		$ProfileForm->info( T_( 'Country' ), $user_Country->get_name() );
+	}
+
 $ProfileForm->end_fieldset();
 
 
@@ -116,6 +125,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.19  2010/11/24 15:27:18  efy-asimo
+ * Add country to disp=user page
+ *
  * Revision 1.18  2010/07/26 06:52:27  efy-asimo
  * MFB v-4-0
  *
