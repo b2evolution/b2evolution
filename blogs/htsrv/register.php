@@ -44,11 +44,14 @@ $login_required = false;
 
 // Check if country is required
 $registration_require_country = (bool)$Settings->get('registration_require_country');
+// Check if gender is required
+$registration_require_gender = $Settings->get('registration_require_gender');
 
 param( 'action',  'string', '' );
 param( 'login',   'string', '' );
 param( 'email',   'string', '' );
 param( 'country', 'integer', '' );
+param( 'gender',  'string', NULL );
 param( 'redirect_to', 'string', '' ); // do not default to $admin_url; "empty" gets handled better in the end (uses $blogurl, if no admin perms).
 
 
@@ -71,6 +74,7 @@ switch( $action )
 				'login'   => & $login,
 				'email'   => & $email,
 				'country' => & $country,
+				'gender'  => & $gender,
 				'locale'  => & $locale,
 				'pass1'   => & $pass1,
 				'pass2'   => & $pass2,
@@ -92,6 +96,12 @@ switch( $action )
 		if( $registration_require_country )
 		{
 			$paramsList['country'] = $country;
+		}
+
+		if( ( $registration_require_gender == 'required' ) || 
+			( ( $registration_require_gender == 'optional' ) && ( ! empty( $gender ) ) ) )
+		{
+			$paramsList['gender'] = $gender;
 		}
 
 		// Check profile params:
@@ -118,6 +128,7 @@ switch( $action )
 		$new_User->set( 'pass', md5($pass1) ); // encrypted
 		$new_User->set( 'nickname', $login );
 		$new_User->set( 'ctry_ID', $country );
+		$new_User->set( 'gender', $gender );
 		$new_User->set_email( $email );
 		$new_User->set( 'ip', $Hit->IP );
 		$new_User->set( 'domain', $Hit->get_remote_host( true ) );
@@ -225,6 +236,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.104  2010/11/24 14:55:30  efy-asimo
+ * Add user gender
+ *
  * Revision 1.103  2010/02/08 17:51:14  efy-yury
  * copyright 2009 -> 2010
  *

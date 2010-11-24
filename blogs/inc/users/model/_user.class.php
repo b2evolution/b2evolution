@@ -84,6 +84,7 @@ class User extends DataObject
 	var $allow_msgform;
 	var $notify;
 	var $showonline;
+	var $gender;
 
 	/**
 	 * Has the user been validated (by email)?
@@ -237,6 +238,7 @@ class User extends DataObject
 			$this->validated = $db_row->user_validated;
 			$this->notify = $db_row->user_notify;
 			$this->showonline = $db_row->user_showonline;
+			$this->gender = $db_row->user_gender;
 			$this->avatar_file_ID = $db_row->user_avatar_file_ID;
 			$this->ctry_ID = $db_row->user_ctry_ID;
 
@@ -382,6 +384,9 @@ class User extends DataObject
 
 			param( 'edited_user_showonline', 'integer', 0 );
 			$this->set_from_Request('showonline', 'edited_user_showonline', true);
+
+			param( 'edited_user_gender', 'string', '' );
+			$this->set_from_Request('gender', 'edited_user_gender', true);
 
 			param( 'edited_user_url', 'string', true );
 			param_check_url( 'edited_user_url', 'commenting' );
@@ -2101,6 +2106,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.87  2010/11/24 14:55:30  efy-asimo
+ * Add user gender
+ *
  * Revision 1.86  2010/11/07 18:50:44  fplanque
  * Added Comment::author2() with skins v2 style params.
  *

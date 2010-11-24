@@ -2812,6 +2812,10 @@ function upgrade_b2evo_tables()
 	db_drop_col( 'T_groups', 'grp_perm_templates' );
 	task_end();
 
+	task_begin( 'Upgrading users table, add user gender...' );
+	db_add_col( 'T_users', 'user_gender', 'char(1) NULL DEFAULT NULL AFTER user_showonline' );
+	task_end();
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -2986,6 +2990,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.374  2010/11/24 14:55:30  efy-asimo
+ * Add user gender
+ *
  * Revision 1.373  2010/11/04 00:48:17  fplanque
  * no message
  *

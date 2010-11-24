@@ -112,6 +112,7 @@ $schema_queries = array(
 			user_allow_msgform TINYINT NOT NULL DEFAULT '2',
 			user_notify tinyint(1) NOT NULL default 1,
 			user_showonline tinyint(1) NOT NULL default 1,
+			user_gender char(1) NULL,
 			user_grp_ID int(4) NOT NULL default 1,
 			user_validated tinyint(1) NOT NULL DEFAULT 0,
 			user_avatar_file_ID int(10) unsigned default NULL,
@@ -282,6 +283,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.52  2010/11/24 14:55:30  efy-asimo
+ * Add user gender
+ *
  * Revision 1.51  2010/10/15 13:10:09  efy-asimo
  * Convert group permissions to pluggable permissions - part1
  *

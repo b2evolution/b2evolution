@@ -242,6 +242,14 @@ if( $action != 'view' )
 	$Form->select_input_object( 'edited_user_ctry_ID', $edited_User->ctry_ID, $CountryCache, 'Country', array( 'required' => !$has_full_access, 'allow_none' => $has_full_access ) );
 
 	$Form->checkbox( 'edited_user_showonline', $edited_User->get('showonline'), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
+
+	if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
+	{
+		$Form->radio( 'edited_user_gender', $edited_User->get('gender'), array(
+					array( 'M', T_('Male') ),
+					array( 'F', T_('Female') ),
+				), T_('Gender') );
+	}
 }
 else
 { // display only
@@ -258,6 +266,15 @@ else
 	$Form->info( T_('Identity shown'), $edited_User->get('preferredname') );
 	$Form->info( T_('Country'), $edited_User->get_country_name() );
 	$Form->info( T_('Show online'), ($edited_User->get('showonline')) ? T_('yes') : T_('no') );
+
+	if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
+	{
+		$user_gender = $edited_User->get( 'gender' );
+		if( ! empty( $user_gender ) )
+		{
+			$Form->info( T_('Gender'), ( $user_gender == 'M' ) ? T_( 'Male' ) : T_( 'Female' ) );
+		}
+	}
 	$Form->info( T_('Multiple sessions'), ($UserSettings->get('login_multiple_sessions', $edited_User->ID) ? T_('Allowed') : T_('Forbidden')) );
 }
 
@@ -475,6 +492,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.19  2010/11/24 14:55:30  efy-asimo
+ * Add user gender
+ *
  * Revision 1.18  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:

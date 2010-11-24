@@ -87,6 +87,7 @@ class GeneralSettings extends AbstractSettings
 		'newusers_mustvalidate' => '1',
 		'newusers_revalidate_emailchg' => '0',
 		'newusers_level' => '1',
+		'registration_require_gender' => 'optional',
 
 		'allow_avatars' => 1,
 
@@ -233,6 +234,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.33  2010/11/24 14:55:30  efy-asimo
+ * Add user gender
+ *
  * Revision 1.32  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:

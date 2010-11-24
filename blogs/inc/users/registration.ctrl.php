@@ -64,6 +64,8 @@ switch ( $action )
 
 		param( 'registration_require_country', 'integer', 0 );
 
+		param( 'registration_require_gender', 'string', '' );
+
 		$Settings->set_array( array(
 									 array( 'newusers_canregister', $newusers_canregister),
 
@@ -79,7 +81,9 @@ switch ( $action )
 
 									 array( 'js_passwd_hashing', $js_passwd_hashing),
 
-									 array( 'registration_require_country', $registration_require_country)) );
+									 array( 'registration_require_country', $registration_require_country),
+
+									 array( 'registration_require_gender', $registration_require_gender) ) );
 
 		if( ! $Messages->count('error') )
 		{
@@ -122,6 +126,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2010/11/24 14:55:30  efy-asimo
+ * Add user gender
+ *
  * Revision 1.9  2010/05/07 08:07:14  efy-asimo
  * Permissions check update (User tab, Global Settings tab) - bugfix
  *

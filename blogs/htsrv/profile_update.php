@@ -64,6 +64,7 @@ param( 'allow_pm', 'integer', 0 );           // checkbox
 param( 'allow_email', 'integer', 0 );        // checkbox
 param( 'newuser_notify', 'integer', 0 );        // checkbox
 param( 'newuser_showonline', 'integer', 0 );    // checkbox
+param( 'newuser_gender', 'string', NULL );
 param( 'pass1', 'string', '' );
 param( 'pass2', 'string', '' );
 
@@ -105,6 +106,7 @@ $Plugins->trigger_event( 'ProfileFormSent', array(
 		'allow_email' => & $allow_email,
 		'newuser_notify' => & $newuser_notify,
 		'newuser_showonline' => & $newuser_showonline,
+		'newuser_gender' => & $newuser_gender,
 		'pass1' => & $pass1,
 		'pass2' => & $pass2,
 		'User' => & $current_User,
@@ -172,6 +174,7 @@ if( $allow_email )
 $current_User->set( 'allow_msgform', $newuser_allow_msgform );
 $current_User->set( 'notify', $newuser_notify );
 $current_User->set( 'showonline', $newuser_showonline );
+$current_User->set( 'gender', $newuser_gender );
 
 
 // Set Messages into user's session, so they get restored on the next page (after redirect):
@@ -190,6 +193,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.65  2010/11/24 14:55:30  efy-asimo
+ * Add user gender
+ *
  * Revision 1.64  2010/07/19 09:35:02  efy-asimo
  * Fix messaging permission setup
  * Update comments number per page

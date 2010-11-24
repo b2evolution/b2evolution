@@ -2202,6 +2202,7 @@ class Plugin
 	 *   - 'newuser_allow_msgform': "message form" status (by reference)
 	 *   - 'newuser_notify': "notifications" status (by reference)
 	 *   - 'newuser_showonline': "show online" status (by reference)
+	 *   - 'newuser_gender': gender (by reference)
 	 *   - 'pass1': pass1 (by reference)
 	 *   - 'pass2': pass2 (by reference)
 	 */
@@ -3099,6 +3100,9 @@ class Plugin
 
 /*
  * $Log$
+ * Revision 1.48  2010/11/24 14:55:30  efy-asimo
+ * Add user gender
+ *
  * Revision 1.47  2010/11/18 15:09:16  efy-asimo
  * create $login_error global variable
  *

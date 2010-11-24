@@ -544,6 +544,12 @@ function profile_check_params( $params, $User = NULL )
 		param_error( 'country', T_('Please select country.') );
 	}
 
+	// Checking gender
+	if( isset($params['gender']) && empty($params['gender'][0]) )
+	{
+		param_error( 'gender', T_('Please select gender.') );
+	}
+
 	// Checking URL:
 	if( isset($params['url']) )
 	{
@@ -716,6 +722,9 @@ function seconds_to_fields( $duration )
 
 /*
  * $Log$
+ * Revision 1.25  2010/11/24 14:55:30  efy-asimo
+ * Add user gender
+ *
  * Revision 1.24  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *

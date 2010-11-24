@@ -93,6 +93,12 @@ $Form->begin_fieldset( T_('Other options') );
 
 	$Form->checkbox_input( 'registration_require_country', $Settings->get('registration_require_country'), T_('Require country'), array( 'note'=>T_('New users will have to specify their country in order to register.') ) );
 
+	$Form->radio( 'registration_require_gender',$Settings->get('registration_require_gender'), array(
+					array( 'hidden', T_('Hidden') ),
+					array( 'optional', T_('Optional') ),
+					array( 'required', T_('Required') ),
+				), T_('Gender'), true );
+
 $Form->end_fieldset();
 
 // --------------------------------------------
@@ -105,6 +111,9 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.11  2010/11/24 14:55:30  efy-asimo
+ * Add user gender
+ *
  * Revision 1.10  2010/05/07 08:07:14  efy-asimo
  * Permissions check update (User tab, Global Settings tab) - bugfix
  *

@@ -90,6 +90,14 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 	$ProfileForm->select( 'newuser_idmode', $current_User->get('idmode'), array( &$current_User, 'callback_optionsForIdMode' ), T_('Identity shown'), '', 'bComment' );
 	$ProfileForm->checkbox( 'newuser_showonline', $current_User->get( 'showonline' ), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
 
+	if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
+	{
+		$ProfileForm->radio( 'newuser_gender', $current_User->get('gender'), array(
+							array( 'M', T_('Male') ),
+							array( 'F', T_('Female') ),
+						), T_('Gender') );
+	}
+
 $ProfileForm->end_fieldset();
 
 $ProfileForm->begin_fieldset( T_('Password') );
@@ -129,6 +137,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.17  2010/11/24 14:55:30  efy-asimo
+ * Add user gender
+ *
  * Revision 1.16  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:

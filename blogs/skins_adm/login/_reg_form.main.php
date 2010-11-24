@@ -75,6 +75,16 @@ $Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20
 		$Form->select_input_object( 'country', $country, $CountryCache, 'Country', array('allow_none'=>true, 'required'=>true) );
 	}
 
+	$registration_require_gender = $Settings->get( 'registration_require_gender' );
+	if( $registration_require_gender != 'hidden' )
+	{ // not hidden, show the gender radio
+		$gender_required = ( $registration_require_gender == 'required' );
+		$Form->radio_input( 'gender', false, array(
+					array( 'value' => 'M', 'label' => T_('Male') ),
+					array( 'value' => 'F', 'label' => T_('Female') ),
+				), T_('Gender'), array( 'required' => $gender_required ) );
+	}
+
 	$Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Preferred language') );
 
 	$Plugins->trigger_event( 'DisplayRegisterFormFieldset', array( 'Form' => & $Form ) );
@@ -94,6 +104,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.14  2010/11/24 14:55:30  efy-asimo
+ * Add user gender
+ *
  * Revision 1.13  2010/02/08 17:56:56  efy-yury
  * copyright 2009 -> 2010
  *

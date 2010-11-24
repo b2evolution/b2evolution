@@ -87,7 +87,7 @@ if( ! is_null($user_ID) )
 		{
 			$action = 'view';
 		}
-		header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&amp;action='.$action.'&amp;user_ID='.$user_ID ) );
+		header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&action='.$action.'&user_ID='.$user_ID, '', '&' ) );
 	}
 
 	if( $action != 'list' )
@@ -332,6 +332,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.50  2010/11/24 14:55:30  efy-asimo
+ * Add user gender
+ *
  * Revision 1.49  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *
