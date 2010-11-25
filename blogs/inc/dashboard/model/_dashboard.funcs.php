@@ -88,7 +88,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 	$Debuglog->add( sprintf('Getting updates from %s.', $evonetsrv_host), 'evonet' );
 	if( $debug )
 	{
-		$Messages->add( sprintf(T_('Getting updates from %s.'), $evonetsrv_host), 'notes' );
+		$Messages->add( sprintf(T_('Getting updates from %s.'), $evonetsrv_host), 'note' );
 	}
 	$Settings->set( 'evonet_last_attempt', $servertimenow );
 	$Settings->dbupdate();
@@ -288,6 +288,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.39  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.38  2010/09/23 14:21:00  efy-asimo
  * antispam in comment text feature
  *

@@ -128,7 +128,7 @@ profile_check_params( array(
 	'pass_required' => false ), $current_User );
 
 
-if( $Messages->count('error') )
+if( $Messages->has_errors() )
 {
 	headers_content_mightcache( 'text/html', 0 );		// Do NOT cache error messages! (Users would not see they fixed them)
 
@@ -196,6 +196,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.67  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.66  2010/11/24 16:05:52  efy-asimo
  * User country and gender options modifications
  *

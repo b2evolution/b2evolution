@@ -188,7 +188,7 @@ function header_redirect( $redirect_to = NULL, $status = false )
 	}
 
 	// Transfer of Messages to next page:
-	if( $Messages->count('all') )
+	if( $Messages->count() )
 	{ // Set Messages into user's session, so they get restored on the next page (after redirect):
 		$Session->set( 'Messages', $Messages );
 	 // echo 'Passing Messages to next page';
@@ -1115,6 +1115,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.77  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.76  2010/09/15 13:04:06  efy-asimo
  * Cross post navigatation
  *

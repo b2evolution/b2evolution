@@ -2107,7 +2107,7 @@ class File extends DataObject
 			$result_link .= '<br/>'.sprintf( $link, $row->$object_ID, $row->$object_name );
 		}
 
-		if( $count = count($query_result) > 0 )
+		if( ( $count = count($query_result) ) > 0 )
 		{ // there are restrictions
 			return sprintf( $restriction['msg'].$result_link, $count );
 		}
@@ -2119,6 +2119,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.90  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.89  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

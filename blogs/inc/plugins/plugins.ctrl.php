@@ -422,7 +422,10 @@ switch( $action )
 
 		if( ! empty( $edit_Plugin->install_dep_notes ) )
 		{ // Add notes from dependencies
-			$Messages->add_messages( array( 'note' => $edit_Plugin->install_dep_notes ) );
+			foreach( $edit_Plugin->install_dep_notes as $note )
+			{
+				$Messages->add( $note, 'note' );
+			}
 		}
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( '?ctrl=plugins', 303 ); // Will EXIT
@@ -461,7 +464,10 @@ switch( $action )
 		}
 		if( ! empty( $msgs['note'] ) )
 		{ // just notes:
-			$Messages->add_messages( array( 'note' => $msgs['note'] ) );
+			foreach( $msgs['note'] as $note )
+			{
+				$Messages->add( $note, 'note' );
+			}
 		}
 
 		// Ask plugin:
@@ -690,7 +696,7 @@ switch( $action )
 			}
 		}
 
-		if( $Messages->count('error') )
+		if( $Messages->has_errors() )
 		{ // there were errors
 			$action = 'edit_settings';
 		}
@@ -1133,6 +1139,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.21  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.20  2010/05/07 08:07:14  efy-asimo
  * Permissions check update (User tab, Global Settings tab) - bugfix
  *

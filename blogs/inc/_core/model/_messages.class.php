@@ -52,202 +52,76 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class Messages
 {
 	/**
-	 * The stored messages (by category).
-	 * array of arrays
+	 * The stored messages text.
+	 * array of Strings
 	 *
 	 * @var array
 	 */
-	var $messages = array();
+	var $messages_text = array();
 
 	/**
-	 * Default category for messages.
-	 * @var string
-	 */
-	var $defaultcategory = 'error';
-
-	/**
-	 * string or array to display before messages
-	 * @var mixed
-	 */
-	var $head = '';
-
-	/**
-	 * to display after messages
-	 * @var string
-	 */
-	var $foot = '';
-
-	/**
-	 * Cache for {@link Log::count()}
+	 * The stored messages type.
+	 * array of Strings
+	 *
 	 * @var array
 	 */
-	var $_count = array();
-
+	var $messages_type = array();
 
 	/**
-	 * Constructor.
-	 *
-	 * @param string sets default category
+	 * The number of messages
+	 * 
+	 * @var integer
 	 */
-	function Messages( $category = 'error' )
+	var $count = 0;
+
+	/**
+	 * Error message was added or not.
+	 * 
+	 * @var boolean
+	 */
+	var $has_errors = false;
+
+	/**
+	 * Clears messages content
+	 */
+	function clear()
 	{
-		$this->defaultcategory = $category;
-
-		// create the array for this category
-		$this->messages[$category] = array();
+		$this->messages_text = array();
+		$this->messages_type = array();
+		$this->count = 0;
+		$this->has_errors = false;
 	}
 
 
 	/**
-	 * Clears the Log (all or specified category).
-	 *
-	 * @param string category, use 'all' to unset all categories
-	 */
-	function clear( $category = NULL )
-	{
-		if( $category == 'all' )
-		{
-			$this->messages = array();
-			$this->_count = array();
-		}
-		else
-		{
-			if( $category === NULL )
-			{
-				$category = $this->defaultcategory;
-			}
-			unset( $this->messages[ $category ] );
-			unset( $this->_count[$category] );
-			unset( $this->_count['all'] );
-		}
-	}
-
-
-	/**
-	 * Add a message to the Log.
+	 * Add a message.
 	 *
 	 * @param string the message
-	 * @param string|array the category, default is to use the object's default category.
-	 *        Can also be an array of categories to add the same message to.
-	 * @param boolean Dump (output) this directly?
+	 * @param string the message type, it can have this values: 'success', 'warning', 'error', 'note'
 	 */
-	function add( $message, $category = NULL )
+	function add( $text, $type = 'error' )
 	{
-		if( $category === NULL )
-		{ // By default, we use the default category:
-			$category = $this->defaultcategory;
-		}
-
-		if( is_array($category) )
-		{
-			foreach( $category as $l_cat )
-			{
-				$this->add( $message, $l_cat, false );
-			}
-		}
-		else
-		{
-			$this->messages[$category][] = $message;
-
-			if( empty($this->_count[$category]) )
-			{
-				$this->_count[$category] = 0;
-			}
-			$this->_count[$category]++;
-		}
+		$this->messages_text[$this->count] = $text;
+		$this->messages_type[$this->count] = $type;
+		$this->count++;
+		$this->error = ( $type == 'error' );
 	}
 
 
 	/**
-	 * Add an array of messages.
+	 * Add a Messages object to this.
 	 *
-	 * @param array Array of messages where the keys are the categories and hold an array of messages.
+	 * @param Messages object
 	 */
-	function add_messages( $messages )
+	function add_messages( $p_Messages )
 	{
-		foreach( $messages as $l_cat => $l_messages  )
+		$this->count = $this->count + $p_Messages->count;
+		for( $i = 0; $i < $p_Messages->count; $i++ )
 		{
-			foreach( $l_messages as $l_message )
-			{
-				$this->add( $l_message, $l_cat );
-			}
+			$this->messages_text[] = $p_Messages->messages_text[$i];
+			$this->messages_type[] = $p_Messages->messages_type[$i];
+			$this->error = ( $p_Messages->messages_type[$i] == 'error' );
 		}
-	}
-
-
-	/**
-	 * Get head/foot for a specific category, designed for internal use of {@link display()}
-	 *
-	 * @static
-	 * @access private
-	 *
-	 * @param mixed head or foot (array [ category => head/foot, category => 'string', 'template',
-	 *              or string [for container only])
-	 * @param string the category (or container)
-	 * @param string template, where the head/foot gets used (%s)
-	 */
-	function get_head_foot( $headfoot, $category, $template = NULL )
-	{
-		if( is_string($headfoot) && $category == 'container' )
-		{ // container head or foot
-			$r = $headfoot;
-		}
-		elseif( is_array($headfoot) )
-		{ // head or foot for categories
-			if( isset($headfoot[$category]) )
-			{
-				$r = $headfoot[$category];
-			}
-			elseif( isset($headfoot['all']) && $category != 'container' )
-			{ // use 'all' info, except if for container
-				$r = $headfoot['all'];
-			}
-			else
-			{
-				return false;
-			}
-
-			if( is_array($r) )
-			{
-				if( isset($r['template']) )
-				{
-					$template = $r['template'];
-				}
-				$r = $r['string'];
-			}
-
-			// Replace '%s' with category:
-			$r = str_replace( '%s', $category, $r );
-		}
-
-		if( empty($r) )
-		{
-			return false;
-		}
-
-		if( !empty($template) )
-		{
-			$r = sprintf( $template, $r );
-		}
-
-		return $r;
-	}
-
-
-	/**
-	 * Wrapper to display messages as simple paragraphs.
-	 *
-	 * @param mixed the category of messages, see {@link display()}. NULL for default category.
-	 * @param mixed the outer div, see {@link display()}
-	 * @param mixed the css class for inner paragraphs
-	 */
-	function display_paragraphs( $category = 'all', $outerdivclass = 'panelinfo', $cssclass = NULL )
-	{
-		if( is_null($cssclass) )
-		{
-			$cssclass = array( 'all' => array( 'divClass' => false ) );
-		}
-		return $this->display( '', '', true, $category, $cssclass, 'p', $outerdivclass );
 	}
 
 
@@ -261,14 +135,10 @@ class Messages
 	 *
 	 * @param string HTML to display before the log when there is something to display
 	 * @param string HTML to display after the log when there is something to display
-	 * @param boolean Skip if previewing?
-	 *        TODO: dh> This appears to not display e.g. errors which got inserted?!!
-	 *                  I also don't see how this is a "simple" param (in the sense
-	 *                  of useful/required)
 	 */
-	function disp( $before = '<div class="action_messages">', $after = '</div>', $skip_if_preview = true )
+	function disp( $before = '<div class="action_messages">', $after = '</div>' )
 	{
-		if( count($this->messages) )
+		if( $this->count )
 		{
 			global $preview;
 			if( $preview )
@@ -276,7 +146,7 @@ class Messages
 				return;
 			}
 
-			$disp = $this->display( NULL, NULL, false, 'all', NULL, NULL, NULL );
+			$disp = $this->display( NULL, NULL, false, NULL );
 
 			if( !empty( $disp ) )
 			{
@@ -287,15 +157,10 @@ class Messages
 
 
 	/**
-	 * Display messages of the Log object.
+	 * Display messages of the object.
 	 *
-	 * - You can either output/get the messages of a category (string),
-	 *   all categories ('all') or category groups (array of strings) (defaults to 'all').
-	 * - Head/Foot will be displayed on top/bottom of the messages. You can pass
-	 *   an array as head/foot with the category as key and this will be displayed
-	 *   on top of the category's messages.
-	 * - You can choose from various styles for message groups ('ul', 'p', 'br')
-	 *   and set a css class for it (by default 'log_'.$category gets used).
+	 * - You can output/get the messages
+	 * - Head/Foot will be displayed on top/bottom of the messages.
 	 * - You can suppress the outer div or set a css class for it (defaults to
 	 *   'log_container').
 	 *
@@ -303,52 +168,17 @@ class Messages
 	 * start by getting rid of the $category selection and the special cases for 'all'. If you don't want to display ALL messages,
 	 * then you should not log them in the same Log object and you should instantiate separate logs instead.
 	 *
-	 * @param string|NULL Header/title, might be array ( category => msg ),
-	 *                    'container' is then top. NULL for object's default ({@link Log::$head}.
-	 * @param string|NULL Footer, might be array ( category => msg ), 'container' is then bottom.
-	 *                    NULL for object's default ({@link Log::$foot}.
+	 * @param string|NULL Header/title
+	 * @param string|NULL Footer
 	 * @param boolean to display or return (default: display)
-	 * @param mixed the category of messages to use (category, 'all', list of categories (array)
-	 *              or NULL for {@link $defaultcategory}).
-	 * @param string the CSS class of the messages div tag (default: 'log_'.$category)
-	 * @param string the style to use, 'ul', 'p', 'br', 'raw'
-	 *               (default: 'br' for single message, 'ul' for more)
 	 * @param mixed the outer div, may be false
 	 * @return boolean false, if no messages; else true (and outputs if $display)
 	 */
-	function display( $head = NULL, $foot = NULL, $display = true, $category = 'all', $cssclass = NULL, $style = NULL, $outerdivclass = 'log_container' )
+	function display( $head = NULL, $foot = NULL, $display = true, $outerdivclass = 'log_container' )
 	{
-		if( is_null( $head ) )
-		{ // Use object default:
-			$head = isset( $this->head ) ? $this->head : '';
-		}
-		if( is_null( $foot ) )
-		{ // Use object default:
-			$foot = isset( $this->foot ) ? $this->foot : '';
-		}
-		if( is_null( $category ) )
-		{
-			$category = isset( $this, $this->defaultcategory ) ? $this->defaultcategory : 'error';
-		}
-
-		if( !$this->count( $category ) )
-		{ // no messages
+		if( $this->count == 0 ) {
 			return false;
 		}
-		else
-		{
-			$messages = $this->get_messages( $category );
-		}
-
-		if( !is_array($cssclass) )
-		{
-			$cssclass = array( 'all' => array( 'class' => is_null($cssclass) ? NULL : $cssclass, 'divClass' => true ) );
-		}
-		elseif( !isset($cssclass['all']) )
-		{
-			$cssclass['all'] = array( 'class' => NULL, 'divClass' => true );
-		}
-
 
 		$disp = '';
 
@@ -357,62 +187,23 @@ class Messages
 			$disp .= "\n<div class=\"$outerdivclass\">";
 		}
 
-		$disp .= Log::get_head_foot( $head, 'container', '<h2>%s</h2>' );
-
-
-		foreach( $messages as $lcategory => $lmessages )
+		if( !empty( $head ) )
 		{
-			$lcssclass = isset($cssclass[$lcategory]) ? $cssclass[$lcategory] : $cssclass['all'];
-			if( !isset($lcssclass['class']) || is_null($lcssclass['class']) )
-			{
-				$lcssclass['class'] = 'log_'.$lcategory;
-			}
-			if( !isset($lcssclass['divClass']) || is_null($lcssclass['divClass']) || $lcssclass['divClass'] === true )
-			{
-				$lcssclass['divClass'] = $lcssclass['class'];
-			}
-
-
-			$disp .= "\n";
-			if( $lcssclass['divClass'] )
-			{
-				$disp .= "\t<div class=\"{$lcssclass['divClass']}\">";
-			}
-
-			$disp .= Log::get_head_foot( $head, $lcategory, '<h3>%s</h3>' );
-
-			if( $style == NULL )
-			{ // 'br' for a single message, 'ul' for more
-				$style = count($lmessages) == 1 ? 'br' : 'ul';
-			}
-
-			// implode messages
-			if( $style == 'ul' )
-			{
-				$disp .= "\t<ul".( $lcssclass['class'] ? " class=\"{$lcssclass['class']}\"" : '' ).'>'
-					.'<li>'.implode( "</li>\n<li>", $lmessages )."</li></ul>\n";
-			}
-			elseif( $style == 'p' )
-			{
-				$disp .= "\t<p".( $lcssclass['class'] ? " class=\"{$lcssclass['class']}\"" : '' ).'>'
-							.implode( "</p>\n<p class=\"{$lcssclass['class']}\">", $lmessages )."</p>\n";
-			}
-			elseif( $style == 'raw' )
-			{
-				$disp .= implode( "\n", $lmessages )."\n";
-			}
-			else
-			{
-				$disp .= "\t".implode( "\n<br />\t", $lmessages );
-			}
-			$disp .= Log::get_head_foot( $foot, $lcategory, "\n<p>%s</p>" );
-			if( $lcssclass['divClass'] )
-			{
-				$disp .= "\t</div>\n";
-			}
+			$disp .= '<h3>'.$head.'</h3>';
 		}
 
-		$disp .= Log::get_head_foot( $foot, 'container', "\n<p>%s</p>" );
+		$disp .= '<ul>';
+		for( $i = 0; $i < $this->count; $i++ )
+		{
+			$disp .= "<li>\t<div class=\"log_{$this->messages_type[$i]}\"".'>'
+					.$this->messages_text[$i]."</div></li>\n";
+		}
+		$disp .= '</ul>';
+
+		if( !empty( $foot ) )
+		{
+			$disp .= "\n<p>".$foot."</p>";
+		}
 
 		if( $outerdivclass )
 		{
@@ -424,7 +215,6 @@ class Messages
 			echo $disp;
 			return true;
 		}
-
 		return $disp;
 	}
 
@@ -434,12 +224,13 @@ class Messages
 	 *
 	 * @param string prefix of the string
 	 * @param string suffic of the string
-	 * @param string the category
+	 * @param string the glue
+	 * @param string result format
 	 * @return string the messages, imploded. Tags stripped.
 	 */
-	function get_string( $head = '', $foot = '', $category = NULL, $implodeBy = ', ', $format = 'striptags' )
+	function get_string( $head = '', $foot = '', $implodeBy = ', ', $format = 'striptags' )
 	{
-		if( !$this->count( $category ) )
+		if( !$this->count )
 		{
 			return false;
 		}
@@ -449,7 +240,7 @@ class Messages
 		{
 			$r .= $head.' ';
 		}
-		$r .= implode( $implodeBy, $this->get_messages( $category, true ) );
+		$r .= implode( $implodeBy, $this->messages_text );
 		if( '' != $foot )
 		{
 			$r .= ' '.$foot;
@@ -474,105 +265,32 @@ class Messages
 
 
 	/**
-	 * Counts messages of a given category
+	 * Get the number of messages
 	 *
-	 * @todo this seems a bit weird (not really relying on the cache ($_count) and unsetting 'all') -> write testcases to safely be able to change it.
-	 * @param string|array the category, NULL=default, 'all' = all
 	 * @return number of messages
 	 */
-	function count( $category = NULL )
+	function count()
 	{
-		if( is_null($category) )
-		{	// use default category:
-			$category = $this->defaultcategory;
-		}
-
-		if( is_string($category) )
-		{
-			if( empty( $this->_count[$category] ) )
-			{
-				$this->_count[$category] = count( $this->get_messages( $category, true ) );
-			}
-			if( $category != 'all' )
-			{
-				unset($this->_count['all']);
-			}
-			return $this->_count[$category];
-		}
-
-		return count( $this->get_messages( $category, true ) );
+		return $this->count;
 	}
 
 
 	/**
-	 * Returns array of messages of a single category or group of categories.
+	 * Has error message in current object
 	 *
-	 * If the category is an array, those categories will be used (where 'all' will
-	 * be translated with the not already processed categories).
-	 * <code>get_messages( array('error', 'note', 'all') )</code> would return
-	 * 'errors', 'notes' and the remaining messages, in that order.
-	 *
-	 * @param string|array the category, NULL=default, 'all' = all
-	 * @param boolean if true will use subarrays for each category
-	 * @return array the messages, one or two dimensions (depends on second param)
+	 * @return boolean true if error message was added, false otherwise
 	 */
-	function get_messages( $category = NULL, $singleDimension = false )
+	function has_errors()
 	{
-		$messages = array();
-
-		if( is_null($category) )
-		{
-			$category = $this->defaultcategory;
-		}
-
-		if( $category == 'all' )
-		{
-			$category = array_keys( $this->messages );
-			sort($category);
-		}
-		elseif( !is_array($category) )
-		{
-			$category = array( $category );
-		}
-
-		$categoriesDone = array();
-
-		while( $lcategory = array_shift( $category ) )
-		{
-			if( $lcategory == 'all' )
-			{ // Put those categories in queue, which have not been processed already
-				$category = array_merge( array_diff( array_keys( $this->messages ), $categoriesDone ), $category );
-				sort($category);
-				continue;
-			}
-			if( in_array( $lcategory, $categoriesDone ) )
-			{
-				continue;
-			}
-			$categoriesDone[] = $lcategory;
-
-
-			if( !isset($this->messages[$lcategory][0]) )
-			{ // no messages
-				continue;
-			}
-
-			if( $singleDimension )
-			{
-				$messages = array_merge( $messages, $this->messages[$lcategory] );
-			}
-			else
-			{
-				$messages[$lcategory] = $this->messages[$lcategory];
-			}
-		}
-		return $messages;
+		return $has_errors;
 	}
-
 }
 
 /*
  * $Log$
+ * Revision 1.3  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.2  2010/02/08 17:51:48  efy-yury
  * copyright 2009 -> 2010
  *

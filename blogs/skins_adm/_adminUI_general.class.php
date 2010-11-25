@@ -446,7 +446,7 @@ class AdminUI_general extends Menu
 
 			if( $display_messages )
 			{ // Display info & error messages
-				$Messages->display( NULL, NULL, true, 'all', NULL, NULL, 'action_messages' );
+				$Messages->display( NULL, NULL, true, 'action_messages' );
 			}
 			return;
 		}
@@ -1400,6 +1400,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.112  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.111  2010/11/22 13:44:33  efy-asimo
  * Admin skin preferences update
  *

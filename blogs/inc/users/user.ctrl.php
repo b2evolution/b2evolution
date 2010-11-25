@@ -91,7 +91,7 @@ if( ! is_null($user_ID) )
 /*
  * Perform actions, if there were no errors:
  */
-if( !$Messages->count('error') )
+if( !$Messages->has_errors() )
 { // no errors
 	switch( $action )
 	{
@@ -456,6 +456,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.23  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.22  2010/11/22 13:44:33  efy-asimo
  * Admin skin preferences update
  *

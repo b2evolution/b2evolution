@@ -391,10 +391,14 @@ class DataObject
 	/**
 	 * Check relations for restrictions or cascades.
 	 * @todo dh> Add link to affected items, e.g. items when trying to delete an attachment, where it gets used.
+	 * 
+	 * @return Messages object with the restriction messages
 	 */
 	function check_relations( $what, $ignore = array(), $addlink = false )
 	{
-		global $DB, $Messages;
+		global $DB;
+
+		$restriction_Messages = new Messages();
 
 		foreach( $this->$what as $restriction )
 		{
@@ -410,7 +414,7 @@ class DataObject
 					// without restriction => don't display the message
 					if( $link != '' )
 					{
-						$Messages->add( $link, 'restrict' );
+						$restriction_Messages->add( $link );
 					}
 				}
 				else
@@ -422,11 +426,13 @@ class DataObject
 					0, 0, 'restriction/cascade check' );
 					if( $count )
 					{
-						$Messages->add( sprintf( $restriction['msg'], $count ), 'restrict' );
+						$restriction_Messages->add( sprintf( $restriction['msg'], $count ), 'error' );
 					}
 				}
 			}
 		}
+
+		return $restriction_Messages;
 	}
 
 
@@ -442,17 +448,14 @@ class DataObject
 		global $Messages;
 
 		// Check restrictions:
-		$this->check_relations( 'delete_restrictions', $ignore, $addlink );
+		$restriction_Messages = $this->check_relations( 'delete_restrictions', $ignore, $addlink );
 
-		if( $Messages->count('restrict') )
+		if( $restriction_Messages->count() )
 		{	// There are restrictions:
-			$head = array(
-					'container' => $restrict_title,
-					'restrict' => T_('The following relations prevent deletion:')
-				);
+			$head = $restrict_title.' '.T_('The following relations prevent deletion:');
 			$foot = T_('Please delete related objects before you proceed.');
-			$Messages->add( $Messages->display( $head, $foot, false, 'restrict', '', 'ul', false ) );
-			$Messages->clear( 'restrict' );
+			$final_message = $restriction_Messages->display( $head, $foot, false, false );
+			$Messages->add( $final_message, 'error' );
 			return false;	// Can't delete
 		}
 
@@ -477,12 +480,12 @@ class DataObject
 		$block_item_Widget->title = $confirm_title;
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
-		$this->check_relations( 'delete_cascades' );
+		$restriction_Messages = $this->check_relations( 'delete_cascades' );
 
-		if( $Messages->count('restrict') )
+		if( $restriction_Messages->count() )
 		{	// The will be cascading deletes, issue WARNING:
 			echo '<h3>'.T_('WARNING: Deleting this object will also delete:').'</h3>';
-			$Messages->display( '', '', true, 'restrict', NULL, NULL, NULL );
+			$restriction_Messages->display( '', '' );
 		}
 
 		echo '<p class="warning">'.$confirm_title.'</p>';
@@ -835,6 +838,9 @@ class DataObject
 
 /*
  * $Log$
+ * Revision 1.37  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.36  2010/03/19 09:48:55  efy-asimo
  * file deleting restrictions - task
  *

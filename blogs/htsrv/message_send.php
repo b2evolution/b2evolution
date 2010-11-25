@@ -267,7 +267,7 @@ if( $allow_msgform == 'email' )
 		) );
 	
 	
-	if( $Messages->count( 'error' ) )
+	if( $Messages->has_errors() )
 	{ // there were errors: display them and get out of here
 		$Messages->display( T_('Cannot send email, please correct these errors:'),
 		'[<a href="javascript:history.go(-1)">'. T_('Back to email editing') . '</a>]' );
@@ -332,6 +332,9 @@ header_redirect(); // exits!
 
 /*
  * $Log$
+ * Revision 1.72  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.71  2010/07/14 09:06:14  efy-asimo
  * todo fp>asimo modifications
  *

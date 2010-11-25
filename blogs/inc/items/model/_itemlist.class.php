@@ -226,8 +226,9 @@ class ItemList2 extends ItemListLight
 		// Trigger plugin event, allowing to manipulate or validate the item before it gets previewed
 		$Plugins->trigger_event( 'AppendItemPreviewTransact', array( 'Item' => & $Item ) );
 
-		if( $errcontent = $Messages->display( T_('Invalid post, please correct these errors:'), '', false, 'error' ) )
+		if( $Messages->has_errors() )
 		{
+			$errcontent = $Messages->display( T_('Invalid post, please correct these errors:'), '', false );
 			$Item->content = $errcontent."\n<hr />\n".$content;
 		}
 
@@ -729,6 +730,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.37  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.36  2010/09/15 13:04:06  efy-asimo
  * Cross post navigatation
  *

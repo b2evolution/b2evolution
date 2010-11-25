@@ -723,7 +723,6 @@ class test_plugin extends Plugin
 	 */
 	function LoginAttempt()
 	{
-		// $this->msg( 'NO LOGIN!', 'login_error' );
 		$this->msg( 'This the TEST plugin responding to the LoginAttempt event.', 'note' );
 	}
 
@@ -886,6 +885,9 @@ class test_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.92  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.91  2010/06/01 02:44:44  sam2kb
  * New hooks added: GetCollectionKinds and InitCollectionKinds.
  * Use them to define new and override existing presets for new blogs.

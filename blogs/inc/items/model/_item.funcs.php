@@ -1465,7 +1465,7 @@ function check_categories( & $post_category, & $post_extracats )
 			$GenericCategory = & $GenericCategoryCache->get_by_ID( $post_category );
 			$post_category_Blog = $GenericCategory->get_Blog();
 			$Messages->add( sprintf( T_('The main category for this post has been automatically set to "%s" (Blog "%s")'),
-				$GenericCategory->get_name(), $post_category_Blog->get( 'name') ), 'redwarning' );
+				$GenericCategory->get_name(), $post_category_Blog->get( 'name') ), 'warning' );
 		}
 	}
 
@@ -1543,7 +1543,7 @@ function check_categories( & $post_category, & $post_extracats )
 			}
 			$ignored_cats = substr( $ignored_cats, 0, $ingnored_length - 2 );
 			$Messages->add( sprintf( T_('The category selection "%s" was ignored since %s'),
-				$ignored_cats,$cross_posting_text ), 'redwarning' );
+				$ignored_cats, $cross_posting_text ), 'warning' );
 		}
 	}
 
@@ -1947,6 +1947,9 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 
 /*
  * $Log$
+ * Revision 1.122  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.121  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:

@@ -701,7 +701,7 @@ function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_ID
 	}
 	if( ($content = check_html_sanity( $content, 'xmlrpc_posting' )) === false  )
 	{
-		return xmlrpcs_resperror( 22, $Messages->get_string( 'Invalid post contents, please correct these errors:'."\n", '', NULL, "  //  \n", 'xmlrpc' ) );
+		return xmlrpcs_resperror( 22, $Messages->get_string( 'Invalid post contents, please correct these errors:'."\n", '', "  //  \n", 'xmlrpc' ) );
 	}
 
 	// INSERT NEW POST INTO DB:
@@ -776,7 +776,7 @@ function xmlrpcs_edit_item( & $edited_Item, $post_title, $content, $post_date, $
 	}
 	if( ($content = check_html_sanity( $content, 'xmlrpc_posting' )) === false  )
 	{
-		return xmlrpcs_resperror( 22, $Messages->get_string( 'Invalid post contents, please correct these errors:'."\n", '', NULL, "  //  \n", 'xmlrpc' ) );
+		return xmlrpcs_resperror( 22, $Messages->get_string( 'Invalid post contents, please correct these errors:'."\n", '', "  //  \n", 'xmlrpc' ) );
 	}
 
 	// UPDATE POST IN DB:
@@ -917,6 +917,9 @@ function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.29  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.28  2010/05/22 12:22:49  efy-asimo
  * move $allow_cross_posting in the backoffice
  *

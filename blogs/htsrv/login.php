@@ -289,7 +289,7 @@ switch( $action )
 			// Call plugin event to allow catching input in general and validating own things from DisplayRegisterFormFieldset event
 			$Plugins->trigger_event( 'ValidateAccountFormSent' );
 
-			if( $Messages->count('error') )
+			if( $Messages->has_errors() )
 			{
 				break;
 			}
@@ -416,6 +416,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.112  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.111  2010/11/20 19:19:03  sam2kb
  * Redirect to $baseurl on logout if redirect URI is not set. Temporarily fix until we remove actions from redirect URIs
  *

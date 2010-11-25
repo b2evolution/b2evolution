@@ -91,7 +91,7 @@ switch( $action )
 
 		$Settings->set( 'time_difference', $newtime_difference );
 
-		if( ! $Messages->count('error') )
+		if( ! $Messages->has_errors() )
 		{
 			locale_updateDB();
 			$Settings->dbupdate();
@@ -399,6 +399,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.9  2010/02/08 17:53:23  efy-yury
  * copyright 2009 -> 2010
  *

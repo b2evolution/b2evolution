@@ -220,7 +220,7 @@ if( $display_mode != 'js')
 }
 
 
-if( $action == 'ban' && !$Messages->count('error') && !( $delhits || $delcomments || $blacklist_locally || $report ) )
+if( $action == 'ban' && !$Messages->has_errors() && !( $delhits || $delcomments || $blacklist_locally || $report ) )
 { // Nothing to do, ask user:
 	$AdminUI->disp_view( 'antispam/views/_antispam_ban.form.php' );
 }
@@ -241,6 +241,9 @@ if( $display_mode != 'js')
 
 /*
  * $Log$
+ * Revision 1.20  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.19  2010/10/18 15:29:35  efy-asimo
  * ajax calls charset - fix
  *

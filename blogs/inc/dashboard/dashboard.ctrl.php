@@ -623,13 +623,13 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	// However if we have outdated info, we will load updates here.
 	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 	// Let's clear any remaining messages that should already have been displayed before...
-	$Messages->clear( 'all' );
+	$Messages->clear();
 
 	if( b2evonet_get_updates() !== NULL )
 	{	// Updates are allowed, display them:
 
 		// Display info & error messages
-		echo $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
+		echo $Messages->display( NULL, NULL, false, 'action_messages' );
 
 		/**
 		 * @var AbstractSettings
@@ -705,6 +705,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.72  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.71  2010/10/18 15:36:35  efy-asimo
  * close antispam overlay on escape key
  *

@@ -106,7 +106,7 @@ switch( $action )
 
 		$Settings->set( 'general_cache_enabled', $new_cache_status );
 
-		if( ! $Messages->count('error') )
+		if( ! $Messages->has_errors() )
 		{
 			$Settings->dbupdate();
 			$Messages->add( T_('General settings updated.'), 'success' );
@@ -145,6 +145,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.23  2010/06/24 07:03:11  efy-asimo
  * move the cross posting options to the bottom of teh Features tab & fix error message after moving post
  *

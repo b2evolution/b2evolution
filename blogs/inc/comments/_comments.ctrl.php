@@ -188,7 +188,7 @@ switch( $action )
 		param( 'comment_nofollow', 'integer', 0 );
 		$edited_Comment->set_from_Request( 'nofollow' );
 
-		if( $Messages->count('error') )
+		if( $Messages->has_errors() )
 		{	// There have been some validation errors:
 			break;
 		}
@@ -387,6 +387,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.37  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.36  2010/10/22 15:09:57  efy-asimo
  * Remove autoloading datepciker css, instead load before every usage, also remove jquery-ui.css load
  *

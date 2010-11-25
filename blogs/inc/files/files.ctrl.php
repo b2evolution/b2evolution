@@ -804,13 +804,12 @@ switch( $action )
 			while( $l_File = & $selected_Filelist->get_next() )
 			{
 				// Check if there are delete restrictions on this file:
-				$l_File->check_relations( 'delete_restrictions', array(), true );
+				$restriction_Messages = $l_File->check_relations( 'delete_restrictions', array(), true );
 
-				if( $Messages->count('restrict') )
+				if( $restriction_Messages->count() )
 				{ // There are restrictions:
 					$Messages->add( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
-						.$Messages->display( NULL, NULL, false, 'restrict', '', 'ul', false ) );
-					$Messages->clear( 'restrict' );
+						.$restriction_Messages->display( NULL, NULL, false, false ) );
 
 					// remove it from the list of selected files (that will be offered to delete):
 					$selected_Filelist->remove( $l_File );
@@ -1498,9 +1497,9 @@ switch( $fm_mode )
 
 				// We are moving, we'll need to unlink the target file and drop it's meta data:
 				// Check if there are delete restrictions on this file:
-				$dest_File->check_relations( 'delete_restrictions' );
+				$restriction_Messages = $dest_File->check_relations( 'delete_restrictions' );
 
-				if( $Messages->count('restrict') )
+				if( $restriction_Messages->count() )
 				{ // There are restrictions:
 					// TODO: work on a better output display here...
 					param_error( 'new_names['.$loop_src_File->get_md5_ID().']', sprintf( T_('Cannot overwrite the file &laquo;%s&raquo; because of the following relations'), $dest_File->get_rdfp_rel_path() ) );
@@ -1765,6 +1764,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.73  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.72  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:

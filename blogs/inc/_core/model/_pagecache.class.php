@@ -226,7 +226,7 @@ class PageCache
 			return false;
 		}
 
-		if( $Messages->count('all') )
+		if( $Messages->count() )
 		{	// There are some messages do be displayed. That means the user has done some action.
 			// We do want to display those messages.
 			// There may also be more... like a "comment pending review" etc...
@@ -630,6 +630,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.25  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.24  2010/09/08 13:32:19  efy-asimo
  * prune page cache - without caching the file names
  *

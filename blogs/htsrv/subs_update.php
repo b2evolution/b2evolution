@@ -72,7 +72,7 @@ if( $demo_mode && ($current_User->ID == 1 || $current_User->login == 'demouser')
 profile_check_params( array( 'email' => array($newuser_email, 'newuser_email') ) );
 
 
-if( $Messages->count( 'error' ) )
+if( $Messages->has_errors() )
 {
 	headers_content_mightcache( 'text/html', 0 );		// Do NOT cache error messages! (Users would not see they fixed them)
 
@@ -135,6 +135,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.31  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.30  2010/02/08 17:51:16  efy-yury
  * copyright 2009 -> 2010
  *

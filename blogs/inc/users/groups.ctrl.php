@@ -167,7 +167,7 @@ switch ( $action )
 			}
 		}
 
-		if( $Messages->count( 'error' ) )
+		if( $Messages->has_errors() )
 		{	// We have found validation errors:
 			$action = 'edit';
 			break;
@@ -278,6 +278,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.9  2010/05/07 08:07:14  efy-asimo
  * Permissions check update (User tab, Global Settings tab) - bugfix
  *

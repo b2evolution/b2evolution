@@ -1202,7 +1202,7 @@ function param_errors_detected()
 {
 	global $Messages;
 
-	return $Messages->count('error');
+	return $Messages->has_errors();
 }
 
 
@@ -2121,6 +2121,9 @@ function isset_param( $var )
 
 /*
  * $Log$
+ * Revision 1.66  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.65  2010/07/26 06:52:15  efy-asimo
  * MFB v-4-0
  *

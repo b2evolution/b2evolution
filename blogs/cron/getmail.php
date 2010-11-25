@@ -677,10 +677,10 @@ for ( $index = 1; $index <= $imap_obj->Nmsgs; $index++ )
 	$post_title = check_html_sanity( trim( $post_title ), 'posting', false );
 	$content = check_html_sanity( trim( $content ), 'posting', $Settings->get( 'AutoBR' ) );
 
-	if( ( $error = $Messages->get_string( T_( 'Cannot post, please correct these errors:' ), '', 'error' ) ) )
+	if( $Messages->has_errors() )
 	{
-		echo_message( $error, ERROR, 0 );
-		$Messages->clear( 'error' );
+		echo_message( $Messages->get_string( T_( 'Cannot post, please correct these errors:' ), '' ), ERROR, 0 );
+		$Messages->clear();
 		rmdir_r( $tmpDirMIME );
 		continue;
 	}
@@ -723,6 +723,9 @@ if( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.46  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.45  2010/11/03 19:44:14  sam2kb
  * Increased modularity - files_Module
  * Todo:

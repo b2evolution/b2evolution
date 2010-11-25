@@ -121,9 +121,9 @@ if( $error = validate_url( $url, 'commenting' ) )
 	$Messages->add( T_('Supplied URL is invalid: ').$error, 'error' );
 }
 
-if( $Messages->count('error') )
+if( $Messages->has_errors() )
 {
-	trackback_response( 1, $Messages->get_string( '', '', 'all', "\n" ) ); // exits
+	trackback_response( 1, $Messages->get_string( '', '', "\n" ) ); // exits
 }
 
 // TODO: dh> title and excerpt should be htmlbody, too, no?
@@ -210,6 +210,9 @@ trackback_response( 0, 'ok' );
 
 /*
  * $Log$
+ * Revision 1.74  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.73  2010/02/08 17:51:16  efy-yury
  * copyright 2009 -> 2010
  *

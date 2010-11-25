@@ -98,7 +98,7 @@ class AdminUI extends AdminUI_general
 			."\n\n";
 
 		// Display info & error messages
-		$r .= $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
+		$r .= $Messages->display( NULL, NULL, false, 'action_messages' );
 
 		return $r;
 	}
@@ -463,6 +463,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.35  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.34  2010/11/22 13:44:33  efy-asimo
  * Admin skin preferences update
  *

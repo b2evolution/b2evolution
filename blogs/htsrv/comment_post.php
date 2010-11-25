@@ -261,7 +261,7 @@ $Plugins->trigger_event('BeforeCommentFormInsert', array(
 /*
  * Display error messages:
  */
-if( $Messages->count('error') )
+if( $Messages->has_errors() )
 {
 	if( ! isset($page_title) )
 	{
@@ -405,6 +405,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.145  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.144  2010/06/01 11:33:19  efy-asimo
  * Split blog_comments advanced permission (published, deprecated, draft)
  * Use this new permissions (Antispam tool,when edit/delete comments)

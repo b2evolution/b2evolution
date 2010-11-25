@@ -150,12 +150,12 @@ switch( $action )
 				}
 				else
 				{
-					$Messages->add( sprintf( T_( 'Some %s folders could not be renamed to %s' ), $old_foldername, $evocache_foldername ), 'redwarning' );
+					$Messages->add( sprintf( T_( 'Some %s folders could not be renamed to %s' ), $old_foldername, $evocache_foldername ), 'warning' );
 				}
 				$Settings->set( 'evocache_foldername', $evocache_foldername );
 			}
 
-			if( ! $Messages->count('error') )
+			if( ! $Messages->has_errors() )
 			{
 				if( $Settings->dbupdate() )
 				{
@@ -211,6 +211,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.14  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.13  2010/07/13 07:10:15  efy-asimo
  * Group file settings and file types tabs into a single Settings tab, with a 3rd level selection
  *

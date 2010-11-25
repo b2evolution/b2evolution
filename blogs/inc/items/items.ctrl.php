@@ -411,7 +411,7 @@ switch( $action )
 			}
 		}
 
-		if( $Messages->count('error') )
+		if( $Messages->has_errors() )
 		{
 			if( !empty( $mass_create ) )
 			{
@@ -447,7 +447,7 @@ switch( $action )
 		{
 			if( $edited_Item->status != 'published' )
 			{
-				$Messages->add( T_('Post not publicly published: skipping trackback...'), 'info' );
+				$Messages->add( T_('Post not publicly published: skipping trackback...'), 'note' );
 			}
 			else
 			{ // trackback now:
@@ -548,7 +548,7 @@ switch( $action )
  		// Params we need for tab switching (in case of error or if we save&edit)
 		$tab_switch_params = 'p='.$edited_Item->ID;
 
-		if( $Messages->count('error') )
+		if( $Messages->has_errors() )
 		{	// There have been some validation errors:
 			break;
 		}
@@ -562,7 +562,7 @@ switch( $action )
 		{
 			if( $edited_Item->status != 'published' )
 			{
-				$Messages->add( T_('Post not publicly published: skipping trackback...'), 'info' );
+				$Messages->add( T_('Post not publicly published: skipping trackback...'), 'note' );
 			}
 			else
 			{ // trackback now:
@@ -745,7 +745,7 @@ switch( $action )
 
 		$Plugins->trigger_event( 'AdminBeforeItemEditDelete', array( 'Item' => & $edited_Item ) );
 
-		if( ! $Messages->count('error') )
+		if( ! $Messages->has_errors() )
 		{	// There have been no validation errors:
 			// DELETE POST FROM DB:
 			$edited_Item->dbdelete();
@@ -1386,6 +1386,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.106  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.105  2010/10/22 15:09:57  efy-asimo
  * Remove autoloading datepciker css, instead load before every usage, also remove jquery-ui.css load
  *

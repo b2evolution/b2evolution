@@ -19,12 +19,15 @@ else
 }
 
 global $Messages;
-$result_message = $Messages->get_string( '', '', 'all', "\n" );
+$result_message = $Messages->get_string( '', '', "\n" );
 
 return $job_ret;
 
 /*
  * $Log$
+ * Revision 1.2  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.1  2007/06/25 10:59:45  fplanque
  * MODULES (refactored MVC)
  *

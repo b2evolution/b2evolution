@@ -470,12 +470,12 @@ $Form->begin_form();
 			<td class="firstcol">&nbsp;</td> <?php /* blueyed> This empty column is needed so that the defaut width:100% style of the main column below makes the column go over the whole screen */ ?>
 			<td class="lastcol" colspan="<?php echo $filetable_cols - 1 ?>" id="fileman_error">
 				<?php
-					if( ! $Messages->count('fl_error') )
+					if( ! $Messages->has_errors() )
 					{ // no Filelist errors, the directory must be empty
 						$Messages->add( T_('No files found.')
-							.( $fm_Filelist->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$fm_Filelist->get_filter().'&raquo;' : '' ), 'fl_error' );
+							.( $fm_Filelist->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$fm_Filelist->get_filter().'&raquo;' : '' ), 'error' );
 					}
-					$Messages->display( '', '', true, 'fl_error', 'log_error' );
+					$Messages->display( '', '' );
 				?>
 			</td>
 		</tr>
@@ -685,6 +685,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.43  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.42  2010/09/16 14:12:24  efy-asimo
  * New avatar upload
  *

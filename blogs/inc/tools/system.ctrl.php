@@ -94,13 +94,13 @@ echo '<h2>'.T_('About this system').'</h2>';
 	// However if we have outdated info, we will load updates here.
 	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 	// Let's clear any remaining messages that should already have been displayed before...
-	$Messages->clear( 'all' );
+	$Messages->clear();
 
 	if( b2evonet_get_updates( true ) !== NULL )
 	{	// Updates are allowed, display them:
 
 		// Display info & error messages
-		echo $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
+		echo $Messages->display( NULL, NULL, false, 'action_messages' );
 
 		/**
 		 * @var AbstractSettings
@@ -587,6 +587,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.32  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.31  2010/11/04 03:16:10  sam2kb
  * Display PHP info in a pop-up window
  *

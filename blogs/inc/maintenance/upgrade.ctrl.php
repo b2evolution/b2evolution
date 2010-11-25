@@ -79,11 +79,11 @@ switch( $action )
 		// However if we have outdated info, we will load updates here.
 		load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 		// Let's clear any remaining messages that should already have been displayed before...
-		$Messages->clear( 'all' );
+		$Messages->clear();
 		b2evonet_get_updates( true );
 
 		// Display info & error messages
-		echo $Messages->display( NULL, NULL, false, 'all', NULL, NULL, 'action_messages' );
+		echo $Messages->display( NULL, NULL, false, 'action_messages' );
 
 
 		/**
@@ -311,6 +311,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.11  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

@@ -80,7 +80,7 @@ switch( $action )
 				'pass2'   => & $pass2,
 			) );
 
-		if( $Messages->count( 'error' ) )
+		if( $Messages->has_errors() )
 		{ // a Plugin has added an error
 			break;
 		}
@@ -115,7 +115,7 @@ switch( $action )
 			param_error( 'login', sprintf( T_('The login &laquo;%s&raquo; is already registered, please choose another one.'), $login ) );
 		}
 
-		if( $Messages->count( 'error' ) )
+		if( $Messages->has_errors() )
 		{
 			break;
 		}
@@ -235,6 +235,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.106  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.105  2010/11/24 16:05:52  efy-asimo
  * User country and gender options modifications
  *

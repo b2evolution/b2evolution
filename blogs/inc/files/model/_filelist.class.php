@@ -331,7 +331,7 @@ class Filelist
 		// Attempt list files for requested directory: (recursively if flat mode):
 		if( ($filepath_array = get_filenames( $this->_ads_list_path, $this->include_files, $this->include_dirs, true, $this->flatmode )) === false )
 		{
-			$Messages->add( sprintf( T_('Cannot open directory &laquo;%s&raquo;!'), $this->_ads_list_path ), 'fl_error' );
+			$Messages->add( sprintf( T_('Cannot open directory &laquo;%s&raquo;!'), $this->_ads_list_path ), 'error' );
 			return false;
 		}
 
@@ -757,7 +757,7 @@ class Filelist
 				}
 				else
 				{
-					$Messages->add( sprintf( T_('The filter &laquo;%s&raquo; is not a regular expression.'), $filter_string ), 'fl_error' );
+					$Messages->add( sprintf( T_('The filter &laquo;%s&raquo; is not a regular expression.'), $filter_string ), 'error' );
 					$filter_string = '~.*~';
 				}
 			}
@@ -1260,6 +1260,9 @@ class Filelist
 
 /*
  * $Log$
+ * Revision 1.11  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.10  2010/04/02 07:27:11  efy-asimo
  * cache folders rename and Filelist navigation - fix
  *

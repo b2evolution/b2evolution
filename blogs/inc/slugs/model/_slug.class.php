@@ -277,7 +277,7 @@ class Slug extends DataObject
 				$DB->rollback();
 				return false;
 			}
-			$Messages->add( sprintf(T_('Warning: this change also changed the canonical slug of the post! (%s)'), $this->get_link_to_object()), 'redwarning' );
+			$Messages->add( sprintf(T_('Warning: this change also changed the canonical slug of the post! (%s)'), $this->get_link_to_object()), 'warning' );
 		}
 
 		parent::dbupdate();
@@ -289,6 +289,9 @@ class Slug extends DataObject
 
 /*
  * $Log$
+ * Revision 1.14  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.13  2010/10/19 02:00:54  fplanque
  * MFB
  *

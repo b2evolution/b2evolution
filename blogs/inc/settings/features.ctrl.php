@@ -145,7 +145,7 @@ switch( $action )
 		param( 'xmlrpc_default_title', 'string', true );
 		$Settings->set( 'xmlrpc_default_title', trim($xmlrpc_default_title) );
 
-		if( ! $Messages->count('error') )
+		if( ! $Messages->has_errors() )
 		{
 			$Settings->dbupdate();
 			$Messages->add( T_('Settings updated.'), 'success' );
@@ -183,6 +183,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.18  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.17  2010/06/24 07:03:11  efy-asimo
  * move the cross posting options to the bottom of teh Features tab & fix error message after moving post
  *

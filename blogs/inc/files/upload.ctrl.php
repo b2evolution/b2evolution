@@ -179,7 +179,7 @@ file_controller_build_tabs();
 // If there were errors, display them and exit (especially in case there's no valid FileRoot ($fm_FileRoot)):
 // TODO: dh> this prevents users from uploading if _any_ blog media directory is not writable.
 //           See http://forums.b2evolution.net/viewtopic.php?p=49001#49001
-if( $Messages->count('error') )
+if( $Messages->has_errors() )
 {
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 	$AdminUI->disp_html_head();
@@ -215,7 +215,7 @@ if( ! $Settings->get('upload_enabled') )
 
 
 // If there were errors, display them and exit (especially in case there's no valid FileRoot ($fm_FileRoot)):
-if( $Messages->count('error') )
+if( $Messages->has_errors() )
 {
 	$AdminUI->disp_html_head();
 	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
@@ -702,6 +702,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.41  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.40  2010/10/27 14:56:42  efy-asimo
  * when replacing a file, keep a backup
  *

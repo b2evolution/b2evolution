@@ -85,7 +85,7 @@ switch ( $action )
 
 									 array( 'registration_require_gender', $registration_require_gender) ) );
 
-		if( ! $Messages->count('error') )
+		if( ! $Messages->has_errors() )
 		{
 			if( $Settings->dbupdate() )
 			{
@@ -126,6 +126,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.10  2010/11/24 14:55:30  efy-asimo
  * Add user gender
  *

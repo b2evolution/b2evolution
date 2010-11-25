@@ -92,7 +92,7 @@ switch( $action )
 		}
 
 
-		if( ! $Messages->count('error') )
+		if( ! $Messages->has_errors() )
 		{
 			$Settings->dbupdate();
 
@@ -130,6 +130,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.10  2010/11/25 15:16:34  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.9  2010/11/18 21:19:40  sam2kb
  * Added missing dbupdate()
  *

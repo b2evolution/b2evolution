@@ -28,7 +28,7 @@ if( $action == 'req_login' )
 
 global $admin_url, $ReqHost, $htsvr_url;
 
-if( $Messages->count( 'all' ) > 0 )
+if( $Messages->count() > 0 )
 { // Display messages
 	$Messages->display();
 }
@@ -94,6 +94,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.4  2010/11/25 15:16:35  efy-asimo
+ * refactor $Messages
+ *
  * Revision 1.3  2010/07/26 06:52:27  efy-asimo
  * MFB v-4-0
  *
