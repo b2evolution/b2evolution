@@ -104,7 +104,7 @@ class Messages
 		$this->messages_text[$this->count] = $text;
 		$this->messages_type[$this->count] = $type;
 		$this->count++;
-		$this->error = ( $type == 'error' );
+		$this->has_errors = ( $type == 'error' );
 	}
 
 
@@ -120,7 +120,7 @@ class Messages
 		{
 			$this->messages_text[] = $p_Messages->messages_text[$i];
 			$this->messages_type[] = $p_Messages->messages_type[$i];
-			$this->error = ( $p_Messages->messages_type[$i] == 'error' );
+			$this->has_errors = ( $p_Messages->messages_type[$i] == 'error' );
 		}
 	}
 
@@ -282,12 +282,15 @@ class Messages
 	 */
 	function has_errors()
 	{
-		return $has_errors;
+		return $this->has_errors;
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.4  2010/11/26 12:49:11  efy-asimo
+ * Messages class - fix
+ *
  * Revision 1.3  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *
