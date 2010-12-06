@@ -441,9 +441,13 @@ class AdminUI extends AdminUI_general
 	function set_skin_settings( $user_ID )
 	{
 		global $UserSettings;
-		$UserSettings->set( 'show_evobar', param( 'show_evobar', 'boolean' ), $user_ID );
+		$show_menu = param( 'show_menu', 'boolean' );
+		// evobar or menu must be visible. If menu is not visible, show_evobar must be set to true.
+		$show_evobar = ( $show_menu ? param( 'show_evobar', 'boolean' ) : true );
+
+		$UserSettings->set( 'show_evobar', $show_evobar, $user_ID );
 		$UserSettings->set( 'show_breadcrumbs', param( 'show_breadcrumbs', 'boolean' ), $user_ID );
-		$UserSettings->set( 'show_menu', param( 'show_menu', 'boolean' ), $user_ID );
+		$UserSettings->set( 'show_menu', $show_menu, $user_ID );
 		// It will be saved by the user.ctrl
 		// $UserSettings->dbupdate();
 	}
@@ -463,6 +467,9 @@ class AdminUI extends AdminUI_general
 
 /*
  * $Log$
+ * Revision 1.36  2010/12/06 13:15:41  efy-asimo
+ * Admin skin preferences, show evobar - fix
+ *
  * Revision 1.35  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *
