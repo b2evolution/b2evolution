@@ -390,6 +390,7 @@ function install_basic_skins()
 
 	skin_install( 'asevo' );
 	skin_install( 'custom' );
+	skin_install( 'dating_mood' );
 	skin_install( 'glossyblue' );
 	skin_install( 'intense' );
 	skin_install( 'natural_pink' );
@@ -845,6 +846,9 @@ function get_antispam_query()
 
 /*
  * $Log$
+ * Revision 1.97  2010/12/06 23:02:50  fplanque
+ * no message
+ *
  * Revision 1.96  2010/10/19 02:00:54  fplanque
  * MFB
  *
