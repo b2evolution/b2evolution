@@ -73,6 +73,7 @@ if( $current_User->check_perm('options', 'edit') )
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 	echo '<ul>';
 	echo '<li><a href="'.regenerate_url('action', 'action=show_create_comments&amp;'.url_crumb('tools')).'">'.T_('Create sample comments for testing moderation').'</a></li>';
+	echo '<li><a href="'.regenerate_url('action', 'action=show_create_posts&amp;'.url_crumb('tools')).'">'.T_('Create sample posts for testing moderation').'</a></li>';
 	echo '</ul>';
 	$block_item_Widget->disp_template_raw( 'block_end' );
 
@@ -102,6 +103,9 @@ $block_item_Widget->disp_template_raw( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.3  2010/12/06 14:27:57  efy-asimo
+ * Generate sample posts tool
+ *
  * Revision 1.2  2010/11/12 15:13:31  efy-asimo
  * MFB:
  * Tool 1: "Find all broken posts that have no matching category"

@@ -16,6 +16,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_funcs('plugins/_plugin.funcs.php');
 
+// load item class
+load_class( 'items/model/_item.class.php', 'Item' );
 
 param( 'tab', 'string', '', true );
 
@@ -154,9 +156,6 @@ if( empty($tab) )
 
 			$current_User->check_perm('options', 'edit', true);
 
-			// load item class
-			load_class( 'items/model/_item.class.php', 'Item' );
-
 			// select broken items
 			$sql = 'SELECT * FROM T_items__item
 						WHERE post_canonical_slug_ID NOT IN (
@@ -267,6 +266,56 @@ if( empty($tab) )
 			$Messages->add( sprintf( T_('Created %d comments.'), $count - 1 ), 'success' );
 			break;
 
+		case 'create_sample_posts':
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'tools' );
+
+			$current_User->check_perm('options', 'edit', true);
+
+			$blog_ID = param( 'blog_ID', 'string', 0 );
+			$num_posts = param( 'num_posts', 'string', 0 );
+
+			if ( ! ( param_check_number( 'blog_ID', T_('Blog ID must be a number'), true ) &&
+				param_check_number( 'num_posts', T_('"How many posts" field must be a number'), true ) ) )
+			{ // param errors
+				$action = 'show_create_posts';
+				break;
+			}
+
+			// check blog_ID
+			$BlogCache = & get_BlogCache();
+			$selected_Blog = $BlogCache->get_by_ID( $blog_ID, false, false );
+			if( $selected_Blog == NULL )
+			{
+				$Messages->add( T_( 'Blog ID must be a valid Blog ID!' ), 'error' );
+				$action = 'show_create_posts';
+				break;
+			}
+
+			$time = ( $localtimenow );
+			$content = T_( 'This is an auto generated post for testing moderation.' );
+			for( $i = 1; $i <= $num_posts; $i++ )
+			{
+				for( $j = 0; $j < 50; $j++ )
+				{ // create 50 random word
+					$length = rand(1, 15);
+					$word = generate_random_key( $length, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' );
+					$content = $content.' '.$word;
+				}
+				$Item = new Item();
+				$Item->set( 'title', 'Generated post '.$i );
+				$Item->set( 'content', $content );
+				$Item->set( 'status', 'published' );
+				$Item->set( 'dateset', '1' );
+				// set post main cat ID, from selected blog
+				$Item->set( 'main_cat_ID', $selected_Blog->get_default_cat_ID() );
+				$Item->set( 'datestart', date( 'Y-m-d H:i:s', $time ) );
+				$Item->set( 'datecreated', $time );
+				$Item->dbinsert();
+			}
+			$Messages->add( sprintf( T_('Created %d posts.'), $num_posts ), 'success' );
+			break;
+
 		case 'recreate_itemslugs':
 			$ItemCache = get_ItemCache();
 			$ItemCache->load_where( '( post_title != "" ) AND ( post_urltitle = "title" OR post_urltitle LIKE "title-%" )');
@@ -345,6 +394,10 @@ if( empty($tab) )
 			$AdminUI->disp_view( 'tools/views/_create_comments.form.php' );
 			break;
 
+		case 'show_create_posts':
+			$AdminUI->disp_view( 'tools/views/_create_posts.form.php' );
+			break;
+
 		default:
 			$AdminUI->disp_view( 'tools/views/_misc_tools.view.php' );
 			break;
@@ -379,6 +432,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.36  2010/12/06 14:27:57  efy-asimo
+ * Generate sample posts tool
+ *
  * Revision 1.35  2010/11/12 15:13:31  efy-asimo
  * MFB:
  * Tool 1: "Find all broken posts that have no matching category"
