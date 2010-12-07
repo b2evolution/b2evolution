@@ -255,6 +255,8 @@ $user_agents = array(
 	array('robot', 'StackRambler', 'Rambler' ),
 	array('robot', 'AportWorm', 'Aport.ru' ),
 	array('robot', 'ScoutJet', 'ScoutJet' ),
+	array('robot', 'bingbot/', 'Bing' ),
+	array('robot', 'Nigma.ru/', 'Nigma.ru' ),
 	// Unknown robots:
 	array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:
