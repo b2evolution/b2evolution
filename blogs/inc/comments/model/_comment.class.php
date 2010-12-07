@@ -1453,7 +1453,7 @@ class Comment extends DataObject
 	 */
 	function send_email_notifications()
 	{
-		global $DB, $admin_url, $debug, $Debuglog, $baseurl;
+		global $DB, $admin_url, $debug, $Debuglog, $htsrv_url;
 
 		$edited_Item = & $this->get_Item();
 		$edited_Blog = & $edited_Item->get_Blog();
@@ -1583,7 +1583,7 @@ class Comment extends DataObject
 			if( $this->status == 'draft' )
 			{
 				$secret_value = '&secret='.$this->secret;
-				$notify_message .= T_('Quick moderation').': '.$baseurl.'htsrv/comment_review.php?cmt_ID='.$this->ID.$secret_value."\n\n";
+				$notify_message .= T_('Quick moderation').': '.$htsrv_url.'comment_review.php?cmt_ID='.$this->ID.$secret_value."\n\n";
 			}
 
 			$notify_message .= T_('Edit comment').': '.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$this->ID."\n\n"
@@ -1734,6 +1734,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.71  2010/12/07 13:05:50  efy-asimo
+ * hardcoded url in email notification - fix
+ *
  * Revision 1.70  2010/11/07 18:50:45  fplanque
  * Added Comment::author2() with skins v2 style params.
  *
