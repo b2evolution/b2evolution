@@ -211,18 +211,30 @@ if( empty($tab) )
 
 			// check blog_ID
 			$BlogCache = & get_BlogCache();
-			if( $BlogCache->get_by_ID( $blog_ID, false, false ) == NULL )
+			$selected_Blog = $BlogCache->get_by_ID( $blog_ID, false, false );
+			if( $selected_Blog == NULL )
 			{
 				$Messages->add( T_( 'Blog ID must be a valid Blog ID!' ), 'error' );
 				$action = 'show_create_comments';
 				break;
 			}
 
+			$curr_orderby = $selected_Blog->get_setting('orderby');
+			if( $curr_orderby == 'RAND' )
+			{
+				$curr_orderby .= '()';
+			}
+			else
+			{
+				$curr_orderby = 'post_'.$curr_orderby;
+			}
+			$curr_orderdir = $selected_Blog->get_setting('orderdir');
+
 			// find the $num_posts latest posts in blog
 			$sql = 'SELECT post_ID 
 						FROM T_items__item INNER JOIN T_categories ON post_main_cat_ID = cat_ID
 					 WHERE cat_blog_ID = '.$blog_ID.' AND post_status = '.$DB->quote( 'published' ).'
-					 ORDER BY post_datecreated DESC
+					 ORDER BY '.$curr_orderby.' '.$curr_orderdir.', post_ID '.$curr_orderdir.'
 					 LIMIT '.$num_posts;
 			$items_result = $DB->get_results( $sql, ARRAY_A, 'Find the x latest posts in blog' );
 
@@ -432,6 +444,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.37  2010/12/08 13:55:37  efy-asimo
+ * Create Sample comments - fix
+ *
  * Revision 1.36  2010/12/06 14:27:57  efy-asimo
  * Generate sample posts tool
  *
