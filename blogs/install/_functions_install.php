@@ -519,7 +519,7 @@ function install_basic_widgets()
 	foreach( $blog_ids as $blog_id )
 	{
 		echo 'Installing default widgets for blog #'.$blog_id.'... ';
-		insert_basic_widgets( $blog_id );
+		insert_basic_widgets( $blog_id, true );
 		echo "OK.<br />\n";
 	}
 
@@ -846,6 +846,9 @@ function get_antispam_query()
 
 /*
  * $Log$
+ * Revision 1.98  2010/12/08 12:57:16  efy-asimo
+ * widgets default blog param - fix
+ *
  * Revision 1.97  2010/12/06 23:02:50  fplanque
  * no message
  *

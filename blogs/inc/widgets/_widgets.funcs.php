@@ -27,11 +27,17 @@
  * @todo factorize!
  *
  * @param integer should never be 0
+ * @param boolean should be true only when it's called after initial install
  */
-function insert_basic_widgets( $blog_id )
+function insert_basic_widgets( $blog_id, $initial_install = false )
 {
 	global $DB;
 
+	$default_blog_param = 's:7:"blog_ID";s:0:"";';
+	if( $initial_install )
+	{
+		$default_blog_param = 's:7:"blog_ID";s:0:"4";';
+	}
 
 	if( false )
 	{// old code: NOT USED ANYMORE - TO BE REMOVED SOON.
@@ -152,7 +158,7 @@ function insert_basic_widgets( $blog_id )
 		if( $blog_id != 2 )
 		{
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-								VALUES( '.$blog_id.', "Sidebar", 80, "core", "coll_media_index", \'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";s:7:"blog_ID";s:0:"";s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\' )' );
+								VALUES( '.$blog_id.', "Sidebar", 80, "core", "coll_media_index", \'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\' )' );
 		}
 		if( $blog_id <= 2 )
 		{
@@ -167,7 +173,7 @@ function insert_basic_widgets( $blog_id )
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code )
 							VALUES( '.$blog_id.', "Sidebar 2", 2, "core", "coll_comment_list" )' );
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
-							VALUES( '.$blog_id.', "Sidebar 2", 3, "core", "coll_media_index", \'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";s:7:"blog_ID";s:0:"";s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\' )' );
+							VALUES( '.$blog_id.', "Sidebar 2", 3, "core", "coll_media_index", \'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";'.$default_blog_param.'s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\' )' );
 		$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_type, wi_code, wi_params )
 							VALUES( '.$blog_id.', "Sidebar 2", 4, "core", "free_html", \'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}\' )' );
 	}
@@ -176,6 +182,9 @@ function insert_basic_widgets( $blog_id )
 
 /*
  * $Log$
+ * Revision 1.6  2010/12/08 12:57:16  efy-asimo
+ * widgets default blog param - fix
+ *
  * Revision 1.5  2010/12/07 16:53:34  efy-asimo
  * widgets - use current blog by default to pick photos - fix
  *
