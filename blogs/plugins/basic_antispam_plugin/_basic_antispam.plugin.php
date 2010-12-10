@@ -50,7 +50,7 @@ class basic_antispam_plugin extends Plugin
 	var $name = 'Basic Antispam';
 	var $code = '';
 	var $priority = 60;
-	var $version = '2.0-dev';
+	var $version = '2.1';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 	var $number_of_installs = 1;
@@ -661,6 +661,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.39  2010/12/10 21:03:29  sam2kb
+ * Version bump
+ *
  * Revision 1.38  2010/12/10 21:00:39  sam2kb
  * More antispam options
  *
