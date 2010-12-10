@@ -75,6 +75,12 @@ class basic_antispam_plugin extends Plugin
 					'note' => T_('Allow non-registered visitors to leave comments.'),
 					'defaultvalue' => '1',
 				),
+				'no_anon_url' => array(
+					'type' => 'checkbox',
+					'label' => T_('Disable anonymous URLs'),
+					'note' => T_('Disable URLs from non-registered visitors.'),
+					'defaultvalue' => 0,
+				),
 				'check_dupes' => array(
 					'type' => 'checkbox',
 					'label' => T_('Detect feedback duplicates'),
@@ -89,6 +95,18 @@ class basic_antispam_plugin extends Plugin
 					'defaultvalue' => '4',
 					'size' => 3,
 				),
+				'trim_whitespace' => array(
+					'type' => 'checkbox',
+					'label' => T_('Strip whitespace'),
+					'note' => T_('Strip whitespace from the beginning and end of comment content.'),
+					'defaultvalue' => 1,
+				),
+				'remove_repetitions' => array(
+					'type' => 'checkbox',
+					'label' => T_('Remove repetitive characters'),
+					'note'=>T_('Remove repetitive characters in name and content. The string like "Thaaaaaaaaaanks!" becomes "Thaaanks!".'),
+					'defaultvalue' => 0,
+				),
 				'nofollow_for_hours' => array(
 					'type' => 'integer',
 					'label' => T_('Apply rel="nofollow"'),
@@ -96,7 +114,6 @@ class basic_antispam_plugin extends Plugin
 					'defaultvalue' => '-1', // use "nofollow" infinitely by default so lazy admins won't promote spam
 					'size' => 5,
 				),
-
 				'check_url_referers' => array(
 					'type' => 'checkbox',
 					'label' => T_('Check referers for URL'),
@@ -192,6 +209,26 @@ class basic_antispam_plugin extends Plugin
 	}
 
 
+	function CommentFormSent( & $params )
+	{
+		if( $this->Settings->get('trim_whitespace') )
+		{	// Strip whitespace
+			$params['comment'] = trim( $params['comment'] );
+		}
+
+		if( $this->Settings->get('remove_repetitions') )
+		{	// Remove repetitions
+			$params['anon_name'] = $this->remove_repetition( $params['anon_name'] );
+			$params['comment'] = $this->remove_repetition( $params['comment'] );
+		}
+
+		if( $this->Settings->get('no_anon_url') )
+		{	// Remove URL
+			$params['anon_url'] = '';
+		}
+	}
+
+
 	/**
 	 * Check for duplicate comments.
 	 */
@@ -211,11 +248,18 @@ class basic_antispam_plugin extends Plugin
 	 */
 	function FilterCommentAuthor( & $params )
 	{
-		if( ! $params['makelink'] )
+		if( ! isset($params['makelink']) )
 		{
 			return false;
 		}
 
+		if( $this->Settings->get('no_anon_url') && !isset($params['Comment']->author_user_ID) )
+		{	// Remove anonymous URL
+			$params['data'] = preg_replace( '~<a\s[^>]+>~i', '', $params['data'] );
+			
+			return;
+		}
+		
 		$this->apply_nofollow( $params['data'], $params['Comment'] );
 	}
 
@@ -285,6 +329,12 @@ class basic_antispam_plugin extends Plugin
 				{
 					return $m[1].$m[2].\' rel="nofollow">\';
 				}' ), $data );
+	}
+
+
+	function remove_repetition( $str = '' )
+	{
+		return @preg_replace( '~(.)\\1{3,}~iu', '$1$1$1', $str );
 	}
 
 
@@ -611,6 +661,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.38  2010/12/10 21:00:39  sam2kb
+ * More antispam options
+ *
  * Revision 1.37  2010/02/08 17:56:01  efy-yury
  * copyright 2009 -> 2010
  *
