@@ -5,6 +5,8 @@ global $Blog, $htsrv_url, $current_User, $Session, $admin_url, $status_list;
 ?>
 <script type="text/javascript">
 
+var modifieds = new Array();
+
 function isDefined( variable )
 {
 	return (typeof(variable) != 'undefined');
@@ -14,6 +16,22 @@ function isDefined( variable )
 function fadeIn( id, color )
 {
 	jQuery('#' + id).animate({ backgroundColor: color }, 200);
+}
+
+function fadeInStatus( id, status )
+{
+	switch(status)
+	{
+		case 'published':
+			fadeIn(id, '#339900');
+			break;
+		case 'deprecated':
+			fadeIn(id, '#656565');
+			break;
+		case 'deleted':
+			fadeIn(id, '#EE0000');
+			break;
+	};
 }
 
 function delete_comment_url( comment_id )
@@ -29,19 +47,24 @@ function delete_comment_url( comment_id )
 	});
 }
 
+function show_modifieds()
+{
+	for(var id in modifieds)
+	{
+		fadeInStatus( id, modifieds[id] );
+	}
+}
+
 // Set comments status
 function setCommentStatus( id, status, redirect_to )
 {
 	var divid = 'c' + id;
-	switch(status)
-	{
-		case 'published':
-			fadeIn(divid, '#339900');
-			break;
-		case 'deprecated':
-			fadeIn(divid, '#656565');
-			break;
-	};
+	fadeInStatus( divid, status );
+	modifieds[divid] = status;
+
+	var statuses = get_show_statuses();
+	var currentpage = get_current_page();
+	var item_id = get_itemid();
 
 	$.ajax({
 	type: 'POST',
@@ -52,12 +75,17 @@ function setCommentStatus( id, status, redirect_to )
 			'status': status,
 			'action': 'set_comment_status',
 			'moderation': 'commentlist',
+			'statuses': statuses,
+			'itemid': item_id,
+			'currentpage': currentpage,
 			'redirect_to': redirect_to,
 			'crumb_comment': <?php echo '\''.get_crumb('comment').'\''; ?>,
 		},
 	success: function(result)
 		{
-			$('#comment_' + id).html(result);
+			delete modifieds[divid];
+			$('#comments_container').html(result);
+			show_modifieds();
 		}
 	});
 }
@@ -75,17 +103,12 @@ function deleteComment( commentIds )
 		if( $('#'+divid) != null )
 		{
 			fadeIn(divid, '#EE0000');
+			modifieds[divid] = 'deleted';
 		}
 	}
 
 	var statuses = get_show_statuses();
-
-	var item_id = $('#comments_container').attr('value');
-	if( ! isDefined( item_id) )
-	{
-		item_id = -1;
-	}
-
+	var item_id = get_itemid();
 	var currentpage = get_current_page();
 
 	$.ajax({
@@ -94,7 +117,9 @@ function deleteComment( commentIds )
 	data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentIds=' + commentIds + '&action=delete_comments&itemid=' + item_id + '&statuses=' + statuses + '&currentpage=' + currentpage + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
 	success: function(result)
 		{
+			delete modifieds[divid];
 			$('#comments_container').html(result);
+			show_modifieds();
 		}
 	});
 }
@@ -112,6 +137,7 @@ function antispamSettings( the_html )
 	jQuery( '#close_button' ).bind( 'click', closeAntispamSettings );
 	jQuery( '.SaveButton' ).bind( 'click', refresh_overlay );
 
+	// Close antispam popup if Escape key is pressed:
 	var keycode_esc = 27;
 	jQuery(document).keyup(function(e)
 	{
@@ -174,7 +200,7 @@ function refreshAfterBan( deleted_ids )
 		var divid = 'c' + comment_ids[i];
 		fadeIn(divid, '#EE0000');
 	}
-	var item_id = $('#comments_container').attr('value');
+	var item_id = get_itemid();
 	refresh_item_comments( item_id );
 }
 
@@ -214,6 +240,16 @@ function get_show_statuses()
 	return '(draft,published,deprecated)';
 }
 
+function get_itemid()
+{
+	var item_id = $('#comments_container').attr('value');
+	if( ! isDefined( item_id) )
+	{
+		item_id = -1;
+	}
+	return item_id;
+}
+
 function refresh_item_comments( item_id, currentpage )
 {
 	var statuses = get_show_statuses();
@@ -233,6 +269,7 @@ function refresh_item_comments( item_id, currentpage )
 		success: function(result)
 		{
 			endRefreshComments( result );
+			show_modifieds();
 		}
 	});
 }

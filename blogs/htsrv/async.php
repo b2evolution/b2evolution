@@ -186,7 +186,21 @@ switch( $action )
 
 			if( $moderation != NULL )
 			{
-				echo_comment( $edited_Comment->ID, rawurlencode( $redirect_to ), true );
+				$statuses = param( 'statuses', 'string', NULL );
+				$item_ID = param( 'itemid', 'integer' );
+				$currentpage = param( 'currentpage', 'integer', 1 );
+
+				if( strlen($statuses) > 2 )
+				{
+					$statuses = substr( $statuses, 1, strlen($statuses) - 2 );
+				}
+				$status_list = explode( ',', $statuses );
+				if( $status_list == NULL )
+				{
+					$status_list = array( 'published', 'draft', 'deprecated' );
+				}
+
+				echo_item_comments( $blog, $item_ID, $status_list, $currentpage );
 				exit(0);
 			}
 		}
@@ -357,6 +371,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.62  2010/12/14 15:29:37  efy-asimo
+ * comment moderation with ajax - fix
+ *
  * Revision 1.61  2010/10/19 13:31:31  efy-asimo
  * Ajax comment moderation - fix
  *
