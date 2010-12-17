@@ -49,7 +49,7 @@ class twitter_plugin extends Plugin
 	 */
 	var $code = 'evo_twitter';
 	var $priority = 50;
-	var $version = '3.2';
+	var $version = '3.3';
 	var $author = 'Lee Turner';
 	var $help_url = 'http://leeturner.org/twitterlution.php';
 
@@ -138,65 +138,18 @@ class twitter_plugin extends Plugin
 	 */
 	function ItemSendPing( & $params )
 	{
-    /**
+		/**
 		 * @var Blog
 		 */
 		$item_Blog = $params['Item']->get_Blog();
 
-		// Try to get twitter account for Blog:
-		$oauth_token = $this->get_coll_setting( 'twitter_token', $item_Blog );
-		$oauth_token_secret = $this->get_coll_setting( 'twitter_secret', $item_Blog );
-		if( empty($oauth_token) || empty($oauth_token_secret) )
-		{ // Not found, fallback to Trying to get twitter account for User:
-			$oauth_token = $this->UserSettings->get( 'twitter_token' );
-			$oauth_token_secret = $this->UserSettings->get( 'twitter_secret' );
-			if( empty($oauth_token) || empty($oauth_token_secret) )
-			{	// Still no twitter account found:
-				$params['xmlrpcresp'] = T_('You must configure a twitter username/password before you can post to twitter.');
-				return false;
-			}
-			else
-			{	// Get additional params from User Setttings:
-				$msg = $this->UserSettings->get( 'twitter_msg_format' );
-				$oauth_contact = $this->UserSettings->get( 'twitter_contact' );
-			}
-		}
-		else
-		{	// Get additional params from Blog Setttings:
-			$msg = $this->get_coll_setting( 'twitter_msg_format', $item_Blog );
-			$oauth_contact = $this->get_coll_setting( 'twitter_contact', $item_Blog );
-		}
+		$content = array(
+				'title'		=> $params['Item']->dget('title', 'xml'),
+				'excerpt'	=> $params['Item']->dget('excerpt', 'xml'),
+				'url'		=> $params['Item']->get_tinyurl(),
+			);
 
-		$title =  $params['Item']->dget('title', 'xml');
-		$excerpt =  $params['Item']->dget('excerpt', 'xml');
-		$url = $params['Item']->get_tinyurl();
-
-		$msg = str_replace( '$title$', $title, $msg );
-		$msg = str_replace( '$excerpt$', $excerpt, $msg );
-		$msg = str_replace( '$url$', $url, $msg );
-
-		require_once 'twitteroauth/twitteroauth.php';
-		$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth_token, $oauth_token_secret );
-
-		$result = $connection->post('statuses/update', array( 'status' => $msg ));
-
-		if( empty($result) )
-		{
-			return false;
-		}
-		elseif( !empty($result->error) )
-		{
-			$params['xmlrpcresp'] = $result->error;
-			return false;
-		}
-
-		if( empty( $oauth_contact ) )
-		{
-			$oauth_contact = $this->get_twitter_contact( $oauth_token, $oauth_token_secret );
-		}
-
-		$params['xmlrpcresp'] = T_('Posted to account: @').$oauth_contact;
-		return true;
+		return $this->send_a_tweet( $content, $item_Blog, $params['xmlrpcresp'] );
 	}
 
 	/**
@@ -552,10 +505,73 @@ class twitter_plugin extends Plugin
 		header_redirect( $redirect_to );
 		// We have EXITed already at this point!!
 	}
+	
+	
+	function send_a_tweet( $content, $item_Blog, & $xmlrpcresp )
+	{
+		// Try to get twitter account for Blog:
+		$oauth_token = $this->get_coll_setting( 'twitter_token', $item_Blog );
+		$oauth_token_secret = $this->get_coll_setting( 'twitter_secret', $item_Blog );
+		if( empty($oauth_token) || empty($oauth_token_secret) )
+		{ // Not found, fallback to Trying to get twitter account for User:
+			$oauth_token = $this->UserSettings->get( 'twitter_token' );
+			$oauth_token_secret = $this->UserSettings->get( 'twitter_secret' );
+			if( empty($oauth_token) || empty($oauth_token_secret) )
+			{	// Still no twitter account found:
+				$xmlrpcresp = T_('You must configure a twitter username/password before you can post to twitter.');
+				return false;
+			}
+			else
+			{	// Get additional params from User Setttings:
+				$msg = $this->UserSettings->get( 'twitter_msg_format' );
+				$oauth_contact = $this->UserSettings->get( 'twitter_contact' );
+			}
+		}
+		else
+		{	// Get additional params from Blog Setttings:
+			$msg = $this->get_coll_setting( 'twitter_msg_format', $item_Blog );
+			$oauth_contact = $this->get_coll_setting( 'twitter_contact', $item_Blog );
+		}
+
+		$content = array_merge( array(
+					'title'		=> '',
+					'excerpt'	=> '',
+					'url'		=> ''
+				), $content );
+
+		$msg = str_replace( array( '$title$', '$excerpt$', '$url$' ),
+							array( $content['title'], $content['excerpt'], $content['url'] ), $msg );
+
+		require_once 'twitteroauth/twitteroauth.php';
+		$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth_token, $oauth_token_secret );
+
+		$result = $connection->post('statuses/update', array( 'status' => $msg ));
+
+		if( empty($result) )
+		{
+			return false;
+		}
+		elseif( !empty($result->error) )
+		{
+			$xmlrpcresp = $result->error;
+			return false;
+		}
+
+		if( empty( $oauth_contact ) )
+		{
+			$oauth_contact = $this->get_twitter_contact( $oauth_token, $oauth_token_secret );
+		}
+
+		$xmlrpcresp = T_('Posted to account: @').$oauth_contact;
+		return true;
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.27  2010/12/17 12:16:00  sam2kb
+ * Allow tweeting custom messages, not only from Item
+ *
  * Revision 1.26  2010/11/09 16:19:57  efy-asimo
  * disable twitter plugin, if curl is not loaded
  *
