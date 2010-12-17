@@ -57,7 +57,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	$res_affected_hits = $DB->get_results( $sql, ARRAY_A );
 	if( $DB->num_rows == 0 )
 	{ // No matching hits.
-		printf( '<p>'.T_('No %s match the keyword [%s].').'</p>', '<strong>'.T_('log-hits').'</strong>', htmlspecialchars($keyword) );
+		printf( '<p>'.T_('No <strong>log-hits</strong> match the keyword [%s].').'</p>', htmlspecialchars($keyword) );
 	}
 	else
 	{
@@ -65,7 +65,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 		<p>
 			<input type="checkbox" name="delhits" id="delhits_cb" value="1" checked="checked" />
 			<label for="delhits_cb">
-			<?php printf ( T_('Delete the following %s %s:'), $DB->num_rows == 500 ? '500+' : $DB->num_rows , '<strong>'.T_('referer hits').'</strong>' ) ?>
+			<?php printf ( T_('Delete the following %s <strong>referer hits</strong>:'), $DB->num_rows == 500 ? '500+' : $DB->num_rows ) ?>
 			</label>
 		</p>
 		<table class="grouped" cellspacing="0">
@@ -112,7 +112,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	$res_affected_comments = $DB->get_results( $sql, OBJECT, 'Find matching comments' );
 	if( $DB->num_rows == 0 )
 	{ // No matching hits.
-		printf( '<p>'.T_('No %s match the keyword [%s].').'</p>', '<strong>'.T_('comments').'</strong>', htmlspecialchars($keyword) );
+		printf( '<p>'.T_('No <strong>comments</strong> match the keyword [%s].').'</p>', htmlspecialchars($keyword) );
 	}
 	else
 	{ // create comment arrays
@@ -185,7 +185,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	{
 		if( ! $current_User->check_perm( 'users', 'view', false ) )
 		{ // current user has no permission to view users
-			printf( '<p>'.T_('There are %d matching %s but you have no permission to see them.').'</p>', $DB->num_rows, '<strong>'.T_('users').'</strong>' );
+			printf( '<p>'.T_('There are %d matching <strong>users</strong> but you have no permission to see them.').'</p>', $DB->num_rows );
 		}
 		else
 		{ // matching found, and current user has permission to view -> display users table
@@ -235,13 +235,13 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 	}
 	else
 	{ // There is no affected users
-		printf( '<p>'.T_('No %s match the keyword [%s]').'</p>', '<strong>'.T_('users').'</strong>', $keyword );
+		printf( '<p>'.T_('No <strong>users</strong> match the keyword [%s]').'</p>', $keyword );
 	}
 
 	// Check if the string is already in the blacklist:
 	if( antispam_check($keyword) )
 	{ // Already there:
-		printf( '<p>'.T_('The keyword [%s] is %s by the blacklist.').'</p>', htmlspecialchars($keyword), '<strong>'.T_('already handled').'</strong>' );
+		printf( '<p>'.T_('The keyword [%s] is <strong>already handled</strong> by the blacklist.').'</p>', htmlspecialchars($keyword) );
 	}
 	else
 	{ // Not in blacklist
@@ -249,7 +249,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 		<p>
 		<input type="checkbox" name="blacklist_locally" id="blacklist_locally_cb" value="1" checked="checked" />
 		<label for="blacklist_locally_cb">
-			<?php printf ( T_('%s the keyword [%s] locally.'), '<strong>'.T_('Blacklist').'</strong>', htmlspecialchars($keyword) ) ?>
+			<?php printf ( T_('<strong>Blacklist</strong> the keyword [%s] locally.'), htmlspecialchars($keyword) ) ?>
 		</label>
 		</p>
 
@@ -260,7 +260,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 			<p>
 			<input type="checkbox" name="report" id="report_cb" value="1" checked="checked" />
 			<label for="report_cb">
-				<?php printf ( T_('%s the keyword [%s] as abuse to b2evolution.net.'), '<strong>'.T_('Report').'</strong>', htmlspecialchars($keyword) ) ?>
+				<?php printf ( T_('<strong>Report</strong> the keyword [%s] as abuse to b2evolution.net.'), htmlspecialchars($keyword) ) ?>
 			</label>
 			[<a href="http://b2evolution.net/about/terms.html"><?php echo T_('Terms of service') ?></a>]
 			</p>
@@ -289,6 +289,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.27  2010/12/17 13:00:09  sam2kb
+ * Don't make sentenses too complicated for translators, remember about declension.
+ *
  * Revision 1.26  2010/11/04 00:48:17  fplanque
  * no message
  *
