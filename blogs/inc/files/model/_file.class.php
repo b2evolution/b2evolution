@@ -1013,7 +1013,7 @@ class File extends DataObject
 	 * @param string
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
-	                  $before_image_legend = '<div class="image_legend">',
+	                  $before_image_legend = '<div class="image_legend">', // can be NULL
 	                  $after_image_legend = '</div>',
 	                  $after_image = '</div>',
 	                  $size_name = 'original',
@@ -1089,7 +1089,7 @@ class File extends DataObject
 	 *
 	 * @access should be private
 	 * @param string relative path for this file's parent directory
-	 * @param string full path for this file's parent directory 
+	 * @param string full path for this file's parent directory
 	 */
 	function modify_path ( $rel_dir, $full_dir )
 	{
@@ -1097,10 +1097,10 @@ class File extends DataObject
 		{
 			$new_rel_dir = $rel_dir.$this->_name.'/';
 			$new_full_dir = $full_dir.$this->_name.'/';
-			
+
 			$temp_Filelist = new Filelist( $this->_FileRoot, $this->_adfp_full_path );
 			$temp_Filelist->load();
-			
+
 			while ( $temp_File = $temp_Filelist->get_next() )
 			{
 				$temp_File->modify_path( $new_rel_dir, $new_full_dir );
@@ -1126,7 +1126,7 @@ class File extends DataObject
 			$this->load_meta();
 		}
 	}
-	
+
 
 	/**
 	 * Rename the file in its current directory on disk.
@@ -1146,14 +1146,14 @@ class File extends DataObject
 		{
 			return false;
 		}
-		
+
 		global $DB;
 		$DB->begin();
-		
+
 		$oldname = $this->get_name();
 
 		if( $this->is_dir() )
-		{ // modify folder content file paths in db 
+		{ // modify folder content file paths in db
 			$rel_dir = dirname( $this->_rdfp_rel_path ).'/';
 			if( $rel_dir == './' )
 			{
@@ -1161,16 +1161,16 @@ class File extends DataObject
 			}
 			$rel_dir = $rel_dir.$newname.'/';
 			$full_dir = $this->_dir.$newname.'/';
-			
+
 			$temp_Filelist = new Filelist( $this->_FileRoot, $this->_adfp_full_path );
 			$temp_Filelist->load();
-			
+
 			while ( $temp_File = $temp_Filelist->get_next() )
 			{
 				$temp_File->modify_path ( $rel_dir, $full_dir, $paths );
 			}
 		}
-		
+
 		if( ! @rename( $this->_adfp_full_path, $this->_dir.$newname ) )
 		{ // Rename will fail if $newname already exists (at least on windows)
 			$DB->rollback();
@@ -1224,7 +1224,7 @@ class File extends DataObject
 			// experience proves that users are inconsistent!
 			$this->load_meta();
 		}
-		
+
 		$DB->commit();
 
 		return true;
@@ -1936,7 +1936,7 @@ class File extends DataObject
 	function save_thumb_to_cache( $thumb_imh, $size_name, $thumb_mimetype, $thumb_quality = 90 )
 	{
 		global $Plugins;
-		
+
 		$Plugins->trigger_event( 'BeforeThumbCreate', array(
 			  'imh' => & $thumb_imh,
 			  'size' => & $size_name,
@@ -1944,7 +1944,7 @@ class File extends DataObject
 			  'quality' => & $thumb_quality,
 			  'File' => & $this,
 		  ) );
-		
+
 		$af_thumb_path = $this->get_af_thumb_path( $size_name, $thumb_mimetype, true );
 		if( $af_thumb_path[0] != '!' )
 		{	// We obtained a path for the thumbnail to be saved:
@@ -2062,7 +2062,7 @@ class File extends DataObject
 	 * Get link to restricted object
 	 *
 	 * Used when try to delete a file, which is attached to a post, or to a user
-	 * 
+	 *
 	 * @param array restriction
 	 * @return string message with links to objects
 	 */
@@ -2075,7 +2075,7 @@ class File extends DataObject
 			case 'T_links':
 				$object_ID = 'post_ID';			// related table object ID
 				$object_name = 'post_title';	// related table object name
-				
+
 				// link to object
 				$link = '<a href="'.$admin_url.'?ctrl=items&action=edit&p=%d">%s</a>';
 				$object_query = 'SELECT post_ID, post_title FROM T_items__item'
@@ -2119,6 +2119,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.91  2010/12/18 00:23:05  fplanque
+ * minor stuff & fixes
+ *
  * Revision 1.90  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *

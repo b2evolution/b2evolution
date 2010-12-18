@@ -87,6 +87,7 @@ if( $content_mode == 'auto' )
 			break;
 
 		case 'posts-filtered':
+		case 'search':
 			$content_mode = $Blog->get_setting('filtered_content');
 			break;
 
@@ -113,7 +114,7 @@ switch( $content_mode )
 					'before_image' =>        $params['before_image'],
 					'before_image_legend' => $params['before_image_legend'],
 					'after_image_legend' =>  $params['after_image_legend'],
-					'after_image' =>         $params['after_image_legend'],
+					'after_image' =>         $params['after_image'],
 					'after' =>               $params['after_images'],
 					'image_size' =>          $params['excerpt_image_size'],
 					'limit' =>               $params['excerpt_image_limit'],
@@ -153,7 +154,7 @@ switch( $content_mode )
 					'before_image' =>        $params['before_image'],
 					'before_image_legend' => $params['before_image_legend'],
 					'after_image_legend' =>  $params['after_image_legend'],
-					'after_image' =>         $params['after_image_legend'],
+					'after_image' =>         $params['after_image'],
 					'after' =>               $params['after_images'],
 					'image_size' =>          $params['image_size'],
 					'limit' =>               $params['image_limit'],
@@ -242,6 +243,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.34  2010/12/18 00:23:05  fplanque
+ * minor stuff & fixes
+ *
  * Revision 1.33  2010/04/22 18:55:20  blueyed
  * An attempt to save views during shutdown.
  *

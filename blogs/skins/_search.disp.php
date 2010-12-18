@@ -15,8 +15,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-// Note: this is a very imperfect sitemap, but it's a start :)
-
 // --------------------------------- START OF COMMON LINKS --------------------------------
 skin_widget( array(
 		// CODE for the widget:
@@ -54,6 +52,9 @@ while( mainlist_get_item() )
 
 /*
  * $Log$
+ * Revision 1.3  2010/12/18 00:23:05  fplanque
+ * minor stuff & fixes
+ *
  * Revision 1.2  2010/02/08 17:56:14  efy-yury
  * copyright 2009 -> 2010
  *

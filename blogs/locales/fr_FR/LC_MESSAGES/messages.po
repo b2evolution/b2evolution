@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution 2.5\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2010-12-11 22:09+0100\n"
-"PO-Revision-Date: 2010-12-12 03:03+0100\n"
+"PO-Revision-Date: 2010-12-17 23:30+0100\n"
 "Last-Translator: Francois Planque <http://fplanque.com>\n"
 "Language-Team: François PLANQUE <http://fplanque.net/>\n"
 "MIME-Version: 1.0\n"
@@ -578,7 +578,7 @@ msgstr "L'autentification a échoué pour l'utilisateur %s."
 #: ../../../cron/getmail.php:630
 #, php-format
 msgid "Blog #%d not found!"
-msgstr ""
+msgstr "Blog n°%d introuvable!"
 
 #: ../../../cron/getmail.php:642
 msgid "Permission denied."
@@ -763,7 +763,7 @@ msgstr "L'URL du commentaire a été supprimée."
 
 #: ../../../htsrv/comment_review.php:108
 msgid "Comment review"
-msgstr ""
+msgstr "Prévisualisation du commentaire"
 
 #: ../../../htsrv/comment_review.php:121
 #: ../../../inc/comments/model/_comment.class.php:874
@@ -1224,7 +1224,7 @@ msgstr "Ecrire"
 #: ../../../inc/_core/__core.init.php:298
 #: ../../../inc/_core/__core.init.php:303
 msgid "No blog is currently selected"
-msgstr ""
+msgstr "Aucun blog n'est acyuellement séléectionné"
 
 #: ../../../inc/_core/__core.init.php:297
 msgid "Manage"
@@ -4631,7 +4631,7 @@ msgstr ""
 
 #: ../../../inc/collections/views/_coll_features.form.php:161
 msgid "(numeric)"
-msgstr ""
+msgstr "(numérique)"
 
 #: ../../../inc/collections/views/_coll_features.form.php:165
 msgid "Ex: Color"
@@ -6224,7 +6224,7 @@ msgstr "Liste des Commentaires"
 
 #: ../../../inc/comments/views/_comment_list_table.view.php:79
 msgid "Kind"
-msgstr ""
+msgstr "Genre"
 
 #: ../../../inc/comments/views/_comment_list_table.view.php:178
 msgid "IP"
@@ -7387,7 +7387,7 @@ msgstr ""
 
 #: ../../../inc/files/upload.ctrl.php:606
 msgid "Link this file to your post"
-msgstr ""
+msgstr "Lier ce fichier à votre article"
 
 #: ../../../inc/files/upload.ctrl.php:607
 msgid "The file will be appended for download at the end of the post"
@@ -7870,7 +7870,7 @@ msgstr ""
 
 #: ../../../inc/files/views/_file_list.inc.php:518
 msgid "Insert IMG/link into post"
-msgstr ""
+msgstr "Insérer IMG/lien dans article"
 
 #: ../../../inc/files/views/_file_list.inc.php:523
 msgid "Rename files..."
@@ -7977,7 +7977,7 @@ msgstr "Renommer"
 
 #: ../../../inc/files/views/_file_settings.form.php:169
 msgid "File manager settings"
-msgstr ""
+msgstr "Réglages du gestionnaire de fichiers"
 
 #: ../../../inc/files/views/_file_settings.form.php:175
 msgid "Accessible file roots"
@@ -8682,11 +8682,11 @@ msgstr "Pages:"
 #: ../../../inc/items/views/inc/_item_links.inc.php:53
 #: ../../../skins/_item_content.inc.php:55
 msgid "Attachments"
-msgstr ""
+msgstr "Fichiers attachés"
 
 #: ../../../inc/items/model/_item.class.php:1970
 msgid "Download file"
-msgstr ""
+msgstr "Télécharger le fichier"
 
 #: ../../../inc/items/model/_item.class.php:2053
 msgid "Comment feed for this post"
@@ -8875,7 +8875,7 @@ msgstr ""
 #: ../../../inc/items/model/_item.funcs.php:502
 #: ../../../inc/items/model/_item.funcs.php:528
 msgid "Add/Link files"
-msgstr ""
+msgstr "Ajouter/Lier les fichiers"
 
 #. TRANS: This is the value of an input submit button
 #: ../../../inc/items/model/_item.funcs.php:508
@@ -8919,7 +8919,7 @@ msgstr ""
 
 #: ../../../inc/items/model/_item.funcs.php:877
 msgid "Intros"
-msgstr ""
+msgstr "Intros"
 
 #: ../../../inc/items/model/_item.funcs.php:943
 msgid "Full text view"
@@ -8964,7 +8964,7 @@ msgstr "Date de sortie"
 
 #: ../../../inc/items/model/_item.funcs.php:1064
 msgid "Update to NOW"
-msgstr ""
+msgstr "Changer vers MAINTENANT"
 
 #: ../../../inc/items/model/_item.funcs.php:1073
 msgid "Set to"
@@ -9163,7 +9163,7 @@ msgstr ""
 #: ../../../inc/items/views/_item_expert.form.php:219
 #: ../../../inc/items/views/_item_mass_edit.view.php:73
 msgid "URL title \"slug\""
-msgstr ""
+msgstr "Titre URL / \"slug\""
 
 #: ../../../inc/items/views/_item_expert.form.php:224
 msgid "&lt;title&gt; tag"
@@ -9337,17 +9337,17 @@ msgstr ""
 #: ../../../inc/items/views/_item_list_full.view.php:75
 #: ../../../inc/items/views/_item_list_table.view.php:279
 msgid "Mass create"
-msgstr ""
+msgstr "Créer en masse"
 
 #: ../../../inc/items/views/_item_list_full.view.php:76
 #: ../../../inc/items/views/_item_list_table.view.php:286
 msgid "Mass edit"
-msgstr ""
+msgstr "Editer en masse"
 
 #: ../../../inc/items/views/_item_list_full.view.php:76
 #: ../../../inc/items/views/_item_list_table.view.php:286
 msgid "Mass edit the current post list..."
-msgstr ""
+msgstr "Editer en masse la liste d'articles courante"
 
 #. TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 #: ../../../inc/items/views/_item_list_full.view.php:164
@@ -9401,7 +9401,7 @@ msgstr "Pingbacks"
 
 #: ../../../inc/items/views/_item_list_full.view.php:382
 msgid "Show"
-msgstr ""
+msgstr "Montrer"
 
 #: ../../../inc/items/views/_item_list_full.view.php:385
 msgid "Drafts"
@@ -9409,7 +9409,7 @@ msgstr "Brouillons"
 
 #: ../../../inc/items/views/_item_list_full.view.php:393
 msgid "All comments"
-msgstr ""
+msgstr "Tous les commentaires"
 
 #: ../../../inc/items/views/_item_list_full.view.php:431
 #: ../../../skins/_item_comment_form.inc.php:151
@@ -9521,7 +9521,7 @@ msgstr ""
 
 #: ../../../inc/items/views/_item_list_table.view.php:267
 msgid "New link"
-msgstr ""
+msgstr "Nouveau lien"
 
 #: ../../../inc/items/views/_item_list_table.view.php:268
 msgid "Add a sidebar link..."
@@ -9598,7 +9598,7 @@ msgstr "Supprimer ce type d'article!"
 #: ../../../inc/items/views/_itemtype.form.php:52
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:81
 msgid "Item type"
-msgstr ""
+msgstr "Type d'article"
 
 #: ../../../inc/items/views/_itemtype.form.php:52
 #: ../../../inc/items/views/_itemtypes.view.php:117
@@ -10260,7 +10260,7 @@ msgstr ""
 
 #: ../../../inc/maintenance/views/_backup.form.php:53
 msgid "Folders & files"
-msgstr ""
+msgstr "Dossiers & fichiers"
 
 #: ../../../inc/maintenance/views/_backup.form.php:64
 msgid "Affected paths:"
@@ -10276,7 +10276,7 @@ msgstr ""
 
 #: ../../../inc/maintenance/views/_backup.form.php:158
 msgid "Maintenance mode"
-msgstr ""
+msgstr "Mode Maintenance"
 
 #: ../../../inc/maintenance/views/_backup.form.php:158
 msgid "Put b2evolution into Maintenance Mode while backing up - Recommended"
@@ -10304,9 +10304,10 @@ msgstr ""
 msgid "Unzip & install now!"
 msgstr ""
 
+# Has to be kept short for skin images not to align badly
 #: ../../../inc/maintenance/views/_upgrade.form.php:73
 msgid "Install now!"
-msgstr "Installer maintenant!"
+msgstr "Installer!"
 
 #: ../../../inc/maintenance/views/_upgrade.form.php:87
 msgid "Force 'upgrade' nonetheless"
@@ -10370,59 +10371,59 @@ msgstr "Supprimer le message?"
 #. TRANS: Email salutation
 #: ../../../inc/messaging/model/_message.class.php:430
 msgid "Dear user,"
-msgstr ""
+msgstr "Cher utilisateur,"
 
 #: ../../../inc/messaging/model/_message.class.php:438
 #, php-format
 msgid "New conversation created: \"%s\""
-msgstr ""
+msgstr "Nouvelle conversation créee: \"%s\""
 
 #. TRANS: Space at the end
 #: ../../../inc/messaging/model/_message.class.php:440
 #, php-format
 msgid "has created the \"%s\" conversation. "
-msgstr ""
+msgstr "a lancé la conversation \"%s\". "
 
 #: ../../../inc/messaging/model/_message.class.php:442
 #: ../../../inc/messaging/model/_message.class.php:450
 #, php-format
 msgid "To read it, click on this link: %s"
-msgstr ""
+msgstr "Pour la lire, cliquez simplement sur ce lien: %s"
 
 #: ../../../inc/messaging/model/_message.class.php:446
 #, php-format
 msgid "New message in conversation \"%s\" created"
-msgstr ""
+msgstr "Nouveau message ajouté à la conversation \"%s\""
 
 #. TRANS: Space at the end
 #: ../../../inc/messaging/model/_message.class.php:448
 #, php-format
 msgid "has created a new message in the \"%s\" conversation. "
-msgstr ""
+msgstr "a ajouté un nouveau message dans la conversation \"%s\"."
 
 #: ../../../inc/messaging/model/_message.class.php:455
 msgid "Best regards"
-msgstr ""
+msgstr "Salutations"
 
 #. TRANS: %s gets replaced by app_name, usually "b2evolution"
 #: ../../../inc/messaging/model/_message.class.php:458
 #, php-format
 msgid "%s mailer"
-msgstr ""
+msgstr "Système de messagerie de %s"
 
 #: ../../../inc/messaging/model/_message.class.php:460
 msgid "This is an automatically generated message; please do not reply to this email."
-msgstr ""
+msgstr "Ceci est un message généré automatiquement; merci de ne pas répondre à cet email."
 
 #: ../../../inc/messaging/model/_messaging.funcs.php:147
 msgid "You don't have permission to send private messages."
-msgstr ""
+msgstr "Vous n'avez pas la permission d'envoyer des messages privés."
 
 #: ../../../inc/messaging/model/_messaging.funcs.php:153
 #: ../../../skins/_msgform.disp.php:85
 #: ../../../skins/_user.disp.php:69
 msgid "You cannot send a private message to yourself."
-msgstr ""
+msgstr "Vous ne pouvez pas vous envoyer un message privé à vous même."
 
 #: ../../../inc/messaging/model/_thread.class.php:92
 msgid "Please enter a subject"
@@ -10431,11 +10432,11 @@ msgstr "Merci d'entrer un sujet"
 #: ../../../inc/messaging/model/_thread.class.php:156
 #, php-format
 msgid "You cannot send threads to yourself: %s"
-msgstr ""
+msgstr "Vous ne pouvez pas vous envoyer des conversations à vous même: %s."
 
 #: ../../../inc/messaging/threads.ctrl.php:93
 msgid "You don't have permission to initiate conversations with the following users: "
-msgstr ""
+msgstr "Vous n'avez pas la permission de lancer des conversations avec les utilisateurs suivants:"
 
 #: ../../../inc/messaging/threads.ctrl.php:109
 msgid "New thread created."
@@ -10444,7 +10445,7 @@ msgstr "Nouvelle discussion créée."
 #: ../../../inc/messaging/threads.ctrl.php:137
 #, php-format
 msgid "Thread &laquo;%s&raquo; deleted."
-msgstr ""
+msgstr "Conversation &laquo;%s&raquo; supprimée."
 
 #: ../../../inc/messaging/threads.ctrl.php:150
 #, php-format
@@ -10462,7 +10463,7 @@ msgstr "Supprimer la conversation &laquo;%s&raquo;?"
 
 #: ../../../inc/messaging/views/_contact_list.view.php:73
 msgid "Contacts list"
-msgstr ""
+msgstr "Liste des contacts"
 
 #: ../../../inc/messaging/views/_contact_list.view.php:171
 #: ../../../inc/users/views/_user_list.view.php:253
@@ -10490,7 +10491,7 @@ msgstr "Débloquer le contact"
 
 #: ../../../inc/messaging/views/_contact_list.view.php:213
 msgid "Block / Unblock"
-msgstr ""
+msgstr "Bloquer / Débloquer."
 
 #: ../../../inc/messaging/views/_message_list.view.php:257
 #: ../../../inc/messaging/views/_thread_list.view.php:201
@@ -10507,7 +10508,7 @@ msgstr "Nouvelle conversation"
 
 #: ../../../inc/messaging/views/_thread.form.php:57
 msgid "Enter comma or space separated logins"
-msgstr ""
+msgstr "Entrez des identifiants séparés par des virgules ou des espaces."
 
 #: ../../../inc/messaging/views/_thread.form.php:57
 msgid "Recipients"
@@ -10979,12 +10980,13 @@ msgstr "Nom de Classe"
 msgid "Class file"
 msgstr "Fichier Classe"
 
+# Keep this short!!
 #: ../../../inc/plugins/plugins.ctrl.php:1104
 #: ../../../inc/skins/model/_skin.class.php:437
 #: ../../../inc/skins/model/_skin.class.php:479
 #: ../../../inc/skins/model/_skin.class.php:480
 msgid "Install NOW!"
-msgstr "Installer MAINTENANT!"
+msgstr "Installer!"
 
 #: ../../../inc/plugins/views/_plugin_list.view.php:79
 msgid "Installed plugins"
@@ -11220,7 +11222,7 @@ msgstr "Nouvelle devise créée."
 
 #: ../../../inc/regional/currencies.ctrl.php:211
 msgid "Currency updated."
-msgstr ""
+msgstr "Devise mise à jour."
 
 #: ../../../inc/regional/currencies.ctrl.php:237
 #, php-format
@@ -11311,7 +11313,7 @@ msgstr "Supprimer cette devise!"
 #: ../../../inc/regional/views/_currency.form.php:48
 #: ../../../inc/regional/views/_currency_list.view.php:168
 msgid "New currency"
-msgstr ""
+msgstr "Nouvelle devise"
 
 #: ../../../inc/regional/views/_currency.form.php:55
 #: ../../../inc/regional/views/_currency_list.view.php:118
@@ -11383,10 +11385,9 @@ msgstr "Stats"
 msgid "Hit summary"
 msgstr "Résumé des hits"
 
-# D:\www\b2evo19\blogs\inc\VIEW\sessions\_stats_summary.view.php:31
 #: ../../../inc/sessions/_sessions.init.php:195
 msgid "Global hits"
-msgstr ""
+msgstr "Hits globaux"
 
 #: ../../../inc/sessions/_sessions.init.php:198
 msgid "Browser hits"
@@ -11490,20 +11491,20 @@ msgstr "Impossible de supprimer l'objectif &laquo;%s&raquo;"
 #: ../../../inc/sessions/stats.ctrl.php:211
 #: ../../../inc/sessions/stats.ctrl.php:238
 msgid "Analytics"
-msgstr ""
+msgstr "Analytics"
 
 #: ../../../inc/sessions/goals.ctrl.php:219
 #: ../../../inc/sessions/stats.ctrl.php:239
 msgid "Goal tracking"
-msgstr ""
+msgstr "Suivi des objectifs"
 
 #: ../../../inc/sessions/goals.ctrl.php:223
 msgid "Goal definitions"
-msgstr ""
+msgstr "Définition des objectifs"
 
 #: ../../../inc/sessions/goals.ctrl.php:226
 msgid "Goal hit stats"
-msgstr ""
+msgstr "Statistiques sur les objectifs"
 
 #: ../../../inc/sessions/goals.ctrl.php:251
 #, php-format
@@ -11651,7 +11652,7 @@ msgstr "Session par utilisateur"
 #: ../../../inc/sessions/views/_stats_sessions.view.php:48
 #: ../../../inc/sessions/views/_stats_sessions_list.view.php:54
 msgid "Recent sessions"
-msgstr ""
+msgstr "Sessions récentes"
 
 #: ../../../inc/sessions/stats.ctrl.php:232
 #: ../../../inc/sessions/views/_stats_hit_list.view.php:75
@@ -11666,7 +11667,7 @@ msgstr "Nouvel objectif"
 #: ../../../inc/sessions/views/_goal.form.php:47
 #: ../../../inc/sessions/views/_stats_goals.view.php:83
 msgid "Key"
-msgstr ""
+msgstr "Clef"
 
 #: ../../../inc/sessions/views/_goal.form.php:47
 msgid "Should be URL friendly"
@@ -11795,7 +11796,7 @@ msgstr "De"
 #: ../../../inc/sessions/views/_stats_goalhits.view.php:114
 #: ../../../inc/sessions/views/_stats_hit_list.view.php:84
 msgid "Exclude"
-msgstr ""
+msgstr "Exclurer"
 
 #: ../../../inc/sessions/views/_stats_goalhits.view.php:115
 #: ../../../inc/sessions/views/_stats_hit_list.view.php:85
@@ -11843,7 +11844,7 @@ msgstr "Créer un nouvel objectif..."
 #: ../../../inc/sessions/views/_stats_hit_list.view.php:146
 #: ../../../inc/sessions/views/_stats_refsearches.view.php:85
 msgid "SR"
-msgstr ""
+msgstr "Rg"
 
 #: ../../../inc/sessions/views/_stats_refdomains.view.php:99
 msgid "Regular sites"
@@ -12514,11 +12515,11 @@ msgstr "Installer un nouvel habillage..."
 
 #: ../../../inc/skins/views/_coll_skin.view.php:33
 msgid "Don't change"
-msgstr ""
+msgstr "Ne pas changer"
 
 #: ../../../inc/skins/views/_coll_skin.view.php:33
 msgid "Keep current skin!"
-msgstr ""
+msgstr "Garder l'habillage actuel"
 
 #: ../../../inc/skins/views/_coll_skin_settings.form.php:51
 msgid "Select another skin..."
@@ -12526,11 +12527,11 @@ msgstr "Sélectionner un autre habillage..."
 
 #: ../../../inc/skins/views/_coll_skin_settings.form.php:51
 msgid "Use a different skin"
-msgstr ""
+msgstr "Utiliser un autre habillage"
 
 #: ../../../inc/skins/views/_coll_skin_settings.form.php:53
 msgid "Current skin"
-msgstr ""
+msgstr "Habillage actuel"
 
 #: ../../../inc/skins/views/_coll_skin_settings.form.php:57
 #: ../../../inc/skins/views/_skin.form.php:52
@@ -12835,7 +12836,7 @@ msgstr "Supprimé"
 
 #: ../../../inc/tools/system.ctrl.php:191
 msgid "Install folder"
-msgstr ""
+msgstr "Dossier Install"
 
 #: ../../../inc/tools/system.ctrl.php:191
 msgid "Not deleted"
@@ -12851,7 +12852,7 @@ msgstr "Autorisé!"
 
 #: ../../../inc/tools/system.ctrl.php:197
 msgid "Database reset"
-msgstr ""
+msgstr "Remise à zéro de la base de données"
 
 #: ../../../inc/tools/system.ctrl.php:197
 #: ../../../inc/users/views/_user_identity.form.php:257
@@ -12876,16 +12877,16 @@ msgstr "Heure"
 
 #: ../../../inc/tools/system.ctrl.php:224
 msgid "Server time"
-msgstr ""
+msgstr "Heure serveur"
 
 # D:\www\b2cvs20\blogs\inc\tools\system.ctrl.php:165
 #: ../../../inc/tools/system.ctrl.php:227
 msgid "GMT / UTC time"
-msgstr ""
+msgstr "Heure GMT / UTC"
 
 #: ../../../inc/tools/system.ctrl.php:230
 msgid "b2evolution time"
-msgstr ""
+msgstr "Heure b2evolution"
 
 #: ../../../inc/tools/system.ctrl.php:239
 msgid "MySQL"
@@ -12893,7 +12894,7 @@ msgstr " MySQL"
 
 #: ../../../inc/tools/system.ctrl.php:244
 msgid "MySQL version"
-msgstr ""
+msgstr "Version MySQL"
 
 #: ../../../inc/tools/system.ctrl.php:247
 msgid "This version is too old. The minimum recommended MySQL version is 4.1."
@@ -15003,11 +15004,13 @@ msgid "Item URL"
 msgstr ""
 
 # D:\www\b2evo20\blogs\skins\custom\_main.php:79
-# D:\www\b2evo20\blogs\skins\natural_pink\_main.php:52
-# D:\www\b2evo20\blogs\skins\nifty_corners\_main.php:67
+# D:\www\b2evo20\blogs\skins\n
+# ural_pink\_main.php:52
+# D:\www\b2evo20\blogs\skins\n
+# ty_corners\_main.php:67
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:144
 msgid "Nowhere"
-msgstr ""
+msgstr "Nulle part"
 
 #: ../../../inc/widgets/widgets/_coll_item_list.widget.php:150
 msgid "Display excerpt for each item."
@@ -15149,23 +15152,23 @@ msgstr "Afficher formulaire de recherche"
 
 #: ../../../inc/widgets/widgets/_coll_search_form.widget.php:92
 msgid "Search options"
-msgstr ""
+msgstr "Options de recherche"
 
 #: ../../../inc/widgets/widgets/_coll_search_form.widget.php:93
 msgid "Display radio buttons for \"All Words\", \"Some Word\" and \"Entire Phrase\""
-msgstr ""
+msgstr "Afficher des boutons radio pour \"Tous les mots\", \"N'importe quel mot\" et \"Phrase complète\""
 
 #: ../../../inc/widgets/widgets/_coll_search_form.widget.php:98
 msgid "Results on search page"
-msgstr ""
+msgstr "Page de résultats"
 
 #: ../../../inc/widgets/widgets/_coll_search_form.widget.php:99
 msgid "Use advanced search page to display results (disp=search)"
-msgstr ""
+msgstr "Utiliser la page de recherche avancée pour afficher les résultats (disp=search)"
 
 #: ../../../inc/widgets/widgets/_coll_search_form.widget.php:141
 msgid "All words"
-msgstr ""
+msgstr "Tous les mots"
 
 #: ../../../inc/widgets/widgets/_coll_search_form.widget.php:142
 msgid "Some word"
@@ -15261,7 +15264,7 @@ msgstr "Flux XML"
 
 #: ../../../inc/widgets/widgets/_coll_xml_feeds.widget.php:93
 msgid "Help link"
-msgstr ""
+msgstr "Lien d'aide"
 
 # D:\www\b2cvs20\blogs\inc\widgets\widgets\_coll_xml_feeds.widget.php:86
 #: ../../../inc/widgets/widgets/_coll_xml_feeds.widget.php:95
@@ -15287,7 +15290,7 @@ msgstr "Affiche la liste de tous les blogs appartenant au même utilisateur."
 
 #: ../../../inc/widgets/widgets/_colls_list_owner.widget.php:90
 msgid "My blogs"
-msgstr ""
+msgstr "Mes blogs"
 
 #: ../../../inc/widgets/widgets/_colls_list_public.widget.php:54
 msgid "Public blog list"
@@ -15299,7 +15302,7 @@ msgstr "Afficher la liste de tous les blogs marqués comme publics."
 
 #: ../../../inc/widgets/widgets/_colls_list_public.widget.php:90
 msgid "All blogs"
-msgstr ""
+msgstr "Tous les blogs"
 
 #: ../../../inc/widgets/widgets/_free_html.widget.php:54
 msgid "Free HTML"
@@ -17977,13 +17980,10 @@ msgstr "Droite"
 msgid "Footer"
 msgstr "Pied de page"
 
-# D:\www\b2cvs20\blogs\skins\custom\_skin.class.php:58
 #: ../../../skins/dating_mood/_skin.class.php:51
 msgid "Background Color"
 msgstr "Couleur de fond"
 
-# D:\www\b2cvs20\blogs\skins\custom\_skin.class.php:52
-# D:\www\b2cvs20\blogs\skins\custom\_skin.class.php:59
 #: ../../../skins/dating_mood/_skin.class.php:52
 msgid "E-g: #000000 for black"
 msgstr "Ex: #000000 pour noir"
@@ -17994,8 +17994,6 @@ msgstr "Ex: #000000 pour noir"
 msgid "By"
 msgstr "Par"
 
-# D:\www\b2cvs20\blogs\skins\evocamp\items.main.php:131
-# D:\www\b2cvs20\blogs\skins\evocamp\single.main.php:95
 #: ../../../skins/evocamp/_item_block.inc.php:59
 #: ../../../skins/evocamp/single.main.php:99
 msgid "In "
@@ -18015,7 +18013,7 @@ msgstr "Posté dans"
 
 #: ../../../skins/evopress/_skin.class.php:51
 msgid "Post date"
-msgstr ""
+msgstr "Date de l'article:"
 
 #: ../../../skins/evopress/_skin.class.php:52
 msgid "Display the date of each post"
@@ -18162,12 +18160,10 @@ msgstr "Atteindre l'interface d'admin!"
 msgid "Please wait..."
 msgstr "Veuillez attendre..."
 
-# D:\www\b2cvs20\blogs\skins_adm\login\_lostpass_form.main.php:48
 #: ../../../skins_adm/login/_lostpass_form.main.php:49
 msgid "Please enter your login below. Do <strong>NOT</strong> enter your e-mail address!"
 msgstr "Entrez votre identifiant ci-dessous. <strong>NE PAS</strong> saisir votre adresse e-mail !"
 
-# D:\www\b2evo20\blogs\inc\VIEW\login\_lostpass_form.php:49
 #: ../../../skins_adm/login/_lostpass_form.main.php:50
 msgid "An email will be sent to your registered email address immediately."
 msgstr "Un email va être envoyé à votre adresse email enregistrée immédiatement."

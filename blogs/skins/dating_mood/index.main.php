@@ -195,10 +195,10 @@ skin_include( '_html_header.inc.php' );
 				) );
 			$Item->msgform_link( array(
 					'before'    => ' ',
-					'after'     => ', ',
+					'after'     => '',
 				) );
 			$Item->issue_time( array(
-					'before'    => '',
+					'before'    => ', ',
 					'after'     => '',
 					'date_format' => 'l j F Y à H:i',
 				) );

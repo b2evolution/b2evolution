@@ -424,9 +424,12 @@ function request_title( $params = array() )
 
 
 	if( ! empty( $r ) )
-	{
+	{	// We have at leats one title match:
 		$r = implode( $params['glue'], $r );
-		$r = $before.format_to_output( $r, $params['format'] ).$after;
+		if( ! empty( $r ) )
+		{	// This is in case we asked for an empty title (e-g for search)
+			$r = $before.format_to_output( $r, $params['format'] ).$after;
+		}
 	}
 	elseif( !empty( $params['title_none'] ) )
 	{
@@ -1115,6 +1118,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.78  2010/12/18 00:23:05  fplanque
+ * minor stuff & fixes
+ *
  * Revision 1.77  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *
