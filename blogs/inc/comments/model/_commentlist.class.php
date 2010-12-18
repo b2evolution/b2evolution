@@ -637,7 +637,7 @@ class CommentList2 extends DataObjectList2
 		// Use defaults + overrides:
 		$params = array_merge( $default_params, $params );
 
-		if( $this->total_pages <= 1 )
+		if( $this->total_pages <= 1 || $this->page > $this->total_pages )
 		{	// Single page:
 			echo $params['block_single'];
 			return;
@@ -727,6 +727,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.31  2010/12/18 15:01:54  sam2kb
+ * Don't display page links if requested page is out of range
+ *
  * Revision 1.30  2010/10/19 02:00:53  fplanque
  * MFB
  *
