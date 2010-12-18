@@ -1517,7 +1517,7 @@ class ItemListLight extends DataObjectList2
 		// Use defaults + overrides:
 		$params = array_merge( $default_params, $params );
 
-		if( $this->total_pages <= 1 )
+		if( $this->total_pages <= 1 || $this->page > $this->total_pages )
 		{	// Single page:
 			echo $params['block_single'];
 			return;
@@ -1543,6 +1543,9 @@ class ItemListLight extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.45  2010/12/18 13:48:38  sam2kb
+ * Don't display page links if requested page is out of range
+ *
  * Revision 1.44  2010/09/02 07:48:33  efy-asimo
  * ItemList and CommentList doc
  *
