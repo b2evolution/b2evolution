@@ -169,8 +169,7 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 	$CommentList->display_init();
 
 	// Set redir=no in order to open comment pages
-	$old_redir = $redir;
-	memorize_param( 'redir', 'string', $old_redir, 'no' );
+	memorize_param( 'redir', 'string', '', 'no' );
 
 	if( $Blog->get_setting( 'paged_comments' ) )
 	{ // Prev/Next page navigation

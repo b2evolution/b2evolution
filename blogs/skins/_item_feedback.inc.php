@@ -170,8 +170,7 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 	$CommentList->display_init();
 
 	// Set redir=no in order to open comment pages
-	$old_redir = $redir;
-	memorize_param( 'redir', 'string', $old_redir, 'no' );
+	memorize_param( 'redir', 'string', '', 'no' );
 
 	if( $Blog->get_setting( 'paged_comments' ) )
 	{ // Prev/Next page navigation
@@ -244,6 +243,9 @@ skin_include( '_item_comment_form.inc.php', $params );
 
 /*
  * $Log$
+ * Revision 1.29  2010/12/19 06:17:21  sam2kb
+ * Fixed paged comments
+ *
  * Revision 1.28  2010/11/07 18:50:45  fplanque
  * Added Comment::author2() with skins v2 style params.
  *
