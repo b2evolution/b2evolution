@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2010-12-11 22:09+0100\n"
-"PO-Revision-Date: 2010-12-18 07:19-0500\n"
+"PO-Revision-Date: 2010-12-19 00:37-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -3170,7 +3170,7 @@ msgstr "Статус нового отзыва"
 #: ../../../inc/collections/_collections.init.php:725
 #: ../../../multiblogs.php:418
 msgid "Misc"
-msgstr "Другое"
+msgstr "Инструменты"
 
 #: ../../../inc/antispam/views/_antispam_settings.form.php:64
 msgid "Block spam referers"
@@ -13032,11 +13032,11 @@ msgstr "Обслуживание базы данных"
 
 #: ../../../inc/tools/views/_misc_tools.view.php:66
 msgid "Find all broken posts that have no matching category"
-msgstr ""
+msgstr "Найти все записи, не привязанные ни к одной категории"
 
 #: ../../../inc/tools/views/_misc_tools.view.php:67
 msgid "Find all broken slugs that have no matching target post"
-msgstr ""
+msgstr "Найти все короткие ссылки, не используемые ни в одной записи"
 
 #: ../../../inc/tools/views/_misc_tools.view.php:71
 msgid "Testing Tools"
@@ -17093,7 +17093,7 @@ msgstr "Твиттер: произошла ошибка при инициали�
 
 #: ../../../plugins/twitter_plugin/_twitter.plugin.php:452
 msgid "Error occured during verifying twitter plugin initialization. Pleas try again."
-msgstr ""
+msgstr "Твиттер: произошла ошибка в процессе проверки плагина. Повторите попытку."
 
 #: ../../../plugins/twitter_plugin/_twitter.plugin.php:456
 msgid "Twitter plugin connection denied."
@@ -17101,7 +17101,7 @@ msgstr "Твиттер: соединение запрещено."
 
 #: ../../../plugins/twitter_plugin/_twitter.plugin.php:494
 msgid "Twitter plugin was initialized successful!"
-msgstr ""
+msgstr "Твиттер: плагин успешно запущен!"
 
 #: ../../../plugins/twitter_plugin/_twitter.plugin.php:551
 msgid "Twitter account have been unlinked"
@@ -17781,7 +17781,7 @@ msgstr "снять отметки со всех"
 
 #: ../../../skins_adm/chicago/_adminUI.class.php:405
 msgid "Admin skin settings"
-msgstr "Настройки темы блога"
+msgstr "Настройки панели управления"
 
 #: ../../../skins_adm/chicago/_adminUI.class.php:412
 msgid "Show evobar"
@@ -17789,7 +17789,7 @@ msgstr "Показывать эвобар (панель управления с�
 
 #: ../../../skins_adm/chicago/_adminUI.class.php:413
 msgid "Show breadcrumbs path"
-msgstr "Показать навигационную цепочку"
+msgstr "Показывать навигационную цепочку"
 
 #: ../../../skins_adm/chicago/_adminUI.class.php:414
 msgid "Show Menu"
@@ -17802,7 +17802,7 @@ msgstr "Настройки темы Chicago"
 #: ../../../skins_adm/chicago/_adminUI.class.php:419
 #, php-format
 msgid "Admin skin settings for this user cannot be edited because this user is using a different admin skin (%s)"
-msgstr ""
+msgstr "Не удалось изменить настройки панели управления т.к. используется не совместимая тема (%s)"
 
 #: ../../../skins_adm/login/_html_footer.inc.php:40
 msgid "Credits"
