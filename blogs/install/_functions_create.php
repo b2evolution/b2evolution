@@ -1098,11 +1098,12 @@ function create_demo_contents()
 	// Insert a post:
 	$now = date('Y-m-d H:i:s',$timestamp++);
 	$edited_Item = new Item();
-	$edited_Item->insert( 1, T_("Apache optimization..."), sprintf( T_("<p>In the <code>/blogs</code> folder there is a file called [<code>sample.htaccess</code>]. You should try renaming it to [<code>.htaccess</code>].</p>
+	$edited_Item->insert( 1, T_("Apache optimization..."), sprintf( T_("<p>b2evolution comes with an <code>.htaccess</code> file destined to optimize the way b2evolution is handled by your webseerver (if you are using Apache). In some circumstances, that file may not be automatically activated at setup. Please se the man page about <a %s>Tricky Stuff</a> for more information.</p>
 
-<p>This will optimize the way b2evolution is handled by the webserver (if you are using Apache). This file is not active by default because a few hosts would display an error right away when you try to use it. If this happens to you when you rename the file, just remove it and you'll be fine.</p>
-
-<p>For further optimization, please review the manual page about <a %s>Performance optimization</a>. Depending on your current configuration and on what your <a %s>web hosting</a> company allows you to do, you may increase the speed of b2evolution by up to a factor of 10!</p>"), 'href="http://manual.b2evolution.net/Performance_optimization"', 'href="http://b2evolution.net/web-hosting/"' ),
+<p>For further optimization, please review the manual page about <a %s>Performance optimization</a>. Depending on your current configuration and on what your <a %s>web hosting</a> company allows you to do, you may increase the speed of b2evolution by up to a factor of 10!</p>"),
+'href="http://manual.b2evolution.net/Tricky_stuff"',
+'href="http://manual.b2evolution.net/Performance_optimization"',
+'href="http://b2evolution.net/web-hosting/"' ),
 												$now, $cat_b2evo, array( $cat_ann_b ) );
 
 	// Insert a post:
@@ -1132,7 +1133,7 @@ function create_demo_contents()
 
 <p>You can add, remove and reorder widgets from the Blog Settings tab in the admin interface.</p>
 
-<p>Note: to be displayed widgets are placed in containers. Each container appears in a specific place in an evoskin. If you change your blog skin, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.</p>'), $now, $cat_b2evo );
+<p>Note: in order to be displayed, widgets are placed in containers. Each container appears in a specific place in an evoskin. If you change your blog skin, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.</p>'), $now, $cat_b2evo );
 	$edited_Item->set_tags_from_string( 'widgets' );
 	//$edited_Item->dbsave();
 	$edited_Item->insert_update_tags( 'update' );
@@ -1293,6 +1294,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.300  2010/12/24 02:35:03  fplanque
+ * i18n
+ *
  * Revision 1.299  2010/11/04 00:48:17  fplanque
  * no message
  *
