@@ -209,7 +209,7 @@ class User extends DataObject
 			// Default value: Allow both
  			$this->set( 'allow_msgform', 3 );
 
- 			$this->set( 'notify', 1 );
+ 			$this->set( 'notify', 0 );
  			$this->set( 'showonline', 1 );
 		}
 		else
@@ -2106,6 +2106,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.88  2010/12/24 01:47:12  fplanque
+ * bump - changed user_notify default
+ *
  * Revision 1.87  2010/11/24 14:55:30  efy-asimo
  * Add user gender
  *

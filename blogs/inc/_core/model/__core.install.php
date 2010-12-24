@@ -110,7 +110,7 @@ $schema_queries = array(
 			user_locale varchar(20) DEFAULT 'en-EU' NOT NULL,
 			user_idmode varchar(20) NOT NULL DEFAULT 'login',
 			user_allow_msgform TINYINT NOT NULL DEFAULT '2',
-			user_notify tinyint(1) NOT NULL default 1,
+			user_notify tinyint(1) NOT NULL default 0,
 			user_showonline tinyint(1) NOT NULL default 1,
 			user_gender char(1) NULL,
 			user_grp_ID int(4) NOT NULL default 1,
@@ -283,6 +283,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.53  2010/12/24 01:47:12  fplanque
+ * bump - changed user_notify default
+ *
  * Revision 1.52  2010/11/24 14:55:30  efy-asimo
  * Add user gender
  *
