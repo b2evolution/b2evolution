@@ -111,7 +111,7 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Description') );
-	$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is diplayed under the blog name on the blog template.'), 250 );
+	$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is displayed under the blog name on the blog template.'), 250 );
 	$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This is displayed on the blog template.'), 50, 'large' );
 $Form->end_fieldset();
 
@@ -123,6 +123,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.25  2011/01/02 18:47:38  sam2kb
+ * typo: diplayed => displayed
+ *
  * Revision 1.24  2010/06/19 01:09:31  blueyed
  * Improve jQuery hintbox integration.
  *

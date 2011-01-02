@@ -788,7 +788,7 @@ class Results extends Table
 
 		echo $this->params['after'];
 
-		// Return number of rows diplayed:
+		// Return number of rows displayed:
 		return $this->current_idx;
 	}
 
@@ -1836,6 +1836,9 @@ function conditional( $condition, $on_true, $on_false = '' )
 
 /*
  * $Log$
+ * Revision 1.35  2011/01/02 18:47:38  sam2kb
+ * typo: diplayed => displayed
+ *
  * Revision 1.34  2010/10/25 00:43:15  sam2kb
  * Point order links to "page_url", similar to prev/next links
  *
