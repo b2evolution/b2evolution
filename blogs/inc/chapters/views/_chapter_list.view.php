@@ -113,7 +113,14 @@ function cat_line( $Chapter, $level )
 		$r .= '<td class="center">'.$Chapter->dget('order').'</td>';
 	}
 
-	$r .= '<td class="center">'.(int)$number_of_posts_in_cat[$Chapter->ID].'</td>';
+	if( isset($number_of_posts_in_cat[$Chapter->ID]) )
+	{
+		$r .= '<td class="center">'.(int)$number_of_posts_in_cat[$Chapter->ID].'</td>';
+	}
+	else
+	{	// no posts in this category
+		$r .= '<td class="center"> - </td>';
+	}
 
 	$r .= '<td class="lastcol shrinkwrap">';
 	if( $permission_to_edit )
@@ -263,6 +270,9 @@ echo '<p class="note">'.sprintf( T_('<strong>Note:</strong> Ordering of categori
 $Session->delete( 'fadeout_array');
 /*
  * $Log$
+ * Revision 1.30  2011/01/02 02:25:33  sam2kb
+ * Fixed http://forums.b2evolution.net/viewtopic.php?t=21653
+ *
  * Revision 1.29  2011/01/02 02:20:25  sam2kb
  * typo: explicitely => explicitly
  *
