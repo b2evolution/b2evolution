@@ -366,7 +366,9 @@ class Comment extends DataObject
 	 */
 	function get_avatar( $size = 'crop-64x64', $class = 'bCommentAvatar', $params = array() )
 	{
-		global $Plugins, $default_avatar;
+		global $Settings, $Plugins, $default_avatar;
+
+		if( ! $Settings->get('allow_avatars') ) return;
 
 		if( $comment_author_User = & $this->get_author_User() )
 		{	// Author is a user
@@ -1734,6 +1736,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.72  2011/01/02 18:32:00  sam2kb
+ * Don't display avatars in comments if disabled in user settings
+ *
  * Revision 1.71  2010/12/07 13:05:50  efy-asimo
  * hardcoded url in email notification - fix
  *
