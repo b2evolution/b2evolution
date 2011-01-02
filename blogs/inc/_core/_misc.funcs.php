@@ -3768,7 +3768,7 @@ function get_available_sort_options()
 {
 	return array(
 		'datestart'    => T_('Date issued (Default)'),
-		'order'        => T_('Order (as explicitely specified)'),
+		'order'        => T_('Order (as explicitly specified)'),
 		//'datedeadline' => T_('Deadline'),
 		'title'        => T_('Title'),
 		'datecreated'  => T_('Date created'),
@@ -4092,6 +4092,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.247  2011/01/02 02:20:25  sam2kb
+ * typo: explicitely => explicitly
+ *
  * Revision 1.246  2010/11/03 19:44:14  sam2kb
  * Increased modularity - files_Module
  * Todo:

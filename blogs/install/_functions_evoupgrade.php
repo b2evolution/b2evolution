@@ -2819,7 +2819,7 @@ function upgrade_b2evo_tables()
 	/*
 	 * ADD UPGRADES HERE.
 	 *
-	 * ALL DB CHANGES MUST BE EXPLICITELY CARRIED OUT. DO NOT RELY ON SCHEMA UPDATES!
+	 * ALL DB CHANGES MUST BE EXPLICITLY CARRIED OUT. DO NOT RELY ON SCHEMA UPDATES!
 	 * Schema updates do not survive after several incremental changes.
 	 *
 	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 100).
@@ -2990,6 +2990,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.375  2011/01/02 02:20:25  sam2kb
+ * typo: explicitely => explicitly
+ *
  * Revision 1.374  2010/11/24 14:55:30  efy-asimo
  * Add user gender
  *

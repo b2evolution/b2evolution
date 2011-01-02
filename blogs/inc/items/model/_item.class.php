@@ -217,7 +217,7 @@ class Item extends ItemLight
 	var $Links = NULL;
 
 	/**
-	 * Has the publish date been explicitely set?
+	 * Has the publish date been explicitly set?
  	 *
 	 * @var integer
 	 */
@@ -279,7 +279,7 @@ class Item extends ItemLight
 				$this->creator_user_login = $current_User->login;
 				$this->set_creator_User( $current_User );
 			}
-			$this->set( 'dateset', 0 );	// Date not explicitely set yet
+			$this->set( 'dateset', 0 );	// Date not explicitly set yet
 			$this->set( 'notifications_status', 'noreq' );
 			// Set the renderer list to 'default' will trigger all 'opt-out' renderers:
 			$this->set( 'renderers', array('default') );
@@ -4541,6 +4541,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.213  2011/01/02 02:20:25  sam2kb
+ * typo: explicitely => explicitly
+ *
  * Revision 1.212  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:

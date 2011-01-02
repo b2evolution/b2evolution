@@ -179,6 +179,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.52  2011/01/02 02:20:25  sam2kb
+ * typo: explicitely => explicitly
+ *
  * Revision 1.51  2010/10/13 14:07:55  efy-asimo
  * Optional paged comments in the front end
  *
@@ -253,7 +256,7 @@ class CollectionSettings extends AbstractSettings
  * 2009
  *
  * Revision 1.26  2009/01/28 22:34:21  fplanque
- * Default cat for each blog can now be chosen explicitely
+ * Default cat for each blog can now be chosen explicitly
  *
  * Revision 1.25  2008/10/05 10:55:46  tblue246
  * Blog by mail: We've only one working method => removed the drop-down box and added automatical change to pop3a.

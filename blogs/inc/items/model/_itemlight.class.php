@@ -257,7 +257,7 @@ class ItemLight extends DataObject
 		if( $allow_redir == 'auto' )
 		{	// We allow redir only if the permalink is already single.
 			// In other words: we implicitely allow redir if there is no need to redir!
-			// and more useful: we explicitely prevent redir if we know it would take place.
+			// and more useful: we explicitly prevent redir if we know it would take place.
 			$allow_redir = ($this->Blog->get_setting( 'permalinks' ) == 'single');
 		}
 
@@ -1065,6 +1065,9 @@ class ItemLight extends DataObject
 
 /*
  * $Log$
+ * Revision 1.41  2011/01/02 02:20:25  sam2kb
+ * typo: explicitely => explicitly
+ *
  * Revision 1.40  2010/10/19 02:00:53  fplanque
  * MFB
  *

@@ -474,6 +474,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.22  2011/01/02 02:20:25  sam2kb
+ * typo: explicitely => explicitly
+ *
  * Revision 1.21  2010/02/08 17:52:06  efy-yury
  * copyright 2009 -> 2010
  *
@@ -514,7 +517,7 @@ $AdminUI->disp_global_footer();
  * 2009
  *
  * Revision 1.8  2009/01/28 22:34:21  fplanque
- * Default cat for each blog can now be chosen explicitely
+ * Default cat for each blog can now be chosen explicitly
  *
  * Revision 1.7  2009/01/28 21:23:23  fplanque
  * Manual ordering of categories

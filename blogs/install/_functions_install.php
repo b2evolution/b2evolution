@@ -152,7 +152,7 @@ function install_newdb()
 	}
 	else
 	{	// OLD INSTALLER call. Probably an automated script calling.
-		// Let's force the sample contents since they haven't been explicitely disabled
+		// Let's force the sample contents since they haven't been explicitly disabled
 		$create_sample_contents = 1;
 	}
 
@@ -846,6 +846,9 @@ function get_antispam_query()
 
 /*
  * $Log$
+ * Revision 1.99  2011/01/02 02:20:25  sam2kb
+ * typo: explicitely => explicitly
+ *
  * Revision 1.98  2010/12/08 12:57:16  efy-asimo
  * widgets default blog param - fix
  *

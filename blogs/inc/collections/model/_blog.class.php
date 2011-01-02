@@ -2347,6 +2347,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.124  2011/01/02 02:20:25  sam2kb
+ * typo: explicitely => explicitly
+ *
  * Revision 1.123  2010/11/02 02:30:32  sam2kb
  * Do not set invalid blog_urlname, otherwise evobar displays broken blog links
  *
@@ -2566,7 +2569,7 @@ class Blog extends DataObject
  * bugfix
  *
  * Revision 1.53  2009/01/28 22:34:21  fplanque
- * Default cat for each blog can now be chosen explicitely
+ * Default cat for each blog can now be chosen explicitly
  *
  * Revision 1.52  2009/01/23 17:23:09  fplanque
  * doc/minor
