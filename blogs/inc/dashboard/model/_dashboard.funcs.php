@@ -36,6 +36,14 @@ function b2evonet_get_updates( $force_short_delay = false )
 	if( ! isset( $allow_evo_stats ) )
 	{	// Set default value:
 		$allow_evo_stats = true; // allow (non-anonymous) stats
+		
+		if( (preg_match( '~^https?://localhost[/:]~', $baseurl)
+				|| preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) /* domain ending in ".local" */
+			&& $evonetsrv_host != 'localhost'	// OK if we are pinging locally anyway ;)
+			)
+		{
+			$allow_evo_stats = false; // disable stats/updates if running on localhost
+		}
 	}
 	if( $allow_evo_stats === false )
 	{ // Get outta here as fast as you can, EdB style:
@@ -103,7 +111,8 @@ function b2evonet_get_updates( $force_short_delay = false )
 
 	// Run system checks:
 	load_funcs( 'tools/model/_system.funcs.php' );
-	list( $mediadir_status ) = system_check_media_dir();
+	list( $mediadir_status ) = system_check_dir('media');
+	list( $installdir_status ) = system_check_install_removed();
 	list( $uid, $uname ) = system_check_process_user();
 	list( $gid, $gname ) = system_check_process_group();
 
@@ -129,7 +138,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 											'php_upload_max' => new xmlrpcval( system_check_upload_max_filesize(), 'int' ),
 											'php_post_max' => new xmlrpcval( system_check_post_max_size(), 'int' ),
 											'mediadir_status' => new xmlrpcval( $mediadir_status, 'string' ), // If error, then the host is potentially borked
-											'install_removed' => new xmlrpcval( system_check_install_removed() ? 1 : 0, 'int' ), // How many people do go through this extra measure?
+											'install_removed' => new xmlrpcval( ($installdir_status == 'ok') ? 1 : 0, 'int' ), // How many people do go through this extra measure?
 											// How many "low security" hosts still active?; we'd like to standardize security best practices... on suphp?
 											'php_uid' => new xmlrpcval( $uid, 'int' ),
 											'php_uname' => new xmlrpcval( $uname, 'string' ),	// Potential unsecure hosts will use names like 'nobody', 'www-data'
@@ -288,6 +297,9 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.40  2011/01/03 03:00:43  sam2kb
+ * Disable stats/updates if running on localhost.
+ *
  * Revision 1.39  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *
