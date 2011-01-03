@@ -175,7 +175,7 @@ else
 }
 
 // Media folder writable?
-list( $mediadir_status, $mediadir_msg ) = system_check_media_dir();
+list( $mediadir_status, $mediadir_msg ) = system_check_dir('media');
 $mediadir_long = '';
 if( $mediadir_status == 'error' )
 {
@@ -186,10 +186,22 @@ init_system_check( T_( 'Media directory' ), $mediadir_msg.' - '.$media_path );
 disp_system_check( $mediadir_status, $mediadir_long );
 
 
+// Cache folder writable?
+list( $cachedir_status, $cachedir_msg ) = system_check_dir('cache');
+$cachedir_long = '';
+if( $cachedir_status == 'error' )
+{
+	$cachedir_long = '<p>'.T_('You will not be able to use page cache.')."</p>\n"
+	.'<p>'.T_('Your host requires that you set special file permissions on your cache directory.').get_manual_link('cache_file_permission_errors')."</p>\n";
+}
+init_system_check( T_( 'Cache directory' ), $cachedir_msg.' - '.$cache_path );
+disp_system_check( $cachedir_status, $cachedir_long );
+
+
 // /install/ folder deleted?
-$install_removed = system_check_install_removed();
-init_system_check( T_( 'Install folder' ), $install_removed ?  T_('Deleted') : T_('Not deleted').' - '.$basepath.$install_subdir );
-if( ! $install_removed )
+list( $installdir_status, $installdir_msg ) = system_check_install_removed();
+init_system_check( T_( 'Install folder' ), $installdir_msg );
+if( $installdir_status == 'error' )
 {
 	disp_system_check( 'warning', T_('For maximum security, it is recommended that you delete your /blogs/install/ folder once you are done with install or upgrade.') );
 
@@ -587,6 +599,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.33  2011/01/03 03:02:54  sam2kb
+ * Check if /cache directory is writable. Check if /install directory and index.php are readable.
+ *
  * Revision 1.32  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *

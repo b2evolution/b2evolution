@@ -20,46 +20,79 @@
 
 
 /**
- * Check that the media dir is ready for operation, i-e writable by PHP.
+ * Check if a directory is ready for operation, i-e writable by PHP.
  *
  * @return array {status,msg}
  */
-function system_check_media_dir()
+function system_check_dir( $directory = 'media' )
 {
-	global $media_path;
+	global $media_path, $cache_path;
 
-	if( ! is_dir( $media_path ) )
+	switch( $directory )
 	{
-		$mediadir_msg = T_( 'Media directory doesn\'t exist.' );
-		$mediadir_status = 'error';
+		case 'cache':
+			$path = $cache_path;
+			break;
+
+		case 'media':
+			$path = $media_path;
+			break;
+
+		default:
+			return array( 'error', 'Unknown directory' );
 	}
-	elseif( ! is_readable( $media_path ) )
+
+	if( ! is_dir( $path ) )
 	{
-		$mediadir_msg = T_( 'Media directory is not readable.' );
-		$mediadir_status = 'error';
+		$msg = T_( 'The directory doesn\'t exist.' );
+		$status = 'error';
 	}
-	elseif( ! is_writable( $media_path ) )
+	elseif( ! is_readable( $path ) )
 	{
-		$mediadir_msg = T_( 'Media directory is not writable.' );
-		$mediadir_status = 'error';
+		$msg = T_( 'The directory is not readable.' );
+		$status = 'error';
+	}
+	elseif( ! is_writable( $path ) )
+	{
+		$msg = T_( 'The directory is not writable.' );
+		$satus = 'error';
 	}
 	else
 	{
-		$mediadir_msg = T_( 'Ok' );
-		$mediadir_status = 'ok';
+		$msg = T_( 'Ok' );
+		$status = 'ok';
 	}
 
-	return array( $mediadir_status, $mediadir_msg );
+	return array( $status, $msg );
 }
 
 
 /**
- * @return boolean true if install directory has been removed
+ * Check if install directory has been removed
+ *
+ * @return array {status,msg}
  */
 function system_check_install_removed()
 {
-	global $basepath, $install_subdir;
-	return ! is_dir( $basepath.$install_subdir );
+	global $install_path;
+
+	if( ! is_dir($install_path) || ! file_exists($install_path.'index.php') )
+	{
+		$msg = T_('Deleted');
+		$status = 'ok';
+	}
+	elseif( ! is_readable($install_path) || ! is_readable($install_path.'index.php') )
+	{
+		$msg = T_('Protected');
+		$exists = 'ok';
+	}
+	else
+	{
+		$msg = T_('Not deleted').' - '.$install_path;
+		$status = 'error';
+	}
+
+	return array( $status, $msg );
 }
 
 
@@ -213,6 +246,9 @@ function system_check_gd_version()
 
 /*
  * $Log$
+ * Revision 1.8  2011/01/03 03:02:54  sam2kb
+ * Check if /cache directory is writable. Check if /install directory and index.php are readable.
+ *
  * Revision 1.7  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *
