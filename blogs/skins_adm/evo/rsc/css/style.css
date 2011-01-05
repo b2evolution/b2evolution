@@ -112,7 +112,7 @@ a.DeleteButton {
 }
 a.CurrentBlog {
 	font-weight: bold;
-	background-image: url(../../../legacy/rsc/img/desert-button-2.gif);
+	background-image: url(../../../evo/rsc/img/desert-button-2.gif);
 	background-color: #fff;
 	border: 1px solid #888;
 }
@@ -134,14 +134,14 @@ a.ActionButton:hover {
 	color: #00b;
 	text-decoration: underline;
 	background-color: #fff;
-	background-image: url(../../../legacy/rsc/img/desert-button-2.gif);
+	background-image: url(../../../evo/rsc/img/desert-button-2.gif);
 	border: 1px solid #00b;
 }
 a.DeleteButton:hover {
 	color: #c00;
 	text-decoration: underline;
 	background-color: #fff;
-	background-image: url(../../../legacy/rsc/img/desert-button-2.gif);
+	background-image: url(../../../evo/rsc/img/desert-button-2.gif);
 	border: 1px solid #c00;
 }
 a.PublishButton {
@@ -150,7 +150,7 @@ a.PublishButton {
 	text-decoration: none;
 	font-weight: bold;
 	padding: 2px 1ex;
-	background-image: url(../../../legacy/rsc/img/desert-button.gif);
+	background-image: url(../../../evo/rsc/img/desert-button.gif);
 	background-color: #ddd;
 	border: 1px solid #ccc5aa;
 	white-space:nowrap;
@@ -159,7 +159,7 @@ a.PublishButton:hover {
 	color: #c00;
 	text-decoration: underline;
 	background-color: #fff;
-	background-image: url(../../../legacy/rsc/img/desert-button-2.gif);
+	background-image: url(../../../evo/rsc/img/desert-button-2.gif);
 	border: 1px solid #c00;
 }
 
@@ -190,7 +190,7 @@ div.PostActionsArea input:hover {
 	color: #00b;
 	text-decoration: underline;
 	background-color: #fff;
-	background-image: url(../../../legacy/rsc/img/desert-button-2.gif);
+	background-image: url(../../../evo/rsc/img/desert-button-2.gif);
 	border: 1px solid #00b;
 }
 
@@ -216,7 +216,7 @@ div.edit_actions input.DeleteButton:hover {
  */
 #header {
 	font-size:85%;
-	background: #fff url(../../../legacy/rsc/img/bg_grey.gif) repeat-x bottom;
+	background: #fff url(../../../evo/rsc/img/bg_grey.gif) repeat-x bottom;
 	margin: 0;
 }
 
@@ -339,7 +339,7 @@ ul.tabs {
 }
 ul.tabs li {
 	float:left;
-	background:url(../../../legacy/rsc/img/tabs_left_grey.gif) no-repeat left top;
+	background:url(../../../evo/rsc/img/tabs_left_grey.gif) no-repeat left top;
 	margin:0;
 	padding:0 0 0 9px;
 	border-bottom:1px solid #929292;
@@ -348,7 +348,7 @@ ul.tabs li a {
 	float:left;
 	display:block;
 	white-space:nowrap;
-	background: url(../../../legacy/rsc/img/tabs_right_grey.gif) no-repeat right top;
+	background: url(../../../evo/rsc/img/tabs_right_grey.gif) no-repeat right top;
 	padding:4px 11px 3px 2px;
 	text-decoration:none;
 	color:#765;
@@ -403,7 +403,7 @@ div.panelblocktabs
 	margin-top: 1ex;
 	float:left;
 	width:100%;
-	background: url(../../../legacy/rsc/img/tabs_bg.gif) repeat-x bottom;
+	background: url(../../../evo/rsc/img/tabs_bg.gif) repeat-x bottom;
 	font-size:85%;
 	line-height:normal;
 }
@@ -663,7 +663,7 @@ div.edit_toolbar {
 div.edit_toolbar input {
 	color:#333;
 	background-color: #fff;
-	background-image: url(../../../legacy/rsc/img/desert-button-2.gif);
+	background-image: url(../../../evo/rsc/img/desert-button-2.gif);
 	border: 1px solid #bbb;
 	margin: 0 1px;
 }
