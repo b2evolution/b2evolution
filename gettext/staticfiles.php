@@ -93,22 +93,25 @@ if( !isset($argv) )
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<title>b2evo :: static page generation</title>
-		<link href="../blogs/skins_adm/legacy/rsc/css/desert.css" rel="stylesheet" type="text/css" title="Desert" />
+		<link href="../blogs/skins_adm/chicago/rsc/css/chicago.css" rel="stylesheet" type="text/css" />
 	</head>
-	<body>
-	<div class="center" style="margin:auto;width:75%">
-
-	<img src="<?php echo $rsc_url ?>img/b2evolution8.png" /><br />
+	<body style="background:white">
+	<div class="pblock" style="width:800px; margin:10px auto">
+    <div class="pan_left"><div class="pan_right"><div class="pan_top"><div class="pan_tl"><div class="pan">
+    <div class="panelblock">
+	<img src="<?php echo $adminskins_url ?>chicago/rsc/img/b2evolution-footer-logo-blue-bg.gif" />
+    <br />
+    
 <?php
 }
 
 log_('<hr />');
 log_('This script maintains the static html files of the b2evolution project.');
 log_('written by <a href="http://thequod.de/contact">daniel hahler</a>, 2004');
+log_('<hr />');
 
 if( isset($argv) )
 { // commandline mode
-	log_('<hr />');
 	if( isset($argv[1]) && in_array($argv[1], array('extract', 'merge')) )
 	{
 		$action = $argv[1];
@@ -132,34 +135,46 @@ elseif( $action == '' )
 function htmlmenu()
 {
 	global $targets, $highlight_untranslated;
+	
 	echo '
-	<hr />
-	<br />
-	<div style="width:75%;margin:auto">
-	<form method="get" class="fform">
-	<fieldset>
-		<legend>Create translated files</legend>
-		<input type="hidden" name="action" value="merge" />
-		<input type="checkbox" value="1" name="highlight_untranslated" '.( ($highlight_untranslated) ? 'checked="checked"' : '' ).' />
-		highlight untranslated strings
-		<br /><br />(targets: '.implode(', ', array_keys( $targets )).')
-		<br /><br /><input type="submit" value="create static files from locales .po files" class="search" />
-	</fieldset>
-	</form>
-
-	<form method="get" class="fform">
-	<fieldset>
-		<legend>Extract translatable strings into .POT file</legend>
-		<input type="hidden" name="action" value="extract" />
-		';
-		form_info( 'static POT file', str_replace( '\\', '/', STATIC_POT ) );
-		echo '
-		<input type="submit" value="extract" class="search" />
-	</fieldset>
-	</form>
+	<div class="fieldset_wrapper fieldset">
+	  <div class="fieldset_title">
+		<div class="fieldset_title_right">
+		  <div class="fieldset_title_bg">Create static files from locales .po files</div>
+		</div>
+	  </div>
+	  <form method="get" class="fform">
+	    <input type="hidden" name="action" value="merge" />
+		<fieldset class="fieldset">
+		  <fieldset>
+			<div class="label"><label>Highlight untranslated strings:</label></div>
+			<div class="info">
+			<input type="checkbox" value="1" name="highlight_untranslated" '.( ($highlight_untranslated) ? 'checked="checked"' : '' ).' />
+			(targets: '.implode(', ', array_keys( $targets )).')
+			</div>
+		  </fieldset>
+		  <fieldset><div class="input"><input type="submit" value="Create" class="search" /></div></fieldset>
+		</fieldset>
+	  </form>
 	</div>
-	<br /><br />
-	';
+	
+	<div class="fieldset_wrapper fieldset">
+	  <div class="fieldset_title">
+		<div class="fieldset_title_right">
+		  <div class="fieldset_title_bg">Extract translatable strings into .POT file</div>
+		</div>
+	  </div>
+	  <form method="get" class="fform">
+	    <input type="hidden" name="action" value="extract" />
+		<fieldset class="fieldset">
+		  <fieldset>
+		  <div class="label">Static POT file:</div>
+		  <div class="info">'.str_replace( '\\', '/', STATIC_POT ).'</div>
+		  </fieldset>
+		  <fieldset><div class="input"><input type="submit" value="Extract" class="search" /></div></fieldset>
+		</fieldset>
+	  </form>
+	</div>';
 };
 
 
@@ -422,14 +437,15 @@ switch( $action )
 	break;
 }
 
-log_('');
-log_('Finito.');
 
 if( !isset($argv) )
 {
 	if( !empty($action) )
 		htmlmenu();
-	echo '</div></body></html>';
+	echo '</div></div>
+</div></div></div></div>
+<div class="pan_bot"><div class="pan_bl"><div class="pan_br"></div></div></div>
+</div></body></html>';
 }
 
 ?>
