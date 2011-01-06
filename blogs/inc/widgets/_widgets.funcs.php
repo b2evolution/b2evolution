@@ -35,8 +35,8 @@ function insert_basic_widgets( $blog_id, $initial_install = false )
 
 	$default_blog_param = 's:7:"blog_ID";s:0:"";';
 	if( $initial_install )
-	{
-		$default_blog_param = 's:7:"blog_ID";s:0:"4";';
+	{	// Take pictures out of photoblog:
+		$default_blog_param = 's:7:"blog_ID";s:1:"4";';
 	}
 
 	if( false )
@@ -182,6 +182,9 @@ function insert_basic_widgets( $blog_id, $initial_install = false )
 
 /*
  * $Log$
+ * Revision 1.7  2011/01/06 14:48:22  efy-asimo
+ * Widget initialization - fix
+ *
  * Revision 1.6  2010/12/08 12:57:16  efy-asimo
  * widgets default blog param - fix
  *
