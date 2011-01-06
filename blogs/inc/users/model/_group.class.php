@@ -422,6 +422,7 @@ class Group extends DataObject
 	 *                  - blog_ismember
 	 *                  - blog_post_statuses
 	 *                  - blog_del_post
+	 *                  - blog_edit_ts
 	 *                  - blog_comments
 	 *                  - blog_cats
 	 *                  - blog_properties
@@ -469,6 +470,7 @@ class Group extends DataObject
 						'blog_post_statuses' => array(),
 						'blog_edit' => 'no',
 						'blog_del_post' => '0',
+						'blog_edit_ts' => '0',
 						'blog_comments' => '0',
 						'blog_draft_comments' => '0',
 						'blog_published_comments' => '0',
@@ -499,6 +501,7 @@ class Group extends DataObject
 
 				$this->blog_post_statuses[$perm_target_blog]['blog_edit'] = $row['bloggroup_perm_edit'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_del_post'] = $row['bloggroup_perm_delpost'];
+				$this->blog_post_statuses[$perm_target_blog]['blog_edit_ts'] = $row['bloggroup_perm_edit_ts'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_comments'] = $row['bloggroup_perm_publ_cmts']
 					+ $row['bloggroup_perm_depr_cmts'] + $row['bloggroup_perm_draft_cmts'];
 				$this->blog_post_statuses[$perm_target_blog]['blog_draft_comments'] = $row['bloggroup_perm_draft_cmts'];
@@ -688,6 +691,11 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.37  2011/01/06 14:31:47  efy-asimo
+ * advanced blog permissions:
+ *  - add blog_edit_ts permission
+ *  - make the display more compact
+ *
  * Revision 1.36  2010/10/15 13:10:09  efy-asimo
  * Convert group permissions to pluggable permissions - part1
  *

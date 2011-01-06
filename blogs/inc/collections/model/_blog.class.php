@@ -1884,12 +1884,12 @@ class Blog extends DataObject
 		{ // Proceed insertions:
 			$DB->query( "
 					INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
-						bloguser_perm_poststatuses, bloguser_perm_delpost,
+						bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_edit_ts,
 						bloguser_perm_draft_cmts, bloguser_perm_publ_cmts, bloguser_perm_depr_cmts,
 						bloguser_perm_cats, bloguser_perm_properties,
 						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
 					VALUES ( $this->ID, $current_User->ID, 1,
-						'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1, 1, 1 )" );
+						'published,protected,private,draft,deprecated', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 )" );
 		}
 
 		// Create default category:
@@ -2347,6 +2347,11 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.125  2011/01/06 14:31:47  efy-asimo
+ * advanced blog permissions:
+ *  - add blog_edit_ts permission
+ *  - make the display more compact
+ *
  * Revision 1.124  2011/01/02 02:20:25  sam2kb
  * typo: explicitely => explicitly
  *

@@ -1147,7 +1147,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item )
 
 	if( $edited_Item->status == 'draft'
 			&& $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID )	// TODO: if we actually set the primary cat to another blog, we may still get an ugly perm die
-			&& $current_User->check_perm( 'edit_timestamp', 'edit', false ) )
+			&& $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{	// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
 		$publish_style = 'display: inline';
 	}
@@ -1947,6 +1947,11 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 
 /*
  * $Log$
+ * Revision 1.123  2011/01/06 14:31:47  efy-asimo
+ * advanced blog permissions:
+ *  - add blog_edit_ts permission
+ *  - make the display more compact
+ *
  * Revision 1.122  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *

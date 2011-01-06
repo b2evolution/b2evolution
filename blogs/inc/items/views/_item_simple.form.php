@@ -197,7 +197,7 @@ $Form->begin_form( '', '', $params );
 
 	$Form->begin_fieldset( T_('Meta info').get_manual_link('post_simple_meta_fieldset'), array( 'id' => 'itemform_adv_props' ) );
 
-	if( $current_User->check_perm( 'edit_timestamp' ) )
+	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
 		echo '<div id="itemform_edit_timestamp" class="edit_fieldgroup">';
 		$Form->switch_layout( 'linespan' );
@@ -285,6 +285,11 @@ echo_autocomplete_tags();
 
 /*
  * $Log$
+ * Revision 1.42  2011/01/06 14:31:47  efy-asimo
+ * advanced blog permissions:
+ *  - add blog_edit_ts permission
+ *  - make the display more compact
+ *
  * Revision 1.41  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:

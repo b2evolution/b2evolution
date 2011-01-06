@@ -252,7 +252,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 	// ---------- PUBLISH ---------
 	if( $edited_Comment->status == 'draft'
 			&& $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID )	// TODO: if we actually set the primary cat to another blog, we may still get an ugly perm die
-			&& $current_User->check_perm( 'edit_timestamp', 'edit', false ) )
+			&& $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{
 		 $publish_style = 'display: inline';
 	}
@@ -391,6 +391,11 @@ function add_ban_icons( $content )
 
 /*
  * $Log$
+ * Revision 1.19  2011/01/06 14:31:47  efy-asimo
+ * advanced blog permissions:
+ *  - add blog_edit_ts permission
+ *  - make the display more compact
+ *
  * Revision 1.18  2010/10/19 13:31:31  efy-asimo
  * Ajax comment moderation - fix
  *

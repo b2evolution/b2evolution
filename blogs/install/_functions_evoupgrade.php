@@ -2816,6 +2816,20 @@ function upgrade_b2evo_tables()
 	db_add_col( 'T_users', 'user_gender', 'char(1) NULL DEFAULT NULL AFTER user_showonline' );
 	task_end();
 
+	task_begin( 'Upgrading edit timpestamp blog-user permission...' );
+	db_add_col( 'T_coll_user_perms', 'bloguser_perm_edit_ts', 'tinyint NOT NULL default 0 AFTER bloguser_perm_delpost' );
+	$DB->query( 'UPDATE T_coll_user_perms, T_users
+						SET bloguser_perm_edit_ts = 1
+						WHERE bloguser_user_ID = user_ID  AND user_level > 4' );
+	task_end();
+
+	task_begin( 'Upgrading edit timpestamp blog-group permission...' );
+	db_add_col( 'T_coll_group_perms', 'bloggroup_perm_edit_ts', 'tinyint NOT NULL default 0 AFTER bloggroup_perm_delpost' );
+	$DB->query( 'UPDATE T_coll_group_perms
+						SET bloggroup_perm_edit_ts = 1
+						WHERE bloggroup_group_ID = 1' );
+	task_end();
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -2990,6 +3004,11 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.376  2011/01/06 14:31:47  efy-asimo
+ * advanced blog permissions:
+ *  - add blog_edit_ts permission
+ *  - make the display more compact
+ *
  * Revision 1.375  2011/01/02 02:20:25  sam2kb
  * typo: explicitely => explicitly
  *

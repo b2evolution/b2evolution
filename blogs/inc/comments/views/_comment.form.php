@@ -172,7 +172,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
  	$Form->switch_layout( 'linespan' );
 
-	if( $current_User->check_perm( 'edit_timestamp' ) )
+	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{	// ------------------------------------ TIME STAMP -------------------------------------
 		echo '<div id="itemform_edit_timestamp">';
 		$Form->date( 'comment_issue_date', $edited_Comment->date, T_('Comment date') );
@@ -297,6 +297,11 @@ echo_comment_publishbt_js();
 
 /*
  * $Log$
+ * Revision 1.21  2011/01/06 14:31:47  efy-asimo
+ * advanced blog permissions:
+ *  - add blog_edit_ts permission
+ *  - make the display more compact
+ *
  * Revision 1.20  2010/07/20 06:49:28  efy-asimo
  * admin user can move comments to different post
  * add comments to msgform

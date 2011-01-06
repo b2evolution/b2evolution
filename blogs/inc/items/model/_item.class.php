@@ -451,7 +451,8 @@ class Item extends ItemLight
 			param_error( 'post_url', T_('If you want to redirect this post, you must specify an URL! (Expert mode)') );
 		}
 
-		if( $current_User->check_perm( 'edit_timestamp' ) )
+		$this->load_Blog();
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $this->Blog->ID ) )
 		{
 			$this->set( 'dateset', param( 'item_dateset', 'integer', 0 ) );
 
@@ -2669,8 +2670,9 @@ class Item extends ItemLight
 
 		if( ! is_logged_in() ) return false;
 
+		$this->load_Blog();
 		if( ! ($current_User->check_perm( 'item_post!published', 'edit', false, $this ))
-			|| ! ($current_User->check_perm( 'edit_timestamp' ) ) )
+			|| ! ($current_User->check_perm( 'blog_edit_ts', 'edit', false, $this->Blog->ID ) ) )
 		{ // User has no right to publish this post now:
 			return false;
 		}
@@ -4541,6 +4543,11 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.214  2011/01/06 14:31:47  efy-asimo
+ * advanced blog permissions:
+ *  - add blog_edit_ts permission
+ *  - make the display more compact
+ *
  * Revision 1.213  2011/01/02 02:20:25  sam2kb
  * typo: explicitely => explicitly
  *

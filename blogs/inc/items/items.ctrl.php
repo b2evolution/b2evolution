@@ -669,7 +669,7 @@ switch( $action )
 		// Check permissions:
 		/* TODO: Check extra categories!!! */
 		$current_User->check_perm( 'item_post!'.$post_status, 'edit', true, $edited_Item );
-		$current_User->check_perm( 'edit_timestamp', 'any', true );
+		$current_User->check_perm( 'blog_edit_ts', 'edit', true, $Blog->ID );
 
 		$edited_Item->set( 'status', $post_status );
 
@@ -1386,6 +1386,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.107  2011/01/06 14:31:47  efy-asimo
+ * advanced blog permissions:
+ *  - add blog_edit_ts permission
+ *  - make the display more compact
+ *
  * Revision 1.106  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *

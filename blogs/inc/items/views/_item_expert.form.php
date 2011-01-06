@@ -339,7 +339,7 @@ $Form->begin_form( '', '', $params );
 
 	$Form->checkbox_basic_input( 'item_featured', $edited_Item->featured, '<strong>'.T_('Featured post').'</strong>' );
 
-	if( $current_User->check_perm( 'edit_timestamp' ) )
+	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
 		echo '<div id="itemform_edit_timestamp" class="edit_fieldgroup">';
 		issue_date_control( $Form, true );
@@ -447,6 +447,11 @@ echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.73  2011/01/06 14:31:47  efy-asimo
+ * advanced blog permissions:
+ *  - add blog_edit_ts permission
+ *  - make the display more compact
+ *
  * Revision 1.72  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:

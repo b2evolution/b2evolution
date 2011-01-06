@@ -72,7 +72,7 @@ else
 $SQL = new SQL();
 $SQL->SELECT( 'grp_ID, grp_name, bloggroup_perm_poststatuses, bloggroup_perm_edit, bloggroup_ismember,'
 	. 'bloggroup_perm_draft_cmts, bloggroup_perm_publ_cmts, bloggroup_perm_depr_cmts,'
-	. 'bloggroup_perm_delpost, bloggroup_perm_cats,'
+	. 'bloggroup_perm_delpost, bloggroup_perm_edit_ts, bloggroup_perm_cats,'
 	. 'bloggroup_perm_properties, bloggroup_perm_admin, bloggroup_perm_media_upload,'
 	. 'bloggroup_perm_media_browse, bloggroup_perm_media_change, bloggroup_perm_page,'
 	. 'bloggroup_perm_intro, bloggroup_perm_podcast, bloggroup_perm_sidebar' );
@@ -238,74 +238,24 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can post/edit with following statuses:'),
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Publ'),
+						'th' => T_('Post statuses'),
 						'th_class' => 'checkright',
-						'td' => '%coll_perm_status_checkbox( {row}, \'published\', \''.TS_('Permission to post into this blog with published status').'\' )%',
-						'td_class' => 'center',
-					);
-$Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can post/edit with following statuses:'),
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Prot'),
-						'th_class' => 'checkright',
-						'td' => '%coll_perm_status_checkbox( {row}, \'protected\', \''.TS_('Permission to post into this blog with protected status').'\' )%',
-						'td_class' => 'center',
-					);
-$Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can post/edit with following statuses:'),
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Priv'),
-						'th_class' => 'checkright',
-						'td' => '%coll_perm_status_checkbox( {row}, \'private\', \''.TS_('Permission to post into this blog with private status').'\' )%',
-						'td_class' => 'center',
-					);
-$Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can post/edit with following statuses:'),
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Drft'),
-						'th_class' => 'checkright',
-						'td' => '%coll_perm_status_checkbox( {row}, \'draft\', \''.TS_('Permission to post into this blog with draft status').'\' )%',
-						'td_class' => 'center',
-					);
-$Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can post/edit with following statuses:'),
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Depr'),
-						'th_class' => 'checkright',
-						'td' => '%coll_perm_status_checkbox( {row}, \'deprecated\', \''.TS_('Permission to post into this blog with deprecated status').'\' )%',
-						'td_class' => 'center',
-					);
-$Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can post/edit with following statuses:'),
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Redr'),
-						'th_class' => 'checkright',
-						'td' => '%coll_perm_status_checkbox( {row}, \'redirected\', \''.TS_('Permission to post into this blog with redirected status').'\' )%',
+						'td' => '%coll_perm_status_checkbox( {row}, \'published\', \''.TS_('Permission to post into this blog with published status').'\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'protected\', \''.TS_('Permission to post into this blog with protected status').'\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'private\', \''.TS_('Permission to post into this blog with private status').'\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'draft\', \''.TS_('Permission to post into this blog with draft status').'\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'deprecated\', \''.TS_('Permission to post into this blog with deprecated status').'\' )%'.
+								'%coll_perm_status_checkbox( {row}, \'redirected\', \''.TS_('Permission to post into this blog with redirected status').'\' )%',
 						'td_class' => 'center',
 					);
 
 $Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can use special post types:'),
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Page'),
+						'th' => T_('Post types'),
 						'th_class' => 'checkright',
-						'td' => '%coll_perm_checkbox( {row}, \'perm_page\', \''.TS_('Permission to create pages').'\' )%',
-						'td_class' => 'center',
-					);
-$Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can use special post types:'),
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Intro'),
-						'th_class' => 'checkright',
-						'td' => '%coll_perm_checkbox( {row}, \'perm_intro\', \''.TS_('Permission to create intro posts (Intro-* post types)').'\' )%',
-						'td_class' => 'center',
-					);
-$Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can use special post types:'),
-						'th' => /* TRANS: SHORT table header on TWO lines; short for "Podcast" */ T_('Podc'),
-						'th_class' => 'checkright',
-						'td' => '%coll_perm_checkbox( {row}, \'perm_podcast\', \''.TS_('Permission to create podcast episodes').'\' )%',
-						'td_class' => 'center',
-					);
-$Results->cols[] = array(
-						'th_group' => /* TRANS: SHORT table header on TWO lines */ T_('Can use special post types:'),
-						'th' => /* TRANS: SHORT table header on TWO lines; short for "Sidebar", meaning Sidebar links */ T_('Sideb'),
-						'th_class' => 'checkright',
-						'td' => '%coll_perm_checkbox( {row}, \'perm_sidebar\', \''.TS_('Permission to create sidebar links').'\' )%',
+						'td' => '%coll_perm_checkbox( {row}, \'perm_page\', \''.TS_('Permission to create pages').'\' )%'.
+								'%coll_perm_checkbox( {row}, \'perm_intro\', \''.TS_('Permission to create intro posts (Intro-* post types)').'\' )%'.
+								'%coll_perm_checkbox( {row}, \'perm_podcast\', \''.TS_('Permission to create podcast episodes').'\' )%'.
+								'%coll_perm_checkbox( {row}, \'perm_sidebar\', \''.TS_('Permission to create sidebar links').'\' )%',
 						'td_class' => 'center',
 					);
 
@@ -343,6 +293,15 @@ $Results->cols[] = array(
 						'order' => 'bloggroup_perm_delpost',
 						'default_dir' => 'D',
 						'td' => '%coll_perm_checkbox( {row}, \'perm_delpost\', \''.TS_('Permission to delete posts in this blog').'\' )%',
+						'td_class' => 'center',
+					);
+
+$Results->cols[] = array(
+						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Edit<br />TS'),
+						'th_class' => 'checkright',
+						'order' => 'bloggroup_perm_edit_ts',
+						'default_dir' => 'D',
+						'td' => '%coll_perm_checkbox( {row}, \'perm_edit_ts\', \''.TS_('Ability to edit timestamp on posts and comments in this blog').'\' )%',
 						'td_class' => 'center',
 					);
 
@@ -538,6 +497,11 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.17  2011/01/06 14:31:47  efy-asimo
+ * advanced blog permissions:
+ *  - add blog_edit_ts permission
+ *  - make the display more compact
+ *
  * Revision 1.16  2010/09/08 15:07:44  efy-asimo
  * manual links
  *

@@ -165,7 +165,7 @@ switch( $action )
 		param_check_html( 'content', T_('Invalid comment text.'), '#', $post_autobr );	// Check this is backoffice content (NOT with comment rules)
 		$edited_Comment->set( 'content', get_param( 'content' ) );
 
-		if( $current_User->check_perm( 'edit_timestamp' ))
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{ // We use user date
 			param_date( 'comment_issue_date', T_('Please enter a valid comment date.'), true );
 			if( strlen(get_param('comment_issue_date')) )
@@ -387,6 +387,11 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.38  2011/01/06 14:31:47  efy-asimo
+ * advanced blog permissions:
+ *  - add blog_edit_ts permission
+ *  - make the display more compact
+ *
  * Revision 1.37  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *
