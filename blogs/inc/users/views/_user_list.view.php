@@ -73,8 +73,9 @@ if( $usr_unconfirmed )
 }
 
 $SQL = new SQL();
-$SQL->SELECT( 'T_users.*, grp_ID, grp_name' );
+$SQL->SELECT( 'T_users.*, grp_ID, grp_name, ctry_name' );
 $SQL->FROM( 'T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID' );
+$SQL->FROM_add( 'LEFT JOIN T_country ON user_ctry_ID = ctry_ID' );
 $SQL->WHERE( $where_clause.' 1' );
 $SQL->GROUP_BY( 'user_ID, grp_ID' );
 $SQL->ORDER_BY( 'grp_name, *' );
@@ -234,6 +235,21 @@ $Results->cols[] = array(
 						'td' => '$user_firstname$ $user_lastname$',
 					);
 
+$Results->cols[] = array(
+						'th' => T_('Gender'),
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
+						'order' => 'user_gender',
+						'td' => '$user_gender$',
+					);
+
+$Results->cols[] = array(
+						'th' => T_('Country'),
+						'th_class' => 'shrinkwrap',
+						'order' => 'ctry_name',
+						'td' => '$ctry_name$',
+					);
+
 function user_mailto( $email )
 {
 	if( empty( $email ) )
@@ -357,6 +373,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.28  2011/01/07 14:36:15  efy-asimo
+ * Display Gender $ Country on user list
+ *
  * Revision 1.27  2010/10/17 18:51:57  sam2kb
  * Display email validation status
  *
