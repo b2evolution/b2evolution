@@ -534,7 +534,7 @@ class ComponentWidget extends DataObject
 	 *
 	 * @access protected
 	 */
-	function disp_title( $title = NULL )
+	function disp_title( $title = NULL, $display = true )
 	{
 		if( is_null($title) )
 		{
@@ -543,9 +543,13 @@ class ComponentWidget extends DataObject
 
 		if( $this->disp_params['block_display_title'] && !empty( $title ) )
 		{
-			echo $this->disp_params['block_title_start'];
-			echo format_to_output( $title );
-			echo $this->disp_params['block_title_end'];
+			$r = $this->disp_params['block_title_start'];
+			$r .= format_to_output( $title );
+			$r .= $this->disp_params['block_title_end'];
+
+			if( $display ) echo $r;
+
+			return $r;
 		}
 	}
 
@@ -705,6 +709,9 @@ class ComponentWidget extends DataObject
 
 /*
  * $Log$
+ * Revision 1.79  2011/01/10 04:45:20  sam2kb
+ * Option to return widget title instead of displaying it
+ *
  * Revision 1.78  2010/07/26 06:52:27  efy-asimo
  * MFB v-4-0
  *
