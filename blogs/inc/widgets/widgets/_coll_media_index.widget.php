@@ -164,11 +164,6 @@ class coll_media_index_Widget extends ComponentWidget
 		$list_blogs = ( $this->disp_params[ 'blog_ID' ] ? $this->disp_params[ 'blog_ID' ] : $Blog->ID );
 		//pre_dump( $list_blogs );
 
-		echo $this->disp_params[ 'block_start'];
-
-		// Display title if requested
-		$this->disp_title();
-
 		// Display photos:
 		// TODO: permissions, complete statuses...
 		// TODO: A FileList object based on ItemListLight but adding File data into the query?
@@ -202,17 +197,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 		$layout = $this->disp_params[ 'thumb_layout' ];
 
-		if( $layout == 'grid' )
-		{
-			echo $this->disp_params[ 'grid_start' ];
-		}
-		else
-		{
-			echo $this->disp_params[ 'list_start' ];
-		}
-
 		$nb_cols = $this->disp_params[ 'grid_nb_cols' ];
 		$count = 0;
+		$r = '';
 		/**
 		 * @var File
 		 */
@@ -233,13 +220,13 @@ class coll_media_index_Widget extends ComponentWidget
 			{
 				if( $count % $nb_cols == 0 )
 				{
-					echo $this->disp_params[ 'grid_colstart' ];
+					$r .= $this->disp_params[ 'grid_colstart' ];
 				}
-				echo $this->disp_params[ 'grid_cellstart' ];
+				$r .= $this->disp_params[ 'grid_cellstart' ];
 			}
 			else
 			{
-				echo $this->disp_params[ 'item_start' ];
+				$r .= $this->disp_params[ 'item_start' ];
 			}
 
 			// 1/ Hack a dirty permalink( will redirect to canonical):
@@ -251,26 +238,45 @@ class coll_media_index_Widget extends ComponentWidget
 			// 3/ Instantiate a light object in order to get permamnent url:
 			$ItemLight = new ItemLight( $FileList->get_row_by_idx( $FileList->current_idx - 1 ) );	// index had already been incremented
 
-			echo '<a href="'.$ItemLight->get_permanent_url().'">';
+			$r .= '<a href="'.$ItemLight->get_permanent_url().'">';
 			// Generate the IMG THUMBNAIL tag with all the alt, title and desc if available
-			echo $File->get_thumb_imgtag( $this->disp_params['thumb_size'] );
-			echo '</a>';
+			$r .= $File->get_thumb_imgtag( $this->disp_params['thumb_size'] );
+			$r .= '</a>';
 
 			++$count;
 
 			if( $layout == 'grid' )
 			{
-				echo $this->disp_params[ 'grid_cellend' ];
+				$r .= $this->disp_params[ 'grid_cellend' ];
 				if( $count % $nb_cols == 0 )
 				{
-					echo $this->disp_params[ 'grid_colend' ];
+					$r .= $this->disp_params[ 'grid_colend' ];
 				}
 			}
 			else
 			{
-				echo $this->disp_params[ 'item_end' ];
+				$r .= $this->disp_params[ 'item_end' ];
 			}
 		}
+
+		// Exit if no files found
+		if( empty($r) ) return;
+
+		echo $this->disp_params[ 'block_start'];
+
+		// Display title if requested
+		$this->disp_title();
+		
+		if( $layout == 'grid' )
+		{
+			echo $this->disp_params[ 'grid_start' ];
+		}
+		else
+		{
+			echo $this->disp_params[ 'list_start' ];
+		}
+		
+		echo $r;
 
 		if( $layout == 'grid' )
 		{
@@ -295,6 +301,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.24  2011/01/10 05:08:55  sam2kb
+ * Don't display widget title if no images found
+ *
  * Revision 1.23  2010/04/12 09:41:36  efy-asimo
  * private URL shortener - task
  *
