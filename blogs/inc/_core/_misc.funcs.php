@@ -142,7 +142,7 @@ function shutdown()
 	global $shutdown_count_item_views;
 
 	// Try forking a background process and let the parent return as fast as possbile.
-	if( is_callable('pcntl_fork') ) // NOTE: not enabled in php5-fpm (via dotdeb)
+	if( is_callable('pcntl_fork') && function_exists('posix_kill') ) // NOTE: not enabled in php5-fpm (via dotdeb)
 	{
 		if( $pid = pcntl_fork() )
 			return; // Parent
@@ -4092,6 +4092,10 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.248  2011/01/10 02:24:04  sam2kb
+ * Check if POSIX functions loaded
+ * Fixes http://forums.b2evolution.net/viewtopic.php?t=21893
+ *
  * Revision 1.247  2011/01/02 02:20:25  sam2kb
  * typo: explicitely => explicitly
  *
