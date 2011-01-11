@@ -312,7 +312,7 @@ class Plugins_admin extends Plugins
 	 */
 	function discover()
 	{
-		global $Debuglog, $Timer;
+		global $Messages, $Debuglog, $Timer;
 
 		$Timer->resume('plugins_discover');
 
@@ -323,6 +323,8 @@ class Plugins_admin extends Plugins
 		// Get subdirs in $this->plugins_path
 		$subdirs = array();
 		$subdirs = get_filenames( $this->plugins_path, false, true, true, false );
+		
+		if( empty($subdirs) ) return;
 
 		// Skip plugins which are in a directory that starts with an underscore ("_")
 		foreach( $subdirs as $k => $v )
@@ -337,7 +339,10 @@ class Plugins_admin extends Plugins
 
 		foreach( $subdirs as $subdir )
 		{
-			foreach( get_filenames( $subdir, true, false, true, false ) as $filename )
+			// Some directories may be unreadable ( get_filenames returns false which is not an array )
+			if( !$files = get_filenames( $subdir, true, false, true, false ) ) continue;
+
+			foreach( $files as $filename )
 			{
 				if( ! (preg_match( '~/_([^/]+)\.plugin\.php$~', $filename, $match ) && is_file( $filename )) )
 				{
@@ -1481,6 +1486,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.35  2011/01/11 05:39:50  sam2kb
+ * Additional checks in plugins discover function
+ *
  * Revision 1.34  2010/06/01 02:44:44  sam2kb
  * New hooks added: GetCollectionKinds and InitCollectionKinds.
  * Use them to define new and override existing presets for new blogs.
