@@ -195,6 +195,22 @@ if( !$Messages->has_errors() )
 				break;
 			}
 
+			// if new user is true then it will redirect to user list after user has been created
+			$is_new_user = $edited_User->ID == 0 ? true : false;
+
+			// memorize user old login and root path, before update
+			$edited_user_old_login = $edited_User->login;
+			$edited_user_root_path = NULL;
+			$FileRootCache = & get_FileRootCache();
+			if( !$is_new_user )
+			{
+				$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $edited_User->ID );
+				if( $user_FileRoot && file_exists( $user_FileRoot->ads_path ) )
+				{
+					$edited_user_root_path = $user_FileRoot->ads_path;
+				}
+			}
+
 			// load data from request
 			if( !$edited_User->load_from_Request() )
 			{	// We have found validation errors:
@@ -202,15 +218,13 @@ if( !$Messages->has_errors() )
 				break;
 			}
 
-			// if new user is true then it will redirect to user list after user has been created
-			$is_new_user = $edited_User->ID == 0 ? true : false;
-
 			// Update user
 			$DB->begin();
 
 			$is_password_form = param( 'password_form', 'boolean', false );
 			if( $edited_User->dbsave() )
 			{
+				$update_success = true;
 				if( $is_new_user )
 				{
 					$Messages->add( T_('New user has been created.'), 'success' );
@@ -221,10 +235,33 @@ if( !$Messages->has_errors() )
 				}
 				else
 				{
-					$Messages->add( T_('Profile has been updated.'), 'success' );
+					if( $edited_user_old_login != $edited_User->login && $edited_user_root_path != NULL )
+					{ // user login changed and user has a root directory (another way $edited_user_root_path value would be NULL)
+						$FileRootCache->clear();
+						$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $edited_User->ID );
+						if( $user_FileRoot )
+						{ // user FilerRooot exists, rename user root folder
+							if( ! @rename( $edited_user_root_path, $user_FileRoot->ads_path ) )
+							{ // unsuccessful folder rename
+								$Messages->add( sprintf( T_('You cannot choose the new login "%s" (cannot rename user fileroot)'), $edited_User->login), 'error' );
+								$update_success = false;
+							}
+						}
+					}
+					if( $update_success )
+					{
+						$Messages->add( T_('Profile has been updated.'), 'success' );
+					}
 				}
 
-				$DB->commit();
+				if( $update_success )
+				{
+					$DB->commit();
+				}
+				else
+				{
+					$DB->rollback();
+				}
 			}
 			else
 			{
@@ -456,6 +493,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.24  2011/01/11 09:31:34  efy-asimo
+ * rename user private file root when changing the login of the user
+ *
  * Revision 1.23  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *
