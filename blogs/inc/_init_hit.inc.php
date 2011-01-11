@@ -109,7 +109,7 @@ $pagenow = explode( '?', $pagenow );
 $pagenow = $pagenow[0];
 */
 // find precisely the first occurrence of something.php in PHP_SELF, extract that and ignore any extra path.
-if( ! preg_match( '#/([A-Za-z0-9_\-]+\.php[0-9]?)#', $_SERVER['PHP_SELF'], $matches ))
+if( ! preg_match( '#/([A-Za-z0-9_\-.]+\.php[0-9]?)#i', $_SERVER['PHP_SELF'], $matches ))
 {
 	debug_die('Can\'t identify current .php script name in PHP_SELF.');
 }
@@ -233,6 +233,9 @@ $Timer->pause( '_init_hit' );
 
 /*
  * $Log$
+ * Revision 1.8  2011/01/11 17:48:49  sam2kb
+ * Allow filenames with dots and uppercase PHP extension
+ *
  * Revision 1.7  2010/10/24 02:52:09  sam2kb
  * Check if $_SERVER['HTTP_HOST'] is set before using it
  *
