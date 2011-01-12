@@ -161,11 +161,23 @@ class FileRootCache
 		$tmp_FileRoot = & $this->get_by_type_and_ID( $root_type, $root_in_type_ID, $create );
 		return $tmp_FileRoot->ads_path;
 	}
+
+
+	/**
+	 * Clear the cache
+	 */
+	function clear()
+	{
+		$this->cache = array();
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.10  2011/01/12 12:56:05  efy-asimo
+ * rename user private file root when changing the login of the user - fix
+ *
  * Revision 1.9  2010/02/08 17:52:18  efy-yury
  * copyright 2009 -> 2010
  *
