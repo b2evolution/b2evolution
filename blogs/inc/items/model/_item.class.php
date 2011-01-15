@@ -4418,7 +4418,9 @@ class Item extends ItemLight
 				return false;
 			}
 			$this->set( 'tiny_slug_ID', $Slug->ID );
-			if( ! $this->dbupdate() )
+			
+			// Update Item preserving mod date
+			if( ! $this->dbupdate( false ) )
 			{ // Item dbupdate failed
 				$DB->rollback();
 				return false;
@@ -4543,6 +4545,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.215  2011/01/15 20:21:23  sam2kb
+ * Create missing tiny_slug preserving Item mod date
+ *
  * Revision 1.214  2011/01/06 14:31:47  efy-asimo
  * advanced blog permissions:
  *  - add blog_edit_ts permission
