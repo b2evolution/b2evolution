@@ -524,10 +524,13 @@ class Comment extends DataObject
 			}
 		}
 
-		$params['data'] = & $r;
-		$params['Comment'] = & $this;
+		$hook_params = array(
+			'data' => & $r,
+			'Comment' => & $this,
+			'makelink' => ! empty($params['link_to']),
+		);
 
-		$Plugins->trigger_event( 'FilterCommentAuthor', $params );
+		$Plugins->trigger_event( 'FilterCommentAuthor', $hook_params );
 
 		return $r;
 	}
@@ -1736,6 +1739,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.73  2011/01/16 22:14:03  sam2kb
+ * Fix hook invocation of FilterCommentAuthor ('makelink' gone missing)
+ *
  * Revision 1.72  2011/01/02 18:32:00  sam2kb
  * Don't display avatars in comments if disabled in user settings
  *
