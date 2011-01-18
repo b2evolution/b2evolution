@@ -248,7 +248,7 @@ class basic_antispam_plugin extends Plugin
 	 */
 	function FilterCommentAuthor( & $params )
 	{
-		if( ! isset($params['makelink']) )
+		if( ! $params['makelink'] )
 		{
 			return false;
 		}
@@ -259,7 +259,7 @@ class basic_antispam_plugin extends Plugin
 			
 			return;
 		}
-		
+
 		$this->apply_nofollow( $params['data'], $params['Comment'] );
 	}
 
@@ -661,6 +661,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.40  2011/01/18 00:56:48  sam2kb
+ * Revert wrong fix for "makelink" notice.
+ *
  * Revision 1.39  2010/12/10 21:03:29  sam2kb
  * Version bump
  *
