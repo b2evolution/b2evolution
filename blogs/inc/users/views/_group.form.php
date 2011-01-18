@@ -43,6 +43,43 @@ global $edited_Group;
 
 global $action;
 
+// asimo> this may belong to the pluggable permissions display
+// javascript to handle shared root permissions, when file permission was changed
+?>
+<script type="text/javascript">
+	function file_perm_changed()
+	{
+		var file_perm = jQuery( '[name="edited_grp_perm_files"]:checked' ).val();
+		if( file_perm == null )
+		{ // there is file perms radio
+			return;
+		}
+
+		switch( file_perm )
+		{
+		case "none":
+			jQuery('#edited_grp_perm_shared_root_radio_2').attr('disabled', 'disabled');
+			jQuery('#edited_grp_perm_shared_root_radio_3').attr('disabled', 'disabled');
+			jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
+			break;
+		case "view":
+			jQuery('#edited_grp_perm_shared_root_radio_2').attr('disabled', '');
+			jQuery('#edited_grp_perm_shared_root_radio_3').attr('disabled', 'disabled');
+			jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
+			break;
+		case "add":
+			jQuery('#edited_grp_perm_shared_root_radio_2').attr('disabled', '');
+			jQuery('#edited_grp_perm_shared_root_radio_3').attr('disabled', '');
+			jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', 'disabled');
+			break;
+		default:
+			jQuery('#edited_grp_perm_shared_root_radio_2').attr('disabled', '');
+			jQuery('#edited_grp_perm_shared_root_radio_3').attr('disabled', '');
+			jQuery('#edited_grp_perm_shared_root_radio_4').attr('disabled', '');
+		}
+	}
+</script>
+<?php
 
 /**
  * Display pluggable permissions
@@ -229,8 +266,21 @@ if( $action != 'view' )
 
 $Form->end_form();
 
+// set shared root permission availability, when form was loaded and when file perms was changed
+?>
+<script type="text/javascript">
+		file_perm_changed();
+		jQuery( '[name="edited_grp_perm_files"]' ).click(function() {
+			file_perm_changed();
+		});
+</script>
+<?php
+
 /*
  * $Log$
+ * Revision 1.30  2011/01/18 16:23:03  efy-asimo
+ * add shared_root perm and refactor file perms - part1
+ *
  * Revision 1.29  2010/10/15 13:10:09  efy-asimo
  * Convert group permissions to pluggable permissions - part1
  *

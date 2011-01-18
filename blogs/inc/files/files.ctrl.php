@@ -169,7 +169,7 @@ if( ! empty($root) )
 { // We have requested a root folder by string:
 	$fm_FileRoot = & $FileRootCache->get_by_ID($root, true);
 
-	if( ! $fm_FileRoot || ! isset( $available_Roots[$fm_FileRoot->ID] ) )
+	if( ! $fm_FileRoot || ! isset( $available_Roots[$fm_FileRoot->ID] ) || ! $current_User->check_perm( 'files', 'view', false, $fm_FileRoot ) )
 	{ // Root not found or not in list of available ones
 		$Messages->add( T_('You don\'t have access to the requested root directory.'), 'error' );
 		$fm_FileRoot = false;
@@ -182,7 +182,7 @@ elseif( !empty($edited_User) )
 	/**
 	 * @var File
 	 */
-	if( $avatar_File = & $edited_User->get_avatar_File() )
+	if( ( $avatar_File = & $edited_User->get_avatar_File() ) && ( $current_User->check_perm( 'files', 'view', false, $avatar_File->get_FileRoot() ) ) )
 	{
 		$fm_FileRoot = & $avatar_File->get_FileRoot();
 		$path = dirname( $avatar_File->get_rdfs_rel_path() ).'/';
@@ -199,7 +199,7 @@ elseif( !empty($edited_Item) )
 		 * @var File
 		 */
 		$File = & $FileList->get_next();
-		if( !empty( $File ) )
+		if( !empty( $File ) && $current_User->check_perm( 'files', 'view', false, $File->get_FileRoot ) )
 		{	// Obtain and use file root of first file:
 			$fm_FileRoot = & $File->get_FileRoot();
 			$path = dirname( $File->get_rdfs_rel_path() ).'/';
@@ -207,6 +207,10 @@ elseif( !empty($edited_Item) )
 	}
 }
 
+if( $fm_FileRoot && ! $current_User->check_perm( 'files', 'view', false, $fm_FileRoot ) )
+{
+	$fm_FileRoot = false;
+};
 
 if( empty($fm_FileRoot) && !empty($edited_User) )
 {	// Still not set a root, try to get it for the edited User
@@ -230,13 +234,18 @@ if( empty($fm_FileRoot) && !empty($Blog) )
 if( ! $fm_FileRoot )
 { // No root requested (or the requested is invalid),
 	// get the first one available:
-	if( $available_Roots
-	    && ( $tmp_keys = array_keys( $available_Roots ) )
-	    && $first_Root = & $available_Roots[ $tmp_keys[0] ] )
-	{ // get the first one
-		$fm_FileRoot = & $first_Root;
+	if( $available_Roots )
+	{
+		foreach( $available_Roots as $l_FileRoot )
+		{
+			if( $current_User->check_perm( 'files', 'view', false, l_FileRoot ) )
+			{
+				$fm_FileRoot = $l_FileRoot;
+				break;
+			}
+		}
 	}
-	else
+	if( ! $fm_FileRoot )
 	{
 		$Messages->add( T_('You don\'t have access to any root directory.'), 'error' );
 	}
@@ -1764,6 +1773,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.74  2011/01/18 16:23:02  efy-asimo
+ * add shared_root perm and refactor file perms - part1
+ *
  * Revision 1.73  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *

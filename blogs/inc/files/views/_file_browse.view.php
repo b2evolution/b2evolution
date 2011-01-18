@@ -81,7 +81,7 @@ if( isset( $edited_User ) )
 <?php
 	$Widget = new Widget( 'file_browser' );
 
-	if( $current_User->check_perm( 'files', 'add', false, $blog ? $blog : NULL ) )
+	if( $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
 	{
 		$Widget->global_icon( T_('Upload...'), '', regenerate_url( 'ctrl', 'ctrl=upload' ), T_('Upload').' &raquo;', 1, 5 );
 	}
@@ -163,6 +163,10 @@ if( isset( $edited_User ) )
 					$optgroup = '';
 					foreach( $rootlist as $l_FileRoot )
 					{
+						if( ! $current_User->check_perm( 'files', 'view', false, $l_FileRoot ) )
+						{
+							continue;
+						}
 						if( ($typegroupname = $l_FileRoot->get_typegroupname()) != $optgroup )
 						{ // We're entering a new group:
 							if( ! empty($optgroup) )
@@ -308,7 +312,7 @@ if( isset( $edited_User ) )
 				 * CREATE FILE/FOLDER TOOLBAR:
 				 */
 				if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ))
-							&& $current_User->check_perm( 'files', 'add', false, $blog ? $blog : NULL ) )
+							&& $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
 				{ // dir or file creation is enabled and we're allowed to add files:
 					global $create_type;
 
@@ -364,7 +368,7 @@ if( isset( $edited_User ) )
 				/*
 				 * UPLOAD:
 				 */
-				if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add', false, $blog ? $blog : NULL ) )
+				if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
 				{	// Upload is enabled and we have permission to use it...
 					echo "<!-- QUICK UPLOAD: -->\n";
 					echo '<div class="toolbaritem">';
@@ -398,6 +402,9 @@ if( isset( $edited_User ) )
 
 /*
  * $Log$
+ * Revision 1.20  2011/01/18 16:23:03  efy-asimo
+ * add shared_root perm and refactor file perms - part1
+ *
  * Revision 1.19  2010/02/08 17:52:51  efy-yury
  * copyright 2009 -> 2010
  *

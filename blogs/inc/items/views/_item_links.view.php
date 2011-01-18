@@ -171,7 +171,7 @@ if( $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
 			}
 		}
 
-		if( isset($current_File) )
+		if( isset($current_File) && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
 		{
 			if( $current_File->is_dir() )
 				$title = T_('Locate this directory!');
@@ -250,6 +250,9 @@ $Results->display( $AdminUI->get_template( 'compact_results' ) );
 
 /*
  * $Log$
+ * Revision 1.19  2011/01/18 16:23:03  efy-asimo
+ * add shared_root perm and refactor file perms - part1
+ *
  * Revision 1.18  2010/02/08 17:53:19  efy-yury
  * copyright 2009 -> 2010
  *

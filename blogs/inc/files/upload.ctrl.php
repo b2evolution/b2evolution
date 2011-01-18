@@ -108,22 +108,27 @@ if( ! empty($root) )
 { // We have requested a root folder by string:
 	$fm_FileRoot = & $FileRootCache->get_by_ID($root, true);
 
-	if( ! $fm_FileRoot || ( ! isset( $available_Roots[$fm_FileRoot->ID] ) && ( $action != 'avatar_upload' ) ) )
+	if( ! $fm_FileRoot || ( ! isset( $available_Roots[$fm_FileRoot->ID] ) && ( $action != 'avatar_upload' ) ) || !$current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
 	{ // Root not found or not in list of available ones. If avatar upload is in progress, the edited user root doesn't have to be available.
-		$Messages->add( T_('You don\'t have access to the requested root directory.'), 'error' );
+		$Messages->add( T_('You don\'t have upload permission to the requested root directory.'), 'warning' );
 		$fm_FileRoot = false;
 	}
 }
 
 if( ! $fm_FileRoot )
 { // No root requested (or the requested is invalid), get the first one available:
-	if( $available_Roots
-	    && ( $tmp_keys = array_keys( $available_Roots ) )
-	    && $first_Root = & $available_Roots[ $tmp_keys[0] ] )
-	{ // get the first one
-		$fm_FileRoot = & $first_Root;
+	if( $available_Roots )
+	{
+		foreach( $available_Roots as $l_FileRoot )
+		{
+			if( $current_User->check_perm( 'files', 'add', false, $l_FileRoot ) )
+			{ // select 
+				$fm_FileRoot = $l_FileRoot;
+				break;
+			}
+		}
 	}
-	else
+	if( ! $fm_FileRoot )
 	{
 		$Messages->add( T_('You don\'t have access to any root directory.'), 'error' );
 	}
@@ -702,6 +707,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.42  2011/01/18 16:23:02  efy-asimo
+ * add shared_root perm and refactor file perms - part1
+ *
  * Revision 1.41  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *

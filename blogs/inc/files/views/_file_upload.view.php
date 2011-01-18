@@ -218,7 +218,7 @@ global $fm_FileRoot;
 			echo '<td id="fm_dirtree">';
 
 			// Version with all roots displayed
-			echo get_directory_tree( NULL, NULL, $ads_list_path, true );
+			echo get_directory_tree( NULL, NULL, $ads_list_path, true, NULL, false, 'add' );
 
 			// Version with only the current root displayed:
 			// echo get_directory_tree( $fm_FileRoot, $fm_FileRoot->ads_path, $ads_list_path, true );
@@ -416,6 +416,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.21  2011/01/18 16:23:03  efy-asimo
+ * add shared_root perm and refactor file perms - part1
+ *
  * Revision 1.20  2010/10/27 14:56:42  efy-asimo
  * when replacing a file, keep a backup
  *

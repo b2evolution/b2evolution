@@ -283,7 +283,7 @@ while( $Item = & $ItemList->get_item() )
 					'class'     => 'ActionButton'
 				) );
 
-			if( isset($GLOBALS['files_Module']) )
+			if( isset($GLOBALS['files_Module']) && $current_User->check_perm( 'files', 'view' ) )
 			{
 				echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_item&amp;item_ID='.$Item->ID )
 							.'" class="ActionButton">'.get_icon( 'folder', 'imgtag' ).' '.T_('Files...').'</a>';
@@ -472,6 +472,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.46  2011/01/18 16:23:03  efy-asimo
+ * add shared_root perm and refactor file perms - part1
+ *
  * Revision 1.45  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:

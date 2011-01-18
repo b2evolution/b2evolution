@@ -172,9 +172,12 @@ class Group extends DataObject
 			}
 			else
 			{
-				$value = param( 'edited_grp_'.$name, 'string', true );
+				$value = param( 'edited_grp_'.$name, 'string', '' );
 			}
-			$GroupSettings->set( $name, $value, $this->ID );
+			if( $value != '' )
+			{ // if radio is not set, then doesn't change the settings
+				$GroupSettings->set( $name, $value, $this->ID );
+			}
 		}
 
 		return !param_errors_detected();
@@ -252,7 +255,7 @@ class Group extends DataObject
 			$permvalue = false; // This will result in $perm == false always. We go on for the $Debuglog..
 		}
 
-		$pluggable_perms = array( 'spamblacklist', 'slugs', 'templates', 'options', 'files' );
+		$pluggable_perms = array( 'shared_root', 'spamblacklist', 'slugs', 'templates', 'options', 'files' );
 		if( in_array( $permname, $pluggable_perms ) ) {
 			$permname = 'perm_'.$permname;
 		}
@@ -691,6 +694,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.38  2011/01/18 16:23:03  efy-asimo
+ * add shared_root perm and refactor file perms - part1
+ *
  * Revision 1.37  2011/01/06 14:31:47  efy-asimo
  * advanced blog permissions:
  *  - add blog_edit_ts permission

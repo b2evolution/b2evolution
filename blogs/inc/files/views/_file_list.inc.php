@@ -163,6 +163,10 @@ $Form->begin_form();
 	$checkall = param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
 	$fm_highlight = param( 'fm_highlight', 'string', NULL );
 
+	// Set FileList perms
+	$all_perm = $current_User->check_perm( 'files', 'all', false );
+	$edit_perm = $current_User->check_perm( 'files', 'edit', false, $fm_Filelist->get_FileRoot() );
+
 	/***********************************************************/
 	/*                    MAIN FILE LIST:                      */
 	/***********************************************************/
@@ -420,9 +424,9 @@ $Form->begin_form();
 
 		echo '<td class="actions lastcol">';
 
-		if( $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
+		if( $edit_perm )
 		{ // User can edit:
-			if( $lFile->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
+			if( $lFile->is_editable( $all_perm ) )
 			{
 				echo action_icon( T_('Edit file...'), 'edit', regenerate_url( 'fm_selected', 'action=edit_file&amp;crumb_file='.url_crumb('file').'&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
 			}
@@ -434,7 +438,7 @@ $Form->begin_form();
 
 		echo action_icon( T_('Edit properties...'), 'properties', regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path() ).'&amp;'.url_crumb('file') ) );
 
-		if( $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
+		if( $edit_perm )
 		{ // User can edit:
 			echo action_icon( T_('Move'), 'file_move', regenerate_url( 'fm_mode,fm_sources,fm_sources_root', 'fm_mode=file_move&amp;fm_sources[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
 			echo action_icon( T_('Copy'), 'file_copy', regenerate_url( 'fm_mode,fm_sources,fm_sources_root', 'fm_mode=file_copy&amp;fm_sources[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
@@ -518,7 +522,7 @@ $Form->begin_form();
 				$field_options['img_tag'] = T_('Insert IMG/link into post');
 			}
 
-			if( $current_User->check_perm( 'files', 'edit', false, $blog ? $blog : NULL ) )
+			if( $edit_perm )
 			{ // User can edit:
 				$field_options['rename'] = T_('Rename files...');
 				$field_options['delete'] = T_('Delete files...');
@@ -685,6 +689,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.44  2011/01/18 16:23:03  efy-asimo
+ * add shared_root perm and refactor file perms - part1
+ *
  * Revision 1.43  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *

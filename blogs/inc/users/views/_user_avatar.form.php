@@ -86,14 +86,16 @@ if( ( $current_User->check_perm( 'users', 'all' ) ) || ( $current_User->ID == $e
 		$Form->hiddens_by_key( get_memorized('ctrl') );
 		$Form->add_crumb( 'file' );
 
-		// upload part
-		$info_content = '<input name="uploadfile[]" type="file" size="10" />';
-		$info_content .= '<input class="ActionButton" type="submit" value="&gt; '.T_('Upload!').'" />';
-		$Form->info( T_('Upload a new avatar'), $info_content );
-
 		$FileRootCache = & get_FileRootCache();
 		$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $edited_User->ID );
 		$ads_list_path = get_canonical_path( $user_FileRoot->ads_path.$path );
+
+		if( $current_User->check_perm( 'files', 'add', false, $user_FileRoot ) )
+		{ // upload part
+			$info_content = '<input name="uploadfile[]" type="file" size="10" />';
+			$info_content .= '<input class="ActionButton" type="submit" value="&gt; '.T_('Upload!').'" />';
+			$Form->info( T_('Upload a new avatar'), $info_content );
+		}
 
 		if( is_dir( $ads_list_path ) )
 		{ // profile_picture folder exists in the user root dir
@@ -129,6 +131,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.10  2011/01/18 16:23:03  efy-asimo
+ * add shared_root perm and refactor file perms - part1
+ *
  * Revision 1.9  2010/10/17 18:53:04  sam2kb
  * Added a link to delete edited user
  *

@@ -34,7 +34,7 @@ if( $user_profile_only )
 
 	// Make sure the user only edits himself:
 	$user_ID = $current_User->ID;
-	if( ! in_array( $action, array( 'update', 'edit', 'default_settings' ) ) )
+	if( ! in_array( $action, array( 'update', 'update_avatar', 'edit', 'default_settings' ) ) )
 	{
 		$action = 'edit';
 	}
@@ -493,6 +493,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2011/01/18 16:23:03  efy-asimo
+ * add shared_root perm and refactor file perms - part1
+ *
  * Revision 1.24  2011/01/11 09:31:34  efy-asimo
  * rename user private file root when changing the login of the user
  *

@@ -642,11 +642,12 @@ function rel_path_to_base( $path )
  * @param string used by recursion
  * @return string
  */
-function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_full_path = NULL, $radios = false, $rds_rel_path = NULL, $is_recursing = false )
+function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_full_path = NULL, $radios = false, $rds_rel_path = NULL, $is_recursing = false, $action = 'view' )
 {
 	static $js_closeClickIDs; // clickopen IDs that should get closed
 	static $instance_ID = 0;
 	static $fm_highlight;
+	global $current_User;
 
 	// A folder might be highlighted (via "Locate this directory!")
 	if( ! isset($fm_highlight) )
@@ -675,6 +676,10 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 
 		foreach( $_roots as $l_Root )
 		{
+			if( ! $current_User->check_perm( 'files', $action, false, $l_Root ) )
+			{
+				continue;
+			}
 			$subR = get_directory_tree( $l_Root, $l_Root->ads_path, $ads_selected_full_path, $radios, '', true );
 			if( !empty( $subR['string'] ) )
 			{
@@ -1051,6 +1056,9 @@ function check_showparams( & $Filelist )
 
 /*
  * $Log$
+ * Revision 1.49  2011/01/18 16:23:02  efy-asimo
+ * add shared_root perm and refactor file perms - part1
+ *
  * Revision 1.48  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

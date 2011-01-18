@@ -93,11 +93,16 @@ if( $mode != 'upload' )
 		/**
 		 * @global File
 		 */
-		global $current_File;
+		global $current_File, $current_User;
 		global $edited_Item;
 
-		// File relative path & name:
-		return $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID );
+		$r = T_( 'You don\'t have permission to this file root' );
+		if( $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
+		{
+			// File relative path & name:
+			$r = $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID );
+		}
+		return $r;
 	}
 	$Results->cols[] = array(
 							'th' => T_('Path'),
@@ -121,15 +126,18 @@ if( $mode != 'upload' )
 	{
 		global $current_File, $edited_Item, $current_User;
 
-		if( $current_File->is_dir() )
-			$title = T_('Locate this directory!');
-		else
-			$title = T_('Locate this file!');
-
-
-		$r = $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID,
-						get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title );
-
+		$r = '';
+		if( $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
+		{
+			if( $current_File->is_dir() )
+				$title = T_('Locate this directory!');
+			else
+				$title = T_('Locate this file!');
+	
+	
+			$r = $current_File->get_linkedit_link( '&amp;fm_mode=link_item&amp;item_ID='.$edited_Item->ID,
+							get_icon( 'locate', 'imgtag', array( 'title'=>$title ) ), $title );
+		}
 		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 		{	// Check that we have permission to edit item:
 			$r .= action_icon( T_('Delete this link!'), 'unlink',
@@ -161,6 +169,9 @@ if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Ite
 
 /*
  * $Log$
+ * Revision 1.16  2011/01/18 16:23:03  efy-asimo
+ * add shared_root perm and refactor file perms - part1
+ *
  * Revision 1.15  2010/02/08 17:52:57  efy-yury
  * copyright 2009 -> 2010
  *

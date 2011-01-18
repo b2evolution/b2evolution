@@ -131,22 +131,26 @@ class files_Module extends Module
 		switch( $grp_ID )
 		{
 			case 1: // Administrators group ID equals 1
-				$permname = 'all';
+				$permfiles = 'all';
+				$permshared = 'edit';
 				break;
 			case 2: // Privileged Bloggers group equals 2
-				$permname = 'add';
+				$permfiles = 'add';
+				$permshared = 'add';
 				break;
 			case 3: // Bloggers group ID equals 3
-				$permname = 'view';
+				$permfiles = 'view';
+				$permshared = 'view';
 				break;
 			default: // Other groups
-				$permname = 'none';
+				$permfiles = 'none';
+				$permshared = 'none';
 				break;
 		}
 
 		// We can return as many default permissions as we want:
 		// e.g. array ( permission_name => permission_value, ... , ... )
-		return $permissions = array( 'perm_files' => $permname );
+		return $permissions = array( 'perm_files' => $permfiles, 'perm_shared_root' => $permshared );
 	}
 
 	/**
@@ -188,6 +192,21 @@ class files_Module extends Module
 				'perm_type' => 'radiobox',
 				'field_lines' => true,
 				'field_note' => T_('This setting will further restrict any media file permissions on specific blogs.'),
+				),
+			'perm_shared_root' => array(
+				'label' => T_('Access to shared root'),
+				'user_func'  => 'check_sharedroot_user_perm',
+				'group_func' => 'check_sharedroot_group_perm',
+				'perm_block' => 'additional',
+				'options'  => array(
+						// format: array( radio_button_value, radio_button_label, radio_button_note )
+						array( 'none', T_('No Access') ),
+						array( 'view', T_('Read only') ),
+						array( 'add', T_('Add/Upload') ),
+						array( 'edit', T_('Edit') ),
+					),
+				'perm_type' => 'radiobox',
+				'field_lines' => false,
 				),
 		);
 		// We can return as many permissions as we want.
@@ -254,6 +273,49 @@ class files_Module extends Module
 				}
 		}
 
+		if( $perm && isset($permtarget) && ( $permtarget instanceof  FileRoot ) )
+		{
+			global $current_User;
+			switch( $permtarget->type )
+			{
+				case 'shared':
+					return $current_User->check_perm( 'shared_root', $permlevel );
+				case 'user':
+					return $permtarget->in_type_ID == $current_User->ID;
+			}
+		}
+
+		return $perm;
+	}
+
+	function check_sharedroot_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		$perm = false;
+		switch ( $permvalue )
+		{
+			case 'edit':
+				if( $permlevel == 'edit' )
+				{ // User can ask for normal edit perm...
+					$perm = true;
+					break;
+				}
+
+			case 'add':
+				// User can ask for normal add perm...
+				if( $permlevel == 'add' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'view':
+				// User can ask for normal view perm...
+				if( $permlevel == 'view' )
+				{
+					$perm = true;
+					break;
+				}
+		}
 		return $perm;
 	}
 
@@ -312,6 +374,9 @@ $files_Module = new files_Module();
 
 /*
  * $Log$
+ * Revision 1.12  2011/01/18 16:23:02  efy-asimo
+ * add shared_root perm and refactor file perms - part1
+ *
  * Revision 1.11  2010/10/19 02:00:54  fplanque
  * MFB
  *
