@@ -238,7 +238,7 @@ if( ! $fm_FileRoot )
 	{
 		foreach( $available_Roots as $l_FileRoot )
 		{
-			if( $current_User->check_perm( 'files', 'view', false, l_FileRoot ) )
+			if( $current_User->check_perm( 'files', 'view', false, $l_FileRoot ) )
 			{
 				$fm_FileRoot = $l_FileRoot;
 				break;
@@ -1773,6 +1773,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.75  2011/01/19 14:33:42  efy-asimo
+ * Missing $ - fix
+ *
  * Revision 1.74  2011/01/18 16:23:02  efy-asimo
  * add shared_root perm and refactor file perms - part1
  *
