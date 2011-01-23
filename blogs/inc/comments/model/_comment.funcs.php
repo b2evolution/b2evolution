@@ -308,7 +308,7 @@ function echo_comment_publishbt_js()
 function add_jsban( $url )
 {
 	$url = rawurlencode(get_ban_domain( $url ));
-	return '<a id="ban_url" href="javascript:ban_url('.'\''.$url.'\''.');"'.get_icon( 'ban' ).'</a>';
+	return '<a id="ban_url" href="javascript:ban_url('.'\''.$url.'\''.');">'.get_icon( 'ban' ).'</a>';
 }
 
 
@@ -391,6 +391,9 @@ function add_ban_icons( $content )
 
 /*
  * $Log$
+ * Revision 1.20  2011/01/23 19:24:36  sam2kb
+ * Fixed HTML errors in liks
+ *
  * Revision 1.19  2011/01/06 14:31:47  efy-asimo
  * advanced blog permissions:
  *  - add blog_edit_ts permission

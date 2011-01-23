@@ -785,7 +785,7 @@ class Comment extends DataObject
 
 		if( $ajax_button )
 		{
-			echo ' <a href="javascript:delete_comment_url('.$this->ID.');"'.get_icon( 'delete' ).'</a>';
+			echo ' <a href="javascript:delete_comment_url('.$this->ID.');">'.get_icon( 'delete' ).'</a>';
 		}
 		else
 		{
@@ -832,7 +832,7 @@ class Comment extends DataObject
 
 		if( $ajax_button )
 		{
-			echo ' <a id="ban_url" href="javascript:ban_url('.'\''.$authorurl.'\''.');"'.get_icon( 'ban' ).'</a>';
+			echo ' <a id="ban_url" href="javascript:ban_url('.'\''.$authorurl.'\''.');">'.get_icon( 'ban' ).'</a>';
 		}
 		else
 		{
@@ -1739,6 +1739,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.74  2011/01/23 19:24:36  sam2kb
+ * Fixed HTML errors in liks
+ *
  * Revision 1.73  2011/01/16 22:14:03  sam2kb
  * Fix hook invocation of FilterCommentAuthor ('makelink' gone missing)
  *
