@@ -236,9 +236,9 @@ switch( $action )
 	case 'delete_url':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
-		
+
 		$edited_Comment->set('author_url', NULL );
-		
+
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
 		$Messages->add( T_('Comment url has been deleted.'), 'success' );
@@ -352,7 +352,7 @@ switch( $action )
 
 
 	case 'list':
-	default:		
+	default:
 		// Begin payload block:
 		$AdminUI->disp_payload_begin();
 
@@ -368,7 +368,7 @@ switch( $action )
 			$AdminUI->disp_view( 'comments/views/_comment_list_table.view.php' );
 		}
 		echo '</td>';
-		
+
 		echo '<td class="browse_right_col">';
 			// Display VIEW:
 			$AdminUI->disp_view( 'comments/views/_comments_sidebar.view.php' );
@@ -387,6 +387,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.39  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.38  2011/01/06 14:31:47  efy-asimo
  * advanced blog permissions:
  *  - add blog_edit_ts permission

@@ -2812,7 +2812,7 @@ function upgrade_b2evo_tables()
 	db_drop_col( 'T_groups', 'grp_perm_templates' );
 	task_end();
 
-	task_begin( 'Upgrading users table, add user gender...' );
+	task_begin( 'Upgrading users table, adding user gender...' );
 	db_add_col( 'T_users', 'user_gender', 'char(1) NULL DEFAULT NULL AFTER user_showonline' );
 	task_end();
 
@@ -3004,6 +3004,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.377  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.376  2011/01/06 14:31:47  efy-asimo
  * advanced blog permissions:
  *  - add blog_edit_ts permission

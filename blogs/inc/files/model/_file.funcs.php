@@ -1056,11 +1056,17 @@ function check_showparams( & $Filelist )
 
 /*
  * $Log$
+ * Revision 1.50  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.49  2011/01/18 16:23:02  efy-asimo
  * add shared_root perm and refactor file perms - part1
  *
  * Revision 1.48  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
+ * Group file settings and file types tabs into a single Settings tab, with a 3rd level selection
+ *
+ * Revision 1.44.2.5  2010/07/06 21:02:38  fplanque
+ * delete all kinds of ?evocache folders at once
  *
  * Revision 1.47  2010/07/13 07:10:15  efy-asimo
  * Group file settings and file types tabs into a single Settings tab, with a 3rd level selection

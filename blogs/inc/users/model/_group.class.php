@@ -256,7 +256,8 @@ class Group extends DataObject
 		}
 
 		$pluggable_perms = array( 'shared_root', 'spamblacklist', 'slugs', 'templates', 'options', 'files' );
-		if( in_array( $permname, $pluggable_perms ) ) {
+		if( in_array( $permname, $pluggable_perms ) ) 
+		{
 			$permname = 'perm_'.$permname;
 		}
 		// echo "<br>Checking group perm $permname:$permlevel against $permvalue";
@@ -694,6 +695,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.39  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.38  2011/01/18 16:23:03  efy-asimo
  * add shared_root perm and refactor file perms - part1
  *

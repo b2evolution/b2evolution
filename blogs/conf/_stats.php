@@ -197,8 +197,8 @@ $known_search_params =  array(
 	'Gw',           // scroogle.org
 	'text',         // yandex.ru
 	'search_query',	// search.ukr.net
-	'wd',			// baidu.com
-	'keywords',		// gde.ru
+	'wd',           // baidu.com
+	'keywords',     // gde.ru
 );
 
 

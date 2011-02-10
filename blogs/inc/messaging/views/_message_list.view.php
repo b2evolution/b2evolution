@@ -182,7 +182,8 @@ $Results->filter_area = array(
  */
 function user_avatar( $user_ID, $user_avatar_file_ID )
 {
-	if( ! $GLOBALS['Settings']->get('allow_avatars') ) return '';
+	if( ! $GLOBALS['Settings']->get('allow_avatars') ) 
+		return '';
 
 	$FileCache = & get_FileCache();
 
@@ -292,6 +293,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.29  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.28  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:

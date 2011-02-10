@@ -159,7 +159,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 	// CALL PLUGINS NOW:
 	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Comment', 'edit_layout' => NULL ) );
-	
+
 	echo_comment_buttons( $Form, $edited_Comment );
 
 	?>
@@ -297,6 +297,9 @@ echo_comment_publishbt_js();
 
 /*
  * $Log$
+ * Revision 1.22  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.21  2011/01/06 14:31:47  efy-asimo
  * advanced blog permissions:
  *  - add blog_edit_ts permission

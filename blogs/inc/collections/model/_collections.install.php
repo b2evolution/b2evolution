@@ -358,7 +358,13 @@ $schema_queries = array_merge( $schema_queries, array(
 ) );
 
 /*
- * _collections.install.php,v
+ * $Log$
+ * Revision 1.21  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
+ * Revision 1.17.2.6  2010/10/19 01:04:48  fplanque
+ * doc
+ *
  * Revision 1.3  2009/08/30 12:31:44  tblue246
  * Fixed CVS keywords
  *

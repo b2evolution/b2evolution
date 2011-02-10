@@ -956,7 +956,8 @@ class User extends DataObject
 		}
 
 		$pluggable_perms = array( 'spamblacklist', 'slugs', 'templates', 'options', 'files' );
-		if( in_array( $permname, $pluggable_perms ) ) {
+		if( in_array( $permname, $pluggable_perms ) ) 
+		{
 			$permname = 'perm_'.$permname;
 		}
 		//$Debuglog->add( "Querying perm [$permname][$permlevel]".( isset( $perm_target_ID ) ? '['.$perm_target_ID.']' : '' ).']', 'perms' );
@@ -2111,6 +2112,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.90  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.89  2011/01/06 14:31:47  efy-asimo
  * advanced blog permissions:
  *  - add blog_edit_ts permission

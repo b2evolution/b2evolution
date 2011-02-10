@@ -495,7 +495,8 @@ function attachment_iframe( & $Form, $creating, & $edited_Item, & $Blog )
 	global $current_User;
 	global $Settings;
 
-	if( ! isset($GLOBALS['files_Module']) ) return;
+	if( ! isset($GLOBALS['files_Module']) ) 
+		return;
 
 	$fieldset_title = T_('Images &amp; Attachments').get_manual_link('post_attachments_fieldset');
 
@@ -1947,6 +1948,9 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 
 /*
  * $Log$
+ * Revision 1.124  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.123  2011/01/06 14:31:47  efy-asimo
  * advanced blog permissions:
  *  - add blog_edit_ts permission
@@ -1977,8 +1981,8 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
  * Revision 1.116  2010/08/05 08:04:12  efy-asimo
  * Ajaxify comments on itemList FullView and commentList FullView pages
  *
- * Revision 1.115  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
+ * Revision 1.109.2.5  2010/07/06 21:00:34  fplanque
+ * doc
  *
  * Revision 1.114  2010/06/30 07:34:42  efy-asimo
  * Cross posting fix - ingore extra cats from different blogs, when cross posting is disabled
@@ -2339,7 +2343,7 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
  * Better category selector
  *
  * Revision 1.3  2007/09/03 20:01:53  blueyed
- * Fixed "Add a new category Â»" link (blog param)
+ * Fixed "Add a new category»" link (blog param)
  *
  * Revision 1.2  2007/09/03 16:44:28  fplanque
  * chicago admin skin

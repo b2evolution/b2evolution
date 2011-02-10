@@ -2965,9 +2965,9 @@ class Item extends ItemLight
 						);
 
 		$r = implode( ' ', $classes );
-		
+
 		if( ! $output ) return $r;
-		
+
 		echo $r;
 	}
 
@@ -3615,7 +3615,7 @@ class Item extends ItemLight
 	/**
 	 * Create new slug with validated title
 	 * !!!private!!! This function should be called only from Item dbupdate() function
-	 *
+	 * @private 
 	 * @return Slug
 	 */
 	function update_slug($urltitle = NULL)
@@ -3656,7 +3656,7 @@ class Item extends ItemLight
 		}
 
 		// set the item urltitle
-		$this->set( 'urltitle', $new_Slug->get( 'title' ) );	
+		$this->set( 'urltitle', $new_Slug->get( 'title' ) );
 
 		return $new_Slug;
 	}
@@ -4447,7 +4447,7 @@ class Item extends ItemLight
 			return '';
 		}
 		$Blog = & $this->get_Blog();
-		return url_add_tail( $Blog->get( 'url' ), '/'.$tinyslug );
+		return url_add_tail( $Blog->get( 'url'), '/'.$tinyslug );
 	}
 
 
@@ -4545,6 +4545,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.216  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.215  2011/01/15 20:21:23  sam2kb
  * Create missing tiny_slug preserving Item mod date
  *

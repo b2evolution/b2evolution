@@ -333,7 +333,7 @@ while( $Item = & $ItemList->get_item() )
 			}
 
 
-  			// ---------- comments ----------
+  		// ---------- comments ----------
 
 			$total_comments_number = generic_ctp_number( $Item->ID, 'total', 'total' );
 			$draft_comments_number = generic_ctp_number( $Item->ID, 'total', 'draft' );
@@ -404,10 +404,10 @@ while( $Item = & $ItemList->get_item() )
 			echo '<div id="comments_container" value="'.$Item->ID.'">';
 			// display comments
 			$CommentList->display_if_empty( array(
-				'before'    => '<div class="bComment"><p>',
-				'after'     => '</p></div>',
-				'msg_empty' => T_('No feedback for this post yet...'),
-			) );
+					'before'    => '<div class="bComment"><p>',
+					'after'     => '</p></div>',
+					'msg_empty' => T_('No feedback for this post yet...'),
+				) );
 
 			require $inc_path.'comments/views/_comment_list.inc.php';
 			echo '</div>'; // comments_container div
@@ -472,6 +472,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.47  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.46  2011/01/18 16:23:03  efy-asimo
  * add shared_root perm and refactor file perms - part1
  *

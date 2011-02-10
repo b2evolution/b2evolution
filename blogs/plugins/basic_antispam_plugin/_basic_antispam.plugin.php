@@ -50,7 +50,7 @@ class basic_antispam_plugin extends Plugin
 	var $name = 'Basic Antispam';
 	var $code = '';
 	var $priority = 60;
-	var $version = '2.1';
+	var $version = '4.1';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 	var $number_of_installs = 1;
@@ -661,6 +661,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.41  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.40  2011/01/18 00:56:48  sam2kb
  * Revert wrong fix for "makelink" notice.
  *

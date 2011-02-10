@@ -49,7 +49,7 @@ class twitter_plugin extends Plugin
 	 */
 	var $code = 'evo_twitter';
 	var $priority = 50;
-	var $version = '3.3';
+	var $version = '4.1';
 	var $author = 'Lee Turner';
 	var $help_url = 'http://leeturner.org/twitterlution.php';
 
@@ -569,6 +569,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.28  2011/02/10 23:07:22  fplanque
+ * minor/doc
+ *
  * Revision 1.27  2010/12/17 12:16:00  sam2kb
  * Allow tweeting custom messages, not only from Item
  *

@@ -607,9 +607,9 @@ class PageCache
 
 
 	/**
-	 * Delete any file that is older than 24 hours from the whole /cache folder (recursively) 
+	 * Delete any file that is older than 24 hours from the whole /cache folder (recursively)
 	 * except index.html files and hiddenfiles (starting with .)
-	 * 
+	 *
 	 * @static
 	 *
 	 * @return string empty string on success, error message otherwise.
@@ -630,6 +630,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.26  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.25  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *

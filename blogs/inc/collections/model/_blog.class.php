@@ -300,7 +300,7 @@ class Blog extends DataObject
 			param_check_url( 'rss2_redirect', 'commenting' );
 			$this->set_setting( 'rss2_redirect', get_param( 'rss2_redirect' ) );
 		}
-		
+
 		if( param( 'image_size', 'string', NULL ) !== NULL )
 		{
 			$this->set_setting( 'image_size', get_param( 'image_size' ));
@@ -1872,7 +1872,7 @@ class Blog extends DataObject
 						WHERE blog_ID = '.$this->ID );
 			$Messages->add( sprintf(T_('The new blog has been associated with the stub file &laquo;%s&raquo;.'), $stub_filename ), 'success' );
 		}
-		else if( $this->access_type == 'relative' )
+		elseif( $this->access_type == 'relative' )
 		{ // Show error message only if stub file should exists!
 			$Messages->add( sprintf(T_('No stub file named &laquo;%s&raquo; was found. You must create it for the blog to function properly with the current settings.'), $stub_filename ), 'error' );
 		}
@@ -2347,6 +2347,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.126  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.125  2011/01/06 14:31:47  efy-asimo
  * advanced blog permissions:
  *  - add blog_edit_ts permission
@@ -2359,7 +2362,7 @@ class Blog extends DataObject
  * Do not set invalid blog_urlname, otherwise evobar displays broken blog links
  *
  * Revision 1.122  2010/10/19 02:00:53  fplanque
- * MFB
+ * allow blog deletion to take a long time...
  *
  * Revision 1.121  2010/10/13 14:07:55  efy-asimo
  * Optional paged comments in the front end

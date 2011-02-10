@@ -58,7 +58,7 @@ while( $Comment = & $CommentList->get_next() )
 	}
 	echo '<div id="comment_'.$Comment->ID.'">';
 	echo_comment( $Comment->ID, $redirect_to, $save_context );
-	echo'</div>';
+	echo '</div>';
 } //end of the loop, don't delete
 
 if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
@@ -68,6 +68,9 @@ if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
 
 /*
  * $Log$
+ * Revision 1.22  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.21  2010/09/28 13:03:16  efy-asimo
  * Paged comments on item full view
  *

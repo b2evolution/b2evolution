@@ -114,7 +114,7 @@ switch( $action )
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'collection' );
-		
+
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 		$update_redirect_url = '?ctrl=coll_settings&tab='.$tab.'&blog='.$blog;
@@ -383,6 +383,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.37  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.36  2010/10/05 12:53:46  efy-asimo
  * Move twitter_unlink into twitter_plugin
  *

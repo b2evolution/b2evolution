@@ -6,7 +6,7 @@
  *
  * @package evocore
  *
- * @version _files.install.php,v 1.3 2009/08/30 12:31:44 tblue246 Exp
+ * @version $Id$
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
@@ -51,7 +51,13 @@ $schema_queries['T_filetypes'] = array(
 
 
 /*
- * _files.install.php,v
+ * $Log$
+ * Revision 1.5  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
+ * Revision 1.4.2.3  2010/10/19 01:04:48  fplanque
+ * doc
+ *
  * Revision 1.3  2009/08/30 12:31:44  tblue246
  * Fixed CVS keywords
  *

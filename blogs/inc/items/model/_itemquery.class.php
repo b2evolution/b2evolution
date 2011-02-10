@@ -84,7 +84,7 @@ class ItemQuery extends SQL
 
 		$this->p = $p;
 		$this->title = $title;
-		
+
 		// if a post number is specified, load that post
 		if( !empty($p) )
 		{
@@ -754,6 +754,9 @@ class ItemQuery extends SQL
 
 /*
  * $Log$
+ * Revision 1.22  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.21  2010/06/07 19:00:17  sam2kb
  * Exclude current Item from related posts list
  *

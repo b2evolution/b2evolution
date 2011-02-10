@@ -228,7 +228,7 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false )
  * @param boolean overwrite
  * @param array read only file list
  */
-function verify_overwrite( $src, $dest, $action = '', $overwrite = true, &$read_only_list )
+function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read_only_list )
 {
 	$dir = opendir( $src );
 
@@ -379,8 +379,17 @@ function aliases_to_tables( $aliases )
 
 /*
  * $Log$
- * Revision 1.9  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
+ * Revision 1.10  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
+ * Revision 1.8.2.3  2010/07/14 16:13:16  fplanque
+ * cmeanup upgrade process (2nd checkin?)
+ *
+ * Revision 1.8.2.2  2010/07/13 14:44:03  fplanque
+ * cleanup uprade process
+ *
+ * Revision 1.8.2.1  2010/07/13 13:06:29  fplanque
+ * Backup messages
  *
  * Revision 1.8  2010/02/04 19:29:53  blueyed
  * wording

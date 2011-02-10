@@ -1739,6 +1739,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.75  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.74  2011/01/23 19:24:36  sam2kb
  * Fixed HTML errors in liks
  *
@@ -1769,8 +1772,8 @@ class Comment extends DataObject
  * Revision 1.65  2010/08/05 08:04:12  efy-asimo
  * Ajaxify comments on itemList FullView and commentList FullView pages
  *
- * Revision 1.64  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
+ * Revision 1.56.2.6  2010/07/19 06:13:08  efy-asimo
+ * remove get_author_ip function() from comment class
  *
  * Revision 1.63  2010/06/24 08:54:05  efy-asimo
  * PHP 4 compatibility

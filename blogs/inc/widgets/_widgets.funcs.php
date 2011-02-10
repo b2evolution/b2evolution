@@ -35,7 +35,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false )
 
 	$default_blog_param = 's:7:"blog_ID";s:0:"";';
 	if( $initial_install )
-	{	// Take pictures out of photoblog:
+	{	// In the case of initial install, we grab photos out of the photoblog (Blog #4)
 		$default_blog_param = 's:7:"blog_ID";s:1:"4";';
 	}
 
@@ -182,6 +182,9 @@ function insert_basic_widgets( $blog_id, $initial_install = false )
 
 /*
  * $Log$
+ * Revision 1.8  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.7  2011/01/06 14:48:22  efy-asimo
  * Widget initialization - fix
  *

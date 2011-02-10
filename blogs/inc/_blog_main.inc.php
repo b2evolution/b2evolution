@@ -660,17 +660,32 @@ else
 
 /*
  * $Log$
+ * Revision 1.170  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.169  2010/09/29 14:32:29  efy-asimo
  * doc and small modificaitons
  *
- * Revision 1.168  2010/09/21 14:38:20  efy-asimo
+ * Revision 1.165.2.7  2010/09/28 20:35:18  fplanque
+ * minor/doc
+ *
+ * Revision 1.165.2.6  2010/09/21 14:37:41  efy-asimo
  * Requesting a post in the wrong blog - fix
  *
- * Revision 1.167  2010/07/26 06:52:15  efy-asimo
- * MFB v-4-0
+ * Revision 1.165.2.5  2010/07/15 18:15:51  fplanque
+ * Better pagenow handling
  *
- * Revision 1.166  2010/07/14 09:06:14  efy-asimo
- * todo fp>asimo modifications
+ * Revision 1.165.2.4  2010/07/14 23:12:13  fplanque
+ * fixed homepage url resolving for index.php & blogx.php
+ *
+ * Revision 1.165.2.3  2010/07/14 16:42:16  fplanque
+ * doc
+ *
+ * Revision 1.165.2.2  2010/07/14 09:05:18  efy-asimo
+ * todo modifications
+ *
+ * Revision 1.165.2.1  2010/07/06 00:47:42  fplanque
+ * minor/doc
  *
  * Revision 1.165  2010/04/22 18:59:09  blueyed
  * Add halt_on_empty param to get_by_urltitle and use it. Bug: did when looking up single char bad URLs.

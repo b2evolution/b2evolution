@@ -1131,11 +1131,11 @@ function locales_load_available_defs()
 
 /*
  * $Log$
- * Revision 1.44  2010/10/19 02:00:54  fplanque
- * MFB
+ * Revision 1.45  2011/02/10 23:07:21  fplanque
+ * minor/doc
  *
- * Revision 1.43  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
+ * Revision 1.41.2.1  2010/07/03 23:17:47  fplanque
+ * revert unwanted
  *
  * Revision 1.42  2010/06/17 17:48:46  blueyed
  * Fix locale_from_httpaccept, complete rewrite.

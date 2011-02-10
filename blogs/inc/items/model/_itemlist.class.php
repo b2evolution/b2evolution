@@ -362,7 +362,7 @@ class ItemList2 extends ItemListLight
 
 	/**
 	 * Returns values needed to make sort links for a given column
-	 * It needs because the order is not handled by the result class.
+	 * Needed because the order is not handled by the result class.
 	 * Reason: Sometimes the item list needs to be ordered without having a display table, and columns. The result class order is based on columns.
 	 *
 	 * Returns an array containing the following values:
@@ -730,6 +730,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.38  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.37  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *

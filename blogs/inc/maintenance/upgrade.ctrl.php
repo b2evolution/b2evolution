@@ -311,11 +311,26 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.13  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.12  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *
- * Revision 1.11  2010/07/26 06:52:16  efy-asimo
- * MFB v-4-0
+ * Revision 1.10.2.5  2010/07/23 09:33:05  efy-asimo
+ * Item slug update - fix, and use b2evo's generic download mechanism in upgrade.ctrl.php
+ *
+ * Revision 1.10.2.4  2010/07/14 16:13:16  fplanque
+ * cmeanup upgrade process (2nd checkin?)
+ *
+ * Revision 1.10.2.3  2010/07/13 14:44:03  fplanque
+ * cleanup uprade process
+ *
+ * Revision 1.10.2.2  2010/07/13 13:12:47  fplanque
+ * Throw out some warnings
+ *
+ * Revision 1.10.2.1  2010/07/13 13:06:29  fplanque
+ * Backup messages
  *
  * Revision 1.10  2010/01/30 18:55:32  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)

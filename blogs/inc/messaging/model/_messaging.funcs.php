@@ -126,7 +126,7 @@ function check_blocked_contacts( $recipients_list )
 
 /**
  * Send a private message to a user
- * 
+ *
  * @param string recipient user login name
  * @param string message title/subject
  * @param string message text
@@ -173,6 +173,9 @@ function send_private_message( $recipient, $subject, $text )
 
 /*
  * $Log$
+ * Revision 1.12  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.11  2010/07/14 09:06:14  efy-asimo
  * todo fp>asimo modifications
  *

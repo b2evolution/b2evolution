@@ -43,7 +43,8 @@ if( $display_mode != 'js' )
 	$AdminUI->set_path( 'tools', 'antispam' );
 }
 else
-{
+{	// This is an Ajax response
+	// fp> TODO: have a more systematic way of handling AJAX responses
 	header_content_type( 'text/html', $io_charset );
 }
 
@@ -241,6 +242,9 @@ if( $display_mode != 'js')
 
 /*
  * $Log$
+ * Revision 1.21  2011/02/10 23:07:21  fplanque
+ * minor/doc
+ *
  * Revision 1.20  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *
