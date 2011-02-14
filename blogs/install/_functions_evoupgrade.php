@@ -2830,6 +2830,10 @@ function upgrade_b2evo_tables()
 						WHERE bloggroup_group_ID = 1' );
 	task_end();
 
+	task_begin( 'Upgrading comments table, add trash status...' );
+	$DB->query( "ALTER TABLE T_comments MODIFY COLUMN comment_status ENUM('published','deprecated','draft', 'trash') DEFAULT 'published' NOT NULL");
+	task_end();
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -3004,6 +3008,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.378  2011/02/14 14:13:24  efy-asimo
+ * Comments trash status
+ *
  * Revision 1.377  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

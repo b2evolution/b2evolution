@@ -153,6 +153,8 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 					}
 					$deprecated_comments[] = $affected_Comment;
 					break;
+				case 'trash':
+					break;
 				default:
 					debug_die( 'Invalid comment status' );
 			}
@@ -289,6 +291,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.28  2011/02/14 14:13:24  efy-asimo
+ * Comments trash status
+ *
  * Revision 1.27  2010/12/17 13:00:09  sam2kb
  * Don't make sentenses too complicated for translators, remember about declension.
  *

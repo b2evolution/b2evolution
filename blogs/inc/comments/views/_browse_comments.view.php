@@ -34,6 +34,7 @@ global $CommentList, $show_statuses;
 
 global $dispatcher;
 
+global $current_User, $admin_url;
 
 /*
  * Display comments:
@@ -47,7 +48,20 @@ if( $CommentList->is_filtered() )
 {	// List is filtered, offer option to reset filters:
 	$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3 );
 }
-$block_item_Widget->title = T_('Feedback (Comments, Trackbacks...)');
+$emptytrash_link = '';
+$trashcan_link = '';
+if( $current_User->check_perm( 'blogs', 'editall' ) )
+{
+	if( $CommentList->is_trashcan() )
+	{
+		$emptytrash_link = '<span class="emptytrash"><a href="'.$admin_url.'?ctrl=comments&amp;action=emptytrash">'.T_('Empty Trash').'</a></span> ';
+	}
+	else
+	{
+		$trashcan_link = get_trashcan_link();
+	}
+}
+$block_item_Widget->title = $trashcan_link.$emptytrash_link.T_('Feedback (Comments, Trackbacks...)');
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Display filters title
@@ -93,6 +107,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.11  2011/02/14 14:13:24  efy-asimo
+ * Comments trash status
+ *
  * Revision 1.10  2010/08/05 08:04:12  efy-asimo
  * Ajaxify comments on itemList FullView and commentList FullView pages
  *

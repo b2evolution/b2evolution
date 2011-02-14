@@ -489,6 +489,16 @@ ul.widget_list li {
 	color: #888;
 }
 
+.trashcan a {
+	float: right;
+	color: #6495ED;
+}
+
+.emptytrash a {
+	float: right;
+	color: red;
+}
+
 /*
  * Avatar selection:
  */

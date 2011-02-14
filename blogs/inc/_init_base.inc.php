@@ -252,6 +252,7 @@ $post_statuses = array (
 	'protected' => NT_('Protected'),
 	'private' => NT_('Private'),
 	'draft' => NT_('Draft'),
+	'trash' => NT_('Trash'),
 );
 
 
@@ -279,6 +280,9 @@ $Timer->pause( '_init_base' );
 
 /*
  * $Log$
+ * Revision 1.5  2011/02/14 14:13:24  efy-asimo
+ * Comments trash status
+ *
  * Revision 1.4  2010/05/02 19:03:05  fplanque
  * Made poor init a little less poor...
  *

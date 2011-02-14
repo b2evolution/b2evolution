@@ -33,6 +33,8 @@ global $AdminUI;
  */
 global $Blog;
 
+global $current_User;
+
 global $CommentList;
 
 global $show_statuses, $s, $sentence, $exact;
@@ -76,6 +78,16 @@ $Form->begin_form( '' );
 		<?php if( in_array( "deprecated", $show_statuses ) ) echo 'checked="checked" '; ?>
 	/>
 	<label for="sh_deprecated"><?php echo T_('Deprecated') ?> <span class="notes">(<?php echo T_('Not published!') ?>)</span></label><br />
+
+	<?php
+	if( $current_User->check_perm( 'blogs', 'editall', false ) )
+	{
+		echo '<input type="checkbox" name="show_statuses[]" value="trash" id="sh_trash" class="checkbox" ';
+			if( in_array( "trash", $show_statuses ) ) echo 'checked="checked" ';
+		echo '/>';
+		echo '	<label for="sh_trash">'.T_('Trash').' <span class="notes">('.T_('Deleted!').')</span></label><br />';
+	}
+	?>
 
 	</div>
 
@@ -186,6 +198,9 @@ echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.8  2011/02/14 14:13:24  efy-asimo
+ * Comments trash status
+ *
  * Revision 1.7  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

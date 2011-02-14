@@ -63,10 +63,10 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 			foreach( $postIDarray as $tmp_post_id)
 			{	// Initializes each post to nocount!
 				$cache_ctp_number[$tmp_post_id] = array(
-						'comments' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
-						'trackbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
-						'pingbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
-						'feedbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 )
+						'comments' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'trash' => 0, 'total' => 0 ),
+						'trackbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'trash' => 0, 'total' => 0 ),
+						'pingbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'trash' => 0, 'total' => 0 ),
+						'feedbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'trash' => 0, 'total' => 0 )
 					);
 			}
 
@@ -103,10 +103,10 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 
 		// Initializes post to nocount!
 		$cache_ctp_number[intval($post_id)] = array(
-				'comments' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
-				'trackbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
-				'pingbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 ),
-				'feedbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'total' => 0 )
+				'comments' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'trash' => 0, 'total' => 0 ),
+				'trackbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'trash' => 0, 'total' => 0 ),
+				'pingbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'trash' => 0, 'total' => 0 ),
+				'feedbacks' => array( 'published' => 0, 'draft' => 0, 'deprecated' => 0, 'trash' => 0, 'total' => 0 )
 			);
 
 		$query = 'SELECT comment_post_ID, comment_type, comment_status, COUNT(*) AS type_count
@@ -394,8 +394,21 @@ function add_ban_icons( $content )
 }
 
 
+/**
+ * Get trashcan link
+ */
+function get_trashcan_link()
+{
+	global $admin_url;
+	return '<span class="trashcan"><a href="'.$admin_url.'?ctrl=comments&amp;show_statuses[]=trash'.'">'.T_('Trashcan').'</a></span> ';
+}
+
+
 /*
  * $Log$
+ * Revision 1.22  2011/02/14 14:13:24  efy-asimo
+ * Comments trash status
+ *
  * Revision 1.21  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

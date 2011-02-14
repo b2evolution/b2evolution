@@ -895,9 +895,7 @@ class Comment extends DataObject
 		echo $before;
 		if( $ajax_button )
 		{
-			echo '<a href="javascript:deleteComment('.$this->ID.');" title="'.$title.'" onclick="return confirm(\'';
-			echo TS_('You are about to delete this comment!\\nThis cannot be undone!');
-			echo '\')"';
+			echo '<a href="javascript:deleteComment('.$this->ID.');" title="'.$title.'"';
 			if( !empty( $class ) ) echo ' class="'.$class.'"';
 			echo '>'.$text.'</a>';
 		}
@@ -1694,17 +1692,25 @@ class Comment extends DataObject
 	{
 		global $Plugins;
 
-		// remember ID, because parent method resets it to 0
-		$old_ID = $this->ID;
-
-		if( $r = parent::dbdelete() )
+		if( $this->status == 'trash' )
 		{
-			// re-set the ID for the Plugin event
-			$this->ID = $old_ID;
+			// remember ID, because parent method resets it to 0
+			$old_ID = $this->ID;
 
-			$Plugins->trigger_event( 'AfterCommentDelete', $params = array( 'Comment' => & $this ) );
+			if( $r = parent::dbdelete() )
+			{
+				// re-set the ID for the Plugin event
+				$this->ID = $old_ID;
 
-			$this->ID = 0;
+				$Plugins->trigger_event( 'AfterCommentDelete', $params = array( 'Comment' => & $this ) );
+
+				$this->ID = 0;
+			}
+		}
+		else
+		{ // don't delete just move to the trashcan
+			$this->set( 'status', 'trash' );
+			$r = $this->dbupdate();
 		}
 
 		return $r;
@@ -1729,6 +1735,9 @@ class Comment extends DataObject
 			case 'deprecated':
 				return 'blog_deprecated_comments';
 
+			case 'trash':
+				return 'blog_trash_comments';
+
 			default:
 				debug_die( 'Invalid comment status!' );
 		}
@@ -1739,6 +1748,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.76  2011/02/14 14:13:24  efy-asimo
+ * Comments trash status
+ *
  * Revision 1.75  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

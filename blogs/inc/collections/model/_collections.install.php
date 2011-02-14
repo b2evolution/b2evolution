@@ -193,7 +193,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_ID            int(11) unsigned NOT NULL auto_increment,
 			comment_post_ID       int(11) unsigned NOT NULL default '0',
 			comment_type          enum('comment','linkback','trackback','pingback') NOT NULL default 'comment',
-			comment_status        ENUM('published','deprecated','protected','private','draft','redirected') DEFAULT 'published' NOT NULL,
+			comment_status        ENUM('published','deprecated','draft','trash') DEFAULT 'published' NOT NULL,
 			comment_author_ID     int unsigned NULL default NULL,
 			comment_author        varchar(100) NULL,
 			comment_author_email  varchar(255) NULL,
@@ -359,6 +359,9 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.22  2011/02/14 14:13:24  efy-asimo
+ * Comments trash status
+ *
  * Revision 1.21  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

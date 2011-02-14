@@ -57,6 +57,18 @@ switch( $action )
 		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment_Item->ID, '&' ) );
 		break;
 
+	case 'trash_delete':
+		param( 'blog_ID', 'integer', 0 );
+
+		// Check permission:
+		$current_User->check_perm( 'blogs', 'editall', true );
+		break;
+
+	case 'emptytrash':
+		// Check permission:
+		$current_User->check_perm( 'blogs', 'all', true );
+		break;
+
 	case 'list':
 	  // Check permission:
 		$selected = autoselect_blog( 'blog_comments', 'edit' );
@@ -263,6 +275,57 @@ switch( $action )
 		break;
 
 
+
+	case 'trash_delete':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+
+		$query = 'SELECT T_comments.*
+					FROM T_blogs LEFT OUTER JOIN T_categories ON blog_ID = cat_blog_ID
+						LEFT OUTER JOIN T_items__item ON cat_ID = post_main_cat_ID
+						LEFT OUTER JOIN T_comments ON post_ID = comment_post_ID
+					WHERE comment_status = "trash"';
+
+		if( isset($blog_ID) && ( $blog_ID != 0 ) )
+		{
+			$query .=  'AND blog_ID='.$blog_ID;
+		}
+
+		$DB->begin();
+		$trash_comments = $DB->get_results( $query, OBJECT, 'get_trash_comments' );
+
+		$result = true;
+		foreach( $trash_comments as $row_stats )
+		{
+			$Comment = new Comment( $row_stats );
+			$result = $result && $Comment->dbdelete();
+			if( !$result )
+			{
+				$DB->rollback();
+				break;
+			}
+		}
+
+		if( $result )
+		{
+			$DB->commit();
+			$Messages->add( T_('Trash was deleted succesfull.'), 'success' );
+		}
+		else
+		{
+			$Messages->add( T_('Could not empty trashcan.'), 'error' );
+		}
+
+		header_redirect( regenerate_url( 'action', 'action=list', '', '&' ) );
+		break;
+
+	case 'emptytrash':
+		/*
+		 * Trash comments:
+		 */
+		$AdminUI->title = $AdminUI->title_titlearea = T_('Trash comments');
+		break;
+
 	case 'list':
 		/*
 		 * Latest comments:
@@ -350,6 +413,16 @@ switch( $action )
 		$AdminUI->disp_payload_end();
 		break;
 
+	case 'emptytrash':
+		// Begin payload block:
+		$AdminUI->disp_payload_begin();
+
+		// Display VIEW:
+		$AdminUI->disp_view( 'comments/views/_trash_comments.view.php' );
+
+		// End payload block:
+		$AdminUI->disp_payload_end();
+		break;
 
 	case 'list':
 	default:
@@ -387,6 +460,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.40  2011/02/14 14:13:24  efy-asimo
+ * Comments trash status
+ *
  * Revision 1.39  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

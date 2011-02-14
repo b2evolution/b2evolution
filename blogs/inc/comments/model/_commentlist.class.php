@@ -723,10 +723,27 @@ class CommentList2 extends DataObjectList2
 		return $col_sort_values;
 	}
 
+
+	/**
+	 * Checks if currently selected filter contains only comments trash status
+	 * 
+	 * @return boolean
+	 */
+	function is_trashcan()
+	{
+		if( count( $this->filters['statuses'] ) == 1 )
+		{
+			return $this->filters['statuses'][0] == 'trash';
+		}
+		return false;
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.32  2011/02/14 14:13:24  efy-asimo
+ * Comments trash status
+ *
  * Revision 1.31  2010/12/18 15:01:54  sam2kb
  * Don't display page links if requested page is out of range
  *

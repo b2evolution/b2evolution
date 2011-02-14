@@ -1022,6 +1022,7 @@ class User extends DataObject
 			case 'blog_draft_comments':
 			case 'blog_published_comments':
 			case 'blog_deprecated_comments':
+			case 'blog_trash_comments':
 			case 'blog_properties':
 			case 'blog_cats':
 			case 'blog_genstatic':
@@ -2112,6 +2113,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.91  2011/02/14 14:13:24  efy-asimo
+ * Comments trash status
+ *
  * Revision 1.90  2011/02/10 23:07:21  fplanque
  * minor/doc
  *
