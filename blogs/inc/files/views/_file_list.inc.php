@@ -436,10 +436,9 @@ $Form->begin_form();
 			}
 		}
 
-		echo action_icon( T_('Edit properties...'), 'properties', regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path() ).'&amp;'.url_crumb('file') ) );
-
 		if( $edit_perm )
 		{ // User can edit:
+			echo action_icon( T_('Edit properties...'), 'properties', regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path() ).'&amp;'.url_crumb('file') ) );
 			echo action_icon( T_('Move'), 'file_move', regenerate_url( 'fm_mode,fm_sources,fm_sources_root', 'fm_mode=file_move&amp;fm_sources[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
 			echo action_icon( T_('Copy'), 'file_copy', regenerate_url( 'fm_mode,fm_sources,fm_sources_root', 'fm_mode=file_copy&amp;fm_sources[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
 			echo action_icon( T_('Delete'), 'file_delete', regenerate_url( 'fm_selected', 'action=delete&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;'.url_crumb('file') ) );
@@ -689,6 +688,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.45  2011/02/14 15:31:43  efy-asimo
+ * files "Edit properties" needs edit permission
+ *
  * Revision 1.44  2011/01/18 16:23:03  efy-asimo
  * add shared_root perm and refactor file perms - part1
  *
