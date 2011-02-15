@@ -409,7 +409,10 @@ class Group extends DataObject
 				break;
 		}
 
-		$Debuglog->add( "Group perm $permname:$permlevel:$perm_target => ".($perm?'granted':'DENIED'), 'perms' );
+		$target_ID = $perm_target;
+		if( is_object($perm_target) ) $target_ID = $perm_target->ID;
+
+		$Debuglog->add( "Group perm $permname:$permlevel:$target_ID => ".($perm?'granted':'DENIED'), 'perms' );
 
 		return $perm;
 	}
@@ -695,6 +698,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.40  2011/02/15 05:25:58  sam2kb
+ * Fixed error "Object could not be converted to string"
+ *
  * Revision 1.39  2011/02/10 23:07:21  fplanque
  * minor/doc
  *
