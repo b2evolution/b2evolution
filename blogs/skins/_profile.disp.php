@@ -78,7 +78,7 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 	if( $Settings->get('allow_avatars') )
 	{
 		$avatar_tag = $current_User->get_avatar_imgtag();
-		if( $current_User->check_perm( 'admin', 'any' ) && $current_User->check_perm( 'files', 'view' ) )
+		if( $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) )
 		{
 			$avatar_tag .= ' <a href="'.$admin_url.'?ctrl=files&amp;user_ID='.$current_User->ID.'">'.T_('change').' &raquo;</a>';
 		}
@@ -144,6 +144,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.19  2011/02/15 15:37:00  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.18  2010/11/24 16:05:52  efy-asimo
  * User country and gender options modifications
  *

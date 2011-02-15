@@ -509,6 +509,11 @@ class collections_Module extends Module
 
 		global $Settings;
 
+		if( !$current_User->check_perm( 'admin', 'normal' ) )
+		{
+			return;
+		}
+
 		$entries = array();
 
 		if( $current_User->check_perm( 'blogs', 'create' ) || $current_User->check_perm( 'perm_createblog', 'allowed' ))
@@ -577,6 +582,11 @@ class collections_Module extends Module
 		 */
 		global $AdminUI;
 
+		if( !$current_User->check_perm( 'admin', 'normal' ) )
+		{
+			return;
+		}
+
 		$AdminUI->add_menu_entries(
 				NULL, // root
 				array(
@@ -611,6 +621,11 @@ class collections_Module extends Module
 		 * @var AdminUI_general
 		 */
 		global $AdminUI;
+
+		if( !$current_User->check_perm( 'admin', 'normal' ) )
+		{
+			return;
+		}
 
 		// BLOG SETTINGS:
 		if( $ctrl == 'collections' )
@@ -713,6 +728,11 @@ class collections_Module extends Module
 		 */
 		global $AdminUI;
 
+		if( !$current_User->check_perm( 'admin', 'normal' ) )
+		{
+			return;
+		}
+
 		if( $current_User->check_perm( 'options', 'view' ) )
 		{	// Permission to view settings:
 			$AdminUI->add_menu_entries( 'options', array(
@@ -736,6 +756,9 @@ $collections_Module = new collections_Module();
 
 /*
  * $Log$
+ * Revision 1.23  2011/02/15 15:37:00  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.22  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

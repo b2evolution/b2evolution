@@ -955,7 +955,7 @@ class User extends DataObject
 			return $this->cache_perms[$permname][$permlevel][$perm_target_ID];
 		}
 
-		$pluggable_perms = array( 'spamblacklist', 'slugs', 'templates', 'options', 'files' );
+		$pluggable_perms = array( 'admin', 'spamblacklist', 'slugs', 'templates', 'options', 'files' );
 		if( in_array( $permname, $pluggable_perms ) ) 
 		{
 			$permname = 'perm_'.$permname;
@@ -2113,6 +2113,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.94  2011/02/15 15:37:00  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.93  2011/02/15 06:13:49  sam2kb
  * strlen replaced with evo_strlen to support utf-8 logins and domain names
  *

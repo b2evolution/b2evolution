@@ -48,7 +48,6 @@ $schema_queries = array(
 		"CREATE TABLE T_groups (
 			grp_ID int(11) NOT NULL auto_increment,
 			grp_name varchar(50) NOT NULL default '',
-			grp_perm_admin enum('none','hidden','visible') NOT NULL default 'visible',
 			grp_perm_blogs enum('user','viewall','editall') NOT NULL default 'user',
 			grp_perm_bypass_antispam         TINYINT(1) NOT NULL DEFAULT 0,
 			grp_perm_xhtmlvalidation         VARCHAR(10) NOT NULL default 'always',
@@ -283,6 +282,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.54  2011/02/15 15:37:00  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.53  2010/12/24 01:47:12  fplanque
  * bump - changed user_notify default
  *

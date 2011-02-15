@@ -162,7 +162,6 @@ switch ( $action )
 
 			if( $edited_Group->ID != 1 )
 			{ // Groups others than #1 can be prevented from logging in or editing users
-				$edited_Group->set( 'perm_admin', param( 'edited_grp_perm_admin', 'string', true ) );
 				$edited_Group->set( 'perm_users', param( 'edited_grp_perm_users', 'string', true ) );
 			}
 		}
@@ -278,6 +277,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.11  2011/02/15 15:37:00  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.10  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *

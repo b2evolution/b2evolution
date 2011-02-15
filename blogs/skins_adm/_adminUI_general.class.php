@@ -177,12 +177,16 @@ class AdminUI_general extends Menu
 	*/
 	function breadcrumbpath_add( $text, $url, $help = NULL )
 	{
-		global $Blog;
+		global $Blog, $current_User;
 
 		$blog_ID = isset($Blog) ? $Blog->ID : 0;
 		$url = str_replace( '$blog$', $blog_ID, $url );
 
-		$html = '<a href="'.$url.'">'.$text.'</a>';
+		$html = $text;
+		if( $current_User->check_perm( 'admin', 'normal' ) )
+		{
+			$html = '<a href="'.$url.'">'.$text.'</a>';
+		}
 
 		if( !empty($help) )
 		{
@@ -1400,6 +1404,9 @@ class AdminUI_general extends Menu
 
 /*
  * $Log$
+ * Revision 1.113  2011/02/15 15:37:00  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.112  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *

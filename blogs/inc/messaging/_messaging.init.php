@@ -255,6 +255,11 @@ class messaging_Module extends Module
 		global $current_User;
 		global $unread_messages_count;
 
+		if( !$current_User->check_perm( 'admin', 'restricted' ) )
+		{
+			return;
+		}
+
 		$entries = array();
 
 		if( $current_User->check_perm( 'perm_messaging', 'write' ) )
@@ -307,6 +312,11 @@ class messaging_Module extends Module
 		 */
 		global $AdminUI;
 
+		if( !$current_User->check_perm( 'admin', 'restricted' ) )
+		{
+			return;
+		}
+
 		if( $current_User->check_perm( 'perm_messaging', 'write' ) )
 		{	// Permission to view messaging:
 			$AdminUI->add_menu_entries( NULL, array(
@@ -332,6 +342,9 @@ $messaging_Module = new messaging_Module();
 
 /*
  * $Log$
+ * Revision 1.20  2011/02/15 15:37:00  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.19  2010/01/30 18:55:32  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

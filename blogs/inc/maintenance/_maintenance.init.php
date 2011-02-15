@@ -157,6 +157,11 @@ class maintenance_Module extends Module
 	{
 		global $AdminUI, $current_User;
 
+		if( !$current_User->check_perm( 'admin', 'normal' ) )
+		{
+			return;
+		}
+
 		if( $current_User->check_perm( 'perm_maintenance', 'backup' ) )
 		{
 			// Display Backup tab in Tools menu
@@ -184,6 +189,9 @@ $maintenance_Module = new maintenance_Module();
 
 /*
  * $Log$
+ * Revision 1.6  2011/02/15 15:37:00  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.5  2010/01/30 18:55:32  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

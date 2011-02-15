@@ -509,8 +509,10 @@ $Form->begin_form();
 				$field_options['link'] = T_('Link files to current post');
 			}
 
-			if( $mode != 'upload' && ($fm_Filelist->get_root_type() == 'collection' || !empty($Blog)) )
+			if( $mode != 'upload' && ($fm_Filelist->get_root_type() == 'collection' || !empty($Blog))
+				&& $current_User->check_perm( 'admin', 'normal' ) )
 			{	// We are browsing files for a collection:
+				// User must have access to admin permission
 				// fp> TODO: use current as default but let user choose into which blog he wants to post
 				$field_options['make_post'] = T_('Make one post (including all images)');
 				$field_options['make_posts'] = T_('Make multiple posts (1 per image)');
@@ -688,6 +690,9 @@ $Form->begin_form();
 <?php
 /*
  * $Log$
+ * Revision 1.46  2011/02/15 15:37:00  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.45  2011/02/14 15:31:43  efy-asimo
  * files "Edit properties" needs edit permission
  *

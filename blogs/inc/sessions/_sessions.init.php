@@ -111,6 +111,11 @@ class sessions_Module extends Module
 		global $admin_url;
 		global $Blog;
 
+		if( !$current_User->check_perm( 'admin', 'normal' ) )
+		{
+			return;
+		}
+
 		if( !empty($Blog) && $current_User->check_perm( 'stats', 'list' ) )
 		{	// Permission to view stats for user's blogs:
 			$entries = array();
@@ -177,6 +182,11 @@ class sessions_Module extends Module
 		 * @var AdminUI_general
 		 */
 		global $AdminUI;
+
+		if( !$current_User->check_perm( 'admin', 'normal' ) )
+		{
+			return;
+		}
 
 		if( $current_User->check_perm( 'stats', 'list' ) )
 		{	// Permission to view stats for user's blogs:
@@ -286,6 +296,11 @@ class sessions_Module extends Module
 		 */
 		global $AdminUI;
 
+		if( !$current_User->check_perm( 'admin', 'normal' ) )
+		{
+			return;
+		}
+
 		if( $ctrl !== 'user' && $current_User->check_perm( 'stats', 'view' ) )
 		{	// Viewing aggregate + Permission to view stats for ALL blogs:
 			$sessions_menu = array(
@@ -339,6 +354,9 @@ $sessions_Module = new sessions_Module();
 
 /*
  * $Log$
+ * Revision 1.30  2011/02/15 15:37:00  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.29  2010/02/08 17:53:55  efy-yury
  * copyright 2009 -> 2010
  *

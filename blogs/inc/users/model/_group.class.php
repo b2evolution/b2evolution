@@ -55,7 +55,6 @@ class Group extends DataObject
 	 */
 	var $blog_post_statuses = array();
 
-	var $perm_admin;
 	var $perm_blogs;
 	var $perm_security;
 	var $perm_bypass_antispam = false;
@@ -97,7 +96,6 @@ class Group extends DataObject
 		{
 			// echo 'Creating blank group';
 			$this->set( 'name', T_('New group') );
-			$this->set( 'perm_admin', 'visible' );
 			$this->set( 'perm_blogs', 'user' );
 			$this->set( 'perm_stats', 'none' );
 			$this->set( 'perm_users', 'none' );
@@ -107,7 +105,6 @@ class Group extends DataObject
 			// echo 'Instanciating existing group';
 			$this->ID                           = $db_row->grp_ID;
 			$this->name                         = $db_row->grp_name;
-			$this->perm_admin                   = $db_row->grp_perm_admin;
 			$this->perm_blogs                   = $db_row->grp_perm_blogs;
 			$this->perm_bypass_antispam         = $db_row->grp_perm_bypass_antispam;
 			$this->perm_xhtmlvalidation         = $db_row->grp_perm_xhtmlvalidation;
@@ -169,6 +166,11 @@ class Group extends DataObject
 			if( $name == 'perm_createblog' || $name == 'perm_getblog' || $name == 'perm_templates' )
 			{ // These two permissions are represented by checkboxes, all other pluggable group permissions are represented by radiobox.
 				$value = param( 'edited_grp_'.$name, 'string', 'denied' );
+			}
+			else
+			if( ( $name == 'perm_admin' ) && ( $this->ID == 1 ) )
+			{ // Admin group has always admin perm, it can not be set or changed.
+				continue;
 			}
 			else
 			{
@@ -255,7 +257,7 @@ class Group extends DataObject
 			$permvalue = false; // This will result in $perm == false always. We go on for the $Debuglog..
 		}
 
-		$pluggable_perms = array( 'shared_root', 'spamblacklist', 'slugs', 'templates', 'options', 'files' );
+		$pluggable_perms = array( 'admin', 'shared_root', 'spamblacklist', 'slugs', 'templates', 'options', 'files' );
 		if( in_array( $permname, $pluggable_perms ) ) 
 		{
 			$permname = 'perm_'.$permname;
@@ -265,25 +267,6 @@ class Group extends DataObject
 		// Check group permission:
 		switch( $permname )
 		{
-			case 'admin':
-				switch( $permvalue )
-				{ // Depending on current group permission:
-
-					case 'visible':
-						// All permissions granted
-						$perm = true; // Permission granted
-						break;
-
-					case 'hidden':
-						// User can only ask for hidden perm
-						if(( $permlevel == 'hidden' ) || ( $permlevel == 'any' ))
-						{ // Permission granted
-							$perm = true;
-							break;
-						}
-				}
-				break;
-
 			case 'blogs':
 				switch( $permvalue )
 				{ // Depending on current group permission:
@@ -692,12 +675,15 @@ class Group extends DataObject
 	 */
 	function check_messaging_perm()
 	{
-		return $this->check_perm( 'perm_messaging', 'write' ) && ( $this->get( 'perm_admin' ) != 'none' );
+		return $this->check_perm( 'perm_messaging', 'write' ) && ( $this->check_perm( 'admin', 'restricted' ) );
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.41  2011/02/15 15:37:00  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.40  2011/02/15 05:25:58  sam2kb
  * Fixed error "Object could not be converted to string"
  *

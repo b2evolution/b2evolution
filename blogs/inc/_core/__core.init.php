@@ -270,6 +270,7 @@ class _core_Module extends Module
 		switch( $grp_ID )
 		{
 			case 1:		// Administrators (group ID 1) have permission by default:
+				$permadmin = 'normal';
 				$permspam = 'edit';
 				$permslugs = 'edit';
 				$permtemplates = 'allowed';
@@ -277,6 +278,7 @@ class _core_Module extends Module
 				break;
 
 			case 2:		// Privileged bloggers (group ID 2) have permission by default:
+				$permadmin = 'restricted';
 				$permspam = 'edit';
 				$permslugs = 'none';
 				$permtemplates = 'denied';
@@ -284,6 +286,7 @@ class _core_Module extends Module
 				break;
 
 			case 3:		// Bloggers (group ID 3) have permission by default:
+				$permadmin = 'restricted';
 				$permspam = 'view';
 				$permslugs = 'none';
 				$permtemplates = 'denied';
@@ -292,6 +295,7 @@ class _core_Module extends Module
 
 			default: 
 				// Other groups have no permission by default
+				$permadmin = 'none';
 				$permspam = 'none';
 				$permslugs = 'none';
 				$permtemplates = 'denied';
@@ -302,6 +306,7 @@ class _core_Module extends Module
 		// We can return as many default permissions as we want:
 		// e.g. array ( permission_name => permission_value, ... , ... )
 		return $permissions = array(
+			'perm_admin' => $permadmin,
 			'perm_spamblacklist' => $permspam,
 			'perm_slugs' => $permslugs,
 			'perm_templates' => $permtemplates,
@@ -314,7 +319,7 @@ class _core_Module extends Module
 	 *
 	 * @return array
 	 */
-	function get_available_group_permissions()
+	function get_available_group_permissions( $grp_ID = NULL )
 	{
 		$none_option = array( 'none', T_( 'No Access' ), '' );
 		$view_option = array( 'view', T_( 'View only' ), '' );
@@ -327,8 +332,34 @@ class _core_Module extends Module
 		// 'perm_block' group form block where this permissions will be displayed. Now available, the following blocks: additional, system
 		// 'options' is permission options
 		// 'perm_type' is used in the group form to decide to show radiobox or checkbox
-		// 'field_lines' is used in the group form to decide to show radio options in multiple lines or not 
+		// 'field_lines' is used in the group form to decide to show radio options in multiple lines or not
+		if( $grp_ID == 1 )
+		{
+			$perm_admin_values = array(
+				'label' => T_( 'Access to Admin area' ),
+				'perm_block' => 'core_general',
+				'perm_type' => 'info',
+				'info' => T_( 'Visible link' ),
+			);
+		}
+		else
+		{
+			$perm_admin_values = array(
+				'label' => T_( 'Access to Admin area' ),
+				'user_func'  => 'check_admin_user_perm',
+				'group_func' => 'check_admin_group_perm',
+				'perm_block' => 'core_general',
+				'options'  => array(
+					$none_option, 
+					array( 'restricted', T_( 'Restricted' ) ), 
+					array( 'normal', T_( 'Normal' ) ) ),
+				'perm_type' => 'radiobox',
+				'field_lines' => false,
+			);
+		}
+
 		$permissions = array(
+			'perm_admin' => $perm_admin_values,
 			'perm_spamblacklist' => array(
 				'label' => T_( 'Antispam' ),
 				'user_func'  => 'check_core_user_perm',
@@ -368,6 +399,35 @@ class _core_Module extends Module
 			);
 		return $permissions;
 	}
+
+
+	/**
+	 * Check admin permission for the group
+	 */
+	function check_admin_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		$perm = false;
+		switch( $permvalue )
+		{
+			case 'full':
+			case 'normal':
+				if( $permlevel == 'normal' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'restricted':
+				if( $permlevel == 'restricted' || $permlevel == 'any' )
+				{
+					$perm = true;
+					break;
+				}
+		}
+
+		return $perm;
+	}
+
 
 	/**
 	 * Check a permission for the user. ( see 'user_func' in get_available_group_permissions() function  )
@@ -440,100 +500,133 @@ class _core_Module extends Module
 
 		global $Settings;
 
-		$entries = array(
-			'b2evo' => array(
-					'text' => '<strong>b2evolution</strong>',
-					'href' => $home_url,
-				),
-			'dashboard' => array(
-					'text' => T_('Dashboard'),
-					'href' => $admin_url,
-					'title' => T_('Go to admin dashboard'),
-				),
-			'see' => array(
-					'text' => T_('See'),
-					'href' => $home_url,
-					'title' => T_('See the home page'),
-				),
-			'write' => array(
-					'text' => T_('Write'),
-					'title' => T_('No blog is currently selected'),
-					'disabled' => true,
-				),
-			'manage' => array(
-					'text' => T_('Manage'),
-					'title' => T_('No blog is currently selected'),
-					'disabled' => true,
-				),
-			'customize' => array(
-					'text' => T_('Customize'),
-					'title' => T_('No blog is currently selected'),
-					'disabled' => true,
-				),
-			'tools' => array(
-					'text' => T_('Tools'),
-					'disabled' => true,
-				),
-		);
+		$perm_admin_normal = $current_User->check_perm( 'admin', 'normal' );
+		$perm_admin_restricted = $current_User->check_perm( 'admin', 'restricted' );
+
+		if( !$perm_admin_restricted )
+		{
+			return;
+		}
+
+		if( $perm_admin_normal )
+		{
+			$entries = array(
+				'b2evo' => array(
+						'text' => '<strong>b2evolution</strong>',
+						'href' => $home_url,
+					),
+				'dashboard' => array(
+						'text' => T_('Dashboard'),
+						'href' => $admin_url,
+						'title' => T_('Go to admin dashboard'),
+					),
+				'see' => array(
+						'text' => T_('See'),
+						'href' => $home_url,
+						'title' => T_('See the home page'),
+					),
+				'write' => array(
+						'text' => T_('Write'),
+						'title' => T_('No blog is currently selected'),
+						'disabled' => true,
+					),
+				'manage' => array(
+						'text' => T_('Manage'),
+						'title' => T_('No blog is currently selected'),
+						'disabled' => true,
+					),
+				'customize' => array(
+						'text' => T_('Customize'),
+						'title' => T_('No blog is currently selected'),
+						'disabled' => true,
+					),
+				'tools' => array(
+						'text' => T_('Tools'),
+						'disabled' => true,
+					),
+			);
+		}
+		else
+		{
+			$entries = array(
+				'see' => array(
+						'text' => T_('See'),
+						'href' => $home_url,
+						'title' => T_('See the home page'),
+					),
+				'manage' => array(
+						'text' => T_('Manage'),
+						'title' => T_('No blog is currently selected'),
+						'disabled' => true,
+					),
+			);
+		}
 
 		if( !empty($Blog) )
 		{	// A blog is currently selected:
-			$entries['dashboard']['href'] = $admin_url.'?blog='.$Blog->ID;
-			$entries['see']['href'] = $Blog->get( 'url' );
-
-
-			$entries['see']['title'] = T_('See the public view of this blog');
-
-
-			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
-			{	// We have permission to add a post with at least one status:
-				$entries['write']['href'] = $admin_url.'?ctrl=items&amp;action=new&amp;blog='.$Blog->ID;
-				$entries['write']['disabled'] = false;
-				$entries['write']['title'] = T_('Write a new post into this blog');
-			}
-			else
+			if( $perm_admin_normal )
 			{
-				$entries['write']['title'] = T_('You don\'t have permission to post into this blog');
+				$entries['dashboard']['href'] = $admin_url.'?blog='.$Blog->ID;
 			}
 
+			if( $perm_admin_restricted )
+			{
+				$entries['see']['href'] = $Blog->get( 'url' );
+				$entries['see']['title'] = T_('See the public view of this blog');
+			}
 
- 			$items_url = $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=restore';
-			$entries['manage']['href'] = $items_url;
-			$entries['manage']['disabled'] = false;
-			$entries['manage']['title'] = T_('Manage the contents of this blog');
-			$entries['manage']['entries'] = array(
-					'posts' => array(
-							'text' => T_('Posts').'&hellip;',
-							'href' => $items_url.'&amp;tab=list',
-						),
-					'pages' => array(
-							'text' => T_('Pages').'&hellip;',
-							'href' => $items_url.'&amp;tab=pages',
-						),
-					'intros' => array(
-							'text' => T_('Intro posts').'&hellip;',
-							'href' => $items_url.'&amp;tab=intros',
-						),
-					'podcasts' => array(
-							'text' => T_('Podcast episodes').'&hellip;',
-							'href' => $items_url.'&amp;tab=podcasts',
-						),
-					'links' => array(
-							'text' => T_('Sidebar links').'&hellip;',
-							'href' => $items_url.'&amp;tab=links',
-						),
-				);
-			if( $Blog->get_setting( 'use_workflow' ) )
-			{	// We want to use workflow properties for this blog:
-				$entries['manage']['entries']['tracker'] = array(
-						'text' => T_('Tracker').'&hellip;',
-						'href' => $items_url.'&amp;tab=tracker',
+			if( $perm_admin_normal )
+			{
+				if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+				{	// We have permission to add a post with at least one status:
+					$entries['write']['href'] = $admin_url.'?ctrl=items&amp;action=new&amp;blog='.$Blog->ID;
+					$entries['write']['disabled'] = false;
+					$entries['write']['title'] = T_('Write a new post into this blog');
+				}
+				else
+				{
+					$entries['write']['title'] = T_('You don\'t have permission to post into this blog');
+				}
+	
+	
+	 			$items_url = $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=restore';
+				$entries['manage']['href'] = $items_url;
+				$entries['manage']['disabled'] = false;
+				$entries['manage']['title'] = T_('Manage the contents of this blog');
+				$entries['manage']['entries'] = array(
+						'posts' => array(
+								'text' => T_('Posts').'&hellip;',
+								'href' => $items_url.'&amp;tab=list',
+							),
+						'pages' => array(
+								'text' => T_('Pages').'&hellip;',
+								'href' => $items_url.'&amp;tab=pages',
+							),
+						'intros' => array(
+								'text' => T_('Intro posts').'&hellip;',
+								'href' => $items_url.'&amp;tab=intros',
+							),
+						'podcasts' => array(
+								'text' => T_('Podcast episodes').'&hellip;',
+								'href' => $items_url.'&amp;tab=podcasts',
+							),
+						'links' => array(
+								'text' => T_('Sidebar links').'&hellip;',
+								'href' => $items_url.'&amp;tab=links',
+							),
+					);
+				if( $Blog->get_setting( 'use_workflow' ) )
+				{	// We want to use workflow properties for this blog:
+					$entries['manage']['entries']['tracker'] = array(
+							'text' => T_('Tracker').'&hellip;',
+							'href' => $items_url.'&amp;tab=tracker',
+						);
+				}
+				$entries['manage']['entries']['full'] = array(
+						'text' => T_('All Items').'&hellip;',
+						'href' => $items_url.'&amp;tab=full',
 					);
 			}
-			$entries['manage']['entries']['full'] = array(
-					'text' => T_('All Items').'&hellip;',
-					'href' => $items_url.'&amp;tab=full',
-				);
 		}
 
 		// Check if user has permission for published, draft or depreceted comments (any of these)
@@ -542,7 +635,7 @@ class _core_Module extends Module
 		$perm_files    = $current_User->check_perm( 'files', 'view', false, (! empty($Blog)) ? $Blog->ID : NULL );
 		$perm_chapters = (! empty($Blog)) && $current_User->check_perm( 'blog_cats', 'edit', false, $Blog->ID );
 
-		if( $perm_comments || $perm_files || $perm_chapters )
+		if( $perm_admin_normal && ( $perm_comments || $perm_chapters ) )
 		{
 			$entries['manage']['disabled'] = false;
 
@@ -561,14 +654,6 @@ class _core_Module extends Module
 					);
 			}
 
-			if( $perm_files )
-			{	// FM enabled and permission to view files:
-				$entries['manage']['entries']['files'] = array(
-						'text' => T_('Files').'&hellip;',
-						'href' => $admin_url.'?ctrl=files&amp;blog='.$blog,
-					);
-			}
-
 			if( $perm_chapters )
 			{	// Chapters:
 				$entries['manage']['entries']['chapters'] = array(
@@ -578,9 +663,18 @@ class _core_Module extends Module
 			}
 		}
 
+		if( $perm_admin_restricted && $perm_files )
+		{
+			$entries['manage']['disabled'] = false;
 
+			// FM enabled and permission to view files:
+			$entries['manage']['entries']['files'] = array(
+					'text' => T_('Files').'&hellip;',
+					'href' => $admin_url.'?ctrl=files&amp;blog='.$blog,
+				);
+		}
 
-		if( $current_User->check_perm( 'options', 'view' ) )
+		if( $perm_admin_normal && $current_User->check_perm( 'options', 'view' ) )
 		{	// Permission to access system info
 			$entries['b2evo']['entries']['system'] = array(
 					'text' => T_('About this system').'&hellip;',
@@ -592,7 +686,7 @@ class _core_Module extends Module
 		}
 
 		// CUSTOMIZE:
-		if( !empty($Blog) && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+		if( $perm_admin_normal && !empty($Blog) && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 		{	// We have permission to edit blog properties:
 			$blog_param = '&amp;blog='.$Blog->ID;
 
@@ -629,7 +723,7 @@ class _core_Module extends Module
 		$perm_spam = $current_User->check_perm( 'spamblacklist', 'view', false );
 		$perm_options = $current_User->check_perm( 'options', 'view' );
 		$perm_slugs = $current_User->check_perm( 'slugs', 'view' );
-		if( $perm_spam || $perm_options || $perm_slugs )
+		if( $perm_admin_normal && ( $perm_spam || $perm_options || $perm_slugs ) )
 		{	// Permission to view settings:
 			if( $perm_spam )
 			{
@@ -655,7 +749,7 @@ class _core_Module extends Module
 			}
 		}
 
-		if( $debug )
+		if( $perm_admin_normal && $debug )
 		{
 			$debug_text = 'DEBUG: ';
 			if( !empty($seo_page_type) )
@@ -753,7 +847,7 @@ class _core_Module extends Module
 			);
 
 		// AB switch:
-		if( $current_User->check_perm( 'admin', 'any' ) )
+		if( $perm_admin_normal )
 		{	// User must have permission to access admin...
 			if( $is_admin_page )
 			{
@@ -812,7 +906,9 @@ class _core_Module extends Module
 		 */
 		global $AdminUI;
 
-		if( $current_User->check_perm( 'options', 'view' ) )
+		$perm_admin_normal = $current_User->check_perm( 'admin', 'normal' );
+
+		if( $perm_admin_normal && $current_User->check_perm( 'options', 'view' ) )
 		{	// Permission to view settings:
 			$AdminUI->add_menu_entries( NULL, array(
 						'options' => array(
@@ -845,7 +941,7 @@ class _core_Module extends Module
 					) );
 		}
 
-		if( $current_User->check_perm( 'users', 'view' ) )
+		if( $perm_admin_normal && $current_User->check_perm( 'users', 'view' ) )
 		{	// Permission to view users:
 			$users_entries = array(
 						'text' => T_('Users'),
@@ -929,7 +1025,7 @@ class _core_Module extends Module
 		$perm_options = $current_User->check_perm( 'options', 'view' );
 		$perm_spam = $current_User->check_perm( 'spamblacklist', 'view' );
 		$perm_slugs = $current_User->check_perm( 'slugs', 'view' );
-		if( $perm_options || $perm_spam || $perm_slugs )
+		if( $perm_admin_normal && ( $perm_options || $perm_spam || $perm_slugs ) )
 		{	// Permission to view tools, antispam or slugs.
 			$tools_entries = array( 'tools' => array(
 					'text' => T_('Tools'),
@@ -977,6 +1073,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.69  2011/02/15 15:37:00  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.68  2010/11/04 18:29:46  sam2kb
  * View personal blogs in user profile
  *

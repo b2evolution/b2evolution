@@ -96,7 +96,7 @@ function display_pluggable_permissions( &$Form, $perm_block )
 		$Module = & $GLOBALS[$module_name.'_Module'];
 		if( method_exists( $Module, 'get_available_group_permissions' ) )
 		{
-			$permissions = $Module->get_available_group_permissions();
+			$permissions = $Module->get_available_group_permissions( $edited_Group->ID );
 			if( array_key_exists( $perm_name, $permissions ) )
 			{
 				$perm = $permissions[$perm_name];
@@ -123,6 +123,10 @@ function display_pluggable_permissions( &$Form, $perm_block )
 								$perm['field_note'] = '';
 							}
 							$Form->radio( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], $perm['options'], $perm['label'], $perm['field_lines'], $perm['field_note'] );
+						break;
+
+						case 'info':
+							$Form->info( $perm['label'], $perm['info'] );
 						break;
 					}
 				}
@@ -162,18 +166,7 @@ $Form->begin_fieldset( T_('General').get_manual_link('group_properties_general')
 
 	$Form->text( 'edited_grp_name', $edited_Group->name, 50, T_('Name'), '', 50, 'large' );
 
- 	if( $edited_Group->ID != 1 )
-	{	// Groups others than #1 can be prevented from editing users
-		$Form->radio( 'edited_grp_perm_admin', $edited_Group->get('perm_admin'),
-				array(  $perm_none_option,
-								array( 'hidden', T_('Hidden (type in admin.php directly)') ),
-								array( 'visible', T_('Visible links to admin in evobar') ) // TODO: this may be obsolete, especially now we have the evobar
-							), T_('Access to Admin area'), false );
-	}
-	else
-	{	// Group #1 always has user management right:
-		$Form->info( T_('Access to Admin area'), T_('Visible link') );
-	}
+	display_pluggable_permissions( $Form, 'core_general' );
 
 $Form->end_fieldset();
 
@@ -278,6 +271,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.31  2011/02/15 15:37:00  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.30  2011/01/18 16:23:03  efy-asimo
  * add shared_root perm and refactor file perms - part1
  *

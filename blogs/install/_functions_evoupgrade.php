@@ -2834,6 +2834,29 @@ function upgrade_b2evo_tables()
 	$DB->query( "ALTER TABLE T_comments MODIFY COLUMN comment_status ENUM('published','deprecated','draft', 'trash') DEFAULT 'published' NOT NULL");
 	task_end();
 
+	task_begin( 'Upgrading groups admin access permission...' );
+	$sql = 'SELECT grp_ID, grp_perm_admin 
+				FROM T_groups';
+	$rows = $DB->get_results( $sql, OBJECT, 'Get groups admin perms' );
+	foreach( $rows as $row )
+	{
+		switch( $row->grp_perm_admin )
+		{
+			case 'visible':
+				$value = 'normal';
+				break;
+			case 'hidden':
+				$value = 'restricted';
+				break;
+			default:
+				$value = 'none';
+		}
+		$DB->query( 'INSERT INTO T_groups__groupsettings( gset_grp_ID, gset_name, gset_value )
+						VALUES( '.$row->grp_ID.', "perm_admin", "'.$value.'" )' );
+	}
+	db_drop_col( 'T_groups', 'grp_perm_admin' );
+	task_end();
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -3008,6 +3031,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.380  2011/02/15 15:37:00  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.379  2011/02/15 06:13:49  sam2kb
  * strlen replaced with evo_strlen to support utf-8 logins and domain names
  *

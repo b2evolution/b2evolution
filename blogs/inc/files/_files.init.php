@@ -345,6 +345,11 @@ class files_Module extends Module
 		 */
 		global $AdminUI;
 
+		if( !$current_User->check_perm( 'admin', 'restricted' ) )
+		{
+			return;
+		}
+
 		if( $current_User->check_perm( 'files', 'view', false, $blog ? $blog : NULL ) )
 		{	// FM enabled and permission to view files:
 			$AdminUI->add_menu_entries( NULL, array(
@@ -374,6 +379,9 @@ $files_Module = new files_Module();
 
 /*
  * $Log$
+ * Revision 1.13  2011/02/15 15:37:00  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.12  2011/01/18 16:23:02  efy-asimo
  * add shared_root perm and refactor file perms - part1
  *

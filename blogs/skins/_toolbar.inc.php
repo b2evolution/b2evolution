@@ -82,7 +82,7 @@ $Plugins->trigger_event( 'AdminAfterEvobarInit' );
 	</div>
 	<div class="actions_left">
 		<?php
-		if( $is_admin_page || $current_User->check_perm( 'admin', 'visible' ) )
+		if( $is_admin_page || $current_User->check_perm( 'admin', 'restricted' ) )
 		{ // We are already in admin or we have permission to view admin options:
 			// Display evobar menu:
 			echo $topleft_Menu->get_html_menu( NULL, 'sf-menu-left' );

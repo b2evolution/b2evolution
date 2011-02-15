@@ -88,7 +88,6 @@ function create_default_data()
 	echo 'Creating default groups... ';
 	$Group_Admins = new Group(); // COPY !
 	$Group_Admins->set( 'name', 'Administrators' );
-	$Group_Admins->set( 'perm_admin', 'visible' );
 	$Group_Admins->set( 'perm_blogs', 'editall' );
 	$Group_Admins->set( 'perm_stats', 'edit' );
 	$Group_Admins->set( 'perm_users', 'edit' );
@@ -97,7 +96,6 @@ function create_default_data()
 
 	$Group_Privileged = new Group(); // COPY !
 	$Group_Privileged->set( 'name', 'Privileged Bloggers' );
-	$Group_Privileged->set( 'perm_admin', 'visible' );
 	$Group_Privileged->set( 'perm_blogs', 'viewall' );
 	$Group_Privileged->set( 'perm_stats', 'user' );
 	$Group_Privileged->set( 'perm_users', 'view' );
@@ -106,7 +104,6 @@ function create_default_data()
 
 	$Group_Bloggers = new Group(); // COPY !
 	$Group_Bloggers->set( 'name', 'Bloggers' );
-	$Group_Bloggers->set( 'perm_admin', 'visible' );
 	$Group_Bloggers->set( 'perm_blogs', 'user' );
 	$Group_Bloggers->set( 'perm_stats', 'none' );
 	$Group_Bloggers->set( 'perm_users', 'none' );
@@ -115,7 +112,6 @@ function create_default_data()
 
 	$Group_Users = new Group(); // COPY !
 	$Group_Users->set( 'name', 'Basic Users' );
-	$Group_Users->set( 'perm_admin', 'none' );
 	$Group_Users->set( 'perm_blogs', 'user' );
 	$Group_Users->set( 'perm_stats', 'none' );
 	$Group_Users->set( 'perm_users', 'none' );
@@ -1294,6 +1290,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.302  2011/02/15 15:37:00  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.301  2011/01/06 14:31:47  efy-asimo
  * advanced blog permissions:
  *  - add blog_edit_ts permission

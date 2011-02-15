@@ -55,7 +55,7 @@ require_once $inc_path.'_main.inc.php';
 
 
 // Check global permission:
-if( ! $current_User->check_perm( 'admin', 'any' ) )
+if( ! $current_User->check_perm( 'admin', 'restricted' ) )
 {	// No permission to access admin...
 	require $adminskins_path.'_access_denied.main.php';
 }
@@ -224,6 +224,9 @@ require $inc_path.$ctrl_mappings[$ctrl];
 
 /*
  * $Log$
+ * Revision 1.38  2011/02/15 15:36:59  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.37  2010/02/08 17:50:26  efy-yury
  * copyright 2009 -> 2010
  *

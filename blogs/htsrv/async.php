@@ -46,7 +46,7 @@ require_once $inc_path.'_main.inc.php';
 param( 'action', 'string', '' );
 
 // Check global permission:
-if( empty($current_User) || ! $current_User->check_perm( 'admin', 'any' ) )
+if( empty($current_User) || ! $current_User->check_perm( 'admin', 'restricted' ) )
 {	// No permission to access admin...
 	require $adminskins_path.'_access_denied.main.php';
 }
@@ -371,6 +371,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.63  2011/02/15 15:36:59  efy-asimo
+ * Change access to admin permission
+ *
  * Revision 1.62  2010/12/14 15:29:37  efy-asimo
  * comment moderation with ajax - fix
  *
