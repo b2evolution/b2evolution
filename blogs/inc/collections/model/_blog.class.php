@@ -2338,7 +2338,7 @@ class Blog extends DataObject
 					  				INNER JOIN T_postcats ON itag_itm_ID = postcat_post_ID
 					  				INNER JOIN T_categories ON postcat_cat_ID = cat_ID
 						 WHERE cat_blog_ID = '.$this->ID.'
-						 	 AND tag_name = '.$DB->quote( strtolower($tag) );
+						 	 AND tag_name = '.$DB->quote( evo_strtolower($tag) );
 
 		return $DB->get_var( $sql );
 
@@ -2347,6 +2347,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.127  2011/02/15 05:31:53  sam2kb
+ * evo_strtolower mbstring wrapper for strtolower function
+ *
  * Revision 1.126  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

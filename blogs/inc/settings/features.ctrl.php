@@ -81,7 +81,7 @@ switch( $action )
 		$Settings->set( 'eblog_novalidatecert', $eblog_novalidatecert );
 
 		param( 'eblog_server_host', 'string', true );
-		$Settings->set( 'eblog_server_host', strtolower(trim($eblog_server_host)));
+		$Settings->set( 'eblog_server_host', evo_strtolower(trim($eblog_server_host)));
 
 		param( 'eblog_server_port', 'integer', true );
 		$Settings->set( 'eblog_server_port', $eblog_server_port );
@@ -183,6 +183,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.19  2011/02/15 05:31:53  sam2kb
+ * evo_strtolower mbstring wrapper for strtolower function
+ *
  * Revision 1.18  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *

@@ -107,7 +107,7 @@ switch( $action )
 		profile_check_params( $paramsList );
 
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
-		$login = strtolower( $login );
+		$login = evo_strtolower( $login );
 
 		$UserCache = & get_UserCache();
 		if( $UserCache->get_by_login( $login ) )
@@ -235,6 +235,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.107  2011/02/15 05:31:53  sam2kb
+ * evo_strtolower mbstring wrapper for strtolower function
+ *
  * Revision 1.106  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *

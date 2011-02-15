@@ -1671,16 +1671,7 @@ class Item extends ItemLight
 			return;
 		}
 		$this->tags = preg_split( '/\s*[;,]+\s*/', $tags, -1, PREG_SPLIT_NO_EMPTY );
-
-		if( function_exists( 'mb_strtolower' ) )
-		{	// fp> TODO: instead of those "when used" ifs, it would make more sense to redefine mb_strtolower beforehand if it doesn"t exist (it would then just be a fallback to the strtolower + a Debuglog->add() )
-			// Tblue> Note on charset: param() should have converted the tag string from $io_charset to $evo_charset.
-			array_walk( $this->tags, create_function( '& $tag', '$tag = mb_strtolower( $tag, $GLOBALS[\'evo_charset\'] );' ) );
-		}
-		else
-		{
-			array_walk( $this->tags, create_function( '& $tag', '$tag = strtolower( $tag );' ) );
-		}
+		array_walk( $this->tags, create_function( '& $tag', '$tag = evo_strtolower( $tag );' ) );
 		$this->tags = array_unique( $this->tags );
 		// pre_dump( $this->tags );
 	}
@@ -3810,7 +3801,7 @@ class Item extends ItemLight
 									 WHERE tag_name IN ('.$DB->quote($this->tags).')';
 				$existing_tags = $DB->get_col( $query, 0, 'Find existing tags' );
 
-				$new_tags = array_diff( array_map('strtolower', $this->tags), $existing_tags );
+				$new_tags = array_diff( array_map('evo_strtolower', $this->tags), $existing_tags );
 
 				if( !empty( $new_tags ) )
 				{	// insert new tags:
@@ -4545,6 +4536,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.217  2011/02/15 05:31:53  sam2kb
+ * evo_strtolower mbstring wrapper for strtolower function
+ *
  * Revision 1.216  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

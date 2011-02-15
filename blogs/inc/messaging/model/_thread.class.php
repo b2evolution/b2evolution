@@ -126,7 +126,7 @@ class Thread extends DataObject
 
 
 	/**
-	 * Check are recipients available in database
+	 * Check if recipients available in database
 	 *
 	 * @param string recipients
 	 */
@@ -142,7 +142,7 @@ class Thread extends DataObject
 			$login = trim($recipient);
 			if( ! empty( $login ) )
 			{
-				$recipients_list[] = strtolower( $login );
+				$recipients_list[] = evo_strtolower( $login );
 			}
 		}
 
@@ -319,6 +319,9 @@ class Thread extends DataObject
 
 /*
  * $Log$
+ * Revision 1.20  2011/02/15 05:31:53  sam2kb
+ * evo_strtolower mbstring wrapper for strtolower function
+ *
  * Revision 1.19  2010/01/30 18:55:32  blueyed
  * Fix "Assigning the return value of new by reference is deprecated" (PHP 5.3)
  *

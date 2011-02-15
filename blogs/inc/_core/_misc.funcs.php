@@ -633,6 +633,29 @@ function evo_bytes( $string )
 
 
 /**
+ * mbstring wrapper for strtolower function
+ *
+ * fp> TODO: instead of those "when used" ifs, it would make more sense to redefine
+ * mb_strtolower beforehand if it doesn"t exist (it would then just be a fallback
+ * to the strtolower + a Debuglog->add() )
+ *
+ * @param string
+ * @return string
+ */
+function evo_strtolower( $string )
+{
+	global $current_charset;
+
+	if( $current_charset != 'iso-8859-1' && $current_charset != '' && function_exists('mb_strtolower') )
+	{
+		return mb_strtolower( $string, $current_charset );
+	}
+
+	return strtolower($string);
+}
+
+
+/**
  * mbstring wrapper for strlen function
  *
  * @param string
@@ -4092,6 +4115,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.249  2011/02/15 05:31:53  sam2kb
+ * evo_strtolower mbstring wrapper for strtolower function
+ *
  * Revision 1.248  2011/01/10 02:24:04  sam2kb
  * Check if POSIX functions loaded
  * Fixes http://forums.b2evolution.net/viewtopic.php?t=21893

@@ -92,7 +92,7 @@ if( ! empty($login_action) || (! empty($login) && ! empty($pass)) )
 	header_nocache();		// Don't take risks here :p
 
 	// Note: login and password cannot include '<' !
-	$login = strtolower(strip_tags(remove_magic_quotes($login)));
+	$login = evo_strtolower(strip_tags(remove_magic_quotes($login)));
 	$pass = strip_tags(remove_magic_quotes($pass));
 	$pass_md5 = md5( $pass );
 
@@ -292,6 +292,9 @@ $Timer->pause( '_init_login' );
 
 /*
  * $Log$
+ * Revision 1.5  2011/02/15 05:31:53  sam2kb
+ * evo_strtolower mbstring wrapper for strtolower function
+ *
  * Revision 1.4  2010/11/18 15:09:16  efy-asimo
  * create $login_error global variable
  *

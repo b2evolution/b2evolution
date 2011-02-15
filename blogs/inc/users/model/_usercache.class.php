@@ -87,7 +87,7 @@ class UserCache extends DataObjectCache
 	{
 		// Make sure we have a lowercase login:
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes.
-		$login = strtolower( $login );
+		$login = evo_strtolower( $login );
 
 		if( !isset( $this->cache_login[$login] ) )
 		{
@@ -149,7 +149,7 @@ class UserCache extends DataObjectCache
 	{
 		if( parent::add( $Obj ) )
 		{
-			$this->cache_login[ strtolower($Obj->login) ] = & $Obj;
+			$this->cache_login[ evo_strtolower($Obj->login) ] = & $Obj;
 
 			return true;
 		}
@@ -268,6 +268,9 @@ class UserCache extends DataObjectCache
 
 /*
  * $Log$
+ * Revision 1.11  2011/02/15 05:31:53  sam2kb
+ * evo_strtolower mbstring wrapper for strtolower function
+ *
  * Revision 1.10  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
  *

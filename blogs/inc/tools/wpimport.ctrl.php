@@ -206,7 +206,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					case 'post_tag':
 						echo 'Reading tag: '.$row['name'].'<br>';
 						$tag_id = $row2['term_taxonomy_id'];
-						$tags[$tag_id]['name'] = strtolower( $row['name'] );
+						$tags[$tag_id]['name'] = evo_strtolower( $row['name'] );
 						$tags[$tag_id]['slug'] = $row['slug'];
 						$tags[$tag_id]['description'] = $row2['description'];
 						break;
@@ -577,6 +577,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <?php
 /*
  * $Log$
+ * Revision 1.10  2011/02/15 05:31:53  sam2kb
+ * evo_strtolower mbstring wrapper for strtolower function
+ *
  * Revision 1.9  2009/07/09 12:12:49  tblue246
  * a) RegExp delimiter *is* needed. b) Removed uppercase A-Z range and made RegExp case-insensitive.
  *

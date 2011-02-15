@@ -315,8 +315,8 @@ param( 'import_mode', 'string', 'normal' );
 							<?php
 							foreach( $evousers as $user )
 							{
-								?><option value="<?php echo $user->user_ID ?>"<?php if( strtolower($author) == strtolower( $user->user_login ) ) echo ' selected="selected"';
-								echo '>'.format_to_output(strtolower($user->user_login), 'formvalue').'</option>';
+								?><option value="<?php echo $user->user_ID ?>"<?php if( evo_strtolower($author) == evo_strtolower( $user->user_login ) ) echo ' selected="selected"';
+								echo '>'.format_to_output(evo_strtolower($user->user_login), 'formvalue').'</option>';
 							}
 						?></select>
 						<input type="text" value="<?php echo format_to_output($author, 'formvalue') ?>" name="user_name[]" maxlength="30" class="input" />
@@ -886,7 +886,7 @@ param( 'import_mode', 'string', 'normal' );
 						if( ! $item_Author )
 						{
 							$item_Author = new User();
-							$item_Author->set('login', strtolower($usersmapped[ $post_author ][1]));
+							$item_Author->set('login', evo_strtolower($usersmapped[ $post_author ][1]));
 							$item_Author->set('nickname', $usersmapped[ $post_author ][1]);
 							$item_Author->set('pass', md5( $default_password ));
 							$item_Author->set('level', $default_userlevel);
@@ -1674,6 +1674,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.20  2011/02/15 05:31:53  sam2kb
+ * evo_strtolower mbstring wrapper for strtolower function
+ *
  * Revision 1.19  2010/05/22 12:22:49  efy-asimo
  * move $allow_cross_posting in the backoffice
  *

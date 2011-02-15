@@ -261,7 +261,7 @@ class User extends DataObject
 		$edited_user_login = param( 'edited_user_login', 'string' );
 		param_check_not_empty( 'edited_user_login', T_( 'You must provide a login!' ) );
 		// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
-		$this->set_from_Request( 'login', 'edited_user_login', true, 'strtolower' );
+		$this->set_from_Request( 'login', 'edited_user_login', true, 'evo_strtolower' );
 
 		// ******* Identity form ******* //
 
@@ -2113,6 +2113,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.92  2011/02/15 05:31:53  sam2kb
+ * evo_strtolower mbstring wrapper for strtolower function
+ *
  * Revision 1.91  2011/02/14 14:13:24  efy-asimo
  * Comments trash status
  *

@@ -322,7 +322,7 @@ function processAttachments( $mailAttachments, $mediadir, $media_url, $add_img_t
 
 	foreach( $mailAttachments as $attachment )
 	{
-		$filename = strtolower( $attachment['FileName'] );
+		$filename = evo_strtolower( $attachment['FileName'] );
 		if( $filename == '' )
 		{
 			$filename = tempnam( $mediadir, 'upload' ) . '.' . $attachment['SubType'];
@@ -723,6 +723,9 @@ if( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.47  2011/02/15 05:31:53  sam2kb
+ * evo_strtolower mbstring wrapper for strtolower function
+ *
  * Revision 1.46  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *
