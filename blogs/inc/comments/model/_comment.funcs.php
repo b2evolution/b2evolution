@@ -354,7 +354,7 @@ function add_ban_icons( $content )
 		}
 
 		$pos = strpos( $content, $url, $from );
-		$length = strlen($url);
+		$length = evo_strlen($url);
 		$i++;
 
 		// check img tags
@@ -406,6 +406,9 @@ function get_trashcan_link()
 
 /*
  * $Log$
+ * Revision 1.23  2011/02/15 06:13:49  sam2kb
+ * strlen replaced with evo_strlen to support utf-8 logins and domain names
+ *
  * Revision 1.22  2011/02/14 14:13:24  efy-asimo
  * Comments trash status
  *

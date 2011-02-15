@@ -560,7 +560,7 @@ class User extends DataObject
 
 			case 'userurl>userpage':
 				// We give priority to user submitted url:
-				if( strlen($this->url)>10 )
+				if( evo_strlen($this->url) > 10 )
 				{
 					$url = $this->url;
 				}
@@ -2113,6 +2113,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.93  2011/02/15 06:13:49  sam2kb
+ * strlen replaced with evo_strlen to support utf-8 logins and domain names
+ *
  * Revision 1.92  2011/02/15 05:31:53  sam2kb
  * evo_strtolower mbstring wrapper for strtolower function
  *

@@ -726,7 +726,7 @@ function make_rel_links_abs( $s, $host = NULL )
  */
 function disp_url( $url, $max_length = NULL )
 {
-	if( !empty($max_length) && strlen($url) > $max_length )
+	if( !empty($max_length) && evo_strlen($url) > $max_length )
 	{
 		$disp_url = htmlspecialchars(substr( $url, 0, $max_length-1 )).'&hellip;';
 	}
@@ -824,6 +824,9 @@ function idna_decode( $url )
 
 /* {{{ Revision log:
  * $Log$
+ * Revision 1.53  2011/02/15 06:13:49  sam2kb
+ * strlen replaced with evo_strlen to support utf-8 logins and domain names
+ *
  * Revision 1.52  2010/07/26 06:52:15  efy-asimo
  * MFB v-4-0
  *

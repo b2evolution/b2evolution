@@ -358,7 +358,7 @@ function upgrade_b2evo_tables()
 				continue;
 			}
 			// crop off the baseurl:
-			$blog_siteurl = substr( $blog_siteurl.'/', strlen( $baseurl) );
+			$blog_siteurl = evo_substr( $blog_siteurl.'/', evo_strlen($baseurl) );
 			// echo ' -> ', $blog_siteurl,'<br />';
 
 			$query_update_blog = "UPDATE T_blogs SET blog_siteurl = '$blog_siteurl' WHERE blog_ID = $blog_ID";
@@ -3008,6 +3008,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.379  2011/02/15 06:13:49  sam2kb
+ * strlen replaced with evo_strlen to support utf-8 logins and domain names
+ *
  * Revision 1.378  2011/02/14 14:13:24  efy-asimo
  * Comments trash status
  *

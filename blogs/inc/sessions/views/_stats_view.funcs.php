@@ -44,9 +44,9 @@ function stats_format_req_URI( $hit_blog_ID, $hit_uri, $max_len = 40 )
 		$full_url = $hit_uri;
 	}
 
-	if( strlen($hit_uri) > $max_len )
+	if( evo_strlen($hit_uri) > $max_len )
 	{
-		$hit_uri = '...'.substr( $hit_uri, -$max_len );
+		$hit_uri = '...'.evo_substr( $hit_uri, -$max_len );
 	}
 
 	return '<a href="'.$full_url.'">'.$hit_uri.'</a>';
@@ -72,6 +72,9 @@ function stat_session_login( $login )
 
 /*
  * $Log$
+ * Revision 1.11  2011/02/15 06:13:49  sam2kb
+ * strlen replaced with evo_strlen to support utf-8 logins and domain names
+ *
  * Revision 1.10  2010/02/08 17:53:55  efy-yury
  * copyright 2009 -> 2010
  *

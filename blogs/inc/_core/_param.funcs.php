@@ -1166,7 +1166,7 @@ function param_check_passwords( $var1, $var2, $required = false, $min_length = 6
 		return false;
 	}
 
-	if( strlen($pass1) < $min_length )
+	if( evo_strlen($pass1) < $min_length )
 	{
 		param_error_multiple( array( $var1, $var2), sprintf( T_('The minimum password length is %d characters.'), $min_length ) );
 		return false;
@@ -2121,6 +2121,9 @@ function isset_param( $var )
 
 /*
  * $Log$
+ * Revision 1.67  2011/02/15 06:13:49  sam2kb
+ * strlen replaced with evo_strlen to support utf-8 logins and domain names
+ *
  * Revision 1.66  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *

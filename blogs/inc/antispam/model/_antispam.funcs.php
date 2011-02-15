@@ -325,7 +325,7 @@ function get_ban_domain( $url )
 		return false;
 	}
 
-	if( strlen( $base_domain ) < strlen( $domain ) )
+	if( evo_strlen( $base_domain ) < evo_strlen( $domain ) )
 	{	// The guy is spamming with subdomains (or www):
 		return '.'.$base_domain;
 	}
@@ -458,6 +458,9 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 
 /*
  * $Log$
+ * Revision 1.17  2011/02/15 06:13:49  sam2kb
+ * strlen replaced with evo_strlen to support utf-8 logins and domain names
+ *
  * Revision 1.16  2010/10/19 02:00:53  fplanque
  * MFB
  *
