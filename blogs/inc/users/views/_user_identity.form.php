@@ -349,6 +349,10 @@ else
 if( $action != 'view' )
 { // We can edit the values:
 
+	if( $has_full_access )
+	{
+		$Form->text_input( 'edited_user_source', $edited_User->source, 30, T_('Source'), '', array( 'maxlength' => 30 ) );
+	}
 	$Form->text_input( 'edited_user_url', $edited_User->url, 30, T_('URL'), $url_fieldnote, array( 'maxlength' => 100 ) );
 	$Form->text_input( 'edited_user_icq', $edited_User->icq, 30, T_('ICQ'), $icq_fieldnote, array( 'maxlength' => 10 ) );
 	$Form->text_input( 'edited_user_aim', $edited_User->aim, 30, T_('AIM'), $aim_fieldnote, array( 'maxlength' => 50 ) );
@@ -492,6 +496,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.20  2011/02/17 14:56:38  efy-asimo
+ * Add user source param
+ *
  * Revision 1.19  2010/11/24 14:55:30  efy-asimo
  * Add user gender
  *

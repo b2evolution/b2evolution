@@ -299,6 +299,18 @@ if( isset($collections_Module) )
 						);
 }
 
+if( $current_User->check_perm( 'users', 'edit', false ) )
+{
+	$Results->cols[] = array(
+						'th' => T_('Source'),
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'center',
+						'order' => 'user_source',
+						'default_dir' => 'D',
+						'td' => '$user_source$',
+					);
+}
+
 if( ! $current_User->check_perm( 'users', 'edit', false ) )
 {
 	$Results->cols[] = array(
@@ -373,6 +385,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.29  2011/02/17 14:56:38  efy-asimo
+ * Add user source param
+ *
  * Revision 1.28  2011/01/07 14:36:15  efy-asimo
  * Display Gender $ Country on user list
  *

@@ -2857,6 +2857,10 @@ function upgrade_b2evo_tables()
 	db_drop_col( 'T_groups', 'grp_perm_admin' );
 	task_end();
 
+	task_begin( 'Upgrading users table, add users source...' );
+	db_add_col( 'T_users', 'user_source', 'varchar(30) NULL' );
+	task_end();
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -3031,6 +3035,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.381  2011/02/17 14:56:38  efy-asimo
+ * Add user source param
+ *
  * Revision 1.380  2011/02/15 15:37:00  efy-asimo
  * Change access to admin permission
  *

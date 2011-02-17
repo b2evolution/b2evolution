@@ -67,6 +67,7 @@ class User extends DataObject
 	var $level;
 	var $avatar_file_ID;
 	var $ctry_ID;
+	var $source;
 
 	/**
 	 * Does the user accept messages?
@@ -241,6 +242,7 @@ class User extends DataObject
 			$this->gender = $db_row->user_gender;
 			$this->avatar_file_ID = $db_row->user_avatar_file_ID;
 			$this->ctry_ID = $db_row->user_ctry_ID;
+			$this->source = $db_row->user_source;
 
 			// Group for this user:
 			$this->group_ID = $db_row->user_grp_ID;
@@ -387,6 +389,12 @@ class User extends DataObject
 
 			param( 'edited_user_gender', 'string', '' );
 			$this->set_from_Request('gender', 'edited_user_gender', true);
+
+			if( $is_identity_form && $current_User->check_perm( 'users', 'edit' ) )
+			{
+				param( 'edited_user_source', 'string', true );
+				$this->set_from_Request('source', 'edited_user_source', true);
+			}
 
 			param( 'edited_user_url', 'string', true );
 			param_check_url( 'edited_user_url', 'commenting' );
@@ -2113,6 +2121,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.95  2011/02/17 14:56:38  efy-asimo
+ * Add user source param
+ *
  * Revision 1.94  2011/02/15 15:37:00  efy-asimo
  * Change access to admin permission
  *

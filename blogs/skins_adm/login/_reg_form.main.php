@@ -45,7 +45,8 @@ $Form = new Form( $htsrv_url_sensitive.'register.php', '', 'post', 'fieldset' );
 $Form->begin_form( 'fform' );
 
 $Form->add_crumb( 'regform' );
-$Form->hidden( 'action', 'register');
+$Form->hidden( 'action', 'register' );
+$Form->hidden( 'source', $source );
 $Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
 
 $Form->begin_fieldset();
@@ -103,6 +104,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.16  2011/02/17 14:56:38  efy-asimo
+ * Add user source param
+ *
  * Revision 1.15  2010/11/24 16:05:52  efy-asimo
  * User country and gender options modifications
  *
