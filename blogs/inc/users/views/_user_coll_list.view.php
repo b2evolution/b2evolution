@@ -6,16 +6,7 @@
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
  * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
  *
- * {@internal Open Source relicensing agreement:
- * Daniel HAHLER grants Francois PLANQUE the right to license
- * Daniel HAHLER's contributions to this file and the b2evolution project
- * under any OSI approved OSS license (http://www.opensource.org/licenses/).
- * }}
- *
  * @package admin
- * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
- * @author blueyed: Daniel HAHLER
- * @author fplanque: Francois PLANQUE.
  *
  * @version $Id$
  */
@@ -130,6 +121,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.2  2011/02/20 22:31:39  fplanque
+ * minor / doc
+ *
  * Revision 1.1  2010/11/04 18:29:46  sam2kb
  * View personal blogs in user profile
  *

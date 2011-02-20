@@ -60,7 +60,9 @@ switch( $action )
 
 		// TODO: to give the user feedback through Messages, we would need to start a new $Session here and append $Messages to it.
 		
-		if( $redirect_to == $ReqURI ) $redirect_to = $baseurl;
+		// Redirect to $baseurl on logout if redirect URI is not set. Temporarily fix until we remove actions from redirect URIs
+		if( $redirect_to == $ReqURI ) 
+			$redirect_to = $baseurl;
 		
 		header_redirect(); // defaults to redirect_to param and exits
 		/* exited */
@@ -416,6 +418,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.113  2011/02/20 22:31:38  fplanque
+ * minor / doc
+ *
  * Revision 1.112  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *

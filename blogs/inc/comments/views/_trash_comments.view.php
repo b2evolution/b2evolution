@@ -6,7 +6,6 @@
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
  * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}.
- * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -78,6 +77,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.2  2011/02/20 22:31:39  fplanque
+ * minor / doc
+ *
  * Revision 1.1  2011/02/14 14:15:23  efy-asimo
  * Comments trash status
  *
