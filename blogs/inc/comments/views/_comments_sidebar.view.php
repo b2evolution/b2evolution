@@ -83,7 +83,8 @@ $Form->begin_form( '' );
 	if( $current_User->check_perm( 'blogs', 'editall', false ) )
 	{
 		echo '<input type="checkbox" name="show_statuses[]" value="trash" id="sh_trash" class="checkbox" ';
-			if( in_array( "trash", $show_statuses ) ) echo 'checked="checked" ';
+		if( in_array( "trash", $show_statuses ) ) 
+			echo 'checked="checked" ';
 		echo '/>';
 		echo '	<label for="sh_trash">'.T_('Trash').' <span class="notes">('.T_('Deleted!').')</span></label><br />';
 	}
@@ -198,6 +199,9 @@ echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.9  2011/02/20 23:37:06  fplanque
+ * minor/doc
+ *
  * Revision 1.8  2011/02/14 14:13:24  efy-asimo
  * Comments trash status
  *

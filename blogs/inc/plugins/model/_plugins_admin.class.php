@@ -324,7 +324,8 @@ class Plugins_admin extends Plugins
 		$subdirs = array();
 		$subdirs = get_filenames( $this->plugins_path, false, true, true, false );
 		
-		if( empty($subdirs) ) return;
+		if( empty($subdirs) ) 
+			return;
 
 		// Skip plugins which are in a directory that starts with an underscore ("_")
 		foreach( $subdirs as $k => $v )
@@ -340,7 +341,8 @@ class Plugins_admin extends Plugins
 		foreach( $subdirs as $subdir )
 		{
 			// Some directories may be unreadable ( get_filenames returns false which is not an array )
-			if( !$files = get_filenames( $subdir, true, false, true, false ) ) continue;
+			if( !$files = get_filenames( $subdir, true, false, true, false ) ) 
+				continue;
 
 			foreach( $files as $filename )
 			{
@@ -1486,6 +1488,9 @@ class Plugins_admin extends Plugins
 
 /*
  * $Log$
+ * Revision 1.36  2011/02/20 23:37:06  fplanque
+ * minor/doc
+ *
  * Revision 1.35  2011/01/11 05:39:50  sam2kb
  * Additional checks in plugins discover function
  *

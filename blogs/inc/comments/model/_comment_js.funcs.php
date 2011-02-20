@@ -214,7 +214,7 @@ function startRefreshComments( item_id, currentpage )
 function endRefreshComments( result )
 {
 	$('#comments_container').html(result);
-		$('#comments_container').fadeTo( "slow", 1 );
+	$('#comments_container').fadeTo( "slow", 1 );
 }
 
 function get_current_page()
