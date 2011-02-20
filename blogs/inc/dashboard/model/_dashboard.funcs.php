@@ -36,14 +36,6 @@ function b2evonet_get_updates( $force_short_delay = false )
 	if( ! isset( $allow_evo_stats ) )
 	{	// Set default value:
 		$allow_evo_stats = true; // allow (non-anonymous) stats
-		
-		if( (preg_match( '~^https?://localhost[/:]~', $baseurl)
-				|| preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) /* domain ending in ".local" */
-			&& $evonetsrv_host != 'localhost'	// OK if we are pinging locally anyway ;)
-			)
-		{
-			$allow_evo_stats = false; // disable stats/updates if running on localhost
-		}
 	}
 	if( $allow_evo_stats === false )
 	{ // Get outta here as fast as you can, EdB style:
@@ -297,8 +289,8 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
- * Revision 1.40  2011/01/03 03:00:43  sam2kb
- * Disable stats/updates if running on localhost.
+ * Revision 1.41  2011/02/20 23:33:20  fplanque
+ * I want updates to run on my localhost
  *
  * Revision 1.39  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
