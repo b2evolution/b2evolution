@@ -27,6 +27,10 @@ load_class( 'regional/model/_country.class.php', 'Country' );
 * @var Blog
 */
 global $Blog;
+/**
+ * @var GeneralSettings
+ */
+global $Settings;
 
 $user_ID = param( 'user_ID', 'integer', '' );
 if( empty($user_ID) )
@@ -97,7 +101,10 @@ $ProfileForm->end_fieldset();
 
 
 $ProfileForm->begin_fieldset( T_('Additional info') );
-
+	if( ( $Settings->get( 'registration_require_gender' ) != 'hidden' ) && ( $User->get( 'gender' ) !== NULL ) )
+	{
+		$ProfileForm->info( T_('Gender'), $User->gender() );
+	}
 	// Load the user fields:
 	$User->userfields_load();
 
@@ -125,6 +132,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.20  2011/02/21 15:25:27  efy-asimo
+ * Display user gender
+ *
  * Revision 1.19  2010/11/24 15:27:18  efy-asimo
  * Add country to disp=user page
  *

@@ -1935,6 +1935,23 @@ class User extends DataObject
 
 
 	/**
+	 * Return gender of the user
+	 */
+	function gender()
+	{
+		switch( $this->gender )
+		{
+			case 'M':
+				return T_('Male');
+			case 'F':
+				return T_('Female');
+		}
+
+		return NULL;
+	}
+
+
+	/**
 	 * Template function: display email of the user
 	 */
 	function email( $format = 'htmlbody' )
@@ -2121,6 +2138,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.96  2011/02/21 15:25:26  efy-asimo
+ * Display user gender
+ *
  * Revision 1.95  2011/02/17 14:56:38  efy-asimo
  * Add user source param
  *
