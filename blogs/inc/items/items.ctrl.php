@@ -1106,19 +1106,25 @@ switch( $action )
 			case 'update_edit':
 			case 'update': // on error
 			case 'update_publish': // on error
-				if( ! $current_User->check_perm( 'blog_del_post', 'any', false, $edited_Item->get_blog_ID() ) )
-				{ // User has no right to delete this post
-					break;
-				}
-				$AdminUI->global_icon( T_('Delete this post'), 'delete', '?ctrl=items&amp;action=delete&amp;post_ID='.$edited_Item->ID.'&amp;'.url_crumb('item'),
-						 T_('delete'), 4, 3, array(
+				if( $current_User->check_perm( 'blog_del_post', 'any', false, $edited_Item->get_blog_ID() ) )
+				{	// User has permissions to delete this post
+					$AdminUI->global_icon( T_('Delete this post'), 'delete', '?ctrl=items&amp;action=delete&amp;post_ID='.$edited_Item->ID.'&amp;'.url_crumb('item'),
+						 ' '.T_('Delete'), 4, 3, array(
 						 		'onclick' => 'return confirm(\''.TS_('You are about to delete this post!\\nThis cannot be undone!').'\')',
 						 		'style' => 'margin-right: 3ex;',	// Avoid misclicks by all means!
+								'class' => 'DeleteButton',
+						 ) );
+				}
+
+				$AdminUI->global_icon( T_('Permanent link to full entry'), 'permalink', $edited_Item->get_permanent_url(),
+						' '.T_('Permalink'), 4, 3, array(
+						 		'style' => 'margin-right: 3ex',
+								'class' => 'ActionButton',
 						 ) );
 				break;
 		}
 
-		$AdminUI->global_icon( T_('Cancel editing!'), 'close', $redirect_to, T_('cancel'), 4, 2 );
+		$AdminUI->global_icon( T_('Cancel editing!'), 'close', $redirect_to, T_('Cancel'), 4, 2 );
 
 		break;
 
@@ -1386,6 +1392,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.108  2011/02/21 06:46:52  sam2kb
+ * Added permalink button to item edit form
+ *
  * Revision 1.107  2011/01/06 14:31:47  efy-asimo
  * advanced blog permissions:
  *  - add blog_edit_ts permission
