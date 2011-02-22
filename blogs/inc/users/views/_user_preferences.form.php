@@ -253,7 +253,7 @@ $Form->end_fieldset();
 	/***************  Admin skin settings  **************/
 // asimo> this div is need to make sure the settings show/hide js part always work without reference to the AdminUI.
 echo '<div id="admin_skin_settings_div">';
-	$AdminUI->display_skin_settings( & $Form, $edited_User->ID );
+	$AdminUI->display_skin_settings( $Form, $edited_User->ID );
 echo '</div>';
 
 	/***************  Plugins  **************/
@@ -330,6 +330,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.15  2011/02/22 16:00:31  efy-asimo
+ * fix deprecated warning
+ *
  * Revision 1.14  2010/11/22 13:44:33  efy-asimo
  * Admin skin preferences update
  *
