@@ -502,11 +502,7 @@ class _core_Module extends Module
 
 		$perm_admin_normal = $current_User->check_perm( 'admin', 'normal' );
 		$perm_admin_restricted = $current_User->check_perm( 'admin', 'restricted' );
-
-		if( !$perm_admin_restricted )
-		{
-			return;
-		}
+		$entries = NULL;
 
 		if( $perm_admin_normal )
 		{
@@ -546,7 +542,7 @@ class _core_Module extends Module
 					),
 			);
 		}
-		else
+		elseif( $perm_admin_restricted )
 		{
 			$entries = array(
 				'see' => array(
@@ -774,7 +770,10 @@ class _core_Module extends Module
 				);
 		}
 
-		$topleft_Menu->add_menu_entries( NULL, $entries );
+		if( $entries !== NULL )
+		{
+			$topleft_Menu->add_menu_entries( NULL, $entries );
+		}
 
 
 
@@ -1073,6 +1072,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.70  2011/02/22 06:51:06  efy-asimo
+ * Fix right menu
+ *
  * Revision 1.69  2011/02/15 15:37:00  efy-asimo
  * Change access to admin permission
  *
