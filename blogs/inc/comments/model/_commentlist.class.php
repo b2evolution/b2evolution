@@ -608,6 +608,8 @@ class CommentList2 extends DataObjectList2
 	
 	/**
 	 * Template tag
+	 *
+	 * Display page links (when paginated comments are enabled)
 	 */
 	function page_links( $params = array() )
 	{
@@ -661,7 +663,7 @@ class CommentList2 extends DataObjectList2
 
 	/**
 	 * Returns values needed to make sort links for a given column
-	 * It needs because the order is not handled by the result class.
+	 * This is needed because the order is not handled by the result class.
 	 * Reason: Sometimes the comment list needs to be ordered without having a display table, and columns. The result class order is based on columns.
 	 *
 	 * Returns an array containing the following values:
@@ -741,6 +743,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.33  2011/02/23 21:45:18  fplanque
+ * minor / cleanup
+ *
  * Revision 1.32  2011/02/14 14:13:24  efy-asimo
  * Comments trash status
  *

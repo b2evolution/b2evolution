@@ -405,7 +405,8 @@ function strmaxlen( $str, $maxlen = 50, $tail = NULL, $format = 'raw', $cut_at_w
 
 	if( evo_strlen( $str ) > $maxlen )
 	{
-		// Replace all HTML entities by a single char. html_entity_decode for example would not handle &hellip;.
+		// Replace all HTML entities by a single char. html_entity_decode for example
+		// would not handle &hellip;.
 		$tail_for_length = preg_replace('~&\w+?;~', '.', $tail);
 		$tail_length = evo_strlen( html_entity_decode($tail_for_length) );
 		$len = $maxlen-$tail_length;
@@ -4115,6 +4116,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.250  2011/02/23 21:45:18  fplanque
+ * minor / cleanup
+ *
  * Revision 1.249  2011/02/15 05:31:53  sam2kb
  * evo_strtolower mbstring wrapper for strtolower function
  *

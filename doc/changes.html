@@ -34,15 +34,24 @@
 			<p>Skins and plugins from v2 &amp; v3 are compatible with v4 and should run without problems.</p>
 			<h2>4.1.0-beta</h2>
 			<ul>
-            	<li>Gender property for users (@evofactory)</li>
             	<li>Comments:
             	  <ul>
             	    <li>Comments can now be deleted with a single click... but they remain in the &quot;Recycle bin&quot; so they can be recovered if needed. (@evofactory)</li>
             	    <li>Comments can now optionally be paged in the front end (@sam2kb)</li>
             	    <li>Default avatars can be configured do different graphic styles: b2evo default, Gravatar, Identicon, Monsterid or Wavatar (@sam2kb)</li>
-          	      </ul>
+          	    </ul>
             	</li>
-            	<li>User registration form accepts a source param  (@evofactory)</li>
+            	<li>User management:
+            	  <ul>
+            	    <li>Gender property for users (@evofactory)</li>
+            	    <li>Show Gender &amp; Country in user list (@evofactory)</li>
+            	    <li>Show confirmed status in user list (@sam2kb)</li>
+            	    <li>registration form accepts a source param. ?source=... that will be attached to the new user profile (30 characters max). Can be used for tracking newsletter or ad returns. (@evofactory)</li>
+            	    <li>Specific user groups can be given permission to access the shared file root or not. (@evofactory)</li>
+                    <li>View personal blogs in user profile (backoffice) (@sam2kb)</li>
+                    <li>Full support of non-ASCII usernames/logins (@sam2kb)</li>
+          	      </ul>
+          	  </li>
            	  <li>User permissions on blogs:
            	    <ul>
            	      <li>Advanced user permissions screen has been refactored       	          </li>
@@ -55,13 +64,11 @@
            	      <li>Added possibility to define new blog types in a plugin so that users can create blogs with preconfigured settings for specific tasks. Install the test plugin for a demo implementation of this. (@sam2kb)</li>
        	        </ul>
            	  </li>
-           	  <li>Specific user groups can be given permission to access the shared file root or not. (@evofactory)</li>
+           	  <li>Autocompletion when adding tags to a post (@blueyed)</li>
            	  <li>Bugfixes (@sam2kb, @blueyed)</li>
-	          <li>View personal blogs in user profile (backoffice) (@sam2kb)</li>
-    	      <li>Basic antispam plugin: remove repetitive characters, trim whitespace and disable URLs from non-registered visitors (@sam2kb)</li>
-			  <li>Full support of non-ASCII usernames/logins (@sam2kb)</li>
+    	      <li>Basic antispam plugin: remove repetitive characters and trim whitespace (@sam2kb)</li>
             </ul>
-			<h2>4.0.2-beta</h2>
+<h2>4.0.2-beta</h2>
             <ul>
               <li>Fixed tinyurls (@evofactory)</li>
               <li>Allow closing of antispam popup by pressing Escape (@evofactory)</li>

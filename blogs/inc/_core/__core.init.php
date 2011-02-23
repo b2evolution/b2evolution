@@ -278,7 +278,7 @@ class _core_Module extends Module
 				break;
 
 			case 2:		// Privileged bloggers (group ID 2) have permission by default:
-				$permadmin = 'restricted';
+				$permadmin = 'normal';
 				$permspam = 'edit';
 				$permslugs = 'none';
 				$permtemplates = 'denied';
@@ -286,7 +286,7 @@ class _core_Module extends Module
 				break;
 
 			case 3:		// Bloggers (group ID 3) have permission by default:
-				$permadmin = 'restricted';
+				$permadmin = 'normal';
 				$permspam = 'view';
 				$permslugs = 'none';
 				$permtemplates = 'denied';
@@ -1072,6 +1072,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.71  2011/02/23 21:45:18  fplanque
+ * minor / cleanup
+ *
  * Revision 1.70  2011/02/22 06:51:06  efy-asimo
  * Fix right menu
  *

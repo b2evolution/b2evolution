@@ -1131,11 +1131,7 @@ class User extends DataObject
 				break;
 
 			// asimo> edit_timestamp permission was converted to blog_edit_ts permission
-			/*case 'edit_timestamp':
-				// Global permission to edit timestamps...
-				// fp> TODO: merge below
-				$perm = ($this->level >= 5);
-				break;*/
+
 
 			// asimo> files permission was converted to pluggable permission
 			/*case 'files':
@@ -1943,6 +1939,7 @@ class User extends DataObject
 		{
 			case 'M':
 				return T_('Male');
+
 			case 'F':
 				return T_('Female');
 		}
@@ -2138,6 +2135,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.97  2011/02/23 21:45:18  fplanque
+ * minor / cleanup
+ *
  * Revision 1.96  2011/02/21 15:25:26  efy-asimo
  * Display user gender
  *

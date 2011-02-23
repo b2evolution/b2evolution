@@ -251,7 +251,7 @@ else
 $Form->end_fieldset();
 
 	/***************  Admin skin settings  **************/
-// asimo> this div is need to make sure the settings show/hide js part always work without reference to the AdminUI.
+// asimo> this div is needed to make sure the settings show/hide js part always work without reference to the AdminUI.
 echo '<div id="admin_skin_settings_div">';
 	$AdminUI->display_skin_settings( $Form, $edited_User->ID );
 echo '</div>';
@@ -330,6 +330,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.16  2011/02/23 21:45:18  fplanque
+ * minor / cleanup
+ *
  * Revision 1.15  2011/02/22 16:00:31  efy-asimo
  * fix deprecated warning
  *

@@ -4410,7 +4410,7 @@ class Item extends ItemLight
 			}
 			$this->set( 'tiny_slug_ID', $Slug->ID );
 			
-			// Update Item preserving mod date
+			// Update Item preserving mod date:
 			if( ! $this->dbupdate( false ) )
 			{ // Item dbupdate failed
 				$DB->rollback();
@@ -4536,6 +4536,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.218  2011/02/23 21:45:18  fplanque
+ * minor / cleanup
+ *
  * Revision 1.217  2011/02/15 05:31:53  sam2kb
  * evo_strtolower mbstring wrapper for strtolower function
  *

@@ -54,7 +54,8 @@ $usedgroups = $DB->get_col( 'SELECT grp_ID
  * Query user list:
  */
 $keywords = param( 'keywords', 'string', '', true );
-$usr_unconfirmed = param( 'usr_unconfirmed', 'boolean', false, true );
+// fp> TODO: implement this like other filtersets in the app. You need a checkbox, or better yet: a select that allows: Confirmed/Unconfirmed/All
+// $usr_unconfirmed = param( 'usr_unconfirmed', 'boolean', false, true );
 
 $where_clause = '';
 
@@ -67,11 +68,13 @@ if( !empty( $keywords ) )
 		$where_clause .= 'CONCAT_WS( " ", user_login, user_firstname, user_lastname, user_nickname, user_email) LIKE "%'.$DB->escape($kw).'%" AND ';
 	}
 }
+// fp> TODO: implement this like other filtersets in the app. You need a checkbox, or better yet: a select that allows: Confirmed/Unconfirmed/All
+/*
 if( $usr_unconfirmed )
 {
 	$where_clause .= 'user_validated = 0 AND ';
 }
-
+*/
 $SQL = new SQL();
 $SQL->SELECT( 'T_users.*, grp_ID, grp_name, ctry_name' );
 $SQL->FROM( 'T_users RIGHT JOIN T_groups ON user_grp_ID = grp_ID' );
@@ -131,7 +134,8 @@ $Results->filter_area = array(
 	'url_ignore' => 'results_user_page,keywords',
 	'presets' => array(
 		'all' => array( T_('All users'), '?ctrl=users' ),
-		'unconfirmed' => array( T_('Unconfirmed email'), '?ctrl=users&amp;usr_unconfirmed=1' ),
+// fp> TODO: implement this like other filtersets in the app. You need a checkbox, or better yet: a select that allows: Confirmed/Unconfirmed/All
+//		'unconfirmed' => array( T_('Unconfirmed email'), '?ctrl=users&amp;usr_unconfirmed=1' ),
 		)
 	);
 
@@ -385,6 +389,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.30  2011/02/23 21:45:18  fplanque
+ * minor / cleanup
+ *
  * Revision 1.29  2011/02/17 14:56:38  efy-asimo
  * Add user source param
  *
