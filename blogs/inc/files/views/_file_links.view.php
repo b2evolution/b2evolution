@@ -96,7 +96,7 @@ if( $mode != 'upload' )
 		global $current_File, $current_User;
 		global $edited_Item;
 
-		$r = T_( 'You don\'t have permission to this file root' );
+		$r = T_( 'You don\'t have permission to access this file root' );
 		if( $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
 		{
 			// File relative path & name:
@@ -169,6 +169,9 @@ if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Ite
 
 /*
  * $Log$
+ * Revision 1.17  2011/02/23 02:04:03  fplanque
+ * minor
+ *
  * Revision 1.16  2011/01/18 16:23:03  efy-asimo
  * add shared_root perm and refactor file perms - part1
  *

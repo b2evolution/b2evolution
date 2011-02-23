@@ -640,6 +640,7 @@ function rel_path_to_base( $path )
  * @param string the root path to use
  * @param boolean add radio buttons ?
  * @param string used by recursion
+ * @param string fp>asimo : in what case can this be something else than "view" ?
  * @return string
  */
 function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_full_path = NULL, $radios = false, $rds_rel_path = NULL, $is_recursing = false, $action = 'view' )
@@ -677,7 +678,7 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 		foreach( $_roots as $l_Root )
 		{
 			if( ! $current_User->check_perm( 'files', $action, false, $l_Root ) )
-			{
+			{	// current user does not have permission to "view" (or other $action) this root
 				continue;
 			}
 			$subR = get_directory_tree( $l_Root, $l_Root->ads_path, $ads_selected_full_path, $radios, '', true );
@@ -1056,6 +1057,9 @@ function check_showparams( & $Filelist )
 
 /*
  * $Log$
+ * Revision 1.51  2011/02/23 02:04:03  fplanque
+ * minor
+ *
  * Revision 1.50  2011/02/10 23:07:21  fplanque
  * minor/doc
  *
