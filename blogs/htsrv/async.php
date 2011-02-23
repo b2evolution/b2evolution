@@ -160,13 +160,13 @@ switch( $action )
 			$SQL->LIMIT( '10' );
 			$SQL->ORDER_BY('user_login');
 
-			echo implode("\n", $DB->get_col($SQL->get()));
+			echo implode( "\n", $DB->get_col($SQL->get()) );
 		}
 
 		exit(0);
 
 	case 'set_comment_status':
-
+		// Used for quick moderation of comments
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
@@ -321,6 +321,7 @@ switch( $action )
 
 	case 'get_tags':
 		// Get list of tags, where $term matches at the beginning or anywhere (sorted)
+		// To be used for Tag autocompletion
 		$Session->assert_received_crumb( 'item' ); // via item forms
 
 		if( ! function_exists('json_encode') )
@@ -371,6 +372,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.64  2011/02/23 20:12:55  fplanque
+ * minor/doc
+ *
  * Revision 1.63  2011/02/15 15:36:59  efy-asimo
  * Change access to admin permission
  *

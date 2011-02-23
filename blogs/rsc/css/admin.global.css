@@ -489,14 +489,13 @@ ul.widget_list li {
 	color: #888;
 }
 
+/* TODO: Transform the following 2 into normal action icons */
 .trashcan a {
 	float: right;
-	color: #6495ED;
 }
-
 .emptytrash a {
 	float: right;
-	color: red;
+	margin-right: 1ex;
 }
 
 /*

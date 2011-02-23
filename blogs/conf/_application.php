@@ -21,7 +21,7 @@ $app_version = '4.1.0-beta';
  * Release date (ISO)
  * @global string
  */
-$app_date = '2011-01-30';
+$app_date = '2011-02-23';
 
 /**
  * This is used to check if the database is up to date.
