@@ -522,18 +522,21 @@ function get_icon_info($name)
 		case 'recycle_full': return array(
 			'file' => 'icons/recycle_full.png',
 			'alt'  => T_('Open recycle bin'),
-			'size' => array( 15, 15 ),
+			'size' => array( 16, 16 ),
 		);
 		case 'recycle_empty': return array(
 			'file' => 'icons/recycle_empty.png',
 			'alt'  => T_('Empty recycle bin'),
-			'size' => array( 15, 15 ),
+			'size' => array( 16, 16 ),
 		);
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.72  2011/02/24 13:11:28  efy-asimo
+ * Change recycle icons size
+ *
  * Revision 1.71  2011/02/24 07:42:26  efy-asimo
  * Change trashcan to Recycle bin
  *
