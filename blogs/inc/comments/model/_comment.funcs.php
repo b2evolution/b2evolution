@@ -395,17 +395,27 @@ function add_ban_icons( $content )
 
 
 /**
- * Get trashcan link
+ * Get opentrash link
+ * 
+ * @param boolean check permission or not. Should be false only if it was already checked.
+ * @return Open recycle bin link if user has the corresponding 'blogs' - 'editall' permission, empty string otherwise
  */
-function get_trashcan_link()
+function get_opentrash_link( $check_perm = true )
 {
-	global $admin_url;
-	return '<span class="trashcan"><a href="'.$admin_url.'?ctrl=comments&amp;show_statuses[]=trash'.'">'.T_('Trashcan').'</a></span> ';
+	global $admin_url, $current_User;
+	if( !$check_perm || $current_User->check_perm( 'blogs', 'editall' ) )
+	{
+		return '<span class="floatright">'.action_icon( T_('Open recycle bin'), 'recycle_full', $admin_url.'?ctrl=comments&amp;show_statuses[]=trash' ).'</span> ';
+	}
+	return '';
 }
 
 
 /*
  * $Log$
+ * Revision 1.24  2011/02/24 07:42:27  efy-asimo
+ * Change trashcan to Recycle bin
+ *
  * Revision 1.23  2011/02/15 06:13:49  sam2kb
  * strlen replaced with evo_strlen to support utf-8 logins and domain names
  *

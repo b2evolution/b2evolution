@@ -64,19 +64,22 @@ $Results->cols[] = array(
 			'th' => T_('Actions'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
-			'td' => action_icon( TS_('Empty blog\'s trash'), 'delete',
-	        		/*'admin.php?ctrl=comments&amp;blog_ID=$blog_ID$&amp;action=trash_delete&amp;redirect_to='.*/regenerate_url( 'action', 'blog_ID=$blog_ID$&amp;action=trash_delete' ).'&amp;'.url_crumb('comment') ),
+			'td' => action_icon( TS_('Empty blog\'s recycle bin'), 'recycle_empty',
+	        			regenerate_url( 'action', 'blog_ID=$blog_ID$&amp;action=trash_delete' ).'&amp;'.url_crumb('comment') ),
 		);
 
-$Results->global_icon( T_('Cancel empty trash'), 'close', regenerate_url( 'action', 'action=list&filter=reset'), 3, 4  );
+$Results->global_icon( T_('Cancel empty recycle bin'), 'close', regenerate_url( 'action', 'action=list&filter=reset'), 3, 4  );
 
-echo '<p>[<a href="'.regenerate_url( 'action,blog_ID', 'action=trash_delete' ).'&amp;'.url_crumb('comment').'">'.T_( 'Empty all blog\'s trash' ).'</a>]</p>';
+echo '<p>[<a href="'.regenerate_url( 'action,blog_ID', 'action=trash_delete' ).'&amp;'.url_crumb('comment').'">'.T_( 'Empty all blog\'s recycle bin' ).'</a>]</p>';
 
 $Results->display();
 
 
 /*
  * $Log$
+ * Revision 1.3  2011/02/24 07:42:27  efy-asimo
+ * Change trashcan to Recycle bin
+ *
  * Revision 1.2  2011/02/20 22:31:39  fplanque
  * minor / doc
  *

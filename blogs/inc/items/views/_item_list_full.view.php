@@ -378,9 +378,9 @@ while( $Item = & $ItemList->get_item() )
 			<h4>
 			<?php 
 				echo T_('Comments'), ', ', T_('Trackbacks'), ', ', T_('Pingbacks').' ('.$CommentList->total_rows.')';
-				$trashcan_link = get_trashcan_link();
+				$opentrash_link = get_opentrash_link();
 				$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', 'javascript:startRefreshComments('.$Item->ID.')' ).'</span> ';
-				echo $refresh_link.$trashcan_link;
+				echo $refresh_link.$opentrash_link;
 			?>:</h4>
             
             
@@ -473,6 +473,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.49  2011/02/24 07:42:27  efy-asimo
+ * Change trashcan to Recycle bin
+ *
  * Revision 1.48  2011/02/14 14:13:24  efy-asimo
  * Comments trash status
  *

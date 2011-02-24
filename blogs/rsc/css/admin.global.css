@@ -489,15 +489,6 @@ ul.widget_list li {
 	color: #888;
 }
 
-/* TODO: Transform the following 2 into normal action icons */
-.trashcan a {
-	float: right;
-}
-.emptytrash a {
-	float: right;
-	margin-right: 1ex;
-}
-
 /*
  * Avatar selection:
  */

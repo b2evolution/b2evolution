@@ -49,19 +49,19 @@ if( $CommentList->is_filtered() )
 	$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3 );
 }
 $emptytrash_link = '';
-$trashcan_link = '';
+$opentrash_link = '';
 if( $current_User->check_perm( 'blogs', 'editall' ) )
 {
-	if( $CommentList->is_trashcan() )
+	if( $CommentList->is_trashfilter() )
 	{
-		$emptytrash_link = '<span class="emptytrash"><a href="'.$admin_url.'?ctrl=comments&amp;action=emptytrash">'.T_('Empty Trash').'</a></span> ';
+		$emptytrash_link = '<span class="floatright">'.action_icon( T_('Empty recycle bin'), 'recycle_empty', $admin_url.'?ctrl=comments&amp;action=emptytrash' ).'</span> ';
 	}
 	else
 	{
-		$trashcan_link = get_trashcan_link();
+		$opentrash_link = get_opentrash_link( false );
 	}
 }
-$block_item_Widget->title = $trashcan_link.$emptytrash_link.T_('Feedback (Comments, Trackbacks...)');
+$block_item_Widget->title = $opentrash_link.$emptytrash_link.T_('Feedback (Comments, Trackbacks...)');
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Display filters title
@@ -107,6 +107,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.12  2011/02/24 07:42:27  efy-asimo
+ * Change trashcan to Recycle bin
+ *
  * Revision 1.11  2011/02/14 14:13:24  efy-asimo
  * Comments trash status
  *

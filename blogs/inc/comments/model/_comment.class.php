@@ -1709,7 +1709,7 @@ class Comment extends DataObject
 			}
 		}
 		else
-		{ // don't delete, just move to the trashcan:
+		{ // don't delete, just move to the trash:
 			$this->set( 'status', 'trash' );
 			$r = $this->dbupdate();
 		}
@@ -1749,6 +1749,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.79  2011/02/24 07:42:27  efy-asimo
+ * Change trashcan to Recycle bin
+ *
  * Revision 1.78  2011/02/20 23:37:06  fplanque
  * minor/doc
  *

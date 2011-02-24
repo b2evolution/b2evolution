@@ -731,7 +731,7 @@ class CommentList2 extends DataObjectList2
 	 * 
 	 * @return boolean
 	 */
-	function is_trashcan()
+	function is_trashfilter()
 	{
 		if( count( $this->filters['statuses'] ) == 1 )
 		{
@@ -743,6 +743,9 @@ class CommentList2 extends DataObjectList2
 
 /*
  * $Log$
+ * Revision 1.34  2011/02/24 07:42:27  efy-asimo
+ * Change trashcan to Recycle bin
+ *
  * Revision 1.33  2011/02/23 21:45:18  fplanque
  * minor / cleanup
  *

@@ -320,14 +320,10 @@ if( $blog )
 
 		$nb_blocks_displayed++;
 
-		$trashcan_link = '';
-		if( $current_User->check_perm( 'blogs', 'editall' ) )
-		{
-			$trashcan_link = get_trashcan_link();
-		}
+		$opentrash_link = get_opentrash_link();
 		$refresh_link = '<span class="floatright">'.action_icon( T_('Refresh comment list'), 'refresh', 'javascript:startRefreshComments()' ).'</span> ';
 
-		$block_item_Widget->title = $refresh_link.$trashcan_link.T_('Comments awaiting moderation').
+		$block_item_Widget->title = $refresh_link.$opentrash_link.T_('Comments awaiting moderation').
 			' <a href="'.$admin_url.'?ctrl=comments&amp;show_statuses[]=draft'.'">'.
 			'<span id="badge" class="badge">'.get_comments_awaiting_moderation_number( $Blog->ID ).'</span></a>';
 
@@ -712,6 +708,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.75  2011/02/24 07:42:27  efy-asimo
+ * Change trashcan to Recycle bin
+ *
  * Revision 1.74  2011/02/14 14:13:24  efy-asimo
  * Comments trash status
  *

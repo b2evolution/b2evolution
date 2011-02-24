@@ -309,11 +309,11 @@ switch( $action )
 		if( $result )
 		{
 			$DB->commit();
-			$Messages->add( T_('Trash was deleted succesfull.'), 'success' );
+			$Messages->add( T_('Recycle bin content was deleted succesfull.'), 'success' );
 		}
 		else
 		{
-			$Messages->add( T_('Could not empty trashcan.'), 'error' );
+			$Messages->add( T_('Could not empty recycle bin.'), 'error' );
 		}
 
 		header_redirect( regenerate_url( 'action', 'action=list', '', '&' ) );
@@ -460,6 +460,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.41  2011/02/24 07:42:27  efy-asimo
+ * Change trashcan to Recycle bin
+ *
  * Revision 1.40  2011/02/14 14:13:24  efy-asimo
  * Comments trash status
  *

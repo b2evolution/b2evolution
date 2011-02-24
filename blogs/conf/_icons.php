@@ -518,11 +518,25 @@ function get_icon_info($name)
 			'alt'	 => '-',
 			'size' => array( 12, 12 ),
 		);
+
+		case 'recycle_full': return array(
+			'file' => 'icons/recycle_full.png',
+			'alt'  => T_('Open recycle bin'),
+			'size' => array( 15, 15 ),
+		);
+		case 'recycle_empty': return array(
+			'file' => 'icons/recycle_empty.png',
+			'alt'  => T_('Empty recycle bin'),
+			'size' => array( 15, 15 ),
+		);
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.71  2011/02/24 07:42:26  efy-asimo
+ * Change trashcan to Recycle bin
+ *
  * Revision 1.70  2010/01/22 20:20:16  efy-asimo
  * Remove File manager rename file
  *
