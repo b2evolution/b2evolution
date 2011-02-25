@@ -199,9 +199,9 @@ disp_system_check( $cachedir_status, $cachedir_long );
 
 
 // /install/ folder deleted?
-list( $installdir_status, $installdir_msg ) = system_check_install_removed();
-init_system_check( T_( 'Install folder' ), $installdir_msg );
-if( $installdir_status == 'error' )
+$install_removed = system_check_install_removed();
+init_system_check( T_( 'Install folder' ), $install_removed ?  T_('Deleted') : T_('Not deleted').' - '.$basepath.$install_subdir );
+if( ! $install_removed )
 {
 	disp_system_check( 'warning', T_('For maximum security, it is recommended that you delete your /blogs/install/ folder once you are done with install or upgrade.') );
 
@@ -599,8 +599,8 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
- * Revision 1.33  2011/01/03 03:02:54  sam2kb
- * Check if /cache directory is writable. Check if /install directory and index.php are readable.
+ * Revision 1.34  2011/02/25 21:52:14  fplanque
+ * partial rollback. install folder needs to be removed completely for max safety. There is no in between "ok" state.
  *
  * Revision 1.32  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages

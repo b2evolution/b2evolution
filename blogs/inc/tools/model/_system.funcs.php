@@ -68,31 +68,12 @@ function system_check_dir( $directory = 'media' )
 
 
 /**
- * Check if install directory has been removed
- *
- * @return array {status,msg}
+ * @return boolean true if install directory has been removed
  */
 function system_check_install_removed()
 {
-	global $install_path;
-
-	if( ! is_dir($install_path) || ! file_exists($install_path.'index.php') )
-	{
-		$msg = T_('Deleted');
-		$status = 'ok';
-	}
-	elseif( ! is_readable($install_path) || ! is_readable($install_path.'index.php') )
-	{
-		$msg = T_('Protected');
-		$exists = 'ok';
-	}
-	else
-	{
-		$msg = T_('Not deleted').' - '.$install_path;
-		$status = 'error';
-	}
-
-	return array( $status, $msg );
+	global $basepath, $install_subdir;
+	return ! is_dir( $basepath.$install_subdir );
 }
 
 
@@ -246,8 +227,8 @@ function system_check_gd_version()
 
 /*
  * $Log$
- * Revision 1.8  2011/01/03 03:02:54  sam2kb
- * Check if /cache directory is writable. Check if /install directory and index.php are readable.
+ * Revision 1.9  2011/02/25 21:52:14  fplanque
+ * partial rollback. install folder needs to be removed completely for max safety. There is no in between "ok" state.
  *
  * Revision 1.7  2010/02/08 17:54:47  efy-yury
  * copyright 2009 -> 2010
