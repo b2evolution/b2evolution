@@ -309,7 +309,7 @@ switch( $action )
 		if( $result )
 		{
 			$DB->commit();
-			$Messages->add( T_('Recycle bin content was deleted succesfull.'), 'success' );
+			$Messages->add( T_('Recycle bin content was succesfully deleted.'), 'success' );
 		}
 		else
 		{
@@ -460,6 +460,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.42  2011/02/25 22:04:08  fplanque
+ * minor / UI cleanup
+ *
  * Revision 1.41  2011/02/24 07:42:27  efy-asimo
  * Change trashcan to Recycle bin
  *

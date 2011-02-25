@@ -1112,14 +1112,12 @@ switch( $action )
 						 ' '.T_('Delete'), 4, 3, array(
 						 		'onclick' => 'return confirm(\''.TS_('You are about to delete this post!\\nThis cannot be undone!').'\')',
 						 		'style' => 'margin-right: 3ex;',	// Avoid misclicks by all means!
-								'class' => 'DeleteButton',
 						 ) );
 				}
 
 				$AdminUI->global_icon( T_('Permanent link to full entry'), 'permalink', $edited_Item->get_permanent_url(),
 						' '.T_('Permalink'), 4, 3, array(
 						 		'style' => 'margin-right: 3ex',
-								'class' => 'ActionButton',
 						 ) );
 				break;
 		}
@@ -1392,6 +1390,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.109  2011/02/25 22:04:09  fplanque
+ * minor / UI cleanup
+ *
  * Revision 1.108  2011/02/21 06:46:52  sam2kb
  * Added permalink button to item edit form
  *

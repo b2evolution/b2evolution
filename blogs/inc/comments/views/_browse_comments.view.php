@@ -54,7 +54,7 @@ if( $current_User->check_perm( 'blogs', 'editall' ) )
 {
 	if( $CommentList->is_trashfilter() )
 	{
-		$emptytrash_link = '<span class="floatright">'.action_icon( T_('Empty recycle bin'), 'recycle_empty', $admin_url.'?ctrl=comments&amp;action=emptytrash' ).'</span> ';
+		$emptytrash_link = '<span class="floatright">'.action_icon( T_('Empty recycle bin'), 'recycle_empty', $admin_url.'?ctrl=comments&amp;action=emptytrash', T_('Empty recycle bin...'), 5, 3 ).'</span> ';
 	}
 	else
 	{
@@ -107,6 +107,9 @@ $block_item_Widget->disp_template_replaced( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.13  2011/02/25 22:04:09  fplanque
+ * minor / UI cleanup
+ *
  * Revision 1.12  2011/02/24 07:42:27  efy-asimo
  * Change trashcan to Recycle bin
  *
