@@ -606,6 +606,8 @@ function locale_options_return( $default = '' )
 /**
  * Detect language from HTTP_ACCEPT_LANGUAGE
  *
+ * Rewrittent by blueyed in Revision 1.42
+ *
  * HTTP_ACCEPT_LANGUAGE is sorted by prio and then the best match is used
  * (either full locale ("en-US") or best fitting locale for a short one ("en").
  *
@@ -1131,6 +1133,9 @@ function locales_load_available_defs()
 
 /*
  * $Log$
+ * Revision 1.46  2011/02/27 17:45:11  fplanque
+ * no message
+ *
  * Revision 1.45  2011/02/10 23:07:21  fplanque
  * minor/doc
  *
