@@ -1946,8 +1946,32 @@ function echo_pages( $item_ID, $currentpage, $comments_number )
 }
 
 
+/**
+ * Display collapsible <legend> tag
+ * 
+ * @param string legend text
+ * @param string ID used in toggle_clickopen function
+ * @param boolean false to return the output or true to display it
+ */
+function collapsible_legend_tag( $legend, $id, $display = true )
+{
+	global $rsc_url;
+
+	$r = '<legend style="cursor:pointer" title="'.T_('Click to expand').'" onclick="toggle_clickopen(\''.$id.'\')">
+				<img src="'.$rsc_url.'icons/expand.gif" align="bottom" id="clickimg_'.$id.'" /> '.$legend.'</legend>
+			<div id="clickdiv_'.$id.'" style="display:none">';
+
+	if( $display ) echo $r;
+
+	return $r;
+}
+
+
 /*
  * $Log$
+ * Revision 1.125  2011/03/01 15:10:23  sam2kb
+ * Collapsible filter blocks
+ *
  * Revision 1.124  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

@@ -71,13 +71,44 @@ echo $Widget->replace_vars( $template['block_start'] );
 	$Form->begin_form( '' );
 
 		$Form->hidden_ctrl();
-		$Form->submit( array( 'submit', T_('Search'), 'search', '', 'float:right' ) );
+		$Form->submit( array( 'submit', T_('Search'), 'search' ) );
 
 		$Form->hidden( 'tab', $tab );
 		$Form->hidden( 'blog', $Blog->ID );
+		
+		echo '<fieldset>';
+		echo '<legend>'.T_('Title / Text contains').'</legend>';
+
+		echo $Form->inputstart;
+		?>
+		<div><input type="text" name="s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" /></div>
+		<?php
+		echo $Form->inputend;
+		// echo T_('Words').' : ';
+		?>
+		<div class="tile">
+			<input type="radio" name="sentence" value="AND" id="sentAND" class="radio" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> />
+			<label for="sentAND"><?php echo T_('AND') ?></label>
+		</div>
+		<div class="tile">
+			<input type="radio" name="sentence" value="OR" id="sentOR" class="radio" <?php if( $sentence=='OR' ) echo 'checked="checked" '?> />
+			<label for="sentOR"><?php echo T_('OR') ?></label>
+		</div>
+		<div class="tile">
+			<input type="radio" name="sentence" value="sentence" id="sentence" class="radio" <?php if( $sentence=='sentence' ) echo 'checked="checked" '?> />
+			<label for="sentence"><?php echo T_('Entire phrase') ?></label>
+		</div>
+		<div>
+			<input type="checkbox" name="exact" value="1" id="exact" class="checkbox" <?php if( $exact ) echo 'checked="checked" '?> />
+			<label for="exact"><?php echo T_('Exact match') ?></label>
+		</div>
+
+		<?php
+		echo '</fieldset>';
+		
 
 		echo '<fieldset>';
-		echo '<legend>'.T_('Posts to show').'</legend>';
+		collapsible_legend_tag( T_('Posts to show'), 'item-visibility' );
 		?>
 		<div>
 
@@ -110,36 +141,6 @@ echo $Widget->replace_vars( $template['block_start'] );
 		<label for="sh_redirected"><?php echo T_('Redirected') ?></label><br />
 
 	 	</div>
-
-		<?php
-		echo '</fieldset>';
-
-
-		echo '<fieldset>';
-		echo '<legend>'.T_('Title / Text contains').'</legend>';
-
-		echo $Form->inputstart;
-		?>
-		<div><input type="text" name="s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField" /></div>
-		<?php
-		echo $Form->inputend;
-		// echo T_('Words').' : ';
-		?>
-		<div class="tile">
-			<input type="radio" name="sentence" value="AND" id="sentAND" class="radio" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> />
-			<label for="sentAND"><?php echo T_('AND') ?></label>
-		</div>
-		<div class="tile">
-			<input type="radio" name="sentence" value="OR" id="sentOR" class="radio" <?php if( $sentence=='OR' ) echo 'checked="checked" '?> />
-			<label for="sentOR"><?php echo T_('OR') ?></label>
-		</div>
-		<div class="tile">
-			<input type="radio" name="sentence" value="sentence" id="sentence" class="radio" <?php if( $sentence=='sentence' ) echo 'checked="checked" '?> />
-			<label for="sentence"><?php echo T_('Entire phrase') ?></label>
-		</div>
-		<div class="tile">
-			<input type="checkbox" name="exact" value="1" id="exact" class="checkbox" <?php if( $exact ) echo 'checked="checked" '?> />
-			<label for="exact"><?php echo T_('Exact match') ?></label>
 		</div>
 
 		<?php
@@ -151,7 +152,8 @@ echo $Widget->replace_vars( $template['block_start'] );
  		 * TODO: allow multiple selection
 		 */
 		echo '<fieldset>';
-		echo '<legend>'.T_('Assignees').'</legend>';
+		collapsible_legend_tag( T_('Assignees'), 'item-assignees' );
+		
 		// Load current blog members into cache:
 		$UserCache = & get_UserCache();
 		$UserCache->load_blogmembers( $Blog->ID );
@@ -173,6 +175,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 			}
 			echo '</ul>';
 		}
+		echo '</div>';
 		echo '</fieldset>';
 
 
@@ -181,7 +184,8 @@ echo $Widget->replace_vars( $template['block_start'] );
 		 * TODO: allow multiple selection
 		 */
 		echo '<fieldset>';
-		echo '<legend>'.T_('Authors').'</legend>';
+		collapsible_legend_tag( T_('Authors'), 'item-authors' );
+
 		// Load current blog members into cache:
 		$UserCache->load_blogmembers( $Blog->ID );
 		if( count($UserCache->cache) )
@@ -197,6 +201,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 			}
 			echo '</ul>';
 		}
+		echo '</div>';
 		echo '</fieldset>';
 
 
@@ -209,7 +214,8 @@ echo $Widget->replace_vars( $template['block_start'] );
 		if( count($ItemStatusCache->cache) )
 		{	// We have satuses:
 			echo '<fieldset>';
-			echo '<legend>'.T_('Statuses').'</legend>';
+			collapsible_legend_tag( T_('Statuses'), 'item-statuses' );
+
 			echo '<ul>';
 
 			echo '<li><input type="radio" name="status" value="-" class="radio"';
@@ -225,6 +231,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 				echo '</a></li>';
 			}
 			echo '</ul>';
+			echo '</div>';
 			echo '</fieldset>';
 		}
 
@@ -233,10 +240,11 @@ echo $Widget->replace_vars( $template['block_start'] );
 				// CODE for the widget:
 				'widget' => 'coll_category_list',
 				// Optional display params
-				'block_start' => '<fieldset>',
-				'block_end' => '</fieldset>',
+				'block_start' => '<fieldset>'.collapsible_legend_tag( T_('Categories'), 'item-cats', false ),
+				'block_end' => '</div></fieldset>',
 				'block_title_start' => '<legend>',
 				'block_title_end' => '</legend>',
+				'block_display_title' => false,
 				'link_type' => 'context',
 				'display_checkboxes' => 1,
 			) );
@@ -246,10 +254,9 @@ echo $Widget->replace_vars( $template['block_start'] );
 		// ARCHIVES:
 		// Call the Archives plugin:
 		$Plugins->call_by_code( 'evo_Arch', array( // Parameters follow:
-				'block_start'=>'<fieldset>',
-				'block_end'=>"</fieldset>\n",
-				'title'=>'<legend>'.T_('Archives')."</legend>\n",
-				'link_type'=>'context', 							// Preserve page context
+				'block_start'=>'<fieldset>'.collapsible_legend_tag( T_('Archives'), 'item-archives', false ),
+				'block_end'=>"</div></fieldset>\n",
+				'link_type'=>'context',               // Preserve page context
 				'form'=>true,                         // add form fields (radio buttons)
 				'limit'=>'',                          // No limit
 				'more_link'=>'',                      // No more link
@@ -261,7 +268,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 		if( $ItemList->is_filtered() )
 		{
 			// TODO: style this better:
-			echo '&nbsp; <a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset">'.T_('Reset all filters!').'</a>';
+			echo '<p class="center"><a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset">'.T_('Reset all filters!').'</a></p>';
 		}
 
 	$Form->end_form();
@@ -270,6 +277,9 @@ echo $template['block_end'];
 
 /*
  * $Log$
+ * Revision 1.19  2011/03/01 15:10:23  sam2kb
+ * Collapsible filter blocks
+ *
  * Revision 1.18  2010/02/08 17:53:19  efy-yury
  * copyright 2009 -> 2010
  *
