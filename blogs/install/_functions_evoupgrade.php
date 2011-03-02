@@ -2785,7 +2785,7 @@ function upgrade_b2evo_tables()
 		// set_upgrade_checkpoint( '10000' );
 	}
 
-	task_begin( 'Convert group permissions to pluggable permissions...' );
+	/*task_begin( 'Convert group permissions to pluggable permissions...' );
 	// asimo>This delete query needs just in case if this version of b2evo was used, before upgrade process call
 	$DB->query( 'DELETE FROM T_groups__groupsettings 
 					WHERE gset_name = "perm_files" OR gset_name = "perm_options" OR gset_name = "perm_templates"' );
@@ -2859,6 +2859,20 @@ function upgrade_b2evo_tables()
 
 	task_begin( 'Upgrading users table, add users source...' );
 	db_add_col( 'T_users', 'user_source', 'varchar(30) NULL' );
+	task_end();
+
+	task_begin( 'Upgrading blogs table, remove allowcomments setting...' );
+	$DB->query( 'INSERT INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+					SELECT blog_ID, "allow_comments", "never"
+						FROM T_blogs
+						WHERE blog_allowcomments = "never"' );
+	db_drop_col( 'T_blogs', 'blog_allowcomments' );
+	task_end();*/
+
+	task_begin( 'Upgrading collection settings allow_rating fields...' );
+	$DB->query( 'UPDATE T_coll_settings
+					SET cset_value = "any"
+					WHERE cset_value = "always" AND cset_name = "allow_rating"' );
 	task_end();
 
 	/*
@@ -3035,6 +3049,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.382  2011/03/02 09:45:59  efy-asimo
+ * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
+ *
  * Revision 1.381  2011/02/17 14:56:38  efy-asimo
  * Add user source param
  *

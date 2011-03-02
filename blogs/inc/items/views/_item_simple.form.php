@@ -244,7 +244,7 @@ $Form->begin_form( '', '', $params );
 
 	// ################### COMMENT STATUS ###################
 
-	if( $Blog->allowcomments == 'post_by_post' )
+	if( ( $Blog->get_setting( 'allow_comments' ) != 'never' ) && ( $Blog->get_setting( 'disable_comments_bypost' ) ) )
 	{
 		$Form->begin_fieldset( T_('Comments'), array( 'id' => 'itemform_comments' ) );
 
@@ -285,6 +285,9 @@ echo_autocomplete_tags();
 
 /*
  * $Log$
+ * Revision 1.43  2011/03/02 09:45:59  efy-asimo
+ * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
+ *
  * Revision 1.42  2011/01/06 14:31:47  efy-asimo
  * advanced blog permissions:
  *  - add blog_edit_ts permission

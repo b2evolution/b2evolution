@@ -539,9 +539,9 @@ class Item extends ItemLight
 			$this->set_from_Request( 'datedeadline', 'item_deadline', true );
 		}
 
-		// Allow comments for this item (only if set to "post_by_post" for the Blog):
+		// Allow comments status for this item (only if comments are allowed in this blog, and disable_comments_bypost is enabled):
 		$this->load_Blog();
-		if( $this->Blog->allowcomments == 'post_by_post' )
+		if( ( $this->Blog->get_setting( 'allow_comments' ) != 'never' ) && ( $this->Blog->get_setting( 'disable_comments_bypost' ) ) )
 		{
 			if( param( 'post_comment_status', 'string', 'open' ) !== NULL )
 			{ // 'open' or 'closed' or ...
@@ -671,9 +671,9 @@ class Item extends ItemLight
 	 */
 	function can_see_comments()
 	{
-		if( $this->comment_status == 'disabled'
+		if( ( $this->Blog->get_setting( 'disable_comments_bypost' ) && ( $this->comment_status == 'disabled' ) )
 				|| $this->is_intro() // Intros: no comments
-		    || ( $this->get_Blog() && $this->Blog->allowcomments == 'never' ) )
+		    || ( $this->get_Blog() && $this->Blog->get_setting( 'allow_comments' ) == 'never' ) )
 		{ // Comments are disabled on this post
 			return false;
 		}
@@ -693,100 +693,106 @@ class Item extends ItemLight
 	 */
 	function can_comment( $before_error = '<p><em>', $after_error = '</em></p>', $non_published_msg = '#', $closed_msg = '#' )
 	{
-		global $Plugins;
-
 		$display = ( ! is_null($before_error) );
 
-		// Ask Plugins (it can say NULL and would get skipped in Plugin::trigger_event_first_return()):
-		// Examples:
-		//  - A plugin might want to restrict comments on posts older than 20 days.
-		//  - A plugin might want to allow comments always for certain users (admin).
-		if( $event_return = $Plugins->trigger_event_first_return( 'ItemCanComment', array( 'Item' => $this ) ) )
+		if( $this->check_blog_settings( 'allow_comments' ) )
 		{
-			$plugin_return_value = $event_return['plugin_return'];
-			if( $plugin_return_value === true )
-			{
-				return true; // OK, user can comment!
+			if( $this->Blog->get_setting( 'disable_comments_bypost' ) && ( $this->comment_status == 'disabled' ) )
+			{ // Comments are disabled on this post
+				return false;
 			}
 
-			if( $display && is_string($plugin_return_value) )
-			{
-				echo $before_error;
-				echo $plugin_return_value;
-				echo $after_error;
+			if( $this->comment_status == 'closed'  )
+			{ // Comments are closed on this post
+
+				if( $display)
+				{
+					if( $closed_msg == '#' )
+						$closed_msg = T_( 'Comments are closed for this post.' );
+	
+					echo $before_error;
+					echo $closed_msg;
+					echo $after_error;
+				}
+
+				return false;
 			}
 
-			return false;
-		}
+			if( ($this->status == 'draft') || ($this->status == 'deprecated' ) || ($this->status == 'redirected' ) )
+			{ // Post is not published
 
-		$this->get_Blog();
+				if( $display )
+				{
+					if( $non_published_msg == '#' )
+						$non_published_msg = T_( 'This post is not published. You cannot leave comments.' );
+	
+					echo $before_error;
+					echo $non_published_msg;
+					echo $after_error;
+				}
 
-		if( $this->Blog->allowcomments == 'never')
-		{
-			return false;
-		}
-
-		if( $this->Blog->allowcomments == 'always')
-		{
-			return true;
-		}
-
-		if( $this->comment_status == 'disabled'  )
-		{ // Comments are disabled on this post
-			return false;
-		}
-
-		if( $this->comment_status == 'closed'  )
-		{ // Comments are closed on this post
-
-			if( $display)
-			{
-				if( $closed_msg == '#' )
-					$closed_msg = T_( 'Comments are closed for this post.' );
-
-				echo $before_error;
-				echo $closed_msg;
-				echo $after_error;
+				return false;
 			}
 
-			return false;
+			return true; // OK, user can comment!
 		}
 
-		if( ($this->status == 'draft') || ($this->status == 'deprecated' ) || ($this->status == 'redirected' ) )
-		{ // Post is not published
-
-			if( $display )
-			{
-				if( $non_published_msg == '#' )
-					$non_published_msg = T_( 'This post is not published. You cannot leave comments.' );
-
-				echo $before_error;
-				echo $non_published_msg;
-				echo $after_error;
-			}
-
-			return false;
-		}
-
-		return true; // OK, user can comment!
+		// Current user not allowed to comment in this blog
+		return false;
 	}
 
 
 	/**
-	 * Template function: Check if user can can rate this post
+	 * Check if current user is allowed for several action in this post's blog
+	 * 
+	 * @private function
+	 * 
+	 * @param string blog settings name. Param value can be 'allow_comments', 'allow_attachments','allow_rating'
+	 * @return boolean  true if user is allowed for the corresponding action
+	 */
+	function check_blog_settings( $settings_name )
+	{
+		global $current_User;
+
+		$this->load_Blog();
+
+		switch( $this->Blog->get_setting( $settings_name ) )
+		{
+			case 'never':
+				return false;
+			case 'any':
+				return true;
+			case 'registered':
+				return is_logged_in();
+			case 'member':
+				return (is_logged_in() && $current_User->check_perm( 'blog_ismember', 'view', false, $item_Blog->ID ) );
+			default:
+				debug_die( 'Invalid blog '.$settings_name.' settings!' );
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Template function: Check if user can attach files to this post comments
+	 *
+	 * @return boolean true if user can attach files to this post comments, false if s/he cannot
+	 */
+	function can_attach()
+	{
+		return $this->check_blog_settings( 'allow_attachments' );
+	}
+
+
+	/**
+	 * Template function: Check if user can rate this post
 	 *
 	 * @return boolean true if user can post, false if s/he cannot
 	 */
 	function can_rate()
 	{
-		$this->get_Blog();
-
-		if( $this->Blog->get_setting('allow_rating') == 'never' )
-		{
-			return false;
-		}
-
-		return true; // OK, user can rate!
+		return $this->check_blog_settings( 'allow_rating' );
 	}
 
 
@@ -4536,6 +4542,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.219  2011/03/02 09:45:59  efy-asimo
+ * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
+ *
  * Revision 1.218  2011/02/23 21:45:18  fplanque
  * minor / cleanup
  *

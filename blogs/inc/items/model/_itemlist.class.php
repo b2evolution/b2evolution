@@ -115,13 +115,13 @@ class ItemList2 extends ItemListLight
 			$post_category = $this->Blog->get_default_cat_ID();
 		}
 		$comment_Blog = & $BlogCache->get_by_ID( get_catblog( $post_category ) );
-		if( $comment_Blog->allowcomments == 'post_by_post' )
+		if( ( $comment_Blog->get_setting( 'allow_comments' ) != 'never' ) && ( $comment_Blog->get_setting( 'disable_comments_bypost' ) ) )
 		{ // param is required
 			$post_comment_status = param( 'post_comment_status', 'string', true );
 		}
 		else
 		{
-			$post_comment_status = $comment_Blog->allowcomments;
+			$post_comment_status = $comment_Blog->get_setting( 'allow_comments' );
 		}
 
 
@@ -730,6 +730,9 @@ class ItemList2 extends ItemListLight
 
 /*
  * $Log$
+ * Revision 1.39  2011/03/02 09:45:59  efy-asimo
+ * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
+ *
  * Revision 1.38  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

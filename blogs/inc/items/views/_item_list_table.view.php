@@ -123,7 +123,7 @@ function task_title_link( $Item )
 
 	$Item->get_Blog();
 
-	if( $Item->Blog->allowcomments != 'never' )
+	if( $Item->Blog->get_setting( 'allow_comments' ) != 'never' )
 	{	// The current blog can have comments:
 		$nb_comments = generic_ctp_number($Item->ID, 'feedback');
 		$col .= '<a href="?ctrl=items&amp;blog='.$Item->get_blog_ID().'&amp;p='.$Item->ID.'"
@@ -308,6 +308,9 @@ $ItemList->display( NULL, $result_fadeout );
 
 /*
  * $Log$
+ * Revision 1.29  2011/03/02 09:45:59  efy-asimo
+ * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
+ *
  * Revision 1.28  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:

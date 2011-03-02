@@ -101,7 +101,6 @@ class Blog extends DataObject
 	var $links_blog_ID = 0;	// DEPRECATED
 	var $notes;
 	var $keywords;
-	var $allowcomments = 'post_by_post';
 	var $allowtrackbacks = 0;
 	var $allowblogcss = 0;
 	var $allowusercss = 0;
@@ -186,7 +185,6 @@ class Blog extends DataObject
 			$this->links_blog_ID = $db_row->blog_links_blog_ID; // DEPRECATED
 			$this->notes = $db_row->blog_notes;
 			$this->keywords = $db_row->blog_keywords;
-			$this->allowcomments = $db_row->blog_allowcomments;
 			$this->allowtrackbacks = $db_row->blog_allowtrackbacks;
 			$this->allowblogcss = $db_row->blog_allowblogcss;
 			$this->allowusercss = $db_row->blog_allowusercss;
@@ -478,10 +476,13 @@ class Blog extends DataObject
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
 		}
 
-		if( param( 'blog_allowcomments',   'string', NULL ) !== NULL )
+		if( param( 'allow_comments', 'string', NULL ) !== NULL )
 		{ // Feedback options:
-			$this->set_from_Request( 'allowcomments' );
+			$this->set_setting( 'allow_comments', param( 'allow_comments', 'string', 'any' ) );
 			$this->set_setting( 'new_feedback_status', param( 'new_feedback_status', 'string', 'draft' ) );
+			$this->set_setting( 'disable_comments_bypost', param( 'disable_comments_bypost', 'string', '0' ) );
+			$this->set_setting( 'allow_anon_url', param( 'allow_anon_url', 'string', '0' ) );
+			$this->set_setting( 'allow_attachments', param( 'allow_attachments', 'string', 'registered' ) );
 			$this->set_setting( 'allow_rating', param( 'allow_rating', 'string', 'never' ) );
 			$this->set( 'allowtrackbacks', param( 'blog_allowtrackbacks', 'integer', 0 ) );
 			$this->set_setting( 'comments_orderdir', param( 'comments_orderdir', '/^(?:ASC|DESC)$/', 'ASC' ) );
@@ -2347,6 +2348,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.128  2011/03/02 09:45:58  efy-asimo
+ * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
+ *
  * Revision 1.127  2011/02/15 05:31:53  sam2kb
  * evo_strtolower mbstring wrapper for strtolower function
  *

@@ -189,7 +189,7 @@ $Form->begin_form( '', '', $params );
 
 	// ################### COMMENT STATUS ###################
 
-	if( $Blog->allowcomments == 'post_by_post' )
+	if( ( $Blog->get_setting( 'allow_comments' ) != 'never' ) && ( $Blog->get_setting( 'disable_comments_bypost' ) ) )
 	{
 		$Form->begin_fieldset( T_('Comments'), array( 'id' => 'itemform_comments' ) );
 
@@ -225,6 +225,9 @@ echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.13  2011/03/02 09:45:59  efy-asimo
+ * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
+ *
  * Revision 1.12  2010/03/04 19:36:04  fplanque
  * minor/doc
  *

@@ -719,7 +719,7 @@ function xmlrpcs_new_item( $post_title, $content, $post_date, $main_cat, $cat_ID
 
 	// Comment status:
 	$edited_Item->load_Blog();
-	if( $edited_Item->Blog->allowcomments == 'post_by_post' )
+	if( ( $edited_Item->Blog->get_setting( 'allow_comments' ) != 'never' ) && ( $edited_Item->Blog->get_setting( 'disable_comments_bypost' ) ) )
 	{
 		$edited_Item->set( 'comment_status', $allow_comments );
 	}
@@ -917,6 +917,9 @@ function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.30  2011/03/02 09:45:59  efy-asimo
+ * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
+ *
  * Revision 1.29  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *

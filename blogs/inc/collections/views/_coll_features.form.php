@@ -79,21 +79,34 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Feedback options') );
-	$Form->radio( 'blog_allowcomments', $edited_Blog->get( 'allowcomments' ),
-						array(  array( 'always', T_('Allow on all posts'), T_('Always allow comments on every post'),
+	$Form->radio( 'allow_comments', $edited_Blog->get_setting( 'allow_comments' ),
+						array(  array( 'any', T_('Any user'), T_('Including anonymous users'),
 										'', 'onclick="show_hide_feedback_details(this);"'),
-						array( 'post_by_post', T_('Can be disabled on a per post basis'),  T_('Comments can be disabled on each post separatly'),
+								array( 'registered', T_('Registered users only'),  '',
 										'', 'onclick="show_hide_feedback_details(this);"'),
-						array( 'never', T_('No comments are allowed in this blog'), T_('Never allow any comments in this blog'),
+								array( 'member', T_('Members only'),  T_( 'Users have to be members of this blog' ),
 										'', 'onclick="show_hide_feedback_details(this);"'),
-					), T_('Comments'), true );
+								array( 'never', T_('Not allowed'), '',
+										'', 'onclick="show_hide_feedback_details(this);"'),
+					), T_('Comments from'), true );
 
 	echo '<div id="feedback_details_container">';
 
+	$Form->checkbox( 'disable_comments_bypost', $edited_Blog->get_setting( 'disable_comments_bypost' ), '', T_('Comments can be disabled on each post separately') );
+
+	$Form->checkbox( 'allow_anon_url', $edited_Blog->get_setting( 'allow_anon_url' ), T_('Anonymous URLs'), T_('Allow anonymous commenters to submit an URL') );
+
+	$any_option = array( 'any', T_('Any user'), T_('Including anonymous users'), '' );
+	$registered_option = array( 'registered', T_('Registered users only'),  '', '' );
+	$member_option = array( 'member', T_('Members only'), T_('Users have to be members of this blog'), '' );
+	$never_option = array( 'never', T_('Not allowed'), '', '' );
+	$Form->radio( 'allow_attachments', $edited_Blog->get_setting( 'allow_attachments' ),
+						array(  $any_option, $registered_option, $member_option, $never_option,
+						), T_('Allow attachments from'), true );
+
 	$Form->radio( 'allow_rating', $edited_Blog->get_setting( 'allow_rating' ),
-						array(  array( 'always', T_('Always') ),
-										array( 'never', T_('Never') ),
-					), T_('Ratings'), true );
+						array( $any_option, $registered_option, $member_option, $never_option,
+						), T_('Allow ratings from'), true );
 
 	$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
 
@@ -125,7 +138,7 @@ $Form->begin_fieldset( T_('Feedback options') );
 
 	echo '</div>';
 
-	if( $edited_Blog->get( 'allowcomments' ) == 'never' )
+	if( $edited_Blog->get_setting( 'allow_comments' ) == 'never' )
 	{ ?>
 	<script type="text/javascript">
 		<!--
@@ -237,6 +250,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.39  2011/03/02 09:45:59  efy-asimo
+ * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
+ *
  * Revision 1.38  2010/11/03 19:44:14  sam2kb
  * Increased modularity - files_Module
  * Todo:

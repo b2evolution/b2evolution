@@ -70,6 +70,10 @@ class CollectionSettings extends AbstractSettings
 
 		// Comment settings:
 			'new_feedback_status' => 'draft',  	// 'draft', 'published' or 'deprecated'
+			'allow_comments' => 'any',
+			'disable_comments_bypost' => '1',
+			'allow_anon_url' => '0',
+			'allow_attachments' => 'registered',
 			'allow_rating'   => 'never',
 			'comments_orderdir' => 'ASC',
 			'paged_comments' => '0',
@@ -179,6 +183,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.53  2011/03/02 09:45:59  efy-asimo
+ * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
+ *
  * Revision 1.52  2011/01/02 02:20:25  sam2kb
  * typo: explicitely => explicitly
  *

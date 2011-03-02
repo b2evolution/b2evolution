@@ -228,7 +228,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 <div class="right_col">
 
 <?php
-	if( $Blog->get_setting('allow_rating') != 'never'
+	if( $comment_Item->can_rate()
 		|| !empty( $edited_Comment->rating ) )
 	{	// Rating is editable
 		$Form->begin_fieldset( T_('Rating') );
@@ -297,6 +297,9 @@ echo_comment_publishbt_js();
 
 /*
  * $Log$
+ * Revision 1.23  2011/03/02 09:45:59  efy-asimo
+ * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
+ *
  * Revision 1.22  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

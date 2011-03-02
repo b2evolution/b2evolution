@@ -60,7 +60,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			blog_urlname         VARCHAR(255) NOT NULL DEFAULT 'urlname',
 			blog_notes           TEXT NULL,
 			blog_keywords        tinytext,
-			blog_allowcomments   VARCHAR(20) NOT NULL default 'post_by_post',
 			blog_allowtrackbacks TINYINT(1) NOT NULL default 0,
 			blog_allowblogcss    TINYINT(1) NOT NULL default 1,
 			blog_allowusercss    TINYINT(1) NOT NULL default 1,
@@ -359,6 +358,9 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.23  2011/03/02 09:45:59  efy-asimo
+ * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
+ *
  * Revision 1.22  2011/02/14 14:13:24  efy-asimo
  * Comments trash status
  *

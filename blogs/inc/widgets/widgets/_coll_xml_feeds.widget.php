@@ -150,7 +150,7 @@ class coll_xml_feeds_Widget extends ComponentWidget
 			echo $this->disp_params['item_start'];
 			echo $Skin->name.': ';
 			echo '<a href="'.$Blog->get_item_feed_url( $Skin->folder ).'">'.T_('Posts').'</a>';
-			if ( $Blog->allowcomments != 'never' )
+			if ( $Blog->get_setting( 'allow_comments') != 'never' )
 			{
 				echo ', <a href="'.$Blog->get_comment_feed_url( $Skin->folder ).'">'.T_('Comments').'</a>';
 			}
@@ -195,6 +195,9 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.23  2011/03/02 09:45:59  efy-asimo
+ * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
+ *
  * Revision 1.22  2010/02/08 17:54:48  efy-yury
  * copyright 2009 -> 2010
  *

@@ -42,7 +42,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 { // We want to display the comments form and the item can be commented on:
 
 	echo $params['before_comment_form'];
-	
+
 	// INIT/PREVIEW:
 	if( $Comment = $Session->get('core.preview_Comment') )
 	{	// We have a comment to preview
@@ -79,7 +79,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 		if( $PageCache->is_collecting )
 		{	// This page is going into the cache, we don't want personal data cached!!!
 			// fp> These fields should be filled out locally with Javascript tapping directly into the cookies. Anyone JS savvy enough to do that?
-      $comment_author = '';
+			$comment_author = '';
 			$comment_author_email = '';
 			$comment_author_url = '';
 		}
@@ -161,7 +161,11 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 		// Note: we use funky field names to defeat the most basic guestbook spam bots
 		$Form->text( 'u', $comment_author, 40, T_('Name'), '', 100, 'bComment' );
 		$Form->text( 'i', $comment_author_email, 40, T_('Email'), '<br />'.T_('Your email address will <strong>not</strong> be revealed on this site.'), 100, 'bComment' );
-		$Form->text( 'o', $comment_author_url, 40, T_('Website'), '<br />'.T_('Your URL will be displayed.'), 100, 'bComment' );
+		$Item->load_Blog();
+		if( $Item->Blog->get_setting( 'allow_anon_url' ) )
+		{
+			$Form->text( 'o', $comment_author_url, 40, T_('Website'), '<br />'.T_('Your URL will be displayed.'), 100, 'bComment' );
+		}
 	}
 
 	if( $Item->can_rate() )
@@ -244,6 +248,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 
 /*
  * $Log$
+ * Revision 1.20  2011/03/02 09:45:59  efy-asimo
+ * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
+ *
  * Revision 1.19  2010/06/07 19:05:58  sam2kb
  * Added missing params
  *

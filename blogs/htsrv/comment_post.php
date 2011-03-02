@@ -52,6 +52,7 @@ if( ! $commented_Item->can_comment( NULL ) )
 $comment = param( 'p', 'html' );
 
 param( 'comment_autobr', 'integer', ($comments_use_autobr == 'always') ? 1 : 0 );
+$commented_Item->load_Blog(); // Make sure Blog is loaded (will be needed wether logged in or not)
 
 if( is_logged_in() )
 {
@@ -71,7 +72,14 @@ else
 	// Note: we use funky field names to defeat the most basic guestbook spam bots and/or their most basic authors
 	$author = param( 'u', 'string' );
 	$email = param( 'i', 'string' );
-	$url = param( 'o', 'string' );
+	if( $commented_Item->Blog->get_setting( 'allow_anon_url' ) )
+	{
+		$url = param( 'o', 'string' );
+	}
+	else
+	{
+		$url = NULL;
+	}
 	param( 'comment_cookies', 'integer', 0 );
 	param( 'comment_allow_msgform', 'integer', 0 ); // checkbox
 }
@@ -111,8 +119,6 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'comment' );
-
-$commented_Item->get_Blog(); // Make sure Blog is loaded (will be needed wether logged in or not)
 
 if( $User )
 {	// User is logged in (or provided, e.g. via OpenID plugin)
@@ -405,6 +411,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.146  2011/03/02 09:45:58  efy-asimo
+ * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
+ *
  * Revision 1.145  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *

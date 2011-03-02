@@ -69,18 +69,6 @@ class basic_antispam_plugin extends Plugin
 	function GetDefaultSettings()
 	{
 		return array(
-				'allow_anon_comments' => array(
-					'type' => 'checkbox',
-					'label' => T_('Allow anonymous comments'),
-					'note' => T_('Allow non-registered visitors to leave comments.'),
-					'defaultvalue' => '1',
-				),
-				'no_anon_url' => array(
-					'type' => 'checkbox',
-					'label' => T_('Disable anonymous URLs'),
-					'note' => T_('Disable URLs from non-registered visitors.'),
-					'defaultvalue' => 0,
-				),
 				'check_dupes' => array(
 					'type' => 'checkbox',
 					'label' => T_('Detect feedback duplicates'),
@@ -122,21 +110,6 @@ class basic_antispam_plugin extends Plugin
 				),
 
 			);
-	}
-
-
-	/**
-	 * We check if this is an anonymous visitor and do not allow comments, if we're setup
-	 * to do so.
-	 */
-	function ItemCanComment( & $params )
-	{
-		if( ! is_logged_in() && ! $this->Settings->get('allow_anon_comments') )
-		{
-			return T_('Comments are not allowed from anonymous visitors.');
-		}
-
-		// return NULL
 	}
 
 
@@ -221,11 +194,6 @@ class basic_antispam_plugin extends Plugin
 			$params['anon_name'] = $this->remove_repetition( $params['anon_name'] );
 			$params['comment'] = $this->remove_repetition( $params['comment'] );
 		}
-
-		if( $this->Settings->get('no_anon_url') )
-		{	// Remove URL
-			$params['anon_url'] = '';
-		}
 	}
 
 
@@ -251,13 +219,6 @@ class basic_antispam_plugin extends Plugin
 		if( ! $params['makelink'] )
 		{
 			return false;
-		}
-
-		if( $this->Settings->get('no_anon_url') && !isset($params['Comment']->author_user_ID) )
-		{	// Remove anonymous URL
-			$params['data'] = preg_replace( '~<a\s[^>]+>~i', '', $params['data'] );
-			
-			return;
 		}
 
 		$this->apply_nofollow( $params['data'], $params['Comment'] );
@@ -661,6 +622,9 @@ class basic_antispam_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.42  2011/03/02 09:45:59  efy-asimo
+ * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
+ *
  * Revision 1.41  2011/02/10 23:07:21  fplanque
  * minor/doc
  *
