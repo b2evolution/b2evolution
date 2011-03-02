@@ -199,7 +199,7 @@ elseif( !empty($edited_Item) )
 		 * @var File
 		 */
 		$File = & $FileList->get_next();
-		if( !empty( $File ) && $current_User->check_perm( 'files', 'view', false, $File->get_FileRoot ) )
+		if( !empty( $File ) && $current_User->check_perm( 'files', 'view', false, $File->get_FileRoot() ) )
 		{	// Obtain and use file root of first file:
 			$fm_FileRoot = & $File->get_FileRoot();
 			$path = dirname( $File->get_rdfs_rel_path() ).'/';
@@ -1773,6 +1773,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.76  2011/03/02 11:04:22  efy-asimo
+ * Refactor file uploads for future use
+ *
  * Revision 1.75  2011/01/19 14:33:42  efy-asimo
  * Missing $ - fix
  *

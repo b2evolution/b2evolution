@@ -376,25 +376,7 @@ global $fm_FileRoot;
 
 				<p class="note">
 					<?php
-					$restrictNotes = array();
-
-					// Get list of recognized file types (others are not allowed to get uploaded)
-					// dh> because FiletypeCache/DataObjectCache has no interface for getting a list, this dirty query seems less dirty to me.
-					$allowed_extensions = $DB->get_col( 'SELECT ftyp_extensions FROM T_filetypes WHERE ftyp_allowed != 0' );
-					$allowed_extensions = implode( ' ', $allowed_extensions ); // implode with space, ftyp_extensions can hold many, separated by space
-					// into array:
-					$allowed_extensions = preg_split( '~\s+~', $allowed_extensions, -1, PREG_SPLIT_NO_EMPTY );
-					// readable:
-					$allowed_extensions = implode_with_and($allowed_extensions);
-
-					$restrictNotes[] = '<strong>'.T_('Allowed file extensions').'</strong>: '.$allowed_extensions;
-
-					if( $Settings->get( 'upload_maxkb' ) )
-					{ // We want to restrict on file size:
-						$restrictNotes[] = '<strong>'.T_('Maximum allowed file size').'</strong>: '.bytesreadable( $Settings->get( 'upload_maxkb' )*1024 );
-					}
-
-					echo implode( '<br />', $restrictNotes ).'<br />';
+					echo get_upload_restriction();
 					?>
 				</p>
 			</div>
@@ -416,6 +398,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.22  2011/03/02 11:04:22  efy-asimo
+ * Refactor file uploads for future use
+ *
  * Revision 1.21  2011/01/18 16:23:03  efy-asimo
  * add shared_root perm and refactor file perms - part1
  *

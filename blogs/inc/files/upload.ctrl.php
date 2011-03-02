@@ -388,257 +388,49 @@ if( isset($_FILES) && count( $_FILES ) )
 	// Check that this action request is not a CSRF hacked request:
 	$Session->assert_received_crumb( 'file' );
 
-	// Some files have been uploaded:
-	param( 'uploadfile_title', 'array', array() );
-	param( 'uploadfile_alt', 'array', array() );
-	param( 'uploadfile_desc', 'array', array() );
-	param( 'uploadfile_name', 'array', array() );
-
-	foreach( $_FILES['uploadfile']['name'] as $lKey => $lName )
+	$upload_result = process_upload( $fm_FileRoot->ID, $path, false, false, $upload_quickmode );
+	if( isset( $upload_result ) )
 	{
-		if( empty( $lName ) )
-		{ // No file name
-			if( $upload_quickmode
-				 || !empty( $uploadfile_title[$lKey] )
-				 || !empty( $uploadfile_alt[$lKey] )
-				 || !empty( $uploadfile_desc[$lKey] )
-				 || !empty( $uploadfile_name[$lKey] ) )
-			{ // User specified params but NO file!!!
-				// Remember the file as failed when additional info provided.
-				$failedFiles[$lKey] = T_( 'Please select a local file to upload.' );
-			}
-			// Abort upload for this file:
-			continue;
-		}
+		$failedFiles = $upload_result['failedFiles'];
+		$uploadedFiles = $upload_result['uploadedFiles'];
+		$renamedFiles = $upload_result['renamedFiles'];
+		$renamedMessages = $upload_result['renamedMessages'];
 
-		if( $Settings->get( 'upload_maxkb' )
-				&& $_FILES['uploadfile']['size'][$lKey] > $Settings->get( 'upload_maxkb' )*1024 )
-		{ // bigger than defined by blog
-			$failedFiles[$lKey] = sprintf(
-					T_('The file is too large: %s but the maximum allowed is %s.'),
-					bytesreadable( $_FILES['uploadfile']['size'][$lKey] ),
-					bytesreadable($Settings->get( 'upload_maxkb' )*1024) );
-			// Abort upload for this file:
-			continue;
-		}
+		foreach( $uploadedFiles as $uploadedFile )
+		{
+			$success_msg = sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded to the server.'), $uploadedFile->dget('name') );
 
-		if( $_FILES['uploadfile']['error'][$lKey] )
-		{ // PHP has detected an error!:
-			switch( $_FILES['uploadfile']['error'][$lKey] )
-			{
-				case UPLOAD_ERR_FORM_SIZE:
-					// The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.
-
-					// This can easily be changed, so we do not use it.. file size gets checked for real just above.
-					break;
-
-				case UPLOAD_ERR_INI_SIZE: // bigger than allowed in php.ini
-					$failedFiles[$lKey] = T_('The file exceeds the upload_max_filesize directive in php.ini.');
-					// Abort upload for this file:
-					continue;
-
-				case UPLOAD_ERR_PARTIAL:
-					$failedFiles[$lKey] = T_('The file was only partially uploaded.');
-					// Abort upload for this file:
-					continue;
-
-				case UPLOAD_ERR_NO_FILE:
-					// Is probably the same as empty($lName) before.
-					$failedFiles[$lKey] = T_('No file was uploaded.');
-					// Abort upload for this file:
-					continue;
-
-				case 6: // numerical value of UPLOAD_ERR_NO_TMP_DIR
-				# (min_php: 4.3.10, 5.0.3) case UPLOAD_ERR_NO_TMP_DIR:
-					// Missing a temporary folder.
-					$failedFiles[$lKey] = T_('Missing a temporary folder (upload_tmp_dir in php.ini).');
-					// Abort upload for this file:
-					continue;
-
-				default:
-					$failedFiles[$lKey] = T_('Unknown error.').' #'.$_FILES['uploadfile']['error'][$lKey];
-					// Abort upload for this file:
-					continue;
-			}
-		}
-
-		if( ! isset($_FILES['uploadfile']['_evo_fetched_url'][$lKey]) // skip check for fetched URLs
-			&& ! is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey] ) )
-		{ // Ensure that a malicious user hasn't tried to trick the script into working on files upon which it should not be working.
-			$failedFiles[$lKey] = T_('The file does not seem to be a valid upload! It may exceed the upload_max_filesize directive in php.ini.');
-			// Abort upload for this file:
-			continue;
-		}
-
-		// Use new name on server if specified:
-		$newName = !empty( $uploadfile_name[ $lKey ] ) ? $uploadfile_name[ $lKey ] : $lName;
-
-		if( $error_filename = validate_filename( $newName ) )
-		{ // Not a file name or not an allowed extension
-			$failedFiles[$lKey] = $error_filename;
-			// Abort upload for this file:
-			continue;
-		}
-
-		$uploadfile_path = $_FILES['uploadfile']['tmp_name'][$lKey];
-		$image_info = getimagesize($uploadfile_path);
-		if( $image_info )
-		{ // This is an image, validate mimetype vs. extension
-			$FiletypeCache = get_Cache('FiletypeCache');
-			$correct_Filetype = $FiletypeCache->get_by_mimetype($image_info['mime']);
-			$correct_extension = array_shift($correct_Filetype->get_extensions());
-
-			$path_info = pathinfo($newName);
-			$current_extension = $path_info['extension'];
-
-			if( strtolower($current_extension) != strtolower($correct_extension) )
-			{
-				$old_name = $newName;
-				$newName = $path_info['filename'].'.'.$correct_extension;
-				$Messages->add( sprintf(T_('The extension of the file &laquo;%s&raquo; has been corrected. The new filename is &laquo;%s&raquo;.'), $old_name, $newName), 'warning' );
-			}
-		}
-
-		// Get File object for requested target location:
-		$FileCache = & get_FileCache();
-		$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
-
-		$num_ext = 0;
-		$oldName = $newName;
-
-		while( $newFile->exists() )
-		{ // The file already exists in the target location!
-			$num_ext++;
-			$ext_pos = strrpos( $newName, '.');
-			if( $num_ext == 1 )
-			{
-				$newName = substr_replace( $newName, '-'.$num_ext.'.', $ext_pos, 1 );
-				if( $image_info )
+			// Allow to insert/link new upload into currently edited post:
+			if( $mode == 'upload' && !empty($item_ID) )
+			{	// The filemanager has been opened from an Item, offer to insert an img tag into original post.
+				// TODO: Add plugin hook to allow generating JS insert code(s)
+				$img_tag = format_to_output( $uploadedFile->get_tag(), 'formvalue' );
+				if( $uploadedFile->is_image() )
 				{
-					$oldFile_thumb = $newFile->get_preview_thumb( 'fulltype' );
+					$link_msg = T_('Link this image to your post');
+					$link_note = T_('recommended - allows automatic resizing');
 				}
 				else
 				{
-					$oldFile_thumb = $newFile->get_size_formatted();
+					$link_msg = T_('Link this file to your post');
+					$link_note = T_('The file will be appended for download at the end of the post');
 				}
+				$success_msg .= '<ul>'
+						.'<li>'.action_icon( T_('Link this file!'), 'link',
+									regenerate_url( 'fm_selected,ctrl', 'ctrl=files&amp;action=link_inpost&amp;fm_selected[]='.rawurlencode($uploadedFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
+									' '.$link_msg, 5, 5, array( 'target' => $iframe_name ) )
+						.' ('.$link_note.')</li>'
+
+						.'<li>'.T_('or').' <a href="#" onclick="if( window.focus && window.opener ){'
+						.'window.opener.focus(); textarea_wrap_selection( window.opener.document.getElementById(\'itemform_post_content\'), \''
+						.format_to_output( $uploadedFile->get_tag(), 'formvalue' ).'\', \'\', 1, window.opener.document ); } return false;">'
+						.T_('Insert the following code snippet into your post').'</a> : <input type="text" value="'.$img_tag.'" size="60" /></li>'
+						// fp> TODO: it would be supacool to have an ajaxy "tumbnail size selector" here that generates a thumnail of requested size on server and then changes the code in the input above
+					.'</ul>';
 			}
-			else
-			{
-				$replace_length = strlen( '-'.($num_ext-1) );
-				$newName = substr_replace( $newName, '-'.$num_ext, $ext_pos-$replace_length, $replace_length );
-			}
-			$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
+
+			$Messages->add( $success_msg, 'success' );
 		}
-
-		// Trigger plugin event
-		if( $Plugins->trigger_event_first_false( 'AfterFileUpload', array(
-				  'File' => & $newFile,
-				  'name' => & $_FILES['uploadfile']['name'][$lKey],
-				  'type' => & $_FILES['uploadfile']['type'][$lKey],
-				  'tmp_name' => & $_FILES['uploadfile']['tmp_name'][$lKey],
-				  'size' => & $_FILES['uploadfile']['size'][$lKey],
-			  ) ) )
-		{
-			// Plugin returned 'false'. Abort file upload
-			continue;
-		}
-
-		// Attempt to move the uploaded file to the requested target location:
-		if( isset($_FILES['uploadfile']['_evo_fetched_url'][$lKey]) )
-		{ // fetched remotely
-			if( ! rename( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->get_full_path() ) )
-			{
-				$failedFiles[$lKey] = T_('An unknown error occurred when moving the uploaded file on the server.');
-				// Abort upload for this file:
-				continue;
-			}
-		}
-		elseif( ! move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->get_full_path() ) )
-		{
-			$failedFiles[$lKey] = T_('An unknown error occurred when moving the uploaded file on the server.');
-			// Abort upload for this file:
-			continue;
-		}
-
-		// change to default chmod settings
-		if( $newFile->chmod( NULL ) === false )
-		{ // add a note, this is no error!
-			$Messages->add( sprintf( T_('Could not change permissions of &laquo;%s&raquo; to default chmod setting.'), $newFile->dget('name') ), 'note' );
-		}
-
-		// Refreshes file properties (type, size, perms...)
-		$newFile->load_properties();
-
-		if( $num_ext )
-		{ // The file name was changed!
-			if( $image_info )
-			{
-				$newFile_thumb = $newFile->get_preview_thumb( 'fulltype' );
-			}
-			else
-			{
-				$newFile_thumb = $newFile->get_size_formatted();
-			}
-			//$newFile_size = bytesreadable ($_FILES['uploadfile']['size'][$lKey]);
-			$renamedMessages[$lKey]['message'] = sprintf( T_('"%s was renamed to %s. Would you like to replace %s with the new version instead?'),
-													   '&laquo;'.$oldName.'&raquo;', '&laquo;'.$newName.'&raquo;', '&laquo;'.$oldName.'&raquo;' );
-			$renamedMessages[$lKey]['oldThumb'] = $oldFile_thumb;
-			$renamedMessages[$lKey]['newThumb'] = $newFile_thumb;
-			$renamedFiles[$lKey]['oldName'] = $oldName;
-			$renamedFiles[$lKey]['newName'] = $newName;
-		}
-
-		// Store extra info about the file into File Object:
-		if( isset( $uploadfile_title[$lKey] ) )
-		{ // If a title text has been passed... (does not happen in quick upload mode)
-			$newFile->set( 'title', trim( strip_tags($uploadfile_title[$lKey])) );
-		}
-		if( isset( $uploadfile_alt[$lKey] ) )
-		{ // If an alt text has been passed... (does not happen in quick upload mode)
-			$newFile->set( 'alt', trim( strip_tags($uploadfile_alt[$lKey])) );
-		}
-		if( isset( $uploadfile_desc[$lKey] ) )
-		{ // If a desc text has been passed... (does not happen in quick upload mode)
-			$newFile->set( 'desc', trim( strip_tags($uploadfile_desc[$lKey])) );
-		}
-		// TODO: dh> store _evo_fetched_url (source URL) somewhere (e.g. at the end of desc)?
-		// fp> no. why?
-
-		$success_msg = sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded to the server.'), $newFile->dget('name') );
-
-		// Allow to insert/link new upload into currently edited post:
-		if( $mode =='upload' && !empty($item_ID) )
-		{	// The filemanager has been opened from an Item, offer to insert an img tag into original post.
-			// TODO: Add plugin hook to allow generating JS insert code(s)
-			$img_tag = format_to_output( $newFile->get_tag(), 'formvalue' );
-			if( $newFile->is_image() )
-			{
-				$link_msg = T_('Link this image to your post');
-				$link_note = T_('recommended - allows automatic resizing');
-			}
-			else
-			{
-				$link_msg = T_('Link this file to your post');
-				$link_note = T_('The file will be appended for download at the end of the post');
-			}
-			$success_msg .= '<ul>'
-					.'<li>'.action_icon( T_('Link this file!'), 'link',
-								regenerate_url( 'fm_selected,ctrl', 'ctrl=files&amp;action=link_inpost&amp;fm_selected[]='.rawurlencode($newFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
-								' '.$link_msg, 5, 5, array( 'target' => $iframe_name ) )
-					.' ('.$link_note.')</li>'
-
-					.'<li>'.T_('or').' <a href="#" onclick="if( window.focus && window.opener ){'
-					.'window.opener.focus(); textarea_wrap_selection( window.opener.document.getElementById(\'itemform_post_content\'), \''
-					.format_to_output( $newFile->get_tag(), 'formvalue' ).'\', \'\', 1, window.opener.document ); } return false;">'
-					.T_('Insert the following code snippet into your post').'</a> : <input type="text" value="'.$img_tag.'" size="60" /></li>'
-					// fp> TODO: it would be supacool to have an ajaxy "tumbnail size selector" here that generates a thumnail of requested size on server and then changes the code in the input above
-				.'</ul>';
-		}
-
-		$Messages->add( $success_msg, 'success' );
-
-		// Store File object into DB:
-		$newFile->dbsave();
 	}
 
 	if( $upload_quickmode && !empty($failedFiles) )
@@ -649,13 +441,17 @@ if( isset($_FILES) && count( $_FILES ) )
 
 	if( $action == 'avatar_upload' )
 	{
+		if( !empty( $uploadedFiles ) )
+		{
+			$newFile = $uploadedFiles[0];
+		}
 		$redirect_to = param( 'redirect_to', 'string' );
 		if( !empty( $failedFiles ) )
 		{	// Transmit file error to next page!
 			$Messages->add( $failedFiles[0], 'error' );
 			unset($failedFiles);
 		}
-		else if ( $newFile->is_image() )
+		else if ( isset( $newFile ) && ( $newFile->is_image() ) )
 		{ // the file is an image, we can set it to avatar
 			$redirect_to = url_add_param( $redirect_to, 'file_ID='.$newFile->ID.'&'.url_crumb('user'), '&' );
 		}
@@ -707,6 +503,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.43  2011/03/02 11:04:22  efy-asimo
+ * Refactor file uploads for future use
+ *
  * Revision 1.42  2011/01/18 16:23:02  efy-asimo
  * add shared_root perm and refactor file perms - part1
  *

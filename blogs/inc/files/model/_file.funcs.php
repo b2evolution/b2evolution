@@ -599,6 +599,34 @@ function check_rename ( & $newname, $is_dir, $allow_locked_filetypes )
 
 
 /**
+ * Return a string with upload restrictions ( allowed extensions, max file size )
+ */
+function get_upload_restriction()
+{
+	global $DB, $Settings;
+	$restrictNotes = array();
+
+	// Get list of recognized file types (others are not allowed to get uploaded)
+	// dh> because FiletypeCache/DataObjectCache has no interface for getting a list, this dirty query seems less dirty to me.
+	$allowed_extensions = $DB->get_col( 'SELECT ftyp_extensions FROM T_filetypes WHERE ftyp_allowed != 0' );
+	$allowed_extensions = implode( ' ', $allowed_extensions ); // implode with space, ftyp_extensions can hold many, separated by space
+	// into array:
+	$allowed_extensions = preg_split( '~\s+~', $allowed_extensions, -1, PREG_SPLIT_NO_EMPTY );
+	// readable:
+	$allowed_extensions = implode_with_and($allowed_extensions);
+
+	$restrictNotes[] = '<strong>'.T_('Allowed file extensions').'</strong>: '.$allowed_extensions;
+
+	if( $Settings->get( 'upload_maxkb' ) )
+	{ // We want to restrict on file size:
+		$restrictNotes[] = '<strong>'.T_('Maximum allowed file size').'</strong>: '.bytesreadable( $Settings->get( 'upload_maxkb' )*1024 );
+	}
+
+	return implode( '<br />', $restrictNotes ).'<br />';
+}
+
+
+/**
  * Return the path without the leading {@link $basepath}, or if not
  * below {@link $basepath}, just the basename of it.
  *
@@ -640,7 +668,9 @@ function rel_path_to_base( $path )
  * @param string the root path to use
  * @param boolean add radio buttons ?
  * @param string used by recursion
- * @param string fp>asimo : in what case can this be something else than "view" ?
+ * @param string what kind of action do the user ( we need this to check permission )
+ * 			fp>asimo : in what case can this be something else than "view" ?
+ * 			asimo>fp : on the _file_upload.view, we must show only those roots where current user has permission to add files
  * @return string
  */
 function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_full_path = NULL, $radios = false, $rds_rel_path = NULL, $is_recursing = false, $action = 'view' )
@@ -1036,8 +1066,9 @@ function delete_cachefolders( $Log = NULL )
 	return $deleted_dirs;
 }
 
+
 /**
- * ???
+ * Check and set the given FileList object fm_showhidden and fm_showevocache params 
  */
 function check_showparams( & $Filelist )
 {
@@ -1055,8 +1086,305 @@ function check_showparams( & $Filelist )
 }
 
 
+/**
+ * Process file upload
+ * 
+ * @param string FileRoot id string
+ * @param string the upload dir relative path in the FileRoot
+ * @param boolean create path dirs if not exists
+ * @param boolean check files add permission for current_User
+ * @param boolean upload quick mode
+ * @param boolean show warnings if filename not valid
+ * @return mixed NULL if user should have but has not permission to upload
+ * 				 array, which contains uploadedFiles, failedFiles, renamedFiles and renamedMessages
+ */
+function process_upload( $root, $path, $create_path_dirs = false, $check_perms = true, $upload_quickmode = true, $warn_invalid_filenames = true )
+{
+	global $Settings, $Plugins, $Messages, $current_User;
+
+	// Process uploaded files:
+	if( isset($_FILES) && count( $_FILES ) )
+	{
+		/**
+		 * Remember failed files (and the error messages)
+		 * @var array
+		 */
+		$failedFiles = array();
+		/**
+		 * Remember uploaded files
+		 * @var array
+		 */
+		$uploadedFiles = array();
+		/**
+		 * Remember renamed files
+		 * @var array
+		 */
+		$renamedFiles = array();
+		/**
+		 * Remember renamed Messages
+		 * @var array
+		 */
+		$renamedMessages = array();
+
+		$FileRootCache = & get_FileRootCache();
+		$fm_FileRoot = & $FileRootCache->get_by_ID($root, true);
+
+		if( !$fm_FileRoot )
+		{ // fileRoot not found
+			return NULL;
+		}
+
+		if( $check_perms && ( !isset( $current_User ) || $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) ) )
+		{ // if needs permission but current User has no permission to upload
+			return NULL;
+		}
+
+		// Let's get into requested list dir...
+		$non_canonical_list_path = $fm_FileRoot->ads_path.$path;
+
+		// Dereference any /../ just to make sure, and CHECK if directory exists:
+		$ads_list_path = get_canonical_path( $non_canonical_list_path );
+
+		if( !is_dir( $ads_list_path ) && $create_path_dirs )
+		{ // Create path
+			mkdir_r( $ads_list_path );
+		}
+
+		// Some files have been uploaded:
+		param( 'uploadfile_title', 'array', array() );
+		param( 'uploadfile_alt', 'array', array() );
+		param( 'uploadfile_desc', 'array', array() );
+		param( 'uploadfile_name', 'array', array() );
+
+		foreach( $_FILES['uploadfile']['name'] as $lKey => $lName )
+		{
+			if( empty( $lName ) )
+			{ // No file name
+				if( $upload_quickmode
+					 || !empty( $uploadfile_title[$lKey] )
+					 || !empty( $uploadfile_alt[$lKey] )
+					 || !empty( $uploadfile_desc[$lKey] )
+					 || !empty( $uploadfile_name[$lKey] ) )
+				{ // User specified params but NO file!!!
+					// Remember the file as failed when additional info provided.
+					$failedFiles[$lKey] = T_( 'Please select a local file to upload.' );
+				}
+				// Abort upload for this file:
+				continue;
+			}
+
+			if( $Settings->get( 'upload_maxkb' )
+					&& $_FILES['uploadfile']['size'][$lKey] > $Settings->get( 'upload_maxkb' )*1024 )
+			{ // bigger than defined by blog
+				$failedFiles[$lKey] = sprintf(
+						T_('The file is too large: %s but the maximum allowed is %s.'),
+						bytesreadable( $_FILES['uploadfile']['size'][$lKey] ),
+						bytesreadable($Settings->get( 'upload_maxkb' )*1024) );
+				// Abort upload for this file:
+				continue;
+			}
+
+			if( $_FILES['uploadfile']['error'][$lKey] )
+			{ // PHP has detected an error!:
+				switch( $_FILES['uploadfile']['error'][$lKey] )
+				{
+					case UPLOAD_ERR_FORM_SIZE:
+						// The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form.
+
+						// This can easily be changed, so we do not use it.. file size gets checked for real just above.
+						break;
+
+					case UPLOAD_ERR_INI_SIZE: // bigger than allowed in php.ini
+						$failedFiles[$lKey] = T_('The file exceeds the upload_max_filesize directive in php.ini.');
+						// Abort upload for this file:
+						continue;
+
+					case UPLOAD_ERR_PARTIAL:
+						$failedFiles[$lKey] = T_('The file was only partially uploaded.');
+						// Abort upload for this file:
+						continue;
+
+					case UPLOAD_ERR_NO_FILE:
+						// Is probably the same as empty($lName) before.
+						$failedFiles[$lKey] = T_('No file was uploaded.');
+						// Abort upload for this file:
+						continue;
+
+					case 6: // numerical value of UPLOAD_ERR_NO_TMP_DIR
+					# (min_php: 4.3.10, 5.0.3) case UPLOAD_ERR_NO_TMP_DIR:
+						// Missing a temporary folder.
+						$failedFiles[$lKey] = T_('Missing a temporary folder (upload_tmp_dir in php.ini).');
+						// Abort upload for this file:
+						continue;
+
+					default:
+						$failedFiles[$lKey] = T_('Unknown error.').' #'.$_FILES['uploadfile']['error'][$lKey];
+						// Abort upload for this file:
+						continue;
+				}
+			}
+
+			if( ! isset($_FILES['uploadfile']['_evo_fetched_url'][$lKey]) // skip check for fetched URLs
+				&& ! is_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey] ) )
+			{ // Ensure that a malicious user hasn't tried to trick the script into working on files upon which it should not be working.
+				$failedFiles[$lKey] = T_('The file does not seem to be a valid upload! It may exceed the upload_max_filesize directive in php.ini.');
+				// Abort upload for this file:
+				continue;
+			}
+
+			// Use new name on server if specified:
+			$newName = !empty( $uploadfile_name[ $lKey ] ) ? $uploadfile_name[ $lKey ] : $lName;
+
+			if( !$warn_invalid_filenames )
+			{
+				$newName = preg_replace( '/[^a-z0-9\-_.]+/i', '_', $newName );
+			}
+			if( $error_filename = validate_filename( $newName ) )
+			{ // Not a file name or not an allowed extension
+				$failedFiles[$lKey] = $error_filename;
+				// Abort upload for this file:
+				continue;
+			}
+
+			$uploadfile_path = $_FILES['uploadfile']['tmp_name'][$lKey];
+			$image_info = getimagesize($uploadfile_path);
+			if( $image_info )
+			{ // This is an image, validate mimetype vs. extension
+				$FiletypeCache = get_Cache('FiletypeCache');
+				$correct_Filetype = $FiletypeCache->get_by_mimetype($image_info['mime']);
+				$correct_extension = array_shift($correct_Filetype->get_extensions());
+
+				$path_info = pathinfo($newName);
+				$current_extension = $path_info['extension'];
+
+				if( strtolower($current_extension) != strtolower($correct_extension) )
+				{
+					$old_name = $newName;
+					$newName = $path_info['filename'].'.'.$correct_extension;
+					$Messages->add( sprintf(T_('The extension of the file &laquo;%s&raquo; has been corrected. The new filename is &laquo;%s&raquo;.'), $old_name, $newName), 'warning' );
+				}
+			}
+
+			// Get File object for requested target location:
+			$FileCache = & get_FileCache();
+			$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
+
+			$num_ext = 0;
+			$oldName = $newName;
+
+			while( $newFile->exists() )
+			{ // The file already exists in the target location!
+				$num_ext++;
+				$ext_pos = strrpos( $newName, '.');
+				if( $num_ext == 1 )
+				{
+					$newName = substr_replace( $newName, '-'.$num_ext.'.', $ext_pos, 1 );
+					if( $image_info )
+					{
+						$oldFile_thumb = $newFile->get_preview_thumb( 'fulltype' );
+					}
+					else
+					{
+						$oldFile_thumb = $newFile->get_size_formatted();
+					}
+				}
+				else
+				{
+					$replace_length = strlen( '-'.($num_ext-1) );
+					$newName = substr_replace( $newName, '-'.$num_ext, $ext_pos-$replace_length, $replace_length );
+				}
+				$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
+			}
+
+			// Trigger plugin event
+			if( $Plugins->trigger_event_first_false( 'AfterFileUpload', array(
+					  'File' => & $newFile,
+					  'name' => & $_FILES['uploadfile']['name'][$lKey],
+					  'type' => & $_FILES['uploadfile']['type'][$lKey],
+					  'tmp_name' => & $_FILES['uploadfile']['tmp_name'][$lKey],
+					  'size' => & $_FILES['uploadfile']['size'][$lKey],
+				  ) ) )
+			{
+				// Plugin returned 'false'. Abort file upload
+				continue;
+			}
+
+			// Attempt to move the uploaded file to the requested target location:
+			if( isset($_FILES['uploadfile']['_evo_fetched_url'][$lKey]) )
+			{ // fetched remotely
+				if( ! rename( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->get_full_path() ) )
+				{
+					$failedFiles[$lKey] = T_('An unknown error occurred when moving the uploaded file on the server.');
+					// Abort upload for this file:
+					continue;
+				}
+			}
+			elseif( ! move_uploaded_file( $_FILES['uploadfile']['tmp_name'][$lKey], $newFile->get_full_path() ) )
+			{
+				$failedFiles[$lKey] = T_('An unknown error occurred when moving the uploaded file on the server.');
+				// Abort upload for this file:
+				continue;
+			}
+
+			// change to default chmod settings
+			if( $newFile->chmod( NULL ) === false )
+			{ // add a note, this is no error!
+				$Messages->add( sprintf( T_('Could not change permissions of &laquo;%s&raquo; to default chmod setting.'), $newFile->dget('name') ), 'note' );
+			}
+
+			// Refreshes file properties (type, size, perms...)
+			$newFile->load_properties();
+
+			if( $num_ext )
+			{ // The file name was changed!
+				if( $image_info )
+				{
+					$newFile_thumb = $newFile->get_preview_thumb( 'fulltype' );
+				}
+				else
+				{
+					$newFile_thumb = $newFile->get_size_formatted();
+				}
+				//$newFile_size = bytesreadable ($_FILES['uploadfile']['size'][$lKey]);
+				$renamedMessages[$lKey]['message'] = sprintf( T_('"%s was renamed to %s. Would you like to replace %s with the new version instead?'),
+														   '&laquo;'.$oldName.'&raquo;', '&laquo;'.$newName.'&raquo;', '&laquo;'.$oldName.'&raquo;' );
+				$renamedMessages[$lKey]['oldThumb'] = $oldFile_thumb;
+				$renamedMessages[$lKey]['newThumb'] = $newFile_thumb;
+				$renamedFiles[$lKey]['oldName'] = $oldName;
+				$renamedFiles[$lKey]['newName'] = $newName;
+			}
+
+			// Store extra info about the file into File Object:
+			if( isset( $uploadfile_title[$lKey] ) )
+			{ // If a title text has been passed... (does not happen in quick upload mode)
+				$newFile->set( 'title', trim( strip_tags($uploadfile_title[$lKey])) );
+			}
+			if( isset( $uploadfile_alt[$lKey] ) )
+			{ // If an alt text has been passed... (does not happen in quick upload mode)
+				$newFile->set( 'alt', trim( strip_tags($uploadfile_alt[$lKey])) );
+			}
+			if( isset( $uploadfile_desc[$lKey] ) )
+			{ // If a desc text has been passed... (does not happen in quick upload mode)
+				$newFile->set( 'desc', trim( strip_tags($uploadfile_desc[$lKey])) );
+			}
+			// TODO: dh> store _evo_fetched_url (source URL) somewhere (e.g. at the end of desc)?
+			// fp> no. why?
+
+			// Store File object into DB:
+			$newFile->dbsave();
+			$uploadedFiles[] = $newFile;
+		}
+	}
+
+	return array( 'uploadedFiles' => $uploadedFiles, 'failedFiles' => $failedFiles, 'renamedFiles' => $renamedFiles, 'renamedMessages' => $renamedMessages );
+}
+
+
 /*
  * $Log$
+ * Revision 1.52  2011/03/02 11:04:22  efy-asimo
+ * Refactor file uploads for future use
+ *
  * Revision 1.51  2011/02/23 02:04:03  fplanque
  * minor
  *
