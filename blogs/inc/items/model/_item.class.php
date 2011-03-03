@@ -781,7 +781,8 @@ class Item extends ItemLight
 	 */
 	function can_attach()
 	{
-		return $this->check_blog_settings( 'allow_attachments' );
+		global $Settings;
+		return $this->check_blog_settings( 'allow_attachments' ) && $Settings->get( 'upload_enabled' );
 	}
 
 
@@ -4542,6 +4543,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.220  2011/03/03 15:38:59  efy-asimo
+ * add upload_enabled perm check to item class can_attach() function
+ *
  * Revision 1.219  2011/03/02 09:45:59  efy-asimo
  * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
  *
