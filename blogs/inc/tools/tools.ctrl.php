@@ -191,6 +191,18 @@ if( empty($tab) )
 			}
 			break;
 
+		case 'delete_orphan_comment_uploads':
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'tools' );
+
+			$current_User->check_perm('options', 'edit', true);
+
+			// delete orphan comment upload, older then 24 hours
+			$count = remove_orphan_files( NULL, 24 );
+
+			$Messages->add( sprintf( T_('%d files have been deleted'), $count ), 'success' );
+			break;
+
 		case 'create_sample_comments':
 			// Check that this action request is not a CSRF hacked request:
 			$Session->assert_received_crumb( 'tools' );
@@ -444,6 +456,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.38  2011/03/03 12:50:57  efy-asimo
+ * tool to find and delete orphan comment attachment files
+ *
  * Revision 1.37  2010/12/08 13:55:37  efy-asimo
  * Create Sample comments - fix
  *

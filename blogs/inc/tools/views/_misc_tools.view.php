@@ -60,12 +60,13 @@ if( $current_User->check_perm('options', 'edit') )
 	// echo '<li><a href="'.regenerate_url('action', 'action=backup_db').'">'.T_('Backup database').'</a></li>';
 	echo '</ul>';
 	$block_item_Widget->disp_template_raw( 'block_end' );
-
+	
 	$block_item_Widget->title = T_('Database Maintenance Tools');
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 	echo '<ul>';
 	echo '<li><a href="'.regenerate_url('action', 'action=find_broken_posts&amp;'.url_crumb('tools')).'">'.T_('Find all broken posts that have no matching category').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=find_broken_slugs&amp;'.url_crumb('tools')).'">'.T_('Find all broken slugs that have no matching target post').'</a></li>';
+	echo '<li><a href="'.regenerate_url('action', 'action=delete_orphan_comment_uploads&amp;'.url_crumb('tools')).'">'.T_('Find and delete orphan comment uploads').'</a></li>';
 	echo '</ul>';
 	$block_item_Widget->disp_template_raw( 'block_end' );
 
@@ -103,6 +104,9 @@ $block_item_Widget->disp_template_raw( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.5  2011/03/03 12:50:57  efy-asimo
+ * tool to find and delete orphan comment attachment files
+ *
  * Revision 1.4  2011/02/21 15:27:02  efy-asimo
  * Change tool text
  *
