@@ -64,6 +64,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 
 			// Form fields:
 			$comment_content = $Comment->original_content;
+			$comment_attachments = $Comment->preview_attachments;
 			// for visitors:
 			$comment_author = $Comment->author;
 			$comment_author_email = $Comment->author_email;
@@ -132,7 +133,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 		  /* ]]> */
 		  </script>';
 
-	$Form = new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post' );
+	$Form = new Form( $htsrv_url.'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post', NULL, 'multipart/form-data' );
 	$Form->begin_form( 'bComment', '', array( 'target' => '_self', 'onsubmit' => 'return validateCommentForm(this);' ) );
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
@@ -193,6 +194,17 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	// set b2evoCanvas for plugins
 	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "p" );</script>';
 
+	// Attach files:
+	if( $Item->can_attach() )
+	{
+		if( !isset( $comment_attachments ) )
+		{
+			$comment_attachments = '';
+		}
+		$Form->hidden( 'preview_attachments', $comment_attachments );
+		$Form->input_field( array( 'label' => T_('Attach files'), 'note' => '<br />'.get_upload_restriction(), 'name' => 'uploadfile[]', 'type' => 'file', 'size' => '30' ) );
+	}
+
 	$comment_options = array();
 
 	if( substr($comments_use_autobr,0,4) == 'opt-')
@@ -248,6 +260,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 
 /*
  * $Log$
+ * Revision 1.21  2011/03/03 12:47:29  efy-asimo
+ * comments attachments
+ *
  * Revision 1.20  2011/03/02 09:45:59  efy-asimo
  * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
  *

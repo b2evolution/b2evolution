@@ -2875,6 +2875,15 @@ function upgrade_b2evo_tables()
 					WHERE cset_value = "always" AND cset_name = "allow_rating"' );
 	task_end();
 
+	task_begin( 'Upgrading links table, add link_cmt_ID...' );
+	$DB->query( 'ALTER TABLE T_links
+					MODIFY COLUMN link_itm_ID int(11) unsigned NULL,
+					MODIFY COLUMN link_creator_user_ID int(11) unsigned NULL,
+					MODIFY COLUMN link_lastedit_user_ID int(11) unsigned NULL,
+					ADD COLUMN link_cmt_ID int(11) unsigned NULL AFTER link_itm_ID,
+					ADD INDEX link_cmt_ID ( link_cmt_ID )' );
+	task_end();
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -3049,6 +3058,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.384  2011/03/03 12:47:29  efy-asimo
+ * comments attachments
+ *
  * Revision 1.383  2011/03/02 09:48:15  efy-asimo
  * remove comment
  *

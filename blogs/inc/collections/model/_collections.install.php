@@ -338,9 +338,10 @@ $schema_queries = array_merge( $schema_queries, array(
 			link_ID               int(11) unsigned  not null AUTO_INCREMENT,
 			link_datecreated      datetime          not null DEFAULT '2000-01-01 00:00:00',
 			link_datemodified     datetime          not null DEFAULT '2000-01-01 00:00:00',
-			link_creator_user_ID  int(11) unsigned  not null,
-			link_lastedit_user_ID int(11) unsigned  not null,
-			link_itm_ID           int(11) unsigned  NOT NULL,
+			link_creator_user_ID  int(11) unsigned  NULL,
+			link_lastedit_user_ID int(11) unsigned  NULL,
+			link_itm_ID           int(11) unsigned  NULL,
+			link_cmt_ID           int(11) unsigned  NULL,
 			link_dest_itm_ID      int(11) unsigned  NULL,
 			link_file_ID          int(11) unsigned  NULL,
 			link_ltype_ID         int(11) unsigned  NOT NULL default 1,
@@ -351,6 +352,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			PRIMARY KEY (link_ID),
 			UNIQUE link_itm_ID_order (link_itm_ID, link_order),
 			INDEX link_itm_ID( link_itm_ID ),
+			INDEX link_cmt_ID( link_cmt_ID ),
 			INDEX link_dest_itm_ID (link_dest_itm_ID),
 			INDEX link_file_ID (link_file_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -358,6 +360,9 @@ $schema_queries = array_merge( $schema_queries, array(
 
 /*
  * $Log$
+ * Revision 1.24  2011/03/03 12:47:29  efy-asimo
+ * comments attachments
+ *
  * Revision 1.23  2011/03/02 09:45:59  efy-asimo
  * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
  *

@@ -39,6 +39,7 @@ class Link extends DataObject
 {
 	var $ltype_ID = 0;
 	var $Item;
+	var $Comment;
 	/**
 	 * @access protected Use {@link get_File()}
 	 */
@@ -62,8 +63,18 @@ class Link extends DataObject
 			$this->ltype_ID = $db_row->link_ltype_ID;
 
 			// source of link:
-			$ItemCache = & get_ItemCache();
-			$this->Item = & $ItemCache->get_by_ID( $db_row->link_itm_ID );
+			if( $db_row->link_itm_ID != NULL )
+			{ // Item
+				$ItemCache = & get_ItemCache();
+				$this->Item = & $ItemCache->get_by_ID( $db_row->link_itm_ID );
+				$this->Comment = NULL;
+			}
+			else
+			{ // Comment
+				$CommentCache = & get_CommentCache();
+				$this->Comment = $CommentCache->get_by_ID( $db_row->link_cmt_ID );
+				$this->Item = NULL;
+			}
 
 			$this->file_ID = $db_row->link_file_ID;
 
@@ -125,6 +136,9 @@ class Link extends DataObject
 
 /*
  * $Log$
+ * Revision 1.12  2011/03/03 12:47:29  efy-asimo
+ * comments attachments
+ *
  * Revision 1.11  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:

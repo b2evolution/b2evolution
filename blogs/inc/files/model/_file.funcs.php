@@ -1380,8 +1380,61 @@ function process_upload( $root, $path, $create_path_dirs = false, $check_perms =
 }
 
 
+/**
+ * Remove files with the given ids
+ * 
+ * @param array file ids to remove, default to remove all orphan file IDs
+ * @param integer remove files older then the given hour, default NULL will remove all
+ * @return integer the number of removed files
+ */
+function remove_orphan_files( $file_ids = NULL, $older_then = NULL )
+{
+	global $DB, $localtimenow;
+	// asimo> This SQL query should use file class delete_restrictions array (currently T_links and T_users is explicitly used)
+	// select orphan comment attachment file ids
+	$sql = 'SELECT file_ID FROM T_files
+				WHERE ( file_path LIKE "comments/p%" OR file_path LIKE "anonymous_comments/p%" ) AND file_ID NOT IN (
+					SELECT * FROM (
+						( SELECT DISTINCT link_file_ID FROM T_links 
+							WHERE link_file_ID IS NOT NULL ) UNION
+						( SELECT DISTINCT user_avatar_file_ID FROM T_users 
+							WHERE user_avatar_file_ID IS NOT NULL ) ) AS linked_files )';
+
+	if( $file_ids != NULL )
+	{ // remove only from the given files
+		$sql .= ' AND file_ID IN ( '.implode( ',', $file_ids ).' )';
+	}
+
+	$result = $DB->get_col( $sql );
+	$FileCache = & get_FileCache();
+	$count = 0;
+	foreach( $result as $file_ID )
+	{
+		$File = $FileCache->get_by_ID( $file_ID, false, false );
+		if( $older_then != NULL )
+		{ // we have to check if the File is older then the given value
+			$datediff = $localtimenow - filemtime( $File->_adfp_full_path );
+			if( $datediff > $older_then * 3600 ) // convert hours to seconds
+			{ // not older
+				continue;
+			}
+		}
+		// delete the file
+		if( $File->unlink() )
+		{
+			$count++;
+		}
+	}
+
+	return $count;
+}
+
+
 /*
  * $Log$
+ * Revision 1.53  2011/03/03 12:47:29  efy-asimo
+ * comments attachments
+ *
  * Revision 1.52  2011/03/02 11:04:22  efy-asimo
  * Refactor file uploads for future use
  *
