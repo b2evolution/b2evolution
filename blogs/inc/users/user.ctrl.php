@@ -140,6 +140,63 @@ if( !$Messages->has_errors() )
 			/* EXITED */
 			break;
 
+		case 'upload_avatar':
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			if( empty($edited_User) || !is_object($edited_User) )
+			{
+				$Messages->add( 'No user set!' ); // Needs no translation, should be prevented by UI.
+				$action = 'list';
+				break;
+			}
+
+			if( !$current_User->check_perm( 'users', 'edit' ) && $edited_User->ID != $current_User->ID )
+			{ // user is only allowed to update him/herself
+				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
+				$action = 'view';
+				break;
+			}
+
+			// process upload
+			$FileRootCache = & get_FileRootCache();
+			$root = FileRoot::gen_ID( 'user', $edited_User->ID );
+			$result = process_upload( $root, 'profile_pictures', true, false, true, false );
+			if( empty( $result ) )
+			{
+				$Messages->add( T_( 'You don\'t have permission to selected user file rott.' ), 'error' );
+			}
+			else
+			{
+				$uploadedFiles = $result['uploadedFiles'];
+				if( !empty( $uploadedFiles ) )
+				{ // upload was successful
+					$File = $uploadedFiles[0];
+					if( $File->is_image() )
+					{ // set uploaded image as avatar
+						$edited_User->set( 'avatar_file_ID', $File->ID, true );
+						$edited_User->dbupdate();
+						$Messages->add( T_('Avatar has been set successfull.'), 'success' );
+						$action = 'avatar';
+						break;
+					}
+					else
+					{ // uploaded file is not an image, delete the file
+						$Messages->add( T_( 'You can only set an image file to avatar!' ) );
+						$File->unlink();
+					}
+				}
+
+				$failedFiles = $result['failedFiles'];
+				if( !empty( $failedFiles ) )
+				{
+					$Messages->add( $failedFiles[0] );
+				}
+			}
+
+			$action = 'avatar';
+			break;
+
 		case 'update_avatar':
 			// Check that this action request is not a CSRF hacked request:
 			$Session->assert_received_crumb( 'user' );
@@ -493,6 +550,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.26  2011/03/03 14:31:57  efy-asimo
+ * use user.ctrl for avatar upload
+ * create File object in the db if an avatar file is already on the user's profile picture folder
+ *
  * Revision 1.25  2011/01/18 16:23:03  efy-asimo
  * add shared_root perm and refactor file perms - part1
  *

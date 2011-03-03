@@ -108,7 +108,7 @@ if( ! empty($root) )
 { // We have requested a root folder by string:
 	$fm_FileRoot = & $FileRootCache->get_by_ID($root, true);
 
-	if( ! $fm_FileRoot || ( ! isset( $available_Roots[$fm_FileRoot->ID] ) && ( $action != 'avatar_upload' ) ) || !$current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+	if( ! $fm_FileRoot || !isset( $available_Roots[$fm_FileRoot->ID] ) || !$current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
 	{ // Root not found or not in list of available ones. If avatar upload is in progress, the edited user root doesn't have to be available.
 		$Messages->add( T_('You don\'t have upload permission to the requested root directory.'), 'warning' );
 		$fm_FileRoot = false;
@@ -149,20 +149,10 @@ if( $fm_FileRoot )
 		$ads_list_path = get_canonical_path( $non_canonical_list_path );
 
 		if( !is_dir( $ads_list_path ) )
-		{ // This should happen only when avatar upload is in progress
-			if( $action == 'avatar_upload' )
-			{
-				// Get File object for requested target location:
-				$FileCache = & get_FileCache();
-				$newFolder = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, $path, true );
-				$newFolder->create( 'dir' );
-			}
-			else
-			{ // This should never happen, but just in case the diretory does not exist:
-				$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $path ), 'error' );
-				$path = '';		// fp> added
-				$ads_list_path = NULL;
-			}
+		{ // This should never happen, but just in case the diretory does not exist:
+			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $path ), 'error' );
+			$path = '';		// fp> added
+			$ads_list_path = NULL;
 		}
 		elseif( ! preg_match( '#^'.preg_quote($fm_FileRoot->ads_path, '#').'#', $ads_list_path ) )
 		{ // cwd is OUTSIDE OF root!
@@ -439,29 +429,6 @@ if( isset($_FILES) && count( $_FILES ) )
 		unset($failedFiles);
 	}
 
-	if( $action == 'avatar_upload' )
-	{
-		if( !empty( $uploadedFiles ) )
-		{
-			$newFile = $uploadedFiles[0];
-		}
-		$redirect_to = param( 'redirect_to', 'string' );
-		if( !empty( $failedFiles ) )
-		{	// Transmit file error to next page!
-			$Messages->add( $failedFiles[0], 'error' );
-			unset($failedFiles);
-		}
-		else if ( isset( $newFile ) && ( $newFile->is_image() ) )
-		{ // the file is an image, we can set it to avatar
-			$redirect_to = url_add_param( $redirect_to, 'file_ID='.$newFile->ID.'&'.url_crumb('user'), '&' );
-		}
-		else
-		{ // the uploaded file wasn't an image, transmit the error message
-			$Messages->add( T_('You can only set an image file to avatar!'), 'error' );
-		}
-		header_redirect( $redirect_to );
-	}
-
 	if( empty($failedFiles) && empty($renamedFiles) )
 	{ // quick mode or no failed files, Go back to Browsing
 		// header_redirect( $dispatcher.'?ctrl=files&root='.$fm_FileRoot->ID.'&path='.rawurlencode($path) );
@@ -503,6 +470,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.44  2011/03/03 14:31:57  efy-asimo
+ * use user.ctrl for avatar upload
+ * create File object in the db if an avatar file is already on the user's profile picture folder
+ *
  * Revision 1.43  2011/03/02 11:04:22  efy-asimo
  * Refactor file uploads for future use
  *

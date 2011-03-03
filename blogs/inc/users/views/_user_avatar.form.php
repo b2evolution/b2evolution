@@ -76,21 +76,15 @@ if( ( $current_User->check_perm( 'users', 'all' ) ) || ( $current_User->ID == $e
 		load_class( 'files/model/_fileroot.class.php', 'FileRoot' );
 		$path = 'profile_pictures';
 
-		$Form->hidden( 'ctrl', 'upload' );
-		$Form->hidden( 'root', FileRoot::gen_ID( 'user', $edited_User->ID ) );
-		$Form->hidden( 'path', $path );
-		$Form->hidden( 'action', 'avatar_upload' );
-		$Form->hidden( 'redirect_to', regenerate_url( '', 'user_tab=avatar&user_ID='.$edited_User->ID.'&action=update_avatar', '', '&') );
+		$Form->hidden( 'action', 'upload_avatar' );
 		// The following is mainly a hint to the browser.
 		$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
-		$Form->hiddens_by_key( get_memorized('ctrl') );
-		$Form->add_crumb( 'file' );
 
 		$FileRootCache = & get_FileRootCache();
 		$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $edited_User->ID );
 		$ads_list_path = get_canonical_path( $user_FileRoot->ads_path.$path );
 
-		if( $current_User->check_perm( 'files', 'add', false, $user_FileRoot ) )
+		if( $current_User->check_perm( 'files', 'add', false, $user_FileRoot ) || $current_User->check_perm( 'users', 'edit' ) )
 		{ // upload part
 			$info_content = '<input name="uploadfile[]" type="file" size="10" />';
 			$info_content .= '<input class="ActionButton" type="submit" value="&gt; '.T_('Upload!').'" />';
@@ -107,7 +101,7 @@ if( ( $current_User->check_perm( 'users', 'all' ) ) || ( $current_User->ID == $e
 				$info_content = '';
 				while( $lFile = & $user_avatar_Filelist->get_next() )
 				{ // Loop through all Files:
-					$lFile->load_meta();
+					$lFile->load_meta( true );
 					if( $lFile->is_image() )
 					{
 						$url = regenerate_url( '', 'user_tab=avatar&user_ID='.$edited_User->ID.'&action=update_avatar&file_ID='.$lFile->ID.'&'.url_crumb('user'), '', '&');
@@ -131,6 +125,10 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.11  2011/03/03 14:31:57  efy-asimo
+ * use user.ctrl for avatar upload
+ * create File object in the db if an avatar file is already on the user's profile picture folder
+ *
  * Revision 1.10  2011/01/18 16:23:03  efy-asimo
  * add shared_root perm and refactor file perms - part1
  *
