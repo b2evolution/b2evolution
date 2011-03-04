@@ -1258,13 +1258,23 @@ class Comment extends DataObject
 	 *
 	 * @param string Output format, see {@link format_to_output()}
 	 * @param boolean Add ban url action icon after each url or not
+	 * @param boolean show comment attachments
+	 * @param array attachment display params
 	 */
-	function content( $format = 'htmlbody', $ban_urls = false, $show_attachments = true )
+	function content( $format = 'htmlbody', $ban_urls = false, $show_attachments = true, $params = array() )
 	{
 		global $current_User;
 
 		if( $show_attachments )
 		{
+			// Make sure we are not missing any param:
+			$params = array_merge( array(
+					'before_image'        => '<div class="image_block">',
+					'before_image_legend' => '<div class="image_legend">',
+					'after_image_legend'  => '</div>',
+					'after_image'         => '</div>',
+					'image_size'          => 'fit-400x320',
+				), $params );
 			$attachments = array( 'images' => array(), 'docs' => array() );
 			if( empty( $this->ID ) && isset( $this->preview_attachments ) )
 			{ // PREVIEW
@@ -1300,7 +1310,7 @@ class Comment extends DataObject
 		{
 			foreach( $attachments['images'] as $image_File )
 			{ // show image attachments
-				echo $image_File->get_tag( '<div class="image_block">', '<div class="image_legend">', '</div>', '</div>', 'fit-400x320' );
+				echo $image_File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'] );
 			}
 		}
 
@@ -1828,6 +1838,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.81  2011/03/04 08:40:23  efy-asimo
+ * Add params to content display template
+ *
  * Revision 1.80  2011/03/03 12:47:29  efy-asimo
  * comments attachments
  *
