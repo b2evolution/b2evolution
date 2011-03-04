@@ -176,6 +176,14 @@ form.bComment fieldset div.info
 	/* border: 1px solid #f00; */
 }
 
+/* bComment Avatar */
+form.bComment fieldset div.avatartag
+{
+	float: left;
+	margin: 0.2ex;
+	padding: 0;
+}
+
 /* Avatar widget */
 div.widget_core_coll_avatar {
 	margin-top: 1em;

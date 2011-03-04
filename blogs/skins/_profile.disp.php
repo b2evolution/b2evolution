@@ -78,9 +78,9 @@ $ProfileForm->begin_fieldset( T_('Identity') );
 	if( $Settings->get('allow_avatars') )
 	{
 		$avatar_tag = $current_User->get_avatar_imgtag();
-		if( $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) )
+		if( $Settings->get( 'fm_enable_roots_user' ) )
 		{
-			$avatar_tag .= ' <a href="'.$admin_url.'?ctrl=files&amp;user_ID='.$current_User->ID.'">'.T_('change').' &raquo;</a>';
+			$avatar_tag .= ' <a href="'.get_user_avatar_url().'">'.T_('change').' &raquo;</a>';
 		}
 		$ProfileForm->info( T_('Avatar'), $avatar_tag );
 	}
@@ -144,6 +144,9 @@ $ProfileForm->end_form();
 
 /*
  * $Log$
+ * Revision 1.20  2011/03/04 08:20:45  efy-asimo
+ * Simple avatar upload in the front office
+ *
  * Revision 1.19  2011/02/15 15:37:00  efy-asimo
  * Change access to admin permission
  *

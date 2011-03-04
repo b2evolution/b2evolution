@@ -444,6 +444,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_postidx'        => '_postidx.disp.php',
 				'disp_posts'          => '_posts.disp.php',
 				'disp_profile'        => '_profile.disp.php',
+				'disp_avatar'         => '_avatar.disp.php',
 				'disp_search'					=> '_search.disp.php',
 				'disp_single'         => '_single.disp.php',
 				'disp_sitemap'        => '_sitemap.disp.php',
@@ -889,6 +890,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.87  2011/03/04 08:20:45  efy-asimo
+ * Simple avatar upload in the front office
+ *
  * Revision 1.86  2010/10/18 12:02:26  efy-asimo
  * tiny url links - fix
  *

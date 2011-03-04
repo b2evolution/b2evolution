@@ -164,7 +164,7 @@ if( !$Messages->has_errors() )
 			$result = process_upload( $root, 'profile_pictures', true, false, true, false );
 			if( empty( $result ) )
 			{
-				$Messages->add( T_( 'You don\'t have permission to selected user file rott.' ), 'error' );
+				$Messages->add( T_( 'You don\'t have permission to selected user file root.' ), 'error' );
 			}
 			else
 			{
@@ -550,6 +550,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.27  2011/03/04 08:20:45  efy-asimo
+ * Simple avatar upload in the front office
+ *
  * Revision 1.26  2011/03/03 14:31:57  efy-asimo
  * use user.ctrl for avatar upload
  * create File object in the db if an avatar file is already on the user's profile picture folder

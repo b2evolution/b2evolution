@@ -415,6 +415,26 @@ function get_user_profile_url()
 
 
 /**
+ * Get URL to edit user avatar
+ */
+function get_user_avatar_url()
+{
+	global $current_User, $Blog, $is_admin_page, $admin_url, $ReqURI;
+
+	if( $is_admin_page || empty( $Blog ) )
+	{
+		$url = $admin_url.'?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$current_User->ID;
+	}
+	else
+	{
+		$url = url_add_param( $Blog->gen_blogurl(), 'disp=avatar&amp;redirect_to='.rawurlencode($ReqURI) );
+	}
+
+	return $url;
+}
+
+
+/**
  * Template tag: Provide a link to subscription screen
  */
 function user_subs_link( $before = '', $after = '', $link_text = '', $link_title = '#' )
@@ -722,6 +742,9 @@ function seconds_to_fields( $duration )
 
 /*
  * $Log$
+ * Revision 1.28  2011/03/04 08:20:45  efy-asimo
+ * Simple avatar upload in the front office
+ *
  * Revision 1.27  2011/02/15 15:37:00  efy-asimo
  * Change access to admin permission
  *

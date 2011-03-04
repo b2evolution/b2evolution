@@ -305,6 +305,7 @@ function request_title( $params = array() )
 			'sitemap_text'        => T_('Site Map'),
 			'msgform_text'        => T_('Send a Message'),
 			'profile_text'        => T_('User Profile'),
+			'avatar_text'         => T_('User Avatar'),
 			'user_text'           => T_('User'),
 			'subs_text'           => T_('Subscriptions'),
 			'comments_text'       => T_('Latest Comments'),
@@ -376,6 +377,11 @@ function request_title( $params = array() )
 		case 'profile':
 			// We are requesting the user profile:
 			$r[] = $params['profile_text'];
+			break;
+
+		case 'avatar':
+			// We are requesting the user avatar:
+			$r[] = $params['avatar_text'];
 			break;
 
 		case 'subs':
@@ -1118,6 +1124,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.79  2011/03/04 08:20:44  efy-asimo
+ * Simple avatar upload in the front office
+ *
  * Revision 1.78  2010/12/18 00:23:05  fplanque
  * minor stuff & fixes
  *
