@@ -2884,6 +2884,9 @@ function upgrade_b2evo_tables()
 					ADD INDEX link_cmt_ID ( link_cmt_ID )' );
 	task_end();
 
+	require_once dirname(__FILE__).'/_functions_create.php';
+	create_default_jobs( true );
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -3058,6 +3061,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.385  2011/03/07 08:11:04  efy-asimo
+ * Create default jobbs into the scheduler
+ *
  * Revision 1.384  2011/03/03 12:47:29  efy-asimo
  * comments attachments
  *
