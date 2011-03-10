@@ -96,13 +96,19 @@ $Results->cols[] = array(
  */
 function display_perm( $perm )
 {
-	if ( $perm )
+	switch( $perm )
 	{
-		$r = get_icon( 'file_allowed' );
-	}
-	else
-	{
-		$r = get_icon( 'file_not_allowed' );
+		case 'any':
+			$r = get_icon( 'file_allowed' );
+			break;
+		case 'registered':
+			$r = get_icon( 'file_allowed_registered' );
+			break;
+		case 'admin':
+			$r = get_icon( 'file_not_allowed' );
+			break;
+		default:
+			debug_die( 'Wrong filetype allowed value!' );
 	}
 	return $r;
 }
@@ -145,6 +151,9 @@ $Session->delete( 'fadeout_id');
 
 /*
  * $Log$
+ * Revision 1.13  2011/03/10 14:54:18  efy-asimo
+ * Allow file types modification & add m4v file type
+ *
  * Revision 1.12  2010/02/08 17:53:02  efy-yury
  * copyright 2009 -> 2010
  *

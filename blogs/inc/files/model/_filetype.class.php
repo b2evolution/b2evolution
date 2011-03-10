@@ -76,6 +76,7 @@ class Filetype extends DataObject
 		else
 		{	// Create a new filetype:
 			$this->set( 'viewtype', 'browser' );
+			$this->set( 'allowed', 'registered' );
 		}
 	}
 
@@ -121,8 +122,8 @@ class Filetype extends DataObject
 		$this->set_from_Request( 'viewtype' );
 
 		// Allowed to upload theses extensions
-		param( 'ftyp_allowed', 'integer', '0' );
-		if( $GLOBALS['ftyp_allowed'] )
+		param( 'ftyp_allowed', 'string', 'registered' );
+		if( $GLOBALS['ftyp_allowed'] != 'admin' )
 		{
 			// Check if the extension is in the array of the not allowed extensions (_advanced.php)
 			$not_allowed = false;
@@ -137,7 +138,7 @@ class Filetype extends DataObject
 			}
 			if( $not_allowed )
 			{ // this extension is not allowed
-				$GLOBALS['ftyp_allowed'] = 0;
+				$GLOBALS['ftyp_allowed'] = 'admin';
 			}
 		}
 		$this->set_from_Request( 'allowed' );
@@ -198,10 +199,34 @@ class Filetype extends DataObject
 	{
 		return explode(' ', $this->extensions);
 	}
+
+
+	/**
+	 * Get if filetype is allowed for the currentUser
+	 * 
+	 * @param boolean locked files are allowed for the current user.
+	 * @return boolean true if currentUser is allowed to upload/rename files with this filetype, false otherwise
+	 */
+	function is_allowed( $allow_locked = NULL )
+	{
+		global $current_User;
+		if( !is_logged_in() )
+		{
+			return $this->allowed == 'any';
+		}
+		if( $allow_locked == NULL )
+		{
+			$allow_locked = $current_User->check_perm( 'files', 'all' );
+		}
+		return ( $this->allowed != 'admin' ) ? true : $allow_locked;
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.9  2011/03/10 14:54:18  efy-asimo
+ * Allow file types modification & add m4v file type
+ *
  * Revision 1.8  2010/02/08 17:52:18  efy-yury
  * copyright 2009 -> 2010
  *

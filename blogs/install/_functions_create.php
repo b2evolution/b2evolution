@@ -213,23 +213,24 @@ function create_default_data()
 	$DB->query( "INSERT INTO T_filetypes
 			(ftyp_ID, ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed)
 		VALUES
-			(1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 1),
-			(2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 1),
-			(3, 'jpg jpeg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 1),
-			(4, 'txt', 'Text file', 'text/plain', 'document.png', 'text', 1),
-			(5, 'htm html', 'HTML file', 'text/html', 'html.png', 'browser', 0),
-			(6, 'pdf', 'PDF file', 'application/pdf', 'pdf.png', 'browser', 1),
-			(7, 'doc', 'Microsoft Word file', 'application/msword', 'doc.gif', 'external', 1),
-			(8, 'xls', 'Microsoft Excel file', 'application/vnd.ms-excel', 'xls.gif', 'external', 1),
-			(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'ppt.gif', 'external', 1),
-			(10, 'pps', 'Slideshow', 'pps', 'pps.gif', 'external', 1),
-			(11, 'zip', 'ZIP archive', 'application/zip', 'zip.gif', 'external', 1),
-			(12, 'php php3 php4 php5 php6', 'PHP script', 'application/x-httpd-php', 'php.gif', 'text', 0),
-			(13, 'css', 'Style sheet', 'text/css', '', 'text', 1),
-			(14, 'mp3', 'MPEG audio file', 'audio/mpeg', '', 'browser', 1),
-			(15, 'm4a', 'MPEG audio file', 'audio/x-m4a', '', 'browser', 1),
-			(16, 'mp4', 'MPEG video', 'video/mp4', '', 'browser', 1),
-			(17, 'mov', 'Quicktime video', 'video/quicktime', '', 'browser', 1)
+			(1, 'gif', 'GIF image', 'image/gif', 'image2.png', 'image', 'any'),
+			(2, 'png', 'PNG image', 'image/png', 'image2.png', 'image', 'any'),
+			(3, 'jpg jpeg', 'JPEG image', 'image/jpeg', 'image2.png', 'image', 'any'),
+			(4, 'txt', 'Text file', 'text/plain', 'document.png', 'text', 'registered'),
+			(5, 'htm html', 'HTML file', 'text/html', 'html.png', 'browser', 'admin'),
+			(6, 'pdf', 'PDF file', 'application/pdf', 'pdf.png', 'browser', 'registered'),
+			(7, 'doc', 'Microsoft Word file', 'application/msword', 'doc.gif', 'external', 'registered'),
+			(8, 'xls', 'Microsoft Excel file', 'application/vnd.ms-excel', 'xls.gif', 'external', 'registered'),
+			(9, 'ppt', 'Powerpoint', 'application/vnd.ms-powerpoint', 'ppt.gif', 'external', 'registered'),
+			(10, 'pps', 'Slideshow', 'pps', 'pps.gif', 'external', 'registered'),
+			(11, 'zip', 'ZIP archive', 'application/zip', 'zip.gif', 'external', 'registered'),
+			(12, 'php php3 php4 php5 php6', 'PHP script', 'application/x-httpd-php', 'php.gif', 'text', 'admin'),
+			(13, 'css', 'Style sheet', 'text/css', '', 'text', 'registered'),
+			(14, 'mp3', 'MPEG audio file', 'audio/mpeg', '', 'browser', 'registered'),
+			(15, 'm4a', 'MPEG audio file', 'audio/x-m4a', '', 'browser', 'registered'),
+			(16, 'mp4', 'MPEG video', 'video/mp4', '', 'browser', 'registered'),
+			(17, 'mov', 'Quicktime video', 'video/quicktime', '', 'browser', 'registered'),
+			(18, 'm4v', 'MPEG video file', 'video/x-m4v', '', 'browser', 'registered')
 		" );
 	echo "OK.<br />\n";
 
@@ -1345,6 +1346,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.304  2011/03/10 14:54:19  efy-asimo
+ * Allow file types modification & add m4v file type
+ *
  * Revision 1.303  2011/03/07 08:11:04  efy-asimo
  * Create default jobbs into the scheduler
  *

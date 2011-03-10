@@ -92,8 +92,13 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 		}
 	}
 
-	$Form->checkbox( 'ftyp_allowed', $edited_Filetype->allowed, T_('Allow upload'),
-									T_('Check to allow uploading and renaming of this file type'), '', 1, $not_allowed);
+	$Form->radio( 'ftyp_allowed',  $edited_Filetype->allowed,
+					array(
+							array( 'any', T_( 'Allow anyone (including anonymous users) to upload/rename files of this type' ) ),
+							array( 'registered', T_( 'Allow only registered users to upload/rename files of this type' ) ),
+							array( 'admin', T_( 'Allow only admins to upload/rename files of this type' ) )
+						),
+					T_( 'Allow upload' ), true );
 
 if( $creating )
 {
@@ -111,6 +116,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.8  2011/03/10 14:54:18  efy-asimo
+ * Allow file types modification & add m4v file type
+ *
  * Revision 1.7  2010/02/08 17:53:02  efy-yury
  * copyright 2009 -> 2010
  *

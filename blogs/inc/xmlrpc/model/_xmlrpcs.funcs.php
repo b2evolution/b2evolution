@@ -278,7 +278,7 @@ function _wp_mw_newmediaobject($m)
 
 	// Check valid filename/extension: (includes check for locked filenames)
 	logIO( 'File name: '.$filename );
-	if( $error_filename = validate_filename( $filename, false ) )
+	if( $error_filename = validate_filename( $filename ) )
 	{
 		return xmlrpcs_resperror( 5, $error_filename );
 	}
@@ -917,6 +917,9 @@ function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
 
 /*
  * $Log$
+ * Revision 1.31  2011/03/10 14:54:18  efy-asimo
+ * Allow file types modification & add m4v file type
+ *
  * Revision 1.30  2011/03/02 09:45:59  efy-asimo
  * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
  *

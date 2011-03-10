@@ -454,9 +454,9 @@ class File extends DataObject
 	/**
 	 * Is the file editable?
 	 *
-	 * @param boolean allow locked file types?
+	 * @param mixed true/false allow locked file types? NULL value means that FileType will decide
 	 */
-	function is_editable( $allow_locked = false )
+	function is_editable( $allow_locked = NULL )
 	{
 		if( $this->is_dir() )
 		{ // we cannot edit dirs
@@ -469,12 +469,8 @@ class File extends DataObject
 			return false;
 		}
 
-		if( ! $Filetype->allowed && ! $allow_locked )
-		{	// We cannot edit locked file types:
-			return false;
-		}
-
-		return true;
+		// user can edit only allowed file types
+		return $Filetype->is_allowed( $allow_locked );
 	}
 
 
@@ -2119,6 +2115,9 @@ class File extends DataObject
 
 /*
  * $Log$
+ * Revision 1.92  2011/03/10 14:54:18  efy-asimo
+ * Allow file types modification & add m4v file type
+ *
  * Revision 1.91  2010/12/18 00:23:05  fplanque
  * minor stuff & fixes
  *

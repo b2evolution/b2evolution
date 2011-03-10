@@ -45,13 +45,16 @@ $schema_queries['T_filetypes'] = array(
 			ftyp_mimetype varchar(50) NOT NULL,
 			ftyp_icon varchar(20) default NULL,
 			ftyp_viewtype varchar(10) NOT NULL,
-			ftyp_allowed tinyint(1) NOT NULL default 0,
+			ftyp_allowed enum('any','registered','admin') NOT NULL default 'admin',
 			PRIMARY KEY (ftyp_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
 
 
 /*
  * $Log$
+ * Revision 1.6  2011/03/10 14:54:18  efy-asimo
+ * Allow file types modification & add m4v file type
+ *
  * Revision 1.5  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

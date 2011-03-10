@@ -415,6 +415,11 @@ function get_icon_info($name)
 			'alt'  => T_( 'Allowed' ),
 			'size' => array( 16, 14 ),
 		);
+		case 'file_allowed_registered': return array(
+			'file' => 'icons/lock_open.png',
+			'alt'  => T_( 'Allowed for registered users' ),
+			'size' => array( 16, 14 ),
+		);
 		case 'file_not_allowed': return array(
 			'file' => 'icons/locked.gif',
 			'alt'  => T_( 'Blocked' ),
@@ -534,6 +539,9 @@ function get_icon_info($name)
 
 /*
  * $Log$
+ * Revision 1.73  2011/03/10 14:54:18  efy-asimo
+ * Allow file types modification & add m4v file type
+ *
  * Revision 1.72  2011/02/24 13:11:28  efy-asimo
  * Change recycle icons size
  *

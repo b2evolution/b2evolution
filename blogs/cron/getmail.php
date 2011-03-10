@@ -331,7 +331,7 @@ function processAttachments( $mailAttachments, $mediadir, $media_url, $add_img_t
 		$filename = preg_replace( '/[^a-z0-9\-_.]/', '-', $filename );
 
 		// Check valid filename/extension: (includes check for locked filenames)
-		if( $error_filename = validate_filename( $filename, false ) )
+		if( $error_filename = validate_filename( $filename ) )
 		{
 			echo_message( '&#x2718; ' . 'Invalid filename: '.$error_filename, WARNING, 2 );
 			$return = false; // return: at least one error. try with next attachment
@@ -723,6 +723,9 @@ if( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.48  2011/03/10 14:54:18  efy-asimo
+ * Allow file types modification & add m4v file type
+ *
  * Revision 1.47  2011/02/15 05:31:53  sam2kb
  * evo_strtolower mbstring wrapper for strtolower function
  *

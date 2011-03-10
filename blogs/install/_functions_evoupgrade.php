@@ -2887,6 +2887,33 @@ function upgrade_b2evo_tables()
 	require_once dirname(__FILE__).'/_functions_create.php';
 	create_default_jobs( true );
 
+	task_begin( 'Upgrading filetypes table...' );
+	// get allowed filetype ids
+	$sql = 'SELECT ftyp_ID
+				FROM T_filetypes
+				WHERE ftyp_allowed != 0';
+	$allowed_ids = implode( ',', $DB->get_col( $sql, 0, 'Get allowed filetypes' ) );
+	// update table column
+	$DB->query( 'ALTER TABLE T_filetypes
+					MODIFY COLUMN ftyp_allowed enum("any","registered","admin") NOT NULL default "admin"' );
+	// update ftyp_allowed column content
+	$DB->query( 'UPDATE T_filetypes
+					SET ftyp_allowed = "registered"
+					WHERE ftyp_ID IN ('.$allowed_ids.')' );
+	$DB->query( 'UPDATE T_filetypes
+					SET ftyp_allowed = "admin"
+					WHERE ftyp_ID NOT IN ('.$allowed_ids.')' );
+	$DB->query( 'UPDATE T_filetypes
+					SET ftyp_allowed = "any"
+					WHERE ftyp_extensions = "gif" OR ftyp_extensions = "png" OR ftyp_extensions LIKE "%jpg%"' );
+	// Add m4v file type if not exists
+	if( !db_key_exists( 'T_filetypes', 'ftyp_extensions', '"m4v"' ) )
+	{
+		$DB->query( 'INSERT INTO T_filetypes (ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed)
+			             VALUES ("m4v", "MPEG video file", "video/x-m4v", "", "browser", "registered")', 'Add "m4v" file type' );
+	}
+	task_end();
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -3061,6 +3088,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.386  2011/03/10 14:54:19  efy-asimo
+ * Allow file types modification & add m4v file type
+ *
  * Revision 1.385  2011/03/07 08:11:04  efy-asimo
  * Create default jobbs into the scheduler
  *

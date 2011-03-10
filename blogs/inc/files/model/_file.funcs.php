@@ -485,10 +485,10 @@ function get_canonical_path( $ads_path )
  * @uses $FiletypeCache, $settings or $force_regexp_filename form _advanced.php
  *
  * @param string filename to test
- * @param boolean
+ * @param mixed true/false to allow locked filetypes. NULL means that FileType will decide
  * @return nothing if the filename is valid according to the regular expression and the extension too, error message if not
  */
-function validate_filename( $filename, $allow_locked_filetypes = false )
+function validate_filename( $filename, $allow_locked_filetypes = NULL )
 {
 	global $Settings, $force_regexp_filename;
 
@@ -514,7 +514,7 @@ function validate_filename( $filename, $allow_locked_filetypes = false )
 		$FiletypeCache = & get_FiletypeCache();
 		if( $Filetype = & $FiletypeCache->get_by_extension( strtolower( $match[1] ) , false ) )
 		{
-			if( $Filetype->allowed || $allow_locked_filetypes )
+			if( $Filetype->is_allowed( $allow_locked_filetypes ) )
 			{ // Filename has an unlocked extension or we allow locked extensions
 				return;
 			}
@@ -603,12 +603,26 @@ function check_rename ( & $newname, $is_dir, $allow_locked_filetypes )
  */
 function get_upload_restriction()
 {
-	global $DB, $Settings;
+	global $DB, $Settings, $current_User;
 	$restrictNotes = array();
+
+	if( is_logged_in() )
+	{
+		$condition = ( $current_User->check_perm( 'files', 'all' ) ) ? '' : 'ftyp_allowed <> "admin"';
+	}
+	else
+	{
+		$condition = 'ftyp_allowed = "any"';
+	}
+
+	if( !empty( $condition ) )
+	{
+		$condition = ' WHERE '.$condition;
+	}
 
 	// Get list of recognized file types (others are not allowed to get uploaded)
 	// dh> because FiletypeCache/DataObjectCache has no interface for getting a list, this dirty query seems less dirty to me.
-	$allowed_extensions = $DB->get_col( 'SELECT ftyp_extensions FROM T_filetypes WHERE ftyp_allowed != 0' );
+	$allowed_extensions = $DB->get_col( 'SELECT ftyp_extensions FROM T_filetypes'.$condition );
 	$allowed_extensions = implode( ' ', $allowed_extensions ); // implode with space, ftyp_extensions can hold many, separated by space
 	// into array:
 	$allowed_extensions = preg_split( '~\s+~', $allowed_extensions, -1, PREG_SPLIT_NO_EMPTY );
@@ -1432,6 +1446,9 @@ function remove_orphan_files( $file_ids = NULL, $older_then = NULL )
 
 /*
  * $Log$
+ * Revision 1.54  2011/03/10 14:54:18  efy-asimo
+ * Allow file types modification & add m4v file type
+ *
  * Revision 1.53  2011/03/03 12:47:29  efy-asimo
  * comments attachments
  *
