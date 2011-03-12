@@ -50,8 +50,7 @@ class twitter_plugin extends Plugin
 	var $code = 'evo_twitter';
 	var $priority = 50;
 	var $version = '4.1';
-	var $author = 'Lee Turner';
-	var $help_url = 'http://leeturner.org/twitterlution.php';
+	var $author = 'b2evolution Group';
 
 	/*
 	 * These variables MAY be overriden.
@@ -216,8 +215,8 @@ class twitter_plugin extends Plugin
 
 	/**
 	 * Get link to twitter oAuth
-	 * 
-	 * @param string target type can be "blog" or "user", depends if we set blog or user setting 
+	 *
+	 * @param string target type can be "blog" or "user", depends if we set blog or user setting
 	 * @param string current blog id or edited user id
 	 * @return string twitter oAuth link
 	 */
@@ -261,7 +260,7 @@ class twitter_plugin extends Plugin
 			{
 				$oauth_contact = $this->get_twitter_contact( $oauth_token, $oauth_token_secret );
 				if( ! empty( $oauth_contact ) )
-			{
+				{
 					if( $target_type == 'blog' )
 					{ // CollSettings
 						$this->set_coll_setting( 'twitter_contact', $oauth_contact, $Blog->ID );
@@ -272,8 +271,8 @@ class twitter_plugin extends Plugin
 						$this->UserSettings->set( 'twitter_contact', $oauth_contact, $target_id );
 						$this->UserSettings->dbupdate();
 					}
+				}
 			}
-		}
 			$result = T_('Linked to').': @'.$oauth_contact.'. ';
 		}
 
@@ -318,9 +317,9 @@ class twitter_plugin extends Plugin
 
 	/**
 	 * Get twitter contact display name
-	 * 
+	 *
 	 * @access private
-	 * 
+	 *
 	 * @param string oauth_token
 	 * @param string oauth tokensecret
 	 * @return string contact display name on success, empty string on error
@@ -549,6 +548,7 @@ class twitter_plugin extends Plugin
 
 		if( empty($result) )
 		{
+			$xmlrpcresp = 'Unknown error while posting "'.$msg.'" to account @'.$oauth_contact;
 			return false;
 		}
 		elseif( !empty($result->error) )
@@ -562,13 +562,16 @@ class twitter_plugin extends Plugin
 			$oauth_contact = $this->get_twitter_contact( $oauth_token, $oauth_token_secret );
 		}
 
-		$xmlrpcresp = T_('Posted to account: @').$oauth_contact;
+		$xmlrpcresp = T_('Posted to account @').$oauth_contact;
 		return true;
 	}
 }
 
 /*
  * $Log$
+ * Revision 1.29  2011/03/12 21:41:33  fplanque
+ * minor debug messages
+ *
  * Revision 1.28  2011/02/10 23:07:22  fplanque
  * minor/doc
  *
