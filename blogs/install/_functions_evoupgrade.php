@@ -2797,7 +2797,7 @@ function upgrade_b2evo_tables()
 	foreach( $rows as $row )
 	{
 		$DB->query( 'INSERT INTO T_groups__groupsettings( gset_grp_ID, gset_name, gset_value )
-						VALUES( '.$row->grp_ID.', "perm_spamblacklist", "'.$row->perm_spamblacklist.'" ),
+						VALUES( '.$row->grp_ID.', "perm_spamblacklist", "'.$row->grp_perm_spamblacklist.'" ),
 							( '.$row->grp_ID.', "perm_slugs", "'.$row->grp_perm_slugs.'" ),
 							( '.$row->grp_ID.', "perm_files", "'.$row->grp_perm_files.'" ),
 							( '.$row->grp_ID.', "perm_options", "'.$row->grp_perm_options.'" ),
@@ -3088,6 +3088,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.387  2011/03/14 14:12:40  efy-asimo
+ * fix upgrade script
+ *
  * Revision 1.386  2011/03/10 14:54:19  efy-asimo
  * Allow file types modification & add m4v file type
  *
