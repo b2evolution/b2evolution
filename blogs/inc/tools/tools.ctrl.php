@@ -118,6 +118,20 @@ if( empty($tab) )
 			$Messages->add( sprintf( T_('Deleted %d directories.'), $deleted_dirs ), 'success' );
 			break;
 
+		case 'repair_cache':
+			load_funcs( 'tools/model/_system.funcs.php' );
+			$result = system_check_caches();
+			if( empty( $result ) )
+			{
+				$Messages->add( T_( 'All cache folders are working properly.' ), 'success' );
+			}
+			else
+			{
+				$error_message = T_( 'Unable to repair all cache folders becaue of file permissions' ).':<br />';
+				$Messages->add( $error_message.implode( '<br />', $result ) );
+			}
+			break;
+
 		case 'optimize_tables':
 			// Optimize MyISAM tables
 			global $tableprefix;
@@ -456,6 +470,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.39  2011/03/15 09:34:06  efy-asimo
+ * have checkboxes for enabling caching in new blogs
+ * refactorize cache create/enable/disable
+ *
  * Revision 1.38  2011/03/03 12:50:57  efy-asimo
  * tool to find and delete orphan comment attachment files
  *

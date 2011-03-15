@@ -112,6 +112,8 @@ class GeneralSettings extends AbstractSettings
 		'cross_posting_blog' => 0,					// Allow to choose main category from another blog
 
 		'general_cache_enabled' => 0,
+		'newblog_cache_enabled' => 0,
+		'newblog_cache_enabled_widget' => 0,
 
 		'eblog_enabled' => 0,						// blog by email
 		'eblog_method' => 'pop3',					// blog by email
@@ -234,6 +236,10 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.34  2011/03/15 09:34:05  efy-asimo
+ * have checkboxes for enabling caching in new blogs
+ * refactorize cache create/enable/disable
+ *
  * Revision 1.33  2010/11/24 14:55:30  efy-asimo
  * Add user gender
  *

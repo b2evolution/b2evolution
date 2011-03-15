@@ -22,9 +22,9 @@
 /**
  * Check if a directory is ready for operation, i-e writable by PHP.
  *
- * @return array {status,msg}
+ * @return integer result code, 0 means 'ok'
  */
-function system_check_dir( $directory = 'media' )
+function system_check_dir( $directory = 'media', $relative_path = NULL )
 {
 	global $media_path, $cache_path;
 
@@ -39,31 +39,219 @@ function system_check_dir( $directory = 'media' )
 			break;
 
 		default:
-			return array( 'error', 'Unknown directory' );
+			return 1;
+	}
+
+	if( $relative_path != NULL )
+	{
+		$path .= $relative_path;
 	}
 
 	if( ! is_dir( $path ) )
 	{
-		$msg = T_( 'The directory doesn\'t exist.' );
-		$status = 'error';
+		return 2;
 	}
 	elseif( ! is_readable( $path ) )
 	{
-		$msg = T_( 'The directory is not readable.' );
-		$status = 'error';
+		return 3;
 	}
 	elseif( ! is_writable( $path ) )
 	{
-		$msg = T_( 'The directory is not writable.' );
-		$satus = 'error';
+		return 4;
 	}
 	else
 	{
-		$msg = T_( 'Ok' );
-		$status = 'ok';
+		$tempfile_path = $path.'temp.tmp';
+		if( !@touch( $tempfile_path ) || !@unlink( $tempfile_path ) )
+		{
+			return 5;
+		}
 	}
 
-	return array( $status, $msg );
+	return 0;
+}
+
+
+/**
+ * Get corresponding status and message for the system_check_dir code.
+ * 
+ * @param integer system_check_dir result code
+ * @param string before message
+ */
+function system_get_result( $check_dir_code, $before_msg = '' )
+{
+	$status = ( $check_dir_code == 0 ) ? 'ok' : 'error';
+	$system_results = array(
+		0 => T_( 'OK' ),
+		1 => T_( 'Unknown directory' ), 
+		2 => T_( 'The directory doesn\'t exist.' ),
+		3 => T_( 'The directory is not readable.' ),
+		4 => T_( 'The directory is not writable.' ),
+		5 => T_( 'No permission to create/delete file in directory!' ) );
+	return array( $status, $before_msg.$system_results[$check_dir_code] );
+}
+
+
+/**
+ * Create cache/ and  /cache/plugins/ folders
+ * 
+ * @return boolean false if cache/ folder not exists or has limited editing permission, true otherwise
+ */
+function system_create_cache_folder()
+{
+	global $cache_path;
+	// create /cache folder
+	mkdir_r( $cache_path );
+	// check /cache folder
+	if( system_check_dir( 'cache' ) > 0 )
+	{
+		return false;
+	}
+
+	// create /cache/plugins/ folder
+	mkdir_r( $cache_path.'plugins/' );
+	return true;
+}
+
+
+/**
+ * Get blog ids
+ * 
+ * @param boolean true to get only those blogs where cache is enabled
+ * @return array blog ids
+ */
+function system_get_blogs( $only_cache_enabled )
+{
+	global $DB;
+	$query = 'SELECT blog_ID FROM T_blogs';
+	if( $only_cache_enabled )
+	{
+		$query .= ' INNER JOIN T_coll_settings ON ( blog_ID = cset_coll_ID
+								AND cset_name = "cache_enabled"
+								AND cset_value = "1" )';
+	}
+	return $DB->get_col( $query );
+}
+
+
+/**
+ * Check if the given blog cache directory is ready for operation
+ * 
+ * @param mixed blog ID, or NULL to check the general cache
+ * @param boolean true if function should try to repair the corresponding cache folder, false otherwise
+ * @return mixed false if the corresponding setting is disabled, or array( status, message ).
+ */
+function system_check_blog_cache( $blog_ID = NULL, $repair = false )
+{
+	global $Settings;
+	load_class( '_core/model/_pagecache.class.php', 'PageCache' );
+
+	$Blog = NULL;
+	$result = NULL;
+	if( ( $blog_ID == NULL ) && ( $Settings->get( 'general_cache_enabled' ) ) )
+	{
+		$result = system_check_dir( 'cache', 'general/' );
+		$before_msg = T_( 'General cache' ).': ';
+	}
+	else
+	{
+		$BlogCache = & get_BlogCache();
+		$Blog = $BlogCache->get_by_ID( $blog_ID );
+		if( $Blog->get_setting( 'cache_enabled' ) )
+		{
+			$result = system_check_dir( 'cache', 'c'.$blog_ID.'/' );
+			$before_msg = sprintf( T_( '%s cache' ).': ', $Blog->get( 'shortname' ) );
+		}
+	}
+
+	if( !isset( $result ) )
+	{
+		return false;
+	}
+
+	if( !$repair || ( $result == 0 ) )
+	{
+		return system_get_result( $result/*, $before_msg*/ );
+	}
+
+	// try to repair the corresponding cache folder
+	$PageCache = new PageCache( $Blog );
+	$PageCache->cache_delete();
+	$PageCache->cache_create();
+	return system_check_blog_cache( $blog_ID, false );
+}
+
+
+function system_check_caches( $repair = true )
+{
+	global $DB;
+
+	// Check cache/ folder
+	$result = system_check_dir( 'cache' );
+	if( $result > 0 )
+	{ // error with cache/ folder
+		$failed = true;
+		if( $repair && ( $result == 2 ) )
+		{ // if cache folder not exists, and should repair, then try to create it
+			$failed = ( $failed && !system_create_cache_folder() );
+		}
+		if( $failed )
+		{ // could/should not repair
+			list( $status, $message ) = system_get_result( $result, T_( 'Cache folder error' ).': ' );
+			return array( $message );
+		}
+	}
+
+	$error_messages = array();
+	if( ( $result = system_check_blog_cache( NULL, $repair ) ) !== false )
+	{ // general cache folder should exists
+		list( $status, $message ) = $result;
+		if( $status != 'ok' )
+		{
+			$error_messages[] = T_( 'General cache folder error' ).': '.$message;
+		}
+	}
+
+	$cache_enabled_blogs = system_get_blogs( true ); 
+	$BlogCache = & get_BlogCache();
+	foreach( $cache_enabled_blogs as $blog_ID )
+	{ // blog's cache folder should exists
+		if( ( $result = system_check_blog_cache( $blog_ID, $repair ) ) !== false )
+		{
+			list( $status, $message ) = $result;
+			if( $status != 'ok' )
+			{
+				$Blog = $BlogCache->get_by_ID( $blog_ID );
+				$error_messages[] = sprintf( T_( '&laquo;%s&raquo; page cache folder' ),  $Blog->get( 'shortname' ) ).': '.$message;
+			}
+		}
+	}
+
+	return $error_messages;
+}
+
+
+/**
+ * Initialize cache settings and folders (during install or upgrade)
+ */
+function system_init_caches()
+{
+	global $cache_path, $Settings, $DB;
+
+	// create /cache and /cache/plugins/ folders
+	if( !system_create_cache_folder() )
+	{
+		return false;
+	}
+
+	$Settings->set( 'newblog_cache_enabled', true );
+	set_cache_enabled( 'general_cache_enabled', true );
+	$existing_blogs = system_get_blogs( false );
+	foreach( $existing_blogs as $blog_ID )
+	{
+		set_cache_enabled( 'cache_enabled', true, $blog_ID );
+	}
+	return true;
 }
 
 
@@ -227,6 +415,10 @@ function system_check_gd_version()
 
 /*
  * $Log$
+ * Revision 1.10  2011/03/15 09:34:05  efy-asimo
+ * have checkboxes for enabling caching in new blogs
+ * refactorize cache create/enable/disable
+ *
  * Revision 1.9  2011/02/25 21:52:14  fplanque
  * partial rollback. install folder needs to be removed completely for max safety. There is no in between "ok" state.
  *

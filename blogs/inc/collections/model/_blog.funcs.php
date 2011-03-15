@@ -533,8 +533,83 @@ function get_collection_kinds( $kind = NULL )
 }
 
 
+/**
+ * Enable/Disable the given cache
+ * 
+ * @param string cache key name, 'general_cache_enabled', blogs 'cache_enabled'
+ * @param boolean status to set
+ * @param integer the id of the blog, if we want to set a blog's cache. Let it NULL to set general caching.
+ * @param boolean true to save db changes, false if db update will be called outside from this function
+ */
+function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_setting = true )
+{
+	load_class( '_core/model/_pagecache.class.php', 'PageCache' );
+	global $Settings;
+
+	if( empty( $coll_ID ) )
+	{ // general cache
+		$Blog = NULL;
+		$old_cache_status = $Settings->get( $cache_key );
+		$cache_name = T_( 'General' );
+	}
+	else
+	{ // blog page cache
+		$BlogCache = & get_BlogCache();
+		$Blog = $BlogCache->get_by_ID( $coll_ID );
+		$old_cache_status = $Blog->get_setting( $cache_key );
+		$cache_name = T_( 'Page' );
+	}
+
+	$PageCache = new PageCache( $Blog );
+	if( $old_cache_status == false && $new_status == true )
+	{ // Caching has been turned ON:
+		if( $PageCache->cache_create( false ) )
+		{ // corresponding cache folder was created  
+			$result = array( 'success', sprintf( T_( '%s caching has been enabled.' ), $cache_name ) );
+		}
+		else
+		{ // error creating cache folder
+			$result = array( 'error', sprintf( T_( '%s caching could not be enabled. Check /cache/ folder file permissions.' ), $cache_name ) );
+			$new_status = false;
+		}
+	}
+	elseif( $old_cache_status == true && $new_status == false )
+	{ // Caching has been turned OFF:
+		$PageCache->cache_delete();
+		$result = array( 'note',  sprintf( T_( '%s caching has been disabled. Cache contents have been purged.' ), $cache_name ) );
+	}
+	else
+	{ // nothing was changed
+		return NULL;
+	}
+
+	// set db changes
+	if( $Blog == NULL )
+	{
+		$Settings->set( 'general_cache_enabled', $new_status );
+		if( $save_setting )
+		{ // save
+			$Settings->dbupdate();
+		}
+	}
+	else
+	{
+		$Blog->set_setting( $cache_key, $new_status );
+		if( $save_setting )
+		{ // save
+			$Blog->dbupdate();
+		}
+	}
+	return $result;
+}
+
+
 /*
  * $Log$
+ * Revision 1.13  2011/03/15 09:34:05  efy-asimo
+ * have checkboxes for enabling caching in new blogs
+ * refactorize cache create/enable/disable
+ *
  * Revision 1.12  2011/01/06 14:31:47  efy-asimo
  * advanced blog permissions:
  *  - add blog_edit_ts permission

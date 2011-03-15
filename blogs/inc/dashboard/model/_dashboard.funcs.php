@@ -103,7 +103,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 
 	// Run system checks:
 	load_funcs( 'tools/model/_system.funcs.php' );
-	list( $mediadir_status ) = system_check_dir('media');
+	list( $mediadir_status ) =  system_get_result( system_check_dir('media') );
 	list( $installdir_status ) = system_check_install_removed();
 	list( $uid, $uname ) = system_check_process_user();
 	list( $gid, $gname ) = system_check_process_group();
@@ -289,6 +289,10 @@ function show_comments_awaiting_moderation( $blog_ID, $limit = 5, $comment_IDs =
 
 /*
  * $Log$
+ * Revision 1.42  2011/03/15 09:34:05  efy-asimo
+ * have checkboxes for enabling caching in new blogs
+ * refactorize cache create/enable/disable
+ *
  * Revision 1.41  2011/02/20 23:33:20  fplanque
  * I want updates to run on my localhost
  *

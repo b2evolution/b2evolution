@@ -81,30 +81,19 @@ switch( $action )
 		$Settings->set( 'reloadpage_timeout', $reloadpage_timeout );
 
 		$new_cache_status = param( 'general_cache_enabled', 'integer', 0 );
-		$old_cache_status = $Settings->get('general_cache_enabled');
-
-		load_class( '_core/model/_pagecache.class.php', 'PageCache' );
-		$PageCache = new PageCache();
-
-		if( $old_cache_status == false && $new_cache_status == true )
-		{ // Caching has been turned ON:
-			if( $PageCache->cache_create() )
-			{
-				$Messages->add( T_('General caching has been enabled.'), 'success' );
-			}
-			else
-			{
-				$Messages->add( T_('General caching could not be enabled. Check /cache/ folder file permissions.'), 'error' );
-				$new_cache_status = 0;
+		if( ! $Messages->has_errors() )
+		{
+			load_funcs( 'collections/model/_blog.funcs.php' );
+			$result = set_cache_enabled( 'general_cache_enabled', $new_cache_status, NULL, false );
+			if( $result != NULL )
+			{ // general cache setting was changed
+				list( $status, $message ) = $result;
+				$Messages->add( $message, $status );
 			}
 		}
-		elseif( $old_cache_status == true && $new_cache_status == false )
-		{ // Caching has been turned OFF:
-			$PageCache->cache_delete();
-			$Messages->add( T_('General caching has been disabled. All general cache contents have been purged.'), 'note' );
-		}
 
-		$Settings->set( 'general_cache_enabled', $new_cache_status );
+		$Settings->set( 'newblog_cache_enabled', param( 'newblog_cache_enabled', 'integer', 0 ) );
+		$Settings->set( 'newblog_cache_enabled_widget', param( 'newblog_cache_enabled_widget', 'integer', 0 ) );
 
 		if( ! $Messages->has_errors() )
 		{
@@ -145,6 +134,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.25  2011/03/15 09:34:05  efy-asimo
+ * have checkboxes for enabling caching in new blogs
+ * refactorize cache create/enable/disable
+ *
  * Revision 1.24  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *

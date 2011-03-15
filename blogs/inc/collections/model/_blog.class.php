@@ -453,7 +453,6 @@ class Blog extends DataObject
 
 		if( in_array( 'cache', $groups ) )
 		{ // we want to load the cache params:
-			$this->set_setting( 'cache_enabled', param( 'cache_enabled', 'integer', 0 ) );
 			$this->set_setting( 'cache_enabled_widgets', param( 'cache_enabled_widgets', 'integer', 0 ) );
 		}
 
@@ -1856,7 +1855,7 @@ class Blog extends DataObject
 	 */
 	function create()
 	{
-		global $DB, $Messages, $basepath, $current_User;
+		global $DB, $Messages, $basepath, $current_User, $Settings;
 		$DB->begin();
 
 		// DB INSERT
@@ -1911,6 +1910,18 @@ class Blog extends DataObject
 		$Messages->add( T_('Default widgets have been set-up for this blog.'), 'success' );
 
 		$DB->commit();
+
+		// set caching
+		if( $Settings->get( 'newblog_cache_enabled' ) )
+		{
+			$result = set_cache_enabled( 'cache_enabled', true, $this->ID );
+			if( $result != NULL )
+			{
+				list( $status, $message ) = $result;
+				$Messages->add( $message, $status );
+			}
+		}
+		$this->set_setting( 'cache_enabled_widgets', $Settings->get( 'newblog_cache_enabled_widget' ) );
 
 		// Commit changes in cache:
 		$BlogCache = & get_BlogCache();
@@ -2348,6 +2359,10 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.129  2011/03/15 09:34:05  efy-asimo
+ * have checkboxes for enabling caching in new blogs
+ * refactorize cache create/enable/disable
+ *
  * Revision 1.128  2011/03/02 09:45:58  efy-asimo
  * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
  *

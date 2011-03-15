@@ -618,6 +618,10 @@ class PageCache
 	{
 		global $cache_path;
 
+		load_funcs( 'tools/model/_system.funcs.php' );
+		// check and try to repair cache folders
+		system_check_caches();
+
 		$path = trailing_slash( $cache_path );
 
 		$first_error = '';
@@ -630,6 +634,10 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.27  2011/03/15 09:34:05  efy-asimo
+ * have checkboxes for enabling caching in new blogs
+ * refactorize cache create/enable/disable
+ *
  * Revision 1.26  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

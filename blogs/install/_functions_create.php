@@ -1341,11 +1341,20 @@ function create_demo_contents()
 
 	install_basic_widgets();
 
+	load_funcs( 'tools/model/_system.funcs.php' );
+	if( !system_init_caches() )
+	{
+		echo "<strong>The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal.</strong><br />\n";
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.305  2011/03/15 09:34:06  efy-asimo
+ * have checkboxes for enabling caching in new blogs
+ * refactorize cache create/enable/disable
+ *
  * Revision 1.304  2011/03/10 14:54:19  efy-asimo
  * Allow file types modification & add m4v file type
  *

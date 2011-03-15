@@ -175,7 +175,7 @@ else
 }
 
 // Media folder writable?
-list( $mediadir_status, $mediadir_msg ) = system_check_dir('media');
+list( $mediadir_status, $mediadir_msg ) = system_get_result( system_check_dir('media') );
 $mediadir_long = '';
 if( $mediadir_status == 'error' )
 {
@@ -187,7 +187,7 @@ disp_system_check( $mediadir_status, $mediadir_long );
 
 
 // Cache folder writable?
-list( $cachedir_status, $cachedir_msg ) = system_check_dir('cache');
+list( $cachedir_status, $cachedir_msg ) = system_get_result( system_check_dir('cache') );
 $cachedir_long = '';
 if( $cachedir_status == 'error' )
 {
@@ -224,6 +224,35 @@ else
 }
 
 
+$block_item_Widget->disp_template_raw( 'block_end' );
+
+
+/*
+ * Caching
+ */
+$block_item_Widget->title = T_( 'Caching' );
+$block_item_Widget->disp_template_replaced( 'block_start' );
+// General cache is enabled
+init_system_check( T_( 'General caching' ), $Settings->get( 'general_cache_enabled' ) ? T_( 'Enabled' ) : T_( 'Disabled' ) );
+disp_system_check( 'note' );
+if( $cachedir_status != 'error' )
+{ // 'cache/ directory exists and, it is writable
+	$error_messages = system_check_caches( false );
+	$blogs = system_get_blogs( false );
+	$cache_enabled_blogs = system_get_blogs( true );
+	$enabled_message = count( $cache_enabled_blogs ).'/'.count( $blogs ).' '.T_( 'Enabled' );
+	// how many blogs cache is enabled
+	init_system_check( T_( 'Blog\'s cache setting' ), $enabled_message );
+	disp_system_check( 'note' );
+	if( count( $error_messages ) > 0 )
+	{ // show errors
+		init_system_check( T_( 'Blog\'s cache errors' ), implode( '<br />', $error_messages ) );
+		disp_system_check( 'error' );
+	}
+}
+// cache folder size
+init_system_check( T_( 'Cache size' ), bytesreadable( get_dirsize_recursive( $cache_path ) ) );
+disp_system_check( 'note' );
 $block_item_Widget->disp_template_raw( 'block_end' );
 
 
@@ -599,6 +628,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.35  2011/03/15 09:34:06  efy-asimo
+ * have checkboxes for enabling caching in new blogs
+ * refactorize cache create/enable/disable
+ *
  * Revision 1.34  2011/02/25 21:52:14  fplanque
  * partial rollback. install folder needs to be removed completely for max safety. There is no in between "ok" state.
  *

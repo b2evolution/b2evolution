@@ -207,30 +207,15 @@ switch( $action )
 				break;
 
 			case 'advanced':
-				$old_cache_status = $edited_Blog->get_setting('cache_enabled');
 				if( $edited_Blog->load_from_Request( array( 'pings', 'cache', 'authors' ) ) )
 				{ // Commit update to the DB:
-					$new_cache_status = $edited_Blog->get_setting('cache_enabled');
-
-					load_class( '_core/model/_pagecache.class.php', 'PageCache' );
-					$PageCache = new PageCache( $edited_Blog );
-
-					if( $old_cache_status == false && $new_cache_status == true )
-					{ // Caching has been turned ON:
-						if( $PageCache->cache_create() )
-						{
-							$Messages->add( T_('Page caching has been enabled for this blog.'), 'success' );
-						}
-						else
-						{
-							$Messages->add( T_('Page caching could not be enabled for this blog. Check /cache/ folder file permissions.'), 'error' );
-							$edited_Blog->set_setting('cache_enabled', 0 );
-						}
-					}
-					elseif( $old_cache_status == true && $new_cache_status == false )
-					{ // Caching has been turned OFF:
-						$PageCache->cache_delete();
-						$Messages->add( T_('Page caching has been disabled for this blog. All cache contents have been purged.'), 'note' );
+					$cache_status = param( 'cache_enabled', 'integer', 0 );
+					load_funcs( 'collections/model/_blog.funcs.php' );
+					$result = set_cache_enabled( 'cache_enabled', $cache_status, $edited_Blog->ID, false );
+					if( $result != NULL )
+					{
+						list( $status, $message ) = $result;
+						$Messages->add( $message, $status );
 					}
 
 					$edited_Blog->dbupdate();
@@ -383,6 +368,10 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.38  2011/03/15 09:34:05  efy-asimo
+ * have checkboxes for enabling caching in new blogs
+ * refactorize cache create/enable/disable
+ *
  * Revision 1.37  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

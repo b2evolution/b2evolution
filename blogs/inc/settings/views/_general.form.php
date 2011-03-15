@@ -94,6 +94,12 @@ $Form->begin_fieldset( T_('Caching') );
 
 	$Form->checkbox_input( 'general_cache_enabled', $Settings->get('general_cache_enabled'), T_('Enable general cache'), array( 'note'=>T_('Cache rendered pages that are not controlled by a skin. See Blog Settings for skin output caching.') ) );
 
+	$cache_note = '('.T_( 'See Blog Settings for existing' ).')';
+	$Form->checklist( array(
+			array( 'newblog_cache_enabled', 1, T_( 'Enable page cache for NEW blogs' ), $Settings->get('newblog_cache_enabled'), false, $cache_note ),
+			array( 'newblog_cache_enabled_widget', 1, T_( 'Enable widget cache for NEW blogs' ), $Settings->get('newblog_cache_enabled_widget'), false, $cache_note )
+			), 'new_blogs_cahe', T_( 'Enable for new blogs' ) );
+
 $Form->end_fieldset();
 
 // --------------------------------------------
@@ -106,6 +112,10 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.23  2011/03/15 09:34:05  efy-asimo
+ * have checkboxes for enabling caching in new blogs
+ * refactorize cache create/enable/disable
+ *
  * Revision 1.22  2010/06/24 07:03:11  efy-asimo
  * move the cross posting options to the bottom of teh Features tab & fix error message after moving post
  *

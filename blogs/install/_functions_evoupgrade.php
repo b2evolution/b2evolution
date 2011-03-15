@@ -2914,6 +2914,12 @@ function upgrade_b2evo_tables()
 	}
 	task_end();
 
+	load_funcs('tools/model/_system.funcs.php');
+	if( !system_init_caches() )
+	{
+		echo "<strong>The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal.</strong><br />\n";
+	}
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -3088,6 +3094,10 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.388  2011/03/15 09:34:06  efy-asimo
+ * have checkboxes for enabling caching in new blogs
+ * refactorize cache create/enable/disable
+ *
  * Revision 1.387  2011/03/14 14:12:40  efy-asimo
  * fix upgrade script
  *

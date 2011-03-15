@@ -49,6 +49,7 @@ if( $current_User->check_perm('options', 'edit') )
 	echo '<li><a href="'.regenerate_url('action', 'action=del_itemprecache&amp;'.url_crumb('tools')).'">'.T_('Clear pre-renderered item cache (DB)').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=del_pagecache&amp;'.url_crumb('tools')).'">'.T_('Clear full page cache (/cache directory)').'</a></li>';
 	echo '<li><a href="'.regenerate_url('action', 'action=del_filecache&amp;'.url_crumb('tools')).'">'.T_('Clear thumbnail caches (?evocache directories)').'</a></li>';
+	echo '<li><a href="'.regenerate_url('action', 'action=repair_cache&amp;'.url_crumb('tools')).'">'.T_('Repair cache').'</a></li>';
 	echo '</ul>';
 	$block_item_Widget->disp_template_raw( 'block_end' );
 
@@ -104,6 +105,10 @@ $block_item_Widget->disp_template_raw( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.6  2011/03/15 09:34:06  efy-asimo
+ * have checkboxes for enabling caching in new blogs
+ * refactorize cache create/enable/disable
+ *
  * Revision 1.5  2011/03/03 12:50:57  efy-asimo
  * tool to find and delete orphan comment attachment files
  *
