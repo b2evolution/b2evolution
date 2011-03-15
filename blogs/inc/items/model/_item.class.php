@@ -671,6 +671,7 @@ class Item extends ItemLight
 	 */
 	function can_see_comments()
 	{
+		$this->load_Blog();
 		if( ( $this->Blog->get_setting( 'disable_comments_bypost' ) && ( $this->comment_status == 'disabled' ) )
 				|| $this->is_intro() // Intros: no comments
 		    || ( $this->get_Blog() && $this->Blog->get_setting( 'allow_comments' ) == 'never' ) )
@@ -4543,6 +4544,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.221  2011/03/15 14:10:10  efy-asimo
+ * can_see_comments - fix
+ *
  * Revision 1.220  2011/03/03 15:38:59  efy-asimo
  * add upload_enabled perm check to item class can_attach() function
  *
