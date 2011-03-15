@@ -212,9 +212,12 @@ function get_dirsize_recursive( $path )
 	$files = get_filenames( $path );
 	$total = 0;
 
-	foreach( $files as $lFile )
+	if( !empty( $files ) )
 	{
-		$total += filesize($lFile);
+		foreach( $files as $lFile )
+		{
+			$total += filesize($lFile);
+		}
 	}
 
 	return $total;
@@ -1446,6 +1449,9 @@ function remove_orphan_files( $file_ids = NULL, $older_then = NULL )
 
 /*
  * $Log$
+ * Revision 1.55  2011/03/15 09:37:04  efy-asimo
+ * get_dirsize_recursive() function has warning, when dir is empty - fix
+ *
  * Revision 1.54  2011/03/10 14:54:18  efy-asimo
  * Allow file types modification & add m4v file type
  *
