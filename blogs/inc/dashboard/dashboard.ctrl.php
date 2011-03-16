@@ -176,12 +176,27 @@ if( $blog )
 				$.ajax({
 				type: 'POST',
 				url: '<?php echo $htsrv_url; ?>async.php',
+				data: 'action=get_opentrash_link&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
+				success: function(result)
+					{
+						var recycle_bin = jQuery('#recycle_bin');
+						if( recycle_bin.length )
+						{
+							recycle_bin.replaceWith( result );
+						}
+					}
+				});
+
+				$.ajax({
+				type: 'POST',
+				url: '<?php echo $htsrv_url; ?>async.php',
 				data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentid=' + id + '&action=delete_comment&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
 				success: function(result)
 					{
-						// var divid = 'comment_' + id;
-						delete modifieds[divid];
-						processResult(result, modifieds);
+						jQuery('#' + divid).effect('transfer', { to: $('#recycle_bin') }, 700, function() {
+							delete modifieds[divid];
+							processResult(result, modifieds);
+						});
 					}
 				});
 			}
@@ -708,6 +723,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.76  2011/03/16 13:34:53  efy-asimo
+ * animate comment delete
+ *
  * Revision 1.75  2011/02/24 07:42:27  efy-asimo
  * Change trashcan to Recycle bin
  *

@@ -165,6 +165,14 @@ switch( $action )
 
 		exit(0);
 
+	case 'get_opentrash_link':
+		// Used to show recycle bin
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+
+		echo get_opentrash_link( true, true );
+		exit(0);
+
 	case 'set_comment_status':
 		// Used for quick moderation of comments
 		// Check that this action request is not a CSRF hacked request:
@@ -372,6 +380,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.65  2011/03/16 13:34:53  efy-asimo
+ * animate comment delete
+ *
  * Revision 1.64  2011/02/23 20:12:55  fplanque
  * minor/doc
  *

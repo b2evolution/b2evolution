@@ -100,3 +100,11 @@ img.rightmargin {
 	margin-top:.2ex;
 	margin-bottom:.2ex;
 }
+
+#recycle_bin {
+	float: right;
+}
+
+.ui-effects-transfer {
+	border: 2px solid black;
+}

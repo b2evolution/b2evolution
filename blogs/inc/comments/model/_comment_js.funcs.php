@@ -114,12 +114,24 @@ function deleteComment( commentIds )
 	$.ajax({
 	type: 'POST',
 	url: '<?php echo $htsrv_url; ?>async.php',
+	data: 'action=get_opentrash_link&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
+	success: function(result)
+		{
+			jQuery('#recycle_bin').replaceWith( result );
+		}
+	});
+
+	$.ajax({
+	type: 'POST',
+	url: '<?php echo $htsrv_url; ?>async.php',
 	data: 'blogid=' + <?php echo $Blog->ID; ?> + '&commentIds=' + commentIds + '&action=delete_comments&itemid=' + item_id + '&statuses=' + statuses + '&currentpage=' + currentpage + '&' + <?php echo '\''.url_crumb('comment').'\''; ?>,
 	success: function(result)
 		{
-			delete modifieds[divid];
-			$('#comments_container').html(result);
-			show_modifieds();
+			jQuery('#' + divid).effect('transfer', { to: $('#recycle_bin') }, 700, function() {
+				delete modifieds[divid];
+				$('#comments_container').html(result);
+				show_modifieds();
+			});
 		}
 	});
 }
