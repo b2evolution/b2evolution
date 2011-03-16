@@ -36,7 +36,7 @@ else
 	header_redirect( $to_dashboard );
 }
 
-// Check the secret paramater (This doubles as a CRUMB)
+// Check the secret parameter (This doubles as a CRUMB)
 if( $secret != $posted_Comment->get('secret') )
 {	// Invalid secret, no moderation allowed here, go to regular form with regular login requirements:
 	header_redirect( $to_comment_edit );
@@ -58,7 +58,6 @@ switch( $action )
 		/* exited */
 		break;
 
-
 	case 'deprecate':
 		$posted_Comment->set('status', 'deprecated' );
 
@@ -69,7 +68,6 @@ switch( $action )
 		header_redirect( $to_dashboard );
 		/* exited */
 		break;
-
 
 	case 'delete':
 		// Delete from DB:
@@ -175,7 +173,7 @@ else
 				$posted_Comment->author_url( '', ' &middot; Url: <span class="bUrl">', '</span>' );
 				if( $posted_Comment->author_url != null )
 				{
-					echo ' '.action_icon( T_('Delete comment url'), 'delete', regenerate_url( '', array( 'action=deleteurl', 'cmt_ID='.$cmt_ID, 'secret='.$secret ) ) ).' ';
+					echo ' '.action_icon( T_('Delete comment URL'), 'delete', regenerate_url( '', array( 'action=deleteurl', 'cmt_ID='.$cmt_ID, 'secret='.$secret ) ) ).' ';
 					echo ' '.action_icon( T_('Antispam tool'), 'ban', $antispam_url );
 				}
 				$posted_Comment->author_email( '', ' &middot; Email: <span class="bEmail">', '</span>' );
@@ -204,6 +202,9 @@ else
 <?php
 /*
  * $Log$
+ * Revision 1.12  2011/03/16 01:31:19  fplanque
+ * minor
+ *
  * Revision 1.11  2011/02/20 22:31:38  fplanque
  * minor / doc
  *

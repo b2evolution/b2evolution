@@ -177,9 +177,10 @@ else
 // TODO: AutoBR should really be a "comment renderer" (like with Items)
 // OLD stub: $comment = format_to_post( $comment, $comment_autobr, 1 ); // includes antispam
 $saved_comment = $comment;
+// Following call says "WARNING: this does *NOT* (necessarilly) make the HTML code safe.":
 $comment = check_html_sanity( $comment, $perm_comment_edit ? 'posting' : 'commenting', $comment_autobr, $User );
 if( $comment === false )
-{	// ERROR
+{	// ERROR! Restore original comment for further editing:
 	$comment = $saved_comment;
 }
 
@@ -474,6 +475,9 @@ header_redirect(); // Will save $Messages into Session
 
 /*
  * $Log$
+ * Revision 1.148  2011/03/16 01:31:19  fplanque
+ * minor
+ *
  * Revision 1.147  2011/03/03 12:47:29  efy-asimo
  * comments attachments
  *
