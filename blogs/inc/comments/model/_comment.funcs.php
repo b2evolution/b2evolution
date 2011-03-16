@@ -403,12 +403,20 @@ function add_ban_icons( $content )
  */
 function get_opentrash_link( $check_perm = true, $force_show = false )
 {
-	global $admin_url, $current_User, $DB;
+	global $admin_url, $current_User, $DB, $blog;
 
 	$show_recycle_bin = ( !$check_perm || $current_User->check_perm( 'blogs', 'editall' ) );
 	if( $show_recycle_bin && ( !$force_show ) )
 	{ // get trash comments number
-		$query = 'SELECT count( comment_ID ) FROM T_comments WHERE comment_status = "trash"';
+		$query = 'SELECT count( comment_ID )
+					FROM T_blogs LEFT OUTER JOIN T_categories ON blog_ID = cat_blog_ID
+						LEFT OUTER JOIN T_items__item ON cat_ID = post_main_cat_ID
+						LEFT OUTER JOIN T_comments ON post_ID = comment_post_ID
+					WHERE comment_status = "trash"';
+		if( isset( $blog ) )
+		{
+			$query .= ' AND blog_ID='.$blog;
+		}
 		$show_recycle_bin = ( $DB->get_var( $query ) > 0 );
 	}
 
@@ -424,6 +432,9 @@ function get_opentrash_link( $check_perm = true, $force_show = false )
 
 /*
  * $Log$
+ * Revision 1.27  2011/03/16 13:56:05  efy-asimo
+ * Update show "Open recycle bin"
+ *
  * Revision 1.26  2011/03/16 13:34:53  efy-asimo
  * animate comment delete
  *
