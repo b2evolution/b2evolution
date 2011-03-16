@@ -2009,10 +2009,11 @@ function balance_tags( $text )
 	$newtext = '';
 
 	# b2 bug fix for comments - in case you REALLY meant to type '< !--'
-	$text = str_replace('< !--', '<    !--', $text);
+	// $text = str_replace('< !--', '<    !--', $text);
 
-	# b2 bug fix for LOVE <3 (and other situations with '<' before a number)
-	$text = preg_replace('#<([0-9]{1})#', '&lt;$1', $text);
+	// escape any < that does not look like a tag, i-e: that is not followed by a letter like in <a> or a / like in </a>:
+	// (also not escaping comments like <!-- )
+	$text = preg_replace('#<([^a-z/!]{1})#i', '&lt;$1', $text);
 
 	while( preg_match('~<(\s*/?\w+)\s*(.*?)/?>~s', $text, $regex) )
 	{
@@ -2099,8 +2100,8 @@ function balance_tags( $text )
 	}
 
 	# b2 fix for the bug with HTML comments
-	$newtext = str_replace( '< !--', '<'.'!--', $newtext ); // the concatenation is needed to work around some strange parse error in PHP 4.3.1
-	$newtext = str_replace( '<    !--', '< !--', $newtext );
+	// $newtext = str_replace( '< !--', '<'.'!--', $newtext ); // the concatenation is needed to work around some strange parse error in PHP 4.3.1
+	// $newtext = str_replace( '<    !--', '< !--', $newtext );
 
 	return $newtext;
 }
@@ -2121,6 +2122,9 @@ function isset_param( $var )
 
 /*
  * $Log$
+ * Revision 1.68  2011/03/16 01:30:54  fplanque
+ * fix for http://forums.b2evolution.net/viewtopic.php?p=107882
+ *
  * Revision 1.67  2011/02/15 06:13:49  sam2kb
  * strlen replaced with evo_strlen to support utf-8 logins and domain names
  *
