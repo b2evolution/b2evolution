@@ -35,6 +35,12 @@ global $comments_use_autobr, $mode, $month, $tab, $redirect_to;
 
 $Form = new Form( NULL, 'comment_checkchanges', 'post' );
 
+if( $current_User->check_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
+{
+	$Form->global_icon( T_( 'Elevate this comment into a post' ), '', '?ctrl=comments&amp;action=elevate&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment'),
+				T_( 'Elevate into a post' ), 4, 3, array( 'style' => 'margin-right: 3ex;' ) );
+}
+
 $Form->global_icon( T_('Delete this comment'), 'delete', '?ctrl=comments&amp;action=delete&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment'),
 			T_('delete'), 4, 3, array(
 				 'onclick' => 'return confirm(\''.TS_('You are about to delete this comment!\\nThis cannot be undone!').'\')',
@@ -297,6 +303,9 @@ echo_comment_publishbt_js();
 
 /*
  * $Log$
+ * Revision 1.24  2011/03/23 14:09:29  efy-asimo
+ * Elevate comment into a post feature
+ *
  * Revision 1.23  2011/03/02 09:45:59  efy-asimo
  * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
  *

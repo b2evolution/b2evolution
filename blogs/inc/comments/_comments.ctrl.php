@@ -57,6 +57,20 @@ switch( $action )
 		param( 'redirect_to', 'string', url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&p='.$edited_Comment_Item->ID, '&' ) );
 		break;
 
+	case 'elevate':
+		global $blog;
+		load_class( 'items/model/_item.class.php', 'Item' );
+
+		param( 'comment_ID', 'integer', true );
+		$edited_Comment = & Comment_get_by_ID( $comment_ID );
+
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $blog );
+
+		// Check permission:
+		$current_User->check_perm( 'blog_post!draft', 'edit', true, $blog );
+		break;
+
 	case 'trash_delete':
 		param( 'blog_ID', 'integer', 0 );
 
@@ -326,6 +340,30 @@ switch( $action )
 		$AdminUI->title = $AdminUI->title_titlearea = T_('Trash comments');
 		break;
 
+	case 'elevate':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comment' );
+
+		$item_content = $edited_Comment->get_author_name().' '.T_( 'wrote' ).': <blockquote>'.$edited_Comment->get_content().'</blockquote>';
+		$new_Item = new Item();
+		$new_Item->set( 'status', 'draft' );
+		$new_Item->set_creator_by_login( $current_User->login );
+		$new_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
+		$new_Item->set( 'title', T_( 'Elevated from comment' ) );
+		$new_Item->set( 'content', $item_content );
+
+		if( !$new_Item->dbinsert() )
+		{
+			$Messages->add( T_( 'Unable to create the new post!' ), 'error' );
+			break;
+		}
+
+		$edited_Comment->set( 'status', 'deprecated' );
+		$edited_Comment->dbupdate();
+
+		header_redirect( url_add_param( $admin_url, 'ctrl=items&blog='.$blog.'&action=edit&p='.$new_Item->ID, '&' ) );
+		break;
+
 	case 'list':
 		/*
 		 * Latest comments:
@@ -375,7 +413,7 @@ switch( $action )
 
 $AdminUI->set_path( 'items', 'comments' );
 
-if( ( $action == 'edit' ) || ( $action == 'update_publish' ) || ( $action == 'update' ) )
+if( ( $action == 'edit' ) || ( $action == 'update_publish' ) || ( $action == 'update' ) || ( $action == 'elevate' ) )
 { // load date picker style for _comment.form.php
 	require_css( 'ui.datepicker.css' );
 }
@@ -400,6 +438,7 @@ switch( $action )
 
 
 	case 'edit':
+	case 'elevate':
 	case 'update_publish':
 	case 'update':	// on error
 		// Begin payload block:
@@ -460,6 +499,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.43  2011/03/23 14:09:28  efy-asimo
+ * Elevate comment into a post feature
+ *
  * Revision 1.42  2011/02/25 22:04:08  fplanque
  * minor / UI cleanup
  *
