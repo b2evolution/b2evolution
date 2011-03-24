@@ -15,6 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $login = param( 'login', 'string', '' );
 $action = param( 'action', 'string', '' );
+$redirect_to = param( 'redirect_to', 'string', '' );
 
 if( is_logged_in() )
 { // already logged in
@@ -28,20 +29,20 @@ if( $action == 'req_login' )
 
 global $admin_url, $ReqHost, $htsvr_url;
 
-if( $Messages->count() > 0 )
-{ // Display messages
-	$Messages->display();
+if( !isset( $redirect_to ) )
+{
+	$redirect_to = regenerate_url( 'disp' );
 }
 
-$Form = new Form( '', 'login_form' );
+$Form = new Form( '', 'login_form', 'post' );
 
 $Form->begin_form( 'bComment' );
 
 	$Form->hidden( 'redirect_to', $redirect_to );
 
-	$Form->begin_fieldset( '', array( 'class' => /*'border:none'*/'noborder' ) );
-
+	$Form->begin_field();
 	$Form->text_input( 'login', $login, 16, T_('Login'), '', array( 'maxlength' => 20, 'class' => 'input_text' ) );
+	$Form->end_field();
 
 	$pwd_note = '<a href="'.$htsrv_url_sensitive.'login.php?action=lostpassword&amp;redirect_to='
 		.rawurlencode( url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
@@ -51,7 +52,9 @@ $Form->begin_form( 'bComment' );
 	}
 	$pwd_note .= '">'.T_('Lost password ?').'</a>';
 
+	$Form->begin_field();
 	$Form->password_input( 'pwd', '', 16, T_('Password'), array( 'note'=>$pwd_note, 'maxlength' => 70, 'class' => 'input_text' ) );
+	$Form->end_field();
 
 	// Allow a plugin to add fields/payload
 	$Plugins->trigger_event( 'DisplayLoginFormFieldset', array( 'Form' => & $Form ) );
@@ -72,6 +75,7 @@ $Form->begin_form( 'bComment' );
 		$links[] = $link;
 	}
 
+	$Form->begin_fieldset();
 	echo '<div class="login_actions" style="text-align:right">';
 
 	if( empty($login_required)
@@ -84,9 +88,7 @@ $Form->begin_form( 'bComment' );
 	}
 
 	echo implode( ' &middot; ', $links );
-
 	echo '</div>';
-
 	$Form->end_fieldset();
 
 $Form->end_form();
@@ -94,6 +96,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.5  2011/03/24 15:15:05  efy-asimo
+ * in-skin login - feature
+ *
  * Revision 1.4  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *

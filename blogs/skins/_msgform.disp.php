@@ -144,9 +144,7 @@ if( !isset($recipient_User) && empty($recipient_address) )
 
 if( $allow_msgform == 'login' )
 { // try to login to send private message (there is no other option)
-	global $htsrv_path, $Messages;
-	$Messages->add( 'You must log in before you can contact this user' );
-	//$thispage_url = regenerate_url( '', 'recipient_id='.$recipient_User->ID, '', '&' );
+	echo '<p class="error">'.T_( 'You must log in before you can contact this user' ).'</p>';
 	param( 'action', 'string', 'req_login' );
 	require '_login.disp.php';
 }
@@ -246,6 +244,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.22  2011/03/24 15:15:05  efy-asimo
+ * in-skin login - feature
+ *
  * Revision 1.21  2010/07/20 06:49:28  efy-asimo
  * admin user can move comments to different post
  * add comments to msgform

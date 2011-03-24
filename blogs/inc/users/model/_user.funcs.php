@@ -120,11 +120,15 @@ function user_login_link( $before = '', $after = '', $link_text = '', $link_titl
  *
  * @return string
  */
-function get_login_url()
+function get_login_url( $redirect_to = NULL )
 {
 	global $htsrv_url_sensitive, $edited_Blog, $generating_static;
 
-	if( !isset($generating_static) )
+	if( !empty( $redirect_to ) )
+	{
+		$redirect = $redirect_to;
+	}
+	elseif( !isset($generating_static) )
 	{ // We are not generating a static page here:
 		$redirect = regenerate_url( '', '', '', '&' );
 	}
@@ -137,13 +141,51 @@ function get_login_url()
 		$redirect = '';
 	}
 
+	if( use_in_skin_login() )
+	{ // use in-skin login
+		global $blog;
+
+		$BlogCache = & get_BlogCache();
+		$Blog = $BlogCache->get_by_ID( $blog );
+
+		if( ! empty($redirect) )
+		{
+			$redirect = '&redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $htsrv_url_sensitive ) );
+		}
+		return $Blog->get( 'url' ).'?disp=login'.$redirect;
+	}
+
 	if( ! empty($redirect) )
 	{
 		$redirect = '?redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $htsrv_url_sensitive ) );
 	}
-
 	return $htsrv_url_sensitive.'login.php'.$redirect;
 }
+
+
+/**
+ * Use in-skin login
+ */
+function use_in_skin_login()
+{
+	global $blog;
+
+	if( is_admin_page() )
+	{
+		return false;
+	}
+
+	if( !isset( $blog ) )
+	{
+		return false;
+	}
+
+	$BlogCache = & get_BlogCache();
+	$Blog = $BlogCache->get_by_ID( $blog, false, false );
+
+	return $Blog->get_setting( 'in_skin_login' );
+}
+
 
 /**
  * Template tag: Output a link to new user registration
@@ -742,6 +784,9 @@ function seconds_to_fields( $duration )
 
 /*
  * $Log$
+ * Revision 1.29  2011/03/24 15:15:05  efy-asimo
+ * in-skin login - feature
+ *
  * Revision 1.28  2011/03/04 08:20:45  efy-asimo
  * Simple avatar upload in the front office
  *

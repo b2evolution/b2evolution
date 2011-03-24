@@ -304,6 +304,7 @@ function request_title( $params = array() )
 			'search_text'         => T_('Search'),
 			'sitemap_text'        => T_('Site Map'),
 			'msgform_text'        => T_('Send a Message'),
+			'login_text'          => T_('Login'),
 			'profile_text'        => T_('User Profile'),
 			'avatar_text'         => T_('User Avatar'),
 			'user_text'           => T_('User'),
@@ -392,6 +393,11 @@ function request_title( $params = array() )
 		case 'msgform':
 			// We are requesting the message form:
 			$r[] = $params['msgform_text'];
+			break;
+
+		case 'login':
+			// We are requesting the login form:
+			$r[] = $params['login_text'];
 			break;
 
 		case 'single':
@@ -1124,6 +1130,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.80  2011/03/24 15:15:05  efy-asimo
+ * in-skin login - feature
+ *
  * Revision 1.79  2011/03/04 08:20:44  efy-asimo
  * Simple avatar upload in the front office
  *

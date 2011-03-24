@@ -118,6 +118,9 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		$Form->checkbox_input( 'cache_enabled_widgets', $edited_Blog->get_setting('cache_enabled_widgets'), T_('Enable widget cache'), array( 'note'=>T_('Cache rendered widgets') ) );
 	$Form->end_fieldset();
 
+	$Form->begin_fieldset( T_('Login').' ['.T_('Admin').']' );
+		$Form->checkbox_input( 'in_skin_login', $edited_Blog->get_setting( 'in_skin_login' ), T_( 'In-skin login' ), array( 'note' => T_( 'Use in-skin login form every time it\'s possible' ) ) );
+	$Form->end_fieldset();
 
 	$Form->begin_fieldset( '['. T_('Deprecated'). '] '.T_('Static file generation').' ['.T_('Admin').']' );
 		$Form->text_input( 'source_file', $edited_Blog->get_setting( 'source_file' ), 25, T_('Source file'),
@@ -196,6 +199,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.31  2011/03/24 15:15:05  efy-asimo
+ * in-skin login - feature
+ *
  * Revision 1.30  2010/07/26 06:52:16  efy-asimo
  * MFB v-4-0
  *

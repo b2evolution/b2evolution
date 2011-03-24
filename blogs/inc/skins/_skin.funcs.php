@@ -358,6 +358,14 @@ function skin_init( $disp )
 			}
 			break;
 
+		case 'login':
+			$seo_page_type = 'Login form';
+			if( $Blog->get_setting( $disp.'_noindex' ) )
+			{	// We prefer robots not to index these pages:
+				$robots_index = false;
+			}
+			break;
+
 		case 'profile':
 		case 'subs':
 			$seo_page_type = 'Special feature page';
@@ -437,7 +445,8 @@ function skin_include( $template_name, $params = array() )
 				'disp_catdir'         => '_catdir.disp.php',
 				'disp_comments'       => '_comments.disp.php',
 				'disp_feedback-popup' => '_feedback_popup.disp.php',
-				'disp_help'		  			=> '_help.disp.php',
+				'disp_help'           => '_help.disp.php',
+				'disp_login'          => '_login.disp.php',
 				'disp_mediaidx'       => '_mediaidx.disp.php',
 				'disp_msgform'        => '_msgform.disp.php',
 				'disp_page'           => '_page.disp.php',
@@ -890,6 +899,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.88  2011/03/24 15:15:05  efy-asimo
+ * in-skin login - feature
+ *
  * Revision 1.87  2011/03/04 08:20:45  efy-asimo
  * Simple avatar upload in the front office
  *

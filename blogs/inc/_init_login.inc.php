@@ -281,9 +281,17 @@ else
 if( ! empty( $login_error ) )
 {
 	// Init charset handling:
-	init_charsets( $current_charset );
-
-	require $htsrv_path.'login.php';
+	if( use_in_skin_login() )
+	{
+		$Messages->add( $login_error );
+		param( 'redirect_to', 'string', $baseurl );
+		header_redirect( get_login_url( $redirect_to ) );
+	}
+	else
+	{
+		init_charsets( $current_charset );
+		require $htsrv_path.'login.php';
+	}
 	exit(0);
 }
 
@@ -292,6 +300,9 @@ $Timer->pause( '_init_login' );
 
 /*
  * $Log$
+ * Revision 1.6  2011/03/24 15:15:05  efy-asimo
+ * in-skin login - feature
+ *
  * Revision 1.5  2011/02/15 05:31:53  sam2kb
  * evo_strtolower mbstring wrapper for strtolower function
  *

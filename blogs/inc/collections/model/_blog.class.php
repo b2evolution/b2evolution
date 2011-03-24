@@ -462,6 +462,11 @@ class Blog extends DataObject
 			$this->set_setting( 'use_workflow',  param( 'blog_use_workflow', 'integer', 0 ) );
 		}
 
+		if( in_array( 'login', $groups ) )
+		{ // we want to load the login params:
+			$this->set_setting( 'in_skin_login', param( 'in_skin_login', 'integer', 0 ) );
+		}
+
 		if( in_array( 'features', $groups ) )
 		{ // we want to load the workflow checkboxes:
 			$this->set_setting( 'allow_subscriptions',  param( 'allow_subscriptions', 'integer', 0 ) );
@@ -2359,6 +2364,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.130  2011/03/24 15:15:05  efy-asimo
+ * in-skin login - feature
+ *
  * Revision 1.129  2011/03/15 09:34:05  efy-asimo
  * have checkboxes for enabling caching in new blogs
  * refactorize cache create/enable/disable

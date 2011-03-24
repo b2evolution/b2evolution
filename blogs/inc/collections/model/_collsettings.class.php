@@ -137,6 +137,7 @@ class CollectionSettings extends AbstractSettings
 		// General settings:
 			'cache_enabled' => 0,
 			'cache_enabled_widgets' => 0,
+			'in_skin_login' => 0,							// Use in skin login form every time it's possible
 			'default_cat_ID' => NULL,						// Default Cat for new posts
 			'require_title' => 'required',  		// Is a title for items required ("required", "optional", "none")
 			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet,evo_twitter', // ping plugin codes, separated by comma
@@ -183,6 +184,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.54  2011/03/24 15:15:05  efy-asimo
+ * in-skin login - feature
+ *
  * Revision 1.53  2011/03/02 09:45:59  efy-asimo
  * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
  *

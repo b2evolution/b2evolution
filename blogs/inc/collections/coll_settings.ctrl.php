@@ -207,7 +207,7 @@ switch( $action )
 				break;
 
 			case 'advanced':
-				if( $edited_Blog->load_from_Request( array( 'pings', 'cache', 'authors' ) ) )
+				if( $edited_Blog->load_from_Request( array( 'pings', 'cache', 'authors', 'login' ) ) )
 				{ // Commit update to the DB:
 					$cache_status = param( 'cache_enabled', 'integer', 0 );
 					load_funcs( 'collections/model/_blog.funcs.php' );
@@ -368,6 +368,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.39  2011/03/24 15:15:05  efy-asimo
+ * in-skin login - feature
+ *
  * Revision 1.38  2011/03/15 09:34:05  efy-asimo
  * have checkboxes for enabling caching in new blogs
  * refactorize cache create/enable/disable
