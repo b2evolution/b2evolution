@@ -402,6 +402,16 @@ function widgetSettings( the_html )
 	jQuery( '#widget_settings' ).prepend( jQuery( '#server_messages' ) );
 	AttachServerRequest( 'form' ); // send form via hidden iframe
 	jQuery( '#widget_settings > form > span > a' ).bind( 'click', closeWidgetSettings );
+
+	// Close widget Settings if Escape key is pressed:
+	var keycode_esc = 27;
+	jQuery(document).keyup(function(e)
+	{
+		if( e.keyCode == keycode_esc )
+		{
+			closeWidgetSettings();
+		}
+	});
 }
 
 function widgetSettingsCallback( the_widget, the_name )
@@ -458,9 +468,20 @@ function convertAvailableList()
 	// Close action:
 	jQuery( '.available_widgets_toolbar > a' ).bind( 'click', function(e)
 	{
-		jQuery('.available_widgets').removeClass( 'available_widgets_active' );
+		closeAvailableWidgets();
 		// cancel default href action:
 		return false;
+	});
+
+	// Close Overlay if Escape key is pressed:
+	var keycode_esc = 27;
+	jQuery(document).keyup(function(e)
+	{
+		if( e.keyCode == keycode_esc )
+		{
+			closeAvailableWidgets();
+			return false;
+		}
 	});
 
 	jQuery( ".available_widgets li" ).each( function()
@@ -477,6 +498,14 @@ function convertAvailableList()
 			return false;
 		});
 	});
+}
+
+/**
+ * Close available widgets overlay
+ */
+function closeAvailableWidgets()
+{
+	jQuery('.available_widgets').removeClass( 'available_widgets_active' );
 }
 
 
