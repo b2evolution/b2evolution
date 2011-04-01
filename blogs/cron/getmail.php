@@ -687,6 +687,8 @@ for ( $index = 1; $index <= $imap_obj->Nmsgs; $index++ )
 
 	if( $do_real_posting )
 	{
+		load_class( 'items/model/_item.class.php', 'Item' );
+
 		// INSERT NEW POST INTO DB:
 		$edited_Item = new Item();
 
@@ -723,6 +725,9 @@ if( $test > 0 )
 
 /*
  * $Log$
+ * Revision 1.49  2011/04/01 15:41:50  sam2kb
+ * Load Item class
+ *
  * Revision 1.48  2011/03/10 14:54:18  efy-asimo
  * Allow file types modification & add m4v file type
  *
