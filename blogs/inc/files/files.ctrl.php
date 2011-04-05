@@ -809,6 +809,7 @@ switch( $action )
 			// make sure we have loaded metas for all files in selection!
 			$selected_Filelist->load_meta();
 
+			$index = 0;
 			// Check if there are delete restrictions on the files:
 			while( $l_File = & $selected_Filelist->get_next() )
 			{
@@ -822,7 +823,9 @@ switch( $action )
 
 					// remove it from the list of selected files (that will be offered to delete):
 					$selected_Filelist->remove( $l_File );
+					unset( $fm_selected[$index] );
 				}
+				$index++;
 			}
 
 			if( ! $selected_Filelist->count() )
@@ -1773,6 +1776,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.77  2011/04/05 12:41:39  efy-asimo
+ * file perms check and file delete - fix
+ *
  * Revision 1.76  2011/03/02 11:04:22  efy-asimo
  * Refactor file uploads for future use
  *

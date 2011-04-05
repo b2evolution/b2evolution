@@ -332,53 +332,14 @@ class Group extends DataObject
 				}
 				break;
 
-			case 'files':
-				switch( $permvalue )
-				{ // Depending on current group permission:
-					case 'all':
-						global $demo_mode;
-						if( ! $demo_mode )
-						{ // All permissions granted
-							$perm = true;
-							break;
-						}
-
-					case 'edit':
-						// User can ask for normal edit perm...
-						if( $permlevel == 'edit' )
-						{
-							$perm = true;
-							break;
-						}
-						// ... or for any lower priority perm... (no break)
-
-					case 'add':
-						// User can ask for add perm...
-						if( $permlevel == 'add' )
-						{
-							$perm = true;
-							break;
-						}
-						// ... or for any lower priority perm... (no break)
-
-					case 'view':
-						// User can ask for view perm...
-						if( $permlevel == 'view' )
-						{
-							$perm = true;
-							break;
-						}
-						// ... or for any lower priority perm... (no break)
-
-					case 'list':
-						// User can only ask for list perm
-						if( $permlevel == 'list' )
-						{
-							$perm = true;
-							break;
-						}
+			case 'perm_messaging':
+			case 'perm_files':
+				if( ! $this->check_perm( 'admin', 'restricted' ) )
+				{
+					$perm = false;
+					break;
 				}
-				break;
+				// don't break, perm_files and perm_messaging are pluggable permissions
 
 			default:
 
@@ -681,6 +642,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.42  2011/04/05 12:41:40  efy-asimo
+ * file perms check and file delete - fix
+ *
  * Revision 1.41  2011/02/15 15:37:00  efy-asimo
  * Change access to admin permission
  *

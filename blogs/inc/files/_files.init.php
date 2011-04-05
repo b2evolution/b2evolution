@@ -273,7 +273,7 @@ class files_Module extends Module
 				}
 		}
 
-		if( $perm && isset($permtarget) && ( $permtarget instanceof  FileRoot ) )
+		if( $perm && isset($permtarget) && ( is_a( $permtarget, 'FileRoot' ) ) )
 		{
 			global $current_User;
 			switch( $permtarget->type )
@@ -379,6 +379,9 @@ $files_Module = new files_Module();
 
 /*
  * $Log$
+ * Revision 1.14  2011/04/05 12:41:39  efy-asimo
+ * file perms check and file delete - fix
+ *
  * Revision 1.13  2011/02/15 15:37:00  efy-asimo
  * Change access to admin permission
  *
