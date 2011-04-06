@@ -782,8 +782,106 @@ function seconds_to_fields( $duration )
 }
 
 
+/**
+ * Display user edit forms action icons
+ * 
+ * @param Form where to display
+ * @param User edited user
+ * @param String the action string, 'view' or 'edit'
+ */
+function echo_user_actions( $Form, $edited_User, $action )
+{
+	global $current_User;
+
+	if( ( $current_User->check_perm( 'users', 'edit', false ) ) && ( $current_User->ID != $edited_User->ID )
+		&& ( $edited_User->ID != 1 ) )
+	{
+		$Form->global_icon( T_('Delete this user!'), 'delete', '?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete'), 3, 4  );
+	}
+	if( $edited_User->get_msgform_possibility( $current_User ) )
+	{
+		$Form->global_icon( T_('Compose message'), 'comments', '?ctrl=threads&action=new&user_login='.$edited_User->login );
+	}
+	$Form->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', regenerate_url( 'user_ID,action,ctrl', 'ctrl=users' ) );
+}
+
+
+/**
+ * Get user menu sub entries
+ * 
+ * @param boolean true to get admin interface user sub menu entries, false to get front office user sub menu entries
+ * @param integer edited user ID
+ * @return array user sub entries
+ */
+function get_user_sub_entries( $is_admin, $user_ID )
+{
+	global $current_User, $Settings, $Blog;
+	$users_sub_entries = array();
+	if( empty( $user_ID ) )
+	{
+		$user_ID = $current_User->ID;
+	}
+
+	if( $is_admin )
+	{
+		$ctrl_param = '?ctrl=user';
+		$user_param = '&amp;user_ID='.$user_ID;
+		$base_url = '';
+	}
+	else
+	{
+		$ctrl_param = '?disp=profile';
+		$user_param = '';
+		$base_url = $Blog->gen_blogurl();
+	}
+	$edit_perm = ( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'edit' ) );
+	$view_perm = ( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'view' ) );
+
+	if( $view_perm )
+	{
+		$users_sub_entries['identity'] = array(
+							'text' => T_('Identity'),
+							'href' => $base_url.$ctrl_param.'&amp;user_tab=identity'.$user_param	);
+
+		if( $Settings->get('allow_avatars') )
+		{
+			$users_sub_entries['avatar'] = array(
+							'text' => T_('Avatar'),
+							'href' => $base_url.$ctrl_param.'&amp;user_tab=avatar'.$user_param );
+		}
+
+		if( $edit_perm )
+		{
+			$users_sub_entries['password'] = array(
+								'text' => T_('Password'),
+								'href' => $base_url.$ctrl_param.'&amp;user_tab=password'.$user_param );
+		}
+
+		$users_sub_entries['preferences'] = array(
+							'text' => T_('Preferences'),
+	 						'href' => $base_url.$ctrl_param.'&amp;user_tab=preferences'.$user_param );								
+
+		if( $is_admin )
+		{ // show this only in backoffice
+			$users_sub_entries['advanced'] = array(
+								'text' => T_('Advanced'),
+								'href' => '?ctrl=user&amp;user_tab=advanced'.$user_param );
+
+			$users_sub_entries['blogs'] = array(
+								'text' => T_('Personal blogs'),
+		 						'href' => '?ctrl=user&amp;user_tab=blogs'.$user_param );
+		}
+	}
+
+	return $users_sub_entries;
+}
+
+
 /*
  * $Log$
+ * Revision 1.30  2011/04/06 13:30:56  efy-asimo
+ * Refactor profile display
+ *
  * Revision 1.29  2011/03/24 15:15:05  efy-asimo
  * in-skin login - feature
  *

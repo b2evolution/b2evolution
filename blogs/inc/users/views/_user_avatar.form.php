@@ -18,23 +18,44 @@ global $current_User;
  * @var current action
  */
 global $action;
+/**
+ * @var the action destination of the form (NULL for pagenow)
+ */
+global $form_action;
 
-// Begin payload block:
-$this->disp_payload_begin();
-
-$Form = new Form( NULL, 'user_checkchanges', 'post', NULL, 'multipart/form-data' );
+$Form = new Form( $form_action, 'user_checkchanges', 'post', NULL, 'multipart/form-data' );
 
 if( !$user_profile_only )
 {
-	$Form->global_icon( T_('Delete this user!'), 'delete', '?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete'), 3, 4  );
-	$Form->global_icon( T_('Compose message'), 'comments', '?ctrl=threads&action=new&user_login='.$edited_User->login );
-	$Form->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', regenerate_url( 'user_ID,action,ctrl', 'ctrl=users' ) );
+	echo_user_actions( $Form, $edited_User, $action );
 }
 
-$Form->begin_form( 'fform', sprintf( T_('Edit %s avatar'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' ) );
+$is_admin = is_admin_page();
+if( $is_admin )
+{
+	$form_title = sprintf( T_('Edit %s avatar'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' );
+	$form_class = 'fform';
+	$ctrl_param = '?ctrl=user';
+}
+else
+{
+	global $Blog;
+	$form_title = '';
+	$form_class = 'bComment';
+	$ctrl_param = $Blog->gen_blogurl().'?disp=profile';
+}
+
+$Form->begin_form( $form_class, $form_title );
 
 	$Form->add_crumb( 'user' );
-	$Form->hidden_ctrl();
+	if( $is_admin )
+	{
+		$Form->hidden_ctrl();
+	}
+	else
+	{
+		$Form->hidden( 'disp', 'profile' );
+	}
 	$Form->hidden( 'user_tab', 'avatar' );
 	$Form->hidden( 'avatar_form', '1' );
 
@@ -42,7 +63,7 @@ $Form->begin_form( 'fform', sprintf( T_('Edit %s avatar'), $edited_User->dget('f
 
 	/***************  Avatar  **************/
 
-$Form->begin_fieldset( T_('Avatar') );
+$Form->begin_fieldset( $is_admin ? T_('Avatar') : '', array( 'class'=>'fieldset clear' ) );
 
 global $admin_url;
 $avatar_tag = $edited_User->get_avatar_imgtag();
@@ -50,15 +71,15 @@ if( $current_User->check_perm( 'users', 'all' ) || ( $current_User->ID == $edite
 {
 	if( !empty( $avatar_tag ) )
 	{
-		$avatar_tag .= ' '.action_icon( T_( 'Remove' ), 'delete', '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID.'&amp;action=remove_avatar&amp;'.url_crumb('user').'', T_( 'Remove' ) );
+		$avatar_tag .= ' '.action_icon( T_( 'Remove' ), 'delete', $ctrl_param.'&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID.'&amp;action=remove_avatar&amp;'.url_crumb('user').'', T_( 'Remove' ) );
 		if( $current_User->check_perm( 'files', 'view' ) )
 		{
-			$avatar_tag .= ' '.action_icon( T_( 'Change' ), 'link', '?ctrl=files&amp;user_ID='.$edited_User->ID, T_( 'Change' ).' &raquo;', 5, 5 );
+			$avatar_tag .= ' '.action_icon( T_( 'Change' ), 'link', $admin_url.'?ctrl=files&amp;user_ID='.$edited_User->ID, T_( 'Change' ).' &raquo;', 5, 5 );
 		}
 	}
 	elseif( $current_User->check_perm( 'files', 'view' ) )
 	{
-		$avatar_tag .= ' '.action_icon( T_( 'Upload or choose an avatar' ), 'link', '?ctrl=files&amp;user_ID='.$edited_User->ID, T_( 'Upload/Select' ).' &raquo;', 5, 5 );
+		$avatar_tag .= ' '.action_icon( T_( 'Upload or choose an avatar' ), 'link', $admin_url.'?ctrl=files&amp;user_ID='.$edited_User->ID, T_( 'Upload/Select' ).' &raquo;', 5, 5 );
 	}
 }
 
@@ -84,13 +105,12 @@ if( ( $current_User->check_perm( 'users', 'all' ) ) || ( $current_User->ID == $e
 		$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $edited_User->ID );
 		$ads_list_path = get_canonical_path( $user_FileRoot->ads_path.$path );
 
-		if( $current_User->check_perm( 'files', 'add', false, $user_FileRoot ) || $current_User->check_perm( 'users', 'edit' ) )
-		{ // upload part
-			$info_content = '<input name="uploadfile[]" type="file" size="10" />';
-			$info_content .= '<input class="ActionButton" type="submit" value="&gt; '.T_('Upload!').'" />';
-			$Form->info( T_('Upload a new avatar'), $info_content );
-		}
+		// Upload
+		$info_content = '<input name="uploadfile[]" type="file" size="10" />';
+		$info_content .= '<input class="ActionButton" type="submit" value="&gt; '.T_('Upload!').'" />';
+		$Form->info( T_('Upload a new avatar'), $info_content );
 
+		// Previously uploaded avatars
 		if( is_dir( $ads_list_path ) )
 		{ // profile_picture folder exists in the user root dir
 			$user_avatar_Filelist = new Filelist( $user_FileRoot, $ads_list_path );
@@ -120,11 +140,11 @@ $Form->end_fieldset();
 
 $Form->end_form();
 
-// End payload block:
-$this->disp_payload_end();
-
 /*
  * $Log$
+ * Revision 1.12  2011/04/06 13:30:56  efy-asimo
+ * Refactor profile display
+ *
  * Revision 1.11  2011/03/03 14:31:57  efy-asimo
  * use user.ctrl for avatar upload
  * create File object in the db if an avatar file is already on the user's profile picture folder

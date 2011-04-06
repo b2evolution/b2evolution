@@ -175,6 +175,9 @@ form.bComment fieldset div.info
 	padding-top: .5ex;
 	/* border: 1px solid #f00; */
 }
+form.bComment fieldset div.label select {
+	width: 94%;
+}
 
 /* bComment Avatar */
 form.bComment fieldset div.avatartag
@@ -204,4 +207,39 @@ div.container_menu_top div.widget_core_coll_search_form {
 }
 div.container_menu_top input.search_field {
 	width: 160px;	/* There is typically more space here */
+}
+
+/* tabs */
+div.tabs {
+	line-height:normal;
+	position: relative;
+	top: 2px;
+	margin: 0 14px 0;
+	list-style: none;
+	padding-bottom: 18px;
+}
+
+div.tabs div.option,
+div.tabs div.selected {
+	padding: 0 0 0 6px;
+	float: left;
+}
+
+div.tabs div.option a {
+	padding: 5px 11px 4px 4px;
+}
+
+div.tabs div.selected {
+	font-weight:bold;
+}
+
+div.tabs div.option a:hover {
+	text-decoration: underline;
+}
+
+.action_icon
+{
+	margin: 0 2px;
+	font-weight: bold;
+	vertical-align: top;
 }

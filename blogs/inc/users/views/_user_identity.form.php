@@ -65,6 +65,10 @@ global $action;
  * @var user permission, if user is only allowed to edit his profile
  */
 global $user_profile_only;
+/**
+ * @var the action destination of the form (NULL for pagenow)
+ */
+global $form_action;
 
 $GroupCache = & get_GroupCache();
 $group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
@@ -119,25 +123,35 @@ $group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
 <?php
 
 // Begin payload block:
-$this->disp_payload_begin();
+//$this->disp_payload_begin();
 
-$Form = new Form( NULL, 'user_checkchanges' );
+$Form = new Form( $form_action, 'user_checkchanges' );
 
 if( !$user_profile_only )
 {
-	$Form->global_icon( T_('Delete this user!'), 'delete', '?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete'), 3, 4  );
-	$Form->global_icon( T_('Compose message'), 'comments', '?ctrl=threads&action=new&user_login='.$edited_User->login );
-	$Form->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', regenerate_url( 'user_ID,action,ctrl', 'ctrl=users' ) );
+	echo_user_actions( $Form, $edited_User, $action );
 }
 
-if( $edited_User->ID == 0 )
-{	// Creating new user:
-	$Form->begin_form( 'fform', T_('Edit user identity') );
+$is_admin = is_admin_page();
+if( $is_admin )
+{
+	if( $edited_User->ID == 0 )
+	{
+		$form_title = T_('Edit user identity');
+	}
+	else
+	{
+		$form_title = sprintf( T_('Edit %s identity'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' );
+	}
+	$form_class = 'fform';
 }
 else
-{	// Editing existing user:
-	$Form->begin_form( 'fform', sprintf( T_('Edit %s identity'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' ) );
+{
+	$form_title = '';
+	$form_class = 'bComment';
 }
+
+	$Form->begin_form( $form_class, $form_title );
 
 	$Form->add_crumb( 'user' );
 	$Form->hidden_ctrl();
@@ -463,7 +477,7 @@ for( $i=1; $i<=3; $i++ )
 	}
 	$label .= '</optgroup></select>';
 
-	$Form->text_input( 'new_uf_val_'.$i, param( 'new_uf_val_'.$i, 'string', '' ), 50, $label, '', array('maxlength' => 255, 'clickable_label'=>false) );
+	$Form->text_input( 'new_uf_val_'.$i, param( 'new_uf_val_'.$i, 'string', '' ), 30, $label, '', array('maxlength' => 255, 'clickable_label'=>false) );
 }
 
 $Form->end_fieldset();
@@ -472,20 +486,20 @@ $Form->end_fieldset();
 
 if( $action != 'view' )
 { // Edit buttons
-	$Form->buttons( array(
+	$action_buttons = array(
 		array( '', 'actionArray[update]', T_('Save !'), 'SaveButton' ),
-		array( 'reset', '', T_('Reset'), 'ResetButton' ),
+		array( 'reset', '', T_('Reset'), 'ResetButton' ) );
+	if( $is_admin )
+	{
 		// dh> TODO: Non-Javascript-confirm before trashing all settings with a misplaced click.
-		array( 'type' => 'submit', 'name' => 'actionArray[default_settings]', 'value' => T_('Restore defaults'), 'class' => 'ResetButton',
-			'onclick' => "return confirm('".TS_('This will reset all your user settings.').'\n'.TS_('This cannot be undone.').'\n'.TS_('Are you sure?')."');" ),
-	) );
+		$action_buttons[] = array( 'type' => 'submit', 'name' => 'actionArray[default_settings]', 'value' => T_('Restore defaults'), 'class' => 'ResetButton',
+			'onclick' => "return confirm('".TS_('This will reset all your user settings.').'\n'.TS_('This cannot be undone.').'\n'.TS_('Are you sure?')."');" );
+	}
+	$Form->buttons( $action_buttons );
 }
 
 
 $Form->end_form();
-
-// End payload block:
-$this->disp_payload_end();
 
 // call the users group dropdown list handler
 ?>
@@ -496,6 +510,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.21  2011/04/06 13:30:56  efy-asimo
+ * Refactor profile display
+ *
  * Revision 1.20  2011/02/17 14:56:38  efy-asimo
  * Add user source param
  *

@@ -123,21 +123,13 @@ if( !$Messages->has_errors() )
 				break;
 			}
 
-			if( !$current_User->check_perm( 'users', 'edit' ) && $edited_User->ID != $current_User->ID )
-			{ // user is only allowed to update him/herself
-				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
+			if( !$edited_User->remove_avatar() )
+			{ // could not remove the avatar
 				$action = 'view';
 				break;
 			}
 
-			$edited_User->set( 'avatar_file_ID', NULL, true );
-
-			$edited_User->dbupdate();
-
-			$Messages->add( T_('Avatar has been removed.'), 'success' );
-
-			header_redirect( '?ctrl=user&user_tab=avatar&user_ID='.$edited_User->ID, 303 ); // will save $Messages into Session
-			/* EXITED */
+			$action = 'edit';
 			break;
 
 		case 'upload_avatar':
@@ -151,50 +143,13 @@ if( !$Messages->has_errors() )
 				break;
 			}
 
-			if( !$current_User->check_perm( 'users', 'edit' ) && $edited_User->ID != $current_User->ID )
-			{ // user is only allowed to update him/herself
-				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
-				$action = 'view';
+			$result = $edited_User->update_avatar_from_upload();
+			if( $result !== true )
+			{
+				$action = $result;
 				break;
 			}
-
-			// process upload
-			$FileRootCache = & get_FileRootCache();
-			$root = FileRoot::gen_ID( 'user', $edited_User->ID );
-			$result = process_upload( $root, 'profile_pictures', true, false, true, false );
-			if( empty( $result ) )
-			{
-				$Messages->add( T_( 'You don\'t have permission to selected user file root.' ), 'error' );
-			}
-			else
-			{
-				$uploadedFiles = $result['uploadedFiles'];
-				if( !empty( $uploadedFiles ) )
-				{ // upload was successful
-					$File = $uploadedFiles[0];
-					if( $File->is_image() )
-					{ // set uploaded image as avatar
-						$edited_User->set( 'avatar_file_ID', $File->ID, true );
-						$edited_User->dbupdate();
-						$Messages->add( T_('Avatar has been set successfull.'), 'success' );
-						$action = 'avatar';
-						break;
-					}
-					else
-					{ // uploaded file is not an image, delete the file
-						$Messages->add( T_( 'You can only set an image file to avatar!' ) );
-						$File->unlink();
-					}
-				}
-
-				$failedFiles = $result['failedFiles'];
-				if( !empty( $failedFiles ) )
-				{
-					$Messages->add( $failedFiles[0] );
-				}
-			}
-
-			$action = 'avatar';
+			$action = 'edit';
 			break;
 
 		case 'update_avatar':
@@ -207,31 +162,21 @@ if( !$Messages->has_errors() )
 				$action = 'list';
 				break;
 			}
-
-			if( !$current_User->check_perm( 'users', 'edit' ) && $edited_User->ID != $current_User->ID )
-			{ // user is only allowed to update him/herself
-				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
-				$action = 'view';
-				break;
-			}
-
 			$file_ID = param( 'file_ID', 'integer', NULL );
-			if( $file_ID == NULL )
+
+			$result = $edited_User->update_avatar( $file_ID );
+			if( $result !== true )
 			{
-				$Messages->add( T_('Could not change the avatar!'), 'error' );
-				$action = 'view';
+				$action = $result;
 				break;
-			}
-
-			$edited_User->set( 'avatar_file_ID', $file_ID, true );
-
-			$edited_User->dbupdate();
-
-			$Messages->add( T_('Avatar has been set successfull.'), 'success' );
-			$action = 'avatar';
+			}			
+			$action = 'edit';
 			break;
 
 		case 'update':
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
 			// Update existing user OR create new user:
 			if( empty($edited_User) || !is_object($edited_User) )
 			{
@@ -240,94 +185,17 @@ if( !$Messages->has_errors() )
 				break;
 			}
 
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'user' );
-
-			//$reload_page = false; // We set it to true, if a setting changes that needs a page reload (locale, admin skin, ..)
-
-			if( !$current_User->check_perm( 'users', 'edit' ) && $edited_User->ID != $current_User->ID )
-			{ // user is only allowed to update him/herself
-				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
-				$action = 'view';
-				break;
-			}
-
 			// if new user is true then it will redirect to user list after user has been created
 			$is_new_user = $edited_User->ID == 0 ? true : false;
 
-			// memorize user old login and root path, before update
-			$edited_user_old_login = $edited_User->login;
-			$edited_user_root_path = NULL;
-			$FileRootCache = & get_FileRootCache();
-			if( !$is_new_user )
+			$result = $edited_User->update_from_request( $is_new_user );
+			if( $result !== true )
 			{
-				$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $edited_User->ID );
-				if( $user_FileRoot && file_exists( $user_FileRoot->ads_path ) )
-				{
-					$edited_user_root_path = $user_FileRoot->ads_path;
-				}
-			}
-
-			// load data from request
-			if( !$edited_User->load_from_Request() )
-			{	// We have found validation errors:
-				$action = 'edit';
+				$action = $result;
 				break;
 			}
 
-			// Update user
-			$DB->begin();
-
-			$is_password_form = param( 'password_form', 'boolean', false );
-			if( $edited_User->dbsave() )
-			{
-				$update_success = true;
-				if( $is_new_user )
-				{
-					$Messages->add( T_('New user has been created.'), 'success' );
-				}
-				elseif( $is_password_form )
-				{
-					$Messages->add( T_('Password has been changed.'), 'success' );
-				}
-				else
-				{
-					if( $edited_user_old_login != $edited_User->login && $edited_user_root_path != NULL )
-					{ // user login changed and user has a root directory (another way $edited_user_root_path value would be NULL)
-						$FileRootCache->clear();
-						$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $edited_User->ID );
-						if( $user_FileRoot )
-						{ // user FilerRooot exists, rename user root folder
-							if( ! @rename( $edited_user_root_path, $user_FileRoot->ads_path ) )
-							{ // unsuccessful folder rename
-								$Messages->add( sprintf( T_('You cannot choose the new login "%s" (cannot rename user fileroot)'), $edited_User->login), 'error' );
-								$update_success = false;
-							}
-						}
-					}
-					if( $update_success )
-					{
-						$Messages->add( T_('Profile has been updated.'), 'success' );
-					}
-				}
-
-				if( $update_success )
-				{
-					$DB->commit();
-				}
-				else
-				{
-					$DB->rollback();
-				}
-			}
-			else
-			{
-				$DB->rollback();
-				$Messages->add( 'New user creation error', 'error' );
-			}
-
-			// Update user settings:
-			if( param( 'preferences_form', 'boolean', false ) )
+			if( param( 'advanced_form', 'boolean', false ) )
 			{
 				$current_admin_skin = param( 'current_admin_skin', 'string' );
 				if( ( $current_admin_skin == $UserSettings->get( 'admin_skin', $current_User->ID ) ) && 
@@ -489,6 +357,9 @@ switch( $user_tab )
 	case 'preferences':
 		$AdminUI->breadcrumbpath_add( T_('Preferences'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 		break;
+	case 'advanced':
+		$AdminUI->breadcrumbpath_add( T_('Advanced'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+		break;
 	case 'blogs':
 		$AdminUI->breadcrumbpath_add( T_('Personal blogs'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 		break;
@@ -518,22 +389,34 @@ switch( $action )
 		{
 			case 'identity':
 				// Display user identity form:
+				$AdminUI->disp_payload_begin();
 				$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
+				$AdminUI->disp_payload_end();
 				break;
 			case 'avatar':
 				// Display user avatar form:
 				if( $Settings->get('allow_avatars') )
 				{
+					$AdminUI->disp_payload_begin();
 					$AdminUI->disp_view( 'users/views/_user_avatar.form.php' );
+					$AdminUI->disp_payload_end();
 				}
 				break;
 			case 'password':
 				// Display user password form:
+				$AdminUI->disp_payload_begin();
 				$AdminUI->disp_view( 'users/views/_user_password.form.php' );
+				$AdminUI->disp_payload_end();
 				break;
 			case 'preferences':
 				// Display user preferences form:
+				$AdminUI->disp_payload_begin();
 				$AdminUI->disp_view( 'users/views/_user_preferences.form.php' );
+				$AdminUI->disp_payload_end();
+				break;
+			case 'advanced':
+				// Display user advanced form:
+				$AdminUI->disp_view( 'users/views/_user_advanced.form.php' );
 				break;
 			case 'blogs':
 				// Display user blog list:
@@ -550,6 +433,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.28  2011/04/06 13:30:56  efy-asimo
+ * Refactor profile display
+ *
  * Revision 1.27  2011/03/04 08:20:45  efy-asimo
  * Simple avatar upload in the front office
  *

@@ -439,6 +439,26 @@ class User extends DataObject
 			param( 'edited_user_locale', 'string', true );
 			$this->set_from_Request('locale', 'edited_user_locale', true);
 
+			// Session timeout
+			$edited_user_timeout_sessions = param( 'edited_user_timeout_sessions', 'string', NULL );
+			if( isset( $edited_user_timeout_sessions ) && ( $current_User->ID == $this->ID  || $current_User->check_perm( 'users', 'edit' ) ) )
+			{
+				switch( $edited_user_timeout_sessions )
+				{
+					case 'default':
+						$UserSettings->set( 'timeout_sessions', NULL, $this->ID );
+						break;
+					case 'custom':
+						$UserSettings->set( 'timeout_sessions', param_duration( 'timeout_sessions' ), $this->ID );
+						break;
+				}
+			}
+		}
+
+		$is_advanced_form = param( 'advanced_form', 'boolean', false );
+
+		if( $is_advanced_form )
+		{
 			$UserSettings->set( 'admin_skin', param( 'edited_user_admin_skin', 'string' ), $this->ID );
 
 			// Action icon params:
@@ -461,21 +481,6 @@ class User extends DataObject
 			if( isset($edited_user_results_per_page) )
 			{
 				$UserSettings->set( 'results_per_page', $edited_user_results_per_page, $this->ID );
-			}
-
-			// Session timeout
-			$edited_user_timeout_sessions = param( 'edited_user_timeout_sessions', 'string', NULL );
-			if( isset( $edited_user_timeout_sessions ) && $current_User->check_perm( 'users', 'edit' ) )
-			{
-				switch( $edited_user_timeout_sessions )
-				{
-					case 'default':
-						$UserSettings->set( 'timeout_sessions', NULL, $this->ID );
-						break;
-					case 'custom':
-						$UserSettings->set( 'timeout_sessions', param_duration( 'timeout_sessions' ), $this->ID );
-						break;
-				}
 			}
 		}
 
@@ -2115,6 +2120,7 @@ class User extends DataObject
 		}
 	}
 
+
 	/**
 	* Get first field for a specific type
 	*
@@ -2131,10 +2137,218 @@ class User extends DataObject
 
 		return $this->userfields[$idx][1];
 	}
+
+
+	/**
+	 * Update user data from Request form fields.
+	 *
+	 * @param boolean is new user
+	 * @return mixed true on success, allowed action otherwise
+	 */
+	function update_from_request( $is_new_user = false )
+	{
+		global $current_User, $DB, $Messages, $UserSettings;
+
+		if( !$current_User->check_perm( 'users', 'edit' ) && $this->ID != $current_User->ID )
+		{ // user is only allowed to update him/herself
+			$Messages->add( T_('You are only allowed to update your own profile!') );
+			return 'view';
+		}
+
+		// memorize user old login and root path, before update
+		$user_old_login = $this->login;
+		$user_root_path = NULL;
+		$FileRootCache = & get_FileRootCache();
+		if( !$is_new_user )
+		{
+			$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $this->ID );
+			if( $user_FileRoot && file_exists( $user_FileRoot->ads_path ) )
+			{
+				$user_root_path = $user_FileRoot->ads_path;
+			}
+		}
+
+		// load data from request
+		if( !$this->load_from_Request() )
+		{	// We have found validation errors:
+			return 'edit';
+		}
+
+		// Update user
+		$DB->begin();
+
+		$is_password_form = param( 'password_form', 'boolean', false );
+		if( $this->dbsave() )
+		{
+			$update_success = true;
+			if( $is_new_user )
+			{
+				$Messages->add( T_('New user has been created.'), 'success' );
+			}
+			elseif( $is_password_form )
+			{
+				$Messages->add( T_('Password has been changed.'), 'success' );
+			}
+			else
+			{
+				if( $user_old_login != $this->login && $user_root_path != NULL )
+				{ // user login changed and user has a root directory (another way $user_root_path value would be NULL)
+					$FileRootCache->clear();
+					$user_FileRoot = & $FileRootCache->get_by_type_and_ID( 'user', $this->ID );
+					if( $user_FileRoot )
+					{ // user FilerRooot exists, rename user root folder
+						if( ! @rename( $user_root_path, $user_FileRoot->ads_path ) )
+						{ // unsuccessful folder rename
+							$Messages->add( sprintf( T_('You cannot choose the new login "%s" (cannot rename user fileroot)'), $this->login), 'error' );
+							$update_success = false;
+						}
+					}
+				}
+				if( $update_success )
+				{
+					$Messages->add( T_('Profile has been updated.'), 'success' );
+				}
+			}
+
+			if( $update_success )
+			{
+				$DB->commit();
+			}
+			else
+			{
+				$DB->rollback();
+			}
+		}
+		else
+		{
+			$DB->rollback();
+			$Messages->add( 'New user creation error', 'error' );
+		}
+
+		// Update user settings:
+		if( param( 'preferences_form', 'boolean', false ) )
+		{
+			if( $UserSettings->dbupdate() )
+			{
+				$Messages->add( T_('User feature settings have been changed.'), 'success');
+			}
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Update user avatar file
+	 * 
+	 * @param integer the new avatar file ID
+	 * @return mixed true on success, allowed action otherwise
+	 */
+	function update_avatar( $file_ID )
+	{
+		global $current_User, $Messages;
+
+		if( !$current_User->check_perm( 'users', 'edit' ) && $this->ID != $current_User->ID )
+		{ // user is only allowed to update him/herself
+			$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
+			return 'view';
+		}
+
+		if( $file_ID == NULL )
+		{
+			$Messages->add( T_('Could not change the avatar!'), 'error' );
+			return 'edit';
+		}
+
+		$this->set( 'avatar_file_ID', $file_ID, true );
+		$this->dbupdate();
+
+		$Messages->add( T_('Avatar has been set successfull.'), 'success' );
+		return true;
+	}
+
+
+	/**
+	 * Remove user avatar
+	 * 
+	 * @return mixed true on success, false otherwise
+	 */
+	function remove_avatar()
+	{
+		global $current_User, $Messages;
+
+		if( !$current_User->check_perm( 'users', 'edit' ) && $this->ID != $current_User->ID )
+		{ // user is only allowed to update him/herself
+			$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
+			return false;
+		}
+
+		$this->set( 'avatar_file_ID', NULL, true );
+		$this->dbupdate();
+
+		$Messages->add( T_('Avatar has been removed.'), 'success' );
+		return true;
+	}
+
+
+	/**
+	 * Update user avatar file to the currently uploaded file
+	 * 
+	 * @return mixed true on success, allowed action otherwise.
+	 */
+	function update_avatar_from_upload()
+	{
+		global $current_User, $Messages;
+
+		if( !$current_User->check_perm( 'users', 'edit' ) && $this->ID != $current_User->ID )
+		{ // user is only allowed to update him/herself
+			$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
+			return 'view';
+		}
+
+		// process upload
+		$FileRootCache = & get_FileRootCache();
+		$root = FileRoot::gen_ID( 'user', $this->ID );
+		$result = process_upload( $root, 'profile_pictures', true, false, true, false );
+		if( empty( $result ) )
+		{
+			$Messages->add( T_( 'You don\'t have permission to selected user file root.' ), 'error' );
+			return 'view';
+		}
+
+		$uploadedFiles = $result['uploadedFiles'];
+		if( !empty( $uploadedFiles ) )
+		{ // upload was successful
+			$File = $uploadedFiles[0];
+			if( $File->is_image() )
+			{ // set uploaded image as avatar
+				$this->set( 'avatar_file_ID', $File->ID, true );
+				$this->dbupdate();
+				$Messages->add( T_('Avatar has been set successfull.'), 'success' );
+				return true;
+			}
+			else
+			{ // uploaded file is not an image, delete the file
+				$Messages->add( T_( 'You can only set an image file to avatar!' ) );
+				$File->unlink();
+			}
+		}
+
+		$failedFiles = $result['failedFiles'];
+		if( !empty( $failedFiles ) )
+		{
+			$Messages->add( $failedFiles[0] );
+		}
+
+		return 'edit';
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.98  2011/04/06 13:30:56  efy-asimo
+ * Refactor profile display
+ *
  * Revision 1.97  2011/02/23 21:45:18  fplanque
  * minor / cleanup
  *

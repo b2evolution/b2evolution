@@ -372,8 +372,8 @@ class twitter_plugin extends Plugin
 			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugin_settings&blog='.$target_id );
 		}
 		else if ($target_type == 'user' )
-		{ // redirect to user preferences form
-			$redirect_to = url_add_param( $admin_url, 'ctrl=user&user_tab=preferences&user_ID='.$target_id );
+		{ // redirect to user advanced preferences form
+			$redirect_to = url_add_param( $admin_url, 'ctrl=user&user_tab=advanced&user_ID='.$target_id );
 		}
 		else
 		{
@@ -431,7 +431,7 @@ class twitter_plugin extends Plugin
 			$Blog->dbupdate();
 		}
 		else if( $target_type == 'user' )
-		{ // user preferences
+		{ // user advanced preferences
 			$this->UserSettings->set( 'twitter_token', $token, $target_id );
 			$this->UserSettings->set( 'twitter_secret', $secret, $target_id );
 			$this->UserSettings->set( 'twitter_contact', $contact, $target_id );
@@ -481,7 +481,7 @@ class twitter_plugin extends Plugin
 		}
 		else if ($target_type == 'user' )
 		{ // User settings
-			$redirect_to = url_add_param( $admin_url, 'ctrl=user&user_tab=preferences&user_ID='.$target_id );
+			$redirect_to = url_add_param( $admin_url, 'ctrl=user&user_tab=advanced&user_ID='.$target_id );
 
 			if( isset( $current_User ) && ( !$current_User->check_perm( 'users', 'edit' ) ) && ( $target_id != $current_User->ID ) )
 			{ // user is only allowed to update him/herself
@@ -569,6 +569,9 @@ class twitter_plugin extends Plugin
 
 /*
  * $Log$
+ * Revision 1.30  2011/04/06 13:30:56  efy-asimo
+ * Refactor profile display
+ *
  * Revision 1.29  2011/03/12 21:41:33  fplanque
  * minor debug messages
  *

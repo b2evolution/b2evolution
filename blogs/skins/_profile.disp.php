@@ -38,112 +38,102 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'regional/model/_country.class.php', 'Country' );
 
-global $Settings, $admin_url;
+global $Blog, $Session, $Messages, $inc_path;
+global $action, $user_profile_only, $edited_User, $form_action;
+
+$form_action = $Blog->gen_blogurl().'?disp=profile';
 
 if( ! is_logged_in() )
 { // must be logged in!
 	echo '<p class="error">'.T_( 'You are not logged in.' ).'</p>';
 	return;
 }
-// --- //
+
+$user_profile_only = true;
+// edited_User is always the current_User
+$edited_User = $current_User;
+
 $redirect_to = param( 'redirect_to', 'string', '' );
+$action = param_action();
 
+if( !empty( $action ) )
+{ // Check that this action request is not a CSRF hacked request:
+	$Session->assert_received_crumb( 'user' );
+}
 
-/**
- * form to update the profile
- * @var Form
- */
-$ProfileForm = new Form( $htsrv_url_sensitive.'profile_update.php', 'ProfileForm' );
+switch( $action )
+{
+	case 'update_avatar':
+		$file_ID = param( 'file_ID', 'integer', NULL );
+		$current_User->update_avatar( $file_ID );
+		$Messages->display();
+		break;
 
-$ProfileForm->begin_form( 'bComment' );
+	case 'remove_avatar':
+		$current_User->remove_avatar();
+		$Messages->display();
+		break;
 
-	$ProfileForm->add_crumb( 'profileform' );
-	$ProfileForm->hidden( 'checkuser_id', $current_User->ID );
-	$ProfileForm->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
+	case 'update':
+		$current_User->update_from_request();
+		$Messages->display();
+		break;
 
-$ProfileForm->begin_fieldset( T_('Email communications') );
+	case 'upload_avatar':
+		$current_User->update_avatar_from_upload();
+		$Messages->display();
+		break;
+}
 
-	$ProfileForm->text_input( 'newuser_email', $current_User->get( 'email' ), 40, T_('Email'), '', array( 'maxlength' => 100, 'class' => 'bComment' ) );
-	$Group = & $current_User->get_Group();
-	$messaging_options = array(
-		array( 'allow_pm', 1, '', $current_User->accepts_pm(), /*true = disabled*/! $Group->check_messaging_perm(), T_( 'Allow others to send me private messages' ) ),
-		array( 'allow_email', 2, '',  $current_User->accepts_email(), /*true = disabled*/false, T_( 'Allow others to send me emails through a message form (email address will never be displayed)' ) ) );
-	$ProfileForm->checklist( $messaging_options, 'newuser_allow_msgform', T_('Message form') );
-	$ProfileForm->checkbox( 'newuser_notify', $current_User->get( 'notify' ), T_('Notifications'), T_('Check this to receive a notification whenever someone else comments on one of <strong>your</strong> posts.') );
+$user_tab = param( 'user_tab', 'string' );
+if( empty($user_tab) )
+{
+	$user_tab = 'identity';
+}
 
-$ProfileForm->end_fieldset();
-
-$ProfileForm->begin_fieldset( T_('Identity') );
-
-	if( $Settings->get('allow_avatars') )
+// Display tabs
+echo '<div class="tabs">';
+$tabs = get_user_sub_entries( false, NULL );
+foreach( $tabs as $tab => $tab_data )
+{
+	if( $tab == $user_tab )
 	{
-		$avatar_tag = $current_User->get_avatar_imgtag();
-		if( $Settings->get( 'fm_enable_roots_user' ) )
-		{
-			$avatar_tag .= ' <a href="'.get_user_avatar_url().'">'.T_('change').' &raquo;</a>';
-		}
-		$ProfileForm->info( T_('Avatar'), $avatar_tag );
+		echo '<div class="selected">';
 	}
-
-	$ProfileForm->info( T_('Login'), $current_User->get('login') );
-	$ProfileForm->text_input( 'newuser_firstname', $current_User->get( 'firstname' ), 40, T_('First name'), '', array( 'maxlength' => 50, 'class' => 'bComment' ) );
-	$ProfileForm->text_input( 'newuser_lastname', $current_User->get( 'lastname' ), 40, T_('Last name'), '', array( 'maxlength' => 50, 'class' => 'bComment' ) );
-	$ProfileForm->text_input( 'newuser_nickname', $current_User->get( 'nickname' ), 40, T_('Nickname'), '', array( 'maxlength' => 50, 'class' => 'bComment' ) );
-	$ProfileForm->select( 'newuser_idmode', $current_User->get('idmode'), array( &$current_User, 'callback_optionsForIdMode' ), T_('Identity shown'), '', 'bComment' );
-
-	$require_country = (bool)$Settings->get( 'registration_require_country' );
-	$CountryCache = & get_CountryCache();
-	$ProfileForm->select_input_object( 'newuser_ctry_ID', $current_User->ctry_ID, $CountryCache, T_( 'Country' ), array( 'allow_none' => !$require_country ) );
-
-	$ProfileForm->checkbox( 'newuser_showonline', $current_User->get( 'showonline' ), T_('Show online'), T_('Check this to be displayed as online when visiting the site.') );
-
-	if( $Settings->get( 'registration_require_gender' ) != 'hidden' )
+	else
 	{
-		$ProfileForm->radio( 'newuser_gender', $current_User->get('gender'), array(
-							array( 'M', T_('Male') ),
-							array( 'F', T_('Female') ),
-						), T_('Gender') );
+		echo '<div class="option">';
 	}
+	echo '<a href='.$tab_data['href'].'>'.$tab_data['text'].'</a>';
+	echo '</div>';
+}
+echo '</div>';
 
-$ProfileForm->end_fieldset();
-
-$ProfileForm->begin_fieldset( T_('Password') );
-
-	$ProfileForm->password_input( 'pass1', '', 16, T_('New pass'), array( 'note' => T_('Leave blank to leave the password unchanged.'), 'maxlength' => 50, 'class' => 'bComment', 'autocomplete' => 'off' ) );
-	$ProfileForm->password_input( 'pass2', '', 16, T_('Confirm'), array( 'note' => T_('Confirm new password by typing it again.')
-		.' '.sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'class' => 'bComment', 'autocomplete' => 'off' ) );
-
-$ProfileForm->end_fieldset();
-
-
-$ProfileForm->begin_fieldset( T_('Preferences') );
-
-	$ProfileForm->select( 'newuser_locale', $current_User->get( 'locale' ), 'locale_options_return', T_('Preferred locale'), '', 'bComment' );
-
-$ProfileForm->end_fieldset();
-
-$ProfileForm->begin_fieldset( T_('Additional info') );
-
-	$ProfileForm->info( T_('Level'), $current_User->get('level') );
-	$ProfileForm->info( T_('Posts'), $current_User->get('num_posts') );
-	$ProfileForm->text_input( 'newuser_url', $current_User->get( 'url' ), 40, T_('URL'), '', array( 'maxlength' => 100, 'class' => 'bComment' ) );
-	$ProfileForm->text_input( 'newuser_icq', $current_User->get( 'icq' ), 40, T_('ICQ'), '', array( 'maxlength' => 10, 'class' => 'bComment' ) );
-	$ProfileForm->text_input( 'newuser_aim', $current_User->get( 'aim' ), 40, T_('AOL I.M.'), '', array( 'maxlength' => 50, 'class' => 'bComment' ) );
-	$ProfileForm->text_input( 'newuser_msn', $current_User->get( 'msn' ), 40, T_('MSN I.M.'), '', array( 'maxlength' => 100, 'class' => 'bComment' ) );
-	$ProfileForm->text_input( 'newuser_yim', $current_User->get( 'yim' ), 40, T_('Yahoo I.M.'), '', array( 'maxlength' => 50, 'class' => 'bComment' ) );
-
-$ProfileForm->end_fieldset();
-
-$Plugins->trigger_event( 'DisplayProfileFormFieldset', array( 'Form' => & $ProfileForm, 'User' => & $current_User, 'edit_layout' => 'private' ) );
-
-$ProfileForm->buttons( array( array( '', '', T_('Update'), 'SaveButton' ),
-															array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
-
-$ProfileForm->end_form();
+// Display form
+switch( $user_tab )
+{
+	case 'identity':
+		require $inc_path.'users/views/_user_identity.form.php';
+		break;
+	case 'avatar':
+		require $inc_path.'users/views/_user_avatar.form.php';
+		break;
+	case 'password':
+		require $inc_path.'users/views/_user_password.form.php';
+		break;
+	case 'preferences':
+		require $inc_path.'users/views/_user_preferences.form.php';
+		break;
+	default:
+		debug_die( "Unknown user tab" );
+}
 
 
 /*
  * $Log$
+ * Revision 1.21  2011/04/06 13:30:56  efy-asimo
+ * Refactor profile display
+ *
  * Revision 1.20  2011/03/04 08:20:45  efy-asimo
  * Simple avatar upload in the front office
  *

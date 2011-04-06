@@ -55,21 +55,31 @@ global $action;
  * @var user permission, if user is only allowed to edit his profile
  */
 global $user_profile_only;
+/**
+ * @var the action destination of the form (NULL for pagenow)
+ */
+global $form_action;
 
-
-// Begin payload block:
-$this->disp_payload_begin();
-
-$Form = new Form( NULL, 'user_checkchanges' );
+$Form = new Form( $form_action, 'user_checkchanges' );
 
 if( !$user_profile_only )
 {
-	$Form->global_icon( T_('Delete this user!'), 'delete', '?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete'), 3, 4  );
-	$Form->global_icon( T_('Compose message'), 'comments', '?ctrl=threads&action=new&user_login='.$edited_User->login );
-	$Form->global_icon( ( $action != 'view' ? T_('Cancel editing!') : T_('Close user profile!') ), 'close', regenerate_url( 'user_ID,action,ctrl', 'ctrl=users' ) );
+	echo_user_actions( $Form, $edited_User, $action );
 }
 
-$Form->begin_form( 'fform', sprintf( T_('Change %s password'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' ) );
+$is_admin = is_admin_page();
+if( $is_admin )
+{
+	$form_title = sprintf( T_('Change %s password'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' );
+	$form_class = 'fform';
+}
+else
+{
+	$form_title = '';
+	$form_class = 'bComment';
+}
+
+$Form->begin_form( $form_class, $form_title );
 
 	$Form->add_crumb( 'user' );
 	$Form->hidden_ctrl();
@@ -84,7 +94,7 @@ $Form->begin_form( 'fform', sprintf( T_('Change %s password'), $edited_User->dge
 if( $action != 'view' )
 { // We can edit the values:
 
-	$Form->begin_fieldset( T_('Password') );
+	$Form->begin_fieldset( $is_admin ? T_('Password') : '', array( 'class'=>'fieldset clear' ) );
 		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'note' => ( !empty($edited_User->ID) ? T_('Leave empty if you don\'t want to change the password.') : '' ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
 		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'note'=>sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
 
@@ -103,12 +113,12 @@ if( $action != 'view' )
 
 $Form->end_form();
 
-// End payload block:
-$this->disp_payload_end();
-
 
 /*
  * $Log$
+ * Revision 1.7  2011/04/06 13:30:56  efy-asimo
+ * Refactor profile display
+ *
  * Revision 1.6  2010/10/17 18:53:04  sam2kb
  * Added a link to delete edited user
  *

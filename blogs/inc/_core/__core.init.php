@@ -961,38 +961,7 @@ class _core_Module extends Module
 
 		if( $ctrl == 'user' )
 		{	// Viewing a specific user:
-			$users_sub_entries = array();
-
-			$users_sub_entries['identity'] = array(
-								'text' => T_('Identity'),
-								'href' => '?ctrl=user&amp;user_tab=identity&amp;user_ID='.$user_ID	);
-
-			if( !empty( $user_ID ) )
-			{
-				if( $Settings->get('allow_avatars') )
-				{
-					$users_sub_entries['avatar'] = array(
-									'text' => T_('Avatar'),
-									'href' => '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$user_ID );
-				}
-
-				if( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'edit' ) )
-				{
-					$users_sub_entries['password'] = array(
-										'text' => T_('Password'),
-										'href' => '?ctrl=user&amp;user_tab=password&amp;user_ID='.$user_ID );
-				}
-
-				$users_sub_entries['preferences'] = array(
-									'text' => T_('Preferences'),
-	 								'href' => '?ctrl=user&amp;user_tab=preferences&amp;user_ID='.$user_ID );								
-
-				$users_sub_entries['blogs'] = array(
-									'text' => T_('Personal blogs'),
-	 								'href' => '?ctrl=user&amp;user_tab=blogs&amp;user_ID='.$user_ID );
-			}
-
-			$users_entries['entries'] = $users_sub_entries;
+			$users_entries['entries'] = get_user_sub_entries( true, $user_ID );
 		}
 		else
 		{	// Viewing all users:
@@ -1072,6 +1041,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.72  2011/04/06 13:30:55  efy-asimo
+ * Refactor profile display
+ *
  * Revision 1.71  2011/02/23 21:45:18  fplanque
  * minor / cleanup
  *
