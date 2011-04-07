@@ -11,7 +11,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Settings;
+global $Settings, $Messages;
 
 
 if( $Settings->get( 'outbound_notifications_mode' ) != 'cron' )
@@ -50,7 +50,11 @@ $ItemCache = & get_ItemCache();
 $edited_Item = & $ItemCache->get_by_ID( $item_ID );
 
 // send outbound pings:
-$edited_Item->send_outbound_pings();
+if( ! $edited_Item->send_outbound_pings() )
+{
+	$result_message = $Messages->get_string( '', '', "\n" );
+	return 5;
+}
 
 // Send email notifications now!
 $edited_Item->send_email_notifications( false );
@@ -61,12 +65,19 @@ $edited_Item->set( 'notifications_status', 'finished' );
 // Save the new processing status to DB
 $edited_Item->dbupdate();
 
-$result_message = T_('Done.');
+$result_message = $Messages->get_string( '', '', "\n" );
+if( empty( $result_message ) )
+{
+	$result_message = T_('Done.');
+}
 
 return 1; /* ok */
 
 /*
  * $Log$
+ * Revision 1.5  2011/04/07 13:55:03  efy-asimo
+ * Show asynchronous notifications result
+ *
  * Revision 1.4  2009/09/26 12:00:42  tblue246
  * Minor/coding style
  *

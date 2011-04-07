@@ -4147,6 +4147,9 @@ class Item extends ItemLight
 		$this->load_Blog();
 		$ping_plugins = array_unique(explode(',', $this->Blog->get_setting('ping_plugins')));
 
+		// init result
+		$r = true;
+
 		if( (preg_match( '#^http://localhost[/:]#', $baseurl)
 				|| preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) /* domain ending in ".local" */
 			&& $evonetsrv_host != 'localhost'	// OK if we are pinging locally anyway ;)
@@ -4156,6 +4159,7 @@ class Item extends ItemLight
 			{
 				$Messages->add( T_('Skipping pings (Running on localhost).'), 'note' );
 			}
+			return false;
 		}
 		else foreach( $ping_plugins as $plugin_code )
 		{
@@ -4166,7 +4170,7 @@ class Item extends ItemLight
 				$Messages->add( sprintf(T_('Pinging %s...'), $Plugin->ping_service_name), 'note' );
 				$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
 
-				$r = $Plugin->ItemSendPing( $params );
+				$r = $r && ( $Plugin->ItemSendPing( $params ) );
 
 				if( !empty($params['xmlrpcresp']) )
 				{
@@ -4185,6 +4189,7 @@ class Item extends ItemLight
 				}
 			}
 		}
+		return $r;
 	}
 
 
@@ -4544,6 +4549,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.222  2011/04/07 13:55:03  efy-asimo
+ * Show asynchronous notifications result
+ *
  * Revision 1.221  2011/03/15 14:10:10  efy-asimo
  * can_see_comments - fix
  *
