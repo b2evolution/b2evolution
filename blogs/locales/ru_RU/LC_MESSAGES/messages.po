@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2010-12-24 03:13+0100\n"
-"PO-Revision-Date: 2011-01-01 22:55-0500\n"
+"PO-Revision-Date: 2011-04-19 23:02-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -4107,11 +4107,11 @@ msgstr "Без рубрики"
 
 #: ../../../inc/collections/model/_blog.class.php:1904
 msgid "A default category has been created for this blog."
-msgstr "Создана рубрика по умолчанию для этого блога."
+msgstr "Создана стандартная рубрика блога."
 
 #: ../../../inc/collections/model/_blog.class.php:1910
 msgid "Default widgets have been set-up for this blog."
-msgstr "Виджеты \"по умолчанию\" были установлены для этого блога."
+msgstr "Установлены стандартные виджеты блога."
 
 #: ../../../inc/collections/model/_blog.class.php:2007
 msgid "Deleted post-categories"
@@ -8862,7 +8862,7 @@ msgstr "Это короткая ссылка на запись, которую �
 #: ../../../inc/items/model/_item.funcs.php:311
 #, php-format
 msgid "Warning: the URL slug has been changed to &laquo;%s&raquo;."
-msgstr "Внимание: короткая ссылка записи была изменена на &laquo;%s&raquo;."
+msgstr "Внимание: короткая ссылка была изменена на &laquo;%s&raquo;."
 
 #: ../../../inc/items/model/_item.funcs.php:500
 msgid "Images &amp; Attachments"
