@@ -2913,6 +2913,10 @@ function upgrade_b2evo_tables()
 			             VALUES ("m4v", "MPEG video file", "video/x-m4v", "", "browser", "registered")', 'Add "m4v" file type' );
 	}
 	task_end();
+	
+	task_begin( 'Upgrading collection settings table, change cset_value type...' );
+	$DB->query( 'ALTER TABLE T_coll_settings MODIFY COLUMN cset_value TEXT NULL' );
+	task_end();
 
 	load_funcs('tools/model/_system.funcs.php');
 	if( !system_init_caches() )
@@ -3094,6 +3098,10 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.389  2011/04/28 08:20:55  sam2kb
+ * Changed collection settings cset_value type to TEXT
+ * See: http://forums.b2evolution.net/viewtopic.php?t=22068
+ *
  * Revision 1.388  2011/03/15 09:34:06  efy-asimo
  * have checkboxes for enabling caching in new blogs
  * refactorize cache create/enable/disable
