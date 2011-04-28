@@ -1,0 +1,178 @@
+<?php
+/**
+ * This file implements files quick upload
+ *
+ * This file is part of the evoCore framework - {@link http://evocore.net/}
+ * See also {@link http://sourceforge.net/projects/evocms/}.
+ *
+ * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}
+ *
+ * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
+ *
+ * @package htsrv
+ *
+ * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
+ * @author efy-asimo: Attila Simo.
+ *
+ * @version $Id$
+ */
+
+
+/**
+ * Do the MAIN initializations:
+ */
+require_once dirname(__FILE__).'/../conf/_config.php';
+
+require_once $inc_path.'_main.inc.php';
+
+global $current_User;
+global $http_response_code;
+
+param( 'upload', 'boolean', true );
+param( 'root_and_path', 'string', true );
+
+// Check that this action request is not a CSRF hacked request:
+$Session->assert_received_crumb( 'file' );
+
+if( strpos( $root_and_path, '::' ) )
+{
+	list( $root, $path ) = explode( '::', $root_and_path, 2 );
+	$FileRootCache = & get_FileRootCache();
+	$fm_FileRoot = $FileRootCache->get_by_ID( $root );
+	$non_canonical_list_path = $fm_FileRoot->ads_path.$path;
+	$upload_path = get_canonical_path( $non_canonical_list_path );
+}
+
+if( !isset( $upload_path ) )
+{
+	echo '<span class="result_error">'.T_( 'Bad request. Unknown upload location!' ).'</span>';
+	exit();
+}
+
+if( $upload && ( !$current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) ) )
+{
+	echo '<span class="result_error">'.T_( 'You don\'t have permission to upload on this file root.' ).'</span>';
+	exit();
+}
+
+if( $upload )
+{
+	if (!function_exists('apache_request_headers'))
+	{
+		function apache_request_headers() { 
+			foreach( $_SERVER as $key => $value ) {
+				if( substr( $key, 0, 5 ) == "HTTP_" )
+				{
+					$key = str_replace( " ", "-", ucwords( strtolower( str_replace( "_", " ", substr( $key, 5 ) ) ) ) ); 
+					$out[$key] = $value; 
+				}
+				else
+				{
+					$out[$key]=$value; 
+				}
+			}
+			return $out; 
+		}
+	}
+    $headers = apache_request_headers();
+
+    // basic checks
+    if(/* false && */isset(
+		$headers['CONTENT_TYPE'],
+		$headers['CONTENT_LENGTH'],
+		$headers['X-File-Size'],
+		$headers['X-File-Name']
+		) && ( $headers['CONTENT_TYPE'] === 'multipart/form-data' ) && ( $headers['CONTENT_LENGTH'] === $headers['X-File-Size'] ) )
+	{
+		// create the object and assign property
+		$file = new stdClass;
+		$file->name = basename($headers['X-File-Name']);
+		$file->size = $headers['X-File-Size'];
+		$file->content = file_get_contents("php://input");
+
+		if( $Settings->get( 'upload_maxkb' ) && ( $file->size > $Settings->get( 'upload_maxkb' )*1024 ) )
+		{
+			echo '<span class="result_error">';
+			echo sprintf( T_('The file is too large: %s but the maximum allowed is %s.'), $file->size, $Settings->get( 'upload_maxkb' )*1024 );
+			echo '</span>';
+			exit();
+		}
+
+		$newName = $file->name;
+		if( $error_filename = validate_filename( $newName ) )
+		{ // Not a file name or not an allowed extension
+			echo '<span class="result_error"> '.$error_filename.'</span>';
+			exit();
+		}
+
+		$oldName = $newName;
+		list( $newFile, $oldFile_thumb ) = check_file_exists( $fm_FileRoot, $path, $newName );
+		$newName = $newFile->get( 'name' );
+
+		// if everything is ok, save the file somewhere
+		if( file_put_contents( $newFile->get_full_path(), $file->content ) )
+		{
+			// change to default chmod settings
+			$newFile->chmod( NULL );
+
+			// Refreshes file properties (type, size, perms...)
+			$newFile->load_properties();
+
+			// save file into the db
+			$newFile->dbsave();
+
+			$message = '';
+			if( ! empty( $oldFile_thumb ) )
+			{
+				$image_info = getimagesize( $newFile->get_full_path() );
+				if( $image_info )
+				{
+					$newFile_thumb = $newFile->get_preview_thumb( 'fulltype' );
+				}
+				else
+				{
+					$newFile_thumb = $newFile->get_size_formatted();
+				}
+				$message = '<br />';
+				$message .= sprintf( T_('"%s was renamed to %s. Would you like to replace %s with the new version instead?'),
+									'&laquo;'.$oldName.'&raquo;', '&laquo;'.$newName.'&raquo;', '&laquo;'.$oldName.'&raquo;' );
+				$message .= '<li class="invalid" title="'.T_('File name changed.').'">';
+				$message .= '<input type="radio" name="Renamed_'.$newFile->ID.'" value="Yes" id="Yes_'.$newFile->ID.'"/>';
+				$message .= '<label for="Yes_'.$newFile->ID.'">';
+				$message .= sprintf( T_("Replace the old version %s with the new version %s and keep old version as %s."), $oldFile_thumb, $newFile_thumb, $newName ).'</label><br />';
+				$message .= '<input type="radio" name="Renamed_'.$newFile->ID.'" value="No" id="No_'.$newFile->ID.'" checked="checked"/>';
+				$message .= '<label for="No_'.$newFile->ID.'">';
+				$message .= sprintf( T_("Don't touch the old version and keep the new version as %s."), $newName ).'</label><br />';
+				$message .= '</li>';
+				echo '1';
+			}
+			else
+			{
+				echo '0';
+			}
+			echo ' <span class="result_success">'.T_( 'OK' ).'</span>';
+			echo $message;
+			if( !empty( $message ) )
+			{
+				echo '<input type="hidden" name="renamedFiles['.$newFile->ID.'][newName]" value="'.$newName.'" />';
+				echo '<input type="hidden" name="renamedFiles['.$newFile->ID.'][oldName]" value="'.$oldName.'" />';
+			}
+			exit();
+		}
+	}
+
+	// Could not find upload information
+	echo '<span class="result_error">'.T_( 'Bad request. Missing header information.' ).'</span>';
+	exit();
+}
+
+echo '<span class="error">'.T_( 'Incorrect upload param' ).'</span>';
+exit();
+
+/*
+ * $Log$
+ * Revision 1.1  2011/04/28 14:07:59  efy-asimo
+ * multiple file upload
+ *
+ */
+?>

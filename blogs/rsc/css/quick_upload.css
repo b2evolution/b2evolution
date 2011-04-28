@@ -1,0 +1,21 @@
+#progress {
+    width: 200px;
+    border: 1px solid #BBB;
+    background-color: #FFF;
+    padding: 0;
+}
+
+#progress span {
+    display: block;
+    width: 0px;
+    height: 12px;
+    background-color: #DDD;
+}
+
+.result_success {
+	color: #0c0;
+}
+
+.result_error {
+	color: #e00;
+}

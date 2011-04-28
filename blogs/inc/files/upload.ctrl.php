@@ -50,27 +50,26 @@ global $item_ID, $iframe_name;
 // Check permission:
 $current_User->check_perm( 'files', 'add', true, $blog ? $blog : NULL );
 
-
-$AdminUI->set_path( 'files', 'upload' );
+$AdminUI->set_path( 'files' );
 
 // Params that may need to be passed through:
 param( 'fm_mode', 'string', NULL, true );
 param( 'item_ID', 'integer', NULL, true );
 param( 'user_ID', 'integer', NULL, true );
 param( 'iframe_name', 'string', '', true );
+param( 'tab3', 'string' );
+if( empty( $tab3 ) )
+{
+	$tab3 = 'standard';
+}
 
 $action = param_action();
 
-// Standard vs Advanced mode
-param( 'uploadwithproperties', 'integer', NULL, false );
-if( !is_null($uploadwithproperties) )
+if( $tab3 == 'quick' )
 {
-	$UserSettings->set( 'fm_uploadwithproperties', $uploadwithproperties );
-	$UserSettings->dbupdate();
-}
-else
-{
-	$uploadwithproperties = $UserSettings->get( 'fm_uploadwithproperties' );
+	require_css( 'quick_upload.css' );
+	require_js( 'multiupload/sendfile.js' );
+	require_js( 'multiupload/quick_upload.js' );
 }
 
 // INIT params:
@@ -176,6 +175,8 @@ file_controller_build_tabs();
 //           See http://forums.b2evolution.net/viewtopic.php?p=49001#49001
 if( $Messages->has_errors() )
 {
+	$AdminUI->set_path( 'files', 'upload', $tab3 );
+
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 	$AdminUI->disp_html_head();
 
@@ -212,6 +213,8 @@ if( ! $Settings->get('upload_enabled') )
 // If there were errors, display them and exit (especially in case there's no valid FileRoot ($fm_FileRoot)):
 if( $Messages->has_errors() )
 {
+	$AdminUI->set_path( 'files', 'upload', $tab3 );
+
 	$AdminUI->disp_html_head();
 	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
 	$AdminUI->disp_body_top();
@@ -439,6 +442,8 @@ if( isset($_FILES) && count( $_FILES ) )
 
 file_controller_build_tabs();
 
+$AdminUI->set_path( 'files', 'upload', $tab3 );
+
 // fp> TODO: this here is a bit sketchy since we have Blog & fileroot not necessarilly in sync. Needs investigation / propositions.
 // Note: having both allows to post from any media dir into any blog.
 $AdminUI->breadcrumbpath_init();
@@ -461,8 +466,14 @@ $AdminUI->disp_body_top();
 /*
  * Display payload:
  */
-$AdminUI->disp_view( 'files/views/_file_upload.view.php' );
-
+if( $tab3 == 'quick' )
+{
+	$AdminUI->disp_view( 'files/views/_file_quick_upload.view.php' );
+}
+else
+{
+	$AdminUI->disp_view( 'files/views/_file_upload.view.php' );
+}
 
 // Display body bottom, debug info and close </html>:
 $AdminUI->disp_global_footer();
@@ -470,6 +481,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.45  2011/04/28 14:07:58  efy-asimo
+ * multiple file upload
+ *
  * Revision 1.44  2011/03/03 14:31:57  efy-asimo
  * use user.ctrl for avatar upload
  * create File object in the db if an avatar file is already on the user's profile picture folder

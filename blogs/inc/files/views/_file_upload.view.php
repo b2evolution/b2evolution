@@ -38,9 +38,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $Settings;
 
-global $UserSettings;
-
-global $upload_quickmode, $failedFiles, $ads_list_path, $uploadwithproperties, $renamedMessages, $renamedFiles;
+global $upload_quickmode, $failedFiles, $ads_list_path, $tab3, $renamedMessages, $renamedFiles;
 
 global $fm_FileRoot;
 
@@ -161,7 +159,7 @@ global $fm_FileRoot;
 		newLI.appendChild( radioURL );
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Upload by URL'); ?>:', false, 'input', 'uploadfile_url['+evo_upload_fields_count+']', '70', '0', 'text', 'upload_file' );
 		<?php
-		if( $uploadwithproperties )
+		if( $tab3 == 'advanced' )
 		{	// We want file properties on the upload form:
 			?>
 		appendLabelAndInputElements( newLI, '<?php echo TS_('Filename on server (optional)'); ?>:', false, 'input', 'uploadfile_name[]', '50', '80', 'text', '' );
@@ -186,6 +184,7 @@ global $fm_FileRoot;
 	$Form->hidden_ctrl();
 	$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 ); // Just a hint for the browser.
 	$Form->hidden( 'upload_quickmode', $upload_quickmode );
+	$Form->hidden( 'tab3', $tab3 );
 	$Form->hiddens_by_key( get_memorized() );
 
 	$Widget = new Widget( 'file_browser' );
@@ -195,23 +194,6 @@ global $fm_FileRoot;
 ?>
 
 <table id="fm_browser" cellspacing="0" cellpadding="0">
-	<thead>
-		<tr>
-			<td colspan="2" id="fm_bar">
-			<?php
-				if( $uploadwithproperties )
-				{
-					echo '<a href="'.regenerate_url( 'uploadwithproperties', 'uploadwithproperties=0' ).'">'.T_('Hide advanced upload properties').'</a>';
-				}
-				else
-				{
-					echo '<a href="'.regenerate_url( 'uploadwithproperties', 'uploadwithproperties=1' ).'">'.T_('Show advanced upload properties').'</a>';
-				}
-			?>
-			</td>
-		</tr>
-	</thead>
-
 	<tbody>
 		<tr>
 			<?php
@@ -323,7 +305,7 @@ global $fm_FileRoot;
 							<label for="<?php echo 'Yes_'.$lKey ?>"><?php echo sprintf( T_("Don't touch the old version and keep the new version as %s."), $renamedFiles[$lKey]['newName'] ) ?> </label><br />
 							<?php
 						}
-						if( $uploadwithproperties )
+						if( $tab3 == 'advanced' )
 						{	// We want file properties on the upload form:
 							?>
 							<label><?php echo T_('Filename on server (optional)'); ?>:</label>
@@ -398,6 +380,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.23  2011/04/28 14:07:58  efy-asimo
+ * multiple file upload
+ *
  * Revision 1.22  2011/03/02 11:04:22  efy-asimo
  * Refactor file uploads for future use
  *

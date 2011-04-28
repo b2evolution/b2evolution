@@ -981,6 +981,21 @@ function file_controller_build_tabs()
 							'href' => regenerate_url( 'ctrl', 'ctrl=upload' ) ),
 					)
 			);
+
+		$AdminUI->add_menu_entries(
+			array('files', 'upload'),
+			array(
+					'quick' => array(
+						'text' => T_('Quick'),
+						'href' => '?ctrl=upload&amp;tab3=quick' ),
+					'standard' => array(
+						'text' => T_('Standard'),
+						'href' => '?ctrl=upload&amp;tab3=standard' ),
+					'advanced' => array(
+						'text' => T_('Advanced'),
+						'href' => '?ctrl=upload&amp;tab3=advanced' ),
+				)
+			);
 	}
 
 	if( $current_User->check_perm( 'options', 'view' ) )
@@ -1168,10 +1183,10 @@ function process_upload( $root, $path, $create_path_dirs = false, $check_perms =
 		}
 
 		// Some files have been uploaded:
-		param( 'uploadfile_title', 'array', array() );
-		param( 'uploadfile_alt', 'array', array() );
-		param( 'uploadfile_desc', 'array', array() );
-		param( 'uploadfile_name', 'array', array() );
+		$uploadfile_title = param( 'uploadfile_title', 'array', array() );
+		$uploadfile_alt = param( 'uploadfile_alt', 'array', array() );
+		$uploadfile_desc = param( 'uploadfile_desc', 'array', array() );
+		$uploadfile_name = param( 'uploadfile_name', 'array', array() );
 
 		foreach( $_FILES['uploadfile']['name'] as $lKey => $lName )
 		{
@@ -1283,35 +1298,9 @@ function process_upload( $root, $path, $create_path_dirs = false, $check_perms =
 			}
 
 			// Get File object for requested target location:
-			$FileCache = & get_FileCache();
-			$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
-
-			$num_ext = 0;
 			$oldName = $newName;
-
-			while( $newFile->exists() )
-			{ // The file already exists in the target location!
-				$num_ext++;
-				$ext_pos = strrpos( $newName, '.');
-				if( $num_ext == 1 )
-				{
-					$newName = substr_replace( $newName, '-'.$num_ext.'.', $ext_pos, 1 );
-					if( $image_info )
-					{
-						$oldFile_thumb = $newFile->get_preview_thumb( 'fulltype' );
-					}
-					else
-					{
-						$oldFile_thumb = $newFile->get_size_formatted();
-					}
-				}
-				else
-				{
-					$replace_length = strlen( '-'.($num_ext-1) );
-					$newName = substr_replace( $newName, '-'.$num_ext, $ext_pos-$replace_length, $replace_length );
-				}
-				$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
-			}
+			list( $newFile, $oldFile_thumb ) = check_file_exists( $fm_FileRoot, $path, $newName, $image_info );
+			$newName = $newFile->get( 'name' );
 
 			// Trigger plugin event
 			if( $Plugins->trigger_event_first_false( 'AfterFileUpload', array(
@@ -1352,7 +1341,7 @@ function process_upload( $root, $path, $create_path_dirs = false, $check_perms =
 			// Refreshes file properties (type, size, perms...)
 			$newFile->load_properties();
 
-			if( $num_ext )
+			if( ! empty( $oldFile_thumb ) )
 			{ // The file name was changed!
 				if( $image_info )
 				{
@@ -1394,6 +1383,59 @@ function process_upload( $root, $path, $create_path_dirs = false, $check_perms =
 	}
 
 	return array( 'uploadedFiles' => $uploadedFiles, 'failedFiles' => $failedFiles, 'renamedFiles' => $renamedFiles, 'renamedMessages' => $renamedMessages );
+}
+
+
+/**
+ * Check if file exists in the target location with the given name. Used during file upload.
+ * 
+ * @param FileRoot target file Root
+ * @param string target path
+ * @param string file name
+ * @param array the new file image_info
+ * @return array contains two elements
+ * 			first elements is a new File object
+ * 			second element is the existing file thumb, or empty string, if the file doesn't exists
+ */
+function check_file_exists( $fm_FileRoot, $path, $newName, $image_info = NULL )
+{
+	// Get File object for requested target location:
+	$FileCache = & get_FileCache();
+	$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
+
+	$num_ext = 0;
+	$oldName = $newName;
+
+	$oldFile_thumb = "";
+	while( $newFile->exists() )
+	{ // The file already exists in the target location!
+		$num_ext++;
+		$ext_pos = strrpos( $newName, '.');
+		if( $num_ext == 1 )
+		{
+			if( $image_info == NULL )
+			{
+				$image_info = getimagesize( $newFile->get_full_path() );
+			}
+			$newName = substr_replace( $newName, '-'.$num_ext.'.', $ext_pos, 1 );
+			if( $image_info )
+			{
+				$oldFile_thumb = $newFile->get_preview_thumb( 'fulltype' );
+			}
+			else
+			{
+				$oldFile_thumb = $newFile->get_size_formatted();
+			}
+		}
+		else
+		{
+			$replace_length = strlen( '-'.($num_ext-1) );
+			$newName = substr_replace( $newName, '-'.$num_ext, $ext_pos-$replace_length, $replace_length );
+		}
+		$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
+	}
+
+	return array( $newFile, $oldFile_thumb );
 }
 
 
@@ -1449,6 +1491,9 @@ function remove_orphan_files( $file_ids = NULL, $older_then = NULL )
 
 /*
  * $Log$
+ * Revision 1.56  2011/04/28 14:07:58  efy-asimo
+ * multiple file upload
+ *
  * Revision 1.55  2011/03/15 09:37:04  efy-asimo
  * get_dirsize_recursive() function has warning, when dir is empty - fix
  *
