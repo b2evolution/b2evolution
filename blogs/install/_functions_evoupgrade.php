@@ -2861,15 +2861,15 @@ function upgrade_b2evo_tables()
 	db_add_col( 'T_users', 'user_source', 'varchar(30) NULL' );
 	task_end();
 
-	task_begin( 'Upgrading blogs table, remove allowcomments setting...' );
-	$DB->query( 'INSERT INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+	task_begin( 'Upgrading blogs table: more granularity for comment allowing...' );
+	$DB->query( 'INSERT INTO T_coll_settings( cset_coll_ID, cset_name, cset_value )
 					SELECT blog_ID, "allow_comments", "never"
 						FROM T_blogs
 						WHERE blog_allowcomments = "never"' );
 	db_drop_col( 'T_blogs', 'blog_allowcomments' );
 	task_end();
 
-	task_begin( 'Upgrading collection settings allow_rating fields...' );
+	task_begin( 'UUpgrading blogs table: allow_rating fields...' );
 	$DB->query( 'UPDATE T_coll_settings
 					SET cset_value = "any"
 					WHERE cset_value = "always" AND cset_name = "allow_rating"' );
@@ -2884,18 +2884,17 @@ function upgrade_b2evo_tables()
 					ADD INDEX link_cmt_ID ( link_cmt_ID )' );
 	task_end();
 
-	require_once dirname(__FILE__).'/_functions_create.php';
-	create_default_jobs( true );
-
 	task_begin( 'Upgrading filetypes table...' );
 	// get allowed filetype ids
 	$sql = 'SELECT ftyp_ID
 				FROM T_filetypes
 				WHERE ftyp_allowed != 0';
 	$allowed_ids = implode( ',', $DB->get_col( $sql, 0, 'Get allowed filetypes' ) );
-	// update table column
+
+	// update table column  -- this column is about who can edit the filetype: any user, registered users or only admins.
 	$DB->query( 'ALTER TABLE T_filetypes
 					MODIFY COLUMN ftyp_allowed enum("any","registered","admin") NOT NULL default "admin"' );
+
 	// update ftyp_allowed column content
 	$DB->query( 'UPDATE T_filetypes
 					SET ftyp_allowed = "registered"
@@ -2906,6 +2905,7 @@ function upgrade_b2evo_tables()
 	$DB->query( 'UPDATE T_filetypes
 					SET ftyp_allowed = "any"
 					WHERE ftyp_extensions = "gif" OR ftyp_extensions = "png" OR ftyp_extensions LIKE "%jpg%"' );
+
 	// Add m4v file type if not exists
 	if( !db_key_exists( 'T_filetypes', 'ftyp_extensions', '"m4v"' ) )
 	{
@@ -2913,16 +2913,13 @@ function upgrade_b2evo_tables()
 			             VALUES ("m4v", "MPEG video file", "video/x-m4v", "", "browser", "registered")', 'Add "m4v" file type' );
 	}
 	task_end();
-	
-	task_begin( 'Upgrading collection settings table, change cset_value type...' );
-	$DB->query( 'ALTER TABLE T_coll_settings MODIFY COLUMN cset_value TEXT NULL' );
-	task_end();
 
-	load_funcs('tools/model/_system.funcs.php');
-	if( !system_init_caches() )
-	{
-		echo "<strong>The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal.</strong><br />\n";
-	}
+	// The AdSense plugin needs to store quite long strings of data...
+	task_begin( 'Upgrading collection settings table, change cset_value type...' );
+	$DB->query( 'ALTER TABLE T_coll_settings 
+							 MODIFY COLUMN cset_name VARCHAR(50) NOT NULL,
+							 MODIFY COLUMN cset_value VARCHAR(10000) NULL' );	
+	task_end();
 
 	/*
 	 * ADD UPGRADES HERE.
@@ -2974,6 +2971,17 @@ function upgrade_b2evo_tables()
 	}
 
 
+
+	// Init Caches: (it should be possible to do this with each upgrade)
+	load_funcs('tools/model/_system.funcs.php');
+	if( !system_init_caches() )
+	{
+		echo "<strong>The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal.</strong><br />\n";
+	}
+
+	// Create default cron jobs (this can be done at each upgrade):
+	require_once dirname(__FILE__).'/_functions_create.php';
+	create_default_jobs( true );
 
 	// This has to be at the end because plugin install may fail if the DB schema is not current (matching Plugins class).
 	// Only new default plugins will be installed, based on $old_db_version.
@@ -3098,6 +3106,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.390  2011/05/02 23:31:11  fplanque
+ * minor
+ *
  * Revision 1.389  2011/04/28 08:20:55  sam2kb
  * Changed collection settings cset_value type to TEXT
  * See: http://forums.b2evolution.net/viewtopic.php?t=22068

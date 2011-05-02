@@ -716,8 +716,11 @@ function create_default_countries()
 }
 
 /**
- * Create default scheduled jobs
- * 
+ * Create default scheduled jobs that don't exist yet:
+ * - Prune page cache
+ * - Prune hit log & session log from stats
+ * - Poll antispam blacklist
+ *
  * @param boolean true if it's called from the ugrade script, false if it's called from the install script
  */
 function create_default_jobs( $is_upgrade = false )
@@ -736,7 +739,10 @@ function create_default_jobs( $is_upgrade = false )
 	$prune_pagecache = "( ".$DB->quote( form_date( $date, '02:00:00' ) ).", 86400, ".$DB->quote( T_( 'Prune old files from page cache' ) ).", ".$DB->quote( $prune_pagecache_ctrl ).", ".$ctsk_params." )";
 	$prune_sessions = "( ".$DB->quote( form_date( $date, '03:00:00' ) ).", 86400, ".$DB->quote( T_( 'Prune old hits & sessions' ) ).", ".$DB->quote( $prune_sessions_ctrl ).", ".$ctsk_params." )";
 	$poll_antispam = "( ".$DB->quote( form_date( $date, '04:00:00' ) ).", 86400, ".$DB->quote( T_( 'Poll the antispam blacklist' ) ).", ".$DB->quote( $poll_antispam_ctrl ).", ".$ctsk_params." )";
-	$insert_values = array( $prune_pagecache_ctrl => $prune_pagecache, $prune_sessions_ctrl => $prune_sessions, $poll_antispam_ctrl => $poll_antispam );
+	$insert_values = array( 
+		$prune_pagecache_ctrl => $prune_pagecache, 
+		$prune_sessions_ctrl => $prune_sessions, 
+		$poll_antispam_ctrl => $poll_antispam );
 
 	if( $is_upgrade )
 	{ // Check if this jobs already exists, and don't create another
@@ -1351,6 +1357,9 @@ function create_demo_contents()
 
 /*
  * $Log$
+ * Revision 1.306  2011/05/02 23:31:11  fplanque
+ * minor
+ *
  * Revision 1.305  2011/03/15 09:34:06  efy-asimo
  * have checkboxes for enabling caching in new blogs
  * refactorize cache create/enable/disable
@@ -1359,7 +1368,7 @@ function create_demo_contents()
  * Allow file types modification & add m4v file type
  *
  * Revision 1.303  2011/03/07 08:11:04  efy-asimo
- * Create default jobbs into the scheduler
+ * Create default jobs into the scheduler
  *
  * Revision 1.302  2011/02/15 15:37:00  efy-asimo
  * Change access to admin permission
