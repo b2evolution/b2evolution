@@ -2974,6 +2974,18 @@ function upgrade_b2evo_tables()
 
 	// Init Caches: (it should be possible to do this with each upgrade)
 	load_funcs('tools/model/_system.funcs.php');
+	// We're gonna need some environment in order to init caches...
+	global $Settings, $Plugins;
+	if( ! is_object( $Settings ) )
+	{
+		load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+		$Settings = new GeneralSettings();
+	}
+	if( ! is_object( $Plugins ) )
+	{
+		load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+		$Plugins = new Plugins();
+	}
 	if( !system_init_caches() )
 	{
 		echo "<strong>The /cache folder could not be created/written to. b2evolution will still work but without caching, which will make it operate slower than optimal.</strong><br />\n";
@@ -3106,6 +3118,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.391  2011/05/04 13:06:54  efy-asimo
+ * upgrade script system_init_caches() - fix
+ *
  * Revision 1.390  2011/05/02 23:31:11  fplanque
  * minor
  *
