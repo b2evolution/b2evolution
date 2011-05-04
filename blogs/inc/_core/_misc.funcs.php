@@ -142,7 +142,7 @@ function shutdown()
 	global $shutdown_count_item_views;
 
 	// Try forking a background process and let the parent return as fast as possbile.
-	if( is_callable('pcntl_fork') && function_exists('posix_kill') ) // NOTE: not enabled in php5-fpm (via dotdeb)
+	if( is_callable('pcntl_fork') && function_exists('posix_kill') && defined('STDIN') )
 	{
 		if( $pid = pcntl_fork() )
 			return; // Parent
@@ -152,7 +152,11 @@ function shutdown()
 			posix_kill(posix_getpid(), SIGHUP);
 		}
 
-		ob_end_clean(); // Discard the output buffer and close
+		if ( ob_get_level() )
+		{	// Discard the output buffer and close
+			ob_end_clean();
+		}
+
 		fclose(STDIN);  // Close all of the standard
 		fclose(STDOUT); // file descriptors as we
 		fclose(STDERR); // are running as a daemon.
@@ -4116,6 +4120,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.251  2011/05/04 17:44:21  sam2kb
+ * More checks before forking a shutdown process
+ *
  * Revision 1.250  2011/02/23 21:45:18  fplanque
  * minor / cleanup
  *
