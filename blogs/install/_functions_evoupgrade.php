@@ -2782,144 +2782,149 @@ function upgrade_b2evo_tables()
 		$DB->query( 'ALTER TABLE T_users__usersettings ENGINE=innodb' );
 		task_end();
 
-		// set_upgrade_checkpoint( '10000' );
+		set_upgrade_checkpoint( '10000' );
 	}
 
-	task_begin( 'Convert group permissions to pluggable permissions...' );
-	// asimo>This delete query needs just in case if this version of b2evo was used, before upgrade process call
-	$DB->query( 'DELETE FROM T_groups__groupsettings 
-					WHERE gset_name = "perm_files" OR gset_name = "perm_options" OR gset_name = "perm_templates"' );
-	// Get current permission values from groups table 
-	$sql = 'SELECT grp_ID, grp_perm_spamblacklist, grp_perm_slugs, grp_perm_files, grp_perm_options, grp_perm_templates
-			      FROM T_groups';
-	$rows = $DB->get_results( $sql, OBJECT, 'Get groups converted permissions' );
-	// Insert values into groupsettings table
-	foreach( $rows as $row )
-	{
-		$DB->query( 'INSERT INTO T_groups__groupsettings( gset_grp_ID, gset_name, gset_value )
-						VALUES( '.$row->grp_ID.', "perm_spamblacklist", "'.$row->grp_perm_spamblacklist.'" ),
-							( '.$row->grp_ID.', "perm_slugs", "'.$row->grp_perm_slugs.'" ),
-							( '.$row->grp_ID.', "perm_files", "'.$row->grp_perm_files.'" ),
-							( '.$row->grp_ID.', "perm_options", "'.$row->grp_perm_options.'" ),
-							( '.$row->grp_ID.', "perm_templates", "'.$row->grp_perm_templates.'" )' );
-	}
-
-	// Drop all converted permissin colums from groups table
-	db_drop_col( 'T_groups', 'grp_perm_spamblacklist' );
-	db_drop_col( 'T_groups', 'grp_perm_slugs' );
-	db_drop_col( 'T_groups', 'grp_perm_files' );
-	db_drop_col( 'T_groups', 'grp_perm_options' );
-	db_drop_col( 'T_groups', 'grp_perm_templates' );
-	task_end();
-
-	task_begin( 'Upgrading users table, adding user gender...' );
-	db_add_col( 'T_users', 'user_gender', 'char(1) NULL DEFAULT NULL AFTER user_showonline' );
-	task_end();
-
-	task_begin( 'Upgrading edit timpestamp blog-user permission...' );
-	db_add_col( 'T_coll_user_perms', 'bloguser_perm_edit_ts', 'tinyint NOT NULL default 0 AFTER bloguser_perm_delpost' );
-	$DB->query( 'UPDATE T_coll_user_perms, T_users
-						SET bloguser_perm_edit_ts = 1
-						WHERE bloguser_user_ID = user_ID  AND user_level > 4' );
-	task_end();
-
-	task_begin( 'Upgrading edit timpestamp blog-group permission...' );
-	db_add_col( 'T_coll_group_perms', 'bloggroup_perm_edit_ts', 'tinyint NOT NULL default 0 AFTER bloggroup_perm_delpost' );
-	$DB->query( 'UPDATE T_coll_group_perms
-						SET bloggroup_perm_edit_ts = 1
-						WHERE bloggroup_group_ID = 1' );
-	task_end();
-
-	task_begin( 'Upgrading comments table, add trash status...' );
-	$DB->query( "ALTER TABLE T_comments MODIFY COLUMN comment_status ENUM('published','deprecated','draft', 'trash') DEFAULT 'published' NOT NULL");
-	task_end();
-
-	task_begin( 'Upgrading groups admin access permission...' );
-	$sql = 'SELECT grp_ID, grp_perm_admin 
-				FROM T_groups';
-	$rows = $DB->get_results( $sql, OBJECT, 'Get groups admin perms' );
-	foreach( $rows as $row )
-	{
-		switch( $row->grp_perm_admin )
+	if( $old_db_version < 10100 )
+	{	// 4.1
+		task_begin( 'Convert group permissions to pluggable permissions...' );
+		// asimo>This delete query needs just in case if this version of b2evo was used, before upgrade process call
+		$DB->query( 'DELETE FROM T_groups__groupsettings
+						WHERE gset_name = "perm_files" OR gset_name = "perm_options" OR gset_name = "perm_templates"' );
+		// Get current permission values from groups table
+		$sql = 'SELECT grp_ID, grp_perm_spamblacklist, grp_perm_slugs, grp_perm_files, grp_perm_options, grp_perm_templates
+				      FROM T_groups';
+		$rows = $DB->get_results( $sql, OBJECT, 'Get groups converted permissions' );
+		// Insert values into groupsettings table
+		foreach( $rows as $row )
 		{
-			case 'visible':
-				$value = 'normal';
-				break;
-			case 'hidden':
-				$value = 'restricted';
-				break;
-			default:
-				$value = 'none';
+			$DB->query( 'INSERT INTO T_groups__groupsettings( gset_grp_ID, gset_name, gset_value )
+							VALUES( '.$row->grp_ID.', "perm_spamblacklist", "'.$row->grp_perm_spamblacklist.'" ),
+								( '.$row->grp_ID.', "perm_slugs", "'.$row->grp_perm_slugs.'" ),
+								( '.$row->grp_ID.', "perm_files", "'.$row->grp_perm_files.'" ),
+								( '.$row->grp_ID.', "perm_options", "'.$row->grp_perm_options.'" ),
+								( '.$row->grp_ID.', "perm_templates", "'.$row->grp_perm_templates.'" )' );
 		}
-		$DB->query( 'INSERT INTO T_groups__groupsettings( gset_grp_ID, gset_name, gset_value )
-						VALUES( '.$row->grp_ID.', "perm_admin", "'.$value.'" )' );
+
+		// Drop all converted permissin colums from groups table
+		db_drop_col( 'T_groups', 'grp_perm_spamblacklist' );
+		db_drop_col( 'T_groups', 'grp_perm_slugs' );
+		db_drop_col( 'T_groups', 'grp_perm_files' );
+		db_drop_col( 'T_groups', 'grp_perm_options' );
+		db_drop_col( 'T_groups', 'grp_perm_templates' );
+		task_end();
+
+		task_begin( 'Upgrading users table, adding user gender...' );
+		db_add_col( 'T_users', 'user_gender', 'char(1) NULL DEFAULT NULL AFTER user_showonline' );
+		task_end();
+
+		task_begin( 'Upgrading edit timpestamp blog-user permission...' );
+		db_add_col( 'T_coll_user_perms', 'bloguser_perm_edit_ts', 'tinyint NOT NULL default 0 AFTER bloguser_perm_delpost' );
+		$DB->query( 'UPDATE T_coll_user_perms, T_users
+							SET bloguser_perm_edit_ts = 1
+							WHERE bloguser_user_ID = user_ID  AND user_level > 4' );
+		task_end();
+
+		task_begin( 'Upgrading edit timpestamp blog-group permission...' );
+		db_add_col( 'T_coll_group_perms', 'bloggroup_perm_edit_ts', 'tinyint NOT NULL default 0 AFTER bloggroup_perm_delpost' );
+		$DB->query( 'UPDATE T_coll_group_perms
+							SET bloggroup_perm_edit_ts = 1
+							WHERE bloggroup_group_ID = 1' );
+		task_end();
+
+		task_begin( 'Upgrading comments table, add trash status...' );
+		$DB->query( "ALTER TABLE T_comments MODIFY COLUMN comment_status ENUM('published','deprecated','draft', 'trash') DEFAULT 'published' NOT NULL");
+		task_end();
+
+		task_begin( 'Upgrading groups admin access permission...' );
+		$sql = 'SELECT grp_ID, grp_perm_admin
+					FROM T_groups';
+		$rows = $DB->get_results( $sql, OBJECT, 'Get groups admin perms' );
+		foreach( $rows as $row )
+		{
+			switch( $row->grp_perm_admin )
+			{
+				case 'visible':
+					$value = 'normal';
+					break;
+				case 'hidden':
+					$value = 'restricted';
+					break;
+				default:
+					$value = 'none';
+			}
+			$DB->query( 'INSERT INTO T_groups__groupsettings( gset_grp_ID, gset_name, gset_value )
+							VALUES( '.$row->grp_ID.', "perm_admin", "'.$value.'" )' );
+		}
+		db_drop_col( 'T_groups', 'grp_perm_admin' );
+		task_end();
+
+		task_begin( 'Upgrading users table, add users source...' );
+		db_add_col( 'T_users', 'user_source', 'varchar(30) NULL' );
+		task_end();
+
+		task_begin( 'Upgrading blogs table: more granularity for comment allowing...' );
+		$DB->query( 'INSERT INTO T_coll_settings( cset_coll_ID, cset_name, cset_value )
+						SELECT blog_ID, "allow_comments", "never"
+							FROM T_blogs
+							WHERE blog_allowcomments = "never"' );
+		db_drop_col( 'T_blogs', 'blog_allowcomments' );
+		task_end();
+
+		task_begin( 'UUpgrading blogs table: allow_rating fields...' );
+		$DB->query( 'UPDATE T_coll_settings
+						SET cset_value = "any"
+						WHERE cset_value = "always" AND cset_name = "allow_rating"' );
+		task_end();
+
+		task_begin( 'Upgrading links table, add link_cmt_ID...' );
+		$DB->query( 'ALTER TABLE T_links
+						MODIFY COLUMN link_itm_ID int(11) unsigned NULL,
+						MODIFY COLUMN link_creator_user_ID int(11) unsigned NULL,
+						MODIFY COLUMN link_lastedit_user_ID int(11) unsigned NULL,
+						ADD COLUMN link_cmt_ID int(11) unsigned NULL AFTER link_itm_ID,
+						ADD INDEX link_cmt_ID ( link_cmt_ID )' );
+		task_end();
+
+		task_begin( 'Upgrading filetypes table...' );
+		// get allowed filetype ids
+		$sql = 'SELECT ftyp_ID
+					FROM T_filetypes
+					WHERE ftyp_allowed != 0';
+		$allowed_ids = implode( ',', $DB->get_col( $sql, 0, 'Get allowed filetypes' ) );
+
+		// update table column  -- this column is about who can edit the filetype: any user, registered users or only admins.
+		$DB->query( 'ALTER TABLE T_filetypes
+						MODIFY COLUMN ftyp_allowed enum("any","registered","admin") NOT NULL default "admin"' );
+
+		// update ftyp_allowed column content
+		$DB->query( 'UPDATE T_filetypes
+						SET ftyp_allowed = "registered"
+						WHERE ftyp_ID IN ('.$allowed_ids.')' );
+		$DB->query( 'UPDATE T_filetypes
+						SET ftyp_allowed = "admin"
+						WHERE ftyp_ID NOT IN ('.$allowed_ids.')' );
+		$DB->query( 'UPDATE T_filetypes
+						SET ftyp_allowed = "any"
+						WHERE ftyp_extensions = "gif" OR ftyp_extensions = "png" OR ftyp_extensions LIKE "%jpg%"' );
+
+		// Add m4v file type if not exists
+		if( !db_key_exists( 'T_filetypes', 'ftyp_extensions', '"m4v"' ) )
+		{
+			$DB->query( 'INSERT INTO T_filetypes (ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed)
+				             VALUES ("m4v", "MPEG video file", "video/x-m4v", "", "browser", "registered")', 'Add "m4v" file type' );
+		}
+		task_end();
+
+		// The AdSense plugin needs to store quite long strings of data...
+		task_begin( 'Upgrading collection settings table, change cset_value type...' );
+		$DB->query( 'ALTER TABLE T_coll_settings
+								 MODIFY COLUMN cset_name VARCHAR(50) NOT NULL,
+								 MODIFY COLUMN cset_value VARCHAR(10000) NULL' );
+		task_end();
+
+		set_upgrade_checkpoint( '10100' );
 	}
-	db_drop_col( 'T_groups', 'grp_perm_admin' );
-	task_end();
-
-	task_begin( 'Upgrading users table, add users source...' );
-	db_add_col( 'T_users', 'user_source', 'varchar(30) NULL' );
-	task_end();
-
-	task_begin( 'Upgrading blogs table: more granularity for comment allowing...' );
-	$DB->query( 'INSERT INTO T_coll_settings( cset_coll_ID, cset_name, cset_value )
-					SELECT blog_ID, "allow_comments", "never"
-						FROM T_blogs
-						WHERE blog_allowcomments = "never"' );
-	db_drop_col( 'T_blogs', 'blog_allowcomments' );
-	task_end();
-
-	task_begin( 'UUpgrading blogs table: allow_rating fields...' );
-	$DB->query( 'UPDATE T_coll_settings
-					SET cset_value = "any"
-					WHERE cset_value = "always" AND cset_name = "allow_rating"' );
-	task_end();
-
-	task_begin( 'Upgrading links table, add link_cmt_ID...' );
-	$DB->query( 'ALTER TABLE T_links
-					MODIFY COLUMN link_itm_ID int(11) unsigned NULL,
-					MODIFY COLUMN link_creator_user_ID int(11) unsigned NULL,
-					MODIFY COLUMN link_lastedit_user_ID int(11) unsigned NULL,
-					ADD COLUMN link_cmt_ID int(11) unsigned NULL AFTER link_itm_ID,
-					ADD INDEX link_cmt_ID ( link_cmt_ID )' );
-	task_end();
-
-	task_begin( 'Upgrading filetypes table...' );
-	// get allowed filetype ids
-	$sql = 'SELECT ftyp_ID
-				FROM T_filetypes
-				WHERE ftyp_allowed != 0';
-	$allowed_ids = implode( ',', $DB->get_col( $sql, 0, 'Get allowed filetypes' ) );
-
-	// update table column  -- this column is about who can edit the filetype: any user, registered users or only admins.
-	$DB->query( 'ALTER TABLE T_filetypes
-					MODIFY COLUMN ftyp_allowed enum("any","registered","admin") NOT NULL default "admin"' );
-
-	// update ftyp_allowed column content
-	$DB->query( 'UPDATE T_filetypes
-					SET ftyp_allowed = "registered"
-					WHERE ftyp_ID IN ('.$allowed_ids.')' );
-	$DB->query( 'UPDATE T_filetypes
-					SET ftyp_allowed = "admin"
-					WHERE ftyp_ID NOT IN ('.$allowed_ids.')' );
-	$DB->query( 'UPDATE T_filetypes
-					SET ftyp_allowed = "any"
-					WHERE ftyp_extensions = "gif" OR ftyp_extensions = "png" OR ftyp_extensions LIKE "%jpg%"' );
-
-	// Add m4v file type if not exists
-	if( !db_key_exists( 'T_filetypes', 'ftyp_extensions', '"m4v"' ) )
-	{
-		$DB->query( 'INSERT INTO T_filetypes (ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed)
-			             VALUES ("m4v", "MPEG video file", "video/x-m4v", "", "browser", "registered")', 'Add "m4v" file type' );
-	}
-	task_end();
-
-	// The AdSense plugin needs to store quite long strings of data...
-	task_begin( 'Upgrading collection settings table, change cset_value type...' );
-	$DB->query( 'ALTER TABLE T_coll_settings 
-							 MODIFY COLUMN cset_name VARCHAR(50) NOT NULL,
-							 MODIFY COLUMN cset_value VARCHAR(10000) NULL' );	
-	task_end();
 
 	/*
 	 * ADD UPGRADES HERE.
@@ -3118,6 +3123,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.392  2011/05/05 23:30:28  fplanque
+ * DB version bump
+ *
  * Revision 1.391  2011/05/04 13:06:54  efy-asimo
  * upgrade script system_init_caches() - fix
  *
