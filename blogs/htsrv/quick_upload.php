@@ -64,7 +64,7 @@ if( $upload )
 				if( substr( $key, 0, 5 ) == "HTTP_" )
 				{
 					$key = str_replace( " ", "-", ucwords( strtolower( str_replace( "_", " ", substr( $key, 5 ) ) ) ) ); 
-					$out[$key] = $value; 
+					$out[$key] = $value;
 				}
 				else
 				{
@@ -74,15 +74,27 @@ if( $upload )
 			return $out; 
 		}
 	}
-    $headers = apache_request_headers();
+	$headers = apache_request_headers();
 
-    // basic checks
-    if(/* false && */isset(
-		$headers['CONTENT_TYPE'],
-		$headers['CONTENT_LENGTH'],
+	// set content_type and content_length because of compatibility with different php versions
+	$content_type = 'Content-Type';
+	if( ( ! isset( $headers['Content-Type'] ) ) && isset( $headers['CONTENT_TYPE'] ) )
+	{
+		$content_type = 'CONTENT_TYPE';
+	}
+	$content_length = 'Content-Length';
+	if( ( ! isset( $headers['Content-Length'] ) ) && isset( $headers['CONTENT_LENGTH'] ) )
+	{
+		$content_length = 'CONTENT_LENGTH';
+	}
+
+	// basic checks
+	if( isset(
+		$headers[$content_type],
+		$headers[$content_length],
 		$headers['X-File-Size'],
 		$headers['X-File-Name']
-		) && ( $headers['CONTENT_TYPE'] === 'multipart/form-data' ) && ( $headers['CONTENT_LENGTH'] === $headers['X-File-Size'] ) )
+		) && ( $headers[$content_type] === 'multipart/form-data' ) && ( $headers[$content_length] === $headers['X-File-Size'] ) )
 	{
 		// create the object and assign property
 		$file = new stdClass;
@@ -109,8 +121,17 @@ if( $upload )
 		list( $newFile, $oldFile_thumb ) = check_file_exists( $fm_FileRoot, $path, $newName );
 		$newName = $newFile->get( 'name' );
 
+		/*use $result = file_put_contents( $newFile->get_full_path(), $file->content ) in php5*/
+		$file_handle = fopen( $newFile->get_full_path(), 'w' );
+		$result = false;
+		if( $file_handle )
+		{
+			$result = fwrite( $file_handle, $file->content );
+			$result = $result && fclose( $file_handle );
+		}
+
 		// if everything is ok, save the file somewhere
-		if( file_put_contents( $newFile->get_full_path(), $file->content ) )
+		if( $result )
 		{
 			// change to default chmod settings
 			$newFile->chmod( NULL );
@@ -159,6 +180,9 @@ if( $upload )
 			}
 			exit();
 		}
+
+		echo '<span class="result_error">'.T_( 'The file could not be saved!' ).'</span>';
+		exit();
 	}
 
 	// Could not find upload information
@@ -171,6 +195,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.2  2011/05/05 15:11:02  efy-asimo
+ * multifile upload - fix
+ *
  * Revision 1.1  2011/04/28 14:07:59  efy-asimo
  * multiple file upload
  *
