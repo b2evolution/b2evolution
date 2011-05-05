@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 
 global $current_User;
-global $http_response_code;
 
 param( 'upload', 'boolean', true );
 param( 'root_and_path', 'string', true );
@@ -34,6 +33,7 @@ param( 'root_and_path', 'string', true );
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'file' );
 
+$upload_path = false;
 if( strpos( $root_and_path, '::' ) )
 {
 	list( $root, $path ) = explode( '::', $root_and_path, 2 );
@@ -43,7 +43,7 @@ if( strpos( $root_and_path, '::' ) )
 	$upload_path = get_canonical_path( $non_canonical_list_path );
 }
 
-if( !isset( $upload_path ) )
+if( $upload_path === false )
 {
 	echo '<span class="result_error">'.T_( 'Bad request. Unknown upload location!' ).'</span>';
 	exit();
@@ -195,6 +195,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.3  2011/05/05 16:06:47  efy-asimo
+ * security issue - fix
+ *
  * Revision 1.2  2011/05/05 15:11:02  efy-asimo
  * multifile upload - fix
  *
