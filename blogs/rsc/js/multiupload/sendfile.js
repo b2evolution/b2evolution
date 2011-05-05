@@ -50,7 +50,7 @@ sendFile = (function(toString){
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("X-File-Name", handler.file.fileName);
         xhr.setRequestHeader("X-File-Size", handler.file.fileSize);
-        xhr.setRequestHeader("Content-Type", "multipart/form-data");
+        xhr.setRequestHeader("Content-Type", "application/octet-stream");
         xhr.send(handler.file);
         return  handler;
     };

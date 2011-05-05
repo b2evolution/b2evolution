@@ -94,7 +94,7 @@ if( $upload )
 		$headers[$content_length],
 		$headers['X-File-Size'],
 		$headers['X-File-Name']
-		) && ( $headers[$content_type] === 'multipart/form-data' ) && ( $headers[$content_length] === $headers['X-File-Size'] ) )
+		) && ( $headers[$content_type] === 'application/octet-stream' ) && ( $headers[$content_length] === $headers['X-File-Size'] ) )
 	{
 		// create the object and assign property
 		$file = new stdClass;
@@ -195,6 +195,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.4  2011/05/05 16:19:35  efy-asimo
+ * "Missing boundary in multipart/form-data" warning - fix
+ *
  * Revision 1.3  2011/05/05 16:06:47  efy-asimo
  * security issue - fix
  *
