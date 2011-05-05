@@ -4200,11 +4200,25 @@ class Item extends ItemLight
 	{
 		switch( $matches[1] )
 		{
+			case 'perm_url':
 			case 'item_perm_url':
 				return $this->get_permanent_url();
 
+			case 'title':
 			case 'item_title':
 				return $this->title;
+
+			case 'excerpt':
+				return $this->get_excerpt2();
+
+			case 'views':
+				return $this->views;
+
+			case 'author':
+				return $this->get('t_author');
+
+			case 'author_login':
+				return $this->get_creator_login();
 
 			default:
 				return $matches[1];
@@ -4549,6 +4563,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.223  2011/05/05 20:18:54  sam2kb
+ * More replacement tags for item footer
+ *
  * Revision 1.222  2011/04/07 13:55:03  efy-asimo
  * Show asynchronous notifications result
  *

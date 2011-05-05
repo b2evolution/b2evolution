@@ -128,7 +128,7 @@ class CollectionSettings extends AbstractSettings
 			'rss2_redirect' => '',
 			'feed_content'   => 'normal',
 			'posts_per_feed' => '8',
-			'xml_item_footer_text' => '<p><small><a href="$item_perm_url$">Original post</a> blogged on <a href="http://b2evolution.net/">b2evolution</a>.</small></p>',
+			'xml_item_footer_text' => '<p><small><a href="$perm_url$">Original post</a> blogged on <a href="http://b2evolution.net/">b2evolution</a>.</small></p>',
 			'image_size'	=> 'fit-320x320',
 
 		// Sitemaps settings:
@@ -184,6 +184,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.55  2011/05/05 20:14:30  sam2kb
+ * More replacement tags for item footer
+ *
  * Revision 1.54  2011/03/24 15:15:05  efy-asimo
  * in-skin login - feature
  *
