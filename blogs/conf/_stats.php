@@ -257,6 +257,14 @@ $user_agents = array(
 	array('robot', 'ScoutJet', 'ScoutJet' ),
 	array('robot', 'bingbot/', 'Bing' ),
 	array('robot', 'Nigma.ru/', 'Nigma.ru' ),
+	array('robot', 'ichiro/', 'Ichiro' ),
+	array('robot', 'MJ12bot/', 'Majestic-12' ),
+	array('robot', 'YoudaoBot/', 'Youdao' ),
+	array('robot', 'Sogou web spider/', 'Sogou web spider' ),
+	array('robot', 'findfiles.net', 'findfiles.net' ),
+	array('robot', 'SiteBot/', 'SiteBot' ),
+	array('robot', 'Nutch-', 'Apache Nutch' ),
+	array('robot', 'DoCoMo/', 'DoCoMo' ),
 	// Unknown robots:
 	array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:
