@@ -79,8 +79,8 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating collection settings table',
 		"CREATE TABLE T_coll_settings (
 			cset_coll_ID INT(11) UNSIGNED NOT NULL,
-			cset_name    VARCHAR( 30 ) NOT NULL,
-			cset_value   TEXT NULL,
+			cset_name    VARCHAR( 50 ) NOT NULL,
+			cset_value   VARCHAR( 10000 ) NULL,
 			PRIMARY KEY ( cset_coll_ID, cset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
