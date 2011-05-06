@@ -60,7 +60,7 @@ param( 'iframe_name', 'string', '', true );
 param( 'tab3', 'string' );
 if( empty( $tab3 ) )
 {
-	$tab3 = 'standard';
+	$tab3 = 'quick';
 }
 
 $action = param_action();
@@ -481,6 +481,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.46  2011/05/06 07:04:46  efy-asimo
+ * multiupload ui update
+ *
  * Revision 1.45  2011/04/28 14:07:58  efy-asimo
  * multiple file upload
  *

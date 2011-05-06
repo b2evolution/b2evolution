@@ -80,6 +80,7 @@ echo '<tbody>';
 		var incompatible_browser = <?php echo '"'.T_( 'Your browser does not support XMLHttpRequest technology!.Please use standard upload!' ).'"'; ?>;
 		var maxsize = <?php echo $Settings->get( 'upload_maxkb' )*1024; ?>;
 		var size_error = <?php echo '"<span class=\"result_error\">'.T_('The file is too large: %1 but the maximum allowed is %2.').'</span>"'; ?>;
+		var ok_text =  <?php echo '"'.T_( 'OK' ).'"'; ?>;
 
 		jQuery( '#fm_dirtree input[type=radio]' ).click( function()
 		{
@@ -102,6 +103,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.2  2011/05/06 07:04:46  efy-asimo
+ * multiupload ui update
+ *
  * Revision 1.1  2011/04/28 14:07:58  efy-asimo
  * multiple file upload
  *

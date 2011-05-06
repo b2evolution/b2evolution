@@ -10,6 +10,7 @@ onload = function()
 	var file_queue = new Array();
     var bars = new Array();
     var divs = new Array();
+    var results = new Array();
     var uploading = false;
 
     function size( bytes )
@@ -38,6 +39,7 @@ onload = function()
     	curr_file.push( file_queue.shift() );
     	var bar = bars.shift();
     	var div = divs.shift();
+    	var result_span = results.shift();
     	var filename = uploading_text + " \"" + curr_file[0].name + "\" ...";
 
     	sendMultipleFiles({
@@ -77,8 +79,9 @@ onload = function()
             		if( result_code == '1' )
             		{ // file name was changed, show submit button
             			submit.setAttribute("type", "submit");
+            			div.innerHTML += xhr.responseText.substr(1);
             		}
-            		div.innerHTML += xhr.responseText.substr(1);
+            		result_span.innerHTML = ok_text;
                     bar.style.width = "200px";
                     upload_next();
                 }
@@ -110,12 +113,21 @@ onload = function()
 
 		while( i < input.files.length )
 		{
+			// create new upload node
 			file_queue.push(input.files[i]);
-			var bar = upload_queue.appendChild(document.createElement("div")).appendChild(document.createElement("span"));
-			var div = upload_queue.appendChild(document.createElement("div"));
+			var newupload = upload_queue.appendChild(document.createElement("div"));
+			newupload.id = "uploadblock";
+			var div = newupload.appendChild(document.createElement("div"));
+			var bar = newupload.appendChild(document.createElement("div")).appendChild(document.createElement("span"));
+			var result_span = newupload.appendChild(document.createElement("span"));
+			var separator = newupload.appendChild(document.createElement("div"));
+			separator.id = "upload_separator";
+			bar.id = "bar"
 			bar.parentNode.id = "progress";
+			result_span.id = "result_success";
 			bars.push(bar);
 			divs.push(div);
+			results.push(result_span);
 			i++;
 		}
 		if( !uploading )

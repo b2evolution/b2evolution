@@ -171,10 +171,9 @@ if( $upload )
 			{
 				echo '0';
 			}
-			echo ' <span class="result_success">'.T_( 'OK' ).'</span>';
-			echo $message;
 			if( !empty( $message ) )
 			{
+				echo $message;
 				echo '<input type="hidden" name="renamedFiles['.$newFile->ID.'][newName]" value="'.$newName.'" />';
 				echo '<input type="hidden" name="renamedFiles['.$newFile->ID.'][oldName]" value="'.$oldName.'" />';
 			}
@@ -195,6 +194,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.5  2011/05/06 07:04:45  efy-asimo
+ * multiupload ui update
+ *
  * Revision 1.4  2011/05/05 16:19:35  efy-asimo
  * "Missing boundary in multipart/form-data" warning - fix
  *
