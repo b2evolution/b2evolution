@@ -35,14 +35,14 @@ if( $is_admin )
 {
 	$form_title = sprintf( T_('Edit %s avatar'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' );
 	$form_class = 'fform';
-	$ctrl_param = '?ctrl=user';
+	$ctrl_param = '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID;
 }
 else
 {
 	global $Blog;
 	$form_title = '';
 	$form_class = 'bComment';
-	$ctrl_param = $Blog->gen_blogurl().'?disp=profile';
+	$ctrl_param = $Blog->gen_blogurl().'?disp='.$disp;
 }
 
 $Form->begin_form( $form_class, $form_title );
@@ -54,7 +54,7 @@ $Form->begin_form( $form_class, $form_title );
 	}
 	else
 	{
-		$Form->hidden( 'disp', 'profile' );
+		$Form->hidden( 'disp', $disp );
 	}
 	$Form->hidden( 'user_tab', 'avatar' );
 	$Form->hidden( 'avatar_form', '1' );
@@ -67,23 +67,19 @@ $Form->begin_fieldset( $is_admin ? T_('Avatar') : '', array( 'class'=>'fieldset 
 
 global $admin_url;
 $avatar_tag = $edited_User->get_avatar_imgtag();
-if( $current_User->check_perm( 'users', 'all' ) || ( $current_User->ID == $edited_User->ID ) )
+if( empty( $avatar_tag ) )
 {
-	if( !empty( $avatar_tag ) )
+	if( ( $current_User->ID == $edited_User->ID ) )
 	{
-		$avatar_tag .= ' '.action_icon( T_( 'Remove' ), 'delete', $ctrl_param.'&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID.'&amp;action=remove_avatar&amp;'.url_crumb('user').'', T_( 'Remove' ) );
-		if( $current_User->check_perm( 'files', 'view' ) )
-		{
-			$avatar_tag .= ' '.action_icon( T_( 'Change' ), 'link', $admin_url.'?ctrl=files&amp;user_ID='.$edited_User->ID, T_( 'Change' ).' &raquo;', 5, 5 );
-		}
+		$avatar_tag = T_( 'You currently don\'t have an avatar.' );
 	}
-	elseif( $current_User->check_perm( 'files', 'view' ) )
+	else
 	{
-		$avatar_tag .= ' '.action_icon( T_( 'Upload or choose an avatar' ), 'link', $admin_url.'?ctrl=files&amp;user_ID='.$edited_User->ID, T_( 'Upload/Select' ).' &raquo;', 5, 5 );
+		$avatar_tag = T_( 'This user currently doesn\'t have an avatar.' );
 	}
 }
 
-$Form->info( T_( 'Avatar' ), $avatar_tag );
+$Form->info( T_( 'Current avatar' ), $avatar_tag );
 
 // fp> TODO: a javascript REFRAME feature would ne neat here: selecting a square area of the img and saving it as a new avatar image
 
@@ -134,6 +130,32 @@ if( ( $current_User->check_perm( 'users', 'all' ) ) || ( $current_User->ID == $e
 			}
 		}
 	}
+
+	$more_content = '';
+	if( $edited_User->has_avatar() )
+	{
+		$more_content = '<div><a href="'.$ctrl_param.'&amp;action=remove_avatar&amp;'.url_crumb('user').'">';
+		if( $edited_User->ID == $current_User->ID )
+		{
+			$more_content .= T_( 'Remove your current avatar' );
+		}
+		else
+		{
+			$more_content .= T_( 'Remove this user current avatar' );
+		}
+		$more_content .= '</a></div>';
+	}
+
+	if( $current_User->check_perm( 'files', 'view' ) )
+	{
+		$more_content .= '<div><a href="'.$admin_url.'?ctrl=files&amp;user_ID='.$edited_User->ID.'">';
+		$more_content .= T_( 'Use the file manager to assign a new avatar' ).'</a></div>';
+	}
+
+	if( ! empty( $more_content ) )
+	{
+		$Form->info( T_('More functions'), $more_content );
+	}
 }
 
 $Form->end_fieldset();
@@ -142,6 +164,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.13  2011/05/09 06:38:19  efy-asimo
+ * Simple avatar modification update
+ *
  * Revision 1.12  2011/04/06 13:30:56  efy-asimo
  * Refactor profile display
  *

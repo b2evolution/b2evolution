@@ -367,6 +367,9 @@ function skin_init( $disp )
 			break;
 
 		case 'profile':
+		case 'avatar':
+		case 'pwdchange':
+		case 'userprefs':
 		case 'subs':
 			$seo_page_type = 'Special feature page';
 			if( $Blog->get_setting( 'special_noindex' ) )
@@ -453,8 +456,10 @@ function skin_include( $template_name, $params = array() )
 				'disp_postidx'        => '_postidx.disp.php',
 				'disp_posts'          => '_posts.disp.php',
 				'disp_profile'        => '_profile.disp.php',
-				'disp_avatar'         => '_avatar.disp.php',
-				'disp_search'					=> '_search.disp.php',
+				'disp_avatar'         => '_profile.disp.php',
+				'disp_pwdchange'      => '_profile.disp.php',
+				'disp_userprefs'      => '_profile.disp.php',
+				'disp_search'         => '_search.disp.php',
 				'disp_single'         => '_single.disp.php',
 				'disp_sitemap'        => '_sitemap.disp.php',
 				'disp_subs'           => '_subs.disp.php',
@@ -899,6 +904,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.89  2011/05/09 06:38:18  efy-asimo
+ * Simple avatar modification update
+ *
  * Revision 1.88  2011/03/24 15:15:05  efy-asimo
  * in-skin login - feature
  *

@@ -145,7 +145,7 @@ div.feedback_feed_msg {
 form.bComment fieldset
 {	/* one form line */
 	border: none;
-	margin: 1ex 0 0 0;
+	margin: 1em 0 0 0;
 	padding: 0ex;
 	/* border: 1px solid #00f; */
 }
@@ -172,7 +172,6 @@ form.bComment fieldset.input{
 form.bComment fieldset div.info
 { /* info zone of form line */
 	margin: 0 0 0 108px;
-	padding-top: .5ex;
 	/* border: 1px solid #f00; */
 }
 form.bComment fieldset div.label select {
@@ -183,7 +182,7 @@ form.bComment fieldset div.label select {
 form.bComment fieldset div.avatartag
 {
 	float: left;
-	margin: 0.2ex;
+	margin: 0 0.5em 0.5em 0;
 	padding: 0;
 }
 
@@ -222,11 +221,8 @@ div.tabs {
 div.tabs div.option,
 div.tabs div.selected {
 	padding: 0 0 0 6px;
+	margin: 5px;
 	float: left;
-}
-
-div.tabs div.option a {
-	padding: 5px 11px 4px 4px;
 }
 
 div.tabs div.selected {

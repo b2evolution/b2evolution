@@ -824,42 +824,48 @@ function get_user_sub_entries( $is_admin, $user_ID )
 
 	if( $is_admin )
 	{
-		$ctrl_param = '?ctrl=user';
+		$ctrl_param = '?ctrl=user&amp;user_tab=';
 		$user_param = '&amp;user_ID='.$user_ID;
 		$base_url = '';
+		$profile_entrie = 'identity';
+		$password_entrie = 'password';
+		$preferences_entrie = 'preferences';
 	}
 	else
 	{
-		$ctrl_param = '?disp=profile';
+		$ctrl_param = '?disp=';
 		$user_param = '';
 		$base_url = $Blog->gen_blogurl();
+		$profile_entrie = 'profile';
+		$password_entrie = 'pwdchange';
+		$preferences_entrie = 'userprefs';
 	}
 	$edit_perm = ( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'edit' ) );
 	$view_perm = ( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'view' ) );
 
 	if( $view_perm )
 	{
-		$users_sub_entries['identity'] = array(
+		$users_sub_entries[$profile_entrie] = array(
 							'text' => T_('Identity'),
-							'href' => $base_url.$ctrl_param.'&amp;user_tab=identity'.$user_param	);
+							'href' => $base_url.$ctrl_param.$profile_entrie.$user_param	);
 
 		if( $Settings->get('allow_avatars') )
 		{
 			$users_sub_entries['avatar'] = array(
 							'text' => T_('Avatar'),
-							'href' => $base_url.$ctrl_param.'&amp;user_tab=avatar'.$user_param );
+							'href' => $base_url.$ctrl_param.'avatar'.$user_param );
 		}
 
 		if( $edit_perm )
 		{
-			$users_sub_entries['password'] = array(
+			$users_sub_entries[$password_entrie] = array(
 								'text' => T_('Password'),
-								'href' => $base_url.$ctrl_param.'&amp;user_tab=password'.$user_param );
+								'href' => $base_url.$ctrl_param.$password_entrie.$user_param );
 		}
 
-		$users_sub_entries['preferences'] = array(
+		$users_sub_entries[$preferences_entrie] = array(
 							'text' => T_('Preferences'),
-	 						'href' => $base_url.$ctrl_param.'&amp;user_tab=preferences'.$user_param );								
+	 						'href' => $base_url.$ctrl_param.$preferences_entrie.$user_param );								
 
 		if( $is_admin )
 		{ // show this only in backoffice
@@ -879,6 +885,9 @@ function get_user_sub_entries( $is_admin, $user_ID )
 
 /*
  * $Log$
+ * Revision 1.31  2011/05/09 06:38:19  efy-asimo
+ * Simple avatar modification update
+ *
  * Revision 1.30  2011/04/06 13:30:56  efy-asimo
  * Refactor profile display
  *

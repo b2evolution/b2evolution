@@ -307,6 +307,8 @@ function request_title( $params = array() )
 			'login_text'          => T_('Login'),
 			'profile_text'        => T_('User Profile'),
 			'avatar_text'         => T_('User Avatar'),
+			'pwdchange_text'      => T_('Password'),
+			'userprefs_text'      => T_('User preferences'),
 			'user_text'           => T_('User'),
 			'subs_text'           => T_('Subscriptions'),
 			'comments_text'       => T_('Latest Comments'),
@@ -383,6 +385,16 @@ function request_title( $params = array() )
 		case 'avatar':
 			// We are requesting the user avatar:
 			$r[] = $params['avatar_text'];
+			break;
+
+		case 'pwdchange':
+			// We are requesting the user change password:
+			$r[] = $params['pwdchange_text'];
+			break;
+
+		case 'userprefs':
+			// We are requesting the user preferences:
+			$r[] = $params['userprefs_text'];
 			break;
 
 		case 'subs':
@@ -1130,6 +1142,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.81  2011/05/09 06:38:18  efy-asimo
+ * Simple avatar modification update
+ *
  * Revision 1.80  2011/03/24 15:15:05  efy-asimo
  * in-skin login - feature
  *
