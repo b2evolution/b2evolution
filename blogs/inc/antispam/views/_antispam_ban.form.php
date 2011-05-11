@@ -213,7 +213,7 @@ $Form->begin_form( 'fform',  T_('Confirm ban & delete') );
 						<?php
 						if( $current_user_edit_perm )
 						{
-							echo '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID='
+							echo '<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID='
 								.$affected_User->ID.'"><strong>'.$affected_User->login.'</strong></a>';
 						}
 						else
@@ -291,6 +291,9 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Check & ban...'), 'SaveBu
 
 /*
  * $Log$
+ * Revision 1.29  2011/05/11 07:11:51  efy-asimo
+ * User settings update
+ *
  * Revision 1.28  2011/02/14 14:13:24  efy-asimo
  * Comments trash status
  *

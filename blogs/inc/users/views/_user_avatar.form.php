@@ -33,7 +33,7 @@ if( !$user_profile_only )
 $is_admin = is_admin_page();
 if( $is_admin )
 {
-	$form_title = sprintf( T_('Edit %s avatar'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' );
+	$form_title = sprintf( T_('Edit avatar for user %s'), $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;' );
 	$form_class = 'fform';
 	$ctrl_param = '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID;
 }
@@ -164,6 +164,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.14  2011/05/11 07:11:52  efy-asimo
+ * User settings update
+ *
  * Revision 1.13  2011/05/09 06:38:19  efy-asimo
  * Simple avatar modification update
  *

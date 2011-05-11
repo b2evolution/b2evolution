@@ -174,7 +174,7 @@ $Results->grp_cols[] = array(
 $Results->cols[] = array(
 						'th' => T_('Login'),
 						'order' => 'user_login',
-						'td' => '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID=$user_ID$">$user_login$</a>',
+						'td' => '<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID=$user_ID$">$user_login$</a>',
 					);
 
 $Results->cols[] = array(
@@ -440,7 +440,7 @@ $Results->cols = array(); // RESET!
 $Results->cols[] = array(
 						'th' => T_('Login'),
 						'order' => 'user_login',
-						'td' => '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID=$user_ID$">$user_login$</a>',
+						'td' => '<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID=$user_ID$">$user_login$</a>',
 					);
 
 
@@ -510,6 +510,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Update'), 'S
 
 /*
  * $Log$
+ * Revision 1.19  2011/05/11 07:11:51  efy-asimo
+ * User settings update
+ *
  * Revision 1.18  2011/01/06 14:31:47  efy-asimo
  * advanced blog permissions:
  *  - add blog_edit_ts permission

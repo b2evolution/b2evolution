@@ -196,7 +196,7 @@ function user_avatar( $user_ID, $user_avatar_file_ID )
 
 	if( $current_User->check_perm( 'users', 'view' ) )
 	{
-		return '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-80x80' ).'</a>';
+		return '<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-80x80' ).'</a>';
 	}
 	else
 	{
@@ -303,6 +303,9 @@ $Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'S
 												array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
 /*
  * $Log$
+ * Revision 1.31  2011/05/11 07:11:51  efy-asimo
+ * User settings update
+ *
  * Revision 1.30  2011/02/15 15:37:00  efy-asimo
  * Change access to admin permission
  *

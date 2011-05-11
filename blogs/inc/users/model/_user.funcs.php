@@ -441,18 +441,7 @@ function get_user_profile_link( $before = '', $after = '', $link_text = '', $lin
  */
 function get_user_profile_url()
 {
-	global $current_User, $Blog, $is_admin_page, $admin_url, $ReqURI;
-
-	if( $is_admin_page || empty( $Blog ) )
-	{
-		$url = $admin_url.'?ctrl=user&amp;user_tab=identity&amp;user_ID='.$current_User->ID;
-	}
-	else
-	{
-		$url = url_add_param( $Blog->gen_blogurl(), 'disp=profile&amp;redirect_to='.rawurlencode($ReqURI) );
-	}
-
-	return $url;
+	return get_user_settings_url( 'profile' );
 }
 
 
@@ -461,15 +450,49 @@ function get_user_profile_url()
  */
 function get_user_avatar_url()
 {
+	return get_user_settings_url( 'avatar' );
+}
+
+
+/**
+ * Get URL to change user password
+ */
+function get_user_pwdchange_url()
+{
+	return get_user_settings_url( 'pwdchange' );
+}
+
+
+/**
+ * Get URL to edit user preferences
+ */
+function get_user_preferences_url()
+{
+	return get_user_settings_url( 'userprefs' );
+}
+
+
+/**
+ * Get URL to a specific user settinga tab (profile, avatar, pwdchange, userprefs)
+ * 
+ * @param string user tab
+ */
+function get_user_settings_url( $user_tab )
+{
 	global $current_User, $Blog, $is_admin_page, $admin_url, $ReqURI;
+
+	if( ! in_array( $user_tab, array( 'profile', 'avatar', 'pwdchange', 'userprefs' ) ) )
+	{
+		debug_die( 'Not supported user tab!' );
+	}
 
 	if( $is_admin_page || empty( $Blog ) )
 	{
-		$url = $admin_url.'?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$current_User->ID;
+		$url = $admin_url.'?ctrl=user&amp;user_tab='.$user_tab.'&amp;user_ID='.$current_User->ID;
 	}
 	else
 	{
-		$url = url_add_param( $Blog->gen_blogurl(), 'disp=avatar&amp;redirect_to='.rawurlencode($ReqURI) );
+		$url = url_add_param( $Blog->gen_blogurl(), 'disp='.$user_tab );
 	}
 
 	return $url;
@@ -689,7 +712,7 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 		{	// Permission to view user details
 			global $admin_url;
 	// fp>dh why did you add $admin_url here? If this is gonna be used outside of admin, it should not point to the profile in the admin but rather to the profile disp in the public blog skin
-			$img_tag = '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID='.$User->ID.'">'.$img_tag.'</a>';
+			$img_tag = '<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID='.$User->ID.'">'.$img_tag.'</a>';
 		}
 
 	}
@@ -827,27 +850,21 @@ function get_user_sub_entries( $is_admin, $user_ID )
 		$ctrl_param = '?ctrl=user&amp;user_tab=';
 		$user_param = '&amp;user_ID='.$user_ID;
 		$base_url = '';
-		$profile_entrie = 'identity';
-		$password_entrie = 'password';
-		$preferences_entrie = 'preferences';
 	}
 	else
 	{
 		$ctrl_param = '?disp=';
 		$user_param = '';
 		$base_url = $Blog->gen_blogurl();
-		$profile_entrie = 'profile';
-		$password_entrie = 'pwdchange';
-		$preferences_entrie = 'userprefs';
 	}
 	$edit_perm = ( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'edit' ) );
 	$view_perm = ( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'view' ) );
 
 	if( $view_perm )
 	{
-		$users_sub_entries[$profile_entrie] = array(
-							'text' => T_('Identity'),
-							'href' => $base_url.$ctrl_param.$profile_entrie.$user_param	);
+		$users_sub_entries['profile'] = array(
+							'text' => T_('Profile'),
+							'href' => $base_url.$ctrl_param.'profile'.$user_param	);
 
 		if( $Settings->get('allow_avatars') )
 		{
@@ -858,14 +875,14 @@ function get_user_sub_entries( $is_admin, $user_ID )
 
 		if( $edit_perm )
 		{
-			$users_sub_entries[$password_entrie] = array(
+			$users_sub_entries['pwdchange'] = array(
 								'text' => T_('Password'),
-								'href' => $base_url.$ctrl_param.$password_entrie.$user_param );
+								'href' => $base_url.$ctrl_param.'pwdchange'.$user_param );
 		}
 
-		$users_sub_entries[$preferences_entrie] = array(
+		$users_sub_entries['userprefs'] = array(
 							'text' => T_('Preferences'),
-	 						'href' => $base_url.$ctrl_param.$preferences_entrie.$user_param );								
+	 						'href' => $base_url.$ctrl_param.'userprefs'.$user_param );								
 
 		if( $is_admin )
 		{ // show this only in backoffice
@@ -885,6 +902,9 @@ function get_user_sub_entries( $is_admin, $user_ID )
 
 /*
  * $Log$
+ * Revision 1.32  2011/05/11 07:11:51  efy-asimo
+ * User settings update
+ *
  * Revision 1.31  2011/05/09 06:38:19  efy-asimo
  * Simple avatar modification update
  *

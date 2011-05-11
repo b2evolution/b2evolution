@@ -70,7 +70,7 @@ if( !$user_profile_only )
 $is_admin = is_admin_page();
 if( $is_admin )
 {
-	$form_title = sprintf( T_('Change %s password'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' );
+	$form_title = sprintf( T_('Change password for user %s'), $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;' );
 	$form_class = 'fform';
 }
 else
@@ -83,7 +83,7 @@ $Form->begin_form( $form_class, $form_title );
 
 	$Form->add_crumb( 'user' );
 	$Form->hidden_ctrl();
-	$Form->hidden( 'user_tab', 'password' );
+	$Form->hidden( 'user_tab', 'pwdchange' );
 	$Form->hidden( 'password_form', '1' );
 
 	$Form->hidden( 'user_ID', $edited_User->ID );
@@ -95,8 +95,8 @@ if( $action != 'view' )
 { // We can edit the values:
 
 	$Form->begin_fieldset( $is_admin ? T_('Password') : '', array( 'class'=>'fieldset clear' ) );
-		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'note' => ( !empty($edited_User->ID) ? T_('Leave empty if you don\'t want to change the password.') : '' ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
-		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'note'=>sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
+		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'note' => sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
+		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
 
 	$Form->end_fieldset();
 }
@@ -105,10 +105,10 @@ if( $action != 'view' )
 
 if( $action != 'view' )
 { // Edit buttons
-	$Form->buttons( array(
-		array( '', 'actionArray[update]', T_('Change password!'), 'SaveButton' ),
-		array( 'reset', '', T_('Reset'), 'ResetButton' ) ) );
+	$Form->buttons( array( array( '', 'actionArray[update]', T_('Change password!'), 'SaveButton' ) ) );
 }
+
+	$Form->info( '', '<div><a href="'.regenerate_url( 'disp', 'disp=profile' ).'">'.T_( 'Abandon password change' ).'</a></div>' );
 
 
 $Form->end_form();
@@ -116,6 +116,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.8  2011/05/11 07:11:52  efy-asimo
+ * User settings update
+ *
  * Revision 1.7  2011/04/06 13:30:56  efy-asimo
  * Refactor profile display
  *

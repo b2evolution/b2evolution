@@ -47,7 +47,7 @@ if( !$user_profile_only )
 	echo '</span>';
 }
 
-echo '<h2>'.sprintf( T_('View %s personal blogs'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' ).'</h2>';
+echo '<h2>'.sprintf( T_('View personal blogs for user %s'), $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;' ).'</h2>';
 
 $SQL = 'SELECT * FROM T_blogs WHERE blog_owner_user_ID = '.$DB->quote($edited_User->ID);
 
@@ -121,6 +121,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.3  2011/05/11 07:11:52  efy-asimo
+ * User settings update
+ *
  * Revision 1.2  2011/02/20 22:31:39  fplanque
  * minor / doc
  *

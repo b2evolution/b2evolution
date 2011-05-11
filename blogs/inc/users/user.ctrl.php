@@ -10,7 +10,7 @@ global $AdminUI;
 param( 'user_tab', 'string' );
 if( empty($user_tab) )
 {
-	$user_tab = 'identity';
+	$user_tab = 'profile';
 }
 
 $AdminUI->set_path( 'users', $user_tab );
@@ -342,8 +342,8 @@ $AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
 $AdminUI->breadcrumbpath_add( $edited_User->login, '?ctrl=user&amp;user_ID='.$edited_User->ID );
 switch( $user_tab )
 {
-	case 'identity':
-		$AdminUI->breadcrumbpath_add( T_('Identity'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+	case 'profile':
+		$AdminUI->breadcrumbpath_add( T_('Profile'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 		break;
 	case 'avatar':
 		if( isset($GLOBALS['files_Module']) )
@@ -351,10 +351,10 @@ switch( $user_tab )
 			$AdminUI->breadcrumbpath_add( T_('Avatar'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 		}
 		break;
-	case 'password':
+	case 'pwdchange':
 		$AdminUI->breadcrumbpath_add( T_('Change password'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 		break;
-	case 'preferences':
+	case 'userprefs':
 		$AdminUI->breadcrumbpath_add( T_('Preferences'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 		break;
 	case 'advanced':
@@ -387,7 +387,7 @@ switch( $action )
 
 		switch( $user_tab )
 		{
-			case 'identity':
+			case 'profile':
 				// Display user identity form:
 				$AdminUI->disp_payload_begin();
 				$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
@@ -402,13 +402,13 @@ switch( $action )
 					$AdminUI->disp_payload_end();
 				}
 				break;
-			case 'password':
+			case 'pwdchange':
 				// Display user password form:
 				$AdminUI->disp_payload_begin();
 				$AdminUI->disp_view( 'users/views/_user_password.form.php' );
 				$AdminUI->disp_payload_end();
 				break;
-			case 'preferences':
+			case 'userprefs':
 				// Display user preferences form:
 				$AdminUI->disp_payload_begin();
 				$AdminUI->disp_view( 'users/views/_user_preferences.form.php' );
@@ -433,6 +433,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.29  2011/05/11 07:11:51  efy-asimo
+ * User settings update
+ *
  * Revision 1.28  2011/04/06 13:30:56  efy-asimo
  * Refactor profile display
  *

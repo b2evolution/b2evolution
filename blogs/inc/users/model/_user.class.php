@@ -293,9 +293,13 @@ class User extends DataObject
 
 			if( $q = $DB->get_var( $query ) )
 			{
-				param_error( 'edited_user_login',
-					sprintf( T_( 'This login already exists. Do you want to <a %s>edit the existing user</a>?' ),
-						'href="?ctrl=user&amp;user_tab=identity&amp;user_ID='.$q.'"' ) );
+				$error_message = T_( 'This login already exists.' );
+				if( $current_User->check_perm( 'users', 'edit' ) )
+				{
+					$error_message = sprintf( T_( 'This login already exists. Do you want to <a %s>edit the existing user</a>?' ),
+						'href="?ctrl=user&amp;user_tab=profile&amp;user_ID='.$q.'"' );
+				}
+				param_error( 'edited_user_login', $error_message );
 			}
 
 			// EXPERIMENTAL user fields & EXISTING fields:
@@ -2346,6 +2350,9 @@ class User extends DataObject
 
 /*
  * $Log$
+ * Revision 1.99  2011/05/11 07:11:51  efy-asimo
+ * User settings update
+ *
  * Revision 1.98  2011/04/06 13:30:56  efy-asimo
  * Refactor profile display
  *

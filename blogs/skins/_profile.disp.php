@@ -53,7 +53,6 @@ $user_profile_only = true;
 // edited_User is always the current_User
 $edited_User = $current_User;
 
-$redirect_to = param( 'redirect_to', 'string', '' );
 $action = param_action();
 
 if( !empty( $action ) )
@@ -88,9 +87,9 @@ switch( $action )
 // Display tabs
 echo '<div class="tabs">';
 $entries = get_user_sub_entries( false, NULL );
-foreach( $entries as $entrie => $entrie_data )
+foreach( $entries as $entry => $entry_data )
 {
-	if( $entrie == $disp )
+	if( $entry == $disp )
 	{
 		echo '<div class="selected">';
 	}
@@ -98,7 +97,7 @@ foreach( $entries as $entrie => $entrie_data )
 	{
 		echo '<div class="option">';
 	}
-	echo '<a href='.$entrie_data['href'].'>'.$entrie_data['text'].'</a>';
+	echo '<a href='.$entry_data['href'].'>'.$entry_data['text'].'</a>';
 	echo '</div>';
 }
 echo '</div>';
@@ -125,6 +124,9 @@ switch( $disp )
 
 /*
  * $Log$
+ * Revision 1.23  2011/05/11 07:11:52  efy-asimo
+ * User settings update
+ *
  * Revision 1.22  2011/05/09 06:38:19  efy-asimo
  * Simple avatar modification update
  *

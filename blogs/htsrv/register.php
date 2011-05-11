@@ -184,7 +184,7 @@ switch( $action )
 							.T_('Login:')." $login\n"
 							.T_('Email').": $email\n"
 							."\n"
-							.T_('Edit user').': '.$admin_url.'?ctrl=user&user_tab=identity&user_ID='.$new_User->ID."\n";
+							.T_('Edit user').': '.$admin_url.'?ctrl=user&user_tab=profile&user_ID='.$new_User->ID."\n";
 
 		send_mail( $AdminUser->get( 'email' ), NULL, T_('New user registration on your blog'), $message, $notify_from ); // ok, if this may fail..
 
@@ -237,6 +237,9 @@ require $adminskins_path.'login/_reg_form.main.php';
 
 /*
  * $Log$
+ * Revision 1.109  2011/05/11 07:11:51  efy-asimo
+ * User settings update
+ *
  * Revision 1.108  2011/02/17 14:56:38  efy-asimo
  * Add user source param
  *

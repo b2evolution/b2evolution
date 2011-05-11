@@ -82,7 +82,7 @@ if( !$user_profile_only )
 $is_admin = is_admin_page();
 if( $is_admin )
 {
-	$form_title = sprintf( T_('Edit %s preferences'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' );
+	$form_title = sprintf( T_('Edit preferences for user %s'), $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;' );
 	$form_class = 'fform';
 }
 else
@@ -95,7 +95,7 @@ $Form->begin_form( $form_class, $form_title );
 
 	$Form->add_crumb( 'user' );
 	$Form->hidden_ctrl();
-	$Form->hidden( 'user_tab', 'preferences' );
+	$Form->hidden( 'user_tab', 'userprefs' );
 	$Form->hidden( 'preferences_form', '1' );
 
 	$Form->hidden( 'user_ID', $edited_User->ID );
@@ -217,6 +217,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.18  2011/05/11 07:11:52  efy-asimo
+ * User settings update
+ *
  * Revision 1.17  2011/04/06 13:30:56  efy-asimo
  * Refactor profile display
  *

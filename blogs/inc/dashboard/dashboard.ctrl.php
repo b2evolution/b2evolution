@@ -692,7 +692,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	echo '<ul>';
 		if( $current_User->check_perm( 'users', 'edit' ) )
 		{
-			echo '<li><a href="'.$dispatcher.'?ctrl=user&amp;user_tab=identity&amp;action=new">'.T_('Create new user').' &raquo;</a></li>';
+			echo '<li><a href="'.$dispatcher.'?ctrl=user&amp;user_tab=profile&amp;action=new">'.T_('Create new user').' &raquo;</a></li>';
 		}
 		if( $current_User->check_perm( 'blogs', 'create' ) )
 		{
@@ -723,6 +723,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.77  2011/05/11 07:11:51  efy-asimo
+ * User settings update
+ *
  * Revision 1.76  2011/03/16 13:34:53  efy-asimo
  * animate comment delete
  *

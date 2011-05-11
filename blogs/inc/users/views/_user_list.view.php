@@ -115,7 +115,7 @@ $Results->title = T_('Groups & Users').get_manual_link('users_and_groups');
  */
 if( $current_User->check_perm( 'users', 'edit', false ) )
 { // create new user link
-	$Results->global_icon( T_('Create a new user...'), 'new', '?ctrl=user&amp;action=new&amp;user_tab=identity', T_('Add user').' &raquo;', 3, 4  );
+	$Results->global_icon( T_('Create a new user...'), 'new', '?ctrl=user&amp;action=new&amp;user_tab=profile', T_('Add user').' &raquo;', 3, 4  );
 	$Results->global_icon( T_('Create a new group...'), 'new', '?ctrl=groups&amp;action=new', T_('Add group').' &raquo;', 3, 4  );
 }
 
@@ -209,7 +209,7 @@ if( $Settings->get('allow_avatars') )
 		{
 			return '';
 		}
-		return '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-48x48' ).'</a>';
+		return '<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID='.$user_ID.'">'.$File->get_thumb_imgtag( 'crop-48x48' ).'</a>';
 	}
 	$Results->cols[] = array(
 							'th' => T_('Avatar'),
@@ -223,7 +223,7 @@ $Results->cols[] = array(
 						'th' => T_('Login'),
 						'th_class' => 'shrinkwrap',
 						'order' => 'user_login',
-						'td' => '<a href="?ctrl=user&amp;user_tab=identity&amp;user_ID=$user_ID$"><strong>$user_login$</strong></a>',
+						'td' => '<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID=$user_ID$"><strong>$user_login$</strong></a>',
 					);
 
 $Results->cols[] = array(
@@ -373,8 +373,8 @@ else
 	$Results->cols[] = array(
 						'th' => T_('Actions'),
 						'td_class' => 'shrinkwrap',
-						'td' => action_icon( T_('Edit this user...'), 'edit', '%regenerate_url( \'ctrl,action\', \'ctrl=user&amp;user_ID=$user_ID$&amp;user_tab=identity\' )%' )
-										.action_icon( T_('Duplicate this user...'), 'copy', '%regenerate_url( \'ctrl,action\', \'ctrl=user&amp;action=new&amp;user_ID=$user_ID$&amp;user_tab=identity\' )%' )
+						'td' => action_icon( T_('Edit this user...'), 'edit', '%regenerate_url( \'ctrl,action\', \'ctrl=user&amp;user_ID=$user_ID$&amp;user_tab=profile\' )%' )
+										.action_icon( T_('Duplicate this user...'), 'copy', '%regenerate_url( \'ctrl,action\', \'ctrl=user&amp;action=new&amp;user_ID=$user_ID$&amp;user_tab=profile\' )%' )
 										.'¤conditional( (#user_ID# != 1) && (#nb_blogs# < 1) && (#user_ID# != '.$current_User->ID.'), \''
 											.action_icon( T_('Delete this user!'), 'delete',
 												'%regenerate_url( \'action\', \'action=delete&amp;user_ID=$user_ID$&amp;'.url_crumb('user').'\' )%' ).'\', \''
@@ -389,6 +389,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.31  2011/05/11 07:11:52  efy-asimo
+ * User settings update
+ *
  * Revision 1.30  2011/02/23 21:45:18  fplanque
  * minor / cleanup
  *

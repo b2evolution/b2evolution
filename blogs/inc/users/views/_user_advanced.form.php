@@ -106,7 +106,7 @@ if( !$user_profile_only )
 	echo_user_actions( $Form, $edited_User, $action );
 }
 
-$Form->begin_form( 'fform', sprintf( T_('Edit %s preferences'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' ) );
+$Form->begin_form( 'fform', sprintf( T_('Edit advanced preferences for user %s'), $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;' ) );
 
 	$Form->add_crumb( 'user' );
 	$Form->hidden_ctrl();
@@ -245,6 +245,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.2  2011/05/11 07:11:52  efy-asimo
+ * User settings update
+ *
  * Revision 1.1  2011/04/06 13:30:56  efy-asimo
  * Refactor profile display
  *

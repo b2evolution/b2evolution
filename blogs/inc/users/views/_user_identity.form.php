@@ -137,11 +137,11 @@ if( $is_admin )
 {
 	if( $edited_User->ID == 0 )
 	{
-		$form_title = T_('Edit user identity');
+		$form_title = T_('Edit user profile');
 	}
 	else
 	{
-		$form_title = sprintf( T_('Edit %s identity'), $edited_User->dget('fullname').' ['.$edited_User->dget('login').']' );
+		$form_title = sprintf( T_('Edit profile for user %s'), $edited_User->dget('fullname').' &laquo;'.$edited_User->dget('login').'&raquo;' );
 	}
 	$form_class = 'fform';
 }
@@ -155,7 +155,7 @@ else
 
 	$Form->add_crumb( 'user' );
 	$Form->hidden_ctrl();
-	$Form->hidden( 'user_tab', 'identity' );
+	$Form->hidden( 'user_tab', 'profile' );
 	$Form->hidden( 'identity_form', '1' );
 
 	$Form->hidden( 'user_ID', $edited_User->ID );
@@ -510,6 +510,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.22  2011/05/11 07:11:52  efy-asimo
+ * User settings update
+ *
  * Revision 1.21  2011/04/06 13:30:56  efy-asimo
  * Refactor profile display
  *

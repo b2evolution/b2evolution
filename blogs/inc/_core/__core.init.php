@@ -791,8 +791,20 @@ class _core_Module extends Module
 					'href' => get_user_profile_url(),
 					'entries' => array(
 						'profile' => array(
-								'text' => T_('Edit user profile').'&hellip;',
+								'text' => T_('Edit your profile').'&hellip;',
 								'href' => get_user_profile_url(),
+							),
+						'avatar' => array(
+								'text' => T_('Change your avatar').'&hellip;',
+								'href' => get_user_avatar_url(),
+							),
+						'pwdchange' => array(
+								'text' => T_('Change your password').'&hellip;',
+								'href' => get_user_pwdchange_url(),
+							),
+						'userprefs' => array(
+								'text' => T_('Set your preferences').'&hellip;',
+								'href' => get_user_preferences_url(),
 							),
 						),
 				),
@@ -956,7 +968,7 @@ class _core_Module extends Module
 			$users_entries = array(
 						'text' => T_('My profile'),
 						'title' => T_('User profile'),
-						'href' => '?ctrl=user&amp;user_tab=identity&amp;user_ID='.$user_ID );
+						'href' => '?ctrl=user&amp;user_tab=profile&amp;user_ID='.$user_ID );
 		}
 
 		if( $ctrl == 'user' )
@@ -1041,6 +1053,9 @@ $_core_Module = new _core_Module();
 
 /*
  * $Log$
+ * Revision 1.73  2011/05/11 07:11:51  efy-asimo
+ * User settings update
+ *
  * Revision 1.72  2011/04/06 13:30:55  efy-asimo
  * Refactor profile display
  *
