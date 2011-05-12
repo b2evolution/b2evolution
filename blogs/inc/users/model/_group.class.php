@@ -293,6 +293,11 @@ class Group extends DataObject
 
 			case 'stats':
 			case 'users':
+				if( ! $this->check_perm( 'admin', 'normal' ) )
+				{
+					$perm = false;
+					break;
+				}
 				switch( $permvalue )
 				{ // Depending on current group permission:
 
@@ -642,6 +647,9 @@ class Group extends DataObject
 
 /*
  * $Log$
+ * Revision 1.43  2011/05/12 10:27:34  efy-asimo
+ * Add admin normal access master restriction to user and stats permission check
+ *
  * Revision 1.42  2011/04/05 12:41:40  efy-asimo
  * file perms check and file delete - fix
  *
