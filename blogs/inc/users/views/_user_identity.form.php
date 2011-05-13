@@ -119,6 +119,38 @@ $group_msg_perm = $GroupCache->get_option_array( 'check_messaging_perm' );
 			}
 		}
 	}
+
+	// Identity shown dropdown list handler
+	// init variables
+	var idmodes = [];
+	var laquo = String.fromCharCode(171);
+	var raquo = String.fromCharCode(187);
+	idmodes["nickname"] = " " + laquo + "<?php echo T_( 'Nickname' ); ?>" + raquo;
+	idmodes["login"] = " " + laquo + "<?php echo T_( 'Login' ); ?>" + raquo;
+	idmodes["firstname"] = " " + laquo + "<?php echo T_( 'First name' ); ?>" + raquo;
+	idmodes["lastname"] = " " + laquo + "<?php echo T_( 'Last name' ); ?>" + raquo;
+	idmodes["namefl"] = " " + laquo + "<?php echo T_( 'First name' ).' '.T_( 'Last name' ); ?>" + raquo;
+	idmodes["namelf"] = " " + laquo + "<?php echo T_( 'Last name' ).' '.T_( 'First name' ); ?>" + raquo;
+
+	// Identity fields on change fucntion
+	function idmodes_onchange( fieldname )
+	{
+		var fieldText = jQuery( '#edited_user_' + fieldname ).val();
+		if( fieldText == "" )
+		{
+			fieldText = "-";
+		}
+		jQuery( '#edited_user_idmode option[value="' + fieldname + '"]' ).text( fieldText + idmodes[fieldname] );
+	}
+
+	// Handle Identity shown composite fields (-First name Last name- and -Last name First name-)
+	function name_onchange()
+	{
+		var firstName = jQuery( '#edited_user_firstname' ).val();
+		var lastName = jQuery( '#edited_user_lastname' ).val();
+		jQuery( '#edited_user_idmode option[value="namefl"]' ).text( firstName + " " + lastName + idmodes["namefl"] );
+		jQuery( '#edited_user_idmode option[value="namelf"]' ).text( lastName + " " + firstName + idmodes["namelf"] );
+	}
 </script>
 <?php
 
@@ -236,14 +268,14 @@ $Form->begin_fieldset( T_('Identity') );
 if( $action != 'view' )
 {   // We can edit the values:
 
-	$Form->text_input( 'edited_user_login', $edited_User->login, 20, T_('Login'), '', array( 'required' => true ) );
+	$Form->text_input( 'edited_user_login', $edited_User->login, 20, T_('Login'), '', array( 'required' => true, 'onchange' => 'idmodes_onchange( "login" )' ) );
 	$Form->text_input( 'edited_user_firstname', $edited_User->firstname, 20, T_('First name'), '', array( 'maxlength' => 50 ) );
 	$Form->text_input( 'edited_user_lastname', $edited_User->lastname, 20, T_('Last name'), '', array( 'maxlength' => 50 ) );
 
 	$nickname_editing = $Settings->get( 'nickname_editing' );
 	if( ( $nickname_editing == 'edited-user' && $edited_User->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $has_full_access ) )
 	{
-		$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => true ) );
+		$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => true, 'onchange' => 'idmodes_onchange( "nickname" )' ) );
 	}
 	else
 	{
@@ -501,15 +533,34 @@ if( $action != 'view' )
 
 $Form->end_form();
 
-// call the users group dropdown list handler
 ?>
-	<script type="text/javascript">
-		user_group_changed();
-	</script>
+<script type="text/javascript">
+	// call the users group dropdown list handler
+	user_group_changed();
+
+	// handle firstname and lastname change in the Identity shown dropdown list
+	jQuery( '#edited_user_firstname' ).change( function()
+	{
+		// change First name text
+		idmodes_onchange( "firstname" );
+		// change -First name Last name- and -Last name First name- texts
+		name_onchange();
+	} );
+	jQuery( '#edited_user_lastname' ).change( function()
+	{
+		// change Last name text
+		idmodes_onchange( "lastname" );
+		// change -First name Last name- and -Last name First name- texts
+		name_onchange();
+	} );
+</script>
 <?php
 
 /*
  * $Log$
+ * Revision 1.23  2011/05/13 07:24:26  efy-asimo
+ * dinamically update "Identiy shown" select options
+ *
  * Revision 1.22  2011/05/11 07:11:52  efy-asimo
  * User settings update
  *
