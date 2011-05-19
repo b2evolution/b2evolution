@@ -222,6 +222,11 @@ switch( $action )
 		// UPDATE DB:
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
+		if( $edited_Comment->status == 'published' )
+		{ // comment status was set to published or it was already published, needs to handle notifications
+			$edited_Comment->handle_notifications();
+		}
+
 		$Messages->add( T_('Comment has been updated.'), 'success' );
 
 		header_redirect( $redirect_to );
@@ -236,6 +241,9 @@ switch( $action )
 		$edited_Comment->set('status', 'published' );
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
+
+		// comment status was set to published, needs to handle notifications
+		$edited_Comment->handle_notifications();
 
 		$Messages->add( T_('Comment has been published.'), 'success' );
 
@@ -499,6 +507,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.44  2011/05/19 17:47:07  efy-asimo
+ * register for updates on a specific blog post
+ *
  * Revision 1.43  2011/03/23 14:09:28  efy-asimo
  * Elevate comment into a post feature
  *

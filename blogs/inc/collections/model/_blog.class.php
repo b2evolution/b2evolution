@@ -470,6 +470,7 @@ class Blog extends DataObject
 		if( in_array( 'features', $groups ) )
 		{ // we want to load the workflow checkboxes:
 			$this->set_setting( 'allow_subscriptions',  param( 'allow_subscriptions', 'integer', 0 ) );
+			$this->set_setting( 'allow_item_subscriptions',  param( 'allow_item_subscriptions', 'integer', 0 ) );
 			$this->set_setting( 'enable_goto_blog',  param( 'enable_goto_blog', 'integer', 0 ) );
 
 			$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
@@ -2364,6 +2365,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.131  2011/05/19 17:47:07  efy-asimo
+ * register for updates on a specific blog post
+ *
  * Revision 1.130  2011/03/24 15:15:05  efy-asimo
  * in-skin login - feature
  *

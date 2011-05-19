@@ -142,6 +142,7 @@ class CollectionSettings extends AbstractSettings
 			'require_title' => 'required',  		// Is a title for items required ("required", "optional", "none")
 			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet,evo_twitter', // ping plugin codes, separated by comma
 			'allow_subscriptions' => 0,					// Don't all email subscriptions by default
+			'allow_item_subscriptions' => 0,			// Don't allow email subscriptions for a specific post by default
 			'use_workflow' => 0,								// Don't use workflow by default
 			'aggregate_coll_IDs' => '',
 			'blog_footer_text' => '&copy;$year$ by $owner$',
@@ -184,6 +185,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.56  2011/05/19 17:47:07  efy-asimo
+ * register for updates on a specific blog post
+ *
  * Revision 1.55  2011/05/05 20:14:30  sam2kb
  * More replacement tags for item footer
  *

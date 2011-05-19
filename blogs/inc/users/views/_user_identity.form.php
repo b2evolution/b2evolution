@@ -246,7 +246,10 @@ if( $action != 'view' )
 		array( 'PM', 1, T_( 'Allow others to send me private messages' ), ( $edited_User->get( 'allow_msgform' ) % 2 == 1 ) ),
 		array( 'email', 2, T_( 'Allow others to send me emails through a message form (email address will never be displayed)' ),  $edited_User->get( 'allow_msgform' ) > 1 ) );
 	$Form->checklist( $messaging_options, 'edited_user_msgform', T_('Message form') );
-	$Form->checkbox( 'edited_user_notify', $edited_User->get('notify'), T_('Notifications'), T_('Check this to receive a notification whenever someone else comments on one of <strong>your</strong> posts.') );
+	$notify_options = array(
+		array( 'edited_user_notify', 1, T_( 'Notify me by email whenever a comment is published on one of <strong>my</strong> posts.' ), $edited_User->get( 'notify' ) ),
+		array( 'edited_user_notify_moderation', 2, T_( 'Notify me by email whenever a comment is awaiting moderation on one of <strong>my</strong> blogs.' ), $edited_User->get( 'notify_moderation' ) ) );
+	$Form->checklist( $notify_options, 'edited_user_notification', T_( 'Notifications' ) );
 
 }
 else
@@ -558,6 +561,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.24  2011/05/19 17:47:07  efy-asimo
+ * register for updates on a specific blog post
+ *
  * Revision 1.23  2011/05/13 07:24:26  efy-asimo
  * dinamically update "Identiy shown" select options
  *

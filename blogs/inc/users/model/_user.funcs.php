@@ -900,8 +900,49 @@ function get_user_sub_entries( $is_admin, $user_ID )
 }
 
 
+/**
+ * Get if user is subscribed to get emails, when a new comment is published on this item.
+ * 
+ * @param integer user ID
+ * @param integer item ID
+ * @return boolean true if user is subscribed and false otherwise
+ */
+function get_user_isubscription( $user_ID, $item_ID )
+{
+	global $DB;
+	$result = $DB->get_var( 'SELECT count( isub_user_ID )
+								FROM T_items__subscriptions
+								WHERE isub_user_ID = '.$user_ID.' AND isub_item_ID = '.$item_ID.' AND isub_comments <> 0' );
+	return $result > 0;
+}
+
+
+/**
+ * Set user item subscription
+ * 
+ * @param integer user ID
+ * @param integer item ID
+ * @param integer value 0 for unsubscribe and 1 for subscribe
+ * @return boolean true is new value was successfuly set, false otherwise
+ */
+function set_user_isubscription( $user_ID, $item_ID, $value )
+{
+	global $DB;
+	if( ( $value < 0 ) || ( $value > 1 ) )
+	{ // Invalid value. It should be 0 for unsubscribe and 1 for subscribe.
+		return false;
+	}
+
+	return $DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments, isub_attend )
+								VALUES ( '.$item_ID.', '.$user_ID.', '.$value.', 0 )' );
+}
+
+
 /*
  * $Log$
+ * Revision 1.33  2011/05/19 17:47:07  efy-asimo
+ * register for updates on a specific blog post
+ *
  * Revision 1.32  2011/05/11 07:11:51  efy-asimo
  * User settings update
  *

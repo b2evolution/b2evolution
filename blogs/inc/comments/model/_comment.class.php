@@ -116,6 +116,16 @@ class Comment extends DataObject
 	 * @var string
 	 */
 	var $secret;
+	/**
+	 * Have post processing notifications been handled?
+	 * @var string
+	 */
+	var $notif_status;
+	/**
+	 * Which cron task is responsible for handling notifications?
+	 * @var integer
+	 */
+	var $notif_ctsk_ID;
 
 	/**
 	 * Constructor
@@ -135,6 +145,7 @@ class Comment extends DataObject
 			$this->rating = NULL;
 			$this->featured = 0;
 			$this->nofollow = 1;
+			$this->notif_status = 'noreq';
 		}
 		else
 		{
@@ -163,6 +174,8 @@ class Comment extends DataObject
 			$this->spam_karma = $db_row->comment_spam_karma;
 			$this->allow_msgform = $db_row->comment_allow_msgform;
 			$this->secret = $db_row->comment_secret;
+			$this->notif_status = $db_row->comment_notif_status;
+			$this->notif_ctsk_ID = $db_row->comment_notif_ctsk_ID;
 		}
 	}
 
@@ -1526,6 +1539,77 @@ class Comment extends DataObject
 
 
 	/**
+	 * Handle comment email notifications
+	 * Should be called only when a new comment was posted or when a comment status was changed to published
+	 */
+	function handle_notifications( $just_posted = false )
+	{
+		global $Settings;
+
+		if( $just_posted )
+		{ // send email notification to moderators
+			$this->send_email_notifications( true );
+		}
+
+		if( $this->status != 'published' )
+		{ // don't send notificaitons about not published comments
+			return;
+		}
+
+		$notifications_mode = $Settings->get('outbound_notifications_mode');
+
+		if( $notifications_mode == 'off' )
+		{ // don't send notification
+			return false;
+		}
+
+		if( $this->get( 'notif_status' ) != 'noreq' )
+		{ // notification have been done before, or is in progress
+			return false;
+		}
+
+		$edited_Item = & $this->get_Item();
+
+		if( $notifications_mode == 'immediate' )
+		{ // Send email notifications now!
+			$this->send_email_notifications( false, $just_posted );
+
+			// Record that processing has been done:
+			$this->set( 'notif_status', 'finished' );
+		}
+		else
+		{ // Create scheduled job to send notifications
+			// CREATE OBJECT:
+			load_class( '/cron/model/_cronjob.class.php', 'Cronjob' );
+			$edited_Cronjob = new Cronjob();
+
+			// start datetime. We do not want to ping before the post is effectively published:
+			$edited_Cronjob->set( 'start_datetime', $this->date );
+
+			// name:
+			$edited_Cronjob->set( 'name', sprintf( T_('Send notifications about &laquo;%s&raquo; new comment'), strip_tags($edited_Item->get( 'title' ) ) ) );
+
+			// controller:
+			$edited_Cronjob->set( 'controller', 'cron/jobs/_comment_notifications.job.php' );
+
+			// params: specify which post this job is supposed to send notifications for:
+			$edited_Cronjob->set( 'params', array( 'comment_ID' => $this->ID, 'except_moderators' => $just_posted ) );
+
+			// Save cronjob to DB:
+			$edited_Cronjob->dbinsert();
+
+			// Memorize the cron job ID which is going to handle this post:
+			$this->set( 'notif_ctsk_ID', $edited_Cronjob->ID );
+
+			// Record that processing has been scheduled:
+			$this->set( 'notif_status', 'todo' );
+		}
+		// update comment notification params
+		$this->dbupdate();
+	}
+
+
+	/**
 	 * Send email notifications to subscribed users:
 	 *
 	 * @todo fp> SEPARATE MODERATION notifications from SUBSCRIPTION notifications
@@ -1534,48 +1618,115 @@ class Comment extends DataObject
 	 * @todo dh> Indicator in url to see where the user came from (&from=subnote ["subscription notification"]) - Problem: too long urls.
 	 * @todo dh> "Beautify" like {@link Item::send_email_notifications()} ? fp > sure
 	 * @todo Should include "visibility status" in the mail to the Item's Author
+	 * 
+	 * efy-asimo> moderatation and subscription notificatinos have been separated
+	 * 
+	 * @param boolean true if send only moderation email, false otherwise
+	 * @param boolean true if send for everyone else but not for moterators, because a moderation email was sent for them
 	 */
-	function send_email_notifications()
+	function send_email_notifications( $only_moderators = false, $except_moderators = false )
 	{
-		global $DB, $admin_url, $debug, $Debuglog, $htsrv_url;
+		global $DB, $admin_url, $debug, $Debuglog, $htsrv_url;//, $UserSettings;
+
+		if( $only_moderators && $except_moderators )
+		{ // at least one of them must be false
+			return;
+		}
 
 		$edited_Item = & $this->get_Item();
 		$edited_Blog = & $edited_Item->get_Blog();
+		$owner_User = $edited_Blog->get_owner_User();
+		$notify_users = array();
 
-		$notify_array = array();
+		if( $only_moderators || $except_moderators )
+		{ // get moderators
+			$sql = 'SELECT DISTINCT user_email, user_locale, user_ID
+						FROM T_coll_user_perms INNER JOIN T_users ON bloguser_user_ID = user_ID
+						WHERE bloguser_blog_ID = '.$edited_Blog->ID.
+						' AND bloguser_perm_draft_cmts <> 0 AND bloguser_perm_publ_cmts <> 0
+						AND bloguser_perm_depr_cmts <> 0 AND user_notify_moderation <> 0 AND LENGTH(TRIM(user_email)) > 0';
+			$moderators_to_notify = $DB->get_results( $sql );
+		}
 
-		if( $edited_Blog->get_setting( 'allow_subscriptions' ) )
-		{	// Get list of users who want to be notfied:
-			// TODO: also use extra cats/blogs??
-			// So far you get notifications for everything. We'll need a setting to decide if you want to received unmoderated (aka unpublished) comments or not.
-			// Note: users receive comments on their own posts. This is done on purpose. Otherwise they think it's broken when they test the app.
-			$sql = 'SELECT DISTINCT user_email, user_locale
-								FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
-							 WHERE sub_coll_ID = '.$this->Item->get_blog_ID().'
-							   AND sub_comments <> 0
-							   AND LENGTH(TRIM(user_email)) > 0';
-			$notify_list = $DB->get_results( $sql );
-
-			// Preprocess list:
-			foreach( $notify_list as $notification )
+		if( $only_moderators )
+		{ // Preprocess moderator list:
+			foreach( $moderators_to_notify as $moderator )
 			{
-				$notify_array[$notification->user_email] = $notification->user_locale;
+				$notify_users[$moderator->user_ID] = build_notify_data( $moderator->user_email, $moderator->user_locale, $moderator->user_unsubscribe_key, 'moderator' );
+			}
+			if( $owner_User->get( 'notify_moderation' ) && is_email( $owner_User->get( 'email' ) ) )
+			{ // add blog owner
+				$notify_users[$owner_User->ID] = build_notify_data( $owner_User->get( 'email' ), $owner_User->get( 'locale' ), $owner_User->get( 'unsubscribe_key' ), 'moderator' );
+			}
+		}
+		else
+		{
+			$moderators = array();
+			$except_condition = '';
+			if( $except_moderators )
+			{ // Set except moderators condition. Exclude moderators who already got a notification email.
+				foreach( $moderators_to_notify as $moderator )
+				{
+					$moderators[] = $moderator->user_email;
+				}
+				if( $owner_User->get( 'notify_moderation' ) && is_email( $owner_User->get( 'email' ) ) )
+				{ // add blog owner
+					$moderators[] = $owner_User->get( 'email' );
+				}
+				if( ! empty( $moderators ) )
+				{
+					$except_condition = ' AND user_email NOT IN ( "'.implode( '", "', $moderators ).'" )';
+				}
+			}
+
+			// Check if we need to include the item creator user:
+			$creator_User = & $edited_Item->get_creator_User();
+			if( $creator_User->get( 'notify' ) && ( ! empty( $creator_User->email ) ) )
+			{ // Creator wants to be notified...
+				if( ( ! ($this->get_author_User() // comment is from registered user
+								&& $creator_User->login == $this->author_User->login) ) // comment is from same user as post
+						&& ! ( in_array( $creator_User->get( 'email' ), $moderators ) ) ) // creator user is not a moderator (moderators already got an email)
+				{	// Creator is not commenting on his own post...
+					$notify_users[$creator_User->ID] = build_notify_data( $creator_User->get( 'email' ), $creator_User->get( 'locale' ), $creator_User->get( 'unsubscribe_key' ), 'creator' );
+				}
+			}
+
+			// Get list of users who want to be notified about the this post comments
+			if( $edited_Blog->get_setting( 'allow_item_subscriptions' ) )
+			{ // item subscriptions is allowed
+				$sql = 'SELECT DISTINCT user_email, user_locale, user_ID, user_unsubscribe_key
+									FROM T_items__subscriptions INNER JOIN T_users ON isub_user_ID = user_ID
+								 WHERE isub_item_ID = '.$edited_Item->ID.'
+								   AND isub_comments <> 0
+								   AND LENGTH(TRIM(user_email)) > 0'.$except_condition;
+				$notify_list = $DB->get_results( $sql );
+
+				// Preprocess list:
+				foreach( $notify_list as $notification )
+				{
+					$notify_users[$notification->user_ID] = build_notify_data( $notification->user_email, $notification->user_locale, $notification->user_unsubscribe_key, 'item_subscription' );
+				}
+			}
+
+			// Get list of users who want to be notfied about this blog comments
+			if( $edited_Blog->get_setting( 'allow_subscriptions' ) )
+			{ // blog subscription is allowed
+				$sql = 'SELECT DISTINCT user_email, user_locale, user_ID, user_unsubscribe_key
+								FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
+							 WHERE sub_coll_ID = '.$edited_Blog->ID.'
+							   AND sub_comments <> 0
+							   AND LENGTH(TRIM(user_email)) > 0'.$except_condition;
+				$notify_list = $DB->get_results( $sql );
+
+				// Preprocess list:
+				foreach( $notify_list as $notification )
+				{
+					$notify_users[$notification->user_ID] = build_notify_data( $notification->user_email, $notification->user_locale, $notification->user_unsubscribe_key, 'blog_subscription' );
+				}
 			}
 		}
 
-		// Check if we need to include the author:
-		$item_author_User = & $edited_Item->get_creator_User();
-		if( $item_author_User->notify
-				&& ( ! empty( $item_author_User->email ) ) )
-		{ // Author wants to be notified...
-			if( ! ($this->get_author_User() // comment is from registered user
-							&& $item_author_User->login == $this->author_User->login) ) // comment is from same user as post
-				{	// Author is not commenting on his own post...
-					$notify_array[$item_author_User->email] = $item_author_User->locale;
-				}
-		}
-
-		if( ! count($notify_array) )
+		if( ! count( $notify_users ) )
 		{ // No-one to notify:
 			return false;
 		}
@@ -1605,8 +1756,14 @@ class Comment extends DataObject
 		}
 
 		// Send emails:
-		foreach( $notify_array as $notify_email => $notify_locale )
+		foreach( $notify_users as $notify_user_ID => $notify_data )
 		{
+			// get data content
+			$notify_email = $notify_data[ 'email' ];
+			$notify_locale = $notify_data[ 'locale' ];
+			$notify_key = $notify_data[ 'key' ];
+			$notify_type = $notify_data[ 'type' ];
+
 			locale_temp_switch($notify_locale);
 
 			switch( $this->type )
@@ -1619,6 +1776,10 @@ class Comment extends DataObject
 				default:
 					/* TRANS: Subject of the mail to send on new comments. First %s is the blog's shortname, the second %s is the item's title. */
 					$subject = T_('[%s] New comment on "%s"');
+					if( $only_moderators )
+					{
+						$subject = T_('[%s] New comment awaiting moderation on "%s"');
+					}
 			}
 
 			$subject = sprintf( $subject, $edited_Blog->get('shortname'), $edited_Item->get('title') );
@@ -1664,14 +1825,34 @@ class Comment extends DataObject
 			$notify_message .= $this->get('content')
 				."\n\n-- \n";
 
-			if( $this->status == 'draft' )
-			{
+			if( $notify_type == 'moderator' )
+			{ // moderation email
 				$secret_value = '&secret='.$this->secret;
 				$notify_message .= T_('Quick moderation').': '.$htsrv_url.'comment_review.php?cmt_ID='.$this->ID.$secret_value."\n\n";
+				$notify_message .= T_('Edit comment').': '.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$this->ID."\n\n";
 			}
-
-			$notify_message .= T_('Edit comment').': '.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$this->ID."\n\n"
-							   .T_('Edit your subscriptions/notifications').': '.str_replace('&amp;', '&', url_add_param( $edited_Blog->gen_blogurl(), 'disp=subs' ) )."\n";
+			else if( $notify_type == 'blog_subscription' )
+			{ // blog subscription
+				$notify_message .= T_( 'You are receiving notifications when anyone comments on any post.' )."\n";
+				$notify_message .= T_( 'If you don\'t want to receive any more notifications on this blog, click here' ).': '
+									.$htsrv_url.'quick_unsubscribe.php?type=collection&user_ID='.$notify_user_ID.'&coll_ID='.$edited_Blog->ID.'&key='.md5( $notify_user_ID.$notify_key )."\n\n";
+			}
+			else if( $notify_type == 'item_subscription' )
+			{ // item subscription
+				$notify_message .= T_( 'You are receiving notifications when anyone comments on this post.' )."\n";
+				$notify_message .= T_( 'If you don\'t want to receive any more notifications on this post, click here' ).': '
+									.$htsrv_url.'quick_unsubscribe.php?type=post&user_ID='.$notify_user_ID.'&post_ID='.$edited_Item->ID.'&key='.md5( $notify_user_ID.$notify_key )."\n\n";
+			}
+			else if( $notify_type == 'creator' )
+			{ // user is the creator of the post
+				$notify_message .= T_( 'This is your post. You are receiving notifications when anyone comments on your posts. ' )."\n";
+				$notify_message .= T_( 'If you don\'t want to receive any more notifications on your posts, click here' ).': '
+									.$htsrv_url.'quick_unsubscribe.php?type=creator&user_ID='.$notify_user_ID.'&key='.md5( $notify_user_ID.$notify_key )."\n\n";
+			}
+			else
+			{
+				debug_die( 'Unknown user subscription type' );
+			}
 
 			if( $debug )
 			{
@@ -1838,6 +2019,9 @@ class Comment extends DataObject
 
 /*
  * $Log$
+ * Revision 1.82  2011/05/19 17:47:07  efy-asimo
+ * register for updates on a specific blog post
+ *
  * Revision 1.81  2011/03/04 08:40:23  efy-asimo
  * Add params to content display template
  *

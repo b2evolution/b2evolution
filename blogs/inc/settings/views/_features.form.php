@@ -65,11 +65,11 @@ $Form->begin_fieldset( T_('Online Help').get_manual_link('online help'));
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('After each new post...').get_manual_link('after_each_post_settings') );
+$Form->begin_fieldset( T_('After each new post or comment...').get_manual_link('after_each_post_settings') );
 	$Form->radio_input( 'outbound_notifications_mode', $Settings->get('outbound_notifications_mode'),
 		array(
 			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('No notification about your new content will be sent out.') ),
-			array( 'value'=>'immediate', 'label'=>T_('Immediate'), 'note'=>T_('This is guaranteed to work but may create an annoying delay after each post.') ),
+			array( 'value'=>'immediate', 'label'=>T_('Immediate'), 'note'=>T_('This is guaranteed to work but may create an annoying delay after each post or comment publication.') ),
 			array( 'value'=>'cron', 'label'=>T_('Asynchronous'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up.') )
 		),
 		T_('Outbound pings & email notifications'),
@@ -219,6 +219,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.29  2011/05/19 17:47:07  efy-asimo
+ * register for updates on a specific blog post
+ *
  * Revision 1.28  2010/10/19 02:00:53  fplanque
  * MFB
  *

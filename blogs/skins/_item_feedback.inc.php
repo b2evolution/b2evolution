@@ -232,7 +232,44 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 
 }
 
+// ----------- Register for item's comment notification -----------
+if( is_logged_in() && $Item->can_comment( NULL ) )
+{
+	global $DB, $htsrv_url;
+	$not_subscribed = true;
+	$creator_User = $Item->get_creator_User();
 
+	if( $Blog->get_setting( 'allow_subscriptions' ) )
+	{
+		$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
+					WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';
+		if( $DB->get_var( $sql ) > 0 )
+		{
+			echo '<p>'.T_( 'You are receiving notifications when anyone comments on any post.' );
+			echo ' <a href="'.$Blog->gen_baseurl().'?disp=subs">'.T_( 'Click here to manage your subscriptions.' ).'</a></p>';
+			$not_subscribed = false;
+		}
+	}
+
+	if( $not_subscribed && ( $creator_User->ID == $current_User->ID ) && ( $current_User->get( 'notify' ) != 0 ) )
+	{
+		echo '<p>'.T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' );
+		echo ' <a href="'.$Blog->gen_baseurl().'?disp=subs">'.T_( 'Click here to manage your subscriptions.' ).'</a></p>';
+		$not_subscribed = false;
+	}
+	if( $not_subscribed && $Blog->get_setting( 'allow_item_subscriptions' ) )
+	{
+		if( get_user_isubscription( $current_User->ID, $Item->ID ) )
+		{
+			echo '<p>'.T_( 'You will be notified by email when someone comments here.' );
+			echo ' <a href="'.$htsrv_url.'isubs_update.php?p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'itemsubs' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></p>';
+		}
+		else
+		{
+			echo '<p><a href="'.$htsrv_url.'isubs_update.php?p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'itemsubs' ).'">'.T_( 'Notify me by email when someone comments here.' ).'</a></p>';
+		}
+	}
+}
 
 // ------------------ COMMENT FORM INCLUDED HERE ------------------
 skin_include( '_item_comment_form.inc.php', $params );
@@ -243,6 +280,9 @@ skin_include( '_item_comment_form.inc.php', $params );
 
 /*
  * $Log$
+ * Revision 1.30  2011/05/19 17:47:07  efy-asimo
+ * register for updates on a specific blog post
+ *
  * Revision 1.29  2010/12/19 06:17:21  sam2kb
  * Fixed paged comments
  *

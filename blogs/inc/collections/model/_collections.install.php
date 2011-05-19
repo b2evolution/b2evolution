@@ -207,6 +207,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_spam_karma    TINYINT NULL,
 			comment_allow_msgform TINYINT NOT NULL DEFAULT 0,
 			comment_secret        varchar(32) NULL default NULL,
+			comment_notif_status  ENUM('noreq','todo','started','finished') NOT NULL DEFAULT 'noreq',
+			comment_notif_ctsk_ID INT(10) unsigned NULL DEFAULT NULL,
 			PRIMARY KEY comment_ID (comment_ID),
 			KEY comment_post_ID (comment_post_ID),
 			KEY comment_date (comment_date),
@@ -268,6 +270,16 @@ $schema_queries = array_merge( $schema_queries, array(
 			itag_tag_ID int(11) unsigned NOT NULL,
 			PRIMARY KEY (itag_itm_ID, itag_tag_ID),
 			UNIQUE tagitem ( itag_tag_ID, itag_itm_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_items__subscriptions' => array(
+		'Creating table for a specific blog post subscriptions',
+		"CREATE TABLE T_items__subscriptions (
+			isub_item_ID    int(11) unsigned NOT NULL,
+			isub_user_ID    int(11) unsigned NOT NULL,
+			isub_comments   tinyint(1) NOT NULL,
+			isub_attend     tinyint(1) NOT NULL,
+			PRIMARY KEY (isub_item_ID, isub_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_subscriptions' => array(

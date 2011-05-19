@@ -24,25 +24,26 @@ $default_ctrl = 'dashboard';
  *  change {@link $tableprefix} in _basic_config.php)
  */
 $db_config['aliases'] = array_merge( $db_config['aliases'], array(
-		'T_blogs'               => $tableprefix.'blogs',
-		'T_categories'          => $tableprefix.'categories',
-		'T_coll_group_perms'    => $tableprefix.'bloggroups',
-		'T_coll_user_perms'     => $tableprefix.'blogusers',
-		'T_coll_settings'       => $tableprefix.'coll_settings',
-		'T_comments'            => $tableprefix.'comments',
-		'T_items__item'         => $tableprefix.'items__item',
-		'T_items__itemtag'      => $tableprefix.'items__itemtag',
-		'T_items__prerendering' => $tableprefix.'items__prerendering',
-		'T_items__status'       => $tableprefix.'items__status',
-		'T_items__tag'          => $tableprefix.'items__tag',
-		'T_items__type'         => $tableprefix.'items__type',
-		'T_items__version'      => $tableprefix.'items__version',
-		'T_links'               => $tableprefix.'links',
-		'T_postcats'            => $tableprefix.'postcats',
-		'T_skins__container'    => $tableprefix.'skins__container',
-		'T_skins__skin'         => $tableprefix.'skins__skin',
-		'T_subscriptions'       => $tableprefix.'subscriptions',
-		'T_widget'              => $tableprefix.'widget',
+		'T_blogs'                => $tableprefix.'blogs',
+		'T_categories'           => $tableprefix.'categories',
+		'T_coll_group_perms'     => $tableprefix.'bloggroups',
+		'T_coll_user_perms'      => $tableprefix.'blogusers',
+		'T_coll_settings'        => $tableprefix.'coll_settings',
+		'T_comments'             => $tableprefix.'comments',
+		'T_items__item'          => $tableprefix.'items__item',
+		'T_items__itemtag'       => $tableprefix.'items__itemtag',
+		'T_items__prerendering'  => $tableprefix.'items__prerendering',
+		'T_items__status'        => $tableprefix.'items__status',
+		'T_items__tag'           => $tableprefix.'items__tag',
+		'T_items__type'          => $tableprefix.'items__type',
+		'T_items__subscriptions' => $tableprefix.'items__subscriptions',
+		'T_items__version'       => $tableprefix.'items__version',
+		'T_links'                => $tableprefix.'links',
+		'T_postcats'             => $tableprefix.'postcats',
+		'T_skins__container'     => $tableprefix.'skins__container',
+		'T_skins__skin'          => $tableprefix.'skins__skin',
+		'T_subscriptions'        => $tableprefix.'subscriptions',
+		'T_widget'               => $tableprefix.'widget',
 	) );
 
 /**
@@ -756,6 +757,9 @@ $collections_Module = new collections_Module();
 
 /*
  * $Log$
+ * Revision 1.24  2011/05/19 17:47:07  efy-asimo
+ * register for updates on a specific blog post
+ *
  * Revision 1.23  2011/02/15 15:37:00  efy-asimo
  * Change access to admin permission
  *

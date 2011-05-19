@@ -29,7 +29,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var DB
  */
-global $DB;
+global $DB, $UserSettings;
 
 if( ! is_logged_in() )
 { // must be logged in!
@@ -59,7 +59,10 @@ $Form->begin_form( 'bComment' );
 
 		$Form->text( 'newuser_email', $current_User->get( 'email' ), 40, T_('Email'), '', 100, 'bComment' );
 
-		$Form->checkbox( 'newuser_notify', $current_User->get( 'notify' ), T_('Notifications'), T_('Check this to receive a notification whenever someone else comments on one of <strong>your</strong> posts.') );
+		$notify_options = array(
+			array( 'newuser_notify', 1, T_( 'Notify me by email whenever a comment is published on one of <strong>my</strong> posts.' ), $current_User->get( 'notify' ) ),
+			array( 'newuser_notify_moderation', 2, T_( 'Notify me by email whenever a comment is awaiting moderation on one of <strong>my</strong> blogs.' ), $current_User->get( 'notify_moderation' ) ) );
+		$Form->checklist( $notify_options, 'newuser_notification', T_( 'Notifications' ) );
 
 	$Form->end_fieldset();
 
@@ -116,6 +119,9 @@ $Form->end_form( array( array( '', '', T_('Update'), 'SaveButton' ),
 
 /*
  * $Log$
+ * Revision 1.9  2011/05/19 17:47:07  efy-asimo
+ * register for updates on a specific blog post
+ *
  * Revision 1.8  2010/02/08 17:56:14  efy-yury
  * copyright 2009 -> 2010
  *

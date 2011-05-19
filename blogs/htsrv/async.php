@@ -192,6 +192,11 @@ switch( $action )
 			$edited_Comment->set('status', $status );
 			$edited_Comment->dbupdate();
 
+			if( $status == 'published' )
+			{
+				$edited_Comment->handle_notifications();
+			}
+
 			if( $moderation != NULL )
 			{
 				$statuses = param( 'statuses', 'string', NULL );
@@ -380,6 +385,9 @@ echo '-collapse='.$collapse;
 
 /*
  * $Log$
+ * Revision 1.66  2011/05/19 17:47:07  efy-asimo
+ * register for updates on a specific blog post
+ *
  * Revision 1.65  2011/03/16 13:34:53  efy-asimo
  * animate comment delete
  *

@@ -52,6 +52,8 @@ switch( $action )
 
 		$posted_Comment->dbupdate();	// Commit update to the DB
 
+		$posted_Comment->handle_notifications();
+
 		$Messages->add( T_('Comment has been published.'), 'success' );
 
 		header_redirect( $to_dashboard );
@@ -202,6 +204,9 @@ else
 <?php
 /*
  * $Log$
+ * Revision 1.13  2011/05/19 17:47:07  efy-asimo
+ * register for updates on a specific blog post
+ *
  * Revision 1.12  2011/03/16 01:31:19  fplanque
  * minor
  *

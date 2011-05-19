@@ -110,6 +110,8 @@ $schema_queries = array(
 			user_idmode varchar(20) NOT NULL DEFAULT 'login',
 			user_allow_msgform TINYINT NOT NULL DEFAULT '2',
 			user_notify tinyint(1) NOT NULL default 0,
+			user_notify_moderation tinyint(1) NOT NULL default 0,
+			user_unsubscribe_key varchar(32) NOT NULL default '',
 			user_showonline tinyint(1) NOT NULL default 1,
 			user_gender char(1) NULL,
 			user_grp_ID int(4) NOT NULL default 1,
@@ -283,6 +285,9 @@ $schema_queries = array(
 
 /*
  * $Log$
+ * Revision 1.56  2011/05/19 17:47:07  efy-asimo
+ * register for updates on a specific blog post
+ *
  * Revision 1.55  2011/02/17 14:56:38  efy-asimo
  * Add user source param
  *

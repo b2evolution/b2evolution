@@ -430,8 +430,26 @@ function get_opentrash_link( $check_perm = true, $force_show = false )
 }
 
 
+/**
+ * Creates an array for the notification email
+ * 
+ * @param string user email
+ * @param string user locale
+ * @param string user unsubscribe key
+ * @param string notification type ( moderator, creator, blog_subscription, item_subscription )
+ * @return array user data
+ */
+function build_notify_data( $notify_email, $notify_locale, $notify_key, $notify_type )
+{
+	return array( 'email' => $notify_email, 'locale' => $notify_locale, 'key' => $notify_key, 'type' => $notify_type );
+}
+
+
 /*
  * $Log$
+ * Revision 1.28  2011/05/19 17:47:07  efy-asimo
+ * register for updates on a specific blog post
+ *
  * Revision 1.27  2011/03/16 13:56:05  efy-asimo
  * Update show "Open recycle bin"
  *

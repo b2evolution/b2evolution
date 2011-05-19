@@ -45,6 +45,7 @@ $Session->assert_received_crumb( 'subsform' );
 param( 'checkuser_id', 'integer', true );
 param( 'newuser_email', 'string', true );
 param( 'newuser_notify', 'integer', 0 );
+param( 'newuser_notify_moderation', 'integer', 0 );
 param( 'subs_blog_IDs', 'string', true );
 
 /**
@@ -86,6 +87,7 @@ if( $Messages->has_errors() )
 // Do the profile update:
 $current_User->set_email( $newuser_email );
 $current_User->set( 'notify', $newuser_notify );
+$current_User->set( 'notify_moderation', $newuser_notify_moderation );
 
 $current_User->dbupdate();
 
@@ -135,6 +137,9 @@ header_redirect();
 
 /*
  * $Log$
+ * Revision 1.32  2011/05/19 17:47:07  efy-asimo
+ * register for updates on a specific blog post
+ *
  * Revision 1.31  2010/11/25 15:16:34  efy-asimo
  * refactor $Messages
  *

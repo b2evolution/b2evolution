@@ -204,6 +204,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Subscriptions') );
 	$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post and/or comment.') );
+	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for a specific post comments.' ) );
 	// TODO: checkbox 'Enable RSS/Atom feeds'
 	// TODO2: which feeds (skins)?
 $Form->end_fieldset();
@@ -250,6 +251,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.40  2011/05/19 17:47:07  efy-asimo
+ * register for updates on a specific blog post
+ *
  * Revision 1.39  2011/03/02 09:45:59  efy-asimo
  * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
  *
