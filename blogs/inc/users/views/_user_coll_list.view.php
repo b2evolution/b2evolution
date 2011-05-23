@@ -67,6 +67,12 @@ $Results->cols[] = array(
 
 function disp_coll_name( $coll_name, $coll_ID )
 {
+	global $current_User;
+	if( ! $current_User->check_perm( 'admin', 'normal' ) )
+	{
+		return $coll_name;
+	}
+
 	$edit_url = regenerate_url( 'ctrl', 'ctrl=coll_settings&amp;blog='.$coll_ID );
 
 	return '<a href="'.$edit_url.'" title="'.T_('Edit properties...').'">'.$coll_name.'</a>';
@@ -99,6 +105,12 @@ $Results->cols[] = array(
 
 function disp_actions( $curr_blog_ID )
 {
+	global $current_User;
+	if( ! $current_User->check_perm( 'admin', 'normal' ) )
+	{
+		return '';
+	}
+
 	$r = action_icon( T_('Edit properties...'), 'properties', regenerate_url( 'ctrl', 'ctrl=coll_settings&amp;blog='.$curr_blog_ID ) );
 	$r .= action_icon( T_('Edit categories...'), 'edit', regenerate_url( 'ctrl', 'ctrl=chapters&amp;blog='.$curr_blog_ID ) );
 	$r .= action_icon( T_('Delete this blog...'), 'delete', regenerate_url( 'ctrl', 'ctrl=collections&amp;action=delete&amp;blog='.$curr_blog_ID.'&amp;'.url_crumb('collection') ) );
@@ -121,6 +133,9 @@ $this->disp_payload_end();
 
 /*
  * $Log$
+ * Revision 1.4  2011/05/23 13:46:06  efy-asimo
+ * Add admin normal access permission check before displaying personal blogs actions
+ *
  * Revision 1.3  2011/05/11 07:11:52  efy-asimo
  * User settings update
  *
