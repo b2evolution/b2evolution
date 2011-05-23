@@ -1125,32 +1125,6 @@ class Item extends ItemLight
 
 
 	/**
-	 * This is like a teaser with no HTML and a cropping.
-	 *
-	 * Note: Excerpt and Teaser are TWO DIFFERENT THINGS.
-	 *
-	 * @param int Max length of excerpt
-	 * @return string
-	 */
-	function get_content_excerpt( $crop_at = 200 )
-	{
-		// Get teaser for page 1:
-		// fp> Note: I'm not sure about using 'text' here, but there should definitely be no rendering here.
-		$output = $this->get_content_teaser( 1, false, 'text' );
-
-		// Get rid of all HTML:
-		$output = strip_tags( $output );
-
-		// Ger rid of all new lines:
-		$output = trim( str_replace( array( "\r", "\n", "\t" ), array( ' ', ' ', ' ' ), $output ) );
-
-		$output = strmaxlen($output, $crop_at);
-
-		return $output;
-	}
-
-
-	/**
 	 * Display content teaser of item (will stop at "<!-- more -->"
 	 */
 	function content_teaser( $params )
@@ -2067,6 +2041,13 @@ class Item extends ItemLight
 	{
 		if( ! $this->can_see_comments() )
 		{	// Comments disabled
+			return;
+		}
+
+		$this->load_Blog();
+
+		if( $this->Blog->get_setting( 'comment_feed_content' ) == 'none' )
+		{	// Comment feeds disabled
 			return;
 		}
 
@@ -4563,6 +4544,9 @@ class Item extends ItemLight
 
 /*
  * $Log$
+ * Revision 1.224  2011/05/23 02:20:07  sam2kb
+ * Option to display excerpts in comment feeds, or disable feeds completely
+ *
  * Revision 1.223  2011/05/05 20:18:54  sam2kb
  * More replacement tags for item footer
  *

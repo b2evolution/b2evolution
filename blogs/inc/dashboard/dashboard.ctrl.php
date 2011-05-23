@@ -497,7 +497,7 @@ if( $blog )
 					'restrict_to_image_position' => 'teaser',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 				) );
 
-			echo '<div class="small">'.$Item->get_content_excerpt( 150 ).'</div>';
+			echo '<div class="small">'.excerpt( $Item->get_content_teaser( 1, false ), 150 ).'</div>';
 
 			echo '<div style="clear:left;">'.get_icon('pixel').'</div>'; // IE crap
 			echo '</div>';
@@ -723,6 +723,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.78  2011/05/23 02:20:07  sam2kb
+ * Option to display excerpts in comment feeds, or disable feeds completely
+ *
  * Revision 1.77  2011/05/11 07:11:51  efy-asimo
  * User settings update
  *

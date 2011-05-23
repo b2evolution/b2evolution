@@ -253,25 +253,14 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 
 	// Restore "redir" param
 	forget_param('redir');
-	
-	// _______________________________________________________________
 
 	// Display count of comments to be moderated:
 	$Item->feedback_moderation( 'feedbacks', '<div class="moderation_msg"><p>', '</p></div>', '',
 			T_('This post has 1 feedback awaiting moderation... %s'),
 			T_('This post has %d feedbacks awaiting moderation... %s') );
 
-	// _______________________________________________________________
-
-	if( $Blog->get_setting( 'feed_content' ) != 'none' )
-	{
-		// Display link for comments feed:
-		$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
-
-	}
-
-	// _______________________________________________________________
-
+	// Display link for comments feed:
+	$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
 }
 
 

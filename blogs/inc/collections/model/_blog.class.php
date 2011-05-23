@@ -385,12 +385,17 @@ class Blog extends DataObject
 			$this->set_setting( 'archives_sort_order', param( 'archives_sort_order', 'string', false ) );
 		}
 
-		if( param( 'feed_content',   'string', NULL ) !== NULL )
+		if( param( 'feed_content', 'string', NULL ) !== NULL )
 		{ // How much content in feeds?
 			$this->set_setting( 'feed_content', get_param( 'feed_content' ) );
 
 			param_integer_range( 'posts_per_feed', 1, 9999, T_('Items per feed must be between %d and %d.') );
 			$this->set_setting( 'posts_per_feed', get_param( 'posts_per_feed' ) );
+		}
+
+		if( param( 'comment_feed_content', 'string', NULL ) !== NULL )
+		{ // How much content in comment feeds?
+			$this->set_setting( 'comment_feed_content', get_param( 'comment_feed_content' ) );
 		}
 
 		if( param( 'require_title', 'string', NULL ) !== NULL )
@@ -2365,6 +2370,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.132  2011/05/23 02:20:07  sam2kb
+ * Option to display excerpts in comment feeds, or disable feeds completely
+ *
  * Revision 1.131  2011/05/19 17:47:07  efy-asimo
  * register for updates on a specific blog post
  *

@@ -15,6 +15,14 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+// What level of detail do we want?
+$feed_content = $Blog->get_setting('comment_feed_content');
+if( $feed_content == 'none' )
+{	// We don't want to provide this feed!
+	// This will normaly have been detected earlier but just for security:
+	debug_die( 'Feeds are disabled.');
+}
+
 $post_ID = NULL;
 if( isset($Item) )
 {	// Comments for a specific Item:
@@ -68,12 +76,12 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 	<generator uri="http://b2evolution.net/" version="<?php echo $app_version ?>"><?php echo $app_name ?></generator>
 	<updated><?php echo gmdate('Y-m-d\TH:i:s\Z'); ?></updated>
 	<?php while( $Comment = & $CommentList->get_next() )
-	{ /* Loop through comments: */ ?>
+	{	/* Loop through comments: */ ?>
 	<entry>
 		<title type="text"><?php
 			echo format_to_output( T_('In response to:'), 'xml' ).' ';
-			$Comment->get_Item();
-			$Comment->Item->title( array(
+				$Comment->get_Item();
+				$Comment->Item->title( array(
 				'format' => 'xml',
 				'link_type' => 'none',
 			) ); ?></title>
@@ -85,7 +93,14 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 		<id><?php $Comment->permanent_url() ?></id>
 		<published><?php $Comment->date( 'isoZ', true ); ?></published>
 		<updated><?php $Comment->date( 'isoZ', true ); ?></updated>
-		<content type="html"><![CDATA[<?php echo make_rel_links_abs( $Comment->get_content() ); ?>]]></content>
+		<?php
+		$content = $Comment->get_content();
+		if( $feed_content == 'excerpt' )
+		{
+			$content = excerpt($content);
+		}
+		?>
+		<content type="html"><![CDATA[<?php echo make_rel_links_abs($content); ?>]]></content>
 	</entry>
 	<?php
 	} // End of comment loop.

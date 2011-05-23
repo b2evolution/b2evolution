@@ -382,6 +382,27 @@ function zeroise( $number, $threshold )
 
 
 /**
+ * Get a limited text-only excerpt
+ *
+ * @param string
+ * @param int Maximum length
+ * @return string
+ */
+function excerpt( $str, $crop_at = 200 )
+{
+	// fp> Note: I'm not sure about using 'text' here, but there should definitely be no rendering here.
+	$output = format_to_output( $str, 'text' );
+
+	// Ger rid of all new lines:
+	$output = trim( str_replace( array( "\r", "\n", "\t" ), array( ' ', ' ', ' ' ), $output ) );
+
+	$output = strmaxlen($output, $crop_at);
+
+	return $output;
+}
+
+
+/**
  * Crop string to maxlen with &hellip; (default tail) at the end if needed.
  *
  * If $format is not "raw", we make sure to not cut in the middle of an
@@ -4120,6 +4141,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.252  2011/05/23 02:20:06  sam2kb
+ * Option to display excerpts in comment feeds, or disable feeds completely
+ *
  * Revision 1.251  2011/05/04 17:44:21  sam2kb
  * More checks before forking a shutdown process
  *

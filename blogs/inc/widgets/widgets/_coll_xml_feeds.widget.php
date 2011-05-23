@@ -150,7 +150,7 @@ class coll_xml_feeds_Widget extends ComponentWidget
 			echo $this->disp_params['item_start'];
 			echo $Skin->name.': ';
 			echo '<a href="'.$Blog->get_item_feed_url( $Skin->folder ).'">'.T_('Posts').'</a>';
-			if ( $Blog->get_setting( 'allow_comments') != 'never' )
+			if ( $Blog->get_setting( 'allow_comments') != 'never' && $Blog->get_setting( 'comment_feed_content') != 'none' )
 			{
 				echo ', <a href="'.$Blog->get_comment_feed_url( $Skin->folder ).'">'.T_('Comments').'</a>';
 			}
@@ -172,7 +172,7 @@ class coll_xml_feeds_Widget extends ComponentWidget
 			$feedhlp = $global_Cache->get( 'feedhlp' );
 			if( empty( $feedhlp ) )
 			{	// Use basic default: (fp> needs serious update) -- Note: no localization because destination is in English anyway.
-				$feedhlp = array( array( 'http://webreference.fr/2006/08/30/rss_atom_xml', 'What is RSS?' ) );
+				$feedhlp = array( array( 'http://www.webreference.fr/defintions/rss-atom-xml', 'What is RSS?' ) );
 			}
 
 			if( $this->disp_params[ 'info_link' ] )
@@ -195,6 +195,9 @@ class coll_xml_feeds_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.24  2011/05/23 02:20:07  sam2kb
+ * Option to display excerpts in comment feeds, or disable feeds completely
+ *
  * Revision 1.23  2011/03/02 09:45:59  efy-asimo
  * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
  *

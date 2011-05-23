@@ -15,6 +15,14 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+// What level of detail do we want?
+$feed_content = $Blog->get_setting('comment_feed_content');
+if( $feed_content == 'none' )
+{	// We don't want to provide this feed!
+	// This will normaly have been detected earlier but just for security:
+	debug_die( 'Feeds are disabled.');
+}
+
 $post_ID = NULL;
 if( isset($Item) )
 {	// Comments for a specific Item:
@@ -69,7 +77,13 @@ echo '<?xml version="1.0" encoding="'.$io_charset.'"?'.'>';
 				'format' => 'xml',
 				'link_type' => 'none',
 			) ); ?></title>
-			<description><?php echo make_rel_links_abs( $Comment->get_content('entityencoded') ); ?></description>
+			<?php
+			$content = $Comment->get_content();
+			if( $feed_content == 'excerpt' )
+			{
+				$content = excerpt($content);
+			}
+			?><description><?php echo make_rel_links_abs( format_to_output( $content, 'entityencoded' ) ); ?></description>
 			<link><?php $Comment->permanent_url() ?></link>
 		</item>
 		<?php } // End of comment loop. ?>

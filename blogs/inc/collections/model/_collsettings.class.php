@@ -131,6 +131,9 @@ class CollectionSettings extends AbstractSettings
 			'xml_item_footer_text' => '<p><small><a href="$perm_url$">Original post</a> blogged on <a href="http://b2evolution.net/">b2evolution</a>.</small></p>',
 			'image_size'	=> 'fit-320x320',
 
+		// Comment feed settings:
+			'comment_feed_content' => 'normal',
+
 		// Sitemaps settings:
 			'enable_sitemaps' => 1,
 
@@ -185,6 +188,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.57  2011/05/23 02:20:07  sam2kb
+ * Option to display excerpts in comment feeds, or disable feeds completely
+ *
  * Revision 1.56  2011/05/19 17:47:07  efy-asimo
  * register for updates on a specific blog post
  *

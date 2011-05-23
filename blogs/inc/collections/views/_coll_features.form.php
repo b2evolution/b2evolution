@@ -168,6 +168,11 @@ $Form->begin_fieldset( T_('RSS/Atom feeds') );
 		$params['force_keys_as_values'] = true;
 		$Form->select_input_array( 'image_size', $edited_Blog->get_setting('image_size') , get_available_thumb_sizes(), T_('Image size'), '', $params );
 	}
+	$Form->radio( 'comment_feed_content', $edited_Blog->get_setting('comment_feed_content'),
+								array(  array( 'none', T_('No feeds') ),
+										array( 'excerpt', T_('Comment excerpts') ),
+										array( 'normal', T_('Standard comment contents') ),
+									), T_('Comment feed contents'), true, T_('How much content do you want to make available in comment feeds?') );
 $Form->end_fieldset();
 
 
@@ -251,6 +256,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.41  2011/05/23 02:20:07  sam2kb
+ * Option to display excerpts in comment feeds, or disable feeds completely
+ *
  * Revision 1.40  2011/05/19 17:47:07  efy-asimo
  * register for updates on a specific blog post
  *

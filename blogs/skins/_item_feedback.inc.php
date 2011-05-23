@@ -212,24 +212,13 @@ if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_ping
 	// Restore "redir" param
 	forget_param('redir');
 
-	// _______________________________________________________________
-
 	// Display count of comments to be moderated:
 	$Item->feedback_moderation( 'feedbacks', '<div class="moderation_msg"><p>', '</p></div>', '',
 			T_('This post has 1 feedback awaiting moderation... %s'),
 			T_('This post has %d feedbacks awaiting moderation... %s') );
 
-	// _______________________________________________________________
-
-	if( $Blog->get_setting( 'feed_content' ) != 'none' )
-	{ // fp: TODO; move this tesqt into feedback_feed_link()
-		// Display link for comments feed:
-		$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
-
-	}
-
-	// _______________________________________________________________
-
+	// Display link for comments feed:
+	$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );
 }
 
 // ----------- Register for item's comment notification -----------
@@ -280,6 +269,9 @@ skin_include( '_item_comment_form.inc.php', $params );
 
 /*
  * $Log$
+ * Revision 1.31  2011/05/23 02:20:07  sam2kb
+ * Option to display excerpts in comment feeds, or disable feeds completely
+ *
  * Revision 1.30  2011/05/19 17:47:07  efy-asimo
  * register for updates on a specific blog post
  *
