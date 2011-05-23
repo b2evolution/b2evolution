@@ -162,7 +162,7 @@ else
 	}
 	$sql = $SQL->get();
 }
-echo $sql;
+
 // Create result set:
 $Results = new Results( $sql, '', $split_engines ? '--D' : '-D' , NULL, $sql_count );
 
@@ -270,6 +270,9 @@ $Results->display();
 
 /*
  * $Log$
+ * Revision 1.11  2011/05/23 03:15:52  sam2kb
+ * minor
+ *
  * Revision 1.10  2010/11/03 19:44:15  sam2kb
  * Increased modularity - files_Module
  * Todo:
