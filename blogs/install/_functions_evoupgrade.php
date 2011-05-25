@@ -2955,6 +2955,16 @@ function upgrade_b2evo_tables()
 	}
 	task_end();
 
+	task_begin( 'Upgrading items table, add attend status...' );
+	db_add_col( 'T_items__item', 'post_attend_status', 'tinyint(1) NOT NULL default 0 AFTER post_comment_status' );
+	task_end();
+
+	task_begin( 'Upgrading specific blog post subscriptions...' );
+	$DB->query( 'ALTER TABLE T_items__subscriptions
+					MODIFY COLUMN isub_comments tinyint(1) NOT NULL default 0,
+					MODIFY COLUMN isub_attend tinyint(1) NOT NULL default 0' );
+	task_end();
+
 	/*
 	 * ADD UPGRADES HERE.
 	 *
@@ -3152,6 +3162,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.394  2011/05/25 14:59:34  efy-asimo
+ * Post attending
+ *
  * Revision 1.393  2011/05/19 17:47:07  efy-asimo
  * register for updates on a specific blog post
  *

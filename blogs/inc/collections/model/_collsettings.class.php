@@ -74,7 +74,8 @@ class CollectionSettings extends AbstractSettings
 			'disable_comments_bypost' => '1',
 			'allow_anon_url' => '0',
 			'allow_attachments' => 'registered',
-			'allow_rating'   => 'never',
+			'allow_rating' => 'never',
+			'allow_attending' => 'never',
 			'comments_orderdir' => 'ASC',
 			'paged_comments' => '0',
 			'comments_per_page' => 1000,
@@ -188,6 +189,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.58  2011/05/25 14:59:33  efy-asimo
+ * Post attending
+ *
  * Revision 1.57  2011/05/23 02:20:07  sam2kb
  * Option to display excerpts in comment feeds, or disable feeds completely
  *

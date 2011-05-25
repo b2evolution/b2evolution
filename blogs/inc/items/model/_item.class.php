@@ -150,6 +150,11 @@ class Item extends ItemLight
 	 * @var string
 	 */
 	var $comment_status;
+	/**
+	 * Attend status
+	 * @var boolean
+	 */
+	var $attend_status;
 
 	var $pst_ID;
 	var $datedeadline = '';
@@ -308,6 +313,7 @@ class Item extends ItemLight
 			$this->notifications_status = $db_row->post_notifications_status;
 			$this->notifications_ctsk_ID = $db_row->post_notifications_ctsk_ID;
 			$this->comment_status = $db_row->post_comment_status;			// Comments status
+			$this->attend_status = $db_row->post_attend_status;
 			$this->order = $db_row->post_order;
 			$this->featured = $db_row->post_featured;
 			for( $i = 1 ; $i <= 5; $i++ )
@@ -547,6 +553,11 @@ class Item extends ItemLight
 			{ // 'open' or 'closed' or ...
 				$this->set_from_Request( 'comment_status' );
 			}
+		}
+
+		if( $this->Blog->get_setting( 'allow_attending' ) == 'enable_bypost' )
+		{
+			$this->set( 'attend_status', param( 'post_attend_status', 'integer', 0 ), false );
 		}
 
 		if( param( 'renderers_displayed', 'integer', 0 ) )
@@ -4539,11 +4550,38 @@ class Item extends ItemLight
 				return '';
 		}
 	}
+
+
+	/**
+	 * Get this item attendes (list of users that have isub_attend = 1)
+	 * 
+	 * @return mixed NULL if item doesn't allow attending or array with specific user fields
+	 */
+	function get_attendants()
+	{
+		global $DB;
+
+		$this->load_Blog();
+		$blog_attend_status = $this->Blog->get_setting( 'allow_attending' );
+		if( ( $blog_attend_status == 'never' )
+			|| ( ( $blog_attend_status == 'enable_bypost' ) && ( $this->get( 'attend_status' ) == 1 ) ) )
+		{
+			return NULL;
+		}
+
+		$sql = 'SELECT DISTINCT T_users.*
+					FROM T_items__subscriptions INNER JOIN T_users ON isub_user_ID = user_ID
+				 WHERE isub_item_ID = '.$this->ID.' AND isub_attend <> 0';
+		return $DB->get_results( $sql, OBJECT, 'Find item attendants' );
+	}
 }
 
 
 /*
  * $Log$
+ * Revision 1.225  2011/05/25 14:59:34  efy-asimo
+ * Post attending
+ *
  * Revision 1.224  2011/05/23 02:20:07  sam2kb
  * Option to display excerpts in comment feeds, or disable feeds completely
  *

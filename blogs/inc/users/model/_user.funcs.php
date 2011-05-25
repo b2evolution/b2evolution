@@ -923,9 +923,10 @@ function get_user_isubscription( $user_ID, $item_ID )
  * @param integer user ID
  * @param integer item ID
  * @param integer value 0 for unsubscribe and 1 for subscribe
+ * @param string item subscriotion type ( isub_comments, isub_attend )
  * @return boolean true is new value was successfuly set, false otherwise
  */
-function set_user_isubscription( $user_ID, $item_ID, $value )
+function set_user_isubscription( $user_ID, $item_ID, $value, $type )
 {
 	global $DB;
 	if( ( $value < 0 ) || ( $value > 1 ) )
@@ -933,13 +934,21 @@ function set_user_isubscription( $user_ID, $item_ID, $value )
 		return false;
 	}
 
-	return $DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments, isub_attend )
-								VALUES ( '.$item_ID.', '.$user_ID.', '.$value.', 0 )' );
+	if( ( $type != 'isub_comments' ) && ( $type != 'isub_attend' ) )
+	{ // Invalid type. It should be 'isub_comments' or 'isub_attend'.
+		return false;
+	}
+
+	return $DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, '.$type.' )
+								VALUES ( '.$item_ID.', '.$user_ID.', '.$value.' )' );
 }
 
 
 /*
  * $Log$
+ * Revision 1.34  2011/05/25 14:59:34  efy-asimo
+ * Post attending
+ *
  * Revision 1.33  2011/05/19 17:47:07  efy-asimo
  * register for updates on a specific blog post
  *

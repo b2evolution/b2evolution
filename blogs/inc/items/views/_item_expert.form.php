@@ -417,6 +417,15 @@ $Form->begin_form( '', '', $params );
 		$Form->end_fieldset();
 	}
 
+	// ################### ATTENDING ###################
+
+	if( $Blog->get_setting( 'allow_attending' ) == 'enable_bypost' )
+	{
+		$Form->begin_fieldset( T_( 'Attending events' ) );
+		$Form->checkbox_basic_input( 'post_attend_status', $edited_Item->get( 'attend_status' ), T_('Allow users to attend this event') );
+		$Form->end_fieldset();
+	}
+
 	?>
 
 </div>
@@ -447,6 +456,9 @@ echo_onchange_newcat();
 
 /*
  * $Log$
+ * Revision 1.75  2011/05/25 14:59:34  efy-asimo
+ * Post attending
+ *
  * Revision 1.74  2011/03/02 09:45:59  efy-asimo
  * Update collection features allow_comments, disable_comments_bypost, allow_attachments, allow_rating
  *

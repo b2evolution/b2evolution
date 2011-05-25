@@ -42,6 +42,7 @@ $Session->assert_received_crumb( 'itemsubs' );
 // Get params
 $item_ID = param( 'p', 'integer', true );
 param( 'notify', 'integer', 0 );
+param( 'type', 'string', '' );
 
 /**
  * Basic security checks:
@@ -57,7 +58,14 @@ if( $demo_mode && ($current_User->ID == 1 || $current_User->login == 'demouser')
 				. T_('Back to blog') . '</a>]' );
 }
 
-if( ! is_email( $current_User->get( 'email' ) ) )
+// Set item subscription type
+$isub_type = 'isub_comments';
+if( $type == 'attend' )
+{
+	$isub_type = 'isub_attend';
+}
+
+if( ( $isub_type == 'isub_comments' ) && ( ! is_email( $current_User->get( 'email' ) ) ) )
 { // user doesn't have a valid email address
 	$Messages->add( T_( 'Your email address is invalid. Please set your email address first.' ), 'error' );
 }
@@ -72,7 +80,7 @@ if( $Messages->has_errors() )
 	header_redirect();
 }
 
-if( set_user_isubscription( $current_User->ID, $item_ID, $notify ) )
+if( set_user_isubscription( $current_User->ID, $item_ID, $notify, $isub_type ) )
 { // user subscription was set
 	if( $notify == 0 )
 	{
@@ -80,18 +88,35 @@ if( set_user_isubscription( $current_User->ID, $item_ID, $notify ) )
 	}
 	else
 	{
-		$Messages->add( T_( 'You have successfuly subscribed for notifications.' ), 'success' );
+		if( $isub_type == 'isub_attend' )
+		{
+			$Messages->add( T_( 'You have successfuly subscribed to attend this event.' ), 'success' );
+		}
+		else
+		{
+			$Messages->add( T_( 'You have successfuly subscribed for notifications.' ), 'success' );
+		}
 	}
 }
 else
 { // couldn't update the database
-	$Messages->add( T_( 'Could not subscribe for notifications.' ), 'error' );
+	if( $isub_type == 'isub_attend' )
+	{
+		$Messages->add( T_( 'Could not subscribe to attend this event.' ), 'error' );
+	}
+	else
+	{
+		$Messages->add( T_( 'Could not subscribe for notifications.' ), 'error' );
+	}
 }
 
 header_redirect();
 
 /*
  * $Log$
+ * Revision 1.2  2011/05/25 14:59:33  efy-asimo
+ * Post attending
+ *
  * Revision 1.1  2011/05/19 17:47:07  efy-asimo
  * register for updates on a specific blog post
  *

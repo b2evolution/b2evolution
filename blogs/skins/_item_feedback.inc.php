@@ -39,6 +39,14 @@ $params = array_merge( array(
 		'comment_end'          => '</div>',
 		'preview_start'        => '<div class="bComment" id="comment_preview">',
 		'preview_end'          => '</div>',
+		'attend_template'      => '_item_attend.inc.php',  // The template used for displaying post attending
+		'attending_start'      => '<div class="bComment">',
+		'attending_end'        => '</div>',
+		'attend_list_start'    => '<ul>',
+		'attend_list_end'      => '</ul>',
+		'attend_start'         => '<li>',
+		'attend_end'           => '</li>',
+		'attend_user_field'    => 'login',	// 'login' or 'prefered_name' or 'namefl' or 'namefl' or 'nickname'
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
 		'link_to'		           => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'form_title_start'     => '<h3>',
@@ -48,6 +56,34 @@ $params = array_merge( array(
 
 global $c, $tb, $pb, $redir;
 
+// ----------------- ATTENDING INCLUDED HERE -----------------
+$Item->load_Blog();
+$item_Blog = $Item->get_Blog();
+$attending = $item_Blog->get_setting( 'allow_attending' );
+
+if( ! is_logged_in() )
+{ // don't show attending if user is not logged in
+	$attending = 'never';
+}
+
+if( ( $attending == 'always' ) || ( ( $attending == 'enable_bypost' ) && $Item->get( 'attend_status' ) ) )
+{
+	echo $params['before_section_title'];
+	echo T_( 'Attending this event' );
+	echo $params['after_section_title'];
+
+	skin_include( $params['attend_template'], array(
+				'Item'              => & $Item,
+				'attending_start'   => $params['attending_start'],
+				'attending_end'     => $params['attending_end'],
+				'attend_list_start' => $params['attend_list_start'],
+				'attend_list_end'   => $params['attend_list_end'],
+				'attend_start'      => $params['attend_start'],
+				'attend_end'        => $params['attend_end'],
+				'attend_user_field' => $params['attend_user_field'],
+			) );
+}
+// -------------------- END OF ATTENDING ---------------------
 
 if( ! $Item->can_see_comments() )
 {	// Comments are disabled for this post
@@ -269,6 +305,9 @@ skin_include( '_item_comment_form.inc.php', $params );
 
 /*
  * $Log$
+ * Revision 1.32  2011/05/25 14:59:34  efy-asimo
+ * Post attending
+ *
  * Revision 1.31  2011/05/23 02:20:07  sam2kb
  * Option to display excerpts in comment feeds, or disable feeds completely
  *

@@ -30,14 +30,20 @@ global $edited_Blog;
 	<!--
 	function show_hide_feedback_details(ob)
 	{
-		var fldset = document.getElementById( 'feedback_details_container' );
+		var fldset = jQuery( '.feedback_details_container' );
 		if( ob.value == 'never' )
 		{
-			fldset.style.display = 'none';
+			for( i = 0; i < fldset.length; i++ )
+			{
+				fldset[i].style.display = 'none';
+			}
 		}
 		else
 		{
-			fldset.style.display = '';
+			for( i = 0; i < fldset.length; i++ )
+			{
+				fldset[i].style.display = '';
+			}
 		}
 	}
 	//-->
@@ -90,7 +96,7 @@ $Form->begin_fieldset( T_('Feedback options') );
 										'', 'onclick="show_hide_feedback_details(this);"'),
 					), T_('Comments from'), true );
 
-	echo '<div id="feedback_details_container">';
+	echo '<div class="feedback_details_container">';
 
 	$Form->checkbox( 'disable_comments_bypost', $edited_Blog->get_setting( 'disable_comments_bypost' ), '', T_('Comments can be disabled on each post separately') );
 
@@ -107,6 +113,16 @@ $Form->begin_fieldset( T_('Feedback options') );
 	$Form->radio( 'allow_rating', $edited_Blog->get_setting( 'allow_rating' ),
 						array( $any_option, $registered_option, $member_option, $never_option,
 						), T_('Allow ratings from'), true );
+
+	echo '</div>';
+
+	$Form->radio( 'allow_attending', $edited_Blog->get_setting( 'allow_attending' ),
+						array( array( 'never', T_( 'Never' ), '', '' ),
+								array( 'enable_bypost', T_( 'Let post author decide' ), '', '' ),
+								array( 'always', T_( 'Always' ), '', '' )
+						), T_( 'Allow users to attend events posted in this blog' ), true );
+
+	echo '<div class="feedback_details_container">';
 
 	$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Trackbacks'), T_("Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.") );
 
@@ -142,8 +158,11 @@ $Form->begin_fieldset( T_('Feedback options') );
 	{ ?>
 	<script type="text/javascript">
 		<!--
-		var fldset = document.getElementById( 'feedback_details_container' );
-		fldset.style.display = 'none';
+		var fldset = jQuery( '.feedback_details_container' );
+		for( i = 0; i < fldset.length; i++ )
+		{
+			fldset[i].style.display = 'none';
+		}
 		//-->
 	</script>
 	<?php
@@ -256,6 +275,9 @@ $Form->end_form( array(
 
 /*
  * $Log$
+ * Revision 1.42  2011/05/25 14:59:33  efy-asimo
+ * Post attending
+ *
  * Revision 1.41  2011/05/23 02:20:07  sam2kb
  * Option to display excerpts in comment feeds, or disable feeds completely
  *

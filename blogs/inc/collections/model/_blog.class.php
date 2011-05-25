@@ -494,6 +494,7 @@ class Blog extends DataObject
 			$this->set_setting( 'allow_anon_url', param( 'allow_anon_url', 'string', '0' ) );
 			$this->set_setting( 'allow_attachments', param( 'allow_attachments', 'string', 'registered' ) );
 			$this->set_setting( 'allow_rating', param( 'allow_rating', 'string', 'never' ) );
+			$this->set_setting( 'allow_attending', param( 'allow_attending', 'string', 'never' ) );
 			$this->set( 'allowtrackbacks', param( 'blog_allowtrackbacks', 'integer', 0 ) );
 			$this->set_setting( 'comments_orderdir', param( 'comments_orderdir', '/^(?:ASC|DESC)$/', 'ASC' ) );
 
@@ -2370,6 +2371,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.133  2011/05/25 14:59:33  efy-asimo
+ * Post attending
+ *
  * Revision 1.132  2011/05/23 02:20:07  sam2kb
  * Option to display excerpts in comment feeds, or disable feeds completely
  *

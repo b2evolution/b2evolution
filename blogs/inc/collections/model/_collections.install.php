@@ -150,6 +150,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_views                  INT(11) UNSIGNED NOT NULL DEFAULT 0,
 			post_wordcount              int(11) default NULL,
 			post_comment_status         ENUM('disabled', 'open', 'closed') NOT NULL DEFAULT 'open',
+			post_attend_status          tinyint(1) NOT NULL DEFAULT 0,
 			post_commentsexpire         DATETIME DEFAULT NULL,
 			post_renderers              TEXT NOT NULL,
 			post_priority               int(11) unsigned null COMMENT 'Task priority in workflow',
@@ -277,8 +278,8 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_items__subscriptions (
 			isub_item_ID    int(11) unsigned NOT NULL,
 			isub_user_ID    int(11) unsigned NOT NULL,
-			isub_comments   tinyint(1) NOT NULL,
-			isub_attend     tinyint(1) NOT NULL,
+			isub_comments   tinyint(1) NOT NULL DEFAULT 0,
+			isub_attend     tinyint(1) NOT NULL DEFAULT 0,
 			PRIMARY KEY (isub_item_ID, isub_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
