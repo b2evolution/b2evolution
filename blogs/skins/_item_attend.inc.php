@@ -18,12 +18,14 @@ global $htsrv_url;
 $params = array_merge( array(
 	'attending_start'   => '<div class="bComment">',
 	'attending_end'     => '</div>',
-	'attend_list_start' => '<ul>',
-	'attend_list_end'   => '</ul>',
-    'attend_start'      => '<li>',
-    'attend_end'        => '</li>',
+	'attend_list_start' => '<table width="100%"><tbody align="center">',
+	'attend_list_end'   => '</tbody></table>',
+	'attend_line_start' => '<tr>',
+	'attend_line_end'   => '</tr>',
+	'attend_start'      => '<td>',
+	'attend_end'        => '</td>',
 	'attend_user_field' => 'login', // 'login' or 'prefered_name' or 'namefl' or 'namefl' or 'nickname'
-    'Item'              => NULL, // This object MUST be passed as a param!
+	'Item'              => NULL, // This object MUST be passed as a param!
 	), $params );
 
 // current user is attending this event
@@ -45,42 +47,41 @@ if( empty( $attendants ) )
 }
 else
 {
+	$disp_count = 0;
+	$line_start_displayed = false;
 	echo $params['attend_list_start'];
 	foreach( $attendants as $attendant )
 	{
-		$attending_User = new User( $attendant );
-		switch( $params['attend_user_field'] )
+		if( ( $disp_count % 3 ) == 0 )
 		{
-			case 'prefered_name':
-				$link_text = $attending_User->get_preferred_name();
-				break;
-			case 'namefl':
-				$link_text = trim( $attending_User->get( 'firstname' ).' '.$attending_User->get( 'lastname' ) );
-				break;
-			case 'namelf':
-				$link_text = trim( $attending_User->get( 'lastname' ).' '.$attending_User->get( 'firstname' ) );
-				break;
-			case 'nickname':
-				$link_text = $attending_User->get( 'nickname' );
-				break;
-			case 'login':
-			default:
-				$link_text = $attending_User->get( 'login' );
-				break;
+			if( $line_start_displayed )
+			{
+				echo $params['attend_line_end'];
+			}
+			echo $params['attend_line_start'];
+			$line_start_displayed = true;
 		}
+		$disp_count++;
+		$attending_User = new User( $attendant );
 		if( empty( $link_text ) )
 		{ // set login as default subscribe text
 			$link_text = $attending_User->get( 'login' );
 		}
 
 		echo $params['attend_start'];
-		echo '<a href="'.$blog_url.'?disp=user&user_ID='.$attending_User->ID.'">'.$link_text.'</a>';
+		echo '<a href="'.$blog_url.'?disp=user&user_ID='.$attending_User->ID.'">';
+		$attending_User->disp( $params['attend_user_field'] );
+		echo '</a>';
 		echo $params['attend_end'];
 
 		if( $attending_User->ID == $current_User->ID )
 		{ // current user is already attending this event
 			$is_attendant = true;
 		}
+	}
+	if( $line_start_displayed )
+	{
+		echo $params['attend_line_end'];
 	}
 	echo $params['attend_list_end'];
 }
@@ -100,6 +101,9 @@ echo $params['attending_end'];
 
 /*
  * $Log$
+ * Revision 1.2  2011/05/30 13:35:30  efy-asimo
+ * Use table to display item attendants
+ *
  * Revision 1.1  2011/05/25 14:59:34  efy-asimo
  * Post attending
  *

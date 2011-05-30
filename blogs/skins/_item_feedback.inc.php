@@ -42,11 +42,13 @@ $params = array_merge( array(
 		'attend_template'      => '_item_attend.inc.php',  // The template used for displaying post attending
 		'attending_start'      => '<div class="bComment">',
 		'attending_end'        => '</div>',
-		'attend_list_start'    => '<ul>',
-		'attend_list_end'      => '</ul>',
-		'attend_start'         => '<li>',
-		'attend_end'           => '</li>',
-		'attend_user_field'    => 'login',	// 'login' or 'prefered_name' or 'namefl' or 'namefl' or 'nickname'
+		'attend_list_start'    => '<table width="100%"><tbody align="center">',
+		'attend_list_end'      => '</tbody></table>',
+		'attend_line_start'    => '<tr>',
+		'attend_line_end'      => '</tr>',
+		'attend_start'         => '<td>',
+		'attend_end'           => '</td>',
+		'attend_user_field'    => 'login',	// 'login' or 'nickname' ( and everything what can be a param of User->disp() function )
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
 		'link_to'		           => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'form_title_start'     => '<h3>',
@@ -78,6 +80,8 @@ if( ( $attending == 'always' ) || ( ( $attending == 'enable_bypost' ) && $Item->
 				'attending_end'     => $params['attending_end'],
 				'attend_list_start' => $params['attend_list_start'],
 				'attend_list_end'   => $params['attend_list_end'],
+				'attend_line_start' => $params['attend_line_start'],
+				'attend_line_end'   => $params['attend_line_end'],
 				'attend_start'      => $params['attend_start'],
 				'attend_end'        => $params['attend_end'],
 				'attend_user_field' => $params['attend_user_field'],
@@ -305,6 +309,9 @@ skin_include( '_item_comment_form.inc.php', $params );
 
 /*
  * $Log$
+ * Revision 1.33  2011/05/30 13:35:30  efy-asimo
+ * Use table to display item attendants
+ *
  * Revision 1.32  2011/05/25 14:59:34  efy-asimo
  * Post attending
  *
