@@ -26,12 +26,16 @@ skin_widget( array(
 		'order_by' => 'title',
 		'order_dir' => 'ASC',
 		'limit' => 1000,
+		'page' => param( 'coll_post_list_paged', 'integer', 1 ),
 	) );
 // ---------------------------------- END OF POST LIST ---------------------------------
 
 
 /*
  * $Log$
+ * Revision 1.4  2011/05/31 14:20:28  efy-asimo
+ * paged nav on ?disp=postidx
+ *
  * Revision 1.3  2010/11/08 16:13:52  efy-asimo
  * disp=postidx shows 1000 posts
  *

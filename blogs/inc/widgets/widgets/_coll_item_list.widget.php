@@ -254,6 +254,11 @@ class coll_item_list_Widget extends ComponentWidget
 				'unit' => 'posts', // We want to advertise all items (not just a page or a day)
 			);
 
+		if( isset( $this->disp_params['page'] ) )
+		{
+			$filters['page'] = $this->disp_params['page'];
+		}
+
 		if( $this->disp_params['item_type'] != '#' )
 		{	// Not "default", restrict to a specific type (or '' for all)
 			$filters['types'] = $this->disp_params['item_type'];
@@ -359,6 +364,11 @@ class coll_item_list_Widget extends ComponentWidget
 			}
 		}
 
+		if( isset( $this->disp_params['page'] ) )
+		{
+			$ItemList->page_links();
+		}
+
 		echo $this->disp_params['list_end'];
 
 		echo $this->disp_params['block_end'];
@@ -434,6 +444,9 @@ class coll_item_list_Widget extends ComponentWidget
 
 /*
  * $Log$
+ * Revision 1.31  2011/05/31 14:20:27  efy-asimo
+ * paged nav on ?disp=postidx
+ *
  * Revision 1.30  2010/06/07 19:00:17  sam2kb
  * Exclude current Item from related posts list
  *
