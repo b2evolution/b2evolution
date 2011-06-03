@@ -161,7 +161,7 @@ $search_engines = array(
 	'//cc.bingj.com', // q=
 	'.qip.ru/', // query=
 	'://duckduckgo.com/', //q=
-	'rambler.ru', // query=
+	'rambler.ru', // query, words=
 	'nigma.ru', // s=
 	'ask.com', // q=
 );
@@ -199,6 +199,7 @@ $known_search_params =  array(
 	'search_query',	// search.ukr.net
 	'wd',           // baidu.com
 	'keywords',     // gde.ru
+	'words',		// rambler.ru
 );
 
 
