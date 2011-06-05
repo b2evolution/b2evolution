@@ -29,7 +29,7 @@ class smilies_plugin extends Plugin
 	 * fp> There is... I can't remember the exact problem thouh. Probably some interaction with the code highlight or the video plugins.
 	 */
 	var $priority = 15;
-	var $version = '4.0.0-dev';
+	var $version = '4.0.5';
 	var $apply_rendering = 'opt-in';
 	var $group = 'rendering';
 	var $number_of_installs = 3; // QUESTION: dh> why 3?
@@ -76,21 +76,21 @@ class smilies_plugin extends Plugin
 		global $rsc_subdir;
 		return array(
 				'use_toolbar_default' => array(
-					'label' => T_( 'Use smilies toolbar' ),
+					'label' => T_('Use smilies toolbar'),
 					'defaultvalue' => 0,
 					'type' => 'checkbox',
-					'note' => T_( 'This is the default setting. Users can override it in their profile.' ),
+					'note' => T_('This is the default setting. Users can override it in their profile.'),
 				),
 				'render_comments' => array(	// fp> Note: this is not a default in this version, it's an 'always' :]
-					'label' => $this->T_('Render comments' ),
+					'label' => $this->T_('Render comments'),
 					'note' => $this->T_('Check to also render smilies in comments.'),
 					'defaultvalue' => 0,
 					'type' => 'checkbox',
 				),
 				// TODO (yabs) : Display these as images and individual inputs
 				'smiley_list' => array(
-					'label' => $this->T_( 'Smiley list'),
-					'note' => sprintf( $this->T_( 'This is the list of smileys [one per line], in the format : char_sequence image_file // optional comment<br />
+					'label' => $this->T_('Smiley list'),
+					'note' => sprintf( $this->T_('This is the list of smileys [one per line], in the format : char_sequence image_file // optional comment<br />
 							To disable a smiley, just add one or more spaces to the start of its setting<br />
 							You can add new smiley images by uploading the images to the %s folder.' ), '<span style="font-weight:bold">'.$rsc_subdir.'smilies/</span>' ),
 					'type' => 'html_textarea', // allows smilies with "<" in them
@@ -157,7 +157,7 @@ XX(      graydead.gif
 	{
 		return array(
 				'use_toolbar' => array(
-					'label' => T_( 'Use smilies toolbar' ),
+					'label' => T_('Use smilies toolbar'),
 					'defaultvalue' => $this->Settings->get('use_toolbar_default'),
 					'type' => 'checkbox',
 				),
@@ -263,7 +263,13 @@ XX(      graydead.gif
 
 			foreach( $tmpsmilies as $smiley )
 			{
-				$this->search[] = $smiley[ 'code' ];
+				$this->search[] = $smiley['code'];
+				$smiley_masked = '';
+				for( $i = 0; $i < strlen($smiley['code'] ); $i++ )
+				{
+					$smiley_masked .= '&#'.ord(substr($smiley['code'], $i, 1)).';';
+				}
+				$smiley['code'] = $smiley_masked;
 				$this->replace[] = $this->get_smiley_img_tag($smiley);
 			}
 		}
@@ -418,6 +424,9 @@ XX(      graydead.gif
 
 /*
  * $Log$
+ * Revision 1.53  2011/06/05 03:53:39  sam2kb
+ * Bugfix: http://forums.b2evolution.net/viewtopic.php?t=22468
+ *
  * Revision 1.52  2010/02/08 17:55:47  efy-yury
  * copyright 2009 -> 2010
  *
