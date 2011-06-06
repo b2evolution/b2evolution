@@ -165,6 +165,32 @@ switch( $action )
 		}
 
 		break;
+
+
+	case 'reset':
+		// Reset settings to default values:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'skin' );
+
+ 		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		// Make sure we got skin and blog IDs:
+		param( 'skin_ID', 'integer', true );
+		param( 'blog', 'integer', true );
+
+		// At some point we may want to remove skin settings from all blogs
+		$DB->query('DELETE FROM T_coll_settings
+					WHERE cset_coll_ID = '.$DB->quote($blog).'
+					AND cset_name REGEXP "^skin'.$skin_ID.'_"');
+
+		$Messages->add( T_('Default skin settings loaded'), 'success' );
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=coll_settings&tab=skin&blog='.$blog, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
 
@@ -221,6 +247,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.16  2011/06/06 21:22:31  sam2kb
+ * New action: load default skin settings
+ *
  * Revision 1.15  2010/02/26 22:15:48  fplanque
  * whitespace/doc/minor
  *
