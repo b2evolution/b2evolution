@@ -201,6 +201,8 @@ switch( $content_mode )
 							'after_image' =>         $params['after_image_legend'],
 							'after' =>               $params['after_images'],
 							'image_size' =>          $params['image_size'],
+							'limit' =>               $params['image_limit'],
+							'image_link_to' =>       $params['image_link_to'],
 							'restrict_to_image_position' => 'aftermore',	// Optionally restrict to files/images linked to specific position: 'teaser'|'aftermore'
 						) );
 				}
@@ -243,6 +245,9 @@ switch( $content_mode )
 }
 /*
  * $Log$
+ * Revision 1.35  2011/06/09 00:11:48  sam2kb
+ * Added missing params to $Item->images
+ *
  * Revision 1.34  2010/12/18 00:23:05  fplanque
  * minor stuff & fixes
  *
