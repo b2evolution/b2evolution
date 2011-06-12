@@ -217,7 +217,7 @@ $user_agents = array(
 	// Robots:
 	array('robot', 'Googlebot', 'Google (Googlebot)' ), // removed slash in order to also match "Googlebot-Image", "Googlebot-Mobile", "Googlebot-Sitemaps"
 	array('robot', 'Slurp/', 'Inktomi (Slurp)' ),
-	array('robot', 'Yahoo! Slurp;', 'Yahoo (Slurp)' ),
+	array('robot', 'Yahoo! Slurp', 'Yahoo (Slurp)' ), // removed ; to also match "Yahoo! Slurp China"
 	array('robot', 'msnbot', 'MSN Search (msnbot)' ), // removed slash in order to also match "msnbot-media"
 	array('robot', 'Frontier/',	'Userland (Frontier)' ),
 	array('robot', 'ping.blo.gs/', 'blo.gs' ),
@@ -265,6 +265,12 @@ $user_agents = array(
 	array('robot', 'SiteBot/', 'SiteBot' ),
 	array('robot', 'Nutch-', 'Apache Nutch' ),
 	array('robot', 'DoCoMo/', 'DoCoMo' ),
+	array('robot', 'findlinks/', 'FindLinks' ),
+	array('robot', 'MLBot', 'MLBot' ),
+	array('robot', 'facebookexternalhit', 'Facebook' ),
+	array('robot', ' oBot/', 'IBM Bot' ),
+	array('robot', 'GarlikCrawler/', 'Garlik' ),
+	array('robot', 'Yeti/', 'Naver' ),
 	// Unknown robots:
 	array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:
