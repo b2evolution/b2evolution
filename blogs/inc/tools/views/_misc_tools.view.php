@@ -71,6 +71,14 @@ if( $current_User->check_perm('options', 'edit') )
 	echo '</ul>';
 	$block_item_Widget->disp_template_raw( 'block_end' );
 
+	$block_item_Widget->title = T_('Antispam Tools');
+	$block_item_Widget->disp_template_replaced( 'block_start' );
+	echo '<ul>';
+	echo '<li><a href="'.regenerate_url('action', 'action=find_spam_comments&amp;'.url_crumb('tools')).'">'.T_('Find and delete comments matching antispam blacklist').'</a></li>';
+	echo '<li><a href="'.regenerate_url('action', 'action=find_spam_referers&amp;'.url_crumb('tools')).'">'.T_('Find and delete all banned hit-log entries').'</a></li>';
+	echo '</ul>';
+	$block_item_Widget->disp_template_raw( 'block_end' );
+
 	$block_item_Widget->title = T_('Testing Tools');
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 	echo '<ul>';
@@ -105,6 +113,9 @@ $block_item_Widget->disp_template_raw( 'block_end' );
 
 /*
  * $Log$
+ * Revision 1.8  2011/06/14 06:05:18  sam2kb
+ * Check and remove all comments and hits mathing antispam blacklist
+ *
  * Revision 1.7  2011/05/02 23:31:11  fplanque
  * minor
  *

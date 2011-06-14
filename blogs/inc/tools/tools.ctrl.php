@@ -164,12 +164,7 @@ if( empty($tab) )
 			}
 			break;
 
-		case 'del_broken_posts':
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'tools' );
-
-			$current_User->check_perm('options', 'edit', true);
-
+		case 'find_broken_posts':
 			// select broken items
 			$sql = 'SELECT * FROM T_items__item
 						WHERE post_canonical_slug_ID NOT IN (
@@ -188,12 +183,7 @@ if( empty($tab) )
 			$Messages->add( sprintf( T_('Deleted %d posts.'), $num_deleted ), 'success' );
 			break;
 
-		case 'del_broken_slugs':
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'tools' );
-
-			$current_User->check_perm('options', 'edit', true);
-
+		case 'find_broken_slugs':
 			// delete broken slugs
 			$r = $DB->query( 'DELETE FROM T_slug
 								WHERE slug_type = "item" and slug_itm_ID NOT IN (
@@ -206,23 +196,13 @@ if( empty($tab) )
 			break;
 
 		case 'delete_orphan_comment_uploads':
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'tools' );
-
-			$current_User->check_perm('options', 'edit', true);
-
-			// delete orphan comment upload, older then 24 hours
+			// delete orphan comment upload, older than 24 hours
 			$count = remove_orphan_files( NULL, 24 );
 
 			$Messages->add( sprintf( T_('%d files have been deleted'), $count ), 'success' );
 			break;
 
 		case 'create_sample_comments':
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'tools' );
-
-			$current_User->check_perm('options', 'edit', true);
-
 			$blog_ID = param( 'blog_ID', 'string', 0 );
 			$num_comments = param( 'num_comments', 'string', 0 );
 			$num_posts = param( 'num_posts', 'string', 0 );
@@ -305,11 +285,6 @@ if( empty($tab) )
 			break;
 
 		case 'create_sample_posts':
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'tools' );
-
-			$current_User->check_perm('options', 'edit', true);
-
 			$blog_ID = param( 'blog_ID', 'string', 0 );
 			$num_posts = param( 'num_posts', 'string', 0 );
 
@@ -398,6 +373,53 @@ if( empty($tab) )
 			phpinfo();
 			exit();
 			break;
+
+		case 'find_spam_comments':
+			$keywords = $DB->get_results('SELECT aspm_string FROM T_antispam');
+			foreach( $keywords as $word )
+			{
+				$str = $word->aspm_string;
+				$r = $DB->query( 'DELETE FROM T_comments
+									WHERE comment_author LIKE '.$DB->quote('%'.$str.'%').'
+									OR comment_author_email LIKE '.$DB->quote('%'.$str.'%').'
+									OR comment_author_url LIKE '.$DB->quote('%'.$str.'%').'
+									OR comment_content LIKE '.$DB->quote('%'.$str.'%'),
+									'Delete all spam comments' );
+				
+				if( $r )
+				{
+					$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars($str) ), 'success' );
+					$deleted = 'true';
+				}
+			}
+
+			if( empty($deleted) )
+			{
+				$Messages->add( T_('No spam comments found'), 'success' );
+			}
+			break;
+
+		case 'find_spam_referers':
+			$keywords = $DB->get_results('SELECT aspm_string FROM T_antispam');
+			foreach( $keywords as $word )
+			{
+				$str = $word->aspm_string;
+				$r = $DB->query('DELETE FROM T_hitlog
+									WHERE hit_referer LIKE '.$DB->quote('%'.$str.'%'),
+									'Delete all banned hit-log entries' );
+
+				if( $r )
+				{
+					$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars($str) ), 'success' );
+					$deleted = 'true';
+				}
+			}
+
+			if( empty($deleted) )
+			{
+				$Messages->add( T_('No banned hit-log entries found'), 'success' );
+			}
+			break;
 	}
 }
 
@@ -470,6 +492,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.40  2011/06/14 06:05:18  sam2kb
+ * Check and remove all comments and hits mathing antispam blacklist
+ *
  * Revision 1.39  2011/03/15 09:34:06  efy-asimo
  * have checkboxes for enabling caching in new blogs
  * refactorize cache create/enable/disable
