@@ -25,6 +25,18 @@ global $notify_from;
 
 global $Blog;
 
+if( is_logged_in() )
+{ // if a user is already logged in don't allow to register
+	echo '<p>'.T_('You are already logged in').'</p>';
+	return;
+}
+
+if( ! $Settings->get('newusers_canregister') )
+{
+	echo '<p>'.T_('User registration is currently not allowed.').'</p>';
+	return;
+}
+
 $action = param( 'action', 'string', '' );
 $login = param( 'login', 'string', '' );
 $email = param( 'email', 'string', '' );
@@ -123,6 +135,9 @@ $Form->end_form();
 
 /*
  * $Log$
+ * Revision 1.2  2011/06/14 20:56:57  sam2kb
+ * Hide the form if user registration is disabled
+ *
  * Revision 1.1  2011/06/14 13:33:56  efy-asimo
  * in-skin register
  *
