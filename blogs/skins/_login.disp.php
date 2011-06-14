@@ -24,6 +24,7 @@ $redirect_to = param( 'redirect_to', 'string', '' );
 
 if( is_logged_in() && ( $action != 'req_validatemail' ) )
 { // already logged in
+	echo '<p>'.T_('You are already logged in').'</p>';
 	return;
 }
 
@@ -138,6 +139,9 @@ else
 
 /*
  * $Log$
+ * Revision 1.7  2011/06/14 20:20:44  sam2kb
+ * Display message if a user is already logged in
+ *
  * Revision 1.6  2011/06/14 13:33:56  efy-asimo
  * in-skin register
  *
