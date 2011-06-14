@@ -85,7 +85,10 @@ $Form->text_input( 'login', $login, 16,  T_('Login'), '', array( 'maxlength'=>20
 				), T_('Gender'), array( 'required' => true ) );
 	}
 
-	$Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Preferred language') );
+	if( $Settings->get( 'registration_ask_locale' ) )
+	{
+		$Form->select( 'locale', $locale, 'locale_options_return', T_('Locale'), T_('Preferred language') );
+	}
 
 	$Plugins->trigger_event( 'DisplayRegisterFormFieldset', array( 'Form' => & $Form ) );
 
@@ -104,6 +107,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.17  2011/06/14 13:33:56  efy-asimo
+ * in-skin register
+ *
  * Revision 1.16  2011/02/17 14:56:38  efy-asimo
  * Add user source param
  *

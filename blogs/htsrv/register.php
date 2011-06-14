@@ -42,18 +42,41 @@ require_once $inc_path.'_main.inc.php';
 // Login is not required on the register page:
 $login_required = false;
 
+global $baseurl;
+
+if( is_logged_in() )
+{ // if a user is already logged in don't allow to register
+	header_redirect( $baseurl );
+}
+
 // Check if country is required
 $registration_require_country = (bool)$Settings->get('registration_require_country');
 // Check if gender is required
 $registration_require_gender = $Settings->get('registration_require_gender');
+// Check if registration ask for locale
+$registration_ask_locale = $Settings->get('registration_ask_locale');
 
 param( 'action',  'string', '' );
 param( 'login',   'string', '' );
 param( 'email',   'string', '' );
 param( 'country', 'integer', '' );
 param( 'gender',  'string', NULL );
+param( 'locale', 'string', '' );
 param( 'source', 'string', '' );
 param( 'redirect_to', 'string', '' ); // do not default to $admin_url; "empty" gets handled better in the end (uses $blogurl, if no admin perms).
+param( 'inskin', 'boolean', false, true );
+
+global $Blog;
+if( $inskin && empty( $Blog ) )
+{
+	param( 'blog', 'integer', 0 );
+
+	if( isset( $blog) && $blog > 0 )
+	{
+		$BlogCache = & get_BlogCache();
+		$Blog = $BlogCache->get_by_ID( $blog, false, false );
+	}
+}
 
 
 if( ! $Settings->get('newusers_canregister') )
@@ -135,7 +158,10 @@ switch( $action )
 		$new_User->set( 'domain', $Hit->get_remote_host( true ) );
 		$new_User->set( 'browser', substr( $Hit->get_user_agent(), 0 , 200 ) );
 		$new_User->set_datecreated( $localtimenow );
-		$new_User->set( 'locale', $locale );
+		if( $registration_ask_locale )
+		{ // set locale if it was prompted, otherwise let default
+			$new_User->set( 'locale', $locale );
+		}
 		$newusers_grp_ID = $Settings->get('newusers_grp_ID');
 		// echo $newusers_grp_ID;
 		$GroupCache = & get_GroupCache();
@@ -195,6 +221,7 @@ switch( $action )
 
 		if( $Settings->get('newusers_mustvalidate') )
 		{ // We want that the user validates his email address:
+			$action = 'reg_validation';
 			if( $new_User->send_validate_email($redirect_to) )
 			{
 				$Messages->add( T_('An email has been sent to your email address. Please click on the link therein to validate your account.'), 'success' );
@@ -206,13 +233,29 @@ switch( $action )
 				// fp> TODO: allow to enter a different email address (just in case it's that kind of problem)
 			}
 		}
+		else
+		{
+			$action = 'reg_complete';
+		}
 
 		// Autologin the user. This is more comfortable for the user and avoids
 		// extra confusion when account validation is required.
 		$Session->set_User( $new_User );
 
-		// Display confirmation screen:
-		require $adminskins_path.'login/_reg_complete.main.php';
+		if( $inskin && !empty( $Blog ) && !empty( $Blog->skin_ID ) )
+		{ // Display in-skin confirmation/validation screen
+			$SkinCache = & get_SkinCache();
+			$Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
+			$skin = $Skin->folder;
+			$disp = 'register';
+			$redirect_to = $Blog->gen_baseurl();
+			$ads_current_skin_path = $skins_path.$skin.'/';
+			require $ads_current_skin_path.'index.main.php';
+		}
+		else
+		{ // Display confirmation screen:
+			require $adminskins_path.'login/_reg_complete.main.php';
+		}
 
 		exit(0);
 		break;
@@ -231,12 +274,26 @@ switch( $action )
 /*
  * Default: registration form:
  */
+if( $inskin && !empty( $Blog ) )
+{ // in-skin display
+	$SkinCache = & get_SkinCache();
+	$Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
+	$skin = $Skin->folder;
+	$disp = 'register';
+	$ads_current_skin_path = $skins_path.$skin.'/';
+	require $ads_current_skin_path.'index.main.php';
+	// already exited here
+	exit(0);
+}
 // Display reg form:
 require $adminskins_path.'login/_reg_form.main.php';
 
 
 /*
  * $Log$
+ * Revision 1.110  2011/06/14 13:33:55  efy-asimo
+ * in-skin register
+ *
  * Revision 1.109  2011/05/11 07:11:51  efy-asimo
  * User settings update
  *

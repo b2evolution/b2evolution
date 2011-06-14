@@ -243,11 +243,11 @@ if( ! empty($current_User)
 		&& ! $current_User->validated
 		&& $Settings->get('newusers_mustvalidate') // same check as in login.php
 		&& param('action', 'string', '') != 'logout' ) // fp> TODO: non validated users should be automatically logged out
-{
+{ // efy-asimo> It's not a good idea to automatically log out the user, because needs to send a validation email.
 	if( $action != 'req_validatemail' && $action != 'validatemail' )
 	{ // we're not in that action already:
 		$action = 'req_validatemail'; // for login.php
-		$login_error = T_('You must validate your email address before you can log in.');
+		$login_error = T_('You must validate your email address before you can continue as a logged in user.');
 	}
 }
 else
@@ -280,18 +280,40 @@ else
 
 if( ! empty( $login_error ) )
 {
+	param( 'inskin', 'boolean', 0 );
+	if( $inskin || use_in_skin_login() )
+	{ // Use in-skin login
+		if( is_logged_in() )
+		{ // user is logged in, but the email address is not validated yet
+			$login = $current_User->login;
+			$email = $current_User->email;
+		}
+		if( empty( $Blog ) )
+		{
+			if( isset( $blog) && $blog > 0 )
+			{
+				$BlogCache = & get_BlogCache();
+				$Blog = $BlogCache->get_by_ID( $blog, false, false );
+			}
+		}
+		if( ( !empty( $Blog ) ) && ( !empty( $Blog->skin_ID ) ) )
+		{
+			$Messages->add( $login_error );
+			$SkinCache = & get_SkinCache();
+			$Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
+			$skin = $Skin->folder;
+			$disp = 'login';
+			$redirect_to = $Blog->gen_baseurl();
+			$ads_current_skin_path = $skins_path.$skin.'/';
+			require $ads_current_skin_path.'index.main.php';
+			exit(0);
+		}
+	}
+
+	// Use standard login
 	// Init charset handling:
-	if( use_in_skin_login() )
-	{
-		$Messages->add( $login_error );
-		param( 'redirect_to', 'string', $baseurl );
-		header_redirect( get_login_url( $redirect_to ) );
-	}
-	else
-	{
-		init_charsets( $current_charset );
-		require $htsrv_path.'login.php';
-	}
+	init_charsets( $current_charset );
+	require $htsrv_path.'login.php';
 	exit(0);
 }
 
@@ -300,6 +322,9 @@ $Timer->pause( '_init_login' );
 
 /*
  * $Log$
+ * Revision 1.7  2011/06/14 13:33:55  efy-asimo
+ * in-skin register
+ *
  * Revision 1.6  2011/03/24 15:15:05  efy-asimo
  * in-skin login - feature
  *

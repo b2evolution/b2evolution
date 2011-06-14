@@ -366,6 +366,14 @@ function skin_init( $disp )
 			}
 			break;
 
+		case 'register':
+			$seo_page_type = 'Register form';
+			if( $Blog->get_setting( $disp.'_noindex' ) )
+			{	// We prefer robots not to index these pages:
+				$robots_index = false;
+			}
+			break;
+
 		case 'profile':
 		case 'avatar':
 		case 'pwdchange':
@@ -450,6 +458,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_feedback-popup' => '_feedback_popup.disp.php',
 				'disp_help'           => '_help.disp.php',
 				'disp_login'          => '_login.disp.php',
+				'disp_register'       => '_register.disp.php',
 				'disp_mediaidx'       => '_mediaidx.disp.php',
 				'disp_msgform'        => '_msgform.disp.php',
 				'disp_page'           => '_page.disp.php',
@@ -904,6 +913,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.90  2011/06/14 13:33:55  efy-asimo
+ * in-skin register
+ *
  * Revision 1.89  2011/05/09 06:38:18  efy-asimo
  * Simple avatar modification update
  *

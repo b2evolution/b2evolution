@@ -93,6 +93,8 @@ $Form->begin_fieldset( T_('Other options') );
 
 	$Form->checkbox_input( 'registration_require_country', $Settings->get('registration_require_country'), T_('Require country'), array( 'note'=>T_('New users will have to specify their country in order to register.') ) );
 
+	$Form->checkbox_input( 'registration_ask_locale', $Settings->get('registration_ask_locale'), T_('Ask for language'), array( 'note'=>T_('New users will be prompted for their preferred language/locale.') ) );
+
 	$Form->radio( 'registration_require_gender',$Settings->get('registration_require_gender'), array(
 					array( 'hidden', T_('Hidden') ),
 					array( 'optional', T_('Optional') ),
@@ -111,6 +113,9 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 
 /*
  * $Log$
+ * Revision 1.12  2011/06/14 13:33:56  efy-asimo
+ * in-skin register
+ *
  * Revision 1.11  2010/11/24 14:55:30  efy-asimo
  * Add user gender
  *

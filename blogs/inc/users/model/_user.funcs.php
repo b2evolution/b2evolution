@@ -182,6 +182,10 @@ function use_in_skin_login()
 
 	$BlogCache = & get_BlogCache();
 	$Blog = $BlogCache->get_by_ID( $blog, false, false );
+	if( empty( $Blog ) )
+	{
+		return false;
+	}
 
 	return $Blog->get_setting( 'in_skin_login' );
 }
@@ -244,11 +248,33 @@ function get_user_register_link( $before = '', $after = '', $link_text = '', $li
 
 	if( ! empty($redirect) )
 	{
-		$redirect = '?redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $htsrv_url_sensitive ) );
+		$redirect = 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect, $htsrv_url_sensitive ) );
+	}
+
+	if( use_in_skin_login() )
+	{
+		global $blog;
+
+		$BlogCache = & get_BlogCache();
+		$Blog = $BlogCache->get_by_ID( $blog );
+
+		$register_url = $Blog->get( 'url' ).'?disp=register';
+		if( !empty( $redirect ) )
+		{
+			$register_url .= '&'.$redirect;
+		}
+	}
+	else
+	{
+		$register_url = $htsrv_url_sensitive.'register.php';
+		if( !empty( $redirect ) )
+		{
+			$register_url .= '?'.$redirect;
+		}
 	}
 
 	$r = $before;
-	$r .= '<a href="'.$htsrv_url_sensitive.'register.php'.$redirect.'" title="'.$link_title.'">';
+	$r .= '<a href="'.$register_url.'" title="'.$link_title.'">';
 	$r .= $link_text;
 	$r .= '</a>';
 	$r .= $after;
@@ -946,6 +972,9 @@ function set_user_isubscription( $user_ID, $item_ID, $value, $type )
 
 /*
  * $Log$
+ * Revision 1.35  2011/06/14 13:33:55  efy-asimo
+ * in-skin register
+ *
  * Revision 1.34  2011/05/25 14:59:34  efy-asimo
  * Post attending
  *

@@ -64,6 +64,8 @@ switch ( $action )
 
 		param( 'registration_require_country', 'integer', 0 );
 
+		param( 'registration_ask_locale', 'integer', 0 );
+
 		param( 'registration_require_gender', 'string', '' );
 
 		$Settings->set_array( array(
@@ -82,6 +84,8 @@ switch ( $action )
 									 array( 'js_passwd_hashing', $js_passwd_hashing),
 
 									 array( 'registration_require_country', $registration_require_country),
+
+									 array( 'registration_ask_locale', $registration_ask_locale),
 
 									 array( 'registration_require_gender', $registration_require_gender) ) );
 
@@ -126,6 +130,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.12  2011/06/14 13:33:56  efy-asimo
+ * in-skin register
+ *
  * Revision 1.11  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *

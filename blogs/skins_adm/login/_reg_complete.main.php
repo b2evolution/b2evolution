@@ -41,11 +41,7 @@ $Form->begin_form( 'fform' );
 
 $Form->hidden( 'login', $login );
 $Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
-
-$Form->begin_fieldset();
-$Form->info( T_('Login'), $login );
-$Form->info( T_('Email'), $email );
-$Form->end_fieldset();
+$Form->hidden( 'inskin', 0 );
 
 // Now the user has been logged in automatically at the end of the registration progress.
 // Allow him to proceed or go to the blogs, though he will see the "validate account" screen then,
@@ -54,11 +50,29 @@ if( empty($redirect_to) )
 {
 	$redirect_to = $baseurl; // dh> this was the old behaviour, I think there could be a better default
 }
-echo '<p class="center"><a href="'
-	.htmlspecialchars(url_rel_to_same_host($redirect_to, $htsrv_url_sensitive))
-	.'">'.T_('Continue').' &raquo;</a> '; // dh> TODO: this does not seem to be sensible for dir=rtl.
-echo '</p>';
 
+if( $action == 'reg_complete' )
+{
+	$Form->begin_fieldset();
+	$Form->info( T_('Login'), $login );
+	$Form->info( T_('Email'), $email );
+	$Form->end_fieldset();
+
+	echo '<p class="center"><a href="'
+		.htmlspecialchars(url_rel_to_same_host($redirect_to, $htsrv_url_sensitive))
+		.'">'.T_('Continue').' &raquo;</a> '; // dh> TODO: this does not seem to be sensible for dir=rtl.
+	echo '</p>';
+}
+elseif( $action == 'reg_validation' )
+{
+	echo '<p>'.sprintf( T_( 'An email has just been sent to %s . Please check your email and click on the validation
+					link you will find on that email. ' ), '<b>'.$email.'</b>' ).'</p>';
+	echo '<p>'.sprintf( T_( 'If you have not received the email in the next few minutes, please check your spam folder. 
+					The email was sent from %s and has the title %s' ), $notify_from,
+					'<b>'.sprintf( T_('Validate your email address for "%s"'), $login ).'</b>' ).'</p>';
+	echo '<p>'.T_( 'If you still can\'t find the email or if you would like to use a different email address' ).','.
+					'<a href="'.$redirect_to.'">'.T_( 'click here to try again' ).'.</a></p>';
+}
 
 $Form->end_form();
 
@@ -66,6 +80,9 @@ require dirname(__FILE__).'/_html_footer.inc.php';
 
 /*
  * $Log$
+ * Revision 1.8  2011/06/14 13:33:56  efy-asimo
+ * in-skin register
+ *
  * Revision 1.7  2010/02/08 17:56:56  efy-yury
  * copyright 2009 -> 2010
  *

@@ -46,7 +46,11 @@ require_once $inc_path.'_main.inc.php';
 param( 'action', 'string', 'req_login' );
 param( 'mode', 'string', '' );
 param( 'login', 'string', '' );
-// echo 'login: ', $login;
+param( 'inskin', 'boolean', false );
+if( $inskin )
+{
+	param( 'blog', 'integer', NULL );
+}
 
 // gets used by header_redirect();
 // TODO: dh> problem here is that $ReqURI won't include the e.g. "ctrl" param in a POSTed form and therefor the user lands on the default admin page after logging in (again)
@@ -59,11 +63,11 @@ switch( $action )
 		logout();          // logout $Session and set $current_User = NULL
 
 		// TODO: to give the user feedback through Messages, we would need to start a new $Session here and append $Messages to it.
-		
+
 		// Redirect to $baseurl on logout if redirect URI is not set. Temporarily fix until we remove actions from redirect URIs
 		if( $redirect_to == $ReqURI ) 
 			$redirect_to = $baseurl;
-		
+
 		header_redirect(); // defaults to redirect_to param and exits
 		/* exited */
 		break;
@@ -391,8 +395,24 @@ $redirect_to = preg_replace( '~(?<=\?|&) (login|pwd) = [^&]+ ~x', '', $redirect_
 $Debuglog->add( 'redirect_to: '.$redirect_to );
 
 
+/*
+ * Display in-skin login if it's supported
+ */
+if( $inskin && use_in_skin_login() )
+{ // in-skin display
+	$BlogCache = & get_BlogCache();
+	$Blog = $BlogCache->get_by_ID( $blog, false, false );
+	if( ! empty( $Blog ) )
+	{
+		$redirect = $Blog->gen_blogurl().'?disp=login';
+		header_redirect( $redirect );
+		// already exited here
+		exit(0);
+	}
+}
+
 /**
- * Display:
+ * Display standard login screen:
  */
 switch( $action )
 {
@@ -418,6 +438,9 @@ exit(0);
 
 /*
  * $Log$
+ * Revision 1.114  2011/06/14 13:33:55  efy-asimo
+ * in-skin register
+ *
  * Revision 1.113  2011/02/20 22:31:38  fplanque
  * minor / doc
  *

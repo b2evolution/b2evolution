@@ -2,6 +2,8 @@
 /**
  * This file implements the login form
  *
+ * This file is not meant to be called directly.
+ * 
  * @copyright (c)2003-2010 by Francois PLANQUE - {@link http://fplanque.net/}.
  *
  * @package evocore
@@ -13,11 +15,14 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $blog;
+
 $login = param( 'login', 'string', '' );
 $action = param( 'action', 'string', '' );
+$email = param( 'email', 'string', '' );
 $redirect_to = param( 'redirect_to', 'string', '' );
 
-if( is_logged_in() )
+if( is_logged_in() && ( $action != 'req_validatemail' ) )
 { // already logged in
 	return;
 }
@@ -34,11 +39,14 @@ if( !isset( $redirect_to ) )
 	$redirect_to = regenerate_url( 'disp' );
 }
 
-$Form = new Form( '', 'login_form', 'post' );
+if( $action != 'req_validatemail' )
+{
+	$Form = new Form( '', 'login_form', 'post' );
 
-$Form->begin_form( 'bComment' );
+	$Form->begin_form( 'bComment' );
 
 	$Form->hidden( 'redirect_to', $redirect_to );
+	$Form->hidden( 'inskin', true );
 
 	$Form->begin_field();
 	$Form->text_input( 'login', $login, 16, T_('Login'), '', array( 'maxlength' => 20, 'class' => 'input_text' ) );
@@ -67,10 +75,10 @@ $Form->begin_form( 'bComment' );
 	$links = array();
 
 	// link to standard login screen
-	$link = '<a href="'.$htsrv_url.'login.php?redirect_to'.$redirect_to.'">'.T_( 'Standard login form').' &raquo;</a>';
+	$link = '<a href="'.$htsrv_url.'login.php?redirect_to='.$redirect_to.'">'.T_( 'Standard login form').' &raquo;</a>';
 	$links[] = $link;
 
-	if( $link = get_user_register_link( '', '', '', '#', true /*disp_when_logged_in*/, $redirect_to ) )
+	if( $link = get_user_register_link( '', '', '', '#', true /*disp_when_logged_in*/ ) )
 	{ // registration is allowed, add register link
 		$links[] = $link;
 	}
@@ -91,11 +99,48 @@ $Form->begin_form( 'bComment' );
 	echo '</div>';
 	$Form->end_fieldset();
 
-$Form->end_form();
+	$Form->end_form();
+}
+else
+{
+	$Form = new Form( $htsrv_url_sensitive.'login.php', 'login_form', 'post' );
+
+	$Form->begin_form( 'bComment' );
+
+	$Form->add_crumb( 'validateform' );
+	$Form->hidden( 'action', 'req_validatemail');
+	$Form->hidden( 'redirect_to', url_rel_to_same_host($redirect_to, $htsrv_url_sensitive) );
+	$Form->hidden( 'inskin', true );
+	if( isset( $blog ) )
+	{
+		$Form->hidden( 'blog', $blog );
+	}
+	$Form->hidden( 'req_validatemail_submit', 1 ); // to know if the form has been submitted
+
+	$Form->begin_fieldset();
+
+	echo '<ol>';
+	echo '<li>'.T_('Please confirm your email address below.').'</li>';
+	echo '<li>'.T_('An email will be sent to this address immediately.').'</li>';
+	echo '<li>'.T_('As soon as you receive the email, click on the link therein to activate your account.').'</li>';
+	echo '</ol>';
+
+	$Form->text_input( 'email', $email, 16, T_('Email'), '', array( 'maxlength'=>255, 'class'=>'input_text', 'required'=>true ) );
+	$Form->end_fieldset();
+
+	// Submit button:
+	$submit_button = array( array( 'name'=>'submit', 'value'=>T_('Send me an email now'), 'class'=>'submit' ) );
+
+	$Form->buttons_input($submit_button);
+	$Form->end_form();	
+}
 
 
 /*
  * $Log$
+ * Revision 1.6  2011/06/14 13:33:56  efy-asimo
+ * in-skin register
+ *
  * Revision 1.5  2011/03/24 15:15:05  efy-asimo
  * in-skin login - feature
  *

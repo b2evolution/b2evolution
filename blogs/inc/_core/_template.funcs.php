@@ -280,7 +280,7 @@ function header_noexpire()
  */
 function request_title( $params = array() )
 {
-	global $MainList, $preview, $disp;
+	global $MainList, $preview, $disp, $action;
 
 	$r = array();
 
@@ -305,6 +305,10 @@ function request_title( $params = array() )
 			'sitemap_text'        => T_('Site Map'),
 			'msgform_text'        => T_('Send a Message'),
 			'login_text'          => T_('Login'),
+			'req_validatemail'    => T_('Email validation'),
+			'register_text'       => T_('Register'),
+			'register_complete'   => T_('Registration complete'),
+			'register_validation' => T_('Email validation'),
 			'profile_text'        => T_('User Profile'),
 			'avatar_text'         => T_('User Avatar'),
 			'pwdchange_text'      => T_('Password'),
@@ -409,7 +413,30 @@ function request_title( $params = array() )
 
 		case 'login':
 			// We are requesting the login form:
-			$r[] = $params['login_text'];
+			if( $action == 'req_validatemail' )
+			{
+				$r[] = $params['req_validatemail'];
+			}
+			else
+			{
+				$r[] = $params['login_text'];
+			}
+			break;
+
+		case 'register':
+			// We are requesting the registration form:
+			if( $action == 'reg_complete' )
+			{ // registration complete
+				$r[] = $params['register_complete'];
+			}
+			elseif( $action == 'reg_validation' )
+			{ // registration complete, but needs email validation
+				$r[] = $params['register_validation'];
+			}
+			else
+			{ // register form
+				$r[] = $params['register_text'];
+			}
 			break;
 
 		case 'single':
@@ -1142,6 +1169,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.82  2011/06/14 13:33:55  efy-asimo
+ * in-skin register
+ *
  * Revision 1.81  2011/05/09 06:38:18  efy-asimo
  * Simple avatar modification update
  *

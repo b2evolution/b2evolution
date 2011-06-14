@@ -88,6 +88,7 @@ class GeneralSettings extends AbstractSettings
 		'newusers_revalidate_emailchg' => '0',
 		'newusers_level' => '1',
 		'registration_require_gender' => 'optional',
+		'registration_ask_locale' => '0',
 
 		'allow_avatars' => 1,
 
@@ -236,6 +237,9 @@ class GeneralSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.35  2011/06/14 13:33:55  efy-asimo
+ * in-skin register
+ *
  * Revision 1.34  2011/03/15 09:34:05  efy-asimo
  * have checkboxes for enabling caching in new blogs
  * refactorize cache create/enable/disable

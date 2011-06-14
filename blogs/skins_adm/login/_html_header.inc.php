@@ -62,9 +62,16 @@ if( ! empty( $login_error ) )
 	echo '<div class="log_error"> '.$login_error.' </div>';
 	echo '</div>';
 }
+else
+{
+	$Messages->display();
+}
 
 /*
  * $Log$
+ * Revision 1.14  2011/06/14 13:33:56  efy-asimo
+ * in-skin register
+ *
  * Revision 1.13  2011/02/10 23:07:22  fplanque
  * minor/doc
  *
