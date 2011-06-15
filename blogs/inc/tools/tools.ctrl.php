@@ -334,7 +334,9 @@ if( empty($tab) )
 			$ItemCache->load_where( '( post_title != "" ) AND ( post_urltitle = "title" OR post_urltitle LIKE "title-%" )');
 			$items = $ItemCache->get_ID_array();
 			$count_slugs = 0;
-			@set_time_limit(0);
+
+			set_max_execution_time(0);
+
 			foreach( $items as $item_ID )
 			{
 				$Item = $ItemCache->get_by_ID($item_ID);
@@ -375,50 +377,58 @@ if( empty($tab) )
 			break;
 
 		case 'find_spam_comments':
-			$keywords = $DB->get_results('SELECT aspm_string FROM T_antispam');
-			foreach( $keywords as $word )
-			{
-				$str = $word->aspm_string;
-				$r = $DB->query( 'DELETE FROM T_comments
-									WHERE comment_author LIKE '.$DB->quote('%'.$str.'%').'
-									OR comment_author_email LIKE '.$DB->quote('%'.$str.'%').'
-									OR comment_author_url LIKE '.$DB->quote('%'.$str.'%').'
-									OR comment_content LIKE '.$DB->quote('%'.$str.'%'),
-									'Delete all spam comments' );
-				
-				if( $r )
-				{
-					$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars($str) ), 'success' );
-					$deleted = 'true';
-				}
-			}
+			$keywords = $DB->get_col('SELECT aspm_string FROM T_antispam');
+			$keywords = array_chunk( $keywords, 100 );
+			$rows_affected = 0;
 
-			if( empty($deleted) )
+			@ignore_user_abort(true);
+			set_max_execution_time(900);
+
+			// Delete comments in chunks of 100 keywords per SQL query
+			foreach( $keywords as $chunk )
 			{
-				$Messages->add( T_('No spam comments found'), 'success' );
+				$arr = array();
+				foreach( $chunk as $word )
+				{
+					$arr[] = $DB->quote('%'.$word.'%');
+				}
+
+				$DB->query('DELETE FROM T_comments
+							WHERE (comment_author LIKE '.implode(' OR comment_author LIKE ', $arr).')
+							OR (comment_author_email LIKE '.implode(' OR comment_author_email LIKE ', $arr).')
+							OR (comment_author_url LIKE '.implode(' OR comment_author_url LIKE ', $arr).')
+							OR (comment_content LIKE '.implode(' OR comment_content LIKE ', $arr).')',
+							'Delete spam comments');
+
+				$rows_affected = $rows_affected + $DB->rows_affected;
 			}
+			$Messages->add( sprintf( T_('Deleted %d comments'), $rows_affected ), 'success' );
 			break;
 
 		case 'find_spam_referers':
-			$keywords = $DB->get_results('SELECT aspm_string FROM T_antispam');
-			foreach( $keywords as $word )
-			{
-				$str = $word->aspm_string;
-				$r = $DB->query('DELETE FROM T_hitlog
-									WHERE hit_referer LIKE '.$DB->quote('%'.$str.'%'),
-									'Delete all banned hit-log entries' );
+			$keywords = $DB->get_col('SELECT aspm_string FROM T_antispam');
+			$keywords = array_chunk( $keywords, 100 );
+			$rows_affected = 0;
 
-				if( $r )
+			@ignore_user_abort(true);
+			set_max_execution_time(900);
+
+			// Delete hits in chunks of 100 keywords per SQL query
+			foreach( $keywords as $chunk )
+			{
+				$arr = array();
+				foreach( $chunk as $word )
 				{
-					$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars($str) ), 'success' );
-					$deleted = 'true';
+					$arr[] = $DB->quote('%'.$word.'%');
 				}
-			}
 
-			if( empty($deleted) )
-			{
-				$Messages->add( T_('No banned hit-log entries found'), 'success' );
+				$DB->query('DELETE FROM T_hitlog
+							WHERE hit_referer LIKE '.implode(' OR hit_referer LIKE ', $arr),
+							'Delete all banned hit-log entries' );
+
+				$rows_affected = $rows_affected + $DB->rows_affected;
 			}
+			$Messages->add( sprintf( T_('Deleted %d logged hits'), $rows_affected ), 'success' );
 			break;
 	}
 }
@@ -492,6 +502,9 @@ $AdminUI->disp_global_footer();
 
 /*
  * $Log$
+ * Revision 1.41  2011/06/15 07:38:13  sam2kb
+ * Refactor spam comments and hits removal actions
+ *
  * Revision 1.40  2011/06/14 06:05:18  sam2kb
  * Check and remove all comments and hits mathing antispam blacklist
  *
