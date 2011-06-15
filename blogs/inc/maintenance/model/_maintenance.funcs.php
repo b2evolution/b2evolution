@@ -40,20 +40,6 @@ function check_version( $new_version_dir )
 
 
 /**
- * Set max execution time
- * @param integer seconds
- */
-function set_max_execution_time( $seconds )
-{
-	if( function_exists( 'set_time_limit' ) )
-	{
-		set_time_limit( $seconds );
-	}
-	@ini_set( 'max_execution_time', $seconds );
-}
-
-
-/**
  * Enable/disable maintenance mode
  *
  * @param boolean true if maintenance mode need to be enabled
@@ -379,6 +365,9 @@ function aliases_to_tables( $aliases )
 
 /*
  * $Log$
+ * Revision 1.11  2011/06/15 06:29:44  sam2kb
+ * Relocate "set_max_execution_time" function
+ *
  * Revision 1.10  2011/02/10 23:07:21  fplanque
  * minor/doc
  *

@@ -4141,8 +4141,25 @@ function get_ReqURI()
 }
 
 
+/**
+ * Set max execution time
+ * @param integer seconds
+ */
+function set_max_execution_time( $seconds )
+{
+	if( function_exists( 'set_time_limit' ) )
+	{
+		set_time_limit( $seconds );
+	}
+	@ini_set( 'max_execution_time', $seconds );
+}
+
+
 /*
  * $Log$
+ * Revision 1.254  2011/06/15 06:29:44  sam2kb
+ * Relocate "set_max_execution_time" function
+ *
  * Revision 1.253  2011/06/15 04:47:38  sam2kb
  * Strip www prefix if hostname is a subdomain
  *

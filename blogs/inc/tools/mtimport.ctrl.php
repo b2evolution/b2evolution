@@ -475,11 +475,7 @@ param( 'import_mode', 'string', 'normal' );
 		<h4>Importing from [<?php echo $exportedfile ?>]..<?php if( $simulate ) echo ' (simulating)' ?></h4>
 
 		<?php
-		if( function_exists( 'set_time_limit' ) )
-		{
-			set_time_limit( 900 ); // 15 minutes ought to be enough for everybody *g
-		}
-		@ini_set( 'max_execution_time', '900' );
+		set_max_execution_time(900);
 
 		// counters
 		$count_postscreated = 0;
@@ -1674,6 +1670,9 @@ function tidypostdata( $string )
 
 /*
  * $Log$
+ * Revision 1.21  2011/06/15 06:29:44  sam2kb
+ * Relocate "set_max_execution_time" function
+ *
  * Revision 1.20  2011/02/15 05:31:53  sam2kb
  * evo_strtolower mbstring wrapper for strtolower function
  *

@@ -100,7 +100,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		else
 		{
 			// Try to obtain some serious time to do some serious processing (15 minutes)
-			@set_time_limit( 900 );
+			set_max_execution_time(900);
 
 			// required fields initialization
 			$wp_db = $_POST['wp_db'];
@@ -577,6 +577,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <?php
 /*
  * $Log$
+ * Revision 1.11  2011/06/15 06:29:44  sam2kb
+ * Relocate "set_max_execution_time" function
+ *
  * Revision 1.10  2011/02/15 05:31:53  sam2kb
  * evo_strtolower mbstring wrapper for strtolower function
  *

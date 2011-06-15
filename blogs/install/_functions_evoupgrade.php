@@ -270,7 +270,7 @@ function upgrade_b2evo_tables()
 
 
 	// Try to obtain some serious time to do some serious processing (5 minutes)
-	@set_time_limit( 300 );
+	set_max_execution_time(300);
 
 
 
@@ -3162,6 +3162,9 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.395  2011/06/15 06:29:44  sam2kb
+ * Relocate "set_max_execution_time" function
+ *
  * Revision 1.394  2011/05/25 14:59:34  efy-asimo
  * Post attending
  *
