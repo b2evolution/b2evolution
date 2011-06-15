@@ -3168,8 +3168,10 @@ function get_base_domain( $url )
 	}
 	$base_domain = convert_charset(idna_decode($match[0]), $evo_charset, 'UTF-8');
 
-	// Remove any www*. prefix:
-	$base_domain = preg_replace( '~^www.*?\.~i', '', $base_domain );
+	if( substr_count($base_domain, '.') > 1 )
+	{	// Remove any www*. prefix:
+		$base_domain = preg_replace( '~^www.*?\.~i', '', $base_domain );
+	}
 
 	//echo '<br>'.$base_domain.'</p>';
 
@@ -4141,6 +4143,9 @@ function get_ReqURI()
 
 /*
  * $Log$
+ * Revision 1.253  2011/06/15 04:47:38  sam2kb
+ * Strip www prefix if hostname is a subdomain
+ *
  * Revision 1.252  2011/05/23 02:20:06  sam2kb
  * Option to display excerpts in comment feeds, or disable feeds completely
  *
