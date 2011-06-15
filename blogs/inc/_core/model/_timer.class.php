@@ -88,7 +88,6 @@ class Timer
 	 */
 	function start( $category, $log = true )
 	{
-		global $Debuglog;
 		$this->reset( $category );
 		$this->resume( $category, $log );
 	}
@@ -290,6 +289,9 @@ class Timer_noop
 
 /*
  * $Log$
+ * Revision 1.11  2011/06/15 20:27:41  sam2kb
+ * minor
+ *
  * Revision 1.10  2010/07/26 06:52:15  efy-asimo
  * MFB v-4-0
  *
