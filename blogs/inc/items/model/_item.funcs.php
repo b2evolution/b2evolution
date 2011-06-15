@@ -308,7 +308,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	if( !empty($orig_title) && $urltitle != $orig_title )
 	{
-		$Messages->add( sprintf(T_('Warning: the URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'error' );
+		$Messages->add( sprintf(T_('Warning: the URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'note' );
 	}
 
 	return $urltitle;
@@ -1969,6 +1969,10 @@ function collapsible_legend_tag( $legend, $id, $display = true )
 
 /*
  * $Log$
+ * Revision 1.126  2011/06/15 20:30:38  sam2kb
+ * Change message type to "note"
+ * See http://forums.b2evolution.net/viewtopic.php?t=22334
+ *
  * Revision 1.125  2011/03/01 15:10:23  sam2kb
  * Collapsible filter blocks
  *
