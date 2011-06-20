@@ -92,7 +92,7 @@ class Cronjob extends DataObject
 				return $this->set_param( 'params', 'string', serialize($parvalue), false );
 
 			case 'name':
-				return $this->set_param( $parname, 'string', substr( $parvalue, 0, 50 ), false );
+				return $this->set_param( $parname, 'string', evo_substr( $parvalue, 0, 50 ), false );
 		}
 
 		return $this->set_param( $parname, 'string', $parvalue, $make_null );
@@ -119,6 +119,9 @@ class Cronjob extends DataObject
 
 /*
  * $Log$
+ * Revision 1.7  2011/06/20 22:08:36  sam2kb
+ * Use evo_substr
+ *
  * Revision 1.6  2010/02/08 17:52:14  efy-yury
  * copyright 2009 -> 2010
  *
