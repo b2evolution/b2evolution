@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: b2evolution\n"
 "Report-Msgid-Bugs-To: http://fplanque.net/\n"
 "POT-Creation-Date: 2010-12-24 03:13+0100\n"
-"PO-Revision-Date: 2011-04-19 23:02-0500\n"
+"PO-Revision-Date: 2011-06-14 23:49-0500\n"
 "Last-Translator: Alex\n"
 "Language-Team: Russian b2evolution\n"
 "MIME-Version: 1.0\n"
@@ -3121,7 +3121,7 @@ msgstr "Локальный"
 
 #: ../../../inc/antispam/views/_antispam_list.view.php:131
 msgid "Reported"
-msgstr "Сообщено"
+msgstr "Отправлено"
 
 #: ../../../inc/antispam/views/_antispam_list.view.php:132
 msgid "Central"
