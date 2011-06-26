@@ -78,7 +78,7 @@ class PageCache
 	{
 		global $Debuglog;
 		global $Settings;
-		global $cache_path;
+		global $cache_path, $pagecache_max_age;
 
 		if( is_null($Blog) )
 		{	// Cache for "other" "genereic" "special" pages:
@@ -107,6 +107,8 @@ class PageCache
 				$this->is_enabled = true;
 			}
 		}
+
+		$this->max_age_seconds = $pagecache_max_age;
 	}
 
 
@@ -634,6 +636,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.29  2011/06/26 17:30:56  sam2kb
+ * Added global param $pagecache_max_age
+ *
  * Revision 1.28  2011/06/26 16:30:41  sam2kb
  * minor
  *

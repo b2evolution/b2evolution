@@ -363,6 +363,16 @@ $cookie_expired = time() - 86400;
  */
 $crumb_expires = 7200;
 
+/**
+ * Page cache expiration time
+ * How old can a cached object get before we consider it outdated
+ *
+ * Default: 15 minutes
+ *
+ * @global int $crumb_expires
+ */
+$pagecache_max_age = 900;
+
 
 // ** Location of the b2evolution subdirectories **
 
