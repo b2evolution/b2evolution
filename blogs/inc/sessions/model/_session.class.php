@@ -510,17 +510,17 @@ class Session
 	 */
 	function create_crumb( $crumb_name )
 	{
-		global $servertimenow;
+		global $servertimenow, $crumb_expires;
 
 		// Retrieve latest saved crumb:
 		$crumb_recalled = $this->get( 'crumb_latest_'.$crumb_name, '-0' );
 		list( $crumb_value, $crumb_time ) = explode( '-', $crumb_recalled );
 
-		if( $servertimenow - $crumb_time > 3600 )
+		if( $servertimenow - $crumb_time > ($crumb_expires/2) )
 		{	// The crumb we already had is older than 1 hour...
 			// We'll need to generate a new value:
 			$crumb_value = '';
-			if( $servertimenow - $crumb_time < 7000 ) // Leave some margin here to make sure we do no overwrite a newer 1-2 hr crumb
+			if( $servertimenow - $crumb_time < ($crumb_expires - 200) ) // Leave some margin here to make sure we do no overwrite a newer 1-2 hr crumb
 			{	// Not too old either, save as previous crumb:
 				$this->set( 'crumb_prev_'.$crumb_name, $crumb_recalled );
 			}
@@ -548,7 +548,7 @@ class Session
 	 */
 	function assert_received_crumb( $crumb_name )
 	{
-		global $servertimenow;
+		global $servertimenow, $crumb_expires;
 
 		if( ! $crumb_received = param( 'crumb_'.$crumb_name, 'string', NULL ) )
 		{ // We did not receive a crumb!
@@ -558,7 +558,7 @@ class Session
 		// Retrieve latest saved crumb:
 		$crumb_recalled = $this->get( 'crumb_latest_'.$crumb_name, '-0' );
 		list( $crumb_value, $crumb_time ) = explode( '-', $crumb_recalled );
-		if( $crumb_received == $crumb_value && $servertimenow - $crumb_time <= 7200 )
+		if( $crumb_received == $crumb_value && $servertimenow - $crumb_time <= $crumb_expires )
 		{	// Crumb is valid
 			// echo '<p>-<p>-<p>A';
 			return true;
@@ -567,7 +567,7 @@ class Session
 		// Retrieve previous saved crumb:
 		$crumb_recalled = $this->get( 'crumb_prev_'.$crumb_name, '-0' );
 		list( $crumb_value, $crumb_time ) = explode( '-', $crumb_recalled );
-		if( $crumb_received == $crumb_value && $servertimenow - $crumb_time <= 7200 )
+		if( $crumb_received == $crumb_value && $servertimenow - $crumb_time <= $crumb_expires )
 		{	// Crumb is valid
 			// echo '<p>-<p>-<p>B';
 			return true;
@@ -578,7 +578,7 @@ class Session
 		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
 		echo '<h3 style="color:#f00;">'.T_('Incorrect crumb received!').' ['.$crumb_name.']</h3>';
 		echo '<p>'.T_('Your request was stopped for security reasons.').'</p>';
-		echo '<p>'.T_('Have you waited more than 2 hours before submitting your request?').'</p>';
+		echo '<p>'.sprintf( T_('Have you waited more than %d minutes before submitting your request?'), floor($crumb_expires/60) ).'</p>';
 		echo '<p>'.T_('Please go back to the previous page and refresh it before submitting the form again.').'</p>';
 		echo '</div>';
 
@@ -661,6 +661,9 @@ function session_unserialize_load_all_classes()
 
 /*
  * $Log$
+ * Revision 1.37  2011/06/26 17:06:40  sam2kb
+ * Added global param $crumb_expires
+ *
  * Revision 1.36  2010/11/25 15:16:35  efy-asimo
  * refactor $Messages
  *

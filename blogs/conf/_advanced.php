@@ -354,6 +354,15 @@ $cookie_expires = time() + 31536000;
  */
 $cookie_expired = time() - 86400;
 
+/**
+ * Crumb expiration time
+ *
+ * Default: 2 hours
+ *
+ * @global int $crumb_expires
+ */
+$crumb_expires = 7200;
+
 
 // ** Location of the b2evolution subdirectories **
 
