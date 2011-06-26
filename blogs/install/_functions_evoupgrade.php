@@ -2205,8 +2205,8 @@ function upgrade_b2evo_tables()
 		$rows = $DB->get_results( $sql, OBJECT, 'get all search hits' );
 		foreach( $rows as $row )
 		{
-			$keyphrase = Hit::extract_keyphrase_from_referer( $row->hit_referer );
-			if( empty( $keyphrase ) )
+			$params = Hit::extract_params_from_referer( $row->hit_referer );
+			if( empty( $params['keyphrase'] ) )
 			{
 				continue;
 			}
@@ -2215,13 +2215,13 @@ function upgrade_b2evo_tables()
 
 			$sql = 'SELECT keyp_ID
 			          FROM T_track__keyphrase
-			         WHERE keyp_phrase = '.$DB->quote($keyphrase);
+			         WHERE keyp_phrase = '.$DB->quote($params['keyphrase']);
 			$keyp_ID = $DB->get_var( $sql, 0, 0, 'Get keyphrase ID' );
 
 			if( empty( $keyp_ID ) )
 			{
 				$sql = 'INSERT INTO T_track__keyphrase( keyp_phrase )
-				        VALUES ('.$DB->quote($keyphrase).')';
+				        VALUES ('.$DB->quote($params['keyphrase']).')';
 				$DB->query( $sql, 'Add new keyphrase' );
 				$keyp_ID = $DB->insert_id;
 			}
@@ -3162,6 +3162,10 @@ function upgrade_b2evo_tables()
 
 /*
  * $Log$
+ * Revision 1.396  2011/06/26 17:55:58  sam2kb
+ * Search engine stats refactoring
+ * All related params moved to /inc/sessions/model/_search_engines.php
+ *
  * Revision 1.395  2011/06/15 06:29:44  sam2kb
  * Relocate "set_max_execution_time" function
  *

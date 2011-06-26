@@ -85,125 +85,6 @@ $blackList = array(
 
 
 /**
- * Search engines for statistics
- *
- * The following substrings will be looked up in the referer http header
- * in order to identify search engines
- *
- * @todo fp> merge definitions for search engine sig + keyword param + position param into a single array
- * @todo fp> move to admin interface (specific list editor), include query params
- *       fp Actually, I'm not sure a DB table would be a good idea. It would slow down lookup and it's not really a table the average user is going to modify anyway...
- *       dh> It would be a cheap query, and the processing _might_ be even faster, if we can ask MySQL to do the lookup, instead of iterating the same list always. Also, this is a good thing for autoupdates. You're right about average users changing it though.
- * @todo fp> have regexps, for example for //www\.google\.[^/]+/search
- *
- *
- * @global array $search_engines
- */
-$search_engines = array(
-	'//www.google.',	// q=  and optional start= or cd= when using ajax
-	'//images.google.',
- 	'//video.google.',
-	'.hotbot.',
-	'.altavista.',
-	'.excite.',
-	'.voila.fr/',
-	'http://search',
-	'://suche.',
-	'search.',
-	'search2.',
-	'http://recherche',
-	'recherche.',
-	'recherches.',
-	'vachercher.',
-	'feedster.com/',
-	'alltheweb.com/',
-	'daypop.com/',
-	'feedster.com/',
-	'technorati.com/',
-	'weblogs.com/',
-	'exalead.com/',
-	'killou.com/',
-	'buscador.terra.es',
-	'web.toile.com',
-	'metacrawler.com/',
-	'.mamma.com/',
-	'.dogpile.com/',
-	'search1-1.free.fr',
-	'search1-2.free.fr',
-	'overture.com',
-	'startium.com',
-	'2020search.com',
-	'bestsearchonearth.info',
-	'mysearch.com',
-	'popdex.com',
-	'64.233.167.104',
-	'seek.3721.com',
-	'http://netscape.',
-	'http://www.netscape.',
-	'/searchresults/',
-	'/websearch?',
-	'http://results.',
-	'baidu.com/',
-	'reacteur.com/',
-	'http://www.lmi.fr/',
-	'kartoo.com/',
-	'icq.com/search',
-	'alexa.com/search',
-	'att.net/s/', // string=
-	'blingo.com/search',  //q=
-	'crawler.com/search/',	// q
-	'inbox.com/search/', // q
-	'scroogle.org/', // GW=
-	'cuil.com/',
-	'yandex.',
-	'go.mail.ru/search',
-	'//www.bing.com', //q=
-	'//cc.bingj.com', // q=
-	'.qip.ru/', // query=
-	'://duckduckgo.com/', //q=
-	'rambler.ru', // query, words=
-	'nigma.ru', // s=
-	'ask.com', // q=
-);
-
-
-/**
- * Search params needed to extract keywords from a search engine referer url
- *
- * Typically http://google.com?s=keyphraz returns keyphraz
- *
- * fp> TODO: merge with above table
- *           dh> Piwik (open source web analytics) might have good data to use for this (referrer/search param pairs)
- *           dh> Also useful/required: default encoding of search_params values (e.g. latin1 for suche.t-online.de)
- * fp> TODO: put into configurable database table
- *
- * @global array $known_search_params
- */
-$known_search_params =  array(
-	'q',
-	'as_q',         // Google Advanced Search Query
-	'as_epq',       // Google Advanced Search Query
-	'query',
-	'search',
-	's',            // google.co.uk
-	'p',
-	'kw',
-	'qs',
-	'searchfor',    // mysearch.myway.com
-	'r',
-	'rdata',        // search.ke.voila.fr
-	'string',       // att.net
-	'su',           // suche.web.de
-	'Gw',           // scroogle.org
-	'text',         // yandex.ru
-	'search_query',	// search.ukr.net
-	'wd',           // baidu.com
-	'keywords',     // gde.ru
-	'words',		// rambler.ru
-);
-
-
-/**
  * UserAgent identifiers for logging/statistics
  *
  * The following substrings will be looked up in the user_agent http header
@@ -271,6 +152,7 @@ $user_agents = array(
 	array('robot', ' oBot/', 'IBM Bot' ),
 	array('robot', 'GarlikCrawler/', 'Garlik' ),
 	array('robot', 'Yeti/', 'Naver' ),
+	array('robot', 'TurnitinBot/', 'Turnitin' ),
 	// Unknown robots:
 	array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:

@@ -144,12 +144,28 @@ class Hit
 	var $agent_type;
 
 	/**
+	 * Array of 2 letter ISO country codes
+	 * This gets lazy-filled by {@link get_country_codes()}.
+	 * @var array
+	 * @access protected
+	 */
+	var $country_codes;
+
+	/**
+	 * Array of known search engines in format( searchEngineName => URL )
+	 * This gets lazy-filled by {@link get_search_engine_names()}.
+	 * @var array
+	 * @access protected
+	 */
+	var $search_engine_names;
+
+	/**
 	 * Extracted from search referers:
 	 */
-	var $_extracted_keyphrase = false;
+	var $_search_params_extracted = false;
 	var $_keyphrase = NULL;
-	var $_extracted_serprank = false;
 	var $_serprank = NULL;
+	var $_search_engine = NULL;
 
 
 	/**
@@ -239,7 +255,7 @@ class Hit
 	function detect_referer()
 	{
 		global $Debuglog, $debug;
-		global $self_referer_list, $blackList, $search_engines;  // used to detect $referer_type
+		global $self_referer_list, $blackList;  // used to detect $referer_type
 		global $skins_path;
 		global $Settings;
 
@@ -322,44 +338,14 @@ class Hit
 
 
 		// Is the referer a search engine?
-		// Note: for debug simulation, you may need to add sth like $search_engines[] = '/credits.html'; into the conf
-		// fp>dh: why add the code, but no matching data to stats.conf ?
-		// dh> I wanted to refactor it, so that the data could contain the default encoding, too. Then I stopped this. I've left this though, since I thought it could turn out to be useful in the future.
-		foreach( $search_engines as $search_engine_name => $lSearchEngine )
+		if( $this->is_search_referer($this->referer) )
 		{
-			if( stristr($this->referer, $lSearchEngine) ) // search simulation
-			{
-				$Debuglog->add( 'Hit: detect_referer(): search engine ('.$lSearchEngine.')', 'request' );
-				$this->referer_type = 'search';
-
-				if( ctype_digit($search_engine_name) )
-				{ // no name defined in $search_engines
-					$this->search_engine = $lSearchEngine;
-				}
-				else
-				{
-					$this->search_engine = $search_engine_name;
-				}
-				return;
-			}
+			$Debuglog->add( 'Hit: detect_referer(): search engine', 'request' );
+			$this->referer_type = 'search';
+			return;
 		}
-		$this->search_engine = 'unknown';
 
 		$this->referer_type = 'referer';
-	}
-
-
-	/**
-	 * Get name of search engine.
-	 * This is only useful for referer_type="search".
-	 *
-	 * @return string Search engine name (or "pattern") from $search_engines. "unknown" if not detected.
-	 */
-	function get_search_engine()
-	{
-		if( ! isset($this->search_engine) )
-			$this->detect_referer();
-		return $this->search_engine;
 	}
 
 
@@ -752,17 +738,17 @@ class Hit
 	 */
 	function get_keyphrase()
 	{
-		if( !empty( $this->_extracted_keyphrase ) )
+		if( $this->_search_params_extracted )
 		{
 			return $this->_keyphrase;
 		}
 
 		if( $this->referer_type == 'search' )
 		{
-			$this->_keyphrase = Hit::extract_keyphrase_from_referer( $this->referer );
+			Hit::extract_params_from_referer( $this->referer );
 		}
 
-		$this->_extracted_keyphrase = true;
+		$this->_search_params_extracted = true;
 
 		return $this->_keyphrase;
 	}
@@ -773,19 +759,40 @@ class Hit
 	 */
 	function get_serprank()
 	{
-		if( !empty( $this->_extracted_serprank ) )
+		if( $this->_search_params_extracted )
 		{
-			return $this->_extracted_serprank;
+			return $this->_serprank;
 		}
 
 		if( $this->referer_type == 'search' )
 		{
-			$this->_serprank = Hit::extract_serprank_from_referer( $this->referer );
+			Hit::extract_params_from_referer( $this->referer );
 		}
 
-		$this->_extracted_serprank = true;
+		$this->_search_params_extracted = true;
 
 		return $this->_serprank;
+	}
+
+
+	/**
+	 * Get name of search engine
+	 */
+	function get_search_engine()
+	{
+		if( $this->_search_params_extracted )
+		{
+			return $this->_search_engine;
+		}
+
+		if( $this->referer_type == 'search' )
+		{
+			Hit::extract_params_from_referer( $this->referer );
+		}
+
+		$this->_search_params_extracted = true;
+
+		return $this->_search_engine;
 	}
 
 
@@ -910,6 +917,95 @@ class Hit
 	}
 
 
+	function get_param_from_string( $string, $param )
+	{
+		parse_str($string, $array);
+		$value = isset($array[$param]) ? $array[$param] : NULL;
+
+		return $value;
+	}
+
+
+	/**
+	 * Get array of 2 letter ISO country codes
+	 *
+	 * @return array
+	 */
+	function get_country_codes()
+	{
+		global $DB;
+
+		if( is_null( $this->country_codes ) )
+		{
+			$this->country_codes = $DB->get_col('SELECT ctry_code FROM T_country', 0, 'get 2 letter ISO country codes' );
+		}
+		return $this->country_codes;
+	}
+
+
+	/**
+	 * @return array Array of ( searchEngineName => URL )
+	 */
+	function get_search_engine_names()
+	{
+		global $search_engine_params;
+
+		if( is_null( $this->search_engine_names ) )
+		{
+			$this->search_engine_names = array();
+			foreach( $search_engine_params as $url => $info )
+			{
+				if( !isset($this->search_engine_names[$info[0]]) )
+				{	// Do not overwrite existing keys
+					$this->search_engine_names[$info[0]] = $url;
+				}
+			}
+		}
+		return $this->search_engine_names;
+	}
+
+
+	/**
+	 * Reduce URL to more minimal form.  2 letter country codes are
+	 * replaced by '{}', while other parts are simply removed.
+	 *
+	 * Examples:
+	 *   www.example.com -> example.com
+	 *   search.example.com -> example.com
+	 *   m.example.com -> example.com
+	 *   de.example.com -> {}.example.com
+	 *   example.de -> example.{}
+	 *   example.co.uk -> example.{}
+	 *
+	 * @param string $url
+	 * @return string
+	 */
+	function get_lossy_url( $url )
+	{
+		static $countries;
+
+		if( !isset($countries) )
+		{	// Load 2 letter ISO country codes 
+			$countries = implode( '|', $this->get_country_codes() );
+		}
+
+		return preg_replace(
+			array(
+				'/^(w+[0-9]*|search)\./',
+				'/(^|\.)m\./',
+				'/(\.(com|org|net|co|it|edu))?\.('.$countries.')(\/|$)/',
+				'/^('.$countries.')\./',
+			),
+			array(
+				'',
+				'$1',
+				'.{}$4',
+				'{}.',
+			),
+			$url);
+	}
+
+
 	/**
 	 * Determine if a hit is a new view (not reloaded or from a robot).
 	 *
@@ -987,141 +1083,248 @@ class Hit
 	}
 
 
-	/**
-	 * Extract the keyphrase from a search engine referer url
-	 *
-	 * Typically http://google.com?s=keyphraz returns keyphraz
-	 *
-	 * @static
-	 * @param string referer
-	 * @return string keyphrase
-	 */
-	function extract_keyphrase_from_referer( $ref )
+	function is_search_referer( $referer, $return_params = false )
 	{
-		global $evo_charset, $known_search_params;
+		global $search_engine_params;
 
-		// Parse URL.
-		$pu = @parse_url($ref);
-		if( ! isset($pu['query']) )
+		// Load search engine definitions
+		require_once dirname(__FILE__).'/_search_engines.php';
+
+		// Parse referer
+		$pu = @parse_url($referer);
+
+		if( ! isset($pu['query']) || ! isset($pu['host']) )
 		{
-			return NULL;
+			return false;
 		}
 
-		// Parse query string into associate array.
-		parse_str($pu['query'], $ref_params);
+		$ref_host = $pu['host'];
+		$ref_query = isset($pu['query']) ? $pu['query'] : '';
+		$ref_fragment = isset($pu['fragment']) ? $pu['fragment'] : '';
 
-		// Special handling for images.google.*:
-		if( substr($pu['host'], 0, 14) == 'images.google.' && isset($ref_params['prev']) )
+		// Some search engines (eg. Bing Images) use the same domain
+		// as an existing search engine (eg. Bing), we must also use the url path
+		$ref_path = isset($pu['path']) ? $pu['path'] : '';
+
+		$host_pattern = $this->get_lossy_url($ref_host);
+
+		if( array_key_exists($ref_host.$ref_path, $search_engine_params) )
 		{
-			$prev = @parse_url($ref_params['prev']);
-			if( $prev === false ) 
-			{
-				$prev = @parse_url($pu['host'].$ref_params['prev']);
-				if( ! $prev ) 
-				{
-					return NULL;
-				}
+			$ref_host = $ref_host.$ref_path;
+		}
+		elseif( array_key_exists($host_pattern.$ref_path, $search_engine_params) )
+		{
+			$ref_host = $host_pattern.$ref_path;
+		}
+		elseif( array_key_exists($host_pattern, $search_engine_params) )
+		{
+			$ref_host = $host_pattern;
+		}
+		elseif( !array_key_exists($ref_host, $search_engine_params) )
+		{
+			if( !strncmp($ref_query, 'cx=partner-pub-', 15) )
+			{	// Google custom search engine
+				$ref_host = 'www.google.com/cse';
 			}
-			parse_str($prev['query'], $prev_params);
-
-			$ie = isset($ref_params['ie']) ? $ref_params['ie'] : 'utf-8';
-			$q = convert_charset($prev_params['q'], $evo_charset, $ie);
-			return $q;
-		}
-
-		foreach( $known_search_params as $search_param )
-		{
-			if( isset($ref_params[$search_param]) )
-			{ // found the keyphrase query parameter
-				$q = trim(urldecode($ref_params[$search_param]));
-
-			/* fp> what's that? when do we need that?
-			 * Tblue> I think the problem is this: yandex.ru uses the text
-			 *        parameter for the keyphrase and the p parameter for
-			 *        the serprank, but some other search engine uses p
-			 *        for the keyphrase. If yandex.ru puts the p param
-			 *        before the text param in the URL, we would get the
-			 *        serprank instead of the keyphrase, so if p appears
-			 *        to be the serprank, we skip it. This may work for
-			 *        yandex.ru, but if somebody searches for a numeric
-			 *        value using the search engine which uses the p param
-			 *        for the keyphrase, we won't get the correct result!
-			 *        Conclusion: We need a better fix for yandex.ru.
-			 * fp> What we need is to merge definitions for search engine sig + keyword param + position param into a single array or a single database table
-
-				if( ctype_digit( $q ) && $param_parts[0] == 'p' )
-				{	// ?p=5&text=keyword
-					continue;
-				}
-			*/
-
-				// convert from "input encoding":
-				if( isset($ref_params['ie']) )
-				{ // input encoding provided (Google does)
-					$ie = $ref_params['ie'];
-				}
-				else
-				{ // no input encoding provided, try to autodetect...
-					$ie = 'utf-8'; // default
-
-					if( can_check_encoding() )
-					{
-						foreach( array('utf-8', 'iso-8859-15') as $test_encoding )
-						{
-							if( check_encoding($q, $test_encoding) )
-							{
-								$ie = $test_encoding;
-								break;
-							}
-						}
-					}
-				}
-				$q = convert_charset($q, $evo_charset, $ie);
-
-				return $q;
+			elseif( !strncmp($ref_path, '/pemonitorhosted/ws/results/', 28) )
+			{	// Private-label search powered by InfoSpace Metasearch
+				$ref_host = 'infospace.com';
+			}
+			else
+			{	// Not a search referer
+				return false;
 			}
 		}
 
-		return NULL;
+		if( $return_params )
+		{
+			return array( $ref_host, $ref_path, $ref_query, $ref_fragment );
+		}
+		return true;
 	}
 
 
 	/**
-	 * Extract the "serp rank" from a search engine referer url
+	 * Extracts a keyword from a raw not encoded URL.
+	 * Will only extract keyword if a known search engine has been detected.
+	 * Returns the keyword:
+	 * - in UTF8: automatically converted from other charsets when applicable
+	 * - strtolowered: "QUErY test!" will return "query test!"
+	 * - trimmed: extra spaces before and after are removed
 	 *
-	 * Typically http://google.com?s=keyphraz&start=18 returns 18
+	 * Lists of supported search engines can be found in /conf/_stats.php
+	 * The function returns false when a keyword couldn't be found.
+	 * 	 eg. if the url is "http://www.google.com/partners.html" this will return false,
+	 *       as the google keyword parameter couldn't be found.
 	 *
-	 * @static
-	 * @param string referer
-	 * @return string keyphrase
+	 * @param string URL referer
+	 * @return array|false false if a keyword couldn't be extracted,
+	 * 						or array(
+	 * 							'engine_name' => 'Google',
+	 * 							'keywords' => 'my searched keywords',
+	 *							'serprank' => 4)
 	 */
-	function extract_serprank_from_referer( $ref )
+	function extract_params_from_referer( $ref )
 	{
-		// Note: The param names cannot contain special RegExp (PCRE)
-		// characters (they must be escaped).
-		static $serprank_params = array(
-				'start',	// google
-				'cd',		// google
-				'b',		// yahoo
-				'page',		// aol
-				'page2',	// lycos
-				'first',	// bing
-				'sf',		// mail.ru
-				'p',		// yandex.ru
+		global $search_engine_params, $evo_charset;
+
+		@list($ref_host, $ref_path, $query, $fragment) = $this->is_search_referer($ref, true);
+
+		if( empty($ref_host) )
+		{	// Not a search referer
+			return false;
+		}
+
+		$search_engine_name = $search_engine_params[$ref_host][0];
+
+		$keyword_param = NULL;
+		if( !empty($search_engine_params[$ref_host][1]) )
+		{
+			$keyword_param = $search_engine_params[$ref_host][1];
+		}
+		if( is_null($keyword_param) )
+		{	// Get settings from first item in group
+			$search_engine_names = $this->get_search_engine_names();
+
+			$url = $search_engine_names[$search_engine_name];
+			$keyword_param = $search_engine_params[$url][1];
+		}
+		if( !is_array($keyword_param) )
+		{
+			$keyword_param = array($keyword_param);
+		}
+
+		if( $search_engine_name == 'Google Images'
+			|| ($search_engine_name == 'Google' && strpos($ref, '/imgres') !== false) )
+		{
+			$query = urldecode(trim( $this->get_param_from_string($query, 'prev') ));
+			$query = str_replace( '&', '&amp;', strstr($query, '?') );
+			$search_engine_name = 'Google Images';
+		}
+		elseif( $search_engine_name == 'Google' && (strpos($query, '&as_') !== false || strpos($query, 'as_') === 0) )
+		{
+			$keys = array();
+
+			if( $key = $this->get_param_from_string($query, 'as_q') )
+			{
+				array_push($keys, $key);
+			}
+			if( $key = $this->get_param_from_string($query, 'as_oq') )
+			{
+				array_push($keys, str_replace('+', ' OR ', $key));
+			}
+			if( $key = $this->get_param_from_string($query, 'as_epq') )
+			{
+				array_push($keys, "\"$key\"");
+			}
+			if( $key = $this->get_param_from_string($query, 'as_eq') )
+			{
+				array_push($keys, "-$key");
+			}
+			$key = trim(urldecode(implode(' ', $keys)));
+		}
+
+		if( empty($key) )
+		{
+			foreach( $keyword_param as $param )
+			{
+				if( $param[0] == '/' )
+				{	// regular expression match
+					if( @preg_match($param, $ref, $matches) )
+					{
+						$key = trim(urldecode($matches[1]));
+						break;
+					}
+				}
+				else
+				{	// search for keywords now &vname=keyword
+					if( $key = $this->get_param_from_string($query, $param) )
+					{
+						$key = trim(urldecode($key));
+						if( !empty($key) ) break;
+					}
+				}
+			}
+		}
+
+		if( empty($key) )
+		{
+			return false;
+		}
+
+		if( !empty($search_engine_params[$ref_host][3]) )
+		{	// Use defined input encoding
+			$ie = trim($search_engine_params[$ref_host][3]);
+		}
+		else
+		{	// No input encoding provided, try to autodetect...
+			$ie = 'utf-8'; // default
+
+			if( can_check_encoding() )
+			{
+				foreach( array('utf-8', 'iso-8859-15') as $test_encoding )
+				{
+					if( check_encoding($key, $test_encoding) )
+					{
+						$ie = $test_encoding;
+						break;
+					}
+				}
+			}
+		}
+		$key = convert_charset($key, $evo_charset, $ie);
+		$key = evo_strtolower($key);
+
+		// Extract the "serp rank"
+		// Typically http://google.com?s=keyphraz&start=18 returns 18
+		if( !empty($search_engine_params[$ref_host][4]) )
+		{
+			$serp_param = $search_engine_params[$ref_host][4];
+		}
+		elseif( !empty($search_engine_params[$url][4]) )
+		{
+			$serp_param = $search_engine_params[$url][4];
+		}
+		else
+		{	// Fallback to default params
+			$serp_param = array('offset','page','start');
+		}
+
+		if( !empty($serp_param) )
+		{
+			if( !is_array($serp_param) )
+			{
+				$serp_param = array($serp_param);
+			}
+
+			if( strpos($search_engine_name, 'Google') !== false )
+			{	// Append fragment which Google uses in instant search
+				$query .= '&'.$fragment;
+			}
+
+			foreach( $serp_param as $param )
+			{
+				if( $var = $this->get_param_from_string($query, $param) )
+				{
+					if( ctype_digit($var) )
+					{
+						$serprank = $var;
+						break;
+					}
+				}
+			}
+		}
+
+		$this->_search_engine = $search_engine_name;
+		$this->_keyphrase = $key;
+		$this->_serprank = isset($serprank) ? $serprank : NULL;
+		$this->_search_params_extracted = true;
+
+		return array(
+				'engine_name'	=> $this->_search_engine,
+				'keyphrase'		=> $this->_keyphrase,
+				'serprank'		=> $this->_serprank
 			);
-		static $regexp = '';
-
-		if( $regexp === '' )
-		{	// Generate RegExp:
-			$regexp = '~[&?](?:'.implode( '|', $serprank_params ).')=([0-9]+)~i';
-		}
-
-		if( ! preg_match( $regexp, $ref, $serprank ) )
-		{	// Could not extract serp rank:
-			return NULL;
-		}
-
-		return $serprank[1];
 	}
 
 
@@ -1228,6 +1431,10 @@ class Hit
 
 /*
  * $Log$
+ * Revision 1.61  2011/06/26 17:54:52  sam2kb
+ * Search engine stats refactoring
+ * All related params moved to /inc/sessions/model/_search_engines.php
+ *
  * Revision 1.60  2010/03/08 21:55:55  fplanque
  * bleh
  *
