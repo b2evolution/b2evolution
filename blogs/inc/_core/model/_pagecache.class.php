@@ -347,21 +347,21 @@ class PageCache
 
 
 			// Check if the request has an If-Modified-Since date
-	  	if( array_key_exists( 'HTTP_IF_MODIFIED_SINCE', $_SERVER) )
-    	{
-        $if_modified_since = strtotime( preg_replace('/;.*$/','',$_SERVER['HTTP_IF_MODIFIED_SINCE']) );
-        if( $retrieved_ts <= $if_modified_since )
-        {	// Cached version is equal to (or older than) $if_modified since; contents not modified, send 304!
+			if( array_key_exists( 'HTTP_IF_MODIFIED_SINCE', $_SERVER) )
+			{
+				$if_modified_since = strtotime( preg_replace('/;.*$/','',$_SERVER['HTTP_IF_MODIFIED_SINCE']) );
+				if( $retrieved_ts <= $if_modified_since )
+				{	// Cached version is equal to (or older than) $if_modified since; contents not modified, send 304!
 
-        // fp> IMPORTANT: thsi will not prevent you from logging out but it can prevent you from seeing you're logged out.
-        // It may tell you that the version with the evobar was not modified so your browser will show the evobar again
-        // TODO: investigate ETag & Vary Headers.
-        // Vary on cookie, does that work?
-        // ETag: maybe sending user ID would be enough  and then denying 304 whenever an Etag is sent back
+					// fp> IMPORTANT: thsi will not prevent you from logging out but it can prevent you from seeing you're logged out.
+					// It may tell you that the version with the evobar was not modified so your browser will show the evobar again
+					// TODO: investigate ETag & Vary Headers.
+					// Vary on cookie, does that work?
+					// ETag: maybe sending user ID would be enough  and then denying 304 whenever an Etag is sent back
 
 					header( 'HTTP/1.0 304 Not Modified' );
 					exit(0);
-        }
+				}
 			}
 
 			// ============== Ready to send cached version of the page =================
@@ -634,6 +634,9 @@ class PageCache
 
 /*
  * $Log$
+ * Revision 1.28  2011/06/26 16:30:41  sam2kb
+ * minor
+ *
  * Revision 1.27  2011/03/15 09:34:05  efy-asimo
  * have checkboxes for enabling caching in new blogs
  * refactorize cache create/enable/disable
