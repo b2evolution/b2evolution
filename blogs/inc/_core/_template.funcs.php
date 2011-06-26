@@ -68,11 +68,11 @@ function header_content_type( $type = 'text/html', $charset = '#' )
  */
 function headers_content_mightcache( $type = 'text/html', $max_age = '#', $charset = '#' )
 {
-	global $is_admin_page;
+	global $Messages, $is_admin_page;
 
 	header_content_type( $type, $charset );
 
-	if( empty($max_age) || $is_admin_page || is_logged_in() )
+	if( empty($max_age) || $is_admin_page || is_logged_in() || $Messages->count() )
 	{	// Don't cache if no max_age given + NEVER EVER allow admin pages to cache + NEVER EVER allow logged in data to be cached:
 		header_nocache();
 		return;
@@ -1169,6 +1169,9 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 
 /*
  * $Log$
+ * Revision 1.83  2011/06/26 17:01:14  sam2kb
+ * Send header_nocache if we have any messages to display
+ *
  * Revision 1.82  2011/06/14 13:33:55  efy-asimo
  * in-skin register
  *
