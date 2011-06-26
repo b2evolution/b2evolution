@@ -369,7 +369,7 @@ $crumb_expires = 7200;
  *
  * Default: 15 minutes
  *
- * @global int $crumb_expires
+ * @global int $pagecache_max_age
  */
 $pagecache_max_age = 900;
 
