@@ -1252,17 +1252,26 @@ class Hit
 			return false;
 		}
 
+
+		// Convert encoding
 		if( !empty($search_engine_params[$ref_host][3]) )
-		{	// Use defined input encoding
-			$ie = trim($search_engine_params[$ref_host][3]);
+		{
+			$ie = $search_engine_params[$ref_host][3];
+		}
+		elseif( !empty($search_engine_params[$url][3]) )
+		{
+			$ie = $search_engine_params[$url][3];
 		}
 		else
-		{	// No input encoding provided, try to autodetect...
-			$ie = 'utf-8'; // default
+		{	// Fallback to default encoding
+			$ie = array('utf-8', 'iso-8859-15');
+		}
 
+		if( is_array($ie) )
+		{
 			if( can_check_encoding() )
 			{
-				foreach( array('utf-8', 'iso-8859-15') as $test_encoding )
+				foreach( $ie as $test_encoding )
 				{
 					if( check_encoding($key, $test_encoding) )
 					{
@@ -1271,9 +1280,15 @@ class Hit
 					}
 				}
 			}
+			else
+			{
+				$ie = $ie[0];
+			}
 		}
+		
 		$key = convert_charset($key, $evo_charset, $ie);
 		$key = evo_strtolower($key);
+
 
 		// Extract the "serp rank"
 		// Typically http://google.com?s=keyphraz&start=18 returns 18
@@ -1290,27 +1305,24 @@ class Hit
 			$serp_param = array('offset','page','start');
 		}
 
-		if( !empty($serp_param) )
+		if( !is_array($serp_param) )
 		{
-			if( !is_array($serp_param) )
-			{
-				$serp_param = array($serp_param);
-			}
+			$serp_param = array($serp_param);
+		}
 
-			if( strpos($search_engine_name, 'Google') !== false )
-			{	// Append fragment which Google uses in instant search
-				$query .= '&'.$fragment;
-			}
+		if( strpos($search_engine_name, 'Google') !== false )
+		{	// Append fragment which Google uses in instant search
+			$query .= '&'.$fragment;
+		}
 
-			foreach( $serp_param as $param )
+		foreach( $serp_param as $param )
+		{
+			if( $var = $this->get_param_from_string($query, $param) )
 			{
-				if( $var = $this->get_param_from_string($query, $param) )
+				if( ctype_digit($var) )
 				{
-					if( ctype_digit($var) )
-					{
-						$serprank = $var;
-						break;
-					}
+					$serprank = $var;
+					break;
 				}
 			}
 		}
@@ -1431,9 +1443,8 @@ class Hit
 
 /*
  * $Log$
- * Revision 1.61  2011/06/26 17:54:52  sam2kb
- * Search engine stats refactoring
- * All related params moved to /inc/sessions/model/_search_engines.php
+ * Revision 1.62  2011/06/27 00:49:48  sam2kb
+ * Fixed encoding detection
  *
  * Revision 1.60  2010/03/08 21:55:55  fplanque
  * bleh
