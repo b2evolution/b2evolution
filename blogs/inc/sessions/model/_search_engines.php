@@ -868,11 +868,11 @@ $search_engine_params = array(
 	'search.yam.com'			=> array('Yam', 'k', 'Search/Web/?SearchType=web&k={k}'),
 
 	// Yandex
-	'yandex.com'				=> array('Yandex', 'text', 'yandsearch?text={k}', '', 'p'),
+	'yandex.com'				=> array('Yandex', 'text', 'yandsearch?text={k}', array('utf-8','windows-1251'), 'p'),
 	'yandex.{}'					=> array('Yandex'),
 
 	// Yandex Images
-	'images.yandex.com'			=> array('Yandex Images', 'text', 'yandsearch?text={k}', '', 'p'),
+	'images.yandex.com'			=> array('Yandex Images', 'text', 'yandsearch?text={k}', array('utf-8','windows-1251'), 'p'),
 	'images.yandex.{}'			=> array('Yandex Images'),
 
 	// Yasni
