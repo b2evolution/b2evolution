@@ -538,6 +538,9 @@ $search_engine_params = array(
 	'www.toile.com'				=> array('La Toile Du Quebec (Google)', 'q', 'search?q={k}'),
 	'web.toile.com'				=> array('La Toile Du Quebec (Google)'),
 
+	// LiveTool
+	'search.livetool.ru'		=> array('LiveTool', 'text', '', array('utf-8','windows-1251'), 'text'),
+
 	// Looksmart
 	'www.looksmart.com'			=> array('Looksmart', 'key'),
 
