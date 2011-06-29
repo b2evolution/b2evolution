@@ -110,6 +110,7 @@ function skin_init( $disp )
 		// CONTENT PAGES:
 		case 'single':
 		case 'page':
+			require_js( 'communication.js' ); // auto requires jQuery
 			if( $disp == 'single' )
 			{
 				$seo_page_type = 'Single post page';
@@ -351,6 +352,7 @@ function skin_init( $disp )
 			break;
 
 		case 'msgform':
+			require_js( 'communication.js' ); // auto requires jQuery
 			$seo_page_type = 'Contact form';
 			if( $Blog->get_setting( $disp.'_noindex' ) )
 			{	// We prefer robots not to index these pages:
@@ -913,6 +915,9 @@ function skin_installed( $name )
 
 /*
  * $Log$
+ * Revision 1.91  2011/06/29 13:14:01  efy-asimo
+ * Use ajax to display comment and contact forms
+ *
  * Revision 1.90  2011/06/14 13:33:55  efy-asimo
  * in-skin register
  *

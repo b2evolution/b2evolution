@@ -580,6 +580,12 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
 	}
 	else
 	{ // nothing was changed
+		// check if ajax_form_enabled has correct state after b2evo upgrade
+		if( ( $Blog != NULL ) && ( $new_status ) && ( !$Blog->get_setting( 'ajax_form_enabled' ) ) )
+		{ // if page cache is enabled, ajax form must be enabled to
+			$Blog->set_setting( 'ajax_form_enabled', true );
+			$Blog->dbupdate();
+		}
 		return NULL;
 	}
 
@@ -595,6 +601,10 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
 	else
 	{
 		$Blog->set_setting( $cache_key, $new_status );
+		if( ( $cache_key == 'cache_enabled' ) && $new_status )
+		{ // if page cache is enabled, ajax form must be enabled to
+			$Blog->set_setting( 'ajax_form_enabled', true );
+		}
 		if( $save_setting )
 		{ // save
 			$Blog->dbupdate();
@@ -606,6 +616,9 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
 
 /*
  * $Log$
+ * Revision 1.14  2011/06/29 13:14:01  efy-asimo
+ * Use ajax to display comment and contact forms
+ *
  * Revision 1.13  2011/03/15 09:34:05  efy-asimo
  * have checkboxes for enabling caching in new blogs
  * refactorize cache create/enable/disable

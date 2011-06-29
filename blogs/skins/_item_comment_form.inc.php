@@ -50,7 +50,10 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 		{ // display PREVIEW:
 
 			// We do not want the current rendered page to be cached!!
-			$PageCache->abort_collect();
+			if( !empty( $PageCache ) )
+			{
+				$PageCache->abort_collect();
+			}
 
 			// ------------------ PREVIEW COMMENT INCLUDED HERE ------------------
 			skin_include( $params['comment_template'], array(
@@ -77,7 +80,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	else
 	{ // New comment:
 		$Comment = new Comment();
-		if( $PageCache->is_collecting )
+		if( ( !empty( $PageCache ) ) && ( $PageCache->is_collecting ) )
 		{	// This page is going into the cache, we don't want personal data cached!!!
 			// fp> These fields should be filled out locally with Javascript tapping directly into the cookies. Anyone JS savvy enough to do that?
 			$comment_author = '';
@@ -99,7 +102,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	}
 
 
-	if( $PageCache->is_collecting )
+	if( ( !empty( $PageCache ) ) && ( $PageCache->is_collecting ) )
 	{	// This page is going into the cache, we don't want personal data cached!!!
 		// fp> These fields should be filled out locally with Javascript tapping directly into the cookies. Anyone JS savvy enough to do that?
 	}
@@ -260,6 +263,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 
 /*
  * $Log$
+ * Revision 1.22  2011/06/29 13:14:01  efy-asimo
+ * Use ajax to display comment and contact forms
+ *
  * Revision 1.21  2011/03/03 12:47:29  efy-asimo
  * comments attachments
  *

@@ -458,6 +458,7 @@ class Blog extends DataObject
 
 		if( in_array( 'cache', $groups ) )
 		{ // we want to load the cache params:
+			$this->set_setting( 'ajax_form_enabled', param( 'ajax_form_enabled', 'integer', 0 ) );
 			$this->set_setting( 'cache_enabled_widgets', param( 'cache_enabled_widgets', 'integer', 0 ) );
 		}
 
@@ -2371,6 +2372,9 @@ class Blog extends DataObject
 
 /*
  * $Log$
+ * Revision 1.135  2011/06/29 13:14:01  efy-asimo
+ * Use ajax to display comment and contact forms
+ *
  * Revision 1.134  2011/06/15 06:29:44  sam2kb
  * Relocate "set_max_execution_time" function
  *

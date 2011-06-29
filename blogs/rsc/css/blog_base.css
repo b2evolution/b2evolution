@@ -239,3 +239,8 @@ div.tabs div.option a:hover {
 	font-weight: bold;
 	vertical-align: top;
 }
+/* Ajax form */
+div.section_requires_javascript p.ajax-loader {
+	text-align: center;
+	margin-top: 1em;
+}

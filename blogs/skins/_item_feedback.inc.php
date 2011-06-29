@@ -301,7 +301,20 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 }
 
 // ------------------ COMMENT FORM INCLUDED HERE ------------------
-skin_include( '_item_comment_form.inc.php', $params );
+if( $Blog->get_setting( 'ajax_form_enabled' ) )
+{
+	$json_params = array( 
+		'action' => 'get_comment_form',
+		'p' => $Item->ID,
+		'blog' => $Blog->ID,
+		'disp' => $disp,
+		'params' => $params );
+	display_ajax_form( $json_params );
+}
+else
+{
+	skin_include( '_item_comment_form.inc.php', $params );
+}
 // Note: You can customize the default item feedback by copying the generic
 // /skins/_item_comment_form.inc.php file into the current skin folder.
 // ---------------------- END OF COMMENT FORM ---------------------
@@ -309,6 +322,9 @@ skin_include( '_item_comment_form.inc.php', $params );
 
 /*
  * $Log$
+ * Revision 1.34  2011/06/29 13:14:01  efy-asimo
+ * Use ajax to display comment and contact forms
+ *
  * Revision 1.33  2011/05/30 13:35:30  efy-asimo
  * Use table to display item attendants
  *

@@ -1166,9 +1166,112 @@ function addup_percentage( $hit_count, $hit_total, $decimals = 1, $dec_point = '
 }
 
 
+/**
+ * Display a form through an ajax call
+ * @param array params
+ */
+function display_ajax_form( $params )
+{
+	global $rsc_url, $htsrv_url;
+
+	echo '<div class="section_requires_javascript">';
+
+	// needs json_encode function to create json type params
+	if ( !function_exists( 'json_encode' ) )
+	{// json_encode function does not exists
+		function json_encode( $a = false )
+		{
+			if( is_null( $a ) )
+			{
+				return 'null';
+			}
+			if( $a === false )
+			{
+				return 'false';
+			}
+			if( $a === true )
+			{
+				return 'true';
+			}
+			if( is_scalar( $a ) )
+			{
+				if( is_float( $a ) )
+				{ // Always use "." for floats.
+					return floatval( str_replace( ",", ".", strval( $a ) ) );
+				}
+	
+				if( is_string( $a ) )
+				{
+					$jsonReplaces = array( array( "\\", "/", "\n", "\t", "\r", "\b", "\f", '"' ), array( '\\\\', '\\/', '\\n', '\\t', '\\r', '\\b', '\\f', '\"' ) );
+					return '"'.str_replace( $jsonReplaces[0], $jsonReplaces[1], $a ).'"';
+				}
+	
+				return $a;
+			}
+			$isList = true;
+			for( $i = 0, reset($a); $i < count($a); $i++, next($a) )
+			{
+				if( key($a) !== $i )
+				{
+					$isList = false;
+					break;
+				}
+			}
+			$result = array();
+			if( $isList )
+			{
+				foreach( $a as $v )
+				{
+					$result[] = json_encode($v);
+				}
+				return '['.join( ',', $result ).']';
+			}
+			else
+			{
+				foreach( $a as $k => $v )
+				{
+					$result[] = json_encode($k).':'.json_encode($v);
+				}
+				return '{'.join( ',', $result ).'}';
+			}
+		}
+	}
+	$json_params = json_encode( $params );
+	$ajax_loader = "<p class='ajax-loader'><img src='".$rsc_url."img/ajax-loader2.gif' /><br />".T_( 'Form is loading...' )."</p>";
+	?>
+	<script type="text/javascript">
+		// display loader gif until the ajax call returns
+		document.write( <?php echo '"'.$ajax_loader.'"'; ?> );
+
+		function get_form()
+		{
+			$.ajax({
+				url: '<?php echo $htsrv_url; ?>anon_async.php',
+				type: 'POST',
+				data: <?php echo $json_params; ?>,
+				success: function(result)
+					{
+						$('.section_requires_javascript').html(result);
+					}
+			});
+		}
+
+		// get the form
+		get_form();
+	</script>
+	<noscript>
+		<?php echo '<p>'.T_( 'This section can only be displayed by javascript enabled browsers.' ).'</p>'; ?>
+	</noscript>
+	<?php
+	echo '</div>';
+}
+
 
 /*
  * $Log$
+ * Revision 1.84  2011/06/29 13:14:01  efy-asimo
+ * Use ajax to display comment and contact forms
+ *
  * Revision 1.83  2011/06/26 17:01:14  sam2kb
  * Send header_nocache if we have any messages to display
  *

@@ -139,6 +139,7 @@ class CollectionSettings extends AbstractSettings
 			'enable_sitemaps' => 1,
 
 		// General settings:
+			'ajax_form_enabled' => 0,
 			'cache_enabled' => 0,
 			'cache_enabled_widgets' => 0,
 			'in_skin_login' => 0,							// Use in skin login form every time it's possible
@@ -189,6 +190,9 @@ class CollectionSettings extends AbstractSettings
 
 /*
  * $Log$
+ * Revision 1.59  2011/06/29 13:14:01  efy-asimo
+ * Use ajax to display comment and contact forms
+ *
  * Revision 1.58  2011/05/25 14:59:33  efy-asimo
  * Post attending
  *
