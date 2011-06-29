@@ -153,6 +153,8 @@ $user_agents = array(
 	array('robot', 'GarlikCrawler/', 'Garlik' ),
 	array('robot', 'Yeti/', 'Naver' ),
 	array('robot', 'TurnitinBot/', 'Turnitin' ),
+	array('robot', 'NerdByNature.Bot', 'NerdByNature' ),
+	array('robot', 'SeznamBot/', 'SeznamBot' ),
 	// Unknown robots:
 	array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:
