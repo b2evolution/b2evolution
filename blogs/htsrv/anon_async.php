@@ -56,8 +56,19 @@ switch( $action )
 		$BlogCache = & get_BlogCache();
 		$Blog = $BlogCache->get_by_ID( $blog_ID );
 		$disp = param( 'disp', 'string', '' );
+		$skin = '';
+		if( !empty( $Blog->skin_ID ) )
+		{ // check if Blog skin has specific comment form
+			$SkinCache = & get_SkinCache();
+			$Skin = & $SkinCache->get_by_ID( $Blog->skin_ID );
+			$skin = $Skin->folder.'/';
+			if( ! file_exists( $skins_path.$skin.'_item_comment_form.inc.php' ) )
+			{
+				$skin = '';
+			}
+		}
 
-		require $skins_path.'_item_comment_form.inc.php';
+		require $skins_path.$skin.'_item_comment_form.inc.php';
 		break;
 
 	case 'get_msg_form':
@@ -82,6 +93,9 @@ exit();
 
 /*
  * $Log$
+ * Revision 1.2  2011/07/01 12:18:44  efy-asimo
+ * Use ajax to display comment and contact forms - fix basic and glossyblue skins
+ *
  * Revision 1.1  2011/06/29 13:14:01  efy-asimo
  * Use ajax to display comment and contact forms
  *
